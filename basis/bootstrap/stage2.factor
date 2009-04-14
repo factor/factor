@@ -30,7 +30,7 @@ SYMBOL: bootstrap-time
     [ "bootstrap." prepend require ] each ;
 
 : count-words ( pred -- )
-    all-words swap count number>string write ;
+    all-words swap count number>string write ; inline
 
 : print-time ( ms -- )
     1000 /i
@@ -45,10 +45,17 @@ SYMBOL: bootstrap-time
     [ optimized>> ] count-words " compiled words" print
     [ symbol? ] count-words " symbol words" print
     [ ] count-words " words total" print
-
+    
     "Bootstrapping is complete." print
     "Now, you can run Factor:" print
     vm write " -i=" write "output-image" get print flush ;
+
+: save/restore-error ( quot -- )
+    error get-global
+    error-continuation get-global
+    [ call ] 2dip
+    error-continuation set-global
+    error set-global ; inline
 
 [
     ! We time bootstrap
@@ -104,6 +111,7 @@ SYMBOL: bootstrap-time
     drop
     [
         load-help? off
-        "vocab:bootstrap/bootstrap-error.factor" run-file
+        [ "vocab:bootstrap/bootstrap-error.factor" parse-file ] save/restore-error
+        call
     ] with-scope
 ] recover

@@ -165,7 +165,7 @@ M: irc-chat to-chat in-messages>> mailbox-put ;
     " hostname servername :irc.factor" irc-print ;
 
 : /CONNECT ( server port -- stream )
-    irc> connect>> call drop ;
+    irc> connect>> call drop ; inline
 
 : /JOIN ( channel password -- )
     "JOIN " irc-write

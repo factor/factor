@@ -1,16 +1,16 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings arrays assocs ui
-ui.private ui.gadgets ui.gadgets.private ui.backend
-ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
-kernel math math.vectors namespaces make sequences strings
-vectors words windows.kernel32 windows.gdi32 windows.user32
-windows.opengl32 windows.messages windows.types windows.nt
-windows threads libc combinators fry combinators.short-circuit
-continuations command-line shuffle opengl ui.render ascii
-math.bitwise locals accessors math.rectangles math.order ascii
-calendar io.encodings.utf16n ;
+USING: alien alien.c-types alien.strings arrays assocs ui ui.private
+ui.gadgets ui.gadgets.private ui.backend ui.clipboards
+ui.gadgets.worlds ui.gestures ui.event-loop io kernel math
+math.vectors namespaces make sequences strings vectors words
+windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
+windows.messages windows.types windows.offscreen windows.nt windows
+threads libc combinators fry combinators.short-circuit continuations
+command-line shuffle opengl ui.render ascii math.bitwise locals
+accessors math.rectangles math.order ascii calendar
+io.encodings.utf16n ;
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
@@ -354,7 +354,7 @@ H{ } clone wm-handlers set-global
 
 : add-wm-handler ( quot wm -- )
     dup array?
-    [ [ execute add-wm-handler ] with each ]
+    [ [ execute( -- wm ) add-wm-handler ] with each ]
     [ wm-handlers get-global set-at ] if ;
 
 [ handle-wm-close 0                  ] WM_CLOSE add-wm-handler
@@ -433,12 +433,7 @@ M: windows-ui-backend do-events
     style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( world -- RECT )
-    [ window-loc>> dup ] [ dim>> ] bi v+
-    "RECT" <c-object>
-    over first over set-RECT-right
-    swap second over set-RECT-bottom
-    over first over set-RECT-left
-    swap second over set-RECT-top ;
+    [ window-loc>> ] [ dim>> ] bi <RECT> ;
 
 : default-position-RECT ( RECT -- )
     dup get-RECT-dimensions [ 2drop ] 2dip
@@ -501,34 +496,11 @@ M: windows-ui-backend (open-window) ( world -- )
     hWnd>> show-window ;
 
 M: win-base select-gl-context ( handle -- )
-    [ hDC>> ] keep hRC>> wglMakeCurrent win32-error=0/f
+    [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f
     GdiFlush drop ;
 
 M: win-base flush-gl-context ( handle -- )
     hDC>> SwapBuffers win32-error=0/f ;
-
-: (bitmap-info) ( dim -- BITMAPINFO )
-    "BITMAPINFO" <c-object> [
-        BITMAPINFO-bmiHeader {
-            [ nip "BITMAPINFOHEADER" heap-size swap set-BITMAPINFOHEADER-biSize ]
-            [ [ first ] dip set-BITMAPINFOHEADER-biWidth ]
-            [ [ second ] dip set-BITMAPINFOHEADER-biHeight ]
-            [ nip 1 swap set-BITMAPINFOHEADER-biPlanes ]
-            [ nip 32 swap set-BITMAPINFOHEADER-biBitCount ]
-            [ nip BI_RGB swap set-BITMAPINFOHEADER-biCompression ]
-            [ [ first2 * 4 * ] dip set-BITMAPINFOHEADER-biSizeImage ]
-            [ nip 72 swap set-BITMAPINFOHEADER-biXPelsPerMeter ]
-            [ nip 72 swap set-BITMAPINFOHEADER-biYPelsPerMeter ]
-            [ nip 0 swap set-BITMAPINFOHEADER-biClrUsed ]
-            [ nip 0 swap set-BITMAPINFOHEADER-biClrImportant ]
-        } 2cleave
-    ] keep ;
-
-: make-offscreen-dc-and-bitmap ( dim -- hDC hBitmap bits )
-    f CreateCompatibleDC
-    dup rot (bitmap-info) DIB_RGB_COLORS f <void*>
-    [ f 0 CreateDIBSection ] keep *void*
-    [ 2dup SelectObject drop ] dip ;
 
 : setup-offscreen-gl ( dim -- hDC hRC hBitmap bits )
     make-offscreen-dc-and-bitmap [
@@ -548,13 +520,12 @@ M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
 ! each pixel; it's left as zero
 
 : (make-opaque) ( byte-array -- byte-array' )
-    [ length 4 / ]
+    [ length 4 /i ]
     [ '[ 255 swap 4 * 3 + _ set-nth ] each ]
     [ ] tri ;
 
 : (opaque-pixels) ( world -- pixels )
-    [ handle>> bits>> ] [ dim>> first2 * 4 * ] bi
-    memory>byte-array (make-opaque) ;
+    [ handle>> bits>> ] [ dim>> ] bi bitmap>byte-array (make-opaque) ;
 
 M: windows-ui-backend offscreen-pixels ( world -- alien w h )
     [ (opaque-pixels) ] [ dim>> first2 ] bi ;

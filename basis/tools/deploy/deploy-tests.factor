@@ -1,10 +1,9 @@
 IN: tools.deploy.tests
 USING: tools.test system io.pathnames io.files io.files.info
-io.files.temp kernel tools.deploy.config
-tools.deploy.config.editor tools.deploy.backend math sequences
-io.launcher arrays namespaces continuations layouts accessors
-io.encodings.ascii urls math.parser io.directories
-tools.deploy.test ;
+io.files.temp kernel tools.deploy.config tools.deploy.config.editor
+tools.deploy.backend math sequences io.launcher arrays namespaces
+continuations layouts accessors io.encodings.ascii urls math.parser
+io.directories tools.deploy.test ;
 
 [ t ] [ "hello-world" shake-and-bake 500000 small-enough? ] unit-test
 
@@ -26,6 +25,8 @@ tools.deploy.test ;
 os macosx? [
     [ t ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
 ] when
+
+[ t ] [ "benchmark.regex-dna" shake-and-bake 900000 small-enough? ] unit-test
 
 {
     "tools.deploy.test.1"
@@ -80,32 +81,17 @@ M: quit-responder call-responder*
 
 [ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
 
-[ ] [
-    "tools.deploy.test.6" shake-and-bake
-    run-temp-image
-] unit-test
-
-[ ] [
-    "tools.deploy.test.7" shake-and-bake
-    run-temp-image
-] unit-test
-
-[ ] [
-    "tools.deploy.test.8" shake-and-bake
-    run-temp-image
-] unit-test
-
-[ ] [
-    "tools.deploy.test.9" shake-and-bake
-    run-temp-image
-] unit-test
-
-[ ] [
-    "tools.deploy.test.10" shake-and-bake
-    run-temp-image
-] unit-test
-
-[ ] [
-    "tools.deploy.test.11" shake-and-bake
-    run-temp-image
-] unit-test
+{
+    "tools.deploy.test.6"
+    "tools.deploy.test.7"
+    "tools.deploy.test.8"
+    "tools.deploy.test.9"
+    "tools.deploy.test.10"
+    "tools.deploy.test.11"
+    "tools.deploy.test.12"
+} [
+    [ ] swap [
+        shake-and-bake
+        run-temp-image
+    ] curry unit-test
+] each

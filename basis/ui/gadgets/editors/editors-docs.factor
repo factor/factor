@@ -1,6 +1,6 @@
 USING: documents help.markup help.syntax ui.gadgets
 ui.gadgets.scrollers models strings ui.commands
-ui.text colors fonts ;
+ui.text colors fonts help.tips ;
 IN: ui.gadgets.editors
 
 HELP: editor
@@ -108,5 +108,9 @@ ARTICLE: "ui.gadgets.editors" "Editor gadgets"
 { $subsection <action-field> }
 "Editors edit " { $emphasis "documents" } ":"
 { $subsection "documents" } ;
+
+TIP: "Editor gadgets support undo and redo; press " { $command editor "editing" com-undo } " and " { $command editor "editing" com-redo } "." ;
+
+TIP: "Learn the keyboard shortcuts used in " { $link "ui.gadgets.editors" } "." ;
 
 ABOUT: "ui.gadgets.editors"

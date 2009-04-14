@@ -17,7 +17,6 @@ colors
 colors.constants
 prettyprint
 vars
-call
 quotations
 io
 io.directories
@@ -37,6 +36,7 @@ ui.gadgets.panes
        ui.gadgets.buttons
        ui.gadgets.packs
        ui.gadgets.grids
+       ui.gadgets.corners
        ui.gestures
        ui.gadgets.scrollers
 splitting
@@ -172,7 +172,7 @@ VAR: present-space
         swap call space-ensure-solids 
     >present-space 
     update-model-projections 
-    update-observer-projections ;
+    update-observer-projections ; inline
 
 : rotation-4D ( m -- ) 
     '[ _ [ [ middle-of-space dup vneg ] keep 
@@ -186,8 +186,6 @@ VAR: present-space
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! menu
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USE: ui.gadgets.labeled.private
 
 : menu-rotations-4D ( -- gadget )
     3 3 <frame>

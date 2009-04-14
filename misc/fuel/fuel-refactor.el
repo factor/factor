@@ -36,7 +36,7 @@
       (let ((name (match-string-no-properties 2))
             (body (match-string-no-properties 4))
             (end (match-end 0)))
-        (list (split-string body nil t) name pos end)))))
+        (list (split-string (or body "") nil t) name pos end)))))
 
 (defun fuel-refactor--find (code to)
   (let ((candidate) (result))
@@ -88,7 +88,7 @@
 (defun fuel-refactor--insert-word (word stack-effect code)
   (let ((start (goto-char (fuel-refactor--insertion-point))))
     (open-line 1)
-    (insert ": " word " " stack-effect "\n" code " ;\n")
+    (insert ": " word " " stack-effect "\n" (or code " ") " ;\n")
     (indent-region start (point))
     (move-overlay fuel-stack--overlay start (point))))
 
@@ -103,39 +103,46 @@
     (delete-overlay fuel-stack--overlay)))
 
 (defun fuel-refactor--extract (begin end)
-  (unless (< begin end) (error "No proper region to extract"))
-  (let* ((code (buffer-substring begin end))
-         (existing (fuel-refactor--reuse-existing code))
-         (code-str (or existing (fuel--region-to-string begin end)))
+  (let* ((rp (< begin end))
+         (code (and rp (buffer-substring begin end)))
+         (existing (and code (fuel-refactor--reuse-existing code)))
+         (code-str (and code (or existing (fuel--region-to-string begin end))))
          (word (or (car existing) (read-string "New word name: ")))
          (stack-effect (or existing
-                           (fuel-stack--infer-effect code-str)
+                           (and code-str (fuel-stack--infer-effect code-str))
                            (read-string "Stack effect: "))))
-    (goto-char begin)
-    (delete-region begin end)
-    (insert word)
-    (indent-region begin (point))
+    (when rp
+      (goto-char begin)
+      (delete-region begin end)
+      (insert word)
+      (indent-region begin (point)))
     (save-excursion
       (let ((start (or (cadr existing) (point))))
         (unless existing
           (fuel-refactor--insert-word word stack-effect code))
-        (fuel-refactor--extract-other start
-                                      (or (car (cddr existing)) (point))
-                                      code)))))
+        (if rp
+            (fuel-refactor--extract-other start
+                                          (or (car (cddr existing)) (point))
+                                          code)
+          (unwind-protect
+              (sit-for fuel-stack-highlight-period)
+            (delete-overlay fuel-stack--overlay)))))))
 
 (defun fuel-refactor-extract-region (begin end)
   "Extracts current region as a separate word."
   (interactive "r")
-  (let ((begin (save-excursion
-                 (goto-char begin)
-                 (when (zerop (skip-syntax-backward "w"))
-                   (skip-syntax-forward "-"))
-                 (point)))
-        (end (save-excursion
-               (goto-char end)
-               (skip-syntax-forward "w")
-               (point))))
-    (fuel-refactor--extract begin end)))
+  (if (= begin end)
+      (fuel-refactor--extract begin end)
+    (let ((begin (save-excursion
+                   (goto-char begin)
+                   (when (zerop (skip-syntax-backward "w"))
+                     (skip-syntax-forward "-"))
+                   (point)))
+          (end (save-excursion
+                 (goto-char end)
+                 (skip-syntax-forward "w")
+                 (point))))
+      (fuel-refactor--extract begin end))))
 
 (defun fuel-refactor-extract-sexp ()
   "Extracts current innermost sexp (up to point) as a separate

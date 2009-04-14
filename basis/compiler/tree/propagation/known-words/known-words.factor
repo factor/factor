@@ -312,7 +312,7 @@ generic-comparison-ops [
 \ clone [
     in-d>> first value-info literal>> {
         { V{ } [ [ drop { } 0 vector boa ] ] }
-        { H{ } [ [ drop hashtable new ] ] }
+        { H{ } [ [ drop 0 <hashtable> ] ] }
         [ drop f ]
     } case
 ] "custom-inlining" set-word-prop

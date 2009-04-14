@@ -1,43 +1,46 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private namespaces make io io.encodings
 sequences math generic threads.private classes io.backend
-io.files continuations destructors byte-arrays accessors ;
+io.files continuations destructors byte-arrays accessors
+combinators ;
 IN: io.streams.c
 
-TUPLE: c-writer handle disposed ;
+TUPLE: c-stream handle disposed ;
+
+M: c-stream dispose* handle>> fclose ;
+
+M: c-stream stream-seek
+    handle>> swap {
+        { seek-absolute [ 0 ] }
+        { seek-relative [ 1 ] }
+        { seek-end [ 2 ] }
+        [ bad-seek-type ]
+    } case fseek ;
+
+TUPLE: c-writer < c-stream ;
 
 : <c-writer> ( handle -- stream ) f c-writer boa ;
 
-M: c-writer stream-write1
-    dup check-disposed
-    handle>> fputc ;
+M: c-writer stream-element-type drop +byte+ ;
 
-M: c-writer stream-write
-    dup check-disposed
-    handle>> fwrite ;
+M: c-writer stream-write1 dup check-disposed handle>> fputc ;
 
-M: c-writer stream-flush
-    dup check-disposed
-    handle>> fflush ;
+M: c-writer stream-write dup check-disposed handle>> fwrite ;
 
-M: c-writer dispose*
-    handle>> fclose ;
+M: c-writer stream-flush dup check-disposed handle>> fflush ;
 
-TUPLE: c-reader handle disposed ;
+TUPLE: c-reader < c-stream ;
 
 : <c-reader> ( handle -- stream ) f c-reader boa ;
 
-M: c-reader stream-read
-    dup check-disposed
-    handle>> fread ;
+M: c-reader stream-element-type drop +byte+ ;
 
-M: c-reader stream-read-partial
-    stream-read ;
+M: c-reader stream-read dup check-disposed handle>> fread ;
 
-M: c-reader stream-read1
-    dup check-disposed
-    handle>> fgetc ;
+M: c-reader stream-read-partial stream-read ;
+
+M: c-reader stream-read1 dup check-disposed handle>> fgetc ;
 
 : read-until-loop ( stream delim -- ch )
     over stream-read1 dup [
@@ -50,9 +53,6 @@ M: c-reader stream-read-until
     dup check-disposed
     [ swap read-until-loop ] B{ } make swap
     over empty? over not and [ 2drop f f ] when ;
-
-M: c-reader dispose*
-    handle>> fclose ;
 
 M: c-io-backend init-io ;
 

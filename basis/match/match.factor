@@ -16,8 +16,8 @@ SYMBOL: _
 : define-match-vars ( seq -- )
     [ define-match-var ] each ;
 
-: MATCH-VARS: ! vars ...
-    ";" parse-tokens define-match-vars ; parsing
+SYNTAX: MATCH-VARS: ! vars ...
+    ";" parse-tokens define-match-vars ;
 
 : match-var? ( symbol -- bool )
     dup word? [ "match-var" word-prop ] [ drop f ] if ;

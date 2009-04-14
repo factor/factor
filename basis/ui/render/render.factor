@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.rectangles math.vectors namespaces kernel accessors
-combinators sequences opengl opengl.gl opengl.glu colors
+assocs combinators sequences opengl opengl.gl colors
 colors.constants ui.gadgets ui.pens ;
 IN: ui.render
 
@@ -22,7 +22,7 @@ SYMBOL: viewport-translation
         dim>>
         [ { 0 1 } v* viewport-translation set ]
         [ [ { 0 0 } ] dip gl-viewport ]
-        [ [ 0 ] dip first2 0 gluOrtho2D ] tri
+        [ [ 0 ] dip first2 0 1 -1 glOrtho ] tri
     ]
     [ clip set ] bi
     do-clip ;
@@ -38,7 +38,7 @@ SYMBOL: viewport-translation
     ! white gl-clear is broken w.r.t window resizing
     ! Linux/PPC Radeon 9200
     COLOR: white gl-color
-    clip get dim>> gl-fill-rect ;
+    { 0 0 } clip get dim>> gl-fill-rect ;
 
 GENERIC: draw-gadget* ( gadget -- )
 
@@ -55,21 +55,57 @@ SYMBOL: origin
 
 GENERIC: draw-children ( gadget -- )
 
+! For gadget selection
+SYMBOL: selected-gadgets
+
+SYMBOL: selection-background
+
+GENERIC: selected-children ( gadget -- assoc/f selection-background )
+
+M: gadget selected-children drop f f ;
+
+! For text rendering
+SYMBOL: background
+
+SYMBOL: foreground
+
+GENERIC: gadget-background ( gadget -- color )
+
+M: gadget gadget-background dup interior>> pen-background ;
+
+GENERIC: gadget-foreground ( gadget -- color )
+
+M: gadget gadget-foreground dup interior>> pen-foreground ;
+
+<PRIVATE
+
+: draw-selection-background ( gadget -- )
+    selection-background get background set
+    selection-background get gl-color
+    [ { 0 0 } ] dip dim>> gl-fill-rect ;
+
+: draw-standard-background ( object -- )
+    dup interior>> dup [ draw-interior ] [ 2drop ] if ;
+
+: draw-background ( gadget -- )
+    origin get [
+        [
+            dup selected-gadgets get key?
+            [ draw-selection-background ]
+            [ draw-standard-background ] if
+        ] [ draw-gadget* ] bi
+    ] with-translation ;
+
+: draw-border ( object -- )
+    dup boundary>> dup [
+        origin get [ draw-boundary ] with-translation
+    ] [ 2drop ] if ;
+
+PRIVATE>
+
 : (draw-gadget) ( gadget -- )
     dup loc>> origin get v+ origin [
-        [
-            origin get [
-                [ dup interior>> dup [ draw-interior ] [ 2drop ] if ]
-                [ draw-gadget* ]
-                bi
-            ] with-translation
-        ]
-        [ draw-children ]
-        [
-            dup boundary>> dup [
-                origin get [ draw-boundary ] with-translation
-            ] [ 2drop ] if
-        ] tri
+        [ draw-background ] [ draw-children ] [ draw-border ] tri
     ] with-variable ;
 
 : >absolute ( rect -- rect )
@@ -88,28 +124,33 @@ GENERIC: draw-children ( gadget -- )
         [ [ (draw-gadget) ] with-clipping ]
     } cond ;
 
-! For text rendering
-SYMBOL: background
-
-SYMBOL: foreground
-
-GENERIC: gadget-background ( gadget -- color )
-
-M: gadget gadget-background dup interior>> pen-background ;
-
-GENERIC: gadget-foreground ( gadget -- color )
-
-M: gadget gadget-foreground dup interior>> pen-foreground ;
-
 M: gadget draw-children
-    [ visible-children ]
-    [ gadget-background ]
-    [ gadget-foreground ] tri [
-        [ foreground set ] when*
-        [ background set ] when*
-        [ draw-gadget ] each
-    ] with-scope ;
+    dup children>> [
+        {
+            [ visible-children ]
+            [ selected-children ]
+            [ gadget-background ]
+            [ gadget-foreground ]
+        } cleave [
+            
+            {
+                [ [ selected-gadgets set ] when* ]
+                [ [ selection-background set ] when* ]
+                [ [ background set ] when* ]
+                [ [ foreground set ] when* ]
+            } spread
+            [ draw-gadget ] each
+        ] with-scope
+    ] [ drop ] if ;
 
 CONSTANT: selection-color T{ rgba f 0.8 0.8 1.0 1.0 }
+
+CONSTANT: panel-background-color
+    T{ rgba f
+        0.7843137254901961
+        0.7686274509803922
+        0.7176470588235294
+        1.0
+    }
 
 CONSTANT: focus-border-color COLOR: dark-gray

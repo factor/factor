@@ -32,6 +32,8 @@ IN: opengl.capabilities
     (gl-version) drop ;
 : gl-vendor-version ( -- version )
     (gl-version) nip ;
+: gl-vendor ( -- name )
+    GL_VENDOR glGetString ;
 : has-gl-version? ( version -- ? )
     gl-version version-before? ;
 : (make-gl-version-error) ( required-version -- )

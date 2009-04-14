@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays kernel math namespaces
-opengl.gl sequences math.vectors ui images images.viewer
-models ui.gadgets.worlds ui.gadgets fry alien.syntax ;
+opengl.gl sequences math.vectors ui images images.normalization
+images.viewer models ui.gadgets.worlds ui.gadgets fry alien.syntax ;
 IN: cap
 
 : screenshot-array ( world -- byte-array )

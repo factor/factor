@@ -49,15 +49,15 @@ PRIVATE>
     in-advice? get [ "ad-do-it should only be called inside 'around' advice" throw ] unless coyield ;
     
 : make-advised ( word -- )
-    [ dup [ over dup '[ _ call-before _ _ call-around _ call-after ] ] annotate ]
+    [ dup '[ [ _ ] dip over dup '[ _ call-before _ _ call-around _ call-after ] ] annotate ]
     [ { before after around } [ <linked-hash> swap set-word-prop ] with each ] 
     [ t advised set-word-prop ] tri ;
 
 : unadvise ( word --  )
     [ reset ] [ { before after around advised } [ f swap set-word-prop ] with each ] bi ;
 
-: ADVISE: ! word adname location => word adname quot loc
-    scan-word scan scan-word parse-definition swap [ spin ] dip advise ; parsing
+SYNTAX: ADVISE: ! word adname location => word adname quot loc
+    scan-word scan scan-word parse-definition swap [ spin ] dip advise ;
     
-: UNADVISE:    
-    scan-word parsed \ unadvise parsed ; parsing
+SYNTAX: UNADVISE:    
+    scan-word parsed \ unadvise parsed ;

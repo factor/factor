@@ -307,7 +307,7 @@ HELP: find-last-integer
 { $notes "This word is used to implement " { $link find-last } "." } ;
 
 HELP: byte-array>bignum
-{ $values { "byte-array" byte-array } { "n" integer } }
+{ $values { "x" byte-array } { "y" bignum } }
 { $description "Converts a byte-array, interpreted as little-endian, into a bignum integer. User code should call " { $link le> } " or " { $link be> } " instead." } ;
 
 ARTICLE: "division-by-zero" "Division by zero"
@@ -355,8 +355,9 @@ ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 { $subsection 2/ }
 { $subsection 2^ }
 { $subsection bit? }
-"The " { $vocab-link "math.bitwise" } " vocabulary implements additional bitwise integer operations."
-{ $see-also "conditionals" } ;
+{ $subsection "math.bitwise" }
+{ $subsection "math.bits" }
+{ $see-also "booleans" } ;
 
 ARTICLE: "arithmetic" "Arithmetic"
 "Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact ratio. Floating point numbers are also supported, along with complex numbers."

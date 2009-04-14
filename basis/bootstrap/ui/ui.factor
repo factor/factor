@@ -10,12 +10,4 @@ IN: bootstrap.ui
             { [ os unix? ] [ "x11" ] }
         } cond
     ] unless* "ui.backend." prepend require
-
-    "ui-text-backend" get [
-        {
-            { [ os macosx? ] [ "core-text" ] }
-            { [ os windows? ] [ "pango" ] }
-            { [ os unix? ] [ "pango" ] }
-        } cond
-    ] unless* "ui.text." prepend require
 ] when

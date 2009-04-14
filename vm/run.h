@@ -236,6 +236,9 @@ void init_stacks(CELL ds_size, CELL rs_size);
 
 void primitive_datastack(void);
 void primitive_retainstack(void);
+void primitive_set_datastack(void);
+void primitive_set_retainstack(void);
+void primitive_check_datastack(void);
 void primitive_getenv(void);
 void primitive_setenv(void);
 void primitive_exit(void);

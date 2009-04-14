@@ -26,3 +26,8 @@ tools.test math kernel sequences ;
 [ fixnum-bitnot ] [ \ bitnot modular-variant ] unit-test
 [ fixnum+fast ] [ \ fixnum+ modular-variant ] unit-test
 [ fixnum+fast ] [ \ fixnum+fast modular-variant ] unit-test
+
+[ 3 ] [ 1 2 +-integer-integer ] unit-test
+[ 3 ] [ 1 >bignum 2 +-integer-integer ] unit-test
+[ 3 ] [ 1 2 >bignum +-integer-integer ] unit-test
+[ 3 ] [ 1 >bignum 2 >bignum +-integer-integer ] unit-test

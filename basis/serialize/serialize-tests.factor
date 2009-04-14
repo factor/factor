@@ -7,7 +7,7 @@ sequences math prettyprint parser classes math.constants
 io.encodings.binary random assocs serialize.private ;
 IN: serialize.tests
 
-: test-serialize-cell
+: test-serialize-cell ( a -- ? )
     2^ random dup
     binary [ serialize-cell ] with-byte-writer
     binary [ deserialize-cell ] with-byte-reader = ;
@@ -27,7 +27,7 @@ TUPLE: serialize-test a b ;
 
 C: <serialize-test> serialize-test
 
-: objects
+CONSTANT: objects
     {
         f
         t
@@ -52,7 +52,7 @@ C: <serialize-test> serialize-test
         << 1 [ 2 ] curry parsed >>
         { { "a" "bc" } { "de" "fg" } }
         H{ { "a" "bc" } { "de" "fg" } }
-    } ;
+    }
 
 : check-serialize-1 ( obj -- ? )
     "=====" print

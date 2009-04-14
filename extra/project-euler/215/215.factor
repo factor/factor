@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals math ;
+USING: accessors kernel locals math project-euler.common ;
 IN: project-euler.215
 
 ! http://projecteuler.net/index.php?section=problems&id=215
@@ -89,4 +89,4 @@ PRIVATE>
 ! [ euler215 ] 100 ave-time
 ! 208 ms ave run time - 9.06 SD (100 trials)
 
-MAIN: euler215
+SOLUTION: euler215

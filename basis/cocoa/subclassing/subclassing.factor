@@ -8,7 +8,7 @@ IN: cocoa.subclassing
 
 : init-method ( method -- sel imp types )
     first3 swap
-    [ sel_registerName ] [ execute ] [ utf8 string>alien ]
+    [ sel_registerName ] [ execute( -- xt ) ] [ utf8 string>alien ]
     tri* ;
 
 : throw-if-false ( obj what -- )
@@ -76,6 +76,6 @@ SYMBOL: +superclass+
         import-objc-class
     ] bind ;
 
-: CLASS:
+SYNTAX: CLASS:
     parse-definition unclip
-    >hashtable define-objc-class ; parsing
+    >hashtable define-objc-class ;

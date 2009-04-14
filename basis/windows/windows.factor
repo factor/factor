@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax alien.c-types alien.strings arrays
-combinators kernel math namespaces parser prettyprint sequences
+combinators kernel math namespaces parser sequences
 windows.errors windows.types windows.kernel32 words
 io.encodings.utf16n ;
 IN: windows

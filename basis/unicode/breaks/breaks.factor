@@ -2,9 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit unicode.categories kernel math
 combinators splitting sequences math.parser io.files io assocs
-arrays namespaces make math.ranges unicode.normalize.private values
-io.encodings.ascii unicode.syntax unicode.data compiler.units fry
-alien.syntax sets accessors interval-maps memoize locals words ;
+arrays namespaces make math.ranges unicode.normalize
+unicode.normalize.private values io.encodings.ascii
+unicode.data compiler.units fry unicode.categories.syntax
+alien.syntax sets accessors interval-maps memoize locals words
+simple-flat-file ;
 IN: unicode.breaks
 
 <PRIVATE
@@ -30,9 +32,9 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
         [ drop Control ]
     } case ;
 
-CATEGORY: (extend) Me Mn ;
-: extend? ( ch -- ? )
-    { [ (extend)? ] [ "Other_Grapheme_Extend" property? ] } 1|| ;
+CATEGORY: extend
+    Me Mn |
+    "Other_Grapheme_Extend" property? ;
 
 : loe? ( ch -- ? )
     "Logical_Order_Exception" property? ;
@@ -58,7 +60,7 @@ SYMBOL: table
 : finish-table ( -- table )
     table get [ [ 1 = ] map ] map ;
 
-: eval-seq ( seq -- seq ) [ dup word? [ execute ] when ] map ;
+: eval-seq ( seq -- seq ) [ ?execute ] map ;
 
 : (set-table) ( class1 class2 val -- )
     [ table get nth ] dip '[ _ or ] change-nth ;
@@ -99,6 +101,16 @@ PRIVATE>
     [ grapheme-class [ nip ] [ grapheme-break? ] 2bi ] find drop
     nip swap length or 1+ ;
 
+: first-grapheme-from ( start str -- i )
+    over tail-slice first-grapheme + ;
+
+: last-grapheme ( str -- i )
+    unclip-last-slice grapheme-class swap
+    [ grapheme-class dup rot grapheme-break? ] find-last drop ?1+ nip ;
+
+: last-grapheme-from ( end str -- i )
+    swap head-slice last-grapheme ;
+
 <PRIVATE
 
 : >pieces ( str quot: ( str -- i ) -- graphemes )
@@ -112,10 +124,6 @@ PRIVATE>
 : string-reverse ( str -- rts )
     >graphemes reverse concat ;
 
-: last-grapheme ( str -- i )
-    unclip-last-slice grapheme-class swap
-    [ grapheme-class dup rot grapheme-break? ] find-last drop ?1+ nip ;
-
 <PRIVATE
 
 graphemes init-table table
@@ -126,7 +134,7 @@ to: grapheme-table
 
 VALUE: word-break-table
 
-"vocab:unicode/data/WordBreakProperty.txt" load-script
+"vocab:unicode/data/WordBreakProperty.txt" load-interval-file
 to: word-break-table
 
 C-ENUM: wOther wCR wLF wNewline wExtend wFormat wKatakana wALetter wMidLetter

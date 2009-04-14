@@ -32,13 +32,6 @@ IN: project-euler.071
 ! repeatedly until the denominator is as close to 1000000 as possible without
 ! going over.
 
-<PRIVATE
-
-: penultimate ( seq -- elt )
-    dup length 2 - swap nth ;
-
-PRIVATE>
-
 : euler071 ( -- answer )
     2/5 [ dup denominator 1000000 <= ] [ 3/7 mediant dup ] produce
     nip penultimate numerator ;
@@ -46,4 +39,4 @@ PRIVATE>
 ! [ euler071 ] 100 ave-time
 ! 155 ms ave run time - 6.95 SD (100 trials)
 
-MAIN: euler071
+SOLUTION: euler071

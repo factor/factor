@@ -832,7 +832,7 @@ SYMBOLS:
     define-keyboard-format-constant
     define-hid-keyboard-format-constant ;
 
-: define-constants
+: define-constants ( -- )
     define-guid-constants
     define-format-constants ;
 

@@ -1,11 +1,11 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences vectors classes classes.algebra
 combinators arrays words assocs parser namespaces make
 definitions prettyprint prettyprint.backend prettyprint.custom
 quotations generalizations debugger io compiler.units
 kernel.private effects accessors hashtables sorting shuffle
-math.order sets see ;
+math.order sets see effects.parser ;
 IN: multi-methods
 
 ! PART I: Converting hook specializers
@@ -214,18 +214,16 @@ M: no-method error.
     [ "multi-method-specializer" word-prop ]
     [ "multi-method-generic" word-prop ] bi prefix ;
 
-: define-generic ( word -- )
-    dup "multi-methods" word-prop [
-        drop
-    ] [
+: define-generic ( word effect -- )
+    over set-stack-effect
+    dup "multi-methods" word-prop [ drop ] [
         [ H{ } clone "multi-methods" set-word-prop ]
         [ update-generic ]
         bi
     ] if ;
 
 ! Syntax
-: GENERIC:
-    CREATE define-generic ; parsing
+SYNTAX: GENERIC: CREATE-WORD complete-effect define-generic ;
 
 : parse-method ( -- quot classes generic )
     parse-definition [ 2 tail ] [ second ] [ first ] tri ;
@@ -238,13 +236,13 @@ M: no-method error.
 
 : (METHOD:) ( -- method def ) CREATE-METHOD parse-definition ;
 
-: METHOD: (METHOD:) define ; parsing
+SYNTAX: METHOD: (METHOD:) define ;
 
 ! For compatibility
-: M:
+SYNTAX: M:
     scan-word 1array scan-word create-method-in
     parse-definition
-    define ; parsing
+    define ;
 
 ! Definition protocol. We qualify core generics here
 QUALIFIED: syntax

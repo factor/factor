@@ -3,7 +3,7 @@
 USING: accessors arrays assocs calendar colors colors.constants
 documents documents.elements fry kernel words sets splitting math
 math.vectors models.delay models.arrow combinators.short-circuit
-parser present sequences tools.completion tools.vocabs.browser generic
+parser present sequences tools.completion help.vocabs generic
 generic.standard.engines.tuple fonts definitions.icons ui.images
 ui.commands ui.operations ui.gadgets ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.scrollers ui.gadgets.tables
@@ -141,6 +141,7 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
         t >>selection-required?
         t >>single-click?
         30 >>min-cols
+        10 >>min-rows
         10 >>max-rows
         dup '[ _ accept-completion ] >>action ;
 

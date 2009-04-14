@@ -39,7 +39,7 @@ M: V >pprint-sequence ;
 
 M: V pprint* pprint-object ;
 
-: V{ \ } [ >V ] parse-literal ; parsing
+SYNTAX: V{ \ } [ >V ] parse-literal ;
 
 INSTANCE: V growable
 

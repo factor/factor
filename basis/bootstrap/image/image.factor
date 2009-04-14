@@ -95,10 +95,10 @@ CONSTANT: -1-offset             9
 SYMBOL: sub-primitives
 
 : make-jit ( quot rc rt offset -- quad )
-    [ { } make ] 3dip 4array ; inline
+    [ [ call( -- ) ] { } make ] 3dip 4array ;
 
 : jit-define ( quot rc rt offset name -- )
-    [ make-jit ] dip set ; inline
+    [ make-jit ] dip set ;
 
 : define-sub-primitive ( quot rc rt offset word -- )
     [ make-jit ] dip sub-primitives get set-at ;
@@ -398,9 +398,14 @@ M: byte-array '
     ] emit-object ;
 
 ! Tuples
+ERROR: tuple-removed class ;
+
+: require-tuple-layout ( word -- layout )
+    dup tuple-layout [ ] [ tuple-removed ] ?if ;
+
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]
-    [ class transfer-word tuple-layout ] bi prefix [ ' ] map
+    [ class transfer-word require-tuple-layout ] bi prefix [ ' ] map
     tuple type-number dup [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
@@ -446,6 +451,8 @@ M: quotation '
         quotation type-number object tag-number [
             emit ! array
             f ' emit ! compiled
+            f ' emit ! cached-effect
+            f ' emit ! cache-counter
             0 emit ! xt
             0 emit ! code
         ] emit-object
@@ -515,7 +522,7 @@ M: quotation '
     20000 <hashtable> objects set
     emit-header t, 0, 1, -1,
     "Building generic words..." print flush
-    call-remake-generics-hook
+    remake-generics
     "Serializing words..." print flush
     emit-words
     "Serializing JIT data..." print flush

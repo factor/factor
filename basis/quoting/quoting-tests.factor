@@ -3,8 +3,9 @@
 USING: tools.test quoting ;
 IN: quoting.tests
 
-
-[ "abc" ] [ "'abc'" unquote ] unit-test
-[ "abc" ] [ "\"abc\"" unquote ] unit-test
-[ "'abc" ] [ "'abc" unquote ] unit-test
-[ "abc'" ] [ "abc'" unquote ] unit-test
+[ f ] [ "" quoted? ] unit-test
+[ t ] [ "''" quoted? ] unit-test
+[ t ] [ "\"\"" quoted? ] unit-test
+[ t ] [ "\"Circus Maximus\"" quoted? ] unit-test
+[ t ] [ "'Circus Maximus'" quoted? ] unit-test
+[ f ] [ "Circus Maximus" quoted? ] unit-test

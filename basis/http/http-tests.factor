@@ -1,8 +1,8 @@
-USING: http http.server http.client http.client.private tools.test multiline
-io.streams.string io.encodings.utf8 io.encodings.8-bit
-io.encodings.binary io.encodings.string kernel arrays splitting
-sequences assocs io.sockets db db.sqlite continuations urls
-hashtables accessors namespaces xml.data ;
+USING: http http.server http.client http.client.private tools.test
+multiline io.streams.string io.encodings.utf8 io.encodings.8-bit
+io.encodings.binary io.encodings.string io.encodings.ascii kernel
+arrays splitting sequences assocs io.sockets db db.sqlite
+continuations urls hashtables accessors namespaces xml.data ;
 IN: http.tests
 
 [ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test
@@ -13,7 +13,7 @@ IN: http.tests
 
 [ "application/octet-stream" binary ] [ "application/octet-stream" parse-content-type ] unit-test
 
-: lf>crlf "\n" split "\r\n" join ;
+: lf>crlf ( string -- string' ) "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
 POST /bar HTTP/1.1
@@ -180,14 +180,14 @@ accessors namespaces threads
 http.server.responses http.server.redirection furnace.redirection
 http.server.dispatchers db.tuples ;
 
-: add-quit-action
+: add-quit-action ( responder -- responder )
     <action>
         [ stop-this-server "Goodbye" "text/html" <content> ] >>display
     "quit" add-responder ;
 
-: test-db-file "test.db" temp-file ;
+: test-db-file ( -- path ) "test.db" temp-file ;
 
-: test-db test-db-file <sqlite-db> ;
+: test-db ( -- db ) test-db-file <sqlite-db> ;
 
 [ test-db-file delete-file ] ignore-errors
 
@@ -268,7 +268,7 @@ test-db [
     test-httpd
 ] unit-test
 
-: 404? [ download-failed? ] [ response>> code>> 404 = ] bi and ;
+: 404? ( response -- ? ) [ download-failed? ] [ response>> code>> 404 = ] bi and ;
 
 ! This should give a 404 not an infinite redirect loop
 [ "http://localhost/d/blah" add-port http-get nip ] [ 404? ] must-fail-with
@@ -359,4 +359,44 @@ SYMBOL: a
 ! Test basic auth
 [ "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" ] [ <request> "Aladdin" "open sesame" set-basic-auth "Authorization" header ] unit-test
 
+! Test a corner case with static responder
+[ ] [
+    <dispatcher>
+        add-quit-action
+        "vocab:http/test/foo.html" <static> >>default
+    test-httpd
+] unit-test
 
+[ t ] [
+    "http://localhost/" add-port http-get nip
+    "vocab:http/test/foo.html" ascii file-contents =
+] unit-test
+
+[ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
+
+! Check behavior of 307 redirect (reported by Chris Double)
+[ ] [
+    <dispatcher>
+        add-quit-action
+        <action>
+            [ "b" <temporary-redirect> ] >>submit
+        "a" add-responder
+        <action>
+            [
+                request get post-data>> data>> "data" =
+                [ "OK" "text/plain" <content> ] [ "OOPS" throw ] if
+            ] >>submit
+        "b" add-responder
+    test-httpd
+] unit-test
+
+[ "OK" ] [ "data" "http://localhost/a" add-port http-post nip ] unit-test
+
+! Check that download throws errors (reported by Chris Double)
+[
+    "resource:temp" [
+        "http://localhost/tweet_my_twat" add-port download
+    ] with-directory
+] must-fail
+
+[ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test

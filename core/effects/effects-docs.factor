@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math strings words kernel ;
+USING: help.markup help.syntax math strings words kernel combinators ;
 IN: effects
 
 ARTICLE: "effect-declaration" "Stack effect declaration"
@@ -29,14 +29,11 @@ $nl
 "The stack effect inferencer verifies stack effect comments to ensure the correct number of inputs and outputs is listed. Value names are ignored; only their number matters. An error is thrown if a word's declared stack effect does not match its inferred stack effect. See " { $link "inference" } "." ;
 
 ARTICLE: "effects" "Stack effects"
-"A " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that an operation takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output."
+"A " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that an operation takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output. Stack effects are first-class, and words for working with them are found in the " { $vocab-link "effects" } " vocabulary."
 $nl
-"Stack effects of words can be declared."
+"Stack effects of words must be declared, and the " { $link "compiler" } " checks that these declarations are correct. Invalid declarations are reported as " { $link "compiler-errors" } ". The " { $link "inference" } " tool can be used to check stack effects interactively."
 { $subsection "effect-declaration" }
-"Stack effects are first-class, and words for working with them are found in the " { $vocab-link "effects" } " vocabulary."
-{ $subsection effect }
-{ $subsection effect? }
-"There is a literal syntax for stack objects. It is most often used with " { $link define-declared } "."
+"There is a literal syntax for stack objects. It is most often used with " { $link define-declared } ", " { $link call-effect } " and " { $link execute-effect } "."
 { $subsection POSTPONE: (( }
 "Getting a word's declared stack effect:"
 { $subsection stack-effect }
@@ -45,7 +42,9 @@ $nl
 "Comparing effects:"
 { $subsection effect-height }
 { $subsection effect<= }
-{ $see-also "inference" } ;
+"The class of stack effects:"
+{ $subsection effect }
+{ $subsection effect? } ;
 
 ABOUT: "effects"
 

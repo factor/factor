@@ -1,6 +1,6 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: grouping kernel make math.order sequences ;
+USING: grouping kernel make math.order sequences project-euler.common ;
 IN: project-euler.011
 
 ! http://projecteuler.net/index.php?section=problems&id=11
@@ -101,4 +101,4 @@ PRIVATE>
 ! [ euler011 ] 100 ave-time
 ! 3 ms ave run time - 0.77 SD (100 trials)
 
-MAIN: euler011
+SOLUTION: euler011

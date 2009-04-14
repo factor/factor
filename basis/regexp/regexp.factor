@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel kernel.private math sequences
-sequences.private strings sets assocs prettyprint.backend
-prettyprint.custom make lexer namespaces parser arrays fry locals
-regexp.parser splitting sorting regexp.ast regexp.negation
-regexp.compiler words call call.private math.ranges ;
+sequences.private strings sets assocs make lexer namespaces parser
+arrays fry locals regexp.parser splitting sorting regexp.ast
+regexp.negation regexp.compiler compiler.units words math.ranges ;
 IN: regexp
 
 TUPLE: regexp
@@ -35,7 +34,7 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
 : match-index-from ( i string regexp -- index/f )
     ! This word is unsafe. It assumes that i is a fixnum
     ! and that string is a string.
-    dup dfa>> execute-unsafe( index string regexp -- i/f ) ;
+    dup dfa>> execute( index string regexp -- i/f ) ; inline
 
 GENERIC: end/start ( string regexp -- end start )
 M: regexp end/start drop length 0 ;
@@ -68,7 +67,7 @@ PRIVATE>
 
 : do-next-match ( i string regexp -- i start end ? )
     dup next-match>>
-    execute-unsafe( i string regexp -- i start end ? ) ; inline
+    execute( i string regexp -- i start end ? ) ; inline
 
 :: (each-match) ( i string regexp quot: ( start end string -- ) -- )
     i string regexp do-next-match [| i' start end |
@@ -129,31 +128,28 @@ PRIVATE>
 GENERIC: compile-regexp ( regex -- regexp )
 
 : regexp-initial-word ( i string regexp -- i/f )
-    compile-regexp match-index-from ;
+    [ compile-regexp ] with-compilation-unit match-index-from ;
 
-: do-compile-regexp ( regexp -- regexp )
+M: regexp compile-regexp ( regexp -- regexp )
     dup '[
         dup \ regexp-initial-word =
         [ drop _ get-ast ast>dfa dfa>word ] when
     ] change-dfa ;
 
-M: regexp compile-regexp ( regexp -- regexp )
-    do-compile-regexp ;
-
 M: reverse-regexp compile-regexp ( regexp -- regexp )
-    t backwards? [ do-compile-regexp ] with-variable ;
+    t backwards? [ call-next-method ] with-variable ;
 
 DEFER: compile-next-match
 
 : next-initial-word ( i string regexp -- i start end string )
-    compile-next-match do-next-match ;
+    [ compile-next-match ] with-compilation-unit do-next-match ;
 
 : compile-next-match ( regexp -- regexp )
     dup '[
         dup \ next-initial-word = [
             drop _ [ compile-regexp dfa>> def>> ] [ reverse-regexp? ] bi
             '[ { array-capacity string regexp } declare _ _ next-match ]
-            (( i string regexp -- i start end string )) simple-define-temp
+            (( i string regexp -- i start end string )) define-temp
         ] when
     ] change-next-match ;
 
@@ -208,23 +204,20 @@ PRIVATE>
 
 PRIVATE>
 
-: R! CHAR: ! parsing-regexp ; parsing
-: R" CHAR: " parsing-regexp ; parsing
-: R# CHAR: # parsing-regexp ; parsing
-: R' CHAR: ' parsing-regexp ; parsing
-: R( CHAR: ) parsing-regexp ; parsing
-: R/ CHAR: / parsing-regexp ; parsing
-: R@ CHAR: @ parsing-regexp ; parsing
-: R[ CHAR: ] parsing-regexp ; parsing
-: R` CHAR: ` parsing-regexp ; parsing
-: R{ CHAR: } parsing-regexp ; parsing
-: R| CHAR: | parsing-regexp ; parsing
+SYNTAX: R! CHAR: ! parsing-regexp ;
+SYNTAX: R" CHAR: " parsing-regexp ;
+SYNTAX: R# CHAR: # parsing-regexp ;
+SYNTAX: R' CHAR: ' parsing-regexp ;
+SYNTAX: R( CHAR: ) parsing-regexp ;
+SYNTAX: R/ CHAR: / parsing-regexp ;
+SYNTAX: R@ CHAR: @ parsing-regexp ;
+SYNTAX: R[ CHAR: ] parsing-regexp ;
+SYNTAX: R` CHAR: ` parsing-regexp ;
+SYNTAX: R{ CHAR: } parsing-regexp ;
+SYNTAX: R| CHAR: | parsing-regexp ;
 
-M: regexp pprint*
-    [
-        [
-            [ raw>> dup find-regexp-syntax swap % swap % % ]
-            [ options>> options>string % ] bi
-        ] "" make
-    ] keep present-text ;
+USING: vocabs vocabs.loader ;
 
+"prettyprint" vocab [
+    "regexp.prettyprint" require
+] when

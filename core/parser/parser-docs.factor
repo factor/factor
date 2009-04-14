@@ -54,8 +54,10 @@ $nl
 ARTICLE: "parsing-words" "Parsing words"
 "The Factor parser follows a simple recursive-descent design. The parser reads successive tokens from the input; if the token identifies a number or an ordinary word, it is added to an accumulator vector. Otherwise if the token identifies a parsing word, the parsing word is executed immediately."
 $nl
-"Parsing words are marked by suffixing the definition with a " { $link POSTPONE: parsing } " declaration. Here is the simplest possible parsing word; it prints a greeting at parse time:"
-{ $code ": hello \"Hello world\" print ; parsing" }
+"Parsing words are defined using the a defining word:"
+{ $subsection POSTPONE: SYNTAX: }
+"Parsing words have uppercase names by convention. Here is the simplest possible parsing word; it prints a greeting at parse time:"
+{ $code "SYNTAX: HELLO \"Hello world\" print ;" }
 "Parsing words must not pop or push items from the stack; however, they are permitted to access the accumulator vector supplied by the parser at the top of the stack. That is, parsing words must have stack effect " { $snippet "( accum -- accum )" } ", where " { $snippet "accum" } " is the accumulator vector supplied by the parser."
 $nl
 "Parsing words can read input, add word definitions to the dictionary, and do anything an ordinary word can."
@@ -90,9 +92,7 @@ ARTICLE: "parser" "The parser"
 "This parser is a general facility for reading textual representations of objects and definitions. The parser is implemented in the " { $vocab-link "parser" } " and " { $vocab-link "syntax" } " vocabularies."
 $nl
 "This section concerns itself with usage and extension of the parser. Standard syntax is described in " { $link "syntax" } "."
-{ $subsection "vocabulary-search" }
 { $subsection "parser-files" }
-{ $subsection "top-level-forms" }
 "The parser can be extended."
 { $subsection "parsing-words" }
 { $subsection "parser-lexer" }

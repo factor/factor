@@ -14,7 +14,7 @@ words splitting grouping sorting accessors ;
 [ t ] [
     symbolic-stack-trace
     [ word? ] filter
-    { baz bar foo throw } tail?
+    { baz bar foo } tail?
 ] unit-test
 
 : bleh ( seq -- seq' ) [ 3 + ] map [ 0 > ] filter ;

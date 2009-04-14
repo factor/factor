@@ -2,7 +2,7 @@ USING: tools.test tools.annotations tools.time math parser eval
 io.streams.string kernel strings ;
 IN: tools.annotations.tests
 
-: foo ;
+: foo ( -- ) ;
 \ foo watch
 
 [ ] [ foo ] unit-test
@@ -43,6 +43,6 @@ GENERIC: blah-generic ( a -- b )
 
 M: string blah-generic ;
 
-{ string blah-generic } watch
+[ ] [ M\ string blah-generic watch ] unit-test
 
 [ "hi" ] [ "hi" blah-generic ] unit-test

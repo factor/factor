@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions graphs assocs kernel
 kernel.private slots.private math namespaces sequences strings
@@ -10,9 +10,9 @@ IN: words
 
 : set-word ( word -- ) \ word set-global ;
 
-GENERIC: execute ( word -- )
-
 M: word execute (execute) ;
+
+M: word ?execute execute( -- value ) ;
 
 M: word <=>
     [ [ name>> ] [ vocabulary>> ] bi 2array ] compare ;
@@ -166,13 +166,14 @@ CONSTANT: reset-on-redefine { "inferred-effect" "cannot-infer" }
 : set-stack-effect ( effect word -- )
     2dup "declared-effect" word-prop = [ 2drop ] [
         swap
+        [ drop changed-effect ]
         [ "declared-effect" set-word-prop ]
-        [ drop dup primitive? [ dup redefined ] unless drop ] 2bi
+        [ drop dup primitive? [ drop ] [ redefined ] if ]
+        2tri
     ] if ;
 
 : define-declared ( word def effect -- )
-    pick swap "declared-effect" set-word-prop
-    define ;
+    [ nip swap set-stack-effect ] [ drop define ] 3bi ;
 
 : make-inline ( word -- )
     t "inline" set-word-prop ;
@@ -195,7 +196,7 @@ M: word reset-word
     {
         "unannotated-def" "parsing" "inline" "recursive"
         "foldable" "flushable" "reading" "writing" "reader"
-        "writer" "declared-effect" "delimiter"
+        "writer" "delimiter"
     } reset-props ;
 
 GENERIC: subwords ( word -- seq )
@@ -234,7 +235,10 @@ ERROR: bad-create name vocab ;
 
 PREDICATE: parsing-word < word "parsing" word-prop ;
 
-: make-parsing ( word -- ) t "parsing" set-word-prop ;
+M: parsing-word definer drop \ SYNTAX: \ ; ;
+
+: define-syntax ( word quot -- )
+    [ drop ] [ define ] 2bi t "parsing" set-word-prop ;
 
 : delimiter? ( obj -- ? )
     dup word? [ "delimiter" word-prop ] [ drop f ] if ;
@@ -248,7 +252,7 @@ M: word forget*
     dup "forgotten" word-prop [ drop ] [
         [ delete-xref ]
         [ [ name>> ] [ vocabulary>> vocab-words ] bi delete-at ]
-        [ [ reset-word ] [ t "forgotten" set-word-prop ] bi ]
+        [ t "forgotten" set-word-prop ]
         tri
     ] if ;
 
@@ -257,6 +261,6 @@ M: word hashcode*
 
 M: word literalize <wrapper> ;
 
-: ?word-name ( word -- name ) dup word? [ name>> ] when ;
-
 : xref-words ( -- ) all-words [ xref ] each ;
+
+INSTANCE: word definition

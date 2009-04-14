@@ -16,14 +16,9 @@ HELP: run-spider
      { "spider" spider } }
 { $description "Runs a spider until completion. See the " { $subsection "spider-tutorial" } " for a complete description of the tuple slots that affect how thet spider works." } ;
 
-HELP: slurp-heap-while
-{ $values
-     { "heap" "a heap" } { "quot1" quotation } { "quot2" quotation } }
-{ $description "Removes values from a heap that match the predicate quotation " { $snippet "quot1" } " and processes them with " { $snippet "quot2" } " until the predicate quotation no longer matches." } ;
-
 ARTICLE: "spider-tutorial" "Spider tutorial"
 "To create a new spider, call the " { $link <spider> } " word with a link to the site you wish to spider."
-{ $code <" "http://concatentative.org" <spider> "> }
+{ $code <" "http://concatenative.org" <spider> "> }
 "The max-depth is initialized to 0, which retrieves just the initial page. Let's initialize it to something more fun:"
 { $code <" 1 >>max-depth "> }
 "Now the spider will retrieve the first page and all the pages it links to in the same domain." $nl

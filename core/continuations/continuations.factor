@@ -1,8 +1,8 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
 namespaces make math splitting sorting quotations assocs
-combinators accessors ;
+combinators combinators.private accessors ;
 IN: continuations
 
 SYMBOL: error
@@ -73,7 +73,7 @@ C: <continuation> continuation
 
 <PRIVATE
 
-: (continue) ( continuation -- )
+: (continue) ( continuation -- * )
     >continuation<
     set-catchstack
     set-namestack
@@ -81,19 +81,18 @@ C: <continuation> continuation
     [ set-datastack ] dip
     set-callstack ;
 
-: (continue-with) ( obj continuation -- )
-    swap 4 setenv
-    >continuation<
-    set-catchstack
-    set-namestack
-    set-retainstack
-    [ set-datastack drop 4 getenv f 4 setenv f ] dip
-    set-callstack ;
-
 PRIVATE>
 
 : continue-with ( obj continuation -- * )
-    [ (continue-with) ] 2 (throw) ;
+    [
+        swap 4 setenv
+        >continuation<
+        set-catchstack
+        set-namestack
+        set-retainstack
+        [ set-datastack drop 4 getenv f 4 setenv f ] dip
+        set-callstack
+    ] (( obj continuation -- * )) call-effect-unsafe ;
 
 : continue ( continuation -- * )
     f swap continue-with ;
@@ -111,11 +110,8 @@ SYMBOL: return-continuation
         [
             [ [ { } like set-datastack ] dip call datastack ] dip
             continue-with
-        ] 3 (throw)
+        ] (( stack quot continuation -- * )) call-effect-unsafe
     ] callcc1 2nip ;
-
-: assert-depth ( quot -- )
-    { } swap with-datastack { } assert= ; inline
 
 GENERIC: compute-restarts ( error -- seq )
 
@@ -133,7 +129,7 @@ SYMBOL: thread-error-hook
     dup save-error
     catchstack* empty? [
         thread-error-hook get-global
-        [ 1 (throw) ] [ die ] if*
+        [ (( error -- * )) call-effect-unsafe ] [ die ] if*
     ] when
     c> continue-with ;
 

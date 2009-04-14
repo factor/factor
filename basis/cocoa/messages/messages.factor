@@ -5,7 +5,7 @@ continuations combinators compiler compiler.alien stack-checker kernel
 math namespaces make parser quotations sequences strings words
 cocoa.runtime io macros memoize io.encodings.utf8 effects libc
 libc.private parser lexer init core-foundation fry generalizations
-specialized-arrays.direct.alien call ;
+specialized-arrays.direct.alien ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -22,15 +22,13 @@ SYMBOL: super-message-senders
 message-senders [ H{ } clone ] initialize
 super-message-senders [ H{ } clone ] initialize
 
-: cache-stub ( method function hash -- )
-    [
-        over get [ 2drop ] [ over [ sender-stub ] dip set ] if
-    ] bind ;
+: cache-stub ( method assoc function -- )
+    '[ _ sender-stub ] cache drop ;
 
 : cache-stubs ( method -- )
-    dup
-    "objc_msgSendSuper" super-message-senders get cache-stub
-    "objc_msgSend" message-senders get cache-stub ;
+    [ super-message-senders get "objc_msgSendSuper" cache-stub ]
+    [ message-senders get "objc_msgSend" cache-stub ]
+    bi ;
 
 : <super> ( receiver -- super )
     "objc-super" <c-object> [

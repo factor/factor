@@ -8,7 +8,7 @@ IN: tetris.gl
 #! OpenGL rendering for tetris
 
 : draw-block ( block -- )
-    [ { 1 1 } gl-fill-rect ] with-translation ;
+    { 1 1 } gl-fill-rect ;
 
 : draw-piece-blocks ( piece -- )
     piece-blocks [ draw-block ] each ;
@@ -37,7 +37,7 @@ IN: tetris.gl
 
 : draw-tetris ( width height tetris -- )
     #! width and height are in pixels
-    GL_MODELVIEW [
+    [
         {
             [ board>> scale-board ]
             [ board>> draw-board ]

@@ -65,9 +65,8 @@ HELP: derive-url
 } ;
 
 HELP: ensure-port
-{ $values { "url" url } }
-{ $description "If the URL does not specify a port number, fill in the default for the URL's protocol. If the protocol is unknown, the port number is not changed." }
-{ $side-effects "url" }
+{ $values { "url" url } { "url'" url } }
+{ $description "If the URL does not specify a port number, create a new URL which is equal except the port number is set to the default for the URL's protocol. If the protocol is unknown, outputs an exact copy of the input URL." }
 { $examples
     { $example
         "USING: accessors prettyprint urls ;"
@@ -82,9 +81,9 @@ HELP: parse-host
 { $notes "This word is used by " { $link >url } ". It can also be used directly to parse " { $snippet "host:port" } " strings which are not full URLs." }
 { $examples
     { $example
-        "USING: prettyprint urls kernel ;"
-        "\"sbcl.org:80\" parse-host .s 2drop"
-        "\"sbcl.org\"\n80"
+        "USING: arrays kernel prettyprint urls ;"
+        "\"sbcl.org:80\" parse-host 2array ."
+        "{ \"sbcl.org\" 80 }"
     }
 } ;
 

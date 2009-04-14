@@ -224,6 +224,10 @@ M: x-clipboard paste-clipboard
     [ XA_NET_WM_NAME XA_UTF8_STRING 8 PropModeReplace ] dip
     utf8 encode dup length XChangeProperty drop ;
 
+: set-class ( dpy window -- )
+    XA_WM_CLASS XA_STRING 8 PropModeReplace "Factor"
+    utf8 encode dup length XChangeProperty drop ;
+
 M: x11-ui-backend set-title ( string world -- )
     handle>> window>> swap
     [ dpy get ] 2dip [ set-title-old ] [ set-title-new ] 3bi ;
@@ -242,11 +246,15 @@ M: x11-ui-backend set-fullscreen* ( ? world -- )
 
 M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
-    handle>> window>> dup set-closable map-window ;
+    handle>> window>>
+    [ set-closable ] [ dpy get swap set-class ] [ map-window ] tri ;
 
 M: x11-ui-backend raise-window* ( world -- )
     handle>> [
-        dpy get swap window>> XRaiseWindow drop
+        dpy get swap window>>
+        [ RevertToPointerRoot CurrentTime XSetInputFocus drop ]
+        [ XRaiseWindow drop ]
+        2bi
     ] when* ;
 
 M: x11-handle select-gl-context ( handle -- )

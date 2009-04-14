@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Matthew Willis.
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license
-USING: alien alien.syntax alien.destructors combinators system ;
+USING: alien alien.syntax alien.destructors combinators system
+alien.libraries ;
 IN: glib
 
 <<

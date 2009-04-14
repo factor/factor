@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel strings values io.files assocs
-splitting sequences io namespaces sets io.encodings.utf8 ;
+splitting sequences io namespaces sets
+io.encodings.ascii io.encodings.utf8 ;
 IN: io.encodings.iana
 
 <PRIVATE
@@ -10,15 +11,11 @@ SYMBOL: e>n-table
 SYMBOL: aliases
 PRIVATE>
 
-ERROR: missing-encoding name ;
-
 : name>encoding ( name -- encoding )
-    dup n>e-table get-global at [ ] [ missing-encoding ] ?if ;
-
-ERROR: missing-name encoding ;
+    n>e-table get-global at ;
 
 : encoding>name ( encoding -- name )
-    dup e>n-table get-global at [ ] [ missing-name ] ?if ;
+    e>n-table get-global at ;
 
 <PRIVATE
 : parse-iana ( file -- synonym-set )
@@ -56,3 +53,5 @@ e>n-table [ initial-e>n ] initialize
             [ n>e-table get-global set-at ] with each
         ] [ "Bad encoding registration" throw ] if*
     ] [ swap e>n-table get-global set-at ] 2bi ;
+
+ascii "ANSI_X3.4-1968" register-encoding

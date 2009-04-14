@@ -3,7 +3,7 @@ USING: ui.operations ui.commands prettyprint kernel namespaces
 tools.test ui.gadgets ui.gadgets.editors parser io
 io.streams.string math help help.markup accessors ;
 
-: my-pprint pprint ;
+: my-pprint ( obj -- ) pprint ;
 
 [ drop t ] \ my-pprint [ ] f operation boa "op" set
 

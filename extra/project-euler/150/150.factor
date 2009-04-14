@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hints kernel locals math math.order sequences sequences.private ;
+USING: hints kernel locals math math.order sequences sequences.private project-euler.common ;
 IN: project-euler.150
 
 ! http://projecteuler.net/index.php?section=problems&id=150
@@ -75,4 +75,4 @@ PRIVATE>
 ! [ euler150 ] 10 ave-time
 ! 30208 ms ave run time - 593.45 SD (10 trials)
 
-MAIN: euler150
+SOLUTION: euler150

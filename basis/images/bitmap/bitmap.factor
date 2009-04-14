@@ -3,16 +3,25 @@
 USING: accessors alien alien.c-types arrays byte-arrays columns
 combinators fry grouping io io.binary io.encodings.binary io.files
 kernel macros math math.bitwise math.functions namespaces sequences
-strings images endian summary ;
+strings images endian summary locals ;
 IN: images.bitmap
 
-TUPLE: bitmap-image < image
-magic size reserved offset header-length width
+: assert-sequence= ( a b -- )
+    2dup sequence= [ 2drop ] [ assert ] if ;
+
+: read2 ( -- n ) 2 read le> ;
+: read4 ( -- n ) 4 read le> ;
+: write2 ( n -- ) 2 >le write ;
+: write4 ( n -- ) 4 >le write ;
+
+TUPLE: bitmap-image < image ;
+
+! Used to construct the final bitmap-image
+
+TUPLE: loading-bitmap 
+size reserved offset header-length width
 height planes bit-count compression size-image
 x-pels y-pels color-used color-important rgb-quads color-index ;
-
-! Currently can only handle 24/32bit bitmaps.
-! Handles row-reversed bitmaps (their height is negative)
 
 ERROR: bitmap-magic magic ;
 
@@ -21,40 +30,34 @@ M: bitmap-magic summary
 
 <PRIVATE
 
-: array-copy ( bitmap array -- bitmap array' )
-    over size-image>> abs memory>byte-array ;
-
 : 8bit>buffer ( bitmap -- array )
     [ rgb-quads>> 4 <sliced-groups> [ 3 head-slice ] map ]
     [ color-index>> >array ] bi [ swap nth ] with map concat ;
 
 ERROR: bmp-not-supported n ;
 
-: raw-bitmap>buffer ( bitmap -- array )
+: reverse-lines ( byte-array width -- byte-array )
+    <sliced-groups> <reversed> concat ; inline
+
+: raw-bitmap>seq ( loading-bitmap -- array )
     dup bit-count>>
     {
         { 32 [ color-index>> ] }
-        { 24 [ color-index>> ] }
-        { 16 [ bmp-not-supported ] }
-        { 8 [ 8bit>buffer ] }
-        { 4 [ bmp-not-supported ] }
-        { 2 [ bmp-not-supported ] }
-        { 1 [ bmp-not-supported ] }
+        { 24 [ [ color-index>> ] [ width>> 3 * ] bi reverse-lines ] }
+        { 8 [ [ 8bit>buffer ] [ width>> 3 * ] bi reverse-lines ] }
+        [ bmp-not-supported ]
     } case >byte-array ;
 
-: read2 ( -- n ) 2 read le> ;
-: read4 ( -- n ) 4 read le> ;
-
-: parse-file-header ( bitmap -- bitmap )
-    2 read dup "BM" sequence= [ bitmap-magic ] unless >>magic
+: parse-file-header ( loading-bitmap -- loading-bitmap )
+    2 read "BM" assert-sequence=
     read4 >>size
     read4 >>reserved
     read4 >>offset ;
 
-: parse-bitmap-header ( bitmap -- bitmap )
+: parse-bitmap-header ( loading-bitmap -- loading-bitmap )
     read4 >>header-length
     read4 >>width
-    read4 >>height
+    read4 32 >signed >>height
     read2 >>planes
     read2 >>bit-count
     read4 >>compression
@@ -64,10 +67,10 @@ ERROR: bmp-not-supported n ;
     read4 >>color-used
     read4 >>color-important ;
 
-: rgb-quads-length ( bitmap -- n )
+: rgb-quads-length ( loading-bitmap -- n )
     [ offset>> 14 - ] [ header-length>> ] bi - ;
 
-: color-index-length ( bitmap -- n )
+: color-index-length ( loading-bitmap -- n )
     {
         [ width>> ]
         [ planes>> * ]
@@ -75,21 +78,39 @@ ERROR: bmp-not-supported n ;
         [ height>> abs * ]
     } cleave ;
 
-: parse-bitmap ( bitmap -- bitmap )
+: image-size ( loading-bitmap -- n )
+    [ [ width>> ] [ height>> ] bi * ] [ bit-count>> 8 /i ] bi * abs ;
+
+: bitmap-padding ( width -- n )
+    3 * 4 mod 4 swap - 4 mod ; inline
+
+:: fixup-color-index ( loading-bitmap -- loading-bitmap )
+    loading-bitmap width>> :> width
+    width 3 * :> width*3
+    loading-bitmap width>> bitmap-padding :> padding
+    loading-bitmap [ color-index>> length ] [ height>> abs ] bi /i :> stride
+    loading-bitmap
+    padding 0 > [
+        [
+            stride <sliced-groups>
+            [ width*3 head-slice ] map concat
+        ] change-color-index
+    ] when ;
+
+: parse-bitmap ( loading-bitmap -- loading-bitmap )
     dup rgb-quads-length read >>rgb-quads
-    dup color-index-length read >>color-index ;
+    dup color-index-length read >>color-index
+    fixup-color-index ;
 
-: load-bitmap-data ( path bitmap -- bitmap )
-    [ binary ] dip '[
-        _ parse-file-header parse-bitmap-header parse-bitmap
+: load-bitmap-data ( path -- loading-bitmap )
+    binary [
+        loading-bitmap new
+        parse-file-header parse-bitmap-header parse-bitmap
     ] with-file-reader ;
-
-: process-bitmap-data ( bitmap -- bitmap )
-    dup raw-bitmap>buffer >>bitmap ;
 
 ERROR: unknown-component-order bitmap ;
 
-: bitmap>component-order ( bitmap -- object )
+: bitmap>component-order ( loading-bitmap -- object )
     bit-count>> {
         { 32 [ BGRA ] }
         { 24 [ BGR ] }
@@ -97,61 +118,78 @@ ERROR: unknown-component-order bitmap ;
         [ unknown-component-order ]
     } case ;
 
-: fill-image-slots ( bitmap -- bitmap )
-    dup {
-        [ [ width>> ] [ height>> ] bi 2array >>dim ]
+: loading-bitmap>bitmap-image ( bitmap-image loading-bitmap -- bitmap-image )
+    {
+        [ raw-bitmap>seq >>bitmap ]
+        [ [ width>> ] [ height>> abs ] bi 2array >>dim ]
+        [ height>> 0 < [ t >>upside-down? ] when ]
         [ bitmap>component-order >>component-order ]
-        [ bitmap>> >>bitmap ]
     } cleave ;
 
-M: bitmap-image load-image* ( path bitmap -- bitmap )
-    load-bitmap-data process-bitmap-data
-    fill-image-slots ;
-
-MACRO: (nbits>bitmap) ( bits -- )
-    [ -3 shift ] keep '[
-        bitmap-image new
-            2over * _ * >>size-image
-            swap >>height
-            swap >>width
-            swap array-copy [ >>bitmap ] [ >>color-index ] bi
-            _ >>bit-count fill-image-slots
-            t >>upside-down?
-    ] ;
-
-: bgr>bitmap ( array height width -- bitmap )
-    24 (nbits>bitmap) ;
-
-: bgra>bitmap ( array height width -- bitmap )
-    32 (nbits>bitmap) ;
-
-: write2 ( n -- ) 2 >le write ;
-: write4 ( n -- ) 4 >le write ;
+M: bitmap-image load-image* ( path loading-bitmap -- bitmap )
+    swap load-bitmap-data loading-bitmap>bitmap-image ;
 
 PRIVATE>
 
-: save-bitmap ( bitmap path -- )
+: bitmap>color-index ( bitmap -- byte-array )
+    [
+        bitmap>>
+        4 <sliced-groups>
+        [ 3 head-slice <reversed> ] map
+        B{ } join
+    ] [
+        dim>> first dup bitmap-padding dup 0 > [
+            [ 3 * group ] dip '[ _ <byte-array> append ] map
+            B{ } join
+        ] [
+            2drop
+        ] if
+    ] bi ;
+
+: save-bitmap ( image path -- )
     binary [
         B{ CHAR: B CHAR: M } write
         [
-            color-index>> length 14 + 40 + write4
+            bitmap>color-index length 14 + 40 + write4
             0 write4
             54 write4
             40 write4
         ] [
             {
-                [ width>> write4 ]
-                [ height>> write4 ]
-                [ planes>> 1 or write2 ]
-                [ bit-count>> 24 or write2 ]
-                [ compression>> 0 or write4 ]
-                [ size-image>> write4 ]
-                [ x-pels>> 0 or write4 ]
-                [ y-pels>> 0 or write4 ]
-                [ color-used>> 0 or write4 ]
-                [ color-important>> 0 or write4 ]
-                [ rgb-quads>> write ]
-                [ color-index>> write ]
+                ! width height
+                [ dim>> first2 [ write4 ] bi@ ]
+
+                ! planes
+                [ drop 1 write2 ]
+
+                ! bit-count
+                [ drop 24 write2 ]
+
+                ! compression
+                [ drop 0 write4 ]
+
+                ! size-image
+                [ bitmap>color-index length write4 ]
+
+                ! x-pels
+                [ drop 0 write4 ]
+
+                ! y-pels
+                [ drop 0 write4 ]
+
+                ! color-used
+                [ drop 0 write4 ]
+
+                ! color-important
+                [ drop 0 write4 ]
+
+                ! rgb-quads
+                [
+                    [ bitmap>color-index ]
+                    [ dim>> first 3 * ]
+                    [ dim>> first bitmap-padding + ] tri
+                    reverse-lines write
+                ]
             } cleave
         ] bi
     ] with-file-writer ;

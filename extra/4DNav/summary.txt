@@ -1,1 +1,1 @@
-4DNav : simmple tool to navigate thru a 4D space view as projections on 4 3D spaces.
+Simple tool to navigate through a 4D space with projections on 4 3D spaces

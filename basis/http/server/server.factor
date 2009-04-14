@@ -45,10 +45,13 @@ ERROR: no-boundary ;
     ";" split1 nip
     "=" split1 nip [ no-boundary ] unless* ;
 
+SYMBOL: upload-limit
+
 : read-multipart-data ( request -- mime-parts )
     [ "content-type" header ]
     [ "content-length" header string>number ] bi
-    unlimit-input
+    unlimited-input
+    upload-limit get stream-throws limit-input
     stream-eofs limit-input
     binary decode-input
     parse-multipart-form-data parse-multipart ;
@@ -132,15 +135,15 @@ M: response write-full-response ( request response -- )
         [ content-charset>> encode-output ]
         [ write-response-body ]
         bi
-    ] unless ;
+    ] unless drop ;
 
 M: raw-response write-response ( respose -- )
     write-response-line
     write-response-body
     drop ;
 
-M: raw-response write-full-response ( response -- )
-    write-response ;
+M: raw-response write-full-response ( request response -- )
+    nip write-response ;
 
 : post-request? ( -- ? ) request get method>> "POST" = ;
 
@@ -182,7 +185,7 @@ main-responder [ <404> <trivial-responder> ] initialize
     swap development? get [ make-http-error >>body ] [ drop ] if ;
 
 : do-response ( response -- )
-    [ request get swap write-full-response ]
+    '[ request get _ write-full-response ]
     [
         [ \ do-response log-error ]
         [
@@ -252,10 +255,13 @@ LOG: httpd-benchmark DEBUG
 
 TUPLE: http-server < threaded-server ;
 
+SYMBOL: request-limit
+
+64 1024 * request-limit set-global
+
 M: http-server handle-client*
-    drop
-    [
-        64 1024 * stream-throws limit-input
+    drop [
+        request-limit get stream-throws limit-input
         ?refresh-all
         [ read-request ] ?benchmark
         [ do-request ] ?benchmark

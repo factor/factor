@@ -20,7 +20,7 @@
 								</t:a>
 							</h2>
 
-							<t:farkup t:name="parsed" t:parsed="true" />
+							<t:farkup t:name="content" />
 						</t:bind>
 					</div>
 				</td>
@@ -58,7 +58,7 @@
 			<tr>
 				<td colspan="2" class="footer">
 					<t:bind t:name="footer">
-						<t:farkup t:name="parsed" t:parsed="true" />
+						<t:farkup t:name="content" />
 					</t:bind>
 				</td>
 			</tr>

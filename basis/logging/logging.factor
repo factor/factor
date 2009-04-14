@@ -80,7 +80,7 @@ ERROR: bad-log-message-parameters msg word level ;
 PRIVATE>
 
 : (define-logging) ( word level quot -- )
-    [ dup ] 2dip 2curry annotate ;
+    [ dup ] 2dip 2curry annotate ; inline
 
 : call-logging-quot ( quot word level -- quot' )
     [ "called" ] 2dip [ log-message ] 3curry prepose ;
@@ -135,11 +135,11 @@ PRIVATE>
     [ [ input-logging-quot ] 2keep drop error-logging-quot ]
     (define-logging) ;
 
-: LOG:
+SYNTAX: LOG:
     #! Syntax: name level
     CREATE-WORD dup scan-word
     '[ 1array stack>message _ _ log-message ]
-    (( message -- )) define-declared ; parsing
+    (( message -- )) define-declared ;
 
 USE: vocabs.loader
 

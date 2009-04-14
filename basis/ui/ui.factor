@@ -1,11 +1,10 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces make dlists
-deques sequences threads sequences words continuations init call
-combinators hashtables concurrency.flags sets accessors calendar fry
-destructors ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gadgets.tracks ui.gestures ui.backend ui.render ui.text
-ui.text.private ;
+deques sequences threads sequences words continuations init
+combinators combinators.short-circuit hashtables concurrency.flags
+sets accessors calendar fry destructors ui.gadgets ui.gadgets.private
+ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend ui.render ;
 IN: ui
 
 <PRIVATE
@@ -63,7 +62,7 @@ M: world graft*
 : (ungraft-world) ( world -- )
     {
         [ handle>> select-gl-context ]
-        [ text-handle>> dispose ]
+        [ text-handle>> [ dispose ] when* ]
         [ images>> [ dispose ] when* ]
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
@@ -95,8 +94,7 @@ M: world ungraft*
 : restore-world ( world -- )
     {
         [ reset-world ]
-        [ init-text-rendering ]
-        [ f >>images drop ]
+        [ f >>text-handle f >>images drop ]
         [ restore-gadget ]
     } cleave ;
 
@@ -119,12 +117,10 @@ M: world ungraft*
     gesture-queue [ send-queued-gesture notify-queued ] slurp-deque ;
 
 : update-ui ( -- )
-    [
-        notify-queued
-        layout-queued
-        redraw-worlds
-        send-queued-gestures
-    ] [ ui-error ] recover ;
+    notify-queued
+    layout-queued
+    redraw-worlds
+    send-queued-gestures ;
 
 SYMBOL: ui-thread
 
@@ -135,8 +131,7 @@ SYMBOL: ui-thread
 PRIVATE>
 
 : find-window ( quot -- world )
-    windows get values
-    [ gadget-child swap call ] with find-last nip ; inline
+    [ windows get values ] dip '[ gadget-child @ ] find-last nip ; inline
 
 : ui-running? ( -- ? )
     \ ui-running get-global ;
@@ -144,16 +139,22 @@ PRIVATE>
 <PRIVATE
 
 : update-ui-loop ( -- )
-    [ ui-running? ui-thread get-global self eq? and ]
-    [ ui-notify-flag get lower-flag update-ui ]
-    while ;
+    #! Note the logic: if update-ui fails, we open an error window
+    #! and run one iteration of update-ui. If that also fails, well,
+    #! the whole UI subsystem is broken so we exit out of the
+    #! update-ui-loop.
+    [ { [ ui-running? ] [ ui-thread get-global self eq? ] } 0&& ]
+    [
+        ui-notify-flag get lower-flag
+        [ update-ui ] [ ui-error update-ui ] recover
+    ] while ;
 
 : start-ui-thread ( -- )
     [ self ui-thread set-global update-ui-loop ]
     "UI update" spawn drop ;
 
 : start-ui ( quot -- )
-    call notify-ui-thread start-ui-thread ;
+    call( -- ) notify-ui-thread start-ui-thread ;
 
 : restore-windows ( -- )
     [
@@ -193,6 +194,6 @@ M: object close-window
 ] "ui" add-init-hook
 
 : with-ui ( quot -- )
-    ui-running? [ call ] [ '[ init-ui @ ] (with-ui) ] if ;
+    ui-running? [ call( -- ) ] [ '[ init-ui @ ] (with-ui) ] if ;
 
 HOOK: beep ui-backend ( -- )

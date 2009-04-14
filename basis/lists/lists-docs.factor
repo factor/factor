@@ -21,7 +21,7 @@ ARTICLE: { "lists" "protocol" } "The list protocol"
 { $subsection cdr }
 { $subsection nil? } ;
 
-ARTICLE: { "lists" "strict" } "Strict lists"
+ARTICLE: { "lists" "strict" } "Constructing strict lists"
 "Strict lists are simply cons cells where the car and cdr have already been evaluated. These are the lists of Lisp. To construct a strict list, the following words are provided:"
 { $subsection cons }
 { $subsection swons }
@@ -82,10 +82,6 @@ HELP: nil?
 { $description "Return true if the cons object is the nil cons." } ;
 
 { nil nil? } related-words
-
-HELP: list? ( object -- ? )
-{ $values { "object" "an object" } { "?" "a boolean" } }
-{ $description "Returns true if the object conforms to the list protocol." } ;
 
 { 1list 2list 3list } related-words
 

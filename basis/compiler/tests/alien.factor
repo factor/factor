@@ -1,10 +1,27 @@
-IN: compiler.tests
 USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences stack-checker
 stack-checker.errors words arrays parser quotations
 continuations effects namespaces.private io io.streams.string
 memory system threads tools.test math accessors combinators
-specialized-arrays.float ;
+specialized-arrays.float alien.libraries io.pathnames
+io.backend ;
+IN: compiler.tests
+
+<<
+: libfactor-ffi-tests-path ( -- string )
+    "resource:" (normalize-path)
+    {
+        { [ os winnt? ]  [ "libfactor-ffi-test.dll" ] }
+        { [ os macosx? ] [ "libfactor-ffi-test.dylib" ] }
+        { [ os unix?  ]  [ "libfactor-ffi-test.so" ] }
+    } cond append-path ;
+
+"f-cdecl" libfactor-ffi-tests-path "cdecl" add-library
+
+"f-stdcall" libfactor-ffi-tests-path "stdcall" add-library
+>>
+
+LIBRARY: f-cdecl
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -107,9 +124,7 @@ unit-test
     "int" { "int" "int" "int" "int" } "stdcall" alien-indirect
     gc ;
 
-<< "f-stdcall" f "stdcall" add-library >>
-
-[ f ] [ "f-stdcall" load-library ] unit-test
+[ f ] [ "f-stdcall" load-library f = ] unit-test
 [ "stdcall" ] [ "f-stdcall" library abi>> ] unit-test
 
 : ffi_test_18 ( w x y z -- int )
@@ -149,7 +164,7 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 
 : ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
     "int"
-    f "ffi_test_31"
+    "f-cdecl" "ffi_test_31"
     { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
     alien-invoke gc 3 ;
 
@@ -157,7 +172,7 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 
 : ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
     "float"
-    f "ffi_test_31_point_5"
+    "f-cdecl" "ffi_test_31_point_5"
     { "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" }
     alien-invoke ;
 

@@ -1,6 +1,6 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.ranges sequences ;
+USING: kernel math math.ranges sequences project-euler.common ;
 IN: project-euler.006
 
 ! http://projecteuler.net/index.php?section=problems&id=6
@@ -40,4 +40,4 @@ PRIVATE>
 ! [ euler006 ] 100 ave-time
 ! 0 ms ave run time - 0.24 SD (100 trials)
 
-MAIN: euler006
+SOLUTION: euler006

@@ -48,7 +48,7 @@
     "B" "BIN:"
     "C:" "C-ENUM:" "C-STRUCT:" "C-UNION:" "CHAR:" "CONSTANT:" "call-next-method"
     "DEFER:"
-    "ERROR:" "EXCLUDE:"
+    "EBNF:" ";EBNF" "ERROR:" "EXCLUDE:"
     "f" "FORGET:" "FROM:" "FUNCTION:"
     "GENERIC#" "GENERIC:"
     "HELP:" "HEX:" "HOOK:"
@@ -106,9 +106,10 @@
   "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
 (defconst fuel-syntax--word-definition-regex
-  (fuel-syntax--second-word-regex
-   '(":" "::" "GENERIC:" "DEFER:" "HOOK:" "MAIN:" "MATH:" "POSTPONE:"
-     "SYMBOL:" "RENAME:")))
+  (format "\\_<\\(%s\\)?: +\\_<\\(\\w+\\)\\_>"
+          (regexp-opt
+           '(":" "GENERIC" "DEFER" "HOOK" "MAIN" "MATH" "POSTPONE"
+             "SYMBOL" "RENAME"))))
 
 (defconst fuel-syntax--alias-definition-regex
   "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
@@ -167,9 +168,6 @@
 
 (defconst fuel-syntax--indent-def-start-regex
   (format "^\\(%s:\\)\\( \\|\n\\)" (regexp-opt fuel-syntax--indent-def-starts)))
-
-(defconst fuel-syntax--no-indent-def-start-regex
-  (format "^\\(%s:\\) " (regexp-opt fuel-syntax--no-indent-def-starts)))
 
 (defconst fuel-syntax--definition-start-regex
   (format "^\\(%s:\\) " (regexp-opt (append fuel-syntax--no-indent-def-starts
@@ -240,30 +238,31 @@
     (modify-syntax-entry ?\r " " table)
     (modify-syntax-entry ?\  " " table)
     (modify-syntax-entry ?\n " " table)
-    (modify-syntax-entry ?\( "()" table)
-    (modify-syntax-entry ?\) ")(" table)
     table))
 
 (defconst fuel-syntax--syntactic-keywords
-  `(;; CHARs:
-    ("\\(CHAR:\\|POSTPONE:\\|\\\\\\) \\(.\\)\\( \\|$\\)" (2 "w"))
-    ;; Comments:
+  `(;; Comments
     ("\\_<\\(#?!\\) .*\\(\n\\|$\\)" (1 "<") (2 ">"))
     ("\\_<\\(#?!\\)\\(\n\\|$\\)" (1 "<") (2 ">"))
-    ;; Strings
+    ;; Strings and chars
+    ("CHAR: \\(\"\\) [^\\\"]*?\\(\"\\)\\([^\\\"]\\|\\\\.\\)*?\\(\"\\)"
+     (1 "w") (2 "\"") (4 "\""))
+    ("\\(CHAR:\\|POSTPONE:\\|\\\\\\) \\(.\\)\\( \\|$\\)" (2 "w"))
     ("\\( \\|^\\)\\(DLL\\|P\\|SBUF\\)\\(\"\\)\\([^\n\r\f\\\"]\\|\\\\.\\)*?\\(\"\\)"
      (3 "\"") (5 "\""))
-    ("\\(\"\\)\\([^\n\r\f\\\"]\\|\\\\.\\)*?\\(\"\\)" (1 "\"") (3 "\""))
+    ("\\_<\\(\"\\)\\([^\n\r\f\\\"]\\|\\\\.\\)*?\\(\"\\)" (1 "\"") (3 "\""))
     ("\\_<<\\(\"\\)\\_>" (1 "<b"))
     ("\\_<\\(\"\\)>\\_>" (1 ">b"))
     ;; Multiline constructs
+    ("\\_<\\(E\\)BNF:\\( \\|\n\\)" (1 "<b"))
+    ("\\_<;EBN\\(F\\)\\_>" (1 ">b"))
     ("\\_<\\(U\\)SING: \\(;\\)" (1 "<b") (2 ">b"))
     ("\\_<USING:\\( \\)" (1 "<b"))
     ("\\_<\\(C\\)-ENUM: \\(;\\)" (1 "<b") (2 ">b"))
     ("\\_<C-ENUM:\\( \\|\n\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? +< +\\w+? *\\( \\|\n\\)\\([^;]\\|$\\)" (1 "<b"))
-    ("\\_<\\(TUPLE\\|SYMBOLS\\|VARS\\): +\\w+? *\\( \\|\n\\)\\([^;<\n]\\|\\_>\\)"
-     (2 "<b"))
+    ("\\_<TUPLE: +\\w+? *\\( \\|\n\\)\\([^;<\n]\\|\\_>\\)" (1 "<b"))
+    ("\\_<\\(SYMBOLS\\|VARS\\|SINGLETONS\\): *?\\( \\|\n\\)\\([^;\n]\\|\\_>\\)" (2 "<b"))
     ("\\(\n\\| \\);\\_>" (1 ">b"))
     ;; Let and lambda:
     ("\\_<\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
@@ -277,6 +276,8 @@
     ;; Parenthesis:
     ("\\_<\\((\\)\\_>" (1 "()"))
     ("\\_<\\()\\)\\_>" (1 ")("))
+    ("\\_<(\\((\\)\\_>" (1 "()"))
+    ("\\_<\\()\\))\\_>" (1 ")("))
     ;; Quotations:
     ("\\_<'\\(\\[\\)\\_>" (1 "(]"))      ; fried
     ("\\_<\\(\\[\\)\\_>" (1 "(]"))
@@ -322,7 +323,7 @@
 (defsubst fuel-syntax--is-last-char (pos)
   (save-excursion
     (goto-char (1+ pos))
-    (fuel-syntax--looking-at-emptiness)))
+    (looking-at-p "[ ]*$")))
 
 (defsubst fuel-syntax--line-offset (pos)
   (- pos (save-excursion

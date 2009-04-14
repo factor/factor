@@ -4,7 +4,7 @@ prettyprint ;
 
 [ 0 ] [ 123 <byte-vector> length ] unit-test
 
-: do-it
+: do-it ( seq -- seq )
     123 [ over push ] each ;
 
 [ t ] [

@@ -42,4 +42,4 @@ PRIVATE>
 ! [ euler022 ] 100 ave-time
 ! 74 ms ave run time - 5.13 SD (100 trials)
 
-MAIN: euler022
+SOLUTION: euler022

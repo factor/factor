@@ -6,7 +6,7 @@ math.order hashtables byte-arrays destructors
 io io.sockets io.streams.string io.files io.timeouts
 io.pathnames io.encodings io.encodings.string io.encodings.ascii
 io.encodings.utf8 io.encodings.8-bit io.encodings.binary io.crlf
-io.streams.duplex fry ascii urls urls.encoding present prettyprint 
+io.streams.duplex fry ascii urls urls.encoding present locals
 http http.parsers http.client.post-data ;
 IN: http.client
 
@@ -77,12 +77,13 @@ SYMBOL: redirects
 : redirect? ( response -- ? )
     code>> 300 399 between? ;
 
-: do-redirect ( quot: ( chunk -- ) response -- response )
+:: do-redirect ( quot: ( chunk -- ) response -- response )
     redirects inc
     redirects get max-redirects < [
         request get clone
-        swap "location" header redirect-url
-        "GET" >>method swap (with-http-request)
+        response "location" header redirect-url
+        response code>> 307 = [ "GET" >>method ] unless
+        quot (with-http-request)
     ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
@@ -183,7 +184,7 @@ ERROR: download-failed response ;
     present file-name "?" split1 drop "/" ?tail drop ;
 
 : download-to ( url file -- )
-    binary [ [ write ] with-http-get drop ] with-file-writer ;
+    binary [ [ write ] with-http-get check-response drop ] with-file-writer ;
 
 : download ( url -- )
     dup download-name download-to ;

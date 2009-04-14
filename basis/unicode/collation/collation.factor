@@ -4,8 +4,8 @@ USING: combinators.short-circuit sequences io.files
 io.encodings.ascii kernel values splitting accessors math.parser
 ascii io assocs strings math namespaces make sorting combinators
 math.order arrays unicode.normalize unicode.data locals
-unicode.syntax macros sequences.deep words unicode.breaks
-quotations combinators.short-circuit ;
+macros sequences.deep words unicode.breaks
+quotations combinators.short-circuit simple-flat-file ;
 IN: unicode.collation
 
 <PRIVATE
@@ -20,13 +20,11 @@ TUPLE: weight primary secondary tertiary ignorable? ;
         [ >>primary ] [ >>secondary ] [ >>tertiary ] tri*
     ] map ;
 
-: parse-line ( line -- code-poing weight )
-    ";" split1 [ [ blank? ] trim ] bi@
-    [ " " split [ hex> ] "" map-as ] [ parse-weight ] bi* ;
+: parse-keys ( string -- chars )
+    " " split [ hex> ] "" map-as ;
 
 : parse-ducet ( file -- ducet )
-    ascii file-lines filter-comments
-    [ parse-line ] H{ } map>assoc ;
+    data [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
 
 "vocab:unicode/collation/allkeys.txt" parse-ducet to: ducet
 

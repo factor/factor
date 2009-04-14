@@ -4,8 +4,8 @@ prettyprint.backend prettyprint.custom kernel.private io generic
 math system strings sbufs vectors byte-arrays quotations
 io.streams.byte-array classes.builtin parser lexer
 classes.predicate classes.union classes.intersection
-classes.singleton classes.tuple tools.vocabs.browser math.parser
-accessors ;
+classes.singleton classes.tuple help.vocabs math.parser
+accessors definitions ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -49,13 +49,15 @@ $nl
     { "associative mapping" { "an object whose class implements the " { $link "assocs-protocol" } } }
     { "boolean"               { { $link t } " or " { $link f } } }
     { "class"                 { "a set of objects identified by a " { $emphasis "class word" } " together with a discriminating predicate. See " { $link "classes" } } }
-    { "definition specifier"  { "a " { $link word } ", " { $link method-spec } ", " { $link link } ", vocabulary specifier, or any other object whose class implements the " { $link "definition-protocol" } } }
+    { "combinator"            { "a word taking a quotation or another word as input; a higher-order function. See " { $link "combinators" } } }
+    { "definition specifier"  { "an instance of " { $link definition } " which implements the " { $link "definition-protocol" } } }
     { "generalized boolean"   { "an object interpreted as a boolean; a value of " { $link f } " denotes false and anything else denotes true" } }
     { "generic word"          { "a word whose behavior depends can be specialized on the class of one of its inputs. See " { $link "generic" } } }
     { "method"                { "a specialized behavior of a generic word on a class. See " { $link "generic" } } }
     { "object"                { "any datum which can be identified" } }
     { "ordering specifier"    { "see " { $link "order-specifiers" } } }
     { "pathname string"       { "an OS-specific pathname which identifies a file" } }
+    { "quotation"             { "an anonymous function; an instance of the " { $link quotation } " class. More generally, instances of the " { $link callable } " class can be used in many places documented to expect quotations" } }
     { "sequence" { "a sequence; see " { $link "sequence-protocol" } } }
     { "slot"                  { "a component of an object which can store a value" } }
     { "stack effect"          { "a pictorial representation of a word's inputs and outputs, for example " { $snippet "+ ( x y -- z )" } ". See " { $link "effects" } } }
@@ -70,7 +72,7 @@ ARTICLE: "tail-call-opt" "Tail-call optimization"
 $nl
 "Tail-call optimization allows iterative algorithms to be implemented in an efficient manner using recursion, without the need for any kind of primitive looping construct in the language. However, in practice, most iteration is performed via combinators such as " { $link while } ", " { $link each } ", " { $link map } ", " { $link assoc-each } ", and so on. The definitions of these combinators do bottom-out in recursive words, however." ;
 
-ARTICLE: "evaluator" "Evaluation semantics"
+ARTICLE: "evaluator" "Stack machine model"
 { $link "quotations" } " are evaluated sequentially from beginning to end. When the end is reached, the quotation returns to its caller. As each object in the quotation is evaluated in turn, an action is taken based on its type:"
 { $list
     { "a " { $link word } " - the word's definition quotation is called. See " { $link "words" } }
@@ -84,12 +86,13 @@ ARTICLE: "objects" "Objects"
 "An " { $emphasis "object" } " is any datum which may be identified. All values are objects in Factor. Each object carries type information, and types are checked at runtime; Factor is dynamically typed."
 { $subsection "equality" }
 { $subsection "math.order" }
-{ $subsection "destructors" }
 { $subsection "classes" }
 { $subsection "tuples" }
 { $subsection "generic" }
-{ $subsection "slots" }
-{ $subsection "mirrors" } ;
+"Advanced features:"
+{ $subsection "delegate" }
+{ $subsection "mirrors" }
+{ $subsection "slots" } ;
 
 ARTICLE: "numbers" "Numbers"
 { $subsection "arithmetic" }
@@ -118,9 +121,9 @@ ARTICLE: "collections" "Collections"
 "Fixed-length sequences:"
 { $subsection "arrays" }
 { $subsection "quotations" }
-"Fixed-length specialized sequences:"
 { $subsection "strings" }
 { $subsection "byte-arrays" }
+{ $subsection "specialized-arrays" }
 "Resizable sequences:"
 { $subsection "vectors" }
 { $subsection "byte-vectors" }
@@ -128,7 +131,8 @@ ARTICLE: "collections" "Collections"
 { $subsection "growable" }
 { $heading "Associative mappings" }
 { $subsection "assocs" }
-{ $subsection "namespaces" }
+{ $subsection "linked-assocs" }
+{ $subsection "biassocs" }
 { $subsection "refs" }
 "Implementations:"
 { $subsection "hashtables" }
@@ -140,30 +144,32 @@ ARTICLE: "collections" "Collections"
 { $subsection "dlists" }
 { $subsection "search-deques" }
 { $heading "Other collections" }
-{ $subsection "boxes" }
+{ $subsection "lists" }
+{ $subsection "disjoint-sets" }
+{ $subsection "interval-maps" }
 { $subsection "heaps" }
+{ $subsection "boxes" }
 { $subsection "graphs" }
 { $subsection "buffers" }
 "There are also many other vocabularies tagged " { $link T{ vocab-tag { name "collections" } } } " in the library." ;
 
-USING: io.encodings.utf8 io.encodings.utf16 io.encodings.binary io.encodings.ascii io.files ;
+USING: io.encodings.utf8 io.encodings.binary io.files ;
 
 ARTICLE: "encodings-introduction" "An introduction to encodings"
 "In order to express text in terms of binary, some sort of encoding has to be used. In a modern context, this is understood as a two-way mapping between Unicode code points (characters) and some amount of binary. Since English isn't the only language in the world, ASCII is not sufficient as a mapping from binary to Unicode; it can't even express em-dashes or curly quotes. Unicode was designed as a universal character set that could potentially represent everything." $nl
 "Not all encodings can represent all Unicode code points, but Unicode can represent basically everything that exists in modern encodings. Some encodings are language-specific, and some can represent everything in Unicode. Though the world is moving toward Unicode and UTF-8, the reality today is that there are several encodings which must be taken into account." $nl
-"Factor uses a system of encoding descriptors to denote encodings. Encoding descriptors are objects which describe encodings. Examples are " { $link utf8 } ", " { $link ascii } " and " { $link binary } ". Encoding descriptors can be passed around independently. Each encoding descriptor has some method for constructing an encoded or decoded stream, and the resulting stream has an encoding descriptor stored which has methods for reading or writing characters." $nl
+"Factor uses a system of encoding descriptors to denote encodings. Encoding descriptors are objects which describe encodings. Examples are " { $link utf8 } " and " { $link binary } ". Encoding descriptors can be passed around independently. Each encoding descriptor has some method for constructing an encoded or decoded stream, and the resulting stream has an encoding descriptor stored which has methods for reading or writing characters." $nl
 "Constructors for streams which deal with bytes usually take an encoding as an explicit parameter. For example, to open a text file for reading whose contents are in UTF-8, use the following"
 { $code "\"file.txt\" utf8 <file-reader>" }
 "If there is an error in the encoded stream, a replacement character (0xFFFD) will be inserted. To throw an exception upon error, use a strict encoding as follows"
 { $code "\"file.txt\" utf8 strict <file-reader>" }
 "In a similar way, encodings can be specified when opening a file for writing."
-{ $code "\"file.txt\" ascii <file-writer>" }
+{ $code "USE: io.encodings.ascii" "\"file.txt\" ascii <file-writer>" }
 "An encoding is also needed for some words that don't return streams, such as " { $link file-contents } ", for example"
-{ $code "\"file.txt\" utf16 file-contents" }
+{ $code "USE: io.encodings.utf16" "\"file.txt\" utf16 file-contents" }
 "Encoding descriptors are also used by " { $link "io.streams.byte-array" } " and taken by combinators like " { $link with-file-writer } " and " { $link with-byte-reader } " which deal with streams. It is " { $emphasis "not" } " used with " { $link "io.streams.string" } " because these deal with abstract text."
 $nl
-"When the " { $link binary } " encoding is used, a " { $link byte-array } " is expected for writing and returned for reading, since the stream deals with bytes. All other encodings deal with strings, since they are used to represent text."
-{ $see-also "stream-elements" } ;
+"When the " { $link binary } " encoding is used, a " { $link byte-array } " is expected for writing and returned for reading, since the stream deals with bytes. All other encodings deal with strings, since they are used to represent text." ;
 
 ARTICLE: "io" "Input and output"
 { $heading "Streams" }
@@ -240,62 +246,82 @@ ARTICLE: "class-index" "Class index"
 { $heading "Predicate classes" }
 { $index [ classes [ predicate-class? ] filter ] } ;
 
-ARTICLE: "program-org" "Program organization"
-{ $subsection "definitions" }
-{ $subsection "vocabularies" }
-{ $subsection "parser" }
-{ $subsection "vocabs.loader" }
-{ $subsection "source-files" } ;
-
 USING: help.cookbook help.tutorial ;
 
 ARTICLE: "handbook-language-reference" "Language reference"
+"Fundamentals:"
 { $subsection "conventions" }
 { $subsection "syntax" }
-{ $subsection "dataflow" }
-{ $subsection "objects" }
-{ $subsection "program-org" }
+{ $subsection "effects" }
+"Data types:"
+{ $subsection "booleans" }
 { $subsection "numbers" }
 { $subsection "collections" }
-{ $subsection "io" }
+"Evaluation semantics:"
+{ $subsection "evaluator" }
+{ $subsection "words" }
+{ $subsection "shuffle-words" }
+{ $subsection "combinators" }
+{ $subsection "errors" }
+{ $subsection "continuations" }
+"Named values:"
+{ $subsection "locals" }
+{ $subsection "namespaces" }
+{ $subsection "namespaces-global" }
+{ $subsection "values" }
+"Abstractions:"
+{ $subsection "objects" }
+{ $subsection "destructors" }
+{ $subsection "macros" }
+{ $subsection "fry" }
+"Program organization:"
+{ $subsection "vocabs.loader" }
 "Vocabularies tagged " { $link T{ vocab-tag { name "extensions" } } } " implement various additional language abstractions." ;
 
 ARTICLE: "handbook-environment-reference" "Environment reference"
+"Parse time and compile time:"
+{ $subsection "parser" }
+{ $subsection "definitions" }
+{ $subsection "vocabularies" }
+{ $subsection "source-files" }
+{ $subsection "compiler" }
+"Tools:"
 { $subsection "prettyprint" }
 { $subsection "tools" }
-{ $subsection "cli" }
-{ $subsection "rc-files" }
 { $subsection "help" }
 { $subsection "inference" }
-{ $subsection "compiler" }
-{ $subsection "system" }
 { $subsection "images" }
-{ $subsection "alien" }
+"VM:"
+{ $subsection "cli" }
+{ $subsection "rc-files" }
 { $subsection "init" }
-{ $subsection "layouts" }
-{ $see-also "program-org" } ;
+{ $subsection "system" }
+{ $subsection "layouts" } ;
 
 ARTICLE: "handbook-library-reference" "Library reference"
 "This index only includes articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
 { $index [ "handbook" orphan-articles remove ] } ;
 
-ARTICLE: "handbook" "Factor documentation"
-"Welcome to Factor."
-$nl
-"Explore the code base:"
-{ $subsection "vocab-index" }
+ARTICLE: "handbook" "Factor handbook"
 "Learn the language:"
 { $subsection "cookbook" }
 { $subsection "first-program" }
+"Reference material:"
 { $subsection "handbook-language-reference" }
 { $subsection "handbook-environment-reference" }
+{ $subsection "io" }
 { $subsection "ui" }
+{ $subsection "ui-tools" }
+{ $subsection "unicode" }
+{ $subsection "alien" }
 { $subsection "handbook-library-reference" }
-"The below indices only include articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
+"Explore loaded libraries:"
 { $subsection "article-index" }
 { $subsection "primitive-index" }
 { $subsection "error-index" }
 { $subsection "type-index" }
-{ $subsection "class-index" } ;
+{ $subsection "class-index" }
+"Explore the code base:"
+{ $subsection "vocab-index" } ;
 
 ABOUT: "handbook"
