@@ -40,13 +40,13 @@ TUPLE: interval { from read-only } { to read-only } ;
 : [a,a] ( a -- interval )
     closed-point dup <interval> ; foldable
 
-: [-inf,a] ( a -- interval ) -1./0. swap [a,b] ; inline
+: [-inf,a] ( a -- interval ) -1/0. swap [a,b] ; inline
 
-: [-inf,a) ( a -- interval ) -1./0. swap [a,b) ; inline
+: [-inf,a) ( a -- interval ) -1/0. swap [a,b) ; inline
 
-: [a,inf] ( a -- interval ) 1./0. [a,b] ; inline
+: [a,inf] ( a -- interval ) 1/0. [a,b] ; inline
 
-: (a,inf] ( a -- interval ) 1./0. (a,b] ; inline
+: (a,inf] ( a -- interval ) 1/0. (a,b] ; inline
 
 : [-inf,inf] ( -- interval ) full-interval ; inline
 
