@@ -29,7 +29,8 @@ IN: db2.statements.tests
     
     [ { { "rocky" "mac" } } ]
     [
-        "select name, os from computer;" sql-query
+        "select name, os from computer;"
+        f f <statement> sql-query
     ] unit-test
 
     [ "insert into" sql-command ]
@@ -39,28 +40,30 @@ IN: db2.statements.tests
     [ sql-syntax-error? ] must-fail-with
 
     [ ] [
-        { "clubber" "windows" }
         "insert into computer (name, os) values(?, ?);"
-        sql-bind-command*
+        { "clubber" "windows" }
+        f <statement>
+        sql-bind-command
     ] unit-test
 
     [ { { "windows" } } ] [
-        { "clubber" }
-        "select os from computer where name = ?;" sql-bind-query*
+        "select os from computer where name = ?;"
+        { "clubber" } f <statement> sql-bind-query
     ] unit-test
 
     [ { { "windows" } } ] [
+        "select os from computer where name = ?;"
         { { VARCHAR "clubber" } }
-        "select os from computer where name = ?;" sql-bind-typed-query*
+        f <statement> sql-bind-typed-query
     ] unit-test
 
     [ ] [
+        "insert into computer (name, os) values(?, ?);"
         {
             { VARCHAR "clubber" }
             { VARCHAR "windows" }
-        }
-        "insert into computer (name, os) values(?, ?);"
-        sql-bind-typed-command*
+        } f <statement>
+        sql-bind-typed-command
     ] unit-test
 
 
