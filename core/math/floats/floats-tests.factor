@@ -56,8 +56,6 @@ unit-test
 [ t ] [ 0.0 zero? ] unit-test
 [ t ] [ -0.0 zero? ] unit-test
 
-! [ f ] [ 0.0/0.0 0.0/0.0 number= ] unit-test
-
 [ 0 ] [ 1/0. >bignum ] unit-test
 
 [ t ] [ 64 [ 2^ 0.5 * ] map [ < ] monotonic? ] unit-test
