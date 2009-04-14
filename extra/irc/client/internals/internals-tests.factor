@@ -1,10 +1,13 @@
+! Copyright (C) 2009 Bruno Deferrari
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test accessors arrays sequences
-       io io.streams.duplex namespaces threads destructors
-       calendar irc.client.private irc.client irc.messages.private
-       concurrency.mailboxes classes assocs combinators ;
+io io.streams.duplex namespaces threads destructors
+calendar concurrency.mailboxes classes assocs combinators
+irc.messages.parser irc.client.base irc.client.chats
+irc.client.participants irc.client.internals ;
 EXCLUDE: irc.messages => join ;
 RENAME: join irc.messages => join_
-IN: irc.client.tests
+IN: irc.client.internals.tests
 
 ! Streams for testing
 TUPLE: mb-writer lines last-line disposed ;
@@ -28,18 +31,20 @@ M: mb-writer dispose drop ;
         t >>is-ready
         t >>is-running
         <test-stream> >>stream
-    dup [ spawn-irc yield ] with-irc-client ;
+    dup [ spawn-irc yield ] with-irc ;
 
-! to be used inside with-irc-client quotations
-: %add-named-chat ( chat -- ) irc> attach-chat ;
+! to be used inside with-irc quotations
+: %add-named-chat ( chat -- ) (attach-chat) ;
 : %push-line ( line -- ) irc> stream>> in>> push-line yield ;
-: %join ( channel -- ) <irc-channel-chat> irc> attach-chat ;
+: %push-lines ( lines -- ) [ %push-line ] each ;
+: %join ( channel -- ) <irc-channel-chat> (attach-chat) ;
+: %pop-output-line ( -- string ) irc> stream>> out>> lines>> pop ;
 
 : read-matching-message ( chat quot: ( msg -- ? ) -- irc-message )
     [ in-messages>> 0.1 seconds ] dip mailbox-get-timeout? ;
 
-: with-irc ( quot: ( -- ) -- )
-    [ spawn-client ] dip [ irc> terminate-irc ] compose with-irc-client ; inline
+: spawning-irc ( quot: ( -- ) -- )
+    [ spawn-client ] dip [ (terminate-irc) ] compose with-irc ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                       TESTS
@@ -49,170 +54,160 @@ M: mb-writer dispose drop ;
 
   { "factorbot" } [ irc> nick>> ] unit-test
 
-  { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
-
   { "#factortest" } [ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
-                      parse-irc-line forward-name ] unit-test
+                      string>irc-message chat-name ] unit-test
 
   { "someuser" } [ ":someuser!n=user@some.where PRIVMSG factorbot :hi"
-                   parse-irc-line forward-name ] unit-test
-] with-irc
+                   string>irc-message chat-name ] unit-test
+] spawning-irc
+
+{ privmsg "#channel" "hello" } [
+    "#channel" "hello" strings>privmsg
+    [ class ] [ target>> ] [ trailing>> ] tri
+] unit-test
 
 ! Test login and nickname set
 [ { "factorbot2" } [
     ":some.where 001 factorbot2 :Welcome factorbot2" %push-line
     irc> nick>>
   ] unit-test
-] with-irc
+] spawning-irc
 
 ! Test connect
 { V{ "NICK factorbot" "USER factorbot hostname servername :irc.factor" } } [
     "someserver" irc-port "factorbot" f <irc-profile> <irc-client>
     [ 2drop <test-stream> t ] >>connect
-    [ connect-irc ] [ stream>> out>> lines>> ] [ terminate-irc ] tri
+    [
+        (connect-irc)
+        (do-login)
+        irc> stream>> out>> lines>>
+        (terminate-irc)
+    ] with-irc
 ] unit-test
 
 ! Test join
 [ { "JOIN #factortest" } [
-      "#factortest" %join
-      irc> stream>> out>> lines>> pop
+      "#factortest" %join %pop-output-line
   ] unit-test
-] with-irc
+] spawning-irc
 
-[ { join_ "#factortest" } [
+[ { join_ "#factortest"} [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
       { ":factorbot!n=factorbo@some.where JOIN :#factortest"
         ":ircserver.net 353 factorbot @ #factortest :@factorbot "
         ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
         ":ircserver.net 477 factorbot #factortest :[ircserver-info] blah blah"
-      } [ %push-line ] each
-      in-messages>> 0.1 seconds mailbox-get-timeout
-      [ class ] [ trailing>> ] bi
+      } %push-lines
+      [ join? ] read-matching-message
+      [ class ] [ channel>> ] bi
   ] unit-test
-] with-irc
-
-[ { T{ participant-changed f "somebody" +join+ } } [
-      "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
-      ":somebody!n=somebody@some.where JOIN :#factortest" %push-line
-      [ participant-changed? ] read-matching-message
-  ] unit-test
-] with-irc
+] spawning-irc
 
 [ { privmsg "#factortest" "hello" } [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
       ":somebody!n=somebody@some.where PRIVMSG #factortest :hello" %push-line
       [ privmsg? ] read-matching-message
-      [ class ] [ name>> ] [ trailing>> ] tri
+      [ class ] [ target>> ] [ trailing>> ] tri
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { privmsg "factorbot" "hello" } [
       "ircuser" <irc-nick-chat>  [ %add-named-chat ] keep
       ":ircuser!n=user@isp.net PRIVMSG factorbot :hello" %push-line
       [ privmsg? ] read-matching-message
-      [ class ] [ name>> ] [ trailing>> ] tri
+      [ class ] [ target>> ] [ trailing>> ] tri
   ] unit-test
-] with-irc
+] spawning-irc
 
-[ { mode } [
+[ { mode "#factortest" "+ns" } [
       "#factortest" <irc-channel-chat>  [ %add-named-chat ] keep
       ":ircserver.net MODE #factortest +ns" %push-line
-      [ mode? ] read-matching-message class
+      [ mode? ] read-matching-message
+      [ class ] [ name>> ] [ mode>> ] tri
   ] unit-test
-] with-irc
+] spawning-irc
 
 ! Participant lists tests
-[ { H{ { "ircuser" +normal+ } } } [
+[ { { "ircuser" } } [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
       ":ircuser!n=user@isp.net JOIN :#factortest" %push-line
-      participants>>
+      participants>> keys
   ] unit-test
-] with-irc
+] spawning-irc
 
-[ { H{ { "ircuser2" +normal+ } } } [
+[ { { "ircuser2" } } [
       "#factortest" <irc-channel-chat>
-          H{ { "ircuser2" +normal+ }
-             { "ircuser" +normal+ } } clone >>participants
+      { "ircuser2" "ircuser" } [ over join-participant ] each
       [ %add-named-chat ] keep
       ":ircuser!n=user@isp.net PART #factortest" %push-line
-      participants>>
+      participants>> keys
   ] unit-test
-] with-irc
+] spawning-irc
 
-[ { H{ { "ircuser2" +normal+ } } } [
+[ { { "ircuser2" } } [
       "#factortest" <irc-channel-chat>
-          H{ { "ircuser2" +normal+ }
-             { "ircuser" +normal+ } } clone >>participants
+      { "ircuser2" "ircuser" } [ over join-participant ] each
       [ %add-named-chat ] keep
       ":ircuser!n=user@isp.net QUIT" %push-line
-      participants>>
+      participants>> keys
   ] unit-test
-] with-irc
+] spawning-irc
 
-[ { H{ { "ircuser2" +normal+ } } } [
+[ { { "ircuser2" } } [
       "#factortest" <irc-channel-chat>
-          H{ { "ircuser2" +normal+ }
-             { "ircuser" +normal+ } } clone >>participants
+      { "ircuser2" "ircuser" } [ over join-participant ] each
       [ %add-named-chat ] keep
       ":ircuser2!n=user2@isp.net KICK #factortest ircuser" %push-line
-      participants>>
+      participants>> keys
   ] unit-test
-] with-irc
+] spawning-irc
 
-[ { H{ { "ircuser2" +normal+ } } } [
+[ { H{ { "ircuser2" T{ participant { nick "ircuser2" } } } } } [
       "#factortest" <irc-channel-chat>
-          H{ { "ircuser" +normal+ } } clone >>participants
+      "ircuser" over join-participant
       [ %add-named-chat ] keep
       ":ircuser!n=user2@isp.net NICK :ircuser2" %push-line
       participants>>
   ] unit-test
-] with-irc
+] spawning-irc
 
-[ { H{ { "factorbot" +operator+ } { "ircuser" +normal+ } } } [
+[ { H{ { "factorbot" T{ participant { nick "factorbot" } { operator t } } }
+       { "ircuser" T{ participant { nick "ircuser" } } }
+       { "voiced" T{ participant { nick "voiced" } { voice t } } } } } [
       "#factortest" <irc-channel-chat>
-          H{ { "ircuser" +normal+ } } clone >>participants
+      "ircuser" over join-participant
       [ %add-named-chat ] keep
-      ":ircserver.net 353 factorbot @ #factortest :@factorbot " %push-line
-      ":ircserver.net 353 factorbot @ #factortest :ircuser2 " %push-line
-      ":ircserver.net 366 factorbot #factortest :End of /NAMES list." %push-line
-      ":ircserver.net 353 factorbot @ #factortest :@factorbot " %push-line
-      ":ircserver.net 353 factorbot @ #factortest :ircuser " %push-line
-      ":ircserver.net 366 factorbot #factortest :End of /NAMES list." %push-line
+      { ":ircserver.net 353 factorbot @ #factortest :@factorbot "
+        ":ircserver.net 353 factorbot @ #factortest :ircuser2 "
+        ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
+        ":ircserver.net 353 factorbot @ #factortest :@factorbot +voiced "
+        ":ircserver.net 353 factorbot @ #factortest :ircuser "
+        ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
+      } %push-lines
       participants>>
   ] unit-test
-] with-irc
+] spawning-irc
 
-! Namelist change notification
-[ { T{ participant-changed f f f f } } [
+[ { mode "#factortest" "+o" "ircuser" } [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
-      ":ircserver.net 353 factorbot @ #factortest :@factorbot " %push-line
-      ":ircserver.net 366 factorbot #factortest :End of /NAMES list." %push-line
-      [ participant-changed? ] read-matching-message
-  ] unit-test
-] with-irc
-
-[ { T{ participant-changed f "ircuser" +part+ f } } [
-      "#factortest" <irc-channel-chat>
-          H{ { "ircuser" +normal+ } } clone >>participants
-      [ %add-named-chat ] keep
-      ":ircuser!n=user@isp.net QUIT" %push-line
-      [ participant-changed? ] read-matching-message
-  ] unit-test
-] with-irc
-
-[ { T{ participant-changed f "ircuser" +nick+ "ircuser2" } } [
-      "#factortest" <irc-channel-chat>
-          H{ { "ircuser" +normal+ } } clone >>participants
-      [ %add-named-chat ] keep
-      ":ircuser!n=user2@isp.net NICK :ircuser2" %push-line
-      [ participant-changed? ] read-matching-message
-  ] unit-test
-] with-irc
-
-! Mode change
-[ { T{ participant-changed f "ircuser" +mode+ "+o" } } [
-      "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
+      "ircuser" over join-participant
       ":ircserver.net MODE #factortest +o ircuser" %push-line
-      [ participant-changed? ] read-matching-message
+      [ mode? ] read-matching-message
+      { [ class ] [ name>> ] [ mode>> ] [ parameter>> ] } cleave
   ] unit-test
-] with-irc
+] spawning-irc
+
+[ { T{ participant { nick "ircuser" } { operator t } } } [
+      "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
+      "ircuser" over join-participant
+      ":ircserver.net MODE #factortest +o ircuser" %push-line
+      participants>> "ircuser" swap at
+  ] unit-test
+] spawning-irc
+
+! Send privmsg
+[ { "PRIVMSG #factortest :hello" } [
+      "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
+      "hello" swap (speak) %pop-output-line
+  ] unit-test
+] spawning-irc
