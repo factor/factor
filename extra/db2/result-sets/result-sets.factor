@@ -29,4 +29,4 @@ GENERIC# column-typed 1 ( result-set column -- sql )
     dup #columns [ column ] with map ;
 
 : sql-row-typed ( result-set -- seq )
-    dup #columns [ column-typed ] with map ;
+    dup #columns [ B column-typed ] with map ;

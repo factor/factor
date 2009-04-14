@@ -16,8 +16,8 @@ HOOK: <statement> db-connection ( sql in out -- statement )
 GENERIC: statement>result-set* ( statement -- result-set )
 GENERIC: execute-statement* ( statement type -- )
 GENERIC: prepare-statement* ( statement -- statement' )
-GENERIC: bind-sequence ( sequence statement -- )
-GENERIC: bind-typed-sequence ( sequence statement -- )
+GENERIC: bind-sequence ( statement -- )
+GENERIC: bind-typed-sequence ( statement -- )
 
 : statement>result-set ( statement -- result-set )
     [ statement>result-set* ]
@@ -47,3 +47,7 @@ M: object execute-statement* ( statement type -- )
 
 : statement>result-sequence ( statement -- sequence )
     statement>result-set [ [ sql-row ] statement-map ] with-disposal ;
+
+: statement>typed-result-sequence ( statement -- sequence )
+    [ out>> ] [ statement>result-set ] bi
+    [ [ sql-row-typed ] with statement-map ] with-disposal ;

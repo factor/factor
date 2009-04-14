@@ -5,10 +5,8 @@ db2.private db2.sqlite.lib db2.statements db2.utils destructors
 kernel make math.parser sequences strings assocs db2.utils ;
 IN: db2.fql
 
-TUPLE: fql-statement sql in out ;
-
-GENERIC: expand-fql* ( object -- sequence/fql-statement )
-GENERIC: normalize-fql ( object -- sequence/fql-statement )
+GENERIC: expand-fql* ( object -- sequence/statement )
+GENERIC: normalize-fql ( object -- sequence/statement )
 
 ! M: object normalize-fql ;
 
@@ -66,7 +64,7 @@ M: and expand-fql* ( obj -- string )
 M: string expand-fql* ( string -- string ) ;
 
 M: insert expand-fql*
-    [ fql-statement new ] dip
+    [ statement new ] dip
     [
         {
             [ "insert into " % into>> % ]
@@ -77,7 +75,7 @@ M: insert expand-fql*
     ] "" make >>sql ;
 
 M: update expand-fql*
-    [ fql-statement new ] dip
+    [ statement new ] dip
     [
         {
             [ "update " % tables>> ", " join % ]
@@ -93,7 +91,7 @@ M: update expand-fql*
     ] "" make >>sql ;
 
 M: delete expand-fql*
-    [ fql-statement new ] dip
+    [ statement new ] dip
     [
         {
             [ "delete from " % tables>> ", " join % ]
@@ -104,7 +102,7 @@ M: delete expand-fql*
     ] "" make >>sql ;
 
 M: select expand-fql*
-    [ fql-statement new ] dip
+    [ statement new ] dip
     [
         {
             [ "select " % names>> ", " join % ]
@@ -116,21 +114,3 @@ M: select expand-fql*
             [ limit>> [ " limit " % # ] when* ]
         } cleave
     ] "" make >>sql ;
-
-M: fql-statement sql-command ( sql -- )
-    sql>> sql-command ;
-
-M: fql-statement sql-query ( sql -- sequence )
-    sql>> sql-query ;
-
-M: fql-statement sql-bind-command ( fql-statement -- )
-    [ in>> ] [ sql>> ] bi sql-bind-command* ;
-
-M: fql-statement sql-bind-query ( fql-statement -- out-sequence )
-    [ in>> ] [ sql>> ] bi sql-bind-query* ;
-
-M: fql-statement sql-bind-typed-command ( string -- )
-    [ in>> ] [ sql>> ] bi sql-bind-typed-command* ;
-
-M: fql-statement sql-bind-typed-query ( string -- out-sequence )
-    [ in>> ] [ sql>> ] bi sql-bind-typed-query* ;
