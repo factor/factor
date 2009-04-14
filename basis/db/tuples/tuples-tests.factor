@@ -411,7 +411,7 @@ TUPLE: exam id name score ;
             T{ exam f 4 "Cartman" 41 }
         }
     ] [
-        T{ exam f T{ interval f { 2 t } { 1.0/0.0 f } } } select-tuples
+        T{ exam f T{ interval f { 2 t } { 1/0. f } } } select-tuples
     ] unit-test
 
     [
@@ -419,7 +419,7 @@ TUPLE: exam id name score ;
             T{ exam f 1 "Kyle" 100 }
         }
     ] [
-        T{ exam f T{ interval f { -1.0/0.0 t } { 2 f } } } select-tuples
+        T{ exam f T{ interval f { -1/0. t } { 2 f } } } select-tuples
     ] unit-test
 
     [
@@ -430,7 +430,7 @@ TUPLE: exam id name score ;
             T{ exam f 4 "Cartman" 41 }
         }
     ] [
-        T{ exam f T{ interval f { -1.0/0.0 t } { 1/0. f } } } select-tuples
+        T{ exam f T{ interval f { -1/0. t } { 1/0. f } } } select-tuples
     ] unit-test
     
     [

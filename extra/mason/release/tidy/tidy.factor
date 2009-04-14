@@ -12,11 +12,11 @@ IN: mason.release.tidy
     append ;
 
 : remove-common-files ( -- )
-    common-files [ delete-tree ] each ;
+    common-files [ really-delete-tree ] each ;
 
 : remove-factor-app ( -- )
     target-os get "macosx" =
-    [ "Factor.app" delete-tree ] unless ;
+    [ "Factor.app" really-delete-tree ] unless ;
 
 : tidy ( -- )
     "factor" [ remove-factor-app remove-common-files ] with-directory ;
