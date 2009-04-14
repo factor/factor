@@ -54,10 +54,3 @@ M: sequence sql-bind-command* [ sql-bind-command* ] with each ;
 M: sequence sql-bind-query* [ sql-bind-query* ] with map ;
 M: sequence sql-bind-typed-command* [ sql-bind-typed-command* ] with each ;
 M: sequence sql-bind-typed-query* [ sql-bind-typed-query* ] with map ;
-
-! M: string sql-command [ sql-command ] each ;
-! M: string sql-query [ sql-query ] map ;
-! M: string sql-bind-command* sql-bind-command* ;
-! M: string sql-bind-query* sql-bind-query* ;
-! M: string sql-bind-typed-command sql-bind-typed-command* ;
-! M: string sql-bind-typed-query sql-bind-typed-query* ;
