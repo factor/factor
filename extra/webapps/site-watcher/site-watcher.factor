@@ -1,15 +1,16 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs db.sqlite furnace furnace.actions furnace.alloy
-furnace.auth furnace.auth.features.deactivate-user
+USING: accessors assocs db.sqlite furnace furnace.actions
+furnace.alloy furnace.auth furnace.auth.features.deactivate-user
 furnace.auth.features.edit-profile
 furnace.auth.features.recover-password
 furnace.auth.features.registration furnace.auth.login
 furnace.boilerplate furnace.redirection html.forms http.server
 http.server.dispatchers kernel namespaces site-watcher site-watcher.db
 site-watcher.private urls validators io.sockets.secure.unix.debug
-io.servers.connection db db.tuples sequences webapps.site-watcher.common
-webapps.site-watcher.watching webapps.site-watcher.spidering ;
+io.servers.connection io.files.temp db db.tuples sequences
+webapps.site-watcher.common webapps.site-watcher.watching
+webapps.site-watcher.spidering ;
 QUALIFIED: assocs
 IN: webapps.site-watcher
 

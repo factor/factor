@@ -42,7 +42,7 @@ PRIVATE>
     #! gamma(x) = integral 0..inf [ t^(x-1) exp(-t) ] dt
     #! gamma(n+1) = n! for n > 0
     dup { [ 0.0 <= ] [ 1.0 mod zero? ] } 1&& [
-        drop 1./0.
+        drop 1/0.
     ] [
         [ abs gamma-lanczos6 ] keep dup 0 > [ drop ] [ gamma-neg ] if
     ] if ;
@@ -51,7 +51,7 @@ PRIVATE>
     #! gammaln(x) is an alternative when gamma(x)'s range
     #! varies too widely
     dup 0 < [
-        drop 1./0.
+        drop 1/0.
     ] [
         [ abs gammaln-lanczos6 ] keep dup 0 > [ drop ] [ gamma-neg ] if
     ] if ;
