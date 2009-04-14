@@ -3,34 +3,43 @@
 USING: accessors fry html.parser html.parser.analyzer
 http.client kernel tools.time sets assocs sequences
 concurrency.combinators io threads namespaces math multiline
-heaps math.parser inspector urls assoc-heaps logging
-combinators.short-circuit continuations calendar prettyprint ;
+math.parser inspector urls logging combinators.short-circuit
+continuations calendar prettyprint dlists deques locals
+spider.unique-deque combinators concurrency.semaphores ;
 IN: spider
 
 TUPLE: spider base count max-count sleep max-depth initial-links
-filters spidered todo nonmatching quiet ;
+filters spidered todo nonmatching quiet currently-spidering
+#threads semaphore follow-robots? robots ;
 
-TUPLE: spider-result url depth headers fetch-time parsed-html
-links processing-time timestamp ;
+TUPLE: spider-result url depth headers
+fetched-in parsed-html links processed-in fetched-at ;
 
 : <spider> ( base -- spider )
     >url
     spider new
         over >>base
-        swap 0 <unique-min-heap> [ heap-push ] keep >>todo
-        <unique-min-heap> >>nonmatching
+        over >>currently-spidering
+        swap 0 <unique-deque> [ push-url ] keep >>todo
+        <unique-deque> >>nonmatching
         0 >>max-depth
         0 >>count
         1/0. >>max-count
-        H{ } clone >>spidered ;
+        H{ } clone >>spidered
+        1 [ >>#threads ] [ <semaphore> >>semaphore ] bi ;
+
+: <spider-result> ( url depth -- spider-result )
+    spider-result new
+        swap >>depth
+        swap >>url ;
 
 <PRIVATE
 
 : apply-filters ( links spider -- links' )
-    filters>> [ '[ _ 1&& ] filter ] when* ;
+    filters>> [ '[ [ _ 1&& ] filter ] call( seq -- seq' ) ] when* ;
 
-: push-links ( links level assoc-heap -- )
-    '[ _ _ heap-push ] each ;
+: push-links ( links level unique-deque -- )
+    '[ _ _ push-url ] each ;
 
 : add-todo ( links level spider -- )
     todo>> push-links ;
@@ -38,64 +47,81 @@ links processing-time timestamp ;
 : add-nonmatching ( links level spider -- )
     nonmatching>> push-links ;
 
-: filter-base ( spider spider-result -- base-links nonmatching-links )
+: filter-base-links ( spider spider-result -- base-links nonmatching-links )
     [ base>> host>> ] [ links>> prune ] bi*
     [ host>> = ] with partition ;
 
 : add-spidered ( spider spider-result -- )
     [ [ 1+ ] change-count ] dip
     2dup [ spidered>> ] [ dup url>> ] bi* rot set-at
-    [ filter-base ] 2keep
+    [ filter-base-links ] 2keep
     depth>> 1+ swap
     [ add-nonmatching ]
     [ tuck [ apply-filters ] 2dip add-todo ] 2bi ;
 
-: normalize-hrefs ( links -- links' )
-    [ >url ] map
-    spider get base>> swap [ derive-url ] with map ;
+: normalize-hrefs ( base links -- links' )
+    [ derive-url ] with map ;
 
-: print-spidering ( url depth -- )
+: print-spidering ( spider-result -- )
+    [ url>> ] [ depth>> ] bi
     "depth: " write number>string write
     ", spidering: " write . yield ;
 
-: (spider-page) ( url depth -- spider-result )
-    f pick spider get spidered>> set-at
-    over '[ _ http-get ] benchmark swap
-    [ parse-html dup find-hrefs normalize-hrefs ] benchmark
-    now spider-result boa ;
+:: fill-spidered-result ( spider spider-result -- )
+    f spider-result url>> spider spidered>> set-at
+    [ spider-result url>> http-get ] benchmark :> fetched-in :> html :> headers
+    [
+        html parse-html
+        spider currently-spidering>>
+        over find-all-links normalize-hrefs
+    ] benchmark :> processed-in :> links :> parsed-html
+    spider-result
+        headers >>headers
+        fetched-in >>fetched-in
+        parsed-html >>parsed-html
+        links >>links
+        processed-in >>processed-in
+        now >>fetched-at drop ;
 
-: spider-page ( url depth -- )
-    spider get quiet>> [ 2dup print-spidering ] unless
-    (spider-page)
-    spider get [ quiet>> [ dup describe ] unless ]
-    [ swap add-spidered ] bi ;
+:: spider-page ( spider spider-result -- )
+    spider quiet>> [ spider-result print-spidering ] unless
+    spider spider-result fill-spidered-result
+    spider quiet>> [ spider-result describe ] unless
+    spider spider-result add-spidered ;
 
 \ spider-page ERROR add-error-logging
 
-: spider-sleep ( -- )
-    spider get sleep>> [ sleep ] when* ;
+: spider-sleep ( spider -- ) sleep>> [ sleep ] when* ;
 
-: queue-initial-links ( spider -- spider )
-    [ initial-links>> normalize-hrefs 0 ] keep
-    [ add-todo ] keep ;
+: queue-initial-links ( spider -- )
+    [
+        [ currently-spidering>> ] [ initial-links>> ] bi normalize-hrefs 0
+    ] keep add-todo ;
 
-: slurp-heap-while ( heap quot1 quot2: ( value key -- ) -- )
-    pick heap-empty? [ 3drop ] [
-        [ [ heap-pop dup ] 2dip slip [ t ] compose [ 2drop f ] if ]
-        [ roll [ slurp-heap-while ] [ 3drop ] if ] 3bi
-    ] if ; inline recursive
+: spider-page? ( spider -- ? )
+    {
+        [ todo>> deque>> deque-empty? not ]
+        [ [ todo>> peek-url depth>> ] [ max-depth>> ] bi < ]
+        [ [ count>> ] [ max-count>> ] bi < ]
+    } 1&& ;
+
+: setup-next-url ( spider -- spider spider-result )
+    dup todo>> peek-url url>> >>currently-spidering
+    dup todo>> pop-url [ url>> ] [ depth>> ] bi <spider-result> ;
+
+: spider-next-page ( spider -- )
+    setup-next-url spider-page ;
 
 PRIVATE>
 
+: run-spider-loop ( spider -- )
+    dup spider-page? [
+        [ spider-next-page ] [ spider-sleep ] [ run-spider-loop ] tri
+    ] [
+        drop
+    ] if ;
+
 : run-spider ( spider -- spider )
     "spider" [
-        dup spider [
-            queue-initial-links
-            [ todo>> ] [ max-depth>> ] bi
-            '[
-                _ <= spider get
-                [ count>> ] [ max-count>> ] bi < and
-            ] [ spider-page spider-sleep ] slurp-heap-while
-            spider get
-        ] with-variable
+        dup queue-initial-links [ run-spider-loop ] keep
     ] with-logging ;

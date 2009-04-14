@@ -33,9 +33,9 @@ $nl
 "A general rule of thumb is that any word which applies " { $link call } " or " { $link curry } " to one of its inputs must be declared " { $link POSTPONE: inline } "."
 $nl
 "Here is an example where the stack effect cannot be inferred:"
-{ $code ": foo 0 [ + ] ;" "[ foo reduce ] infer." }
+{ $code ": foo ( -- n quot ) 0 [ + ] ;" "[ foo reduce ] infer." }
 "However if " { $snippet "foo" } " was declared " { $link POSTPONE: inline } ", everything would work, since the " { $link reduce } " combinator is also " { $link POSTPONE: inline } ", and the inferencer can see the literal quotation value at the point it is passed to " { $link call } ":"
-{ $example ": foo 0 [ + ] ; inline" "[ foo reduce ] infer." "( object -- object )" }
+{ $example ": foo ( -- n quot ) 0 [ + ] ; inline" "[ foo reduce ] infer." "( object -- object )" }
 "Passing a literal quotation on the data stack through an inlined recursive combinator nullifies its literal status. For example, the following will not infer:"
 { $example
   "[ [ reverse ] swap [ reverse ] map swap call ] infer." "Got a computed value where a literal quotation was expected\n\nType :help for debugging help."

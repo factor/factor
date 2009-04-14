@@ -3,8 +3,8 @@ USING: sequences stack-checker.transforms tools.test math kernel
 quotations stack-checker accessors combinators words arrays
 classes classes.tuple ;
 
-: compose-n-quot ( word -- quot' ) <repetition> >quotation ;
-: compose-n ( quot -- ) compose-n-quot call ;
+: compose-n-quot ( word n -- quot' ) <repetition> >quotation ;
+: compose-n ( quot n -- ) compose-n-quot call ;
 \ compose-n [ compose-n-quot ] 2 define-transform
 : compose-n-test ( a b c -- x ) 2 \ + compose-n ;
 
@@ -66,3 +66,8 @@ DEFER: curry-folding-test ( quot -- )
 { 3 0 } [ [ 1 2 3 ] curry-folding-test ] must-infer-as
 { 3 0 } [ 1 [ 2 3 ] curry curry-folding-test ] must-infer-as
 { 3 0 } [ [ 1 2 ] 3 [ ] curry compose curry-folding-test ] must-infer-as
+
+: member?-test ( a -- ? ) { 1 2 3 10 7 58 } member? ;
+
+[ f ] [ 1.0 member?-test ] unit-test
+[ t ] [ \ member?-test def>> first [ member?-test ] all? ] unit-test

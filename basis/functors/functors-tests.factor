@@ -13,7 +13,7 @@ WHERE
 
 TUPLE: B { value T } ;
 
-C: <B> B
+C: <B> B ( T -- B )
 
 ;FUNCTOR
 

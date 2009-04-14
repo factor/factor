@@ -1,7 +1,8 @@
 USING: editors help.markup help.syntax summary inspector io io.styles
 listener parser prettyprint tools.profiler tools.walker ui.commands
 ui.gadgets.panes ui.gadgets.presentations ui.operations
-ui.tools.operations ui.tools.profiler ui.tools.common vocabs see ;
+ui.tools.operations ui.tools.profiler ui.tools.common vocabs see
+help.tips ;
 IN: ui.tools
 
 ARTICLE: "starting-ui-tools" "Starting the UI tools"
@@ -54,17 +55,23 @@ $nl
 
 ARTICLE: "ui-tools" "UI developer tools"
 "The " { $vocab-link "ui.tools" } " vocabulary hierarchy implements a collection of simple developer tools."
-$nl
+{ $subsection "starting-ui-tools" }
 "To take full advantage of the UI tools, you should be using a supported text editor. See " { $link "editor" } "."
+$nl
+"Common functionality:"
 { $subsection "ui-shortcuts" }
 { $subsection "ui-presentations" }
+{ $subsection "definitions.icons" }
+"Tools:"
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }
 { $subsection "ui-inspector" }
-{ $subsection "ui-profiler" }
+{ $subsection "ui.tools.profiler" }
 { $subsection "ui-walker" }
 { $subsection "ui.tools.deploy" }
 "Platform-specific features:"
 { $subsection "ui-cocoa" } ;
+
+TIP: "All UI developer tools support a common set of " { $link "ui-shortcuts" } ". Each individual tool has its own shortcuts as well; the F1 key is context-sensitive." ;
 
 ABOUT: "ui-tools"

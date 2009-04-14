@@ -3,6 +3,38 @@ namespaces combinators words classes sequences accessors
 math.functions arrays ;
 IN: combinators.tests
 
+[ 3 ] [ 1 2 [ + ] call( x y -- z ) ] unit-test
+[ 1 2 [ + ] call( -- z ) ] must-fail
+[ 1 2 [ + ] call( x y -- z a ) ] must-fail
+[ 1 2 3 { 1 2 3 4 } ] [ 1 2 3 4 [ datastack nip ] call( x -- y ) ] unit-test
+[ [ + ] call( x y -- z ) ] must-infer
+
+[ 3 ] [ 1 2 \ + execute( x y -- z ) ] unit-test
+[ 1 2 \ + execute( -- z ) ] must-fail
+[ 1 2 \ + execute( x y -- z a ) ] must-fail
+[ \ + execute( x y -- z ) ] must-infer
+
+: compile-execute(-test-1 ( a b -- c ) \ + execute( a b -- c ) ;
+
+[ t ] [ \ compile-execute(-test-1 optimized>> ] unit-test
+[ 4 ] [ 1 3 compile-execute(-test-1 ] unit-test
+
+: compile-execute(-test-2 ( a b w -- c ) execute( a b -- c ) ;
+
+[ t ] [ \ compile-execute(-test-2 optimized>> ] unit-test
+[ 4 ] [ 1 3 \ + compile-execute(-test-2 ] unit-test
+[ 5 ] [ 1 4 \ + compile-execute(-test-2 ] unit-test
+[ -3 ] [ 1 4 \ - compile-execute(-test-2 ] unit-test
+[ 5 ] [ 1 4 \ + compile-execute(-test-2 ] unit-test
+
+: compile-call(-test-1 ( a b q -- c ) call( a b -- c ) ;
+
+[ t ] [ \ compile-call(-test-1 optimized>> ] unit-test
+[ 4 ] [ 1 3 [ + ] compile-call(-test-1 ] unit-test
+[ 7 ] [ 1 3 2 [ * + ] curry compile-call(-test-1 ] unit-test
+[ 7 ] [ 1 3 [ 2 * ] [ + ] compose compile-call(-test-1 ] unit-test
+[ 4 ] [ 1 3 [ { + } [ ] like call ] compile-call(-test-1 ] unit-test
+
 ! Compiled
 : cond-test-1 ( obj -- str )
     {
@@ -256,7 +288,7 @@ CONSTANT: case-const-2 2
     } case
 ] unit-test
 
-: do-not-call "do not call" throw ;
+: do-not-call ( -- * ) "do not call" throw ;
 
 : test-case-6 ( obj -- value )
     {

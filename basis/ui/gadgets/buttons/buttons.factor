@@ -6,7 +6,7 @@ classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.tracks
 ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.pens ui.pens.solid
 ui.pens.image ui.pens.tile math.rectangles locals fry
-combinators.smart call ;
+combinators.smart ;
 IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot ;

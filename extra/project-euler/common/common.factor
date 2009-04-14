@@ -1,8 +1,10 @@
-! Copyright (c) 2007-2008 Aaron Schaefer.
+! Copyright (c) 2007-2009 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel make math math.functions math.matrices math.miller-rabin
-    math.order math.parser math.primes.factors math.ranges math.ratios
-    sequences sorting strings unicode.case ;
+USING: accessors arrays kernel lists make math math.functions math.matrices
+    math.miller-rabin math.order math.parser math.primes.factors
+    math.primes.lists math.ranges math.ratios namespaces parser prettyprint
+    quotations sequences sorting strings unicode.case vocabs vocabs.parser
+    words ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -15,11 +17,13 @@ IN: project-euler.common
 ! log10 - #25, #134
 ! max-path - #18, #67
 ! mediant - #71, #73
+! nth-prime - #7, #69
 ! nth-triangle - #12, #42
 ! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92
 ! palindrome? - #4, #36, #55
 ! pandigital? - #32, #38
 ! pentagonal? - #44, #45
+! penultimate - #69, #71
 ! propagate-all - #18, #67
 ! sum-proper-divisors - #21
 ! tau* - #12
@@ -43,7 +47,7 @@ IN: project-euler.common
 
 : (sum-divisors) ( n -- sum )
     dup sqrt >integer [1,b] [
-        [ 2dup mod 0 = [ 2dup / + , ] [ drop ] if ] each
+        [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each
         dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
     ] { } make sum ;
 
@@ -56,7 +60,7 @@ PRIVATE>
     >lower [ CHAR: a - 1+ ] sigma ;
 
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
-    swap [ swap [ 2array ] with map ] with map concat ;
+    [ [ 2array ] with map ] curry map concat ;
 
 : log10 ( m -- n )
     log 10 log / ;
@@ -74,6 +78,12 @@ PRIVATE>
 : number>digits ( n -- seq )
     [ dup 0 = not ] [ 10 /mod ] produce reverse nip ;
 
+: number-length ( n -- m )
+    log10 floor 1+ >integer ;
+
+: nth-prime ( n -- n )
+    1- lprimes lnth ;
+
 : nth-triangle ( n -- n )
     dup 1+ * 2 / ;
 
@@ -85,6 +95,9 @@ PRIVATE>
 
 : pentagonal? ( n -- ? )
     dup 0 > [ 24 * 1+ sqrt 1+ 6 / 1 mod zero? ] [ drop f ] if ;
+
+: penultimate ( seq -- elt )
+    dup length 2 - swap nth ;
 
 ! Not strictly needed, but it is nice to be able to dump the triangle after the
 ! propagation
@@ -116,7 +129,7 @@ PRIVATE>
     factor-2s dup [ 1+ ]
     [ perfect-square? -1 0 ? ]
     [ dup sqrt >fixnum [1,b] ] tri* [
-        dupd mod 0 = [ [ 2 + ] dip ] when
+        dupd divisor? [ [ 2 + ] dip ] when
     ] each drop * ;
 
 ! These transforms are for generating primitive Pythagorean triples
@@ -127,3 +140,9 @@ PRIVATE>
 : d-transform ( triple -- new-triple )
     { { -1 -2 -2 } { 2 1 2 } { 2 2 3 } } transform ;
 
+SYNTAX: SOLUTION:
+    scan-word
+    [ name>> "-main" append create-in ] keep
+    [ drop in get vocab (>>main) ]
+    [ [ . ] swap prefix (( -- )) define-declared ]
+    2bi ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.disassembler namespaces combinators
 alien alien.syntax alien.c-types lexer parser kernel
-sequences layouts math math.order
+sequences layouts math math.order alien.libraries
 math.parser system make fry arrays ;
 IN: tools.disassembler.udis
 
@@ -30,9 +30,9 @@ CONSTANT: UD_VENDOR_AMD   0
 CONSTANT: UD_VENDOR_INTEL 1
 
 FUNCTION: void ud_init ( ud* u ) ;
-FUNCTION: void ud_set_mode ( ud* u, uint8_t mode ) ;
+FUNCTION: void ud_set_mode ( ud* u, uchar mode ) ;
 FUNCTION: void ud_set_pc ( ud* u, ulonglong pc ) ;
-FUNCTION: void ud_set_input_buffer ( ud* u, uint8_t* offset, size_t size ) ;
+FUNCTION: void ud_set_input_buffer ( ud* u, uchar* offset, size_t size ) ;
 FUNCTION: void ud_set_vendor ( ud* u, uint vendor ) ;
 FUNCTION: void ud_set_syntax ( ud* u, void* syntax ) ;
 FUNCTION: void ud_input_skip ( ud* u, size_t size ) ;

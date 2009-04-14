@@ -103,18 +103,19 @@ M: lambda-parser parse-quotation ( -- quotation )
     "|" expect "|" parse-wbindings
     (parse-lambda) <wlet> ?rewrite-closures ;
 
-: parse-locals ( -- vars assoc )
-    "(" expect ")" parse-effect
-    word [ over "declared-effect" set-word-prop ] when*
+: parse-locals ( -- effect vars assoc )
+    complete-effect
+    dup
     in>> [ dup pair? [ first ] when ] map make-locals ;
 
-: parse-locals-definition ( word reader -- word quot )
+: parse-locals-definition ( word reader -- word quot effect )
     [ parse-locals ] dip
     ((parse-lambda)) <lambda>
-    [ "lambda" set-word-prop ]
-    [ rewrite-closures dup length 1 = [ first ] [ bad-rewrite ] if ] 2bi ; inline
+    [ nip "lambda" set-word-prop ]
+    [ nip rewrite-closures dup length 1 = [ first ] [ bad-rewrite ] if ]
+    [ drop nip ] 3tri ; inline
 
-: (::) ( -- word def )
+: (::) ( -- word def effect )
     CREATE-WORD
     [ parse-definition ]
     parse-locals-definition ;
@@ -123,5 +124,5 @@ M: lambda-parser parse-quotation ( -- quotation )
     CREATE-METHOD
     [
         [ parse-definition ] 
-        parse-locals-definition
+        parse-locals-definition drop
     ] with-method-definition ;

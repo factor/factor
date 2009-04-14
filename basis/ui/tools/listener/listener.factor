@@ -2,12 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar combinators locals
 colors.constants combinators.short-circuit compiler.units
-concurrency.flags concurrency.mailboxes continuations destructors
-documents documents.elements fry hashtables help help.markup io
-io.styles kernel lexer listener math models models.delay models.arrow
-namespaces parser prettyprint quotations sequences strings threads
-tools.vocabs vocabs vocabs.loader vocabs.parser words debugger ui ui.commands
-ui.pens.solid ui.gadgets ui.gadgets.glass ui.gadgets.buttons ui.gadgets.editors
+help.tips concurrency.flags concurrency.mailboxes continuations
+destructors documents documents.elements fry hashtables help
+help.markup io io.styles kernel lexer listener math models
+models.delay models.arrow namespaces parser prettyprint quotations
+sequences strings threads tools.vocabs vocabs vocabs.loader
+vocabs.parser words debugger ui ui.commands ui.pens.solid ui.gadgets
+ui.gadgets.glass ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
@@ -83,6 +84,8 @@ M: interactor model-changed
         dup popup>>
         [ 2drop ] [ [ value>> ] dip show-summary ] if
     ] [ call-next-method ] if ;
+
+M: interactor stream-element-type drop +character+ ;
 
 GENERIC: (print-input) ( object -- )
 
@@ -260,8 +263,9 @@ M: listener-operation invoke-command ( target command -- )
 
 : listener-run-files ( seq -- )
     [
-        [ \ listener-run-files ] dip
-        '[ _ [ run-file ] each ] call-listener
+        '[ _ [ run-file ] each ]
+        \ listener-run-files
+        call-listener
     ] unless-empty ;
 
 : com-end ( listener -- )
@@ -352,16 +356,11 @@ interactor "completion" f {
     { T{ key-down f { C+ } "r" } history-completion-popup }
 } define-command-map
 
-: welcome. ( -- )
-    "If this is your first time with Factor, please read the " print
-    "handbook" ($link) ". To see a list of keyboard shortcuts," print
-    "press F1." print nl ;
-
 : listener-thread ( listener -- )
     dup listener-streams [
         [ com-browse ] help-hook set
         '[ [ _ input>> ] 2dip debugger-popup ] error-hook set
-        welcome.
+        tip-of-the-day. nl
         listener
     ] with-streams* ;
 
@@ -383,7 +382,7 @@ interactor "completion" f {
         [ wait-for-listener ]
     } cleave ;
 
-: listener-help ( -- ) "ui-listener" com-browse ;
+: listener-help ( -- ) "help.home" com-browse ;
 
 \ listener-help H{ { +nullary+ t } } define-command
 

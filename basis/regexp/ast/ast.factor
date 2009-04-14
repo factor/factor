@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays accessors fry sequences regexp.classes ;
-FROM: math.ranges => [a,b] ;
+USING: kernel arrays accessors fry sequences regexp.classes
+math.ranges math ;
 IN: regexp.ast
 
 TUPLE: negation term ;
@@ -21,12 +21,12 @@ CONSTANT: epsilon T{ tagged-epsilon { tag t } }
 TUPLE: concatenation first second ;
 
 : <concatenation> ( seq -- concatenation )
-    [ epsilon ] [ unclip [ concatenation boa ] reduce ] if-empty ;
+    [ epsilon ] [ [ ] [ concatenation boa ] map-reduce ] if-empty ;
 
 TUPLE: alternation first second ;
 
 : <alternation> ( seq -- alternation )
-    unclip [ alternation boa ] reduce ;
+    [ ] [ alternation boa ] map-reduce ;
 
 TUPLE: star term ;
 C: <star> star
@@ -37,8 +37,7 @@ C: <with-options> with-options
 TUPLE: options on off ;
 C: <options> options
 
-SINGLETONS: unix-lines dotall multiline comments case-insensitive
-unicode-case reversed-regexp ;
+SINGLETONS: unix-lines dotall multiline case-insensitive reversed-regexp ;
 
 : <maybe> ( term -- term' )
     f <concatenation> 2array <alternation> ;
@@ -50,10 +49,20 @@ unicode-case reversed-regexp ;
     <array> <concatenation> ;
 
 GENERIC: <times> ( term times -- term' )
+
 M: at-least <times>
     n>> swap [ repetition ] [ <star> ] bi 2array <concatenation> ;
+
+: to-times ( term n -- ast )
+    dup zero?
+    [ 2drop epsilon ]
+    [ dupd 1- to-times 2array <concatenation> <maybe> ]
+    if ;
+
 M: from-to <times>
-    [ n>> ] [ m>> ] bi [a,b] swap '[ _ repetition ] map <alternation> ;
+    [ n>> swap repetition ]
+    [ [ m>> ] [ n>> ] bi - to-times ] 2bi
+    2array <concatenation> ;
 
 : char-class ( ranges ? -- term )
     [ <or-class> ] dip [ <not-class> ] when ;

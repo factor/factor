@@ -37,7 +37,7 @@ IN: math.bitwise
 
 ! flags
 MACRO: flags ( values -- )
-    [ 0 ] [ [ dup word? [ execute ] when bitor ] curry compose ] reduce ;
+    [ 0 ] [ [ ?execute bitor ] curry compose ] reduce ;
 
 ! bitfield
 <PRIVATE

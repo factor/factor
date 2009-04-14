@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic sequences io words arrays summary effects
-assocs accessors namespaces compiler.errors stack-checker.values
-stack-checker.recursive-state ;
+continuations assocs accessors namespaces compiler.errors
+stack-checker.values stack-checker.recursive-state ;
 IN: stack-checker.errors
 
 : pretty-word ( word -- word' )
@@ -15,7 +15,7 @@ M: inference-error compiler-error-type type>> ;
 : (inference-error) ( ... class type -- * )
     [ boa ] dip
     recursive-state get word>>
-    \ inference-error boa throw ; inline
+    \ inference-error boa rethrow ; inline
 
 : inference-error ( ... class -- * )
     +error+ (inference-error) ; inline

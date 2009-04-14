@@ -10,11 +10,11 @@ IN: xmode.loader.syntax
 : (parse-rule-tag) ( rule-set tag specs class -- )
     new swap init-from-tag swap add-rule ; inline
 
-: RULE:
+SYNTAX: RULE:
     scan scan-word scan-word [
-        parse-definition { } make
+        [ parse-definition call( -- ) ] { } make
         swap [ (parse-rule-tag) ] 2curry
-    ] dip swap define-tag ; parsing
+    ] dip swap define-tag ;
 
 ! Attribute utilities
 : string>boolean ( string -- ? ) "TRUE" = ;

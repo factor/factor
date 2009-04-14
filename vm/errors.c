@@ -144,12 +144,6 @@ void misc_signal_handler_impl(void)
 	signal_error(signal_number,signal_callstack_top);
 }
 
-void primitive_throw(void)
-{
-	dpop();
-	throw_impl(dpop(),stack_chain->callstack_top);
-}
-
 void primitive_call_clear(void)
 {
 	throw_impl(dpop(),stack_chain->callstack_bottom);

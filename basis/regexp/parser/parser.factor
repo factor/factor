@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: peg.ebnf kernel math.parser sequences assocs arrays fry math
 combinators regexp.classes strings splitting peg locals accessors
-regexp.ast ;
+regexp.ast unicode.case unicode.script.private unicode.categories
+memoize interval-maps sets unicode.data combinators.short-circuit ;
 IN: regexp.parser
 
 : allowed-char? ( ch -- ? )
@@ -18,23 +19,54 @@ ERROR: bad-number ;
 
 ERROR: bad-class name ;
 
-: name>class ( name -- class )
+: simple ( str -- simple )
+    ! Alternatively, first collation key level?
+    >case-fold [ " \t_" member? not ] filter ;
+
+: simple-table ( seq -- table )
+    [ [ simple ] keep ] H{ } map>assoc ;
+
+MEMO: simple-script-table ( -- table )
+    script-table interval-values prune simple-table ;
+
+MEMO: simple-category-table ( -- table )
+    categories simple-table ;
+
+: parse-unicode-class ( name -- class )
     {
-        { "Lower" letter-class }
-        { "Upper" LETTER-class }
-        { "Alpha" Letter-class }
-        { "ASCII" ascii-class }
-        { "Digit" digit-class }
-        { "Alnum" alpha-class }
-        { "Punct" punctuation-class }
-        { "Graph" java-printable-class }
-        { "Print" java-printable-class }
-        { "Blank" non-newline-blank-class }
-        { "Cntrl" control-character-class }
-        { "XDigit" hex-digit-class }
-        { "Space" java-blank-class }
-        ! TODO: unicode-character-class
-    } [ bad-class ] at-error ;
+        { [ dup { [ length 1 = ] [ first "clmnpsz" member? ] } 1&& ] [
+            >upper first
+            <category-range-class>
+        ] }
+        { [ dup >title categories member? ] [
+            simple-category-table at <category-class>
+        ] }
+        { [ "script=" ?head ] [
+            dup simple-script-table at
+            [ <script-class> ]
+            [ "script=" prepend bad-class ] ?if
+        ] }
+        [ bad-class ]
+    } cond ;
+
+: unicode-class ( name -- class )
+    dup parse-unicode-class [ ] [ bad-class ] ?if ;
+
+: name>class ( name -- class )
+    >string simple {
+        { "lower" letter-class }
+        { "upper" LETTER-class }
+        { "alpha" Letter-class }
+        { "ascii" ascii-class }
+        { "digit" digit-class }
+        { "alnum" alpha-class }
+        { "punct" punctuation-class }
+        { "graph" java-printable-class }
+        { "blank" non-newline-blank-class }
+        { "cntrl" control-character-class }
+        { "xdigit" hex-digit-class }
+        { "space" java-blank-class }
+    } [ unicode-class ] at-error ;
 
 : lookup-escape ( char -- ast )
     {
@@ -66,15 +98,14 @@ ERROR: bad-class name ;
         { CHAR: i case-insensitive }
         { CHAR: d unix-lines }
         { CHAR: m multiline }
-        { CHAR: n multiline }
         { CHAR: r reversed-regexp }
         { CHAR: s dotall }
-        { CHAR: u unicode-case }
-        { CHAR: x comments }
     } ;
 
+ERROR: nonexistent-option name ;
+
 : ch>option ( ch -- singleton )
-    options-assoc at ;
+    dup options-assoc at [ ] [ nonexistent-option ] ?if ;
 
 : option>ch ( option -- string )
     options-assoc value-at ;
@@ -101,8 +132,8 @@ CharacterInBracket = !("}") Character
 
 QuotedCharacter = !("\\E") .
 
-Escape = "p{" CharacterInBracket*:s "}" => [[ s >string name>class <primitive-class> ]]
-       | "P{" CharacterInBracket*:s "}" => [[ s >string name>class <primitive-class> <negation> ]]
+Escape = "p{" CharacterInBracket*:s "}" => [[ s name>class <primitive-class> ]]
+       | "P{" CharacterInBracket*:s "}" => [[ s name>class <primitive-class> <negation> ]]
        | "Q" QuotedCharacter*:s "\\E" => [[ s <concatenation> ]]
        | "u" Character:a Character:b Character:c Character:d
             => [[ { a b c d } hex> ensure-number ]]
@@ -119,19 +150,29 @@ Character = EscapeSequence
           | "^" => [[ ^ <tagged-epsilon> ]]
           | . ?[ allowed-char? ]?
 
-AnyRangeCharacter = EscapeSequence | .
+AnyRangeCharacter = !("&&"|"||"|"--"|"~~") (EscapeSequence | .)
 
 RangeCharacter = !("]") AnyRangeCharacter
 
-Range = RangeCharacter:a "-" RangeCharacter:b => [[ a b <range> ]]
+Range = RangeCharacter:a "-" !("-") RangeCharacter:b => [[ a b <range-class> ]]
       | RangeCharacter
 
-StartRange = AnyRangeCharacter:a "-" RangeCharacter:b => [[ a b <range> ]]
+StartRange = AnyRangeCharacter:a "-" !("-") RangeCharacter:b => [[ a b <range-class> ]]
            | AnyRangeCharacter
 
 Ranges = StartRange:s Range*:r => [[ r s prefix ]]
 
-CharClass = "^"?:n Ranges:e => [[ e n char-class ]]
+BasicCharClass =  "^"?:n Ranges:e => [[ e n char-class ]]
+
+CharClass = BasicCharClass:b "&&" CharClass:c
+                => [[ b c 2array <and-class> ]]
+          | BasicCharClass:b "||" CharClass:c
+                => [[ b c 2array <or-class> ]]
+          | BasicCharClass:b "~~" CharClass:c
+                => [[ b c <sym-diff-class> ]]
+          | BasicCharClass:b "--" CharClass:c
+                => [[ b c <minus-class> ]]
+          | BasicCharClass
 
 Options = [idmsux]*
 
@@ -148,7 +189,7 @@ Parenthized = "?:" Alternation:a => [[ a ]]
 
 Element = "(" Parenthized:p ")" => [[ p ]]
         | "[" CharClass:r "]" => [[ r ]]
-        | ".":d => [[ any-char <primitive-class> ]]
+        | ".":d => [[ dot ]]
         | Character
 
 Number = (!(","|"}").)* => [[ string>number ensure-number ]]

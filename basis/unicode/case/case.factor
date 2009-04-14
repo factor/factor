@@ -1,17 +1,11 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unicode.data sequences namespaces
-sbufs make unicode.syntax unicode.normalize math hints
-unicode.categories combinators unicode.syntax assocs combinators.short-circuit
+sbufs make unicode.normalize math hints
+unicode.categories combinators assocs combinators.short-circuit
 strings splitting kernel accessors unicode.breaks fry locals ;
 QUALIFIED: ascii
 IN: unicode.case
-
-<PRIVATE
-: ch>lower ( ch -- lower ) simple-lower at-default ; inline
-: ch>upper ( ch -- upper ) simple-upper at-default ; inline
-: ch>title ( ch -- title ) simple-title at-default ; inline
-PRIVATE>
 
 SYMBOL: locale ! Just casing locale, or overall?
 
@@ -86,7 +80,7 @@ SYMBOL: locale ! Just casing locale, or overall?
 :: map-case ( string string-quot char-quot -- case )
     string length <sbuf> :> out
     string [
-        dup special-casing at
+        dup special-case
         [ string-quot call out push-all ]
         [ char-quot call out push ] ?if
     ] each out "" like ; inline

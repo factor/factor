@@ -104,3 +104,6 @@ USING: math.matrices math.vectors tools.test math ;
 [ { 0 1 0 } ] [ { 0 0 1 } { 1 0 0 } cross ] unit-test
 
 [ { 1 0 0 } ] [ { 1 1 0 } { 1 0 0 } proj ] unit-test
+
+[ { { { 1 "a" } { 1 "b" } } { { 2 "a" } { 2 "b" } } } ]
+[ { 1 2 } { "a" "b" } cross-zip ] unit-test

@@ -53,6 +53,10 @@ IN: tools.deploy.shaker
         run-file
     ] when ;
 
+: strip-call ( -- )
+    "Stripping stack effect checking from call( and execute(" show
+    "vocab:tools/deploy/shaker/strip-call.factor" run-file ;
+
 : strip-cocoa ( -- )
     "cocoa" vocab [
         "Stripping unused Cocoa methods" show
@@ -115,6 +119,7 @@ IN: tools.deploy.shaker
                 "inline"
                 "inlined-block"
                 "input-classes"
+                "instances"
                 "interval"
                 "intrinsics"
                 "lambda"
@@ -152,6 +157,8 @@ IN: tools.deploy.shaker
                 "specializer"
                 "step-into"
                 "step-into?"
+                ! UI needs this
+                ! "superclass"
                 "transform-n"
                 "transform-quot"
                 "tuple-dispatch-generic"
@@ -163,8 +170,6 @@ IN: tools.deploy.shaker
         
         strip-prettyprint? [
             {
-                "break-before"
-                "break-after"
                 "delimiter"
                 "flushable"
                 "foldable"
@@ -199,7 +204,8 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-vocab-globals ( except names -- words )
-    [ child-vocabs [ words ] map concat ] map concat swap diff ;
+    [ child-vocabs [ words ] map concat ] map concat
+    swap [ first2 lookup ] map sift diff ;
 
 : stripped-globals ( -- seq )
     [
@@ -240,7 +246,8 @@ IN: tools.deploy.shaker
         strip-dictionary? [
             "libraries" "alien" lookup ,
 
-            { } { "cpu" "compiler" } strip-vocab-globals %
+            { { "yield-hook" "compiler.utilities" } }
+            { "cpu" "compiler" } strip-vocab-globals %
 
             {
                 gensym
@@ -256,9 +263,7 @@ IN: tools.deploy.shaker
                 command-line:main-vocab-hook
                 compiled-crossref
                 compiled-generic-crossref
-                recompile-hook
-                update-tuples-hook
-                remake-generics-hook
+                compiler-impl
                 definition-observers
                 definitions:crossref
                 interactive-vocabs
@@ -270,7 +275,6 @@ IN: tools.deploy.shaker
                 lexer-factory
                 print-use-hook
                 root-cache
-                vocab-roots
                 vocabs:dictionary
                 vocabs:load-vocab-hook
                 word
@@ -339,7 +343,8 @@ IN: tools.deploy.shaker
     ] 2each ;
 
 : compress-quotations ( -- )
-    [ quotation? ] [ remain-compiled ] "quotations" compress ;
+    [ quotation? ] [ remain-compiled ] "quotations" compress
+    [ quotation? ] instances [ f >>cached-effect f >>cache-counter drop ] each ;
 
 : compress-strings ( -- )
     [ string? ] [ ] "strings" compress ;
@@ -399,6 +404,7 @@ SYMBOL: deploy-vocab
     init-stripper
     strip-default-methods
     strip-libc
+    strip-call
     strip-cocoa
     strip-debugger
     compute-next-methods

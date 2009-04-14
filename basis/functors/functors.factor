@@ -14,7 +14,9 @@ IN: functors
 
 : scan-param ( -- obj ) scan-object literalize ;
 
-: define* ( word def effect -- ) pick set-word define-declared ;
+: define* ( word def -- ) over set-word define ;
+
+: define-declared* ( word def effect -- ) pick set-word define-declared ;
 
 TUPLE: fake-quotation seq ;
 
@@ -36,12 +38,17 @@ M: array fake-quotations> [ fake-quotations> ] map ;
 
 M: object fake-quotations> ;
 
-: parse-definition* ( -- )
+: parse-definition* ( accum -- accum )
     parse-definition >fake-quotations parsed \ fake-quotations> parsed ;
 
-: DEFINE* ( accum -- accum ) effect get parsed \ define* parsed ;
+: parse-declared* ( accum -- accum )
+    complete-effect
+    [ parse-definition* ] dip
+    parsed ;
 
-: `TUPLE:
+: DEFINE* ( accum -- accum ) \ define-declared* parsed ;
+
+SYNTAX: `TUPLE:
     scan-param parsed
     scan {
         { ";" [ tuple parsed f parsed ] }
@@ -52,40 +59,38 @@ M: object fake-quotations> ;
             make parsed
         ]
     } case
-    \ define-tuple-class parsed ; parsing
+    \ define-tuple-class parsed ;
 
-: `M:
-    effect off
+SYNTAX: `M:
     scan-param parsed
     scan-param parsed
     \ create-method-in parsed
     parse-definition*
-    DEFINE* ; parsing
+    \ define* parsed ;
 
-: `C:
-    effect off
+SYNTAX: `C:
     scan-param parsed
     scan-param parsed
-    [ [ boa ] curry ] over push-all
-    DEFINE* ; parsing
+    complete-effect
+    [ [ [ boa ] curry ] over push-all ] dip parsed
+    \ define-declared* parsed ;
 
-: `:
-    effect off
+SYNTAX: `:
+    scan-param parsed
+    parse-declared*
+    \ define-declared* parsed ;
+
+SYNTAX: `SYNTAX:
     scan-param parsed
     parse-definition*
-    DEFINE* ; parsing
+    \ define-syntax parsed ;
 
-: `INSTANCE:
+SYNTAX: `INSTANCE:
     scan-param parsed
     scan-param parsed
-    \ add-mixin-instance parsed ; parsing
+    \ add-mixin-instance parsed ;
 
-: `inline [ word make-inline ] over push-all ; parsing
-
-: `parsing [ word make-parsing ] over push-all ; parsing
-
-: `(
-    ")" parse-effect effect set ; parsing
+SYNTAX: `inline [ word make-inline ] over push-all ;
 
 : (INTERPOLATE) ( accum quot -- accum )
     [ scan interpolate-locals ] dip
@@ -93,11 +98,11 @@ M: object fake-quotations> ;
 
 PRIVATE>
 
-: IS [ dup search [ ] [ no-word ] ?if ] (INTERPOLATE) ; parsing
+SYNTAX: IS [ dup search [ ] [ no-word ] ?if ] (INTERPOLATE) ;
 
-: DEFINES [ create-in ] (INTERPOLATE) ; parsing
+SYNTAX: DEFINES [ create-in ] (INTERPOLATE) ;
 
-: DEFINES-CLASS [ create-class-in ] (INTERPOLATE) ; parsing
+SYNTAX: DEFINES-CLASS [ create-class-in ] (INTERPOLATE) ;
 
 DEFER: ;FUNCTOR delimiter
 
@@ -110,9 +115,8 @@ DEFER: ;FUNCTOR delimiter
         { "C:" POSTPONE: `C: }
         { ":" POSTPONE: `: }
         { "INSTANCE:" POSTPONE: `INSTANCE: }
+        { "SYNTAX:" POSTPONE: `SYNTAX: }
         { "inline" POSTPONE: `inline }
-        { "parsing" POSTPONE: `parsing }
-        { "(" POSTPONE: `( }
     } ;
 
 : push-functor-words ( -- )
@@ -127,9 +131,9 @@ DEFER: ;FUNCTOR delimiter
     [ \ ;FUNCTOR parse-until >quotation ] ((parse-lambda)) <let*> 1quotation
     pop-functor-words ;
 
-: (FUNCTOR:) ( -- word def )
+: (FUNCTOR:) ( -- word def effect )
     CREATE-WORD [ parse-functor-body ] parse-locals-definition ;
 
 PRIVATE>
 
-: FUNCTOR: (FUNCTOR:) define ; parsing
+SYNTAX: FUNCTOR: (FUNCTOR:) define-declared ;

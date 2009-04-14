@@ -35,11 +35,14 @@ SYMBOLS: +optimized+ +unoptimized+ ;
     [ usage [ word? ] filter ] [ compiled-usage keys ] if
     [ queue-compile ] each ;
 
-: ripple-up? ( word status -- ? )
-    swap "compiled-status" word-prop [ = not ] keep and ;
+: ripple-up? ( status word -- ? )
+    [
+        [ nip changed-effects get key? ]
+        [ "compiled-status" word-prop eq? not ] 2bi or
+    ] keep "compiled-status" word-prop and ;
 
 : save-compiled-status ( word status -- )
-    [ dupd ripple-up? [ ripple-up ] [ drop ] if ]
+    [ over ripple-up? [ ripple-up ] [ drop ] if ]
     [ "compiled-status" set-word-prop ]
     2bi ;
 
@@ -111,7 +114,7 @@ t compile-dependencies? set-global
     ] with-return ;
 
 : compile-loop ( deque -- )
-    [ (compile) yield-hook get call ] slurp-deque ;
+    [ (compile) yield-hook get call( -- ) ] slurp-deque ;
 
 : decompile ( word -- )
     f 2array 1array modify-code-heap ;
@@ -119,7 +122,9 @@ t compile-dependencies? set-global
 : compile-call ( quot -- )
     [ dup infer define-temp ] with-compilation-unit execute ;
 
-: optimized-recompile-hook ( words -- alist )
+SINGLETON: optimizing-compiler
+
+M: optimizing-compiler recompile ( words -- alist )
     [
         <hashed-dlist> compile-queue set
         H{ } clone compiled set
@@ -129,10 +134,10 @@ t compile-dependencies? set-global
     ] with-scope ;
 
 : enable-compiler ( -- )
-    [ optimized-recompile-hook ] recompile-hook set-global ;
+    optimizing-compiler compiler-impl set-global ;
 
 : disable-compiler ( -- )
-    [ default-recompile-hook ] recompile-hook set-global ;
+    f compiler-impl set-global ;
 
 : recompile-all ( -- )
     forget-errors all-words compile ;

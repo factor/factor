@@ -1,8 +1,8 @@
 IN: urls.tests
-USING: urls urls.private tools.test
+USING: urls urls.private tools.test prettyprint
 arrays kernel assocs present accessors ;
 
-: urls
+CONSTANT: urls
     {
         {
             T{ url
@@ -80,7 +80,16 @@ arrays kernel assocs present accessors ;
             }
             "ftp://slava:secret@ftp.kernel.org/"
         }
-    } ;
+        {
+            T{ url
+               { protocol "http" }
+               { host "foo.com" }
+               { path "/" }
+               { query H{ { "a" f } } }
+            }
+            "http://foo.com/?a"
+        }
+    }
 
 urls [
     [ 1array ] [ [ >url ] curry ] bi* unit-test
@@ -227,3 +236,5 @@ urls [
 [ "http://localhost/?foo=bar" >url ] unit-test
 
 [ "/" ] [ "http://www.jedit.org" >url path>> ] unit-test
+
+[ "USING: urls ;\nURL\" foo\"" ] [ URL" foo" unparse-use ] unit-test

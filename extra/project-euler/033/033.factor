@@ -33,7 +33,7 @@ IN: project-euler.033
     10 99 [a,b] dup cartesian-product [ first2 < ] filter ;
 
 : safe? ( ax xb -- ? )
-    [ 10 /mod ] bi@ -roll = rot zero? not and nip ;
+    [ 10 /mod ] bi@ [ = ] dip zero? not and nip ;
 
 : ax/xb ( ax xb -- z/f )
     2dup safe? [ [ 10 /mod ] bi@ 2nip / ] [ 2drop f ] if ;
@@ -52,4 +52,4 @@ PRIVATE>
 ! [ euler033 ] 100 ave-time
 ! 7 ms ave run time - 1.31 SD (100 trials)
 
-MAIN: euler033
+SOLUTION: euler033

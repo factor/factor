@@ -117,20 +117,20 @@ $nl
 }
 { $references
     { "Since quotations are objects, they can be constructed and taken apart at will. You can write code that writes code. Arrays are just one of the various types of sequences, and the sequence operations such as " { $link each } " and " { $link map } " operate on all types of sequences. There are many more sequence iteration operations than the ones above, too." }
-    "dataflow"
+    "combinators"
     "sequences"
 } ;
 
-ARTICLE: "cookbook-variables" "Variables cookbook"
-"Before using a variable, you must define a symbol for it:"
-{ $code "SYMBOL: name" }
+ARTICLE: "cookbook-variables" "Dynamic variables cookbook"
 "A symbol is a word which pushes itself on the stack when executed. Try it:"
 { $example "SYMBOL: foo" "foo ." "foo" }
+"Before using a variable, you must define a symbol for it:"
+{ $code "SYMBOL: name" }
 "Symbols can be passed to the " { $link get } " and " { $link set } " words to read and write variable values:"
-{ $example "\"Slava\" name set" "name get print" "Slava" }
+{ $unchecked-example "\"Slava\" name set" "name get print" "Slava" }
 "If you set variables inside a " { $link with-scope } ", their values will be lost after leaving the scope:"
-{ $example
-    ": print-name name get print ;"
+{ $unchecked-example
+    ": print-name ( -- ) name get print ;"
     "\"Slava\" name set"
     "["
     "    \"Diana\" name set"
@@ -139,11 +139,8 @@ ARTICLE: "cookbook-variables" "Variables cookbook"
     "\"Here, the name is \" write  print-name"
     "There, the name is Diana\nHere, the name is Slava"
 }
-{ $curious
-    "Variables are dynamically-scoped in Factor."
-}
 { $references
-    "There is a lot more to be said about variables and namespaces."
+    "There is a lot more to be said about dynamically-scoped variables and namespaces."
     "namespaces"
 } ;
 

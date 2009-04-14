@@ -139,10 +139,10 @@ check_library_exists() {
 }
 
 check_X11_libraries() {
-    check_library_exists freetype
     check_library_exists GLU
     check_library_exists GL
     check_library_exists X11
+    check_library_exists pango-1.0
 }
 
 check_libraries() {
@@ -445,16 +445,6 @@ get_url() {
     check_ret $DOWNLOADER
 }
 
-maybe_download_dlls() {
-    if [[ $OS == winnt ]] ; then
-	for file in `cat build-support/dlls.txt`; do
-	    get_url http://factorcode.org/dlls/$file
-            chmod 777 *.dll
-            check_ret chmod
-	done
-    fi
-}
-
 get_config_info() {
     find_build_info
     check_installed_programs
@@ -472,7 +462,6 @@ install() {
     cd_factor
     make_factor
     get_boot_image
-    maybe_download_dlls
     bootstrap
 }
 
@@ -502,7 +491,7 @@ make_boot_image() {
 }
 
 install_build_system_apt() {
-    sudo apt-get --yes install libc6-dev libpango-1.0-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
+    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
     check_ret sudo
 }
 
@@ -547,7 +536,6 @@ case "$1" in
     update) update; update_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
     report) find_build_info ;;
-    dlls) get_config_info; maybe_download_dlls;;
     net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
     make-target) ECHO=false; find_build_info; echo $MAKE_TARGET ;;
     *) usage ;;

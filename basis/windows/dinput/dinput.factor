@@ -2,12 +2,6 @@ USING: windows.kernel32 windows.ole32 windows.com windows.com.syntax
 alien alien.c-types alien.syntax kernel system namespaces math ;
 IN: windows.dinput
 
-<<
-    os windows?
-    [ "dinput" "dinput8.dll" "stdcall" add-library ]
-    when
->>
-
 LIBRARY: dinput
 
 TYPEDEF: void* LPDIENUMDEVICESCALLBACKW
@@ -27,15 +21,15 @@ TYPEDEF: void* LPDIENUMEFFECTSCALLBACKW
     [ "BOOL" { "LPCDIEFFECTINFOW" "LPVOID" } "stdcall" ]
     dip alien-callback ; inline
 TYPEDEF: void* LPDIENUMCREATEDEFFECTOBJECTSCALLBACK
-: LPDIENUMCREATEDEFFECTOBJECTSCALLBACK
+: LPDIENUMCREATEDEFFECTOBJECTSCALLBACK ( quot -- callback )
     [ "BOOL" { "LPDIRECTINPUTEFFECT" "LPVOID" } "stdcall" ]
     dip alien-callback ; inline
 TYPEDEF: void* LPDIENUMEFFECTSINFILECALLBACK
-: LPDIENUMEFFECTSINFILECALLBACK
+: LPDIENUMEFFECTSINFILECALLBACK ( quot -- callback )
     [ "BOOL" { "LPCDIFILEEFFECT" "LPVOID" } "stdcall" ]
     dip alien-callback ; inline
 TYPEDEF: void* LPDIENUMDEVICEOBJECTSCALLBACKW
-: LPDIENUMDEVICEOBJECTSCALLBACKW
+: LPDIENUMDEVICEOBJECTSCALLBACKW ( quot -- callback )
     [ "BOOL" { "LPCDIDEVICEOBJECTINSTANCEW" "LPVOID" } "stdcall" ]
     dip alien-callback ; inline
 

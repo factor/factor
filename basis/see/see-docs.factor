@@ -13,7 +13,12 @@ HELP: synopsis*
 
 HELP: see
 { $values { "defspec" "a definition specifier" } }
-{ $contract "Prettyprints a definition." } ;
+{ $contract "Prettyprints a definition." }
+{ $examples
+  "A word:" { $code "\\ append see" }
+  "A method:" { $code "USE: arrays" "M\\ array length see" }
+  "A help article:" { $code "USE: help.topics" "\"help\" >link see" }
+} ;
 
 HELP: see-methods
 { $values { "word" "a " { $link generic } " or a " { $link class } } }
@@ -25,7 +30,7 @@ HELP: definer
 { $examples
     { $example "USING: definitions prettyprint ;"
                "IN: scratchpad"
-               ": foo ; \\ foo definer . ."
+               ": foo ( -- ) ; \\ foo definer . ."
                ";\nPOSTPONE: :"
     }
     { $example "USING: definitions prettyprint ;"
@@ -50,6 +55,9 @@ $nl
 "Printing a definition:"
 { $subsection see }
 "Printing the methods defined on a generic word or class (see " { $link "objects" } "):"
-{ $subsection see-methods } ;
+{ $subsection see-methods }
+"Definition specifiers implementing the " { $link "definition-protocol" } " should also implement the " { $emphasis "see protocol" } ":"
+{ $subsection see* }
+{ $subsection synopsis* } ;
 
 ABOUT: "see"

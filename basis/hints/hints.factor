@@ -25,7 +25,7 @@ M: object specializer-declaration class ;
     [ drop object eq? not ] assoc-filter
     [ [ t ] ] [
         [ swap specializer-predicate append ] { } assoc>map
-        unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
+        [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce
     ] if-empty ;
 
 : specializer-cases ( quot word -- default alist )
@@ -34,16 +34,18 @@ M: object specializer-declaration class ;
         [ specializer-declaration ] map '[ _ declare ] pick append
     ] { } map>assoc ;
 
+: specialize-quot ( quot specializer -- quot' )
+    specializer-cases alist>quot ;
+
 : method-declaration ( method -- quot )
     [ "method-generic" word-prop dispatch# object <array> ]
     [ "method-class" word-prop ]
     bi prefix ;
 
 : specialize-method ( quot method -- quot' )
-    method-declaration '[ _ declare ] prepend ;
-
-: specialize-quot ( quot specializer -- quot' )
-    specializer-cases alist>quot ;
+    [ method-declaration '[ _ declare ] prepend ]
+    [ "method-generic" word-prop "specializer" word-prop ] bi
+    [ specialize-quot ] when* ;
 
 : standard-method? ( method -- ? )
     dup method-body? [
@@ -52,19 +54,19 @@ M: object specializer-declaration class ;
 
 : specialized-def ( word -- quot )
     [ def>> ] keep
-    [ dup standard-method? [ specialize-method ] [ drop ] if ]
-    [ "specializer" word-prop [ specialize-quot ] when* ]
-    bi ;
+    dup generic? [ drop ] [
+        [ dup standard-method? [ specialize-method ] [ drop ] if ]
+        [ "specializer" word-prop [ specialize-quot ] when* ]
+        bi
+    ] if ;
 
 : specialized-length ( specializer -- n )
     dup [ array? ] all? [ first ] when length ;
 
-: HINTS:
+SYNTAX: HINTS:
     scan-object
-    dup method-spec? [ first2 method ] when
     [ redefined ]
     [ parse-definition "specializer" set-word-prop ] bi ;
-    parsing
 
 ! Default specializers
 { first first2 first3 first4 }
@@ -116,6 +118,6 @@ M: object specializer-declaration class ;
 
 \ >be { { bignum fixnum } { fixnum fixnum } } "specializer" set-word-prop
 
-\ hashtable \ at* method { { fixnum hashtable } { word hashtable } } "specializer" set-word-prop
+M\ hashtable at* { { fixnum object } { word object } } "specializer" set-word-prop
 
-\ hashtable \ set-at method { { object fixnum object } { object word object } } "specializer" set-word-prop
+M\ hashtable set-at { { object fixnum object } { object word object } } "specializer" set-word-prop

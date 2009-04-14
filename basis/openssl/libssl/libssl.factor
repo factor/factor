@@ -2,7 +2,8 @@
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax combinators kernel system namespaces
-assocs parser lexer sequences words quotations math.bitwise ;
+assocs parser lexer sequences words quotations math.bitwise
+alien.libraries ;
 
 IN: openssl.libssl
 
@@ -279,12 +280,12 @@ H{ } clone verify-messages set-global
 
 : verify-message ( n -- word ) verify-messages get-global at ;
 
-: X509_V_:
+SYNTAX: X509_V_:
     scan "X509_V_" prepend create-in
     scan-word
     [ 1quotation (( -- value )) define-inline ]
     [ verify-messages get set-at ]
-    2bi ; parsing
+    2bi ;
 
 >>
 

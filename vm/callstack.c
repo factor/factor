@@ -97,13 +97,13 @@ F_CODE_BLOCK *frame_code(F_STACK_FRAME *frame)
 
 CELL frame_type(F_STACK_FRAME *frame)
 {
-	return frame_code(frame)->type;
+	return frame_code(frame)->block.type;
 }
 
 CELL frame_executing(F_STACK_FRAME *frame)
 {
 	F_CODE_BLOCK *compiled = frame_code(frame);
-	if(compiled->literals == F)
+	if(compiled->literals == F || !stack_traces_p())
 		return F;
 	else
 	{

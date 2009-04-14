@@ -1,13 +1,13 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs grouping kernel
-locals math namespaces sequences fry quotations
-math.order math.ranges vectors unicode.categories
-regexp.transition-tables words sets hashtables combinators.short-circuit
-unicode.case.private regexp.ast regexp.classes ;
+USING: accessors arrays assocs grouping kernel locals math namespaces
+sequences fry quotations math.order math.ranges vectors
+unicode.categories regexp.transition-tables words sets hashtables
+combinators.short-circuit unicode.data regexp.ast
+regexp.classes memoize ;
 IN: regexp.nfa
 
-! This uses unicode.case.private for ch>upper and ch>lower
+! This uses unicode.data for ch>upper and ch>lower
 ! but case-insensitive matching should be done by case-folding everything
 ! before processing starts
 
@@ -60,11 +60,16 @@ GENERIC: modify-epsilon ( tag -- newtag )
 
 M: object modify-epsilon ;
 
+: line-option ( multiline unix-lines default -- option )
+    multiline option? [
+        drop [ unix-lines option? ] 2dip swap ?
+    ] [ 2nip ] if ;
+
 M: $ modify-epsilon
-    multiline option? [ drop end-of-input ] unless ;
+    $unix end-of-input line-option ;
 
 M: ^ modify-epsilon
-    multiline option? [ drop beginning-of-input ] unless ;
+    ^unix beginning-of-input line-option ;
 
 M: tagged-epsilon nfa-node
     clone [ modify-epsilon ] change-tag add-simple-entry ;
@@ -112,8 +117,17 @@ M: or-class modify-class
 M: not-class modify-class
     class>> modify-class <not-class> ;
 
-M: any-char modify-class
-    drop dotall option? t any-char-no-nl ? ;
+MEMO: unix-dot ( -- class )
+    CHAR: \n <not-class> ;
+
+MEMO: nonl-dot ( -- class )
+    { CHAR: \n CHAR: \r } <or-class> <not-class> ;
+
+M: dot modify-class
+    drop dotall option? [ t ] [
+        unix-lines option?
+        unix-dot nonl-dot ?
+    ] if ;
 
 : modify-letter-class ( class -- newclass )
     case-insensitive option? [ drop Letter-class ] when ;
@@ -126,17 +140,17 @@ M: LETTER-class modify-class modify-letter-class ;
         [ [ LETTER? ] bi@ and ]
     } 2|| ;
 
-M: range modify-class
+M: range-class modify-class
     case-insensitive option? [
         dup cased-range? [
             [ from>> ] [ to>> ] bi
-            [ [ ch>lower ] bi@ <range> ]
-            [ [ ch>upper ] bi@ <range> ] 2bi 
+            [ [ ch>lower ] bi@ <range-class> ]
+            [ [ ch>upper ] bi@ <range-class> ] 2bi 
             2array <or-class>
         ] when
     ] when ;
 
-M: class nfa-node
+M: object nfa-node
     modify-class add-simple-entry ;
 
 M: with-options nfa-node ( node -- start end )

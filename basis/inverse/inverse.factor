@@ -122,7 +122,7 @@ M: math-inverse inverse
 
 M: pop-inverse inverse
     [ "pop-length" word-prop cut-slice swap >quotation ]
-    [ "pop-inverse" word-prop ] bi compose call ;
+    [ "pop-inverse" word-prop ] bi compose call( -- quot ) ;
 
 : (undo) ( revquot -- )
     [ unclip-slice inverse % (undo) ] unless-empty ;

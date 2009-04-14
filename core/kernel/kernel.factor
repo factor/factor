@@ -1,7 +1,6 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel.private slots.private math.private
-classes.tuple.private ;
+USING: kernel.private slots.private math.private ;
 IN: kernel
 
 DEFER: dip
@@ -21,6 +20,12 @@ DEFER: 3dip
 
 ! Combinators
 GENERIC: call ( callable -- )
+
+GENERIC: execute ( word -- )
+
+GENERIC: ?execute ( word -- value )
+
+M: object ?execute ;
 
 DEFER: if
 
@@ -235,7 +240,7 @@ GENERIC: boa ( ... class -- tuple )
 
 ! Error handling -- defined early so that other files can
 ! throw errors before continuations are loaded
-: throw ( error -- * ) 5 getenv [ die ] or 1 (throw) ;
+GENERIC: throw ( error -- * )
 
 ERROR: assert got expect ;
 

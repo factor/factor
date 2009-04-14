@@ -9,24 +9,15 @@ ARTICLE: "io.encodings.iana" "IANA-registered encoding names"
 { $subsection name>encoding }
 { $subsection encoding>name }
 "To let a new encoding be used with the above words, use the following:"
-{ $subsection register-encoding }
-"Exceptions when encodings or names are not found:"
-{ $subsection missing-encoding }
-{ $subsection missing-name } ;
-
-HELP: missing-encoding
-{ $error-description "The error called from " { $link name>encoding } " when there is no encoding descriptor registered corresponding to the given name." } ;
-
-HELP: missing-name
-{ $error-description "The error called from " { $link encoding>name } " when there is no name registered corresponding to the given encoding." } ;
+{ $subsection register-encoding } ;
 
 HELP: name>encoding
 { $values { "name" "an encoding name" } { "encoding" "an encoding descriptor" } }
-{ $description "Given an IANA-registered encoding name, find the encoding descriptor that represents it, or " { $code f } " if it is not found (either not implemented in Factor or not registered)." } ;
+{ $description "Given an IANA-registered encoding name, find the encoding descriptor that represents it, or " { $snippet "f" } " if it is not found (either not implemented in Factor or not registered)." } ;
 
 HELP: encoding>name
 { $values { "encoding" "an encoding descriptor" } { "name" "an encoding name" } }
-{ $description "Given an encoding descriptor, return the preferred IANA name." } ;
+{ $description "Given an encoding descriptor, return the preferred IANA name. If no name is found, returns " { $snippet "f" } "." } ;
 
 { name>encoding encoding>name } related-words
 

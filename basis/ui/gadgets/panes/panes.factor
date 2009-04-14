@@ -10,7 +10,7 @@ ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
 ui.gadgets.icons ui.gadgets.grid-lines ui.baseline-alignment
-colors call io.styles ;
+colors io.styles ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < track
@@ -20,6 +20,8 @@ selection-color caret mark selecting? ;
 TUPLE: pane-stream pane ;
 
 C: <pane-stream> pane-stream
+
+M: pane-stream stream-element-type drop +character+ ;
 
 <PRIVATE
 
@@ -47,13 +49,13 @@ C: <pane-stream> pane-stream
 : pane-caret&mark ( pane -- caret mark )
     [ caret>> ] [ mark>> ] bi ; inline
 
-: selected-children ( pane -- seq )
+: selected-subtree ( pane -- seq )
     [ pane-caret&mark sort-pair ] keep gadget-subtree ;
 
 M: pane gadget-selection? pane-caret&mark and ;
 
 M: pane gadget-selection ( pane -- string/f )
-    selected-children gadget-text ;
+    selected-subtree gadget-text ;
 
 : init-prototype ( pane -- pane )
     <shelf> +baseline+ >>align >>prototype ; inline
@@ -70,33 +72,12 @@ M: pane gadget-selection ( pane -- string/f )
     [ >>last-line ] [ 1 track-add ] bi
     dup prepare-last-line ; inline
 
-GENERIC: draw-selection ( loc obj -- )
-
-: if-fits ( rect quot -- )
-    [ clip get over contains-rect? ] dip [ drop ] if ; inline
-
-M: gadget draw-selection ( loc gadget -- )
-    swap offset-rect [
-        dup loc>> [
-            dim>> gl-fill-rect
-        ] with-translation
-    ] if-fits ;
-
-M: node draw-selection ( loc node -- )
-    2dup value>> swap offset-rect [
-        drop 2dup
-        [ value>> loc>> v+ ] keep
-        children>> [ draw-selection ] with each
-    ] if-fits 2drop ;
-
-M: pane draw-gadget*
+M: pane selected-children
     dup gadget-selection? [
-        [ selection-color>> gl-color ]
-        [
-            [ loc>> vneg ] keep selected-children
-            [ draw-selection ] with each
-        ] bi
-    ] [ drop ] if ;
+        [ selected-subtree leaves ]
+        [ selection-color>> ]
+        bi
+    ] [ drop f f ] if ;
 
 : scroll-pane ( pane -- )
     dup scrolls?>> [ scroll>bottom ] [ drop ] if ;

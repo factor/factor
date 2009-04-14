@@ -2,6 +2,24 @@ USING: help.markup help.syntax quotations hashtables kernel
 classes strings continuations destructors math byte-arrays ;
 IN: io
 
+HELP: +byte+
+{ $description "A stream element type. See " { $link stream-element-type } " for explanation." } ;
+
+HELP: +character+
+{ $description "A stream element type. See " { $link stream-element-type } " for explanation." } ;
+
+HELP: stream-element-type
+{ $values { "stream" "a stream" } { "type" { $link +byte+ } " or " { $link +character+ } } }
+{ $description
+  "Outputs one of the following two values:"
+  { $list
+    { { $link +byte+ } " - indicates that stream elements are integers in the range " { $snippet "[0,255]" } "; they represent bytes. Reading a sequence of elements produces a " { $link byte-array } "." }
+    { { $link +character+ } " - indicates that stream elements are non-negative integers, representing Unicode code points. Reading a sequence of elements produces a " { $link string } "." }
+  }
+  "Most external streams are binary streams, and can be wrapped in string streams once a suitable encoding has been provided; see " { $link "io.encodings" } "."
+  
+} ;
+
 HELP: stream-readln
 { $values { "stream" "an input stream" } { "str/f" "a string or " { $link f } } }
 { $contract "Reads a line of input from the stream. Outputs " { $link f } " on stream exhaustion." }
@@ -67,7 +85,6 @@ HELP: stream-copy
 { $values { "in" "an input stream" } { "out" "an output stream" } }
 { $description "Copies the contents of one stream into another, closing both streams when done." } 
 $io-error ;
-
 
 HELP: stream-seek
 { $values
@@ -228,6 +245,8 @@ $nl
 $nl
 "All streams must implement the " { $link dispose } " word in addition to the stream protocol."
 $nl
+"The following word is required for all input and output streams:"
+{ $subsection stream-element-type }
 "These words are required for binary and string input streams:"
 { $subsection stream-read1 }
 { $subsection stream-read }
@@ -243,7 +262,6 @@ $nl
 { $subsection stream-nl }
 "This word is for streams that allow seeking:"
 { $subsection stream-seek }
-"For a discussion of the distinction between binary and string streams, see " { $link "stream-elements" } "."
 { $see-also "io.timeouts" } ;
 
 ARTICLE: "stdio-motivation" "Motivation for default streams"
@@ -294,7 +312,7 @@ $nl
 { $subsection read }
 { $subsection read-until }
 { $subsection read-partial }
-"If the default input stream is a string stream (" { $link "stream-elements" } "), lines of text can be read:"
+"If the default input stream is a character stream (" { $link stream-element-type } " outputs " { $link +character+ } "), lines of text can be read:"
 { $subsection readln }
 "Seeking on the default input stream:"
 { $subsection seek-input }
@@ -309,7 +327,7 @@ $nl
 { $subsection flush }
 { $subsection write1 }
 { $subsection write }
-"If the default output stream is a string stream (" { $link "stream-elements" } "), lines of text can be written:"
+"If the default output stream is a character stream (" { $link stream-element-type } " outputs " { $link +character+ } "), lines of text can be written:"
 { $subsection readln }
 { $subsection print }
 { $subsection nl }
@@ -337,17 +355,9 @@ $nl
 "Copying the contents of one stream to another:"
 { $subsection stream-copy } ;
 
-ARTICLE: "stream-elements" "Stream elements"
-"There are two types of streams:"
-{ $list
-  { { $strong "Binary streams" } " - the elements are integers between 0 and 255, inclusive; they represent bytes. Reading a sequence of elements produces a " { $link byte-array } "." }
-  { { $strong "String streams" } " - the elements are non-negative integers, representing Unicode code points. Reading a sequence of elements produces a " { $link string } "." }
-}
-"Most external streams are binary streams, and can be wrapped in string streams once a suitable encoding has been provided; see " { $link "io.encodings" } "." ;
-
 ARTICLE: "streams" "Streams"
-"Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of elements."
-{ $subsection "stream-elements" }
+"Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of " { $emphasis "elements" } "."
+$nl
 "A stream can either be passed around on the stack or bound to a dynamic variable and used as one of the two implicit " { $emphasis "default streams" } "."
 { $subsection "stream-protocol" }
 { $subsection "stdio" }

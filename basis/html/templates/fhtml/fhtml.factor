@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations sequences kernel namespaces debugger
 combinators math quotations generic strings splitting accessors
-assocs fry vocabs.parser parser lexer io io.files call
+assocs fry vocabs.parser parser lexer io io.files
 io.streams.string io.encodings.utf8 html.templates ;
 IN: html.templates.fhtml
 
@@ -49,7 +49,7 @@ DEFER: <% delimiter
         drop
     ] if ;
 
-: %> lexer get parse-%> ; parsing
+SYNTAX: %> lexer get parse-%> ;
 
 : parse-template-lines ( lines -- quot )
     <template-lexer> [
@@ -65,7 +65,7 @@ DEFER: <% delimiter
     ] with-file-vocabs ;
 
 : eval-template ( string -- )
-    parse-template call ;
+    parse-template call( -- ) ;
 
 TUPLE: fhtml path ;
 

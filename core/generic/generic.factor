@@ -1,9 +1,9 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors words kernel sequences namespaces make assocs
 hashtables definitions kernel.private classes classes.private
 classes.algebra quotations arrays vocabs effects combinators
-sets compiler.units ;
+sets ;
 IN: generic
 
 ! Method combination protocol
@@ -21,16 +21,8 @@ M: generic definition drop f ;
     [ dup "combination" word-prop perform-combination ]
     bi ;
 
-[
-    remake-generics get keys
-    [ generic? ] filter [ make-generic ] each
-] remake-generics-hook set-global
-
 : method ( class generic -- method/f )
     "methods" word-prop at ;
-
-PREDICATE: method-spec < pair
-    first2 generic? swap class? and ;
 
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
@@ -76,7 +68,10 @@ TUPLE: check-method class generic ;
     [ [ [ class-or ] when* ] change-at ] [ no-compilation-unit ] if* ;
 
 : remake-generic ( generic -- )
-    dup remake-generics get set-in-unit ;
+    dup outdated-generics get set-in-unit ;
+
+: remake-generics ( -- )
+    outdated-generics get keys [ generic? ] filter [ make-generic ] each ;
 
 : with-methods ( class generic quot -- )
     [ drop changed-generic ]
@@ -89,9 +84,6 @@ TUPLE: check-method class generic ;
 
 PREDICATE: method-body < word
     "method-generic" word-prop >boolean ;
-
-M: method-spec stack-effect
-    first2 method stack-effect ;
 
 M: method-body stack-effect
     "method-generic" word-prop stack-effect ;
@@ -139,24 +131,6 @@ M: default-method irrelevant? drop t ;
     dupd <default-method> "default-method" set-word-prop ;
 
 ! Definition protocol
-M: method-spec where
-    dup first2 method [ ] [ second ] ?if where ;
-
-M: method-spec set-where
-    first2 method set-where ;
-
-M: method-spec definer
-    first2 method definer ;
-
-M: method-spec definition
-    first2 method definition ;
-
-M: method-spec forget*
-    first2 method [ forgotten-definition ] [ forget* ] bi ;
-
-M: method-spec smart-usage
-    second smart-usage ;
-
 M: method-body definer
     drop \ M: \ ; ;
 
@@ -187,13 +161,21 @@ M: sequence update-methods ( class seq -- )
         [ changed-generic ] [ remake-generic drop ] 2bi
     ] with each ;
 
-: define-generic ( word combination -- )
-    over "combination" word-prop over = [ drop ] [
-        2dup "combination" set-word-prop
-        over "methods" word-prop values forget-all
-        over H{ } clone "methods" set-word-prop
-        dupd define-default-method
-    ] if remake-generic ;
+: define-generic ( word combination effect -- )
+    [ nip swap set-stack-effect ]
+    [
+        drop
+        2dup [ "combination" word-prop ] dip = [ 2drop ] [
+            {
+                [ "combination" set-word-prop ]
+                [ drop "methods" word-prop values forget-all ]
+                [ drop H{ } clone "methods" set-word-prop ]
+                [ define-default-method ]
+            }
+            2cleave
+        ] if
+    ]
+    [ 2drop remake-generic ] 3tri ;
 
 M: generic subwords
     [
@@ -205,6 +187,9 @@ M: generic subwords
 
 M: generic forget*
     [ subwords forget-all ] [ call-next-method ] bi ;
+
+M: class forget-methods
+    [ implementors ] [ [ swap method ] curry ] bi map forget-all ;
 
 : xref-generics ( -- )
     all-words [ subwords [ xref ] each ] each ;

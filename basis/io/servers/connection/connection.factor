@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors kernel math math.parser
 namespaces parser sequences strings prettyprint
@@ -69,7 +69,7 @@ GENERIC: handle-client* ( threaded-server -- )
     [ [ remote-address set ] [ local-address set ] bi* ]
     2bi ;
 
-M: threaded-server handle-client* handler>> call ;
+M: threaded-server handle-client* handler>> call( -- ) ;
 
 : handle-client ( client remote local -- )
     '[

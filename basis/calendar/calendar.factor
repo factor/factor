@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.functions namespaces sequences
-strings system vocabs.loader threads accessors combinators
-locals classes.tuple math.order summary combinators.short-circuit ;
+USING: accessors arrays classes.tuple combinators combinators.short-circuit
+    kernel locals math math.functions math.order namespaces sequences strings
+    summary system threads vocabs.loader ;
 IN: calendar
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
@@ -39,8 +39,10 @@ M: not-a-month summary
     drop "Months are indexed starting at 1" ;
 
 <PRIVATE
+
 : check-month ( n -- n )
     dup zero? [ not-a-month ] when ;
+
 PRIVATE>
 
 : month-names ( -- array )
@@ -52,11 +54,11 @@ PRIVATE>
 : month-name ( n -- string )
     check-month 1- month-names nth ;
 
-: month-abbreviations ( -- array )
+CONSTANT: month-abbreviations
     {
         "Jan" "Feb" "Mar" "Apr" "May" "Jun"
         "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
-    } ;
+    }
 
 : month-abbreviation ( n -- string )
     check-month 1- month-abbreviations nth ;
@@ -70,17 +72,17 @@ CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 
 : day-name ( n -- string ) day-names nth ;
 
-: day-abbreviations2 ( -- array )
-    { "Su" "Mo" "Tu" "We" "Th" "Fr" "Sa" } ;
+CONSTANT: day-abbreviations2
+    { "Su" "Mo" "Tu" "We" "Th" "Fr" "Sa" }
 
 : day-abbreviation2 ( n -- string )
-    day-abbreviations2 nth ;
+    day-abbreviations2 nth ; inline
 
-: day-abbreviations3 ( -- array )
-    { "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" } ;
+CONSTANT: day-abbreviations3
+    { "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" }
 
 : day-abbreviation3 ( n -- string )
-    day-abbreviations3 nth ;
+    day-abbreviations3 nth ; inline
 
 : average-month ( -- ratio ) 30+5/12 ; inline
 : months-per-year ( -- integer ) 12 ; inline
@@ -134,7 +136,7 @@ CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 GENERIC: leap-year? ( obj -- ? )
 
 M: integer leap-year? ( year -- ? )
-    dup 100 mod zero? 400 4 ? mod zero? ;
+    dup 100 divisor? 400 4 ? divisor? ;
 
 M: timestamp leap-year? ( timestamp -- ? )
     year>> leap-year? ;
@@ -346,7 +348,7 @@ M: duration time-
     #! good for any date since October 15, 1582
     [
         dup 2 <= [ [ 1- ] [ 12 + ] bi* ] when
-        [ dup [ 4 /i + ] keep [ 100 /i - ] keep 400 /i + ] dip
+        [ dup [ 4 /i + ] [ 100 /i - ] [ 400 /i + ] tri ] dip
         [ 1+ 3 * 5 /i + ] keep 2 * +
     ] dip 1+ + 7 mod ;
 

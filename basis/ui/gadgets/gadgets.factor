@@ -11,6 +11,7 @@ CONSTANT: horizontal { 1 0 }
 CONSTANT: vertical { 0 1 }
 
 TUPLE: gadget < rect
+id
 pref-dim
 parent
 children
@@ -28,7 +29,7 @@ model ;
 
 M: gadget equal? 2drop f ;
 
-M: gadget hashcode* drop gadget hashcode* ;
+M: gadget hashcode* nip [ [ \ gadget counter ] unless* ] change-id id>> ;
 
 M: gadget model-changed 2drop ;
 
@@ -214,7 +215,8 @@ M: gadget ungraft* drop ;
 
 <PRIVATE
 
-: graft-queue ( -- dlist ) \ graft-queue get ;
+: graft-queue ( -- dlist )
+    \ graft-queue get [ "UI not running" throw ] unless* ;
 
 : unqueue-graft ( gadget -- )
     [ graft-node>> graft-queue delete-node ]

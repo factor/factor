@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors math.vectors classes.tuple math.rectangles colors
-kernel sequences models opengl math math.order namespaces call
+kernel sequences models opengl math math.order namespaces
 ui.commands ui.gestures ui.render ui.gadgets ui.gadgets.labels
 ui.gadgets.scrollers ui.gadgets.presentations ui.gadgets.viewports
 ui.gadgets.packs ;
@@ -57,9 +57,7 @@ M: list draw-gadget*
     origin get [
         dup color>> gl-color
         selected-rect [
-            dup loc>> [
-                dim>> gl-fill-rect
-            ] with-translation
+            rect-bounds gl-fill-rect
         ] when*
     ] with-translation ;
 

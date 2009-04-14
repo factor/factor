@@ -3,7 +3,7 @@
 USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
-alien.strings alien.arrays alien.complex sets libc
+alien.strings alien.arrays alien.complex sets libc alien.libraries
 continuations.private fry cpu.architecture
 compiler.errors
 compiler.alien
@@ -53,7 +53,7 @@ SYMBOL: labels
     V{ } clone literal-table set
     V{ } clone calls set
     compiling-word set
-    compiled-stack-traces? compiling-word get f ? add-literal drop ;
+    compiled-stack-traces? [ compiling-word get add-literal ] when ;
 
 : generate ( mr -- asm )
     [
@@ -464,7 +464,7 @@ TUPLE: callback-context ;
     dup current-callback eq? [
         drop
     ] [
-        yield-hook get call wait-to-return
+        yield-hook get call( -- ) wait-to-return
     ] if ;
 
 : do-callback ( quot token -- )

@@ -176,7 +176,7 @@ PRIVATE>
     3 swap bounds-check nip first4-unsafe ; flushable
 
 : ?nth ( n seq -- elt/f )
-    2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ; flushable
+    2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ; inline
 
 MIXIN: virtual-sequence
 GENERIC: virtual-seq ( seq -- seq' )
@@ -221,8 +221,9 @@ TUPLE: slice-error from to seq reason ;
 : check-slice ( from to seq -- from to seq )
     3dup
     [ 2drop 0 < "start < 0" slice-error ]
-    [ nip length > "end > sequence" slice-error ]
-    [ drop > "start > end" slice-error ] 3tri ; inline
+    [ [ drop ] 2dip length > "end > sequence" slice-error ]
+    [ drop > "start > end" slice-error ]
+    3tri ; inline
 
 : <slice> ( from to seq -- slice )
     dup slice? [ collapse-slice ] when
@@ -505,7 +506,7 @@ PRIVATE>
     [ [ 0 = ] 2dip if ] 2curry
     each-index ; inline
 
-: map-index ( seq quot -- )
+: map-index ( seq quot -- newseq )
     prepare-index 2map ; inline
 
 : reduce-index ( seq identity quot -- )

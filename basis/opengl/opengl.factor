@@ -3,8 +3,8 @@
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types continuations kernel libc math macros
-namespaces math.vectors math.parser opengl.gl opengl.glu
-combinators arrays sequences splitting words byte-arrays assocs
+namespaces math.vectors math.parser opengl.gl combinators
+combinators.smart arrays sequences splitting words byte-arrays assocs
 colors colors.constants accessors generalizations locals fry
 specialized-arrays.float specialized-arrays.uint ;
 IN: opengl
@@ -16,10 +16,23 @@ IN: opengl
 : gl-clear ( color -- )
     gl-clear-color GL_COLOR_BUFFER_BIT glClear ;
 
+: error>string ( n -- string )
+    H{
+        { HEX: 0 "No error" }
+        { HEX: 0501 "Invalid value" }
+        { HEX: 0500 "Invalid enumerant" }
+        { HEX: 0502 "Invalid operation" }
+        { HEX: 0503 "Stack overflow" }
+        { HEX: 0504 "Stack underflow" }
+        { HEX: 0505 "Out of memory" }
+    } at "Unknown error" or ;
+
+TUPLE: gl-error code string ;
+
 : gl-error ( -- )
-    glGetError dup zero? [
-        "GL error: " over gluErrorString append throw
-    ] unless drop ;
+    glGetError dup 0 = [ drop ] [
+        dup error>string \ gl-error boa throw
+    ] if ;
 
 : do-enabled ( what quot -- )
     over glEnable dip glDisable ; inline
@@ -28,7 +41,7 @@ IN: opengl
     over glEnableClientState dip glDisableClientState ; inline
 
 : words>values ( word/value-seq -- value-seq )
-    [ dup word? [ execute ] when ] map ;
+    [ ?execute ] map ;
 
 : (all-enabled) ( seq quot -- )
     over [ glEnable ] each dip [ glDisable ] each ; inline
@@ -44,9 +57,8 @@ MACRO: all-enabled ( seq quot -- )
 MACRO: all-enabled-client-state ( seq quot -- )
     [ words>values ] dip '[ _ _ (all-enabled-client-state) ] ;
 
-: do-matrix ( mode quot -- )
-    swap [ glMatrixMode glPushMatrix call ] keep
-    glMatrixMode glPopMatrix ; inline
+: do-matrix ( quot -- )
+    glPushMatrix call glPopMatrix ; inline
 
 : gl-material ( face pname params -- )
     float-array{ } like glMaterialfv ;
@@ -67,42 +79,46 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : gl-line ( a b -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;
 
-: (rect-vertices) ( dim -- vertices )
+:: (rect-vertices) ( loc dim -- vertices )
     #! We use GL_LINE_STRIP with a duplicated first vertex
     #! instead of GL_LINE_LOOP to work around a bug in Apple's
     #! X3100 driver.
-    {
-        [ drop 0.5 0.5 ]
-        [ first 0.3 - 0.5 ]
-        [ [ first 0.3 - ] [ second 0.3 - ] bi ]
-        [ second 0.3 - 0.5 swap ]
-        [ drop 0.5 0.5 ]
-    } cleave 10 float-array{ } nsequence ;
+    loc first2 :> y :> x
+    dim first2 :> h :> w
+    [
+        x 0.5 +     y 0.5 +
+        x w + 0.3 - y 0.5 +
+        x w + 0.3 - y h + 0.3 -
+        x           y h + 0.3 -
+        x 0.5 +     y 0.5 +
+    ] float-array{ } output>sequence ;
 
-: rect-vertices ( dim -- )
+: rect-vertices ( loc dim -- )
     (rect-vertices) gl-vertex-pointer ;
 
 : (gl-rect) ( -- )
     GL_LINE_STRIP 0 5 glDrawArrays ;
 
-: gl-rect ( dim -- )
+: gl-rect ( loc dim -- )
     rect-vertices (gl-rect) ;
 
-: (fill-rect-vertices) ( dim -- vertices )
-    {
-        [ drop 0 0 ]
-        [ first 0 ]
-        [ first2 ]
-        [ second 0 swap ]
-    } cleave 8 float-array{ } nsequence ;
+:: (fill-rect-vertices) ( loc dim -- vertices )
+    loc first2 :> y :> x
+    dim first2 :> h :> w
+    [
+        x      y
+        x w +  y
+        x w +  y h +
+        x      y h +
+    ] float-array{ } output>sequence ;
 
-: fill-rect-vertices ( dim -- )
+: fill-rect-vertices ( loc dim -- )
     (fill-rect-vertices) gl-vertex-pointer ;
 
 : (gl-fill-rect) ( -- )
     GL_QUADS 0 4 glDrawArrays ;
 
-: gl-fill-rect ( dim -- )
+: gl-fill-rect ( loc dim -- )
     fill-rect-vertices (gl-fill-rect) ;
 
 : do-attribs ( bits quot -- )
@@ -148,9 +164,6 @@ MACRO: all-enabled-client-state ( seq quot -- )
 MACRO: set-draw-buffers ( buffers -- )
     words>values '[ _ (set-draw-buffers) ] ;
 
-: gl-look-at ( eye focus up -- )
-    [ first3 ] tri@ gluLookAt ;
-
 : gen-dlist ( -- id ) 1 glGenLists ;
 
 : make-dlist ( type quot -- id )
@@ -161,7 +174,7 @@ MACRO: set-draw-buffers ( buffers -- )
 : delete-dlist ( id -- ) 1 glDeleteLists ;
 
 : with-translation ( loc quot -- )
-    GL_MODELVIEW [ [ gl-translate ] dip call ] do-matrix ; inline
+    [ [ gl-translate ] dip call ] do-matrix ; inline
 
 : fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
     [ first2 [ >fixnum ] bi@ ] bi@ ;
@@ -173,6 +186,7 @@ MACRO: set-draw-buffers ( buffers -- )
     fix-coordinates glViewport ;
 
 : init-matrices ( -- )
+    #! Leaves with matrix mode GL_MODELVIEW
     GL_PROJECTION glMatrixMode
     glLoadIdentity
     GL_MODELVIEW glMatrixMode

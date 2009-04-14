@@ -58,4 +58,4 @@ PRIVATE>
 ! [ euler023 ] time
 ! 52780 ms run / 3839 ms GC
 
-MAIN: euler023
+SOLUTION: euler023

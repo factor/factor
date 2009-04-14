@@ -3,7 +3,7 @@
 USING: regexp.classes kernel sequences regexp.negation
 quotations assocs fry math locals combinators
 accessors words compiler.units kernel.private strings
-sequences.private arrays call namespaces unicode.breaks
+sequences.private arrays namespaces unicode.breaks
 regexp.transition-tables combinators.short-circuit ;
 IN: regexp.compiler
 
@@ -16,9 +16,6 @@ SYMBOL: backwards?
 
 M: t question>quot drop [ 2drop t ] ;
 M: f question>quot drop [ 2drop f ] ;
-
-M: not-class question>quot
-    class>> question>quot [ not ] compose ;
 
 M: beginning-of-input question>quot
     drop [ drop zero? ] ;
@@ -39,6 +36,12 @@ M: $ question>quot
 
 M: ^ question>quot
     drop [ { [ drop zero? ] [ [ 1- ] dip ?nth "\r\n" member? ] } 2|| ] ;
+
+M: $unix question>quot
+    drop [ { [ length = ] [ ?nth CHAR: \n = ] } 2|| ] ;
+
+M: ^unix question>quot
+    drop [ { [ drop zero? ] [ [ 1- ] dip ?nth CHAR: \n = ] } 2|| ] ;
 
 M: word-break question>quot
     drop [ word-break-at? ] ;
@@ -81,21 +84,24 @@ C: <box> box
     { } assoc-like [ first integer? ] partition
     [ [ literals>cases ] keep ] dip non-literals>dispatch ;
 
-:: step ( last-match index str quot final? direction -- last-index/f )
+: advance ( index backwards? -- index+/-1 )
+    -1 1 ? + >fixnum ; inline
+
+: check ( index string backwards? -- in-bounds? )
+    [ drop -1 eq? not ] [ length < ] if ; inline
+
+:: step ( last-match index str quot final? backwards? -- last-index/f )
     final? index last-match ?
-    index str bounds-check? [
-        index direction + str
+    index str backwards? check [
+        index backwards? advance str
         index str nth-unsafe
         quot call
     ] when ; inline
 
-: direction ( -- n )
-    backwards? get -1 1 ? ;
-
 : transitions>quot ( transitions final-state? -- quot )
     dup shortest? get and [ 2drop [ drop nip ] ] [
-        [ split-literals swap case>quot ] dip direction
-        '[ { array-capacity string } declare _ _ _ step ]
+        [ split-literals swap case>quot ] dip backwards? get
+        '[ { fixnum string } declare _ _ _ step ]
     ] if ;
 
 : word>quot ( word dfa -- quot )
@@ -104,15 +110,11 @@ C: <box> box
     transitions>quot ;
 
 : states>code ( words dfa -- )
-    [ ! with-compilation-unit doesn't compile, so we need call( -- )
-        [
-            '[
-                dup _ word>quot
-                (( last-match index string -- ? ))
-                define-declared
-            ] each
-        ] with-compilation-unit
-    ] call( words dfa -- ) ;
+    '[
+        dup _ word>quot
+        (( last-match index string -- ? ))
+        define-declared
+    ] each ;
 
 : states>words ( dfa -- words dfa )
     dup transitions>> keys [ gensym ] H{ } map>assoc
@@ -123,14 +125,14 @@ C: <box> box
 : dfa>main-word ( dfa -- word )
     states>words [ states>code ] keep start-state>> ;
 
+: word-template ( quot -- quot' )
+    '[ drop [ f ] 2dip over array-capacity? _ [ 2drop ] if ] ;
+
 PRIVATE>
 
-: simple-define-temp ( quot effect -- word )
-    [ [ define-temp ] with-compilation-unit ] call( quot effect -- word ) ;
-
 : dfa>word ( dfa -- quot )
-    dfa>main-word execution-quot '[ drop [ f ] 2dip @ ]
-    (( start-index string regexp -- i/f )) simple-define-temp ;
+    dfa>main-word execution-quot word-template
+    (( start-index string regexp -- i/f )) define-temp ;
 
 : dfa>shortest-word ( dfa -- word )
     t shortest? [ dfa>word ] with-variable ;

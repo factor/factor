@@ -1,7 +1,7 @@
 USING: continuations documents
 ui.tools.listener hashtables kernel namespaces parser sequences
 tools.test ui.commands ui.gadgets ui.gadgets.editors
-ui.gadgets.panes vocabs words tools.test.ui slots.private
+ui.gadgets.panes vocabs words ui.gadgets.debug slots.private
 threads arrays generic threads accessors listener math
 calendar concurrency.promises io ui.tools.common ;
 IN: ui.tools.listener.tests
@@ -68,7 +68,7 @@ IN: ui.tools.listener.tests
 
 [ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 
-: text "Hello world.\nThis is a test." ;
+CONSTANT: text "Hello world.\nThis is a test."
 
 [ ] [ text "interactor" get set-editor-string ] unit-test
 

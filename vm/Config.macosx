@@ -4,6 +4,9 @@ CFLAGS += -fPIC
 PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o
 
 DLL_EXTENSION = .dylib
+SHARED_DLL_EXTENSION = .dylib
+
+SHARED_FLAG = -dynamiclib
 
 ifdef X11
 	LIBS = -lm -framework Cocoa -L/opt/local/lib $(X11_UI_LIBS) -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib

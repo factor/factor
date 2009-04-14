@@ -311,7 +311,7 @@ HELP: each-index
 
 HELP: map-index
 { $values
-     { "seq" sequence } { "quot" quotation } }
+  { "seq" sequence } { "quot" quotation } { "newseq" sequence } }
 { $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them in a sequence of the same type as the input sequence." }
 { $examples { $example "USING: sequences prettyprint math ;"
 "{ 10 20 30 } [ + ] map-index ."
@@ -1354,14 +1354,16 @@ ARTICLE: "virtual-sequences" "Virtual sequences"
 "Virtual sequences allow different ways of accessing a sequence without having to create a new sequence or a new data structure altogether. To do this, they translate the virtual index into a normal index into an underlying sequence using the " { $link "virtual-sequences-protocol" } "."
 { $subsection "virtual-sequences-protocol" } ;
 
-ARTICLE: "sequences-integers" "Integer sequences and counted loops"
+ARTICLE: "sequences-integers" "Counted loops"
 "Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, and 2. This is very useful for performing counted loops."
 $nl
 "For example, the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
 { $example "3 [ . ] each" "0\n1\n2" }
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
 $nl
-"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer." ;
+"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer."
+$nl
+"More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
 
 ARTICLE: "sequences-access" "Accessing sequence elements"
 { $subsection ?nth }
@@ -1593,7 +1595,6 @@ $nl
 "Sequences implement a protocol:"
 { $subsection "sequence-protocol" }
 { $subsection "sequences-f" }
-{ $subsection "sequences-integers" }
 "Sequence utility words can operate on any object whose class implements the sequence protocol. Most implementations are backed by storage. Some implementations obtain their elements from an underlying sequence, or compute them on the fly. These are known as " { $link "virtual-sequences" } "."
 { $subsection "sequences-access" }
 { $subsection "sequences-combinators" }
@@ -1612,6 +1613,10 @@ $nl
 { $subsection "binary-search" }
 { $subsection "sets" }
 { $subsection "sequences-trimming" }
+{ $subsection "sequences.deep" }
+"Using sequences for looping:"
+{ $subsection "sequences-integers" }
+{ $subsection "math.ranges" }
 "For inner loops:"
 { $subsection "sequences-unsafe" } ;
 

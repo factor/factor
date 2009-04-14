@@ -45,4 +45,4 @@ PRIVATE>
 
 ! TODO: this solution is ugly and not very efficient...find a better algorithm
 
-MAIN: euler044
+SOLUTION: euler044

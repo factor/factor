@@ -338,5 +338,14 @@ TUPLE: bad-doctype < xml-error-at contents ;
 M: bad-doctype summary
     call-next-method "\nDTD contains invalid object" append ;
 
+TUPLE: bad-encoding < xml-error-at encoding ;
+: bad-encoding ( encoding -- * )
+    \ bad-encoding xml-error-at
+        swap >>encoding
+    throw ;
+M: bad-encoding summary
+    call-next-method
+    "\nEncoding in XML document does not exist" append ;
+
 UNION: xml-error
     multitags notags pre/post-content xml-error-at ;

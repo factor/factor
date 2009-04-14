@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lists math math.primes.lists ;
+USING: lists math math.primes.lists project-euler.common ;
 IN: project-euler.007
 
 ! http://projecteuler.net/index.php?section=problems&id=7
@@ -17,13 +17,10 @@ IN: project-euler.007
 ! SOLUTION
 ! --------
 
-: nth-prime ( n -- n )
-    1- lprimes lnth ;
-
 : euler007 ( -- answer )
     10001 nth-prime ;
 
 ! [ euler007 ] 100 ave-time
 ! 5 ms ave run time - 1.13 SD (100 trials)
 
-MAIN: euler007
+SOLUTION: euler007

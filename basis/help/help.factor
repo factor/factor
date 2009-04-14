@@ -5,7 +5,7 @@ parser prettyprint sequences words words.symbol assocs
 definitions generic quotations effects slots continuations
 classes.tuple debugger combinators vocabs help.stylesheet
 help.topics help.crossref help.markup sorting classes
-vocabs.loader call ;
+vocabs.loader ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -127,20 +127,11 @@ help-hook [ [ print-topic ] ] initialize
 : help ( topic -- )
     help-hook get call( topic -- ) ;
 
-: about ( vocab -- )
-    dup require
-    dup vocab [ ] [ no-vocab ] ?if
-    dup vocab-help [ help ] [
-        "The " write vocab-name write
-        " vocabulary does not define a main help article." print
-        "To define one, refer to \\ ABOUT: help" print
-    ] ?if ;
-
 : ($index) ( articles -- )
     sort-articles [ \ $subsection swap 2array ] map print-element ;
 
 : $index ( element -- )
-    first call [ ($index) ] unless-empty ;
+    first call( -- seq ) [ ($index) ] unless-empty ;
 
 : $about ( element -- )
     first vocab-help [ 1array $subsection ] when* ;

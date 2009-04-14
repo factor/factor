@@ -12,6 +12,9 @@ HELP: Letter
 HELP: alpha
 { $class-description "The class of alphanumeric characters." } ;
 
+HELP: math
+{ $class-description "The class of Unicode math characters." } ;
+
 HELP: blank
 { $class-description "The class of whitespace characters." } ;
 
@@ -54,6 +57,8 @@ ARTICLE: "unicode.categories" "Character classes"
 { $subsection uncased }
 { $subsection uncased? }
 { $subsection character }
-{ $subsection character? } ;
+{ $subsection character? }
+{ $subsection math }
+{ $subsection math? } ;
 
 ABOUT: "unicode.categories"

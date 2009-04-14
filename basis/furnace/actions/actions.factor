@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences kernel assocs combinators
 validators http hashtables namespaces fry continuations locals
@@ -9,6 +9,7 @@ http.server.responses
 furnace.utilities
 furnace.redirection
 furnace.conversations
+furnace.chloe-tags
 html.forms
 html.components
 html.components
@@ -52,10 +53,10 @@ TUPLE: action rest init authorize display validate submit ;
     '[
         _ dup display>> [
             {
-                [ init>> call ]
-                [ authorize>> call ]
+                [ init>> call( -- ) ]
+                [ authorize>> call( -- ) ]
                 [ drop restore-validation-errors ]
-                [ display>> call ]
+                [ display>> call( -- response ) ]
             } cleave
         ] [ drop <400> ] if
     ] with-exit-continuation ;
@@ -81,9 +82,9 @@ CONSTANT: revalidate-url-key "__u"
 : handle-post ( action -- response )
     '[
         _ dup submit>> [
-            [ validate>> call ]
-            [ authorize>> call ]
-            [ submit>> call ]
+            [ validate>> call( -- ) ]
+            [ authorize>> call( -- ) ]
+            [ submit>> call( -- response ) ]
             tri
         ] [ drop <400> ] if
     ] with-exit-continuation ;

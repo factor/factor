@@ -20,10 +20,10 @@ PRIVATE>
     [ (parse-here) ] "" make but-last
     lexer get next-line ;
 
-: STRING:
+SYNTAX: STRING:
     CREATE-WORD
     parse-here 1quotation
-    (( -- string )) define-inline ; parsing
+    (( -- string )) define-inline ;
 
 <PRIVATE
 
@@ -48,16 +48,16 @@ PRIVATE>
         change-column drop
     ] "" make ;
 
-: <"
-    "\">" parse-multiline-string parsed ; parsing
+SYNTAX: <"
+    "\">" parse-multiline-string parsed ;
 
-: <'
-    "'>" parse-multiline-string parsed ; parsing
+SYNTAX: <'
+    "'>" parse-multiline-string parsed ;
 
-: {'
-    "'}" parse-multiline-string parsed ; parsing
+SYNTAX: {'
+    "'}" parse-multiline-string parsed ;
 
-: {"
-    "\"}" parse-multiline-string parsed ; parsing
+SYNTAX: {"
+    "\"}" parse-multiline-string parsed ;
 
-: /* "*/" parse-multiline-string drop ; parsing
+SYNTAX: /* "*/" parse-multiline-string drop ;

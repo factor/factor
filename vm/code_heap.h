@@ -1,16 +1,6 @@
 /* compiled code */
 F_HEAP code_heap;
 
-INLINE F_BLOCK *compiled_to_block(F_CODE_BLOCK *compiled)
-{
-	return (F_BLOCK *)compiled - 1;
-}
-
-INLINE F_CODE_BLOCK *block_to_compiled(F_BLOCK *block)
-{
-	return (F_CODE_BLOCK *)(block + 1);
-}
-
 void init_code_heap(CELL size);
 
 bool in_code_heap_p(CELL ptr);

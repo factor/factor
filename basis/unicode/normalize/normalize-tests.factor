@@ -1,5 +1,5 @@
 USING: unicode.normalize kernel tools.test sequences
-unicode.data io.encodings.utf8 io.files splitting math.parser
+simple-flat-file io.encodings.utf8 io.files splitting math.parser
 locals math quotations assocs combinators unicode.normalize.private ;
 IN: unicode.normalize.tests
 
@@ -23,9 +23,8 @@ IN: unicode.normalize.tests
 [ "\u00d55c" ] [ "\u001112\u001161\u0011ab" nfc ] unit-test
 
 : parse-test ( -- tests )
-    "vocab:unicode/normalize/NormalizationTest.txt"
-    utf8 file-lines filter-comments
-    [ ";" split 5 head [ " " split [ hex> ] "" map-as ] map ] map ;
+    "vocab:unicode/normalize/NormalizationTest.txt" data
+    [ 5 head [ " " split [ hex> ] "" map-as ] map ] map ;
 
 :: assert= ( test spec quot -- )
     spec [

@@ -26,7 +26,7 @@ HELP: <repeat-button>
 { $description "Creates a new " { $link button } " derived from a " { $link <border-button> } " which calls the quotation every 100 milliseconds as long as the mouse button is held down." } ;
 
 HELP: button-pen
-{ $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " gneeric words by delegating to an object in one of four slots which depend on the state of the button being drawn:"
+{ $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " generic words by delegating to an object in one of four slots which depend on the state of the button being drawn:"
     { $list
         { { $snippet "plain"    } " - the button is inactive" }
         { { $snippet "rollover" } " - the button is under the mouse" }

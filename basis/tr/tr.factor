@@ -17,7 +17,8 @@ M: bad-tr summary
     [ [ ascii? ] all? ] both? [ bad-tr ] unless ;
 
 : compute-tr ( quot from to -- mapping )
-    zip [ 128 ] 2dip '[ [ @ _ at ] keep or ] B{ } map-as ; inline
+    [ 128 ] 3dip zip
+    '[ [ _ call( x -- y ) _ at ] keep or ] B{ } map-as ; inline
 
 : tr-hints ( word -- )
     { { byte-array } { string } } "specializer" set-word-prop ;
@@ -39,10 +40,9 @@ M: bad-tr summary
 
 PRIVATE>
 
-: TR:
+SYNTAX: TR:
     scan parse-definition
     unclip-last [ unclip-last ] dip compute-tr
     [ check-tr ]
     [ [ create-tr ] dip define-tr ]
     [ [ "-fast" append create-tr ] dip define-fast-tr ] 2tri ;
-    parsing

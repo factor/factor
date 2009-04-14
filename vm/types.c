@@ -81,7 +81,7 @@ void primitive_word_xt(void)
 	F_WORD *word = untag_word(dpop());
 	F_CODE_BLOCK *code = (profiling_p ? word->profiling : word->code);
 	dpush(allot_cell((CELL)code + sizeof(F_CODE_BLOCK)));
-	dpush(allot_cell((CELL)code + sizeof(F_CODE_BLOCK) + code->code_length));
+	dpush(allot_cell((CELL)code + code->block.size));
 }
 
 void primitive_wrapper(void)
@@ -136,6 +136,18 @@ CELL allot_array_1(CELL obj)
 	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,1);
 	UNREGISTER_ROOT(obj);
 	set_array_nth(a,0,obj);
+	return tag_object(a);
+}
+
+CELL allot_array_2(CELL v1, CELL v2)
+{
+	REGISTER_ROOT(v1);
+	REGISTER_ROOT(v2);
+	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,2);
+	UNREGISTER_ROOT(v2);
+	UNREGISTER_ROOT(v1);
+	set_array_nth(a,0,v1);
+	set_array_nth(a,1,v2);
 	return tag_object(a);
 }
 

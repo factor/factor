@@ -8,7 +8,8 @@ continuations ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.menus ui.gadgets.wrappers ui.render ui.pens.solid
 ui.gadgets.line-support ui.text ui.gestures ui.baseline-alignment
-math.rectangles splitting unicode.categories fonts grouping ;
+math.rectangles splitting unicode.categories grouping ;
+EXCLUDE: fonts => selection ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
@@ -140,7 +141,7 @@ M: editor ungraft*
 : scroll>caret ( editor -- )
     dup graft-state>> second [
         [
-            [ caret-loc ] [ caret-dim { 1 0 } v+ ] bi <rect>
+            [ caret-loc ] [ caret-dim { 2 1 } v+ ] bi <rect>
         ] keep scroll>rect
     ] [ drop ] if ;
 
@@ -171,11 +172,10 @@ TUPLE: selected-line start end first? last? ;
 
 :: draw-selection ( line pair editor -- )
     pair [ editor font>> line offset>x ] map :> pair
-    pair first 0 2array [
-        editor selection-color>> gl-color
-        pair second pair first - round 1 max
-        editor line-height 2array gl-fill-rect
-    ] with-translation ;
+    editor selection-color>> gl-color
+    pair first 0 2array
+    pair second pair first - round 1 max editor line-height 2array
+    gl-fill-rect ;
 
 : draw-unselected-line ( line editor -- )
     font>> swap draw-text ;
@@ -413,8 +413,7 @@ editor "caret-motion" f {
 } define-command-map
 
 : clear-editor ( editor -- )
-    #! The with-datastack is a kludge to make it infer. Stupid.
-    model>> 1array [ clear-doc ] with-datastack drop ;
+    model>> clear-doc ;
 
 : select-all ( editor -- ) doc-elt select-elt ;
 
@@ -453,6 +452,7 @@ editor "caret-motion" f {
 
 editor "selection" f {
     { T{ button-down f { S+ } 1 } extend-selection }
+    { T{ button-up f { S+ } 1 } com-copy-selection }
     { T{ drag } drag-selection }
     { gain-focus focus-editor }
     { lose-focus unfocus-editor }
@@ -619,7 +619,7 @@ TUPLE: action-field < field quot ;
     [ editor>> editor-string ]
     [ editor>> clear-editor ]
     [ quot>> ]
-    tri call ;
+    tri call( string -- ) ;
 
 action-field H{
     { T{ key-down f f "RET" } [ invoke-action-field ] }

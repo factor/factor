@@ -63,7 +63,7 @@ unit-test
 [ "USING: math ;\nIN: prettyprint.tests\n: bar ( x -- y ) 2 + ;\n" ]
 [ [ \ bar see ] with-string-writer ] unit-test
 
-: blah 
+: blah ( a a a a a a a a a a a a a a a a a a a a -- )
     drop
     drop
     drop
@@ -102,7 +102,7 @@ unit-test
         ] keep =
     ] with-scope ;
 
-GENERIC: method-layout
+GENERIC: method-layout ( a -- b )
 
 M: complex method-layout
     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -135,7 +135,7 @@ M: object method-layout ;
     [ \ method-layout see-methods ] with-string-writer "\n" split
 ] unit-test
 
-: soft-break-test
+: soft-break-test ( -- str )
     {
         "USING: kernel math sequences strings ;"
         "IN: prettyprint.tests"
@@ -152,7 +152,7 @@ M: object method-layout ;
 
 DEFER: parse-error-file
 
-: another-soft-break-test
+: another-soft-break-test ( -- str )
     {
         "USING: make sequences ;"
         "IN: prettyprint.tests"
@@ -166,7 +166,7 @@ DEFER: parse-error-file
     check-see
 ] unit-test
 
-: string-layout
+: string-layout ( -- str )
     {
         "USING: accessors debugger io kernel ;"
         "IN: prettyprint.tests"
@@ -180,29 +180,7 @@ DEFER: parse-error-file
     "string-layout-test" string-layout check-see
 ] unit-test
 
-! Define dummy words for the below...
-: <NSRect> ( a b c d -- e ) ;
-: <PixelFormat> ( -- fmt ) ;
-: send ( obj -- ) ;
-
-\ send soft "break-after" set-word-prop
-
-: final-soft-break-test
-    {
-        "USING: kernel sequences ;"
-        "IN: prettyprint.tests"
-        ": final-soft-break-layout ( class dim -- view )"
-        "    [ \"alloc\" send 0 0 ] dip first2 <NSRect>"
-        "    <PixelFormat> \"initWithFrame:pixelFormat:\" send"
-        "    dup 1 \"setPostsBoundsChangedNotifications:\" send"
-        "    dup 1 \"setPostsFrameChangedNotifications:\" send ;"
-    } ;
-
-[ t ] [
-    "final-soft-break-layout" final-soft-break-test check-see
-] unit-test
-
-: narrow-test
+: narrow-test ( -- str )
     {
         "USING: arrays combinators continuations kernel sequences ;"
         "IN: prettyprint.tests"
@@ -218,7 +196,7 @@ DEFER: parse-error-file
     "narrow-layout" narrow-test check-see
 ] unit-test
 
-: another-narrow-test
+: another-narrow-test ( -- str )
     {
         "IN: prettyprint.tests"
         ": another-narrow-layout ( -- obj )"
@@ -300,11 +278,7 @@ GENERIC: generic-see-test-with-f ( obj -- obj )
 M: f generic-see-test-with-f ;
 
 [ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
-    [ { POSTPONE: f generic-see-test-with-f } see ] with-string-writer
-] unit-test
-
-[ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
-    [ \ f \ generic-see-test-with-f method see ] with-string-writer
+    [ M\ f generic-see-test-with-f see ] with-string-writer
 ] unit-test
 
 PREDICATE: predicate-see-test < integer even? ;
@@ -326,10 +300,10 @@ INTERSECTION: intersection-see-test sequence number ;
     
 TUPLE: started-out-hustlin' ;
 
-GENERIC: ended-up-ballin'
+GENERIC: ended-up-ballin' ( a -- b )
 
 M: started-out-hustlin' ended-up-ballin' ; inline
 
 [ "USING: prettyprint.tests ;\nM: started-out-hustlin' ended-up-ballin' ; inline\n" ] [
-    [ { started-out-hustlin' ended-up-ballin' } see ] with-string-writer
+    [ M\ started-out-hustlin' ended-up-ballin' see ] with-string-writer
 ] unit-test

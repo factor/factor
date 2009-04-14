@@ -57,10 +57,12 @@ IN: bootstrap.syntax
     "EXCLUDE:"
     "RENAME:"
     "ALIAS:"
+    "SYNTAX:"
     "V{"
     "W{"
     "["
     "\\"
+    "M\\"
     "]"
     "delimiter"
     "f"
@@ -68,7 +70,6 @@ IN: bootstrap.syntax
     "foldable"
     "inline"
     "recursive"
-    "parsing"
     "t"
     "{"
     "}"
@@ -78,6 +79,8 @@ IN: bootstrap.syntax
     "call-next-method"
     "initial:"
     "read-only"
+    "call("
+    "execute("
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol

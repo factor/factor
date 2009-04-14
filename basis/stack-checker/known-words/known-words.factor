@@ -11,7 +11,8 @@ strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
 combinators locals locals.backend locals.types words.private
-quotations.private call call.private stack-checker.values
+quotations.private combinators.private stack-checker.values
+alien.libraries
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -135,17 +136,16 @@ M: object infer-call*
     peek-d literal value>> second 1+ { tuple } <effect>
     apply-word/effect ;
 
-: infer-(throw) ( -- )
-    \ (throw)
-    peek-d literal value>> 2 + { "*" } <effect>
+: infer-effect-unsafe ( word -- )
+    pop-literal nip
+    add-effect-input
     apply-word/effect ;
 
 : infer-execute-effect-unsafe ( -- )
-    \ execute
-    pop-literal nip
-    [ in>> "word" suffix ] [ out>> ] [ terminated?>> ] tri
-    effect boa
-    apply-word/effect ;
+    \ execute infer-effect-unsafe ;
+
+: infer-call-effect-unsafe ( -- )
+    \ call infer-effect-unsafe ;
 
 : infer-exit ( -- )
     \ exit (( n -- * )) apply-word/effect ;
@@ -186,10 +186,10 @@ M: object infer-call*
         { \ execute [ infer-execute ] }
         { \ (execute) [ infer-execute ] }
         { \ execute-effect-unsafe [ infer-execute-effect-unsafe ] }
+        { \ call-effect-unsafe [ infer-call-effect-unsafe ] }
         { \ if [ infer-if ] }
         { \ dispatch [ infer-dispatch ] }
         { \ <tuple-boa> [ infer-<tuple-boa> ] }
-        { \ (throw) [ infer-(throw) ] }
         { \ exit [ infer-exit ] }
         { \ load-local [ 1 infer->r ] }
         { \ load-locals [ infer-load-locals ] }
@@ -212,9 +212,10 @@ M: object infer-call*
 
 {
     declare call (call) slip 2slip 3slip dip 2dip 3dip curry compose
-    execute (execute) execute-effect-unsafe if dispatch <tuple-boa>
-    (throw) exit load-local load-locals get-local drop-locals
-    do-primitive alien-invoke alien-indirect alien-callback
+    execute (execute) call-effect-unsafe execute-effect-unsafe if
+    dispatch <tuple-boa> exit load-local load-locals get-local
+    drop-locals do-primitive alien-invoke alien-indirect
+    alien-callback
 } [ t "special" set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }
@@ -604,6 +605,8 @@ M: object infer-call*
 
 \ fflush { alien } { } define-primitive
 
+\ fseek { alien integer integer } { } define-primitive
+
 \ fclose { alien } { } define-primitive
 
 \ <wrapper> { object } { wrapper } define-primitive
@@ -626,6 +629,9 @@ M: object infer-call*
 
 \ datastack { } { array } define-primitive
 \ datastack make-flushable
+
+\ check-datastack { array integer integer } { object } define-primitive
+\ check-datastack make-flushable
 
 \ retainstack { } { array } define-primitive
 \ retainstack make-flushable

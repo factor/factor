@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Chris Double, Matthew Willis, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences math vectors arrays namespaces make
-quotations promises combinators io lists accessors call ;
+quotations promises combinators io lists accessors ;
 IN: lists.lazy
 
 M: promise car ( promise -- car )
@@ -203,7 +203,7 @@ M: lazy-append nil? ( lazy-append -- bool )
 
 TUPLE: lazy-from-by n quot ;
 
-C: lfrom-by lazy-from-by ( n quot -- list )
+C: lfrom-by lazy-from-by
 
 : lfrom ( n -- list )
     [ 1+ ] lfrom-by ;

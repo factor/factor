@@ -9,8 +9,8 @@ typedef enum {
 	RT_XT,
 	/* current offset */
 	RT_HERE,
-	/* a local label */
-	RT_LABEL,
+	/* current code block */
+	RT_THIS,
 	/* immediate literal */
 	RT_IMMEDIATE,
 	/* address of stack_chain var */
@@ -43,21 +43,15 @@ typedef enum {
 #define REL_INDIRECT_ARM_MASK 0xfff
 #define REL_RELATIVE_ARM_3_MASK 0xffffff
 
-/* the rel type is built like a cell to avoid endian-specific code in
-the compiler */
-#define REL_TYPE(r) ((r)->type & 0x000000ff)
-#define REL_CLASS(r) (((r)->type & 0x0000ff00) >> 8)
-#define REL_ARGUMENT(r) (((r)->type & 0xffff0000) >> 16)
-
-/* code relocation consists of a table of entries for each fixup */
-typedef struct {
-	unsigned int type;
-	unsigned int offset;
-} F_REL;
+/* code relocation table consists of a table of entries for each fixup */
+typedef u32 F_REL;
+#define REL_TYPE(r)   (((r) & 0xf0000000) >> 28)
+#define REL_CLASS(r)  (((r) & 0x0f000000) >> 24)
+#define REL_OFFSET(r)  ((r) & 0x00ffffff)
 
 void flush_icache_for(F_CODE_BLOCK *compiled);
 
-typedef void (*RELOCATION_ITERATOR)(F_REL *rel, F_CODE_BLOCK *compiled);
+typedef void (*RELOCATION_ITERATOR)(F_REL rel, CELL index, F_CODE_BLOCK *compiled);
 
 void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter);
 
@@ -81,9 +75,12 @@ void relocate_code_block(F_CODE_BLOCK *relocating);
 
 CELL compiled_code_format(void);
 
-bool stack_traces_p(void);
+INLINE bool stack_traces_p(void)
+{
+	return userenv[STACK_TRACES_ENV] != F;
+}
 
-F_CODE_BLOCK *add_compiled_block(
+F_CODE_BLOCK *add_code_block(
 	CELL type,
 	F_ARRAY *code,
 	F_ARRAY *labels,

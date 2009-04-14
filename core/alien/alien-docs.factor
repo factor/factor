@@ -1,7 +1,7 @@
 USING: byte-arrays arrays help.syntax help.markup
-alien.syntax compiler definitions math libc
-debugger parser io io.backend system
-alien.accessors eval ;
+alien.syntax compiler definitions math libc eval
+debugger parser io io.backend system alien.accessors
+alien.libraries ;
 IN: alien
 
 HELP: alien
@@ -21,16 +21,6 @@ HELP: expired?
 HELP: <bad-alien>
 { $values  { "alien" c-ptr } }
 { $description "Constructs an invalid alien pointer that has expired." } ;
-
-HELP: <library>
-{ $values
-     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $snippet "cdecl" } " or " { $snippet "stdcall" } }
-     { "library" library } }
-{ $description "Opens a C library using the path and ABI parameters and outputs a library tuple." }
-{ $notes "User code should use " { $link add-library } " so that the opened library is added to a global hashtable, " { $link libraries } "." } ;
-
-HELP: libraries
-{ $description "A global hashtable that keeps a list of open libraries. Use the " { $link add-library } " word to construct a library and add it with a single call." } ;
 
 HELP: <displaced-alien> ( displacement c-ptr -- alien )
 { $values { "displacement" "an integer" } { "c-ptr" c-ptr } { "alien" "a new alien" } }
@@ -53,61 +43,6 @@ HELP: <alien>
 
 HELP: c-ptr
 { $class-description "Class of objects consisting of aliens, byte arrays and " { $link f } ". These objects can convert to pointer C types, which are all aliases of " { $snippet "void*" } "." } ;
-
-HELP: library
-{ $values { "name" "a string" } { "library" "a hashtable" } }
-{ $description "Looks up a library by its logical name. The library object is a hashtable with the following keys:"
-    { $list
-        { { $snippet "name" } " - the full path of the C library binary" }
-        { { $snippet "abi" } " - the ABI used by the library, either " { $snippet "cdecl" } " or " { $snippet "stdcall" } }
-        { { $snippet "dll" } " - an instance of the " { $link dll } " class; only set if the library is loaded" }
-    }
-} ;
-
-HELP: dlopen ( path -- dll )
-{ $values { "path" "a pathname string" } { "dll" "a DLL handle" } }
-{ $description "Opens a native library and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } "." }
-{ $errors "Throws an error if the library could not be found, or if loading fails for some other reason." }
-{ $notes "This is the low-level facility used to implement " { $link load-library } ". Use the latter instead." } ;
-
-HELP: dlsym ( name dll -- alien )
-{ $values { "name" "a C symbol name" } { "dll" "a DLL handle" } { "alien" "an alien pointer" } }
-{ $description "Looks up a symbol in a native library. If " { $snippet "dll" } " is " { $link f } " looks for the symbol in the runtime executable." }
-{ $errors "Throws an error if the symbol could not be found." } ;
-
-HELP: dlclose ( dll -- )
-{ $values { "dll" "a DLL handle" } }
-{ $description "Closes a DLL handle created by " { $link dlopen } ". This word might not be implemented on all platforms." } ;
-
-HELP: load-library
-{ $values { "name" "a string" } { "dll" "a DLL handle" } }
-{ $description "Loads a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } ". If the library is already loaded, returns the existing handle." } ;
-
-HELP: add-library
-{ $values { "name" "a string" } { "path" "a string" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
-{ $description "Defines a new logical library named " { $snippet "name" } " located in the file system at " { $snippet "path" } "and the specified ABI." }
-{ $notes "Because the entire source file is parsed before top-level forms are executed, " { $link add-library } " cannot be used in the same file as " { $link POSTPONE: FUNCTION: } " definitions from that library. The " { $link add-library } " call will happen too late, after compilation, and the alien calls will not work."
-$nl
-"Instead, " { $link add-library } " calls must either be placed in different source files from those that use that library, or alternatively, " { $link "syntax-immediate" } " can be used to load the library before compilation." }
-{ $examples "Here is a typical usage of " { $link add-library } ":"
-{ $code
-    "<< \"freetype\" {"
-    "    { [ os macosx? ] [ \"libfreetype.6.dylib\" \"cdecl\" add-library ] }"
-    "    { [ os windows? ] [ \"freetype6.dll\" \"cdecl\" add-library ] }"
-    "    [ drop ]"
-    "} cond >>"
-}
-"Note the parse time evaluation with " { $link POSTPONE: << } "." } ;
-
-HELP: alien-invoke-error
-{ $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
-    { $list
-        { "This can happen when experimenting with " { $link alien-invoke } " in this listener. To fix the problem, place the " { $link alien-invoke } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
-        { "The return type or parameter list references an unknown C type." }
-        { "The symbol or library could not be found." }
-        { "One of the four inputs to " { $link alien-invoke } " is not a literal value. To call functions which are not known at compile-time, use " { $link alien-indirect } "." }
-    }
-} ;
 
 HELP: alien-invoke
 { $values { "..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }
@@ -225,6 +160,16 @@ ARTICLE: "alien-invoke" "Calling C from Factor"
 "Sometimes it is necessary to invoke a C function pointer, rather than a named C function:"
 { $subsection alien-indirect }
 "There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "." ;
+
+HELP: alien-invoke-error
+{ $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
+    { $list
+        { "This can happen when experimenting with " { $link alien-invoke } " in this listener. To fix the problem, place the " { $link alien-invoke } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
+        { "The return type or parameter list references an unknown C type." }
+        { "The symbol or library could not be found." }
+        { "One of the four inputs to " { $link alien-invoke } " is not a literal value. To call functions which are not known at compile-time, use " { $link alien-indirect } "." }
+    }
+} ;
 
 ARTICLE: "alien-callback-gc" "Callbacks and code GC"
 "A callback consits of two parts; the callback word, which pushes the address of the callback on the stack when executed, and the callback body itself. If the callback word is redefined, removed from the dictionary using " { $link forget } ", or recompiled, the callback body will not be reclaimed by the garbage collector, since potentially C code may be holding a reference to the callback body."

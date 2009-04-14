@@ -9,7 +9,7 @@ compiler.units accessors vocabs.parser macros.expander ui
 ui.tools.browser ui.tools.listener ui.tools.listener.completion
 ui.tools.profiler ui.tools.inspector ui.tools.traceback
 ui.commands ui.gadgets.editors ui.gestures ui.operations
-ui.tools.deploy models ;
+ui.tools.deploy models help.tips ;
 IN: ui.tools.operations
 
 ! Objects
@@ -80,8 +80,6 @@ IN: ui.tools.operations
     { +secondary+ t }
     { +listener+ t }
 } define-operation
-
-UNION: definition word method-spec link vocab vocab-link ;
 
 [ definition? ] \ edit H{
     { +keyboard+ T{ key-down f { C+ } "e" } }
@@ -156,8 +154,6 @@ M: word com-stack-effect 1quotation com-stack-effect ;
     { +keyboard+ T{ key-down f { C+ } "t" } }
     { +listener+ t }
 } define-operation
-
-: com-profile ( quot -- ) profile profiler-window ;
 
 [ quotation? ] \ com-profile H{
     { +keyboard+ T{ key-down f { C+ } "o" } }

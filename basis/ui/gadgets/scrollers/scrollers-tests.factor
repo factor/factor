@@ -1,7 +1,7 @@
 USING: ui.gadgets ui.gadgets.scrollers namespaces tools.test
 kernel models models.product models.range ui.gadgets.viewports
 ui.gadgets.labels ui.gadgets.grids ui.gadgets.sliders math
-math.vectors arrays sequences tools.test.ui math.rectangles
+math.vectors arrays sequences ui.gadgets.debug math.rectangles
 accessors ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.scrollers.private ;
 IN: ui.gadgets.scrollers.tests
@@ -45,13 +45,13 @@ IN: ui.gadgets.scrollers.tests
 
     [ { 100 100 } ] [ "s" get viewport>> gadget-child pref-dim ] unit-test
 
-    [ ] [ { 0 0 } "s" get scroll ] unit-test
+    [ ] [ { 0 0 } "s" get set-scroll-position ] unit-test
 
     [ { 0 0 } ] [ "s" get model>> range-min-value ] unit-test
 
     [ { 100 100 } ] [ "s" get model>> range-max-value ] unit-test
 
-    [ ] [ { 10 20 } "s" get scroll ] unit-test
+    [ ] [ { 10 20 } "s" get set-scroll-position ] unit-test
 
     [ { 10 20 } ] [ "s" get model>> range-value ] unit-test
 
@@ -74,7 +74,7 @@ dup layout
         drop
         "g2" get scroll>gadget
         "s" get layout
-        "s" get scroller-value
+        "s" get scroll-position
     ] map [ { 0 0 } = ] all?
 ] unit-test
 

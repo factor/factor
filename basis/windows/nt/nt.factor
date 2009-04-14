@@ -1,6 +1,7 @@
-USING: alien sequences ;
+USING: alien sequences alien.libraries ;
 {
     { "advapi32" "advapi32.dll" "stdcall" }
+    { "dinput"   "dinput8.dll"  "stdcall" }
     { "gdi32"    "gdi32.dll"    "stdcall" }
     { "user32"   "user32.dll"   "stdcall" }
     { "kernel32" "kernel32.dll" "stdcall" }
@@ -12,4 +13,5 @@ USING: alien sequences ;
     { "gl"       "opengl32.dll" "stdcall" }
     { "glu"      "glu32.dll"    "stdcall" }
     { "ole32"    "ole32.dll"    "stdcall" }
+    { "usp10"    "usp10.dll"    "stdcall" }
 } [ first3 add-library ] each

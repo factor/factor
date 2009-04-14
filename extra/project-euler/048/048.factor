@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions sequences ;
+USING: kernel math math.functions sequences project-euler.common ;
 IN: project-euler.048
 
 ! http://projecteuler.net/index.php?section=problems&id=48
@@ -22,4 +22,4 @@ IN: project-euler.048
 ! [ euler048 ] 100 ave-time
 ! 276 ms run / 1 ms GC ave time - 100 trials
 
-MAIN: euler048
+SOLUTION: euler048

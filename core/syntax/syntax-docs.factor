@@ -167,6 +167,8 @@ $nl
 ARTICLE: "syntax" "Syntax"
 "Factor has two main forms of syntax: " { $emphasis "definition" } " syntax and " { $emphasis "literal" } " syntax. Code is data, so the syntax for code is a special case of object literal syntax. This section documents literal syntax. Definition syntax is covered in " { $link "words" } ". Extending the parser is the main topic of " { $link "parser" } "."
 { $subsection "parser-algorithm" }
+{ $subsection "vocabulary-search" }
+{ $subsection "top-level-forms" }
 { $subsection "syntax-comments" }
 { $subsection "syntax-literals" }
 { $subsection "syntax-immediate" } ;
@@ -177,10 +179,10 @@ HELP: delimiter
 { $syntax ": foo ... ; delimiter" }
 { $description "Declares the most recently defined word as a delimiter. Delimiters are words which are only ever valid as the end of a nested block to be read by " { $link parse-until } ". An unpaired occurrence of a delimiter is a parse error." } ;
 
-HELP: parsing
-{ $syntax ": foo ... ; parsing" }
-{ $description "Declares the most recently defined word as a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
+HELP: SYNTAX:
+{ $syntax "SYNTAX: foo ... ;" }
+{ $description "Defines a parsing word." }
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< SYNTAX: HELLO \"Hello parser!\" print ; >>\n: world ( -- ) HELLO ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }
@@ -508,8 +510,8 @@ HELP: P"
 HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
-{ $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
-{ $notes "All words except those only pushing literals on the stack must have a stack effect declaration. See " { $link "effect-declaration" } " for details." } ;
+{ $description "A stack effect declaration. This is treated as a comment unless it appears inside a word definition." }
+{ $see-also "effect-declaration" } ;
 
 HELP: ((
 { $syntax "(( inputs -- outputs ))" }
@@ -556,18 +558,18 @@ HELP: BIN:
 { $examples { $example "USE: prettyprint" "BIN: 100 ." "4" } } ;
 
 HELP: GENERIC:
-{ $syntax "GENERIC: word" "GENERIC: word ( stack -- effect )" }
+{ $syntax "GENERIC: word ( stack -- effect )" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new generic word in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." } ;
 
 HELP: GENERIC#
-{ $syntax "GENERIC# word n" "GENERIC# word n ( stack -- effect )" }
+{ $syntax "GENERIC# word n ( stack -- effect )" }
 { $values { "word" "a new word to define" } { "n" "the stack position to dispatch on" } }
 { $description "Defines a new generic word which dispatches on the " { $snippet "n" } "th most element from the top of the stack in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
 { $notes
     "The following two definitions are equivalent:"
-    { $code "GENERIC: foo" }
-    { $code "GENERIC# foo 0" }
+    { $code "GENERIC: foo ( obj -- )" }
+    { $code "GENERIC# foo 0 ( obj -- )" }
 } ;
 
 HELP: MATH:
@@ -576,7 +578,7 @@ HELP: MATH:
 { $description "Defines a new generic word which uses the " { $link math-combination } " method combination." } ;
 
 HELP: HOOK:
-{ $syntax "HOOK: word variable" "HOOK: word variable ( stack -- effect ) " }
+{ $syntax "HOOK: word variable ( stack -- effect ) " }
 { $values { "word" "a new word to define" } { "variable" word } }
 { $description "Defines a new hook word in the current vocabulary. Hook words are generic words which dispatch on the value of a variable, so methods are defined with " { $link POSTPONE: M: } ". Hook words differ from other generic words in that the dispatch value is removed from the stack before the chosen method is called." }
 { $examples
@@ -762,7 +764,9 @@ HELP: >>
 { $description "Marks the end of a parse time code block." } ;
 
 HELP: call-next-method
+{ $syntax "call-next-method" }
 { $description "Calls the next applicable method. Only valid inside a method definition. The values at the top of the stack are passed on to the next method, and they must be compatible with that method's class specializer." }
+{ $notes "This word looks like an ordinary word but it is a parsing word. It cannot be factored out of a method definition, since the code expansion references the current method object directly." }
 { $errors
     "Throws a " { $link no-next-method } " error if this is the least specific method, and throws an " { $link inconsistent-next-method } " error if the values at the top of the stack are not compatible with the current method's specializer."
 } ;
@@ -770,3 +774,13 @@ HELP: call-next-method
 { POSTPONE: call-next-method (call-next-method) next-method } related-words
 
 { POSTPONE: << POSTPONE: >> } related-words
+
+HELP: call(
+{ $syntax "call( stack -- effect )" }
+{ $description "Calls the quotation on the top of the stack, asserting that it has the given stack effect. The quotation does not need to be known at compile time." } ;
+
+HELP: execute(
+{ $syntax "execute( stack -- effect )" }
+{ $description "Calls the word on the top of the stack, asserting that it has the given stack effect. The word does not need to be known at compile time." } ;
+
+{ POSTPONE: call( POSTPONE: execute( } related-words

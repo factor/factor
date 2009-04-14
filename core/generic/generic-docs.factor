@@ -1,6 +1,6 @@
 USING: help.markup help.syntax words classes classes.algebra
 definitions kernel alien sequences math quotations
-generic.standard generic.math combinators prettyprint ;
+generic.standard generic.math combinators prettyprint effects ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
@@ -45,8 +45,8 @@ $nl
 { $subsection make-generic }
 "Low-level method constructor:"
 { $subsection <method> }
-"A " { $emphasis "method specifier" } " refers to a method and implements the " { $link "definition-protocol" } ":"
-{ $subsection method-spec }
+"Methods may be pushed on the stack with a literal syntax:"
+{ $subsection POSTPONE: M\ }
 { $see-also "see" } ;
 
 ARTICLE: "method-combination" "Custom method combination"
@@ -62,7 +62,7 @@ ARTICLE: "method-combination" "Custom method combination"
     { { $link POSTPONE: HOOK: } { $link hook-combination } }
     { { $link POSTPONE: MATH: } { $link math-combination } }
 }
-"Developing a custom method combination requires that a parsing word calling " { $link define-generic } " be defined; additionally, it is a good idea to implement the definition protocol words " { $link definer } " and " { $link synopsis* } " on the class of words having this method combination, to properly support developer tools."
+"Developing a custom method combination requires that a parsing word calling " { $link define-generic } " be defined; additionally, it is a good idea to implement the " { $link "definition-protocol" } " on the class of words having this method combination, to properly support developer tools."
 $nl
 "The combination quotation passed to " { $link define-generic } " has stack effect " { $snippet "( word -- quot )" } ". It's job is to call various introspection words, including at least obtaining the set of methods defined on the generic word, then combining these methods in some way to produce a quotation."
 { $see-also "generic-introspection" } ;
@@ -98,8 +98,8 @@ $nl
 "Generic words must declare their stack effect in order to compile. See " { $link "effect-declaration" } "."
 { $subsection "method-order" }
 { $subsection "call-next-method" }
-{ $subsection "generic-introspection" }
 { $subsection "method-combination" }
+{ $subsection "generic-introspection" }
 "Generic words specialize behavior based on the class of an object; sometimes behavior needs to be specialized on the object's " { $emphasis "structure" } "; this is known as " { $emphasis "pattern matching" } " and is implemented in the " { $vocab-link "match" } " vocabulary." ;
 
 ABOUT: "generic"
@@ -115,13 +115,14 @@ HELP: make-generic
 $low-level-note ;
 
 HELP: define-generic
-{ $values { "word" word } { "combination" "a method combination" } }
+{ $values { "word" word } { "effect" effect } { "combination" "a method combination" } }
 { $description "Defines a generic word. A method combination is an object which responds to the " { $link perform-combination } " generic word." }
 { $contract "The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and thus must be side-effect free." } ;
 
-HELP: method-spec
-{ $class-description "The class of method specifiers, which are two-element arrays consisting of a class word followed by a generic word." }
-{ $examples { $code "{ fixnum + }" "{ editor draw-gadget* }" } } ;
+HELP: M\
+{ $syntax "M\\ class generic" }
+{ $class-description "Pushes a method on the stack." }
+{ $examples { $code "M\\ fixnum + see" } { $code "USING: ui.gadgets ui.gadgets.editors ;" "M\\ editor draw-gadget* edit" } } ;
 
 HELP: method-body
 { $class-description "The class of method bodies, which are words with special word properties set." } ;
