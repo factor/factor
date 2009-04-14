@@ -29,7 +29,7 @@ IN: mason.release.archive
         "-fs" "HFS+"
     "-volname" "factor" }
     archive-name suffix try-process
-    "dmg-root" delete-tree ;
+    "dmg-root" really-delete-tree ;
 
 : make-unix-archive ( -- )
     [ "tar" , "-cvzf" , archive-name , "factor" , ] { } make try-process ;
