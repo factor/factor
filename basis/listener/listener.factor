@@ -34,7 +34,7 @@ M: object stream-read-quot
 
 SYMBOL: visible-vars
 
-: show-var ( var -- ) visible-vars  [ swap suffix ] change ;
+: show-var ( var -- ) visible-vars [ swap suffix ] change ;
 
 : show-vars ( seq -- ) visible-vars [ swap union ] change ;
 
