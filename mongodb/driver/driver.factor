@@ -1,14 +1,12 @@
 USING: accessors assocs bson.constants bson.writer combinators
-constructors continuations destructors formatting fry io
-io.encodings.binary io.sockets io.streams.duplex kernel linked-assocs
-math math.parser memoize mongodb.msg mongodb.operations namespaces
-parser prettyprint sequences sets splitting strings uuid ;
+constructors continuations destructors formatting fry io io.pools
+io.encodings.binary io.sockets io.streams.duplex kernel linked-assocs hashtables
+math math.parser memoize mongodb.connection mongodb.msg mongodb.operations namespaces
+parser prettyprint sequences sets splitting strings uuid arrays ;
 
 IN: mongodb.driver
 
-TUPLE: mdb-node master? inet ;
-
-TUPLE: mdb-db name nodes collections ;
+TUPLE: mdb-pool < pool { mdb mdb-db } ;
 
 TUPLE: mdb-cursor collection id return# ;
 
@@ -23,6 +21,11 @@ TUPLE: mdb-collection
 : <mdb-collection> ( name -- collection )
     [ mdb-collection new ] dip >>name ; inline
 
+M: mdb-pool make-connection
+    mdb>> mdb-open ;
+
+: <mdb-pool> ( mdb -- pool ) mdb-pool <pool> swap >>mdb ;
+
 CONSTANT: MDB-GENERAL-ERROR 1
 
 CONSTANT: PARTIAL? "partial?"
@@ -30,28 +33,9 @@ CONSTANT: DIRTY? "dirty?"
 
 ERROR: mdb-error id msg ;
 
-SYMBOL: mdb-instance
-
-: mdb ( -- mdb )
-    mdb-instance get ; inline
-
-: master>> ( mdb -- inet )
-    nodes>> [ t ] dip at inet>> ;
-
-: slave>> ( mdb -- inet )
-    nodes>> [ f ] dip at inet>> ;
-
 <PRIVATE
 
 CONSTRUCTOR: mdb-cursor ( id collection return# -- cursor ) ;
-
-SYMBOL: mdb-socket-stream
-
-: >>mdb-stream ( stream -- )
-    mdb-socket-stream set ; inline
-
-: mdb-stream>> ( -- stream )
-    mdb-socket-stream get ; inline
 
 : check-ok ( result -- ? )
      [ "ok" ] dip key? ; inline 
@@ -59,20 +43,14 @@ SYMBOL: mdb-socket-stream
 : >mdbregexp ( value -- regexp )
    first <mdbregexp> ; inline
 
-: prepare-mdb-session ( mdb -- stream )
-    [ mdb-instance set ] keep
-    master>> [ remote-address set ] keep
-    binary <client> local-address set ; inline    
-
 PRIVATE>
 
 SYNTAX: r/ ( token -- mdbregexp )
     \ / [ >mdbregexp ]  parse-literal ; 
 
 : with-db ( mdb quot -- ... )
-    [ [ prepare-mdb-session ] dip
-      [ >>mdb-stream ] prepose
-      with-disposal ] with-scope ; inline
+    swap [ mdb-open &dispose >mdb-connection ] curry
+    prepose with-destructors ; inline
   
 : build-id-selector ( assoc -- selector )
     [ MDB_OID_FIELD swap at ] keep
@@ -81,76 +59,41 @@ SYNTAX: r/ ( token -- mdbregexp )
 <PRIVATE
 
 : index-collection ( -- ns )
-   mdb name>> "%s.system.indexes" sprintf ; inline
+   mdb-instance name>> "%s.system.indexes" sprintf ; inline
 
 : namespaces-collection ( -- ns )
-    mdb name>> "%s.system.namespaces" sprintf ; inline
+    mdb-instance name>> "%s.system.namespaces" sprintf ; inline
 
 : cmd-collection ( -- ns )
-    mdb name>> "%s.$cmd" sprintf ; inline
+    mdb-instance name>> "%s.$cmd" sprintf ; inline
  
 : index-ns ( colname -- index-ns )
-    [ mdb name>> ] dip "%s.%s" sprintf ; inline
-
-: ismaster-cmd ( node -- result )
-    binary "admin.$cmd" H{ { "ismaster" 1 } } <mdb-query-msg>
-    1 >>return# '[ _ write-message read-message ] with-client
-    objects>> first ; 
-
-: split-host-str ( hoststr -- host port )
-    ":" split [ first ] keep
-    second string>number ; inline
-
-: eval-ismaster-result ( node result -- node result )
-    [ [ "ismaster" ] dip at
-      >fixnum 1 =
-      [ t >>master? ] [ f >>master? ] if ] keep ;
-
-: check-node ( node -- node remote )
-    dup inet>> ismaster-cmd  
-    eval-ismaster-result
-    [ "remote" ] dip at ;
-
-: check-nodes ( node -- nodelist )
-    check-node
-    [ V{ } clone [ push ] keep ] dip
-    [ split-host-str <inet> [ f ] dip
-      mdb-node boa check-node drop
-      swap tuck push
-    ] when* ;
-
-: verify-nodes ( -- )
-    mdb nodes>> [ t ] dip at
-    check-nodes
-    H{ } clone tuck
-    '[ dup master?>> _ set-at ] each
-    [ mdb ] dip >>nodes drop ;
+    [ mdb-instance name>> ] dip "%s.%s" sprintf ; inline
 
 : send-message ( message -- )
-    [ mdb-stream>> ] dip '[ _ write-message ] with-stream* ;
+    [ mdb-connection> handle>> ] dip '[ _ write-message ] with-stream* ;
 
 : send-query-plain ( query-message -- result )
-    [ mdb-stream>> ] dip
+    [ mdb-connection> handle>> ] dip
     '[ _ write-message read-message ] with-stream* ;
 
-: send-query ( query-message -- cursor result )
+: make-cursor ( mdb-result-msg -- cursor/f )
+    dup cursor>> 0 > 
+    [ [ cursor>> ] [ collection>> ] [ requested#>> ] tri <mdb-cursor> ]
+    [ drop f ] if ;
+
+: send-query ( query-message -- cursor/f result )
     [ send-query-plain ] keep
-    { [ collection>> >>collection drop ]
-      [ return#>> >>requested# ]
-    } 2cleave
-    [ [ cursor>> 0 > ] keep
-      '[ _ [ cursor>> ] [ collection>> ] [ requested#>> ] tri <mdb-cursor> ]
-      [ f ] if
-    ] [ objects>> ] bi ;
+    [ collection>> >>collection drop ]
+    [ return#>> >>requested# ] 2bi
+    [ make-cursor ] [ objects>> ] bi ;
 
 PRIVATE>
 
 : <mdb> ( db host port -- mdb )
-    [ f ] 2dip <inet> mdb-node boa
-    check-nodes
-    H{ } clone tuck
-    '[ dup master?>> _ set-at ] each
-    H{ } clone mdb-db boa ;
+    <inet> f  <mdb-node>
+    check-nodes [  [ master?>> ] keep 2array ] map
+    >hashtable (<mdb-db>) ;
 
 GENERIC: create-collection ( name -- )
 M: string create-collection
@@ -181,7 +124,7 @@ M: mdb-collection create-collection ( mdb-collection -- )
     '[ _ "%s contains invalid characters ( . $ ; )" sprintf throw ] when ; inline
 
 : (ensure-collection) ( collection --  )
-    mdb collections>> dup keys length 0 = 
+    mdb-instance collections>> dup keys length 0 = 
     [ load-collection-list      
       [ [ "options" ] dip key? ] filter
       [ [ "name" ] dip at "." split second <mdb-collection> ] map
@@ -196,11 +139,11 @@ PRIVATE>
 
 MEMO: ensure-collection ( collection -- fq-collection )
     dup mdb-collection? [ name>> ] when
-    "." split1 over mdb name>> =
+    "." split1 over mdb-instance name>> =
     [ nip ] [ drop ] if
     [ ] [ reserved-namespace? ] bi
     [ [ (ensure-collection) ] keep ] unless
-    [ mdb name>> ] dip "%s.%s" sprintf ; inline
+    [ mdb-instance name>> ] dip "%s.%s" sprintf ; inline
 
 : <query> ( collection query -- mdb-query )
     [ ensure-collection ] dip
@@ -243,7 +186,8 @@ M: mdb-query-msg explain.
 
 GENERIC: find-one ( mdb-query -- result/f )
 M: mdb-query-msg find-one
-    1 >>return# send-query-plain objects>> [ first ] [ f ] if* ;
+    1 >>return# send-query-plain objects>>
+    dup empty? [ drop f ] [ first ] if ;
 
 GENERIC: count ( collection selector -- result )
 M: assoc count

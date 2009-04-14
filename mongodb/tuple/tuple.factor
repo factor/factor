@@ -11,10 +11,9 @@ SYNTAX: MDBTUPLE:
     define-tuple-class ; 
 
 : define-persistent ( class collection options -- )
-    [ <mdb-tuple-collection> ] dip
-    [ [ dup ] dip link-collection ] dip ! cl options
+    [ [ <mdb-tuple-collection> dupd link-collection ] when* ] dip 
     [ dup '[ _ mdb-persistent add-mixin-instance ] with-compilation-unit ] dip
-    [ dup annotate-writers ] dip 
+    ! [ dup annotate-writers ] dip 
     set-slot-map ;
 
 : ensure-table ( class -- )

@@ -66,8 +66,7 @@ PRIVATE>
     [  ] [ MDB_ADDON_SLOTS prepend ] if ; inline
 
 : set-slot-map ( class options -- )
-    '[ _ optl>map MDB_SLOTDEF_LIST set-word-prop ] keep
-    dup tuple-collection link-collection ; inline
+    optl>map MDB_SLOTDEF_LIST set-word-prop ; inline
   
 M: tuple-class tuple-collection ( tuple -- mdb-collection )
     (mdb-collection) ;

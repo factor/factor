@@ -52,12 +52,10 @@ TUPLE: cond-value value quot ;
 CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
 
 : write-mdb-persistent ( value quot: ( tuple -- assoc ) -- value' )
-    over needs-store? mdb-dirty-handling? get and
-    [ over [ (( tuple -- assoc )) call-effect ] dip 
-      [ tuple-collection name>> ] keep
-      [ add-storable ] dip
-    ] [ drop ] if 
-    [ tuple-collection name>> ] [ _id>> ] bi <objref> ; inline
+   over [ (( tuple -- assoc )) call-effect ] dip 
+   [ tuple-collection name>> ] keep
+   [ add-storable ] dip
+   [ tuple-collection name>> ] [ _id>> ] bi <objref> ; inline
 
 : write-field ( value quot: ( tuple -- assoc ) -- value' )
    <cond-value> {

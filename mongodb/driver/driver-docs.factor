@@ -212,27 +212,10 @@ HELP: load-index-list
 }
 { $description "" } ;
 
-HELP: master>>
-{ $values
-  { "mdb" null }
-  { "inet" null }
-}
-{ $description "" } ;
-
-HELP: mdb
-{ $values
-  
-  { "mdb" null }
-}
-{ $description "" } ;
-
 HELP: mdb-collection
 { $var-description "" } ;
 
 HELP: mdb-cursor
-{ $var-description "" } ;
-
-HELP: mdb-db
 { $var-description "" } ;
 
 HELP: mdb-error
@@ -241,12 +224,6 @@ HELP: mdb-error
   { "msg" null }
 }
 { $description "" } ;
-
-HELP: mdb-instance
-{ $var-description "" } ;
-
-HELP: mdb-node
-{ $var-description "" } ;
 
 HELP: r/
 { $values
@@ -274,13 +251,6 @@ HELP: skip
   { "mdb-query" null }
   { "skip#" null }
   { "mdb-query" null }
-}
-{ $description "" } ;
-
-HELP: slave>>
-{ $values
-  { "mdb" null }
-  { "inet" null }
 }
 { $description "" } ;
 
