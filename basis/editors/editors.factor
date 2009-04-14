@@ -82,7 +82,7 @@ M: object error-line
     error get (:edit) ;
 
 : edit-error ( error -- )
-    [ file>> ] [ line#>> ] bi edit-location ;
+    [ file>> ] [ line#>> ] bi 2dup and [ edit-location ] [ 2drop ] if ;
 
 : edit-each ( seq -- )
     [

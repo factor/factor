@@ -42,6 +42,7 @@ $nl
 ABOUT: "tools.test"
 
 HELP: unit-test
+{ $syntax "[ output ] [ input ] unit-test" }
 { $values { "output" "a sequence of expected stack elements" } { "input" "a quotation run with an empty stack" } }
 { $description "Runs a quotation with an empty stack, comparing the resulting stack with " { $snippet "output" } ". Elements are compared using " { $link = } ". Throws an error if the expected stack does not match the resulting stack." } ;
 

@@ -37,14 +37,17 @@ error-toggle source-file-table error-table error-display ;
 SINGLETON: source-file-renderer
 
 M: source-file-renderer row-columns
-    drop first2
-    [ [ source-file-icon ] [ ] [ length number>string ] tri* ] output>array ;
+    drop first2 [
+        [ source-file-icon ]
+        [ "<Listener input>" or ]
+        [ length number>string ] tri*
+    ] output>array ;
 
 M: source-file-renderer prototype-row
     drop source-file-icon "" "" 3array ;
 
 M: source-file-renderer row-value
-    drop dup [ first <pathname> ] when ;
+    drop dup [ first [ <pathname> ] [ f ] if* ] when ;
 
 M: source-file-renderer column-titles
     drop { "" "File" "Errors" } ;
@@ -76,7 +79,7 @@ M: error-renderer row-columns
     drop [
         {
             [ error-type error-icon ]
-            [ line#>> number>string ]
+            [ line#>> [ number>string ] [ "" ] if* ]
             [ asset>> unparse-short ]
             [ error>> summary ]
         } cleave
@@ -94,11 +97,15 @@ M: error-renderer column-titles
 M: error-renderer column-alignment drop { 0 1 0 0 } ;
 
 : sort-errors ( seq -- seq' )
-    [ [ [ file>> ] [ line#>> ] bi 2array ] compare ] sort ;
+    [ [ [ asset>> ] [ line#>> ] bi 2array ] keep ] { } map>assoc
+    sort-keys values ;
+
+: file-matches? ( error pathname/f -- ? )
+    [ file>> ] [ dup [ string>> ] when ] bi* = ;
 
 : <error-table-model> ( error-list -- model )
     [ model>> ] [ source-file>> ] bi
-    [ [ file>> ] [ string>> ] bi* = ] <search>
+    [ file-matches? ] <search>
     [ sort-errors ] <arrow> ;
 
 :: <error-table> ( error-list -- table )

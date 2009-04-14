@@ -20,17 +20,8 @@ GENERIC: error-type ( error -- type )
     new
         swap
         [ >>asset ]
-        [
-            where [ first2 ] [ "<unknown file>" 0 ] if*
-            [ >>file ] [ >>line# ] bi*
-        ] bi
+        [ where [ first2 [ >>file ] [ >>line# ] bi* ] when* ] bi
         swap >>error ; inline
-
-: delete-file-errors ( seq file type -- )
-    [
-        [ swap file>> = ] [ swap error-type = ]
-        bi-curry* bi and not
-    ] 2curry filter-here ;
 
 SYMBOL: error-types
 
@@ -42,8 +33,11 @@ error-types [ V{ } clone ] initialize
 : error-icon-path ( type -- icon )
     error-types get at icon>> ;
 
+: error-counts ( -- alist )
+    error-types get [ nip dup quot>> call( -- seq ) length ] assoc-map ;
+
 : error-summary ( -- )
-    error-types get [ nip dup quot>> call( -- seq ) length ] assoc-map
+    error-counts
     [ nip 0 > ] assoc-filter
     [
         over
@@ -68,3 +62,10 @@ SYMBOL: error-observers
 : remove-error-observer ( observer -- ) error-observers get delq ;
 
 : notify-error-observers ( -- ) error-observers get [ errors-changed ] each ;
+
+: delete-file-errors ( seq file type -- )
+    [
+        [ swap file>> = ] [ swap error-type = ]
+        bi-curry* bi and not
+    ] 2curry filter-here
+    notify-error-observers ;
