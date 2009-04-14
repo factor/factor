@@ -227,7 +227,7 @@ unit-test
 [ -3 10 nth ] must-fail
 [ 11 10 nth ] must-fail
 
-[ -1./0. 0 delete-nth ] must-fail
+[ -1/0. 0 delete-nth ] must-fail
 [ "" ] [ "" [ CHAR: \s = ] trim ] unit-test
 [ "" ] [ "" [ CHAR: \s = ] trim-head ] unit-test
 [ "" ] [ "" [ CHAR: \s = ] trim-tail ] unit-test
