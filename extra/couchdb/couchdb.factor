@@ -46,7 +46,7 @@ PREDICATE: file-exists-error < couchdb-error
     <post-request> couch-request ;
 
 : couch-delete ( url -- assoc )
-    <delete-request> couch-request ;
+    "DELETE" <client-request> couch-request ;
 
 : response-ok ( assoc -- assoc )
     "ok" over delete-at* and t assert= ;
@@ -57,9 +57,9 @@ PREDICATE: file-exists-error < couchdb-error
 ! server
 TUPLE: server { host string } { port integer } { uuids vector } { uuids-to-cache integer } ;
 
-: default-couch-host "localhost" ;
-: default-couch-port 5984 ;
-: default-uuids-to-cache 100 ;
+: default-couch-host ( -- host ) "localhost" ; inline
+: default-couch-port ( -- port ) 5984 ; inline
+: default-uuids-to-cache ( -- n ) 100 ; inline
 
 : <server> ( host port -- server )
     V{ } clone default-uuids-to-cache server boa ;
@@ -123,7 +123,7 @@ C: <db> db
     db-url "_all_docs" append couch-get ;
 
 : <json-post-data> ( assoc -- post-data )
-    >json "application/json" <post-data> ;
+    >json "application/json" <post-data> swap >>data ;
 
 ! documents
 : id> ( assoc -- id ) "_id" swap at ; 

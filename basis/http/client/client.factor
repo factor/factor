@@ -1,12 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math math.parser namespaces make
+USING: accessors assocs debugger kernel math math.parser namespaces make
 sequences strings splitting calendar continuations accessors vectors
 math.order hashtables byte-arrays destructors
 io io.sockets io.streams.string io.files io.timeouts
 io.pathnames io.encodings io.encodings.string io.encodings.ascii
 io.encodings.utf8 io.encodings.8-bit io.encodings.binary io.crlf
-io.streams.duplex fry ascii urls urls.encoding present
+io.streams.duplex fry ascii urls urls.encoding present prettyprint 
 http http.parsers http.client.post-data ;
 IN: http.client
 
@@ -82,7 +82,7 @@ SYMBOL: redirects
     redirects get max-redirects < [
         request get clone
         swap "location" header redirect-url
-        "GET" >>method swap with-http-request
+        "GET" >>method swap (with-http-request)
     ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
@@ -105,9 +105,7 @@ SYMBOL: redirects
     request get url>> url-addr ascii <client> drop
     1 minutes over set-timeout ;
 
-PRIVATE>
-
-: with-http-request ( request quot: ( chunk -- ) -- response )
+: (with-http-request) ( request quot: ( chunk -- ) -- response )
     swap
     request [
         <request-socket> [
@@ -129,23 +127,26 @@ PRIVATE>
         [ do-redirect ] [ nip ] if
     ] with-variable ; inline recursive
 
+PRIVATE>
+
 : <client-request> ( url method -- request )
     <request>
         swap >>method
         swap >url ensure-port >>url ; inline
 
-PRIVATE>
-
 : success? ( code -- ? ) 200 299 between? ;
 
-ERROR: download-failed response data ;
+! ERROR: download-failed response data ;
 
-M: download-failed error.
-    "HTTP request failed:" print nl
-    [ response>> . ] [ data>> . ] bi ;
+! M: download-failed error.
+!     "HTTP request failed:" print nl
+!    [ response>> . ] [ data>> . ] bi ;
+ERROR: download-failed response ;
 
-: check-response* ( response data -- response data )
-    over code>> success? [ download-failed ] unless ;
+: check-response ( response -- response )
+    dup code>> success? [ download-failed ] unless ;
+! : check-response ( response data -- response data )
+    ! over code>> success? [ download-failed ] unless ;
 
 : check-response-with-body ( response body -- response body )
     [ >>body check-response ] keep ;
@@ -166,17 +167,17 @@ M: download-failed error.
 : with-http-get ( url quot -- response )
     [ <get-request> ] dip with-http-request check-response ; inline
 
-: <delete-request> ( url -- request )
-    <client-request> "DELETE" >>method ;
+! : <delete-request> ( url -- request )
+!     "DELETE" <client-request> ;
 
-: http-delete ( url -- response data )
-    <delete-request> http-request ;
+! : http-delete ( url -- response )
+!     <delete-request> http-request ;
 
-: <trace-request> ( url -- request )
-    <client-request> "TRACE" >>method ;
+! : <trace-request> ( url -- request )
+!     <client-request> "TRACE" >>method ;
 
-: http-trace ( url -- response data )
-    <trace-request> http-request ;
+! : http-trace ( url -- response )
+!     <trace-request> http-request ;
 
 : download-name ( url -- name )
     present file-name "?" split1 drop "/" ?tail drop ;
