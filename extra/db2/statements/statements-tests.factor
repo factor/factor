@@ -7,8 +7,7 @@ IN: db2.statements.tests
 { 1 0 } [ [ drop ] statement-each ] must-infer-as
 { 1 1 } [ [ ] statement-map ] must-infer-as
 
-
-: test-sql-command ( -- )
+: create-computer-table ( -- )
     [ "drop table computer;" sql-command ] ignore-errors
 
     [ "drop table computer;" sql-command ]
@@ -17,7 +16,11 @@ IN: db2.statements.tests
     [ ] [
         "create table computer(name varchar, os varchar);"
         sql-command
-    ] unit-test
+    ] unit-test ;
+
+
+: test-sql-command ( -- )
+    create-computer-table
     
     [ ] [
         "insert into computer (name, os) values('rocky', 'mac');"
@@ -38,17 +41,17 @@ IN: db2.statements.tests
     [ ] [
         { "clubber" "windows" }
         "insert into computer (name, os) values(?, ?);"
-        sql-bind-command
+        sql-bind-command*
     ] unit-test
 
     [ { { "windows" } } ] [
         { "clubber" }
-        "select os from computer where name = ?;" sql-bind-query
+        "select os from computer where name = ?;" sql-bind-query*
     ] unit-test
 
     [ { { "windows" } } ] [
         { { VARCHAR "clubber" } }
-        "select os from computer where name = ?;" sql-bind-typed-query
+        "select os from computer where name = ?;" sql-bind-typed-query*
     ] unit-test
 
     [ ] [
@@ -57,7 +60,7 @@ IN: db2.statements.tests
             { VARCHAR "windows" }
         }
         "insert into computer (name, os) values(?, ?);"
-        sql-bind-typed-command
+        sql-bind-typed-command*
     ] unit-test
 
 

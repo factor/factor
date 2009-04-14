@@ -1,15 +1,11 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays calendar.format
-combinators db2.connections db2.sqlite.ffi db2.errors
+combinators db2.connections db2.errors db2.result-sets
+db2.sqlite.errors db2.sqlite.ffi db2.sqlite.result-sets
 io.backend io.encodings.string io.encodings.utf8 kernel math
-namespaces present sequences serialize urls db2.sqlite.errors ;
+namespaces present sequences serialize urls ;
 IN: db2.sqlite.lib
-
-: ?when ( object quot -- object' ) dupd when ; inline
-
-: assoc-with ( object sequence quot -- obj curry )
-    swapd [ [ -rot ] dip  call ] 2curry ; inline
 
 : sqlite-check-result ( n -- )
     {
