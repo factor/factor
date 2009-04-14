@@ -6,41 +6,58 @@ destructors fry kernel math namespaces sequences strings
 db2.sqlite.types ;
 IN: db2
 
-<PRIVATE
+GENERIC: sql-command ( object -- )
+GENERIC: sql-query ( object -- sequence )
+GENERIC: sql-bind-command* ( sequence object -- )
+GENERIC: sql-bind-query* ( sequence object -- sequence )
+GENERIC: sql-bind-typed-command* ( sequence object -- )
+GENERIC: sql-bind-typed-query* ( sequence object -- sequence )
 
-: execute-sql-string ( string -- )
+GENERIC: sql-bind-command ( object -- )
+GENERIC: sql-bind-query ( object -- sequence )
+GENERIC: sql-bind-typed-command ( object -- )
+GENERIC: sql-bind-typed-query ( object -- sequence )
+
+M: string sql-command ( sql -- )
     f f <statement> [ execute-statement ] with-disposal ;
 
-PRIVATE>
-
-: sql-command ( sql -- )
-    dup string?
-    [ execute-sql-string ]
-    [ [ execute-sql-string ] each ] if ;
-
-: sql-query ( sql -- sequence )
+M: string sql-query ( sql -- sequence )
     f f <statement> [ statement>result-sequence ] with-disposal ;
 
-: sql-bind-command ( sequence string -- )
+M: string sql-bind-command* ( sequence string -- )
     f f <statement> [
         prepare-statement
         [ bind-sequence ] [ statement>result-set drop ] bi
     ] with-disposal ;
 
-: sql-bind-query ( in-sequence string -- out-sequence )
+M: string sql-bind-query* ( in-sequence string -- out-sequence )
     f f <statement> [
         prepare-statement
         [ bind-sequence ] [ statement>result-sequence ] bi
     ] with-disposal ;
 
-: sql-bind-typed-command ( in-sequence string -- )
+M: string sql-bind-typed-command* ( in-sequence string -- )
     f f <statement> [
         prepare-statement
         [ bind-typed-sequence ] [ statement>result-set drop ] bi
     ] with-disposal ;
 
-: sql-bind-typed-query ( in-sequence string -- out-sequence )
+M: string sql-bind-typed-query* ( in-sequence string -- out-sequence )
     f f <statement> [
         prepare-statement
         [ bind-typed-sequence ] [ statement>result-sequence ] bi
     ] with-disposal ;
+
+M: sequence sql-command [ sql-command ] each ;
+M: sequence sql-query [ sql-query ] map ;
+M: sequence sql-bind-command* [ sql-bind-command* ] with each ;
+M: sequence sql-bind-query* [ sql-bind-query* ] with map ;
+M: sequence sql-bind-typed-command* [ sql-bind-typed-command* ] with each ;
+M: sequence sql-bind-typed-query* [ sql-bind-typed-query* ] with map ;
+
+! M: string sql-command [ sql-command ] each ;
+! M: string sql-query [ sql-query ] map ;
+! M: string sql-bind-command* sql-bind-command* ;
+! M: string sql-bind-query* sql-bind-query* ;
+! M: string sql-bind-typed-command sql-bind-typed-command* ;
+! M: string sql-bind-typed-query sql-bind-typed-query* ;
