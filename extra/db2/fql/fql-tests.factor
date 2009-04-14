@@ -33,6 +33,26 @@ IN: db2.fql.tests
         expand-fql sql>>
     ] unit-test
 
+    [ "delete from computer order by omg limit 3" ]
+    [
+        delete new
+            "computer" >>tables
+            "omg" >>order-by
+            3 >>limit
+        expand-fql sql>>
+    ] unit-test
+
+    [ "update computer set name = oscar order by omg limit 3" ]
+    [
+        update new
+            "computer" >>tables
+            "name" >>keys
+            "oscar" >>values
+            "omg" >>order-by
+            3 >>limit
+        expand-fql sql>>
+    ] unit-test
+
     ;
 
 [ test-fql ] test-dbs
