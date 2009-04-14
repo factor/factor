@@ -309,15 +309,14 @@ M: source-file-error error.
         [
             [
                 [ file>> [ % ": " % ] when* ]
-                [ line#>> [ # ": " % ] when* ]
-                [ summary % ] tri
+                [ line#>> [ # ": " % ] when* ] bi
             ] "" make
         ] [
             [
                 presented set
                 bold font-style set
             ] H{ } make-assoc
-        ] bi format nl
+        ] bi format
     ] [ error>> error. ] bi ;
 
 M: bad-effect summary
