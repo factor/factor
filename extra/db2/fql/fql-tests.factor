@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors db2 db2.fql db2.statements.tests db2.tester
-kernel tools.test ;
+USING: accessors db2 db2.statements.tests db2.tester
+kernel tools.test db2.fql ;
 IN: db2.fql.tests
 
 : test-fql ( -- )
@@ -26,6 +26,20 @@ IN: db2.fql.tests
         select new
             { "name" "os" } >>names
             "computer" >>from
+            "os" >>group-by
+            "lol" >>order-by
+            100 >>offset
+            3 >>limit
+        expand-fql sql>>
+    ] unit-test
+
+    [
+        "select name, os from computer where (hmm > 1 or foo is NULL) group by os order by lol offset 100 limit 3"
+    ] [
+        select new
+            { "name" "os" } >>names
+            "computer" >>from
+            T{ or f { "hmm > 1" "foo is NULL" } } >>where
             "os" >>group-by
             "lol" >>order-by
             100 >>offset
