@@ -5,7 +5,7 @@ io.files io.files.temp io.directories html.streams help kernel
 assocs sequences make words accessors arrays help.topics vocabs
 tools.vocabs help.vocabs namespaces prettyprint io
 vocabs.loader serialize fry memoize ascii unicode.case math.order
-sorting debugger html xml.syntax xml.writer ;
+sorting debugger html xml.syntax xml.writer math.parser ;
 IN: help.html
 
 : escape-char ( ch -- )
@@ -23,7 +23,7 @@ IN: help.html
             { CHAR: , "__comma__" }
             { CHAR: @ "__at__" }
         } at [ % ] [ , ] ?if
-    ] [ number>string "__" "__" surround ] if ;
+    ] [ number>string "__" "__" surround % ] if ;
 
 : escape-filename ( string -- filename )
     [ [ escape-char ] each ] "" make ;
