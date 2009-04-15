@@ -83,8 +83,8 @@ M: unknown-typeflag summary ( obj -- str )
 
 ! Normal file
 : typeflag-0 ( header -- )
-    dup name>> dup global_pax_header = [
-        [ read-data-blocks ] with-string-writer drop
+    dup name>> dup "global_pax_header" = [
+        drop [ read-data-blocks ] with-string-writer drop
     ] [
         prepend-current-directory read/write-blocks
     ] if ;
