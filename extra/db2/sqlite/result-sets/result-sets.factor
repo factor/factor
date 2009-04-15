@@ -11,7 +11,8 @@ M: sqlite-result-set dispose
     f >>handle drop ;
 
 M: sqlite-statement statement>result-set*
-    prepare-statement >sqlite-result-set ;
+    prepare-statement
+    sqlite-result-set new-result-set dup advance-row ;
 
 M: sqlite-result-set advance-row ( result-set -- )
     dup handle>> sqlite-next >>has-more? drop ;
