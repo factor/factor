@@ -3,7 +3,7 @@
 
 USING: accessors arrays classes.tuple combinators continuations io
 kernel lexer math prettyprint quotations sequences source-files
-strings words ;
+source-files.errors strings words ;
 
 IN: fuel.pprint
 

@@ -115,14 +115,15 @@ SYMBOL: error-summary-hook
             '[ datastack _ with-datastack ]
             [ call-error-hook datastack ]
             recover
-            (listener)
-        ] when*
+        ] [ return ] if*
     ] [
         dup lexer-error?
-        [ call-error-hook datastack (listener) ]
+        [ call-error-hook datastack ]
         [ rethrow ]
         if
-    ] recover ;
+    ] recover
+
+    (listener) ;
 
 PRIVATE>
 
