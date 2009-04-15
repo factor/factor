@@ -140,7 +140,46 @@ HELP: <process-stream>
   { "desc" "a launch descriptor" }
   { "encoding" "an encoding descriptor" }
   { "stream" "a bidirectional stream" } }
-{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream of the given encoding." } ;
+{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream with the given encoding." } ;
+
+HELP: <process-reader>
+{ $values
+  { "desc" "a launch descriptor" }
+  { "encoding" "an encoding descriptor" }
+  { "stream" "an input stream" } }
+{ $description "Launches a process and redirects its output via a pipe which may be read as a stream with the given encoding." } ;
+
+HELP: <process-writer>
+{ $values
+  { "desc" "a launch descriptor" }
+  { "encoding" "an encoding descriptor" }
+  { "stream" "an output stream" }
+}
+{ $description "Launches a process and redirects its input via a pipe which may be written to as a stream with the given encoding." } ;
+
+HELP: with-process-stream
+{ $values
+  { "desc" "a launch descriptor" }
+  { "encoding" "an encoding descriptor" }
+  { "quot" quotation }
+}
+{ $description "Launches a process and redirects its input and output via a pair of pipes. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to these pipes." } ;
+
+HELP: with-process-reader
+{ $values
+  { "desc" "a launch descriptor" }
+  { "encoding" "an encoding descriptor" }
+  { "quot" quotation }
+}
+{ $description "Launches a process and redirects its output via a pipe. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to this pipe." } ;
+
+HELP: with-process-writer
+{ $values
+  { "desc" "a launch descriptor" }
+  { "encoding" "an encoding descriptor" }
+  { "quot" quotation }
+}
+{ $description "Launches a process and redirects its input via a pipe. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to this pipe." } ;
 
 HELP: wait-for-process
 { $values { "process" process } { "status" object } }
@@ -175,7 +214,11 @@ ARTICLE: "io.launcher.launch" "Launching processes"
 "Redirecting standard input and output to a pipe:"
 { $subsection <process-reader> }
 { $subsection <process-writer> }
-{ $subsection <process-stream> } ;
+{ $subsection <process-stream> }
+"Combinators built on top of the above:"
+{ $subsection with-process-reader }
+{ $subsection with-process-writer }
+{ $subsection with-process-stream } ;
 
 ARTICLE: "io.launcher.examples" "Launcher examples"
 "Starting a command and waiting for it to finish:"
