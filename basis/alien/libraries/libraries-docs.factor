@@ -58,3 +58,10 @@ $nl
     "} cond >>"
 }
 "Note the parse time evaluation with " { $link POSTPONE: << } "." } ;
+
+ARTICLE: "loading-libs" "Loading native libraries"
+"Before calling a C library, you must associate its path name on disk with a logical name which Factor uses to identify the library:"
+{ $subsection add-library }
+"Once a library has been defined, you can try loading it to see if the path name is correct:"
+{ $subsection load-library }
+"If the compiler cannot load a library, or cannot resolve a symbol in a library, a linkage error is reported using the compiler error mechanism (see " { $link "compiler-errors" } "). Once you install the right library, reload the source file containing the " { $link add-library } " form to force the compiler to try loading the library again." ;
