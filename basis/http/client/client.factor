@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs debugger kernel math math.parser namespaces make
+USING: accessors assocs kernel math math.parser namespaces make
 sequences strings splitting calendar continuations accessors vectors
 math.order hashtables byte-arrays destructors
 io io.sockets io.streams.string io.files io.timeouts
@@ -128,26 +128,19 @@ SYMBOL: redirects
         [ do-redirect ] [ nip ] if
     ] with-variable ; inline recursive
 
-PRIVATE>
-
 : <client-request> ( url method -- request )
     <request>
         swap >>method
         swap >url ensure-port >>url ; inline
 
+PRIVATE>
+
 : success? ( code -- ? ) 200 299 between? ;
 
-! ERROR: download-failed response data ;
-
-! M: download-failed error.
-!     "HTTP request failed:" print nl
-!    [ response>> . ] [ data>> . ] bi ;
 ERROR: download-failed response ;
 
 : check-response ( response -- response )
     dup code>> success? [ download-failed ] unless ;
-! : check-response ( response data -- response data )
-    ! over code>> success? [ download-failed ] unless ;
 
 : check-response-with-body ( response body -- response body )
     [ >>body check-response ] keep ;
@@ -166,19 +159,7 @@ ERROR: download-failed response ;
     <get-request> http-request ;
 
 : with-http-get ( url quot -- response )
-    [ <get-request> ] dip with-http-request check-response ; inline
-
-! : <delete-request> ( url -- request )
-!     "DELETE" <client-request> ;
-
-! : http-delete ( url -- response )
-!     <delete-request> http-request ;
-
-! : <trace-request> ( url -- request )
-!     <client-request> "TRACE" >>method ;
-
-! : http-trace ( url -- response )
-!     <trace-request> http-request ;
+    [ <get-request> ] dip with-http-request ; inline
 
 : download-name ( url -- name )
     present file-name "?" split1 drop "/" ?tail drop ;
@@ -202,6 +183,12 @@ ERROR: download-failed response ;
 
 : http-put ( post-data url -- response data )
     <put-request> http-request ;
+
+: <delete-request> ( url -- request )
+    "DELETE" <client-request> ;
+
+: http-delete ( url -- response data )
+    <delete-request> http-request ;
 
 USING: vocabs vocabs.loader ;
 
