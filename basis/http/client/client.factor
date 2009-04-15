@@ -165,7 +165,7 @@ ERROR: download-failed response ;
     present file-name "?" split1 drop "/" ?tail drop ;
 
 : download-to ( url file -- )
-    binary [ [ write ] with-http-get drop ] with-file-writer ;
+    binary [ [ write ] with-http-get check-response drop ] with-file-writer ;
 
 : download ( url -- )
     dup download-name download-to ;

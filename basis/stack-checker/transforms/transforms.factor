@@ -1,13 +1,13 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors arrays kernel kernel.private combinators.private
-words sequences generic math math.order namespaces make quotations assocs
-combinators combinators.short-circuit classes.tuple
+words sequences generic math math.order namespaces make quotations
+assocs combinators combinators.short-circuit classes.tuple
 classes.tuple.private effects summary hashtables classes generic sets
 definitions generic.standard slots.private continuations locals
-generalizations stack-checker.backend stack-checker.state
-stack-checker.visitor stack-checker.errors stack-checker.values
-stack-checker.recursive-state ;
+sequences.private generalizations stack-checker.backend
+stack-checker.state stack-checker.visitor stack-checker.errors
+stack-checker.values stack-checker.recursive-state ;
 IN: stack-checker.transforms
 
 : give-up-transform ( word -- )
@@ -106,40 +106,68 @@ IN: stack-checker.transforms
     ] [ drop f ] if
 ] 1 define-transform
 
-! Membership testing
-CONSTANT: bit-member-max 256
+! Fast at for integer maps
+CONSTANT: lookup-table-at-max 256
 
-: bit-member? ( seq -- ? )
+: lookup-table-at? ( assoc -- ? )
     #! Can we use a fast byte array test here?
     {
-        [ length 4 > ]
-        [ [ integer? ] all? ]
-        [ [ 0 bit-member-max between? ] any? ]
+        [ assoc-size 4 > ]
+        [ values [ ] all? ]
+        [ keys [ integer? ] all? ]
+        [ keys [ 0 lookup-table-at-max between? ] all? ]
     } 1&& ;
 
-: bit-member-seq ( seq -- flags )
-    [ supremum 1+ ] keep '[ _ member? 1 0 ? ] B{ } map-as ;
+: lookup-table-seq ( assoc -- table )
+    [ keys supremum 1+ ] keep '[ _ at ] { } map-as ;
 
-: bit-member-quot ( seq -- newquot )
-    bit-member-seq
+: lookup-table-quot ( seq -- newquot )
+    lookup-table-seq
     '[
-        _ {
-            { [ over fixnum? ] [ ?nth 1 eq? ] }
-            { [ over bignum? ] [ ?nth 1 eq? ] }
-            [ 2drop f ]
-        } cond
+        _ over integer? [
+            2dup bounds-check? [
+                nth-unsafe dup >boolean
+            ] [ 2drop f f ] if
+        ] [ 2drop f f ] if
     ] ;
 
-: member-quot ( seq -- newquot )
-    dup bit-member? [
-        bit-member-quot
-    ] [
-        dup length 4 <= [
-            [ drop f ] swap
-            [ literalize [ t ] ] { } map>assoc linear-case-quot
+: fast-lookup-table-at? ( assoc -- ? )
+    values {
+        [ [ integer? ] all? ]
+        [ [ 0 254 between? ] all? ]
+    } 1&& ;
+
+: fast-lookup-table-seq ( assoc -- table )
+    lookup-table-seq [ 255 or ] B{ } map-as ;
+
+: fast-lookup-table-quot ( seq -- newquot )
+    fast-lookup-table-seq
+    '[
+        _ over integer? [
+            2dup bounds-check? [
+                nth-unsafe dup 255 eq? [ drop f f ] [ t ] if
+            ] [ 2drop f f ] if
+        ] [ 2drop f f ] if
+    ] ;
+
+: at-quot ( assoc -- quot )
+    dup lookup-table-at? [
+        dup fast-lookup-table-at? [
+            fast-lookup-table-quot
         ] [
-            unique [ key? ] curry
+            lookup-table-quot
         ] if
+    ] [ drop f ] if ;
+
+\ at* [ at-quot ] 1 define-transform
+
+! Membership testing
+: member-quot ( seq -- newquot )
+    dup length 4 <= [
+        [ drop f ] swap
+        [ literalize [ t ] ] { } map>assoc linear-case-quot
+    ] [
+        unique [ key? ] curry
     ] if ;
 
 \ member? [

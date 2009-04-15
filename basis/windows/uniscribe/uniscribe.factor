@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs math sequences fry io.encodings.string
-io.encodings.utf16n accessors arrays combinators destructors locals
-cache namespaces init images.normalization fonts alien.c-types
-windows windows.usp10 windows.offscreen windows.gdi32
-windows.ole32 windows.types windows.fonts opengl.textures ;
+io.encodings.utf16n accessors arrays combinators destructors
+cache namespaces init fonts alien.c-types windows windows.usp10
+windows.offscreen windows.gdi32 windows.ole32 windows.types
+windows.fonts opengl.textures locals ;
 IN: windows.uniscribe
 
 TUPLE: script-string font string metrics ssa size image disposed ;
@@ -59,10 +59,10 @@ TUPLE: script-string font string metrics ssa size image disposed ;
         ssa>> ! ssa
         0 ! iX
         0 ! iY
-        0 ! uOptions
-        f ! prc
+        ETO_OPAQUE ! uOptions
     ]
-    [ selection-start/end ] bi
+    [ [ { 0 0 } ] dip size>> <RECT> ]
+    [ selection-start/end ] tri
     ! iMinSel
     ! iMaxSel
     FALSE ! fDisabled
@@ -108,7 +108,7 @@ M: script-string dispose*
 
 SYMBOL: cached-script-strings
 
-: cached-script-string ( string font -- script-string )
+: cached-script-string ( font string -- script-string )
     cached-script-strings get-global [ <script-string> ] 2cache ;
 
 [ <cache-assoc> cached-script-strings set-global ]
