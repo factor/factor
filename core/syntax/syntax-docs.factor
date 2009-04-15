@@ -66,6 +66,12 @@ ARTICLE: "syntax-floats" "Float syntax"
     "7.e13"
     "1.0e-5"
 }
+"There are three special float values:"
+{ $table
+{ "Positive infinity" { $snippet "1/0." } }
+{ "Negative infinity" { $snippet "-1/0." } }
+{ "Not-a-number" { $snippet "0/0." } }
+}
 "More information on floats can be found in " { $link "floats" } "." ;
 
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"

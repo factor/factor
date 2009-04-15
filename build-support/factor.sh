@@ -199,7 +199,7 @@ find_architecture() {
 
 write_test_program() {
     echo "#include <stdio.h>" > $C_WORD.c
-    echo "int main(){printf(\"%d\", 8*sizeof(void*)); return 0; }" >> $C_WORD.c
+    echo "int main(){printf(\"%ld\", 8*sizeof(void*)); return 0; }" >> $C_WORD.c
 }
 
 c_find_word_size() {
