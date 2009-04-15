@@ -12,7 +12,7 @@ TUPLE: source-file-error error asset file line# ;
 : group-by-source-file ( errors -- assoc )
     H{ } clone [ [ push-at ] curry [ dup file>> ] prepose each ] keep ;
 
-TUPLE: error-type type word plural icon quot ;
+TUPLE: error-type type word plural icon quot forget-quot ;
 
 GENERIC: error-type ( error -- type )
 
@@ -69,3 +69,9 @@ SYMBOL: error-observers
         bi-curry* bi and not
     ] 2curry filter-here
     notify-error-observers ;
+
+: delete-definition-errors ( definition -- )
+    error-types get [
+        second forget-quot>> dup
+        [ call( definition -- ) ] [ 2drop ] if
+    ] with each ;

@@ -61,8 +61,7 @@ M: pathname where string>> 1 2array ;
     [
         source-file
         [ unxref-source ]
-        [ definitions>> [ keys forget-all ] each ]
-        bi
+        [ definitions>> [ keys forget-all ] each ] bi
     ]
     [ source-files get delete-at ]
     bi ;
@@ -82,7 +81,7 @@ SYMBOL: file
     \ source-file-error new
         f >>line#
         file get path>> >>file
-        swap >>error rethrow  ;
+        swap >>error rethrow ;
 
 : with-source-file ( name quot -- )
     #! Should be called from inside with-compilation-unit.

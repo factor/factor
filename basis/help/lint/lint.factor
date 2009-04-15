@@ -21,6 +21,7 @@ T{ error-type
    { plural "help lint failures" }
    { icon "vocab:ui/tools/error-list/icons/help-lint-error.tiff" }
    { quot [ lint-failures get values ] }
+   { forget-quot [ lint-failures get delete-at ] }
 } define-error-type
 
 M: help-lint-error error-type drop +help-lint-failure+ ;
