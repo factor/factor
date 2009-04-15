@@ -112,9 +112,10 @@ M: f      handle-input handle-disconnect ;
 
 ! Processing loops
 
+! FIXME: should get forward channels, process the message, and then forward
 : in-multiplexer-loop ( -- ? )
     irc> in-messages>> mailbox-get
-    [ process-message ] [ forward-message ] [ irc-end? not ] tri ;
+    [ forward-message ] [ process-message ] [ irc-end? not ] tri ;
 
 : strings>privmsg ( name string -- privmsg )
     " :" prepend append "PRIVMSG " prepend string>irc-message ;

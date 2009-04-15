@@ -15,14 +15,14 @@ M: privmsg >log-line
     [ "<" % dup sender>> % "> " % text>> % ] "" make ;
 
 M: join >log-line
-    [ "* " % sender>> % " has entered the channel." % ] "" make ;
+    [ "* " % sender>> % " has joined the channel." % ] "" make ;
 
 M: part >log-line
     [ "* " % dup sender>> % " has left the channel" %
       comment>> dot-or-parens % ] "" make ;
 
 M: quit >log-line
-    [ "* " % dup sender>> % " has left IRC" %
+    [ "* " % dup sender>> % " has quit" %
       comment>> dot-or-parens % ] "" make ;
 
 M: kick >log-line
