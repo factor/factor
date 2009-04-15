@@ -1,6 +1,9 @@
-! Copyright (C) 2008 Alex Chapman
+! Copyright (C) 2008, 2009 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs continuations debugger hashtables http http.client io json.reader json.writer kernel make math math.parser namespaces sequences strings urls urls.encoding vectors ;
+USING: accessors arrays assocs continuations debugger hashtables http
+http.client io io.encodings.string io.encodings.utf8 json.reader
+json.writer kernel make math math.parser namespaces sequences strings
+urls urls.encoding vectors ;
 IN: couchdb
 
 ! NOTE: This code only works with the latest couchdb (0.9.*), because old
@@ -27,7 +30,7 @@ PREDICATE: file-exists-error < couchdb-error
 : couch-http-request ( request -- data )
     [ http-request ] [
         dup download-failed? [
-            data>> json> <couchdb-error> throw
+            response>> body>> json> <couchdb-error> throw
         ] [
             rethrow
         ] if
@@ -46,7 +49,7 @@ PREDICATE: file-exists-error < couchdb-error
     <post-request> couch-request ;
 
 : couch-delete ( url -- assoc )
-    "DELETE" <client-request> couch-request ;
+    <delete-request> couch-request ;
 
 : response-ok ( assoc -- assoc )
     "ok" over delete-at* and t assert= ;
@@ -79,11 +82,11 @@ TUPLE: server { host string } { port integer } { uuids vector } { uuids-to-cache
 : uuids-url ( server -- url )
     [ dup server-url % "_uuids?count=" % uuids-to-cache>> number>string % ] "" make ;
 
-: uuids-post ( server -- uuids )
-     uuids-url f swap couch-post "uuids" swap at >vector ;
+: uuids-get ( server -- uuids )
+     uuids-url couch-get "uuids" swap at >vector ;
 
 : get-uuids ( server -- server )
-    dup uuids-post [ nip ] curry change-uuids ;
+    dup uuids-get [ nip ] curry change-uuids ;
 
 : ensure-uuids ( server -- server )
     dup uuids>> empty? [ get-uuids ] when ;
@@ -123,7 +126,7 @@ C: <db> db
     db-url "_all_docs" append couch-get ;
 
 : <json-post-data> ( assoc -- post-data )
-    >json "application/json" <post-data> swap >>data ;
+    >json utf8 encode "application/json" <post-data> swap >>data ;
 
 ! documents
 : id> ( assoc -- id ) "_id" swap at ; 
@@ -189,7 +192,7 @@ C: <db> db
 !     construct-attachment H{ } clone
 
 ! TODO:
-! - startkey, count, descending, etc.
+! - startkey, limit, descending, etc.
 ! - loading specific revisions
 ! - views
 ! - attachments
