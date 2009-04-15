@@ -91,7 +91,7 @@ M: irc-message handle-outgoing-irc irc-message>string irc-print t ;
 : handle-reader-message ( irc-message -- ) irc> in-messages>> mailbox-put ;
 
 : (handle-disconnect) ( -- )
-    irc> in-messages>> irc-disconnected swap mailbox-put
+    irc-disconnected irc> in-messages>> mailbox-put
     irc> reconnect-time>> sleep
     (connect-irc)
     (do-login) ;
