@@ -1,1 +1,0 @@
-A protocol for getting and setting
