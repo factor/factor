@@ -71,8 +71,9 @@ ERROR: checksum-error ;
     ] if ;
 
 ERROR: unknown-typeflag ch ;
+
 M: unknown-typeflag summary ( obj -- str )
-    ch>> "Unknown typeflag: " prefix ;
+    ch>> [ "Unknown typeflag: " ] dip prefix ;
 
 : read/write-blocks ( tar-header path -- )
     binary [ read-data-blocks ] with-file-writer ;
