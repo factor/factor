@@ -268,15 +268,6 @@ M: duplicate-slot-names summary
 M: invalid-slot-name summary
     drop "Invalid slot name" ;
 
-M: source-file-error summary
-    error>> summary ;
-
-M: source-file-error compute-restarts
-    error>> compute-restarts ;
-
-M: source-file-error error-help
-    error>> error-help ;
-
 M: not-in-a-method-error summary
     drop "call-next-method can only be called in a method definition" ;
 
@@ -303,21 +294,6 @@ M: lexer-error compute-restarts
 
 M: lexer-error error-help
     error>> error-help ;
-
-M: source-file-error error.
-    [
-        [
-            [
-                [ file>> [ % ": " % ] when* ]
-                [ line#>> [ # ": " % ] when* ] bi
-            ] "" make
-        ] [
-            [
-                presented set
-                bold font-style set
-            ] H{ } make-assoc
-        ] bi format
-    ] [ error>> error. ] bi ;
 
 M: bad-effect summary
     drop "Bad stack effect declaration" ;
