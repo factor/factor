@@ -14,6 +14,9 @@ ARTICLE: "editor" "Editor integration"
 
 ABOUT: "editor"
 
+HELP: edit-hook
+{ $var-description "A quotation with stack effect " { $snippet "( file line -- )" } ". If not set, the " { $link edit } " word throws a condition with restarts for loading one of the sub-vocabularies of the " { $vocab-link "editors" } " vocabulary." } ;
+
 HELP: edit
 { $values { "defspec" "a definition specifier" } }
 { $description "Opens the source file containing the definition using the current " { $link edit-hook } ". See " { $link "editor" } "." }

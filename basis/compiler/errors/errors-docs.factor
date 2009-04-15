@@ -14,7 +14,7 @@ $nl
 { $subsection :warnings }
 { $subsection :errors }
 { $subsection :linkage }
-"Compiler warnings and errors are also shown in the " { $link "ui.tools.error-list" } "." ;
+"Compiler warnings and errors are reported using the " { $link "tools.errors" } " mechanism and are shown in the " { $link "ui.tools.error-list" } "." ;
 
 HELP: compiler-error
 { $values { "error" "an error" } { "word" word } }

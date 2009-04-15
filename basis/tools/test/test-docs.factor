@@ -9,7 +9,8 @@ ARTICLE: "tools.test.write" "Writing unit tests"
 { $subsection POSTPONE: must-fail-with }
 "Assert that a quotation or word has a specific static stack effect (see " { $link "inference" } "):"
 { $subsection POSTPONE: must-infer }
-{ $subsection POSTPONE: must-infer-as } ;
+{ $subsection POSTPONE: must-infer-as }
+"All of the above are used like ordinary words but are actually parsing words. This ensures that parse-time state, namely the line number, can be associated with the test in question, and reported in test failures." ;
 
 ARTICLE: "tools.test.run" "Running unit tests"
 "The following words run test harness files; any test failures are collected and printed at the end:"
@@ -17,9 +18,9 @@ ARTICLE: "tools.test.run" "Running unit tests"
 { $subsection test-all }
 "The following word prints failures:"
 { $subsection :test-failures }
-"Help lint failures are also shown in the " { $link "ui.tools.error-list" } "."
+"Test failures are reported using the " { $link "tools.errors" } " mechanism and are shown in the " { $link "ui.tools.error-list" } "."
 $nl
-"Unit test failurs are instances of a class, and are stored in a global variable:"
+"Unit test failures are instances of a class, and are stored in a global variable:"
 { $subsection test-failure }
 { $subsection test-failures } ;
 

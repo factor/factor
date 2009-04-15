@@ -30,7 +30,7 @@ $nl
 { $heading "Anti-pattern #4: Logging and rethrowing" }
 "If you are going to rethrow an error, do not log a message. If you do so, the user will see two log messages for the same error, which will clutter logs without adding any useful information." ;
 
-ARTICLE: "errors" "Error handling"
+ARTICLE: "errors" "Exception handling"
 "Support for handling exceptional situations such as bad user input, implementation bugs, and input/output errors is provided by a set of words built using continuations."
 $nl
 "Two words raise an error in the innermost error handler for the current dynamic extent:"
