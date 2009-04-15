@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs couchdb kernel namespaces sequences strings tools.test ;
+USING: accessors assocs couchdb kernel namespaces sequences strings tools.test ;
 IN: couchdb.tests
 
 ! You must have a CouchDB server (currently only the version from svn will
@@ -16,6 +16,7 @@ IN: couchdb.tests
     [ ] [ couch get ensure-db ] unit-test
     [ 0 ] [ couch get db-info "doc_count" swap at ] unit-test
     [ ] [ couch get compact-db ] unit-test
+    [ t ] [ couch get server>> next-uuid string? ] unit-test
     [ ] [ H{
             { "Subject" "I like Planktion" }
             { "Tags" { "plankton" "baseball" "decisions" } }
