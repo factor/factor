@@ -411,7 +411,7 @@ TUPLE: exam id name score ;
             T{ exam f 4 "Cartman" 41 }
         }
     ] [
-        T{ exam f T{ interval f { 2 t } { 1.0/0.0 f } } } select-tuples
+        T{ exam f T{ interval f { 2 t } { 1/0. f } } } select-tuples
     ] unit-test
 
     [
@@ -419,7 +419,7 @@ TUPLE: exam id name score ;
             T{ exam f 1 "Kyle" 100 }
         }
     ] [
-        T{ exam f T{ interval f { -1.0/0.0 t } { 2 f } } } select-tuples
+        T{ exam f T{ interval f { -1/0. t } { 2 f } } } select-tuples
     ] unit-test
 
     [
@@ -430,7 +430,7 @@ TUPLE: exam id name score ;
             T{ exam f 4 "Cartman" 41 }
         }
     ] [
-        T{ exam f T{ interval f { -1.0/0.0 t } { 1/0. f } } } select-tuples
+        T{ exam f T{ interval f { -1/0. t } { 1/0. f } } } select-tuples
     ] unit-test
     
     [
@@ -634,3 +634,22 @@ compound-foo "COMPOUND_FOO"
 
 [ test-compound-primary-key ] test-sqlite
 [ test-compound-primary-key ] test-postgresql
+
+
+TUPLE: example id data ;
+
+example "EXAMPLE"
+{
+    { "id" "ID" +db-assigned-id+ }
+    { "data" "DATA" BLOB }
+} define-persistent
+
+: test-blob-select ( -- )
+    example ensure-table
+    [ ] [ example new B{ 1 2 3 4 5 } >>data insert-tuple ] unit-test
+    [
+        T{ example { id 1 } { data B{ 1 2 3 4 5 } } }
+    ] [ example new B{ 1 2 3 4 5 } >>data select-tuple ] unit-test ;
+
+[ test-blob-select ] test-sqlite
+[ test-blob-select ] test-postgresql

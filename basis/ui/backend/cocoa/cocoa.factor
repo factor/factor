@@ -39,13 +39,16 @@ M: pasteboard set-clipboard-contents
     [ 0 0 ] dip dim>> first2 <CGRect> ;
 
 : auto-position ( window loc -- )
+    #! Note: if this is the initial window, the length of the windows
+    #! vector should be 1, since (open-window) calls auto-position
+    #! after register-window.
     dup { 0 0 } = [
         drop
-        windows get [ -> center ] [
-            peek second window-loc>>
+        windows get length 1 <= [ -> center ] [
+            windows get peek second window-loc>>
             dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
             -> setFrameTopLeftPoint:
-        ] if-empty
+        ] if
     ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
 M: cocoa-ui-backend set-title ( string world -- )
@@ -70,8 +73,8 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     world dim>> <FactorView> :> view
     view world world>NSRect <ViewWindow> :> window
     view -> release
-    window world window-loc>> auto-position
     world view register-window
+    window world window-loc>> auto-position
     world window save-position
     window install-window-delegate
     view window <window-handle> world (>>handle)
