@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Doug Coleman.
+! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors images images.loader io.pathnames kernel namespaces
 opengl opengl.gl opengl.textures sequences strings ui ui.gadgets
@@ -27,11 +27,8 @@ M: image-gadget draw-gadget* ( gadget -- )
 
 GENERIC: image. ( object -- )
 
-: default-image. ( path -- )
-    <image-gadget> gadget. ;
+M: string image. ( image -- ) load-image image. ;
 
-M: string image. ( image -- ) load-image default-image. ;
+M: pathname image. ( image -- ) load-image image. ;
 
-M: pathname image. ( image -- ) load-image default-image. ;
-
-M: image image. ( image -- ) default-image. ;
+M: image image. ( image -- ) <image-gadget> gadget. ;

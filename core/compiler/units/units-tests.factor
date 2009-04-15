@@ -1,5 +1,5 @@
 USING: definitions compiler.units tools.test arrays sequences words kernel
-accessors namespaces fry ;
+accessors namespaces fry eval ;
 IN: compiler.units.tests
 
 [ [ [ ] define-temp ] with-compilation-unit ] must-infer
@@ -46,3 +46,16 @@ M: observer definitions-changed 2drop global [ counter inc ] bind ;
 [ ] with-compilation-unit
 
 [ 1 ] [ counter get-global ] unit-test
+
+observer remove-definition-observer
+
+! Notify observers with nested compilation units
+observer add-definition-observer
+
+0 counter set-global
+
+DEFER: nesting-test
+
+[ ] [ "IN: compiler.units.tests << : nesting-test ( -- ) ; >>" eval ] unit-test
+
+observer remove-definition-observer

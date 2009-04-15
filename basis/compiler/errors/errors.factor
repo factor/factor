@@ -25,6 +25,7 @@ T{ error-type
    { plural "compiler errors" }
    { icon "vocab:ui/tools/error-list/icons/compiler-error.tiff" }
    { quot [ +compiler-error+ errors-of-type values ] }
+   { forget-quot [ compiler-errors get delete-at ] }
 } define-error-type
 
 T{ error-type
@@ -33,6 +34,7 @@ T{ error-type
    { plural "compiler warnings" }
    { icon "vocab:ui/tools/error-list/icons/compiler-warning.tiff" }
    { quot [ +compiler-warning+ errors-of-type values ] }
+   { forget-quot [ compiler-errors get delete-at ] }
 } define-error-type
 
 T{ error-type
@@ -41,6 +43,7 @@ T{ error-type
    { plural "linkage errors" }
    { icon "vocab:ui/tools/error-list/icons/linkage-error.tiff" }
    { quot [ +linkage-error+ errors-of-type values ] }
+   { forget-quot [ compiler-errors get delete-at ] }
 } define-error-type
 
 : <compiler-error> ( error word -- compiler-error )
@@ -48,8 +51,7 @@ T{ error-type
 
 : compiler-error ( error word -- )
     compiler-errors get-global pick
-    [ [ [ <compiler-error> ] keep ] dip set-at ] [ delete-at drop ] if
-    notify-error-observers ;
+    [ [ [ <compiler-error> ] keep ] dip set-at ] [ delete-at drop ] if ;
 
 : compiler-errors. ( type -- )
     errors-of-type values errors. ;
