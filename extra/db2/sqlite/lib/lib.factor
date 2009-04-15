@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays calendar.format
-combinators db2.connections db2.errors db2.result-sets
-db2.sqlite.errors db2.sqlite.ffi db2.sqlite.result-sets
+combinators db2.sqlite.errors
 io.backend io.encodings.string io.encodings.utf8 kernel math
-namespaces present sequences serialize urls ;
+namespaces present sequences serialize urls db2.sqlite.ffi ;
 IN: db2.sqlite.lib
 
 : sqlite-check-result ( n -- )
@@ -15,7 +14,6 @@ IN: db2.sqlite.lib
     } case ;
 
 : sqlite-open ( path -- db )
-    normalize-path
     "void*" <c-object>
     [ sqlite3_open sqlite-check-result ] keep *void* ;
 
@@ -110,5 +108,3 @@ IN: db2.sqlite.lib
 : sqlite-next ( prepared -- ? )
     sqlite3_step sqlite-step-has-more-rows? ;
 
-: >sqlite-result-set ( statement -- result-set )
-    sqlite-result-set new-result-set dup advance-row ;
