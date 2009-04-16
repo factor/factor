@@ -16,7 +16,7 @@ SYMBOL: current-stream
     "irc.freenode.org" 6667 "flogger" f <irc-profile> ;
 
 : add-timestamp ( string timestamp -- string )
-    timestamp>hms "[" prepend "] " append prepend ;
+    timestamp>hms [ "[" % % "] " % % ] "" make ;
 
 : timestamp-path ( timestamp -- path )
     timestamp>ymd ".log" append log-directory prepend-path ;
