@@ -19,7 +19,7 @@ SYMBOL: current-irc-client
 
 UNION: to-target privmsg notice ;
 UNION: to-channel join part topic kick rpl-channel-modes
-                  rpl-notopic rpl-topic rpl-names rpl-names-end ;
+                  topic rpl-names rpl-names-end ;
 UNION: to-one-chat to-target to-channel mode ;
 UNION: to-many-chats nick quit ;
 UNION: to-all-chats irc-end irc-disconnected irc-connected ;
