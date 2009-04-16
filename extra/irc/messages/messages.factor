@@ -7,7 +7,7 @@ IN: irc.messages
 
 ! connection
 IRC: pass        "PASS"    password ;
-IRC: nick        "NICK"    nickname ;
+IRC: nick        "NICK"    : nickname ;
 IRC: user        "USER"    user mode _ : realname ;
 IRC: oper        "OPER"    name password ;
 IRC: mode        "MODE"    name mode parameter ;
