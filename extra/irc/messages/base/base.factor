@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes.parser classes.tuple
+USING: accessors arrays assocs calendar classes.parser classes.tuple
        combinators fry generic.parser kernel lexer
        mirrors namespaces parser sequences splitting strings words ;
 IN: irc.messages.base
@@ -51,6 +51,7 @@ M: irc-message post-process-irc-message drop ;
 
 GENERIC: fill-irc-message-slots ( irc-message -- )
 M: irc-message fill-irc-message-slots
+    gmt >>timestamp
     {
         [ process-irc-trailing ]
         [ process-irc-prefix ]

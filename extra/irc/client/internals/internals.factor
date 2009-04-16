@@ -52,7 +52,7 @@ M: to-all-chats  message-forwards drop chats> ;
 M: to-many-chats message-forwards sender>> participant-chats ;
 
 GENERIC: process-message ( irc-message -- )
-M: object process-message drop ; 
+M: object process-message drop ;
 M: ping   process-message trailing>> /PONG ;
 M: join   process-message [ sender>> ] [ chat> ] bi join-participant ;
 M: part   process-message [ sender>> ] [ chat> ] bi part-participant ;
