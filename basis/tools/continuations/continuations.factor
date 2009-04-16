@@ -69,6 +69,18 @@ M: object add-breakpoint ;
 : (step-into-call-next-method) ( method -- )
     next-method-quot (step-into-quot) ;
 
+<< {
+    (step-into-quot)
+    (step-into-dip)
+    (step-into-2dip)
+    (step-into-3dip)
+    (step-into-if)
+    (step-into-dispatch)
+    (step-into-execute)
+    (step-into-continuation)
+    (step-into-call-next-method)
+} [ t "no-compile" set-word-prop ] each >>
+
 : change-frame ( continuation quot -- continuation' )
     #! Applies quot to innermost call frame of the
     #! continuation.
