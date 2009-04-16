@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays float-arrays kernel locals math math.constants math.functions math.matrices math.vectors math.quaternions random sequences ;
+USING: accessors arrays kernel locals math math.constants math.functions math.matrices math.vectors math.quaternions random sequences ;
 IN: jamshred.oint
 
 ! An oint is a point with three linearly independent unit vectors
@@ -12,7 +12,7 @@ TUPLE: oint location forward up left ;
 C: <oint> oint
 
 : rotation-quaternion ( theta axis -- quaternion )
-    swap 2 / dup cos swap sin rot n*v first3 rect> >r rect> r> 2array ;
+    swap 2 / dup cos swap sin rot n*v first3 rect> [ rect> ] dip 2array ;
 
 : rotate-vector ( q qrecip v -- v )
     v>q swap q* q* q>v ;
