@@ -95,7 +95,7 @@ PRIVATE>
 : euler011 ( -- answer )
     [
         { [ horizontal ] [ vertical ] [ diagonal/ ] [ diagonal\ ] }
-        [ call 4 max-product , ] each
+        [ call( -- matrix ) 4 max-product , ] each
     ] { } make supremum ;
 
 ! [ euler011 ] 100 ave-time

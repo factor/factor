@@ -58,7 +58,7 @@ SYMBOL: *calling*
   swap [ * - ] keep 2array ;
   
 : change-global ( variable quot -- )
-  global swap change-at ;
+  global swap change-at ; inline
 
 : (correct-for-timing-overhead) ( timingshash -- timingshash )
   time-dummy-word [ subtract-overhead ] curry assoc-map ;  
@@ -75,7 +75,7 @@ SYMBOL: *calling*
       correct-for-timing-overhead
       "total time:" write
   ] dip pprint nl
-  print-word-timings nl ;
+  print-word-timings nl ; inline
 
 : profile-vocab ( vocab quot -- )
   "annotating vocab..." print flush
@@ -88,4 +88,4 @@ SYMBOL: *calling*
       correct-for-timing-overhead
       "total time:" write
   ] dip pprint
-  print-word-timings ;
+  print-word-timings ; inline
