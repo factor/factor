@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays alien system combinators alien.syntax namespaces
+USING: kernel accessors arrays alien system combinators alien.syntax namespaces
        alien.c-types sequences vocabs.loader shuffle
-       openal.backend specialized-arrays.uint ;
+       openal.backend specialized-arrays.uint alien.libraries generalizations ;
 IN: openal
 
 << "alut" {
@@ -245,13 +245,11 @@ SYMBOL: init
         f init set-global
     ] unless ;
 
-: <uint-array> ( n -- byte-array ) "ALuint" <c-array> ;
-
 : gen-sources ( size -- seq )
-    dup <uint-array> 2dup underlying>> alGenSources swap ;
+    dup <uint-array> [ alGenSources ] keep ;
 
 : gen-buffers ( size -- seq )
-    dup <uint-array> 2dup underlying>> alGenBuffers swap ;
+    dup <uint-array> [ alGenBuffers ] keep ;
 
 : gen-buffer ( -- buffer ) 1 gen-buffers first ;
 
@@ -264,10 +262,10 @@ os macosx? "openal.macosx" "openal.other" ? require
 
 : create-buffer-from-wav ( filename -- buffer )
     gen-buffer dup rot load-wav-file
-    [ alBufferData ] 4keep alutUnloadWAV ;
+    [ alBufferData ] 4 nkeep alutUnloadWAV ;
 
 : queue-buffers ( source buffers -- )
-    [ length ] [ >uint-array underlying>> ] bi alSourceQueueBuffers ;
+    [ length ] [ >uint-array ] bi alSourceQueueBuffers ;
 
 : queue-buffer ( source buffer -- )
     1array queue-buffers ;

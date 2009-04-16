@@ -1,8 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors combinators float-arrays kernel
-locals math math.constants math.matrices math.order math.ranges
-math.vectors math.quadratic random sequences vectors jamshred.oint ;
+USING: accessors arrays colors combinators kernel locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences specialized-arrays.float vectors jamshred.oint ;
 IN: jamshred.tunnel
 
 : n-segments ( -- n ) 5000 ; inline
@@ -26,20 +24,20 @@ C: <segment> segment
 
 : (random-segments) ( segments n -- segments )
     dup 0 > [
-        >r dup peek random-segment over push r> 1- (random-segments)
+        [ dup peek random-segment over push ] dip 1- (random-segments)
     ] [ drop ] if ;
 
 : default-segment-radius ( -- r ) 1 ;
 
 : initial-segment ( -- segment )
-    F{ 0 0 0 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 }
+    float-array{ 0 0 0 } float-array{ 0 0 -1 } float-array{ 0 1 0 } float-array{ -1 0 0 }
     0 random-color default-segment-radius <segment> ;
 
 : random-segments ( n -- segments )
     initial-segment 1vector swap (random-segments) ;
 
 : simple-segment ( n -- segment )
-    [ F{ 0 0 -1 } n*v F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } ] keep
+    [ float-array{ 0 0 -1 } n*v float-array{ 0 0 -1 } float-array{ 0 1 0 } float-array{ -1 0 0 } ] keep
     random-color default-segment-radius <segment> ;
 
 : simple-segments ( n -- segments )
@@ -58,12 +56,12 @@ C: <segment> segment
 
 : nearer-segment ( segment segment oint -- segment )
     #! return whichever of the two segments is nearer to the oint
-    >r 2dup r> tuck distance >r distance r> < -rot ? ;
+    [ 2dup ] dip tuck distance [ distance ] dip < -rot ? ;
 
 : (find-nearest-segment) ( nearest next oint -- nearest ? )
     #! find the nearest of 'next' and 'nearest' to 'oint', and return
     #! t if the nearest hasn't changed
-    pick >r nearer-segment dup r> = ;
+    pick [ nearer-segment dup ] dip = ;
 
 : find-nearest-segment ( oint segments -- segment )
     dup first swap rest-slice rot [ (find-nearest-segment) ] curry
@@ -78,9 +76,9 @@ C: <segment> segment
 : nearest-segment ( segments oint start-segment -- segment )
     #! find the segment nearest to 'oint', and return it.
     #! start looking at segment 'start-segment'
-    number>> over >r
-    [ nearest-segment-forward ] 3keep
-    nearest-segment-backward r> nearer-segment ;
+    number>> over [
+        [ nearest-segment-forward ] 3keep nearest-segment-backward
+    ] dip nearer-segment ;
 
 : get-segment ( segments n -- segment )
     over sequence-index-range clamp-to-range swap nth ;

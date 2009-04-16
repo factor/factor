@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays float-arrays jamshred.oint jamshred.tunnel kernel math.vectors sequences tools.test ;
+USING: accessors arrays jamshred.oint jamshred.tunnel kernel math.vectors sequences specialized-arrays.float tools.test ;
 IN: jamshred.tunnel.tests
 
 [ 0 ] [ T{ segment f { 0 0 0 } f f f 0 }
@@ -14,7 +14,7 @@ IN: jamshred.tunnel.tests
 
 [ 3 ] [ <straight-tunnel> T{ oint f { 0 0 -3.25 } } 0 nearest-segment-forward number>> ] unit-test
 
-[ F{ 0 0 0 } ] [ <straight-tunnel> T{ oint f { 0 0 -0.25 } } over first nearest-segment location>> ] unit-test
+[ float-array{ 0 0 0 } ] [ <straight-tunnel> T{ oint f { 0 0 -0.25 } } over first nearest-segment location>> ] unit-test
 
 : test-segment-oint ( -- oint )
     { 0 0 0 } { 0 0 -1 } { 0 1 0 } { -1 0 0 } <oint> ;
