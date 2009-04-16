@@ -45,11 +45,11 @@ M: sequence chat-put [ chat-put ] with each ;
 
 ! Server message handling
 
-GENERIC: forward-message ( irc-message -- )
-M: irc-message   forward-message +server-chat+ chat-put ;
-M: to-one-chat   forward-message dup chat> chat-put ;
-M: to-all-chats  forward-message chats> chat-put ;
-M: to-many-chats forward-message dup sender>> participant-chats chat-put ;
+GENERIC: message-forwards ( irc-message -- seq )
+M: irc-message   message-forwards drop +server-chat+ ;
+M: to-one-chat   message-forwards chat> ;
+M: to-all-chats  message-forwards drop chats> ;
+M: to-many-chats message-forwards sender>> participant-chats ;
 
 GENERIC: process-message ( irc-message -- )
 M: object process-message drop ; 
@@ -91,7 +91,7 @@ M: irc-message handle-outgoing-irc irc-message>string irc-print t ;
 : handle-reader-message ( irc-message -- ) irc> in-messages>> mailbox-put ;
 
 : (handle-disconnect) ( -- )
-    irc> in-messages>> irc-disconnected swap mailbox-put
+    irc-disconnected irc> in-messages>> mailbox-put
     irc> reconnect-time>> sleep
     (connect-irc)
     (do-login) ;
@@ -113,8 +113,12 @@ M: f      handle-input handle-disconnect ;
 ! Processing loops
 
 : in-multiplexer-loop ( -- ? )
-    irc> in-messages>> mailbox-get
-    [ process-message ] [ forward-message ] [ irc-end? not ] tri ;
+    irc> in-messages>> mailbox-get {
+        [ message-forwards ]
+        [ process-message ]
+        [ swap chat-put ]
+        [ irc-end? not ]
+    } cleave ;
 
 : strings>privmsg ( name string -- privmsg )
     " :" prepend append "PRIVMSG " prepend string>irc-message ;
