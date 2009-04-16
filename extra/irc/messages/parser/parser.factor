@@ -32,4 +32,4 @@ PRIVATE>
     [ >>trailing ]
     tri*
     [ (>>prefix) ] [ fill-irc-message-slots ] [ swap >>line ] tri
-    now >>timestamp dup sender >>sender ;
+    gmt >>timestamp dup sender >>sender ;
