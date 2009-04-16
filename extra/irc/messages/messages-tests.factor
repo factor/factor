@@ -58,7 +58,8 @@ IN: irc.messages.tests
      { command "NICK" }
      { parameters  { } }
      { trailing "someuser2" }
-     { sender "someuser" } } }
+     { sender "someuser" }
+     { nickname "someuser2" } } }
 [ ":someuser!n=user@some.where NICK :someuser2"
   string>irc-message f >>timestamp ] unit-test
 
