@@ -6,8 +6,8 @@ math.functions math.vectors opengl opengl.gl opengl.glu
 opengl.demo-support sequences specialized-arrays.float ;
 IN: jamshred.gl
 
-: min-vertices 6 ; inline
-: max-vertices 32 ; inline
+: min-vertices ( -- n ) 6 ; inline
+: max-vertices ( -- n ) 32 ; inline
 
 : n-vertices ( -- n ) 32 ; inline
 
@@ -55,7 +55,7 @@ IN: jamshred.gl
 : draw-segment ( next-segment segment -- )
     GL_QUAD_STRIP [
         [ draw-vertex-pair ] 2curry
-        n-vertices equally-spaced-radians F{ 0.0 } append swap each
+        n-vertices equally-spaced-radians float-array{ 0.0 } append swap each
     ] do-state ;
 
 : draw-segments ( segments -- )
@@ -68,15 +68,13 @@ IN: jamshred.gl
 : draw-tunnel ( player -- )
     segments-to-render draw-segments ;
 
-: init-graphics ( width height -- )
+: init-graphics ( -- )
     GL_DEPTH_TEST glEnable
     GL_SCISSOR_TEST glDisable
     1.0 glClearDepth
     0.0 0.0 0.0 0.0 glClearColor
-    GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
-    GL_PROJECTION glMatrixMode glLoadIdentity
-    dup 0 = [ 2drop ] [ / >float 45.0 swap 0.1 100.0 gluPerspective ] if
-    GL_MODELVIEW glMatrixMode glLoadIdentity
+    GL_PROJECTION glMatrixMode glPushMatrix
+    GL_MODELVIEW glMatrixMode glPushMatrix
     GL_LEQUAL glDepthFunc
     GL_LIGHTING glEnable
     GL_LIGHT0 glEnable
@@ -89,11 +87,26 @@ IN: jamshred.gl
     GL_LIGHT0 GL_DIFFUSE float-array{ 1.0 1.0 1.0 1.0 } underlying>> glLightfv
     GL_LIGHT0 GL_SPECULAR float-array{ 1.0 1.0 1.0 1.0 } underlying>> glLightfv ;
 
+: cleanup-graphics ( -- )
+    GL_DEPTH_TEST glDisable
+    GL_SCISSOR_TEST glEnable
+    GL_MODELVIEW glMatrixMode glPopMatrix
+    GL_PROJECTION glMatrixMode glPopMatrix
+    GL_LIGHTING glDisable
+    GL_LIGHT0 glDisable
+    GL_FOG glDisable
+    GL_COLOR_MATERIAL glDisable ;
+
+: pre-draw ( width height -- )
+    GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
+    GL_PROJECTION glMatrixMode glLoadIdentity
+    dup 0 = [ 2drop ] [ / >float 45.0 swap 0.1 100.0 gluPerspective ] if
+    GL_MODELVIEW glMatrixMode glLoadIdentity ;
+
 : player-view ( player -- )
     [ location>> ]
     [ [ location>> ] [ forward>> ] bi v+ ]
     [ up>> ] tri gl-look-at ;
 
 : draw-jamshred ( jamshred width height -- )
-    init-graphics jamshred-player [ player-view ] [ draw-tunnel ] bi ;
-
+    pre-draw jamshred-player [ player-view ] [ draw-tunnel ] bi ;

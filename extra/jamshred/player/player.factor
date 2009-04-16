@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors combinators float-arrays jamshred.log jamshred.oint jamshred.sound jamshred.tunnel kernel locals math math.constants math.order math.ranges math.vectors math.matrices sequences shuffle strings system ;
+USING: accessors colors.constants combinators jamshred.log jamshred.oint jamshred.sound jamshred.tunnel kernel locals math math.constants math.order math.ranges math.vectors math.matrices sequences shuffle specialized-arrays.float strings system ;
 IN: jamshred.player
 
 TUPLE: player < oint
@@ -16,11 +16,11 @@ TUPLE: player < oint
 : max-speed ( -- speed ) 30.0 ;
 
 : <player> ( name sounds -- player )
-    [ F{ 0 0 5 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } ] 2dip
+    [ float-array{ 0 0 5 } float-array{ 0 0 -1 } float-array{ 0 1 0 } float-array{ -1 0 0 } ] 2dip
     f f 0 default-speed player boa ;
 
 : turn-player ( player x-radians y-radians -- )
-    >r over r> left-pivot up-pivot ;
+    [ over ] dip left-pivot up-pivot ;
 
 : roll-player ( player z-radians -- )
     forward-pivot ;
@@ -134,4 +134,4 @@ TUPLE: player < oint
     [ update-time ] [ distance-to-move ] [ (move-player) 2drop ] tri ;
 
 : update-player ( player -- )
-    [ move-player ] [ nearest-segment>> white swap (>>color) ] bi ;
+    [ move-player ] [ nearest-segment>> "white" named-color swap (>>color) ] bi ;
