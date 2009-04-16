@@ -354,8 +354,6 @@ IN: tools.deploy.shaker
 
 : finish-deploy ( final-image -- )
     "Finishing up" show
-    [ { } set-datastack ] dip
-    { } set-retainstack
     V{ } set-namestack
     V{ } set-catchstack
     "Saving final image" show

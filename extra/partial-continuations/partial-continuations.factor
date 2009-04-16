@@ -4,7 +4,7 @@ IN: partial-continuations
 USING: kernel continuations arrays sequences quotations ;
 
 : breset ( quot -- )
-    [ 1array swap keep first continue-with ] callcc1 nip ;
+    [ 1array swap keep first continue-with ] callcc1 nip ; inline
 
 : (bshift) ( v r k -- obj )
     [ dup first -rot ] dip

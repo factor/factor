@@ -43,7 +43,7 @@ M: lex-hash at*
 
 : parse* ( parser -- ast )
     compile
-    [ execute [ error-stack get first throw ] unless* ] with-global-lexer
+    [ execute( -- result ) [ error-stack get first throw ] unless* ] with-global-lexer
     ast>> ;
 
 : create-bnf ( name parser -- )

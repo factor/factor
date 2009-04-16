@@ -72,17 +72,17 @@ file-chooser H{
 : init-filelist-model ( file-chooser -- file-chooser )
     dup list-of-files <model> >>model ; 
 
-: (fc-go) ( file-chooser quot -- )
+: (fc-go) ( file-chooser button quot -- )
     [ [ file-chooser? ] find-parent dup path>> ] dip
     call
     normalize-path swap set-model
     update-filelist-model
-    drop ;
+    drop ; inline
 
-: fc-go-parent ( file-chooser -- )
+: fc-go-parent ( file-chooser button -- )
     [ dup value>> parent-directory ] (fc-go) ;
 
-: fc-go-home ( file-chooser -- )
+: fc-go-home ( file-chooser button -- )
     [ home ] (fc-go) ;
 
 : fc-change-directory ( file-chooser file -- )

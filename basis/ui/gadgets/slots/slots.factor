@@ -44,11 +44,8 @@ TUPLE: slot-editor < track ref close-hook update-hook text ;
     { +description+ "Parse the object being edited, and store the result back into the edited slot." }
 } define-command
 
-: eval-1 ( string -- object )
-    1array [ eval ] with-datastack first ;
-
 : com-eval ( slot-editor -- )
-    [ [ text>> editor-string eval-1 ] [ ref>> ] bi set-ref ]
+    [ [ text>> editor-string eval( -- result ) ] [ ref>> ] bi set-ref ]
     [ close-and-update ]
     bi ;
 

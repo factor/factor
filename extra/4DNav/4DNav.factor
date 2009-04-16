@@ -75,8 +75,6 @@ VAR: present-space
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! namespace utilities
-    
-: make* ( seq -- seq ) [ dup quotation? [ call ] [ ] if ] map ;
 
 : closed-quot ( quot -- quot )
   namestack swap '[ namestack [ _ set-namestack @ ] dip set-namestack ] ;
@@ -156,9 +154,9 @@ VAR: present-space
     3 model-projection <model> view4> (>>model) ;
 
 : camera-action ( quot -- quot ) 
-    [ drop [ ] observer3d>  
+    '[ drop _ observer3d>  
     with-self update-observer-projections ] 
-    make* closed-quot ;
+    closed-quot ;
 
 : win3D ( text gadget -- ) 
     "navigateur 4D : " rot append open-window ;
@@ -400,7 +398,7 @@ M: handler handle-gesture ( gesture gadget -- ? )
 
 : add-keyboard-delegate ( obj -- obj )
  <handler>
-{
+H{
         { T{ key-down f f "LEFT" }  
             [ [ rotation-step turn-left ] camera-action ] }
         { T{ key-down f f "RIGHT" } 
@@ -435,7 +433,7 @@ M: handler handle-gesture ( gesture gadget -- ? )
         { T{ key-down f f "3" } [ mvt-3D-3  camera-action ] }
         { T{ key-down f f "4" } [ mvt-3D-4  camera-action ] }
 
-    } [ make* ] map >hashtable >>table
+    } >>table
     ;    
 
 ! --------------------------------------------
