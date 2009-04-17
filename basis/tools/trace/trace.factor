@@ -79,3 +79,5 @@ M: trace-step summary
     [ [ trace-step ] break-hook ] dip
     [ break ] [ end drop ] surround
     with-variable ;
+
+<< \ trace t "no-compile" set-word-prop >>

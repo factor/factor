@@ -5,7 +5,7 @@ sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
 sequences.private assocs models models.arrow arrays accessors
 generic generic.standard definitions make sbufs
-tools.continuations ;
+tools.continuations parser ;
 IN: tools.walker
 
 SYMBOL: show-walker-hook ! ( status continuation thread -- )
@@ -34,6 +34,8 @@ DEFER: start-walker-thread
 
 : walk ( quot -- quot' )
     \ break prefix [ break rethrow ] recover ;
+
+<< \ walk t "no-compile" set-word-prop >>
 
 break-hook [
     [
@@ -159,4 +161,4 @@ SYMBOL: +stopped+
 ! For convenience
 IN: syntax
 
-: B ( -- ) break ;
+SYNTAX: B \ break parsed ;
