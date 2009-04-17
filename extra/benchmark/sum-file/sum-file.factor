@@ -9,6 +9,6 @@ IN: benchmark.sum-file
     ascii [ 0 sum-file-loop ] with-file-reader . ;
 
 : sum-file-main ( -- )
-    random-numbers-path sum-file ;
+    5 [ random-numbers-path sum-file ] times ;
 
 MAIN: sum-file-main

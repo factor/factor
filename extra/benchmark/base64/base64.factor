@@ -5,7 +5,7 @@ IN: benchmark.base64
 
 : base64-benchmark ( -- )
     65535 [ 255 bitand ] "" map-as
-    100 [ >base64 base64> ] times
+    20 [ >base64 base64> ] times
     drop ;
 
 MAIN: base64-benchmark

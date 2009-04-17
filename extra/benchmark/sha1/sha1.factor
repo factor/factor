@@ -1,7 +1,7 @@
-USING: checksums checksums.sha1 io.files kernel ;
+USING: checksums checksums.sha1 sequences byte-arrays kernel ;
 IN: benchmark.sha1
 
 : sha1-file ( -- )
-    "vocab:mime/multipart/multipart-tests.factor" sha1 checksum-file drop ;
+    2000000 iota >byte-array sha1 checksum-bytes drop ;
 
 MAIN: sha1-file

@@ -11,6 +11,6 @@ IN: benchmark.random
     ] with-file-writer ;
 
 : random-main ( -- )
-    1000000 write-random-numbers ;
+    300000 write-random-numbers ;
 
 MAIN: random-main
