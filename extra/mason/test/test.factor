@@ -25,8 +25,8 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 : do-compile-errors ( -- )
     compiler-errors get values
-    compiler-error-messages-file
     compiler-errors-file
+    compiler-error-messages-file
     do-step ;
 
 : do-tests ( -- )
