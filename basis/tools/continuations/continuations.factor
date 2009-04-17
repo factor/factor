@@ -12,7 +12,6 @@ IN: tools.continuations
 : after-break ( object -- )
     {
         { [ dup continuation? ] [ (continue) ] }
-        { [ dup quotation? ] [ call ] }
         { [ dup not ] [ "Single stepping abandoned" rethrow ] }
     } cond ;
 
@@ -22,7 +21,7 @@ SYMBOL: break-hook
 
 : break ( -- )
     continuation callstack >>call
-    break-hook get call
+    break-hook get call( continuation -- continuation' )
     after-break ;
 
 \ break t "break?" set-word-prop
@@ -125,14 +124,14 @@ PRIVATE>
 } [ "step-into" set-word-prop ] assoc-each
 
 ! Never step into these words
+: don't-step-into ( word -- )
+    dup [ execute break ] curry "step-into" set-word-prop ;
+
 {
     >n ndrop >c c>
     continue continue-with
     stop suspend (spawn)
-} [
-    dup [ execute break ] curry
-    "step-into" set-word-prop
-] each
+} [ don't-step-into ] each
 
 \ break [ break ] "step-into" set-word-prop
 

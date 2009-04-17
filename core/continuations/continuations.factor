@@ -74,14 +74,14 @@ C: <continuation> continuation
 <PRIVATE
 
 : (continue) ( continuation -- * )
-    >continuation<
-    set-catchstack
-    set-namestack
-    set-retainstack
-    [ set-datastack ] dip
-    set-callstack ;
-
-\ (continue) t "no-compile" set-word-prop
+    [
+        >continuation<
+        set-catchstack
+        set-namestack
+        set-retainstack
+        [ set-datastack ] dip
+        set-callstack
+    ] (( continuation -- * )) call-effect-unsafe ;
 
 PRIVATE>
 
