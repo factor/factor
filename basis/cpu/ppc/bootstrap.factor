@@ -310,7 +310,7 @@ CONSTANT: rs-reg 30
     4 ds-reg 0 LWZ
     5 ds-reg -4 LWZU
     5 0 4 CMP
-    2 swap execute ! magic number
+    2 swap execute( offset -- ) ! magic number
     \ f tag-number 3 LI
     3 ds-reg 0 STW ;
 
@@ -341,7 +341,7 @@ CONSTANT: rs-reg 30
 : jit-math ( insn -- )
     3 ds-reg 0 LWZ
     4 ds-reg -4 LWZU
-    [ 5 3 4 ] dip execute
+    [ 5 3 4 ] dip execute( dst src1 src2 -- )
     5 ds-reg 0 STW ;
 
 [ \ ADD jit-math ] f f f \ fixnum+fast define-sub-primitive
