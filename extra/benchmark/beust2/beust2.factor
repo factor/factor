@@ -34,7 +34,7 @@ IN: benchmark.beust2
 
 :: beust ( -- )
     [let | i! [ 0 ] |
-        10000000000 [ i 1+ i! ] count-numbers
+        5000000000 [ i 1+ i! ] count-numbers
         i number>string " unique numbers." append print
     ] ;
 
