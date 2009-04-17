@@ -27,7 +27,7 @@ IN: kernel.tests
 
 [ ] [ :c ] unit-test
 
-: (overflow-d-alt) ( -- ) 3 ;
+: (overflow-d-alt) ( -- n ) 3 ;
 
 : overflow-d-alt ( -- ) (overflow-d-alt) overflow-d-alt ;
 
@@ -107,7 +107,7 @@ IN: kernel.tests
 ! Regression
 : (loop) ( a b c d -- )
     [ pick ] dip swap [ pick ] dip swap
-    < [ [ 1+ ] 3dip (loop) ] [ 2drop 2drop ] if ; inline
+    < [ [ 1+ ] 3dip (loop) ] [ 2drop 2drop ] if ; inline recursive
 
 : loop ( obj obj -- )
     H{ } values swap [ dup length swap ] dip 0 -roll (loop) ;

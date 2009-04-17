@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences fry words assocs linked-assocs tools.annotations
-coroutines lexer parser quotations arrays namespaces continuations ;
+coroutines lexer parser quotations arrays namespaces continuations
+summary ;
 IN: advice
 
 SYMBOLS: before after around advised in-advice? ;
@@ -45,8 +46,13 @@ PRIVATE>
 : remove-advice ( name word loc --  )
     word-prop delete-at ;
 
+ERROR: ad-do-it-error ;
+
+M: ad-do-it-error summary
+    drop "ad-do-it should only be called inside 'around' advice" ;
+
 : ad-do-it ( input -- result )
-    in-advice? get [ "ad-do-it should only be called inside 'around' advice" throw ] unless coyield ;
+    in-advice? get [ ad-do-it-error ] unless coyield ;
     
 : make-advised ( word -- )
     [ dup '[ [ _ ] dip over dup '[ _ call-before _ _ call-around _ call-after ] ] annotate ]
