@@ -63,19 +63,20 @@ SYMBOLS: +optimized+ +unoptimized+ ;
         } 1||
     ] [ error-type +compiler-warning+ eq? ] bi* and ;
 
-: fail ( word error -- * )
-    [ 2dup ignore-error? [ drop f ] when swap compiler-error ]
-    [
-        drop
-        [ compiled-unxref ]
-        [ f swap compiled get set-at ]
-        [ +unoptimized+ save-compiled-status ]
-        tri
-    ] 2bi
+: (fail) ( word -- * )
+    [ compiled-unxref ]
+    [ f swap compiled get set-at ]
+    [ +unoptimized+ save-compiled-status ]
+    tri
     return ;
 
+: fail ( word error -- * )
+    [ 2dup ignore-error? [ drop f ] when swap compiler-error ] [ drop (fail) ] 2bi ;
+
 : frontend ( word -- nodes )
-    [ build-tree-from-word ] [ fail ] recover optimize-tree ;
+    dup contains-breakpoints? [ (fail) ] [
+        [ build-tree-from-word ] [ fail ] recover optimize-tree
+    ] if ;
 
 ! Only switch this off for debugging.
 SYMBOL: compile-dependencies?

@@ -3,7 +3,7 @@
 USING: accessors kernel math sorting words parser io summary
 quotations sequences prettyprint continuations effects
 definitions compiler.units namespaces assocs tools.walker
-tools.time generic inspector fry ;
+tools.time generic inspector fry tools.continuations ;
 IN: tools.annotations
 
 GENERIC: reset ( word -- )

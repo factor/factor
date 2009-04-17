@@ -12,7 +12,6 @@ IN: tools.continuations
 : after-break ( object -- )
     {
         { [ dup continuation? ] [ (continue) ] }
-        { [ dup quotation? ] [ call ] }
         { [ dup not ] [ "Single stepping abandoned" rethrow ] }
     } cond ;
 
@@ -22,14 +21,14 @@ SYMBOL: break-hook
 
 : break ( -- )
     continuation callstack >>call
-    break-hook get call
+    break-hook get call( continuation -- continuation' )
     after-break ;
 
 \ break t "break?" set-word-prop
 
-<PRIVATE
-
 GENERIC: add-breakpoint ( quot -- quot' )
+
+<PRIVATE
 
 M: callable add-breakpoint
     dup [ break ] head? [ \ break prefix ] unless ;
@@ -68,6 +67,18 @@ M: object add-breakpoint ;
 
 : (step-into-call-next-method) ( method -- )
     next-method-quot (step-into-quot) ;
+
+<< {
+    (step-into-quot)
+    (step-into-dip)
+    (step-into-2dip)
+    (step-into-3dip)
+    (step-into-if)
+    (step-into-dispatch)
+    (step-into-execute)
+    (step-into-continuation)
+    (step-into-call-next-method)
+} [ t "no-compile" set-word-prop ] each >>
 
 : change-frame ( continuation quot -- continuation' )
     #! Applies quot to innermost call frame of the
@@ -113,14 +124,14 @@ PRIVATE>
 } [ "step-into" set-word-prop ] assoc-each
 
 ! Never step into these words
+: don't-step-into ( word -- )
+    dup [ execute break ] curry "step-into" set-word-prop ;
+
 {
     >n ndrop >c c>
     continue continue-with
     stop suspend (spawn)
-} [
-    dup [ execute break ] curry
-    "step-into" set-word-prop
-] each
+} [ don't-step-into ] each
 
 \ break [ break ] "step-into" set-word-prop
 
