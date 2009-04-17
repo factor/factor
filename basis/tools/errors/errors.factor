@@ -7,29 +7,21 @@ IN: tools.errors
 #! Tools for source-files.errors. Used by tools.tests and others
 #! for error reporting
 
-M: source-file-error summary
-    error>> summary ;
-
 M: source-file-error compute-restarts
     error>> compute-restarts ;
 
 M: source-file-error error-help
     error>> error-help ;
 
-M: source-file-error error.
+M: source-file-error summary
     [
-        [
-            [
-                [ file>> [ % ": " % ] when* ]
-                [ line#>> [ # "\n" % ] when* ] bi
-            ] "" make
-        ] [
-            [
-                presented set
-                bold font-style set
-            ] H{ } make-assoc
-        ] bi format
-    ] [ error>> error. ] bi ;
+        [ file>> [ % ": " % ] [ "<Listener input>" % ] if* ]
+        [ line#>> [ # ] when* ] bi
+    ] "" make
+    ;
+
+M: source-file-error error.
+    [ summary print nl ] [ error>> error. ] bi ;
 
 : errors. ( errors -- )
     group-by-source-file sort-errors
