@@ -31,7 +31,7 @@ yield
 
 [ [ 3 throw ] "A" suspend ] [ 3 = ] must-fail-with
 
-:: spawn-namespace-test ( -- )
+:: spawn-namespace-test ( -- ? )
     [let | p [ <promise> ] g [ gensym ] |
         [
             g "x" set

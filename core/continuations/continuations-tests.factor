@@ -3,7 +3,7 @@ continuations debugger parser memory arrays words
 kernel.private accessors eval ;
 IN: continuations.tests
 
-: (callcc1-test) ( -- )
+: (callcc1-test) ( n obj -- n' obj )
     [ 1- dup ] dip ?push
     over 0 = [ "test-cc" get continue-with ] when
     (callcc1-test) ;
@@ -59,7 +59,7 @@ IN: continuations.tests
 ! : callstack-overflow callstack-overflow f ;
 ! [ callstack-overflow ] must-fail
 
-: don't-compile-me ( -- ) { } [ ] each ;
+: don't-compile-me ( n -- ) { } [ ] each ;
 
 : foo ( -- ) callstack "c" set 3 don't-compile-me ;
 : bar ( -- a b ) 1 foo 2 ;

@@ -54,7 +54,7 @@ IN: heaps.tests
 : sort-entries ( entries -- entries' )
     [ [ key>> ] compare ] sort ;
 
-: delete-test ( n -- ? )
+: delete-test ( n -- obj1 obj2 )
     [
         random-alist
         <min-heap> [ heap-push-all ] keep

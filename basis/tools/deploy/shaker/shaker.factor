@@ -354,8 +354,6 @@ IN: tools.deploy.shaker
 
 : finish-deploy ( final-image -- )
     "Finishing up" show
-    [ { } set-datastack ] dip
-    { } set-retainstack
     V{ } set-namestack
     V{ } set-catchstack
     "Saving final image" show
@@ -376,9 +374,9 @@ SYMBOL: deploy-vocab
             [:c]
             [print-error]
             '[
-                [ _ execute ] [
-                    _ execute nl
-                    _ execute
+                [ _ execute( obj -- ) ] [
+                    _ execute( obj -- ) nl
+                    _ execute( obj -- )
                 ] recover
             ] %
         ] if

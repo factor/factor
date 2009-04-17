@@ -1,5 +1,5 @@
 USING: help.markup help.syntax ui.commands ui.gadgets.slots
-ui.gadgets.editors ;
+ui.gadgets.editors kernel ;
 IN: ui.tools.inspector
 
 ARTICLE: "ui-inspector-edit" "Editing slot values in the inspector"
@@ -20,5 +20,9 @@ $nl
 { $command-map inspector-gadget "multi-touch" }
 "The UI inspector is an instance of " { $link inspector-gadget } "."
 { $subsection "ui-inspector-edit" } ;
+
+HELP: inspector
+{ $values { "obj" object } }
+{ $description "Opens a new inspector window displaying the slots of " { $snippet "obj" } "." } ;
 
 ABOUT: "ui-inspector"

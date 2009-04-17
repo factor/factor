@@ -8,7 +8,7 @@ IN: lcs
     0 1 ? + [ [ 1+ ] bi@ ] dip min min ;
 
 : lcs-step ( insert delete change same? -- next )
-    1 -1./0. ? + max max ; ! -1./0. is -inf (float)
+    1 -1/0. ? + max max ; ! -1/0. is -inf (float)
 
 :: loop-step ( i j matrix old new step -- )
     i j 1+ matrix nth nth ! insertion

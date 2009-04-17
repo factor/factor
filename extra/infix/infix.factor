@@ -40,7 +40,7 @@ M: ast-array infix-codegen
 M: ast-op infix-codegen
     [ left>> infix-codegen ] [ right>> infix-codegen ]
     [ op>> select-op ] tri
-    2over [ number? ] both? [ call ] [
+    2over [ number? ] both? [ call( a b -- c ) ] [
         [ [ prepare-operand ] bi@ ] dip '[ @ @ @ ]
     ] if ;
 

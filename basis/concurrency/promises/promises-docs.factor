@@ -7,6 +7,10 @@ IN: concurrency.promises
 HELP: promise
 { $class-description "The class of write-once promises." } ;
 
+HELP: <promise>
+{ $values { "promise" promise } }
+{ $description "Creates a new promise which may be fulfilled by calling " { $link fulfill } "." } ;
+
 HELP: promise-fulfilled?
 { $values { "promise" promise } { "?" "a boolean" } }
 { $description "Tests if " { $link fulfill } " has previously been called on the promise, in which case " { $link ?promise } " will return immediately without blocking." } ;

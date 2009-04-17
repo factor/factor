@@ -139,7 +139,6 @@ check_library_exists() {
 }
 
 check_X11_libraries() {
-    check_library_exists GLU
     check_library_exists GL
     check_library_exists X11
     check_library_exists pango-1.0
@@ -199,7 +198,7 @@ find_architecture() {
 
 write_test_program() {
     echo "#include <stdio.h>" > $C_WORD.c
-    echo "int main(){printf(\"%d\", 8*sizeof(void*)); return 0; }" >> $C_WORD.c
+    echo "int main(){printf(\"%ld\", 8*sizeof(void*)); return 0; }" >> $C_WORD.c
 }
 
 c_find_word_size() {
@@ -491,7 +490,7 @@ make_boot_image() {
 }
 
 install_build_system_apt() {
-    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
+    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev wget git-core git-doc rlwrap gcc make
     check_ret sudo
 }
 

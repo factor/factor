@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.order math.vectors
+USING: arrays kernel locals math math.functions math.order math.vectors
 sequences ui.gadgets accessors combinators ;
 IN: ui.baseline-alignment
 
@@ -24,35 +24,47 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
     [ dup [ 2dup - ] [ f ] if ] dip
     gadget-metrics boa ; inline
 
+: ?supremum ( seq -- n/f )
+    sift [ f ] [ supremum ] if-empty ;
+
 : max-ascent ( seq -- n )
-    0 [ ascent>> [ max ] when* ] reduce ; inline
+    [ ascent>> ] map ?supremum ;
 
 : max-cap-height ( seq -- n )
-    0 [ cap-height>> [ max ] when* ] reduce ; inline
+    [ cap-height>> ] map ?supremum ;
 
 : max-descent ( seq -- n )
-    0 [ descent>> [ max ] when* ] reduce ; inline
+    [ descent>> ] map ?supremum ;
 
 : max-text-height ( seq -- y )
-    0 [ [ height>> ] [ ascent>> ] bi [ max ] [ drop ] if ] reduce ;
+    [ ascent>> ] filter [ height>> ] map ?supremum ;
 
 : max-graphics-height ( seq -- y )
-    0 [ [ height>> ] [ ascent>> ] bi [ drop ] [ max ] if ] reduce ;
-
-: (align-baselines) ( y max leading -- y' ) [ swap - ] dip + ;
+    [ ascent>> not ] filter [ height>> ] map ?supremum 0 or ;
 
 :: combine-metrics ( graphics-height ascent descent cap-height -- ascent' descent' )
-    cap-height 2 / :> mid-line 
-    graphics-height 2 /
-    [ ascent mid-line - max mid-line + >integer ]
-    [ descent mid-line + max mid-line - >integer ] bi ;
+    ascent [
+        cap-height 2 / :> mid-line 
+        graphics-height 2 /
+        [ ascent mid-line - max mid-line + floor >integer ]
+        [ descent mid-line + max mid-line - ceiling >integer ] bi
+    ] [ f f ] if ;
+
+: (measure-metrics) ( children sizes -- graphics-height ascent descent cap-height )
+    [ <gadget-metrics> ] 2map
+    {
+        [ max-graphics-height ]
+        [ max-ascent ]
+        [ max-descent ]
+        [ max-cap-height ]
+    } cleave ;
 
 PRIVATE>
 
 :: align-baselines ( gadgets -- ys )
     gadgets [ dup pref-dim <gadget-metrics> ] map
-    dup max-ascent :> max-ascent
-    dup max-cap-height :> max-cap-height
+    dup max-ascent 0 or :> max-ascent
+    dup max-cap-height 0 or :> max-cap-height
     dup max-graphics-height :> max-graphics-height
     
     max-cap-height max-graphics-height + 2 /i :> critical-line
@@ -61,20 +73,12 @@ PRIVATE>
 
     [
         dup ascent>>
-        [ ascent>> max-ascent text-leading ]
-        [ height>> max-graphics-height graphics-leading ] if
-        (align-baselines)
+        [ ascent>> max-ascent swap - text-leading ]
+        [ height>> max-graphics-height swap - 2/ graphics-leading ] if +
     ] map ;
 
 : measure-metrics ( children sizes -- ascent descent )
-    [ <gadget-metrics> ] 2map
-    {
-        [ max-graphics-height ]
-        [ max-ascent ]
-        [ max-descent ]
-        [ max-cap-height ]
-    } cleave
-    combine-metrics ;
+    (measure-metrics) combine-metrics ;
 
 : measure-height ( children sizes -- height )
-    measure-metrics + ;
+    (measure-metrics) dup [ combine-metrics + ] [ 3drop ] if ;

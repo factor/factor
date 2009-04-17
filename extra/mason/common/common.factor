@@ -2,10 +2,21 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences splitting system accessors
 math.functions make io io.files io.pathnames io.directories
-io.launcher io.encodings.utf8 prettyprint
+io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
 combinators.short-circuit parser combinators calendar
-calendar.format arrays mason.config locals ;
+calendar.format arrays mason.config locals system ;
 IN: mason.common
+
+HOOK: really-delete-tree os ( path -- )
+
+M: windows really-delete-tree
+    #! Workaround: Cygwin GIT creates read-only files for
+    #! some reason.
+    [ { "chmod" "ug+rw" "-R" } swap (normalize-path) suffix try-process ]
+    [ delete-tree ]
+    bi ;
+
+M: unix really-delete-tree delete-tree ;
 
 : short-running-process ( command -- )
     #! Give network operations at most 15 minutes to complete.
@@ -76,9 +87,11 @@ CONSTANT: test-all-errors-file "test-all-errors"
 CONSTANT: help-lint-vocabs-file "help-lint-vocabs"
 CONSTANT: help-lint-errors-file "help-lint-errors"
 
+CONSTANT: compiler-errors-file "compiler-errors"
+CONSTANT: compiler-error-messages-file "compiler-error-messages"
+
 CONSTANT: boot-time-file "boot-time"
 CONSTANT: load-time-file "load-time"
-CONSTANT: compiler-errors-file "compiler-errors"
 CONSTANT: test-time-file "test-time"
 CONSTANT: help-lint-time-file "help-lint-time"
 CONSTANT: benchmark-time-file "benchmark-time"

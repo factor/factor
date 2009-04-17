@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
-combinators deques search-deques macros io stack-checker
+combinators deques search-deques macros io source-files.errors stack-checker
 stack-checker.state stack-checker.inlining combinators.short-circuit
 compiler.errors compiler.units compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.builder compiler.cfg.optimizer
@@ -53,22 +53,30 @@ SYMBOLS: +optimized+ +unoptimized+ ;
     f swap compiler-error ;
 
 : ignore-error? ( word error -- ? )
-    [ [ inline? ] [ macro? ] bi or ]
-    [ compiler-error-type +warning+ eq? ] bi* and ;
-
-: fail ( word error -- * )
-    [ 2dup ignore-error? [ 2drop ] [ swap compiler-error ] if ]
     [
-        drop
-        [ compiled-unxref ]
-        [ f swap compiled get set-at ]
-        [ +unoptimized+ save-compiled-status ]
-        tri
-    ] 2bi
+        {
+            [ inline? ]
+            [ macro? ]
+            [ "transform-quot" word-prop ]
+            [ "no-compile" word-prop ]
+            [ "special" word-prop ]
+        } 1||
+    ] [ error-type +compiler-warning+ eq? ] bi* and ;
+
+: (fail) ( word -- * )
+    [ compiled-unxref ]
+    [ f swap compiled get set-at ]
+    [ +unoptimized+ save-compiled-status ]
+    tri
     return ;
 
+: fail ( word error -- * )
+    [ 2dup ignore-error? [ drop f ] when swap compiler-error ] [ drop (fail) ] 2bi ;
+
 : frontend ( word -- nodes )
-    [ build-tree-from-word ] [ fail ] recover optimize-tree ;
+    dup contains-breakpoints? [ (fail) ] [
+        [ build-tree-from-word ] [ fail ] recover optimize-tree
+    ] if ;
 
 ! Only switch this off for debugging.
 SYMBOL: compile-dependencies?
@@ -121,6 +129,8 @@ t compile-dependencies? set-global
 
 : compile-call ( quot -- )
     [ dup infer define-temp ] with-compilation-unit execute ;
+
+\ compile-call t "no-compile" set-word-prop
 
 SINGLETON: optimizing-compiler
 

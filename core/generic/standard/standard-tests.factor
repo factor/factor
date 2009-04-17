@@ -66,7 +66,7 @@ M: circle area radius>> sq pi * ;
 
 GENERIC: perimiter ( shape -- n )
 
-: rectangle-perimiter ( n -- n ) + 2 * ;
+: rectangle-perimiter ( l w -- n ) + 2 * ;
 
 M: rectangle perimiter
     [ width>> ] [ height>> ] bi
