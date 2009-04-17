@@ -72,3 +72,6 @@ IN: irc.messages.tests
      { trailing "Nickname is already in use" } } }
 [ ":ircserver.net 433 * nickname :Nickname is already in use"
   string>irc-message f >>timestamp ] unit-test
+
+{ t } [ ":someuser!n=user@some.where PRIVMSG #factortest :ACTION jumps!"
+        string>irc-message action? ] unit-test
