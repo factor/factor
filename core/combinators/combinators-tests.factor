@@ -357,7 +357,7 @@ DEFER: corner-case-1
 
 [ 4 ] [ 2 2 [ + ] curry 1array case ] unit-test
 
-: test-case-8 ( n -- )
+: test-case-8 ( n -- string )
     {
         { 1 [ "foo" ] }
     } case ;

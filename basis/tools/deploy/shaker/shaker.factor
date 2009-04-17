@@ -374,9 +374,9 @@ SYMBOL: deploy-vocab
             [:c]
             [print-error]
             '[
-                [ _ execute ] [
-                    _ execute nl
-                    _ execute
+                [ _ execute( obj -- ) ] [
+                    _ execute( obj -- ) nl
+                    _ execute( obj -- )
                 ] recover
             ] %
         ] if

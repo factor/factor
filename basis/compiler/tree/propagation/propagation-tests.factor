@@ -680,7 +680,7 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 : (littledan-3-test) ( x -- )
     length 1+ f <array> (littledan-3-test) ; inline recursive
 
-: littledan-3-test ( x -- )
+: littledan-3-test ( -- )
     0 f <array> (littledan-3-test) ; inline
 
 [ ] [ [ littledan-3-test ] final-classes drop ] unit-test
