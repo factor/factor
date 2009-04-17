@@ -26,9 +26,9 @@ SYMBOL: break-hook
 
 \ break t "break?" set-word-prop
 
-<PRIVATE
-
 GENERIC: add-breakpoint ( quot -- quot' )
+
+<PRIVATE
 
 M: callable add-breakpoint
     dup [ break ] head? [ \ break prefix ] unless ;
