@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs benchmark bootstrap.stage2
 compiler.errors generic help.html help.lint io.directories
@@ -42,7 +42,11 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
     do-step ;
 
 : do-benchmarks ( -- )
-    run-benchmarks benchmarks-file to-file ;
+    run-benchmarks
+    [
+        [ keys benchmark-error-vocabs-file to-file ]
+        [ benchmark-error-messages-file utf8 [ benchmark-errors. ] with-file-writer ] bi
+    ] [ benchmarks-file to-file ] bi* ;
 
 : benchmark-ms ( quot -- ms )
     benchmark 1000 /i ; inline

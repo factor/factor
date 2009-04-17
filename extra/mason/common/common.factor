@@ -98,6 +98,8 @@ CONSTANT: benchmark-time-file "benchmark-time"
 CONSTANT: html-help-time-file "html-help-time"
 
 CONSTANT: benchmarks-file "benchmarks"
+CONSTANT: benchmark-error-messages-file "benchmark-error-messages"
+CONSTANT: benchmark-error-vocabs-file "benchmark-error-vocabs"
 
 SYMBOL: status
 
