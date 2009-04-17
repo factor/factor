@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
-! Slava Pestov, Doug Coleman.
+! Slava Pestov, Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays namespaces make io io.encodings.string
-io.encodings.utf8 io.timeouts io.sockets io.sockets.secure
-io.encodings.ascii kernel logging sequences combinators
-splitting assocs strings math.order math.parser random system
-calendar summary calendar.format accessors sets hashtables
-base64 debugger classes prettyprint io.crlf ;
+USING: arrays namespaces make io io.encodings.string io.encodings.utf8
+io.encodings.iana io.timeouts io.sockets io.sockets.secure
+io.encodings.ascii kernel logging sequences combinators splitting
+assocs strings math.order math.parser random system calendar summary
+calendar.format accessors sets hashtables base64 debugger classes
+prettyprint io.crlf words ;
 IN: smtp
 
 SYMBOL: smtp-domain
@@ -44,6 +44,8 @@ TUPLE: email
     { cc array }
     { bcc array }
     { subject string }
+    { content-type string initial: "text/plain" }
+    { encoding word initial: utf8 }
     { body string } ;
 
 : <email> ( -- email ) email new ; inline
@@ -85,8 +87,8 @@ M: message-contains-dot summary ( obj -- string )
     "." over member?
     [ message-contains-dot ] when ;
 
-: send-body ( body -- )
-    utf8 encode
+: send-body ( email -- )
+    [ body>> ] [ encoding>> ] bi encode
     >base64-lines write crlf
     "." command ;
 
@@ -195,24 +197,23 @@ ERROR: invalid-header-string string ;
     ! This could be much smarter.
     " " split1-last swap or "<" ?head drop ">" ?tail drop ;
 
-: utf8-mime-header ( -- alist )
-    {
-        { "MIME-Version" "1.0" }
-        { "Content-Transfer-Encoding" "base64" }
-        { "Content-Type" "Text/plain; charset=utf-8" }
-    } ;
+: email-content-type ( email -- content-type )
+    [ content-type>> ] [ encoding>> encoding>name ] bi "; charset=" glue ;
 
-: email>headers ( email -- hashtable )
+: email>headers ( email -- assoc )
     [
+        now timestamp>rfc822 "Date" set
+        message-id "Message-Id" set
+        "1.0" "MIME-Version" set
+        "base64" "Content-Transfer-Encoding" set
         {
             [ from>> "From" set ]
             [ to>> ", " join "To" set ]
             [ cc>> ", " join [ "Cc" set ] unless-empty ]
             [ subject>> "Subject" set ]
+            [ email-content-type "Content-Type" set ]
         } cleave
-        now timestamp>rfc822 "Date" set
-        message-id "Message-Id" set
-    ] { } make-assoc utf8-mime-header append ;
+    ] { } make-assoc ;
 
 : (send-email) ( headers email -- )
     [
@@ -227,7 +228,7 @@ ERROR: invalid-header-string string ;
         data get-ok
         swap write-headers
         crlf
-        body>> send-body get-ok
+        send-body get-ok
         quit get-ok
     ] with-smtp-connection ;
 

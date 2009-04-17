@@ -1,3 +1,5 @@
 Elie Chaftari
 Dirk Vleugels
 Slava Pestov
+Doug Coleman
+Daniel Ehrenberg

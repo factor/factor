@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel quotations help.syntax help.markup
-io.sockets strings calendar ;
+io.sockets strings calendar io.encodings.utf8 ;
 IN: smtp
 
 HELP: smtp-domain
@@ -41,7 +41,9 @@ HELP: email
         { { $slot "to" } "The recipients of the e-mail. A sequence of e-mail addresses." }
         { { $slot "cc" } "Carbon-copy. A sequence of e-mail addresses." }
         { { $slot "bcc" } "Blind carbon-copy. A sequence of e-mail addresses." }
-        { { $slot "subject" } " The subject of the e-mail. A string." }
+        { { $slot "subject" } "The subject of the e-mail. A string." }
+        { { $slot "content-type" } { "The MIME type of the body. A string, default is " { $snippet "text/plain" } "." } }
+        { { $slot "encoding" } { "An encoding to send the body as. Default is " { $link utf8 } "." } }
         { { $slot "body" } " The body of the e-mail. A string." }
     }
 "The " { $slot "from" } " and " { $slot "to" } " slots are required; the rest are optional."
