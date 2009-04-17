@@ -58,3 +58,6 @@ TUPLE: do-not-compile word ;
             } cleave
         ] maybe-cannot-infer
     ] with-tree-builder ;
+
+: contains-breakpoints? ( word -- ? )
+    def>> [ word? ] filter [ "break?" word-prop ] any? ;

@@ -148,7 +148,11 @@ DEFER: (flat-length)
     ] sum-outputs ;
 
 : should-inline? ( #call word -- ? )
-    dup "inline" word-prop [ 2drop t ] [ inlining-rank 5 >= ] if ;
+    {
+        { [ dup contains-breakpoints? ] [ 2drop f ] }
+        { [ dup "inline" word-prop ] [ 2drop t ] }
+        [ inlining-rank 5 >= ]
+    } cond ;
 
 SYMBOL: history
 
