@@ -5,7 +5,7 @@ math system strings sbufs vectors byte-arrays quotations
 io.streams.byte-array classes.builtin parser lexer
 classes.predicate classes.union classes.intersection
 classes.singleton classes.tuple help.vocabs math.parser
-accessors definitions ;
+accessors definitions sets ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -197,29 +197,6 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.ports" }
 { $see-also "destructors" } ;
 
-ARTICLE: "tools" "Developer tools"
-{ $subsection "tools.vocabs" }
-"Exploratory tools:"
-{ $subsection "see" }
-{ $subsection "editor" }
-{ $subsection "listener" }
-{ $subsection "tools.crossref" }
-{ $subsection "inspector" }
-{ $subsection "tools.completion" }
-{ $subsection "summary" }
-"Debugging tools:"
-{ $subsection "tools.annotations" }
-{ $subsection "tools.test" }
-{ $subsection "tools.threads" }
-"Performance tools:"
-{ $subsection "tools.memory" }
-{ $subsection "profiling" }
-{ $subsection "timing" }
-{ $subsection "tools.disassembler" }
-"Deployment tools:"
-{ $subsection "tools.deploy" }
-{ $see-also "ui-tools" } ;
-
 ARTICLE: "article-index" "Article index"
 { $index [ articles get keys ] } ;
 
@@ -248,59 +225,79 @@ ARTICLE: "class-index" "Class index"
 
 USING: help.cookbook help.tutorial ;
 
-ARTICLE: "handbook-language-reference" "Language reference"
-"Fundamentals:"
+ARTICLE: "handbook-language-reference" "The language"
+{ $heading "Fundamentals" }
 { $subsection "conventions" }
 { $subsection "syntax" }
 { $subsection "effects" }
-"Data types:"
+{ $subsection "evaluator" }
+{ $heading "Data types" }
 { $subsection "booleans" }
 { $subsection "numbers" }
 { $subsection "collections" }
-"Evaluation semantics:"
-{ $subsection "evaluator" }
+{ $heading "Evaluation" }
 { $subsection "words" }
 { $subsection "shuffle-words" }
 { $subsection "combinators" }
 { $subsection "errors" }
 { $subsection "continuations" }
-"Named values:"
+{ $heading "Named values" }
 { $subsection "locals" }
 { $subsection "namespaces" }
 { $subsection "namespaces-global" }
 { $subsection "values" }
-"Abstractions:"
+{ $heading "Abstractions" }
 { $subsection "objects" }
 { $subsection "destructors" }
 { $subsection "macros" }
 { $subsection "fry" }
-"Program organization:"
+{ $heading "Program organization" }
 { $subsection "vocabs.loader" }
 "Vocabularies tagged " { $link T{ vocab-tag { name "extensions" } } } " implement various additional language abstractions." ;
 
-ARTICLE: "handbook-environment-reference" "Environment reference"
-"Parse time and compile time:"
+ARTICLE: "handbook-system-reference" "The implementation"
+{ $heading "Parse time and compile time" }
 { $subsection "parser" }
 { $subsection "definitions" }
 { $subsection "vocabularies" }
 { $subsection "source-files" }
 { $subsection "compiler" }
-"Tools:"
-{ $subsection "prettyprint" }
-{ $subsection "tools" }
-{ $subsection "help" }
-{ $subsection "inference" }
+{ $heading "Virtual machine" }
 { $subsection "images" }
-"VM:"
 { $subsection "cli" }
 { $subsection "rc-files" }
 { $subsection "init" }
 { $subsection "system" }
 { $subsection "layouts" } ;
 
-ARTICLE: "handbook-library-reference" "Library reference"
-"This index only includes articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
-{ $index [ "handbook" orphan-articles remove ] } ;
+ARTICLE: "handbook-tools-reference" "Developer tools"
+"The below tools are text-based. " { $link "ui-tools" } " are documented separately."
+{ $heading "Workflow" }
+{ $subsection "listener" }
+{ $subsection "editor" }
+{ $subsection "tools.vocabs" }
+{ $subsection "tools.test" }
+{ $subsection "help" }
+{ $heading "Debugging" }
+{ $subsection "prettyprint" }
+{ $subsection "inspector" }
+{ $subsection "tools.annotations" }
+{ $subsection "inference" }
+{ $heading "Browsing" }
+{ $subsection "see" }
+{ $subsection "tools.crossref" }
+{ $heading "Performance" }
+{ $subsection "timing" }
+{ $subsection "profiling" }
+{ $subsection "tools.memory" }
+{ $subsection "tools.threads" }
+{ $subsection "tools.disassembler" }
+{ $heading "Deployment" }
+{ $subsection "tools.deploy" } ;
+
+ARTICLE: "handbook-library-reference" "Libraries"
+"This index lists articles from loaded vocabularies which are not subsections of any other article. To explore more vocabularies, see " { $link "vocab-index" } "."
+{ $index [ orphan-articles { "help.home" "handbook" } diff ] } ;
 
 ARTICLE: "handbook" "Factor handbook"
 "Learn the language:"
@@ -308,11 +305,11 @@ ARTICLE: "handbook" "Factor handbook"
 { $subsection "first-program" }
 "Reference material:"
 { $subsection "handbook-language-reference" }
-{ $subsection "handbook-environment-reference" }
 { $subsection "io" }
 { $subsection "ui" }
+{ $subsection "handbook-system-reference" }
+{ $subsection "handbook-tools-reference" }
 { $subsection "ui-tools" }
-{ $subsection "unicode" }
 { $subsection "alien" }
 { $subsection "handbook-library-reference" }
 "Explore loaded libraries:"

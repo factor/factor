@@ -70,7 +70,7 @@ CLASS: {
 ! Service support; evaluate Factor code from other apps
 :: do-service ( pboard error quot -- )
     pboard error ?pasteboard-string
-    dup [ quot call ] when
+    dup [ quot call( string -- result/f ) ] when
     [ pboard set-pasteboard-string ] when* ;
 
 CLASS: {

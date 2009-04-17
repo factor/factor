@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
-sequences strings vectors words words.symbol quotations io combinators
-sorting splitting math.parser effects continuations io.files vocabs
-io.encodings.utf8 source-files classes hashtables compiler.errors
-compiler.units accessors sets lexer vocabs.parser effects.parser slots ;
+sequences strings vectors words words.symbol quotations io
+combinators sorting splitting math.parser effects continuations
+io.files vocabs io.encodings.utf8 source-files classes
+hashtables compiler.units accessors sets lexer vocabs.parser
+effects.parser slots ;
 IN: parser
 
 : location ( -- loc )
@@ -280,11 +281,9 @@ print-use-hook [ [ ] ] initialize
 
 : parse-file ( file -- quot )
     [
-        [
-            [ parsing-file ] keep
-            [ utf8 <file-reader> ] keep
-            parse-stream
-        ] with-compiler-errors
+        [ parsing-file ] keep
+        [ utf8 <file-reader> ] keep
+        parse-stream
     ] [
         over parse-file-restarts rethrow-restarts
         drop parse-file

@@ -11,6 +11,7 @@ ui.gadgets.tabbed ui.gadgets.status-bar ui.gadgets.borders
 ui.tools.browser ui.tools.common ui.baseline-alignment
 ui.operations ui.images ;
 FROM: models.arrow => <arrow> ;
+FROM: models.arrow.smart => <smart-arrow> ;
 FROM: models.product => <product> ;
 IN: ui.tools.profiler
 
@@ -112,8 +113,8 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
 : <methods-model> ( profiler -- model )
     [
         [ method-counters <model> ] dip
-        [ generic>> ] [ class>> ] bi 3array <product>
-        [ first3 '[ _ _ method-matches? ] filter ] <arrow>
+        [ generic>> ] [ class>> ] bi
+        [ '[ _ _ method-matches? ] filter ] <smart-arrow>
     ] keep <profiler-model> ;
 
 : sort-by-name ( obj1 obj2 -- <=> )
@@ -208,6 +209,6 @@ profiler-gadget "toolbar" f {
 : profiler-window ( -- )
     <profiler-gadget> "Profiling results" open-status-window ;
 
-: com-profile ( quot -- ) profile profiler-window ;
+: com-profile ( quot -- ) profile profiler-window ; inline
 
 MAIN: profiler-window

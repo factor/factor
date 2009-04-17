@@ -46,7 +46,7 @@ SLOT: model
 
 : show-links-popup ( browser-gadget quot title -- )
     [ dup model>> ] 2dip <links-popup>
-    [ hand-loc get { 0 0 } <rect> show-glass ] [ request-focus ] bi ;
+    [ hand-loc get { 0 0 } <rect> show-glass ] [ request-focus ] bi ; inline
 
 : com-show-outgoing-links ( browser-gadget -- )
     [ uses ] "Outgoing links" show-links-popup ;

@@ -7,15 +7,15 @@ HELP: <smart-arrow>
 { $examples
   "A model which adds the values of two existing models:"
   { $example
-    "USING: models models.arrows.smart accessors math prettyprint ;"
+    "USING: models models.arrow.smart accessors kernel math prettyprint ;"
     "1 <model> 2 <model> [ + ] <smart-arrow>"
     "[ activate-model ] [ value>> ] bi ."
     "3"
   }
 } ;
 
-ARTICLE: "models.arrows.smart" "Smart arrow models"
-"The " { $vocab-link "models.arrows.smart" } " vocabulary generalizes arrows to arbitrary input arity. They're called “smart” because they resemble " { $link "combinators.smart" } "."
+ARTICLE: "models.arrow.smart" "Smart arrow models"
+"The " { $vocab-link "models.arrow.smart" } " vocabulary generalizes arrows to arbitrary input arity. They're called “smart” because they resemble " { $link "combinators.smart" } "."
 { $subsection <smart-arrow> } ;
 
-ABOUT: "models.arrows.smart"
+ABOUT: "models.arrow.smart"

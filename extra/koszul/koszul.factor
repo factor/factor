@@ -165,7 +165,7 @@ DEFER: (d)
     swap call [ at 0 or ] curry map ; inline
 
 : op-matrix ( domain range quot -- matrix )
-    rot [ [ 2dup ] dip (op-matrix) ] map 2nip ; inline
+    rot [ (op-matrix) ] with with map ; inline
 
 : d-matrix ( domain range -- matrix )
     [ (d) ] op-matrix ;
