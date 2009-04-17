@@ -27,7 +27,7 @@ INSTANCE: fake-break word-break
 
 [ { 0 0 } ] [ "a" get loc>> ] unit-test
 
-[ { 45 15 } ] [ "b" get loc>> ] unit-test
+[ { 45 7 } ] [ "b" get loc>> ] unit-test
 
 [ { 0 30 } ] [ "c" get loc>> ] unit-test
 
