@@ -111,7 +111,7 @@ file-chooser H{
 : line-selected-action ( file-chooser -- )
      dup list>> list-value
      dup directory? 
-     [ fc-change-directory ] [ fc-load-file ] if ; inline
+     [ fc-change-directory ] [ fc-load-file ] if ;
 
 : present-dir-element ( element -- string )
     [ name>> ] [ directory? ] bi   [ "-> " prepend ] when ;
