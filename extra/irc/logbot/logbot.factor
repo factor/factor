@@ -27,7 +27,7 @@ SYMBOL: current-stream
     ] [
         current-stream get [ dispose ] when*
         [ day-of-year current-day set ]
-        [ timestamp-path latin1 <file-writer> ] bi
+        [ timestamp-path latin1 <file-appender> ] bi
         current-stream set
     ] if current-stream get ;
 
