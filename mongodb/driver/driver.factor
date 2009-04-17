@@ -73,7 +73,9 @@ SYNTAX: r/ ( token -- mdbregexp )
 : send-message ( message -- )
     [ mdb-connection> handle>> ] dip '[ _ write-message ] with-stream* ;
 
+DEFER: check-collection
 : send-query-plain ( query-message -- result )
+    [ check-collection ] change-collection
     [ mdb-connection> handle>> ] dip
     '[ _ write-message read-message ] with-stream* ;
 
@@ -135,9 +137,7 @@ M: mdb-collection create-collection ( mdb-collection -- )
 MEMO: reserved-namespace? ( name -- ? )
     [ "$cmd" = ] [ "system" head? ] bi or ;
     
-PRIVATE>
-
-MEMO: ensure-collection ( collection -- fq-collection )
+MEMO: check-collection ( collection -- fq-collection )
     dup mdb-collection? [ name>> ] when
     "." split1 over mdb-instance name>> =
     [ nip ] [ drop ] if
@@ -145,8 +145,9 @@ MEMO: ensure-collection ( collection -- fq-collection )
     [ [ (ensure-collection) ] keep ] unless
     [ mdb-instance name>> ] dip "%s.%s" sprintf ; inline
 
+PRIVATE>
+
 : <query> ( collection query -- mdb-query )
-    [ ensure-collection ] dip
     <mdb-query-msg> ; inline
 
 GENERIC# limit 1 ( mdb-query limit# -- mdb-query )
@@ -183,19 +184,18 @@ GENERIC: explain. ( mdb-query -- )
 M: mdb-query-msg explain.
     t >>explain find nip . ;
 
-
 GENERIC: find-one ( mdb-query -- result/f )
 M: mdb-query-msg find-one
     1 >>return# send-query-plain objects>>
     dup empty? [ drop f ] [ first ] if ;
 
-GENERIC: count ( collection selector -- result )
-M: assoc count
-    [ "count" H{ } clone [ set-at ] keep ] dip
-    [ over [ "query" ] dip set-at ] when*
+GENERIC: count ( mdb-query -- result )
+M: mdb-query-msg count    
+    [ collection>> "count" H{ } clone [ set-at ] keep ] keep
+    query>> [ over [ "query" ] dip set-at ] when*
     [ cmd-collection ] dip <mdb-query-msg> find-one 
     [ check-ok ] keep '[ "n" _ at >fixnum ] [ f ] if ;
- 
+
 : lasterror ( -- error )
     cmd-collection H{ { "getlasterror" 1 } } <mdb-query-msg>
     find-one [ "err" ] dip at ;
@@ -218,12 +218,12 @@ PRIVATE>
 
 GENERIC: save ( collection assoc -- )
 M: assoc save
-    [ ensure-collection ] dip
+    [ check-collection ] dip
     <mdb-insert-msg> send-message-check-error ;
 
 GENERIC: save-unsafe ( collection object -- )
 M: assoc save-unsafe
-    [ ensure-collection ] dip
+    [ check-collection ] dip
     <mdb-insert-msg> send-message ;
 
 GENERIC: ensure-index ( collection name spec -- )
@@ -244,7 +244,7 @@ M: assoc ensure-index
     check-ok [ "could not drop index" throw ] unless ;
 
 : <update> ( collection selector object -- update-msg )
-    [ ensure-collection ] 2dip <mdb-update-msg> ;
+    [ check-collection ] 2dip <mdb-update-msg> ;
 
 : >upsert ( mdb-update-msg -- mdb-update-msg )
     1 >>upsert? ; 
@@ -259,17 +259,20 @@ M: mdb-update-msg update-unsafe
  
 GENERIC: delete ( collection selector -- )
 M: assoc delete
-    [ ensure-collection ] dip
+    [ check-collection ] dip
     <mdb-delete-msg> send-message-check-error ;
 
 GENERIC: delete-unsafe ( collection selector -- )
 M: assoc delete-unsafe
-    [ ensure-collection ] dip
+    [ check-collection ] dip
     <mdb-delete-msg> send-message ;
 
 : load-index-list ( -- index-list )
     index-collection
     H{ } clone <mdb-query-msg> find nip ;
+
+: ensure-collection ( name -- )
+    check-collection drop ;
 
 : drop-collection ( name -- )
     [ cmd-collection ] dip
