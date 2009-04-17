@@ -21,7 +21,7 @@ TUPLE: deque { front read-only } { back read-only } ;
     [ back>> ] [ front>> ] bi deque boa ;
 
 : flipped ( deque quot -- newdeque )
-    [ flip ] dip call flip ;
+    [ flip ] dip call flip ; inline
 PRIVATE>
 
 : deque-empty? ( deque -- ? )

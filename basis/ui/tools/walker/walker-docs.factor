@@ -1,6 +1,6 @@
 IN: ui.tools.walker
 USING: help.markup help.syntax ui.commands ui.operations
-ui.render tools.walker sequences ;
+ui.render tools.walker sequences tools.continuations ;
 
 ARTICLE: "ui-walker-step" "Stepping through code"
 "If the current position points to a word, the various stepping commands behave as follows:"

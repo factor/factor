@@ -4,7 +4,7 @@ USING: arrays hashtables io kernel math math.parser memory
 namespaces parser lexer sequences strings io.styles
 vectors words generic system combinators continuations debugger
 definitions compiler.units accessors colors prettyprint fry
-sets vocabs.parser ;
+sets vocabs.parser source-files.errors locals ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -32,17 +32,9 @@ M: object stream-read-quot
 
 : read-quot ( -- quot/f ) input-stream get stream-read-quot ;
 
-<PRIVATE
-
-SYMBOL: quit-flag
-
-PRIVATE>
-
-: bye ( -- ) quit-flag on ;
-
 SYMBOL: visible-vars
 
-: show-var ( var -- ) visible-vars  [ swap suffix ] change ;
+: show-var ( var -- ) visible-vars [ swap suffix ] change ;
 
 : show-vars ( seq -- ) visible-vars [ swap union ] change ;
 
@@ -67,6 +59,8 @@ t display-stacks? set-global
 SYMBOL: max-stack-items
 
 10 max-stack-items set-global
+
+SYMBOL: error-summary-hook
 
 <PRIVATE
 
@@ -96,26 +90,44 @@ SYMBOL: max-stack-items
         ] dip
     ] when stack. ;
 
-: stacks. ( -- )
+: datastack. ( datastack -- )
     display-stacks? get [
-        datastack [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
-    ] when ;
+        [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
+    ] [ drop ] if ;
 
 : prompt. ( -- )
-    "( " in get auto-use? get [ " - auto" append ] when " )" 3append
+    in get auto-use? get [ " - auto" append ] when "( " " )" surround
     H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl flush ;
 
-: listen ( -- )
-    visible-vars. stacks. prompt.
-    [ read-quot [ [ call-error-hook ] recover ] [ bye ] if* ]
-    [ dup lexer-error? [ call-error-hook ] [ rethrow ] if ] recover ;
+[ error-summary ] error-summary-hook set-global
 
-: until-quit ( -- )
-    quit-flag get [ quit-flag off ] [ listen until-quit ] if ;
+: call-error-summary-hook ( -- )
+    error-summary-hook get call( -- ) ;
+
+:: (listener) ( datastack -- )
+    call-error-summary-hook
+    visible-vars.
+    datastack datastack.
+    prompt.
+
+    [
+        read-quot [
+            '[ datastack _ with-datastack ]
+            [ call-error-hook datastack ]
+            recover
+        ] [ return ] if*
+    ] [
+        dup lexer-error?
+        [ call-error-hook datastack ]
+        [ rethrow ]
+        if
+    ] recover
+
+    (listener) ;
 
 PRIVATE>
 
 : listener ( -- )
-    [ until-quit ] with-interactive-vocabs ;
+    [ [ { } (listener) ] with-interactive-vocabs ] with-return ;
 
 MAIN: listener

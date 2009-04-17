@@ -145,12 +145,6 @@ ARTICLE: "reading-writing-memory" "Reading and writing memory directly"
 { $subsection set-alien-float }
 { $subsection set-alien-double } ;
 
-ARTICLE: "loading-libs" "Loading native libraries"
-"Before calling a C library, you must associate its path name on disk with a logical name which Factor uses to identify the library:"
-{ $subsection add-library }
-"Once a library has been defined, you can try loading it to see if the path name is correct:"
-{ $subsection load-library } ;
-
 ARTICLE: "alien-invoke" "Calling C from Factor"
 "The easiest way to call into a C library is to define bindings using a pair of parsing words:"
 { $subsection POSTPONE: LIBRARY: }

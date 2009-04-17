@@ -76,7 +76,7 @@ M: satisfy-parser parse ( input parser -- list )
     over empty? [
         2drop nil
     ] [
-        quot>> [ unclip-slice dup ] dip call
+        quot>> [ unclip-slice dup ] dip call( char -- ? )
         [ swap <parse-results> ] [ 2drop nil ] if
     ] if ;
 
