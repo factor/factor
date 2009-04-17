@@ -66,6 +66,7 @@ $nl
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }
 { $subsection "ui-inspector" }
+{ $subsection "ui.tools.error-list" }
 { $subsection "ui.tools.profiler" }
 { $subsection "ui-walker" }
 { $subsection "ui.tools.deploy" }

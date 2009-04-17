@@ -79,8 +79,7 @@ site-watcher-db <alloy>
 main-responder set-global
 
 M: site-watcher-app init-user-profile
-    drop B
-    "username" value "email" value <account> insert-tuple ;
+    drop "username" value "email" value <account> insert-tuple ;
 
 : init-db ( -- )
     site-watcher-db [

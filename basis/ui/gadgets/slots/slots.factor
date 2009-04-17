@@ -23,14 +23,14 @@ TUPLE: slot-editor < track ref close-hook update-hook text ;
 } define-command
 
 : close ( slot-editor -- )
-    dup close-hook>> call ;
+    dup close-hook>> call( slot-editor -- ) ;
 
 \ close H{
     { +description+ "Close the slot editor without saving changes." }
 } define-command
 
 : close-and-update ( slot-editor -- )
-    [ update-hook>> call ] [ close ] bi ;
+    [ update-hook>> call( -- ) ] [ close ] bi ;
 
 : slot-editor-value ( slot-editor -- object )
     text>> control-value parse-fresh first ;
@@ -44,11 +44,8 @@ TUPLE: slot-editor < track ref close-hook update-hook text ;
     { +description+ "Parse the object being edited, and store the result back into the edited slot." }
 } define-command
 
-: eval-1 ( string -- object )
-    1array [ eval ] with-datastack first ;
-
 : com-eval ( slot-editor -- )
-    [ [ text>> editor-string eval-1 ] [ ref>> ] bi set-ref ]
+    [ [ text>> editor-string eval( -- result ) ] [ ref>> ] bi set-ref ]
     [ close-and-update ]
     bi ;
 

@@ -568,6 +568,11 @@ M: sequence <=>
     2dup [ length ] bi@ =
     [ mismatch not ] [ 2drop f ] if ; inline
 
+ERROR: assert-sequence got expected ;
+
+: assert-sequence= ( a b -- )
+    2dup sequence= [ 2drop ] [ assert-sequence ] if ;
+
 : sequence-hashcode-step ( oldhash newpart -- newhash )
     >fixnum swap [
         [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi

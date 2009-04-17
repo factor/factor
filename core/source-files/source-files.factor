@@ -4,7 +4,7 @@ USING: arrays definitions generic assocs kernel math namespaces
 sequences strings vectors words quotations io io.files
 io.pathnames combinators sorting splitting math.parser effects
 continuations checksums checksums.crc32 vocabs hashtables graphs
-compiler.units io.encodings.utf8 accessors ;
+compiler.units io.encodings.utf8 accessors source-files.errors ;
 IN: source-files
 
 SYMBOL: source-files
@@ -61,8 +61,7 @@ M: pathname where string>> 1 2array ;
     [
         source-file
         [ unxref-source ]
-        [ definitions>> [ keys forget-all ] each ]
-        bi
+        [ definitions>> [ keys forget-all ] each ] bi
     ]
     [ source-files get delete-at ]
     bi ;
@@ -77,21 +76,20 @@ M: pathname forget*
 
 SYMBOL: file
 
-TUPLE: source-file-error error file ;
-
-: <source-file-error> ( msg -- error )
+: wrap-source-file-error ( error -- * )
+    file get rollback-source-file
     \ source-file-error new
-        file get >>file
-        swap >>error ;
+        f >>line#
+        file get path>> >>file
+        swap >>error rethrow ;
 
 : with-source-file ( name quot -- )
     #! Should be called from inside with-compilation-unit.
     [
-        swap source-file
-        dup file set
-        definitions>> old-definitions set
         [
-            file get rollback-source-file
-            <source-file-error> rethrow
-        ] recover
+            source-file
+            [ file set ]
+            [ definitions>> old-definitions set ] bi
+        ] dip
+        [ wrap-source-file-error ] recover
     ] with-scope ; inline

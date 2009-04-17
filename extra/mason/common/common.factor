@@ -87,9 +87,11 @@ CONSTANT: test-all-errors-file "test-all-errors"
 CONSTANT: help-lint-vocabs-file "help-lint-vocabs"
 CONSTANT: help-lint-errors-file "help-lint-errors"
 
+CONSTANT: compiler-errors-file "compiler-errors"
+CONSTANT: compiler-error-messages-file "compiler-error-messages"
+
 CONSTANT: boot-time-file "boot-time"
 CONSTANT: load-time-file "load-time"
-CONSTANT: compiler-errors-file "compiler-errors"
 CONSTANT: test-time-file "test-time"
 CONSTANT: help-lint-time-file "help-lint-time"
 CONSTANT: benchmark-time-file "benchmark-time"
