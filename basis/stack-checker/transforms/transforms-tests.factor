@@ -1,6 +1,6 @@
 IN: stack-checker.transforms.tests
 USING: sequences stack-checker.transforms tools.test math kernel
-quotations stack-checker accessors combinators words arrays
+quotations stack-checker stack-checker.errors accessors combinators words arrays
 classes classes.tuple ;
 
 : compose-n-quot ( word n -- quot' ) <repetition> >quotation ;
@@ -71,3 +71,10 @@ DEFER: curry-folding-test ( quot -- )
 
 [ f ] [ 1.0 member?-test ] unit-test
 [ t ] [ \ member?-test def>> first [ member?-test ] all? ] unit-test
+
+! Macro expansion should throw its own type of error
+: bad-macro ( -- ) ;
+
+\ bad-macro [ "OOPS" throw ] 0 define-transform
+
+[ [ bad-macro ] infer ] [ inference-error? ] must-fail-with

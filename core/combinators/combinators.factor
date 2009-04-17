@@ -86,6 +86,8 @@ ERROR: no-case object ;
         ] [ callable? ] if
     ] find nip ;
 
+\ case-find t "no-compile" set-word-prop
+
 : case ( obj assoc -- )
     case-find {
         { [ dup array? ] [ nip second call ] }

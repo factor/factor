@@ -3,7 +3,7 @@
 USING: accessors arrays kernel continuations assocs namespaces
 sequences words vocabs definitions hashtables init sets
 math math.order classes classes.algebra classes.tuple
-classes.tuple.private generic ;
+classes.tuple.private generic source-files.errors ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -62,7 +62,7 @@ GENERIC: definitions-changed ( assoc obj -- )
     definition-observers get push ;
 
 : remove-definition-observer ( obj -- )
-    definition-observers get delete ;
+    definition-observers get delq ;
 
 : notify-definition-observers ( assoc -- )
     definition-observers get
@@ -132,17 +132,20 @@ GENERIC: definitions-changed ( assoc obj -- )
     changed-generics get compiled-generic-usages
     append assoc-combine keys ;
 
-: unxref-forgotten-definitions ( -- )
-    forgotten-definitions get
-    keys [ word? ] filter
-    [ delete-compiled-xref ] each ;
+: process-forgotten-definitions ( -- )
+    forgotten-definitions get keys
+    [ [ word? ] filter [ delete-compiled-xref ] each ]
+    [ [ delete-definition-errors ] each ]
+    bi ;
 
 : finish-compilation-unit ( -- )
     remake-generics
     to-recompile recompile
     update-tuples
-    unxref-forgotten-definitions
-    modify-code-heap ;
+    process-forgotten-definitions
+    modify-code-heap
+    updated-definitions notify-definition-observers
+    notify-error-observers ;
 
 : with-nested-compilation-unit ( quot -- )
     [
@@ -166,9 +169,5 @@ GENERIC: definitions-changed ( assoc obj -- )
         H{ } clone new-classes set
         <definitions> new-definitions set
         <definitions> old-definitions set
-        [
-            finish-compilation-unit
-            updated-definitions
-            notify-definition-observers
-        ] [ ] cleanup
+        [ finish-compilation-unit ] [ ] cleanup
     ] with-scope ; inline
