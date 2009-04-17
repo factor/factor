@@ -11,6 +11,12 @@ GENERIC: >log-line ( object -- line )
 
 M: irc-message >log-line line>> ;
 
+M: ctcp >log-line
+    [ "CTCP: " % dup sender>> % " " % text>> % ] "" make ;
+
+M: action >log-line
+    [ "* " % dup sender>> % " " % text>> % ] "" make ;
+
 M: privmsg >log-line
     [ "<" % dup sender>> % "> " % text>> % ] "" make ;
 
