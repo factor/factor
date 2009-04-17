@@ -526,10 +526,10 @@ HELP: ((
 { $notes "Useful for meta-programming with " { $link define-declared } "." }
 { $examples
     { $code
-        "SYMBOL: my-dynamic-word"
+        "<< SYMBOL: my-dynamic-word"
         "USING: math random words ;"
-        "3 { [ + ] [ - ] [ * ] [ / ] } random curry"
-        "(( x -- y )) define-declared"
+        "my-dynamic-word 3 { [ + ] [ - ] [ * ] [ / ] } random curry"
+        "(( x -- y )) define-declared >>"
     }
 } ;
 
