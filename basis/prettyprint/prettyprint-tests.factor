@@ -254,7 +254,7 @@ M: class-see-layout class-see-layout ;
 ! Regression
 [ t ] [
     "IN: prettyprint.tests\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
-    dup (( -- )) eval
+    dup eval( -- )
     "generic-decl-test" "prettyprint.tests" lookup
     [ see ] with-string-writer =
 ] unit-test
