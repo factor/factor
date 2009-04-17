@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic sequences io words arrays summary effects
 continuations assocs accessors namespaces compiler.errors
-stack-checker.values stack-checker.recursive-state ;
+stack-checker.values stack-checker.recursive-state
+source-files.errors compiler.errors ;
 IN: stack-checker.errors
 
 : pretty-word ( word -- word' )
@@ -10,7 +11,7 @@ IN: stack-checker.errors
 
 TUPLE: inference-error error type word ;
 
-M: inference-error compiler-error-type type>> ;
+M: inference-error error-type type>> ;
 
 : (inference-error) ( ... class type -- * )
     [ boa ] dip
@@ -18,10 +19,10 @@ M: inference-error compiler-error-type type>> ;
     \ inference-error boa rethrow ; inline
 
 : inference-error ( ... class -- * )
-    +error+ (inference-error) ; inline
+    +compiler-error+ (inference-error) ; inline
 
 : inference-warning ( ... class -- * )
-    +warning+ (inference-error) ; inline
+    +compiler-warning+ (inference-error) ; inline
 
 TUPLE: literal-expected what ;
 
@@ -81,3 +82,8 @@ TUPLE: unknown-primitive-error ;
 
 : unknown-primitive-error ( -- * )
     \ unknown-primitive-error inference-warning ;
+
+TUPLE: transform-expansion-error word error ;
+
+: transform-expansion-error ( word error -- * )
+    \ transform-expansion-error inference-error ;

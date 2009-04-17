@@ -9,7 +9,7 @@ GENERIC: my-generic ( x -- b )
 
 M: integer my-generic sq ;
 
-M: fixnum my-generic call-next-method my-var get call ;
+M: fixnum my-generic call-next-method my-var get call( a -- b ) ;
 
 : test-7 ( -- )
     [ 1 + ] my-var set-global

@@ -1440,4 +1440,4 @@ SYMBOL: root
 : close-x ( -- ) dpy get XCloseDisplay drop ;
 
 : with-x ( display-string quot -- )
-    [ initialize-x ] dip [ close-x ] [ ] cleanup ;
+    [ initialize-x ] dip [ close-x ] [ ] cleanup ; inline
