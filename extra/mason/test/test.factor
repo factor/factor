@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs benchmark bootstrap.stage2
-compiler.errors generic help.html help.lint io.directories
+USING: accessors assocs benchmark bootstrap.stage2 compiler.errors
+source-files.errors generic help.html help.lint io.directories
 io.encodings.utf8 io.files kernel mason.common math namespaces
-prettyprint sequences sets sorting tools.test tools.time
-tools.vocabs words system io tools.errors locals ;
+prettyprint sequences sets sorting tools.test tools.time tools.vocabs
+words system io tools.errors locals ;
 IN: mason.test
 
 : do-load ( -- )
@@ -20,7 +20,9 @@ M: word word-vocabulary vocabulary>> ;
 M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 :: do-step ( errors summary-file details-file -- )
-    errors [ file>> ] map prune natural-sort summary-file to-file
+    errors
+    [ error-type +linkage-error+ eq? not ] filter
+    [ file>> ] map prune natural-sort summary-file to-file
     errors details-file utf8 [ errors. ] with-file-writer ;
 
 : do-compile-errors ( -- )
@@ -43,10 +45,10 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 : do-benchmarks ( -- )
     run-benchmarks
-    [
+    [ benchmarks-file to-file ] [
         [ keys benchmark-error-vocabs-file to-file ]
         [ benchmark-error-messages-file utf8 [ benchmark-errors. ] with-file-writer ] bi
-    ] [ benchmarks-file to-file ] bi* ;
+    ] bi* ;
 
 : benchmark-ms ( quot -- ms )
     benchmark 1000 /i ; inline
