@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs debugger io kernel sequences source-files.errors
-summary accessors continuations make math.parser io.styles namespaces ;
+summary accessors continuations make math.parser io.styles namespaces
+compiler.errors ;
 IN: tools.errors
 
 #! Tools for source-files.errors. Used by tools.tests and others
@@ -30,3 +31,12 @@ M: source-file-error error.
         [ [ nl ] [ error. ] interleave ]
         bi*
     ] assoc-each ;
+
+: compiler-errors. ( type -- )
+    errors-of-type values errors. ;
+
+: :errors ( -- ) +compiler-error+ compiler-errors. ;
+
+: :warnings ( -- ) +compiler-warning+ compiler-errors. ;
+
+: :linkage ( -- ) +linkage-error+ compiler-errors. ;
