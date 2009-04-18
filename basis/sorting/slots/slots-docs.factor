@@ -11,7 +11,7 @@ HELP: compare-slots
 }
 { $description "Compares two objects using a chain of intrinsic linear orders such that if two objects are " { $link +eq+ } ", then the next comparator is tried. The comparators are slot-name/comparator pairs." } ;
 
-HELP: sort-by-slots
+HELP: sort-by
 { $values
      { "seq" sequence } { "sort-specs" "a sequence of accessors ending with a comparator" }
      { "seq'" sequence }
@@ -32,27 +32,13 @@ HELP: sort-by-slots
     }
 } ;
 
-HELP: split-by-slots
-{ $values
-     { "accessor-seqs" "a sequence of sequences of tuple accessors" }
-     { "quot" quotation }
-}
-{ $description "Splits a sequence of tuples into a sequence of slices of tuples that have the same values in all slots in the accessor sequence. This word is only useful for splitting a sorted sequence, but is more efficient than partitioning in such a case." } ;
-
-HELP: sort-by
-{ $values
-    { "seq" sequence } { "sort-seq" "a sequence of comparators" }
-    { "seq'" sequence }
-}
-{ $description "Sorts a sequence by comparing elements by comparators, using subsequent comparators when there is a tie." } ;
-
 ARTICLE: "sorting.slots" "Sorting by slots"
 "The " { $vocab-link "sorting.slots" } " vocabulary can sort tuples by slot in ascending or descending order, using subsequent slots as tie-breakers." $nl
 "Comparing two objects by a sequence of slots:"
 { $subsection compare-slots }
 "Sorting a sequence of tuples by a slot/comparator pairs:"
-{ $subsection sort-by-slots }
-"Sorting a sequence by a sequence of comparators:"
-{ $subsection sort-by } ;
+{ $subsection sort-by }
+{ $subsection sort-keys-by }
+{ $subsection sort-values-by } ;
 
 ABOUT: "sorting.slots"
