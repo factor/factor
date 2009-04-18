@@ -17,7 +17,7 @@ IN: compiler.tests
     M: my-mixin my-generic drop 0 ;
     M: object my-generic drop 1 ;
     : my-inline ( -- b ) { } my-generic ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ ] [

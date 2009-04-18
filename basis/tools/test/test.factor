@@ -129,13 +129,13 @@ TEST: must-infer
 TEST: must-fail-with
 TEST: must-fail
 
-M: test-failure summary
-    asset>> [ [ experiment. ] with-string-writer ] [ "Top-level form" ] if* ;
-
 M: test-failure error. ( error -- )
-    [ call-next-method ]
-    [ traceback-button. ]
-    bi ;
+    {
+        [ summary print nl ]
+        [ asset>> [ experiment. nl ] when* ]
+        [ error>> error. ]
+        [ traceback-button. ]
+    } cleave ;
 
 : :test-failures ( -- ) test-failures get errors. ;
 

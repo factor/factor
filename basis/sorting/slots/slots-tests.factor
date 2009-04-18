@@ -159,3 +159,15 @@ TUPLE: tuple2 d ;
     { { 3 2 1 } { 1 2 3 } { 1 3 2 } { 1 } }
     { length-test<=> <=> } sort-by
 ] unit-test
+
+[ { { 0 1 } { 1 2 } { 1 1 } { 3 2 } } ]
+[
+    { { 3 2 } { 1 2 } { 0 1 } { 1 1 } }
+    { length-test<=> <=> } sort-keys-by
+] unit-test
+
+[ { { 0 1 } { 1 1 } { 3 2 } { 1 2 } } ]
+[
+    { { 3 2 } { 1 2 } { 0 1 } { 1 1 } }
+    { length-test<=> <=> } sort-values-by
+] unit-test

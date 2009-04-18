@@ -27,7 +27,7 @@ C: <redefinition-test> redefinition-test
 
 [ t ] [ "redefinition-test" get redefinition-test? ] unit-test
 
-"IN: classes.tuple.tests TUPLE: redefinition-test ;" eval
+"IN: classes.tuple.tests TUPLE: redefinition-test ;" eval( -- )
 
 [ t ] [ "redefinition-test" get redefinition-test? ] unit-test
 
@@ -39,7 +39,7 @@ C: <point> point
 [ ] [ 100 200 <point> "p" set ] unit-test
 
 ! Use eval to sequence parsing explicitly
-[ ] [ "IN: classes.tuple.tests TUPLE: point x y z ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: point x y z ;" eval( -- ) ] unit-test
 
 [ 100 ] [ "p" get x>> ] unit-test
 [ 200 ] [ "p" get y>> ] unit-test
@@ -51,7 +51,7 @@ C: <point> point
 
 [ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
-[ ] [ "IN: classes.tuple.tests TUPLE: point z y ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: point z y ;" eval( -- ) ] unit-test
 
 [ 2 ] [ "p" get tuple-size ] unit-test
 
@@ -89,7 +89,7 @@ C: <empty> empty
 [ t length ] [ object>> t eq? ] must-fail-with
 
 [ "<constructor-test>" ]
-[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval word name>> ] unit-test
+[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval( -- ) word name>> ] unit-test
 
 TUPLE: size-test a b c d ;
 
@@ -102,7 +102,7 @@ GENERIC: <yo-momma> ( a -- b )
 
 TUPLE: yo-momma ;
 
-[ ] [ "IN: classes.tuple.tests C: <yo-momma> yo-momma" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests C: <yo-momma> yo-momma" eval( -- ) ] unit-test
 
 [ f ] [ \ <yo-momma> generic? ] unit-test
 
@@ -204,7 +204,7 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 : cons-test-1 ( -- tuple ) \ erg's-reshape-problem new ;
 : cons-test-2 ( a b c d -- tuple ) \ erg's-reshape-problem boa ;
 
-[ ] [ "IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval( -- ) ] unit-test
 
 [ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
 
@@ -281,13 +281,13 @@ test-server-slot-values
 ] unit-test
 
 [
-    "IN: classes.tuple.tests TUPLE: bad-superclass < word ;" eval
+    "IN: classes.tuple.tests TUPLE: bad-superclass < word ;" eval( -- )
 ] must-fail
 
 ! Dynamically changing inheritance hierarchy
 TUPLE: electronic-device ;
 
-[ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device cpu ram ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device cpu ram ;" eval( -- ) ] unit-test
 
 [ f ] [ electronic-device laptop class<= ] unit-test
 [ t ] [ server electronic-device class<= ] unit-test
@@ -303,17 +303,17 @@ TUPLE: electronic-device ;
 [ f ] [ "server" get laptop? ] unit-test
 [ t ] [ "server" get server? ] unit-test
 
-[ ] [ "IN: classes.tuple.tests TUPLE: computer cpu ram ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: computer cpu ram ;" eval( -- ) ] unit-test
 
 [ f ] [ "laptop" get electronic-device? ] unit-test
 [ t ] [ "laptop" get computer? ] unit-test
 
-[ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device cpu ram disk ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device cpu ram disk ;" eval( -- ) ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
 
-[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage ;" eval( -- ) ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
@@ -326,7 +326,7 @@ TUPLE: make-me-some-accessors voltage grounded? ;
 [ ] [ "laptop" get 220 >>voltage drop ] unit-test
 [ ] [ "server" get 110 >>voltage drop ] unit-test
 
-[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage grounded? ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage grounded? ;" eval( -- ) ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
@@ -334,7 +334,7 @@ test-server-slot-values
 [ 220 ] [ "laptop" get voltage>> ] unit-test
 [ 110 ] [ "server" get voltage>> ] unit-test
 
-[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device grounded? voltage ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device grounded? voltage ;" eval( -- ) ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
@@ -343,7 +343,7 @@ test-server-slot-values
 [ 110 ] [ "server" get voltage>> ] unit-test
 
 ! Reshaping superclass and subclass simultaneously
-[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage ; TUPLE: computer < electronic-device cpu ram ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage ; TUPLE: computer < electronic-device cpu ram ;" eval( -- ) ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
@@ -364,11 +364,11 @@ C: <test2> test2
 
 test-a/b
 
-[ ] [ "IN: classes.tuple.tests TUPLE: test1 a x ; TUPLE: test2 < test1 b y ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: test1 a x ; TUPLE: test2 < test1 b y ;" eval( -- ) ] unit-test
 
 test-a/b
 
-[ ] [ "IN: classes.tuple.tests TUPLE: test1 a ; TUPLE: test2 < test1 b ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: test1 a ; TUPLE: test2 < test1 b ;" eval( -- ) ] unit-test
 
 test-a/b
 
@@ -393,19 +393,19 @@ T{ move-up-2 f "a" "b" "c" } "move-up" set
 
 test-move-up
 
-[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 a b c ; TUPLE: move-up-2 < move-up-1 ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 a b c ; TUPLE: move-up-2 < move-up-1 ;" eval( -- ) ] unit-test
 
 test-move-up
 
-[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 a c ; TUPLE: move-up-2 < move-up-1 b ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 a c ; TUPLE: move-up-2 < move-up-1 b ;" eval( -- ) ] unit-test
 
 test-move-up
 
-[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 c ; TUPLE: move-up-2 < move-up-1 b a ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 c ; TUPLE: move-up-2 < move-up-1 b a ;" eval( -- ) ] unit-test
 
 test-move-up
 
-[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 ; TUPLE: move-up-2 < move-up-1 a b c ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: move-up-1 ; TUPLE: move-up-2 < move-up-1 a b c ;" eval( -- ) ] unit-test
 
 ! Constructors must be recompiled when changing superclass
 TUPLE: constructor-update-1 xxx ;
@@ -416,7 +416,7 @@ C: <constructor-update-2> constructor-update-2
 
 { 3 1 } [ <constructor-update-2> ] must-infer-as
 
-[ ] [ "IN: classes.tuple.tests TUPLE: constructor-update-1 xxx ttt www ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: constructor-update-1 xxx ttt www ;" eval( -- ) ] unit-test
 
 { 5 1 } [ <constructor-update-2> ] must-infer-as
 
@@ -431,7 +431,7 @@ UNION: redefinition-problem' redefinition-problem integer ;
 
 TUPLE: redefinition-problem-2 ;
 
-"IN: classes.tuple.tests TUPLE: redefinition-problem < redefinition-problem-2 ;" eval
+"IN: classes.tuple.tests TUPLE: redefinition-problem < redefinition-problem-2 ;" eval( -- )
 
 [ t ] [ 3 redefinition-problem'? ] unit-test
 
@@ -472,7 +472,7 @@ USE: vocabs
     ] with-compilation-unit
 ] unit-test
 
-[ "USE: words T{ word }" eval ]
+[ "USE: words T{ word }" eval( -- ) ]
 [ error>> T{ no-method f word new } = ]
 must-fail-with
 
@@ -485,7 +485,7 @@ must-fail-with
 
 [ t ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
 
-: accessor-exists? ( class name -- ? )
+: accessor-exists? ( name -- ? )
     [ "forget-accessors-test" "classes.tuple.tests" lookup ] dip
     ">>" append "accessors" lookup method >boolean ;
 
@@ -520,13 +520,13 @@ TUPLE: another-forget-accessors-test ;
 [ f ] [
     t parser-notes? [
         [
-            "IN: classes.tuple.tests TUPLE: shadow-1 a b ; TUPLE: shadow-2 < shadow-1 a b ;" eval
+            "IN: classes.tuple.tests TUPLE: shadow-1 a b ; TUPLE: shadow-2 < shadow-1 a b ;" eval( -- )
         ] with-string-writer empty?
     ] with-variable
 ] unit-test
 
 ! Missing error check
-[ "IN: classes.tuple.tests USE: words TUPLE: wrong-superclass < word ;" eval ] must-fail
+[ "IN: classes.tuple.tests USE: words TUPLE: wrong-superclass < word ;" eval( -- ) ] must-fail
 
 ! Class forget messyness
 TUPLE: subclass-forget-test ;
@@ -535,7 +535,7 @@ TUPLE: subclass-forget-test-1 < subclass-forget-test ;
 TUPLE: subclass-forget-test-2 < subclass-forget-test ;
 TUPLE: subclass-forget-test-3 < subclass-forget-test-2 ;
 
-[ ] [ "IN: classes.tuple.tests FORGET: subclass-forget-test" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests FORGET: subclass-forget-test" eval( -- ) ] unit-test
 
 [ { subclass-forget-test-2 } ]
 [ subclass-forget-test-2 class-usages ]
@@ -549,7 +549,7 @@ unit-test
 [ f ] [ subclass-forget-test-2 tuple-class? ] unit-test
 [ subclass-forget-test-3 new ] must-fail
 
-[ "IN: classes.tuple.tests TUPLE: subclass-forget-test-4 < subclass-forget-test-2 ;" eval ] must-fail
+[ "IN: classes.tuple.tests TUPLE: subclass-forget-test-4 < subclass-forget-test-2 ;" eval( -- ) ] must-fail
 
 ! More
 DEFER: subclass-reset-test
@@ -562,11 +562,11 @@ GENERIC: break-me ( obj -- )
 [ ] [ [ M\ integer break-me forget ] with-compilation-unit ] unit-test
 
 [ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test ;" <string-reader> "subclass-reset-test" parse-stream drop ] unit-test
-[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-1 < subclass-reset-test ;" eval ] unit-test
-[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-2 < subclass-reset-test ;" eval ] unit-test
-[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-3 < subclass-reset-test-2 ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-1 < subclass-reset-test ;" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-2 < subclass-reset-test ;" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-3 < subclass-reset-test-2 ;" eval( -- ) ] unit-test
 
-[ ] [ "IN: classes.tuple.tests USE: kernel M: subclass-reset-test-1 break-me drop ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests USE: kernel M: subclass-reset-test-1 break-me drop ;" eval( -- ) ] unit-test
 
 [ ] [ "IN: classes.tuple.tests : subclass-reset-test ( -- ) ;" <string-reader> "subclass-reset-test" parse-stream drop ] unit-test
 
@@ -576,7 +576,7 @@ GENERIC: break-me ( obj -- )
 
 [ t ] [ \ break-me "methods" word-prop assoc-empty? ] unit-test
 
-[ ] [ "IN: classes.tuple.tests USE: math USE: kernel M: integer break-me drop ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests USE: math USE: kernel M: integer break-me drop ;" eval( -- ) ] unit-test
 
 [ f ] [ \ break-me "methods" word-prop assoc-empty? ] unit-test
 
@@ -632,7 +632,7 @@ TUPLE: reshape-test x ;
 
 T{ reshape-test f "hi" } "tuple" set
 
-[ ] [ "IN: classes.tuple.tests TUPLE: reshape-test { x read-only } ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: reshape-test { x read-only } ;" eval( -- ) ] unit-test
 
 [ f ] [ \ reshape-test \ (>>x) method ] unit-test
 
@@ -640,11 +640,11 @@ T{ reshape-test f "hi" } "tuple" set
 
 [ "hi" ] [ "tuple" get x>> ] unit-test
 
-[ ] [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x integer read-only } ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x integer read-only } ;" eval( -- ) ] unit-test
 
 [ 0 ] [ "tuple" get x>> ] unit-test
 
-[ ] [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x fixnum initial: 4 read-only } ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x fixnum initial: 4 read-only } ;" eval( -- ) ] unit-test
 
 [ 0 ] [ "tuple" get x>> ] unit-test
 
@@ -660,20 +660,20 @@ ERROR: error-class-test a b c ;
 [ "( a b c -- * )" ] [ \ error-class-test stack-effect effect>string ] unit-test
 [ f ] [ \ error-class-test "inline" word-prop ] unit-test
 
-[ "IN: classes.tuple.tests ERROR: error-x ; : error-x 3 ;" eval ]
+[ "IN: classes.tuple.tests ERROR: error-x ; : error-x 3 ;" eval( -- ) ]
 [ error>> error>> redefine-error? ] must-fail-with
 
 DEFER: error-y
 
 [ ] [ [ \ error-y dup class? [ forget-class ] [ drop ] if ] with-compilation-unit ] unit-test
 
-[ ] [ "IN: classes.tuple.tests GENERIC: error-y ( a -- b )" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests GENERIC: error-y ( a -- b )" eval( -- ) ] unit-test
 
 [ f ] [ \ error-y tuple-class? ] unit-test
 
 [ t ] [ \ error-y generic? ] unit-test
 
-[ ] [ "IN: classes.tuple.tests ERROR: error-y ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests ERROR: error-y ;" eval( -- ) ] unit-test
 
 [ t ] [ \ error-y tuple-class? ] unit-test
 
@@ -694,7 +694,7 @@ DEFER: error-y
 ] unit-test
 
 [ ] [
-    "IN: sequences TUPLE: reversed { seq read-only } ;" eval
+    "IN: sequences TUPLE: reversed { seq read-only } ;" eval( -- )
 ] unit-test
 
 TUPLE: bogus-hashcode-1 x ;
@@ -735,14 +735,14 @@ SLOT: kex
 
 DEFER: redefine-tuple-twice
 
-[ ] [ "IN: classes.tuple.tests TUPLE: redefine-tuple-twice ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: redefine-tuple-twice ;" eval( -- ) ] unit-test
 
 [ t ] [ \ redefine-tuple-twice symbol? ] unit-test
 
-[ ] [ "IN: classes.tuple.tests DEFER: redefine-tuple-twice" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests DEFER: redefine-tuple-twice" eval( -- ) ] unit-test
 
 [ t ] [ \ redefine-tuple-twice deferred? ] unit-test
 
-[ ] [ "IN: classes.tuple.tests TUPLE: redefine-tuple-twice ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: redefine-tuple-twice ;" eval( -- ) ] unit-test
 
 [ t ] [ \ redefine-tuple-twice symbol? ] unit-test

@@ -14,7 +14,7 @@ IN: compiler.tests
     MIXIN: my-mixin
     M: my-mixin my-generic drop 0 ;
     : my-inline ( a -- b ) { my-mixin } declare my-generic ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ ] [
@@ -24,7 +24,7 @@ IN: compiler.tests
     TUPLE: my-tuple ;
     M: my-tuple my-generic drop 1 ;
     INSTANCE: my-tuple my-mixin
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ 1 ] [
