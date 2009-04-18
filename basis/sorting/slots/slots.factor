@@ -12,13 +12,13 @@ IN: sorting.slots
     dup +eq+ eq? [ drop f ] when ;
 
 : slot-comparator ( seq -- quot )
-    [
-        but-last-slice
-        [ '[ [ _ execute( tuple -- value ) ] bi@ ] ] map concat
+    unclip-last-slice [
+        [
+            '[ [ _ execute( tuple -- value ) ] bi@ ]
+        ] map concat
     ] [
-        peek
         '[ _ call( obj1 obj2 -- obj3 obj4 ) _ short-circuit-comparator ]
-    ] bi ;
+    ] bi* ;
 
 PRIVATE>
 
