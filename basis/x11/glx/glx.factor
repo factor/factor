@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! based on glx.h from xfree86, and some of glxtokens.h
-USING: alien alien.c-types alien.syntax x11.xlib namespaces make
+USING: alien alien.c-types alien.syntax x11 x11.xlib namespaces make
 kernel sequences parser words specialized-arrays.int accessors ;
 IN: x11.glx
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays hashtables io kernel math
 math.order namespaces prettyprint sequences strings combinators
-x11.xlib ;
+x11 x11.xlib ;
 IN: x11.events
 
 GENERIC: expose-event ( event window -- )

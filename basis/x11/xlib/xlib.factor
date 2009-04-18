@@ -1412,32 +1412,3 @@ FUNCTION: char* setlocale ( int category, char* name ) ;
 FUNCTION: Bool XSupportsLocale ( ) ;
 
 FUNCTION: char* XSetLocaleModifiers ( char* modifier_list ) ;
-
-SYMBOL: dpy
-SYMBOL: scr
-SYMBOL: root
-
-: init-locale ( -- )
-   LC_ALL "" setlocale [ "setlocale() failed" print flush ] unless
-   XSupportsLocale [ "XSupportsLocale() failed" print flush ] unless ;
-
-: flush-dpy ( -- ) dpy get XFlush drop ;
-
-: x-atom ( string -- atom ) dpy get swap 0 XInternAtom ;
-
-: check-display ( alien -- alien' )
-    [
-        "Cannot connect to X server - check $DISPLAY" throw
-    ] unless* ;
-
-: initialize-x ( display-string -- )
-    init-locale
-    dup [ ascii string>alien ] when
-    XOpenDisplay check-display dpy set-global
-    dpy get XDefaultScreen scr set-global
-    dpy get scr get XRootWindow root set-global ;
-
-: close-x ( -- ) dpy get XCloseDisplay drop ;
-
-: with-x ( display-string quot -- )
-    [ initialize-x ] dip [ close-x ] [ ] cleanup ; inline
