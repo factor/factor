@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar combinators.short-circuit
+USING: accessors arrays calendar combinators.short-circuit fry
 continuations debugger io.directories io.files io.launcher
 io.pathnames io.encodings.ascii kernel make mason.common mason.config
-mason.platform mason.report mason.email namespaces sequences ;
+mason.platform mason.report mason.notify namespaces sequences
+quotations macros ;
 IN: mason.child
 
 : make-cmd ( -- args )
@@ -58,30 +59,18 @@ IN: mason.child
         try-process
     ] with-directory ;
 
-: return-with ( obj -- * ) return-continuation get continue-with ;
+: recover-else ( try catch else -- )
+    [ [ '[ @ f t ] ] [ '[ @ f ] ] bi* recover ] dip '[ drop @ ] when ; inline
 
-: build-clean? ( -- ? )
+MACRO: recover-cond ( alist -- )
+    dup { [ length 1 = ] [ first callable? ] } 1&&
+    [ first ] [ [ first first2 ] [ rest ] bi '[ _ _ [ _ recover-cond ] recover-else ] ] if ;
+
+: build-child ( -- status )
+    copy-image
     {
-        [ load-everything-vocabs-file eval-file empty? ]
-        [ test-all-vocabs-file eval-file empty? ]
-        [ help-lint-vocabs-file eval-file empty? ]
-        [ compiler-errors-file eval-file empty? ]
-        [ benchmark-error-vocabs-file eval-file empty? ]
-    } 0&& ;
-
-: build-child ( -- )
-    [
-        return-continuation set
-
-        copy-image
-
-        [ make-vm ] [ compile-failed-report status-error return-with ] recover
-        [ boot ] [ boot-failed-report status-error return-with ] recover
-        [ test ] [ test-failed-report status-error return-with ] recover
-
-        successful-report
-
-        build-clean? status-clean status-dirty ? return-with
-    ] callcc1
-    status set
-    email-report ;
+        { [ notify-make-vm make-vm ] [ compile-failed ] }
+        { [ notify-boot boot ] [ boot-failed ] }
+        { [ notify-test test ] [ test-failed ] }
+        [ success ]
+    } recover-cond ;
