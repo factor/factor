@@ -5,13 +5,14 @@ io.directories.hierarchy io.files io.launcher kernel
 mason.common mason.config mason.platform namespaces ;
 IN: mason.cleanup
 
+: compress ( filename -- )
+    dup exists? [ "bzip2" swap 2array try-output-process ] [ drop ] if ;
+
 : compress-image ( -- )
-    "bzip2" boot-image-name 2array try-process ;
+    boot-image-name compress ;
 
 : compress-test-log ( -- )
-    "test-log" exists? [
-        { "bzip2" "test-log" } try-process
-    ] when ;
+    "test-log" compress ;
 
 : cleanup ( -- )
     builder-debug get [

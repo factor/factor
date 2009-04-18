@@ -184,6 +184,12 @@ ERROR: download-failed response ;
 : http-put ( post-data url -- response data )
     <put-request> http-request ;
 
+: <delete-request> ( url -- request )
+    "DELETE" <client-request> ;
+
+: http-delete ( url -- response data )
+    <delete-request> http-request ;
+
 USING: vocabs vocabs.loader ;
 
 "debugger" vocab [ "http.client.debugger" require ] when

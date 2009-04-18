@@ -12,7 +12,7 @@ TUPLE: source-file-error error asset file line# ;
 : group-by-source-file ( errors -- assoc )
     H{ } clone [ [ push-at ] curry [ dup file>> ] prepose each ] keep ;
 
-TUPLE: error-type type word plural icon quot forget-quot ;
+TUPLE: error-type type word plural icon quot forget-quot { fatal? initial: t } ;
 
 GENERIC: error-type ( error -- type )
 
@@ -34,12 +34,12 @@ error-types [ V{ } clone ] initialize
     error-types get at icon>> ;
 
 : error-counts ( -- alist )
-    error-types get [ nip dup quot>> call( -- seq ) length ] assoc-map ;
+    error-types get
+    [ nip dup quot>> call( -- seq ) length ] assoc-map
+    [ [ fatal?>> ] [ 0 > ] bi* and ] assoc-filter ;
 
 : error-summary ( -- )
-    error-counts
-    [ nip 0 > ] assoc-filter
-    [
+    error-counts [
         over
         [ word>> write ]
         [ " - show " write number>string write bl ]

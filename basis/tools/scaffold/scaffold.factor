@@ -24,6 +24,9 @@ ERROR: no-vocab vocab ;
 
 : contains-separator? ( string -- ? ) [ path-separator? ] any? ;
 
+: ensure-vocab-exists ( string -- string )
+    dup vocabs member? [ no-vocab ] unless ;
+
 : check-vocab-name ( string -- string )
     [ ]
     [ contains-dot? [ vocab-name-contains-dot ] when ]
@@ -234,6 +237,7 @@ PRIVATE>
     [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
 
 : scaffold-help ( vocab -- )
+    ensure-vocab-exists
     [
         dup "-docs.factor" vocab/suffix>path scaffolding? [
             set-scaffold-docs-file
@@ -268,6 +272,7 @@ PRIVATE>
 PRIVATE>
 
 : scaffold-tests ( vocab -- )
+    ensure-vocab-exists
     dup "-tests.factor" vocab/suffix>path
     scaffolding? [
         set-scaffold-tests-file
