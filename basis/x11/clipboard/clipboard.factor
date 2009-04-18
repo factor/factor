@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax arrays
 kernel math namespaces sequences io.encodings.string
-io.encodings.utf8 io.encodings.ascii x11.xlib x11.constants
+io.encodings.utf8 io.encodings.ascii x11 x11.xlib x11.constants
 specialized-arrays.int accessors ;
 IN: x11.clipboard
 
