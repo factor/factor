@@ -44,6 +44,7 @@ T{ error-type
    { icon "vocab:ui/tools/error-list/icons/linkage-error.tiff" }
    { quot [ +linkage-error+ errors-of-type values ] }
    { forget-quot [ compiler-errors get delete-at ] }
+   { fatal? f }
 } define-error-type
 
 : <compiler-error> ( error word -- compiler-error )

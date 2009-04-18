@@ -92,11 +92,9 @@ file-chooser H{
 ;
 
 : fc-load-file ( file-chooser file -- )
-  dupd [ selected-file>> ] [ name>> ] bi* swap set-model 
-  [ path>> value>> ] 
-  [ selected-file>> value>> append ] 
-  [ hook>> ] tri
-  call
+  over [ name>> ] [ selected-file>> ] bi* set-model 
+  [ [ path>> value>> ] [ selected-file>> value>> ] bi append ] [ hook>> ] bi
+  call( path -- )
 ; inline
 
 ! : fc-ok-action ( file-chooser -- quot )

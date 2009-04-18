@@ -29,10 +29,10 @@ M: method-forget-class method-forget-test ;
 ] unit-test
 
 ! Minor leak
-[ ] [ "IN: classes.tests TUPLE: forget-me ;" eval ] unit-test
+[ ] [ "IN: classes.tests TUPLE: forget-me ;" eval( -- ) ] unit-test
 [ ] [ f \ word set-global ] unit-test
-[ ] [ "IN: classes.tests USE: kernel USE: classes.algebra forget-me tuple class<= drop" eval ] unit-test
-[ ] [ "IN: classes.tests FORGET: forget-me" eval ] unit-test
+[ ] [ "IN: classes.tests USE: kernel USE: classes.algebra forget-me tuple class<= drop" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tests FORGET: forget-me" eval( -- ) ] unit-test
 [ 0 ] [
     [ word? ] instances
     [ [ name>> "forget-me" = ] [ vocabulary>> "classes.tests" = ] bi and ] count

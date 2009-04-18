@@ -160,7 +160,8 @@ void copy_roots(void)
 		copy_handle(&stacks->catchstack_save);
 		copy_handle(&stacks->current_callback_save);
 
-		mark_active_blocks(stacks);
+		if(!performing_compaction)
+			mark_active_blocks(stacks);
 
 		stacks = stacks->next;
 	}

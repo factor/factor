@@ -14,7 +14,7 @@ IN: compiler.tests
     GENERIC: my-generic ( a -- b )
     M: object my-generic [ <=> ] sort ;
     : my-inline ( a -- b ) my-generic ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ ] [
@@ -23,7 +23,7 @@ IN: compiler.tests
     IN: compiler.tests.redefine5
     TUPLE: my-tuple ;
     M: my-tuple my-generic drop 0 ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ 0 ] [

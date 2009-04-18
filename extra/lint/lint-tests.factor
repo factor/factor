@@ -2,7 +2,7 @@ USING: io lint kernel math tools.test ;
 IN: lint.tests
 
 ! Don't write code like this
-: lint1 ( -- ) [ "hi" print ] [ ] if ; ! when
+: lint1 ( obj -- ) [ "hi" print ] [ ] if ; ! when
 
 [ { { lint1 { [ [ ] if ] } } } ] [ \ lint1 lint-word ] unit-test
 

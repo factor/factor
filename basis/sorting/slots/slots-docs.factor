@@ -14,7 +14,7 @@ HELP: compare-slots
 HELP: sort-by-slots
 { $values
      { "seq" sequence } { "sort-specs" "a sequence of accessors ending with a comparator" }
-     { "sortedseq" sequence }
+     { "seq'" sequence }
 }
 { $description "Sorts a sequence of tuples by the sort-specs in " { $snippet "sort-spec" } ". A sort-spec is a sequence of slot accessors ending in a comparator." }
 { $examples
@@ -42,7 +42,7 @@ HELP: split-by-slots
 HELP: sort-by
 { $values
     { "seq" sequence } { "sort-seq" "a sequence of comparators" }
-    { "sortedseq" sequence }
+    { "seq'" sequence }
 }
 { $description "Sorts a sequence by comparing elements by comparators, using subsequent comparators when there is a tie." } ;
 

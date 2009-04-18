@@ -12,7 +12,7 @@ IN: compiler.tests
     IN: compiler.tests.folding
     GENERIC: foldable-generic ( a -- b ) foldable
     M: integer foldable-generic f <array> ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ ] [
@@ -20,7 +20,7 @@ IN: compiler.tests
     USING: math arrays ;
     IN: compiler.tests.folding
     : fold-test ( -- x ) 10 foldable-generic ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ t ] [

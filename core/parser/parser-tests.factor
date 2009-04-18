@@ -10,43 +10,43 @@ IN: parser.tests
 
 [
     [ 1 [ 2 [ 3 ] 4 ] 5 ]
-    [ "1\n[\n2\n[\n3\n]\n4\n]\n5" eval ]
+    [ "1\n[\n2\n[\n3\n]\n4\n]\n5" eval( -- a b c ) ]
     unit-test
 
     [ t t f f ]
-    [ "t t f f" eval ]
+    [ "t t f f" eval( -- ? ? ? ? ) ]
     unit-test
 
     [ "hello world" ]
-    [ "\"hello world\"" eval ]
+    [ "\"hello world\"" eval( -- string ) ]
     unit-test
 
     [ "\n\r\t\\" ]
-    [ "\"\\n\\r\\t\\\\\"" eval ]
+    [ "\"\\n\\r\\t\\\\\"" eval( -- string ) ]
     unit-test
 
     [ "hello world" ]
     [
         "IN: parser.tests : hello ( -- str ) \"hello world\" ;"
-        eval "USE: parser.tests hello" eval
+        eval( -- ) "USE: parser.tests hello" eval( -- string )
     ] unit-test
 
     [ ]
-    [ "! This is a comment, people." eval ]
+    [ "! This is a comment, people." eval( -- ) ]
     unit-test
 
     ! Test escapes
 
     [ " " ]
-    [ "\"\\u000020\"" eval ]
+    [ "\"\\u000020\"" eval( -- string ) ]
     unit-test
 
     [ "'" ]
-    [ "\"\\u000027\"" eval ]
+    [ "\"\\u000027\"" eval( -- string ) ]
     unit-test
 
     ! Test EOL comments in multiline strings.
-    [ "Hello" ] [ "#! This calls until-eol.\n\"Hello\"" eval ] unit-test
+    [ "Hello" ] [ "#! This calls until-eol.\n\"Hello\"" eval( -- string ) ] unit-test
 
     [ word ] [ \ f class ] unit-test
 
@@ -68,7 +68,7 @@ IN: parser.tests
     [ \ baz "declared-effect" word-prop terminated?>> ]
     unit-test
 
-    [ ] [ "IN: parser.tests USE: math : effect-parsing-test ( a b -- d ) - ;" eval ] unit-test
+    [ ] [ "IN: parser.tests USE: math : effect-parsing-test ( a b -- d ) - ;" eval( -- ) ] unit-test
 
     [ t ] [
         "effect-parsing-test" "parser.tests" lookup
@@ -79,14 +79,14 @@ IN: parser.tests
     [ \ effect-parsing-test "declared-effect" word-prop ] unit-test
 
     ! Funny bug
-    [ 2 ] [ "IN: parser.tests : \0. ( -- x ) 2 ; \0." eval ] unit-test
+    [ 2 ] [ "IN: parser.tests : \0. ( -- x ) 2 ; \0." eval( -- n ) ] unit-test
 
-    [ "IN: parser.tests : missing-- ( a b ) ;" eval ] must-fail
+    [ "IN: parser.tests : missing-- ( a b ) ;" eval( -- ) ] must-fail
 
     ! These should throw errors
-    [ "HEX: zzz" eval ] must-fail
-    [ "OCT: 999" eval ] must-fail
-    [ "BIN: --0" eval ] must-fail
+    [ "HEX: zzz" eval( -- obj ) ] must-fail
+    [ "OCT: 999" eval( -- obj ) ] must-fail
+    [ "BIN: --0" eval( -- obj ) ] must-fail
 
     ! Another funny bug
     [ t ] [
@@ -102,14 +102,14 @@ IN: parser.tests
     ] unit-test
     DEFER: foo
 
-    "IN: parser.tests USING: math prettyprint ; SYNTAX: foo 2 2 + . ;" eval
+    "IN: parser.tests USING: math prettyprint ; SYNTAX: foo 2 2 + . ;" eval( -- )
 
-    [ ] [ "USE: parser.tests foo" eval ] unit-test
+    [ ] [ "USE: parser.tests foo" eval( -- ) ] unit-test
 
-    "IN: parser.tests USING: math prettyprint ; : foo ( -- ) 2 2 + . ;" eval
+    "IN: parser.tests USING: math prettyprint ; : foo ( -- ) 2 2 + . ;" eval( -- )
 
     [ t ] [
-        "USE: parser.tests \\ foo" eval
+        "USE: parser.tests \\ foo" eval( -- word )
         "foo" "parser.tests" lookup eq?
     ] unit-test
 
@@ -269,12 +269,12 @@ IN: parser.tests
     ] unit-test
 
     [ ] [
-        "IN: parser.tests : <bogus-error> ( -- ) ; : bogus ( -- ) <bogus-error> ;"
+        "IN: parser.tests : <bogus-error> ( -- ) ; : bogus ( -- error ) <bogus-error> ;"
         <string-reader> "bogus-error" parse-stream drop
     ] unit-test
 
     [ ] [
-        "IN: parser.tests TUPLE: bogus-error ; C: <bogus-error> bogus-error : bogus ( -- ) <bogus-error> ;"
+        "IN: parser.tests TUPLE: bogus-error ; C: <bogus-error> bogus-error : bogus ( -- error ) <bogus-error> ;"
         <string-reader> "bogus-error" parse-stream drop
     ] unit-test
 
@@ -339,16 +339,16 @@ IN: parser.tests
     ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
-        "IN: parser.tests : foo ( x y -- z ) 1 2 ; : bar ( a -- b ) ;" eval
+        "IN: parser.tests : foo ( x y -- z ) 1 2 ; : bar ( a -- b ) ;" eval( -- )
     ] unit-test
 
     [
-        "IN: parser.tests : foo ( x y -- z) 1 2 ; : bar ( a -- b ) ;" eval
+        "IN: parser.tests : foo ( x y -- z) 1 2 ; : bar ( a -- b ) ;" eval( -- )
     ] must-fail
 ] with-file-vocabs
 
 [ ] [
-    "IN: parser.tests USE: kernel PREDICATE: foo < object ( x -- y ) ;" eval
+    "IN: parser.tests USE: kernel PREDICATE: foo < object ( x -- y ) ;" eval( -- )
 ] unit-test
 
 [ t ] [
@@ -422,31 +422,31 @@ IN: parser.tests
 ] unit-test
 
 [
-    "USE: this-better-not-exist" eval
+    "USE: this-better-not-exist" eval( -- )
 ] must-fail
 
-[ ": foo ;" eval ] [ error>> error>> no-current-vocab? ] must-fail-with
+[ ": foo ;" eval( -- ) ] [ error>> error>> no-current-vocab? ] must-fail-with
 
-[ 92 ] [ "CHAR: \\" eval ] unit-test
-[ 92 ] [ "CHAR: \\\\" eval ] unit-test
+[ 92 ] [ "CHAR: \\" eval( -- n ) ] unit-test
+[ 92 ] [ "CHAR: \\\\" eval( -- n ) ] unit-test
 
 [ ] [
     {
         "IN: parser.tests"
-        "USING: math arrays ;"
-        "GENERIC: change-combination ( a -- b )"
-        "M: integer change-combination 1 ;"
-        "M: array change-combination 2 ;"
+        "USING: math arrays kernel ;"
+        "GENERIC: change-combination ( obj a -- b )"
+        "M: integer change-combination 2drop 1 ;"
+        "M: array change-combination 2drop 2 ;"
     } "\n" join <string-reader> "change-combination-test" parse-stream drop
 ] unit-test
 
 [ ] [
     {
         "IN: parser.tests"
-        "USING: math arrays ;"
-        "GENERIC# change-combination 1 ( a -- b )"
-        "M: integer change-combination 1 ;"
-        "M: array change-combination 2 ;"
+        "USING: math arrays kernel ;"
+        "GENERIC# change-combination 1 ( obj a -- b )"
+        "M: integer change-combination 2drop 1 ;"
+        "M: array change-combination 2drop 2 ;"
     } "\n" join <string-reader> "change-combination-test" parse-stream drop
 ] unit-test
 
@@ -463,7 +463,7 @@ IN: parser.tests
 ] unit-test
 
 [ [ ] ] [
-    "IN: parser.tests : staging-problem-test-1 ( -- ) 1 ; : staging-problem-test-2 ( -- ) staging-problem-test-1 ;"
+    "IN: parser.tests : staging-problem-test-1 ( -- a ) 1 ; : staging-problem-test-2 ( -- a ) staging-problem-test-1 ;"
     <string-reader> "staging-problem-test" parse-stream
 ] unit-test
 
@@ -472,7 +472,7 @@ IN: parser.tests
 [ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
 
 [ [ ] ] [
-    "IN: parser.tests << : staging-problem-test-1 ( -- ) 1 ; >> : staging-problem-test-2 ( -- ) staging-problem-test-1 ;"
+    "IN: parser.tests << : staging-problem-test-1 ( -- a ) 1 ; >> : staging-problem-test-2 ( -- a ) staging-problem-test-1 ;"
     <string-reader> "staging-problem-test" parse-stream
 ] unit-test
 
@@ -480,10 +480,10 @@ IN: parser.tests
 
 [ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
 
-[ "DEFER: blahy" eval ] [ error>> error>> no-current-vocab? ] must-fail-with
+[ "DEFER: blahy" eval( -- ) ] [ error>> error>> no-current-vocab? ] must-fail-with
 
 [
-    "IN: parser.tests SYNTAX: blahy ; FORGET: blahy" eval
+    "IN: parser.tests SYNTAX: blahy ; FORGET: blahy" eval( -- )
 ] [
     error>> staging-violation?
 ] must-fail-with
@@ -491,12 +491,12 @@ IN: parser.tests
 ! Bogus error message
 DEFER: blahy
 
-[ "IN: parser.tests USE: kernel TUPLE: blahy < tuple ; : blahy ( -- ) ; TUPLE: blahy < tuple ; : blahy ( -- ) ;" eval ]
+[ "IN: parser.tests USE: kernel TUPLE: blahy < tuple ; : blahy ( -- ) ; TUPLE: blahy < tuple ; : blahy ( -- ) ;" eval( -- ) ]
 [ error>> error>> def>> \ blahy eq? ] must-fail-with
 
 [ ] [ f lexer set f file set "Hello world" note. ] unit-test
 
-[ "CHAR: \\u9999999999999" eval ] must-fail
+[ "CHAR: \\u9999999999999" eval( -- n ) ] must-fail
 
 SYMBOLS: a b c ;
 
@@ -506,15 +506,15 @@ SYMBOLS: a b c ;
 
 DEFER: blah
 
-[ ] [ "IN: parser.tests GENERIC: blah ( -- )" eval ] unit-test
-[ ] [ "IN: parser.tests SYMBOLS: blah ;" eval ] unit-test
+[ ] [ "IN: parser.tests GENERIC: blah ( -- )" eval( -- ) ] unit-test
+[ ] [ "IN: parser.tests SYMBOLS: blah ;" eval( -- ) ] unit-test
 
 [ f ] [ \ blah generic? ] unit-test
 [ t ] [ \ blah symbol? ] unit-test
 
 DEFER: blah1
 
-[ "IN: parser.tests SINGLETONS: blah1 blah1 blah1 ;" eval ]
+[ "IN: parser.tests SINGLETONS: blah1 blah1 blah1 ;" eval( -- ) ]
 [ error>> error>> def>> \ blah1 eq? ]
 must-fail-with
 
@@ -545,10 +545,10 @@ EXCLUDE: qualified.tests.bar => x ;
 [ 3 ] [ x ] unit-test
 [ 4 ] [ y ] unit-test
 
-[ "IN: qualified.tests FROM: qualified.tests => doesnotexist ;" eval ]
+[ "IN: qualified.tests FROM: qualified.tests => doesnotexist ;" eval( -- ) ]
 [ error>> no-word-error? ] must-fail-with
 
-[ "IN: qualified.tests RENAME: doesnotexist qualified.tests => blahx" eval ]
+[ "IN: qualified.tests RENAME: doesnotexist qualified.tests => blahx" eval( -- ) ]
 [ error>> no-word-error? ] must-fail-with
 
 ! Two similar bugs

@@ -261,7 +261,7 @@ M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
 
 CONSTANT: new-definition "USING: math ;\nIN: locals.tests\n: a-word-with-locals ( -- x ) 2 3 + ;\n"
 
-[ ] [ new-definition eval ] unit-test
+[ ] [ new-definition eval( -- ) ] unit-test
 
 [ t ] [
     [ \ a-word-with-locals see ] with-string-writer
@@ -461,7 +461,7 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 
 [
     "USING: locals fry math ; 1 '[ [let | A [ 10 ] | A _ + ] ]"
-    eval call
+    eval( -- ) call
 ] [ error>> >r/r>-in-fry-error? ] must-fail-with
     
 :: (funny-macro-test) ( obj quot -- ? ) obj { quot } 1&& ; inline
@@ -473,10 +473,10 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ f ] [ 2 funny-macro-test ] unit-test
 
 ! Some odd parser corner cases
-[ "USE: locals [let" eval ] [ error>> unexpected-eof? ] must-fail-with
-[ "USE: locals [let |" eval ] [ error>> unexpected-eof? ] must-fail-with
-[ "USE: locals [let | a" eval ] [ error>> unexpected-eof? ] must-fail-with
-[ "USE: locals [|" eval ] [ error>> unexpected-eof? ] must-fail-with
+[ "USE: locals [let" eval( -- ) ] [ error>> unexpected-eof? ] must-fail-with
+[ "USE: locals [let |" eval( -- ) ] [ error>> unexpected-eof? ] must-fail-with
+[ "USE: locals [let | a" eval( -- ) ] [ error>> unexpected-eof? ] must-fail-with
+[ "USE: locals [|" eval( -- ) ] [ error>> unexpected-eof? ] must-fail-with
 
 [ 25 ] [ 5 [| a | { [ a sq ] } cond ] call ] unit-test
 [ 25 ] [ 5 [| | { [| a | a sq ] } ] call first call ] unit-test
@@ -491,19 +491,19 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 
 [ 3 ] [ 3 [| a | \ a ] call ] unit-test
 
-[ "USE: locals [| | { [let | a [ 0 ] | a ] } ]" eval ] must-fail
+[ "USE: locals [| | { [let | a [ 0 ] | a ] } ]" eval( -- ) ] must-fail
 
-[ "USE: locals [| | { [wlet | a [ 0 ] | a ] } ]" eval ] must-fail
+[ "USE: locals [| | { [wlet | a [ 0 ] | a ] } ]" eval( -- ) ] must-fail
 
-[ "USE: locals [| | { [let* | a [ 0 ] | a ] } ]" eval ] must-fail
+[ "USE: locals [| | { [let* | a [ 0 ] | a ] } ]" eval( -- ) ] must-fail
 
-[ "USE: locals [| | [let | a! [ 0 ] | { a! } ] ]" eval ] must-fail
+[ "USE: locals [| | [let | a! [ 0 ] | { a! } ] ]" eval( -- ) ] must-fail
 
-[ "USE: locals [| | [wlet | a [ 0 ] | { a } ] ]" eval ] must-fail
+[ "USE: locals [| | [wlet | a [ 0 ] | { a } ] ]" eval( -- ) ] must-fail
 
-[ "USE: locals [| | { :> a } ]" eval ] must-fail
+[ "USE: locals [| | { :> a } ]" eval( -- ) ] must-fail
 
-[ "USE: locals 3 :> a" eval ] must-fail
+[ "USE: locals 3 :> a" eval( -- ) ] must-fail
 
 [ 3 ] [ 3 [| | :> a a ] call ] unit-test
 
