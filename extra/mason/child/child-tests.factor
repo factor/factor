@@ -1,5 +1,5 @@
 IN: mason.child.tests
-USING: mason.child mason.config tools.test namespaces ;
+USING: mason.child mason.config tools.test namespaces io kernel sequences ;
 
 [ { "make" "winnt-x86-32" } ] [
     [
