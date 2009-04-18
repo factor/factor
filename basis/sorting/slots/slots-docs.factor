@@ -18,7 +18,7 @@ HELP: sort-by-slots
 }
 { $description "Sorts a sequence of tuples by the sort-specs in " { $snippet "sort-spec" } ". A sort-spec is a sequence of slot accessors ending in a comparator." }
 { $examples
-    "Sort by slot c, then b descending:"
+    "Sort by slot a, then b descending:"
     { $example
         "USING: accessors math.order prettyprint sorting.slots ;"
         "IN: scratchpad"
