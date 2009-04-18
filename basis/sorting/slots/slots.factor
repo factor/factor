@@ -9,7 +9,7 @@ IN: sorting.slots
 
 : short-circuit-comparator ( obj1 obj2 word --  comparator/? )
     execute( obj1 obj2 -- obj3 )
-    dup +eq+ eq? [ drop f ] when ; inline
+    dup +eq+ eq? [ drop f ] when ;
 
 : slot-comparator ( seq -- quot )
     [
@@ -17,12 +17,12 @@ IN: sorting.slots
         [ '[ [ _ execute( tuple -- value ) ] bi@ ] ] map concat
     ] [
         peek
-        '[ @ _ short-circuit-comparator ]
+        '[ _ call( obj1 obj2 -- obj3 obj4 ) _ short-circuit-comparator ]
     ] bi ;
 
 PRIVATE>
 
-MACRO: compare-slots ( sort-specs -- <=> )
+MACRO: compare-slots ( sort-specs -- quot )
     #! sort-spec: { accessors comparator }
     [ slot-comparator ] map '[ _ 2|| +eq+ or ] ;
 
