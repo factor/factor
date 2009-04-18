@@ -12,20 +12,20 @@ IN: mason.email
     <email>
         builder-from get >>from
         builder-recipients get >>to
-        swap >>content-type
         swap prefix-subject >>subject
+        swap >>content-type
         swap >>body
     send-email ;
 
-: subject ( -- str )
-    status get {
+: subject ( status -- str )
+    {
         { status-clean [ "clean" ] }
         { status-dirty [ "dirty" ] }
         { status-error [ "error" ] }
     } case ;
 
-: email-report ( -- )
-    "report" utf8 file-contents "text/html" subject email-status ;
+: email-report ( report status -- )
+    [ "text/html" ] dip subject email-status ;
 
 : email-error ( error callstack -- )
     [

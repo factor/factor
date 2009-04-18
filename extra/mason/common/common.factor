@@ -4,15 +4,27 @@ USING: kernel namespaces sequences splitting system accessors
 math.functions make io io.files io.pathnames io.directories
 io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
 combinators.short-circuit parser combinators calendar
-calendar.format arrays mason.config locals system ;
+calendar.format arrays mason.config locals system debugger ;
 IN: mason.common
+
+ERROR: output-process-error output process ;
+
+M: output-process-error error.
+    [ "Process:" print process>> . nl ]
+    [ "Output:" print output>> print ]
+    bi ;
+
+: try-output-process ( command -- )
+    >process +stdout+ >>stderr utf8 <process-reader*>
+    [ contents ] [ dup wait-for-process ] bi*
+    0 = [ 2drop ] [ output-process-error ] if ;
 
 HOOK: really-delete-tree os ( path -- )
 
 M: windows really-delete-tree
     #! Workaround: Cygwin GIT creates read-only files for
     #! some reason.
-    [ { "chmod" "ug+rw" "-R" } swap (normalize-path) suffix try-process ]
+    [ { "chmod" "ug+rw" "-R" } swap (normalize-path) suffix try-output-process ]
     [ delete-tree ]
     bi ;
 
@@ -23,7 +35,7 @@ M: unix really-delete-tree delete-tree ;
     <process>
         swap >>command
         15 minutes >>timeout
-    try-process ;
+    try-output-process ;
 
 :: upload-safely ( local username host remote -- )
     [let* | temp [ remote ".incomplete" append ]
@@ -68,7 +80,7 @@ SYMBOL: stamp
 : prepare-build-machine ( -- )
     builds-dir get make-directories
     builds-dir get
-    [ { "git" "clone" "git://factorcode.org/git/factor.git" } try-process ]
+    [ { "git" "clone" "git://factorcode.org/git/factor.git" } try-output-process ]
     with-directory ;
 
 : git-id ( -- id )
@@ -100,8 +112,6 @@ CONSTANT: html-help-time-file "html-help-time"
 CONSTANT: benchmarks-file "benchmarks"
 CONSTANT: benchmark-error-messages-file "benchmark-error-messages"
 CONSTANT: benchmark-error-vocabs-file "benchmark-error-vocabs"
-
-SYMBOL: status
 
 SYMBOL: status-error ! didn't bootstrap, or crashed
 SYMBOL: status-dirty ! bootstrapped but not all tests passed
