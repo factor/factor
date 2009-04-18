@@ -149,21 +149,23 @@ void copy_roots(void)
 	copy_registered_locals();
 	copy_stack_elements(extra_roots_region,extra_roots);
 
-	save_stacks();
-	F_CONTEXT *stacks = stack_chain;
-
-	while(stacks)
+	if(!performing_compaction)
 	{
-		copy_stack_elements(stacks->datastack_region,stacks->datastack);
-		copy_stack_elements(stacks->retainstack_region,stacks->retainstack);
+		save_stacks();
+		F_CONTEXT *stacks = stack_chain;
 
-		copy_handle(&stacks->catchstack_save);
-		copy_handle(&stacks->current_callback_save);
+		while(stacks)
+		{
+			copy_stack_elements(stacks->datastack_region,stacks->datastack);
+			copy_stack_elements(stacks->retainstack_region,stacks->retainstack);
 
-		if(!performing_compaction)
+			copy_handle(&stacks->catchstack_save);
+			copy_handle(&stacks->current_callback_save);
+
 			mark_active_blocks(stacks);
 
-		stacks = stacks->next;
+			stacks = stacks->next;
+		}
 	}
 
 	int i;

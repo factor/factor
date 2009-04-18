@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types combinators kernel locals math math.ranges openal sequences sequences.merged ;
+USING: accessors alien.c-types combinators kernel locals math math.ranges openal sequences sequences.merged specialized-arrays.uchar specialized-arrays.short ;
 IN: synth.buffers
 
 TUPLE: buffer sample-freq 8bit? id ;
@@ -57,11 +57,11 @@ M: 8bit-stereo-buffer buffer-data
 M: 16bit-stereo-buffer buffer-data
     interleaved-stereo-data 16bit-buffer-data ;
 
-: telephone-sample-freq 8000 ;
-: half-sample-freq 22050 ;
-: cd-sample-freq 44100 ;
-: digital-sample-freq 48000 ;
-: professional-sample-freq 88200 ;
+: telephone-sample-freq ( -- n ) 8000 ;
+: half-sample-freq ( -- n ) 22050 ;
+: cd-sample-freq ( -- n ) 44100 ;
+: digital-sample-freq ( -- n ) 48000 ;
+: professional-sample-freq ( -- n ) 88200 ;
 
 : send-buffer ( buffer -- buffer )
     {

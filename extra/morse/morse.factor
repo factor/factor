@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators hashtables kernel lists math
+USING: accessors ascii assocs combinators hashtables kernel lists math
 namespaces make openal parser-combinators promises sequences
-strings symbols synth synth.buffers unicode.case ;
+strings synth synth.buffers unicode.case ;
 IN: morse
 
 <PRIVATE
@@ -135,7 +135,7 @@ SYMBOLS: source dot-buffer dash-buffer intra-char-gap-buffer letter-gap-buffer ;
 : intra-char-gap ( -- ) intra-char-gap-buffer queue ;
 : letter-gap ( -- ) letter-gap-buffer queue ;
 
-: beep-freq 880 ;
+: beep-freq ( -- n ) 880 ;
 
 : <morse-buffer> ( -- buffer )
     half-sample-freq <8bit-mono-buffer> ;
@@ -160,7 +160,7 @@ SYMBOLS: source dot-buffer dash-buffer intra-char-gap-buffer letter-gap-buffer ;
         init-openal 1 gen-sources first source set make-buffers
         call
         source get source-play
-    ] with-scope ;
+    ] with-scope ; inline
 
 : play-char ( ch -- )
     [ intra-char-gap ] [
@@ -176,7 +176,7 @@ PRIVATE>
 : play-as-morse* ( str unit-length -- )
     [
         [ letter-gap ] [ ch>morse play-char ] interleave
-    ] swap playing-morse ;
+    ] swap playing-morse ; inline
 
 : play-as-morse ( str -- )
-    0.05 play-as-morse* ;
+    0.05 play-as-morse* ; inline
