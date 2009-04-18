@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays compiler.units continuations debugger
 fuel.pprint io io.streams.string kernel namespaces parser sequences
-vectors vocabs.parser ;
+vectors vocabs.parser eval fry ;
 
 IN: fuel.eval
 
@@ -55,21 +55,20 @@ t fuel-eval-res-flag set-global
 : (fuel-end-eval) ( output -- )
     fuel-eval-output set-global fuel-send-retort fuel-pop-status ; inline
 
-: (fuel-eval) ( lines -- )
-    [ [ parse-lines ] with-compilation-unit call ] curry
-    [ print-error ] recover ; inline
+: (fuel-eval) ( string -- )
+    '[ _ eval( -- ) ] try ;
 
 : (fuel-eval-each) ( lines -- )
-    [ 1vector (fuel-eval) ] each ; inline
+    [ (fuel-eval) ] each ;
 
 : (fuel-eval-usings) ( usings -- )
-    [ "USING: " prepend " ;" append ] map
+    [ "USE: " prepend ] map
     (fuel-eval-each) fuel-forget-error fuel-forget-output ;
 
 : (fuel-eval-in) ( in -- )
-    [ dup "IN: " prepend 1vector (fuel-eval) in set ] when* ; inline
+    [ dup "IN: " prepend (fuel-eval) in set ] when* ;
 
 : (fuel-eval-in-context) ( lines in usings -- )
     (fuel-begin-eval)
-    [ (fuel-eval-usings) (fuel-eval-in) (fuel-eval) ] with-string-writer
+    [ (fuel-eval-usings) (fuel-eval-in) "\n" join (fuel-eval) ] with-string-writer
     (fuel-end-eval) ;
