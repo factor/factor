@@ -45,10 +45,10 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 : do-benchmarks ( -- )
     run-benchmarks
-    [
+    [ benchmarks-file to-file ] [
         [ keys benchmark-error-vocabs-file to-file ]
         [ benchmark-error-messages-file utf8 [ benchmark-errors. ] with-file-writer ] bi
-    ] [ benchmarks-file to-file ] bi* ;
+    ] bi* ;
 
 : benchmark-ms ( quot -- ms )
     benchmark 1000 /i ; inline
