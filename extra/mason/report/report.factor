@@ -3,7 +3,7 @@
 USING: benchmark combinators.smart debugger fry io assocs
 io.encodings.utf8 io.files io.sockets io.streams.string kernel
 locals mason.common mason.config mason.platform math namespaces
-prettyprint sequences xml.syntax xml.writer ;
+prettyprint sequences xml.syntax xml.writer combinators.short-circuit ;
 IN: mason.report
 
 : common-report ( -- xml )
@@ -30,7 +30,7 @@ IN: mason.report
         pprint-xml
     ] with-file-writer ; inline
 
-:: failed-report ( error file what -- )
+:: failed-report ( error file what -- status )
     [
         error [ error. ] with-string-writer :> error
         file utf8 file-contents 400 short tail* :> output
@@ -42,15 +42,16 @@ IN: mason.report
         Launcher error:
         <pre><-error-></pre>
         XML]
-    ] with-report ;
+    ] with-report
+    status-error ;
 
-: compile-failed-report ( error -- )
+: compile-failed ( error -- status )
     "compile-log" "VM compilation failed" failed-report ;
 
-: boot-failed-report ( error -- )
+: boot-failed ( error -- status )
     "boot-log" "Bootstrap failed" failed-report ;
 
-: test-failed-report ( error -- )
+: test-failed ( error -- status )
     "test-log" "Tests failed" failed-report ;
 
 : timings-table ( -- xml )
@@ -66,7 +67,7 @@ IN: mason.report
         [XML <tr><td><-></td><td><-></td></tr> XML]
     ] map [XML <h2>Timings</h2> <table><-></table> XML] ;
 
-: fail-dump ( heading vocabs-file messages-file -- xml )
+: error-dump ( heading vocabs-file messages-file -- xml )
     [ eval-file ] dip over empty? [ 3drop f ] [
         [ ]
         [ [ [XML <li><-></li> XML] ] map [XML <ul><-></ul> XML] ]
@@ -89,29 +90,41 @@ IN: mason.report
             "Load failures"
             load-everything-vocabs-file
             load-everything-errors-file
-            fail-dump
+            error-dump
 
             "Compiler warnings and errors"
             compiler-errors-file
             compiler-error-messages-file
-            fail-dump
+            error-dump
 
             "Unit test failures"
             test-all-vocabs-file
             test-all-errors-file
-            fail-dump
+            error-dump
             
             "Help lint failures"
             help-lint-vocabs-file
             help-lint-errors-file
-            fail-dump
+            error-dump
 
             "Benchmark errors"
             benchmark-error-vocabs-file
             benchmark-error-messages-file
-            fail-dump
+            error-dump
             
             "Benchmark timings"
             benchmarks-file eval-file benchmarks-table
         ] output>array
     ] with-report ;
+
+: build-clean? ( -- ? )
+    {
+        [ load-everything-vocabs-file eval-file empty? ]
+        [ test-all-vocabs-file eval-file empty? ]
+        [ help-lint-vocabs-file eval-file empty? ]
+        [ compiler-errors-file eval-file empty? ]
+        [ benchmark-error-vocabs-file eval-file empty? ]
+    } 0&& ;
+
+: success ( -- status )
+    successful-report build-clean? status-clean status-dirty ? ;
