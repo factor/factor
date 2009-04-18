@@ -63,6 +63,7 @@ IN: mason.report
         benchmark-time-file
         html-help-time-file
     } [
+        execute( -- string )
         dup utf8 file-contents milli-seconds>time
         [XML <tr><td><-></td><td><-></td></tr> XML]
     ] map [XML <h2>Timings</h2> <table><-></table> XML] ;
