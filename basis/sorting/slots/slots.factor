@@ -7,7 +7,7 @@ IN: sorting.slots
 
 <PRIVATE
 
-: short-circuit-comparator ( obj1 obj2 word --  comparator/? )
+: short-circuit-comparator ( obj1 obj2 word -- comparator/? )
     execute( obj1 obj2 -- obj3 )
     dup +eq+ eq? [ drop f ] when ;
 
