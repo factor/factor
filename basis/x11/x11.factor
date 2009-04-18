@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings continuations io io.backend
-io.encodings.ascii kernel namespaces x11.xlib
-vocabs vocabs.loader calendar threads ;
+USING: alien.strings continuations io
+io.encodings.ascii kernel namespaces x11.xlib x11.io
+vocabs vocabs.loader ;
 IN: x11
 
 SYMBOL: dpy
@@ -19,18 +19,6 @@ SYMBOL: root
 
 : check-display ( alien -- alien' )
     [ "Cannot connect to X server - check $DISPLAY" throw ] unless* ;
-
-HOOK: init-x-io io-backend ( -- )
-
-M: object init-x-io ;
-
-HOOK: wait-for-display io-backend ( -- )
-
-M: object wait-for-display 10 milliseconds sleep ;
-
-HOOK: awaken-event-loop io-backend ( -- )
-
-M: object awaken-event-loop ;
 
 : init-x ( display-string -- )
     init-locale
