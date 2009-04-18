@@ -13,7 +13,7 @@
 
 USING: kernel arrays alien alien.c-types alien.strings
 alien.syntax math math.bitwise words sequences namespaces
-continuations io io.encodings.ascii ;
+continuations io io.encodings.ascii x11.syntax ;
 IN: x11.xlib
 
 LIBRARY: xlib
@@ -71,26 +71,26 @@ C-STRUCT: Display
 { "void*" "free_funcs" }
 { "int" "fd" } ;
 
-FUNCTION: Display* XOpenDisplay ( void* display_name ) ;
+X-FUNCTION: Display* XOpenDisplay ( void* display_name ) ;
 
 ! 2.2 Obtaining Information about the Display, Image Formats, or Screens
 
-FUNCTION: ulong XBlackPixel ( Display* display, int screen_number ) ;
-FUNCTION: ulong XWhitePixel ( Display* display, int screen_number ) ;
-FUNCTION: Colormap XDefaultColormap ( Display* display, int screen_number ) ;
-FUNCTION: int XDefaultDepth ( Display* display, int screen_number ) ;
-FUNCTION: GC XDefaultGC ( Display* display, int screen_number ) ;
-FUNCTION: int XDefaultScreen ( Display* display ) ;
-FUNCTION: Window XRootWindow ( Display* display, int screen_number ) ;
-FUNCTION: Window XDefaultRootWindow ( Display* display ) ;
-FUNCTION: int XProtocolVersion ( Display* display ) ;
-FUNCTION: int XProtocolRevision ( Display* display ) ;
-FUNCTION: int XQLength ( Display* display ) ;
-FUNCTION: int XScreenCount ( Display* display ) ;
-FUNCTION: int XConnectionNumber ( Display* display ) ;
+X-FUNCTION: ulong XBlackPixel ( Display* display, int screen_number ) ;
+X-FUNCTION: ulong XWhitePixel ( Display* display, int screen_number ) ;
+X-FUNCTION: Colormap XDefaultColormap ( Display* display, int screen_number ) ;
+X-FUNCTION: int XDefaultDepth ( Display* display, int screen_number ) ;
+X-FUNCTION: GC XDefaultGC ( Display* display, int screen_number ) ;
+X-FUNCTION: int XDefaultScreen ( Display* display ) ;
+X-FUNCTION: Window XRootWindow ( Display* display, int screen_number ) ;
+X-FUNCTION: Window XDefaultRootWindow ( Display* display ) ;
+X-FUNCTION: int XProtocolVersion ( Display* display ) ;
+X-FUNCTION: int XProtocolRevision ( Display* display ) ;
+X-FUNCTION: int XQLength ( Display* display ) ;
+X-FUNCTION: int XScreenCount ( Display* display ) ;
+X-FUNCTION: int XConnectionNumber ( Display* display ) ;
 
 ! 2.5 Closing the Display
-FUNCTION: int XCloseDisplay ( Display* display ) ;
+X-FUNCTION: int XCloseDisplay ( Display* display ) ;
 
 !
 ! 3 - Window Functions
@@ -147,17 +147,17 @@ CONSTANT: StaticGravity         10
 
 ! 3.3 - Creating Windows
 
-FUNCTION: Window XCreateWindow ( Display* display, Window parent, int x, int y, uint width, uint height, uint border_width, int depth, uint class, Visual* visual, ulong valuemask, XSetWindowAttributes* attributes ) ;
-FUNCTION: Window XCreateSimpleWindow ( Display* display, Window parent, int x, int y, uint width, uint height, uint border_width, ulong border, ulong background ) ;
-FUNCTION: Status XDestroyWindow ( Display* display, Window w ) ;
-FUNCTION: Status XMapWindow ( Display* display, Window window ) ;
-FUNCTION: Status XMapSubwindows ( Display* display, Window window ) ;
-FUNCTION: Status XUnmapWindow ( Display* display, Window w ) ;
-FUNCTION: Status XUnmapSubwindows ( Display* display, Window w ) ;
+X-FUNCTION: Window XCreateWindow ( Display* display, Window parent, int x, int y, uint width, uint height, uint border_width, int depth, uint class, Visual* visual, ulong valuemask, XSetWindowAttributes* attributes ) ;
+X-FUNCTION: Window XCreateSimpleWindow ( Display* display, Window parent, int x, int y, uint width, uint height, uint border_width, ulong border, ulong background ) ;
+X-FUNCTION: Status XDestroyWindow ( Display* display, Window w ) ;
+X-FUNCTION: Status XMapWindow ( Display* display, Window window ) ;
+X-FUNCTION: Status XMapSubwindows ( Display* display, Window window ) ;
+X-FUNCTION: Status XUnmapWindow ( Display* display, Window w ) ;
+X-FUNCTION: Status XUnmapSubwindows ( Display* display, Window w ) ;
 
 ! 3.5 Mapping Windows
 
-FUNCTION: int XMapRaised ( Display* display, Window w ) ;
+X-FUNCTION: int XMapRaised ( Display* display, Window w ) ;
 
 ! 3.7 - Configuring Windows
 
@@ -178,25 +178,25 @@ C-STRUCT: XWindowChanges
         { "Window" "sibling" }
         { "int" "stack_mode" } ;
 
-FUNCTION: Status XConfigureWindow ( Display* display, Window w, uint value_mask, XWindowChanges* values ) ;
-FUNCTION: Status XMoveWindow ( Display* display, Window w, int x, int y ) ;
-FUNCTION: Status XResizeWindow ( Display* display, Window w, uint width, uint height ) ;
-FUNCTION: Status XSetWindowBorderWidth ( Display* display, ulong w, uint width ) ;
+X-FUNCTION: Status XConfigureWindow ( Display* display, Window w, uint value_mask, XWindowChanges* values ) ;
+X-FUNCTION: Status XMoveWindow ( Display* display, Window w, int x, int y ) ;
+X-FUNCTION: Status XResizeWindow ( Display* display, Window w, uint width, uint height ) ;
+X-FUNCTION: Status XSetWindowBorderWidth ( Display* display, ulong w, uint width ) ;
 
 
 ! 3.8 Changing Window Stacking Order
 
-FUNCTION: Status XRaiseWindow ( Display* display, Window w ) ;
-FUNCTION: Status XLowerWindow ( Display* display, Window w ) ;
+X-FUNCTION: Status XRaiseWindow ( Display* display, Window w ) ;
+X-FUNCTION: Status XLowerWindow ( Display* display, Window w ) ;
 
 ! 3.9 - Changing Window Attributes
 
-FUNCTION: Status XChangeWindowAttributes (
+X-FUNCTION: Status XChangeWindowAttributes (
   Display* display, Window w, ulong valuemask, XSetWindowAttributes* attr ) ;
-FUNCTION: Status XSetWindowBackground (
+X-FUNCTION: Status XSetWindowBackground (
   Display* display, Window w, ulong background_pixel ) ;
-FUNCTION: Status XDefineCursor ( Display* display, Window w, Cursor cursor ) ;
-FUNCTION: Status XUndefineCursor ( Display* display, Window w ) ;
+X-FUNCTION: Status XDefineCursor ( Display* display, Window w, Cursor cursor ) ;
+X-FUNCTION: Status XUndefineCursor ( Display* display, Window w ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 4 - Window Information Functions
@@ -204,7 +204,7 @@ FUNCTION: Status XUndefineCursor ( Display* display, Window w ) ;
 
 ! 4.1 - Obtaining Window Information
 
-FUNCTION: Status XQueryTree (
+X-FUNCTION: Status XQueryTree (
   Display* display,
   Window w,
   Window* root_return,
@@ -236,13 +236,13 @@ C-STRUCT: XWindowAttributes
         { "Bool" "override_redirect" }
         { "Screen*" "screen" } ;
 
-FUNCTION: Status XGetWindowAttributes ( Display* display, Window w, XWindowAttributes* attr ) ;
+X-FUNCTION: Status XGetWindowAttributes ( Display* display, Window w, XWindowAttributes* attr ) ;
 
 CONSTANT: IsUnmapped            0
 CONSTANT: IsUnviewable          1
 CONSTANT: IsViewable            2
 
-FUNCTION: Status XGetGeometry (
+X-FUNCTION: Status XGetGeometry (
   Display* display,
   Drawable d,
   Window* root_return,
@@ -255,27 +255,27 @@ FUNCTION: Status XGetGeometry (
 
 ! 4.2 - Translating Screen Coordinates
 
-FUNCTION: Bool XQueryPointer ( Display* display, Window w, Window* root_return, Window* child_return, int* root_x_return, int* root_y_return, int* win_x_return, int* win_y_return, uint* mask_return ) ;
+X-FUNCTION: Bool XQueryPointer ( Display* display, Window w, Window* root_return, Window* child_return, int* root_x_return, int* root_y_return, int* win_x_return, int* win_y_return, uint* mask_return ) ;
 
 ! 4.3 - Properties and Atoms
 
-FUNCTION: Atom XInternAtom ( Display* display, char* atom_name, Bool only_if_exists ) ;
+X-FUNCTION: Atom XInternAtom ( Display* display, char* atom_name, Bool only_if_exists ) ;
 
-FUNCTION: char* XGetAtomName ( Display* display, Atom atom ) ;
+X-FUNCTION: char* XGetAtomName ( Display* display, Atom atom ) ;
 
 ! 4.4 - Obtaining and Changing Window Properties
 
-FUNCTION: int XGetWindowProperty ( Display* display, Window w, Atom property, long long_offset, long long_length, Bool delete, Atom req_type, Atom* actual_type_return, int* actual_format_return, ulong* nitems_return, ulong* bytes_after_return, char** prop_return ) ;
+X-FUNCTION: int XGetWindowProperty ( Display* display, Window w, Atom property, long long_offset, long long_length, Bool delete, Atom req_type, Atom* actual_type_return, int* actual_format_return, ulong* nitems_return, ulong* bytes_after_return, char** prop_return ) ;
 
-FUNCTION: int XChangeProperty ( Display* display, Window w, Atom property, Atom type, int format, int mode, void* data, int nelements ) ;
+X-FUNCTION: int XChangeProperty ( Display* display, Window w, Atom property, Atom type, int format, int mode, void* data, int nelements ) ;
 
 ! 4.5 Selections
 
-FUNCTION: int XSetSelectionOwner ( Display* display, Atom selection, Window owner, Time time ) ;
+X-FUNCTION: int XSetSelectionOwner ( Display* display, Atom selection, Window owner, Time time ) ;
 
-FUNCTION: Window XGetSelectionOwner ( Display* display, Atom selection ) ;
+X-FUNCTION: Window XGetSelectionOwner ( Display* display, Atom selection ) ;
 
-FUNCTION: int XConvertSelection ( Display* display, Atom selection, Atom target, Atom property, Window requestor, Time time ) ;
+X-FUNCTION: int XConvertSelection ( Display* display, Atom selection, Atom target, Atom property, Window requestor, Time time ) ;
 
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -284,8 +284,8 @@ FUNCTION: int XConvertSelection ( Display* display, Atom selection, Atom target,
 
 ! 5.1 - Creating and Freeing Pixmaps
 
-FUNCTION: Pixmap XCreatePixmap ( Display* display, Drawable d, uint width, uint height, uint depth ) ;
-FUNCTION: int XFreePixmap ( Display* display, Pixmap pixmap ) ;
+X-FUNCTION: Pixmap XCreatePixmap ( Display* display, Drawable d, uint width, uint height, uint depth ) ;
+X-FUNCTION: int XFreePixmap ( Display* display, Pixmap pixmap ) ;
 
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -300,13 +300,13 @@ C-STRUCT: XColor
         { "char" "flags" }
         { "char" "pad" } ;
 
-FUNCTION: Status XLookupColor ( Display* display, Colormap colormap, char* color_name, XColor* exact_def_return, XColor* screen_def_return ) ;
-FUNCTION: Status XAllocColor ( Display* display, Colormap colormap, XColor* screen_in_out ) ;
-FUNCTION: Status XQueryColor ( Display* display, Colormap colormap, XColor* def_in_out ) ;
+X-FUNCTION: Status XLookupColor ( Display* display, Colormap colormap, char* color_name, XColor* exact_def_return, XColor* screen_def_return ) ;
+X-FUNCTION: Status XAllocColor ( Display* display, Colormap colormap, XColor* screen_in_out ) ;
+X-FUNCTION: Status XQueryColor ( Display* display, Colormap colormap, XColor* def_in_out ) ;
 
 ! 6.4 Creating, Copying, and Destroying Colormaps
 
-FUNCTION: Colormap XCreateColormap ( Display* display, Window w, Visual* visual, int alloc ) ;
+X-FUNCTION: Colormap XCreateColormap ( Display* display, Window w, Visual* visual, int alloc ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 7 - Graphics Context Functions
@@ -378,27 +378,27 @@ C-STRUCT: XGCValues
         { "int" "dash_offset" }
         { "char" "dashes" } ;
 
-FUNCTION: GC XCreateGC ( Display* display, Window d, ulong valuemask, XGCValues* values ) ;
-FUNCTION: int XChangeGC ( Display* display, GC gc, ulong valuemask, XGCValues* values ) ;
-FUNCTION: Status XGetGCValues ( Display* display, GC gc, ulong valuemask, XGCValues* values_return ) ;
-FUNCTION: Status XSetForeground ( Display* display, GC gc, ulong foreground ) ;
-FUNCTION: Status XSetBackground ( Display* display, GC gc, ulong background ) ;
-FUNCTION: Status XSetFunction ( Display* display, GC gc, int function ) ;
-FUNCTION: Status XSetSubwindowMode ( Display* display, GC gc, int subwindow_mode ) ;
+X-FUNCTION: GC XCreateGC ( Display* display, Window d, ulong valuemask, XGCValues* values ) ;
+X-FUNCTION: int XChangeGC ( Display* display, GC gc, ulong valuemask, XGCValues* values ) ;
+X-FUNCTION: Status XGetGCValues ( Display* display, GC gc, ulong valuemask, XGCValues* values_return ) ;
+X-FUNCTION: Status XSetForeground ( Display* display, GC gc, ulong foreground ) ;
+X-FUNCTION: Status XSetBackground ( Display* display, GC gc, ulong background ) ;
+X-FUNCTION: Status XSetFunction ( Display* display, GC gc, int function ) ;
+X-FUNCTION: Status XSetSubwindowMode ( Display* display, GC gc, int subwindow_mode ) ;
 
-FUNCTION: GContext XGContextFromGC ( GC gc ) ;
+X-FUNCTION: GContext XGContextFromGC ( GC gc ) ;
 
-FUNCTION: Status XSetFont ( Display* display, GC gc, Font font ) ;
+X-FUNCTION: Status XSetFont ( Display* display, GC gc, Font font ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 8 - Graphics Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-FUNCTION: Status XClearWindow ( Display* display, Window w ) ;
-FUNCTION: Status XDrawPoint ( Display* display, Drawable d, GC gc, int x, int y ) ;
-FUNCTION: Status XDrawLine ( Display* display, Drawable d, GC gc, int x1, int y1, int x2, int y2 ) ;
-FUNCTION: Status XDrawArc ( Display* display, Drawable d, GC gc, int x, int y, uint width, uint height, int angle1, int angle2 ) ;
-FUNCTION: Status XFillArc ( Display* display, Drawable d, GC gc, int x, int y, uint width, uint height, int angle1, int angle2 ) ;
+X-FUNCTION: Status XClearWindow ( Display* display, Window w ) ;
+X-FUNCTION: Status XDrawPoint ( Display* display, Drawable d, GC gc, int x, int y ) ;
+X-FUNCTION: Status XDrawLine ( Display* display, Drawable d, GC gc, int x1, int y1, int x2, int y2 ) ;
+X-FUNCTION: Status XDrawArc ( Display* display, Drawable d, GC gc, int x, int y, uint width, uint height, int angle1, int angle2 ) ;
+X-FUNCTION: Status XFillArc ( Display* display, Drawable d, GC gc, int x, int y, uint width, uint height, int angle1, int angle2 ) ;
 
 ! 8.5 - Font Metrics
 
@@ -410,9 +410,9 @@ C-STRUCT: XCharStruct
         { "short" "descent" }
         { "ushort" "attributes" } ;
 
-FUNCTION: Font XLoadFont ( Display* display, char* name ) ;
-FUNCTION: XFontStruct* XQueryFont ( Display* display, XID font_ID ) ;
-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, char* name ) ;
+X-FUNCTION: Font XLoadFont ( Display* display, char* name ) ;
+X-FUNCTION: XFontStruct* XQueryFont ( Display* display, XID font_ID ) ;
+X-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, char* name ) ;
 
 C-STRUCT: XFontStruct
         { "XExtData*" "ext_data" }
@@ -432,11 +432,11 @@ C-STRUCT: XFontStruct
         { "int" "ascent" }
         { "int" "descent" } ;
 
-FUNCTION: int XTextWidth ( XFontStruct* font_struct, char* string, int count ) ;
+X-FUNCTION: int XTextWidth ( XFontStruct* font_struct, char* string, int count ) ;
 
 ! 8.6 - Drawing Text
 
-FUNCTION: Status XDrawString (
+X-FUNCTION: Status XDrawString (
         Display* display,
         Drawable d,
         GC gc,
@@ -479,8 +479,8 @@ C-STRUCT: XImage
     { "XPointer"     "obdata" }
     { "XImage-funcs" "f" } ;
 
-FUNCTION: XImage* XGetImage ( Display* display, Drawable d, int x, int y, uint width, uint height, ulong plane_mask, int format ) ;
-FUNCTION: int XDestroyImage ( XImage *ximage ) ;
+X-FUNCTION: XImage* XGetImage ( Display* display, Drawable d, int x, int y, uint width, uint height, ulong plane_mask, int format ) ;
+X-FUNCTION: int XDestroyImage ( XImage *ximage ) ;
 
 : XImage-size ( ximage -- size )
     [ XImage-height ] [ XImage-bytes_per_line ] bi * ;
@@ -492,12 +492,12 @@ FUNCTION: int XDestroyImage ( XImage *ximage ) ;
 ! 9 - Window and Session Manager Functions
 !
 
-FUNCTION: Status XReparentWindow ( Display* display, Window w, Window parent, int x, int y ) ;
-FUNCTION: Status XAddToSaveSet ( Display* display, Window w ) ;
-FUNCTION: Status XRemoveFromSaveSet ( Display* display, Window w ) ;
-FUNCTION: Status XGrabServer ( Display* display ) ;
-FUNCTION: Status XUngrabServer ( Display* display ) ;
-FUNCTION: Status XKillClient ( Display* display, XID resource ) ;
+X-FUNCTION: Status XReparentWindow ( Display* display, Window w, Window parent, int x, int y ) ;
+X-FUNCTION: Status XAddToSaveSet ( Display* display, Window w ) ;
+X-FUNCTION: Status XRemoveFromSaveSet ( Display* display, Window w ) ;
+X-FUNCTION: Status XGrabServer ( Display* display ) ;
+X-FUNCTION: Status XUngrabServer ( Display* display ) ;
+X-FUNCTION: Status XKillClient ( Display* display, XID resource ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 10 - Events
@@ -1066,11 +1066,11 @@ C-UNION: XEvent
 ! 11 - Event Handling Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-FUNCTION: Status XSelectInput ( Display* display, Window w, long event_mask ) ;
-FUNCTION: Status XFlush ( Display* display ) ;
-FUNCTION: Status XSync ( Display* display, int discard ) ;
-FUNCTION: Status XNextEvent ( Display* display, XEvent* event ) ;
-FUNCTION: Status XMaskEvent ( Display* display, long event_mask, XEvent* event_return ) ;
+X-FUNCTION: Status XSelectInput ( Display* display, Window w, long event_mask ) ;
+X-FUNCTION: Status XFlush ( Display* display ) ;
+X-FUNCTION: Status XSync ( Display* display, int discard ) ;
+X-FUNCTION: Status XNextEvent ( Display* display, XEvent* event ) ;
+X-FUNCTION: Status XMaskEvent ( Display* display, long event_mask, XEvent* event_return ) ;
 
 ! 11.3 - Event Queue Management
 
@@ -1078,16 +1078,16 @@ CONSTANT: QueuedAlready 0
 CONSTANT: QueuedAfterReading 1
 CONSTANT: QueuedAfterFlush 2
 
-FUNCTION: int XEventsQueued ( Display* display, int mode ) ;
-FUNCTION: int XPending ( Display* display ) ;
+X-FUNCTION: int XEventsQueued ( Display* display, int mode ) ;
+X-FUNCTION: int XPending ( Display* display ) ;
 
 ! 11.6 - Sending Events to Other Applications
 
-FUNCTION: Status XSendEvent ( Display* display, Window w, Bool propagate, long event_mask, XEvent* event_send ) ;
+X-FUNCTION: Status XSendEvent ( Display* display, Window w, Bool propagate, long event_mask, XEvent* event_send ) ;
 
 ! 11.8 - Handling Protocol Errors
 
-FUNCTION: int XSetErrorHandler ( void* handler ) ;
+X-FUNCTION: int XSetErrorHandler ( void* handler ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 12 - Input Device Functions
@@ -1095,7 +1095,7 @@ FUNCTION: int XSetErrorHandler ( void* handler ) ;
 
 CONSTANT: None 0
 
-FUNCTION: int XGrabPointer (
+X-FUNCTION: int XGrabPointer (
   Display* display,
   Window grab_window,
   Bool owner_events,
@@ -1106,16 +1106,16 @@ FUNCTION: int XGrabPointer (
   Cursor cursor,
   Time time ) ;
 
-FUNCTION: Status XUngrabPointer ( Display* display, Time time ) ;
-FUNCTION: Status XChangeActivePointerGrab ( Display* display, uint event_mask, Cursor cursor, Time time ) ;
-FUNCTION: Status XGrabKey ( Display* display, int keycode, uint modifiers, Window grab_window, Bool owner_events, int pointer_mode, int keyboard_mode ) ;
-FUNCTION: Status XSetInputFocus ( Display* display, Window focus, int revert_to, Time time ) ;
+X-FUNCTION: Status XUngrabPointer ( Display* display, Time time ) ;
+X-FUNCTION: Status XChangeActivePointerGrab ( Display* display, uint event_mask, Cursor cursor, Time time ) ;
+X-FUNCTION: Status XGrabKey ( Display* display, int keycode, uint modifiers, Window grab_window, Bool owner_events, int pointer_mode, int keyboard_mode ) ;
+X-FUNCTION: Status XSetInputFocus ( Display* display, Window focus, int revert_to, Time time ) ;
 
-FUNCTION: Status XGetInputFocus ( Display* display,
+X-FUNCTION: Status XGetInputFocus ( Display* display,
                                   Window*  focus_return,
                                   int*     revert_to_return ) ;
 
-FUNCTION: Status XWarpPointer ( Display* display, Window src_w, Window dest_w, int src_x, int src_y, uint src_width, uint src_height, int dest_x, int dest_y ) ;
+X-FUNCTION: Status XWarpPointer ( Display* display, Window src_w, Window dest_w, int src_x, int src_y, uint src_width, uint src_height, int dest_x, int dest_y ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 14 - Inter-Client Communication Functions
@@ -1123,15 +1123,15 @@ FUNCTION: Status XWarpPointer ( Display* display, Window src_w, Window dest_w, i
 
 ! 14.1 Client to Window Manager Communication
 
-FUNCTION: Status XFetchName ( Display* display, Window w, char** window_name_return ) ;
-FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop_window_return ) ;
+X-FUNCTION: Status XFetchName ( Display* display, Window w, char** window_name_return ) ;
+X-FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop_window_return ) ;
 
 ! 14.1.1.  Manipulating Top-Level Windows
 
-FUNCTION: Status XIconifyWindow (
+X-FUNCTION: Status XIconifyWindow (
         Display* display, Window w, int screen_number ) ;
 
-FUNCTION: Status XWithdrawWindow (
+X-FUNCTION: Status XWithdrawWindow (
         Display* display, Window w, int screen_number ) ;
 
 ! 14.1.6 - Setting and Reading the WM_HINTS Property
@@ -1173,10 +1173,10 @@ C-STRUCT: XSizeHints
 
 ! 14.1.10.  Setting and Reading the WM_PROTOCOLS Property
 
-FUNCTION: Status XSetWMProtocols (
+X-FUNCTION: Status XSetWMProtocols (
         Display* display, Window w, Atom* protocols, int count ) ;
 
-FUNCTION: Status XGetWMProtocols (
+X-FUNCTION: Status XGetWMProtocols (
         Display* display,
         Window w,
         Atom** protocols_return,
@@ -1188,9 +1188,9 @@ FUNCTION: Status XGetWMProtocols (
 
 ! 16.1 Keyboard Utility Functions
 
-FUNCTION: KeySym XLookupKeysym ( XKeyEvent* key_event, int index ) ;
+X-FUNCTION: KeySym XLookupKeysym ( XKeyEvent* key_event, int index ) ;
 
-FUNCTION: int XLookupString (
+X-FUNCTION: int XLookupString (
         XKeyEvent* event_struct,
         void* buffer_return,
         int bytes_buffer,
@@ -1227,7 +1227,7 @@ C-STRUCT: XVisualInfo
 ! Appendix D - Compatibility Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-FUNCTION: Status XSetStandardProperties (
+X-FUNCTION: Status XSetStandardProperties (
         Display* display,
         Window w,
         char* window_name,
@@ -1314,10 +1314,10 @@ CONSTANT: XA_LAST_PREDEFINED 68
 ! The rest of the stuff is not from the book.
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-FUNCTION: void XFree ( void* data ) ;
-FUNCTION: int XStoreName ( Display* display, Window w, char* window_name ) ;
-FUNCTION: void XSetWMNormalHints ( Display* display, Window w, XSizeHints* hints ) ;
-FUNCTION: int XBell ( Display* display, int percent ) ;
+X-FUNCTION: void XFree ( void* data ) ;
+X-FUNCTION: int XStoreName ( Display* display, Window w, char* window_name ) ;
+X-FUNCTION: void XSetWMNormalHints ( Display* display, Window w, XSizeHints* hints ) ;
+X-FUNCTION: int XBell ( Display* display, int percent ) ;
 
 ! !!! INPUT METHODS
 
@@ -1381,23 +1381,23 @@ CONSTANT: XLookupChars     2
 CONSTANT: XLookupKeySym    3
 CONSTANT: XLookupBoth      4
 
-FUNCTION: Bool XFilterEvent ( XEvent* event, Window w ) ;
+X-FUNCTION: Bool XFilterEvent ( XEvent* event, Window w ) ;
 
-FUNCTION: XIM XOpenIM ( Display* dpy, void* rdb, char* res_name, char* res_class ) ;
+X-FUNCTION: XIM XOpenIM ( Display* dpy, void* rdb, char* res_name, char* res_class ) ;
 
-FUNCTION: Status XCloseIM ( XIM im ) ;
+X-FUNCTION: Status XCloseIM ( XIM im ) ;
 
-FUNCTION: XIC XCreateIC ( XIM im, char* key1, Window value1, char* key2, Window value2, char* key3, int value3, char* key4, char* value4, char* key5, char* value5, int key6 ) ;
+X-FUNCTION: XIC XCreateIC ( XIM im, char* key1, Window value1, char* key2, Window value2, char* key3, int value3, char* key4, char* value4, char* key5, char* value5, int key6 ) ;
 
-FUNCTION: void XDestroyIC ( XIC ic ) ;
+X-FUNCTION: void XDestroyIC ( XIC ic ) ;
 
-FUNCTION: void XSetICFocus ( XIC ic ) ;
+X-FUNCTION: void XSetICFocus ( XIC ic ) ;
         
-FUNCTION: void XUnsetICFocus ( XIC ic ) ;
+X-FUNCTION: void XUnsetICFocus ( XIC ic ) ;
 
-FUNCTION: int XwcLookupString ( XIC ic, XKeyPressedEvent* event, ulong* buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
+X-FUNCTION: int XwcLookupString ( XIC ic, XKeyPressedEvent* event, ulong* buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
 
-FUNCTION: int Xutf8LookupString ( XIC ic, XKeyPressedEvent* event, char* buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
+X-FUNCTION: int Xutf8LookupString ( XIC ic, XKeyPressedEvent* event, char* buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
 
 ! !!! category of setlocale
 CONSTANT: LC_ALL      0
@@ -1407,8 +1407,8 @@ CONSTANT: LC_MONETARY 3
 CONSTANT: LC_NUMERIC  4
 CONSTANT: LC_TIME     5
 
-FUNCTION: char* setlocale ( int category, char* name ) ;
+X-FUNCTION: char* setlocale ( int category, char* name ) ;
 
-FUNCTION: Bool XSupportsLocale ( ) ;
+X-FUNCTION: Bool XSupportsLocale ( ) ;
 
-FUNCTION: char* XSetLocaleModifiers ( char* modifier_list ) ;
+X-FUNCTION: char* XSetLocaleModifiers ( char* modifier_list ) ;

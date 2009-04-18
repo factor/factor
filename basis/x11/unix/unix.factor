@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend.unix io.backend.unix.multiplexers
-namespaces system x11 x11.xlib accessors threads sequences ;
+namespaces system x11 x11.xlib x11.io
+accessors threads sequences ;
 IN: x11.unix
 
 SYMBOL: dpy-fd
