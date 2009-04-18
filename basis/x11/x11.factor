@@ -28,6 +28,10 @@ HOOK: wait-for-display io-backend ( -- )
 
 M: object wait-for-display 10 milliseconds sleep ;
 
+HOOK: awaken-event-loop io-backend ( -- )
+
+M: object awaken-event-loop ;
+
 : init-x ( display-string -- )
     init-locale
     dup [ ascii string>alien ] when
