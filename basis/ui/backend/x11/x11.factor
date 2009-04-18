@@ -4,10 +4,10 @@ USING: accessors alien alien.c-types arrays ui ui.private ui.gadgets
 ui.gadgets.private ui.gestures ui.backend ui.clipboards
 ui.gadgets.worlds ui.render ui.event-loop assocs kernel math
 namespaces opengl sequences strings x11 x11.xlib x11.events x11.xim
-x11.glx x11.clipboard x11.constants x11.windows io.encodings.string
-io.encodings.ascii io.encodings.utf8 combinators command-line
-math.vectors classes.tuple opengl.gl threads math.rectangles
-environment ascii ;
+x11.glx x11.clipboard x11.constants x11.windows x11.io
+io.encodings.string io.encodings.ascii io.encodings.utf8 combinators
+command-line math.vectors classes.tuple opengl.gl threads
+math.rectangles environment ascii ;
 IN: ui.backend.x11
 
 SINGLETON: x11-ui-backend
