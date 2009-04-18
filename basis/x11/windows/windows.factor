@@ -29,6 +29,8 @@ IN: x11.windows
 
 : window-attributes ( visinfo -- attributes )
     "XSetWindowAttributes" <c-object>
+    0 over set-XSetWindowAttributes-background_pixel
+    0 over set-XSetWindowAttributes-border_pixel
     [ [ create-colormap ] dip set-XSetWindowAttributes-colormap ] keep
     event-mask over set-XSetWindowAttributes-event_mask ;
 
