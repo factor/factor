@@ -272,8 +272,8 @@ HELP: nweave
 
 HELP: n*quot
 { $values
-     { "n" integer } { "seq" sequence }
-     { "seq'" sequence }
+     { "n" integer } { "quot" quotation }
+     { "quot'" quotation }
 }
 { $examples
     { $example "USING: generalizations prettyprint math ;"

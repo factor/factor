@@ -8,12 +8,13 @@ IN: sorting.slots
 <PRIVATE
 
 : short-circuit-comparator ( obj1 obj2 word --  comparator/? )
-    execute dup +eq+ eq? [ drop f ] when ; inline
+    execute( obj1 obj2 -- obj3 )
+    dup +eq+ eq? [ drop f ] when ; inline
 
 : slot-comparator ( seq -- quot )
     [
         but-last-slice
-        [ '[ [ _ execute ] bi@ ] ] map concat
+        [ '[ [ _ execute( tuple -- value ) ] bi@ ] ] map concat
     ] [
         peek
         '[ @ _ short-circuit-comparator ]
@@ -25,21 +26,22 @@ MACRO: compare-slots ( sort-specs -- <=> )
     #! sort-spec: { accessors comparator }
     [ slot-comparator ] map '[ _ 2|| +eq+ or ] ;
 
-MACRO: sort-by-slots ( sort-specs -- quot )
-    '[ [ _ compare-slots ] sort ] ;
+: sort-by-slots ( seq sort-specs -- seq' )
+    '[ _ compare-slots ] sort ;
 
 MACRO: compare-seq ( seq -- quot )
     [ '[ _ short-circuit-comparator ] ] map '[ _ 2|| +eq+ or ] ;
 
-MACRO: sort-by ( sort-seq -- quot )
-    '[ [ _ compare-seq ] sort ] ;
+: sort-by ( seq sort-seq -- seq' )
+    '[ _ compare-seq ] sort ;
 
-MACRO: sort-keys-by ( sort-seq -- quot )
+: sort-keys-by ( seq sort-seq -- seq' )
     '[ [ first ] bi@ _ compare-seq ] sort ;
 
-MACRO: sort-values-by ( sort-seq -- quot )
+: sort-values-by ( seq sort-seq -- seq' )
     '[ [ second ] bi@ _ compare-seq ] sort ;
 
 MACRO: split-by-slots ( accessor-seqs -- quot )
-    [ [ '[ [ _ execute ] bi@ ] ] map concat [ = ] compose ] map
+    [ [ '[ [ _ execute( tuple -- value ) ] bi@ ] ] map concat
+    [ = ] compose ] map
     '[ [ _ 2&& ] slice monotonic-slice ] ;

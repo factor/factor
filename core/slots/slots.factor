@@ -222,7 +222,7 @@ M: slot-spec make-slot
     [ make-slot ] map ;
 
 : finalize-slots ( specs base -- specs )
-    over length [ + ] with map [ >>offset ] 2map ;
+    over length iota [ + ] with map [ >>offset ] 2map ;
 
 : slot-named ( name specs -- spec/f )
     [ name>> = ] with find nip ;

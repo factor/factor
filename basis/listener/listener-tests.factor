@@ -25,7 +25,7 @@ SYNTAX: hello "Hi" print ;
                 "\\ + 1 2 3 4" parse-interactive
                 "cont" get continue-with
             ] ignore-errors
-            "USE: debugger :1" (( -- quot )) eval
+            "USE: debugger :1" eval( -- quot )
         ] callcc1
     ] unit-test
 ] with-file-vocabs

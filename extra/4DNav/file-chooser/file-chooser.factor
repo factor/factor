@@ -92,11 +92,9 @@ file-chooser H{
 ;
 
 : fc-load-file ( file-chooser file -- )
-  dupd [ selected-file>> ] [ name>> ] bi* swap set-model 
-  [ path>> value>> ] 
-  [ selected-file>> value>> append ] 
-  [ hook>> ] tri
-  call
+  over [ name>> ] [ selected-file>> ] bi* set-model 
+  [ [ path>> value>> ] [ selected-file>> value>> ] bi append ] [ hook>> ] bi
+  call( path -- )
 ; inline
 
 ! : fc-ok-action ( file-chooser -- quot )
@@ -111,7 +109,7 @@ file-chooser H{
 : line-selected-action ( file-chooser -- )
      dup list>> list-value
      dup directory? 
-     [ fc-change-directory ] [ fc-load-file ] if ; inline
+     [ fc-change-directory ] [ fc-load-file ] if ;
 
 : present-dir-element ( element -- string )
     [ name>> ] [ directory? ] bi   [ "-> " prepend ] when ;
