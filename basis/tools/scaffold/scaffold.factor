@@ -5,7 +5,8 @@ io.encodings.utf8 hashtables kernel namespaces sequences
 vocabs.loader io combinators calendar accessors math.parser
 io.streams.string ui.tools.operations quotations strings arrays
 prettyprint words vocabs sorting sets classes math alien urls
-splitting ascii combinators.short-circuit alarms words.symbol ;
+splitting ascii combinators.short-circuit alarms words.symbol
+system ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
