@@ -1,5 +1,6 @@
 USING: alien.syntax kernel math windows.types math.bitwise ;
 IN: windows.advapi32
+
 LIBRARY: advapi32
 
 CONSTANT: PROV_RSA_FULL       1
@@ -122,6 +123,34 @@ C-STRUCT: ACCESS_ALLOWED_CALLBACK_ACE
 
 TYPEDEF: ACCESS_ALLOWED_CALLBACK_ACE* PACCESS_ALLOWED_CALLBACK_ACE
 
+C-STRUCT: SECURITY_DESCRIPTOR
+    { "UCHAR" "Revision" }
+    { "UCHAR" "Sbz1" }
+    { "WORD" "Control" }
+    { "PVOID" "Owner" }
+    { "PVOID" "Group" }
+    { "PACL" "Sacl" }
+    { "PACL" "Dacl" } ;
+
+TYPEDEF: SECURITY_DESCRIPTOR* PSECURITY_DESCRIPTOR
+
+CONSTANT: SE_OWNER_DEFAULTED 1
+CONSTANT: SE_GROUP_DEFAULTED 2
+CONSTANT: SE_DACL_PRESENT 4
+CONSTANT: SE_DACL_DEFAULTED 8
+CONSTANT: SE_SACL_PRESENT 16
+CONSTANT: SE_SACL_DEFAULTED 32
+CONSTANT: SE_DACL_AUTO_INHERIT_REQ 256
+CONSTANT: SE_SACL_AUTO_INHERIT_REQ 512
+CONSTANT: SE_DACL_AUTO_INHERITED 1024
+CONSTANT: SE_SACL_AUTO_INHERITED 2048
+CONSTANT: SE_DACL_PROTECTED 4096
+CONSTANT: SE_SACL_PROTECTED 8192
+CONSTANT: SE_SELF_RELATIVE 32768
+
+TYPEDEF: DWORD SECURITY_DESCRIPTOR_CONTROL
+TYPEDEF: SECURITY_DESCRIPTOR_CONTROL* PSECURITY_DESCRIPTOR_CONTROL
+
 
 ! typedef enum _TOKEN_INFORMATION_CLASS {
 CONSTANT: TokenUser 1
@@ -140,6 +169,140 @@ CONSTANT: TokenGroupsAndPrivileges 13
 CONSTANT: TokenSessionReference 14
 CONSTANT: TokenSandBoxInert 15
 ! } TOKEN_INFORMATION_CLASS;
+
+TYPEDEF: DWORD ACCESS_MODE
+C-ENUM:
+    NOT_USED_ACCESS
+    GRANT_ACCESS
+    SET_ACCESS
+    DENY_ACCESS
+    REVOKE_ACCESS
+    SET_AUDIT_SUCCESS
+    SET_AUDIT_FAILURE ;
+
+TYPEDEF: DWORD MULTIPLE_TRUSTEE_OPERATION
+C-ENUM:
+    NO_MULTIPLE_TRUSTEE
+    TRUSTEE_IS_IMPERSONATE ;
+
+TYPEDEF: DWORD TRUSTEE_FORM
+C-ENUM:
+  TRUSTEE_IS_SID
+  TRUSTEE_IS_NAME
+  TRUSTEE_BAD_FORM
+  TRUSTEE_IS_OBJECTS_AND_SID
+  TRUSTEE_IS_OBJECTS_AND_NAME ;
+
+TYPEDEF: DWORD TRUSTEE_TYPE
+C-ENUM:
+    TRUSTEE_IS_UNKNOWN
+    TRUSTEE_IS_USER
+    TRUSTEE_IS_GROUP
+    TRUSTEE_IS_DOMAIN
+    TRUSTEE_IS_ALIAS
+    TRUSTEE_IS_WELL_KNOWN_GROUP
+    TRUSTEE_IS_DELETED
+    TRUSTEE_IS_INVALID
+    TRUSTEE_IS_COMPUTER ;
+
+TYPEDEF: DWORD SE_OBJECT_TYPE
+C-ENUM:
+    SE_UNKNOWN_OBJECT_TYPE
+    SE_FILE_OBJECT
+    SE_SERVICE
+    SE_PRINTER
+    SE_REGISTRY_KEY
+    SE_LMSHARE
+    SE_KERNEL_OBJECT
+    SE_WINDOW_OBJECT
+    SE_DS_OBJECT
+    SE_DS_OBJECT_ALL
+    SE_PROVIDER_DEFINED_OBJECT
+    SE_WMIGUID_OBJECT
+    SE_REGISTRY_WOW64_32KEY ;
+
+TYPEDEF: TRUSTEE* PTRUSTEE
+
+C-STRUCT: TRUSTEE
+    { "PTRUSTEE" "pMultipleTrustee" }
+    { "MULTIPLE_TRUSTEE_OPERATION" "MultipleTrusteeOperation" }
+    { "TRUSTEE_FORM" "TrusteeForm" }
+    { "TRUSTEE_TYPE" "TrusteeType" }
+    { "LPTSTR" "ptstrName" } ;
+
+C-STRUCT: EXPLICIT_ACCESS
+    { "DWORD" "grfAccessPermissions" }
+    { "ACCESS_MODE" "grfAccessMode" }
+    { "DWORD" "grfInheritance" }
+    { "TRUSTEE" "Trustee" } ;
+
+C-STRUCT: SID_IDENTIFIER_AUTHORITY
+    { { "BYTE" 6 } "Value" } ;
+
+TYPEDEF: SID_IDENTIFIER_AUTHORITY* PSID_IDENTIFIER_AUTHORITY
+
+CONSTANT: SECURITY_NULL_SID_AUTHORITY 0
+CONSTANT: SECURITY_WORLD_SID_AUTHORITY    1
+CONSTANT: SECURITY_LOCAL_SID_AUTHORITY    2
+CONSTANT: SECURITY_CREATOR_SID_AUTHORITY  3
+CONSTANT: SECURITY_NON_UNIQUE_AUTHORITY   4
+CONSTANT: SECURITY_NT_AUTHORITY   5
+CONSTANT: SECURITY_RESOURCE_MANAGER_AUTHORITY 6
+
+CONSTANT: SECURITY_NULL_RID 0
+CONSTANT: SECURITY_WORLD_RID 0
+CONSTANT: SECURITY_LOCAL_RID 0
+CONSTANT: SECURITY_CREATOR_OWNER_RID 0
+CONSTANT: SECURITY_CREATOR_GROUP_RID 1
+CONSTANT: SECURITY_CREATOR_OWNER_SERVER_RID 2
+CONSTANT: SECURITY_CREATOR_GROUP_SERVER_RID 3
+CONSTANT: SECURITY_DIALUP_RID 1
+CONSTANT: SECURITY_NETWORK_RID 2
+CONSTANT: SECURITY_BATCH_RID 3
+CONSTANT: SECURITY_INTERACTIVE_RID 4
+CONSTANT: SECURITY_SERVICE_RID 6
+CONSTANT: SECURITY_ANONYMOUS_LOGON_RID 7
+CONSTANT: SECURITY_PROXY_RID 8
+CONSTANT: SECURITY_SERVER_LOGON_RID 9
+CONSTANT: SECURITY_PRINCIPAL_SELF_RID 10
+CONSTANT: SECURITY_AUTHENTICATED_USER_RID 11
+CONSTANT: SECURITY_LOGON_IDS_RID 5
+CONSTANT: SECURITY_LOGON_IDS_RID_COUNT 3
+CONSTANT: SECURITY_LOCAL_SYSTEM_RID 18
+CONSTANT: SECURITY_NT_NON_UNIQUE 21
+CONSTANT: SECURITY_BUILTIN_DOMAIN_RID 32
+CONSTANT: DOMAIN_USER_RID_ADMIN 500
+CONSTANT: DOMAIN_USER_RID_GUEST 501
+CONSTANT: DOMAIN_GROUP_RID_ADMINS 512
+CONSTANT: DOMAIN_GROUP_RID_USERS 513
+CONSTANT: DOMAIN_GROUP_RID_GUESTS 514
+CONSTANT: DOMAIN_ALIAS_RID_ADMINS 544
+CONSTANT: DOMAIN_ALIAS_RID_USERS 545
+CONSTANT: DOMAIN_ALIAS_RID_GUESTS 546
+CONSTANT: DOMAIN_ALIAS_RID_POWER_USERS 547
+CONSTANT: DOMAIN_ALIAS_RID_ACCOUNT_OPS 548
+CONSTANT: DOMAIN_ALIAS_RID_SYSTEM_OPS 549
+CONSTANT: DOMAIN_ALIAS_RID_PRINT_OPS 550
+CONSTANT: DOMAIN_ALIAS_RID_BACKUP_OPS 551
+CONSTANT: DOMAIN_ALIAS_RID_REPLICATOR 552
+CONSTANT: SE_GROUP_MANDATORY 1
+CONSTANT: SE_GROUP_ENABLED_BY_DEFAULT 2
+CONSTANT: SE_GROUP_ENABLED 4
+CONSTANT: SE_GROUP_OWNER 8
+CONSTANT: SE_GROUP_LOGON_ID -1073741824
+
+! SID is a variable length structure
+TYPEDEF: void* PSID
+
+TYPEDEF: EXPLICIT_ACCESS* PEXPLICIT_ACCESS
+
+TYPEDEF: DWORD SECURITY_INFORMATION
+TYPEDEF: SECURITY_INFORMATION* PSECURITY_INFORMATION
+
+CONSTANT: OWNER_SECURITY_INFORMATION 1
+CONSTANT: GROUP_SECURITY_INFORMATION 2
+CONSTANT: DACL_SECURITY_INFORMATION 4
+CONSTANT: SACL_SECURITY_INFORMATION 8
 
 CONSTANT: DELETE                     HEX: 00010000
 CONSTANT: READ_CONTROL               HEX: 00020000
@@ -187,6 +350,34 @@ CONSTANT: TOKEN_ADJUST_DEFAULT         HEX: 0080
         TOKEN_ADJUST_DEFAULT
     } flags ; foldable
 
+CONSTANT: HKEY_CLASSES_ROOT       1
+CONSTANT: HKEY_CURRENT_CONFIG     2
+CONSTANT: HKEY_CURRENT_USER       3
+CONSTANT: HKEY_LOCAL_MACHINE      4
+CONSTANT: HKEY_USERS              5
+
+CONSTANT: KEY_ALL_ACCESS          HEX: 0001
+CONSTANT: KEY_CREATE_LINK         HEX: 0002
+CONSTANT: KEY_CREATE_SUB_KEY      HEX: 0004
+CONSTANT: KEY_ENUMERATE_SUB_KEYS  HEX: 0008
+CONSTANT: KEY_EXECUTE             HEX: 0010
+CONSTANT: KEY_NOTIFY              HEX: 0020
+CONSTANT: KEY_QUERY_VALUE         HEX: 0040
+CONSTANT: KEY_READ                HEX: 0080
+CONSTANT: KEY_SET_VALUE           HEX: 0100
+CONSTANT: KEY_WOW64_64KEY         HEX: 0200
+CONSTANT: KEY_WOW64_32KEY         HEX: 0400
+CONSTANT: KEY_WRITE               HEX: 0800
+
+CONSTANT: REG_BINARY              1
+CONSTANT: REG_DWORD               2
+CONSTANT: REG_EXPAND_SZ           3
+CONSTANT: REG_MULTI_SZ            4
+CONSTANT: REG_QWORD               5
+CONSTANT: REG_SZ                  6
+
+TYPEDEF: DWORD REGSAM
+
 
 ! : I_ScGetCurrentGroupStateW ;
 ! : A_SHAFinal ;
@@ -224,7 +415,19 @@ FUNCTION: BOOL AdjustTokenPrivileges ( HANDLE TokenHandle,
                                PTOKEN_PRIVILEGES PreviousState,
                                PDWORD ReturnLength ) ;
 
-! : AllocateAndInitializeSid ;
+FUNCTION: BOOL AllocateAndInitializeSid (
+                PSID_IDENTIFIER_AUTHORITY pIdentifierAuthority,
+                BYTE nSubAuthorityCount,
+                DWORD dwSubAuthority0,
+                DWORD dwSubAuthority1,
+                DWORD dwSubAuthority2,
+                DWORD dwSubAuthority3,
+                DWORD dwSubAuthority4,
+                DWORD dwSubAuthority5,
+                DWORD dwSubAuthority6,
+                DWORD dwSubAuthority7,
+                PSID* pSid ) ;
+
 ! : AllocateLocallyUniqueId ;
 ! : AreAllAccessesGranted ;
 ! : AreAnyAccessesGranted ;
@@ -442,7 +645,8 @@ FUNCTION: BOOL CryptReleaseContext ( HCRYPTPROV hProv, DWORD dwFlags ) ;
 ! : GetExplicitEntriesFromAclA ;
 ! : GetExplicitEntriesFromAclW ;
 ! : GetFileSecurityA ;
-! : GetFileSecurityW ;
+FUNCTION: BOOL GetFileSecurityW ( LPCTSTR lpFileName, SECURITY_INFORMATION RequestedInformation, PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD nLength, LPDWORD lpnLengthNeeded ) ;
+ALIAS: GetFileSecurity GetFileSecurityW
 ! : GetInformationCodeAuthzLevelW ;
 ! : GetInformationCodeAuthzPolicyW ;
 ! : GetInheritanceSourceA ;
@@ -459,19 +663,20 @@ FUNCTION: BOOL CryptReleaseContext ( HCRYPTPROV hProv, DWORD dwFlags ) ;
 ! : GetMultipleTrusteeW ;
 ! : GetNamedSecurityInfoA ;
 ! : GetNamedSecurityInfoExA ;
-! : GetNamedSecurityInfoExW ;
-! : GetNamedSecurityInfoW ;
+! FUNCTION: DWORD GetNamedSecurityInfoExW
+FUNCTION: DWORD GetNamedSecurityInfoW ( LPTSTR pObjectName, SE_OBJECT_TYPE ObjectType, SECURITY_INFORMATION SecurityInfo, PSID* ppsidOwner, PSID* ppsidGroup, PACL* ppDacl, PACL* ppSacl, PSECURITY_DESCRIPTOR* ppSecurityDescriptor ) ;
+ALIAS: GetNamedSecurityInfo GetNamedSecurityInfoW
 ! : GetNumberOfEventLogRecords ;
 ! : GetOldestEventLogRecord ;
 ! : GetOverlappedAccessResults ;
 ! : GetPrivateObjectSecurity ;
-! : GetSecurityDescriptorControl ;
-! : GetSecurityDescriptorDacl ;
-! : GetSecurityDescriptorGroup ;
-! : GetSecurityDescriptorLength ;
-! : GetSecurityDescriptorOwner ;
-! : GetSecurityDescriptorRMControl ;
-! : GetSecurityDescriptorSacl ;
+FUNCTION: BOOL GetSecurityDescriptorControl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSECURITY_DESCRIPTOR_CONTROL pControl, LPDWORD lpdwRevision ) ;
+FUNCTION: BOOL GetSecurityDescriptorDacl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbDaclPresent, PACL* pDacl, LPBOOL lpDaclDefaulted ) ;
+FUNCTION: BOOL GetSecurityDescriptorGroup ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSID* pGroup, LPBOOL lpGroupDefaulted ) ;
+FUNCTION: BOOL GetSecurityDescriptorLength ( PSECURITY_DESCRIPTOR pSecurityDescriptor ) ;
+FUNCTION: BOOL GetSecurityDescriptorOwner ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSID* pOwner, LPBOOL lpOwnerDefaulted ) ;
+FUNCTION: BOOL GetSecurityDescriptorRMControl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PUCHAR RMControl ) ;
+FUNCTION: BOOL GetSecurityDescriptorSacl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbSaclPresent, PACL* pSacl, LPBOOL lpSaclDefaulted ) ;
 ! : GetSecurityInfo ;
 ! : GetSecurityInfoExA ;
 ! : GetSecurityInfoExW ;
@@ -510,7 +715,7 @@ ALIAS: GetUserName GetUserNameW
 ! : ImpersonateNamedPipeClient ;
 ! : ImpersonateSelf ;
 FUNCTION: BOOL InitializeAcl ( PACL pAcl, DWORD nAclLength, DWORD dwAclRevision ) ;
-! : InitializeSecurityDescriptor ;
+FUNCTION: BOOL InitializeSecurityDescriptor ( PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD dwRevision ) ;
 ! : InitializeSid ;
 ! : InitiateSystemShutdownA ;
 ! : InitiateSystemShutdownExA ;
@@ -674,8 +879,8 @@ FUNCTION: BOOL OpenThreadToken ( HANDLE ThreadHandle, DWORD DesiredAccess, BOOL 
 ! : RegConnectRegistryW ;
 ! : RegCreateKeyA ;
 ! : RegCreateKeyExA ;
-! : RegCreateKeyExW ;
-! : RegCreateKeyW ;
+FUNCTION: LONG RegCreateKeyExW ( HKEY hKey, LPCTSTR lpSubKey, DWORD Reserved, LPTSTR lpClass, DWORD dwOptions, REGSAM samDesired, LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition ) ;
+! : RegCreateKeyW
 ! : RegDeleteKeyA ;
 ! : RegDeleteKeyW ;
 ! : RegDeleteValueA ;
@@ -692,7 +897,7 @@ FUNCTION: BOOL OpenThreadToken ( HANDLE ThreadHandle, DWORD DesiredAccess, BOOL 
 ! : RegLoadKeyA ;
 ! : RegLoadKeyW ;
 ! : RegNotifyChangeKeyValue ;
-! : RegOpenCurrentUser ;
+FUNCTION: LONG RegOpenCurrentUser ( REGSAM samDesired, PHKEY phkResult ) ;
 ! : RegOpenKeyA ;
 ! : RegOpenKeyExA ;
 ! : RegOpenKeyExW ;
@@ -705,7 +910,7 @@ FUNCTION: BOOL OpenThreadToken ( HANDLE ThreadHandle, DWORD DesiredAccess, BOOL 
 ! : RegQueryMultipleValuesW ;
 ! : RegQueryValueA ;
 ! : RegQueryValueExA ;
-! : RegQueryValueExW ;
+FUNCTION: LONG RegQueryValueExW ( HKEY hKey, LPCTSTR lpValueName, LPWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData ) ;
 ! : RegQueryValueW ;
 ! : RegReplaceKeyA ;
 ! : RegReplaceKeyW ;
@@ -756,7 +961,8 @@ FUNCTION: BOOL OpenThreadToken ( HANDLE ThreadHandle, DWORD DesiredAccess, BOOL 
 ! : SetEntriesInAccessListA ;
 ! : SetEntriesInAccessListW ;
 ! : SetEntriesInAclA ;
-! : SetEntriesInAclW ;
+FUNCTION: DWORD SetEntriesInAclW ( ULONG cCountOfExplicitEntries, PEXPLICIT_ACCESS pListOfExplicitEntries, PACL OldAcl, PACL* NewAcl ) ;
+ALIAS: SetEntriesInAcl SetEntriesInAclW
 ! : SetEntriesInAuditListA ;
 ! : SetEntriesInAuditListW ;
 ! : SetFileSecurityA ;
@@ -767,7 +973,8 @@ FUNCTION: BOOL OpenThreadToken ( HANDLE ThreadHandle, DWORD DesiredAccess, BOOL 
 ! : SetNamedSecurityInfoA ;
 ! : SetNamedSecurityInfoExA ;
 ! : SetNamedSecurityInfoExW ;
-! : SetNamedSecurityInfoW ;
+FUNCTION: DWORD SetNamedSecurityInfoW ( LPTSTR pObjectName, SE_OBJECT_TYPE ObjectType, SECURITY_INFORMATION SecurityInfo, PSID psidOwner, PSID psidGroup, PACL pDacl, PACL pSacl ) ;
+ALIAS: SetNamedSecurityInfo SetNamedSecurityInfoW
 ! : SetPrivateObjectSecurity ;
 ! : SetPrivateObjectSecurityEx ;
 ! : SetSecurityDescriptorControl ;

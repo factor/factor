@@ -18,23 +18,23 @@ IN: mason.release.archive
 
 : archive-name ( -- string ) base-name extension append ;
 
-: make-windows-archive ( -- )
-    [ "zip" , "-r" , archive-name , "factor" , ] { } make try-process ;
+: make-windows-archive ( archive-name -- )
+    [ "zip" , "-r" , , "factor" , ] { } make try-output-process ;
 
-: make-macosx-archive ( -- )
-    { "mkdir" "dmg-root" } try-process
-    { "cp" "-R" "factor" "dmg-root" } try-process
+: make-macosx-archive ( archive-name -- )
+    { "mkdir" "dmg-root" } try-output-process
+    { "cp" "-R" "factor" "dmg-root" } try-output-process
     { "hdiutil" "create"
         "-srcfolder" "dmg-root"
         "-fs" "HFS+"
     "-volname" "factor" }
-    archive-name suffix try-process
+    swap suffix try-output-process
     "dmg-root" really-delete-tree ;
 
-: make-unix-archive ( -- )
-    [ "tar" , "-cvzf" , archive-name , "factor" , ] { } make try-process ;
+: make-unix-archive ( archive-name -- )
+    [ "tar" , "-cvzf" , , "factor" , ] { } make try-output-process ;
 
-: make-archive ( -- )
+: make-archive ( archive-name -- )
     target-os get {
         { "winnt" [ make-windows-archive ] }
         { "macosx" [ make-macosx-archive ] }
@@ -44,5 +44,5 @@ IN: mason.release.archive
 : releases ( -- path )
     builds-dir get "releases" append-path dup make-directories ;
 
-: save-archive ( -- )
-    archive-name releases move-file-into ;
+: save-archive ( archive-name -- )
+    releases move-file-into ;

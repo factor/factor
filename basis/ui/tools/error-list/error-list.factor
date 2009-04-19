@@ -26,7 +26,7 @@ MEMO: error-icon ( type -- image-name )
 
 : <error-toggle> ( -- model gadget )
     #! Linkage errors are not shown by default.
-    error-types get keys [ dup +linkage-error+ eq? not <model> ] { } map>assoc
+    error-types get [ fatal?>> <model> ] assoc-map
     [ [ [ error-icon ] dip ] assoc-map <checkboxes> ]
     [ <mapping> ] bi ;
 
@@ -80,7 +80,7 @@ M: error-renderer row-columns
         {
             [ error-type error-icon ]
             [ line#>> [ number>string ] [ "" ] if* ]
-            [ asset>> unparse-short ]
+            [ asset>> [ unparse-short ] [ "" ] if* ]
             [ error>> summary ]
         } cleave
     ] output>array ;
