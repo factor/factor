@@ -45,7 +45,7 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
 
 : adjust-texture-dim ( dim -- dim' )
     non-power-of-2-textures? get [
-        [ next-power-of-2 ] map
+        [ dup 1 = [ next-power-of-2 ] unless ] map
     ] unless ;
 
 : (tex-image) ( image bitmap -- )

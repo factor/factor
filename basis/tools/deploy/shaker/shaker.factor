@@ -357,7 +357,7 @@ IN: tools.deploy.shaker
     V{ } set-namestack
     V{ } set-catchstack
     "Saving final image" show
-    [ save-image-and-exit ] call-clear ;
+    save-image-and-exit ;
 
 SYMBOL: deploy-vocab
 
@@ -421,10 +421,10 @@ SYMBOL: deploy-vocab
 : deploy-error-handler ( quot -- )
     [
         strip-debugger?
-        [ error-continuation get call>> callstack>array die ]
+        [ error-continuation get call>> callstack>array die 1 exit ]
         ! Don't reference these words literally, if we're stripping the
         ! debugger out we don't want to load the prettyprinter at all
-        [ [:c] execute nl [print-error] execute flush ] if
+        [ [:c] execute( -- ) nl [print-error] execute( error -- ) flush ] if
         1 exit
     ] recover ; inline
 

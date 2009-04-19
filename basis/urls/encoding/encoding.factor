@@ -14,6 +14,25 @@ IN: urls.encoding
         [ "/_-.:" member? ]
     } 1|| ; foldable
 
+! see http://tools.ietf.org/html/rfc3986#section-2.2
+: gen-delim? ( ch -- ? )
+    ":/?#[]@" member? ; foldable
+
+: sub-delim? ( ch -- ? )
+    "!$&'()*+,;=" member? ; foldable
+
+: reserved? ( ch -- ? )
+    [ gen-delim? ] [ sub-delim? ] bi or ; foldable
+
+! see http://tools.ietf.org/html/rfc3986#section-2.3
+: unreserved? ( ch -- ? )
+    {
+        [ letter? ]
+        [ LETTER? ]
+        [ digit? ]
+        [ "-._~" member? ]
+    } 1|| ; foldable
+
 <PRIVATE
 
 : push-utf8 ( ch -- )
@@ -25,6 +44,11 @@ PRIVATE>
 : url-encode ( str -- encoded )
     [
         [ dup url-quotable? [ , ] [ push-utf8 ] if ] each
+    ] "" make ;
+
+: url-encode-full ( str -- encoded )
+    [
+        [ dup unreserved? [ , ] [ push-utf8 ] if ] each
     ] "" make ;
 
 <PRIVATE

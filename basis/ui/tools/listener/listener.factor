@@ -358,9 +358,8 @@ interactor "completion" f {
 } define-command-map
 
 : ui-error-summary ( -- )
-    all-errors [
-        [ error-type ] map prune
-        [ error-icon-path 1array \ $image prefix " " 2array ] { } map-as
+    error-counts keys [
+        [ icon>> 1array \ $image prefix " " 2array ] { } map-as
         { "Press " { $command tool "common" show-error-list } " to view errors." }
         append print-element nl
     ] unless-empty ;

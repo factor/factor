@@ -27,12 +27,12 @@ SYMBOLS:
 
 : (flag) ( thing -- integer )
     {
-        { [ dup word? ] [ execute ] }
-        { [ dup callable? ] [ call ] }
+        { [ dup word? ] [ execute( -- value ) ] }
+        { [ dup callable? ] [ call( -- value ) ] }
         [ ]
     } cond ;
 
-: (flags) ( array -- )
+: (flags) ( array -- n )
     0 [ (flag) bitor ] reduce ;
 
 : (DIOBJECTDATAFORMAT) ( pguid dwOfs dwType dwFlags alien -- alien )
@@ -63,14 +63,16 @@ SYMBOLS:
     ] ;
 
 : (DIDATAFORMAT) ( dwSize dwObjSize dwFlags dwDataSize dwNumObjs rgodf alien -- alien )
-    [ {
-        [ set-DIDATAFORMAT-rgodf ]
-        [ set-DIDATAFORMAT-dwNumObjs ]
-        [ set-DIDATAFORMAT-dwDataSize ]
-        [ set-DIDATAFORMAT-dwFlags ]
-        [ set-DIDATAFORMAT-dwObjSize ]
-        [ set-DIDATAFORMAT-dwSize ]
-    } cleave ] keep ;
+    [
+        {
+            [ set-DIDATAFORMAT-rgodf ]
+            [ set-DIDATAFORMAT-dwNumObjs ]
+            [ set-DIDATAFORMAT-dwDataSize ]
+            [ set-DIDATAFORMAT-dwFlags ]
+            [ set-DIDATAFORMAT-dwObjSize ]
+            [ set-DIDATAFORMAT-dwSize ]
+        } cleave
+    ] keep ;
 
 : <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
     [ "DIDATAFORMAT" heap-size "DIOBJECTDATAFORMAT" heap-size ] 4 ndip
@@ -78,9 +80,10 @@ SYMBOLS:
     "DIDATAFORMAT" <c-object> (DIDATAFORMAT) ;
 
 : (malloc-guid-symbol) ( symbol guid -- )
-    global swap '[ [
-        _ execute [ byte-length malloc ] [ over byte-array>memory ] bi
-    ] unless* ] change-at ;
+    '[
+        _ execute( -- value )
+        [ byte-length malloc ] [ over byte-array>memory ] bi
+    ] initialize ;
 
 : define-guid-constants ( -- )
     {
@@ -105,7 +108,7 @@ SYMBOLS:
     } [ first2 (malloc-guid-symbol) ] each ;
 
 : define-joystick-format-constant ( -- )
-    c_dfDIJoystick2 global [ [
+    c_dfDIJoystick2 [
         DIDF_ABSAXIS
         "DIJOYSTATE2" heap-size
         "DIJOYSTATE2" {
@@ -274,10 +277,10 @@ SYMBOLS:
             { GUID_Slider_malloced "rglFSlider"   0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTFORCE }
             { GUID_Slider_malloced "rglFSlider"   1 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTFORCE }
         } <DIDATAFORMAT>
-    ] unless* ] change-at ;
+    ] initialize ;
 
 : define-mouse-format-constant ( -- )
-    c_dfDIMouse2 global [ [
+    c_dfDIMouse2 [
         DIDF_RELAXIS
         "DIMOUSESTATE2" heap-size
         "DIMOUSESTATE2" {
@@ -293,13 +296,13 @@ SYMBOLS:
             { GUID_Button_malloced "rgbButtons" 6 { DIDFT_OPTIONAL DIDFT_ANYINSTANCE DIDFT_BUTTON } 0 }
             { GUID_Button_malloced "rgbButtons" 7 { DIDFT_OPTIONAL DIDFT_ANYINSTANCE DIDFT_BUTTON } 0 }
         } <DIDATAFORMAT>
-    ] unless* ] change-at ;
+    ] initialize ;
 
 ! Not a standard DirectInput format. Included for cross-platform niceness.
 ! This format returns the keyboard keys in USB HID order rather than Windows
 ! order
 : define-hid-keyboard-format-constant ( -- )
-    c_dfDIKeyboard_HID global [ [
+    c_dfDIKeyboard_HID [
         DIDF_RELAXIS
         256
         f {
@@ -560,10 +563,10 @@ SYMBOLS:
             { GUID_Key_malloced f 254 { DIDFT_OPTIONAL DIDFT_BUTTON [ 0 DIDFT_MAKEINSTANCE ] } 0 }
             { GUID_Key_malloced f 255 { DIDFT_OPTIONAL DIDFT_BUTTON [ 0 DIDFT_MAKEINSTANCE ] } 0 }
         } <DIDATAFORMAT>
-    ] unless* ] change-at ;
+    ] initialize ;
 
 : define-keyboard-format-constant ( -- )
-    c_dfDIKeyboard global [ [
+    c_dfDIKeyboard [
         DIDF_RELAXIS
         256
         f {
@@ -824,7 +827,7 @@ SYMBOLS:
             { GUID_Key_malloced f 254 { DIDFT_OPTIONAL DIDFT_BUTTON [ 254 DIDFT_MAKEINSTANCE ] } 0 }
             { GUID_Key_malloced f 255 { DIDFT_OPTIONAL DIDFT_BUTTON [ 255 DIDFT_MAKEINSTANCE ] } 0 }
         } <DIDATAFORMAT>
-    ] unless* ] change-at ;
+    ] initialize ;
 
 : define-format-constants ( -- )
     define-joystick-format-constant
@@ -837,7 +840,9 @@ SYMBOLS:
     define-format-constants ;
 
 [ define-constants ] "windows.dinput.constants" add-init-hook
-define-constants
+
+: uninitialize ( variable quot -- )
+    [ global ] dip '[ _ when* f ] change-at ; inline
 
 : free-dinput-constants ( -- )
     {
@@ -846,10 +851,11 @@ define-constants
         GUID_Slider_malloced GUID_Button_malloced GUID_Key_malloced GUID_POV_malloced GUID_Unknown_malloced
         GUID_SysMouse_malloced GUID_SysKeyboard_malloced GUID_Joystick_malloced GUID_SysMouseEm_malloced
         GUID_SysMouseEm2_malloced GUID_SysKeyboardEm_malloced GUID_SysKeyboardEm2_malloced
-    } [ global [ [ free ] when* f ] change-at ] each
+    } [ [ free ] uninitialize ] each
+
     {
         c_dfDIKeyboard c_dfDIKeyboard_HID c_dfDIMouse2 c_dfDIJoystick2
-    } [ global [ [ DIDATAFORMAT-rgodf free ] when* f ] change-at ] each ;
+    } [ [ DIDATAFORMAT-rgodf free ] uninitialize ] each ;
 
 PRIVATE>
 

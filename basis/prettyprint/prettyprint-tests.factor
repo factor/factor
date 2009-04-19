@@ -2,8 +2,8 @@ USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
-continuations generic compiler.units tools.walker eval
-accessors make vocabs.parser see ;
+continuations generic compiler.units tools.continuations
+tools.continuations.private eval accessors make vocabs.parser see ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -254,7 +254,7 @@ M: class-see-layout class-see-layout ;
 ! Regression
 [ t ] [
     "IN: prettyprint.tests\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
-    dup (( -- )) eval
+    dup eval( -- )
     "generic-decl-test" "prettyprint.tests" lookup
     [ see ] with-string-writer =
 ] unit-test

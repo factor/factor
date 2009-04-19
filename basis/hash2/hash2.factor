@@ -1,4 +1,6 @@
-USING: kernel sequences arrays math vectors ;
+! Copyright (C) 2007 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel sequences arrays math vectors locals ;
 IN: hash2
 
 ! Little ad-hoc datastructure used to map two numbers
@@ -22,8 +24,8 @@ IN: hash2
 : assoc2 ( a b alist -- value )
     (assoc2) dup [ third ] when ; inline
 
-: set-assoc2 ( value a b alist -- alist )
-    [ rot 3array ] dip ?push ; inline
+:: set-assoc2 ( value a b alist -- alist )
+    { a b value } alist ?push ; inline
 
 : hash2@ ( a b hash2 -- a b bucket hash2 )
     [ 2dup hashcode2 ] dip [ length mod ] keep ; inline
@@ -31,8 +33,8 @@ IN: hash2
 : hash2 ( a b hash2 -- value/f )
     hash2@ nth dup [ assoc2 ] [ 3drop f ] if ;
 
-: set-hash2 ( a b value hash2 -- )
-    [ -rot ] dip hash2@ [ set-assoc2 ] change-nth ;
+:: set-hash2 ( a b value hash2 -- )
+    value a b hash2 hash2@ [ set-assoc2 ] change-nth ;
 
 : alist>hash2 ( alist size -- hash2 )
     <hash2> [ over [ first3 ] dip set-hash2 ] reduce ; inline
