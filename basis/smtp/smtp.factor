@@ -164,9 +164,8 @@ M: plain-auth send-auth
 
 : encode-header ( string -- string' )
     dup aux>> [
-        "=?utf-8?B?"
-        swap utf8 encode >base64
-        "?=" 3append
+        utf8 encode >base64
+        "=?utf-8?B?" "?=" surround
     ] when ;
 
 ERROR: invalid-header-string string ;
