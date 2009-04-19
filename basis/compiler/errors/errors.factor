@@ -1,7 +1,6 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors source-files.errors kernel namespaces assocs
-tools.errors ;
+USING: accessors source-files.errors kernel namespaces assocs ;
 IN: compiler.errors
 
 TUPLE: compiler-error < source-file-error ;
@@ -53,12 +52,3 @@ T{ error-type
 : compiler-error ( error word -- )
     compiler-errors get-global pick
     [ [ [ <compiler-error> ] keep ] dip set-at ] [ delete-at drop ] if ;
-
-: compiler-errors. ( type -- )
-    errors-of-type values errors. ;
-
-: :errors ( -- ) +compiler-error+ compiler-errors. ;
-
-: :warnings ( -- ) +compiler-warning+ compiler-errors. ;
-
-: :linkage ( -- ) +linkage-error+ compiler-errors. ;

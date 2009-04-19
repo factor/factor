@@ -59,9 +59,6 @@ t fuel-eval-res-flag set-global
     [ [ parse-lines ] with-compilation-unit call( -- ) ] curry
     [ print-error ] recover ;
 
-: (fuel-eval-each) ( lines -- )
-    [ (fuel-eval) ] each ;
-
 : (fuel-eval-usings) ( usings -- )
     [ [ use+ ] curry [ drop ] recover ] each
     fuel-forget-error fuel-forget-output ;
