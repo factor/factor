@@ -204,7 +204,7 @@ ERROR: invalid-header-string string ;
         now timestamp>rfc822 "Date" set
         message-id "Message-Id" set
         "1.0" "MIME-Version" set
-        "quoted-printable" "Content-Transfer-Encoding" set
+        "base64" "Content-Transfer-Encoding" set
         {
             [ from>> "From" set ]
             [ to>> ", " join "To" set ]
