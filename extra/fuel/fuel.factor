@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: assocs compiler.units fuel.eval fuel.help fuel.remote fuel.xref
-help.topics io.pathnames kernel namespaces parser sequences
-tools.scaffold vocabs.loader ;
+USING: accessors assocs compiler.units continuations fuel.eval fuel.help
+fuel.remote fuel.xref help.topics io.pathnames kernel math namespaces parser
+sequences tools.scaffold vocabs.loader ;
 
 IN: fuel
 
@@ -28,6 +28,24 @@ IN: fuel
 <PRIVATE
 
 SYMBOL: :uses
+SYMBOL: :uses-suggestions
+
+: is-use-restart ( restart -- ? )
+    name>> [ "Use the " head? ] [ " vocabulary" tail? ] bi and ;
+
+: get-restart-vocab ( restart -- vocab )
+    [ "Use the " length ] dip
+    name>> [ length " vocabulary" length - ] keep
+    subseq ;
+
+: is-suggested-restart ( restart -- ? )
+    dup is-use-restart [
+        get-restart-vocab :uses-suggestions get member?
+    ] [ drop f ] if ;
+
+: try-suggested-restarts ( -- )
+    restarts get [ is-suggested-restart ] filter
+    dup length 1 = [ first restart ] [ drop ] if ;
 
 : fuel-set-use-hook ( -- )
     [ amended-use get clone :uses prefix fuel-eval-set-result ]
@@ -37,6 +55,10 @@ SYMBOL: :uses
     [ parse-fresh drop ] curry with-compilation-unit ; inline
 
 PRIVATE>
+
+: fuel-use-suggested-vocabs ( ... suggestions quot: ( ... -- ... ) -- ... )
+    [ :uses-suggestions set ] dip
+    [ try-suggested-restarts rethrow ] recover ;
 
 : fuel-run-file ( path -- )
     [ fuel-set-use-hook run-file ] curry with-scope ; inline
