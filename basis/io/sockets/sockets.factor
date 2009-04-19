@@ -192,7 +192,7 @@ M: object (client) ( remote -- client-in client-out local )
     ] with-destructors ;
 
 : <client> ( remote encoding -- stream local )
-    [ (client) -rot ] dip <encoder-duplex> swap ;
+    [ (client) ] dip swap [ <encoder-duplex> ] dip ;
 
 SYMBOL: local-address
 
