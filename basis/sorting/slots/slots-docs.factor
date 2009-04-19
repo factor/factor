@@ -6,8 +6,10 @@ IN: sorting.slots
 
 HELP: compare-slots
 { $values
-     { "sort-specs" "a sequence of accessors ending with a comparator" }
-     { "<=>" { $link +lt+ } " " { $link +eq+ } " or " { $link +gt+ } }
+  { "obj1" object }
+  { "obj2" object }
+  { "sort-specs" "a sequence of accessors ending with a comparator" }
+  { "<=>" { $link +lt+ } " " { $link +eq+ } " or " { $link +gt+ } }
 }
 { $description "Compares two objects using a chain of intrinsic linear orders such that if two objects are " { $link +eq+ } ", then the next comparator is tried. The comparators are slot-name/comparator pairs." } ;
 
@@ -27,7 +29,7 @@ HELP: sort-by
         "    T{ sort-me f 2 3 } T{ sort-me f 3 2 }"
         "    T{ sort-me f 4 3 } T{ sort-me f 2 1 }"
         "}"
-        "{ { a>> <=> } { b>> >=< } } sort-by-slots ."
+        "{ { a>> <=> } { b>> >=< } } sort-by ."
         "{\n    T{ sort-me { a 2 } { b 3 } }\n    T{ sort-me { a 2 } { b 1 } }\n    T{ sort-me { a 3 } { b 2 } }\n    T{ sort-me { a 4 } { b 3 } }\n}"
     }
 } ;
