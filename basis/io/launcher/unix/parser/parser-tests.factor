@@ -10,13 +10,13 @@ USING: io.launcher.unix.parser tools.test ;
 [ V{ "abc" "def" } ] [ "abc def" tokenize-command ] unit-test
 [ V{ "abc def" } ] [ "abc\\ def" tokenize-command ] unit-test
 [ V{ "abc\\" "def" } ] [ "abc\\\\ def" tokenize-command ] unit-test
-[ V{ "abc\\ def" } ] [ "'abc\\\\ def'" tokenize-command ] unit-test
-[ V{ "abc\\ def" } ] [ "  'abc\\\\ def'" tokenize-command ] unit-test
-[ V{ "abc\\ def" "hey" } ] [ "'abc\\\\ def' hey" tokenize-command ] unit-test
-[ V{ "abc def" "hey" } ] [ "'abc def' \"hey\"" tokenize-command ] unit-test
-[ "'abc def' \"hey" tokenize-command ] must-fail
-[ "'abc def" tokenize-command ] must-fail
-[ V{ "abc def" "h\"ey" } ] [ "'abc def' \"h\\\"ey\"  " tokenize-command ] unit-test
+[ V{ "abc\\ def" } ] [ "\"abc\\\\ def\"" tokenize-command ] unit-test
+[ V{ "abc\\ def" } ] [ "  \"abc\\\\ def\"" tokenize-command ] unit-test
+[ V{ "abc\\ def" "hey" } ] [ "\"abc\\\\ def\" hey" tokenize-command ] unit-test
+[ V{ "abc def" "hey" } ] [ "\"abc def\" \"hey\"" tokenize-command ] unit-test
+[ "\"abc def\" \"hey" tokenize-command ] must-fail
+[ "\"abc def" tokenize-command ] must-fail
+[ V{ "abc def" "h\"ey" } ] [ "\"abc def\" \"h\\\"ey\"  " tokenize-command ] unit-test
 
 [
     V{
