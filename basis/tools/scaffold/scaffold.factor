@@ -303,9 +303,9 @@ SYMBOL: examples-flag
     [ touch-file ] [ "Click to edit: " write <pathname> . ] bi ;
 
 : scaffold-factor-boot-rc ( -- )
-    windows? "factor-boot-rc" ".factor-boot-rc" ? scaffold-rc ;
+    os windows? "factor-boot-rc" ".factor-boot-rc" ? scaffold-rc ;
 
 : scaffold-factor-rc ( -- )
-    windows? "factor-rc" ".factor-rc" ? scaffold-rc ;
+    os windows? "factor-rc" ".factor-rc" ? scaffold-rc ;
 
 : scaffold-emacs ( -- ) ".emacs" scaffold-rc ;
