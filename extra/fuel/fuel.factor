@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs compiler.units continuations fuel.eval fuel.help
-fuel.remote fuel.xref help.topics io.pathnames kernel math namespaces parser
-sequences tools.scaffold vocabs.loader ;
+fuel.remote fuel.xref help.topics io.pathnames kernel namespaces parser
+sequences tools.scaffold vocabs.loader words ;
 
 IN: fuel
 
@@ -33,10 +33,8 @@ SYMBOL: :uses-suggestions
 : is-use-restart ( restart -- ? )
     name>> [ "Use the " head? ] [ " vocabulary" tail? ] bi and ;
 
-: get-restart-vocab ( restart -- vocab )
-    [ "Use the " length ] dip
-    name>> [ length " vocabulary" length - ] keep
-    subseq ;
+: get-restart-vocab ( restart -- vocab/f )
+    obj>> dup word? [ vocabulary>> ] [ drop f ] if ;
 
 : is-suggested-restart ( restart -- ? )
     dup is-use-restart [
@@ -56,9 +54,9 @@ SYMBOL: :uses-suggestions
 
 PRIVATE>
 
-: fuel-use-suggested-vocabs ( ... suggestions quot: ( ... -- ... ) -- ... )
+: fuel-use-suggested-vocabs ( suggestions quot ... suggestions quot: ( ... -- ... ) -- ... )
     [ :uses-suggestions set ] dip
-    [ try-suggested-restarts rethrow ] recover ;
+    [ try-suggested-restarts rethrow ] recover ; inline
 
 : fuel-run-file ( path -- )
     [ fuel-set-use-hook run-file ] curry with-scope ; inline
