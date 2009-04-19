@@ -59,17 +59,14 @@ t fuel-eval-res-flag set-global
     [ [ parse-lines ] with-compilation-unit call( -- ) ] curry
     [ print-error ] recover ;
 
-: (fuel-eval-each) ( lines -- )
-    [ (fuel-eval) ] each ;
-
 : (fuel-eval-usings) ( usings -- )
     [ "USE: " prepend ] map
-    (fuel-eval-each) fuel-forget-error fuel-forget-output ;
+    (fuel-eval) fuel-forget-error fuel-forget-output ;
 
 : (fuel-eval-in) ( in -- )
-    [ dup "IN: " prepend (fuel-eval) in set ] when* ;
+    [ dup "IN: " prepend 1array (fuel-eval) in set ] when* ;
 
 : (fuel-eval-in-context) ( lines in usings -- )
     (fuel-begin-eval)
-    [ (fuel-eval-usings) (fuel-eval-in) "\n" join (fuel-eval) ] with-string-writer
+    [ (fuel-eval-usings) (fuel-eval-in) (fuel-eval) ] with-string-writer
     (fuel-end-eval) ;
