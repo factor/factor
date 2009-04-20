@@ -48,17 +48,17 @@ SYMBOL: file
     f file get f failure ;
 
 :: (unit-test) ( output input -- error ? )
-    [ { } input with-datastack output assert-sequence= f f ] [ t ] recover ; inline
+    [ { } input with-datastack output assert-sequence= f f ] [ t ] recover ;
 
 : short-effect ( effect -- pair )
     [ in>> length ] [ out>> length ] bi 2array ;
 
 :: (must-infer-as) ( effect quot -- error ? )
-    [ quot infer short-effect effect assert= f f ] [ t ] recover ; inline
+    [ quot infer short-effect effect assert= f f ] [ t ] recover ;
 
 :: (must-infer) ( word/quot -- error ? )
     word/quot dup word? [ '[ _ execute ] ] when :> quot
-    [ quot infer drop f f ] [ t ] recover ; inline
+    [ quot infer drop f f ] [ t ] recover ;
 
 TUPLE: did-not-fail ;
 CONSTANT: did-not-fail T{ did-not-fail }
@@ -66,11 +66,11 @@ CONSTANT: did-not-fail T{ did-not-fail }
 M: did-not-fail summary drop "Did not fail" ;
 
 :: (must-fail-with) ( quot pred -- error ? )
-    [ quot call did-not-fail t ]
-    [ dup pred call [ drop f f ] [ t ] if ] recover ; inline
+    [ { } quot with-datastack drop did-not-fail t ]
+    [ dup pred call( error -- ? ) [ drop f f ] [ t ] if ] recover ;
 
 :: (must-fail) ( quot -- error ? )
-    [ quot call did-not-fail t ] [ drop f f ] recover ; inline
+    [ { } quot with-datastack drop did-not-fail t ] [ drop f f ] recover ;
 
 : experiment-title ( word -- string )
     "(" ?head drop ")" ?tail drop { { CHAR: - CHAR: \s } } substitute >title ;
