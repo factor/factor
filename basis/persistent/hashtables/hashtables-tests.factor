@@ -83,7 +83,7 @@ M: hash-0-b hashcode* 2drop 0 ;
 : random-string ( -- str )
     1000000 random ; ! [ CHAR: a CHAR: z [a,b] random ] "" replicate-as ;
 
-: random-assocs ( -- hash phash )
+: random-assocs ( n -- hash phash )
     [ random-string ] replicate
     [ H{ } clone [ '[ swap _ set-at ] each-index ] keep ]
     [ PH{ } clone swap [ spin new-at ] each-index ]
@@ -92,7 +92,7 @@ M: hash-0-b hashcode* 2drop 0 ;
 : ok? ( assoc1 assoc2 -- ? )
     [ assoc= ] [ [ assoc-size ] bi@ = ] 2bi and ;
 
-: test-persistent-hashtables-1 ( n -- )
+: test-persistent-hashtables-1 ( n -- ? )
     random-assocs ok? ;
 
 [ t ] [ 10 test-persistent-hashtables-1 ] unit-test
@@ -106,7 +106,7 @@ M: hash-0-b hashcode* 2drop 0 ;
 [ t ] [ 10000 test-persistent-hashtables-1 ] unit-test
 [ t ] [ 50000 test-persistent-hashtables-1 ] unit-test
 
-: test-persistent-hashtables-2 ( n -- )
+: test-persistent-hashtables-2 ( n -- ? )
     random-assocs
     dup keys [
         [ nip over delete-at ] [ swap pluck-at nip ] 3bi

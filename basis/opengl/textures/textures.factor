@@ -45,7 +45,7 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
 
 : adjust-texture-dim ( dim -- dim' )
     non-power-of-2-textures? get [
-        [ next-power-of-2 ] map
+        [ dup 1 = [ next-power-of-2 ] unless ] map
     ] unless ;
 
 : (tex-image) ( image bitmap -- )
@@ -128,7 +128,9 @@ M: single-texture dispose*
     [ display-list>> [ delete-dlist ] when* ] bi ;
 
 M: single-texture draw-scaled-texture
-    dup texture>> [ draw-textured-rect ] [ 2drop ] if ;
+    2dup dim>> = [ nip draw-texture ] [
+        dup texture>> [ draw-textured-rect ] [ 2drop ] if
+    ] if ;
 
 TUPLE: multi-texture grid display-list loc disposed ;
 
@@ -165,6 +167,8 @@ TUPLE: multi-texture grid display-list loc disposed ;
         ] keep
         f multi-texture boa
     ] with-destructors ;
+
+M: multi-texture draw-scaled-texture nip draw-texture ;
 
 M: multi-texture dispose* grid>> [ [ dispose ] each ] each ;
 

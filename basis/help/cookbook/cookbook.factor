@@ -74,7 +74,7 @@ $nl
     "shuffle-words"
     "words"
     "generic"
-    "tools"
+    "handbook-tools-reference"
 } ;
 
 ARTICLE: "cookbook-combinators" "Control flow cookbook"

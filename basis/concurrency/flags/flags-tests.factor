@@ -11,7 +11,7 @@ kernel threads locals accessors calendar ;
 
 [ f ] [ flag-test-1 ] unit-test
 
-:: flag-test-2 ( -- )
+:: flag-test-2 ( -- ? )
     [let | f [ <flag> ] |
         [ 1 seconds sleep f raise-flag ] "Flag test" spawn drop
         f lower-flag

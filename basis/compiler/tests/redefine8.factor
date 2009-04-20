@@ -16,7 +16,7 @@ IN: compiler.tests
     ! We add the bogus quotation here to hinder inlining
     ! since otherwise we cannot trigger this bug.
     M: my-mixin my-generic 1 + [ [ <=> ] sort ] drop ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ ] [
@@ -24,7 +24,7 @@ IN: compiler.tests
     USE: math
     IN: compiler.tests.redefine8
     INSTANCE: float my-mixin
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ 2.0 ] [

@@ -1,10 +1,10 @@
-! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs benchmark bootstrap.stage2
-compiler.errors generic help.html help.lint io.directories
+USING: accessors assocs benchmark bootstrap.stage2 compiler.errors
+source-files.errors generic help.html help.lint io.directories
 io.encodings.utf8 io.files kernel mason.common math namespaces
-prettyprint sequences sets sorting tools.test tools.time
-tools.vocabs words system io ;
+prettyprint sequences sets sorting tools.test tools.time tools.vocabs
+words system io tools.errors locals ;
 IN: mason.test
 
 : do-load ( -- )
@@ -19,27 +19,36 @@ M: word word-vocabulary vocabulary>> ;
 
 M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
 
+:: do-step ( errors summary-file details-file -- )
+    errors
+    [ error-type +linkage-error+ eq? not ] filter
+    [ file>> ] map prune natural-sort summary-file to-file
+    errors details-file utf8 [ errors. ] with-file-writer ;
+
 : do-compile-errors ( -- )
-    compiler-errors-file utf8 [
-        +error+ errors-of-type keys
-        [ word-vocabulary ] map
-        prune natural-sort .
-    ] with-file-writer ;
+    compiler-errors get values
+    compiler-errors-file
+    compiler-error-messages-file
+    do-step ;
 
 : do-tests ( -- )
-    run-all-tests
-    [ keys test-all-vocabs-file to-file ]
-    [ test-all-errors-file utf8 [ test-failures. ] with-file-writer ]
-    bi ;
+    test-all test-failures get
+    test-all-vocabs-file
+    test-all-errors-file
+    do-step ;
 
 : do-help-lint ( -- )
-    "" run-help-lint
-    [ keys help-lint-vocabs-file to-file ]
-    [ help-lint-errors-file utf8 [ typos. ] with-file-writer ]
-    bi ;
+    help-lint-all lint-failures get values
+    help-lint-vocabs-file
+    help-lint-errors-file
+    do-step ;
 
 : do-benchmarks ( -- )
-    run-benchmarks benchmarks-file to-file ;
+    run-benchmarks
+    [ benchmarks-file to-file ] [
+        [ keys benchmark-error-vocabs-file to-file ]
+        [ benchmark-error-messages-file utf8 [ benchmark-errors. ] with-file-writer ] bi
+    ] bi* ;
 
 : benchmark-ms ( quot -- ms )
     benchmark 1000 /i ; inline

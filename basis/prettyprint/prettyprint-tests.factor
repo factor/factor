@@ -2,8 +2,8 @@ USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
-continuations generic compiler.units tools.walker eval
-accessors make vocabs.parser see ;
+continuations generic compiler.units tools.continuations
+tools.continuations.private eval accessors make vocabs.parser see ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -90,7 +90,7 @@ unit-test
     [ \ blah see ] with-string-writer "\n" ?tail drop 6 tail*
 ] unit-test
 
-: check-see ( expect name -- )
+: check-see ( expect name -- ? )
     [
         use [ clone ] change
 
@@ -105,6 +105,7 @@ unit-test
 GENERIC: method-layout ( a -- b )
 
 M: complex method-layout
+    drop
     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ;
 
@@ -116,8 +117,9 @@ M: object method-layout ;
 
 [
     {
-        "USING: math prettyprint.tests ;"
+        "USING: kernel math prettyprint.tests ;"
         "M: complex method-layout"
+        "    drop"
         "    \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\""
         "    ;"
         ""
@@ -180,15 +182,15 @@ DEFER: parse-error-file
     "string-layout-test" string-layout check-see
 ] unit-test
 
-: narrow-test ( -- str )
+: narrow-test ( -- array )
     {
         "USING: arrays combinators continuations kernel sequences ;"
         "IN: prettyprint.tests"
-        ": narrow-layout ( obj -- )"
+        ": narrow-layout ( obj1 obj2 -- obj3 )"
         "    {"
         "        { [ dup continuation? ] [ append ] }"
         "        { [ dup not ] [ drop reverse ] }"
-        "        { [ dup pair? ] [ delete ] }"
+        "        { [ dup pair? ] [ [ delete ] keep ] }"
         "    } cond ;"
     } ;
 
@@ -196,7 +198,7 @@ DEFER: parse-error-file
     "narrow-layout" narrow-test check-see
 ] unit-test
 
-: another-narrow-test ( -- str )
+: another-narrow-test ( -- array )
     {
         "IN: prettyprint.tests"
         ": another-narrow-layout ( -- obj )"
@@ -252,19 +254,15 @@ M: class-see-layout class-see-layout ;
 ! Regression
 [ t ] [
     "IN: prettyprint.tests\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
-    dup eval
+    dup eval( -- )
     "generic-decl-test" "prettyprint.tests" lookup
     [ see ] with-string-writer =
 ] unit-test
 
-[ [ + ] ] [
-    [ \ + (step-into-execute) ] (remove-breakpoints)
-] unit-test
+[ [ + ] ] [ [ \ + (step-into-execute) ] (remove-breakpoints) ] unit-test
 
-[ [ (step-into-execute) ] ] [
-    [ (step-into-execute) ] (remove-breakpoints)
-] unit-test
-
+[ [ (step-into-execute) ] ] [ [ (step-into-execute) ] (remove-breakpoints) ] unit-test
+ 
 [ [ 2 2 + . ] ] [
     [ 2 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test

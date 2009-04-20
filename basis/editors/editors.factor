@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser lexer kernel namespaces sequences definitions
-io.files io.backend io.pathnames io summary continuations
-tools.crossref tools.vocabs prettyprint source-files assocs
+USING: parser lexer kernel namespaces sequences definitions io.files
+io.backend io.pathnames io summary continuations tools.crossref
+tools.vocabs prettyprint source-files source-files.errors assocs
 vocabs vocabs.loader splitting accessors debugger prettyprint
 help.topics ;
 IN: editors
@@ -57,7 +57,7 @@ M: lexer-error error-line
     [ error>> error-line ] [ line>> ] bi or ;
 
 M: source-file-error error-file
-    [ error>> error-file ] [ file>> path>> ] bi or ;
+    [ error>> error-file ] [ file>> ] bi or ;
 
 M: source-file-error error-line
     error>> error-line ;
@@ -80,6 +80,9 @@ M: object error-line
 
 : :edit ( -- )
     error get (:edit) ;
+
+: edit-error ( error -- )
+    [ file>> ] [ line#>> ] bi 2dup and [ edit-location ] [ 2drop ] if ;
 
 : edit-each ( seq -- )
     [

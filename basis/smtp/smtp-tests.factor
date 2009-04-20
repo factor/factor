@@ -16,7 +16,7 @@ IN: smtp.tests
 [ { "hello" "." "world" } validate-message ] must-fail
 
 [ "aGVsbG8Kd29ybGQ=\r\n.\r\n" ] [
-    "hello\nworld" [ send-body ] with-string-writer
+    T{ email { body "hello\nworld" } } [ send-body ] with-string-writer
 ] unit-test
 
 [ { "500 syntax error" } <response> check-response ]
@@ -51,7 +51,7 @@ IN: smtp.tests
 [
     {
         { "Content-Transfer-Encoding" "base64" }
-        { "Content-Type" "Text/plain; charset=utf-8" }
+        { "Content-Type" "text/plain; charset=UTF-8" }
         { "From" "Doug <erg@factorcode.org>" }
         { "MIME-Version" "1.0" }
         { "Subject" "Factor rules" }

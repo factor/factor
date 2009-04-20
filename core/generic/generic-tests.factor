@@ -65,11 +65,11 @@ M: number union-containment drop 2 ;
 [ 2 ] [ 1.0 union-containment ] unit-test
 
 ! Testing recovery from bad method definitions
-"IN: generic.tests GENERIC: unhappy ( x -- x )" eval
+"IN: generic.tests GENERIC: unhappy ( x -- x )" eval( -- )
 [
-    "IN: generic.tests M: dictionary unhappy ;" eval
+    "IN: generic.tests M: dictionary unhappy ;" eval( -- )
 ] must-fail
-[ ] [ "IN: generic.tests GENERIC: unhappy ( x -- x )" eval ] unit-test
+[ ] [ "IN: generic.tests GENERIC: unhappy ( x -- x )" eval( -- ) ] unit-test
 
 GENERIC# complex-combination 1 ( a b -- c )
 M: string complex-combination drop ;
@@ -177,7 +177,7 @@ M: f generic-forget-test-3 ;
 
 [ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
 
-[ ] [ "IN: generic.tests M: f generic-forget-test-3 ;" eval ] unit-test
+[ ] [ "IN: generic.tests M: f generic-forget-test-3 ;" eval( -- ) ] unit-test
 
 [ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
 
@@ -193,7 +193,7 @@ M: integer a-generic a-word ;
 
 [ t ] [ "m" get \ a-word usage memq? ] unit-test
 
-[ ] [ "IN: generic.tests : a-generic ( -- ) ;" eval ] unit-test
+[ ] [ "IN: generic.tests : a-generic ( -- ) ;" eval( -- ) ] unit-test
 
 [ f ] [ "m" get \ a-word usage memq? ] unit-test
 
@@ -207,25 +207,25 @@ M: integer a-generic a-word ;
     M: boii jeah ;
     GENERIC: jeah* ( a -- b )
     M: boii jeah* jeah ;
-    "> eval
+    "> eval( -- )
 
     <"
     IN: compiler.tests
     FORGET: boii
-    "> eval
+    "> eval( -- )
     
     <"
     IN: compiler.tests
     TUPLE: boii ;
     M: boii jeah ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 ! call-next-method cache test
 GENERIC: c-n-m-cache ( a -- b )
 
 ! Force it to be unoptimized
-M: fixnum c-n-m-cache { } [ ] like call call-next-method ;
+M: fixnum c-n-m-cache { } [ ] like call( -- ) call-next-method ;
 M: integer c-n-m-cache 1 + ;
 M: number c-n-m-cache ;
 

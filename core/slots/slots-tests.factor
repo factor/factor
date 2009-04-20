@@ -25,12 +25,12 @@ TUPLE: hello length ;
 [ t ] [ r/w-test \ foo>> method "flushable" word-prop ] unit-test
 
 ! See if declarations are cleared on redefinition
-[ ] [ "IN: slots.tests TUPLE: r/w-test { foo read-only } ;" eval ] unit-test
+[ ] [ "IN: slots.tests TUPLE: r/w-test { foo read-only } ;" eval( -- ) ] unit-test
 
 [ t ] [ r/w-test \ foo>> method "foldable" word-prop ] unit-test
 [ t ] [ r/w-test \ foo>> method "flushable" word-prop ] unit-test
 
-[ ] [ "IN: slots.tests TUPLE: r/w-test foo ;" eval ] unit-test
+[ ] [ "IN: slots.tests TUPLE: r/w-test foo ;" eval( -- ) ] unit-test
 
 [ f ] [ r/w-test \ foo>> method "foldable" word-prop ] unit-test
 [ t ] [ r/w-test \ foo>> method "flushable" word-prop ] unit-test

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences ui.gadgets ui.baseline-alignment kernel math
-math.functions math.vectors math.order math.rectangles namespaces
-accessors fry combinators arrays ;
+USING: sequences ui.gadgets ui.baseline-alignment
+ui.baseline-alignment.private kernel math math.functions math.vectors
+math.order math.rectangles namespaces accessors fry combinators arrays ;
 IN: ui.gadgets.packs
 
 TUPLE: pack < gadget
@@ -84,8 +84,7 @@ M: pack pref-dim*
     children>> dup pref-dims measure-metrics drop ;
 
 : pack-cap-height ( pack -- n )
-    children>> [ cap-height ] map sift
-    [ f ] [ supremum ] if-empty ;
+    children>> [ cap-height ] map ?supremum ;
 
 PRIVATE>
 

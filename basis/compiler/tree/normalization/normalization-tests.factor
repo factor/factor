@@ -17,13 +17,13 @@ sequences accessors tools.test kernel math ;
 
 [ 2 ] [ [ 3 [ drop ] [ 2drop 3 ] if ] build-tree count-introductions ] unit-test
 
-: foo ( -- ) swap ; inline recursive
+: foo ( quot: ( -- ) -- ) call ; inline recursive
 
 : recursive-inputs ( nodes -- n )
     [ #recursive? ] find nip child>> first in-d>> length ;
 
-[ 0 2 ] [
-    [ foo ] build-tree
+[ 1 3 ] [
+    [ [ swap ] foo ] build-tree
     [ recursive-inputs ]
     [ analyze-recursive normalize recursive-inputs ] bi
 ] unit-test
@@ -34,18 +34,18 @@ sequences accessors tools.test kernel math ;
 [ ] [ [ [ 1 ] [ 2 ] if + * ] test-normalization ] unit-test
 
 DEFER: bbb
-: aaa ( x -- ) dup [ dup [ bbb ] dip aaa ] [ drop ] if ; inline recursive
-: bbb ( x -- ) [ drop 0 ] dip aaa ; inline recursive
+: aaa ( obj x -- obj ) dup [ dup [ bbb ] dip aaa ] [ drop ] if ; inline recursive
+: bbb ( obj x -- obj ) [ drop 0 ] dip aaa ; inline recursive
 
 [ ] [ [ bbb ] test-normalization ] unit-test
 
-: ccc ( -- ) ccc drop 1 ; inline recursive
+: ccc ( obj -- 1 ) ccc drop 1 ; inline recursive
 
 [ ] [ [ ccc ] test-normalization ] unit-test
 
 DEFER: eee
-: ddd ( -- ) eee ; inline recursive
-: eee ( -- ) swap ddd ; inline recursive
+: ddd ( a b -- a b ) eee ; inline recursive
+: eee ( a b -- a b ) swap ddd ; inline recursive
 
 [ ] [ [ eee ] test-normalization ] unit-test
 

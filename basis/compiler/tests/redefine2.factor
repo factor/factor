@@ -5,7 +5,7 @@ arrays words assocs eval words.symbol ;
 
 DEFER: redefine2-test
 
-[ ] [ "USE: sequences USE: kernel IN: compiler.tests TUPLE: redefine2-test ; M: redefine2-test nth 2drop 3 ; INSTANCE: redefine2-test sequence" eval ] unit-test
+[ ] [ "USE: sequences USE: kernel IN: compiler.tests TUPLE: redefine2-test ; M: redefine2-test nth 2drop 3 ; INSTANCE: redefine2-test sequence" eval( -- ) ] unit-test
 
 [ t ] [ \ redefine2-test symbol? ] unit-test
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
 namespaces make math splitting sorting quotations assocs
-combinators combinators.private accessors ;
+combinators combinators.private accessors words ;
 IN: continuations
 
 SYMBOL: error
@@ -74,12 +74,14 @@ C: <continuation> continuation
 <PRIVATE
 
 : (continue) ( continuation -- * )
-    >continuation<
-    set-catchstack
-    set-namestack
-    set-retainstack
-    [ set-datastack ] dip
-    set-callstack ;
+    [
+        >continuation<
+        set-catchstack
+        set-namestack
+        set-retainstack
+        [ set-datastack ] dip
+        set-callstack
+    ] (( continuation -- * )) call-effect-unsafe ;
 
 PRIVATE>
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: debugger help help.topics help.crossref help.home kernel models
+USING: debugger classes help help.topics help.crossref help.home kernel models
 compiler.units assocs words vocabs accessors fry arrays
 combinators.short-circuit namespaces sequences models help.apropos
 combinators ui ui.commands ui.gadgets ui.gadgets.panes
@@ -90,6 +90,10 @@ M: browser-gadget focusable-child* search-field>> ;
 
 : browser-window ( -- )
     "help.home" (browser-window) ;
+
+: error-help-window ( error -- )
+    [ error-help ]
+    [ dup tuple? [ class ] [ drop "errors" ] if ] bi or (browser-window) ;
 
 \ browser-window H{ { +nullary+ t } } define-command
 

@@ -25,7 +25,7 @@ IN: advice.tests
         foo
     ] unit-test
  
-    : bar ( a -- b ) 1+ ;
+    : bar ( a -- b ) 1 + ;
     \ bar make-advised
 
     { 11 } [
