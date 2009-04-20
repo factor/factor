@@ -1,7 +1,6 @@
 ! Copyright (C) 2007, 2008, 2009 Alex Chapman, 2009 Diego Martinelli
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs biassocs combinators hashtables kernel lists math
-namespaces make multiline openal parser sequences splitting strings synth synth.buffers ;
+USING: accessors ascii assocs biassocs combinators hashtables kernel lists literals math namespaces make multiline openal parser sequences splitting strings synth synth.buffers ;
 IN: morse
 
 <PRIVATE
@@ -14,68 +13,65 @@ CONSTANT: unknown-char CHAR: ?
 
 PRIVATE>
 
-DEFER: morse-code-table
-
-H{
-    { CHAR: a ".-"    }
-    { CHAR: b "-..."  }
-    { CHAR: c "-.-."  }
-    { CHAR: d "-.."   }
-    { CHAR: e "."     }
-    { CHAR: f "..-."  }
-    { CHAR: g "--."   }
-    { CHAR: h "...."  }
-    { CHAR: i ".."    }
-    { CHAR: j ".---"  }
-    { CHAR: k "-.-"   }
-    { CHAR: l ".-.."  }
-    { CHAR: m "--"    }
-    { CHAR: n "-."    }
-    { CHAR: o "---"   }
-    { CHAR: p ".--."  }
-    { CHAR: q "--.-"  }
-    { CHAR: r ".-."   }
-    { CHAR: s "..."   }
-    { CHAR: t "-"     }
-    { CHAR: u "..-"   }
-    { CHAR: v "...-"  }
-    { CHAR: w ".--"   }
-    { CHAR: x "-..-"  }
-    { CHAR: y "-.--"  }
-    { CHAR: z "--.."  }
-    { CHAR: 1 ".----" }
-    { CHAR: 2 "..---" }
-    { CHAR: 3 "...--" }
-    { CHAR: 4 "....-" }
-    { CHAR: 5 "....." }
-    { CHAR: 6 "-...." }
-    { CHAR: 7 "--..." }
-    { CHAR: 8 "---.." }
-    { CHAR: 9 "----." }
-    { CHAR: 0 "-----" }
-    { CHAR: . ".-.-.-" }
-    { CHAR: , "--..--" }
-    { CHAR: ? "..--.." }
-    { CHAR: ' ".----." }
-    { CHAR: ! "-.-.--" }
-    { CHAR: / "-..-."  }
-    { CHAR: ( "-.--."  }
-    { CHAR: ) "-.--.-" }
-    { CHAR: & ".-..."  }
-    { CHAR: : "---..." }
-    { CHAR: ; "-.-.-." }
-    { CHAR: = "-...- " }
-    { CHAR: + ".-.-."  }
-    { CHAR: - "-....-" }
-    { CHAR: _ "..--.-" }
-    { CHAR: " ".-..-." }
-    { CHAR: $ "...-..-" }
-    { CHAR: @ ".--.-." }
-    { CHAR: \s "/" }
-} >biassoc \ morse-code-table set-global
-
-: morse-code-table ( -- biassoc )
-    \ morse-code-table get-global ;
+CONSTANT: morse-code-table $[
+    H{
+        { CHAR: a ".-"    }
+        { CHAR: b "-..."  }
+        { CHAR: c "-.-."  }
+        { CHAR: d "-.."   }
+        { CHAR: e "."     }
+        { CHAR: f "..-."  }
+        { CHAR: g "--."   }
+        { CHAR: h "...."  }
+        { CHAR: i ".."    }
+        { CHAR: j ".---"  }
+        { CHAR: k "-.-"   }
+        { CHAR: l ".-.."  }
+        { CHAR: m "--"    }
+        { CHAR: n "-."    }
+        { CHAR: o "---"   }
+        { CHAR: p ".--."  }
+        { CHAR: q "--.-"  }
+        { CHAR: r ".-."   }
+        { CHAR: s "..."   }
+        { CHAR: t "-"     }
+        { CHAR: u "..-"   }
+        { CHAR: v "...-"  }
+        { CHAR: w ".--"   }
+        { CHAR: x "-..-"  }
+        { CHAR: y "-.--"  }
+        { CHAR: z "--.."  }
+        { CHAR: 1 ".----" }
+        { CHAR: 2 "..---" }
+        { CHAR: 3 "...--" }
+        { CHAR: 4 "....-" }
+        { CHAR: 5 "....." }
+        { CHAR: 6 "-...." }
+        { CHAR: 7 "--..." }
+        { CHAR: 8 "---.." }
+        { CHAR: 9 "----." }
+        { CHAR: 0 "-----" }
+        { CHAR: . ".-.-.-" }
+        { CHAR: , "--..--" }
+        { CHAR: ? "..--.." }
+        { CHAR: ' ".----." }
+        { CHAR: ! "-.-.--" }
+        { CHAR: / "-..-."  }
+        { CHAR: ( "-.--."  }
+        { CHAR: ) "-.--.-" }
+        { CHAR: & ".-..."  }
+        { CHAR: : "---..." }
+        { CHAR: ; "-.-.-." }
+        { CHAR: = "-...- " }
+        { CHAR: + ".-.-."  }
+        { CHAR: - "-....-" }
+        { CHAR: _ "..--.-" }
+        { CHAR: " ".-..-." }
+        { CHAR: $ "...-..-" }
+        { CHAR: @ ".--.-." }
+        { CHAR: \s "/" }
+    } >biassoc
+]
 
 : ch>morse ( ch -- morse )
     ch>lower morse-code-table at [ unknown-char ] unless* ;
