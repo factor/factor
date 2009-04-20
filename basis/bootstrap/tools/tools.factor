@@ -6,6 +6,7 @@ IN: bootstrap.tools
     "bootstrap.image"
     "tools.annotations"
     "tools.crossref"
+    "tools.errors"
     "tools.deploy"
     "tools.disassembler"
     "tools.memory"

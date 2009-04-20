@@ -57,7 +57,7 @@ compiler.tree.combinators ;
     \ (each-integer) label-is-loop?
 ] unit-test
 
-: loop-test-2 ( a -- )
+: loop-test-2 ( a b -- a' )
     dup [ 1+ loop-test-2 1- ] [ drop ] if ; inline recursive
 
 [ t ] [

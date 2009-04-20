@@ -13,11 +13,11 @@ unit-test
 [ t ] [ \ see-test macro? ] unit-test
 
 [ t ] [
-    "USING: math ;\nIN: macros.tests\n: see-test ( a b -- c ) - ;\n" dup eval
+    "USING: math ;\nIN: macros.tests\n: see-test ( a b -- c ) - ;\n" dup eval( -- )
     [ \ see-test see ] with-string-writer =
 ] unit-test
 
 [ f ] [ \ see-test macro? ] unit-test
 
-[ ] [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ; : a ( -- ) [ a ] c ;" eval ] unit-test
+[ ] [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ; : a ( -- ) [ a ] c ;" eval( -- ) ] unit-test
 

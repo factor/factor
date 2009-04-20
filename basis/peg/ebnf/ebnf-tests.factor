@@ -444,12 +444,12 @@ foo=<foreign any-char> 'd'
   "ad" parser4
 ] unit-test
 
-{ t } [
- "USING: kernel peg.ebnf ; \"a\\n\" [EBNF foo='a' '\n'  => [[ drop \"\n\" ]] EBNF]" eval drop t
+{ } [
+ "USING: kernel peg.ebnf ; \"a\\n\" [EBNF foo='a' '\n'  => [[ drop \"\n\" ]] EBNF] drop" eval( -- ) 
 ] unit-test
 
 [
-  "USING: peg.ebnf ; <EBNF foo='a' foo='b' EBNF>" eval drop
+  "USING: peg.ebnf ; <EBNF foo='a' foo='b' EBNF>" eval( -- ) drop
 ] must-fail
 
 { t } [
@@ -521,12 +521,12 @@ Tok                = Spaces (Number | Special )
   "\\" [EBNF foo="\\" EBNF]
 ] unit-test
 
-[ "USE: peg.ebnf [EBNF EBNF]" eval ] must-fail
+[ "USE: peg.ebnf [EBNF EBNF]" eval( -- ) ] must-fail
 
 [ <" USE: peg.ebnf [EBNF
     lol = a
     lol = b
-  EBNF] "> eval
+  EBNF] "> eval( -- )
 ] [
     error>> [ redefined-rule? ] [ name>> "lol" = ] bi and
 ] must-fail-with

@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 William Schlieper <schlieper@unc.edu>
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: kernel combinators fry continuations sequences arrays vectors assocs hashtables heaps namespaces ;
-
+USING: kernel combinators fry continuations sequences arrays
+vectors assocs hashtables heaps namespaces ;
 IN: graph-theory
 
 MIXIN: graph
@@ -35,7 +34,7 @@ M: graph num-vertices
     vertices length ;
 
 M: graph num-edges
-   [ vertices ] [ '[ _ adjlist length ] map sum ] bi ;
+   [ vertices ] [ '[ _ adjlist length ] sigma ] bi ;
 
 M: graph adjlist
     [ vertices ] [ swapd '[ _ swap _ adj? ] filter ] bi ;
@@ -88,5 +87,5 @@ PRIVATE>
 
 : topological-sort ( graph -- seq/f )
     dup dag?
-    [ V{ } swap [ drop ] [ prefix ] [ ] full-depth-first drop ]
+    [ V{ } clone swap [ drop ] [ prefix ] [ ] full-depth-first drop ]
     [ drop f ] if ;

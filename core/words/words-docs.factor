@@ -31,7 +31,7 @@ $nl
 { $subsection define }
 { $subsection define-declared }
 { $subsection define-inline }
-"Word definitions should declare their stack effect, unless the definition is completely trivial. See " { $link "effect-declaration" } "."
+"Word definitions must declare their stack effect. See " { $link "effect-declaration" } "."
 $nl
 "All other types of word definitions, such as " { $link "words.symbol" } " and " { $link "generic" } ", are just special cases of the above." ;
 
@@ -75,6 +75,7 @@ ARTICLE: "word-definition" "Defining words"
 { $subsection "colon-definition" }
 { $subsection "words.symbol" }
 { $subsection "words.alias" }
+{ $subsection "words.constant" }
 { $subsection "primitives" }
 { $subsection "deferred" }
 { $subsection "declarations" }

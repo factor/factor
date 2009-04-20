@@ -28,4 +28,4 @@ TUPLE: packet data addr socket ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: forever ( quot -- ) [ call ] [ forever ] bi ;         inline recursive
+: forever ( quot: ( -- ) -- ) [ call ] [ forever ] bi ; inline recursive

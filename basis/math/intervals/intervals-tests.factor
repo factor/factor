@@ -255,11 +255,11 @@ IN: math.intervals.tests
     0 pick interval-contains? over first \ recip eq? and [
         2drop t
     ] [
-        [ [ random-element ] dip first execute ] 2keep
-        second execute interval-contains?
+        [ [ random-element ] dip first execute( a -- b ) ] 2keep
+        second execute( a -- b ) interval-contains?
     ] if ;
 
-[ t ] [ 80000 [ drop unary-test ] all? ] unit-test
+[ t ] [ 80000 iota [ drop unary-test ] all? ] unit-test
 
 : random-binary-op ( -- pair )
     {
@@ -286,11 +286,11 @@ IN: math.intervals.tests
     0 pick interval-contains? over first { / /i mod rem } member? and [
         3drop t
     ] [
-        [ [ [ random-element ] bi@ ] dip first execute ] 3keep
-        second execute interval-contains?
+        [ [ [ random-element ] bi@ ] dip first execute( a b -- c ) ] 3keep
+        second execute( a b -- c ) interval-contains?
     ] if ;
 
-[ t ] [ 80000 [ drop binary-test ] all? ] unit-test
+[ t ] [ 80000 iota [ drop binary-test ] all? ] unit-test
 
 : random-comparison ( -- pair )
     {
@@ -305,7 +305,7 @@ IN: math.intervals.tests
     [ [ [ random-element ] bi@ ] dip first execute ] 3keep
     second execute dup incomparable eq? [ 2drop t ] [ = ] if ;
 
-[ t ] [ 40000 [ drop comparison-test ] all? ] unit-test
+[ t ] [ 40000 iota [ drop comparison-test ] all? ] unit-test
 
 [ t ] [ -10 10 [a,b] 0 100 [a,b] assume> 0 10 (a,b] = ] unit-test
 
@@ -322,7 +322,7 @@ IN: math.intervals.tests
 [ t ] [ -10 10 [a,b] interval-abs 0 10 [a,b] = ] unit-test
 
 ! Test that commutative interval ops really are
-: random-interval-or-empty ( -- )
+: random-interval-or-empty ( -- obj )
     10 random 0 = [ empty-interval ] [ random-interval ] if ;
 
 : random-commutative-op ( -- op )
@@ -333,7 +333,7 @@ IN: math.intervals.tests
     } random ;
 
 [ t ] [
-    80000 [
+    80000 iota [
         drop
         random-interval-or-empty random-interval-or-empty
         random-commutative-op
