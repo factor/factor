@@ -141,7 +141,7 @@ TUPLE: key-caps-gadget < gadget keys alarm ;
         swap [ 
             " " [ drop ] <border-button>
             swap [ first >>loc ] [ second >>dim ] bi
-        ] [ execute ] bi*
+        ] [ execute( -- value ) ] bi*
     ] dip set-nth ;
 
 : add-keys-gadgets ( gadget -- gadget )

@@ -91,3 +91,49 @@ IN: ui.gadgets.packs.tests
 [ ] [ "g" get prefer ] unit-test
 
 [ ] [ "g" get layout ] unit-test
+
+! Baseline alignment without any text gadgets should behave like align=1/2
+<shelf> +baseline+ >>align
+    <gadget> { 30 30 } >>dim add-gadget
+    <gadget> { 30 20 } >>dim add-gadget
+"g" set
+
+[ { 60 30 } ] [ "g" get pref-dim ] unit-test
+
+[ ] [ "g" get prefer ] unit-test
+
+[ ] [ "g" get layout ] unit-test
+
+[ V{ { 0 0 } { 30 5 } } ]
+[ "g" get children>> [ loc>> ] map ] unit-test
+
+<shelf> +baseline+ >>align
+<gadget> { 30 30 } >>dim add-gadget
+10 10 { 10 10 } <baseline-gadget> add-gadget
+"g" set
+
+[ ] [ "g" get prefer ] unit-test
+
+[ ] [ "g" get layout ] unit-test
+
+[ V{ { 0 0 } { 30 10 } } ]
+[ "g" get children>> [ loc>> ] map ] unit-test
+
+<shelf> +baseline+ >>align
+<shelf> <gadget> { 30 30 } >>dim add-gadget add-gadget
+10 10 { 10 10 } <baseline-gadget> add-gadget
+"g" set
+
+[ ] [ "g" get prefer ] unit-test
+
+[ ] [ "g" get layout ] unit-test
+
+[ V{ { 0 0 } { 30 10 } } ]
+[ "g" get children>> [ loc>> ] map ] unit-test
+
+<shelf> +baseline+ >>align
+<gadget> { 24 24 } >>dim add-gadget
+12 9 { 15 15 } <baseline-gadget> add-gadget
+"g" set
+
+[ { 39 24 } ] [ "g" get pref-dim ] unit-test

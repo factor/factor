@@ -106,7 +106,8 @@ PRIVATE>
 
 : deep-sequence>cons ( sequence -- cons )
     [ <reversed> ] keep nil
-    [ tuck same? [ deep-sequence>cons ] when swons ] with reduce ;
+    [ [ nip ] [ same? ] 2bi [ deep-sequence>cons ] when swons ]
+    with reduce ;
 
 <PRIVATE
 :: (lmap>vector) ( acc list quot: ( elt -- elt' ) -- acc )

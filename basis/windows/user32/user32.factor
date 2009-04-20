@@ -807,7 +807,7 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
 ! FUNCTION: EqualRect
 ! FUNCTION: ExcludeUpdateRgn
 ! FUNCTION: ExitWindowsEx
-! FUNCTION: FillRect
+FUNCTION: int FillRect ( HDC hDC, RECT* lprc, HBRUSH hbr ) ;
 FUNCTION: HWND FindWindowA ( char* lpClassName, char* lpWindowName ) ;
 FUNCTION: HWND FindWindowExA ( HWND hwndParent, HWND childAfter, char* lpClassName, char* lpWindowName ) ;
 ! FUNCTION: FindWindowExW

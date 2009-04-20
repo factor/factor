@@ -5,6 +5,7 @@ DLLEXPORT void minor_gc(void);
 
 F_ZONE *newspace;
 bool performing_gc;
+bool performing_compaction;
 CELL collecting_gen;
 
 /* if true, we collecting AGING space for the second time, so if it is still

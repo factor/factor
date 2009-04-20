@@ -124,19 +124,14 @@ void signal_error(int signal, F_STACK_FRAME *native_stack)
 	general_error(ERROR_SIGNAL,tag_fixnum(signal),F,native_stack);
 }
 
-void divide_by_zero_error(F_STACK_FRAME *native_stack)
+void divide_by_zero_error(void)
 {
-	general_error(ERROR_DIVIDE_BY_ZERO,F,F,native_stack);
+	general_error(ERROR_DIVIDE_BY_ZERO,F,F,NULL);
 }
 
 void memory_signal_handler_impl(void)
 {
 	memory_protection_error(signal_fault_addr,signal_callstack_top);
-}
-
-void divide_by_zero_signal_handler_impl(void)
-{
-	divide_by_zero_error(signal_callstack_top);
 }
 
 void misc_signal_handler_impl(void)

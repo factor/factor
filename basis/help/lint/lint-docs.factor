@@ -14,6 +14,10 @@ $nl
 "To run help lint, use one of the following two words:"
 { $subsection help-lint }
 { $subsection help-lint-all }
+"Once a help lint run completes, failures can be listed:"
+{ $subsection :lint-failures }
+"Help lint failures are also shown in the " { $link "ui.tools.error-list" } "."
+$nl
 "Help lint performs the following checks:"
 { $list
     "ensures examples run and produce stated output"
