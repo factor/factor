@@ -26,7 +26,7 @@ void primitive_die(void);
 
 void throw_error(CELL error, F_STACK_FRAME *native_stack);
 void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, F_STACK_FRAME *native_stack);
-void divide_by_zero_error(F_STACK_FRAME *native_stack);
+void divide_by_zero_error(void);
 void memory_protection_error(CELL addr, F_STACK_FRAME *native_stack);
 void signal_error(int signal, F_STACK_FRAME *native_stack);
 void type_error(CELL type, CELL tagged);
@@ -53,7 +53,6 @@ CELL signal_fault_addr;
 void *signal_callstack_top;
 
 void memory_signal_handler_impl(void);
-void divide_by_zero_signal_handler_impl(void);
 void misc_signal_handler_impl(void);
 
 void primitive_unimplemented(void);
