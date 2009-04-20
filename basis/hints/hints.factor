@@ -65,7 +65,7 @@ M: object specializer-declaration class ;
 
 SYNTAX: HINTS:
     scan-object
-    [ redefined ]
+    [ changed-definition ]
     [ parse-definition "specializer" set-word-prop ] bi ;
 
 ! Default specializers

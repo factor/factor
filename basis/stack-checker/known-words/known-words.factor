@@ -219,6 +219,8 @@ M: object infer-call*
 } [ t "special" set-word-prop ] each
 
 M\ quotation call t "no-compile" set-word-prop
+M\ curry call t "no-compile" set-word-prop
+M\ compose call t "no-compile" set-word-prop
 M\ word execute t "no-compile" set-word-prop
 \ clear t "no-compile" set-word-prop
 
@@ -230,14 +232,11 @@ M\ word execute t "no-compile" set-word-prop
         { [ dup "primitive" word-prop ] [ infer-primitive ] }
         { [ dup "transform-quot" word-prop ] [ apply-transform ] }
         { [ dup "macro" word-prop ] [ apply-macro ] }
-        { [ dup "cannot-infer" word-prop ] [ cannot-infer-effect ] }
-        { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
         { [ dup local? ] [ infer-local-reader ] }
         { [ dup local-reader? ] [ infer-local-reader ] }
         { [ dup local-writer? ] [ infer-local-writer ] }
         { [ dup local-word? ] [ infer-local-word ] }
-        { [ dup recursive-word? ] [ call-recursive-word ] }
-        [ dup infer-word apply-word/effect ]
+        [ infer-word ]
     } cond ;
 
 : define-primitive ( word inputs outputs -- )

@@ -24,6 +24,10 @@ M: inference-error error-type type>> ;
 : inference-warning ( ... class -- * )
     +compiler-warning+ (inference-error) ; inline
 
+TUPLE: do-not-compile word ;
+
+: do-not-compile ( word -- * ) \ do-not-compile inference-warning ;
+
 TUPLE: literal-expected what ;
 
 : literal-expected ( what -- * ) \ literal-expected inference-warning ;

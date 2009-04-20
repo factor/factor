@@ -57,7 +57,6 @@ SYMBOLS: +optimized+ +unoptimized+ ;
         {
             [ inline? ]
             [ macro? ]
-            [ "transform-quot" word-prop ]
             [ "no-compile" word-prop ]
             [ "special" word-prop ]
         } 1||
@@ -150,4 +149,4 @@ M: optimizing-compiler recompile ( words -- alist )
     f compiler-impl set-global ;
 
 : recompile-all ( -- )
-    forget-errors all-words compile ;
+    all-words compile ;
