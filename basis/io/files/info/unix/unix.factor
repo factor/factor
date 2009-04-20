@@ -80,7 +80,7 @@ M: unix stat>file-info ( stat -- file-info )
         [ stat-st_rdev >>rdev ]
         [ stat-st_blocks >>blocks ]
         [ stat-st_blksize >>blocksize ]
-        [ drop blocks>> blocksize>> * >>size-on-disk ]
+        [ drop dup [ blocks>> ] [ blocksize>> ] bi * >>size-on-disk ]
     } cleave ;
 
 : n>file-type ( n -- type )
