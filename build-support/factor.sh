@@ -139,7 +139,6 @@ check_library_exists() {
 }
 
 check_X11_libraries() {
-    check_library_exists GLU
     check_library_exists GL
     check_library_exists X11
     check_library_exists pango-1.0
@@ -491,7 +490,7 @@ make_boot_image() {
 }
 
 install_build_system_apt() {
-    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
+    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev wget git-core git-doc rlwrap gcc make
     check_ret sudo
 }
 

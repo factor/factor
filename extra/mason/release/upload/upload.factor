@@ -8,14 +8,13 @@ IN: mason.release.upload
 : remote-location ( -- dest )
     upload-directory get "/" platform 3append ;
 
-: remote-archive-name ( -- dest )
-    remote-location "/" archive-name 3append ;
+: remote-archive-name ( archive-name -- dest )
+    [ remote-location "/" ] dip 3append ;
 
-: upload ( -- )
+: upload ( archive-name -- )
     upload-to-factorcode? get [
-        archive-name
         upload-username get
         upload-host get
-        remote-archive-name
+        pick remote-archive-name
         upload-safely
-    ] when ;
+    ] [ drop ] if ;

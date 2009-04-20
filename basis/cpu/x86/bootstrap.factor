@@ -334,7 +334,7 @@ big-endian off
     ! compare with second value
     ds-reg [] temp0 CMP
     ! move t if true
-    [ temp1 temp3 ] dip execute
+    [ temp1 temp3 ] dip execute( dst src -- )
     ! store
     ds-reg [] temp1 MOV ;
 
@@ -355,7 +355,7 @@ big-endian off
     ! pop stack
     ds-reg bootstrap-cell SUB
     ! compute result
-    [ ds-reg [] temp0 ] dip execute ;
+    [ ds-reg [] temp0 ] dip execute( dst src -- ) ;
 
 [ \ ADD jit-math ] f f f \ fixnum+fast define-sub-primitive
 

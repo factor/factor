@@ -18,7 +18,7 @@ M: empty-mixin sheeple drop "wake up" ;
 [ t ] [ object \ sheeple method \ sheeple-test "compiled-uses" word-prop key? ] unit-test
 [ f ] [ empty-mixin \ sheeple method \ sheeple-test "compiled-uses" word-prop key? ] unit-test
 
-[ ] [ "IN: compiler.tests USE: arrays INSTANCE: array empty-mixin" eval ] unit-test
+[ ] [ "IN: compiler.tests USE: arrays INSTANCE: array empty-mixin" eval( -- ) ] unit-test
 
 [ "wake up" ] [ sheeple-test ] unit-test
 [ f ] [ object \ sheeple method \ sheeple-test "compiled-uses" word-prop key? ] unit-test

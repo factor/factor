@@ -41,7 +41,7 @@ METHOD: expand { glob-expr }
     [ ]
   if ;
 
-METHOD: expand { factor-expr } expr>> eval unparse ;
+METHOD: expand { factor-expr } expr>> eval>string ;
 
 DEFER: expansion
 
@@ -64,7 +64,7 @@ METHOD: expand { object } ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : run-sword ( basic-expr -- )
-  command>> expansion unclip "shell" lookup execute ;
+  command>> expansion unclip "shell" lookup execute( arguments -- ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

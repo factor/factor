@@ -61,3 +61,5 @@ M: memoized reset-word
 
 : invalidate-memoized ( inputs... word -- )
     [ stack-effect in>> packer call ] [ "memoize" word-prop delete-at ] bi ;
+
+\ invalidate-memoized t "no-compile" set-word-prop

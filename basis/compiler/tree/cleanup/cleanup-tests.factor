@@ -197,7 +197,7 @@ M: fixnum annotate-entry-test-1 drop ;
         [ dup annotate-entry-test-1 1+ ] dip (annotate-entry-test-2)
     ] if ; inline recursive
 
-: annotate-entry-test-2 ( from to -- ) 0 -rot (annotate-entry-test-2) ; inline
+: annotate-entry-test-2 ( from to -- obj ) 0 -rot (annotate-entry-test-2) ; inline
 
 [ f ] [
     [ { bignum } declare annotate-entry-test-2 ]
@@ -302,7 +302,7 @@ cell-bits 32 = [
 ] unit-test
 
 [ t ] [
-    [ 1000 [ 1+ ] map ] { 1+ fixnum+ } inlined?
+    [ 1000 iota [ 1+ ] map ] { 1+ fixnum+ } inlined?
 ] unit-test
 
 : rec ( a -- b )

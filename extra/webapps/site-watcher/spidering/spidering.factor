@@ -12,7 +12,7 @@ CONSTANT: site-list-url URL" $site-watcher-app/spider-list"
         { site-watcher-app "spider-list" } >>template
         [
             ! Silly query
-            username B spidering-sites [ site>> ] map
+            username spidering-sites [ site>> ] map
             "sites" set-value
         ] >>init
     <protected>

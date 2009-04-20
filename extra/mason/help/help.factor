@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.html io.directories io.files io.launcher
 kernel make mason.common mason.config namespaces sequences ;
@@ -6,7 +6,7 @@ IN: mason.help
 
 : make-help-archive ( -- )
     "factor/temp" [
-        { "tar" "cfz" "docs.tar.gz" "docs" } try-process
+        { "tar" "cfz" "docs.tar.gz" "docs" } try-output-process
     ] with-directory ;
 
 : upload-help-archive ( -- )
@@ -16,11 +16,8 @@ IN: mason.help
     help-directory get "/docs.tar.gz" append
     upload-safely ;
 
-: (upload-help) ( -- )
+: upload-help ( -- )
     upload-help? get [
         make-help-archive
         upload-help-archive
     ] when ;
-
-: upload-help ( -- )
-    status get status-clean eq? [ (upload-help) ] when ;

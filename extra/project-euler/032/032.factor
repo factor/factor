@@ -27,7 +27,9 @@ IN: project-euler.032
 <PRIVATE
 
 : source-032 ( -- seq )
-    9 factorial [ 9 permutation [ 1+ ] map 10 digits>integer ] map ;
+    9 factorial iota [
+        9 permutation [ 1+ ] map 10 digits>integer
+    ] map ;
 
 : 1and4 ( n -- ? )
     number>string 1 cut-slice 4 cut-slice

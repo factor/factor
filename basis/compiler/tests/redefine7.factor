@@ -13,7 +13,7 @@ IN: compiler.tests
     MIXIN: my-mixin
     INSTANCE: fixnum my-mixin
     : my-inline ( a -- b ) dup my-mixin? [ 1 + ] when ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ ] [
@@ -21,7 +21,7 @@ IN: compiler.tests
     USE: math
     IN: compiler.tests.redefine7
     INSTANCE: float my-mixin
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ 2.0 ] [

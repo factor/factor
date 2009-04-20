@@ -24,6 +24,7 @@ ARTICLE: "wrappers" "Wrappers"
 "Wrappers are used to push words on the data stack; they evaluate to the object being wrapped:"
 { $subsection wrapper }
 { $subsection literalize }
+"Wrapper literal syntax is documented in " { $link "syntax-words" } "."
 { $see-also "combinators" } ;
 
 ABOUT: "quotations"

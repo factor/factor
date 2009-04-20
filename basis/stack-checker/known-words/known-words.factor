@@ -218,8 +218,7 @@ M: object infer-call*
     alien-callback
 } [ t "special" set-word-prop ] each
 
-{ call execute dispatch load-locals get-local drop-locals }
-[ t "no-compile" set-word-prop ] each
+\ clear t "no-compile" set-word-prop
 
 : non-inline-word ( word -- )
     dup called-dependency depends-on
