@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors combinators kernel locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences specialized-arrays.float vectors jamshred.oint ;
+USING: accessors arrays colors combinators kernel literals locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences specialized-arrays.float vectors jamshred.oint ;
 IN: jamshred.tunnel
 
 CONSTANT: n-segments 5000
@@ -15,9 +15,7 @@ C: <segment> segment
     { 100 100 100 } [ random 100 / >float ] map first3 1.0 <rgba> ;
 
 CONSTANT: tunnel-segment-distance 0.4
-USE: words.constant
-DEFER: random-rotation-angle
-\ random-rotation-angle pi 20 / define-constant
+CONSTANT: random-rotation-angle $[ pi 20 / ]
 
 : random-segment ( previous-segment -- segment )
     clone dup random-rotation-angle random-turn
