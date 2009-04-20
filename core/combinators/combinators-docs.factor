@@ -303,13 +303,7 @@ ARTICLE: "combinators" "Combinators"
 { $subsection "combinators.short-circuit" }
 { $subsection "combinators.smart" }
 "More combinators are defined for working on data structures, such as " { $link "sequences-combinators" } " and " { $link "assocs-combinators" } "."
-$nl
-"The " { $vocab-link "combinators" } " provides some less frequently-used features."
-$nl
-"A combinator which can help with implementing methods on " { $link hashcode* } ":"
-{ $subsection recursive-hashcode }
 { $subsection "combinators-quot" }
-"Advanced topics:"
 { $see-also "quotations" } ;
 
 ABOUT: "combinators"

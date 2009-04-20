@@ -249,6 +249,7 @@ ARTICLE: "handbook-language-reference" "The language"
 { $heading "Abstractions" }
 { $subsection "objects" }
 { $subsection "destructors" }
+{ $subsection "parsing-words" }
 { $subsection "macros" }
 { $subsection "fry" }
 { $heading "Program organization" }
