@@ -7,7 +7,7 @@ continuations generic compiler.units sets classes fry ;
 IN: tools.profiler
 
 : profile ( quot -- )
-    [ t profiling call ] [ f profiling ] [ ] cleanup ;
+    [ t profiling call ] [ f profiling ] [ ] cleanup ; inline
 
 : filter-counts ( alist -- alist' )
     [ second 0 > ] filter ;

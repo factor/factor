@@ -90,7 +90,7 @@ M: list focusable-child* drop t ;
 
 : invoke-value-action ( list -- )
     dup list-empty? [
-        dup hook>> call
+        dup hook>> call( list -- )
     ] [
         [ index>> ] keep nth-gadget invoke-secondary
     ] if ;

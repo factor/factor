@@ -32,7 +32,7 @@ IN: help.definitions.tests
         "hello" "help.definitions.tests" lookup "help" word-prop
     ] unit-test
 
-    [ ] [ "IN: help.definitions.tests USING: help.syntax ; : xxx ( -- ) ; HELP: xxx ;" eval ] unit-test
+    [ ] [ "IN: help.definitions.tests USING: help.syntax ; : xxx ( -- ) ; HELP: xxx ;" eval( -- ) ] unit-test
 
     [ ] [ "xxx" "help.definitions.tests" lookup print-topic ] unit-test
 

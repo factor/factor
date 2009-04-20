@@ -187,7 +187,9 @@ void primitive_save_image_and_exit(void)
 		userenv[i] = F;
 
 	/* do a full GC + code heap compaction */
+	performing_compaction = true;
 	compact_code_heap();
+	performing_compaction = false;
 
 	UNREGISTER_C_STRING(path);
 

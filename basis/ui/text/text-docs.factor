@@ -46,7 +46,7 @@ HELP: offset>x
 
 HELP: line-metrics
 { $values { "font" font } { "string" string } { "metrics" line-metrics } }
-{ $contract "Outputs a " { $link line-metrics } " object with text measurements." } ;
+{ $contract "Outputs a " { $link metrics } " object with text measurements." } ;
 
 ARTICLE: "text-rendering" "Rendering text"
 "The " { $vocab-link "ui.text" } " vocabulary provides a cross-platform interface to the operating system's native font rendering engine. Currently, it uses Core Text on Mac OS X and FreeType on Windows and X11."

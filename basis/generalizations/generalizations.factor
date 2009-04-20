@@ -7,7 +7,7 @@ IN: generalizations
 
 <<
 
-: n*quot ( n seq -- seq' ) <repetition> concat >quotation ;
+: n*quot ( n quot -- quot' ) <repetition> concat >quotation ;
 
 : repeat ( n obj quot -- ) swapd times ; inline
 

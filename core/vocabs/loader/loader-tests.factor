@@ -143,7 +143,7 @@ IN: vocabs.loader.tests
 forget-junk
 
 [ { } ] [
-    "IN: xabbabbja" eval "xabbabbja" vocab-files
+    "IN: xabbabbja" eval( -- ) "xabbabbja" vocab-files
 ] unit-test
 
 [ "xabbabbja" forget-vocab ] with-compilation-unit

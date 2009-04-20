@@ -29,7 +29,7 @@ SYMBOL: foo
     } "\n" join
     [
         "testfile" source-file file set
-        eval
+        eval( -- )
     ] with-scope
 ] unit-test
 

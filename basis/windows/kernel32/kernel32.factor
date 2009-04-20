@@ -1477,7 +1477,7 @@ ALIAS: LoadLibraryEx LoadLibraryExW
 ! FUNCTION: LoadLibraryW
 ! FUNCTION: LoadModule
 ! FUNCTION: LoadResource
-! FUNCTION: LocalAlloc
+FUNCTION: HLOCAL LocalAlloc ( UINT uFlags, SIZE_T uBytes ) ;
 ! FUNCTION: LocalCompact
 ! FUNCTION: LocalFileTimeToFileTime
 ! FUNCTION: LocalFlags
