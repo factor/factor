@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings arrays byte-arrays
 hashtables io io.encodings.string kernel math namespaces
-sequences strings continuations x11.xlib specialized-arrays.uint
+sequences strings continuations x11 x11.xlib specialized-arrays.uint
 accessors io.encodings.utf16n ;
 IN: x11.xim
 
@@ -22,7 +22,7 @@ SYMBOL: xim
     xim get-global XCloseIM drop f xim set-global ;
 
 : with-xim ( quot -- )
-    [ "Factor" init-xim ] dip [ close-xim ] [ ] cleanup ;
+    [ "Factor" init-xim ] dip [ close-xim ] [ ] cleanup ; inline
 
 : create-xic ( window classname -- xic )
     [

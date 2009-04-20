@@ -59,14 +59,19 @@ focused? ;
 
 GENERIC: cell-width ( font cell -- x )
 GENERIC: cell-height ( font cell -- y )
+GENERIC: cell-padding ( cell -- y )
 GENERIC: draw-cell ( font cell -- )
 
 M: string cell-width text-width ;
 M: string cell-height text-height ceiling ;
+M: string cell-padding drop 0 ;
 M: string draw-cell draw-text ;
+
+CONSTANT: image-padding 2
 
 M: image-name cell-width nip image-dim first ;
 M: image-name cell-height nip image-dim second ;
+M: image-name cell-padding drop image-padding ;
 M: image-name draw-cell nip draw-image ;
 
 : table-rows ( table -- rows )
@@ -87,7 +92,7 @@ CONSTANT: column-title-background COLOR: light-gray
     if ;
 
 : row-column-widths ( table row -- widths )
-    [ font>> ] dip [ cell-width ] with map ;
+    [ font>> ] dip [ [ cell-width ] [ cell-padding ] bi + ] with map ;
 
 : compute-total-width ( gap widths -- total )
     swap [ column-offsets drop ] keep - ;
@@ -162,9 +167,10 @@ M: table layout*
         '[ [ 0 2array ] [ _ 2array ] bi gl-line ] each
     ] bi ;
 
-: column-loc ( font column width align -- loc )
-    [ [ cell-width ] dip swap - ] dip
-    * >integer 0 2array ;
+:: column-loc ( font column width align -- loc )
+    font column cell-width width swap - align * column cell-padding 2 / 1 align - * +
+    font column cell-height \ line-height get swap - 2 /
+    [ >integer ] bi@ 2array ;
 
 : translate-column ( width gap -- )
     + 0 2array gl-translate ;
@@ -203,18 +209,21 @@ M: table draw-line ( row index table -- )
 
 M: table draw-gadget*
     dup control-value empty? [ drop ] [
-        {
-            [ draw-selected-row ]
-            [ draw-lines ]
-            [ draw-column-lines ]
-            [ draw-focused-row ]
-            [ draw-moused-row ]
-        } cleave
+        dup line-height \ line-height [
+            {
+                [ draw-selected-row ]
+                [ draw-lines ]
+                [ draw-column-lines ]
+                [ draw-focused-row ]
+                [ draw-moused-row ]
+            } cleave
+        ] with-variable
     ] if ;
 
 M: table line-height ( table -- y )
     [ font>> ] [ renderer>> prototype-row ] bi
-    [ cell-height ] with [ max ] map-reduce ;
+    [ [ cell-height ] [ cell-padding ] bi + ] with
+    [ max ] map-reduce ;
 
 M: table pref-dim*
     [ compute-column-widths drop ] keep
@@ -379,14 +388,16 @@ TUPLE: column-headers < gadget table ;
         column-title-background <solid> >>interior ;
 
 : draw-column-titles ( table -- )
-    {
-        [ renderer>> column-titles ]
-        [ column-widths>> ]
-        [ table-column-alignment ]
-        [ font>> column-title-font ]
-        [ gap>> ]
-    } cleave
-    draw-columns ;
+    dup font>> font-metrics height>> \ line-height [
+        {
+            [ renderer>> column-titles ]
+            [ column-widths>> ]
+            [ table-column-alignment ]
+            [ font>> column-title-font ]
+            [ gap>> ]
+        } cleave
+        draw-columns
+    ] with-variable ;
 
 M: column-headers draw-gadget*
     table>> draw-column-titles ;

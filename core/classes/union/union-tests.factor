@@ -26,13 +26,13 @@ M: union-1 generic-update-test drop "union-1" ;
 [ t ] [ union-1 number class<= ] unit-test
 [ "union-1" ] [ 1.0 generic-update-test ] unit-test
 
-"IN: classes.union.tests USE: math USE: arrays UNION: union-1 rational array ;" eval
+"IN: classes.union.tests USE: math USE: arrays UNION: union-1 rational array ;" eval( -- )
 
 [ t ] [ bignum union-1 class<= ] unit-test
 [ f ] [ union-1 number class<= ] unit-test
 [ "union-1" ] [ { 1.0 } generic-update-test ] unit-test
 
-"IN: classes.union.tests USE: math PREDICATE: union-1 < integer even? ;" eval
+"IN: classes.union.tests USE: math PREDICATE: union-1 < integer even? ;" eval( -- )
 
 [ f ] [ union-1 union-class? ] unit-test
 [ t ] [ union-1 predicate-class? ] unit-test
@@ -58,7 +58,7 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 [ t ] [ fixnum redefine-bug-2 class<= ] unit-test
 [ t ] [ quotation redefine-bug-2 class<= ] unit-test
 
-[ ] [ "IN: classes.union.tests USE: math UNION: redefine-bug-1 bignum ;" eval ] unit-test
+[ ] [ "IN: classes.union.tests USE: math UNION: redefine-bug-1 bignum ;" eval( -- ) ] unit-test
 
 [ t ] [ bignum redefine-bug-1 class<= ] unit-test
 [ f ] [ fixnum redefine-bug-2 class<= ] unit-test

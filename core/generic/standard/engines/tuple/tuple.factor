@@ -82,6 +82,8 @@ M: engine-word stack-effect
         effect boa
     ] [ 2drop f ] if ;
 
+M: engine-word where "tuple-dispatch-generic" word-prop where ;
+
 M: engine-word crossref? "forgotten" word-prop not ;
 
 M: engine-word irrelevant? drop t ;

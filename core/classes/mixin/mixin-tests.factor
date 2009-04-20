@@ -42,7 +42,7 @@ INSTANCE: integer mx1
 [ t ] [ mx1 integer class<= ] unit-test
 [ t ] [ mx1 number class<= ] unit-test
 
-"IN: classes.mixin.tests USE: arrays INSTANCE: array mx1" eval
+"IN: classes.mixin.tests USE: arrays INSTANCE: array mx1" eval( -- )
 
 [ t ] [ array mx1 class<= ] unit-test
 [ f ] [ mx1 number class<= ] unit-test

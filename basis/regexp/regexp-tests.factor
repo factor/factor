@@ -262,11 +262,11 @@ IN: regexp-tests
 ! Comment inside a regular expression
 [ t ] [ "ac" "a(?#boo)c" <regexp> matches? ] unit-test
 
-[ ] [ "USING: regexp kernel ; R' -{3}[+]{1,6}(?:!!)?\\s' drop" eval ] unit-test
+[ ] [ "USING: regexp kernel ; R' -{3}[+]{1,6}(?:!!)?\\s' drop" eval( -- ) ] unit-test
 
-[ ] [ "USING: regexp kernel ; R' (ftp|http|https)://(\\w+:?\\w*@)?(\\S+)(:[0-9]+)?(/|/([\\w#!:.?+=&%@!\\-/]))?' drop" eval ] unit-test
+[ ] [ "USING: regexp kernel ; R' (ftp|http|https)://(\\w+:?\\w*@)?(\\S+)(:[0-9]+)?(/|/([\\w#!:.?+=&%@!\\-/]))?' drop" eval( -- ) ] unit-test
 
-[ ] [ "USING: regexp kernel ; R' \\*[^\s*][^*]*\\*' drop" eval ] unit-test
+[ ] [ "USING: regexp kernel ; R' \\*[^\s*][^*]*\\*' drop" eval( -- ) ] unit-test
 
 [ "ab" ] [ "ab" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
 [ "abc" ] [ "abc" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test

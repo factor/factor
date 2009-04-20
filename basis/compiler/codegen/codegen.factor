@@ -5,6 +5,7 @@ kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
 alien.strings alien.arrays alien.complex sets libc alien.libraries
 continuations.private fry cpu.architecture
+source-files.errors
 compiler.errors
 compiler.alien
 compiler.cfg
@@ -379,8 +380,7 @@ TUPLE: no-such-library name ;
 M: no-such-library summary
     drop "Library not found" ;
 
-M: no-such-library compiler-error-type
-    drop +linkage+ ;
+M: no-such-library error-type drop +linkage-error+ ;
 
 : no-such-library ( name -- )
     \ no-such-library boa
@@ -391,8 +391,7 @@ TUPLE: no-such-symbol name ;
 M: no-such-symbol summary
     drop "Symbol not found" ;
 
-M: no-such-symbol compiler-error-type
-    drop +linkage+ ;
+M: no-such-symbol error-type drop +linkage-error+ ;
 
 : no-such-symbol ( name -- )
     \ no-such-symbol boa

@@ -22,7 +22,7 @@ M: foo call-responder*
     "x" [ 1+ ] schange
     "x" sget number>string "text/html" <content> ;
 
-: url-responder-mock-test ( -- )
+: url-responder-mock-test ( -- string )
     [
         <request>
             "GET" >>method
@@ -34,7 +34,7 @@ M: foo call-responder*
         [ write-response-body drop ] with-string-writer
     ] with-destructors ;
 
-: sessions-mock-test ( -- )
+: sessions-mock-test ( -- string )
     [
         <request>
             "GET" >>method

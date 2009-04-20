@@ -524,7 +524,7 @@ ERROR: custom-error ;
 
 { 2 1 } [ [ + ] inference-invalidation-b ] must-infer-as
 
-[ ] [ "IN: stack-checker.tests : inference-invalidation-a ( -- a b ) 1 2 ;" eval ] unit-test
+[ ] [ "IN: stack-checker.tests : inference-invalidation-a ( -- a b ) 1 2 ;" eval( -- ) ] unit-test
 
 [ 3 ] [ inference-invalidation-c ] unit-test
 
@@ -536,7 +536,7 @@ M: object inference-invalidation-d inference-invalidation-c 2drop ;
 
 \ inference-invalidation-d must-infer
 
-[ ] [ "IN: stack-checker.tests : inference-invalidation-a ( -- ) ;" eval ] unit-test
+[ ] [ "IN: stack-checker.tests : inference-invalidation-a ( -- ) ;" eval( -- ) ] unit-test
 
 [ [ inference-invalidation-d ] infer ] must-fail
 

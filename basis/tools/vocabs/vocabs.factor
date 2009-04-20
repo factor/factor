@@ -78,7 +78,7 @@ SYMBOL: failures
             recover
         ] each
         failures get
-    ] with-compiler-errors ;
+    ] with-scope ;
 
 : source-modified? ( path -- ? )
     dup source-files get at [
