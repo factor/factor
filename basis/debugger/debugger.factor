@@ -88,8 +88,27 @@ M: string error. print ;
 : divide-by-zero-error. ( obj -- )
     "Division by zero" print drop ;
 
+CONSTANT: signal-names
+{
+    "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGTRAP" "SIGABRT"
+    "SIGEMT" "SIGFPE" "SIGKILL" "SIGBUS" "SIGSEGV" "SIGSYS"
+    "SIGPIPE" "SIGALRM" "SIGTERM" "SIGURG" "SIGSTOP" "SIGTSIP"
+    "SIGCONT" "SIGCHLD" "SIGTTIN" "SIGTTOU" "SIGIO" "SIGXCPU"
+    "SIGXFSZ" "SIGVTALRM" "SIGPROF" "SIGWINCH" "SIGINFO"
+    "SIGUSR1" "SIGUSR2"
+}
+
+: signal-name ( n -- str )
+    1- signal-names nth;
+
+: signal-name. ( n -- )
+    dup signal-names length <=
+    os unix? and
+    [ " (" write signal-name write ")" write ] [ drop ] if ;
+
 : signal-error. ( obj -- )
-    "Operating system signal " write third . ;
+    "Operating system signal " write
+    third [ pprint ] [ signal-name. ] bi nl ;
 
 : array-size-error. ( obj -- )
     "Invalid array size: " write dup third .
