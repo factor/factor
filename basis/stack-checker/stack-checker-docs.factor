@@ -109,7 +109,6 @@ HELP: inference-error
     "The " { $snippet "error" } " slot contains one of several possible " { $link "inference-errors" } "."
 } ;
 
-
 HELP: infer
 { $values { "quot" "a quotation" } { "effect" "an instance of " { $link effect } } }
 { $description "Attempts to infer the quotation's stack effect. For interactive testing, the " { $link infer. } " word should be called instead since it presents the output in a nicely formatted manner." }
@@ -121,11 +120,3 @@ HELP: infer.
 { $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
 
 { infer infer. } related-words
-
-HELP: forget-errors
-{ $description "Removes markers indicating which words do not have stack effects."
-$nl
-"The stack effect inference code remembers which words failed to infer as an optimization, so that it does not try to infer the stack effect of words which do not have one over and over again." }
-{ $notes "Usually this word does not need to be called directly; if a word failed to compile because of a stack effect error, fixing the word definition clears the flag automatically. However, if words failed to compile due to external factors which were subsequently rectified, such as an unavailable C library or a missing or broken compiler transform, this flag can be cleared for all words:"
-{ $code "forget-errors" }
-"Subsequent invocations of the compiler will consider all words for compilation." } ;

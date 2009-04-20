@@ -97,7 +97,6 @@ IN: tools.deploy.shaker
             {
                 "alias"
                 "boa-check"
-                "cannot-infer"
                 "coercer"
                 "combination"
                 "compiled-status"
@@ -116,7 +115,6 @@ IN: tools.deploy.shaker
                 "identities"
                 "if-intrinsics"
                 "infer"
-                "inferred-effect"
                 "inline"
                 "inlined-block"
                 "input-classes"

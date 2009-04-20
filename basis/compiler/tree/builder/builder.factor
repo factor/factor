@@ -1,7 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors quotations kernel sequences namespaces
-assocs words arrays vectors hints combinators compiler.tree
+assocs words arrays vectors hints combinators continuations
+effects compiler.tree
 stack-checker
 stack-checker.state
 stack-checker.errors
@@ -15,23 +16,27 @@ IN: compiler.tree.builder
     with-infer nip ; inline
 
 : build-tree ( quot -- nodes )
-    #! Not safe to call from inference transforms.
     [ f initial-recursive-state infer-quot ] with-tree-builder ;
 
 : build-tree-with ( in-stack quot -- nodes out-stack )
-    #! Not safe to call from inference transforms.
     [
-        [ >vector \ meta-d set ]
-        [ f initial-recursive-state infer-quot ] bi*
-    ] with-tree-builder
-    unclip-last in-d>> ;
+        [
+            [ >vector \ meta-d set ]
+            [ f initial-recursive-state infer-quot ] bi*
+        ] with-tree-builder
+        unclip-last in-d>>
+    ] [ "OOPS" USE: io print flush 3drop f f ] recover ;
 
-: build-sub-tree ( #call quot -- nodes )
+: build-sub-tree ( #call quot -- nodes/f )
     [ [ out-d>> ] [ in-d>> ] bi ] dip build-tree-with
-    over ends-with-terminate?
-    [ drop swap [ f swap #push ] map append ]
-    [ rot #copy suffix ]
-    if ;
+    {
+        { [ over not ] [ 3drop f ] }
+        { [ over ends-with-terminate? ] [ drop swap [ f swap #push ] map append ] }
+        [ rot #copy suffix ]
+    } cond ;
+
+: check-no-compile ( word -- )
+    dup "no-compile" word-prop [ do-not-compile ] [ drop ] if ;
 
 : (build-tree-from-word) ( word -- )
     dup initial-recursive-state recursive-state set
@@ -39,24 +44,19 @@ IN: compiler.tree.builder
     [ 1quotation ] [ specialized-def ] if
     infer-quot-here ;
 
-: check-cannot-infer ( word -- )
-    dup "cannot-infer" word-prop [ cannot-infer-effect ] [ drop ] if ;
+: check-effect ( word effect -- )
+    over required-stack-effect 2dup effect<=
+    [ 3drop ] [ effect-error ] if ;
 
-TUPLE: do-not-compile word ;
-
-: check-no-compile ( word -- )
-    dup "no-compile" word-prop [ do-not-compile inference-warning ] [ drop ] if ;
+: finish-word ( word -- )
+    current-effect check-effect ;
 
 : build-tree-from-word ( word -- nodes )
     [
-        [
-            {
-                [ check-cannot-infer ]
-                [ check-no-compile ]
-                [ (build-tree-from-word) ]
-                [ finish-word ]
-            } cleave
-        ] maybe-cannot-infer
+        [ check-no-compile ]
+        [ (build-tree-from-word) ]
+        [ finish-word ]
+        tri
     ] with-tree-builder ;
 
 : contains-breakpoints? ( word -- ? )

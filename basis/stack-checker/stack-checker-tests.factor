@@ -588,3 +588,7 @@ DEFER: eee'
 [ forget-test ] must-infer
 [ ] [ [ \ forget-test forget ] with-compilation-unit ] unit-test
 [ forget-test ] must-infer
+
+[ [ cond ] infer ] must-fail
+[ [ bi ] infer ] must-fail
+[ at ] must-infer

@@ -4,6 +4,7 @@ USING: accessors kernel arrays sequences math math.order
 math.partial-dispatch generic generic.standard generic.math
 classes.algebra classes.union sets quotations assocs combinators
 words namespaces continuations classes fry combinators.smart hints
+locals
 compiler.tree
 compiler.tree.builder
 compiler.tree.recursive
@@ -27,24 +28,30 @@ SYMBOL: node-count
 SYMBOL: inlining-count
 
 ! Splicing nodes
-GENERIC: splicing-nodes ( #call word/quot/f -- nodes )
+GENERIC: splicing-nodes ( #call word/quot/f -- nodes/f )
 
 M: word splicing-nodes
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
 M: callable splicing-nodes
-    build-sub-tree analyze-recursive normalize ;
+    build-sub-tree dup [ analyze-recursive normalize ] when ;
 
 ! Dispatch elimination
+: undo-inlining ( #call -- ? )
+    f >>method f >>body f >>class drop f ;
+
+: propagate-body ( #call -- ? )
+    body>> (propagate) t ;
+
 : eliminate-dispatch ( #call class/f word/quot/f -- ? )
     dup [
         [ >>class ] dip
-        over method>> over = [ drop ] [
-            2dup splicing-nodes
-            [ >>method ] [ >>body ] bi*
+        over method>> over = [ drop propagate-body ] [
+            2dup splicing-nodes dup [
+                [ >>method ] [ >>body ] bi* propagate-body
+            ] [ 2drop undo-inlining ] if
         ] if
-        body>> (propagate) t
-    ] [ 2drop f >>method f >>body f >>class drop f ] if ;
+    ] [ 2drop undo-inlining ] if ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
     dup "methods" word-prop assoc-empty? [ 2drop f f ] [
@@ -159,14 +166,15 @@ SYMBOL: history
     [ history [ swap suffix ] change ]
     bi ;
 
-: inline-word-def ( #call word quot -- ? )
-    over history get memq? [ 3drop f ] [
-        [
-            [ remember-inlining ] dip
-            [ drop ] [ splicing-nodes ] 2bi
-            [ >>body drop ] [ count-nodes ] [ (propagate) ] tri
-        ] with-scope node-count +@
-        t
+:: inline-word-def ( #call word quot -- ? )
+    word history get memq? [ f ] [
+        #call quot splicing-nodes [
+            [
+                word remember-inlining
+                [ ] [ count-nodes ] [ (propagate) ] tri
+            ] with-scope
+            [ #call (>>body) ] [ node-count +@ ] bi* t
+        ] [ f ] if*
     ] if ;
 
 : inline-word ( #call word -- ? )

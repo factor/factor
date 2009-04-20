@@ -131,43 +131,10 @@ GENERIC: subwords ( word -- seq )
 
 M: word subwords drop f ;
 
-<PRIVATE
-
-SYMBOL: visited
-
-CONSTANT: reset-on-redefine { "inferred-effect" "cannot-infer" }
-
-: relevant-callers ( word -- seq )
-    crossref get at keys
-    [ word? ] filter
-    [
-        [ reset-on-redefine [ word-prop ] with any? ]
-        [ inline? ]
-        bi or
-    ] filter ;
-
-: (redefined) ( word -- )
-    dup visited get key? [ drop ] [
-        [ reset-on-redefine reset-props ]
-        [ visited get conjoin ]
-        [
-            [ relevant-callers [ (redefined) ] each ]
-            [ subwords [ (redefined) ] each ]
-            bi
-        ] tri
-    ] if ;
-
-PRIVATE>
-
-: redefined ( word -- )
-    [ H{ } clone visited [ (redefined) ] with-variable ]
-    [ changed-definition ]
-    bi ;
-
 : define ( word def -- )
     [ ] like
     over unxref
-    over redefined
+    over changed-definition
     >>def
     dup crossref? [ dup xref ] when drop ;
 
@@ -176,7 +143,7 @@ PRIVATE>
         swap
         [ drop changed-effect ]
         [ "declared-effect" set-word-prop ]
-        [ drop dup primitive? [ drop ] [ redefined ] if ]
+        [ drop dup primitive? [ drop ] [ changed-definition ] if ]
         2tri
     ] if ;
 
