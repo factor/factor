@@ -29,7 +29,6 @@ SYMBOL: check-optimizer?
     normalize
     propagate
     cleanup
-    ?check
     dup run-escape-analysis? [
         escape-analysis
         unbox-tuples
