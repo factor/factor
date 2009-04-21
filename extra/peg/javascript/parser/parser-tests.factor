@@ -5,8 +5,6 @@ USING: kernel tools.test peg peg.javascript.ast peg.javascript.parser
        accessors multiline sequences math peg.ebnf ;
 IN: peg.javascript.parser.tests
 
-\ javascript must-infer
-
 {
   T{
       ast-begin

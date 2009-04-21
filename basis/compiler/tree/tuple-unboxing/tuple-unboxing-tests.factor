@@ -8,8 +8,6 @@ compiler.tree.def-use kernel accessors sequences math
 math.private sorting math.order binary-search sequences.private
 slots.private ;
 
-\ unbox-tuples must-infer
-
 : test-unboxing ( quot -- )
     build-tree
     analyze-recursive

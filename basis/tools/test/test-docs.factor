@@ -58,8 +58,8 @@ HELP: must-fail-with
 { $notes "This word is used to test error handling code, ensuring that errors thrown by code contain the relevant debugging information." } ;
 
 HELP: must-infer
-{ $values { "word/quot" "a quotation or a word" } }
-{ $description "Ensures that the quotation or word has a static stack effect without running it." }
+{ $values { "quot" quotation } }
+{ $description "Ensures that the quotation has a static stack effect without running it." }
 { $notes "This word is used to test that code will compile with the optimizing compiler for optimum performance. See " { $link "compiler" } "." } ;
 
 HELP: must-infer-as

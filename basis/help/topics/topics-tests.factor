@@ -3,11 +3,6 @@ help.markup help.syntax kernel sequences tools.test words parser
 namespaces assocs source-files eval ;
 IN: help.topics.tests
 
-\ article-name must-infer
-\ article-title must-infer
-\ article-content must-infer
-\ article-parent must-infer
-
 ! Test help cross-referencing
 
 [ ] [ "Test B" { "Hello world." } <article> { "test" "b" } add-article ] unit-test

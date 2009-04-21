@@ -6,9 +6,6 @@ compiler.tree.normalization.renaming
 compiler.tree compiler.tree.checker
 sequences accessors tools.test kernel math ;
 
-\ count-introductions must-infer
-\ normalize must-infer
-
 [ 3 ] [ [ 3drop 1 2 3 ] build-tree count-introductions ] unit-test
 
 [ 4 ] [ [ 3drop 1 2 3 3drop drop ] build-tree count-introductions ] unit-test

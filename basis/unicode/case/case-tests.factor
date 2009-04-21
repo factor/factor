@@ -4,10 +4,6 @@ USING: unicode.case tools.test namespaces strings unicode.normalize
 unicode.case.private ;
 IN: unicode.case.tests
 
-\ >upper must-infer
-\ >lower must-infer
-\ >title must-infer
-
 [ "Hello How Are You? I'm Good" ] [ "hEllo how ARE yOU? I'm good" >title ] unit-test
 [ "FUSS" ] [ "Fu\u0000DF" >upper ] unit-test
 [ "\u0003C3a\u0003C2 \u0003C3\u0003C2 \u0003C3a\u0003C2" ] [ "\u0003A3A\u0003A3 \u0003A3\u0003A3 \u0003A3A\u0003A3" >lower ] unit-test
