@@ -28,23 +28,14 @@ SYMBOL: compiled
 : maybe-compile ( word -- )
     dup optimized>> [ drop ] [ queue-compile ] if ;
 
-SYMBOLS: +optimized+ +unoptimized+ ;
+: recompile-callers? ( word -- ? )
+    changed-effects get key? ;
 
-: ripple-up ( words -- )
-    dup "compiled-status" word-prop +unoptimized+ eq?
-    [ usage [ word? ] filter ] [ compiled-usage keys ] if
-    [ queue-compile ] each ;
-
-: ripple-up? ( status word -- ? )
-    [
-        [ nip changed-effects get key? ]
-        [ "compiled-status" word-prop eq? not ] 2bi or
-    ] keep "compiled-status" word-prop and ;
-
-: save-compiled-status ( word status -- )
-    [ over ripple-up? [ ripple-up ] [ drop ] if ]
-    [ "compiled-status" set-word-prop ]
-    2bi ;
+: recompile-callers ( words -- )
+    dup recompile-callers? [
+        [ usage [ word? ] filter ] [ compiled-usage keys ] bi
+        [ [ queue-compile ] each ] bi@
+    ] [ drop ] if ;
 
 : start ( word -- )
     "trace-compilation" get [ dup name>> print flush ] when
@@ -55,20 +46,19 @@ SYMBOLS: +optimized+ +unoptimized+ ;
 : ignore-error? ( word error -- ? )
     [
         {
-            [ inline? ]
             [ macro? ]
-            [ "no-compile" word-prop ]
+            [ inline? ]
             [ "special" word-prop ]
+            [ "no-compile" word-prop ]
         } 1||
     ] [ error-type +compiler-warning+ eq? ] bi* and ;
 
 : (fail) ( word compiled -- * )
     swap
+    [ recompile-callers ]
     [ compiled-unxref ]
     [ compiled get set-at ]
-    [ +unoptimized+ save-compiled-status ]
-    tri
-    return ;
+    tri return ;
 
 : not-compiled-def ( word error -- def )
     '[ _ _ not-compiled ] [ ] like ;
@@ -106,11 +96,10 @@ t compile-dependencies? set-global
     ] each ;
 
 : finish ( word -- )
-    [ +optimized+ save-compiled-status ]
+    [ recompile-callers ]
     [ compiled-unxref ]
     [
-        dup crossref?
-        [
+        dup crossref? [
             dependencies get
             generic-dependencies get
             compiled-xref

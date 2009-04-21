@@ -138,12 +138,15 @@ M: word subwords drop f ;
     >>def
     dup crossref? [ dup xref ] when drop ;
 
+: changed-effect ( word -- )
+    [ dup changed-effects get set-in-unit ]
+    [ dup primitive? [ drop ] [ changed-definition ] if ] bi ;
+
 : set-stack-effect ( effect word -- )
     2dup "declared-effect" word-prop = [ 2drop ] [
-        swap
-        [ drop changed-effect ]
-        [ "declared-effect" set-word-prop ]
-        [ drop dup primitive? [ drop ] [ changed-definition ] if ]
+        [ nip changed-effect ]
+        [ nip subwords [ changed-effect ] each ]
+        [ swap "declared-effect" set-word-prop ]
         2tri
     ] if ;
 
@@ -151,7 +154,11 @@ M: word subwords drop f ;
     [ nip swap set-stack-effect ] [ drop define ] 3bi ;
 
 : make-inline ( word -- )
-    t "inline" set-word-prop ;
+    dup inline? [ drop ] [
+        [ t "inline" set-word-prop ]
+        [ changed-effect ]
+        bi
+    ] if ;
 
 : make-recursive ( word -- )
     t "recursive" set-word-prop ;
