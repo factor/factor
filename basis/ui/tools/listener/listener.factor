@@ -32,9 +32,10 @@ output history flag mailbox thread waiting token-model word-model popup ;
 
 : interactor-busy? ( interactor -- ? )
     #! We're busy if there's no thread to resume.
-    [ waiting>> ]
-    [ thread>> dup [ thread-registered? ] when ]
-    bi and not ;
+    {
+        [ waiting>> ]
+        [ thread>> dup [ thread-registered? ] when ]
+    } 1&& not ;
 
 SLOT: vocabs
 
@@ -171,7 +172,7 @@ M: interactor dispose drop ;
     over set-caret
     mark>caret ;
 
-TUPLE: listener-gadget < tool input output scroller ;
+TUPLE: listener-gadget < tool error-summary output scroller input ;
 
 { 600 700 } listener-gadget set-tool-dim
 
@@ -181,17 +182,22 @@ TUPLE: listener-gadget < tool input output scroller ;
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
 
-: init-listener ( listener -- listener )
+: init-input/output ( listener -- listener )
     <interactor>
     [ >>input ] [ pane new-pane t >>scrolls? >>output ] bi
     dup listener-streams >>output drop ;
 
-: <listener-gadget> ( -- gadget )
+: init-error-summary ( listener -- listener )
+    <pane> >>error-summary
+    dup error-summary>> f track-add ;
+
+: <listener-gadget> ( -- listener )
     vertical listener-gadget new-track
         add-toolbar
-        init-listener
+        init-input/output
         dup output>> <scroller> >>scroller
-        dup scroller>> 1 track-add ;
+        dup scroller>> 1 track-add
+        init-error-summary ;
 
 M: listener-gadget focusable-child*
     input>> dup popup>> or ;
@@ -357,18 +363,20 @@ interactor "completion" f {
     { T{ key-down f { C+ } "r" } history-completion-popup }
 } define-command-map
 
-: ui-error-summary ( -- )
-    error-counts keys [
-        [ icon>> 1array \ $image prefix " " 2array ] { } map-as
-        { "Press " { $command tool "common" show-error-list } " to view errors." }
-        append print-element nl
-    ] unless-empty ;
+: ui-error-summary ( listener -- )
+    error-summary>> [
+        error-counts keys [
+            [ icon>> 1array \ $image prefix " " 2array ] { } map-as
+            { "Press " { $command tool "common" show-error-list } " to view errors." }
+            append print-element
+        ] unless-empty
+    ] with-pane ;
 
 : listener-thread ( listener -- )
     dup listener-streams [
         [ com-browse ] help-hook set
-        '[ [ _ input>> ] 2dip debugger-popup ] error-hook set
-        [ ui-error-summary ] error-summary-hook set
+        [ '[ [ _ input>> ] 2dip debugger-popup ] error-hook set ]
+        [ '[ _ ui-error-summary ] error-summary-hook set ] bi
         tip-of-the-day. nl
         listener
     ] with-streams* ;
