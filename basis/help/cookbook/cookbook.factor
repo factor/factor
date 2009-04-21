@@ -67,7 +67,7 @@ $nl
     }
     "In Factor, this example will print 3 since word redefinition is explicitly supported."
     $nl
-    "Indeed, redefining a word twice in the same source file is an error; this is almost always a mistake since there's no way to call the first definition. See " { $link "definition-checking" } "."
+    "However, redefining a word twice in the same source file is an error; this is almost always a mistake since there's no way to call the first definition. See " { $link "definition-checking" } "."
 }
 { $references
     { "A whole slew of shuffle words can be used to rearrange the stack. There are forms of word definition other than colon definition, words can be defined entirely at runtime, and word definitions can be " { $emphasis "annotated" } " with tracing calls and breakpoints without modifying the source code." }
