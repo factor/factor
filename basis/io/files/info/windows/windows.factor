@@ -5,10 +5,32 @@ io.files.windows io.files.windows.nt kernel windows.kernel32
 windows.time windows accessors alien.c-types combinators
 generalizations system alien.strings io.encodings.utf16n
 sequences splitting windows.errors fry continuations destructors
-calendar ascii combinators.short-circuit ;
+calendar ascii combinators.short-circuit locals ;
 IN: io.files.info.windows
 
+:: round-up-to ( n multiple -- n' )
+    n multiple rem dup 0 = [
+        drop n
+    ] [
+        multiple swap - n +
+    ] if ;
+
 TUPLE: windows-file-info < file-info attributes ;
+
+: get-compressed-file-size ( path -- n )
+    "DWORD" <c-object> [ GetCompressedFileSize ] keep
+    over INVALID_FILE_SIZE = [
+        win32-error-string throw
+    ] [
+        *uint >64bit
+    ] if ;
+
+: set-windows-size-on-disk ( file-info path -- file-info )
+    over attributes>> +compressed+ swap member? [
+        get-compressed-file-size
+    ] [
+        drop dup size>> 4096 round-up-to
+    ] if >>size-on-disk ;
 
 : WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
     [ \ windows-file-info new ] dip
@@ -79,7 +101,9 @@ TUPLE: windows-file-info < file-info attributes ;
     ] if ;
 
 M: windows file-info ( path -- info )
-    normalize-path get-file-information-stat ;
+    normalize-path
+    [ get-file-information-stat ]
+    [ set-windows-size-on-disk ] bi ;
 
 M: windows link-info ( path -- info )
     file-info ;
