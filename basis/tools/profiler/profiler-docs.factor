@@ -23,7 +23,7 @@ $nl
 { $subsection vocabs-profile. }
 { $subsection method-profile. }
 { $subsection "profiler-limitations" }
-{ $see-also "ui-profiler" } ;
+{ $see-also "ui.tools.profiler" } ;
 
 ABOUT: "profiling"
 
