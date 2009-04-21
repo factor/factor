@@ -14,7 +14,7 @@ IN: compiler.units.tests
 
 ! Non-optimizing compiler bugs
 [ 1 1 ] [
-    "A" "B" <word> [ [ 1 ] dip ] >>def dup f 2array 1array modify-code-heap
+    "A" "B" <word> [ [ 1 ] dip ] 2array 1array modify-code-heap
     1 swap execute
 ] unit-test
 

@@ -45,8 +45,8 @@ IN: compiler.tree.builder
     infer-quot-here ;
 
 : check-effect ( word effect -- )
-    over required-stack-effect 2dup effect<=
-    [ 3drop ] [ effect-error ] if ;
+    swap required-stack-effect 2dup effect<=
+    [ 2drop ] [ effect-error ] if ;
 
 : finish-word ( word -- )
     current-effect check-effect ;
