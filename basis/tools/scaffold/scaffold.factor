@@ -1,5 +1,5 @@
-! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! Copyright (c) 2008 Doug Coleman. All rights reserved.
+! This software is licensed under the Simplified BSD License.
 USING: assocs io.files io.pathnames io.directories
 io.encodings.utf8 hashtables kernel namespaces sequences
 vocabs.loader io combinators calendar accessors math.parser
@@ -79,9 +79,10 @@ ERROR: no-vocab vocab ;
     dup exists? [ not-scaffolding f ] [ scaffolding t ] if ;
 
 : scaffold-copyright ( -- )
-    "! Copyright (C) " write now year>> number>string write
-    developer-name get [ "Your name" ] unless* bl write "." print
-    "! See http://factorcode.org/license.txt for BSD license." print ;
+    "! Copyright (c) " write now year>> number>string write
+    developer-name get [ "Your name" ] unless* bl write
+    ". All rights reserved." print
+    "! This software is licensed under the Simplified BSD License." print ;
 
 : main-file-string ( vocab -- string )
     [
