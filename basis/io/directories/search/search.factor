@@ -3,7 +3,7 @@
 USING: accessors arrays continuations deques dlists fry
 io.directories io.files io.files.info io.pathnames kernel
 sequences system vocabs.loader locals math namespaces
-sorting assocs ;
+sorting assocs calendar threads ;
 IN: io.directories.search
 
 <PRIVATE
@@ -70,30 +70,35 @@ ERROR: file-not-found ;
 : find-all-in-directories ( directories bfs? quot: ( obj -- ? ) -- paths/f )
     '[ _ _ find-all-files ] map concat ; inline
 
+: qualified-directory-entries ( path -- seq )
+    directory-entries
+    current-directory get '[ [ _ prepend-path ] change-name ] map ;
+
+: qualified-directory-files ( path -- seq )
+    directory-files
+    current-directory get '[ _ prepend-path ] map ;
+
 : with-qualified-directory-files ( path quot -- )
-    '[
-        "" directory-files current-directory get
-        '[ _ prepend-path ] map @
-    ] with-directory ; inline
+    '[ "" qualified-directory-files @ ] with-directory ; inline
 
 : with-qualified-directory-entries ( path quot -- )
-    '[
-        "" directory-entries current-directory get
-        '[ [ _ prepend-path ] change-name ] map @
-    ] with-directory ; inline
+    '[ "" qualified-directory-entries @ ] with-directory ; inline
 
 : directory-size ( path -- n )
-    0 swap t [ link-info size-on-disk>> + ] each-file ;
+    0 swap t [
+        [ link-info size-on-disk>> + ] [ 2drop ] recover
+    ] each-file ;
+
+: path>usage ( directory-entry -- name size )
+    [ name>> dup ] [ directory? ] bi [
+        directory-size
+    ] [
+        [ link-info size-on-disk>> ] [ drop 0 ] recover
+    ] if ;
 
 : directory-usage ( path -- assoc )
     [
-        [
-            [ name>> dup ] [ directory? ] bi [
-                directory-size
-            ] [
-                link-info size-on-disk>>
-            ] if
-        ] { } map>assoc
+        [ [ path>usage ] [ drop name>> 0 ] recover ] { } map>assoc
     ] with-qualified-directory-entries sort-values ;
 
 os windows? [ "io.directories.search.windows" require ] when
