@@ -8,5 +8,6 @@ M: windows default-emacsclient
     {
         [ "Emacs" [ "emacsclientw.exe" tail? ] find-in-program-files ]
         [ "Emacs" [ "emacsclient.exe" tail? ] find-in-program-files ]
+        [ "Emacs" [ "emacs.exe" tail? ] find-in-program-files ]
         [ "emacs.exe" ]
     } 0|| ;
