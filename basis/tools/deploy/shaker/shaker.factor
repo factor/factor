@@ -99,7 +99,6 @@ IN: tools.deploy.shaker
                 "boa-check"
                 "coercer"
                 "combination"
-                "compiled-status"
                 "compiled-generic-uses"
                 "compiled-uses"
                 "constraints"

@@ -19,9 +19,6 @@ SYMBOL: changed-definitions
 
 SYMBOL: changed-effects
 
-: changed-effect ( word -- )
-    dup changed-effects get set-in-unit ;
-
 SYMBOL: changed-generics
 
 SYMBOL: outdated-generics
