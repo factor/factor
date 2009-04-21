@@ -12,8 +12,8 @@ TUPLE: player < oint
     { speed float } ;
 
 ! speeds are in GL units / second
-: default-speed ( -- speed ) 1.0 ;
-: max-speed ( -- speed ) 30.0 ;
+CONSTANT: default-speed 1.0
+CONSTANT: max-speed 30.0
 
 : <player> ( name sounds -- player )
     [ float-array{ 0 0 5 } float-array{ 0 0 -1 } float-array{ 0 1 0 } float-array{ -1 0 0 } ] 2dip

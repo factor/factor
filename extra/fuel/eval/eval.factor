@@ -60,11 +60,11 @@ t fuel-eval-res-flag set-global
     [ print-error ] recover ;
 
 : (fuel-eval-usings) ( usings -- )
-    [ "USE: " prepend ] map
-    (fuel-eval) fuel-forget-error fuel-forget-output ;
+    [ [ use+ ] curry [ drop ] recover ] each
+    fuel-forget-error fuel-forget-output ;
 
 : (fuel-eval-in) ( in -- )
-    [ dup "IN: " prepend 1array (fuel-eval) in set ] when* ;
+    [ in set ] when* ;
 
 : (fuel-eval-in-context) ( lines in usings -- )
     (fuel-begin-eval)

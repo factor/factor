@@ -94,11 +94,10 @@ $nl
 "This section concerns itself with usage and extension of the parser. Standard syntax is described in " { $link "syntax" } "."
 { $subsection "parser-files" }
 "The parser can be extended."
-{ $subsection "parsing-words" }
 { $subsection "parser-lexer" }
 "The parser can be invoked reflectively;"
 { $subsection parse-stream }
-{ $see-also "definitions" "definition-checking" } ;
+{ $see-also "parsing-words" "definitions" "definition-checking" } ;
 
 ABOUT: "parser"
 

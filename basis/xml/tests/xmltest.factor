@@ -43,7 +43,7 @@ MACRO: drop-input ( quot -- newquot )
     xml-tests [ unit-test ] assoc-each ;
 
 : works? ( result quot -- ? )
-    [ first ] [ call ] bi* = ;
+    [ first ] [ call( -- result ) ] bi* = ;
 
 : partition-xml-tests ( -- successes failures )
     xml-tests [ first2 works? ] partition ;

@@ -218,6 +218,8 @@ M: object infer-call*
     alien-callback
 } [ t "special" set-word-prop ] each
 
+M\ quotation call t "no-compile" set-word-prop
+M\ word execute t "no-compile" set-word-prop
 \ clear t "no-compile" set-word-prop
 
 : non-inline-word ( word -- )
