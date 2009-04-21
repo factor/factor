@@ -60,8 +60,8 @@ HELP: modify-code-heap ( alist -- )
 { $values { "alist" "an alist" } }
 { $description "Stores compiled code definitions in the code heap. The alist maps words to the following:"
 { $list
-    { { $link f } " - in this case, the word is compiled with the non-optimizing compiler part of the VM." }
-    { { $snippet "{ code labels rel words literals }" } " - in this case, a code heap block is allocated with the given data." }
+    { "a quotation - in this case, the quotation is compiled with the non-optimizing compiler and the word will call the quotation when executed." }
+    { { $snippet "{ code labels rel words literals }" } " - in this case, a code heap block is allocated with the given data and the word will call the code block when executed." }
 } }
 { $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;
 

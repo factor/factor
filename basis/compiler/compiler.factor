@@ -62,18 +62,25 @@ SYMBOLS: +optimized+ +unoptimized+ ;
         } 1||
     ] [ error-type +compiler-warning+ eq? ] bi* and ;
 
-: (fail) ( word -- * )
+: (fail) ( word compiled -- * )
+    swap
     [ compiled-unxref ]
-    [ f swap compiled get set-at ]
+    [ compiled get set-at ]
     [ +unoptimized+ save-compiled-status ]
     tri
     return ;
 
+: not-compiled-def ( word error -- def )
+    '[ _ _ not-compiled ] [ ] like ;
+
 : fail ( word error -- * )
-    [ 2dup ignore-error? [ drop f ] when swap compiler-error ] [ drop (fail) ] 2bi ;
+    2dup ignore-error?
+    [ drop f over def>> ]
+    [ 2dup not-compiled-def ] if
+    [ swap compiler-error ] [ (fail) ] bi-curry* bi ;
 
 : frontend ( word -- nodes )
-    dup contains-breakpoints? [ (fail) ] [
+    dup contains-breakpoints? [ dup def>> (fail) ] [
         [ build-tree-from-word ] [ fail ] recover optimize-tree
     ] if ;
 
@@ -124,7 +131,7 @@ t compile-dependencies? set-global
     [ (compile) yield-hook get call( -- ) ] slurp-deque ;
 
 : decompile ( word -- )
-    f 2array 1array modify-code-heap ;
+    dup def>> 2array 1array modify-code-heap ;
 
 : compile-call ( quot -- )
     [ dup infer define-temp ] with-compilation-unit execute ;

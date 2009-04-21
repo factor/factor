@@ -40,3 +40,9 @@ M: source-file-error error.
 : :warnings ( -- ) +compiler-warning+ compiler-errors. ;
 
 : :linkage ( -- ) +linkage-error+ compiler-errors. ;
+
+M: not-compiled summary
+    word>> name>> "The word " " cannot be executed because it failed to compile" surround ;
+
+M: not-compiled error.
+    [ summary print nl ] [ error>> error. ] bi ;
