@@ -33,5 +33,6 @@ M: sbuf stream-element-type drop +character+ ;
     512 <sbuf> ;
 
 : with-string-writer ( quot -- str )
-    <string-writer> swap [ output-stream get ] compose with-output-stream*
-    >string ; inline
+    <string-writer> [
+        swap with-output-stream*
+    ] keep >string ; inline
