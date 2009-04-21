@@ -170,7 +170,7 @@ SYMBOL: history
     ] if ;
 
 : inline-word ( #call word -- ? )
-    dup specialized-def inline-word-def ;
+    dup def>> inline-word-def ;
 
 : inline-method-body ( #call word -- ? )
     2dup should-inline? [ inline-word ] [ 2drop f ] if ;
