@@ -56,6 +56,10 @@ test-2 "TEST2" {
    { "z" "Z" { VARCHAR 256 } +not-null+ }
 } define-persistent
 
+: test-1-tuple ( -- tuple )
+    f 100 random 100 random 100 random [ number>string ] tri@
+    test-1 boa ;
+
 : db-tester ( test-db -- )
     [
         [
@@ -67,8 +71,7 @@ test-2 "TEST2" {
             drop
             10 [
                 dup [
-                    f 100 random 100 random 100 random [ number>string ] tri@
-                    test-1 boa insert-tuple yield
+                    test-1-tuple insert-tuple yield
                 ] with-db
             ] times
         ] with parallel-each
@@ -84,8 +87,7 @@ test-2 "TEST2" {
         <db-pool> [
             10 [
                 10 [
-                    f 100 random 100 random 100 random test-1 boa
-                    insert-tuple yield
+                    test-1-tuple insert-tuple yield
                 ] times
             ] parallel-each
         ] with-pooled-db
