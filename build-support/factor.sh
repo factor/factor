@@ -22,6 +22,13 @@ test_program_installed() {
     return 1;
 }
 
+exit_script() {
+    if [[ $FIND_MAKE_TARGET -eq true ]] ; then
+		echo $MAKE_TARGET;
+	fi
+	exit $1
+}
+
 ensure_program_installed() {
     installed=0;
     for i in $* ;
@@ -43,7 +50,7 @@ ensure_program_installed() {
             $ECHO -n "any of [ $* ]"
         fi
         $ECHO " and try again."
-        exit 1
+        exit_script 1;
     fi
 }
 
@@ -51,7 +58,7 @@ check_ret() {
     RET=$?
     if [[ $RET -ne 0 ]] ; then
        $ECHO $1 failed
-       exit 2
+       exit_script 2
     fi
 }
 
@@ -62,7 +69,7 @@ check_gcc_version() {
     if [[ $GCC_VERSION == *3.3.* ]] ; then
         $ECHO "You have a known buggy version of gcc (3.3)"
         $ECHO "Install gcc 3.4 or higher and try again."
-        exit 3
+        exit_script 3
     elif [[ $GCC_VERSION == *4.3.* ]] ; then
        MAKE_OPTS="$MAKE_OPTS SITE_CFLAGS=-fno-forward-propagate"
     fi
@@ -154,7 +161,7 @@ check_factor_exists() {
     if [[ -d "factor" ]] ; then
         $ECHO "A directory called 'factor' already exists."
         $ECHO "Rename or delete it and try again."
-        exit 4
+        exit_script 4
     fi
 }
 
@@ -279,7 +286,7 @@ check_os_arch_word() {
         $ECHO "OS, ARCH, or WORD is empty.  Please report this."
 
         echo $MAKE_TARGET
-        exit 5
+        exit_script 5
     fi
 }
 
@@ -385,7 +392,7 @@ check_makefile_exists() {
         echo "You are likely in the wrong directory."
         echo "Run this script from your factor directory:"
         echo "     ./build-support/factor.sh"
-        exit 6
+        exit_script 6
     fi
 }
 
@@ -536,6 +543,6 @@ case "$1" in
     bootstrap) get_config_info; bootstrap ;;
     report) find_build_info ;;
     net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
-    make-target) ECHO=false; find_build_info; echo $MAKE_TARGET ;;
+    make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
     *) usage ;;
 esac

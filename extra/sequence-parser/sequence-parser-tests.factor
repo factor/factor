@@ -1,4 +1,5 @@
-USING: tools.test sequence-parser ascii kernel accessors ;
+USING: tools.test sequence-parser unicode.categories kernel
+accessors ;
 IN: sequence-parser.tests
 
 [ "hello" ]
@@ -189,3 +190,15 @@ IN: sequence-parser.tests
 
 [ "123u" ]
 [ "123u" <sequence-parser> take-c-integer ] unit-test
+
+[ 36 ]
+[
+    "    //jofiejoe\n    //eoieow\n/*asdf*/\n      "
+    <sequence-parser> skip-whitespace/comments n>>
+] unit-test
+
+[ f ]
+[ "\n" <sequence-parser> take-integer ] unit-test
+
+[ "\n" ] [ "\n" <sequence-parser> [ ] take-while ] unit-test
+[ f ] [ "\n" <sequence-parser> [ not ] take-while ] unit-test
