@@ -166,9 +166,9 @@ SYMBOL: history
     [ history [ swap suffix ] change ]
     bi ;
 
-:: inline-word-def ( #call word quot -- ? )
+:: inline-word ( #call word -- ? )
     word history get memq? [ f ] [
-        #call quot splicing-nodes [
+        #call word specialized-def splicing-nodes [
             [
                 word remember-inlining
                 [ ] [ count-nodes ] [ (propagate) ] tri
@@ -176,9 +176,6 @@ SYMBOL: history
             [ #call (>>body) ] [ node-count +@ ] bi* t
         ] [ f ] if*
     ] if ;
-
-: inline-word ( #call word -- ? )
-    dup specialized-def inline-word-def ;
 
 : inline-method-body ( #call word -- ? )
     2dup should-inline? [ inline-word ] [ 2drop f ] if ;
@@ -199,10 +196,6 @@ SYMBOL: history
     call( #call -- word/quot/f )
     object swap eliminate-dispatch ;
 
-: inline-instance-check ( #call word -- ? )
-    over in-d>> second value-info literal>> dup class?
-    [ "predicate" word-prop '[ drop @ ] inline-word-def ] [ 3drop f ] if ;
-
 : (do-inlining) ( #call word -- ? )
     #! If the generic was defined in an outer compilation unit,
     #! then it doesn't have a definition yet; the definition
@@ -214,7 +207,6 @@ SYMBOL: history
     #! discouraged, but it should still work.)
     {
         { [ dup never-inline-word? ] [ 2drop f ] }
-        { [ dup \ instance? eq? ] [ inline-instance-check ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }

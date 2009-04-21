@@ -341,6 +341,11 @@ generic-comparison-ops [
     ] [ 2drop object-info ] if
 ] "outputs" set-word-prop
 
+\ instance? [
+    in-d>> second value-info literal>> dup class?
+    [ "predicate" word-prop '[ drop @ ] ] [ drop f ] if
+] "custom-inlining" set-word-prop
+
 \ equal? [
     ! If first input has a known type and second input is an
     ! object, we convert this to [ swap equal? ].

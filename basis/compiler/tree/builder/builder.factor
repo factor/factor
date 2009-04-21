@@ -25,7 +25,7 @@ IN: compiler.tree.builder
             [ f initial-recursive-state infer-quot ] bi*
         ] with-tree-builder
         unclip-last in-d>>
-    ] [ "OOPS" USE: io print flush 3drop f f ] recover ;
+    ] [ 3drop f f ] recover ;
 
 : build-sub-tree ( #call quot -- nodes/f )
     [ [ out-d>> ] [ in-d>> ] bi ] dip build-tree-with
