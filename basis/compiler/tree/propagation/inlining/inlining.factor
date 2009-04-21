@@ -3,7 +3,7 @@
 USING: accessors kernel arrays sequences math math.order
 math.partial-dispatch generic generic.standard generic.math
 classes.algebra classes.union sets quotations assocs combinators
-words namespaces continuations classes fry combinators.smart
+words namespaces continuations classes fry combinators.smart hints
 compiler.tree
 compiler.tree.builder
 compiler.tree.recursive
@@ -136,12 +136,10 @@ DEFER: (flat-length)
     [
         [ classes-known? 2 0 ? ]
         [
-            {
-                [ body-length-bias ]
-                [ "default" word-prop -4 0 ? ]
-                [ "specializer" word-prop 1 0 ? ]
-                [ method-body? 1 0 ? ]
-            } cleave
+            [ body-length-bias ]
+            [ "specializer" word-prop 1 0 ? ]
+            [ method-body? 1 0 ? ]
+            tri
             node-count-bias
             loop-nesting get 0 or 2 *
         ] bi*
@@ -172,7 +170,7 @@ SYMBOL: history
     ] if ;
 
 : inline-word ( #call word -- ? )
-    dup def>> inline-word-def ;
+    dup specialized-def inline-word-def ;
 
 : inline-method-body ( #call word -- ? )
     2dup should-inline? [ inline-word ] [ 2drop f ] if ;
@@ -181,7 +179,9 @@ SYMBOL: history
     { curry compose } memq? ;
 
 : never-inline-word? ( word -- ? )
-    [ deferred? ] [ { call execute } memq? ] bi or ;
+    [ deferred? ]
+    [ "default" word-prop ]
+    [ { call execute } memq? ] tri or or ;
 
 : custom-inlining? ( word -- ? )
     "custom-inlining" word-prop ;

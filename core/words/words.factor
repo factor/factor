@@ -68,10 +68,6 @@ M: word crossref?
         vocabulary>> >boolean
     ] if ;
 
-GENERIC: compiled-crossref? ( word -- ? )
-
-M: word compiled-crossref? crossref? ;
-
 GENERIC# (quot-uses) 1 ( obj assoc -- )
 
 M: object (quot-uses) 2drop ;
@@ -131,25 +127,37 @@ compiled-generic-crossref [ H{ } clone ] initialize
 
 : inline? ( word -- ? ) "inline" word-prop ; inline
 
+GENERIC: subwords ( word -- seq )
+
+M: word subwords drop f ;
+
+<PRIVATE
+
 SYMBOL: visited
 
 CONSTANT: reset-on-redefine { "inferred-effect" "cannot-infer" }
+
+: relevant-callers ( word -- seq )
+    crossref get at keys
+    [ word? ] filter
+    [
+        [ reset-on-redefine [ word-prop ] with any? ]
+        [ inline? ]
+        bi or
+    ] filter ;
 
 : (redefined) ( word -- )
     dup visited get key? [ drop ] [
         [ reset-on-redefine reset-props ]
         [ visited get conjoin ]
         [
-            crossref get at keys
-            [ word? ] filter
-            [
-                [ reset-on-redefine [ word-prop ] with any? ]
-                [ inline? ]
-                bi or
-            ] filter
-            [ (redefined) ] each
+            [ relevant-callers [ (redefined) ] each ]
+            [ subwords [ (redefined) ] each ]
+            bi
         ] tri
     ] if ;
+
+PRIVATE>
 
 : redefined ( word -- )
     [ H{ } clone visited [ (redefined) ] with-variable ]
@@ -198,10 +206,6 @@ M: word reset-word
         "foldable" "flushable" "reading" "writing" "reader"
         "writer" "delimiter"
     } reset-props ;
-
-GENERIC: subwords ( word -- seq )
-
-M: word subwords drop f ;
 
 : reset-generic ( word -- )
     [ subwords forget-all ]

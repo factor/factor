@@ -31,17 +31,6 @@ $nl
 $nl
 "For more about presentation gadgets, see " { $link "ui.gadgets.presentations" } "." ;
 
-ARTICLE: "ui-profiler" "UI profiler" 
-"The graphical profiler is based on the terminal profiler (see " { $link "profiling" } ") and adds more convenient browsing of profiler results."
-$nl
-"To use the profiler, enter a piece of code in the listener input area and press " { $operation com-profile } "."
-$nl
-"Clicking on a vocabulary in the vocabulary list narrows down the word list to only include words from that vocabulary. The sorting options control the order of elements in the vocabulary and word lists. The search fields narrow down the list to only include words or vocabularies whose names contain a substring."
-$nl
-"Consult " { $link "profiling" } " for details about the profiler itself."
-{ $command-map profiler-gadget "toolbar" }
-"The profiler is an instance of " { $link profiler-gadget } "." ;
-
 ARTICLE: "ui-cocoa" "Functionality specific to Mac OS X"
 "On Mac OS X, the Factor UI offers additional features which integrate with this operating system."
 $nl
