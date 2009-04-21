@@ -5,9 +5,6 @@ xml.writer.private io.streams.string xml.traversal sequences
 io.encodings.utf8 io.files accessors io.directories math math.parser ;
 IN: xml.writer.tests
 
-\ write-xml must-infer
-\ xml>string must-infer
-\ pprint-xml must-infer
 ! Add a test for pprint-xml with sensitive-tags
 
 [ "foo" ] [ T{ name { main "foo" } } name>string ] unit-test

@@ -5,7 +5,12 @@ classes classes.tuple ;
 
 : compose-n-quot ( word n -- quot' ) <repetition> >quotation ;
 : compose-n ( quot n -- ) compose-n-quot call ;
+
+<<
 \ compose-n [ compose-n-quot ] 2 define-transform
+\ compose-n t "no-compile" set-word-prop
+>>
+
 : compose-n-test ( a b c -- x ) 2 \ + compose-n ;
 
 [ 6 ] [ 1 2 3 compose-n-test ] unit-test

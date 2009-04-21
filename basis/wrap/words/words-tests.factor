@@ -79,4 +79,3 @@ IN: wrap.words.tests
     } 35 35 wrap-words [ { } like ] map
 ] unit-test
 
-\ wrap-words must-infer

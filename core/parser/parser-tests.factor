@@ -6,8 +6,6 @@ vocabs vocabs.loader accessors eval combinators lexer
 vocabs.parser words.symbol multiline source-files.errors ;
 IN: parser.tests
 
-\ run-file must-infer
-
 [
     [ 1 [ 2 [ 3 ] 4 ] 5 ]
     [ "1\n[\n2\n[\n3\n]\n4\n]\n5" eval( -- a b c ) ]

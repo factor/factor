@@ -599,7 +599,7 @@ must-fail-with
 
 : foo ( a b -- c ) declared-types boa ;
 
-\ foo must-infer
+\ foo def>> must-infer
 
 [ T{ declared-types f 0 "hi" } ] [ 0.0 "hi" foo ] unit-test
 
