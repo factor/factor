@@ -138,7 +138,7 @@ ALIAS: $slot $snippet
 
 ! Images
 : $image ( element -- )
-    [ [ "" ] dip first image associate format ] ($span) ;
+    [ first write-image ] ($span) ;
 
 : <$image> ( path -- element )
     1array \ $image prefix ;
