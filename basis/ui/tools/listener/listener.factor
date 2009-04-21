@@ -13,7 +13,7 @@ ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.listener.completion ui.tools.listener.popups
-ui.tools.listener.history ui.tools.error-list ;
+ui.tools.listener.history ui.tools.error-list ui.images ;
 FROM: source-files.errors => all-errors ;
 IN: ui.tools.listener
 
@@ -187,8 +187,11 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
     [ >>input ] [ pane new-pane t >>scrolls? >>output ] bi
     dup listener-streams >>output drop ;
 
+: <error-summary> ( -- gadget )
+    <pane> COLOR: light-yellow <solid> >>interior ;
+
 : init-error-summary ( listener -- listener )
-    <pane> >>error-summary
+    <error-summary> >>error-summary
     dup error-summary>> f track-add ;
 
 : <listener-gadget> ( -- listener )
@@ -363,12 +366,14 @@ interactor "completion" f {
     { T{ key-down f { C+ } "r" } history-completion-popup }
 } define-command-map
 
-: ui-error-summary ( listener -- )
+: error-summary. ( listener -- )
     error-summary>> [
         error-counts keys [
-            [ icon>> 1array \ $image prefix " " 2array ] { } map-as
+            H{ { table-gap { 3 3 } } } [
+                [ [ [ icon>> write-image ] with-cell ] each ] with-row
+            ] tabular-output
             { "Press " { $command tool "common" show-error-list } " to view errors." }
-            append print-element
+            print-element
         ] unless-empty
     ] with-pane ;
 
@@ -376,7 +381,7 @@ interactor "completion" f {
     dup listener-streams [
         [ com-browse ] help-hook set
         [ '[ [ _ input>> ] 2dip debugger-popup ] error-hook set ]
-        [ '[ _ ui-error-summary ] error-summary-hook set ] bi
+        [ '[ _ error-summary. ] error-summary-hook set ] bi
         tip-of-the-day. nl
         listener
     ] with-streams* ;
