@@ -83,15 +83,15 @@ ERROR: file-not-found ;
     ] with-directory ; inline
 
 : directory-size ( path -- n )
-    0 swap t [ file-info size-on-disk>> + ] each-file ;
+    0 swap t [ link-info size-on-disk>> + ] each-file ;
 
-: path>sizes ( path -- assoc )
+: directory-usage ( path -- assoc )
     [
         [
             [ name>> dup ] [ directory? ] bi [
                 directory-size
             ] [
-                file-info size-on-disk>>
+                link-info size-on-disk>>
             ] if
         ] { } map>assoc
     ] with-qualified-directory-entries sort-values ;
