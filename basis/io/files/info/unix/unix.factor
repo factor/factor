@@ -63,6 +63,8 @@ M: unix link-info ( path -- info )
 
 M: unix new-file-info ( -- class ) unix-file-info new ;
 
+CONSTANT: standard-unix-block-size 512
+
 M: unix stat>file-info ( stat -- file-info )
     [ new-file-info ] dip
     {
@@ -80,6 +82,7 @@ M: unix stat>file-info ( stat -- file-info )
         [ stat-st_rdev >>rdev ]
         [ stat-st_blocks >>blocks ]
         [ stat-st_blksize >>blocksize ]
+        [ drop dup blocks>> standard-unix-block-size * >>size-on-disk ]
     } cleave ;
 
 : n>file-type ( n -- type )

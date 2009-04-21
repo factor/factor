@@ -1,12 +1,12 @@
-! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
+! Copyright (C) 2007, 2009 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov, Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays namespaces make io io.encodings.string io.encodings.utf8
-io.encodings.iana io.timeouts io.sockets io.sockets.secure
-io.encodings.ascii kernel logging sequences combinators splitting
-assocs strings math.order math.parser random system calendar summary
-calendar.format accessors sets hashtables base64 debugger classes
-prettyprint io.crlf words ;
+USING: arrays namespaces make io io.encodings io.encodings.string
+io.encodings.utf8 io.encodings.iana io.encodings.binary
+io.encodings.ascii io.timeouts io.sockets io.sockets.secure io.crlf
+kernel logging sequences combinators splitting assocs strings
+math.order math.parser random system calendar summary calendar.format
+accessors sets hashtables base64 debugger classes prettyprint words ;
 IN: smtp
 
 SYMBOL: smtp-domain
@@ -88,8 +88,9 @@ M: message-contains-dot summary ( obj -- string )
     [ message-contains-dot ] when ;
 
 : send-body ( email -- )
-    [ body>> ] [ encoding>> ] bi encode
-    >base64-lines write crlf
+    binary encode-output
+    [ body>> ] [ encoding>> ] bi encode >base64-lines write
+    ascii encode-output crlf
     "." command ;
 
 : quit ( -- )
