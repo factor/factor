@@ -216,7 +216,10 @@ M: object infer-call*
     dispatch <tuple-boa> exit load-local load-locals get-local
     drop-locals do-primitive alien-invoke alien-indirect
     alien-callback
-} [ t "special" set-word-prop ] each
+} [
+    [ t "special" set-word-prop ]
+    [ t "no-compile" set-word-prop ] bi
+] each
 
 M\ quotation call t "no-compile" set-word-prop
 M\ curry call t "no-compile" set-word-prop
