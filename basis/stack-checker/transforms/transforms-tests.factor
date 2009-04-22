@@ -3,10 +3,10 @@ USING: sequences stack-checker.transforms tools.test math kernel
 quotations stack-checker stack-checker.errors accessors combinators words arrays
 classes classes.tuple ;
 
-: compose-n-quot ( word n -- quot' ) <repetition> >quotation ;
-: compose-n ( quot n -- ) compose-n-quot call ;
+: compose-n ( quot n -- ) "OOPS" throw ;
 
 <<
+: compose-n-quot ( word n -- quot' ) <repetition> >quotation ;
 \ compose-n [ compose-n-quot ] 2 define-transform
 \ compose-n t "no-compile" set-word-prop
 >>
