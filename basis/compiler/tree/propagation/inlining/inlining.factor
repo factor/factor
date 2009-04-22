@@ -28,12 +28,10 @@ SYMBOL: node-count
 SYMBOL: inlining-count
 
 ! Splicing nodes
-GENERIC: splicing-nodes ( #call word/quot/f -- nodes/f )
-
-M: word splicing-nodes
+: splicing-call ( #call word -- nodes )
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
-M: callable splicing-nodes
+: splicing-body ( #call quot/word -- nodes/f )
     build-sub-tree dup [ analyze-recursive normalize ] when ;
 
 ! Dispatch elimination
@@ -42,6 +40,12 @@ M: callable splicing-nodes
 
 : propagate-body ( #call -- ? )
     body>> (propagate) t ;
+
+GENERIC: splicing-nodes ( #call word/quot -- nodes/f )
+
+M: word splicing-nodes splicing-call ;
+
+M: callable splicing-nodes splicing-body ;
 
 : eliminate-dispatch ( #call class/f word/quot/f -- ? )
     dup [
@@ -168,7 +172,7 @@ SYMBOL: history
 
 :: inline-word ( #call word -- ? )
     word history get memq? [ f ] [
-        #call word specialized-def splicing-nodes [
+        #call word splicing-body [
             [
                 word remember-inlining
                 [ ] [ count-nodes ] [ (propagate) ] tri

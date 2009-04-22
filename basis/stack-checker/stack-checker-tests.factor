@@ -299,7 +299,7 @@ ERROR: custom-error ;
     [ custom-error inference-error ] infer
 ] unit-test
 
-[ T{ effect f 1 2 t } ] [
+[ T{ effect f 1 1 t } ] [
     [ dup [ 3 throw ] dip ] infer
 ] unit-test
 

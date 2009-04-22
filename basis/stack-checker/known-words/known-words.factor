@@ -221,6 +221,10 @@ M: object infer-call*
     [ t "no-compile" set-word-prop ] bi
 ] each
 
+! Exceptions to the above
+\ curry f "no-compile" set-word-prop
+\ compose f "no-compile" set-word-prop
+
 M\ quotation call t "no-compile" set-word-prop
 M\ curry call t "no-compile" set-word-prop
 M\ compose call t "no-compile" set-word-prop
