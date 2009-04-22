@@ -300,8 +300,6 @@ main = Primary
   "x[i][j].y" primary
 ] unit-test
 
-'ebnf' compile must-infer
-
 { V{ V{ "a" "b" } "c" } } [
   "abc" [EBNF a="a" "b" foo=(a "c") EBNF]
 ] unit-test
