@@ -5,7 +5,7 @@ IN: help.markup.tests
 
 TUPLE: blahblah quux ;
 
-[ "an int" ] [ [ { "int" } $instance ] with-string-writer ] unit-test
+[ "int" ] [ [ { "int" } $instance ] with-string-writer ] unit-test
 
 [ ] [ \ quux>> print-topic ] unit-test
 [ ] [ \ >>quux print-topic ] unit-test

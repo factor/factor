@@ -13,30 +13,47 @@ GENERIC: uses ( defspec -- seq )
 
 <PRIVATE
 
+SYMBOL: visited
+
 GENERIC# quot-uses 1 ( obj assoc -- )
 
 M: object quot-uses 2drop ;
 
 M: word quot-uses over crossref? [ conjoin ] [ 2drop ] if ;
 
-: seq-uses ( seq assoc -- ) [ quot-uses ] curry each ;
+: (seq-uses) ( seq assoc -- )
+    [ quot-uses ] curry each ;
+
+: seq-uses ( seq assoc -- )
+    over visited get memq? [ 2drop ] [
+        over visited get push
+        (seq-uses)
+    ] if ;
+
+: assoc-uses ( assoc' assoc -- )
+    over visited get memq? [ 2drop ] [
+        over visited get push
+        [ >alist ] dip (seq-uses)
+    ] if ;
 
 M: array quot-uses seq-uses ;
 
-M: hashtable quot-uses [ >alist ] dip seq-uses ;
+M: hashtable quot-uses assoc-uses ;
 
 M: callable quot-uses seq-uses ;
 
 M: wrapper quot-uses [ wrapped>> ] dip quot-uses ;
 
 M: callable uses ( quot -- assoc )
-    H{ } clone [ quot-uses ] keep keys ;
+    V{ } clone visited [
+        H{ } clone [ quot-uses ] keep keys
+    ] with-variable ;
 
 M: word uses def>> uses ;
 
 M: link uses { $subsection $link $see-also } article-links ;
 
-M: pathname uses string>> source-file top-level-form>> uses ;
+M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
 
 GENERIC: crossref-def ( defspec -- )
 

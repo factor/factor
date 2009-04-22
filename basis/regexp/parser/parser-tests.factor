@@ -4,7 +4,7 @@ IN: regexp.parser.tests
 : regexp-parses ( string -- )
     [ [ ] ] dip '[ _ parse-regexp drop ] unit-test ;
 
-: regexp-fails ( string -- regexp )
+: regexp-fails ( string -- )
     '[ _ parse-regexp ] must-fail ;
 
 {

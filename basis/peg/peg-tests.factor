@@ -206,5 +206,3 @@ USE: compiler
 [ ] [ enable-compiler ] unit-test
 
 [ [ ] ] [ "" epsilon [ drop [ [ ] ] call ] action parse ] unit-test
-  
-[ [ ] ] [ "" epsilon [ drop [ [ ] ] ] action [ call ] action parse ] unit-test
