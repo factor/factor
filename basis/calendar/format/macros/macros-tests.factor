@@ -1,4 +1,4 @@
-USING: tools.test kernel ;
+USING: tools.test kernel accessors ;
 IN: calendar.format.macros
 
 [ 2 ] [ { [ 2 ] } attempt-all-quots ] unit-test
@@ -10,6 +10,6 @@ IN: calendar.format.macros
 : compiled-test-1 ( -- n )
     { [ 1 throw ] [ 2 ] } attempt-all-quots ;
 
-\ compiled-test-1 must-infer
+\ compiled-test-1 def>> must-infer
 
 [ 2 ] [ compiled-test-1 ] unit-test

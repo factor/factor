@@ -525,11 +525,19 @@ HELP: ((
 { $description "Literal stack effect syntax." }
 { $notes "Useful for meta-programming with " { $link define-declared } "." }
 { $examples
-    { $code
+    { $example
+        "USING: compiler.units kernel math prettyprint random words ;"
+        "IN: scratchpad"
+        ""
         "SYMBOL: my-dynamic-word"
-        "USING: math random words ;"
-        "3 { [ + ] [ - ] [ * ] [ / ] } random curry"
-        "(( x -- y )) define-declared"
+        ""
+        "["
+        "    my-dynamic-word 2 { [ + ] [ * ] } random curry"
+        "    (( x -- y )) define-declared"
+        "] with-compilation-unit"
+        ""
+        "2 my-dynamic-word ."
+        "4"
     }
 } ;
 

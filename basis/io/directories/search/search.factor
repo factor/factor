@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays continuations deques dlists fry
 io.directories io.files io.files.info io.pathnames kernel
-sequences system vocabs.loader ;
+sequences system vocabs.loader locals math namespaces
+sorting assocs ;
 IN: io.directories.search
 
 <PRIVATE
@@ -13,10 +14,10 @@ TUPLE: directory-iterator path bfs queue ;
     dup directory-files [ append-path ] with map ;
 
 : push-directory ( path iter -- )
-    [ qualified-directory ] dip [
-        [ queue>> ] [ bfs>> ] bi
+    [ qualified-directory ] dip '[
+        _ [ queue>> ] [ bfs>> ] bi
         [ push-front ] [ push-back ] if
-    ] curry each ;
+    ] each ;
 
 : <directory-iterator> ( path bfs? -- iterator )
     <dlist> directory-iterator boa
@@ -28,12 +29,11 @@ TUPLE: directory-iterator path bfs queue ;
         [ over push-directory next-file ] [ nip ] if
     ] if ;
 
-: iterate-directory ( iter quot: ( obj -- ? ) -- obj )
-    over next-file [
-        over call
-        [ 2nip ] [ iterate-directory ] if*
+:: iterate-directory ( iter quot: ( obj -- ? ) -- obj )
+    iter next-file [
+        quot call [ iter quot iterate-directory ] unless*
     ] [
-        2drop f
+        f
     ] if* ; inline recursive
 
 PRIVATE>
@@ -69,5 +69,31 @@ ERROR: file-not-found ;
 
 : find-all-in-directories ( directories bfs? quot: ( obj -- ? ) -- paths/f )
     '[ _ _ find-all-files ] map concat ; inline
+
+: with-qualified-directory-files ( path quot -- )
+    '[
+        "" directory-files current-directory get
+        '[ _ prepend-path ] map @
+    ] with-directory ; inline
+
+: with-qualified-directory-entries ( path quot -- )
+    '[
+        "" directory-entries current-directory get
+        '[ [ _ prepend-path ] change-name ] map @
+    ] with-directory ; inline
+
+: directory-size ( path -- n )
+    0 swap t [ link-info size-on-disk>> + ] each-file ;
+
+: directory-usage ( path -- assoc )
+    [
+        [
+            [ name>> dup ] [ directory? ] bi [
+                directory-size
+            ] [
+                link-info size-on-disk>>
+            ] if
+        ] { } map>assoc
+    ] with-qualified-directory-entries sort-values ;
 
 os windows? [ "io.directories.search.windows" require ] when

@@ -1,11 +1,8 @@
 USING: arrays debugger.threads destructors io io.directories
 io.encodings.8-bit io.encodings.ascii io.encodings.binary
 io.files io.files.private io.files.temp io.files.unique kernel
-make math sequences system threads tools.test ;
+make math sequences system threads tools.test generic.standard ;
 IN: io.files.tests
-
-\ exists? must-infer
-\ (exists?) must-infer
 
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
 
@@ -144,3 +141,15 @@ USE: debugger.threads
         -10 seek-absolute seek-input
     ] with-file-reader
 ] must-fail
+
+[
+    "non-string-error" unique-file ascii [
+        { } write
+    ] with-file-writer
+] [ no-method? ] must-fail-with
+
+[
+    "non-byte-array-error" unique-file binary [
+        "" write
+    ] with-file-writer
+] [ no-method? ] must-fail-with

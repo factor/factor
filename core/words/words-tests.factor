@@ -51,7 +51,7 @@ SYMBOL: a-symbol
 ! See if redefining a generic as a colon def clears some
 ! word props.
 GENERIC: testing ( a -- b )
-"IN: words.tests : testing ( -- ) ;" (( -- )) eval
+"IN: words.tests : testing ( -- ) ;" eval( -- )
 
 [ f ] [ \ testing generic? ] unit-test
 
@@ -63,52 +63,6 @@ FORGET: forgotten
 FORGET: another-forgotten
 : another-forgotten ( -- ) ;
 
-! I forgot remove-crossref calls!
-: fee ( -- ) ;
-: foe ( -- ) fee ;
-: fie ( -- ) foe ;
-
-[ t ] [ \ fee usage [ word? ] filter empty? ] unit-test
-[ t ] [ \ foe usage empty? ] unit-test
-[ f ] [ \ foe crossref get key? ] unit-test
-
-FORGET: foe
-
-! xref should not retain references to gensyms
-[ ] [
-    [ gensym [ * ] define ] with-compilation-unit
-] unit-test
-
-[ t ] [
-    \ * usage [ word? ] filter [ crossref? ] all?
-] unit-test
-
-DEFER: calls-a-gensym
-[ ] [
-    [
-        \ calls-a-gensym
-        gensym dup "x" set 1quotation
-        (( x -- x )) define-declared
-    ] with-compilation-unit
-] unit-test
-
-[ f ] [ "x" get crossref get at ] unit-test
-
-! more xref buggery
-[ f ] [
-    GENERIC: xyzzle ( x -- x )
-    : a ( -- ) ; \ a
-    M: integer xyzzle a ;
-    FORGET: a
-    M: object xyzzle ;
-    crossref get at
-] unit-test
-
-! regression
-GENERIC: freakish ( x -- y )
-: bar ( x -- y ) freakish ;
-M: array freakish ;
-[ t ] [ \ bar \ freakish usage member? ] unit-test
 
 DEFER: x
 [ x ] [ undefined? ] must-fail-with
@@ -116,45 +70,25 @@ DEFER: x
 [ ] [ "no-loc" "words.tests" create drop ] unit-test
 [ f ] [ "no-loc" "words.tests" lookup where ] unit-test
 
-[ ] [ "IN: words.tests : no-loc-2 ( -- ) ;" (( -- )) eval ] unit-test
+[ ] [ "IN: words.tests : no-loc-2 ( -- ) ;" eval( -- ) ] unit-test
 [ f ] [ "no-loc-2" "words.tests" lookup where ] unit-test
 
-[ ] [ "IN: words.tests : test-last ( -- ) ;" (( -- )) eval ] unit-test
+[ ] [ "IN: words.tests : test-last ( -- ) ;" eval( -- ) ] unit-test
 [ "test-last" ] [ word name>> ] unit-test
-
-! regression
-SYMBOL: quot-uses-a
-SYMBOL: quot-uses-b
-
-[ ] [
-    [
-        quot-uses-a [ 2 3 + ] define
-    ] with-compilation-unit
-] unit-test
-
-[ { + } ] [ \ quot-uses-a uses ] unit-test
-
-[ ] [
-    [
-        quot-uses-b 2 [ 3 + ] curry define
-    ] with-compilation-unit
-] unit-test
-
-[ { + } ] [ \ quot-uses-b uses ] unit-test
 
 "undef-test" "words.tests" lookup [
     [ forget ] with-compilation-unit
 ] when*
 
-[ "IN: words.tests : undef-test ( -- ) ; << undef-test >>" (( -- )) eval ]
+[ "IN: words.tests : undef-test ( -- ) ; << undef-test >>" eval( -- ) ]
 [ error>> undefined? ] must-fail-with
 
 [ ] [
-    "IN: words.tests GENERIC: symbol-generic ( -- )" (( -- )) eval
+    "IN: words.tests GENERIC: symbol-generic ( -- )" eval( -- )
 ] unit-test
 
 [ ] [
-    "IN: words.tests SYMBOL: symbol-generic" (( -- )) eval
+    "IN: words.tests SYMBOL: symbol-generic" eval( -- )
 ] unit-test
 
 [ t ] [ "symbol-generic" "words.tests" lookup symbol? ] unit-test
@@ -174,14 +108,14 @@ SYMBOL: quot-uses-b
 [ f ] [ "symbol-generic" "words.tests" lookup generic? ] unit-test
 
 ! Regressions
-[ ] [ "IN: words.tests : decl-forget-test ( -- ) ; foldable" (( -- )) eval ] unit-test
+[ ] [ "IN: words.tests : decl-forget-test ( -- ) ; foldable" eval( -- ) ] unit-test
 [ t ] [ "decl-forget-test" "words.tests" lookup "foldable" word-prop ] unit-test
-[ ] [ "IN: words.tests : decl-forget-test ( -- ) ;" (( -- )) eval ] unit-test
+[ ] [ "IN: words.tests : decl-forget-test ( -- ) ;" eval( -- ) ] unit-test
 [ f ] [ "decl-forget-test" "words.tests" lookup "foldable" word-prop ] unit-test
 
-[ ] [ "IN: words.tests : decl-forget-test ( -- ) ; flushable" (( -- )) eval ] unit-test
+[ ] [ "IN: words.tests : decl-forget-test ( -- ) ; flushable" eval( -- ) ] unit-test
 [ t ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
-[ ] [ "IN: words.tests : decl-forget-test ( -- ) ;" (( -- )) eval ] unit-test
+[ ] [ "IN: words.tests : decl-forget-test ( -- ) ;" eval( -- ) ] unit-test
 [ f ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
 
 [ { } ]
@@ -190,9 +124,4 @@ SYMBOL: quot-uses-b
         "compiled-uses" word-prop
         keys [ "forgotten" word-prop ] any?
     ] filter
-] unit-test
-
-[ { } ] [
-    crossref get keys
-    [ word? ] filter [ "forgotten" word-prop ] filter
 ] unit-test

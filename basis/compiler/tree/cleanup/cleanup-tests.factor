@@ -302,7 +302,7 @@ cell-bits 32 = [
 ] unit-test
 
 [ t ] [
-    [ 1000 [ 1+ ] map ] { 1+ fixnum+ } inlined?
+    [ 1000 iota [ 1+ ] map ] { 1+ fixnum+ } inlined?
 ] unit-test
 
 : rec ( a -- b )

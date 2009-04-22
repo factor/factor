@@ -180,6 +180,7 @@ SYMBOL: interactive-vocabs
     "math.order"
     "memory"
     "namespaces"
+    "parser"
     "prettyprint"
     "see"
     "sequences"
@@ -191,6 +192,7 @@ SYMBOL: interactive-vocabs
     "tools.annotations"
     "tools.crossref"
     "tools.disassembler"
+    "tools.errors"
     "tools.memory"
     "tools.profiler"
     "tools.test"
@@ -262,7 +264,7 @@ print-use-hook [ [ ] ] initialize
 
 : finish-parsing ( lines quot -- )
     file get
-    [ record-form ]
+    [ record-top-level-form ]
     [ record-definitions ]
     [ record-checksum ]
     tri ;

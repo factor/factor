@@ -50,21 +50,19 @@ IN: continuations.tests
     gc
 ] unit-test
 
-[ f ] [ { } kernel-error? ] unit-test
-[ f ] [ { "A" "B" } kernel-error? ] unit-test
-
 ! ! See how well callstack overflow is handled
 ! [ clear drop ] must-fail
 ! 
 ! : callstack-overflow callstack-overflow f ;
 ! [ callstack-overflow ] must-fail
 
-: don't-compile-me ( n -- ) { } [ ] each ;
-
-: foo ( -- ) callstack "c" set 3 don't-compile-me ;
+: don't-compile-me ( -- ) ;
+: foo ( -- ) callstack "c" set don't-compile-me ;
 : bar ( -- a b ) 1 foo 2 ;
 
-[ 1 3 2 ] [ bar ] unit-test
+<< { don't-compile-me foo bar } [ t "no-compile" set-word-prop ] each >>
+
+[ 1 2 ] [ bar ] unit-test
 
 [ t ] [ \ bar def>> "c" get innermost-frame-quot = ] unit-test
 
@@ -107,4 +105,4 @@ SYMBOL: error-counter
 
 [ { 4 } ] [ { 2 2 } [ + ] with-datastack ] unit-test
 
-\ with-datastack must-infer
+[ with-datastack ] must-infer

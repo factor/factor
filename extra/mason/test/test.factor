@@ -1,10 +1,10 @@
-! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs benchmark bootstrap.stage2
-compiler.errors generic help.html help.lint io.directories
+USING: accessors assocs benchmark bootstrap.stage2 compiler.errors
+source-files.errors generic help.html help.lint io.directories
 io.encodings.utf8 io.files kernel mason.common math namespaces
-prettyprint sequences sets sorting tools.test tools.time
-tools.vocabs words system io tools.errors locals ;
+prettyprint sequences sets sorting tools.test tools.time tools.vocabs
+words system io tools.errors locals ;
 IN: mason.test
 
 : do-load ( -- )
@@ -20,14 +20,10 @@ M: word word-vocabulary vocabulary>> ;
 M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 :: do-step ( errors summary-file details-file -- )
-    errors [ file>> ] map prune natural-sort summary-file to-file
+    errors
+    [ error-type +linkage-error+ eq? not ] filter
+    [ file>> ] map prune natural-sort summary-file to-file
     errors details-file utf8 [ errors. ] with-file-writer ;
-
-: do-compile-errors ( -- )
-    compiler-errors get values
-    compiler-errors-file
-    compiler-error-messages-file
-    do-step ;
 
 : do-tests ( -- )
     test-all test-failures get
@@ -42,7 +38,17 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
     do-step ;
 
 : do-benchmarks ( -- )
-    run-benchmarks benchmarks-file to-file ;
+    run-benchmarks
+    [ benchmarks-file to-file ] [
+        [ keys benchmark-error-vocabs-file to-file ]
+        [ benchmark-error-messages-file utf8 [ benchmark-errors. ] with-file-writer ] bi
+    ] bi* ;
+
+: do-compile-errors ( -- )
+    compiler-errors get values
+    compiler-errors-file
+    compiler-error-messages-file
+    do-step ;
 
 : benchmark-ms ( quot -- ms )
     benchmark 1000 /i ; inline
@@ -60,11 +66,12 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
     ".." [
         bootstrap-time get boot-time-file to-file
         check-boot-image
-        [ do-load do-compile-errors ] benchmark-ms load-time-file to-file
+        [ do-load ] benchmark-ms load-time-file to-file
         [ generate-help ] benchmark-ms html-help-time-file to-file
         [ do-tests ] benchmark-ms test-time-file to-file
         [ do-help-lint ] benchmark-ms help-lint-time-file to-file
         [ do-benchmarks ] benchmark-ms benchmark-time-file to-file
+        do-compile-errors
     ] with-directory ;
 
 MAIN: do-all

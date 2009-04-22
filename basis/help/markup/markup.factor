@@ -138,7 +138,7 @@ ALIAS: $slot $snippet
 
 ! Images
 : $image ( element -- )
-    [ [ "" ] dip first image associate format ] ($span) ;
+    [ first write-image ] ($span) ;
 
 : <$image> ( path -- element )
     1array \ $image prefix ;
@@ -251,7 +251,7 @@ M: word ($instance)
     dup name>> a/an write bl ($link) ;
 
 M: string ($instance)
-    dup a/an write bl $snippet ;
+    write ;
 
 M: f ($instance)
     drop { f } $link ;

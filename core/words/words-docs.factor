@@ -104,10 +104,6 @@ $nl
     
     { { { $snippet "\"help\"" } ", " { $snippet "\"help-loc\"" } ", " { $snippet "\"help-parent\"" } } { "Where word help is stored - " { $link "writing-help" } } }
 
-    { { $snippet "\"infer\"" } { $link "macros" } }
-
-    { { { $snippet "\"inferred-effect\"" } } { $link "inference" } }
-
     { { $snippet "\"specializer\"" } { $link "hints" } }
     
     { { $snippet "\"predicating\"" } " Set on class predicates, stores the corresponding class word" }
@@ -164,10 +160,12 @@ ABOUT: "words"
 
 HELP: execute ( word -- )
 { $values { "word" word } }
-{ $description "Executes a word." }
+{ $description "Executes a word. Words which call execute must be inlined in order to compile when called from other words." }
 { $examples
-    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ;\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
+    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ; inline\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
+
+{ execute POSTPONE: execute( } related-words
 
 HELP: deferred
 { $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;
@@ -293,10 +291,6 @@ HELP: define-temp
     { $code "[ 2 2 + . ] (( -- )) define-temp execute" }
     "This word must be called from inside " { $link with-compilation-unit } "."
 } ;
-
-HELP: quot-uses
-{ $values { "quot" quotation } { "assoc" "an assoc with words as keys" } }
-{ $description "Outputs a set of words referenced by the quotation and any quotations it contains." } ;
 
 HELP: delimiter?
 { $values { "obj" object } { "?" "a boolean" } }

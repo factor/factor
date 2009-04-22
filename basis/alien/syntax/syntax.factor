@@ -16,9 +16,7 @@ SYNTAX: BAD-ALIEN <bad-alien> parsed ;
 SYNTAX: LIBRARY: scan "c-library" set ;
 
 SYNTAX: FUNCTION:
-    scan "c-library" get scan ";" parse-tokens
-    [ "()" subseq? not ] filter
-    define-function ;
+    (FUNCTION:) define-declared ;
 
 SYNTAX: TYPEDEF:
     scan scan typedef ;

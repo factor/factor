@@ -3,7 +3,7 @@
 USING: accessors arrays hashtables kernel models math namespaces
 make sequences quotations math.vectors combinators sorting
 binary-search vectors dlists deques models threads
-concurrency.flags math.order math.rectangles fry ;
+concurrency.flags math.order math.rectangles fry locals ;
 IN: ui.gadgets
 
 ! Values for orientation slot
@@ -66,8 +66,8 @@ M: gadget children-on nip children>> ;
 : ((fast-children-on)) ( gadget dim axis -- <=> )
     [ swap loc>> v- ] dip v. 0 <=> ;
 
-: (fast-children-on) ( dim axis children -- i )
-    -rot '[ _ _ ((fast-children-on)) ] search drop ;
+:: (fast-children-on) ( dim axis children -- i )
+    children [ dim axis ((fast-children-on)) ] search drop ;
 
 PRIVATE>
 

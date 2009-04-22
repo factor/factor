@@ -40,10 +40,7 @@ M: missing-effect summary
     ] "" make ;
 
 M: effect-error summary
-    [
-        "Stack effect declaration of the word " %
-        word>> name>> % " is wrong" %
-    ] "" make ;
+    drop "Stack effect declaration is wrong" ;
 
 M: recursive-quotation-error error.
     "The quotation " write

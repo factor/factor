@@ -189,4 +189,4 @@ HINTS: decoder-read-until { string input-port utf8 } { string input-port ascii }
 
 HINTS: decoder-readln { input-port utf8 } { input-port ascii } ;
 
-HINTS: encoder-write { string output-port utf8 } { string output-port ascii } ;
+HINTS: encoder-write { object output-port utf8 } { object output-port ascii } ;
