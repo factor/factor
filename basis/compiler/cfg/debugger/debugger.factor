@@ -16,7 +16,7 @@ M: callable test-cfg
     build-tree optimize-tree gensym build-cfg ;
 
 M: word test-cfg
-    [ build-tree-from-word optimize-tree ] keep build-cfg ;
+    [ build-tree optimize-tree ] keep build-cfg ;
 
 SYMBOL: allocate-registers?
 

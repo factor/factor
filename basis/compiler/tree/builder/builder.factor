@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors quotations kernel sequences namespaces
+USING: fry locals accessors quotations kernel sequences namespaces
 assocs words arrays vectors hints combinators continuations
 effects compiler.tree
 stack-checker
@@ -11,53 +11,55 @@ stack-checker.backend
 stack-checker.recursive-state ;
 IN: compiler.tree.builder
 
-: with-tree-builder ( quot -- nodes )
-    '[ V{ } clone stack-visitor set @ ]
-    with-infer nip ; inline
+<PRIVATE
 
-: build-tree ( quot -- nodes )
-    [ f initial-recursive-state infer-quot ] with-tree-builder ;
+GENERIC: (build-tree) ( quot -- )
 
-: build-tree-with ( in-stack quot -- nodes out-stack )
-    [
-        [
-            [ >vector \ meta-d set ]
-            [ f initial-recursive-state infer-quot ] bi*
-        ] with-tree-builder
-        unclip-last in-d>>
-    ] [ 3drop f f ] recover ;
-
-: build-sub-tree ( #call quot -- nodes/f )
-    [ [ out-d>> ] [ in-d>> ] bi ] dip build-tree-with
-    {
-        { [ over not ] [ 3drop f ] }
-        { [ over ends-with-terminate? ] [ drop swap [ f swap #push ] map append ] }
-        [ rot #copy suffix ]
-    } cond ;
+M: callable (build-tree) f initial-recursive-state infer-quot ;
 
 : check-no-compile ( word -- )
     dup "no-compile" word-prop [ do-not-compile ] [ drop ] if ;
-
-: (build-tree-from-word) ( word -- )
-    dup initial-recursive-state recursive-state set
-    dup [ "inline" word-prop ] [ "recursive" word-prop ] bi and
-    [ 1quotation ] [ specialized-def ] if
-    infer-quot-here ;
 
 : check-effect ( word effect -- )
     swap required-stack-effect 2dup effect<=
     [ 2drop ] [ effect-error ] if ;
 
-: finish-word ( word -- )
-    current-effect check-effect ;
+: inline-recursive? ( word -- ? )
+    [ "inline" word-prop ] [ "recursive" word-prop ] bi and ;
 
-: build-tree-from-word ( word -- nodes )
-    [
+: word-body ( word -- quot )
+    dup inline-recursive? [ 1quotation ] [ specialized-def ] if ;
+
+M: word (build-tree)
+    {
+        [ initial-recursive-state recursive-state set ]
         [ check-no-compile ]
-        [ (build-tree-from-word) ]
-        [ finish-word ]
-        tri
-    ] with-tree-builder ;
+        [ word-body infer-quot-here ]
+        [ current-effect check-effect ]
+    } cleave ;
+
+: build-tree-with ( in-stack word/quot -- nodes )
+    [
+        V{ } clone stack-visitor set
+        [ [ >vector \ meta-d set ] [ length d-in set ] bi ]
+        [ (build-tree) ]
+        bi*
+    ] with-infer nip ;
+
+PRIVATE>
+
+: build-tree ( word/quot -- nodes )
+    [ f ] dip build-tree-with ;
+
+:: build-sub-tree ( #call word/quot -- nodes/f )
+    [
+        #call in-d>> word/quot build-tree-with unclip-last in-d>> :> in-d
+        {
+            { [ dup not ] [ ] }
+            { [ dup ends-with-terminate? ] [ #call out-d>> [ f swap #push ] map append ] }
+            [ in-d #call out-d>> #copy suffix ]
+        } cond
+    ] [ dup inference-error? [ drop f ] [ rethrow ] if ] recover ;
 
 : contains-breakpoints? ( word -- ? )
     def>> [ word? ] filter [ "break?" word-prop ] any? ;

@@ -84,11 +84,8 @@ M: object apply-object push-literal ;
     meta-r empty? [ too-many->r ] unless ;
 
 : infer-quot-here ( quot -- )
-    meta-r [
-        V{ } clone \ meta-r set
-        [ apply-object terminated? get not ] all?
-        [ commit-literals check->r ] [ literals get delete-all ] if
-    ] dip \ meta-r set ;
+    [ apply-object terminated? get not ] all?
+    [ commit-literals ] [ literals get delete-all ] if ;
 
 : infer-quot ( quot rstate -- )
     recursive-state get [
@@ -116,10 +113,14 @@ M: object apply-object push-literal ;
     ] if ;
 
 : infer->r ( n -- )
-    consume-d dup copy-values [ nip output-r ] [ #>r, ] 2bi ;
+    terminated? get [ drop ] [
+        consume-d dup copy-values [ nip output-r ] [ #>r, ] 2bi
+    ] if ;
 
 : infer-r> ( n -- )
-    consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi ;
+    terminated? get [ drop ] [
+        consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi
+    ] if ;
 
 : (consume/produce) ( effect -- inputs outputs )
     [ in>> length consume-d ] [ out>> length produce-d ] bi ;
@@ -130,6 +131,7 @@ M: object apply-object push-literal ;
     bi ; inline
 
 : end-infer ( -- )
+    terminated? get [ check->r ] unless
     meta-d clone #return, ;
 
 : required-stack-effect ( word -- effect )
