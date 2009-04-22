@@ -15,6 +15,7 @@ SYMBOL: compile-queue
 SYMBOL: compiled
 
 : queue-compile? ( word -- ? )
+    #! Don't attempt to compile certain words.
     {
         [ "forgotten" word-prop ]
         [ compiled get key? ]
@@ -25,17 +26,14 @@ SYMBOL: compiled
 : queue-compile ( word -- )
     dup queue-compile? [ compile-queue get push-front ] [ drop ] if ;
 
-: maybe-compile ( word -- )
-    dup optimized>> [ drop ] [ queue-compile ] if ;
-
 : recompile-callers? ( word -- ? )
     changed-effects get key? ;
 
 : recompile-callers ( words -- )
-    dup recompile-callers? [
-        [ usage [ word? ] filter ] [ compiled-usage keys ] bi
-        [ [ queue-compile ] each ] bi@
-    ] [ drop ] if ;
+    #! If a word's stack effect changed, recompile all words that
+    #! have compiled calls to it.
+    dup recompile-callers?
+    [ compiled-usage keys [ queue-compile ] each ] [ drop ] if ;
 
 : start ( word -- )
     "trace-compilation" get [ dup name>> print flush ] when
@@ -44,6 +42,8 @@ SYMBOL: compiled
     f swap compiler-error ;
 
 : ignore-error? ( word error -- ? )
+    #! Ignore warnings on inline combinators, macros, and special
+    #! words such as 'call'.
     [
         {
             [ macro? ]
@@ -53,35 +53,61 @@ SYMBOL: compiled
         } 1||
     ] [ error-type +compiler-warning+ eq? ] bi* and ;
 
-: (fail) ( word compiled -- * )
-    swap
+: finish ( word -- )
+    #! Recompile callers if the word's stack effect changed, then
+    #! save the word's dependencies so that if they change, the
+    #! word can get recompiled too.
     [ recompile-callers ]
     [ compiled-unxref ]
-    [ compiled get set-at ]
-    tri return ;
+    [
+        dup crossref? [
+            dependencies get
+            generic-dependencies get
+            compiled-xref
+        ] [ drop ] if
+    ] tri ;
+
+: deoptimize-with ( word def -- * )
+    #! If the word failed to infer, compile it with the
+    #! non-optimizing compiler. 
+    swap [ finish ] [ compiled get set-at ] bi return ;
 
 : not-compiled-def ( word error -- def )
     '[ _ _ not-compiled ] [ ] like ;
 
-: fail ( word error -- * )
+: deoptimize ( word error -- * )
+    #! If the error is ignorable, compile the word with the
+    #! non-optimizing compiler, using its definition. Otherwise,
+    #! if the compiler error is not ignorable, use a dummy
+    #! definition from 'not-compiled-def' which throws an error.
     2dup ignore-error?
     [ drop f over def>> ]
     [ 2dup not-compiled-def ] if
-    [ swap compiler-error ] [ (fail) ] bi-curry* bi ;
+    [ swap compiler-error ] [ deoptimize-with ] bi-curry* bi ;
 
 : frontend ( word -- nodes )
-    dup contains-breakpoints? [ dup def>> (fail) ] [
-        [ build-tree-from-word ] [ fail ] recover optimize-tree
+    #! If the word contains breakpoints, don't optimize it, since
+    #! the walker does not support this.
+    dup contains-breakpoints? [ dup def>> deoptimize-with ] [
+        [ build-tree ] [ deoptimize ] recover optimize-tree
     ] if ;
+
+: compile-dependency ( word -- )
+    #! If a word calls an unoptimized word, try to compile the callee.
+    dup optimized>> [ drop ] [ queue-compile ] if ;
 
 ! Only switch this off for debugging.
 SYMBOL: compile-dependencies?
 
 t compile-dependencies? set-global
 
+: compile-dependencies ( asm -- )
+    compile-dependencies? get
+    [ calls>> [ compile-dependency ] each ] [ drop ] if ;
+
 : save-asm ( asm -- )
     [ [ code>> ] [ label>> ] bi compiled get set-at ]
-    [ compile-dependencies? get [ calls>> [ maybe-compile ] each ] [ drop ] if ]
+    [ compile-dependencies ]
     bi ;
 
 : backend ( nodes word -- )
@@ -95,18 +121,9 @@ t compile-dependencies? set-global
         save-asm
     ] each ;
 
-: finish ( word -- )
-    [ recompile-callers ]
-    [ compiled-unxref ]
-    [
-        dup crossref? [
-            dependencies get
-            generic-dependencies get
-            compiled-xref
-        ] [ drop ] if
-    ] tri ;
-
-: (compile) ( word -- )
+: compile-word ( word -- )
+    #! We return early if the word has breakpoints or if it
+    #! failed to infer.
     '[
         _ {
             [ start ]
@@ -117,7 +134,7 @@ t compile-dependencies? set-global
     ] with-return ;
 
 : compile-loop ( deque -- )
-    [ (compile) yield-hook get call( -- ) ] slurp-deque ;
+    [ compile-word yield-hook get call( -- ) ] slurp-deque ;
 
 : decompile ( word -- )
     dup def>> 2array 1array modify-code-heap ;
