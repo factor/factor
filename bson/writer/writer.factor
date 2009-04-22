@@ -4,7 +4,7 @@ USING: accessors assocs bson.constants byte-arrays byte-vectors
 calendar fry io io.binary io.encodings io.encodings.binary
 io.encodings.utf8 io.streams.byte-array kernel math math.parser
 namespaces quotations sequences sequences.private serialize strings
-words combinators.short-circuit ;
+words combinators.short-circuit literals ;
 
 
 IN: bson.writer
@@ -28,7 +28,6 @@ CONSTANT: INT64-SIZE 8
     swap '[ _ swap nth-byte 0 B{ 0 }
             [ set-nth-unsafe ] keep write ] each
             ; inline
-
 
 PRIVATE>
 
@@ -147,7 +146,7 @@ M: sequence bson-write ( array -- )
     [ [ MDB_OID_FIELD ] dip write-pair ] when* ; inline
 
 : skip-field? ( name -- boolean )
-    { "_id" "_mfd" } member? ; inline
+   { $[ MDB_OID_FIELD MDB_META_FIELD ] } member? ; inline
 
 M: assoc bson-write ( assoc -- )
     '[ _  [ write-oid ] keep

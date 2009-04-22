@@ -6,7 +6,7 @@ parser prettyprint sequences sets splitting strings uuid arrays ;
 
 IN: mongodb.driver
 
-TUPLE: mdb-pool < pool { mdb mdb-db } ;
+TUPLE: mdb-pool < pool mdb ;
 
 TUPLE: mdb-cursor collection id return# ;
 
@@ -37,9 +37,6 @@ ERROR: mdb-error id msg ;
 
 CONSTRUCTOR: mdb-cursor ( id collection return# -- cursor ) ;
 
-: check-ok ( result -- ? )
-     [ "ok" ] dip key? ; inline 
-
 : >mdbregexp ( value -- regexp )
    first <mdbregexp> ; inline
 
@@ -49,33 +46,13 @@ SYNTAX: r/ ( token -- mdbregexp )
     \ / [ >mdbregexp ]  parse-literal ; 
 
 : with-db ( mdb quot -- ... )
-    swap [ mdb-open &dispose >mdb-connection ] curry
-    prepose with-destructors ; inline
+    '[ _ mdb-open &dispose _ with-connection ] with-destructors ; inline
   
 : build-id-selector ( assoc -- selector )
     [ MDB_OID_FIELD swap at ] keep
     H{ } clone [ set-at ] keep ;
 
 <PRIVATE
-
-: index-collection ( -- ns )
-   mdb-instance name>> "%s.system.indexes" sprintf ; inline
-
-: namespaces-collection ( -- ns )
-    mdb-instance name>> "%s.system.namespaces" sprintf ; inline
-
-: cmd-collection ( -- ns )
-    mdb-instance name>> "%s.$cmd" sprintf ; inline
- 
-: index-ns ( colname -- index-ns )
-    [ mdb-instance name>> ] dip "%s.%s" sprintf ; inline
-
-: send-message ( message -- )
-    [ mdb-connection> handle>> ] dip '[ _ write-message ] with-stream* ;
-
-: send-query-plain ( query-message -- result )
-    [ mdb-connection> handle>> ] dip
-    '[ _ write-message read-message ] with-stream* ;
 
 : make-cursor ( mdb-result-msg -- cursor/f )
     dup cursor>> 0 > 
@@ -91,9 +68,9 @@ SYNTAX: r/ ( token -- mdbregexp )
 PRIVATE>
 
 : <mdb> ( db host port -- mdb )
-    <inet> f  <mdb-node>
-    check-nodes [  [ master?>> ] keep 2array ] map
-    >hashtable (<mdb-db>) ;
+   <inet> t [ <mdb-node> ] keep
+   H{ } clone [ set-at ] keep <mdb-db>
+   [ verify-nodes ] keep ;
 
 GENERIC: create-collection ( name -- )
 M: string create-collection
@@ -123,7 +100,10 @@ M: mdb-collection create-collection ( mdb-collection -- )
     [ ";$." intersect length 0 > ] keep
     '[ _ "%s contains invalid characters ( . $ ; )" sprintf throw ] when ; inline
 
+USE: tools.continuations
+
 : (ensure-collection) ( collection --  )
+    break
     mdb-instance collections>> dup keys length 0 = 
     [ load-collection-list      
       [ [ "options" ] dip key? ] filter
@@ -240,8 +220,8 @@ M: assoc ensure-index
     H{ } clone
     [ [ "index" ] dip set-at ] keep
     [ [ "deleteIndexes" ] dip set-at ] keep
-    [ cmd-collection ] dip <mdb-query-msg> find-one 
-    check-ok [ "could not drop index" throw ] unless ;
+    [ cmd-collection ] dip <mdb-query-msg>
+    find-one drop ;
 
 : <update> ( collection selector object -- update-msg )
     [ ensure-collection ] 2dip <mdb-update-msg> ;
@@ -274,5 +254,8 @@ M: assoc delete-unsafe
 : drop-collection ( name -- )
     [ cmd-collection ] dip
     "drop" H{ } clone [ set-at ] keep
-    <mdb-query-msg> find-one check-ok
-    [ "could not drop collection" throw ] unless ;
+    <mdb-query-msg> find-one drop ;
+
+: >pwd-digest ( user password -- digest )
+    "mongo" swap 3array ":" join md5-checksum ; 
+

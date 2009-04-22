@@ -131,12 +131,12 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 
 : (insert) ( quot: ( i -- doc ) collection -- )
     [ trial-size ] 2dip
-    '[ _ call [ _ ] dip
+    '[ _ call( i -- doc ) [ _ ] dip
        result get lasterror>> [ save ] [ save-unsafe ] if ] each-integer ; inline
 
-: (prepare-batch) ( i b quot: ( i -- doc ) -- )
+: (prepare-batch) ( i b quot: ( i -- doc ) -- batch-seq )
     [ [ * ] keep 1 range boa ] dip
-    '[ _ call ] map ; inline
+    '[ _ call( i -- doc ) ] map ; inline
 
 : (insert-batch) ( quot: ( i -- doc ) collection -- )
     [ trial-size batch-size [ / ] keep ] 2dip
@@ -170,10 +170,10 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     [ '[ _ _ (insert-batch) ] ] [ '[ _ _ (insert) ] ] if ;
 
 : serialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
-    '[ trial-size [ _ call assoc>bv drop ] each-integer ] ; inline
+    '[ trial-size [ _ call( i -- doc ) assoc>bv drop ] each-integer ] ; inline
 
 : deserialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
-    [ 0 ] dip call assoc>bv
+    [ 0 ] dip call( i -- doc ) assoc>bv
     '[ trial-size [  _ binary [ H{ } stream>assoc 2drop ] with-byte-reader ] times ] ; inline
 
 : check-for-key ( assoc key -- )
@@ -240,41 +240,41 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     [ <result> ] prepose
     [ print-result ] compose with-scope ; inline
 
-: bench-quot ( feat-seq op-word -- quot: ( elt -- ) )
+: [bench-quot] ( feat-seq op-word -- quot: ( doc-word -- ) )
     '[ _ swap _
-       '[ [ [ _ execute ] dip
-            [ execute ] each _ execute benchmark ] with-result ] each
+       '[ [ [ _ execute( -- quot: ( i -- doc ) ) ] dip
+          [ execute( -- ) ] each _ execute( -- quot: ( -- ) ) benchmark ] with-result ] each
        print-separator ] ; inline
 
 : run-serialization-bench ( doc-word-seq feat-seq -- )
     "Serialization Tests" print
     print-separator-bold
-    \ serialize bench-quot each ; inline
+    \ serialize [bench-quot] each ; inline
 
 : run-deserialization-bench ( doc-word-seq feat-seq -- )
     "Deserialization Tests" print
     print-separator-bold
-    \ deserialize bench-quot each ; inline
+    \ deserialize [bench-quot] each ; inline
     
 : run-insert-bench ( doc-word-seq feat-seq -- )
     "Insert Tests" print
     print-separator-bold 
-    \ insert bench-quot each ; inline
+    \ insert [bench-quot] each ; inline
 
 : run-find-one-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-One" print
     print-separator-bold
-    \ find-one bench-quot each ; inline
+    \ find-one [bench-quot] each ; inline
 
 : run-find-all-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-All" print
     print-separator-bold
-    \ find-all bench-quot each ; inline
+    \ find-all [bench-quot] each ; inline
 
 : run-find-range-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-Range" print
     print-separator-bold
-    \ find-range bench-quot each ; inline
+    \ find-range [bench-quot] each ; inline
 
     
 : run-benchmarks ( -- )

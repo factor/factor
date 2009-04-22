@@ -1,5 +1,5 @@
 USING: classes kernel accessors sequences fry assocs mongodb.tuple.collection
-advice words classes.tuple slots generic ;
+words classes.tuple slots generic ;
 
 IN: mongodb.tuple.state
 
@@ -50,19 +50,3 @@ SYMBOL: mdb-dirty-handling?
 : needs-store? ( tuple -- ? )
    [ persistent? not ] [ dirty? ] bi or ;
 
-<PRIVATE
-
-: create-advice ( word -- )
-   MDB_DIRTY_ADVICE over after advised-with?
-   [ drop ]
-   [ [ [ dup mark-dirty ] MDB_DIRTY_ADVICE ] dip advise-after ] if ;
-
-: (annotate-writer) ( class name -- )
-   writer-word method [ create-advice ] when* ;
-
-PRIVATE>
-
-: annotate-writers ( class -- )
-   dup all-slots [ name>> ] map
-   MDB_ADDON_SLOTS '[ _ memq? not ] filter
-   [ (annotate-writer) ] with each ;
