@@ -10,13 +10,6 @@ stack-checker.state stack-checker.visitor stack-checker.errors
 stack-checker.values stack-checker.recursive-state ;
 IN: stack-checker.transforms
 
-: give-up-transform ( word -- )
-    {
-        { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
-        { [ dup recursive-word? ] [ call-recursive-word ] }
-        [ dup infer-word apply-word/effect ]
-    } cond ;
-
 : call-transformer ( word stack quot -- newquot )
     '[ _ _ with-datastack [ length 1 assert= ] [ first ] bi nip ]
     [ transform-expansion-error ]
@@ -29,7 +22,7 @@ IN: stack-checker.transforms
         word inlined-dependency depends-on
         values [ length meta-d shorten-by ] [ #drop, ] bi
         rstate infer-quot
-    ] [ word give-up-transform ] if* ;
+    ] [ word infer-word ] if* ;
 
 : literals? ( values -- ? ) [ literal-value? ] all? ;
 
@@ -41,7 +34,7 @@ IN: stack-checker.transforms
             [ first literal recursion>> ] tri
         ] if
         ((apply-transform))
-    ] [ 2drop give-up-transform ] if ;
+    ] [ 2drop infer-word ] if ;
 
 : apply-transform ( word -- )
     [ ] [ "transform-quot" word-prop ] [ "transform-n" word-prop ] tri
@@ -59,6 +52,8 @@ IN: stack-checker.transforms
 ! Combinators
 \ cond [ cond>quot ] 1 define-transform
 
+\ cond t "no-compile" set-word-prop
+
 \ case [
     [
         [ no-case ]
@@ -71,13 +66,23 @@ IN: stack-checker.transforms
     ] if-empty
 ] 1 define-transform
 
+\ case t "no-compile" set-word-prop
+
 \ cleave [ cleave>quot ] 1 define-transform
+
+\ cleave t "no-compile" set-word-prop
 
 \ 2cleave [ 2cleave>quot ] 1 define-transform
 
+\ 2cleave t "no-compile" set-word-prop
+
 \ 3cleave [ 3cleave>quot ] 1 define-transform
 
+\ 3cleave t "no-compile" set-word-prop
+
 \ spread [ spread>quot ] 1 define-transform
+
+\ spread t "no-compile" set-word-prop
 
 \ (call-next-method) [
     [
@@ -90,6 +95,8 @@ IN: stack-checker.transforms
     ] bi
 ] 1 define-transform
 
+\ (call-next-method) t "no-compile" set-word-prop
+
 ! Constructors
 \ boa [
     dup tuple-class? [
@@ -99,6 +106,9 @@ IN: stack-checker.transforms
         bi append
     ] [ drop f ] if
 ] 1 define-transform
+
+\ boa t "no-compile" set-word-prop
+M\ tuple-class boa t "no-compile" set-word-prop
 
 \ new [
     dup tuple-class? [

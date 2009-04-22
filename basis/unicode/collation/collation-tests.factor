@@ -11,9 +11,10 @@ IN: unicode.collation.tests
 : test-two ( str1 str2 -- )
     [ +lt+ ] -rot [ string<=> ] 2curry unit-test ;
 
-: test-equality ( str1 str2 -- )
+: test-equality ( str1 str2 -- ? ? ? ? )
     { primary= secondary= tertiary= quaternary= }
-    [ execute ] with with each ;
+    [ execute( a b -- ? ) ] with with map
+    first4 ;
 
 [ f f f f ] [ "hello" "hi" test-equality ] unit-test
 [ t f f f ] [ "hello" "h\u0000e9llo" test-equality ] unit-test

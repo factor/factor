@@ -2,9 +2,6 @@ IN: multi-methods.tests
 USING: multi-methods tools.test math sequences namespaces system
 kernel strings words compiler.units quotations ;
 
-\ GENERIC: must-infer
-\ create-method-in must-infer
-
 DEFER: fake
 \ fake H{ } clone "multi-methods" set-word-prop
 

@@ -4,14 +4,14 @@ USING: accessors arrays sequences sorting assocs colors.constants fry
 combinators combinators.smart combinators.short-circuit editors make
 memoize compiler.units fonts kernel io.pathnames prettyprint
 source-files.errors math.parser init math.order models models.arrow
-models.arrow.smart models.search models.mapping models.delay debugger namespaces
-summary locals ui ui.commands ui.gadgets ui.gadgets.panes
+models.arrow.smart models.search models.mapping models.delay debugger
+namespaces summary locals ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.tables ui.gadgets.labeled ui.gadgets.tracks ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.gadgets.scrollers
 ui.tools.inspector ui.gadgets.status-bar ui.operations
 ui.gadgets.buttons ui.gadgets.borders ui.gadgets.packs
-ui.gadgets.labels ui.baseline-alignment ui.images
-compiler.errors calendar ;
+ui.gadgets.labels ui.baseline-alignment ui.images ui.tools.listener
+compiler.errors calendar tools.errors ;
 IN: ui.tools.error-list
 
 CONSTANT: source-file-icon
@@ -39,7 +39,7 @@ SINGLETON: source-file-renderer
 M: source-file-renderer row-columns
     drop first2 [
         [ source-file-icon ]
-        [ "<Listener input>" or ]
+        [ +listener-input+ or ]
         [ length number>string ] tri*
     ] output>array ;
 
@@ -97,7 +97,7 @@ M: error-renderer column-titles
 M: error-renderer column-alignment drop { 0 1 0 0 } ;
 
 : sort-errors ( seq -- seq' )
-    [ [ [ asset>> unparse-short ] [ line#>> ] bi 2array ] keep ] { } map>assoc
+    [ [ [ line#>> ] [ asset>> unparse-short ] bi 2array ] keep ] { } map>assoc
     sort-keys values ;
 
 : file-matches? ( error pathname/f -- ? )

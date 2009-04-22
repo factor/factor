@@ -7,12 +7,6 @@ random stack-checker effects kernel.private sbufs math.order
 classes.tuple accessors ;
 IN: classes.algebra.tests
 
-\ class< must-infer
-\ class-and must-infer
-\ class-or must-infer
-\ flatten-class must-infer
-\ flatten-builtin-class must-infer
-
 : class-and* ( cls1 cls2 cls3 -- ? ) [ class-and ] dip class= ;
 
 : class-or* ( cls1 cls2 cls3 -- ? ) [ class-or ] dip class= ;

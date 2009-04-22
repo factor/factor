@@ -10,7 +10,7 @@ SYMBOL: whitelist
 
 : with-sandbox-vocabs ( quot -- )
     "sandbox.syntax" load-vocab vocab-words 1vector
-    use [ call ] with-variable ; inline
+    use [ auto-use? off call ] with-variable ; inline
 
 : parse-sandbox ( lines assoc -- quot )
     whitelist [ [ parse-lines ] with-sandbox-vocabs ] with-variable ;

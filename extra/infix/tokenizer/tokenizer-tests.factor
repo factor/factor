@@ -3,7 +3,6 @@
 USING: infix.ast infix.tokenizer tools.test ;
 IN: infix.tokenizer.tests
 
-\ tokenize-infix must-infer
 [ V{ T{ ast-number f 1 } } ] [ "1" tokenize-infix ] unit-test
 [ V{ T{ ast-number f 1.02 } CHAR: * T{ ast-number f 3 } } ] [ "1.02*3" tokenize-infix ] unit-test
 [ V{ T{ ast-number f 3 } CHAR: / CHAR: ( T{ ast-number f 3 } CHAR: + T{ ast-number f 4 } CHAR: ) } ]

@@ -302,8 +302,8 @@ IN: math.intervals.tests
 
 : comparison-test ( -- ? )
     random-interval random-interval random-comparison
-    [ [ [ random-element ] bi@ ] dip first execute ] 3keep
-    second execute dup incomparable eq? [ 2drop t ] [ = ] if ;
+    [ [ [ random-element ] bi@ ] dip first execute( a b -- ? ) ] 3keep
+    second execute( a b -- ? ) dup incomparable eq? [ 2drop t ] [ = ] if ;
 
 [ t ] [ 40000 iota [ drop comparison-test ] all? ] unit-test
 

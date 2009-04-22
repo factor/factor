@@ -13,13 +13,13 @@ ARTICLE: "conventions" "Conventions"
 { $heading "Documentation conventions" }
 "Factor documentation consists of two distinct bodies of text. There is a hierarchy of articles, much like this one, and there is word documentation. Help articles reference word documentation, and vice versa, but not every documented word is referenced from some help article."
 $nl
-"Every article has links to parent articles at the top. These can be persued if the article is too specific."
+"Every article has links to parent articles at the top. Explore these if the article you are reading is too specific."
 $nl
 "Some generic words have " { $strong "Description" } " headings, and others have " { $strong "Contract" } " headings. A distinction is made between words which are not intended to be extended with user-defined methods, and those that are."
 { $heading "Vocabulary naming conventions" }
 "A vocabulary name ending in " { $snippet ".private" } " contains words which are either implementation detail, unsafe, or both. For example, the " { $snippet "sequence.private" } " vocabulary contains words which access sequence elements without bounds checking (" { $link "sequences-unsafe" } ")."
 $nl
-"You should should avoid using internal words from the Factor library unless absolutely necessary. Similarly, your own code can place words in internal vocabularies if you do not want other people to use them unless they have a good reason."
+"You should avoid using internal words from the Factor library unless absolutely necessary. Similarly, your own code can place words in internal vocabularies if you do not want other people to use them unless they have a good reason."
 { $heading "Word naming conventions" }
 "These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
 { $table
@@ -249,6 +249,7 @@ ARTICLE: "handbook-language-reference" "The language"
 { $heading "Abstractions" }
 { $subsection "objects" }
 { $subsection "destructors" }
+{ $subsection "parsing-words" }
 { $subsection "macros" }
 { $subsection "fry" }
 { $heading "Program organization" }
