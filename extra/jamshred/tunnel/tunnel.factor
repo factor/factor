@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors combinators kernel locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences specialized-arrays.float vectors jamshred.oint ;
+USING: accessors arrays colors combinators kernel literals locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences specialized-arrays.float vectors jamshred.oint ;
 IN: jamshred.tunnel
 
-: n-segments ( -- n ) 5000 ; inline
+CONSTANT: n-segments 5000
 
 TUPLE: segment < oint number color radius ;
 C: <segment> segment
@@ -14,8 +14,8 @@ C: <segment> segment
 : random-color ( -- color )
     { 100 100 100 } [ random 100 / >float ] map first3 1.0 <rgba> ;
 
-: tunnel-segment-distance ( -- n ) 0.4 ;
-: random-rotation-angle ( -- theta ) pi 20 / ;
+CONSTANT: tunnel-segment-distance 0.4
+CONSTANT: random-rotation-angle $[ pi 20 / ]
 
 : random-segment ( previous-segment -- segment )
     clone dup random-rotation-angle random-turn
@@ -27,7 +27,7 @@ C: <segment> segment
         [ dup peek random-segment over push ] dip 1- (random-segments)
     ] [ drop ] if ;
 
-: default-segment-radius ( -- r ) 1 ;
+CONSTANT: default-segment-radius 1
 
 : initial-segment ( -- segment )
     float-array{ 0 0 0 } float-array{ 0 0 -1 } float-array{ 0 1 0 } float-array{ -1 0 0 }
@@ -115,7 +115,7 @@ C: <segment> segment
 : wall-normal ( seg oint -- n )
     location>> vector-to-centre normalize ;
 
-: distant ( -- n ) 1000 ;
+CONSTANT: distant 1000
 
 : max-real ( a b -- c )
     #! sometimes collision-coefficient yields complex roots, so we ignore these (hack)

@@ -9,8 +9,6 @@ accessors combinators io prettyprint words sequences.deep
 sequences.private arrays classes kernel.private ;
 IN: compiler.tree.dead-code.tests
 
-\ remove-dead-code must-infer
-
 : count-live-values ( quot -- n )
     build-tree
     analyze-recursive

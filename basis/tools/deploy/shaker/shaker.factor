@@ -15,6 +15,7 @@ QUALIFIED: definitions
 QUALIFIED: init
 QUALIFIED: layouts
 QUALIFIED: source-files
+QUALIFIED: source-files.errors
 QUALIFIED: vocabs
 IN: tools.deploy.shaker
 
@@ -96,10 +97,8 @@ IN: tools.deploy.shaker
             {
                 "alias"
                 "boa-check"
-                "cannot-infer"
                 "coercer"
                 "combination"
-                "compiled-status"
                 "compiled-generic-uses"
                 "compiled-uses"
                 "constraints"
@@ -115,7 +114,6 @@ IN: tools.deploy.shaker
                 "identities"
                 "if-intrinsics"
                 "infer"
-                "inferred-effect"
                 "inline"
                 "inlined-block"
                 "input-classes"
@@ -264,8 +262,8 @@ IN: tools.deploy.shaker
                 compiled-crossref
                 compiled-generic-crossref
                 compiler-impl
+                compiler.errors:compiler-errors
                 definition-observers
-                definitions:crossref
                 interactive-vocabs
                 layouts:num-tags
                 layouts:num-types
@@ -275,6 +273,7 @@ IN: tools.deploy.shaker
                 lexer-factory
                 print-use-hook
                 root-cache
+                source-files.errors:error-types
                 vocabs:dictionary
                 vocabs:load-vocab-hook
                 word

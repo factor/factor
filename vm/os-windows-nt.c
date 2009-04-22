@@ -23,12 +23,6 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 		signal_fault_addr = e->ExceptionInformation[1];
 		c->EIP = (CELL)memory_signal_handler_impl;
 	}
-	else if(e->ExceptionCode == EXCEPTION_FLT_DIVIDE_BY_ZERO
-			|| e->ExceptionCode == EXCEPTION_INT_DIVIDE_BY_ZERO)
-	{
-		signal_number = ERROR_DIVIDE_BY_ZERO;
-		c->EIP = (CELL)divide_by_zero_signal_handler_impl;
-	}
 	/* If the Widcomm bluetooth stack is installed, the BTTray.exe process
 	injects code into running programs. For some reason this results in
 	random SEH exceptions with this (undocumented) exception code being
@@ -37,7 +31,7 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 	this exception means. */
 	else if(e->ExceptionCode != 0x40010006)
 	{
-		signal_number = 11;
+		signal_number = e->ExceptionCode;
 		c->EIP = (CELL)misc_signal_handler_impl;
 	}
 

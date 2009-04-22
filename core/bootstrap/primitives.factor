@@ -12,8 +12,6 @@ IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
 
-crossref off
-
 H{ } clone sub-primitives set
 
 "vocab:bootstrap/syntax.factor" parse-file

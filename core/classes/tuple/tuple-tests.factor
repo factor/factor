@@ -5,7 +5,7 @@ generic.standard effects classes.tuple classes.tuple.private
 arrays vectors strings compiler.units accessors classes.algebra
 calendar prettyprint io.streams.string splitting summary
 columns math.order classes.private slots slots.private eval see
-words.symbol ;
+words.symbol compiler.errors ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -34,9 +34,7 @@ C: <redefinition-test> redefinition-test
 ! Make sure we handle changing shapes!
 TUPLE: point x y ;
 
-C: <point> point
-
-[ ] [ 100 200 <point> "p" set ] unit-test
+[ ] [ 100 200 point boa "p" set ] unit-test
 
 ! Use eval to sequence parsing explicitly
 [ ] [ "IN: classes.tuple.tests TUPLE: point x y z ;" eval( -- ) ] unit-test
@@ -112,8 +110,6 @@ TUPLE: yo-momma ;
     [ ] [ \ yo-momma forget ] unit-test
     [ ] [ \ <yo-momma> forget ] unit-test
     [ f ] [ \ yo-momma update-map get values memq? ] unit-test
-
-    [ f ] [ \ yo-momma crossref get at ] unit-test
 ] with-compilation-unit
 
 TUPLE: loc-recording ;
@@ -199,17 +195,6 @@ TUPLE: erg's-reshape-problem a b c d ;
 
 C: <erg's-reshape-problem> erg's-reshape-problem
 
-! We want to make sure constructors are recompiled when
-! tuples are reshaped
-: cons-test-1 ( -- tuple ) \ erg's-reshape-problem new ;
-: cons-test-2 ( a b c d -- tuple ) \ erg's-reshape-problem boa ;
-
-[ ] [ "IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval( -- ) ] unit-test
-
-[ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
-
-[ t ] [ cons-test-1 tuple-size "a" get tuple-size = ] unit-test
-
 ! Inheritance
 TUPLE: computer cpu ram ;
 C: <computer> computer
@@ -287,7 +272,7 @@ test-server-slot-values
 ! Dynamically changing inheritance hierarchy
 TUPLE: electronic-device ;
 
-[ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device cpu ram ;" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device cpu ram ; C: <computer> computer C: <laptop> laptop C: <server> server" eval( -- ) ] unit-test
 
 [ f ] [ electronic-device laptop class<= ] unit-test
 [ t ] [ server electronic-device class<= ] unit-test
@@ -303,17 +288,17 @@ TUPLE: electronic-device ;
 [ f ] [ "server" get laptop? ] unit-test
 [ t ] [ "server" get server? ] unit-test
 
-[ ] [ "IN: classes.tuple.tests TUPLE: computer cpu ram ;" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: computer cpu ram ; C: <computer> computer C: <laptop> laptop C: <server> server" eval( -- ) ] unit-test
 
 [ f ] [ "laptop" get electronic-device? ] unit-test
 [ t ] [ "laptop" get computer? ] unit-test
 
-[ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device cpu ram disk ;" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device cpu ram disk ; C: <computer> computer C: <laptop> laptop C: <server> server" eval( -- ) ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
 
-[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage ;" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage ; C: <computer> computer C: <laptop> laptop C: <server> server" eval( -- ) ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
@@ -326,7 +311,7 @@ TUPLE: make-me-some-accessors voltage grounded? ;
 [ ] [ "laptop" get 220 >>voltage drop ] unit-test
 [ ] [ "server" get 110 >>voltage drop ] unit-test
 
-[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage grounded? ;" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage grounded? ; C: <computer> computer" eval( -- ) ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
@@ -334,7 +319,7 @@ test-server-slot-values
 [ 220 ] [ "laptop" get voltage>> ] unit-test
 [ 110 ] [ "server" get voltage>> ] unit-test
 
-[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device grounded? voltage ;" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device grounded? voltage ; C: <computer> computer C: <laptop> laptop C: <server> server" eval( -- ) ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
@@ -343,7 +328,7 @@ test-server-slot-values
 [ 110 ] [ "server" get voltage>> ] unit-test
 
 ! Reshaping superclass and subclass simultaneously
-[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage ; TUPLE: computer < electronic-device cpu ram ;" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage ; TUPLE: computer < electronic-device cpu ram ; C: <computer> computer C: <laptop> laptop C: <server> server" eval( -- ) ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
@@ -354,9 +339,7 @@ test-server-slot-values
 ! Reshape crash
 TUPLE: test1 a ; TUPLE: test2 < test1 b ;
 
-C: <test2> test2
-
-"a" "b" <test2> "test" set
+"a" "b" test2 boa "test" set
 
 : test-a/b ( -- )
     [ "a" ] [ "test" get a>> ] unit-test
@@ -412,15 +395,17 @@ TUPLE: constructor-update-1 xxx ;
 
 TUPLE: constructor-update-2 < constructor-update-1 yyy zzz ;
 
-C: <constructor-update-2> constructor-update-2
+: <constructor-update-2> ( a b c -- tuple ) constructor-update-2 boa ;
 
 { 3 1 } [ <constructor-update-2> ] must-infer-as
 
 [ ] [ "IN: classes.tuple.tests TUPLE: constructor-update-1 xxx ttt www ;" eval( -- ) ] unit-test
 
-{ 5 1 } [ <constructor-update-2> ] must-infer-as
+{ 3 1 } [ <constructor-update-2> ] must-infer-as
 
-[ { 1 2 3 4 5 } ] [ 1 2 3 4 5 <constructor-update-2> tuple-slots ] unit-test
+[ 1 2 3 4 5 <constructor-update-2> ] [ not-compiled? ] must-fail-with
+
+[ ] [ [ \ <constructor-update-2> forget ] with-compilation-unit ] unit-test
 
 ! Redefinition problem
 TUPLE: redefinition-problem ;
@@ -599,7 +584,7 @@ must-fail-with
 
 : foo ( a b -- c ) declared-types boa ;
 
-\ foo must-infer
+\ foo def>> must-infer
 
 [ T{ declared-types f 0 "hi" } ] [ 0.0 "hi" foo ] unit-test
 
@@ -623,7 +608,7 @@ must-fail-with
 
 : blah ( -- vec ) vector new ;
 
-\ blah must-infer
+[ vector new ] must-infer
 
 [ V{ } ] [ blah ] unit-test
 

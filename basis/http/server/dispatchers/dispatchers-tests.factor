@@ -3,8 +3,6 @@ tools.test kernel namespaces accessors io http math sequences
 assocs arrays classes words urls ;
 IN: http.server.dispatchers.tests
 
-\ find-responder must-infer
-
 TUPLE: mock-responder path ;
 
 C: <mock-responder> mock-responder

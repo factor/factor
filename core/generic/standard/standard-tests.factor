@@ -280,27 +280,6 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
     V{ } my-var [ call-next-hooker ] with-variable
 ] unit-test
 
-! Cross-referencing with generic words
-TUPLE: xref-tuple-1 ;
-TUPLE: xref-tuple-2 < xref-tuple-1 ;
-
-: (xref-test) ( obj -- ) drop ;
-
-GENERIC: xref-test ( obj -- )
-
-M: xref-tuple-1 xref-test (xref-test) ;
-M: xref-tuple-2 xref-test (xref-test) ;
-
-[ t ] [
-    \ xref-test
-    \ xref-tuple-1 \ xref-test method [ usage unique ] closure key?
-] unit-test
-
-[ t ] [
-    \ xref-test
-    \ xref-tuple-2 \ xref-test method [ usage unique ] closure key?
-] unit-test
-
 [ t ] [
     { } \ nth effective-method nip \ sequence \ nth method eq?
 ] unit-test

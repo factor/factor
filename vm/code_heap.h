@@ -5,7 +5,7 @@ void init_code_heap(CELL size);
 
 bool in_code_heap_p(CELL ptr);
 
-void default_word_code(F_WORD *word, bool relocate);
+void jit_compile_word(F_WORD *word, CELL def, bool relocate);
 
 void set_word_code(F_WORD *word, F_CODE_BLOCK *compiled);
 

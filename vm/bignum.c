@@ -170,7 +170,7 @@ bignum_divide(bignum_type numerator, bignum_type denominator,
 {
   if (BIGNUM_ZERO_P (denominator))
     {
-      divide_by_zero_error(NULL);
+      divide_by_zero_error();
       return;
     }
   if (BIGNUM_ZERO_P (numerator))
@@ -242,7 +242,7 @@ bignum_quotient(bignum_type numerator, bignum_type denominator)
 {
   if (BIGNUM_ZERO_P (denominator))
     {
-      divide_by_zero_error(NULL);
+      divide_by_zero_error();
       return (BIGNUM_OUT_OF_BAND);
     }
   if (BIGNUM_ZERO_P (numerator))
@@ -295,7 +295,7 @@ bignum_remainder(bignum_type numerator, bignum_type denominator)
 {
   if (BIGNUM_ZERO_P (denominator))
     {
-      divide_by_zero_error(NULL);
+      divide_by_zero_error();
       return (BIGNUM_OUT_OF_BAND);
     }
   if (BIGNUM_ZERO_P (numerator))

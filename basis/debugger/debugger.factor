@@ -88,8 +88,7 @@ M: string error. print ;
 : divide-by-zero-error. ( obj -- )
     "Division by zero" print drop ;
 
-: signal-error. ( obj -- )
-    "Operating system signal " write third . ;
+HOOK: signal-error. os ( obj -- )
 
 : array-size-error. ( obj -- )
     "Invalid array size: " write dup third .
@@ -127,14 +126,14 @@ M: string error. print ;
 : primitive-error. ( error -- ) 
     "Unimplemented primitive" print drop ;
 
-PREDICATE: kernel-error < array
+PREDICATE: vm-error < array
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
         [ second 0 15 between? ]
     } cond ;
 
-: kernel-errors ( error -- n errors )
+: vm-errors ( error -- n errors )
     second {
         { 0  [ expired-error.          ] }
         { 1  [ io-error.               ] }
@@ -154,9 +153,11 @@ PREDICATE: kernel-error < array
         { 15 [ memory-error.           ] }
     } ; inline
 
-M: kernel-error error. dup kernel-errors case ;
+M: vm-error summary drop "VM error" ;
 
-M: kernel-error error-help kernel-errors at first ;
+M: vm-error error. dup vm-errors case ;
+
+M: vm-error error-help vm-errors at first ;
 
 M: no-method summary
     drop "No suitable method" ;
@@ -307,3 +308,8 @@ M: check-mixin-class summary drop "Not a mixin class" ;
 M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
 
 M: wrong-values summary drop "Quotation called with wrong stack effect" ;
+
+{
+    { [ os windows? ] [ "debugger.windows" require ] }
+    { [ os unix? ] [ "debugger.unix" require ] }
+} cond

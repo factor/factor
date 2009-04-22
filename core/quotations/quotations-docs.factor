@@ -25,6 +25,12 @@ ARTICLE: "wrappers" "Wrappers"
 { $subsection wrapper }
 { $subsection literalize }
 "Wrapper literal syntax is documented in " { $link "syntax-words" } "."
+{ $example
+  "IN: scratchpad"
+  "DEFER: my-word"
+  "\\ my-word name>> ."
+  "\"my-word\""
+}
 { $see-also "combinators" } ;
 
 ABOUT: "quotations"

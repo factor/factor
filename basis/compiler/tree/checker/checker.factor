@@ -144,13 +144,15 @@ M: #terminate check-stack-flow*
 
 SYMBOL: branch-out
 
-: check-branch ( nodes -- stack )
+: check-branch ( nodes -- datastack )
     [
         datastack [ clone ] change
-        V{ } clone retainstack set
-        (check-stack-flow)
-        terminated? get [ assert-retainstack-empty ] unless
-        terminated? get f datastack get ?
+        retainstack [ clone ] change
+        retainstack get clone [ (check-stack-flow) ] dip
+        terminated? get [ drop f ] [
+            retainstack get assert=
+            datastack get
+        ] if
     ] with-scope ;
 
 M: #branch check-stack-flow*

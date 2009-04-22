@@ -10,7 +10,7 @@ sequences.private destructors combinators eval locals.backend
 system compiler.units ;
 IN: stack-checker.tests
 
-\ infer. must-infer
+[ 1234 infer ] must-fail
 
 { 0 2 } [ 2 "Hello" ] must-infer-as
 { 1 2 } [ dup ] must-infer-as
@@ -64,11 +64,6 @@ IN: stack-checker.tests
     dup [ ] [ simple-recursion-2 ] if ;
 
 { 1 1 } [ simple-recursion-2 ] must-infer-as
-
-: bad-recursion-2 ( obj -- obj )
-    dup [ dup first swap second bad-recursion-2 ] [ ] if ;
-
-[ [ bad-recursion-2 ] infer ] must-fail
 
 : funny-recursion ( obj -- obj )
     dup [ funny-recursion 1 ] [ 2 ] if drop ;
@@ -197,92 +192,9 @@ DEFER: blah4
 ] must-infer-as
 
 ! Regression
-
-! This order of branches works
-DEFER: do-crap
-: more-crap ( obj -- ) dup [ drop ] [ dup do-crap call ] if ;
-: do-crap ( obj -- ) dup [ more-crap ] [ do-crap ] if ;
-[ [ do-crap ] infer ] must-fail
-
-! This one does not
-DEFER: do-crap*
-: more-crap* ( obj -- ) dup [ drop ] [ dup do-crap* call ] if ;
-: do-crap* ( obj -- ) dup [ do-crap* ] [ more-crap* ] if ;
-[ [ do-crap* ] infer ] must-fail
-
-! Regression
 : too-deep ( a b -- c )
     dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline recursive
 { 2 1 } [ too-deep ] must-infer-as
-
-! Error reporting is wrong
-MATH: xyz ( a b -- c )
-M: fixnum xyz 2array ;
-M: float xyz
-    [ 3 ] bi@ swapd [ 2array swap ] dip 2array swap ;
-
-[ [ xyz ] infer ] [ inference-error? ] must-fail-with
-
-! Doug Coleman discovered this one while working on the
-! calendar library
-DEFER: A
-DEFER: B
-DEFER: C
-
-: A ( a -- )
-    dup {
-        [ drop ]
-        [ A ]
-        [ \ A no-method ]
-        [ dup C A ]
-    } dispatch ;
-
-: B ( b -- )
-    dup {
-        [ C ]
-        [ B ]
-        [ \ B no-method ]
-        [ dup B B ]
-    } dispatch ;
-
-: C ( c -- )
-    dup {
-        [ A ]
-        [ C ]
-        [ \ C no-method ]
-        [ dup B C ]
-    } dispatch ;
-
-{ 1 0 } [ A ] must-infer-as
-{ 1 0 } [ B ] must-infer-as
-{ 1 0 } [ C ] must-infer-as
-
-! I found this bug by thinking hard about the previous one
-DEFER: Y
-: X ( a b -- c d ) dup [ swap Y ] [ ] if ;
-: Y ( a b -- c d ) X ;
-
-{ 2 2 } [ X ] must-infer-as
-{ 2 2 } [ Y ] must-infer-as
-
-! This one comes from UI code
-DEFER: #1
-: #2 ( a b: ( -- ) -- ) dup [ call ] [ 2drop ] if ; inline
-: #3 ( a -- ) [ #1 ] #2 ;
-: #4 ( a -- ) dup [ drop ] [ dup #4 dup #3 call ] if ;
-: #1 ( a -- ) dup [ dup #4 dup #3 ] [ ] if drop ;
-
-[ \ #4 def>> infer ] must-fail
-[ [ #1 ] infer ] must-fail
-
-! Similar
-DEFER: bar
-: foo ( a b -- c d ) dup [ 2drop f f bar ] [ ] if ;
-: bar ( a b -- ) [ 2 2 + ] t foo drop call drop ;
-
-[ [ foo ] infer ] must-fail
-
-[ 1234 infer ] must-fail
 
 ! This used to hang
 [ [ [ dup call ] dup call ] infer ]
@@ -311,16 +223,6 @@ DEFER: bar
 [ [ [ [ drop 3 ] swap call ] dup call ] infer ]
 [ inference-error? ] must-fail-with
 
-! This form should not have a stack effect
-
-: bad-recursion-1 ( a -- b )
-    dup [ drop bad-recursion-1 5 ] [ ] if ;
-
-[ [ bad-recursion-1 ] infer ] must-fail
-
-: bad-bin ( a b -- ) 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
-[ [ bad-bin ] infer ] must-fail
-
 [ [ 1 drop-locals ] infer ] [ inference-error? ] must-fail-with
 
 ! Regression
@@ -333,113 +235,13 @@ DEFER: bar
 
 [ [ 3 [ ] curry 1 2 [ ] 2curry if ] infer ] must-fail
 
-! Test number protocol
-\ bitor must-infer
-\ bitand must-infer
-\ bitxor must-infer
-\ mod must-infer
-\ /i must-infer
-\ /f must-infer
-\ /mod must-infer
-\ + must-infer
-\ - must-infer
-\ * must-infer
-\ / must-infer
-\ < must-infer
-\ <= must-infer
-\ > must-infer
-\ >= must-infer
-\ number= must-infer
-
-! Test object protocol
-\ = must-infer
-\ clone must-infer
-\ hashcode* must-infer
-
-! Test sequence protocol
-\ length must-infer
-\ nth must-infer
-\ set-length must-infer
-\ set-nth must-infer
-\ new must-infer
-\ new-resizable must-infer
-\ like must-infer
-\ lengthen must-infer
-
-! Test assoc protocol
-\ at* must-infer
-\ set-at must-infer
-\ new-assoc must-infer
-\ delete-at must-infer
-\ clear-assoc must-infer
-\ assoc-size must-infer
-\ assoc-like must-infer
-\ assoc-clone-like must-infer
-\ >alist must-infer
 { 1 3 } [ [ 2drop f ] assoc-find ] must-infer-as
-
-! Test some random library words
-\ 1quotation must-infer
-\ string>number must-infer
-\ get must-infer
-
-\ push must-infer
-\ append must-infer
-\ peek must-infer
-
-\ reverse must-infer
-\ member? must-infer
-\ remove must-infer
-\ natural-sort must-infer
-
-\ forget must-infer
-\ define-class must-infer
-\ define-tuple-class must-infer
-\ define-union-class must-infer
-\ define-predicate-class must-infer
-\ instance? must-infer
-\ next-method-quot must-infer
 
 ! Test words with continuations
 { 0 0 } [ [ drop ] callcc0 ] must-infer-as
 { 0 1 } [ [ 4 swap continue-with ] callcc1 ] must-infer-as
 { 2 1 } [ [ + ] [ ] [ ] cleanup ] must-infer-as
 { 2 1 } [ [ + ] [ 3drop 0 ] recover ] must-infer-as
-
-\ dispose must-infer
-
-! Test stream protocol
-\ set-timeout must-infer
-\ stream-read must-infer
-\ stream-read1 must-infer
-\ stream-readln must-infer
-\ stream-read-until must-infer
-\ stream-write must-infer
-\ stream-write1 must-infer
-\ stream-nl must-infer
-\ stream-flush must-infer
-
-! Test stream utilities
-\ lines must-infer
-\ contents must-infer
-
-! Test prettyprinting
-\ . must-infer
-\ short. must-infer
-\ unparse must-infer
-
-\ describe must-infer
-\ error. must-infer
-
-! Test odds and ends
-\ io-thread must-infer
-
-! Incorrect stack declarations on inline recursive words should
-! be caught
-: fooxxx ( a b -- c ) over [ foo ] when ; inline
-: barxxx ( a b -- c ) fooxxx ;
-
-[ [ barxxx ] infer ] must-fail
 
 ! A typo
 { 1 0 } [ { [ ] } dispatch ] must-infer-as
@@ -462,7 +264,6 @@ M: string my-hook "a string" ;
 DEFER: deferred-word
 
 { 1 1 } [ [ deferred-word ] [ 3 ] if ] must-infer-as
-
 
 DEFER: an-inline-word
 
@@ -498,14 +299,12 @@ ERROR: custom-error ;
     [ custom-error inference-error ] infer
 ] unit-test
 
-[ T{ effect f 1 2 t } ] [
+[ T{ effect f 1 1 t } ] [
     [ dup [ 3 throw ] dip ] infer
 ] unit-test
 
 ! Regression
-: missing->r-check ( a -- ) 1 load-locals ;
-
-[ [ missing->r-check ] infer ] must-fail
+[ [ 1 load-locals ] infer ] must-fail
 
 ! Corner case
 [ [ [ f dup ] [ dup ] produce ] infer ] must-fail
@@ -513,35 +312,12 @@ ERROR: custom-error ;
 [ [ [ f dup ] [ ] while ] infer ] must-fail
 
 : erg's-inference-bug ( -- ) f dup [ erg's-inference-bug ] when ; inline recursive
-
 [ [ erg's-inference-bug ] infer ] must-fail
-
-: inference-invalidation-a ( -- ) ;
-: inference-invalidation-b ( quot -- ) [ inference-invalidation-a ] dip call ; inline
-: inference-invalidation-c ( a b -- c ) [ + ] inference-invalidation-b ; inline
-
-[ 7 ] [ 4 3 inference-invalidation-c ] unit-test
-
-{ 2 1 } [ [ + ] inference-invalidation-b ] must-infer-as
-
-[ ] [ "IN: stack-checker.tests : inference-invalidation-a ( -- a b ) 1 2 ;" eval( -- ) ] unit-test
-
-[ 3 ] [ inference-invalidation-c ] unit-test
-
-{ 0 1 } [ inference-invalidation-c ] must-infer-as
-
-GENERIC: inference-invalidation-d ( obj -- )
-
-M: object inference-invalidation-d inference-invalidation-c 2drop ;
-
-\ inference-invalidation-d must-infer
-
-[ ] [ "IN: stack-checker.tests : inference-invalidation-a ( -- ) ;" eval( -- ) ] unit-test
-
-[ [ inference-invalidation-d ] infer ] must-fail
+FORGET: erg's-inference-bug
 
 : bad-recursion-3 ( -- ) dup [ [ bad-recursion-3 ] dip ] when ; inline recursive
 [ [ bad-recursion-3 ] infer ] must-fail
+FORGET: bad-recursion-3
 
 : bad-recursion-4 ( -- ) 4 [ dup call roll ] times ; inline recursive
 [ [ [ ] [ 1 2 3 ] over dup bad-recursion-4 ] infer ] must-fail
@@ -561,6 +337,8 @@ M: object inference-invalidation-d inference-invalidation-c 2drop ;
     inline recursive
 
 [ [ unbalanced-retain-usage ] infer ] [ inference-error? ] must-fail-with
+
+FORGET: unbalanced-retain-usage
 
 DEFER: eee'
 : ddd' ( ? -- ) [ f eee' ] when ; inline recursive
@@ -588,3 +366,7 @@ DEFER: eee'
 [ forget-test ] must-infer
 [ ] [ [ \ forget-test forget ] with-compilation-unit ] unit-test
 [ forget-test ] must-infer
+
+[ [ cond ] infer ] must-fail
+[ [ bi ] infer ] must-fail
+[ at ] must-infer

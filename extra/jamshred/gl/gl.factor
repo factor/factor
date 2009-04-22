@@ -6,18 +6,17 @@ math.functions math.vectors opengl opengl.gl opengl.glu
 opengl.demo-support sequences specialized-arrays.float ;
 IN: jamshred.gl
 
-: min-vertices ( -- n ) 6 ; inline
-: max-vertices ( -- n ) 32 ; inline
+CONSTANT: min-vertices 6
+CONSTANT: max-vertices 32
 
-: n-vertices ( -- n ) 32 ; inline
+CONSTANT: n-vertices 32
 
 ! render enough of the tunnel that it looks continuous
-: n-segments-ahead ( -- n ) 60 ; inline
-: n-segments-behind ( -- n ) 40 ; inline
+CONSTANT: n-segments-ahead 60
+CONSTANT: n-segments-behind 40
 
-: wall-drawing-offset ( -- n )
-    #! so that we can't see through the wall, we draw it a bit further away
-    0.15 ;
+! so that we can't see through the wall, we draw it a bit further away
+CONSTANT: wall-drawing-offset 0.15
 
 : wall-drawing-radius ( segment -- r )
     radius>> wall-drawing-offset + ;

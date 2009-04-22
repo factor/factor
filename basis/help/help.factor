@@ -156,10 +156,7 @@ help-hook [ [ print-topic ] ] initialize
     error get (:help) ;
 
 : remove-article ( name -- )
-    dup articles get key? [
-        dup unxref-article
-        dup articles get delete-at
-    ] when drop ;
+    articles get delete-at ;
 
 : add-article ( article name -- )
     [ remove-article ] keep
@@ -167,7 +164,6 @@ help-hook [ [ print-topic ] ] initialize
     xref-article ;
 
 : remove-word-help ( word -- )
-    dup word-help [ dup unxref-article ] when
     f "help" set-word-prop ;
 
 : set-word-help ( content word -- )
