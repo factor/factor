@@ -264,7 +264,6 @@ IN: tools.deploy.shaker
                 compiler-impl
                 compiler.errors:compiler-errors
                 definition-observers
-                definitions:crossref
                 interactive-vocabs
                 layouts:num-tags
                 layouts:num-types
