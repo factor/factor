@@ -110,8 +110,6 @@ TUPLE: yo-momma ;
     [ ] [ \ yo-momma forget ] unit-test
     [ ] [ \ <yo-momma> forget ] unit-test
     [ f ] [ \ yo-momma update-map get values memq? ] unit-test
-
-    [ f ] [ \ yo-momma crossref get at ] unit-test
 ] with-compilation-unit
 
 TUPLE: loc-recording ;

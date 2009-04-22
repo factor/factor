@@ -264,7 +264,7 @@ print-use-hook [ [ ] ] initialize
 
 : finish-parsing ( lines quot -- )
     file get
-    [ record-form ]
+    [ record-top-level-form ]
     [ record-definitions ]
     [ record-checksum ]
     tri ;

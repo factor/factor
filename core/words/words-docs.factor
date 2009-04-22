@@ -290,10 +290,6 @@ HELP: define-temp
     "This word must be called from inside " { $link with-compilation-unit } "."
 } ;
 
-HELP: quot-uses
-{ $values { "quot" quotation } { "assoc" "an assoc with words as keys" } }
-{ $description "Outputs a set of words referenced by the quotation and any quotations it contains." } ;
-
 HELP: delimiter?
 { $values { "obj" object } { "?" "a boolean" } }
 { $description "Tests if an object is a delimiter word declared by " { $link POSTPONE: delimiter } "." }

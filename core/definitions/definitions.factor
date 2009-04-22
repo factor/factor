@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences namespaces assocs graphs math math.order ;
+USING: kernel sequences namespaces assocs math ;
 IN: definitions
 
 MIXIN: definition
@@ -53,29 +53,3 @@ SYMBOL: forgotten-definitions
 GENERIC: definer ( defspec -- start end )
 
 GENERIC: definition ( defspec -- seq )
-
-SYMBOL: crossref
-
-GENERIC: uses ( defspec -- seq )
-
-M: object uses drop f ;
-
-: xref ( defspec -- ) dup uses crossref get add-vertex ;
-
-: usage ( defspec -- seq ) crossref get at keys ;
-
-GENERIC: irrelevant? ( defspec -- ? )
-
-M: object irrelevant? drop f ;
-
-GENERIC: smart-usage ( defspec -- seq )
-
-M: f smart-usage drop \ f smart-usage ;
-
-M: object smart-usage usage [ irrelevant? not ] filter ;
-
-: unxref ( defspec -- )
-    dup uses crossref get remove-vertex ;
-
-: delete-xref ( defspec -- )
-    dup unxref crossref get delete-at ;
