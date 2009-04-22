@@ -592,17 +592,6 @@ string-encoding-test "STRING_ENCODING_TEST" {
 [ test-string-encoding ] test-sqlite
 [ test-string-encoding ] test-postgresql
 
-! Don't comment these out. These words must infer
-\ bind-tuple must-infer
-\ insert-tuple must-infer
-\ update-tuple must-infer
-\ delete-tuples must-infer
-\ select-tuple must-infer
-\ define-persistent must-infer
-\ ensure-table must-infer
-\ create-table must-infer
-\ drop-table must-infer
-
 : test-queries ( -- )
     [ ] [ exam ensure-table ] unit-test
     [ ] [ 1000 [ random-exam insert-tuple ] times ] unit-test

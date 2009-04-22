@@ -52,3 +52,5 @@ T{ error-type
 : compiler-error ( error word -- )
     compiler-errors get-global pick
     [ [ [ <compiler-error> ] keep ] dip set-at ] [ delete-at drop ] if ;
+
+ERROR: not-compiled word error ;

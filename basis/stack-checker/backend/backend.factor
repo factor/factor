@@ -1,10 +1,10 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry arrays generic io io.streams.string kernel math
 namespaces parser sequences strings vectors words quotations
 effects classes continuations assocs combinators
 compiler.errors accessors math.order definitions sets
-generic.standard.engines.tuple hints stack-checker.state
+generic.standard.engines.tuple hints macros stack-checker.state
 stack-checker.visitor stack-checker.errors stack-checker.values
 stack-checker.recursive-state ;
 IN: stack-checker.backend
@@ -84,11 +84,8 @@ M: object apply-object push-literal ;
     meta-r empty? [ too-many->r ] unless ;
 
 : infer-quot-here ( quot -- )
-    meta-r [
-        V{ } clone \ meta-r set
-        [ apply-object terminated? get not ] all?
-        [ commit-literals check->r ] [ literals get delete-all ] if
-    ] dip \ meta-r set ;
+    [ apply-object terminated? get not ] all?
+    [ commit-literals ] [ literals get delete-all ] if ;
 
 : infer-quot ( quot rstate -- )
     recursive-state get [
@@ -116,13 +113,14 @@ M: object apply-object push-literal ;
     ] if ;
 
 : infer->r ( n -- )
-    consume-d dup copy-values [ nip output-r ] [ #>r, ] 2bi ;
+    terminated? get [ drop ] [
+        consume-d dup copy-values [ nip output-r ] [ #>r, ] 2bi
+    ] if ;
 
 : infer-r> ( n -- )
-    consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi ;
-
-: undo-infer ( -- )
-    recorded get [ f "inferred-effect" set-word-prop ] each ;
+    terminated? get [ drop ] [
+        consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi
+    ] if ;
 
 : (consume/produce) ( effect -- inputs outputs )
     [ in>> length consume-d ] [ out>> length produce-d ] bi ;
@@ -132,65 +130,30 @@ M: object apply-object push-literal ;
     [ terminated?>> [ terminate ] when ]
     bi ; inline
 
-: infer-word-def ( word -- )
-    [ specialized-def ] [ add-recursive-state ] bi infer-quot ;
-
 : end-infer ( -- )
+    terminated? get [ check->r ] unless
     meta-d clone #return, ;
 
 : required-stack-effect ( word -- effect )
     dup stack-effect [ ] [ missing-effect ] ?if ;
 
-: check-effect ( word effect -- )
-    over required-stack-effect 2dup effect<=
-    [ 3drop ] [ effect-error ] if ;
-
-: finish-word ( word -- )
-    [ current-effect check-effect ]
-    [ recorded get push ]
-    [ t "inferred-effect" set-word-prop ]
-    tri ;
-
-: cannot-infer-effect ( word -- * )
-    "cannot-infer" word-prop rethrow ;
-
-: maybe-cannot-infer ( word quot -- )
-    [ [ "cannot-infer" set-word-prop ] keep rethrow ] recover ; inline
-
-: infer-word ( word -- effect )
-    [
-        [
-            init-inference
-            init-known-values
-            stack-visitor off
-            dependencies off
-            generic-dependencies off
-            [ infer-word-def end-infer ]
-            [ finish-word ]
-            [ stack-effect ]
-            tri
-        ] with-scope
-    ] maybe-cannot-infer ;
-
 : apply-word/effect ( word effect -- )
     swap '[ _ #call, ] consume/produce ;
 
-: call-recursive-word ( word -- )
-    dup required-stack-effect apply-word/effect ;
-
-: cached-infer ( word -- )
-    dup stack-effect apply-word/effect ;
+: infer-word ( word -- )
+    {
+        { [ dup macro? ] [ do-not-compile ] }
+        { [ dup "no-compile" word-prop ] [ do-not-compile ] }
+        [ dup required-stack-effect apply-word/effect ]
+    } cond ;
 
 : with-infer ( quot -- effect visitor )
     [
-        [
-            V{ } clone recorded set
-            init-inference
-            init-known-values
-            stack-visitor off
-            call
-            end-infer
-            current-effect
-            stack-visitor get
-        ] [ ] [ undo-infer ] cleanup
+        init-inference
+        init-known-values
+        stack-visitor off
+        call
+        end-infer
+        current-effect
+        stack-visitor get
     ] with-scope ; inline

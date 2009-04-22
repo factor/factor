@@ -3,6 +3,8 @@ sequences tools.test words namespaces layouts classes
 classes.builtin arrays quotations io.launcher system ;
 IN: memory.tests
 
+[ ] [ { } { } become ] unit-test
+
 ! LOL
 [ ] [
     vm

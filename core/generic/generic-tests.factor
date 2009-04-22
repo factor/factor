@@ -133,69 +133,19 @@ M: f tag-and-f 4 ;
 [ 3.4 3 ] [ 3.4 tag-and-f ] unit-test
 
 ! Issues with forget
-GENERIC: generic-forget-test-1 ( a b -- c )
+GENERIC: generic-forget-test ( a -- b )
 
-M: integer generic-forget-test-1 / ;
+M: f generic-forget-test ;
 
-[ t ] [
-    \ / usage [ word? ] filter
-    [ name>> "integer=>generic-forget-test-1" = ] any?
-] unit-test
-
-[ ] [
-    [ \ generic-forget-test-1 forget ] with-compilation-unit
-] unit-test
-
-[ f ] [
-    \ / usage [ word? ] filter
-    [ name>> "integer=>generic-forget-test-1" = ] any?
-] unit-test
-
-GENERIC: generic-forget-test-2 ( a b -- c )
-
-M: sequence generic-forget-test-2 = ;
-
-[ t ] [
-    \ = usage [ word? ] filter
-    [ name>> "sequence=>generic-forget-test-2" = ] any?
-] unit-test
-
-[ ] [
-    [ M\ sequence generic-forget-test-2 forget ] with-compilation-unit
-] unit-test
-
-[ f ] [
-    \ = usage [ word? ] filter
-    [ name>> "sequence=>generic-forget-test-2" = ] any?
-] unit-test
-
-GENERIC: generic-forget-test-3 ( a -- b )
-
-M: f generic-forget-test-3 ;
-
-[ ] [ \ f \ generic-forget-test-3 method "m" set ] unit-test
+[ ] [ \ f \ generic-forget-test method "m" set ] unit-test
 
 [ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
 
-[ ] [ "IN: generic.tests M: f generic-forget-test-3 ;" eval( -- ) ] unit-test
+[ ] [ "IN: generic.tests M: f generic-forget-test ;" eval( -- ) ] unit-test
 
 [ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
 
-[ f ] [ f generic-forget-test-3 ] unit-test
-
-: a-word ( -- ) ;
-
-GENERIC: a-generic ( a -- b )
-
-M: integer a-generic a-word ;
-
-[ ] [ \ integer \ a-generic method "m" set ] unit-test
-
-[ t ] [ "m" get \ a-word usage memq? ] unit-test
-
-[ ] [ "IN: generic.tests : a-generic ( -- ) ;" eval( -- ) ] unit-test
-
-[ f ] [ "m" get \ a-word usage memq? ] unit-test
+[ f ] [ f generic-forget-test ] unit-test
 
 ! erg's regression
 [ ] [

@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser words definitions kernel sequences assocs arrays
 kernel.private fry combinators accessors vectors strings sbufs
-byte-arrays byte-vectors io.binary io.streams.string splitting
-math math.parser generic generic.standard generic.standard.engines classes
-hashtables ;
+byte-arrays byte-vectors io.binary io.streams.string splitting math
+math.parser generic generic.standard generic.standard.engines classes
+hashtables namespaces ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
@@ -37,13 +37,18 @@ M: object specializer-declaration class ;
 : specialize-quot ( quot specializer -- quot' )
     specializer-cases alist>quot ;
 
-: method-declaration ( method -- quot )
-    [ "method-generic" word-prop dispatch# object <array> ]
-    [ "method-class" word-prop ]
-    bi prefix ;
+! compiler.tree.propagation.inlining sets this to f
+SYMBOL: specialize-method?
+
+t specialize-method? set-global
 
 : specialize-method ( quot method -- quot' )
-    [ method-declaration '[ _ declare ] prepend ]
+    [
+        specialize-method? get [
+            [ "method-class" word-prop ] [ "method-generic" word-prop ] bi
+            method-declaration prepend
+        ] [ drop ] if
+    ]
     [ "method-generic" word-prop "specializer" word-prop ] bi
     [ specialize-quot ] when* ;
 
@@ -65,7 +70,7 @@ M: object specializer-declaration class ;
 
 SYNTAX: HINTS:
     scan-object
-    [ redefined ]
+    [ changed-definition ]
     [ parse-definition "specializer" set-word-prop ] bi ;
 
 ! Default specializers

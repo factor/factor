@@ -86,8 +86,6 @@ M: engine-word where "tuple-dispatch-generic" word-prop where ;
 
 M: engine-word crossref? "forgotten" word-prop not ;
 
-M: engine-word irrelevant? drop t ;
-
 : remember-engine ( word -- )
     generic get "engines" word-prop push ;
 

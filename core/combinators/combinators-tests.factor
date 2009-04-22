@@ -42,7 +42,7 @@ IN: combinators.tests
         { [ dup 2 mod 1 = ] [ drop "odd" ] }
     } cond ;
 
-\ cond-test-1 must-infer
+\ cond-test-1 def>> must-infer
 
 [ "even" ] [ 2 cond-test-1 ] unit-test
 [ "odd" ] [ 3 cond-test-1 ] unit-test
@@ -54,7 +54,7 @@ IN: combinators.tests
         [ drop "something else" ]
     } cond ;
 
-\ cond-test-2 must-infer
+\ cond-test-2 def>> must-infer
 
 [ "true" ] [ t cond-test-2 ] unit-test
 [ "false" ] [ f cond-test-2 ] unit-test
@@ -67,7 +67,7 @@ IN: combinators.tests
         { [ dup f = ] [ drop "false" ] }
     } cond ;
 
-\ cond-test-3 must-infer
+\ cond-test-3 def>> must-infer
 
 [ "something else" ] [ t cond-test-3 ] unit-test
 [ "something else" ] [ f cond-test-3 ] unit-test
@@ -77,7 +77,7 @@ IN: combinators.tests
     {
     } cond ;
 
-\ cond-test-4 must-infer
+\ cond-test-4 def>> must-infer
 
 [ cond-test-4 ] [ class \ no-cond = ] must-fail-with
 
@@ -168,7 +168,7 @@ IN: combinators.tests
         { 4 [ "four" ] }
     } case ;
 
-\ case-test-1 must-infer
+\ case-test-1 def>> must-infer
 
 [ "two" ] [ 2 case-test-1 ] unit-test
 
@@ -186,7 +186,7 @@ IN: combinators.tests
         [ sq ]
     } case ;
 
-\ case-test-2 must-infer
+\ case-test-2 def>> must-infer
 
 [ 25 ] [ 5 case-test-2 ] unit-test
 
@@ -204,7 +204,7 @@ IN: combinators.tests
         [ sq ]
     } case ;
 
-\ case-test-3 must-infer
+\ case-test-3 def>> must-infer
 
 [ "an array" ] [ { 1 2 3 } case-test-3 ] unit-test
 
@@ -222,7 +222,7 @@ CONSTANT: case-const-2 2
         [ drop "demasiado" ]
     } case ;
 
-\ case-test-4 must-infer
+\ case-test-4 def>> must-infer
 
 [ "uno" ] [ 1 case-test-4 ] unit-test
 [ "dos" ] [ 2 case-test-4 ] unit-test
@@ -239,7 +239,7 @@ CONSTANT: case-const-2 2
         [ drop "demasiado" print ]
     } case ;
 
-\ case-test-5 must-infer
+\ case-test-5 def>> must-infer
 
 [ ] [ 1 case-test-5 ] unit-test
 
@@ -296,7 +296,7 @@ CONSTANT: case-const-2 2
         { 3 [ "three" ] }
     } case ;
 
-\ test-case-6 must-infer
+\ test-case-6 def>> must-infer
 
 [ "three" ] [ 3 test-case-6 ] unit-test
 [ "do-not-call" ] [ \ do-not-call test-case-6 ] unit-test
@@ -343,7 +343,7 @@ CONSTANT: case-const-2 2
         { \ ] [ "KFC" ] }
     } case ;
 
-\ test-case-7 must-infer
+\ test-case-7 def>> must-infer
 
 [ "plus" ] [ \ + test-case-7 ] unit-test
 

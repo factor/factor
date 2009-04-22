@@ -107,4 +107,4 @@ SYMBOL: error-counter
 
 [ { 4 } ] [ { 2 2 } [ + ] with-datastack ] unit-test
 
-\ with-datastack must-infer
+[ with-datastack ] must-infer

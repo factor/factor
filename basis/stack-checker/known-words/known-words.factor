@@ -216,10 +216,25 @@ M: object infer-call*
     dispatch <tuple-boa> exit load-local load-locals get-local
     drop-locals do-primitive alien-invoke alien-indirect
     alien-callback
-} [ t "special" set-word-prop ] each
+} [
+    [ t "special" set-word-prop ]
+    [ t "no-compile" set-word-prop ] bi
+] each
 
-M\ quotation call t "no-compile" set-word-prop
-M\ word execute t "no-compile" set-word-prop
+! Exceptions to the above
+\ curry f "no-compile" set-word-prop
+\ compose f "no-compile" set-word-prop
+
+! More words not to compile
+\ call t "no-compile" set-word-prop
+\ call subwords [ t "no-compile" set-word-prop ] each
+
+\ execute t "no-compile" set-word-prop
+\ execute subwords [ t "no-compile" set-word-prop ] each
+
+\ effective-method t "no-compile" set-word-prop
+\ effective-method subwords [ t "no-compile" set-word-prop ] each
+
 \ clear t "no-compile" set-word-prop
 
 : non-inline-word ( word -- )
@@ -230,14 +245,11 @@ M\ word execute t "no-compile" set-word-prop
         { [ dup "primitive" word-prop ] [ infer-primitive ] }
         { [ dup "transform-quot" word-prop ] [ apply-transform ] }
         { [ dup "macro" word-prop ] [ apply-macro ] }
-        { [ dup "cannot-infer" word-prop ] [ cannot-infer-effect ] }
-        { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
         { [ dup local? ] [ infer-local-reader ] }
         { [ dup local-reader? ] [ infer-local-reader ] }
         { [ dup local-writer? ] [ infer-local-writer ] }
         { [ dup local-word? ] [ infer-local-word ] }
-        { [ dup recursive-word? ] [ call-recursive-word ] }
-        [ dup infer-word apply-word/effect ]
+        [ infer-word ]
     } cond ;
 
 : define-primitive ( word inputs outputs -- )

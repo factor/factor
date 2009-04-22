@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions fry help.topics kernel
 colors.constants math.rectangles models.arrow namespaces sequences
-sorting definitions.icons ui.gadgets ui.gadgets.glass
+sorting definitions.icons tools.crossref ui.gadgets ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
 ui.gadgets.search-tables ui.gadgets.wrappers ui.gestures ui.operations
 ui.pens.solid ui.images ;
