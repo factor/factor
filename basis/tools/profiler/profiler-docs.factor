@@ -1,5 +1,5 @@
-USING: tools.profiler.private tools.time help.markup help.syntax
-quotations io strings words definitions ;
+USING: tools.profiler.private tools.time tools.crossref
+help.markup help.syntax quotations io strings words definitions ;
 IN: tools.profiler
 
 ARTICLE: "profiler-limitations" "Profiler limitations"

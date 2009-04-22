@@ -36,7 +36,7 @@ IN: compiler.units.tests
     enable-compiler
 ] unit-test
 
-! Notify observers even if compilation unit did nothing
+! Check that we notify observers
 SINGLETON: observer
 
 observer add-definition-observer
@@ -47,7 +47,7 @@ SYMBOL: counter
 
 M: observer definitions-changed 2drop global [ counter inc ] bind ;
 
-[ ] with-compilation-unit
+[ gensym [ ] (( -- )) define-declared ] with-compilation-unit
 
 [ 1 ] [ counter get-global ] unit-test
 
