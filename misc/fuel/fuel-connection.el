@@ -164,7 +164,7 @@
     (fuel-con--send-string/wait buffer
                                 fuel-con--init-stanza
                                 'fuel-con--establish-connection-cont
-                                60000)
+                                3000000)
     conn))
 
 (defun fuel-con--establish-connection-cont (ignore)

@@ -10,8 +10,6 @@ compiler.tree.combinators ;
 [ { f t t t } ] [ t { f f t t } (tail-calls) ] unit-test
 [ { f f f t } ] [ t { f f t f } (tail-calls) ] unit-test
 
-\ analyze-recursive must-infer
-
 : label-is-loop? ( nodes word -- ? )
     [
         {
@@ -21,8 +19,6 @@ compiler.tree.combinators ;
         } 2&&
     ] curry contains-node? ;
 
-\ label-is-loop? must-infer
-
 : label-is-not-loop? ( nodes word -- ? )
     [
         {
@@ -31,8 +27,6 @@ compiler.tree.combinators ;
             [ swap label>> word>> eq? ]
         } 2&&
     ] curry contains-node? ;
-
-\ label-is-not-loop? must-infer
 
 : loop-test-1 ( a -- )
     dup [ 1+ loop-test-1 ] [ drop ] if ; inline recursive

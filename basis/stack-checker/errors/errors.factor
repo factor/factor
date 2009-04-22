@@ -24,6 +24,10 @@ M: inference-error error-type type>> ;
 : inference-warning ( ... class -- * )
     +compiler-warning+ (inference-error) ; inline
 
+TUPLE: do-not-compile word ;
+
+: do-not-compile ( word -- * ) \ do-not-compile inference-warning ;
+
 TUPLE: literal-expected what ;
 
 : literal-expected ( what -- * ) \ literal-expected inference-warning ;
@@ -48,9 +52,9 @@ TUPLE: missing-effect word ;
 : missing-effect ( word -- * )
     pretty-word \ missing-effect inference-error ;
 
-TUPLE: effect-error word inferred declared ;
+TUPLE: effect-error inferred declared ;
 
-: effect-error ( word inferred declared -- * )
+: effect-error ( inferred declared -- * )
     \ effect-error inference-error ;
 
 TUPLE: recursive-quotation-error quot ;

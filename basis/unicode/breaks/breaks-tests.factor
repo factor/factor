@@ -32,7 +32,7 @@ IN: unicode.breaks.tests
         [ concat [ quot call [ "" like ] map ] curry ] bi unit-test
     ] each ;
 
-: grapheme-test ( tests quot -- )
+: grapheme-test ( tests -- )
     [
         [ 1quotation ]
         [ concat [ >graphemes [ "" like ] map ] curry ] bi unit-test

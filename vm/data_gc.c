@@ -149,20 +149,23 @@ void copy_roots(void)
 	copy_registered_locals();
 	copy_stack_elements(extra_roots_region,extra_roots);
 
-	save_stacks();
-	F_CONTEXT *stacks = stack_chain;
-
-	while(stacks)
+	if(!performing_compaction)
 	{
-		copy_stack_elements(stacks->datastack_region,stacks->datastack);
-		copy_stack_elements(stacks->retainstack_region,stacks->retainstack);
+		save_stacks();
+		F_CONTEXT *stacks = stack_chain;
 
-		copy_handle(&stacks->catchstack_save);
-		copy_handle(&stacks->current_callback_save);
+		while(stacks)
+		{
+			copy_stack_elements(stacks->datastack_region,stacks->datastack);
+			copy_stack_elements(stacks->retainstack_region,stacks->retainstack);
 
-		mark_active_blocks(stacks);
+			copy_handle(&stacks->catchstack_save);
+			copy_handle(&stacks->current_callback_save);
 
-		stacks = stacks->next;
+			mark_active_blocks(stacks);
+
+			stacks = stacks->next;
+		}
 	}
 
 	int i;
@@ -561,6 +564,8 @@ void primitive_clear_gc_stats(void)
 	clear_gc_stats();
 }
 
+/* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
+   to coalesce equal but distinct quotations and wrappers. */
 void primitive_become(void)
 {
 	F_ARRAY *new_objects = untag_array(dpop());
@@ -582,5 +587,9 @@ void primitive_become(void)
 
 	gc();
 
+	/* If a word's definition quotation was in old_objects and the
+	   quotation in new_objects is not compiled, we might leak memory
+	   by referencing the old quotation unless we recompile all
+	   unoptimized words. */
 	compile_all_words();
 }

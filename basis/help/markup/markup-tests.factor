@@ -5,7 +5,7 @@ IN: help.markup.tests
 
 TUPLE: blahblah quux ;
 
-[ "an int" ] [ [ { "int" } $instance ] with-string-writer ] unit-test
+[ "int" ] [ [ { "int" } $instance ] with-string-writer ] unit-test
 
 [ ] [ \ quux>> print-topic ] unit-test
 [ ] [ \ >>quux print-topic ] unit-test
@@ -26,5 +26,3 @@ TUPLE: blahblah quux ;
 [ "a string, a fixnum, or an integer" ]
 [ [ { $or string fixnum integer } print-element ] with-string-writer ] unit-test
 
-\ print-element must-infer
-\ print-topic must-infer

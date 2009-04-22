@@ -31,6 +31,3 @@ T{ model-tester f f } "tester" set
     "tester" get
     "model-c" get value>>
 ] unit-test
-
-\ model-changed must-infer
-\ set-model must-infer

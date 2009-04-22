@@ -6,9 +6,6 @@ compiler.tree.normalization.renaming
 compiler.tree compiler.tree.checker
 sequences accessors tools.test kernel math ;
 
-\ count-introductions must-infer
-\ normalize must-infer
-
 [ 3 ] [ [ 3drop 1 2 3 ] build-tree count-introductions ] unit-test
 
 [ 4 ] [ [ 3drop 1 2 3 3drop drop ] build-tree count-introductions ] unit-test
@@ -17,13 +14,13 @@ sequences accessors tools.test kernel math ;
 
 [ 2 ] [ [ 3 [ drop ] [ 2drop 3 ] if ] build-tree count-introductions ] unit-test
 
-: foo ( a b -- b a ) swap ; inline recursive
+: foo ( quot: ( -- ) -- ) call ; inline recursive
 
 : recursive-inputs ( nodes -- n )
     [ #recursive? ] find nip child>> first in-d>> length ;
 
-[ 0 2 ] [
-    [ foo ] build-tree
+[ 1 3 ] [
+    [ [ swap ] foo ] build-tree
     [ recursive-inputs ]
     [ analyze-recursive normalize recursive-inputs ] bi
 ] unit-test
