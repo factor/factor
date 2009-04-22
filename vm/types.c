@@ -54,7 +54,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->code = NULL;
 
 	REGISTER_UNTAGGED(word);
-	default_word_code(word,true);
+	jit_compile_word(word,word->def,true);
 	UNREGISTER_UNTAGGED(word);
 
 	REGISTER_UNTAGGED(word);

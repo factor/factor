@@ -5,8 +5,6 @@ math.private compiler.tree.builder compiler.tree.optimizer
 compiler.cfg.builder compiler.cfg.debugger arrays locals byte-arrays
 kernel.private math ;
 
-\ build-cfg must-infer
-
 ! Just ensure that various CFGs build correctly.
 : unit-test-cfg ( quot -- ) '[ _ test-cfg drop ] [ ] swap unit-test ;
 

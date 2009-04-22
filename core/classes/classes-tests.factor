@@ -3,7 +3,7 @@ io.streams.string kernel math namespaces parser prettyprint
 sequences strings tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 classes.algebra vectors definitions source-files compiler.units
-kernel.private sorting vocabs memory eval accessors ;
+kernel.private sorting vocabs memory eval accessors sets ;
 IN: classes.tests
 
 [ t ] [ 3 object instance? ] unit-test
@@ -22,10 +22,11 @@ M: method-forget-class method-forget-test ;
 [ ] [ [ \ method-forget-class forget ] with-compilation-unit ] unit-test
 [ t ] [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
 
-[ t ] [
+[ { } { } ] [
     all-words [ class? ] filter
     implementors-map get keys
-    [ natural-sort ] bi@ =
+    [ natural-sort ] bi@
+    [ diff ] [ swap diff ] 2bi
 ] unit-test
 
 ! Minor leak

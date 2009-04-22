@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs math fry
 io kernel namespaces prettyprint prettyprint.sections
@@ -12,9 +12,6 @@ IN: help.crossref
 : article-children ( topic -- seq )
     { $subsection } article-links ;
 
-M: link uses
-    { $subsection $link $see-also } article-links ;
-
 : help-path ( topic -- seq )
     [ article-parent ] follow rest ;
 
@@ -22,10 +19,7 @@ M: link uses
     article-children [ set-article-parent ] with each ;
 
 : xref-article ( topic -- )
-    dup >link xref dup set-article-parents ;
-
-: unxref-article ( topic -- )
-    >link unxref ;
+    dup set-article-parents ;
 
 : prev/next ( obj seq n -- obj' )
     [ [ index dup ] keep ] dip swap

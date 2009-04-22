@@ -3,7 +3,7 @@
 USING: accessors words sequences math prettyprint kernel arrays io
 io.styles namespaces assocs kernel.private strings combinators
 sorting math.parser vocabs definitions tools.profiler.private
-continuations generic compiler.units sets classes fry ;
+tools.crossref continuations generic compiler.units sets classes fry ;
 IN: tools.profiler
 
 : profile ( quot -- )

@@ -1,4 +1,4 @@
-USING: definitions compiler.units tools.test arrays sequences words kernel
+USING: compiler definitions compiler.units tools.test arrays sequences words kernel
 accessors namespaces fry eval ;
 IN: compiler.units.tests
 
@@ -14,11 +14,13 @@ IN: compiler.units.tests
 
 ! Non-optimizing compiler bugs
 [ 1 1 ] [
-    "A" "B" <word> [ [ 1 ] dip ] >>def dup f 2array 1array modify-code-heap
+    "A" "B" <word> [ [ [ 1 ] dip ] 2array 1array modify-code-heap ] keep
     1 swap execute
 ] unit-test
 
 [ "A" "B" ] [
+    disable-compiler
+
     gensym "a" set
     gensym "b" set
     [
@@ -30,9 +32,11 @@ IN: compiler.units.tests
         "a" get [ "B" ] define
     ] with-compilation-unit
     "b" get execute
+
+    enable-compiler
 ] unit-test
 
-! Notify observers even if compilation unit did nothing
+! Check that we notify observers
 SINGLETON: observer
 
 observer add-definition-observer
@@ -43,7 +47,7 @@ SYMBOL: counter
 
 M: observer definitions-changed 2drop global [ counter inc ] bind ;
 
-[ ] with-compilation-unit
+[ gensym [ ] (( -- )) define-declared ] with-compilation-unit
 
 [ 1 ] [ counter get-global ] unit-test
 

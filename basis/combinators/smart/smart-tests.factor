@@ -42,7 +42,7 @@ IN: combinators.smart.tests
 : nested-smart-combo-test ( -- array )
     [ [ 1 2 ] output>array [ 3 4 ] output>array ] output>array ;
 
-\ nested-smart-combo-test must-infer
+\ nested-smart-combo-test def>> must-infer
 
 [ { { 1 2 } { 3 4 } } ] [ nested-smart-combo-test ] unit-test
 

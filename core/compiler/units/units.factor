@@ -41,7 +41,7 @@ SYMBOL: compiler-impl
 HOOK: recompile compiler-impl ( words -- alist )
 
 ! Non-optimizing compiler
-M: f recompile [ f ] { } map>assoc ;
+M: f recompile [ dup def>> ] { } map>assoc ;
 
 ! Trivial compiler. We don't want to touch the code heap
 ! during stage1 bootstrap, it would just waste time.
@@ -144,7 +144,7 @@ GENERIC: definitions-changed ( assoc obj -- )
     update-tuples
     process-forgotten-definitions
     modify-code-heap
-    updated-definitions notify-definition-observers
+    updated-definitions dup assoc-empty? [ drop ] [ notify-definition-observers ] if
     notify-error-observers ;
 
 : with-nested-compilation-unit ( quot -- )

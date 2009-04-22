@@ -104,10 +104,6 @@ $nl
     
     { { { $snippet "\"help\"" } ", " { $snippet "\"help-loc\"" } ", " { $snippet "\"help-parent\"" } } { "Where word help is stored - " { $link "writing-help" } } }
 
-    { { $snippet "\"infer\"" } { $link "macros" } }
-
-    { { { $snippet "\"inferred-effect\"" } } { $link "inference" } }
-
     { { $snippet "\"specializer\"" } { $link "hints" } }
     
     { { $snippet "\"predicating\"" } " Set on class predicates, stores the corresponding class word" }
@@ -293,10 +289,6 @@ HELP: define-temp
     { $code "[ 2 2 + . ] (( -- )) define-temp execute" }
     "This word must be called from inside " { $link with-compilation-unit } "."
 } ;
-
-HELP: quot-uses
-{ $values { "quot" quotation } { "assoc" "an assoc with words as keys" } }
-{ $description "Outputs a set of words referenced by the quotation and any quotations it contains." } ;
 
 HELP: delimiter?
 { $values { "obj" object } { "?" "a boolean" } }
