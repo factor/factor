@@ -78,6 +78,8 @@ SYMBOL: bootstrap-time
         "stage2: deployment mode" print
     ] [
         "listener" require
+        "debugger" require
+        "tools.errors" require
         "none" require
     ] if
 
