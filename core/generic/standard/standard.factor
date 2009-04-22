@@ -13,13 +13,7 @@ GENERIC: dispatch# ( word -- n )
 M: generic dispatch#
     "combination" word-prop dispatch# ;
 
-GENERIC: method-declaration ( class generic -- quot )
-
-M: generic method-declaration
-    "combination" word-prop method-declaration ;
-
-M: quotation engine>quot
-    assumed get generic get method-declaration prepend ;
+M: quotation engine>quot ;
 
 ERROR: no-method object generic ;
 
@@ -122,9 +116,6 @@ M: standard-combination perform-combination
 
 M: standard-combination dispatch# #>> ;
 
-M: standard-combination method-declaration
-    dispatch# object <array> swap prefix [ declare ] curry [ ] like ;
-
 M: standard-combination next-method-quot*
     [
         single-next-method-quot
@@ -150,8 +141,6 @@ PREDICATE: hook-generic < generic
     hook-combination get var>> [ get ] curry prepend ;
 
 M: hook-combination dispatch# drop 0 ;
-
-M: hook-combination method-declaration 2drop [ ] ;
 
 M: hook-generic extra-values drop 1 ;
 
