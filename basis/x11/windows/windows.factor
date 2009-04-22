@@ -6,7 +6,7 @@ arrays fry ;
 IN: x11.windows
 
 : create-window-mask ( -- n )
-    { CWColormap CWEventMask } flags ;
+    { CWBackPixel CWBorderPixel CWColormap CWEventMask } flags ;
 
 : create-colormap ( visinfo -- colormap )
     [ dpy get root get ] dip XVisualInfo-visual AllocNone
