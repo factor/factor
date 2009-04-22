@@ -160,10 +160,12 @@ ABOUT: "words"
 
 HELP: execute ( word -- )
 { $values { "word" word } }
-{ $description "Executes a word." }
+{ $description "Executes a word. Words which call execute must be inlined in order to compile when called from other words." }
 { $examples
-    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ;\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
+    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ; inline\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
+
+{ execute POSTPONE: execute( } related-words
 
 HELP: deferred
 { $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;

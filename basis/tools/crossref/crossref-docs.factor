@@ -1,5 +1,5 @@
 USING: help.markup help.syntax words definitions prettyprint
-tools.crossref.private math quotations assocs ;
+tools.crossref.private math quotations assocs kernel ;
 IN: tools.crossref
 
 ARTICLE: "tools.crossref" "Definition cross referencing"
@@ -51,7 +51,7 @@ HELP: usage.
 { $examples { $code "\\ reverse usage." } } ;
 
 HELP: quot-uses
-{ $values { "quot" quotation } { "assoc" "an assoc with words as keys" } }
+{ $values { "obj" object } { "assoc" "an assoc with words as keys" } }
 { $description "Outputs a set of words referenced by the quotation and any quotations it contains." } ;
 
 { usage usage. } related-words
