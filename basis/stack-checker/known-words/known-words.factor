@@ -225,10 +225,16 @@ M: object infer-call*
 \ curry f "no-compile" set-word-prop
 \ compose f "no-compile" set-word-prop
 
-M\ quotation call t "no-compile" set-word-prop
-M\ curry call t "no-compile" set-word-prop
-M\ compose call t "no-compile" set-word-prop
-M\ word execute t "no-compile" set-word-prop
+! More words not to compile
+\ call t "no-compile" set-word-prop
+\ call subwords [ t "no-compile" set-word-prop ] each
+
+\ execute t "no-compile" set-word-prop
+\ execute subwords [ t "no-compile" set-word-prop ] each
+
+\ effective-method t "no-compile" set-word-prop
+\ effective-method subwords [ t "no-compile" set-word-prop ] each
+
 \ clear t "no-compile" set-word-prop
 
 : non-inline-word ( word -- )
