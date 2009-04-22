@@ -54,7 +54,7 @@ SYMBOL: :uses-suggestions
 
 PRIVATE>
 
-: fuel-use-suggested-vocabs ( suggestions quot ... suggestions quot: ( ... -- ... ) -- ... )
+: fuel-use-suggested-vocabs ( suggestions quot -- ... )
     [ :uses-suggestions set ] dip
     [ try-suggested-restarts rethrow ] recover ; inline
 
