@@ -1,7 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes generic.standard classes.tuple generic.math
 generic.standard arrays io.pathnames vocabs.loader io sequences
-assocs words.symbol words.alias words.constant ;
+assocs words.symbol words.alias words.constant combinators ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -152,6 +152,11 @@ ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
 "Pathnames are documented in " { $link "io.pathnames" } "." ;
 
+ARTICLE: "syntax-effects" "Stack effect syntax"
+"Note that this is " { $emphasis "not" } " syntax to declare stack effects of words. This pushes an " { $link effect } " instance on the stack for reflection, for use with words such as " { $link define-declared } ", " { $link call-effect } " and " { $link execute-effect } "."
+{ $subsection POSTPONE: (( }
+{ $see-also "effects" "inference" "tools.inference" } ;
+
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."
 $nl
@@ -168,7 +173,8 @@ $nl
 { $subsection "syntax-sbufs" }
 { $subsection "syntax-hashtables" }
 { $subsection "syntax-tuples" }
-{ $subsection "syntax-pathnames" } ;
+{ $subsection "syntax-pathnames" }
+{ $subsection "syntax-effects" } ;
 
 ARTICLE: "syntax" "Syntax"
 "Factor has two main forms of syntax: " { $emphasis "definition" } " syntax and " { $emphasis "literal" } " syntax. Code is data, so the syntax for code is a special case of object literal syntax. This section documents literal syntax. Definition syntax is covered in " { $link "words" } ". Extending the parser is the main topic of " { $link "parser" } "."
@@ -517,7 +523,7 @@ HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
 { $description "A stack effect declaration. This is treated as a comment unless it appears inside a word definition." }
-{ $see-also "effect-declaration" } ;
+{ $see-also "effects" } ;
 
 HELP: ((
 { $syntax "(( inputs -- outputs ))" }

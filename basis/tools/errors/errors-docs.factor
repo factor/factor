@@ -6,15 +6,15 @@ ARTICLE: "compiler-errors" "Compiler warnings and errors"
 "After loading a vocabulary, you might see messages like:"
 { $code
     ":errors - print 2 compiler errors"
-    ":warnings - print 50 compiler warnings"
+    ":warnings - print 1 compiler warnings"
 }
-"These messages arise from the compiler's stack effect checker. Production code should not have any warnings and errors in it. Warning and error conditions are documented in " { $link "inference-errors" } "."
+"This indicates that some words did not pass the stack checker. Stack checker error conditions are documented in " { $link "inference-errors" } ", and the stack checker itself in " { $link "inference" } "."
 $nl
 "Words to view warnings and errors:"
 { $subsection :warnings }
 { $subsection :errors }
 { $subsection :linkage }
-"Compiler warnings and errors are reported using the " { $link "tools.errors" } " mechanism and are shown in the " { $link "ui.tools.error-list" } "." ;
+"Compiler warnings and errors are reported using the " { $link "tools.errors" } " mechanism, and as a result, they are also are shown in the " { $link "ui.tools.error-list" } "." ;
 
 HELP: compiler-error
 { $values { "error" "an error" } { "word" word } }
