@@ -48,7 +48,7 @@ ARTICLE: "thread-impl" "Thread implementation"
 { $subsection sleep-queue } ;
 
 ARTICLE: "threads" "Lightweight co-operative threads"
-"Factor supports lightweight co-operative threads implemented on top of continuations. A thread will yield while waiting for input/output operations to complete, or when a yield has been explicitly requested."
+"Factor supports lightweight co-operative threads implemented on top of " { $link "continuations" } ". A thread will yield while waiting for input/output operations to complete, or when a yield has been explicitly requested."
 $nl
 "Factor threads are very lightweight. Each thread can take as little as 900 bytes of memory. This library has been tested running hundreds of thousands of simple threads."
 $nl

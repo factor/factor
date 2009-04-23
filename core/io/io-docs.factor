@@ -355,9 +355,27 @@ $nl
 "Copying the contents of one stream to another:"
 { $subsection stream-copy } ;
 
+ARTICLE: "stream-examples" "Stream example"
+"Ask the user for their age, and print it back:"
+{ $code
+    "USING: io math.parser ;"
+    ""
+    ": ask-age ( -- ) \"How old are you?\" print ;"
+    ""
+    ": read-age ( -- n ) readln string>number ;"
+    ""
+    ": print-age ( n -- )"
+    "    \"You are \" write"
+    "    number>string write"
+    "    \" years old.\" print ;"
+    ": example ( -- ) ask-age read-age print-age ;"
+    ""
+    "example"
+} ;
+
 ARTICLE: "streams" "Streams"
 "Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of " { $emphasis "elements" } "."
-$nl
+{ $subsection "stream-examples" }
 "A stream can either be passed around on the stack or bound to a dynamic variable and used as one of the two implicit " { $emphasis "default streams" } "."
 { $subsection "stream-protocol" }
 { $subsection "stdio" }

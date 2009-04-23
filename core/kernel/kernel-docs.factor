@@ -182,11 +182,13 @@ HELP: either?
 
 HELP: call
 { $values { "callable" callable } }
-{ $description "Calls a quotation." }
+{ $description "Calls a quotation. Words which " { $link call } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal quotation can have a static stack effect." }
 { $examples
     "The following two lines are equivalent:"
     { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
 } ;
+
+{ call POSTPONE: call( } related-words
 
 HELP: call-clear ( quot -- )
 { $values { "quot" callable } }
