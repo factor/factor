@@ -56,12 +56,23 @@ $nl
 }
 "The " { $link inet } " address specifier is not supported by the " { $link send } " word because a single host name can resolve to any number of IPv4 or IPv6 addresses, therefore there is no way to know which address should be used. Applications should call " { $link resolve-host } " then use some kind of strategy to pick the correct address (for example, by sending a packet to each one and waiting for a response, or always assuming IPv4)." ;
 
+ARTICLE: "network-examples" "Networking examples"
+"Send some bytes to a remote host:"
+{ $code
+    "USING: io io.encodings.ascii io.sockets strings ;"
+    "\"myhost\" 1033 <inet> ascii"
+    "[ B{ 12 17 102 } write ] with-client"
+}
+"Look up the IP addresses associated with a host name:"
+{ $code "USING: io.sockets ;" "\"www.apple.com\" 80 <inet> resolve-host ." } ;
+
 ARTICLE: "network-streams" "Networking"
 "Factor supports connection-oriented and packet-oriented communication over a variety of protocols:"
 { $list
     "TCP/IP and UDP/IP, over IPv4 and IPv6"
     "Unix domain sockets (Unix only)"
 }
+{ $subsection "network-examples" }
 { $subsection "network-addressing" }
 { $subsection "network-connection" }
 { $subsection "network-packet" }

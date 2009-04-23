@@ -39,7 +39,7 @@ $nl
     { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
 }
 { $heading "Stack effect conventions" }
-"Stack effect conventions are documented in " { $link "effect-declaration" } "."
+"Stack effect conventions are documented in " { $link "effects" } "."
 { $heading "Glossary of terms" }
 "Common terminology and abbreviations used throughout Factor and its documentation:"
 { $table
@@ -229,9 +229,11 @@ ARTICLE: "handbook-language-reference" "The language"
 { $heading "Fundamentals" }
 { $subsection "conventions" }
 { $subsection "syntax" }
-{ $subsection "effects" }
+{ $heading "The stack" }
 { $subsection "evaluator" }
-{ $heading "Data types" }
+{ $subsection "effects" }
+{ $subsection "inference" }
+{ $heading "Basic data types" }
 { $subsection "booleans" }
 { $subsection "numbers" }
 { $subsection "collections" }
@@ -239,16 +241,18 @@ ARTICLE: "handbook-language-reference" "The language"
 { $subsection "words" }
 { $subsection "shuffle-words" }
 { $subsection "combinators" }
-{ $subsection "errors" }
-{ $subsection "continuations" }
+{ $subsection "threads" }
 { $heading "Named values" }
 { $subsection "locals" }
 { $subsection "namespaces" }
 { $subsection "namespaces-global" }
 { $subsection "values" }
 { $heading "Abstractions" }
+{ $subsection "errors" }
 { $subsection "objects" }
 { $subsection "destructors" }
+{ $subsection "continuations" }
+{ $subsection "memoize" }
 { $subsection "parsing-words" }
 { $subsection "macros" }
 { $subsection "fry" }
@@ -263,6 +267,7 @@ ARTICLE: "handbook-system-reference" "The implementation"
 { $subsection "vocabularies" }
 { $subsection "source-files" }
 { $subsection "compiler" }
+{ $subsection "tools.errors" }
 { $heading "Virtual machine" }
 { $subsection "images" }
 { $subsection "cli" }
@@ -283,7 +288,7 @@ ARTICLE: "handbook-tools-reference" "Developer tools"
 { $subsection "prettyprint" }
 { $subsection "inspector" }
 { $subsection "tools.annotations" }
-{ $subsection "inference" }
+{ $subsection "tools.inference" }
 { $heading "Browsing" }
 { $subsection "see" }
 { $subsection "tools.crossref" }

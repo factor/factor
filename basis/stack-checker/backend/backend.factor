@@ -84,8 +84,11 @@ M: object apply-object push-literal ;
     meta-r empty? [ too-many->r ] unless ;
 
 : infer-quot-here ( quot -- )
-    [ apply-object terminated? get not ] all?
-    [ commit-literals ] [ literals get delete-all ] if ;
+    meta-r [
+        V{ } clone \ meta-r set
+        [ apply-object terminated? get not ] all?
+        [ commit-literals check->r ] [ literals get delete-all ] if
+    ] dip \ meta-r set ;
 
 : infer-quot ( quot rstate -- )
     recursive-state get [
@@ -113,32 +116,24 @@ M: object apply-object push-literal ;
     ] if ;
 
 : infer->r ( n -- )
-    terminated? get [ drop ] [
-        consume-d dup copy-values [ nip output-r ] [ #>r, ] 2bi
-    ] if ;
+    consume-d dup copy-values [ nip output-r ] [ #>r, ] 2bi ;
 
 : infer-r> ( n -- )
-    terminated? get [ drop ] [
-        consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi
-    ] if ;
-
-: (consume/produce) ( effect -- inputs outputs )
-    [ in>> length consume-d ] [ out>> length produce-d ] bi ;
+    consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi ;
 
 : consume/produce ( effect quot: ( inputs outputs -- ) -- )
-    '[ (consume/produce) @ ]
+    '[ [ in>> length consume-d ] [ out>> length produce-d ] bi @ ]
     [ terminated?>> [ terminate ] when ]
     bi ; inline
 
+: apply-word/effect ( word effect -- )
+    swap '[ _ #call, ] consume/produce ;
+
 : end-infer ( -- )
-    terminated? get [ check->r ] unless
     meta-d clone #return, ;
 
 : required-stack-effect ( word -- effect )
     dup stack-effect [ ] [ missing-effect ] ?if ;
-
-: apply-word/effect ( word effect -- )
-    swap '[ _ #call, ] consume/produce ;
 
 : infer-word ( word -- )
     {
