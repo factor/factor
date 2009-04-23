@@ -25,19 +25,9 @@ IN: math.matrices
 : m*   ( m m -- m ) [ v* ] 2map ;
 : m/   ( m m -- m ) [ v/ ] 2map ;
 
-TUPLE: flipped { seq read-only } ;
-
-M: flipped length seq>> first length ;
-
-M: flipped nth-unsafe seq>> swap <column> ;
-
-INSTANCE: flipped sequence
-
-C: <flipped> flipped
-
-: v.m ( v m -- v ) <flipped> [ v. ] with map ;
-: m.v ( m v -- v ) [ v. ] curry map ; inline
-: m.  ( m m -- m ) <flipped> [ swap m.v ] curry map ;
+: v.m ( v m -- v ) flip [ v. ] with map ;
+: m.v ( m v -- v ) [ v. ] curry map ;
+: m.  ( m m -- m ) flip [ swap m.v ] curry map ;
 
 : mmin ( m -- n ) [ 1/0. ] dip [ [ min ] each ] each ;
 : mmax ( m -- n ) [ -1/0. ] dip [ [ max ] each ] each ;
