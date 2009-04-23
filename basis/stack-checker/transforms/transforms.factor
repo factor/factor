@@ -113,11 +113,9 @@ M\ tuple-class boa t "no-compile" set-word-prop
 \ new [
     dup tuple-class? [
         dup inlined-dependency depends-on
-        [
-            [ all-slots [ initial>> literalize , ] each ]
-            [ literalize , ] bi
-            \ boa ,
-        ] [ ] make
+        [ all-slots [ initial>> literalize ] map ]
+        [ tuple-layout '[ _ <tuple-boa> ] ]
+        bi append
     ] [ drop f ] if
 ] 1 define-transform
 
