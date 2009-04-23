@@ -74,7 +74,9 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : fold-word ( stack word -- stack )
     2dup enough?
-    [ 1quotation with-datastack ] [ [ % ] [ , ] bi* { } ] if ;
+    [ 1quotation with-datastack ]
+    [ [ [ literalize , ] each ] [ , ] bi* { } ]
+    if ;
 
 : fold ( quot -- folded-quot )
     [ { } [ fold-word ] reduce % ] [ ] make ; 
@@ -217,9 +219,7 @@ DEFER: _
     "predicate" word-prop [ dupd call assure ] curry ;
 
 : slot-readers ( class -- quot )
-    all-slots
-    [ name>> reader-word 1quotation [ keep ] curry ] map concat
-    [ ] like [ drop ] compose ;
+    all-slots [ name>> reader-word 1quotation ] map [ cleave ] curry ;
 
 : ?wrapped ( object -- wrapped )
     dup wrapper? [ wrapped>> ] when ;
