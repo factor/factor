@@ -160,7 +160,7 @@ ABOUT: "words"
 
 HELP: execute ( word -- )
 { $values { "word" word } }
-{ $description "Executes a word. Words which call execute must be inlined in order to compile when called from other words." }
+{ $description "Executes a word. Words which " { $link execute } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal word can have a static stack effect." }
 { $examples
     { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ; inline\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;

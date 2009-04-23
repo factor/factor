@@ -791,7 +791,14 @@ HELP: call-next-method
 
 HELP: call(
 { $syntax "call( stack -- effect )" }
-{ $description "Calls the quotation on the top of the stack, asserting that it has the given stack effect. The quotation does not need to be known at compile time." } ;
+{ $description "Calls the quotation on the top of the stack, asserting that it has the given stack effect. The quotation does not need to be known at compile time." }
+{ $examples
+  { $code
+    "TUPLE: action name quot ;"
+    ": perform-action ( action -- )"
+    "    [ name>> print ] [ quot>> call( -- ) ] bi ;"
+  }
+} ;
 
 HELP: execute(
 { $syntax "execute( stack -- effect )" }
