@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences namespaces assocs math ;
+USING: kernel sequences namespaces assocs math accessors ;
 IN: definitions
 
 MIXIN: definition
@@ -40,6 +40,8 @@ GENERIC: set-where ( loc defspec -- )
 GENERIC: forget* ( defspec -- )
 
 M: f forget* drop ;
+
+M: wrapper forget* wrapped>> forget* ;
 
 SYMBOL: forgotten-definitions
 
