@@ -54,11 +54,20 @@ ARTICLE: "io.mmap.arrays" "Memory-mapped arrays"
 ARTICLE: "io.mmap.low-level" "Reading and writing mapped files directly"
 "Data can be read and written from the " { $link mapped-file } " by applying low-level alien words to the " { $slot "address" } " slot. See " { $link "reading-writing-memory" } "." ;
 
+ARTICLE: "io.mmap.examples" "Memory-mapped file example"
+"Convert a file of 4-byte cells from little to big endian or vice versa, by directly mapping it into memory and operating on it with sequence words:"
+{ $code
+    "USING: accessors grouping io.files io.mmap.char kernel sequences ;"
+    "\"mydata.dat\" ["
+    "    4 <sliced-groups> [ reverse-here ] change-each"
+    "] with-mapped-char-file"
+} ;
+
 ARTICLE: "io.mmap" "Memory-mapped files"
 "The " { $vocab-link "io.mmap" } " vocabulary implements support for memory-mapped files."
 { $subsection <mapped-file> }
 "Memory-mapped files are disposable and can be closed with " { $link dispose } " or " { $link with-disposal } "."
-$nl
+{ $subsection "io.mmap.examples" }
 "A utility combinator which wraps the above:"
 { $subsection with-mapped-file }
 "Instances of " { $link mapped-file } " don't support any interesting operations in themselves. There are two facilities for accessing their contents:"

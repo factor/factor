@@ -269,28 +269,28 @@ ARTICLE: "combinators-quot" "Quotation construction utilities"
 { $subsection case>quot }
 { $subsection alist>quot } ;
 
-ARTICLE: "call" "Fundamental combinators"
-"The most basic combinators are those that take either a quotation or word, and invoke it immediately. There are two sets of combinators; they differe in whether or not the stack effect of the expected code is declared."
-$nl
-"The simplest combinators do not take an effect declaration:"
-{ $subsection call }
-{ $subsection execute }
-"These combinators only get optimized by the compiler if the quotation or word parameter is a literal; otherwise a compiler warning will result. Definitions of combinators which require literal parameters must be followed by the " { $link POSTPONE: inline } " declaration. For example:"
-{ $code
-    ": keep ( x quot -- x )"
-    "    over [ call ] dip ; inline"
-}
-"See " { $link "declarations" } " and " { $link "compiler-errors" } " for details."
-$nl
-"The other set of combinators allow arbitrary quotations and words to be called from optimized code. This is done by specifying the stack effect of the quotation literally. It is checked at runtime that the stack effect is accurate."
-{ $subsection call-effect }
-{ $subsection execute-effect }
-"A simple layer of syntax sugar is defined on top:"
-{ $subsection POSTPONE: call( }
-{ $subsection POSTPONE: execute( }
+ARTICLE: "call-unsafe" "Unsafe combinators"
 "Unsafe calls declare an effect statically without any runtime checking:"
 { $subsection call-effect-unsafe }
-{ $subsection execute-effect-unsafe }
+{ $subsection execute-effect-unsafe } ;
+
+ARTICLE: "call" "Fundamental combinators"
+"The most basic combinators are those that take either a quotation or word, and invoke it immediately."
+$nl
+"There are two sets of combinators; they differ in whether or not the stack effect of the expected code is declared."
+$nl
+"The simplest combinators do not take an effect declaration. The compiler checks the stack effect at compile time, rejecting the program if this cannot be done:"
+{ $subsection call }
+{ $subsection execute }
+"The second set of combinators takes an effect declaration. The stack effect of the quotation or word is checked at runtime:"
+{ $subsection POSTPONE: call( }
+{ $subsection POSTPONE: execute( }
+"The above are syntax sugar. The underlying words are a bit more verbose but allow non-constant effects to be passed in:"
+{ $subsection call-effect }
+{ $subsection execute-effect }
+{ $subsection "call-unsafe" }
+"The combinator variants that do not take an effect declaration can only be used if the compiler is able to infer the stack effect by other means. See " { $link "inference-combinators" } "."
+{ $subsection "call-unsafe" }
 { $see-also "effects" "inference" } ;
 
 ARTICLE: "combinators" "Combinators"
