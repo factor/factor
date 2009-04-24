@@ -86,7 +86,7 @@ M: mdb-collection create-collection ( mdb-collection -- )
         ] 2bi
     ] keep <mdb-query-msg> 1 >>return# send-query-plain
     objects>> first check-ok
-    [ "could not create collection" throw ] unless ;
+    [ drop ] [ throw ] if ;
 
 : load-collection-list ( -- collection-list )
     namespaces-collection
@@ -101,7 +101,6 @@ M: mdb-collection create-collection ( mdb-collection -- )
 USE: tools.continuations
 
 : (ensure-collection) ( collection --  )
-    break
     mdb-instance collections>> dup keys length 0 = 
     [ load-collection-list      
       [ [ "options" ] dip key? ] filter
@@ -170,7 +169,7 @@ M: mdb-query-msg count
     [ collection>> "count" H{ } clone [ set-at ] keep ] keep
     query>> [ over [ "query" ] dip set-at ] when*
     [ cmd-collection ] dip <mdb-query-msg> find-one 
-    [ check-ok ] keep '[ "n" _ at >fixnum ] [ f ] if ;
+    [ check-ok nip ] keep '[ "n" _ at >fixnum ] [ f ] if ;
 
 : lasterror ( -- error )
     cmd-collection H{ { "getlasterror" 1 } } <mdb-query-msg>
@@ -180,8 +179,8 @@ GENERIC: validate. ( collection -- )
 M: string validate.
     [ cmd-collection ] dip
     "validate" H{ } clone [ set-at ] keep
-    <mdb-query-msg> find-one [ check-ok ] keep
-    '[ "result" _ at print ] when ;
+    <mdb-query-msg> find-one [ check-ok nip ] keep
+    '[ "result" _ at print ] [  ] if ;
 M: mdb-collection validate.
     name>> validate. ;
 

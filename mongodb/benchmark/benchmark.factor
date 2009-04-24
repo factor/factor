@@ -1,6 +1,7 @@
 USING: calendar math fry kernel assocs math.ranges bson.reader io.streams.byte-array
 sequences formatting combinators namespaces io tools.time prettyprint io.encodings.binary
-accessors words mongodb.driver strings math.parser tools.walker bson.writer ;
+accessors words mongodb.driver strings math.parser tools.walker bson.writer
+tools.continuations ;
 
 IN: mongodb.benchmark
 
@@ -106,25 +107,25 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 : set-doc ( name -- )
     [ result ] dip '[ _ >>doc ] change ; inline
 
-: small-doc ( -- )
-    "small" set-doc ; inline
+: small-doc ( -- quot )
+    "small" set-doc [ ] ; inline
 
-: medium-doc ( -- )
-    "medium" set-doc ; inline
+: medium-doc ( -- quot )
+    "medium" set-doc [ ] ; inline
 
-: large-doc ( -- )
-    "large" set-doc ; inline
+: large-doc ( -- quot )
+    "large" set-doc [ ] ; inline
 
 : small-doc-prepare ( -- quot: ( i -- doc ) )
-    small-doc
-    '[ "x" DOC-SMALL clone [ set-at ] keep ] ; inline
+    small-doc drop
+    '[ "x" DOC-SMALL clone [ set-at ] keep ] ; 
 
 : medium-doc-prepare ( -- quot: ( i -- doc ) )
-    medium-doc
-    '[ "x" DOC-MEDIUM clone [ set-at ] keep ] ; inline
+    medium-doc drop
+    '[ "x" DOC-MEDIUM clone [ set-at ] keep ] ; 
 
 : large-doc-prepare ( -- quot: ( i -- doc ) )
-    large-doc
+    large-doc drop
     [ "x" DOC-LARGE clone [ set-at ] keep 
        [ now "access-time" ] dip
        [ set-at ] keep ] ;
@@ -132,36 +133,36 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 : (insert) ( quot: ( i -- doc ) collection -- )
     [ trial-size ] 2dip
     '[ _ call( i -- doc ) [ _ ] dip
-       result get lasterror>> [ save ] [ save-unsafe ] if ] each-integer ; inline
+       result get lasterror>> [ save ] [ save-unsafe ] if ] each-integer ; 
 
 : (prepare-batch) ( i b quot: ( i -- doc ) -- batch-seq )
     [ [ * ] keep 1 range boa ] dip
-    '[ _ call( i -- doc ) ] map ; inline
+    '[ _ call( i -- doc ) ] map ; 
 
 : (insert-batch) ( quot: ( i -- doc ) collection -- )
     [ trial-size batch-size [ / ] keep ] 2dip
     '[ _ _ (prepare-batch) [ _ ] dip
        result get lasterror>> [ save ] [ save-unsafe ] if
-    ] each-integer ; inline
+    ] each-integer ; 
 
 : bchar ( boolean -- char )
-    [ "t" ] [ "f" ] if ; inline
+    [ "t" ] [ "f" ] if ; inline 
 
 : collection-name ( -- collection )
     collection "benchmark" get*
     result get doc>>
     result get index>> bchar
     "%s-%s-%s" sprintf
-    [ [ result get ] dip >>collection drop ] keep ; inline
+    [ [ result get ] dip >>collection drop ] keep ; 
     
 : prepare-collection ( -- collection )
     collection-name
     [ "_x_idx" drop-index ] keep
     [ drop-collection ] keep
-    [ create-collection ] keep ; inline
+    [ create-collection ] keep ; 
 
 : prepare-index ( collection -- )
-    "_x_idx" H{ { "x" 1 } } ensure-index ; inline
+    "_x_idx" H{ { "x" 1 } } ensure-index ; 
 
 : insert ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
     prepare-collection
@@ -170,14 +171,14 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     [ '[ _ _ (insert-batch) ] ] [ '[ _ _ (insert) ] ] if ;
 
 : serialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
-    '[ trial-size [ _ call( i -- doc ) assoc>bv drop ] each-integer ] ; inline
+    '[ trial-size [ _ call( i -- doc ) assoc>bv drop ] each-integer ] ; 
 
 : deserialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
     [ 0 ] dip call( i -- doc ) assoc>bv
-    '[ trial-size [  _ binary [ H{ } stream>assoc 2drop ] with-byte-reader ] times ] ; inline
+    '[ trial-size [  _ binary [ H{ } stream>assoc 2drop ] with-byte-reader ] times ] ; 
 
 : check-for-key ( assoc key -- )
-    CHECK-KEY [ swap key? [ "ups... where's the key" throw ] unless ] [ 2drop ] if ; inline
+    CHECK-KEY [ swap key? [ "ups... where's the key" throw ] unless ] [ 2drop ] if ; 
 
 : (check-find-result) ( result -- )
     "x" check-for-key ; inline
@@ -185,24 +186,28 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 : (find) ( cursor -- )
     [ find [ (check-find-result) ] each (find) ] when* ; inline recursive
 
-: find-one ( -- quot: ( -- ) )
+: find-one ( quot -- quot: ( -- ) )
+    drop
     [ trial-size
       collection-name
       trial-size 2 / "x" H{ } clone [ set-at ] keep
       '[ _ _ <query> 1 limit (find) ] times ] ;
   
-: find-all ( -- quot: ( -- ) )
-      collection-name
-      H{ } clone
-      '[ _ _ <query> (find) ] ;
+: find-all ( quot -- quot: ( -- ) )
+    drop
+    collection-name
+    H{ } clone
+    '[ _ _ <query> (find) ] ;
   
-: find-range ( -- quot: ( -- ) )
+: find-range ( quot -- quot: ( -- ) )
+    break
+    drop
     [ trial-size batch-size /i
        collection-name
        trial-size 2 / "$gt" H{ } clone [ set-at ] keep
        [ trial-size 2 / batch-size + "$lt" ] dip [ set-at ] keep
        "x" H{ } clone [ set-at ] keep
-       '[ _ _ <query> find [ "x" check-for-key ] each drop ] times ] ;
+       '[ _ _ <query> (find) ] times ] ;
 
 : batch ( -- )
     result [ t >>batch ] change ; inline
@@ -221,7 +226,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
       trial-size ] dip
     1000000 / /i
     "%-18s: {batch:%s,index:%s;errchk:%s} %10s docs/s"
-    sprintf print flush ; inline
+    sprintf print flush ; 
 
 : print-separator ( -- )
     "----------------------------------------------------------------" print flush ; inline
@@ -236,45 +241,44 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     sprintf print flush
     print-separator-bold ;
 
-: with-result ( quot: ( -- ) -- )
-    [ <result> ] prepose
-    [ print-result ] compose with-scope ; inline
+: with-result ( options quot -- )
+    '[ <result> _ call( options -- time ) print-result ] with-scope ; 
 
 : [bench-quot] ( feat-seq op-word -- quot: ( doc-word -- ) )
     '[ _ swap _
-       '[ [ [ _ execute( -- quot: ( i -- doc ) ) ] dip
-          [ execute( -- ) ] each _ execute( -- quot: ( -- ) ) benchmark ] with-result ] each
-       print-separator ] ; inline
+       '[ [ [ _ execute( -- quot ) ] dip
+          [ execute( -- ) ] each _ execute( quot -- quot ) benchmark ] with-result ] each
+       print-separator ] ; 
 
 : run-serialization-bench ( doc-word-seq feat-seq -- )
     "Serialization Tests" print
     print-separator-bold
-    \ serialize [bench-quot] each ; inline
+    \ serialize [bench-quot] '[ _ call( doc-word -- ) ] each ; 
 
 : run-deserialization-bench ( doc-word-seq feat-seq -- )
     "Deserialization Tests" print
     print-separator-bold
-    \ deserialize [bench-quot] each ; inline
+    \ deserialize [bench-quot] '[ _ call( doc-word -- ) ] each ; 
     
 : run-insert-bench ( doc-word-seq feat-seq -- )
     "Insert Tests" print
     print-separator-bold 
-    \ insert [bench-quot] each ; inline
+    \ insert [bench-quot] '[ _ call( doc-word -- ) ] each ; 
 
 : run-find-one-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-One" print
     print-separator-bold
-    \ find-one [bench-quot] each ; inline
+    \ find-one [bench-quot] '[ _ call( doc-word -- ) ] each ; 
 
 : run-find-all-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-All" print
     print-separator-bold
-    \ find-all [bench-quot] each ; inline
+    \ find-all [bench-quot] '[ _ call( doc-word -- ) ] each ; 
 
 : run-find-range-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-Range" print
     print-separator-bold
-    \ find-range [bench-quot] each ; inline
+    \ find-range [bench-quot] '[ _ call( doc-word -- ) ] each ; 
 
     
 : run-benchmarks ( -- )

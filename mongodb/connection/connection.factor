@@ -19,8 +19,9 @@ TUPLE: mdb-connection instance node handle remote local ;
 
 CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
 
-: check-ok ( result -- ? )
-     [ "ok" ] dip at >integer 1 =  ; inline 
+: check-ok ( result -- errmsg ? )
+    [ [ "errmsg" ] dip at ] 
+    [ [ "ok" ] dip at >integer 1 = ] bi ; inline 
 
 : <mdb-db> ( name nodes -- mdb-db )
     mdb-db new swap >>nodes swap >>name H{ } clone >>collections ;
@@ -87,7 +88,7 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
     
 : perform-authentication ( --  )
     cmd-collection build-auth-query send-query-1result
-    dup check-ok [ drop ] [ [ "errmsg" ] dip at throw ] if ; inline
+    check-ok [ drop ] [ throw ] if ; inline
 
 : authenticate-connection ( mdb-connection -- )
    [ mdb-connection get instance>> auth?
