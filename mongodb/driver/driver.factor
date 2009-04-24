@@ -120,6 +120,9 @@ MEMO: check-collection ( collection -- fq-collection )
     [ [ (ensure-collection) ] keep ] unless
     [ mdb-instance name>> ] dip "%s.%s" sprintf ; inline
 
+: fix-query-collection ( mdb-query -- mdb-query )
+    [ check-collection ] change-collection ; inline
+    
 PRIVATE>
 
 : <query> ( collection query -- mdb-query )
@@ -151,7 +154,7 @@ M: mdb-cursor get-more ( mdb-cursor -- mdb-cursor objects )
 
 GENERIC: find ( mdb-query -- cursor result )
 M: mdb-query-msg find
-    send-query ;
+    fix-query-collection send-query ;
 M: mdb-cursor find
     get-more ;
 
@@ -161,6 +164,7 @@ M: mdb-query-msg explain.
 
 GENERIC: find-one ( mdb-query -- result/f )
 M: mdb-query-msg find-one
+    fix-query-collection 
     1 >>return# send-query-plain objects>>
     dup empty? [ drop f ] [ first ] if ;
 
