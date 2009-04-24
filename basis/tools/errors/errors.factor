@@ -22,7 +22,7 @@ M: source-file-error summary
 
 M: source-file-error error.
     [ summary print nl ]
-    [ "Asset: " write asset>> short. nl ]
+    [ asset>> [ "Asset: " write short. nl ] when* ]
     [ error>> error. ]
     tri ;
 
