@@ -42,13 +42,13 @@ SYMBOL: specialize-method?
 
 t specialize-method? set-global
 
+: method-declaration ( method -- quot )
+    [ "method-generic" word-prop dispatch# object <array> ]
+    [ "method-class" word-prop ]
+    bi prefix [ declare ] curry [ ] like ;
+
 : specialize-method ( quot method -- quot' )
-    [
-        specialize-method? get [
-            [ "method-class" word-prop ] [ "method-generic" word-prop ] bi
-            method-declaration prepend
-        ] [ drop ] if
-    ]
+    [ specialize-method? get [ method-declaration prepend ] [ drop ] if ]
     [ "method-generic" word-prop "specializer" word-prop ] bi
     [ specialize-quot ] when* ;
 
