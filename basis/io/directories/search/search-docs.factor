@@ -41,11 +41,11 @@ HELP: find-all-files
      { "path" "a pathname string" } { "quot" quotation }
      { "paths/f" "a sequence of pathname strings or f" }
 }
-{ $description "Finds all files in the input directory matching the predicate quotation in a breadth-first or depth-first traversal." } ;
+{ $description "Recursively finds all files in the input directory matching the predicate quotation." } ;
 
 HELP: find-all-in-directories
 { $values
-     { "directories" "a sequence of directory paths" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
+     { "directories" "a sequence of directory paths" } { "quot" quotation }
      { "paths/f" "a sequence of pathname strings or f" }
 }
 { $description "Finds all files in the input directories matching the predicate quotation in a breadth-first or depth-first traversal." } ;
