@@ -200,7 +200,6 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     '[ _ _ <query> (find) ] ;
   
 : find-range ( quot -- quot: ( -- ) )
-    break
     drop
     [ trial-size batch-size /i
        collection-name
