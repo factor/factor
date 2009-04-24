@@ -2,34 +2,33 @@ IN: tools.errors
 USING: help.markup help.syntax source-files.errors words io
 compiler.errors ;
 
-ARTICLE: "compiler-errors" "Compiler warnings and errors"
-"After loading a vocabulary, you might see messages like:"
+ARTICLE: "compiler-errors" "Compiler errors"
+"After loading a vocabulary, you might see a message like:"
 { $code
     ":errors - print 2 compiler errors"
-    ":warnings - print 1 compiler warnings"
 }
 "This indicates that some words did not pass the stack checker. Stack checker error conditions are documented in " { $link "inference-errors" } ", and the stack checker itself in " { $link "inference" } "."
 $nl
-"Words to view warnings and errors:"
-{ $subsection :warnings }
+"Words to view errors:"
 { $subsection :errors }
 { $subsection :linkage }
-"Compiler warnings and errors are reported using the " { $link "tools.errors" } " mechanism, and as a result, they are also are shown in the " { $link "ui.tools.error-list" } "." ;
+"Compiler errors are reported using the " { $link "tools.errors" } " mechanism, and as a result, they are also are shown in the " { $link "ui.tools.error-list" } "." ;
 
 HELP: compiler-error
-{ $values { "error" "an error" } { "word" word } }
-{ $description "Saves the error for future persual via " { $link :errors } ", " { $link :warnings } " and " { $link :linkage } "." } ;
+{ $values { "error" compiler-error } { "word" word } }
+{ $description "Saves the error for viewing with " { $link :errors } "." } ;
+
+HELP: linkage-error
+{ $values { "error" linkage-error } { "word" word } }
+{ $description "Saves the error for viewing with " { $link :linkage } "." } ;
 
 HELP: :errors
-{ $description "Prints all serious compiler errors from the most recent compile to " { $link output-stream } "." } ;
-
-HELP: :warnings
-{ $description "Prints all ignorable compiler warnings from the most recent compile to " { $link output-stream } "." } ;
+{ $description "Prints all compiler errors." } ;
 
 HELP: :linkage
-{ $description "Prints all C library interface linkage errors from the most recent compile to " { $link output-stream } "." } ;
+{ $description "Prints all C library interface linkage errors." } ;
 
-{ :errors :warnings :linkage } related-words
+{ :errors :linkage } related-words
 
 HELP: errors.
 { $values { "errors" "a sequence of " { $link source-file-error } " instances" } }
