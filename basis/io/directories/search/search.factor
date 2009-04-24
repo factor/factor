@@ -6,15 +6,20 @@ sequences system vocabs.loader locals math namespaces
 sorting assocs calendar threads ;
 IN: io.directories.search
 
+: qualified-directory-entries ( path -- seq )
+    dup directory-entries
+    [ [ append-path ] change-name ] with map ;
+
+: qualified-directory-files ( path -- seq )
+    dup directory-files [ append-path ] with map ;
+
 <PRIVATE
 
 TUPLE: directory-iterator path bfs queue ;
 
-: qualified-directory ( path -- seq )
-    dup directory-files [ append-path ] with map ;
-
 : push-directory ( path iter -- )
-    [ qualified-directory ] dip '[
+    [ dup directory-entry? [ name>> ] when ] dip
+    [ qualified-directory-entries ] dip '[
         _ [ queue>> ] [ bfs>> ] bi
         [ push-front ] [ push-back ] if
     ] each ;
@@ -25,8 +30,9 @@ TUPLE: directory-iterator path bfs queue ;
 
 : next-file ( iter -- file/f )
     dup queue>> deque-empty? [ drop f ] [
-        dup queue>> pop-back dup link-info directory?
-        [ over push-directory next-file ] [ nip ] if
+        dup queue>> pop-back dup directory?
+        [ over push-directory next-file ]
+        [ nip name>> ] if
     ] if ;
 
 :: iterate-directory ( iter quot: ( obj -- ? ) -- obj )
@@ -70,14 +76,6 @@ ERROR: file-not-found ;
 : find-all-in-directories ( directories bfs? quot: ( obj -- ? ) -- paths/f )
     '[ _ _ find-all-files ] map concat ; inline
 
-: qualified-directory-entries ( path -- seq )
-    directory-entries
-    current-directory get '[ [ _ prepend-path ] change-name ] map ;
-
-: qualified-directory-files ( path -- seq )
-    directory-files
-    current-directory get '[ _ prepend-path ] map ;
-
 : with-qualified-directory-files ( path quot -- )
     '[ "" qualified-directory-files @ ] with-directory ; inline
 
@@ -93,7 +91,7 @@ ERROR: file-not-found ;
     [ name>> dup ] [ directory? ] bi [
         directory-size
     ] [
-        [ link-info size-on-disk>> ] [ drop 0 ] recover
+        [ link-info size-on-disk>> ] [ 2drop 0 ] recover
     ] if ;
 
 : directory-usage ( path -- assoc )
