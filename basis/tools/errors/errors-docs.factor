@@ -1,6 +1,6 @@
 IN: tools.errors
 USING: help.markup help.syntax source-files.errors words io
-compiler.errors ;
+compiler.errors classes ;
 
 ARTICLE: "compiler-errors" "Compiler errors"
 "After loading a vocabulary, you might see a message like:"
@@ -15,11 +15,11 @@ $nl
 "Compiler errors are reported using the " { $link "tools.errors" } " mechanism, and as a result, they are also are shown in the " { $link "ui.tools.error-list" } "." ;
 
 HELP: compiler-error
-{ $values { "error" compiler-error } { "word" word } }
+{ $values { "error" compiler-error } }
 { $description "Saves the error for viewing with " { $link :errors } "." } ;
 
 HELP: linkage-error
-{ $values { "error" linkage-error } { "word" word } }
+{ $values { "error" linkage-error } { "word" word } { "class" class } }
 { $description "Saves the error for viewing with " { $link :linkage } "." } ;
 
 HELP: :errors

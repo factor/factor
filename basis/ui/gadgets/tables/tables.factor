@@ -5,8 +5,8 @@ math.functions math.rectangles math.order math.vectors namespaces
 opengl sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.worlds ui.gestures ui.render ui.pens.solid ui.text
 ui.commands ui.images ui.gadgets.menus ui.gadgets.line-support
-math.rectangles models math.ranges sequences combinators fonts locals
-strings ;
+math.rectangles models math.ranges sequences combinators
+combinators.short-circuit fonts locals strings ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -246,9 +246,6 @@ PRIVATE>
 : update-selected-value ( table -- )
     [ selected-row drop ] [ selected-value>> ] bi set-model ;
 
-: initial-selected-index ( model table -- n/f )
-    [ value>> length 1 >= ] [ selection-required?>> ] bi* and 0 f ? ;
-
 : show-row-summary ( table n -- )
     over nth-row
     [ swap [ renderer>> row-value ] keep show-summary ]
@@ -258,8 +255,28 @@ PRIVATE>
 : hide-mouse-help ( table -- )
     f >>mouse-index [ hide-status ] [ relayout-1 ] bi ;
 
+: find-row-index ( value table -- n/f )
+    [ model>> value>> ] [ renderer>> '[ _ row-value ] map index ] bi ;
+
+: initial-selected-index ( table -- n/f )
+    {
+        [ model>> value>> empty? not ]
+        [ selection-required?>> ]
+        [ drop 0 ]
+    } 1&& ;
+
+: (update-selected-index) ( table -- n/f )
+    [ selected-value>> value>> ] keep over
+    [ find-row-index ] [ 2drop f ] if ;
+
+: update-selected-index ( table -- n/f )
+    {
+        [ (update-selected-index) ]
+        [ initial-selected-index ]
+    } 1|| ;
+
 M: table model-changed
-    [ nip ] [ initial-selected-index ] 2bi {
+    nip dup update-selected-index {
         [ >>selected-index f >>mouse-index drop ]
         [ show-row-summary ]
         [ drop update-selected-value ]
@@ -302,12 +319,16 @@ PRIVATE>
 : table-button-up ( table -- )
     dup row-action? [ row-action ] [ update-selected-value ] if ;
 
+PRIVATE>
+
 : select-row ( table n -- )
     over validate-line
     [ (select-row) ]
     [ drop update-selected-value ]
     [ show-row-summary ]
     2tri ;
+
+<PRIVATE
 
 : prev/next-row ( table n -- )
     [ dup selected-index>> ] dip '[ _ + ] [ 0 ] if* select-row ;
@@ -354,9 +375,9 @@ PRIVATE>
         show-operations-menu
     ] [ drop ] if-mouse-row ;
 
-: focus-table ( table -- ) t >>focused? drop ;
+: focus-table ( table -- ) t >>focused? relayout-1 ;
 
-: unfocus-table ( table -- ) f >>focused? drop ;
+: unfocus-table ( table -- ) f >>focused? relayout-1 ;
 
 table "sundry" f {
     { mouse-enter show-mouse-help }
