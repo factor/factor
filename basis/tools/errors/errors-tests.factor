@@ -6,14 +6,7 @@ DEFER: blah
 [ ] [
     {
         T{ compiler-error
-           { error
-             T{ inference-error
-                f
-                T{ do-not-compile f blah }
-                +compiler-error+
-                blah
-             }
-           }
+           { error T{ do-not-compile f blah } }
            { asset blah }
         }
     } errors.
