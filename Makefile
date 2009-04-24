@@ -35,6 +35,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/data_gc.o \
 	vm/data_heap.o \
 	vm/debug.o \
+	vm/dispatch.o \
 	vm/errors.o \
 	vm/factor.o \
 	vm/image.o \
@@ -182,5 +183,5 @@ vm/ffi_test.o: vm/ffi_test.c
 
 .m.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
-	
+
 .PHONY: factor

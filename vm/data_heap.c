@@ -334,7 +334,7 @@ CELL next_object(void)
 	type = untag_header(value);
 	heap_scan_ptr += untagged_object_size(heap_scan_ptr);
 
-	return RETAG(obj,type <= HEADER_TYPE ? type : OBJECT_TYPE);
+	return RETAG(obj,type < HEADER_TYPE ? type : OBJECT_TYPE);
 }
 
 /* Push object at heap scan cursor and advance; pushes f when done */
