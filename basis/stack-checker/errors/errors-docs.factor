@@ -101,8 +101,6 @@ $nl
 { $subsection recursive-quotation-error }
 { $subsection too-many->r }
 { $subsection too-many-r> }
-{ $subsection missing-effect }
-"Main wrapper for all inference warnings and errors:"
-{ $subsection inference-error } ;
+{ $subsection missing-effect } ;
 
 ABOUT: "inference-errors"
