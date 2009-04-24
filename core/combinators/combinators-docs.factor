@@ -198,6 +198,8 @@ ARTICLE: "booleans" "Booleans"
 "In Factor, any object that is not " { $link f } " has a true value, and " { $link f } " has a false value. The " { $link t } " object is the canonical true value."
 { $subsection f }
 { $subsection t }
+"A union class of the above:"
+{ $subsection boolean }
 "There are some logical operations on booleans:"
 { $subsection >boolean }
 { $subsection not }
