@@ -24,7 +24,7 @@ IN: io.directories.search
 TUPLE: directory-iterator path bfs queue ;
 
 : push-directory-entries ( path iter -- )
-    [ qualified-directory-entries ] dip '[
+    [ [ qualified-directory-entries ] [ 2drop f ] recover ] dip '[
         _ [ queue>> ] [ bfs>> ] bi
         [ push-front ] [ push-back ] if
     ] each ;
@@ -70,16 +70,12 @@ PRIVATE>
     [ ] accumulator [ each-directory-entry ] dip ;
 
 : find-file ( path bfs? quot -- path/f )
-    '[
-        _ _ _ [ <directory-iterator> ] dip
-        [ keep and ] curry iterate-directory
-    ] [ drop f ] recover ;
+    [ <directory-iterator> ] dip
+    [ keep and ] curry iterate-directory ;
 
 : find-all-files ( path quot -- paths/f )
-    '[
-        _ _ [ f <directory-iterator> ] dip
-        pusher [ [ f ] compose iterate-directory drop ] dip
-    ] [ drop f ] recover ;
+    [ f <directory-iterator> ] dip pusher
+    [ [ f ] compose iterate-directory drop ] dip ;
 
 ERROR: file-not-found path bfs? quot ;
 
