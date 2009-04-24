@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.order math.vectors sequences ;
+USING: arrays kernel math math.order math.vectors
+sequences sequences.private accessors columns ;
 IN: math.matrices
 
 ! Matrices

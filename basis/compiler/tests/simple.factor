@@ -3,8 +3,6 @@ sequences.private math.private math combinators strings alien
 arrays memory vocabs parser eval ;
 IN: compiler.tests
 
-\ (compile) must-infer
-
 ! Test empty word
 [ ] [ [ ] compile-call ] unit-test
 

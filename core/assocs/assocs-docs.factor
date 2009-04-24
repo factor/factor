@@ -361,8 +361,7 @@ HELP: inc-at
 
 HELP: >alist
 { $values { "assoc" assoc } { "newassoc" "an array of key/value pairs" } }
-{ $contract "Converts an associative structure into an association list." }
-{ $notes "The " { $link assoc } " mixin has a default implementation for this generic word which constructs the association list by iterating over the assoc with " { $link assoc-find } "." } ;
+{ $contract "Converts an associative structure into an association list." } ;
 
 HELP: assoc-clone-like
 { $values

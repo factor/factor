@@ -28,10 +28,6 @@ T{ foo-gadget } <toolbar> "t" set
     } <radio-buttons> "religion" set
 ] unit-test
 
-\ <radio-buttons> must-infer
-
-\ <checkbox> must-infer
-
 [ 0 ] [
     "religion" get gadget-child value>>
 ] unit-test

@@ -4,7 +4,7 @@ io.backend.windows io.files.windows io.encodings.utf16n windows
 windows.kernel32 kernel libc math threads system environment
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.short-circuit ascii splitting alien strings assocs
-namespaces make accessors tr windows.time ;
+namespaces make accessors tr windows.time windows.shell32 ;
 IN: io.files.windows.nt
 
 M: winnt cwd
@@ -58,4 +58,9 @@ M: winnt open-append
     [ dup windows-file-size ] [ drop 0 ] recover
     [ (open-append) ] dip >>ptr ;
 
-M: winnt home "USERPROFILE" os-env ;
+M: winnt home
+    {
+        [ "HOMEDRIVE" os-env "HOMEPATH" os-env append-path ]
+        [ "USERPROFILE" os-env ]
+        [ my-documents ]
+    } 0|| ;

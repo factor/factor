@@ -104,5 +104,3 @@ dup layout
     model>> dependencies>> [ range-max value>> ] map
     { 0 0 } =
 ] unit-test
-
-\ <scroller> must-infer

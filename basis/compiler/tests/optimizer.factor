@@ -261,7 +261,7 @@ USE: binary-search.private
 : lift-loop-tail-test-2 ( -- a b c )
     10 [ ] lift-loop-tail-test-1 1 2 3 ;
 
-\ lift-loop-tail-test-2 must-infer
+\ lift-loop-tail-test-2 def>> must-infer
 
 [ 1 2 3 ] [ lift-loop-tail-test-2 ] unit-test
 
@@ -302,8 +302,8 @@ HINTS: recursive-inline-hang-3 array ;
 
 : member-test ( obj -- ? ) { + - * / /i } member? ;
 
-\ member-test must-infer
-[ ] [ \ member-test build-tree-from-word optimize-tree drop ] unit-test
+\ member-test def>> must-infer
+[ ] [ \ member-test build-tree optimize-tree drop ] unit-test
 [ t ] [ \ + member-test ] unit-test
 [ f ] [ \ append member-test ] unit-test
 
@@ -325,7 +325,7 @@ PREDICATE: list < improper-list
     dup "a" get { array-capacity } declare >=
     [ dup "b" get { array-capacity } declare >= [ 3 ] [ 4 ] if ] [ 5 ] if ;
 
-\ interval-inference-bug must-infer
+[ t ] [ \ interval-inference-bug optimized>> ] unit-test
 
 [ ] [ 1 "a" set 2 "b" set ] unit-test
 [ 2 3 ] [ 2 interval-inference-bug ] unit-test

@@ -43,8 +43,8 @@ IN: locals.tests
 
 [ { 1 2 } ] [ 2 let-test-4 ] unit-test
 
-:: let-test-5 ( a -- b )
-    a [let | a [ ] b [ ] | a b 2array ] ;
+:: let-test-5 ( a b -- b )
+    a b [let | a [ ] b [ ] | a b 2array ] ;
 
 [ { 2 1 } ] [ 1 2 let-test-5 ] unit-test
 
@@ -129,7 +129,8 @@ write-test-2 "q" set
 SYMBOL: a
 
 :: use-test ( a b c -- a b c )
-    USE: kernel ;
+    USE: kernel
+    a b c ;
 
 [ t ] [ a symbol? ] unit-test
 
@@ -171,9 +172,9 @@ M:: string lambda-generic ( a b -- c ) a b lambda-generic-2 ;
 
 [ ] [ \ lambda-generic see ] unit-test
 
-:: unparse-test-1 ( a -- ) [let | a! [ ] | ] ;
+:: unparse-test-1 ( a -- ) [let | a! [ 3 ] | ] ;
 
-[ "[let | a! [ ] | ]" ] [
+[ "[let | a! [ 3 ] | ]" ] [
     \ unparse-test-1 "lambda" word-prop body>> first unparse
 ] unit-test
 
@@ -286,7 +287,7 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
         { [ a b > ] [ 5 ] }
     } cond ;
 
-\ cond-test must-infer
+\ cond-test def>> must-infer
 
 [ 3 ] [ 1 2 cond-test ] unit-test
 [ 4 ] [ 2 2 cond-test ] unit-test
@@ -295,7 +296,7 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 :: 0&&-test ( a -- ? )
     { [ a integer? ] [ a even? ] [ a 10 > ] } 0&& ;
 
-\ 0&&-test must-infer
+\ 0&&-test def>> must-infer
 
 [ f ] [ 1.5 0&&-test ] unit-test
 [ f ] [ 3 0&&-test ] unit-test
@@ -305,7 +306,7 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 :: &&-test ( a -- ? )
     { [ a integer? ] [ a even? ] [ a 10 > ] } && ;
 
-\ &&-test must-infer
+\ &&-test def>> must-infer
 
 [ f ] [ 1.5 &&-test ] unit-test
 [ f ] [ 3 &&-test ] unit-test
@@ -321,7 +322,7 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
         ]
     ] ;
 
-\ let-and-cond-test-1 must-infer
+\ let-and-cond-test-1 def>> must-infer
 
 [ 20 ] [ let-and-cond-test-1 ] unit-test
 
@@ -332,7 +333,7 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
         ]
     ] ;
 
-\ let-and-cond-test-2 must-infer
+\ let-and-cond-test-2 def>> must-infer
 
 [ { 10 20 } ] [ let-and-cond-test-2 ] unit-test
 
@@ -388,7 +389,7 @@ ERROR: punned-class x ;
         { 5 [ a a ^ ] }
     } case ;
 
-\ big-case-test must-infer
+\ big-case-test def>> must-infer
 
 [ 9 ] [ 3 big-case-test ] unit-test
 
@@ -400,7 +401,7 @@ ERROR: punned-class x ;
         [| x | x 12 + { "howdy" } nth ]
     } case ;
 
-\ littledan-case-problem-1 must-infer
+\ littledan-case-problem-1 def>> must-infer
 
 [ "howdy" ] [ -12 \ littledan-case-problem-1 def>> call ] unit-test
 [ "howdy" ] [ -12 littledan-case-problem-1 ] unit-test
@@ -412,7 +413,7 @@ ERROR: punned-class x ;
         [| x | x a - { "howdy" } nth ]
     } case ;
 
-\ littledan-case-problem-2 must-infer
+\ littledan-case-problem-2 def>> must-infer
 
 [ "howdy" ] [ -12 \ littledan-case-problem-2 def>> call ] unit-test
 [ "howdy" ] [ -12 littledan-case-problem-2 ] unit-test
@@ -424,7 +425,7 @@ ERROR: punned-class x ;
         [| x | x a - { "howdy" } nth ]
     } cond ;
 
-\ littledan-cond-problem-1 must-infer
+\ littledan-cond-problem-1 def>> must-infer
 
 [ f ] [ -12 \ littledan-cond-problem-1 def>> call ] unit-test
 [ 4 ] [ 12 \ littledan-cond-problem-1 def>> call ] unit-test
@@ -448,12 +449,12 @@ ERROR: punned-class x ;
 : littledan-case-problem-4 ( a -- b )
     [ 1 + ] littledan-case-problem-3 ;
 
-\ littledan-case-problem-4 must-infer
+\ littledan-case-problem-4 def>> must-infer
 */
 
 GENERIC: lambda-method-forget-test ( a -- b )
 
-M:: integer lambda-method-forget-test ( a -- b ) ;
+M:: integer lambda-method-forget-test ( a -- b ) a ;
 
 [ ] [ [ M\ integer lambda-method-forget-test forget ] with-compilation-unit ] unit-test
 
@@ -467,7 +468,7 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 :: (funny-macro-test) ( obj quot -- ? ) obj { quot } 1&& ; inline
 : funny-macro-test ( n -- ? ) [ odd? ] (funny-macro-test) ;
 
-\ funny-macro-test must-infer
+\ funny-macro-test def>> must-infer
 
 [ t ] [ 3 funny-macro-test ] unit-test
 [ f ] [ 2 funny-macro-test ] unit-test
@@ -483,11 +484,11 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 
 :: FAILdog-1 ( -- b ) { [| c | c ] } ;
 
-\ FAILdog-1 must-infer
+\ FAILdog-1 def>> must-infer
 
 :: FAILdog-2 ( a -- b ) a { [| c | c ] } cond ;
 
-\ FAILdog-2 must-infer
+\ FAILdog-2 def>> must-infer
 
 [ 3 ] [ 3 [| a | \ a ] call ] unit-test
 
@@ -518,7 +519,7 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
         { [ is-integer? ] [ is-even? ] [ >10? ] } &&
     ] ;
 
-\ wlet-&&-test must-infer
+\ wlet-&&-test def>> must-infer
 [ f ] [ 1.5 wlet-&&-test ] unit-test
 [ f ] [ 3 wlet-&&-test ] unit-test
 [ f ] [ 8 wlet-&&-test ] unit-test
@@ -527,13 +528,13 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 : fry-locals-test-1 ( -- n )
     [let | | 6 '[ [let | A [ 4 ] | A _ + ] ] call ] ;
 
-\ fry-locals-test-1 must-infer
+\ fry-locals-test-1 def>> must-infer
 [ 10 ] [ fry-locals-test-1 ] unit-test
 
 :: fry-locals-test-2 ( -- n )
     [let | | 6 '[ [let | A [ 4 ] | A _ + ] ] call ] ;
 
-\ fry-locals-test-2 must-infer
+\ fry-locals-test-2 def>> must-infer
 [ 10 ] [ fry-locals-test-2 ] unit-test
 
 [ 1 ] [ 3 4 [| | '[ [ _ swap - ] call ] call ] call ] unit-test

@@ -3,9 +3,6 @@
 USING: infix.ast infix.parser infix.tokenizer tools.test ;
 IN: infix.parser.tests
 
-\ parse-infix must-infer
-\ build-infix-ast must-infer
-
 [ T{ ast-number { value 1 } } ] [ "1" build-infix-ast ] unit-test
 [ T{ ast-negation f T{ ast-number { value 1 } } } ]
 [ "-1" build-infix-ast ] unit-test

@@ -97,10 +97,8 @@ IN: tools.deploy.shaker
             {
                 "alias"
                 "boa-check"
-                "cannot-infer"
                 "coercer"
                 "combination"
-                "compiled-status"
                 "compiled-generic-uses"
                 "compiled-uses"
                 "constraints"
@@ -116,7 +114,6 @@ IN: tools.deploy.shaker
                 "identities"
                 "if-intrinsics"
                 "infer"
-                "inferred-effect"
                 "inline"
                 "inlined-block"
                 "input-classes"
@@ -267,7 +264,6 @@ IN: tools.deploy.shaker
                 compiler-impl
                 compiler.errors:compiler-errors
                 definition-observers
-                definitions:crossref
                 interactive-vocabs
                 layouts:num-tags
                 layouts:num-types

@@ -86,7 +86,6 @@ unit-test
     drop ;
 
 [ "drop ;" ] [
-    \ blah f "inferred-effect" set-word-prop
     [ \ blah see ] with-string-writer "\n" ?tail drop 6 tail*
 ] unit-test
 
