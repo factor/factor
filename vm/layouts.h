@@ -42,7 +42,7 @@ typedef signed long long s64;
 #define F_TYPE 7
 #define F F_TYPE
 
-#define HEADER_TYPE 7 /* anything less than or equal to this is a tag */
+#define HEADER_TYPE 8 /* anything less than this is a tag */
 
 #define GC_COLLECTED 5 /* See gc.c */
 

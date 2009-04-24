@@ -12,6 +12,7 @@ classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
 combinators locals locals.backend locals.types words.private
 quotations.private combinators.private stack-checker.values
+generic.standard.private
 alien.libraries
 stack-checker.alien
 stack-checker.state
@@ -676,3 +677,5 @@ M: object infer-call*
 \ gc-stats { } { array } define-primitive
 
 \ jit-compile { quotation } { } define-primitive
+
+\ lookup-method { object array } { word } define-primitive

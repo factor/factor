@@ -41,6 +41,7 @@
 #include "callstack.h"
 #include "alien.h"
 #include "quotations.h"
+#include "dispatch.h"
 #include "factor.h"
 #include "utilities.h"
 
