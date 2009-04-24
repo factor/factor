@@ -28,6 +28,7 @@ typedef struct {
 F_GC_STATS gc_stats[MAX_GEN_COUNT];
 u64 cards_scanned;
 u64 decks_scanned;
+u64 card_scan_time;
 CELL code_heap_scans;
 
 /* What generation was being collected when copy_code_heap_roots() was last
