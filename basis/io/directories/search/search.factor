@@ -43,7 +43,8 @@ TUPLE: directory-iterator path bfs queue ;
 
 :: iterate-directory-entries ( iter quot -- directory-entry/f )
     iter next-directory-entry [
-        quot call( obj -- obj ) [ iter quot iterate-directory-entries ] unless*
+        quot call( obj -- obj )
+        [ iter quot iterate-directory-entries ] unless*
     ] [
         f
     ] if* ; inline recursive
@@ -57,8 +58,7 @@ TUPLE: directory-iterator path bfs queue ;
 PRIVATE>
 
 : each-file ( path bfs? quot -- )
-    setup-traversal [ name>> ] prepose
-    iterate-directory-entries drop ; inline
+    setup-traversal iterate-directory drop ;
 
 : each-directory-entry ( path bfs? quot -- )
     setup-traversal iterate-directory-entries drop ;
@@ -87,11 +87,8 @@ ERROR: file-not-found path bfs? quot ;
     3dup find-file dup [ 2nip nip ] [ drop file-not-found ] if ;
 
 : find-in-directories ( directories bfs? quot -- path'/f )
-    '[
-        _ [ _ _ find-file-throws ] attempt-all
-    ] [
-        drop f
-    ] recover ;
+    '[ _ [ _ _ find-file-throws ] attempt-all ]
+    [ drop f ] recover ;
 
 : find-all-in-directories ( directories quot -- paths/f )
     '[ _ find-all-files ] map concat ;
