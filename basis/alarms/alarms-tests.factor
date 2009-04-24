@@ -15,5 +15,3 @@ tools.test threads concurrency.count-downs ;
         [ resume ] curry instant later drop
     ] "test" suspend drop
 ] unit-test
-
-\ alarm-thread-loop must-infer

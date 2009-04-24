@@ -1,5 +1,5 @@
-USING: tools.profiler.private tools.time help.markup help.syntax
-quotations io strings words definitions ;
+USING: tools.profiler.private tools.time tools.crossref
+help.markup help.syntax quotations io strings words definitions ;
 IN: tools.profiler
 
 ARTICLE: "profiler-limitations" "Profiler limitations"
@@ -23,7 +23,7 @@ $nl
 { $subsection vocabs-profile. }
 { $subsection method-profile. }
 { $subsection "profiler-limitations" }
-{ $see-also "ui-profiler" } ;
+{ $see-also "ui.tools.profiler" } ;
 
 ABOUT: "profiling"
 

@@ -43,8 +43,6 @@ WHERE
 
 >>
 
-\ sqsq must-infer
-
 [ 16 ] [ 2 sqsq ] unit-test
 
 <<

@@ -11,8 +11,6 @@ compiler.tree.propagation.info stack-checker.errors
 compiler.tree.checker
 kernel.private ;
 
-\ escape-analysis must-infer
-
 GENERIC: count-unboxed-allocations* ( m node -- n )
 
 : (count-unboxed-allocations) ( m node -- n )

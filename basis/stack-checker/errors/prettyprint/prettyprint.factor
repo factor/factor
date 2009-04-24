@@ -1,18 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel prettyprint io debugger
-sequences assocs stack-checker.errors summary effects make ;
+sequences assocs stack-checker.errors summary effects ;
 IN: stack-checker.errors.prettyprint
 
-M: inference-error summary error>> summary ;
-
-M: inference-error error-help error>> error-help ;
-
-M: inference-error error.
-    [ word>> [ "In word: " write . ] when* ] [ error>> error. ] bi ;
-
 M: literal-expected summary
-    [ "Got a computed value where a " % what>> % " was expected" % ] "" make ;
+    what>> "Got a computed value where a " " was expected" surround ;
 
 M: literal-expected error. summary print ;
 
@@ -25,66 +18,45 @@ M: unbalanced-branches-error error.
     [ [ first pprint-short bl ] [ second effect>string print ] bi ] each ;
 
 M: too-many->r summary
-    drop
-    "Quotation pushes elements on retain stack without popping them" ;
+    drop "Quotation pushes elements on retain stack without popping them" ;
 
 M: too-many-r> summary
-    drop
-    "Quotation pops retain stack elements which it did not push" ;
+    drop "Quotation pops retain stack elements which it did not push" ;
 
 M: missing-effect summary
-    [
-        "The word " %
-        word>> name>> %
-        " must declare a stack effect" %
-    ] "" make ;
+    drop "Missing stack effect declaration" ;
 
 M: effect-error summary
-    [
-        "Stack effect declaration of the word " %
-        word>> name>> % " is wrong" %
-    ] "" make ;
+    drop "Stack effect declaration is wrong" ;
 
-M: recursive-quotation-error error.
-    "The quotation " write
-    quot>> pprint
-    " calls itself." print
-    "Stack effect inference is undecidable when quotation-level recursion is permitted." print ;
+M: recursive-quotation-error summary
+    drop "Recursive quotation" ;
 
 M: undeclared-recursion-error summary
-    drop
-    "Inline recursive words must be declared recursive" ;
+    word>> name>>
+    "The inline recursive word " " must be declared recursive" surround ;
 
 M: diverging-recursion-error summary
-    [
-        "The recursive word " %
-        word>> name>> %
-        " digs arbitrarily deep into the stack" %
-    ] "" make ;
+    word>> name>>
+    "The recursive word " " digs arbitrarily deep into the stack" surround ;
 
 M: unbalanced-recursion-error summary
-    [
-        "The recursive word " %
-        word>> name>> %
-        " leaves with the stack having the wrong height" %
-    ] "" make ;
+    word>> name>>
+    "The recursive word " " leaves with the stack having the wrong height" surround ;
 
 M: inconsistent-recursive-call-error summary
-    [
-        "The recursive word " %
-        word>> name>> %
-        " calls itself with a different set of quotation parameters than were input" %
-    ] "" make ;
+    word>> name>>
+    "The recursive word "
+    " calls itself with a different set of quotation parameters than were input" surround ;
 
 M: unknown-primitive-error summary
-    drop
-    "Cannot determine stack effect statically" ;
+    word>> name>> "The " " word cannot be called from optimized words" surround ;
 
 M: transform-expansion-error summary
-    drop
-    "Compiler transform threw an error" ;
+    word>> name>> "Macro expansion of " " threw an error" surround ;
 
 M: transform-expansion-error error.
-    [ summary print ]
-    [ "Word: " write word>> . nl ]
-    [ error>> error. ] tri ;
+    [ summary print ] [ error>> error. ] bi ;
+
+M: do-not-compile summary
+    word>> name>> "Cannot compile call to " prepend ;

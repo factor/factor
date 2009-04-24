@@ -93,7 +93,7 @@ IN: mason.report
             load-everything-errors-file
             error-dump
 
-            "Compiler warnings and errors"
+            "Compiler errors"
             compiler-errors-file
             compiler-error-messages-file
             error-dump

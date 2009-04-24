@@ -11,9 +11,7 @@ $nl
 { $subsection source-file }
 "Words intended for the parser:"
 { $subsection record-checksum }
-{ $subsection record-form }
-{ $subsection xref-source }
-{ $subsection unxref-source }
+{ $subsection record-definitions }
 "Removing a source file from the database:"
 { $subsection forget-source }
 "Updating the database:"
@@ -40,25 +38,6 @@ HELP: source-file
 HELP: record-checksum
 { $values { "source-file" source-file } { "lines" "a sequence of strings" } }
 { $description "Records the CRC32 checksm of the source file's contents." } 
-$low-level-note ;
-
-HELP: xref-source
-{ $values { "source-file" source-file } }
-{ $description "Adds the source file to the " { $link crossref } " graph enabling words to find source files which reference them in their top level forms." }
-$low-level-note ;
-
-HELP: unxref-source
-{ $values { "source-file" source-file } }
-{ $description "Removes the source file from the " { $link crossref } " graph." }
-$low-level-note ;
-
-HELP: xref-sources
-{ $description "Adds all loaded source files to the " { $link crossref } " graph. This is done during bootstrap." }
-$low-level-note ;
-
-HELP: record-form
-{ $values { "quot" quotation } { "source-file" source-file } }
-{ $description "Records usage information for a source file's top level form." }
 $low-level-note ;
 
 HELP: reset-checksums

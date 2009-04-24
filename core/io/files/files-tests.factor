@@ -4,9 +4,6 @@ io.files io.files.private io.files.temp io.files.unique kernel
 make math sequences system threads tools.test generic.standard ;
 IN: io.files.tests
 
-\ exists? must-infer
-\ (exists?) must-infer
-
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
 
 [ ] [ "append-test" temp-file ascii <file-appender> dispose ] unit-test

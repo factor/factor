@@ -4,7 +4,7 @@ USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
 sequences.private assocs models models.arrow arrays accessors
-generic generic.standard definitions make sbufs ;
+generic generic.standard definitions make sbufs tools.crossref ;
 IN: tools.continuations
 
 <PRIVATE
