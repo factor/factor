@@ -28,7 +28,7 @@ IN: mason.report
         common-report
         _ call( -- xml )
         [XML <html><body><-><-></body></html> XML]
-        pprint-xml
+        write-xml
     ] with-file-writer ; inline
 
 :: failed-report ( error file what -- status )
