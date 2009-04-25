@@ -35,8 +35,8 @@ M: effect pprint* effect>string "(" ")" surround text ;
     name>> "( no name )" or ;
 
 : pprint-word ( word -- )
-    dup record-vocab
-    dup word-name* swap word-style styled-text ;
+    [ record-vocab ]
+    [ [ word-name* ] [ word-style ] bi styled-text ] bi ;
 
 : pprint-prefix ( word quot -- )
     <block swap pprint-word call block> ; inline
@@ -48,11 +48,12 @@ M: word pprint*
     [ pprint-word ] [ ?start-group ] [ ?end-group ] tri ;
 
 M: method-body pprint*
-    <block
-    \ M\ pprint-word
-    [ "method-class" word-prop pprint-word ]
-    [ "method-generic" word-prop pprint-word ] bi
-    block> ;
+    [
+        [
+            [ "M\\ " % "method-class" word-prop word-name* % ]
+            [ " " % "method-generic" word-prop word-name* % ] bi
+        ] "" make
+    ] [ word-style ] bi styled-text ;
 
 M: real pprint* number>string text ;
 

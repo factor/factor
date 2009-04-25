@@ -29,7 +29,7 @@ $nl
 $nl
 "The " { $link compile-word } " word performs the actual task of compiling an individual word. The process proceeds as follows:"
 { $list
-  { "The " { $link frontend } " word calls " { $link build-tree } ". If this fails, the error is passed to " { $link deoptimize } ". The logic for ignoring compile warnings generated for inline words and macros is located here. If the error is not ignorable, it is added to the global " { $link compiler-errors } " assoc (see " { $link "compiler-errors" } ")." }
+  { "The " { $link frontend } " word calls " { $link build-tree } ". If this fails, the error is passed to " { $link deoptimize } ". The logic for ignoring certain compile errors generated for inline words and macros is located here. If the error is not ignorable, it is added to the global " { $link compiler-errors } " assoc (see " { $link "compiler-errors" } ")." }
   { "If the word contains a breakpoint, compilation ends here. Otherwise, all remaining steps execute until machine code is generated. Any further errors thrown by the compiler are not reported as compile errors, but instead are ordinary exceptions. This is because they indicate bugs in the compiler, not errors in user code." }
   { "The " { $link frontend } " word then calls " { $link optimize-tree } ". This produces the final optimized tree IR, and this stage of the compiler is complete." }
   { "The " { $link backend } " word calls " { $link build-cfg } " followed by " { $link optimize-cfg } " and a few other stages. Finally, it calls " { $link save-asm } ", and adds any uncompiled words called by this word to the compilation queue with " { $link compile-dependency } "." }

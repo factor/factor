@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
-combinators deques search-deques macros io source-files.errors stack-checker
-stack-checker.state stack-checker.inlining combinators.short-circuit
-compiler.errors compiler.units compiler.tree.builder
-compiler.tree.optimizer compiler.cfg.builder compiler.cfg.optimizer
-compiler.cfg.linearization compiler.cfg.two-operand
-compiler.cfg.linear-scan compiler.cfg.stack-frame compiler.codegen
-compiler.utilities ;
+combinators deques search-deques macros io source-files.errors
+stack-checker stack-checker.state stack-checker.inlining
+stack-checker.errors combinators.short-circuit compiler.errors
+compiler.units compiler.tree.builder compiler.tree.optimizer
+compiler.cfg.builder compiler.cfg.optimizer compiler.cfg.linearization
+compiler.cfg.two-operand compiler.cfg.linear-scan
+compiler.cfg.stack-frame compiler.codegen compiler.utilities ;
 IN: compiler
 
 SYMBOL: compile-queue
@@ -39,10 +39,10 @@ SYMBOL: compiled
     "trace-compilation" get [ dup name>> print flush ] when
     H{ } clone dependencies set
     H{ } clone generic-dependencies set
-    f swap compiler-error ;
+    clear-compiler-error ;
 
 : ignore-error? ( word error -- ? )
-    #! Ignore warnings on inline combinators, macros, and special
+    #! Ignore some errors on inline combinators, macros, and special
     #! words such as 'call'.
     [
         {
@@ -51,7 +51,12 @@ SYMBOL: compiled
             [ "special" word-prop ]
             [ "no-compile" word-prop ]
         } 1||
-    ] [ error-type +compiler-warning+ eq? ] bi* and ;
+    ] [
+        {
+            [ do-not-compile? ]
+            [ literal-expected? ]
+        } 1||
+    ] bi* and ;
 
 : finish ( word -- )
     #! Recompile callers if the word's stack effect changed, then
@@ -80,10 +85,16 @@ SYMBOL: compiled
     #! non-optimizing compiler, using its definition. Otherwise,
     #! if the compiler error is not ignorable, use a dummy
     #! definition from 'not-compiled-def' which throws an error.
-    2dup ignore-error?
-    [ drop f over def>> ]
-    [ 2dup not-compiled-def ] if
-    [ swap compiler-error ] [ deoptimize-with ] bi-curry* bi ;
+    2dup ignore-error? [
+        drop
+        [ dup def>> deoptimize-with ]
+        [ clear-compiler-error ]
+        bi
+    ] [
+        [ swap <compiler-error> compiler-error ]
+        [ [ drop ] [ not-compiled-def ] 2bi deoptimize-with ]
+        2bi
+    ] if ;
 
 : frontend ( word -- nodes )
     #! If the word contains breakpoints, don't optimize it, since

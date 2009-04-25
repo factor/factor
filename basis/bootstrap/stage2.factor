@@ -68,9 +68,11 @@ SYMBOL: bootstrap-time
     "staging" get "deploy-vocab" get or [
         "stage2: deployment mode" print
     ] [
-        "listener" require
         "debugger" require
+        "alien.prettyprint" require
+        "inspector" require
         "tools.errors" require
+        "listener" require
         "none" require
     ] if
 
