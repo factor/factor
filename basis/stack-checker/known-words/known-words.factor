@@ -12,7 +12,7 @@ classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
 combinators locals locals.backend locals.types words.private
 quotations.private combinators.private stack-checker.values
-generic.standard.private
+generic.single generic.single.private
 alien.libraries
 stack-checker.alien
 stack-checker.state
@@ -235,6 +235,8 @@ M: object infer-call*
 
 \ effective-method t "no-compile" set-word-prop
 \ effective-method subwords [ t "no-compile" set-word-prop ] each
+
+\ execute-unsafe t "no-compile" set-word-prop
 
 \ clear t "no-compile" set-word-prop
 

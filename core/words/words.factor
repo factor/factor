@@ -154,8 +154,15 @@ M: word reset-word
 : reset-generic ( word -- )
     [ subwords forget-all ]
     [ reset-word ]
-    [ { "methods" "combination" "default-method" } reset-props ]
-    tri ;
+    [
+        {
+            "methods"
+            "combination"
+            "default-method"
+            "engines"
+            "decision-tree"
+        } reset-props
+    ] tri ;
 
 : gensym ( -- word )
     "( gensym )" f <word> ;

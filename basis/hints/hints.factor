@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser words definitions kernel sequences assocs arrays
 kernel.private fry combinators accessors vectors strings sbufs
 byte-arrays byte-vectors io.binary io.streams.string splitting math
-math.parser generic generic.standard generic.standard.engines classes
+math.parser generic generic.single generic.standard classes
 hashtables namespaces ;
 IN: hints
 

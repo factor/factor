@@ -2,13 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
-combinators deques search-deques macros io source-files.errors
-stack-checker stack-checker.state stack-checker.inlining
-stack-checker.errors combinators.short-circuit compiler.errors
-compiler.units compiler.tree.builder compiler.tree.optimizer
-compiler.cfg.builder compiler.cfg.optimizer compiler.cfg.linearization
-compiler.cfg.two-operand compiler.cfg.linear-scan
-compiler.cfg.stack-frame compiler.codegen compiler.utilities ;
+generic.single combinators deques search-deques macros io
+source-files.errors stack-checker stack-checker.state
+stack-checker.inlining stack-checker.errors combinators.short-circuit
+compiler.errors compiler.units compiler.tree.builder
+compiler.tree.optimizer compiler.cfg.builder compiler.cfg.optimizer
+compiler.cfg.linearization compiler.cfg.two-operand
+compiler.cfg.linear-scan compiler.cfg.stack-frame compiler.codegen
+compiler.utilities ;
 IN: compiler
 
 SYMBOL: compile-queue
@@ -19,6 +20,7 @@ SYMBOL: compiled
     {
         [ "forgotten" word-prop ]
         [ compiled get key? ]
+        [ single-generic? ]
         [ inlined-block? ]
         [ primitive? ]
     } 1|| not ;
