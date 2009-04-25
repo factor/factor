@@ -161,7 +161,7 @@ USE: tools.walker
           [ query>> "query" selector set-at ]
         } cleave
         selector
-    ] ; inline flushable    
+    ] ;     
 
 PRIVATE>
 

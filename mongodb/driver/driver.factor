@@ -84,9 +84,7 @@ M: mdb-collection create-collection ( mdb-collection -- )
              [ [ size>> "size" ] dip set-at ]
              [ [ max>> "max" ] dip set-at ] 2tri ] when
         ] 2bi
-    ] keep <mdb-query-msg> 1 >>return# send-query-plain
-    objects>> first check-ok
-    [ drop ] [ throw ] if ;
+    ] keep <mdb-query-msg> 1 >>return# send-query-plain drop ;
 
 : load-collection-list ( -- collection-list )
     namespaces-collection
@@ -107,7 +105,7 @@ USE: tools.continuations
       [ [ "name" ] dip at "." split second <mdb-collection> ] map
       over '[ [ ] [ name>> ] bi _ set-at ] each ] [ ] if
     [ dup ] dip key? [ drop ]
-    [ [ ensure-valid-collection-name ] keep create-collection ] if ; inline
+    [ [ ensure-valid-collection-name ] keep create-collection ] if ; 
 
 MEMO: reserved-namespace? ( name -- ? )
     [ "$cmd" = ] [ "system" head? ] bi or ;
@@ -118,7 +116,7 @@ MEMO: check-collection ( collection -- fq-collection )
     [ nip ] [ drop ] if
     [ ] [ reserved-namespace? ] bi
     [ [ (ensure-collection) ] keep ] unless
-    [ mdb-instance name>> ] dip "%s.%s" sprintf ; inline
+    [ mdb-instance name>> ] dip "%s.%s" sprintf ; 
 
 : fix-query-collection ( mdb-query -- mdb-query )
     [ check-collection ] change-collection ; inline

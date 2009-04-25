@@ -15,7 +15,7 @@ TUPLE: state
     [ state new ] dip
     [ clone >>exemplar ] keep
     clone [ >>result ] [ V{ } clone [ push ] keep >>scope ] bi
-    V{ } clone [ T_Object "" element boa swap push ] keep >>element ; inline
+    V{ } clone [ T_Object "" element boa swap push ] keep >>element ; 
 
 PREDICATE: bson-eoo     < integer T_EOO = ;
 PREDICATE: bson-not-eoo < integer T_EOO > ;

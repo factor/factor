@@ -84,7 +84,7 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
     "nonce" get-nonce 2array
     3array >hashtable
     [ [ "nonce" ] dip at calculate-key-digest "key" ] keep
-    [ set-at ] keep ; inline
+    [ set-at ] keep ; 
     
 : perform-authentication ( --  )
     cmd-collection build-auth-query send-query-1result
@@ -137,7 +137,7 @@ PRIVATE>
 : mdb-open ( mdb -- mdb-connection )
     clone [ <mdb-connection> ] keep
     master-node open-connection
-    [ authenticate-connection ] keep ; inline
+    [ authenticate-connection ] keep ; 
 
 : mdb-close ( mdb-connection -- )
      [ dispose f ] change-handle drop ;
