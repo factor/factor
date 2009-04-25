@@ -163,7 +163,10 @@ M: optimizing-compiler recompile ( words -- alist )
     [
         <hashed-dlist> compile-queue set
         H{ } clone compiled set
-        [ queue-compile ] each
+        [
+            [ queue-compile ]
+            [ subwords [ compile-dependency ] each ] bi
+        ] each
         compile-queue get compile-loop
         compiled get >alist
     ] with-scope ;
