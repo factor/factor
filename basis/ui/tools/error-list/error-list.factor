@@ -4,14 +4,14 @@ USING: accessors arrays sequences sorting assocs colors.constants fry
 combinators combinators.smart combinators.short-circuit editors make
 memoize compiler.units fonts kernel io.pathnames prettyprint
 source-files.errors math.parser init math.order models models.arrow
-models.arrow.smart models.search models.mapping models.delay debugger
+models.arrow.smart models.search models.mapping debugger
 namespaces summary locals ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.tables ui.gadgets.labeled ui.gadgets.tracks ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.gadgets.scrollers
 ui.tools.inspector ui.gadgets.status-bar ui.operations
 ui.gadgets.buttons ui.gadgets.borders ui.gadgets.packs
 ui.gadgets.labels ui.baseline-alignment ui.images ui.tools.listener
-compiler.errors calendar tools.errors ;
+compiler.errors tools.errors tools.errors.model ;
 IN: ui.tools.error-list
 
 CONSTANT: source-file-icon
@@ -180,23 +180,9 @@ error-list-gadget "toolbar" f {
     { T{ key-down f f "F1" } error-list-help }
 } define-command-map
 
-SYMBOL: error-list-model
-
-error-list-model [ f <model> ] initialize
-
-SINGLETON: updater
-
-M: updater errors-changed
-    drop f error-list-model get-global set-model ;
-
-[ updater add-error-observer ] "ui.tools.error-list" add-init-hook
-
-: <error-list-model> ( -- model )
-    error-list-model get-global
-    1/2 seconds <delay> [ drop all-errors ] <arrow> ;
-
 : error-list-window ( -- )
-    <error-list-model> <error-list-gadget> "Errors" open-status-window ;
+    error-list-model get [ drop all-errors ] <arrow>
+    <error-list-gadget> "Errors" open-status-window ;
 
 : show-error-list ( -- )
     [ error-list-gadget? ] find-window

@@ -13,7 +13,7 @@ ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.listener.completion ui.tools.listener.popups
-ui.tools.listener.history ui.tools.error-list ui.images ;
+ui.tools.listener.history ui.images ui.tools.error-list tools.errors.model ;
 FROM: source-files.errors => all-errors ;
 IN: ui.tools.listener
 
@@ -187,8 +187,18 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
     [ >>input ] [ pane new-pane t >>scrolls? >>output ] bi
     dup listener-streams >>output drop ;
 
+: error-summary. ( -- )
+    error-counts keys [
+        H{ { table-gap { 3 3 } } } [
+            [ [ [ icon>> write-image ] with-cell ] each ] with-row
+        ] tabular-output
+        { "Press " { $command tool "common" show-error-list } " to view errors." }
+        print-element
+    ] unless-empty ;
+
 : <error-summary> ( -- gadget )
-    <pane> COLOR: light-yellow <solid> >>interior ;
+    error-list-model get [ drop error-summary. ] <pane-control>
+        COLOR: light-yellow <solid> >>interior ;
 
 : init-error-summary ( listener -- listener )
     <error-summary> >>error-summary
@@ -366,22 +376,11 @@ interactor "completion" f {
     { T{ key-down f { C+ } "r" } history-completion-popup }
 } define-command-map
 
-: error-summary. ( listener -- )
-    error-summary>> [
-        error-counts keys [
-            H{ { table-gap { 3 3 } } } [
-                [ [ [ icon>> write-image ] with-cell ] each ] with-row
-            ] tabular-output
-            { "Press " { $command tool "common" show-error-list } " to view errors." }
-            print-element
-        ] unless-empty
-    ] with-pane ;
-
 : listener-thread ( listener -- )
     dup listener-streams [
         [ com-browse ] help-hook set
-        [ '[ [ _ input>> ] 2dip debugger-popup ] error-hook set ]
-        [ '[ _ error-summary. ] error-summary-hook set ] bi
+        '[ [ _ input>> ] 2dip debugger-popup ] error-hook set
+        error-summary? off
         tip-of-the-day. nl
         listener
     ] with-streams* ;

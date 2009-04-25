@@ -69,12 +69,9 @@ PRIVATE>
         [ nth-prime primes-upto ]
     } cond product ;
 
-: (primorial-upto) ( count limit -- m )
-    '[ dup primorial _ <= ] [ 1+ dup primorial ] produce
-    nip penultimate ;
-
 : primorial-upto ( limit -- m )
-    1 swap (primorial-upto) ;
+    1 swap '[ dup primorial _ <= ] [ 1+ dup primorial ] produce
+    nip penultimate ;
 
 PRIVATE>
 

@@ -110,7 +110,7 @@ HELP: save-location
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
 HELP: parser-notes
-{ $var-description "A boolean controlling whether the parser will print various notes and warnings. Switched on by default. If a source file is being run for its effect on " { $link output-stream } ", this variable should be switched off, to prevent parser notes from polluting the output." } ;
+{ $var-description "A boolean controlling whether the parser will print various notes. Switched on by default. If a source file is being run for its effect on " { $link output-stream } ", this variable should be switched off, to prevent parser notes from polluting the output." } ;
 
 HELP: parser-notes?
 { $values { "?" "a boolean" } }
@@ -260,7 +260,7 @@ HELP: forget-smudged
 
 HELP: finish-parsing
 { $values { "lines" "the lines of text just parsed" } { "quot" "the quotation just parsed" } }
-{ $description "Records information to the current " { $link file } " and prints warnings about any removed definitions which are still in use." }
+{ $description "Records information to the current " { $link file } "." }
 { $notes "This is one of the factors of " { $link parse-stream } "." } ;
 
 HELP: parse-stream
