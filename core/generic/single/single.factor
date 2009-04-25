@@ -1,12 +1,65 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes.algebra math combinators
-generic.standard.engines hashtables kernel kernel.private layouts
-namespaces sequences words sorting quotations effects
-generic.standard.private words.private ;
-IN: generic.standard.compiler
+USING: accessors arrays assocs classes classes.algebra
+combinators definitions generic hashtables kernel
+kernel.private layouts make math namespaces quotations
+sequences words generic.single.private words.private
+effects ;
+IN: generic.single
+
+ERROR: no-method object generic ;
+
+ERROR: inconsistent-next-method class generic ;
+
+TUPLE: single-combination ;
+
+PREDICATE: single-generic < generic
+    "combination" word-prop single-combination? ;
+
+GENERIC: dispatch# ( word -- n )
+
+M: generic dispatch# "combination" word-prop dispatch# ;
+
+SYMBOL: assumed
+SYMBOL: default
+SYMBOL: generic-word
+SYMBOL: combination
+
+: with-combination ( combination quot -- )
+    [ combination ] dip with-variable ; inline
+
+HOOK: picker combination ( -- quot )
+
+M: single-combination next-method-quot*
+    [
+        2dup next-method dup [
+            [
+                pick "predicate" word-prop %
+                1quotation ,
+                [ inconsistent-next-method ] 2curry ,
+                \ if ,
+            ] [ ] make picker prepend
+        ] [ 3drop f ] if
+    ] with-combination ;
+
+: single-effective-method ( obj word -- method )
+    [ [ order [ instance? ] with find-last nip ] keep method ]
+    [ "default-method" word-prop ]
+    bi or ;
+
+M: single-generic effective-method
+    [ [ picker ] with-combination call ] keep single-effective-method ;
+
+M: single-combination make-default-method
+    combination [ [ picker ] dip [ no-method ] curry append ] with-variable ;
 
 ! ! ! Build an engine ! ! !
+
+: find-default ( methods -- default )
+    #! Side-effects methods.
+    [ object bootstrap-word ] dip delete-at* [
+        drop generic-word get "default-method" word-prop
+    ] unless ;
 
 ! 1. Flatten methods
 TUPLE: predicate-engine methods ;
@@ -28,6 +81,10 @@ TUPLE: predicate-engine methods ;
     H{ } clone [ [ flatten-method ] curry assoc-each ] keep ;
 
 ! 2. Convert methods
+: split-methods ( assoc class -- first second )
+    [ [ nip class<= not ] curry assoc-filter ]
+    [ [ nip class<=     ] curry assoc-filter ] 2bi ;
+
 : convert-methods ( assoc class word -- assoc' )
     over [ split-methods ] 2dip pick assoc-empty?
     [ 3drop ] [ [ execute ] dip pick set-at ] if ; inline
@@ -76,10 +133,6 @@ C: <tag-dispatch-engine> tag-dispatch-engine
     <tag-dispatch-engine> ;
 
 ! ! ! Compile engine ! ! !
-SYMBOL: assumed
-SYMBOL: default
-SYMBOL: generic-word
-
 GENERIC: compile-engine ( engine -- obj )
 
 : compile-engines ( assoc -- assoc' )
@@ -98,8 +151,7 @@ M: tag-dispatch-engine compile-engine
 
 : hi-tag-number ( class -- n ) "type" word-prop ;
 
-: num-hi-tags ( -- n )
-    num-types get num-tags get - ;
+: num-hi-tags ( -- n ) num-types get num-tags get - ;
 
 M: hi-tag-dispatch-engine compile-engine
     methods>> compile-engines*
@@ -123,8 +175,8 @@ M: tuple-dispatch-engine compile-engine
 : sort-methods ( assoc -- assoc' )
     >alist [ keys sort-classes ] keep extract-keys ;
 
-: literalize-methods ( assoc -- assoc' )
-    [ [ ] curry \ drop prefix ] assoc-map ;
+: quote-methods ( assoc -- assoc' )
+    [ 1quotation \ drop prefix ] assoc-map ;
 
 : methods-with-default ( engine -- assoc )
     methods>> clone default get object bootstrap-word pick set-at ;
@@ -141,34 +193,49 @@ M: tuple-dispatch-engine compile-engine
     } cond ;
 
 : class-predicates ( assoc -- assoc )
-    [ [ "predicate" word-prop picker prepend ] dip ] assoc-map ;
+    [ [ "predicate" word-prop [ dup ] prepend ] dip ] assoc-map ;
 
-: predicate-engine-effect ( -- effect )
-    (dispatch#) get 1+ dup 1+ <effect> ;
+PREDICATE: predicate-engine-word < word "owner-generic" word-prop ;
+
+: <predicate-engine-word> ( -- word )
+    generic-word get name>> "/predicate-engine" append f <word>
+    dup generic-word get "owner-generic" set-word-prop ;
+
+M: predicate-engine-word stack-effect "owner-generic" word-prop stack-effect ;
 
 : define-predicate-engine ( alist -- word )
-    [ generic-word get name>> "/predicate-engine" append f <word> dup ] dip
-    predicate-engine-effect define-declared ;
+    [ <predicate-engine-word> ] dip
+    [ define ] [ drop generic-word get "engines" word-prop push ] [ drop ] 2tri ;
 
 M: predicate-engine compile-engine
     methods-with-default
     sort-methods
-    literalize-methods
+    quote-methods
     prune-redundant-predicates
     class-predicates
-    [ peek wrapped>> ]
-    [ alist>quot picker prepend define-predicate-engine ] if-empty ;
+    [ peek ] [ alist>quot picker prepend define-predicate-engine ] if-empty ;
 
 M: word compile-engine ;
 
 M: f compile-engine ;
 
-: build-engine ( generic combination -- engine )
-    [
-        #>> (dispatch#) set
+: build-decision-tree ( generic -- methods )
+    {
         [ generic-word set ]
-        [ "default-method" word-prop default set ]
-        [ "methods" word-prop ] tri
-        <engine> compile-engine 1quotation
-        picker [ lookup-method ] surround
-    ] with-scope ;
+        [ "engines" word-prop forget-all ]
+        [ V{ } clone "engines" set-word-prop ]
+        [
+            "methods" word-prop clone
+            [ find-default default set ]
+            [ <engine> compile-engine ] bi
+        ]
+    } cleave ;
+
+: execute-unsafe ( word -- ) (execute) ;
+
+M: single-combination perform-combination
+    [
+        dup build-decision-tree
+        [ "decision-tree" set-word-prop ]
+        [ 1quotation picker [ lookup-method execute-unsafe ] surround define ] 2bi
+    ] with-combination ;

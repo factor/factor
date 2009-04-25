@@ -69,7 +69,7 @@ bootstrapping? on
     "classes.predicate"
     "compiler.units"
     "continuations.private"
-    "generic.standard.private"
+    "generic.single.private"
     "growable"
     "hashtables"
     "hashtables.private"
@@ -533,7 +533,7 @@ tuple
     { "jit-compile" "quotations" (( quot -- )) }
     { "load-locals" "locals.backend" (( ... n -- )) }
     { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
-    { "lookup-method" "generic.standard.private" (( object methods -- method )) }
+    { "lookup-method" "generic.single.private" (( object methods -- method )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number
