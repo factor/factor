@@ -39,55 +39,55 @@ TUPLE: directory-iterator path bfs queue ;
         dup directory?
         [ name>> over push-directory-entries next-directory-entry ]
         [ nip ] if
-    ] if ; recursive
+    ] if ;
 
-:: iterate-directory-entries ( iter quot -- directory-entry/f )
+:: iterate-directory-entries ( iter quot: ( obj -- obj ) -- directory-entry/f )
     iter next-directory-entry [
-        quot call( obj -- obj )
+        quot call
         [ iter quot iterate-directory-entries ] unless*
     ] [
         f
     ] if* ; inline recursive
 
 : iterate-directory ( iter quot -- path/f )
-    [ name>> ] prepose iterate-directory-entries ;
+    [ name>> ] prepose iterate-directory-entries ; inline
 
 : setup-traversal ( path bfs quot -- iterator quot' )
-    [ <directory-iterator> ] dip [ f ] compose ;
+    [ <directory-iterator> ] dip [ f ] compose ; inline
 
 PRIVATE>
 
 : each-file ( path bfs? quot -- )
-    setup-traversal iterate-directory drop ;
+    setup-traversal iterate-directory drop ; inline
 
 : each-directory-entry ( path bfs? quot -- )
-    setup-traversal iterate-directory-entries drop ;
+    setup-traversal iterate-directory-entries drop ; inline
 
 : recursive-directory-files ( path bfs? -- paths )
-    [ ] accumulator [ each-file ] dip ;
+    [ ] accumulator [ each-file ] dip ; inline
 
-: recursive-directory-entries ( path bfs? -- paths )
-    [ ] accumulator [ each-directory-entry ] dip ;
+: recursive-directory-entries ( path bfs? -- directory-entries )
+    [ ] accumulator [ each-directory-entry ] dip ; inline
 
 : find-file ( path bfs? quot -- path/f )
     [ <directory-iterator> ] dip
-    [ keep and ] curry iterate-directory ;
+    [ keep and ] curry iterate-directory ; inline
 
 : find-all-files ( path quot -- paths/f )
     [ f <directory-iterator> ] dip pusher
-    [ [ f ] compose iterate-directory drop ] dip ;
+    [ [ f ] compose iterate-directory drop ] dip ; inline
 
 ERROR: file-not-found path bfs? quot ;
 
 : find-file-throws ( path bfs? quot -- path )
-    3dup find-file dup [ 2nip nip ] [ drop file-not-found ] if ;
+    3dup find-file dup [ 2nip nip ] [ drop file-not-found ] if ; inline
 
 : find-in-directories ( directories bfs? quot -- path'/f )
     '[ _ [ _ _ find-file-throws ] attempt-all ]
-    [ drop f ] recover ;
+    [ drop f ] recover ; inline
 
 : find-all-in-directories ( directories quot -- paths/f )
-    '[ _ find-all-files ] map concat ;
+    '[ _ find-all-files ] map concat ; inline
 
 : link-size/0 ( path -- n )
     [ link-info size-on-disk>> ] [ 2drop 0 ] recover ;
