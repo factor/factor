@@ -6,7 +6,7 @@ combinators math.ranges unicode.categories byte-arrays
 io.encodings.string io.encodings.utf16 assocs math.parser
 combinators.short-circuit fry namespaces combinators.smart
 splitting io.encodings.ascii arrays io.files.info unicode.case
-io.directories.search literals math.functions ;
+io.directories.search literals math.functions continuations ;
 IN: id3
 
 <PRIVATE
@@ -205,7 +205,9 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
         drop
     ] if ;
 
-: (mp3>id3) ( path -- id3v2/f )
+PRIVATE>
+
+: mp3>id3 ( path -- id3/f )
     [
         [ <id3> ] dip
         {
@@ -213,12 +215,7 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
             [ dup id3v1+? [ read-v1+-tags merge-id3v1 ] [ drop ] if ]
             [ dup id3v2? [ read-v2-tags ] [ drop ] if ]
         } cleave
-    ] with-mapped-uchar-file ;
-
-PRIVATE>
-
-: mp3>id3 ( path -- id3/f )
-    dup file-info size>> 0 <= [ drop f ] [ (mp3>id3) ] if ;
+    ] with-mapped-uchar-file-reader ;
 
 : find-id3-frame ( id3 name -- obj/f )
     swap frames>> at* [ data>> ] when ;
@@ -239,8 +236,14 @@ PRIVATE>
 : find-mp3s ( path -- seq )
     [ >lower ".mp3" tail? ] find-all-files ;
 
+ERROR: id3-parse-error path error ;
+
+: (mp3-paths>id3s) ( seq -- seq' )
+    [ dup [ mp3>id3 ] [ \ id3-parse-error boa ] recover ] { } map>assoc ;
+
 : mp3-paths>id3s ( seq -- seq' )
-    [ dup mp3>id3 ] { } map>assoc ;
+    (mp3-paths>id3s)
+    [ dup second id3-parse-error? [ f over set-second ] when ] map ;
 
 : parse-mp3-directory ( path -- seq )
     find-mp3s mp3-paths>id3s ;
