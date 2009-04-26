@@ -122,6 +122,12 @@ F_REL rel_to_emit(CELL code, CELL code_format, CELL code_length, bool *rel_p)
 		GROWABLE_ARRAY_APPEND(code,code_to_emit(name)); \
 	}
 
+#define EMIT_TAIL_CALL(name) { \
+		if(stack_frame) EMIT(userenv[JIT_EPILOG]); \
+		tail_call = true;		  \
+		EMIT(name);			  \
+	}
+
 bool jit_stack_frame_p(F_ARRAY *array)
 {
 	F_FIXNUM length = array_capacity(array);
@@ -213,21 +219,21 @@ void jit_compile(CELL quot, bool relocate)
 
 				EMIT(word->subprimitive);
 			}
+			else if(obj == userenv[JIT_EXECUTE_WORD])
+			{
+				if(i == length - 1)
+					EMIT_TAIL_CALL(userenv[JIT_EXECUTE_JUMP])
+				else
+					EMIT(userenv[JIT_EXECUTE_CALL])
+			}
 			else
 			{
 				GROWABLE_ARRAY_ADD(literals,obj);
 
 				if(i == length - 1)
-				{
-					if(stack_frame)
-						EMIT(userenv[JIT_EPILOG]);
-
-					EMIT(userenv[JIT_WORD_JUMP]);
-
-					tail_call = true;
-				}
+					EMIT_TAIL_CALL(userenv[JIT_WORD_JUMP])
 				else
-					EMIT(userenv[JIT_WORD_CALL]);
+					EMIT(userenv[JIT_WORD_CALL])
 			}
 			break;
 		case WRAPPER_TYPE:
@@ -253,6 +259,8 @@ void jit_compile(CELL quot, bool relocate)
 				if(stack_frame)
 					EMIT(userenv[JIT_EPILOG]);
 
+				tail_call = true;
+
 				jit_compile(array_nth(untag_object(array),i),relocate);
 				jit_compile(array_nth(untag_object(array),i + 1),relocate);
 
@@ -263,7 +271,6 @@ void jit_compile(CELL quot, bool relocate)
 
 				i += 2;
 
-				tail_call = true;
 				break;
 			}
 			else if(jit_fast_dip_p(untag_object(array),i))
@@ -299,15 +306,10 @@ void jit_compile(CELL quot, bool relocate)
 		case ARRAY_TYPE:
 			if(jit_fast_dispatch_p(untag_object(array),i))
 			{
-				if(stack_frame)
-					EMIT(userenv[JIT_EPILOG]);
-
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
-				EMIT(userenv[JIT_DISPATCH]);
+				EMIT_TAIL_CALL(userenv[JIT_DISPATCH]);
 
 				i++;
-
-				tail_call = true;
 				break;
 			}
 			else if(jit_ignore_declare_p(untag_object(array),i))
@@ -366,6 +368,12 @@ struct.) */
 		offset -= size; \
 	}
 
+#define COUNT_TAIL_CALL(name,scan) {		       \
+		if(stack_frame) COUNT(JIT_EPILOG,scan) \
+		tail_call = true;		       \
+		COUNT(name,scan);		       \
+	}
+
 F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 {
 	CELL code_format = compiled_code_format();
@@ -393,15 +401,15 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 			word = untag_object(obj);
 			if(word->subprimitive != F)
 				COUNT(word->subprimitive,i)
-			else if(i == length - 1)
+			else if(obj == userenv[JIT_EXECUTE_WORD])
 			{
-				if(stack_frame)
-					COUNT(userenv[JIT_EPILOG],i);
-
-				COUNT(userenv[JIT_WORD_JUMP],i)
-
-				tail_call = true;
+				if(i == length - 1)
+					COUNT_TAIL_CALL(userenv[JIT_EXECUTE_JUMP],i)
+				else
+					COUNT(userenv[JIT_EXECUTE_CALL],i)
 			}
+			else if(i == length - 1)
+				COUNT_TAIL_CALL(userenv[JIT_WORD_JUMP],i)
 			else
 				COUNT(userenv[JIT_WORD_CALL],i)
 			break;
@@ -424,12 +432,12 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 			{
 				if(stack_frame)
 					COUNT(userenv[JIT_EPILOG],i)
+				tail_call = true;
 
 				COUNT(userenv[JIT_IF_1],i)
 				COUNT(userenv[JIT_IF_2],i)
 				i += 2;
 
-				tail_call = true;
 				break;
 			}
 			else if(jit_fast_dip_p(untag_object(array),i))
@@ -453,22 +461,14 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 		case ARRAY_TYPE:
 			if(jit_fast_dispatch_p(untag_object(array),i))
 			{
-				if(stack_frame)
-					COUNT(userenv[JIT_EPILOG],i)
-
 				i++;
-
-				COUNT(userenv[JIT_DISPATCH],i)
-
-				tail_call = true;
+				COUNT_TAIL_CALL(userenv[JIT_DISPATCH],i)
 				break;
 			}
 			if(jit_ignore_declare_p(untag_object(array),i))
 			{
 				if(offset == 0) return i;
-
 				i++;
-
 				break;
 			}
 		default:

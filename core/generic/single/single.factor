@@ -242,8 +242,6 @@ M: f compile-engine ;
         ]
     } cleave ;
 
-: execute-unsafe ( word -- ) (execute) ;
-
 : make-empty-cache ( -- array )
     generic-word get "methods" word-prop
     assoc-size 2 * next-power-of-2 f <array> ;
@@ -257,7 +255,7 @@ M: single-combination perform-combination
                 picker %
                 ,
                 make-empty-cache ,
-                [ lookup-method execute-unsafe ] %
+                [ lookup-method (execute) ] %
             ] [ ] make define
         ] 2bi
     ] with-combination ;

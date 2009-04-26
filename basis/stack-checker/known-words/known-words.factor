@@ -229,7 +229,6 @@ M: object infer-call*
 ! More words not to compile
 \ call t "no-compile" set-word-prop
 \ execute t "no-compile" set-word-prop
-\ execute-unsafe t "no-compile" set-word-prop
 \ clear t "no-compile" set-word-prop
 
 : non-inline-word ( word -- )
