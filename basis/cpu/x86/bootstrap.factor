@@ -151,6 +151,18 @@ big-endian off
     jit-3r>
 ] rc-relative rt-xt 23 rex-length 8 * + jit-3dip jit-define
 
+: prepare-(execute) ( -- operand )
+    ! load from stack
+    temp0 ds-reg [] MOV
+    ! pop stack
+    ds-reg bootstrap-cell SUB
+    ! execute word
+    temp0 word-xt-offset [+] ;
+
+[ prepare-(execute) JMP ] f f f jit-execute-jump jit-define
+
+[ prepare-(execute) CALL ] f f f jit-execute-call jit-define
+
 [
     ! unwind stack frame
     stack-reg stack-frame-size bootstrap-cell - ADD
@@ -169,15 +181,6 @@ big-endian off
     ! call quotation
     arg quot-xt-offset [+] JMP
 ] f f f \ (call) define-sub-primitive
-
-[
-    ! load from stack
-    temp0 ds-reg [] MOV
-    ! pop stack
-    ds-reg bootstrap-cell SUB
-    ! execute word
-    temp0 word-xt-offset [+] JMP
-] f f f \ (execute) define-sub-primitive
 
 ! Objects
 [
