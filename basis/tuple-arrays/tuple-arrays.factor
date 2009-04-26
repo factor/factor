@@ -1,34 +1,68 @@
-! Copyright (C) 2007 Daniel Ehrenberg.
+! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: splitting grouping classes.tuple classes math kernel
-sequences arrays accessors ;
+USING: accessors arrays combinators.smart fry functors grouping
+kernel macros sequences sequences.private stack-checker
+parser ;
+FROM: inverse => undo ;
 IN: tuple-arrays
 
-TUPLE: tuple-array { seq read-only } { class read-only } ;
+<PRIVATE
 
-: <tuple-array> ( length class -- tuple-array )
-    [
-        new tuple>array 1 tail
-        [ <repetition> concat ] [ length ] bi <sliced-groups>
-    ] [ ] bi tuple-array boa ;
+MACRO: infer-in ( class -- quot ) infer in>> '[ _ ] ;
 
-M: tuple-array nth
-    [ seq>> nth ] [ class>> ] bi prefix >tuple ;
+: smart-tuple>array ( tuple class -- array )
+    '[ [ _ boa ] undo ] output>array ; inline
 
-M: tuple-array set-nth ( elt n seq -- )
-    [ tuple>array 1 tail ] 2dip seq>> set-nth ;
+: smart-array>tuple ( array class -- tuple )
+    '[ _ boa ] input<sequence ; inline
 
-M: tuple-array new-sequence
-    class>> <tuple-array> ;
+: tuple-arity ( class -- quot ) '[ _ boa ] infer-in ; inline
 
-: >tuple-array ( seq -- tuple-array )
+: tuple-prototype ( class -- array )
+    [ new ] [ smart-tuple>array ] bi ; inline
+
+PRIVATE>
+
+FUNCTOR: define-tuple-array ( CLASS -- )
+
+CLASS IS ${CLASS}
+
+CLASS-array DEFINES-CLASS ${CLASS}-array
+CLASS-array? IS ${CLASS-array}?
+
+<CLASS-array> DEFINES <${CLASS}-array>
+>CLASS-array DEFINES >${CLASS}-array
+
+WHERE
+
+TUPLE: CLASS-array { seq sliced-groups read-only } ;
+
+: <CLASS-array> ( length -- tuple-array )
+    CLASS tuple-prototype <repetition> concat
+    CLASS tuple-arity <sliced-groups>
+    CLASS-array boa ;
+
+M: CLASS-array nth-unsafe
+    seq>> nth-unsafe CLASS smart-array>tuple ;
+
+M: CLASS-array set-nth-unsafe
+    [ CLASS smart-tuple>array ] 2dip seq>> set-nth-unsafe ;
+
+M: CLASS-array new-sequence
+    drop <CLASS-array> ;
+
+: >CLASS-array ( seq -- tuple-array )
     dup empty? [
-        0 over first class <tuple-array> clone-like
+        0 <CLASS-array> clone-like
     ] unless ;
 
-M: tuple-array like 
-    drop dup tuple-array? [ >tuple-array ] unless ;
+M: CLASS-array like 
+    drop dup CLASS-array? [ >CLASS-array ] unless ;
 
-M: tuple-array length seq>> length ;
+M: CLASS-array length seq>> length ;
 
-INSTANCE: tuple-array sequence
+INSTANCE: CLASS-array sequence
+
+;FUNCTOR
+
+SYNTAX: TUPLE-ARRAY: scan-word define-tuple-array ;
