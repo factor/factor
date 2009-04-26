@@ -137,6 +137,9 @@ SYMBOL: jit-2dip-word
 SYMBOL: jit-2dip
 SYMBOL: jit-3dip-word
 SYMBOL: jit-3dip
+SYMBOL: jit-execute-word
+SYMBOL: jit-execute-jump
+SYMBOL: jit-execute-call
 SYMBOL: jit-epilog
 SYMBOL: jit-return
 SYMBOL: jit-profiling
@@ -173,6 +176,9 @@ SYMBOL: undefined-quot
         { jit-2dip 47 }
         { jit-3dip-word 48 }
         { jit-3dip 49 }
+        { jit-execute-word 50 }
+        { jit-execute-jump 51 }
+        { jit-execute-call 52 }
         { undefined-quot 60 }
     } ; inline
 
@@ -486,6 +492,7 @@ M: quotation '
     \ dip jit-dip-word set
     \ 2dip jit-2dip-word set
     \ 3dip jit-3dip-word set
+    \ (execute) jit-execute-word set
     [ undefined ] undefined-quot set
     {
         jit-code-format
@@ -506,6 +513,9 @@ M: quotation '
         jit-2dip
         jit-3dip-word
         jit-3dip
+        jit-execute-word
+        jit-execute-jump
+        jit-execute-call
         jit-epilog
         jit-return
         jit-profiling
