@@ -82,8 +82,10 @@ registers) does not run out of memory */
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
+int count;
 INLINE void *allot_object(CELL type, CELL a)
 {
+  if(!gc_off) { if(count++ % 100 == 0) { printf("!\n"); gc(); } }
 	CELL *object;
 
 	if(HAVE_NURSERY_P && nursery.size - ALLOT_BUFFER_ZONE > a)

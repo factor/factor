@@ -366,6 +366,7 @@ CELL find_all_words(void)
 	gc_off = false;
 
 	GROWABLE_ARRAY_TRIM(words);
+	GROWABLE_ARRAY_DONE(words);
 
 	return words;
 }
