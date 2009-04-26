@@ -62,6 +62,8 @@ SYMBOL: max-stack-items
 
 SYMBOL: error-summary?
 
+t error-summary? set-global
+
 <PRIVATE
 
 : title. ( string -- )

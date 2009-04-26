@@ -1,4 +1,4 @@
-IN: compiler.tests
+IN: compiler.tests.peg-regression-2
 USING: peg.ebnf strings tools.test ;
 
 GENERIC: <times> ( times -- term' )

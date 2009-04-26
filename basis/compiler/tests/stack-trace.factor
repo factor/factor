@@ -1,4 +1,4 @@
-IN: compiler.tests
+IN: compiler.tests.stack-trace
 USING: compiler tools.test namespaces sequences
 kernel.private kernel math continuations continuations.private
 words splitting grouping sorting accessors ;
