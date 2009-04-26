@@ -3,7 +3,7 @@
 USING: arrays morse strings tools.test ;
 IN: morse.tests
 
-[ CHAR: ? ] [ CHAR: \\ ch>morse ] unit-test
+[ "?" ] [ CHAR: \\ ch>morse ] unit-test
 [ "..." ] [ CHAR: s ch>morse ] unit-test
 [ CHAR: s ] [ "..." morse>ch ] unit-test
 [ CHAR: \s ] [ "..--..--.." morse>ch ] unit-test
