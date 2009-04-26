@@ -7,6 +7,7 @@ IN: io.mmap.tests
 [ ] [ "12345" "mmap-test-file.txt" temp-file ascii set-file-contents ] unit-test
 [ ] [ "mmap-test-file.txt" temp-file [ CHAR: 2 0 pick set-nth drop ] with-mapped-char-file ] unit-test
 [ 5 ] [ "mmap-test-file.txt" temp-file [ length ] with-mapped-char-file ] unit-test
+[ 5 ] [ "mmap-test-file.txt" temp-file [ length ] with-mapped-char-file-reader ] unit-test
 [ "22345" ] [ "mmap-test-file.txt" temp-file ascii file-contents ] unit-test
 [ "mmap-test-file.txt" temp-file delete-file ] ignore-errors
 
