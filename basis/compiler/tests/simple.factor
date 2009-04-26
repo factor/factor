@@ -1,7 +1,7 @@
 USING: compiler compiler.units tools.test kernel kernel.private
 sequences.private math.private math combinators strings alien
 arrays memory vocabs parser eval ;
-IN: compiler.tests
+IN: compiler.tests.simple
 
 ! Test empty word
 [ ] [ [ ] compile-call ] unit-test

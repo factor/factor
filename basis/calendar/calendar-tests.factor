@@ -1,5 +1,5 @@
 USING: arrays calendar kernel math sequences tools.test
-continuations system math.order threads ;
+continuations system math.order threads accessors ;
 IN: calendar.tests
 
 [ f ] [ 2004 12 32 0   0  0 instant <timestamp> valid-timestamp? ] unit-test
@@ -163,3 +163,10 @@ IN: calendar.tests
 [ t ] [ now 50 milliseconds sleep now before? ] unit-test
 [ t ] [ now 50 milliseconds sleep now swap after? ] unit-test
 [ t ] [ now 50 milliseconds sleep now 50 milliseconds sleep now swapd between? ] unit-test
+
+[ 4 12 ] [ 2009 easter [ month>> ] [ day>> ] bi ] unit-test
+[ 4 2 ] [ 1961 easter [ month>> ] [ day>> ] bi ] unit-test
+
+[ f ] [ now dup midnight eq? ] unit-test
+[ f ] [ now dup easter eq? ] unit-test
+[ f ] [ now dup beginning-of-year eq? ] unit-test

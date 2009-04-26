@@ -1,6 +1,6 @@
 USING: math.private kernel combinators accessors arrays
 generalizations tools.test ;
-IN: compiler.tests
+IN: compiler.tests.spilling
 
 : float-spill-bug ( a -- b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b )
     {
