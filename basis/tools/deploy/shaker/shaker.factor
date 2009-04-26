@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io.backend io.streams.c init fry
 namespaces make assocs kernel parser lexer strings.parser vocabs
-sequences words words.private memory kernel.private
+sequences words memory kernel.private
 continuations io vocabs.loader system strings sets
 vectors quotations byte-arrays sorting compiler.units
 definitions generic generic.standard tools.deploy.config ;

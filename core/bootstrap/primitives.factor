@@ -98,7 +98,6 @@ bootstrapping? on
     "threads.private"
     "tools.profiler.private"
     "words"
-    "words.private"
     "vectors"
     "vectors.private"
 } [ create-vocab drop ] each
@@ -339,7 +338,7 @@ tuple
     [ create dup 1quotation ] dip define-declared ;
 
 {
-    { "(execute)" "words.private" (( word -- )) }
+    { "(execute)" "kernel.private" (( word -- )) }
     { "(call)" "kernel.private" (( quot -- )) }
     { "both-fixnums?" "math.private" (( x y -- ? )) }
     { "fixnum+fast" "math.private" (( x y -- z )) }

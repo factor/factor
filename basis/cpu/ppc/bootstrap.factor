@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.ppc.assembler compiler.codegen.fixup compiler.units
-compiler.constants math math.private layouts words words.private
+compiler.constants math math.private layouts words
 vocabs slots.private locals.backend ;
 IN: bootstrap.ppc
 

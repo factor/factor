@@ -3,7 +3,7 @@
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler layouts compiler.units math
 math.private compiler.constants vocabs slots.private words
-words.private locals.backend ;
+locals.backend ;
 IN: bootstrap.x86
 
 big-endian off
