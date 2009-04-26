@@ -22,13 +22,13 @@ void add_to_free_list(F_HEAP *heap, F_FREE_BLOCK *block)
 	if(block->block.size < FREE_LIST_COUNT * BLOCK_SIZE_INCREMENT)
 	{
 		int index = block->block.size / BLOCK_SIZE_INCREMENT;
-		block->next_free = heap->free.small[index];
-		heap->free.small[index] = block;
+		block->next_free = heap->free.small_blocks[index];
+		heap->free.small_blocks[index] = block;
 	}
 	else
 	{
-		block->next_free = heap->free.large;
-		heap->free.large = block;
+		block->next_free = heap->free.large_blocks;
+		heap->free.large_blocks = block;
 	}
 }
 
@@ -101,11 +101,11 @@ F_FREE_BLOCK *find_free_block(F_HEAP *heap, CELL size)
 	while(attempt < FREE_LIST_COUNT * BLOCK_SIZE_INCREMENT)
 	{
 		int index = attempt / BLOCK_SIZE_INCREMENT;
-		F_FREE_BLOCK *block = heap->free.small[index];
+		F_FREE_BLOCK *block = heap->free.small_blocks[index];
 		if(block)
 		{
 			assert_free_block(block);
-			heap->free.small[index] = block->next_free;
+			heap->free.small_blocks[index] = block->next_free;
 			return block;
 		}
 
@@ -113,7 +113,7 @@ F_FREE_BLOCK *find_free_block(F_HEAP *heap, CELL size)
 	}
 
 	F_FREE_BLOCK *prev = NULL;
-	F_FREE_BLOCK *block = heap->free.large;
+	F_FREE_BLOCK *block = heap->free.large_blocks;
 
 	while(block)
 	{
@@ -123,7 +123,7 @@ F_FREE_BLOCK *find_free_block(F_HEAP *heap, CELL size)
 			if(prev)
 				prev->next_free = block->next_free;
 			else
-				heap->free.large = block->next_free;
+				heap->free.large_blocks = block->next_free;
 			return block;
 		}
 
