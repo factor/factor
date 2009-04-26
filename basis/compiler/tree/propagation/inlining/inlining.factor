@@ -3,7 +3,8 @@
 USING: accessors kernel arrays sequences math math.order
 math.partial-dispatch generic generic.standard generic.math
 classes.algebra classes.union sets quotations assocs combinators
-words namespaces continuations classes fry combinators.smart
+words namespaces continuations classes fry combinators.smart hints
+locals
 compiler.tree
 compiler.tree.builder
 compiler.tree.recursive
@@ -27,24 +28,34 @@ SYMBOL: node-count
 SYMBOL: inlining-count
 
 ! Splicing nodes
-GENERIC: splicing-nodes ( #call word/quot/f -- nodes )
-
-M: word splicing-nodes
+: splicing-call ( #call word -- nodes )
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
-M: callable splicing-nodes
-    build-sub-tree analyze-recursive normalize ;
+: splicing-body ( #call quot/word -- nodes/f )
+    build-sub-tree dup [ analyze-recursive normalize ] when ;
 
 ! Dispatch elimination
+: undo-inlining ( #call -- ? )
+    f >>method f >>body f >>class drop f ;
+
+: propagate-body ( #call -- ? )
+    body>> (propagate) t ;
+
+GENERIC: splicing-nodes ( #call word/quot -- nodes/f )
+
+M: word splicing-nodes splicing-call ;
+
+M: callable splicing-nodes splicing-body ;
+
 : eliminate-dispatch ( #call class/f word/quot/f -- ? )
     dup [
         [ >>class ] dip
-        over method>> over = [ drop ] [
-            2dup splicing-nodes
-            [ >>method ] [ >>body ] bi*
+        over method>> over = [ drop propagate-body ] [
+            2dup splicing-nodes dup [
+                [ >>method ] [ >>body ] bi* propagate-body
+            ] [ 2drop undo-inlining ] if
         ] if
-        body>> (propagate) t
-    ] [ 2drop f >>method f >>body f >>class drop f ] if ;
+    ] [ 2drop undo-inlining ] if ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
     dup "methods" word-prop assoc-empty? [ 2drop f f ] [
@@ -136,19 +147,21 @@ DEFER: (flat-length)
     [
         [ classes-known? 2 0 ? ]
         [
-            {
-                [ body-length-bias ]
-                [ "default" word-prop -4 0 ? ]
-                [ "specializer" word-prop 1 0 ? ]
-                [ method-body? 1 0 ? ]
-            } cleave
+            [ body-length-bias ]
+            [ "specializer" word-prop 1 0 ? ]
+            [ method-body? 1 0 ? ]
+            tri
             node-count-bias
             loop-nesting get 0 or 2 *
         ] bi*
     ] sum-outputs ;
 
 : should-inline? ( #call word -- ? )
-    dup "inline" word-prop [ 2drop t ] [ inlining-rank 5 >= ] if ;
+    {
+        { [ dup contains-breakpoints? ] [ 2drop f ] }
+        { [ dup "inline" word-prop ] [ 2drop t ] }
+        [ inlining-rank 5 >= ]
+    } cond ;
 
 SYMBOL: history
 
@@ -157,18 +170,16 @@ SYMBOL: history
     [ history [ swap suffix ] change ]
     bi ;
 
-: inline-word-def ( #call word quot -- ? )
-    over history get memq? [ 3drop f ] [
-        [
-            [ remember-inlining ] dip
-            [ drop ] [ splicing-nodes ] 2bi
-            [ >>body drop ] [ count-nodes ] [ (propagate) ] tri
-        ] with-scope node-count +@
-        t
+:: inline-word ( #call word -- ? )
+    word history get memq? [ f ] [
+        #call word splicing-body [
+            [
+                word remember-inlining
+                [ ] [ count-nodes ] [ (propagate) ] tri
+            ] with-scope
+            [ #call (>>body) ] [ node-count +@ ] bi* t
+        ] [ f ] if*
     ] if ;
-
-: inline-word ( #call word -- ? )
-    dup def>> inline-word-def ;
 
 : inline-method-body ( #call word -- ? )
     2dup should-inline? [ inline-word ] [ 2drop f ] if ;
@@ -177,7 +188,9 @@ SYMBOL: history
     { curry compose } memq? ;
 
 : never-inline-word? ( word -- ? )
-    [ deferred? ] [ { call execute } memq? ] bi or ;
+    [ deferred? ]
+    [ "default" word-prop ]
+    [ { call execute } memq? ] tri or or ;
 
 : custom-inlining? ( word -- ? )
     "custom-inlining" word-prop ;
@@ -186,10 +199,6 @@ SYMBOL: history
     [ dup ] [ "custom-inlining" word-prop ] bi*
     call( #call -- word/quot/f )
     object swap eliminate-dispatch ;
-
-: inline-instance-check ( #call word -- ? )
-    over in-d>> second value-info literal>> dup class?
-    [ "predicate" word-prop '[ drop @ ] inline-word-def ] [ 3drop f ] if ;
 
 : (do-inlining) ( #call word -- ? )
     #! If the generic was defined in an outer compilation unit,
@@ -202,7 +211,6 @@ SYMBOL: history
     #! discouraged, but it should still work.)
     {
         { [ dup never-inline-word? ] [ 2drop f ] }
-        { [ dup \ instance? eq? ] [ inline-instance-check ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }

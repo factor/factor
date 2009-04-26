@@ -108,7 +108,7 @@ nl
 
 "." write flush
 
-{ (compile) } compile-unoptimized
+{ compile-word } compile-unoptimized
 
 "." write flush
 

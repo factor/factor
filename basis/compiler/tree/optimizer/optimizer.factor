@@ -18,6 +18,12 @@ IN: compiler.tree.optimizer
 
 SYMBOL: check-optimizer?
 
+: ?check ( nodes -- nodes' )
+    check-optimizer? get [
+        compute-def-use
+        dup check-nodes
+    ] when ;
+
 : optimize-tree ( nodes -- nodes' )
     analyze-recursive
     normalize
@@ -30,10 +36,7 @@ SYMBOL: check-optimizer?
     apply-identities
     compute-def-use
     remove-dead-code
-    check-optimizer? get [
-        compute-def-use
-        dup check-nodes
-    ] when
+    ?check
     compute-def-use
     optimize-modular-arithmetic
     finalize ;

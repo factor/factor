@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions fry help.topics kernel
 colors.constants math.rectangles models.arrow namespaces sequences
-sorting definitions.icons ui.gadgets ui.gadgets.glass
+sorting definitions.icons tools.crossref ui.gadgets ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
 ui.gadgets.search-tables ui.gadgets.wrappers ui.gestures ui.operations
 ui.pens.solid ui.images ;
@@ -46,7 +46,7 @@ SLOT: model
 
 : show-links-popup ( browser-gadget quot title -- )
     [ dup model>> ] 2dip <links-popup>
-    [ hand-loc get { 0 0 } <rect> show-glass ] [ request-focus ] bi ;
+    [ hand-loc get { 0 0 } <rect> show-glass ] [ request-focus ] bi ; inline
 
 : com-show-outgoing-links ( browser-gadget -- )
     [ uses ] "Outgoing links" show-links-popup ;

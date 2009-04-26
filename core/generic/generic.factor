@@ -33,6 +33,8 @@ M: generic definition drop f ;
 
 GENERIC: effective-method ( generic -- method )
 
+\ effective-method t "no-compile" set-word-prop
+
 : next-method-class ( class generic -- class/f )
     order [ class<= ] with filter reverse dup length 1 =
     [ drop f ] [ second ] if ;
@@ -121,8 +123,6 @@ M: method-body crossref?
 
 PREDICATE: default-method < word "default" word-prop ;
 
-M: default-method irrelevant? drop t ;
-
 : <default-method> ( generic combination -- method )
     [ drop object bootstrap-word swap <method> ] [ make-default-method ] 2bi
     [ define ] [ drop t "default" set-word-prop ] [ drop ] 2tri ;
@@ -152,9 +152,6 @@ M: method-body forget*
         ]
         [ call-next-method ] bi
     ] if ;
-
-M: method-body smart-usage
-    "method-generic" word-prop smart-usage ;
 
 M: sequence update-methods ( class seq -- )
     implementors [
@@ -190,6 +187,3 @@ M: generic forget*
 
 M: class forget-methods
     [ implementors ] [ [ swap method ] curry ] bi map forget-all ;
-
-: xref-generics ( -- )
-    all-words [ subwords [ xref ] each ] each ;

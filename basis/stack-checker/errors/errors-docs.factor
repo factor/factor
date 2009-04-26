@@ -3,10 +3,9 @@ sequences.private words ;
 IN: stack-checker.errors
 
 HELP: literal-expected
-{ $error-description "Thrown when inference encounters a " { $link call } " or " { $link if } " being applied to a value which is not known to be a literal. Such a form can have an arbitrary stack effect, and does not compile." }
-{ $notes "This error will be thrown when compiling any combinator, such as " { $link each } ". However, words calling combinators can compile if the combinator is declared " { $link POSTPONE: inline } " and the quotation being passed in is a literal." }
+{ $error-description "Thrown when inference encounters a combinator or macro being applied to a value which is not known to be a literal, or constructed in a manner which can be analyzed statically. Such code needs changes before it can compile and run. See " { $link "inference-combinators" } " and " { $link "inference-escape" } " for details." }
 { $examples
-    "In this example, words calling " { $snippet "literal-expected-example" } " will compile, even if " { $snippet "literal-expected-example" } " does not compile itself:"
+    "In this example, words calling " { $snippet "literal-expected-example" } " will have a static stac keffect, even if " { $snippet "literal-expected-example" } " does not:"
     { $code
         ": literal-expected-example ( quot -- )"
         "    [ call ] [ call ] bi ; inline"
@@ -16,10 +15,8 @@ HELP: literal-expected
 HELP: unbalanced-branches-error
 { $values { "in" "a sequence of integers" } { "out" "a sequence of integers" } }
 { $description "Throws an " { $link unbalanced-branches-error } "." }
-{ $error-description "Thrown when inference encounters an " { $link if } " or " { $link dispatch } " where the branches do not all exit with the same stack height." }
-{ $notes "Conditionals with variable stack effects are considered to be bad style and should be avoided since they do not compile."
-$nl
-"If this error comes up when inferring the stack effect of a recursive word, check the word's stack effect declaration; it might be wrong." }
+{ $error-description "Thrown when inference encounters an " { $link if } " or " { $link dispatch } " where the branches do not all exit with the same stack height. See " { $link "inference-branches" } " for details." }
+{ $notes "If this error comes up when inferring the stack effect of a recursive word, check the word's stack effect declaration; it might be wrong." }
 { $examples
     { $code
         ": unbalanced-branches-example ( a b c -- )"
@@ -86,25 +83,24 @@ HELP: inconsistent-recursive-call-error
     }
 } ;
 
-ARTICLE: "inference-errors" "Inference warnings and errors"
+ARTICLE: "inference-errors" "Stack checker errors"
 "These conditions are thrown by " { $link "inference" } ", as well as the " { $link "compiler" } "."
 $nl
-"Main wrapper for all inference warnings and errors:"
-{ $subsection inference-error }
-"Inference warnings:"
+"Error thrown when insufficient information is available to calculate the stack effect of a combinator call (see " { $link "inference-combinators" } "):"
 { $subsection literal-expected }
-"Inference errors:"
-{ $subsection recursive-quotation-error }
-{ $subsection unbalanced-branches-error }
+"Error thrown when a word's stack effect declaration does not match the composition of the stack effects of its factors:"
 { $subsection effect-error }
-{ $subsection missing-effect }
-"Inference errors for inline recursive words:"
+"Error thrown when branches have incompatible stack effects (see " { $link "inference-branches" } "):"
+{ $subsection unbalanced-branches-error }
+"Inference errors for inline recursive words (see " { $link "inference-recursive-combinators" } "):"
 { $subsection undeclared-recursion-error }
 { $subsection diverging-recursion-error }
 { $subsection unbalanced-recursion-error }
 { $subsection inconsistent-recursive-call-error }
-"Retain stack usage errors:"
+"More obscure errors that are unlikely to arise in ordinary code:"
+{ $subsection recursive-quotation-error }
 { $subsection too-many->r }
-{ $subsection too-many-r> } ;
+{ $subsection too-many-r> }
+{ $subsection missing-effect } ;
 
 ABOUT: "inference-errors"

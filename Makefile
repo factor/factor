@@ -7,7 +7,6 @@ CONSOLE_EXECUTABLE = factor-console
 TEST_LIBRARY = factor-ffi-test
 VERSION = 0.92
 
-IMAGE = factor.image
 BUNDLE = Factor.app
 LIBPATH = -L/usr/X11R6/lib
 CFLAGS = -Wall
@@ -151,17 +150,17 @@ macosx.app: factor
 		@executable_path/../Frameworks/libfactor.dylib \
 		Factor.app/Contents/MacOS/factor
 
-factor: $(DLL_OBJS) $(EXE_OBJS)
+$(EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
-factor-console: $(DLL_OBJS) $(EXE_OBJS)
+$(CONSOLE_EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION) $(EXE_OBJS)
 
-factor-ffi-test: vm/ffi_test.o
+$(TEST_LIBRARY): vm/ffi_test.o
 	$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(SHARED_DLL_EXTENSION) $(TEST_OBJS)
 
 clean:

@@ -35,7 +35,7 @@ M: hello bing hello-test ;
 [ 3 ] [ 1 0 <hello> 2 whoa ] unit-test
 [ 3 ] [ 1 0 <hello> f <goodbye> 2 whoa ] unit-test
 
-[ ] [ 3 [ "USING: accessors delegate ; IN: delegate.tests CONSULT: baz goodbye these>> ;" eval ] times ] unit-test
+[ ] [ 3 [ "USING: accessors delegate ; IN: delegate.tests CONSULT: baz goodbye these>> ;" eval( -- ) ] times ] unit-test
 [ H{ { goodbye T{ consultation f baz goodbye [ these>> ] } } } ] [ baz protocol-consult ] unit-test
 [ H{ } ] [ bee protocol-consult ] unit-test
 
@@ -63,22 +63,22 @@ CONSULT: beta hey value>> 1- ;
 [ 0 ] [ 1 <hey> three ] unit-test
 [ { hey } ] [ alpha protocol-users ] unit-test
 [ { hey } ] [ beta protocol-users ] unit-test
-[ ] [ "USE: delegate IN: delegate.tests PROTOCOL: alpha one ;" eval ] unit-test
+[ ] [ "USE: delegate IN: delegate.tests PROTOCOL: alpha one ;" eval( -- ) ] unit-test
 [ f ] [ hey \ two method ] unit-test
 [ f ] [ hey \ four method ] unit-test
-[ ] [ "USE: delegate IN: delegate.tests PROTOCOL: beta two three four ;" eval ] unit-test
+[ ] [ "USE: delegate IN: delegate.tests PROTOCOL: beta two three four ;" eval( -- ) ] unit-test
 [ { hey } ] [ alpha protocol-users ] unit-test
 [ { hey } ] [ beta protocol-users ] unit-test
 [ 2 ] [ 1 <hey> one ] unit-test
 [ 0 ] [ 1 <hey> two ] unit-test
 [ 0 ] [ 1 <hey> three ] unit-test
 [ 0 ] [ 1 <hey> four ] unit-test
-[ ] [ "USING: math accessors delegate ; IN: delegate.tests CONSULT: beta hey value>> 2 - ;" eval ] unit-test
+[ ] [ "USING: math accessors delegate ; IN: delegate.tests CONSULT: beta hey value>> 2 - ;" eval( -- ) ] unit-test
 [ 2 ] [ 1 <hey> one ] unit-test
 [ -1 ] [ 1 <hey> two ] unit-test
 [ -1 ] [ 1 <hey> three ] unit-test
 [ -1 ] [ 1 <hey> four ] unit-test
-[ ] [ "IN: delegate.tests FORGET: alpha" eval ] unit-test
+[ ] [ "IN: delegate.tests FORGET: alpha" eval( -- ) ] unit-test
 [ f ] [ hey \ one method ] unit-test
 
 TUPLE: slot-protocol-test-1 a b ;

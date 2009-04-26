@@ -6,7 +6,7 @@ USING: kernel byte-arrays combinators strings arrays sequences splitting
        io io.binary io.sockets io.encodings.binary
        accessors
        combinators.smart
-       newfx
+       assocs
        ;
 
 IN: dns
@@ -148,8 +148,8 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
   [
     {
       [ name>>                 dn->ba ]
-      [ type>>  type-table  of uint16->ba ]
-      [ class>> class-table of uint16->ba ]
+      [ type>>  type-table  at uint16->ba ]
+      [ class>> class-table at uint16->ba ]
     } cleave
   ] output>array concat ;
 
@@ -203,8 +203,8 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
   [
     {
       [ name>>                 dn->ba     ]
-      [ type>>  type-table  of uint16->ba ]
-      [ class>> class-table of uint16->ba ]
+      [ type>>  type-table  at uint16->ba ]
+      [ class>> class-table at uint16->ba ]
       [ ttl>>   uint32->ba ]
       [
         [ type>>            ] [ rdata>> ] bi rdata->ba
@@ -219,13 +219,13 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
   [
     {
       [ qr>>                     15 shift ]
-      [ opcode>> opcode-table of 11 shift ]
+      [ opcode>> opcode-table at 11 shift ]
       [ aa>>                     10 shift ]
       [ tc>>                      9 shift ]
       [ rd>>                      8 shift ]
       [ ra>>                      7 shift ]
       [ z>>                       4 shift ]
-      [ rcode>>  rcode-table of   0 shift ]
+      [ rcode>>  rcode-table at   0 shift ]
     } cleave
   ] sum-outputs uint16->ba ;
 
@@ -301,8 +301,8 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
     [ get-name ]
     [
       skip-name
-      [ 0 + get-double type-table  key-of ]
-      [ 2 + get-double class-table key-of ]
+      [ 0 + get-double type-table  value-at ]
+      [ 2 + get-double class-table value-at ]
       2bi
     ]
   2bi query boa ;
@@ -364,10 +364,10 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
   [
     skip-name
       {
-        [ 0 + get-double type-table  key-of ]
-        [ 2 + get-double class-table key-of ]
+        [ 0 + get-double type-table  value-at ]
+        [ 2 + get-double class-table value-at ]
         [ 4 + get-quad   ]
-        [ [ 10 + ] [ get-double type-table key-of ] 2bi get-rdata ]
+        [ [ 10 + ] [ get-double type-table value-at ] 2bi get-rdata ]
       }
     2cleave
   ]
@@ -393,13 +393,13 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
     get-double
     {
       [ 15 >> BIN:    1 bitand ]
-      [ 11 >> BIN:  111 bitand opcode-table key-of ]
+      [ 11 >> BIN:  111 bitand opcode-table value-at ]
       [ 10 >> BIN:    1 bitand ]
       [  9 >> BIN:    1 bitand ]
       [  8 >> BIN:    1 bitand ]
       [  7 >> BIN:    1 bitand ]
       [  4 >> BIN:  111 bitand ]
-      [       BIN: 1111 bitand rcode-table key-of ]
+      [       BIN: 1111 bitand rcode-table value-at ]
     }
   cleave ;
 
@@ -484,7 +484,7 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: message-query ( message -- query ) question-section>> 1st ;
+: message-query ( message -- query ) question-section>> first ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

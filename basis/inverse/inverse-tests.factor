@@ -83,3 +83,9 @@ C: <nil> nil
 [ [ sqrt ] ] [ [ sq ] [undo] ] unit-test
 [ [ not ] ] [ [ not ] [undo] ] unit-test
 [ { 3 2 1 } ] [ { 1 2 3 } [ reverse ] undo ] unit-test
+
+TUPLE: funny-tuple ;
+: <funny-tuple> ( -- funny-tuple ) \ funny-tuple boa ;
+: funny-tuple ( -- ) "OOPS" throw ;
+
+[ ] [ [ <funny-tuple> ] [undo] drop ] unit-test

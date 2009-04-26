@@ -5,7 +5,8 @@ io.encodings.utf8 hashtables kernel namespaces sequences
 vocabs.loader io combinators calendar accessors math.parser
 io.streams.string ui.tools.operations quotations strings arrays
 prettyprint words vocabs sorting sets classes math alien urls
-splitting ascii combinators.short-circuit alarms words.symbol ;
+splitting ascii combinators.short-circuit alarms words.symbol
+system ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -23,6 +24,9 @@ ERROR: no-vocab vocab ;
 : contains-dot? ( string -- ? ) ".." swap subseq? ;
 
 : contains-separator? ( string -- ? ) [ path-separator? ] any? ;
+
+: ensure-vocab-exists ( string -- string )
+    dup vocabs member? [ no-vocab ] unless ;
 
 : check-vocab-name ( string -- string )
     [ ]
@@ -234,6 +238,7 @@ PRIVATE>
     [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
 
 : scaffold-help ( vocab -- )
+    ensure-vocab-exists
     [
         dup "-docs.factor" vocab/suffix>path scaffolding? [
             set-scaffold-docs-file
@@ -268,6 +273,7 @@ PRIVATE>
 PRIVATE>
 
 : scaffold-tests ( vocab -- )
+    ensure-vocab-exists
     dup "-tests.factor" vocab/suffix>path
     scaffolding? [
         set-scaffold-tests-file
@@ -296,8 +302,10 @@ SYMBOL: examples-flag
     [ home ] dip append-path
     [ touch-file ] [ "Click to edit: " write <pathname> . ] bi ;
 
-: scaffold-factor-boot-rc ( -- ) ".factor-boot-rc" scaffold-rc ;
+: scaffold-factor-boot-rc ( -- )
+    os windows? "factor-boot-rc" ".factor-boot-rc" ? scaffold-rc ;
 
-: scaffold-factor-rc ( -- ) ".factor-rc" scaffold-rc ;
+: scaffold-factor-rc ( -- )
+    os windows? "factor-rc" ".factor-rc" ? scaffold-rc ;
 
 : scaffold-emacs ( -- ) ".emacs" scaffold-rc ;

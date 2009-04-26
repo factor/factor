@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.private effects fry
 kernel kernel.private make sequences continuations quotations
-stack-checker stack-checker.transforms ;
+stack-checker stack-checker.transforms words ;
 IN: stack-checker.call-effect
 
 ! call( and execute( have complex expansions.
@@ -54,6 +54,8 @@ M: quotation cached-effect
 
 \ call-effect-slow [ call-effect-slow>quot ] 1 define-transform
 
+\ call-effect-slow t "no-compile" set-word-prop
+
 : call-effect-fast ( quot effect inline-cache -- )
     2over call-effect-unsafe?
     [ [ nip (>>value) ] [ drop call-effect-unsafe ] 3bi ]
@@ -70,6 +72,8 @@ M: quotation cached-effect
         ] if
     ]
 ] 0 define-transform
+
+\ call-effect t "no-compile" set-word-prop
 
 : execute-effect-slow ( word effect -- )
     [ '[ _ execute ] ] dip call-effect-slow ; inline
@@ -93,3 +97,5 @@ M: quotation cached-effect
     inline-cache new '[ _ _ execute-effect-ic ] ;
 
 \ execute-effect [ execute-effect>quot ] 1 define-transform
+
+\ execute-effect t "no-compile" set-word-prop

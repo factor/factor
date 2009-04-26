@@ -1,4 +1,4 @@
-IN: compiler.tests
+IN: compiler.tests.float
 USING: compiler.units compiler kernel kernel.private memory math
 math.private tools.test math.floats.private ;
 

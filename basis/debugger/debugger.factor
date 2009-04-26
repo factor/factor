@@ -8,8 +8,9 @@ classes.mixin classes.tuple continuations continuations.private
 combinators generic.math classes.builtin classes compiler.units
 generic.standard vocabs init kernel.private io.encodings
 accessors math.order destructors source-files parser
-classes.tuple.parser effects.parser lexer compiler.errors
-generic.parser strings.parser vocabs.loader vocabs.parser ;
+classes.tuple.parser effects.parser lexer
+generic.parser strings.parser vocabs.loader vocabs.parser see
+source-files.errors ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -87,8 +88,7 @@ M: string error. print ;
 : divide-by-zero-error. ( obj -- )
     "Division by zero" print drop ;
 
-: signal-error. ( obj -- )
-    "Operating system signal " write third . ;
+HOOK: signal-error. os ( obj -- )
 
 : array-size-error. ( obj -- )
     "Invalid array size: " write dup third .
@@ -126,14 +126,14 @@ M: string error. print ;
 : primitive-error. ( error -- ) 
     "Unimplemented primitive" print drop ;
 
-PREDICATE: kernel-error < array
+PREDICATE: vm-error < array
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
         [ second 0 15 between? ]
     } cond ;
 
-: kernel-errors ( error -- n errors )
+: vm-errors ( error -- n errors )
     second {
         { 0  [ expired-error.          ] }
         { 1  [ io-error.               ] }
@@ -153,9 +153,11 @@ PREDICATE: kernel-error < array
         { 15 [ memory-error.           ] }
     } ; inline
 
-M: kernel-error error. dup kernel-errors case ;
+M: vm-error summary drop "VM error" ;
 
-M: kernel-error error-help kernel-errors at first ;
+M: vm-error error. dup vm-errors case ;
+
+M: vm-error error-help vm-errors at first ;
 
 M: no-method summary
     drop "No suitable method" ;
@@ -213,14 +215,13 @@ M: condition error-help error>> error-help ;
 
 M: assert summary drop "Assertion failed" ;
 
-M: assert error.
-    "Assertion failed" print
+M: assert-sequence summary drop "Assertion failed" ;
+
+M: assert-sequence error.
     standard-table-style [
-        15 length-limit set
-        5 line-limit set
-        [ expect>> [ [ "Expect:" write ] with-cell pprint-cell ] with-row ]
-        [ got>> [ [ "Got:" write ] with-cell pprint-cell ] with-row ] bi
-    ] tabular-output nl ;
+        [ "=== Expected:" print expected>> stack. ]
+        [ "=== Got:" print got>> stack. ] bi
+    ] tabular-output ;
 
 M: immutable summary drop "Sequence is immutable" ;
 
@@ -268,20 +269,6 @@ M: duplicate-slot-names summary
 M: invalid-slot-name summary
     drop "Invalid slot name" ;
 
-: file. ( file -- ) path>> <pathname> . ;
-
-M: source-file-error error.
-    [ file>> file. ] [ error>> error. ] bi ;
-
-M: source-file-error summary
-    error>> summary ;
-
-M: source-file-error compute-restarts
-    error>> compute-restarts ;
-
-M: source-file-error error-help
-    error>> error-help ;
-
 M: not-in-a-method-error summary
     drop "call-next-method can only be called in a method definition" ;
 
@@ -309,12 +296,6 @@ M: lexer-error compute-restarts
 M: lexer-error error-help
     error>> error-help ;
 
-M: object compiler-error. ( error word -- )
-    nl
-    "While compiling " write pprint ": " print
-    nl
-    print-error ;
-
 M: bad-effect summary
     drop "Bad stack effect declaration" ;
 
@@ -327,3 +308,8 @@ M: check-mixin-class summary drop "Not a mixin class" ;
 M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
 
 M: wrong-values summary drop "Quotation called with wrong stack effect" ;
+
+{
+    { [ os windows? ] [ "debugger.windows" require ] }
+    { [ os unix? ] [ "debugger.unix" require ] }
+} cond

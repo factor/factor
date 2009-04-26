@@ -18,5 +18,5 @@ IN: math.binpack
     [ dup zip ] dip binpack [ keys ] map ;
 
 : binpack! ( items quot n -- bins ) 
-    [ dupd map zip ] dip binpack [ keys ] map ;
+    [ dupd map zip ] dip binpack [ keys ] map ; inline
 

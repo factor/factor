@@ -24,6 +24,13 @@ ARTICLE: "wrappers" "Wrappers"
 "Wrappers are used to push words on the data stack; they evaluate to the object being wrapped:"
 { $subsection wrapper }
 { $subsection literalize }
+"Wrapper literal syntax is documented in " { $link "syntax-words" } "."
+{ $example
+  "IN: scratchpad"
+  "DEFER: my-word"
+  "\\ my-word name>> ."
+  "\"my-word\""
+}
 { $see-also "combinators" } ;
 
 ABOUT: "quotations"
