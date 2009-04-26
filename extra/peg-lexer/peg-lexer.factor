@@ -45,11 +45,11 @@ M: lex-hash at*
 : parse* ( parser -- ast )
     compile
     [ execute [ error-stack get first throw ] unless* ] with-global-lexer
-    ast>> ;
+    ast>> ; inline
 
 : create-bnf ( name parser -- )
     reset-tokenizer [ lexer get skip-blank parse* dup ignore? [ drop ] [ parsed ] if ] curry
-    define-syntax ;
+    define-syntax word make-inline ;
     
 SYNTAX: ON-BNF:
     CREATE-WORD reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
