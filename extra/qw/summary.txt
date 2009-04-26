@@ -1,0 +1,1 @@
+Perlish syntax for literal arrays of whitespace-delimited strings (qw{ foo bar })
