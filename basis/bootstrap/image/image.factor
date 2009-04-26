@@ -3,14 +3,13 @@
 USING: alien arrays byte-arrays generic assocs hashtables assocs
 hashtables.private io io.binary io.files io.encodings.binary
 io.pathnames kernel kernel.private math namespaces make parser
-prettyprint sequences sequences.private strings sbufs
-vectors words quotations assocs system layouts splitting
-grouping growable classes classes.builtin classes.tuple
-classes.tuple.private words.private vocabs
-vocabs.loader source-files definitions debugger
-quotations.private sequences.private combinators
-math.order math.private accessors
-slots.private compiler.units fry ;
+prettyprint sequences sequences.private strings sbufs vectors words
+quotations assocs system layouts splitting grouping growable classes
+classes.builtin classes.tuple classes.tuple.private words.private
+vocabs vocabs.loader source-files definitions debugger
+quotations.private sequences.private combinators math.order
+math.private accessors slots.private compiler.units compiler.constants
+fry ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -94,13 +93,30 @@ CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
 
-: make-jit ( quot rc rt offset -- quad )
-    [ [ call( -- ) ] { } make ] 3dip 4array ;
+SYMBOL: jit-define-rc
+SYMBOL: jit-define-rt
+SYMBOL: jit-define-offset
 
-: jit-define ( quot rc rt offset name -- )
+: compute-offset ( -- offset )
+    building get length jit-define-rc get rc-absolute-cell = cell 4 ? - ;
+
+: jit-rel ( rc rt -- )
+    jit-define-rt set
+    jit-define-rc set
+    compute-offset jit-define-offset set ;
+
+: make-jit ( quot -- quad )
+    [
+        call( -- )
+        jit-define-rc get
+        jit-define-rt get
+        jit-define-offset get 3array
+    ] { } make prefix ;
+
+: jit-define ( quot name -- )
     [ make-jit ] dip set ;
 
-: define-sub-primitive ( quot rc rt offset word -- )
+: define-sub-primitive ( quot word -- )
     [ make-jit ] dip sub-primitives get set-at ;
 
 ! The image being constructed; a vector of word-size integers

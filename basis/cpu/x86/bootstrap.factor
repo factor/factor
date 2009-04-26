@@ -12,7 +12,7 @@ big-endian off
 
 [
     ! Load word
-    temp0 0 MOV
+    temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
     ! Bump profiling counter
     temp0 profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
@@ -21,35 +21,35 @@ big-endian off
     temp0 compiled-header-size ADD
     ! Jump to XT
     temp0 JMP
-] rc-absolute-cell rt-immediate 1 rex-length + jit-profiling jit-define
+] jit-profiling jit-define
 
 [
     ! load XT
-    temp0 0 MOV
+    temp0 0 MOV rc-absolute-cell rt-this jit-rel
     ! save stack frame size
     stack-frame-size PUSH
     ! push XT
     temp0 PUSH
     ! alignment
     stack-reg stack-frame-size 3 bootstrap-cells - SUB
-] rc-absolute-cell rt-this 1 rex-length + jit-prolog jit-define
+] jit-prolog jit-define
 
 [
     ! load literal
-    temp0 0 MOV
+    temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
     ! increment datastack pointer
     ds-reg bootstrap-cell ADD
     ! store literal on datastack
     ds-reg [] temp0 MOV
-] rc-absolute-cell rt-immediate 1 rex-length + jit-push-immediate jit-define
+] jit-push-immediate jit-define
 
 [
-    f JMP
-] rc-relative rt-xt 1 jit-word-jump jit-define
+    f JMP rc-relative rt-xt jit-rel
+] jit-word-jump jit-define
 
 [
-    f CALL
-] rc-relative rt-xt 1 jit-word-call jit-define
+    f CALL rc-relative rt-xt jit-rel
+] jit-word-call jit-define
 
 [
     ! load boolean
@@ -59,17 +59,17 @@ big-endian off
     ! compare boolean with f
     temp0 \ f tag-number CMP
     ! jump to true branch if not equal
-    f JNE
-] rc-relative rt-xt 10 rex-length 3 * + jit-if-1 jit-define
+    f JNE rc-relative rt-xt jit-rel
+] jit-if-1 jit-define
 
 [
     ! jump to false branch if equal
-    f JMP
-] rc-relative rt-xt 1 jit-if-2 jit-define
+    f JMP rc-relative rt-xt jit-rel
+] jit-if-2 jit-define
 
 [
     ! load dispatch table
-    temp1 0 MOV
+    temp1 0 MOV rc-absolute-cell rt-immediate jit-rel
     ! load index
     temp0 ds-reg [] MOV
     ! turn it into an array offset
@@ -83,7 +83,7 @@ big-endian off
     ! execute branch. the quot must be in arg, since it might
     ! not be compiled yet
     arg quot-xt-offset [+] JMP
-] rc-absolute-cell rt-immediate 1 rex-length + jit-dispatch jit-define
+] jit-dispatch jit-define
 
 : jit->r ( -- )
     rs-reg bootstrap-cell ADD
@@ -135,21 +135,21 @@ big-endian off
 
 [
     jit->r
-    f CALL
+    f CALL rc-relative rt-xt jit-rel
     jit-r>
-] rc-relative rt-xt 11 rex-length 4 * + jit-dip jit-define
+] jit-dip jit-define
 
 [
     jit-2>r
-    f CALL
+    f CALL rc-relative rt-xt jit-rel
     jit-2r>
-] rc-relative rt-xt 17 rex-length 6 * + jit-2dip jit-define
+] jit-2dip jit-define
 
 [
     jit-3>r
-    f CALL
+    f CALL rc-relative rt-xt jit-rel
     jit-3r>
-] rc-relative rt-xt 23 rex-length 8 * + jit-3dip jit-define
+] jit-3dip jit-define
 
 : prepare-(execute) ( -- operand )
     ! load from stack
@@ -159,16 +159,16 @@ big-endian off
     ! execute word
     temp0 word-xt-offset [+] ;
 
-[ prepare-(execute) JMP ] f f f jit-execute-jump jit-define
+[ prepare-(execute) JMP ] jit-execute-jump jit-define
 
-[ prepare-(execute) CALL ] f f f jit-execute-call jit-define
+[ prepare-(execute) CALL ] jit-execute-call jit-define
 
 [
     ! unwind stack frame
     stack-reg stack-frame-size bootstrap-cell - ADD
-] f f f jit-epilog jit-define
+] jit-epilog jit-define
 
-[ 0 RET ] f f f jit-return jit-define
+[ 0 RET ] jit-return jit-define
 
 ! Sub-primitives
 
@@ -180,7 +180,7 @@ big-endian off
     ds-reg bootstrap-cell SUB
     ! call quotation
     arg quot-xt-offset [+] JMP
-] f f f \ (call) define-sub-primitive
+] \ (call) define-sub-primitive
 
 ! Objects
 [
@@ -192,7 +192,7 @@ big-endian off
     temp0 tag-bits get SHL
     ! push to stack
     ds-reg [] temp0 MOV
-] f f f \ tag define-sub-primitive
+] \ tag define-sub-primitive
 
 [
     ! load slot number
@@ -210,26 +210,26 @@ big-endian off
     temp0 temp1 temp0 [+] MOV
     ! push to stack
     ds-reg [] temp0 MOV
-] f f f \ slot define-sub-primitive
+] \ slot define-sub-primitive
 
 ! Shufflers
 [
     ds-reg bootstrap-cell SUB
-] f f f \ drop define-sub-primitive
+] \ drop define-sub-primitive
 
 [
     ds-reg 2 bootstrap-cells SUB
-] f f f \ 2drop define-sub-primitive
+] \ 2drop define-sub-primitive
 
 [
     ds-reg 3 bootstrap-cells SUB
-] f f f \ 3drop define-sub-primitive
+] \ 3drop define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
     ds-reg bootstrap-cell ADD
     ds-reg [] temp0 MOV
-] f f f \ dup define-sub-primitive
+] \ dup define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
@@ -237,7 +237,7 @@ big-endian off
     ds-reg 2 bootstrap-cells ADD
     ds-reg [] temp0 MOV
     ds-reg bootstrap-cell neg [+] temp1 MOV
-] f f f \ 2dup define-sub-primitive
+] \ 2dup define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
@@ -247,31 +247,31 @@ big-endian off
     ds-reg [] temp0 MOV
     ds-reg -1 bootstrap-cells [+] temp1 MOV
     ds-reg -2 bootstrap-cells [+] temp3 MOV
-] f f f \ 3dup define-sub-primitive
+] \ 3dup define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
     ds-reg [] temp0 MOV
-] f f f \ nip define-sub-primitive
+] \ nip define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
     ds-reg 2 bootstrap-cells SUB
     ds-reg [] temp0 MOV
-] f f f \ 2nip define-sub-primitive
+] \ 2nip define-sub-primitive
 
 [
     temp0 ds-reg -1 bootstrap-cells [+] MOV
     ds-reg bootstrap-cell ADD
     ds-reg [] temp0 MOV
-] f f f \ over define-sub-primitive
+] \ over define-sub-primitive
 
 [
     temp0 ds-reg -2 bootstrap-cells [+] MOV
     ds-reg bootstrap-cell ADD
     ds-reg [] temp0 MOV
-] f f f \ pick define-sub-primitive
+] \ pick define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
@@ -279,7 +279,7 @@ big-endian off
     ds-reg [] temp1 MOV
     ds-reg bootstrap-cell ADD
     ds-reg [] temp0 MOV
-] f f f \ dupd define-sub-primitive
+] \ dupd define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
@@ -288,21 +288,21 @@ big-endian off
     ds-reg [] temp0 MOV
     ds-reg -1 bootstrap-cells [+] temp1 MOV
     ds-reg -2 bootstrap-cells [+] temp0 MOV
-] f f f \ tuck define-sub-primitive
+] \ tuck define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
     temp1 ds-reg bootstrap-cell neg [+] MOV
     ds-reg bootstrap-cell neg [+] temp0 MOV
     ds-reg [] temp1 MOV
-] f f f \ swap define-sub-primitive
+] \ swap define-sub-primitive
 
 [
     temp0 ds-reg -1 bootstrap-cells [+] MOV
     temp1 ds-reg -2 bootstrap-cells [+] MOV
     ds-reg -2 bootstrap-cells [+] temp0 MOV
     ds-reg -1 bootstrap-cells [+] temp1 MOV
-] f f f \ swapd define-sub-primitive
+] \ swapd define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
@@ -311,7 +311,7 @@ big-endian off
     ds-reg -2 bootstrap-cells [+] temp1 MOV
     ds-reg -1 bootstrap-cells [+] temp0 MOV
     ds-reg [] temp3 MOV
-] f f f \ rot define-sub-primitive
+] \ rot define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
@@ -320,14 +320,14 @@ big-endian off
     ds-reg -2 bootstrap-cells [+] temp0 MOV
     ds-reg -1 bootstrap-cells [+] temp3 MOV
     ds-reg [] temp1 MOV
-] f f f \ -rot define-sub-primitive
+] \ -rot define-sub-primitive
 
-[ jit->r ] f f f \ load-local define-sub-primitive
+[ jit->r ] \ load-local define-sub-primitive
 
 ! Comparisons
 : jit-compare ( insn -- )
     ! load t
-    temp3 0 MOV
+    temp3 0 MOV rc-absolute-cell rt-immediate jit-rel
     ! load f
     temp1 \ f tag-number MOV
     ! load first value
@@ -342,8 +342,7 @@ big-endian off
     ds-reg [] temp1 MOV ;
 
 : define-jit-compare ( insn word -- )
-    [ [ jit-compare ] curry rc-absolute-cell rt-immediate 1 rex-length + ] dip
-    define-sub-primitive ;
+    [ [ jit-compare ] curry ] dip define-sub-primitive ;
 
 \ CMOVE \ eq? define-jit-compare
 \ CMOVGE \ fixnum>= define-jit-compare
@@ -360,9 +359,9 @@ big-endian off
     ! compute result
     [ ds-reg [] temp0 ] dip execute( dst src -- ) ;
 
-[ \ ADD jit-math ] f f f \ fixnum+fast define-sub-primitive
+[ \ ADD jit-math ] \ fixnum+fast define-sub-primitive
 
-[ \ SUB jit-math ] f f f \ fixnum-fast define-sub-primitive
+[ \ SUB jit-math ] \ fixnum-fast define-sub-primitive
 
 [
     ! load second input
@@ -377,20 +376,20 @@ big-endian off
     temp0 temp1 IMUL2
     ! push result
     ds-reg [] temp1 MOV
-] f f f \ fixnum*fast define-sub-primitive
+] \ fixnum*fast define-sub-primitive
 
-[ \ AND jit-math ] f f f \ fixnum-bitand define-sub-primitive
+[ \ AND jit-math ] \ fixnum-bitand define-sub-primitive
 
-[ \ OR jit-math ] f f f \ fixnum-bitor define-sub-primitive
+[ \ OR jit-math ] \ fixnum-bitor define-sub-primitive
 
-[ \ XOR jit-math ] f f f \ fixnum-bitxor define-sub-primitive
+[ \ XOR jit-math ] \ fixnum-bitxor define-sub-primitive
 
 [
     ! complement
     ds-reg [] NOT
     ! clear tag bits
     ds-reg [] tag-mask get XOR
-] f f f \ fixnum-bitnot define-sub-primitive
+] \ fixnum-bitnot define-sub-primitive
 
 [
     ! load shift count
@@ -414,7 +413,7 @@ big-endian off
     temp1 temp3 CMOVGE
     ! push to stack
     ds-reg [] temp1 MOV
-] f f f \ fixnum-shift-fast define-sub-primitive
+] \ fixnum-shift-fast define-sub-primitive
 
 : jit-fixnum-/mod ( -- )
     ! load second parameter
@@ -434,7 +433,7 @@ big-endian off
     ds-reg bootstrap-cell SUB
     ! push to stack
     ds-reg [] mod-arg MOV
-] f f f \ fixnum-mod define-sub-primitive
+] \ fixnum-mod define-sub-primitive
 
 [
     jit-fixnum-/mod
@@ -444,7 +443,7 @@ big-endian off
     div-arg tag-bits get SHL
     ! push to stack
     ds-reg [] div-arg MOV
-] f f f \ fixnum/i-fast define-sub-primitive
+] \ fixnum/i-fast define-sub-primitive
 
 [
     jit-fixnum-/mod
@@ -453,7 +452,7 @@ big-endian off
     ! push to stack
     ds-reg [] mod-arg MOV
     ds-reg bootstrap-cell neg [+] div-arg MOV
-] f f f \ fixnum/mod-fast define-sub-primitive
+] \ fixnum/mod-fast define-sub-primitive
 
 [
     temp0 ds-reg [] MOV
@@ -464,7 +463,7 @@ big-endian off
     temp1 1 tag-fixnum MOV
     temp0 temp1 CMOVE
     ds-reg [] temp0 MOV
-] f f f \ both-fixnums? define-sub-primitive
+] \ both-fixnums? define-sub-primitive
 
 [
     ! load local number
@@ -475,7 +474,7 @@ big-endian off
     temp0 rs-reg temp0 [+] MOV
     ! push to stack
     ds-reg [] temp0 MOV
-] f f f \ get-local define-sub-primitive
+] \ get-local define-sub-primitive
 
 [
     ! load local count
@@ -486,6 +485,6 @@ big-endian off
     fixnum>slot@
     ! decrement retain stack pointer
     rs-reg temp0 SUB
-] f f f \ drop-locals define-sub-primitive
+] \ drop-locals define-sub-primitive
 
 [ "bootstrap.x86" forget-vocab ] with-compilation-unit
