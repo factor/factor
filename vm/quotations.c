@@ -368,10 +368,10 @@ struct.) */
 		offset -= size; \
 	}
 
-#define COUNT_TAIL_CALL(name,scan) {		       \
-		if(stack_frame) COUNT(JIT_EPILOG,scan) \
-		tail_call = true;		       \
-		COUNT(name,scan);		       \
+#define COUNT_TAIL_CALL(name,scan) { \
+		if(stack_frame) COUNT(userenv[JIT_EPILOG],scan) \
+		tail_call = true; \
+		COUNT(name,scan); \
 	}
 
 F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
