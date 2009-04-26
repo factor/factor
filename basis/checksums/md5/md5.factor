@@ -14,7 +14,7 @@ IN: checksums.md5
 SYMBOLS: a b c d old-a old-b old-c old-d ;
 
 : T ( N -- Y )
-    sin abs 4294967296 * >integer ; foldable
+    sin abs 32 2^ * >integer ; foldable
 
 : initialize-md5 ( -- )
     0 bytes-read set
