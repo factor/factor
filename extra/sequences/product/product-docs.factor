@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff bsd license
 USING: help.markup help.syntax multiline quotations sequences sequences.product ;
 IN: sequences
 

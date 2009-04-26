@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff bsd license
 USING: arrays kernel make sequences sequences.product tools.test ;
 IN: sequences.product.tests
 

@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff bsd license
 USING: accessors arrays kernel locals math sequences ;
 IN: sequences.product
 
