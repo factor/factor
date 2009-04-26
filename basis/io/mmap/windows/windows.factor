@@ -28,12 +28,21 @@ M: win32-mapped-file dispose
 
 C: <win32-mapped-file> win32-mapped-file
 
-M: windows (mapped-file)
+M: windows (mapped-file-r/w)
     [
         { GENERIC_WRITE GENERIC_READ } flags
         OPEN_ALWAYS
         { PAGE_READWRITE SEC_COMMIT } flags
         FILE_MAP_ALL_ACCESS mmap-open
+        -rot <win32-mapped-file>
+    ] with-destructors ;
+
+M: windows (mapped-file-reader)
+    [
+        GENERIC_READ
+        OPEN_ALWAYS
+        { PAGE_READONLY SEC_COMMIT } flags
+        FILE_MAP_READ mmap-open
         -rot <win32-mapped-file>
     ] with-destructors ;
 

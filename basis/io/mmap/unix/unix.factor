@@ -13,8 +13,13 @@ IN: io.mmap.unix
         [ 0 mmap dup MAP_FAILED = [ (io-error) ] when ] keep
     ] with-destructors ;
 
-M: unix (mapped-file)
+M: unix (mapped-file-r/w)
     { PROT_READ PROT_WRITE } flags
+    { MAP_FILE MAP_SHARED } flags
+    mmap-open ;
+
+M: unix (mapped-file-reader)
+    { PROT_READ } flags
     { MAP_FILE MAP_SHARED } flags
     mmap-open ;
 
