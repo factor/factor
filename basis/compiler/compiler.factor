@@ -15,18 +15,17 @@ IN: compiler
 SYMBOL: compile-queue
 SYMBOL: compiled
 
-: queue-compile? ( word -- ? )
+: compile? ( word -- ? )
     #! Don't attempt to compile certain words.
     {
         [ "forgotten" word-prop ]
         [ compiled get key? ]
-        [ single-generic? ]
         [ inlined-block? ]
         [ primitive? ]
     } 1|| not ;
 
 : queue-compile ( word -- )
-    dup queue-compile? [ compile-queue get push-front ] [ drop ] if ;
+    dup compile? [ compile-queue get push-front ] [ drop ] if ;
 
 : recompile-callers? ( word -- ? )
     changed-effects get key? ;
@@ -43,6 +42,14 @@ SYMBOL: compiled
     H{ } clone generic-dependencies set
     clear-compiler-error ;
 
+GENERIC: no-compile? ( word -- ? )
+
+M: word no-compile? "no-compile" word-prop ;
+
+M: method-body no-compile? "method-generic" word-prop no-compile? ;
+
+M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
+
 : ignore-error? ( word error -- ? )
     #! Ignore some errors on inline combinators, macros, and special
     #! words such as 'call'.
@@ -50,8 +57,8 @@ SYMBOL: compiled
         {
             [ macro? ]
             [ inline? ]
+            [ no-compile? ]
             [ "special" word-prop ]
-            [ "no-compile" word-prop ]
         } 1||
     ] [
         {
@@ -98,12 +105,16 @@ SYMBOL: compiled
         2bi
     ] if ;
 
+: optimize? ( word -- ? )
+    { [ contains-breakpoints? ] [ single-generic? ] } 1|| not ;
+
 : frontend ( word -- nodes )
     #! If the word contains breakpoints, don't optimize it, since
     #! the walker does not support this.
-    dup contains-breakpoints? [ dup def>> deoptimize-with ] [
-        [ build-tree ] [ deoptimize ] recover optimize-tree
-    ] if ;
+    dup optimize?
+    [ [ build-tree ] [ deoptimize ] recover optimize-tree ]
+    [ dup def>> deoptimize-with ]
+    if ;
 
 : compile-dependency ( word -- )
     #! If a word calls an unoptimized word, try to compile the callee.

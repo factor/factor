@@ -17,3 +17,6 @@ M: hook-combination picker
 M: hook-combination dispatch# drop 0 ;
 
 M: hook-generic definer drop \ HOOK: f ;
+
+M: hook-generic effective-method
+    [ "combination" word-prop var>> get ] keep (effective-method) ;

@@ -1,11 +1,10 @@
-IN: generic.standard.tests
-USING: tools.test math math.functions math.constants
-generic.standard strings sequences arrays kernel accessors words
-specialized-arrays.double byte-arrays bit-arrays parser
-namespaces make quotations stack-checker vectors growable
-hashtables sbufs prettyprint byte-vectors bit-vectors
-specialized-vectors.double definitions generic sets graphs assocs
-grouping see ;
+IN: generic.single.tests
+USING: tools.test math math.functions math.constants generic.standard
+generic.single strings sequences arrays kernel accessors words
+specialized-arrays.double byte-arrays bit-arrays parser namespaces
+make quotations stack-checker vectors growable hashtables sbufs
+prettyprint byte-vectors bit-vectors specialized-vectors.double
+definitions generic sets graphs assocs grouping see ;
 
 GENERIC: lo-tag-test ( obj -- obj' )
 
@@ -249,23 +248,6 @@ M: string my-hook "a string" ;
 [ "a string" ] [ my-hook my-var set my-hook ] unit-test
 [ 1.0 my-var set my-hook ] [ T{ no-method f 1.0 my-hook } = ] must-fail-with
 
-HOOK: my-tuple-hook my-var ( -- x )
-
-M: sequence my-tuple-hook my-hook ;
-
-TUPLE: m-t-h-a ;
-
-M: m-t-h-a my-tuple-hook "foo" ;
-
-TUPLE: m-t-h-b < m-t-h-a ;
-
-M: m-t-h-b my-tuple-hook "bar" ;
-
-[ f ] [
-    \ my-tuple-hook [ "engines" word-prop ] keep prefix
-    [ 1quotation infer ] map all-equal?
-] unit-test
-
 HOOK: call-next-hooker my-var ( -- x )
 
 M: sequence call-next-hooker "sequence" ;
@@ -281,7 +263,7 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
 ] unit-test
 
 [ t ] [
-    { } \ nth effective-method nip \ sequence \ nth method eq?
+    { } \ nth effective-method nip M\ sequence nth eq?
 ] unit-test
 
 [ t ] [

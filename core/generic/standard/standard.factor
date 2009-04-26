@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors definitions generic generic.single kernel
-namespaces words math combinators ;
+namespaces words math combinators sequences ;
 IN: generic.standard
 
 TUPLE: standard-combination < single-combination # ;
@@ -32,6 +32,10 @@ M: standard-combination picker
 
 M: standard-combination dispatch# #>> ;
 
-M: simple-generic definer drop \ GENERIC: f ;
+M: standard-generic effective-method
+    [ datastack ] dip [ "combination" word-prop #>> swap <reversed> nth ] keep
+    (effective-method) ;
 
 M: standard-generic definer drop \ GENERIC# f ;
+
+M: simple-generic definer drop \ GENERIC: f ;
