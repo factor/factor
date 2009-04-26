@@ -32,14 +32,17 @@ typedef signed long long s64;
 /*** Tags ***/
 #define FIXNUM_TYPE 0
 #define BIGNUM_TYPE 1
-#define TUPLE_TYPE 2
-#define OBJECT_TYPE 3
-#define RATIO_TYPE 4
-#define FLOAT_TYPE 5
-#define COMPLEX_TYPE 6
+#define RATIO_TYPE 2
+#define FLOAT_TYPE 3
+#define COMPLEX_TYPE 4
+#define F_TYPE 5
+#define OBJECT_TYPE 6
+#define TUPLE_TYPE 7
+
+#define HI_TAG_OR_TUPLE_P(cell) (((CELL)(cell) & 6) == 6)
+#define HI_TAG_HEADER(cell) (((CELL)(cell) & 1) * CELLS + UNTAG(cell))
 
 /* Canonical F object */
-#define F_TYPE 7
 #define F F_TYPE
 
 #define HEADER_TYPE 8 /* anything less than this is a tag */

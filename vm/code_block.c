@@ -220,7 +220,7 @@ void mark_object_code_block(CELL scan)
 	F_QUOTATION *quot;
 	F_CALLSTACK *stack;
 
-	switch(object_type(scan))
+	switch(hi_tag(scan))
 	{
 	case WORD_TYPE:
 		word = (F_WORD *)scan;
