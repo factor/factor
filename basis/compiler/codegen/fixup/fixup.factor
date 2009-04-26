@@ -25,7 +25,7 @@ TUPLE: label-fixup label class ;
 M: label-fixup fixup*
     dup class>> rc-absolute?
     [ "Absolute labels not supported" throw ] when
-    [ label>> ] [ class>> ] bi compiled-offset 4 - rot
+    [ class>> ] [ label>> ] bi compiled-offset 4 - swap
     3array label-table get push ;
 
 TUPLE: rel-fixup class type ;
