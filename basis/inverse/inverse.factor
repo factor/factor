@@ -12,7 +12,7 @@ IN: inverse
 ERROR: fail ;
 M: fail summary drop "Matching failed" ;
 
-: assure ( ? -- ) [ fail ] unless ;
+: assure ( ? -- ) [ fail ] unless ; inline
 
 : =/fail ( obj1 obj2 -- ) = assure ;
 
