@@ -77,12 +77,6 @@ INLINE CELL tag_tuple(F_TUPLE *tuple)
 	return RETAG(tuple,TUPLE_TYPE);
 }
 
-INLINE F_TUPLE *untag_tuple(CELL object)
-{
-	type_check(TUPLE_TYPE,object);
-	return untag_object(object);
-}
-
 INLINE CELL tuple_size(F_TUPLE_LAYOUT *layout)
 {
 	CELL size = untag_fixnum_fast(layout->size);
@@ -165,32 +159,69 @@ void primitive_word_xt(void);
 void primitive_wrapper(void);
 
 /* Macros to simulate a vector in C */
-#define GROWABLE_ARRAY(result) \
-	CELL result##_count = 0; \
-	CELL result = tag_object(allot_array(ARRAY_TYPE,100,F))
+typedef struct {
+	CELL count;
+	CELL array;
+} F_GROWABLE_ARRAY;
 
-F_ARRAY *growable_array_add(F_ARRAY *result, CELL elt, CELL *result_count);
+INLINE F_GROWABLE_ARRAY make_growable_array(void)
+{
+	F_GROWABLE_ARRAY result;
+	result.count = 0;
+	result.array = tag_object(allot_array(ARRAY_TYPE,10000,F));
+	return result;
+}
+
+#define GROWABLE_ARRAY(result) F_GROWABLE_ARRAY result##_g = make_growable_array(); \
+	REGISTER_ROOT(result##_g.array)
+
+void growable_array_add(F_GROWABLE_ARRAY *result, CELL elt);
 
 #define GROWABLE_ARRAY_ADD(result,elt) \
-	result = tag_object(growable_array_add(untag_object(result),elt,&result##_count))
+	growable_array_add(&result##_g,elt)
 
-F_ARRAY *growable_array_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count);
+void growable_array_append(F_GROWABLE_ARRAY *result, F_ARRAY *elts);
 
 #define GROWABLE_ARRAY_APPEND(result,elts) \
-	result = tag_object(growable_array_append(untag_object(result),elts,&result##_count))
+	growable_array_append(&result##_g,elts)
 
-#define GROWABLE_ARRAY_TRIM(result) \
-	result = tag_object(reallot_array(untag_object(result),result##_count))
+INLINE CELL growable_array_trim(F_GROWABLE_ARRAY *array)
+{
+	return tag_object(reallot_array(untag_object(array->array),array->count));
+}
+
+#define GROWABLE_ARRAY_TRIM(result) CELL result = growable_array_trim(&result##_g)
+
+#define GROWABLE_ARRAY_DONE(result) UNREGISTER_ROOT(result##_g.array)
 
 /* Macros to simulate a byte vector in C */
-#define GROWABLE_BYTE_ARRAY(result) \
-	CELL result##_count = 0; \
-	CELL result = tag_object(allot_byte_array(100))
+typedef struct {
+	CELL count;
+	CELL array;
+} F_GROWABLE_BYTE_ARRAY;
 
-F_ARRAY *growable_byte_array_append(F_BYTE_ARRAY *result, void *elts, CELL len, CELL *result_count);
+INLINE F_GROWABLE_BYTE_ARRAY make_growable_byte_array(void)
+{
+	F_GROWABLE_BYTE_ARRAY result;
+	result.count = 0;
+	result.array = tag_object(allot_byte_array(10000));
+	return result;
+}
+
+#define GROWABLE_BYTE_ARRAY(result) \
+	F_GROWABLE_BYTE_ARRAY result##_g = make_growable_byte_array(); \
+	REGISTER_ROOT(result##_g.array)
+
+void growable_byte_array_append(F_GROWABLE_BYTE_ARRAY *result, void *elts, CELL len);
 
 #define GROWABLE_BYTE_ARRAY_APPEND(result,elts,len) \
-	result = tag_object(growable_byte_array_append(untag_object(result),elts,len,&result##_count))
+	growable_byte_array_append(&result##_g,elts,len)
 
-#define GROWABLE_BYTE_ARRAY_TRIM(result) \
-	result = tag_object(reallot_byte_array(untag_object(result),result##_count))
+INLINE CELL growable_byte_array_trim(F_GROWABLE_BYTE_ARRAY *byte_array)
+{
+	return tag_object(reallot_byte_array(untag_object(byte_array->array),byte_array->count));
+}
+
+#define GROWABLE_BYTE_ARRAY_TRIM(result) CELL result = growable_byte_array_trim(&result##_g)
+
+#define GROWABLE_BYTE_ARRAY_DONE(result) UNREGISTER_ROOT(result##_g.array);

@@ -550,6 +550,7 @@ void primitive_gc_stats(void)
 	GROWABLE_ARRAY_ADD(stats,allot_cell(code_heap_scans));
 
 	GROWABLE_ARRAY_TRIM(stats);
+	GROWABLE_ARRAY_DONE(stats);
 	dpush(stats);
 }
 

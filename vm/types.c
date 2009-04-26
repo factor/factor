@@ -192,41 +192,45 @@ void primitive_resize_array(void)
 	dpush(tag_object(reallot_array(array,capacity)));
 }
 
-F_ARRAY *growable_array_add(F_ARRAY *result, CELL elt, CELL *result_count)
+void growable_array_add(F_GROWABLE_ARRAY *array, CELL elt)
 {
+	F_ARRAY *underlying = untag_object(array->array);
 	REGISTER_ROOT(elt);
 
-	if(*result_count == array_capacity(result))
+	if(array->count == array_capacity(underlying))
 	{
-		result = reallot_array(result,*result_count * 2);
+		underlying = reallot_array(underlying,array->count * 2);
+		array->array = tag_object(underlying);
 	}
 
 	UNREGISTER_ROOT(elt);
-	set_array_nth(result,*result_count,elt);
-	(*result_count)++;
-
-	return result;
+	set_array_nth(underlying,array->count++,elt);
 }
 
-F_ARRAY *growable_array_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
+void growable_array_append(F_GROWABLE_ARRAY *array, F_ARRAY *elts)
 {
 	REGISTER_UNTAGGED(elts);
 
-	CELL elts_size = array_capacity(elts);
-	CELL new_size = *result_count + elts_size;
+	F_ARRAY *underlying = untag_object(array->array);
 
-	if(new_size >= array_capacity(result))
-		result = reallot_array(result,new_size * 2);
+	CELL elts_size = array_capacity(elts);
+	CELL new_size = array->count + elts_size;
+
+	if(new_size >= array_capacity(underlying))
+	{
+		underlying = reallot_array(underlying,new_size * 2);
+		array->array = tag_object(underlying);
+	}
 
 	UNREGISTER_UNTAGGED(elts);
 
-	write_barrier((CELL)result);
+	write_barrier((CELL)array->array);
 
-	memcpy((void *)AREF(result,*result_count),(void *)AREF(elts,0),elts_size * CELLS);
+	memcpy((void *)AREF(underlying,array->count),
+	       (void *)AREF(elts,0),
+	       elts_size * CELLS);
 
-	*result_count += elts_size;
-
-	return result;
+	array->count += elts_size;
 }
 
 /* Byte arrays */
@@ -283,18 +287,20 @@ void primitive_resize_byte_array(void)
 	dpush(tag_object(reallot_byte_array(array,capacity)));
 }
 
-F_BYTE_ARRAY *growable_byte_array_append(F_BYTE_ARRAY *result, void *elts, CELL len, CELL *result_count)
+void growable_byte_array_append(F_GROWABLE_BYTE_ARRAY *array, void *elts, CELL len)
 {
-	CELL new_size = *result_count + len;
+	CELL new_size = array->count + len;
+	F_BYTE_ARRAY *underlying = untag_object(array->array);
 
-	if(new_size >= byte_array_capacity(result))
-		result = reallot_byte_array(result,new_size * 2);
+	if(new_size >= byte_array_capacity(underlying))
+	{
+		underlying = reallot_byte_array(underlying,new_size * 2);
+		array->array = tag_object(underlying);
+	}
 
-	memcpy((void *)BREF(result,*result_count),elts,len);
+	memcpy((void *)BREF(underlying,array->count),elts,len);
 
-	*result_count = new_size;
-
-	return result;
+	array->count += len;
 }
 
 /* Tuples */
