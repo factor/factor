@@ -2,7 +2,20 @@ USING: help.markup help.syntax io strings arrays io.backend
 io.files.private quotations sequences ;
 IN: io.files
 
+ARTICLE: "io.files.examples" "Examples of reading and writing files"
+"Sort the lines in a file and write them back to the same file:"
+{ $code
+    "USING: io io.encodings.utf8 io.files sequences sorting ;"
+    "\"lines.txt\" utf8 [ file-lines natural-sort ] 2keep set-file-lines"
+}
+"Read 1024 bytes from a file:"
+{ $code
+    "USING: io io.encodings.binary io.files ;"
+    "\"data.bin\" binary [ 1024 read ] with-file-reader"
+} ;
+
 ARTICLE: "io.files" "Reading and writing files"
+{ $subsection "io.files.examples" }
 "File streams:"
 { $subsection <file-reader> }
 { $subsection <file-writer> }

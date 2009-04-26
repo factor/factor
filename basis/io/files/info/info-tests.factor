@@ -3,9 +3,6 @@ io.directories kernel io.pathnames accessors tools.test
 sequences io.files.temp ;
 IN: io.files.info.tests
 
-\ file-info must-infer
-\ link-info must-infer
-
 [ t ] [
     temp-directory [ "hi41" "test41" utf8 set-file-contents ] with-directory
     temp-directory "test41" append-path utf8 file-contents "hi41" =

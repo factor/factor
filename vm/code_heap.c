@@ -21,14 +21,16 @@ void set_word_code(F_WORD *word, F_CODE_BLOCK *compiled)
 	word->optimizedp = T;
 }
 
-/* Allocates memory */
-void default_word_code(F_WORD *word, bool relocate)
+/* Compile a word definition with the non-optimizing compiler. Allocates memory */
+void jit_compile_word(F_WORD *word, CELL def, bool relocate)
 {
+	REGISTER_ROOT(def);
 	REGISTER_UNTAGGED(word);
-	jit_compile(word->def,relocate);
+	jit_compile(def,relocate);
 	UNREGISTER_UNTAGGED(word);
+	UNREGISTER_ROOT(def);
 
-	word->code = untag_quotation(word->def)->code;
+	word->code = untag_quotation(def)->code;
 	word->optimizedp = F;
 }
 
@@ -83,15 +85,15 @@ void primitive_modify_code_heap(void)
 
 		CELL data = array_nth(pair,1);
 
-		if(data == F)
+		if(type_of(data) == QUOTATION_TYPE)
 		{
 			REGISTER_UNTAGGED(alist);
 			REGISTER_UNTAGGED(word);
-			default_word_code(word,false);
+			jit_compile_word(word,data,false);
 			UNREGISTER_UNTAGGED(word);
 			UNREGISTER_UNTAGGED(alist);
 		}
-		else
+		else if(type_of(data) == ARRAY_TYPE)
 		{
 			F_ARRAY *compiled_code = untag_array(data);
 
@@ -115,6 +117,8 @@ void primitive_modify_code_heap(void)
 
 			set_word_code(word,compiled);
 		}
+		else
+			critical_error("Expected a quotation or an array",data);
 
 		REGISTER_UNTAGGED(alist);
 		update_word_xt(word);

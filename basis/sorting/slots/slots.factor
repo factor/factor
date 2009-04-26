@@ -1,45 +1,28 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit fry kernel macros math.order
-sequences words sorting sequences.deep assocs splitting.monotonic
-math ;
+USING: arrays fry kernel math.order sequences sorting ;
 IN: sorting.slots
 
-<PRIVATE
+: execute-comparator ( obj1 obj2 word -- <=>/f )
+    execute( obj1 obj2 -- <=> ) dup +eq+ eq? [ drop f ] when ;
 
-: short-circuit-comparator ( obj1 obj2 word --  comparator/? )
-    execute dup +eq+ eq? [ drop f ] when ; inline
+: execute-accessor ( obj1 obj2 word -- obj1' obj2' )
+    '[ _ execute( tuple -- value ) ] bi@ ;
 
-: slot-comparator ( seq -- quot )
-    [
-        but-last-slice
-        [ '[ [ _ execute ] bi@ ] ] map concat
-    ] [
-        peek
-        '[ @ _ short-circuit-comparator ]
-    ] bi ;
-
-PRIVATE>
-
-MACRO: compare-slots ( sort-specs -- <=> )
+: compare-slots ( obj1 obj2 sort-specs -- <=> )
     #! sort-spec: { accessors comparator }
-    [ slot-comparator ] map '[ _ 2|| +eq+ or ] ;
+    [
+        dup array? [
+            unclip-last-slice
+            [ [ execute-accessor ] each ] dip
+        ] when execute-comparator
+    ] with with map-find drop +eq+ or ;
 
-MACRO: sort-by-slots ( sort-specs -- quot )
-    '[ [ _ compare-slots ] sort ] ;
+: sort-by-with ( seq sort-specs quot -- seq' )
+    swap '[ _ bi@ _ compare-slots ] sort ; inline
 
-MACRO: compare-seq ( seq -- quot )
-    [ '[ _ short-circuit-comparator ] ] map '[ _ 2|| +eq+ or ] ;
+: sort-by ( seq sort-specs -- seq' ) [ ] sort-by-with ;
 
-MACRO: sort-by ( sort-seq -- quot )
-    '[ [ _ compare-seq ] sort ] ;
+: sort-keys-by ( seq sort-seq -- seq' ) [ first ] sort-by-with ;
 
-MACRO: sort-keys-by ( sort-seq -- quot )
-    '[ [ first ] bi@ _ compare-seq ] sort ;
-
-MACRO: sort-values-by ( sort-seq -- quot )
-    '[ [ second ] bi@ _ compare-seq ] sort ;
-
-MACRO: split-by-slots ( accessor-seqs -- quot )
-    [ [ '[ [ _ execute ] bi@ ] ] map concat [ = ] compose ] map
-    '[ [ _ 2&& ] slice monotonic-slice ] ;
+: sort-values-by ( seq sort-seq -- seq' ) [ second ] sort-by-with ;

@@ -5,6 +5,7 @@ kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
 alien.strings alien.arrays alien.complex sets libc alien.libraries
 continuations.private fry cpu.architecture
+source-files.errors
 compiler.errors
 compiler.alien
 compiler.cfg
@@ -374,47 +375,21 @@ M: long-long-type flatten-value-type ( type -- types )
 : box-return* ( node -- )
     return>> [ ] [ box-return ] if-void ;
 
-TUPLE: no-such-library name ;
-
-M: no-such-library summary
-    drop "Library not found" ;
-
-M: no-such-library compiler-error-type
-    drop +linkage+ ;
-
-: no-such-library ( name -- )
-    \ no-such-library boa
-    compiling-word get compiler-error ;
-
-TUPLE: no-such-symbol name ;
-
-M: no-such-symbol summary
-    drop "Symbol not found" ;
-
-M: no-such-symbol compiler-error-type
-    drop +linkage+ ;
-
-: no-such-symbol ( name -- )
-    \ no-such-symbol boa
-    compiling-word get compiler-error ;
-
 : check-dlsym ( symbols dll -- )
     dup dll-valid? [
         dupd '[ _ dlsym ] any?
-        [ drop ] [ no-such-symbol ] if
+        [ drop ] [ compiling-word get no-such-symbol ] if
     ] [
-        dll-path no-such-library drop
+        dll-path compiling-word get no-such-library drop
     ] if ;
 
-: stdcall-mangle ( symbol node -- symbol )
-    "@"
-    swap parameters>> parameter-sizes drop
-    number>string 3append ;
+: stdcall-mangle ( symbol params -- symbol )
+    parameters>> parameter-sizes drop number>string "@" glue ;
 
 : alien-invoke-dlsym ( params -- symbols dll )
-    dup function>> dup pick stdcall-mangle 2array
-    swap library>> library dup [ dll>> ] when
-    2dup check-dlsym ;
+    [ [ function>> dup ] keep stdcall-mangle 2array ]
+    [ library>> library dup [ dll>> ] when ]
+    bi 2dup check-dlsym ;
 
 M: ##alien-invoke generate-insn
     params>>

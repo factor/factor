@@ -1139,7 +1139,8 @@ FUNCTION: BOOL GetCommState ( HANDLE hFile, LPDCB lpDCB ) ;
 ! FUNCTION: GetCommTimeouts
 ! FUNCTION: GetComPlusPackageInstallStatus
 ! FUNCTION: GetCompressedFileSizeA
-! FUNCTION: GetCompressedFileSizeW
+FUNCTION: DWORD GetCompressedFileSizeW ( LPCTSTR lpFileName, LPDWORD lpFileSizeHigh ) ;
+ALIAS: GetCompressedFileSize GetCompressedFileSizeW
 FUNCTION: BOOL GetComputerNameW ( LPTSTR lpBuffer, LPDWORD lpnSize ) ;
 ALIAS: GetComputerName GetComputerNameW
 FUNCTION: BOOL GetComputerNameExW ( COMPUTER_NAME_FORMAT NameType, LPTSTR lpBuffer, LPDWORD lpnSize ) ;
@@ -1477,7 +1478,7 @@ ALIAS: LoadLibraryEx LoadLibraryExW
 ! FUNCTION: LoadLibraryW
 ! FUNCTION: LoadModule
 ! FUNCTION: LoadResource
-! FUNCTION: LocalAlloc
+FUNCTION: HLOCAL LocalAlloc ( UINT uFlags, SIZE_T uBytes ) ;
 ! FUNCTION: LocalCompact
 ! FUNCTION: LocalFileTimeToFileTime
 ! FUNCTION: LocalFlags

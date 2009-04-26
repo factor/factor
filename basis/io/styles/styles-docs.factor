@@ -274,7 +274,7 @@ HELP: <input>
 { $description "Creates a new " { $link input } "." } ;
 
 HELP: standard-table-style
-{ $values { "style" hashtable } }
+{ $values { "value" hashtable } }
 { $description "Outputs a table style where cells are separated by 5-pixel gaps and framed by a light gray border. This style can be passed to " { $link tabular-output } "." } ;
 
 ARTICLE: "io.streams.plain" "Plain writer streams"

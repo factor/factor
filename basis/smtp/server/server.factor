@@ -36,6 +36,7 @@ SYMBOL: data-mode
 
 : process ( -- )
     read-crlf {
+        { [ dup not ] [ f ] }
         {
             [ dup [ "HELO" head? ] [ "EHLO" head? ] bi or ]
             [ "220 and..?\r\n" write flush t ]

@@ -95,7 +95,7 @@ $nl
 { $subsection POSTPONE: MATH: }
 "Method definition:"
 { $subsection POSTPONE: M: }
-"Generic words must declare their stack effect in order to compile. See " { $link "effect-declaration" } "."
+"Generic words must declare their stack effect in order to compile. See " { $link "effects" } "."
 { $subsection "method-order" }
 { $subsection "call-next-method" }
 { $subsection "method-combination" }

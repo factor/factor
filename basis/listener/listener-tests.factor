@@ -25,7 +25,7 @@ SYNTAX: hello "Hi" print ;
                 "\\ + 1 2 3 4" parse-interactive
                 "cont" get continue-with
             ] ignore-errors
-            "USE: debugger :1" eval
+            "USE: debugger :1" eval( -- quot )
         ] callcc1
     ] unit-test
 ] with-file-vocabs
@@ -50,7 +50,7 @@ SYNTAX: hello "Hi" print ;
 
 [
     [ ] [
-        "IN: listener.tests : hello ( -- )\n\"world\" ;" parse-interactive
+        "IN: listener.tests : hello ( -- string )\n\"world\" ;" parse-interactive
         drop
     ] unit-test
 ] with-file-vocabs

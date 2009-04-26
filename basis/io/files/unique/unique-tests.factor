@@ -5,7 +5,7 @@ IN: io.files.unique.tests
 
 [ 123 ] [
     "core" ".test" [
-        [ [ 123 CHAR: a <repetition> ] dip ascii set-file-contents ]
+        [ [ 123 CHAR: a <string> ] dip ascii set-file-contents ]
         [ file-info size>> ] bi
     ] cleanup-unique-file
 ] unit-test

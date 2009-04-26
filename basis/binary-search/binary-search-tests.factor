@@ -1,8 +1,6 @@
 IN: binary-search.tests
 USING: binary-search math.order vectors kernel tools.test ;
 
-\ sorted-member? must-infer
-
 [ f ] [ 3 { } [ <=> ] with search drop ] unit-test
 [ 0 ] [ 3 { 3 } [ <=> ] with search drop ] unit-test
 [ 1 ] [ 2 { 1 2 3 } [ <=> ] with search drop ] unit-test

@@ -1,9 +1,7 @@
 USING: compiler compiler.units tools.test kernel kernel.private
 sequences.private math.private math combinators strings alien
 arrays memory vocabs parser eval ;
-IN: compiler.tests
-
-\ (compile) must-infer
+IN: compiler.tests.simple
 
 ! Test empty word
 [ ] [ [ ] compile-call ] unit-test
@@ -237,6 +235,6 @@ M: f single-combination-test-2 single-combination-test-4 ;
 10 [
     [ "compiler.tests.foo" forget-vocab ] with-compilation-unit
     [ t ] [
-        "USING: prettyprint words accessors ; IN: compiler.tests.foo : (recursive) ( -- ) (recursive) (recursive) ; inline recursive : recursive ( -- ) (recursive) ; \\ (recursive) optimized>>" eval
+        "USING: prettyprint words accessors ; IN: compiler.tests.foo : (recursive) ( -- ) (recursive) (recursive) ; inline recursive : recursive ( -- ) (recursive) ; \\ (recursive) optimized>>" eval( -- obj )
     ] unit-test
 ] times

@@ -30,7 +30,7 @@ $nl
 { $heading "Anti-pattern #4: Logging and rethrowing" }
 "If you are going to rethrow an error, do not log a message. If you do so, the user will see two log messages for the same error, which will clutter logs without adding any useful information." ;
 
-ARTICLE: "errors" "Error handling"
+ARTICLE: "errors" "Exception handling"
 "Support for handling exceptional situations such as bad user input, implementation bugs, and input/output errors is provided by a set of words built using continuations."
 $nl
 "Two words raise an error in the innermost error handler for the current dynamic extent:"
@@ -81,8 +81,6 @@ $nl
 { $subsection attempt-all }
 { $subsection retry }
 { $subsection with-return }
-"Reflecting the datastack:"
-{ $subsection with-datastack }
 "Continuations serve as the building block for a number of higher-level abstractions, such as " { $link "errors" } " and " { $link "threads" } "."
 { $subsection "continuations.private" } ;
 
@@ -211,7 +209,7 @@ $low-level-note ;
 
 HELP: with-datastack
 { $values { "stack" sequence } { "quot" quotation } { "newstack" sequence } }
-{ $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
+{ $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified; a new sequence is produced. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
 { $examples
     { $example "USING: continuations math prettyprint ;" "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }
 } ;

@@ -3,10 +3,7 @@
 USING: tools.test unix.users kernel strings math ;
 IN: unix.users.tests
 
-
 [ ] [ all-users drop ] unit-test
-
-\ all-users must-infer
 
 [ t ] [ real-user-name string? ] unit-test
 [ t ] [ effective-user-name string? ] unit-test

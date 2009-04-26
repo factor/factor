@@ -22,7 +22,7 @@ M: buffer dispose* ptr>> free ;
     swap >>fill 0 >>pos drop ;
 
 : buffer-capacity ( buffer -- n )
-    [ size>> ] [ fill>> ] bi - ; inline
+    [ size>> ] [ fill>> ] bi - >fixnum ; inline
 
 : buffer-empty? ( buffer -- ? )
     fill>> zero? ; inline

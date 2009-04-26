@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar combinators locals
-colors.constants combinators.short-circuit compiler.units
-help.tips concurrency.flags concurrency.mailboxes continuations
-destructors documents documents.elements fry hashtables help
-help.markup io io.styles kernel lexer listener math models
+source-files.errors colors.constants combinators.short-circuit
+compiler.units help.tips concurrency.flags concurrency.mailboxes
+continuations destructors documents documents.elements fry hashtables
+help help.markup io io.styles kernel lexer listener math models sets
 models.delay models.arrow namespaces parser prettyprint quotations
 sequences strings threads tools.vocabs vocabs vocabs.loader
 vocabs.parser words debugger ui ui.commands ui.pens.solid ui.gadgets
@@ -13,7 +13,8 @@ ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.listener.completion ui.tools.listener.popups
-ui.tools.listener.history ;
+ui.tools.listener.history ui.images ui.tools.error-list tools.errors.model ;
+FROM: source-files.errors => all-errors ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking
@@ -31,9 +32,10 @@ output history flag mailbox thread waiting token-model word-model popup ;
 
 : interactor-busy? ( interactor -- ? )
     #! We're busy if there's no thread to resume.
-    [ waiting>> ]
-    [ thread>> dup [ thread-registered? ] when ]
-    bi and not ;
+    {
+        [ waiting>> ]
+        [ thread>> dup [ thread-registered? ] when ]
+    } 1&& not ;
 
 SLOT: vocabs
 
@@ -170,7 +172,7 @@ M: interactor dispose drop ;
     over set-caret
     mark>caret ;
 
-TUPLE: listener-gadget < tool input output scroller ;
+TUPLE: listener-gadget < tool error-summary output scroller input ;
 
 { 600 700 } listener-gadget set-tool-dim
 
@@ -180,17 +182,35 @@ TUPLE: listener-gadget < tool input output scroller ;
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
 
-: init-listener ( listener -- listener )
+: init-input/output ( listener -- listener )
     <interactor>
     [ >>input ] [ pane new-pane t >>scrolls? >>output ] bi
     dup listener-streams >>output drop ;
 
-: <listener-gadget> ( -- gadget )
+: error-summary. ( -- )
+    error-counts keys [
+        H{ { table-gap { 3 3 } } } [
+            [ [ [ icon>> write-image ] with-cell ] each ] with-row
+        ] tabular-output
+        { "Press " { $command tool "common" show-error-list } " to view errors." }
+        print-element
+    ] unless-empty ;
+
+: <error-summary> ( -- gadget )
+    error-list-model get [ drop error-summary. ] <pane-control>
+        COLOR: light-yellow <solid> >>interior ;
+
+: init-error-summary ( listener -- listener )
+    <error-summary> >>error-summary
+    dup error-summary>> f track-add ;
+
+: <listener-gadget> ( -- listener )
     vertical listener-gadget new-track
         add-toolbar
-        init-listener
+        init-input/output
         dup output>> <scroller> >>scroller
-        dup scroller>> 1 track-add ;
+        dup scroller>> 1 track-add
+        init-error-summary ;
 
 M: listener-gadget focusable-child*
     input>> dup popup>> or ;
@@ -360,6 +380,7 @@ interactor "completion" f {
     dup listener-streams [
         [ com-browse ] help-hook set
         '[ [ _ input>> ] 2dip debugger-popup ] error-hook set
+        error-summary? off
         tip-of-the-day. nl
         listener
     ] with-streams* ;

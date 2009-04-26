@@ -104,7 +104,7 @@ PRIVATE>
 : fuel-vocab-summary ( name -- )
     (fuel-vocab-summary) fuel-eval-set-result ;
 
-: fuel-index ( quot -- ) call format-index fuel-eval-set-result ;
+: fuel-index ( quot -- ) call( -- seq ) format-index fuel-eval-set-result ;
 
 : fuel-get-vocabs/tag ( tag -- )
     (fuel-get-vocabs/tag) fuel-eval-set-result ;

@@ -66,7 +66,7 @@ M: circle area radius>> sq pi * ;
 
 GENERIC: perimiter ( shape -- n )
 
-: rectangle-perimiter ( n -- n ) + 2 * ;
+: rectangle-perimiter ( l w -- n ) + 2 * ;
 
 M: rectangle perimiter
     [ width>> ] [ height>> ] bi
@@ -278,27 +278,6 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
 
 [ "vector growable sequence" ] [
     V{ } my-var [ call-next-hooker ] with-variable
-] unit-test
-
-! Cross-referencing with generic words
-TUPLE: xref-tuple-1 ;
-TUPLE: xref-tuple-2 < xref-tuple-1 ;
-
-: (xref-test) ( obj -- ) drop ;
-
-GENERIC: xref-test ( obj -- )
-
-M: xref-tuple-1 xref-test (xref-test) ;
-M: xref-tuple-2 xref-test (xref-test) ;
-
-[ t ] [
-    \ xref-test
-    \ xref-tuple-1 \ xref-test method [ usage unique ] closure key?
-] unit-test
-
-[ t ] [
-    \ xref-test
-    \ xref-tuple-2 \ xref-test method [ usage unique ] closure key?
 ] unit-test
 
 [ t ] [

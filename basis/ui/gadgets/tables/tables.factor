@@ -5,8 +5,8 @@ math.functions math.rectangles math.order math.vectors namespaces
 opengl sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.worlds ui.gestures ui.render ui.pens.solid ui.text
 ui.commands ui.images ui.gadgets.menus ui.gadgets.line-support
-math.rectangles models math.ranges sequences combinators fonts locals
-strings ;
+math.rectangles models math.ranges sequences combinators
+combinators.short-circuit fonts locals strings ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -59,14 +59,19 @@ focused? ;
 
 GENERIC: cell-width ( font cell -- x )
 GENERIC: cell-height ( font cell -- y )
+GENERIC: cell-padding ( cell -- y )
 GENERIC: draw-cell ( font cell -- )
 
 M: string cell-width text-width ;
 M: string cell-height text-height ceiling ;
+M: string cell-padding drop 0 ;
 M: string draw-cell draw-text ;
+
+CONSTANT: image-padding 2
 
 M: image-name cell-width nip image-dim first ;
 M: image-name cell-height nip image-dim second ;
+M: image-name cell-padding drop image-padding ;
 M: image-name draw-cell nip draw-image ;
 
 : table-rows ( table -- rows )
@@ -87,7 +92,7 @@ CONSTANT: column-title-background COLOR: light-gray
     if ;
 
 : row-column-widths ( table row -- widths )
-    [ font>> ] dip [ cell-width ] with map ;
+    [ font>> ] dip [ [ cell-width ] [ cell-padding ] bi + ] with map ;
 
 : compute-total-width ( gap widths -- total )
     swap [ column-offsets drop ] keep - ;
@@ -162,9 +167,10 @@ M: table layout*
         '[ [ 0 2array ] [ _ 2array ] bi gl-line ] each
     ] bi ;
 
-: column-loc ( font column width align -- loc )
-    [ [ cell-width ] dip swap - ] dip
-    * >integer 0 2array ;
+:: column-loc ( font column width align -- loc )
+    font column cell-width width swap - align * column cell-padding 2 / 1 align - * +
+    font column cell-height \ line-height get swap - 2 /
+    [ >integer ] bi@ 2array ;
 
 : translate-column ( width gap -- )
     + 0 2array gl-translate ;
@@ -203,18 +209,21 @@ M: table draw-line ( row index table -- )
 
 M: table draw-gadget*
     dup control-value empty? [ drop ] [
-        {
-            [ draw-selected-row ]
-            [ draw-lines ]
-            [ draw-column-lines ]
-            [ draw-focused-row ]
-            [ draw-moused-row ]
-        } cleave
+        dup line-height \ line-height [
+            {
+                [ draw-selected-row ]
+                [ draw-lines ]
+                [ draw-column-lines ]
+                [ draw-focused-row ]
+                [ draw-moused-row ]
+            } cleave
+        ] with-variable
     ] if ;
 
 M: table line-height ( table -- y )
     [ font>> ] [ renderer>> prototype-row ] bi
-    [ cell-height ] with [ max ] map-reduce ;
+    [ [ cell-height ] [ cell-padding ] bi + ] with
+    [ max ] map-reduce ;
 
 M: table pref-dim*
     [ compute-column-widths drop ] keep
@@ -237,9 +246,6 @@ PRIVATE>
 : update-selected-value ( table -- )
     [ selected-row drop ] [ selected-value>> ] bi set-model ;
 
-: initial-selected-index ( model table -- n/f )
-    [ value>> length 1 >= ] [ selection-required?>> ] bi* and 0 f ? ;
-
 : show-row-summary ( table n -- )
     over nth-row
     [ swap [ renderer>> row-value ] keep show-summary ]
@@ -249,8 +255,28 @@ PRIVATE>
 : hide-mouse-help ( table -- )
     f >>mouse-index [ hide-status ] [ relayout-1 ] bi ;
 
+: find-row-index ( value table -- n/f )
+    [ model>> value>> ] [ renderer>> '[ _ row-value ] map index ] bi ;
+
+: initial-selected-index ( table -- n/f )
+    {
+        [ model>> value>> empty? not ]
+        [ selection-required?>> ]
+        [ drop 0 ]
+    } 1&& ;
+
+: (update-selected-index) ( table -- n/f )
+    [ selected-value>> value>> ] keep over
+    [ find-row-index ] [ 2drop f ] if ;
+
+: update-selected-index ( table -- n/f )
+    {
+        [ (update-selected-index) ]
+        [ initial-selected-index ]
+    } 1|| ;
+
 M: table model-changed
-    [ nip ] [ initial-selected-index ] 2bi {
+    nip dup update-selected-index {
         [ >>selected-index f >>mouse-index drop ]
         [ show-row-summary ]
         [ drop update-selected-value ]
@@ -293,12 +319,16 @@ PRIVATE>
 : table-button-up ( table -- )
     dup row-action? [ row-action ] [ update-selected-value ] if ;
 
+PRIVATE>
+
 : select-row ( table n -- )
     over validate-line
     [ (select-row) ]
     [ drop update-selected-value ]
     [ show-row-summary ]
     2tri ;
+
+<PRIVATE
 
 : prev/next-row ( table n -- )
     [ dup selected-index>> ] dip '[ _ + ] [ 0 ] if* select-row ;
@@ -345,9 +375,9 @@ PRIVATE>
         show-operations-menu
     ] [ drop ] if-mouse-row ;
 
-: focus-table ( table -- ) t >>focused? drop ;
+: focus-table ( table -- ) t >>focused? relayout-1 ;
 
-: unfocus-table ( table -- ) f >>focused? drop ;
+: unfocus-table ( table -- ) f >>focused? relayout-1 ;
 
 table "sundry" f {
     { mouse-enter show-mouse-help }
@@ -379,14 +409,16 @@ TUPLE: column-headers < gadget table ;
         column-title-background <solid> >>interior ;
 
 : draw-column-titles ( table -- )
-    {
-        [ renderer>> column-titles ]
-        [ column-widths>> ]
-        [ table-column-alignment ]
-        [ font>> column-title-font ]
-        [ gap>> ]
-    } cleave
-    draw-columns ;
+    dup font>> font-metrics height>> \ line-height [
+        {
+            [ renderer>> column-titles ]
+            [ column-widths>> ]
+            [ table-column-alignment ]
+            [ font>> column-title-font ]
+            [ gap>> ]
+        } cleave
+        draw-columns
+    ] with-variable ;
 
 M: column-headers draw-gadget*
     table>> draw-column-titles ;
