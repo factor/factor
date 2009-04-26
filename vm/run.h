@@ -139,7 +139,7 @@ INLINE CELL tag_object(void* cell)
 	return RETAG(cell,OBJECT_TYPE);
 }
 
-INLINE CELL object_type(CELL tagged)
+INLINE CELL hi_tag(CELL tagged)
 {
 	return untag_header(get(UNTAG(tagged)));
 }
@@ -148,7 +148,7 @@ INLINE CELL type_of(CELL tagged)
 {
 	CELL tag = TAG(tagged);
 	if(tag == OBJECT_TYPE)
-		return object_type(tagged);
+		return hi_tag(tagged);
 	else
 		return tag;
 }
