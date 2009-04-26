@@ -42,16 +42,13 @@ M: single-combination next-method-quot*
         ] [ 3drop f ] if
     ] with-combination ;
 
-: single-effective-method ( obj word -- method )
+: (effective-method) ( obj word -- method )
     [ [ order [ instance? ] with find-last nip ] keep method ]
     [ "default-method" word-prop ]
     bi or ;
 
-M: single-generic effective-method
-    [ [ picker ] with-combination call ] keep single-effective-method ;
-
 M: single-combination make-default-method
-    combination [ [ picker ] dip [ no-method ] curry append ] with-variable ;
+    [ [ picker ] dip [ no-method ] curry append ] with-combination ;
 
 ! ! ! Build an engine ! ! !
 
@@ -101,7 +98,10 @@ TUPLE: tuple-dispatch-engine echelons ;
     [ ?set-at ] change-at ;
 
 : echelon-sort ( assoc -- assoc' )
-    H{ } clone [ [ push-echelon ] curry assoc-each ] keep ;
+    #! Convert an assoc mapping classes to methods into an
+    #! assoc mapping echelons to assocs. The first echelon
+    #! is always there
+    H{ { 0 f } } clone [ [ push-echelon ] curry assoc-each ] keep ;
 
 : <tuple-dispatch-engine> ( methods -- engine )
     echelon-sort
@@ -127,9 +127,13 @@ TUPLE: tag-dispatch-engine methods ;
 C: <tag-dispatch-engine> tag-dispatch-engine
 
 : <engine> ( assoc -- engine )
+    dup keys [ not ] filter [ "FOO" throw ] unless-empty
     flatten-methods
+    dup keys [ not ] filter [ "FOO1" throw ] unless-empty
     convert-tuple-methods
+    dup keys [ not ] filter [ "FOO2" throw ] unless-empty
     convert-hi-tag-methods
+    dup keys [ not ] filter [ "FOO3" throw ] unless-empty
     <tag-dispatch-engine> ;
 
 ! ! ! Compile engine ! ! !
@@ -146,7 +150,7 @@ GENERIC: compile-engine ( engine -- obj )
 
 M: tag-dispatch-engine compile-engine
     methods>> compile-engines*
-    [ [ tag-number ] dip ] assoc-map
+    [ [ global [ target-word ] bind tag-number ] dip ] assoc-map
     num-tags get direct-dispatch-table ;
 
 : hi-tag-number ( class -- n ) "type" word-prop ;
@@ -159,16 +163,23 @@ M: hi-tag-dispatch-engine compile-engine
     num-hi-tags direct-dispatch-table ;
 
 : build-fast-hash ( methods -- buckets )
-    >alist V{ } clone [ hashcode 1array ] distribute-buckets
+    V{ } clone [ hashcode 1array ] distribute-buckets
     [ compile-engines* >alist >array ] map ;
 
 M: echelon-dispatch-engine compile-engine
-    methods>> compile-engines* build-fast-hash ;
+    dup n>> 0 = [
+        methods>> dup assoc-size {
+            { 0 [ drop default get ] }
+            { 1 [ >alist first second compile-engine ] }
+        } case
+    ] [
+        methods>> compile-engines* build-fast-hash
+    ] if ;
 
 M: tuple-dispatch-engine compile-engine
     tuple assumed [
         echelons>> compile-engines
-        dup keys supremum f <array> default get prefix
+        dup keys supremum 1+ f <array>
         [ <enum> swap update ] keep
     ] with-variable ;
 
