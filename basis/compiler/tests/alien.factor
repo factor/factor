@@ -5,7 +5,7 @@ continuations effects namespaces.private io io.streams.string
 memory system threads tools.test math accessors combinators
 specialized-arrays.float alien.libraries io.pathnames
 io.backend ;
-IN: compiler.tests
+IN: compiler.tests.alien
 
 <<
 : libfactor-ffi-tests-path ( -- string )
