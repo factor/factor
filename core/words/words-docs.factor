@@ -1,5 +1,5 @@
 USING: definitions help.markup help.syntax kernel parser
-kernel.private words.private vocabs classes quotations
+kernel.private vocabs classes quotations
 strings effects compiler.units ;
 IN: words
 
@@ -162,15 +162,6 @@ $nl
 { $see-also "vocabularies" "vocabs.loader" "definitions" "see" } ;
 
 ABOUT: "words"
-
-HELP: execute ( word -- )
-{ $values { "word" word } }
-{ $description "Executes a word. Words which " { $link execute } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal word can have a static stack effect." }
-{ $examples
-    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ; inline\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
-} ;
-
-{ execute POSTPONE: execute( } related-words
 
 HELP: deferred
 { $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;

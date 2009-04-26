@@ -3,8 +3,7 @@
 USING: accessors arrays assocs classes classes.algebra
 combinators definitions generic hashtables kernel
 kernel.private layouts make math namespaces quotations
-sequences words generic.single.private words.private
-effects make ;
+sequences words generic.single.private effects make ;
 IN: generic.single
 
 ERROR: no-method object generic ;
@@ -127,13 +126,9 @@ TUPLE: tag-dispatch-engine methods ;
 C: <tag-dispatch-engine> tag-dispatch-engine
 
 : <engine> ( assoc -- engine )
-    dup keys [ not ] filter [ "FOO" throw ] unless-empty
     flatten-methods
-    dup keys [ not ] filter [ "FOO1" throw ] unless-empty
     convert-tuple-methods
-    dup keys [ not ] filter [ "FOO2" throw ] unless-empty
     convert-hi-tag-methods
-    dup keys [ not ] filter [ "FOO3" throw ] unless-empty
     <tag-dispatch-engine> ;
 
 ! ! ! Compile engine ! ! !

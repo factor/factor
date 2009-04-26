@@ -1,7 +1,7 @@
 USING: assocs compiler.cfg.builder compiler.cfg.optimizer
 compiler.errors compiler.tree.builder compiler.tree.optimizer
 compiler.units help.markup help.syntax io parser quotations
-sequences words words.private ;
+sequences words ;
 IN: compiler
 
 HELP: enable-compiler

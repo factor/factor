@@ -9,8 +9,8 @@ quotations quotations.private sbufs sbufs.private
 sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
-words.private assocs summary compiler.units system.private
-combinators locals locals.backend locals.types words.private
+assocs summary compiler.units system.private
+combinators locals locals.backend locals.types
 quotations.private combinators.private stack-checker.values
 generic.single generic.single.private
 alien.libraries

@@ -3,7 +3,7 @@
 USING: arrays byte-arrays byte-vectors generic assocs hashtables
 io.binary kernel kernel.private math namespaces make sequences
 words quotations strings alien.accessors alien.strings layouts
-system combinators math.bitwise words.private math.order
+system combinators math.bitwise math.order
 accessors growable cpu.architecture compiler.constants ;
 IN: compiler.codegen.fixup
 
