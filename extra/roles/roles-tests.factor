@@ -53,3 +53,15 @@ SYMBOL: knife
 
 [ knife { utensil tool } { } define-tuple-class-with-roles ]
 [ multiple-inheritance-attempted? ] must-fail-with 
+
+! make sure method dispatch works
+GENERIC: poke ( pokee poker -- result )
+GENERIC: scoop ( scoopee scooper -- result )
+GENERIC: tune ( tunee tuner -- result )
+
+M: fork poke drop " got poked" append ;
+M: spoon scoop drop " got scooped" append ;
+M: instrument tune drop " got tuned" append ;
+
+[ "potato got poked" "potato got scooped" "potato got tuned" ]
+[ "potato" tuning-spork new [ poke ] [ scoop ] [ tune ] 2tri ] unit-test
