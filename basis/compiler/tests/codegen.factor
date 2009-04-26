@@ -4,7 +4,7 @@ sequences sequences.private tools.test namespaces.private
 slots.private sequences.private byte-arrays alien
 alien.accessors layouts words definitions compiler.units io
 combinators vectors grouping make ;
-IN: compiler.tests
+IN: compiler.tests.codegen
 
 ! Originally, this file did black box testing of templating
 ! optimization. We now have a different codegen, but the tests
