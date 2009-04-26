@@ -38,11 +38,25 @@ static CELL nth_hashcode(F_TUPLE_LAYOUT *layout, F_FIXNUM echelon)
 	return ptr[echelon * 2 + 1];
 }
 
-static CELL lookup_tuple_method(CELL object, CELL methods)
+INLINE CELL method_cache_hashcode(F_TUPLE_LAYOUT *layout, F_ARRAY *array)
+{
+	CELL capacity = (array_capacity(array) >> 1) - 1;
+	return (((CELL)layout >> TAG_BITS) & capacity) << 1;
+}
+
+INLINE CELL lookup_tuple_method_fast(F_TUPLE_LAYOUT *layout, CELL method_cache)
+{
+	F_ARRAY *array = untag_object(method_cache);
+	CELL hashcode = method_cache_hashcode(layout,array);
+	if(array_nth(array,hashcode) == tag_object(layout))
+		return array_nth(array,hashcode + 1);
+	else
+		return F;
+}
+
+static CELL lookup_tuple_method_slow(F_TUPLE_LAYOUT *layout, CELL methods)
 {
 	F_ARRAY *echelons = untag_object(methods);
-	F_TUPLE *tuple = untag_object(object);
-	F_TUPLE_LAYOUT *layout = untag_object(tuple->layout);
 
 	F_FIXNUM echelon = untag_fixnum_fast(layout->echelon);
 	F_FIXNUM max_echelon = array_capacity(echelons) - 1;
@@ -66,8 +80,32 @@ static CELL lookup_tuple_method(CELL object, CELL methods)
 		echelon--;
 	}
 
-	critical_error("Cannot find tuple method",object);
+	critical_error("Cannot find tuple method",methods);
 	return F;
+}
+
+static void update_method_cache(F_TUPLE_LAYOUT *layout, CELL method_cache, CELL method)
+{
+	F_ARRAY *array = untag_object(method_cache);
+	CELL hashcode = method_cache_hashcode(layout,array);
+	set_array_nth(array,hashcode,tag_object(layout));
+	set_array_nth(array,hashcode + 1,method);
+}
+
+static CELL lookup_tuple_method(CELL object, CELL methods, CELL method_cache)
+{
+	F_TUPLE *tuple = untag_object(object);
+	F_TUPLE_LAYOUT *layout = untag_object(tuple->layout);
+
+	CELL method = lookup_tuple_method_fast(layout,method_cache);
+	if(method == F)
+	{
+		local_cache_misses++;
+		method = lookup_tuple_method_slow(layout,methods);
+		update_method_cache(layout,method_cache,method);
+	}
+
+	return method;
 }
 
 static CELL lookup_hi_tag_method(CELL object, CELL methods)
@@ -77,7 +115,7 @@ static CELL lookup_hi_tag_method(CELL object, CELL methods)
 	return array_nth(hi_tag_methods,hi_tag - HEADER_TYPE);
 }
 
-static CELL lookup_method(CELL object, CELL methods)
+static CELL lookup_method(CELL object, CELL methods, CELL method_cache)
 {
 	F_ARRAY *tag_methods = untag_object(methods);
 	CELL tag = TAG(object);
@@ -90,7 +128,7 @@ static CELL lookup_method(CELL object, CELL methods)
 		switch(tag)
 		{
 		case TUPLE_TYPE:
-			return lookup_tuple_method(object,element);
+			return lookup_tuple_method(object,element,method_cache);
 		case OBJECT_TYPE:
 			return lookup_hi_tag_method(object,element);
 		default:
@@ -102,7 +140,9 @@ static CELL lookup_method(CELL object, CELL methods)
 
 void primitive_lookup_method(void)
 {
-	CELL methods = dpop();
-	CELL object = dpop();
-	dpush(lookup_method(object,methods));
+	CELL method_cache = get(ds);
+	CELL methods = get(ds - CELLS);
+	CELL object = get(ds - CELLS * 2);
+	ds -= CELLS * 2;
+	drepl(lookup_method(object,methods,method_cache));
 }
