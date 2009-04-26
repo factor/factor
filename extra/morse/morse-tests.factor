@@ -41,3 +41,4 @@ IN: morse.tests
     MORSE] ] unit-test
 ! [ ] [ "sos" 0.075 play-as-morse* ] unit-test
 ! [ ] [ "Factor rocks!" play-as-morse ] unit-test
+! [ ] [ "\n" play-as-morse ] unit-test
