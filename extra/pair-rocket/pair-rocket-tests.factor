@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff bsd license
 USING: kernel pair-rocket tools.test ;
 IN: pair-rocket.tests
 
