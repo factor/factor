@@ -1,7 +1,7 @@
 USING: accessors compiler compiler.units tools.test math parser
 kernel sequences sequences.private classes.mixin generic
 definitions arrays words assocs eval strings ;
-IN: compiler.tests
+IN: compiler.tests.redefine1
 
 GENERIC: method-redefine-generic-1 ( a -- b )
 
