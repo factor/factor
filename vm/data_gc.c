@@ -416,13 +416,6 @@ void end_gc(CELL gc_elapsed)
 		reset_generations(NURSERY,collecting_gen);
 	}
 
-	if(collecting_gen == TENURED)
-	{
-		/* now that all reachable code blocks have been marked,
-		deallocate the rest */
-		free_unmarked(&code_heap);
-	}
-
 	collecting_aging_again = false;
 }
 
@@ -491,7 +484,7 @@ void garbage_collection(CELL gen,
 		code_heap_scans++;
 
 		if(collecting_gen == TENURED)
-			update_code_heap_roots();
+			free_unmarked(&code_heap,(HEAP_ITERATOR)update_literal_references);
 		else
 			copy_code_heap_roots();
 
