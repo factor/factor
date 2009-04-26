@@ -6,7 +6,7 @@ sbufs strings.private slots.private alien math.order
 alien.accessors alien.c-types alien.syntax alien.strings
 namespaces libc sequences.private io.encodings.ascii
 classes compiler ;
-IN: compiler.tests
+IN: compiler.tests.intrinsics
 
 ! Make sure that intrinsic ops compile to correct code.
 [ ] [ 1 [ drop ] compile-call ] unit-test
