@@ -4,7 +4,7 @@ USING: accessors arrays assocs classes classes.algebra
 combinators definitions generic hashtables kernel
 kernel.private layouts make math namespaces quotations
 sequences words generic.single.private words.private
-effects ;
+effects make ;
 IN: generic.single
 
 ERROR: no-method object generic ;
@@ -163,7 +163,7 @@ M: hi-tag-dispatch-engine compile-engine
     num-hi-tags direct-dispatch-table ;
 
 : build-fast-hash ( methods -- buckets )
-    V{ } clone [ hashcode 1array ] distribute-buckets
+    >alist V{ } clone [ hashcode 1array ] distribute-buckets
     [ compile-engines* >alist >array ] map ;
 
 M: echelon-dispatch-engine compile-engine
@@ -244,9 +244,20 @@ M: f compile-engine ;
 
 : execute-unsafe ( word -- ) (execute) ;
 
+: make-empty-cache ( -- array )
+    generic-word get "methods" word-prop
+    assoc-size 2 * next-power-of-2 f <array> ;
+
 M: single-combination perform-combination
     [
         dup build-decision-tree
         [ "decision-tree" set-word-prop ]
-        [ 1quotation picker [ lookup-method execute-unsafe ] surround define ] 2bi
+        [
+            [
+                picker %
+                ,
+                make-empty-cache ,
+                [ lookup-method execute-unsafe ] %
+            ] [ ] make define
+        ] 2bi
     ] with-combination ;
