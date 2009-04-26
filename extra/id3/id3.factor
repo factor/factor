@@ -207,7 +207,7 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
 
 PRIVATE>
 
-: mp3>id3 ( path -- id3v2/f )
+: mp3>id3 ( path -- id3/f )
     [
         [ <id3> ] dip
         {
