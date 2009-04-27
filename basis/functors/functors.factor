@@ -5,7 +5,7 @@ words interpolate namespaces sequences io.streams.string fry
 classes.mixin effects lexer parser classes.tuple.parser
 effects.parser locals.types locals.parser generic.parser
 locals.rewrite.closures vocabs.parser classes.parser
-arrays accessors ;
+arrays accessors words.symbol ;
 IN: functors
 
 ! This is a hack
@@ -90,6 +90,10 @@ SYNTAX: `:
     parse-declared*
     \ define-declared* parsed ;
 
+SYNTAX: `SYMBOL:
+    scan-param parsed
+    \ define-symbol parsed ;
+
 SYNTAX: `SYNTAX:
     scan-param parsed
     parse-definition*
@@ -128,6 +132,7 @@ DEFER: ;FUNCTOR delimiter
         { ":" POSTPONE: `: }
         { "INSTANCE:" POSTPONE: `INSTANCE: }
         { "SYNTAX:" POSTPONE: `SYNTAX: }
+        { "SYMBOL:" POSTPONE: `SYMBOL: }
         { "inline" POSTPONE: `inline }
         { "call-next-method" POSTPONE: `call-next-method }
     } ;
