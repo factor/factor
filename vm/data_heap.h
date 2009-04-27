@@ -37,7 +37,6 @@ F_DATA_HEAP *data_heap;
 
 /* the 0th generation is where new objects are allocated. */
 #define NURSERY 0
-#define HAVE_NURSERY_P (data_heap->gen_count>1)
 /* where objects hang around */
 #define AGING (data_heap->gen_count-2)
 #define HAVE_AGING_P (data_heap->gen_count>2)
