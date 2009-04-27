@@ -34,7 +34,7 @@ words ;
 
 [ 1 ] [ \ foobar counter>> ] unit-test
 
-: fooblah ( -- ) { } [ ] like call ;
+: fooblah ( -- ) { } [ ] like call( -- ) ;
 
 : foobaz ( -- ) fooblah fooblah ;
 

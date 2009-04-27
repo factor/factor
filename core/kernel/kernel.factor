@@ -176,11 +176,13 @@ PRIVATE>
 : tri-curry@ ( x y z q -- p' q' r' ) [curry] tri@ ; inline
 
 ! Booleans
+UNION: boolean POSTPONE: t POSTPONE: f ;
+
+: >boolean ( obj -- ? ) [ t ] [ f ] if ; inline
+
 : not ( obj -- ? ) [ f ] [ t ] if ; inline
 
 : and ( obj1 obj2 -- ? ) over ? ; inline
-
-: >boolean ( obj -- ? ) [ t ] [ f ] if ; inline
 
 : or ( obj1 obj2 -- ? ) dupd ? ; inline
 

@@ -4,38 +4,54 @@ stack-checker.backend
 stack-checker.branches
 stack-checker.errors
 stack-checker.transforms
-stack-checker.state ;
+stack-checker.state
+continuations ;
 IN: stack-checker
 
 ARTICLE: "inference-simple" "Straight-line stack effects"
-"The simplest case to look at is that of a quotation which does not have any branches or recursion, and just pushes literals and calls words, each of which has a known stack effect."
+"The simplest case is when a piece of code does not have any branches or recursion, and just pushes literals and calls words."
 $nl
-"Stack effect inference works by stepping through the quotation, while maintaining a \"shadow stack\" which tracks stack height at the current position in the quotation. Initially, the shadow stack is empty. If a word is encountered which expects more values than there are on the shadow stack, a global counter is incremented. This counter keeps track of the number of inputs the quotation expects on the stack. When inference is done, this counter, together with the final height of the shadow stack, gives the inferred stack effect."
-{ $subsection d-in }
-{ $subsection meta-d }
-"When a literal is encountered, it is simply pushed on the shadow stack. For example, the stack effect of the following quotation is inferred by pushing all three literals on the shadow stack, then taking the value of " { $link d-in } " and the length of " { $link meta-d } ":"
+"Pushing a literal has stack effect " { $snippet "( -- object )" } ". The stack effect of a most words is always known statically from the declaration. Stack effects of " { $link POSTPONE: inline } " words and " { $link "macros" } ", may depend on literals pushed on the stack prior to the call, and this case is discussed in " { $link "inference-combinators" } "."
+$nl
+"The stack effect of each element in a code snippet is composed. The result is then the stack effect of the snippet."
+$nl
+"An example:"
 { $example "[ 1 2 3 ] infer." "( -- object object object )" }
-"In the following example, the call to " { $link + } " expects two values on the shadow stack, but only one value is present, the literal which was pushed previously. This increments the " { $link d-in } " counter by one:"
-{ $example "[ 2 + ] infer." "( object -- object )" }
-"After the call to " { $link + } ", the shadow stack contains a \"computed value placeholder\", since the inferencer has no way to know what the resulting value actually is (in fact it is arbitrary)." ;
+"Another example:"
+{ $example "[ 2 + ] infer." "( object -- object )" } ;
 
 ARTICLE: "inference-combinators" "Combinator stack effects"
-"Without further information, one cannot say what the stack effect of " { $link call } " is; it depends on the given quotation. If the inferencer encounters a " { $link call } " without further information, a " { $link literal-expected } " error is raised."
-{ $example "[ dup call ] infer." "Got a computed value where a literal quotation was expected\n\nType :help for debugging help." }
-"On the other hand, the stack effect of applying " { $link call } " to a literal quotation or a " { $link curry } " of a literal quotation is easy to compute; it behaves as if the quotation was substituted at that point:"
-{ $example "[ [ 2 + ] call ] infer." "( object -- object )" }
-"Consider a combinator such as " { $link keep } ". The combinator itself does not have a stack effect, because it applies " { $link call } " to a potentially arbitrary quotation. However, since the combinator is declared " { $link POSTPONE: inline } ", a given usage of it can have a stack effect:"
-{ $example "[ [ 2 + ] keep ] infer." "( object -- object object )" }
-"Another example is the " { $link compose } " combinator. Because it is decared " { $link POSTPONE: inline } ", we can infer the stack effect of applying " { $link call } " to the result of " { $link compose } ":"
-{ $example "[ 2 [ + ] curry [ sq ] compose ] infer." "( -- object )" }
-"Incidentally, this example demonstrates that the stack effect of nested currying and composition can also be inferred."
+"If a word, call it " { $snippet "W" } ", calls a combinator, one of the following two conditions must hold:"
+{ $list
+  { "The combinator may be called with a quotation that is either a literal, or built from literals, " { $link curry } " and " { $link compose } "." }
+  { "The combinator must be called on an input parameter, or be built from input parameters, literals, " { $link curry } " and " { $link compose } ", " { $strong "if" } " the word " { $snippet "W" } " must be declared " { $link POSTPONE: inline } ". Then " { $snippet "W" } " is itself considered to be a combinator, and its callers must satisfy one of these two conditions." }
+}
+"If neither condition holds, the stack checker throws a " { $link literal-expected } " error, and an escape hatch such as " { $link POSTPONE: call( } " must be used instead. See " { $link "inference-escape" } " for details. An inline combinator can be called with an unknown quotation by currying the quotation onto a literal quotation that uses " { $link POSTPONE: call( } "."
+{ $heading "Examples" }
+{ $subheading "Calling a combinator" }
+"The following usage of " { $link map } " passes the stack checker, because the quotation is the result of " { $link curry } ":"
+{ $example "[ [ + ] curry map ] infer." "( object object -- object )" }
+{ $subheading "Defining an inline combinator" }
+"The following word calls a quotation twice; the word is declared " { $link POSTPONE: inline } ", since it invokes " { $link call } " on the result of " { $link compose } " on an input parameter:"
+{ $code ": twice ( value quot -- result ) dup compose call ; inline" }
+"The following code now passes the stack checker; it would fail were " { $snippet "twice" } " not declared " { $link POSTPONE: inline } ":"
+{ $unchecked-example "USE: math.functions" "[ [ sqrt ] twice ] infer." "( object -- object )" }
+{ $subheading "Defining a combinator for unknown quotations" }
+"In the next example, " { $link POSTPONE: call( } " must be used because the quotation the result of calling a runtime accessor, and the compiler cannot make any static assumptions about this quotation at all:"
+{ $code
+  "TUPLE: action name quot ;"
+  ": perform ( value action -- result ) quot>> call( value -- result ) ;"
+}
+{ $subheading "Passing an unknown quotation to an inline combinator" }
+"Suppose we want to write :"
+{ $code ": perform ( values action -- results ) quot>> map ;" }
+"However this fails to pass the stack checker since there is no guarantee the quotation has the right stack effect for " { $link map } ". It can be wrapped in a new quotation with a declaration:"
+{ $code ": perform ( values action -- results )" "    quot>> [ call( value -- result ) ] curry map ;" }
+{ $heading "Explanation" }
+"This restriction exists because without further information, one cannot say what the stack effect of " { $link call } " is; it depends on the given quotation. If the stack checker encounters a " { $link call } " without further information, a " { $link literal-expected } " error is raised."
 $nl
-"A general rule of thumb is that any word which applies " { $link call } " or " { $link curry } " to one of its inputs must be declared " { $link POSTPONE: inline } "."
-$nl
-"Here is an example where the stack effect cannot be inferred:"
-{ $code ": foo ( -- n quot ) 0 [ + ] ;" "[ foo reduce ] infer." }
-"However if " { $snippet "foo" } " was declared " { $link POSTPONE: inline } ", everything would work, since the " { $link reduce } " combinator is also " { $link POSTPONE: inline } ", and the inferencer can see the literal quotation value at the point it is passed to " { $link call } ":"
-{ $example ": foo ( -- n quot ) 0 [ + ] ; inline" "[ foo reduce ] infer." "( object -- object )" }
+"On the other hand, the stack effect of applying " { $link call } " to a literal quotation or a " { $link curry } " of a literal quotation is easy to compute; it behaves as if the quotation was substituted at that point."
+{ $heading "Limitations" }
 "Passing a literal quotation on the data stack through an inlined recursive combinator nullifies its literal status. For example, the following will not infer:"
 { $example
   "[ [ reverse ] swap [ reverse ] map swap call ] infer." "Got a computed value where a literal quotation was expected\n\nType :help for debugging help."
@@ -46,30 +62,25 @@ $nl
 } ;
 
 ARTICLE: "inference-branches" "Branch stack effects"
-"Conditionals such as " { $link if } " and combinators built on " { $link if } " present a problem, in that if the two branches leave the stack at a different height, it is not clear what the stack effect should be. In this case, inference throws a " { $link unbalanced-branches-error } "."
+"Conditionals such as " { $link if } " and combinators built on top have the same restrictions as " { $link POSTPONE: inline } " combinators (see " { $link "inference-combinators" } ") with the additional requirement that all branches leave the stack at the same height. If this is not the case, the stack checker throws a " { $link unbalanced-branches-error } "."
 $nl
 "If all branches leave the stack at the same height, then the stack effect of the conditional is just the maximum of the stack effect of each branch. For example,"
 { $example "[ [ + ] [ drop ] if ] infer." "( object object object -- object )" }
 "The call to " { $link if } " takes one value from the stack, a generalized boolean. The first branch " { $snippet "[ + ]" } " has stack effect " { $snippet "( x x -- x )" } " and the second has stack effect " { $snippet "( x -- )" } ". Since both branches decrease the height of the stack by one, we say that the stack effect of the two branches is " { $snippet "( x x -- x )" } ", and together with the boolean popped off the stack by " { $link if } ", this gives a total stack effect of " { $snippet "( x x x -- x )" } "." ;
 
-ARTICLE: "inference-recursive" "Stack effects of recursive words"
-"When a recursive call is encountered, the declared stack effect is substituted in. When inference is complete, the inferred stack effect is compared with the declared stack effect."
+ARTICLE: "inference-recursive-combinators" "Recursive combinator stack effects"
+"Most combinators do not call themselves recursively directly; instead, they are implemented in terms of existing combinators, for example " { $link while } ", " { $link map } ", and the " { $link "compositional-combinators" } ". In these cases, the rules outlined in " { $link "inference-combinators" } " apply."
 $nl
-"Attempting to infer the stack effect of a recursive word which outputs a variable number of objects on the stack will fail. For example, the following will throw an " { $link unbalanced-branches-error } ":"
-{ $code ": foo ( seq -- ) dup empty? [ drop ] [ dup pop foo ] if ;" "[ foo ] infer." }
-"If you declare an incorrect stack effect, inference will fail also. Badly defined recursive words cannot confuse the inferencer." ;
-
-ARTICLE: "inference-recursive-combinators" "Recursive combinator inference"
-"Most combinators are not explicitly recursive; instead, they are implemented in terms of existing combinators, for example " { $link while } ", " { $link map } ", and the " { $link "compositional-combinators" } "."
-$nl
-"Combinators which are recursive require additional care."
-$nl
-"If a recursive word takes quotation parameters from the stack and calls them, it must be declared " { $link POSTPONE: inline } " (as documented in " { $link "inference-combinators" } ") as well as " { $link POSTPONE: recursive } "."
-$nl
-"Furthermore, the input parameters which are quotations must be annotated in the stack effect. For example, the following will not infer:"
+"Combinators which are recursive require additional care. In addition to being declared " { $link POSTPONE: inline } ", they must be declared " { $link POSTPONE: recursive } ". There are three restrictions that only apply to combinators with this declaration:"
+{ $heading "Input quotation declaration" }
+"Input parameters which are quotations must be annotated as much in the stack effect. For example, the following will not infer:"
 { $example ": bad ( quot -- ) [ call ] keep foo ; inline recursive" "[ [ ] bad ] infer." "Got a computed value where a literal quotation was expected\n\nType :help for debugging help." }
 "The following is correct:"
 { $example ": good ( quot: ( -- ) -- ) [ call ] keep good ; inline recursive" "[ [ ] good ] infer." "( -- )" }
+"The effect of the nested quotation itself is only present for documentation purposes; the mere presence of a nested effect is sufficient to mark that value as a quotation parameter."
+{ $heading "Data flow restrictions" }
+"The stack checker does not trace data flow in two instances."
+$nl
 "An inline recursive word cannot pass a quotation on the data stack through the recursive call. For example, the following will not infer:"
 { $example ": bad ( ? quot: ( ? -- ) -- ) 2dup [ not ] dip bad call ; inline recursive" "[ [ drop ] bad ] infer." "Got a computed value where a literal quotation was expected\n\nType :help for debugging help." }
 "However a small change can be made:"
@@ -80,23 +91,47 @@ $nl
     "[ [ 5 ] t foo ] infer."
 } ;
 
-ARTICLE: "inference" "Stack effect inference"
-"The stack effect inference tool is used to check correctness of code before it is run. It is also used by the optimizing compiler to build the high-level SSA representation on which optimizations can be performed. Only words for which a stack effect can be inferred will compile with the optimizing compiler; all other words will be compiled with the non-optimizing compiler (see " { $link "compiler" } ")."
-$nl
-"The main entry point is a single word which takes a quotation and prints its stack effect and variable usage:"
-{ $subsection infer. }
-"Instead of printing the inferred information, it can be returned as objects on the stack:"
+ARTICLE: "tools.inference" "Stack effect tools"
+{ $link "inference" } " can be used interactively to print stack effects of quotations without running them. It can also be used from " { $link "combinators.smart" } "."
 { $subsection infer }
-"Static stack effect inference can be combined with unit tests; see " { $link "tools.test.write" } "."
+{ $subsection infer. }
+"There are also some words for working with " { $link effect } " instances. Getting a word's declared stack effect:"
+{ $subsection stack-effect }
+"Converting a stack effect to a string form:"
+{ $subsection effect>string }
+"Comparing effects:"
+{ $subsection effect-height }
+{ $subsection effect<= }
+"The class of stack effects:"
+{ $subsection effect }
+{ $subsection effect? } ;
+
+ARTICLE: "inference-escape" "Stack effect checking escape hatches"
+"In a static checking regime, sometimes it is necessary to step outside the boundaries and run some code which cannot be statically checked; perhaps this code is constructed at run-time. There are two ways to get around the static stack checker."
 $nl
-"The following articles describe the implementation of the stack effect inference algorithm:"
+"If the stack effect of a word or quotation is known, but the word or quotation itself is not, " { $link POSTPONE: execute( } " or " { $link POSTPONE: call( } " can be used. See " { $link "call" } " for details."
+$nl
+"If the stack effect is not known, the code being called cannot manipulate the datastack directly. Instead, it must reflect the datastack into an array:"
+{ $subsection with-datastack }
+"The surrounding code has a static stack effect since " { $link with-datastack } " has one. However, the array passed in as input may be transformed arbitrarily by calling this combinator." ;
+
+ARTICLE: "inference" "Stack effect checking"
+"The " { $link "compiler" } " checks the " { $link "effects" } " of words before they can be run. This ensures that words take exactly the number of inputs and outputs that the programmer declares in source."
+$nl
+"Words that do not pass the stack checker are rejected and cannot be run, and so essentially this defines a very simple and permissive type system that nevertheless catches some invalid programs and enables compiler optimizations."
+$nl
+"If a word's stack effect cannot be inferred, a compile error is reported. See " { $link "compiler-errors" } "."
+$nl
+"The following articles describe how different control structures are handled by the stack checker."
 { $subsection "inference-simple" }
-{ $subsection "inference-recursive" } 
 { $subsection "inference-combinators" }
 { $subsection "inference-recursive-combinators" }
 { $subsection "inference-branches" }
+"Stack checking catches several classes of errors."
 { $subsection "inference-errors" }
-{ $see-also "effects" } ;
+"Sometimes code with a dynamic stack effect has to be run."
+{ $subsection "inference-escape" }
+{ $see-also "effects" "tools.inference" "tools.errors" } ;
 
 ABOUT: "inference"
 

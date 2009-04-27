@@ -41,7 +41,7 @@ M: mb-writer dispose drop ;
 : %pop-output-line ( -- string ) irc> stream>> out>> lines>> pop ;
 
 : read-matching-message ( chat quot: ( msg -- ? ) -- irc-message )
-    [ in-messages>> 0.1 seconds ] dip mailbox-get-timeout? ;
+    [ in-messages>> 0.1 seconds ] dip mailbox-get-timeout? ; inline
 
 : spawning-irc ( quot: ( -- ) -- )
     [ spawn-client ] dip [ (terminate-irc) ] compose with-irc ; inline

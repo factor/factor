@@ -12,7 +12,7 @@ $nl
 $nl
 "Factor evaluates code left to right, and stores intermediate values on a " { $emphasis "stack" } ". If you think of the stack as a pile of papers, then " { $emphasis "pushing" } " a value on the stack corresponds to placing a piece of paper at the top of the pile, while " { $emphasis "popping" } " a value corresponds to removing the topmost piece."
 $nl
-"All words except those which only push literals on the stack must have a " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that a word takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output. Stack effect declarations can be viewed by browsing source code, or using tools such as " { $link see } "; they are also checked by the compiler. See " { $link "effect-declaration" } "."
+"All words have a " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that a word takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output. Stack effect declarations can be viewed by browsing source code, or using tools such as " { $link see } "; they are also checked by the compiler. See " { $link "effects" } "."
 $nl
 "Coming back to the example in the beginning of this article, the following series of steps occurs as the code is evaluated:"
 { $table
@@ -56,18 +56,9 @@ $nl
     "5 0 -       ! Computes 5-0"
     "5 0 swap -  ! Computes 0-5"
 }
-"Also, in the above example a stack effect declaration is written between " { $snippet "(" } " and " { $snippet ")" } " with a mnemonic description of what the word does to the stack. See " { $link "effect-declaration" } " for details."
+"Also, in the above example a stack effect declaration is written between " { $snippet "(" } " and " { $snippet ")" } " with a mnemonic description of what the word does to the stack. See " { $link "effects" } " for details."
 { $curious
-    "This syntax will be familiar to anybody who has used Forth before. However the behavior is slightly different. In most Forth systems, the below code prints 2, because the definition of " { $snippet "b" } " still refers to the previous definition of " { $snippet "a" } ":"
-    { $code
-        ": a 1 ;"
-        ": b ( -- x ) a 1 + ;"
-        ": a 2 ;"
-        "b ."
-    }
-    "In Factor, this example will print 3 since word redefinition is explicitly supported."
-    $nl
-    "Indeed, redefining a word twice in the same source file is an error; this is almost always a mistake since there's no way to call the first definition. See " { $link "definition-checking" } "."
+  "This syntax will be familiar to anybody who has used Forth before. However, unlike Forth, some additional static checks are performed. See " { $link "definition-checking" } " and " { $link "inference" } "."
 }
 { $references
     { "A whole slew of shuffle words can be used to rearrange the stack. There are forms of word definition other than colon definition, words can be defined entirely at runtime, and word definitions can be " { $emphasis "annotated" } " with tracing calls and breakpoints without modifying the source code." }
@@ -175,53 +166,11 @@ $nl
     "parser"
 } ;
 
-ARTICLE: "cookbook-io" "Input and output cookbook"
-"Ask the user for their age, and print it back:"
-{ $code
-    "USING: io math.parser ;"
-    ": ask-age ( -- ) \"How old are you?\" print ;"
-    ": read-age ( -- n ) readln string>number ;"
-    ": print-age ( n -- )"
-    "    \"You are \" write"
-    "    number>string write"
-    "    \" years old.\" print ;"
-    ": example ( -- ) ask-age read-age print-age ;"
-    "example"
-}
-"Print the lines of a file in sorted order:"
-{ $code
-    "USING: io io.encodings.utf8 io.files sequences sorting ;"
-    "\"lines.txt\" utf8 file-lines natural-sort [ print ] each"
-}
-"Read 1024 bytes from a file:"
-{ $code
-    "USING: io io.encodings.binary io.files ;"
-    "\"data.bin\" binary [ 1024 read ] with-file-reader"
-}
-"Convert a file of 4-byte cells from little to big endian or vice versa, by directly mapping it into memory and operating on it with sequence words:"
-{ $code
-    "USING: accessors grouping io.files io.mmap.char kernel sequences ;"
-    "\"mydata.dat\" ["
-    "    4 <sliced-groups> [ reverse-here ] change-each"
-    "] with-mapped-char-file"
-}
-"Send some bytes to a remote host:"
-{ $code
-    "USING: io io.encodings.ascii io.sockets strings ;"
-    "\"myhost\" 1033 <inet> ascii"
-    "[ B{ 12 17 102 } write ] with-client"
-}
-{ $references
-    { }
-    "number-strings"
-    "io"
-} ;
-
 ARTICLE: "cookbook-application" "Application cookbook"
 "Vocabularies can define a main entry point:"
 { $code "IN: game-of-life"
 "..."
-": play-life ... ;"
+": play-life ( -- ) ... ;"
 ""
 "MAIN: play-life"
 }
@@ -318,7 +267,6 @@ $nl
     { "Use " { $link "cleave-combinators" } " and " { $link "spread-combinators" } " instead of " { $link "shuffle-words" } " to give your code more structure." }
     { "Not everything has to go on the stack. The " { $vocab-link "namespaces" } " vocabulary provides dynamically-scoped variables, and the " { $vocab-link "locals" } " vocabulary provides lexically-scoped variables. Learn both and use them where they make sense, but keep in mind that overuse of variables makes code harder to factor." }
     "Every time you define a word which simply manipulates sequences, hashtables or objects in an abstract way which is not related to your program domain, check the library to see if you can reuse an existing definition."
-    { "Learn to use the " { $link "inference" } " tool." }
     { "Write unit tests. Factor provides good support for unit testing; see " { $link "tools.test" } ". Once your program has a good test suite you can refactor with confidence and catch regressions early." }
     "Don't write Factor as if it were C. Imperative programming and indexed loops are almost always not the most idiomatic solution."
     { "Use sequences, assocs and objects to group related data. Object allocation is very cheap. Don't be afraid to create tuples, pairs and triples. Don't be afraid of operations which allocate new objects either, such as " { $link append } "." }
@@ -332,6 +280,7 @@ $nl
 "Factor tries to implement as much of itself as possible, because this improves simplicity and performance. One consequence is that Factor exposes its internals for extension and study. You even have the option of using low-level features not usually found in high-level languages, such manual memory management, pointer arithmetic, and inline assembly code."
 $nl
 "Unsafe features are tucked away so that you will not invoke them by accident, or have to use them to solve conventional programming problems. However when the need arises, unsafe features are invaluable, for example you might have to do some pointer arithmetic when interfacing directly with C libraries." ;
+
 ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
 "Factor is a very clean and consistent language. However, it has some limitations and leaky abstractions you should keep in mind, as well as behaviors which differ from other languages you may be used to."
 { $list
@@ -341,13 +290,6 @@ ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
     { "If a literal object appears in a word definition, the object itself is pushed on the stack when the word executes, not a copy. If you intend to mutate this object, you must " { $link clone } " it first. See " { $link "syntax-literals" } "." }
     { "For a discussion of potential issues surrounding the " { $link f } " object, see " { $link "booleans" } "." }
     { "Factor's object system is quite flexible. Careless usage of union, mixin and predicate classes can lead to similar problems to those caused by “multiple inheritance” in other languages. In particular, it is possible to have two classes such that they have a non-empty intersection and yet neither is a subclass of the other. If a generic word defines methods on two such classes, various disambiguation rules are applied to ensure method dispatch remains deterministic, however they may not be what you expect. See " { $link "method-order" } " for details." }
-    { "Performance-sensitive code should have a static stack effect so that it can be compiled by the optimizing word compiler, which generates more efficient code than the non-optimizing quotation compiler. See " { $link "inference" } " and " { $link "compiler" } "."
-    $nl
-    "This means that methods defined on performance sensitive, frequently-called core generic words such as " { $link nth } " should have static stack effects which are consistent with each other, since a generic word will only have a static stack effect if all methods do."
-    $nl
-    "Unit tests for the " { $vocab-link "stack-checker" } " vocabulary can be used to ensure that any methods your vocabulary defines on core generic words have static stack effects:"
-    { $code "\"stack-checker\" test" }
-    "In general, you should strive to write code with inferable stack effects, even for sections of a program which are not performance sensitive; the " { $link infer. } " tool together with the optimizing compiler's error reporting can catch many bugs ahead of time." }
     { "Be careful when calling words which access variables from a " { $link make-assoc } " which constructs an assoc with arbitrary keys, since those keys might shadow variables." }
     { "If " { $link run-file } " throws a stack depth assertion, it means that the top-level form in the file left behind values on the stack. The stack depth is compared before and after loading a source file, since this type of situation is almost always an error. If you have a legitimate need to load a source file which returns data in some manner, define a word in the source file which produces this data on the stack and call the word after loading the file." }
 } ;
@@ -372,7 +314,6 @@ ARTICLE: "cookbook" "Factor cookbook"
 { $subsection "cookbook-combinators" }
 { $subsection "cookbook-variables" }
 { $subsection "cookbook-vocabs" }
-{ $subsection "cookbook-io" }
 { $subsection "cookbook-application" }
 { $subsection "cookbook-scripts" }
 { $subsection "cookbook-philosophy" }

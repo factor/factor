@@ -115,9 +115,13 @@ void copy_gen_cards(CELL gen)
 old->new references */
 void copy_cards(void)
 {
+	u64 start = current_micros();
+
 	int i;
 	for(i = collecting_gen + 1; i < data_heap->gen_count; i++)
 		copy_gen_cards(i);
+
+	card_scan_time += (current_micros() - start);
 }
 
 /* Copy all tagged pointers in a range of memory */
@@ -326,7 +330,7 @@ CELL copy_next_from_tenured(CELL scan)
 
 void copy_reachable_objects(CELL scan, CELL *end)
 {
-	if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	if(collecting_gen == NURSERY)
 	{
 		while(scan < *end)
 			scan = copy_next_from_nursery(scan);
@@ -401,7 +405,7 @@ void end_gc(CELL gc_elapsed)
 		if(collecting_gen != NURSERY)
 			reset_generations(NURSERY,collecting_gen - 1);
 	}
-	else if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	else if(collecting_gen == NURSERY)
 	{
 		nursery.here = nursery.start;
 	}
@@ -410,13 +414,6 @@ void end_gc(CELL gc_elapsed)
 		/* all generations up to and including the one
 		collected are now empty */
 		reset_generations(NURSERY,collecting_gen);
-	}
-
-	if(collecting_gen == TENURED)
-	{
-		/* now that all reachable code blocks have been marked,
-		deallocate the rest */
-		free_unmarked(&code_heap);
 	}
 
 	collecting_aging_again = false;
@@ -435,7 +432,7 @@ void garbage_collection(CELL gen,
 		return;
 	}
 
-	s64 start = current_micros();
+	u64 start = current_micros();
 
 	performing_gc = true;
 	growing_data_heap = growing_data_heap_;
@@ -487,7 +484,7 @@ void garbage_collection(CELL gen,
 		code_heap_scans++;
 
 		if(collecting_gen == TENURED)
-			update_code_heap_roots();
+			free_unmarked(&code_heap,(HEAP_ITERATOR)update_literal_references);
 		else
 			copy_code_heap_roots();
 
@@ -539,9 +536,10 @@ void primitive_gc_stats(void)
 		total_gc_time += s->gc_time;
 	}
 
-	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(total_gc_time)));
-	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(cards_scanned)));
-	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(decks_scanned)));
+	GROWABLE_ARRAY_ADD(stats,tag_bignum(ulong_long_to_bignum(total_gc_time)));
+	GROWABLE_ARRAY_ADD(stats,tag_bignum(ulong_long_to_bignum(cards_scanned)));
+	GROWABLE_ARRAY_ADD(stats,tag_bignum(ulong_long_to_bignum(decks_scanned)));
+	GROWABLE_ARRAY_ADD(stats,tag_bignum(ulong_long_to_bignum(card_scan_time)));
 	GROWABLE_ARRAY_ADD(stats,allot_cell(code_heap_scans));
 
 	GROWABLE_ARRAY_TRIM(stats);
@@ -556,6 +554,7 @@ void clear_gc_stats(void)
 
 	cards_scanned = 0;
 	decks_scanned = 0;
+	card_scan_time = 0;
 	code_heap_scans = 0;
 }
 

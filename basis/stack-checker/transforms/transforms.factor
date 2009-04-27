@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors arrays kernel kernel.private combinators.private
-words sequences generic math math.order namespaces make quotations
+words sequences generic math math.order namespaces quotations
 assocs combinators combinators.short-circuit classes.tuple
 classes.tuple.private effects summary hashtables classes generic sets
 definitions generic.standard slots.private continuations locals
@@ -113,11 +113,9 @@ M\ tuple-class boa t "no-compile" set-word-prop
 \ new [
     dup tuple-class? [
         dup inlined-dependency depends-on
-        [
-            [ all-slots [ initial>> literalize , ] each ]
-            [ literalize , ] bi
-            \ boa ,
-        ] [ ] make
+        [ all-slots [ initial>> literalize ] map ]
+        [ tuple-layout '[ _ <tuple-boa> ] ]
+        bi append
     ] [ drop f ] if
 ] 1 define-transform
 

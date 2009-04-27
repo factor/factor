@@ -299,7 +299,7 @@ ERROR: custom-error ;
     [ custom-error inference-error ] infer
 ] unit-test
 
-[ T{ effect f 1 1 t } ] [
+[ T{ effect f 1 2 t } ] [
     [ dup [ 3 throw ] dip ] infer
 ] unit-test
 
@@ -370,3 +370,5 @@ DEFER: eee'
 [ [ cond ] infer ] must-fail
 [ [ bi ] infer ] must-fail
 [ at ] must-infer
+
+[ [ [ "OOPS" throw ] dip ] [ drop ] if ] must-infer

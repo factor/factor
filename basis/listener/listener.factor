@@ -60,7 +60,9 @@ SYMBOL: max-stack-items
 
 10 max-stack-items set-global
 
-SYMBOL: error-summary-hook
+SYMBOL: error-summary?
+
+t error-summary? set-global
 
 <PRIVATE
 
@@ -99,13 +101,8 @@ SYMBOL: error-summary-hook
     in get auto-use? get [ " - auto" append ] when "( " " )" surround
     H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl flush ;
 
-[ error-summary ] error-summary-hook set-global
-
-: call-error-summary-hook ( -- )
-    error-summary-hook get call( -- ) ;
-
 :: (listener) ( datastack -- )
-    call-error-summary-hook
+    error-summary? get [ error-summary ] when
     visible-vars.
     datastack datastack.
     prompt.

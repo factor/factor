@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test combinators.smart math kernel ;
+USING: tools.test combinators.smart math kernel accessors ;
 IN: combinators.smart.tests
 
 : test-bi ( -- 9 11 )

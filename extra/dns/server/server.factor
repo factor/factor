@@ -2,7 +2,7 @@
 USING: kernel combinators sequences sets math threads namespaces continuations
        debugger io io.sockets unicode.case accessors destructors
        combinators.short-circuit combinators.smart
-       newfx fry arrays
+       fry arrays
        dns dns.util dns.misc ;
 
 IN: dns.server
@@ -64,7 +64,7 @@ SYMBOL: records-var
   [ rr->rdata-names ] map concat ;
 
 : extract-names ( message -- names )
-  [ message-query name>> ] [ extract-rdata-names ] bi prefix-on ;
+  [ message-query name>> ] [ extract-rdata-names ] bi swap prefix ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! fill-authority
@@ -99,7 +99,7 @@ DEFER: query->rrs
 : matching-cname? ( query -- rrs/f )
   [ ] [ clone CNAME >>type matching-rrs ] bi ! query rrs
   [ empty? not ]
-    [ 1st swap clone over rdata>> >>name query->rrs prefix-on ]
+    [ first swap clone over rdata>> >>name query->rrs swap prefix ]
     [ 2drop f ]
   1if ;
 

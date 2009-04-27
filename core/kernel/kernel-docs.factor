@@ -129,6 +129,9 @@ HELP: ?
 { $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
 { $description "Chooses between two values depending on the boolean value of " { $snippet "cond" } "." } ;
 
+HELP: boolean
+{ $class-description "A union of the " { $link POSTPONE: t } " and " { $link POSTPONE: f } " classes." } ;
+
 HELP: >boolean
 { $values { "obj" "a generalized boolean" } { "?" "a boolean" } }
 { $description "Convert a generalized boolean into a boolean. That is, " { $link f } " retains its value, whereas anything else becomes " { $link t } "." } ;
@@ -182,11 +185,13 @@ HELP: either?
 
 HELP: call
 { $values { "callable" callable } }
-{ $description "Calls a quotation." }
+{ $description "Calls a quotation. Words which " { $link call } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal quotation can have a static stack effect." }
 { $examples
     "The following two lines are equivalent:"
     { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
 } ;
+
+{ call POSTPONE: call( } related-words
 
 HELP: call-clear ( quot -- )
 { $values { "quot" callable } }

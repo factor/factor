@@ -5,7 +5,7 @@ quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
 compiler ;
-IN: optimizer.tests
+IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
