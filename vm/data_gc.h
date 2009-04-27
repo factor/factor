@@ -58,7 +58,7 @@ INLINE bool should_copy(CELL untagged)
 		return true;
 	else if(HAVE_AGING_P && collecting_gen == AGING)
 		return !in_zone(&data_heap->generations[TENURED],untagged);
-	else if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	else if(collecting_gen == NURSERY)
 		return in_zone(&nursery,untagged);
 	else
 	{
@@ -78,6 +78,11 @@ allocation (which does not call GC because of possible roots in volatile
 registers) does not run out of memory */
 #define ALLOT_BUFFER_ZONE 1024
 
+/* If this is defined, we GC every 100 allocations. This catches missing local roots */
+#ifdef GC_DEBUG
+int gc_count;
+#endif
+
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
@@ -85,10 +90,18 @@ registers) does not run out of memory */
 int count;
 INLINE void *allot_object(CELL type, CELL a)
 {
-  if(!gc_off) { if(count++ % 100 == 0) { printf("!\n"); gc(); } }
+#ifdef GC_DEBUG
+	if(!gc_off)
+	{
+		if(gc_count++ % 1000 == 0)
+			gc();
+
+	}
+#endif
+
 	CELL *object;
 
-	if(HAVE_NURSERY_P && nursery.size - ALLOT_BUFFER_ZONE > a)
+	if(nursery.size - ALLOT_BUFFER_ZONE > a)
 	{
 		/* If there is insufficient room, collect the nursery */
 		if(nursery.here + ALLOT_BUFFER_ZONE + a > nursery.end)
