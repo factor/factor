@@ -6,12 +6,16 @@ IN: ui.frp
 
 ! Layout utilities
 
+GENERIC: output-model ( gadget -- model )
+M: gadget output-model model>> ;
+M: frp-table output-model selected-value>> ;
+
 GENERIC: , ( object -- )
 M: gadget , make:, ;
 M: model , activate-model ;
 
 GENERIC: -> ( object -- model )
-M: gadget -> dup make:, model>> ;
+M: gadget -> dup make:, output-model ;
 M: model -> dup , ;
 
 : <box> ( models type -- track )
@@ -22,7 +26,9 @@ M: model -> dup , ;
 
 ! Gadgets
 : <frp-button> ( text -- button ) [ t swap set-control-value ] <bevel-button> f <model> >>model ;
-TUPLE: frp-table < table quot ;
+TUPLE: frp-table < table quot column-titles column-alignment ;
+M: frp-table column-titles column-titles>> ;
+M: frp-table column-alignment column-alignment>> ;
 M: frp-table row-columns quot>> call( a -- b ) ;
 : <frp-table> ( model quot -- table )
     frp-table new-line-gadget dup >>renderer swap >>quot swap >>model
