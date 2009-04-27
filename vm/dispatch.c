@@ -38,24 +38,11 @@ static CELL nth_hashcode(F_TUPLE_LAYOUT *layout, F_FIXNUM echelon)
 	return ptr[echelon * 2 + 1];
 }
 
-INLINE CELL method_cache_hashcode(F_TUPLE_LAYOUT *layout, F_ARRAY *array)
+static CELL lookup_tuple_method(CELL object, CELL methods)
 {
-	CELL capacity = (array_capacity(array) >> 1) - 1;
-	return (((CELL)layout >> TAG_BITS) & capacity) << 1;
-}
+	F_TUPLE *tuple = untag_object(object);
+	F_TUPLE_LAYOUT *layout = untag_object(tuple->layout);
 
-INLINE CELL lookup_tuple_method_fast(F_TUPLE_LAYOUT *layout, CELL method_cache)
-{
-	F_ARRAY *array = untag_object(method_cache);
-	CELL hashcode = method_cache_hashcode(layout,array);
-	if(array_nth(array,hashcode) == tag_object(layout))
-		return array_nth(array,hashcode + 1);
-	else
-		return F;
-}
-
-static CELL lookup_tuple_method_slow(F_TUPLE_LAYOUT *layout, CELL methods)
-{
 	F_ARRAY *echelons = untag_object(methods);
 
 	F_FIXNUM echelon = untag_fixnum_fast(layout->echelon);
@@ -84,56 +71,68 @@ static CELL lookup_tuple_method_slow(F_TUPLE_LAYOUT *layout, CELL methods)
 	return F;
 }
 
-static void update_method_cache(F_TUPLE_LAYOUT *layout, CELL method_cache, CELL method)
-{
-	F_ARRAY *array = untag_object(method_cache);
-	CELL hashcode = method_cache_hashcode(layout,array);
-	set_array_nth(array,hashcode,tag_object(layout));
-	set_array_nth(array,hashcode + 1,method);
-}
-
-static CELL lookup_tuple_method(CELL object, CELL methods, CELL method_cache)
-{
-	F_TUPLE *tuple = untag_object(object);
-	F_TUPLE_LAYOUT *layout = untag_object(tuple->layout);
-
-	CELL method = lookup_tuple_method_fast(layout,method_cache);
-	if(method == F)
-	{
-		local_cache_misses++;
-		method = lookup_tuple_method_slow(layout,methods);
-		update_method_cache(layout,method_cache,method);
-	}
-
-	return method;
-}
-
 static CELL lookup_hi_tag_method(CELL object, CELL methods)
 {
 	F_ARRAY *hi_tag_methods = untag_object(methods);
-	CELL hi_tag = object_type(object);
-	return array_nth(hi_tag_methods,hi_tag - HEADER_TYPE);
+	return array_nth(hi_tag_methods,hi_tag(object) - HEADER_TYPE);
+}
+
+static CELL method_cache_hashcode(CELL key, F_ARRAY *array)
+{
+	CELL capacity = (array_capacity(array) >> 1) - 1;
+	return ((key >> TAG_BITS) & capacity) << 1;
+}
+
+static CELL lookup_cached_method(CELL key, CELL method_cache)
+{
+	F_ARRAY *array = untag_object(method_cache);
+	CELL hashcode = method_cache_hashcode(key,array);
+	if(array_nth(array,hashcode) == key)
+		return array_nth(array,hashcode + 1);
+	else
+		return F;
+}
+
+static void update_method_cache(CELL key, CELL method_cache, CELL method)
+{
+	F_ARRAY *array = untag_object(method_cache);
+	CELL hashcode = method_cache_hashcode(key,array);
+	set_array_nth(array,hashcode,key);
+	set_array_nth(array,hashcode + 1,method);
 }
 
 static CELL lookup_method(CELL object, CELL methods, CELL method_cache)
 {
 	F_ARRAY *tag_methods = untag_object(methods);
-	CELL tag = TAG(object);
-	CELL element = array_nth(tag_methods,tag);
-
-	if(type_of(element) == WORD_TYPE)
-		return element;
+	if(!HI_TAG_OR_TUPLE_P(object))
+		return array_nth(tag_methods,TAG(object));
 	else
 	{
-		switch(tag)
+		CELL key = get(HI_TAG_HEADER(object));
+		CELL method = lookup_cached_method(key,method_cache);
+		if(method != F)
+			return method;
+		else
 		{
-		case TUPLE_TYPE:
-			return lookup_tuple_method(object,element,method_cache);
-		case OBJECT_TYPE:
-			return lookup_hi_tag_method(object,element);
-		default:
-			critical_error("Bad methods array",methods);
-			return F;
+			method = array_nth(tag_methods,TAG(object));
+			if(type_of(method) != WORD_TYPE)
+			{
+				switch(TAG(object))
+				{
+				case TUPLE_TYPE:
+					method = lookup_tuple_method(object,method);
+					break;
+				case OBJECT_TYPE:
+					method = lookup_hi_tag_method(object,method);
+					break;
+				default:
+					critical_error("Bad methods array",methods);
+					break;
+				}
+			}
+
+			update_method_cache(key,method_cache,method);
+			return method;
 		}
 	}
 }

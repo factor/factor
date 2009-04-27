@@ -106,7 +106,11 @@ M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
     ] if ;
 
 : optimize? ( word -- ? )
-    { [ contains-breakpoints? ] [ single-generic? ] } 1|| not ;
+    {
+        [ predicate-engine-word? ]
+        [ contains-breakpoints? ]
+        [ single-generic? ]
+    } 1|| not ;
 
 : frontend ( word -- nodes )
     #! If the word contains breakpoints, don't optimize it, since

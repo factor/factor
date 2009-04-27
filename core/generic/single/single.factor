@@ -143,14 +143,18 @@ GENERIC: compile-engine ( engine -- obj )
 : direct-dispatch-table ( assoc n -- table )
     default get <array> [ <enum> swap update ] keep ;
 
+: lo-tag-number ( class -- n )
+    "type" word-prop dup num-tags get member?
+    [ drop object tag-number ] unless ;
+
 M: tag-dispatch-engine compile-engine
     methods>> compile-engines*
-    [ [ global [ target-word ] bind tag-number ] dip ] assoc-map
+    [ [ lo-tag-number ] dip ] assoc-map
     num-tags get direct-dispatch-table ;
 
-: hi-tag-number ( class -- n ) "type" word-prop ;
-
 : num-hi-tags ( -- n ) num-types get num-tags get - ;
+
+: hi-tag-number ( class -- n ) "type" word-prop ;
 
 M: hi-tag-dispatch-engine compile-engine
     methods>> compile-engines*

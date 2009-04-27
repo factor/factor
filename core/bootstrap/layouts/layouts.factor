@@ -14,13 +14,13 @@ BIN: 111 tag-mask set
 H{
     { fixnum      BIN: 000 }
     { bignum      BIN: 001 }
-    { tuple       BIN: 010 }
-    { object      BIN: 011 }
-    { hi-tag      BIN: 011 }
-    { ratio       BIN: 100 }
-    { float       BIN: 101 }
-    { complex     BIN: 110 }
-    { POSTPONE: f BIN: 111 }
+    { ratio       BIN: 010 }
+    { float       BIN: 011 }
+    { complex     BIN: 100 }
+    { POSTPONE: f BIN: 101 }
+    { object      BIN: 110 }
+    { hi-tag      BIN: 110 }
+    { tuple       BIN: 111 }
 } tag-numbers set
 
 tag-numbers get H{
