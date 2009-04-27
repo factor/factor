@@ -1,18 +1,19 @@
 USING: accessors assocs continuations effects io
 io.encodings.binary io.servers.connection kernel
-memoize namespaces parser sets sequences serialize threads vocabs
-vocabs.parser words tools.walker ;
+memoize namespaces parser sets sequences serialize
+threads vocabs vocabs.parser words ;
 
 IN: modules.rpc-server
 
 SYMBOL: serving-vocabs V{ } clone serving-vocabs set-global
 
-: do-rpc ( args word -- results ) [ execute ] curry with-datastack ; inline
+: do-rpc ( args word -- bytes )
+   [ execute ] curry with-datastack object>bytes ; inline
 
-MEMO: mem-do-rpc ( args word -- results ) do-rpc ; inline
+MEMO: mem-do-rpc ( args word -- bytes ) do-rpc ; inline
 
 : process ( vocabspec -- ) vocab-words [ deserialize ] dip deserialize
-   swap at "executer" get execute( args word -- results ) serialize flush ;
+   swap at "executer" get execute( args word -- bytes ) write flush ;
 
 : (serve) ( -- ) deserialize dup serving-vocabs get-global index
    [ process ] [ drop ] if ;
@@ -29,3 +30,10 @@ MEMO: mem-do-rpc ( args word -- results ) do-rpc ; inline
 
 SYNTAX: service \ do-rpc  "executer" set (service) ;
 SYNTAX: mem-service \ mem-do-rpc "executer" set (service) ;
+
+: change-global ( var quot -- ) [ [ get-global ] keep ] dip dip set-global ; inline
+
+load-vocab-hook [
+   [ dup words>> values
+   \ mem-do-rpc "memoize" word-prop [ delete-at ] curry each ]
+append ] change-global
