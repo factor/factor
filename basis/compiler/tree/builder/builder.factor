@@ -15,7 +15,7 @@ IN: compiler.tree.builder
 
 GENERIC: (build-tree) ( quot -- )
 
-M: callable (build-tree) f initial-recursive-state infer-quot ;
+M: callable (build-tree) infer-quot-here ;
 
 : check-no-compile ( word -- )
     dup "no-compile" word-prop [ do-not-compile ] [ drop ] if ;
@@ -31,15 +31,13 @@ M: callable (build-tree) f initial-recursive-state infer-quot ;
     dup inline-recursive? [ 1quotation ] [ specialized-def ] if ;
 
 M: word (build-tree)
-    {
-        [ initial-recursive-state recursive-state set ]
-        [ check-no-compile ]
-        [ word-body infer-quot-here ]
-        [ current-effect check-effect ]
-    } cleave ;
+    [ check-no-compile ]
+    [ word-body infer-quot-here ]
+    [ current-effect check-effect ] tri ;
 
 : build-tree-with ( in-stack word/quot -- nodes )
     [
+        <recursive-state> recursive-state set
         V{ } clone stack-visitor set
         [ [ >vector \ meta-d set ] [ length d-in set ] bi ]
         [ (build-tree) ]
@@ -56,15 +54,16 @@ PRIVATE>
     #! This slows down compiler.tree.propagation.inlining since then every
     #! inlined usage of a method has an inline-dependency on the mixin, and
     #! not the more specific type at the call site.
-    specialize-method? off
-    [
-        #call in-d>> word/quot build-tree-with unclip-last in-d>> :> in-d
-        {
-            { [ dup not ] [ ] }
-            { [ dup ends-with-terminate? ] [ #call out-d>> [ f swap #push ] map append ] }
-            [ in-d #call out-d>> #copy suffix ]
-        } cond
-    ] [ dup inference-error? [ drop f ] [ rethrow ] if ] recover ;
+    f specialize-method? [
+        [
+            #call in-d>> word/quot build-tree-with unclip-last in-d>> :> in-d
+            {
+                { [ dup not ] [ ] }
+                { [ dup ends-with-terminate? ] [ #call out-d>> [ f swap #push ] map append ] }
+                [ in-d #call out-d>> #copy suffix ]
+            } cond
+        ] [ dup inference-error? [ drop f ] [ rethrow ] if ] recover
+    ] with-variable ;
 
 : contains-breakpoints? ( word -- ? )
     def>> [ word? ] filter [ "break?" word-prop ] any? ;

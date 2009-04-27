@@ -42,7 +42,6 @@ SYMBOL: literals
 : init-inference ( -- )
     terminated? off
     V{ } clone \ meta-d set
-    V{ } clone \ meta-r set
     V{ } clone literals set
     0 d-in set ;
 

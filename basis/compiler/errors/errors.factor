@@ -1,56 +1,72 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors source-files.errors kernel namespaces assocs ;
+USING: accessors source-files.errors kernel namespaces assocs fry
+summary ;
 IN: compiler.errors
 
-TUPLE: compiler-error < source-file-error ;
-
-M: compiler-error error-type error>> error-type ;
-
+SYMBOL: +compiler-error+
 SYMBOL: compiler-errors
 
 compiler-errors [ H{ } clone ] initialize
 
-SYMBOLS: +compiler-error+ +compiler-warning+ +linkage-error+ ;
+TUPLE: compiler-error < source-file-error ;
 
-: errors-of-type ( type -- assoc )
-    compiler-errors get-global
-    swap [ [ nip error-type ] dip eq? ] curry
-    assoc-filter ;
+M: compiler-error error-type drop +compiler-error+ ;
+
+SYMBOL: +linkage-error+
+SYMBOL: linkage-errors
+
+linkage-errors [ H{ } clone ] initialize
+
+TUPLE: linkage-error < source-file-error ;
+
+M: linkage-error error-type drop +linkage-error+ ;
+
+: clear-compiler-error ( word -- )
+    compiler-errors linkage-errors
+    [ get-global delete-at ] bi-curry@ bi ;
+
+: compiler-error ( error -- )
+    dup asset>> compiler-errors get-global set-at ;
 
 T{ error-type
    { type +compiler-error+ }
    { word ":errors" }
    { plural "compiler errors" }
    { icon "vocab:ui/tools/error-list/icons/compiler-error.tiff" }
-   { quot [ +compiler-error+ errors-of-type values ] }
+   { quot [ compiler-errors get values ] }
    { forget-quot [ compiler-errors get delete-at ] }
 } define-error-type
 
-T{ error-type
-   { type +compiler-warning+ }
-   { word ":warnings" }
-   { plural "compiler warnings" }
-   { icon "vocab:ui/tools/error-list/icons/compiler-warning.tiff" }
-   { quot [ +compiler-warning+ errors-of-type values ] }
-   { forget-quot [ compiler-errors get delete-at ] }
-} define-error-type
+: <compiler-error> ( error word -- compiler-error )
+    \ compiler-error <definition-error> ;
+
+: <linkage-error> ( error word -- linkage-error )
+    \ linkage-error <definition-error> ;
+
+: linkage-error ( error word class -- )
+    '[ _ boa ] dip <linkage-error> dup asset>> linkage-errors get set-at ; inline
 
 T{ error-type
    { type +linkage-error+ }
    { word ":linkage" }
    { plural "linkage errors" }
    { icon "vocab:ui/tools/error-list/icons/linkage-error.tiff" }
-   { quot [ +linkage-error+ errors-of-type values ] }
-   { forget-quot [ compiler-errors get delete-at ] }
+   { quot [ linkage-errors get values ] }
+   { forget-quot [ linkage-errors get delete-at ] }
    { fatal? f }
 } define-error-type
 
-: <compiler-error> ( error word -- compiler-error )
-    \ compiler-error <definition-error> ;
+TUPLE: no-such-library name ;
 
-: compiler-error ( error word -- )
-    compiler-errors get-global pick
-    [ [ [ <compiler-error> ] keep ] dip set-at ] [ delete-at drop ] if ;
+M: no-such-library summary drop "Library not found" ;
+
+: no-such-library ( name word -- ) \ no-such-library linkage-error ;
+
+TUPLE: no-such-symbol name ;
+
+M: no-such-symbol summary drop "Symbol not found" ;
+
+: no-such-symbol ( name word -- ) \ no-such-symbol linkage-error ;
 
 ERROR: not-compiled word error ;

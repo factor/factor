@@ -18,6 +18,8 @@ IN: functors
 
 : define-declared* ( word def effect -- ) pick set-word define-declared ;
 
+TUPLE: fake-call-next-method ;
+
 TUPLE: fake-quotation seq ;
 
 GENERIC: >fake-quotations ( quot -- fake )
@@ -29,17 +31,25 @@ M: array >fake-quotations [ >fake-quotations ] { } map-as ;
 
 M: object >fake-quotations ;
 
-GENERIC: fake-quotations> ( fake -- quot )
+GENERIC: (fake-quotations>) ( fake -- )
 
-M: fake-quotation fake-quotations>
-    seq>> [ fake-quotations> ] [ ] map-as ;
+: fake-quotations> ( fake -- quot )
+    [ (fake-quotations>) ] [ ] make ;
 
-M: array fake-quotations> [ fake-quotations> ] map ;
+M: fake-quotation (fake-quotations>)
+    [ seq>> [ (fake-quotations>) ] each ] [ ] make , ;
 
-M: object fake-quotations> ;
+M: array (fake-quotations>)
+    [ [ (fake-quotations>) ] each ] { } make , ;
+
+M: fake-call-next-method (fake-quotations>)
+    drop method-body get literalize , \ (call-next-method) , ;
+
+M: object (fake-quotations>) , ;
 
 : parse-definition* ( accum -- accum )
-    parse-definition >fake-quotations parsed \ fake-quotations> parsed ;
+    parse-definition >fake-quotations parsed
+    [ fake-quotations> first ] over push-all ;
 
 : parse-declared* ( accum -- accum )
     complete-effect
@@ -64,7 +74,7 @@ SYNTAX: `TUPLE:
 SYNTAX: `M:
     scan-param parsed
     scan-param parsed
-    \ create-method-in parsed
+    [ create-method-in dup method-body set ] over push-all
     parse-definition*
     \ define* parsed ;
 
@@ -92,6 +102,8 @@ SYNTAX: `INSTANCE:
 
 SYNTAX: `inline [ word make-inline ] over push-all ;
 
+SYNTAX: `call-next-method T{ fake-call-next-method } parsed ;
+
 : (INTERPOLATE) ( accum quot -- accum )
     [ scan interpolate-locals ] dip
     '[ _ with-string-writer @ ] parsed ;
@@ -117,6 +129,7 @@ DEFER: ;FUNCTOR delimiter
         { "INSTANCE:" POSTPONE: `INSTANCE: }
         { "SYNTAX:" POSTPONE: `SYNTAX: }
         { "inline" POSTPONE: `inline }
+        { "call-next-method" POSTPONE: `call-next-method }
     } ;
 
 : push-functor-words ( -- )

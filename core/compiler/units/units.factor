@@ -144,8 +144,8 @@ GENERIC: definitions-changed ( assoc obj -- )
     update-tuples
     process-forgotten-definitions
     modify-code-heap
-    updated-definitions dup assoc-empty? [ drop ] [ notify-definition-observers ] if
-    notify-error-observers ;
+    updated-definitions dup assoc-empty?
+    [ drop ] [ notify-definition-observers notify-error-observers ] if ;
 
 : with-nested-compilation-unit ( quot -- )
     [

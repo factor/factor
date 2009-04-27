@@ -1,6 +1,7 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.ranges sequences project-euler.common ;
+USING: kernel math math.functions math.ranges project-euler.common sequences
+    sets ;
 IN: project-euler.001
 
 ! http://projecteuler.net/index.php?section=problems&id=1
@@ -32,7 +33,7 @@ PRIVATE>
     999 15 sum-divisible-by - ;
 
 ! [ euler001 ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.0 SD (100 trials)
 
 
 ! ALTERNATE SOLUTIONS
@@ -42,14 +43,14 @@ PRIVATE>
     0 999 3 <range> sum 0 999 5 <range> sum + 0 999 15 <range> sum - ;
 
 ! [ euler001a ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.03 SD (100 trials)
 
 
 : euler001b ( -- answer )
     1000 [ [ 5 mod ] [ 3 mod ] bi [ 0 = ] either? ] filter sum ;
 
 ! [ euler001b ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.06 SD (100 trials)
 
 
 : euler001c ( -- answer )
@@ -57,5 +58,12 @@ PRIVATE>
 
 ! [ euler001c ] 100 ave-time
 ! 0 ms ave run time - 0.06 SD (100 trials)
+
+
+: euler001d ( -- answer )
+    { 3 5 } [ [ 999 ] keep <range> ] gather sum ;
+
+! [ euler001d ] 100 ave-time
+! 0 ms ave run time - 0.08 SD (100 trials)
 
 SOLUTION: euler001
