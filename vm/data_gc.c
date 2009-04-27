@@ -330,7 +330,7 @@ CELL copy_next_from_tenured(CELL scan)
 
 void copy_reachable_objects(CELL scan, CELL *end)
 {
-	if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	if(collecting_gen == NURSERY)
 	{
 		while(scan < *end)
 			scan = copy_next_from_nursery(scan);
@@ -405,7 +405,7 @@ void end_gc(CELL gc_elapsed)
 		if(collecting_gen != NURSERY)
 			reset_generations(NURSERY,collecting_gen - 1);
 	}
-	else if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	else if(collecting_gen == NURSERY)
 	{
 		nursery.here = nursery.start;
 	}
