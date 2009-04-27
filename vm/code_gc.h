@@ -2,8 +2,8 @@
 #define BLOCK_SIZE_INCREMENT 32
 
 typedef struct {
-	F_FREE_BLOCK *small[FREE_LIST_COUNT];
-	F_FREE_BLOCK *large;
+	F_FREE_BLOCK *small_blocks[FREE_LIST_COUNT];
+	F_FREE_BLOCK *large_blocks;
 } F_HEAP_FREE_LIST;
 
 typedef struct {

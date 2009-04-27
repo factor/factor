@@ -224,7 +224,8 @@ void mark_object_code_block(CELL scan)
 	{
 	case WORD_TYPE:
 		word = (F_WORD *)scan;
-		mark_code_block(word->code);
+		if(word->code)
+		  mark_code_block(word->code);
 		if(word->profiling)
 			mark_code_block(word->profiling);
 		break;
