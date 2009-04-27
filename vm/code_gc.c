@@ -1,5 +1,10 @@
 #include "master.h"
 
+static void clear_free_list(F_HEAP *heap)
+{
+	memset(&heap->free,0,sizeof(F_HEAP_FREE_LIST));
+}
+
 /* This malloc-style heap code is reasonably generic. Maybe in the future, it
 will be used for the data heap too, if we ever get incremental
 mark/sweep/compact GC. */
@@ -8,17 +13,23 @@ void new_heap(F_HEAP *heap, CELL size)
 	heap->segment = alloc_segment(align_page(size));
 	if(!heap->segment)
 		fatal_error("Out of memory in new_heap",size);
-	heap->free_list = NULL;
+
+	clear_free_list(heap);
 }
 
-/* If there is no previous block, next_free becomes the head of the free list,
-else its linked in */
-INLINE void update_free_list(F_HEAP *heap, F_FREE_BLOCK *prev, F_FREE_BLOCK *next_free)
+void add_to_free_list(F_HEAP *heap, F_FREE_BLOCK *block)
 {
-	if(prev)
-		prev->next_free = next_free;
+	if(block->block.size < FREE_LIST_COUNT * BLOCK_SIZE_INCREMENT)
+	{
+		int index = block->block.size / BLOCK_SIZE_INCREMENT;
+		block->next_free = heap->free.small_blocks[index];
+		heap->free.small_blocks[index] = block;
+	}
 	else
-		heap->free_list = next_free;
+	{
+		block->next_free = heap->free.large_blocks;
+		heap->free.large_blocks = block;
+	}
 }
 
 /* Called after reading the code heap from the image file, and after code GC.
@@ -28,7 +39,11 @@ compiling.limit. */
 void build_free_list(F_HEAP *heap, CELL size)
 {
 	F_BLOCK *prev = NULL;
-	F_FREE_BLOCK *prev_free = NULL;
+
+	clear_free_list(heap);
+
+	size = (size + BLOCK_SIZE_INCREMENT - 1) & ~(BLOCK_SIZE_INCREMENT - 1);
+
 	F_BLOCK *scan = first_block(heap);
 	F_FREE_BLOCK *end = (F_FREE_BLOCK *)(heap->segment->start + size);
 
@@ -38,8 +53,7 @@ void build_free_list(F_HEAP *heap, CELL size)
 		switch(scan->status)
 		{
 		case B_FREE:
-			update_free_list(heap,prev_free,(F_FREE_BLOCK *)scan);
-			prev_free = (F_FREE_BLOCK *)scan;
+			add_to_free_list(heap,(F_FREE_BLOCK *)scan);
 			break;
 		case B_ALLOCATED:
 			break;
@@ -58,10 +72,9 @@ void build_free_list(F_HEAP *heap, CELL size)
 	{
 		end->block.status = B_FREE;
 		end->block.size = heap->segment->end - (CELL)end;
-		end->next_free = NULL;
 
 		/* add final free block */
-		update_free_list(heap,prev_free,end);
+		add_to_free_list(heap,end);
 	}
 	/* This branch is taken if the newly loaded image fits exactly, or
 	after code GC */
@@ -70,63 +83,88 @@ void build_free_list(F_HEAP *heap, CELL size)
 		/* even if there's no room at the end of the heap for a new
 		free block, we might have to jigger it up by a few bytes in
 		case prev + prev->size */
-		if(prev)
-			prev->size = heap->segment->end - (CELL)prev;
-
-		/* this is the last free block */
-		update_free_list(heap,prev_free,NULL);
+		if(prev) prev->size = heap->segment->end - (CELL)prev;
 	}
 
+}
+
+static void assert_free_block(F_FREE_BLOCK *block)
+{
+	if(block->block.status != B_FREE)
+		critical_error("Invalid block in free list",(CELL)block);
+}
+		
+F_FREE_BLOCK *find_free_block(F_HEAP *heap, CELL size)
+{
+	CELL attempt = size;
+
+	while(attempt < FREE_LIST_COUNT * BLOCK_SIZE_INCREMENT)
+	{
+		int index = attempt / BLOCK_SIZE_INCREMENT;
+		F_FREE_BLOCK *block = heap->free.small_blocks[index];
+		if(block)
+		{
+			assert_free_block(block);
+			heap->free.small_blocks[index] = block->next_free;
+			return block;
+		}
+
+		attempt *= 2;
+	}
+
+	F_FREE_BLOCK *prev = NULL;
+	F_FREE_BLOCK *block = heap->free.large_blocks;
+
+	while(block)
+	{
+		assert_free_block(block);
+		if(block->block.size >= size)
+		{
+			if(prev)
+				prev->next_free = block->next_free;
+			else
+				heap->free.large_blocks = block->next_free;
+			return block;
+		}
+
+		prev = block;
+		block = block->next_free;
+	}
+
+	return NULL;
+}
+
+F_FREE_BLOCK *split_free_block(F_HEAP *heap, F_FREE_BLOCK *block, CELL size)
+{
+	if(block->block.size != size )
+	{
+		/* split the block in two */
+		F_FREE_BLOCK *split = (F_FREE_BLOCK *)((CELL)block + size);
+		split->block.status = B_FREE;
+		split->block.size = block->block.size - size;
+		split->next_free = block->next_free;
+		block->block.size = size;
+		add_to_free_list(heap,split);
+	}
+
+	return block;
 }
 
 /* Allocate a block of memory from the mark and sweep GC heap */
 F_BLOCK *heap_allot(F_HEAP *heap, CELL size)
 {
-	F_FREE_BLOCK *prev = NULL;
-	F_FREE_BLOCK *scan = heap->free_list;
+	size = (size + BLOCK_SIZE_INCREMENT - 1) & ~(BLOCK_SIZE_INCREMENT - 1);
 
-	size = (size + 31) & ~31;
-
-	while(scan)
+	F_FREE_BLOCK *block = find_free_block(heap,size);
+	if(block)
 	{
-		if(scan->block.status != B_FREE)
-			critical_error("Invalid block in free list",(CELL)scan);
+		block = split_free_block(heap,block,size);
 
-		if(scan->block.size < size)
-		{
-			prev = scan;
-			scan = scan->next_free;
-			continue;
-		}
-
-		/* we found a candidate block */
-		F_FREE_BLOCK *next_free;
-
-		if(scan->block.size - size <= sizeof(F_BLOCK) * 2)
-		{
-			/* too small to be split */
-			next_free = scan->next_free;
-		}
-		else
-		{
-			/* split the block in two */
-			F_FREE_BLOCK *split = (F_FREE_BLOCK *)((CELL)scan + size);
-			split->block.status = B_FREE;
-			split->block.size = scan->block.size - size;
-			split->next_free = scan->next_free;
-			scan->block.size = size;
-			next_free = split;
-		}
-
-		/* update the free list */
-		update_free_list(heap,prev,next_free);
-
-		/* this is our new block */
-		scan->block.status = B_ALLOCATED;
-		return &scan->block;
+		block->block.status = B_ALLOCATED;
+		return &block->block;
 	}
-
-	return NULL;
+	else
+		return NULL;
 }
 
 void mark_block(F_BLOCK *block)
@@ -162,8 +200,10 @@ void unmark_marked(F_HEAP *heap)
 
 /* After code GC, all referenced code blocks have status set to B_MARKED, so any
 which are allocated and not marked can be reclaimed. */
-void free_unmarked(F_HEAP *heap)
+void free_unmarked(F_HEAP *heap, HEAP_ITERATOR iter)
 {
+	clear_free_list(heap);
+
 	F_BLOCK *prev = NULL;
 	F_BLOCK *scan = first_block(heap);
 
@@ -183,10 +223,15 @@ void free_unmarked(F_HEAP *heap)
 		case B_FREE:
 			if(prev && prev->status == B_FREE)
 				prev->size += scan->size;
+			else
+				prev = scan;
 			break;
 		case B_MARKED:
+			if(prev && prev->status == B_FREE)
+				add_to_free_list(heap,(F_FREE_BLOCK *)prev);
 			scan->status = B_ALLOCATED;
 			prev = scan;
+			iter(scan);
 			break;
 		default:
 			critical_error("Invalid scan->status",(CELL)scan);
@@ -195,7 +240,8 @@ void free_unmarked(F_HEAP *heap)
 		scan = next_block(heap,scan);
 	}
 
-	build_free_list(heap,heap->segment->size);
+	if(prev && prev->status == B_FREE)
+		add_to_free_list(heap,(F_FREE_BLOCK *)prev);
 }
 
 /* Compute total sum of sizes of free blocks, and size of largest free block */

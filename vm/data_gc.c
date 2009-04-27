@@ -330,7 +330,7 @@ CELL copy_next_from_tenured(CELL scan)
 
 void copy_reachable_objects(CELL scan, CELL *end)
 {
-	if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	if(collecting_gen == NURSERY)
 	{
 		while(scan < *end)
 			scan = copy_next_from_nursery(scan);
@@ -405,7 +405,7 @@ void end_gc(CELL gc_elapsed)
 		if(collecting_gen != NURSERY)
 			reset_generations(NURSERY,collecting_gen - 1);
 	}
-	else if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	else if(collecting_gen == NURSERY)
 	{
 		nursery.here = nursery.start;
 	}
@@ -414,13 +414,6 @@ void end_gc(CELL gc_elapsed)
 		/* all generations up to and including the one
 		collected are now empty */
 		reset_generations(NURSERY,collecting_gen);
-	}
-
-	if(collecting_gen == TENURED)
-	{
-		/* now that all reachable code blocks have been marked,
-		deallocate the rest */
-		free_unmarked(&code_heap);
 	}
 
 	collecting_aging_again = false;
@@ -491,7 +484,7 @@ void garbage_collection(CELL gen,
 		code_heap_scans++;
 
 		if(collecting_gen == TENURED)
-			update_code_heap_roots();
+			free_unmarked(&code_heap,(HEAP_ITERATOR)update_literal_references);
 		else
 			copy_code_heap_roots();
 
