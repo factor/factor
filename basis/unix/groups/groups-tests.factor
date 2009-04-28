@@ -5,8 +5,6 @@ IN: unix.groups.tests
 
 [ ] [ all-groups drop ] unit-test
 
-\ all-groups must-infer
-
 [ t ] [ real-group-name string? ] unit-test
 [ t ] [ effective-group-name string? ] unit-test
 

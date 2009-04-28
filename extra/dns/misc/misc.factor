@@ -1,6 +1,6 @@
 
 USING: kernel combinators sequences splitting math 
-       io.files io.encodings.utf8 random newfx dns.util ;
+       io.files io.encodings.utf8 random dns.util ;
 
 IN: dns.misc
 
@@ -9,8 +9,8 @@ IN: dns.misc
 : resolv-conf-servers ( -- seq )
   "/etc/resolv.conf" utf8 file-lines
   [ " " split ] map
-  [ 1st "nameserver" = ] filter
-  [ 2nd ] map ;
+  [ first "nameserver" = ] filter
+  [ second ] map ;
 
 : resolv-conf-server ( -- ip ) resolv-conf-servers random ;
 

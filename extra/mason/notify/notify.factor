@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors io io.sockets io.encodings.utf8 io.files
 io.launcher kernel make mason.config mason.common mason.email
-mason.twitter namespaces sequences ;
+mason.twitter namespaces sequences prettyprint ;
 IN: mason.notify
 
 : status-notify ( input-file args -- )
@@ -38,7 +38,7 @@ IN: mason.notify
     f { "test" } status-notify ;
 
 : notify-report ( status -- )
-    [ "Build finished with status: " write print flush ]
+    [ "Build finished with status: " write . flush ]
     [
         [ "report" utf8 file-contents ] dip email-report
         "report" { "report" } status-notify

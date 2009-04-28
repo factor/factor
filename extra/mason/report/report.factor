@@ -28,7 +28,7 @@ IN: mason.report
         common-report
         _ call( -- xml )
         [XML <html><body><-><-></body></html> XML]
-        pprint-xml
+        write-xml
     ] with-file-writer ; inline
 
 :: failed-report ( error file what -- status )
@@ -93,7 +93,7 @@ IN: mason.report
             load-everything-errors-file
             error-dump
 
-            "Compiler warnings and errors"
+            "Compiler errors"
             compiler-errors-file
             compiler-error-messages-file
             error-dump

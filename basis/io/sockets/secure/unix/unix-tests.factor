@@ -5,7 +5,6 @@ io.backend.unix classes words destructors threads tools.test
 concurrency.promises byte-arrays locals calendar io.timeouts
 io.sockets.secure.unix.debug ;
 
-\ <secure-config> must-infer
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
 
 [ ] [ <promise> "port" set ] unit-test

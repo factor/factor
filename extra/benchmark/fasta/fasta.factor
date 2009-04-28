@@ -46,8 +46,8 @@ CONSTANT: homo-sapiens
     }
 
 : make-cumulative ( freq -- chars floats )
-    dup keys >byte-array
-    swap values >double-array unclip [ + ] accumulate swap suffix ;
+    [ keys >byte-array ]
+    [ values >double-array ] bi unclip [ + ] accumulate swap suffix ;
 
 :: select-random ( seed chars floats -- seed elt )
     floats seed random -rot
@@ -55,7 +55,7 @@ CONSTANT: homo-sapiens
     chars nth-unsafe ; inline
 
 : make-random-fasta ( seed len chars floats -- seed )
-    [ rot drop select-random ] 2curry B{ } map-as print ; inline
+    [ rot drop select-random ] 2curry "" map-as print ; inline
 
 : write-description ( desc id -- )
     ">" write write bl print ; inline
@@ -71,7 +71,7 @@ CONSTANT: homo-sapiens
 
 :: make-repeat-fasta ( k len alu -- k' )
     [let | kn [ alu length ] |
-        len [ k + kn mod alu nth-unsafe ] B{ } map-as print
+        len [ k + kn mod alu nth-unsafe ] "" map-as print
         k len +
     ] ; inline
 

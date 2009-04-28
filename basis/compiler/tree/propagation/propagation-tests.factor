@@ -12,8 +12,6 @@ specialized-arrays.double system sorting math.libm
 math.intervals ;
 IN: compiler.tree.propagation.tests
 
-\ propagate must-infer
-
 [ V{ } ] [ [ ] final-classes ] unit-test
 
 [ V{ fixnum } ] [ [ 1 ] final-classes ] unit-test

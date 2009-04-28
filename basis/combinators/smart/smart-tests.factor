@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test combinators.smart math kernel ;
+USING: tools.test combinators.smart math kernel accessors ;
 IN: combinators.smart.tests
 
 : test-bi ( -- 9 11 )
@@ -42,7 +42,7 @@ IN: combinators.smart.tests
 : nested-smart-combo-test ( -- array )
     [ [ 1 2 ] output>array [ 3 4 ] output>array ] output>array ;
 
-\ nested-smart-combo-test must-infer
+\ nested-smart-combo-test def>> must-infer
 
 [ { { 1 2 } { 3 4 } } ] [ nested-smart-combo-test ] unit-test
 

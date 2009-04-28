@@ -4,10 +4,6 @@ USING: regexp tools.test kernel sequences regexp.parser regexp.private
 eval strings multiline accessors ;
 IN: regexp-tests
 
-\ <regexp> must-infer
-\ compile-regexp must-infer
-\ matches? must-infer
-
 [ f ] [ "b" "a*" <regexp> matches? ] unit-test
 [ t ] [ "" "a*" <regexp> matches? ] unit-test
 [ t ] [ "a" "a*" <regexp> matches? ] unit-test

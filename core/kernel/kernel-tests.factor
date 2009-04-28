@@ -1,7 +1,7 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
 continuations prettyprint io.streams.string debugger assocs
-sequences.private accessors locals.backend grouping ;
+sequences.private accessors locals.backend grouping words ;
 IN: kernel.tests
 
 [ 0 ] [ f size ] unit-test
@@ -23,19 +23,24 @@ IN: kernel.tests
 
 : overflow-d ( -- ) 3 overflow-d ;
 
-[ overflow-d ] [ { "kernel-error" 12 f f } = ] must-fail-with
-
-[ ] [ :c ] unit-test
-
 : (overflow-d-alt) ( -- n ) 3 ;
 
 : overflow-d-alt ( -- ) (overflow-d-alt) overflow-d-alt ;
 
+: overflow-r ( -- ) 3 load-local overflow-r ;
+
+<<
+{ overflow-d (overflow-d-alt) overflow-d-alt overflow-r }
+[ t "no-compile" set-word-prop ] each
+>>
+
+[ overflow-d ] [ { "kernel-error" 12 f f } = ] must-fail-with
+
+[ ] [ :c ] unit-test
+
 [ overflow-d-alt ] [ { "kernel-error" 12 f f } = ] must-fail-with
 
 [ ] [ [ :c ] with-string-writer drop ] unit-test
-
-: overflow-r ( -- ) 3 load-local overflow-r ;
 
 [ overflow-r ] [ { "kernel-error" 14 f f } = ] must-fail-with
 
@@ -99,7 +104,9 @@ IN: kernel.tests
 [ ] [ :c ] unit-test
 
 ! Doesn't compile; important
-: foo ( a -- b ) 5 + 0 [ ] each ;
+: foo ( a -- b ) ;
+
+<< \ foo t "no-compile" set-word-prop >>
 
 [ drop foo ] must-fail
 [ ] [ :c ] unit-test
@@ -109,13 +116,13 @@ IN: kernel.tests
     [ pick ] dip swap [ pick ] dip swap
     < [ [ 1+ ] 3dip (loop) ] [ 2drop 2drop ] if ; inline recursive
 
-: loop ( obj obj -- )
+: loop ( obj -- )
     H{ } values swap [ dup length swap ] dip 0 -roll (loop) ;
 
 [ loop ] must-fail
 
 ! Discovered on Windows
-: total-failure-1 ( -- ) "" [ ] map unimplemented ;
+: total-failure-1 ( -- a ) "" [ ] map unimplemented ;
 
 [ total-failure-1 ] must-fail
 

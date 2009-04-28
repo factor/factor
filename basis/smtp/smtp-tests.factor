@@ -4,8 +4,6 @@ namespaces logging accessors assocs sorting smtp.private
 concurrency.promises system ;
 IN: smtp.tests
 
-\ send-email must-infer
-
 { 0 0 } [ [ ] with-smtp-connection ] must-infer-as
 
 [ "hello\nworld" validate-address ] must-fail
