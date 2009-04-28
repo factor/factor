@@ -101,11 +101,32 @@ static void update_method_cache(CELL key, CELL method_cache, CELL method)
 	set_array_nth(array,hashcode + 1,method);
 }
 
-static CELL lookup_method(CELL object, CELL methods, CELL method_cache)
+static CELL lookup_hairy_method(CELL object, CELL methods)
 {
-	F_ARRAY *tag_methods = untag_object(methods);
+	CELL method = array_nth(untag_object(methods),TAG(object));
+	if(type_of(method) == WORD_TYPE)
+		return method;
+	else
+	{
+		switch(TAG(object))
+		{
+		case TUPLE_TYPE:
+			return lookup_tuple_method(object,method);
+			break;
+		case OBJECT_TYPE:
+			return lookup_hi_tag_method(object,method);
+			break;
+		default:
+			critical_error("Bad methods array",methods);
+			return -1;
+		}
+	}
+}
+
+static CELL lookup_method_with_cache(CELL object, CELL methods, CELL method_cache)
+{
 	if(!HI_TAG_OR_TUPLE_P(object))
-		return array_nth(tag_methods,TAG(object));
+		return array_nth(untag_object(methods),TAG(object));
 	else
 	{
 		CELL key = get(HI_TAG_HEADER(object));
@@ -114,23 +135,7 @@ static CELL lookup_method(CELL object, CELL methods, CELL method_cache)
 			return method;
 		else
 		{
-			method = array_nth(tag_methods,TAG(object));
-			if(type_of(method) != WORD_TYPE)
-			{
-				switch(TAG(object))
-				{
-				case TUPLE_TYPE:
-					method = lookup_tuple_method(object,method);
-					break;
-				case OBJECT_TYPE:
-					method = lookup_hi_tag_method(object,method);
-					break;
-				default:
-					critical_error("Bad methods array",methods);
-					break;
-				}
-			}
-
+			method = lookup_hairy_method(object,methods);
 			update_method_cache(key,method_cache,method);
 			return method;
 		}
@@ -143,5 +148,23 @@ void primitive_lookup_method(void)
 	CELL methods = get(ds - CELLS);
 	CELL object = get(ds - CELLS * 2);
 	ds -= CELLS * 2;
-	drepl(lookup_method(object,methods,method_cache));
+	drepl(lookup_method_with_cache(object,methods,method_cache));
+}
+
+/* Next two functions are used for polymorphic inline caching */
+
+CELL object_class(CELL object)
+{
+	if(!HI_TAG_OR_TUPLE_P(object))
+		return tag_fixnum(TAG(object));
+	else
+		return get(HI_TAG_HEADER(object));
+}
+
+CELL lookup_method(CELL object, CELL methods)
+{
+	if(!HI_TAG_OR_TUPLE_P(object))
+		return array_nth(untag_object(methods),TAG(object));
+	else
+		return lookup_hairy_method(object,methods);
 }

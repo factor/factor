@@ -533,6 +533,7 @@ tuple
     { "load-locals" "locals.backend" (( ... n -- )) }
     { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
     { "lookup-method" "generic.single.private" (( object methods method-cache -- method )) }
+    { "inline-cache-miss" "generic.single.private" (( generic methods -- )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number

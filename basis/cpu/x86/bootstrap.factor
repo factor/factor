@@ -1,9 +1,9 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler layouts compiler.units math
 math.private compiler.constants vocabs slots.private words
-locals.backend ;
+locals.backend make sequences combinators ;
 IN: bootstrap.x86
 
 big-endian off
@@ -170,7 +170,57 @@ big-endian off
 
 [ 0 RET ] jit-return jit-define
 
-! Sub-primitives
+! ! ! Polymorphic inline caches
+
+! The 'make' trick lets us compute the jump distance for the conditional branches there
+
+! Tag
+[
+    ds-reg bootstrap-cell SUB
+    temp0 tag-bits get AND
+] pic-tag jit-define
+
+! Hi-tag
+[
+    ds-reg bootstrap-cell SUB
+    temp0 object tag-number TEST
+    [ temp0 temp0 object tag-number neg [+] MOV ] { } make
+    [ length JNE ] [ % ] bi
+] pic-hi-tag jit-define
+
+! Tuple
+[
+    ds-reg bootstrap-cell SUB
+    temp0 tuple tag-number TEST
+    [ temp0 temp0 tuple tag-number neg bootstrap-cell + [+] MOV ] { } make
+    [ length JNE ] [ % ] bi
+] pic-tuple jit-define
+
+! Hi-tag and tuple
+[
+    ds-reg bootstrap-cell SUB
+    ! If bits 2 and 3 are set, the tag is either 6 (object) or 7 (tuple)
+    temp0 6 TEST
+    [
+        temp1 temp0 MOV
+        ! Make temp0 untagged
+        temp0 tag-mask get bitnot AND
+        ! Set temp1 to 0 for objects, and 4 or 8 for tuples
+        temp1 1 AND
+        bootstrap-cell {
+            { 4 [ temp1 2 SHL ] }
+            { 8 [ temp1 3 SHL ] }
+        } case
+        ! Load header cell or tuple layout cell
+        temp0 temp0 temp1 [+] MOV
+    ] [ ] make [ length JNE ] [ % ] bi
+] pic-hi-tag-tuple jit-define
+
+[ temp0 HEX: ffffffff CMP ] pic-check jit-define
+
+[ f JE rc-relative rt-xt jit-rel ] pic-hit jit-define
+
+! ! ! Sub-primitives
 
 ! Quotations and words
 [

@@ -47,6 +47,7 @@
 #include "quotations.h"
 #include "dispatch.h"
 #include "jit.h"
+#include "inline_cache.h"
 #include "factor.h"
 #include "utilities.h"
 

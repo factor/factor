@@ -321,10 +321,11 @@ M: label CALL (CALL) label-fixup ;
 M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 
 GENERIC# JUMPcc 1 ( addr opcode -- )
-: (JUMPcc) ( n -- rel-class ) extended-opcode, 0 4, rc-relative ;
-M: f JUMPcc nip (JUMPcc) drop ;
-M: callable JUMPcc (JUMPcc) rel-word ;
-M: label JUMPcc (JUMPcc) label-fixup ;
+: (JUMPcc) ( addr n -- rel-class ) extended-opcode, 4, rc-relative ;
+M: f JUMPcc [ 0 ] dip (JUMPcc) 2drop ;
+M: integer JUMPcc (JUMPcc) drop ;
+M: callable JUMPcc [ 0 ] dip (JUMPcc) rel-word ;
+M: label JUMPcc [ 0 ] dip (JUMPcc) label-fixup ;
 
 : JO  ( dst -- ) HEX: 80 JUMPcc ;
 : JNO ( dst -- ) HEX: 81 JUMPcc ;
@@ -381,6 +382,10 @@ M: operand XOR OCT: 060 2-operand ;
 GENERIC: CMP ( dst src -- )
 M: immediate CMP swap { BIN: 111 t HEX: 80 } immediate-1/4 ;
 M: operand CMP OCT: 070 2-operand ;
+
+GENERIC: TEST ( dst src -- )
+M: immediate TEST swap { BIN: 101 t HEX: 84 } immediate-1/4 ;
+M: operand TEST OCT: 204 2-operand ;
 
 : XCHG ( dst src -- ) OCT: 207 2-operand ;
 

@@ -172,7 +172,8 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity)
 {
 #ifdef FACTOR_DEBUG
-	assert(untag_header(array->header) == ARRAY_TYPE);
+	CELL header = untag_header(array->header);
+	assert(header == ARRAY_TYPE || header == BIGNUM_TYPE);
 #endif
 
 	CELL to_copy = array_capacity(array);

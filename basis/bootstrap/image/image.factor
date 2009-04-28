@@ -5,10 +5,10 @@ hashtables.private io io.binary io.files io.encodings.binary
 io.pathnames kernel kernel.private math namespaces make parser
 prettyprint sequences sequences.private strings sbufs vectors words
 quotations assocs system layouts splitting grouping growable classes
-classes.builtin classes.tuple classes.tuple.private
-vocabs vocabs.loader source-files definitions debugger
-quotations.private sequences.private combinators math.order
-math.private accessors slots.private compiler.units compiler.constants
+classes.builtin classes.tuple classes.tuple.private vocabs
+vocabs.loader source-files definitions debugger quotations.private
+sequences.private combinators math.order math.private accessors
+slots.private generic.single.private compiler.units compiler.constants
 fry ;
 IN: bootstrap.image
 
@@ -162,6 +162,15 @@ SYMBOL: jit-profiling
 SYMBOL: jit-declare-word
 SYMBOL: jit-save-stack
 
+! PIC stubs
+SYMBOL: pic-tag
+SYMBOL: pic-hi-tag
+SYMBOL: pic-tuple
+SYMBOL: pic-hi-tag-tuple
+SYMBOL: pic-check
+SYMBOL: pic-hit
+SYMBOL: pic-miss-word
+
 ! Default definition for undefined words
 SYMBOL: undefined-quot
 
@@ -184,17 +193,24 @@ SYMBOL: undefined-quot
         { jit-return 34 }
         { jit-profiling 35 }
         { jit-push-immediate 36 }
-        { jit-declare-word 42 }
-        { jit-save-stack 43 }
-        { jit-dip-word 44 }
-        { jit-dip 45 }
-        { jit-2dip-word 46 }
-        { jit-2dip 47 }
-        { jit-3dip-word 48 }
-        { jit-3dip 49 }
-        { jit-execute-word 50 }
-        { jit-execute-jump 51 }
-        { jit-execute-call 52 }
+        { jit-declare-word 37 }
+        { jit-save-stack 38 }
+        { jit-dip-word 39 }
+        { jit-dip 40 }
+        { jit-2dip-word 41 }
+        { jit-2dip 42 }
+        { jit-3dip-word 43 }
+        { jit-3dip 44 }
+        { jit-execute-word 45 }
+        { jit-execute-jump 46 }
+        { jit-execute-call 47 }
+        { pic-tag 48 }
+        { pic-hi-tag 49 }
+        { pic-tuple 50 }
+        { pic-hi-tag-tuple 51 }
+        { pic-check 52 }
+        { pic-hit 53 }
+        { pic-miss-word 54 }
         { undefined-quot 60 }
     } ; inline
 
@@ -509,6 +525,7 @@ M: quotation '
     \ 2dip jit-2dip-word set
     \ 3dip jit-3dip-word set
     \ (execute) jit-execute-word set
+    \ inline-cache-miss \ pic-miss-word set
     [ undefined ] undefined-quot set
     {
         jit-code-format
@@ -537,6 +554,13 @@ M: quotation '
         jit-profiling
         jit-declare-word
         jit-save-stack
+        pic-tag
+        pic-hi-tag
+        pic-tuple
+        pic-hi-tag-tuple
+        pic-check
+        pic-hit
+        pic-miss-word
         undefined-quot
     } [ emit-userenv ] each ;
 

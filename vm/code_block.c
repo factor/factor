@@ -427,7 +427,7 @@ F_CODE_BLOCK *add_code_block(
 #ifdef FACTOR_DEBUG
 	type_check(ARRAY_TYPE,literals);
 	type_check(BYTE_ARRAY_TYPE,relocation);
-	assert(hi_tag(code) == ARRAY_TYPE);
+	assert(untag_header(code->header) == ARRAY_TYPE);
 #endif
 
 	CELL code_format = compiled_code_format();
