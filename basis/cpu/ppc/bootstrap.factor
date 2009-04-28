@@ -60,7 +60,7 @@ CONSTANT: rs-reg 30
     BCTR
 ] jit-primitive jit-define
 
-[ 0 BL rc-relative-ppc-3 rt-xt jit-rel ] jit-word-call jit-define
+[ 0 BL rc-relative-ppc-3 rt-xt-direct jit-rel ] jit-word-call jit-define
 
 [ 0 B rc-relative-ppc-3 rt-xt ] jit-word-jump jit-define
 

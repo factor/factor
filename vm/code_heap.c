@@ -22,6 +22,9 @@ void jit_compile_word(F_WORD *word, CELL def, bool relocate)
 	UNREGISTER_ROOT(def);
 
 	word->code = untag_quotation(def)->code;
+
+	if(word->direct_entry_def != F)
+		jit_compile(word->direct_entry_def,relocate);
 }
 
 /* Apply a function to every code block */

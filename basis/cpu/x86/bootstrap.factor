@@ -48,7 +48,7 @@ big-endian off
 ] jit-word-jump jit-define
 
 [
-    f CALL rc-relative rt-xt jit-rel
+    f CALL rc-relative rt-xt-direct jit-rel
 ] jit-word-call jit-define
 
 [

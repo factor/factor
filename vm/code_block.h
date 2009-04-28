@@ -5,8 +5,10 @@ typedef enum {
 	RT_DLSYM,
 	/* a pointer to a compiled word reference */
 	RT_DISPATCH,
-	/* a compiled word reference */
+	/* a word's general entry point XT */
 	RT_XT,
+	/* a word's direct entry point XT */
+	RT_XT_DIRECT,
 	/* current offset */
 	RT_HERE,
 	/* current code block */
