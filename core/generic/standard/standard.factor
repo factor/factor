@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors definitions generic generic.single kernel
-namespaces words math math.order combinators sequences ;
+namespaces words math math.order combinators sequences
+generic.single.private ;
 IN: generic.standard
 
 TUPLE: standard-combination < single-combination # ;
@@ -36,6 +37,12 @@ M: standard-combination dispatch# #>> ;
 M: standard-generic effective-method
     [ datastack ] dip [ "combination" word-prop #>> swap <reversed> nth ] keep
     (effective-method) ;
+
+M: standard-combination cold-call-def
+    #! Direct calls to the generic word (not tail calls or indirect calls)
+    #! will jump to the inline cache entry point instead of the megamorphic
+    #! dispatch entry point.
+    [ f inline-cache-miss ] curry picker prepend ;
 
 M: standard-generic definer drop \ GENERIC# f ;
 
