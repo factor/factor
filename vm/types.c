@@ -224,7 +224,7 @@ void growable_array_append(F_GROWABLE_ARRAY *array, F_ARRAY *elts)
 
 	UNREGISTER_UNTAGGED(elts);
 
-	write_barrier((CELL)array->array);
+	write_barrier(array->array);
 
 	memcpy((void *)AREF(underlying,array->count),
 	       (void *)AREF(elts,0),

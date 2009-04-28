@@ -13,7 +13,7 @@ CFLAGS = -Wall
 FFI_TEST_CFLAGS = -fPIC
 
 ifdef DEBUG
-	CFLAGS += -g
+	CFLAGS += -g -DFACTOR_DEBUG
 else
 	CFLAGS += -O3
 endif

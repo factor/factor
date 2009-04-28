@@ -118,7 +118,10 @@ void init_factor(F_PARAMETERS *p)
 	init_stacks(p->ds_size,p->rs_size);
 	load_image(p);
 	init_c_io();
+
+#ifndef FACTOR_DEBUG
 	init_signals();
+#endif
 
 	if(p->console)
 		open_console();

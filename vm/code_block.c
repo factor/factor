@@ -184,6 +184,13 @@ void update_word_references(F_CODE_BLOCK *compiled)
 	}
 }
 
+INLINE void check_code_address(CELL address)
+{
+#ifdef FACTOR_DEBUG
+	assert(address >= code_heap.segment->start && address < code_heap.segment->end);
+#endif
+}
+
 /* Update references to words. This is done after a new code block
 is added to the heap. */
 
@@ -191,6 +198,8 @@ is added to the heap. */
 collections */
 void mark_code_block(F_CODE_BLOCK *compiled)
 {
+	check_code_address((CELL)compiled);
+
 	mark_block(&compiled->block);
 
 	copy_handle(&compiled->literals);
@@ -287,6 +296,11 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 /* Compute an address to store at a relocation */
 void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 {
+#ifdef FACTOR_DEBUG
+	type_check(ARRAY_TYPE,compiled->literals);
+	type_check(BYTE_ARRAY_TYPE,compiled->relocation);
+#endif
+
 	CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
 	F_ARRAY *literals = untag_object(compiled->literals);
 	F_FIXNUM absolute_value;
@@ -410,6 +424,12 @@ F_CODE_BLOCK *add_code_block(
 	CELL relocation,
 	CELL literals)
 {
+#ifdef FACTOR_DEBUG
+	type_check(ARRAY_TYPE,literals);
+	type_check(BYTE_ARRAY_TYPE,relocation);
+	assert(hi_tag(code) == ARRAY_TYPE);
+#endif
+
 	CELL code_format = compiled_code_format();
 	CELL code_length = align8(array_capacity(code) * code_format);
 
@@ -435,6 +455,11 @@ F_CODE_BLOCK *add_code_block(
 	compiled->block.needs_fixup = true;
 	compiled->literals = literals;
 	compiled->relocation = relocation;
+
+#ifdef FACTOR_DEBUG
+	type_check(ARRAY_TYPE,compiled->literals);
+	type_check(BYTE_ARRAY_TYPE,compiled->relocation);
+#endif
 
 	/* code */
 	deposit_integers((CELL)(compiled + 1),code,code_format);

@@ -48,7 +48,8 @@ void update_word_xt(F_WORD *word)
 		word->xt = (XT)(word->code + 1);
 }
 
-void set_profiling(bool profiling)
+/* Allocates memory */
+static void set_profiling(bool profiling)
 {
 	if(profiling == profiling_p)
 		return;
