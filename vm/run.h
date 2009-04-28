@@ -129,8 +129,16 @@ INLINE CELL tag_header(CELL cell)
 	return cell << TAG_BITS;
 }
 
+INLINE void check_header(CELL cell)
+{
+#ifdef FACTOR_DEBUG
+	assert(TAG(cell) == FIXNUM_TYPE && untag_fixnum_fast(cell) < TYPE_COUNT);
+#endif
+}
+
 INLINE CELL untag_header(CELL cell)
 {
+	check_header(cell);
 	return cell >> TAG_BITS;
 }
 

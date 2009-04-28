@@ -1,5 +1,16 @@
 #include "master.h"
 
+INLINE void check_data_pointer(CELL pointer)
+{
+#ifdef FACTOR_DEBUG
+	if(!growing_data_heap)
+	{
+		assert(pointer >= data_heap->segment->start
+		       && pointer < data_heap->segment->end);
+	}
+#endif
+}
+
 /* Scan all the objects in the card */
 void copy_card(F_CARD *ptr, CELL gen, CELL here)
 {
@@ -211,6 +222,8 @@ INLINE CELL copy_object_impl(CELL pointer)
 /* Follow a chain of forwarding pointers */
 CELL resolve_forwarding(CELL untagged, CELL tag)
 {
+	check_data_pointer(untagged);
+
 	CELL header = get(untagged);
 	/* another forwarding pointer */
 	if(TAG(header) == GC_COLLECTED)
@@ -218,6 +231,7 @@ CELL resolve_forwarding(CELL untagged, CELL tag)
 	/* we've found the destination */
 	else
 	{
+		check_header(header);
 		CELL pointer = RETAG(untagged,tag);
 		if(should_copy(untagged))
 			pointer = RETAG(copy_object_impl(pointer),tag);
@@ -231,21 +245,30 @@ pointer address without copying anything; otherwise, install
 a new forwarding pointer. */
 INLINE CELL copy_object(CELL pointer)
 {
+	check_data_pointer(pointer);
+
 	CELL tag = TAG(pointer);
 	CELL header = get(UNTAG(pointer));
 
 	if(TAG(header) == GC_COLLECTED)
 		return resolve_forwarding(UNTAG(header),tag);
 	else
+	{
+		check_header(header);
 		return RETAG(copy_object_impl(pointer),tag);
+	}
 }
 
 void copy_handle(CELL *handle)
 {
 	CELL pointer = *handle;
 
-	if(!immediate_p(pointer) && should_copy(pointer))
-		*handle = copy_object(pointer);
+	if(!immediate_p(pointer))
+	{
+		check_data_pointer(pointer);
+		if(should_copy(pointer))
+			*handle = copy_object(pointer);
+	}
 }
 
 CELL copy_next_from_nursery(CELL scan)
@@ -264,9 +287,12 @@ CELL copy_next_from_nursery(CELL scan)
 		{
 			CELL pointer = *obj;
 
-			if(!immediate_p(pointer)
-				&& (pointer >= nursery_start && pointer < nursery_end))
-				*obj = copy_object(pointer);
+			if(!immediate_p(pointer))
+			{
+				check_data_pointer(pointer);
+				if(pointer >= nursery_start && pointer < nursery_end)
+					*obj = copy_object(pointer);
+			}
 		}
 	}
 
@@ -292,10 +318,13 @@ CELL copy_next_from_aging(CELL scan)
 		{
 			CELL pointer = *obj;
 
-			if(!immediate_p(pointer)
-				&& !(pointer >= newspace_start && pointer < newspace_end)
-				&& !(pointer >= tenured_start && pointer < tenured_end))
-				*obj = copy_object(pointer);
+			if(!immediate_p(pointer))
+			{
+				check_data_pointer(pointer);
+				if(!(pointer >= newspace_start && pointer < newspace_end)
+				   && !(pointer >= tenured_start && pointer < tenured_end))
+					*obj = copy_object(pointer);
+			}
 		}
 	}
 
@@ -318,8 +347,12 @@ CELL copy_next_from_tenured(CELL scan)
 		{
 			CELL pointer = *obj;
 
-			if(!immediate_p(pointer) && !(pointer >= newspace_start && pointer < newspace_end))
-				*obj = copy_object(pointer);
+			if(!immediate_p(pointer))
+			{
+				check_data_pointer(pointer);
+				if(!(pointer >= newspace_start && pointer < newspace_end))
+					*obj = copy_object(pointer);
+			}
 		}
 	}
 
@@ -474,6 +507,7 @@ void garbage_collection(CELL gen,
 	copy_roots();
 	/* collect objects referenced from older generations */
 	copy_cards();
+
 	/* do some tracing */
 	copy_reachable_objects(scan,&newspace->here);
 

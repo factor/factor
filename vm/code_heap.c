@@ -97,7 +97,7 @@ void primitive_modify_code_heap(void)
 		{
 			F_ARRAY *compiled_code = untag_array(data);
 
-			F_ARRAY *literals = untag_array(array_nth(compiled_code,0));
+			CELL literals = array_nth(compiled_code,0);
 			CELL relocation = array_nth(compiled_code,1);
 			F_ARRAY *labels = untag_array(array_nth(compiled_code,2));
 			F_ARRAY *code = untag_array(array_nth(compiled_code,3));
@@ -110,7 +110,7 @@ void primitive_modify_code_heap(void)
 				code,
 				labels,
 				relocation,
-				tag_object(literals));
+				literals);
 
 			UNREGISTER_UNTAGGED(word);
 			UNREGISTER_UNTAGGED(alist);

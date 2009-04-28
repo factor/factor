@@ -204,6 +204,8 @@ void jit_compile(CELL quot, bool relocate)
 	for(i = 0; i < length; i++)
 	{
 		CELL obj = array_nth(untag_object(array),i);
+		REGISTER_ROOT(obj);
+
 		F_WORD *word;
 		F_WRAPPER *wrapper;
 
@@ -325,6 +327,8 @@ void jit_compile(CELL quot, bool relocate)
 			EMIT(userenv[JIT_PUSH_IMMEDIATE])
 			break;
 		}
+
+		UNREGISTER_ROOT(obj);
 	}
 
 	if(!tail_call)
@@ -339,6 +343,10 @@ void jit_compile(CELL quot, bool relocate)
 	GROWABLE_BYTE_ARRAY_TRIM(relocation);
 	GROWABLE_ARRAY_TRIM(code);
 
+	GROWABLE_ARRAY_DONE(literals);
+	GROWABLE_BYTE_ARRAY_DONE(relocation);
+	GROWABLE_ARRAY_DONE(code);
+
 	F_CODE_BLOCK *compiled = add_code_block(
 		QUOTATION_TYPE,
 		untag_object(code),
@@ -350,10 +358,6 @@ void jit_compile(CELL quot, bool relocate)
 
 	if(relocate)
 		relocate_code_block(compiled);
-
-	GROWABLE_ARRAY_DONE(literals);
-	GROWABLE_BYTE_ARRAY_DONE(relocation);
-	GROWABLE_ARRAY_DONE(code);
 
 	UNREGISTER_ROOT(array);
 	UNREGISTER_ROOT(quot);
@@ -536,10 +540,13 @@ void compile_all_words(void)
 	{
 		F_WORD *word = untag_word(array_nth(untag_array(words),i));
 		REGISTER_UNTAGGED(word);
+
 		if(word->optimizedp == F)
 			jit_compile_word(word,word->def,false);
+
 		UNREGISTER_UNTAGGED(word);
 		update_word_xt(word);
+
 	}
 
 	UNREGISTER_ROOT(words);

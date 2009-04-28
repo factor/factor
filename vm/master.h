@@ -2,7 +2,11 @@
 #define __FACTOR_MASTER_H__
 
 #ifndef WINCE
-	#include <errno.h>
+#include <errno.h>
+#endif
+
+#ifdef FACTOR_DEBUG
+#include <assert.h>
 #endif
 
 #include <fcntl.h>

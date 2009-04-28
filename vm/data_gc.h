@@ -93,7 +93,7 @@ INLINE void *allot_object(CELL type, CELL a)
 #ifdef GC_DEBUG
 	if(!gc_off)
 	{
-		if(gc_count++ % 1000 == 0)
+		if(gc_count++ % 100 == 0)
 			gc();
 
 	}

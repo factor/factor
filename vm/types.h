@@ -40,23 +40,35 @@ INLINE CELL tag_boolean(CELL untagged)
 
 DEFINE_UNTAG(F_ARRAY,ARRAY_TYPE,array)
 
+INLINE CELL array_capacity(F_ARRAY* array)
+{
+#ifdef FACTOR_DEBUG
+	CELL header = untag_header(array->header);
+	assert(header == ARRAY_TYPE || header == BIGNUM_TYPE || header == BYTE_ARRAY_TYPE);
+#endif
+	return array->capacity >> TAG_BITS;
+}
+
 #define AREF(array,index) ((CELL)(array) + sizeof(F_ARRAY) + (index) * CELLS)
 #define UNAREF(array,ptr) (((CELL)(ptr)-(CELL)(array)-sizeof(F_ARRAY)) / CELLS)
 
 INLINE CELL array_nth(F_ARRAY *array, CELL slot)
 {
+#ifdef FACTOR_DEBUG
+	assert(slot < array_capacity(array));
+	assert(untag_header(array->header) == ARRAY_TYPE);
+#endif
 	return get(AREF(array,slot));
 }
 
 INLINE void set_array_nth(F_ARRAY *array, CELL slot, CELL value)
 {
+#ifdef FACTOR_DEBUG
+	assert(slot < array_capacity(array));
+	assert(untag_header(array->header) == ARRAY_TYPE);
+#endif
 	put(AREF(array,slot),value);
 	write_barrier((CELL)array);
-}
-
-INLINE CELL array_capacity(F_ARRAY* array)
-{
-	return array->capacity >> TAG_BITS;
 }
 
 #define BREF(byte_array,index) ((CELL)byte_array + sizeof(F_BYTE_ARRAY) + (index))
@@ -164,11 +176,12 @@ typedef struct {
 	CELL array;
 } F_GROWABLE_ARRAY;
 
+/* Allocates memory */
 INLINE F_GROWABLE_ARRAY make_growable_array(void)
 {
 	F_GROWABLE_ARRAY result;
 	result.count = 0;
-	result.array = tag_object(allot_array(ARRAY_TYPE,10000,F));
+	result.array = tag_object(allot_array(ARRAY_TYPE,100,F));
 	return result;
 }
 
@@ -185,14 +198,16 @@ void growable_array_append(F_GROWABLE_ARRAY *result, F_ARRAY *elts);
 #define GROWABLE_ARRAY_APPEND(result,elts) \
 	growable_array_append(&result##_g,elts)
 
-INLINE CELL growable_array_trim(F_GROWABLE_ARRAY *array)
+INLINE void growable_array_trim(F_GROWABLE_ARRAY *array)
 {
-	return tag_object(reallot_array(untag_object(array->array),array->count));
+	array->array = tag_object(reallot_array(untag_object(array->array),array->count));
 }
 
-#define GROWABLE_ARRAY_TRIM(result) CELL result = growable_array_trim(&result##_g)
+#define GROWABLE_ARRAY_TRIM(result) growable_array_trim(&result##_g)
 
-#define GROWABLE_ARRAY_DONE(result) UNREGISTER_ROOT(result##_g.array)
+#define GROWABLE_ARRAY_DONE(result) \
+	UNREGISTER_ROOT(result##_g.array); \
+	CELL result = result##_g.array;
 
 /* Macros to simulate a byte vector in C */
 typedef struct {
@@ -204,7 +219,7 @@ INLINE F_GROWABLE_BYTE_ARRAY make_growable_byte_array(void)
 {
 	F_GROWABLE_BYTE_ARRAY result;
 	result.count = 0;
-	result.array = tag_object(allot_byte_array(10000));
+	result.array = tag_object(allot_byte_array(100));
 	return result;
 }
 
@@ -217,11 +232,13 @@ void growable_byte_array_append(F_GROWABLE_BYTE_ARRAY *result, void *elts, CELL 
 #define GROWABLE_BYTE_ARRAY_APPEND(result,elts,len) \
 	growable_byte_array_append(&result##_g,elts,len)
 
-INLINE CELL growable_byte_array_trim(F_GROWABLE_BYTE_ARRAY *byte_array)
+INLINE void growable_byte_array_trim(F_GROWABLE_BYTE_ARRAY *byte_array)
 {
-	return tag_object(reallot_byte_array(untag_object(byte_array->array),byte_array->count));
+	byte_array->array = tag_object(reallot_byte_array(untag_object(byte_array->array),byte_array->count));
 }
 
-#define GROWABLE_BYTE_ARRAY_TRIM(result) CELL result = growable_byte_array_trim(&result##_g)
+#define GROWABLE_BYTE_ARRAY_TRIM(result) growable_byte_array_trim(&result##_g)
 
-#define GROWABLE_BYTE_ARRAY_DONE(result) UNREGISTER_ROOT(result##_g.array);
+#define GROWABLE_BYTE_ARRAY_DONE(result) \
+	UNREGISTER_ROOT(result##_g.array); \
+	CELL result = result##_g.array;
