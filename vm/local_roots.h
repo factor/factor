@@ -19,7 +19,12 @@ CELL gc_locals;
 
 DEFPUSHPOP(gc_local_,gc_locals)
 
-#define REGISTER_ROOT(obj) gc_local_push((CELL)&(obj))
+#define REGISTER_ROOT(obj) \
+	{ \
+		if(!immediate_p(obj))	 \
+			check_data_pointer(obj); \
+		gc_local_push((CELL)&(obj));	\
+	}
 #define UNREGISTER_ROOT(obj) \
 	{ \
 		if(gc_local_pop() != (CELL)&(obj))			\

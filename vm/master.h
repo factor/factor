@@ -31,8 +31,8 @@
 #include "bignum.h"
 #include "write_barrier.h"
 #include "data_heap.h"
-#include "local_roots.h"
 #include "data_gc.h"
+#include "local_roots.h"
 #include "debug.h"
 #include "types.h"
 #include "math.h"
@@ -46,6 +46,7 @@
 #include "alien.h"
 #include "quotations.h"
 #include "dispatch.h"
+#include "jit.h"
 #include "factor.h"
 #include "utilities.h"
 

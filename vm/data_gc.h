@@ -153,3 +153,14 @@ void primitive_gc_stats(void);
 void clear_gc_stats(void);
 void primitive_clear_gc_stats(void);
 void primitive_become(void);
+
+INLINE void check_data_pointer(CELL pointer)
+{
+#ifdef FACTOR_DEBUG
+	if(!growing_data_heap)
+	{
+		assert(pointer >= data_heap->segment->start
+		       && pointer < data_heap->segment->end);
+	}
+#endif
+}
