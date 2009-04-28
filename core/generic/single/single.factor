@@ -245,11 +245,12 @@ M: f compile-engine ;
     generic-word get "methods" word-prop
     assoc-size 2 * next-power-of-2 f <array> ;
 
+HOOK: cold-call-def combination ( word -- quot/f )
+
+M: single-combination cold-call-def drop f ;
+
 : define-cold-call ( word -- )
-    #! Direct calls to the generic word (not tail calls or indirect calls)
-    #! will jump to the inline cache entry point instead of the megamorphic
-    #! dispatch entry point.
-    dup [ f inline-cache-miss ] curry [ ] like >>direct-entry-def drop ;
+    dup cold-call-def >>direct-entry-def drop ;
 
 M: single-combination perform-combination
     [
