@@ -316,7 +316,7 @@ M: operand JMP { BIN: 100 t HEX: ff } 1-operand ;
 GENERIC: CALL ( op -- )
 : (CALL) ( -- rel-class ) HEX: e8 , 0 4, rc-relative ;
 M: f CALL (CALL) 2drop ;
-M: callable CALL (CALL) rel-word ;
+M: callable CALL (CALL) rel-word-direct ;
 M: label CALL (CALL) label-fixup ;
 M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 

@@ -41,10 +41,11 @@ CONSTANT: rt-primitive   0
 CONSTANT: rt-dlsym       1
 CONSTANT: rt-dispatch    2
 CONSTANT: rt-xt          3
-CONSTANT: rt-here        4
-CONSTANT: rt-this        5
-CONSTANT: rt-immediate   6
-CONSTANT: rt-stack-chain 7
+CONSTANT: rt-xt-direct   4
+CONSTANT: rt-here        5
+CONSTANT: rt-this        6
+CONSTANT: rt-immediate   7
+CONSTANT: rt-stack-chain 8
 
 : rc-absolute? ( n -- ? )
     [ rc-absolute-ppc-2/2 = ]

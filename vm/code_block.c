@@ -24,6 +24,7 @@ void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
 			{
 			case RT_PRIMITIVE:
 			case RT_XT:
+			case RT_XT_DIRECT:
 			case RT_IMMEDIATE:
 			case RT_HERE:
 				index++;
@@ -153,14 +154,43 @@ void copy_literal_references(F_CODE_BLOCK *compiled)
 CELL object_xt(CELL obj)
 {
 	if(type_of(obj) == WORD_TYPE)
-		return (CELL)untag_word(obj)->xt;
+	{
+		F_WORD *word = untag_object(obj);
+		return (CELL)word->xt;
+	}
 	else
-		return (CELL)untag_quotation(obj)->xt;
+	{
+		F_QUOTATION *quot = untag_object(obj);
+		return (CELL)quot->xt;
+	}
+}
+
+CELL word_direct_xt(CELL obj)
+{
+#ifdef FACTOR_DEBUG
+	type_check(WORD_TYPE,obj);
+#endif
+	F_WORD *word = untag_object(obj);
+	CELL quot = word->direct_entry_def;
+	if(quot == F || max_pic_size == 0)
+		return (CELL)word->xt;
+	else
+	{
+		F_QUOTATION *untagged = untag_object(quot);
+#ifdef FACTOR_DEBUG
+		type_check(QUOTATION_TYPE,quot);
+#endif
+		if(untagged->compiledp == F)
+			return (CELL)word->xt;
+		else
+			return (CELL)untagged->xt;
+	}
 }
 
 void update_word_references_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 {
-	if(REL_TYPE(rel) == RT_XT)
+	F_RELTYPE type = REL_TYPE(rel);
+	if(type == RT_XT || type == RT_XT_DIRECT)
 	{
 		CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
 		F_ARRAY *literals = untag_object(compiled->literals);
@@ -318,6 +348,9 @@ void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 		break;
 	case RT_XT:
 		absolute_value = object_xt(array_nth(literals,index));
+		break;
+	case RT_XT_DIRECT:
+		absolute_value = word_direct_xt(array_nth(literals,index));
 		break;
 	case RT_HERE:
 		absolute_value = offset + (short)to_fixnum(array_nth(literals,index));
