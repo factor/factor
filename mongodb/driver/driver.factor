@@ -8,7 +8,7 @@ IN: mongodb.driver
 
 TUPLE: mdb-pool < pool mdb ;
 
-TUPLE: mdb-cursor collection id return# ;
+TUPLE: mdb-cursor id query ;
 
 UNION: boolean t POSTPONE: f ;
 
@@ -35,7 +35,11 @@ ERROR: mdb-error id msg ;
 
 <PRIVATE
 
-CONSTRUCTOR: mdb-cursor ( id collection return# -- cursor ) ;
+GENERIC: <mdb-cursor> ( id query/get-more -- cursor )
+M: mdb-query-msg <mdb-cursor>
+    mdb-cursor boa ;
+M: mdb-getmore-msg <mdb-cursor>
+    query>> mdb-cursor boa ;
 
 : >mdbregexp ( value -- regexp )
    first <mdbregexp> ; inline
@@ -52,16 +56,32 @@ SYNTAX: r/ ( token -- mdbregexp )
     [ MDB_OID_FIELD swap at ] keep
     H{ } clone [ set-at ] keep ;
 
-: make-cursor ( mdb-result-msg -- cursor/f )
-    dup cursor>> 0 > 
-    [ [ cursor>> ] [ collection>> ] [ requested#>> ] tri <mdb-cursor> ]
-    [ drop f ] if ;
+GENERIC: update-query ( result query/cursor -- )
+M: mdb-query-msg update-query 
+    swap [ start#>> ] [ returned#>> ] bi + >>skip# drop ;
+M: mdb-getmore-msg update-query
+    query>> update-query ; 
+      
+: make-cursor ( mdb-result-msg query/cursor -- cursor/f )
+    over cursor>> 0 > 
+    [ [ update-query ]
+      [ [ cursor>> ] dip <mdb-cursor> ] 2bi
+    ] [ 2drop f ] if ;
 
-: send-query ( query-message -- cursor/f result )
+DEFER: send-query
+GENERIC: verify-query-result ( result query/get-more -- mdb-result-msg query/get-more ) 
+M: mdb-query-msg verify-query-result ;
+M: mdb-getmore-msg verify-query-result
+    over flags>> ResultFlag_CursorNotFound =
+    [ nip query>> [ send-query-plain ] keep ] when ;
+    
+: send-query ( query/get-more -- cursor/f result )
     [ send-query-plain ] keep
+    verify-query-result 
     [ collection>> >>collection drop ]
-    [ return#>> >>requested# ] 2bi
-    [ make-cursor ] [ objects>> ] bi ;
+    [ return#>> >>requested# ] 
+    [ make-cursor ] 2tri
+    swap objects>> ;
 
 PRIVATE>
 
@@ -147,7 +167,8 @@ M: mdb-query-msg hint ( mdb-query index-hint -- mdb-query )
 
 GENERIC: get-more ( mdb-cursor -- mdb-cursor objects )
 M: mdb-cursor get-more ( mdb-cursor -- mdb-cursor objects )
-    [ [ collection>> ] [ return#>> ] [ id>> ] tri <mdb-getmore-msg> send-query ] 
+    [ [ query>> dup [ collection>> ] [ return#>> ] bi ]
+      [ id>> ] bi <mdb-getmore-msg> swap >>query send-query ] 
     [ f f ] if* ;
 
 GENERIC: find ( mdb-query -- cursor result )

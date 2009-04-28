@@ -12,12 +12,25 @@ CONSTANT: OP_GetMore 2005
 CONSTANT: OP_Delete  2006 
 CONSTANT: OP_KillCursors 2007
 
+CONSTANT: ResultFlag_CursorNotFound  1 ! /* returned, with zero results, when getMore is called but the cursor id is not valid at the server. */
+CONSTANT: ResultFlag_ErrSet  2 ! /* { $err : ... } is being returned */
+CONSTANT: ResultFlag_ShardConfigStale 4 !  /* have to update config from the server,  usually $err is also set */
+            
 TUPLE: mdb-msg
 { opcode integer } 
 { req-id integer initial: 0 }
 { resp-id integer initial: 0 }
 { length integer initial: 0 }     
 { flags integer initial: 0 } ;
+
+TUPLE: mdb-query-msg < mdb-msg
+{ collection string }
+{ skip# integer initial: 0 }
+{ return# integer initial: 0 }
+{ query assoc }
+{ returnfields assoc }
+{ orderby sequence }
+explain hint ;
 
 TUPLE: mdb-insert-msg < mdb-msg
 { collection string }
@@ -36,20 +49,12 @@ TUPLE: mdb-delete-msg < mdb-msg
 TUPLE: mdb-getmore-msg < mdb-msg
 { collection string }
 { return# integer initial: 0 }
-{ cursor integer initial: 0 } ;
+{ cursor integer initial: 0 }
+{ query mdb-query-msg } ;
 
 TUPLE: mdb-killcursors-msg < mdb-msg
 { cursors# integer initial: 0 }
 { cursors sequence } ;
-
-TUPLE: mdb-query-msg < mdb-msg
-{ collection string }
-{ skip# integer initial: 0 }
-{ return# integer initial: 0 }
-{ query assoc }
-{ returnfields assoc }
-{ orderby sequence }
-explain hint ;
 
 TUPLE: mdb-reply-msg < mdb-msg
 { collection string }
