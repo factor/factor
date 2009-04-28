@@ -156,3 +156,5 @@ M: input summary
     ] "" make ;
 
 : write-object ( str obj -- ) presented associate format ;
+
+: write-image ( image -- ) [ "" ] dip image associate format ;

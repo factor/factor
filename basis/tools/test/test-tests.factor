@@ -1,8 +1,6 @@
 IN: tools.test.tests
 USING: tools.test tools.test.private namespaces kernel sequences ;
 
-\ test-all must-infer
-
 : fake-unit-test ( quot -- )
     [
         "fake" file set

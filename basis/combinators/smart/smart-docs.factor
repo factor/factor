@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel quotations math sequences
-multiline ;
+multiline stack-checker ;
 IN: combinators.smart
 
 HELP: input<sequence
@@ -108,7 +108,7 @@ HELP: append-outputs-as
 
 
 ARTICLE: "combinators.smart" "Smart combinators"
-"The macros in the " { $vocab-link "combinators.smart" } " vocabulary look at the static stack effects of input quotations and generate code which produces or consumes the relevant number of stack values." $nl
+"A " { $emphasis "smart combinator" } " is a macro which reflects on the stack effect of an input quotation. The " { $vocab-link "combinators.smart" } " vocabulary implements a few simple smart combinators which look at the static stack effects of input quotations and generate code which produces or consumes the relevant number of stack values." $nl
 "Call a quotation and discard all output values:"
 { $subsection drop-outputs }
 "Take all input values from a sequence:"
@@ -122,6 +122,7 @@ ARTICLE: "combinators.smart" "Smart combinators"
 { $subsection sum-outputs }
 "Concatenating output values:"
 { $subsection append-outputs }
-{ $subsection append-outputs-as } ;
+{ $subsection append-outputs-as }
+"New smart combinators can be created by defining " { $link "macros" } " which call " { $link infer } "." ;
 
 ABOUT: "combinators.smart"

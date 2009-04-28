@@ -63,52 +63,6 @@ FORGET: forgotten
 FORGET: another-forgotten
 : another-forgotten ( -- ) ;
 
-! I forgot remove-crossref calls!
-: fee ( -- ) ;
-: foe ( -- ) fee ;
-: fie ( -- ) foe ;
-
-[ t ] [ \ fee usage [ word? ] filter empty? ] unit-test
-[ t ] [ \ foe usage empty? ] unit-test
-[ f ] [ \ foe crossref get key? ] unit-test
-
-FORGET: foe
-
-! xref should not retain references to gensyms
-[ ] [
-    [ gensym [ * ] define ] with-compilation-unit
-] unit-test
-
-[ t ] [
-    \ * usage [ word? ] filter [ crossref? ] all?
-] unit-test
-
-DEFER: calls-a-gensym
-[ ] [
-    [
-        \ calls-a-gensym
-        gensym dup "x" set 1quotation
-        (( x -- x )) define-declared
-    ] with-compilation-unit
-] unit-test
-
-[ f ] [ "x" get crossref get at ] unit-test
-
-! more xref buggery
-[ f ] [
-    GENERIC: xyzzle ( x -- x )
-    : a ( -- ) ; \ a
-    M: integer xyzzle a ;
-    FORGET: a
-    M: object xyzzle ;
-    crossref get at
-] unit-test
-
-! regression
-GENERIC: freakish ( x -- y )
-: bar ( x -- y ) freakish ;
-M: array freakish ;
-[ t ] [ \ bar \ freakish usage member? ] unit-test
 
 DEFER: x
 [ x ] [ undefined? ] must-fail-with
@@ -121,26 +75,6 @@ DEFER: x
 
 [ ] [ "IN: words.tests : test-last ( -- ) ;" eval( -- ) ] unit-test
 [ "test-last" ] [ word name>> ] unit-test
-
-! regression
-SYMBOL: quot-uses-a
-SYMBOL: quot-uses-b
-
-[ ] [
-    [
-        quot-uses-a [ 2 3 + ] define
-    ] with-compilation-unit
-] unit-test
-
-[ { + } ] [ \ quot-uses-a uses ] unit-test
-
-[ ] [
-    [
-        quot-uses-b 2 [ 3 + ] curry define
-    ] with-compilation-unit
-] unit-test
-
-[ { + } ] [ \ quot-uses-b uses ] unit-test
 
 "undef-test" "words.tests" lookup [
     [ forget ] with-compilation-unit
@@ -190,9 +124,4 @@ SYMBOL: quot-uses-b
         "compiled-uses" word-prop
         keys [ "forgotten" word-prop ] any?
     ] filter
-] unit-test
-
-[ { } ] [
-    crossref get keys
-    [ word? ] filter [ "forgotten" word-prop ] filter
 ] unit-test

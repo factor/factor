@@ -10,7 +10,7 @@ IN: tools.time
 : time. ( data -- )
     unclip
     "==== RUNNING TIME" print nl 1000000 /f pprint " seconds" print nl
-    4 cut*
+    5 cut*
     "==== GARBAGE COLLECTION" print nl
     [
         6 group
@@ -32,6 +32,7 @@ IN: tools.time
             "Total GC time (us):"
             "Cards scanned:"
             "Decks scanned:"
+            "Card scan time (us):"
             "Code heap literal scans:"
         } swap zip simple-table.
     ] bi* ;

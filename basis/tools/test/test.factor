@@ -56,8 +56,7 @@ SYMBOL: file
 :: (must-infer-as) ( effect quot -- error ? )
     [ quot infer short-effect effect assert= f f ] [ t ] recover ;
 
-:: (must-infer) ( word/quot -- error ? )
-    word/quot dup word? [ '[ _ execute ] ] when :> quot
+:: (must-infer) ( quot -- error ? )
     [ quot infer drop f f ] [ t ] recover ;
 
 TUPLE: did-not-fail ;

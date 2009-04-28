@@ -4,8 +4,6 @@ IN: http.server.tests
 
 [ t ] [ [ \ + first ] [ <500> ] recover response? ] unit-test
 
-\ make-http-error must-infer
-
 [ "text/plain; charset=UTF-8" ] [
     <response>
         "text/plain" >>content-type

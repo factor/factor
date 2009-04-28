@@ -33,8 +33,6 @@ TAG: neg calculate
     calc-arith
 ] unit-test
 
-\ calc-arith must-infer
-
 XML-NS: foo http://blah.com
 
 [ T{ name { main "bling" } { url "http://blah.com" } } ] [ "bling" foo ] unit-test
@@ -90,7 +88,6 @@ XML-NS: foo http://blah.com
 [ "<x>3</x>" ] [ 3 [XML <x><-></x> XML] xml>string ] unit-test
 [ "<x></x>" ] [ f [XML <x><-></x> XML] xml>string ] unit-test
 
-\ <XML must-infer
 [ [XML <-> XML] ] must-infer
 [ [XML <foo><-></foo> <bar val=<->/> XML] ] must-infer
 
