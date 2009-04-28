@@ -145,5 +145,6 @@ void *primitives[] = {
 	primitive_jit_compile,
 	primitive_load_locals,
 	primitive_check_datastack,
-	primitive_lookup_method
+	primitive_lookup_method,
+	primitive_inline_cache_miss,
 };

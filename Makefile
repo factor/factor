@@ -40,6 +40,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/errors.o \
 	vm/factor.o \
 	vm/image.o \
+	vm/inline_cache.o \
 	vm/io.o \
 	vm/jit.o \
 	vm/math.o \

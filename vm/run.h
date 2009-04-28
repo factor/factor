@@ -48,7 +48,7 @@ typedef enum {
 	JIT_RETURN,
 	JIT_PROFILING,
 	JIT_PUSH_IMMEDIATE,
-	JIT_DECLARE_WORD    = 42,
+	JIT_DECLARE_WORD,
 	JIT_SAVE_STACK,
 	JIT_DIP_WORD,
 	JIT_DIP,
@@ -59,6 +59,15 @@ typedef enum {
 	JIT_EXECUTE_WORD,
 	JIT_EXECUTE_JUMP,
 	JIT_EXECUTE_CALL,
+
+	/* Used by polymorphic inline cache generation in inline_cache.c */
+	PIC_TAG             = 53,
+	PIC_HI_TAG,
+	PIC_TUPLE,
+	PIC_HI_TAG_TUPLE,
+	PIC_CHECK,
+	PIC_HIT,
+	PIC_MISS_WORD,
 
 	STACK_TRACES_ENV    = 59,
 

@@ -168,14 +168,7 @@ void jit_compile(CELL quot, bool relocate)
 
 			/* Intrinsics */
 			if(word->subprimitive != F)
-			{
-				REGISTER_UNTAGGED(word);
-				if(array_nth(untag_object(word->subprimitive),1) != F)
-					jit_add_literal(&jit,T);
-				UNREGISTER_UNTAGGED(word);
-
-				jit_emit(&jit,word->subprimitive);
-			}
+				jit_emit_subprimitive(&jit,word);
 			/* The (execute) primitive is special-cased */
 			else if(obj == userenv[JIT_EXECUTE_WORD])
 			{
