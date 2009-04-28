@@ -26,6 +26,8 @@ void default_parameters(F_PARAMETERS *p)
 	p->tenured_size = 4 * CELLS;
 #endif
 
+	p->max_pic_size = 3;
+
 	p->secure_gc = false;
 	p->fep = false;
 
@@ -99,8 +101,6 @@ void init_factor(F_PARAMETERS *p)
 	p->aging_size <<= 20;
 	p->tenured_size <<= 20;
 	p->code_size <<= 20;
-
-	p->max_pic_size = 3;
 
 	/* Disable GC during init as a sanity check */
 	gc_off = true;

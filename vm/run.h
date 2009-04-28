@@ -61,7 +61,7 @@ typedef enum {
 	JIT_EXECUTE_CALL,
 
 	/* Used by polymorphic inline cache generation in inline_cache.c */
-	PIC_TAG             = 53,
+	PIC_TAG             = 48,
 	PIC_HI_TAG,
 	PIC_TUPLE,
 	PIC_HI_TAG_TUPLE,
