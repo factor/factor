@@ -245,6 +245,12 @@ M: f compile-engine ;
     generic-word get "methods" word-prop
     assoc-size 2 * next-power-of-2 f <array> ;
 
+: define-cold-call ( word -- )
+    #! Direct calls to the generic word (not tail calls or indirect calls)
+    #! will jump to the inline cache entry point instead of the megamorphic
+    #! dispatch entry point.
+    dup [ f inline-cache-miss ] curry [ ] like >>direct-entry-def drop ;
+
 M: single-combination perform-combination
     [
         dup build-decision-tree
@@ -256,5 +262,6 @@ M: single-combination perform-combination
                 make-empty-cache ,
                 [ lookup-method (execute) ] %
             ] [ ] make define
-        ] 2bi
+        ]
+        [ drop define-cold-call ] 2tri
     ] with-combination ;
