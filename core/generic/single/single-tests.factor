@@ -4,7 +4,7 @@ generic.single strings sequences arrays kernel accessors words
 specialized-arrays.double byte-arrays bit-arrays parser namespaces
 make quotations stack-checker vectors growable hashtables sbufs
 prettyprint byte-vectors bit-vectors specialized-vectors.double
-definitions generic sets graphs assocs grouping see ;
+definitions generic sets graphs assocs grouping see eval ;
 
 GENERIC: lo-tag-test ( obj -- obj' )
 
@@ -269,3 +269,9 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
 [ t ] [
     \ + \ nth effective-method nip dup \ nth "default-method" word-prop eq? and
 ] unit-test
+
+[ ] [ "IN: generic.single.tests GENERIC: xyz ( a -- b )" eval( -- ) ] unit-test
+[ ] [ "IN: generic.single.tests MATH: xyz ( a b -- c )" eval( -- ) ] unit-test
+
+[ f ] [ "xyz" "generic.single.tests" lookup direct-entry-def>> ] unit-test
+[ f ] [ "xyz" "generic.single.tests" lookup "decision-tree" word-prop ] unit-test

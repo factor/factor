@@ -1,12 +1,14 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors definitions generic generic.single kernel
-namespaces words math combinators sequences ;
+namespaces words math math.order combinators sequences ;
 IN: generic.standard
 
 TUPLE: standard-combination < single-combination # ;
 
-C: <standard-combination> standard-combination
+: <standard-combination> ( n -- standard-combination )
+    dup 0 2 between? [ "Bad dispatch position" throw ] unless
+    standard-combination boa ;
 
 PREDICATE: standard-generic < generic
     "combination" word-prop standard-combination? ;
@@ -24,7 +26,6 @@ CONSTANT: simple-combination T{ standard-combination f 0 }
         { 0 [ [ dup ] ] }
         { 1 [ [ over ] ] }
         { 2 [ [ pick ] ] }
-        [ 1- (picker) [ dip swap ] curry ]
     } case ;
 
 M: standard-combination picker
