@@ -68,10 +68,6 @@ DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot)):
 	add $STACK_PADDING,STACK_REG
         jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
 
-DEF(F_FASTCALL void,primitive_inline_cache_miss,(void)):
-	mov (STACK_REG),ARG0
-	jmp MANGLE(inline_cache_miss)
-
 #ifdef WINDOWS
 	.section .drectve
 	.ascii " -export:c_to_factor"

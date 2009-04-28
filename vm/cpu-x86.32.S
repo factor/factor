@@ -30,6 +30,7 @@ and the callstack top is passed in EDX */
 	pop %ebx
 
 #define QUOT_XT_OFFSET 14
+#define WORD_XT_OFFSET 30
 
 /* We pass a function pointer to memcpy to work around a Mac OS X
 ABI limitation which would otherwise require us to do a bizzaro PC-relative
@@ -58,6 +59,14 @@ DEF(bool,check_sse2,(void)):
 	pop %ebx
 	mov %edx,%eax
 	ret
+
+DEF(F_FASTCALL void,primitive_inline_cache_miss,(void)):
+	mov (%esp),%eax
+	sub $8,%esp
+	push %eax
+	call MANGLE(inline_cache_miss)
+	add $12,%esp
+	jmp *WORD_XT_OFFSET(%eax)
 
 #include "cpu-x86.S"
 
