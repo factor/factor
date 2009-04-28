@@ -28,7 +28,10 @@ endif
 
 DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/alien.o \
+	vm/arrays.o \
 	vm/bignum.o \
+	vm/booleans.o \
+	vm/byte_arrays.o \
 	vm/callstack.o \
 	vm/code_block.o \
 	vm/code_gc.o \
@@ -48,8 +51,10 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/profiler.o \
 	vm/quotations.o \
 	vm/run.o \
-	vm/types.o \
-	vm/utilities.o
+	vm/strings.o \
+	vm/tuples.o \
+	vm/utilities.o \
+	vm/words.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 

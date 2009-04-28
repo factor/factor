@@ -1,7 +1,7 @@
 #include "master.h"
 
 /* Allocates memory */
-static F_CODE_BLOCK *compile_profiling_stub(CELL word)
+F_CODE_BLOCK *compile_profiling_stub(CELL word)
 {
 	REGISTER_ROOT(word);
 	F_JIT jit;
@@ -11,25 +11,6 @@ static F_CODE_BLOCK *compile_profiling_stub(CELL word)
 	jit_dispose(&jit);
 	UNREGISTER_ROOT(word);
 	return block;
-}
-
-/* Allocates memory */
-void update_word_xt(F_WORD *word)
-{
-	if(profiling_p)
-	{
-		if(!word->profiling)
-		{
-			REGISTER_UNTAGGED(word);
-			F_CODE_BLOCK *profiling = compile_profiling_stub(tag_object(word));
-			UNREGISTER_UNTAGGED(word);
-			word->profiling = profiling;
-		}
-
-		word->xt = (XT)(word->profiling + 1);
-	}
-	else
-		word->xt = (XT)(word->code + 1);
 }
 
 /* Allocates memory */

@@ -79,7 +79,7 @@ M: quotation cached-effect
     [ '[ _ execute ] ] dip call-effect-slow ; inline
 
 : execute-effect-unsafe? ( word effect -- ? )
-    over optimized>> [ [ stack-effect ] dip effect<= ] [ 2drop f ] if ; inline
+    over optimized? [ [ stack-effect ] dip effect<= ] [ 2drop f ] if ; inline
 
 : execute-effect-fast ( word effect inline-cache -- )
     2over execute-effect-unsafe?

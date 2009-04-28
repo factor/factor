@@ -29,7 +29,7 @@ enable-compiler
 gc
 
 : compile-unoptimized ( words -- )
-    [ optimized>> not ] filter compile ;
+    [ optimized? not ] filter compile ;
 
 nl
 "Compiling..." write flush

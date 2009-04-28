@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math math.private math.order
@@ -259,7 +259,7 @@ bi
     "vocabulary"
     { "def" { "quotation" "quotations" } initial: [ ] }
     "props"
-    { "optimized" read-only }
+    { "direct-entry-def" }
     { "counter" { "fixnum" "math" } }
     { "sub-primitive" read-only }
 } define-builtin
@@ -539,6 +539,7 @@ tuple
     { "dispatch-stats" "generic.single" (( -- stats )) }
     { "reset-inline-cache-stats" "generic.single" (( -- )) }
     { "inline-cache-stats" "generic.single" (( -- stats )) }
+    { "optimized?" "words" (( word -- ? )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number

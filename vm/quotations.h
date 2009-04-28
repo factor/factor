@@ -1,3 +1,5 @@
+DEFINE_UNTAG(F_QUOTATION,QUOTATION_TYPE,quotation)
+
 void set_quot_xt(F_QUOTATION *quot, F_CODE_BLOCK *code);
 void jit_compile(CELL quot, bool relocate);
 F_FASTCALL CELL lazy_jit_compile_impl(CELL quot, F_STACK_FRAME *stack);

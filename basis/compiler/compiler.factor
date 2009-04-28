@@ -122,7 +122,7 @@ M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
 
 : compile-dependency ( word -- )
     #! If a word calls an unoptimized word, try to compile the callee.
-    dup optimized>> [ drop ] [ queue-compile ] if ;
+    dup optimized? [ drop ] [ queue-compile ] if ;
 
 ! Only switch this off for debugging.
 SYMBOL: compile-dependencies?
