@@ -672,3 +672,8 @@ M: object infer-call*
 \ jit-compile { quotation } { } define-primitive
 
 \ lookup-method { object array } { word } define-primitive
+
+\ reset-dispatch-stats { } { } define-primitive
+\ dispatch-stats { } { array } define-primitive
+\ reset-inline-cache-stats { } { } define-primitive
+\ inline-cache-stats { } { array } define-primitive

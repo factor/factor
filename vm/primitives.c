@@ -147,4 +147,8 @@ void *primitives[] = {
 	primitive_check_datastack,
 	primitive_lookup_method,
 	primitive_inline_cache_miss,
+	primitive_reset_dispatch_stats,
+	primitive_dispatch_stats,
+	primitive_reset_inline_cache_stats,
+	primitive_inline_cache_stats,
 };

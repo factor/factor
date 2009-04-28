@@ -69,6 +69,7 @@ bootstrapping? on
     "classes.predicate"
     "compiler.units"
     "continuations.private"
+    "generic.single"
     "generic.single.private"
     "growable"
     "hashtables"
@@ -534,6 +535,10 @@ tuple
     { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
     { "lookup-method" "generic.single.private" (( object methods method-cache -- method )) }
     { "inline-cache-miss" "generic.single.private" (( generic methods -- )) }
+    { "reset-dispatch-stats" "generic.single" (( -- )) }
+    { "dispatch-stats" "generic.single" (( -- stats )) }
+    { "reset-inline-cache-stats" "generic.single" (( -- )) }
+    { "inline-cache-stats" "generic.single" (( -- stats )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number
