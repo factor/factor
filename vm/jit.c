@@ -1,0 +1,79 @@
+#include "master.h"
+
+/* Allocates memory */
+void jit_init(F_JIT *jit, CELL jit_type, CELL owner)
+{
+	jit->owner = owner;
+	REGISTER_ROOT(jit->owner);
+
+	jit->type = jit_type;
+	jit->code_format = compiled_code_format();
+
+	jit->code = make_growable_array();
+	REGISTER_ROOT(jit->code.array);
+	jit->relocation = make_growable_byte_array();
+	REGISTER_ROOT(jit->relocation.array);
+	jit->literals = make_growable_array();
+	REGISTER_ROOT(jit->literals.array);
+
+	if(stack_traces_p())
+		growable_array_add(&jit->literals,jit->owner);
+}
+
+/* Allocates memory */
+F_CODE_BLOCK *jit_make_code_block(F_JIT *jit)
+{
+	growable_array_trim(&jit->code);
+	growable_byte_array_trim(&jit->relocation);
+	growable_array_trim(&jit->literals);
+
+	F_CODE_BLOCK *code = add_code_block(
+		jit->type,
+		untag_object(jit->code.array),
+		NULL, /* no labels */
+		jit->relocation.array,
+		jit->literals.array);
+
+	return code;
+}
+
+void jit_dispose(F_JIT *jit)
+{
+	UNREGISTER_ROOT(jit->literals.array);
+	UNREGISTER_ROOT(jit->relocation.array);
+	UNREGISTER_ROOT(jit->code.array);
+	UNREGISTER_ROOT(jit->owner);
+}
+
+static F_REL rel_to_emit(F_JIT *jit, CELL template, bool *rel_p)
+{
+	F_ARRAY *quadruple = untag_object(template);
+	CELL rel_class = array_nth(quadruple,1);
+	CELL rel_type = array_nth(quadruple,2);
+	CELL offset = array_nth(quadruple,3);
+
+	if(rel_class == F)
+	{
+		*rel_p = false;
+		return 0;
+	}
+	else
+	{
+		*rel_p = true;
+		return (to_fixnum(rel_type) << 28)
+			| (to_fixnum(rel_class) << 24)
+			| ((jit->code.count + to_fixnum(offset)) * jit->code_format);
+	}
+}
+
+/* Allocates memory */
+void jit_emit(F_JIT *jit, CELL template)
+{
+	REGISTER_ROOT(template);
+	bool rel_p;
+	F_REL rel = rel_to_emit(jit,template,&rel_p);
+	if(rel_p) growable_byte_array_append(&jit->relocation,&rel,sizeof(F_REL));
+	growable_array_append(&jit->code,code_to_emit(template));
+	UNREGISTER_ROOT(template);
+}
+

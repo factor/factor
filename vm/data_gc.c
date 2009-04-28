@@ -1,16 +1,5 @@
 #include "master.h"
 
-INLINE void check_data_pointer(CELL pointer)
-{
-#ifdef FACTOR_DEBUG
-	if(!growing_data_heap)
-	{
-		assert(pointer >= data_heap->segment->start
-		       && pointer < data_heap->segment->end);
-	}
-#endif
-}
-
 /* Scan all the objects in the card */
 void copy_card(F_CARD *ptr, CELL gen, CELL here)
 {

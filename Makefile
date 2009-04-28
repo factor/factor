@@ -41,6 +41,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/factor.o \
 	vm/image.o \
 	vm/io.o \
+	vm/jit.o \
 	vm/math.o \
 	vm/primitives.o \
 	vm/profiler.o \

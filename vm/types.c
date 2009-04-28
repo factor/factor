@@ -171,6 +171,10 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity)
 {
+#ifdef FACTOR_DEBUG
+	assert(untag_header(array->header) == ARRAY_TYPE);
+#endif
+
 	CELL to_copy = array_capacity(array);
 	if(capacity < to_copy)
 		to_copy = capacity;
@@ -267,6 +271,10 @@ void primitive_uninitialized_byte_array(void)
 
 F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity)
 {
+#ifdef FACTOR_DEBUG
+	assert(untag_header(array->header) == BYTE_ARRAY_TYPE);
+#endif
+
 	CELL to_copy = array_capacity(array);
 	if(capacity < to_copy)
 		to_copy = capacity;
