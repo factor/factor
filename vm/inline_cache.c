@@ -1,5 +1,10 @@
 #include "master.h"
 
+void init_inline_caching(int max_size)
+{
+	max_pic_size = max_size;
+}
+
 /* Figure out what kind of type check the PIC needs based on the methods
 it contains */
 static CELL determine_inline_cache_type(CELL cache_entries)
@@ -40,6 +45,11 @@ static CELL determine_inline_cache_type(CELL cache_entries)
 	return -1;
 }
 
+static void update_pic_count(CELL type)
+{
+	pic_counts[type - PIC_TAG]++;
+}
+
 /* picker: one of dup, over, pick
    cache_entries: array of class/method pairs */
 static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL cache_entries)
@@ -48,12 +58,16 @@ static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL c
 	REGISTER_ROOT(generic_word);
 	REGISTER_ROOT(cache_entries);
 
+	CELL inline_cache_type = determine_inline_cache_type(cache_entries);
+
+	update_pic_count(inline_cache_type);
+
 	F_JIT jit;
 	jit_init(&jit,WORD_TYPE,generic_word);
 
 	/* Generate machine code to determine the object's class. */
 	jit_emit_subprimitive(&jit,untag_object(picker));
-	jit_emit(&jit,userenv[determine_inline_cache_type(cache_entries)]);
+	jit_emit(&jit,userenv[inline_cache_type]);
 
 	/* Generate machine code to check, in turn, if the class is one of the cached entries. */
 	CELL i;
@@ -121,20 +135,40 @@ static void examine_generic_word(CELL generic_word, CELL *picker, CELL *all_meth
 	*all_methods = array_nth(array,1);
 }
 
+static CELL inline_cache_size(CELL cache_entries)
+{
+	return (cache_entries == F ? 0 : array_capacity(untag_array(cache_entries)));
+}
+
 /* Allocates memory */
 static CELL add_inline_cache_entry(CELL cache_entries, CELL class, CELL method)
 {
-	F_ARRAY *cache_entries_array = untag_object(cache_entries);
-	CELL pic_size = array_capacity(cache_entries_array);
-	cache_entries_array = reallot_array(cache_entries_array,pic_size + 2);
-	set_array_nth(cache_entries_array,pic_size,class);
-	set_array_nth(cache_entries_array,pic_size + 1,method);
-	return tag_object(cache_entries_array);
+	if(cache_entries == F)
+		return allot_array_2(class,method);
+	else
+	{
+		F_ARRAY *cache_entries_array = untag_object(cache_entries);
+		CELL pic_size = array_capacity(cache_entries_array);
+		cache_entries_array = reallot_array(cache_entries_array,pic_size + 2);
+		set_array_nth(cache_entries_array,pic_size,class);
+		set_array_nth(cache_entries_array,pic_size + 1,method);
+		return tag_object(cache_entries_array);
+	}
+}
+
+static void update_pic_transitions(CELL pic_size)
+{
+	if(pic_size == max_pic_size)
+		pic_to_mega_transitions++;
+	else if(pic_size == 0)
+		cold_call_to_ic_transitions++;
+	else if(pic_size == 1)
+		ic_to_pic_transitions++;
 }
 
 /* The cache_entries parameter is either f (on cold call site) or an array (on cache miss).
 Called from assembly with the actual return address */
-F_FASTCALL XT inline_cache_miss(CELL return_address)
+XT inline_cache_miss(CELL return_address)
 {
 	CELL cache_entries = dpop();
 	CELL generic_word = dpop();
@@ -142,7 +176,9 @@ F_FASTCALL XT inline_cache_miss(CELL return_address)
 
 	F_CODE_BLOCK *block;
 
-	CELL pic_size = (cache_entries == F ? 0 : array_capacity(untag_array(cache_entries)));
+	CELL pic_size = inline_cache_size(cache_entries);
+
+	update_pic_transitions(pic_size);
 
 	if(pic_size >= max_pic_size)
 		block = megamorphic_call_stub(generic_word);
@@ -156,17 +192,10 @@ F_FASTCALL XT inline_cache_miss(CELL return_address)
 		REGISTER_ROOT(picker);
 		REGISTER_ROOT(all_methods);
 
-		/* Find the right method. */
 		CELL class = object_class(object);
 		CELL method = lookup_method(object,all_methods);
 
-		/* Add a new entry to the PIC. */
-		if(cache_entries == F)
-			cache_entries = allot_array_2(class,method);
-		else
-			cache_entries = add_inline_cache_entry(cache_entries,class,method);
-		
-		/* Install the new PIC. */
+		cache_entries = add_inline_cache_entry(cache_entries,class,method);		
 		block = compile_inline_cache(picker,generic_word,cache_entries);
 
 		UNREGISTER_ROOT(all_methods);
@@ -175,8 +204,30 @@ F_FASTCALL XT inline_cache_miss(CELL return_address)
 		UNREGISTER_ROOT(generic_word);
 	}
 
+	/* Install the new stub. */
 	XT xt = (block + 1);
 	set_call_site(return_address,(CELL)xt);
 
 	return xt;
+}
+
+void primitive_reset_inline_cache_stats(void)
+{
+	cold_call_to_ic_transitions = ic_to_pic_transitions = pic_to_mega_transitions = 0;
+	CELL i;
+	for(i = 0; i < 4; i++) pic_counts[i] = 0;
+}
+
+void primitive_inline_cache_stats(void)
+{
+	GROWABLE_ARRAY(stats);
+	GROWABLE_ARRAY_ADD(stats,allot_cell(cold_call_to_ic_transitions));
+	GROWABLE_ARRAY_ADD(stats,allot_cell(ic_to_pic_transitions));
+	GROWABLE_ARRAY_ADD(stats,allot_cell(pic_to_mega_transitions));
+	CELL i;
+	for(i = 0; i < 4; i++)
+		GROWABLE_ARRAY_ADD(stats,allot_cell(pic_counts[i]));
+	GROWABLE_ARRAY_TRIM(stats);
+	GROWABLE_ARRAY_DONE(stats);
+	dpush(stats);
 }

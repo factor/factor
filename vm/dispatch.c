@@ -126,15 +126,22 @@ static CELL lookup_hairy_method(CELL object, CELL methods)
 static CELL lookup_method_with_cache(CELL object, CELL methods, CELL method_cache)
 {
 	if(!HI_TAG_OR_TUPLE_P(object))
+	{
+		megamorphic_cache_hits++;
 		return array_nth(untag_object(methods),TAG(object));
+	}
 	else
 	{
 		CELL key = get(HI_TAG_HEADER(object));
 		CELL method = lookup_cached_method(key,method_cache);
 		if(method != F)
+		{
+			megamorphic_cache_hits++;
 			return method;
+		}
 		else
 		{
+			megamorphic_cache_misses++;
 			method = lookup_hairy_method(object,methods);
 			update_method_cache(key,method_cache,method);
 			return method;
@@ -167,4 +174,19 @@ CELL lookup_method(CELL object, CELL methods)
 		return array_nth(untag_object(methods),TAG(object));
 	else
 		return lookup_hairy_method(object,methods);
+}
+
+void primitive_reset_dispatch_stats(void)
+{
+	megamorphic_cache_hits = megamorphic_cache_misses = 0;
+}
+
+void primitive_dispatch_stats(void)
+{
+	GROWABLE_ARRAY(stats);
+	GROWABLE_ARRAY_ADD(stats,allot_cell(megamorphic_cache_hits));
+	GROWABLE_ARRAY_ADD(stats,allot_cell(megamorphic_cache_misses));
+	GROWABLE_ARRAY_TRIM(stats);
+	GROWABLE_ARRAY_DONE(stats);
+	dpush(stats);
 }

@@ -1,8 +1,17 @@
-int max_pic_size;
+CELL max_pic_size;
+
+CELL cold_call_to_ic_transitions;
+CELL ic_to_pic_transitions;
+CELL pic_to_mega_transitions;
+
+/* PIC_TAG, PIC_HI_TAG, PIC_TUPLE, PIC_HI_TAG_TUPLE */
+CELL pic_counts[4];
+
+void init_inline_caching(int max_size);
 
 void primitive_inline_cache_miss(void);
 
-F_FASTCALL XT inline_cache_miss(CELL return_address);
+XT inline_cache_miss(CELL return_address);
 
-CELL object_class(CELL object);
-CELL lookup_method(CELL object, CELL methods);
+void primitive_reset_inline_cache_stats(void);
+void primitive_inline_cache_stats(void);
