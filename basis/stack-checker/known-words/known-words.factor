@@ -677,3 +677,5 @@ M: object infer-call*
 \ dispatch-stats { } { array } define-primitive
 \ reset-inline-cache-stats { } { } define-primitive
 \ inline-cache-stats { } { array } define-primitive
+
+\ optimized? { word } { object } define-primitive

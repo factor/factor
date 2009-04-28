@@ -461,7 +461,7 @@ void compile_all_words(void)
 		F_WORD *word = untag_word(array_nth(untag_array(words),i));
 		REGISTER_UNTAGGED(word);
 
-		if(word->optimizedp == F)
+		if(!word->code || !word_optimized_p(word))
 			jit_compile_word(word,word->def,false);
 
 		UNREGISTER_UNTAGGED(word);

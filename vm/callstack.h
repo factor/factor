@@ -1,3 +1,10 @@
+INLINE CELL callstack_size(CELL size)
+{
+	return sizeof(F_CALLSTACK) + size;
+}
+
+DEFINE_UNTAG(F_CALLSTACK,CALLSTACK_TYPE,callstack)
+
 F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
 
 #define FIRST_STACK_FRAME(stack) (F_STACK_FRAME *)((stack) + 1)

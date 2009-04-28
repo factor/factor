@@ -262,14 +262,10 @@ void primitive_check_datastack(void);
 void primitive_getenv(void);
 void primitive_setenv(void);
 void primitive_exit(void);
-void primitive_os_env(void);
-void primitive_os_envs(void);
-void primitive_set_os_env(void);
-void primitive_unset_os_env(void);
-void primitive_set_os_envs(void);
 void primitive_micros(void);
 void primitive_sleep(void);
 void primitive_set_slot(void);
 void primitive_load_locals(void);
+void primitive_clone(void);
 
 bool stage2;

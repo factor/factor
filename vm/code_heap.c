@@ -12,15 +12,6 @@ bool in_code_heap_p(CELL ptr)
 		&& ptr <= code_heap.segment->end);
 }
 
-void set_word_code(F_WORD *word, F_CODE_BLOCK *compiled)
-{
-	if(compiled->block.type != WORD_TYPE)
-		critical_error("bad param to set_word_xt",(CELL)compiled);
-
-	word->code = compiled;
-	word->optimizedp = T;
-}
-
 /* Compile a word definition with the non-optimizing compiler. Allocates memory */
 void jit_compile_word(F_WORD *word, CELL def, bool relocate)
 {
@@ -31,7 +22,6 @@ void jit_compile_word(F_WORD *word, CELL def, bool relocate)
 	UNREGISTER_ROOT(def);
 
 	word->code = untag_quotation(def)->code;
-	word->optimizedp = F;
 }
 
 /* Apply a function to every code block */
@@ -115,7 +105,7 @@ void primitive_modify_code_heap(void)
 			UNREGISTER_UNTAGGED(word);
 			UNREGISTER_UNTAGGED(alist);
 
-			set_word_code(word,compiled);
+			word->code = compiled;
 		}
 		else
 			critical_error("Expected a quotation or an array",data);

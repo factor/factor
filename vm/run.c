@@ -224,3 +224,25 @@ void primitive_load_locals(void)
 	ds -= CELLS * count;
 	rs += CELLS * count;
 }
+
+static CELL clone_object(CELL object)
+{
+	CELL size = object_size(object);
+	if(size == 0)
+		return object;
+	else
+	{
+		REGISTER_ROOT(object);
+		void *new_obj = allot_object(type_of(object),size);
+		UNREGISTER_ROOT(object);
+
+		CELL tag = TAG(object);
+		memcpy(new_obj,(void*)UNTAG(object),size);
+		return RETAG(new_obj,tag);
+	}
+}
+
+void primitive_clone(void)
+{
+	drepl(clone_object(dpeek()));
+}

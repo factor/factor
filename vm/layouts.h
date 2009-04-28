@@ -155,9 +155,8 @@ typedef struct {
 	CELL def;
 	/* TAGGED property assoc for library code */
 	CELL props;
-	/* TAGGED t or f, t means its compiled with the optimizing compiler,
-	f means its compiled with the non-optimizing compiler */
-	CELL optimizedp;
+	/* TAGGED alternative entry point for direct non-tail calls. Used for inline caching */
+	CELL direct_entry_def;
 	/* TAGGED call count for profiling */
 	CELL counter;
 	/* TAGGED machine code for sub-primitive */
