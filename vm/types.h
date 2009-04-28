@@ -223,22 +223,9 @@ INLINE F_GROWABLE_BYTE_ARRAY make_growable_byte_array(void)
 	return result;
 }
 
-#define GROWABLE_BYTE_ARRAY(result) \
-	F_GROWABLE_BYTE_ARRAY result##_g = make_growable_byte_array(); \
-	REGISTER_ROOT(result##_g.array)
-
 void growable_byte_array_append(F_GROWABLE_BYTE_ARRAY *result, void *elts, CELL len);
-
-#define GROWABLE_BYTE_ARRAY_APPEND(result,elts,len) \
-	growable_byte_array_append(&result##_g,elts,len)
 
 INLINE void growable_byte_array_trim(F_GROWABLE_BYTE_ARRAY *byte_array)
 {
 	byte_array->array = tag_object(reallot_byte_array(untag_object(byte_array->array),byte_array->count));
 }
-
-#define GROWABLE_BYTE_ARRAY_TRIM(result) growable_byte_array_trim(&result##_g)
-
-#define GROWABLE_BYTE_ARRAY_DONE(result) \
-	UNREGISTER_ROOT(result##_g.array); \
-	CELL result = result##_g.array;
