@@ -1,6 +1,6 @@
 USING: alien.c-types alien.syntax audio combinators
 combinators.short-circuit io io.binary io.encodings.binary
-io.files io.streams.memory kernel locals sequences ;
+io.files io.streams.byte-array kernel locals sequences ;
 IN: audio.wav
 
 CONSTANT: RIFF-MAGIC "RIFF"
@@ -16,7 +16,6 @@ C-STRUCT: riff-chunk-header
 C-STRUCT: riff-chunk
     { "riff-chunk-header" "header" }
     { "char[4]" "format" }
-    { "uchar[0]" "body" }
     ;
 
 C-STRUCT: wav-fmt-chunk
@@ -34,8 +33,17 @@ C-STRUCT: wav-data-chunk
     { "uchar[0]" "body" }
     ;
 
+ERROR: invalid-wav-file ;
+
+: ensured-read ( count -- output/f )
+    [ read ] keep over length = [ drop f ] unless ;
+: ensured-read* ( count -- output )
+    ensured-read [ invalid-wav-file ] unless* ;
+
 : read-chunk ( -- byte-array/f )
-    4 read [ 4 read le> [ <uint> ] [ read ] bi 3append ] [ f ] if* ;
+    4 ensured-read [ 4 ensured-read* dup le> ensured-read* 3append ] [ f ] if* ;
+: read-riff-chunk ( -- byte-array/f )
+    "riff-chunk" heap-size ensured-read* ;
 
 : id= ( chunk id -- ? )
     [ 4 memory>byte-array ] dip sequence= ;
@@ -48,8 +56,6 @@ C-STRUCT: wav-data-chunk
         { [ dup DATA-MAGIC id= ] [ data! ] }
     } cond ] while drop
     fmt data ;
-
-ERROR: invalid-wav-file ;
 
 : verify-wav ( chunk -- )
     { [ RIFF-MAGIC id= ] [ riff-chunk-format WAVE-MAGIC id= ] } 1&&
@@ -68,7 +74,5 @@ ERROR: invalid-wav-file ;
 
 : read-wav ( filename -- audio )
     binary [
-        read-chunk
-        [ verify-wav ]
-        [ riff-chunk-body <memory-stream> [ (read-wav) ] with-input-stream* ] bi
+        read-riff-chunk verify-wav (read-wav)
     ] with-file-reader ;
