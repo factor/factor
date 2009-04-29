@@ -1,6 +1,7 @@
 USING: alien.c-types alien.syntax audio combinators
 combinators.short-circuit io io.binary io.encodings.binary
-io.files io.streams.byte-array kernel locals sequences ;
+io.files io.streams.byte-array kernel locals math
+sequences ;
 IN: audio.wav
 
 CONSTANT: RIFF-MAGIC "RIFF"
@@ -46,19 +47,25 @@ ERROR: invalid-wav-file ;
     "riff-chunk" heap-size ensured-read* ;
 
 : id= ( chunk id -- ? )
-    [ 4 memory>byte-array ] dip sequence= ;
+    [ 4 head ] dip sequence= ;
+
+: check-chunk ( chunk id min-size -- ? )
+    [ id= ] [ [ length ] dip >= ] bi-curry* bi and ;
 
 :: read-wav-chunks ( -- fmt data )
     f :> fmt! f :> data!
     [ { [ fmt data and not ] [ read-chunk ] } 0&& dup ]
     [ {
-        { [ dup FMT-MAGIC  id= ] [ fmt!  ] }
-        { [ dup DATA-MAGIC id= ] [ data! ] }
+        { [ dup FMT-MAGIC  "wav-fmt-chunk"  heap-size check-chunk ] [ fmt!  ] }
+        { [ dup DATA-MAGIC "wav-data-chunk" heap-size check-chunk ] [ data! ] }
     } cond ] while drop
     fmt data ;
 
 : verify-wav ( chunk -- )
-    { [ RIFF-MAGIC id= ] [ riff-chunk-format WAVE-MAGIC id= ] } 1&&
+    {
+        [ RIFF-MAGIC id= ]
+        [ riff-chunk-format 4 memory>byte-array WAVE-MAGIC id= ]
+    } 1&&
     [ invalid-wav-file ] unless ;
 
 : (read-wav) ( -- audio )
