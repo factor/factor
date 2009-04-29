@@ -10,9 +10,9 @@ IN: ui.frp
 TUPLE: frp-table < table quot val-quot color-quot column-titles column-alignment ;
 M: frp-table column-titles column-titles>> ;
 M: frp-table column-alignment column-alignment>> ;
-M: frp-table row-columns quot>> call( a -- b ) ;
-M: frp-table row-value val-quot>> call( a -- b ) ;
-M: frp-table row-color color-quot>> call( a -- b ) ;
+M: frp-table row-columns quot>> [ call( a -- b ) ] [ drop f ] if* ;
+M: frp-table row-value val-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
+M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 
 : <frp-table> ( model quot -- table )
     frp-table new-line-gadget dup >>renderer swap >>quot swap >>model
