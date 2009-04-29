@@ -59,7 +59,7 @@ ERROR: invalid-wav-file ;
         { [ dup FMT-MAGIC  "wav-fmt-chunk"  heap-size check-chunk ] [ fmt!  ] }
         { [ dup DATA-MAGIC "wav-data-chunk" heap-size check-chunk ] [ data! ] }
     } cond ] while drop
-    fmt data ;
+    fmt data 2dup and [ invalid-wav-file ] unless ;
 
 : verify-wav ( chunk -- )
     {
@@ -69,7 +69,7 @@ ERROR: invalid-wav-file ;
     [ invalid-wav-file ] unless ;
 
 : (read-wav) ( -- audio )
-    read-wav-chunks 
+    read-wav-chunks
     [
         [ wav-fmt-chunk-num-channels    2 memory>byte-array le> ]
         [ wav-fmt-chunk-bits-per-sample 2 memory>byte-array le> ]
