@@ -20,6 +20,12 @@ IN: math.quaternions
 
 PRIVATE>
 
+: q+ ( u v -- u+v )
+    v+ ;
+
+: q- ( u v -- u-v )
+    v- ;
+
 : q* ( u v -- u*v )
     [ q*a ] [ q*b ] 2bi 2array ;
 
