@@ -194,7 +194,14 @@ void update_word_references_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 	{
 		CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
 		F_ARRAY *literals = untag_object(compiled->literals);
-		CELL xt = object_xt(array_nth(literals,index));
+		CELL obj = array_nth(literals,index);
+
+		CELL xt;
+		if(type == RT_XT)
+			xt = object_xt(obj);
+		else
+			xt = word_direct_xt(obj);
+
 		store_address_in_code_block(REL_CLASS(rel),offset,xt);
 	}
 }
@@ -212,6 +219,12 @@ void update_word_references(F_CODE_BLOCK *compiled)
 		iterate_relocations(compiled,update_word_references_step);
 		flush_icache_for(compiled);
 	}
+}
+
+void update_literal_and_word_references(F_CODE_BLOCK *compiled)
+{
+	update_literal_references(compiled);
+	update_word_references(compiled);
 }
 
 INLINE void check_code_address(CELL address)

@@ -347,7 +347,7 @@ M: f '
                     [ vocabulary>> , ]
                     [ def>> , ]
                     [ props>> , ]
-                    [ drop f , ]
+                    [ direct-entry-def>> , ] ! direct-entry-def
                     [ drop 0 , ] ! count
                     [ word-sub-primitive , ]
                     [ drop 0 , ] ! xt

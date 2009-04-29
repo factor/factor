@@ -67,6 +67,8 @@ void copy_literal_references(F_CODE_BLOCK *compiled);
 
 void update_word_references(F_CODE_BLOCK *compiled);
 
+void update_literal_and_word_references(F_CODE_BLOCK *compiled);
+
 void mark_code_block(F_CODE_BLOCK *compiled);
 
 void mark_active_blocks(F_CONTEXT *stacks);
