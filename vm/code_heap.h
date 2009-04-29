@@ -20,3 +20,10 @@ void primitive_modify_code_heap(void);
 void primitive_code_room(void);
 
 void compact_code_heap(void);
+
+INLINE void check_code_pointer(CELL pointer)
+{
+#ifdef FACTOR_DEBUG
+	assert(pointer >= code_heap.segment->start && pointer < code_heap.segment->end);
+#endif
+}

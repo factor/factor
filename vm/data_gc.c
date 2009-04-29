@@ -507,7 +507,7 @@ void garbage_collection(CELL gen,
 		code_heap_scans++;
 
 		if(collecting_gen == TENURED)
-			free_unmarked(&code_heap,(HEAP_ITERATOR)update_literal_references);
+			free_unmarked(&code_heap,(HEAP_ITERATOR)update_literal_and_word_references);
 		else
 			copy_code_heap_roots();
 

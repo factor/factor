@@ -66,7 +66,7 @@ DEF(F_FASTCALL void,primitive_inline_cache_miss,(void)):
 	push %eax
 	call MANGLE(inline_cache_miss)
 	add $12,%esp
-	jmp *WORD_XT_OFFSET(%eax)
+	jmp *%eax
 
 #include "cpu-x86.S"
 

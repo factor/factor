@@ -54,6 +54,12 @@ static void update_pic_count(CELL type)
    cache_entries: array of class/method pairs */
 static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL cache_entries)
 {
+#ifdef FACTOR_DEBUG
+	type_check(WORD_TYPE,picker);
+	type_check(WORD_TYPE,generic_word);
+	type_check(ARRAY_TYPE,cache_entries);
+#endif
+
 	REGISTER_ROOT(picker);
 	REGISTER_ROOT(generic_word);
 	REGISTER_ROOT(cache_entries);
@@ -94,6 +100,8 @@ static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL c
 	jit_word_jump(&jit,userenv[PIC_MISS_WORD]);
 
 	F_CODE_BLOCK *code = jit_make_code_block(&jit);
+	relocate_code_block(code);
+
 	jit_dispose(&jit);
 
 	UNREGISTER_ROOT(cache_entries);
@@ -137,7 +145,7 @@ static void examine_generic_word(CELL generic_word, CELL *picker, CELL *all_meth
 
 static CELL inline_cache_size(CELL cache_entries)
 {
-	return (cache_entries == F ? 0 : array_capacity(untag_array(cache_entries)));
+	return (cache_entries == F ? 0 : array_capacity(untag_array(cache_entries)) / 2);
 }
 
 /* Allocates memory */
@@ -170,6 +178,8 @@ static void update_pic_transitions(CELL pic_size)
 Called from assembly with the actual return address */
 XT inline_cache_miss(CELL return_address)
 {
+	check_code_pointer(return_address);
+
 	CELL cache_entries = dpop();
 	CELL generic_word = dpop();
 	CELL object = dpop();
@@ -195,7 +205,7 @@ XT inline_cache_miss(CELL return_address)
 		CELL class = object_class(object);
 		CELL method = lookup_method(object,all_methods);
 
-		cache_entries = add_inline_cache_entry(cache_entries,class,method);		
+		cache_entries = add_inline_cache_entry(cache_entries,class,method);
 		block = compile_inline_cache(picker,generic_word,cache_entries);
 
 		UNREGISTER_ROOT(all_methods);

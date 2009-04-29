@@ -51,7 +51,7 @@ void copy_code_heap_roots(void)
 collections, done at the end. */
 void update_code_heap_roots(void)
 {
-	iterate_code_heap(update_literal_references);
+	iterate_code_heap(update_literal_and_word_references);
 }
 
 /* Update pointers to words referenced from all code blocks. Only after

@@ -20,5 +20,5 @@ INLINE void set_call_site(CELL return_address, CELL target)
 #ifdef FACTOR_DEBUG
 	assert(*(unsigned char *)(return_address - 5) == 0xe8);
 #endif
-	*(F_FIXNUM *)(return_address - 4) = (target - (return_address - 4));
+	*(F_FIXNUM *)(return_address - 4) = (target - return_address);
 }

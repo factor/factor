@@ -212,6 +212,9 @@ void free_unmarked(F_HEAP *heap, HEAP_ITERATOR iter)
 		switch(scan->status)
 		{
 		case B_ALLOCATED:
+			if(secure_gc)
+				memset(scan + 1,0,scan->size - sizeof(F_BLOCK));
+
 			if(prev && prev->status == B_FREE)
 				prev->size += scan->size;
 			else
