@@ -210,12 +210,12 @@ big-endian off
         ! Set temp1 to 0 for objects, and 4 or 8 for tuples
         temp1 1 tag-fixnum AND
         bootstrap-cell {
-            { 4 [ temp1 2 SHL ] }
-            { 8 [ temp1 3 SHL ] }
+            { 4 [ temp1 1 SHR ] }
+            { 8 [ ] }
         } case
         ! Load header cell or tuple layout cell
         temp1 temp0 temp1 [+] MOV
-    ] [ ] make [ length JNE ] [ % ] bi
+    ] [ ] make [ length JL ] [ % ] bi
 ] pic-hi-tag-tuple jit-define
 
 [
