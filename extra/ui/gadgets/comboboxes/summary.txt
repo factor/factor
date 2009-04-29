@@ -1,1 +1,1 @@
-Comboxes have a model choosen from a list of options
+Combo boxes have a model choosen from a list of options
