@@ -298,9 +298,12 @@ SYMBOL: examples-flag
         "}" print
     ] with-variable ;
 
+: touch. ( path -- )
+    [ touch-file ]
+    [ "Click to edit: " write <pathname> . ] bi ;
+
 : scaffold-rc ( path -- )
-    [ home ] dip append-path
-    [ touch-file ] [ "Click to edit: " write <pathname> . ] bi ;
+    [ home ] dip append-path touch. ;
 
 : scaffold-factor-boot-rc ( -- )
     os windows? "factor-boot-rc" ".factor-boot-rc" ? scaffold-rc ;
@@ -308,4 +311,7 @@ SYMBOL: examples-flag
 : scaffold-factor-rc ( -- )
     os windows? "factor-rc" ".factor-rc" ? scaffold-rc ;
 
-: scaffold-emacs ( -- ) ".emacs" scaffold-rc ;
+
+HOOK: scaffold-emacs os ( -- )
+
+M: unix scaffold-emacs ( -- ) ".emacs" scaffold-rc ;
