@@ -10,7 +10,7 @@ IN: compiler.tests.optimizer
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
-[ t ] [ \ xyz optimized? ] unit-test
+[ t ] [ M\ array xyz optimized? ] unit-test
 
 ! Test predicate inlining
 : pred-test-1 ( a -- b c )

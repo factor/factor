@@ -4,7 +4,7 @@
 ! optimization, which would batch generic word updates at the
 ! end of a compilation unit.
 
-USING: kernel accessors peg.ebnf ;
+USING: kernel accessors peg.ebnf words ;
 IN: compiler.tests.peg-regression
 
 TUPLE: pipeline-expr background ;
