@@ -36,11 +36,11 @@ M: gadget -> dup make:, output-model ;
 M: model -> dup , ;
 M: table -> dup , selected-value>> ;
 
-: <box> ( models type -- track )
-   [ { } make:make ] dip <track> swap dup [ model>> ] map <product>
-   [ [ f track-add ] each ] dip >>model ; inline
-: <hbox> ( models -- track ) horizontal <box> ; inline
-: <vbox> ( models -- track ) vertical <box> ; inline
+: <box> ( gadgets type -- track )
+   [ { } make:make ] dip <track> swap [ f track-add ] each ; inline
+: <box*> ( gadgets type -- track ) [ <box> ] [ [ model>> ] map <product> ] bi >>model ; inline
+: <hbox> ( gadgets -- track ) horizontal <box> ; inline
+: <vbox> ( gadgets -- track ) vertical <box> ; inline
 
 ! Model utilities
 TUPLE: multi-model < model ;
