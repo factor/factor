@@ -15,7 +15,7 @@ HELP: <vbox>
 { $description "Creates an vertical track containing the gadgets listed in the quotation" } ;
 
 ! Gadgets
-HELP: <model-button>
+HELP: <frp-button>
 { $description "Creates an button whose model updates on clicks" } ;
 
 HELP: <merge>

@@ -1,8 +1,25 @@
-USING: accessors arrays fry kernel models models.product
-monads sequences ui.gadgets ui.gadgets.buttons ui.gadgets.tracks
-ui.gadgets.tables ;
+USING: accessors arrays colors fonts fry kernel models
+models.product monads sequences ui.gadgets ui.gadgets.buttons
+ui.gadgets.editors ui.gadgets.line-support ui.gadgets.tables
+ui.gadgets.tracks ui.render ;
 QUALIFIED: make
 IN: ui.frp
+
+! Gadgets
+: <frp-button> ( text -- button ) [ t swap set-control-value ] <border-button> f <model> >>model ;
+TUPLE: frp-table < table quot val-quot color-quot column-titles column-alignment ;
+M: frp-table column-titles column-titles>> ;
+M: frp-table column-alignment column-alignment>> ;
+M: frp-table row-columns quot>> call( a -- b ) ;
+M: frp-table row-value val-quot>> call( a -- b ) ;
+M: frp-table row-color color-quot>> call( a -- b ) ;
+
+: <frp-table> ( model quot -- table )
+    frp-table new-line-gadget dup >>renderer swap >>quot swap >>model
+    f <model> >>selected-value sans-serif-font >>font
+    focus-border-color >>focus-border-color
+    transparent >>column-line-color ;
+: <frp-field> ( -- field ) f <model> <model-field> ;
 
 ! Layout utilities
 
@@ -17,24 +34,13 @@ M: model , activate-model ;
 GENERIC: -> ( object -- model )
 M: gadget -> dup make:, output-model ;
 M: model -> dup , ;
+M: table -> dup , selected-value>> ;
 
 : <box> ( models type -- track )
    [ { } make:make ] dip <track> swap dup [ model>> ] map <product>
    [ [ f track-add ] each ] dip >>model ; inline
 : <hbox> ( models -- track ) horizontal <box> ; inline
 : <vbox> ( models -- track ) vertical <box> ; inline
-
-! Gadgets
-: <frp-button> ( text -- button ) [ t swap set-control-value ] <bevel-button> f <model> >>model ;
-TUPLE: frp-table < table quot column-titles column-alignment ;
-M: frp-table column-titles column-titles>> ;
-M: frp-table column-alignment column-alignment>> ;
-M: frp-table row-columns quot>> call( a -- b ) ;
-: <frp-table> ( model quot -- table )
-    frp-table new-line-gadget dup >>renderer swap >>quot swap >>model
-    f <model> >>selected-value sans-serif-font >>font
-    focus-border-color >>focus-border-color
-    transparent >>column-line-color ;
 
 ! Model utilities
 TUPLE: multi-model < model ;
@@ -81,6 +87,3 @@ INSTANCE: gadget monad
 M: gadget monad-of drop gadget-monad ;
 M: gadget-monad return drop <gadget> swap >>model ;
 M: gadget >>= model>> '[ _ swap call( x -- y ) ] ; 
- 
-! ! list (model = Columns), listContent (model = contents)
-
