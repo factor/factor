@@ -31,8 +31,6 @@ MEMO: mem-do-rpc ( args word -- bytes ) do-rpc ; inline
 SYNTAX: service \ do-rpc  "executer" set (service) ;
 SYNTAX: mem-service \ mem-do-rpc "executer" set (service) ;
 
-: change-global ( var quot -- ) [ [ get-global ] keep ] dip dip set-global ; inline
-
 load-vocab-hook [
    [ dup words>> values
    \ mem-do-rpc "memoize" word-prop [ delete-at ] curry each ]
