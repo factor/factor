@@ -163,6 +163,7 @@ SYMBOL: jit-declare-word
 SYMBOL: jit-save-stack
 
 ! PIC stubs
+SYMBOL: pic-load
 SYMBOL: pic-tag
 SYMBOL: pic-hi-tag
 SYMBOL: pic-tuple
@@ -204,13 +205,14 @@ SYMBOL: undefined-quot
         { jit-execute-word 45 }
         { jit-execute-jump 46 }
         { jit-execute-call 47 }
-        { pic-tag 48 }
-        { pic-hi-tag 49 }
-        { pic-tuple 50 }
-        { pic-hi-tag-tuple 51 }
-        { pic-check 52 }
-        { pic-hit 53 }
-        { pic-miss-word 54 }
+        { pic-load 48 }
+        { pic-tag 49 }
+        { pic-hi-tag 50 }
+        { pic-tuple 51 }
+        { pic-hi-tag-tuple 52 }
+        { pic-check 53 }
+        { pic-hit 54 }
+        { pic-miss-word 55 }
         { undefined-quot 60 }
     } ; inline
 
@@ -554,6 +556,7 @@ M: quotation '
         jit-profiling
         jit-declare-word
         jit-save-stack
+        pic-load
         pic-tag
         pic-hi-tag
         pic-tuple

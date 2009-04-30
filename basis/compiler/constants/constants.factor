@@ -46,6 +46,7 @@ CONSTANT: rt-here        5
 CONSTANT: rt-this        6
 CONSTANT: rt-immediate   7
 CONSTANT: rt-stack-chain 8
+CONSTANT: rt-untagged    9
 
 : rc-absolute? ( n -- ? )
     [ rc-absolute-ppc-2/2 = ]

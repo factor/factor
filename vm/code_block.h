@@ -16,7 +16,9 @@ typedef enum {
 	/* immediate literal */
 	RT_IMMEDIATE,
 	/* address of stack_chain var */
-	RT_STACK_CHAIN
+	RT_STACK_CHAIN,
+	/* untagged fixnum literal */
+	RT_UNTAGGED,
 } F_RELTYPE;
 
 typedef enum {

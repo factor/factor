@@ -172,16 +172,20 @@ big-endian off
 
 ! ! ! Polymorphic inline caches
 
-! The 'make' trick lets us compute the jump distance for the conditional branches there
+! Load a value from a stack position
+[
+    temp0 ds-reg HEX: ffffffff [+] MOV rc-absolute rt-untagged jit-rel
+] pic-load jit-define
 
 ! Tag
 : make-pic-tag ( -- )
-    ds-reg bootstrap-cell SUB
     temp1 temp0 MOV
     temp1 tag-mask get AND
     temp1 tag-bits get SHL ;
 
 [ make-pic-tag ] pic-tag jit-define
+
+! The 'make' trick lets us compute the jump distance for the conditional branches there
 
 ! Hi-tag
 [

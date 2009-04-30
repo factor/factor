@@ -27,6 +27,7 @@ void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
 			case RT_XT_DIRECT:
 			case RT_IMMEDIATE:
 			case RT_HERE:
+			case RT_UNTAGGED:
 				index++;
 				break;
 			case RT_DLSYM:
@@ -373,6 +374,9 @@ void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 		break;
 	case RT_STACK_CHAIN:
 		absolute_value = (CELL)&stack_chain;
+		break;
+	case RT_UNTAGGED:
+		absolute_value = to_fixnum(array_nth(literals,index));
 		break;
 	default:
 		critical_error("Bad rel type",rel);

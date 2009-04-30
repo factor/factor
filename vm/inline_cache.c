@@ -50,17 +50,15 @@ static void update_pic_count(CELL type)
 	pic_counts[type - PIC_TAG]++;
 }
 
-/* picker: one of dup, over, pick
+/* index: 0 = top of stack, 1 = item underneath, etc
    cache_entries: array of class/method pairs */
-static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL methods, CELL cache_entries)
+static F_CODE_BLOCK *compile_inline_cache(F_FIXNUM index, CELL generic_word, CELL methods, CELL cache_entries)
 {
 #ifdef FACTOR_DEBUG
-	type_check(WORD_TYPE,picker);
 	type_check(WORD_TYPE,generic_word);
 	type_check(ARRAY_TYPE,cache_entries);
 #endif
 
-	REGISTER_ROOT(picker);
 	REGISTER_ROOT(generic_word);
 	REGISTER_ROOT(methods);
 	REGISTER_ROOT(cache_entries);
@@ -73,7 +71,7 @@ static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL m
 	jit_init(&jit,WORD_TYPE,generic_word);
 
 	/* Generate machine code to determine the object's class. */
-	jit_emit_subprimitive(&jit,untag_object(picker));
+	jit_emit_with(&jit,userenv[PIC_LOAD],tag_fixnum(-index * CELLS));
 	jit_emit(&jit,userenv[inline_cache_type]);
 
 	/* Generate machine code to check, in turn, if the class is one of the cached entries. */
@@ -93,12 +91,10 @@ static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL m
 	   this function being called again.
 
 	   The inline-cache-miss primitive call receives enough information to
-	   reconstruct the PIC. We also execute the picker again, so that the
-	   object being dispatched on can be popped from the top of the stack. */
-	jit_emit_subprimitive(&jit,untag_object(picker));
+	   reconstruct the PIC. */
 	jit_push(&jit,generic_word);
 	jit_push(&jit,methods);
-	jit_push(&jit,picker);
+	jit_push(&jit,tag_fixnum(index));
 	jit_push(&jit,cache_entries);
 	jit_word_jump(&jit,userenv[PIC_MISS_WORD]);
 
@@ -110,7 +106,6 @@ static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL m
 	UNREGISTER_ROOT(cache_entries);
 	UNREGISTER_ROOT(methods);
 	UNREGISTER_ROOT(generic_word);
-	UNREGISTER_ROOT(picker);
 
 	return code;
 }
@@ -159,10 +154,10 @@ XT inline_cache_miss(CELL return_address)
 	check_code_pointer(return_address);
 
 	CELL cache_entries = dpop();
-	CELL picker = dpop();
+	F_FIXNUM index = untag_fixnum_fast(dpop());
 	CELL methods = dpop();
 	CELL generic_word = dpop();
-	CELL object = dpop();
+	CELL object = get(ds - index * CELLS);
 
 	XT xt;
 
@@ -176,17 +171,15 @@ XT inline_cache_miss(CELL return_address)
 	{
 		REGISTER_ROOT(generic_word);
 		REGISTER_ROOT(cache_entries);
-		REGISTER_ROOT(picker);
 		REGISTER_ROOT(methods);
 
 		CELL class = object_class(object);
 		CELL method = lookup_method(object,methods);
 
 		cache_entries = add_inline_cache_entry(cache_entries,class,method);
-		xt = compile_inline_cache(picker,generic_word,methods,cache_entries) + 1;
+		xt = compile_inline_cache(index,generic_word,methods,cache_entries) + 1;
 
 		UNREGISTER_ROOT(methods);
-		UNREGISTER_ROOT(picker);
 		UNREGISTER_ROOT(cache_entries);
 		UNREGISTER_ROOT(generic_word);
 	}

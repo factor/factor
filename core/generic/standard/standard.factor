@@ -27,6 +27,7 @@ CONSTANT: simple-combination T{ standard-combination f 0 }
         { 0 [ [ dup ] ] }
         { 1 [ [ over ] ] }
         { 2 [ [ pick ] ] }
+        [ 1- (picker) [ dip swap ] curry ]
     } case ;
 
 M: standard-combination picker
@@ -42,7 +43,7 @@ M: standard-combination direct-entry-def ( word methods -- )
     #! Direct calls to the generic word (not tail calls or indirect calls)
     #! will jump to the inline cache entry point instead of the megamorphic
     #! dispatch entry point.
-    picker first [ [ f inline-cache-miss ] 3curry ] keep prefix ;
+    combination get #>> [ f inline-cache-miss ] 3curry [ ] like ;
 
 M: standard-generic definer drop \ GENERIC# f ;
 
