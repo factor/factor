@@ -47,7 +47,7 @@ typedef signed long long s64;
 
 #define HEADER_TYPE 8 /* anything less than this is a tag */
 
-#define GC_COLLECTED 5 /* See gc.c */
+#define GC_COLLECTED 5 /* can be anything other than FIXNUM_TYPE */
 
 /*** Header types ***/
 #define WRAPPER_TYPE 8
