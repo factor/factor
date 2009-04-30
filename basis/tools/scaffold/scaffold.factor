@@ -106,15 +106,14 @@ M: bad-developer-name summary
 
 : scaffold-authors ( vocab-root vocab -- )
     developer-name get [
-        dup string? [ bad-developer-name ] unless
         "authors.txt" vocab-root/vocab/file>path scaffolding? [
-            utf8 set-file-contents
+            developer-name get swap utf8 set-file-contents
         ] [
-            2drop
+            drop
         ] if
     ] [
         2drop
-    ] if* ;
+    ] if ;
 
 : lookup-type ( string -- object/string ? )
     "new" ?head drop [ { [ CHAR: ' = ] [ digit? ] } 1|| ] trim-tail
