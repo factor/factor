@@ -50,6 +50,17 @@ static void update_pic_count(CELL type)
 	pic_counts[type - PIC_TAG]++;
 }
 
+static void jit_emit_check(F_JIT *jit, CELL class)
+{
+	CELL template;
+	if(TAG(class) == FIXNUM_TYPE && untag_fixnum_fast(class) < HEADER_TYPE)
+		template = userenv[PIC_CHECK_TAG];
+	else
+		template = userenv[PIC_CHECK];
+
+	jit_emit_with(jit,template,class);
+}
+
 /* index: 0 = top of stack, 1 = item underneath, etc
    cache_entries: array of class/method pairs */
 static F_CODE_BLOCK *compile_inline_cache(F_FIXNUM index, CELL generic_word, CELL methods, CELL cache_entries)
@@ -80,7 +91,7 @@ static F_CODE_BLOCK *compile_inline_cache(F_FIXNUM index, CELL generic_word, CEL
 	{
 		/* Class equal? */
 		CELL class = array_nth(untag_object(cache_entries),i);
-		jit_emit_with(&jit,userenv[PIC_CHECK],class);
+		jit_emit_check(&jit,class);
 
 		/* Yes? Jump to method */
 		CELL method = array_nth(untag_object(cache_entries),i + 1);
@@ -186,6 +197,10 @@ XT inline_cache_miss(CELL return_address)
 
 	/* Install the new stub. */
 	set_call_site(return_address,(CELL)xt);
+
+#ifdef PIC_DEBUG
+	printf("Updated call site 0x%lx with 0x%lx\n",return_address,(CELL)xt);
+#endif
 
 	return xt;
 }

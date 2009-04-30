@@ -168,6 +168,7 @@ SYMBOL: pic-tag
 SYMBOL: pic-hi-tag
 SYMBOL: pic-tuple
 SYMBOL: pic-hi-tag-tuple
+SYMBOL: pic-check-tag
 SYMBOL: pic-check
 SYMBOL: pic-hit
 SYMBOL: pic-miss-word
@@ -210,9 +211,10 @@ SYMBOL: undefined-quot
         { pic-hi-tag 50 }
         { pic-tuple 51 }
         { pic-hi-tag-tuple 52 }
-        { pic-check 53 }
-        { pic-hit 54 }
-        { pic-miss-word 55 }
+        { pic-check-tag 53 }
+        { pic-check 54 }
+        { pic-hit 55 }
+        { pic-miss-word 56 }
         { undefined-quot 60 }
     } ; inline
 
@@ -561,6 +563,7 @@ M: quotation '
         pic-hi-tag
         pic-tuple
         pic-hi-tag-tuple
+        pic-check-tag
         pic-check
         pic-hit
         pic-miss-word
