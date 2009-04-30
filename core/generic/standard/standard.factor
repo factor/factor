@@ -38,11 +38,11 @@ M: standard-generic effective-method
     [ datastack ] dip [ "combination" word-prop #>> swap <reversed> nth ] keep
     (effective-method) ;
 
-M: standard-combination cold-call-def
+M: standard-combination direct-entry-def ( word methods -- )
     #! Direct calls to the generic word (not tail calls or indirect calls)
     #! will jump to the inline cache entry point instead of the megamorphic
     #! dispatch entry point.
-    [ f inline-cache-miss ] curry picker prepend ;
+    picker first [ [ f inline-cache-miss ] 3curry ] keep prefix ;
 
 M: standard-generic definer drop \ GENERIC# f ;
 

@@ -230,30 +230,28 @@ M: word compile-engine ;
 M: f compile-engine ;
 
 : build-decision-tree ( generic -- methods )
-    {
-        [ generic-word set ]
-        [ "engines" word-prop forget-all ]
-        [ V{ } clone "engines" set-word-prop ]
-        [
-            "methods" word-prop clone
-            [ find-default default set ]
-            [ <engine> compile-engine ] bi
-        ]
-    } cleave ;
+    [ "engines" word-prop forget-all ]
+    [ V{ } clone "engines" set-word-prop ]
+    [
+        "methods" word-prop clone
+        [ find-default default set ]
+        [ <engine> compile-engine ] bi
+    ] tri ;
 
 : make-empty-cache ( -- array )
     generic-word get "methods" word-prop
     assoc-size 2 * next-power-of-2 f <array> ;
 
-HOOK: cold-call-def combination ( word -- quot/f )
+HOOK: direct-entry-def combination ( word methods -- quot/f )
 
-M: single-combination cold-call-def drop f ;
+M: single-combination direct-entry-def 2drop f ;
 
-: define-cold-call ( word -- )
-    dup cold-call-def >>direct-entry-def drop ;
+: define-direct-entry ( word methods -- )
+    [ drop ] [ direct-entry-def ] 2bi >>direct-entry-def drop ;
 
 M: single-combination perform-combination
     [
+        dup generic-word set
         dup build-decision-tree
         [ "decision-tree" set-word-prop ]
         [
@@ -264,5 +262,5 @@ M: single-combination perform-combination
                 [ lookup-method (execute) ] %
             ] [ ] make define
         ]
-        [ drop define-cold-call ] 2tri
+        [ define-direct-entry ] 2tri
     ] with-combination ;
