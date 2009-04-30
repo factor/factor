@@ -89,6 +89,15 @@ static bool jit_ignore_declare_p(F_ARRAY *array, CELL i)
 		&& array_nth(array,i + 1) == userenv[JIT_DECLARE_WORD];
 }
 
+static bool jit_mega_lookup_p(F_ARRAY *array, CELL i)
+{
+	return (i + 3) < array_capacity(array)
+		&& type_of(array_nth(array,i)) == ARRAY_TYPE
+		&& type_of(array_nth(array,i + 1)) == FIXNUM_TYPE
+		&& type_of(array_nth(array,i + 2)) == ARRAY_TYPE
+		&& array_nth(array,i + 3) == userenv[MEGA_LOOKUP_WORD];
+}
+
 static bool jit_stack_frame_p(F_ARRAY *array)
 {
 	F_FIXNUM length = array_capacity(array);
@@ -189,7 +198,7 @@ void jit_compile(CELL quot, bool relocate)
 					jit_word_jump(&jit,obj);
 				}
 				else
-					jit_emit_with(&jit,userenv[JIT_WORD_CALL],obj);
+					jit_word_call(&jit,obj);
 			}
 			break;
 		case WRAPPER_TYPE:
@@ -255,6 +264,16 @@ void jit_compile(CELL quot, bool relocate)
 			else if(jit_ignore_declare_p(untag_object(array),i))
 			{
 				i++;
+				break;
+			}
+			else if(jit_mega_lookup_p(untag_object(array),i))
+			{
+				jit_emit_mega_cache_lookup(&jit,
+					array_nth(untag_object(array),i),
+					untag_fixnum_fast(array_nth(untag_object(array),i + 1)),
+					array_nth(untag_object(array),i + 2));
+				i += 3;
+				tail_call = true;
 				break;
 			}
 		default:

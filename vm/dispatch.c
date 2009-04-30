@@ -81,30 +81,6 @@ static CELL lookup_hi_tag_method(CELL object, CELL methods)
 	return array_nth(hi_tag_methods,tag);
 }
 
-static CELL method_cache_hashcode(CELL key, F_ARRAY *array)
-{
-	CELL capacity = (array_capacity(array) >> 1) - 1;
-	return ((key >> TAG_BITS) & capacity) << 1;
-}
-
-static CELL lookup_cached_method(CELL key, CELL method_cache)
-{
-	F_ARRAY *array = untag_object(method_cache);
-	CELL hashcode = method_cache_hashcode(key,array);
-	if(array_nth(array,hashcode) == key)
-		return array_nth(array,hashcode + 1);
-	else
-		return F;
-}
-
-static void update_method_cache(CELL key, CELL method_cache, CELL method)
-{
-	F_ARRAY *array = untag_object(method_cache);
-	CELL hashcode = method_cache_hashcode(key,array);
-	set_array_nth(array,hashcode,key);
-	set_array_nth(array,hashcode + 1,method);
-}
-
 static CELL lookup_hairy_method(CELL object, CELL methods)
 {
 	CELL method = array_nth(untag_object(methods),TAG(object));
@@ -127,42 +103,20 @@ static CELL lookup_hairy_method(CELL object, CELL methods)
 	}
 }
 
-static CELL lookup_method_with_cache(CELL object, CELL methods, CELL method_cache)
+CELL lookup_method(CELL object, CELL methods)
 {
 	if(!HI_TAG_OR_TUPLE_P(object))
-	{
-		megamorphic_cache_hits++;
 		return array_nth(untag_object(methods),TAG(object));
-	}
 	else
-	{
-		CELL key = get(HI_TAG_HEADER(object));
-		CELL method = lookup_cached_method(key,method_cache);
-		if(method != F)
-		{
-			megamorphic_cache_hits++;
-			return method;
-		}
-		else
-		{
-			megamorphic_cache_misses++;
-			method = lookup_hairy_method(object,methods);
-			update_method_cache(key,method_cache,method);
-			return method;
-		}
-	}
+		return lookup_hairy_method(object,methods);
 }
 
 void primitive_lookup_method(void)
 {
-	CELL method_cache = get(ds);
-	CELL methods = get(ds - CELLS);
-	CELL object = get(ds - CELLS * 2);
-	ds -= CELLS * 2;
-	drepl(lookup_method_with_cache(object,methods,method_cache));
+	CELL methods = dpop();
+	CELL object = dpop();
+	dpush(lookup_method(object,methods));
 }
-
-/* Next two functions are used for polymorphic inline caching */
 
 CELL object_class(CELL object)
 {
@@ -172,12 +126,35 @@ CELL object_class(CELL object)
 		return get(HI_TAG_HEADER(object));
 }
 
-CELL lookup_method(CELL object, CELL methods)
+static CELL method_cache_hashcode(CELL class, F_ARRAY *array)
 {
-	if(!HI_TAG_OR_TUPLE_P(object))
-		return array_nth(untag_object(methods),TAG(object));
-	else
-		return lookup_hairy_method(object,methods);
+	CELL capacity = (array_capacity(array) >> 1) - 1;
+	return ((class >> TAG_BITS) & capacity) << 1;
+}
+
+static void update_method_cache(CELL cache, CELL class, CELL method)
+{
+	F_ARRAY *array = untag_object(cache);
+	CELL hashcode = method_cache_hashcode(class,array);
+	set_array_nth(array,hashcode,class);
+	set_array_nth(array,hashcode + 1,method);
+}
+
+void primitive_mega_cache_miss(void)
+{
+	megamorphic_cache_misses++;
+
+	CELL cache = dpop();
+	F_FIXNUM index = untag_fixnum_fast(dpop());
+	CELL methods = dpop();
+
+	CELL object = get(ds - index * CELLS);
+	CELL class = object_class(object);
+	CELL method = lookup_method(object,methods);
+
+	update_method_cache(cache,class,method);
+
+	dpush(method);
 }
 
 void primitive_reset_dispatch_stats(void)
@@ -193,4 +170,33 @@ void primitive_dispatch_stats(void)
 	GROWABLE_ARRAY_TRIM(stats);
 	GROWABLE_ARRAY_DONE(stats);
 	dpush(stats);
+}
+
+void jit_emit_class_lookup(F_JIT *jit, F_FIXNUM index, CELL type)
+{
+	jit_emit_with(jit,userenv[PIC_LOAD],tag_fixnum(-index * CELLS));
+	jit_emit(jit,userenv[type]);
+}
+
+void jit_emit_mega_cache_lookup(F_JIT *jit, CELL methods, F_FIXNUM index, CELL cache)
+{
+	/* Generate machine code to determine the object's class. */
+	jit_emit_class_lookup(jit,index,PIC_HI_TAG_TUPLE);
+
+	/* Do a cache lookup. */
+	jit_emit_with(jit,userenv[MEGA_LOOKUP],cache);
+	
+	/* If we end up here, the cache missed. */
+	jit_emit(jit,userenv[JIT_PROLOG]);
+
+	/* Push index, method table and cache on the stack. */
+	jit_push(jit,methods);
+	jit_push(jit,tag_fixnum(index));
+	jit_push(jit,cache);
+	jit_word_call(jit,userenv[MEGA_MISS_WORD]);
+
+	/* Now the new method has been stored into the cache, and its on
+	   the stack. */
+	jit_emit(jit,userenv[JIT_EPILOG]);
+	jit_emit(jit,userenv[JIT_EXECUTE_JUMP]);
 }

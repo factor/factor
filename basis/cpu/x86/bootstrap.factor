@@ -3,7 +3,7 @@
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler layouts compiler.units math
 math.private compiler.constants vocabs slots.private words
-locals.backend make sequences combinators ;
+locals.backend make sequences combinators arrays ;
 IN: bootstrap.x86
 
 big-endian off
@@ -181,9 +181,11 @@ big-endian off
 ] pic-load jit-define
 
 ! Tag
-[
+: load-tag ( -- )
     temp1 tag-mask get AND
-] pic-tag jit-define
+    temp1 tag-bits get SHL ;
+
+[ load-tag ] pic-tag jit-define
 
 ! The 'make' trick lets us compute the jump distance for the
 ! conditional branches there
@@ -191,8 +193,8 @@ big-endian off
 ! Hi-tag
 [
     temp0 temp1 MOV
-    temp1 tag-mask get AND
-    temp1 object tag-number CMP
+    load-tag
+    temp1 object tag-number tag-fixnum CMP
     [ temp1 temp0 object tag-number neg [+] MOV ] { } make
     [ length JNE ] [ % ] bi
 ] pic-hi-tag jit-define
@@ -200,8 +202,8 @@ big-endian off
 ! Tuple
 [
     temp0 temp1 MOV
-    temp1 tag-mask get AND
-    temp1 tuple tag-number CMP
+    load-tag
+    temp1 tuple tag-number tag-fixnum CMP
     [ temp1 temp0 tuple tag-number neg bootstrap-cell + [+] MOV ] { } make
     [ length JNE ] [ % ] bi
 ] pic-tuple jit-define
@@ -209,21 +211,17 @@ big-endian off
 ! Hi-tag and tuple
 [
     temp0 temp1 MOV
-    temp1 tag-mask get AND
+    load-tag
     ! If bits 2 and 3 are set, the tag is either 6 (object) or 7 (tuple)
     temp1 BIN: 110 tag-fixnum CMP
     [
-        ! Untag temp0 in temp2
-        temp2 temp0 MOV
-        temp2 tag-mask get bitnot AND
-        ! Set temp1 to 0 for objects, and 1 for tuples
-        temp1 1 AND
-        bootstrap-cell {
-            { 4 [ temp1 2 SHR ] }
-            { 8 [ temp1 3 SHR ] }
-        } case
+        ! Untag temp0
+        temp0 tag-mask get bitnot AND
+        ! Set temp1 to 0 for objects, and 8 for tuples
+        temp1 1 tag-fixnum AND
+        bootstrap-cell 4 = [ temp1 1 SHR ] when
         ! Load header cell or tuple layout cell
-        temp1 temp2 temp1 [+] MOV
+        temp1 temp0 temp1 [+] MOV
     ] [ ] make [ length JL ] [ % ] bi
 ] pic-hi-tag-tuple jit-define
 
@@ -237,6 +235,34 @@ big-endian off
 ] pic-check jit-define
 
 [ f JE rc-relative rt-xt jit-rel ] pic-hit jit-define
+
+! ! ! Megamorphic caches
+
+[
+    ! cache = ...
+    temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
+    ! key = class
+    temp2 temp1 MOV
+    ! compute cache.length - 1
+    temp3 temp0 1 bootstrap-cells array tag-number - [+] MOV
+    temp3 1 SHR
+    temp3 4 SUB
+    ! key &= cache.length - 1
+    temp2 temp3 AND
+    ! cache += array-start-offset
+    temp0 array-start-offset ADD
+    ! cache += key
+    temp0 temp2 ADD
+    ! if(get(cache) == class)
+    temp0 [] temp1 CMP
+    ! ... goto get(cache + bootstrap-cell)
+    [
+        temp0 temp0 bootstrap-cell [+] MOV
+        temp0 word-xt-offset [+] JMP
+    ] [ ] make
+    [ length JNE ] [ % ] bi
+    ! fall-through on miss
+] mega-lookup jit-define
 
 ! ! ! Sub-primitives
 

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors definitions generic generic.single kernel
 namespaces words math math.order combinators sequences
-generic.single.private ;
+generic.single.private quotations kernel.private
+assocs arrays ;
 IN: generic.standard
 
 TUPLE: standard-combination < single-combination # ;
@@ -39,11 +40,18 @@ M: standard-generic effective-method
     [ datastack ] dip [ "combination" word-prop #>> swap <reversed> nth ] keep
     (effective-method) ;
 
-M: standard-combination direct-entry-def ( word methods -- )
+M: standard-combination inline-cache-quot ( word methods -- )
     #! Direct calls to the generic word (not tail calls or indirect calls)
     #! will jump to the inline cache entry point instead of the megamorphic
     #! dispatch entry point.
     combination get #>> [ f inline-cache-miss ] 3curry [ ] like ;
+
+: make-empty-cache ( -- array )
+    generic-word get "methods" word-prop
+    assoc-size 2 * next-power-of-2 f <array> ;
+
+M: standard-combination mega-cache-quot
+    combination get #>> make-empty-cache [ mega-cache-lookup ] 3curry [ ] like ;
 
 M: standard-generic definer drop \ GENERIC# f ;
 
