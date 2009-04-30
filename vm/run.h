@@ -32,7 +32,7 @@ typedef enum {
 	BOOT_ENV            = 20, /* boot quotation */
 	GLOBAL_ENV,               /* global namespace */
 
-	/* Used by the JIT compiler */
+	/* Quotation compilation in quotations.c */
 	JIT_CODE_FORMAT     = 22,
 	JIT_PROLOG,
 	JIT_PRIMITIVE_WORD,
@@ -60,7 +60,7 @@ typedef enum {
 	JIT_EXECUTE_JUMP,
 	JIT_EXECUTE_CALL,
 
-	/* Used by polymorphic inline cache generation in inline_cache.c */
+	/* Polymorphic inline cache generation in inline_cache.c */
 	PIC_LOAD            = 48,
 	PIC_TAG,
 	PIC_HI_TAG,
@@ -71,7 +71,10 @@ typedef enum {
 	PIC_HIT,
 	PIC_MISS_WORD,
 
-	STACK_TRACES_ENV    = 59,
+	/* Megamorphic cache generation in dispatch.c */
+	MEGA_LOOKUP         = 57,
+	MEGA_LOOKUP_WORD,
+        MEGA_MISS_WORD,
 
 	UNDEFINED_ENV       = 60, /* default quotation for undefined words */
 
@@ -84,6 +87,8 @@ typedef enum {
 	THREADS_ENV         = 64,
 	RUN_QUEUE_ENV       = 65,
 	SLEEP_QUEUE_ENV     = 66,
+
+	STACK_TRACES_ENV    = 67,
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV

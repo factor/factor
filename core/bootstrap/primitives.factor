@@ -349,6 +349,7 @@ tuple
     { "get-local" "locals.backend" (( n -- obj )) }
     { "load-local" "locals.backend" (( obj -- )) }
     { "drop-locals" "locals.backend" (( n -- )) }
+    { "mega-cache-lookup" "generic.single.private" (( methods index cache -- )) }
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words
@@ -501,8 +502,9 @@ tuple
     { "jit-compile" "quotations" (( quot -- )) }
     { "load-locals" "locals.backend" (( ... n -- )) }
     { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
-    { "lookup-method" "generic.single.private" (( object methods method-cache -- method )) }
-    { "inline-cache-miss" "generic.single.private" (( generic methods -- )) }
+    { "inline-cache-miss" "generic.single.private" (( generic methods index cache -- )) }
+    { "mega-cache-miss" "generic.single.private" (( methods index cache -- method )) }
+    { "lookup-method" "generic.single.private" (( object methods -- method )) }
     { "reset-dispatch-stats" "generic.single" (( -- )) }
     { "dispatch-stats" "generic.single" (( -- stats )) }
     { "reset-inline-cache-stats" "generic.single" (( -- )) }

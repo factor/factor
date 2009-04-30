@@ -173,6 +173,11 @@ SYMBOL: pic-check
 SYMBOL: pic-hit
 SYMBOL: pic-miss-word
 
+! Megamorphic dispatch
+SYMBOL: mega-lookup
+SYMBOL: mega-lookup-word
+SYMBOL: mega-miss-word
+
 ! Default definition for undefined words
 SYMBOL: undefined-quot
 
@@ -215,6 +220,9 @@ SYMBOL: undefined-quot
         { pic-check 54 }
         { pic-hit 55 }
         { pic-miss-word 56 }
+        { mega-lookup 57 }
+        { mega-lookup-word 58 }
+        { mega-miss-word 59 }
         { undefined-quot 60 }
     } ; inline
 
@@ -526,6 +534,8 @@ M: quotation '
     \ 3dip jit-3dip-word set
     \ (execute) jit-execute-word set
     \ inline-cache-miss \ pic-miss-word set
+    \ mega-cache-lookup \ mega-lookup-word set
+    \ mega-cache-miss \ mega-miss-word set
     [ undefined ] undefined-quot set
     {
         jit-code-format
@@ -563,6 +573,9 @@ M: quotation '
         pic-check
         pic-hit
         pic-miss-word
+        mega-lookup
+        mega-lookup-word
+        mega-miss-word
         undefined-quot
     } [ emit-userenv ] each ;
 

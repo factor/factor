@@ -46,6 +46,12 @@ INLINE void jit_word_jump(F_JIT *jit, CELL word)
 }
 
 /* Allocates memory */
+INLINE void jit_word_call(F_JIT *jit, CELL word)
+{
+	jit_emit_with(jit,userenv[JIT_WORD_CALL],word);
+}
+
+/* Allocates memory */
 INLINE void jit_emit_subprimitive(F_JIT *jit, F_WORD *word)
 {
 	REGISTER_UNTAGGED(word);

@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel layouts system strings words quotations byte-arrays alien ;
+USING: math kernel layouts system strings words quotations byte-arrays
+alien arrays ;
 IN: compiler.constants
 
 ! These constants must match vm/memory.h
@@ -20,8 +21,8 @@ CONSTANT: deck-bits 18
 : tuple-class-offset ( -- n ) bootstrap-cell tuple tag-number - ; inline
 : word-xt-offset ( -- n ) 9 bootstrap-cells \ word tag-number - ; inline
 : quot-xt-offset ( -- n ) 5 bootstrap-cells quotation tag-number - ; inline
-: word-code-offset ( -- n ) 10 bootstrap-cells object tag-number - ; inline
-: array-start-offset ( -- n ) 2 bootstrap-cells object tag-number - ; inline
+: word-code-offset ( -- n ) 10 bootstrap-cells \ word tag-number - ; inline
+: array-start-offset ( -- n ) 2 bootstrap-cells array tag-number - ; inline
 : compiled-header-size ( -- n ) 5 bootstrap-cells ; inline
 
 ! Relocation classes

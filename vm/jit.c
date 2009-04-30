@@ -1,5 +1,11 @@
 #include "master.h"
 
+/* Simple code generator used by:
+- profiler (profiler.c),
+- quotation compiler (quotations.c),
+- megamorphic caches (dispatch.c),
+- polymorphic inline caches (inline_cache.c) */
+
 /* Allocates memory */
 void jit_init(F_JIT *jit, CELL jit_type, CELL owner)
 {

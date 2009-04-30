@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
 combinators definitions generic hashtables kernel
-kernel.private layouts make math namespaces quotations
+kernel.private layouts math namespaces quotations
 sequences words generic.single.private effects make ;
 IN: generic.single
 
@@ -29,7 +29,7 @@ SYMBOL: combination
 
 HOOK: picker combination ( -- quot )
 
-M: single-combination next-method-quot*
+M: single-combination next-method-quot* ( class generic combination -- quot )
     [
         2dup next-method dup [
             [
@@ -238,29 +238,19 @@ M: f compile-engine ;
         [ <engine> compile-engine ] bi
     ] tri ;
 
-: make-empty-cache ( -- array )
-    generic-word get "methods" word-prop
-    assoc-size 2 * next-power-of-2 f <array> ;
+HOOK: inline-cache-quot combination ( word methods -- quot/f )
 
-HOOK: direct-entry-def combination ( word methods -- quot/f )
+: define-inline-cache-quot ( word methods -- )
+    [ drop ] [ inline-cache-quot ] 2bi >>direct-entry-def drop ;
 
-M: single-combination direct-entry-def 2drop f ;
-
-: define-direct-entry ( word methods -- )
-    [ drop ] [ direct-entry-def ] 2bi >>direct-entry-def drop ;
+HOOK: mega-cache-quot combination ( methods -- quot/f )
 
 M: single-combination perform-combination
     [
         dup generic-word set
         dup build-decision-tree
         [ "decision-tree" set-word-prop ]
-        [
-            [
-                picker %
-                ,
-                make-empty-cache ,
-                [ lookup-method (execute) ] %
-            ] [ ] make define
-        ]
-        [ define-direct-entry ] 2tri
+        [ mega-cache-quot define ]
+        [ define-inline-cache-quot ]
+        2tri
     ] with-combination ;

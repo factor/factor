@@ -82,8 +82,7 @@ static F_CODE_BLOCK *compile_inline_cache(F_FIXNUM index, CELL generic_word, CEL
 	jit_init(&jit,WORD_TYPE,generic_word);
 
 	/* Generate machine code to determine the object's class. */
-	jit_emit_with(&jit,userenv[PIC_LOAD],tag_fixnum(-index * CELLS));
-	jit_emit(&jit,userenv[inline_cache_type]);
+	jit_emit_class_lookup(&jit,index,inline_cache_type);
 
 	/* Generate machine code to check, in turn, if the class is one of the cached entries. */
 	CELL i;
