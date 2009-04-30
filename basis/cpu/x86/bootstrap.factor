@@ -241,6 +241,7 @@ big-endian off
     temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
     ! key = class
     temp2 temp1 MOV
+    bootstrap-cell 8 = [ temp2 1 SHL ] when
     ! key &= cache.length - 1
     temp2 mega-cache-size get 1- bootstrap-cell * AND
     ! cache += array-start-offset
