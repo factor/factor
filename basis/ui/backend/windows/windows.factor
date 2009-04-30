@@ -6,14 +6,18 @@ ui.gadgets ui.gadgets.private ui.backend ui.clipboards
 ui.gadgets.worlds ui.gestures ui.event-loop io kernel math
 math.vectors namespaces make sequences strings vectors words
 windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
-windows.messages windows.types windows.offscreen windows.nt windows
+windows.messages windows.types windows.offscreen windows.nt
 threads libc combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render ascii math.bitwise locals
 accessors math.rectangles math.order ascii calendar
-io.encodings.utf16n ;
+io.encodings.utf16n windows.errors ;
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
+
+: lo-word ( wparam -- lo ) <short> *short ; inline
+: hi-word ( wparam -- hi ) -16 shift lo-word ; inline
+: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
 
 : crlf>lf ( str -- str' )
     CHAR: \r swap remove ;
@@ -285,8 +289,6 @@ SYMBOL: nc-buttons
     2drop nip
     message>button nc-buttons get
     swap [ push ] [ delete ] if ;
-
-: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
 
 : mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
 

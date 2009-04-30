@@ -1110,7 +1110,19 @@ FUNCTION: BOOL FindVolumeMountPointClose ( HANDLE hFindVolumeMountPoint ) ;
 ! FUNCTION: FoldStringA
 ! FUNCTION: FoldStringW
 ! FUNCTION: FormatMessageA
-! FUNCTION: FormatMessageW
+FUNCTION: DWORD FormatMessageW (
+        DWORD dwFlags,
+        LPCVOID lpSource,
+        DWORD dwMessageId,
+        DWORD dwLanguageId,
+        LPTSTR lpBuffer,
+        DWORD nSize,
+        void* Arguments
+    ) ;
+
+ALIAS: FormatMessage FormatMessageW
+
+
 FUNCTION: BOOL FreeConsole ( ) ;
 ! FUNCTION: FreeEnvironmentStringsA
 FUNCTION: BOOL FreeEnvironmentStringsW ( LPTCH lpszEnvironmentBlock ) ;
