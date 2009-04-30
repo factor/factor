@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry assocs arrays byte-arrays strings accessors sequences
 kernel slots classes.algebra classes.tuple classes.tuple.private
@@ -7,9 +7,6 @@ slots.private classes compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.slots
 
 ! Propagation of immutable slots and array lengths
-
-! Revisit this code when delegation is removed and when complex
-! numbers become tuples.
 
 UNION: fixed-length-sequence array byte-array string ;
 

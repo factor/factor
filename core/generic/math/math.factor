@@ -22,11 +22,11 @@ PREDICATE: math-class < class
 
 : math-precedence ( class -- pair )
     [
-        { null fixnum bignum ratio float complex object } bootstrap-words
-        swap [ class<= ] curry find drop
+        { fixnum integer rational real number object } bootstrap-words
+        swap [ swap class<= ] curry find drop -1 or
     ] [
-        { null fixnum integer rational real number object } bootstrap-words
-        swap [ swap class<= ] curry find drop
+        { fixnum bignum ratio float complex object } bootstrap-words
+        swap [ class<= ] curry find drop -1 or
     ] bi 2array ;
 
 : (math-upgrade) ( max class -- quot )
