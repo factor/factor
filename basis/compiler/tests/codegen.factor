@@ -26,7 +26,7 @@ IN: compiler.tests.codegen
 
 [ 2 3 4 ] [ 3 [ 2 swap 4 ] compile-call ] unit-test
 
-[ { 1 2 3 } { 1 4 3 } 6 6 ]
+[ { 1 2 3 } { 1 4 3 } 2 2 ]
 [ { 1 2 3 } { 1 4 3 } [ over tag over tag ] compile-call ]
 unit-test
 
