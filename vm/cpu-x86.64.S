@@ -78,6 +78,6 @@ DEF(F_FASTCALL void,primitive_inline_cache_miss,(void)):
 	sub $STACK_PADDING,%rsp
 	call MANGLE(inline_cache_miss)
 	add $STACK_PADDING,%rsp
-	jmp *WORD_XT_OFFSET(%rax)
+	jmp *%rax
 
 #include "cpu-x86.S"

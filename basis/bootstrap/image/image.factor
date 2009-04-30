@@ -98,7 +98,7 @@ SYMBOL: jit-define-rt
 SYMBOL: jit-define-offset
 
 : compute-offset ( -- offset )
-    building get length jit-define-rc get rc-absolute-cell = cell 4 ? - ;
+    building get length jit-define-rc get rc-absolute-cell = bootstrap-cell 4 ? - ;
 
 : jit-rel ( rc rt -- )
     jit-define-rt set

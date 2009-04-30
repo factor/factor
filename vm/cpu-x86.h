@@ -25,11 +25,11 @@ INLINE void check_call_site(CELL return_address)
 INLINE CELL get_call_target(CELL return_address)
 {
 	check_call_site(return_address);
-	return *(F_FIXNUM *)(return_address - 4) + return_address;
+	return *(int *)(return_address - 4) + return_address;
 }
 
 INLINE void set_call_target(CELL return_address, CELL target)
 {
 	check_call_site(return_address);
-	*(F_FIXNUM *)(return_address - 4) = (target - return_address);
+	*(int *)(return_address - 4) = (target - return_address);
 }
