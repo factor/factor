@@ -2,7 +2,7 @@ USING: alien alien.c-types alien.syntax arrays continuations
 destructors generic io.mmap io.ports io.backend.windows io.files.windows
 kernel libc math math.bitwise namespaces quotations sequences windows
 windows.advapi32 windows.kernel32 io.backend system accessors
-io.backend.windows.privileges ;
+io.backend.windows.privileges windows.errors ;
 IN: io.backend.windows.nt.privileges
 
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES

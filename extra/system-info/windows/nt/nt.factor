@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.strings
 kernel libc math namespaces system-info.backend
 system-info.windows windows windows.advapi32
-windows.kernel32 system byte-arrays ;
+windows.kernel32 system byte-arrays windows.errors ;
 IN: system-info.windows.nt
 
 M: winnt cpus ( -- n )
@@ -41,6 +41,6 @@ M: winnt available-virtual-mem ( -- n )
     GetComputerName win32-error=0/f alien>native-string ;
  
 : username ( -- string )
-    UNLEN 1+
+    UNLEN 1 +
     [ <byte-array> dup ] keep <uint>
     GetUserName win32-error=0/f alien>native-string ;

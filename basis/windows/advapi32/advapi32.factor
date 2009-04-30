@@ -894,15 +894,52 @@ FUNCTION: LONG RegCreateKeyExW ( HKEY hKey, LPCTSTR lpSubKey, DWORD Reserved, LP
 ! : RegCreateKeyW
 ! : RegDeleteKeyA ;
 ! : RegDeleteKeyW ;
+
+FUNCTION: LONG RegDeleteKeyExW (
+        HKEY hKey,
+        LPCTSTR lpSubKey,
+        DWORD Reserved,
+        LPTSTR lpClass,
+        DWORD dwOptions,
+        REGSAM samDesired,
+        LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+        PHKEY phkResult,
+        LPDWORD lpdwDisposition
+    ) ;
+
+ALIAS: RegDeleteKeyEx RegDeleteKeyExW
+
 ! : RegDeleteValueA ;
 ! : RegDeleteValueW ;
 ! : RegDisablePredefinedCache ;
 ! : RegEnumKeyA ;
 ! : RegEnumKeyExA ;
-! : RegEnumKeyExW ;
+FUNCTION: LONG RegEnumKeyExW (
+        HKEY hKey,
+        DWORD dwIndex,
+        LPTSTR lpName,
+        LPDWORD lpcName,
+        LPDWORD lpReserved,
+        LPTSTR lpClass,
+        LPDWORD lpcClass,
+        PFILETIME lpftLastWriteTime
+    ) ;
 ! : RegEnumKeyW ;
 ! : RegEnumValueA ;
-! : RegEnumValueW ;
+
+FUNCTION: LONG RegEnumValueW (
+        HKEY hKey,
+        DWORD dwIndex,
+        LPTSTR lpValueName,
+        LPDWORD lpcchValueName,
+        LPDWORD lpReserved,
+        LPDWORD lpType,
+        LPBYTE lpData,
+        LPDWORD lpcbData
+    ) ;
+
+ALIAS: RegEnumValue RegEnumValueW
+
 ! : RegFlushKey ;
 ! : RegGetKeySecurity ;
 ! : RegLoadKeyA ;
