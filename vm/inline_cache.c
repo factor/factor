@@ -116,13 +116,9 @@ static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL m
 }
 
 /* A generic word's definition performs general method lookup. Allocates memory */
-static F_CODE_BLOCK *megamorphic_call_stub(CELL generic_word)
+static XT megamorphic_call_stub(CELL generic_word)
 {
-	F_WORD *word = untag_word(generic_word);
-	REGISTER_UNTAGGED(word);
-	jit_compile(word->def,true);
-	UNREGISTER_UNTAGGED(word);
-	return untag_quotation(word->def)->code;
+	return untag_word(generic_word)->xt;
 }
 
 static CELL inline_cache_size(CELL cache_entries)
@@ -168,14 +164,14 @@ XT inline_cache_miss(CELL return_address)
 	CELL generic_word = dpop();
 	CELL object = dpop();
 
-	F_CODE_BLOCK *block;
+	XT xt;
 
 	CELL pic_size = inline_cache_size(cache_entries);
 
 	update_pic_transitions(pic_size);
 
 	if(pic_size >= max_pic_size)
-		block = megamorphic_call_stub(generic_word);
+		xt = megamorphic_call_stub(generic_word);
 	else
 	{
 		REGISTER_ROOT(generic_word);
@@ -187,7 +183,7 @@ XT inline_cache_miss(CELL return_address)
 		CELL method = lookup_method(object,methods);
 
 		cache_entries = add_inline_cache_entry(cache_entries,class,method);
-		block = compile_inline_cache(picker,generic_word,methods,cache_entries);
+		xt = compile_inline_cache(picker,generic_word,methods,cache_entries) + 1;
 
 		UNREGISTER_ROOT(methods);
 		UNREGISTER_ROOT(picker);
@@ -196,7 +192,6 @@ XT inline_cache_miss(CELL return_address)
 	}
 
 	/* Install the new stub. */
-	XT xt = (block + 1);
 	set_call_site(return_address,(CELL)xt);
 
 	return xt;
