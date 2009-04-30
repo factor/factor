@@ -107,40 +107,60 @@ void primitive_string(void)
 	dpush(tag_object(allot_string(length,initial)));
 }
 
+static bool reallot_string_in_place_p(F_STRING *string, CELL capacity)
+{
+	return in_zone(&nursery,(CELL)string) && capacity <= string_capacity(string);
+}
+
 F_STRING* reallot_string(F_STRING* string, CELL capacity)
 {
-	CELL to_copy = string_capacity(string);
-	if(capacity < to_copy)
-		to_copy = capacity;
-
-	REGISTER_UNTAGGED(string);
-	F_STRING *new_string = allot_string_internal(capacity);
-	UNREGISTER_UNTAGGED(string);
-
-	memcpy(new_string + 1,string + 1,to_copy);
-
-	if(string->aux != F)
+	if(reallot_string_in_place_p(string,capacity))
 	{
+		string->length = tag_fixnum(capacity);
+
+		if(string->aux != F)
+		{
+			F_BYTE_ARRAY *aux = untag_object(string->aux);
+			aux->capacity = tag_fixnum(capacity * 2);
+		}
+
+		return string;
+	}
+	else
+	{
+		CELL to_copy = string_capacity(string);
+		if(capacity < to_copy)
+			to_copy = capacity;
+
+		REGISTER_UNTAGGED(string);
+		F_STRING *new_string = allot_string_internal(capacity);
+		UNREGISTER_UNTAGGED(string);
+
+		memcpy(new_string + 1,string + 1,to_copy);
+
+		if(string->aux != F)
+		{
+			REGISTER_UNTAGGED(string);
+			REGISTER_UNTAGGED(new_string);
+			F_BYTE_ARRAY *new_aux = allot_byte_array(capacity * sizeof(u16));
+			UNREGISTER_UNTAGGED(new_string);
+			UNREGISTER_UNTAGGED(string);
+
+			write_barrier((CELL)new_string);
+			new_string->aux = tag_object(new_aux);
+
+			F_BYTE_ARRAY *aux = untag_object(string->aux);
+			memcpy(new_aux + 1,aux + 1,to_copy * sizeof(u16));
+		}
+
 		REGISTER_UNTAGGED(string);
 		REGISTER_UNTAGGED(new_string);
-		F_BYTE_ARRAY *new_aux = allot_byte_array(capacity * sizeof(u16));
+		fill_string(new_string,to_copy,capacity,'\0');
 		UNREGISTER_UNTAGGED(new_string);
 		UNREGISTER_UNTAGGED(string);
 
-		write_barrier((CELL)new_string);
-		new_string->aux = tag_object(new_aux);
-
-		F_BYTE_ARRAY *aux = untag_object(string->aux);
-		memcpy(new_aux + 1,aux + 1,to_copy * sizeof(u16));
+		return new_string;
 	}
-
-	REGISTER_UNTAGGED(string);
-	REGISTER_UNTAGGED(new_string);
-	fill_string(new_string,to_copy,capacity,'\0');
-	UNREGISTER_UNTAGGED(new_string);
-	UNREGISTER_UNTAGGED(string);
-
-	return new_string;
 }
 
 void primitive_resize_string(void)

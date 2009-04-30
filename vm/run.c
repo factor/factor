@@ -120,7 +120,7 @@ bool stack_to_array(CELL bottom, CELL top)
 	{
 		F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth / CELLS);
 		memcpy(a + 1,(void*)bottom,depth);
-		dpush(tag_object(a));
+		dpush(tag_array(a));
 		return true;
 	}
 }

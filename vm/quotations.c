@@ -439,7 +439,7 @@ void primitive_array_to_quotation(void)
 	quot->compiledp = F;
 	quot->cached_effect = F;
 	quot->cache_counter = F;
-	drepl(tag_object(quot));
+	drepl(tag_quotation(quot));
 }
 
 void primitive_quotation_xt(void)

@@ -74,7 +74,11 @@ static CELL lookup_tuple_method(CELL object, CELL methods)
 static CELL lookup_hi_tag_method(CELL object, CELL methods)
 {
 	F_ARRAY *hi_tag_methods = untag_object(methods);
-	return array_nth(hi_tag_methods,hi_tag(object) - HEADER_TYPE);
+	CELL tag = hi_tag(object) - HEADER_TYPE;
+#ifdef FACTOR_DEBUG
+	assert(tag < TYPE_COUNT - HEADER_TYPE);
+#endif
+	return array_nth(hi_tag_methods,tag);
 }
 
 static CELL method_cache_hashcode(CELL key, F_ARRAY *array)

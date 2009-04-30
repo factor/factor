@@ -32,9 +32,9 @@ typedef signed long long s64;
 /*** Tags ***/
 #define FIXNUM_TYPE 0
 #define BIGNUM_TYPE 1
-#define RATIO_TYPE 2
+#define ARRAY_TYPE 2
 #define FLOAT_TYPE 3
-#define COMPLEX_TYPE 4
+#define QUOTATION_TYPE 4
 #define F_TYPE 5
 #define OBJECT_TYPE 6
 #define TUPLE_TYPE 7
@@ -50,17 +50,15 @@ typedef signed long long s64;
 #define GC_COLLECTED 5 /* See gc.c */
 
 /*** Header types ***/
-#define ARRAY_TYPE 8
-#define WRAPPER_TYPE 9
-#define BYTE_ARRAY_TYPE 10
-#define CALLSTACK_TYPE 11
-#define STRING_TYPE 12
-#define WORD_TYPE 13
-#define QUOTATION_TYPE 14
-#define DLL_TYPE 15
-#define ALIEN_TYPE 16
+#define WRAPPER_TYPE 8
+#define BYTE_ARRAY_TYPE 9
+#define CALLSTACK_TYPE 10
+#define STRING_TYPE 11
+#define WORD_TYPE 12
+#define DLL_TYPE 13
+#define ALIEN_TYPE 14
 
-#define TYPE_COUNT 17
+#define TYPE_COUNT 15
 
 INLINE bool immediate_p(CELL obj)
 {
@@ -177,13 +175,6 @@ typedef struct {
 
 /* Assembly code makes assumptions about the layout of this struct */
 typedef struct {
-	CELL header;
-	CELL numerator;
-	CELL denominator;
-} F_RATIO;
-
-/* Assembly code makes assumptions about the layout of this struct */
-typedef struct {
 /* We use a union here to force the float value to be aligned on an
 8-byte boundary. */
 	union {
@@ -209,13 +200,6 @@ typedef struct {
 	/* UNTAGGED compiled code block */
 	F_CODE_BLOCK *code;
 } F_QUOTATION;
-
-/* Assembly code makes assumptions about the layout of this struct */
-typedef struct {
-	CELL header;
-	CELL real;
-	CELL imaginary;
-} F_COMPLEX;
 
 /* Assembly code makes assumptions about the layout of this struct */
 typedef struct {

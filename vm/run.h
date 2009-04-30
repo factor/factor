@@ -153,14 +153,17 @@ INLINE CELL untag_header(CELL cell)
 	return cell >> TAG_BITS;
 }
 
-INLINE CELL tag_object(void* cell)
-{
-	return RETAG(cell,OBJECT_TYPE);
-}
-
 INLINE CELL hi_tag(CELL tagged)
 {
 	return untag_header(get(UNTAG(tagged)));
+}
+
+INLINE CELL tag_object(void *cell)
+{
+#ifdef FACTOR_DEBUG
+	assert(hi_tag((CELL)cell) >= HEADER_TYPE);
+#endif
+	return RETAG(cell,OBJECT_TYPE);
 }
 
 INLINE CELL type_of(CELL tagged)

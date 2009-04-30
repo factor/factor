@@ -29,9 +29,6 @@ UNION: fixed-length-sequence array byte-array string ;
     [ constructor-output-class <class-info> ]
     bi* value-info-intersect 1array ;
 
-: tuple-constructor? ( word -- ? )
-    { <tuple-boa> <complex> } memq? ;
-
 : fold-<tuple-boa> ( values class -- info )
     [ [ literal>> ] map ] dip prefix >tuple
     <literal-info> ;
@@ -44,18 +41,9 @@ UNION: fixed-length-sequence array byte-array string ;
         <tuple-info>
     ] if ;
 
-: propagate-<tuple-boa> ( #call -- info )
+: propagate-<tuple-boa> ( #call -- infos )
     in-d>> unclip-last
-    value-info literal>> first (propagate-tuple-constructor) ;
-
-: propagate-<complex> ( #call -- info )
-    in-d>> [ value-info ] map complex <tuple-info> ;
-
-: propagate-tuple-constructor ( #call word -- infos )
-    {
-        { \ <tuple-boa> [ propagate-<tuple-boa> ] }
-        { \ <complex> [ propagate-<complex> ] }
-    } case 1array ;
+    value-info literal>> first (propagate-tuple-constructor) 1array ;
 
 : read-only-slot? ( n class -- ? )
     all-slots [ offset>> = ] with find nip

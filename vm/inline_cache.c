@@ -144,7 +144,7 @@ static CELL add_inline_cache_entry(CELL cache_entries, CELL class, CELL method)
 		cache_entries_array = reallot_array(cache_entries_array,pic_size + 2);
 		set_array_nth(cache_entries_array,pic_size,class);
 		set_array_nth(cache_entries_array,pic_size + 1,method);
-		return tag_object(cache_entries_array);
+		return tag_array(cache_entries_array);
 	}
 }
 

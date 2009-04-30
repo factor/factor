@@ -286,9 +286,6 @@ M: object infer-call*
 \ bignum>float { bignum } { float } define-primitive
 \ bignum>float make-foldable
 
-\ <ratio> { integer integer } { ratio } define-primitive
-\ <ratio> make-foldable
-
 \ string>float { string } { float } define-primitive
 \ string>float make-foldable
 
@@ -306,9 +303,6 @@ M: object infer-call*
 
 \ bits>double { integer } { float } define-primitive
 \ bits>double make-foldable
-
-\ <complex> { real real } { complex } define-primitive
-\ <complex> make-foldable
 
 \ both-fixnums? { object object } { object } define-primitive
 
