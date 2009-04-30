@@ -6,7 +6,7 @@ F_TUPLE *allot_tuple(F_TUPLE_LAYOUT *layout)
 	REGISTER_UNTAGGED(layout);
 	F_TUPLE *tuple = allot_object(TUPLE_TYPE,tuple_size(layout));
 	UNREGISTER_UNTAGGED(layout);
-	tuple->layout = tag_object(layout);
+	tuple->layout = tag_array((F_ARRAY *)layout);
 	return tuple;
 }
 

@@ -1,5 +1,10 @@
 DEFINE_UNTAG(F_ARRAY,ARRAY_TYPE,array)
 
+INLINE CELL tag_array(F_ARRAY *array)
+{
+	return RETAG(array,ARRAY_TYPE);
+}
+
 /* Inline functions */
 INLINE CELL array_size(CELL size)
 {
@@ -61,7 +66,7 @@ INLINE F_GROWABLE_ARRAY make_growable_array(void)
 {
 	F_GROWABLE_ARRAY result;
 	result.count = 0;
-	result.array = tag_object(allot_array(ARRAY_TYPE,100,F));
+	result.array = tag_array(allot_array(ARRAY_TYPE,100,F));
 	return result;
 }
 
@@ -80,7 +85,7 @@ void growable_array_append(F_GROWABLE_ARRAY *result, F_ARRAY *elts);
 
 INLINE void growable_array_trim(F_GROWABLE_ARRAY *array)
 {
-	array->array = tag_object(reallot_array(untag_object(array->array),array->count));
+	array->array = tag_array(reallot_array(untag_object(array->array),array->count));
 }
 
 #define GROWABLE_ARRAY_TRIM(result) growable_array_trim(&result##_g)

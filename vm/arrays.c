@@ -34,7 +34,7 @@ void primitive_array(void)
 {
 	CELL initial = dpop();
 	CELL size = unbox_array_size();
-	dpush(tag_object(allot_array(ARRAY_TYPE,size,initial)));
+	dpush(tag_array(allot_array(ARRAY_TYPE,size,initial)));
 }
 
 CELL allot_array_1(CELL obj)
@@ -43,7 +43,7 @@ CELL allot_array_1(CELL obj)
 	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,1);
 	UNREGISTER_ROOT(obj);
 	set_array_nth(a,0,obj);
-	return tag_object(a);
+	return tag_array(a);
 }
 
 CELL allot_array_2(CELL v1, CELL v2)
@@ -55,7 +55,7 @@ CELL allot_array_2(CELL v1, CELL v2)
 	UNREGISTER_ROOT(v1);
 	set_array_nth(a,0,v1);
 	set_array_nth(a,1,v2);
-	return tag_object(a);
+	return tag_array(a);
 }
 
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
@@ -73,35 +73,48 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 	set_array_nth(a,1,v2);
 	set_array_nth(a,2,v3);
 	set_array_nth(a,3,v4);
-	return tag_object(a);
+	return tag_array(a);
 }
 
-F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity)
+static bool reallot_array_in_place_p(F_ARRAY *array, CELL capacity)
+{
+	return in_zone(&nursery,(CELL)array) && capacity <= array_capacity(array);
+}
+
+F_ARRAY *reallot_array(F_ARRAY *array, CELL capacity)
 {
 #ifdef FACTOR_DEBUG
 	CELL header = untag_header(array->header);
 	assert(header == ARRAY_TYPE || header == BIGNUM_TYPE);
 #endif
 
-	CELL to_copy = array_capacity(array);
-	if(capacity < to_copy)
+	if(reallot_array_in_place_p(array,capacity))
+	{
+		array->capacity = tag_fixnum(capacity);
+		return array;
+	}
+	else
+	{
+		CELL to_copy = array_capacity(array);
+		if(capacity < to_copy)
 		to_copy = capacity;
 
-	REGISTER_UNTAGGED(array);
-	F_ARRAY* new_array = allot_array_internal(untag_header(array->header),capacity);
-	UNREGISTER_UNTAGGED(array);
+		REGISTER_UNTAGGED(array);
+		F_ARRAY* new_array = allot_array_internal(untag_header(array->header),capacity);
+		UNREGISTER_UNTAGGED(array);
+	
+		memcpy(new_array + 1,array + 1,to_copy * CELLS);
+		memset((char *)AREF(new_array,to_copy),'\0',(capacity - to_copy) * CELLS);
 
-	memcpy(new_array + 1,array + 1,to_copy * CELLS);
-	memset((char *)AREF(new_array,to_copy),'\0',(capacity - to_copy) * CELLS);
-
-	return new_array;
+		return new_array;
+	}
 }
 
 void primitive_resize_array(void)
 {
 	F_ARRAY* array = untag_array(dpop());
 	CELL capacity = unbox_array_size();
-	dpush(tag_object(reallot_array(array,capacity)));
+	dpush(tag_array(reallot_array(array,capacity)));
 }
 
 void growable_array_add(F_GROWABLE_ARRAY *array, CELL elt)
@@ -112,7 +125,7 @@ void growable_array_add(F_GROWABLE_ARRAY *array, CELL elt)
 	if(array->count == array_capacity(underlying))
 	{
 		underlying = reallot_array(underlying,array->count * 2);
-		array->array = tag_object(underlying);
+		array->array = tag_array(underlying);
 	}
 
 	UNREGISTER_ROOT(elt);
@@ -131,7 +144,7 @@ void growable_array_append(F_GROWABLE_ARRAY *array, F_ARRAY *elts)
 	if(new_size >= array_capacity(underlying))
 	{
 		underlying = reallot_array(underlying,new_size * 2);
-		array->array = tag_object(underlying);
+		array->array = tag_array(underlying);
 	}
 
 	UNREGISTER_UNTAGGED(elts);

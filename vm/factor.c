@@ -167,7 +167,7 @@ void pass_args_to_factor(int argc, F_CHAR **argv)
 		set_array_nth(args,i,arg);
 	}
 
-	userenv[ARGS_ENV] = tag_object(args);
+	userenv[ARGS_ENV] = tag_array(args);
 }
 
 void start_factor(F_PARAMETERS *p)

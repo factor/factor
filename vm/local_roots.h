@@ -38,7 +38,7 @@ CELL extra_roots;
 
 DEFPUSHPOP(root_,extra_roots)
 
-#define REGISTER_UNTAGGED(obj) root_push(obj ? tag_object(obj) : 0)
+#define REGISTER_UNTAGGED(obj) root_push(obj ? RETAG(obj,OBJECT_TYPE) : 0)
 #define UNREGISTER_UNTAGGED(obj) obj = untag_object(root_pop())
 
 /* We ignore strings which point outside the data heap, but we might be given

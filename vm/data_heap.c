@@ -216,12 +216,8 @@ CELL unaligned_object_size(CELL pointer)
 		return sizeof(F_QUOTATION);
 	case WORD_TYPE:
 		return sizeof(F_WORD);
-	case RATIO_TYPE:
-		return sizeof(F_RATIO);
 	case FLOAT_TYPE:
 		return sizeof(F_FLOAT);
-	case COMPLEX_TYPE:
-		return sizeof(F_COMPLEX);
 	case DLL_TYPE:
 		return sizeof(F_DLL);
 	case ALIEN_TYPE:
@@ -276,10 +272,6 @@ CELL binary_payload_start(CELL pointer)
 		tuple = untag_object(pointer);
 		layout = untag_object(tuple->layout);
 		return tuple_size(layout);
-	case RATIO_TYPE:
-		return sizeof(F_RATIO);
-	case COMPLEX_TYPE:
-		return sizeof(F_COMPLEX);
 	case WRAPPER_TYPE:
 		return sizeof(F_WRAPPER);
 	default:
@@ -291,20 +283,22 @@ CELL binary_payload_start(CELL pointer)
 /* Push memory usage statistics in data heap */
 void primitive_data_room(void)
 {
-	F_ARRAY *a = allot_array(ARRAY_TYPE,data_heap->gen_count * 2,F);
-	int gen;
-
 	dpush(tag_fixnum((data_heap->cards_end - data_heap->cards) >> 10));
 	dpush(tag_fixnum((data_heap->decks_end - data_heap->decks) >> 10));
 
+	GROWABLE_ARRAY(a);
+
+	int gen;
 	for(gen = 0; gen < data_heap->gen_count; gen++)
 	{
 		F_ZONE *z = (gen == NURSERY ? &nursery : &data_heap->generations[gen]);
-		set_array_nth(a,gen * 2,tag_fixnum((z->end - z->here) >> 10));
-		set_array_nth(a,gen * 2 + 1,tag_fixnum((z->size) >> 10));
+		GROWABLE_ARRAY_ADD(a,tag_fixnum((z->end - z->here) >> 10));
+		GROWABLE_ARRAY_ADD(a,tag_fixnum((z->size) >> 10));
 	}
 
-	dpush(tag_object(a));
+	GROWABLE_ARRAY_TRIM(a);
+	GROWABLE_ARRAY_DONE(a);
+	dpush(a);
 }
 
 /* Disables GC and activates next-object ( -- obj ) primitive */

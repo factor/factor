@@ -30,23 +30,35 @@ void primitive_uninitialized_byte_array(void)
 	dpush(tag_object(allot_byte_array_internal(size)));
 }
 
+static bool reallot_byte_array_in_place_p(F_BYTE_ARRAY *array, CELL capacity)
+{
+	return in_zone(&nursery,(CELL)array) && capacity <= array_capacity(array);
+}
+
 F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity)
 {
 #ifdef FACTOR_DEBUG
 	assert(untag_header(array->header) == BYTE_ARRAY_TYPE);
 #endif
-
-	CELL to_copy = array_capacity(array);
-	if(capacity < to_copy)
+	if(reallot_byte_array_in_place_p(array,capacity))
+	{
+		array->capacity = tag_fixnum(capacity);
+		return array;
+	}
+	else
+	{
+		CELL to_copy = array_capacity(array);
+		if(capacity < to_copy)
 		to_copy = capacity;
 
-	REGISTER_UNTAGGED(array);
-	F_BYTE_ARRAY *new_array = allot_byte_array_internal(capacity);
-	UNREGISTER_UNTAGGED(array);
+		REGISTER_UNTAGGED(array);
+		F_BYTE_ARRAY *new_array = allot_byte_array_internal(capacity);
+		UNREGISTER_UNTAGGED(array);
 
-	memcpy(new_array + 1,array + 1,to_copy);
+		memcpy(new_array + 1,array + 1,to_copy);
 
-	return new_array;
+		return new_array;
+	}
 }
 
 void primitive_resize_byte_array(void)

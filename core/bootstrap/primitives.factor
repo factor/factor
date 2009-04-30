@@ -126,9 +126,7 @@ bootstrapping? on
 "fixnum" "math" create register-builtin
 "bignum" "math" create register-builtin
 "tuple" "kernel" create register-builtin
-"ratio" "math" create register-builtin
 "float" "math" create register-builtin
-"complex" "math" create register-builtin
 "f" "syntax" lookup register-builtin
 "array" "arrays" create register-builtin
 "wrapper" "kernel" create register-builtin
@@ -147,24 +145,6 @@ bootstrapping? on
 "f?" "syntax" vocab-words delete-at
 
 ! Some unions
-"integer" "math" create
-"fixnum" "math" lookup
-"bignum" "math" lookup
-2array
-define-union-class
-
-"rational" "math" create
-"integer" "math" lookup
-"ratio" "math" lookup
-2array
-define-union-class
-
-"real" "math" create
-"rational" "math" lookup
-"float" "math" lookup
-2array
-define-union-class
-
 "c-ptr" "alien" create [
     "alien" "alien" lookup ,
     "f" "syntax" lookup ,
@@ -211,18 +191,8 @@ bi
 "bignum" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
 
-"ratio" "math" create {
-    { "numerator" { "integer" "math" } read-only }
-    { "denominator" { "integer" "math" } read-only }
-} define-builtin
-
 "float" "math" create { } define-builtin
 "float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
-
-"complex" "math" create {
-    { "real" { "real" "math" } read-only }
-    { "imaginary" { "real" "math" } read-only }
-} define-builtin
 
 "array" "arrays" create {
     { "length" { "array-capacity" "sequences.private" } read-only }
@@ -395,14 +365,12 @@ tuple
     { "float>bignum" "math.private" (( x -- y )) }
     { "fixnum>float" "math.private" (( x -- y )) }
     { "bignum>float" "math.private" (( x -- y )) }
-    { "<ratio>" "math.private" (( a b -- a/b )) }
     { "string>float" "math.private" (( str -- n/f )) }
     { "float>string" "math.private" (( n -- str )) }
     { "float>bits" "math" (( x -- n )) }
     { "double>bits" "math" (( x -- n )) }
     { "bits>float" "math" (( n -- x )) }
     { "bits>double" "math" (( n -- x )) }
-    { "<complex>" "math.private" (( x y -- z )) }
     { "fixnum+" "math.private" (( x y -- z )) }
     { "fixnum-" "math.private" (( x y -- z )) }
     { "fixnum*" "math.private" (( x y -- z )) }
