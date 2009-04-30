@@ -224,7 +224,7 @@ big-endian off
 ] pic-hi-tag-tuple jit-define
 
 [
-    temp1 HEX: ffffffff CMP rc-absolute rt-untagged jit-rel
+    temp1 HEX: ffffffff CMP rc-absolute rt-immediate jit-rel
 ] pic-check-tag jit-define
 
 [
