@@ -100,7 +100,7 @@ TYPEDEF: HANDLE              HGDIOBJ
 TYPEDEF: HANDLE              HGLOBAL
 TYPEDEF: HANDLE              HHOOK
 TYPEDEF: HANDLE              HINSTANCE
-TYPEDEF: HANDLE              HKEY
+TYPEDEF: DWORD               HKEY
 TYPEDEF: HANDLE              HKL
 TYPEDEF: HANDLE              HLOCAL
 TYPEDEF: HANDLE              HMENU

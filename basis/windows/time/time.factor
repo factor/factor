@@ -1,11 +1,11 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types kernel math windows windows.kernel32
-namespaces calendar math.bitwise ;
+USING: alien alien.c-types kernel math windows.errors
+windows.kernel32 namespaces calendar math.bitwise ;
 IN: windows.time
 
 : >64bit ( lo hi -- n )
-    32 shift bitor ;
+    32 shift bitor ; inline
 
 : windows-1601 ( -- timestamp )
     1601 1 1 0 0 0 instant <timestamp> ;
