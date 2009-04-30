@@ -89,21 +89,27 @@ M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
 : not-compiled-def ( word error -- def )
     '[ _ _ not-compiled ] [ ] like ;
 
+: ignore-error ( word error -- * )
+    drop
+    [ clear-compiler-error ]
+    [ dup def>> deoptimize-with ]
+    bi ;
+
+: remember-error ( word error -- * )
+    [ swap <compiler-error> compiler-error ]
+    [ [ drop ] [ not-compiled-def ] 2bi deoptimize-with ]
+    2bi ;
+
 : deoptimize ( word error -- * )
     #! If the error is ignorable, compile the word with the
     #! non-optimizing compiler, using its definition. Otherwise,
     #! if the compiler error is not ignorable, use a dummy
     #! definition from 'not-compiled-def' which throws an error.
-    2dup ignore-error? [
-        drop
-        [ dup def>> deoptimize-with ]
-        [ clear-compiler-error ]
-        bi
-    ] [
-        [ swap <compiler-error> compiler-error ]
-        [ [ drop ] [ not-compiled-def ] 2bi deoptimize-with ]
-        2bi
-    ] if ;
+    {
+        { [ dup inference-error? not ] [ rethrow ] }
+        { [ 2dup ignore-error? ] [ ignore-error ] }
+        [ remember-error ]
+    } cond ;
 
 : optimize? ( word -- ? )
     {
