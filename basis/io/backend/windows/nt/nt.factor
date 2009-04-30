@@ -46,7 +46,7 @@ M: winnt add-completion ( win32-handle -- )
             { [ dup integer? ] [ ] }
             { [ dup array? ] [
                 first dup eof?
-                [ drop 0 ] [ win32-error-string throw ] if
+                [ drop 0 ] [ n>win32-error-string throw ] if
             ] }
         } cond
     ] with-timeout ;
