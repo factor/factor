@@ -93,7 +93,7 @@ void primitive_modify_code_heap(void)
 			CELL literals = array_nth(compiled_code,0);
 			CELL relocation = array_nth(compiled_code,1);
 			F_ARRAY *labels = untag_array(array_nth(compiled_code,2));
-			F_ARRAY *code = untag_array(array_nth(compiled_code,3));
+			F_BYTE_ARRAY *code = untag_byte_array(array_nth(compiled_code,3));
 
 			REGISTER_UNTAGGED(alist);
 			REGISTER_UNTAGGED(word);

@@ -9,9 +9,7 @@ IN: compiler.codegen.fixup
 
 GENERIC: fixup* ( obj -- )
 
-: code-format ( -- n ) 22 getenv ;
-
-: compiled-offset ( -- n ) building get length code-format * ;
+: compiled-offset ( -- n ) building get length ;
 
 SYMBOL: relocation-table
 SYMBOL: label-table
@@ -91,4 +89,4 @@ SYMBOL: literal-table
         literal-table get >array
         relocation-table get >byte-array
         label-table get resolve-labels
-    ] { } make 4array ;
+    ] B{ } make 4array ;
