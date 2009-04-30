@@ -9,8 +9,6 @@ IN: bootstrap.ppc
 4 \ cell set
 big-endian on
 
-4 jit-code-format set
-
 CONSTANT: ds-reg 29
 CONSTANT: rs-reg 30
 
