@@ -6,7 +6,7 @@ vocabs.loader io combinators calendar accessors math.parser
 io.streams.string ui.tools.operations quotations strings arrays
 prettyprint words vocabs sorting sets classes math alien urls
 splitting ascii combinators.short-circuit alarms words.symbol
-system ;
+system summary ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -16,6 +16,10 @@ ERROR: not-a-vocab-root string ;
 ERROR: vocab-name-contains-separator path ;
 ERROR: vocab-name-contains-dot path ;
 ERROR: no-vocab vocab ;
+ERROR: bad-developer-name name ;
+
+M: bad-developer-name summary
+    drop "Developer name must be a string." ;
 
 <PRIVATE
 
@@ -101,11 +105,16 @@ ERROR: no-vocab vocab ;
     ] if ;
 
 : scaffold-authors ( vocab-root vocab -- )
-    "authors.txt" vocab-root/vocab/file>path scaffolding? [
-        [ developer-name get ] dip utf8 set-file-contents
+    developer-name get [
+        dup string? [ bad-developer-name ] unless
+        "authors.txt" vocab-root/vocab/file>path scaffolding? [
+            utf8 set-file-contents
+        ] [
+            2drop
+        ] if
     ] [
-        drop
-    ] if ;
+        2drop
+    ] if* ;
 
 : lookup-type ( string -- object/string ? )
     "new" ?head drop [ { [ CHAR: ' = ] [ digit? ] } 1|| ] trim-tail
@@ -298,9 +307,12 @@ SYMBOL: examples-flag
         "}" print
     ] with-variable ;
 
+: touch. ( path -- )
+    [ touch-file ]
+    [ "Click to edit: " write <pathname> . ] bi ;
+
 : scaffold-rc ( path -- )
-    [ home ] dip append-path
-    [ touch-file ] [ "Click to edit: " write <pathname> . ] bi ;
+    [ home ] dip append-path touch. ;
 
 : scaffold-factor-boot-rc ( -- )
     os windows? "factor-boot-rc" ".factor-boot-rc" ? scaffold-rc ;
@@ -308,4 +320,7 @@ SYMBOL: examples-flag
 : scaffold-factor-rc ( -- )
     os windows? "factor-rc" ".factor-rc" ? scaffold-rc ;
 
-: scaffold-emacs ( -- ) ".emacs" scaffold-rc ;
+
+HOOK: scaffold-emacs os ( -- )
+
+M: unix scaffold-emacs ( -- ) ".emacs" scaffold-rc ;
