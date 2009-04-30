@@ -247,8 +247,8 @@ SYMBOL: undefined-quot
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
-: emit-object ( header tag quot -- addr )
-    swap here-as [ swap tag-fixnum emit call align-here ] dip ;
+: emit-object ( class quot -- addr )
+    over tag-number here-as [ swap type-number tag-fixnum emit call align-here ] dip ;
     inline
 
 ! Write an object to the image.
@@ -293,7 +293,7 @@ GENERIC: ' ( obj -- ptr )
 
 M: bignum '
     [
-        bignum tag-number dup [ emit-bignum ] emit-object
+        bignum [ emit-bignum ] emit-object
     ] cache-object ;
 
 ! Fixnums
@@ -316,7 +316,7 @@ M: fake-bignum ' n>> tag-fixnum ;
 
 M: float '
     [
-        float tag-number dup [
+        float [
             align-here double>bits emit-64
         ] emit-object
     ] cache-object ;
@@ -360,8 +360,7 @@ M: f '
                 } cleave
             ] { } make [ ' ] map
         ] bi
-        \ word type-number object tag-number
-        [ emit-seq ] emit-object
+        \ word [ emit-seq ] emit-object
     ] keep put-object ;
 
 : word-error ( word msg -- * )
@@ -382,8 +381,7 @@ M: word ' ;
 ! Wrappers
 
 M: wrapper '
-    wrapped>> ' wrapper type-number object tag-number
-    [ emit ] emit-object ;
+    wrapped>> ' wrapper [ emit ] emit-object ;
 
 ! Strings
 : native> ( object -- object )
@@ -412,7 +410,7 @@ M: wrapper '
 
 : emit-string ( string -- ptr )
     [ length ] [ extended-part ' ] [ ] tri
-    string type-number object tag-number [
+    string [
         [ emit-fixnum ]
         [ emit ]
         [ f ' emit ascii-part pad-bytes emit-bytes ]
@@ -429,12 +427,11 @@ M: string '
 
 : emit-dummy-array ( obj type -- ptr )
     [ assert-empty ] [
-        type-number object tag-number
         [ 0 emit-fixnum ] emit-object
     ] bi* ;
 
 M: byte-array '
-    byte-array type-number object tag-number [
+    byte-array [
         dup length emit-fixnum
         pad-bytes emit-bytes
     ] emit-object ;
@@ -448,7 +445,7 @@ ERROR: tuple-removed class ;
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]
     [ class transfer-word require-tuple-layout ] bi prefix [ ' ] map
-    tuple type-number dup [ emit-seq ] emit-object ;
+    tuple [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
     dup class name>> "tombstone" =
@@ -463,8 +460,7 @@ M: tombstone '
 
 ! Arrays
 : emit-array ( array -- offset )
-    [ ' ] map array type-number object tag-number
-    [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
+    [ ' ] map array [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
 
 M: array ' emit-array ;
 
@@ -490,7 +486,7 @@ M: tuple-layout-array '
 M: quotation '
     [
         array>> '
-        quotation type-number object tag-number [
+        quotation [
             emit ! array
             f ' emit ! compiled
             f ' emit ! cached-effect
