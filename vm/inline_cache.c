@@ -52,7 +52,7 @@ static void update_pic_count(CELL type)
 
 /* picker: one of dup, over, pick
    cache_entries: array of class/method pairs */
-static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL cache_entries)
+static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL methods, CELL cache_entries)
 {
 #ifdef FACTOR_DEBUG
 	type_check(WORD_TYPE,picker);
@@ -62,6 +62,7 @@ static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL c
 
 	REGISTER_ROOT(picker);
 	REGISTER_ROOT(generic_word);
+	REGISTER_ROOT(methods);
 	REGISTER_ROOT(cache_entries);
 
 	CELL inline_cache_type = determine_inline_cache_type(cache_entries);
@@ -96,6 +97,8 @@ static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL c
 	   object being dispatched on can be popped from the top of the stack. */
 	jit_emit_subprimitive(&jit,untag_object(picker));
 	jit_push(&jit,generic_word);
+	jit_push(&jit,methods);
+	jit_push(&jit,picker);
 	jit_push(&jit,cache_entries);
 	jit_word_jump(&jit,userenv[PIC_MISS_WORD]);
 
@@ -105,6 +108,7 @@ static F_CODE_BLOCK *compile_inline_cache(CELL picker, CELL generic_word, CELL c
 	jit_dispose(&jit);
 
 	UNREGISTER_ROOT(cache_entries);
+	UNREGISTER_ROOT(methods);
 	UNREGISTER_ROOT(generic_word);
 	UNREGISTER_ROOT(picker);
 
@@ -119,28 +123,6 @@ static F_CODE_BLOCK *megamorphic_call_stub(CELL generic_word)
 	jit_compile(word->def,true);
 	UNREGISTER_UNTAGGED(word);
 	return untag_quotation(word->def)->code;
-}
-
-/* Assumes that generic word definitions look like:
-   [ <picker> <methods> <cache> lookup-method (execute) ]
-*/
-static void examine_generic_word(CELL generic_word, CELL *picker, CELL *all_methods)
-{
-	CELL def = untag_word(generic_word)->def;
-	F_QUOTATION *quot = untag_quotation(def);
-	F_ARRAY *array = untag_object(quot->array);
-
-#ifdef FACTOR_DEBUG
-	assert(array_capacity(array) == 5);
-	type_check(WORD_TYPE,array_nth(array,0));
-	type_check(ARRAY_TYPE,array_nth(array,1));
-	type_check(ARRAY_TYPE,array_nth(array,2));
-	type_check(WORD_TYPE,array_nth(array,3));
-	type_check(WORD_TYPE,array_nth(array,4));
-#endif
-
-	*picker = array_nth(array,0);
-	*all_methods = array_nth(array,1);
 }
 
 static CELL inline_cache_size(CELL cache_entries)
@@ -181,6 +163,8 @@ XT inline_cache_miss(CELL return_address)
 	check_code_pointer(return_address);
 
 	CELL cache_entries = dpop();
+	CELL picker = dpop();
+	CELL methods = dpop();
 	CELL generic_word = dpop();
 	CELL object = dpop();
 
@@ -194,21 +178,18 @@ XT inline_cache_miss(CELL return_address)
 		block = megamorphic_call_stub(generic_word);
 	else
 	{
-		CELL picker, all_methods;
-		examine_generic_word(generic_word,&picker,&all_methods);
-
 		REGISTER_ROOT(generic_word);
 		REGISTER_ROOT(cache_entries);
 		REGISTER_ROOT(picker);
-		REGISTER_ROOT(all_methods);
+		REGISTER_ROOT(methods);
 
 		CELL class = object_class(object);
-		CELL method = lookup_method(object,all_methods);
+		CELL method = lookup_method(object,methods);
 
 		cache_entries = add_inline_cache_entry(cache_entries,class,method);
-		block = compile_inline_cache(picker,generic_word,cache_entries);
+		block = compile_inline_cache(picker,generic_word,methods,cache_entries);
 
-		UNREGISTER_ROOT(all_methods);
+		UNREGISTER_ROOT(methods);
 		UNREGISTER_ROOT(picker);
 		UNREGISTER_ROOT(cache_entries);
 		UNREGISTER_ROOT(generic_word);
