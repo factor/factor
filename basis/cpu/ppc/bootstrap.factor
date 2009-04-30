@@ -62,7 +62,7 @@ CONSTANT: rs-reg 30
 
 [ 0 BL rc-relative-ppc-3 rt-xt-direct jit-rel ] jit-word-call jit-define
 
-[ 0 B rc-relative-ppc-3 rt-xt ] jit-word-jump jit-define
+[ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-word-jump jit-define
 
 [
     3 ds-reg 0 LWZ
@@ -139,19 +139,19 @@ CONSTANT: rs-reg 30
 
 [
     jit->r
-    0 BL rc-relative-ppc-3 rt-xt
+    0 BL rc-relative-ppc-3 rt-xt jit-rel
     jit-r>
 ] jit-dip jit-define
 
 [
     jit-2>r
-    0 BL rc-relative-ppc-3 rt-xt
+    0 BL rc-relative-ppc-3 rt-xt jit-rel
     jit-2r>
 ] jit-2dip jit-define
 
 [
     jit-3>r
-    0 BL rc-relative-ppc-3 rt-xt
+    0 BL rc-relative-ppc-3 rt-xt jit-rel
     jit-3r>
 ] jit-3dip jit-define
 
@@ -306,7 +306,7 @@ CONSTANT: rs-reg 30
 
 ! Comparisons
 : jit-compare ( insn -- )
-    0 3 LOAD32
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
     4 ds-reg 0 LWZ
     5 ds-reg -4 LWZU
     5 0 4 CMP
@@ -315,8 +315,7 @@ CONSTANT: rs-reg 30
     3 ds-reg 0 STW ;
 
 : define-jit-compare ( insn word -- )
-    [ [ jit-compare ] curry rc-absolute-ppc-2/2 rt-immediate 1 ] dip
-    define-sub-primitive ;
+    [ [ jit-compare ] curry ] dip define-sub-primitive ;
 
 \ BEQ \ eq? define-jit-compare
 \ BGE \ fixnum>= define-jit-compare
