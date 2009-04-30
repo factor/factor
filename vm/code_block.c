@@ -154,15 +154,15 @@ void copy_literal_references(F_CODE_BLOCK *compiled)
 
 CELL object_xt(CELL obj)
 {
-	if(type_of(obj) == WORD_TYPE)
-	{
-		F_WORD *word = untag_object(obj);
-		return (CELL)word->xt;
-	}
-	else
+	if(TAG(obj) == QUOTATION_TYPE)
 	{
 		F_QUOTATION *quot = untag_object(obj);
 		return (CELL)quot->xt;
+	}
+	else
+	{
+		F_WORD *word = untag_object(obj);
+		return (CELL)word->xt;
 	}
 }
 
@@ -215,6 +215,18 @@ void update_word_references(F_CODE_BLOCK *compiled)
 {
 	if(compiled->block.needs_fixup)
 		relocate_code_block(compiled);
+	/* update_word_references() is always applied to every block in
+	   the code heap. Since it resets all call sites to point to
+	   their canonical XT (cold entry point for non-tail calls,
+	   standard entry point for tail calls), it means that no PICs
+	   are referenced after this is done. So instead of polluting
+	   the code heap with dead PICs that will be freed on the next
+	   GC, we add them to the free list immediately. */
+	else if(compiled->block.type == PIC_TYPE)
+	{
+		fflush(stdout);
+		heap_free(&code_heap,&compiled->block);
+	}
 	else
 	{
 		iterate_relocations(compiled,update_word_references_step);

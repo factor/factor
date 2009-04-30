@@ -47,13 +47,6 @@ void copy_code_heap_roots(void)
 	iterate_code_heap(copy_literal_references);
 }
 
-/* Update literals referenced from all code blocks. Only for tenured
-collections, done at the end. */
-void update_code_heap_roots(void)
-{
-	iterate_code_heap(update_literal_and_word_references);
-}
-
 /* Update pointers to words referenced from all code blocks. Only after
 defining a new word. */
 void update_code_heap_words(void)

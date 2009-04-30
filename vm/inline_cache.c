@@ -5,6 +5,23 @@ void init_inline_caching(int max_size)
 	max_pic_size = max_size;
 }
 
+void deallocate_inline_cache(CELL return_address)
+{
+	/* Find the call target. */
+	XT old_xt = (XT)get_call_target(return_address);
+	F_CODE_BLOCK *old_block = (F_CODE_BLOCK *)old_xt - 1;
+	CELL old_type = old_block->block.type;
+
+#ifdef FACTOR_DEBUG
+	/* The call target was either another PIC,
+	   or a compiled quotation (megamorphic stub) */
+	assert(old_type == PIC_TYPE || old_type == QUOTATION_TYPE);
+#endif
+
+	if(old_type == PIC_TYPE)
+		heap_free(&code_heap,&old_block->block);
+}
+
 /* Figure out what kind of type check the PIC needs based on the methods
 it contains */
 static CELL determine_inline_cache_type(CELL cache_entries)
@@ -79,7 +96,7 @@ static F_CODE_BLOCK *compile_inline_cache(F_FIXNUM index, CELL generic_word, CEL
 	update_pic_count(inline_cache_type);
 
 	F_JIT jit;
-	jit_init(&jit,WORD_TYPE,generic_word);
+	jit_init(&jit,PIC_TYPE,generic_word);
 
 	/* Generate machine code to determine the object's class. */
 	jit_emit_class_lookup(&jit,index,inline_cache_type);
@@ -163,6 +180,11 @@ XT inline_cache_miss(CELL return_address)
 {
 	check_code_pointer(return_address);
 
+	/* Since each PIC is only referenced from a single call site,
+	   if the old call target was a PIC, we can deallocate it immediately,
+	   instead of leaving dead PICs around until the next GC. */
+	deallocate_inline_cache(return_address);
+
 	CELL cache_entries = dpop();
 	F_FIXNUM index = untag_fixnum_fast(dpop());
 	CELL methods = dpop();
@@ -195,7 +217,7 @@ XT inline_cache_miss(CELL return_address)
 	}
 
 	/* Install the new stub. */
-	set_call_site(return_address,(CELL)xt);
+	set_call_target(return_address,(CELL)xt);
 
 #ifdef PIC_DEBUG
 	printf("Updated call site 0x%lx with 0x%lx\n",return_address,(CELL)xt);

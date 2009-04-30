@@ -60,6 +60,9 @@ typedef signed long long s64;
 
 #define TYPE_COUNT 15
 
+/* Not a real type, but F_CODE_BLOCK's type field can be set to this */
+#define PIC_TYPE 69
+
 INLINE bool immediate_p(CELL obj)
 {
 	return (obj == F || TAG(obj) == FIXNUM_TYPE);

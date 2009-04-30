@@ -10,7 +10,7 @@ F_FASTCALL void lazy_jit_compile(CELL quot);
 
 void set_callstack(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *memcpy);
 
-INLINE void set_call_site(CELL return_address, CELL target)
+INLINE void check_call_site(CELL return_address)
 {
 	/* An x86 CALL instruction looks like so:
 	   |e8|..|..|..|..|
@@ -20,5 +20,16 @@ INLINE void set_call_site(CELL return_address, CELL target)
 #ifdef FACTOR_DEBUG
 	assert(*(unsigned char *)(return_address - 5) == 0xe8);
 #endif
+}
+
+INLINE CELL get_call_target(CELL return_address)
+{
+	check_call_site(return_address);
+	return *(F_FIXNUM *)(return_address - 4) + return_address;
+}
+
+INLINE void set_call_target(CELL return_address, CELL target)
+{
+	check_call_site(return_address);
 	*(F_FIXNUM *)(return_address - 4) = (target - return_address);
 }
