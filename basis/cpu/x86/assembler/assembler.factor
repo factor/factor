@@ -384,7 +384,7 @@ M: immediate CMP swap { BIN: 111 t HEX: 80 } immediate-1/4 ;
 M: operand CMP OCT: 070 2-operand ;
 
 GENERIC: TEST ( dst src -- )
-M: immediate TEST swap { BIN: 101 t HEX: 84 } immediate-1/4 ;
+M: immediate TEST swap { BIN: 0 t HEX: f7 } immediate-4 ;
 M: operand TEST OCT: 204 2-operand ;
 
 : XCHG ( dst src -- ) OCT: 207 2-operand ;
