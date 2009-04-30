@@ -11,6 +11,8 @@ BIN: 111 tag-mask set
 
 15 num-types set
 
+32 mega-cache-size set
+
 H{
     { fixnum      BIN: 000 }
     { bignum      BIN: 001 }

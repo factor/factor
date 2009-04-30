@@ -16,6 +16,8 @@ SYMBOL: tag-numbers
 
 SYMBOL: type-numbers
 
+SYMBOL: mega-cache-size
+
 : type-number ( class -- n )
     type-numbers get at ;
 

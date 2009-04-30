@@ -3,7 +3,7 @@
 USING: accessors definitions generic generic.single kernel
 namespaces words math math.order combinators sequences
 generic.single.private quotations kernel.private
-assocs arrays ;
+assocs arrays layouts ;
 IN: generic.standard
 
 TUPLE: standard-combination < single-combination # ;
@@ -47,8 +47,7 @@ M: standard-combination inline-cache-quot ( word methods -- )
     combination get #>> [ f inline-cache-miss ] 3curry [ ] like ;
 
 : make-empty-cache ( -- array )
-    generic-word get "methods" word-prop
-    assoc-size 2 * next-power-of-2 f <array> ;
+    mega-cache-size get f <array> ;
 
 M: standard-combination mega-cache-quot
     combination get #>> make-empty-cache [ mega-cache-lookup ] 3curry [ ] like ;
