@@ -105,7 +105,7 @@ M: winnt seek-handle ( n seek-type handle -- )
         GetLastError {
             { [ dup expected-io-error? ] [ drop f ] }
             { [ dup eof? ] [ drop t ] }
-            [ win32-error-string throw ]
+            [ n>win32-error-string throw ]
         } cond
     ] [ f ] if ;
 
