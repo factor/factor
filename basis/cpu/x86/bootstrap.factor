@@ -172,55 +172,64 @@ big-endian off
 
 ! ! ! Polymorphic inline caches
 
+! temp0 contains the object being dispatched on
+! temp1 contains its class
+
 ! Load a value from a stack position
 [
-    temp0 ds-reg HEX: ffffffff [+] MOV rc-absolute rt-untagged jit-rel
+    temp1 ds-reg HEX: ffffffff [+] MOV rc-absolute rt-untagged jit-rel
 ] pic-load jit-define
 
 ! Tag
-: make-pic-tag ( -- )
-    temp1 temp0 MOV
+[
     temp1 tag-mask get AND
-    temp1 tag-bits get SHL ;
+] pic-tag jit-define
 
-[ make-pic-tag ] pic-tag jit-define
-
-! The 'make' trick lets us compute the jump distance for the conditional branches there
+! The 'make' trick lets us compute the jump distance for the
+! conditional branches there
 
 ! Hi-tag
 [
-    make-pic-tag
-    temp1 object tag-number tag-fixnum CMP
+    temp0 temp1 MOV
+    temp1 tag-mask get AND
+    temp1 object tag-number CMP
     [ temp1 temp0 object tag-number neg [+] MOV ] { } make
     [ length JNE ] [ % ] bi
 ] pic-hi-tag jit-define
 
 ! Tuple
 [
-    make-pic-tag
-    temp1 tuple tag-number tag-fixnum CMP
+    temp0 temp1 MOV
+    temp1 tag-mask get AND
+    temp1 tuple tag-number CMP
     [ temp1 temp0 tuple tag-number neg bootstrap-cell + [+] MOV ] { } make
     [ length JNE ] [ % ] bi
 ] pic-tuple jit-define
 
 ! Hi-tag and tuple
 [
-    make-pic-tag
+    temp0 temp1 MOV
+    temp1 tag-mask get AND
     ! If bits 2 and 3 are set, the tag is either 6 (object) or 7 (tuple)
     temp1 BIN: 110 tag-fixnum CMP
     [
-        ! Make temp0 untagged
-        temp0 tag-mask get bitnot AND
-        ! Set temp1 to 0 for objects, and 4 or 8 for tuples
-        temp1 1 tag-fixnum AND
+        ! Untag temp0 in temp2
+        temp2 temp0 MOV
+        temp2 tag-mask get bitnot AND
+        ! Set temp1 to 0 for objects, and 1 for tuples
+        temp1 1 AND
         bootstrap-cell {
-            { 4 [ temp1 1 SHR ] }
-            { 8 [ ] }
+            { 4 [ temp1 2 SHR ] }
+            { 8 [ temp1 3 SHR ] }
         } case
         ! Load header cell or tuple layout cell
-        temp1 temp0 temp1 [+] MOV
+        temp1 temp2 temp1 [+] MOV
     ] [ ] make [ length JL ] [ % ] bi
 ] pic-hi-tag-tuple jit-define
+
+[
+    temp1 HEX: ffffffff CMP rc-absolute rt-untagged jit-rel
+] pic-check-tag jit-define
 
 [
     temp2 HEX: ffffffff MOV rc-absolute-cell rt-immediate jit-rel
