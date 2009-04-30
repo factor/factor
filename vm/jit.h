@@ -1,8 +1,7 @@
 typedef struct {
 	CELL type;
 	CELL owner;
-	CELL code_format;
-	F_GROWABLE_ARRAY code;
+	F_GROWABLE_BYTE_ARRAY code;
 	F_GROWABLE_BYTE_ARRAY relocation;
 	F_GROWABLE_ARRAY literals;
 } F_JIT;
@@ -11,7 +10,7 @@ void jit_init(F_JIT *jit, CELL jit_type, CELL owner);
 F_CODE_BLOCK *jit_make_code_block(F_JIT *jit);
 void jit_dispose(F_JIT *jit);
 
-INLINE F_ARRAY *code_to_emit(CELL template)
+INLINE F_BYTE_ARRAY *code_to_emit(CELL template)
 {
 	return untag_object(array_nth(untag_object(template),0));
 }

@@ -8,8 +8,6 @@ IN: bootstrap.x86
 
 big-endian off
 
-1 jit-code-format set
-
 [
     ! Load word
     temp0 0 MOV rc-absolute-cell rt-immediate jit-rel

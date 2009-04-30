@@ -33,8 +33,7 @@ typedef enum {
 	GLOBAL_ENV,               /* global namespace */
 
 	/* Quotation compilation in quotations.c */
-	JIT_CODE_FORMAT     = 22,
-	JIT_PROLOG,
+	JIT_PROLOG          = 23,
 	JIT_PRIMITIVE_WORD,
 	JIT_PRIMITIVE,
 	JIT_WORD_JUMP,

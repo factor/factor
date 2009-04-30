@@ -111,7 +111,7 @@ SYMBOL: jit-define-offset
         jit-define-rc get
         jit-define-rt get
         jit-define-offset get 3array
-    ] { } make prefix ;
+    ] B{ } make prefix ;
 
 : jit-define ( quot name -- )
     [ make-jit ] dip set ;
@@ -135,7 +135,6 @@ SYMBOL: bootstrap-global
 SYMBOL: bootstrap-boot-quot
 
 ! JIT parameters
-SYMBOL: jit-code-format
 SYMBOL: jit-prolog
 SYMBOL: jit-primitive-word
 SYMBOL: jit-primitive
@@ -185,7 +184,6 @@ SYMBOL: undefined-quot
     H{
         { bootstrap-boot-quot 20 }
         { bootstrap-global 21 }
-        { jit-code-format 22 }
         { jit-prolog 23 }
         { jit-primitive-word 24 }
         { jit-primitive 25 }
@@ -538,7 +536,6 @@ M: quotation '
     \ mega-cache-miss \ mega-miss-word set
     [ undefined ] undefined-quot set
     {
-        jit-code-format
         jit-prolog
         jit-primitive-word
         jit-primitive

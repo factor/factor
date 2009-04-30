@@ -310,7 +310,7 @@ worse than the duplication itself (eg, putting all state in some global
 struct.) */
 #define COUNT(name,scan) \
 	{ \
-		CELL size = array_capacity(code_to_emit(name)) * code_format; \
+		CELL size = array_capacity(code_to_emit(name)); \
 		if(offset == 0) return scan - 1; \
 		if(offset < size) return scan + 1; \
 		offset -= size; \
@@ -324,8 +324,6 @@ struct.) */
 
 F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 {
-	CELL code_format = compiled_code_format();
-
 	CELL array = untag_quotation(quot)->array;
 
 	bool stack_frame = jit_stack_frame_p(untag_object(array));

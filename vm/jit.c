@@ -13,9 +13,8 @@ void jit_init(F_JIT *jit, CELL jit_type, CELL owner)
 	REGISTER_ROOT(jit->owner);
 
 	jit->type = jit_type;
-	jit->code_format = compiled_code_format();
 
-	jit->code = make_growable_array();
+	jit->code = make_growable_byte_array();
 	REGISTER_ROOT(jit->code.array);
 	jit->relocation = make_growable_byte_array();
 	REGISTER_ROOT(jit->relocation.array);
@@ -29,7 +28,7 @@ void jit_init(F_JIT *jit, CELL jit_type, CELL owner)
 /* Allocates memory */
 F_CODE_BLOCK *jit_make_code_block(F_JIT *jit)
 {
-	growable_array_trim(&jit->code);
+	growable_byte_array_trim(&jit->code);
 	growable_byte_array_trim(&jit->relocation);
 	growable_array_trim(&jit->literals);
 
@@ -66,9 +65,9 @@ static F_REL rel_to_emit(F_JIT *jit, CELL template, bool *rel_p)
 	else
 	{
 		*rel_p = true;
-		return (to_fixnum(rel_type) << 28)
-			| (to_fixnum(rel_class) << 24)
-			| ((jit->code.count + to_fixnum(offset)) * jit->code_format);
+		return (untag_fixnum_fast(rel_type) << 28)
+			| (untag_fixnum_fast(rel_class) << 24)
+			| ((jit->code.count + untag_fixnum_fast(offset)));
 	}
 }
 
@@ -79,7 +78,8 @@ void jit_emit(F_JIT *jit, CELL template)
 	bool rel_p;
 	F_REL rel = rel_to_emit(jit,template,&rel_p);
 	if(rel_p) growable_byte_array_append(&jit->relocation,&rel,sizeof(F_REL));
-	growable_array_append(&jit->code,code_to_emit(template));
+	F_BYTE_ARRAY *code = code_to_emit(template);
+	growable_byte_array_append(&jit->code,code + 1,array_capacity(code));
 	UNREGISTER_ROOT(template);
 }
 

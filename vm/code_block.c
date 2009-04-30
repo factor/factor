@@ -396,7 +396,7 @@ void relocate_code_block(F_CODE_BLOCK *compiled)
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
-void fixup_labels(F_ARRAY *labels, CELL code_format, F_CODE_BLOCK *compiled)
+void fixup_labels(F_ARRAY *labels, F_CODE_BLOCK *compiled)
 {
 	CELL i;
 	CELL size = array_capacity(labels);
@@ -411,31 +411,6 @@ void fixup_labels(F_ARRAY *labels, CELL code_format, F_CODE_BLOCK *compiled)
 			offset + (CELL)(compiled + 1),
 			target + (CELL)(compiled + 1));
 	}
-}
-
-/* Write a sequence of integers to memory, with 'format' bytes per integer */
-void deposit_integers(CELL here, F_ARRAY *array, CELL format)
-{
-	CELL count = array_capacity(array);
-	CELL i;
-
-	for(i = 0; i < count; i++)
-	{
-		F_FIXNUM value = to_fixnum(array_nth(array,i));
-		if(format == 1)
-			bput(here + i,value);
-		else if(format == sizeof(unsigned int))
-			*(unsigned int *)(here + format * i) = value;
-		else if(format == sizeof(CELL))
-			*(CELL *)(here + format * i) = value;
-		else
-			critical_error("Bad format in deposit_integers()",format);
-	}
-}
-
-CELL compiled_code_format(void)
-{
-	return untag_fixnum_fast(userenv[JIT_CODE_FORMAT]);
 }
 
 /* Might GC */
@@ -469,7 +444,7 @@ F_CODE_BLOCK *allot_code_block(CELL size)
 /* Might GC */
 F_CODE_BLOCK *add_code_block(
 	CELL type,
-	F_ARRAY *code,
+	F_BYTE_ARRAY *code,
 	F_ARRAY *labels,
 	CELL relocation,
 	CELL literals)
@@ -477,11 +452,10 @@ F_CODE_BLOCK *add_code_block(
 #ifdef FACTOR_DEBUG
 	type_check(ARRAY_TYPE,literals);
 	type_check(BYTE_ARRAY_TYPE,relocation);
-	assert(untag_header(code->header) == ARRAY_TYPE);
+	assert(untag_header(code->header) == BYTE_ARRAY_TYPE);
 #endif
 
-	CELL code_format = compiled_code_format();
-	CELL code_length = align8(array_capacity(code) * code_format);
+	CELL code_length = align8(array_capacity(code));
 
 	REGISTER_ROOT(literals);
 	REGISTER_ROOT(relocation);
@@ -506,16 +480,11 @@ F_CODE_BLOCK *add_code_block(
 	compiled->literals = literals;
 	compiled->relocation = relocation;
 
-#ifdef FACTOR_DEBUG
-	type_check(ARRAY_TYPE,compiled->literals);
-	type_check(BYTE_ARRAY_TYPE,compiled->relocation);
-#endif
-
 	/* code */
-	deposit_integers((CELL)(compiled + 1),code,code_format);
+	memcpy(compiled + 1,code + 1,code_length);
 
 	/* fixup labels */
-	if(labels) fixup_labels(labels,code_format,compiled);
+	if(labels) fixup_labels(labels,compiled);
 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */
