@@ -555,6 +555,54 @@ M: windows-ui-backend (with-ui)
 M: windows-ui-backend beep ( -- )
     0 MessageBeep drop ;
 
+: fullscreen-RECT ( hwnd -- RECT )
+    MONITOR_DEFAULTTONEAREST MonitorFromWindow
+    "MONITORINFOEX" <c-object> dup length over set-MONITORINFOEX-cbSize
+    [ GetMonitorInfo win32-error=0/f ] keep MONITORINFOEX-rcMonitor ;
+
+: hwnd>RECT ( hwnd -- RECT )
+    "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep ;
+
+: fullscreen-flags ( -- n )
+    { WS_CAPTION WS_BORDER WS_THICKFRAME } flags ; inline
+
+: enter-fullscreen ( world -- )
+    handle>> hWnd>>
+    {
+        [
+            GWL_STYLE GetWindowLong
+            fullscreen-flags unmask
+        ]
+        [ GWL_STYLE rot SetWindowLong win32-error=0/f ]
+        [
+            HWND_TOP
+            over hwnd>RECT get-RECT-dimensions
+            SWP_FRAMECHANGED
+            SetWindowPos win32-error=0/f
+        ]
+        [ SW_MAXIMIZE ShowWindow win32-error=0/f ]
+    } cleave ;
+
+: exit-fullscreen ( world -- )
+    handle>> hWnd>>
+    {
+        [
+            GWL_STYLE GetWindowLong
+            fullscreen-flags bitor
+        ]
+        [ GWL_STYLE rot SetWindowLong win32-error=0/f ]
+        [
+            f
+            over hwnd>RECT get-RECT-dimensions
+            { SWP_NOMOVE SWP_NOSIZE SWP_NOZORDER SWP_FRAMECHANGED } flags
+            SetWindowPos win32-error=0/f
+        ]
+        [ SW_RESTORE ShowWindow win32-error=0/f ]
+    } cleave ;
+
+M: windows-ui-backend set-fullscreen* ( ? world -- )
+    swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
+
 windows-ui-backend ui-backend set-global
 
 [ "ui.tools" ] main-vocab-hook set-global
