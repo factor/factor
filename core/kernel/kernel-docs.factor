@@ -183,6 +183,20 @@ HELP: either?
     { $example "USING: kernel math prettyprint ;" "5 7 [ even? ] either? ." "f" }
 } ;
 
+HELP: execute
+{ $values { "word" word } }
+{ $description "Executes a word. Words which " { $link execute } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal word can have a static stack effect." }
+{ $examples
+    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ; inline\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
+} ;
+
+{ execute POSTPONE: execute( } related-words
+
+HELP: (execute)
+{ $values { "word" word } }
+{ $description "Executes a word without checking if it is a word first." }
+{ $warning "This word is in the " { $vocab-link "kernel.private" } " vocabulary because it is unsafe. Calling with a parameter that is not a word will crash Factor. Use " { $link execute } " instead." } ;
+
 HELP: call
 { $values { "callable" callable } }
 { $description "Calls a quotation. Words which " { $link call } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal quotation can have a static stack effect." }

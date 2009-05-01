@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax arrays
 byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors windows math.bitwise io.encodings.utf16n ;
+windows.errors math.bitwise io.encodings.utf16n ;
 IN: windows.winsock
 
 USE: libc
@@ -403,7 +403,7 @@ CONSTANT: SIO_GET_EXTENSION_FUNCTION_POINTER -939524090
 : (winsock-error-string) ( n -- str )
     ! #! WSAStartup returns the error code 'n' directly
     dup winsock-expected-error?
-    [ drop f ] [ error_message utf16n alien>string ] if ;
+    [ drop f ] [ n>win32-error-string ] if ;
 
 : winsock-error-string ( -- string/f )
     WSAGetLastError (winsock-error-string) ;

@@ -1,6 +1,7 @@
 USING: help.markup help.syntax words classes classes.algebra
 definitions kernel alien sequences math quotations
-generic.standard generic.math combinators prettyprint effects ;
+generic.single generic.standard generic.hook generic.math
+combinators prettyprint effects ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"

@@ -1,19 +1,19 @@
 USING: assocs compiler.cfg.builder compiler.cfg.optimizer
 compiler.errors compiler.tree.builder compiler.tree.optimizer
 compiler.units help.markup help.syntax io parser quotations
-sequences words words.private ;
+sequences words ;
 IN: compiler
 
-HELP: enable-compiler
+HELP: enable-optimizer
 { $description "Enables the optimizing compiler." } ;
 
-HELP: disable-compiler
+HELP: disable-optimizer
 { $description "Disable the optimizing compiler." } ;
 
 ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "Normally, new word definitions are recompiled automatically. This can be changed:"
-{ $subsection disable-compiler }
-{ $subsection enable-compiler }
+{ $subsection disable-optimizer }
+{ $subsection enable-optimizer }
 "Removing a word's optimized definition:"
 { $subsection decompile }
 "Compiling a single quotation:"

@@ -1,5 +1,4 @@
-USING: help.markup help.syntax parser vocabs.loader strings
-command-line.private ;
+USING: help.markup help.syntax parser vocabs.loader strings ;
 IN: command-line
 
 HELP: run-bootstrap-init
@@ -53,6 +52,7 @@ ARTICLE: "runtime-cli-args" "Command line switches for the VM"
     { { $snippet "-aging=" { $emphasis "n" } } "Size of aging generation (1), megabytes" }
     { { $snippet "-tenured=" { $emphasis "n" } } "Size of oldest generation (2), megabytes" }
     { { $snippet "-codeheap=" { $emphasis "n" } } "Code heap size, megabytes" }
+    { { $snippet "-pic=" { $emphasis "n" } } "Maximum inline cache size. Setting of 0 disables inline caching, > 1 enables polymorphic inline caching" }
     { { $snippet "-securegc" } "If specified, unused portions of the data heap will be zeroed out after every garbage collection" }
 }
 "If an " { $snippet "-i=" } " switch is not present, the default image file is used, which is usually a file named " { $snippet "factor.image" } " in the same directory as the runtime executable (on Windows and Mac OS X) or the current directory (on Unix)." ;

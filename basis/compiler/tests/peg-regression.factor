@@ -4,7 +4,7 @@
 ! optimization, which would batch generic word updates at the
 ! end of a compilation unit.
 
-USING: kernel accessors peg.ebnf ;
+USING: kernel accessors peg.ebnf words ;
 IN: compiler.tests.peg-regression
 
 TUPLE: pipeline-expr background ;
@@ -22,5 +22,5 @@ pipeline = "hello" => [[ ast>pipeline-expr ]]
 
 USE: tools.test
 
-[ t ] [ \ expr optimized>> ] unit-test
-[ t ] [ \ ast>pipeline-expr optimized>> ] unit-test
+[ t ] [ \ expr optimized? ] unit-test
+[ t ] [ \ ast>pipeline-expr optimized? ] unit-test

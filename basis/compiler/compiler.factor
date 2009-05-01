@@ -2,19 +2,20 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
-combinators deques search-deques macros io source-files.errors
-stack-checker stack-checker.state stack-checker.inlining
-stack-checker.errors combinators.short-circuit compiler.errors
-compiler.units compiler.tree.builder compiler.tree.optimizer
-compiler.cfg.builder compiler.cfg.optimizer compiler.cfg.linearization
-compiler.cfg.two-operand compiler.cfg.linear-scan
-compiler.cfg.stack-frame compiler.codegen compiler.utilities ;
+generic.single combinators deques search-deques macros io
+source-files.errors stack-checker stack-checker.state
+stack-checker.inlining stack-checker.errors combinators.short-circuit
+compiler.errors compiler.units compiler.tree.builder
+compiler.tree.optimizer compiler.cfg.builder compiler.cfg.optimizer
+compiler.cfg.linearization compiler.cfg.two-operand
+compiler.cfg.linear-scan compiler.cfg.stack-frame compiler.codegen
+compiler.utilities ;
 IN: compiler
 
 SYMBOL: compile-queue
 SYMBOL: compiled
 
-: queue-compile? ( word -- ? )
+: compile? ( word -- ? )
     #! Don't attempt to compile certain words.
     {
         [ "forgotten" word-prop ]
@@ -24,7 +25,7 @@ SYMBOL: compiled
     } 1|| not ;
 
 : queue-compile ( word -- )
-    dup queue-compile? [ compile-queue get push-front ] [ drop ] if ;
+    dup compile? [ compile-queue get push-front ] [ drop ] if ;
 
 : recompile-callers? ( word -- ? )
     changed-effects get key? ;
@@ -41,6 +42,14 @@ SYMBOL: compiled
     H{ } clone generic-dependencies set
     clear-compiler-error ;
 
+GENERIC: no-compile? ( word -- ? )
+
+M: word no-compile? "no-compile" word-prop ;
+
+M: method-body no-compile? "method-generic" word-prop no-compile? ;
+
+M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
+
 : ignore-error? ( word error -- ? )
     #! Ignore some errors on inline combinators, macros, and special
     #! words such as 'call'.
@@ -48,8 +57,8 @@ SYMBOL: compiled
         {
             [ macro? ]
             [ inline? ]
+            [ no-compile? ]
             [ "special" word-prop ]
-            [ "no-compile" word-prop ]
         } 1||
     ] [
         {
@@ -80,32 +89,46 @@ SYMBOL: compiled
 : not-compiled-def ( word error -- def )
     '[ _ _ not-compiled ] [ ] like ;
 
+: ignore-error ( word error -- * )
+    drop
+    [ clear-compiler-error ]
+    [ dup def>> deoptimize-with ]
+    bi ;
+
+: remember-error ( word error -- * )
+    [ swap <compiler-error> compiler-error ]
+    [ [ drop ] [ not-compiled-def ] 2bi deoptimize-with ]
+    2bi ;
+
 : deoptimize ( word error -- * )
     #! If the error is ignorable, compile the word with the
     #! non-optimizing compiler, using its definition. Otherwise,
     #! if the compiler error is not ignorable, use a dummy
     #! definition from 'not-compiled-def' which throws an error.
-    2dup ignore-error? [
-        drop
-        [ dup def>> deoptimize-with ]
-        [ clear-compiler-error ]
-        bi
-    ] [
-        [ swap <compiler-error> compiler-error ]
-        [ [ drop ] [ not-compiled-def ] 2bi deoptimize-with ]
-        2bi
-    ] if ;
+    {
+        { [ dup inference-error? not ] [ rethrow ] }
+        { [ 2dup ignore-error? ] [ ignore-error ] }
+        [ remember-error ]
+    } cond ;
+
+: optimize? ( word -- ? )
+    {
+        [ predicate-engine-word? ]
+        [ contains-breakpoints? ]
+        [ single-generic? ]
+    } 1|| not ;
 
 : frontend ( word -- nodes )
     #! If the word contains breakpoints, don't optimize it, since
     #! the walker does not support this.
-    dup contains-breakpoints? [ dup def>> deoptimize-with ] [
-        [ build-tree ] [ deoptimize ] recover optimize-tree
-    ] if ;
+    dup optimize?
+    [ [ build-tree ] [ deoptimize ] recover optimize-tree ]
+    [ dup def>> deoptimize-with ]
+    if ;
 
 : compile-dependency ( word -- )
     #! If a word calls an unoptimized word, try to compile the callee.
-    dup optimized>> [ drop ] [ queue-compile ] if ;
+    dup optimized? [ drop ] [ queue-compile ] if ;
 
 ! Only switch this off for debugging.
 SYMBOL: compile-dependencies?
@@ -161,15 +184,21 @@ M: optimizing-compiler recompile ( words -- alist )
     [
         <hashed-dlist> compile-queue set
         H{ } clone compiled set
-        [ queue-compile ] each
+        [
+            [ queue-compile ]
+            [ subwords [ compile-dependency ] each ] bi
+        ] each
         compile-queue get compile-loop
         compiled get >alist
     ] with-scope ;
 
-: enable-compiler ( -- )
+: with-optimizer ( quot -- )
+    [ optimizing-compiler compiler-impl ] dip with-variable ; inline
+
+: enable-optimizer ( -- )
     optimizing-compiler compiler-impl set-global ;
 
-: disable-compiler ( -- )
+: disable-optimizer ( -- )
     f compiler-impl set-global ;
 
 : recompile-all ( -- )

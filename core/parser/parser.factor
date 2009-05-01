@@ -272,7 +272,7 @@ print-use-hook [ [ ] ] initialize
 : parse-stream ( stream name -- quot )
     [
         [
-            lines dup parse-fresh
+            stream-lines dup parse-fresh
             [ nip ] [ finish-parsing ] 2bi
             forget-smudged
         ] with-source-file

@@ -5,7 +5,7 @@ sequences namespaces parser kernel kernel.private classes
 classes.private arrays hashtables vectors classes.tuple sbufs
 hashtables.private sequences.private math classes.tuple.private
 growable namespaces.private assocs words command-line vocabs io
-io.encodings.string libc splitting math.parser
+io.encodings.string libc splitting math.parser memory
 compiler.units math.order compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.optimizer ;
 IN: bootstrap.compiler
@@ -23,10 +23,13 @@ IN: bootstrap.compiler
 
 "cpu." cpu name>> append require
 
-enable-compiler
+enable-optimizer
+
+! Push all tuple layouts to tenured space to improve method caching
+gc
 
 : compile-unoptimized ( words -- )
-    [ optimized>> not ] filter compile ;
+    [ optimized? not ] filter compile ;
 
 nl
 "Compiling..." write flush

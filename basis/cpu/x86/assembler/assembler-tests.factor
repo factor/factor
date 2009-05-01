@@ -62,3 +62,5 @@ IN: cpu.x86.assembler.tests
 [ { HEX: 48 HEX: d3 HEX: e1 } ] [ [ RCX CL SHL ] { } make ] unit-test
 [ { HEX: 48 HEX: d3 HEX: e8 } ] [ [ RAX CL SHR ] { } make ] unit-test
 [ { HEX: 48 HEX: d3 HEX: e9 } ] [ [ RCX CL SHR ] { } make ] unit-test
+
+[ { HEX: f7 HEX: c1 HEX: d2 HEX: 04 HEX: 00 HEX: 00 } ] [ [ ECX 1234 TEST ] { } make ] unit-test

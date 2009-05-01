@@ -32,9 +32,8 @@ typedef enum {
 	BOOT_ENV            = 20, /* boot quotation */
 	GLOBAL_ENV,               /* global namespace */
 
-	/* Used by the JIT compiler */
-	JIT_CODE_FORMAT     = 22,
-	JIT_PROLOG,
+	/* Quotation compilation in quotations.c */
+	JIT_PROLOG          = 23,
 	JIT_PRIMITIVE_WORD,
 	JIT_PRIMITIVE,
 	JIT_WORD_JUMP,
@@ -42,22 +41,36 @@ typedef enum {
 	JIT_IF_WORD,
 	JIT_IF_1,
 	JIT_IF_2,
-	JIT_DISPATCH_WORD,
-	JIT_DISPATCH,
-	JIT_EPILOG,
+	JIT_EPILOG          = 33,
 	JIT_RETURN,
 	JIT_PROFILING,
 	JIT_PUSH_IMMEDIATE,
-	JIT_DECLARE_WORD    = 42,
-	JIT_SAVE_STACK,
+	JIT_SAVE_STACK = 38,
 	JIT_DIP_WORD,
 	JIT_DIP,
 	JIT_2DIP_WORD,
 	JIT_2DIP,
 	JIT_3DIP_WORD,
 	JIT_3DIP,
+	JIT_EXECUTE_WORD,
+	JIT_EXECUTE_JUMP,
+	JIT_EXECUTE_CALL,
 
-	STACK_TRACES_ENV    = 59,
+	/* Polymorphic inline cache generation in inline_cache.c */
+	PIC_LOAD            = 48,
+	PIC_TAG,
+	PIC_HI_TAG,
+	PIC_TUPLE,
+	PIC_HI_TAG_TUPLE,
+	PIC_CHECK_TAG,
+	PIC_CHECK,
+	PIC_HIT,
+	PIC_MISS_WORD,
+
+	/* Megamorphic cache generation in dispatch.c */
+	MEGA_LOOKUP         = 57,
+	MEGA_LOOKUP_WORD,
+        MEGA_MISS_WORD,
 
 	UNDEFINED_ENV       = 60, /* default quotation for undefined words */
 
@@ -70,6 +83,8 @@ typedef enum {
 	THREADS_ENV         = 64,
 	RUN_QUEUE_ENV       = 65,
 	SLEEP_QUEUE_ENV     = 66,
+
+	STACK_TRACES_ENV    = 67,
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV
@@ -126,26 +141,37 @@ INLINE CELL tag_header(CELL cell)
 	return cell << TAG_BITS;
 }
 
+INLINE void check_header(CELL cell)
+{
+#ifdef FACTOR_DEBUG
+	assert(TAG(cell) == FIXNUM_TYPE && untag_fixnum_fast(cell) < TYPE_COUNT);
+#endif
+}
+
 INLINE CELL untag_header(CELL cell)
 {
+	check_header(cell);
 	return cell >> TAG_BITS;
 }
 
-INLINE CELL tag_object(void* cell)
-{
-	return RETAG(cell,OBJECT_TYPE);
-}
-
-INLINE CELL object_type(CELL tagged)
+INLINE CELL hi_tag(CELL tagged)
 {
 	return untag_header(get(UNTAG(tagged)));
+}
+
+INLINE CELL tag_object(void *cell)
+{
+#ifdef FACTOR_DEBUG
+	assert(hi_tag((CELL)cell) >= HEADER_TYPE);
+#endif
+	return RETAG(cell,OBJECT_TYPE);
 }
 
 INLINE CELL type_of(CELL tagged)
 {
 	CELL tag = TAG(tagged);
 	if(tag == OBJECT_TYPE)
-		return object_type(tagged);
+		return hi_tag(tagged);
 	else
 		return tag;
 }
@@ -242,14 +268,10 @@ void primitive_check_datastack(void);
 void primitive_getenv(void);
 void primitive_setenv(void);
 void primitive_exit(void);
-void primitive_os_env(void);
-void primitive_os_envs(void);
-void primitive_set_os_env(void);
-void primitive_unset_os_env(void);
-void primitive_set_os_envs(void);
 void primitive_micros(void);
 void primitive_sleep(void);
 void primitive_set_slot(void);
 void primitive_load_locals(void);
+void primitive_clone(void);
 
 bool stage2;

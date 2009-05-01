@@ -1,11 +1,11 @@
-USING: definitions generic kernel kernel.private math
-math.constants parser sequences tools.test words assocs
-namespaces quotations sequences.private classes continuations
-generic.standard effects classes.tuple classes.tuple.private
-arrays vectors strings compiler.units accessors classes.algebra
-calendar prettyprint io.streams.string splitting summary
-columns math.order classes.private slots slots.private eval see
-words.symbol compiler.errors ;
+USING: definitions generic kernel kernel.private math math.constants
+parser sequences tools.test words assocs namespaces quotations
+sequences.private classes continuations generic.single
+generic.standard effects classes.tuple classes.tuple.private arrays
+vectors strings compiler.units accessors classes.algebra calendar
+prettyprint io.streams.string splitting summary columns math.order
+classes.private slots slots.private eval see words.symbol
+compiler.errors ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
