@@ -1,8 +1,8 @@
-USING: accessors assocs bson.constants bson.writer combinators
+USING: accessors assocs bson.constants bson.writer combinators combinators.smart
 constructors continuations destructors formatting fry io io.pools
 io.encodings.binary io.sockets io.streams.duplex kernel linked-assocs hashtables
-math math.parser memoize mongodb.connection mongodb.msg mongodb.operations namespaces
-parser prettyprint sequences sets splitting strings uuid arrays ;
+namespaces parser prettyprint sequences sets splitting strings uuid arrays
+math math.parser memoize mongodb.connection mongodb.msg mongodb.operations  ;
 
 IN: mongodb.driver
 
@@ -10,72 +10,72 @@ TUPLE: mdb-pool < pool mdb ;
 
 TUPLE: mdb-cursor id query ;
 
-UNION: boolean t POSTPONE: f ;
-
 TUPLE: mdb-collection
 { name string }
 { capped boolean initial: f }
 { size integer initial: -1 }
 { max integer initial: -1 } ;
 
-: <mdb-collection> ( name -- collection )
-    [ mdb-collection new ] dip >>name ; inline
+CONSTRUCTOR: mdb-collection ( name -- collection ) ;
+
+TUPLE: index-spec
+{ ns string } { name string } { key hashtable } { unique? boolean initial: f } ;
+
+CONSTRUCTOR: index-spec ( ns name key -- index-spec ) ;
+
+: unique-index ( index-spec -- index-spec )
+    t >>unique? ;
 
 M: mdb-pool make-connection
     mdb>> mdb-open ;
 
-: <mdb-pool> ( mdb -- pool ) mdb-pool <pool> swap >>mdb ;
-
-CONSTANT: MDB-GENERAL-ERROR 1
+: <mdb-pool> ( mdb -- pool ) [ mdb-pool <pool> ] dip >>mdb ; inline
 
 CONSTANT: PARTIAL? "partial?"
-CONSTANT: DIRTY? "dirty?"
 
-ERROR: mdb-error id msg ;
+ERROR: mdb-error msg ;
+
+: >pwd-digest ( user password -- digest )
+    "mongo" swap 3array ":" join md5-checksum ; 
 
 <PRIVATE
 
-GENERIC: <mdb-cursor> ( id query/get-more -- cursor )
+GENERIC: <mdb-cursor> ( id mdb-query-msg/mdb-getmore-msg -- mdb-cursor )
+
 M: mdb-query-msg <mdb-cursor>
     mdb-cursor boa ;
+
 M: mdb-getmore-msg <mdb-cursor>
     query>> mdb-cursor boa ;
 
 : >mdbregexp ( value -- regexp )
    first <mdbregexp> ; inline
 
-PRIVATE>
+GENERIC: update-query ( mdb-result-msg mdb-query-msg/mdb-getmore-msg -- )
 
-SYNTAX: r/ ( token -- mdbregexp )
-    \ / [ >mdbregexp ]  parse-literal ; 
-
-: with-db ( mdb quot -- ... )
-    '[ _ mdb-open &dispose _ with-connection ] with-destructors ; inline
-  
-: build-id-selector ( assoc -- selector )
-    [ MDB_OID_FIELD swap at ] keep
-    H{ } clone [ set-at ] keep ;
-
-GENERIC: update-query ( result query/cursor -- )
 M: mdb-query-msg update-query 
     swap [ start#>> ] [ returned#>> ] bi + >>skip# drop ;
+
 M: mdb-getmore-msg update-query
     query>> update-query ; 
       
-: make-cursor ( mdb-result-msg query/cursor -- cursor/f )
+: make-cursor ( mdb-result-msg mdb-query-msg/mdb-getmore-msg -- mdb-cursor/f )
     over cursor>> 0 > 
     [ [ update-query ]
       [ [ cursor>> ] dip <mdb-cursor> ] 2bi
     ] [ 2drop f ] if ;
 
 DEFER: send-query
-GENERIC: verify-query-result ( result query/get-more -- mdb-result-msg query/get-more ) 
+
+GENERIC: verify-query-result ( mdb-result-msg mdb-query-msg/mdb-getmore-msg -- mdb-result-msg mdb-query-msg/mdb-getmore-msg ) 
+
 M: mdb-query-msg verify-query-result ;
+
 M: mdb-getmore-msg verify-query-result
     over flags>> ResultFlag_CursorNotFound =
     [ nip query>> [ send-query-plain ] keep ] when ;
     
-: send-query ( query/get-more -- cursor/f result )
+: send-query ( mdb-query-msg/mdb-getmore-msg -- mdb-cursor/f seq )
     [ send-query-plain ] keep
     verify-query-result 
     [ collection>> >>collection drop ]
@@ -85,16 +85,27 @@ M: mdb-getmore-msg verify-query-result
 
 PRIVATE>
 
+SYNTAX: r/ ( token -- mdbregexp )
+    \ / [ >mdbregexp ] parse-literal ; 
+
+: with-db ( mdb quot -- * )
+    '[ _ mdb-open &dispose _ with-connection ] with-destructors ; inline
+  
+: >id-selector ( assoc -- selector )
+    [ MDB_OID_FIELD swap at ] keep
+    H{ } clone [ set-at ] keep ;
+
 : <mdb> ( db host port -- mdb )
    <inet> t [ <mdb-node> ] keep
    H{ } clone [ set-at ] keep <mdb-db>
    [ verify-nodes ] keep ;
 
 GENERIC: create-collection ( name -- )
+
 M: string create-collection
     <mdb-collection> create-collection ;
 
-M: mdb-collection create-collection ( mdb-collection -- )
+M: mdb-collection create-collection
     [ cmd-collection ] dip
     <linked-hash> [
         [ [ name>> "create" ] dip set-at ]
@@ -116,8 +127,6 @@ M: mdb-collection create-collection ( mdb-collection -- )
     [ ";$." intersect length 0 > ] keep
     '[ _ "%s contains invalid characters ( . $ ; )" sprintf throw ] when ; inline
 
-USE: tools.continuations
-
 : (ensure-collection) ( collection --  )
     mdb-instance collections>> dup keys length 0 = 
     [ load-collection-list      
@@ -127,10 +136,10 @@ USE: tools.continuations
     [ dup ] dip key? [ drop ]
     [ [ ensure-valid-collection-name ] keep create-collection ] if ; 
 
-MEMO: reserved-namespace? ( name -- ? )
+: reserved-namespace? ( name -- ? )
     [ "$cmd" = ] [ "system" head? ] bi or ;
-    
-MEMO: check-collection ( collection -- fq-collection )
+
+: check-collection ( collection -- fq-collection )
     dup mdb-collection? [ name>> ] when
     "." split1 over mdb-instance name>> =
     [ nip ] [ drop ] if
@@ -140,54 +149,67 @@ MEMO: check-collection ( collection -- fq-collection )
 
 : fix-query-collection ( mdb-query -- mdb-query )
     [ check-collection ] change-collection ; inline
-    
-PRIVATE>
 
-: <query> ( collection query -- mdb-query )
-    <mdb-query-msg> ; inline
+GENERIC: get-more ( mdb-cursor -- mdb-cursor seq )
 
-GENERIC# limit 1 ( mdb-query limit# -- mdb-query )
-M: mdb-query-msg limit ( query limit# -- mdb-query )
-    >>return# ; inline
-
-GENERIC# skip 1 ( mdb-query skip# -- mdb-query )
-M: mdb-query-msg skip ( query skip# -- mdb-query )
-    >>skip# ; inline
-
-: asc ( key -- spec ) [ 1 ] dip H{ } clone [ set-at ] keep ; inline
-: desc ( key -- spec ) [ -1 ] dip H{ } clone [ set-at ] keep ; inline
-
-GENERIC# sort 1 ( mdb-query quot -- mdb-query )
-M: mdb-query-msg sort ( query qout -- mdb-query )
-    [ { } ] dip with-datastack >>orderby ;
-
-GENERIC# hint 1 ( mdb-query index-hint -- mdb-query )
-M: mdb-query-msg hint ( mdb-query index-hint -- mdb-query )
-    >>hint ;
-
-GENERIC: get-more ( mdb-cursor -- mdb-cursor objects )
-M: mdb-cursor get-more ( mdb-cursor -- mdb-cursor objects )
+M: mdb-cursor get-more 
     [ [ query>> dup [ collection>> ] [ return#>> ] bi ]
       [ id>> ] bi <mdb-getmore-msg> swap >>query send-query ] 
     [ f f ] if* ;
 
-GENERIC: find ( mdb-query -- cursor result )
+PRIVATE>
+
+: <query> ( collection assoc -- mdb-query-msg )
+    <mdb-query-msg> ; inline
+
+GENERIC# limit 1 ( mdb-query-msg limit# -- mdb-query )
+
+M: mdb-query-msg limit 
+    >>return# ; inline
+
+GENERIC# skip 1 ( mdb-query-msg skip# -- mdb-query-msg )
+
+M: mdb-query-msg skip 
+    >>skip# ; inline
+
+: asc ( key -- spec ) 1 2array ; inline
+: desc ( key -- spec ) -1 2array ; inline
+
+GENERIC# sort 1 ( mdb-query-msg sort-quot -- mdb-query-msg )
+
+M: mdb-query-msg sort
+    output>array >>orderby ; inline
+
+: key-spec ( spec-quot -- spec-assoc )
+    output>array >hashtable ; inline
+
+GENERIC# hint 1 ( mdb-query-msg index-hint -- mdb-query-msg )
+
+M: mdb-query-msg hint 
+    >>hint ;
+
+GENERIC: find ( mdb-query-msg/mdb-cursor -- mdb-cursor seq )
+
 M: mdb-query-msg find
     fix-query-collection send-query ;
+
 M: mdb-cursor find
     get-more ;
 
-GENERIC: explain. ( mdb-query -- )
+GENERIC: explain. ( mdb-query-msg -- )
+
 M: mdb-query-msg explain.
     t >>explain find nip . ;
 
-GENERIC: find-one ( mdb-query -- result/f )
+GENERIC: find-one ( mdb-query-msg -- result/f )
+
 M: mdb-query-msg find-one
     fix-query-collection 
     1 >>return# send-query-plain objects>>
     dup empty? [ drop f ] [ first ] if ;
 
-GENERIC: count ( mdb-query -- result )
+GENERIC: count ( mdb-query-msg -- result )
+
 M: mdb-query-msg count    
     [ collection>> "count" H{ } clone [ set-at ] keep ] keep
     query>> [ over [ "query" ] dip set-at ] when*
@@ -199,18 +221,20 @@ M: mdb-query-msg count
     find-one [ "err" ] dip at ;
 
 GENERIC: validate. ( collection -- )
+
 M: string validate.
     [ cmd-collection ] dip
     "validate" H{ } clone [ set-at ] keep
     <mdb-query-msg> find-one [ check-ok nip ] keep
     '[ "result" _ at print ] [  ] if ;
+
 M: mdb-collection validate.
     name>> validate. ;
 
 <PRIVATE
 
 : send-message-check-error ( message -- )
-    send-message lasterror [ [ MDB-GENERAL-ERROR ] dip mdb-error ] when* ;
+    send-message lasterror [ mdb-error ] when* ;
 
 PRIVATE>
 
@@ -224,15 +248,16 @@ M: assoc save-unsafe
     [ check-collection ] dip
     <mdb-insert-msg> send-message ;
 
-GENERIC: ensure-index ( collection name spec -- )
-M: assoc ensure-index
-    H{ } clone
-    [ [ uuid1 "_id" ] dip set-at ] keep
-    [ [ "key" ] dip set-at ] keep
-    [ [ "name" ] dip set-at ] keep
-    [ [ index-ns "ns" ] dip set-at ] keep
-    [ index-collection ] dip
-    save ;
+GENERIC: ensure-index ( index-spec -- )
+M: index-spec ensure-index
+    <linked-hash> [ [ uuid1 "_id" ] dip set-at ] keep
+    [ { [ [ name>> "name" ] dip set-at ]
+        [ [ ns>> index-ns "ns" ] dip set-at ]
+        [ [ key>> "key" ] dip set-at ]
+        [ swap unique?>>
+          [ swap [ "unique" ] dip set-at ] [ drop ] if* ] } 2cleave
+    ] keep
+    [ index-collection ] dip save ;
 
 : drop-index ( collection name -- )
     H{ } clone
@@ -277,6 +302,4 @@ M: assoc delete-unsafe
     "drop" H{ } clone [ set-at ] keep
     <mdb-query-msg> find-one drop ;
 
-: >pwd-digest ( user password -- digest )
-    "mongo" swap 3array ":" join md5-checksum ; 
 

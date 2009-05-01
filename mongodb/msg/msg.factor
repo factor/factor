@@ -91,7 +91,7 @@ M: sequence <mdb-insert-msg> ( collection sequence -- mdb-insert-msg )
     [ >>collection ] dip
     >>objects OP_Insert >>opcode ;
 
-M: hashtable <mdb-insert-msg> ( collection assoc -- mdb-insert-msg )
+M: assoc <mdb-insert-msg> ( collection assoc -- mdb-insert-msg )
     [ mdb-insert-msg new ] 2dip
     [ >>collection ] dip
     V{ } clone tuck push

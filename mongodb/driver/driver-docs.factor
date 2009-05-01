@@ -10,7 +10,8 @@ HELP: <mdb-collection>
 }
 { $description "Creates a new mdb-collection instance. Use this to create capped/limited collections. See also: " { $link mdb-collection } }
 { $examples
-  { $example "\"mycollection\" <mdb-collection> t >>capped" } } ;
+  { $example "! creates a mdb-collection instance capped to a maximum of 1000000 entries"
+    "\"mycollection\" <mdb-collection> t >>capped 1000000 >>max" } } ;
 
 HELP: <mdb>
 { $values
@@ -26,8 +27,8 @@ HELP: <mdb>
 HELP: <query>
 { $values
   { "collection" "collection to query" }
-  { "query" "query assoc" }
-  { "mdb-query" "mdb-query-msg instance" }
+  { "assoc" "query assoc" }
+  { "mdb-query-msg" "mdb-query-msg instance" }
 }
 { $description "Creates a new mdb-query-msg instance. "
   "This word must be called from within a with-db scope."
@@ -41,176 +42,164 @@ HELP: <update>
   { "collection" "collection to update" }
   { "selector" "selector assoc (selects which object(s) to update" }
   { "object" "updated object or update instruction" }
-  { "update-msg" "mdb-update-msg instance" }
+  { "mdb-update-msg" "mdb-update-msg instance" }
 }
-{ $description "" } ;
+{ $description "Creates an update message for the object(s) identified by the given selector."
+  "MongoDB supports full object updates as well as partial update modifiers such as $set, $inc or $push"
+  "For more information see: " { $url "http://www.mongodb.org/display/DOCS/Updates" } } ;
 
 HELP: >upsert
 { $values
-  { "mdb-update-msg" null }
-  { "mdb-update-msg" null }
+  { "mdb-update-msg" "a mdb-update-msg" }
+  { "mdb-update-msg" "mdb-update-msg with the upsert indicator set to t" }
 }
-{ $description "" } ;
-
-HELP: DIRTY?
-{ $values
-  
-  { "value" null }
-}
-{ $description "" } ;
-
-HELP: MDB-GENERAL-ERROR
-{ $values
-  
-  { "value" null }
-}
-{ $description "" } ;
+{ $description "Marks a mdb-update-msg as upsert operation"
+  "(inserts object identified by the update selector if it doesn't exist in the collection)" } ;
 
 HELP: PARTIAL?
-{ $values
-  
-  { "value" null }
+{ $values  
+  { "value" "partial?" }
 }
-{ $description "" } ;
+{ $description "key which refers to a partially loaded object" } ;
 
 HELP: asc
 { $values
-  { "key" null }
-  { "spec" null }
+  { "key" "sort key" }
+  { "spec" "sort spec" }
 }
-{ $description "" } ;
-
-HELP: boolean
-{ $var-description "" } ;
+{ $description "indicates that the values of the specified key should be sorted in ascending order" } ;
 
 HELP: count
 { $values
-  { "collection" null }
-  { "query" null }
-  { "result" null }
+  { "mdb-query-msg" "query" }
+  { "result" "number of objects in the collection that match the query" }
 }
-{ $description "" } ;
+{ $description "count objects in a collection" } ;
 
 HELP: create-collection
 { $values
-  { "name" null }
+  { "name" "collection name" }
 }
-{ $description "" } ;
+{ $description "Creates a new collection with the given name." } ;
 
 HELP: delete
 { $values
-  { "collection" null }
-  { "selector" null }
+  { "collection" "a collection" }
+  { "selector" "assoc which identifies the objects to be removed from the collection" }
 }
-{ $description "" } ;
+{ $description "removes objects from the collection (with lasterror check)" } ;
 
 HELP: delete-unsafe
 { $values
-  { "collection" null }
-  { "selector" null }
+  { "collection" "a collection" }
+  { "selector" "assoc which identifies the objects to be removed from the collection" }
 }
-{ $description "" } ;
+{ $description "removes objects from the collection (without error check)" } ;
 
 HELP: desc
 { $values
-  { "key" null }
-  { "spec" null }
+  { "key" "sort key" }
+  { "spec" "sort spec" }
 }
-{ $description "" } ;
+{ $description "indicates that the values of the specified key should be sorted in descending order" } ;
 
 HELP: drop-collection
 { $values
-  { "name" null }
+  { "name" "a collection" }
 }
-{ $description "" } ;
+{ $description "removes the collection and all objects in it from the database" } ;
 
 HELP: drop-index
 { $values
-  { "collection" null }
-  { "name" null }
+  { "collection" "a collection" }
+  { "name" "an index name" }
 }
-{ $description "" } ;
+{ $description "drops the specified index from the collection" } ;
 
 HELP: ensure-collection
 { $values
-  { "collection" null }
-  { "fq-collection" null }
+  { "collection" "a collection; e.g. mycollection " }
+  { "fq-collection" "full qualified collection name; e.g. db.mycollection" }
 }
-{ $description "" } ;
+{ $description "ensures that the collection exists in the database and returns its full qualified name" } ;
 
 HELP: ensure-index
 { $values
-  { "collection" null }
-  { "name" null }
-  { "spec" null }
+  { "collection" "a collection" }
+  { "name" "index name" }
+  { "spec" "index spec" }
 }
-{ $description "" } ;
+{ $description "Ensures the existence of the given index. "
+  "For more information on MongoDB indexes see: " { $url "http://www.mongodb.org/display/DOCS/Indexes" } }
+{ $examples
+  { $example "\"mycollection\" nameIdx [ \"name\" asc ] keyspec <index-spec> ensure-index" }
+  { $example "\"mycollection\" nameIdx [ \"name\" asc ] keyspec <index-spec> unique-index ensure-index" } } ;
 
 HELP: explain.
 { $values
-  { "mdb-query" null }
+  { "mdb-query-msg" "a query message" }
 }
-{ $description "" } ;
+{ $description "Prints the execution plan for the given query" } ;
 
 HELP: find
 { $values
-  { "mdb-query" null }
-  { "cursor" null }
-  { "result" null }
+  { "mdb-query" "a query" }
+  { "cursor" "a cursor (if there are more results) or f" }
+  { "result" "a sequences of objects" }
 }
-{ $description "" } ;
+{ $description "executes the given query" }
+{ $examples
+  { $example "\"mycollection\" H{ { \"name\" \"Alfred\" } } <query> find " } } ;
 
 HELP: find-one
 { $values
-  { "mdb-query" null }
-  { "result" null }
+  { "mdb-query" "a query" }
+  { "result" "a single object or f" }
 }
-{ $description "" } ;
-
-HELP: get-more
-{ $values
-  { "mdb-cursor" null }
-  { "mdb-cursor" null }
-  { "objects" null }
-}
-{ $description "" } ;
+{ $description "Executes the query and returns one object at most" } ;
 
 HELP: hint
 { $values
-  { "mdb-query" null }
-  { "index-hint" null }
-  { "mdb-query" null }
+  { "mdb-query" "a query" }
+  { "index-hint" "a hint to an index" }
+  { "mdb-query" "modified query object" }
 }
-{ $description "" } ;
+{ $description "Annotates the query with a hint to an index. "
+  "For detailed information see: " { $url "http://www.mongodb.org/display/DOCS/Optimizing+Mongo+Performance#OptimizingMongoPerformance-Hint" } }
+{ $examples
+  { $example "\"mycollection\" H{ { \"name\" \"Alfred\" } { \"age\" 70 } } <query> H{ { \"name\" 1 } } hint find" } } ;
 
 HELP: lasterror
 { $values
   
-  { "error" null }
+  { "error" "error message or f" }
 }
-{ $description "" } ;
+{ $description "Checks if the last operation resulted in an error on the MongoDB side"
+  "For more information see: " { $url "http://www.mongodb.org/display/DOCS/Mongo+Commands#MongoCommands-LastErrorCommands" } } ;
 
 HELP: limit
 { $values
-  { "mdb-query" null }
-  { "limit#" null }
-  { "mdb-query" null }
+  { "mdb-query" "a query" }
+  { "limit#" "number of objects that should be returned at most" }
+  { "mdb-query" "modified query object" }
 }
-{ $description "" } ;
+{ $description "Limits the number of returned objects to limit#" }
+{ $examples
+  { $example "\"mycollection\" H{ } <query> 10 limit find" } } ;
 
 HELP: load-collection-list
 { $values
   
-  { "collection-list" null }
+  { "collection-list" "list of collections in the current database" }
 }
-{ $description "" } ;
+{ $description "Returns a list of all collections that exist in the current database" } ;
 
 HELP: load-index-list
 { $values
   
-  { "index-list" null }
+  { "index-list" "list of indexes" }
 }
-{ $description "" } ;
+{ $description "Returns a list of all indexes that exist in the current database" } ;
 
 HELP: mdb-collection
 { $var-description "" } ;
@@ -220,8 +209,7 @@ HELP: mdb-cursor
 
 HELP: mdb-error
 { $values
-  { "id" null }
-  { "msg" null }
+  { "msg" "error message" }
 }
 { $description "" } ;
 
@@ -234,10 +222,11 @@ HELP: r/
 
 HELP: save
 { $values
-  { "collection" null }
-  { "assoc" assoc }
+  { "collection" "a collection" }
+  { "assoc" "object" }
 }
-{ $description "" } ;
+{ $description "Saves the object to the given collection."
+  " If the object contains a field name \"_id\" this command automatically performs an update (with upsert) instead of a plain save" } ;
 
 HELP: save-unsafe
 { $values
