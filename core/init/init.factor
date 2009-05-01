@@ -1,6 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private sequences assocs namespaces namespaces.private ;
+USING: continuations continuations.private kernel
+kernel.private sequences assocs namespaces namespaces.private
+continuations continuations.private ;
 IN: init
 
 SYMBOL: init-hooks
@@ -14,7 +16,7 @@ init-hooks global [ drop V{ } clone ] cache drop
     dup init-hooks get at [ over call( -- ) ] unless
     init-hooks get set-at ;
 
-: boot ( -- ) init-namespaces ;
+: boot ( -- ) init-namespaces init-catchstack init-error-handler ;
 
 : boot-quot ( -- quot ) 20 getenv ;
 

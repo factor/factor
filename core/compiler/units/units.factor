@@ -61,6 +61,10 @@ GENERIC: definitions-changed ( assoc obj -- )
 [ V{ } clone definition-observers set-global ]
 "compiler.units" add-init-hook
 
+! This goes here because vocabs cannot depend on init
+[ V{ } clone vocab-observers set-global ]
+"vocabs" add-init-hook
+
 : add-definition-observer ( obj -- )
     definition-observers get push ;
 
