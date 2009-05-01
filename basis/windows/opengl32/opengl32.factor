@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax parser namespaces kernel
-math math.bitwise windows.types init assocs
+math math.bitwise windows.types init assocs splitting
 sequences libc opengl.gl opengl.gl.extensions opengl.gl.windows ;
 IN: windows.opengl32
 
@@ -103,7 +103,7 @@ FUNCTION: BOOL wglMakeCurrent ( HDC hDC, HGLRC hglrc ) ;
 
 ! WGL_ARB_extensions_string extension
 
-GL-FUNCTION: char* wglGetExtensionsStringARB ( HDC hDC ) ;
+GL-FUNCTION: char* wglGetExtensionsStringARB { } ( HDC hDC ) ;
 
 ! WGL_ARB_pixel_format extension
 
@@ -160,7 +160,7 @@ CONSTANT: WGL_SWAP_UNDEFINED_ARB          HEX: 202A
 CONSTANT: WGL_TYPE_RGBA_ARB               HEX: 202B
 CONSTANT: WGL_TYPE_COLORINDEX_ARB         HEX: 202C
 
-GL-FUNCTION: BOOL wglGetPixelFormatAttribivARB (
+GL-FUNCTION: BOOL wglGetPixelFormatAttribivARB { } (
         HDC hdc,
         int iPixelFormat,
         int iLayerPlane,
@@ -169,7 +169,7 @@ GL-FUNCTION: BOOL wglGetPixelFormatAttribivARB (
         int* piValues
     ) ;
 
-GL-FUNCTION: BOOL wglGetPixelFormatAttribfvARB (
+GL-FUNCTION: BOOL wglGetPixelFormatAttribfvARB { } (
         HDC hdc,
         int iPixelFormat,
         int iLayerPlane,
@@ -178,7 +178,7 @@ GL-FUNCTION: BOOL wglGetPixelFormatAttribfvARB (
         FLOAT* pfValues
     ) ;
 
-GL-FUNCTION: BOOL wglChoosePixelFormatARB (
+GL-FUNCTION: BOOL wglChoosePixelFormatARB { } (
         HDC hdc,
         int* piAttribIList,
         FLOAT* pfAttribFList,
