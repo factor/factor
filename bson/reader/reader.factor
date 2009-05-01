@@ -158,7 +158,7 @@ M: bson-double element-data-read ( type -- double )
 
 M: bson-boolean element-data-read ( type -- boolean )
    drop
-   read-byte t = ;
+   read-byte 1 = ;
 
 M: bson-date element-data-read ( type -- timestamp )
    drop
