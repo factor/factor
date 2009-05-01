@@ -71,7 +71,7 @@ t specialize-method? set-global
 SYNTAX: HINTS:
     scan-object
     [ changed-definition ]
-    [ parse-definition "specializer" set-word-prop ] bi ;
+    [ parse-definition { } like "specializer" set-word-prop ] bi ;
 
 ! Default specializers
 { first first2 first3 first4 }

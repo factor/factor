@@ -4,7 +4,7 @@ sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
-compiler ;
+compiler definitions ;
 IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
@@ -384,3 +384,9 @@ DEFER: loop-bbb
     1 >bignum 2 >bignum
     [ { bignum integer } declare [ shift ] keep 1+ ] compile-call
 ] unit-test
+
+: broken-declaration ( -- ) \ + declare ;
+
+[ f ] [ \ broken-declaration optimized? ] unit-test
+
+[ ] [ [ \ broken-declaration forget ] with-compilation-unit ] unit-test
