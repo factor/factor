@@ -290,7 +290,6 @@ $nl
 "The above are syntax sugar. The underlying words are a bit more verbose but allow non-constant effects to be passed in:"
 { $subsection call-effect }
 { $subsection execute-effect }
-{ $subsection "call-unsafe" }
 "The combinator variants that do not take an effect declaration can only be used if the compiler is able to infer the stack effect by other means. See " { $link "inference-combinators" } "."
 { $subsection "call-unsafe" }
 { $see-also "effects" "inference" } ;
@@ -306,6 +305,7 @@ ARTICLE: "combinators" "Combinators"
 { $subsection "combinators.smart" }
 "More combinators are defined for working on data structures, such as " { $link "sequences-combinators" } " and " { $link "assocs-combinators" } "."
 { $subsection "combinators-quot" }
+{ $subsection "generalizations" }
 { $see-also "quotations" } ;
 
 ABOUT: "combinators"

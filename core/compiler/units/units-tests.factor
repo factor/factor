@@ -19,7 +19,7 @@ IN: compiler.units.tests
 ] unit-test
 
 [ "A" "B" ] [
-    disable-compiler
+    disable-optimizer
 
     gensym "a" set
     gensym "b" set
@@ -33,7 +33,7 @@ IN: compiler.units.tests
     ] with-compilation-unit
     "b" get execute
 
-    enable-compiler
+    enable-optimizer
 ] unit-test
 
 ! Check that we notify observers

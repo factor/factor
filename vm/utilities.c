@@ -50,6 +50,6 @@ void print_fixnum(F_FIXNUM x)
 CELL read_cell_hex(void)
 {
 	CELL cell;
-	scanf(CELL_HEX_FORMAT,&cell);
+	if(scanf(CELL_HEX_FORMAT,&cell) < 0) exit(1);
 	return cell;
 };

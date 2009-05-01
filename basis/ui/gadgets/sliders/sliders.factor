@@ -53,8 +53,8 @@ CONSTANT: min-thumb-dim 30
     [ slider-max* 1 max ]
     bi / ;
 
-: slider>screen ( m slider -- n ) slider-scale * elevator-padding + ;
-: screen>slider ( m slider -- n ) [ elevator-padding - ] dip slider-scale / ;
+: slider>screen ( m slider -- n ) slider-scale * ;
+: screen>slider ( m slider -- n ) slider-scale / ;
 
 M: slider model-changed nip elevator>> relayout-1 ;
 
@@ -133,7 +133,7 @@ elevator H{
         swap >>orientation ;
 
 : thumb-loc ( slider -- loc )
-    [ slider-value ] keep slider>screen ;
+    [ slider-value ] keep slider>screen elevator-padding + ;
 
 : layout-thumb-loc ( thumb slider -- )
     [ thumb-loc ] [ orientation>> ] bi n*v
