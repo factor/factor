@@ -239,7 +239,7 @@ M: iokit-game-input-backend (reset-game-input)
 
 M: iokit-game-input-backend (close-game-input)
     +hid-manager+ get-global [
-        +hid-manager+ global [ 
+        +hid-manager+ [ 
             [
                 CFRunLoopGetMain CFRunLoopDefaultMode
                 IOHIDManagerUnscheduleFromRunLoop
@@ -247,7 +247,7 @@ M: iokit-game-input-backend (close-game-input)
             [ 0 IOHIDManagerClose drop ]
             [ CFRelease ] tri
             f
-        ] change-at
+        ] change-global
         f +keyboard-state+ set-global
         f +controller-states+ set-global
     ] when ;

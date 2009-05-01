@@ -4,9 +4,9 @@ math.parser models models.arrow models.history namespaces random
 sequences splitting ui ui.gadgets.alerts ui.gadgets.book-extras
 ui.gadgets.books ui.gadgets.buttons ui.gadgets.frames
 ui.gadgets.grids ui.gadgets.labels ui.gadgets.tracks fonts
-wrap.strings ;
+wrap.strings system ;
 
-IN: drills
+IN: drills.deployed
 SYMBOLS: it startLength ;
 : big ( gadget -- gadget ) T{ font { name "sans-serif" } { size 30 } } >>font ;
 : card ( model quot -- button ) <arrow> <label-control> big [ next ] <book-btn> ;
@@ -30,7 +30,7 @@ it get [ length startLength get swap - number>string "/" startLength get number>
          [ utf8 file-lines [ "\t" split [ 25 wrap-string ] map ] map dup [ first2 swap 2array ] map append ] map concat
             [ length startLength set-global ] keep <history> [ add-history ] [ show ] bi
          "Got it?" open-window
-   ] when*
+   ] [ 0 exit ] if*
 ] with-ui ;
 
 MAIN: drill
