@@ -1,4 +1,6 @@
-USING: accessors destructors kernel math ui.backend ;
+USING: accessors assocs classes destructors functors kernel
+lexer math parser sequences specialized-arrays.int ui.backend
+words.symbol ;
 IN: ui.pixel-formats
 
 SYMBOLS:
@@ -59,3 +61,32 @@ M: pixel-format dispose
 : pixel-format-attribute ( pixel-format attribute-name -- value )
     [ handle>> ] dip (pixel-format-attribute) ;
 
+<PRIVATE
+
+FUNCTOR: define-pixel-format-attribute-table ( NAME TABLE -- )
+
+>PFA              DEFINES >${NAME}
+>PFA-int-array    DEFINES >${NAME}-int-array
+
+WHERE
+
+GENERIC: >PFA ( attribute -- pfas )
+
+M: object >PFA
+    drop { } ;
+M: symbol >PFA
+    TABLE at [ { } ] unless* ;
+M: pixel-format-attribute >PFA
+    dup class TABLE at
+    [ swap value>> suffix ]
+    [ drop { } ] if* ;
+
+: >PFA-int-array ( attribute -- int-array )
+    [ >PFA ] map concat 0 suffix >int-array ;
+
+;FUNCTOR
+
+SYNTAX: PIXEL-FORMAT-ATTRIBUTE-TABLE:
+    scan scan-object define-pixel-format-attribute-table ;
+
+PRIVATE>
