@@ -1,17 +1,17 @@
 USING: help.markup help.syntax io.streams.plain io strings
-hashtables kernel quotations colors ;
+hashtables kernel quotations colors assocs ;
 IN: io.styles
 
 HELP: stream-format
-{ $values { "str" string } { "style" "a hashtable" } { "stream" "an output stream" } }
+{ $values { "str" string } { "style" assoc } { "stream" "an output stream" } }
 { $contract "Writes formatted text to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output."
 $nl
-"The " { $snippet "style" } " hashtable holds character style information. See " { $link "character-styles" } "." }
+"The " { $snippet "style" } " assoc holds character style information. See " { $link "character-styles" } "." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link format } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: make-block-stream
-{ $values { "style" "a hashtable" } { "stream" "an output stream" } { "stream'" "an output stream" } }
+{ $values { "style" assoc } { "stream" "an output stream" } { "stream'" "an output stream" } }
 { $contract "Creates an output stream which wraps " { $snippet "stream" } " and adds " { $snippet "style" } " on calls to " { $link stream-write } " and " { $link stream-format } "."
 $nl
 "Unlike " { $link make-span-stream } ", this creates a new paragraph block in the output."
@@ -21,7 +21,7 @@ $nl
 $io-error ;
 
 HELP: stream-write-table
-{ $values { "table-cells" "a sequence of sequences of table cells" } { "style" "a hashtable" } { "stream" "an output stream" } }
+{ $values { "table-cells" "a sequence of sequences of table cells" } { "style" assoc } { "stream" "an output stream" } }
 { $contract "Prints a table of cells produced by " { $link with-cell } "."
 $nl
 "The " { $snippet "style" } " hashtable holds table style information. See " { $link "table-styles" } "." }
@@ -29,13 +29,13 @@ $nl
 $io-error ;
 
 HELP: make-cell-stream
-{ $values { "style" hashtable } { "stream" "an output stream" } { "stream'" object } }
+{ $values { "style" assoc } { "stream" "an output stream" } { "stream'" object } }
 { $contract "Creates an output stream which writes to a table cell object." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link with-cell } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: make-span-stream
-{ $values { "style" "a hashtable" } { "stream" "an output stream" } { "stream'" "an output stream" } }
+{ $values { "style" assoc } { "stream" "an output stream" } { "stream'" "an output stream" } }
 { $contract "Creates an output stream which wraps " { $snippet "stream" } " and adds " { $snippet "style" } " on calls to " { $link stream-write } " and " { $link stream-format } "."
 $nl
 "Unlike " { $link make-block-stream } ", the stream output is inline, and not nested in a paragraph block." }
@@ -43,19 +43,19 @@ $nl
 $io-error ;
 
 HELP: format
-{ $values { "str" string } { "style" "a hashtable" } }
+{ $values { "str" string } { "style" assoc } }
 { $description "Writes formatted text to " { $link output-stream } ". If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 { $notes "Details are in the documentation for " { $link stream-format } "." }
 $io-error ;
 
 HELP: with-nesting
-{ $values { "style" "a hashtable" } { "quot" quotation } }
+{ $values { "style" assoc } { "quot" quotation } }
 { $description "Calls the quotation in a new dynamic scope with " { $link output-stream } " rebound to a nested paragraph stream, with formatting information applied." }
 { $notes "Details are in the documentation for " { $link make-block-stream } "." }
 $io-error ;
 
 HELP: tabular-output
-{ $values { "style" "a hashtable" } { "quot" quotation } }
+{ $values { "style" assoc } { "quot" quotation } }
 { $description "Calls a quotation which emits a series of equal-length table rows using " { $link with-row } ". The results are laid out in a tabular fashion on " { $link output-stream } "."
 $nl
 "The " { $snippet "style" } " hashtable holds table style information. See " { $link "table-styles" } "." }
@@ -85,7 +85,7 @@ HELP: write-cell
 $io-error ;
 
 HELP: with-style
-{ $values { "style" "a hashtable" } { "quot" quotation } }
+{ $values { "style" assoc } { "quot" quotation } }
 { $description "Calls the quotation in a new dynamic scope where calls to " { $link write } ", " { $link format } " and other stream output words automatically inherit style settings from " { $snippet "style" } "." }
 { $notes "Details are in the documentation for " { $link make-span-stream } "." }
 $io-error ;
