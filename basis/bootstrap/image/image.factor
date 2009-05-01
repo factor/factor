@@ -144,8 +144,6 @@ SYMBOL: jit-push-immediate
 SYMBOL: jit-if-word
 SYMBOL: jit-if-1
 SYMBOL: jit-if-2
-SYMBOL: jit-dispatch-word
-SYMBOL: jit-dispatch
 SYMBOL: jit-dip-word
 SYMBOL: jit-dip
 SYMBOL: jit-2dip-word
@@ -158,7 +156,6 @@ SYMBOL: jit-execute-call
 SYMBOL: jit-epilog
 SYMBOL: jit-return
 SYMBOL: jit-profiling
-SYMBOL: jit-declare-word
 SYMBOL: jit-save-stack
 
 ! PIC stubs
@@ -192,13 +189,10 @@ SYMBOL: undefined-quot
         { jit-if-word 28 }
         { jit-if-1 29 }
         { jit-if-2 30 }
-        { jit-dispatch-word 31 }
-        { jit-dispatch 32 }
         { jit-epilog 33 }
         { jit-return 34 }
         { jit-profiling 35 }
         { jit-push-immediate 36 }
-        { jit-declare-word 37 }
         { jit-save-stack 38 }
         { jit-dip-word 39 }
         { jit-dip 40 }
@@ -524,9 +518,7 @@ M: quotation '
 
 : emit-jit-data ( -- )
     \ if jit-if-word set
-    \ dispatch jit-dispatch-word set
     \ do-primitive jit-primitive-word set
-    \ declare jit-declare-word set
     \ dip jit-dip-word set
     \ 2dip jit-2dip-word set
     \ 3dip jit-3dip-word set
@@ -545,8 +537,6 @@ M: quotation '
         jit-if-word
         jit-if-1
         jit-if-2
-        jit-dispatch-word
-        jit-dispatch
         jit-dip-word
         jit-dip
         jit-2dip-word
@@ -559,7 +549,6 @@ M: quotation '
         jit-epilog
         jit-return
         jit-profiling
-        jit-declare-word
         jit-save-stack
         pic-load
         pic-tag

@@ -65,24 +65,6 @@ big-endian off
     f JMP rc-relative rt-xt jit-rel
 ] jit-if-2 jit-define
 
-[
-    ! load dispatch table
-    temp1 0 MOV rc-absolute-cell rt-immediate jit-rel
-    ! load index
-    temp0 ds-reg [] MOV
-    ! turn it into an array offset
-    fixnum>slot@
-    ! pop index
-    ds-reg bootstrap-cell SUB
-    ! compute quotation location
-    temp0 temp1 ADD
-    ! load quotation
-    arg temp0 array-start-offset [+] MOV
-    ! execute branch. the quot must be in arg, since it might
-    ! not be compiled yet
-    arg quot-xt-offset [+] JMP
-] jit-dispatch jit-define
-
 : jit->r ( -- )
     rs-reg bootstrap-cell ADD
     temp0 ds-reg [] MOV
