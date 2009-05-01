@@ -47,7 +47,7 @@ HOOK: (pixel-format-attribute) ui-backend ( pixel-format-handle attribute-name -
 
 ERROR: invalid-pixel-format-attributes attributes ;
 
-TUPLE: pixel-format { handle read-only } ;
+TUPLE: pixel-format handle ;
 
 : <pixel-format> ( attributes -- pixel-format )
     dup (make-pixel-format)
