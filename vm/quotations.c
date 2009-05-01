@@ -53,13 +53,6 @@ static bool jit_fast_if_p(F_ARRAY *array, CELL i)
 		&& array_nth(array,i + 2) == userenv[JIT_IF_WORD];
 }
 
-static bool jit_fast_dispatch_p(F_ARRAY *array, CELL i)
-{
-	return (i + 2) == array_capacity(array)
-		&& type_of(array_nth(array,i)) == ARRAY_TYPE
-		&& array_nth(array,i + 1) == userenv[JIT_DISPATCH_WORD];
-}
-
 static bool jit_fast_dip_p(F_ARRAY *array, CELL i)
 {
 	return (i + 2) <= array_capacity(array)
@@ -79,13 +72,6 @@ static bool jit_fast_3dip_p(F_ARRAY *array, CELL i)
 	return (i + 2) <= array_capacity(array)
 		&& type_of(array_nth(array,i)) == QUOTATION_TYPE
 		&& array_nth(array,i + 1) == userenv[JIT_3DIP_WORD];
-}
-
-static bool jit_ignore_declare_p(F_ARRAY *array, CELL i)
-{
-	return (i + 1) < array_capacity(array)
-		&& type_of(array_nth(array,i)) == ARRAY_TYPE
-		&& array_nth(array,i + 1) == userenv[JIT_DECLARE_WORD];
 }
 
 static bool jit_mega_lookup_p(F_ARRAY *array, CELL i)
@@ -108,7 +94,7 @@ static bool jit_stack_frame_p(F_ARRAY *array)
 		if(type_of(obj) == WORD_TYPE)
 		{
 			F_WORD *word = untag_object(obj);
-			if(word->subprimitive == F && obj != userenv[JIT_DECLARE_WORD])
+			if(word->subprimitive == F)
 				return true;
 		}
 		else if(type_of(obj) == QUOTATION_TYPE)
@@ -190,6 +176,7 @@ static void jit_iterate_quotation(F_JIT *jit, CELL array, CELL compiling, CELL r
 			jit_push(jit,wrapper->object);
 			break;
 		case FIXNUM_TYPE:
+			/* Primitive calls */
 			if(jit_primitive_call_p(untag_object(array),i))
 			{
 				jit_emit(jit,userenv[JIT_SAVE_STACK]);
@@ -201,7 +188,7 @@ static void jit_iterate_quotation(F_JIT *jit, CELL array, CELL compiling, CELL r
 				break;
 			}
 		case QUOTATION_TYPE:
-			/* if preceeded by two literal quotations (this is why if and ? are
+			/* 'if' preceeded by two literal quotations (this is why if and ? are
 			   mutually recursive in the library, but both still work) */
 			if(jit_fast_if_p(untag_object(array),i))
 			{
@@ -248,23 +235,8 @@ static void jit_iterate_quotation(F_JIT *jit, CELL array, CELL compiling, CELL r
 				break;
 			}
 		case ARRAY_TYPE:
-			/* Jump tables */
-			if(jit_fast_dispatch_p(untag_object(array),i))
-			{
-				TAIL_CALL;
-				jit_emit_with(jit,userenv[JIT_DISPATCH],obj);
-
-				i++;
-				break;
-			}
-			/* Non-optimizing compiler ignores declarations */
-			else if(jit_ignore_declare_p(untag_object(array),i))
-			{
-				i++;
-				break;
-			}
 			/* Method dispatch */
-			else if(jit_mega_lookup_p(untag_object(array),i))
+			if(jit_mega_lookup_p(untag_object(array),i))
 			{
 				jit_emit_mega_cache_lookup(jit,
 					array_nth(untag_object(array),i),

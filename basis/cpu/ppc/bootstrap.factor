@@ -74,21 +74,6 @@ CONSTANT: rs-reg 30
     0 B rc-relative-ppc-3 rt-xt jit-rel
 ] jit-if-2 jit-define
 
-: jit-jump-quot ( -- )
-    4 3 quot-xt-offset LWZ
-    4 MTCTR
-    BCTR ;
-
-[
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
-    6 ds-reg 0 LWZ
-    6 6 1 SRAWI
-    3 3 6 ADD
-    3 3 array-start-offset LWZ
-    ds-reg dup 4 SUBI
-    jit-jump-quot
-] jit-dispatch jit-define
-
 : jit->r ( -- )
     4 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
@@ -167,7 +152,9 @@ CONSTANT: rs-reg 30
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    jit-jump-quot
+    4 3 quot-xt-offset LWZ
+    4 MTCTR
+    BCTR
 ] \ (call) define-sub-primitive
 
 [
