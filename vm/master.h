@@ -2,7 +2,11 @@
 #define __FACTOR_MASTER_H__
 
 #ifndef WINCE
-	#include <errno.h>
+#include <errno.h>
+#endif
+
+#ifdef FACTOR_DEBUG
+#include <assert.h>
 #endif
 
 #include <fcntl.h>
@@ -27,10 +31,15 @@
 #include "bignum.h"
 #include "write_barrier.h"
 #include "data_heap.h"
-#include "local_roots.h"
 #include "data_gc.h"
+#include "local_roots.h"
 #include "debug.h"
-#include "types.h"
+#include "arrays.h"
+#include "strings.h"
+#include "booleans.h"
+#include "byte_arrays.h"
+#include "tuples.h"
+#include "words.h"
 #include "math.h"
 #include "float_bits.h"
 #include "io.h"
@@ -41,6 +50,9 @@
 #include "callstack.h"
 #include "alien.h"
 #include "quotations.h"
+#include "jit.h"
+#include "dispatch.h"
+#include "inline_cache.h"
 #include "factor.h"
 #include "utilities.h"
 

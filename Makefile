@@ -9,11 +9,11 @@ VERSION = 0.92
 
 BUNDLE = Factor.app
 LIBPATH = -L/usr/X11R6/lib
-CFLAGS = -Wall
+CFLAGS = -Wall -Werror
 FFI_TEST_CFLAGS = -fPIC
 
 ifdef DEBUG
-	CFLAGS += -g
+	CFLAGS += -g -DFACTOR_DEBUG
 else
 	CFLAGS += -O3
 endif
@@ -28,7 +28,10 @@ endif
 
 DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/alien.o \
+	vm/arrays.o \
 	vm/bignum.o \
+	vm/booleans.o \
+	vm/byte_arrays.o \
 	vm/callstack.o \
 	vm/code_block.o \
 	vm/code_gc.o \
@@ -36,17 +39,22 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/data_gc.o \
 	vm/data_heap.o \
 	vm/debug.o \
+	vm/dispatch.o \
 	vm/errors.o \
 	vm/factor.o \
 	vm/image.o \
+	vm/inline_cache.o \
 	vm/io.o \
+	vm/jit.o \
 	vm/math.o \
 	vm/primitives.o \
 	vm/profiler.o \
 	vm/quotations.o \
 	vm/run.o \
-	vm/types.o \
-	vm/utilities.o
+	vm/strings.o \
+	vm/tuples.o \
+	vm/utilities.o \
+	vm/words.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
@@ -183,5 +191,5 @@ vm/ffi_test.o: vm/ffi_test.c
 
 .m.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
-	
+
 .PHONY: factor

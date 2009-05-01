@@ -25,7 +25,3 @@ HELP: complex
 { $class-description "The class of complex numbers with non-zero imaginary part." } ;
 
 ABOUT: "complex-numbers"
-
-HELP: <complex> ( x y -- z )
-{ $values { "x" "a real number" } { "y" "a real number" } { "z" "a complex number" } }
-{ $description "Low-level complex number constructor. User code should call " { $link rect> } " instead." } ;

@@ -3,15 +3,13 @@
 USING: arrays byte-arrays byte-vectors generic assocs hashtables
 io.binary kernel kernel.private math namespaces make sequences
 words quotations strings alien.accessors alien.strings layouts
-system combinators math.bitwise words.private math.order
+system combinators math.bitwise math.order
 accessors growable cpu.architecture compiler.constants ;
 IN: compiler.codegen.fixup
 
 GENERIC: fixup* ( obj -- )
 
-: code-format ( -- n ) 22 getenv ;
-
-: compiled-offset ( -- n ) building get length code-format * ;
+: compiled-offset ( -- n ) building get length ;
 
 SYMBOL: relocation-table
 SYMBOL: label-table
@@ -25,7 +23,7 @@ TUPLE: label-fixup label class ;
 M: label-fixup fixup*
     dup class>> rc-absolute?
     [ "Absolute labels not supported" throw ] when
-    [ label>> ] [ class>> ] bi compiled-offset 4 - rot
+    [ class>> ] [ label>> ] bi compiled-offset 4 - swap
     3array label-table get push ;
 
 TUPLE: rel-fixup class type ;
@@ -58,6 +56,9 @@ SYMBOL: literal-table
 : rel-word ( word class -- )
     [ add-literal ] dip rt-xt rel-fixup ;
 
+: rel-word-direct ( word class -- )
+    [ add-literal ] dip rt-xt-direct rel-fixup ;
+
 : rel-primitive ( word class -- )
     [ def>> first add-literal ] dip rt-primitive rel-fixup ;
 
@@ -88,4 +89,4 @@ SYMBOL: literal-table
         literal-table get >array
         relocation-table get >byte-array
         label-table get resolve-labels
-    ] { } make 4array ;
+    ] B{ } make 4array ;

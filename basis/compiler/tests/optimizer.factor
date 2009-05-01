@@ -4,13 +4,13 @@ sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
-compiler ;
+compiler definitions ;
 IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
-[ t ] [ \ xyz optimized>> ] unit-test
+[ t ] [ M\ array xyz optimized? ] unit-test
 
 ! Test predicate inlining
 : pred-test-1 ( a -- b c )
@@ -95,7 +95,7 @@ TUPLE: pred-test ;
 ! regression
 GENERIC: void-generic ( obj -- * )
 : breakage ( -- * ) "hi" void-generic ;
-[ t ] [ \ breakage optimized>> ] unit-test
+[ t ] [ \ breakage optimized? ] unit-test
 [ breakage ] must-fail
 
 ! regression
@@ -120,7 +120,7 @@ GENERIC: void-generic ( obj -- * )
 ! compiling <tuple> with a non-literal class failed
 : <tuple>-regression ( class -- tuple ) <tuple> ;
 
-[ t ] [ \ <tuple>-regression optimized>> ] unit-test
+[ t ] [ \ <tuple>-regression optimized? ] unit-test
 
 GENERIC: foozul ( a -- b )
 M: reversed foozul ;
@@ -229,7 +229,7 @@ USE: binary-search.private
 : node-successor-f-bug ( x -- * )
     [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
 
-[ t ] [ \ node-successor-f-bug optimized>> ] unit-test
+[ t ] [ \ node-successor-f-bug optimized? ] unit-test
 
 [ ] [ [ new ] build-tree optimize-tree drop ] unit-test
 
@@ -243,7 +243,7 @@ USE: binary-search.private
         ] if
     ] if ;
 
-[ t ] [ \ lift-throw-tail-regression optimized>> ] unit-test
+[ t ] [ \ lift-throw-tail-regression optimized? ] unit-test
 [ 3 "an integer" ] [ 3 lift-throw-tail-regression ] unit-test
 [ "hi" "a string" ] [ "hi" lift-throw-tail-regression ] unit-test
 
@@ -274,7 +274,7 @@ HINTS: recursive-inline-hang array ;
 : recursive-inline-hang-1 ( -- a )
     { } recursive-inline-hang ;
 
-[ t ] [ \ recursive-inline-hang-1 optimized>> ] unit-test
+[ t ] [ \ recursive-inline-hang-1 optimized? ] unit-test
 
 DEFER: recursive-inline-hang-3
 
@@ -325,7 +325,7 @@ PREDICATE: list < improper-list
     dup "a" get { array-capacity } declare >=
     [ dup "b" get { array-capacity } declare >= [ 3 ] [ 4 ] if ] [ 5 ] if ;
 
-[ t ] [ \ interval-inference-bug optimized>> ] unit-test
+[ t ] [ \ interval-inference-bug optimized? ] unit-test
 
 [ ] [ 1 "a" set 2 "b" set ] unit-test
 [ 2 3 ] [ 2 interval-inference-bug ] unit-test
@@ -384,3 +384,9 @@ DEFER: loop-bbb
     1 >bignum 2 >bignum
     [ { bignum integer } declare [ shift ] keep 1+ ] compile-call
 ] unit-test
+
+: broken-declaration ( -- ) \ + declare ;
+
+[ f ] [ \ broken-declaration optimized? ] unit-test
+
+[ ] [ [ \ broken-declaration forget ] with-compilation-unit ] unit-test

@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser namespaces make sequences strings
+USING: kernel math math.parser math.order namespaces make sequences strings
 words assocs combinators accessors arrays ;
 IN: effects
 
@@ -13,7 +13,7 @@ TUPLE: effect { in read-only } { out read-only } { terminated? read-only } ;
 : effect-height ( effect -- n )
     [ out>> length ] [ in>> length ] bi - ; inline
 
-: effect<= ( eff1 eff2 -- ? )
+: effect<= ( effect1 effect2 -- ? )
     {
         { [ over terminated?>> ] [ t ] }
         { [ dup terminated?>> ] [ f ] }
@@ -21,6 +21,12 @@ TUPLE: effect { in read-only } { out read-only } { terminated? read-only } ;
         { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
         [ t ]
     } cond 2nip ; inline
+
+: effect= ( effect1 effect2 -- ? )
+    [ [ in>> length ] bi@ = ]
+    [ [ out>> length ] bi@ = ]
+    [ [ terminated?>> ] bi@ = ]
+    2tri and and ;
 
 GENERIC: effect>string ( obj -- str )
 M: string effect>string ;
@@ -66,3 +72,13 @@ M: effect clone
 
 : add-effect-input ( effect -- effect' )
     [ in>> "obj" suffix ] [ out>> ] [ terminated?>> ] tri effect boa ;
+
+: compose-effects ( effect1 effect2 -- effect' )
+    over terminated?>> [
+        drop
+    ] [
+        [ [ [ in>> length ] [ out>> length ] bi ] [ in>> length ] bi* swap [-] + ]
+        [ [ out>> length ] [ [ in>> length ] [ out>> length ] bi ] bi* [ [-] ] dip + ]
+        [ nip terminated?>> ] 2tri
+        effect boa
+    ] if ; inline

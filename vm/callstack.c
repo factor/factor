@@ -170,7 +170,7 @@ void primitive_callstack_to_array(void)
 	frame_index = 0;
 	iterate_callstack_object(stack,stack_frame_to_array);
 
-	dpush(tag_object(array));
+	dpush(tag_array(array));
 }
 
 F_STACK_FRAME *innermost_stack_frame(F_CALLSTACK *callstack)
@@ -214,7 +214,7 @@ void primitive_set_innermost_stack_frame_quot(void)
 	REGISTER_UNTAGGED(callstack);
 	REGISTER_UNTAGGED(quot);
 
-	jit_compile(tag_object(quot),true);
+	jit_compile(tag_quotation(quot),true);
 
 	UNREGISTER_UNTAGGED(quot);
 	UNREGISTER_UNTAGGED(callstack);

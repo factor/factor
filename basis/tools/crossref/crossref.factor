@@ -3,8 +3,7 @@
 USING: words assocs definitions io io.pathnames io.styles kernel
 prettyprint sorting see sets sequences arrays hashtables help.crossref
 help.topics help.markup quotations accessors source-files namespaces
-graphs vocabs generic generic.standard.engines.tuple threads
-compiler.units init ;
+graphs vocabs generic generic.single threads compiler.units init ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -82,7 +81,7 @@ M: object irrelevant? drop f ;
 
 M: default-method irrelevant? drop t ;
 
-M: engine-word irrelevant? drop t ;
+M: predicate-engine irrelevant? drop t ;
 
 PRIVATE>
 

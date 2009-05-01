@@ -19,3 +19,7 @@ USING: effects tools.test prettyprint accessors sequences ;
 [ { "x" "y" } ] [ { "y" "x" } (( a b -- b a )) shuffle ] unit-test
 [ { "y" "x" "y" } ] [ { "y" "x" } (( a b -- a b a )) shuffle ] unit-test
 [ { } ] [ { "y" "x" } (( a b -- )) shuffle ] unit-test
+
+[ t ] [ (( -- )) (( -- )) compose-effects (( -- )) effect= ] unit-test
+[ t ] [ (( -- * )) (( -- )) compose-effects (( -- * )) effect= ] unit-test
+[ t ] [ (( -- )) (( -- * )) compose-effects (( -- * )) effect= ] unit-test

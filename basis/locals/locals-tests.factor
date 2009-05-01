@@ -585,4 +585,4 @@ M: integer ed's-bug neg ;
 :: ed's-test-case ( a -- b )
    { [ a ed's-bug ] } && ;
 
-[ t ] [ \ ed's-test-case optimized>> ] unit-test
+[ t ] [ \ ed's-test-case optimized? ] unit-test
