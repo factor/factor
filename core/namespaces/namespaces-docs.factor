@@ -14,7 +14,8 @@ ARTICLE: "namespaces-change" "Changing variable values"
 { $subsection off }
 { $subsection inc }
 { $subsection dec }
-{ $subsection change } ;
+{ $subsection change }
+{ $subsection change-global } ;
 
 ARTICLE: "namespaces-global" "Global variables"
 { $subsection namespace }
@@ -71,6 +72,11 @@ HELP: on
 HELP: change
 { $values { "variable" "a variable, by convention a symbol" } { "quot" { $quotation "( old -- new )" } } }
 { $description "Applies the quotation to the old value of the variable, and assigns the resulting value to the variable." }
+{ $side-effects "variable" } ;
+
+HELP: change-global
+{ $values { "variable" "a variable, by convention a symbol" } { "quot" { $quotation "( old -- new )" } } }
+{ $description "Applies the quotation to the old value of the global variable, and assigns the resulting value to the global variable." }
 { $side-effects "variable" } ;
 
 HELP: +@
