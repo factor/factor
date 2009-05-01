@@ -42,22 +42,10 @@ CONSTANT: NSOpenGLPFAAllowOfflineRenderers 96
 CONSTANT: NSOpenGLPFAVirtualScreenCount 128
 CONSTANT: NSOpenGLCPSwapInterval 222
 
-: <PixelFormat> ( attributes -- pixelfmt )
-    NSOpenGLPixelFormat -> alloc swap [
-        %
-        NSOpenGLPFADepthSize , 16 ,
-        ! NSOpenGLPFARendererID , kCGLRendererGenericFloatID ,
-        ! NSOpenGLPFASupersample ,
-        ! NSOpenGLPFASampleBuffers , 1 ,
-        ! NSOpenGLPFASamples , 8 ,
-        0 ,
-    ] int-array{ } make
-    -> initWithAttributes:
-    -> autorelease ;
-
-: <GLView> ( class dim -- view )
-    [ -> alloc 0 0 ] dip first2 <CGRect>
-    NSOpenGLPFAWindow NSOpenGLPFADoubleBuffer 2array <PixelFormat>
+: <GLView> ( class dim pixel-format -- view )
+    [ -> alloc ]
+    [ [ 0 0 ] dip first2 <CGRect> ]
+    [ handle>> ] tri*
     -> initWithFrame:pixelFormat:
     dup 1 -> setPostsBoundsChangedNotifications:
     dup 1 -> setPostsFrameChangedNotifications: ;

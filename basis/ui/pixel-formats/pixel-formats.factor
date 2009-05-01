@@ -1,7 +1,7 @@
 USING: destructors math ui.backend ;
 IN: ui.pixel-formats
 
-SINGLETONS:
+SYMBOLS:
     double-buffered
     stereo
     offscreen
