@@ -9,7 +9,8 @@ core-graphics.types destructors fry generalizations io.thread
 kernel libc literals locals math math.rectangles memory
 namespaces sequences specialized-arrays.int threads ui
 ui.backend ui.backend.cocoa.views ui.clipboards ui.gadgets
-ui.gadgets.worlds ui.pixel-formats ui.private words.symbol ;
+ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private
+ui.private words.symbol ;
 IN: ui.backend.cocoa
 
 TUPLE: handle ;
@@ -23,9 +24,7 @@ SINGLETON: cocoa-ui-backend
 
 <PRIVATE
 
-GENERIC: >NSOpenGLPFA ( attribute -- NSOpenGLPFAs )
-
-CONSTANT: attribute>NSOpenGLPFA-map H{
+PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA H{
     { double-buffered { $ NSOpenGLPFADoubleBuffer } }
     { stereo { $ NSOpenGLPFAStereo } }
     { offscreen { $ NSOpenGLPFAOffScreen } }
@@ -49,28 +48,20 @@ CONSTANT: attribute>NSOpenGLPFA-map H{
     { samples { $ NSOpenGLPFASamples } }
 }
 
-M: object >NSOpenGLPFA
-    drop { } ;
-M: symbol >NSOpenGLPFA
-    attribute>NSOpenGLPFA-map at [ { } ] unless* ;
-M: pixel-format-attribute >NSOpenGLPFA
-    dup class attribute>NSOpenGLPFA-map at
-    [ swap value>> suffix ]
-    [ drop { } ] if* ;
-
 PRIVATE>
 
 M: cocoa-ui-backend (make-pixel-format)
-    [ >NSOpenGLPFA ] map concat 0 suffix >int-array
+    >NSOpenGLPFA-int-array
     NSOpenGLPixelFormat -> alloc swap -> initWithAttributes: ;
 
 M: cocoa-ui-backend (free-pixel-format)
     -> release ;
 
 M: cocoa-ui-backend (pixel-format-attribute)
-    attribute>NSOpenGLPFA-map at
+    >NSOpenGLPFA
+    [ drop f ]
     [ first 0 <int> [ swap 0 -> getValues:forAttribute:forVirtualScreen: ] keep *int ]
-    [ drop f ] if* ;
+    if-empty ;
 
 TUPLE: pasteboard handle ;
 
