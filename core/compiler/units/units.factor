@@ -43,6 +43,9 @@ HOOK: recompile compiler-impl ( words -- alist )
 ! Non-optimizing compiler
 M: f recompile [ dup def>> ] { } map>assoc ;
 
+: without-optimizer ( quot -- )
+    [ f compiler-impl ] dip with-variable ; inline
+
 ! Trivial compiler. We don't want to touch the code heap
 ! during stage1 bootstrap, it would just waste time.
 SINGLETON: dummy-compiler
