@@ -20,7 +20,7 @@ SYNTAX: MDBTUPLE:
     tuple-collection
     [ create-collection ]
     [ [ tuple-index-list ] keep
-      '[ _ name>> swap [ name>> ] [ spec>> ] bi ensure-index ] each
+      '[ _ name>> swap [ name>> ] [ spec>> ] bi <index-spec> ensure-index ] each
     ] bi ;
 
 : ensure-tables ( classes -- )
@@ -80,4 +80,4 @@ PRIVATE>
 
 : count-tuples ( tuple/query -- n )
    dup mdb-query-msg? [ tuple>query ] unless
-   [ collection>> ] [ query>> ] bi count ;
+   [ collection>> ] [ query>> ] bi <query> count ;
