@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math words kernel assocs classes
 math.order kernel.private ;
@@ -16,11 +16,13 @@ SYMBOL: tag-numbers
 
 SYMBOL: type-numbers
 
-: tag-number ( class -- n )
-    tag-numbers get at [ object tag-number ] unless* ;
+SYMBOL: mega-cache-size
 
 : type-number ( class -- n )
     type-numbers get at ;
+
+: tag-number ( class -- n )
+    type-number dup num-tags get >= [ drop object tag-number ] when ;
 
 : tag-fixnum ( n -- tagged )
     tag-bits get shift ;

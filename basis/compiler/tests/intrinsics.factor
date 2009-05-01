@@ -342,12 +342,12 @@ cell 8 = [
 ] unit-test
 
 [ 1 2 ] [
-    1 2 [ <complex> ] compile-call
+    1 2 [ complex boa ] compile-call
     dup real-part swap imaginary-part
 ] unit-test
 
 [ 1 2 ] [
-    1 2 [ <ratio> ] compile-call dup numerator swap denominator
+    1 2 [ ratio boa ] compile-call dup numerator swap denominator
 ] unit-test
 
 [ \ + ] [ \ + [ <wrapper> ] compile-call ] unit-test

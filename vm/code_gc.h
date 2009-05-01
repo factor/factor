@@ -16,6 +16,7 @@ typedef void (*HEAP_ITERATOR)(F_BLOCK *compiled);
 void new_heap(F_HEAP *heap, CELL size);
 void build_free_list(F_HEAP *heap, CELL size);
 F_BLOCK *heap_allot(F_HEAP *heap, CELL size);
+void heap_free(F_HEAP *heap, F_BLOCK *block);
 void mark_block(F_BLOCK *block);
 void unmark_marked(F_HEAP *heap);
 void free_unmarked(F_HEAP *heap, HEAP_ITERATOR iter);

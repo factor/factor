@@ -46,14 +46,16 @@ mouse-index
 { takes-focus? initial: t }
 focused? ;
 
-: <table> ( rows renderer -- table )
-    table new-line-gadget
+: new-table ( rows renderer class -- table )
+    new-line-gadget
         swap >>renderer
         swap >>model
         f <model> >>selected-value
         sans-serif-font >>font
         focus-border-color >>focus-border-color
-        transparent >>column-line-color ;
+        transparent >>column-line-color ; inline
+
+: <table> ( rows renderer -- table ) table new-table ;
 
 <PRIVATE
 

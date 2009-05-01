@@ -1,6 +1,7 @@
 USING: alien.c-types alien.syntax audio combinators
 combinators.short-circuit io io.binary io.encodings.binary
-io.files io.streams.memory kernel locals sequences ;
+io.files io.streams.byte-array kernel locals math
+sequences ;
 IN: audio.wav
 
 CONSTANT: RIFF-MAGIC "RIFF"
@@ -16,7 +17,6 @@ C-STRUCT: riff-chunk-header
 C-STRUCT: riff-chunk
     { "riff-chunk-header" "header" }
     { "char[4]" "format" }
-    { "uchar[0]" "body" }
     ;
 
 C-STRUCT: wav-fmt-chunk
@@ -34,29 +34,42 @@ C-STRUCT: wav-data-chunk
     { "uchar[0]" "body" }
     ;
 
+ERROR: invalid-wav-file ;
+
+: ensured-read ( count -- output/f )
+    [ read ] keep over length = [ drop f ] unless ;
+: ensured-read* ( count -- output )
+    ensured-read [ invalid-wav-file ] unless* ;
+
 : read-chunk ( -- byte-array/f )
-    4 read [ 4 read le> [ <uint> ] [ read ] bi 3append ] [ f ] if* ;
+    4 ensured-read [ 4 ensured-read* dup le> ensured-read* 3append ] [ f ] if* ;
+: read-riff-chunk ( -- byte-array/f )
+    "riff-chunk" heap-size ensured-read* ;
 
 : id= ( chunk id -- ? )
-    [ 4 memory>byte-array ] dip sequence= ;
+    [ 4 head ] dip sequence= ;
+
+: check-chunk ( chunk id min-size -- ? )
+    [ id= ] [ [ length ] dip >= ] bi-curry* bi and ;
 
 :: read-wav-chunks ( -- fmt data )
     f :> fmt! f :> data!
     [ { [ fmt data and not ] [ read-chunk ] } 0&& dup ]
     [ {
-        { [ dup FMT-MAGIC  id= ] [ fmt!  ] }
-        { [ dup DATA-MAGIC id= ] [ data! ] }
+        { [ dup FMT-MAGIC  "wav-fmt-chunk"  heap-size check-chunk ] [ fmt!  ] }
+        { [ dup DATA-MAGIC "wav-data-chunk" heap-size check-chunk ] [ data! ] }
     } cond ] while drop
-    fmt data ;
-
-ERROR: invalid-wav-file ;
+    fmt data 2dup and [ invalid-wav-file ] unless ;
 
 : verify-wav ( chunk -- )
-    { [ RIFF-MAGIC id= ] [ riff-chunk-format WAVE-MAGIC id= ] } 1&&
+    {
+        [ RIFF-MAGIC id= ]
+        [ riff-chunk-format 4 memory>byte-array WAVE-MAGIC id= ]
+    } 1&&
     [ invalid-wav-file ] unless ;
 
 : (read-wav) ( -- audio )
-    read-wav-chunks 
+    read-wav-chunks
     [
         [ wav-fmt-chunk-num-channels    2 memory>byte-array le> ]
         [ wav-fmt-chunk-bits-per-sample 2 memory>byte-array le> ]
@@ -68,7 +81,5 @@ ERROR: invalid-wav-file ;
 
 : read-wav ( filename -- audio )
     binary [
-        read-chunk
-        [ verify-wav ]
-        [ riff-chunk-body <memory-stream> [ (read-wav) ] with-input-stream* ] bi
+        read-riff-chunk verify-wav (read-wav)
     ] with-file-reader ;

@@ -9,7 +9,7 @@ math.private tools.test math.floats.private ;
 
 [ 3.0 1 2 3 ] [ 1.0 2.0 [ float+ 1 2 3 ] compile-call ] unit-test
 
-[ 5 ] [ 1.0 [ 2.0 float+ tag ] compile-call ] unit-test
+[ 3 ] [ 1.0 [ 2.0 float+ tag ] compile-call ] unit-test
 
 [ 3.0 ] [ 1.0 [ 2.0 float+ ] compile-call ] unit-test
 [ 3.0 ] [ 1.0 [ 2.0 swap float+ ] compile-call ] unit-test

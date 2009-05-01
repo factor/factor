@@ -3,14 +3,13 @@
 USING: alien arrays byte-arrays generic assocs hashtables assocs
 hashtables.private io io.binary io.files io.encodings.binary
 io.pathnames kernel kernel.private math namespaces make parser
-prettyprint sequences sequences.private strings sbufs
-vectors words quotations assocs system layouts splitting
-grouping growable classes classes.builtin classes.tuple
-classes.tuple.private words.private vocabs
-vocabs.loader source-files definitions debugger
-quotations.private sequences.private combinators
-math.order math.private accessors
-slots.private compiler.units fry ;
+prettyprint sequences sequences.private strings sbufs vectors words
+quotations assocs system layouts splitting grouping growable classes
+classes.builtin classes.tuple classes.tuple.private vocabs
+vocabs.loader source-files definitions debugger quotations.private
+sequences.private combinators math.order math.private accessors
+slots.private generic.single.private compiler.units compiler.constants
+fry ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -94,13 +93,30 @@ CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
 
-: make-jit ( quot rc rt offset -- quad )
-    [ [ call( -- ) ] { } make ] 3dip 4array ;
+SYMBOL: jit-define-rc
+SYMBOL: jit-define-rt
+SYMBOL: jit-define-offset
 
-: jit-define ( quot rc rt offset name -- )
+: compute-offset ( -- offset )
+    building get length jit-define-rc get rc-absolute-cell = bootstrap-cell 4 ? - ;
+
+: jit-rel ( rc rt -- )
+    jit-define-rt set
+    jit-define-rc set
+    compute-offset jit-define-offset set ;
+
+: make-jit ( quot -- quad )
+    [
+        call( -- )
+        jit-define-rc get
+        jit-define-rt get
+        jit-define-offset get 3array
+    ] B{ } make prefix ;
+
+: jit-define ( quot name -- )
     [ make-jit ] dip set ;
 
-: define-sub-primitive ( quot rc rt offset word -- )
+: define-sub-primitive ( quot word -- )
     [ make-jit ] dip sub-primitives get set-at ;
 
 ! The image being constructed; a vector of word-size integers
@@ -119,7 +135,6 @@ SYMBOL: bootstrap-global
 SYMBOL: bootstrap-boot-quot
 
 ! JIT parameters
-SYMBOL: jit-code-format
 SYMBOL: jit-prolog
 SYMBOL: jit-primitive-word
 SYMBOL: jit-primitive
@@ -129,19 +144,35 @@ SYMBOL: jit-push-immediate
 SYMBOL: jit-if-word
 SYMBOL: jit-if-1
 SYMBOL: jit-if-2
-SYMBOL: jit-dispatch-word
-SYMBOL: jit-dispatch
 SYMBOL: jit-dip-word
 SYMBOL: jit-dip
 SYMBOL: jit-2dip-word
 SYMBOL: jit-2dip
 SYMBOL: jit-3dip-word
 SYMBOL: jit-3dip
+SYMBOL: jit-execute-word
+SYMBOL: jit-execute-jump
+SYMBOL: jit-execute-call
 SYMBOL: jit-epilog
 SYMBOL: jit-return
 SYMBOL: jit-profiling
-SYMBOL: jit-declare-word
 SYMBOL: jit-save-stack
+
+! PIC stubs
+SYMBOL: pic-load
+SYMBOL: pic-tag
+SYMBOL: pic-hi-tag
+SYMBOL: pic-tuple
+SYMBOL: pic-hi-tag-tuple
+SYMBOL: pic-check-tag
+SYMBOL: pic-check
+SYMBOL: pic-hit
+SYMBOL: pic-miss-word
+
+! Megamorphic dispatch
+SYMBOL: mega-lookup
+SYMBOL: mega-lookup-word
+SYMBOL: mega-miss-word
 
 ! Default definition for undefined words
 SYMBOL: undefined-quot
@@ -150,7 +181,6 @@ SYMBOL: undefined-quot
     H{
         { bootstrap-boot-quot 20 }
         { bootstrap-global 21 }
-        { jit-code-format 22 }
         { jit-prolog 23 }
         { jit-primitive-word 24 }
         { jit-primitive 25 }
@@ -159,20 +189,32 @@ SYMBOL: undefined-quot
         { jit-if-word 28 }
         { jit-if-1 29 }
         { jit-if-2 30 }
-        { jit-dispatch-word 31 }
-        { jit-dispatch 32 }
         { jit-epilog 33 }
         { jit-return 34 }
         { jit-profiling 35 }
         { jit-push-immediate 36 }
-        { jit-declare-word 42 }
-        { jit-save-stack 43 }
-        { jit-dip-word 44 }
-        { jit-dip 45 }
-        { jit-2dip-word 46 }
-        { jit-2dip 47 }
-        { jit-3dip-word 48 }
-        { jit-3dip 49 }
+        { jit-save-stack 38 }
+        { jit-dip-word 39 }
+        { jit-dip 40 }
+        { jit-2dip-word 41 }
+        { jit-2dip 42 }
+        { jit-3dip-word 43 }
+        { jit-3dip 44 }
+        { jit-execute-word 45 }
+        { jit-execute-jump 46 }
+        { jit-execute-call 47 }
+        { pic-load 48 }
+        { pic-tag 49 }
+        { pic-hi-tag 50 }
+        { pic-tuple 51 }
+        { pic-hi-tag-tuple 52 }
+        { pic-check-tag 53 }
+        { pic-check 54 }
+        { pic-hit 55 }
+        { pic-miss-word 56 }
+        { mega-lookup 57 }
+        { mega-lookup-word 58 }
+        { mega-miss-word 59 }
         { undefined-quot 60 }
     } ; inline
 
@@ -205,8 +247,8 @@ SYMBOL: undefined-quot
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
-: emit-object ( header tag quot -- addr )
-    swap here-as [ swap tag-fixnum emit call align-here ] dip ;
+: emit-object ( class quot -- addr )
+    over tag-number here-as [ swap type-number tag-fixnum emit call align-here ] dip ;
     inline
 
 ! Write an object to the image.
@@ -251,7 +293,7 @@ GENERIC: ' ( obj -- ptr )
 
 M: bignum '
     [
-        bignum tag-number dup [ emit-bignum ] emit-object
+        bignum [ emit-bignum ] emit-object
     ] cache-object ;
 
 ! Fixnums
@@ -274,7 +316,7 @@ M: fake-bignum ' n>> tag-fixnum ;
 
 M: float '
     [
-        float tag-number dup [
+        float [
             align-here double>bits emit-64
         ] emit-object
     ] cache-object ;
@@ -309,7 +351,7 @@ M: f '
                     [ vocabulary>> , ]
                     [ def>> , ]
                     [ props>> , ]
-                    [ drop f , ]
+                    [ direct-entry-def>> , ] ! direct-entry-def
                     [ drop 0 , ] ! count
                     [ word-sub-primitive , ]
                     [ drop 0 , ] ! xt
@@ -318,8 +360,7 @@ M: f '
                 } cleave
             ] { } make [ ' ] map
         ] bi
-        \ word type-number object tag-number
-        [ emit-seq ] emit-object
+        \ word [ emit-seq ] emit-object
     ] keep put-object ;
 
 : word-error ( word msg -- * )
@@ -340,8 +381,7 @@ M: word ' ;
 ! Wrappers
 
 M: wrapper '
-    wrapped>> ' wrapper type-number object tag-number
-    [ emit ] emit-object ;
+    wrapped>> ' wrapper [ emit ] emit-object ;
 
 ! Strings
 : native> ( object -- object )
@@ -370,7 +410,7 @@ M: wrapper '
 
 : emit-string ( string -- ptr )
     [ length ] [ extended-part ' ] [ ] tri
-    string type-number object tag-number [
+    string [
         [ emit-fixnum ]
         [ emit ]
         [ f ' emit ascii-part pad-bytes emit-bytes ]
@@ -387,12 +427,11 @@ M: string '
 
 : emit-dummy-array ( obj type -- ptr )
     [ assert-empty ] [
-        type-number object tag-number
         [ 0 emit-fixnum ] emit-object
     ] bi* ;
 
 M: byte-array '
-    byte-array type-number object tag-number [
+    byte-array [
         dup length emit-fixnum
         pad-bytes emit-bytes
     ] emit-object ;
@@ -406,7 +445,7 @@ ERROR: tuple-removed class ;
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]
     [ class transfer-word require-tuple-layout ] bi prefix [ ' ] map
-    tuple type-number dup [ emit-seq ] emit-object ;
+    tuple [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
     dup class name>> "tombstone" =
@@ -421,8 +460,7 @@ M: tombstone '
 
 ! Arrays
 : emit-array ( array -- offset )
-    [ ' ] map array type-number object tag-number
-    [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
+    [ ' ] map array [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
 
 M: array ' emit-array ;
 
@@ -448,7 +486,7 @@ M: tuple-layout-array '
 M: quotation '
     [
         array>> '
-        quotation type-number object tag-number [
+        quotation [
             emit ! array
             f ' emit ! compiled
             f ' emit ! cached-effect
@@ -480,15 +518,16 @@ M: quotation '
 
 : emit-jit-data ( -- )
     \ if jit-if-word set
-    \ dispatch jit-dispatch-word set
     \ do-primitive jit-primitive-word set
-    \ declare jit-declare-word set
     \ dip jit-dip-word set
     \ 2dip jit-2dip-word set
     \ 3dip jit-3dip-word set
+    \ (execute) jit-execute-word set
+    \ inline-cache-miss \ pic-miss-word set
+    \ mega-cache-lookup \ mega-lookup-word set
+    \ mega-cache-miss \ mega-miss-word set
     [ undefined ] undefined-quot set
     {
-        jit-code-format
         jit-prolog
         jit-primitive-word
         jit-primitive
@@ -498,19 +537,31 @@ M: quotation '
         jit-if-word
         jit-if-1
         jit-if-2
-        jit-dispatch-word
-        jit-dispatch
         jit-dip-word
         jit-dip
         jit-2dip-word
         jit-2dip
         jit-3dip-word
         jit-3dip
+        jit-execute-word
+        jit-execute-jump
+        jit-execute-call
         jit-epilog
         jit-return
         jit-profiling
-        jit-declare-word
         jit-save-stack
+        pic-load
+        pic-tag
+        pic-hi-tag
+        pic-tuple
+        pic-hi-tag-tuple
+        pic-check-tag
+        pic-check
+        pic-hit
+        pic-miss-word
+        mega-lookup
+        mega-lookup-word
+        mega-miss-word
         undefined-quot
     } [ emit-userenv ] each ;
 

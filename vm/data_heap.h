@@ -135,3 +135,4 @@ INLINE void do_slots(CELL obj, void (* iter)(CELL *))
 		scan += CELLS;
 	}
 }
+

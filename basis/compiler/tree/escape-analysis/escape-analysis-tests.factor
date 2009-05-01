@@ -17,7 +17,7 @@ GENERIC: count-unboxed-allocations* ( m node -- n )
     out-d>> first escaping-allocation? [ 1+ ] unless ;
 
 M: #call count-unboxed-allocations*
-    dup [ immutable-tuple-boa? ] [ word>> \ <complex> eq? ] bi or
+    dup immutable-tuple-boa?
     [ (count-unboxed-allocations) ] [ drop ] if ;
 
 M: #push count-unboxed-allocations*
@@ -291,7 +291,7 @@ C: <ro-box> ro-box
 
 [ 0 ] [ [ bad-tuple-fib-3 i>> ] count-unboxed-allocations ] unit-test
 
-[ 1 ] [ [ <complex> >rect ] count-unboxed-allocations ] unit-test
+[ 1 ] [ [ complex boa >rect ] count-unboxed-allocations ] unit-test
 
 [ 0 ] [ [ 1 cons boa 2 cons boa ] count-unboxed-allocations ] unit-test
 

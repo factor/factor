@@ -120,7 +120,7 @@ bool stack_to_array(CELL bottom, CELL top)
 	{
 		F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth / CELLS);
 		memcpy(a + 1,(void*)bottom,depth);
-		dpush(tag_object(a));
+		dpush(tag_array(a));
 		return true;
 	}
 }
@@ -223,4 +223,26 @@ void primitive_load_locals(void)
 	memcpy((CELL *)(rs + CELLS),(CELL *)(ds - CELLS * (count - 1)),CELLS * count);
 	ds -= CELLS * count;
 	rs += CELLS * count;
+}
+
+static CELL clone_object(CELL object)
+{
+	CELL size = object_size(object);
+	if(size == 0)
+		return object;
+	else
+	{
+		REGISTER_ROOT(object);
+		void *new_obj = allot_object(type_of(object),size);
+		UNREGISTER_ROOT(object);
+
+		CELL tag = TAG(object);
+		memcpy(new_obj,(void*)UNTAG(object),size);
+		return RETAG(new_obj,tag);
+	}
+}
+
+void primitive_clone(void)
+{
+	drepl(clone_object(dpeek()));
 }

@@ -116,7 +116,7 @@ HELP: ?set-at
 { $description "If the third input is an assoc, stores the key/value pair into that assoc, or else creates a new hashtable with the key/value pair as its only entry." } ;
 
 HELP: >hashtable
-{ $values { "assoc" "an assoc" } { "hashtable" "a hashtable" } }
+{ $values { "assoc" assoc } { "hashtable" hashtable } }
 { $description "Constructs a hashtable from any assoc." } ;
 
 HELP: rehash

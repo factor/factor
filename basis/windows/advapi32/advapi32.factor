@@ -350,34 +350,45 @@ CONSTANT: TOKEN_ADJUST_DEFAULT         HEX: 0080
         TOKEN_ADJUST_DEFAULT
     } flags ; foldable
 
-CONSTANT: HKEY_CLASSES_ROOT       1
-CONSTANT: HKEY_CURRENT_CONFIG     2
-CONSTANT: HKEY_CURRENT_USER       3
-CONSTANT: HKEY_LOCAL_MACHINE      4
-CONSTANT: HKEY_USERS              5
+CONSTANT: HKEY_CLASSES_ROOT        HEX: 80000000
+CONSTANT: HKEY_CURRENT_USER        HEX: 80000001
+CONSTANT: HKEY_LOCAL_MACHINE       HEX: 80000002
+CONSTANT: HKEY_USERS               HEX: 80000003
+CONSTANT: HKEY_PERFORMANCE_DATA    HEX: 80000004
+CONSTANT: HKEY_CURRENT_CONFIG      HEX: 80000005
+CONSTANT: HKEY_DYN_DATA            HEX: 80000006
+CONSTANT: HKEY_PERFORMANCE_TEXT    HEX: 80000050
+CONSTANT: HKEY_PERFORMANCE_NLSTEXT HEX: 80000060
 
-CONSTANT: KEY_ALL_ACCESS          HEX: 0001
-CONSTANT: KEY_CREATE_LINK         HEX: 0002
+CONSTANT: KEY_QUERY_VALUE         HEX: 0001
+CONSTANT: KEY_SET_VALUE           HEX: 0002
 CONSTANT: KEY_CREATE_SUB_KEY      HEX: 0004
 CONSTANT: KEY_ENUMERATE_SUB_KEYS  HEX: 0008
-CONSTANT: KEY_EXECUTE             HEX: 0010
-CONSTANT: KEY_NOTIFY              HEX: 0020
-CONSTANT: KEY_QUERY_VALUE         HEX: 0040
-CONSTANT: KEY_READ                HEX: 0080
-CONSTANT: KEY_SET_VALUE           HEX: 0100
-CONSTANT: KEY_WOW64_64KEY         HEX: 0200
-CONSTANT: KEY_WOW64_32KEY         HEX: 0400
-CONSTANT: KEY_WRITE               HEX: 0800
+CONSTANT: KEY_NOTIFY              HEX: 0010
+CONSTANT: KEY_CREATE_LINK         HEX: 0020
+CONSTANT: KEY_READ                HEX: 20019
+CONSTANT: KEY_WOW64_32KEY         HEX: 0200
+CONSTANT: KEY_WOW64_64KEY         HEX: 0100
+CONSTANT: KEY_WRITE               HEX: 20006
+CONSTANT: KEY_EXECUTE             KEY_READ
+CONSTANT: KEY_ALL_ACCESS          HEX: F003F
 
-CONSTANT: REG_BINARY              1
-CONSTANT: REG_DWORD               2
-CONSTANT: REG_EXPAND_SZ           3
-CONSTANT: REG_MULTI_SZ            4
-CONSTANT: REG_QWORD               5
-CONSTANT: REG_SZ                  6
+CONSTANT: REG_NONE                         0
+CONSTANT: REG_SZ                           1
+CONSTANT: REG_EXPAND_SZ                    2
+CONSTANT: REG_BINARY                       3
+CONSTANT: REG_DWORD                        4
+CONSTANT: REG_DWORD_LITTLE_ENDIAN          4
+CONSTANT: REG_DWORD_BIG_ENDIAN             5
+CONSTANT: REG_LINK                         6
+CONSTANT: REG_MULTI_SZ                     7
+CONSTANT: REG_RESOURCE_LIST                8
+CONSTANT: REG_FULL_RESOURCE_DESCRIPTOR     9
+CONSTANT: REG_RESOURCE_REQUIREMENTS_LIST  10
+CONSTANT: REG_QWORD                       11
+CONSTANT: REG_QWORD_LITTLE_ENDIAN         11
 
 TYPEDEF: DWORD REGSAM
-
 
 ! : I_ScGetCurrentGroupStateW ;
 ! : A_SHAFinal ;
@@ -874,7 +885,7 @@ FUNCTION: BOOL OpenThreadToken ( HANDLE ThreadHandle, DWORD DesiredAccess, BOOL 
 ! : ReadEncryptedFileRaw ;
 ! : ReadEventLogA ;
 ! : ReadEventLogW ;
-! : RegCloseKey ;
+FUNCTION: LONG RegCloseKey ( HKEY hKey ) ;
 ! : RegConnectRegistryA ;
 ! : RegConnectRegistryW ;
 ! : RegCreateKeyA ;
@@ -883,15 +894,52 @@ FUNCTION: LONG RegCreateKeyExW ( HKEY hKey, LPCTSTR lpSubKey, DWORD Reserved, LP
 ! : RegCreateKeyW
 ! : RegDeleteKeyA ;
 ! : RegDeleteKeyW ;
+
+FUNCTION: LONG RegDeleteKeyExW (
+        HKEY hKey,
+        LPCTSTR lpSubKey,
+        DWORD Reserved,
+        LPTSTR lpClass,
+        DWORD dwOptions,
+        REGSAM samDesired,
+        LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+        PHKEY phkResult,
+        LPDWORD lpdwDisposition
+    ) ;
+
+ALIAS: RegDeleteKeyEx RegDeleteKeyExW
+
 ! : RegDeleteValueA ;
 ! : RegDeleteValueW ;
 ! : RegDisablePredefinedCache ;
 ! : RegEnumKeyA ;
 ! : RegEnumKeyExA ;
-! : RegEnumKeyExW ;
+FUNCTION: LONG RegEnumKeyExW (
+        HKEY hKey,
+        DWORD dwIndex,
+        LPTSTR lpName,
+        LPDWORD lpcName,
+        LPDWORD lpReserved,
+        LPTSTR lpClass,
+        LPDWORD lpcClass,
+        PFILETIME lpftLastWriteTime
+    ) ;
 ! : RegEnumKeyW ;
 ! : RegEnumValueA ;
-! : RegEnumValueW ;
+
+FUNCTION: LONG RegEnumValueW (
+        HKEY hKey,
+        DWORD dwIndex,
+        LPTSTR lpValueName,
+        LPDWORD lpcchValueName,
+        LPDWORD lpReserved,
+        LPDWORD lpType,
+        LPBYTE lpData,
+        LPDWORD lpcbData
+    ) ;
+
+ALIAS: RegEnumValue RegEnumValueW
+
 ! : RegFlushKey ;
 ! : RegGetKeySecurity ;
 ! : RegLoadKeyA ;
@@ -900,17 +948,33 @@ FUNCTION: LONG RegCreateKeyExW ( HKEY hKey, LPCTSTR lpSubKey, DWORD Reserved, LP
 FUNCTION: LONG RegOpenCurrentUser ( REGSAM samDesired, PHKEY phkResult ) ;
 ! : RegOpenKeyA ;
 ! : RegOpenKeyExA ;
-! : RegOpenKeyExW ;
+FUNCTION: LONG RegOpenKeyExW ( HKEY hKey, LPCTSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult ) ;
+ALIAS: RegOpenKeyEx RegOpenKeyExW
 ! : RegOpenKeyW ;
 ! : RegOpenUserClassesRoot ;
 ! : RegOverridePredefKey ;
 ! : RegQueryInfoKeyA ;
-! : RegQueryInfoKeyW ;
+FUNCTION: LONG RegQueryInfoKeyW (
+        HKEY hKey,
+        LPTSTR lpClass,
+        LPDWORD lpcClass,
+        LPDWORD lpReserved,
+        LPDWORD lpcSubKeys,
+        LPDWORD lpcMaxSubKeyLen,
+        LPDWORD lpcMaxClassLen,
+        LPDWORD lpcValues,
+        LPDWORD lpcMaxValueNameLen,
+        LPDWORD lpcMaxValueLen,
+        LPDWORD lpcbSecurityDescriptor,
+        PFILETIME lpftLastWriteTime
+    ) ;
+ALIAS: RegQueryInfoKey RegQueryInfoKeyW
 ! : RegQueryMultipleValuesA ;
 ! : RegQueryMultipleValuesW ;
 ! : RegQueryValueA ;
 ! : RegQueryValueExA ;
-FUNCTION: LONG RegQueryValueExW ( HKEY hKey, LPCTSTR lpValueName, LPWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData ) ;
+FUNCTION: LONG RegQueryValueExW ( HKEY hKey, LPCTSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData ) ;
+ALIAS: RegQueryValueEx RegQueryValueExW
 ! : RegQueryValueW ;
 ! : RegReplaceKeyA ;
 ! : RegReplaceKeyW ;
