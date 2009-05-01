@@ -14,11 +14,12 @@ M: frp-table row-columns quot>> [ call( a -- b ) ] [ drop f ] if* ;
 M: frp-table row-value val-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 
-: <frp-table> ( model quot -- table )
-    frp-table new-line-gadget dup >>renderer swap >>quot swap >>model
+: <frp-table> ( model -- table )
+    frp-table new-line-gadget dup >>renderer [ ] >>quot swap >>model
     f <model> >>selected-value sans-serif-font >>font
     focus-border-color >>focus-border-color
     transparent >>column-line-color ;
+: <frp-list> ( model -- table ) <frp-table> [ 1array ] >>quot ;
 : <frp-field> ( -- field ) f <model> <model-field> ;
 
 ! Layout utilities
@@ -27,11 +28,11 @@ GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
 M: frp-table output-model selected-value>> ;
 
-GENERIC: , ( object -- )
+GENERIC: , ( uiitem -- )
 M: gadget , make:, ;
 M: model , activate-model ;
 
-GENERIC: -> ( object -- model )
+GENERIC: -> ( uiitem -- model )
 M: gadget -> dup make:, output-model ;
 M: model -> dup , ;
 M: table -> dup , selected-value>> ;
