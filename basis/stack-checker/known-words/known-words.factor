@@ -147,7 +147,7 @@ M: object infer-call*
     apply-word/effect ;
 
 : infer-execute-effect-unsafe ( -- )
-    \ execute infer-effect-unsafe ;
+    \ (execute) infer-effect-unsafe ;
 
 : infer-call-effect-unsafe ( -- )
     \ call infer-effect-unsafe ;
