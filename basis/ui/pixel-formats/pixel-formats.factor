@@ -1,4 +1,4 @@
-USING: destructors math ui.backend ;
+USING: accessors destructors kernel math ui.backend ;
 IN: ui.pixel-formats
 
 SYMBOLS:
@@ -45,10 +45,13 @@ HOOK: (make-pixel-format) ui-backend ( attributes -- pixel-format-handle )
 HOOK: (free-pixel-format) ui-backend ( pixel-format-handle -- )
 HOOK: (pixel-format-attribute) ui-backend ( pixel-format-handle attribute-name -- value )
 
+ERROR: invalid-pixel-format-attributes attributes ;
+
 TUPLE: pixel-format { handle read-only } ;
 
 : <pixel-format> ( attributes -- pixel-format )
-    (make-pixel-format) pixel-format boa ;
+    dup (make-pixel-format)
+    [ nip pixel-format boa ] [ invalid-pixel-format-attributes ] if* ;
 
 M: pixel-format dispose
     [ [ (free-pixel-format) ] when* f ] change-handle drop ;

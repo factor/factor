@@ -153,6 +153,7 @@ M: world handle-gesture ( gesture gadget -- ? )
 GENERIC: world-pixel-format-attributes ( world -- attributes )
 
 M: world world-pixel-format-attributes
+    drop
     { windowed double-buffered T{ depth-bits { value 16 } } } ;
 
 : with-world-pixel-format ( world quot -- )
