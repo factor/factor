@@ -188,9 +188,7 @@ SYMBOL: history
     { curry compose } memq? ;
 
 : never-inline-word? ( word -- ? )
-    [ deferred? ]
-    [ "default" word-prop ]
-    [ { call execute } memq? ] tri or or ;
+    [ deferred? ] [ "default" word-prop ] [ \ call eq? ] tri or or ;
 
 : custom-inlining? ( word -- ? )
     "custom-inlining" word-prop ;
