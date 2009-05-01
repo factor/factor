@@ -59,21 +59,18 @@ CONSTANT: object-info T{ value-info f object full-interval }
 
 : <value-info> ( -- info ) \ value-info new ;
 
-: read-only-slots ( values class -- slots )
-    all-slots
-    [ read-only>> [ drop f ] unless ] 2map
-    f prefix ;
-
 DEFER: <literal-info>
+
+: tuple-slot-infos ( tuple -- slots )
+    [ tuple-slots ] [ class all-slots ] bi
+    [ read-only>> [ <literal-info> ] [ drop f ] if ] 2map
+    f prefix ;
 
 : init-literal-info ( info -- info )
     dup literal>> class >>class
     dup literal>> dup real? [ [a,a] >>interval ] [
         [ [-inf,inf] >>interval ] dip
-        dup tuple? [
-            [ tuple-slots [ <literal-info> ] map ] [ class ] bi
-            read-only-slots >>slots
-        ] [ drop ] if
+        dup tuple? [ tuple-slot-infos >>slots ] [ drop ] if
     ] if ; inline
 
 : init-value-info ( info -- info )
