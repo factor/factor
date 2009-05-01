@@ -23,6 +23,18 @@ void jit_init(F_JIT *jit, CELL jit_type, CELL owner)
 
 	if(stack_traces_p())
 		growable_array_add(&jit->literals,jit->owner);
+
+	jit->computing_offset_p = false;
+}
+
+/* Facility to convert compiled code offsets to quotation offsets.
+Call jit_compute_offset() with the compiled code offset, then emit
+code, and at the end jit->position is the quotation position. */
+void jit_compute_position(F_JIT *jit, CELL offset)
+{
+	jit->computing_offset_p = true;
+	jit->position = 0;
+	jit->offset = offset;
 }
 
 /* Allocates memory */
@@ -75,11 +87,33 @@ static F_REL rel_to_emit(F_JIT *jit, CELL template, bool *rel_p)
 void jit_emit(F_JIT *jit, CELL template)
 {
 	REGISTER_ROOT(template);
+
 	bool rel_p;
 	F_REL rel = rel_to_emit(jit,template,&rel_p);
 	if(rel_p) growable_byte_array_append(&jit->relocation,&rel,sizeof(F_REL));
+
 	F_BYTE_ARRAY *code = code_to_emit(template);
+
+	if(jit->computing_offset_p)
+	{
+		CELL size = array_capacity(code);
+
+		if(jit->offset == 0)
+		{
+			jit->position--;
+			jit->computing_offset_p = false;
+		}
+		else if(jit->offset < size)
+		{
+			jit->position++;
+			jit->computing_offset_p = false;
+		}
+		else
+			jit->offset -= size;
+	}
+
 	growable_byte_array_append(&jit->code,code + 1,array_capacity(code));
+
 	UNREGISTER_ROOT(template);
 }
 
