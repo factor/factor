@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs strings kernel sorting namespaces
-sequences definitions init ;
+sequences definitions ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -68,8 +68,6 @@ M: f vocab-main ;
 SYMBOL: vocab-observers
 
 GENERIC: vocabs-changed ( obj -- )
-
-[ V{ } clone vocab-observers set-global ] "vocabs" add-init-hook
 
 : add-vocab-observer ( obj -- )
     vocab-observers get push ;
