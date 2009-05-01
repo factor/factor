@@ -1,5 +1,6 @@
 USING: hashtables assocs sequences locals math accessors multiline delegate strings
-delegate.protocols kernel peg peg.ebnf lexer namespaces combinators parser words ;
+delegate.protocols kernel peg peg.ebnf peg.private lexer namespaces combinators parser
+words ;
 IN: peg-lexer
 
 TUPLE: lex-hash hash ;
@@ -43,12 +44,12 @@ M: lex-hash at*
 
 : parse* ( parser -- ast )
     compile
-    [ execute( -- result ) [ error-stack get first throw ] unless* ] with-global-lexer
-    ast>> ;
+    [ execute [ error-stack get first throw ] unless* ] with-global-lexer
+    ast>> ; inline
 
 : create-bnf ( name parser -- )
-    reset-tokenizer [ lexer get skip-blank parse* parsed ] curry
-    define-syntax ;
+    reset-tokenizer [ lexer get skip-blank parse* dup ignore? [ drop ] [ parsed ] if ] curry
+    define-syntax word make-inline ;
     
 SYNTAX: ON-BNF:
     CREATE-WORD reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
