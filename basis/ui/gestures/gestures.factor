@@ -310,16 +310,16 @@ HOOK: keysym>string os ( keysym -- string )
 
 M: macosx keysym>string >upper ;
 
-M: object keysym>string ;
+M: object keysym>string dup length 1 = [ >lower ] when ;
 
 M: key-down gesture>string
     [ mods>> ] [ sym>> ] bi
     {
         { [ dup { [ length 1 = ] [ first LETTER? ] } 1&& ] [ [ S+ prefix ] dip ] }
         { [ dup " " = ] [ drop "SPACE" ] }
-        [ keysym>string ]
+        [ ]
     } cond
-    [ modifiers>string ] dip append ;
+    [ modifiers>string ] [ keysym>string ] bi* append ;
 
 M: button-up gesture>string
     [
