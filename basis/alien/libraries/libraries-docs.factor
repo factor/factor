@@ -15,7 +15,7 @@ HELP: libraries
 { $description "A global hashtable that keeps a list of open libraries. Use the " { $link add-library } " word to construct a library and add it with a single call." } ;
 
 HELP: library
-{ $values { "name" "a string" } { "library" "a hashtable" } }
+{ $values { "name" "a string" } { "library" assoc } }
 { $description "Looks up a library by its logical name. The library object is a hashtable with the following keys:"
     { $list
         { { $snippet "name" } " - the full path of the C library binary" }

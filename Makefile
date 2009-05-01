@@ -10,7 +10,6 @@ VERSION = 0.92
 BUNDLE = Factor.app
 LIBPATH = -L/usr/X11R6/lib
 CFLAGS = -Wall -Werror
-FFI_TEST_CFLAGS = -fPIC
 
 ifdef DEBUG
 	CFLAGS += -g -DFACTOR_DEBUG
