@@ -27,12 +27,7 @@ generated.
 4) When preceded by a quotation, calls to 'dip', '2dip' and '3dip' are
 open-coded as retain stack manipulation surrounding a subroutine call.
 
-5) When preceded by an array, calls to the 'declare' word are optimized out
-entirely. This word is only used by the optimizing compiler, and with the
-non-optimizing compiler it would otherwise just decrease performance to have to
-push the array and immediately drop it after.
-
-6) Sub-primitives are primitive words which are implemented in assembly and not
+5) Sub-primitives are primitive words which are implemented in assembly and not
 in the VM. They are open-coded and no subroutine call is generated. This
 includes stack shufflers, some fixnum arithmetic words, and words such as tag,
 slot and eq?. A primitive call is relatively expensive (two subroutine calls)
