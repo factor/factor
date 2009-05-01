@@ -9,18 +9,19 @@ IN: tools.time
     micros [ call micros ] dip - ; inline
 
 : time. ( time -- )
-    "== Running time ==" print nl 1000000 /f pprint " seconds" write ;
+    "== Running time ==" print nl 1000000 /f pprint " seconds" print ;
 
 : gc-stats. ( stats -- )
     5 cut*
     "== Garbage collection ==" print nl
+    "Times are in microseconds." print nl
     [
         6 group
         {
             "GC count:"
-            "Cumulative GC time (us):"
-            "Longest GC pause (us):"
-            "Average GC pause (us):"
+            "Total GC time:"
+            "Longest GC pause:"
+            "Average GC pause:"
             "Objects copied:"
             "Bytes copied:"
         } prefix
@@ -31,10 +32,10 @@ IN: tools.time
     [
         nl
         {
-            "Total GC time (us):"
+            "Total GC time:"
             "Cards scanned:"
             "Decks scanned:"
-            "Card scan time (us):"
+            "Card scan time:"
             "Code heap literal scans:"
         } swap zip simple-table.
     ] bi* ;
