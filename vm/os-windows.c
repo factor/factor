@@ -1,39 +1,5 @@
 #include "master.h"
 
-F_STRING *get_error_message(void)
-{
-	DWORD id = GetLastError();
-	F_CHAR *msg = error_message(id);
-	F_STRING *string = from_u16_string(msg);
-	LocalFree(msg);
-	return string;
-}
-
-/* You must LocalFree() the return value! */
-F_CHAR *error_message(DWORD id)
-{
-	F_CHAR *buffer;
-	int index;
-
-	DWORD ret = FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL,
-		id,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR)(void *) &buffer,
-		0, NULL);
-	if(ret == 0)
-		return error_message(GetLastError());
-
-	/* strip whitespace from end */
-	index = wcslen(buffer) - 1;
-	while(index >= 0 && isspace(buffer[index]))
-		buffer[index--] = 0;
-
-	return buffer;
-}
-
 HMODULE hFactorDll;
 
 void init_ffi(void)

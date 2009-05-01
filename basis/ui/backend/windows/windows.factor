@@ -6,14 +6,18 @@ ui.gadgets ui.gadgets.private ui.backend ui.clipboards
 ui.gadgets.worlds ui.gestures ui.event-loop io kernel math
 math.vectors namespaces make sequences strings vectors words
 windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
-windows.messages windows.types windows.offscreen windows.nt windows
+windows.messages windows.types windows.offscreen windows.nt
 threads libc combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render ascii math.bitwise locals
 accessors math.rectangles math.order ascii calendar
-io.encodings.utf16n ;
+io.encodings.utf16n windows.errors ;
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
+
+: lo-word ( wparam -- lo ) <short> *short ; inline
+: hi-word ( wparam -- hi ) -16 shift lo-word ; inline
+: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
 
 : crlf>lf ( str -- str' )
     CHAR: \r swap remove ;
@@ -286,8 +290,6 @@ SYMBOL: nc-buttons
     message>button nc-buttons get
     swap [ push ] [ delete ] if ;
 
-: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
-
 : mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
 
 : mouse-event>gesture ( uMsg -- button )
@@ -552,6 +554,54 @@ M: windows-ui-backend (with-ui)
 
 M: windows-ui-backend beep ( -- )
     0 MessageBeep drop ;
+
+: fullscreen-RECT ( hwnd -- RECT )
+    MONITOR_DEFAULTTONEAREST MonitorFromWindow
+    "MONITORINFOEX" <c-object> dup length over set-MONITORINFOEX-cbSize
+    [ GetMonitorInfo win32-error=0/f ] keep MONITORINFOEX-rcMonitor ;
+
+: hwnd>RECT ( hwnd -- RECT )
+    "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep ;
+
+: fullscreen-flags ( -- n )
+    { WS_CAPTION WS_BORDER WS_THICKFRAME } flags ; inline
+
+: enter-fullscreen ( world -- )
+    handle>> hWnd>>
+    {
+        [
+            GWL_STYLE GetWindowLong
+            fullscreen-flags unmask
+        ]
+        [ GWL_STYLE rot SetWindowLong win32-error=0/f ]
+        [
+            HWND_TOP
+            over hwnd>RECT get-RECT-dimensions
+            SWP_FRAMECHANGED
+            SetWindowPos win32-error=0/f
+        ]
+        [ SW_MAXIMIZE ShowWindow win32-error=0/f ]
+    } cleave ;
+
+: exit-fullscreen ( world -- )
+    handle>> hWnd>>
+    {
+        [
+            GWL_STYLE GetWindowLong
+            fullscreen-flags bitor
+        ]
+        [ GWL_STYLE rot SetWindowLong win32-error=0/f ]
+        [
+            f
+            over hwnd>RECT get-RECT-dimensions
+            { SWP_NOMOVE SWP_NOSIZE SWP_NOZORDER SWP_FRAMECHANGED } flags
+            SetWindowPos win32-error=0/f
+        ]
+        [ SW_RESTORE ShowWindow win32-error=0/f ]
+    } cleave ;
+
+M: windows-ui-backend set-fullscreen* ( ? world -- )
+    swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 windows-ui-backend ui-backend set-global
 
