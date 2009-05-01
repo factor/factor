@@ -239,12 +239,12 @@ HELP: each-block
 
 HELP: stream-contents
 { $values { "stream" "an input stream" } { "seq" "a string, byte array or " { $link f } } }
-{ $description "Reads the entire contents of a stream. If the stream is empty, outputs"  { $link f } "." }
+{ $description "Reads the entire contents of a stream. If the stream is empty, outputs "  { $link f } "." }
 $io-error ;
 
 HELP: contents
 { $values { "seq" "a string, byte array or " { $link f } } }
-{ $description "Reads the entire contents of a the stream stored in " { $link input-stream } ". If the stream is empty, outputs"  { $link f } "." }
+{ $description "Reads the entire contents of a the stream stored in " { $link input-stream } ". If the stream is empty, outputs " { $link f } "." }
 $io-error ;
 
 ARTICLE: "stream-protocol" "Stream protocol"
