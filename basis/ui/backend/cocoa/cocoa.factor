@@ -1,14 +1,15 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors math arrays assocs cocoa cocoa.application
-command-line kernel memory namespaces cocoa.messages
+command-line kernel memory namespaces cocoa.messages classes
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
 cocoa.windows cocoa.classes cocoa.nibs sequences ui ui.private
 ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
 ui.backend.cocoa.views core-foundation core-foundation.run-loop
 core-graphics.types threads math.rectangles fry libc
 generalizations alien.c-types cocoa.views
-combinators io.thread locals ;
+combinators io.thread locals ui.pixel-formats
+specialized-arrays.int literals core-graphics ;
 IN: ui.backend.cocoa
 
 TUPLE: handle ;
@@ -19,6 +20,57 @@ C: <window-handle> window-handle
 C: <offscreen-handle> offscreen-handle
 
 SINGLETON: cocoa-ui-backend
+
+<PRIVATE
+
+GENERIC: >NSOpenGLPFA ( attribute -- NSOpenGLPFAs )
+
+CONSTANT: attribute>NSOpenGLPFA-map H{
+    { double-buffered { $ NSOpenGLPFADoubleBuffer } }
+    { stereo { $ NSOpenGLPFAStereo } }
+    { offscreen { $ NSOpenGLPFAOffScreen } }
+    { fullscreen { $ NSOpenGLPFAFullScreen } }
+    { windowed { $ NSOpenGLPFAWindow } }
+    { accelerated { $ NSOpenGLPFAAccelerated } }
+    { software-rendered { $ NSOpenGLPFASingleRenderer $ kCGLRendererGenericFloatID } }
+    { robust { $ NSOpenGLPFARobust } }
+    { backing-store { $ NSOpenGLPFABackingStore } }
+    { multisampled { $ NSOpenGLPFAMultisample } }
+    { supersampled { $ NSOpenGLPFASupersample } }
+    { sample-alpha { $ NSOpenGLPFASampleAlpha } }
+    { color-float { $ NSOpenGLPFAColorFloat } }
+    { color-bits { $ NSOpenGLPFAColorSize } }
+    { alpha-bits { $ NSOpenGLPFAAlphaSize } }
+    { accum-bits { $ NSOpenGLPFAAccumSize } }
+    { depth-bits { $ NSOpenGLPFADepthSize } }
+    { stencil-bits { $ NSOpenGLPFAStencilSize } }
+    { aux-buffers { $ NSOpenGLPFAAuxBuffers } }
+    { sample-buffers { $ NSOpenGLPFASampleBuffers } }
+    { samples { $ NSOpenGLPFASamples } }
+}
+
+M: object >NSOpenGLPFA
+    drop { } ;
+M: symbol >NSOpenGLPFA
+    attribute>NSOpenGLPFA-map at [ { } ] unless* ;
+M: pixel-format-attribute >NSOpenGLPFA
+    dup class attribute>NSOpenGLPFA-map at
+    [ swap value>> suffix ]
+    [ drop { } ] if ;
+
+PRIVATE>
+
+M: cocoa-ui-backend (make-pixel-format)
+    [ >NSOpenGLPFA ] map concat >int-array
+    NSOpenGLPixelFormat -> alloc swap -> initWithAttributes: ;
+
+M: cocoa-ui-backend (free-pixel-format)
+    -> release ;
+
+M: cocoa-ui-backend (pixel-format-attribute)
+    attribute>NSOpenGLPFA-map at
+    [ first 0 <int> [ swap 0 -> getValues:forAttribute:forVirtualScreen: ] keep *int ]
+    [ f ] if* ;
 
 TUPLE: pasteboard handle ;
 
@@ -70,7 +122,7 @@ M: cocoa-ui-backend fullscreen* ( world -- ? )
     handle>> view>> -> isInFullScreenMode zero? not ;
 
 M:: cocoa-ui-backend (open-window) ( world -- )
-    world dim>> <FactorView> :> view
+    [ [ dim>> ] dip <FactorView> ] with-world-pixel-format :> view
     view world world>NSRect <ViewWindow> :> window
     view -> release
     world view register-window
@@ -97,18 +149,19 @@ M: cocoa-ui-backend raise-window* ( world -- )
     ] when* ;
 
 : pixel-size ( pixel-format -- size )
-    0 <int> [ NSOpenGLPFAColorSize 0 -> getValues:forAttribute:forVirtualScreen: ]
-    keep *int -3 shift ;
+    color-bits pixel-format-attribute -3 shift ;
 
 : offscreen-buffer ( world pixel-format -- alien w h pitch )
     [ dim>> first2 ] [ pixel-size ] bi*
     { [ * * malloc ] [ 2drop ] [ drop nip ] [ nip * ] } 3cleave ;
 
-: gadget-offscreen-context ( world -- context buffer )
-    NSOpenGLPFAOffScreen 1array <PixelFormat>
-    [ nip NSOpenGLContext -> alloc swap f -> initWithFormat:shareContext: dup ]
-    [ offscreen-buffer ] 2bi
-    4 npick [ -> setOffScreen:width:height:rowbytes: ] dip ;
+:: gadget-offscreen-context ( world -- context buffer )
+    world world-pixel-format-attributes offscreen suffix
+    <pixel-format> [
+        :> pf
+        NSOpenGLContext -> alloc pf handle>> f -> initWithFormat:shareContext:
+        dup world pf offscreen-buffer -> setOffScreen:width:height:rowbytes:
+    ] with-disposal ;
 
 M: cocoa-ui-backend (open-offscreen-buffer) ( world -- )
     dup gadget-offscreen-context <offscreen-handle> >>handle drop ;
