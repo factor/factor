@@ -71,7 +71,7 @@ ERROR: bad-alarm-frequency frequency ;
     ] when* ;
 
 : init-alarms ( -- )
-    alarms global [ cancel-alarms <min-heap> ] change-at
+    alarms [ cancel-alarms <min-heap> ] change-global
     [ alarm-thread-loop t ] "Alarms" spawn-server
     alarm-thread set-global ;
 
