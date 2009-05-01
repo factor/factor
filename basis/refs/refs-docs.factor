@@ -1,14 +1,18 @@
 ! Copyright (C) 2007 Slava Pestov, 2009 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: boxes help.markup help.syntax kernel math namespaces ;
+USING: boxes help.markup help.syntax kernel math namespaces assocs ;
 IN: refs
 
 ARTICLE: "refs" "References"
-"References provide a uniform way of accessing and changing values. Some examples of referenced values are variables, tuple slots, and keys or values of assocs. References can be read, written, and deleted. References are defined in the " { $vocab-link "refs" } " vocabulary, and new reference types can be made by implementing the " { $link "refs-protocol" } "."
-{ $subsection get-ref }
-{ $subsection set-ref }
-{ $subsection set-ref* }
-{ $subsection delete-ref }
+"References provide a uniform way of accessing and changing values. Some examples of referenced values are variables, tuple slots, and keys or values of assocs. References can be read, written, and deleted. References are defined in the " { $vocab-link "refs" } " vocabulary, and new reference types can be made by implementing a protocol."
+{ $subsection "refs-protocol" }
+{ $subsection "refs-impls" }
+{ $subsection "refs-utils" }
+"References are used by the " { $link "ui-inspector" } "." ;
+
+ABOUT: "refs"
+
+ARTICLE: "refs-impls" "Reference implementations"
 "References to objects:"
 { $subsection obj-ref }
 { $subsection <obj-ref> }
@@ -27,20 +31,24 @@ ARTICLE: "refs" "References"
 { $subsection slot-ref }
 { $subsection <slot-ref> }
 "Using boxes as references:"
-{ $subsection "box-refs" }
-"References are used by the UI inspector." ;
+{ $subsection "box-refs" } ;
 
-ABOUT: "refs"
+ARTICLE: "refs-utils" "Reference utilities"
+{ $subsection ref-on }
+{ $subsection ref-off }
+{ $subsection ref-inc }
+{ $subsection ref-dec }
+{ $subsection set-ref* } ;
 
-ARTICLE: "refs-protocol" "Reference Protocol"
+ARTICLE: "refs-protocol" "Reference protocol"
 "To use a class of objects as references you must implement the reference protocol for that class, and mark your class as an instance of the " { $link ref } " mixin class. All references must implement these two words:"
 { $subsection get-ref }
 { $subsection set-ref }
 "References may also implement:"
 { $subsection delete-ref } ;
 
-ARTICLE: "box-refs" "Using Boxes as References"
-"Boxes are elements of the " { $link ref } " mixin class, so any box may be used as a reference. Bear in mind that boxes will still throw an error if you call " { $link get-ref } " on an empty box." ;
+ARTICLE: "box-refs" "Boxes as references"
+{ $link "boxes" } " are elements of the " { $link ref } " mixin class, so any box may be used as a reference. Bear in mind that boxes will still throw an error if you call " { $link get-ref } " on an empty box." ;
 
 HELP: ref
 { $class-description "A mixin class whose instances encapsulate a value which can be read, written, and deleted. Instantiable members of this class include:" { $link obj-ref } ", " { $link var-ref } ", " { $link global-var-ref } ", " { $link slot-ref } ", " { $link box } ", " { $link key-ref } ", and " { $link value-ref } "." } ;
@@ -89,14 +97,14 @@ HELP: key-ref
 { $class-description "Instances of this class identify a key in an associative structure. New key references are created by calling " { $link <key-ref> } "." } ;
 
 HELP: <key-ref>
-{ $values { "assoc" "an assoc" } { "key" object } { "key-ref" key-ref } }
+{ $values { "assoc" assoc } { "key" object } { "key-ref" key-ref } }
 { $description "Creates a reference to a key stored in an assoc." } ;
 
 HELP: value-ref
 { $class-description "Instances of this class identify a value associated to a key in an associative structure. New value references are created by calling " { $link <value-ref> } "." } ;
 
 HELP: <value-ref>
-{ $values { "assoc" "an assoc" } { "key" object } { "value-ref" value-ref } }
+{ $values { "assoc" assoc } { "key" object } { "value-ref" value-ref } }
 { $description "Creates a reference to the value associated with " { $snippet "key" } " in " { $snippet "assoc" } "." } ;
 
 { get-ref set-ref delete-ref set-ref* } related-words
