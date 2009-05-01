@@ -42,31 +42,14 @@ CONSTANT: NSOpenGLPFAAllowOfflineRenderers 96
 CONSTANT: NSOpenGLPFAVirtualScreenCount 128
 CONSTANT: NSOpenGLCPSwapInterval 222
 
-<PRIVATE
-
-SYMBOL: software-renderer?
-SYMBOL: multisample?
-
-PRIVATE>
-
-: with-software-renderer ( quot -- )
-    [ t software-renderer? ] dip with-variable ; inline
-
-: with-multisample ( quot -- )
-    [ t multisample? ] dip with-variable ; inline
-
 : <PixelFormat> ( attributes -- pixelfmt )
     NSOpenGLPixelFormat -> alloc swap [
         %
         NSOpenGLPFADepthSize , 16 ,
-        software-renderer? get [
-            NSOpenGLPFARendererID , kCGLRendererGenericFloatID ,
-        ] when
-        multisample? get [
-            NSOpenGLPFASupersample ,
-            NSOpenGLPFASampleBuffers , 1 ,
-            NSOpenGLPFASamples , 8 ,
-        ] when
+        ! NSOpenGLPFARendererID , kCGLRendererGenericFloatID ,
+        ! NSOpenGLPFASupersample ,
+        ! NSOpenGLPFASampleBuffers , 1 ,
+        ! NSOpenGLPFASamples , 8 ,
         0 ,
     ] int-array{ } make
     -> initWithAttributes:
