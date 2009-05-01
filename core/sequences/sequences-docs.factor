@@ -1,6 +1,6 @@
 USING: arrays help.markup help.syntax math
 sequences.private vectors strings kernel math.order layouts
-quotations generic.standard ;
+quotations generic.single ;
 IN: sequences
 
 HELP: sequence
@@ -1466,8 +1466,8 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection produce }
 { $subsection produce-as }
 "Filtering:"
-{ $subsection push-if }
 { $subsection filter }
+{ $subsection partition }
 "Testing if a sequence contains elements satisfying a predicate:"
 { $subsection any? }
 { $subsection all? }

@@ -70,18 +70,10 @@ DEFER: <literal-info>
     dup literal>> class >>class
     dup literal>> dup real? [ [a,a] >>interval ] [
         [ [-inf,inf] >>interval ] dip
-        {
-            { [ dup complex? ] [
-                [ real-part <literal-info> ]
-                [ imaginary-part <literal-info> ] bi
-                2array >>slots
-            ] }
-            { [ dup tuple? ] [
-                [ tuple-slots [ <literal-info> ] map ] [ class ] bi
-                read-only-slots >>slots
-            ] }
-            [ drop ]
-        } cond
+        dup tuple? [
+            [ tuple-slots [ <literal-info> ] map ] [ class ] bi
+            read-only-slots >>slots
+        ] [ drop ] if
     ] if ; inline
 
 : init-value-info ( info -- info )

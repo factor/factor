@@ -44,7 +44,7 @@ SYMBOL: calls
 
 SYMBOL: compiling-word
 
-: compiled-stack-traces? ( -- ? ) 59 getenv ;
+: compiled-stack-traces? ( -- ? ) 67 getenv ;
 
 ! Mapping _label IDs to label instances
 SYMBOL: labels

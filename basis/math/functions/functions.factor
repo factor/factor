@@ -7,19 +7,8 @@ IN: math.functions
 : >fraction ( a/b -- a b )
     [ numerator ] [ denominator ] bi ; inline
 
-<PRIVATE
-
-: (rect>) ( x y -- z )
-    dup 0 = [ drop ] [ <complex> ] if ; inline
-
-PRIVATE>
-
 : rect> ( x y -- z )
-    2dup [ real? ] both? [
-        (rect>)
-    ] [
-        "Complex number must have real components" throw
-    ] if ; inline
+    dup 0 = [ drop ] [ complex boa ] if ; inline
 
 GENERIC: sqrt ( x -- y ) foldable
 

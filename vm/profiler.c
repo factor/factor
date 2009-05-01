@@ -1,54 +1,20 @@
 #include "master.h"
 
 /* Allocates memory */
-F_CODE_BLOCK *compile_profiling_stub(F_WORD *word)
+F_CODE_BLOCK *compile_profiling_stub(CELL word)
 {
-	CELL literals = allot_array_2(tag_object(word),tag_object(word));
-	REGISTER_ROOT(literals);
-
-	F_ARRAY *quadruple = untag_object(userenv[JIT_PROFILING]);
-
-	CELL code = array_nth(quadruple,0);
-	REGISTER_ROOT(code);
-
-	F_REL rel = (to_fixnum(array_nth(quadruple,1)) << 24)
-		| (to_fixnum(array_nth(quadruple,2)) << 28)
-		| (to_fixnum(array_nth(quadruple,3)) * compiled_code_format());
-
-	F_BYTE_ARRAY *relocation = allot_byte_array(sizeof(F_REL));
-	memcpy(relocation + 1,&rel,sizeof(F_REL));
-
-	UNREGISTER_ROOT(code);
-	UNREGISTER_ROOT(literals);
-
-	return add_code_block(
-		WORD_TYPE,
-		untag_object(code),
-		NULL, /* no labels */
-		tag_object(relocation),
-		literals);
+	REGISTER_ROOT(word);
+	F_JIT jit;
+	jit_init(&jit,WORD_TYPE,word);
+	jit_emit_with(&jit,userenv[JIT_PROFILING],word);
+	F_CODE_BLOCK *block = jit_make_code_block(&jit);
+	jit_dispose(&jit);
+	UNREGISTER_ROOT(word);
+	return block;
 }
 
 /* Allocates memory */
-void update_word_xt(F_WORD *word)
-{
-	if(profiling_p)
-	{
-		if(!word->profiling)
-		{
-			REGISTER_UNTAGGED(word);
-			F_CODE_BLOCK *profiling = compile_profiling_stub(word);
-			UNREGISTER_UNTAGGED(word);
-			word->profiling = profiling;
-		}
-
-		word->xt = (XT)(word->profiling + 1);
-	}
-	else
-		word->xt = (XT)(word->code + 1);
-}
-
-void set_profiling(bool profiling)
+static void set_profiling(bool profiling)
 {
 	if(profiling == profiling_p)
 		return;

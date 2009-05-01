@@ -22,13 +22,15 @@ IN: bootstrap.x86
 : rex-length ( -- n ) 0 ;
 
 [
-    temp0 0 [] MOV                              ! load stack_chain
-    temp0 [] stack-reg MOV                      ! save stack pointer
-] rc-absolute-cell rt-stack-chain 2 jit-save-stack jit-define
+    ! load stack_chain
+    temp0 0 [] MOV rc-absolute-cell rt-stack-chain jit-rel
+    ! save stack pointer
+    temp0 [] stack-reg MOV
+] jit-save-stack jit-define
 
 [
-    (JMP) drop
-] rc-relative rt-primitive 1 jit-primitive jit-define
+    (JMP) drop rc-relative rt-primitive jit-rel
+] jit-primitive jit-define
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file parsed >>
 call

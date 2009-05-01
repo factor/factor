@@ -6,7 +6,7 @@ sequences assocs sequences.private strings io.styles
 io.pathnames vectors words system splitting math.parser
 classes.mixin classes.tuple continuations continuations.private
 combinators generic.math classes.builtin classes compiler.units
-generic.standard vocabs init kernel.private io.encodings
+generic.standard generic.single vocabs init kernel.private io.encodings
 accessors math.order destructors source-files parser
 classes.tuple.parser effects.parser lexer
 generic.parser strings.parser vocabs.loader vocabs.parser see

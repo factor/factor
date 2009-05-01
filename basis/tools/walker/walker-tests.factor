@@ -1,7 +1,7 @@
 USING: tools.walker io io.streams.string kernel math
 math.private namespaces prettyprint sequences tools.test
 continuations math.parser threads arrays tools.walker.debug
-generic.standard sequences.private kernel.private
+generic.single sequences.private kernel.private
 tools.continuations accessors words ;
 IN: tools.walker.tests
 
@@ -118,7 +118,7 @@ IN: tools.walker.tests
 
 \ breakpoint-test don't-step-into
 
-[ f ] [ \ breakpoint-test optimized>> ] unit-test
+[ f ] [ \ breakpoint-test optimized? ] unit-test
 
 [ { 3 } ] [ [ breakpoint-test ] test-walker ] unit-test
 

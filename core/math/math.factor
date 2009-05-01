@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math.private ;
 IN: math
@@ -63,22 +63,21 @@ PRIVATE>
 : neg ( x -- -x ) 0 swap - ; inline
 : recip ( x -- y ) 1 swap / ; inline
 : sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
-
 : ?1+ ( x -- y ) [ 1+ ] [ 0 ] if* ; inline
-
 : rem ( x y -- z ) abs [ mod ] [ + ] [ mod ] tri ; foldable
-
 : 2^ ( n -- 2^n ) 1 swap shift ; inline
-
 : even? ( n -- ? ) 1 bitand zero? ;
-
 : odd? ( n -- ? ) 1 bitand 1 number= ;
 
 UNION: integer fixnum bignum ;
 
+TUPLE: ratio { numerator integer read-only } { denominator integer read-only } ;
+
 UNION: rational integer ratio ;
 
 UNION: real rational float ;
+
+TUPLE: complex { real real read-only } { imaginary real read-only } ;
 
 UNION: number real complex ;
 

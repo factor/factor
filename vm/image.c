@@ -183,7 +183,7 @@ void primitive_save_image_and_exit(void)
 	for(i = 0; i < FIRST_SAVE_ENV; i++)
 		userenv[i] = F;
 
-	for(i = LAST_SAVE_ENV + 1; i < USER_ENV; i++)
+	for(i = LAST_SAVE_ENV + 1; i < STACK_TRACES_ENV; i++)
 		userenv[i] = F;
 
 	/* do a full GC + code heap compaction */
