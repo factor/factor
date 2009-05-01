@@ -30,8 +30,13 @@ UNION: fixed-length-sequence array byte-array string ;
     [ [ literal>> ] map ] dip prefix >tuple
     <literal-info> ;
 
+: read-only-slots ( values class -- slots )
+    all-slots
+    [ read-only>> [ value-info ] [ drop f ] if ] 2map
+    f prefix ;
+
 : (propagate-tuple-constructor) ( values class -- info )
-    [ [ value-info ] map ] dip [ read-only-slots ] keep
+    [ read-only-slots ] keep
     over rest-slice [ dup [ literal?>> ] when ] all? [
         [ rest-slice ] dip fold-<tuple-boa>
     ] [

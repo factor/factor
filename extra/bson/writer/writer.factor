@@ -6,10 +6,7 @@ io.encodings.utf8 io.streams.byte-array kernel math math.parser
 namespaces quotations sequences sequences.private serialize strings
 words combinators.short-circuit literals ;
 
-
 IN: bson.writer
-
-#! Writes the object out to a byte-vector in BSON format
 
 <PRIVATE
 
@@ -24,10 +21,9 @@ CONSTANT: INT64-SIZE 8
     [ 8192 <byte-vector> [ shared-buffer set ] keep ] unless* ; inline
 
 : >le-stream ( x n -- )
-    ! >le write  
-    swap '[ _ swap nth-byte 0 B{ 0 }
-            [ set-nth-unsafe ] keep write ] each
-            ; inline
+    swap
+    '[ _ swap nth-byte 0 B{ 0 }
+       [ set-nth-unsafe ] keep write ] each ; inline
 
 PRIVATE>
 
