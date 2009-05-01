@@ -164,8 +164,8 @@ M: sequence update-methods ( class seq -- )
         drop
         2dup [ "combination" word-prop ] dip = [ 2drop ] [
             {
+                [ drop reset-generic ]
                 [ "combination" set-word-prop ]
-                [ drop "methods" word-prop values forget-all ]
                 [ drop H{ } clone "methods" set-word-prop ]
                 [ define-default-method ]
             }

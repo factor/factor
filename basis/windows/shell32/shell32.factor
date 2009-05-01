@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax
 combinators io.encodings.utf16n io.files io.pathnames kernel
-windows windows.com windows.com.syntax windows.user32
-windows.ole32 ;
+windows.errors windows.com windows.com.syntax windows.user32
+windows.ole32 windows ;
 IN: windows.shell32
 
 CONSTANT: CSIDL_DESKTOP HEX: 00

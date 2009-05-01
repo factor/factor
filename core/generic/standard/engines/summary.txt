@@ -1,1 +1,0 @@
-Generic word dispatch strategy implementation

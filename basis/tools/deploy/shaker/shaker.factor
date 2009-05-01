@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io.backend io.streams.c init fry
 namespaces make assocs kernel parser lexer strings.parser vocabs
-sequences words words.private memory kernel.private
+sequences words memory kernel.private
 continuations io vocabs.loader system strings sets
 vectors quotations byte-arrays sorting compiler.units
 definitions generic generic.standard tools.deploy.config ;
@@ -103,6 +103,7 @@ IN: tools.deploy.shaker
                 "compiled-uses"
                 "constraints"
                 "custom-inlining"
+                "decision-tree"
                 "declared-effect"
                 "default"
                 "default-method"
@@ -112,14 +113,12 @@ IN: tools.deploy.shaker
                 "engines"
                 "forgotten"
                 "identities"
-                "if-intrinsics"
-                "infer"
                 "inline"
                 "inlined-block"
                 "input-classes"
                 "instances"
                 "interval"
-                "intrinsics"
+                "intrinsic"
                 "lambda"
                 "loc"
                 "local-reader"
@@ -136,7 +135,7 @@ IN: tools.deploy.shaker
                 "method-generic"
                 "modular-arithmetic"
                 "no-compile"
-                "optimizer-hooks"
+                "owner-generic"
                 "outputs"
                 "participants"
                 "predicate"
@@ -149,17 +148,13 @@ IN: tools.deploy.shaker
                 "register"
                 "register-size"
                 "shuffle"
-                "slot-names"
                 "slots"
                 "special"
                 "specializer"
-                "step-into"
-                "step-into?"
                 ! UI needs this
                 ! "superclass"
                 "transform-n"
                 "transform-quot"
-                "tuple-dispatch-generic"
                 "type"
                 "writer"
                 "writing"
