@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax parser namespaces kernel
-math math.bitwise windows.types windows.types init assocs
-sequences libc ;
+math math.bitwise windows.types init assocs
+sequences libc opengl.gl ;
 IN: windows.opengl32
 
 ! PIXELFORMATDESCRIPTOR flags
@@ -100,5 +100,6 @@ LIBRARY: gl
 FUNCTION: HGLRC wglCreateContext ( HDC hDC ) ;
 FUNCTION: BOOL wglDeleteContext ( HGLRC hRC ) ;
 FUNCTION: BOOL wglMakeCurrent ( HDC hDC, HGLRC hglrc ) ;
+
 FUNCTION: HGLRC wglGetCurrentContext ( ) ;
 FUNCTION: void* wglGetProcAddress ( char* name ) ;
