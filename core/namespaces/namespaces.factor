@@ -24,12 +24,13 @@ PRIVATE>
 : get-global ( variable -- value ) global at ;
 : set-global ( value variable -- ) global set-at ;
 : change ( variable quot -- ) [ [ get ] keep ] dip dip set ; inline
+: change-global ( variable quot -- ) [ global ] dip change-at ; inline
 : +@ ( n variable -- ) [ 0 or + ] change ;
 : inc ( variable -- ) 1 swap +@ ; inline
 : dec ( variable -- ) -1 swap +@ ; inline
 : bind ( ns quot -- ) swap >n call ndrop ; inline
-: counter ( variable -- n ) global [ 0 or 1+ dup ] change-at ;
+: counter ( variable -- n ) [ 0 or 1+ dup ] change-global ;
 : make-assoc ( quot exemplar -- hash ) 20 swap new-assoc [ swap bind ] keep ; inline
 : with-scope ( quot -- ) 5 <hashtable> swap bind ; inline
 : with-variable ( value key quot -- ) [ associate ] dip bind ; inline
-: initialize ( variable quot -- ) [ global ] dip [ unless* ] curry change-at ; inline
+: initialize ( variable quot -- ) [ unless* ] curry change-global ; inline
