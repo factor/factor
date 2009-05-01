@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
 namespaces make math splitting sorting quotations assocs
-combinators combinators.private accessors words ;
+combinators combinators.private accessors words init ;
 IN: continuations
 
 SYMBOL: error
@@ -200,3 +200,5 @@ M: condition compute-restarts
     "kernel-error" 6 setenv ;
 
 PRIVATE>
+
+[ init-catchstack init-error-handler ] "continuations" add-init-hook
