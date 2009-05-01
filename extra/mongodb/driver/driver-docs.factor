@@ -8,10 +8,8 @@ HELP: <mdb-collection>
   { "name" "name of the collection" }
   { "collection" "mdb-collection instance" }
 }
-{ $description "Creates a new mdb-collection instance. Use this to create capped/limited collections. See also: " { $link mdb-collection } }
-{ $examples
-  { $example "! creates a mdb-collection instance capped to a maximum of 1000000 entries"
-    "\"mycollection\" <mdb-collection> t >>capped 1000000 >>max" } } ;
+{ $examples { $unchecked-example "USING: mongodb.driver ;" "\"mycollection\" <mdb-collection> t >>capped 1000000 >>max" "" } }
+{ $description "Creates a new mdb-collection instance. Use this to create capped/limited collections." } ;
 
 HELP: <mdb>
 { $values
@@ -22,7 +20,7 @@ HELP: <mdb>
 }
 { $description "Create a new mdb-db instance and automatically resolves master/slave information in a paired MongoDB setup." }
 { $examples
-  { $example "\"db\" \"127.0.0.1\" 27017 <mdb>" } } ;
+  { $unchecked-example "USING: mongodb.driver ;" "\"db\" \"127.0.0.1\" 27017 <mdb>" "" } } ;
 
 HELP: <query>
 { $values
@@ -35,7 +33,7 @@ HELP: <query>
   "For more see: "
   { $link with-db } }
 { $examples
-  { $example "\"mycollection\" H{ } <query>" } } ;
+  { $unchecked-example "USING: mongodb.driver ;" "\"mycollection\" H{ } <query>" "" } } ;
 
 HELP: <update>
 { $values
@@ -118,22 +116,22 @@ HELP: drop-index
 
 HELP: ensure-collection
 { $values
-  { "collection" "a collection; e.g. mycollection " }
-  { "fq-collection" "full qualified collection name; e.g. db.mycollection" }
+  { "name" "a collection; e.g. mycollection " }
 }
-{ $description "ensures that the collection exists in the database and returns its full qualified name" } ;
+{ $description "ensures that the collection exists in the database" } ;
 
 HELP: ensure-index
 { $values
-  { "collection" "a collection" }
-  { "name" "index name" }
-  { "spec" "index spec" }
+  { "index-spec" "an index specification" }
 }
 { $description "Ensures the existence of the given index. "
   "For more information on MongoDB indexes see: " { $url "http://www.mongodb.org/display/DOCS/Indexes" } }
 { $examples
-  { $example "\"mycollection\" nameIdx [ \"name\" asc ] keyspec <index-spec> ensure-index" }
-  { $example "\"mycollection\" nameIdx [ \"name\" asc ] keyspec <index-spec> unique-index ensure-index" } } ;
+  { $unchecked-example "USING: mongodb.driver ;"
+    "\"db\" \"127.0.0.1\" 27017 <mdb>"
+    "[ \"mycollection\" nameIdx [ \"name\" asc ] keyspec <index-spec> ensure-index ] with-db" "" }
+  { $unchecked-example  "USING: mongodb.driver ;"
+    "\"db\" \"127.0.0.1\" 27017 <mdb>" "[ \"mycollection\" nameIdx [ \"name\" asc ] keyspec <index-spec> unique-index ensure-index ] with-db" "" } } ;
 
 HELP: explain.
 { $values
@@ -143,31 +141,35 @@ HELP: explain.
 
 HELP: find
 { $values
-  { "mdb-query" "a query" }
-  { "cursor" "a cursor (if there are more results) or f" }
-  { "result" "a sequences of objects" }
+  { "selector" "a mdb-query or mdb-cursor" }
+  { "mdb-cursor/f" "a cursor (if there are more results) or f" }
+  { "seq" "a sequences of objects" }
 }
 { $description "executes the given query" }
 { $examples
-  { $example "\"mycollection\" H{ { \"name\" \"Alfred\" } } <query> find " } } ;
+  { $unchecked-example "USING: mongodb.driver ;"
+    "\"db\" \"127.0.0.1\" 27017 <mdb>"
+    "[ \"mycollection\" H{ { \"name\" \"Alfred\" } } <query> find ] with-db" "" } } ;
 
 HELP: find-one
 { $values
-  { "mdb-query" "a query" }
-  { "result" "a single object or f" }
+  { "mdb-query-msg" "a query" }
+  { "result/f" "a single object or f" }
 }
 { $description "Executes the query and returns one object at most" } ;
 
 HELP: hint
 { $values
-  { "mdb-query" "a query" }
+  { "mdb-query-msg" "a query" }
   { "index-hint" "a hint to an index" }
-  { "mdb-query" "modified query object" }
+  { "mdb-query-msg" "modified query object" }
 }
 { $description "Annotates the query with a hint to an index. "
   "For detailed information see: " { $url "http://www.mongodb.org/display/DOCS/Optimizing+Mongo+Performance#OptimizingMongoPerformance-Hint" } }
 { $examples
-  { $example "\"mycollection\" H{ { \"name\" \"Alfred\" } { \"age\" 70 } } <query> H{ { \"name\" 1 } } hint find" } } ;
+  { $unchecked-example "USING: mongodb.driver ;"
+    "\"db\" \"127.0.0.1\" 27017 <mdb>"
+    "[ \"mycollection\" H{ { \"name\" \"Alfred\" } { \"age\" 70 } } <query> H{ { \"name\" 1 } } hint find ] with-db" "" } } ;
 
 HELP: lasterror
 { $values
@@ -179,13 +181,15 @@ HELP: lasterror
 
 HELP: limit
 { $values
-  { "mdb-query" "a query" }
+  { "mdb-query-msg" "a query" }
   { "limit#" "number of objects that should be returned at most" }
-  { "mdb-query" "modified query object" }
+  { "mdb-query-msg" "modified query object" }
 }
 { $description "Limits the number of returned objects to limit#" }
 { $examples
-  { $example "\"mycollection\" H{ } <query> 10 limit find" } } ;
+  { $unchecked-example "USING: mongodb.driver ;"
+    "\"db\" \"127.0.0.1\" 27017 <mdb>"
+    "[ \"mycollection\" H{ } <query> 10 limit find ] with-db" "" } } ;
 
 HELP: load-collection-list
 { $values
@@ -202,23 +206,23 @@ HELP: load-index-list
 { $description "Returns a list of all indexes that exist in the current database" } ;
 
 HELP: mdb-collection
-{ $var-description "" } ;
+{ $var-description "MongoDB collection" } ;
 
 HELP: mdb-cursor
-{ $var-description "" } ;
+{ $var-description "MongoDB cursor" } ;
 
 HELP: mdb-error
 { $values
   { "msg" "error message" }
 }
-{ $description "" } ;
+{ $description "error class" } ;
 
 HELP: r/
 { $values
-  { "token" null }
-  { "mdbregexp" null }
+  { "token" "a regexp string" }
+  { "mdbregexp" "a mdbregexp tuple instance" }
 }
-{ $description "" } ;
+{ $description "creates a new mdbregexp instance" } ;
 
 HELP: save
 { $values
@@ -230,53 +234,53 @@ HELP: save
 
 HELP: save-unsafe
 { $values
-  { "collection" null }
-  { "object" object }
+  { "collection" "a collection" }
+  { "assoc" "object" }
 }
-{ $description "" } ;
+{ $description "Save the object to the given collection without automatic error check" } ;
 
 HELP: skip
 { $values
-  { "mdb-query" null }
-  { "skip#" null }
-  { "mdb-query" null }
+  { "mdb-query-msg" "a query message" }
+  { "skip#" "number of objects to skip" }
+  { "mdb-query-msg" "annotated query message" }
 }
-{ $description "" } ;
+{ $description "annotates a query message with a number of objects to skip when returning the results" } ;
 
 HELP: sort
 { $values
-  { "mdb-query" null }
-  { "quot" quotation }
-  { "mdb-query" null }
+  { "mdb-query-msg" "a query message" }
+  { "sort-quot" "a quotation with sort specifiers" }
+  { "mdb-query-msg" "annotated query message" }
 }
-{ $description "" } ;
+{ $description "annotates the query message for sort specifiers" } ;
 
 HELP: update
 { $values
-  { "mdb-update-msg" null }
+  { "mdb-update-msg" "a mdb-update message" }
 }
-{ $description "" } ;
+{ $description "performs an update" } ;
 
 HELP: update-unsafe
 { $values
-  { "mdb-update-msg" null }
+  { "mdb-update-msg" "a mdb-update message" }
 }
-{ $description "" } ;
+{ $description "performs an update without automatic error check" } ;
 
 HELP: validate.
 { $values
-  { "collection" null }
+  { "collection" "collection to validate" }
 }
-{ $description "" } ;
+{ $description "validates the collection" } ;
 
 HELP: with-db
 { $values
-  { "mdb" null }
-  { "quot" quotation }
+  { "mdb" "mdb instance" }
+  { "quot" "quotation to execute with the given mdb instance as context" }
 }
-{ $description "" } ;
+{ $description "executes a quotation with the given mdb instance in its context" } ;
 
-ARTICLE: "mongodb.driver" "mongodb.driver"
+ARTICLE: "mongodb.driver" "MongoDB factor driver"
 { $vocab-link "mongodb.driver" }
 ;
 
