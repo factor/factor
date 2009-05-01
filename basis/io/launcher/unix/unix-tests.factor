@@ -33,7 +33,7 @@ concurrency.promises threads unix.process ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    ascii <process-reader> contents
+    ascii <process-reader> stream-contents
 ] unit-test
 
 [ ] [
@@ -52,7 +52,7 @@ concurrency.promises threads unix.process ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    ascii <process-reader> contents
+    ascii <process-reader> stream-contents
 ] unit-test
 
 [ ] [
@@ -70,14 +70,14 @@ concurrency.promises threads unix.process ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    ascii <process-reader> contents
+    ascii <process-reader> stream-contents
 ] unit-test
 
 [ t ] [
     <process>
         "env" >>command
         { { "A" "B" } } >>environment
-    ascii <process-reader> lines
+    ascii <process-reader> stream-lines
     "A=B" swap member?
 ] unit-test
 
@@ -86,7 +86,7 @@ concurrency.promises threads unix.process ;
         "env" >>command
         { { "A" "B" } } >>environment
         +replace-environment+ >>environment-mode
-    ascii <process-reader> lines
+    ascii <process-reader> stream-lines
 ] unit-test
 
 [ "hi\n" ] [
@@ -113,13 +113,13 @@ concurrency.promises threads unix.process ;
     "append-test" temp-file utf8 file-contents
 ] unit-test
 
-[ t ] [ "ls" utf8 <process-stream> contents >boolean ] unit-test
+[ t ] [ "ls" utf8 <process-stream> stream-contents >boolean ] unit-test
 
 [ "Hello world.\n" ] [
     "cat" utf8 <process-stream> [
         "Hello world.\n" write
         output-stream get dispose
-        input-stream get contents
+        input-stream get stream-contents
     ] with-stream
 ] unit-test
 
