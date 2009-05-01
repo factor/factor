@@ -24,7 +24,7 @@ IN: xmode.code2html
     [XML <style><-></style> XML] ;
 
 :: htmlize-stream ( path stream -- xml )
-    stream lines
+    stream stream-lines
     [ "" ] [ path over first find-mode htmlize-lines ]
     if-empty :> input
     default-stylesheet :> stylesheet
