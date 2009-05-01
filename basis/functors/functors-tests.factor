@@ -81,7 +81,26 @@ SYMBOL: W
 
 [ blorgh ] [ blorgh ] unit-test
 
-GENERIC: some-generic ( a -- b )
+<<
+
+FUNCTOR: generic-test ( W -- )
+
+W DEFINES ${W}
+
+WHERE
+
+GENERIC: W ( a -- b )
+M: object W ;
+M: integer W 1 + ;
+
+;FUNCTOR
+
+"snurv" generic-test
+
+>>
+
+[ 2   ] [ 1   snurv ] unit-test
+[ 3.0 ] [ 3.0 snurv ] unit-test
 
 ! Does replacing an ordinary word with a functor-generated one work?
 [ [ ] ] [
@@ -89,6 +108,7 @@ GENERIC: some-generic ( a -- b )
 
     TUPLE: some-tuple ;
     : some-word ( -- ) ;
+    GENERIC: some-generic ( a -- b )
     M: some-tuple some-generic ;
     SYMBOL: some-symbol
     "> <string-reader> "functors-test" parse-stream
@@ -97,6 +117,7 @@ GENERIC: some-generic ( a -- b )
 : test-redefinition ( -- )
     [ t ] [ "some-word" "functors.tests" lookup >boolean ] unit-test
     [ t ] [ "some-tuple" "functors.tests" lookup >boolean ] unit-test
+    [ t ] [ "some-generic" "functors.tests" lookup >boolean ] unit-test
     [ t ] [
         "some-tuple" "functors.tests" lookup
         "some-generic" "functors.tests" lookup method >boolean
@@ -109,13 +130,14 @@ FUNCTOR: redefine-test ( W -- )
 
 W-word DEFINES ${W}-word
 W-tuple DEFINES-CLASS ${W}-tuple
-W-generic IS ${W}-generic
+W-generic DEFINES ${W}-generic
 W-symbol DEFINES ${W}-symbol
 
 WHERE
 
 TUPLE: W-tuple ;
 : W-word ( -- ) ;
+GENERIC: W-generic ( a -- b )
 M: W-tuple W-generic ;
 SYMBOL: W-symbol
 
