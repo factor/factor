@@ -39,7 +39,7 @@ M: history-completion completion-quot drop '[ drop _ history-list ] ;
 
 GENERIC: completion-element ( completion-mode -- element )
 
-M: object completion-element drop one-word-elt ;
+M: object completion-element drop word-start-elt ;
 M: history-completion completion-element drop one-line-elt ;
 
 GENERIC: completion-banner ( completion-mode -- string )
@@ -72,13 +72,13 @@ M: vocab-completion row-color
     drop vocab? COLOR: black COLOR: dark-gray ? ;
 
 : complete-IN:/USE:? ( tokens -- ? )
-    2 short tail* { "IN:" "USE:" } intersects? ;
+    1 short head* 2 short tail* { "IN:" "USE:" } intersects? ;
 
 : chop-; ( seq -- seq' )
     { ";" } split1-last [ ] [ ] ?if ;
 
 : complete-USING:? ( tokens -- ? )
-    chop-; { "USING:" } intersects? ;
+    chop-; 1 short head* { "USING:" } intersects? ;
 
 : complete-CHAR:? ( tokens -- ? )
     2 short tail* "CHAR:" swap member? ;
