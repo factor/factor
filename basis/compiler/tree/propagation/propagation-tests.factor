@@ -9,7 +9,7 @@ compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
 specialized-arrays.double system sorting math.libm
-math.intervals ;
+math.intervals quotations ;
 IN: compiler.tree.propagation.tests
 
 [ V{ } ] [ [ ] final-classes ] unit-test
@@ -686,3 +686,8 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 [ V{ 0 } ] [ [ { } length ] final-literals ] unit-test
 
 [ V{ 1 } ] [ [ { } length 1+ f <array> length ] final-literals ] unit-test
+
+! Mutable tuples with circularity should not cause problems
+TUPLE: circle me ;
+
+[ ] [ circle new dup >>me 1quotation final-info drop ] unit-test

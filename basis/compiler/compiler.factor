@@ -192,10 +192,13 @@ M: optimizing-compiler recompile ( words -- alist )
         compiled get >alist
     ] with-scope ;
 
-: enable-compiler ( -- )
+: with-optimizer ( quot -- )
+    [ optimizing-compiler compiler-impl ] dip with-variable ; inline
+
+: enable-optimizer ( -- )
     optimizing-compiler compiler-impl set-global ;
 
-: disable-compiler ( -- )
+: disable-optimizer ( -- )
     f compiler-impl set-global ;
 
 : recompile-all ( -- )
