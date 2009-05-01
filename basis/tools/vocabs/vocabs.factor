@@ -74,8 +74,6 @@ SYMBOL: failures
 
 SYMBOL: changed-vocabs
 
-[ f changed-vocabs set-global ] "tools.vocabs" add-init-hook
-
 : changed-vocab ( vocab -- )
     dup vocab changed-vocabs get and
     [ dup changed-vocabs get set-at ] [ drop ] if ;
@@ -287,3 +285,12 @@ MEMO: all-authors ( -- seq )
     \ all-vocabs-seq reset-memoized
     \ all-authors reset-memoized
     \ all-tags reset-memoized ;
+
+SINGLETON: cache-observer
+
+M: cache-observer vocabs-changed drop reset-cache ;
+
+[
+    f changed-vocabs set-global
+    cache-observer add-vocab-observer
+] "tools.vocabs" add-init-hook

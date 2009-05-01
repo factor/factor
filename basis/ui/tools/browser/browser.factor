@@ -25,7 +25,10 @@ M: browser-gadget set-history-value
 
 : show-help ( link browser-gadget -- )
     [ >link ] dip
-    [ [ add-recent ] [ history>> add-history ] bi* ]
+    [
+        2dup model>> value>> =
+        [ 2drop ] [ [ add-recent ] [ history>> add-history ] bi* ] if
+    ]
     [ model>> set-model ]
     2bi ;
 

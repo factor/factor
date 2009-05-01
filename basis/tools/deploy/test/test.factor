@@ -16,4 +16,5 @@ IN: tools.deploy.test
 : run-temp-image ( -- )
     vm
     "-i=" "test.image" temp-file append
-    2array try-process ;
+    2array
+    <process> swap >>command +closed+ >>stdin try-process ;

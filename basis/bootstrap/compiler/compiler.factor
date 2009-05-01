@@ -23,7 +23,7 @@ IN: bootstrap.compiler
 
 "cpu." cpu name>> append require
 
-enable-compiler
+enable-optimizer
 
 ! Push all tuple layouts to tenured space to improve method caching
 gc
