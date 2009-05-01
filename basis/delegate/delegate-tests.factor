@@ -1,6 +1,6 @@
 USING: delegate kernel arrays tools.test words math definitions
 compiler.units parser generic prettyprint io.streams.string
-accessors eval multiline generic.standard delegate.protocols
+accessors eval multiline generic.single delegate.protocols
 delegate.private assocs see ;
 IN: delegate.tests
 
