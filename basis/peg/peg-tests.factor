@@ -199,10 +199,10 @@ IN: peg.tests
 
 USE: compiler
 
-[ ] [ disable-compiler ] unit-test
+[ ] [ disable-optimizer ] unit-test
 
 [ ] [ "" epsilon parse drop ] unit-test
 
-[ ] [ enable-compiler ] unit-test
+[ ] [ enable-optimizer ] unit-test
 
 [ [ ] ] [ "" epsilon [ drop [ [ ] ] call ] action parse ] unit-test

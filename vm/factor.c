@@ -26,6 +26,8 @@ void default_parameters(F_PARAMETERS *p)
 	p->tenured_size = 4 * CELLS;
 #endif
 
+	p->max_pic_size = 3;
+
 	p->secure_gc = false;
 	p->fep = false;
 
@@ -66,6 +68,7 @@ void init_parameters_from_args(F_PARAMETERS *p, int argc, F_CHAR **argv)
 		else if(factor_arg(argv[i],STRING_LITERAL("-aging=%d"),&p->aging_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-tenured=%d"),&p->tenured_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-codeheap=%d"),&p->code_size));
+		else if(factor_arg(argv[i],STRING_LITERAL("-pic=%d"),&p->max_pic_size));
 		else if(STRCMP(argv[i],STRING_LITERAL("-securegc")) == 0) p->secure_gc = true;
 		else if(STRCMP(argv[i],STRING_LITERAL("-fep")) == 0) p->fep = true;
 		else if(STRNCMP(argv[i],STRING_LITERAL("-i="),3) == 0) p->image_path = argv[i] + 3;
@@ -118,7 +121,11 @@ void init_factor(F_PARAMETERS *p)
 	init_stacks(p->ds_size,p->rs_size);
 	load_image(p);
 	init_c_io();
+	init_inline_caching(p->max_pic_size);
+
+#ifndef FACTOR_DEBUG
 	init_signals();
+#endif
 
 	if(p->console)
 		open_console();
@@ -160,7 +167,7 @@ void pass_args_to_factor(int argc, F_CHAR **argv)
 		set_array_nth(args,i,arg);
 	}
 
-	userenv[ARGS_ENV] = tag_object(args);
+	userenv[ARGS_ENV] = tag_array(args);
 }
 
 void start_factor(F_PARAMETERS *p)

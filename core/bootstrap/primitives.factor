@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math math.private math.order
@@ -69,6 +69,8 @@ bootstrapping? on
     "classes.predicate"
     "compiler.units"
     "continuations.private"
+    "generic.single"
+    "generic.single.private"
     "growable"
     "hashtables"
     "hashtables.private"
@@ -97,7 +99,6 @@ bootstrapping? on
     "threads.private"
     "tools.profiler.private"
     "words"
-    "words.private"
     "vectors"
     "vectors.private"
 } [ create-vocab drop ] each
@@ -125,9 +126,7 @@ bootstrapping? on
 "fixnum" "math" create register-builtin
 "bignum" "math" create register-builtin
 "tuple" "kernel" create register-builtin
-"ratio" "math" create register-builtin
 "float" "math" create register-builtin
-"complex" "math" create register-builtin
 "f" "syntax" lookup register-builtin
 "array" "arrays" create register-builtin
 "wrapper" "kernel" create register-builtin
@@ -146,24 +145,6 @@ bootstrapping? on
 "f?" "syntax" vocab-words delete-at
 
 ! Some unions
-"integer" "math" create
-"fixnum" "math" lookup
-"bignum" "math" lookup
-2array
-define-union-class
-
-"rational" "math" create
-"integer" "math" lookup
-"ratio" "math" lookup
-2array
-define-union-class
-
-"real" "math" create
-"rational" "math" lookup
-"float" "math" lookup
-2array
-define-union-class
-
 "c-ptr" "alien" create [
     "alien" "alien" lookup ,
     "f" "syntax" lookup ,
@@ -210,18 +191,8 @@ bi
 "bignum" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
 
-"ratio" "math" create {
-    { "numerator" { "integer" "math" } read-only }
-    { "denominator" { "integer" "math" } read-only }
-} define-builtin
-
 "float" "math" create { } define-builtin
 "float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
-
-"complex" "math" create {
-    { "real" { "real" "math" } read-only }
-    { "imaginary" { "real" "math" } read-only }
-} define-builtin
 
 "array" "arrays" create {
     { "length" { "array-capacity" "sequences.private" } read-only }
@@ -258,7 +229,7 @@ bi
     "vocabulary"
     { "def" { "quotation" "quotations" } initial: [ ] }
     "props"
-    { "optimized" read-only }
+    { "direct-entry-def" }
     { "counter" { "fixnum" "math" } }
     { "sub-primitive" read-only }
 } define-builtin
@@ -338,7 +309,7 @@ tuple
     [ create dup 1quotation ] dip define-declared ;
 
 {
-    { "(execute)" "words.private" (( word -- )) }
+    { "(execute)" "kernel.private" (( word -- )) }
     { "(call)" "kernel.private" (( quot -- )) }
     { "both-fixnums?" "math.private" (( x y -- ? )) }
     { "fixnum+fast" "math.private" (( x y -- z )) }
@@ -378,6 +349,7 @@ tuple
     { "get-local" "locals.backend" (( n -- obj )) }
     { "load-local" "locals.backend" (( obj -- )) }
     { "drop-locals" "locals.backend" (( n -- )) }
+    { "mega-cache-lookup" "generic.single.private" (( methods index cache -- )) }
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words
@@ -394,14 +366,12 @@ tuple
     { "float>bignum" "math.private" (( x -- y )) }
     { "fixnum>float" "math.private" (( x -- y )) }
     { "bignum>float" "math.private" (( x -- y )) }
-    { "<ratio>" "math.private" (( a b -- a/b )) }
     { "string>float" "math.private" (( str -- n/f )) }
     { "float>string" "math.private" (( n -- str )) }
     { "float>bits" "math" (( x -- n )) }
     { "double>bits" "math" (( x -- n )) }
     { "bits>float" "math" (( n -- x )) }
     { "bits>double" "math" (( n -- x )) }
-    { "<complex>" "math.private" (( x y -- z )) }
     { "fixnum+" "math.private" (( x y -- z )) }
     { "fixnum-" "math.private" (( x y -- z )) }
     { "fixnum*" "math.private" (( x y -- z )) }
@@ -532,6 +502,14 @@ tuple
     { "jit-compile" "quotations" (( quot -- )) }
     { "load-locals" "locals.backend" (( ... n -- )) }
     { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
+    { "inline-cache-miss" "generic.single.private" (( generic methods index cache -- )) }
+    { "mega-cache-miss" "generic.single.private" (( methods index cache -- method )) }
+    { "lookup-method" "generic.single.private" (( object methods -- method )) }
+    { "reset-dispatch-stats" "generic.single" (( -- )) }
+    { "dispatch-stats" "generic.single" (( -- stats )) }
+    { "reset-inline-cache-stats" "generic.single" (( -- )) }
+    { "inline-cache-stats" "generic.single" (( -- stats )) }
+    { "optimized?" "words" (( word -- ? )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number

@@ -4,7 +4,8 @@ io.backend.windows io.files.windows io.encodings.utf16n windows
 windows.kernel32 kernel libc math threads system environment
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.short-circuit ascii splitting alien strings assocs
-namespaces make accessors tr windows.time windows.shell32 ;
+namespaces make accessors tr windows.time windows.shell32
+windows.errors ;
 IN: io.files.windows.nt
 
 M: winnt cwd

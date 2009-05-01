@@ -13,7 +13,7 @@ CONSTANT: block-size 512
 TUPLE: tar-header name mode uid gid size mtime checksum typeflag
 linkname magic version uname gname devmajor devminor prefix ;
 
-ERROR: checksum-error ;
+ERROR: checksum-error header ;
 
 : trim-string ( seq -- newseq ) [ "\0 " member? ] trim ;
 
@@ -60,14 +60,16 @@ ERROR: checksum-error ;
     ] if ;
 
 : parse-tar-header ( seq -- obj )
-    [ checksum-header ] keep over zero-checksum = [
+    dup checksum-header dup zero-checksum = [
         2drop
         \ tar-header new
             0 >>size
             0 >>checksum
     ] [
-        binary [ read-tar-header ] with-byte-reader
-        [ checksum>> = [ checksum-error ] unless ] keep
+        [
+            binary [ read-tar-header ] with-byte-reader
+            dup checksum>>
+        ] dip = [ checksum-error ] unless
     ] if ;
 
 ERROR: unknown-typeflag ch ;
@@ -90,7 +92,8 @@ M: unknown-typeflag summary ( obj -- str )
     ] if ;
 
 ! Hard link
-: typeflag-1 ( header -- ) unknown-typeflag ;
+: typeflag-1 ( header -- )
+    [ name>> ] [ linkname>> ] bi make-hard-link ;
 
 ! Symlink
 : typeflag-2 ( header -- )
@@ -141,7 +144,8 @@ M: unknown-typeflag summary ( obj -- str )
 
 ! Long file name
 : typeflag-L ( header -- )
-    drop ;
+    drop
+    ;
     ! <string-writer> [ read-data-blocks ] keep
     ! >string [ zero? ] trim-tail filename set
     ! filename get prepend-current-directory make-directories ;
@@ -161,7 +165,7 @@ M: unknown-typeflag summary ( obj -- str )
 ! Vendor extended header type
 : typeflag-X ( header -- ) unknown-typeflag ;
 
-: (parse-tar) ( -- )
+: parse-tar ( -- )
     block-size read dup length block-size = [
         parse-tar-header
         dup typeflag>>
@@ -182,19 +186,19 @@ M: unknown-typeflag summary ( obj -- str )
             ! { CHAR: E [ typeflag-E ] }
             ! { CHAR: I [ typeflag-I ] }
             ! { CHAR: K [ typeflag-K ] }
-            ! { CHAR: L [ typeflag-L ] }
+            { CHAR: L [ typeflag-L ] }
             ! { CHAR: M [ typeflag-M ] }
             ! { CHAR: N [ typeflag-N ] }
             ! { CHAR: S [ typeflag-S ] }
             ! { CHAR: V [ typeflag-V ] }
             ! { CHAR: X [ typeflag-X ] }
             { f [ drop ] }
-        } case (parse-tar)
+        } case parse-tar
     ] [
         drop
     ] if ;
 
 : untar ( path -- )
-    normalize-path [ ] [ parent-directory ] bi [
-         binary [ (parse-tar) ] with-file-reader
+    normalize-path dup parent-directory [
+         binary [ parse-tar ] with-file-reader
     ] with-directory ;

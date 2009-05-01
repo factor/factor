@@ -17,7 +17,7 @@ void new_heap(F_HEAP *heap, CELL size)
 	clear_free_list(heap);
 }
 
-void add_to_free_list(F_HEAP *heap, F_FREE_BLOCK *block)
+static void add_to_free_list(F_HEAP *heap, F_FREE_BLOCK *block)
 {
 	if(block->block.size < FREE_LIST_COUNT * BLOCK_SIZE_INCREMENT)
 	{
@@ -94,7 +94,7 @@ static void assert_free_block(F_FREE_BLOCK *block)
 		critical_error("Invalid block in free list",(CELL)block);
 }
 		
-F_FREE_BLOCK *find_free_block(F_HEAP *heap, CELL size)
+static F_FREE_BLOCK *find_free_block(F_HEAP *heap, CELL size)
 {
 	CELL attempt = size;
 
@@ -134,7 +134,7 @@ F_FREE_BLOCK *find_free_block(F_HEAP *heap, CELL size)
 	return NULL;
 }
 
-F_FREE_BLOCK *split_free_block(F_HEAP *heap, F_FREE_BLOCK *block, CELL size)
+static F_FREE_BLOCK *split_free_block(F_HEAP *heap, F_FREE_BLOCK *block, CELL size)
 {
 	if(block->block.size != size )
 	{
@@ -165,6 +165,13 @@ F_BLOCK *heap_allot(F_HEAP *heap, CELL size)
 	}
 	else
 		return NULL;
+}
+
+/* Deallocates a block manually */
+void heap_free(F_HEAP *heap, F_BLOCK *block)
+{
+	block->status = B_FREE;
+	add_to_free_list(heap,(F_FREE_BLOCK *)block);
 }
 
 void mark_block(F_BLOCK *block)
@@ -212,6 +219,9 @@ void free_unmarked(F_HEAP *heap, HEAP_ITERATOR iter)
 		switch(scan->status)
 		{
 		case B_ALLOCATED:
+			if(secure_gc)
+				memset(scan + 1,0,scan->size - sizeof(F_BLOCK));
+
 			if(prev && prev->status == B_FREE)
 				prev->size += scan->size;
 			else

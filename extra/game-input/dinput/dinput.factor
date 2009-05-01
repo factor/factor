@@ -2,10 +2,10 @@ USING: windows.dinput windows.dinput.constants parser
 alien.c-types windows.ole32 namespaces assocs kernel arrays
 vectors windows.kernel32 windows.com windows.dinput shuffle
 windows.user32 windows.messages sequences combinators locals
-math.rectangles accessors math windows alien
-alien.strings io.encodings.utf16 io.encodings.utf16n
-continuations byte-arrays game-input.dinput.keys-array
-game-input ui.backend.windows ;
+math.rectangles accessors math alien alien.strings
+io.encodings.utf16 io.encodings.utf16n continuations
+byte-arrays game-input.dinput.keys-array game-input
+ui.backend.windows windows.errors ;
 IN: game-input.dinput
 
 SINGLETON: dinput-game-input-backend
@@ -22,7 +22,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     +dinput+ set-global ;
 
 : delete-dinput ( -- )
-    +dinput+ global [ com-release f ] change-at ;
+    +dinput+ [ com-release f ] change-global ;
 
 : device-for-guid ( guid -- device )
     +dinput+ get swap f <void*>
@@ -172,10 +172,8 @@ TUPLE: window-rect < rect window-loc ;
     [ +device-change-window+ set-global ] bi ;
 
 : close-device-change-window ( -- )
-    +device-change-handle+ global
-    [ UnregisterDeviceNotification drop f ] change-at
-    +device-change-window+ global
-    [ DestroyWindow win32-error=0/f f ] change-at ;
+    +device-change-handle+ [ UnregisterDeviceNotification drop f ] change-global
+    +device-change-window+ [ DestroyWindow win32-error=0/f f ] change-global ;
 
 : add-wm-devicechange ( -- )
     [ 4dup handle-wm-devicechange DefWindowProc ]
@@ -185,14 +183,11 @@ TUPLE: window-rect < rect window-loc ;
     WM_DEVICECHANGE wm-handlers get-global delete-at ;
 
 : release-controllers ( -- )
-    +controller-devices+ global [
-        [ drop com-release ] assoc-each f
-    ] change-at
+    +controller-devices+ [ [ drop com-release ] assoc-each f ] change-global
     f +controller-guids+ set-global ;
 
 : release-keyboard ( -- )
-    +keyboard-device+ global
-    [ com-release f ] change-at
+    +keyboard-device+ [ com-release f ] change-global
     f +keyboard-state+ set-global ;
 
 M: dinput-game-input-backend (open-game-input)

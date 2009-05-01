@@ -26,7 +26,7 @@ IN: compiler.tests.codegen
 
 [ 2 3 4 ] [ 3 [ 2 swap 4 ] compile-call ] unit-test
 
-[ { 1 2 3 } { 1 4 3 } 3 3 ]
+[ { 1 2 3 } { 1 4 3 } 2 2 ]
 [ { 1 2 3 } { 1 4 3 } [ over tag over tag ] compile-call ]
 unit-test
 
@@ -37,7 +37,7 @@ unit-test
 
 : foo ( -- ) ;
 
-[ 5 5 ]
+[ 3 3 ]
 [ 1.2 [ tag [ foo ] keep ] compile-call ]
 unit-test
 
@@ -211,7 +211,7 @@ TUPLE: my-tuple ;
     { tuple vector } 3 slot { word } declare
     dup 1 slot 0 fixnum-bitand { [ ] } dispatch ;
 
-[ t ] [ \ dispatch-alignment-regression optimized>> ] unit-test
+[ t ] [ \ dispatch-alignment-regression optimized? ] unit-test
 
 [ vector ] [ dispatch-alignment-regression ] unit-test
 
