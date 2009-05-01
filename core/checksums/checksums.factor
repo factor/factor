@@ -13,7 +13,7 @@ GENERIC: checksum-stream ( stream checksum -- value )
 GENERIC: checksum-lines ( lines checksum -- value )
 
 M: checksum checksum-stream
-    [ contents ] dip checksum-bytes ;
+    [ stream-contents ] dip checksum-bytes ;
 
 M: checksum checksum-lines
     [ B{ CHAR: \n } join ] dip checksum-bytes ;

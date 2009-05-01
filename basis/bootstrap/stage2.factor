@@ -35,10 +35,6 @@ SYMBOL: bootstrap-time
     "Core bootstrap completed in " write core-bootstrap-time get print-time
     "Bootstrap completed in "      write bootstrap-time      get print-time
 
-    [ optimized>> ] count-words " compiled words" print
-    [ symbol? ] count-words " symbol words" print
-    [ ] count-words " words total" print
-    
     "Bootstrapping is complete." print
     "Now, you can run Factor:" print
     vm write " -i=" write "output-image" get print flush ;

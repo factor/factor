@@ -79,6 +79,13 @@ M: one-word-elt next-elt
     drop
     [ f next-word ] modify-col ;
 
+SINGLETON: word-start-elt
+
+M: word-start-elt prev-elt
+    drop one-word-elt prev-elt ;
+
+M: word-start-elt next-elt 2drop ;
+
 SINGLETON: word-elt
 
 M: word-elt prev-elt

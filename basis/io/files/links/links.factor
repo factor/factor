@@ -6,6 +6,8 @@ IN: io.files.links
 
 HOOK: make-link os ( target symlink -- )
 
+HOOK: make-hard-link os ( target link -- )
+
 HOOK: read-link os ( symlink -- path )
 
 : copy-link ( target symlink -- )

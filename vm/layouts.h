@@ -32,32 +32,36 @@ typedef signed long long s64;
 /*** Tags ***/
 #define FIXNUM_TYPE 0
 #define BIGNUM_TYPE 1
-#define TUPLE_TYPE 2
-#define OBJECT_TYPE 3
-#define RATIO_TYPE 4
-#define FLOAT_TYPE 5
-#define COMPLEX_TYPE 6
+#define ARRAY_TYPE 2
+#define FLOAT_TYPE 3
+#define QUOTATION_TYPE 4
+#define F_TYPE 5
+#define OBJECT_TYPE 6
+#define TUPLE_TYPE 7
+
+#define HI_TAG_OR_TUPLE_P(cell) (((CELL)(cell) & 6) == 6)
+#define HI_TAG_HEADER(cell) (((CELL)(cell) & 1) * CELLS + UNTAG(cell))
 
 /* Canonical F object */
-#define F_TYPE 7
 #define F F_TYPE
 
-#define HEADER_TYPE 7 /* anything less than or equal to this is a tag */
+#define HEADER_TYPE 8 /* anything less than this is a tag */
 
-#define GC_COLLECTED 5 /* See gc.c */
+#define GC_COLLECTED 5 /* can be anything other than FIXNUM_TYPE */
 
 /*** Header types ***/
-#define ARRAY_TYPE 8
-#define WRAPPER_TYPE 9
-#define BYTE_ARRAY_TYPE 10
-#define CALLSTACK_TYPE 11
-#define STRING_TYPE 12
-#define WORD_TYPE 13
-#define QUOTATION_TYPE 14
-#define DLL_TYPE 15
-#define ALIEN_TYPE 16
+#define WRAPPER_TYPE 8
+#define BYTE_ARRAY_TYPE 9
+#define CALLSTACK_TYPE 10
+#define STRING_TYPE 11
+#define WORD_TYPE 12
+#define DLL_TYPE 13
+#define ALIEN_TYPE 14
 
-#define TYPE_COUNT 17
+#define TYPE_COUNT 15
+
+/* Not a real type, but F_CODE_BLOCK's type field can be set to this */
+#define PIC_TYPE 69
 
 INLINE bool immediate_p(CELL obj)
 {
@@ -152,9 +156,8 @@ typedef struct {
 	CELL def;
 	/* TAGGED property assoc for library code */
 	CELL props;
-	/* TAGGED t or f, t means its compiled with the optimizing compiler,
-	f means its compiled with the non-optimizing compiler */
-	CELL optimizedp;
+	/* TAGGED alternative entry point for direct non-tail calls. Used for inline caching */
+	CELL direct_entry_def;
 	/* TAGGED call count for profiling */
 	CELL counter;
 	/* TAGGED machine code for sub-primitive */
@@ -172,13 +175,6 @@ typedef struct {
 	CELL header;
 	CELL object;
 } F_WRAPPER;
-
-/* Assembly code makes assumptions about the layout of this struct */
-typedef struct {
-	CELL header;
-	CELL numerator;
-	CELL denominator;
-} F_RATIO;
 
 /* Assembly code makes assumptions about the layout of this struct */
 typedef struct {
@@ -207,13 +203,6 @@ typedef struct {
 	/* UNTAGGED compiled code block */
 	F_CODE_BLOCK *code;
 } F_QUOTATION;
-
-/* Assembly code makes assumptions about the layout of this struct */
-typedef struct {
-	CELL header;
-	CELL real;
-	CELL imaginary;
-} F_COMPLEX;
 
 /* Assembly code makes assumptions about the layout of this struct */
 typedef struct {
