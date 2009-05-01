@@ -19,7 +19,6 @@ IN: stack-checker.transforms
     rstate recursive-state
     [ word stack quot call-transformer ] with-variable
     [
-        word inlined-dependency depends-on
         values [ length meta-d shorten-by ] [ #drop, ] bi
         rstate infer-quot
     ] [ word infer-word ] if* ;
