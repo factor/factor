@@ -108,7 +108,6 @@ IN: stack-checker.transforms
 ] 1 define-transform
 
 \ boa t "no-compile" set-word-prop
-M\ tuple-class boa t "no-compile" set-word-prop
 
 \ new [
     dup tuple-class? [

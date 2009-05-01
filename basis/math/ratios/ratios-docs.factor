@@ -47,6 +47,3 @@ HELP: 2>fraction
 { $values { "a/b" rational } { "c/d" rational } { "a" integer } { "c" integer } { "b" "a positive integer" } { "d" "a positive integer" } }
 { $description "Extracts the numerator and denominator of two rational numbers at once." } ;
 
-HELP: <ratio> ( a b -- a/b )
-{ $values { "a" integer } { "b" integer } { "a/b" "a ratio" } }
-{ $description "Primitive ratio constructor. User code should call " { $link / } " to create ratios instead." } ;

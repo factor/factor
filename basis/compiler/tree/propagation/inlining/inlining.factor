@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel arrays sequences math math.order
-math.partial-dispatch generic generic.standard generic.math
+math.partial-dispatch generic generic.standard generic.single generic.math
 classes.algebra classes.union sets quotations assocs combinators
 words namespaces continuations classes fry combinators.smart hints
 locals
@@ -188,9 +188,7 @@ SYMBOL: history
     { curry compose } memq? ;
 
 : never-inline-word? ( word -- ? )
-    [ deferred? ]
-    [ "default" word-prop ]
-    [ { call execute } memq? ] tri or or ;
+    [ deferred? ] [ "default" word-prop ] [ \ call eq? ] tri or or ;
 
 : custom-inlining? ( word -- ? )
     "custom-inlining" word-prop ;

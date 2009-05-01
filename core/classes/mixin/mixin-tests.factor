@@ -119,3 +119,13 @@ MIXIN: move-instance-declaration-mixin
 [ ] [ "IN: classes.mixin.tests.a" <string-reader> "move-mixin-test-1" parse-stream drop ] unit-test
 
 [ { string } ] [ move-instance-declaration-mixin members ] unit-test
+
+MIXIN: silly-mixin
+SYMBOL: not-a-class
+
+[ [ \ not-a-class \ silly-mixin add-mixin-instance ] with-compilation-unit ] must-fail
+
+SYMBOL: not-a-mixin
+TUPLE: a-class ;
+
+[ [ \ a-class \ not-a-mixin add-mixin-instance ] with-compilation-unit ] must-fail

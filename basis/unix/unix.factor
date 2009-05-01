@@ -194,6 +194,7 @@ FUNCTION: int setsockopt ( int s, int level, int optname, void* optval, socklen_
 FUNCTION: int setuid ( uid_t uid ) ;
 FUNCTION: int socket ( int domain, int type, int protocol ) ;
 FUNCTION: int symlink ( char* path1, char* path2 ) ;
+FUNCTION: int link ( char* path1, char* path2 ) ;
 FUNCTION: int system ( char* command ) ;
 
 FUNCTION: int unlink ( char* path ) ;

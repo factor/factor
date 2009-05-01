@@ -102,6 +102,7 @@ ARTICLE: "tools.inference" "Stack effect tools"
 "Comparing effects:"
 { $subsection effect-height }
 { $subsection effect<= }
+{ $subsection effect= }
 "The class of stack effects:"
 { $subsection effect }
 { $subsection effect? } ;

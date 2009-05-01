@@ -42,10 +42,6 @@ typedef wchar_t F_CHAR;
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
 
-F_STRING *get_error_message(void);
-DLLEXPORT F_CHAR *error_message(DWORD id);
-void windows_error(void);
-
 void init_ffi(void);
 void ffi_dlopen(F_DLL *dll);
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);

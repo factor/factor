@@ -80,21 +80,20 @@ registers) does not run out of memory */
 
 /* If this is defined, we GC every 100 allocations. This catches missing local roots */
 #ifdef GC_DEBUG
-static int count;
+int gc_count;
 #endif
 
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
+int count;
 INLINE void *allot_object(CELL type, CELL a)
 {
-
 #ifdef GC_DEBUG
-
 	if(!gc_off)
 	{
-		if(count++ % 1000 == 0)
+		if(gc_count++ % 100 == 0)
 			gc();
 
 	}
@@ -154,3 +153,14 @@ void primitive_gc_stats(void);
 void clear_gc_stats(void);
 void primitive_clear_gc_stats(void);
 void primitive_become(void);
+
+INLINE void check_data_pointer(CELL pointer)
+{
+#ifdef FACTOR_DEBUG
+	if(!growing_data_heap)
+	{
+		assert(pointer >= data_heap->segment->start
+		       && pointer < data_heap->segment->end);
+	}
+#endif
+}
