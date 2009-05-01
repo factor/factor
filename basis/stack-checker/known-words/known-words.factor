@@ -10,7 +10,7 @@ sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 assocs summary compiler.units system.private
-combinators locals locals.backend locals.types
+combinators combinators.short-circuit locals locals.backend locals.types
 quotations.private combinators.private stack-checker.values
 generic.single generic.single.private
 alien.libraries
@@ -58,8 +58,12 @@ IN: stack-checker.known-words
 : infer-shuffle-word ( word -- )
     "shuffle" word-prop infer-shuffle ;
 
+: check-declaration ( declaration -- declaration )
+    dup { [ array? ] [ [ class? ] all? ] } 1&&
+    [ bad-declaration-error ] unless ;
+
 : infer-declare ( -- )
-    pop-literal nip
+    pop-literal nip check-declaration
     [ length ensure-d ] keep zip
     #declare, ;
 
