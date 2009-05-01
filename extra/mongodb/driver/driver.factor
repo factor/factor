@@ -162,7 +162,7 @@ PRIVATE>
 : <query> ( collection assoc -- mdb-query-msg )
     <mdb-query-msg> ; inline
 
-GENERIC# limit 1 ( mdb-query-msg limit# -- mdb-query )
+GENERIC# limit 1 ( mdb-query-msg limit# -- mdb-query-msg )
 
 M: mdb-query-msg limit 
     >>return# ; inline
@@ -188,7 +188,7 @@ GENERIC# hint 1 ( mdb-query-msg index-hint -- mdb-query-msg )
 M: mdb-query-msg hint 
     >>hint ;
 
-GENERIC: find ( mdb-query-msg/mdb-cursor -- mdb-cursor seq )
+GENERIC: find ( selector -- mdb-cursor/f seq )
 
 M: mdb-query-msg find
     fix-query-collection send-query ;
@@ -243,7 +243,7 @@ M: assoc save
     [ check-collection ] dip
     <mdb-insert-msg> send-message-check-error ;
 
-GENERIC: save-unsafe ( collection object -- )
+GENERIC: save-unsafe ( collection assoc -- )
 M: assoc save-unsafe
     [ check-collection ] dip
     <mdb-insert-msg> send-message ;
@@ -266,7 +266,7 @@ M: index-spec ensure-index
     [ cmd-collection ] dip <mdb-query-msg>
     find-one drop ;
 
-: <update> ( collection selector object -- update-msg )
+: <update> ( collection selector object -- mdb-update-msg )
     [ check-collection ] 2dip <mdb-update-msg> ;
 
 : >upsert ( mdb-update-msg -- mdb-update-msg )
