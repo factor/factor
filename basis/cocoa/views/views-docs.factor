@@ -1,13 +1,9 @@
-USING: help.syntax help.markup ;
+USING: help.syntax help.markup ui.pixel-formats ;
 IN: cocoa.views
 
-HELP: <PixelFormat>
-{ $values { "attributes" "a sequence of attributes" } { "pixelfmt" "an " { $snippet "NSOpenGLPixelFormat" } } }
-{ $description "Creates an " { $snippet "NSOpenGLPixelFormat" } " with some reasonable defaults." } ;
-
 HELP: <GLView>
-{ $values { "class" "an subclass of " { $snippet "NSOpenGLView" } } { "dim" "a pair of real numbers" } { "view" "a new " { $snippet "NSOpenGLView" } } }
-{ $description "Creates a new instance of the specified class, giving it a default pixel format and the given size." } ;
+{ $values { "class" "an subclass of " { $snippet "NSOpenGLView" } } { "dim" "a pair of real numbers" } { "pixel-format" pixel-format } { "view" "a new " { $snippet "NSOpenGLView" } } }
+{ $description "Creates a new instance of the specified class, giving it the specified pixel format and size." } ;
 
 HELP: view-dim
 { $values { "view" "an " { $snippet "NSView" } } { "dim" "a pair of real numbers" } }
@@ -18,7 +14,6 @@ HELP: mouse-location
 { $description "Outputs the current mouse location." } ;
 
 ARTICLE: "cocoa-view-utils" "Cocoa view utilities"
-{ $subsection <PixelFormat> }
 { $subsection <GLView> }
 { $subsection view-dim }
 { $subsection mouse-location } ;

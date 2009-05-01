@@ -1,15 +1,15 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors math arrays assocs cocoa cocoa.application
-command-line kernel memory namespaces cocoa.messages classes
-cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
-cocoa.windows cocoa.classes cocoa.nibs sequences ui ui.private
-ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
-ui.backend.cocoa.views core-foundation core-foundation.run-loop
-core-graphics.types threads math.rectangles fry libc
-generalizations alien.c-types cocoa.views
-combinators io.thread locals ui.pixel-formats
-specialized-arrays.int literals core-graphics ;
+USING: accessors alien.c-types arrays assocs classes cocoa
+cocoa.application cocoa.classes cocoa.messages cocoa.nibs
+cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
+cocoa.views cocoa.windows combinators command-line
+core-foundation core-foundation.run-loop core-graphics
+core-graphics.types destructors fry generalizations io.thread
+kernel libc literals locals math math.rectangles memory
+namespaces sequences specialized-arrays.int threads ui
+ui.backend ui.backend.cocoa.views ui.clipboards ui.gadgets
+ui.gadgets.worlds ui.pixel-formats ui.private words.symbol ;
 IN: ui.backend.cocoa
 
 TUPLE: handle ;
@@ -56,12 +56,12 @@ M: symbol >NSOpenGLPFA
 M: pixel-format-attribute >NSOpenGLPFA
     dup class attribute>NSOpenGLPFA-map at
     [ swap value>> suffix ]
-    [ drop { } ] if ;
+    [ drop { } ] if* ;
 
 PRIVATE>
 
 M: cocoa-ui-backend (make-pixel-format)
-    [ >NSOpenGLPFA ] map concat >int-array
+    [ >NSOpenGLPFA ] map concat 0 suffix >int-array
     NSOpenGLPixelFormat -> alloc swap -> initWithAttributes: ;
 
 M: cocoa-ui-backend (free-pixel-format)
@@ -70,7 +70,7 @@ M: cocoa-ui-backend (free-pixel-format)
 M: cocoa-ui-backend (pixel-format-attribute)
     attribute>NSOpenGLPFA-map at
     [ first 0 <int> [ swap 0 -> getValues:forAttribute:forVirtualScreen: ] keep *int ]
-    [ f ] if* ;
+    [ drop f ] if* ;
 
 TUPLE: pasteboard handle ;
 
@@ -122,7 +122,8 @@ M: cocoa-ui-backend fullscreen* ( world -- ? )
     handle>> view>> -> isInFullScreenMode zero? not ;
 
 M:: cocoa-ui-backend (open-window) ( world -- )
-    [ [ dim>> ] dip <FactorView> ] with-world-pixel-format :> view
+    world [ [ dim>> ] dip <FactorView> ]
+    with-world-pixel-format :> view
     view world world>NSRect <ViewWindow> :> window
     view -> release
     world view register-window
@@ -160,7 +161,8 @@ M: cocoa-ui-backend raise-window* ( world -- )
     <pixel-format> [
         :> pf
         NSOpenGLContext -> alloc pf handle>> f -> initWithFormat:shareContext:
-        dup world pf offscreen-buffer -> setOffScreen:width:height:rowbytes:
+        dup world pf offscreen-buffer
+        4 npick [ -> setOffScreen:width:height:rowbytes: ] dip
     ] with-disposal ;
 
 M: cocoa-ui-backend (open-offscreen-buffer) ( world -- )
