@@ -19,7 +19,7 @@ IN: stack-checker.call-effect
 TUPLE: inline-cache value ;
 
 : cache-hit? ( word/quot ic -- ? )
-    [ value>> ] [ value>> eq? ] bi and ; inline
+    [ value>> eq? ] [ value>> ] bi and ; inline
 
 SINGLETON: +unknown+
 
