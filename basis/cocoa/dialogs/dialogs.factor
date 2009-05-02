@@ -12,6 +12,9 @@ IN: cocoa.dialogs
     dup 1 -> setResolvesAliases:
     dup 1 -> setAllowsMultipleSelection: ;
 
+: <NSDirPanel> ( -- panel ) <NSOpenPanel>
+   dup 1 -> setCanChooseDirectories: ;
+
 : <NSSavePanel> ( -- panel )
     NSSavePanel -> savePanel
     dup 1 -> setCanChooseFiles:
@@ -21,10 +24,12 @@ IN: cocoa.dialogs
 CONSTANT: NSOKButton 1
 CONSTANT: NSCancelButton 0
 
-: open-panel ( -- paths )
-    <NSOpenPanel>
+: (open-panel) ( panel -- paths )
     dup -> runModal NSOKButton =
     [ -> filenames CF>string-array ] [ drop f ] if ;
+    
+: open-panel ( -- paths ) <NSOpenPanel> (open-panel) ;
+: open-dir-panel ( -- paths ) <NSDirPanel> (open-panel) ;
 
 : split-path ( path -- dir file )
     "/" split1-last [ <NSString> ] bi@ ;
