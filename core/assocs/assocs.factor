@@ -32,7 +32,7 @@ M: assoc assoc-like drop ;
         3drop f
     ] [
         3dup nth-unsafe at*
-        [ [ 3drop ] dip ] [ drop [ 1- ] dip (assoc-stack) ] if
+        [ [ 3drop ] dip ] [ drop [ 1 - ] dip (assoc-stack) ] if
     ] if ; inline recursive
 
 : search-alist ( key alist -- pair/f i/f )
@@ -105,7 +105,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     assoc-size 0 = ;
 
 : assoc-stack ( key seq -- value )
-    [ length 1- ] keep (assoc-stack) ; flushable
+    [ length 1 - ] keep (assoc-stack) ; flushable
 
 : assoc-subset? ( assoc1 assoc2 -- ? )
     [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;

@@ -55,7 +55,7 @@ PRIVATE>
 
 : (split) ( separators n seq -- )
     3dup rot [ member? ] curry find-from drop
-    [ [ swap subseq , ] 2keep 1+ swap (split) ]
+    [ [ swap subseq , ] 2keep 1 + swap (split) ]
     [ swap dup zero? [ drop ] [ tail ] if , drop ] if* ; inline recursive
 
 : split, ( seq separators -- ) 0 rot (split) ;
