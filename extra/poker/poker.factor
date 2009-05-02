@@ -1,7 +1,9 @@
-! Copyright (c) 2009 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii binary-search combinators kernel locals math
-    math.bitwise math.order poker.arrays sequences splitting ;
+! Copyright (c) 2009 Aaron Schaefer. All rights reserved.
+! The contents of this file are licensed under the Simplified BSD License
+! A copy of the license is available at http://factorcode.org/license.txt
+USING: accessors arrays ascii binary-search combinators kernel locals math
+    math.bitwise math.order poker.arrays random sequences sequences.product
+    splitting ;
 IN: poker
 
 ! The algorithm used is based on Cactus Kev's Poker Hand Evaluator with
@@ -57,6 +59,8 @@ CONSTANT: TWO_PAIR         7
 CONSTANT: ONE_PAIR         8
 CONSTANT: HIGH_CARD        9
 
+CONSTANT: SUIT_STR { "C" "D" "H" "S" }
+
 CONSTANT: RANK_STR { "2" "3" "4" "5" "6" "7" "8" "9" "T" "J" "Q" "K" "A" }
 
 CONSTANT: VALUE_STR { "" "Straight Flush" "Four of a Kind" "Full House" "Flush"
@@ -107,6 +111,9 @@ CONSTANT: VALUE_STR { "" "Straight Flush" "Four of a Kind" "Full House" "Flush"
 : >ckf ( str -- n )
     #! Cactus Kev Format
     >upper 1 cut (>ckf) ;
+
+: parse-cards ( str -- seq )
+    " " split [ >ckf ] map ;
 
 : flush? ( cards -- ? )
     HEX: F000 [ bitand ] reduce 0 = not ;
@@ -165,6 +172,9 @@ CONSTANT: VALUE_STR { "" "Straight Flush" "Four of a Kind" "Full House" "Flush"
         [ drop STRAIGHT_FLUSH ]                      !   10 straight-flushes
     } cond ;
 
+: card>string ( card -- str )
+    [ >card-rank ] [ >card-suit ] bi append ;
+
 PRIVATE>
 
 TUPLE: hand
@@ -176,13 +186,16 @@ M: hand equal?
     over hand? [ [ value>> ] bi@ = ] [ 2drop f ] if ;
 
 : <hand> ( str -- hand )
-    " " split [ >ckf ] map
-    dup hand-value hand boa ;
+    parse-cards dup hand-value hand boa ;
 
 : >cards ( hand -- str )
-    cards>> [
-        [ >card-rank ] [ >card-suit ] bi append
-    ] map " " join ;
+    cards>> [ card>string ] map " " join ;
 
 : >value ( hand -- str )
     hand-rank VALUE_STR nth ;
+
+: <deck> ( -- deck )
+    RANK_STR SUIT_STR 2array [ concat >ckf ] product-map ;
+
+ALIAS: shuffle randomize
+
