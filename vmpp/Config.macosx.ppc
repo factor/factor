@@ -1,0 +1,3 @@
+include vmpp/Config.macosx
+include vmpp/Config.ppc
+CFLAGS += -arch ppc

@@ -1,0 +1,2 @@
+include vmpp/Config.linux
+include vmpp/Config.x86.32
