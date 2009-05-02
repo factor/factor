@@ -23,7 +23,7 @@ io.sockets.secure.unix.debug ;
 
 : client-test ( -- string )
     <secure-config> [
-        "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop contents
+        "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop stream-contents
     ] with-secure-context ;
 
 [ ] [ [ class name>> write ] server-test ] unit-test
