@@ -1,92 +1,58 @@
-typedef struct {
+struct jit {
 	CELL type;
-	CELL owner;
-	F_GROWABLE_BYTE_ARRAY code;
-	F_GROWABLE_BYTE_ARRAY relocation;
-	F_GROWABLE_ARRAY literals;
+	gc_root<F_OBJECT> owner;
+	growable_byte_array code;
+	growable_byte_array relocation;
+	growable_array literals;
 	bool computing_offset_p;
 	F_FIXNUM position;
 	CELL offset;
-} F_JIT;
 
-void jit_init(F_JIT *jit, CELL jit_type, CELL owner);
+	jit(CELL jit_type, CELL owner);
+	void compute_position(CELL offset);
 
-void jit_compute_position(F_JIT *jit, CELL offset);
+	F_REL rel_to_emit(CELL code_template, bool *rel_p);
+	void emit(CELL code_template);
 
-F_CODE_BLOCK *jit_make_code_block(F_JIT *jit);
+	void literal(CELL literal) { literals.add(literal); }
+	void emit_with(CELL code_template_, CELL literal_);
 
-void jit_dispose(F_JIT *jit);
-
-INLINE F_BYTE_ARRAY *code_to_emit(CELL code_template)
-{
-	return untag_byte_array_fast(array_nth(untag_array_fast(code_template),0));
-}
-
-void jit_emit(F_JIT *jit, CELL code_template);
-
-/* Allocates memory */
-INLINE void jit_add_literal(F_JIT *jit, CELL literal)
-{
-#ifdef FACTOR_DEBUG
-	type_of(literal);
-#endif
-	growable_array_add(&jit->literals,literal);
-}
-
-/* Allocates memory */
-INLINE void jit_emit_with(F_JIT *jit, CELL code_template, CELL argument)
-{
-	REGISTER_ROOT(code_template);
-	jit_add_literal(jit,argument);
-	UNREGISTER_ROOT(code_template);
-	jit_emit(jit,code_template);
-}
-
-/* Allocates memory */
-INLINE void jit_push(F_JIT *jit, CELL literal)
-{
-	jit_emit_with(jit,userenv[JIT_PUSH_IMMEDIATE],literal);
-}
-
-/* Allocates memory */
-INLINE void jit_word_jump(F_JIT *jit, CELL word)
-{
-	jit_emit_with(jit,userenv[JIT_WORD_JUMP],word);
-}
-
-/* Allocates memory */
-INLINE void jit_word_call(F_JIT *jit, CELL word)
-{
-	jit_emit_with(jit,userenv[JIT_WORD_CALL],word);
-}
-
-/* Allocates memory */
-INLINE void jit_emit_subprimitive(F_JIT *jit, CELL word)
-{
-	CELL code_template = untag_word_fast(word)->subprimitive;
-	REGISTER_ROOT(code_template);
-
-	if(array_nth(untag_array_fast(code_template),1) != F)
-		jit_add_literal(jit,T);
-
-	jit_emit(jit,code_template);
-	UNREGISTER_ROOT(code_template);
-}
-
-INLINE F_FIXNUM jit_get_position(F_JIT *jit)
-{
-	if(jit->computing_offset_p)
-	{
-		/* If this is still on, jit_emit() didn't clear it,
-		   so the offset was out of bounds */
-		return -1;
+	void push(CELL literal) {
+		emit_with(userenv[JIT_PUSH_IMMEDIATE],literal);
 	}
-	else
-		return jit->position;
-}
 
-INLINE void jit_set_position(F_JIT *jit, F_FIXNUM position)
-{
-	if(jit->computing_offset_p)
-		jit->position = position;
-}
+	void word_jump(CELL word) {
+		emit_with(userenv[JIT_WORD_JUMP],word);
+	}
+
+	void word_call(CELL word) {
+		emit_with(userenv[JIT_WORD_CALL],word);
+	}
+
+	void emit_subprimitive(CELL word) {
+		gc_root<F_ARRAY> code_template(untagged<F_WORD>(word)->subprimitive);
+		if(array_nth(code_template.untagged(),1) != F) literal(T);
+		emit(code_template.value());
+	}
+
+	void emit_class_lookup(F_FIXNUM index, CELL type);
+
+	F_FIXNUM get_position() {
+		if(computing_offset_p)
+		{
+			/* If this is still on, emit() didn't clear it,
+			   so the offset was out of bounds */
+			return -1;
+		}
+		else
+			return position;
+	}
+
+        void set_position(F_FIXNUM position_) {
+		if(computing_offset_p)
+			position = position_;
+	}
+
+	
+	F_CODE_BLOCK *code_block();
+};

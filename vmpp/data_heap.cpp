@@ -301,19 +301,18 @@ void primitive_data_room(void)
 	dpush(tag_fixnum((data_heap->cards_end - data_heap->cards) >> 10));
 	dpush(tag_fixnum((data_heap->decks_end - data_heap->decks) >> 10));
 
-	GROWABLE_ARRAY(a);
+	growable_array a;
 
 	CELL gen;
 	for(gen = 0; gen < data_heap->gen_count; gen++)
 	{
 		F_ZONE *z = (gen == NURSERY ? &nursery : &data_heap->generations[gen]);
-		GROWABLE_ARRAY_ADD(a,tag_fixnum((z->end - z->here) >> 10));
-		GROWABLE_ARRAY_ADD(a,tag_fixnum((z->size) >> 10));
+		a.add(tag_fixnum((z->end - z->here) >> 10));
+		a.add(tag_fixnum((z->size) >> 10));
 	}
 
-	GROWABLE_ARRAY_TRIM(a);
-	GROWABLE_ARRAY_DONE(a);
-	dpush(a);
+	a.trim();
+	dpush(a.array.value());
 }
 
 /* A heap walk allows useful things to be done, like finding all
@@ -364,7 +363,7 @@ void primitive_end_scan(void)
 
 CELL find_all_words(void)
 {
-	GROWABLE_ARRAY(words);
+	growable_array words;
 
 	begin_scan();
 
@@ -372,14 +371,12 @@ CELL find_all_words(void)
 	while((obj = next_object()) != F)
 	{
 		if(type_of(obj) == WORD_TYPE)
-			GROWABLE_ARRAY_ADD(words,obj);
+			words.add(obj);
 	}
 
 	/* End heap scan */
 	gc_off = false;
 
-	GROWABLE_ARRAY_TRIM(words);
-	GROWABLE_ARRAY_DONE(words);
-
-	return words;
+	words.trim();
+	return words.array.value();
 }

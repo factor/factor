@@ -454,47 +454,37 @@ F_CODE_BLOCK *allot_code_block(CELL size)
 /* Might GC */
 F_CODE_BLOCK *add_code_block(
 	CELL type,
-	F_BYTE_ARRAY *code,
-	F_ARRAY *labels,
-	CELL relocation,
-	CELL literals)
+	CELL code_,
+	CELL labels_,
+	CELL relocation_,
+	CELL literals_)
 {
-#ifdef FACTOR_DEBUG
-	type_check(ARRAY_TYPE,literals);
-	type_check(BYTE_ARRAY_TYPE,relocation);
-	assert(untag_header(code->header) == BYTE_ARRAY_TYPE);
-#endif
+	gc_root<F_BYTE_ARRAY> code(code_);
+	gc_root<F_OBJECT> labels(labels_);
+	gc_root<F_BYTE_ARRAY> relocation(relocation_);
+	gc_root<F_ARRAY> literals(literals_);
 
-	CELL code_length = align8(array_capacity(code));
-
-	REGISTER_ROOT(literals);
-	REGISTER_ROOT(relocation);
-	REGISTER_UNTAGGED(code);
-	REGISTER_UNTAGGED(labels);
-
+	CELL code_length = align8(array_capacity(code.untagged()));
 	F_CODE_BLOCK *compiled = allot_code_block(code_length);
-
-	UNREGISTER_UNTAGGED(F_ARRAY,labels);
-	UNREGISTER_UNTAGGED(F_BYTE_ARRAY,code);
-	UNREGISTER_ROOT(relocation);
-	UNREGISTER_ROOT(literals);
-
-	/* slight space optimization */
-	if(type_of(literals) == ARRAY_TYPE && array_capacity(untag_array_fast(literals)) == 0)
-		literals = F;
 
 	/* compiled header */
 	compiled->block.type = type;
 	compiled->block.last_scan = NURSERY;
 	compiled->block.needs_fixup = true;
-	compiled->literals = literals;
-	compiled->relocation = relocation;
+	compiled->relocation = relocation.value();
+
+	/* slight space optimization */
+	if(literals.type() == ARRAY_TYPE && array_capacity(literals.untagged()) == 0)
+		compiled->literals = F;
+	else
+		compiled->literals = literals.value();
 
 	/* code */
-	memcpy(compiled + 1,code + 1,code_length);
+	memcpy(compiled + 1,code.untagged() + 1,code_length);
 
 	/* fixup labels */
-	if(labels) fixup_labels(labels,compiled);
+	if(labels.value() != F)
+		fixup_labels(labels.as<F_ARRAY>().untagged(),compiled);
 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */

@@ -17,20 +17,21 @@ CELL string_nth(F_STRING* string, CELL index)
 	}
 }
 
-void set_string_nth_fast(F_STRING* string, CELL index, CELL ch)
+void set_string_nth_fast(F_STRING *string, CELL index, CELL ch)
 {
 	bput(SREF(string,index),ch);
 }
 
-void set_string_nth_slow(F_STRING* string, CELL index, CELL ch)
+void set_string_nth_slow(F_STRING *string_, CELL index, CELL ch)
 {
+	gc_root<F_STRING> string(string_);
+
 	F_BYTE_ARRAY *aux;
 
-	bput(SREF(string,index),(ch & 0x7f) | 0x80);
+	bput(SREF(string.untagged(),index),(ch & 0x7f) | 0x80);
 
 	if(string->aux == F)
 	{
-		REGISTER_UNTAGGED(string);
 		/* We don't need to pre-initialize the
 		byte array with any data, since we
 		only ever read from the aux vector
@@ -40,9 +41,8 @@ void set_string_nth_slow(F_STRING* string, CELL index, CELL ch)
 		aux = allot_array_internal<F_BYTE_ARRAY>(
 			untag_fixnum_fast(string->length)
 			* sizeof(u16));
-		UNREGISTER_UNTAGGED(F_STRING,string);
 
-		write_barrier((CELL)string);
+		write_barrier(string.value());
 		string->aux = tag_object(aux);
 	}
 	else
@@ -60,10 +60,10 @@ void set_string_nth(F_STRING* string, CELL index, CELL ch)
 		set_string_nth_slow(string,index,ch);
 }
 
-/* untagged */
-F_STRING* allot_string_internal(CELL capacity)
+/* Allocates memory */
+F_STRING *allot_string_internal(CELL capacity)
 {
-	F_STRING *string = (F_STRING *)allot_object(STRING_TYPE,string_size(capacity));
+	F_STRING *string = allot<F_STRING>(string_size(capacity));
 
 	string->length = tag_fixnum(capacity);
 	string->hashcode = F;
@@ -72,32 +72,28 @@ F_STRING* allot_string_internal(CELL capacity)
 	return string;
 }
 
-/* allocates memory */
-void fill_string(F_STRING *string, CELL start, CELL capacity, CELL fill)
+/* Allocates memory */
+void fill_string(F_STRING *string_, CELL start, CELL capacity, CELL fill)
 {
+	gc_root<F_STRING> string(string_);
+
 	if(fill <= 0x7f)
-		memset((void *)SREF(string,start),fill,capacity - start);
+		memset((void *)SREF(string.untagged(),start),fill,capacity - start);
 	else
 	{
 		CELL i;
 
 		for(i = start; i < capacity; i++)
-		{
-			REGISTER_UNTAGGED(string);
-			set_string_nth(string,i,fill);
-			UNREGISTER_UNTAGGED(F_STRING,string);
-		}
+			set_string_nth(string.untagged(),i,fill);
 	}
 }
 
-/* untagged */
+/* Allocates memory */
 F_STRING *allot_string(CELL capacity, CELL fill)
 {
-	F_STRING* string = allot_string_internal(capacity);
-	REGISTER_UNTAGGED(string);
-	fill_string(string,0,capacity,fill);
-	UNREGISTER_UNTAGGED(F_STRING,string);
-	return string;
+	gc_root<F_STRING> string(allot_string_internal(capacity));
+	fill_string(string.untagged(),0,capacity,fill);
+	return string.untagged();
 }
 
 void primitive_string(void)
@@ -112,9 +108,11 @@ static bool reallot_string_in_place_p(F_STRING *string, CELL capacity)
 	return in_zone(&nursery,(CELL)string) && capacity <= string_capacity(string);
 }
 
-F_STRING* reallot_string(F_STRING* string, CELL capacity)
+F_STRING* reallot_string(F_STRING *string_, CELL capacity)
 {
-	if(reallot_string_in_place_p(string,capacity))
+	gc_root<F_STRING> string(string_);
+
+	if(reallot_string_in_place_p(string.untagged(),capacity))
 	{
 		string->length = tag_fixnum(capacity);
 
@@ -124,42 +122,31 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity)
 			aux->capacity = tag_fixnum(capacity * 2);
 		}
 
-		return string;
+		return string.untagged();
 	}
 	else
 	{
-		CELL to_copy = string_capacity(string);
+		CELL to_copy = string_capacity(string.untagged());
 		if(capacity < to_copy)
 			to_copy = capacity;
 
-		REGISTER_UNTAGGED(string);
-		F_STRING *new_string = allot_string_internal(capacity);
-		UNREGISTER_UNTAGGED(F_STRING,string);
+		gc_root<F_STRING> new_string(allot_string_internal(capacity));
 
-		memcpy(new_string + 1,string + 1,to_copy);
+		memcpy(new_string.untagged() + 1,string.untagged() + 1,to_copy);
 
 		if(string->aux != F)
 		{
-			REGISTER_UNTAGGED(string);
-			REGISTER_UNTAGGED(new_string);
 			F_BYTE_ARRAY *new_aux = allot_byte_array(capacity * sizeof(u16));
-			UNREGISTER_UNTAGGED(F_STRING,new_string);
-			UNREGISTER_UNTAGGED(F_STRING,string);
 
-			write_barrier((CELL)new_string);
+			write_barrier(new_string.value());
 			new_string->aux = tag_object(new_aux);
 
 			F_BYTE_ARRAY *aux = untag_byte_array_fast(string->aux);
 			memcpy(new_aux + 1,aux + 1,to_copy * sizeof(u16));
 		}
 
-		REGISTER_UNTAGGED(string);
-		REGISTER_UNTAGGED(new_string);
-		fill_string(new_string,to_copy,capacity,'\0');
-		UNREGISTER_UNTAGGED(F_STRING,new_string);
-		UNREGISTER_UNTAGGED(F_STRING,string);
-
-		return new_string;
+		fill_string(new_string.untagged(),to_copy,capacity,'\0');
+		return new_string.untagged();
 	}
 }
 
@@ -175,18 +162,16 @@ void primitive_resize_string(void)
 #define MEMORY_TO_STRING(type,utype) \
 	F_STRING *memory_to_##type##_string(const type *string, CELL length) \
 	{ \
-		REGISTER_C_STRING(string);	     \
-		F_STRING *s = allot_string_internal(length); \
-		UNREGISTER_C_STRING(type,string);	     \
+		REGISTER_C_STRING(string); \
+		gc_root<F_STRING> s(allot_string_internal(length)); \
+		UNREGISTER_C_STRING(type,string); \
 		CELL i; \
 		for(i = 0; i < length; i++) \
 		{ \
-			REGISTER_UNTAGGED(s); \
-			set_string_nth(s,i,(utype)*string); \
-			UNREGISTER_UNTAGGED(F_STRING,s);    \
+			set_string_nth(s.untagged(),i,(utype)*string);	\
 			string++; \
 		} \
-		return s; \
+		return s.untagged(); \
 	} \
 	F_STRING *from_##type##_string(const type *str) \
 	{ \
@@ -236,17 +221,16 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 		F_STRING *str = untag_string(dpop()); \
 		type##_string_to_memory(str,address); \
 	} \
-	F_BYTE_ARRAY *string_to_##type##_alien(F_STRING *s, bool check) \
+	F_BYTE_ARRAY *string_to_##type##_alien(F_STRING *s_, bool check) \
 	{ \
-		CELL capacity = string_capacity(s); \
+		gc_root<F_STRING> s(s_); \
+		CELL capacity = string_capacity(s.untagged());	\
 		F_BYTE_ARRAY *_c_str; \
-		if(check && !check_string(s,sizeof(type))) \
-			general_error(ERROR_C_STRING,tag_object(s),F,NULL); \
-		REGISTER_UNTAGGED(s); \
+		if(check && !check_string(s.untagged(),sizeof(type)))	\
+			general_error(ERROR_C_STRING,s.value(),F,NULL);	\
 		_c_str = allot_c_string(capacity,sizeof(type)); \
-		UNREGISTER_UNTAGGED(F_STRING,s);		\
 		type *c_str = (type*)(_c_str + 1); \
-		type##_string_to_memory(s,c_str); \
+		type##_string_to_memory(s.untagged(),c_str);	\
 		c_str[capacity] = 0; \
 		return _c_str; \
 	} \

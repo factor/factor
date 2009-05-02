@@ -85,11 +85,11 @@ void primitive_fread(void)
 		return;
 	}
 
-	F_BYTE_ARRAY *buf = allot_byte_array(size);
+	gc_root<F_BYTE_ARRAY> buf(allot_array_internal<F_BYTE_ARRAY>(size));
 
 	for(;;)
 	{
-		int c = fread(buf + 1,1,size,file);
+		int c = fread(buf.untagged() + 1,1,size,file);
 		if(c <= 0)
 		{
 			if(feof(file))
@@ -104,13 +104,11 @@ void primitive_fread(void)
 		{
 			if(c != size)
 			{
-				REGISTER_UNTAGGED(buf);
 				F_BYTE_ARRAY *new_buf = allot_byte_array(c);
-				UNREGISTER_UNTAGGED(F_BYTE_ARRAY,buf);
-				memcpy(new_buf + 1, buf + 1,c);
+				memcpy(new_buf + 1, buf.untagged() + 1,c);
 				buf = new_buf;
 			}
-			dpush(tag_object(buf));
+			dpush(buf.value());
 			break;
 		}
 	}

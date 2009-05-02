@@ -28,9 +28,7 @@ void iterate_callstack_object(F_CALLSTACK *stack, CALLSTACK_ITER iterator)
 
 F_CALLSTACK *allot_callstack(CELL size)
 {
-	F_CALLSTACK *callstack = (F_CALLSTACK *)allot_object(
-		CALLSTACK_TYPE,
-		callstack_size(size));
+	F_CALLSTACK *callstack = allot<F_CALLSTACK>(callstack_size(size));
 	callstack->length = tag_fixnum(size);
 	return callstack;
 }
@@ -158,17 +156,15 @@ void stack_frame_to_array(F_STACK_FRAME *frame)
 
 void primitive_callstack_to_array(void)
 {
-	F_CALLSTACK *stack = untag_callstack(dpop());
+	gc_root<F_CALLSTACK> callstack(dpop());
 
 	frame_count = 0;
-	iterate_callstack_object(stack,count_stack_frame);
+	iterate_callstack_object(callstack.untagged(),count_stack_frame);
 
-	REGISTER_UNTAGGED(stack);
 	array = allot_array_internal<F_ARRAY>(frame_count);
-	UNREGISTER_UNTAGGED(F_CALLSTACK,stack);
 
 	frame_index = 0;
-	iterate_callstack_object(stack,stack_frame_to_array);
+	iterate_callstack_object(callstack.untagged(),stack_frame_to_array);
 
 	dpush(tag_array(array));
 }
@@ -208,18 +204,12 @@ void primitive_innermost_stack_frame_scan(void)
 
 void primitive_set_innermost_stack_frame_quot(void)
 {
-	F_CALLSTACK *callstack = untag_callstack(dpop());
-	F_QUOTATION *quot = untag_quotation(dpop());
+	gc_root<F_CALLSTACK> callstack(dpop());
+	gc_root<F_QUOTATION> quot(dpop());
 
-	REGISTER_UNTAGGED(callstack);
-	REGISTER_UNTAGGED(quot);
+	jit_compile(quot.value(),true);
 
-	jit_compile(tag_quotation(quot),true);
-
-	UNREGISTER_UNTAGGED(F_QUOTATION,quot);
-	UNREGISTER_UNTAGGED(F_CALLSTACK,callstack);
-
-	F_STACK_FRAME *inner = innermost_stack_frame(callstack);
+	F_STACK_FRAME *inner = innermost_stack_frame(callstack.untagged());
 	type_check(QUOTATION_TYPE,frame_executing(inner));
 
 	CELL offset = (char *)FRAME_RETURN_ADDRESS(inner) - (char *)inner->xt;

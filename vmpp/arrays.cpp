@@ -1,13 +1,13 @@
 #include "master.hpp"
 
 /* make a new array with an initial element */
-F_ARRAY *allot_array(CELL capacity, CELL fill)
+F_ARRAY *allot_array(CELL capacity, CELL fill_)
 {
-	REGISTER_ROOT(fill);
-	F_ARRAY* array = allot_array_internal<F_ARRAY>(capacity);
-	UNREGISTER_ROOT(fill);
-	if(fill == 0)
-		memset((void*)AREF(array,0),'\0',capacity * CELLS);
+	gc_root<F_OBJECT> fill(fill_);
+	gc_root<F_ARRAY> array(allot_array_internal<F_ARRAY>(capacity));
+
+	if(fill.value() == tag_fixnum(0))
+		memset((void*)AREF(array.untagged(),0),'\0',capacity * CELLS);
 	else
 	{
 		/* No need for write barrier here. Either the object is in
@@ -15,9 +15,9 @@ F_ARRAY *allot_array(CELL capacity, CELL fill)
 		and the write barrier is already hit for us in that case. */
 		CELL i;
 		for(i = 0; i < capacity; i++)
-			put(AREF(array,i),fill);
+			put(AREF(array.untagged(),i),fill.value());
 	}
-	return array;
+	return array.untagged();
 }
 
 /* push a new array on the stack */
@@ -28,43 +28,36 @@ void primitive_array(void)
 	dpush(tag_array(allot_array(size,initial)));
 }
 
-CELL allot_array_1(CELL obj)
+CELL allot_array_1(CELL obj_)
 {
-	REGISTER_ROOT(obj);
-	F_ARRAY *a = allot_array_internal<F_ARRAY>(1);
-	UNREGISTER_ROOT(obj);
-	set_array_nth(a,0,obj);
-	return tag_array(a);
+	gc_root<F_OBJECT> obj(obj_);
+	gc_root<F_ARRAY> a(allot_array_internal<F_ARRAY>(1));
+	set_array_nth(a.untagged(),0,obj.value());
+	return a.value();
 }
 
-CELL allot_array_2(CELL v1, CELL v2)
+CELL allot_array_2(CELL v1_, CELL v2_)
 {
-	REGISTER_ROOT(v1);
-	REGISTER_ROOT(v2);
-	F_ARRAY *a = allot_array_internal<F_ARRAY>(2);
-	UNREGISTER_ROOT(v2);
-	UNREGISTER_ROOT(v1);
-	set_array_nth(a,0,v1);
-	set_array_nth(a,1,v2);
-	return tag_array(a);
+	gc_root<F_OBJECT> v1(v1_);
+	gc_root<F_OBJECT> v2(v2_);
+	gc_root<F_ARRAY> a(allot_array_internal<F_ARRAY>(2));
+	set_array_nth(a.untagged(),0,v1.value());
+	set_array_nth(a.untagged(),1,v2.value());
+	return a.value();
 }
 
-CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
+CELL allot_array_4(CELL v1_, CELL v2_, CELL v3_, CELL v4_)
 {
-	REGISTER_ROOT(v1);
-	REGISTER_ROOT(v2);
-	REGISTER_ROOT(v3);
-	REGISTER_ROOT(v4);
-	F_ARRAY *a = allot_array_internal<F_ARRAY>(4);
-	UNREGISTER_ROOT(v4);
-	UNREGISTER_ROOT(v3);
-	UNREGISTER_ROOT(v2);
-	UNREGISTER_ROOT(v1);
-	set_array_nth(a,0,v1);
-	set_array_nth(a,1,v2);
-	set_array_nth(a,2,v3);
-	set_array_nth(a,3,v4);
-	return tag_array(a);
+	gc_root<F_OBJECT> v1(v1_);
+	gc_root<F_OBJECT> v2(v2_);
+	gc_root<F_OBJECT> v3(v3_);
+	gc_root<F_OBJECT> v4(v4_);
+	gc_root<F_ARRAY> a(allot_array_internal<F_ARRAY>(4));
+	set_array_nth(a.untagged(),0,v1.value());
+	set_array_nth(a.untagged(),1,v2.value());
+	set_array_nth(a.untagged(),2,v3.value());
+	set_array_nth(a.untagged(),3,v4.value());
+	return a.value();
 }
 
 void primitive_resize_array(void)
@@ -74,43 +67,16 @@ void primitive_resize_array(void)
 	dpush(tag_array(reallot_array(array,capacity)));
 }
 
-void growable_array_add(F_GROWABLE_ARRAY *array, CELL elt)
+void growable_array::add(CELL elt_)
 {
-	F_ARRAY *underlying = untag_array_fast(array->array);
-	REGISTER_ROOT(elt);
+	gc_root<F_OBJECT> elt(elt_);
+	if(count == array_capacity(array.untagged()))
+		array = reallot_array(array.untagged(),count * 2);
 
-	if(array->count == array_capacity(underlying))
-	{
-		underlying = reallot_array(underlying,array->count * 2);
-		array->array = tag_array(underlying);
-	}
-
-	UNREGISTER_ROOT(elt);
-	set_array_nth(underlying,array->count++,elt);
+	set_array_nth(array.untagged(),count++,elt.value());
 }
 
-void growable_array_append(F_GROWABLE_ARRAY *array, F_ARRAY *elts)
+void growable_array::trim()
 {
-	REGISTER_UNTAGGED(elts);
-
-	F_ARRAY *underlying = untag_array_fast(array->array);
-
-	CELL elts_size = array_capacity(elts);
-	CELL new_size = array->count + elts_size;
-
-	if(new_size >= array_capacity(underlying))
-	{
-		underlying = reallot_array(underlying,new_size * 2);
-		array->array = tag_array(underlying);
-	}
-
-	UNREGISTER_UNTAGGED(F_ARRAY,elts);
-
-	write_barrier(array->array);
-
-	memcpy((void *)AREF(underlying,array->count),
-	       (void *)AREF(elts,0),
-	       elts_size * CELLS);
-
-	array->count += elts_size;
+	array = reallot_array(array.untagged(),count);
 }

@@ -21,10 +21,10 @@
 #include <sys/param.h>
 
 #include "layouts.hpp"
-#include "tagged.hpp"
 #include "platform.hpp"
 #include "primitives.hpp"
 #include "run.hpp"
+#include "tagged.hpp"
 #include "profiler.hpp"
 #include "errors.hpp"
 #include "bignumint.hpp"
@@ -50,8 +50,8 @@
 #include "image.hpp"
 #include "callstack.hpp"
 #include "alien.hpp"
-#include "quotations.hpp"
 #include "jit.hpp"
+#include "quotations.hpp"
 #include "dispatch.hpp"
 #include "inline_cache.hpp"
 #include "factor.hpp"

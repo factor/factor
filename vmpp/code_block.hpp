@@ -84,9 +84,4 @@ INLINE bool stack_traces_p(void)
 	return userenv[STACK_TRACES_ENV] != F;
 }
 
-F_CODE_BLOCK *add_code_block(
-	CELL type,
-	F_BYTE_ARRAY *code,
-	F_ARRAY *labels,
-	CELL relocation,
-	CELL literals);
+F_CODE_BLOCK *add_code_block(CELL type, CELL code, CELL labels, CELL relocation, CELL literals);
