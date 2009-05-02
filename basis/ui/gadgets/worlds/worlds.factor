@@ -152,10 +152,15 @@ M: world handle-gesture ( gesture gadget -- ? )
 
 GENERIC: world-pixel-format-attributes ( world -- attributes )
 
+GENERIC# check-world-pixel-format 1 ( world pixel-format -- )
+
 M: world world-pixel-format-attributes
     drop
     { windowed double-buffered T{ depth-bits { value 16 } } } ;
 
+M: world check-world-pixel-format
+    2drop ;
+
 : with-world-pixel-format ( world quot -- )
     [ dup dup world-pixel-format-attributes <pixel-format> ]
-    dip with-disposal ; inline
+    dip [ 2dup check-world-pixel-format ] prepose with-disposal ; inline
