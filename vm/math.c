@@ -375,18 +375,6 @@ CELL unbox_array_size(void)
 	return 0; /* can't happen */
 }
 
-/* Ratios */
-
-/* Does not reduce to lowest terms, so should only be used by math
-library implementation, to avoid breaking invariants. */
-void primitive_from_fraction(void)
-{
-	F_RATIO* ratio = allot_object(RATIO_TYPE,sizeof(F_RATIO));
-	ratio->denominator = dpop();
-	ratio->numerator = dpop();
-	dpush(RETAG(ratio,RATIO_TYPE));
-}
-
 /* Floats */
 void primitive_fixnum_to_float(void)
 {
@@ -524,14 +512,4 @@ void box_float(float flo)
 void box_double(double flo)
 {
         dpush(allot_float(flo));
-}
-
-/* Complex numbers */
-
-void primitive_from_rect(void)
-{
-	F_COMPLEX* z = allot_object(COMPLEX_TYPE,sizeof(F_COMPLEX));
-	z->imaginary = dpop();
-	z->real = dpop();
-	dpush(RETAG(z,COMPLEX_TYPE));
 }

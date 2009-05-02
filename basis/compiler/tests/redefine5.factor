@@ -1,6 +1,6 @@
 USING: eval tools.test compiler.units vocabs multiline words
 kernel ;
-IN: compiler.tests
+IN: compiler.tests.redefine5
 
 ! Regression: if dispatch was eliminated but method was not inlined,
 ! compiled usage information was not recorded.

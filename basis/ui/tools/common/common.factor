@@ -7,7 +7,7 @@ IN: ui.tools.common
 
 SYMBOL: tool-dims
 
-tool-dims global [ H{ } clone or ] change-at
+tool-dims [ H{ } clone ] initialize
 
 TUPLE: tool < track ;
 

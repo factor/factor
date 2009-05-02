@@ -18,6 +18,10 @@ MACRO: input<sequence ( quot -- newquot )
     [ infer in>> ] keep
     '[ _ firstn @ ] ;
 
+MACRO: input<sequence-unsafe ( quot -- newquot )
+    [ infer in>> ] keep
+    '[ _ firstn-unsafe @ ] ;
+
 MACRO: reduce-outputs ( quot operation -- newquot )
     [ dup infer out>> 1 [-] ] dip n*quot compose ;
 

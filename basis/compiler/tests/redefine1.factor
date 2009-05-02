@@ -1,7 +1,7 @@
 USING: accessors compiler compiler.units tools.test math parser
 kernel sequences sequences.private classes.mixin generic
 definitions arrays words assocs eval strings ;
-IN: compiler.tests
+IN: compiler.tests.redefine1
 
 GENERIC: method-redefine-generic-1 ( a -- b )
 
@@ -11,7 +11,7 @@ M: integer method-redefine-generic-1 3 + ;
 
 [ 6 ] [ method-redefine-test-1 ] unit-test
 
-[ ] [ "IN: compiler.tests USE: math M: fixnum method-redefine-generic-1 4 + ;" eval( -- ) ] unit-test
+[ ] [ "IN: compiler.tests.redefine1 USE: math M: fixnum method-redefine-generic-1 4 + ;" eval( -- ) ] unit-test
 
 [ 7 ] [ method-redefine-test-1 ] unit-test
 
@@ -27,7 +27,7 @@ M: integer method-redefine-generic-2 3 + ;
 
 [ 6 ] [ method-redefine-test-2 ] unit-test
 
-[ ] [ "IN: compiler.tests USE: kernel USE: math M: fixnum method-redefine-generic-2 4 + ; USE: strings M: string method-redefine-generic-2 drop f ;" eval( -- ) ] unit-test
+[ ] [ "IN: compiler.tests.redefine1 USE: kernel USE: math M: fixnum method-redefine-generic-2 4 + ; USE: strings M: string method-redefine-generic-2 drop f ;" eval( -- ) ] unit-test
 
 [ 7 ] [ method-redefine-test-2 ] unit-test
 

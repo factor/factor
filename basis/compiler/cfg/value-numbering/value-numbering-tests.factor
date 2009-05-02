@@ -92,7 +92,7 @@ sequences ;
         T{ ##load-reference f V int-regs 1 + }
         T{ ##peek f V int-regs 2 D 0 }
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc> }
-        T{ ##compare-imm f V int-regs 6 V int-regs 4 7 cc/= }
+        T{ ##compare-imm f V int-regs 6 V int-regs 4 5 cc/= }
         T{ ##replace f V int-regs 6 D 0 }
     } value-numbering trim-temps
 ] unit-test
@@ -110,7 +110,7 @@ sequences ;
         T{ ##load-reference f V int-regs 1 + }
         T{ ##peek f V int-regs 2 D 0 }
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc<= }
-        T{ ##compare-imm f V int-regs 6 V int-regs 4 7 cc= }
+        T{ ##compare-imm f V int-regs 6 V int-regs 4 5 cc= }
         T{ ##replace f V int-regs 6 D 0 }
     } value-numbering trim-temps
 ] unit-test
@@ -132,7 +132,7 @@ sequences ;
         T{ ##unbox-float f V double-float-regs 10 V int-regs 8 }
         T{ ##unbox-float f V double-float-regs 11 V int-regs 9 }
         T{ ##compare-float f V int-regs 12 V double-float-regs 10 V double-float-regs 11 cc< }
-        T{ ##compare-imm f V int-regs 14 V int-regs 12 7 cc= }
+        T{ ##compare-imm f V int-regs 14 V int-regs 12 5 cc= }
         T{ ##replace f V int-regs 14 D 0 }
     } value-numbering trim-temps
 ] unit-test
@@ -149,6 +149,6 @@ sequences ;
         T{ ##peek f V int-regs 29 D -1 }
         T{ ##peek f V int-regs 30 D -2 }
         T{ ##compare f V int-regs 33 V int-regs 29 V int-regs 30 cc<= }
-        T{ ##compare-imm-branch f V int-regs 33 7 cc/= }
+        T{ ##compare-imm-branch f V int-regs 33 5 cc/= }
     } value-numbering trim-temps
 ] unit-test

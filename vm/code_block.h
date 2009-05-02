@@ -5,8 +5,10 @@ typedef enum {
 	RT_DLSYM,
 	/* a pointer to a compiled word reference */
 	RT_DISPATCH,
-	/* a compiled word reference */
+	/* a word's general entry point XT */
 	RT_XT,
+	/* a word's direct entry point XT */
+	RT_XT_DIRECT,
 	/* current offset */
 	RT_HERE,
 	/* current code block */
@@ -14,7 +16,9 @@ typedef enum {
 	/* immediate literal */
 	RT_IMMEDIATE,
 	/* address of stack_chain var */
-	RT_STACK_CHAIN
+	RT_STACK_CHAIN,
+	/* untagged fixnum literal */
+	RT_UNTAGGED,
 } F_RELTYPE;
 
 typedef enum {
@@ -65,6 +69,8 @@ void copy_literal_references(F_CODE_BLOCK *compiled);
 
 void update_word_references(F_CODE_BLOCK *compiled);
 
+void update_literal_and_word_references(F_CODE_BLOCK *compiled);
+
 void mark_code_block(F_CODE_BLOCK *compiled);
 
 void mark_active_blocks(F_CONTEXT *stacks);
@@ -73,8 +79,6 @@ void mark_object_code_block(CELL scan);
 
 void relocate_code_block(F_CODE_BLOCK *relocating);
 
-CELL compiled_code_format(void);
-
 INLINE bool stack_traces_p(void)
 {
 	return userenv[STACK_TRACES_ENV] != F;
@@ -82,7 +86,7 @@ INLINE bool stack_traces_p(void)
 
 F_CODE_BLOCK *add_code_block(
 	CELL type,
-	F_ARRAY *code,
+	F_BYTE_ARRAY *code,
 	F_ARRAY *labels,
 	CELL relocation,
 	CELL literals);

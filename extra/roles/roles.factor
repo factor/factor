@@ -8,8 +8,8 @@ IN: roles
 ERROR: role-slot-overlap class slots ;
 ERROR: multiple-inheritance-attempted classes ;
 
-PREDICATE: role < class
-    { [ mixin-class? ] [ "role-slots" word-prop >boolean ] } 1&& ;
+PREDICATE: role < mixin-class
+    "role-slots" word-prop >boolean ;
 
 : parse-role-definition ( -- class superroles slots )
     CREATE-CLASS scan {

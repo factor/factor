@@ -19,7 +19,6 @@ IN: stack-checker.transforms
     rstate recursive-state
     [ word stack quot call-transformer ] with-variable
     [
-        word inlined-dependency depends-on
         values [ length meta-d shorten-by ] [ #drop, ] bi
         rstate infer-quot
     ] [ word infer-word ] if* ;
@@ -108,7 +107,6 @@ IN: stack-checker.transforms
 ] 1 define-transform
 
 \ boa t "no-compile" set-word-prop
-M\ tuple-class boa t "no-compile" set-word-prop
 
 \ new [
     dup tuple-class? [

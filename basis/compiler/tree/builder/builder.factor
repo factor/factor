@@ -54,15 +54,16 @@ PRIVATE>
     #! This slows down compiler.tree.propagation.inlining since then every
     #! inlined usage of a method has an inline-dependency on the mixin, and
     #! not the more specific type at the call site.
-    specialize-method? off
-    [
-        #call in-d>> word/quot build-tree-with unclip-last in-d>> :> in-d
-        {
-            { [ dup not ] [ ] }
-            { [ dup ends-with-terminate? ] [ #call out-d>> [ f swap #push ] map append ] }
-            [ in-d #call out-d>> #copy suffix ]
-        } cond
-    ] [ dup inference-error? [ drop f ] [ rethrow ] if ] recover ;
+    f specialize-method? [
+        [
+            #call in-d>> word/quot build-tree-with unclip-last in-d>> :> in-d
+            {
+                { [ dup not ] [ ] }
+                { [ dup ends-with-terminate? ] [ #call out-d>> [ f swap #push ] map append ] }
+                [ in-d #call out-d>> #copy suffix ]
+            } cond
+        ] [ dup inference-error? [ drop f ] [ rethrow ] if ] recover
+    ] with-variable ;
 
 : contains-breakpoints? ( word -- ? )
     def>> [ word? ] filter [ "break?" word-prop ] any? ;

@@ -4,7 +4,7 @@ USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
 sequences.private assocs models models.arrow arrays accessors
-generic generic.standard definitions make sbufs tools.crossref ;
+generic generic.single definitions make sbufs tools.crossref ;
 IN: tools.continuations
 
 <PRIVATE
@@ -53,8 +53,7 @@ M: object add-breakpoint ;
 : (step-into-execute) ( word -- )
     {
         { [ dup "step-into" word-prop ] [ "step-into" word-prop call ] }
-        { [ dup standard-generic? ] [ effective-method (step-into-execute) ] }
-        { [ dup hook-generic? ] [ effective-method (step-into-execute) ] }
+        { [ dup single-generic? ] [ effective-method (step-into-execute) ] }
         { [ dup uses \ suspend swap member? ] [ execute break ] }
         { [ dup primitive? ] [ execute break ] }
         [ def>> (step-into-quot) ]

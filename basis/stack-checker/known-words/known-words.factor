@@ -9,9 +9,10 @@ quotations quotations.private sbufs sbufs.private
 sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
-words.private assocs summary compiler.units system.private
-combinators locals locals.backend locals.types words.private
+assocs summary compiler.units system.private
+combinators combinators.short-circuit locals locals.backend locals.types
 quotations.private combinators.private stack-checker.values
+generic.single generic.single.private
 alien.libraries
 stack-checker.alien
 stack-checker.state
@@ -57,8 +58,12 @@ IN: stack-checker.known-words
 : infer-shuffle-word ( word -- )
     "shuffle" word-prop infer-shuffle ;
 
+: check-declaration ( declaration -- declaration )
+    dup { [ array? ] [ [ class? ] all? ] } 1&&
+    [ bad-declaration-error ] unless ;
+
 : infer-declare ( -- )
-    pop-literal nip
+    pop-literal nip check-declaration
     [ length ensure-d ] keep zip
     #declare, ;
 
@@ -142,7 +147,7 @@ M: object infer-call*
     apply-word/effect ;
 
 : infer-execute-effect-unsafe ( -- )
-    \ execute infer-effect-unsafe ;
+    \ (execute) infer-effect-unsafe ;
 
 : infer-call-effect-unsafe ( -- )
     \ call infer-effect-unsafe ;
@@ -227,14 +232,7 @@ M: object infer-call*
 
 ! More words not to compile
 \ call t "no-compile" set-word-prop
-\ call subwords [ t "no-compile" set-word-prop ] each
-
 \ execute t "no-compile" set-word-prop
-\ execute subwords [ t "no-compile" set-word-prop ] each
-
-\ effective-method t "no-compile" set-word-prop
-\ effective-method subwords [ t "no-compile" set-word-prop ] each
-
 \ clear t "no-compile" set-word-prop
 
 : non-inline-word ( word -- )
@@ -292,9 +290,6 @@ M: object infer-call*
 \ bignum>float { bignum } { float } define-primitive
 \ bignum>float make-foldable
 
-\ <ratio> { integer integer } { ratio } define-primitive
-\ <ratio> make-foldable
-
 \ string>float { string } { float } define-primitive
 \ string>float make-foldable
 
@@ -312,9 +307,6 @@ M: object infer-call*
 
 \ bits>double { integer } { float } define-primitive
 \ bits>double make-foldable
-
-\ <complex> { real real } { complex } define-primitive
-\ <complex> make-foldable
 
 \ both-fixnums? { object object } { object } define-primitive
 
@@ -676,3 +668,12 @@ M: object infer-call*
 \ gc-stats { } { array } define-primitive
 
 \ jit-compile { quotation } { } define-primitive
+
+\ lookup-method { object array } { word } define-primitive
+
+\ reset-dispatch-stats { } { } define-primitive
+\ dispatch-stats { } { array } define-primitive
+\ reset-inline-cache-stats { } { } define-primitive
+\ inline-cache-stats { } { array } define-primitive
+
+\ optimized? { word } { object } define-primitive

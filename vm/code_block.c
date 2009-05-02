@@ -24,8 +24,10 @@ void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
 			{
 			case RT_PRIMITIVE:
 			case RT_XT:
+			case RT_XT_DIRECT:
 			case RT_IMMEDIATE:
 			case RT_HERE:
+			case RT_UNTAGGED:
 				index++;
 				break;
 			case RT_DLSYM:
@@ -152,19 +154,55 @@ void copy_literal_references(F_CODE_BLOCK *compiled)
 
 CELL object_xt(CELL obj)
 {
-	if(type_of(obj) == WORD_TYPE)
-		return (CELL)untag_word(obj)->xt;
+	if(TAG(obj) == QUOTATION_TYPE)
+	{
+		F_QUOTATION *quot = untag_object(obj);
+		return (CELL)quot->xt;
+	}
 	else
-		return (CELL)untag_quotation(obj)->xt;
+	{
+		F_WORD *word = untag_object(obj);
+		return (CELL)word->xt;
+	}
+}
+
+CELL word_direct_xt(CELL obj)
+{
+#ifdef FACTOR_DEBUG
+	type_check(WORD_TYPE,obj);
+#endif
+	F_WORD *word = untag_object(obj);
+	CELL quot = word->direct_entry_def;
+	if(quot == F || max_pic_size == 0)
+		return (CELL)word->xt;
+	else
+	{
+		F_QUOTATION *untagged = untag_object(quot);
+#ifdef FACTOR_DEBUG
+		type_check(QUOTATION_TYPE,quot);
+#endif
+		if(untagged->compiledp == F)
+			return (CELL)word->xt;
+		else
+			return (CELL)untagged->xt;
+	}
 }
 
 void update_word_references_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 {
-	if(REL_TYPE(rel) == RT_XT)
+	F_RELTYPE type = REL_TYPE(rel);
+	if(type == RT_XT || type == RT_XT_DIRECT)
 	{
 		CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
 		F_ARRAY *literals = untag_object(compiled->literals);
-		CELL xt = object_xt(array_nth(literals,index));
+		CELL obj = array_nth(literals,index);
+
+		CELL xt;
+		if(type == RT_XT)
+			xt = object_xt(obj);
+		else
+			xt = word_direct_xt(obj);
+
 		store_address_in_code_block(REL_CLASS(rel),offset,xt);
 	}
 }
@@ -177,11 +215,36 @@ void update_word_references(F_CODE_BLOCK *compiled)
 {
 	if(compiled->block.needs_fixup)
 		relocate_code_block(compiled);
+	/* update_word_references() is always applied to every block in
+	   the code heap. Since it resets all call sites to point to
+	   their canonical XT (cold entry point for non-tail calls,
+	   standard entry point for tail calls), it means that no PICs
+	   are referenced after this is done. So instead of polluting
+	   the code heap with dead PICs that will be freed on the next
+	   GC, we add them to the free list immediately. */
+	else if(compiled->block.type == PIC_TYPE)
+	{
+		fflush(stdout);
+		heap_free(&code_heap,&compiled->block);
+	}
 	else
 	{
 		iterate_relocations(compiled,update_word_references_step);
 		flush_icache_for(compiled);
 	}
+}
+
+void update_literal_and_word_references(F_CODE_BLOCK *compiled)
+{
+	update_literal_references(compiled);
+	update_word_references(compiled);
+}
+
+INLINE void check_code_address(CELL address)
+{
+#ifdef FACTOR_DEBUG
+	assert(address >= code_heap.segment->start && address < code_heap.segment->end);
+#endif
 }
 
 /* Update references to words. This is done after a new code block
@@ -191,6 +254,8 @@ is added to the heap. */
 collections */
 void mark_code_block(F_CODE_BLOCK *compiled)
 {
+	check_code_address((CELL)compiled);
+
 	mark_block(&compiled->block);
 
 	copy_handle(&compiled->literals);
@@ -220,11 +285,12 @@ void mark_object_code_block(CELL scan)
 	F_QUOTATION *quot;
 	F_CALLSTACK *stack;
 
-	switch(object_type(scan))
+	switch(hi_tag(scan))
 	{
 	case WORD_TYPE:
 		word = (F_WORD *)scan;
-		mark_code_block(word->code);
+		if(word->code)
+			mark_code_block(word->code);
 		if(word->profiling)
 			mark_code_block(word->profiling);
 		break;
@@ -286,6 +352,11 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 /* Compute an address to store at a relocation */
 void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 {
+#ifdef FACTOR_DEBUG
+	type_check(ARRAY_TYPE,compiled->literals);
+	type_check(BYTE_ARRAY_TYPE,compiled->relocation);
+#endif
+
 	CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
 	F_ARRAY *literals = untag_object(compiled->literals);
 	F_FIXNUM absolute_value;
@@ -304,6 +375,9 @@ void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 	case RT_XT:
 		absolute_value = object_xt(array_nth(literals,index));
 		break;
+	case RT_XT_DIRECT:
+		absolute_value = word_direct_xt(array_nth(literals,index));
+		break;
 	case RT_HERE:
 		absolute_value = offset + (short)to_fixnum(array_nth(literals,index));
 		break;
@@ -312,6 +386,9 @@ void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 		break;
 	case RT_STACK_CHAIN:
 		absolute_value = (CELL)&stack_chain;
+		break;
+	case RT_UNTAGGED:
+		absolute_value = to_fixnum(array_nth(literals,index));
 		break;
 	default:
 		critical_error("Bad rel type",rel);
@@ -331,7 +408,7 @@ void relocate_code_block(F_CODE_BLOCK *compiled)
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
-void fixup_labels(F_ARRAY *labels, CELL code_format, F_CODE_BLOCK *compiled)
+void fixup_labels(F_ARRAY *labels, F_CODE_BLOCK *compiled)
 {
 	CELL i;
 	CELL size = array_capacity(labels);
@@ -346,31 +423,6 @@ void fixup_labels(F_ARRAY *labels, CELL code_format, F_CODE_BLOCK *compiled)
 			offset + (CELL)(compiled + 1),
 			target + (CELL)(compiled + 1));
 	}
-}
-
-/* Write a sequence of integers to memory, with 'format' bytes per integer */
-void deposit_integers(CELL here, F_ARRAY *array, CELL format)
-{
-	CELL count = array_capacity(array);
-	CELL i;
-
-	for(i = 0; i < count; i++)
-	{
-		F_FIXNUM value = to_fixnum(array_nth(array,i));
-		if(format == 1)
-			bput(here + i,value);
-		else if(format == sizeof(unsigned int))
-			*(unsigned int *)(here + format * i) = value;
-		else if(format == sizeof(CELL))
-			*(CELL *)(here + format * i) = value;
-		else
-			critical_error("Bad format in deposit_integers()",format);
-	}
-}
-
-CELL compiled_code_format(void)
-{
-	return untag_fixnum_fast(userenv[JIT_CODE_FORMAT]);
 }
 
 /* Might GC */
@@ -404,13 +456,18 @@ F_CODE_BLOCK *allot_code_block(CELL size)
 /* Might GC */
 F_CODE_BLOCK *add_code_block(
 	CELL type,
-	F_ARRAY *code,
+	F_BYTE_ARRAY *code,
 	F_ARRAY *labels,
 	CELL relocation,
 	CELL literals)
 {
-	CELL code_format = compiled_code_format();
-	CELL code_length = align8(array_capacity(code) * code_format);
+#ifdef FACTOR_DEBUG
+	type_check(ARRAY_TYPE,literals);
+	type_check(BYTE_ARRAY_TYPE,relocation);
+	assert(untag_header(code->header) == BYTE_ARRAY_TYPE);
+#endif
+
+	CELL code_length = align8(array_capacity(code));
 
 	REGISTER_ROOT(literals);
 	REGISTER_ROOT(relocation);
@@ -436,10 +493,10 @@ F_CODE_BLOCK *add_code_block(
 	compiled->relocation = relocation;
 
 	/* code */
-	deposit_integers((CELL)(compiled + 1),code,code_format);
+	memcpy(compiled + 1,code + 1,code_length);
 
 	/* fixup labels */
-	if(labels) fixup_labels(labels,code_format,compiled);
+	if(labels) fixup_labels(labels,compiled);
 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */
