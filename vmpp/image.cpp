@@ -132,17 +132,18 @@ void primitive_save_image(void)
 	/* do a full GC to push everything into tenured space */
 	gc();
 
-	save_image(unbox_native_string());
+	gc_root<F_BYTE_ARRAY> path(dpop());
+	path.untag_check();
+	save_image((F_CHAR *)(path.untagged() + 1));
 }
 
 void primitive_save_image_and_exit(void)
-{
+{	
 	/* We unbox this before doing anything else. This is the only point
 	where we might throw an error, so we have to throw an error here since
 	later steps destroy the current image. */
-	F_CHAR *path = unbox_native_string();
-
-	REGISTER_C_STRING(path);
+	gc_root<F_BYTE_ARRAY> path(dpop());
+	path.untag_check();
 
 	/* strip out userenv data which is set on startup anyway */
 	CELL i;
@@ -157,10 +158,8 @@ void primitive_save_image_and_exit(void)
 	compact_code_heap();
 	performing_compaction = false;
 
-	UNREGISTER_C_STRING(F_CHAR,path);
-
 	/* Save the image */
-	if(save_image(path))
+	if(save_image((F_CHAR *)(path.untagged() + 1)))
 		exit(0);
 	else
 		exit(1);
@@ -335,5 +334,5 @@ void load_image(F_PARAMETERS *p)
 	relocate_code();
 
 	/* Store image path name */
-	userenv[IMAGE_ENV] = tag_object(from_native_string(p->image_path));
+	userenv[IMAGE_ENV] = allot_alien(F,(CELL)p->image_path);
 }

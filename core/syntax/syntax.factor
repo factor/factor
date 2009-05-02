@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays byte-arrays definitions generic
+USING: accessors alien arrays byte-arrays byte-vectors definitions generic
 hashtables kernel math namespaces parser lexer sequences strings
 strings.parser sbufs vectors words words.symbol words.constant
 words.alias quotations io assocs splitting classes.tuple
@@ -98,6 +98,7 @@ IN: bootstrap.syntax
     "{" [ \ } [ >array ] parse-literal ] define-core-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-core-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-core-syntax
+    "BV{" [ \ } [ >byte-vector ] parse-literal ] define-core-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal parsed ] define-core-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax

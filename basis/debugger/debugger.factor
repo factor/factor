@@ -1,14 +1,13 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slots arrays definitions generic hashtables summary io
-kernel math namespaces make prettyprint prettyprint.config
-sequences assocs sequences.private strings io.styles
-io.pathnames vectors words system splitting math.parser
-classes.mixin classes.tuple continuations continuations.private
-combinators generic.math classes.builtin classes compiler.units
-generic.standard generic.single vocabs init kernel.private io.encodings
-accessors math.order destructors source-files parser
-classes.tuple.parser effects.parser lexer
+USING: slots arrays definitions generic hashtables summary io kernel
+math namespaces make prettyprint prettyprint.config sequences assocs
+sequences.private strings io.styles io.pathnames vectors words system
+splitting math.parser classes.mixin classes.tuple continuations
+continuations.private combinators generic.math classes.builtin classes
+compiler.units generic.standard generic.single vocabs init
+kernel.private io.encodings accessors math.order destructors
+source-files parser classes.tuple.parser effects.parser lexer
 generic.parser strings.parser vocabs.loader vocabs.parser see
 source-files.errors ;
 IN: debugger
@@ -17,6 +16,7 @@ GENERIC: error. ( error -- )
 GENERIC: error-help ( error -- topic )
 
 M: object error. . ;
+
 M: object error-help drop f ;
 
 M: tuple error-help class ;
@@ -77,7 +77,7 @@ M: string error. print ;
     "Object did not survive image save/load: " write third . ;
 
 : io-error. ( error -- )
-    "I/O error: " write third print ;
+    "I/O error #" write third . ;
 
 : type-check-error. ( obj -- )
     "Type check error" print
@@ -98,9 +98,7 @@ HOOK: signal-error. os ( obj -- )
     "Cannot convert to C string: " write third . ;
 
 : ffi-error. ( obj -- )
-    "FFI: " write
-    dup third [ write ": " write ] when*
-    fourth print ;
+    "FFI error" print drop ;
 
 : heap-scan-error. ( obj -- )
     "Cannot do next-object outside begin/end-scan" print drop ;

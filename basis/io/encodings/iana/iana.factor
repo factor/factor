@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel strings values io.files assocs
 splitting sequences io namespaces sets
-io.encodings.ascii io.encodings.utf8 ;
+io.encodings.ascii io.encodings.utf8 io.encodings.utf16 ;
 IN: io.encodings.iana
 
 <PRIVATE
@@ -55,3 +55,6 @@ e>n-table [ initial-e>n ] initialize
     ] [ swap e>n-table get-global set-at ] 2bi ;
 
 ascii "ANSI_X3.4-1968" register-encoding
+utf16be "UTF-16BE" register-encoding
+utf16le "UTF-16LE" register-encoding
+utf16 "UTF-16" register-encoding

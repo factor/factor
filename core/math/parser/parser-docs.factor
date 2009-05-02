@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math math.private prettyprint
+USING: help.markup help.syntax math math.parser.private prettyprint
 namespaces make strings ;
 IN: math.parser
 
