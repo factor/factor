@@ -24,7 +24,7 @@ SINGLETON: cocoa-ui-backend
 
 <PRIVATE
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA H{
+PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
     { double-buffered { $ NSOpenGLPFADoubleBuffer } }
     { stereo { $ NSOpenGLPFAStereo } }
     { offscreen { $ NSOpenGLPFAOffScreen } }
@@ -148,13 +148,12 @@ M: cocoa-ui-backend raise-window* ( world -- )
     { [ * * malloc ] [ 2drop ] [ drop nip ] [ nip * ] } 3cleave ;
 
 :: gadget-offscreen-context ( world -- context buffer )
-    world world-pixel-format-attributes offscreen suffix
-    <pixel-format> [
-        :> pf
+    world [
+        nip :> pf
         NSOpenGLContext -> alloc pf handle>> f -> initWithFormat:shareContext:
         dup world pf offscreen-buffer
         4 npick [ -> setOffScreen:width:height:rowbytes: ] dip
-    ] with-disposal ;
+    ] with-world-pixel-format ;
 
 M: cocoa-ui-backend (open-offscreen-buffer) ( world -- )
     dup gadget-offscreen-context <offscreen-handle> >>handle drop ;
