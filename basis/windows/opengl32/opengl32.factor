@@ -71,22 +71,6 @@ CONSTANT: WGL_SWAP_UNDERLAY13     HEX: 10000000
 CONSTANT: WGL_SWAP_UNDERLAY14     HEX: 20000000
 CONSTANT: WGL_SWAP_UNDERLAY15     HEX: 40000000
 
-: windowed-pfd-dwFlags ( -- n )
-    { PFD_DRAW_TO_WINDOW PFD_SUPPORT_OPENGL PFD_DOUBLEBUFFER } flags ;
-: offscreen-pfd-dwFlags ( -- n )
-    { PFD_DRAW_TO_BITMAP PFD_SUPPORT_OPENGL } flags ;
-
-! TODO: compare to http://www.nullterminator.net/opengl32.html
-: make-pfd ( flags bits -- pfd )
-    "PIXELFORMATDESCRIPTOR" <c-object>
-    "PIXELFORMATDESCRIPTOR" heap-size over set-PIXELFORMATDESCRIPTOR-nSize
-    1 over set-PIXELFORMATDESCRIPTOR-nVersion
-    rot over set-PIXELFORMATDESCRIPTOR-dwFlags
-    PFD_TYPE_RGBA over set-PIXELFORMATDESCRIPTOR-iPixelType
-    [ set-PIXELFORMATDESCRIPTOR-cColorBits ] keep
-    16 over set-PIXELFORMATDESCRIPTOR-cDepthBits
-    PFD_MAIN_PLANE over set-PIXELFORMATDESCRIPTOR-dwLayerMask ;
-
 
 LIBRARY: gl
 
