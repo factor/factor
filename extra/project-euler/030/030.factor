@@ -38,7 +38,7 @@ IN: project-euler.030
 PRIVATE>
 
 : euler030 ( -- answer )
-    325537 [ dup sum-fifth-powers = ] filter sum 1- ;
+    325537 iota [ dup sum-fifth-powers = ] filter sum 1- ;
 
 ! [ euler030 ] 100 ave-time
 ! 1700 ms ave run time - 64.84 SD (100 trials)
