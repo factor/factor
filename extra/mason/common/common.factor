@@ -16,7 +16,7 @@ M: output-process-error error.
 
 : try-output-process ( command -- )
     >process +stdout+ >>stderr utf8 <process-reader*>
-    [ contents ] [ dup wait-for-process ] bi*
+    [ stream-contents ] [ dup wait-for-process ] bi*
     0 = [ 2drop ] [ output-process-error ] if ;
 
 HOOK: really-delete-tree os ( path -- )

@@ -41,7 +41,7 @@ M: fixnum bitnot fixnum-bitnot ;
 M: fixnum bit? neg shift 1 bitand 0 > ;
 
 : fixnum-log2 ( x -- n )
-    0 swap [ dup 1 eq? ] [ [ 1+ ] [ 2/ ] bi* ] until drop ;
+    0 swap [ dup 1 eq? ] [ [ 1 + ] [ 2/ ] bi* ] until drop ;
 
 M: fixnum (log2) fixnum-log2 ;
 
@@ -86,7 +86,7 @@ M: bignum (log2) bignum-log2 ;
 ! provided with absolutely no warranty."
 
 ! First step: pre-scaling
-: twos ( x -- y ) dup 1- bitxor log2 ; inline
+: twos ( x -- y ) dup 1 - bitxor log2 ; inline
 
 : scale-denonimator ( den -- scaled-den scale' )
     dup twos neg [ shift ] keep ; inline
@@ -98,7 +98,7 @@ M: bignum (log2) bignum-log2 ;
 
 ! Second step: loop
 : shift-mantissa ( scale mantissa -- scale' mantissa' )
-    [ 1+ ] [ 2/ ] bi* ; inline
+    [ 1 + ] [ 2/ ] bi* ; inline
 
 : /f-loop ( scale mantissa den -- scale' fraction-and-guard rem )
     [ 2dup /i log2 53 > ]
@@ -107,7 +107,7 @@ M: bignum (log2) bignum-log2 ;
 
 ! Third step: post-scaling
 : unscaled-float ( mantissa -- n )
-    52 2^ 1- bitand 1022 52 shift bitor bits>double ; inline
+    52 2^ 1 - bitand 1022 52 shift bitor bits>double ; inline
 
 : scale-float ( scale mantissa -- float' )
     [ dup 0 < [ neg 2^ recip ] [ 2^ ] if ] dip * ; inline
@@ -126,7 +126,7 @@ M: bignum (log2) bignum-log2 ;
         ] [
             pre-scale
             /f-loop over odd?
-            [ zero? [ 1+ ] unless ] [ drop ] if
+            [ zero? [ 1 + ] unless ] [ drop ] if
             post-scale
         ] if
     ] if ; inline
