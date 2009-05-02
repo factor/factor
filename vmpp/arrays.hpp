@@ -5,14 +5,7 @@ INLINE CELL tag_array(F_ARRAY *array)
 	return RETAG(array,ARRAY_TYPE);
 }
 
-/* Inline functions */
-INLINE CELL array_size(CELL size)
-{
-	return sizeof(F_ARRAY) + size * CELLS;
-}
-
-F_ARRAY *allot_array_internal(CELL type, CELL capacity);
-F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill);
+F_ARRAY *allot_array(CELL capacity, CELL fill);
 F_BYTE_ARRAY *allot_byte_array(CELL size);
 
 CELL allot_array_1(CELL obj);
@@ -20,22 +13,20 @@ CELL allot_array_2(CELL v1, CELL v2);
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 
 void primitive_array(void);
-
-F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity);
 void primitive_resize_array(void);
 
 /* Macros to simulate a vector in C */
-typedef struct {
+struct F_GROWABLE_ARRAY {
 	CELL count;
 	CELL array;
-} F_GROWABLE_ARRAY;
+};
 
 /* Allocates memory */
 INLINE F_GROWABLE_ARRAY make_growable_array(void)
 {
 	F_GROWABLE_ARRAY result;
 	result.count = 0;
-	result.array = tag_array(allot_array(ARRAY_TYPE,2,F));
+	result.array = tag_array(allot_array(2,F));
 	return result;
 }
 

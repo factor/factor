@@ -216,11 +216,11 @@ CELL unaligned_object_size(CELL pointer)
 	switch(untag_header(get(pointer)))
 	{
 	case ARRAY_TYPE:
+		return array_size((F_ARRAY*)pointer);
 	case BIGNUM_TYPE:
-		return array_size(array_capacity((F_ARRAY*)pointer));
+		return array_size((F_BIGNUM*)pointer);
 	case BYTE_ARRAY_TYPE:
-		return byte_array_size(
-			byte_array_capacity((F_BYTE_ARRAY*)pointer));
+		return array_size((F_BYTE_ARRAY*)pointer);
 	case STRING_TYPE:
 		return string_size(string_capacity((F_STRING*)pointer));
 	case TUPLE_TYPE:
@@ -282,7 +282,7 @@ CELL binary_payload_start(CELL pointer)
 		return sizeof(F_STRING);
 	/* everything else consists entirely of pointers */
 	case ARRAY_TYPE:
-		return array_size(array_capacity((F_ARRAY*)pointer));
+		return array_size<F_ARRAY>(array_capacity((F_ARRAY*)pointer));
 	case TUPLE_TYPE:
 		tuple = untag_tuple_fast(pointer);
 		layout = untag_tuple_layout(tuple->layout);

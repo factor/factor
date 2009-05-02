@@ -164,7 +164,7 @@ void primitive_callstack_to_array(void)
 	iterate_callstack_object(stack,count_stack_frame);
 
 	REGISTER_UNTAGGED(stack);
-	array = allot_array_internal(ARRAY_TYPE,frame_count);
+	array = allot_array_internal<F_ARRAY>(frame_count);
 	UNREGISTER_UNTAGGED(F_CALLSTACK,stack);
 
 	frame_index = 0;

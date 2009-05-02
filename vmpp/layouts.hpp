@@ -87,6 +87,7 @@ struct F_OBJECT {
 /* Assembly code makes assumptions about the layout of this struct */
 struct F_ARRAY : public F_OBJECT {
 	static const CELL type_number = ARRAY_TYPE;
+	static const CELL element_size = CELLS;
 	/* tagged */
 	CELL capacity;
 };
@@ -104,12 +105,14 @@ struct F_TUPLE_LAYOUT : public F_ARRAY {
 
 struct F_BIGNUM : public F_OBJECT {
 	static const CELL type_number = BIGNUM_TYPE;
+	static const CELL element_size = CELLS;
 	/* tagged */
 	CELL capacity;
 };
 
 struct F_BYTE_ARRAY : public F_OBJECT {
 	static const CELL type_number = BYTE_ARRAY_TYPE;
+	static const CELL element_size = 1;
 	/* tagged */
 	CELL capacity;
 };
