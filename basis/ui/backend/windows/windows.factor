@@ -26,6 +26,7 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     { windowed { $ WGL_DRAW_TO_WINDOW_ARB 1 } }
     { accelerated { $ WGL_ACCELERATION_ARB $ WGL_FULL_ACCELERATION_ARB } }
     { software-rendered { $ WGL_ACCELERATION_ARB $ WGL_NO_ACCELERATION_ARB } }
+    { backing-store { $ WGL_SWAP_METHOD_ARB $ WGL_SWAP_COPY_ARB } }
     { color-float { $ WGL_TYPE_RGBA_FLOAT_ARB 1 } }
     { color-bits { $ WGL_COLOR_BITS_ARB } }
     { red-bits { $ WGL_RED_BITS_ARB } }
@@ -68,6 +69,7 @@ CONSTANT: pfd-flag-map H{
     { offscreen $ PFD_DRAW_TO_BITMAP }
     { fullscreen $ PFD_DRAW_TO_WINDOW }
     { windowed $ PFD_DRAW_TO_WINDOW }
+    { backing-store $ PFD_SWAP_COPY }
     { software-rendered $ PFD_GENERIC_FORMAT }
 }
 

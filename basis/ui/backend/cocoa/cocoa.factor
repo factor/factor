@@ -30,7 +30,6 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
     { windowed { $ NSOpenGLPFAWindow } }
     { accelerated { $ NSOpenGLPFAAccelerated } }
     { software-rendered { $ NSOpenGLPFASingleRenderer $ kCGLRendererGenericFloatID } }
-    { robust { $ NSOpenGLPFARobust } }
     { backing-store { $ NSOpenGLPFABackingStore } }
     { multisampled { $ NSOpenGLPFAMultisample } }
     { supersampled { $ NSOpenGLPFASupersample } }
