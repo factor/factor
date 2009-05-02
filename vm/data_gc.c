@@ -211,6 +211,8 @@ INLINE CELL copy_object_impl(CELL pointer)
 /* Follow a chain of forwarding pointers */
 CELL resolve_forwarding(CELL untagged, CELL tag)
 {
+	check_data_pointer(untagged);
+
 	CELL header = get(untagged);
 	/* another forwarding pointer */
 	if(TAG(header) == GC_COLLECTED)
@@ -218,6 +220,7 @@ CELL resolve_forwarding(CELL untagged, CELL tag)
 	/* we've found the destination */
 	else
 	{
+		check_header(header);
 		CELL pointer = RETAG(untagged,tag);
 		if(should_copy(untagged))
 			pointer = RETAG(copy_object_impl(pointer),tag);
@@ -231,21 +234,30 @@ pointer address without copying anything; otherwise, install
 a new forwarding pointer. */
 INLINE CELL copy_object(CELL pointer)
 {
+	check_data_pointer(pointer);
+
 	CELL tag = TAG(pointer);
 	CELL header = get(UNTAG(pointer));
 
 	if(TAG(header) == GC_COLLECTED)
 		return resolve_forwarding(UNTAG(header),tag);
 	else
+	{
+		check_header(header);
 		return RETAG(copy_object_impl(pointer),tag);
+	}
 }
 
 void copy_handle(CELL *handle)
 {
 	CELL pointer = *handle;
 
-	if(!immediate_p(pointer) && should_copy(pointer))
-		*handle = copy_object(pointer);
+	if(!immediate_p(pointer))
+	{
+		check_data_pointer(pointer);
+		if(should_copy(pointer))
+			*handle = copy_object(pointer);
+	}
 }
 
 CELL copy_next_from_nursery(CELL scan)
@@ -264,9 +276,12 @@ CELL copy_next_from_nursery(CELL scan)
 		{
 			CELL pointer = *obj;
 
-			if(!immediate_p(pointer)
-				&& (pointer >= nursery_start && pointer < nursery_end))
-				*obj = copy_object(pointer);
+			if(!immediate_p(pointer))
+			{
+				check_data_pointer(pointer);
+				if(pointer >= nursery_start && pointer < nursery_end)
+					*obj = copy_object(pointer);
+			}
 		}
 	}
 
@@ -292,10 +307,13 @@ CELL copy_next_from_aging(CELL scan)
 		{
 			CELL pointer = *obj;
 
-			if(!immediate_p(pointer)
-				&& !(pointer >= newspace_start && pointer < newspace_end)
-				&& !(pointer >= tenured_start && pointer < tenured_end))
-				*obj = copy_object(pointer);
+			if(!immediate_p(pointer))
+			{
+				check_data_pointer(pointer);
+				if(!(pointer >= newspace_start && pointer < newspace_end)
+				   && !(pointer >= tenured_start && pointer < tenured_end))
+					*obj = copy_object(pointer);
+			}
 		}
 	}
 
@@ -318,8 +336,12 @@ CELL copy_next_from_tenured(CELL scan)
 		{
 			CELL pointer = *obj;
 
-			if(!immediate_p(pointer) && !(pointer >= newspace_start && pointer < newspace_end))
-				*obj = copy_object(pointer);
+			if(!immediate_p(pointer))
+			{
+				check_data_pointer(pointer);
+				if(!(pointer >= newspace_start && pointer < newspace_end))
+					*obj = copy_object(pointer);
+			}
 		}
 	}
 
@@ -330,7 +352,7 @@ CELL copy_next_from_tenured(CELL scan)
 
 void copy_reachable_objects(CELL scan, CELL *end)
 {
-	if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	if(collecting_gen == NURSERY)
 	{
 		while(scan < *end)
 			scan = copy_next_from_nursery(scan);
@@ -405,7 +427,7 @@ void end_gc(CELL gc_elapsed)
 		if(collecting_gen != NURSERY)
 			reset_generations(NURSERY,collecting_gen - 1);
 	}
-	else if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	else if(collecting_gen == NURSERY)
 	{
 		nursery.here = nursery.start;
 	}
@@ -414,13 +436,6 @@ void end_gc(CELL gc_elapsed)
 		/* all generations up to and including the one
 		collected are now empty */
 		reset_generations(NURSERY,collecting_gen);
-	}
-
-	if(collecting_gen == TENURED)
-	{
-		/* now that all reachable code blocks have been marked,
-		deallocate the rest */
-		free_unmarked(&code_heap);
 	}
 
 	collecting_aging_again = false;
@@ -481,6 +496,7 @@ void garbage_collection(CELL gen,
 	copy_roots();
 	/* collect objects referenced from older generations */
 	copy_cards();
+
 	/* do some tracing */
 	copy_reachable_objects(scan,&newspace->here);
 
@@ -491,7 +507,7 @@ void garbage_collection(CELL gen,
 		code_heap_scans++;
 
 		if(collecting_gen == TENURED)
-			update_code_heap_roots();
+			free_unmarked(&code_heap,(HEAP_ITERATOR)update_literal_and_word_references);
 		else
 			copy_code_heap_roots();
 
@@ -550,6 +566,7 @@ void primitive_gc_stats(void)
 	GROWABLE_ARRAY_ADD(stats,allot_cell(code_heap_scans));
 
 	GROWABLE_ARRAY_TRIM(stats);
+	GROWABLE_ARRAY_DONE(stats);
 	dpush(stats);
 }
 

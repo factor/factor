@@ -1,0 +1,1 @@
+Shared constants and classes

@@ -842,7 +842,7 @@ SYMBOLS:
 [ define-constants ] "windows.dinput.constants" add-init-hook
 
 : uninitialize ( variable quot -- )
-    [ global ] dip '[ _ when* f ] change-at ; inline
+    '[ _ when* f ] change-global ; inline
 
 : free-dinput-constants ( -- )
     {

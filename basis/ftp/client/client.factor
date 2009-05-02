@@ -66,7 +66,7 @@ ERROR: ftp-error got expected ;
 : list ( url -- ftp-response )
     utf8 open-passive-client
     ftp-list
-    lines
+    stream-lines
     <ftp-response> swap >>strings
     read-response 226 ftp-assert
     parse-list ;

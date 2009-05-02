@@ -85,8 +85,6 @@ DLLEXPORT u64 to_unsigned_8(CELL obj);
 
 CELL unbox_array_size(void);
 
-void primitive_from_fraction(void);
-
 INLINE double untag_float_fast(CELL tagged)
 {
 	return ((F_FLOAT*)UNTAG(tagged))->n;
@@ -151,5 +149,3 @@ void primitive_float_bits(void);
 void primitive_bits_float(void);
 void primitive_double_bits(void);
 void primitive_bits_double(void);
-
-void primitive_from_rect(void);

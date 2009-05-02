@@ -1,5 +1,5 @@
 USING: assocs memoize locals kernel accessors init fonts math
-combinators windows windows.types windows.gdi32 ;
+combinators windows.errors windows.types windows.gdi32 ;
 IN: windows.fonts
 
 : windows-font-name ( string -- string' )

@@ -140,7 +140,7 @@ for details."
   (interactive)
   (message "Loading all vocabularies in USING: form ...")
   (let ((err (fuel-eval--retort-error
-              (fuel-eval--send/wait '(:fuel* (t) t :usings) 120000))))
+              (fuel-eval--send/wait '(:fuel* (t .) t :usings) 120000))))
     (message (if err "Warning: some vocabularies failed to load"
                "All vocabularies loaded"))))
 

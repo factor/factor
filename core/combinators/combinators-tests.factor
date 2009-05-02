@@ -16,12 +16,12 @@ IN: combinators.tests
 
 : compile-execute(-test-1 ( a b -- c ) \ + execute( a b -- c ) ;
 
-[ t ] [ \ compile-execute(-test-1 optimized>> ] unit-test
+[ t ] [ \ compile-execute(-test-1 optimized? ] unit-test
 [ 4 ] [ 1 3 compile-execute(-test-1 ] unit-test
 
 : compile-execute(-test-2 ( a b w -- c ) execute( a b -- c ) ;
 
-[ t ] [ \ compile-execute(-test-2 optimized>> ] unit-test
+[ t ] [ \ compile-execute(-test-2 optimized? ] unit-test
 [ 4 ] [ 1 3 \ + compile-execute(-test-2 ] unit-test
 [ 5 ] [ 1 4 \ + compile-execute(-test-2 ] unit-test
 [ -3 ] [ 1 4 \ - compile-execute(-test-2 ] unit-test
@@ -29,7 +29,7 @@ IN: combinators.tests
 
 : compile-call(-test-1 ( a b q -- c ) call( a b -- c ) ;
 
-[ t ] [ \ compile-call(-test-1 optimized>> ] unit-test
+[ t ] [ \ compile-call(-test-1 optimized? ] unit-test
 [ 4 ] [ 1 3 [ + ] compile-call(-test-1 ] unit-test
 [ 7 ] [ 1 3 2 [ * + ] curry compile-call(-test-1 ] unit-test
 [ 7 ] [ 1 3 [ 2 * ] [ + ] compose compile-call(-test-1 ] unit-test
@@ -352,7 +352,7 @@ DEFER: corner-case-1
 
 << \ corner-case-1 2 [ + ] curry 1array [ case ] curry (( a -- b )) define-declared >>
 
-[ t ] [ \ corner-case-1 optimized>> ] unit-test
+[ t ] [ \ corner-case-1 optimized? ] unit-test
 [ 4 ] [ 2 corner-case-1 ] unit-test
 
 [ 4 ] [ 2 2 [ + ] curry 1array case ] unit-test
