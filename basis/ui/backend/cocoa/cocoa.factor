@@ -22,8 +22,6 @@ C: <offscreen-handle> offscreen-handle
 
 SINGLETON: cocoa-ui-backend
 
-<PRIVATE
-
 PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
     { double-buffered { $ NSOpenGLPFADoubleBuffer } }
     { stereo { $ NSOpenGLPFAStereo } }
@@ -47,8 +45,6 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
     { sample-buffers { $ NSOpenGLPFASampleBuffers } }
     { samples { $ NSOpenGLPFASamples } }
 }
-
-PRIVATE>
 
 M: cocoa-ui-backend (make-pixel-format)
     nip >NSOpenGLPFA-int-array
