@@ -41,7 +41,7 @@ template <typename T> CELL array_size(T *array)
 
 template <typename T> T *allot_array_internal(CELL capacity)
 {
-	T *array = (T *)allot_object(T::type_number,array_size<T>(capacity));
+	T *array = allot<T>(array_size<T>(capacity));
 	array->capacity = tag_fixnum(capacity);
 	return array;
 }
@@ -51,29 +51,24 @@ template <typename T> bool reallot_array_in_place_p(T *array, CELL capacity)
 	return in_zone(&nursery,(CELL)array) && capacity <= array_capacity(array);
 }
 
-template <typename T> T *reallot_array(T *array, CELL capacity)
+template <typename T> T *reallot_array(T *array_, CELL capacity)
 {
-#ifdef FACTOR_DEBUG
-	CELL header = untag_header(array->header);
-	assert(header == T::type_number);
-#endif
+	gc_root<T> array(array_);
 
-	if(reallot_array_in_place_p(array,capacity))
+	if(reallot_array_in_place_p(array.untagged(),capacity))
 	{
 		array->capacity = tag_fixnum(capacity);
-		return array;
+		return array.untagged();
 	}
 	else
 	{
-		CELL to_copy = array_capacity(array);
+		CELL to_copy = array_capacity(array.untagged());
 		if(capacity < to_copy)
 			to_copy = capacity;
 
-		REGISTER_UNTAGGED(array);
 		T *new_array = allot_array_internal<T>(capacity);
-		UNREGISTER_UNTAGGED(T,array);
 	
-		memcpy(new_array + 1,array + 1,to_copy * T::element_size);
+		memcpy(new_array + 1,array.untagged() + 1,to_copy * T::element_size);
 		memset((char *)(new_array + 1) + to_copy * T::element_size,
 			0,(capacity - to_copy) * T::element_size);
 

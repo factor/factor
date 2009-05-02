@@ -152,18 +152,14 @@ void init_factor(F_PARAMETERS *p)
 /* May allocate memory */
 void pass_args_to_factor(int argc, F_CHAR **argv)
 {
-	F_ARRAY *args = allot_array(argc,F);
+	growable_array args;
 	int i;
 
 	for(i = 1; i < argc; i++)
-	{
-		REGISTER_UNTAGGED(args);
-		CELL arg = tag_object(from_native_string(argv[i]));
-		UNREGISTER_UNTAGGED(F_ARRAY,args);
-		set_array_nth(args,i,arg);
-	}
+		args.add(tag_object(from_native_string(argv[i])));
 
-	userenv[ARGS_ENV] = tag_array(args);
+	args.trim();
+	userenv[ARGS_ENV] = args.array.value();
 }
 
 void start_factor(F_PARAMETERS *p)

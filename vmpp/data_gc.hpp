@@ -46,24 +46,24 @@ registers) does not run out of memory */
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-INLINE void *allot_object(CELL type, CELL a)
+INLINE void *allot_object(CELL header, CELL size)
 {
 #ifdef GC_DEBUG
 	if(!gc_off)
 		gc();
 #endif
 
-	CELL *object;
+	F_OBJECT *object;
 
-	if(nursery.size - ALLOT_BUFFER_ZONE > a)
+	if(nursery.size - ALLOT_BUFFER_ZONE > size)
 	{
 		/* If there is insufficient room, collect the nursery */
-		if(nursery.here + ALLOT_BUFFER_ZONE + a > nursery.end)
+		if(nursery.here + ALLOT_BUFFER_ZONE + size > nursery.end)
 			garbage_collection(NURSERY,false,0);
 
 		CELL h = nursery.here;
-		nursery.here = h + align8(a);
-		object = (CELL*)h;
+		nursery.here = h + align8(size);
+		object = (F_OBJECT *)h;
 	}
 	/* If the object is bigger than the nursery, allocate it in
 	tenured space */
@@ -72,20 +72,20 @@ INLINE void *allot_object(CELL type, CELL a)
 		F_ZONE *tenured = &data_heap->generations[TENURED];
 
 		/* If tenured space does not have enough room, collect */
-		if(tenured->here + a > tenured->end)
+		if(tenured->here + size > tenured->end)
 		{
 			gc();
 			tenured = &data_heap->generations[TENURED];
 		}
 
 		/* If it still won't fit, grow the heap */
-		if(tenured->here + a > tenured->end)
+		if(tenured->here + size > tenured->end)
 		{
-			garbage_collection(TENURED,true,a);
+			garbage_collection(TENURED,true,size);
 			tenured = &data_heap->generations[TENURED];
 		}
 
-		object = (CELL *)allot_zone(tenured,a);
+		object = (F_OBJECT *)allot_zone(tenured,size);
 
 		/* We have to do this */
 		allot_barrier((CELL)object);
@@ -96,8 +96,13 @@ INLINE void *allot_object(CELL type, CELL a)
 		write_barrier((CELL)object);
 	}
 
-	*object = tag_header(type);
+	object->header = header;
 	return object;
+}
+
+template<typename T> T *allot(CELL size)
+{
+	return (T *)allot_object(tag_header(T::type_number),size);
 }
 
 void copy_reachable_objects(CELL scan, CELL *end);

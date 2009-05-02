@@ -1,16 +1,15 @@
 #include "master.hpp"
 
-F_WORD *allot_word(CELL vocab, CELL name)
+F_WORD *allot_word(CELL vocab_, CELL name_)
 {
-	REGISTER_ROOT(vocab);
-	REGISTER_ROOT(name);
-	F_WORD *word = (F_WORD *)allot_object(WORD_TYPE,sizeof(F_WORD));
-	UNREGISTER_ROOT(name);
-	UNREGISTER_ROOT(vocab);
+	gc_root<F_OBJECT> vocab(vocab_);
+	gc_root<F_OBJECT> name(name_);
+
+	gc_root<F_WORD> word(allot<F_WORD>(sizeof(F_WORD)));
 
 	word->hashcode = tag_fixnum((rand() << 16) ^ rand());
-	word->vocabulary = vocab;
-	word->name = name;
+	word->vocabulary = vocab.value();
+	word->name = name.value();
 	word->def = userenv[UNDEFINED_ENV];
 	word->props = F;
 	word->counter = tag_fixnum(0);
@@ -19,18 +18,13 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->profiling = NULL;
 	word->code = NULL;
 
-	REGISTER_UNTAGGED(word);
-	jit_compile_word(word,word->def,true);
-	UNREGISTER_UNTAGGED(F_WORD,word);
-
-	REGISTER_UNTAGGED(word);
-	update_word_xt(word);
-	UNREGISTER_UNTAGGED(F_WORD,word);
+	jit_compile_word(word.value(),word->def,true);
+	update_word_xt(word.value());
 
 	if(profiling_p)
 		relocate_code_block(word->profiling);
 
-	return word;
+	return word.untagged();
 }
 
 /* <word> ( name vocabulary -- word ) */
@@ -51,15 +45,15 @@ void primitive_word_xt(void)
 }
 
 /* Allocates memory */
-void update_word_xt(F_WORD *word)
+void update_word_xt(CELL word_)
 {
+	gc_root<F_WORD> word(word_);
+
 	if(profiling_p)
 	{
 		if(!word->profiling)
 		{
-			REGISTER_UNTAGGED(word);
-			F_CODE_BLOCK *profiling = compile_profiling_stub(tag_object(word));
-			UNREGISTER_UNTAGGED(F_WORD,word);
+			F_CODE_BLOCK *profiling = compile_profiling_stub(word.value());
 			word->profiling = profiling;
 		}
 
@@ -76,7 +70,7 @@ void primitive_optimized_p(void)
 
 void primitive_wrapper(void)
 {
-	F_WRAPPER *wrapper = (F_WRAPPER *)allot_object(WRAPPER_TYPE,sizeof(F_WRAPPER));
+	F_WRAPPER *wrapper = allot<F_WRAPPER>(sizeof(F_WRAPPER));
 	wrapper->object = dpeek();
 	drepl(tag_object(wrapper));
 }

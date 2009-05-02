@@ -179,7 +179,7 @@ void copy_registered_locals(void)
 }
 
 /* Copy roots over at the start of GC, namely various constants, stacks,
-the user environment and extra roots registered with REGISTER_ROOT */
+the user environment and extra roots registered by local_roots.hpp */
 void copy_roots(void)
 {
 	copy_handle(&T);
@@ -595,7 +595,7 @@ void primitive_gc(void)
 
 void primitive_gc_stats(void)
 {
-	GROWABLE_ARRAY(stats);
+	growable_array stats;
 
 	CELL i;
 	u64 total_gc_time = 0;
@@ -603,25 +603,24 @@ void primitive_gc_stats(void)
 	for(i = 0; i < MAX_GEN_COUNT; i++)
 	{
 		F_GC_STATS *s = &gc_stats[i];
-		GROWABLE_ARRAY_ADD(stats,allot_cell(s->collections));
-		GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(s->gc_time)));
-		GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(s->max_gc_time)));
-		GROWABLE_ARRAY_ADD(stats,allot_cell(s->collections == 0 ? 0 : s->gc_time / s->collections));
-		GROWABLE_ARRAY_ADD(stats,allot_cell(s->object_count));
-		GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(s->bytes_copied)));
+		stats.add(allot_cell(s->collections));
+		stats.add(tag_bignum(long_long_to_bignum(s->gc_time)));
+		stats.add(tag_bignum(long_long_to_bignum(s->max_gc_time)));
+		stats.add(allot_cell(s->collections == 0 ? 0 : s->gc_time / s->collections));
+		stats.add(allot_cell(s->object_count));
+		stats.add(tag_bignum(long_long_to_bignum(s->bytes_copied)));
 
 		total_gc_time += s->gc_time;
 	}
 
-	GROWABLE_ARRAY_ADD(stats,tag_bignum(ulong_long_to_bignum(total_gc_time)));
-	GROWABLE_ARRAY_ADD(stats,tag_bignum(ulong_long_to_bignum(cards_scanned)));
-	GROWABLE_ARRAY_ADD(stats,tag_bignum(ulong_long_to_bignum(decks_scanned)));
-	GROWABLE_ARRAY_ADD(stats,tag_bignum(ulong_long_to_bignum(card_scan_time)));
-	GROWABLE_ARRAY_ADD(stats,allot_cell(code_heap_scans));
+	stats.add(tag_bignum(ulong_long_to_bignum(total_gc_time)));
+	stats.add(tag_bignum(ulong_long_to_bignum(cards_scanned)));
+	stats.add(tag_bignum(ulong_long_to_bignum(decks_scanned)));
+	stats.add(tag_bignum(ulong_long_to_bignum(card_scan_time)));
+	stats.add(allot_cell(code_heap_scans));
 
-	GROWABLE_ARRAY_TRIM(stats);
-	GROWABLE_ARRAY_DONE(stats);
-	dpush(stats);
+	stats.trim();
+	dpush(stats.array.value());
 }
 
 void clear_gc_stats(void)

@@ -15,15 +15,14 @@ bool in_code_heap_p(CELL ptr)
 }
 
 /* Compile a word definition with the non-optimizing compiler. Allocates memory */
-void jit_compile_word(F_WORD *word, CELL def, bool relocate)
+void jit_compile_word(CELL word_, CELL def_, bool relocate)
 {
-	REGISTER_ROOT(def);
-	REGISTER_UNTAGGED(word);
-	jit_compile(def,relocate);
-	UNREGISTER_UNTAGGED(F_WORD,word);
-	UNREGISTER_ROOT(def);
+	gc_root<F_WORD> word(word_);
+	gc_root<F_QUOTATION> def(def_);
 
-	word->code = untag_quotation(def)->code;
+	jit_compile(def.value(),relocate);
+
+	word->code = def->code;
 
 	if(word->direct_entry_def != F)
 		jit_compile(word->direct_entry_def,relocate);
@@ -58,40 +57,32 @@ void update_code_heap_words(void)
 
 void primitive_modify_code_heap(void)
 {
-	F_ARRAY *alist = untag_array(dpop());
+	gc_root<F_ARRAY> alist(dpop());
 
-	CELL count = untag_fixnum_fast(alist->capacity);
+	CELL count = array_capacity(alist.untagged());
+
 	if(count == 0)
 		return;
 
 	CELL i;
 	for(i = 0; i < count; i++)
 	{
-		F_ARRAY *pair = untag_array(array_nth(alist,i));
+		gc_root<F_ARRAY> pair(array_nth(alist.untagged(),i));
 
-		F_WORD *word = untag_word(array_nth(pair,0));
+		gc_root<F_WORD> word(array_nth(pair.untagged(),0));
+		gc_root<F_OBJECT> data(array_nth(pair.untagged(),1));
 
-		CELL data = array_nth(pair,1);
-
-		if(type_of(data) == QUOTATION_TYPE)
+		switch(data.type())
 		{
-			REGISTER_UNTAGGED(alist);
-			REGISTER_UNTAGGED(word);
-			jit_compile_word(word,data,false);
-			UNREGISTER_UNTAGGED(F_WORD,word);
-			UNREGISTER_UNTAGGED(F_ARRAY,alist);
-		}
-		else if(type_of(data) == ARRAY_TYPE)
-		{
-			F_ARRAY *compiled_code = untag_array(data);
-
-			CELL literals = array_nth(compiled_code,0);
-			CELL relocation = array_nth(compiled_code,1);
-			F_ARRAY *labels = untag_array(array_nth(compiled_code,2));
-			F_BYTE_ARRAY *code = untag_byte_array(array_nth(compiled_code,3));
-
-			REGISTER_UNTAGGED(alist);
-			REGISTER_UNTAGGED(word);
+		case QUOTATION_TYPE:
+			jit_compile_word(word.value(),data.value(),false);
+			break;
+		case ARRAY_TYPE:
+			F_ARRAY *compiled_data = data.as<F_ARRAY>().untagged();
+			CELL literals = array_nth(compiled_data,0);
+			CELL relocation = array_nth(compiled_data,1);
+			CELL labels = array_nth(compiled_data,2);
+			CELL code = array_nth(compiled_data,3);
 
 			F_CODE_BLOCK *compiled = add_code_block(
 				WORD_TYPE,
@@ -100,17 +91,14 @@ void primitive_modify_code_heap(void)
 				relocation,
 				literals);
 
-			UNREGISTER_UNTAGGED(F_WORD,word);
-			UNREGISTER_UNTAGGED(F_ARRAY,alist);
-
 			word->code = compiled;
+			break;
+		default:
+			critical_error("Expected a quotation or an array",data.value());
+			break;
 		}
-		else
-			critical_error("Expected a quotation or an array",data);
 
-		REGISTER_UNTAGGED(alist);
-		update_word_xt(word);
-		UNREGISTER_UNTAGGED(F_ARRAY,alist);
+		update_word_xt(word.value());
 	}
 
 	update_code_heap_words();
@@ -184,10 +172,7 @@ void fixup_object_xts(void)
 	while((obj = next_object()) != F)
 	{
 		if(type_of(obj) == WORD_TYPE)
-		{
-			F_WORD *word = untag_word_fast(obj);
-			update_word_xt(word);
-		}
+			update_word_xt(obj);
 		else if(type_of(obj) == QUOTATION_TYPE)
 		{
 			F_QUOTATION *quot = untag_quotation_fast(obj);

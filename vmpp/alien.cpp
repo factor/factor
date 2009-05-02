@@ -9,10 +9,10 @@ char *alien_offset(CELL object)
 	switch(type_of(object))
 	{
 	case BYTE_ARRAY_TYPE:
-		byte_array = untag_byte_array_fast(object);
+		byte_array = untagged<F_BYTE_ARRAY>(object);
 		return (char *)(byte_array + 1);
 	case ALIEN_TYPE:
-		alien = untag_alien_fast(object);
+		alien = untagged<F_ALIEN>(object);
 		if(alien->expired != F)
 			general_error(ERROR_EXPIRED,object,F,NULL);
 		return alien_offset(alien->alien) + alien->displacement;
@@ -33,7 +33,7 @@ char *pinned_alien_offset(CELL object)
 	switch(type_of(object))
 	{
 	case ALIEN_TYPE:
-		alien = untag_alien_fast(object);
+		alien = untagged<F_ALIEN>(object);
 		if(alien->expired != F)
 			general_error(ERROR_EXPIRED,object,F,NULL);
 		return pinned_alien_offset(alien->alien) + alien->displacement;
@@ -52,24 +52,24 @@ char *unbox_alien(void)
 }
 
 /* make an alien */
-CELL allot_alien(CELL delegate, CELL displacement)
+CELL allot_alien(CELL delegate_, CELL displacement)
 {
-	REGISTER_ROOT(delegate);
-	F_ALIEN *alien = (F_ALIEN *)allot_object(ALIEN_TYPE,sizeof(F_ALIEN));
-	UNREGISTER_ROOT(delegate);
+	gc_root<F_OBJECT> delegate(delegate_);
+	gc_root<F_ALIEN> alien(allot<F_ALIEN>(sizeof(F_ALIEN)));
 
-	if(type_of(delegate) == ALIEN_TYPE)
+	if(delegate.isa(ALIEN_TYPE))
 	{
-		F_ALIEN *delegate_alien = untag_alien_fast(delegate);
+		tagged<F_ALIEN> delegate_alien = delegate.as<F_ALIEN>();
 		displacement += delegate_alien->displacement;
 		alien->alien = delegate_alien->alien;
 	}
 	else
-		alien->alien = delegate;
+		alien->alien = delegate.value();
 
 	alien->displacement = displacement;
 	alien->expired = F;
-	return tag_object(alien);
+
+	return alien.value();
 }
 
 /* make an alien and push */
@@ -183,35 +183,28 @@ void box_medium_struct(CELL x1, CELL x2, CELL x3, CELL x4, CELL size)
 /* open a native library and push a handle */
 void primitive_dlopen(void)
 {
-	CELL path = tag_object(string_to_native_alien(
-		untag_string(dpop())));
-	REGISTER_ROOT(path);
-	F_DLL *dll = (F_DLL *)allot_object(DLL_TYPE,sizeof(F_DLL));
-	UNREGISTER_ROOT(path);
-	dll->path = path;
-	ffi_dlopen(dll);
-	dpush(tag_object(dll));
+	gc_root<F_BYTE_ARRAY> path(tag_object(string_to_native_alien(untag_string(dpop()))));
+	gc_root<F_DLL> dll(allot<F_DLL>(sizeof(F_DLL)));
+	dll->path = path.value();
+	ffi_dlopen(dll.untagged());
+	dpush(dll.value());
 }
 
 /* look up a symbol in a native library */
 void primitive_dlsym(void)
 {
-	CELL dll = dpop();
-	REGISTER_ROOT(dll);
+	gc_root<F_OBJECT> dll(dpop());
 	F_SYMBOL *sym = unbox_symbol_string();
-	UNREGISTER_ROOT(dll);
 
-	F_DLL *d;
-
-	if(dll == F)
+	if(dll.value() == F)
 		box_alien(ffi_dlsym(NULL,sym));
 	else
 	{
-		d = untag_dll(dll);
+		tagged<F_DLL> d = dll.as<F_DLL>();
 		if(d->dll == NULL)
 			dpush(F);
 		else
-			box_alien(ffi_dlsym(d,sym));
+			box_alien(ffi_dlsym(d.untagged(),sym));
 	}
 }
 
@@ -227,8 +220,5 @@ void primitive_dll_validp(void)
 	if(dll == F)
 		dpush(T);
 	else
-	{
-		F_DLL *d = untag_dll(dll);
-		dpush(d->dll == NULL ? F : T);
-	}
+		dpush(tagged<F_DLL>(dll)->dll == NULL ? F : T);
 }

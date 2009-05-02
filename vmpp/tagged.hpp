@@ -7,26 +7,49 @@ template <typename T> CELL tag(T *value)
 }
 
 template <typename T>
-class tagged
+struct tagged
 {
-	CELL value;
-public:
-	explicit tagged(CELL tagged) : value(tagged) {}
-	explicit tagged(T *untagged) : value(::tag(untagged)) {}
+	CELL value_;
 
-	CELL tag() const { return value; }
-	T *untag() const { type_check(T::type_number,value); }
-	T *untag_fast() const { return (T *)(UNTAG(value)); }
-	T *operator->() const { return untag_fast(); }
-	CELL *operator&() const { return &value; }
+	T *untag_check() const {
+		if(T::type_number != TYPE_COUNT)
+			type_check(T::type_number,value_);
+		return untagged();
+	}
+	
+	explicit tagged(CELL tagged) : value_(tagged) {
+#ifdef FACTOR_DEBUG
+		untag_check();
+#endif
+	}
+
+	explicit tagged(T *untagged) : value_(::tag(untagged)) {
+#ifdef FACTOR_DEBUG
+		untag_check();
+#endif		
+	}
+
+	CELL value() const { return value_; }
+	T *untagged() const { return (T *)(UNTAG(value_)); }
+
+	T *operator->() const { return untagged(); }
+	CELL *operator&() const { return &value_; }
+
+	const tagged<T>& operator=(const T *x) { value_ = tag(x); return *this; }
+	const tagged<T>& operator=(const CELL &x) { value_ = x; return *this; }
+
+	CELL type() const { return type_of(value_); }
+	bool isa(CELL type_) const { return type() == type_; }
+
+	template<typename X> tagged<X> as() { return tagged<X>(value_); }
 };
 
-template <typename T> T *untag(CELL value)
+template <typename T> T *untag_check(CELL value)
 {
-	return tagged<T>(value).untag();
+	return tagged<T>(value).untag_check();
 }
 
-template <typename T> T *untag_fast(CELL value)
+template <typename T> T *untagged(CELL value)
 {
-	return tagged<T>(value).untag_fast();
+	return tagged<T>(value).untagged();
 }

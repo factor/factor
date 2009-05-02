@@ -8,16 +8,14 @@ void init_profiler(void)
 }
 
 /* Allocates memory */
-F_CODE_BLOCK *compile_profiling_stub(CELL word)
+F_CODE_BLOCK *compile_profiling_stub(CELL word_)
 {
-	REGISTER_ROOT(word);
-	F_JIT jit;
-	jit_init(&jit,WORD_TYPE,word);
-	jit_emit_with(&jit,userenv[JIT_PROFILING],word);
-	F_CODE_BLOCK *block = jit_make_code_block(&jit);
-	jit_dispose(&jit);
-	UNREGISTER_ROOT(word);
-	return block;
+	gc_root<F_WORD> word(word_);
+
+	jit jit(WORD_TYPE,word.value());
+	jit.emit_with(userenv[JIT_PROFILING],word.value());
+
+	return jit.code_block();
 }
 
 /* Allocates memory */
@@ -32,21 +30,17 @@ static void set_profiling(bool profiling)
 	and allocate profiling blocks if necessary */
 	gc();
 
-	CELL words = find_all_words();
-
-	REGISTER_ROOT(words);
+	gc_root<F_ARRAY> words(find_all_words());
 
 	CELL i;
-	CELL length = array_capacity(untag_array_fast(words));
+	CELL length = array_capacity(words.untagged());
 	for(i = 0; i < length; i++)
 	{
-		F_WORD *word = untag_word(array_nth(untag_array(words),i));
+		tagged<F_WORD> word(array_nth(words.untagged(),i));
 		if(profiling)
 			word->counter = tag_fixnum(0);
-		update_word_xt(word);
+		update_word_xt(word.value());
 	}
-
-	UNREGISTER_ROOT(words);
 
 	/* Update XTs in code heap */
 	iterate_code_heap(relocate_code_block);

@@ -26,18 +26,34 @@ void primitive_resize_byte_array(void)
 	dpush(tag_object(reallot_array(array,capacity)));
 }
 
-void growable_byte_array_append(F_GROWABLE_BYTE_ARRAY *array, void *elts, CELL len)
+void growable_byte_array::append_bytes(void *elts, CELL len)
 {
-	CELL new_size = array->count + len;
-	F_BYTE_ARRAY *underlying = untag_byte_array_fast(array->array);
+	CELL new_size = count + len;
 
-	if(new_size >= array_capacity(underlying))
-	{
-		underlying = reallot_array(underlying,new_size * 2);
-		array->array = tag_object(underlying);
-	}
+	if(new_size >= array_capacity(array.untagged()))
+		array = reallot_array(array.untagged(),new_size * 2);
 
-	memcpy((void *)BREF(underlying,array->count),elts,len);
+	memcpy((void *)BREF(array.untagged(),count),elts,len);
 
-	array->count += len;
+	count += len;
+}
+
+void growable_byte_array::append_byte_array(CELL byte_array_)
+{
+	gc_root<F_BYTE_ARRAY> byte_array(byte_array_);
+
+	CELL len = array_capacity(byte_array.untagged());
+	CELL new_size = count + len;
+
+	if(new_size >= array_capacity(array.untagged()))
+		array = reallot_array(array.untagged(),new_size * 2);
+
+	memcpy((void *)BREF(array.untagged(),count),byte_array.untagged() + 1,len);
+
+	count += len;
+}
+
+void growable_byte_array::trim()
+{
+	array = reallot_array(array.untagged(),count);
 }

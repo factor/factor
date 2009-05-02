@@ -1,23 +1,20 @@
 #include "master.hpp"
 
 /* push a new tuple on the stack */
-F_TUPLE *allot_tuple(F_TUPLE_LAYOUT *layout)
+F_TUPLE *allot_tuple(CELL layout_)
 {
-	REGISTER_UNTAGGED(layout);
-	F_TUPLE *tuple = (F_TUPLE *)allot_object(TUPLE_TYPE,tuple_size(layout));
-	UNREGISTER_UNTAGGED(F_TUPLE_LAYOUT,layout);
-	tuple->layout = tag_array((F_ARRAY *)layout);
-	return tuple;
+	gc_root<F_TUPLE_LAYOUT> layout(layout_);
+	gc_root<F_TUPLE> tuple(allot<F_TUPLE>(tuple_size(layout.untagged())));
+	tuple->layout = layout.value();
+	return tuple.untagged();
 }
 
 void primitive_tuple(void)
 {
-	F_TUPLE_LAYOUT *layout = untag_tuple_layout(dpop());
-	F_FIXNUM size = untag_fixnum_fast(layout->size);
-
-	F_TUPLE *tuple = allot_tuple(layout);
+	gc_root<F_TUPLE_LAYOUT> layout(dpop());
+	F_TUPLE *tuple = allot_tuple(layout.value());
 	F_FIXNUM i;
-	for(i = size - 1; i >= 0; i--)
+	for(i = tuple_size(layout.untagged()) - 1; i >= 0; i--)
 		put(AREF(tuple,i),F);
 
 	dpush(tag_tuple(tuple));
@@ -26,10 +23,10 @@ void primitive_tuple(void)
 /* push a new tuple on the stack, filling its slots from the stack */
 void primitive_tuple_boa(void)
 {
-	F_TUPLE_LAYOUT *layout = untag_tuple_layout(dpop());
-	F_FIXNUM size = untag_fixnum_fast(layout->size);
-	F_TUPLE *tuple = allot_tuple(layout);
-	memcpy(tuple + 1,(CELL *)(ds - CELLS * (size - 1)),CELLS * size);
-	ds -= CELLS * size;
-	dpush(tag_tuple(tuple));
+	gc_root<F_TUPLE_LAYOUT> layout(dpop());
+	gc_root<F_TUPLE> tuple(allot_tuple(layout.value()));
+	CELL size = untag_fixnum_fast(layout.untagged()->size) * CELLS;
+	memcpy(tuple.untagged() + 1,(CELL *)(ds - (size - CELLS)),size);
+	ds -= size;
+	dpush(tuple.value());
 }
