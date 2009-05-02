@@ -37,8 +37,6 @@ TUPLE: stencil-bits < pixel-format-attribute ;
 
 TUPLE: aux-buffers < pixel-format-attribute ;
 
-TUPLE: buffer-level < pixel-format-attribute ;
-
 TUPLE: sample-buffers < pixel-format-attribute ;
 TUPLE: samples < pixel-format-attribute ;
 
