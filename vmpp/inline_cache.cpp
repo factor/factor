@@ -33,16 +33,14 @@ void deallocate_inline_cache(CELL return_address)
 
 /* Figure out what kind of type check the PIC needs based on the methods
 it contains */
-static CELL determine_inline_cache_type(CELL cache_entries)
+static CELL determine_inline_cache_type(F_ARRAY *cache_entries)
 {
-	F_ARRAY *array = untag_array_fast(cache_entries);
-
-	bool  seen_hi_tag = false, seen_tuple = false;
+	bool seen_hi_tag = false, seen_tuple = false;
 
 	CELL i;
-	for(i = 0; i < array_capacity(array); i += 2)
+	for(i = 0; i < array_capacity(cache_entries); i += 2)
 	{
-		CELL klass = array_nth(array,i);
+		CELL klass = array_nth(cache_entries,i);
 		F_FIXNUM type;
 
 		/* Is it a tuple layout? */
@@ -76,7 +74,16 @@ static void update_pic_count(CELL type)
 	pic_counts[type - PIC_TAG]++;
 }
 
-static void jit_emit_check(F_JIT *jit, CELL klass)
+struct inline_cache_jit : public jit {
+	F_FIXNUM index;
+
+	inline_cache_jit(CELL generic_word_) : jit(PIC_TYPE,generic_word_) {};
+
+	void emit_check(CELL klass);
+	void compile_inline_cache(F_FIXNUM index, CELL generic_word_, CELL methods_, CELL cache_entries_);
+};
+
+void inline_cache_jit::emit_check(CELL klass)
 {
 	CELL code_template;
 	if(TAG(klass) == FIXNUM_TYPE && untag_fixnum_fast(klass) < HEADER_TYPE)
@@ -84,43 +91,34 @@ static void jit_emit_check(F_JIT *jit, CELL klass)
 	else
 		code_template = userenv[PIC_CHECK];
 
-	jit_emit_with(jit,code_template,klass);
+	emit_with(code_template,klass);
 }
 
 /* index: 0 = top of stack, 1 = item underneath, etc
    cache_entries: array of class/method pairs */
-static F_CODE_BLOCK *compile_inline_cache(F_FIXNUM index, CELL generic_word, CELL methods, CELL cache_entries)
+void inline_cache_jit::compile_inline_cache(F_FIXNUM index, CELL generic_word_, CELL methods_, CELL cache_entries_)
 {
-#ifdef FACTOR_DEBUG
-	type_check(WORD_TYPE,generic_word);
-	type_check(ARRAY_TYPE,cache_entries);
-#endif
+	gc_root<F_WORD> generic_word(generic_word_);
+	gc_root<F_ARRAY> methods(methods_);
+	gc_root<F_ARRAY> cache_entries(cache_entries_);
 
-	REGISTER_ROOT(generic_word);
-	REGISTER_ROOT(methods);
-	REGISTER_ROOT(cache_entries);
-
-	CELL inline_cache_type = determine_inline_cache_type(cache_entries);
-
+	CELL inline_cache_type = determine_inline_cache_type(cache_entries.untagged());
 	update_pic_count(inline_cache_type);
 
-	F_JIT jit;
-	jit_init(&jit,PIC_TYPE,generic_word);
-
 	/* Generate machine code to determine the object's class. */
-	jit_emit_class_lookup(&jit,index,inline_cache_type);
+	emit_class_lookup(index,inline_cache_type);
 
 	/* Generate machine code to check, in turn, if the class is one of the cached entries. */
 	CELL i;
-	for(i = 0; i < array_capacity(untag_array_fast(cache_entries)); i += 2)
+	for(i = 0; i < array_capacity(cache_entries.untagged()); i += 2)
 	{
 		/* Class equal? */
-		CELL klass = array_nth(untag_array_fast(cache_entries),i);
-		jit_emit_check(&jit,klass);
+		CELL klass = array_nth(cache_entries.untagged(),i);
+		emit_check(klass);
 
 		/* Yes? Jump to method */
-		CELL method = array_nth(untag_array_fast(cache_entries),i + 1);
-		jit_emit_with(&jit,userenv[PIC_HIT],method);
+		CELL method = array_nth(cache_entries.untagged(),i + 1);
+		emit_with(userenv[PIC_HIT],method);
 	}
 
 	/* Generate machine code to handle a cache miss, which ultimately results in
@@ -128,21 +126,26 @@ static F_CODE_BLOCK *compile_inline_cache(F_FIXNUM index, CELL generic_word, CEL
 
 	   The inline-cache-miss primitive call receives enough information to
 	   reconstruct the PIC. */
-	jit_push(&jit,generic_word);
-	jit_push(&jit,methods);
-	jit_push(&jit,tag_fixnum(index));
-	jit_push(&jit,cache_entries);
-	jit_word_jump(&jit,userenv[PIC_MISS_WORD]);
+	push(generic_word.value());
+	push(methods.value());
+	push(tag_fixnum(index));
+	push(cache_entries.value());
+	word_jump(userenv[PIC_MISS_WORD]);
+}
 
-	F_CODE_BLOCK *code = jit_make_code_block(&jit);
+static F_CODE_BLOCK *compile_inline_cache(F_FIXNUM index,
+					  CELL generic_word_,
+					  CELL methods_,
+					  CELL cache_entries_)
+{
+	gc_root<F_WORD> generic_word(generic_word_);
+	gc_root<F_ARRAY> methods(methods_);
+	gc_root<F_ARRAY> cache_entries(cache_entries_);
+
+	inline_cache_jit jit(generic_word.value());
+	jit.compile_inline_cache(index,generic_word.value(),methods.value(),cache_entries.value());
+	F_CODE_BLOCK *code = jit.code_block();
 	relocate_code_block(code);
-
-	jit_dispose(&jit);
-
-	UNREGISTER_ROOT(cache_entries);
-	UNREGISTER_ROOT(methods);
-	UNREGISTER_ROOT(generic_word);
-
 	return code;
 }
 
@@ -154,23 +157,21 @@ static XT megamorphic_call_stub(CELL generic_word)
 
 static CELL inline_cache_size(CELL cache_entries)
 {
-	return (cache_entries == F ? 0 : array_capacity(untag_array(cache_entries)) / 2);
+	return array_capacity(untag_array(cache_entries)) / 2;
 }
 
 /* Allocates memory */
-static CELL add_inline_cache_entry(CELL cache_entries, CELL klass, CELL method)
+static CELL add_inline_cache_entry(CELL cache_entries_, CELL klass_, CELL method_)
 {
-	if(cache_entries == F)
-		return allot_array_2(klass,method);
-	else
-	{
-		F_ARRAY *cache_entries_array = untag_array_fast(cache_entries);
-		CELL pic_size = array_capacity(cache_entries_array);
-		cache_entries_array = reallot_array(cache_entries_array,pic_size + 2);
-		set_array_nth(cache_entries_array,pic_size,klass);
-		set_array_nth(cache_entries_array,pic_size + 1,method);
-		return tag_array(cache_entries_array);
-	}
+	gc_root<F_ARRAY> cache_entries(cache_entries_);
+	gc_root<F_OBJECT> klass(klass_);
+	gc_root<F_WORD> method(method_);
+
+	CELL pic_size = array_capacity(cache_entries.untagged());
+	gc_root<F_ARRAY> new_cache_entries(reallot_array(cache_entries.untagged(),pic_size + 2));
+	set_array_nth(new_cache_entries.untagged(),pic_size,klass.value());
+	set_array_nth(new_cache_entries.untagged(),pic_size + 1,method.value());
+	return new_cache_entries.value();
 }
 
 static void update_pic_transitions(CELL pic_size)
@@ -194,35 +195,33 @@ XT inline_cache_miss(CELL return_address)
 	   instead of leaving dead PICs around until the next GC. */
 	deallocate_inline_cache(return_address);
 
-	CELL cache_entries = dpop();
+	gc_root<F_ARRAY> cache_entries(dpop());
 	F_FIXNUM index = untag_fixnum_fast(dpop());
-	CELL methods = dpop();
-	CELL generic_word = dpop();
-	CELL object = get(ds - index * CELLS);
+	gc_root<F_ARRAY> methods(dpop());
+	gc_root<F_WORD> generic_word(dpop());
+	gc_root<F_OBJECT> object(get(ds - index * CELLS));
 
 	XT xt;
 
-	CELL pic_size = inline_cache_size(cache_entries);
+	CELL pic_size = inline_cache_size(cache_entries.value());
 
 	update_pic_transitions(pic_size);
 
 	if(pic_size >= max_pic_size)
-		xt = megamorphic_call_stub(generic_word);
+		xt = megamorphic_call_stub(generic_word.value());
 	else
 	{
-		REGISTER_ROOT(generic_word);
-		REGISTER_ROOT(cache_entries);
-		REGISTER_ROOT(methods);
+		CELL klass = object_class(object.value());
+		CELL method = lookup_method(object.value(),methods.value());
 
-		CELL klass = object_class(object);
-		CELL method = lookup_method(object,methods);
-
-		cache_entries = add_inline_cache_entry(cache_entries,klass,method);
-		xt = compile_inline_cache(index,generic_word,methods,cache_entries) + 1;
-
-		UNREGISTER_ROOT(methods);
-		UNREGISTER_ROOT(cache_entries);
-		UNREGISTER_ROOT(generic_word);
+		gc_root<F_ARRAY> new_cache_entries(add_inline_cache_entry(
+							   cache_entries.value(),
+							   klass,
+							   method));
+		xt = compile_inline_cache(index,
+					  generic_word.value(),
+					  methods.value(),
+					  new_cache_entries.value()) + 1;
 	}
 
 	/* Install the new stub. */
@@ -244,14 +243,13 @@ void primitive_reset_inline_cache_stats(void)
 
 void primitive_inline_cache_stats(void)
 {
-	GROWABLE_ARRAY(stats);
-	GROWABLE_ARRAY_ADD(stats,allot_cell(cold_call_to_ic_transitions));
-	GROWABLE_ARRAY_ADD(stats,allot_cell(ic_to_pic_transitions));
-	GROWABLE_ARRAY_ADD(stats,allot_cell(pic_to_mega_transitions));
+	growable_array stats;
+	stats.add(allot_cell(cold_call_to_ic_transitions));
+	stats.add(allot_cell(ic_to_pic_transitions));
+	stats.add(allot_cell(pic_to_mega_transitions));
 	CELL i;
 	for(i = 0; i < 4; i++)
-		GROWABLE_ARRAY_ADD(stats,allot_cell(pic_counts[i]));
-	GROWABLE_ARRAY_TRIM(stats);
-	GROWABLE_ARRAY_DONE(stats);
-	dpush(stats);
+		stats.add(allot_cell(pic_counts[i]));
+	stats.trim();
+	dpush(stats.array.value());
 }

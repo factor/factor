@@ -96,7 +96,7 @@ INLINE double untag_float(CELL tagged)
 
 INLINE CELL allot_float(double n)
 {
-	F_FLOAT* flo = (F_FLOAT *)allot_object(FLOAT_TYPE,sizeof(F_FLOAT));
+	F_FLOAT *flo = allot<F_FLOAT>(sizeof(F_FLOAT));
 	flo->n = n;
 	return RETAG(flo,FLOAT_TYPE);
 }

@@ -1,68 +1,26 @@
 #include "master.hpp"
 
 /* Simple code generator used by:
-- profiler (profiler.c),
-- quotation compiler (quotations.c),
-- megamorphic caches (dispatch.c),
-- polymorphic inline caches (inline_cache.c) */
+- profiler (profiler.cpp),
+- quotation compiler (quotations.cpp),
+- megamorphic caches (dispatch.cpp),
+- polymorphic inline caches (inline_cache.cpp) */
 
 /* Allocates memory */
-void jit_init(F_JIT *jit, CELL jit_type, CELL owner)
+jit::jit(CELL type_, CELL owner_)
+	: type(type_),
+	  owner(owner_),
+	  code(),
+	  relocation(),
+	  literals(),
+	  computing_offset_p(false),
+	  position(0),
+	  offset(0)
 {
-	jit->owner = owner;
-	REGISTER_ROOT(jit->owner);
-
-	jit->type = jit_type;
-
-	jit->code = make_growable_byte_array();
-	REGISTER_ROOT(jit->code.array);
-	jit->relocation = make_growable_byte_array();
-	REGISTER_ROOT(jit->relocation.array);
-	jit->literals = make_growable_array();
-	REGISTER_ROOT(jit->literals.array);
-
-	if(stack_traces_p())
-		growable_array_add(&jit->literals,jit->owner);
-
-	jit->computing_offset_p = false;
+	if(stack_traces_p()) literal(owner.value());
 }
 
-/* Facility to convert compiled code offsets to quotation offsets.
-Call jit_compute_offset() with the compiled code offset, then emit
-code, and at the end jit->position is the quotation position. */
-void jit_compute_position(F_JIT *jit, CELL offset)
-{
-	jit->computing_offset_p = true;
-	jit->position = 0;
-	jit->offset = offset;
-}
-
-/* Allocates memory */
-F_CODE_BLOCK *jit_make_code_block(F_JIT *jit)
-{
-	growable_byte_array_trim(&jit->code);
-	growable_byte_array_trim(&jit->relocation);
-	growable_array_trim(&jit->literals);
-
-	F_CODE_BLOCK *code = add_code_block(
-		jit->type,
-		untag_byte_array_fast(jit->code.array),
-		NULL, /* no labels */
-		jit->relocation.array,
-		jit->literals.array);
-
-	return code;
-}
-
-void jit_dispose(F_JIT *jit)
-{
-	UNREGISTER_ROOT(jit->literals.array);
-	UNREGISTER_ROOT(jit->relocation.array);
-	UNREGISTER_ROOT(jit->code.array);
-	UNREGISTER_ROOT(jit->owner);
-}
-
-static F_REL rel_to_emit(F_JIT *jit, CELL code_template, bool *rel_p)
+F_REL jit::rel_to_emit(CELL code_template, bool *rel_p)
 {
 	F_ARRAY *quadruple = untag_array_fast(code_template);
 	CELL rel_class = array_nth(quadruple,1);
@@ -79,45 +37,78 @@ static F_REL rel_to_emit(F_JIT *jit, CELL code_template, bool *rel_p)
 		*rel_p = true;
 		return (untag_fixnum_fast(rel_type) << 28)
 			| (untag_fixnum_fast(rel_class) << 24)
-			| ((jit->code.count + untag_fixnum_fast(offset)));
+			| ((code.count + untag_fixnum_fast(offset)));
 	}
 }
 
 /* Allocates memory */
-void jit_emit(F_JIT *jit, CELL code_template)
+void jit::emit(CELL code_template_)
 {
-#ifdef FACTOR_DEBUG
-	type_check(ARRAY_TYPE,code_template);
-#endif
-
-	REGISTER_ROOT(code_template);
+	gc_root<F_ARRAY> code_template(code_template_);
 
 	bool rel_p;
-	F_REL rel = rel_to_emit(jit,code_template,&rel_p);
-	if(rel_p) growable_byte_array_append(&jit->relocation,&rel,sizeof(F_REL));
+	F_REL rel = rel_to_emit(code_template.value(),&rel_p);
+	if(rel_p) relocation.append_bytes(&rel,sizeof(F_REL));
 
-	F_BYTE_ARRAY *code = code_to_emit(code_template);
+	gc_root<F_BYTE_ARRAY> insns(array_nth(code_template.untagged(),0));
 
-	if(jit->computing_offset_p)
+	if(computing_offset_p)
 	{
-		CELL size = array_capacity(code);
+		CELL size = array_capacity(insns.untagged());
 
-		if(jit->offset == 0)
+		if(offset == 0)
 		{
-			jit->position--;
-			jit->computing_offset_p = false;
+			position--;
+			computing_offset_p = false;
 		}
-		else if(jit->offset < size)
+		else if(offset < size)
 		{
-			jit->position++;
-			jit->computing_offset_p = false;
+			position++;
+			computing_offset_p = false;
 		}
 		else
-			jit->offset -= size;
+			offset -= size;
 	}
 
-	growable_byte_array_append(&jit->code,code + 1,array_capacity(code));
-
-	UNREGISTER_ROOT(code_template);
+	code.append_byte_array(insns.value());
 }
+
+void jit::emit_with(CELL code_template_, CELL argument_) {
+	gc_root<F_ARRAY> code_template(code_template_);
+	gc_root<F_OBJECT> argument(argument_);
+	literal(argument.value());
+	emit(code_template.value());
+}
+
+void jit::emit_class_lookup(F_FIXNUM index, CELL type)
+{
+	emit_with(userenv[PIC_LOAD],tag_fixnum(-index * CELLS));
+	emit(userenv[type]);
+}
+
+/* Facility to convert compiled code offsets to quotation offsets.
+Call jit_compute_offset() with the compiled code offset, then emit
+code, and at the end jit->position is the quotation position. */
+void jit::compute_position(CELL offset_)
+{
+	computing_offset_p = true;
+	position = 0;
+	offset = offset_;
+}
+
+/* Allocates memory */
+F_CODE_BLOCK *jit::code_block()
+{
+	code.trim();
+	relocation.trim();
+	literals.trim();
+
+	return add_code_block(
+		type,
+		code.array.value(),
+		F, /* no labels */
+		relocation.array.value(),
+		literals.array.value());
+}
+
 

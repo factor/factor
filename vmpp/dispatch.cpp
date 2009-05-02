@@ -167,39 +167,35 @@ void primitive_reset_dispatch_stats(void)
 
 void primitive_dispatch_stats(void)
 {
-	GROWABLE_ARRAY(stats);
-	GROWABLE_ARRAY_ADD(stats,allot_cell(megamorphic_cache_hits));
-	GROWABLE_ARRAY_ADD(stats,allot_cell(megamorphic_cache_misses));
-	GROWABLE_ARRAY_TRIM(stats);
-	GROWABLE_ARRAY_DONE(stats);
-	dpush(stats);
+	growable_array stats;
+	stats.add(allot_cell(megamorphic_cache_hits));
+	stats.add(allot_cell(megamorphic_cache_misses));
+	stats.trim();
+	dpush(stats.array.value());
 }
 
-void jit_emit_class_lookup(F_JIT *jit, F_FIXNUM index, CELL type)
+void quotation_jit::emit_mega_cache_lookup(CELL methods_, F_FIXNUM index, CELL cache_)
 {
-	jit_emit_with(jit,userenv[PIC_LOAD],tag_fixnum(-index * CELLS));
-	jit_emit(jit,userenv[type]);
-}
+	gc_root<F_ARRAY> methods(methods_);
+	gc_root<F_ARRAY> cache(cache_);
 
-void jit_emit_mega_cache_lookup(F_JIT *jit, CELL methods, F_FIXNUM index, CELL cache)
-{
 	/* Generate machine code to determine the object's class. */
-	jit_emit_class_lookup(jit,index,PIC_HI_TAG_TUPLE);
+	emit_class_lookup(index,PIC_HI_TAG_TUPLE);
 
 	/* Do a cache lookup. */
-	jit_emit_with(jit,userenv[MEGA_LOOKUP],cache);
+	emit_with(userenv[MEGA_LOOKUP],cache.value());
 	
 	/* If we end up here, the cache missed. */
-	jit_emit(jit,userenv[JIT_PROLOG]);
+	emit(userenv[JIT_PROLOG]);
 
 	/* Push index, method table and cache on the stack. */
-	jit_push(jit,methods);
-	jit_push(jit,tag_fixnum(index));
-	jit_push(jit,cache);
-	jit_word_call(jit,userenv[MEGA_MISS_WORD]);
+	push(methods.value());
+	push(tag_fixnum(index));
+	push(cache.value());
+	word_call(userenv[MEGA_MISS_WORD]);
 
 	/* Now the new method has been stored into the cache, and its on
 	   the stack. */
-	jit_emit(jit,userenv[JIT_EPILOG]);
-	jit_emit(jit,userenv[JIT_EXECUTE_JUMP]);
+	emit(userenv[JIT_EPILOG]);
+	emit(userenv[JIT_EXECUTE_JUMP]);
 }

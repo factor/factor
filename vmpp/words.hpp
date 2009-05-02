@@ -4,7 +4,7 @@ F_WORD *allot_word(CELL vocab, CELL name);
 
 void primitive_word(void);
 void primitive_word_xt(void);
-void update_word_xt(F_WORD *word);
+void update_word_xt(CELL word);
 
 INLINE bool word_optimized_p(F_WORD *word)
 {

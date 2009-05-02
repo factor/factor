@@ -231,19 +231,19 @@ void primitive_load_locals(void)
 	rs += CELLS * count;
 }
 
-static CELL clone_object(CELL object)
+static CELL clone_object(CELL object_)
 {
-	CELL size = object_size(object);
+	gc_root<F_OBJECT> object(object_);
+
+	CELL size = object_size(object.value());
 	if(size == 0)
-		return object;
+		return object.value();
 	else
 	{
-		REGISTER_ROOT(object);
-		void *new_obj = allot_object(type_of(object),size);
-		UNREGISTER_ROOT(object);
+		void *new_obj = allot_object(object.type(),size);
 
-		CELL tag = TAG(object);
-		memcpy(new_obj,(void*)UNTAG(object),size);
+		CELL tag = TAG(object.value());
+		memcpy(new_obj,object.untagged(),size);
 		return RETAG(new_obj,tag);
 	}
 }

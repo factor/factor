@@ -2,16 +2,16 @@
 extern bool secure_gc;
 
 /* generational copying GC divides memory into zones */
-typedef struct {
+struct F_ZONE {
 	/* allocation pointer is 'here'; its offset is hardcoded in the
-	compiler backends*/
+	compiler backends */
 	CELL start;
 	CELL here;
 	CELL size;
 	CELL end;
-} F_ZONE;
+};
 
-typedef struct {
+struct F_DATA_HEAP {
 	F_SEGMENT *segment;
 
 	CELL young_size;
@@ -31,7 +31,7 @@ typedef struct {
 
 	CELL *decks;
 	CELL *decks_end;
-} F_DATA_HEAP;
+};
 
 extern F_DATA_HEAP *data_heap;
 

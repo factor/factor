@@ -7,27 +7,18 @@ extern CELL gc_locals;
 DEFPUSHPOP(gc_local_,gc_locals)
 
 template <typename T>
-class gc_root : public tagged<T>
+struct gc_root : public tagged<T>
 {
 	void push() { gc_local_push((CELL)this); }
-public:
+	
 	explicit gc_root(CELL value_) : tagged<T>(value_) { push(); }
 	explicit gc_root(T *value_) : tagged<T>(value_) { push(); }
-	gc_root(const gc_root<T>& copy) : tagged<T>(copy.untag()) {}
+
+	const gc_root<T>& operator=(const T *x) { tagged<T>::operator=(x); return *this; }
+	const gc_root<T>& operator=(const CELL &x) { tagged<T>::operator=(x); return *this; }
+
 	~gc_root() { CELL old = gc_local_pop(); assert(old == (CELL)this); }
 };
-
-#define REGISTER_ROOT(obj) \
-	{ \
-		if(!immediate_p(obj))	 \
-			check_data_pointer(obj); \
-		gc_local_push((CELL)&(obj));	\
-	}
-#define UNREGISTER_ROOT(obj) \
-	{ \
-		if(gc_local_pop() != (CELL)&(obj))			\
-			critical_error("Mismatched REGISTER_ROOT/UNREGISTER_ROOT",0); \
-	}
 
 /* Extra roots: stores pointers to objects in the heap. Requires extra work
 (you have to unregister before accessing the object) but more flexible. */
@@ -35,9 +26,6 @@ extern F_SEGMENT *extra_roots_region;
 extern CELL extra_roots;
 
 DEFPUSHPOP(root_,extra_roots)
-
-#define REGISTER_UNTAGGED(obj) root_push(obj ? RETAG(obj,OBJECT_TYPE) : 0)
-#define UNREGISTER_UNTAGGED(type,obj) obj = (type *)UNTAG(root_pop())
 
 /* We ignore strings which point outside the data heap, but we might be given
 a char* which points inside the data heap, in which case it is a root, for

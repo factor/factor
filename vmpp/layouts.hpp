@@ -81,6 +81,7 @@ INLINE CELL tag_fixnum(F_FIXNUM untagged)
 typedef void *XT;
 
 struct F_OBJECT {
+	static const CELL type_number = TYPE_COUNT;
 	CELL header;
 };
 
