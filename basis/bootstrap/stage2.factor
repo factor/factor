@@ -65,7 +65,6 @@ SYMBOL: bootstrap-time
         "stage2: deployment mode" print
     ] [
         "debugger" require
-        "alien.prettyprint" require
         "inspector" require
         "tools.errors" require
         "listener" require

@@ -1,6 +1,7 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel continuations sequences vectors arrays system math ;
+USING: kernel continuations sequences vectors arrays system math
+io.backend alien.strings memory.private ;
 IN: memory
 
 : (each-object) ( quot: ( obj -- ) -- )
@@ -20,5 +21,11 @@ IN: memory
     #! number of objects that satisfy the predicate.
     [ count-instances 100 + <vector> ] keep swap
     [ [ push-if ] 2curry each-object ] keep >array ; inline
+
+: save-image ( path -- )
+    normalize-path native-string>alien (save-image) ;
+
+: save-image-and-exit ( path -- )
+    normalize-path native-string>alien (save-image) ;
 
 : save ( -- ) image save-image ;

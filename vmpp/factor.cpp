@@ -132,10 +132,10 @@ void init_factor(F_PARAMETERS *p)
 
 	init_profiler();
 
-	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
-	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
+	userenv[CPU_ENV] = allot_alien(F,(CELL)FACTOR_CPU_STRING);
+	userenv[OS_ENV] = allot_alien(F,(CELL)FACTOR_OS_STRING);
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
-	userenv[EXECUTABLE_ENV] = (p->executable_path ? tag_object(from_native_string(p->executable_path)) : F);
+	userenv[EXECUTABLE_ENV] = allot_alien(F,(CELL)p->executable_path);
 	userenv[ARGS_ENV] = F;
 	userenv[EMBEDDED_ENV] = F;
 
@@ -156,7 +156,7 @@ void pass_args_to_factor(int argc, F_CHAR **argv)
 	int i;
 
 	for(i = 1; i < argc; i++)
-		args.add(tag_object(from_native_string(argv[i])));
+		args.add(allot_alien(F,(CELL)argv[i]));
 
 	args.trim();
 	userenv[ARGS_ENV] = args.array.value();

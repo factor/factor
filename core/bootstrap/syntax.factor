@@ -16,6 +16,7 @@ IN: bootstrap.syntax
     "<PRIVATE"
     "BIN:"
     "B{"
+    "BV{"
     "C:"
     "CHAR:"
     "DEFER:"

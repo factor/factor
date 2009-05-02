@@ -392,26 +392,23 @@ void primitive_bignum_to_float(void)
 
 void primitive_str_to_float(void)
 {
-	char *c_str, *end;
-	double f;
-	F_STRING *str = untag_string(dpeek());
-	CELL capacity = string_capacity(str);
+	F_BYTE_ARRAY *bytes = untag_byte_array(dpeek());
+	CELL capacity = array_capacity(bytes);
 
-	c_str = to_char_string(str,false);
-	end = c_str;
-	f = strtod(c_str,&end);
-	if(end != c_str + capacity)
-		drepl(F);
-	else
+	char *c_str = (char *)(bytes + 1);
+	char *end = c_str;
+	double f = strtod(c_str,&end);
+	if(end == c_str + capacity - 1)
 		drepl(allot_float(f));
+	else
+		drepl(F);
 }
 
 void primitive_float_to_str(void)
 {
-	char tmp[33];
-	snprintf(tmp,32,"%.16g",untag_float(dpop()));
-	tmp[32] = '\0';
-	box_char_string(tmp);
+	F_BYTE_ARRAY *array = allot_byte_array(33);
+	snprintf((char *)(array + 1),32,"%.16g",untag_float(dpop()));
+	dpush(tag_object(array));
 }
 
 #define POP_FLOATS(x,y) \

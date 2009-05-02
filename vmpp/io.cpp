@@ -25,20 +25,20 @@ void io_error(void)
 		return;
 #endif
 
-	CELL error = tag_object(from_char_string(strerror(errno)));
-	general_error(ERROR_IO,error,F,NULL);
+	general_error(ERROR_IO,tag_fixnum(errno),F,NULL);
 }
 
 void primitive_fopen(void)
 {
-	char *mode = unbox_char_string();
-	REGISTER_C_STRING(mode);
-	char *path = unbox_char_string();
-	UNREGISTER_C_STRING(char,mode);
+	gc_root<F_BYTE_ARRAY> mode(dpop());
+	gc_root<F_BYTE_ARRAY> path(dpop());
+	mode.untag_check();
+	path.untag_check();
 
 	for(;;)
 	{
-		FILE *file = fopen(path,mode);
+		FILE *file = fopen((char *)(path.untagged() + 1),
+				   (char *)(mode.untagged() + 1));
 		if(file == NULL)
 			io_error();
 		else

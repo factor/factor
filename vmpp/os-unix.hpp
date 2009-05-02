@@ -11,10 +11,7 @@
 typedef char F_CHAR;
 typedef char F_SYMBOL;
 
-#define from_native_string from_char_string
-#define unbox_native_string unbox_char_string
 #define string_to_native_alien(string) string_to_char_alien(string,true)
-#define unbox_symbol_string unbox_char_string
 
 #define STRING_LITERAL(string) string
 

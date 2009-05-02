@@ -7,9 +7,6 @@
 
 typedef wchar_t F_SYMBOL;
 
-#define unbox_symbol_string unbox_u16_string
-#define from_symbol_string from_u16_string
-
 #define FACTOR_OS_STRING "wince"
 #define FACTOR_DLL L"factor-ce.dll"
 #define FACTOR_DLL_NAME "factor-ce.dll"

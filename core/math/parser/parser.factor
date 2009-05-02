@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math.private namespaces sequences sequences.private
-strings arrays combinators splitting math assocs make ;
+strings arrays combinators splitting math assocs byte-arrays make ;
 IN: math.parser
 
 : digit> ( ch -- n )
@@ -79,6 +79,9 @@ SYMBOL: negative?
         string>natural
     ] if ; inline
 
+: string>float ( str -- n/f )
+    >byte-array 0 suffix (string>float) ;
+
 PRIVATE>
 
 : base> ( str radix -- n/f )
@@ -149,13 +152,18 @@ M: ratio >base
         [ ".0" append ]
     } cond ;
 
+: float>string ( x -- str )
+    (float>string)
+    [ 0 = ] trim-tail >string
+    fix-float ;
+
 M: float >base
     drop {
         { [ dup fp-nan? ] [ drop "0/0." ] }
         { [ dup 1/0. = ] [ drop "1/0." ] }
         { [ dup -1/0. = ] [ drop "-1/0." ] }
         { [ dup double>bits HEX: 8000000000000000 = ] [ drop "-0.0" ] }
-        [ float>string fix-float ]
+        [ float>string ]
     } cond ;
 
 : number>string ( n -- str ) 10 >base ;

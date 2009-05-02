@@ -48,17 +48,15 @@ void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol)
 void ffi_dlclose(F_DLL *dll)
 {
 	if(dlclose(dll->dll))
-	{
-		general_error(ERROR_FFI,tag_object(
-			from_char_string(dlerror())),F,NULL);
-	}
+		general_error(ERROR_FFI,F,F,NULL);
 	dll->dll = NULL;
 }
 
 void primitive_existsp(void)
 {
 	struct stat sb;
-	box_boolean(stat(unbox_char_string(),&sb) >= 0);
+	char *path = (char *)(untag_byte_array(dpop()) + 1);
+	box_boolean(stat(path,&sb) >= 0);
 }
 
 F_SEGMENT *alloc_segment(CELL size)
