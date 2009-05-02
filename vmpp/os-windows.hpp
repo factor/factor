@@ -7,8 +7,6 @@
 
 typedef wchar_t F_CHAR;
 
-#define from_native_string from_u16_string
-#define unbox_native_string unbox_u16_string
 #define string_to_native_alien(string) string_to_u16_alien(string,true)
 
 #define STRING_LITERAL(string) L##string

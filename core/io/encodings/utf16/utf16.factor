@@ -1,20 +1,14 @@
 ! Copyright (C) 2006, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces io.binary
-io.encodings combinators splitting io byte-arrays io.encodings.iana ;
+io.encodings combinators splitting io byte-arrays ;
 IN: io.encodings.utf16
 
 SINGLETON: utf16be
 
-utf16be "UTF-16BE" register-encoding
-
 SINGLETON: utf16le
 
-utf16le "UTF-16LE" register-encoding
-
 SINGLETON: utf16
-
-utf16 "UTF-16" register-encoding
 
 ERROR: missing-bom ;
 

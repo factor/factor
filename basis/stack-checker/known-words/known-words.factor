@@ -1,16 +1,16 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors alien alien.accessors arrays byte-arrays
-classes sequences.private continuations.private effects generic
-hashtables hashtables.private io io.backend io.files
-io.files.private io.streams.c kernel kernel.private math
-math.private memory namespaces namespaces.private parser
-quotations quotations.private sbufs sbufs.private
-sequences sequences.private slots.private strings
+USING: fry accessors alien alien.accessors arrays byte-arrays classes
+sequences.private continuations.private effects generic hashtables
+hashtables.private io io.backend io.files io.files.private
+io.streams.c kernel kernel.private math math.private
+math.parser.private memory memory.private namespaces
+namespaces.private parser quotations quotations.private sbufs
+sbufs.private sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
-classes.tuple.private vectors vectors.private words definitions
-assocs summary compiler.units system.private
-combinators combinators.short-circuit locals locals.backend locals.types
+classes.tuple.private vectors vectors.private words definitions assocs
+summary compiler.units system.private combinators
+combinators.short-circuit locals locals.backend locals.types
 quotations.private combinators.private stack-checker.values
 generic.single generic.single.private
 alien.libraries
@@ -290,11 +290,11 @@ M: object infer-call*
 \ bignum>float { bignum } { float } define-primitive
 \ bignum>float make-foldable
 
-\ string>float { string } { float } define-primitive
-\ string>float make-foldable
+\ (string>float) { byte-array } { float } define-primitive
+\ (string>float) make-foldable
 
-\ float>string { float } { string } define-primitive
-\ float>string make-foldable
+\ (float>string) { float } { byte-array } define-primitive
+\ (float>string) make-foldable
 
 \ float>bits { real } { integer } define-primitive
 \ float>bits make-foldable
@@ -465,9 +465,9 @@ M: object infer-call*
 
 \ gc-stats { } { array } define-primitive
 
-\ save-image { string } { } define-primitive
+\ (save-image) { byte-array } { } define-primitive
 
-\ save-image-and-exit { string } { } define-primitive
+\ (save-image-and-exit) { byte-array } { } define-primitive
 
 \ data-room { } { integer integer array } define-primitive
 \ data-room make-flushable
@@ -481,9 +481,9 @@ M: object infer-call*
 \ tag { object } { fixnum } define-primitive
 \ tag make-foldable
 
-\ dlopen { string } { dll } define-primitive
+\ (dlopen) { byte-array } { dll } define-primitive
 
-\ dlsym { string object } { c-ptr } define-primitive
+\ (dlsym) { byte-array object } { c-ptr } define-primitive
 
 \ dlclose { dll } { } define-primitive
 
@@ -598,7 +598,7 @@ M: object infer-call*
 
 \ die { } { } define-primitive
 
-\ fopen { string string } { alien } define-primitive
+\ (fopen) { byte-array byte-array } { alien } define-primitive
 
 \ fgetc { alien } { object } define-primitive
 

@@ -1,6 +1,6 @@
 /* If a runtime function needs to call another function which potentially
-allocates memory, it must store any local variable references to Factor
-objects on the root stack */
+allocates memory, it must wrap any local variable references to Factor
+objects in gc_root instances */
 extern F_SEGMENT *gc_locals_region;
 extern CELL gc_locals;
 
@@ -26,29 +26,6 @@ extern F_SEGMENT *extra_roots_region;
 extern CELL extra_roots;
 
 DEFPUSHPOP(root_,extra_roots)
-
-/* We ignore strings which point outside the data heap, but we might be given
-a char* which points inside the data heap, in which case it is a root, for
-example if we call unbox_char_string() the result is placed in a byte array */
-INLINE bool root_push_alien(const void *ptr)
-{
-	if(in_data_heap_p((CELL)ptr))
-	{
-		F_BYTE_ARRAY *objptr = ((F_BYTE_ARRAY *)ptr) - 1;
-		if(objptr->header == tag_header(BYTE_ARRAY_TYPE))
-		{
-			root_push(tag_object(objptr));
-			return true;
-		}
-	}
-
-	return false;
-}
-
-#define REGISTER_C_STRING(obj) \
-	bool obj##_root = root_push_alien((const char *)obj)
-#define UNREGISTER_C_STRING(type,obj)			\
-	if(obj##_root) obj = (type *)alien_offset(root_pop())
 
 #define REGISTER_BIGNUM(obj) if(obj) root_push(tag_bignum(obj))
 #define UNREGISTER_BIGNUM(obj) if(obj) obj = (untag_bignum_fast(root_pop()))

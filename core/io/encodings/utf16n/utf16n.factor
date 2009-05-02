@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.encodings io.encodings.utf16 kernel ;
+USING: io.encodings io.encodings.utf16 kernel alien.accessors ;
 IN: io.encodings.utf16n
 
 ! Native-order UTF-16
@@ -8,7 +8,7 @@ IN: io.encodings.utf16n
 SINGLETON: utf16n
 
 : utf16n ( -- descriptor )
-    little-endian? utf16le utf16be ? ; foldable
+    B{ 1 0 0 0 } 0 alien-unsigned-4 1 = utf16le utf16be ? ; foldable
 
 M: utf16n <decoder> drop utf16n <decoder> ;
 

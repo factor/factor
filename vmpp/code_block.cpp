@@ -340,10 +340,6 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 		}
 	}
 
-#ifdef FACTOR_DEBUG
-	print_obj(symbol); nl(); fflush(stdout);
-#endif
-
 	return (void *)undefined_symbol;
 }
 

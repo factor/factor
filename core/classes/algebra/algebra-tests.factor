@@ -305,7 +305,16 @@ SINGLETON: sc
 
 [ sa ] [ sa { sa sb sc } min-class ] unit-test
 
+[ f ] [ sa sb classes-intersect? ] unit-test
+
 [ +lt+ ] [ integer sequence class<=> ] unit-test
 [ +lt+ ] [ sequence object class<=> ] unit-test
 [ +gt+ ] [ object sequence class<=> ] unit-test
 [ +eq+ ] [ integer integer class<=> ] unit-test
+
+! Limitations:
+
+! UNION: u1 sa sb ;
+! UNION: u2 sc ;
+
+! [ f ] [ u1 u2 classes-intersect? ] unit-test

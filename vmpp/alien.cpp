@@ -183,7 +183,8 @@ void box_medium_struct(CELL x1, CELL x2, CELL x3, CELL x4, CELL size)
 /* open a native library and push a handle */
 void primitive_dlopen(void)
 {
-	gc_root<F_BYTE_ARRAY> path(tag_object(string_to_native_alien(untag_string(dpop()))));
+	gc_root<F_BYTE_ARRAY> path(dpop());
+	path.untag_check();
 	gc_root<F_DLL> dll(allot<F_DLL>(sizeof(F_DLL)));
 	dll->path = path.value();
 	ffi_dlopen(dll.untagged());
@@ -194,7 +195,11 @@ void primitive_dlopen(void)
 void primitive_dlsym(void)
 {
 	gc_root<F_OBJECT> dll(dpop());
-	F_SYMBOL *sym = unbox_symbol_string();
+	gc_root<F_BYTE_ARRAY> name(dpop());
+	dll.untag_check();
+	name.untag_check();
+
+	F_CHAR *sym = (F_CHAR *)(name.untagged() + 1);
 
 	if(dll.value() == F)
 		box_alien(ffi_dlsym(NULL,sym));
