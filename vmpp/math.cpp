@@ -82,7 +82,7 @@ void primitive_fixnum_divmod(void)
 	else
 	{
 		put(ds - CELLS,tag_fixnum(untag_fixnum_fast(x) / untag_fixnum_fast(y)));
-		put(ds,x % y);
+		put(ds,(F_FIXNUM)x % (F_FIXNUM)y);
 	}
 }
 
