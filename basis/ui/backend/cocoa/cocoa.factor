@@ -51,14 +51,14 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
 PRIVATE>
 
 M: cocoa-ui-backend (make-pixel-format)
-    >NSOpenGLPFA-int-array
+    nip >NSOpenGLPFA-int-array
     NSOpenGLPixelFormat -> alloc swap -> initWithAttributes: ;
 
 M: cocoa-ui-backend (free-pixel-format)
-    -> release ;
+    handle>> -> release ;
 
 M: cocoa-ui-backend (pixel-format-attribute)
-    >NSOpenGLPFA
+    [ handle>> ] [ >NSOpenGLPFA ] bi*
     [ drop f ]
     [ first 0 <int> [ swap 0 -> getValues:forAttribute:forVirtualScreen: ] keep *int ]
     if-empty ;

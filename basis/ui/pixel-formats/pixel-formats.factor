@@ -43,23 +43,23 @@ TUPLE: buffer-level < pixel-format-attribute ;
 TUPLE: sample-buffers < pixel-format-attribute ;
 TUPLE: samples < pixel-format-attribute ;
 
-HOOK: (make-pixel-format) ui-backend ( attributes -- pixel-format-handle )
-HOOK: (free-pixel-format) ui-backend ( pixel-format-handle -- )
-HOOK: (pixel-format-attribute) ui-backend ( pixel-format-handle attribute-name -- value )
+HOOK: (make-pixel-format) ui-backend ( world attributes -- pixel-format-handle )
+HOOK: (free-pixel-format) ui-backend ( pixel-format -- )
+HOOK: (pixel-format-attribute) ui-backend ( pixel-format attribute-name -- value )
 
-ERROR: invalid-pixel-format-attributes attributes ;
+ERROR: invalid-pixel-format-attributes world attributes ;
 
-TUPLE: pixel-format handle ;
+TUPLE: pixel-format world handle ;
 
-: <pixel-format> ( attributes -- pixel-format )
-    dup (make-pixel-format)
+: <pixel-format> ( world attributes -- pixel-format )
+    2dup (make-pixel-format)
     [ nip pixel-format boa ] [ invalid-pixel-format-attributes ] if* ;
 
 M: pixel-format dispose
-    [ [ (free-pixel-format) ] when* f ] change-handle drop ;
+    [ (free-pixel-format) ] [ f >>handle drop ] bi ;
 
 : pixel-format-attribute ( pixel-format attribute-name -- value )
-    [ handle>> ] dip (pixel-format-attribute) ;
+    (pixel-format-attribute) ;
 
 <PRIVATE
 
