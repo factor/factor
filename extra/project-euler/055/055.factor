@@ -61,7 +61,7 @@ IN: project-euler.055
 PRIVATE>
 
 : euler055 ( -- answer )
-    10000 [ lychrel? ] count ;
+    10000 iota [ lychrel? ] count ;
 
 ! [ euler055 ] 100 ave-time
 ! 478 ms ave run time - 30.63 SD (100 trials)
