@@ -1,0 +1,1 @@
+PLAF_DLL_OBJS += vmpppp/cpu-arm.o

@@ -1,4 +1,5 @@
 CC = gcc
+CPP = g++
 AR = ar
 LD = ld
 
@@ -9,7 +10,7 @@ VERSION = 0.92
 
 BUNDLE = Factor.app
 LIBPATH = -L/usr/X11R6/lib
-CFLAGS = -Wall -Werror
+CFLAGS = -Wall
 
 ifdef DEBUG
 	CFLAGS += -g -DFACTOR_DEBUG
@@ -26,38 +27,40 @@ ifdef CONFIG
 endif
 
 DLL_OBJS = $(PLAF_DLL_OBJS) \
-	vm/alien.o \
-	vm/arrays.o \
-	vm/bignum.o \
-	vm/booleans.o \
-	vm/byte_arrays.o \
-	vm/callstack.o \
-	vm/code_block.o \
-	vm/code_gc.o \
-	vm/code_heap.o \
-	vm/data_gc.o \
-	vm/data_heap.o \
-	vm/debug.o \
-	vm/dispatch.o \
-	vm/errors.o \
-	vm/factor.o \
-	vm/image.o \
-	vm/inline_cache.o \
-	vm/io.o \
-	vm/jit.o \
-	vm/math.o \
-	vm/primitives.o \
-	vm/profiler.o \
-	vm/quotations.o \
-	vm/run.o \
-	vm/strings.o \
-	vm/tuples.o \
-	vm/utilities.o \
-	vm/words.o
+	vmpp/alien.o \
+	vmpp/arrays.o \
+	vmpp/bignum.o \
+	vmpp/booleans.o \
+	vmpp/byte_arrays.o \
+	vmpp/callstack.o \
+	vmpp/code_block.o \
+	vmpp/code_gc.o \
+	vmpp/code_heap.o \
+	vmpp/data_gc.o \
+	vmpp/data_heap.o \
+	vmpp/debug.o \
+	vmpp/dispatch.o \
+	vmpp/errors.o \
+	vmpp/factor.o \
+	vmpp/image.o \
+	vmpp/inline_cache.o \
+	vmpp/io.o \
+	vmpp/jit.o \
+	vmpp/local_roots.o \
+	vmpp/math.o \
+	vmpp/primitives.o \
+	vmpp/profiler.o \
+	vmpp/quotations.o \
+	vmpp/run.o \
+	vmpp/strings.o \
+	vmpp/tuples.o \
+	vmpp/utilities.o \
+	vmpp/words.o \
+	vmpp/write_barrier.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
-TEST_OBJS = vm/ffi_test.o
+TEST_OBJS = vmpp/ffi_test.o
 
 default:
 	$(MAKE) `./build-support/factor.sh make-target`
@@ -92,60 +95,60 @@ help:
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
 openbsd-x86-32:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.openbsd.x86.32
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.openbsd.x86.32
 
 openbsd-x86-64:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.openbsd.x86.64
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.openbsd.x86.64
 
 freebsd-x86-32:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.freebsd.x86.32
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.freebsd.x86.32
 
 freebsd-x86-64:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.freebsd.x86.64
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.freebsd.x86.64
 
 netbsd-x86-32:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.netbsd.x86.32
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.netbsd.x86.32
 
 netbsd-x86-64:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.netbsd.x86.64
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.netbsd.x86.64
 
 macosx-ppc:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) macosx.app CONFIG=vm/Config.macosx.ppc
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) macosx.app CONFIG=vmpp/Config.macosx.ppc
 
 macosx-x86-32:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) macosx.app CONFIG=vm/Config.macosx.x86.32
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) macosx.app CONFIG=vmpp/Config.macosx.x86.32
 
 macosx-x86-64:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) macosx.app CONFIG=vm/Config.macosx.x86.64
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) macosx.app CONFIG=vmpp/Config.macosx.x86.64
 
 linux-x86-32:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.linux.x86.32
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.linux.x86.32
 
 linux-x86-64:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.linux.x86.64
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.linux.x86.64
 
 linux-ppc:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.linux.ppc
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.linux.ppc
 
 linux-arm:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.linux.arm
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.linux.arm
 
 solaris-x86-32:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.solaris.x86.32
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.solaris.x86.32
 
 solaris-x86-64:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.solaris.x86.64
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.solaris.x86.64
 
 winnt-x86-32:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.windows.nt.x86.32
-	$(MAKE) $(CONSOLE_EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.windows.nt.x86.32
+	$(MAKE) $(CONSOLE_EXECUTABLE) CONFIG=vmpp/Config.windows.nt.x86.32
 
 winnt-x86-64:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.windows.nt.x86.64
-	$(MAKE) $(CONSOLE_EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.windows.nt.x86.64
+	$(MAKE) $(CONSOLE_EXECUTABLE) CONFIG=vmpp/Config.windows.nt.x86.64
 
 wince-arm:
-	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vm/Config.windows.ce.arm
+	$(MAKE) $(EXECUTABLE) $(TEST_LIBRARY) CONFIG=vmpp/Config.windows.ce.arm
 
 macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
@@ -161,34 +164,39 @@ macosx.app: factor
 
 $(EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
-	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+	$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
 $(CONSOLE_EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
-	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+	$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION) $(EXE_OBJS)
 
-$(TEST_LIBRARY): vm/ffi_test.o
+$(TEST_LIBRARY): vmpp/ffi_test.o
 	$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(SHARED_DLL_EXTENSION) $(TEST_OBJS)
 
 clean:
-	rm -f vm/*.o
+	rm -f vmpp/*.o
 	rm -f factor*.dll libfactor.{a,so,dylib} libfactor-ffi-test.{a,so,dylib} Factor.app/Contents/Frameworks/libfactor.dylib
 
-vm/resources.o:
-	$(WINDRES) vm/factor.rs vm/resources.o
+vmpp/resources.o:
+	$(WINDRES) vmpp/factor.rs vmpp/resources.o
 
-vm/ffi_test.o: vm/ffi_test.c
+vmpp/ffi_test.o: vmpp/ffi_test.c
 	$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
 
+.cpp.o:
+	$(CPP) -c $(CFLAGS) -o $@ $<
+
 .S.o:
 	$(CC) -x assembler-with-cpp -c $(CFLAGS) -o $@ $<
 
-.m.o:
-	$(CC) -c $(CFLAGS) -o $@ $<
+.mm.o:
+	$(CPP) -c $(CFLAGS) -o $@ $<
 
 .PHONY: factor
+
+.SUFFIXES: .mm

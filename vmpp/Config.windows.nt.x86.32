@@ -1,0 +1,4 @@
+DLL_PATH=http://factorcode.org/dlls
+WINDRES=windres
+include vmpp/Config.windows.nt
+include vmpp/Config.x86.32

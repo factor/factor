@@ -1,0 +1,2 @@
+include vmpp/Config.openbsd
+include vmpp/Config.x86.32
