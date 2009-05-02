@@ -1,15 +1,15 @@
 #define FREE_LIST_COUNT 16
 #define BLOCK_SIZE_INCREMENT 32
 
-typedef struct {
+struct F_HEAP_FREE_LIST {
 	F_FREE_BLOCK *small_blocks[FREE_LIST_COUNT];
 	F_FREE_BLOCK *large_blocks;
-} F_HEAP_FREE_LIST;
+};
 
-typedef struct {
+struct F_HEAP {
 	F_SEGMENT *segment;
 	F_HEAP_FREE_LIST free;
-} F_HEAP;
+};
 
 typedef void (*HEAP_ITERATOR)(F_BLOCK *compiled);
 

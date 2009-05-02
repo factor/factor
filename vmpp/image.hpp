@@ -1,7 +1,7 @@
 #define IMAGE_MAGIC 0x0f0e0d0c
 #define IMAGE_VERSION 4
 
-typedef struct {
+struct F_HEADER {
 	CELL magic;
 	CELL version;
 	/* all pointers in the image file are relocated from
@@ -23,9 +23,9 @@ typedef struct {
 	CELL bignum_neg_one;
 	/* Initial user environment */
 	CELL userenv[USER_ENV];
-} F_HEADER;
+};
 
-typedef struct {
+struct F_PARAMETERS {
 	const F_CHAR *image_path;
 	const F_CHAR *executable_path;
 	CELL ds_size, rs_size;
@@ -36,7 +36,7 @@ typedef struct {
 	bool console;
 	bool stack_traces;
 	CELL max_pic_size;
-} F_PARAMETERS;
+};
 
 void load_image(F_PARAMETERS *p);
 bool save_image(const F_CHAR *file);
