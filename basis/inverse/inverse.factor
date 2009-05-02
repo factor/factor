@@ -1,12 +1,12 @@
-! Copyright (C) 2007, 2008 Daniel Ehrenberg.
+! Copyright (C) 2007, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel words summary slots quotations
 sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
-sequences.private combinators mirrors splitting
-combinators.short-circuit fry words.symbol generalizations ;
-RENAME: _ fry => __
+sequences.private combinators mirrors splitting combinators.smart
+combinators.short-circuit fry words.symbol generalizations
+classes ;
 IN: inverse
 
 ERROR: fail ;
@@ -14,7 +14,7 @@ M: fail summary drop "Matching failed" ;
 
 : assure ( ? -- ) [ fail ] unless ; inline
 
-: =/fail ( obj1 obj2 -- ) = assure ;
+: =/fail ( obj1 obj2 -- ) = assure ; inline
 
 ! Inverse of a quotation
 
@@ -143,14 +143,19 @@ MACRO: undo ( quot -- ) [undo] ;
 \ pick [ [ pick ] dip =/fail ] define-inverse
 \ tuck [ swapd [ =/fail ] keep ] define-inverse
 
+\ bi@ 1 [ [undo] '[ _ bi@ ] ] define-pop-inverse
+\ tri@ 1 [ [undo] '[ _ tri@ ] ] define-pop-inverse
+\ bi* 2 [ [ [undo] ] bi@ '[ _ _ bi* ] ] define-pop-inverse
+\ tri* 3 [ [ [undo] ] tri@ '[ _ _ _ tri* ] ] define-pop-inverse
+
 \ not define-involution
-\ >boolean [ { t f } memq? assure ] define-inverse
+\ >boolean [ dup { t f } memq? assure ] define-inverse
 
 \ tuple>array \ >tuple define-dual
 \ reverse define-involution
 
-\ undo 1 [ [ call ] curry ] define-pop-inverse
-\ map 1 [ [undo] [ over sequence? assure map ] curry ] define-pop-inverse
+\ undo 1 [ ] define-pop-inverse
+\ map 1 [ [undo] '[ dup sequence? assure _ map ] ] define-pop-inverse
 
 \ exp \ log define-dual
 \ sq \ sqrt define-dual
@@ -173,15 +178,12 @@ ERROR: missing-literal ;
     2curry
 ] define-pop-inverse
 
-DEFER: _
-\ _ [ drop ] define-inverse
+DEFER: __
+\ __ [ drop ] define-inverse
 
 : both ( object object -- object )
     dupd assert= ;
 \ both [ dup ] define-inverse
-
-: assure-length ( seq length -- seq )
-    over length =/fail ;
 
 {
     { >array array? }
@@ -194,14 +196,23 @@ DEFER: _
     { >string string? }
     { >sbuf sbuf? }
     { >quotation quotation? }
-} [ \ dup swap \ assure 3array >quotation define-inverse ] assoc-each
+} [ '[ dup _ execute assure ] define-inverse ] assoc-each
 
-! These actually work on all seqs--should they?
-\ 1array [ 1 assure-length first ] define-inverse
-\ 2array [ 2 assure-length first2 ] define-inverse
-\ 3array [ 3 assure-length first3 ] define-inverse
-\ 4array [ 4 assure-length first4 ] define-inverse
-\ narray 1 [ [ firstn ] curry ] define-pop-inverse
+: assure-length ( seq length -- )
+    swap length =/fail ; inline
+
+: assure-array ( array -- array )
+    dup array? assure ; inline
+
+: undo-narray ( array n -- ... )
+    [ assure-array ] dip
+    [ assure-length ] [ firstn ] 2bi ; inline
+
+\ 1array [ 1 undo-narray ] define-inverse
+\ 2array [ 2 undo-narray ] define-inverse
+\ 3array [ 3 undo-narray ] define-inverse
+\ 4array [ 4 undo-narray ] define-inverse
+\ narray 1 [ '[ _ undo-narray ] ] define-pop-inverse
 
 \ first [ 1array ] define-inverse
 \ first2 [ 2array ] define-inverse
@@ -213,6 +224,12 @@ DEFER: _
 
 \ append 1 [ [ ?tail assure ] curry ] define-pop-inverse
 \ prepend 1 [ [ ?head assure ] curry ] define-pop-inverse
+
+: assure-same-class ( obj1 obj2 -- )
+    [ class ] bi@ = assure ; inline
+
+\ output>sequence 2 [ [undo] '[ dup _ assure-same-class _ input<sequence ] ] define-pop-inverse
+\ input<sequence 1 [ [undo] '[ _ { } output>sequence ] ] define-pop-inverse
 
 ! Constructor inverse
 : deconstruct-pred ( class -- quot )
@@ -245,7 +262,7 @@ DEFER: _
     ] recover ; inline
 
 : true-out ( quot effect -- quot' )
-    out>> '[ @ __ ndrop t ] ;
+    out>> '[ @ _ ndrop t ] ;
 
 : false-recover ( effect -- quot )
     in>> [ ndrop f ] curry [ recover-fail ] curry ;
