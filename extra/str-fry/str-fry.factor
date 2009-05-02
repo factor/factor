@@ -1,7 +1,7 @@
-USING: fry.private kernel macros math sequences splitting strings.parser ;
+USING: combinators effects kernel math sequences splitting
+strings.parser ;
 IN: str-fry
 : str-fry ( str -- quot ) "_" split
-    [ length 1 - [ncurry] [ call ] append ]
-    [ unclip [ [ rot glue ] reduce ] 2curry ] bi
-    prefix ;
+    [ unclip [ [ rot glue ] reduce ] 2curry ]
+    [ length 1 - 1 <effect> [ call-effect ] 2curry ] bi ;
 SYNTAX: I" parse-string rest str-fry over push-all ;
