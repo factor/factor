@@ -513,4 +513,4 @@ tuple
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number
-"build" "kernel" create build 1+ [ ] curry (( -- n )) define-declared
+"build" "kernel" create build 1 + [ ] curry (( -- n )) define-declared
