@@ -21,9 +21,9 @@ extern CELL bignum_zero;
 extern CELL bignum_pos_one;
 extern CELL bignum_neg_one;
 
-DEFINE_UNTAG(F_ARRAY,BIGNUM_TYPE,bignum);
+DEFINE_UNTAG(F_BIGNUM,BIGNUM_TYPE,bignum);
 
-INLINE CELL tag_bignum(F_ARRAY* bignum)
+INLINE CELL tag_bignum(F_BIGNUM* bignum)
 {
 	return RETAG(bignum,BIGNUM_TYPE);
 }
@@ -106,7 +106,7 @@ INLINE F_FIXNUM float_to_fixnum(CELL tagged)
 	return (F_FIXNUM)untag_float_fast(tagged);
 }
 
-INLINE F_ARRAY *float_to_bignum(CELL tagged)
+INLINE F_BIGNUM *float_to_bignum(CELL tagged)
 {
 	return double_to_bignum(untag_float_fast(tagged));
 }

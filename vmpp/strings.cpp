@@ -37,7 +37,7 @@ void set_string_nth_slow(F_STRING* string, CELL index, CELL ch)
 		if the most significant bit of a
 		character is set. Initially all of
 		the bits are clear. */
-		aux = allot_byte_array_internal(
+		aux = allot_array_internal<F_BYTE_ARRAY>(
 			untag_fixnum_fast(string->length)
 			* sizeof(u16));
 		UNREGISTER_UNTAGGED(F_STRING,string);

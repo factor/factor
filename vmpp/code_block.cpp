@@ -14,7 +14,7 @@ void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
 		CELL index = stack_traces_p() ? 1 : 0;
 
 		F_REL *rel = (F_REL *)(relocation + 1);
-		F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
+		F_REL *rel_end = (F_REL *)((char *)rel + array_capacity(relocation));
 
 		while(rel < rel_end)
 		{
