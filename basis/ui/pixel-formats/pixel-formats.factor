@@ -11,7 +11,6 @@ SYMBOLS:
     windowed
     accelerated
     software-rendered
-    robust
     backing-store
     multisampled
     supersampled 
