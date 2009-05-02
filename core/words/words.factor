@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions graphs assocs kernel
-kernel.private slots.private math namespaces sequences strings
-vectors sbufs quotations assocs hashtables sorting words.private
-vocabs math.order sets ;
+kernel.private kernel.private slots.private math namespaces sequences
+strings vectors sbufs quotations assocs hashtables sorting vocabs
+math.order sets ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -154,8 +154,16 @@ M: word reset-word
 : reset-generic ( word -- )
     [ subwords forget-all ]
     [ reset-word ]
-    [ { "methods" "combination" "default-method" } reset-props ]
-    tri ;
+    [
+        f >>direct-entry-def
+        {
+            "methods"
+            "combination"
+            "default-method"
+            "engines"
+            "decision-tree"
+        } reset-props
+    ] tri ;
 
 : gensym ( -- word )
     "( gensym )" f <word> ;

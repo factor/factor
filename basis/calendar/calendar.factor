@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes.tuple combinators combinators.short-circuit
-    kernel locals math math.functions math.order namespaces sequences strings
-    summary system threads vocabs.loader ;
+USING: accessors arrays classes.tuple combinators
+combinators.short-circuit kernel locals math math.functions
+math.order sequences summary system threads vocabs.loader ;
 IN: calendar
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
@@ -94,26 +94,50 @@ CONSTANT: day-abbreviations3
 :: julian-day-number ( year month day -- n )
     #! Returns a composite date number
     #! Not valid before year -4800
-    [let* | a [ 14 month - 12 /i ]
-            y [ year 4800 + a - ]
-            m [ month 12 a * + 3 - ] |
-        day 153 m * 2 + 5 /i + 365 y * +
-        y 4 /i + y 100 /i - y 400 /i + 32045 -
-    ] ;
+    14 month - 12 /i :> a
+    year 4800 + a - :> y
+    month 12 a * + 3 - :> m
+
+    day 153 m * 2 + 5 /i + 365 y * +
+    y 4 /i + y 100 /i - y 400 /i + 32045 - ;
 
 :: julian-day-number>date ( n -- year month day )
     #! Inverse of julian-day-number
-    [let* | a [ n 32044 + ]
-            b [ 4 a * 3 + 146097 /i ]
-            c [ a 146097 b * 4 /i - ]
-            d [ 4 c * 3 + 1461 /i ]
-            e [ c 1461 d * 4 /i - ]
-            m [ 5 e * 2 + 153 /i ] |
-        100 b * d + 4800 -
-        m 10 /i + m 3 +
-        12 m 10 /i * -
-        e 153 m * 2 + 5 /i - 1+
-    ] ;
+    n 32044 + :> a
+    4 a * 3 + 146097 /i :> b
+    a 146097 b * 4 /i - :> c
+    4 c * 3 + 1461 /i :> d
+    c 1461 d * 4 /i - :> e
+    5 e * 2 + 153 /i :> m
+
+    100 b * d + 4800 -
+    m 10 /i + m 3 +
+    12 m 10 /i * -
+    e 153 m * 2 + 5 /i - 1+ ;
+
+GENERIC: easter ( obj -- obj' )
+
+:: easter-month-day ( year -- month day )
+    year 19 mod :> a
+    year 100 /mod :> c :> b
+    b 4 /mod :> e :> d
+    b 8 + 25 /i :> f
+    b f - 1 + 3 /i :> g
+    19 a * b + d - g - 15 + 30 mod :> h
+    c 4 /mod :> k :> i
+    32 2 e * + 2 i * + h - k - 7 mod :> l
+    a 11 h * + 22 l * + 451 /i :> m
+
+    h l + 7 m * - 114 + 31 /mod 1 + :> day :> month
+    month day ;
+
+M: integer easter ( year -- timestamp )
+    dup easter-month-day <date> ;
+
+M: timestamp easter ( timestamp -- timestamp )
+    clone
+    dup year>> easter-month-day
+    swapd >>day swap >>month ;
 
 : >date< ( timestamp -- year month day )
     [ year>> ] [ month>> ] [ day>> ] tri ;

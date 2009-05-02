@@ -542,12 +542,46 @@ C-STRUCT: DEV_BROADCAST_HDR
     { "DWORD" "dbch_size" }
     { "DWORD" "dbch_devicetype" }
     { "DWORD" "dbch_reserved" } ;
+
 C-STRUCT: DEV_BROADCAST_DEVICEW
     { "DWORD" "dbcc_size" }
     { "DWORD" "dbcc_devicetype" }
     { "DWORD" "dbcc_reserved" }
     { "GUID"  "dbcc_classguid" }
-    { "WCHAR[1]" "dbcc_name" } ;
+    { { "WCHAR" 1 } "dbcc_name" } ;
+
+CONSTANT: CCHDEVICENAME 32
+
+C-STRUCT: MONITORINFOEX
+    { "DWORD" "cbSize" }
+    { "RECT"  "rcMonitor" }
+    { "RECT"  "rcWork" }
+    { "DWORD" "dwFlags" }
+    { { "TCHAR" CCHDEVICENAME } "szDevice" } ;
+
+TYPEDEF: MONITORINFOEX* LPMONITORINFOEX
+TYPEDEF: MONITORINFOEX* LPMONITORINFO
+
+CONSTANT: MONITOR_DEFAULTTONULL 0
+CONSTANT: MONITOR_DEFAULTTOPRIMARY 1
+CONSTANT: MONITOR_DEFAULTTONEAREST 2
+CONSTANT: MONITORINFOF_PRIMARY 1
+CONSTANT: SWP_NOSIZE 1
+CONSTANT: SWP_NOMOVE 2
+CONSTANT: SWP_NOZORDER 4
+CONSTANT: SWP_NOREDRAW 8
+CONSTANT: SWP_NOACTIVATE 16
+CONSTANT: SWP_FRAMECHANGED 32
+CONSTANT: SWP_SHOWWINDOW 64
+CONSTANT: SWP_HIDEWINDOW 128
+CONSTANT: SWP_NOCOPYBITS 256
+CONSTANT: SWP_NOOWNERZORDER 512
+CONSTANT: SWP_NOSENDCHANGING 1024
+CONSTANT: SWP_DRAWFRAME SWP_FRAMECHANGED
+CONSTANT: SWP_NOREPOSITION SWP_NOOWNERZORDER
+CONSTANT: SWP_DEFERERASE 8192
+CONSTANT: SWP_ASYNCWINDOWPOS 16384
+
 
 LIBRARY: user32
 
@@ -910,7 +944,10 @@ ALIAS: GetMessage GetMessageW
 ! FUNCTION: GetMessagePos
 ! FUNCTION: GetMessageTime
 ! FUNCTION: GetMonitorInfoA
-! FUNCTION: GetMonitorInfoW
+
+FUNCTION: BOOL GetMonitorInfoW ( HMONITOR hMonitor, LPMONITORINFO lpmi ) ;
+ALIAS: GetMonitorInfo GetMonitorInfoW
+
 ! FUNCTION: GetMouseMovePointsEx
 ! FUNCTION: GetNextDlgGroupItem
 ! FUNCTION: GetNextDlgTabItem
@@ -961,6 +998,8 @@ FUNCTION: HWND GetWindow ( HWND hWnd, UINT uCmd ) ;
 ! FUNCTION: GetWindowInfo
 ! FUNCTION: GetWindowLongA
 ! FUNCTION: GetWindowLongW
+FUNCTION: LONG_PTR GetWindowLongW ( HANDLE hWnd, int index ) ;
+ALIAS: GetWindowLong GetWindowLongW
 ! FUNCTION: GetWindowModuleFileName
 ! FUNCTION: GetWindowModuleFileNameA
 ! FUNCTION: GetWindowModuleFileNameW
@@ -1127,7 +1166,7 @@ ALIAS: MessageBoxEx MessageBoxExW
 ! FUNCTION: ModifyMenuW
 ! FUNCTION: MonitorFromPoint
 ! FUNCTION: MonitorFromRect
-! FUNCTION: MonitorFromWindow
+FUNCTION: HMONITOR MonitorFromWindow ( HWND hWnd, DWORD dwFlags ) ;
 ! FUNCTION: mouse_event
 
 
@@ -1303,12 +1342,14 @@ FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType ) ;
 ! FUNCTION: SetWindowContextHelpId
 ! FUNCTION: SetWindowLongA
 ! FUNCTION: SetWindowLongW
+FUNCTION: LONG_PTR SetWindowLongW ( HANDLE hWnd, int index, LONG_PTR dwNewLong ) ;
+ALIAS: SetWindowLong SetWindowLongW
 ! FUNCTION: SetWindowPlacement
 FUNCTION: BOOL SetWindowPos ( HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags ) ;
 
 : HWND_BOTTOM ( -- alien ) 1 <alien> ;
 : HWND_NOTOPMOST ( -- alien ) -2 <alien> ;
-: HWND_TOP ( -- alien ) 0 <alien> ;
+CONSTANT: HWND_TOP f
 : HWND_TOPMOST ( -- alien ) -1 <alien> ;
 
 ! FUNCTION: SetWindowRgn

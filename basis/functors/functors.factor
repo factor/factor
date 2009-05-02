@@ -5,7 +5,7 @@ words interpolate namespaces sequences io.streams.string fry
 classes.mixin effects lexer parser classes.tuple.parser
 effects.parser locals.types locals.parser generic.parser
 locals.rewrite.closures vocabs.parser classes.parser
-arrays accessors ;
+arrays accessors words.symbol ;
 IN: functors
 
 ! This is a hack
@@ -18,6 +18,8 @@ IN: functors
 
 : define-declared* ( word def effect -- ) pick set-word define-declared ;
 
+TUPLE: fake-call-next-method ;
+
 TUPLE: fake-quotation seq ;
 
 GENERIC: >fake-quotations ( quot -- fake )
@@ -29,17 +31,25 @@ M: array >fake-quotations [ >fake-quotations ] { } map-as ;
 
 M: object >fake-quotations ;
 
-GENERIC: fake-quotations> ( fake -- quot )
+GENERIC: (fake-quotations>) ( fake -- )
 
-M: fake-quotation fake-quotations>
-    seq>> [ fake-quotations> ] [ ] map-as ;
+: fake-quotations> ( fake -- quot )
+    [ (fake-quotations>) ] [ ] make ;
 
-M: array fake-quotations> [ fake-quotations> ] map ;
+M: fake-quotation (fake-quotations>)
+    [ seq>> [ (fake-quotations>) ] each ] [ ] make , ;
 
-M: object fake-quotations> ;
+M: array (fake-quotations>)
+    [ [ (fake-quotations>) ] each ] { } make , ;
+
+M: fake-call-next-method (fake-quotations>)
+    drop method-body get literalize , \ (call-next-method) , ;
+
+M: object (fake-quotations>) , ;
 
 : parse-definition* ( accum -- accum )
-    parse-definition >fake-quotations parsed \ fake-quotations> parsed ;
+    parse-definition >fake-quotations parsed
+    [ fake-quotations> first ] over push-all ;
 
 : parse-declared* ( accum -- accum )
     complete-effect
@@ -64,7 +74,7 @@ SYNTAX: `TUPLE:
 SYNTAX: `M:
     scan-param parsed
     scan-param parsed
-    \ create-method-in parsed
+    [ create-method-in dup method-body set ] over push-all
     parse-definition*
     \ define* parsed ;
 
@@ -80,6 +90,10 @@ SYNTAX: `:
     parse-declared*
     \ define-declared* parsed ;
 
+SYNTAX: `SYMBOL:
+    scan-param parsed
+    \ define-symbol parsed ;
+
 SYNTAX: `SYNTAX:
     scan-param parsed
     parse-definition*
@@ -91,6 +105,8 @@ SYNTAX: `INSTANCE:
     \ add-mixin-instance parsed ;
 
 SYNTAX: `inline [ word make-inline ] over push-all ;
+
+SYNTAX: `call-next-method T{ fake-call-next-method } parsed ;
 
 : (INTERPOLATE) ( accum quot -- accum )
     [ scan interpolate-locals ] dip
@@ -116,7 +132,9 @@ DEFER: ;FUNCTOR delimiter
         { ":" POSTPONE: `: }
         { "INSTANCE:" POSTPONE: `INSTANCE: }
         { "SYNTAX:" POSTPONE: `SYNTAX: }
+        { "SYMBOL:" POSTPONE: `SYMBOL: }
         { "inline" POSTPONE: `inline }
+        { "call-next-method" POSTPONE: `call-next-method }
     } ;
 
 : push-functor-words ( -- )

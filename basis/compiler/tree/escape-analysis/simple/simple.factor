@@ -47,9 +47,6 @@ M: #push escape-analysis*
     [ record-unknown-allocation ]
     if ;
 
-: record-complex-allocation ( #call -- )
-    [ in-d>> ] [ out-d>> first ] bi record-allocation ;
-
 : slot-offset ( #call -- n/f )
     dup in-d>>
     [ first node-value-info class>> ]
@@ -71,7 +68,6 @@ M: #push escape-analysis*
 M: #call escape-analysis*
     dup word>> {
         { \ <tuple-boa> [ record-tuple-allocation ] }
-        { \ <complex> [ record-complex-allocation ] }
         { \ slot [ record-slot-call ] }
         [ drop record-unknown-allocation ]
     } case ;

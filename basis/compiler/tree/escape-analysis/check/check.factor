@@ -12,7 +12,6 @@ M: #push run-escape-analysis*
 
 M: #call run-escape-analysis*
     {
-        { [ dup word>> \ <complex> eq? ] [ t ] }
         { [ dup immutable-tuple-boa? ] [ t ] }
         [ f ] 
     } cond nip ;

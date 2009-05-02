@@ -414,7 +414,7 @@ void factorbug(void)
 		if(strcmp(cmd,"d") == 0)
 		{
 			CELL addr = read_cell_hex();
-			scanf(" ");
+			if(scanf(" ") < 0) break;
 			CELL count = read_cell_hex();
 			dump_memory(addr,addr+count);
 		}

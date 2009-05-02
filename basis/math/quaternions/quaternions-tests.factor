@@ -24,3 +24,7 @@ math.constants ;
 [ t ] [ qk q>v v>q qk = ] unit-test
 [ t ] [ 1 c>q q1 = ] unit-test
 [ t ] [ C{ 0 1 } c>q qi = ] unit-test
+[ t ] [ qi qi q+ qi 2 q*n = ] unit-test
+[ t ] [ qi qi q- q0 = ] unit-test
+[ t ] [ qi qj q+ qj qi q+ = ] unit-test
+[ t ] [ qi qj q- qj qi q- -1 q*n = ] unit-test

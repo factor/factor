@@ -1,6 +1,7 @@
 USING: http help.markup help.syntax io.pathnames io.streams.string
 io.encodings.8-bit io.encodings.binary kernel strings urls
-urls.encoding byte-arrays strings assocs sequences destructors ;
+urls.encoding byte-arrays strings assocs sequences destructors
+http.client.post-data.private ;
 IN: http.client
 
 HELP: download-failed
@@ -71,7 +72,7 @@ ARTICLE: "http.client.get" "GET requests with the HTTP client"
 { $subsection with-http-get }
 { $subsection with-http-request } ;
 
-ARTICLE: "http.client.post-data" "HTTP client submission data"
+ARTICLE: "http.client.post-data" "HTTP client post data"
 "HTTP POST and PUT request words take a post data parameter, which can be one of the following:"
 { $list
     { "a " { $link byte-array } ": the data is sent the server without further encoding" }
@@ -85,7 +86,9 @@ ARTICLE: "http.client.post-data" "HTTP client submission data"
 { $code
   "\"my-large-post-request.txt\" ascii <file-reader>"
   "[ URL\" http://www.my-company.com/web-service\" http-post ] with-disposal"
-} ;
+}
+"An internal word used to convert objects to " { $link post-data } " instances:"
+{ $subsection >post-data } ;
 
 ARTICLE: "http.client.post" "POST requests with the HTTP client"
 "Basic usage involves passing post data and a " { $link url } ", and getting a " { $link response } " and data back:"
