@@ -124,7 +124,7 @@ bool stack_to_array(CELL bottom, CELL top)
 		return false;
 	else
 	{
-		F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth / CELLS);
+		F_ARRAY *a = allot_array_internal<F_ARRAY>(depth / CELLS);
 		memcpy(a + 1,(void*)bottom,depth);
 		dpush(tag_array(a));
 		return true;

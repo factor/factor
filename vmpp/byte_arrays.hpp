@@ -1,28 +1,16 @@
 DEFINE_UNTAG(F_BYTE_ARRAY,BYTE_ARRAY_TYPE,byte_array)
 
-INLINE CELL byte_array_capacity(F_BYTE_ARRAY *array)
-{
-	return untag_fixnum_fast(array->capacity);
-}
-
-INLINE CELL byte_array_size(CELL size)
-{
-	return sizeof(F_BYTE_ARRAY) + size;
-}
-
 F_BYTE_ARRAY *allot_byte_array(CELL size);
-F_BYTE_ARRAY *allot_byte_array_internal(CELL size);
-F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity);
 
 void primitive_byte_array(void);
 void primitive_uninitialized_byte_array(void);
 void primitive_resize_byte_array(void);
 
 /* Macros to simulate a byte vector in C */
-typedef struct {
+struct F_GROWABLE_BYTE_ARRAY {
 	CELL count;
 	CELL array;
-} F_GROWABLE_BYTE_ARRAY;
+};
 
 INLINE F_GROWABLE_BYTE_ARRAY make_growable_byte_array(void)
 {
@@ -36,5 +24,5 @@ void growable_byte_array_append(F_GROWABLE_BYTE_ARRAY *result, void *elts, CELL 
 
 INLINE void growable_byte_array_trim(F_GROWABLE_BYTE_ARRAY *byte_array)
 {
-	byte_array->array = tag_object(reallot_byte_array(untag_byte_array_fast(byte_array->array),byte_array->count));
+	byte_array->array = tag_object(reallot_array(untag_byte_array_fast(byte_array->array),byte_array->count));
 }

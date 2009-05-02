@@ -50,9 +50,9 @@ F_FASTCALL void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y)
 
 F_FASTCALL void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y)
 {
-	F_ARRAY *bx = fixnum_to_bignum(x);
+	F_BIGNUM *bx = fixnum_to_bignum(x);
 	REGISTER_BIGNUM(bx);
-	F_ARRAY *by = fixnum_to_bignum(y);
+	F_BIGNUM *by = fixnum_to_bignum(y);
 	UNREGISTER_BIGNUM(bx);
 	drepl(tag_bignum(bignum_multiply(bx,by)));
 }
@@ -133,8 +133,8 @@ void primitive_float_to_bignum(void)
 }
 
 #define POP_BIGNUMS(x,y) \
-	bignum_type y = untag_bignum_fast(dpop()); \
-	bignum_type x = untag_bignum_fast(dpop());
+	F_BIGNUM * y = untag_bignum_fast(dpop()); \
+	F_BIGNUM * x = untag_bignum_fast(dpop());
 
 void primitive_bignum_eq(void)
 {
@@ -168,7 +168,7 @@ void primitive_bignum_divint(void)
 
 void primitive_bignum_divmod(void)
 {
-	F_ARRAY *q, *r;
+	F_BIGNUM *q, *r;
 	POP_BIGNUMS(x,y);
 	bignum_divide(x,y,&q,&r);
 	dpush(tag_bignum(q));
@@ -202,7 +202,7 @@ void primitive_bignum_xor(void)
 void primitive_bignum_shift(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());
-        F_ARRAY* x = untag_bignum_fast(dpop());
+        F_BIGNUM* x = untag_bignum_fast(dpop());
 	dpush(tag_bignum(bignum_arithmetic_shift(x,y)));
 }
 
@@ -238,7 +238,7 @@ void primitive_bignum_not(void)
 void primitive_bignum_bitp(void)
 {
 	F_FIXNUM bit = to_fixnum(dpop());
-	F_ARRAY *x = untag_bignum_fast(dpop());
+	F_BIGNUM *x = untag_bignum_fast(dpop());
 	box_boolean(bignum_logbitp(bit,x));
 }
 
@@ -256,8 +256,8 @@ unsigned int bignum_producer(unsigned int digit)
 void primitive_byte_array_to_bignum(void)
 {
 	type_check(BYTE_ARRAY_TYPE,dpeek());
-	CELL n_digits = array_capacity(untag_bignum_fast(dpeek()));
-	bignum_type bignum = digit_stream_to_bignum(
+	CELL n_digits = array_capacity(untag_byte_array_fast(dpeek())) / CELLS;
+	F_BIGNUM * bignum = digit_stream_to_bignum(
 		n_digits,bignum_producer,0x100,0);
 	drepl(tag_bignum(bignum));
 }
@@ -362,9 +362,9 @@ CELL unbox_array_size(void)
 		}
 	case BIGNUM_TYPE:
 		{
-			bignum_type zero = untag_bignum_fast(bignum_zero);
-			bignum_type max = cell_to_bignum(ARRAY_SIZE_MAX);
-			bignum_type n = untag_bignum_fast(dpeek());
+			F_BIGNUM * zero = untag_bignum_fast(bignum_zero);
+			F_BIGNUM * max = cell_to_bignum(ARRAY_SIZE_MAX);
+			F_BIGNUM * n = untag_bignum_fast(dpeek());
 			if(bignum_compare(n,zero) != bignum_comparison_less
 				&& bignum_compare(n,max) == bignum_comparison_less)
 			{

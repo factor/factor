@@ -152,7 +152,7 @@ void init_factor(F_PARAMETERS *p)
 /* May allocate memory */
 void pass_args_to_factor(int argc, F_CHAR **argv)
 {
-	F_ARRAY *args = allot_array(ARRAY_TYPE,argc,F);
+	F_ARRAY *args = allot_array(argc,F);
 	int i;
 
 	for(i = 1; i < argc; i++)

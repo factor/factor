@@ -1,19 +1,10 @@
 #include "master.hpp"
 
-/* the array is full of undefined data, and must be correctly filled before the
-next GC. size is in cells */
-F_ARRAY *allot_array_internal(CELL type, CELL capacity)
-{
-	F_ARRAY *array = (F_ARRAY *)allot_object(type,array_size(capacity));
-	array->capacity = tag_fixnum(capacity);
-	return array;
-}
-
 /* make a new array with an initial element */
-F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill)
+F_ARRAY *allot_array(CELL capacity, CELL fill)
 {
 	REGISTER_ROOT(fill);
-	F_ARRAY* array = allot_array_internal(type, capacity);
+	F_ARRAY* array = allot_array_internal<F_ARRAY>(capacity);
 	UNREGISTER_ROOT(fill);
 	if(fill == 0)
 		memset((void*)AREF(array,0),'\0',capacity * CELLS);
@@ -34,13 +25,13 @@ void primitive_array(void)
 {
 	CELL initial = dpop();
 	CELL size = unbox_array_size();
-	dpush(tag_array(allot_array(ARRAY_TYPE,size,initial)));
+	dpush(tag_array(allot_array(size,initial)));
 }
 
 CELL allot_array_1(CELL obj)
 {
 	REGISTER_ROOT(obj);
-	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,1);
+	F_ARRAY *a = allot_array_internal<F_ARRAY>(1);
 	UNREGISTER_ROOT(obj);
 	set_array_nth(a,0,obj);
 	return tag_array(a);
@@ -50,7 +41,7 @@ CELL allot_array_2(CELL v1, CELL v2)
 {
 	REGISTER_ROOT(v1);
 	REGISTER_ROOT(v2);
-	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,2);
+	F_ARRAY *a = allot_array_internal<F_ARRAY>(2);
 	UNREGISTER_ROOT(v2);
 	UNREGISTER_ROOT(v1);
 	set_array_nth(a,0,v1);
@@ -64,7 +55,7 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 	REGISTER_ROOT(v2);
 	REGISTER_ROOT(v3);
 	REGISTER_ROOT(v4);
-	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,4);
+	F_ARRAY *a = allot_array_internal<F_ARRAY>(4);
 	UNREGISTER_ROOT(v4);
 	UNREGISTER_ROOT(v3);
 	UNREGISTER_ROOT(v2);
@@ -74,40 +65,6 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 	set_array_nth(a,2,v3);
 	set_array_nth(a,3,v4);
 	return tag_array(a);
-}
-
-static bool reallot_array_in_place_p(F_ARRAY *array, CELL capacity)
-{
-	return in_zone(&nursery,(CELL)array) && capacity <= array_capacity(array);
-}
-
-F_ARRAY *reallot_array(F_ARRAY *array, CELL capacity)
-{
-#ifdef FACTOR_DEBUG
-	CELL header = untag_header(array->header);
-	assert(header == ARRAY_TYPE || header == BIGNUM_TYPE);
-#endif
-
-	if(reallot_array_in_place_p(array,capacity))
-	{
-		array->capacity = tag_fixnum(capacity);
-		return array;
-	}
-	else
-	{
-		CELL to_copy = array_capacity(array);
-		if(capacity < to_copy)
-			to_copy = capacity;
-
-		REGISTER_UNTAGGED(array);
-		F_ARRAY* new_array = allot_array_internal(untag_header(array->header),capacity);
-		UNREGISTER_UNTAGGED(F_ARRAY,array);
-	
-		memcpy(new_array + 1,array + 1,to_copy * CELLS);
-		memset((char *)AREF(new_array,to_copy),'\0',(capacity - to_copy) * CELLS);
-
-		return new_array;
-	}
 }
 
 void primitive_resize_array(void)
