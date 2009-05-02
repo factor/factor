@@ -157,5 +157,5 @@ M: world world-pixel-format-attributes
     { windowed double-buffered T{ depth-bits { value 16 } } } ;
 
 : with-world-pixel-format ( world quot -- )
-    [ dup world-pixel-format-attributes <pixel-format> ]
+    [ dup dup world-pixel-format-attributes <pixel-format> ]
     dip with-disposal ; inline
