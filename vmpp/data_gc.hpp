@@ -4,13 +4,13 @@ void gc(void);
 DLLEXPORT void minor_gc(void);
 
 /* statistics */
-typedef struct {
+struct F_GC_STATS {
 	CELL collections;
 	u64 gc_time;
 	u64 max_gc_time;
 	CELL object_count;
 	u64 bytes_copied;
-} F_GC_STATS;
+};
 
 extern F_ZONE *newspace;
 

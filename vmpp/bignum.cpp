@@ -347,7 +347,7 @@ bignum_remainder(F_BIGNUM * numerator, F_BIGNUM * denominator)
     if (n == 1) return (BIGNUM_ONE (0));                               \
     if (n < (type)0 && n == (type)-1) return (BIGNUM_ONE (1));	       \
     {                                                                  \
-      utype accumulator = ((negative_p = (n < (utype)0)) ? (-n) : n); \
+      utype accumulator = ((negative_p = (n < (type)0)) ? (-n) : n); \
       do                                                               \
         {                                                              \
           (*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK);         \

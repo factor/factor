@@ -200,18 +200,18 @@ INLINE CELL type_of(CELL tagged)
 DEFPUSHPOP(d,ds)
 DEFPUSHPOP(r,rs)
 
-typedef struct {
+struct F_SEGMENT {
 	CELL start;
 	CELL size;
 	CELL end;
-} F_SEGMENT;
+};
 
 /* Assembly code makes assumptions about the layout of this struct:
    - callstack_top field is 0
    - callstack_bottom field is 1
    - datastack field is 2
    - retainstack field is 3 */
-typedef struct _F_CONTEXT {
+struct F_CONTEXT {
 	/* C stack pointer on entry */
 	F_STACK_FRAME *callstack_top;
 	F_STACK_FRAME *callstack_bottom;
@@ -238,8 +238,8 @@ typedef struct _F_CONTEXT {
 	CELL catchstack_save;
 	CELL current_callback_save;
 
-	struct _F_CONTEXT *next;
-} F_CONTEXT;
+	F_CONTEXT *next;
+};
 
 extern F_CONTEXT *stack_chain;
 
