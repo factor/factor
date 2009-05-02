@@ -1,0 +1,5 @@
+include vmpp/Config.unix
+PLAF_DLL_OBJS += vmpp/os-genunix.o vm/os-netbsd.o
+CFLAGS += -export-dynamic
+LIBPATH = -L/usr/X11R6/lib -Wl,-rpath,/usr/X11R6/lib -L/usr/pkg/lib -Wl,-rpath,/usr/pkg/lib
+LIBS = -lm -lopenal -lalut $(X11_UI_LIBS)
