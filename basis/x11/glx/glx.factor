@@ -95,17 +95,6 @@ CONSTANT: GLX_RGBA_FLOAT_BIT  HEX: 0004
 ! GLX Events
 ! (also skipped for now. only has GLXPbufferClobberEvent, the rest is handled by xlib methinks)
 
-: choose-visual ( flags -- XVisualInfo* )
-    [ dpy get scr get ] dip
-    [
-        %
-        GLX_RGBA ,
-        GLX_DEPTH_SIZE , 16 ,
-        0 ,
-    ] int-array{ } make
-    glXChooseVisual
-    [ "Could not get a double-buffered GLX RGBA visual" throw ] unless* ;
-
 : create-glx ( XVisualInfo* -- GLXContext )
     [ dpy get ] dip f 1 glXCreateContext
     [ "Failed to create GLX context" throw ] unless* ;
