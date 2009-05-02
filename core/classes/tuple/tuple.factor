@@ -165,7 +165,7 @@ ERROR: bad-superclass class ;
         {
             [ , ]
             [ [ superclass class-size ] [ "slots" word-prop length ] bi + , ]
-            [ superclasses length 1- , ]
+            [ superclasses length 1 - , ]
             [ superclasses [ [ , ] [ hashcode , ] bi ] each ]
         } cleave
     ] { } make ;
@@ -331,7 +331,7 @@ GENERIC: tuple-hashcode ( n tuple -- x )
 
 M: tuple tuple-hashcode
     [
-        [ class hashcode ] [ tuple-size ] [ ] tri
+        [ class hashcode ] [ tuple-size iota ] [ ] tri
         [ rot ] dip [
             swapd array-nth hashcode* sequence-hashcode-step
         ] 2curry each

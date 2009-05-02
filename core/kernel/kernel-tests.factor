@@ -114,7 +114,7 @@ IN: kernel.tests
 ! Regression
 : (loop) ( a b c d -- )
     [ pick ] dip swap [ pick ] dip swap
-    < [ [ 1+ ] 3dip (loop) ] [ 2drop 2drop ] if ; inline recursive
+    < [ [ 1 + ] 3dip (loop) ] [ 2drop 2drop ] if ; inline recursive
 
 : loop ( obj -- )
     H{ } values swap [ dup length swap ] dip 0 -roll (loop) ;
