@@ -135,8 +135,8 @@ M: pathname pprint*
     [ text ] [ f <inset pprint* block> ] bi*
     \ } pprint-word block> ;
 
-M: tuple pprint*
-    boa-tuples? get [ call-next-method ] [
+: pprint-tuple ( tuple -- )
+    boa-tuples? get [ pprint-object ] [
         [
             <flow
             \ T{ pprint-word
@@ -148,6 +148,9 @@ M: tuple pprint*
             block>
         ] check-recursion
     ] if ;
+
+M: tuple pprint*
+    pprint-tuple ;
 
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [
