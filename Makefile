@@ -179,6 +179,9 @@ clean:
 	rm -f vm/*.o
 	rm -f factor*.dll libfactor.{a,so,dylib} libfactor-ffi-test.{a,so,dylib} Factor.app/Contents/Frameworks/libfactor.dylib
 
+tags:
+	etags vm/*.{cpp,hpp,mm,S,c}
+
 vm/resources.o:
 	$(WINDRES) vm/factor.rs vm/resources.o
 
@@ -197,6 +200,6 @@ vm/ffi_test.o: vm/ffi_test.c
 .mm.o:
 	$(CPP) -c $(CFLAGS) -o $@ $<
 
-.PHONY: factor
+.PHONY: factor tags clean
 
 .SUFFIXES: .mm

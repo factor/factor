@@ -3,7 +3,7 @@
 static void check_frame(F_STACK_FRAME *frame)
 {
 #ifdef FACTOR_DEBUG
-	check_code_pointer(frame->xt);
+	check_code_pointer((CELL)frame->xt);
 	assert(frame->size != 0);
 #endif
 }
@@ -20,9 +20,8 @@ void iterate_callstack(CELL top, CELL bottom, CALLSTACK_ITER iterator)
 
 	while((CELL)frame >= top)
 	{
-		F_STACK_FRAME *next = frame_successor(frame);
 		iterator(frame);
-		frame = next;
+		frame = frame_successor(frame);
 	}
 }
 

@@ -20,12 +20,18 @@ struct gc_root : public tagged<T>
 	~gc_root() { CELL old = gc_local_pop(); assert(old == (CELL)this); }
 };
 
-/* Extra roots: stores pointers to objects in the heap. Requires extra work
-(you have to unregister before accessing the object) but more flexible. */
-extern F_SEGMENT *extra_roots_region;
-extern CELL extra_roots;
+/* A similar hack for the bignum implementation */
+extern F_SEGMENT *gc_bignums_region;
+extern CELL gc_bignums;
 
-DEFPUSHPOP(root_,extra_roots)
+DEFPUSHPOP(gc_bignum_,gc_bignums)
 
-#define REGISTER_BIGNUM(obj) if(obj) root_push(tag_bignum(obj))
-#define UNREGISTER_BIGNUM(obj) if(obj) obj = (untag_bignum_fast(root_pop()))
+struct gc_bignum
+{
+	F_BIGNUM **addr;
+
+	gc_bignum(F_BIGNUM **addr_) : addr(addr_) { if(*addr_) check_data_pointer((CELL)*addr_); gc_bignum_push((CELL)addr); }
+	~gc_bignum() { assert((CELL)addr == gc_bignum_pop()); }
+};
+
+#define GC_BIGNUM(x) gc_bignum x##__gc_root(&x)

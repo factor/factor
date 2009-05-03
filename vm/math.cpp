@@ -51,9 +51,9 @@ F_FASTCALL void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y)
 F_FASTCALL void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y)
 {
 	F_BIGNUM *bx = fixnum_to_bignum(x);
-	REGISTER_BIGNUM(bx);
+	GC_BIGNUM(bx);
 	F_BIGNUM *by = fixnum_to_bignum(y);
-	UNREGISTER_BIGNUM(bx);
+	GC_BIGNUM(by);
 	drepl(tag<F_BIGNUM>(bignum_multiply(bx,by)));
 }
 

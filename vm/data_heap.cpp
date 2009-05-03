@@ -224,7 +224,7 @@ CELL unaligned_object_size(CELL pointer)
 	case STRING_TYPE:
 		return string_size(string_capacity((F_STRING*)pointer));
 	case TUPLE_TYPE:
-		tuple = untag<F_TUPLE>(pointer);
+		tuple = (F_TUPLE *)pointer;
 		layout = untag<F_TUPLE_LAYOUT>(tuple->layout);
 		return tuple_size(layout);
 	case QUOTATION_TYPE:
@@ -284,7 +284,7 @@ CELL binary_payload_start(CELL pointer)
 	case ARRAY_TYPE:
 		return array_size<F_ARRAY>(array_capacity((F_ARRAY*)pointer));
 	case TUPLE_TYPE:
-		tuple = untag<F_TUPLE>(pointer);
+		tuple = (F_TUPLE *)pointer;
 		layout = untag<F_TUPLE_LAYOUT>(tuple->layout);
 		return tuple_size(layout);
 	case WRAPPER_TYPE:

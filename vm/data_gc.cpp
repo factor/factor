@@ -37,8 +37,109 @@ void init_data_gc(void)
 	collecting_aging_again = false;
 }
 
+/* Given a pointer to oldspace, copy it to newspace */
+static void *copy_untagged_object(void *pointer, CELL size)
+{
+	if(newspace->here + size >= newspace->end)
+		longjmp(gc_jmp,1);
+	allot_barrier(newspace->here);
+	void *newpointer = allot_zone(newspace,size);
+
+	F_GC_STATS *s = &gc_stats[collecting_gen];
+	s->object_count++;
+	s->bytes_copied += size;
+
+	memcpy(newpointer,pointer,size);
+	return newpointer;
+}
+
+static void forward_object(CELL untagged, CELL newpointer)
+{
+	put(untagged,RETAG(newpointer,GC_COLLECTED));
+}
+
+static CELL copy_object_impl(CELL untagged)
+{
+	CELL newpointer = (CELL)copy_untagged_object(
+		(void*)untagged,
+		untagged_object_size(untagged));
+	forward_object(untagged,newpointer);
+	return newpointer;
+}
+
+static bool should_copy_p(CELL untagged)
+{
+	if(in_zone(newspace,untagged))
+		return false;
+	if(collecting_gen == TENURED)
+		return true;
+	else if(HAVE_AGING_P && collecting_gen == AGING)
+		return !in_zone(&data_heap->generations[TENURED],untagged);
+	else if(collecting_gen == NURSERY)
+		return in_zone(&nursery,untagged);
+	else
+	{
+		critical_error("Bug in should_copy_p",untagged);
+		return false;
+	}
+}
+
+/* Follow a chain of forwarding pointers */
+static CELL resolve_forwarding(CELL untagged, CELL tag)
+{
+	check_data_pointer(untagged);
+
+	CELL header = get(untagged);
+	/* another forwarding pointer */
+	if(TAG(header) == GC_COLLECTED)
+		return resolve_forwarding(UNTAG(header),tag);
+	/* we've found the destination */
+	else
+	{
+		check_header(header);
+		CELL pointer = RETAG(untagged,tag);
+		if(should_copy_p(untagged))
+			pointer = RETAG(copy_object_impl(untagged),tag);
+		return pointer;
+	}
+}
+
+/* Given a pointer to a tagged pointer to oldspace, copy it to newspace.
+If the object has already been copied, return the forwarding
+pointer address without copying anything; otherwise, install
+a new forwarding pointer. While this preserves the tag, it does
+not dispatch on it in any way. */
+static CELL copy_object(CELL pointer)
+{
+	check_data_pointer(pointer);
+
+	CELL tag = TAG(pointer);
+	CELL untagged = UNTAG(pointer);
+	CELL header = get(untagged);
+
+	if(TAG(header) == GC_COLLECTED)
+		return resolve_forwarding(UNTAG(header),tag);
+	else
+	{
+		check_header(header);
+		return RETAG(copy_object_impl(untagged),tag);
+	}
+}
+
+void copy_handle(CELL *handle)
+{
+	CELL pointer = *handle;
+
+	if(!immediate_p(pointer))
+	{
+		check_data_pointer(pointer);
+		if(should_copy_p(pointer))
+			*handle = copy_object(pointer);
+	}
+}
+
 /* Scan all the objects in the card */
-void copy_card(F_CARD *ptr, CELL gen, CELL here)
+static void copy_card(F_CARD *ptr, CELL gen, CELL here)
 {
 	CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + CARD_OFFSET(ptr);
 	CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
@@ -51,7 +152,7 @@ void copy_card(F_CARD *ptr, CELL gen, CELL here)
 	cards_scanned++;
 }
 
-void copy_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)
+static void copy_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)
 {
 	F_CARD *first_card = DECK_TO_CARD(deck);
 	F_CARD *last_card = DECK_TO_CARD(deck + 1);
@@ -83,7 +184,7 @@ void copy_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)
 }
 
 /* Copy all newspace objects referenced from marked cards to the destination */
-void copy_gen_cards(CELL gen)
+static void copy_gen_cards(CELL gen)
 {
 	F_DECK *first_deck = ADDR_TO_DECK(data_heap->generations[gen].start);
 	F_DECK *last_deck = ADDR_TO_DECK(data_heap->generations[gen].end);
@@ -150,7 +251,7 @@ void copy_gen_cards(CELL gen)
 
 /* Scan cards in all generations older than the one being collected, copying
 old->new references */
-void copy_cards(void)
+static void copy_cards(void)
 {
 	u64 start = current_micros();
 
@@ -162,7 +263,7 @@ void copy_cards(void)
 }
 
 /* Copy all tagged pointers in a range of memory */
-void copy_stack_elements(F_SEGMENT *region, CELL top)
+static void copy_stack_elements(F_SEGMENT *region, CELL top)
 {
 	CELL ptr = region->start;
 
@@ -170,17 +271,38 @@ void copy_stack_elements(F_SEGMENT *region, CELL top)
 		copy_handle((CELL*)ptr);
 }
 
-void copy_registered_locals(void)
+static void copy_registered_locals(void)
 {
-	CELL ptr = gc_locals_region->start;
+	CELL scan = gc_locals_region->start;
 
-	for(; ptr <= gc_locals; ptr += CELLS)
-		copy_handle(*(CELL **)ptr);
+	for(; scan <= gc_locals; scan += CELLS)
+		copy_handle(*(CELL **)scan);
+}
+
+static void copy_registered_bignums(void)
+{
+	CELL scan = gc_bignums_region->start;
+
+	for(; scan <= gc_bignums; scan += CELLS)
+	{
+		CELL *handle = *(CELL **)scan;
+		CELL pointer = *handle;
+
+		if(pointer)
+		{
+			check_data_pointer(pointer);
+			if(should_copy_p(pointer))
+				*handle = copy_object(pointer);
+#ifdef FACTOR_DEBUG
+			assert(hi_tag(*handle) == BIGNUM_TYPE);
+#endif
+		}
+	}
 }
 
 /* Copy roots over at the start of GC, namely various constants, stacks,
 the user environment and extra roots registered by local_roots.hpp */
-void copy_roots(void)
+static void copy_roots(void)
 {
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
@@ -188,7 +310,7 @@ void copy_roots(void)
 	copy_handle(&bignum_neg_one);
 
 	copy_registered_locals();
-	copy_stack_elements(extra_roots_region,extra_roots);
+	copy_registered_bignums();
 
 	if(!performing_compaction)
 	{
@@ -214,107 +336,7 @@ void copy_roots(void)
 		copy_handle(&userenv[i]);
 }
 
-/* Given a pointer to oldspace, copy it to newspace */
-INLINE void *copy_untagged_object(void *pointer, CELL size)
-{
-	if(newspace->here + size >= newspace->end)
-		longjmp(gc_jmp,1);
-	allot_barrier(newspace->here);
-	void *newpointer = allot_zone(newspace,size);
-
-	F_GC_STATS *s = &gc_stats[collecting_gen];
-	s->object_count++;
-	s->bytes_copied += size;
-
-	memcpy(newpointer,pointer,size);
-	return newpointer;
-}
-
-INLINE void forward_object(CELL pointer, CELL newpointer)
-{
-	if(pointer != newpointer)
-		put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
-}
-
-INLINE CELL copy_object_impl(CELL pointer)
-{
-	CELL newpointer = (CELL)copy_untagged_object(
-		(void*)UNTAG(pointer),
-		object_size(pointer));
-	forward_object(pointer,newpointer);
-	return newpointer;
-}
-
-bool should_copy_p(CELL untagged)
-{
-	if(in_zone(newspace,untagged))
-		return false;
-	if(collecting_gen == TENURED)
-		return true;
-	else if(HAVE_AGING_P && collecting_gen == AGING)
-		return !in_zone(&data_heap->generations[TENURED],untagged);
-	else if(collecting_gen == NURSERY)
-		return in_zone(&nursery,untagged);
-	else
-	{
-		critical_error("Bug in should_copy_p",untagged);
-		return false;
-	}
-}
-
-/* Follow a chain of forwarding pointers */
-CELL resolve_forwarding(CELL untagged, CELL tag)
-{
-	check_data_pointer(untagged);
-
-	CELL header = get(untagged);
-	/* another forwarding pointer */
-	if(TAG(header) == GC_COLLECTED)
-		return resolve_forwarding(UNTAG(header),tag);
-	/* we've found the destination */
-	else
-	{
-		check_header(header);
-		CELL pointer = RETAG(untagged,tag);
-		if(should_copy_p(untagged))
-			pointer = RETAG(copy_object_impl(pointer),tag);
-		return pointer;
-	}
-}
-
-/* Given a pointer to a tagged pointer to oldspace, copy it to newspace.
-If the object has already been copied, return the forwarding
-pointer address without copying anything; otherwise, install
-a new forwarding pointer. */
-INLINE CELL copy_object(CELL pointer)
-{
-	check_data_pointer(pointer);
-
-	CELL tag = TAG(pointer);
-	CELL header = get(UNTAG(pointer));
-
-	if(TAG(header) == GC_COLLECTED)
-		return resolve_forwarding(UNTAG(header),tag);
-	else
-	{
-		check_header(header);
-		return RETAG(copy_object_impl(pointer),tag);
-	}
-}
-
-void copy_handle(CELL *handle)
-{
-	CELL pointer = *handle;
-
-	if(!immediate_p(pointer))
-	{
-		check_data_pointer(pointer);
-		if(should_copy_p(pointer))
-			*handle = copy_object(pointer);
-	}
-}
-
-CELL copy_next_from_nursery(CELL scan)
+static CELL copy_next_from_nursery(CELL scan)
 {
 	CELL *obj = (CELL *)scan;
 	CELL *end = (CELL *)(scan + binary_payload_start(scan));
@@ -342,7 +364,7 @@ CELL copy_next_from_nursery(CELL scan)
 	return scan + untagged_object_size(scan);
 }
 
-CELL copy_next_from_aging(CELL scan)
+static CELL copy_next_from_aging(CELL scan)
 {
 	CELL *obj = (CELL *)scan;
 	CELL *end = (CELL *)(scan + binary_payload_start(scan));
@@ -374,7 +396,7 @@ CELL copy_next_from_aging(CELL scan)
 	return scan + untagged_object_size(scan);
 }
 
-CELL copy_next_from_tenured(CELL scan)
+static CELL copy_next_from_tenured(CELL scan)
 {
 	CELL *obj = (CELL *)scan;
 	CELL *end = (CELL *)(scan + binary_payload_start(scan));
@@ -424,7 +446,7 @@ void copy_reachable_objects(CELL scan, CELL *end)
 }
 
 /* Prepare to start copying reachable objects into an unused zone */
-void begin_gc(CELL requested_bytes)
+static void begin_gc(CELL requested_bytes)
 {
 	if(growing_data_heap)
 	{
@@ -457,7 +479,7 @@ void begin_gc(CELL requested_bytes)
 	}
 }
 
-void end_gc(CELL gc_elapsed)
+static void end_gc(CELL gc_elapsed)
 {
 	F_GC_STATS *s = &gc_stats[collecting_gen];
 
@@ -604,19 +626,19 @@ void primitive_gc_stats(void)
 	{
 		F_GC_STATS *s = &gc_stats[i];
 		stats.add(allot_cell(s->collections));
-		stats.add(tag_bignum(long_long_to_bignum(s->gc_time)));
-		stats.add(tag_bignum(long_long_to_bignum(s->max_gc_time)));
+		stats.add(tag<F_BIGNUM>(long_long_to_bignum(s->gc_time)));
+		stats.add(tag<F_BIGNUM>(long_long_to_bignum(s->max_gc_time)));
 		stats.add(allot_cell(s->collections == 0 ? 0 : s->gc_time / s->collections));
 		stats.add(allot_cell(s->object_count));
-		stats.add(tag_bignum(long_long_to_bignum(s->bytes_copied)));
+		stats.add(tag<F_BIGNUM>(long_long_to_bignum(s->bytes_copied)));
 
 		total_gc_time += s->gc_time;
 	}
 
-	stats.add(tag_bignum(ulong_long_to_bignum(total_gc_time)));
-	stats.add(tag_bignum(ulong_long_to_bignum(cards_scanned)));
-	stats.add(tag_bignum(ulong_long_to_bignum(decks_scanned)));
-	stats.add(tag_bignum(ulong_long_to_bignum(card_scan_time)));
+	stats.add(tag<F_BIGNUM>(ulong_long_to_bignum(total_gc_time)));
+	stats.add(tag<F_BIGNUM>(ulong_long_to_bignum(cards_scanned)));
+	stats.add(tag<F_BIGNUM>(ulong_long_to_bignum(decks_scanned)));
+	stats.add(tag<F_BIGNUM>(ulong_long_to_bignum(card_scan_time)));
 	stats.add(allot_cell(code_heap_scans));
 
 	stats.trim();
@@ -644,8 +666,8 @@ void primitive_clear_gc_stats(void)
    to coalesce equal but distinct quotations and wrappers. */
 void primitive_become(void)
 {
-	F_ARRAY *new_objects = untag_array(dpop());
-	F_ARRAY *old_objects = untag_array(dpop());
+	F_ARRAY *new_objects = untag_check<F_ARRAY>(dpop());
+	F_ARRAY *old_objects = untag_check<F_ARRAY>(dpop());
 
 	CELL capacity = array_capacity(new_objects);
 	if(capacity != array_capacity(old_objects))
@@ -658,7 +680,8 @@ void primitive_become(void)
 		CELL old_obj = array_nth(old_objects,i);
 		CELL new_obj = array_nth(new_objects,i);
 
-		forward_object(old_obj,new_obj);
+		if(old_obj != new_obj)
+			forward_object(UNTAG(old_obj),new_obj);
 	}
 
 	gc();
