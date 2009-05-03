@@ -25,7 +25,7 @@ void primitive_array(void)
 {
 	CELL initial = dpop();
 	CELL size = unbox_array_size();
-	dpush(tag_array(allot_array(size,initial)));
+	dpush(tag<F_ARRAY>(allot_array(size,initial)));
 }
 
 CELL allot_array_1(CELL obj_)
@@ -62,9 +62,9 @@ CELL allot_array_4(CELL v1_, CELL v2_, CELL v3_, CELL v4_)
 
 void primitive_resize_array(void)
 {
-	F_ARRAY* array = untag_array(dpop());
+	F_ARRAY* array = untag_check<F_ARRAY>(dpop());
 	CELL capacity = unbox_array_size();
-	dpush(tag_array(reallot_array(array,capacity)));
+	dpush(tag<F_ARRAY>(reallot_array(array,capacity)));
 }
 
 void growable_array::add(CELL elt_)

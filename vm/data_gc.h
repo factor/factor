@@ -78,25 +78,18 @@ allocation (which does not call GC because of possible roots in volatile
 registers) does not run out of memory */
 #define ALLOT_BUFFER_ZONE 1024
 
-/* If this is defined, we GC every 100 allocations. This catches missing local roots */
-#ifdef GC_DEBUG
-int gc_count;
-#endif
+/* If this is defined, we GC every allocation. This catches missing local roots */
 
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-int count;
+
 INLINE void *allot_object(CELL type, CELL a)
 {
 #ifdef GC_DEBUG
 	if(!gc_off)
-	{
-		if(gc_count++ % 100 == 0)
-			gc();
-
-	}
+		gc();
 #endif
 
 	CELL *object;
@@ -109,7 +102,7 @@ INLINE void *allot_object(CELL type, CELL a)
 
 		CELL h = nursery.here;
 		nursery.here = h + align8(a);
-		object = (void*)h;
+		object = (CELL*)h;
 	}
 	/* If the object is bigger than the nursery, allocate it in
 	tenured space */
@@ -131,7 +124,7 @@ INLINE void *allot_object(CELL type, CELL a)
 			tenured = &data_heap->generations[TENURED];
 		}
 
-		object = allot_zone(tenured,a);
+		object = (CELL *)allot_zone(tenured,a);
 
 		/* We have to do this */
 		allot_barrier((CELL)object);

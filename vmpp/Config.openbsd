@@ -1,5 +1,0 @@
-include vmpp/Config.unix
-PLAF_DLL_OBJS += vmpp/os-genunix.o vm/os-openbsd.o
-CC = egcc
-CFLAGS += -export-dynamic
-LIBS = -L/usr/local/lib/ -lm $(X11_UI_LIBS) -lz -lssl -lcrypto -lpthread

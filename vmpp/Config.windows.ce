@@ -1,5 +1,0 @@
-CFLAGS += -DWINCE
-LIBS = -lm
-PLAF_DLL_OBJS += vmpp/os-windows-ce.o
-PLAF_EXE_OBJS += vmpp/main-windows-ce.o
-include vmpp/Config.windows
