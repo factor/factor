@@ -27,8 +27,7 @@ DEFER: assoc>tuple
 
 : make-tuple ( assoc -- tuple )
    prepare-assoc>tuple
-   '[ dup _ at assoc>tuple swap _ set-at ] each
-   [ mark-persistent ] keep ; inline recursive
+   '[ dup _ at assoc>tuple swap _ set-at ] each ; inline recursive
 
 : at+ ( value key assoc -- value )
     2dup key?
@@ -38,9 +37,9 @@ DEFER: assoc>tuple
     dup tuple?
     [ assoc? not ] [ drop f ] if  ; inline
 
-: add-storable ( assoc ns -- )
-   [ H{ } clone ] dip object-map get at+
-   [ dup [ MDB_OID_FIELD ] dip at ] dip set-at ; inline
+: add-storable ( assoc ns toid -- )
+   [ [ H{ } clone ] dip object-map get at+ ] dip
+   swap set-at ; inline
 
 : write-field? ( tuple key value -- ? )
    pick mdb-persistent? [ 
@@ -52,10 +51,10 @@ TUPLE: cond-value value quot ;
 CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
 
 : write-mdb-persistent ( value quot: ( tuple -- assoc ) -- value' )
-   over [ (( tuple -- assoc )) call-effect ] dip 
-   [ tuple-collection name>> ] keep
+   over [ call( tuple -- assoc ) ] dip 
+   [ [ tuple-collection name>> ] [ >toid ] bi ] keep
    [ add-storable ] dip
-   [ tuple-collection name>> ] [ _id>> ] bi <objref> ; inline
+   [ tuple-collection name>> ] [ id>> ] bi <objref> ; inline
 
 : write-field ( value quot: ( tuple -- assoc ) -- value' )
    <cond-value> {
@@ -80,8 +79,7 @@ CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
    H{ } clone swap [ <mirror> ] keep pick ; inline
 
 : ensure-mdb-info ( tuple -- tuple )    
-   dup _id>> [ <objid> >>_id ] unless
-   [ mark-persistent ] keep ; inline
+   dup id>> [ <objid> >>id ] unless ; inline
 
 : with-object-map ( quot: ( -- ) -- store-assoc )
    [ H{ } clone dup object-map ] dip with-variable ; inline
@@ -107,9 +105,9 @@ M: tuple tuple>selector ( tuple -- assoc )
     prepare-assoc [ tuple>selector ] write-tuple-fields ;
 
 : assoc>tuple ( assoc -- tuple )
-    dup assoc?
-    [ [ dup tuple-info?
-        [ make-tuple ]
-        [ ] if ] [ drop ] recover
-    ] [ ] if ; inline recursive
+   dup assoc?
+   [ [ dup tuple-info?
+       [ make-tuple ]
+       [ ] if ] [ drop ] recover
+   ] [ ] if ; inline recursive
 
