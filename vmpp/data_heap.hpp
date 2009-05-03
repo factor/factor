@@ -99,12 +99,6 @@ void primitive_end_scan(void);
 /* GC is off during heap walking */
 extern bool gc_off;
 
-INLINE bool in_data_heap_p(CELL ptr)
-{
-	return (ptr >= data_heap->segment->start
-		&& ptr <= data_heap->segment->end);
-}
-
 INLINE void *allot_zone(F_ZONE *z, CELL a)
 {
 	CELL h = z->here;

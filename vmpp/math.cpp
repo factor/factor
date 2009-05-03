@@ -255,10 +255,8 @@ unsigned int bignum_producer(unsigned int digit)
 
 void primitive_byte_array_to_bignum(void)
 {
-	type_check(BYTE_ARRAY_TYPE,dpeek());
-	CELL n_digits = array_capacity(untag_byte_array_fast(dpeek())) / CELLS;
-	F_BIGNUM * bignum = digit_stream_to_bignum(
-		n_digits,bignum_producer,0x100,0);
+	CELL n_digits = array_capacity(untag_byte_array(dpeek()));
+	F_BIGNUM * bignum = digit_stream_to_bignum(n_digits,bignum_producer,0x100,0);
 	drepl(tag_bignum(bignum));
 }
 

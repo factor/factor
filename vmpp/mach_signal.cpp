@@ -60,6 +60,7 @@ static void call_fault_handler(exception_type_t exception,
 
 /* Handle an exception by invoking the user's fault handler and/or forwarding
 the duty to the previously installed handlers.  */
+extern "C"
 kern_return_t
 catch_exception_raise (mach_port_t exception_port,
 	mach_port_t thread,

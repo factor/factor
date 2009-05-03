@@ -135,16 +135,6 @@ void divide_by_zero_error(void)
 	general_error(ERROR_DIVIDE_BY_ZERO,F,F,NULL);
 }
 
-void memory_signal_handler_impl(void)
-{
-	memory_protection_error(signal_fault_addr,signal_callstack_top);
-}
-
-void misc_signal_handler_impl(void)
-{
-	signal_error(signal_number,signal_callstack_top);
-}
-
 void primitive_call_clear(void)
 {
 	throw_impl(dpop(),stack_chain->callstack_bottom);
@@ -154,4 +144,14 @@ void primitive_call_clear(void)
 void primitive_unimplemented(void)
 {
 	not_implemented_error();
+}
+
+void memory_signal_handler_impl(void)
+{
+	memory_protection_error(signal_fault_addr,signal_callstack_top);
+}
+
+void misc_signal_handler_impl(void)
+{
+	signal_error(signal_number,signal_callstack_top);
 }
