@@ -18,7 +18,8 @@ M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
     frp-table new-line-gadget dup >>renderer [ ] >>quot swap >>model
     f <model> >>selected-value sans-serif-font >>font
     focus-border-color >>focus-border-color
-    transparent >>column-line-color ;
+    transparent >>column-line-color [ ] >>val-quot ;
+: <frp-table*> ( -- table ) f <model> <frp-table> ;
 : <frp-list> ( model -- table ) <frp-table> [ 1array ] >>quot ;
 : <frp-list*> ( -- table ) f <model> <frp-list> ;
 
