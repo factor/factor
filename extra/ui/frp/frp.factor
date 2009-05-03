@@ -20,6 +20,8 @@ M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
     focus-border-color >>focus-border-color
     transparent >>column-line-color ;
 : <frp-list> ( model -- table ) <frp-table> [ 1array ] >>quot ;
+: <frp-list*> ( -- table ) f <model> <frp-list> ;
+
 : <frp-field> ( -- field ) f <model> <model-field> ;
 
 ! Layout utilities
@@ -72,10 +74,10 @@ M: fold-model model-changed [ [ value>> ] [ [ oldval>> ] [ quot>> ] bi ] bi*
 
 TUPLE: switch-model < multi-model original switcher on ;
 M: switch-model model-changed 2dup switcher>> =
-   [ [ value>> ] [ t >>on ] bi* set-model ]
+   [ over value>> [ [ value>> ] [ t >>on ] bi* set-model ] [ 2drop ] if ]
    [ dup on>> [ 2drop ] [ [ value>> ] dip set-model ] if ] if ;
 M: switch-model model-activated [ original>> ] keep model-changed ;
-: switch ( signal1 signal2 -- signal' ) [ 2array switch-model <multi-model> ] 2keep
+: <switch> ( signal1 signal2 -- signal' ) [ 2array switch-model <multi-model> ] 2keep
    [ >>original ] [ >>switcher ] bi* ;
 
 TUPLE: mapped < model model quot ;
