@@ -105,16 +105,13 @@ M: world end-world
 GENERIC: draw-world* ( world -- )
 
 M: world draw-world*
-    dup handle>> [
-        check-extensions
-        {
-            [ init-gl ]
-            [ draw-gadget ]
-            [ text-handle>> [ purge-cache ] when* ]
-            [ images>> [ purge-cache ] when* ]
-        } cleave
-    ] with-gl-context
-    flush-layout-cache-hook get call( -- ) ;
+    check-extensions
+    {
+        [ init-gl ]
+        [ draw-gadget ]
+        [ text-handle>> [ purge-cache ] when* ]
+        [ images>> [ purge-cache ] when* ]
+    } cleave ;
 
 : draw-world? ( world -- ? )
     #! We don't draw deactivated worlds, or those with 0 size.
@@ -135,7 +132,10 @@ ui-error-hook [ [ rethrow ] ] initialize
 : draw-world ( world -- )
     dup draw-world? [
         dup world [
-            [ draw-world* ] [
+            [
+                dup handle>> [ draw-world* ] with-gl-context
+                flush-layout-cache-hook get call( -- )
+            ] [
                 over <world-error> ui-error
                 f >>active? drop
             ] recover
