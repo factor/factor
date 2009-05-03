@@ -1,4 +1,0 @@
-CC = arm-wince-mingw32ce-gcc
-DLL_SUFFIX=-ce
-EXE_SUFFIX=-ce
-include vmpp/Config.windows.ce vm/Config.arm
