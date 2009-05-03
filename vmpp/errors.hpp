@@ -50,6 +50,8 @@ INLINE void type_check(CELL type, CELL tagged)
 		return untag_##name##_fast(obj); \
 	} \
 
+void primitive_unimplemented(void);
+
 /* Global variables used to pass fault handler state from signal handler to
 user-space */
 extern CELL signal_number;
@@ -58,5 +60,3 @@ extern F_STACK_FRAME *signal_callstack_top;
 
 void memory_signal_handler_impl(void);
 void misc_signal_handler_impl(void);
-
-void primitive_unimplemented(void);

@@ -1,5 +1,13 @@
 #include "master.hpp"
 
+static void check_frame(F_STACK_FRAME *frame)
+{
+#ifdef FACTOR_DEBUG
+	check_code_pointer(frame->xt);
+	assert(frame->size != 0);
+#endif
+}
+
 /* called before entry into Factor code. */
 F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
 {
@@ -90,6 +98,7 @@ void primitive_set_callstack(void)
 
 F_CODE_BLOCK *frame_code(F_STACK_FRAME *frame)
 {
+	check_frame(frame);
 	return (F_CODE_BLOCK *)frame->xt - 1;
 }
 
@@ -112,8 +121,7 @@ CELL frame_executing(F_STACK_FRAME *frame)
 
 F_STACK_FRAME *frame_successor(F_STACK_FRAME *frame)
 {
-	if(frame->size == 0)
-		critical_error("Stack frame has zero size",(CELL)frame);
+	check_frame(frame);
 	return (F_STACK_FRAME *)((CELL)frame - frame->size);
 }
 
