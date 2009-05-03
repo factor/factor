@@ -1,7 +1,8 @@
 USING: kernel opengl opengl.demo-support opengl.gl opengl.textures
 opengl.shaders opengl.framebuffers opengl.capabilities multiline
 ui.gadgets accessors sequences ui.render ui math locals arrays
-generalizations combinators ui.gadgets.worlds ;
+generalizations combinators ui.gadgets.worlds method-chains
+literals ui.pixel-formats ;
 IN: spheres
 
 STRING: plane-vertex-shader
@@ -110,19 +111,16 @@ main()
 }
 ;
 
-TUPLE: spheres-gadget < demo-gadget
+TUPLE: spheres-world < demo-world
     plane-program solid-sphere-program texture-sphere-program
     reflection-framebuffer reflection-depthbuffer
-    reflection-texture initialized? ;
+    reflection-texture ;
 
-: <spheres-gadget> ( -- gadget )
-    20.0 10.0 20.0 spheres-gadget new-demo-gadget ;
-
-M: spheres-gadget near-plane ( gadget -- z )
+M: spheres-world near-plane ( gadget -- z )
     drop 1.0 ;
-M: spheres-gadget far-plane ( gadget -- z )
+M: spheres-world far-plane ( gadget -- z )
     drop 512.0 ;
-M: spheres-gadget distance-step ( gadget -- dz )
+M: spheres-world distance-step ( gadget -- dz )
     drop 0.5 ;
 
 : (reflection-dim) ( -- w h )
@@ -136,12 +134,14 @@ M: spheres-gadget distance-step ( gadget -- dz )
         GL_TEXTURE_CUBE_MAP GL_TEXTURE_WRAP_S GL_CLAMP glTexParameteri
         GL_TEXTURE_CUBE_MAP GL_TEXTURE_WRAP_T GL_CLAMP glTexParameteri
         GL_TEXTURE_CUBE_MAP GL_TEXTURE_WRAP_R GL_CLAMP glTexParameteri
-        GL_TEXTURE_CUBE_MAP_POSITIVE_X
-        GL_TEXTURE_CUBE_MAP_POSITIVE_Y
-        GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_X
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_Z 6 narray
+        {
+            $ GL_TEXTURE_CUBE_MAP_POSITIVE_X
+            $ GL_TEXTURE_CUBE_MAP_POSITIVE_Y
+            $ GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+            $ GL_TEXTURE_CUBE_MAP_NEGATIVE_X
+            $ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+            $ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+        }
         [ 0 GL_RGBA8 (reflection-dim) 0 GL_RGBA GL_UNSIGNED_BYTE f glTexImage2D ]
         each
     ] keep ;
@@ -171,22 +171,19 @@ M: spheres-gadget distance-step ( gadget -- dz )
     sphere-main-fragment-shader <fragment-shader> check-gl-shader
     3array <gl-program> check-gl-program ;
 
-M: spheres-gadget graft* ( gadget -- )
-    dup find-gl-context
+AFTER: spheres-world begin-world
     "2.0" { "GL_ARB_shader_objects" } require-gl-version-or-extensions
     { "GL_EXT_framebuffer_object" } require-gl-extensions
+    20.0 10.0 20.0 set-demo-orientation
     (plane-program) >>plane-program
     (solid-sphere-program) >>solid-sphere-program
     (texture-sphere-program) >>texture-sphere-program
     (make-reflection-texture) >>reflection-texture
     (make-reflection-depthbuffer) [ >>reflection-depthbuffer ] keep
     (make-reflection-framebuffer) >>reflection-framebuffer
-    t >>initialized?
     drop ;
 
-M: spheres-gadget ungraft* ( gadget -- )
-    f >>initialized?
-    dup find-gl-context
+M: spheres-world end-world
     {
         [ reflection-framebuffer>> [ delete-framebuffer ] when* ]
         [ reflection-depthbuffer>> [ delete-renderbuffer ] when* ]
@@ -196,7 +193,7 @@ M: spheres-gadget ungraft* ( gadget -- )
         [ plane-program>> [ delete-gl-program ] when* ]
     } cleave ;
 
-M: spheres-gadget pref-dim* ( gadget -- dim )
+M: spheres-world pref-dim* ( gadget -- dim )
     drop { 640 480 } ;
 
 :: (draw-sphere) ( program center radius -- )
@@ -280,12 +277,12 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
         [ dim>> 0 0 rot first2 glViewport ]
     } cleave ] with-framebuffer ;
 
-: (draw-gadget) ( gadget -- )
+M: spheres-world draw-world*
     GL_DEPTH_TEST glEnable
     GL_SCISSOR_TEST glDisable
     0.15 0.15 1.0 1.0 glClearColor {
         [ (draw-reflection-texture) ]
-        [ demo-gadget-set-matrices ]
+        [ demo-world-set-matrix ]
         [ sphere-scene ]
         [ reflection-texture>> GL_TEXTURE_CUBE_MAP GL_TEXTURE0 bind-texture-unit ]
         [
@@ -297,10 +294,17 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
         ]
     } cleave ;
 
-M: spheres-gadget draw-gadget* ( gadget -- )
-    dup initialized?>> [ (draw-gadget) ] [ drop ] if ;
-
 : spheres-window ( -- )
-    [ <spheres-gadget> "Spheres" open-window ] with-ui ;
+    [
+        f T{ world-attributes
+            { world-class spheres-world }
+            { title "Spheres" }
+            { pixel-format-attributes {
+                windowed
+                double-buffered
+                T{ depth-bits { value 16 } }
+            } }
+        } open-window
+    ] with-ui ;
 
 MAIN: spheres-window
