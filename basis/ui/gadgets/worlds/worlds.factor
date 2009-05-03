@@ -4,7 +4,7 @@ USING: accessors arrays assocs continuations kernel math models
 namespaces opengl opengl.textures sequences io combinators
 combinators.short-circuit fry math.vectors math.rectangles cache
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-ui.commands ;
+ui.commands ui.pixel-formats destructors ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
@@ -149,3 +149,14 @@ M: world handle-gesture ( gesture gadget -- ? )
 
 : close-global ( world global -- )
     [ get-global find-world eq? ] keep '[ f _ set-global ] when ;
+
+M: world world-pixel-format-attributes
+    drop
+    { windowed double-buffered T{ depth-bits { value 16 } } } ;
+
+M: world check-world-pixel-format
+    2drop ;
+
+: with-world-pixel-format ( world quot -- )
+    [ dup dup world-pixel-format-attributes <pixel-format> ]
+    dip [ 2dup check-world-pixel-format ] prepose with-disposal ; inline
