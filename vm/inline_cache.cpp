@@ -47,7 +47,7 @@ static CELL determine_inline_cache_type(F_ARRAY *cache_entries)
 		switch(type_of(klass))
 		{
 		case FIXNUM_TYPE:
-			type = untag_fixnum_fast(klass);
+			type = untag_fixnum(klass);
 			if(type >= HEADER_TYPE)
 				seen_hi_tag = true;
 			break;
@@ -86,7 +86,7 @@ struct inline_cache_jit : public jit {
 void inline_cache_jit::emit_check(CELL klass)
 {
 	CELL code_template;
-	if(TAG(klass) == FIXNUM_TYPE && untag_fixnum_fast(klass) < HEADER_TYPE)
+	if(TAG(klass) == FIXNUM_TYPE && untag_fixnum(klass) < HEADER_TYPE)
 		code_template = userenv[PIC_CHECK_TAG];
 	else
 		code_template = userenv[PIC_CHECK];
@@ -152,12 +152,12 @@ static F_CODE_BLOCK *compile_inline_cache(F_FIXNUM index,
 /* A generic word's definition performs general method lookup. Allocates memory */
 static XT megamorphic_call_stub(CELL generic_word)
 {
-	return untag_word(generic_word)->xt;
+	return untag<F_WORD>(generic_word)->xt;
 }
 
 static CELL inline_cache_size(CELL cache_entries)
 {
-	return array_capacity(untag_array(cache_entries)) / 2;
+	return array_capacity(untag_check<F_ARRAY>(cache_entries)) / 2;
 }
 
 /* Allocates memory */
@@ -196,7 +196,7 @@ XT inline_cache_miss(CELL return_address)
 	deallocate_inline_cache(return_address);
 
 	gc_root<F_ARRAY> cache_entries(dpop());
-	F_FIXNUM index = untag_fixnum_fast(dpop());
+	F_FIXNUM index = untag_fixnum(dpop());
 	gc_root<F_ARRAY> methods(dpop());
 	gc_root<F_WORD> generic_word(dpop());
 	gc_root<F_OBJECT> object(get(ds - index * CELLS));

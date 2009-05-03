@@ -1,5 +1,3 @@
-DEFINE_UNTAG(F_WORD,WORD_TYPE,word)
-
 F_WORD *allot_word(CELL vocab, CELL name);
 
 void primitive_word(void);
@@ -12,7 +10,5 @@ INLINE bool word_optimized_p(F_WORD *word)
 }
 
 void primitive_optimized_p(void);
-
-DEFINE_UNTAG(F_WRAPPER,WRAPPER_TYPE,wrapper)
 
 void primitive_wrapper(void);

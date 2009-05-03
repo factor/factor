@@ -1,6 +1,6 @@
 INLINE CELL string_capacity(F_STRING *str)
 {
-	return untag_fixnum_fast(str->length);
+	return untag_fixnum(str->length);
 }
 
 INLINE CELL string_size(CELL size)
@@ -10,8 +10,6 @@ INLINE CELL string_size(CELL size)
 
 #define BREF(byte_array,index) ((CELL)byte_array + sizeof(F_BYTE_ARRAY) + (index))
 #define SREF(string,index) ((CELL)string + sizeof(F_STRING) + (index))
-
-DEFINE_UNTAG(F_STRING,STRING_TYPE,string)
 
 F_STRING* allot_string_internal(CELL capacity);
 F_STRING* allot_string(CELL capacity, CELL fill);

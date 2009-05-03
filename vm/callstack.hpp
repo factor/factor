@@ -3,8 +3,6 @@ INLINE CELL callstack_size(CELL size)
 	return sizeof(F_CALLSTACK) + size;
 }
 
-DEFINE_UNTAG(F_CALLSTACK,CALLSTACK_TYPE,callstack)
-
 #define FIRST_STACK_FRAME(stack) (F_STACK_FRAME *)((stack) + 1)
 
 typedef void (*CALLSTACK_ITER)(F_STACK_FRAME *frame);

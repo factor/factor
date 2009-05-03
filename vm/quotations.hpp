@@ -1,10 +1,3 @@
-DEFINE_UNTAG(F_QUOTATION,QUOTATION_TYPE,quotation)
-
-INLINE CELL tag_quotation(F_QUOTATION *quotation)
-{
-	return RETAG(quotation,QUOTATION_TYPE);
-}
-
 struct quotation_jit : public jit {
 	gc_root<F_ARRAY> array;
 	bool compiling, relocate;

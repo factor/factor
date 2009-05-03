@@ -9,7 +9,7 @@ void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
 {
 	if(compiled->relocation != F)
 	{
-		F_BYTE_ARRAY *relocation = untag_byte_array_fast(compiled->relocation);
+		F_BYTE_ARRAY *relocation = untag<F_BYTE_ARRAY>(compiled->relocation);
 
 		CELL index = stack_traces_p() ? 1 : 0;
 
@@ -114,7 +114,7 @@ void update_literal_references_step(F_REL rel, CELL index, F_CODE_BLOCK *compile
 	if(REL_TYPE(rel) == RT_IMMEDIATE)
 	{
 		CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
-		F_ARRAY *literals = untag_array_fast(compiled->literals);
+		F_ARRAY *literals = untag<F_ARRAY>(compiled->literals);
 		F_FIXNUM absolute_value = array_nth(literals,index);
 		store_address_in_code_block(REL_CLASS(rel),offset,absolute_value);
 	}
@@ -156,25 +156,25 @@ CELL object_xt(CELL obj)
 {
 	if(TAG(obj) == QUOTATION_TYPE)
 	{
-		F_QUOTATION *quot = untag_quotation_fast(obj);
+		F_QUOTATION *quot = untag<F_QUOTATION>(obj);
 		return (CELL)quot->xt;
 	}
 	else
 	{
-		F_WORD *word = untag_word_fast(obj);
+		F_WORD *word = untag<F_WORD>(obj);
 		return (CELL)word->xt;
 	}
 }
 
 CELL word_direct_xt(CELL obj)
 {
-	F_WORD *word = untag_word_fast(obj);
+	F_WORD *word = untag<F_WORD>(obj);
 	CELL quot = word->direct_entry_def;
 	if(quot == F || max_pic_size == 0)
 		return (CELL)word->xt;
 	else
 	{
-		F_QUOTATION *untagged = untag_quotation_fast(quot);
+		F_QUOTATION *untagged = untag<F_QUOTATION>(quot);
 		if(untagged->compiledp == F)
 			return (CELL)word->xt;
 		else
@@ -188,7 +188,7 @@ void update_word_references_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 	if(type == RT_XT || type == RT_XT_DIRECT)
 	{
 		CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
-		F_ARRAY *literals = untag_array_fast(compiled->literals);
+		F_ARRAY *literals = untag<F_ARRAY>(compiled->literals);
 		CELL obj = array_nth(literals,index);
 
 		CELL xt;
@@ -313,7 +313,7 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 	CELL symbol = array_nth(literals,index);
 	CELL library = array_nth(literals,index + 1);
 
-	F_DLL *dll = (library == F ? NULL : untag_dll(library));
+	F_DLL *dll = (library == F ? NULL : untag<F_DLL>(library));
 
 	if(dll != NULL && !dll->dll)
 		return (void *)undefined_symbol;
@@ -329,7 +329,7 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 	else if(type_of(symbol) == ARRAY_TYPE)
 	{
 		CELL i;
-		F_ARRAY *names = untag_array_fast(symbol);
+		F_ARRAY *names = untag<F_ARRAY>(symbol);
 		for(i = 0; i < array_capacity(names); i++)
 		{
 			F_SYMBOL *name = alien_offset(array_nth(names,i));
@@ -352,7 +352,7 @@ void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 #endif
 
 	CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
-	F_ARRAY *literals = untag_array_fast(compiled->literals);
+	F_ARRAY *literals = untag<F_ARRAY>(compiled->literals);
 	F_FIXNUM absolute_value;
 
 	switch(REL_TYPE(rel))

@@ -10,9 +10,9 @@ F_FIXNUM to_fixnum(CELL tagged)
 	switch(TAG(tagged))
 	{
 	case FIXNUM_TYPE:
-		return untag_fixnum_fast(tagged);
+		return untag_fixnum(tagged);
 	case BIGNUM_TYPE:
-		return bignum_to_fixnum(untag_bignum_fast(tagged));
+		return bignum_to_fixnum(untag<F_BIGNUM>(tagged));
 	default:
 		type_error(FIXNUM_TYPE,tagged);
 		return -1; /* can't happen */
@@ -26,7 +26,7 @@ CELL to_cell(CELL tagged)
 
 void primitive_bignum_to_fixnum(void)
 {
-	drepl(tag_fixnum(bignum_to_fixnum(untag_bignum_fast(dpeek()))));
+	drepl(tag_fixnum(bignum_to_fixnum(untag<F_BIGNUM>(dpeek()))));
 }
 
 void primitive_float_to_fixnum(void)
@@ -38,14 +38,14 @@ void primitive_float_to_fixnum(void)
 overflow, they call these functions. */
 F_FASTCALL void overflow_fixnum_add(F_FIXNUM x, F_FIXNUM y)
 {
-	drepl(tag_bignum(fixnum_to_bignum(
-		untag_fixnum_fast(x) + untag_fixnum_fast(y))));
+	drepl(tag<F_BIGNUM>(fixnum_to_bignum(
+		untag_fixnum(x) + untag_fixnum(y))));
 }
 
 F_FASTCALL void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y)
 {
-	drepl(tag_bignum(fixnum_to_bignum(
-		untag_fixnum_fast(x) - untag_fixnum_fast(y))));
+	drepl(tag<F_BIGNUM>(fixnum_to_bignum(
+		untag_fixnum(x) - untag_fixnum(y))));
 }
 
 F_FASTCALL void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y)
@@ -54,15 +54,15 @@ F_FASTCALL void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y)
 	REGISTER_BIGNUM(bx);
 	F_BIGNUM *by = fixnum_to_bignum(y);
 	UNREGISTER_BIGNUM(bx);
-	drepl(tag_bignum(bignum_multiply(bx,by)));
+	drepl(tag<F_BIGNUM>(bignum_multiply(bx,by)));
 }
 
 /* Division can only overflow when we are dividing the most negative fixnum
 by -1. */
 void primitive_fixnum_divint(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop()); \
-	F_FIXNUM x = untag_fixnum_fast(dpeek());
+	F_FIXNUM y = untag_fixnum(dpop()); \
+	F_FIXNUM x = untag_fixnum(dpeek());
 	F_FIXNUM result = x / y;
 	if(result == -FIXNUM_MIN)
 		drepl(allot_integer(-FIXNUM_MIN));
@@ -81,7 +81,7 @@ void primitive_fixnum_divmod(void)
 	}
 	else
 	{
-		put(ds - CELLS,tag_fixnum(untag_fixnum_fast(x) / untag_fixnum_fast(y)));
+		put(ds - CELLS,tag_fixnum(untag_fixnum(x) / untag_fixnum(y)));
 		put(ds,(F_FIXNUM)x % (F_FIXNUM)y);
 	}
 }
@@ -96,8 +96,8 @@ void primitive_fixnum_divmod(void)
 
 void primitive_fixnum_shift(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop()); \
-	F_FIXNUM x = untag_fixnum_fast(dpeek());
+	F_FIXNUM y = untag_fixnum(dpop()); \
+	F_FIXNUM x = untag_fixnum(dpeek());
 
 	if(x == 0)
 		return;
@@ -117,24 +117,24 @@ void primitive_fixnum_shift(void)
 		}
 	}
 
-	drepl(tag_bignum(bignum_arithmetic_shift(
+	drepl(tag<F_BIGNUM>(bignum_arithmetic_shift(
 		fixnum_to_bignum(x),y)));
 }
 
 /* Bignums */
 void primitive_fixnum_to_bignum(void)
 {
-	drepl(tag_bignum(fixnum_to_bignum(untag_fixnum_fast(dpeek()))));
+	drepl(tag<F_BIGNUM>(fixnum_to_bignum(untag_fixnum(dpeek()))));
 }
 
 void primitive_float_to_bignum(void)
 {
-	drepl(tag_bignum(float_to_bignum(dpeek())));
+	drepl(tag<F_BIGNUM>(float_to_bignum(dpeek())));
 }
 
 #define POP_BIGNUMS(x,y) \
-	F_BIGNUM * y = untag_bignum_fast(dpop()); \
-	F_BIGNUM * x = untag_bignum_fast(dpop());
+	F_BIGNUM * y = untag<F_BIGNUM>(dpop()); \
+	F_BIGNUM * x = untag<F_BIGNUM>(dpop());
 
 void primitive_bignum_eq(void)
 {
@@ -145,25 +145,25 @@ void primitive_bignum_eq(void)
 void primitive_bignum_add(void)
 {
 	POP_BIGNUMS(x,y);
-	dpush(tag_bignum(bignum_add(x,y)));
+	dpush(tag<F_BIGNUM>(bignum_add(x,y)));
 }
 
 void primitive_bignum_subtract(void)
 {
 	POP_BIGNUMS(x,y);
-	dpush(tag_bignum(bignum_subtract(x,y)));
+	dpush(tag<F_BIGNUM>(bignum_subtract(x,y)));
 }
 
 void primitive_bignum_multiply(void)
 {
 	POP_BIGNUMS(x,y);
-	dpush(tag_bignum(bignum_multiply(x,y)));
+	dpush(tag<F_BIGNUM>(bignum_multiply(x,y)));
 }
 
 void primitive_bignum_divint(void)
 {
 	POP_BIGNUMS(x,y);
-	dpush(tag_bignum(bignum_quotient(x,y)));
+	dpush(tag<F_BIGNUM>(bignum_quotient(x,y)));
 }
 
 void primitive_bignum_divmod(void)
@@ -171,39 +171,39 @@ void primitive_bignum_divmod(void)
 	F_BIGNUM *q, *r;
 	POP_BIGNUMS(x,y);
 	bignum_divide(x,y,&q,&r);
-	dpush(tag_bignum(q));
-	dpush(tag_bignum(r));
+	dpush(tag<F_BIGNUM>(q));
+	dpush(tag<F_BIGNUM>(r));
 }
 
 void primitive_bignum_mod(void)
 {
 	POP_BIGNUMS(x,y);
-	dpush(tag_bignum(bignum_remainder(x,y)));
+	dpush(tag<F_BIGNUM>(bignum_remainder(x,y)));
 }
 
 void primitive_bignum_and(void)
 {
 	POP_BIGNUMS(x,y);
-	dpush(tag_bignum(bignum_bitwise_and(x,y)));
+	dpush(tag<F_BIGNUM>(bignum_bitwise_and(x,y)));
 }
 
 void primitive_bignum_or(void)
 {
 	POP_BIGNUMS(x,y);
-	dpush(tag_bignum(bignum_bitwise_ior(x,y)));
+	dpush(tag<F_BIGNUM>(bignum_bitwise_ior(x,y)));
 }
 
 void primitive_bignum_xor(void)
 {
 	POP_BIGNUMS(x,y);
-	dpush(tag_bignum(bignum_bitwise_xor(x,y)));
+	dpush(tag<F_BIGNUM>(bignum_bitwise_xor(x,y)));
 }
 
 void primitive_bignum_shift(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-        F_BIGNUM* x = untag_bignum_fast(dpop());
-	dpush(tag_bignum(bignum_arithmetic_shift(x,y)));
+	F_FIXNUM y = untag_fixnum(dpop());
+        F_BIGNUM* x = untag<F_BIGNUM>(dpop());
+	dpush(tag<F_BIGNUM>(bignum_arithmetic_shift(x,y)));
 }
 
 void primitive_bignum_less(void)
@@ -232,19 +232,19 @@ void primitive_bignum_greatereq(void)
 
 void primitive_bignum_not(void)
 {
-	drepl(tag_bignum(bignum_bitwise_not(untag_bignum_fast(dpeek()))));
+	drepl(tag<F_BIGNUM>(bignum_bitwise_not(untag<F_BIGNUM>(dpeek()))));
 }
 
 void primitive_bignum_bitp(void)
 {
 	F_FIXNUM bit = to_fixnum(dpop());
-	F_BIGNUM *x = untag_bignum_fast(dpop());
+	F_BIGNUM *x = untag<F_BIGNUM>(dpop());
 	box_boolean(bignum_logbitp(bit,x));
 }
 
 void primitive_bignum_log2(void)
 {
-	drepl(tag_bignum(bignum_integer_length(untag_bignum_fast(dpeek()))));
+	drepl(tag<F_BIGNUM>(bignum_integer_length(untag<F_BIGNUM>(dpeek()))));
 }
 
 unsigned int bignum_producer(unsigned int digit)
@@ -255,9 +255,9 @@ unsigned int bignum_producer(unsigned int digit)
 
 void primitive_byte_array_to_bignum(void)
 {
-	CELL n_digits = array_capacity(untag_byte_array(dpeek()));
+	CELL n_digits = array_capacity(untag_check<F_BYTE_ARRAY>(dpeek()));
 	F_BIGNUM * bignum = digit_stream_to_bignum(n_digits,bignum_producer,0x100,0);
-	drepl(tag_bignum(bignum));
+	drepl(tag<F_BIGNUM>(bignum));
 }
 
 void box_signed_1(s8 n)
@@ -303,7 +303,7 @@ void box_unsigned_cell(CELL cell)
 void box_signed_8(s64 n)
 {
 	if(n < FIXNUM_MIN || n > FIXNUM_MAX)
-		dpush(tag_bignum(long_long_to_bignum(n)));
+		dpush(tag<F_BIGNUM>(long_long_to_bignum(n)));
 	else
 		dpush(tag_fixnum(n));
 }
@@ -313,9 +313,9 @@ s64 to_signed_8(CELL obj)
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
-		return untag_fixnum_fast(obj);
+		return untag_fixnum(obj);
 	case BIGNUM_TYPE:
-		return bignum_to_long_long(untag_bignum_fast(obj));
+		return bignum_to_long_long(untag<F_BIGNUM>(obj));
 	default:
 		type_error(BIGNUM_TYPE,obj);
 		return -1;
@@ -325,7 +325,7 @@ s64 to_signed_8(CELL obj)
 void box_unsigned_8(u64 n)
 {
 	if(n > FIXNUM_MAX)
-		dpush(tag_bignum(ulong_long_to_bignum(n)));
+		dpush(tag<F_BIGNUM>(ulong_long_to_bignum(n)));
 	else
 		dpush(tag_fixnum(n));
 }
@@ -335,9 +335,9 @@ u64 to_unsigned_8(CELL obj)
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
-		return untag_fixnum_fast(obj);
+		return untag_fixnum(obj);
 	case BIGNUM_TYPE:
-		return bignum_to_ulong_long(untag_bignum_fast(obj));
+		return bignum_to_ulong_long(untag<F_BIGNUM>(obj));
 	default:
 		type_error(BIGNUM_TYPE,obj);
 		return -1;
@@ -350,7 +350,7 @@ CELL unbox_array_size(void)
 	{
 	case FIXNUM_TYPE:
 		{
-			F_FIXNUM n = untag_fixnum_fast(dpeek());
+			F_FIXNUM n = untag_fixnum(dpeek());
 			if(n >= 0 && n < (F_FIXNUM)ARRAY_SIZE_MAX)
 			{
 				dpop();
@@ -360,9 +360,9 @@ CELL unbox_array_size(void)
 		}
 	case BIGNUM_TYPE:
 		{
-			F_BIGNUM * zero = untag_bignum_fast(bignum_zero);
+			F_BIGNUM * zero = untag<F_BIGNUM>(bignum_zero);
 			F_BIGNUM * max = cell_to_bignum(ARRAY_SIZE_MAX);
-			F_BIGNUM * n = untag_bignum_fast(dpeek());
+			F_BIGNUM * n = untag<F_BIGNUM>(dpeek());
 			if(bignum_compare(n,zero) != bignum_comparison_less
 				&& bignum_compare(n,max) == bignum_comparison_less)
 			{
@@ -390,7 +390,7 @@ void primitive_bignum_to_float(void)
 
 void primitive_str_to_float(void)
 {
-	F_BYTE_ARRAY *bytes = untag_byte_array(dpeek());
+	F_BYTE_ARRAY *bytes = untag_check<F_BYTE_ARRAY>(dpeek());
 	CELL capacity = array_capacity(bytes);
 
 	char *c_str = (char *)(bytes + 1);
@@ -405,13 +405,13 @@ void primitive_str_to_float(void)
 void primitive_float_to_str(void)
 {
 	F_BYTE_ARRAY *array = allot_byte_array(33);
-	snprintf((char *)(array + 1),32,"%.16g",untag_float(dpop()));
-	dpush(tag_object(array));
+	snprintf((char *)(array + 1),32,"%.16g",untag_float_check(dpop()));
+	dpush(tag<F_BYTE_ARRAY>(array));
 }
 
 #define POP_FLOATS(x,y) \
-	double y = untag_float_fast(dpop()); \
-	double x = untag_float_fast(dpop());
+	double y = untag_float(dpop()); \
+	double x = untag_float(dpop());
 
 void primitive_float_eq(void)
 {
@@ -475,7 +475,7 @@ void primitive_float_greatereq(void)
 
 void primitive_float_bits(void)
 {
-	box_unsigned_4(float_bits(untag_float(dpop())));
+	box_unsigned_4(float_bits(untag_float_check(dpop())));
 }
 
 void primitive_bits_float(void)
@@ -485,7 +485,7 @@ void primitive_bits_float(void)
 
 void primitive_double_bits(void)
 {
-	box_unsigned_8(double_bits(untag_float(dpop())));
+	box_unsigned_8(double_bits(untag_float_check(dpop())));
 }
 
 void primitive_bits_double(void)
@@ -495,12 +495,12 @@ void primitive_bits_double(void)
 
 float to_float(CELL value)
 {
-	return untag_float(value);
+	return untag_float_check(value);
 }
 
 double to_double(CELL value)
 {
-	return untag_float(value);
+	return untag_float_check(value);
 }
 
 void box_float(float flo)

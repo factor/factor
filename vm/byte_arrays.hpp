@@ -1,5 +1,3 @@
-DEFINE_UNTAG(F_BYTE_ARRAY,BYTE_ARRAY_TYPE,byte_array)
-
 F_BYTE_ARRAY *allot_byte_array(CELL size);
 
 void primitive_byte_array(void);
