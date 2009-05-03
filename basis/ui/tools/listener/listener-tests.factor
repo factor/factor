@@ -75,7 +75,7 @@ CONSTANT: text "Hello world.\nThis is a test."
 [ ] [
     [
         "interactor" get register-self
-        "interactor" get contents "promise" get fulfill
+        "interactor" get stream-contents "promise" get fulfill
     ] in-thread
 ] unit-test
 

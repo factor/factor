@@ -20,13 +20,13 @@ HOOK: (file-appender) io-backend ( path -- stream )
     swap normalize-path (file-appender) swap <encoder> ;
 
 : file-lines ( path encoding -- seq )
-    <file-reader> lines ;
+    <file-reader> stream-lines ;
 
 : with-file-reader ( path encoding quot -- )
     [ <file-reader> ] dip with-input-stream ; inline
 
 : file-contents ( path encoding -- seq )
-    <file-reader> contents ;
+    <file-reader> stream-contents ;
 
 : with-file-writer ( path encoding quot -- )
     [ <file-writer> ] dip with-output-stream ; inline

@@ -35,7 +35,7 @@ M: growable set-length ( n seq -- )
     ] if
     (>>length) ;
 
-: new-size ( old -- new ) 1+ 3 * ; inline
+: new-size ( old -- new ) 1 + 3 * ; inline
 
 : ensure ( n seq -- n seq )
     growable-check
