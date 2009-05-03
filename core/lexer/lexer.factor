@@ -9,7 +9,7 @@ TUPLE: lexer text line line-text line-length column ;
 : next-line ( lexer -- )
     dup [ line>> ] [ text>> ] bi ?nth >>line-text
     dup line-text>> length >>line-length
-    [ 1+ ] change-line
+    [ 1 + ] change-line
     0 >>column
     drop ;
 
@@ -39,7 +39,7 @@ GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word ( lexer -- )
     [
-        2dup nth CHAR: " eq? [ drop 1+ ] [ f skip ] if
+        2dup nth CHAR: " eq? [ drop 1 + ] [ f skip ] if
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )

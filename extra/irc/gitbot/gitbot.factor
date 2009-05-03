@@ -33,7 +33,7 @@ M: object handle-message drop ;
         "--pretty=format:%h %an: %s" ,
         ".." glue ,
     ] { } make
-    latin1 [ input-stream get lines ] with-process-reader ;
+    latin1 [ lines ] with-process-reader ;
 
 : updates ( from to -- lines )
     git-log reverse

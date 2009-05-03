@@ -68,8 +68,11 @@ SYMBOL: error-stream
 
 : bl ( -- ) " " write ;
 
-: lines ( stream -- seq )
+: stream-lines ( stream -- seq )
     [ [ readln dup ] [ ] produce nip ] with-input-stream ;
+
+: lines ( -- seq )
+    input-stream get stream-lines ;
 
 <PRIVATE
 
@@ -81,10 +84,13 @@ PRIVATE>
 : each-line ( quot -- )
     [ readln ] each-morsel ; inline
 
-: contents ( stream -- seq )
+: stream-contents ( stream -- seq )
     [
         [ 65536 read-partial dup ] [ ] produce nip concat f like
     ] with-input-stream ;
+
+: contents ( -- seq )
+    input-stream get stream-contents ;
 
 : each-block ( quot: ( block -- ) -- )
     [ 8192 read-partial ] each-morsel ; inline
