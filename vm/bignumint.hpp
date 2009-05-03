@@ -62,7 +62,7 @@ typedef F_FIXNUM bignum_length_type;
 #define BIGNUM_START_PTR(bignum)					\
   ((BIGNUM_TO_POINTER (bignum)) + 1)
 
-#define BIGNUM_LENGTH(bignum) (untag_fixnum_fast((bignum)->capacity) - 1)
+#define BIGNUM_LENGTH(bignum) (untag_fixnum((bignum)->capacity) - 1)
 
 #define BIGNUM_NEGATIVE_P(bignum) (get(AREF(bignum,0)) != 0)
 #define BIGNUM_SET_NEGATIVE_P(bignum,neg) put(AREF(bignum,0),neg)
@@ -75,9 +75,9 @@ typedef F_FIXNUM bignum_length_type;
 
 /* These definitions are here to facilitate caching of the constants
    0, 1, and -1. */
-#define BIGNUM_ZERO() untag_bignum_fast(bignum_zero)
+#define BIGNUM_ZERO() untag<F_BIGNUM>(bignum_zero)
 #define BIGNUM_ONE(neg_p) \
-   untag_bignum_fast(neg_p ? bignum_neg_one : bignum_pos_one)
+   untag<F_BIGNUM>(neg_p ? bignum_neg_one : bignum_pos_one)
 
 #define HD_LOW(digit) ((digit) & BIGNUM_HALF_DIGIT_MASK)
 #define HD_HIGH(digit) ((digit) >> BIGNUM_HALF_DIGIT_LENGTH)

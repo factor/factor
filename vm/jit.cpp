@@ -22,7 +22,7 @@ jit::jit(CELL type_, CELL owner_)
 
 F_REL jit::rel_to_emit(CELL code_template, bool *rel_p)
 {
-	F_ARRAY *quadruple = untag_array_fast(code_template);
+	F_ARRAY *quadruple = untag<F_ARRAY>(code_template);
 	CELL rel_class = array_nth(quadruple,1);
 	CELL rel_type = array_nth(quadruple,2);
 	CELL offset = array_nth(quadruple,3);
@@ -35,9 +35,9 @@ F_REL jit::rel_to_emit(CELL code_template, bool *rel_p)
 	else
 	{
 		*rel_p = true;
-		return (untag_fixnum_fast(rel_type) << 28)
-			| (untag_fixnum_fast(rel_class) << 24)
-			| ((code.count + untag_fixnum_fast(offset)));
+		return (untag_fixnum(rel_type) << 28)
+			| (untag_fixnum(rel_class) << 24)
+			| ((code.count + untag_fixnum(offset)));
 	}
 }
 

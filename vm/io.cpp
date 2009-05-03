@@ -81,7 +81,7 @@ void primitive_fread(void)
 
 	if(size == 0)
 	{
-		dpush(tag_object(allot_string(0,0)));
+		dpush(tag<F_STRING>(allot_string(0,0)));
 		return;
 	}
 
@@ -135,7 +135,7 @@ void primitive_fputc(void)
 void primitive_fwrite(void)
 {
 	FILE *file = (FILE *)unbox_alien();
-	F_BYTE_ARRAY *text = untag_byte_array(dpop());
+	F_BYTE_ARRAY *text = untag_check<F_BYTE_ARRAY>(dpop());
 	CELL length = array_capacity(text);
 	char *string = (char *)(text + 1);
 

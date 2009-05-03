@@ -1,19 +1,7 @@
-INLINE CELL tag_tuple(F_TUPLE *tuple)
-{
-	return RETAG(tuple,TUPLE_TYPE);
-}
-
 INLINE CELL tuple_size(F_TUPLE_LAYOUT *layout)
 {
-	CELL size = untag_fixnum_fast(layout->size);
+	CELL size = untag_fixnum(layout->size);
 	return sizeof(F_TUPLE) + size * CELLS;
-}
-
-DEFINE_UNTAG(F_TUPLE,TUPLE_TYPE,tuple)
-
-INLINE F_TUPLE_LAYOUT *untag_tuple_layout(CELL obj)
-{
-	return (F_TUPLE_LAYOUT *)UNTAG(obj);
 }
 
 INLINE CELL tuple_nth(F_TUPLE *tuple, CELL slot)

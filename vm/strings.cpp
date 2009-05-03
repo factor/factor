@@ -12,7 +12,7 @@ CELL string_nth(F_STRING* string, CELL index)
 		return ch;
 	else
 	{
-		F_BYTE_ARRAY *aux = untag_byte_array_fast(string->aux);
+		F_BYTE_ARRAY *aux = untag<F_BYTE_ARRAY>(string->aux);
 		return (cget(BREF(aux,index * sizeof(u16))) << 7) ^ ch;
 	}
 }
@@ -39,14 +39,14 @@ void set_string_nth_slow(F_STRING *string_, CELL index, CELL ch)
 		character is set. Initially all of
 		the bits are clear. */
 		aux = allot_array_internal<F_BYTE_ARRAY>(
-			untag_fixnum_fast(string->length)
+			untag_fixnum(string->length)
 			* sizeof(u16));
 
 		write_barrier(string.value());
-		string->aux = tag_object(aux);
+		string->aux = tag<F_BYTE_ARRAY>(aux);
 	}
 	else
-		aux = untag_byte_array_fast(string->aux);
+		aux = untag<F_BYTE_ARRAY>(string->aux);
 
 	cput(BREF(aux,index * sizeof(u16)),(ch >> 7) ^ 1);
 }
@@ -100,7 +100,7 @@ void primitive_string(void)
 {
 	CELL initial = to_cell(dpop());
 	CELL length = unbox_array_size();
-	dpush(tag_object(allot_string(length,initial)));
+	dpush(tag<F_STRING>(allot_string(length,initial)));
 }
 
 static bool reallot_string_in_place_p(F_STRING *string, CELL capacity)
@@ -118,7 +118,7 @@ F_STRING* reallot_string(F_STRING *string_, CELL capacity)
 
 		if(string->aux != F)
 		{
-			F_BYTE_ARRAY *aux = untag_byte_array_fast(string->aux);
+			F_BYTE_ARRAY *aux = untag<F_BYTE_ARRAY>(string->aux);
 			aux->capacity = tag_fixnum(capacity * 2);
 		}
 
@@ -139,9 +139,9 @@ F_STRING* reallot_string(F_STRING *string_, CELL capacity)
 			F_BYTE_ARRAY *new_aux = allot_byte_array(capacity * sizeof(u16));
 
 			write_barrier(new_string.value());
-			new_string->aux = tag_object(new_aux);
+			new_string->aux = tag<F_BYTE_ARRAY>(new_aux);
 
-			F_BYTE_ARRAY *aux = untag_byte_array_fast(string->aux);
+			F_BYTE_ARRAY *aux = untag<F_BYTE_ARRAY>(string->aux);
 			memcpy(new_aux + 1,aux + 1,to_copy * sizeof(u16));
 		}
 
@@ -152,38 +152,38 @@ F_STRING* reallot_string(F_STRING *string_, CELL capacity)
 
 void primitive_resize_string(void)
 {
-	F_STRING* string = untag_string(dpop());
+	F_STRING* string = untag_check<F_STRING>(dpop());
 	CELL capacity = unbox_array_size();
-	dpush(tag_object(reallot_string(string,capacity)));
+	dpush(tag<F_STRING>(reallot_string(string,capacity)));
 }
 
 void primitive_string_nth(void)
 {
-	F_STRING *string = untag_string_fast(dpop());
-	CELL index = untag_fixnum_fast(dpop());
+	F_STRING *string = untag<F_STRING>(dpop());
+	CELL index = untag_fixnum(dpop());
 	dpush(tag_fixnum(string_nth(string,index)));
 }
 
 void primitive_set_string_nth(void)
 {
-	F_STRING *string = untag_string_fast(dpop());
-	CELL index = untag_fixnum_fast(dpop());
-	CELL value = untag_fixnum_fast(dpop());
+	F_STRING *string = untag<F_STRING>(dpop());
+	CELL index = untag_fixnum(dpop());
+	CELL value = untag_fixnum(dpop());
 	set_string_nth(string,index,value);
 }
 
 void primitive_set_string_nth_fast(void)
 {
-	F_STRING *string = untag_string_fast(dpop());
-	CELL index = untag_fixnum_fast(dpop());
-	CELL value = untag_fixnum_fast(dpop());
+	F_STRING *string = untag<F_STRING>(dpop());
+	CELL index = untag_fixnum(dpop());
+	CELL value = untag_fixnum(dpop());
 	set_string_nth_fast(string,index,value);
 }
 
 void primitive_set_string_nth_slow(void)
 {
-	F_STRING *string = untag_string_fast(dpop());
-	CELL index = untag_fixnum_fast(dpop());
-	CELL value = untag_fixnum_fast(dpop());
+	F_STRING *string = untag<F_STRING>(dpop());
+	CELL index = untag_fixnum(dpop());
+	CELL value = untag_fixnum(dpop());
 	set_string_nth_slow(string,index,value);
 }

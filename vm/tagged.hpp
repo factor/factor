@@ -49,7 +49,7 @@ template <typename T> T *untag_check(CELL value)
 	return tagged<T>(value).untag_check();
 }
 
-template <typename T> T *untagged(CELL value)
+template <typename T> T *untag(CELL value)
 {
 	return tagged<T>(value).untagged();
 }

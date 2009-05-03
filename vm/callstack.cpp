@@ -29,7 +29,7 @@ void iterate_callstack(CELL top, CELL bottom, CALLSTACK_ITER iterator)
 void iterate_callstack_object(F_CALLSTACK *stack, CALLSTACK_ITER iterator)
 {
 	CELL top = (CELL)FIRST_STACK_FRAME(stack);
-	CELL bottom = top + untag_fixnum_fast(stack->length);
+	CELL bottom = top + untag_fixnum(stack->length);
 
 	iterate_callstack(top,bottom,iterator);
 }
@@ -80,16 +80,16 @@ void primitive_callstack(void)
 
 	F_CALLSTACK *callstack = allot_callstack(size);
 	memcpy(FIRST_STACK_FRAME(callstack),top,size);
-	dpush(tag_object(callstack));
+	dpush(tag<F_CALLSTACK>(callstack));
 }
 
 void primitive_set_callstack(void)
 {
-	F_CALLSTACK *stack = untag_callstack(dpop());
+	F_CALLSTACK *stack = untag_check<F_CALLSTACK>(dpop());
 
 	set_callstack(stack_chain->callstack_bottom,
 		FIRST_STACK_FRAME(stack),
-		untag_fixnum_fast(stack->length),
+		untag_fixnum(stack->length),
 		memcpy);
 
 	/* We cannot return here ... */
@@ -114,7 +114,7 @@ CELL frame_executing(F_STACK_FRAME *frame)
 		return F;
 	else
 	{
-		F_ARRAY *array = untag_array_fast(compiled->literals);
+		F_ARRAY *array = untag<F_ARRAY>(compiled->literals);
 		return array_nth(array,0);
 	}
 }
@@ -174,13 +174,13 @@ void primitive_callstack_to_array(void)
 	frame_index = 0;
 	iterate_callstack_object(callstack.untagged(),stack_frame_to_array);
 
-	dpush(tag_array(array));
+	dpush(tag<F_ARRAY>(array));
 }
 
 F_STACK_FRAME *innermost_stack_frame(F_CALLSTACK *callstack)
 {
 	F_STACK_FRAME *top = FIRST_STACK_FRAME(callstack);
-	CELL bottom = (CELL)top + untag_fixnum_fast(callstack->length);
+	CELL bottom = (CELL)top + untag_fixnum(callstack->length);
 
 	F_STACK_FRAME *frame = (F_STACK_FRAME *)bottom - 1;
 
@@ -195,7 +195,7 @@ Used by the single stepper. */
 void primitive_innermost_stack_frame_quot(void)
 {
 	F_STACK_FRAME *inner = innermost_stack_frame(
-		untag_callstack(dpop()));
+		untag_check<F_CALLSTACK>(dpop()));
 	type_check(QUOTATION_TYPE,frame_executing(inner));
 
 	dpush(frame_executing(inner));
@@ -204,7 +204,7 @@ void primitive_innermost_stack_frame_quot(void)
 void primitive_innermost_stack_frame_scan(void)
 {
 	F_STACK_FRAME *inner = innermost_stack_frame(
-		untag_callstack(dpop()));
+		untag_check<F_CALLSTACK>(dpop()));
 	type_check(QUOTATION_TYPE,frame_executing(inner));
 
 	dpush(frame_scan(inner));

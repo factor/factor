@@ -184,8 +184,8 @@ void init_data_heap(CELL gens,
 	gc_locals_region = alloc_segment(getpagesize());
 	gc_locals = gc_locals_region->start - CELLS;
 
-	extra_roots_region = alloc_segment(getpagesize());
-	extra_roots = extra_roots_region->start - CELLS;
+	gc_bignums_region = alloc_segment(getpagesize());
+	gc_bignums = gc_bignums_region->start - CELLS;
 
 	secure_gc = secure_gc_;
 
@@ -224,8 +224,8 @@ CELL unaligned_object_size(CELL pointer)
 	case STRING_TYPE:
 		return string_size(string_capacity((F_STRING*)pointer));
 	case TUPLE_TYPE:
-		tuple = untag_tuple_fast(pointer);
-		layout = untag_tuple_layout(tuple->layout);
+		tuple = untag<F_TUPLE>(pointer);
+		layout = untag<F_TUPLE_LAYOUT>(tuple->layout);
 		return tuple_size(layout);
 	case QUOTATION_TYPE:
 		return sizeof(F_QUOTATION);
@@ -241,7 +241,7 @@ CELL unaligned_object_size(CELL pointer)
 		return sizeof(F_WRAPPER);
 	case CALLSTACK_TYPE:
 		return callstack_size(
-			untag_fixnum_fast(((F_CALLSTACK *)pointer)->length));
+			untag_fixnum(((F_CALLSTACK *)pointer)->length));
 	default:
 		critical_error("Invalid header",pointer);
 		return -1; /* can't happen */
@@ -284,8 +284,8 @@ CELL binary_payload_start(CELL pointer)
 	case ARRAY_TYPE:
 		return array_size<F_ARRAY>(array_capacity((F_ARRAY*)pointer));
 	case TUPLE_TYPE:
-		tuple = untag_tuple_fast(pointer);
-		layout = untag_tuple_layout(tuple->layout);
+		tuple = untag<F_TUPLE>(pointer);
+		layout = untag<F_TUPLE_LAYOUT>(tuple->layout);
 		return tuple_size(layout);
 	case WRAPPER_TYPE:
 		return sizeof(F_WRAPPER);

@@ -15,12 +15,12 @@ void print_word(F_WORD* word, CELL nesting)
 
 	if(type_of(word->vocabulary) == STRING_TYPE)
 	{
-		print_chars(untag_string(word->vocabulary));
+		print_chars(untag<F_STRING>(word->vocabulary));
 		print_string(":");
 	}
 	
 	if(type_of(word->name) == STRING_TYPE)
-		print_chars(untag_string(word->name));
+		print_chars(untag<F_STRING>(word->name));
 	else
 	{
 		print_string("#<not a string: ");
@@ -62,7 +62,7 @@ void print_array(F_ARRAY* array, CELL nesting)
 
 void print_tuple(F_TUPLE* tuple, CELL nesting)
 {
-	F_TUPLE_LAYOUT *layout = untag_tuple_layout(tuple->layout);
+	F_TUPLE_LAYOUT *layout = untag<F_TUPLE_LAYOUT>(tuple->layout);
 	CELL length = to_fixnum(layout->size);
 
 	print_string(" ");
@@ -102,31 +102,31 @@ void print_nested_obj(CELL obj, F_FIXNUM nesting)
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
-		print_fixnum(untag_fixnum_fast(obj));
+		print_fixnum(untag_fixnum(obj));
 		break;
 	case WORD_TYPE:
-		print_word(untag_word(obj),nesting - 1);
+		print_word(untag<F_WORD>(obj),nesting - 1);
 		break;
 	case STRING_TYPE:
-		print_factor_string(untag_string(obj));
+		print_factor_string(untag<F_STRING>(obj));
 		break;
 	case F_TYPE:
 		print_string("f");
 		break;
 	case TUPLE_TYPE:
 		print_string("T{");
-		print_tuple(untag_tuple_fast(obj),nesting - 1);
+		print_tuple(untag<F_TUPLE>(obj),nesting - 1);
 		print_string(" }");
 		break;
 	case ARRAY_TYPE:
 		print_string("{");
-		print_array(untag_array_fast(obj),nesting - 1);
+		print_array(untag<F_ARRAY>(obj),nesting - 1);
 		print_string(" }");
 		break;
 	case QUOTATION_TYPE:
 		print_string("[");
-		quot = untag_quotation_fast(obj);
-		print_array(untag_array_fast(quot->array),nesting - 1);
+		quot = untag<F_QUOTATION>(obj);
+		print_array(untag<F_ARRAY>(quot->array),nesting - 1);
 		print_string(" ]");
 		break;
 	default:

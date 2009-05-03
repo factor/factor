@@ -136,25 +136,30 @@ void forward_object_xts(void)
 
 	while((obj = next_object()) != F)
 	{
-		if(type_of(obj) == WORD_TYPE)
+		switch(type_of(obj))
 		{
-			F_WORD *word = untag_word_fast(obj);
+		case WORD_TYPE:
+			F_WORD *word = untag<F_WORD>(obj);
 
 			word->code = forward_xt(word->code);
 			if(word->profiling)
 				word->profiling = forward_xt(word->profiling);
-		}
-		else if(type_of(obj) == QUOTATION_TYPE)
-		{
-			F_QUOTATION *quot = untag_quotation_fast(obj);
+			
+			break;
+		case QUOTATION_TYPE:
+			F_QUOTATION *quot = untag<F_QUOTATION>(obj);
 
 			if(quot->compiledp != F)
 				quot->code = forward_xt(quot->code);
-		}
-		else if(type_of(obj) == CALLSTACK_TYPE)
-		{
-			F_CALLSTACK *stack = untag_callstack_fast(obj);
+			
+			break;
+		case CALLSTACK_TYPE:
+			F_CALLSTACK *stack = untag<F_CALLSTACK>(obj);
 			iterate_callstack_object(stack,forward_frame_xt);
+			
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -175,7 +180,7 @@ void fixup_object_xts(void)
 			update_word_xt(obj);
 		else if(type_of(obj) == QUOTATION_TYPE)
 		{
-			F_QUOTATION *quot = untag_quotation_fast(obj);
+			F_QUOTATION *quot = untag<F_QUOTATION>(obj);
 
 			if(quot->compiledp != F)
 				set_quot_xt(quot,quot->code);

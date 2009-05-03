@@ -68,8 +68,11 @@ INLINE bool immediate_p(CELL obj)
 	return (obj == F || TAG(obj) == FIXNUM_TYPE);
 }
 
-INLINE F_FIXNUM untag_fixnum_fast(CELL tagged)
+INLINE F_FIXNUM untag_fixnum(CELL tagged)
 {
+#ifdef FACTOR_DEBUG
+	assert(TAG(tagged) == FIXNUM_TYPE);
+#endif
 	return ((F_FIXNUM)tagged) >> TAG_BITS;
 }
 
@@ -80,8 +83,10 @@ INLINE CELL tag_fixnum(F_FIXNUM untagged)
 
 typedef void *XT;
 
+#define NO_TYPE_CHECK static const CELL type_number = TYPE_COUNT
+
 struct F_OBJECT {
-	static const CELL type_number = TYPE_COUNT;
+	NO_TYPE_CHECK;
 	CELL header;
 };
 
@@ -96,6 +101,7 @@ struct F_ARRAY : public F_OBJECT {
 /* These are really just arrays, but certain elements have special
 significance */
 struct F_TUPLE_LAYOUT : public F_ARRAY {
+	NO_TYPE_CHECK;
 	/* tagged */
 	CELL klass;
 	/* tagged fixnum */

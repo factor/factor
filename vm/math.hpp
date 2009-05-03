@@ -21,13 +21,6 @@ extern CELL bignum_zero;
 extern CELL bignum_pos_one;
 extern CELL bignum_neg_one;
 
-DEFINE_UNTAG(F_BIGNUM,BIGNUM_TYPE,bignum);
-
-INLINE CELL tag_bignum(F_BIGNUM* bignum)
-{
-	return RETAG(bignum,BIGNUM_TYPE);
-}
-
 void primitive_fixnum_to_bignum(void);
 void primitive_float_to_bignum(void);
 void primitive_bignum_eq(void);
@@ -53,7 +46,7 @@ void primitive_byte_array_to_bignum(void);
 INLINE CELL allot_integer(F_FIXNUM x)
 {
 	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
-		return tag_bignum(fixnum_to_bignum(x));
+		return tag<F_BIGNUM>(fixnum_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }
@@ -61,7 +54,7 @@ INLINE CELL allot_integer(F_FIXNUM x)
 INLINE CELL allot_cell(CELL x)
 {
 	if(x > (CELL)FIXNUM_MAX)
-		return tag_bignum(cell_to_bignum(x));
+		return tag<F_BIGNUM>(cell_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }
@@ -83,15 +76,14 @@ DLLEXPORT u64 to_unsigned_8(CELL obj);
 
 CELL unbox_array_size(void);
 
-INLINE double untag_float_fast(CELL tagged)
-{
-	return ((F_FLOAT *)UNTAG(tagged))->n;
-}
-
 INLINE double untag_float(CELL tagged)
 {
-	type_check(FLOAT_TYPE,tagged);
-	return untag_float_fast(tagged);
+	return untag<F_FLOAT>(tagged)->n;
+}
+
+INLINE double untag_float_check(CELL tagged)
+{
+	return untag_check<F_FLOAT>(tagged)->n;
 }
 
 INLINE CELL allot_float(double n)
@@ -103,22 +95,22 @@ INLINE CELL allot_float(double n)
 
 INLINE F_FIXNUM float_to_fixnum(CELL tagged)
 {
-	return (F_FIXNUM)untag_float_fast(tagged);
+	return (F_FIXNUM)untag_float(tagged);
 }
 
 INLINE F_BIGNUM *float_to_bignum(CELL tagged)
 {
-	return double_to_bignum(untag_float_fast(tagged));
+	return double_to_bignum(untag_float(tagged));
 }
 
 INLINE double fixnum_to_float(CELL tagged)
 {
-	return (double)untag_fixnum_fast(tagged);
+	return (double)untag_fixnum(tagged);
 }
 
 INLINE double bignum_to_float(CELL tagged)
 {
-	return bignum_to_double(untag_bignum_fast(tagged));
+	return bignum_to_double(untag<F_BIGNUM>(tagged));
 }
 
 DLLEXPORT void box_float(float flo);
