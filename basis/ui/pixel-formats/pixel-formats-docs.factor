@@ -1,5 +1,12 @@
-USING: destructors help.markup help.syntax kernel math multiline sequences ui.gadgets.worlds ;
+USING: destructors help.markup help.syntax kernel math multiline sequences
+vocabs.parser words ;
 IN: ui.pixel-formats
+
+! break circular dependency
+<<
+    "world" "ui.gadgets.worlds" create drop
+    "ui.gadgets.worlds" (use+)
+>>
 
 ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"
 "The following pixel format attributes can be requested and queried of " { $link pixel-format } "s. Binary attributes are represented by the presence of a symbol in an attribute sequence:"
