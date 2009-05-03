@@ -1,7 +1,7 @@
 USING: kernel opengl opengl.demo-support opengl.gl opengl.textures
 opengl.shaders opengl.framebuffers opengl.capabilities multiline
 ui.gadgets accessors sequences ui.render ui math locals arrays
-generalizations combinators ui.gadgets.worlds ;
+generalizations combinators ui.gadgets.worlds literals ;
 IN: spheres
 
 STRING: plane-vertex-shader
@@ -136,12 +136,14 @@ M: spheres-gadget distance-step ( gadget -- dz )
         GL_TEXTURE_CUBE_MAP GL_TEXTURE_WRAP_S GL_CLAMP glTexParameteri
         GL_TEXTURE_CUBE_MAP GL_TEXTURE_WRAP_T GL_CLAMP glTexParameteri
         GL_TEXTURE_CUBE_MAP GL_TEXTURE_WRAP_R GL_CLAMP glTexParameteri
-        GL_TEXTURE_CUBE_MAP_POSITIVE_X
-        GL_TEXTURE_CUBE_MAP_POSITIVE_Y
-        GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_X
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_Z 6 narray
+        ${
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X
+            GL_TEXTURE_CUBE_MAP_POSITIVE_Y
+            GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_X
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+        }
         [ 0 GL_RGBA8 (reflection-dim) 0 GL_RGBA GL_UNSIGNED_BYTE f glTexImage2D ]
         each
     ] keep ;
