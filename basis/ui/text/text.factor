@@ -75,10 +75,8 @@ M: array draw-text
 
 USING: vocabs.loader namespaces system combinators ;
 
-"ui-backend" get [
-    {
-        { [ os macosx? ] [ "core-text" ] }
-        { [ os windows? ] [ "uniscribe" ] }
-        { [ os unix? ] [ "pango" ] }
-    } cond
-] unless* "ui.text." prepend require
+{
+    { [ os macosx? ] [ "core-text" ] }
+    { [ os windows? ] [ "uniscribe" ] }
+    { [ os unix? ] [ "pango" ] }
+} cond "ui.text." prepend require

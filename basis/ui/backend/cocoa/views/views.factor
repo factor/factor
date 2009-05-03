@@ -365,8 +365,8 @@ CLASS: {
     -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 <int>
     CGLSetParameter drop ;
 
-: <FactorView> ( dim -- view )
-    FactorView swap <GLView> [ sync-refresh-to-screen ] keep ;
+: <FactorView> ( dim pixel-format -- view )
+    [ FactorView ] 2dip <GLView> [ sync-refresh-to-screen ] keep ;
 
 : save-position ( world window -- )
     -> frame CGRect-top-left 2array >>window-loc drop ;

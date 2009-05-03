@@ -1,6 +1,6 @@
 USING: ui.gadgets ui.render ui.text ui.text.private
 ui.gestures ui.backend help.markup help.syntax
-models opengl strings ;
+models opengl sequences strings ;
 IN: ui.gadgets.worlds
 
 HELP: user-input
