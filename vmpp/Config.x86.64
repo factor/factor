@@ -1,2 +1,0 @@
-PLAF_DLL_OBJS += vmpp/cpu-x86.64.o
-CFLAGS += -DFACTOR_64

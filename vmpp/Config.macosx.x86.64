@@ -1,3 +1,0 @@
-include vmpp/Config.macosx
-include vmpp/Config.x86.64
-CFLAGS += -m64

@@ -1,3 +1,0 @@
-include vmpp/Config.linux
-include vmpp/Config.arm
-PLAF_DLL_OBJS += vmpp/os-linux-arm.o

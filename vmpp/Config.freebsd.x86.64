@@ -1,3 +1,0 @@
-include vmpp/Config.freebsd
-include vmpp/Config.x86.64
-LIBS += -lpthread

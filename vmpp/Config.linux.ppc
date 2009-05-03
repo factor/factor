@@ -1,3 +1,0 @@
-include vmpp/Config.linux
-include vmpp/Config.ppc
-CFLAGS += -mregnames

@@ -1,7 +1,7 @@
-#include "master.h"
+#include "master.hpp"
 
 /* gets the address of an object representing a C pointer */
-void *alien_offset(CELL object)
+char *alien_offset(CELL object)
 {
 	F_ALIEN *alien;
 	F_BYTE_ARRAY *byte_array;
@@ -9,10 +9,10 @@ void *alien_offset(CELL object)
 	switch(type_of(object))
 	{
 	case BYTE_ARRAY_TYPE:
-		byte_array = untag_object(object);
-		return byte_array + 1;
+		byte_array = untag<F_BYTE_ARRAY>(object);
+		return (char *)(byte_array + 1);
 	case ALIEN_TYPE:
-		alien = untag_object(object);
+		alien = untag<F_ALIEN>(object);
 		if(alien->expired != F)
 			general_error(ERROR_EXPIRED,object,F,NULL);
 		return alien_offset(alien->alien) + alien->displacement;
@@ -26,14 +26,14 @@ void *alien_offset(CELL object)
 
 /* gets the address of an object representing a C pointer, with the
 intention of storing the pointer across code which may potentially GC. */
-void *pinned_alien_offset(CELL object)
+char *pinned_alien_offset(CELL object)
 {
 	F_ALIEN *alien;
 
 	switch(type_of(object))
 	{
 	case ALIEN_TYPE:
-		alien = untag_object(object);
+		alien = untag<F_ALIEN>(object);
 		if(alien->expired != F)
 			general_error(ERROR_EXPIRED,object,F,NULL);
 		return pinned_alien_offset(alien->alien) + alien->displacement;
@@ -46,30 +46,30 @@ void *pinned_alien_offset(CELL object)
 }
 
 /* pop an object representing a C pointer */
-void *unbox_alien(void)
+char *unbox_alien(void)
 {
 	return alien_offset(dpop());
 }
 
 /* make an alien */
-CELL allot_alien(CELL delegate, CELL displacement)
+CELL allot_alien(CELL delegate_, CELL displacement)
 {
-	REGISTER_ROOT(delegate);
-	F_ALIEN *alien = allot_object(ALIEN_TYPE,sizeof(F_ALIEN));
-	UNREGISTER_ROOT(delegate);
+	gc_root<F_OBJECT> delegate(delegate_);
+	gc_root<F_ALIEN> alien(allot<F_ALIEN>(sizeof(F_ALIEN)));
 
-	if(type_of(delegate) == ALIEN_TYPE)
+	if(delegate.isa(ALIEN_TYPE))
 	{
-		F_ALIEN *delegate_alien = untag_object(delegate);
+		tagged<F_ALIEN> delegate_alien = delegate.as<F_ALIEN>();
 		displacement += delegate_alien->displacement;
 		alien->alien = delegate_alien->alien;
 	}
 	else
-		alien->alien = delegate;
+		alien->alien = delegate.value();
 
 	alien->displacement = displacement;
 	alien->expired = F;
-	return tag_object(alien);
+
+	return alien.value();
 }
 
 /* make an alien and push */
@@ -127,7 +127,7 @@ INLINE void *alien_pointer(void)
 	} \
 	void primitive_set_alien_##name(void) \
 	{ \
-		type* ptr = alien_pointer(); \
+		type *ptr = (type *)alien_pointer(); \
 		type value = to(dpop()); \
 		*ptr = value; \
 	}
@@ -157,7 +157,7 @@ void box_value_struct(void *src, CELL size)
 {
 	F_BYTE_ARRAY *array = allot_byte_array(size);
 	memcpy(array + 1,src,size);
-	dpush(tag_object(array));
+	dpush(tag<F_BYTE_ARRAY>(array));
 }
 
 /* On some x86 OSes, structs <= 8 bytes are returned in registers. */
@@ -183,42 +183,40 @@ void box_medium_struct(CELL x1, CELL x2, CELL x3, CELL x4, CELL size)
 /* open a native library and push a handle */
 void primitive_dlopen(void)
 {
-	CELL path = tag_object(string_to_native_alien(
-		untag_string(dpop())));
-	REGISTER_ROOT(path);
-	F_DLL* dll = allot_object(DLL_TYPE,sizeof(F_DLL));
-	UNREGISTER_ROOT(path);
-	dll->path = path;
-	ffi_dlopen(dll);
-	dpush(tag_object(dll));
+	gc_root<F_BYTE_ARRAY> path(dpop());
+	path.untag_check();
+	gc_root<F_DLL> dll(allot<F_DLL>(sizeof(F_DLL)));
+	dll->path = path.value();
+	ffi_dlopen(dll.untagged());
+	dpush(dll.value());
 }
 
 /* look up a symbol in a native library */
 void primitive_dlsym(void)
 {
-	CELL dll = dpop();
-	REGISTER_ROOT(dll);
-	F_SYMBOL *sym = unbox_symbol_string();
-	UNREGISTER_ROOT(dll);
+	gc_root<F_OBJECT> dll(dpop());
+	gc_root<F_BYTE_ARRAY> name(dpop());
+	dll.untag_check();
+	name.untag_check();
 
-	F_DLL *d;
+	F_CHAR *sym = (F_CHAR *)(name.untagged() + 1);
 
-	if(dll == F)
+	if(dll.value() == F)
 		box_alien(ffi_dlsym(NULL,sym));
 	else
 	{
-		d = untag_dll(dll);
+		tagged<F_DLL> d = dll.as<F_DLL>();
 		if(d->dll == NULL)
 			dpush(F);
 		else
-			box_alien(ffi_dlsym(d,sym));
+			box_alien(ffi_dlsym(d.untagged(),sym));
 	}
 }
 
 /* close a native library handle */
 void primitive_dlclose(void)
 {
-	ffi_dlclose(untag_dll(dpop()));
+	ffi_dlclose(untag_check<F_DLL>(dpop()));
 }
 
 void primitive_dll_validp(void)
@@ -227,8 +225,5 @@ void primitive_dll_validp(void)
 	if(dll == F)
 		dpush(T);
 	else
-	{
-		F_DLL *d = untag_dll(dll);
-		dpush(d->dll == NULL ? F : T);
-	}
+		dpush(tagged<F_DLL>(dll)->dll == NULL ? F : T);
 }

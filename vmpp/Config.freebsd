@@ -1,4 +1,0 @@
-include vmpppp/Config.unix
-PLAF_DLL_OBJS += vmpppp/os-genunix.o vmpp/os-freebsd.o
-CFLAGS += -export-dynamic
-LIBS = -L/usr/local/lib/ -lm $(X11_UI_LIBS)
