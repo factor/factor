@@ -16,6 +16,12 @@ IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
 
+TUPLE: win-base hDC hRC ;
+TUPLE: win < win-base hWnd world title ;
+TUPLE: win-offscreen < win-base hBitmap bits ;
+C: <win> win
+C: <win-offscreen> win-offscreen
+
 <PRIVATE
 
 PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
@@ -216,12 +222,6 @@ M: pasteboard set-clipboard-contents drop copy ;
 : init-clipboard ( -- )
     <pasteboard> clipboard set-global
     <clipboard> selection set-global ;
-
-TUPLE: win-base hDC hRC ;
-TUPLE: win < win-base hWnd world title ;
-TUPLE: win-offscreen < win-base hBitmap bits ;
-C: <win> win
-C: <win-offscreen> win-offscreen
 
 SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
@@ -621,26 +621,24 @@ M: windows-ui-backend do-events
     f class-name-ptr set-global
     f msg-obj set-global ;
 
-: get-dc ( hWnd -- hDC ) GetDC dup win32-error=0/f ;
+: get-dc ( world -- ) handle>> dup hWnd>> GetDC dup win32-error=0/f >>hDC drop ;
 
-: get-rc ( hDC -- hRC )
-    dup wglCreateContext dup win32-error=0/f
-    [ wglMakeCurrent win32-error=0/f ] keep ;
+: get-rc ( world -- )
+    handle>> dup hDC>> dup wglCreateContext dup win32-error=0/f
+    [ wglMakeCurrent win32-error=0/f ] keep >>hRC drop ;
 
 : set-pixel-format ( pixel-format hdc -- )
     swap handle>> "PIXELFORMATDESCRIPTOR" <c-object> SetPixelFormat win32-error=0/f ;
 
-: setup-gl ( world hwnd -- hDC hRC )
-    get-dc
-    [ [ drop ] 2dip [ set-pixel-format ] [ ] [ get-rc ] tri ]
-    curry with-world-pixel-format ;
+: setup-gl ( world -- )
+    [ get-dc ] keep
+    [ swap [ hDC>> set-pixel-format ] [ get-rc ] bi ]
+    with-world-pixel-format ;
 
 M: windows-ui-backend (open-window) ( world -- )
-    [ dup create-window [ setup-gl ] keep ] keep
-    [ f <win> ] keep
-    [ swap hWnd>> register-window ] 2keep
-    dupd (>>handle)
-    hWnd>> show-window ;
+    [ dup create-window f f <win> >>handle setup-gl ]
+    [ dup handle>> hWnd>> register-window ]
+    [ handle>> hWnd>> show-window ] tri ;
 
 M: win-base select-gl-context ( handle -- )
     [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f
@@ -650,17 +648,14 @@ M: win-base flush-gl-context ( handle -- )
     hDC>> SwapBuffers win32-error=0/f ;
 
 : setup-offscreen-gl ( world -- hDC hRC hBitmap bits )
-    [
-        swap
-        make-offscreen-dc-and-bitmap [
-            [ set-pixel-format ]
-            [ get-rc ] bi
-        ] 2dip ;
-    ] with-world-pixel-format
+    dup [ handle>> ] [ dim>> ] bi make-offscreen-dc-and-bitmap
+    [ >>hDC ] [ >>hBitmap ] [ >>bits ] tri* drop [
+        swap [ hDC>> set-pixel-format ] [ get-rc ] bi
+    ] with-world-pixel-format ;
 
 M: windows-ui-backend (open-offscreen-buffer) ( world -- )
-    dup setup-offscreen-gl <win-offscreen>
-    >>handle drop ;
+    win-offscreen new >>handle
+    setup-offscreen-gl ;
 
 M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
     [ hDC>> DeleteDC drop ]
