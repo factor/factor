@@ -24,7 +24,7 @@ HELP: CONSULT:
 
 HELP: SLOT-PROTOCOL:
 { $syntax "SLOT-PROTOCOL: protocol-name slots... ;" }
-{ $description "Defines a protocol consisting of reader and writer words for the listen slot names." } ;
+{ $description "Defines a protocol consisting of reader and writer words for the listed slot names." } ;
 
 { define-protocol POSTPONE: PROTOCOL: } related-words
 
