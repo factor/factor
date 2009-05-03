@@ -28,9 +28,6 @@ INLINE bool collecting_accumulation_gen_p(void)
 
 extern CELL last_code_heap_scan;
 
-/* test if the pointer is in generation being collected, or a younger one. */
-bool should_copy_p(CELL untagged);
-
 void copy_handle(CELL *handle);
 
 void garbage_collection(volatile CELL gen,

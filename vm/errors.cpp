@@ -113,7 +113,6 @@ void memory_protection_error(CELL addr, F_STACK_FRAME *native_stack)
 		general_error(ERROR_RS_OVERFLOW,F,F,native_stack);
 	else if(in_page(addr, nursery.end, 0, 0))
 		critical_error("allot_object() missed GC check",0);
-	else if(in_page(addr, gc_locals_region->start, 0, -1))
 	else
 		general_error(ERROR_MEMORY,allot_cell(addr),F,native_stack);
 }
