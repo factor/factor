@@ -87,3 +87,8 @@ SYNTAX: PIXEL-FORMAT-ATTRIBUTE-TABLE:
     scan scan-object scan-object define-pixel-format-attribute-table ;
 
 PRIVATE>
+
+GENERIC: world-pixel-format-attributes ( world -- attributes )
+
+GENERIC# check-world-pixel-format 1 ( world pixel-format -- )
+

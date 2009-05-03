@@ -150,10 +150,6 @@ M: world handle-gesture ( gesture gadget -- ? )
 : close-global ( world global -- )
     [ get-global find-world eq? ] keep '[ f _ set-global ] when ;
 
-GENERIC: world-pixel-format-attributes ( world -- attributes )
-
-GENERIC# check-world-pixel-format 1 ( world pixel-format -- )
-
 M: world world-pixel-format-attributes
     drop
     { windowed double-buffered T{ depth-bits { value 16 } } } ;
