@@ -32,13 +32,13 @@ void primitive_word(void)
 {
 	CELL vocab = dpop();
 	CELL name = dpop();
-	dpush(tag_object(allot_word(vocab,name)));
+	dpush(tag<F_WORD>(allot_word(vocab,name)));
 }
 
 /* word-xt ( word -- start end ) */
 void primitive_word_xt(void)
 {
-	F_WORD *word = untag_word(dpop());
+	F_WORD *word = untag_check<F_WORD>(dpop());
 	F_CODE_BLOCK *code = (profiling_p ? word->profiling : word->code);
 	dpush(allot_cell((CELL)code + sizeof(F_CODE_BLOCK)));
 	dpush(allot_cell((CELL)code + code->block.size));
@@ -65,12 +65,12 @@ void update_word_xt(CELL word_)
 
 void primitive_optimized_p(void)
 {
-	drepl(tag_boolean(word_optimized_p(untag_word(dpeek()))));
+	drepl(tag_boolean(word_optimized_p(untag_check<F_WORD>(dpeek()))));
 }
 
 void primitive_wrapper(void)
 {
 	F_WRAPPER *wrapper = allot<F_WRAPPER>(sizeof(F_WRAPPER));
 	wrapper->object = dpeek();
-	drepl(tag_object(wrapper));
+	drepl(tag<F_WRAPPER>(wrapper));
 }

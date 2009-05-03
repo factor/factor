@@ -29,8 +29,9 @@ struct jit {
 		emit_with(userenv[JIT_WORD_CALL],word);
 	}
 
-	void emit_subprimitive(CELL word) {
-		gc_root<F_ARRAY> code_template(untagged<F_WORD>(word)->subprimitive);
+	void emit_subprimitive(CELL word_) {
+		gc_root<F_WORD> word(word_);
+		gc_root<F_ARRAY> code_template(word->subprimitive);
 		if(array_nth(code_template.untagged(),1) != F) literal(T);
 		emit(code_template.value());
 	}

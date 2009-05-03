@@ -1,10 +1,3 @@
-DEFINE_UNTAG(F_ARRAY,ARRAY_TYPE,array)
-
-INLINE CELL tag_array(F_ARRAY *array)
-{
-	return RETAG(array,ARRAY_TYPE);
-}
-
 F_ARRAY *allot_array(CELL capacity, CELL fill);
 
 CELL allot_array_1(CELL obj);

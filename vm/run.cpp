@@ -126,7 +126,7 @@ bool stack_to_array(CELL bottom, CELL top)
 	{
 		F_ARRAY *a = allot_array_internal<F_ARRAY>(depth / CELLS);
 		memcpy(a + 1,(void*)bottom,depth);
-		dpush(tag_array(a));
+		dpush(tag<F_ARRAY>(a));
 		return true;
 	}
 }
@@ -153,12 +153,12 @@ CELL array_to_stack(F_ARRAY *array, CELL bottom)
 
 void primitive_set_datastack(void)
 {
-	ds = array_to_stack(untag_array(dpop()),ds_bot);
+	ds = array_to_stack(untag_check<F_ARRAY>(dpop()),ds_bot);
 }
 
 void primitive_set_retainstack(void)
 {
-	rs = array_to_stack(untag_array(dpop()),rs_bot);
+	rs = array_to_stack(untag_check<F_ARRAY>(dpop()),rs_bot);
 }
 
 /* Used to implement call( */
@@ -167,7 +167,7 @@ void primitive_check_datastack(void)
 	F_FIXNUM out = to_fixnum(dpop());
 	F_FIXNUM in = to_fixnum(dpop());
 	F_FIXNUM height = out - in;
-	F_ARRAY *array = untag_array(dpop());
+	F_ARRAY *array = untag_check<F_ARRAY>(dpop());
 	F_FIXNUM length = array_capacity(array);
 	F_FIXNUM depth = (ds - ds_bot + CELLS) / CELLS;
 	if(depth - height != length)
@@ -189,13 +189,13 @@ void primitive_check_datastack(void)
 
 void primitive_getenv(void)
 {
-	F_FIXNUM e = untag_fixnum_fast(dpeek());
+	F_FIXNUM e = untag_fixnum(dpeek());
 	drepl(userenv[e]);
 }
 
 void primitive_setenv(void)
 {
-	F_FIXNUM e = untag_fixnum_fast(dpop());
+	F_FIXNUM e = untag_fixnum(dpop());
 	CELL value = dpop();
 	userenv[e] = value;
 }
@@ -217,7 +217,7 @@ void primitive_sleep(void)
 
 void primitive_set_slot(void)
 {
-	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	F_FIXNUM slot = untag_fixnum(dpop());
 	CELL obj = dpop();
 	CELL value = dpop();
 	set_slot(obj,slot,value);
@@ -225,7 +225,7 @@ void primitive_set_slot(void)
 
 void primitive_load_locals(void)
 {
-	F_FIXNUM count = untag_fixnum_fast(dpop());
+	F_FIXNUM count = untag_fixnum(dpop());
 	memcpy((CELL *)(rs + CELLS),(CELL *)(ds - CELLS * (count - 1)),CELLS * count);
 	ds -= CELLS * count;
 	rs += CELLS * count;

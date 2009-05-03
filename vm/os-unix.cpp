@@ -55,7 +55,7 @@ void ffi_dlclose(F_DLL *dll)
 void primitive_existsp(void)
 {
 	struct stat sb;
-	char *path = (char *)(untag_byte_array(dpop()) + 1);
+	char *path = (char *)(untag_check<F_BYTE_ARRAY>(dpop()) + 1);
 	box_boolean(stat(path,&sb) >= 0);
 }
 

@@ -39,17 +39,6 @@ INLINE void type_check(CELL type, CELL tagged)
 	if(type_of(tagged) != type) type_error(type,tagged);
 }
 
-#define DEFINE_UNTAG(type,check,name) \
-	INLINE type *untag_##name##_fast(CELL obj) \
-	{ \
-		return (type *)UNTAG(obj); \
-	} \
-	INLINE type *untag_##name(CELL obj) \
-	{ \
-		type_check(check,obj); \
-		return untag_##name##_fast(obj); \
-	} \
-
 void primitive_unimplemented(void);
 
 /* Global variables used to pass fault handler state from signal handler to

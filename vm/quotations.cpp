@@ -88,7 +88,7 @@ bool quotation_jit::stack_frame_p()
 		CELL obj = array_nth(array.untagged(),i);
 		if(type_of(obj) == WORD_TYPE)
 		{
-			if(untagged<F_WORD>(obj)->subprimitive == F)
+			if(untag<F_WORD>(obj)->subprimitive == F)
 				return true;
 		}
 		else if(type_of(obj) == QUOTATION_TYPE)
@@ -221,7 +221,7 @@ void quotation_jit::iterate_quotation()
 			{
 				emit_mega_cache_lookup(
 					array_nth(array.untagged(),i),
-					untag_fixnum_fast(array_nth(array.untagged(),i + 1)),
+					untag_fixnum(array_nth(array.untagged(),i + 1)),
 					array_nth(array.untagged(),i + 2));
 				i += 3;
 				tail_call = true;
@@ -290,12 +290,12 @@ void primitive_array_to_quotation(void)
 	quot->compiledp = F;
 	quot->cached_effect = F;
 	quot->cache_counter = F;
-	drepl(tag_quotation(quot));
+	drepl(tag<F_QUOTATION>(quot));
 }
 
 void primitive_quotation_xt(void)
 {
-	F_QUOTATION *quot = untag_quotation(dpeek());
+	F_QUOTATION *quot = untag_check<F_QUOTATION>(dpeek());
 	drepl(allot_cell((CELL)quot->xt));
 }
 

@@ -5,11 +5,11 @@ CELL megamorphic_cache_misses;
 
 static CELL search_lookup_alist(CELL table, CELL klass)
 {
-	F_ARRAY *pairs = untag_array_fast(table);
+	F_ARRAY *pairs = untag<F_ARRAY>(table);
 	F_FIXNUM index = array_capacity(pairs) - 1;
 	while(index >= 0)
 	{
-		F_ARRAY *pair = untag_array_fast(array_nth(pairs,index));
+		F_ARRAY *pair = untag<F_ARRAY>(array_nth(pairs,index));
 		if(array_nth(pair,0) == klass)
 			return array_nth(pair,1);
 		else
@@ -21,7 +21,7 @@ static CELL search_lookup_alist(CELL table, CELL klass)
 
 static CELL search_lookup_hash(CELL table, CELL klass, CELL hashcode)
 {
-	F_ARRAY *buckets = untag_array_fast(table);
+	F_ARRAY *buckets = untag<F_ARRAY>(table);
 	CELL bucket = array_nth(buckets,hashcode & (array_capacity(buckets) - 1));
 	if(type_of(bucket) == WORD_TYPE || bucket == F)
 		return bucket;
@@ -43,12 +43,12 @@ static CELL nth_hashcode(F_TUPLE_LAYOUT *layout, F_FIXNUM echelon)
 
 static CELL lookup_tuple_method(CELL object, CELL methods)
 {
-	F_TUPLE *tuple = untag_tuple_fast(object);
-	F_TUPLE_LAYOUT *layout = untag_tuple_layout(tuple->layout);
+	F_TUPLE *tuple = untag<F_TUPLE>(object);
+	F_TUPLE_LAYOUT *layout = untag<F_TUPLE_LAYOUT>(tuple->layout);
 
-	F_ARRAY *echelons = untag_array_fast(methods);
+	F_ARRAY *echelons = untag<F_ARRAY>(methods);
 
-	F_FIXNUM echelon = untag_fixnum_fast(layout->echelon);
+	F_FIXNUM echelon = untag_fixnum(layout->echelon);
 	F_FIXNUM max_echelon = array_capacity(echelons) - 1;
 	if(echelon > max_echelon) echelon = max_echelon;
        
@@ -61,7 +61,7 @@ static CELL lookup_tuple_method(CELL object, CELL methods)
 		else if(echelon_methods != F)
 		{
 			CELL klass = nth_superclass(layout,echelon);
-			CELL hashcode = untag_fixnum_fast(nth_hashcode(layout,echelon));
+			CELL hashcode = untag_fixnum(nth_hashcode(layout,echelon));
 			CELL result = search_lookup_hash(echelon_methods,klass,hashcode);
 			if(result != F)
 				return result;
@@ -76,7 +76,7 @@ static CELL lookup_tuple_method(CELL object, CELL methods)
 
 static CELL lookup_hi_tag_method(CELL object, CELL methods)
 {
-	F_ARRAY *hi_tag_methods = untag_array_fast(methods);
+	F_ARRAY *hi_tag_methods = untag<F_ARRAY>(methods);
 	CELL tag = hi_tag(object) - HEADER_TYPE;
 #ifdef FACTOR_DEBUG
 	assert(tag < TYPE_COUNT - HEADER_TYPE);
@@ -86,7 +86,7 @@ static CELL lookup_hi_tag_method(CELL object, CELL methods)
 
 static CELL lookup_hairy_method(CELL object, CELL methods)
 {
-	CELL method = array_nth(untag_array_fast(methods),TAG(object));
+	CELL method = array_nth(untag<F_ARRAY>(methods),TAG(object));
 	if(type_of(method) == WORD_TYPE)
 		return method;
 	else
@@ -109,7 +109,7 @@ static CELL lookup_hairy_method(CELL object, CELL methods)
 CELL lookup_method(CELL object, CELL methods)
 {
 	if(!HI_TAG_OR_TUPLE_P(object))
-		return array_nth(untag_array_fast(methods),TAG(object));
+		return array_nth(untag<F_ARRAY>(methods),TAG(object));
 	else
 		return lookup_hairy_method(object,methods);
 }
@@ -137,7 +137,7 @@ static CELL method_cache_hashcode(CELL klass, F_ARRAY *array)
 
 static void update_method_cache(CELL cache, CELL klass, CELL method)
 {
-	F_ARRAY *array = untag_array_fast(cache);
+	F_ARRAY *array = untag<F_ARRAY>(cache);
 	CELL hashcode = method_cache_hashcode(klass,array);
 	set_array_nth(array,hashcode,klass);
 	set_array_nth(array,hashcode + 1,method);
@@ -148,7 +148,7 @@ void primitive_mega_cache_miss(void)
 	megamorphic_cache_misses++;
 
 	CELL cache = dpop();
-	F_FIXNUM index = untag_fixnum_fast(dpop());
+	F_FIXNUM index = untag_fixnum(dpop());
 	CELL methods = dpop();
 
 	CELL object = get(ds - index * CELLS);

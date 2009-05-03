@@ -17,7 +17,7 @@ void primitive_tuple(void)
 	for(i = tuple_size(layout.untagged()) - 1; i >= 0; i--)
 		put(AREF(tuple,i),F);
 
-	dpush(tag_tuple(tuple));
+	dpush(tag<F_TUPLE>(tuple));
 }
 
 /* push a new tuple on the stack, filling its slots from the stack */
@@ -25,7 +25,7 @@ void primitive_tuple_boa(void)
 {
 	gc_root<F_TUPLE_LAYOUT> layout(dpop());
 	gc_root<F_TUPLE> tuple(allot_tuple(layout.value()));
-	CELL size = untag_fixnum_fast(layout.untagged()->size) * CELLS;
+	CELL size = untag_fixnum(layout.untagged()->size) * CELLS;
 	memcpy(tuple.untagged() + 1,(CELL *)(ds - (size - CELLS)),size);
 	ds -= size;
 	dpush(tuple.value());

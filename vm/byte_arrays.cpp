@@ -10,20 +10,20 @@ F_BYTE_ARRAY *allot_byte_array(CELL size)
 void primitive_byte_array(void)
 {
 	CELL size = unbox_array_size();
-	dpush(tag_object(allot_byte_array(size)));
+	dpush(tag<F_BYTE_ARRAY>(allot_byte_array(size)));
 }
 
 void primitive_uninitialized_byte_array(void)
 {
 	CELL size = unbox_array_size();
-	dpush(tag_object(allot_array_internal<F_BYTE_ARRAY>(size)));
+	dpush(tag<F_BYTE_ARRAY>(allot_array_internal<F_BYTE_ARRAY>(size)));
 }
 
 void primitive_resize_byte_array(void)
 {
-	F_BYTE_ARRAY *array = untag_byte_array(dpop());
+	F_BYTE_ARRAY *array = untag_check<F_BYTE_ARRAY>(dpop());
 	CELL capacity = unbox_array_size();
-	dpush(tag_object(reallot_array(array,capacity)));
+	dpush(tag<F_BYTE_ARRAY>(reallot_array(array,capacity)));
 }
 
 void growable_byte_array::append_bytes(void *elts, CELL len)
