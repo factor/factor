@@ -36,7 +36,7 @@ HELP: <fold>
 { $values { "oldval" "starting value" } { "quot" "applied to update and previous values" } { "model" model } { "model'" model } }
 { $description "Similar to " { $link reduce } " but works on models, applying a quotation to the previous and new values at each update" } ;
 
-HELP: switch
+HELP: <switch>
 { $values { "signal1" model } { "signal2" model } { "signal'" model } }
 { $description "Creates a model that starts with the behavior of model1 and switches to the behavior of model2 on its update" } ;
 
