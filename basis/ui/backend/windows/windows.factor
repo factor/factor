@@ -11,7 +11,7 @@ threads libc combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render ascii math.bitwise locals
 accessors math.rectangles math.order ascii calendar
 io.encodings.utf16n windows.errors literals ui.pixel-formats 
-ui.pixel-formats.private memoize ;
+ui.pixel-formats.private memoize classes ;
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
@@ -83,7 +83,7 @@ CONSTANT: pfd-flag-map H{
     pfd-flag-map at [ ] [ 0 ] if* ;
 
 : >pfd-flags ( attributes -- flags )
-    [ >pfd-flag ] map [ bitor ] binary-reduce
+    [ >pfd-flag ] [ bitor ] map-reduce
     PFD_SUPPORT_OPENGL bitor ;
 
 : attr-value ( attributes name -- value )
@@ -632,11 +632,11 @@ M: windows-ui-backend do-events
 
 : setup-gl ( world -- )
     [ get-dc ] keep
-    [ swap [ hDC>> set-pixel-format ] [ get-rc ] bi ]
+    [ swap [ handle>> hDC>> set-pixel-format ] [ get-rc ] bi ]
     with-world-pixel-format ;
 
 M: windows-ui-backend (open-window) ( world -- )
-    [ dup create-window f f <win> >>handle setup-gl ]
+    [ dup create-window [ f f ] dip f f <win> >>handle setup-gl ]
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
 
@@ -647,10 +647,10 @@ M: win-base select-gl-context ( handle -- )
 M: win-base flush-gl-context ( handle -- )
     hDC>> SwapBuffers win32-error=0/f ;
 
-: setup-offscreen-gl ( world -- hDC hRC hBitmap bits )
+: setup-offscreen-gl ( world -- )
     dup [ handle>> ] [ dim>> ] bi make-offscreen-dc-and-bitmap
     [ >>hDC ] [ >>hBitmap ] [ >>bits ] tri* drop [
-        swap [ hDC>> set-pixel-format ] [ get-rc ] bi
+        swap [ handle>> hDC>> set-pixel-format ] [ get-rc ] bi
     ] with-world-pixel-format ;
 
 M: windows-ui-backend (open-offscreen-buffer) ( world -- )
