@@ -7,7 +7,7 @@ namespaces opengl sequences strings x11 x11.xlib x11.events x11.xim
 x11.glx x11.clipboard x11.constants x11.windows x11.io
 io.encodings.string io.encodings.ascii io.encodings.utf8 combinators
 command-line math.vectors classes.tuple opengl.gl threads
-math.rectangles environment ascii
+math.rectangles environment ascii literals
 ui.pixel-formats ui.pixel-formats.private ;
 IN: ui.backend.x11
 
@@ -59,8 +59,8 @@ M: x11-ui-backend (free-pixel-format)
 M: x11-ui-backend (pixel-format-attribute)
     [ dpy get ] 2dip
     [ handle>> ] [ >glx-visual ] bi*
-    [ drop f ] [
-        first [ dpy get ] 2dip
+    [ 2drop f ] [
+        first
         0 <int> [ glXGetConfig drop ] keep *int
     ] if-empty ;
 
