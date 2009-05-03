@@ -134,13 +134,13 @@ M: spheres-world distance-step ( gadget -- dz )
         GL_TEXTURE_CUBE_MAP GL_TEXTURE_WRAP_S GL_CLAMP glTexParameteri
         GL_TEXTURE_CUBE_MAP GL_TEXTURE_WRAP_T GL_CLAMP glTexParameteri
         GL_TEXTURE_CUBE_MAP GL_TEXTURE_WRAP_R GL_CLAMP glTexParameteri
-        {
-            $ GL_TEXTURE_CUBE_MAP_POSITIVE_X
-            $ GL_TEXTURE_CUBE_MAP_POSITIVE_Y
-            $ GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-            $ GL_TEXTURE_CUBE_MAP_NEGATIVE_X
-            $ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
-            $ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+        ${
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X
+            GL_TEXTURE_CUBE_MAP_POSITIVE_Y
+            GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_X
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
         }
         [ 0 GL_RGBA8 (reflection-dim) 0 GL_RGBA GL_UNSIGNED_BYTE f glTexImage2D ]
         each
