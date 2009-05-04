@@ -171,7 +171,7 @@ M: spheres-world distance-step ( gadget -- dz )
     sphere-main-fragment-shader <fragment-shader> check-gl-shader
     3array <gl-program> check-gl-program ;
 
-AFTER: spheres-world begin-world
+M: spheres-world begin-world
     "2.0" { "GL_ARB_shader_objects" } require-gl-version-or-extensions
     { "GL_EXT_framebuffer_object" } require-gl-extensions
     20.0 10.0 20.0 set-demo-orientation
@@ -251,7 +251,7 @@ M: spheres-world pref-dim* ( gadget -- dim )
         [ drop 0 0 (reflection-dim) glViewport ]
         [
             GL_PROJECTION glMatrixMode
-            glLoadIdentity
+            glPushMatrix glLoadIdentity
             reflection-frustum glFrustum
             GL_MODELVIEW glMatrixMode
             glLoadIdentity
@@ -274,7 +274,11 @@ M: spheres-world pref-dim* ( gadget -- dim )
         [ GL_TEXTURE_CUBE_MAP_POSITIVE_Y (reflection-face)
           glPopMatrix 90.0 1.0 0.0 0.0 glRotatef ]
         [ sphere-scene ]
-        [ dim>> 0 0 rot first2 glViewport ]
+        [
+            [ 0 0 ] dip dim>> first2 glViewport
+            GL_PROJECTION glMatrixMode
+            glPopMatrix
+        ]
     } cleave ] with-framebuffer ;
 
 M: spheres-world draw-world*
