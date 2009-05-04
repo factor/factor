@@ -1,7 +1,7 @@
 USING: kernel opengl opengl.demo-support opengl.gl opengl.textures
 opengl.shaders opengl.framebuffers opengl.capabilities multiline
 ui.gadgets accessors sequences ui.render ui math locals arrays
-generalizations combinators ui.gadgets.worlds method-chains
+generalizations combinators ui.gadgets.worlds
 literals ui.pixel-formats ;
 IN: spheres
 
