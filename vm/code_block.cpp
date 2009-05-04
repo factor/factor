@@ -47,23 +47,21 @@ void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
 }
 
 /* Store a 32-bit value into a PowerPC LIS/ORI sequence */
-INLINE void store_address_2_2(CELL cell, CELL value)
+static void store_address_2_2(CELL *cell, CELL value)
 {
-	put(cell - CELLS,((get(cell - CELLS) & ~0xffff) | ((value >> 16) & 0xffff)));
-	put(cell,((get(cell) & ~0xffff) | (value & 0xffff)));
+	cell[-1] = ((cell[-1] & ~0xffff) | ((value >> 16) & 0xffff));
+	cell[ 0] = ((cell[ 0] & ~0xffff) | (value & 0xffff));
 }
 
 /* Store a value into a bitfield of a PowerPC instruction */
-INLINE void store_address_masked(CELL cell, F_FIXNUM value, CELL mask, F_FIXNUM shift)
+static void store_address_masked(CELL *cell, F_FIXNUM value, CELL mask, F_FIXNUM shift)
 {
 	/* This is unaccurate but good enough */
 	F_FIXNUM test = (F_FIXNUM)mask >> 1;
 	if(value <= -test || value >= test)
 		critical_error("Value does not fit inside relocation",0);
 
-	u32 original = *(u32*)cell;
-	original &= ~mask;
-	*(u32*)cell = (original | ((value >> shift) & mask));
+	*cell = ((*cell & ~mask) | ((value >> shift) & mask));
 }
 
 /* Perform a fixup on a code block */
@@ -74,7 +72,7 @@ void store_address_in_code_block(CELL klass, CELL offset, F_FIXNUM absolute_valu
 	switch(klass)
 	{
 	case RC_ABSOLUTE_CELL:
-		put(offset,absolute_value);
+		*(CELL *)offset = absolute_value;
 		break;
 	case RC_ABSOLUTE:
 		*(u32*)offset = absolute_value;
@@ -83,24 +81,24 @@ void store_address_in_code_block(CELL klass, CELL offset, F_FIXNUM absolute_valu
 		*(u32*)offset = relative_value - sizeof(u32);
 		break;
 	case RC_ABSOLUTE_PPC_2_2:
-		store_address_2_2(offset,absolute_value);
+		store_address_2_2((CELL *)offset,absolute_value);
 		break;
 	case RC_RELATIVE_PPC_2:
-		store_address_masked(offset,relative_value,REL_RELATIVE_PPC_2_MASK,0);
+		store_address_masked((CELL *)offset,relative_value,REL_RELATIVE_PPC_2_MASK,0);
 		break;
 	case RC_RELATIVE_PPC_3:
-		store_address_masked(offset,relative_value,REL_RELATIVE_PPC_3_MASK,0);
+		store_address_masked((CELL *)offset,relative_value,REL_RELATIVE_PPC_3_MASK,0);
 		break;
 	case RC_RELATIVE_ARM_3:
-		store_address_masked(offset,relative_value - CELLS * 2,
+		store_address_masked((CELL *)offset,relative_value - CELLS * 2,
 			REL_RELATIVE_ARM_3_MASK,2);
 		break;
 	case RC_INDIRECT_ARM:
-		store_address_masked(offset,relative_value - CELLS,
+		store_address_masked((CELL *)offset,relative_value - CELLS,
 			REL_INDIRECT_ARM_MASK,0);
 		break;
 	case RC_INDIRECT_ARM_PC:
-		store_address_masked(offset,relative_value - CELLS * 2,
+		store_address_masked((CELL *)offset,relative_value - CELLS * 2,
 			REL_INDIRECT_ARM_MASK,0);
 		break;
 	default:
@@ -234,7 +232,7 @@ void update_literal_and_word_references(F_CODE_BLOCK *compiled)
 	update_word_references(compiled);
 }
 
-INLINE void check_code_address(CELL address)
+static void check_code_address(CELL address)
 {
 #ifdef FACTOR_DEBUG
 	assert(address >= code_heap.segment->start && address < code_heap.segment->end);
@@ -273,28 +271,24 @@ void mark_active_blocks(F_CONTEXT *stacks)
 	}
 }
 
-void mark_object_code_block(CELL scan)
+void mark_object_code_block(F_OBJECT *object)
 {
-	F_WORD *word;
-	F_QUOTATION *quot;
-	F_CALLSTACK *stack;
-
-	switch(hi_tag(scan))
+	switch(object->header.hi_tag())
 	{
 	case WORD_TYPE:
-		word = (F_WORD *)scan;
+		F_WORD *word = (F_WORD *)object;
 		if(word->code)
 			mark_code_block(word->code);
 		if(word->profiling)
 			mark_code_block(word->profiling);
 		break;
 	case QUOTATION_TYPE:
-		quot = (F_QUOTATION *)scan;
+		F_QUOTATION *quot = (F_QUOTATION *)object;
 		if(quot->compiledp != F)
 			mark_code_block(quot->code);
 		break;
 	case CALLSTACK_TYPE:
-		stack = (F_CALLSTACK *)scan;
+		F_CALLSTACK *stack = (F_CALLSTACK *)object;
 		iterate_callstack_object(stack,mark_stack_frame_step);
 		break;
 	}
@@ -318,16 +312,17 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 	if(dll != NULL && !dll->dll)
 		return (void *)undefined_symbol;
 
-	if(type_of(symbol) == BYTE_ARRAY_TYPE)
+	switch(tagged<F_OBJECT>(symbol).type())
 	{
+	case BYTE_ARRAY_TYPE:
 		F_SYMBOL *name = alien_offset(symbol);
 		void *sym = ffi_dlsym(dll,name);
 
 		if(sym)
 			return sym;
-	}
-	else if(type_of(symbol) == ARRAY_TYPE)
-	{
+		else
+			return (void *)undefined_symbol;
+	case ARRAY_TYPE:
 		CELL i;
 		F_ARRAY *names = untag<F_ARRAY>(symbol);
 		for(i = 0; i < array_capacity(names); i++)
@@ -338,17 +333,19 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 			if(sym)
 				return sym;
 		}
+		return (void *)undefined_symbol;
+	default:
+		critical_error("Bad symbol specifier",symbol);
+		return (void *)undefined_symbol;
 	}
-
-	return (void *)undefined_symbol;
 }
 
 /* Compute an address to store at a relocation */
 void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 {
 #ifdef FACTOR_DEBUG
-	type_check(ARRAY_TYPE,compiled->literals);
-	type_check(BYTE_ARRAY_TYPE,compiled->relocation);
+	tagged<F_ARRAY>(compiled->literals).untag_check();
+	tagged<F_BYTE_ARRAY>(compiled->relocation).untag_check();
 #endif
 
 	CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);

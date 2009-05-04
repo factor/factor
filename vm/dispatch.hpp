@@ -1,12 +1,12 @@
 CELL lookup_method(CELL object, CELL methods);
-void primitive_lookup_method(void);
+PRIMITIVE(lookup_method);
 
 CELL object_class(CELL object);
 
-void primitive_mega_cache_miss(void);
+PRIMITIVE(mega_cache_miss);
 
-void primitive_reset_dispatch_stats(void);
-void primitive_dispatch_stats(void);
+PRIMITIVE(reset_dispatch_stats);
+PRIMITIVE(dispatch_stats);
 
 void jit_emit_class_lookup(jit *jit, F_FIXNUM index, CELL type);
 

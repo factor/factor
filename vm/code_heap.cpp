@@ -55,7 +55,7 @@ void update_code_heap_words(void)
 	iterate_code_heap(update_word_references);
 }
 
-void primitive_modify_code_heap(void)
+PRIMITIVE(modify_code_heap)
 {
 	gc_root<F_ARRAY> alist(dpop());
 
@@ -105,7 +105,7 @@ void primitive_modify_code_heap(void)
 }
 
 /* Push the free space and total size of the code heap */
-void primitive_code_room(void)
+PRIMITIVE(code_room)
 {
 	CELL used, total_free, max_free;
 	heap_usage(&code_heap,&used,&total_free,&max_free);
@@ -136,7 +136,7 @@ void forward_object_xts(void)
 
 	while((obj = next_object()) != F)
 	{
-		switch(type_of(obj))
+		switch(tagged<F_OBJECT>(obj).type())
 		{
 		case WORD_TYPE:
 			F_WORD *word = untag<F_WORD>(obj);
@@ -176,14 +176,18 @@ void fixup_object_xts(void)
 
 	while((obj = next_object()) != F)
 	{
-		if(type_of(obj) == WORD_TYPE)
-			update_word_xt(obj);
-		else if(type_of(obj) == QUOTATION_TYPE)
+		switch(tagged<F_OBJECT>(obj).type())
 		{
+		case WORD_TYPE:
+			update_word_xt(obj);
+			break;
+		case QUOTATION_TYPE:
 			F_QUOTATION *quot = untag<F_QUOTATION>(obj);
-
 			if(quot->compiledp != F)
 				set_quot_xt(quot,quot->code);
+			break;
+		default:
+			break;
 		}
 	}
 

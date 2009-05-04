@@ -127,13 +127,13 @@ void divide_by_zero_error(void)
 	general_error(ERROR_DIVIDE_BY_ZERO,F,F,NULL);
 }
 
-void primitive_call_clear(void)
+PRIMITIVE(call_clear)
 {
 	throw_impl(dpop(),stack_chain->callstack_bottom);
 }
 
 /* For testing purposes */
-void primitive_unimplemented(void)
+PRIMITIVE(unimplemented)
 {
 	not_implemented_error();
 }

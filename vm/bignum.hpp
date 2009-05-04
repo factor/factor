@@ -1,7 +1,7 @@
 /* :tabSize=2:indentSize=2:noTabs=true:
 
 Copyright (C) 1989-1992 Massachusetts Institute of Technology
-Portions copyright (C) 2004-2007 Slava Pestov
+Portions copyright (C) 2004-2009 Slava Pestov
 
 This material was developed by the Scheme project at the Massachusetts
 Institute of Technology, Department of Electrical Engineering and

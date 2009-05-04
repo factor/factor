@@ -1,39 +1,13 @@
 #include "master.hpp"
 
-/* gets the address of an object representing a C pointer */
-char *alien_offset(CELL object)
-{
-	F_ALIEN *alien;
-	F_BYTE_ARRAY *byte_array;
-
-	switch(type_of(object))
-	{
-	case BYTE_ARRAY_TYPE:
-		byte_array = untag<F_BYTE_ARRAY>(object);
-		return (char *)(byte_array + 1);
-	case ALIEN_TYPE:
-		alien = untag<F_ALIEN>(object);
-		if(alien->expired != F)
-			general_error(ERROR_EXPIRED,object,F,NULL);
-		return alien_offset(alien->alien) + alien->displacement;
-	case F_TYPE:
-		return NULL;
-	default:
-		type_error(ALIEN_TYPE,object);
-		return NULL; /* can't happen */
-	}
-}
-
 /* gets the address of an object representing a C pointer, with the
 intention of storing the pointer across code which may potentially GC. */
 char *pinned_alien_offset(CELL object)
 {
-	F_ALIEN *alien;
-
-	switch(type_of(object))
+	switch(tagged<F_OBJECT>(object).type())
 	{
 	case ALIEN_TYPE:
-		alien = untag<F_ALIEN>(object);
+		F_ALIEN *alien = untag<F_ALIEN>(object);
 		if(alien->expired != F)
 			general_error(ERROR_EXPIRED,object,F,NULL);
 		return pinned_alien_offset(alien->alien) + alien->displacement;
@@ -45,19 +19,13 @@ char *pinned_alien_offset(CELL object)
 	}
 }
 
-/* pop an object representing a C pointer */
-char *unbox_alien(void)
-{
-	return alien_offset(dpop());
-}
-
 /* make an alien */
 CELL allot_alien(CELL delegate_, CELL displacement)
 {
 	gc_root<F_OBJECT> delegate(delegate_);
 	gc_root<F_ALIEN> alien(allot<F_ALIEN>(sizeof(F_ALIEN)));
 
-	if(delegate.isa(ALIEN_TYPE))
+	if(delegate.type_p(ALIEN_TYPE))
 	{
 		tagged<F_ALIEN> delegate_alien = delegate.as<F_ALIEN>();
 		displacement += delegate_alien->displacement;
@@ -72,17 +40,8 @@ CELL allot_alien(CELL delegate_, CELL displacement)
 	return alien.value();
 }
 
-/* make an alien and push */
-void box_alien(void *ptr)
-{
-	if(ptr == NULL)
-		dpush(F);
-	else
-		dpush(allot_alien(F,(CELL)ptr));
-}
-
 /* make an alien pointing at an offset of another alien */
-void primitive_displaced_alien(void)
+PRIMITIVE(displaced_alien)
 {
 	CELL alien = dpop();
 	CELL displacement = to_cell(dpop());
@@ -91,7 +50,7 @@ void primitive_displaced_alien(void)
 		dpush(F);
 	else
 	{
-		switch(type_of(alien))
+		switch(tagged<F_OBJECT>(alien).type())
 		{
 		case BYTE_ARRAY_TYPE:
 		case ALIEN_TYPE:
@@ -107,13 +66,13 @@ void primitive_displaced_alien(void)
 
 /* address of an object representing a C pointer. Explicitly throw an error
 if the object is a byte array, as a sanity check. */
-void primitive_alien_address(void)
+PRIMITIVE(alien_address)
 {
 	box_unsigned_cell((CELL)pinned_alien_offset(dpop()));
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
-INLINE void *alien_pointer(void)
+static void *alien_pointer(void)
 {
 	F_FIXNUM offset = to_fixnum(dpop());
 	return unbox_alien() + offset;
@@ -121,11 +80,11 @@ INLINE void *alien_pointer(void)
 
 /* define words to read/write values at an alien address */
 #define DEFINE_ALIEN_ACCESSOR(name,type,boxer,to) \
-	void primitive_alien_##name(void) \
+	PRIMITIVE(alien_##name) \
 	{ \
 		boxer(*(type*)alien_pointer()); \
 	} \
-	void primitive_set_alien_##name(void) \
+	PRIMITIVE(set_alien_##name) \
 	{ \
 		type *ptr = (type *)alien_pointer(); \
 		type value = to(dpop()); \
@@ -146,42 +105,8 @@ DEFINE_ALIEN_ACCESSOR(float,float,box_float,to_float)
 DEFINE_ALIEN_ACCESSOR(double,double,box_double,to_double)
 DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
 
-/* for FFI calls passing structs by value */
-void to_value_struct(CELL src, void *dest, CELL size)
-{
-	memcpy(dest,alien_offset(src),size);
-}
-
-/* for FFI callbacks receiving structs by value */
-void box_value_struct(void *src, CELL size)
-{
-	F_BYTE_ARRAY *array = allot_byte_array(size);
-	memcpy(array + 1,src,size);
-	dpush(tag<F_BYTE_ARRAY>(array));
-}
-
-/* On some x86 OSes, structs <= 8 bytes are returned in registers. */
-void box_small_struct(CELL x, CELL y, CELL size)
-{
-	CELL data[2];
-	data[0] = x;
-	data[1] = y;
-	box_value_struct(data,size);
-}
-
-/* On OS X/PPC, complex numbers are returned in registers. */
-void box_medium_struct(CELL x1, CELL x2, CELL x3, CELL x4, CELL size)
-{
-	CELL data[4];
-	data[0] = x1;
-	data[1] = x2;
-	data[2] = x3;
-	data[3] = x4;
-	box_value_struct(data,size);
-}
-
 /* open a native library and push a handle */
-void primitive_dlopen(void)
+PRIMITIVE(dlopen)
 {
 	gc_root<F_BYTE_ARRAY> path(dpop());
 	path.untag_check();
@@ -192,7 +117,7 @@ void primitive_dlopen(void)
 }
 
 /* look up a symbol in a native library */
-void primitive_dlsym(void)
+PRIMITIVE(dlsym)
 {
 	gc_root<F_OBJECT> dll(dpop());
 	gc_root<F_BYTE_ARRAY> name(dpop());
@@ -214,16 +139,86 @@ void primitive_dlsym(void)
 }
 
 /* close a native library handle */
-void primitive_dlclose(void)
+PRIMITIVE(dlclose)
 {
 	ffi_dlclose(untag_check<F_DLL>(dpop()));
 }
 
-void primitive_dll_validp(void)
+PRIMITIVE(dll_validp)
 {
 	CELL dll = dpop();
 	if(dll == F)
 		dpush(T);
 	else
 		dpush(tagged<F_DLL>(dll)->dll == NULL ? F : T);
+}
+
+/* gets the address of an object representing a C pointer */
+VM_C_API char *alien_offset(CELL object)
+{
+	switch(tagged<F_OBJECT>(object).type())
+	{
+	case BYTE_ARRAY_TYPE:
+		F_BYTE_ARRAY *byte_array = untag<F_BYTE_ARRAY>(object);
+		return (char *)(byte_array + 1);
+	case ALIEN_TYPE:
+		F_ALIEN *alien = untag<F_ALIEN>(object);
+		if(alien->expired != F)
+			general_error(ERROR_EXPIRED,object,F,NULL);
+		return alien_offset(alien->alien) + alien->displacement;
+	case F_TYPE:
+		return NULL;
+	default:
+		type_error(ALIEN_TYPE,object);
+		return NULL; /* can't happen */
+	}
+}
+
+/* pop an object representing a C pointer */
+VM_C_API char *unbox_alien(void)
+{
+	return alien_offset(dpop());
+}
+
+/* make an alien and push */
+VM_C_API void box_alien(void *ptr)
+{
+	if(ptr == NULL)
+		dpush(F);
+	else
+		dpush(allot_alien(F,(CELL)ptr));
+}
+
+/* for FFI calls passing structs by value */
+VM_C_API void to_value_struct(CELL src, void *dest, CELL size)
+{
+	memcpy(dest,alien_offset(src),size);
+}
+
+/* for FFI callbacks receiving structs by value */
+VM_C_API void box_value_struct(void *src, CELL size)
+{
+	F_BYTE_ARRAY *array = allot_byte_array(size);
+	memcpy(array + 1,src,size);
+	dpush(tag<F_BYTE_ARRAY>(array));
+}
+
+/* On some x86 OSes, structs <= 8 bytes are returned in registers. */
+VM_C_API void box_small_struct(CELL x, CELL y, CELL size)
+{
+	CELL data[2];
+	data[0] = x;
+	data[1] = y;
+	box_value_struct(data,size);
+}
+
+/* On OS X/PPC, complex numbers are returned in registers. */
+VM_C_API void box_medium_struct(CELL x1, CELL x2, CELL x3, CELL x4, CELL size)
+{
+	CELL data[4];
+	data[0] = x1;
+	data[1] = x2;
+	data[2] = x3;
+	data[3] = x4;
+	box_value_struct(data,size);
 }

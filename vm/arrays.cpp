@@ -7,7 +7,7 @@ F_ARRAY *allot_array(CELL capacity, CELL fill_)
 	gc_root<F_ARRAY> array(allot_array_internal<F_ARRAY>(capacity));
 
 	if(fill.value() == tag_fixnum(0))
-		memset((void*)AREF(array.untagged(),0),'\0',capacity * CELLS);
+		memset(array->data(),'\0',capacity * CELLS);
 	else
 	{
 		/* No need for write barrier here. Either the object is in
@@ -15,13 +15,13 @@ F_ARRAY *allot_array(CELL capacity, CELL fill_)
 		and the write barrier is already hit for us in that case. */
 		CELL i;
 		for(i = 0; i < capacity; i++)
-			put(AREF(array.untagged(),i),fill.value());
+			array->data()[i] = fill.value();
 	}
 	return array.untagged();
 }
 
 /* push a new array on the stack */
-void primitive_array(void)
+PRIMITIVE(array)
 {
 	CELL initial = dpop();
 	CELL size = unbox_array_size();
@@ -60,7 +60,7 @@ CELL allot_array_4(CELL v1_, CELL v2_, CELL v3_, CELL v4_)
 	return a.value();
 }
 
-void primitive_resize_array(void)
+PRIMITIVE(resize_array)
 {
 	F_ARRAY* array = untag_check<F_ARRAY>(dpop());
 	CELL capacity = unbox_array_size();

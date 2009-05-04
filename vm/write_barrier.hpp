@@ -43,24 +43,16 @@ extern "C" CELL allot_markers_offset;
 
 /* the write barrier must be called any time we are potentially storing a
 pointer from an older generation to a younger one */
-INLINE void write_barrier(CELL address)
+inline static void write_barrier(F_OBJECT *address)
 {
 	*ADDR_TO_CARD(address) = CARD_MARK_MASK;
 	*ADDR_TO_DECK(address) = CARD_MARK_MASK;
 }
 
-#define SLOT(obj,slot) (UNTAG(obj) + (slot) * CELLS)
-
-INLINE void set_slot(CELL obj, CELL slot, CELL value)
-{
-	put(SLOT(obj,slot),value);
-	write_barrier(obj);
-}
-
 /* we need to remember the first object allocated in the card */
-INLINE void allot_barrier(CELL address)
+inline static void allot_barrier(F_OBJECT *address)
 {
 	F_CARD *ptr = ADDR_TO_ALLOT_MARKER(address);
 	if(*ptr == INVALID_ALLOT_MARKER)
-		*ptr = (address & ADDR_CARD_MASK);
+		*ptr = ((CELL)address & ADDR_CARD_MASK);
 }

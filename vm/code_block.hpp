@@ -49,9 +49,9 @@ typedef enum {
 
 /* code relocation table consists of a table of entries for each fixup */
 typedef u32 F_REL;
-#define REL_TYPE(r)   (F_RELTYPE)(((r) & 0xf0000000) >> 28)
-#define REL_CLASS(r)  (F_RELCLASS)(((r) & 0x0f000000) >> 24)
-#define REL_OFFSET(r)  ((r) & 0x00ffffff)
+#define REL_TYPE(r) (F_RELTYPE)(((r) & 0xf0000000) >> 28)
+#define REL_CLASS(r) (F_RELCLASS)(((r) & 0x0f000000) >> 24)
+#define REL_OFFSET(r) ((r) & 0x00ffffff)
 
 void flush_icache_for(F_CODE_BLOCK *compiled);
 
@@ -75,11 +75,11 @@ void mark_code_block(F_CODE_BLOCK *compiled);
 
 void mark_active_blocks(F_CONTEXT *stacks);
 
-void mark_object_code_block(CELL scan);
+void mark_object_code_block(F_OBJECT *scan);
 
 void relocate_code_block(F_CODE_BLOCK *relocating);
 
-INLINE bool stack_traces_p(void)
+inline static bool stack_traces_p(void)
 {
 	return userenv[STACK_TRACES_ENV] != F;
 }

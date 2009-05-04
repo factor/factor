@@ -1,3 +1,5 @@
-typedef void (*F_PRIMITIVE)(void);
+//typedef extern "C" void (*F_PRIMITIVE)(void);
 
-extern F_PRIMITIVE primitives[];
+extern void *primitives[];
+
+#define PRIMITIVE(name) extern "C" void primitive_##name()

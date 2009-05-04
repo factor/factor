@@ -1,6 +1,6 @@
 #include "master.hpp"
 
-void default_parameters(F_PARAMETERS *p)
+VM_C_API void default_parameters(F_PARAMETERS *p)
 {
 	p->image_path = NULL;
 
@@ -40,7 +40,7 @@ void default_parameters(F_PARAMETERS *p)
 	p->stack_traces = true;
 }
 
-INLINE bool factor_arg(const F_CHAR* str, const F_CHAR* arg, CELL* value)
+static bool factor_arg(const F_CHAR* str, const F_CHAR* arg, CELL* value)
 {
 	int val;
 	if(SSCANF(str,arg,&val) > 0)
@@ -52,7 +52,7 @@ INLINE bool factor_arg(const F_CHAR* str, const F_CHAR* arg, CELL* value)
 		return false;
 }
 
-void init_parameters_from_args(F_PARAMETERS *p, int argc, F_CHAR **argv)
+VM_C_API void init_parameters_from_args(F_PARAMETERS *p, int argc, F_CHAR **argv)
 {
 	default_parameters(p);
 	p->executable_path = argv[0];
@@ -78,7 +78,7 @@ void init_parameters_from_args(F_PARAMETERS *p, int argc, F_CHAR **argv)
 }
 
 /* Do some initialization that we do once only */
-void do_stage1_init(void)
+static void do_stage1_init(void)
 {
 	print_string("*** Stage 2 early init... ");
 	fflush(stdout);
@@ -90,7 +90,7 @@ void do_stage1_init(void)
 	fflush(stdout);
 }
 
-void init_factor(F_PARAMETERS *p)
+VM_C_API void init_factor(F_PARAMETERS *p)
 {
 	/* Kilobytes */
 	p->ds_size = align_page(p->ds_size << 10);
@@ -122,7 +122,10 @@ void init_factor(F_PARAMETERS *p)
 	load_image(p);
 	init_c_io();
 	init_inline_caching(p->max_pic_size);
+
+#ifndef FACTOR_DEBUG
 	init_signals();
+#endif
 
 	if(p->console)
 		open_console();
@@ -147,7 +150,7 @@ void init_factor(F_PARAMETERS *p)
 }
 
 /* May allocate memory */
-void pass_args_to_factor(int argc, F_CHAR **argv)
+VM_C_API void pass_args_to_factor(int argc, F_CHAR **argv)
 {
 	growable_array args;
 	int i;
@@ -159,7 +162,7 @@ void pass_args_to_factor(int argc, F_CHAR **argv)
 	userenv[ARGS_ENV] = args.array.value();
 }
 
-void start_factor(F_PARAMETERS *p)
+static void start_factor(F_PARAMETERS *p)
 {
 	if(p->fep) factorbug();
 
@@ -168,13 +171,13 @@ void start_factor(F_PARAMETERS *p)
 	unnest_stacks();
 }
 
-void start_embedded_factor(F_PARAMETERS *p)
+VM_C_API void start_embedded_factor(F_PARAMETERS *p)
 {
 	userenv[EMBEDDED_ENV] = T;
 	start_factor(p);
 }
 
-void start_standalone_factor(int argc, F_CHAR **argv)
+VM_C_API void start_standalone_factor(int argc, F_CHAR **argv)
 {
 	F_PARAMETERS p;
 	default_parameters(&p);
@@ -184,24 +187,24 @@ void start_standalone_factor(int argc, F_CHAR **argv)
 	start_factor(&p);
 }
 
-char *factor_eval_string(char *string)
+VM_C_API char *factor_eval_string(char *string)
 {
 	char *(*callback)(char *) = (char *(*)(char *))alien_offset(userenv[EVAL_CALLBACK_ENV]);
 	return callback(string);
 }
 
-void factor_eval_free(char *result)
+VM_C_API void factor_eval_free(char *result)
 {
 	free(result);
 }
 
-void factor_yield(void)
+VM_C_API void factor_yield(void)
 {
 	void (*callback)(void) = (void (*)(void))alien_offset(userenv[YIELD_CALLBACK_ENV]);
 	callback();
 }
 
-void factor_sleep(long us)
+VM_C_API void factor_sleep(long us)
 {
 	void (*callback)(long) = (void (*)(long))alien_offset(userenv[SLEEP_CALLBACK_ENV]);
 	callback(us);

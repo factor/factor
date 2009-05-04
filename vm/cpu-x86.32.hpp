@@ -3,4 +3,4 @@
 register CELL ds asm("esi");
 register CELL rs asm("edi");
 
-#define F_FASTCALL extern "C" __attribute__ ((regparm (2)))
+#define VM_ASM_API extern "C" __attribute__ ((regparm (2)))

@@ -30,7 +30,12 @@ struct gc_bignum
 {
 	F_BIGNUM **addr;
 
-	gc_bignum(F_BIGNUM **addr_) : addr(addr_) { if(*addr_) check_data_pointer((CELL)*addr_); gc_bignum_push((CELL)addr); }
+	gc_bignum(F_BIGNUM **addr_) : addr(addr_) {
+		if(*addr_)
+			check_data_pointer(*addr_);
+		gc_bignum_push((CELL)addr);
+	}
+
 	~gc_bignum() { assert((CELL)addr == gc_bignum_pop()); }
 };
 

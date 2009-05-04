@@ -49,9 +49,9 @@ extern F_DATA_HEAP *data_heap;
 /* new objects are allocated here */
 extern F_ZONE nursery;
 
-INLINE bool in_zone(F_ZONE *z, CELL pointer)
+inline static bool in_zone(F_ZONE *z, F_OBJECT *pointer)
 {
-	return pointer >= z->start && pointer < z->end;
+	return (CELL)pointer >= z->start && (CELL)pointer < z->end;
 }
 
 CELL init_zone(F_ZONE *z, CELL size, CELL base);
@@ -81,29 +81,31 @@ size must be a multiple of the page size */
 F_SEGMENT *alloc_segment(CELL size);
 void dealloc_segment(F_SEGMENT *block);
 
-CELL untagged_object_size(CELL pointer);
-CELL unaligned_object_size(CELL pointer);
-CELL object_size(CELL pointer);
-CELL binary_payload_start(CELL pointer);
+CELL untagged_object_size(F_OBJECT *pointer);
+CELL unaligned_object_size(F_OBJECT *pointer);
+CELL binary_payload_start(F_OBJECT *pointer);
+CELL object_size(CELL tagged);
 
 void begin_scan(void);
 CELL next_object(void);
 
-void primitive_data_room(void);
-void primitive_size(void);
+PRIMITIVE(data_room);
+PRIMITIVE(size);
 
-void primitive_begin_scan(void);
-void primitive_next_object(void);
-void primitive_end_scan(void);
+PRIMITIVE(begin_scan);
+PRIMITIVE(next_object);
+PRIMITIVE(end_scan);
 
 /* GC is off during heap walking */
 extern bool gc_off;
 
-INLINE void *allot_zone(F_ZONE *z, CELL a)
+inline static F_OBJECT *allot_zone(F_ZONE *z, CELL a)
 {
 	CELL h = z->here;
 	z->here = h + align8(a);
-	return (void*)h;
+	F_OBJECT *object = (F_OBJECT *)h;
+	allot_barrier(object);
+	return object;
 }
 
 CELL find_all_words(void);
@@ -111,10 +113,10 @@ CELL find_all_words(void);
 /* Every object has a regular representation in the runtime, which makes GC
 much simpler. Every slot of the object until binary_payload_start is a pointer
 to some other object. */
-INLINE void do_slots(CELL obj, void (* iter)(CELL *))
+inline static void do_slots(CELL obj, void (* iter)(CELL *))
 {
 	CELL scan = obj;
-	CELL payload_start = binary_payload_start(obj);
+	CELL payload_start = binary_payload_start((F_OBJECT *)obj);
 	CELL end = obj + payload_start;
 
 	scan += CELLS;

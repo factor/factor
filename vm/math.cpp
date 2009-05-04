@@ -4,62 +4,19 @@ CELL bignum_zero;
 CELL bignum_pos_one;
 CELL bignum_neg_one;
 
-/* Fixnums */
-F_FIXNUM to_fixnum(CELL tagged)
-{
-	switch(TAG(tagged))
-	{
-	case FIXNUM_TYPE:
-		return untag_fixnum(tagged);
-	case BIGNUM_TYPE:
-		return bignum_to_fixnum(untag<F_BIGNUM>(tagged));
-	default:
-		type_error(FIXNUM_TYPE,tagged);
-		return -1; /* can't happen */
-	}
-}
-
-CELL to_cell(CELL tagged)
-{
-	return (CELL)to_fixnum(tagged);
-}
-
-void primitive_bignum_to_fixnum(void)
+PRIMITIVE(bignum_to_fixnum)
 {
 	drepl(tag_fixnum(bignum_to_fixnum(untag<F_BIGNUM>(dpeek()))));
 }
 
-void primitive_float_to_fixnum(void)
+PRIMITIVE(float_to_fixnum)
 {
 	drepl(tag_fixnum(float_to_fixnum(dpeek())));
 }
 
-/* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
-overflow, they call these functions. */
-F_FASTCALL void overflow_fixnum_add(F_FIXNUM x, F_FIXNUM y)
-{
-	drepl(tag<F_BIGNUM>(fixnum_to_bignum(
-		untag_fixnum(x) + untag_fixnum(y))));
-}
-
-F_FASTCALL void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y)
-{
-	drepl(tag<F_BIGNUM>(fixnum_to_bignum(
-		untag_fixnum(x) - untag_fixnum(y))));
-}
-
-F_FASTCALL void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y)
-{
-	F_BIGNUM *bx = fixnum_to_bignum(x);
-	GC_BIGNUM(bx);
-	F_BIGNUM *by = fixnum_to_bignum(y);
-	GC_BIGNUM(by);
-	drepl(tag<F_BIGNUM>(bignum_multiply(bx,by)));
-}
-
 /* Division can only overflow when we are dividing the most negative fixnum
 by -1. */
-void primitive_fixnum_divint(void)
+PRIMITIVE(fixnum_divint)
 {
 	F_FIXNUM y = untag_fixnum(dpop()); \
 	F_FIXNUM x = untag_fixnum(dpeek());
@@ -70,19 +27,19 @@ void primitive_fixnum_divint(void)
 		drepl(tag_fixnum(result));
 }
 
-void primitive_fixnum_divmod(void)
+PRIMITIVE(fixnum_divmod)
 {
-	CELL y = get(ds);
-	CELL x = get(ds - CELLS);
+	CELL y = ((CELL *)ds)[0];
+	CELL x = ((CELL *)ds)[-1];
 	if(y == tag_fixnum(-1) && x == tag_fixnum(FIXNUM_MIN))
 	{
-		put(ds - CELLS,allot_integer(-FIXNUM_MIN));
-		put(ds,tag_fixnum(0));
+		((CELL *)ds)[-1] = allot_integer(-FIXNUM_MIN);
+		((CELL *)ds)[0] = tag_fixnum(0);
 	}
 	else
 	{
-		put(ds - CELLS,tag_fixnum(untag_fixnum(x) / untag_fixnum(y)));
-		put(ds,(F_FIXNUM)x % (F_FIXNUM)y);
+		((CELL *)ds)[-1] = tag_fixnum(untag_fixnum(x) / untag_fixnum(y));
+		((CELL *)ds)[0] = (F_FIXNUM)x % (F_FIXNUM)y;
 	}
 }
 
@@ -94,7 +51,7 @@ void primitive_fixnum_divmod(void)
 #define BRANCHLESS_MAX(x,y) ((x) - (((x) - (y)) & SIGN_MASK((x) - (y))))
 #define BRANCHLESS_ABS(x) ((x ^ SIGN_MASK(x)) - SIGN_MASK(x))
 
-void primitive_fixnum_shift(void)
+PRIMITIVE(fixnum_shift)
 {
 	F_FIXNUM y = untag_fixnum(dpop()); \
 	F_FIXNUM x = untag_fixnum(dpeek());
@@ -121,13 +78,12 @@ void primitive_fixnum_shift(void)
 		fixnum_to_bignum(x),y)));
 }
 
-/* Bignums */
-void primitive_fixnum_to_bignum(void)
+PRIMITIVE(fixnum_to_bignum)
 {
 	drepl(tag<F_BIGNUM>(fixnum_to_bignum(untag_fixnum(dpeek()))));
 }
 
-void primitive_float_to_bignum(void)
+PRIMITIVE(float_to_bignum)
 {
 	drepl(tag<F_BIGNUM>(float_to_bignum(dpeek())));
 }
@@ -136,37 +92,37 @@ void primitive_float_to_bignum(void)
 	F_BIGNUM * y = untag<F_BIGNUM>(dpop()); \
 	F_BIGNUM * x = untag<F_BIGNUM>(dpop());
 
-void primitive_bignum_eq(void)
+PRIMITIVE(bignum_eq)
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_equal_p(x,y));
 }
 
-void primitive_bignum_add(void)
+PRIMITIVE(bignum_add)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<F_BIGNUM>(bignum_add(x,y)));
 }
 
-void primitive_bignum_subtract(void)
+PRIMITIVE(bignum_subtract)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<F_BIGNUM>(bignum_subtract(x,y)));
 }
 
-void primitive_bignum_multiply(void)
+PRIMITIVE(bignum_multiply)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<F_BIGNUM>(bignum_multiply(x,y)));
 }
 
-void primitive_bignum_divint(void)
+PRIMITIVE(bignum_divint)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<F_BIGNUM>(bignum_quotient(x,y)));
 }
 
-void primitive_bignum_divmod(void)
+PRIMITIVE(bignum_divmod)
 {
 	F_BIGNUM *q, *r;
 	POP_BIGNUMS(x,y);
@@ -175,74 +131,74 @@ void primitive_bignum_divmod(void)
 	dpush(tag<F_BIGNUM>(r));
 }
 
-void primitive_bignum_mod(void)
+PRIMITIVE(bignum_mod)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<F_BIGNUM>(bignum_remainder(x,y)));
 }
 
-void primitive_bignum_and(void)
+PRIMITIVE(bignum_and)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<F_BIGNUM>(bignum_bitwise_and(x,y)));
 }
 
-void primitive_bignum_or(void)
+PRIMITIVE(bignum_or)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<F_BIGNUM>(bignum_bitwise_ior(x,y)));
 }
 
-void primitive_bignum_xor(void)
+PRIMITIVE(bignum_xor)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<F_BIGNUM>(bignum_bitwise_xor(x,y)));
 }
 
-void primitive_bignum_shift(void)
+PRIMITIVE(bignum_shift)
 {
 	F_FIXNUM y = untag_fixnum(dpop());
         F_BIGNUM* x = untag<F_BIGNUM>(dpop());
 	dpush(tag<F_BIGNUM>(bignum_arithmetic_shift(x,y)));
 }
 
-void primitive_bignum_less(void)
+PRIMITIVE(bignum_less)
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) == bignum_comparison_less);
 }
 
-void primitive_bignum_lesseq(void)
+PRIMITIVE(bignum_lesseq)
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) != bignum_comparison_greater);
 }
 
-void primitive_bignum_greater(void)
+PRIMITIVE(bignum_greater)
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) == bignum_comparison_greater);
 }
 
-void primitive_bignum_greatereq(void)
+PRIMITIVE(bignum_greatereq)
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) != bignum_comparison_less);
 }
 
-void primitive_bignum_not(void)
+PRIMITIVE(bignum_not)
 {
 	drepl(tag<F_BIGNUM>(bignum_bitwise_not(untag<F_BIGNUM>(dpeek()))));
 }
 
-void primitive_bignum_bitp(void)
+PRIMITIVE(bignum_bitp)
 {
 	F_FIXNUM bit = to_fixnum(dpop());
 	F_BIGNUM *x = untag<F_BIGNUM>(dpop());
 	box_boolean(bignum_logbitp(bit,x));
 }
 
-void primitive_bignum_log2(void)
+PRIMITIVE(bignum_log2)
 {
 	drepl(tag<F_BIGNUM>(bignum_integer_length(untag<F_BIGNUM>(dpeek()))));
 }
@@ -253,100 +209,16 @@ unsigned int bignum_producer(unsigned int digit)
 	return *(ptr + digit);
 }
 
-void primitive_byte_array_to_bignum(void)
+PRIMITIVE(byte_array_to_bignum)
 {
 	CELL n_digits = array_capacity(untag_check<F_BYTE_ARRAY>(dpeek()));
 	F_BIGNUM * bignum = digit_stream_to_bignum(n_digits,bignum_producer,0x100,0);
 	drepl(tag<F_BIGNUM>(bignum));
 }
 
-void box_signed_1(s8 n)
-{
-	dpush(tag_fixnum(n));
-}
-
-void box_unsigned_1(u8 n)
-{
-	dpush(tag_fixnum(n));
-}
-
-void box_signed_2(s16 n)
-{
-	dpush(tag_fixnum(n));
-}
-
-void box_unsigned_2(u16 n)
-{
-	dpush(tag_fixnum(n));
-}
-
-void box_signed_4(s32 n)
-{
-	dpush(allot_integer(n));
-}
-
-void box_unsigned_4(u32 n)
-{
-	dpush(allot_cell(n));
-}
-
-void box_signed_cell(F_FIXNUM integer)
-{
-	dpush(allot_integer(integer));
-}
-
-void box_unsigned_cell(CELL cell)
-{
-	dpush(allot_cell(cell));
-}
-
-void box_signed_8(s64 n)
-{
-	if(n < FIXNUM_MIN || n > FIXNUM_MAX)
-		dpush(tag<F_BIGNUM>(long_long_to_bignum(n)));
-	else
-		dpush(tag_fixnum(n));
-}
-
-s64 to_signed_8(CELL obj)
-{
-	switch(type_of(obj))
-	{
-	case FIXNUM_TYPE:
-		return untag_fixnum(obj);
-	case BIGNUM_TYPE:
-		return bignum_to_long_long(untag<F_BIGNUM>(obj));
-	default:
-		type_error(BIGNUM_TYPE,obj);
-		return -1;
-	}
-}
-
-void box_unsigned_8(u64 n)
-{
-	if(n > FIXNUM_MAX)
-		dpush(tag<F_BIGNUM>(ulong_long_to_bignum(n)));
-	else
-		dpush(tag_fixnum(n));
-}
-
-u64 to_unsigned_8(CELL obj)
-{
-	switch(type_of(obj))
-	{
-	case FIXNUM_TYPE:
-		return untag_fixnum(obj);
-	case BIGNUM_TYPE:
-		return bignum_to_ulong_long(untag<F_BIGNUM>(obj));
-	default:
-		type_error(BIGNUM_TYPE,obj);
-		return -1;
-	}
-}
-
 CELL unbox_array_size(void)
 {
-	switch(type_of(dpeek()))
+	switch(tagged<F_OBJECT>(dpeek()).type())
 	{
 	case FIXNUM_TYPE:
 		{
@@ -377,18 +249,17 @@ CELL unbox_array_size(void)
 	return 0; /* can't happen */
 }
 
-/* Floats */
-void primitive_fixnum_to_float(void)
+PRIMITIVE(fixnum_to_float)
 {
 	drepl(allot_float(fixnum_to_float(dpeek())));
 }
 
-void primitive_bignum_to_float(void)
+PRIMITIVE(bignum_to_float)
 {
 	drepl(allot_float(bignum_to_float(dpeek())));
 }
 
-void primitive_str_to_float(void)
+PRIMITIVE(str_to_float)
 {
 	F_BYTE_ARRAY *bytes = untag_check<F_BYTE_ARRAY>(dpeek());
 	CELL capacity = array_capacity(bytes);
@@ -402,7 +273,7 @@ void primitive_str_to_float(void)
 		drepl(F);
 }
 
-void primitive_float_to_str(void)
+PRIMITIVE(float_to_str)
 {
 	F_BYTE_ARRAY *array = allot_byte_array(33);
 	snprintf((char *)(array + 1),32,"%.16g",untag_float_check(dpop()));
@@ -413,102 +284,228 @@ void primitive_float_to_str(void)
 	double y = untag_float(dpop()); \
 	double x = untag_float(dpop());
 
-void primitive_float_eq(void)
+PRIMITIVE(float_eq)
 {
 	POP_FLOATS(x,y);
 	box_boolean(x == y);
 }
 
-void primitive_float_add(void)
+PRIMITIVE(float_add)
 {
 	POP_FLOATS(x,y);
 	box_double(x + y);
 }
 
-void primitive_float_subtract(void)
+PRIMITIVE(float_subtract)
 {
 	POP_FLOATS(x,y);
 	box_double(x - y);
 }
 
-void primitive_float_multiply(void)
+PRIMITIVE(float_multiply)
 {
 	POP_FLOATS(x,y);
 	box_double(x * y);
 }
 
-void primitive_float_divfloat(void)
+PRIMITIVE(float_divfloat)
 {
 	POP_FLOATS(x,y);
 	box_double(x / y);
 }
 
-void primitive_float_mod(void)
+PRIMITIVE(float_mod)
 {
 	POP_FLOATS(x,y);
 	box_double(fmod(x,y));
 }
 
-void primitive_float_less(void)
+PRIMITIVE(float_less)
 {
 	POP_FLOATS(x,y);
 	box_boolean(x < y);
 }
 
-void primitive_float_lesseq(void)
+PRIMITIVE(float_lesseq)
 {
 	POP_FLOATS(x,y);
 	box_boolean(x <= y);
 }
 
-void primitive_float_greater(void)
+PRIMITIVE(float_greater)
 {
 	POP_FLOATS(x,y);
 	box_boolean(x > y);
 }
 
-void primitive_float_greatereq(void)
+PRIMITIVE(float_greatereq)
 {
 	POP_FLOATS(x,y);
 	box_boolean(x >= y);
 }
 
-void primitive_float_bits(void)
+PRIMITIVE(float_bits)
 {
 	box_unsigned_4(float_bits(untag_float_check(dpop())));
 }
 
-void primitive_bits_float(void)
+PRIMITIVE(bits_float)
 {
 	box_float(bits_float(to_cell(dpop())));
 }
 
-void primitive_double_bits(void)
+PRIMITIVE(double_bits)
 {
 	box_unsigned_8(double_bits(untag_float_check(dpop())));
 }
 
-void primitive_bits_double(void)
+PRIMITIVE(bits_double)
 {
 	box_double(bits_double(to_unsigned_8(dpop())));
 }
 
-float to_float(CELL value)
+VM_C_API F_FIXNUM to_fixnum(CELL tagged)
 {
-	return untag_float_check(value);
+	switch(TAG(tagged))
+	{
+	case FIXNUM_TYPE:
+		return untag_fixnum(tagged);
+	case BIGNUM_TYPE:
+		return bignum_to_fixnum(untag<F_BIGNUM>(tagged));
+	default:
+		type_error(FIXNUM_TYPE,tagged);
+		return -1; /* can't happen */
+	}
 }
 
-double to_double(CELL value)
+VM_C_API CELL to_cell(CELL tagged)
 {
-	return untag_float_check(value);
+	return (CELL)to_fixnum(tagged);
 }
 
-void box_float(float flo)
+VM_C_API void box_signed_1(s8 n)
+{
+	dpush(tag_fixnum(n));
+}
+
+VM_C_API void box_unsigned_1(u8 n)
+{
+	dpush(tag_fixnum(n));
+}
+
+VM_C_API void box_signed_2(s16 n)
+{
+	dpush(tag_fixnum(n));
+}
+
+VM_C_API void box_unsigned_2(u16 n)
+{
+	dpush(tag_fixnum(n));
+}
+
+VM_C_API void box_signed_4(s32 n)
+{
+	dpush(allot_integer(n));
+}
+
+VM_C_API void box_unsigned_4(u32 n)
+{
+	dpush(allot_cell(n));
+}
+
+VM_C_API void box_signed_cell(F_FIXNUM integer)
+{
+	dpush(allot_integer(integer));
+}
+
+VM_C_API void box_unsigned_cell(CELL cell)
+{
+	dpush(allot_cell(cell));
+}
+
+VM_C_API void box_signed_8(s64 n)
+{
+	if(n < FIXNUM_MIN || n > FIXNUM_MAX)
+		dpush(tag<F_BIGNUM>(long_long_to_bignum(n)));
+	else
+		dpush(tag_fixnum(n));
+}
+
+VM_C_API s64 to_signed_8(CELL obj)
+{
+	switch(tagged<F_OBJECT>(obj).type())
+	{
+	case FIXNUM_TYPE:
+		return untag_fixnum(obj);
+	case BIGNUM_TYPE:
+		return bignum_to_long_long(untag<F_BIGNUM>(obj));
+	default:
+		type_error(BIGNUM_TYPE,obj);
+		return -1;
+	}
+}
+
+VM_C_API void box_unsigned_8(u64 n)
+{
+	if(n > FIXNUM_MAX)
+		dpush(tag<F_BIGNUM>(ulong_long_to_bignum(n)));
+	else
+		dpush(tag_fixnum(n));
+}
+
+VM_C_API u64 to_unsigned_8(CELL obj)
+{
+	switch(tagged<F_OBJECT>(obj).type())
+	{
+	case FIXNUM_TYPE:
+		return untag_fixnum(obj);
+	case BIGNUM_TYPE:
+		return bignum_to_ulong_long(untag<F_BIGNUM>(obj));
+	default:
+		type_error(BIGNUM_TYPE,obj);
+		return -1;
+	}
+}
+
+VM_C_API void box_float(float flo)
 {
         dpush(allot_float(flo));
 }
 
-void box_double(double flo)
+VM_C_API float to_float(CELL value)
+{
+	return untag_float_check(value);
+}
+
+VM_C_API void box_double(double flo)
 {
         dpush(allot_float(flo));
+}
+
+VM_C_API double to_double(CELL value)
+{
+	return untag_float_check(value);
+}
+
+/* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
+overflow, they call these functions. */
+VM_ASM_API void overflow_fixnum_add(F_FIXNUM x, F_FIXNUM y)
+{
+	drepl(tag<F_BIGNUM>(fixnum_to_bignum(
+		untag_fixnum(x) + untag_fixnum(y))));
+}
+
+VM_ASM_API void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y)
+{
+	drepl(tag<F_BIGNUM>(fixnum_to_bignum(
+		untag_fixnum(x) - untag_fixnum(y))));
+}
+
+VM_ASM_API void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y)
+{
+	F_BIGNUM *bx = fixnum_to_bignum(x);
+	GC_BIGNUM(bx);
+	F_BIGNUM *by = fixnum_to_bignum(y);
+	GC_BIGNUM(by);
+	drepl(tag<F_BIGNUM>(bignum_multiply(bx,by)));
 }

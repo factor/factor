@@ -1,7 +1,7 @@
 #include "master.hpp"
 
 /* Certain special objects in the image are known to the runtime */
-static void init_objects(F_HEADER *h)
+static void init_objects(F_IMAGE_HEADER *h)
 {
 	memcpy(userenv,h->userenv,sizeof(userenv));
 
@@ -13,7 +13,7 @@ static void init_objects(F_HEADER *h)
 
 CELL data_relocation_base;
 
-static void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
+static void load_data_heap(FILE *file, F_IMAGE_HEADER *h, F_PARAMETERS *p)
 {
 	CELL good_size = h->data_size + (1 << 20);
 
@@ -48,7 +48,7 @@ static void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 
 CELL code_relocation_base;
 
-static void load_code_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
+static void load_code_heap(FILE *file, F_IMAGE_HEADER *h, F_PARAMETERS *p)
 {
 	CELL good_size = h->code_size + (1 << 19);
 
@@ -79,7 +79,7 @@ static void load_code_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 bool save_image(const F_CHAR *filename)
 {
 	FILE* file;
-	F_HEADER h;
+	F_IMAGE_HEADER h;
 
 	file = OPEN_WRITE(filename);
 	if(file == NULL)
@@ -114,7 +114,7 @@ bool save_image(const F_CHAR *filename)
 
 	bool ok = true;
 
-	if(fwrite(&h,sizeof(F_HEADER),1,file) != 1) ok = false;
+	if(fwrite(&h,sizeof(F_IMAGE_HEADER),1,file) != 1) ok = false;
 	if(fwrite((void*)tenured->start,h.data_size,1,file) != 1) ok = false;
 	if(fwrite(first_block(&code_heap),h.code_size,1,file) != 1) ok = false;
 	if(fclose(file)) ok = false;
@@ -127,7 +127,7 @@ bool save_image(const F_CHAR *filename)
 	return ok;
 }
 
-void primitive_save_image(void)
+PRIMITIVE(save_image)
 {
 	/* do a full GC to push everything into tenured space */
 	gc();
@@ -137,7 +137,7 @@ void primitive_save_image(void)
 	save_image((F_CHAR *)(path.untagged() + 1));
 }
 
-void primitive_save_image_and_exit(void)
+PRIMITIVE(save_image_and_exit)
 {	
 	/* We unbox this before doing anything else. This is the only point
 	where we might throw an error, so we have to throw an error here since
@@ -174,19 +174,20 @@ static void data_fixup(CELL *cell)
 	*cell += (tenured->start - data_relocation_base);
 }
 
-static void code_fixup(CELL cell)
+template <typename T> void code_fixup(T **cell)
 {
-	CELL value = get(cell);
-	put(cell,value + (code_heap.segment->start - code_relocation_base));
+	T *ptr = *cell;
+	T *new_ptr = (T *)(((CELL)ptr) + (code_heap.segment->start - code_relocation_base));
+	*cell = new_ptr;
 }
 
 static void fixup_word(F_WORD *word)
 {
 	if(word->code)
-		code_fixup((CELL)&word->code);
+		code_fixup(&word->code);
 	if(word->profiling)
-		code_fixup((CELL)&word->profiling);
-	code_fixup((CELL)&word->xt);
+		code_fixup(&word->profiling);
+	code_fixup(&word->xt);
 }
 
 static void fixup_quotation(F_QUOTATION *quot)
@@ -195,8 +196,8 @@ static void fixup_quotation(F_QUOTATION *quot)
 		quot->xt = (void *)lazy_jit_compile;
 	else
 	{
-		code_fixup((CELL)&quot->xt);
-		code_fixup((CELL)&quot->code);
+		code_fixup(&quot->xt);
+		code_fixup(&quot->code);
 	}
 }
 
@@ -207,8 +208,8 @@ static void fixup_alien(F_ALIEN *d)
 
 static void fixup_stack_frame(F_STACK_FRAME *frame)
 {
-	code_fixup((CELL)&frame->xt);
-	code_fixup((CELL)&FRAME_RETURN_ADDRESS(frame));
+	code_fixup(&frame->xt);
+	code_fixup(&FRAME_RETURN_ADDRESS(frame));
 }
 
 static void fixup_callstack_object(F_CALLSTACK *stack)
@@ -217,45 +218,44 @@ static void fixup_callstack_object(F_CALLSTACK *stack)
 }
 
 /* Initialize an object in a newly-loaded image */
-static void relocate_object(CELL relocating)
+static void relocate_object(F_OBJECT *object)
 {
+	CELL hi_tag = object->header.hi_tag();
+	
 	/* Tuple relocation is a bit trickier; we have to fix up the
-	fixup object before we can get the tuple size, so do_slots is
+	layout object before we can get the tuple size, so do_slots is
 	out of the question */
-	if(untag_header(get(relocating)) == TUPLE_TYPE)
+	if(hi_tag == TUPLE_TYPE)
 	{
-		data_fixup((CELL *)relocating + 1);
+		F_TUPLE *tuple = (F_TUPLE *)object;
+		data_fixup(&tuple->layout);
 
-		CELL scan = relocating + 2 * CELLS;
-		CELL size = untagged_object_size(relocating);
-		CELL end = relocating + size;
+		CELL *scan = (CELL *)(tuple + 1);
+		CELL *end = (CELL *)((CELL)object + untagged_object_size(object));
 
-		while(scan < end)
-		{
-			data_fixup((CELL *)scan);
-			scan += CELLS;
-		}
+		for(; scan < end; scan++)
+			data_fixup(scan);
 	}
 	else
 	{
-		do_slots(relocating,data_fixup);
+		do_slots((CELL)object,data_fixup);
 
-		switch(untag_header(get(relocating)))
+		switch(hi_tag)
 		{
 		case WORD_TYPE:
-			fixup_word((F_WORD *)relocating);
+			fixup_word((F_WORD *)object);
 			break;
 		case QUOTATION_TYPE:
-			fixup_quotation((F_QUOTATION *)relocating);
+			fixup_quotation((F_QUOTATION *)object);
 			break;
 		case DLL_TYPE:
-			ffi_dlopen((F_DLL *)relocating);
+			ffi_dlopen((F_DLL *)object);
 			break;
 		case ALIEN_TYPE:
-			fixup_alien((F_ALIEN *)relocating);
+			fixup_alien((F_ALIEN *)object);
 			break;
 		case CALLSTACK_TYPE:
-			fixup_callstack_object((F_CALLSTACK *)relocating);
+			fixup_callstack_object((F_CALLSTACK *)object);
 			break;
 		}
 	}
@@ -280,10 +280,11 @@ void relocate_data()
 
 	for(relocating = tenured->start;
 		relocating < tenured->here;
-		relocating += untagged_object_size(relocating))
+		relocating += untagged_object_size((F_OBJECT *)relocating))
 	{
-		allot_barrier(relocating);
-		relocate_object(relocating);
+		F_OBJECT *object = (F_OBJECT *)relocating;
+		allot_barrier(object);
+		relocate_object(object);
 	}
 }
 
@@ -313,8 +314,8 @@ void load_image(F_PARAMETERS *p)
 		exit(1);
 	}
 
-	F_HEADER h;
-	if(fread(&h,sizeof(F_HEADER),1,file) != 1)
+	F_IMAGE_HEADER h;
+	if(fread(&h,sizeof(F_IMAGE_HEADER),1,file) != 1)
 		fatal_error("Cannot read image header",0);
 
 	if(h.magic != IMAGE_MAGIC)

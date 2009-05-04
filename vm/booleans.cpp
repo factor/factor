@@ -1,13 +1,11 @@
 #include "master.hpp"
 
-/* FFI calls this */
-void box_boolean(bool value)
+VM_C_API void box_boolean(bool value)
 {
 	dpush(value ? T : F);
 }
 
-/* FFI calls this */
-bool to_boolean(CELL value)
+VM_C_API bool to_boolean(CELL value)
 {
 	return value != F;
 }

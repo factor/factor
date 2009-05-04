@@ -12,7 +12,7 @@ NS_DURING
 NS_HANDLER
 		dpush(allot_alien(F,(CELL)localException));
 		quot = userenv[COCOA_EXCEPTION_ENV];
-		if(type_of(quot) != QUOTATION_TYPE)
+		if(!tagged<F_OBJECT>(quot).type_p(QUOTATION_TYPE))
 		{
 			/* No Cocoa exception handler was registered, so
 			extra/cocoa/ is not loaded. So we pass the exception
