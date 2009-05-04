@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: threads io.files io.pathnames io.monitors init kernel
-vocabs vocabs.loader tools.vocabs namespaces continuations
-sequences splitting assocs command-line concurrency.messaging
-io.backend sets tr accessors ;
-IN: tools.vocabs.monitor
+USING: accessors assocs command-line concurrency.messaging
+continuations init io.backend io.files io.monitors io.pathnames
+kernel namespaces sequences sets splitting threads
+tr vocabs vocabs.loader vocabs.refresh vocabs.cache ;
+IN: vocabs.refresh.monitor
 
 TR: convert-separators "/\\" ".." ;
 
@@ -56,4 +56,4 @@ TR: convert-separators "/\\" ".." ;
 [
     "-no-monitors" (command-line) member?
     [ start-monitor-thread ] unless
-] "tools.vocabs.monitor" add-init-hook
+] "vocabs.refresh.monitor" add-init-hook
