@@ -1,5 +1,5 @@
 IN: vocabs.refresh.tests
-USING: vocabs.refresh tools.test namespaces ;
+USING: vocabs.refresh tools.test continuations namespaces ;
 
 [ ] [
     changed-vocabs get-global

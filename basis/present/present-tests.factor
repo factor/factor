@@ -1,5 +1,5 @@
 IN: present.tests
-USING: tools.test present math vocabs sequences kernel ;
+USING: tools.test vocabs.hierarchy present math vocabs sequences kernel ;
 
 [ "3" ] [ 3 present ] unit-test
 [ "Hi" ] [ "Hi" present ] unit-test
