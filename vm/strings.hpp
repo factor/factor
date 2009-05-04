@@ -1,25 +1,25 @@
 namespace factor
 {
 
-inline static CELL string_capacity(F_STRING *str)
+inline static cell string_capacity(string *str)
 {
 	return untag_fixnum(str->length);
 }
 
-inline static CELL string_size(CELL size)
+inline static cell string_size(cell size)
 {
-	return sizeof(F_STRING) + size;
+	return sizeof(string) + size;
 }
 
-F_STRING* allot_string_internal(CELL capacity);
-F_STRING* allot_string(CELL capacity, CELL fill);
+string* allot_string_internal(cell capacity);
+string* allot_string(cell capacity, cell fill);
 PRIMITIVE(string);
-F_STRING *reallot_string(F_STRING *string, CELL capacity);
+string *reallot_string(string *string, cell capacity);
 PRIMITIVE(resize_string);
 
 /* String getters and setters */
-CELL string_nth(F_STRING* string, CELL index);
-void set_string_nth(F_STRING* string, CELL index, CELL value);
+cell string_nth(string* string, cell index);
+void set_string_nth(string* string, cell index, cell value);
 
 PRIMITIVE(string_nth);
 PRIMITIVE(set_string_nth_slow);

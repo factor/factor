@@ -35,7 +35,7 @@ Technology nor of any adaptation thereof in any advertising,
 promotional, or sales literature without prior written consent from
 MIT in each case. */
 
-#define BIGNUM_OUT_OF_BAND ((F_BIGNUM *) 0)
+#define BIGNUM_OUT_OF_BAND ((bignum *) 0)
 
 enum bignum_comparison
 {
@@ -44,86 +44,86 @@ enum bignum_comparison
   bignum_comparison_greater = 1
 };
 
-int bignum_equal_p(F_BIGNUM *, F_BIGNUM *);
-enum bignum_comparison bignum_compare(F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * bignum_add(F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * bignum_subtract(F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * bignum_negate(F_BIGNUM *);
-F_BIGNUM * bignum_multiply(F_BIGNUM *, F_BIGNUM *);
+int bignum_equal_p(bignum *, bignum *);
+enum bignum_comparison bignum_compare(bignum *, bignum *);
+bignum * bignum_add(bignum *, bignum *);
+bignum * bignum_subtract(bignum *, bignum *);
+bignum * bignum_negate(bignum *);
+bignum * bignum_multiply(bignum *, bignum *);
 void
-bignum_divide(F_BIGNUM * numerator, F_BIGNUM * denominator,
-		  F_BIGNUM * * quotient, F_BIGNUM * * remainder);
-F_BIGNUM * bignum_quotient(F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * bignum_remainder(F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * fixnum_to_bignum(F_FIXNUM);
-F_BIGNUM * cell_to_bignum(CELL);
-F_BIGNUM * long_long_to_bignum(s64 n);
-F_BIGNUM * ulong_long_to_bignum(u64 n);
-F_FIXNUM bignum_to_fixnum(F_BIGNUM *);
-CELL bignum_to_cell(F_BIGNUM *);
-s64 bignum_to_long_long(F_BIGNUM *);
-u64 bignum_to_ulong_long(F_BIGNUM *);
-F_BIGNUM * double_to_bignum(double);
-double bignum_to_double(F_BIGNUM *);
+bignum_divide(bignum * numerator, bignum * denominator,
+		  bignum * * quotient, bignum * * remainder);
+bignum * bignum_quotient(bignum *, bignum *);
+bignum * bignum_remainder(bignum *, bignum *);
+bignum * fixnum_to_bignum(fixnum);
+bignum * cell_to_bignum(cell);
+bignum * long_long_to_bignum(s64 n);
+bignum * ulong_long_to_bignum(u64 n);
+fixnum bignum_to_fixnum(bignum *);
+cell bignum_to_cell(bignum *);
+s64 bignum_to_long_long(bignum *);
+u64 bignum_to_ulong_long(bignum *);
+bignum * double_to_bignum(double);
+double bignum_to_double(bignum *);
 
 /* Added bitwise operators. */
 
-F_BIGNUM * bignum_bitwise_not(F_BIGNUM *);
-F_BIGNUM * bignum_arithmetic_shift(F_BIGNUM *, F_FIXNUM);
-F_BIGNUM * bignum_bitwise_and(F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * bignum_bitwise_ior(F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * bignum_bitwise_xor(F_BIGNUM *, F_BIGNUM *);
+bignum * bignum_bitwise_not(bignum *);
+bignum * bignum_arithmetic_shift(bignum *, fixnum);
+bignum * bignum_bitwise_and(bignum *, bignum *);
+bignum * bignum_bitwise_ior(bignum *, bignum *);
+bignum * bignum_bitwise_xor(bignum *, bignum *);
 
 /* Forward references */
-int bignum_equal_p_unsigned(F_BIGNUM *, F_BIGNUM *);
-enum bignum_comparison bignum_compare_unsigned(F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * bignum_add_unsigned(F_BIGNUM *, F_BIGNUM *, int);
-F_BIGNUM * bignum_subtract_unsigned(F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * bignum_multiply_unsigned(F_BIGNUM *, F_BIGNUM *, int);
-F_BIGNUM * bignum_multiply_unsigned_small_factor
-  (F_BIGNUM *, bignum_digit_type, int);
-void bignum_destructive_scale_up(F_BIGNUM *, bignum_digit_type);
-void bignum_destructive_add(F_BIGNUM *, bignum_digit_type);
+int bignum_equal_p_unsigned(bignum *, bignum *);
+enum bignum_comparison bignum_compare_unsigned(bignum *, bignum *);
+bignum * bignum_add_unsigned(bignum *, bignum *, int);
+bignum * bignum_subtract_unsigned(bignum *, bignum *);
+bignum * bignum_multiply_unsigned(bignum *, bignum *, int);
+bignum * bignum_multiply_unsigned_small_factor
+  (bignum *, bignum_digit_type, int);
+void bignum_destructive_scale_up(bignum *, bignum_digit_type);
+void bignum_destructive_add(bignum *, bignum_digit_type);
 void bignum_divide_unsigned_large_denominator
-  (F_BIGNUM *, F_BIGNUM *, F_BIGNUM * *, F_BIGNUM * *, int, int);
-void bignum_destructive_normalization(F_BIGNUM *, F_BIGNUM *, int);
-void bignum_destructive_unnormalization(F_BIGNUM *, int);
-void bignum_divide_unsigned_normalized(F_BIGNUM *, F_BIGNUM *, F_BIGNUM *);
+  (bignum *, bignum *, bignum * *, bignum * *, int, int);
+void bignum_destructive_normalization(bignum *, bignum *, int);
+void bignum_destructive_unnormalization(bignum *, int);
+void bignum_divide_unsigned_normalized(bignum *, bignum *, bignum *);
 bignum_digit_type bignum_divide_subtract
   (bignum_digit_type *, bignum_digit_type *, bignum_digit_type,
    bignum_digit_type *);
 void bignum_divide_unsigned_medium_denominator
-  (F_BIGNUM *, bignum_digit_type, F_BIGNUM * *, F_BIGNUM * *, int, int);
+  (bignum *, bignum_digit_type, bignum * *, bignum * *, int, int);
 bignum_digit_type bignum_digit_divide
   (bignum_digit_type, bignum_digit_type, bignum_digit_type, bignum_digit_type *);
 bignum_digit_type bignum_digit_divide_subtract
   (bignum_digit_type, bignum_digit_type, bignum_digit_type, bignum_digit_type *);
 void bignum_divide_unsigned_small_denominator
-  (F_BIGNUM *, bignum_digit_type, F_BIGNUM * *, F_BIGNUM * *, int, int);
+  (bignum *, bignum_digit_type, bignum * *, bignum * *, int, int);
 bignum_digit_type bignum_destructive_scale_down
-  (F_BIGNUM *, bignum_digit_type);
-F_BIGNUM * bignum_remainder_unsigned_small_denominator
-  (F_BIGNUM *, bignum_digit_type, int);
-F_BIGNUM * bignum_digit_to_bignum(bignum_digit_type, int);
-F_BIGNUM * allot_bignum(bignum_length_type, int);
-F_BIGNUM * allot_bignum_zeroed(bignum_length_type, int);
-F_BIGNUM * bignum_shorten_length(F_BIGNUM *, bignum_length_type);
-F_BIGNUM * bignum_trim(F_BIGNUM *);
-F_BIGNUM * bignum_new_sign(F_BIGNUM *, int);
-F_BIGNUM * bignum_maybe_new_sign(F_BIGNUM *, int);
-void bignum_destructive_copy(F_BIGNUM *, F_BIGNUM *);
+  (bignum *, bignum_digit_type);
+bignum * bignum_remainder_unsigned_small_denominator
+  (bignum *, bignum_digit_type, int);
+bignum * bignum_digit_to_bignum(bignum_digit_type, int);
+bignum * allot_bignum(bignum_length_type, int);
+bignum * allot_bignum_zeroed(bignum_length_type, int);
+bignum * bignum_shorten_length(bignum *, bignum_length_type);
+bignum * bignum_trim(bignum *);
+bignum * bignum_new_sign(bignum *, int);
+bignum * bignum_maybe_new_sign(bignum *, int);
+void bignum_destructive_copy(bignum *, bignum *);
 
 /* Added for bitwise operations. */
-F_BIGNUM * bignum_magnitude_ash(F_BIGNUM * arg1, F_FIXNUM n);
-F_BIGNUM * bignum_pospos_bitwise_op(int op, F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * bignum_posneg_bitwise_op(int op, F_BIGNUM *, F_BIGNUM *);
-F_BIGNUM * bignum_negneg_bitwise_op(int op, F_BIGNUM *, F_BIGNUM *);
-void        bignum_negate_magnitude(F_BIGNUM *);
+bignum * bignum_magnitude_ash(bignum * arg1, fixnum n);
+bignum * bignum_pospos_bitwise_op(int op, bignum *, bignum *);
+bignum * bignum_posneg_bitwise_op(int op, bignum *, bignum *);
+bignum * bignum_negneg_bitwise_op(int op, bignum *, bignum *);
+void        bignum_negate_magnitude(bignum *);
 
-F_BIGNUM * bignum_integer_length(F_BIGNUM * arg1);
-int bignum_unsigned_logbitp(int shift, F_BIGNUM * bignum);
-int bignum_logbitp(int shift, F_BIGNUM * arg);
-F_BIGNUM * digit_stream_to_bignum(unsigned int n_digits,
+bignum * bignum_integer_length(bignum * arg1);
+int bignum_unsigned_logbitp(int shift, bignum * bignum);
+int bignum_logbitp(int shift, bignum * arg);
+bignum * digit_stream_to_bignum(unsigned int n_digits,
                                    unsigned int (*producer)(unsigned int),
                                    unsigned int radix,
                                    int negative_p);

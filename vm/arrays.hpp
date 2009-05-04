@@ -1,42 +1,42 @@
 namespace factor
 {
 
-inline static CELL array_nth(F_ARRAY *array, CELL slot)
+inline static cell array_nth(array *array, cell slot)
 {
 #ifdef FACTOR_DEBUG
 	assert(slot < array_capacity(array));
-	assert(array->header.hi_tag() == ARRAY_TYPE);
+	assert(array->h.hi_tag() == ARRAY_TYPE);
 #endif
 	return array->data()[slot];
 }
 
-inline static void set_array_nth(F_ARRAY *array, CELL slot, CELL value)
+inline static void set_array_nth(array *array, cell slot, cell value)
 {
 #ifdef FACTOR_DEBUG
 	assert(slot < array_capacity(array));
-	assert(array->header.hi_tag() == ARRAY_TYPE);
+	assert(array->h.hi_tag() == ARRAY_TYPE);
 	check_tagged_pointer(value);
 #endif
 	array->data()[slot] = value;
 	write_barrier(array);
 }
 
-F_ARRAY *allot_array(CELL capacity, CELL fill);
+array *allot_array(cell capacity, cell fill);
 
-CELL allot_array_1(CELL obj);
-CELL allot_array_2(CELL v1, CELL v2);
-CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
+cell allot_array_1(cell obj);
+cell allot_array_2(cell v1, cell v2);
+cell allot_array_4(cell v1, cell v2, cell v3, cell v4);
 
 PRIMITIVE(array);
 PRIMITIVE(resize_array);
 
 struct growable_array {
-	CELL count;
-	gc_root<F_ARRAY> array;
+	cell count;
+	gc_root<array> elements;
 
-	growable_array() : count(0), array(allot_array(2,F)) {}
+	growable_array() : count(0), elements(allot_array(2,F)) {}
 
-	void add(CELL elt);
+	void add(cell elt);
 	void trim();
 };
 

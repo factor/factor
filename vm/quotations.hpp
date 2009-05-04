@@ -2,29 +2,29 @@ namespace factor
 {
 
 struct quotation_jit : public jit {
-	gc_root<F_ARRAY> array;
+	gc_root<array> elements;
 	bool compiling, relocate;
 
-	quotation_jit(CELL quot, bool compiling_, bool relocate_)
+	quotation_jit(cell quot, bool compiling_, bool relocate_)
 		: jit(QUOTATION_TYPE,quot),
-		  array(owner.as<F_QUOTATION>().untagged()->array),
+		  elements(owner.as<quotation>().untagged()->array),
 		  compiling(compiling_),
 		  relocate(relocate_) {};
 
-	void emit_mega_cache_lookup(CELL methods, F_FIXNUM index, CELL cache);
-	bool primitive_call_p(CELL i);
-	bool fast_if_p(CELL i);
-	bool fast_dip_p(CELL i);
-	bool fast_2dip_p(CELL i);
-	bool fast_3dip_p(CELL i);
-	bool mega_lookup_p(CELL i);
+	void emit_mega_cache_lookup(cell methods, fixnum index, cell cache);
+	bool primitive_call_p(cell i);
+	bool fast_if_p(cell i);
+	bool fast_dip_p(cell i);
+	bool fast_2dip_p(cell i);
+	bool fast_3dip_p(cell i);
+	bool mega_lookup_p(cell i);
 	bool stack_frame_p();
 	void iterate_quotation();
 };
 
-void set_quot_xt(F_QUOTATION *quot, F_CODE_BLOCK *code);
-void jit_compile(CELL quot, bool relocate);
-F_FIXNUM quot_code_offset_to_scan(CELL quot, CELL offset);
+void set_quot_xt(quotation *quot, code_block *code);
+void jit_compile(cell quot, bool relocate);
+fixnum quot_code_offset_to_scan(cell quot, cell offset);
 
 PRIMITIVE(jit_compile);
 
@@ -33,6 +33,6 @@ void compile_all_words(void);
 PRIMITIVE(array_to_quotation);
 PRIMITIVE(quotation_xt);
 
-VM_ASM_API CELL lazy_jit_compile_impl(CELL quot, F_STACK_FRAME *stack);
+VM_ASM_API cell lazy_jit_compile_impl(cell quot, stack_frame *stack);
 
 }

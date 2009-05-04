@@ -62,7 +62,7 @@ namespace factor
 /* Exports */
 
 int
-bignum_equal_p(F_BIGNUM * x, F_BIGNUM * y)
+bignum_equal_p(bignum * x, bignum * y)
 {
   return
     ((BIGNUM_ZERO_P (x))
@@ -75,7 +75,7 @@ bignum_equal_p(F_BIGNUM * x, F_BIGNUM * y)
 }
 
 enum bignum_comparison
-bignum_compare(F_BIGNUM * x, F_BIGNUM * y)
+bignum_compare(bignum * x, bignum * y)
 {
   return
     ((BIGNUM_ZERO_P (x))
@@ -98,8 +98,8 @@ bignum_compare(F_BIGNUM * x, F_BIGNUM * y)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_add(F_BIGNUM * x, F_BIGNUM * y)
+bignum *
+bignum_add(bignum * x, bignum * y)
 {
   return
     ((BIGNUM_ZERO_P (x))
@@ -116,8 +116,8 @@ bignum_add(F_BIGNUM * x, F_BIGNUM * y)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_subtract(F_BIGNUM * x, F_BIGNUM * y)
+bignum *
+bignum_subtract(bignum * x, bignum * y)
 {
   return
     ((BIGNUM_ZERO_P (x))
@@ -136,8 +136,8 @@ bignum_subtract(F_BIGNUM * x, F_BIGNUM * y)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_multiply(F_BIGNUM * x, F_BIGNUM * y)
+bignum *
+bignum_multiply(bignum * x, bignum * y)
 {
   bignum_length_type x_length = (BIGNUM_LENGTH (x));
   bignum_length_type y_length = (BIGNUM_LENGTH (y));
@@ -170,8 +170,8 @@ bignum_multiply(F_BIGNUM * x, F_BIGNUM * y)
 
 /* allocates memory */
 void
-bignum_divide(F_BIGNUM * numerator, F_BIGNUM * denominator,
-                  F_BIGNUM * * quotient, F_BIGNUM * * remainder)
+bignum_divide(bignum * numerator, bignum * denominator,
+                  bignum * * quotient, bignum * * remainder)
 {
   if (BIGNUM_ZERO_P (denominator))
     {
@@ -242,8 +242,8 @@ bignum_divide(F_BIGNUM * numerator, F_BIGNUM * denominator,
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_quotient(F_BIGNUM * numerator, F_BIGNUM * denominator)
+bignum *
+bignum_quotient(bignum * numerator, bignum * denominator)
 {
   if (BIGNUM_ZERO_P (denominator))
     {
@@ -266,7 +266,7 @@ bignum_quotient(F_BIGNUM * numerator, F_BIGNUM * denominator)
       case bignum_comparison_greater:
       default:                                        /* to appease gcc -Wall */
         {
-          F_BIGNUM * quotient;
+          bignum * quotient;
           if ((BIGNUM_LENGTH (denominator)) == 1)
             {
               bignum_digit_type digit = (BIGNUM_REF (denominator, 0));
@@ -275,18 +275,18 @@ bignum_quotient(F_BIGNUM * numerator, F_BIGNUM * denominator)
               if (digit < BIGNUM_RADIX_ROOT)
                 bignum_divide_unsigned_small_denominator
                   (numerator, digit,
-                   (&quotient), ((F_BIGNUM * *) 0),
+                   (&quotient), ((bignum * *) 0),
                    q_negative_p, 0);
               else
                 bignum_divide_unsigned_medium_denominator
                   (numerator, digit,
-                   (&quotient), ((F_BIGNUM * *) 0),
+                   (&quotient), ((bignum * *) 0),
                    q_negative_p, 0);
             }
           else
             bignum_divide_unsigned_large_denominator
               (numerator, denominator,
-               (&quotient), ((F_BIGNUM * *) 0),
+               (&quotient), ((bignum * *) 0),
                q_negative_p, 0);
           return (quotient);
         }
@@ -295,8 +295,8 @@ bignum_quotient(F_BIGNUM * numerator, F_BIGNUM * denominator)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_remainder(F_BIGNUM * numerator, F_BIGNUM * denominator)
+bignum *
+bignum_remainder(bignum * numerator, bignum * denominator)
 {
   if (BIGNUM_ZERO_P (denominator))
     {
@@ -314,7 +314,7 @@ bignum_remainder(F_BIGNUM * numerator, F_BIGNUM * denominator)
     case bignum_comparison_greater:
     default:                                        /* to appease gcc -Wall */
       {
-        F_BIGNUM * remainder;
+        bignum * remainder;
         if ((BIGNUM_LENGTH (denominator)) == 1)
           {
             bignum_digit_type digit = (BIGNUM_REF (denominator, 0));
@@ -326,13 +326,13 @@ bignum_remainder(F_BIGNUM * numerator, F_BIGNUM * denominator)
                  (numerator, digit, (BIGNUM_NEGATIVE_P (numerator))));
             bignum_divide_unsigned_medium_denominator
               (numerator, digit,
-               ((F_BIGNUM * *) 0), (&remainder),
+               ((bignum * *) 0), (&remainder),
                0, (BIGNUM_NEGATIVE_P (numerator)));
           }
         else
           bignum_divide_unsigned_large_denominator
             (numerator, denominator,
-             ((F_BIGNUM * *) 0), (&remainder),
+             ((bignum * *) 0), (&remainder),
              0, (BIGNUM_NEGATIVE_P (numerator)));
         return (remainder);
       }
@@ -340,7 +340,7 @@ bignum_remainder(F_BIGNUM * numerator, F_BIGNUM * denominator)
 }
 
 #define FOO_TO_BIGNUM(name,type,utype) \
-  F_BIGNUM * name##_to_bignum(type n)                                 \
+  bignum * name##_to_bignum(type n)                                 \
   {                                                                    \
     int negative_p;                                                    \
     bignum_digit_type result_digits [BIGNUM_DIGITS_FOR(type)];         \
@@ -359,7 +359,7 @@ bignum_remainder(F_BIGNUM * numerator, F_BIGNUM * denominator)
       while (accumulator != 0);                                        \
     }                                                                  \
     {                                                                  \
-      F_BIGNUM * result =                                             \
+      bignum * result =                                             \
         (allot_bignum ((end_digits - result_digits), negative_p));     \
       bignum_digit_type * scan_digits = result_digits;                 \
       bignum_digit_type * scan_result = (BIGNUM_START_PTR (result));   \
@@ -370,13 +370,13 @@ bignum_remainder(F_BIGNUM * numerator, F_BIGNUM * denominator)
   }
   
 /* all below allocate memory */
-FOO_TO_BIGNUM(cell,CELL,CELL)
-FOO_TO_BIGNUM(fixnum,F_FIXNUM,CELL)
+FOO_TO_BIGNUM(cell,cell,cell)
+FOO_TO_BIGNUM(fixnum,fixnum,cell)
 FOO_TO_BIGNUM(long_long,s64,u64)
 FOO_TO_BIGNUM(ulong_long,u64,u64)
 
 #define BIGNUM_TO_FOO(name,type,utype) \
-  type bignum_to_##name(F_BIGNUM * bignum) \
+  type bignum_to_##name(bignum * bignum) \
   { \
     if (BIGNUM_ZERO_P (bignum)) \
       return (0); \
@@ -391,13 +391,13 @@ FOO_TO_BIGNUM(ulong_long,u64,u64)
   }
 
 /* all of the below allocate memory */
-BIGNUM_TO_FOO(cell,CELL,CELL);
-BIGNUM_TO_FOO(fixnum,F_FIXNUM,CELL);
+BIGNUM_TO_FOO(cell,cell,cell);
+BIGNUM_TO_FOO(fixnum,fixnum,cell);
 BIGNUM_TO_FOO(long_long,s64,u64)
 BIGNUM_TO_FOO(ulong_long,u64,u64)
 
 double
-bignum_to_double(F_BIGNUM * bignum)
+bignum_to_double(bignum * bignum)
 {
   if (BIGNUM_ZERO_P (bignum))
     return (0);
@@ -422,7 +422,7 @@ bignum_to_double(F_BIGNUM * bignum)
 /* allocates memory */
 #define inf std::numeric_limits<double>::infinity()
 
-F_BIGNUM *
+bignum *
 double_to_bignum(double x)
 {
   if (x == inf || x == -inf || x != x) return (BIGNUM_ZERO ());
@@ -433,13 +433,13 @@ double_to_bignum(double x)
   if (significand < 0) significand = (-significand);
   {
     bignum_length_type length = (BIGNUM_BITS_TO_DIGITS (exponent));
-    F_BIGNUM * result = (allot_bignum (length, (x < 0)));
+    bignum * result = (allot_bignum (length, (x < 0)));
     bignum_digit_type * start = (BIGNUM_START_PTR (result));
     bignum_digit_type * scan = (start + length);
     bignum_digit_type digit;
     int odd_bits = (exponent % BIGNUM_DIGIT_LENGTH);
     if (odd_bits > 0)
-      DTB_WRITE_DIGIT ((F_FIXNUM)1 << odd_bits);
+      DTB_WRITE_DIGIT ((fixnum)1 << odd_bits);
     while (start < scan)
       {
         if (significand == 0)
@@ -459,7 +459,7 @@ double_to_bignum(double x)
 /* Comparisons */
 
 int
-bignum_equal_p_unsigned(F_BIGNUM * x, F_BIGNUM * y)
+bignum_equal_p_unsigned(bignum * x, bignum * y)
 {
   bignum_length_type length = (BIGNUM_LENGTH (x));
   if (length != (BIGNUM_LENGTH (y)))
@@ -477,7 +477,7 @@ bignum_equal_p_unsigned(F_BIGNUM * x, F_BIGNUM * y)
 }
 
 enum bignum_comparison
-bignum_compare_unsigned(F_BIGNUM * x, F_BIGNUM * y)
+bignum_compare_unsigned(bignum * x, bignum * y)
 {
   bignum_length_type x_length = (BIGNUM_LENGTH (x));
   bignum_length_type y_length = (BIGNUM_LENGTH (y));
@@ -505,21 +505,21 @@ bignum_compare_unsigned(F_BIGNUM * x, F_BIGNUM * y)
 /* Addition */
 
 /* allocates memory */
-F_BIGNUM *
-bignum_add_unsigned(F_BIGNUM * x, F_BIGNUM * y, int negative_p)
+bignum *
+bignum_add_unsigned(bignum * x, bignum * y, int negative_p)
 {
   GC_BIGNUM(x); GC_BIGNUM(y);
 
   if ((BIGNUM_LENGTH (y)) > (BIGNUM_LENGTH (x)))
     {
-      F_BIGNUM * z = x;
+      bignum * z = x;
       x = y;
       y = z;
     }
   {
     bignum_length_type x_length = (BIGNUM_LENGTH (x));
     
-    F_BIGNUM * r = (allot_bignum ((x_length + 1), negative_p));
+    bignum * r = (allot_bignum ((x_length + 1), negative_p));
 
     bignum_digit_type sum;
     bignum_digit_type carry = 0;
@@ -573,8 +573,8 @@ bignum_add_unsigned(F_BIGNUM * x, F_BIGNUM * y, int negative_p)
 /* Subtraction */
 
 /* allocates memory */
-F_BIGNUM *
-bignum_subtract_unsigned(F_BIGNUM * x, F_BIGNUM * y)
+bignum *
+bignum_subtract_unsigned(bignum * x, bignum * y)
 {
   GC_BIGNUM(x); GC_BIGNUM(y);
   
@@ -585,7 +585,7 @@ bignum_subtract_unsigned(F_BIGNUM * x, F_BIGNUM * y)
       return (BIGNUM_ZERO ());
     case bignum_comparison_less:
       {
-        F_BIGNUM * z = x;
+        bignum * z = x;
         x = y;
         y = z;
       }
@@ -598,7 +598,7 @@ bignum_subtract_unsigned(F_BIGNUM * x, F_BIGNUM * y)
   {
     bignum_length_type x_length = (BIGNUM_LENGTH (x));
     
-    F_BIGNUM * r = (allot_bignum (x_length, negative_p));
+    bignum * r = (allot_bignum (x_length, negative_p));
 
     bignum_digit_type difference;
     bignum_digit_type borrow = 0;
@@ -652,14 +652,14 @@ bignum_subtract_unsigned(F_BIGNUM * x, F_BIGNUM * y)
         where R == BIGNUM_RADIX_ROOT */
 
 /* allocates memory */
-F_BIGNUM *
-bignum_multiply_unsigned(F_BIGNUM * x, F_BIGNUM * y, int negative_p)
+bignum *
+bignum_multiply_unsigned(bignum * x, bignum * y, int negative_p)
 {
   GC_BIGNUM(x); GC_BIGNUM(y);
 
   if ((BIGNUM_LENGTH (y)) > (BIGNUM_LENGTH (x)))
     {
-      F_BIGNUM * z = x;
+      bignum * z = x;
       x = y;
       y = z;
     }
@@ -675,7 +675,7 @@ bignum_multiply_unsigned(F_BIGNUM * x, F_BIGNUM * y, int negative_p)
     bignum_length_type x_length = (BIGNUM_LENGTH (x));
     bignum_length_type y_length = (BIGNUM_LENGTH (y));
 
-    F_BIGNUM * r =
+    bignum * r =
       (allot_bignum_zeroed ((x_length + y_length), negative_p));
 
     bignum_digit_type * scan_x = (BIGNUM_START_PTR (x));
@@ -724,15 +724,15 @@ bignum_multiply_unsigned(F_BIGNUM * x, F_BIGNUM * y, int negative_p)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_multiply_unsigned_small_factor(F_BIGNUM * x, bignum_digit_type y,
+bignum *
+bignum_multiply_unsigned_small_factor(bignum * x, bignum_digit_type y,
                                       int negative_p)
 {
   GC_BIGNUM(x);
   
   bignum_length_type length_x = (BIGNUM_LENGTH (x));
 
-  F_BIGNUM * p = (allot_bignum ((length_x + 1), negative_p));
+  bignum * p = (allot_bignum ((length_x + 1), negative_p));
 
   bignum_destructive_copy (x, p);
   (BIGNUM_REF (p, length_x)) = 0;
@@ -741,7 +741,7 @@ bignum_multiply_unsigned_small_factor(F_BIGNUM * x, bignum_digit_type y,
 }
 
 void
-bignum_destructive_add(F_BIGNUM * bignum, bignum_digit_type n)
+bignum_destructive_add(bignum * bignum, bignum_digit_type n)
 {
   bignum_digit_type * scan = (BIGNUM_START_PTR (bignum));
   bignum_digit_type digit;
@@ -765,7 +765,7 @@ bignum_destructive_add(F_BIGNUM * bignum, bignum_digit_type n)
 }
 
 void
-bignum_destructive_scale_up(F_BIGNUM * bignum, bignum_digit_type factor)
+bignum_destructive_scale_up(bignum * bignum, bignum_digit_type factor)
 {
   bignum_digit_type carry = 0;
   bignum_digit_type * scan = (BIGNUM_START_PTR (bignum));
@@ -803,10 +803,10 @@ bignum_destructive_scale_up(F_BIGNUM * bignum, bignum_digit_type factor)
 
 /* allocates memory */
 void
-bignum_divide_unsigned_large_denominator(F_BIGNUM * numerator,
-                                         F_BIGNUM * denominator,
-                                         F_BIGNUM * * quotient,
-                                         F_BIGNUM * * remainder,
+bignum_divide_unsigned_large_denominator(bignum * numerator,
+                                         bignum * denominator,
+                                         bignum * * quotient,
+                                         bignum * * remainder,
                                          int q_negative_p,
                                          int r_negative_p)
 {
@@ -815,13 +815,13 @@ bignum_divide_unsigned_large_denominator(F_BIGNUM * numerator,
   bignum_length_type length_n = ((BIGNUM_LENGTH (numerator)) + 1);
   bignum_length_type length_d = (BIGNUM_LENGTH (denominator));
 
-  F_BIGNUM * q =
-    ((quotient != ((F_BIGNUM * *) 0))
+  bignum * q =
+    ((quotient != ((bignum * *) 0))
      ? (allot_bignum ((length_n - length_d), q_negative_p))
      : BIGNUM_OUT_OF_BAND);
   GC_BIGNUM(q);
   
-  F_BIGNUM * u = (allot_bignum (length_n, r_negative_p));
+  bignum * u = (allot_bignum (length_n, r_negative_p));
   GC_BIGNUM(u);
   
   int shift = 0;
@@ -842,12 +842,12 @@ bignum_divide_unsigned_large_denominator(F_BIGNUM * numerator,
     }
   else
     {
-      F_BIGNUM * v = (allot_bignum (length_d, 0));
+      bignum * v = (allot_bignum (length_d, 0));
 
       bignum_destructive_normalization (numerator, u, shift);
       bignum_destructive_normalization (denominator, v, shift);
       bignum_divide_unsigned_normalized (u, v, q);
-      if (remainder != ((F_BIGNUM * *) 0))
+      if (remainder != ((bignum * *) 0))
         bignum_destructive_unnormalization (u, shift);
     }
 
@@ -856,17 +856,17 @@ bignum_divide_unsigned_large_denominator(F_BIGNUM * numerator,
 
   u = bignum_trim (u);
 
-  if (quotient != ((F_BIGNUM * *) 0))
+  if (quotient != ((bignum * *) 0))
     (*quotient) = q;
 
-  if (remainder != ((F_BIGNUM * *) 0))
+  if (remainder != ((bignum * *) 0))
     (*remainder) = u;
 
   return;
 }
 
 void
-bignum_divide_unsigned_normalized(F_BIGNUM * u, F_BIGNUM * v, F_BIGNUM * q)
+bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q)
 {
   bignum_length_type u_length = (BIGNUM_LENGTH (u));
   bignum_length_type v_length = (BIGNUM_LENGTH (v));
@@ -1021,10 +1021,10 @@ bignum_divide_subtract(bignum_digit_type * v_start,
 
 /* allocates memory */
 void
-bignum_divide_unsigned_medium_denominator(F_BIGNUM * numerator,
+bignum_divide_unsigned_medium_denominator(bignum * numerator,
                                           bignum_digit_type denominator,
-                                          F_BIGNUM * * quotient,
-                                          F_BIGNUM * * remainder,
+                                          bignum * * quotient,
+                                          bignum * * remainder,
                                           int q_negative_p,
                                           int r_negative_p)
 {
@@ -1032,7 +1032,7 @@ bignum_divide_unsigned_medium_denominator(F_BIGNUM * numerator,
   
   bignum_length_type length_n = (BIGNUM_LENGTH (numerator));
   bignum_length_type length_q;
-  F_BIGNUM * q = NULL;
+  bignum * q = NULL;
   GC_BIGNUM(q);
   
   int shift = 0;
@@ -1070,7 +1070,7 @@ bignum_divide_unsigned_medium_denominator(F_BIGNUM * numerator,
 
     q = bignum_trim (q);
 
-    if (remainder != ((F_BIGNUM * *) 0))
+    if (remainder != ((bignum * *) 0))
       {
         if (shift != 0)
           r >>= shift;
@@ -1078,14 +1078,14 @@ bignum_divide_unsigned_medium_denominator(F_BIGNUM * numerator,
         (*remainder) = (bignum_digit_to_bignum (r, r_negative_p));
       }
 
-    if (quotient != ((F_BIGNUM * *) 0))
+    if (quotient != ((bignum * *) 0))
       (*quotient) = q;
   }
   return;
 }
 
 void
-bignum_destructive_normalization(F_BIGNUM * source, F_BIGNUM * target,
+bignum_destructive_normalization(bignum * source, bignum * target,
                                  int shift_left)
 {
   bignum_digit_type digit;
@@ -1095,7 +1095,7 @@ bignum_destructive_normalization(F_BIGNUM * source, F_BIGNUM * target,
   bignum_digit_type * end_source = (scan_source + (BIGNUM_LENGTH (source)));
   bignum_digit_type * end_target = (scan_target + (BIGNUM_LENGTH (target)));
   int shift_right = (BIGNUM_DIGIT_LENGTH - shift_left);
-  bignum_digit_type mask = (((CELL)1 << shift_right) - 1);
+  bignum_digit_type mask = (((cell)1 << shift_right) - 1);
   while (scan_source < end_source)
     {
       digit = (*scan_source++);
@@ -1110,14 +1110,14 @@ bignum_destructive_normalization(F_BIGNUM * source, F_BIGNUM * target,
 }
 
 void
-bignum_destructive_unnormalization(F_BIGNUM * bignum, int shift_right)
+bignum_destructive_unnormalization(bignum * bignum, int shift_right)
 {
   bignum_digit_type * start = (BIGNUM_START_PTR (bignum));
   bignum_digit_type * scan = (start + (BIGNUM_LENGTH (bignum)));
   bignum_digit_type digit;
   bignum_digit_type carry = 0;
   int shift_left = (BIGNUM_DIGIT_LENGTH - shift_right);
-  bignum_digit_type mask = (((F_FIXNUM)1 << shift_right) - 1);
+  bignum_digit_type mask = (((fixnum)1 << shift_right) - 1);
   while (start < scan)
     {
       digit = (*--scan);
@@ -1265,23 +1265,23 @@ bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2,
 
 /* allocates memory */
 void
-bignum_divide_unsigned_small_denominator(F_BIGNUM * numerator,
+bignum_divide_unsigned_small_denominator(bignum * numerator,
                                          bignum_digit_type denominator,
-                                         F_BIGNUM * * quotient,
-                                         F_BIGNUM * * remainder,
+                                         bignum * * quotient,
+                                         bignum * * remainder,
                                          int q_negative_p,
                                          int r_negative_p)
 {
   GC_BIGNUM(numerator);
   
-  F_BIGNUM * q = (bignum_new_sign (numerator, q_negative_p));
+  bignum * q = (bignum_new_sign (numerator, q_negative_p));
   GC_BIGNUM(q);
 
   bignum_digit_type r = (bignum_destructive_scale_down (q, denominator));
 
   q = (bignum_trim (q));
 
-  if (remainder != ((F_BIGNUM * *) 0))
+  if (remainder != ((bignum * *) 0))
     (*remainder) = (bignum_digit_to_bignum (r, r_negative_p));
 
   (*quotient) = q;
@@ -1294,7 +1294,7 @@ bignum_divide_unsigned_small_denominator(F_BIGNUM * numerator,
    that all digits are < BIGNUM_RADIX. */
 
 bignum_digit_type
-bignum_destructive_scale_down(F_BIGNUM * bignum, bignum_digit_type denominator)
+bignum_destructive_scale_down(bignum * bignum, bignum_digit_type denominator)
 {
   bignum_digit_type numerator;
   bignum_digit_type remainder = 0;
@@ -1317,9 +1317,9 @@ bignum_destructive_scale_down(F_BIGNUM * bignum, bignum_digit_type denominator)
 }
 
 /* allocates memory */
-F_BIGNUM *
+bignum *
 bignum_remainder_unsigned_small_denominator(
-       F_BIGNUM * n, bignum_digit_type d, int negative_p)
+       bignum * n, bignum_digit_type d, int negative_p)
 {
   bignum_digit_type two_digits;
   bignum_digit_type * start = (BIGNUM_START_PTR (n));
@@ -1338,34 +1338,34 @@ bignum_remainder_unsigned_small_denominator(
 }
 
 /* allocates memory */
-F_BIGNUM *
+bignum *
 bignum_digit_to_bignum(bignum_digit_type digit, int negative_p)
 {
   if (digit == 0)
     return (BIGNUM_ZERO ());
   else
     {
-      F_BIGNUM * result = (allot_bignum (1, negative_p));
+      bignum * result = (allot_bignum (1, negative_p));
       (BIGNUM_REF (result, 0)) = digit;
       return (result);
     }
 }
 
 /* allocates memory */
-F_BIGNUM *
+bignum *
 allot_bignum(bignum_length_type length, int negative_p)
 {
   BIGNUM_ASSERT ((length >= 0) || (length < BIGNUM_RADIX));
-  F_BIGNUM * result = allot_array_internal<F_BIGNUM>(length + 1);
+  bignum * result = allot_array_internal<bignum>(length + 1);
   BIGNUM_SET_NEGATIVE_P (result, negative_p);
   return (result);
 }
 
 /* allocates memory */
-F_BIGNUM *
+bignum *
 allot_bignum_zeroed(bignum_length_type length, int negative_p)
 {
-  F_BIGNUM * result = allot_bignum(length,negative_p);
+  bignum * result = allot_bignum(length,negative_p);
   bignum_digit_type * scan = (BIGNUM_START_PTR (result));
   bignum_digit_type * end = (scan + length);
   while (scan < end)
@@ -1377,8 +1377,8 @@ allot_bignum_zeroed(bignum_length_type length, int negative_p)
 	source = reallot_array(source,length + 1)
 
 /* allocates memory */
-F_BIGNUM *
-bignum_shorten_length(F_BIGNUM * bignum, bignum_length_type length)
+bignum *
+bignum_shorten_length(bignum * bignum, bignum_length_type length)
 {
   bignum_length_type current_length = (BIGNUM_LENGTH (bignum));
   BIGNUM_ASSERT ((length >= 0) || (length <= current_length));
@@ -1391,8 +1391,8 @@ bignum_shorten_length(F_BIGNUM * bignum, bignum_length_type length)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_trim(F_BIGNUM * bignum)
+bignum *
+bignum_trim(bignum * bignum)
 {
   bignum_digit_type * start = (BIGNUM_START_PTR (bignum));
   bignum_digit_type * end = (start + (BIGNUM_LENGTH (bignum)));
@@ -1412,33 +1412,33 @@ bignum_trim(F_BIGNUM * bignum)
 /* Copying */
 
 /* allocates memory */
-F_BIGNUM *
-bignum_new_sign(F_BIGNUM * bignum, int negative_p)
+bignum *
+bignum_new_sign(bignum * x, int negative_p)
 {
-  GC_BIGNUM(bignum);
-  F_BIGNUM * result = (allot_bignum ((BIGNUM_LENGTH (bignum)), negative_p));
+  GC_BIGNUM(x);
+  bignum * result = (allot_bignum ((BIGNUM_LENGTH (x)), negative_p));
 
-  bignum_destructive_copy (bignum, result);
+  bignum_destructive_copy (x, result);
   return (result);
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_maybe_new_sign(F_BIGNUM * bignum, int negative_p)
+bignum *
+bignum_maybe_new_sign(bignum * x, int negative_p)
 {
-  if ((BIGNUM_NEGATIVE_P (bignum)) ? negative_p : (! negative_p))
-    return (bignum);
+  if ((BIGNUM_NEGATIVE_P (x)) ? negative_p : (! negative_p))
+    return (x);
   else
     {
-      F_BIGNUM * result =
-        (allot_bignum ((BIGNUM_LENGTH (bignum)), negative_p));
-      bignum_destructive_copy (bignum, result);
+      bignum * result =
+        (allot_bignum ((BIGNUM_LENGTH (x)), negative_p));
+      bignum_destructive_copy (x, result);
       return (result);
     }
 }
 
 void
-bignum_destructive_copy(F_BIGNUM * source, F_BIGNUM * target)
+bignum_destructive_copy(bignum * source, bignum * target)
 {
   bignum_digit_type * scan_source = (BIGNUM_START_PTR (source));
   bignum_digit_type * end_source =
@@ -1454,15 +1454,15 @@ bignum_destructive_copy(F_BIGNUM * source, F_BIGNUM * target)
  */
 
 /* allocates memory */
-F_BIGNUM *
-bignum_bitwise_not(F_BIGNUM * x)
+bignum *
+bignum_bitwise_not(bignum * x)
 {
   return bignum_subtract(BIGNUM_ONE(1), x);
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_arithmetic_shift(F_BIGNUM * arg1, F_FIXNUM n)
+bignum *
+bignum_arithmetic_shift(bignum * arg1, fixnum n)
 {
   if (BIGNUM_NEGATIVE_P(arg1) && n < 0)
     return bignum_bitwise_not(bignum_magnitude_ash(bignum_bitwise_not(arg1), n));
@@ -1475,8 +1475,8 @@ bignum_arithmetic_shift(F_BIGNUM * arg1, F_FIXNUM n)
 #define XOR_OP 2
 
 /* allocates memory */
-F_BIGNUM *
-bignum_bitwise_and(F_BIGNUM * arg1, F_BIGNUM * arg2)
+bignum *
+bignum_bitwise_and(bignum * arg1, bignum * arg2)
 {
   return(
          (BIGNUM_NEGATIVE_P (arg1))
@@ -1490,8 +1490,8 @@ bignum_bitwise_and(F_BIGNUM * arg1, F_BIGNUM * arg2)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_bitwise_ior(F_BIGNUM * arg1, F_BIGNUM * arg2)
+bignum *
+bignum_bitwise_ior(bignum * arg1, bignum * arg2)
 {
   return(
          (BIGNUM_NEGATIVE_P (arg1))
@@ -1505,8 +1505,8 @@ bignum_bitwise_ior(F_BIGNUM * arg1, F_BIGNUM * arg2)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_bitwise_xor(F_BIGNUM * arg1, F_BIGNUM * arg2)
+bignum *
+bignum_bitwise_xor(bignum * arg1, bignum * arg2)
 {
   return(
          (BIGNUM_NEGATIVE_P (arg1))
@@ -1522,17 +1522,17 @@ bignum_bitwise_xor(F_BIGNUM * arg1, F_BIGNUM * arg2)
 /* allocates memory */
 /* ash for the magnitude */
 /* assume arg1 is a big number, n is a long */
-F_BIGNUM *
-bignum_magnitude_ash(F_BIGNUM * arg1, F_FIXNUM n)
+bignum *
+bignum_magnitude_ash(bignum * arg1, fixnum n)
 {
   GC_BIGNUM(arg1);
   
-  F_BIGNUM * result = NULL;
+  bignum * result = NULL;
   bignum_digit_type *scan1;
   bignum_digit_type *scanr;
   bignum_digit_type *end;
 
-  F_FIXNUM digit_offset,bit_offset;
+  fixnum digit_offset,bit_offset;
 
   if (BIGNUM_ZERO_P (arg1)) return (arg1);
 
@@ -1584,12 +1584,12 @@ bignum_magnitude_ash(F_BIGNUM * arg1, F_FIXNUM n)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_pospos_bitwise_op(int op, F_BIGNUM * arg1, F_BIGNUM * arg2)
+bignum *
+bignum_pospos_bitwise_op(int op, bignum * arg1, bignum * arg2)
 {
   GC_BIGNUM(arg1); GC_BIGNUM(arg2);
   
-  F_BIGNUM * result;
+  bignum * result;
   bignum_length_type max_length;
 
   bignum_digit_type *scan1, *end1, digit1;
@@ -1619,12 +1619,12 @@ bignum_pospos_bitwise_op(int op, F_BIGNUM * arg1, F_BIGNUM * arg2)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_posneg_bitwise_op(int op, F_BIGNUM * arg1, F_BIGNUM * arg2)
+bignum *
+bignum_posneg_bitwise_op(int op, bignum * arg1, bignum * arg2)
 {
   GC_BIGNUM(arg1); GC_BIGNUM(arg2);
   
-  F_BIGNUM * result;
+  bignum * result;
   bignum_length_type max_length;
 
   bignum_digit_type *scan1, *end1, digit1;
@@ -1672,12 +1672,12 @@ bignum_posneg_bitwise_op(int op, F_BIGNUM * arg1, F_BIGNUM * arg2)
 }
 
 /* allocates memory */
-F_BIGNUM *
-bignum_negneg_bitwise_op(int op, F_BIGNUM * arg1, F_BIGNUM * arg2)
+bignum *
+bignum_negneg_bitwise_op(int op, bignum * arg1, bignum * arg2)
 {
   GC_BIGNUM(arg1); GC_BIGNUM(arg2);
   
-  F_BIGNUM * result;
+  bignum * result;
   bignum_length_type max_length;
 
   bignum_digit_type *scan1, *end1, digit1, carry1;
@@ -1733,7 +1733,7 @@ bignum_negneg_bitwise_op(int op, F_BIGNUM * arg1, F_BIGNUM * arg2)
 }
 
 void
-bignum_negate_magnitude(F_BIGNUM * arg)
+bignum_negate_magnitude(bignum * arg)
 {
   bignum_digit_type *scan;
   bignum_digit_type *end;
@@ -1761,15 +1761,15 @@ bignum_negate_magnitude(F_BIGNUM * arg)
 }
 
 /* Allocates memory */
-F_BIGNUM *
-bignum_integer_length(F_BIGNUM * bignum)
+bignum *
+bignum_integer_length(bignum * x)
 {
-  GC_BIGNUM(bignum);
+  GC_BIGNUM(x);
   
-  bignum_length_type index = ((BIGNUM_LENGTH (bignum)) - 1);
-  bignum_digit_type digit = (BIGNUM_REF (bignum, index));
+  bignum_length_type index = ((BIGNUM_LENGTH (x)) - 1);
+  bignum_digit_type digit = (BIGNUM_REF (x, index));
   
-  F_BIGNUM * result = (allot_bignum (2, 0));
+  bignum * result = (allot_bignum (2, 0));
   
   (BIGNUM_REF (result, 0)) = index;
   (BIGNUM_REF (result, 1)) = 0;
@@ -1784,7 +1784,7 @@ bignum_integer_length(F_BIGNUM * bignum)
 
 /* Allocates memory */
 int
-bignum_logbitp(int shift, F_BIGNUM * arg)
+bignum_logbitp(int shift, bignum * arg)
 {
   return((BIGNUM_NEGATIVE_P (arg)) 
          ? !bignum_unsigned_logbitp (shift, bignum_bitwise_not (arg))
@@ -1792,7 +1792,7 @@ bignum_logbitp(int shift, F_BIGNUM * arg)
 }
 
 int
-bignum_unsigned_logbitp(int shift, F_BIGNUM * bignum)
+bignum_unsigned_logbitp(int shift, bignum * bignum)
 {
   bignum_length_type len = (BIGNUM_LENGTH (bignum));
   int index = shift / BIGNUM_DIGIT_LENGTH;
@@ -1800,12 +1800,12 @@ bignum_unsigned_logbitp(int shift, F_BIGNUM * bignum)
     return 0;
   bignum_digit_type digit = (BIGNUM_REF (bignum, index));
   int p = shift % BIGNUM_DIGIT_LENGTH;
-  bignum_digit_type mask = ((F_FIXNUM)1) << p;
+  bignum_digit_type mask = ((fixnum)1) << p;
   return (digit & mask) ? 1 : 0;
 }
 
 /* Allocates memory */
-F_BIGNUM *
+bignum *
 digit_stream_to_bignum(unsigned int n_digits,
                        unsigned int (*producer)(unsigned int),
                        unsigned int radix,
@@ -1816,7 +1816,7 @@ digit_stream_to_bignum(unsigned int n_digits,
     return (BIGNUM_ZERO ());
   if (n_digits == 1)
     {
-      F_FIXNUM digit = ((F_FIXNUM) ((*producer) (0)));
+      fixnum digit = ((fixnum) ((*producer) (0)));
       return (fixnum_to_bignum (negative_p ? (- digit) : digit));
     }
   {
@@ -1833,7 +1833,7 @@ digit_stream_to_bignum(unsigned int n_digits,
       length = (BIGNUM_BITS_TO_DIGITS (n_digits * log_radix));
     }
     {
-      F_BIGNUM * result = (allot_bignum_zeroed (length, negative_p));
+      bignum * result = (allot_bignum_zeroed (length, negative_p));
       while ((n_digits--) > 0)
         {
           bignum_destructive_scale_up (result, ((bignum_digit_type) radix));

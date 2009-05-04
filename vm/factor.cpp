@@ -3,15 +3,15 @@
 namespace factor
 {
 
-VM_C_API void default_parameters(F_PARAMETERS *p)
+VM_C_API void default_parameters(vm_parameters *p)
 {
 	p->image_path = NULL;
 
 	/* We make a wild guess here that if we're running on ARM, we don't
 	have a lot of memory. */
 #ifdef FACTOR_ARM
-	p->ds_size = 8 * CELLS;
-	p->rs_size = 8 * CELLS;
+	p->ds_size = 8 * sizeof(cell);
+	p->rs_size = 8 * sizeof(cell);
 
 	p->gen_count = 2;
 	p->code_size = 4;
@@ -19,14 +19,14 @@ VM_C_API void default_parameters(F_PARAMETERS *p)
 	p->aging_size = 1;
 	p->tenured_size = 6;
 #else
-	p->ds_size = 32 * CELLS;
-	p->rs_size = 32 * CELLS;
+	p->ds_size = 32 * sizeof(cell);
+	p->rs_size = 32 * sizeof(cell);
 
 	p->gen_count = 3;
-	p->code_size = 8 * CELLS;
-	p->young_size = CELLS / 4;
-	p->aging_size = CELLS / 2;
-	p->tenured_size = 4 * CELLS;
+	p->code_size = 8 * sizeof(cell);
+	p->young_size = sizeof(cell) / 4;
+	p->aging_size = sizeof(cell) / 2;
+	p->tenured_size = 4 * sizeof(cell);
 #endif
 
 	p->max_pic_size = 3;
@@ -43,7 +43,7 @@ VM_C_API void default_parameters(F_PARAMETERS *p)
 	p->stack_traces = true;
 }
 
-static bool factor_arg(const F_CHAR* str, const F_CHAR* arg, CELL* value)
+static bool factor_arg(const vm_char* str, const vm_char* arg, cell* value)
 {
 	int val;
 	if(SSCANF(str,arg,&val) > 0)
@@ -55,7 +55,7 @@ static bool factor_arg(const F_CHAR* str, const F_CHAR* arg, CELL* value)
 		return false;
 }
 
-VM_C_API void init_parameters_from_args(F_PARAMETERS *p, int argc, F_CHAR **argv)
+VM_C_API void init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv)
 {
 	default_parameters(p);
 	p->executable_path = argv[0];
@@ -93,7 +93,7 @@ static void do_stage1_init(void)
 	fflush(stdout);
 }
 
-VM_C_API void init_factor(F_PARAMETERS *p)
+VM_C_API void init_factor(vm_parameters *p)
 {
 	/* Kilobytes */
 	p->ds_size = align_page(p->ds_size << 10);
@@ -111,7 +111,7 @@ VM_C_API void init_factor(F_PARAMETERS *p)
 	/* OS-specific initialization */
 	early_init();
 
-	const F_CHAR *executable_path = vm_executable_path();
+	const vm_char *executable_path = vm_executable_path();
 
 	if(executable_path)
 		p->executable_path = executable_path;
@@ -135,10 +135,10 @@ VM_C_API void init_factor(F_PARAMETERS *p)
 
 	init_profiler();
 
-	userenv[CPU_ENV] = allot_alien(F,(CELL)FACTOR_CPU_STRING);
-	userenv[OS_ENV] = allot_alien(F,(CELL)FACTOR_OS_STRING);
-	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
-	userenv[EXECUTABLE_ENV] = allot_alien(F,(CELL)p->executable_path);
+	userenv[CPU_ENV] = allot_alien(F,(cell)FACTOR_CPU_STRING);
+	userenv[OS_ENV] = allot_alien(F,(cell)FACTOR_OS_STRING);
+	userenv[cell_SIZE_ENV] = tag_fixnum(sizeof(cell));
+	userenv[EXECUTABLE_ENV] = allot_alien(F,(cell)p->executable_path);
 	userenv[ARGS_ENV] = F;
 	userenv[EMBEDDED_ENV] = F;
 
@@ -153,19 +153,19 @@ VM_C_API void init_factor(F_PARAMETERS *p)
 }
 
 /* May allocate memory */
-VM_C_API void pass_args_to_factor(int argc, F_CHAR **argv)
+VM_C_API void pass_args_to_factor(int argc, vm_char **argv)
 {
 	growable_array args;
 	int i;
 
 	for(i = 1; i < argc; i++)
-		args.add(allot_alien(F,(CELL)argv[i]));
+		args.add(allot_alien(F,(cell)argv[i]));
 
 	args.trim();
-	userenv[ARGS_ENV] = args.array.value();
+	userenv[ARGS_ENV] = args.elements.value();
 }
 
-static void start_factor(F_PARAMETERS *p)
+static void start_factor(vm_parameters *p)
 {
 	if(p->fep) factorbug();
 
@@ -174,15 +174,15 @@ static void start_factor(F_PARAMETERS *p)
 	unnest_stacks();
 }
 
-VM_C_API void start_embedded_factor(F_PARAMETERS *p)
+VM_C_API void start_embedded_factor(vm_parameters *p)
 {
 	userenv[EMBEDDED_ENV] = T;
 	start_factor(p);
 }
 
-VM_C_API void start_standalone_factor(int argc, F_CHAR **argv)
+VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {
-	F_PARAMETERS p;
+	vm_parameters p;
 	default_parameters(&p);
 	init_parameters_from_args(&p,argc,argv);
 	init_factor(&p);

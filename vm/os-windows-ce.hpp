@@ -8,7 +8,7 @@
 namespace factor
 {
 
-typedef wchar_t F_SYMBOL;
+typedef wchar_t symbol_char;
 
 #define FACTOR_OS_STRING "wince"
 #define FACTOR_DLL L"factor-ce.dll"
@@ -16,14 +16,14 @@ typedef wchar_t F_SYMBOL;
 
 int errno;
 char *strerror(int err);
-void flush_icache(CELL start, CELL end);
+void flush_icache(cell start, cell end);
 char *getenv(char *name);
 
 #define snprintf _snprintf
 #define snwprintf _snwprintf
 
 s64 current_micros(void);
-void c_to_factor_toplevel(CELL quot);
+void c_to_factor_toplevel(cell quot);
 void open_console(void);
 
 }

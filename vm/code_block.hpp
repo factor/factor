@@ -1,7 +1,7 @@
 namespace factor
 {
 
-typedef enum {
+enum relocation_type {
 	/* arg is a primitive number */
 	RT_PRIMITIVE,
 	/* arg is a literal table index, holding an array pair (symbol/dll) */
@@ -22,9 +22,9 @@ typedef enum {
 	RT_STACK_CHAIN,
 	/* untagged fixnum literal */
 	RT_UNTAGGED,
-} F_RELTYPE;
+};
 
-typedef enum {
+enum relocation_class {
 	/* absolute address in a 64-bit location */
 	RC_ABSOLUTE_CELL,
 	/* absolute address in a 32-bit location */
@@ -43,7 +43,7 @@ typedef enum {
 	RC_INDIRECT_ARM,
 	/* pointer to address in an ARM LDR/STR instruction offset by 8 bytes */
 	RC_INDIRECT_ARM_PC
-} F_RELCLASS;
+};
 
 #define REL_RELATIVE_PPC_2_MASK 0xfffc
 #define REL_RELATIVE_PPC_3_MASK 0x3fffffc
@@ -51,42 +51,42 @@ typedef enum {
 #define REL_RELATIVE_ARM_3_MASK 0xffffff
 
 /* code relocation table consists of a table of entries for each fixup */
-typedef u32 F_REL;
-#define REL_TYPE(r) (F_RELTYPE)(((r) & 0xf0000000) >> 28)
-#define REL_CLASS(r) (F_RELCLASS)(((r) & 0x0f000000) >> 24)
+typedef u32 relocation_entry;
+#define REL_TYPE(r) (relocation_type)(((r) & 0xf0000000) >> 28)
+#define REL_CLASS(r) (relocation_class)(((r) & 0x0f000000) >> 24)
 #define REL_OFFSET(r) ((r) & 0x00ffffff)
 
-void flush_icache_for(F_CODE_BLOCK *compiled);
+void flush_icache_for(code_block *compiled);
 
-typedef void (*RELOCATION_ITERATOR)(F_REL rel, CELL index, F_CODE_BLOCK *compiled);
+typedef void (*relocation_iterator)(relocation_entry rel, cell index, code_block *compiled);
 
-void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter);
+void iterate_relocations(code_block *compiled, relocation_iterator iter);
 
-void store_address_in_code_block(CELL klass, CELL offset, F_FIXNUM absolute_value);
+void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value);
 
-void relocate_code_block(F_CODE_BLOCK *compiled);
+void relocate_code_block(code_block *compiled);
 
-void update_literal_references(F_CODE_BLOCK *compiled);
+void update_literal_references(code_block *compiled);
 
-void copy_literal_references(F_CODE_BLOCK *compiled);
+void copy_literal_references(code_block *compiled);
 
-void update_word_references(F_CODE_BLOCK *compiled);
+void update_word_references(code_block *compiled);
 
-void update_literal_and_word_references(F_CODE_BLOCK *compiled);
+void update_literal_and_word_references(code_block *compiled);
 
-void mark_code_block(F_CODE_BLOCK *compiled);
+void mark_code_block(code_block *compiled);
 
-void mark_active_blocks(F_CONTEXT *stacks);
+void mark_active_blocks(context *stacks);
 
-void mark_object_code_block(F_OBJECT *scan);
+void mark_object_code_block(object *scan);
 
-void relocate_code_block(F_CODE_BLOCK *relocating);
+void relocate_code_block(code_block *relocating);
 
 inline static bool stack_traces_p(void)
 {
 	return userenv[STACK_TRACES_ENV] != F;
 }
 
-F_CODE_BLOCK *add_code_block(CELL type, CELL code, CELL labels, CELL relocation, CELL literals);
+code_block *add_code_block(cell type, cell code, cell labels, cell relocation, cell literals);
 
 }

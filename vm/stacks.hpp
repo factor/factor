@@ -2,17 +2,17 @@ namespace factor
 {
 
 #define DEFPUSHPOP(prefix,ptr) \
-	inline static CELL prefix##peek() { return *(CELL *)ptr; } \
-	inline static void prefix##repl(CELL tagged) { *(CELL *)ptr = tagged; } \
-	inline static CELL prefix##pop(void) \
+	inline static cell prefix##peek() { return *(cell *)ptr; } \
+	inline static void prefix##repl(cell tagged) { *(cell *)ptr = tagged; } \
+	inline static cell prefix##pop(void) \
 	{ \
-		CELL value = prefix##peek(); \
-		ptr -= CELLS; \
+		cell value = prefix##peek(); \
+		ptr -= sizeof(cell); \
 		return value; \
 	} \
-	inline static void prefix##push(CELL tagged) \
+	inline static void prefix##push(cell tagged) \
 	{ \
-		ptr += CELLS; \
+		ptr += sizeof(cell); \
 		prefix##repl(tagged); \
 	}
 

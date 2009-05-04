@@ -1,14 +1,14 @@
 namespace factor
 {
 
-extern CELL bignum_zero;
-extern CELL bignum_pos_one;
-extern CELL bignum_neg_one;
+extern cell bignum_zero;
+extern cell bignum_pos_one;
+extern cell bignum_neg_one;
 
-#define CELL_MAX (CELL)(-1)
-#define FIXNUM_MAX (((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
-#define FIXNUM_MIN (-((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)))
-#define ARRAY_SIZE_MAX ((CELL)1 << (WORD_SIZE - TAG_BITS - 2))
+#define cell_MAX (cell)(-1)
+#define FIXNUM_MAX (((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
+#define FIXNUM_MIN (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)))
+#define ARRAY_SIZE_MAX ((cell)1 << (WORD_SIZE - TAG_BITS - 2))
 
 PRIMITIVE(fixnum_add);
 PRIMITIVE(fixnum_subtract);
@@ -43,59 +43,59 @@ PRIMITIVE(bignum_bitp);
 PRIMITIVE(bignum_log2);
 PRIMITIVE(byte_array_to_bignum);
 
-inline static CELL allot_integer(F_FIXNUM x)
+inline static cell allot_integer(fixnum x)
 {
 	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
-		return tag<F_BIGNUM>(fixnum_to_bignum(x));
+		return tag<bignum>(fixnum_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }
 
-inline static CELL allot_cell(CELL x)
+inline static cell allot_cell(cell x)
 {
-	if(x > (CELL)FIXNUM_MAX)
-		return tag<F_BIGNUM>(cell_to_bignum(x));
+	if(x > (cell)FIXNUM_MAX)
+		return tag<bignum>(cell_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }
 
-CELL unbox_array_size(void);
+cell unbox_array_size(void);
 
-inline static double untag_float(CELL tagged)
+inline static double untag_float(cell tagged)
 {
-	return untag<F_FLOAT>(tagged)->n;
+	return untag<boxed_float>(tagged)->n;
 }
 
-inline static double untag_float_check(CELL tagged)
+inline static double untag_float_check(cell tagged)
 {
-	return untag_check<F_FLOAT>(tagged)->n;
+	return untag_check<boxed_float>(tagged)->n;
 }
 
-inline static CELL allot_float(double n)
+inline static cell allot_float(double n)
 {
-	F_FLOAT *flo = allot<F_FLOAT>(sizeof(F_FLOAT));
+	boxed_float *flo = allot<boxed_float>(sizeof(boxed_float));
 	flo->n = n;
 	return tag(flo);
 }
 
-inline static F_FIXNUM float_to_fixnum(CELL tagged)
+inline static fixnum float_to_fixnum(cell tagged)
 {
-	return (F_FIXNUM)untag_float(tagged);
+	return (fixnum)untag_float(tagged);
 }
 
-inline static F_BIGNUM *float_to_bignum(CELL tagged)
+inline static bignum *float_to_bignum(cell tagged)
 {
 	return double_to_bignum(untag_float(tagged));
 }
 
-inline static double fixnum_to_float(CELL tagged)
+inline static double fixnum_to_float(cell tagged)
 {
 	return (double)untag_fixnum(tagged);
 }
 
-inline static double bignum_to_float(CELL tagged)
+inline static double bignum_to_float(cell tagged)
 {
-	return bignum_to_double(untag<F_BIGNUM>(tagged));
+	return bignum_to_double(untag<bignum>(tagged));
 }
 
 PRIMITIVE(fixnum_to_float);
@@ -121,9 +121,9 @@ PRIMITIVE(double_bits);
 PRIMITIVE(bits_double);
 
 VM_C_API void box_float(float flo);
-VM_C_API float to_float(CELL value);
+VM_C_API float to_float(cell value);
 VM_C_API void box_double(double flo);
-VM_C_API double to_double(CELL value);
+VM_C_API double to_double(cell value);
 
 VM_C_API void box_signed_1(s8 n);
 VM_C_API void box_unsigned_1(u8 n);
@@ -131,19 +131,19 @@ VM_C_API void box_signed_2(s16 n);
 VM_C_API void box_unsigned_2(u16 n);
 VM_C_API void box_signed_4(s32 n);
 VM_C_API void box_unsigned_4(u32 n);
-VM_C_API void box_signed_cell(F_FIXNUM integer);
-VM_C_API void box_unsigned_cell(CELL cell);
+VM_C_API void box_signed_cell(fixnum integer);
+VM_C_API void box_unsigned_cell(cell cell);
 VM_C_API void box_signed_8(s64 n);
 VM_C_API void box_unsigned_8(u64 n);
 
-VM_C_API s64 to_signed_8(CELL obj);
-VM_C_API u64 to_unsigned_8(CELL obj);
+VM_C_API s64 to_signed_8(cell obj);
+VM_C_API u64 to_unsigned_8(cell obj);
 
-VM_C_API F_FIXNUM to_fixnum(CELL tagged);
-VM_C_API CELL to_cell(CELL tagged);
+VM_C_API fixnum to_fixnum(cell tagged);
+VM_C_API cell to_cell(cell tagged);
 
-VM_ASM_API void overflow_fixnum_add(F_FIXNUM x, F_FIXNUM y);
-VM_ASM_API void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y);
-VM_ASM_API void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y);
+VM_ASM_API void overflow_fixnum_add(fixnum x, fixnum y);
+VM_ASM_API void overflow_fixnum_subtract(fixnum x, fixnum y);
+VM_ASM_API void overflow_fixnum_multiply(fixnum x, fixnum y);
 
 }

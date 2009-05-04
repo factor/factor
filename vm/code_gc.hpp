@@ -4,47 +4,47 @@ namespace factor
 #define FREE_LIST_COUNT 16
 #define BLOCK_SIZE_INCREMENT 32
 
-struct F_HEAP_FREE_LIST {
-	F_FREE_BLOCK *small_blocks[FREE_LIST_COUNT];
-	F_FREE_BLOCK *large_blocks;
+struct heap_free_list {
+	free_heap_block *small_blocks[FREE_LIST_COUNT];
+	free_heap_block *large_blocks;
 };
 
-struct F_HEAP {
-	F_SEGMENT *segment;
-	F_HEAP_FREE_LIST free;
+struct heap {
+	segment *seg;
+	heap_free_list free;
 };
 
-typedef void (*HEAP_ITERATOR)(F_BLOCK *compiled);
+typedef void (*heap_iterator)(heap_block *compiled);
 
-void new_heap(F_HEAP *heap, CELL size);
-void build_free_list(F_HEAP *heap, CELL size);
-F_BLOCK *heap_allot(F_HEAP *heap, CELL size);
-void heap_free(F_HEAP *heap, F_BLOCK *block);
-void mark_block(F_BLOCK *block);
-void unmark_marked(F_HEAP *heap);
-void free_unmarked(F_HEAP *heap, HEAP_ITERATOR iter);
-void heap_usage(F_HEAP *heap, CELL *used, CELL *total_free, CELL *max_free);
-CELL heap_size(F_HEAP *heap);
-CELL compute_heap_forwarding(F_HEAP *heap);
-void compact_heap(F_HEAP *heap);
+void new_heap(heap *h, cell size);
+void build_free_list(heap *h, cell size);
+heap_block *heap_allot(heap *h, cell size);
+void heap_free(heap *h, heap_block *block);
+void mark_block(heap_block *block);
+void unmark_marked(heap *heap);
+void free_unmarked(heap *heap, heap_iterator iter);
+void heap_usage(heap *h, cell *used, cell *total_free, cell *max_free);
+cell heap_size(heap *h);
+cell compute_heap_forwarding(heap *h);
+void compact_heap(heap *h);
 
-inline static F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
+inline static heap_block *next_block(heap *h, heap_block *block)
 {
-	CELL next = ((CELL)block + block->size);
-	if(next == heap->segment->end)
+	cell next = ((cell)block + block->size);
+	if(next == h->seg->end)
 		return NULL;
 	else
-		return (F_BLOCK *)next;
+		return (heap_block *)next;
 }
 
-inline static F_BLOCK *first_block(F_HEAP *heap)
+inline static heap_block *first_block(heap *h)
 {
-	return (F_BLOCK *)heap->segment->start;
+	return (heap_block *)h->seg->start;
 }
 
-inline static F_BLOCK *last_block(F_HEAP *heap)
+inline static heap_block *last_block(heap *h)
 {
-	return (F_BLOCK *)heap->segment->end;
+	return (heap_block *)h->seg->end;
 }
 
 }

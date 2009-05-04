@@ -1,13 +1,13 @@
 namespace factor
 {
 
-F_WORD *allot_word(CELL vocab, CELL name);
+word *allot_word(cell vocab, cell name);
 
 PRIMITIVE(word);
 PRIMITIVE(word_xt);
-void update_word_xt(CELL word);
+void update_word_xt(cell word);
 
-inline bool word_optimized_p(F_WORD *word)
+inline bool word_optimized_p(word *word)
 {
 	return word->code->block.type == WORD_TYPE;
 }

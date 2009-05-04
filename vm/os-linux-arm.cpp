@@ -3,7 +3,7 @@
 namespace factor
 {
 
-void flush_icache(CELL start, CELL len)
+void flush_icache(cell start, cell len)
 {
 	int result;
 

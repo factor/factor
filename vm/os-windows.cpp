@@ -12,23 +12,23 @@ void init_ffi(void)
 		fatal_error("GetModuleHandle(\"" FACTOR_DLL_NAME "\") failed", 0);
 }
 
-void ffi_dlopen(F_DLL *dll)
+void ffi_dlopen(dll *dll)
 {
 	dll->dll = LoadLibraryEx(alien_offset(dll->path), NULL, 0);
 }
 
-void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol)
+void *ffi_dlsym(dll *dll, symbol_char *symbol)
 {
 	return GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
 }
 
-void ffi_dlclose(F_DLL *dll)
+void ffi_dlclose(dll *dll)
 {
 	FreeLibrary((HMODULE)dll->dll);
 	dll->dll = NULL;
 }
 
-bool windows_stat(F_CHAR *path)
+bool windows_stat(vm_char *path)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
 	HANDLE h = CreateFileW(path,
@@ -56,18 +56,18 @@ bool windows_stat(F_CHAR *path)
 	return ret;
 }
 
-void windows_image_path(F_CHAR *full_path, F_CHAR *temp_path, unsigned int length)
+void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
 {
 	snwprintf(temp_path, length-1, L"%s.image", full_path); 
 	temp_path[sizeof(temp_path) - 1] = 0;
 }
 
 /* You must free() this yourself. */
-const F_CHAR *default_image_path(void)
+const vm_char *default_image_path(void)
 {
-	F_CHAR full_path[MAX_UNICODE_PATH];
-	F_CHAR *ptr;
-	F_CHAR temp_path[MAX_UNICODE_PATH];
+	vm_char full_path[MAX_UNICODE_PATH];
+	vm_char *ptr;
+	vm_char temp_path[MAX_UNICODE_PATH];
 
 	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
 		fatal_error("GetModuleFileName() failed", 0);
@@ -82,9 +82,9 @@ const F_CHAR *default_image_path(void)
 }
 
 /* You must free() this yourself. */
-const F_CHAR *vm_executable_path(void)
+const vm_char *vm_executable_path(void)
 {
-	F_CHAR full_path[MAX_UNICODE_PATH];
+	vm_char full_path[MAX_UNICODE_PATH];
 	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
 		fatal_error("GetModuleFileName() failed", 0);
 	return safe_strdup(full_path);
@@ -93,11 +93,11 @@ const F_CHAR *vm_executable_path(void)
 
 PRIMITIVE(existsp)
 {
-	F_CHAR *path = (F_CHAR *)(untag_check<F_BYTE_ARRAY>(dpop()) + 1);
+	vm_char *path = (vm_char *)(untag_check<byte_array>(dpop()) + 1);
 	box_boolean(windows_stat(path));
 }
 
-F_SEGMENT *alloc_segment(CELL size)
+segment *alloc_segment(cell size)
 {
 	char *mem;
 	DWORD ignore;
@@ -107,22 +107,22 @@ F_SEGMENT *alloc_segment(CELL size)
 		out_of_memory();
 
 	if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))
-		fatal_error("Cannot allocate low guard page", (CELL)mem);
+		fatal_error("Cannot allocate low guard page", (cell)mem);
 
 	if (!VirtualProtect(mem + size + getpagesize(),
 		getpagesize(), PAGE_NOACCESS, &ignore))
-		fatal_error("Cannot allocate high guard page", (CELL)mem);
+		fatal_error("Cannot allocate high guard page", (cell)mem);
 
-	F_SEGMENT *block = safe_malloc(sizeof(F_SEGMENT));
+	segment *block = safe_malloc(sizeof(segment));
 
-	block->start = (CELL)mem + getpagesize();
+	block->start = (cell)mem + getpagesize();
 	block->size = size;
 	block->end = block->start + size;
 
 	return block;
 }
 
-void dealloc_segment(F_SEGMENT *block)
+void dealloc_segment(segment *block)
 {
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);

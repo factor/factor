@@ -2,6 +2,6 @@
 
 using namespace factor;
 
-CELL cards_offset;
-CELL decks_offset;
-CELL allot_markers_offset;
+cell cards_offset;
+cell decks_offset;
+cell allot_markers_offset;

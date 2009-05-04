@@ -11,13 +11,13 @@
 namespace factor
 {
 
-typedef char F_SYMBOL;
+typedef char symbol_char;
 
 #define FACTOR_OS_STRING "winnt"
 #define FACTOR_DLL L"factor.dll"
 #define FACTOR_DLL_NAME "factor.dll"
 
-void c_to_factor_toplevel(CELL quot);
+void c_to_factor_toplevel(cell quot);
 long exception_handler(PEXCEPTION_POINTERS pe);
 void open_console(void);
 
