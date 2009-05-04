@@ -20,8 +20,8 @@ DEFER: to-strings
   dup class
     {
       { \ string    [ ] }
-      { \ quotation [ call ] }
-      { \ word      [ execute ] }
+      { \ quotation [ call( -- string ) ] }
+      { \ word      [ execute( -- string ) ] }
       { \ fixnum    [ number>string ] }
       { \ array     [ to-strings concat ] }
     }

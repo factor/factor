@@ -1,8 +1,9 @@
-! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays calendar io.directories io.encodings.utf8
+USING: arrays kernel calendar io.directories io.encodings.utf8
 io.files io.launcher mason.child mason.cleanup mason.common
-mason.help mason.release mason.report namespaces prettyprint ;
+mason.help mason.release mason.report mason.email mason.notify
+namespaces prettyprint ;
 IN: mason.build
 
 QUALIFIED: continuations
@@ -14,20 +15,21 @@ QUALIFIED: continuations
 : enter-build-dir  ( -- ) build-dir set-current-directory ;
 
 : clone-builds-factor ( -- )
-    "git" "clone" builds/factor 3array try-process ;
+    "git" "clone" builds/factor 3array try-output-process ;
 
-: record-id ( -- )
-    "factor" [ git-id ] with-directory "git-id" to-file ;
+: begin-build ( -- )
+    "factor" [ git-id ] with-directory
+    [ "git-id" to-file ] [ notify-begin-build ] bi ;
 
 : build ( -- )
     create-build-dir
     enter-build-dir
     clone-builds-factor
     [
-        record-id
+        begin-build
         build-child
-        upload-help
-        release
+        [ notify-report ]
+        [ status-clean eq? [ upload-help release ] when ] bi
     ] [ cleanup ] [ ] continuations:cleanup ;
 
 MAIN: build

@@ -3,8 +3,6 @@ simple-flat-file io.encodings.utf8 io.files splitting math.parser
 locals math quotations assocs combinators unicode.normalize.private ;
 IN: unicode.normalize.tests
 
-{ nfc nfkc nfd nfkd } [ must-infer ] each
-
 [ "ab\u000323\u000302cd" ] [ "ab\u000302" "\u000323cd" string-append ] unit-test
 
 [ "ab\u00064b\u000347\u00034e\u00034d\u000346" ] [ "ab\u000346\u000347\u00064b\u00034e\u00034d" dup reorder ] unit-test

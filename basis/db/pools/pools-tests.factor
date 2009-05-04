@@ -2,8 +2,6 @@ IN: db.pools.tests
 USING: db.pools tools.test continuations io.files io.files.temp
 io.directories namespaces accessors kernel math destructors ;
 
-\ <db-pool> must-infer
-
 { 1 0 } [ [ ] with-db-pool ] must-infer-as
 
 { 1 0 } [ [ ] with-pooled-db ] must-infer-as

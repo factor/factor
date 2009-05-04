@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Peter Burns.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel peg peg.ebnf math.parser math.private strings math
+USING: kernel peg peg.ebnf math.parser math.parser.private strings math
 math.functions sequences arrays vectors hashtables assocs
 prettyprint json ;
 IN: json.reader

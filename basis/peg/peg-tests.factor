@@ -5,8 +5,6 @@ USING: kernel tools.test strings namespaces make arrays sequences
        peg peg.private peg.parsers accessors words math accessors ;
 IN: peg.tests
 
-\ parse must-infer
-
 [ ] [ reset-pegs ] unit-test
 
 [
@@ -201,12 +199,10 @@ IN: peg.tests
 
 USE: compiler
 
-[ ] [ disable-compiler ] unit-test
+[ ] [ disable-optimizer ] unit-test
 
 [ ] [ "" epsilon parse drop ] unit-test
 
-[ ] [ enable-compiler ] unit-test
+[ ] [ enable-optimizer ] unit-test
 
 [ [ ] ] [ "" epsilon [ drop [ [ ] ] call ] action parse ] unit-test
-  
-[ [ ] ] [ "" epsilon [ drop [ [ ] ] ] action [ call ] action parse ] unit-test

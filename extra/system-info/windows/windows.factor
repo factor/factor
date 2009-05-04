@@ -3,7 +3,7 @@
 USING: alien alien.c-types kernel libc math namespaces
 windows windows.kernel32 windows.advapi32
 words combinators vocabs.loader system-info.backend
-system alien.strings ;
+system alien.strings windows.errors ;
 IN: system-info.windows
 
 : system-info ( -- SYSTEM_INFO )

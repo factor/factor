@@ -4,7 +4,8 @@ USING: accessors combinators db kernel sequences peg.ebnf
 strings db.errors ;
 IN: db.errors.sqlite
 
-ERROR: unparsed-sqlite-error error ;
+TUPLE: unparsed-sqlite-error error ;
+C: <unparsed-sqlite-error> unparsed-sqlite-error
 
 SINGLETONS: table-exists table-missing ;
 
@@ -22,4 +23,6 @@ SqliteError =
       => [[ table >string message sqlite-table-error ]]
     | "no such table: " .+:table
       => [[ table >string <sql-table-missing> ]]
+    | .*:error
+      => [[ error >string <unparsed-sqlite-error> ]]
 ;EBNF

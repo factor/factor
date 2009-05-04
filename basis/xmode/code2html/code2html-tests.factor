@@ -3,8 +3,6 @@ USING: xmode.code2html xmode.catalog
 tools.test multiline splitting memoize
 kernel io.streams.string xml.writer ;
 
-\ htmlize-file must-infer
-
 [ ] [ \ (load-mode) reset-memoized ] unit-test
 
 [ ] [

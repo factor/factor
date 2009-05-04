@@ -56,7 +56,7 @@ sequences eval accessors ;
     3 '[ [ [ _ 1array ] call 1array ] call 1array ] call
 ] unit-test
 
-[ "USING: fry locals.backend ; f '[ load-local _ ]" eval ]
+[ "USING: fry locals.backend ; f '[ load-local _ ]" eval( -- quot ) ]
 [ error>> >r/r>-in-fry-error? ] must-fail-with
 
 [ { { "a" 1 } { "b" 2 } { "c" 3 } { "d" 4 } } ] [

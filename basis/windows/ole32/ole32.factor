@@ -1,6 +1,6 @@
 USING: alien alien.syntax alien.c-types alien.strings math
-kernel sequences windows windows.types debugger io accessors
-math.order namespaces make math.parser windows.kernel32
+kernel sequences windows.errors windows.types debugger io
+accessors math.order namespaces make math.parser windows.kernel32
 combinators locals specialized-arrays.direct.uchar ;
 IN: windows.ole32
 
@@ -120,7 +120,7 @@ TUPLE: ole32-error error-code ;
 C: <ole32-error> ole32-error
 
 M: ole32-error error.
-    "COM method failed: " print error-code>> (win32-error-string) print ;
+    "COM method failed: " print error-code>> n>win32-error-string print ;
 
 : ole32-error ( hresult -- )
     dup succeeded? [ drop ] [ <ole32-error> throw ] if ;

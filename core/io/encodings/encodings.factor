@@ -130,7 +130,9 @@ M: encoder stream-element-type
 M: encoder stream-write1
     >encoder< encode-char ;
 
-: encoder-write ( string stream encoding -- )
+GENERIC# encoder-write 2 ( string stream encoding -- )
+
+M: string encoder-write
     [ encode-char ] 2curry each ;
 
 M: encoder stream-write

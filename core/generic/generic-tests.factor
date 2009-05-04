@@ -65,11 +65,11 @@ M: number union-containment drop 2 ;
 [ 2 ] [ 1.0 union-containment ] unit-test
 
 ! Testing recovery from bad method definitions
-"IN: generic.tests GENERIC: unhappy ( x -- x )" eval
+"IN: generic.tests GENERIC: unhappy ( x -- x )" eval( -- )
 [
-    "IN: generic.tests M: dictionary unhappy ;" eval
+    "IN: generic.tests M: dictionary unhappy ;" eval( -- )
 ] must-fail
-[ ] [ "IN: generic.tests GENERIC: unhappy ( x -- x )" eval ] unit-test
+[ ] [ "IN: generic.tests GENERIC: unhappy ( x -- x )" eval( -- ) ] unit-test
 
 GENERIC# complex-combination 1 ( a b -- c )
 M: string complex-combination drop ;
@@ -95,18 +95,6 @@ M: shit big-generic-test "shit" ;
 [ T{ shit f } "shit" ] [ T{ shit f } big-generic-test ] unit-test
 
 [ t ] [ \ + math-generic? ] unit-test
-
-! Test math-combination
-[ [ [ >float ] dip ] ] [ \ real \ float math-upgrade ] unit-test
-[ [ >float ] ] [ \ float \ real math-upgrade ] unit-test
-[ [ [ >bignum ] dip ] ] [ \ fixnum \ bignum math-upgrade ] unit-test
-[ [ >float ] ] [ \ float \ integer math-upgrade ] unit-test
-[ number ] [ \ number \ float math-class-max ] unit-test
-[ float ] [ \ real \ float math-class-max ] unit-test
-[ fixnum ] [ \ fixnum \ null math-class-max ] unit-test
-
-[ t ] [ { hashtable equal? } method-spec? ] unit-test
-[ f ] [ { word = } method-spec? ] unit-test
 
 ! Regression
 TUPLE: first-one ;
@@ -136,69 +124,19 @@ M: f tag-and-f 4 ;
 [ 3.4 3 ] [ 3.4 tag-and-f ] unit-test
 
 ! Issues with forget
-GENERIC: generic-forget-test-1 ( a b -- c )
+GENERIC: generic-forget-test ( a -- b )
 
-M: integer generic-forget-test-1 / ;
+M: f generic-forget-test ;
 
-[ t ] [
-    \ / usage [ word? ] filter
-    [ name>> "integer=>generic-forget-test-1" = ] any?
-] unit-test
-
-[ ] [
-    [ \ generic-forget-test-1 forget ] with-compilation-unit
-] unit-test
-
-[ f ] [
-    \ / usage [ word? ] filter
-    [ name>> "integer=>generic-forget-test-1" = ] any?
-] unit-test
-
-GENERIC: generic-forget-test-2 ( a b -- c )
-
-M: sequence generic-forget-test-2 = ;
-
-[ t ] [
-    \ = usage [ word? ] filter
-    [ name>> "sequence=>generic-forget-test-2" = ] any?
-] unit-test
-
-[ ] [
-    [ { sequence generic-forget-test-2 } forget ] with-compilation-unit
-] unit-test
-
-[ f ] [
-    \ = usage [ word? ] filter
-    [ name>> "sequence=>generic-forget-test-2" = ] any?
-] unit-test
-
-GENERIC: generic-forget-test-3 ( a -- b )
-
-M: f generic-forget-test-3 ;
-
-[ ] [ \ f \ generic-forget-test-3 method "m" set ] unit-test
+[ ] [ \ f \ generic-forget-test method "m" set ] unit-test
 
 [ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
 
-[ ] [ "IN: generic.tests M: f generic-forget-test-3 ;" eval ] unit-test
+[ ] [ "IN: generic.tests M: f generic-forget-test ;" eval( -- ) ] unit-test
 
 [ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
 
-[ f ] [ f generic-forget-test-3 ] unit-test
-
-: a-word ( -- ) ;
-
-GENERIC: a-generic ( a -- b )
-
-M: integer a-generic a-word ;
-
-[ ] [ \ integer \ a-generic method "m" set ] unit-test
-
-[ t ] [ "m" get \ a-word usage memq? ] unit-test
-
-[ ] [ "IN: generic.tests : a-generic ( -- ) ;" eval ] unit-test
-
-[ f ] [ "m" get \ a-word usage memq? ] unit-test
+[ f ] [ f generic-forget-test ] unit-test
 
 ! erg's regression
 [ ] [
@@ -210,31 +148,31 @@ M: integer a-generic a-word ;
     M: boii jeah ;
     GENERIC: jeah* ( a -- b )
     M: boii jeah* jeah ;
-    "> eval
+    "> eval( -- )
 
     <"
     IN: compiler.tests
     FORGET: boii
-    "> eval
+    "> eval( -- )
     
     <"
     IN: compiler.tests
     TUPLE: boii ;
     M: boii jeah ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 ! call-next-method cache test
 GENERIC: c-n-m-cache ( a -- b )
 
 ! Force it to be unoptimized
-M: fixnum c-n-m-cache { } [ ] like call call-next-method ;
+M: fixnum c-n-m-cache { } [ ] like call( -- ) call-next-method ;
 M: integer c-n-m-cache 1 + ;
 M: number c-n-m-cache ;
 
 [ 3 ] [ 2 c-n-m-cache ] unit-test
 
-[ ] [ [ { integer c-n-m-cache } forget ] with-compilation-unit ] unit-test
+[ ] [ [ M\ integer c-n-m-cache forget ] with-compilation-unit ] unit-test
 
 [ 2 ] [ 2 c-n-m-cache ] unit-test
 

@@ -26,7 +26,7 @@ CONSTANT: b 2
 
 [ 3 ] [ foo ] unit-test
 [ 3 ] [ { a b } flags ] unit-test
-\ foo must-infer
+\ foo def>> must-infer
 
 [ 1 ] [ { 1 } flags ] unit-test
 

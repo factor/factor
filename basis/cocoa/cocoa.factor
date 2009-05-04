@@ -7,7 +7,7 @@ compiler.units lexer init ;
 IN: cocoa
 
 : (remember-send) ( selector variable -- )
-    global [ dupd ?set-at ] change-at ;
+    [ dupd ?set-at ] change-global ;
 
 SYMBOL: sent-messages
 

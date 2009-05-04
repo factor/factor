@@ -16,10 +16,11 @@ IN: tools.hexdump
     16 * >hex 8 CHAR: 0 pad-head write "h: " write ;
 
 : >hex-digit ( digit -- str )
-    >hex 2 CHAR: 0 pad-head " " append ;
+    >hex 2 CHAR: 0 pad-head ;
 
 : >hex-digits ( bytes -- str )
-    [ >hex-digit ] { } map-as concat 48 CHAR: \s pad-tail ;
+    [ >hex-digit " " append ] { } map-as concat
+    48 CHAR: \s pad-tail ;
 
 : >ascii ( bytes -- str )
     [ [ printable? ] keep CHAR: . ? ] "" map-as ;

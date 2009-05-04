@@ -152,16 +152,3 @@ M: mock-gadget ungraft*
 
     { { f f } { f t } { t f } { t t } } [ notify-combo ] assoc-each
 ] with-string-writer print
-
-\ <gadget> must-infer
-\ unparent must-infer
-\ add-gadget must-infer
-\ add-gadgets must-infer
-\ clear-gadget must-infer
-
-\ relayout must-infer
-\ relayout-1 must-infer
-\ pref-dim must-infer
-
-\ graft* must-infer
-\ ungraft* must-infer

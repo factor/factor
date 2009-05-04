@@ -1,0 +1,28 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+<h1>Add some sites to watch</h1>
+
+<t:form t:action="$site-watcher-app/add-watch">
+<table>
+  <tr><th>URL:</th><td> <t:field t:name="url" t:size="80" /> <button type="submit">Done</button> </td></tr>
+</table>
+</t:form>
+
+<h1>Keep track of your sites</h1>
+
+<table border="2">
+  <tr> <th>URL</th><th></th> </tr>
+  <t:bind-each t:name="sites">
+    <tr>
+      <td> <t:label t:name="url" /> </td>
+      <td> <t:button t:action="$site-watcher-app/remove-watch" t:for="url">Remove</t:button> </td>
+    </tr>
+  </t:bind-each>
+</table>
+<p>
+  <t:button t:action="$site-watcher-app/check">Check now</t:button>
+</p>
+
+</t:chloe>

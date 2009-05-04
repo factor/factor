@@ -14,6 +14,25 @@ IN: urls.encoding
         [ "/_-.:" member? ]
     } 1|| ; foldable
 
+! see http://tools.ietf.org/html/rfc3986#section-2.2
+: gen-delim? ( ch -- ? )
+    ":/?#[]@" member? ; foldable
+
+: sub-delim? ( ch -- ? )
+    "!$&'()*+,;=" member? ; foldable
+
+: reserved? ( ch -- ? )
+    [ gen-delim? ] [ sub-delim? ] bi or ; foldable
+
+! see http://tools.ietf.org/html/rfc3986#section-2.3
+: unreserved? ( ch -- ? )
+    {
+        [ letter? ]
+        [ LETTER? ]
+        [ digit? ]
+        [ "-._~" member? ]
+    } 1|| ; foldable
+
 <PRIVATE
 
 : push-utf8 ( ch -- )
@@ -25,6 +44,11 @@ PRIVATE>
 : url-encode ( str -- encoded )
     [
         [ dup url-quotable? [ , ] [ push-utf8 ] if ] each
+    ] "" make ;
+
+: url-encode-full ( str -- encoded )
+    [
+        [ dup unreserved? [ , ] [ push-utf8 ] if ] each
     ] "" make ;
 
 <PRIVATE
@@ -72,6 +96,15 @@ PRIVATE>
         ] when*
     ] 2keep set-at ;
 
+: assoc-strings ( assoc -- assoc' )
+    [
+        {
+            { [ dup not ] [ ] }
+            { [ dup array? ] [ [ present ] map ] }
+            [ present 1array ]
+        } cond
+    ] assoc-map ;
+
 PRIVATE>
 
 : query>assoc ( query -- assoc )
@@ -86,11 +119,8 @@ PRIVATE>
 
 : assoc>query ( assoc -- str )
     [
-        dup array? [ [ present ] map ] [ present 1array ] if
-    ] assoc-map
-    [
-        [
+        assoc-strings [
             [ url-encode ] dip
-            [ url-encode "=" glue , ] with each
+            [ [ url-encode "=" glue , ] with each ] [ , ] if*
         ] assoc-each
     ] { } make "&" join ;

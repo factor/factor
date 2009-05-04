@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private namespaces make io io.encodings
-sequences math generic threads.private classes io.backend
-io.files continuations destructors byte-arrays accessors
-combinators ;
+USING: kernel kernel.private namespaces make io io.encodings sequences
+math generic threads.private classes io.backend io.files
+io.encodings.utf8 alien.strings continuations destructors byte-arrays
+accessors combinators ;
 IN: io.streams.c
 
 TUPLE: c-stream handle disposed ;
@@ -68,6 +68,9 @@ M: c-io-backend init-io ;
 M: c-io-backend (init-stdio) init-c-stdio t ;
 
 M: c-io-backend io-multiplex 60 60 * 1000 * 1000 * or (sleep) ;
+
+: fopen ( path mode -- handle )
+    [ utf8 string>alien ] bi@ (fopen) ;
 
 M: c-io-backend (file-reader)
     "rb" fopen <c-reader> ;

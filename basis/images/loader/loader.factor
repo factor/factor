@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: constructors kernel splitting unicode.case combinators
-accessors images.bitmap images.tiff images images.normalization
-io.pathnames ;
+accessors images.bitmap images.tiff images io.pathnames ;
 IN: images.loader
 
 ERROR: unknown-image-extension extension ;
@@ -16,4 +15,4 @@ ERROR: unknown-image-extension extension ;
     } case ;
 
 : load-image ( path -- image )
-    dup image-class new load-image* normalize-image ;
+    dup image-class new load-image* ;

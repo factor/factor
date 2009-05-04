@@ -9,10 +9,8 @@ compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
 specialized-arrays.double system sorting math.libm
-math.intervals ;
+math.intervals quotations ;
 IN: compiler.tree.propagation.tests
-
-\ propagate must-infer
 
 [ V{ } ] [ [ ] final-classes ] unit-test
 
@@ -359,7 +357,7 @@ TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
 ] unit-test
 
 [ V{ complex } ] [
-    [ <complex> ] final-classes
+    [ complex boa ] final-classes
 ] unit-test
 
 [ V{ complex } ] [
@@ -377,7 +375,7 @@ TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
 [ V{ complex } ] [
     [
         { float float object } declare
-        [ "Oops" throw ] [ <complex> ] if
+        [ "Oops" throw ] [ complex boa ] if
     ] final-classes
 ] unit-test
 
@@ -592,7 +590,7 @@ MIXIN: empty-mixin
 
 [ V{ float } ] [
     [
-        [ { float float } declare <complex> ]
+        [ { float float } declare complex boa ]
         [ 2drop C{ 0.0 0.0 } ]
         if real-part
     ] final-classes
@@ -680,7 +678,7 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 : (littledan-3-test) ( x -- )
     length 1+ f <array> (littledan-3-test) ; inline recursive
 
-: littledan-3-test ( x -- )
+: littledan-3-test ( -- )
     0 f <array> (littledan-3-test) ; inline
 
 [ ] [ [ littledan-3-test ] final-classes drop ] unit-test
@@ -688,3 +686,8 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 [ V{ 0 } ] [ [ { } length ] final-literals ] unit-test
 
 [ V{ 1 } ] [ [ { } length 1+ f <array> length ] final-literals ] unit-test
+
+! Mutable tuples with circularity should not cause problems
+TUPLE: circle me ;
+
+[ ] [ circle new dup >>me 1quotation final-info drop ] unit-test

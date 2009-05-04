@@ -1,67 +1,62 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel prettyprint io debugger
 sequences assocs stack-checker.errors summary effects ;
 IN: stack-checker.errors.prettyprint
 
-M: inference-error error-help error>> error-help ;
+M: literal-expected summary
+    what>> "Got a computed value where a " " was expected" surround ;
 
-M: inference-error error.
-    [ word>> [ "In word: " write . ] when* ] [ error>> error. ] bi ;
+M: literal-expected error. summary print ;
 
-M: literal-expected error.
-    "Got a computed value where a " write what>> write " was expected" print ;
+M: unbalanced-branches-error summary
+    drop "Unbalanced branches" ;
 
 M: unbalanced-branches-error error.
-    "Unbalanced branches:" print
+    dup summary print
     [ quots>> ] [ branches>> [ length <effect> ] { } assoc>map ] bi zip
     [ [ first pprint-short bl ] [ second effect>string print ] bi ] each ;
 
 M: too-many->r summary
-    drop
-    "Quotation pushes elements on retain stack without popping them" ;
+    drop "Quotation pushes elements on retain stack without popping them" ;
 
 M: too-many-r> summary
-    drop
-    "Quotation pops retain stack elements which it did not push" ;
+    drop "Quotation pops retain stack elements which it did not push" ;
 
-M: missing-effect error.
-    "The word " write
-    word>> pprint
-    " must declare a stack effect" print ;
+M: missing-effect summary
+    drop "Missing stack effect declaration" ;
 
-M: effect-error error.
-    "Stack effects of the word " write
-    [ word>> pprint " do not match." print ]
-    [ "Inferred: " write inferred>> . ]
-    [ "Declared: " write declared>> . ] tri ;
+M: effect-error summary
+    drop "Stack effect declaration is wrong" ;
 
-M: recursive-quotation-error error.
-    "The quotation " write
-    quot>> pprint
-    " calls itself." print
-    "Stack effect inference is undecidable when quotation-level recursion is permitted." print ;
+M: recursive-quotation-error summary
+    drop "Recursive quotation" ;
 
-M: undeclared-recursion-error error.
-    "The inline recursive word " write
-    word>> pprint
-    " must be declared recursive" print ;
+M: undeclared-recursion-error summary
+    word>> name>>
+    "The inline recursive word " " must be declared recursive" surround ;
 
-M: diverging-recursion-error error.
-    "The recursive word " write
-    word>> pprint
-    " digs arbitrarily deep into the stack" print ;
+M: diverging-recursion-error summary
+    word>> name>>
+    "The recursive word " " digs arbitrarily deep into the stack" surround ;
 
-M: unbalanced-recursion-error error.
-    "The recursive word " write
-    word>> pprint
-    " leaves with the stack having the wrong height" print ;
+M: unbalanced-recursion-error summary
+    word>> name>>
+    "The recursive word " " leaves with the stack having the wrong height" surround ;
 
-M: inconsistent-recursive-call-error error.
-    "The recursive word " write
-    word>> pprint
-    " calls itself with a different set of quotation parameters than were input" print ;
+M: inconsistent-recursive-call-error summary
+    word>> name>>
+    "The recursive word "
+    " calls itself with a different set of quotation parameters than were input" surround ;
 
-M: unknown-primitive-error error.
-    drop
-    "Cannot determine stack effect statically" print ;
+M: unknown-primitive-error summary
+    word>> name>> "The " " word cannot be called from optimized words" surround ;
+
+M: transform-expansion-error summary
+    word>> name>> "Macro expansion of " " threw an error" surround ;
+
+M: transform-expansion-error error.
+    [ summary print ] [ error>> error. ] bi ;
+
+M: do-not-compile summary
+    word>> name>> "Cannot compile call to " prepend ;

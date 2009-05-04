@@ -1,5 +1,5 @@
 USING: kernel generic help.markup help.syntax math classes
-sequences quotations ;
+sequences quotations generic.math.private ;
 IN: generic.math
 
 HELP: math-upgrade
@@ -15,7 +15,7 @@ HELP: no-math-method
 HELP: math-method
 { $values { "word" generic } { "class1" class } { "class2" class } { "quot" quotation } }
 { $description "Generates a definition for " { $snippet "word" } " when the two inputs are instances of " { $snippet "class1" } " and " { $snippet "class2" } ", respectively." }
-{ $examples { $example "USING: generic.math math prettyprint ;" "\\ + fixnum float math-method ." "[ { fixnum float } declare [ >float ] dip float=>+ ]" } } ;
+{ $examples { $example "USING: generic.math math prettyprint ;" "\\ + fixnum float math-method ." "[ { fixnum float } declare [ >float ] dip M\\ float + ]" } } ;
 
 HELP: math-class
 { $class-description "The class of subtypes of " { $link number } " which are not " { $link null } "." } ;

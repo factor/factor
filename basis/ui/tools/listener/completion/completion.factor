@@ -3,11 +3,10 @@
 USING: accessors arrays assocs calendar colors colors.constants
 documents documents.elements fry kernel words sets splitting math
 math.vectors models.delay models.arrow combinators.short-circuit
-parser present sequences tools.completion help.vocabs generic
-generic.standard.engines.tuple fonts definitions.icons ui.images
-ui.commands ui.operations ui.gadgets ui.gadgets.editors
-ui.gadgets.glass ui.gadgets.scrollers ui.gadgets.tables
-ui.gadgets.tracks ui.gadgets.labeled
+parser present sequences tools.completion help.vocabs generic fonts
+definitions.icons ui.images ui.commands ui.operations ui.gadgets
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.scrollers
+ui.gadgets.tables ui.gadgets.tracks ui.gadgets.labeled
 ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.pens.solid
 ui.tools.listener.history combinators vocabs ui.tools.listener.popups ;
 IN: ui.tools.listener.completion
@@ -40,7 +39,7 @@ M: history-completion completion-quot drop '[ drop _ history-list ] ;
 
 GENERIC: completion-element ( completion-mode -- element )
 
-M: object completion-element drop one-word-elt ;
+M: object completion-element drop word-start-elt ;
 M: history-completion completion-element drop one-line-elt ;
 
 GENERIC: completion-banner ( completion-mode -- string )
@@ -73,13 +72,13 @@ M: vocab-completion row-color
     drop vocab? COLOR: black COLOR: dark-gray ? ;
 
 : complete-IN:/USE:? ( tokens -- ? )
-    2 short tail* { "IN:" "USE:" } intersects? ;
+    1 short head* 2 short tail* { "IN:" "USE:" } intersects? ;
 
 : chop-; ( seq -- seq' )
     { ";" } split1-last [ ] [ ] ?if ;
 
 : complete-USING:? ( tokens -- ? )
-    chop-; { "USING:" } intersects? ;
+    chop-; 1 short head* { "USING:" } intersects? ;
 
 : complete-CHAR:? ( tokens -- ? )
     2 short tail* "CHAR:" swap member? ;
@@ -119,8 +118,6 @@ M: object completion-string present ;
     "method-generic" word-prop present ;
 
 M: method-body completion-string method-completion-string ;
-
-M: engine-word completion-string method-completion-string ;
 
 GENERIC# accept-completion-hook 1 ( item popup -- )
 

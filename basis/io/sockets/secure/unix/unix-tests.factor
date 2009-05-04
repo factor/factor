@@ -5,7 +5,6 @@ io.backend.unix classes words destructors threads tools.test
 concurrency.promises byte-arrays locals calendar io.timeouts
 io.sockets.secure.unix.debug ;
 
-\ <secure-config> must-infer
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
 
 [ ] [ <promise> "port" set ] unit-test
@@ -24,7 +23,7 @@ io.sockets.secure.unix.debug ;
 
 : client-test ( -- string )
     <secure-config> [
-        "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop contents
+        "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop stream-contents
     ] with-secure-context ;
 
 [ ] [ [ class name>> write ] server-test ] unit-test
