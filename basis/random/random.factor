@@ -54,7 +54,7 @@ PRIVATE>
 
 : randomize ( seq -- seq )
     dup length [ dup 1 > ]
-    [ [ random ] [ 1- ] bi [ pick exchange ] keep ]
+    [ [ iota random ] [ 1- ] bi [ pick exchange ] keep ]
     while drop ;
 
 : delete-random ( seq -- elt )

@@ -206,8 +206,8 @@ unit-test
 [ 2. ] [ 2 1 ratio>float ] unit-test
 [ .5 ] [ 1 2 ratio>float ] unit-test
 [ .75 ] [ 3 4 ratio>float ] unit-test
-[ 1. ] [ 2000 2^ 2000 2^ 1+ ratio>float ] unit-test
-[ -1. ] [ 2000 2^ neg 2000 2^ 1+ ratio>float ] unit-test
+[ 1. ] [ 2000 2^ 2000 2^ 1 + ratio>float ] unit-test
+[ -1. ] [ 2000 2^ neg 2000 2^ 1 + ratio>float ] unit-test
 [ 0.4 ] [ 6 15 ratio>float ] unit-test
 
 [ HEX: 3fe553522d230931 ]

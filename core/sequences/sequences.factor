@@ -198,7 +198,7 @@ C: <reversed> reversed
 
 M: reversed virtual-seq seq>> ;
 
-M: reversed virtual@ seq>> [ length swap - 1- ] keep ;
+M: reversed virtual@ seq>> [ length swap - 1 - ] keep ;
 
 M: reversed length seq>> length ;
 
@@ -276,7 +276,7 @@ INSTANCE: repetition immutable-sequence
     ] 3keep ; inline
 
 : (copy) ( dst i src j n -- dst )
-    dup 0 <= [ 2drop 2drop ] [ 1- ((copy)) (copy) ] if ;
+    dup 0 <= [ 2drop 2drop ] [ 1 - ((copy)) (copy) ] if ;
     inline recursive
 
 : prepare-subseq ( from to seq -- dst i src j n )
@@ -460,7 +460,7 @@ PRIVATE>
     [ nip find-last-integer ] (find-from) ; inline
 
 : find-last ( seq quot -- i elt )
-    [ [ 1- ] dip find-last-integer ] (find) ; inline
+    [ [ 1 - ] dip find-last-integer ] (find) ; inline
 
 : all? ( seq quot -- ? )
     (each) all-integers? ; inline
@@ -556,7 +556,7 @@ PRIVATE>
     [ empty? not ] filter ;
 
 : mismatch ( seq1 seq2 -- i )
-    [ min-length ] 2keep
+    [ min-length iota ] 2keep
     [ 2nth-unsafe = not ] 2curry
     find drop ; inline
 
@@ -595,8 +595,8 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 : (filter-here) ( quot: ( elt -- ? ) store scan seq -- )
     2dup length < [
         [ move ] 3keep
-        [ nth-unsafe pick call [ 1+ ] when ] 2keep
-        [ 1+ ] dip
+        [ nth-unsafe pick call [ 1 + ] when ] 2keep
+        [ 1 + ] dip
         (filter-here)
     ] [ nip set-length drop ] if ; inline recursive
 
@@ -612,20 +612,20 @@ PRIVATE>
     [ eq? not ] with filter-here ;
 
 : prefix ( seq elt -- newseq )
-    over [ over length 1+ ] dip [
+    over [ over length 1 + ] dip [
         [ 0 swap set-nth-unsafe ] keep
         [ 1 swap copy ] keep
     ] new-like ;
 
 : suffix ( seq elt -- newseq )
-    over [ over length 1+ ] dip [
+    over [ over length 1 + ] dip [
         [ [ over length ] dip set-nth-unsafe ] keep
         [ 0 swap copy ] keep
     ] new-like ;
 
-: peek ( seq -- elt ) [ length 1- ] [ nth ] bi ;
+: peek ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
 
-: pop* ( seq -- ) [ length 1- ] [ shorten ] bi ;
+: pop* ( seq -- ) [ length 1 - ] [ shorten ] bi ;
 
 <PRIVATE
 
@@ -633,7 +633,7 @@ PRIVATE>
     2over = [
         2drop 2drop
     ] [
-        [ [ 2over + pick ] dip move [ 1+ ] dip ] keep
+        [ [ 2over + pick ] dip move [ 1 + ] dip ] keep
         move-backward
     ] if ;
 
@@ -641,13 +641,13 @@ PRIVATE>
     2over = [
         2drop 2drop
     ] [
-        [ [ pick [ dup dup ] dip + swap ] dip move 1- ] keep
+        [ [ pick [ dup dup ] dip + swap ] dip move 1 - ] keep
         move-forward
     ] if ;
 
 : (open-slice) ( shift from to seq ? -- )
     [
-        [ [ 1- ] bi@ ] dip move-forward
+        [ [ 1 - ] bi@ ] dip move-forward
     ] [
         [ over - ] 2dip move-backward
     ] if ;
@@ -667,7 +667,7 @@ PRIVATE>
     check-slice [ over [ - ] dip ] dip open-slice ;
 
 : delete-nth ( n seq -- )
-    [ dup 1+ ] dip delete-slice ;
+    [ dup 1 + ] dip delete-slice ;
 
 : snip ( from to seq -- head tail )
     [ swap head ] [ swap tail ] bi-curry bi* ; inline
@@ -679,10 +679,10 @@ PRIVATE>
     snip-slice surround ;
 
 : remove-nth ( n seq -- seq' )
-    [ [ { } ] dip dup 1+ ] dip replace-slice ;
+    [ [ { } ] dip dup 1 + ] dip replace-slice ;
 
 : pop ( seq -- elt )
-    [ length 1- ] [ [ nth ] [ shorten ] 2bi ] bi ;
+    [ length 1 - ] [ [ nth ] [ shorten ] 2bi ] bi ;
 
 : exchange ( m n seq -- )
     [ nip bounds-check 2drop ]
@@ -692,7 +692,7 @@ PRIVATE>
 
 : reverse-here ( seq -- )
     [ length 2/ ] [ length ] [ ] tri
-    [ [ over - 1- ] dip exchange-unsafe ] 2curry each ;
+    [ [ over - 1 - ] dip exchange-unsafe ] 2curry each ;
 
 : reverse ( seq -- newseq )
     [
@@ -799,7 +799,7 @@ PRIVATE>
 PRIVATE>
 
 : start* ( subseq seq n -- i )
-    pick length pick length swap - 1+
+    pick length pick length swap - 1 +
     [ (start) ] find-from
     swap [ 3drop ] dip ;
 
