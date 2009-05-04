@@ -39,7 +39,7 @@ static void call_fault_handler(exception_type_t exception,
 
 	/* Are we in compiled Factor code? Then use the current stack pointer */
 	if(in_code_heap_p(MACH_PROGRAM_COUNTER(thread_state)))
-		signal_callstack_top = (F_STACK_FRAME *)MACH_STACK_POINTER(thread_state);
+		signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
 	/* Are we in C? Then use the saved callstack top */
 	else
 		signal_callstack_top = NULL;
@@ -50,7 +50,7 @@ static void call_fault_handler(exception_type_t exception,
 	if(exception == EXC_BAD_ACCESS)
 	{
 		signal_fault_addr = MACH_EXC_STATE_FAULT(exc_state);
-		MACH_PROGRAM_COUNTER(thread_state) = (CELL)memory_signal_handler_impl;
+		MACH_PROGRAM_COUNTER(thread_state) = (cell)memory_signal_handler_impl;
 	}
 	else
 	{
@@ -58,7 +58,7 @@ static void call_fault_handler(exception_type_t exception,
 			signal_number = SIGFPE;
 		else
 			signal_number = SIGABRT;
-		MACH_PROGRAM_COUNTER(thread_state) = (CELL)misc_signal_handler_impl;
+		MACH_PROGRAM_COUNTER(thread_state) = (cell)misc_signal_handler_impl;
 	}
 }
 

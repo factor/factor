@@ -3,27 +3,27 @@
 namespace factor
 {
 
-void flush_icache_for(F_CODE_BLOCK *block)
+void flush_icache_for(code_block *block)
 {
-	flush_icache((CELL)block,block->block.size);
+	flush_icache((cell)block,block->block.size);
 }
 
-void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
+void iterate_relocations(code_block *compiled, relocation_iterator iter)
 {
 	if(compiled->relocation != F)
 	{
-		F_BYTE_ARRAY *relocation = untag<F_BYTE_ARRAY>(compiled->relocation);
+		byte_array *relocation = untag<byte_array>(compiled->relocation);
 
-		CELL index = stack_traces_p() ? 1 : 0;
+		cell index = stack_traces_p() ? 1 : 0;
 
-		F_REL *rel = (F_REL *)(relocation + 1);
-		F_REL *rel_end = (F_REL *)((char *)rel + array_capacity(relocation));
-
-		while(rel < rel_end)
+		cell length = array_capacity(relocation) / sizeof(relocation_entry);
+		for(cell i = 0; i < length; i++)
 		{
-			iter(*rel,index,compiled);
+			relocation_entry rel = relocation->data<relocation_entry>()[i];
 
-			switch(REL_TYPE(*rel))
+			iter(rel,index,compiled);
+
+			switch(REL_TYPE(rel))
 			{
 			case RT_PRIMITIVE:
 			case RT_XT:
@@ -40,27 +40,25 @@ void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
 			case RT_STACK_CHAIN:
 				break;
 			default:
-				critical_error("Bad rel type",*rel);
+				critical_error("Bad rel type",rel);
 				return; /* Can't happen */
 			}
-
-			rel++;
 		}
 	}
 }
 
 /* Store a 32-bit value into a PowerPC LIS/ORI sequence */
-static void store_address_2_2(CELL *cell, CELL value)
+static void store_address_2_2(cell *cell, cell value)
 {
 	cell[-1] = ((cell[-1] & ~0xffff) | ((value >> 16) & 0xffff));
 	cell[ 0] = ((cell[ 0] & ~0xffff) | (value & 0xffff));
 }
 
 /* Store a value into a bitfield of a PowerPC instruction */
-static void store_address_masked(CELL *cell, F_FIXNUM value, CELL mask, F_FIXNUM shift)
+static void store_address_masked(cell *cell, fixnum value, cell mask, fixnum shift)
 {
 	/* This is unaccurate but good enough */
-	F_FIXNUM test = (F_FIXNUM)mask >> 1;
+	fixnum test = (fixnum)mask >> 1;
 	if(value <= -test || value >= test)
 		critical_error("Value does not fit inside relocation",0);
 
@@ -68,14 +66,14 @@ static void store_address_masked(CELL *cell, F_FIXNUM value, CELL mask, F_FIXNUM
 }
 
 /* Perform a fixup on a code block */
-void store_address_in_code_block(CELL klass, CELL offset, F_FIXNUM absolute_value)
+void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value)
 {
-	F_FIXNUM relative_value = absolute_value - offset;
+	fixnum relative_value = absolute_value - offset;
 
 	switch(klass)
 	{
 	case RC_ABSOLUTE_CELL:
-		*(CELL *)offset = absolute_value;
+		*(cell *)offset = absolute_value;
 		break;
 	case RC_ABSOLUTE:
 		*(u32*)offset = absolute_value;
@@ -84,24 +82,24 @@ void store_address_in_code_block(CELL klass, CELL offset, F_FIXNUM absolute_valu
 		*(u32*)offset = relative_value - sizeof(u32);
 		break;
 	case RC_ABSOLUTE_PPC_2_2:
-		store_address_2_2((CELL *)offset,absolute_value);
+		store_address_2_2((cell *)offset,absolute_value);
 		break;
 	case RC_RELATIVE_PPC_2:
-		store_address_masked((CELL *)offset,relative_value,REL_RELATIVE_PPC_2_MASK,0);
+		store_address_masked((cell *)offset,relative_value,REL_RELATIVE_PPC_2_MASK,0);
 		break;
 	case RC_RELATIVE_PPC_3:
-		store_address_masked((CELL *)offset,relative_value,REL_RELATIVE_PPC_3_MASK,0);
+		store_address_masked((cell *)offset,relative_value,REL_RELATIVE_PPC_3_MASK,0);
 		break;
 	case RC_RELATIVE_ARM_3:
-		store_address_masked((CELL *)offset,relative_value - CELLS * 2,
+		store_address_masked((cell *)offset,relative_value - sizeof(cell) * 2,
 			REL_RELATIVE_ARM_3_MASK,2);
 		break;
 	case RC_INDIRECT_ARM:
-		store_address_masked((CELL *)offset,relative_value - CELLS,
+		store_address_masked((cell *)offset,relative_value - sizeof(cell),
 			REL_INDIRECT_ARM_MASK,0);
 		break;
 	case RC_INDIRECT_ARM_PC:
-		store_address_masked((CELL *)offset,relative_value - CELLS * 2,
+		store_address_masked((cell *)offset,relative_value - sizeof(cell) * 2,
 			REL_INDIRECT_ARM_MASK,0);
 		break;
 	default:
@@ -110,27 +108,30 @@ void store_address_in_code_block(CELL klass, CELL offset, F_FIXNUM absolute_valu
 	}
 }
 
-void update_literal_references_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
+void update_literal_references_step(relocation_entry rel, cell index, code_block *compiled)
 {
 	if(REL_TYPE(rel) == RT_IMMEDIATE)
 	{
-		CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
-		F_ARRAY *literals = untag<F_ARRAY>(compiled->literals);
-		F_FIXNUM absolute_value = array_nth(literals,index);
+		cell offset = REL_OFFSET(rel) + (cell)(compiled + 1);
+		array *literals = untag<array>(compiled->literals);
+		fixnum absolute_value = array_nth(literals,index);
 		store_address_in_code_block(REL_CLASS(rel),offset,absolute_value);
 	}
 }
 
 /* Update pointers to literals from compiled code. */
-void update_literal_references(F_CODE_BLOCK *compiled)
+void update_literal_references(code_block *compiled)
 {
-	iterate_relocations(compiled,update_literal_references_step);
-	flush_icache_for(compiled);
+	if(!compiled->block.needs_fixup)
+	{
+		iterate_relocations(compiled,update_literal_references_step);
+		flush_icache_for(compiled);
+	}
 }
 
 /* Copy all literals referenced from a code block to newspace. Only for
 aging and nursery collections */
-void copy_literal_references(F_CODE_BLOCK *compiled)
+void copy_literal_references(code_block *compiled)
 {
 	if(collecting_gen >= compiled->block.last_scan)
 	{
@@ -140,7 +141,7 @@ void copy_literal_references(F_CODE_BLOCK *compiled)
 			compiled->block.last_scan = collecting_gen + 1;
 
 		/* initialize chase pointer */
-		CELL scan = newspace->here;
+		cell scan = newspace->here;
 
 		copy_handle(&compiled->literals);
 		copy_handle(&compiled->relocation);
@@ -153,52 +154,51 @@ void copy_literal_references(F_CODE_BLOCK *compiled)
 	}
 }
 
-CELL object_xt(CELL obj)
+void *object_xt(cell obj)
 {
-	if(TAG(obj) == QUOTATION_TYPE)
+	switch(tagged<object>(obj).type())
 	{
-		F_QUOTATION *quot = untag<F_QUOTATION>(obj);
-		return (CELL)quot->xt;
-	}
-	else
-	{
-		F_WORD *word = untag<F_WORD>(obj);
-		return (CELL)word->xt;
+	case WORD_TYPE:
+		return untag<word>(obj)->xt;
+	case QUOTATION_TYPE:
+		return untag<quotation>(obj)->xt;
+	default:
+		critical_error("Expected word or quotation",obj);
+		return NULL;
 	}
 }
 
-CELL word_direct_xt(CELL obj)
+void *word_direct_xt(word *w)
 {
-	F_WORD *word = untag<F_WORD>(obj);
-	CELL quot = word->direct_entry_def;
-	if(quot == F || max_pic_size == 0)
-		return (CELL)word->xt;
+	cell tagged_quot = w->direct_entry_def;
+	if(tagged_quot == F || max_pic_size == 0)
+		return w->xt;
 	else
 	{
-		F_QUOTATION *untagged = untag<F_QUOTATION>(quot);
-		if(untagged->compiledp == F)
-			return (CELL)word->xt;
+		quotation *quot = untag<quotation>(tagged_quot);
+		if(quot->compiledp == F)
+			return w->xt;
 		else
-			return (CELL)untagged->xt;
+			return quot->xt;
 	}
 }
 
-void update_word_references_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
+void update_word_references_step(relocation_entry rel, cell index, code_block *compiled)
 {
-	F_RELTYPE type = REL_TYPE(rel);
+	relocation_type type = REL_TYPE(rel);
 	if(type == RT_XT || type == RT_XT_DIRECT)
 	{
-		CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
-		F_ARRAY *literals = untag<F_ARRAY>(compiled->literals);
-		CELL obj = array_nth(literals,index);
+		cell offset = REL_OFFSET(rel) + (cell)(compiled + 1);
+		array *literals = untag<array>(compiled->literals);
+		cell obj = array_nth(literals,index);
 
-		CELL xt;
+		void *xt;
 		if(type == RT_XT)
 			xt = object_xt(obj);
 		else
-			xt = word_direct_xt(obj);
+			xt = word_direct_xt(untag<word>(obj));
 
-		store_address_in_code_block(REL_CLASS(rel),offset,xt);
+		store_address_in_code_block(REL_CLASS(rel),offset,(cell)xt);
 	}
 }
 
@@ -206,7 +206,7 @@ void update_word_references_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 dlsyms, and words. For all other words in the code heap, we only need
 to update references to other words, without worrying about literals
 or dlsyms. */
-void update_word_references(F_CODE_BLOCK *compiled)
+void update_word_references(code_block *compiled)
 {
 	if(compiled->block.needs_fixup)
 		relocate_code_block(compiled);
@@ -220,7 +220,7 @@ void update_word_references(F_CODE_BLOCK *compiled)
 	else if(compiled->block.type == PIC_TYPE)
 	{
 		fflush(stdout);
-		heap_free(&code_heap,&compiled->block);
+		heap_free(&code,&compiled->block);
 	}
 	else
 	{
@@ -229,16 +229,16 @@ void update_word_references(F_CODE_BLOCK *compiled)
 	}
 }
 
-void update_literal_and_word_references(F_CODE_BLOCK *compiled)
+void update_literal_and_word_references(code_block *compiled)
 {
 	update_literal_references(compiled);
 	update_word_references(compiled);
 }
 
-static void check_code_address(CELL address)
+static void check_code_address(cell address)
 {
 #ifdef FACTOR_DEBUG
-	assert(address >= code_heap.segment->start && address < code_heap.segment->end);
+	assert(address >= code.seg->start && address < code.seg->end);
 #endif
 }
 
@@ -247,9 +247,9 @@ is added to the heap. */
 
 /* Mark all literals referenced from a word XT. Only for tenured
 collections */
-void mark_code_block(F_CODE_BLOCK *compiled)
+void mark_code_block(code_block *compiled)
 {
-	check_code_address((CELL)compiled);
+	check_code_address((cell)compiled);
 
 	mark_block(&compiled->block);
 
@@ -257,41 +257,41 @@ void mark_code_block(F_CODE_BLOCK *compiled)
 	copy_handle(&compiled->relocation);
 }
 
-void mark_stack_frame_step(F_STACK_FRAME *frame)
+void mark_stack_frame_step(stack_frame *frame)
 {
 	mark_code_block(frame_code(frame));
 }
 
 /* Mark code blocks executing in currently active stack frames. */
-void mark_active_blocks(F_CONTEXT *stacks)
+void mark_active_blocks(context *stacks)
 {
 	if(collecting_gen == TENURED)
 	{
-		CELL top = (CELL)stacks->callstack_top;
-		CELL bottom = (CELL)stacks->callstack_bottom;
+		cell top = (cell)stacks->callstack_top;
+		cell bottom = (cell)stacks->callstack_bottom;
 
 		iterate_callstack(top,bottom,mark_stack_frame_step);
 	}
 }
 
-void mark_object_code_block(F_OBJECT *object)
+void mark_object_code_block(object *object)
 {
-	switch(object->header.hi_tag())
+	switch(object->h.hi_tag())
 	{
 	case WORD_TYPE:
-		F_WORD *word = (F_WORD *)object;
-		if(word->code)
-			mark_code_block(word->code);
-		if(word->profiling)
-			mark_code_block(word->profiling);
+		word *w = (word *)object;
+		if(w->code)
+			mark_code_block(w->code);
+		if(w->profiling)
+			mark_code_block(w->profiling);
 		break;
 	case QUOTATION_TYPE:
-		F_QUOTATION *quot = (F_QUOTATION *)object;
-		if(quot->compiledp != F)
-			mark_code_block(quot->code);
+		quotation *q = (quotation *)object;
+		if(q->compiledp != F)
+			mark_code_block(q->code);
 		break;
 	case CALLSTACK_TYPE:
-		F_CALLSTACK *stack = (F_CALLSTACK *)object;
+		callstack *stack = (callstack *)object;
 		iterate_callstack_object(stack,mark_stack_frame_step);
 		break;
 	}
@@ -305,21 +305,21 @@ void undefined_symbol(void)
 }
 
 /* Look up an external library symbol referenced by a compiled code block */
-void *get_rel_symbol(F_ARRAY *literals, CELL index)
+void *get_rel_symbol(array *literals, cell index)
 {
-	CELL symbol = array_nth(literals,index);
-	CELL library = array_nth(literals,index + 1);
+	cell symbol = array_nth(literals,index);
+	cell library = array_nth(literals,index + 1);
 
-	F_DLL *dll = (library == F ? NULL : untag<F_DLL>(library));
+	dll *d = (library == F ? NULL : untag<dll>(library));
 
-	if(dll != NULL && !dll->dll)
+	if(d != NULL && !d->dll)
 		return (void *)undefined_symbol;
 
-	switch(tagged<F_OBJECT>(symbol).type())
+	switch(tagged<object>(symbol).type())
 	{
 	case BYTE_ARRAY_TYPE:
-		F_SYMBOL *name = alien_offset(symbol);
-		void *sym = ffi_dlsym(dll,name);
+		symbol_char *name = alien_offset(symbol);
+		void *sym = ffi_dlsym(d,name);
 
 		if(sym)
 			return sym;
@@ -329,12 +329,12 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 			return (void *)undefined_symbol;
 		}
 	case ARRAY_TYPE:
-		CELL i;
-		F_ARRAY *names = untag<F_ARRAY>(symbol);
+		cell i;
+		array *names = untag<array>(symbol);
 		for(i = 0; i < array_capacity(names); i++)
 		{
-			F_SYMBOL *name = alien_offset(array_nth(names,i));
-			void *sym = ffi_dlsym(dll,name);
+			symbol_char *name = alien_offset(array_nth(names,i));
+			void *sym = ffi_dlsym(d,name);
 
 			if(sym)
 				return sym;
@@ -347,45 +347,45 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 }
 
 /* Compute an address to store at a relocation */
-void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
+void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled)
 {
 #ifdef FACTOR_DEBUG
-	tagged<F_ARRAY>(compiled->literals).untag_check();
-	tagged<F_BYTE_ARRAY>(compiled->relocation).untag_check();
+	tagged<array>(compiled->literals).untag_check();
+	tagged<byte_array>(compiled->relocation).untag_check();
 #endif
 
-	CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
-	F_ARRAY *literals = untag<F_ARRAY>(compiled->literals);
-	F_FIXNUM absolute_value;
+	cell offset = REL_OFFSET(rel) + (cell)(compiled + 1);
+	array *literals = untag<array>(compiled->literals);
+	fixnum absolute_value;
 
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
-		absolute_value = (CELL)primitives[to_fixnum(array_nth(literals,index))];
+		absolute_value = (cell)primitives[untag_fixnum(array_nth(literals,index))];
 		break;
 	case RT_DLSYM:
-		absolute_value = (CELL)get_rel_symbol(literals,index);
+		absolute_value = (cell)get_rel_symbol(literals,index);
 		break;
 	case RT_IMMEDIATE:
 		absolute_value = array_nth(literals,index);
 		break;
 	case RT_XT:
-		absolute_value = object_xt(array_nth(literals,index));
+		absolute_value = (cell)object_xt(array_nth(literals,index));
 		break;
 	case RT_XT_DIRECT:
-		absolute_value = word_direct_xt(array_nth(literals,index));
+		absolute_value = (cell)word_direct_xt(untag<word>(array_nth(literals,index)));
 		break;
 	case RT_HERE:
-		absolute_value = offset + (short)to_fixnum(array_nth(literals,index));
+		absolute_value = offset + (short)untag_fixnum(array_nth(literals,index));
 		break;
 	case RT_THIS:
-		absolute_value = (CELL)(compiled + 1);
+		absolute_value = (cell)(compiled + 1);
 		break;
 	case RT_STACK_CHAIN:
-		absolute_value = (CELL)&stack_chain;
+		absolute_value = (cell)&stack_chain;
 		break;
 	case RT_UNTAGGED:
-		absolute_value = to_fixnum(array_nth(literals,index));
+		absolute_value = untag_fixnum(array_nth(literals,index));
 		break;
 	default:
 		critical_error("Bad rel type",rel);
@@ -396,7 +396,7 @@ void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 }
 
 /* Perform all fixups on a code block */
-void relocate_code_block(F_CODE_BLOCK *compiled)
+void relocate_code_block(code_block *compiled)
 {
 	compiled->block.last_scan = NURSERY;
 	compiled->block.needs_fixup = false;
@@ -405,39 +405,39 @@ void relocate_code_block(F_CODE_BLOCK *compiled)
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
-void fixup_labels(F_ARRAY *labels, F_CODE_BLOCK *compiled)
+void fixup_labels(array *labels, code_block *compiled)
 {
-	CELL i;
-	CELL size = array_capacity(labels);
+	cell i;
+	cell size = array_capacity(labels);
 
 	for(i = 0; i < size; i += 3)
 	{
-		CELL klass = to_fixnum(array_nth(labels,i));
-		CELL offset = to_fixnum(array_nth(labels,i + 1));
-		CELL target = to_fixnum(array_nth(labels,i + 2));
+		cell klass = untag_fixnum(array_nth(labels,i));
+		cell offset = untag_fixnum(array_nth(labels,i + 1));
+		cell target = untag_fixnum(array_nth(labels,i + 2));
 
 		store_address_in_code_block(klass,
-			offset + (CELL)(compiled + 1),
-			target + (CELL)(compiled + 1));
+			offset + (cell)(compiled + 1),
+			target + (cell)(compiled + 1));
 	}
 }
 
 /* Might GC */
-F_CODE_BLOCK *allot_code_block(CELL size)
+code_block *allot_code_block(cell size)
 {
-	F_BLOCK *block = heap_allot(&code_heap,size + sizeof(F_CODE_BLOCK));
+	heap_block *block = heap_allot(&code,size + sizeof(code_block));
 
 	/* If allocation failed, do a code GC */
 	if(block == NULL)
 	{
 		gc();
-		block = heap_allot(&code_heap,size + sizeof(F_CODE_BLOCK));
+		block = heap_allot(&code,size + sizeof(code_block));
 
 		/* Insufficient room even after code GC, give up */
 		if(block == NULL)
 		{
-			CELL used, total_free, max_free;
-			heap_usage(&code_heap,&used,&total_free,&max_free);
+			cell used, total_free, max_free;
+			heap_usage(&code,&used,&total_free,&max_free);
 
 			print_string("Code heap stats:\n");
 			print_string("Used: "); print_cell(used); nl();
@@ -447,24 +447,24 @@ F_CODE_BLOCK *allot_code_block(CELL size)
 		}
 	}
 
-	return (F_CODE_BLOCK *)block;
+	return (code_block *)block;
 }
 
 /* Might GC */
-F_CODE_BLOCK *add_code_block(
-	CELL type,
-	CELL code_,
-	CELL labels_,
-	CELL relocation_,
-	CELL literals_)
+code_block *add_code_block(
+	cell type,
+	cell code_,
+	cell labels_,
+	cell relocation_,
+	cell literals_)
 {
-	gc_root<F_BYTE_ARRAY> code(code_);
-	gc_root<F_OBJECT> labels(labels_);
-	gc_root<F_BYTE_ARRAY> relocation(relocation_);
-	gc_root<F_ARRAY> literals(literals_);
+	gc_root<byte_array> code(code_);
+	gc_root<object> labels(labels_);
+	gc_root<byte_array> relocation(relocation_);
+	gc_root<array> literals(literals_);
 
-	CELL code_length = align8(array_capacity(code.untagged()));
-	F_CODE_BLOCK *compiled = allot_code_block(code_length);
+	cell code_length = align8(array_capacity(code.untagged()));
+	code_block *compiled = allot_code_block(code_length);
 
 	/* compiled header */
 	compiled->block.type = type;
@@ -483,7 +483,7 @@ F_CODE_BLOCK *add_code_block(
 
 	/* fixup labels */
 	if(labels.value() != F)
-		fixup_labels(labels.as<F_ARRAY>().untagged(),compiled);
+		fixup_labels(labels.as<array>().untagged(),compiled);
 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */

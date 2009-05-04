@@ -3,7 +3,7 @@ namespace factor
 
 #define USER_ENV 70
 
-typedef enum {
+enum special_object {
 	NAMESTACK_ENV,            /* used by library only */
 	CATCHSTACK_ENV,           /* used by library only, per-callback */
 
@@ -14,7 +14,7 @@ typedef enum {
 	BREAK_ENV            = 5, /* quotation called by throw primitive */
 	ERROR_ENV,                /* a marker consed onto kernel errors */
 
-	CELL_SIZE_ENV        = 7, /* sizeof(CELL) */
+	cell_SIZE_ENV        = 7, /* sizeof(cell) */
 	CPU_ENV,                  /* CPU architecture */
 	OS_ENV,                   /* operating system name */
 
@@ -88,13 +88,13 @@ typedef enum {
 	SLEEP_QUEUE_ENV     = 66,
 
 	STACK_TRACES_ENV    = 67,
-} F_ENVTYPE;
+};
 
 #define FIRST_SAVE_ENV BOOT_ENV
 #define LAST_SAVE_ENV STAGE2_ENV
 
 /* Canonical T object. It's just a word */
-extern CELL T;
+extern cell T;
 
 PRIMITIVE(getenv);
 PRIMITIVE(setenv);
@@ -108,4 +108,4 @@ PRIMITIVE(clone);
 }
 
 /* TAGGED user environment data; see getenv/setenv prims */
-VM_C_API factor::CELL userenv[USER_ENV];
+VM_C_API factor::cell userenv[USER_ENV];

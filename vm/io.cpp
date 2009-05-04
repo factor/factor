@@ -16,9 +16,9 @@ normal operation. */
 
 void init_c_io(void)
 {
-	userenv[STDIN_ENV] = allot_alien(F,(CELL)stdin);
-	userenv[STDOUT_ENV] = allot_alien(F,(CELL)stdout);
-	userenv[STDERR_ENV] = allot_alien(F,(CELL)stderr);
+	userenv[STDIN_ENV] = allot_alien(F,(cell)stdin);
+	userenv[STDOUT_ENV] = allot_alien(F,(cell)stdout);
+	userenv[STDERR_ENV] = allot_alien(F,(cell)stderr);
 }
 
 void io_error(void)
@@ -33,8 +33,8 @@ void io_error(void)
 
 PRIMITIVE(fopen)
 {
-	gc_root<F_BYTE_ARRAY> mode(dpop());
-	gc_root<F_BYTE_ARRAY> path(dpop());
+	gc_root<byte_array> mode(dpop());
+	gc_root<byte_array> path(dpop());
 	mode.untag_check();
 	path.untag_check();
 
@@ -80,15 +80,15 @@ PRIMITIVE(fgetc)
 PRIMITIVE(fread)
 {
 	FILE *file = (FILE *)unbox_alien();
-	F_FIXNUM size = unbox_array_size();
+	fixnum size = unbox_array_size();
 
 	if(size == 0)
 	{
-		dpush(tag<F_STRING>(allot_string(0,0)));
+		dpush(tag<string>(allot_string(0,0)));
 		return;
 	}
 
-	gc_root<F_BYTE_ARRAY> buf(allot_array_internal<F_BYTE_ARRAY>(size));
+	gc_root<byte_array> buf(allot_array_internal<byte_array>(size));
 
 	for(;;)
 	{
@@ -107,7 +107,7 @@ PRIMITIVE(fread)
 		{
 			if(c != size)
 			{
-				F_BYTE_ARRAY *new_buf = allot_byte_array(c);
+				byte_array *new_buf = allot_byte_array(c);
 				memcpy(new_buf + 1, buf.untagged() + 1,c);
 				buf = new_buf;
 			}
@@ -120,7 +120,7 @@ PRIMITIVE(fread)
 PRIMITIVE(fputc)
 {
 	FILE *file = (FILE *)unbox_alien();
-	F_FIXNUM ch = to_fixnum(dpop());
+	fixnum ch = to_fixnum(dpop());
 
 	for(;;)
 	{
@@ -138,8 +138,8 @@ PRIMITIVE(fputc)
 PRIMITIVE(fwrite)
 {
 	FILE *file = (FILE *)unbox_alien();
-	F_BYTE_ARRAY *text = untag_check<F_BYTE_ARRAY>(dpop());
-	CELL length = array_capacity(text);
+	byte_array *text = untag_check<byte_array>(dpop());
+	cell length = array_capacity(text);
 	char *string = (char *)(text + 1);
 
 	if(length == 0)

@@ -1,23 +1,23 @@
 namespace factor
 {
 
-inline static CELL callstack_size(CELL size)
+inline static cell callstack_size(cell size)
 {
-	return sizeof(F_CALLSTACK) + size;
+	return sizeof(callstack) + size;
 }
 
-#define FIRST_STACK_FRAME(stack) (F_STACK_FRAME *)((stack) + 1)
+#define FIRST_STACK_FRAME(stack) (stack_frame *)((stack) + 1)
 
-typedef void (*CALLSTACK_ITER)(F_STACK_FRAME *frame);
+typedef void (*CALLSTACK_ITER)(stack_frame *frame);
 
-F_STACK_FRAME *fix_callstack_top(F_STACK_FRAME *top, F_STACK_FRAME *bottom);
-void iterate_callstack(CELL top, CELL bottom, CALLSTACK_ITER iterator);
-void iterate_callstack_object(F_CALLSTACK *stack, CALLSTACK_ITER iterator);
-F_STACK_FRAME *frame_successor(F_STACK_FRAME *frame);
-F_CODE_BLOCK *frame_code(F_STACK_FRAME *frame);
-CELL frame_executing(F_STACK_FRAME *frame);
-CELL frame_scan(F_STACK_FRAME *frame);
-CELL frame_type(F_STACK_FRAME *frame);
+stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom);
+void iterate_callstack(cell top, cell bottom, CALLSTACK_ITER iterator);
+void iterate_callstack_object(callstack *stack, CALLSTACK_ITER iterator);
+stack_frame *frame_successor(stack_frame *frame);
+code_block *frame_code(stack_frame *frame);
+cell frame_executing(stack_frame *frame);
+cell frame_scan(stack_frame *frame);
+cell frame_type(stack_frame *frame);
 
 PRIMITIVE(callstack);
 PRIMITIVE(set_callstack);
@@ -26,6 +26,6 @@ PRIMITIVE(innermost_stack_frame_quot);
 PRIMITIVE(innermost_stack_frame_scan);
 PRIMITIVE(set_innermost_stack_frame_quot);
 
-VM_ASM_API void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
+VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom);
 
 }

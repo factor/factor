@@ -11,16 +11,14 @@ typedef signed int s32;
 typedef signed long long s64;
 
 #ifdef _WIN64
-	typedef long long F_FIXNUM;
-	typedef unsigned long long CELL;
+	typedef long long fixnum;
+	typedef unsigned long long cell;
 #else
-	typedef long F_FIXNUM;
-	typedef unsigned long CELL;
+	typedef long fixnum;
+	typedef unsigned long cell;
 #endif
 
-#define CELLS ((signed)sizeof(CELL))
-
-inline static CELL align(CELL a, CELL b)
+inline static cell align(cell a, cell b)
 {
 	return (a + (b-1)) & ~(b-1);
 }
@@ -28,15 +26,13 @@ inline static CELL align(CELL a, CELL b)
 #define align8(a) align(a,8)
 #define align_page(a) align(a,getpagesize())
 
-#define WORD_SIZE (CELLS*8)
-#define HALF_WORD_SIZE (CELLS*4)
-#define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
+#define WORD_SIZE (signed)(sizeof(cell)*8)
 
 #define TAG_MASK 7
 #define TAG_BITS 3
-#define TAG(cell) ((CELL)(cell) & TAG_MASK)
-#define UNTAG(cell) ((CELL)(cell) & ~TAG_MASK)
-#define RETAG(cell,tag) (UNTAG(cell) | (tag))
+#define TAG(x) ((cell)(x) & TAG_MASK)
+#define UNTAG(x) ((cell)(x) & ~TAG_MASK)
+#define RETAG(x,tag) (UNTAG(x) | (tag))
 
 /*** Tags ***/
 #define FIXNUM_TYPE 0
@@ -66,139 +62,133 @@ inline static CELL align(CELL a, CELL b)
 
 #define TYPE_COUNT 15
 
-/* Not a real type, but F_CODE_BLOCK's type field can be set to this */
+/* Not a real type, but code_block's type field can be set to this */
 #define PIC_TYPE 69
 
-inline static bool immediate_p(CELL obj)
+inline static bool immediate_p(cell obj)
 {
 	return (obj == F || TAG(obj) == FIXNUM_TYPE);
 }
 
-inline static F_FIXNUM untag_fixnum(CELL tagged)
+inline static fixnum untag_fixnum(cell tagged)
 {
 #ifdef FACTOR_DEBUG
 	assert(TAG(tagged) == FIXNUM_TYPE);
 #endif
-	return ((F_FIXNUM)tagged) >> TAG_BITS;
+	return ((fixnum)tagged) >> TAG_BITS;
 }
 
-inline static CELL tag_fixnum(F_FIXNUM untagged)
+inline static cell tag_fixnum(fixnum untagged)
 {
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
 }
 
-inline static CELL tag_for(CELL type)
+inline static cell tag_for(cell type)
 {
 	return type < HEADER_TYPE ? type : OBJECT_TYPE;
 }
 
-typedef void *XT;
+class object;
 
-class F_OBJECT;
+struct header {
+	cell value;
 
-struct F_HEADER {
-	CELL header;
-
-	F_HEADER(CELL header_) : header(header_ << TAG_BITS) {}
+	header(cell value_) : value(value_ << TAG_BITS) {}
 
 	void check_header() {
 #ifdef FACTOR_DEBUG
-		assert(TAG(header) == FIXNUM_TYPE && untag_fixnum(header) < TYPE_COUNT);
+		assert(TAG(value) == FIXNUM_TYPE && untag_fixnum(value) < TYPE_COUNT);
 #endif
 	}
 
-	CELL hi_tag() {
+	cell hi_tag() {
 		check_header();
-		return header >> TAG_BITS;
-	}
-
-	void set(CELL header_) {
-		header = header_ << TAG_BITS;
+		return value >> TAG_BITS;
 	}
 
 	bool forwarding_pointer_p() {
-		return TAG(header) == GC_COLLECTED;
+		return TAG(value) == GC_COLLECTED;
 	}
 
-	F_OBJECT *forwarding_pointer() {
-		return (F_OBJECT *)UNTAG(header);
+	object *forwarding_pointer() {
+		return (object *)UNTAG(value);
 	}
 
-	void forward_to(F_OBJECT *pointer) {
-		header = RETAG(pointer,GC_COLLECTED);
+	void forward_to(object *pointer) {
+		value = RETAG(pointer,GC_COLLECTED);
 	}
 };
 
-#define NO_TYPE_CHECK static const CELL type_number = TYPE_COUNT
+#define NO_TYPE_CHECK static const cell type_number = TYPE_COUNT
 
-struct F_OBJECT {
+struct object {
 	NO_TYPE_CHECK;
-	F_HEADER header;
-	CELL *slots() { return (CELL *)this; }
+	header h;
+	cell *slots() { return (cell *)this; }
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
-struct F_ARRAY : public F_OBJECT {
-	static const CELL type_number = ARRAY_TYPE;
-	static const CELL element_size = CELLS;
+struct array : public object {
+	static const cell type_number = ARRAY_TYPE;
+	static const cell element_size = sizeof(cell);
 	/* tagged */
-	CELL capacity;
+	cell capacity;
 
-	CELL *data() { return (CELL *)(this + 1); }
+	cell *data() { return (cell *)(this + 1); }
 };
 
 /* These are really just arrays, but certain elements have special
 significance */
-struct F_TUPLE_LAYOUT : public F_ARRAY {
+struct tuple_layout : public array {
 	NO_TYPE_CHECK;
 	/* tagged */
-	CELL klass;
+	cell klass;
 	/* tagged fixnum */
-	CELL size;
+	cell size;
 	/* tagged fixnum */
-	CELL echelon;
+	cell echelon;
 };
 
-struct F_BIGNUM : public F_OBJECT {
-	static const CELL type_number = BIGNUM_TYPE;
-	static const CELL element_size = CELLS;
+struct bignum : public object {
+	static const cell type_number = BIGNUM_TYPE;
+	static const cell element_size = sizeof(cell);
 	/* tagged */
-	CELL capacity;
+	cell capacity;
 
-	CELL *data() { return (CELL *)(this + 1); }
+	cell *data() { return (cell *)(this + 1); }
 };
 
-struct F_BYTE_ARRAY : public F_OBJECT {
-	static const CELL type_number = BYTE_ARRAY_TYPE;
-	static const CELL element_size = 1;
+struct byte_array : public object {
+	static const cell type_number = BYTE_ARRAY_TYPE;
+	static const cell element_size = 1;
 	/* tagged */
-	CELL capacity;
+	cell capacity;
 
 	template<typename T> T *data() { return (T *)(this + 1); }
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
-struct F_STRING : public F_OBJECT {
-	static const CELL type_number = STRING_TYPE;
+struct string : public object {
+	static const cell type_number = STRING_TYPE;
 	/* tagged num of chars */
-	CELL length;
+	cell length;
 	/* tagged */
-	CELL aux;
+	cell aux;
 	/* tagged */
-	CELL hashcode;
+	cell hashcode;
 
 	u8 *data() { return (u8 *)(this + 1); }
 };
 
 /* The compiled code heap is structured into blocks. */
-typedef enum
+enum block_status
 {
 	B_FREE,
 	B_ALLOCATED,
 	B_MARKED
-} F_BLOCK_STATUS;
+};
 
-struct F_BLOCK
+struct heap_block
 {
 	unsigned char status; /* free or allocated? */
 	unsigned char type; /* this is WORD_TYPE or QUOTATION_TYPE */
@@ -206,126 +196,128 @@ struct F_BLOCK
 	char needs_fixup; /* is this a new block that needs full fixup? */
 
 	/* In bytes, includes this header */
-	CELL size;
+	cell size;
 
 	/* Used during compaction */
-	F_BLOCK *forwarding;
+	heap_block *forwarding;
 };
 
-struct F_FREE_BLOCK
+struct free_heap_block
 {
-	F_BLOCK block;
+	heap_block block;
 
 	/* Filled in on image load */
-        F_FREE_BLOCK *next_free;
+        free_heap_block *next_free;
 };
 
-struct F_CODE_BLOCK
+struct code_block
 {
-	F_BLOCK block;
-	CELL literals; /* # bytes */
-	CELL relocation; /* tagged pointer to byte-array or f */
+	heap_block block;
+	cell literals; /* # bytes */
+	cell relocation; /* tagged pointer to byte-array or f */
+	
+	void *xt() { return (void *)(this + 1); }
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
-struct F_WORD : public F_OBJECT {
-	static const CELL type_number = WORD_TYPE;
+struct word : public object {
+	static const cell type_number = WORD_TYPE;
 	/* TAGGED hashcode */
-	CELL hashcode;
+	cell hashcode;
 	/* TAGGED word name */
-	CELL name;
+	cell name;
 	/* TAGGED word vocabulary */
-	CELL vocabulary;
+	cell vocabulary;
 	/* TAGGED definition */
-	CELL def;
+	cell def;
 	/* TAGGED property assoc for library code */
-	CELL props;
+	cell props;
 	/* TAGGED alternative entry point for direct non-tail calls. Used for inline caching */
-	CELL direct_entry_def;
+	cell direct_entry_def;
 	/* TAGGED call count for profiling */
-	CELL counter;
+	cell counter;
 	/* TAGGED machine code for sub-primitive */
-	CELL subprimitive;
+	cell subprimitive;
 	/* UNTAGGED execution token: jump here to execute word */
-	XT xt;
+	void *xt;
 	/* UNTAGGED compiled code block */
-	F_CODE_BLOCK *code;
+	code_block *code;
 	/* UNTAGGED profiler stub */
-	F_CODE_BLOCK *profiling;
+	code_block *profiling;
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
-struct F_WRAPPER : public F_OBJECT {
-	static const CELL type_number = WRAPPER_TYPE;
-	CELL object;
+struct wrapper : public object {
+	static const cell type_number = WRAPPER_TYPE;
+	cell object;
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
-struct F_FLOAT : F_OBJECT {
-	static const CELL type_number = FLOAT_TYPE;
+struct boxed_float : object {
+	static const cell type_number = FLOAT_TYPE;
 
 #ifndef FACTOR_64
-	CELL padding;
+	cell padding;
 #endif
 
 	double n;
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
-struct F_QUOTATION : public F_OBJECT {
-	static const CELL type_number = QUOTATION_TYPE;
+struct quotation : public object {
+	static const cell type_number = QUOTATION_TYPE;
 	/* tagged */
-	CELL array;
+	cell array;
 	/* tagged */
-	CELL compiledp;
+	cell compiledp;
 	/* tagged */
-	CELL cached_effect;
+	cell cached_effect;
 	/* tagged */
-	CELL cache_counter;
+	cell cache_counter;
 	/* UNTAGGED */
-	XT xt;
+	void *xt;
 	/* UNTAGGED compiled code block */
-	F_CODE_BLOCK *code;
+	code_block *code;
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
-struct F_ALIEN : public F_OBJECT {
-	static const CELL type_number = ALIEN_TYPE;
+struct alien : public object {
+	static const cell type_number = ALIEN_TYPE;
 	/* tagged */
-	CELL alien;
+	cell alien;
 	/* tagged */
-	CELL expired;
+	cell expired;
 	/* untagged */
-	CELL displacement;
+	cell displacement;
 };
 
-struct F_DLL : public F_OBJECT {
-	static const CELL type_number = DLL_TYPE;
+struct dll : public object {
+	static const cell type_number = DLL_TYPE;
 	/* tagged byte array holding a C string */
-	CELL path;
+	cell path;
 	/* OS-specific handle */
 	void *dll;
 };
 
-struct F_CALLSTACK : public F_OBJECT {
-	static const CELL type_number = CALLSTACK_TYPE;
+struct callstack : public object {
+	static const cell type_number = CALLSTACK_TYPE;
 	/* tagged */
-	CELL length;
+	cell length;
 };
 
-struct F_STACK_FRAME
+struct stack_frame
 {
-	XT xt;
+	void *xt;
 	/* Frame size in bytes */
-	CELL size;
+	cell size;
 };
 
-struct F_TUPLE : public F_OBJECT {
-	static const CELL type_number = TUPLE_TYPE;
+struct tuple : public object {
+	static const cell type_number = TUPLE_TYPE;
 	/* tagged layout */
-	CELL layout;
+	cell layout;
 
-	CELL *data() { return (CELL *)(this + 1); }
+	cell *data() { return (cell *)(this + 1); }
 };
 
 }

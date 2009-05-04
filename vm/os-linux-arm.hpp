@@ -14,6 +14,6 @@ inline static void *ucontext_stack_pointer(void *uap)
 #define UAP_PROGRAM_COUNTER(ucontext) \
 	(((ucontext_t *)(ucontext))->uc_mcontext.arm_pc)
 
-void flush_icache(CELL start, CELL len);
+void flush_icache(cell start, cell len);
 
 }

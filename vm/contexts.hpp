@@ -6,37 +6,37 @@ namespace factor
    - callstack_bottom field is 1
    - datastack field is 2
    - retainstack field is 3 */
-struct F_CONTEXT {
+struct context {
 	/* C stack pointer on entry */
-	F_STACK_FRAME *callstack_top;
-	F_STACK_FRAME *callstack_bottom;
+	stack_frame *callstack_top;
+	stack_frame *callstack_bottom;
 
 	/* current datastack top pointer */
-	CELL datastack;
+	cell datastack;
 
 	/* current retain stack top pointer */
-	CELL retainstack;
+	cell retainstack;
 
 	/* saved contents of ds register on entry to callback */
-	CELL datastack_save;
+	cell datastack_save;
 
 	/* saved contents of rs register on entry to callback */
-	CELL retainstack_save;
+	cell retainstack_save;
 
 	/* memory region holding current datastack */
-	F_SEGMENT *datastack_region;
+	segment *datastack_region;
 
 	/* memory region holding current retain stack */
-	F_SEGMENT *retainstack_region;
+	segment *retainstack_region;
 
 	/* saved userenv slots on entry to callback */
-	CELL catchstack_save;
-	CELL current_callback_save;
+	cell catchstack_save;
+	cell current_callback_save;
 
-	F_CONTEXT *next;
+	context *next;
 };
 
-extern CELL ds_size, rs_size;
+extern cell ds_size, rs_size;
 
 #define ds_bot (stack_chain->datastack_region->start)
 #define ds_top (stack_chain->datastack_region->end)
@@ -49,7 +49,7 @@ DEFPUSHPOP(r,rs)
 void reset_datastack(void);
 void reset_retainstack(void);
 void fix_stacks(void);
-void init_stacks(CELL ds_size, CELL rs_size);
+void init_stacks(cell ds_size, cell rs_size);
 
 PRIMITIVE(datastack);
 PRIMITIVE(retainstack);
@@ -63,4 +63,4 @@ VM_C_API void unnest_stacks(void);
 
 }
 
-VM_C_API factor::F_CONTEXT *stack_chain;
+VM_C_API factor::context *stack_chain;

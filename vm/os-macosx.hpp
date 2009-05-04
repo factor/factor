@@ -17,6 +17,6 @@ inline static void *ucontext_stack_pointer(void *uap)
 	return ucontext->uc_stack.ss_sp;
 }
 
-void c_to_factor_toplevel(CELL quot);
+void c_to_factor_toplevel(cell quot);
 
 }

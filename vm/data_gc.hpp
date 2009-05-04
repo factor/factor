@@ -2,21 +2,21 @@ namespace factor
 {
 
 /* statistics */
-struct F_GC_STATS {
-	CELL collections;
+struct gc_stats {
+	cell collections;
 	u64 gc_time;
 	u64 max_gc_time;
-	CELL object_count;
+	cell object_count;
 	u64 bytes_copied;
 };
 
-extern F_ZONE *newspace;
+extern zone *newspace;
 
 extern bool performing_compaction;
-extern CELL collecting_gen;
+extern cell collecting_gen;
 extern bool collecting_aging_again;
 
-extern CELL last_code_heap_scan;
+extern cell last_code_heap_scan;
 
 void init_data_gc(void);
 
@@ -30,29 +30,38 @@ inline static bool collecting_accumulation_gen_p(void)
 		|| collecting_gen == TENURED);
 }
 
-void copy_handle(CELL *handle);
+void copy_handle(cell *handle);
 
-void garbage_collection(volatile CELL gen,
+void garbage_collection(volatile cell gen,
 	bool growing_data_heap_,
-	CELL requested_bytes);
+	cell requested_bytes);
 
 /* We leave this many bytes free at the top of the nursery so that inline
 allocation (which does not call GC because of possible roots in volatile
 registers) does not run out of memory */
 #define ALLOT_BUFFER_ZONE 1024
 
+inline static object *allot_zone(zone *z, cell a)
+{
+	cell h = z->here;
+	z->here = h + align8(a);
+	object *obj = (object *)h;
+	allot_barrier(obj);
+	return obj;
+}
+
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-inline static F_OBJECT *allot_object(F_HEADER header, CELL size)
+inline static object *allot_object(header header, cell size)
 {
 #ifdef GC_DEBUG
 	if(!gc_off)
 		gc();
 #endif
 
-	F_OBJECT *object;
+	object *obj;
 
 	if(nursery.size - ALLOT_BUFFER_ZONE > size)
 	{
@@ -60,48 +69,48 @@ inline static F_OBJECT *allot_object(F_HEADER header, CELL size)
 		if(nursery.here + ALLOT_BUFFER_ZONE + size > nursery.end)
 			garbage_collection(NURSERY,false,0);
 
-		CELL h = nursery.here;
+		cell h = nursery.here;
 		nursery.here = h + align8(size);
-		object = (F_OBJECT *)h;
+		obj = (object *)h;
 	}
 	/* If the object is bigger than the nursery, allocate it in
 	tenured space */
 	else
 	{
-		F_ZONE *tenured = &data_heap->generations[TENURED];
+		zone *tenured = &data->generations[TENURED];
 
 		/* If tenured space does not have enough room, collect */
 		if(tenured->here + size > tenured->end)
 		{
 			gc();
-			tenured = &data_heap->generations[TENURED];
+			tenured = &data->generations[TENURED];
 		}
 
 		/* If it still won't fit, grow the heap */
 		if(tenured->here + size > tenured->end)
 		{
 			garbage_collection(TENURED,true,size);
-			tenured = &data_heap->generations[TENURED];
+			tenured = &data->generations[TENURED];
 		}
 
-		object = allot_zone(tenured,size);
+		obj = allot_zone(tenured,size);
 
 		/* Allows initialization code to store old->new pointers
 		without hitting the write barrier in the common case of
 		a nursery allocation */
-		write_barrier(object);
+		write_barrier(obj);
 	}
 
-	object->header = header;
-	return object;
+	obj->h = header;
+	return obj;
 }
 
-template<typename T> T *allot(CELL size)
+template<typename T> T *allot(cell size)
 {
-	return (T *)allot_object(F_HEADER(T::type_number),size);
+	return (T *)allot_object(header(T::type_number),size);
 }
 
-void copy_reachable_objects(CELL scan, CELL *end);
+void copy_reachable_objects(cell scan, cell *end);
 
 PRIMITIVE(gc);
 PRIMITIVE(gc_stats);
@@ -111,30 +120,29 @@ PRIMITIVE(become);
 
 extern bool growing_data_heap;
 
-inline static void check_data_pointer(F_OBJECT *pointer)
+inline static void check_data_pointer(object *pointer)
 {
 #ifdef FACTOR_DEBUG
 	if(!growing_data_heap)
 	{
-		assert((CELL)pointer >= data_heap->segment->start
-		       && (CELL)pointer < data_heap->segment->end);
+		assert((cell)pointer >= data->seg->start
+		       && (cell)pointer < data->seg->end);
 	}
 #endif
 }
 
-inline static void check_tagged_pointer(CELL tagged)
+inline static void check_tagged_pointer(cell tagged)
 {
 #ifdef FACTOR_DEBUG
 	if(!immediate_p(tagged))
 	{
-		F_OBJECT *object = untag<F_OBJECT>(tagged);
-		check_data_pointer(object);
-		object->header.hi_tag();
+		object *obj = untag<object>(tagged);
+		check_data_pointer(obj);
+		obj->h.hi_tag();
 	}
 #endif
 }
 
 VM_C_API void minor_gc(void);
-
 
 }

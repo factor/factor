@@ -26,7 +26,7 @@ s64 current_micros(void)
 	return (s64)t.tv_sec * 1000000 + t.tv_usec;
 }
 
-void sleep_micros(CELL usec)
+void sleep_micros(cell usec)
 {
 	usleep(usec);
 }
@@ -37,18 +37,18 @@ void init_ffi(void)
 	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
 }
 
-void ffi_dlopen(F_DLL *dll)
+void ffi_dlopen(dll *dll)
 {
 	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY);
 }
 
-void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol)
+void *ffi_dlsym(dll *dll, symbol_char *symbol)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
 	return dlsym(handle,symbol);
 }
 
-void ffi_dlclose(F_DLL *dll)
+void ffi_dlclose(dll *dll)
 {
 	if(dlclose(dll->dll))
 		general_error(ERROR_FFI,F,F,NULL);
@@ -58,11 +58,11 @@ void ffi_dlclose(F_DLL *dll)
 PRIMITIVE(existsp)
 {
 	struct stat sb;
-	char *path = (char *)(untag_check<F_BYTE_ARRAY>(dpop()) + 1);
+	char *path = (char *)(untag_check<byte_array>(dpop()) + 1);
 	box_boolean(stat(path,&sb) >= 0);
 }
 
-F_SEGMENT *alloc_segment(CELL size)
+segment *alloc_segment(cell size)
 {
 	int pagesize = getpagesize();
 
@@ -74,21 +74,21 @@ F_SEGMENT *alloc_segment(CELL size)
 		out_of_memory();
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
-		fatal_error("Cannot protect low guard page",(CELL)array);
+		fatal_error("Cannot protect low guard page",(cell)array);
 
 	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
-		fatal_error("Cannot protect high guard page",(CELL)array);
+		fatal_error("Cannot protect high guard page",(cell)array);
 
-	F_SEGMENT *retval = (F_SEGMENT *)safe_malloc(sizeof(F_SEGMENT));
+	segment *retval = (segment *)safe_malloc(sizeof(segment));
 
-	retval->start = (CELL)(array + pagesize);
+	retval->start = (cell)(array + pagesize);
 	retval->size = size;
 	retval->end = retval->start + size;
 
 	return retval;
 }
 
-void dealloc_segment(F_SEGMENT *block)
+void dealloc_segment(segment *block)
 {
 	int pagesize = getpagesize();
 
@@ -101,7 +101,7 @@ void dealloc_segment(F_SEGMENT *block)
 	free(block);
 }
   
-static F_STACK_FRAME *uap_stack_pointer(void *uap)
+static stack_frame *uap_stack_pointer(void *uap)
 {
 	/* There is a race condition here, but in practice a signal
 	delivered during stack frame setup/teardown or while transitioning
@@ -109,9 +109,9 @@ static F_STACK_FRAME *uap_stack_pointer(void *uap)
 	a divide by zero or stack underflow in the listener */
 	if(in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
 	{
-		F_STACK_FRAME *ptr = (F_STACK_FRAME *)ucontext_stack_pointer(uap);
+		stack_frame *ptr = (stack_frame *)ucontext_stack_pointer(uap);
 		if(!ptr)
-			critical_error("Invalid uap",(CELL)uap);
+			critical_error("Invalid uap",(cell)uap);
 		return ptr;
 	}
 	else
@@ -120,16 +120,16 @@ static F_STACK_FRAME *uap_stack_pointer(void *uap)
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	signal_fault_addr = (CELL)siginfo->si_addr;
+	signal_fault_addr = (cell)siginfo->si_addr;
 	signal_callstack_top = uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) = (CELL)memory_signal_handler_impl;
+	UAP_PROGRAM_COUNTER(uap) = (cell)memory_signal_handler_impl;
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	signal_number = signal;
 	signal_callstack_top = uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) = (CELL)misc_signal_handler_impl;
+	UAP_PROGRAM_COUNTER(uap) = (cell)misc_signal_handler_impl;
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)

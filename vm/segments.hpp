@@ -1,10 +1,10 @@
 namespace factor
 {
 
-struct F_SEGMENT {
-	CELL start;
-	CELL size;
-	CELL end;
+struct segment {
+	cell start;
+	cell size;
+	cell end;
 };
 
 }

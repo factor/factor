@@ -11,14 +11,14 @@ void init_profiler(void)
 }
 
 /* Allocates memory */
-F_CODE_BLOCK *compile_profiling_stub(CELL word_)
+code_block *compile_profiling_stub(cell word_)
 {
-	gc_root<F_WORD> word(word_);
+	gc_root<word> word(word_);
 
 	jit jit(WORD_TYPE,word.value());
 	jit.emit_with(userenv[JIT_PROFILING],word.value());
 
-	return jit.code_block();
+	return jit.to_code_block();
 }
 
 /* Allocates memory */
@@ -33,13 +33,13 @@ static void set_profiling(bool profiling)
 	and allocate profiling blocks if necessary */
 	gc();
 
-	gc_root<F_ARRAY> words(find_all_words());
+	gc_root<array> words(find_all_words());
 
-	CELL i;
-	CELL length = array_capacity(words.untagged());
+	cell i;
+	cell length = array_capacity(words.untagged());
 	for(i = 0; i < length; i++)
 	{
-		tagged<F_WORD> word(array_nth(words.untagged(),i));
+		tagged<word> word(array_nth(words.untagged(),i));
 		if(profiling)
 			word->counter = tag_fixnum(0);
 		update_word_xt(word.value());
