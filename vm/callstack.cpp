@@ -8,12 +8,6 @@ static void check_frame(F_STACK_FRAME *frame)
 #endif
 }
 
-/* called before entry into Factor code. */
-F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
-{
-	stack_chain->callstack_bottom = callstack_bottom;
-}
-
 void iterate_callstack(CELL top, CELL bottom, CALLSTACK_ITER iterator)
 {
 	F_STACK_FRAME *frame = (F_STACK_FRAME *)bottom - 1;
@@ -68,7 +62,7 @@ F_STACK_FRAME *capture_start(void)
 	return frame + 1;
 }
 
-void primitive_callstack(void)
+PRIMITIVE(callstack)
 {
 	F_STACK_FRAME *top = capture_start();
 	F_STACK_FRAME *bottom = stack_chain->callstack_bottom;
@@ -82,7 +76,7 @@ void primitive_callstack(void)
 	dpush(tag<F_CALLSTACK>(callstack));
 }
 
-void primitive_set_callstack(void)
+PRIMITIVE(set_callstack)
 {
 	F_CALLSTACK *stack = untag_check<F_CALLSTACK>(dpop());
 
@@ -161,7 +155,7 @@ void stack_frame_to_array(F_STACK_FRAME *frame)
 	set_array_nth(array,frame_index++,frame_scan(frame));
 }
 
-void primitive_callstack_to_array(void)
+PRIMITIVE(callstack_to_array)
 {
 	gc_root<F_CALLSTACK> callstack(dpop());
 
@@ -189,39 +183,43 @@ F_STACK_FRAME *innermost_stack_frame(F_CALLSTACK *callstack)
 	return frame;
 }
 
+F_STACK_FRAME *innermost_stack_frame_quot(F_CALLSTACK *callstack)
+{
+	F_STACK_FRAME *inner = innermost_stack_frame(callstack);
+	tagged<F_QUOTATION>(frame_executing(inner)).untag_check();
+	return inner;
+}
+
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
-void primitive_innermost_stack_frame_quot(void)
+PRIMITIVE(innermost_stack_frame_quot)
 {
-	F_STACK_FRAME *inner = innermost_stack_frame(
-		untag_check<F_CALLSTACK>(dpop()));
-	type_check(QUOTATION_TYPE,frame_executing(inner));
-
-	dpush(frame_executing(inner));
+	dpush(frame_executing(innermost_stack_frame_quot(untag_check<F_CALLSTACK>(dpop()))));
 }
 
-void primitive_innermost_stack_frame_scan(void)
+PRIMITIVE(innermost_stack_frame_scan)
 {
-	F_STACK_FRAME *inner = innermost_stack_frame(
-		untag_check<F_CALLSTACK>(dpop()));
-	type_check(QUOTATION_TYPE,frame_executing(inner));
-
-	dpush(frame_scan(inner));
+	dpush(frame_scan(innermost_stack_frame_quot(untag_check<F_CALLSTACK>(dpop()))));
 }
 
-void primitive_set_innermost_stack_frame_quot(void)
+PRIMITIVE(set_innermost_stack_frame_quot)
 {
 	gc_root<F_CALLSTACK> callstack(dpop());
 	gc_root<F_QUOTATION> quot(dpop());
 
+	callstack.untag_check();
+	quot.untag_check();
+
 	jit_compile(quot.value(),true);
 
-	F_STACK_FRAME *inner = innermost_stack_frame(callstack.untagged());
-	type_check(QUOTATION_TYPE,frame_executing(inner));
-
+	F_STACK_FRAME *inner = innermost_stack_frame_quot(callstack.untagged());
 	CELL offset = (char *)FRAME_RETURN_ADDRESS(inner) - (char *)inner->xt;
-
 	inner->xt = quot->xt;
-
 	FRAME_RETURN_ADDRESS(inner) = (char *)quot->xt + offset;
+}
+
+/* called before entry into Factor code. */
+VM_ASM_API void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
+{
+	stack_chain->callstack_bottom = callstack_bottom;
 }

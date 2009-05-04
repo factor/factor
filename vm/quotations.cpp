@@ -36,45 +36,45 @@ so this results in a big speedup for relatively little effort. */
 bool quotation_jit::primitive_call_p(CELL i)
 {
 	return (i + 2) == array_capacity(array.untagged())
-		&& type_of(array_nth(array.untagged(),i)) == FIXNUM_TYPE
+		&& tagged<F_OBJECT>(array_nth(array.untagged(),i)).type_p(FIXNUM_TYPE)
 		&& array_nth(array.untagged(),i + 1) == userenv[JIT_PRIMITIVE_WORD];
 }
 
 bool quotation_jit::fast_if_p(CELL i)
 {
 	return (i + 3) == array_capacity(array.untagged())
-		&& type_of(array_nth(array.untagged(),i)) == QUOTATION_TYPE
-		&& type_of(array_nth(array.untagged(),i + 1)) == QUOTATION_TYPE
+		&& tagged<F_OBJECT>(array_nth(array.untagged(),i)).type_p(QUOTATION_TYPE)
+		&& tagged<F_OBJECT>(array_nth(array.untagged(),i + 1)).type_p(QUOTATION_TYPE)
 		&& array_nth(array.untagged(),i + 2) == userenv[JIT_IF_WORD];
 }
 
 bool quotation_jit::fast_dip_p(CELL i)
 {
 	return (i + 2) <= array_capacity(array.untagged())
-		&& type_of(array_nth(array.untagged(),i)) == QUOTATION_TYPE
+		&& tagged<F_OBJECT>(array_nth(array.untagged(),i)).type_p(QUOTATION_TYPE)
 		&& array_nth(array.untagged(),i + 1) == userenv[JIT_DIP_WORD];
 }
 
 bool quotation_jit::fast_2dip_p(CELL i)
 {
 	return (i + 2) <= array_capacity(array.untagged())
-		&& type_of(array_nth(array.untagged(),i)) == QUOTATION_TYPE
+		&& tagged<F_OBJECT>(array_nth(array.untagged(),i)).type_p(QUOTATION_TYPE)
 		&& array_nth(array.untagged(),i + 1) == userenv[JIT_2DIP_WORD];
 }
 
 bool quotation_jit::fast_3dip_p(CELL i)
 {
 	return (i + 2) <= array_capacity(array.untagged())
-		&& type_of(array_nth(array.untagged(),i)) == QUOTATION_TYPE
+		&& tagged<F_OBJECT>(array_nth(array.untagged(),i)).type_p(QUOTATION_TYPE)
 		&& array_nth(array.untagged(),i + 1) == userenv[JIT_3DIP_WORD];
 }
 
 bool quotation_jit::mega_lookup_p(CELL i)
 {
 	return (i + 3) < array_capacity(array.untagged())
-		&& type_of(array_nth(array.untagged(),i)) == ARRAY_TYPE
-		&& type_of(array_nth(array.untagged(),i + 1)) == FIXNUM_TYPE
-		&& type_of(array_nth(array.untagged(),i + 2)) == ARRAY_TYPE
+		&& tagged<F_OBJECT>(array_nth(array.untagged(),i)).type_p(ARRAY_TYPE)
+		&& tagged<F_OBJECT>(array_nth(array.untagged(),i + 1)).type_p(FIXNUM_TYPE)
+		&& tagged<F_OBJECT>(array_nth(array.untagged(),i + 2)).type_p(ARRAY_TYPE)
 		&& array_nth(array.untagged(),i + 3) == userenv[MEGA_LOOKUP_WORD];
 }
 
@@ -86,15 +86,18 @@ bool quotation_jit::stack_frame_p()
 	for(i = 0; i < length - 1; i++)
 	{
 		CELL obj = array_nth(array.untagged(),i);
-		if(type_of(obj) == WORD_TYPE)
+		switch(tagged<F_OBJECT>(obj).type())
 		{
+		case WORD_TYPE:
 			if(untag<F_WORD>(obj)->subprimitive == F)
 				return true;
-		}
-		else if(type_of(obj) == QUOTATION_TYPE)
-		{
+			break;
+		case QUOTATION_TYPE:
 			if(fast_dip_p(i) || fast_2dip_p(i) || fast_3dip_p(i))
 				return true;
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -268,21 +271,13 @@ void jit_compile(CELL quot_, bool relocating)
 	if(relocating) relocate_code_block(compiled);
 }
 
-F_FASTCALL CELL lazy_jit_compile_impl(CELL quot_, F_STACK_FRAME *stack)
-{
-	gc_root<F_QUOTATION> quot(quot_);
-	stack_chain->callstack_top = stack;
-	jit_compile(quot.value(),true);
-	return quot.value();
-}
-
-void primitive_jit_compile(void)
+PRIMITIVE(jit_compile)
 {
 	jit_compile(dpop(),true);
 }
 
 /* push a new quotation on the stack */
-void primitive_array_to_quotation(void)
+PRIMITIVE(array_to_quotation)
 {
 	F_QUOTATION *quot = allot<F_QUOTATION>(sizeof(F_QUOTATION));
 	quot->array = dpeek();
@@ -293,7 +288,7 @@ void primitive_array_to_quotation(void)
 	drepl(tag<F_QUOTATION>(quot));
 }
 
-void primitive_quotation_xt(void)
+PRIMITIVE(quotation_xt)
 {
 	F_QUOTATION *quot = untag_check<F_QUOTATION>(dpeek());
 	drepl(allot_cell((CELL)quot->xt));
@@ -330,4 +325,12 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot_, CELL offset)
 	jit.iterate_quotation();
 
 	return jit.get_position();
+}
+
+VM_ASM_API CELL lazy_jit_compile_impl(CELL quot_, F_STACK_FRAME *stack)
+{
+	gc_root<F_QUOTATION> quot(quot_);
+	stack_chain->callstack_top = stack;
+	jit_compile(quot.value(),true);
+	return quot.value();
 }

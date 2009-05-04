@@ -1,6 +1,6 @@
 #include <amd64/signal.h>
 
-INLINE void *openbsd_stack_pointer(void *uap)
+inline static void *openbsd_stack_pointer(void *uap)
 {
 	struct sigcontext *sc = (struct sigcontext*) uap;
 	return (void *)sc->sc_rsp;

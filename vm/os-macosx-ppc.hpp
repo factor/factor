@@ -33,7 +33,7 @@ Modified for Factor by Slava Pestov */
 		MACH_PROGRAM_COUNTER(&(((ucontext_t *)(ucontext))->uc_mcontext->ss))
 #endif
 
-INLINE CELL fix_stack_pointer(CELL sp)
+inline static CELL fix_stack_pointer(CELL sp)
 {
 	return sp;
 }

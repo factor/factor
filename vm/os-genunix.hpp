@@ -1,4 +1,4 @@
-#define DLLEXPORT extern "C"
+#define VM_C_API extern "C"
 #define NULL_DLL NULL
 
 void c_to_factor_toplevel(CELL quot);

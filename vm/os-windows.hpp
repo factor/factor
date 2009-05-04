@@ -12,7 +12,7 @@ typedef wchar_t F_CHAR;
 #define STRING_LITERAL(string) L##string
 
 #define MAX_UNICODE_PATH 32768
-#define DLLEXPORT extern "C" __declspec(dllexport)
+#define VM_C_API extern "C" __declspec(dllexport)
 #define SSCANF swscanf
 #define STRCMP wcscmp
 #define STRNCMP wcsncmp
@@ -47,8 +47,8 @@ void ffi_dlclose(F_DLL *dll);
 
 void sleep_micros(u64 msec);
 
-INLINE void init_signals(void) {}
-INLINE void early_init(void) {}
+inline static void init_signals(void) {}
+inline static void early_init(void) {}
 const F_CHAR *vm_executable_path(void);
 const F_CHAR *default_image_path(void);
 long getpagesize (void);

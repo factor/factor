@@ -28,7 +28,7 @@ void io_error(void)
 	general_error(ERROR_IO,tag_fixnum(errno),F,NULL);
 }
 
-void primitive_fopen(void)
+PRIMITIVE(fopen)
 {
 	gc_root<F_BYTE_ARRAY> mode(dpop());
 	gc_root<F_BYTE_ARRAY> path(dpop());
@@ -49,7 +49,7 @@ void primitive_fopen(void)
 	}
 }
 
-void primitive_fgetc(void)
+PRIMITIVE(fgetc)
 {
 	FILE *file = (FILE *)unbox_alien();
 
@@ -74,7 +74,7 @@ void primitive_fgetc(void)
 	}
 }
 
-void primitive_fread(void)
+PRIMITIVE(fread)
 {
 	FILE *file = (FILE *)unbox_alien();
 	F_FIXNUM size = unbox_array_size();
@@ -114,7 +114,7 @@ void primitive_fread(void)
 	}
 }
 
-void primitive_fputc(void)
+PRIMITIVE(fputc)
 {
 	FILE *file = (FILE *)unbox_alien();
 	F_FIXNUM ch = to_fixnum(dpop());
@@ -132,7 +132,7 @@ void primitive_fputc(void)
 	}
 }
 
-void primitive_fwrite(void)
+PRIMITIVE(fwrite)
 {
 	FILE *file = (FILE *)unbox_alien();
 	F_BYTE_ARRAY *text = untag_check<F_BYTE_ARRAY>(dpop());
@@ -161,7 +161,7 @@ void primitive_fwrite(void)
 	}
 }
 
-void primitive_fseek(void)
+PRIMITIVE(fseek)
 {
 	int whence = to_fixnum(dpop());
 	FILE *file = (FILE *)unbox_alien();
@@ -186,7 +186,7 @@ void primitive_fseek(void)
 	}
 }
 
-void primitive_fflush(void)
+PRIMITIVE(fflush)
 {
 	FILE *file = (FILE *)unbox_alien();
 	for(;;)
@@ -198,7 +198,7 @@ void primitive_fflush(void)
 	}
 }
 
-void primitive_fclose(void)
+PRIMITIVE(fclose)
 {
 	FILE *file = (FILE *)unbox_alien();
 	for(;;)
@@ -213,12 +213,12 @@ void primitive_fclose(void)
 /* This function is used by FFI I/O. Accessing the errno global directly is
 not portable, since on some libc's errno is not a global but a funky macro that
 reads thread-local storage. */
-int err_no(void)
+VM_C_API int err_no(void)
 {
 	return errno;
 }
 
-void clear_err_no(void)
+VM_C_API void clear_err_no(void)
 {
 	errno = 0;
 }

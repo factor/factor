@@ -64,8 +64,8 @@ typedef F_FIXNUM bignum_length_type;
 
 #define BIGNUM_LENGTH(bignum) (untag_fixnum((bignum)->capacity) - 1)
 
-#define BIGNUM_NEGATIVE_P(bignum) (get(AREF(bignum,0)) != 0)
-#define BIGNUM_SET_NEGATIVE_P(bignum,neg) put(AREF(bignum,0),neg)
+#define BIGNUM_NEGATIVE_P(bignum) (bignum->data()[0] != 0)
+#define BIGNUM_SET_NEGATIVE_P(bignum,neg) (bignum->data()[0] = neg)
 
 #define BIGNUM_ZERO_P(bignum)						\
   ((BIGNUM_LENGTH (bignum)) == 0)

@@ -88,9 +88,9 @@ const F_CHAR *vm_executable_path(void)
 }
 
 
-void primitive_existsp(void)
+PRIMITIVE(existsp)
 {
-	F_CHAR *path = (F_CHAR *)(untag_byte_array(dpop()) + 1);
+	F_CHAR *path = (F_CHAR *)(untag_check<F_BYTE_ARRAY>(dpop()) + 1);
 	box_boolean(windows_stat(path));
 }
 

@@ -36,6 +36,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/code_block.o \
 	vm/code_gc.o \
 	vm/code_heap.o \
+	vm/contexts.o \
 	vm/data_gc.o \
 	vm/data_heap.o \
 	vm/debug.o \
@@ -177,7 +178,10 @@ $(TEST_LIBRARY): vm/ffi_test.o
 
 clean:
 	rm -f vm/*.o
-	rm -f factor*.dll libfactor.{a,so,dylib} libfactor-ffi-test.{a,so,dylib} Factor.app/Contents/Frameworks/libfactor.dylib
+	rm -f factor.dll
+	rm -f libfactor.*
+	rm -f libfactor-ffi-test.*
+	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
 tags:
 	etags vm/*.{cpp,hpp,mm,S,c}

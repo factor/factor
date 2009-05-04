@@ -2,9 +2,9 @@
 
 #define FRAME_RETURN_ADDRESS(frame) *(XT *)(frame_successor(frame) + 1)
 
-INLINE void flush_icache(CELL start, CELL len) {}
+inline static void flush_icache(CELL start, CELL len) {}
 
-INLINE void check_call_site(CELL return_address)
+inline static void check_call_site(CELL return_address)
 {
 	/* An x86 CALL instruction looks like so:
 	   |e8|..|..|..|..|
@@ -16,30 +16,24 @@ INLINE void check_call_site(CELL return_address)
 #endif
 }
 
-INLINE CELL get_call_target(CELL return_address)
+inline static CELL get_call_target(CELL return_address)
 {
 	check_call_site(return_address);
 	return *(int *)(return_address - 4) + return_address;
 }
 
-INLINE void set_call_target(CELL return_address, CELL target)
+inline static void set_call_target(CELL return_address, CELL target)
 {
 	check_call_site(return_address);
 	*(int *)(return_address - 4) = (target - return_address);
 }
 
 /* Defined in assembly */
-extern "C" void primitive_fixnum_add(void);
-extern "C" void primitive_fixnum_subtract(void);
-extern "C" void primitive_fixnum_multiply(void);
+VM_ASM_API void c_to_factor(CELL quot);
+VM_ASM_API void throw_impl(CELL quot, F_STACK_FRAME *rewind_to);
+VM_ASM_API void lazy_jit_compile(CELL quot);
 
-F_FASTCALL void c_to_factor(CELL quot);
-F_FASTCALL void throw_impl(CELL quot, F_STACK_FRAME *rewind_to);
-F_FASTCALL void lazy_jit_compile(CELL quot);
-
-extern "C" void set_callstack(F_STACK_FRAME *to,
+VM_C_API void set_callstack(F_STACK_FRAME *to,
 			      F_STACK_FRAME *from,
 			      CELL length,
 			      void *(*memcpy)(void*,const void*, size_t));
-
-extern "C" void primitive_inline_cache_miss(void);

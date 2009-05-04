@@ -1,5 +1,3 @@
-#define INLINE inline static
-
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -18,6 +16,14 @@ typedef signed long long s64;
 #endif
 
 #define CELLS ((signed)sizeof(CELL))
+
+inline static CELL align(CELL a, CELL b)
+{
+	return (a + (b-1)) & ~(b-1);
+}
+
+#define align8(a) align(a,8)
+#define align_page(a) align(a,getpagesize())
 
 #define WORD_SIZE (CELLS*8)
 #define HALF_WORD_SIZE (CELLS*4)
@@ -38,9 +44,6 @@ typedef signed long long s64;
 #define F_TYPE 5
 #define OBJECT_TYPE 6
 #define TUPLE_TYPE 7
-
-#define HI_TAG_OR_TUPLE_P(cell) (((CELL)(cell) & 6) == 6)
-#define HI_TAG_HEADER(cell) (((CELL)(cell) & 1) * CELLS + UNTAG(cell))
 
 /* Canonical F object */
 #define F F_TYPE
@@ -63,12 +66,12 @@ typedef signed long long s64;
 /* Not a real type, but F_CODE_BLOCK's type field can be set to this */
 #define PIC_TYPE 69
 
-INLINE bool immediate_p(CELL obj)
+inline static bool immediate_p(CELL obj)
 {
 	return (obj == F || TAG(obj) == FIXNUM_TYPE);
 }
 
-INLINE F_FIXNUM untag_fixnum(CELL tagged)
+inline static F_FIXNUM untag_fixnum(CELL tagged)
 {
 #ifdef FACTOR_DEBUG
 	assert(TAG(tagged) == FIXNUM_TYPE);
@@ -76,18 +79,59 @@ INLINE F_FIXNUM untag_fixnum(CELL tagged)
 	return ((F_FIXNUM)tagged) >> TAG_BITS;
 }
 
-INLINE CELL tag_fixnum(F_FIXNUM untagged)
+inline static CELL tag_fixnum(F_FIXNUM untagged)
 {
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
 }
 
+inline static CELL tag_for(CELL type)
+{
+	return type < HEADER_TYPE ? type : OBJECT_TYPE;
+}
+
 typedef void *XT;
+
+class F_OBJECT;
+
+struct F_HEADER {
+	CELL header;
+
+	F_HEADER(CELL header_) : header(header_ << TAG_BITS) {}
+
+	void check_header() {
+#ifdef FACTOR_DEBUG
+		assert(TAG(header) == FIXNUM_TYPE && untag_fixnum(header) < TYPE_COUNT);
+#endif
+	}
+
+	CELL hi_tag() {
+		check_header();
+		return header >> TAG_BITS;
+	}
+
+	void set(CELL header_) {
+		header = header_ << TAG_BITS;
+	}
+
+	bool forwarding_pointer_p() {
+		return TAG(header) == GC_COLLECTED;
+	}
+
+	F_OBJECT *forwarding_pointer() {
+		return (F_OBJECT *)UNTAG(header);
+	}
+
+	void forward_to(F_OBJECT *pointer) {
+		header = RETAG(pointer,GC_COLLECTED);
+	}
+};
 
 #define NO_TYPE_CHECK static const CELL type_number = TYPE_COUNT
 
 struct F_OBJECT {
 	NO_TYPE_CHECK;
-	CELL header;
+	F_HEADER header;
+	CELL *slots() { return (CELL *)this; }
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -96,6 +140,8 @@ struct F_ARRAY : public F_OBJECT {
 	static const CELL element_size = CELLS;
 	/* tagged */
 	CELL capacity;
+
+	CELL *data() { return (CELL *)(this + 1); }
 };
 
 /* These are really just arrays, but certain elements have special
@@ -115,6 +161,8 @@ struct F_BIGNUM : public F_OBJECT {
 	static const CELL element_size = CELLS;
 	/* tagged */
 	CELL capacity;
+
+	CELL *data() { return (CELL *)(this + 1); }
 };
 
 struct F_BYTE_ARRAY : public F_OBJECT {
@@ -122,6 +170,8 @@ struct F_BYTE_ARRAY : public F_OBJECT {
 	static const CELL element_size = 1;
 	/* tagged */
 	CELL capacity;
+
+	template<typename T> T *data() { return (T *)(this + 1); }
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -133,6 +183,8 @@ struct F_STRING : public F_OBJECT {
 	CELL aux;
 	/* tagged */
 	CELL hashcode;
+
+	u8 *data() { return (u8 *)(this + 1); }
 };
 
 /* The compiled code heap is structured into blocks. */
@@ -206,14 +258,13 @@ struct F_WRAPPER : public F_OBJECT {
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
-struct F_FLOAT {
-/* We use a union here to force the float value to be aligned on an
-8-byte boundary. */
+struct F_FLOAT : F_OBJECT {
 	static const CELL type_number = FLOAT_TYPE;
-	union {
-		CELL header;
-		long long padding;
-	};
+
+#ifndef FACTOR_64
+	CELL padding;
+#endif
+
 	double n;
 };
 
@@ -270,4 +321,6 @@ struct F_TUPLE : public F_OBJECT {
 	static const CELL type_number = TUPLE_TYPE;
 	/* tagged layout */
 	CELL layout;
+
+	CELL *data() { return (CELL *)(this + 1); }
 };

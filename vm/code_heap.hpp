@@ -13,13 +13,13 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter);
 
 void copy_code_heap_roots(void);
 
-void primitive_modify_code_heap(void);
+PRIMITIVE(modify_code_heap);
 
-void primitive_code_room(void);
+PRIMITIVE(code_room);
 
 void compact_code_heap(void);
 
-INLINE void check_code_pointer(CELL pointer)
+inline static void check_code_pointer(CELL pointer)
 {
 #ifdef FACTOR_DEBUG
 	assert(pointer >= code_heap.segment->start && pointer < code_heap.segment->end);
