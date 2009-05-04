@@ -36,9 +36,6 @@ M: #push unbox-tuples* ( #push -- nodes )
 : unbox-<tuple-boa> ( #call -- nodes )
     dup unbox-output? [ in-d>> 1 tail* #drop ] when ;
 
-: unbox-<complex> ( #call -- nodes )
-    dup unbox-output? [ drop { } ] when ;
-
 : (flatten-values) ( values accum -- )
     dup '[
         dup unboxed-allocation
@@ -70,7 +67,6 @@ M: #push unbox-tuples* ( #push -- nodes )
 M: #call unbox-tuples*
     dup word>> {
         { \ <tuple-boa> [ unbox-<tuple-boa> ] }
-        { \ <complex> [ unbox-<complex> ] }
         { \ slot [ unbox-slot-access ] }
         [ drop ]
     } case ;

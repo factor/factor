@@ -1,5 +1,5 @@
 USING: definitions help.markup help.syntax kernel parser
-kernel.private words.private vocabs classes quotations
+kernel.private vocabs classes quotations
 strings effects compiler.units ;
 IN: words
 
@@ -21,8 +21,8 @@ $nl
 { $subsection gensym }
 { $subsection define-temp } ;
 
-ARTICLE: "colon-definition" "Word definitions"
-"Every word has an associated quotation definition that is called when the word is executed."
+ARTICLE: "colon-definition" "Colon definitions"
+"Every word has an associated quotation definition that is called when the word is executed. A " { $emphasis "colon definition" } " is a word where this quotation is supplied directly by the user. This is the simplest and most common type of word definition."
 $nl
 "Defining words at parse time:"
 { $subsection POSTPONE: : }
@@ -31,7 +31,7 @@ $nl
 { $subsection define }
 { $subsection define-declared }
 { $subsection define-inline }
-"Word definitions should declare their stack effect, unless the definition is completely trivial. See " { $link "effect-declaration" } "."
+"Word definitions must declare their stack effect. See " { $link "effects" } "."
 $nl
 "All other types of word definitions, such as " { $link "words.symbol" } " and " { $link "generic" } ", are just special cases of the above." ;
 
@@ -56,29 +56,16 @@ $nl
     ": foo undefined ;"
 } ;
 
-ARTICLE: "declarations" "Declarations"
-"Declarations are parsing words that set a word property in the most recently defined word. Declarations only affect definitions compiled with the optimizing compiler. They do not change evaluation semantics of a word, but instead declare that the word follows a certain contract, and thus may be compiled differently."
+ARTICLE: "declarations" "Compiler declarations"
+"Compiler declarations are parsing words that set a word property in the most recently defined word. They appear after the final " { $link POSTPONE: ; } " of a word definition:"
+{ $code ": cubed ( x -- y ) dup dup * * ; foldable" }
+"Compiler declarations assert that the word follows a certain contract, enabling certain optimizations that are not valid in general."
 { $subsection POSTPONE: inline }
 { $subsection POSTPONE: foldable }
 { $subsection POSTPONE: flushable }
 { $subsection POSTPONE: recursive }
-{ $warning "If a generic word is declared " { $link POSTPONE: foldable } " or " { $link POSTPONE: flushable } ", all methods must satisfy the contract, otherwise unpredicable behavior will occur." }
-"Stack effect declarations are documented in " { $link "effect-declaration" } "." ;
-
-ARTICLE: "word-definition" "Defining words"
-"There are two approaches to creating word definitions:"
-{ $list
-    "using parsing words at parse time,"
-    "using defining words at run time."
-}
-"The latter is a more dynamic feature that can be used to implement code generation and such, and in fact parse time defining words are implemented in terms of run time defining words."
-{ $subsection "colon-definition" }
-{ $subsection "words.symbol" }
-{ $subsection "words.alias" }
-{ $subsection "primitives" }
-{ $subsection "deferred" }
-{ $subsection "declarations" }
-"Words implement the definition protocol; see " { $link "definitions" } "." ;
+"It is entirely up to the programmer to ensure that the word satisfies the contract of a declaration. Furthermore, if a generic word is declared " { $link POSTPONE: foldable } " or " { $link POSTPONE: flushable } ", all methods must satisfy the contract. Unspecified behavior may result if a word does not follow the contract of one of its declarations."
+{ $see-also "effects" } ;
 
 ARTICLE: "word-props" "Word properties"
 "Each word has a hashtable of properties."
@@ -99,13 +86,9 @@ $nl
     
     { { { $snippet "\"reading\"" } ", " { $snippet "\"writing\"" } } { "Set on slot accessor words - " { $link "slots" } } }
 
-    { { $snippet "\"declared-effect\"" } { $link "effect-declaration" } }
+    { { $snippet "\"declared-effect\"" } { $link "effects" } }
     
     { { { $snippet "\"help\"" } ", " { $snippet "\"help-loc\"" } ", " { $snippet "\"help-parent\"" } } { "Where word help is stored - " { $link "writing-help" } } }
-
-    { { $snippet "\"infer\"" } { $link "macros" } }
-
-    { { { $snippet "\"inferred-effect\"" } } { $link "inference" } }
 
     { { $snippet "\"specializer\"" } { $link "hints" } }
     
@@ -137,9 +120,7 @@ $nl
 "An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
 { $subsection word-xt } ;
 
-ARTICLE: "words" "Words"
-"Words are the Factor equivalent of functions or procedures; a word is essentially a named quotation."
-$nl
+ARTICLE: "words.introspection" "Word introspection"
 "Word introspection facilities and implementation details are found in the " { $vocab-link "words" } " vocabulary."
 $nl
 "Word objects contain several slots:"
@@ -152,21 +133,35 @@ $nl
 "Words are instances of a class."
 { $subsection word }
 { $subsection word? }
+"Words implement the definition protocol; see " { $link "definitions" } "."
 { $subsection "interned-words" }
 { $subsection "uninterned-words" }
-{ $subsection "word-definition" }
 { $subsection "word-props" }
-{ $subsection "word.private" }
+{ $subsection "word.private" } ;
+
+ARTICLE: "words" "Words"
+"Words are the Factor equivalent of functions or procedures; a word is essentially a named quotation."
+$nl
+"There are two ways of creating word definitions:"
+{ $list
+    "using parsing words at parse time,"
+    "using defining words at run time."
+}
+"The latter is a more dynamic feature that can be used to implement code generation and such, and in fact parse time defining words are implemented in terms of run time defining words."
+$nl
+"Types of words:"
+{ $subsection "colon-definition" }
+{ $subsection "words.symbol" }
+{ $subsection "words.alias" }
+{ $subsection "words.constant" }
+{ $subsection "primitives" }
+"Advanced topics:"
+{ $subsection "deferred" }
+{ $subsection "declarations" }
+{ $subsection "words.introspection" }
 { $see-also "vocabularies" "vocabs.loader" "definitions" "see" } ;
 
 ABOUT: "words"
-
-HELP: execute ( word -- )
-{ $values { "word" word } }
-{ $description "Executes a word." }
-{ $examples
-    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ;\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
-} ;
 
 HELP: deferred
 { $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;
@@ -292,10 +287,6 @@ HELP: define-temp
     { $code "[ 2 2 + . ] (( -- )) define-temp execute" }
     "This word must be called from inside " { $link with-compilation-unit } "."
 } ;
-
-HELP: quot-uses
-{ $values { "quot" quotation } { "assoc" "an assoc with words as keys" } }
-{ $description "Outputs a set of words referenced by the quotation and any quotations it contains." } ;
 
 HELP: delimiter?
 { $values { "obj" object } { "?" "a boolean" } }

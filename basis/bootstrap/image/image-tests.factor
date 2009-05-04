@@ -2,9 +2,6 @@ IN: bootstrap.image.tests
 USING: bootstrap.image bootstrap.image.private tools.test
 kernel math ;
 
-\ ' must-infer
-\ write-image must-infer
-
 [ f ] [ { 1 2 3 } [ 1 2 3 ] eql? ] unit-test
 
 [ t ] [ [ 1 2 3 ] [ 1 2 3 ] eql? ] unit-test

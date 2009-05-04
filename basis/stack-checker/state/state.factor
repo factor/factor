@@ -64,6 +64,3 @@ SYMBOL: generic-dependencies
 : depends-on-generic ( generic class -- )
     generic-dependencies get dup
     [ swap '[ _ ?class-or ] change-at ] [ 3drop ] if ;
-
-! Words we've inferred the stack effect of, for rollback
-SYMBOL: recorded

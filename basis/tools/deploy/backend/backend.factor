@@ -3,12 +3,11 @@
 USING: namespaces make continuations.private kernel.private init
 assocs kernel vocabs words sequences memory io system arrays
 continuations math definitions mirrors splitting parser classes
-summary layouts vocabs.loader prettyprint.config prettyprint
-debugger io.streams.c io.files io.files.temp io.pathnames
-io.directories io.directories.hierarchy io.backend quotations
-io.launcher words.private tools.deploy.config
-tools.deploy.config.editor bootstrap.image io.encodings.utf8
-destructors accessors ;
+summary layouts vocabs.loader prettyprint.config prettyprint debugger
+io.streams.c io.files io.files.temp io.pathnames io.directories
+io.directories.hierarchy io.backend quotations io.launcher
+tools.deploy.config tools.deploy.config.editor bootstrap.image
+io.encodings.utf8 destructors accessors hashtables ;
 IN: tools.deploy.backend
 
 : copy-vm ( executable bundle-name -- vm )
@@ -88,7 +87,7 @@ DEFER: ?make-staging-image
     [ drop ] [ make-staging-image ] if ;
 
 : make-deploy-config ( vocab -- file )
-    [ deploy-config unparse-use ]
+    [ deploy-config vocab-roots get vocab-roots associate assoc-union unparse-use ]
     [ "deploy-config-" prepend temp-file ] bi
     [ utf8 set-file-contents ] keep ;
 

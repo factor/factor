@@ -4,7 +4,7 @@ USING: accessors init namespaces words words.symbol io
 kernel.private math memory continuations kernel io.files
 io.pathnames io.backend system parser vocabs sequences
 vocabs.loader combinators splitting source-files strings
-definitions assocs compiler.errors compiler.units math.parser
+definitions assocs compiler.units math.parser
 generic sets command-line ;
 IN: bootstrap.stage2
 
@@ -15,13 +15,6 @@ SYMBOL: bootstrap-time
 : default-image-name ( -- string )
     vm file-name os windows? [ "." split1-last drop ] when
     ".image" append resource-path ;
-
-: do-crossref ( -- )
-    "Cross-referencing..." print flush
-    H{ } clone crossref set-global
-    xref-words
-    xref-generics
-    xref-sources ;
 
 : load-components ( -- )
     "include" "exclude"
@@ -42,13 +35,16 @@ SYMBOL: bootstrap-time
     "Core bootstrap completed in " write core-bootstrap-time get print-time
     "Bootstrap completed in "      write bootstrap-time      get print-time
 
-    [ optimized>> ] count-words " compiled words" print
-    [ symbol? ] count-words " symbol words" print
-    [ ] count-words " words total" print
-
     "Bootstrapping is complete." print
     "Now, you can run Factor:" print
     vm write " -i=" write "output-image" get print flush ;
+
+: save/restore-error ( quot -- )
+    error get-global
+    error-continuation get-global
+    [ call ] 2dip
+    error-continuation set-global
+    error set-global ; inline
 
 [
     ! We time bootstrap
@@ -61,8 +57,6 @@ SYMBOL: bootstrap-time
 
     (command-line) parse-command-line
 
-    do-crossref
-
     ! Set dll paths
     os wince? [ "windows.ce" require ] when
     os winnt? [ "windows.nt" require ] when
@@ -70,18 +64,18 @@ SYMBOL: bootstrap-time
     "staging" get "deploy-vocab" get or [
         "stage2: deployment mode" print
     ] [
+        "debugger" require
+        "inspector" require
+        "tools.errors" require
         "listener" require
         "none" require
     ] if
 
-    [
-        load-components
+    load-components
 
-        millis over - core-bootstrap-time set-global
+    millis over - core-bootstrap-time set-global
 
-        run-bootstrap-init
-    ] with-compiler-errors
-    :errors
+    run-bootstrap-init
 
     f error set-global
     f error-continuation set-global
@@ -104,6 +98,7 @@ SYMBOL: bootstrap-time
     drop
     [
         load-help? off
-        "vocab:bootstrap/bootstrap-error.factor" run-file
+        [ "vocab:bootstrap/bootstrap-error.factor" parse-file ] save/restore-error
+        call
     ] with-scope
 ] recover

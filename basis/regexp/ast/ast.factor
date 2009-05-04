@@ -21,12 +21,12 @@ CONSTANT: epsilon T{ tagged-epsilon { tag t } }
 TUPLE: concatenation first second ;
 
 : <concatenation> ( seq -- concatenation )
-    [ epsilon ] [ unclip [ concatenation boa ] reduce ] if-empty ;
+    [ epsilon ] [ [ ] [ concatenation boa ] map-reduce ] if-empty ;
 
 TUPLE: alternation first second ;
 
 : <alternation> ( seq -- alternation )
-    unclip [ alternation boa ] reduce ;
+    [ ] [ alternation boa ] map-reduce ;
 
 TUPLE: star term ;
 C: <star> star

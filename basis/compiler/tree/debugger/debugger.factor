@@ -130,8 +130,6 @@ M: node node>quot drop ;
 
 GENERIC: optimized. ( quot/word -- )
 
-M: method-spec optimized. first2 method optimized. ;
-
 M: word optimized. specialized-def optimized. ;
 
 M: callable optimized. build-tree optimize-tree nodes>quot . ;
@@ -144,8 +142,7 @@ SYMBOL: node-count
 
 : make-report ( word/quot -- assoc )
     [
-        dup word? [ build-tree-from-word ] [ build-tree ] if
-        optimize-tree
+        build-tree optimize-tree
 
         H{ } clone words-called set
         H{ } clone generics-called set
@@ -156,7 +153,7 @@ SYMBOL: node-count
             [ 1+ ] dip
             dup #call? [
                 word>> {
-                    { [ dup "intrinsics" word-prop over "if-intrinsics" word-prop or ] [ intrinsics-called ] }
+                    { [ dup "intrinsic" word-prop ] [ intrinsics-called ] }
                     { [ dup generic? ] [ generics-called ] }
                     { [ dup method-body? ] [ methods-called ] }
                     [ words-called ]

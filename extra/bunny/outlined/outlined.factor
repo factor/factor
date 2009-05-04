@@ -216,7 +216,11 @@ MACRO: (framebuffer-texture>>draw) ( iformat xformat setter -- )
     ] with-framebuffer ;
 
 : (pass2) ( draw -- )
-    init-matrices {
+    GL_PROJECTION glMatrixMode
+    glPushMatrix glLoadIdentity
+    GL_MODELVIEW glMatrixMode
+    glLoadIdentity
+    {
         [ color-texture>>  GL_TEXTURE_2D GL_TEXTURE0 bind-texture-unit ]
         [ normal-texture>> GL_TEXTURE_2D GL_TEXTURE1 bind-texture-unit ]
         [ depth-texture>>  GL_TEXTURE_2D GL_TEXTURE2 bind-texture-unit ]
@@ -230,7 +234,9 @@ MACRO: (framebuffer-texture>>draw) ( iformat xformat setter -- )
                 } cleave { -1.0 -1.0 } { 1.0 1.0 } rect-vertices
             ] with-gl-program
         ]
-    } cleave ;
+    } cleave
+    GL_PROJECTION glMatrixMode
+    glPopMatrix ;
 
 M: bunny-outlined draw-bunny
     [ remake-framebuffer-if-needed ]

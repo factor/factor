@@ -1,7 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien assocs io.backend kernel namespaces ;
+USING: accessors alien alien.strings assocs io.backend kernel namespaces ;
 IN: alien.libraries
+
+: dlopen ( path -- dll ) native-string>alien (dlopen) ;
+
+: dlsym ( name dll -- alien ) [ native-string>alien ] dip (dlsym) ;
 
 SYMBOL: libraries
 

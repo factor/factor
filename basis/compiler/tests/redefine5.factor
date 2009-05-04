@@ -1,6 +1,6 @@
 USING: eval tools.test compiler.units vocabs multiline words
 kernel ;
-IN: compiler.tests
+IN: compiler.tests.redefine5
 
 ! Regression: if dispatch was eliminated but method was not inlined,
 ! compiled usage information was not recorded.
@@ -14,7 +14,7 @@ IN: compiler.tests
     GENERIC: my-generic ( a -- b )
     M: object my-generic [ <=> ] sort ;
     : my-inline ( a -- b ) my-generic ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ ] [
@@ -23,7 +23,7 @@ IN: compiler.tests
     IN: compiler.tests.redefine5
     TUPLE: my-tuple ;
     M: my-tuple my-generic drop 0 ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ 0 ] [

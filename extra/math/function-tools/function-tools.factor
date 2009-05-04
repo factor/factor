@@ -9,10 +9,10 @@ IN: math.function-tools
     [ bi - ] 2curry ; inline
 
 : eval ( x func -- pt )
-    dupd call 2array ; inline
+    dupd call( x -- y ) 2array ; inline
 
 : eval-inverse ( y func -- pt )
-    dupd call swap 2array ; inline
+    dupd call( y -- x ) swap 2array ; inline
 
 : eval3d ( x y func -- pt )
-    [ 2dup ] dip call 3array ; inline
+    [ 2dup ] dip call( x y -- z ) 3array ; inline

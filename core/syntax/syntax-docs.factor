@@ -1,7 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes generic.standard classes.tuple generic.math
-generic.standard arrays io.pathnames vocabs.loader io sequences
-assocs words.symbol words.alias words.constant ;
+generic.standard generic.single arrays io.pathnames vocabs.loader io
+sequences assocs words.symbol words.alias words.constant combinators ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -65,6 +65,12 @@ ARTICLE: "syntax-floats" "Float syntax"
     "-3.1456"
     "7.e13"
     "1.0e-5"
+}
+"There are three special float values:"
+{ $table
+{ "Positive infinity" { $snippet "1/0." } }
+{ "Negative infinity" { $snippet "-1/0." } }
+{ "Not-a-number" { $snippet "0/0." } }
 }
 "More information on floats can be found in " { $link "floats" } "." ;
 
@@ -146,6 +152,11 @@ ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
 "Pathnames are documented in " { $link "io.pathnames" } "." ;
 
+ARTICLE: "syntax-effects" "Stack effect syntax"
+"Note that this is " { $emphasis "not" } " syntax to declare stack effects of words. This pushes an " { $link effect } " instance on the stack for reflection, for use with words such as " { $link define-declared } ", " { $link call-effect } " and " { $link execute-effect } "."
+{ $subsection POSTPONE: (( }
+{ $see-also "effects" "inference" "tools.inference" } ;
+
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."
 $nl
@@ -162,11 +173,14 @@ $nl
 { $subsection "syntax-sbufs" }
 { $subsection "syntax-hashtables" }
 { $subsection "syntax-tuples" }
-{ $subsection "syntax-pathnames" } ;
+{ $subsection "syntax-pathnames" }
+{ $subsection "syntax-effects" } ;
 
 ARTICLE: "syntax" "Syntax"
 "Factor has two main forms of syntax: " { $emphasis "definition" } " syntax and " { $emphasis "literal" } " syntax. Code is data, so the syntax for code is a special case of object literal syntax. This section documents literal syntax. Definition syntax is covered in " { $link "words" } ". Extending the parser is the main topic of " { $link "parser" } "."
 { $subsection "parser-algorithm" }
+{ $subsection "vocabulary-search" }
+{ $subsection "top-level-forms" }
 { $subsection "syntax-comments" }
 { $subsection "syntax-literals" }
 { $subsection "syntax-immediate" } ;
@@ -509,7 +523,7 @@ HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
 { $description "A stack effect declaration. This is treated as a comment unless it appears inside a word definition." }
-{ $see-also "effect-declaration" } ;
+{ $see-also "effects" } ;
 
 HELP: ((
 { $syntax "(( inputs -- outputs ))" }
@@ -517,11 +531,19 @@ HELP: ((
 { $description "Literal stack effect syntax." }
 { $notes "Useful for meta-programming with " { $link define-declared } "." }
 { $examples
-    { $code
+    { $example
+        "USING: compiler.units kernel math prettyprint random words ;"
+        "IN: scratchpad"
+        ""
         "SYMBOL: my-dynamic-word"
-        "USING: math random words ;"
-        "3 { [ + ] [ - ] [ * ] [ / ] } random curry"
-        "(( x -- y )) define-declared"
+        ""
+        "["
+        "    my-dynamic-word 2 { [ + ] [ * ] } random curry"
+        "    (( x -- y )) define-declared"
+        "] with-compilation-unit"
+        ""
+        "2 my-dynamic-word ."
+        "4"
     }
 } ;
 
@@ -727,7 +749,7 @@ HELP: <PRIVATE
         "<PRIVATE"
         ""
         ": (fac) ( accum n -- n! )"
-        "    dup 1 <= [ drop ] [ [ * ] keep 1- (fac) ] if ;"
+        "    dup 1 <= [ drop ] [ [ * ] keep 1 - (fac) ] if ;"
         ""
         "PRIVATE>"
         ""
@@ -738,7 +760,7 @@ HELP: <PRIVATE
         "IN: factorial.private"
         ""
         ": (fac) ( accum n -- n! )"
-        "    dup 1 <= [ drop ] [ [ * ] keep 1- (fac) ] if ;"
+        "    dup 1 <= [ drop ] [ [ * ] keep 1 - (fac) ] if ;"
         ""
         "IN: factorial"
         ""
@@ -762,7 +784,9 @@ HELP: >>
 { $description "Marks the end of a parse time code block." } ;
 
 HELP: call-next-method
+{ $syntax "call-next-method" }
 { $description "Calls the next applicable method. Only valid inside a method definition. The values at the top of the stack are passed on to the next method, and they must be compatible with that method's class specializer." }
+{ $notes "This word looks like an ordinary word but it is a parsing word. It cannot be factored out of a method definition, since the code expansion references the current method object directly." }
 { $errors
     "Throws a " { $link no-next-method } " error if this is the least specific method, and throws an " { $link inconsistent-next-method } " error if the values at the top of the stack are not compatible with the current method's specializer."
 } ;
@@ -773,7 +797,14 @@ HELP: call-next-method
 
 HELP: call(
 { $syntax "call( stack -- effect )" }
-{ $description "Calls the quotation on the top of the stack, asserting that it has the given stack effect. The quotation does not need to be known at compile time." } ;
+{ $description "Calls the quotation on the top of the stack, asserting that it has the given stack effect. The quotation does not need to be known at compile time." }
+{ $examples
+  { $code
+    "TUPLE: action name quot ;"
+    ": perform-action ( action -- )"
+    "    [ name>> print ] [ quot>> call( -- ) ] bi ;"
+  }
+} ;
 
 HELP: execute(
 { $syntax "execute( stack -- effect )" }

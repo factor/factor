@@ -112,7 +112,15 @@ HELP: MEMO::
 { $description "Defines a memoized word with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope." } ;
 
 { POSTPONE: MEMO: POSTPONE: MEMO:: } related-words
+                                          
+HELP: M::
+{ $syntax "M:: class generic ( bindings... -- outputs... ) body... ;" }
+{ $description "Defines a method with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope." }
+{ $notes "The output names do not affect the word's behavior, however the compiler attempts to check the stack effect as with other definitions." } ;
 
+{ POSTPONE: M: POSTPONE: M:: } related-words
+
+                                                 
 ARTICLE: "locals-literals" "Locals in literals"
 "Certain data type literals are permitted to contain free variables. Any such literals are written into code which constructs an instance of the type with the free variable values spliced in. Conceptually, this is similar to the transformation applied to quotations containing free variables."
 $nl
@@ -237,13 +245,14 @@ $nl
 }
 "The reason is that locals are rewritten into stack code at parse time, whereas macro expansion is performed later during compile time. To circumvent this problem, the " { $vocab-link "macros.expander" } " vocabulary is used to rewrite simple macro usages prior to local transformation, however "{ $vocab-link "macros.expander" } " does not deal with more complicated cases where the literal inputs to the macro do not immediately precede the macro call in the source." ;
 
-ARTICLE: "locals" "Local variables and lexical closures"
+ARTICLE: "locals" "Lexical variables and closures"
 "The " { $vocab-link "locals" } " vocabulary implements lexical scope with full closures, both downward and upward. Mutable bindings are supported, including assignment to bindings in outer scope."
 $nl
 "Compile-time transformation is used to compile local variables to efficient code; prettyprinter extensions are defined so that " { $link see } " can display original word definitions with local variables and not the closure-converted concatenative code which results."
 $nl
 "Applicative word definitions where the inputs are named local variables:"
 { $subsection POSTPONE: :: }
+{ $subsection POSTPONE: M:: }
 { $subsection POSTPONE: MEMO:: }
 { $subsection POSTPONE: MACRO:: }
 "Lexical binding forms:"

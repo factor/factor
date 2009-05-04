@@ -51,10 +51,13 @@ IN: regexp.dfa
     [ condition-states ] 2dip
     '[ _ _ add-todo-state ] each ;
 
+: ensure-state ( key table -- )
+    2dup key? [ 2drop ] [ [ H{ } clone ] 2dip set-at ] if ; inline
+
 :: new-transitions ( nfa dfa new-states visited-states -- nfa dfa )
     new-states [ nfa dfa ] [
         pop :> state
-        state dfa transitions>> maybe-initialize-key
+        state dfa transitions>> ensure-state
         state nfa find-transitions
         [| trans |
             state trans nfa find-closure :> new-state

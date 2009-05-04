@@ -5,12 +5,12 @@ http.client kernel tools.time sets assocs sequences
 concurrency.combinators io threads namespaces math multiline
 math.parser inspector urls logging combinators.short-circuit
 continuations calendar prettyprint dlists deques locals
-spider.unique-deque ;
+spider.unique-deque combinators concurrency.semaphores ;
 IN: spider
 
 TUPLE: spider base count max-count sleep max-depth initial-links
 filters spidered todo nonmatching quiet currently-spidering
-#threads follow-robots? robots ;
+#threads semaphore follow-robots? robots ;
 
 TUPLE: spider-result url depth headers
 fetched-in parsed-html links processed-in fetched-at ;
@@ -26,7 +26,12 @@ fetched-in parsed-html links processed-in fetched-at ;
         0 >>count
         1/0. >>max-count
         H{ } clone >>spidered
-        1 >>#threads ;
+        1 [ >>#threads ] [ <semaphore> >>semaphore ] bi ;
+
+: <spider-result> ( url depth -- spider-result )
+    spider-result new
+        swap >>depth
+        swap >>url ;
 
 <PRIVATE
 
@@ -57,26 +62,32 @@ fetched-in parsed-html links processed-in fetched-at ;
 : normalize-hrefs ( base links -- links' )
     [ derive-url ] with map ;
 
-: print-spidering ( url depth -- )
+: print-spidering ( spider-result -- )
+    [ url>> ] [ depth>> ] bi
     "depth: " write number>string write
     ", spidering: " write . yield ;
 
-:: new-spidered-result ( spider url depth -- spider-result )
-    f url spider spidered>> set-at
-    [ url http-get ] benchmark :> fetched-at :> html :> headers
+:: fill-spidered-result ( spider spider-result -- )
+    f spider-result url>> spider spidered>> set-at
+    [ spider-result url>> http-get ] benchmark :> fetched-in :> html :> headers
     [
         html parse-html
         spider currently-spidering>>
         over find-all-links normalize-hrefs
-    ] benchmark :> processing-time :> links :> parsed-html
-    url depth headers fetched-at parsed-html links processing-time
-    now spider-result boa ;
+    ] benchmark :> processed-in :> links :> parsed-html
+    spider-result
+        headers >>headers
+        fetched-in >>fetched-in
+        parsed-html >>parsed-html
+        links >>links
+        processed-in >>processed-in
+        now >>fetched-at drop ;
 
-:: spider-page ( spider url depth -- )
-    spider quiet>> [ url depth print-spidering ] unless
-    spider url depth new-spidered-result :> spidered-result
-    spider quiet>> [ spidered-result describe ] unless
-    spider spidered-result add-spidered ;
+:: spider-page ( spider spider-result -- )
+    spider quiet>> [ spider-result print-spidering ] unless
+    spider spider-result fill-spidered-result
+    spider quiet>> [ spider-result describe ] unless
+    spider spider-result add-spidered ;
 
 \ spider-page ERROR add-error-logging
 
@@ -94,9 +105,9 @@ fetched-in parsed-html links processed-in fetched-at ;
         [ [ count>> ] [ max-count>> ] bi < ]
     } 1&& ;
 
-: setup-next-url ( spider -- spider url depth )
+: setup-next-url ( spider -- spider spider-result )
     dup todo>> peek-url url>> >>currently-spidering
-    dup todo>> pop-url [ url>> ] [ depth>> ] bi ;
+    dup todo>> pop-url [ url>> ] [ depth>> ] bi <spider-result> ;
 
 : spider-next-page ( spider -- )
     setup-next-url spider-page ;

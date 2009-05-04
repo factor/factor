@@ -17,8 +17,3 @@ HELP: xref-article
 { $values { "topic" "an article name or a word" } }
 { $description "Sets the " { $link article-parent } " of each child of this article." }
 $low-level-note ;
-
-HELP: unxref-article
-{ $values { "topic" "an article name or a word" } }
-{ $description "Clears the " { $link article-parent } " of each child of this article." }
-$low-level-note ;

@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces make parser sequences strings words assocs splitting
-math.parser cpu.architecture alien alien.accessors quotations
-layouts system compiler.units io.files io.encodings.binary
-accessors combinators effects continuations fry classes ;
+math.parser cpu.architecture alien alien.accessors alien.strings
+quotations layouts system compiler.units io io.files
+io.encodings.binary io.streams.memory accessors combinators effects
+continuations fry classes ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -212,6 +213,15 @@ M: f byte-length drop 0 ;
 
 : memory>byte-array ( alien len -- byte-array )
     [ nip (byte-array) dup ] 2keep memcpy ;
+
+: malloc-string ( string encoding -- alien )
+    string>alien malloc-byte-array ;
+
+M: memory-stream stream-read
+    [
+        [ index>> ] [ alien>> ] bi <displaced-alien>
+        swap memory>byte-array
+    ] [ [ + ] change-index drop ] 2bi ;
 
 : byte-array>memory ( byte-array base -- )
     swap dup byte-length memcpy ;

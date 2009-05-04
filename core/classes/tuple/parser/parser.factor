@@ -89,11 +89,14 @@ ERROR: bad-literal-tuple ;
     swap [ [ slot-named offset>> 2 - ] curry dip ] curry assoc-map
     [ dup <enum> ] dip update boa>tuple ;
 
-: parse-tuple-literal ( -- tuple )
-    scan-word scan {
+: parse-tuple-literal-slots ( class -- tuple )
+    scan {
         { f [ unexpected-eof ] }
         { "f" [ \ } parse-until boa>tuple ] }
         { "{" [ parse-slot-values assoc>tuple ] }
         { "}" [ new ] }
         [ bad-literal-tuple ]
     } case ;
+
+: parse-tuple-literal ( -- tuple )
+    scan-word parse-tuple-literal-slots ;

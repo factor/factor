@@ -1419,7 +1419,7 @@ DESTRUCTOR: DeleteDC
 ! FUNCTION: DeleteMetaFile
 FUNCTION: BOOL DeleteObject ( HGDIOBJ hObject ) ;
 DESTRUCTOR: DeleteObject
-! FUNCTION: DescribePixelFormat
+FUNCTION: int DescribePixelFormat ( HDC hdc, int iPixelFormat, UINT nBytes, PIXELFORMATDESCRIPTOR* ppfd ) ;
 ! FUNCTION: DeviceCapabilitiesExA
 ! FUNCTION: DeviceCapabilitiesExW
 ! FUNCTION: DPtoLP
@@ -1501,7 +1501,6 @@ DESTRUCTOR: DeleteObject
 FUNCTION: BOOL ExtTextOutW ( HDC hdc, int X, int Y, UINT fuOptions, RECT* lprc, LPCTSTR lpString, UINT cbCount, INT* lpDx ) ;
 ALIAS: ExtTextOut ExtTextOutW
 ! FUNCTION: FillPath
-FUNCTION: int FillRect ( HDC hDC, RECT* lprc, HBRUSH hbr ) ;
 ! FUNCTION: FillRgn
 ! FUNCTION: FixBrushOrgEx
 ! FUNCTION: FlattenPath

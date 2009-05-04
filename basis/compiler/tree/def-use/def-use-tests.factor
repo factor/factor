@@ -7,8 +7,6 @@ compiler.tree.def-use arrays kernel.private sorting math.order
 binary-search compiler.tree.checker ;
 IN: compiler.tree.def-use.tests
 
-\ compute-def-use must-infer
-
 [ t ] [
     [ 1 2 3 ] build-tree compute-def-use drop
     def-use get {
