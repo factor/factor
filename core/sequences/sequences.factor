@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel kernel.private slots.private math
+USING: accessors kernel kernel.private locals slots.private math
 math.private math.order ;
 IN: sequences
 
@@ -916,3 +916,10 @@ PRIVATE>
             [ array-flip ] [ generic-flip ] if
         ] [ generic-flip ] if
     ] unless ;
+
+:: reduce-r
+    ( list identity quot: ( obj1 obj2 -- obj ) -- result )
+    list empty?
+    [ identity ]
+    [ list rest identity quot reduce-r list first quot call ] if ;
+    inline recursive
