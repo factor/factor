@@ -20,7 +20,14 @@ struct gc_root : public tagged<T>
 	const gc_root<T>& operator=(const T *x) { tagged<T>::operator=(x); return *this; }
 	const gc_root<T>& operator=(const cell &x) { tagged<T>::operator=(x); return *this; }
 
-	~gc_root() { cell old = gc_local_pop(); assert(old == (cell)this); }
+	~gc_root() {
+#ifdef FACTOR_DEBUG
+		cell old = gc_local_pop();
+		assert(old == (cell)this);
+#else
+		gc_local_pop();
+#endif
+	}
 };
 
 /* A similar hack for the bignum implementation */

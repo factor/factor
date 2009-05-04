@@ -125,10 +125,7 @@ VM_C_API void init_factor(vm_parameters *p)
 	load_image(p);
 	init_c_io();
 	init_inline_caching(p->max_pic_size);
-
-#ifndef FACTOR_DEBUG
 	init_signals();
-#endif
 
 	if(p->console)
 		open_console();
