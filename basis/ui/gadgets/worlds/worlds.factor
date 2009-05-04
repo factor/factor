@@ -4,15 +4,28 @@ USING: accessors arrays assocs continuations kernel math models
 namespaces opengl opengl.textures sequences io combinators
 combinators.short-circuit fry math.vectors math.rectangles cache
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-ui.commands ui.pixel-formats destructors ;
+ui.commands ui.pixel-formats destructors literals ;
 IN: ui.gadgets.worlds
 
+CONSTANT: default-world-pixel-format-attributes
+    { windowed double-buffered T{ depth-bits { value 16 } } }
+
 TUPLE: world < track
-active? focused?
-layers
-title status status-owner
-text-handle handle images
-window-loc ;
+    active? focused?
+    layers
+    title status status-owner
+    text-handle handle images
+    window-loc
+    pixel-format-attributes ;
+
+TUPLE: world-attributes
+    { world-class initial: world }
+    title
+    status
+    gadgets
+    { pixel-format-attributes initial: $ default-world-pixel-format-attributes } ;
+
+C: <world-attributes> world-attributes
 
 : find-world ( gadget -- world/f ) [ world? ] find-parent ;
 
@@ -45,18 +58,23 @@ M: world request-focus-on ( child gadget -- )
     2dup eq?
     [ 2drop ] [ dup focused?>> (request-focus) ] if ;
 
-: new-world ( gadget title status class -- world )
+: new-world ( class -- world )
     vertical swap new-track
         t >>root?
         t >>active?
-        { 0 0 } >>window-loc
-        swap >>status
-        swap >>title
-        swap 1 track-add
-    dup request-focus ;
+        { 0 0 } >>window-loc ;
 
-: <world> ( gadget title status -- world )
-    world new-world ;
+: apply-world-attributes ( world attributes -- world )
+    {
+        [ title>> >>title ]
+        [ status>> >>status ]
+        [ pixel-format-attributes>> >>pixel-format-attributes ]
+        [ gadgets>> [ 1 track-add ] each ]
+    } cleave ;
+
+: <world> ( world-attributes -- world )
+    [ world-class>> new-world ] keep apply-world-attributes
+    dup request-focus ;
 
 : as-big-as-possible ( world gadget -- )
     dup [ { 0 0 } >>loc over dim>> >>dim ] when 2drop ; inline
@@ -77,17 +95,36 @@ SYMBOL: flush-layout-cache-hook
 
 flush-layout-cache-hook [ [ ] ] initialize
 
-: (draw-world) ( world -- )
-    dup handle>> [
-        check-extensions
-        {
-            [ init-gl ]
-            [ draw-gadget ]
-            [ text-handle>> [ purge-cache ] when* ]
-            [ images>> [ purge-cache ] when* ]
-        } cleave
-    ] with-gl-context
-    flush-layout-cache-hook get call( -- ) ;
+GENERIC: begin-world ( world -- )
+GENERIC: end-world ( world -- )
+
+GENERIC: resize-world ( world -- )
+
+M: world begin-world
+    drop ;
+M: world end-world
+    drop ;
+M: world resize-world
+    drop ;
+
+M: world (>>dim)
+    [ call-next-method ]
+    [
+        dup handle>>
+        [ select-gl-context resize-world ]
+        [ drop ] if*
+    ] bi ;
+
+GENERIC: draw-world* ( world -- )
+
+M: world draw-world*
+    check-extensions
+    {
+        [ init-gl ]
+        [ draw-gadget ]
+        [ text-handle>> [ purge-cache ] when* ]
+        [ images>> [ purge-cache ] when* ]
+    } cleave ;
 
 : draw-world? ( world -- ? )
     #! We don't draw deactivated worlds, or those with 0 size.
@@ -108,7 +145,10 @@ ui-error-hook [ [ rethrow ] ] initialize
 : draw-world ( world -- )
     dup draw-world? [
         dup world [
-            [ (draw-world) ] [
+            [
+                dup handle>> [ draw-world* ] with-gl-context
+                flush-layout-cache-hook get call( -- )
+            ] [
                 over <world-error> ui-error
                 f >>active? drop
             ] recover
@@ -151,8 +191,7 @@ M: world handle-gesture ( gesture gadget -- ? )
     [ get-global find-world eq? ] keep '[ f _ set-global ] when ;
 
 M: world world-pixel-format-attributes
-    drop
-    { windowed double-buffered T{ depth-bits { value 16 } } } ;
+    pixel-format-attributes>> ;
 
 M: world check-world-pixel-format
     2drop ;
@@ -160,3 +199,4 @@ M: world check-world-pixel-format
 : with-world-pixel-format ( world quot -- )
     [ dup dup world-pixel-format-attributes <pixel-format> ]
     dip [ 2dup check-world-pixel-format ] prepose with-disposal ; inline
+
