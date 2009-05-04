@@ -9,7 +9,7 @@ threads combinators math.rectangles ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
-    [ mouse-location ] [ drop window ] 2bi move-hand fire-motion ;
+    [ mouse-location ] [ drop window ] 2bi move-hand fire-motion yield ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
