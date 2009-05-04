@@ -1,7 +1,7 @@
-INLINE CELL tag_boolean(CELL untagged)
+inline static CELL tag_boolean(CELL untagged)
 {
-	return (untagged == false ? F : T);
+	return (untagged ? T : F);
 }
 
-DLLEXPORT void box_boolean(bool value);
-DLLEXPORT bool to_boolean(CELL value);
+VM_C_API void box_boolean(bool value);
+VM_C_API bool to_boolean(CELL value);

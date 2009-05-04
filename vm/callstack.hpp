@@ -1,4 +1,4 @@
-INLINE CELL callstack_size(CELL size)
+inline static CELL callstack_size(CELL size)
 {
 	return sizeof(F_CALLSTACK) + size;
 }
@@ -16,11 +16,11 @@ CELL frame_executing(F_STACK_FRAME *frame);
 CELL frame_scan(F_STACK_FRAME *frame);
 CELL frame_type(F_STACK_FRAME *frame);
 
-void primitive_callstack(void);
-void primitive_set_callstack(void);
-void primitive_callstack_to_array(void);
-void primitive_innermost_stack_frame_quot(void);
-void primitive_innermost_stack_frame_scan(void);
-void primitive_set_innermost_stack_frame_quot(void);
+PRIMITIVE(callstack);
+PRIMITIVE(set_callstack);
+PRIMITIVE(callstack_to_array);
+PRIMITIVE(innermost_stack_frame_quot);
+PRIMITIVE(innermost_stack_frame_scan);
+PRIMITIVE(set_innermost_stack_frame_quot);
 
-F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
+VM_ASM_API void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);

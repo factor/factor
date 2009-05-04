@@ -4,4 +4,4 @@ void dump_generations(void);
 void factorbug(void);
 void dump_zone(F_ZONE *z);
 
-void primitive_die(void);
+PRIMITIVE(die);

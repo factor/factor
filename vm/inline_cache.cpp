@@ -41,13 +41,12 @@ static CELL determine_inline_cache_type(F_ARRAY *cache_entries)
 	for(i = 0; i < array_capacity(cache_entries); i += 2)
 	{
 		CELL klass = array_nth(cache_entries,i);
-		F_FIXNUM type;
 
 		/* Is it a tuple layout? */
-		switch(type_of(klass))
+		switch(TAG(klass))
 		{
 		case FIXNUM_TYPE:
-			type = untag_fixnum(klass);
+			F_FIXNUM type = untag_fixnum(klass);
 			if(type >= HEADER_TYPE)
 				seen_hi_tag = true;
 			break;
@@ -199,7 +198,7 @@ XT inline_cache_miss(CELL return_address)
 	F_FIXNUM index = untag_fixnum(dpop());
 	gc_root<F_ARRAY> methods(dpop());
 	gc_root<F_WORD> generic_word(dpop());
-	gc_root<F_OBJECT> object(get(ds - index * CELLS));
+	gc_root<F_OBJECT> object(((CELL *)ds)[-index]);
 
 	XT xt;
 
@@ -234,14 +233,14 @@ XT inline_cache_miss(CELL return_address)
 	return xt;
 }
 
-void primitive_reset_inline_cache_stats(void)
+PRIMITIVE(reset_inline_cache_stats)
 {
 	cold_call_to_ic_transitions = ic_to_pic_transitions = pic_to_mega_transitions = 0;
 	CELL i;
 	for(i = 0; i < 4; i++) pic_counts[i] = 0;
 }
 
-void primitive_inline_cache_stats(void)
+PRIMITIVE(inline_cache_stats)
 {
 	growable_array stats;
 	stats.add(allot_cell(cold_call_to_ic_transitions));

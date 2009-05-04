@@ -23,7 +23,7 @@ static CELL search_lookup_hash(CELL table, CELL klass, CELL hashcode)
 {
 	F_ARRAY *buckets = untag<F_ARRAY>(table);
 	CELL bucket = array_nth(buckets,hashcode & (array_capacity(buckets) - 1));
-	if(type_of(bucket) == WORD_TYPE || bucket == F)
+	if(tagged<F_OBJECT>(bucket).type_p(WORD_TYPE) || bucket == F)
 		return bucket;
 	else
 		return search_lookup_alist(bucket,klass);
@@ -56,7 +56,7 @@ static CELL lookup_tuple_method(CELL object, CELL methods)
 	{
 		CELL echelon_methods = array_nth(echelons,echelon);
 
-		if(type_of(echelon_methods) == WORD_TYPE)
+		if(tagged<F_OBJECT>(echelon_methods).type_p(WORD_TYPE))
 			return echelon_methods;
 		else if(echelon_methods != F)
 		{
@@ -77,7 +77,7 @@ static CELL lookup_tuple_method(CELL object, CELL methods)
 static CELL lookup_hi_tag_method(CELL object, CELL methods)
 {
 	F_ARRAY *hi_tag_methods = untag<F_ARRAY>(methods);
-	CELL tag = hi_tag(object) - HEADER_TYPE;
+	CELL tag = untag<F_OBJECT>(object)->header.hi_tag() - HEADER_TYPE;
 #ifdef FACTOR_DEBUG
 	assert(tag < TYPE_COUNT - HEADER_TYPE);
 #endif
@@ -87,7 +87,7 @@ static CELL lookup_hi_tag_method(CELL object, CELL methods)
 static CELL lookup_hairy_method(CELL object, CELL methods)
 {
 	CELL method = array_nth(untag<F_ARRAY>(methods),TAG(object));
-	if(type_of(method) == WORD_TYPE)
+	if(tagged<F_OBJECT>(method).type_p(WORD_TYPE))
 		return method;
 	else
 	{
@@ -108,13 +108,14 @@ static CELL lookup_hairy_method(CELL object, CELL methods)
 
 CELL lookup_method(CELL object, CELL methods)
 {
-	if(!HI_TAG_OR_TUPLE_P(object))
-		return array_nth(untag<F_ARRAY>(methods),TAG(object));
-	else
+	CELL tag = TAG(object);
+	if(tag == TUPLE_TYPE || tag == OBJECT_TYPE)
 		return lookup_hairy_method(object,methods);
+	else
+		return array_nth(untag<F_ARRAY>(methods),TAG(object));
 }
 
-void primitive_lookup_method(void)
+PRIMITIVE(lookup_method)
 {
 	CELL methods = dpop();
 	CELL object = dpop();
@@ -123,10 +124,15 @@ void primitive_lookup_method(void)
 
 CELL object_class(CELL object)
 {
-	if(!HI_TAG_OR_TUPLE_P(object))
+	switch(TAG(object))
+	{
+	case TUPLE_TYPE:
+		return untag<F_TUPLE>(object)->layout;
+	case OBJECT_TYPE:
+		return untag<F_OBJECT>(object)->header.header;
+	default:
 		return tag_fixnum(TAG(object));
-	else
-		return get(HI_TAG_HEADER(object));
+	}
 }
 
 static CELL method_cache_hashcode(CELL klass, F_ARRAY *array)
@@ -143,7 +149,7 @@ static void update_method_cache(CELL cache, CELL klass, CELL method)
 	set_array_nth(array,hashcode + 1,method);
 }
 
-void primitive_mega_cache_miss(void)
+PRIMITIVE(mega_cache_miss)
 {
 	megamorphic_cache_misses++;
 
@@ -151,7 +157,7 @@ void primitive_mega_cache_miss(void)
 	F_FIXNUM index = untag_fixnum(dpop());
 	CELL methods = dpop();
 
-	CELL object = get(ds - index * CELLS);
+	CELL object = ((CELL *)ds)[-index];
 	CELL klass = object_class(object);
 	CELL method = lookup_method(object,methods);
 
@@ -160,12 +166,12 @@ void primitive_mega_cache_miss(void)
 	dpush(method);
 }
 
-void primitive_reset_dispatch_stats(void)
+PRIMITIVE(reset_dispatch_stats)
 {
 	megamorphic_cache_hits = megamorphic_cache_misses = 0;
 }
 
-void primitive_dispatch_stats(void)
+PRIMITIVE(dispatch_stats)
 {
 	growable_array stats;
 	stats.add(allot_cell(megamorphic_cache_hits));

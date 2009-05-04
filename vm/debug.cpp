@@ -12,14 +12,13 @@ void print_chars(F_STRING* str)
 
 void print_word(F_WORD* word, CELL nesting)
 {
-
-	if(type_of(word->vocabulary) == STRING_TYPE)
+	if(tagged<F_OBJECT>(word->vocabulary).type_p(STRING_TYPE))
 	{
 		print_chars(untag<F_STRING>(word->vocabulary));
 		print_string(":");
 	}
-	
-	if(type_of(word->name) == STRING_TYPE)
+
+	if(tagged<F_OBJECT>(word->name).type_p(STRING_TYPE))
 		print_chars(untag<F_STRING>(word->name));
 	else
 	{
@@ -99,7 +98,7 @@ void print_nested_obj(CELL obj, F_FIXNUM nesting)
 
 	F_QUOTATION *quot;
 
-	switch(type_of(obj))
+	switch(tagged<F_OBJECT>(obj).type())
 	{
 	case FIXNUM_TYPE:
 		print_fixnum(untag_fixnum(obj));
@@ -130,7 +129,11 @@ void print_nested_obj(CELL obj, F_FIXNUM nesting)
 		print_string(" ]");
 		break;
 	default:
-		print_string("#<type "); print_cell(type_of(obj)); print_string(" @ "); print_cell_hex(obj); print_string(">");
+		print_string("#<type ");
+		print_cell(tagged<F_OBJECT>(obj).type());
+		print_string(" @ ");
+		print_cell_hex(obj);
+		print_string(">");
 		break;
 	}
 }
@@ -140,11 +143,11 @@ void print_obj(CELL obj)
 	print_nested_obj(obj,10);
 }
 
-void print_objects(CELL start, CELL end)
+void print_objects(CELL *start, CELL *end)
 {
-	for(; start <= end; start += CELLS)
+	for(; start <= end; start++)
 	{
-		print_obj(get(start));
+		print_obj(*start);
 		nl();
 	}
 }
@@ -152,13 +155,13 @@ void print_objects(CELL start, CELL end)
 void print_datastack(void)
 {
 	print_string("==== DATA STACK:\n");
-	print_objects(ds_bot,ds);
+	print_objects((CELL *)ds_bot,(CELL *)ds);
 }
 
 void print_retainstack(void)
 {
 	print_string("==== RETAIN STACK:\n");
-	print_objects(rs_bot,rs);
+	print_objects((CELL *)rs_bot,(CELL *)rs);
 }
 
 void print_stack_frame(F_STACK_FRAME *frame)
@@ -184,39 +187,8 @@ void print_callstack(void)
 void dump_cell(CELL cell)
 {
 	print_cell_hex_pad(cell); print_string(": ");
-
-	cell = get(cell);
-
+	cell = *(CELL *)cell;
 	print_cell_hex_pad(cell); print_string(" tag "); print_cell(TAG(cell));
-
-	switch(TAG(cell))
-	{
-	case OBJECT_TYPE:
-	case BIGNUM_TYPE:
-	case FLOAT_TYPE:
-		if(cell == F)
-			print_string(" -- F");
-		else if(cell < TYPE_COUNT<<TAG_BITS)
-		{
-			print_string(" -- possible header: ");
-			print_cell(cell>>TAG_BITS);
-		}
-		else if(cell >= data_heap->segment->start
-			&& cell < data_heap->segment->end)
-		{
-			CELL header = get(UNTAG(cell));
-			CELL type = header>>TAG_BITS;
-			print_string(" -- object; ");
-			if(TAG(header) == 0 && type < TYPE_COUNT)
-			{
-				print_string(" type "); print_cell(type);
-			}
-			else
-				print_string(" header corrupt");
-		}
-		break;
-	}
-	
 	nl();
 }
 
@@ -269,7 +241,7 @@ void dump_objects(CELL type)
 	CELL obj;
 	while((obj = next_object()) != F)
 	{
-		if(type == TYPE_COUNT || type_of(obj) == type)
+		if(type == TYPE_COUNT || tagged<F_OBJECT>(obj).type_p(type))
 		{
 			print_cell_hex_pad(obj);
 			print_string(" ");
@@ -494,7 +466,7 @@ void factorbug(void)
 	}
 }
 
-void primitive_die(void)
+PRIMITIVE(die)
 {
 	print_string("The die word was called by the library. Unless you called it yourself,\n");
 	print_string("you have triggered a bug in Factor. Please report.\n");

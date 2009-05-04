@@ -1,7 +1,7 @@
 #define IMAGE_MAGIC 0x0f0e0d0c
 #define IMAGE_VERSION 4
 
-struct F_HEADER {
+struct F_IMAGE_HEADER {
 	CELL magic;
 	CELL version;
 	/* all pointers in the image file are relocated from
@@ -41,5 +41,5 @@ struct F_PARAMETERS {
 void load_image(F_PARAMETERS *p);
 bool save_image(const F_CHAR *file);
 
-void primitive_save_image(void);
-void primitive_save_image_and_exit(void);
+PRIMITIVE(save_image);
+PRIMITIVE(save_image_and_exit);

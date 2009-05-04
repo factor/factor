@@ -25,7 +25,7 @@ CELL heap_size(F_HEAP *heap);
 CELL compute_heap_forwarding(F_HEAP *heap);
 void compact_heap(F_HEAP *heap);
 
-INLINE F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
+inline static F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
 {
 	CELL next = ((CELL)block + block->size);
 	if(next == heap->segment->end)
@@ -34,12 +34,12 @@ INLINE F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
 		return (F_BLOCK *)next;
 }
 
-INLINE F_BLOCK *first_block(F_HEAP *heap)
+inline static F_BLOCK *first_block(F_HEAP *heap)
 {
 	return (F_BLOCK *)heap->segment->start;
 }
 
-INLINE F_BLOCK *last_block(F_HEAP *heap)
+inline static F_BLOCK *last_block(F_HEAP *heap)
 {
 	return (F_BLOCK *)heap->segment->end;
 }

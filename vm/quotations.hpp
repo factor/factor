@@ -23,12 +23,11 @@ void set_quot_xt(F_QUOTATION *quot, F_CODE_BLOCK *code);
 void jit_compile(CELL quot, bool relocate);
 F_FIXNUM quot_code_offset_to_scan(CELL quot, CELL offset);
 
-void primitive_jit_compile(void);
-
-F_FASTCALL CELL lazy_jit_compile_impl(CELL quot, F_STACK_FRAME *stack);
+PRIMITIVE(jit_compile);
 
 void compile_all_words(void);
 
-void primitive_array_to_quotation(void);
-void primitive_quotation_xt(void);
+PRIMITIVE(array_to_quotation);
+PRIMITIVE(quotation_xt);
 
+VM_ASM_API CELL lazy_jit_compile_impl(CELL quot, F_STACK_FRAME *stack);

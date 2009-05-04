@@ -4,7 +4,7 @@
 bool secure_gc;
 
 /* new objects are allocated here */
-DLLEXPORT F_ZONE nursery;
+VM_C_API F_ZONE nursery;
 
 /* GC is off during heap walking */
 bool gc_off;
@@ -198,22 +198,22 @@ CELL object_size(CELL tagged)
 	if(immediate_p(tagged))
 		return 0;
 	else
-		return untagged_object_size(UNTAG(tagged));
+		return untagged_object_size(untag<F_OBJECT>(tagged));
 }
 
 /* Size of the object pointed to by an untagged pointer */
-CELL untagged_object_size(CELL pointer)
+CELL untagged_object_size(F_OBJECT *pointer)
 {
 	return align8(unaligned_object_size(pointer));
 }
 
 /* Size of the data area of an object pointed to by an untagged pointer */
-CELL unaligned_object_size(CELL pointer)
+CELL unaligned_object_size(F_OBJECT *pointer)
 {
 	F_TUPLE *tuple;
 	F_TUPLE_LAYOUT *layout;
 
-	switch(untag_header(get(pointer)))
+	switch(pointer->header.hi_tag())
 	{
 	case ARRAY_TYPE:
 		return array_size((F_ARRAY*)pointer);
@@ -243,12 +243,12 @@ CELL unaligned_object_size(CELL pointer)
 		return callstack_size(
 			untag_fixnum(((F_CALLSTACK *)pointer)->length));
 	default:
-		critical_error("Invalid header",pointer);
+		critical_error("Invalid header",(CELL)pointer);
 		return -1; /* can't happen */
 	}
 }
 
-void primitive_size(void)
+PRIMITIVE(size)
 {
 	box_unsigned_cell(object_size(dpop()));
 }
@@ -256,12 +256,12 @@ void primitive_size(void)
 /* The number of cells from the start of the object which should be scanned by
 the GC. Some types have a binary payload at the end (string, word, DLL) which
 we ignore. */
-CELL binary_payload_start(CELL pointer)
+CELL binary_payload_start(F_OBJECT *pointer)
 {
 	F_TUPLE *tuple;
 	F_TUPLE_LAYOUT *layout;
 
-	switch(untag_header(get(pointer)))
+	switch(pointer->header.hi_tag())
 	{
 	/* these objects do not refer to other objects at all */
 	case FLOAT_TYPE:
@@ -290,13 +290,13 @@ CELL binary_payload_start(CELL pointer)
 	case WRAPPER_TYPE:
 		return sizeof(F_WRAPPER);
 	default:
-		critical_error("Invalid header",pointer);
+		critical_error("Invalid header",(CELL)pointer);
 		return -1; /* can't happen */
 	}
 }
 
 /* Push memory usage statistics in data heap */
-void primitive_data_room(void)
+PRIMITIVE(data_room)
 {
 	dpush(tag_fixnum((data_heap->cards_end - data_heap->cards) >> 10));
 	dpush(tag_fixnum((data_heap->decks_end - data_heap->decks) >> 10));
@@ -326,7 +326,7 @@ void begin_scan(void)
 	gc_off = true;
 }
 
-void primitive_begin_scan(void)
+PRIMITIVE(begin_scan)
 {
 	begin_scan();
 }
@@ -336,27 +336,22 @@ CELL next_object(void)
 	if(!gc_off)
 		general_error(ERROR_HEAP_SCAN,F,F,NULL);
 
-	CELL value = get(heap_scan_ptr);
-	CELL obj = heap_scan_ptr;
-	CELL type;
-
 	if(heap_scan_ptr >= data_heap->generations[TENURED].here)
 		return F;
 
-	type = untag_header(value);
-	heap_scan_ptr += untagged_object_size(heap_scan_ptr);
-
-	return RETAG(obj,type < HEADER_TYPE ? type : OBJECT_TYPE);
+	F_OBJECT *object = (F_OBJECT *)heap_scan_ptr;
+	heap_scan_ptr += untagged_object_size(object);
+	return tag_dynamic(object);
 }
 
 /* Push object at heap scan cursor and advance; pushes f when done */
-void primitive_next_object(void)
+PRIMITIVE(next_object)
 {
 	dpush(next_object());
 }
 
 /* Re-enables GC */
-void primitive_end_scan(void)
+PRIMITIVE(end_scan)
 {
 	gc_off = false;
 }
@@ -370,7 +365,7 @@ CELL find_all_words(void)
 	CELL obj;
 	while((obj = next_object()) != F)
 	{
-		if(type_of(obj) == WORD_TYPE)
+		if(tagged<F_OBJECT>(obj).type_p(WORD_TYPE))
 			words.add(obj);
 	}
 

@@ -1,8 +1,8 @@
 F_BYTE_ARRAY *allot_byte_array(CELL size);
 
-void primitive_byte_array(void);
-void primitive_uninitialized_byte_array(void);
-void primitive_resize_byte_array(void);
+PRIMITIVE(byte_array);
+PRIMITIVE(uninitialized_byte_array);
+PRIMITIVE(resize_byte_array);
 
 /* Macros to simulate a byte vector in C */
 struct growable_byte_array {

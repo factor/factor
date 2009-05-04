@@ -1352,7 +1352,6 @@ bignum_digit_to_bignum(bignum_digit_type digit, int negative_p)
 F_BIGNUM *
 allot_bignum(bignum_length_type length, int negative_p)
 {
-	gc();
   BIGNUM_ASSERT ((length >= 0) || (length < BIGNUM_RADIX));
   F_BIGNUM * result = allot_array_internal<F_BIGNUM>(length + 1);
   BIGNUM_SET_NEGATIVE_P (result, negative_p);

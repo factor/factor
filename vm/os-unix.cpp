@@ -52,7 +52,7 @@ void ffi_dlclose(F_DLL *dll)
 	dll->dll = NULL;
 }
 
-void primitive_existsp(void)
+PRIMITIVE(existsp)
 {
 	struct stat sb;
 	char *path = (char *)(untag_check<F_BYTE_ARRAY>(dpop()) + 1);
@@ -98,7 +98,7 @@ void dealloc_segment(F_SEGMENT *block)
 	free(block);
 }
   
-INLINE F_STACK_FRAME *uap_stack_pointer(void *uap)
+static F_STACK_FRAME *uap_stack_pointer(void *uap)
 {
 	/* There is a race condition here, but in practice a signal
 	delivered during stack frame setup/teardown or while transitioning
@@ -301,7 +301,7 @@ void open_console(void)
 	start_thread(stdin_loop);
 }
 
-DLLEXPORT void wait_for_stdin(void)
+VM_C_API void wait_for_stdin(void)
 {
 	if(write(control_write,"X",1) != 1)
 	{

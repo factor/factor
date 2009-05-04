@@ -1,8 +1,3 @@
-void init_data_gc(void);
-
-void gc(void);
-DLLEXPORT void minor_gc(void);
-
 /* statistics */
 struct F_GC_STATS {
 	CELL collections;
@@ -18,15 +13,19 @@ extern bool performing_compaction;
 extern CELL collecting_gen;
 extern bool collecting_aging_again;
 
-INLINE bool collecting_accumulation_gen_p(void)
+extern CELL last_code_heap_scan;
+
+void init_data_gc(void);
+
+void gc(void);
+
+inline static bool collecting_accumulation_gen_p(void)
 {
 	return ((HAVE_AGING_P
 		&& collecting_gen == AGING
 		&& !collecting_aging_again)
 		|| collecting_gen == TENURED);
 }
-
-extern CELL last_code_heap_scan;
 
 void copy_handle(CELL *handle);
 
@@ -43,7 +42,7 @@ registers) does not run out of memory */
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-INLINE void *allot_object(CELL header, CELL size)
+inline static F_OBJECT *allot_object(F_HEADER header, CELL size)
 {
 #ifdef GC_DEBUG
 	if(!gc_off)
@@ -82,15 +81,12 @@ INLINE void *allot_object(CELL header, CELL size)
 			tenured = &data_heap->generations[TENURED];
 		}
 
-		object = (F_OBJECT *)allot_zone(tenured,size);
-
-		/* We have to do this */
-		allot_barrier((CELL)object);
+		object = allot_zone(tenured,size);
 
 		/* Allows initialization code to store old->new pointers
 		without hitting the write barrier in the common case of
 		a nursery allocation */
-		write_barrier((CELL)object);
+		write_barrier(object);
 	}
 
 	object->header = header;
@@ -99,26 +95,41 @@ INLINE void *allot_object(CELL header, CELL size)
 
 template<typename T> T *allot(CELL size)
 {
-	return (T *)allot_object(tag_header(T::type_number),size);
+	return (T *)allot_object(F_HEADER(T::type_number),size);
 }
 
 void copy_reachable_objects(CELL scan, CELL *end);
 
-void primitive_gc(void);
-void primitive_gc_stats(void);
+PRIMITIVE(gc);
+PRIMITIVE(gc_stats);
 void clear_gc_stats(void);
-void primitive_clear_gc_stats(void);
-void primitive_become(void);
+PRIMITIVE(clear_gc_stats);
+PRIMITIVE(become);
 
 extern bool growing_data_heap;
 
-INLINE void check_data_pointer(CELL pointer)
+inline static void check_data_pointer(F_OBJECT *pointer)
 {
 #ifdef FACTOR_DEBUG
 	if(!growing_data_heap)
 	{
-		assert(pointer >= data_heap->segment->start
-		       && pointer < data_heap->segment->end);
+		assert((CELL)pointer >= data_heap->segment->start
+		       && (CELL)pointer < data_heap->segment->end);
 	}
 #endif
 }
+
+inline static void check_tagged_pointer(CELL tagged)
+{
+#ifdef FACTOR_DEBUG
+	if(!immediate_p(tagged))
+	{
+		F_OBJECT *object = untag<F_OBJECT>(tagged);
+		check_data_pointer(object);
+		object->header.hi_tag();
+	}
+#endif
+}
+
+VM_C_API void minor_gc(void);
+
