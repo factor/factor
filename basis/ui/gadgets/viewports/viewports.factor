@@ -23,7 +23,7 @@ M: viewport layout*
 M: viewport focusable-child*
     gadget-child ;
 
-: scroller-value ( scroller -- loc )
+: scroll-position ( scroller -- loc )
     model>> range-value [ >integer ] map ;
 
 M: viewport model-changed
@@ -31,7 +31,7 @@ M: viewport model-changed
     [ relayout-1 ]
     [
         [ gadget-child ]
-        [ scroller-value vneg ]
+        [ scroll-position vneg ]
         [ constraint>> ]
         tri v* >>loc drop
     ] bi ;

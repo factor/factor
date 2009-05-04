@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences namespaces make math math.ranges
-math.vectors vectors ;
+USING: kernel math math.ranges math.vectors namespaces
+sequences ;
 IN: math.numerical-integration
 
 SYMBOL: num-steps
@@ -15,7 +15,7 @@ SYMBOL: num-steps
     length 2 / 2 - { 2 4 } <repetition> concat
     { 1 4 } { 1 } surround ;
 
-: integrate-simpson ( from to f -- x )
+: integrate-simpson ( from to quot -- x )
     [ setup-simpson-range dup ] dip 
     map dup generate-simpson-weights
-    v. swap [ third ] keep first - 6 / * ;
+    v. swap [ third ] keep first - 6 / * ; inline

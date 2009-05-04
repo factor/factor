@@ -17,9 +17,6 @@ IN: project-euler.007
 ! SOLUTION
 ! --------
 
-: nth-prime ( n -- n )
-    1- lprimes lnth ;
-
 : euler007 ( -- answer )
     10001 nth-prime ;
 

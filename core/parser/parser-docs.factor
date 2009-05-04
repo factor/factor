@@ -92,15 +92,12 @@ ARTICLE: "parser" "The parser"
 "This parser is a general facility for reading textual representations of objects and definitions. The parser is implemented in the " { $vocab-link "parser" } " and " { $vocab-link "syntax" } " vocabularies."
 $nl
 "This section concerns itself with usage and extension of the parser. Standard syntax is described in " { $link "syntax" } "."
-{ $subsection "vocabulary-search" }
 { $subsection "parser-files" }
-{ $subsection "top-level-forms" }
 "The parser can be extended."
-{ $subsection "parsing-words" }
 { $subsection "parser-lexer" }
 "The parser can be invoked reflectively;"
 { $subsection parse-stream }
-{ $see-also "definitions" "definition-checking" } ;
+{ $see-also "parsing-words" "definitions" "definition-checking" } ;
 
 ABOUT: "parser"
 
@@ -113,7 +110,7 @@ HELP: save-location
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
 HELP: parser-notes
-{ $var-description "A boolean controlling whether the parser will print various notes and warnings. Switched on by default. If a source file is being run for its effect on " { $link output-stream } ", this variable should be switched off, to prevent parser notes from polluting the output." } ;
+{ $var-description "A boolean controlling whether the parser will print various notes. Switched on by default. If a source file is being run for its effect on " { $link output-stream } ", this variable should be switched off, to prevent parser notes from polluting the output." } ;
 
 HELP: parser-notes?
 { $values { "?" "a boolean" } }
@@ -263,7 +260,7 @@ HELP: forget-smudged
 
 HELP: finish-parsing
 { $values { "lines" "the lines of text just parsed" } { "quot" "the quotation just parsed" } }
-{ $description "Records information to the current " { $link file } " and prints warnings about any removed definitions which are still in use." }
+{ $description "Records information to the current " { $link file } "." }
 { $notes "This is one of the factors of " { $link parse-stream } "." } ;
 
 HELP: parse-stream

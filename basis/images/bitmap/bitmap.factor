@@ -37,14 +37,14 @@ M: bitmap-magic summary
 ERROR: bmp-not-supported n ;
 
 : reverse-lines ( byte-array width -- byte-array )
-    3 * <sliced-groups> <reversed> concat ; inline
+    <sliced-groups> <reversed> concat ; inline
 
 : raw-bitmap>seq ( loading-bitmap -- array )
     dup bit-count>>
     {
         { 32 [ color-index>> ] }
-        { 24 [ [ color-index>> ] [ width>> ] bi reverse-lines ] }
-        { 8 [ [ 8bit>buffer ] [ width>> ] bi reverse-lines ] }
+        { 24 [ [ color-index>> ] [ width>> 3 * ] bi reverse-lines ] }
+        { 8 [ [ 8bit>buffer ] [ width>> 3 * ] bi reverse-lines ] }
         [ bmp-not-supported ]
     } case >byte-array ;
 
@@ -81,30 +81,31 @@ ERROR: bmp-not-supported n ;
 : image-size ( loading-bitmap -- n )
     [ [ width>> ] [ height>> ] bi * ] [ bit-count>> 8 /i ] bi * abs ;
 
+: bitmap-padding ( width -- n )
+    3 * 4 mod 4 swap - 4 mod ; inline
+
 :: fixup-color-index ( loading-bitmap -- loading-bitmap )
     loading-bitmap width>> :> width
     width 3 * :> width*3
-    loading-bitmap height>> abs :> height
-    loading-bitmap color-index>> length :> color-index-length
-    color-index-length height /i :> stride
-    color-index-length width*3 height * - height /i :> padding
+    loading-bitmap width>> bitmap-padding :> padding
+    loading-bitmap [ color-index>> length ] [ height>> abs ] bi /i :> stride
+    loading-bitmap
     padding 0 > [
-        loading-bitmap [
+        [
             stride <sliced-groups>
             [ width*3 head-slice ] map concat
         ] change-color-index
-    ] [
-        loading-bitmap
-    ] if ;
+    ] when ;
 
 : parse-bitmap ( loading-bitmap -- loading-bitmap )
     dup rgb-quads-length read >>rgb-quads
     dup color-index-length read >>color-index
     fixup-color-index ;
 
-: load-bitmap-data ( path loading-bitmap -- loading-bitmap )
-    [ binary ] dip '[
-        _ parse-file-header parse-bitmap-header parse-bitmap
+: load-bitmap-data ( path -- loading-bitmap )
+    binary [
+        loading-bitmap new
+        parse-file-header parse-bitmap-header parse-bitmap
     ] with-file-reader ;
 
 ERROR: unknown-component-order bitmap ;
@@ -117,8 +118,7 @@ ERROR: unknown-component-order bitmap ;
         [ unknown-component-order ]
     } case ;
 
-: loading-bitmap>bitmap-image ( loading-bitmap -- bitmap-image )
-    [ bitmap-image new ] dip
+: loading-bitmap>bitmap-image ( bitmap-image loading-bitmap -- bitmap-image )
     {
         [ raw-bitmap>seq >>bitmap ]
         [ [ width>> ] [ height>> abs ] bi 2array >>dim ]
@@ -127,20 +127,30 @@ ERROR: unknown-component-order bitmap ;
     } cleave ;
 
 M: bitmap-image load-image* ( path loading-bitmap -- bitmap )
-    drop loading-bitmap new
-    load-bitmap-data
-    loading-bitmap>bitmap-image ;
+    swap load-bitmap-data loading-bitmap>bitmap-image ;
 
 PRIVATE>
 
-: bitmap>color-index ( bitmap-array -- byte-array )
-    4 <sliced-groups> [ 3 head-slice <reversed> ] map B{ } join ; inline
+: bitmap>color-index ( bitmap -- byte-array )
+    [
+        bitmap>>
+        4 <sliced-groups>
+        [ 3 head-slice <reversed> ] map
+        B{ } join
+    ] [
+        dim>> first dup bitmap-padding dup 0 > [
+            [ 3 * group ] dip '[ _ <byte-array> append ] map
+            B{ } join
+        ] [
+            2drop
+        ] if
+    ] bi ;
 
 : save-bitmap ( image path -- )
     binary [
         B{ CHAR: B CHAR: M } write
         [
-            bitmap>> bitmap>color-index length 14 + 40 + write4
+            bitmap>color-index length 14 + 40 + write4
             0 write4
             54 write4
             40 write4
@@ -159,7 +169,7 @@ PRIVATE>
                 [ drop 0 write4 ]
 
                 ! size-image
-                [ bitmap>> bitmap>color-index length write4 ]
+                [ bitmap>color-index length write4 ]
 
                 ! x-pels
                 [ drop 0 write4 ]
@@ -175,7 +185,9 @@ PRIVATE>
 
                 ! rgb-quads
                 [
-                    [ bitmap>> bitmap>color-index ] [ dim>> first ] bi
+                    [ bitmap>color-index ]
+                    [ dim>> first 3 * ]
+                    [ dim>> first bitmap-padding + ] tri
                     reverse-lines write
                 ]
             } cleave

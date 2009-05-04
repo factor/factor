@@ -137,9 +137,6 @@ ERROR: no-content-disposition multipart ;
         [ no-content-disposition ]
     } case ;
 
-: assert-sequence= ( a b -- )
-    2dup sequence= [ 2drop ] [ assert ] if ;
-
 : read-assert-sequence= ( sequence -- )
     [ length read ] keep assert-sequence= ;
 

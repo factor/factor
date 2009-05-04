@@ -4,7 +4,7 @@ USING: accessors kernel math namespaces make sequences random
 strings math.parser math.intervals combinators math.bitwise
 nmake db db.tuples db.types classes words shuffle arrays
 destructors continuations db.tuples.private prettyprint
-db.private ;
+db.private byte-arrays ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -114,6 +114,9 @@ M: sequence where ( spec obj -- )
     [
         [ " or " 0% ] [ dupd where ] interleave drop
     ] in-parens ;
+
+M: byte-array where ( spec obj -- )
+    over column-name>> 0% " = " 0% bind# ;
 
 M: NULL where ( spec obj -- )
     drop column-name>> 0% " is NULL" 0% ;

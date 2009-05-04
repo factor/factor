@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays byte-arrays definitions generic
+USING: accessors alien arrays byte-arrays byte-vectors definitions generic
 hashtables kernel math namespaces parser lexer sequences strings
 strings.parser sbufs vectors words words.symbol words.constant
 words.alias quotations io assocs splitting classes.tuple
-generic.standard generic.math generic.parser classes
+generic.standard generic.hook generic.math generic.parser classes
 io.pathnames vocabs vocabs.parser classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple.parser compiler.units
@@ -98,12 +98,14 @@ IN: bootstrap.syntax
     "{" [ \ } [ >array ] parse-literal ] define-core-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-core-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-core-syntax
+    "BV{" [ \ } [ >byte-vector ] parse-literal ] define-core-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal parsed ] define-core-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
 
     "POSTPONE:" [ scan-word parsed ] define-core-syntax
     "\\" [ scan-word <wrapper> parsed ] define-core-syntax
+    "M\\" [ scan-word scan-word method <wrapper> parsed ] define-core-syntax
     "inline" [ word make-inline ] define-core-syntax
     "recursive" [ word make-recursive ] define-core-syntax
     "foldable" [ word make-foldable ] define-core-syntax

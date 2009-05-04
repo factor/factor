@@ -15,12 +15,19 @@ HELP: each-file
     }
 } ;
 
-HELP: recursive-directory
+HELP: recursive-directory-files
 { $values
      { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" }
      { "paths" "a sequence of pathname strings" }
 }
 { $description "Traverses a directory path recursively and returns a sequence of files in a breadth-first or depth-first manner." } ;
+
+HELP: recursive-directory-entries
+{ $values
+     { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" }
+     { "directory-entries" "a sequence of directory-entries" }
+}
+{ $description "Traverses a directory path recursively and returns a sequence of directory-entries in a breadth-first or depth-first manner." } ;
 
 HELP: find-file
 { $values
@@ -41,11 +48,11 @@ HELP: find-all-files
      { "path" "a pathname string" } { "quot" quotation }
      { "paths/f" "a sequence of pathname strings or f" }
 }
-{ $description "Finds all files in the input directory matching the predicate quotation in a breadth-first or depth-first traversal." } ;
+{ $description "Recursively finds all files in the input directory matching the predicate quotation." } ;
 
 HELP: find-all-in-directories
 { $values
-     { "directories" "a sequence of directory paths" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
+     { "directories" "a sequence of directory paths" } { "quot" quotation }
      { "paths/f" "a sequence of pathname strings or f" }
 }
 { $description "Finds all files in the input directories matching the predicate quotation in a breadth-first or depth-first traversal." } ;
@@ -55,7 +62,8 @@ HELP: find-all-in-directories
 ARTICLE: "io.directories.search" "Searching directories"
 "The " { $vocab-link "io.directories.search" } " vocabulary contains words used for recursively iterating over a directory and for finding files in a directory tree." $nl
 "Traversing directories:"
-{ $subsection recursive-directory }
+{ $subsection recursive-directory-files }
+{ $subsection recursive-directory-entries }
 { $subsection each-file }
 "Finding files:"
 { $subsection find-file }

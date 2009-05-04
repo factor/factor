@@ -99,7 +99,11 @@ M: plain-writer make-block-stream
     nip <ignore-close-stream> ;
 
 M: plain-writer stream-write-table
-    [ drop format-table [ nl ] [ write ] interleave ] with-output-stream* ;
+    [
+        drop
+        [ [ >string ] map ] map format-table
+        [ nl ] [ write ] interleave
+    ] with-output-stream* ;
 
 M: plain-writer make-cell-stream 2drop <string-writer> ;
 
@@ -135,11 +139,11 @@ SYMBOL: wrap-margin
 SYMBOL: table-gap
 SYMBOL: table-border
 
-: standard-table-style ( -- style )
+CONSTANT: standard-table-style
     H{
         { table-gap { 5 5 } }
         { table-border T{ rgba f 0.8 0.8 0.8 1.0 } }
-    } ;
+    }
 
 ! Input history
 TUPLE: input string ;
@@ -156,3 +160,5 @@ M: input summary
     ] "" make ;
 
 : write-object ( str obj -- ) presented associate format ;
+
+: write-image ( image -- ) [ "" ] dip image associate format ;

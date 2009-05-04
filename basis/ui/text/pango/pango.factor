@@ -16,9 +16,7 @@ M: pango-renderer flush-layout-cache
 
 : rendered-layout ( font string -- texture )
     world get world-text-handle [
-        cached-layout
-        [ image>> ] [ text-position vneg ] [ image>> dim>> ] tri
-        <texture>
+        cached-layout [ image>> ] [ text-position vneg ] bi <texture>
     ] 2cache ;
 
 M: pango-renderer draw-string ( font string -- )

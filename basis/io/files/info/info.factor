@@ -5,7 +5,7 @@ vocabs.loader io.files.types ;
 IN: io.files.info
 
 ! File info
-TUPLE: file-info type size permissions created modified
+TUPLE: file-info type size size-on-disk permissions created modified
 accessed ;
 
 HOOK: file-info os ( path -- info )

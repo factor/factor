@@ -1,1 +1,0 @@
-Chained-conditional dispatch strategy

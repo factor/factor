@@ -53,7 +53,7 @@ C: <sphere> sphere
 
 : sphere-t ( b d -- t )
     -+ dup 0.0 <
-    [ 2drop 1.0/0.0 ] [ [ [ 0.0 > ] keep ] dip ? ] if ; inline
+    [ 2drop 1/0. ] [ [ [ 0.0 > ] keep ] dip ? ] if ; inline
 
 : sphere-b&v ( sphere ray -- b v )
     [ sphere-v ] [ nip ] 2bi

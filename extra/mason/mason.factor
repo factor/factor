@@ -6,7 +6,8 @@ mason.email mason.updates namespaces threads ;
 IN: mason
 
 : build-loop-error ( error -- )
-    error-continuation get call>> email-error ;
+    [ "Build loop error:" print flush error. flush ]
+    [ error-continuation get call>> email-error ] bi ;
 
 : build-loop-fatal ( error -- )
     "FATAL BUILDER ERROR:" print

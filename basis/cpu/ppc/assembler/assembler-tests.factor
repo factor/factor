@@ -114,5 +114,3 @@ make vocabs sequences ;
 { HEX: fc411800 } [ 1 2 3 FCMPU ] test-assembler
 { HEX: fc411840 } [ 1 2 3 FCMPO ] test-assembler
 { HEX: 3c601234 HEX: 60635678 } [ HEX: 12345678 3 LOAD ] test-assembler
-
-"cpu.ppc.assembler" words [ must-infer ] each

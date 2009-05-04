@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables html.parser.state
+USING: accessors arrays hashtables sequence-parser
 html.parser.utils kernel namespaces sequences
 unicode.case unicode.categories combinators.short-circuit
 quoting fry ;
@@ -37,89 +37,89 @@ SYMBOL: tagstack
         swap >>name
         swap >>text ; inline
 
-: (read-quote) ( state-parser ch -- string )
+: (read-quote) ( sequence-parser ch -- string )
     '[ [ current _ = ] take-until ] [ advance drop ] bi ;
 
-: read-single-quote ( state-parser -- string )
+: read-single-quote ( sequence-parser -- string )
     CHAR: ' (read-quote) ;
 
-: read-double-quote ( state-parser -- string )
+: read-double-quote ( sequence-parser -- string )
     CHAR: " (read-quote) ;
 
-: read-quote ( state-parser -- string )
+: read-quote ( sequence-parser -- string )
     dup get+increment CHAR: ' =
     [ read-single-quote ] [ read-double-quote ] if ;
 
-: read-key ( state-parser -- string )
+: read-key ( sequence-parser -- string )
     skip-whitespace
     [ current { [ CHAR: = = ] [ blank? ] } 1|| ] take-until ;
 
-: read-token ( state-parser -- string )
+: read-token ( sequence-parser -- string )
     [ current blank? ] take-until ;
 
-: read-value ( state-parser -- string )
+: read-value ( sequence-parser -- string )
     skip-whitespace
     dup current quote? [ read-quote ] [ read-token ] if
     [ blank? ] trim ;
 
-: read-comment ( state-parser -- )
+: read-comment ( sequence-parser -- )
     "-->" take-until-sequence comment new-tag push-tag ;
 
-: read-dtd ( state-parser -- )
+: read-dtd ( sequence-parser -- )
     ">" take-until-sequence dtd new-tag push-tag ;
 
-: read-bang ( state-parser -- )
+: read-bang ( sequence-parser -- )
     advance dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&&
     [ advance advance read-comment ] [ read-dtd ] if ;
 
-: read-tag ( state-parser -- string )
+: read-tag ( sequence-parser -- string )
     [ [ current "><" member? ] take-until ]
     [ dup current CHAR: < = [ advance ] unless drop ] bi ;
 
-: read-until-< ( state-parser -- string )
+: read-until-< ( sequence-parser -- string )
     [ current CHAR: < = ] take-until ;
 
-: parse-text ( state-parser -- )
+: parse-text ( sequence-parser -- )
     read-until-< [ text new-tag push-tag ] unless-empty ;
 
-: parse-key/value ( state-parser -- key value )
+: parse-key/value ( sequence-parser -- key value )
     [ read-key >lower ]
     [ skip-whitespace "=" take-sequence ]
     [ swap [ read-value ] [ drop dup ] if ] tri ;
 
-: (parse-attributes) ( state-parser -- )
+: (parse-attributes) ( sequence-parser -- )
     skip-whitespace
-    dup state-parse-end? [
+    dup sequence-parse-end? [
         drop
     ] [
         [ parse-key/value swap set ] [ (parse-attributes) ] bi
     ] if ;
 
-: parse-attributes ( state-parser -- hashtable )
+: parse-attributes ( sequence-parser -- hashtable )
     [ (parse-attributes) ] H{ } make-assoc ;
 
 : (parse-tag) ( string -- string' hashtable )
     [
         [ read-token >lower ] [ parse-attributes ] bi
-    ] state-parse ;
+    ] parse-sequence ;
 
-: read-< ( state-parser -- string/f )
+: read-< ( sequence-parser -- string/f )
     advance dup current [
         CHAR: ! = [ read-bang f ] [ read-tag ] if
     ] [
         drop f
     ] if* ;
 
-: parse-tag ( state-parser -- )
+: parse-tag ( sequence-parser -- )
     read-< [ (parse-tag) make-tag push-tag ] unless-empty ;
 
-: (parse-html) ( state-parser -- )
+: (parse-html) ( sequence-parser -- )
     dup peek-next [
         [ parse-text ] [ parse-tag ] [ (parse-html) ] tri
     ] [ drop ] if ;
 
 : tag-parse ( quot -- vector )
-    V{ } clone tagstack [ state-parse ] with-variable ; inline
+    V{ } clone tagstack [ parse-sequence ] with-variable ; inline
 
 PRIVATE>
 

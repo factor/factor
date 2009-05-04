@@ -9,7 +9,7 @@ CONSTANT: crc32-polynomial HEX: edb88320
 
 CONSTANT: crc32-table V{ }
 
-256 [
+256 iota [
     8 [
         [ 2/ ] [ even? ] bi [ crc32-polynomial bitxor ] unless
     ] times >bignum

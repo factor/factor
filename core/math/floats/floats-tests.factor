@@ -50,13 +50,11 @@ IN: math.floats.tests
 [ BIN: 11111111111000000000000000000000000000000000000000000000000000 bits>double ]
 unit-test
 
-[ 2.0 ] [ 1.0 1+ ] unit-test
-[ 0.0 ] [ 1.0 1- ] unit-test
+[ 2.0 ] [ 1.0 1 + ] unit-test
+[ 0.0 ] [ 1.0 1 - ] unit-test
 
 [ t ] [ 0.0 zero? ] unit-test
 [ t ] [ -0.0 zero? ] unit-test
-
-! [ f ] [ 0.0/0.0 0.0/0.0 number= ] unit-test
 
 [ 0 ] [ 1/0. >bignum ] unit-test
 

@@ -83,7 +83,7 @@ $nl
 "A word can be used to check if a class has an initial value or not:"
 { $subsection initial-value } ;
 
-ARTICLE: "slots" "Slots"
+ARTICLE: "slots" "Low-level slot operations"
 "The " { $vocab-link "slots" } " vocabulary contains words for introspecting the slots of an object. A " { $emphasis "slot" } " is a component of an object which can store a value."
 $nl
 { $link "tuples" } " are composed entirely of slots, and instances of " { $link "builtin-classes" } " consist of slots together with intrinsic data."
@@ -104,6 +104,9 @@ $nl
 { $subsection define-changer }
 { $subsection define-slot-methods }
 { $subsection define-accessors }
+"Unsafe slot access:"
+{ $subsection slot }
+{ $subsection set-slot }
 { $see-also "accessors" "mirrors" } ;
 
 ABOUT: "slots"

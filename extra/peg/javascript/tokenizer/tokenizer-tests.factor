@@ -4,8 +4,6 @@
 USING: kernel tools.test peg peg.javascript.ast peg.javascript.tokenizer accessors ;
 IN: peg.javascript.tokenizer.tests
 
-\ tokenize-javascript must-infer
-
 {
   V{
     T{ ast-number f 123 }

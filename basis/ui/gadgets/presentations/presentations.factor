@@ -10,7 +10,7 @@ IN: ui.gadgets.presentations
 TUPLE: presentation < button object hook ;
 
 : invoke-presentation ( presentation command -- )
-    [ [ dup hook>> call ] [ object>> ] bi ] dip
+    [ [ dup hook>> call( presentation -- ) ] [ object>> ] bi ] dip
     invoke-command ;
 
 : invoke-primary ( presentation -- )

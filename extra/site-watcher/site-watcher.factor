@@ -3,12 +3,8 @@
 USING: accessors alarms arrays calendar combinators
 combinators.smart continuations debugger http.client fry
 init io.streams.string kernel locals math math.parser db
-namespaces sequences site-watcher.db site-watcher.db.private
-smtp ;
+namespaces sequences site-watcher.db site-watcher.email ;
 IN: site-watcher
-
-SYMBOL: site-watcher-from
-"factor-site-watcher@gmail.com" site-watcher-from set-global
 
 SYMBOL: site-watcher-frequency
 5 minutes site-watcher-frequency set-global
@@ -23,34 +19,31 @@ SYMBOL: running-site-watcher
         [ dup url>> http-get 2drop site-good ] [ site-bad ] recover
     ] each ;
 
-: site-up-email ( email site -- email )
+: site-up-email ( site -- body )
     last-up>> now swap time- duration>minutes 60 /mod
     [ >integer number>string ] bi@
     [ " hours, " append ] [ " minutes" append ] bi* append
-    "Site was down for (at least): " prepend >>body ;
+    "Site was down for (at least): " prepend ;
 
-: site-down-email ( email site -- email ) error>> >>body ;
+: site-down-email ( site -- body ) error>> ;
 
 : send-report ( site -- )
-    [ <email> ] dip
-    {
-        [ email>> 1array >>to ]
-        [ drop site-watcher-from get "factor.site.watcher@gmail.com" or >>from ]
-        [ dup up?>> [ site-up-email ] [ site-down-email ] if ]
-        [ [ url>> ] [ up?>> "up" "down" ? ] bi " is " glue >>subject ]
-    } cleave send-email ;
+    [ ]
+    [ dup up?>> [ site-up-email ] [ site-down-email ] if ]
+    [ [ url>> ] [ up?>> "up" "down" ? ] bi " is " glue ] tri
+    send-site-email ;
 
 : send-reports ( seq -- )
     [ ] [ [ send-report ] each ] if-empty ;
 
 PRIVATE>
 
-: watch-sites ( db -- )
-    [ find-sites check-sites sites-to-report send-reports ] with-db ;
+: watch-sites ( -- )
+    find-sites check-sites sites-to-report send-reports ;
 
 : run-site-watcher ( db -- )
     [ running-site-watcher get ] dip '[ 
-        [ _ watch-sites ] site-watcher-frequency get every
+        [ _ [ watch-sites ] with-db ] site-watcher-frequency get every
         running-site-watcher set
     ] unless ;
 

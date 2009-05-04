@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel io system prettyprint ;
+USING: help.markup help.syntax kernel io system prettyprint continuations ;
 IN: listener
 
 ARTICLE: "listener-watch" "Watching variables in the listener"
@@ -41,32 +41,18 @@ $nl
 { $example "{ 1 2 3 } [\n    .\n] each" "1\n2\n3" }
 "The listener knows when to expect more input by looking at the height of the stack. Parsing words such as " { $link POSTPONE: { } " leave elements on the parser stack, and corresponding words such as " { $link POSTPONE: } } " pop them."
 { $subsection "listener-watch" }
-"You can start a nested listener or exit a listener using the following words:"
+"To start a nested listener:"
 { $subsection listener }
-{ $subsection bye }
-"Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
+"To exit the listener, invoke the " { $link return } " word."
+$nl
+"Multi-line quotations can be read independently of the rest of the listener:"
 { $subsection read-quot } ;
 
 ABOUT: "listener"
-
-<PRIVATE
-
-HELP: quit-flag
-{ $var-description "Variable set to true by " { $link bye } " word; it forces the next iteration of the " { $link listener } " loop to end." } ;
-
-PRIVATE>
 
 HELP: read-quot
 { $values { "quot/f" "a parsed quotation, or " { $link f } " indicating end of file" } }
 { $description "Reads a Factor expression which possibly spans more than one line from " { $link input-stream } ". Additional lines of input are read while the parser stack height is greater than one. Since structural parsing words push partial quotations on the stack, this will keep on reading input until all delimited parsing words are terminated." } ;
 
-HELP: listen
-{ $description "Prompts for an expression on " { $link input-stream } " and evaluates it. On end of file, " { $link quit-flag } " is set to terminate the listener loop." }
-{ $errors "If the expression input by the user throws an error, the error is printed to " { $link output-stream } " and the word returns normally." } ;
-
 HELP: listener
 { $description "Prompts for expressions on " { $link input-stream } " and evaluates them until end of file is reached." } ;
-
-HELP: bye
-{ $description "Exits the current listener." }
-{ $notes "This word is for interactive use only. To exit the Factor runtime, use " { $link exit } "." } ;

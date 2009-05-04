@@ -13,7 +13,12 @@ HELP: synopsis*
 
 HELP: see
 { $values { "defspec" "a definition specifier" } }
-{ $contract "Prettyprints a definition." } ;
+{ $contract "Prettyprints a definition." }
+{ $examples
+  "A word:" { $code "\\ append see" }
+  "A method:" { $code "USE: arrays" "M\\ array length see" }
+  "A help article:" { $code "USE: help.topics" "\"help\" >link see" }
+} ;
 
 HELP: see-methods
 { $values { "word" "a " { $link generic } " or a " { $link class } } }

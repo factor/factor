@@ -10,20 +10,10 @@ $nl
 { $subsection set-where }
 "Definitions can be removed:"
 { $subsection forget }
-"Definitions can answer a sequence of definitions they directly depend on:"
-{ $subsection uses }
 "Definitions must implement a few operations used for printing them in source form:"
 { $subsection definer }
 { $subsection definition }
 { $see-also "see" } ;
-
-ARTICLE: "definition-crossref" "Definition cross referencing"
-"A common cross-referencing system is used to track definition usages:"
-{ $subsection crossref }
-{ $subsection xref }
-{ $subsection unxref }
-{ $subsection delete-xref }
-{ $subsection usage } ;
 
 ARTICLE: "definition-checking" "Definition sanity checking"
 "When a source file is reloaded, the parser compares the previous list of definitions with the current list; any definitions which are no longer present in the file are removed by a call to " { $link forget } ". A warning message is printed if any other definitions still depend on the removed definitions."
@@ -56,11 +46,23 @@ $nl
 { $subsection redefine-error } ;
 
 ARTICLE: "definitions" "Definitions"
-"A " { $emphasis "definition" } " is an artifact read from a source file. This includes words, methods, help articles, and path names (which represent the source file at that location). Words for working with definitions are found in the " { $vocab-link "definitions" } " vocabulary."
+"A " { $emphasis "definition" } " is an artifact read from a source file. Words for working with definitions are found in the " { $vocab-link "definitions" } " vocabulary."
+$nl
+"Definitions are defined using parsing words. Examples of definitions together with their defining parsing words are words (" { $link POSTPONE: : } "), methods (" { $link POSTPONE: M: } "), and vocabularies (" { $link POSTPONE: IN: } ")."
+$nl
+"All definitions share some common traits:"
+{ $list
+  "There is a word to list all definitions of a given type"
+  "There is a parsing word for creating new definitions"
+  "There is an ordinary word which is the runtime equivalent of the parsing word, for introspection"
+  "Instances of the definition may be introspected and modified with the definition protocol"
+}
+"For every source file loaded into the system, a list of definitions is maintained. Pathname objects implement the definition protocol, acting over the definitions their source files contain. See " { $link "source-files" } " for details."
 { $subsection "definition-protocol" }
-{ $subsection "definition-crossref" }
 { $subsection "definition-checking" }
 { $subsection "compilation-units" }
+"A parsing word to remove definitions:"
+{ $subsection POSTPONE: FORGET: }
 { $see-also "see" "parser" "source-files" "words" "generic" "help-impl" } ;
 
 ABOUT: "definitions"
@@ -83,36 +85,3 @@ HELP: forget-all
 { $values { "definitions" "a sequence of definition specifiers" } }
 { $description "Forgets every definition in a sequence." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
-
-HELP: uses
-{ $values { "defspec" "a definition specifier" } { "seq" "a sequence of definition specifiers" } }
-{ $description "Outputs a sequence of definitions directory called by the given definition." }
-{ $notes "The sequence might include the definition itself, if it is a recursive word." }
-{ $examples
-    "We can ask the " { $link sq } " word to produce a list of words it calls:"
-    { $unchecked-example "\ sq uses ." "{ dup * }" }
-} ;
-
-HELP: crossref
-{ $var-description "A graph whose vertices are definition specifiers and edges are usages. See " { $link "graphs" } "." } ;
-
-HELP: xref
-{ $values { "defspec" "a definition specifier" } }
-{ $description "Adds a vertex representing this definition, along with edges representing dependencies to the " { $link crossref } " graph." }
-$low-level-note ;
-
-HELP: usage
-{ $values { "defspec" "a definition specifier" } { "seq" "a sequence of definition specifiers" } }
-{ $description "Outputs a sequence of definitions that directly call the given definition." }
-{ $notes "The sequence might include the definition itself, if it is a recursive word." } ;
-
-HELP: unxref
-{ $values { "defspec" "a definition specifier" } }
-{ $description "Remove edges leaving the vertex which represents the definition from the " { $link crossref } " graph." }
-{ $notes "This word is called before a word is redefined." } ;
-
-HELP: delete-xref
-{ $values { "defspec" "a definition specifier" } }
-{ $description "Remove the vertex which represents the definition from the " { $link crossref } " graph." }
-{ $notes "This word is called before a word is forgotten." }
-{ $see-also forget } ;
