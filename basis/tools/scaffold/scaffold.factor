@@ -5,7 +5,8 @@ io.encodings.utf8 hashtables kernel namespaces sequences
 vocabs.loader io combinators calendar accessors math.parser
 io.streams.string ui.tools.operations quotations strings arrays
 prettyprint words vocabs sorting sets classes math alien urls
-splitting ascii combinators.short-circuit alarms words.symbol ;
+splitting ascii combinators.short-circuit alarms words.symbol
+system summary ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -15,6 +16,10 @@ ERROR: not-a-vocab-root string ;
 ERROR: vocab-name-contains-separator path ;
 ERROR: vocab-name-contains-dot path ;
 ERROR: no-vocab vocab ;
+ERROR: bad-developer-name name ;
+
+M: bad-developer-name summary
+    drop "Developer name must be a string." ;
 
 <PRIVATE
 
@@ -23,6 +28,9 @@ ERROR: no-vocab vocab ;
 : contains-dot? ( string -- ? ) ".." swap subseq? ;
 
 : contains-separator? ( string -- ? ) [ path-separator? ] any? ;
+
+: ensure-vocab-exists ( string -- string )
+    dup vocabs member? [ no-vocab ] unless ;
 
 : check-vocab-name ( string -- string )
     [ ]
@@ -97,10 +105,14 @@ ERROR: no-vocab vocab ;
     ] if ;
 
 : scaffold-authors ( vocab-root vocab -- )
-    "authors.txt" vocab-root/vocab/file>path scaffolding? [
-        [ developer-name get ] dip utf8 set-file-contents
+    developer-name get [
+        "authors.txt" vocab-root/vocab/file>path scaffolding? [
+            developer-name get swap utf8 set-file-contents
+        ] [
+            drop
+        ] if
     ] [
-        drop
+        2drop
     ] if ;
 
 : lookup-type ( string -- object/string ? )
@@ -234,6 +246,7 @@ PRIVATE>
     [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
 
 : scaffold-help ( vocab -- )
+    ensure-vocab-exists
     [
         dup "-docs.factor" vocab/suffix>path scaffolding? [
             set-scaffold-docs-file
@@ -268,6 +281,7 @@ PRIVATE>
 PRIVATE>
 
 : scaffold-tests ( vocab -- )
+    ensure-vocab-exists
     dup "-tests.factor" vocab/suffix>path
     scaffolding? [
         set-scaffold-tests-file
@@ -292,12 +306,20 @@ SYMBOL: examples-flag
         "}" print
     ] with-variable ;
 
+: touch. ( path -- )
+    [ touch-file ]
+    [ "Click to edit: " write <pathname> . ] bi ;
+
 : scaffold-rc ( path -- )
-    [ home ] dip append-path
-    [ touch-file ] [ "Click to edit: " write <pathname> . ] bi ;
+    [ home ] dip append-path touch. ;
 
-: scaffold-factor-boot-rc ( -- ) ".factor-boot-rc" scaffold-rc ;
+: scaffold-factor-boot-rc ( -- )
+    os windows? "factor-boot-rc" ".factor-boot-rc" ? scaffold-rc ;
 
-: scaffold-factor-rc ( -- ) ".factor-rc" scaffold-rc ;
+: scaffold-factor-rc ( -- )
+    os windows? "factor-rc" ".factor-rc" ? scaffold-rc ;
 
-: scaffold-emacs ( -- ) ".emacs" scaffold-rc ;
+
+HOOK: scaffold-emacs os ( -- )
+
+M: unix scaffold-emacs ( -- ) ".emacs" scaffold-rc ;

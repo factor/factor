@@ -1,0 +1,1 @@
+IRC Client chat participants handling

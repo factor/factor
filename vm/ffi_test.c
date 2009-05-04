@@ -1,7 +1,9 @@
 /* This file is linked into the runtime for the sole purpose
  * of testing FFI code. */
-#include "master.h"
 #include "ffi_test.h"
+
+#include <assert.h>
+#include <string.h>
 
 void ffi_test_0(void)
 {
@@ -259,7 +261,7 @@ unsigned long long ffi_test_38(unsigned long long x, unsigned long long y)
 
 int ffi_test_39(long a, long b, struct test_struct_13 s)
 {
-	if(a != b) abort();
+	assert(a == b);
 	return s.x1 + s.x2 + s.x3 + s.x4 + s.x5 + s.x6;
 }
 

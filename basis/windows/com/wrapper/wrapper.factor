@@ -132,7 +132,7 @@ unless
     [ [ 1 ] 2dip set-alien-unsigned-4 ] [ drop ] 2bi ;
 
 : (callbacks>vtbl) ( callbacks -- vtbl )
-    [ execute ] void*-array{ } map-as malloc-byte-array ;
+    [ execute( -- callback ) ] void*-array{ } map-as malloc-byte-array ;
 : (callbacks>vtbls) ( callbacks -- vtbls )
     [ (callbacks>vtbl) ] map ;
 

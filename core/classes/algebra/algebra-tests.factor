@@ -7,12 +7,6 @@ random stack-checker effects kernel.private sbufs math.order
 classes.tuple accessors ;
 IN: classes.algebra.tests
 
-\ class< must-infer
-\ class-and must-infer
-\ class-or must-infer
-\ flatten-class must-infer
-\ flatten-builtin-class must-infer
-
 : class-and* ( cls1 cls2 cls3 -- ? ) [ class-and ] dip class= ;
 
 : class-or* ( cls1 cls2 cls3 -- ? ) [ class-or ] dip class= ;
@@ -311,7 +305,16 @@ SINGLETON: sc
 
 [ sa ] [ sa { sa sb sc } min-class ] unit-test
 
+[ f ] [ sa sb classes-intersect? ] unit-test
+
 [ +lt+ ] [ integer sequence class<=> ] unit-test
 [ +lt+ ] [ sequence object class<=> ] unit-test
 [ +gt+ ] [ object sequence class<=> ] unit-test
 [ +eq+ ] [ integer integer class<=> ] unit-test
+
+! Limitations:
+
+! UNION: u1 sa sb ;
+! UNION: u2 sc ;
+
+! [ f ] [ u1 u2 classes-intersect? ] unit-test

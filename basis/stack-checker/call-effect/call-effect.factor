@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.private effects fry
 kernel kernel.private make sequences continuations quotations
-stack-checker stack-checker.transforms ;
+stack-checker stack-checker.transforms words math ;
 IN: stack-checker.call-effect
 
 ! call( and execute( have complex expansions.
@@ -18,13 +18,35 @@ IN: stack-checker.call-effect
 
 TUPLE: inline-cache value ;
 
-: cache-hit? ( word/quot ic -- ? ) value>> eq? ; inline
+: cache-hit? ( word/quot ic -- ? )
+    [ value>> eq? ] [ value>> ] bi and ; inline
 
-SYMBOL: +unknown+
+SINGLETON: +unknown+
 
 GENERIC: cached-effect ( quot -- effect )
 
 M: object cached-effect drop +unknown+ ;
+
+GENERIC: curry-effect ( effect -- effect' )
+
+M: +unknown+ curry-effect ;
+
+M: effect curry-effect
+    [ in>> length ] [ out>> length ] [ terminated?>> ] tri
+    pick 0 = [ [ 1+ ] dip ] [ [ 1- ] 2dip ] if
+    effect boa ;
+
+M: curry cached-effect
+    quot>> cached-effect curry-effect ;
+
+: compose-effects* ( effect1 effect2 -- effect' )
+    {
+        { [ 2dup [ effect? ] both? ] [ compose-effects ] }
+        { [ 2dup [ +unknown+ eq? ] either? ] [ 2drop +unknown+ ] }
+    } cond ;
+
+M: compose cached-effect
+    [ first>> ] [ second>> ] bi [ cached-effect ] bi@ compose-effects* ;
 
 M: quotation cached-effect
     dup cached-effect>>
@@ -54,6 +76,8 @@ M: quotation cached-effect
 
 \ call-effect-slow [ call-effect-slow>quot ] 1 define-transform
 
+\ call-effect-slow t "no-compile" set-word-prop
+
 : call-effect-fast ( quot effect inline-cache -- )
     2over call-effect-unsafe?
     [ [ nip (>>value) ] [ drop call-effect-unsafe ] 3bi ]
@@ -71,11 +95,13 @@ M: quotation cached-effect
     ]
 ] 0 define-transform
 
+\ call-effect t "no-compile" set-word-prop
+
 : execute-effect-slow ( word effect -- )
     [ '[ _ execute ] ] dip call-effect-slow ; inline
 
 : execute-effect-unsafe? ( word effect -- ? )
-    over optimized>> [ [ stack-effect ] dip effect<= ] [ 2drop f ] if ; inline
+    over optimized? [ [ stack-effect ] dip effect<= ] [ 2drop f ] if ; inline
 
 : execute-effect-fast ( word effect inline-cache -- )
     2over execute-effect-unsafe?
@@ -93,3 +119,5 @@ M: quotation cached-effect
     inline-cache new '[ _ _ execute-effect-ic ] ;
 
 \ execute-effect [ execute-effect>quot ] 1 define-transform
+
+\ execute-effect t "no-compile" set-word-prop

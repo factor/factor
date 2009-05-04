@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slides help.markup math arrays hashtables namespaces sequences
-kernel sequences parser memoize io.encodings.binary locals
-kernel.private help.vocabs assocs quotations tools.vocabs
+USING: slides help.markup math arrays hashtables namespaces
+sequences kernel sequences parser memoize io.encodings.binary
+locals kernel.private help.vocabs assocs quotations
 tools.annotations tools.crossref help.topics math.functions
-compiler.tree.optimizer compiler.cfg.optimizer fry ui.gadgets.panes
-tetris tetris.game combinators generalizations multiline
-sequences.private ;
+compiler.tree.optimizer compiler.cfg.optimizer fry
+ui.gadgets.panes tetris tetris.game combinators generalizations
+multiline sequences.private ;
 IN: otug-talk
 
 : $tetris ( element -- )

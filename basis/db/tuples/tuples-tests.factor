@@ -411,7 +411,7 @@ TUPLE: exam id name score ;
             T{ exam f 4 "Cartman" 41 }
         }
     ] [
-        T{ exam f T{ interval f { 2 t } { 1.0/0.0 f } } } select-tuples
+        T{ exam f T{ interval f { 2 t } { 1/0. f } } } select-tuples
     ] unit-test
 
     [
@@ -419,7 +419,7 @@ TUPLE: exam id name score ;
             T{ exam f 1 "Kyle" 100 }
         }
     ] [
-        T{ exam f T{ interval f { -1.0/0.0 t } { 2 f } } } select-tuples
+        T{ exam f T{ interval f { -1/0. t } { 2 f } } } select-tuples
     ] unit-test
 
     [
@@ -430,7 +430,7 @@ TUPLE: exam id name score ;
             T{ exam f 4 "Cartman" 41 }
         }
     ] [
-        T{ exam f T{ interval f { -1.0/0.0 t } { 1/0. f } } } select-tuples
+        T{ exam f T{ interval f { -1/0. t } { 1/0. f } } } select-tuples
     ] unit-test
     
     [
@@ -592,17 +592,6 @@ string-encoding-test "STRING_ENCODING_TEST" {
 [ test-string-encoding ] test-sqlite
 [ test-string-encoding ] test-postgresql
 
-! Don't comment these out. These words must infer
-\ bind-tuple must-infer
-\ insert-tuple must-infer
-\ update-tuple must-infer
-\ delete-tuples must-infer
-\ select-tuple must-infer
-\ define-persistent must-infer
-\ ensure-table must-infer
-\ create-table must-infer
-\ drop-table must-infer
-
 : test-queries ( -- )
     [ ] [ exam ensure-table ] unit-test
     [ ] [ 1000 [ random-exam insert-tuple ] times ] unit-test
@@ -634,3 +623,22 @@ compound-foo "COMPOUND_FOO"
 
 [ test-compound-primary-key ] test-sqlite
 [ test-compound-primary-key ] test-postgresql
+
+
+TUPLE: example id data ;
+
+example "EXAMPLE"
+{
+    { "id" "ID" +db-assigned-id+ }
+    { "data" "DATA" BLOB }
+} define-persistent
+
+: test-blob-select ( -- )
+    example ensure-table
+    [ ] [ example new B{ 1 2 3 4 5 } >>data insert-tuple ] unit-test
+    [
+        T{ example { id 1 } { data B{ 1 2 3 4 5 } } }
+    ] [ example new B{ 1 2 3 4 5 } >>data select-tuple ] unit-test ;
+
+[ test-blob-select ] test-sqlite
+[ test-blob-select ] test-postgresql

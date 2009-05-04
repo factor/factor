@@ -3,6 +3,6 @@
 USING: eval ;
 IN: tools.deploy.test.11
 
-: foo ( -- ) "USING: math prettyprint ; 2 2 + ." eval ;
+: foo ( -- ) "USING: math prettyprint ; 2 2 + ." eval( -- ) ;
 
 MAIN: foo

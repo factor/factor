@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: quotations effects accessors sequences words kernel ;
+USING: quotations effects accessors sequences words kernel definitions ;
 IN: words.alias
 
 PREDICATE: alias < word "alias" word-prop ;
@@ -12,5 +12,6 @@ PREDICATE: alias < word "alias" word-prop ;
 M: alias reset-word
     [ call-next-method ] [ f "alias" set-word-prop ] bi ;
 
-M: alias stack-effect
-    def>> first stack-effect ;
+M: alias definer drop \ ALIAS: f ;
+
+M: alias definition def>> first 1quotation ;

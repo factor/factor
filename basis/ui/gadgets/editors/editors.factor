@@ -452,6 +452,7 @@ editor "caret-motion" f {
 
 editor "selection" f {
     { T{ button-down f { S+ } 1 } extend-selection }
+    { T{ button-up f { S+ } 1 } com-copy-selection }
     { T{ drag } drag-selection }
     { gain-focus focus-editor }
     { lose-focus unfocus-editor }

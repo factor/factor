@@ -1,8 +1,10 @@
+! Copyright (C) 2009 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: combinators io io.files io.files.links io.directories
 io.pathnames io.streams.string kernel math math.parser
 continuations namespaces pack prettyprint sequences strings
 system tools.hexdump io.encodings.binary summary accessors
-io.backend byte-arrays ;
+io.backend byte-arrays io.streams.byte-array splitting ;
 IN: tar
 
 CONSTANT: zero-checksum 256
@@ -10,37 +12,35 @@ CONSTANT: block-size 512
 
 TUPLE: tar-header name mode uid gid size mtime checksum typeflag
 linkname magic version uname gname devmajor devminor prefix ;
-ERROR: checksum-error ;
 
-SYMBOLS: base-dir filename ;
+ERROR: checksum-error header ;
 
-: tar-trim ( seq -- newseq ) [ "\0 " member? ] trim ;
+: trim-string ( seq -- newseq ) [ "\0 " member? ] trim ;
 
-: read-c-string* ( n -- str/f )
+: read-c-string ( n -- str/f )
     read [ zero? ] trim-tail [ f ] when-empty ;
 
 : read-tar-header ( -- obj )
     \ tar-header new
-    100 read-c-string* >>name
-    8 read-c-string* tar-trim oct> >>mode
-    8 read-c-string* tar-trim oct> >>uid
-    8 read-c-string* tar-trim oct> >>gid
-    12 read-c-string* tar-trim oct> >>size
-    12 read-c-string* tar-trim oct> >>mtime
-    8 read-c-string* tar-trim oct> >>checksum
-    read1 >>typeflag
-    100 read-c-string* >>linkname
-    6 read >>magic
-    2 read >>version
-    32 read-c-string* >>uname
-    32 read-c-string* >>gname
-    8 read tar-trim oct> >>devmajor
-    8 read tar-trim oct> >>devminor
-    155 read-c-string* >>prefix ;
+        100 read-c-string >>name
+        8 read-c-string trim-string oct> >>mode
+        8 read-c-string trim-string oct> >>uid
+        8 read-c-string trim-string oct> >>gid
+        12 read-c-string trim-string oct> >>size
+        12 read-c-string trim-string oct> >>mtime
+        8 read-c-string trim-string oct> >>checksum
+        read1 >>typeflag
+        100 read-c-string >>linkname
+        6 read >>magic
+        2 read >>version
+        32 read-c-string >>uname
+        32 read-c-string >>gname
+        8 read trim-string oct> >>devmajor
+        8 read trim-string oct> >>devminor
+        155 read-c-string >>prefix ;
 
-: header-checksum ( seq -- x )
-    148 cut-slice 8 tail-slice
-    [ sum ] bi@ + 256 + ;
+: checksum-header ( seq -- n )
+    148 cut-slice 8 tail-slice [ sum ] bi@ + 256 + ;
 
 : read-data-blocks ( tar-header -- )
     dup size>> 0 > [
@@ -60,32 +60,40 @@ SYMBOLS: base-dir filename ;
     ] if ;
 
 : parse-tar-header ( seq -- obj )
-    [ header-checksum ] keep over zero-checksum = [
+    dup checksum-header dup zero-checksum = [
         2drop
         \ tar-header new
             0 >>size
             0 >>checksum
     ] [
-        [ read-tar-header ] with-string-reader
-        [ checksum>> = [ checksum-error ] unless ] keep
+        [
+            binary [ read-tar-header ] with-byte-reader
+            dup checksum>>
+        ] dip = [ checksum-error ] unless
     ] if ;
 
 ERROR: unknown-typeflag ch ;
-M: unknown-typeflag summary ( obj -- str )
-    ch>> 1string "Unknown typeflag: " prepend ;
 
-: tar-prepend-path ( path -- newpath )
-    base-dir get prepend-path ;
+M: unknown-typeflag summary ( obj -- str )
+    ch>> [ "Unknown typeflag: " ] dip prefix ;
 
 : read/write-blocks ( tar-header path -- )
     binary [ read-data-blocks ] with-file-writer ;
 
+: prepend-current-directory ( path -- path' )
+    current-directory get prepend-path ;
+
 ! Normal file
 : typeflag-0 ( header -- )
-    dup name>> tar-prepend-path read/write-blocks ;
+    dup name>> dup "global_pax_header" = [
+        drop [ read-data-blocks ] with-string-writer drop
+    ] [
+        prepend-current-directory read/write-blocks
+    ] if ;
 
 ! Hard link
-: typeflag-1 ( header -- ) unknown-typeflag ;
+: typeflag-1 ( header -- )
+    [ name>> ] [ linkname>> ] bi make-hard-link ;
 
 ! Symlink
 : typeflag-2 ( header -- )
@@ -99,7 +107,7 @@ M: unknown-typeflag summary ( obj -- str )
 
 ! Directory
 : typeflag-5 ( header -- )
-    name>> tar-prepend-path make-directories ;
+    name>> prepend-current-directory make-directories ;
 
 ! FIFO
 : typeflag-6 ( header -- ) unknown-typeflag ;
@@ -136,10 +144,11 @@ M: unknown-typeflag summary ( obj -- str )
 
 ! Long file name
 : typeflag-L ( header -- )
-    drop ;
+    drop
+    ;
     ! <string-writer> [ read-data-blocks ] keep
     ! >string [ zero? ] trim-tail filename set
-    ! filename get tar-prepend-path make-directories ;
+    ! filename get prepend-current-directory make-directories ;
 
 ! Multi volume continuation entry
 : typeflag-M ( header -- ) unknown-typeflag ;
@@ -156,8 +165,8 @@ M: unknown-typeflag summary ( obj -- str )
 ! Vendor extended header type
 : typeflag-X ( header -- ) unknown-typeflag ;
 
-: (parse-tar) ( -- )
-    block-size read dup length 512 = [
+: parse-tar ( -- )
+    block-size read dup length block-size = [
         parse-tar-header
         dup typeflag>>
         {
@@ -177,19 +186,19 @@ M: unknown-typeflag summary ( obj -- str )
             ! { CHAR: E [ typeflag-E ] }
             ! { CHAR: I [ typeflag-I ] }
             ! { CHAR: K [ typeflag-K ] }
-            ! { CHAR: L [ typeflag-L ] }
+            { CHAR: L [ typeflag-L ] }
             ! { CHAR: M [ typeflag-M ] }
             ! { CHAR: N [ typeflag-N ] }
             ! { CHAR: S [ typeflag-S ] }
             ! { CHAR: V [ typeflag-V ] }
             ! { CHAR: X [ typeflag-X ] }
             { f [ drop ] }
-        } case (parse-tar)
+        } case parse-tar
     ] [
         drop
     ] if ;
 
-: parse-tar ( path -- )
-    normalize-path dup parent-directory base-dir [
-         binary [ (parse-tar) ] with-file-reader
-    ] with-variable ;
+: untar ( path -- )
+    normalize-path dup parent-directory [
+         binary [ parse-tar ] with-file-reader
+    ] with-directory ;

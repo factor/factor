@@ -50,13 +50,13 @@ IN: project-euler.150
     615949 * 797807 + 20 2^ rem dup 19 2^ - ; inline
 
 : sums-triangle ( -- seq )
-    0 1000 [ 1+ [ next ] replicate partial-sums ] map nip ;
+    0 1000 iota [ 1+ [ next ] replicate partial-sums ] map nip ;
 
 :: (euler150) ( m -- n )
     [let | table [ sums-triangle ] |
         m [| x |
             x 1+ [| y |
-                m x - [| z |
+                m x - iota [| z |
                     x z + table nth-unsafe
                     [ y z + 1+ swap nth-unsafe ]
                     [ y        swap nth-unsafe ] bi -

@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math words kernel assocs classes
 math.order kernel.private ;
@@ -16,11 +16,13 @@ SYMBOL: tag-numbers
 
 SYMBOL: type-numbers
 
-: tag-number ( class -- n )
-    tag-numbers get at [ object tag-number ] unless* ;
+SYMBOL: mega-cache-size
 
 : type-number ( class -- n )
     type-numbers get at ;
+
+: tag-number ( class -- n )
+    type-number dup num-tags get >= [ drop object tag-number ] when ;
 
 : tag-fixnum ( n -- tagged )
     tag-bits get shift ;
@@ -47,13 +49,13 @@ SYMBOL: type-numbers
     cell-bits (first-bignum) ; inline
 
 : most-positive-fixnum ( -- n )
-    first-bignum 1- ; inline
+    first-bignum 1 - ; inline
 
 : most-negative-fixnum ( -- n )
     first-bignum neg ; inline
 
 : (max-array-capacity) ( b -- n )
-    5 - 2^ 1- ; inline
+    5 - 2^ 1 - ; inline
 
 : max-array-capacity ( -- n )
     cell-bits (max-array-capacity) ; inline
@@ -62,7 +64,7 @@ SYMBOL: type-numbers
     bootstrap-cell-bits (first-bignum) ;
 
 : bootstrap-most-positive-fixnum ( -- n )
-    bootstrap-first-bignum 1- ;
+    bootstrap-first-bignum 1 - ;
 
 : bootstrap-most-negative-fixnum ( -- n )
     bootstrap-first-bignum neg ;

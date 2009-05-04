@@ -3,10 +3,6 @@ USING: accessors tools.test persistent.vectors
 persistent.sequences sequences kernel arrays random namespaces
 vectors math math.order ;
 
-\ new-nth must-infer
-\ ppush must-infer
-\ ppop must-infer
-
 [ 0 ] [ PV{ } length ] unit-test
 
 [ 1 ] [ 3 PV{ } ppush length ] unit-test

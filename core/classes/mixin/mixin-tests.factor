@@ -42,7 +42,7 @@ INSTANCE: integer mx1
 [ t ] [ mx1 integer class<= ] unit-test
 [ t ] [ mx1 number class<= ] unit-test
 
-"IN: classes.mixin.tests USE: arrays INSTANCE: array mx1" eval
+"IN: classes.mixin.tests USE: arrays INSTANCE: array mx1" eval( -- )
 
 [ t ] [ array mx1 class<= ] unit-test
 [ f ] [ mx1 number class<= ] unit-test
@@ -119,3 +119,13 @@ MIXIN: move-instance-declaration-mixin
 [ ] [ "IN: classes.mixin.tests.a" <string-reader> "move-mixin-test-1" parse-stream drop ] unit-test
 
 [ { string } ] [ move-instance-declaration-mixin members ] unit-test
+
+MIXIN: silly-mixin
+SYMBOL: not-a-class
+
+[ [ \ not-a-class \ silly-mixin add-mixin-instance ] with-compilation-unit ] must-fail
+
+SYMBOL: not-a-mixin
+TUPLE: a-class ;
+
+[ [ \ a-class \ not-a-mixin add-mixin-instance ] with-compilation-unit ] must-fail

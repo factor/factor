@@ -1,9 +1,9 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private math
-namespaces make sequences words quotations layouts combinators
+namespaces sequences words quotations layouts combinators
 sequences.private classes classes.builtin classes.algebra
-definitions math.order math.private ;
+definitions math.order math.private assocs ;
 IN: generic.math
 
 PREDICATE: math-class < class
@@ -13,23 +13,29 @@ PREDICATE: math-class < class
         number bootstrap-word class<=
     ] if ;
 
+<PRIVATE
+
 : last/first ( seq -- pair ) [ peek ] [ first ] bi 2array ;
 
-: math-precedence ( class -- pair )
-    {
-        { [ dup null class<= ] [ drop { -1 -1 } ] }
-        { [ dup math-class? ] [ class-types last/first ] }
-        [ drop { 100 100 } ]
-    } cond ;
-    
-: math-class<=> ( class1 class2 -- class )
-    [ math-precedence ] compare +gt+ eq? ;
+: bootstrap-words ( classes -- classes' )
+    [ bootstrap-word ] map ;
 
-: math-class-max ( class1 class2 -- class )
-    [ math-class<=> ] most ;
+: math-precedence ( class -- pair )
+    [
+        { fixnum integer rational real number object } bootstrap-words
+        swap [ swap class<= ] curry find drop -1 or
+    ] [
+        { fixnum bignum ratio float complex object } bootstrap-words
+        swap [ class<= ] curry find drop -1 or
+    ] bi 2array ;
 
 : (math-upgrade) ( max class -- quot )
     dupd = [ drop [ ] ] [ "coercer" word-prop [ ] or ] if ;
+
+PRIVATE>
+
+: math-class-max ( class1 class2 -- class )
+    [ [ math-precedence ] bi@ after? ] most ;
 
 : math-upgrade ( class1 class2 -- quot )
     [ math-class-max ] 2keep
@@ -44,33 +50,57 @@ ERROR: no-math-method left right generic ;
 : default-math-method ( generic -- quot )
     [ no-math-method ] curry [ ] like ;
 
+<PRIVATE
+
 : applicable-method ( generic class -- quot )
     over method
     [ 1quotation ]
     [ default-math-method ] ?if ;
+
+PRIVATE>
 
 : object-method ( generic -- quot )
     object bootstrap-word applicable-method ;
 
 : math-method ( word class1 class2 -- quot )
     2dup and [
-        [
-            2dup 2array , \ declare ,
-            2dup math-upgrade %
-            math-class-max over order min-class applicable-method %
-        ] [ ] make
+        [ 2array [ declare ] curry nip ]
+        [ math-upgrade nip ]
+        [ math-class-max over order min-class applicable-method ]
+        3tri 3append
     ] [
         2drop object-method
     ] if ;
 
-SYMBOL: picker
+<PRIVATE
 
-: math-vtable ( picker quot -- quot )
-    [
-        [ , \ tag , ]
-        [ num-tags get swap [ bootstrap-type>class ] prepose map , ] bi*
-        \ dispatch ,
-    ] [ ] make ; inline
+SYMBOL: generic-word
+
+: make-math-method-table ( classes quot: ( class -- quot ) -- alist )
+    [ bootstrap-words ] dip
+    [ [ drop ] [ call ] 2bi ] curry { } map>assoc ; inline
+
+: math-alist>quot ( alist -- quot )
+    [ generic-word get object-method ] dip alist>quot ;
+
+: tag-dispatch-entry ( tag picker -- quot )
+    [ "type" word-prop 1quotation [ tag ] [ eq? ] surround ] dip prepend ;
+
+: tag-dispatch ( picker alist -- alist' )
+    swap [ [ tag-dispatch-entry ] curry dip ] curry assoc-map math-alist>quot ;
+
+: tuple-dispatch-entry ( class picker -- quot )
+    [ 1quotation [ { tuple } declare class ] [ eq? ] surround ] dip prepend ;
+
+: tuple-dispatch ( picker alist -- alist' )
+    swap [ [ tuple-dispatch-entry ] curry dip ] curry assoc-map math-alist>quot ;
+
+: math-dispatch-step ( picker quot: ( class -- quot ) -- quot )
+    [ [ { bignum float fixnum } ] dip make-math-method-table ]
+    [ [ { ratio complex } ] dip make-math-method-table tuple-dispatch ] 2bi
+    tuple swap 2array prefix tag-dispatch ; inline
+
+PRIVATE>
 
 SINGLETON: math-combination
 
@@ -78,20 +108,21 @@ M: math-combination make-default-method
     drop default-math-method ;
 
 M: math-combination perform-combination
-    drop
-    dup
-    [
-        [ 2dup both-fixnums? ] %
-        dup fixnum bootstrap-word dup math-method ,
-        \ over [
-            dup math-class? [
-                \ dup [ [ 2dup ] dip math-method ] math-vtable
-            ] [
-                over object-method
-            ] if nip
-        ] math-vtable nip ,
-        \ if ,
-    ] [ ] make define ;
+    drop dup generic-word [
+        dup
+        [ fixnum bootstrap-word dup math-method ]
+        [
+            [ over ] [
+                dup math-class? [
+                    [ dup ] [ math-method ] with with math-dispatch-step
+                ] [
+                    drop object-method
+                ] if
+            ] with math-dispatch-step
+        ] bi
+        [ if ] 2curry [ 2dup both-fixnums? ] prepend
+        define
+    ] with-variable ;
 
 PREDICATE: math-generic < generic ( word -- ? )
     "combination" word-prop math-combination? ;

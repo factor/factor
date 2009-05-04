@@ -1,6 +1,6 @@
 USING: help.markup help.syntax ui.commands ui.operations
 editors vocabs.loader kernel sequences prettyprint tools.test
-tools.vocabs strings unicode.categories unicode.case
+vocabs.refresh strings unicode.categories unicode.case
 ui.tools.browser ui.tools.common ;
 IN: help.tutorial
 
@@ -76,9 +76,11 @@ $nl
 { $code "." }
 "What we just did is called " { $emphasis "interactive testing" } ". A more advanced technique which comes into play with larger programs is " { $link "tools.test" } "."
 $nl
-"Open the file named " { $snippet "palindrome-tests.factor" } "; it is located in the same directory as " { $snippet "palindrome.factor" } ", and it was created by the scaffold tool."
+"Create a test harness file using the scaffold tool:"
+{ $code "\"palindrome\" scaffold-tests" }
+"Now, open the file named " { $snippet "palindrome-tests.factor" } "; it is located in the same directory as " { $snippet "palindrome.factor" } ", and it was created by the scaffold tool."
 $nl
-"We will add some unit tests, which are similar to the interactive tests we did above. Unit tests are defined with the " { $link unit-test } " word, which takes a sequence of expected outputs, and a piece of code. It runs the code, and asserts that it outputs the expected values."
+"We will add some unit tests, which are similar to the interactive tests we did above. Unit tests are defined with the " { $link POSTPONE: unit-test } " word, which takes a sequence of expected outputs, and a piece of code. It runs the code, and asserts that it outputs the expected values."
 $nl
 "Add the following three lines to " { $snippet "palindrome-tests.factor" } ":"
 { $code

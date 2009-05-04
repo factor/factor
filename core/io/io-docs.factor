@@ -221,9 +221,13 @@ HELP: bl
 { $description "Outputs a space character (" { $snippet "\" \"" } ") to " { $link output-stream } "." }
 $io-error ;
 
-HELP: lines
+HELP: stream-lines
 { $values { "stream" "an input stream" } { "seq" "a sequence of strings" } }
 { $description "Reads lines of text until the stream is exhausted, collecting them in a sequence of strings." } ;
+
+HELP: lines
+{ $values { "seq" "a sequence of strings" } }
+{ $description "Reads lines of text until from the " { $link input-stream } " until it is exhausted, collecting them in a sequence of strings." } ;
 
 HELP: each-line
 { $values { "quot" { $quotation "( str -- )" } } }
@@ -233,9 +237,14 @@ HELP: each-block
 { $values { "quot" { $quotation "( block -- )" } } }
 { $description "Calls the quotation with successive blocks of data, until the current " { $link input-stream } " is exhausted." } ;
 
-HELP: contents
+HELP: stream-contents
 { $values { "stream" "an input stream" } { "seq" "a string, byte array or " { $link f } } }
-{ $description "Reads the entire contents of a stream. If the stream is empty, outputs"  { $link f } "." }
+{ $description "Reads the entire contents of a stream. If the stream is empty, outputs "  { $link f } "." }
+$io-error ;
+
+HELP: contents
+{ $values { "seq" "a string, byte array or " { $link f } } }
+{ $description "Reads the entire contents of a the stream stored in " { $link input-stream } ". If the stream is empty, outputs " { $link f } "." }
 $io-error ;
 
 ARTICLE: "stream-protocol" "Stream protocol"
@@ -347,17 +356,37 @@ $nl
 "First, a simple composition of " { $link stream-write } " and " { $link stream-nl } ":"
 { $subsection stream-print }
 "Processing lines one by one:"
+{ $subsection stream-lines }
 { $subsection lines }
 { $subsection each-line }
 "Processing blocks of data:"
+{ $subsection stream-contents }
 { $subsection contents }
 { $subsection each-block }
 "Copying the contents of one stream to another:"
 { $subsection stream-copy } ;
 
+ARTICLE: "stream-examples" "Stream example"
+"Ask the user for their age, and print it back:"
+{ $code
+    "USING: io math.parser ;"
+    ""
+    ": ask-age ( -- ) \"How old are you?\" print ;"
+    ""
+    ": read-age ( -- n ) readln string>number ;"
+    ""
+    ": print-age ( n -- )"
+    "    \"You are \" write"
+    "    number>string write"
+    "    \" years old.\" print ;"
+    ": example ( -- ) ask-age read-age print-age ;"
+    ""
+    "example"
+} ;
+
 ARTICLE: "streams" "Streams"
 "Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of " { $emphasis "elements" } "."
-$nl
+{ $subsection "stream-examples" }
 "A stream can either be passed around on the stack or bound to a dynamic variable and used as one of the two implicit " { $emphasis "default streams" } "."
 { $subsection "stream-protocol" }
 { $subsection "stdio" }

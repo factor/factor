@@ -1,10 +1,10 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser words definitions kernel sequences assocs arrays
 kernel.private fry combinators accessors vectors strings sbufs
-byte-arrays byte-vectors io.binary io.streams.string splitting
-math generic generic.standard generic.standard.engines classes
-hashtables ;
+byte-arrays byte-vectors io.binary io.streams.string splitting math
+math.parser generic generic.single generic.standard classes
+hashtables namespaces ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
@@ -25,7 +25,7 @@ M: object specializer-declaration class ;
     [ drop object eq? not ] assoc-filter
     [ [ t ] ] [
         [ swap specializer-predicate append ] { } assoc>map
-        unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
+        [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce
     ] if-empty ;
 
 : specializer-cases ( quot word -- default alist )
@@ -37,13 +37,18 @@ M: object specializer-declaration class ;
 : specialize-quot ( quot specializer -- quot' )
     specializer-cases alist>quot ;
 
+! compiler.tree.propagation.inlining sets this to f
+SYMBOL: specialize-method?
+
+t specialize-method? set-global
+
 : method-declaration ( method -- quot )
     [ "method-generic" word-prop dispatch# object <array> ]
     [ "method-class" word-prop ]
-    bi prefix ;
+    bi prefix [ declare ] curry [ ] like ;
 
 : specialize-method ( quot method -- quot' )
-    [ method-declaration '[ _ declare ] prepend ]
+    [ specialize-method? get [ method-declaration prepend ] [ drop ] if ]
     [ "method-generic" word-prop "specializer" word-prop ] bi
     [ specialize-quot ] when* ;
 
@@ -65,9 +70,8 @@ M: object specializer-declaration class ;
 
 SYNTAX: HINTS:
     scan-object
-    dup method-spec? [ first2 method ] when
-    [ redefined ]
-    [ parse-definition "specializer" set-word-prop ] bi ;
+    [ changed-definition ]
+    [ parse-definition { } like "specializer" set-word-prop ] bi ;
 
 ! Default specializers
 { first first2 first3 first4 }
@@ -119,6 +123,8 @@ SYNTAX: HINTS:
 
 \ >be { { bignum fixnum } { fixnum fixnum } } "specializer" set-word-prop
 
-\ hashtable \ at* method { { fixnum object } { word object } } "specializer" set-word-prop
+\ base> { string fixnum } "specializer" set-word-prop
 
-\ hashtable \ set-at method { { object fixnum object } { object word object } } "specializer" set-word-prop
+M\ hashtable at* { { fixnum object } { word object } } "specializer" set-word-prop
+
+M\ hashtable set-at { { object fixnum object } { object word object } } "specializer" set-word-prop

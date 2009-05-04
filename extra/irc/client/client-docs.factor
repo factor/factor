@@ -1,15 +1,8 @@
-USING: help.markup help.syntax quotations kernel irc.messages ;
+! Copyright (C) 2009 Bruno Deferrari
+! See http://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax quotations kernel
+irc.messages irc.messages.base irc.messages.parser irc.client.chats ;
 IN: irc.client
-
-HELP: irc-client "IRC Client object" ;
-
-HELP: irc-server-chat "Chat for server messages unmanaged by other chats" ;
-
-HELP: irc-channel-chat "Chat for irc channels" ;
-
-HELP: irc-nick-chat "Chat for irc users" ;
-
-HELP: irc-profile "IRC Client profile object" ;
 
 HELP: connect-irc "Connecting to an irc server"
 { $values { "irc-client" "an irc client object" } }
@@ -56,30 +49,31 @@ ARTICLE: "irc.client" "IRC Client"
 "Some of the RFC defined irc messages as objects:"
 { $table
   { { $link irc-message } "base of all irc messages" }
-  { { $link logged-in } "logged in to server" }
+  { { $link rpl-welcome } "logged in to server" }
   { { $link ping } "ping message" }
   { { $link join } "channel join" }
   { { $link part } "channel part" }
   { { $link quit } "quit from irc" }
   { { $link privmsg } "private message (to client or channel)" }
   { { $link kick } "kick from channel" }
-  { { $link roomlist } "list of participants in channel" }
-  { { $link nick-in-use } "chosen nick is in use by another client" }
+  { { $link rpl-names } "list of participants in channel" }
+  { { $link rpl-nickname-in-use } "chosen nick is in use by another client" }
   { { $link notice } "notice message" }
   { { $link mode } "mode change" }
   { { $link unhandled } "uninmplemented/unhandled message" }
   }
+
 { $heading "Special messages" }
 "Some special messages that are created by the library and not by the irc server."
 { $table
   { { $link irc-chat-end } "sent to a chat when it has been detached from the client, the chat should stop after it receives this message. " }
-  { { $link irc-end } " sent when the client isn't running anymore, chats should stop after it receives this message." }
+  { { $link irc-end } " sent when the client isn't running anymore, the chat should stop after it receives this message." }
   { { $link irc-disconnected } " sent to notify chats that connection was lost." }
   { { $link irc-connected } " sent to notify chats that a connection with the irc server was established." } }
 
 { $heading "Example:" }
 { $code
-  "USING: irc.client ;"
+  "USING: irc.client irc.client.chats ;"
   "SYMBOL: bot"
   "SYMBOL: mychannel"
   "! Create the profile and client objects"
@@ -91,7 +85,7 @@ ARTICLE: "irc.client" "IRC Client"
   "! Register and start chat (this joins the channel)"
   "mychannel get bot get attach-chat"
   "! Send a message to the channel"
-  "\"what's up?\" mychannel get speak"
+  "\"Hello World!\" mychannel get speak"
   "! Read a message from the channel"
   "mychannel get hear"
 }

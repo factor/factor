@@ -1,8 +1,7 @@
-! Copyright (C) 2008 Slava Pestov
+! Copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays fry kernel models.product models.arrow
-sequences sorting ;
+USING: sorting models.arrow.smart fry ;
 IN: models.sort
 
 : <sort> ( values sort -- model )
-    2array <product> [ first2 sort ] <arrow> ;
+    [ '[ _ call( obj1 obj2 -- <=> ) ] sort ] <smart-arrow> ; inline

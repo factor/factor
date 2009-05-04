@@ -46,7 +46,7 @@ M: winnt add-completion ( win32-handle -- )
             { [ dup integer? ] [ ] }
             { [ dup array? ] [
                 first dup eof?
-                [ drop 0 ] [ (win32-error-string) throw ] if
+                [ drop 0 ] [ n>win32-error-string throw ] if
             ] }
         } cond
     ] with-timeout ;
@@ -105,7 +105,7 @@ M: winnt seek-handle ( n seek-type handle -- )
         GetLastError {
             { [ dup expected-io-error? ] [ drop f ] }
             { [ dup eof? ] [ drop t ] }
-            [ (win32-error-string) throw ]
+            [ n>win32-error-string throw ]
         } cond
     ] [ f ] if ;
 

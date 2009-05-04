@@ -29,3 +29,9 @@ TUPLE: unique-deque assoc deque ;
 : pop-url ( unique-deque -- todo-url ) deque>> pop-front ;
 
 : peek-url ( unique-deque -- todo-url ) deque>> peek-front ;
+
+: slurp-deque-when ( deque quot1 quot2: ( value -- ) -- )
+    pick deque-empty? [ 3drop ] [
+        [ [ pop-front dup ] 2dip slip [ t ] compose [ drop f ] if ]
+        [ roll [ slurp-deque-when ] [ 3drop ] if ] 3bi
+    ] if ; inline recursive

@@ -98,7 +98,7 @@ IN: io.launcher.windows.nt.tests
         <process>
             console-vm "-script" "env.factor" 3array >>command
         ascii <process-reader> contents
-    ] with-directory eval
+    ] with-directory eval( -- alist )
 
     os-envs =
 ] unit-test
@@ -110,7 +110,7 @@ IN: io.launcher.windows.nt.tests
             +replace-environment+ >>environment-mode
             os-envs >>environment
         ascii <process-reader> contents
-    ] with-directory eval
+    ] with-directory eval( -- alist )
     
     os-envs =
 ] unit-test
@@ -121,7 +121,7 @@ IN: io.launcher.windows.nt.tests
             console-vm "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
         ascii <process-reader> contents
-    ] with-directory eval
+    ] with-directory eval( -- alist )
 
     "A" swap at
 ] unit-test
@@ -133,7 +133,7 @@ IN: io.launcher.windows.nt.tests
             { { "USERPROFILE" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
         ascii <process-reader> contents
-    ] with-directory eval
+    ] with-directory eval( -- alist )
 
     "USERPROFILE" swap at "XXX" =
 ] unit-test

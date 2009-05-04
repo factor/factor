@@ -1,9 +1,10 @@
-! Copyright (c) 2007-2008 Aaron Schaefer.
+! Copyright (c) 2007-2009 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel make math math.functions math.matrices math.miller-rabin
-    math.order math.parser math.primes.factors math.ranges math.ratios
-    sequences sorting strings unicode.case parser accessors vocabs.parser
-    namespaces vocabs words quotations prettyprint ;
+USING: accessors arrays kernel lists make math math.functions math.matrices
+    math.miller-rabin math.order math.parser math.primes.factors
+    math.primes.lists math.ranges math.ratios namespaces parser prettyprint
+    quotations sequences sorting strings unicode.case vocabs vocabs.parser
+    words ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -16,11 +17,13 @@ IN: project-euler.common
 ! log10 - #25, #134
 ! max-path - #18, #67
 ! mediant - #71, #73
+! nth-prime - #7, #69
 ! nth-triangle - #12, #42
 ! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92
 ! palindrome? - #4, #36, #55
 ! pandigital? - #32, #38
 ! pentagonal? - #44, #45
+! penultimate - #69, #71
 ! propagate-all - #18, #67
 ! sum-proper-divisors - #21
 ! tau* - #12
@@ -78,6 +81,9 @@ PRIVATE>
 : number-length ( n -- m )
     log10 floor 1+ >integer ;
 
+: nth-prime ( n -- n )
+    1- lprimes lnth ;
+
 : nth-triangle ( n -- n )
     dup 1+ * 2 / ;
 
@@ -89,6 +95,9 @@ PRIVATE>
 
 : pentagonal? ( n -- ? )
     dup 0 > [ 24 * 1+ sqrt 1+ 6 / 1 mod zero? ] [ drop f ] if ;
+
+: penultimate ( seq -- elt )
+    dup length 2 - swap nth ;
 
 ! Not strictly needed, but it is nice to be able to dump the triangle after the
 ! propagation
