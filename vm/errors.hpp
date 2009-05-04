@@ -23,8 +23,8 @@ enum vm_error_type
 };
 
 void out_of_memory(void);
-void fatal_error(char* msg, cell tagged);
-void critical_error(char* msg, cell tagged);
+void fatal_error(const char* msg, cell tagged);
+void critical_error(const char* msg, cell tagged);
 
 PRIMITIVE(die);
 

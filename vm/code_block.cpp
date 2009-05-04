@@ -279,21 +279,27 @@ void mark_object_code_block(object *object)
 	switch(object->h.hi_tag())
 	{
 	case WORD_TYPE:
-		word *w = (word *)object;
-		if(w->code)
-			mark_code_block(w->code);
-		if(w->profiling)
-			mark_code_block(w->profiling);
-		break;
+		{
+			word *w = (word *)object;
+			if(w->code)
+				mark_code_block(w->code);
+			if(w->profiling)
+				mark_code_block(w->profiling);
+			break;
+		}
 	case QUOTATION_TYPE:
-		quotation *q = (quotation *)object;
-		if(q->compiledp != F)
-			mark_code_block(q->code);
-		break;
+		{
+			quotation *q = (quotation *)object;
+			if(q->compiledp != F)
+				mark_code_block(q->code);
+			break;
+		}
 	case CALLSTACK_TYPE:
-		callstack *stack = (callstack *)object;
-		iterate_callstack_object(stack,mark_stack_frame_step);
-		break;
+		{
+			callstack *stack = (callstack *)object;
+			iterate_callstack_object(stack,mark_stack_frame_step);
+			break;
+		}
 	}
 }
 
@@ -318,28 +324,32 @@ void *get_rel_symbol(array *literals, cell index)
 	switch(tagged<object>(symbol).type())
 	{
 	case BYTE_ARRAY_TYPE:
-		symbol_char *name = alien_offset(symbol);
-		void *sym = ffi_dlsym(d,name);
-
-		if(sym)
-			return sym;
-		else
 		{
-			printf("%s\n",name);
-			return (void *)undefined_symbol;
-		}
-	case ARRAY_TYPE:
-		cell i;
-		array *names = untag<array>(symbol);
-		for(i = 0; i < array_capacity(names); i++)
-		{
-			symbol_char *name = alien_offset(array_nth(names,i));
+			symbol_char *name = alien_offset(symbol);
 			void *sym = ffi_dlsym(d,name);
 
 			if(sym)
 				return sym;
+			else
+			{
+				printf("%s\n",name);
+				return (void *)undefined_symbol;
+			}
 		}
-		return (void *)undefined_symbol;
+	case ARRAY_TYPE:
+		{
+			cell i;
+			array *names = untag<array>(symbol);
+			for(i = 0; i < array_capacity(names); i++)
+			{
+				symbol_char *name = alien_offset(array_nth(names,i));
+				void *sym = ffi_dlsym(d,name);
+
+				if(sym)
+					return sym;
+			}
+			return (void *)undefined_symbol;
+		}
 	default:
 		critical_error("Bad symbol specifier",symbol);
 		return (void *)undefined_symbol;

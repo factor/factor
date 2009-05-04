@@ -49,9 +49,11 @@ static cell determine_inline_cache_type(array *cache_entries)
 		switch(TAG(klass))
 		{
 		case FIXNUM_TYPE:
-			fixnum type = untag_fixnum(klass);
-			if(type >= HEADER_TYPE)
-				seen_hi_tag = true;
+			{
+				fixnum type = untag_fixnum(klass);
+				if(type >= HEADER_TYPE)
+					seen_hi_tag = true;
+			}
 			break;
 		case ARRAY_TYPE:
 			seen_tuple = true;
