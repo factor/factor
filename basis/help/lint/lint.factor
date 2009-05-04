@@ -87,7 +87,7 @@ PRIVATE>
 
 : help-lint-all ( -- ) "" help-lint ;
 
-: :lint-failures ( -- ) lint-failures get errors. ;
+: :lint-failures ( -- ) lint-failures get values errors. ;
 
 : unlinked-words ( words -- seq )
     all-word-help [ article-parent not ] filter ;
