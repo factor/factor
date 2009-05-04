@@ -1,5 +1,5 @@
 IN: tools.vocabs.tests
-USING: tools.test tools.vocabs namespaces continuations ;
+USING: continuations namespaces tools.test tools.vocabs tools.vocabs.private ;
 
 [ ] [
     changed-vocabs get-global
@@ -7,3 +7,6 @@ USING: tools.test tools.vocabs namespaces continuations ;
     [ t ] [ "kernel" changed-vocab? ] unit-test
     [ "kernel" changed-vocab ] [ changed-vocabs set-global ] [ ] cleanup
 ] unit-test
+
+[ t ] [ "some-vocab" valid-vocab-dirname ] unit-test
+[ f ] [ ".git" valid-vocab-dirname ] unit-test
