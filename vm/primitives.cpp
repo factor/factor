@@ -3,7 +3,7 @@
 namespace factor
 {
 
-primitive_type primitives[] = {
+const primitive_type primitives[] = {
 	primitive_bignum_to_fixnum,
 	primitive_float_to_fixnum,
 	primitive_fixnum_to_bignum,
