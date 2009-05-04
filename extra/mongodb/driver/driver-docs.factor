@@ -280,9 +280,4 @@ HELP: with-db
 }
 { $description "executes a quotation with the given mdb instance in its context" } ;
 
-ARTICLE: "mongodb.driver" "MongoDB factor driver"
-{ $vocab-link "mongodb.driver" }
-;
-
-ABOUT: "mongodb.driver"
 

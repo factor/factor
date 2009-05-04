@@ -28,7 +28,7 @@ CONSTANT: simple-combination T{ standard-combination f 0 }
         { 0 [ [ dup ] ] }
         { 1 [ [ over ] ] }
         { 2 [ [ pick ] ] }
-        [ 1- (picker) [ dip swap ] curry ]
+        [ 1 - (picker) [ dip swap ] curry ]
     } case ;
 
 M: standard-combination picker

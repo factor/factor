@@ -178,7 +178,7 @@ M: echelon-dispatch-engine compile-engine
 M: tuple-dispatch-engine compile-engine
     tuple assumed [
         echelons>> compile-engines
-        dup keys supremum 1+ f <array>
+        dup keys supremum 1 + f <array>
         [ <enum> swap update ] keep
     ] with-variable ;
 

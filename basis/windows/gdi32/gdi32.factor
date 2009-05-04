@@ -1419,7 +1419,7 @@ DESTRUCTOR: DeleteDC
 ! FUNCTION: DeleteMetaFile
 FUNCTION: BOOL DeleteObject ( HGDIOBJ hObject ) ;
 DESTRUCTOR: DeleteObject
-! FUNCTION: DescribePixelFormat
+FUNCTION: int DescribePixelFormat ( HDC hdc, int iPixelFormat, UINT nBytes, PIXELFORMATDESCRIPTOR* ppfd ) ;
 ! FUNCTION: DeviceCapabilitiesExA
 ! FUNCTION: DeviceCapabilitiesExW
 ! FUNCTION: DPtoLP

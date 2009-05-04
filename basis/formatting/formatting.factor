@@ -4,7 +4,7 @@
 USING: accessors arrays ascii assocs calendar combinators fry kernel 
 generalizations io io.encodings.ascii io.files io.streams.string
 macros math math.functions math.parser peg.ebnf quotations
-sequences splitting strings unicode.case vectors ;
+sequences splitting strings unicode.case vectors combinators.smart ;
 
 IN: formatting
 
@@ -113,7 +113,6 @@ MACRO: printf ( format-string -- )
 : sprintf ( format-string -- result )
     [ printf ] with-string-writer ; inline
 
-
 <PRIVATE
 
 : pad-00 ( n -- string ) number>string 2 CHAR: 0 pad-head ; inline
@@ -129,12 +128,15 @@ MACRO: printf ( format-string -- )
     [ pad-00 ] map "/" join ; inline
 
 : >datetime ( timestamp -- string )
-    { [ day-of-week day-abbreviation3 ]
-      [ month>> month-abbreviation ]
-      [ day>> pad-00 ]
-      [ >time ]
-      [ year>> number>string ]
-    } cleave 5 narray " " join ; inline
+    [
+       {
+          [ day-of-week day-abbreviation3 ]
+          [ month>> month-abbreviation ]
+          [ day>> pad-00 ]
+          [ >time ]
+          [ year>> number>string ]
+       } cleave
+    ] output>array " " join ; inline
 
 : (week-of-year) ( timestamp day -- n )
     [ dup clone 1 >>month 1 >>day day-of-week dup ] dip > [ 7 swap - ] when
@@ -187,5 +189,3 @@ PRIVATE>
 MACRO: strftime ( format-string -- )
     parse-strftime [ length ] keep [ ] join
     '[ _ <vector> @ reverse concat nip ] ;
-
-

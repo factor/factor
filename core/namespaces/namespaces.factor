@@ -29,7 +29,7 @@ PRIVATE>
 : inc ( variable -- ) 1 swap +@ ; inline
 : dec ( variable -- ) -1 swap +@ ; inline
 : bind ( ns quot -- ) swap >n call ndrop ; inline
-: counter ( variable -- n ) [ 0 or 1+ dup ] change-global ;
+: counter ( variable -- n ) [ 0 or 1 + dup ] change-global ;
 : make-assoc ( quot exemplar -- hash ) 20 swap new-assoc [ swap bind ] keep ; inline
 : with-scope ( quot -- ) 5 <hashtable> swap bind ; inline
 : with-variable ( value key quot -- ) [ associate ] dip bind ; inline

@@ -63,7 +63,7 @@ PRIVATE>
 : neg ( x -- -x ) 0 swap - ; inline
 : recip ( x -- y ) 1 swap / ; inline
 : sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
-: ?1+ ( x -- y ) [ 1+ ] [ 0 ] if* ; inline
+: ?1+ ( x -- y ) [ 1 + ] [ 0 ] if* ; inline
 : rem ( x y -- z ) abs [ mod ] [ + ] [ mod ] tri ; foldable
 : 2^ ( n -- 2^n ) 1 swap shift ; inline
 : even? ( n -- ? ) 1 bitand zero? ;
@@ -103,13 +103,13 @@ M: float fp-infinity? ( float -- ? )
     ] if ;
 
 : next-power-of-2 ( m -- n )
-    dup 2 <= [ drop 2 ] [ 1- log2 1+ 2^ ] if ; inline
+    dup 2 <= [ drop 2 ] [ 1 - log2 1 + 2^ ] if ; inline
 
 : power-of-2? ( n -- ? )
-    dup 0 <= [ drop f ] [ dup 1- bitand zero? ] if ; foldable
+    dup 0 <= [ drop f ] [ dup 1 - bitand zero? ] if ; foldable
 
 : align ( m w -- n )
-    1- [ + ] keep bitnot bitand ; inline
+    1 - [ + ] keep bitnot bitand ; inline
 
 <PRIVATE
 
@@ -121,7 +121,7 @@ M: float fp-infinity? ( float -- ? )
     #! Apply quot to i, keep i and quot, hide n.
     [ nip call ] 3keep ; inline
 
-: iterate-next ( i n quot -- i' n quot ) [ 1+ ] 2dip ; inline
+: iterate-next ( i n quot -- i' n quot ) [ 1 + ] 2dip ; inline
 
 PRIVATE>
 
@@ -160,6 +160,6 @@ PRIVATE>
         [ call ] 2keep rot [
             drop
         ] [
-            [ 1- ] dip find-last-integer
+            [ 1 - ] dip find-last-integer
         ] if
     ] if ; inline recursive
