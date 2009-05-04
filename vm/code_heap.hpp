@@ -1,3 +1,6 @@
+namespace factor
+{
+
 /* compiled code */
 extern F_HEAP code_heap;
 
@@ -24,4 +27,6 @@ inline static void check_code_pointer(CELL pointer)
 #ifdef FACTOR_DEBUG
 	assert(pointer >= code_heap.segment->start && pointer < code_heap.segment->end);
 #endif
+}
+
 }

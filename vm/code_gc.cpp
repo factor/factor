@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 static void clear_free_list(F_HEAP *heap)
 {
 	memset(&heap->free,0,sizeof(F_HEAP_FREE_LIST));
@@ -333,4 +336,6 @@ void compact_heap(F_HEAP *heap)
 			memcpy(scan->forwarding,scan,scan->size);
 		scan = next;
 	}
+}
+
 }

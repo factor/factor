@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 CELL string_nth(F_STRING* string, CELL index)
 {
 	/* If high bit is set, the most significant 16 bits of the char
@@ -180,4 +183,6 @@ PRIMITIVE(set_string_nth_slow)
 	CELL index = untag_fixnum(dpop());
 	CELL value = untag_fixnum(dpop());
 	set_string_nth_slow(string,index,value);
+}
+
 }

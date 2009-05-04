@@ -1,3 +1,6 @@
+namespace factor
+{
+
 #define VM_C_API extern "C" __attribute__((visibility("default")))
 #define FACTOR_OS_STRING "macosx"
 #define NULL_DLL "libfactor.dylib"
@@ -15,3 +18,5 @@ inline static void *ucontext_stack_pointer(void *uap)
 }
 
 void c_to_factor_toplevel(CELL quot);
+
+}

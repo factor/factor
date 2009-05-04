@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* From SBCL */
 const char *vm_executable_path(void)
 {
@@ -31,4 +34,6 @@ const char *vm_executable_path(void)
 		return NULL;
 
 	return safe_strdup(path);
+}
+
 }

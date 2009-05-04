@@ -1,3 +1,6 @@
+namespace factor
+{
+
 /* Some functions for converting floating point numbers to binary
 representations and vice versa */
 
@@ -37,4 +40,6 @@ inline static float bits_float(u32 y)
 	F_FLOAT_BITS b;
 	b.y = y;
 	return b.x;
+}
+
 }

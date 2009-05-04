@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 F_HEAP code_heap;
 
 /* Allocate a code heap during startup */
@@ -219,4 +222,6 @@ void compact_code_heap(void)
 	/* Now update the free list; there will be a single free block at
 	the end */
 	build_free_list(&code_heap,size);
+}
+
 }

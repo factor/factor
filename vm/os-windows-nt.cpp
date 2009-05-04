@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 s64 current_micros(void)
 {
 	FILETIME t;
@@ -48,4 +51,6 @@ void c_to_factor_toplevel(CELL quot)
 
 void open_console(void)
 {
+}
+
 }

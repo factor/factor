@@ -1,3 +1,6 @@
+namespace factor
+{
+
 /* Runtime errors */
 typedef enum
 {
@@ -44,3 +47,5 @@ extern F_STACK_FRAME *signal_callstack_top;
 
 void memory_signal_handler_impl(void);
 void misc_signal_handler_impl(void);
+
+}

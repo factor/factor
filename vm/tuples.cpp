@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* push a new tuple on the stack */
 F_TUPLE *allot_tuple(CELL layout_)
 {
@@ -29,4 +32,6 @@ PRIMITIVE(tuple_boa)
 	memcpy(tuple->data(),(CELL *)(ds - (size - CELLS)),size);
 	ds -= size;
 	dpush(tuple.value());
+}
+
 }

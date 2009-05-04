@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 void c_to_factor_toplevel(CELL quot)
 {
 	c_to_factor(quot);
@@ -32,4 +35,6 @@ const char *default_image_path(void)
 	memcpy(new_path,path,len + 1);
 	memcpy(new_path + len,SUFFIX,SUFFIX_LEN + 1);
 	return new_path;
+}
+
 }

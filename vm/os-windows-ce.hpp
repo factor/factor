@@ -5,6 +5,9 @@
 #include <windows.h>
 #include <ctype.h>
 
+namespace factor
+{
+
 typedef wchar_t F_SYMBOL;
 
 #define FACTOR_OS_STRING "wince"
@@ -22,3 +25,5 @@ char *getenv(char *name);
 s64 current_micros(void);
 void c_to_factor_toplevel(CELL quot);
 void open_console(void);
+
+}

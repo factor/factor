@@ -5,7 +5,11 @@
 #define UNICODE
 #endif
 
+#include <shellapi.h>
 #include <windows.h>
+
+namespace factor
+{
 
 typedef char F_SYMBOL;
 
@@ -16,3 +20,5 @@ typedef char F_SYMBOL;
 void c_to_factor_toplevel(CELL quot);
 long exception_handler(PEXCEPTION_POINTERS pe);
 void open_console(void);
+
+}

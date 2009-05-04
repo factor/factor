@@ -1,8 +1,7 @@
 #include <osreldate.h>
-
-extern int getosreldate(void);
-
 #include <sys/sysctl.h>
+
+extern "C" int getosreldate(void);
 
 #ifndef KERN_PROC_PATHNAME
 #define KERN_PROC_PATHNAME 12

@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* gets the address of an object representing a C pointer, with the
 intention of storing the pointer across code which may potentially GC. */
 char *pinned_alien_offset(CELL object)
@@ -221,4 +224,6 @@ VM_C_API void box_medium_struct(CELL x1, CELL x2, CELL x3, CELL x4, CELL size)
 	data[2] = x3;
 	data[3] = x4;
 	box_value_struct(data,size);
+}
+
 }

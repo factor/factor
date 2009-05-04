@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 CELL max_pic_size;
 
 CELL cold_call_to_ic_transitions;
@@ -251,4 +254,6 @@ PRIMITIVE(inline_cache_stats)
 		stats.add(allot_cell(pic_counts[i]));
 	stats.trim();
 	dpush(stats.array.value());
+}
+
 }

@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* Simple non-optimizing compiler.
 
 This is one of the two compilers implementing Factor; the second one is written
@@ -333,4 +336,6 @@ VM_ASM_API CELL lazy_jit_compile_impl(CELL quot_, F_STACK_FRAME *stack)
 	stack_chain->callstack_top = stack;
 	jit_compile(quot.value(),true);
 	return quot.value();
+}
+
 }

@@ -1,5 +1,10 @@
 #include "master.hpp"
 
+factor::F_ZONE nursery;
+
+namespace factor
+{
+
 /* Set by the -securegc command line argument */
 bool secure_gc;
 
@@ -10,8 +15,6 @@ VM_C_API F_ZONE nursery;
 bool gc_off;
 
 F_DATA_HEAP *data_heap;
-
-F_ZONE nursery;
 
 CELL init_zone(F_ZONE *z, CELL size, CELL start)
 {
@@ -374,4 +377,6 @@ CELL find_all_words(void)
 
 	words.trim();
 	return words.array.value();
+}
+
 }

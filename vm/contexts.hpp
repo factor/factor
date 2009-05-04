@@ -1,3 +1,6 @@
+namespace factor
+{
+
 /* Assembly code makes assumptions about the layout of this struct:
    - callstack_top field is 0
    - callstack_bottom field is 1
@@ -33,8 +36,6 @@ struct F_CONTEXT {
 	F_CONTEXT *next;
 };
 
-extern F_CONTEXT *stack_chain;
-
 extern CELL ds_size, rs_size;
 
 #define ds_bot (stack_chain->datastack_region->start)
@@ -59,3 +60,7 @@ PRIMITIVE(check_datastack);
 VM_C_API void save_stacks(void);
 VM_C_API void nest_stacks(void);
 VM_C_API void unnest_stacks(void);
+
+}
+
+VM_C_API factor::F_CONTEXT *stack_chain;
