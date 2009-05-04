@@ -1,6 +1,6 @@
 USING: accessors assocs classes.mixin classes.tuple
 classes.tuple.parser compiler.units fry kernel sequences mongodb.driver
-mongodb.msg mongodb.tuple.collection mongodb.tuple.index
+mongodb.msg mongodb.tuple.collection 
 mongodb.tuple.persistent mongodb.tuple.state strings ;
 
 IN: mongodb.tuple

@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: slides help.markup math arrays hashtables namespaces
 sequences kernel sequences parser memoize io.encodings.binary
-locals kernel.private help.vocabs assocs quotations
-urls peg.ebnf tools.vocabs tools.annotations tools.crossref
-help.topics math.functions compiler.tree.optimizer
-compiler.cfg.optimizer fry ;
+locals kernel.private help.vocabs assocs quotations urls
+peg.ebnf tools.annotations tools.crossref help.topics
+math.functions compiler.tree.optimizer compiler.cfg.optimizer
+fry ;
 IN: vpri-talk
 
 CONSTANT: vpri-slides
