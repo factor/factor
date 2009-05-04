@@ -91,29 +91,29 @@ HELP: backing-store
 { double-buffered backing-store } related-words
 
 HELP: multisampled
-{ $class-description "Requests a pixel format with multisampled antialiasing enabled. The " { $link sample-buffers } " and " { $link samples } " attributes must also be specified to specify the level of multisampling." }
+{ $class-description "Requests a pixel format with multisampled antialiasing enabled. The " { $link sample-buffers } " and " { $link samples } " attributes must also be provided to specify the level of multisampling." }
 { $notes "On some window systems this is not distinct from " { $link supersampled } "." } ;
 
 HELP: supersampled
-{ $class-description "Requests a pixel format with supersampled antialiasing enabled. The " { $link sample-buffers } " and " { $link samples } " attributes must also be specified to specify the level of supersampling." }
+{ $class-description "Requests a pixel format with supersampled antialiasing enabled. The " { $link sample-buffers } " and " { $link samples } " attributes must also be provided to specify the level of supersampling." }
 { $notes "On some window systems this is not distinct from " { $link multisampled } "." } ;
 
 HELP: sample-alpha
 { $class-description "Used with " { $link multisampled } " or " { $link supersampled } " to request more accurate multisampling of alpha values." } ;
 
 HELP: color-float
-{ $class-description "Requests a pixel format where the pixels are stored in floating-point format." } ;
+{ $class-description "Requests a pixel format where the color buffer is stored in floating-point format." } ;
 
 HELP: color-bits
-{ $class-description "Requests a pixel format of at least " { $snippet "value" } " bits per pixel." } ;
+{ $class-description "Requests a pixel format with a color buffer of at least " { $snippet "value" } " bits per pixel." } ;
 HELP: red-bits
-{ $class-description "Requests a pixel format with at least " { $snippet "value" } " red bits per pixel." } ;
+{ $class-description "Requests a pixel format with a color buffer with at least " { $snippet "value" } " red bits per pixel." } ;
 HELP: green-bits
-{ $class-description "Requests a pixel format with at least " { $snippet "value" } " green bits per pixel." } ;
+{ $class-description "Requests a pixel format with a color buffer with at least " { $snippet "value" } " green bits per pixel." } ;
 HELP: blue-bits
-{ $class-description "Requests a pixel format with at least " { $snippet "value" } " blue bits per pixel." } ;
+{ $class-description "Requests a pixel format with a color buffer with at least " { $snippet "value" } " blue bits per pixel." } ;
 HELP: alpha-bits
-{ $class-description "Requests a pixel format with at least " { $snippet "value" } " alpha bits per pixel." } ;
+{ $class-description "Requests a pixel format with a color buffer with at least " { $snippet "value" } " alpha bits per pixel." } ;
 
 { color-float color-bits red-bits green-bits blue-bits alpha-bits } related-words
 
