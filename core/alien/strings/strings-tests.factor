@@ -1,4 +1,4 @@
-USING: alien.strings tools.test kernel libc
+USING: alien.strings alien.c-types tools.test kernel libc
 io.encodings.8-bit io.encodings.utf8 io.encodings.utf16
 io.encodings.utf16n io.encodings.ascii alien io.encodings.string ;
 IN: alien.strings.tests
