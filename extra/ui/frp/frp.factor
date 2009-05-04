@@ -1,7 +1,7 @@
-USING: accessors arrays colors fonts kernel models
+USING: accessors arrays colors fonts kernel math models
 models.product monads sequences ui.gadgets ui.gadgets.buttons
 ui.gadgets.editors ui.gadgets.line-support ui.gadgets.tables
-ui.gadgets.tracks ui.render ui.gadgets.scrollers ;
+ui.gadgets.tracks ui.render ui.gadgets.scrollers ui.baseline-alignment ;
 QUALIFIED: make
 IN: ui.frp
 
@@ -23,7 +23,7 @@ M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 : <frp-list> ( model -- table ) <frp-table> [ 1array ] >>quot ;
 : <frp-list*> ( -- table ) f <model> <frp-list> ;
 
-: <frp-field> ( -- field ) f <model> <model-field> ;
+: <frp-field> ( -- field ) "" <model> <model-field> ;
 
 ! Layout utilities
 
@@ -42,8 +42,11 @@ M: gadget -> dup make:, output-model ;
 M: model -> dup , ;
 M: table -> dup , selected-value>> ;
 
+
+! : <spacer> ( -- ) <gadget> ,( 100% 100% ) ;
+! Add a % object as a possibility for pref-dim
 : <box> ( gadgets type -- track )
-   [ { } make:make ] dip <track> swap [ f track-add ] each ; inline
+   [ { } make:make ] dip <track> +baseline+ >>align swap [ f track-add ] each ; inline
 : <box*> ( gadgets type -- track ) [ <box> ] [ [ model>> ] map <product> ] bi >>model ; inline
 : <hbox> ( gadgets -- track ) horizontal <box> ; inline
 : <hbox*> ( gadgets -- track ) horizontal <box*> ; inline
