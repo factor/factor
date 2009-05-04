@@ -48,21 +48,21 @@ void iterate_relocations(code_block *compiled, relocation_iterator iter)
 }
 
 /* Store a 32-bit value into a PowerPC LIS/ORI sequence */
-static void store_address_2_2(cell *cell, cell value)
+static void store_address_2_2(cell *ptr, cell value)
 {
-	cell[-1] = ((cell[-1] & ~0xffff) | ((value >> 16) & 0xffff));
-	cell[ 0] = ((cell[ 0] & ~0xffff) | (value & 0xffff));
+	ptr[-1] = ((ptr[-1] & ~0xffff) | ((value >> 16) & 0xffff));
+	ptr[ 0] = ((ptr[ 0] & ~0xffff) | (value & 0xffff));
 }
 
 /* Store a value into a bitfield of a PowerPC instruction */
-static void store_address_masked(cell *cell, fixnum value, cell mask, fixnum shift)
+static void store_address_masked(cell *ptr, fixnum value, cell mask, fixnum shift)
 {
 	/* This is unaccurate but good enough */
 	fixnum test = (fixnum)mask >> 1;
 	if(value <= -test || value >= test)
 		critical_error("Value does not fit inside relocation",0);
 
-	*cell = ((*cell & ~mask) | ((value >> shift) & mask));
+	*ptr = ((*ptr & ~mask) | ((value >> shift) & mask));
 }
 
 /* Perform a fixup on a code block */
