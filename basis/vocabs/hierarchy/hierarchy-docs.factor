@@ -29,5 +29,5 @@ HELP: load-all
 { $description "Load all vocabularies in the source tree." } ;
 
 HELP: all-vocabs-under
-{ $values { "prefix" string } }
+{ $values { "prefix" string } { "vocabs" "a sequence of vocabularies" } }
 { $description "Return a sequence of vocab or vocab-links for each vocab matching the provided prefix. Unlike " { $link all-child-vocabs } " this word will return both loaded and unloaded vocabularies." } ;
