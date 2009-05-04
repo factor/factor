@@ -82,8 +82,10 @@ bootstrapping? on
     "kernel"
     "kernel.private"
     "math"
+    "math.parser.private"
     "math.private"
     "memory"
+    "memory.private"
     "quotations"
     "quotations.private"
     "sbufs"
@@ -366,8 +368,8 @@ tuple
     { "float>bignum" "math.private" (( x -- y )) }
     { "fixnum>float" "math.private" (( x -- y )) }
     { "bignum>float" "math.private" (( x -- y )) }
-    { "string>float" "math.private" (( str -- n/f )) }
-    { "float>string" "math.private" (( n -- str )) }
+    { "(string>float)" "math.parser.private" (( str -- n/f )) }
+    { "(float>string)" "math.parser.private" (( n -- str )) }
     { "float>bits" "math" (( x -- n )) }
     { "double>bits" "math" (( x -- n )) }
     { "bits>float" "math" (( n -- x )) }
@@ -414,8 +416,8 @@ tuple
     { "(exists?)" "io.files.private" (( path -- ? )) }
     { "gc" "memory" (( -- )) }
     { "gc-stats" "memory" f }
-    { "save-image" "memory" (( path -- )) }
-    { "save-image-and-exit" "memory" (( path -- )) }
+    { "(save-image)" "memory.private" (( path -- )) }
+    { "(save-image-and-exit)" "memory.private" (( path -- )) }
     { "datastack" "kernel" (( -- ds )) }
     { "retainstack" "kernel" (( -- rs )) }
     { "callstack" "kernel" (( -- cs )) }
@@ -427,38 +429,38 @@ tuple
     { "code-room" "memory" (( -- code-free code-total )) }
     { "micros" "system" (( -- us )) }
     { "modify-code-heap" "compiler.units" (( alist -- )) }
-    { "dlopen" "alien.libraries" (( path -- dll )) }
-    { "dlsym" "alien.libraries" (( name dll -- alien )) }
+    { "(dlopen)" "alien.libraries" (( path -- dll )) }
+    { "(dlsym)" "alien.libraries" (( name dll -- alien )) }
     { "dlclose" "alien.libraries" (( dll -- )) }
     { "<byte-array>" "byte-arrays" (( n -- byte-array )) }
     { "(byte-array)" "byte-arrays" (( n -- byte-array )) }
     { "<displaced-alien>" "alien" (( displacement c-ptr -- alien )) }
-    { "alien-signed-cell" "alien.accessors" f }
-    { "set-alien-signed-cell" "alien.accessors" f }
-    { "alien-unsigned-cell" "alien.accessors" f }
-    { "set-alien-unsigned-cell" "alien.accessors" f }
-    { "alien-signed-8" "alien.accessors" f }
-    { "set-alien-signed-8" "alien.accessors" f }
-    { "alien-unsigned-8" "alien.accessors" f }
-    { "set-alien-unsigned-8" "alien.accessors" f }
-    { "alien-signed-4" "alien.accessors" f }
-    { "set-alien-signed-4" "alien.accessors" f }
-    { "alien-unsigned-4" "alien.accessors" f }
-    { "set-alien-unsigned-4" "alien.accessors" f }
-    { "alien-signed-2" "alien.accessors" f }
-    { "set-alien-signed-2" "alien.accessors" f }
-    { "alien-unsigned-2" "alien.accessors" f }
-    { "set-alien-unsigned-2" "alien.accessors" f }
-    { "alien-signed-1" "alien.accessors" f }
-    { "set-alien-signed-1" "alien.accessors" f }
-    { "alien-unsigned-1" "alien.accessors" f }
-    { "set-alien-unsigned-1" "alien.accessors" f }
-    { "alien-float" "alien.accessors" f }
-    { "set-alien-float" "alien.accessors" f }
-    { "alien-double" "alien.accessors" f }
-    { "set-alien-double" "alien.accessors" f }
-    { "alien-cell" "alien.accessors" f }
-    { "set-alien-cell" "alien.accessors" f }
+    { "alien-signed-cell" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-signed-cell" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-unsigned-cell" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-unsigned-cell" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-signed-8" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-signed-8" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-unsigned-8" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-unsigned-8" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-signed-4" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-signed-4" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-unsigned-4" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-unsigned-4" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-signed-2" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-signed-2" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-unsigned-2" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-unsigned-2" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-signed-1" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-signed-1" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-unsigned-1" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-unsigned-1" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-float" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-float" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-double" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-double" "alien.accessors" (( value c-ptr n -- )) }
+    { "alien-cell" "alien.accessors" (( c-ptr n -- value )) }
+    { "set-alien-cell" "alien.accessors" (( value c-ptr n -- )) }
     { "alien-address" "alien" (( c-ptr -- addr )) }
     { "set-slot" "slots.private" (( value obj n -- )) }
     { "string-nth" "strings.private" (( n string -- ch )) }
@@ -472,7 +474,7 @@ tuple
     { "end-scan" "memory" (( -- )) }
     { "size" "memory" (( obj -- n )) }
     { "die" "kernel" (( -- )) }
-    { "fopen" "io.streams.c" (( path mode -- alien )) }
+    { "(fopen)" "io.streams.c" (( path mode -- alien )) }
     { "fgetc" "io.streams.c" (( alien -- ch/f )) }
     { "fread" "io.streams.c" (( n alien -- str/f )) }
     { "fputc" "io.streams.c" (( ch alien -- )) }

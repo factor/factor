@@ -6,14 +6,15 @@ compiler.units help.tips concurrency.flags concurrency.mailboxes
 continuations destructors documents documents.elements fry hashtables
 help help.markup io io.styles kernel lexer listener math models sets
 models.delay models.arrow namespaces parser prettyprint quotations
-sequences strings threads tools.vocabs vocabs vocabs.loader
+sequences strings threads vocabs vocabs.refresh vocabs.loader
 vocabs.parser words debugger ui ui.commands ui.pens.solid ui.gadgets
 ui.gadgets.glass ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.listener.completion ui.tools.listener.popups
-ui.tools.listener.history ui.images ui.tools.error-list tools.errors.model ;
+ui.tools.listener.history ui.images ui.tools.error-list
+tools.errors.model ;
 FROM: source-files.errors => all-errors ;
 IN: ui.tools.listener
 

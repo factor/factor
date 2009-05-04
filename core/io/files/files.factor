@@ -1,7 +1,8 @@
-! Copyright (C) 2004, 2008 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private sequences init namespaces system io
-io.backend io.pathnames io.encodings io.files.private ;
+io.backend io.pathnames io.encodings io.files.private
+alien.strings ;
 IN: io.files
 
 HOOK: (file-reader) io-backend ( path -- stream )
@@ -40,7 +41,8 @@ HOOK: (file-appender) io-backend ( path -- stream )
 : with-file-appender ( path encoding quot -- )
     [ <file-appender> ] dip with-output-stream ; inline
 
-: exists? ( path -- ? ) normalize-path (exists?) ;
+: exists? ( path -- ? )
+    normalize-path native-string>alien (exists?) ;
 
 ! Current directory
 <PRIVATE
@@ -55,7 +57,7 @@ PRIVATE>
 
 [
     cwd current-directory set-global
-    13 getenv cwd prepend-path \ image set-global
-    14 getenv cwd prepend-path \ vm set-global
+    13 getenv alien>native-string cwd prepend-path \ image set-global
+    14 getenv alien>native-string cwd prepend-path \ vm set-global
     image parent-directory "resource-path" set-global
 ] "io.files" add-init-hook

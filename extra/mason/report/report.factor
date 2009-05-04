@@ -89,8 +89,8 @@ IN: mason.report
             timings-table
 
             "Load failures"
-            load-everything-vocabs-file
-            load-everything-errors-file
+            load-all-vocabs-file
+            load-all-errors-file
             error-dump
 
             "Compiler errors"
@@ -120,7 +120,7 @@ IN: mason.report
 
 : build-clean? ( -- ? )
     {
-        [ load-everything-vocabs-file eval-file empty? ]
+        [ load-all-vocabs-file eval-file empty? ]
         [ test-all-vocabs-file eval-file empty? ]
         [ help-lint-vocabs-file eval-file empty? ]
         [ compiler-errors-file eval-file empty? ]

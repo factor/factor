@@ -1,7 +1,7 @@
 USING: help.markup help.syntax ui.commands ui.operations
 ui.gadgets.editors ui.gadgets.panes listener io words
 ui.tools.listener.completion ui.tools.common help.tips
-tools.vocabs vocabs ;
+vocabs vocabs.refresh ;
 IN: ui.tools.listener
 
 HELP: interactor
