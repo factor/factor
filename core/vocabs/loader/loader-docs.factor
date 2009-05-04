@@ -106,7 +106,7 @@ HELP: reload
 HELP: require
 { $values { "vocab" "a vocabulary specifier" } }
 { $description "Loads a vocabulary if it has not already been loaded." }
-{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "tools.vocabs" } "." } ;
+{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "vocabs.refresh" } "." } ;
 
 HELP: run
 { $values { "vocab" "a vocabulary specifier" } }

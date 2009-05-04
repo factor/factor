@@ -3,14 +3,15 @@
 USING: accessors assocs benchmark bootstrap.stage2 compiler.errors
 source-files.errors generic help.html help.lint io.directories
 io.encodings.utf8 io.files kernel mason.common math namespaces
-prettyprint sequences sets sorting tools.test tools.time tools.vocabs
-words system io tools.errors locals ;
+prettyprint sequences sets sorting tools.test tools.time
+words system io tools.errors vocabs.hierarchy vocabs.errors
+vocabs.refresh locals ;
 IN: mason.test
 
 : do-load ( -- )
-    try-everything
-    [ keys load-everything-vocabs-file to-file ]
-    [ load-everything-errors-file utf8 [ load-failures. ] with-file-writer ]
+    "" (load)
+    [ keys load-all-vocabs-file to-file ]
+    [ load-all-errors-file utf8 [ load-failures. ] with-file-writer ]
     bi ;
 
 GENERIC: word-vocabulary ( word -- vocabulary )
