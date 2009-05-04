@@ -45,16 +45,17 @@ M: demo-world pref-dim* ( gadget -- dim )
 : -+ ( x -- -x x )
     [ neg ] keep ;
 
-: demo-world-frustum ( gadget -- -x x -y y near far )
+: demo-world-frustum ( world -- -x x -y y near far )
     [ near-plane ] [ far-plane ] [ fov-ratio ] tri [
         nip swap FOV / v*n
         first2 [ -+ ] bi@
     ] 3keep drop ;
 
-M: demo-world begin-world
+M: demo-world resize-world
     GL_PROJECTION glMatrixMode
     glLoadIdentity
-    demo-world-frustum glFrustum ;
+    [ [ 0 0 ] dip dim>> first2 glViewport ]
+    [ demo-world-frustum glFrustum ] bi ;
 
 : demo-world-set-matrix ( gadget -- )
     GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
