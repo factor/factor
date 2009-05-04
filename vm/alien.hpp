@@ -1,3 +1,6 @@
+namespace factor
+{
+
 CELL allot_alien(CELL delegate, CELL displacement);
 
 PRIMITIVE(displaced_alien);
@@ -42,3 +45,5 @@ VM_C_API void to_value_struct(CELL src, void *dest, CELL size);
 VM_C_API void box_value_struct(void *src, CELL size);
 VM_C_API void box_small_struct(CELL x, CELL y, CELL size);
 VM_C_API void box_medium_struct(CELL x1, CELL x2, CELL x3, CELL x4, CELL size);
+
+}

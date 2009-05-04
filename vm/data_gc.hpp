@@ -1,3 +1,6 @@
+namespace factor
+{
+
 /* statistics */
 struct F_GC_STATS {
 	CELL collections;
@@ -133,3 +136,5 @@ inline static void check_tagged_pointer(CELL tagged)
 
 VM_C_API void minor_gc(void);
 
+
+}

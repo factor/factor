@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 CELL bignum_zero;
 CELL bignum_pos_one;
 CELL bignum_neg_one;
@@ -508,4 +511,6 @@ VM_ASM_API void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y)
 	F_BIGNUM *by = fixnum_to_bignum(y);
 	GC_BIGNUM(by);
 	drepl(tag<F_BIGNUM>(bignum_multiply(bx,by)));
+}
+
 }

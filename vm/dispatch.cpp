@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 CELL megamorphic_cache_hits;
 CELL megamorphic_cache_misses;
 
@@ -204,4 +207,6 @@ void quotation_jit::emit_mega_cache_lookup(CELL methods_, F_FIXNUM index, CELL c
 	   the stack. */
 	emit(userenv[JIT_EPILOG]);
 	emit(userenv[JIT_EXECUTE_JUMP]);
+}
+
 }

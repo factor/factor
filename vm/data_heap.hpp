@@ -1,3 +1,6 @@
+namespace factor
+{
+
 /* Set by the -securegc command line argument */
 extern bool secure_gc;
 
@@ -45,9 +48,6 @@ extern F_DATA_HEAP *data_heap;
 
 #define MIN_GEN_COUNT 1
 #define MAX_GEN_COUNT 3
-
-/* new objects are allocated here */
-extern F_ZONE nursery;
 
 inline static bool in_zone(F_ZONE *z, F_OBJECT *pointer)
 {
@@ -128,3 +128,7 @@ inline static void do_slots(CELL obj, void (* iter)(CELL *))
 	}
 }
 
+}
+
+/* new objects are allocated here */
+VM_C_API factor::F_ZONE nursery;

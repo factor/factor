@@ -1,3 +1,6 @@
+namespace factor
+{
+
 template<typename T> CELL array_capacity(T *array)
 {
 #ifdef FACTOR_DEBUG
@@ -51,4 +54,6 @@ template <typename T> T *reallot_array(T *array_, CELL capacity)
 
 		return new_array;
 	}
+}
+
 }

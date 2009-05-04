@@ -6,6 +6,9 @@ card has a slot written to.
 
 the offset of the first object is set by the allocator. */
 
+namespace factor
+{
+
 /* if CARD_POINTS_TO_NURSERY is set, CARD_POINTS_TO_AGING must also be set. */
 #define CARD_POINTS_TO_NURSERY 0x80
 #define CARD_POINTS_TO_AGING 0x40
@@ -16,7 +19,7 @@ typedef u8 F_CARD;
 #define CARD_SIZE (1<<CARD_BITS)
 #define ADDR_CARD_MASK (CARD_SIZE-1)
 
-extern "C" CELL cards_offset;
+VM_C_API CELL cards_offset;
 
 #define ADDR_TO_CARD(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)(c) - cards_offset)<<CARD_BITS)
@@ -27,7 +30,7 @@ typedef u8 F_DECK;
 #define DECK_SIZE (1<<DECK_BITS)
 #define ADDR_DECK_MASK (DECK_SIZE-1)
 
-extern "C" CELL decks_offset;
+VM_C_API CELL decks_offset;
 
 #define ADDR_TO_DECK(a) (F_DECK*)(((CELL)(a) >> DECK_BITS) + decks_offset)
 #define DECK_TO_ADDR(c) (CELL*)(((CELL)(c) - decks_offset) << DECK_BITS)
@@ -39,7 +42,7 @@ extern "C" CELL decks_offset;
 
 #define INVALID_ALLOT_MARKER 0xff
 
-extern "C" CELL allot_markers_offset;
+VM_C_API CELL allot_markers_offset;
 
 /* the write barrier must be called any time we are potentially storing a
 pointer from an older generation to a younger one */
@@ -55,4 +58,6 @@ inline static void allot_barrier(F_OBJECT *address)
 	F_CARD *ptr = ADDR_TO_ALLOT_MARKER(address);
 	if(*ptr == INVALID_ALLOT_MARKER)
 		*ptr = ((CELL)address & ADDR_CARD_MASK);
+}
+
 }

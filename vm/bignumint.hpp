@@ -33,6 +33,9 @@ Technology nor of any adaptation thereof in any advertising,
 promotional, or sales literature without prior written consent from
 MIT in each case. */
 
+namespace factor
+{
+
 /* Internal Interface to Bignum Code */
 #undef BIGNUM_ZERO_P
 #undef BIGNUM_NEGATIVE_P
@@ -98,3 +101,5 @@ typedef F_FIXNUM bignum_length_type;
 }
 
 #endif /* not BIGNUM_DISABLE_ASSERTION_CHECKS */
+
+}

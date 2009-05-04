@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 void flush_icache_for(F_CODE_BLOCK *block)
 {
 	flush_icache((CELL)block,block->block.size);
@@ -321,7 +324,10 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 		if(sym)
 			return sym;
 		else
+		{
+			printf("%s\n",name);
 			return (void *)undefined_symbol;
+		}
 	case ARRAY_TYPE:
 		CELL i;
 		F_ARRAY *names = untag<F_ARRAY>(symbol);
@@ -484,4 +490,6 @@ F_CODE_BLOCK *add_code_block(
 	last_code_heap_scan = NURSERY;
 
 	return compiled;
+}
+
 }

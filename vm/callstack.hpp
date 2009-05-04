@@ -1,3 +1,6 @@
+namespace factor
+{
+
 inline static CELL callstack_size(CELL size)
 {
 	return sizeof(F_CALLSTACK) + size;
@@ -24,3 +27,5 @@ PRIMITIVE(innermost_stack_frame_scan);
 PRIMITIVE(set_innermost_stack_frame_quot);
 
 VM_ASM_API void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
+
+}

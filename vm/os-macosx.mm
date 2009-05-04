@@ -2,6 +2,9 @@
 
 #include "master.hpp"
 
+namespace factor
+{
+
 void c_to_factor_toplevel(CELL quot)
 {
 	for(;;)
@@ -79,4 +82,6 @@ Protocol *objc_getProtocol(char *name)
 		return @protocol(NSTextInput);
 	else
 		return nil;
+}
+
 }

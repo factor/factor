@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 VM_C_API void default_parameters(F_PARAMETERS *p)
 {
 	p->image_path = NULL;
@@ -208,4 +211,6 @@ VM_C_API void factor_sleep(long us)
 {
 	void (*callback)(long) = (void (*)(long))alien_offset(userenv[SLEEP_CALLBACK_ENV]);
 	callback(us);
+}
+
 }

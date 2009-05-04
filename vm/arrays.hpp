@@ -1,3 +1,6 @@
+namespace factor
+{
+
 inline static CELL array_nth(F_ARRAY *array, CELL slot)
 {
 #ifdef FACTOR_DEBUG
@@ -36,3 +39,5 @@ struct growable_array {
 	void add(CELL elt);
 	void trim();
 };
+
+}

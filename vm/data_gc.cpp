@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* used during garbage collection only */
 F_ZONE *newspace;
 bool performing_gc;
@@ -681,4 +684,6 @@ PRIMITIVE(become)
 VM_C_API void minor_gc(void)
 {
 	garbage_collection(NURSERY,false,0);
+}
+
 }

@@ -1,3 +1,8 @@
+#include <ucontext.h>
+
+namespace factor
+{
+
 /* Fault handler information.  MacOSX version.
 Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
 Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
@@ -8,8 +13,6 @@ Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
 http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
 
 Modified for Factor by Slava Pestov */
-#include <ucontext.h>
-
 #define FRAME_RETURN_ADDRESS(frame) *((XT *)(frame_successor(frame) + 1) + 2)
 
 #define MACH_EXC_STATE_TYPE ppc_exception_state_t
@@ -36,4 +39,6 @@ Modified for Factor by Slava Pestov */
 inline static CELL fix_stack_pointer(CELL sp)
 {
 	return sp;
+}
+
 }

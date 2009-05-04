@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 void flush_icache(CELL start, CELL len)
 {
 	int result;
@@ -23,4 +26,6 @@ void flush_icache(CELL start, CELL len)
 
 	if(result < 0)
 		critical_error("flush_icache() failed",result);
+}
+
 }

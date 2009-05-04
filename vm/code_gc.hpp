@@ -1,3 +1,6 @@
+namespace factor
+{
+
 #define FREE_LIST_COUNT 16
 #define BLOCK_SIZE_INCREMENT 32
 
@@ -42,4 +45,6 @@ inline static F_BLOCK *first_block(F_HEAP *heap)
 inline static F_BLOCK *last_block(F_HEAP *heap)
 {
 	return (F_BLOCK *)heap->segment->end;
+}
+
 }

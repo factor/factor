@@ -56,6 +56,9 @@ MIT in each case. */
 #include <stdio.h>
 #include <math.h>
 
+namespace factor
+{
+
 /* Exports */
 
 int
@@ -1840,4 +1843,6 @@ digit_stream_to_bignum(unsigned int n_digits,
       return (bignum_trim (result));
     }
   }
+}
+
 }

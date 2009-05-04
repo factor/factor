@@ -1,6 +1,10 @@
 #include "master.hpp"
 
-CELL userenv[USER_ENV];
+factor::CELL userenv[USER_ENV];
+
+namespace factor
+{
+
 CELL T;
 
 PRIMITIVE(getenv)
@@ -67,4 +71,6 @@ static CELL clone_object(CELL object_)
 PRIMITIVE(clone)
 {
 	drepl(clone_object(dpeek()));
+}
+
 }

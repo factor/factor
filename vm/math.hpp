@@ -1,3 +1,6 @@
+namespace factor
+{
+
 extern CELL bignum_zero;
 extern CELL bignum_pos_one;
 extern CELL bignum_neg_one;
@@ -142,3 +145,5 @@ VM_C_API CELL to_cell(CELL tagged);
 VM_ASM_API void overflow_fixnum_add(F_FIXNUM x, F_FIXNUM y);
 VM_ASM_API void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y);
 VM_ASM_API void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y);
+
+}

@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* Simple code generator used by:
 - profiler (profiler.cpp),
 - quotation compiler (quotations.cpp),
@@ -112,3 +115,5 @@ F_CODE_BLOCK *jit::code_block()
 }
 
 
+
+}

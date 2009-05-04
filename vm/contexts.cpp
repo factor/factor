@@ -1,6 +1,10 @@
 #include "master.hpp"
 
-F_CONTEXT *stack_chain;
+factor::F_CONTEXT *stack_chain;
+
+namespace factor
+{
+
 CELL ds_size, rs_size;
 F_CONTEXT *unused_contexts;
 
@@ -183,4 +187,6 @@ PRIMITIVE(check_datastack)
 		}
 		dpush(T);
 	}
+}
+
 }

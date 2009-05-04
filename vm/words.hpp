@@ -1,3 +1,6 @@
+namespace factor
+{
+
 F_WORD *allot_word(CELL vocab, CELL name);
 
 PRIMITIVE(word);
@@ -12,3 +15,5 @@ inline bool word_optimized_p(F_WORD *word)
 PRIMITIVE(optimized_p);
 
 PRIMITIVE(wrapper);
+
+}

@@ -1,3 +1,6 @@
+namespace factor
+{
+
 inline static CELL string_capacity(F_STRING *str)
 {
 	return untag_fixnum(str->length);
@@ -21,3 +24,5 @@ void set_string_nth(F_STRING* string, CELL index, CELL value);
 PRIMITIVE(string_nth);
 PRIMITIVE(set_string_nth_slow);
 PRIMITIVE(set_string_nth_fast);
+
+}

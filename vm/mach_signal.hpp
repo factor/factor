@@ -76,4 +76,9 @@ catch_exception_raise_state_identity (mach_port_t exception_port,
                                       thread_state_t out_state,
                                       mach_msg_type_number_t *out_state_count);
 
+namespace factor
+{
+
 void mach_initialize (void);
+
+}

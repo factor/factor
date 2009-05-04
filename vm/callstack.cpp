@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 static void check_frame(F_STACK_FRAME *frame)
 {
 #ifdef FACTOR_DEBUG
@@ -222,4 +225,6 @@ PRIMITIVE(set_innermost_stack_frame_quot)
 VM_ASM_API void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
 {
 	stack_chain->callstack_bottom = callstack_bottom;
+}
+
 }

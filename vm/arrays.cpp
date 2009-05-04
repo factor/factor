@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* make a new array with an initial element */
 F_ARRAY *allot_array(CELL capacity, CELL fill_)
 {
@@ -79,4 +82,6 @@ void growable_array::add(CELL elt_)
 void growable_array::trim()
 {
 	array = reallot_array(array.untagged(),count);
+}
+
 }

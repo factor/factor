@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 F_WORD *allot_word(CELL vocab_, CELL name_)
 {
 	gc_root<F_OBJECT> vocab(vocab_);
@@ -73,4 +76,6 @@ PRIMITIVE(wrapper)
 	F_WRAPPER *wrapper = allot<F_WRAPPER>(sizeof(F_WRAPPER));
 	wrapper->object = dpeek();
 	drepl(tag<F_WRAPPER>(wrapper));
+}
+
 }

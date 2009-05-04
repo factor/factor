@@ -1,3 +1,6 @@
+namespace factor
+{
+
 struct quotation_jit : public jit {
 	gc_root<F_ARRAY> array;
 	bool compiling, relocate;
@@ -31,3 +34,5 @@ PRIMITIVE(array_to_quotation);
 PRIMITIVE(quotation_xt);
 
 VM_ASM_API CELL lazy_jit_compile_impl(CELL quot, F_STACK_FRAME *stack);
+
+}

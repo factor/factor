@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* Certain special objects in the image are known to the runtime */
 static void init_objects(F_IMAGE_HEADER *h)
 {
@@ -336,4 +339,6 @@ void load_image(F_PARAMETERS *p)
 
 	/* Store image path name */
 	userenv[IMAGE_ENV] = allot_alien(F,(CELL)p->image_path);
+}
+
 }

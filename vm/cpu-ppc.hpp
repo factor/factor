@@ -1,3 +1,6 @@
+namespace factor
+{
+
 #define FACTOR_CPU_STRING "ppc"
 #define VM_ASM_API
 
@@ -10,3 +13,5 @@ void set_callstack(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *me
 void throw_impl(CELL quot, F_STACK_FRAME *rewind);
 void lazy_jit_compile(CELL quot);
 void flush_icache(CELL start, CELL len);
+
+}
