@@ -80,20 +80,22 @@ PRIMITIVE(modify_code_heap)
 			jit_compile_word(word.value(),data.value(),false);
 			break;
 		case ARRAY_TYPE:
-			array *compiled_data = data.as<array>().untagged();
-			cell literals = array_nth(compiled_data,0);
-			cell relocation = array_nth(compiled_data,1);
-			cell labels = array_nth(compiled_data,2);
-			cell code = array_nth(compiled_data,3);
+			{
+				array *compiled_data = data.as<array>().untagged();
+				cell literals = array_nth(compiled_data,0);
+				cell relocation = array_nth(compiled_data,1);
+				cell labels = array_nth(compiled_data,2);
+				cell code = array_nth(compiled_data,3);
 
-			code_block *compiled = add_code_block(
-				WORD_TYPE,
-				code,
-				labels,
-				relocation,
-				literals);
+				code_block *compiled = add_code_block(
+					WORD_TYPE,
+					code,
+					labels,
+					relocation,
+					literals);
 
-			word->code = compiled;
+				word->code = compiled;
+			}
 			break;
 		default:
 			critical_error("Expected a quotation or an array",data.value());
@@ -141,25 +143,28 @@ void forward_object_xts(void)
 		switch(tagged<object>(obj).type())
 		{
 		case WORD_TYPE:
-			word *w = untag<word>(obj);
+			{
+				word *w = untag<word>(obj);
 
-			if(w->code)
-				w->code = forward_xt(w->code);
-			if(w->profiling)
-				w->profiling = forward_xt(w->profiling);
-			
+				if(w->code)
+					w->code = forward_xt(w->code);
+				if(w->profiling)
+					w->profiling = forward_xt(w->profiling);
+			}
 			break;
 		case QUOTATION_TYPE:
-			quotation *quot = untag<quotation>(obj);
+			{
+				quotation *quot = untag<quotation>(obj);
 
-			if(quot->compiledp != F)
-				quot->code = forward_xt(quot->code);
-			
+				if(quot->compiledp != F)
+					quot->code = forward_xt(quot->code);
+			}
 			break;
 		case CALLSTACK_TYPE:
-			callstack *stack = untag<callstack>(obj);
-			iterate_callstack_object(stack,forward_frame_xt);
-			
+			{
+				callstack *stack = untag<callstack>(obj);
+				iterate_callstack_object(stack,forward_frame_xt);
+			}
 			break;
 		default:
 			break;
@@ -185,10 +190,12 @@ void fixup_object_xts(void)
 			update_word_xt(obj);
 			break;
 		case QUOTATION_TYPE:
-			quotation *quot = untag<quotation>(obj);
-			if(quot->compiledp != F)
-				set_quot_xt(quot,quot->code);
-			break;
+			{
+				quotation *quot = untag<quotation>(obj);
+				if(quot->compiledp != F)
+					set_quot_xt(quot,quot->code);
+				break;
+			}
 		default:
 			break;
 		}
