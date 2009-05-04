@@ -1,3 +1,6 @@
+namespace factor
+{
+
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -324,3 +327,5 @@ struct F_TUPLE : public F_OBJECT {
 
 	CELL *data() { return (CELL *)(this + 1); }
 };
+
+}

@@ -8,10 +8,11 @@
 #include <signal.h>
 #include <pthread.h>
 
+namespace factor
+{
+
 typedef char F_CHAR;
 typedef char F_SYMBOL;
-
-#define string_to_native_alien(string) string_to_char_alien(string,true)
 
 #define STRING_LITERAL(string) string
 
@@ -54,3 +55,5 @@ s64 current_micros(void);
 void sleep_micros(CELL usec);
 
 void open_console(void);
+
+}

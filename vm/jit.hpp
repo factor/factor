@@ -1,3 +1,6 @@
+namespace factor
+{
+
 struct jit {
 	CELL type;
 	gc_root<F_OBJECT> owner;
@@ -57,3 +60,5 @@ struct jit {
 	
 	F_CODE_BLOCK *code_block();
 };
+
+}

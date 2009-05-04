@@ -1,3 +1,6 @@
+namespace factor
+{
+
 #define DEFPUSHPOP(prefix,ptr) \
 	inline static CELL prefix##peek() { return *(CELL *)ptr; } \
 	inline static void prefix##repl(CELL tagged) { *(CELL *)ptr = tagged; } \
@@ -12,3 +15,5 @@
 		ptr += CELLS; \
 		prefix##repl(tagged); \
 	}
+
+}

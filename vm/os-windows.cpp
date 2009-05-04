@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 HMODULE hFactorDll;
 
 void init_ffi(void)
@@ -143,4 +146,6 @@ long getpagesize(void)
 void sleep_micros(u64 usec)
 {
 	Sleep((DWORD)(usec / 1000));
+}
+
 }

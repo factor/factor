@@ -1,5 +1,6 @@
 /* Fault handler information.  MacOSX version.
 Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
+
 Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
 
 Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
@@ -10,6 +11,9 @@ http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno
 Modified for Factor by Slava Pestov */
 
 #include "master.hpp"
+
+namespace factor
+{
 
 /* The exception port on which our thread listens. */
 mach_port_t our_exception_port;
@@ -164,7 +168,6 @@ mach_exception_thread (void *arg)
 	}
 }
 
-
 /* Initialize the Mach exception handler thread. */
 void mach_initialize (void)
 {
@@ -200,4 +203,6 @@ void mach_initialize (void)
 		EXCEPTION_DEFAULT, MACHINE_THREAD_STATE)
 		!= KERN_SUCCESS)
 		fatal_error("task_set_exception_ports() failed",0);
+}
+
 }

@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 bool profiling_p;
 
 void init_profiler(void)
@@ -49,4 +52,6 @@ static void set_profiling(bool profiling)
 PRIMITIVE(profiling)
 {
 	set_profiling(to_boolean(dpop()));
+}
+
 }

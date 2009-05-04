@@ -1,3 +1,6 @@
+namespace factor
+{
+
 typedef enum {
 	/* arg is a primitive number */
 	RT_PRIMITIVE,
@@ -85,3 +88,5 @@ inline static bool stack_traces_p(void)
 }
 
 F_CODE_BLOCK *add_code_block(CELL type, CELL code, CELL labels, CELL relocation, CELL literals);
+
+}

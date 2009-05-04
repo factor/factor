@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 void *primitives[] = {
 	(void *)primitive_bignum_to_fixnum,
 	(void *)primitive_float_to_fixnum,
@@ -152,3 +155,5 @@ void *primitives[] = {
 	(void *)primitive_inline_cache_stats,
 	(void *)primitive_optimized_p,
 };
+
+}

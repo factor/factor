@@ -1,5 +1,8 @@
 #include <ucontext.h>
 
+namespace factor
+{
+
 inline static void *ucontext_stack_pointer(void *uap)
 {
         ucontext_t *ucontext = (ucontext_t *)uap;
@@ -8,3 +11,5 @@ inline static void *ucontext_stack_pointer(void *uap)
 
 #define UAP_PROGRAM_COUNTER(ucontext) \
 	(((ucontext_t *)(ucontext))->uc_mcontext.gregs[EIP])
+
+}

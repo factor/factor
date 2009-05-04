@@ -1,3 +1,6 @@
+namespace factor
+{
+
 /* :tabSize=2:indentSize=2:noTabs=true:
 
 Copyright (C) 1989-1992 Massachusetts Institute of Technology
@@ -124,3 +127,5 @@ F_BIGNUM * digit_stream_to_bignum(unsigned int n_digits,
                                    unsigned int (*producer)(unsigned int),
                                    unsigned int radix,
                                    int negative_p);
+
+}

@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 static bool fep_disabled;
 static bool full_output;
 
@@ -471,4 +474,6 @@ PRIMITIVE(die)
 	print_string("The die word was called by the library. Unless you called it yourself,\n");
 	print_string("you have triggered a bug in Factor. Please report.\n");
 	factorbug();
+}
+
 }

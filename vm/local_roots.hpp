@@ -1,3 +1,6 @@
+namespace factor
+{
+
 /* If a runtime function needs to call another function which potentially
 allocates memory, it must wrap any local variable references to Factor
 objects in gc_root instances */
@@ -40,3 +43,5 @@ struct gc_bignum
 };
 
 #define GC_BIGNUM(x) gc_bignum x##__gc_root(&x)
+
+}

@@ -1,6 +1,3 @@
-#include <windows.h>
-#include <stdio.h>
-#include <shellapi.h>
 #include "master.hpp"
 
 int WINAPI WinMain(
@@ -19,7 +16,7 @@ int WINAPI WinMain(
 		return 1;
 	}
 
-	start_standalone_factor(nArgs,szArglist);
+	factor::start_standalone_factor(nArgs,szArglist);
 
 	LocalFree(szArglist);
 

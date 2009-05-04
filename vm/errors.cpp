@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* Global variables used to pass fault handler state from signal handler to
 user-space */
 CELL signal_number;
@@ -146,4 +149,6 @@ void memory_signal_handler_impl(void)
 void misc_signal_handler_impl(void)
 {
 	signal_error(signal_number,signal_callstack_top);
+}
+
 }

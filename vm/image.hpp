@@ -1,3 +1,6 @@
+namespace factor
+{
+
 #define IMAGE_MAGIC 0x0f0e0d0c
 #define IMAGE_VERSION 4
 
@@ -43,3 +46,5 @@ bool save_image(const F_CHAR *file);
 
 PRIMITIVE(save_image);
 PRIMITIVE(save_image_and_exit);
+
+}

@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* Simple wrappers for ANSI C I/O functions, used for bootstrapping.
 
 Note the ugly loop logic in almost every function; we have to handle EINTR
@@ -221,4 +224,6 @@ VM_C_API int err_no(void)
 VM_C_API void clear_err_no(void)
 {
 	errno = 0;
+}
+
 }

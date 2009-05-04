@@ -5,9 +5,10 @@
   #include <wchar.h>
 #endif
 
-typedef wchar_t F_CHAR;
+namespace factor
+{
 
-#define string_to_native_alien(string) string_to_u16_alien(string,true)
+typedef wchar_t F_CHAR;
 
 #define STRING_LITERAL(string) L##string
 
@@ -55,3 +56,4 @@ long getpagesize (void);
 
 s64 current_micros(void);
 
+}

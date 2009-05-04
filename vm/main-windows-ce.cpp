@@ -128,7 +128,7 @@ WinMain(
 	int nCmdShow)
 {
 	parse_args(&__argc, &__argv, lpCmdLine);
-	start_standalone_factor(__argc,(LPWSTR*)__argv);
+	factor::start_standalone_factor(__argc,(LPWSTR*)__argv);
 	// memory leak from malloc, wcsdup
 	return 0;
 }

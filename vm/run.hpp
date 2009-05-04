@@ -1,3 +1,6 @@
+namespace factor
+{
+
 #define USER_ENV 70
 
 typedef enum {
@@ -90,9 +93,6 @@ typedef enum {
 #define FIRST_SAVE_ENV BOOT_ENV
 #define LAST_SAVE_ENV STAGE2_ENV
 
-/* TAGGED user environment data; see getenv/setenv prims */
-extern CELL userenv[USER_ENV];
-
 /* Canonical T object. It's just a word */
 extern CELL T;
 
@@ -104,3 +104,8 @@ PRIMITIVE(sleep);
 PRIMITIVE(set_slot);
 PRIMITIVE(load_locals);
 PRIMITIVE(clone);
+
+}
+
+/* TAGGED user environment data; see getenv/setenv prims */
+VM_C_API factor::CELL userenv[USER_ENV];

@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 F_BYTE_ARRAY *allot_byte_array(CELL size)
 {
 	F_BYTE_ARRAY *array = allot_array_internal<F_BYTE_ARRAY>(size);
@@ -56,4 +59,6 @@ void growable_byte_array::append_byte_array(CELL byte_array_)
 void growable_byte_array::trim()
 {
 	array = reallot_array(array.untagged(),count);
+}
+
 }

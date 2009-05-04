@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* If memory allocation fails, bail out */
 void *safe_malloc(size_t size)
 {
@@ -53,3 +56,5 @@ CELL read_cell_hex(void)
 	if(scanf(CELL_HEX_FORMAT,&cell) < 0) exit(1);
 	return cell;
 };
+
+}

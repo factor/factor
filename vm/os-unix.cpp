@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 void start_thread(void *(*start_routine)(void *))
 {
 	pthread_attr_t attr;
@@ -310,4 +313,6 @@ VM_C_API void wait_for_stdin(void)
 		else
 			fatal_error("Error writing control fd",errno);
 	}
+}
+
 }

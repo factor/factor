@@ -1,5 +1,8 @@
 #include "master.hpp"
 
+namespace factor
+{
+
 /* Snarfed from SBCL linux-so.c. You must free() this yourself. */
 const char *vm_executable_path(void)
 {
@@ -56,3 +59,5 @@ int inotify_rm_watch(int fd, u32 wd)
 }
 
 #endif
+
+}

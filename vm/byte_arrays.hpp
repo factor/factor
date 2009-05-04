@@ -1,3 +1,6 @@
+namespace factor
+{
+
 F_BYTE_ARRAY *allot_byte_array(CELL size);
 
 PRIMITIVE(byte_array);
@@ -16,3 +19,5 @@ struct growable_byte_array {
 
 	void trim();
 };
+
+}

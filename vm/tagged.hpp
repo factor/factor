@@ -1,3 +1,6 @@
+namespace factor
+{
+
 template <typename T> CELL tag(T *value)
 {
 	return RETAG(value,tag_for(T::type_number));
@@ -38,7 +41,7 @@ struct tagged
 #endif
 	}
 
-	explicit tagged(T *untagged) : value_(::tag(untagged)) {
+	explicit tagged(T *untagged) : value_(factor::tag(untagged)) {
 #ifdef FACTOR_DEBUG
 		untag_check();
 #endif
@@ -64,4 +67,6 @@ template <typename T> T *untag_check(CELL value)
 template <typename T> T *untag(CELL value)
 {
 	return tagged<T>(value).untagged();
+}
+
 }
