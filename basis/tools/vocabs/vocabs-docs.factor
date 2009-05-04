@@ -73,3 +73,11 @@ HELP: set-vocab-tags
 HELP: all-vocabs
 { $values { "assoc" "an association list mapping vocabulary roots to sequences of vocabulary specifiers" } }
 { $description "Outputs an association list of all vocabularies which have been loaded or are available for loading." } ;
+
+HELP: load-all-under
+{ $values { "prefix" string } }
+{ $description "Load all vocabularies that match the provided prefix." } ;
+
+HELP: all-vocabs-under
+{ $values { "prefix" string } }
+{ $description "Return a sequence of vocab or vocab-links for each vocab matching the provided prefix. Unlike " { $link all-child-vocabs } " this word will return both loaded and unloaded vocabularies." } ;
