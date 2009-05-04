@@ -51,13 +51,16 @@ SYMBOL: windows
     focus-path f swap focus-gestures ;
 
 : try-to-open-window ( world -- )
-    [ (open-window) ]
-    [ handle>> select-gl-context ]
-    [
-        [ begin-world ]
-        [ [ handle>> (close-window) ] [ ui-error ] bi* ]
-        recover
-    ] tri ;
+    {
+        [ (open-window) ]
+        [ handle>> select-gl-context ]
+        [
+            [ begin-world ]
+            [ [ handle>> (close-window) ] [ ui-error ] bi* ]
+            recover
+        ]
+        [ resize-world ]
+    } cleave ;
 
 M: world graft*
     [ try-to-open-window ]
