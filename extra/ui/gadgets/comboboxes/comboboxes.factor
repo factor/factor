@@ -1,6 +1,6 @@
 USING: accessors arrays kernel math.rectangles models sequences
 ui.frp ui.gadgets ui.gadgets.glass ui.gadgets.labels
-ui.gadgets.tables ui.gestures ;
+ui.gadgets.tables ui.gestures colors.constants fonts ;
 IN: ui.gadgets.comboboxes
 
 TUPLE: combo-table < table spawner ;
@@ -19,4 +19,4 @@ combobox H{
 
 : <combobox> ( options -- combobox ) [ first [ combobox new-label ] keep <model> >>model ] keep
    [ 1array ] map <model> trivial-renderer combo-table new-table
-   >>table ;
+   >>table dup font>> COLOR: gray >>background 12 >>size >>font ;
