@@ -50,7 +50,9 @@ TUPLE: check-mixin-class class ;
     [ [ f ] 2dip "instances" word-prop set-at ]
     2bi ;
 
-: add-mixin-instance ( class mixin -- )
+GENERIC# add-mixin-instance 1 ( class mixin -- )
+
+M: class add-mixin-instance
     #! Note: we call update-classes on the new member, not the
     #! mixin. This ensures that we only have to update the
     #! methods whose specializer intersects the new member, not

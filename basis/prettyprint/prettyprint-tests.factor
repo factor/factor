@@ -2,8 +2,8 @@ USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
-continuations generic compiler.units tools.walker eval
-accessors make vocabs.parser see ;
+continuations generic compiler.units tools.continuations
+tools.continuations.private eval accessors make vocabs.parser see ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -86,11 +86,10 @@ unit-test
     drop ;
 
 [ "drop ;" ] [
-    \ blah f "inferred-effect" set-word-prop
     [ \ blah see ] with-string-writer "\n" ?tail drop 6 tail*
 ] unit-test
 
-: check-see ( expect name -- )
+: check-see ( expect name -- ? )
     [
         use [ clone ] change
 
@@ -105,6 +104,7 @@ unit-test
 GENERIC: method-layout ( a -- b )
 
 M: complex method-layout
+    drop
     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ;
 
@@ -116,8 +116,9 @@ M: object method-layout ;
 
 [
     {
-        "USING: math prettyprint.tests ;"
+        "USING: kernel math prettyprint.tests ;"
         "M: complex method-layout"
+        "    drop"
         "    \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\""
         "    ;"
         ""
@@ -180,37 +181,15 @@ DEFER: parse-error-file
     "string-layout-test" string-layout check-see
 ] unit-test
 
-! Define dummy words for the below...
-: <NSRect> ( a b c d -- e ) ;
-: <PixelFormat> ( -- fmt ) ;
-: send ( obj -- ) ;
-
-\ send soft "break-after" set-word-prop
-
-: final-soft-break-test ( -- str )
-    {
-        "USING: kernel sequences ;"
-        "IN: prettyprint.tests"
-        ": final-soft-break-layout ( class dim -- view )"
-        "    [ \"alloc\" send 0 0 ] dip first2 <NSRect>"
-        "    <PixelFormat> \"initWithFrame:pixelFormat:\" send"
-        "    dup 1 \"setPostsBoundsChangedNotifications:\" send"
-        "    dup 1 \"setPostsFrameChangedNotifications:\" send ;"
-    } ;
-
-[ t ] [
-    "final-soft-break-layout" final-soft-break-test check-see
-] unit-test
-
-: narrow-test ( -- str )
+: narrow-test ( -- array )
     {
         "USING: arrays combinators continuations kernel sequences ;"
         "IN: prettyprint.tests"
-        ": narrow-layout ( obj -- )"
+        ": narrow-layout ( obj1 obj2 -- obj3 )"
         "    {"
         "        { [ dup continuation? ] [ append ] }"
         "        { [ dup not ] [ drop reverse ] }"
-        "        { [ dup pair? ] [ delete ] }"
+        "        { [ dup pair? ] [ [ delete ] keep ] }"
         "    } cond ;"
     } ;
 
@@ -218,7 +197,7 @@ DEFER: parse-error-file
     "narrow-layout" narrow-test check-see
 ] unit-test
 
-: another-narrow-test ( -- str )
+: another-narrow-test ( -- array )
     {
         "IN: prettyprint.tests"
         ": another-narrow-layout ( -- obj )"
@@ -274,19 +253,15 @@ M: class-see-layout class-see-layout ;
 ! Regression
 [ t ] [
     "IN: prettyprint.tests\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
-    dup eval
+    dup eval( -- )
     "generic-decl-test" "prettyprint.tests" lookup
     [ see ] with-string-writer =
 ] unit-test
 
-[ [ + ] ] [
-    [ \ + (step-into-execute) ] (remove-breakpoints)
-] unit-test
+[ [ + ] ] [ [ \ + (step-into-execute) ] (remove-breakpoints) ] unit-test
 
-[ [ (step-into-execute) ] ] [
-    [ (step-into-execute) ] (remove-breakpoints)
-] unit-test
-
+[ [ (step-into-execute) ] ] [ [ (step-into-execute) ] (remove-breakpoints) ] unit-test
+ 
 [ [ 2 2 + . ] ] [
     [ 2 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test
@@ -300,11 +275,7 @@ GENERIC: generic-see-test-with-f ( obj -- obj )
 M: f generic-see-test-with-f ;
 
 [ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
-    [ { POSTPONE: f generic-see-test-with-f } see ] with-string-writer
-] unit-test
-
-[ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
-    [ \ f \ generic-see-test-with-f method see ] with-string-writer
+    [ M\ f generic-see-test-with-f see ] with-string-writer
 ] unit-test
 
 PREDICATE: predicate-see-test < integer even? ;
@@ -331,5 +302,5 @@ GENERIC: ended-up-ballin' ( a -- b )
 M: started-out-hustlin' ended-up-ballin' ; inline
 
 [ "USING: prettyprint.tests ;\nM: started-out-hustlin' ended-up-ballin' ; inline\n" ] [
-    [ { started-out-hustlin' ended-up-ballin' } see ] with-string-writer
+    [ M\ started-out-hustlin' ended-up-ballin' see ] with-string-writer
 ] unit-test

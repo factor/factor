@@ -6,7 +6,7 @@ IN: io.encodings.utf8.tests
     utf8 decode >array ;
 
 : encode-utf8-w/stream ( array -- newarray )
-    utf8 encode >array ;
+    >string utf8 encode >array ;
 
 [ { CHAR: replacement-character } ] [ { BIN: 11110101 BIN: 10111111 BIN: 10000000 BIN: 11111111 } decode-utf8-w/stream ] unit-test
 

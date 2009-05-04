@@ -28,6 +28,7 @@ TUPLE: search-field < track field ;
 
 : <search-field> ( model -- gadget )
     horizontal search-field new-track
+        0 >>fill
         { 5 5 } >>gap
         +baseline+ >>align
         swap <model-field> 10 >>min-cols >>field
@@ -73,7 +74,7 @@ CONSULT: table-protocol search-table table>> ;
         dup field>> { 2 2 } <filled-border> f track-add
         values search 500 milliseconds <delay> quot <string-search>
         renderer <table> f >>takes-focus? >>table
-        dup table>> <scroller> 1 track-add ;
+        dup table>> <scroller> 1 track-add ; inline
 
 M: search-table model-changed
     nip field>> clear-search-field ;

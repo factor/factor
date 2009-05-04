@@ -38,6 +38,4 @@ word wrap.">
 [ "aaa bb\ncccc\nddddd" ] [ "aaa bb cccc ddddd" 6 wrap-string ] unit-test
 [ "aaa bb\nccccccc\nddddddd" ] [ "aaa bb ccccccc ddddddd" 6 wrap-string ] unit-test
 
-\ wrap-string must-infer
-
 [ "a b c d e f\ng h" ] [ "a b c d e f g h" 11 wrap-string ] unit-test

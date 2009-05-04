@@ -42,8 +42,6 @@ IN: ui.gadgets.editors.tests
     ] with-grafted-gadget
 ] unit-test
 
-\ <editor> must-infer
-
 "hello" <model> <model-field> "field" set
 
 "field" get [

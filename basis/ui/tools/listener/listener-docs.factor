@@ -1,7 +1,7 @@
 USING: help.markup help.syntax ui.commands ui.operations
 ui.gadgets.editors ui.gadgets.panes listener io words
 ui.tools.listener.completion ui.tools.common help.tips
-tools.vocabs vocabs ;
+vocabs vocabs.refresh ;
 IN: ui.tools.listener
 
 HELP: interactor
@@ -27,6 +27,8 @@ ARTICLE: "ui-listener" "UI listener"
 { $command-map interactor "quotation" }
 { $heading "Editing commands" }
 "The text editing commands are standard; see " { $link "gadgets-editors-commands" } "."
+$nl
+"The listener displays a summary with any outstanding error conditions before every prompt. See " { $link "ui.tools.error-list" } " for details."
 { $heading "Implementation" }
 "Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } ") and an input area (instance of " { $link interactor } "). Clickable presentations can also be printed to the listener; see " { $link "ui-presentations" } "." ;
 

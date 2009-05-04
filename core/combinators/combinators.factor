@@ -86,6 +86,8 @@ ERROR: no-case object ;
         ] [ callable? ] if
     ] find nip ;
 
+\ case-find t "no-compile" set-word-prop
+
 : case ( obj assoc -- )
     case-find {
         { [ dup array? ] [ nip second call ] }
@@ -121,7 +123,7 @@ ERROR: no-case object ;
     [ [ [ literalize ] dip ] assoc-map linear-case-quot ] with map ;
 
 : hash-dispatch-quot ( table -- quot )
-    [ length 1- [ fixnum-bitand ] curry ] keep
+    [ length 1 - [ fixnum-bitand ] curry ] keep
     [ dispatch ] curry append ;
 
 : hash-case-quot ( default assoc -- quot )
@@ -160,7 +162,7 @@ ERROR: no-case object ;
 
 ! recursive-hashcode
 : recursive-hashcode ( n obj quot -- code )
-    pick 0 <= [ 3drop 0 ] [ [ 1- ] 2dip call ] if ; inline
+    pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
 
 ! These go here, not in sequences and hashtables, since those
 ! two cannot depend on us

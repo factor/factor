@@ -33,13 +33,13 @@ M: lo-tag-class define-builtin-predicate
 
 M: hi-tag-class define-builtin-predicate
     dup class>type [ eq? ] curry [ hi-tag ] prepend 1quotation
-    [ dup tag 3 eq? ] [ [ drop f ] if ] surround
+    [ dup tag 6 eq? ] [ [ drop f ] if ] surround
     define-predicate ;
 
 M: lo-tag-class instance? [ tag ] [ class>type ] bi* eq? ;
 
 M: hi-tag-class instance?
-    over tag 3 eq? [ [ hi-tag ] [ class>type ] bi* eq? ] [ 2drop f ] if ;
+    over tag 6 eq? [ [ hi-tag ] [ class>type ] bi* eq? ] [ 2drop f ] if ;
 
 M: builtin-class (flatten-class) dup set ;
 
@@ -55,7 +55,7 @@ M: anonymous-intersection (flatten-class)
     [
         builtins get sift [ (flatten-class) ] each
     ] [
-        unclip [ assoc-intersect ] reduce [ swap set ] assoc-each
+        [ ] [ assoc-intersect ] map-reduce [ swap set ] assoc-each
     ] if-empty ;
 
 M: anonymous-complement (flatten-class)

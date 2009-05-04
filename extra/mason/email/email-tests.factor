@@ -5,7 +5,6 @@ USING: mason.email mason.common mason.config namespaces tools.test ;
     [
         "linux" target-os set
         "x86.64" target-cpu set
-        status-error status set
-        subject prefix-subject
+        status-error subject prefix-subject
     ] with-scope
 ] unit-test

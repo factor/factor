@@ -62,8 +62,8 @@ HELP: current-temporary-directory
 
 HELP: unique-file
 { $values
+     { "prefix" string }
      { "path" "a pathname string" }
-     { "path'" "a pathname string" }
 }
 { $description "Creates a temporary file in the directory stored in " { $link current-temporary-directory } " and outputs the path name." } ;
 

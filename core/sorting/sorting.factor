@@ -29,13 +29,13 @@ TUPLE: merge
     [ [ [ 2drop ] dip nth-unsafe ] dip push ] [
         pick 2 = [
             [
-                [ 2drop dup 1+ ] dip
+                [ 2drop dup 1 + ] dip
                 [ nth-unsafe ] curry bi@
             ] dip [ push ] curry bi@
         ] [
             pick 3 = [
                 [
-                    [ 2drop dup 1+ dup 1+ ] dip
+                    [ 2drop dup 1 + dup 1 + ] dip
                     [ nth-unsafe ] curry tri@
                 ] dip [ push ] curry tri@
             ] [ [ nip subseq ] dip push-all ] if
@@ -57,10 +57,10 @@ TUPLE: merge
     [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
 
 : l-next ( merge -- )
-    [ [ l-elt ] [ [ 1+ ] change-from1 drop ] bi ] [ accum>> ] bi push ; inline
+    [ [ l-elt ] [ [ 1 + ] change-from1 drop ] bi ] [ accum>> ] bi push ; inline
 
 : r-next ( merge -- )
-    [ [ r-elt ] [ [ 1+ ] change-from2 drop ] bi ] [ accum>> ] bi push ; inline
+    [ [ r-elt ] [ [ 1 + ] change-from2 drop ] bi ] [ accum>> ] bi push ; inline
 
 : decide ( merge -- ? )
     [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
@@ -129,8 +129,8 @@ TUPLE: merge
     while 2drop ; inline
 
 : each-pair ( seq quot -- )
-    [ [ length 1+ 2/ ] keep ] dip
-    [ [ 1 shift dup 1+ ] dip ] prepose curry each-integer ; inline
+    [ [ length 1 + 2/ ] keep ] dip
+    [ [ 1 shift dup 1 + ] dip ] prepose curry each-integer ; inline
 
 : (sort-pairs) ( i1 i2 seq quot accum -- )
     [ 2dup length = ] 2dip rot [

@@ -18,7 +18,7 @@ M: integer some-generic 1+ ;
 
 [ 4 ] [ 3 some-generic ] unit-test
 
-[ ] [ "IN: tools.annotations.tests USE: math M: integer some-generic 1- ;" eval ] unit-test
+[ ] [ "IN: tools.annotations.tests USE: math M: integer some-generic 1- ;" eval( -- ) ] unit-test
 
 [ 2 ] [ 3 some-generic ] unit-test
 
@@ -33,7 +33,7 @@ M: object another-generic ;
 
 \ another-generic watch
 
-[ ] [ "IN: tools.annotations.tests GENERIC: another-generic ( a -- b )" eval ] unit-test
+[ ] [ "IN: tools.annotations.tests GENERIC: another-generic ( a -- b )" eval( -- ) ] unit-test
 
 [ ] [ \ another-generic reset ] unit-test
 
@@ -43,6 +43,6 @@ GENERIC: blah-generic ( a -- b )
 
 M: string blah-generic ;
 
-{ string blah-generic } watch
+[ ] [ M\ string blah-generic watch ] unit-test
 
 [ "hi" ] [ "hi" blah-generic ] unit-test

@@ -16,17 +16,4 @@ M: callable infer ( quot -- effect )
     #! Safe to call from inference transforms.
     infer effect>string print ;
 
-: forget-errors ( -- )
-    all-words [
-        dup subwords [ f "cannot-infer" set-word-prop ] each
-        f "cannot-infer" set-word-prop
-    ] each ;
-
-: forget-effects ( -- )
-    forget-errors
-    all-words [
-        dup subwords [ f "inferred-effect" set-word-prop ] each
-        f "inferred-effect" set-word-prop
-    ] each ;
-
 "stack-checker.call-effect" require

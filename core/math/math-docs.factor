@@ -355,8 +355,9 @@ ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 { $subsection 2/ }
 { $subsection 2^ }
 { $subsection bit? }
-"The " { $vocab-link "math.bitwise" } " vocabulary implements additional bitwise integer operations."
-{ $see-also "conditionals" } ;
+{ $subsection "math.bitwise" }
+{ $subsection "math.bits" }
+{ $see-also "booleans" } ;
 
 ARTICLE: "arithmetic" "Arithmetic"
 "Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact ratio. Floating point numbers are also supported, along with complex numbers."

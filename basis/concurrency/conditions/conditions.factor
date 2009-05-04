@@ -20,10 +20,12 @@ IN: concurrency.conditions
         ]
     ] dip later ;
 
+ERROR: wait-timeout ;
+
 : wait ( queue timeout status -- )
     over [
         [ queue-timeout [ drop ] ] dip suspend
-        [ "Timeout" throw ] [ cancel-alarm ] if
+        [ wait-timeout ] [ cancel-alarm ] if
     ] [
         [ drop '[ _ push-front ] ] dip suspend drop
     ] if ;

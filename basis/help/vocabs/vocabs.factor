@@ -6,7 +6,8 @@ classes.singleton classes.tuple classes.union combinators
 definitions effects fry generic help help.markup help.stylesheet
 help.topics io io.files io.pathnames io.styles kernel macros
 make namespaces prettyprint sequences sets sorting summary
-tools.vocabs vocabs vocabs.loader words words.symbol definitions.icons ;
+vocabs vocabs.files vocabs.hierarchy vocabs.loader
+vocabs.metadata words words.symbol definitions.icons ;
 IN: help.vocabs
 
 : about ( vocab -- )

@@ -6,8 +6,6 @@ threads arrays generic threads accessors listener math
 calendar concurrency.promises io ui.tools.common ;
 IN: ui.tools.listener.tests
 
-\ <interactor> must-infer
-
 [
     [ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 
@@ -77,7 +75,7 @@ CONSTANT: text "Hello world.\nThis is a test."
 [ ] [
     [
         "interactor" get register-self
-        "interactor" get contents "promise" get fulfill
+        "interactor" get stream-contents "promise" get fulfill
     ] in-thread
 ] unit-test
 

@@ -14,7 +14,7 @@ else
     LIBS = -lm -framework Cocoa -framework AppKit
 endif
 
-LINKER = gcc $(CFLAGS) -dynamiclib -single_module -std=gnu99 \
+LINKER = $(CPP) $(CFLAGS) -dynamiclib -single_module -std=gnu99 \
 	-current_version $(VERSION) \
 	-compatibility_version $(VERSION) \
 	-fvisibility=hidden \

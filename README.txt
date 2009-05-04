@@ -20,7 +20,7 @@ implementation. It is not an introduction to the language itself.
 
 * Compiling the Factor VM
 
-The Factor runtime is written in GNU C99, and is built with GNU make and
+The Factor runtime is written in GNU C++, and is built with GNU make and
 gcc.
 
 Factor supports various platforms. For an up-to-date list, see
@@ -59,10 +59,10 @@ On Unix, Factor can either run a graphical user interface using X11, or
 a terminal listener.
 
 For X11 support, you need recent development libraries for libc,
-Pango, X11, OpenGL and GLUT. On a Debian-derived Linux distribution
+Pango, X11, and OpenGL. On a Debian-derived Linux distribution
 (like Ubuntu), you can use the following line to grab everything:
 
-    sudo apt-get install libc6-dev libpango-1.0-dev libx11-dev glutg3-dev
+    sudo apt-get install libc6-dev libpango-1.0-dev libx11-dev
 
 If your DISPLAY environment variable is set, the UI will start
 automatically:
@@ -138,7 +138,7 @@ usage documentation, enter the following in the UI listener:
 The Factor source tree is organized as follows:
 
   build-support/ - scripts used for compiling Factor
-  vm/ - sources for the Factor VM, written in C
+  vm/ - sources for the Factor VM, written in C++
   core/ - Factor core library
   basis/ - Factor basis library, compiler, tools
   extra/ - more libraries and applications

@@ -5,6 +5,10 @@ HELP: make-link
 { $values { "target" "a path to the symbolic link's target" } { "symlink" "a path to new symbolic link" } }
 { $description "Creates a symbolic link." } ;
 
+HELP: make-hard-link
+{ $values { "target" "a path to the hard link's target" } { "link" "a path to new symbolic link" } }
+{ $description "Creates a hard link." } ;
+
 HELP: read-link
 { $values { "symlink" "a path to an existing symbolic link" } { "path" "the path pointed to by the symbolic link" } }
 { $description "Reads the symbolic link and returns its target path." } ;

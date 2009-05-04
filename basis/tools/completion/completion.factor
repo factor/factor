@@ -1,22 +1,22 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel arrays sequences math namespaces
-strings io fry vectors words assocs combinators sorting
-unicode.case unicode.categories math.order vocabs
-tools.vocabs unicode.data ;
+USING: accessors kernel arrays sequences math namespaces strings io
+fry vectors words assocs combinators sorting unicode.case
+unicode.categories math.order vocabs vocabs.hierarchy unicode.data
+locals ;
 IN: tools.completion
 
-: (fuzzy) ( accum ch i full -- accum i ? )
-    index-from
-    [
-        [ swap push ] 2keep 1+ t
+:: (fuzzy) ( accum i full ch -- accum i full ? )
+    ch i full index-from [
+        :> i i accum push
+        accum i 1+ full t
     ] [
-        drop f -1 f
+        f -1 full f
     ] if* ;
 
 : fuzzy ( full short -- indices )
-    dup length <vector> -rot 0 -rot
-    [ -rot [ (fuzzy) ] keep swap ] all? 3drop ;
+    dup [ length <vector> 0 ] curry 2dip
+    [ (fuzzy) ] all? 3drop ;
 
 : (runs) ( runs n seq -- runs n )
     [
