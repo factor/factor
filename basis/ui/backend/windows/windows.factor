@@ -10,10 +10,160 @@ windows.messages windows.types windows.offscreen windows.nt
 threads libc combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render ascii math.bitwise locals
 accessors math.rectangles math.order ascii calendar
-io.encodings.utf16n windows.errors ;
+io.encodings.utf16n windows.errors literals ui.pixel-formats 
+ui.pixel-formats.private memoize classes ;
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
+
+TUPLE: win-base hDC hRC ;
+TUPLE: win < win-base hWnd world title ;
+TUPLE: win-offscreen < win-base hBitmap bits ;
+C: <win> win
+C: <win-offscreen> win-offscreen
+
+<PRIVATE
+
+PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
+    { double-buffered { $ WGL_DOUBLE_BUFFER_ARB 1 } }
+    { stereo { $ WGL_STEREO_ARB 1 } }
+    { offscreen { $ WGL_DRAW_TO_BITMAP_ARB 1 } }
+    { fullscreen { $ WGL_DRAW_TO_WINDOW_ARB 1 } }
+    { windowed { $ WGL_DRAW_TO_WINDOW_ARB 1 } }
+    { accelerated { $ WGL_ACCELERATION_ARB $ WGL_FULL_ACCELERATION_ARB } }
+    { software-rendered { $ WGL_ACCELERATION_ARB $ WGL_NO_ACCELERATION_ARB } }
+    { backing-store { $ WGL_SWAP_METHOD_ARB $ WGL_SWAP_COPY_ARB } }
+    { color-float { $ WGL_TYPE_RGBA_FLOAT_ARB 1 } }
+    { color-bits { $ WGL_COLOR_BITS_ARB } }
+    { red-bits { $ WGL_RED_BITS_ARB } }
+    { green-bits { $ WGL_GREEN_BITS_ARB } }
+    { blue-bits { $ WGL_BLUE_BITS_ARB } }
+    { alpha-bits { $ WGL_ALPHA_BITS_ARB } }
+    { accum-bits { $ WGL_ACCUM_BITS_ARB } }
+    { accum-red-bits { $ WGL_ACCUM_RED_BITS_ARB } }
+    { accum-green-bits { $ WGL_ACCUM_GREEN_BITS_ARB } }
+    { accum-blue-bits { $ WGL_ACCUM_BLUE_BITS_ARB } }
+    { accum-alpha-bits { $ WGL_ACCUM_ALPHA_BITS_ARB } }
+    { depth-bits { $ WGL_DEPTH_BITS_ARB } }
+    { stencil-bits { $ WGL_STENCIL_BITS_ARB } }
+    { aux-buffers { $ WGL_AUX_BUFFERS_ARB } }
+    { sample-buffers { $ WGL_SAMPLE_BUFFERS_ARB } }
+    { samples { $ WGL_SAMPLES_ARB } }
+}
+
+MEMO: (has-wglChoosePixelFormatARB?) ( dc -- ? )
+    { "WGL_ARB_pixel_format" } has-wgl-extensions? ;
+: has-wglChoosePixelFormatARB? ( world -- ? )
+    handle>> hDC>> (has-wglChoosePixelFormatARB?) ;
+
+: arb-make-pixel-format ( world attributes -- pf )
+    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 0 <int> 0 <int>
+    [ wglChoosePixelFormatARB win32-error=0/f ] 2keep drop *int ;
+
+: arb-pixel-format-attribute ( pixel-format attribute -- value )
+    >WGL_ARB
+    [ drop f ] [
+        [ [ world>> handle>> hDC>> ] [ handle>> ] bi 0 1 ] dip
+        first <int> 0 <int>
+        [ wglGetPixelFormatAttribivARB win32-error=0/f ]
+        keep *int
+    ] if-empty ;
+
+CONSTANT: pfd-flag-map H{
+    { double-buffered $ PFD_DOUBLEBUFFER }
+    { stereo $ PFD_STEREO }
+    { offscreen $ PFD_DRAW_TO_BITMAP }
+    { fullscreen $ PFD_DRAW_TO_WINDOW }
+    { windowed $ PFD_DRAW_TO_WINDOW }
+    { backing-store $ PFD_SWAP_COPY }
+    { software-rendered $ PFD_GENERIC_FORMAT }
+}
+
+: >pfd-flag ( attribute -- value )
+    pfd-flag-map at [ ] [ 0 ] if* ;
+
+: >pfd-flags ( attributes -- flags )
+    [ >pfd-flag ] [ bitor ] map-reduce
+    PFD_SUPPORT_OPENGL bitor ;
+
+: attr-value ( attributes name -- value )
+    [ instance? ] curry find nip
+    [ value>> ] [ 0 ] if* ;
+
+: >pfd ( attributes -- pfd )
+    "PIXELFORMATDESCRIPTOR" <c-object>
+    "PIXELFORMATDESCRIPTOR" heap-size over set-PIXELFORMATDESCRIPTOR-nSize
+    1 over set-PIXELFORMATDESCRIPTOR-nVersion
+    over >pfd-flags over set-PIXELFORMATDESCRIPTOR-dwFlags
+    PFD_TYPE_RGBA over set-PIXELFORMATDESCRIPTOR-iPixelType
+    over color-bits attr-value over set-PIXELFORMATDESCRIPTOR-cColorBits
+    over red-bits attr-value over set-PIXELFORMATDESCRIPTOR-cRedBits
+    over green-bits attr-value over set-PIXELFORMATDESCRIPTOR-cGreenBits
+    over blue-bits attr-value over set-PIXELFORMATDESCRIPTOR-cBlueBits
+    over alpha-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAlphaBits
+    over accum-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumBits
+    over accum-red-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumRedBits
+    over accum-green-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumGreenBits
+    over accum-blue-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumBlueBits
+    over accum-alpha-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumAlphaBits
+    over depth-bits attr-value over set-PIXELFORMATDESCRIPTOR-cDepthBits
+    over stencil-bits attr-value over set-PIXELFORMATDESCRIPTOR-cStencilBits
+    over aux-buffers attr-value over set-PIXELFORMATDESCRIPTOR-cAuxBuffers
+    PFD_MAIN_PLANE over set-PIXELFORMATDESCRIPTOR-dwLayerMask
+    nip ;
+
+: pfd-make-pixel-format ( world attributes -- pf )
+    [ handle>> hDC>> ] [ >pfd ] bi*
+    ChoosePixelFormat dup win32-error=0/f ;
+
+: get-pfd ( pixel-format -- pfd )
+    [ world>> handle>> hDC>> ] [ handle>> ] bi
+    "PIXELFORMATDESCRIPTOR" heap-size
+    "PIXELFORMATDESCRIPTOR" <c-object>
+    [ DescribePixelFormat win32-error=0/f ] keep ;
+
+: pfd-flag? ( pfd flag -- ? )
+    [ PIXELFORMATDESCRIPTOR-dwFlags ] dip bitand c-bool> ;
+
+: (pfd-pixel-format-attribute) ( pfd attribute -- value )
+    {
+        { double-buffered [ PFD_DOUBLEBUFFER pfd-flag? ] }
+        { stereo [ PFD_STEREO pfd-flag? ] }
+        { offscreen [ PFD_DRAW_TO_BITMAP pfd-flag? ] }
+        { fullscreen [ PFD_DRAW_TO_WINDOW pfd-flag? ] }
+        { windowed [ PFD_DRAW_TO_WINDOW pfd-flag? ] }
+        { software-rendered [ PFD_GENERIC_FORMAT pfd-flag? ] }
+        { color-bits [ PIXELFORMATDESCRIPTOR-cColorBits ] }
+        { red-bits [ PIXELFORMATDESCRIPTOR-cRedBits ] }
+        { green-bits [ PIXELFORMATDESCRIPTOR-cGreenBits ] }
+        { blue-bits [ PIXELFORMATDESCRIPTOR-cBlueBits ] }
+        { alpha-bits [ PIXELFORMATDESCRIPTOR-cAlphaBits ] }
+        { accum-bits [ PIXELFORMATDESCRIPTOR-cAccumBits ] }
+        { accum-red-bits [ PIXELFORMATDESCRIPTOR-cAccumRedBits ] }
+        { accum-green-bits [ PIXELFORMATDESCRIPTOR-cAccumGreenBits ] }
+        { accum-blue-bits [ PIXELFORMATDESCRIPTOR-cAccumBlueBits ] }
+        { accum-alpha-bits [ PIXELFORMATDESCRIPTOR-cAccumAlphaBits ] }
+        { depth-bits [ PIXELFORMATDESCRIPTOR-cDepthBits ] }
+        { stencil-bits [ PIXELFORMATDESCRIPTOR-cStencilBits ] }
+        { aux-buffers [ PIXELFORMATDESCRIPTOR-cAuxBuffers ] }
+        [ 2drop f ]
+    } case ;
+
+: pfd-pixel-format-attribute ( pixel-format attribute -- value )
+    [ get-pfd ] dip (pfd-pixel-format-attribute) ;
+
+M: windows-ui-backend (make-pixel-format)
+    over has-wglChoosePixelFormatARB?
+    [ arb-make-pixel-format ] [ pfd-make-pixel-format ] if ;
+
+M: windows-ui-backend (free-pixel-format)
+    drop ;
+
+M: windows-ui-backend (pixel-format-attribute)
+    over world>> has-wglChoosePixelFormatARB?
+    [ arb-pixel-format-attribute ] [ pfd-pixel-format-attribute ] if ;
+
+PRIVATE>
 
 : lo-word ( wparam -- lo ) <short> *short ; inline
 : hi-word ( wparam -- hi ) -16 shift lo-word ; inline
@@ -72,12 +222,6 @@ M: pasteboard set-clipboard-contents drop copy ;
 : init-clipboard ( -- )
     <pasteboard> clipboard set-global
     <clipboard> selection set-global ;
-
-TUPLE: win-base hDC hRC ;
-TUPLE: win < win-base hWnd world title ;
-TUPLE: win-offscreen < win-base hBitmap bits ;
-C: <win> win
-C: <win-offscreen> win-offscreen
 
 SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
@@ -477,25 +621,24 @@ M: windows-ui-backend do-events
     f class-name-ptr set-global
     f msg-obj set-global ;
 
-: setup-pixel-format ( hdc flags -- )
-    32 make-pfd [ ChoosePixelFormat dup win32-error=0/f ] 2keep
-    swapd SetPixelFormat win32-error=0/f ;
+: get-dc ( world -- ) handle>> dup hWnd>> GetDC dup win32-error=0/f >>hDC drop ;
 
-: get-dc ( hWnd -- hDC ) GetDC dup win32-error=0/f ;
+: get-rc ( world -- )
+    handle>> dup hDC>> dup wglCreateContext dup win32-error=0/f
+    [ wglMakeCurrent win32-error=0/f ] keep >>hRC drop ;
 
-: get-rc ( hDC -- hRC )
-    dup wglCreateContext dup win32-error=0/f
-    [ wglMakeCurrent win32-error=0/f ] keep ;
+: set-pixel-format ( pixel-format hdc -- )
+    swap handle>> "PIXELFORMATDESCRIPTOR" <c-object> SetPixelFormat win32-error=0/f ;
 
-: setup-gl ( hwnd -- hDC hRC )
-    get-dc dup windowed-pfd-dwFlags setup-pixel-format dup get-rc ;
+: setup-gl ( world -- )
+    [ get-dc ] keep
+    [ swap [ handle>> hDC>> set-pixel-format ] [ get-rc ] bi ]
+    with-world-pixel-format ;
 
 M: windows-ui-backend (open-window) ( world -- )
-    [ create-window [ setup-gl ] keep ] keep
-    [ f <win> ] keep
-    [ swap hWnd>> register-window ] 2keep
-    dupd (>>handle)
-    hWnd>> show-window ;
+    [ dup create-window [ f f ] dip f f <win> >>handle setup-gl ]
+    [ dup handle>> hWnd>> register-window ]
+    [ handle>> hWnd>> show-window ] tri ;
 
 M: win-base select-gl-context ( handle -- )
     [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f
@@ -504,15 +647,15 @@ M: win-base select-gl-context ( handle -- )
 M: win-base flush-gl-context ( handle -- )
     hDC>> SwapBuffers win32-error=0/f ;
 
-: setup-offscreen-gl ( dim -- hDC hRC hBitmap bits )
-    make-offscreen-dc-and-bitmap [
-        [ dup offscreen-pfd-dwFlags setup-pixel-format ]
-        [ get-rc ] bi
-    ] 2dip ;
+: setup-offscreen-gl ( world -- )
+    dup [ handle>> ] [ dim>> ] bi make-offscreen-dc-and-bitmap
+    [ >>hDC ] [ >>hBitmap ] [ >>bits ] tri* drop [
+        swap [ handle>> hDC>> set-pixel-format ] [ get-rc ] bi
+    ] with-world-pixel-format ;
 
 M: windows-ui-backend (open-offscreen-buffer) ( world -- )
-    dup dim>> setup-offscreen-gl <win-offscreen>
-    >>handle drop ;
+    win-offscreen new >>handle
+    setup-offscreen-gl ;
 
 M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
     [ hDC>> DeleteDC drop ]

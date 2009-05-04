@@ -6,6 +6,9 @@ IN: ui.offscreen
 
 TUPLE: offscreen-world < world ;
 
+M: offscreen-world world-pixel-format-attributes
+    { offscreen T{ depth-bits { value 16 } } } ;
+
 : <offscreen-world> ( gadget title status -- world )
     offscreen-world new-world ;
 

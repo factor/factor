@@ -35,4 +35,4 @@ concurrency.promises io.encodings.ascii io threads calendar ;
     dup start-server* sockets>> first addr>> port>> "port" set
 ] unit-test
 
-[ "Hello world." ] [ "localhost" "port" get <inet> ascii <client> drop contents ] unit-test
+[ "Hello world." ] [ "localhost" "port" get <inet> ascii <client> drop stream-contents ] unit-test
