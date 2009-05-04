@@ -293,7 +293,7 @@ void dump_code_heap(void)
 
 	while(scan)
 	{
-		char *status;
+		const char *status;
 		switch(scan->status)
 		{
 		case B_FREE:
