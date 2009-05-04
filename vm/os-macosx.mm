@@ -5,7 +5,7 @@
 namespace factor
 {
 
-void c_to_factor_toplevel(CELL quot)
+void c_to_factor_toplevel(cell quot)
 {
 	for(;;)
 	{
@@ -13,9 +13,9 @@ NS_DURING
 		c_to_factor(quot);
 		NS_VOIDRETURN;
 NS_HANDLER
-		dpush(allot_alien(F,(CELL)localException));
+		dpush(allot_alien(F,(cell)localException));
 		quot = userenv[COCOA_EXCEPTION_ENV];
-		if(!tagged<F_OBJECT>(quot).type_p(QUOTATION_TYPE))
+		if(!tagged<object>(quot).type_p(QUOTATION_TYPE))
 		{
 			/* No Cocoa exception handler was registered, so
 			extra/cocoa/ is not loaded. So we pass the exception

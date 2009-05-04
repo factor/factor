@@ -5,55 +5,55 @@ namespace factor
 
 /* gets the address of an object representing a C pointer, with the
 intention of storing the pointer across code which may potentially GC. */
-char *pinned_alien_offset(CELL object)
+char *pinned_alien_offset(cell obj)
 {
-	switch(tagged<F_OBJECT>(object).type())
+	switch(tagged<object>(obj).type())
 	{
 	case ALIEN_TYPE:
-		F_ALIEN *alien = untag<F_ALIEN>(object);
-		if(alien->expired != F)
-			general_error(ERROR_EXPIRED,object,F,NULL);
-		return pinned_alien_offset(alien->alien) + alien->displacement;
+		alien *ptr = untag<alien>(obj);
+		if(ptr->expired != F)
+			general_error(ERROR_EXPIRED,obj,F,NULL);
+		return pinned_alien_offset(ptr->alien) + ptr->displacement;
 	case F_TYPE:
 		return NULL;
 	default:
-		type_error(ALIEN_TYPE,object);
+		type_error(ALIEN_TYPE,obj);
 		return NULL; /* can't happen */
 	}
 }
 
 /* make an alien */
-CELL allot_alien(CELL delegate_, CELL displacement)
+cell allot_alien(cell delegate_, cell displacement)
 {
-	gc_root<F_OBJECT> delegate(delegate_);
-	gc_root<F_ALIEN> alien(allot<F_ALIEN>(sizeof(F_ALIEN)));
+	gc_root<object> delegate(delegate_);
+	gc_root<alien> new_alien(allot<alien>(sizeof(alien)));
 
 	if(delegate.type_p(ALIEN_TYPE))
 	{
-		tagged<F_ALIEN> delegate_alien = delegate.as<F_ALIEN>();
+		tagged<alien> delegate_alien = delegate.as<alien>();
 		displacement += delegate_alien->displacement;
-		alien->alien = delegate_alien->alien;
+		new_alien->alien = delegate_alien->alien;
 	}
 	else
-		alien->alien = delegate.value();
+		new_alien->alien = delegate.value();
 
-	alien->displacement = displacement;
-	alien->expired = F;
+	new_alien->displacement = displacement;
+	new_alien->expired = F;
 
-	return alien.value();
+	return new_alien.value();
 }
 
 /* make an alien pointing at an offset of another alien */
 PRIMITIVE(displaced_alien)
 {
-	CELL alien = dpop();
-	CELL displacement = to_cell(dpop());
+	cell alien = dpop();
+	cell displacement = to_cell(dpop());
 
 	if(alien == F && displacement == 0)
 		dpush(F);
 	else
 	{
-		switch(tagged<F_OBJECT>(alien).type())
+		switch(tagged<object>(alien).type())
 		{
 		case BYTE_ARRAY_TYPE:
 		case ALIEN_TYPE:
@@ -71,13 +71,13 @@ PRIMITIVE(displaced_alien)
 if the object is a byte array, as a sanity check. */
 PRIMITIVE(alien_address)
 {
-	box_unsigned_cell((CELL)pinned_alien_offset(dpop()));
+	box_unsigned_cell((cell)pinned_alien_offset(dpop()));
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
 static void *alien_pointer(void)
 {
-	F_FIXNUM offset = to_fixnum(dpop());
+	fixnum offset = to_fixnum(dpop());
 	return unbox_alien() + offset;
 }
 
@@ -94,8 +94,8 @@ static void *alien_pointer(void)
 		*ptr = value; \
 	}
 
-DEFINE_ALIEN_ACCESSOR(signed_cell,F_FIXNUM,box_signed_cell,to_fixnum)
-DEFINE_ALIEN_ACCESSOR(unsigned_cell,CELL,box_unsigned_cell,to_cell)
+DEFINE_ALIEN_ACCESSOR(signed_cell,fixnum,box_signed_cell,to_fixnum)
+DEFINE_ALIEN_ACCESSOR(unsigned_cell,cell,box_unsigned_cell,to_cell)
 DEFINE_ALIEN_ACCESSOR(signed_8,s64,box_signed_8,to_signed_8)
 DEFINE_ALIEN_ACCESSOR(unsigned_8,u64,box_unsigned_8,to_unsigned_8)
 DEFINE_ALIEN_ACCESSOR(signed_4,s32,box_signed_4,to_fixnum)
@@ -111,9 +111,9 @@ DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
 /* open a native library and push a handle */
 PRIMITIVE(dlopen)
 {
-	gc_root<F_BYTE_ARRAY> path(dpop());
+	gc_root<byte_array> path(dpop());
 	path.untag_check();
-	gc_root<F_DLL> dll(allot<F_DLL>(sizeof(F_DLL)));
+	gc_root<dll> dll(allot<dll>(sizeof(dll)));
 	dll->path = path.value();
 	ffi_dlopen(dll.untagged());
 	dpush(dll.value());
@@ -122,18 +122,19 @@ PRIMITIVE(dlopen)
 /* look up a symbol in a native library */
 PRIMITIVE(dlsym)
 {
-	gc_root<F_OBJECT> dll(dpop());
-	gc_root<F_BYTE_ARRAY> name(dpop());
-	dll.untag_check();
+	gc_root<object> library(dpop());
+	gc_root<byte_array> name(dpop());
 	name.untag_check();
 
-	F_CHAR *sym = (F_CHAR *)(name.untagged() + 1);
+	vm_char *sym = (vm_char *)(name.untagged() + 1);
 
-	if(dll.value() == F)
+	if(library.value() == F)
 		box_alien(ffi_dlsym(NULL,sym));
 	else
 	{
-		tagged<F_DLL> d = dll.as<F_DLL>();
+		tagged<dll> d = library.as<dll>();
+		d.untag_check();
+
 		if(d->dll == NULL)
 			dpush(F);
 		else
@@ -144,35 +145,34 @@ PRIMITIVE(dlsym)
 /* close a native library handle */
 PRIMITIVE(dlclose)
 {
-	ffi_dlclose(untag_check<F_DLL>(dpop()));
+	ffi_dlclose(untag_check<dll>(dpop()));
 }
 
 PRIMITIVE(dll_validp)
 {
-	CELL dll = dpop();
-	if(dll == F)
+	cell library = dpop();
+	if(library == F)
 		dpush(T);
 	else
-		dpush(tagged<F_DLL>(dll)->dll == NULL ? F : T);
+		dpush(tagged<dll>(library)->dll == NULL ? F : T);
 }
 
 /* gets the address of an object representing a C pointer */
-VM_C_API char *alien_offset(CELL object)
+VM_C_API char *alien_offset(cell obj)
 {
-	switch(tagged<F_OBJECT>(object).type())
+	switch(tagged<object>(obj).type())
 	{
 	case BYTE_ARRAY_TYPE:
-		F_BYTE_ARRAY *byte_array = untag<F_BYTE_ARRAY>(object);
-		return (char *)(byte_array + 1);
+		return untag<byte_array>(obj)->data<char>();
 	case ALIEN_TYPE:
-		F_ALIEN *alien = untag<F_ALIEN>(object);
-		if(alien->expired != F)
-			general_error(ERROR_EXPIRED,object,F,NULL);
-		return alien_offset(alien->alien) + alien->displacement;
+		alien *ptr = untag<alien>(obj);
+		if(ptr->expired != F)
+			general_error(ERROR_EXPIRED,obj,F,NULL);
+		return alien_offset(ptr->alien) + ptr->displacement;
 	case F_TYPE:
 		return NULL;
 	default:
-		type_error(ALIEN_TYPE,object);
+		type_error(ALIEN_TYPE,obj);
 		return NULL; /* can't happen */
 	}
 }
@@ -189,36 +189,36 @@ VM_C_API void box_alien(void *ptr)
 	if(ptr == NULL)
 		dpush(F);
 	else
-		dpush(allot_alien(F,(CELL)ptr));
+		dpush(allot_alien(F,(cell)ptr));
 }
 
 /* for FFI calls passing structs by value */
-VM_C_API void to_value_struct(CELL src, void *dest, CELL size)
+VM_C_API void to_value_struct(cell src, void *dest, cell size)
 {
 	memcpy(dest,alien_offset(src),size);
 }
 
 /* for FFI callbacks receiving structs by value */
-VM_C_API void box_value_struct(void *src, CELL size)
+VM_C_API void box_value_struct(void *src, cell size)
 {
-	F_BYTE_ARRAY *array = allot_byte_array(size);
-	memcpy(array + 1,src,size);
-	dpush(tag<F_BYTE_ARRAY>(array));
+	byte_array *bytes = allot_byte_array(size);
+	memcpy(bytes->data<void>(),src,size);
+	dpush(tag<byte_array>(bytes));
 }
 
 /* On some x86 OSes, structs <= 8 bytes are returned in registers. */
-VM_C_API void box_small_struct(CELL x, CELL y, CELL size)
+VM_C_API void box_small_struct(cell x, cell y, cell size)
 {
-	CELL data[2];
+	cell data[2];
 	data[0] = x;
 	data[1] = y;
 	box_value_struct(data,size);
 }
 
 /* On OS X/PPC, complex numbers are returned in registers. */
-VM_C_API void box_medium_struct(CELL x1, CELL x2, CELL x3, CELL x4, CELL size)
+VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size)
 {
-	CELL data[4];
+	cell data[4];
 	data[0] = x1;
 	data[1] = x2;
 	data[2] = x3;

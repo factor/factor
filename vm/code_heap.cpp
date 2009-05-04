@@ -3,25 +3,24 @@
 namespace factor
 {
 
-F_HEAP code_heap;
+heap code;
 
 /* Allocate a code heap during startup */
-void init_code_heap(CELL size)
+void init_code_heap(cell size)
 {
-	new_heap(&code_heap,size);
+	new_heap(&code,size);
 }
 
-bool in_code_heap_p(CELL ptr)
+bool in_code_heap_p(cell ptr)
 {
-	return (ptr >= code_heap.segment->start
-		&& ptr <= code_heap.segment->end);
+	return (ptr >= code.seg->start && ptr <= code.seg->end);
 }
 
 /* Compile a word definition with the non-optimizing compiler. Allocates memory */
-void jit_compile_word(CELL word_, CELL def_, bool relocate)
+void jit_compile_word(cell word_, cell def_, bool relocate)
 {
-	gc_root<F_WORD> word(word_);
-	gc_root<F_QUOTATION> def(def_);
+	gc_root<word> word(word_);
+	gc_root<quotation> def(def_);
 
 	jit_compile(def.value(),relocate);
 
@@ -32,15 +31,15 @@ void jit_compile_word(CELL word_, CELL def_, bool relocate)
 }
 
 /* Apply a function to every code block */
-void iterate_code_heap(CODE_HEAP_ITERATOR iter)
+void iterate_code_heap(code_heap_iterator iter)
 {
-	F_BLOCK *scan = first_block(&code_heap);
+	heap_block *scan = first_block(&code);
 
 	while(scan)
 	{
 		if(scan->status != B_FREE)
-			iter((F_CODE_BLOCK *)scan);
-		scan = next_block(&code_heap,scan);
+			iter((code_block *)scan);
+		scan = next_block(&code,scan);
 	}
 }
 
@@ -60,20 +59,20 @@ void update_code_heap_words(void)
 
 PRIMITIVE(modify_code_heap)
 {
-	gc_root<F_ARRAY> alist(dpop());
+	gc_root<array> alist(dpop());
 
-	CELL count = array_capacity(alist.untagged());
+	cell count = array_capacity(alist.untagged());
 
 	if(count == 0)
 		return;
 
-	CELL i;
+	cell i;
 	for(i = 0; i < count; i++)
 	{
-		gc_root<F_ARRAY> pair(array_nth(alist.untagged(),i));
+		gc_root<array> pair(array_nth(alist.untagged(),i));
 
-		gc_root<F_WORD> word(array_nth(pair.untagged(),0));
-		gc_root<F_OBJECT> data(array_nth(pair.untagged(),1));
+		gc_root<word> word(array_nth(pair.untagged(),0));
+		gc_root<object> data(array_nth(pair.untagged(),1));
 
 		switch(data.type())
 		{
@@ -81,13 +80,13 @@ PRIMITIVE(modify_code_heap)
 			jit_compile_word(word.value(),data.value(),false);
 			break;
 		case ARRAY_TYPE:
-			F_ARRAY *compiled_data = data.as<F_ARRAY>().untagged();
-			CELL literals = array_nth(compiled_data,0);
-			CELL relocation = array_nth(compiled_data,1);
-			CELL labels = array_nth(compiled_data,2);
-			CELL code = array_nth(compiled_data,3);
+			array *compiled_data = data.as<array>().untagged();
+			cell literals = array_nth(compiled_data,0);
+			cell relocation = array_nth(compiled_data,1);
+			cell labels = array_nth(compiled_data,2);
+			cell code = array_nth(compiled_data,3);
 
-			F_CODE_BLOCK *compiled = add_code_block(
+			code_block *compiled = add_code_block(
 				WORD_TYPE,
 				code,
 				labels,
@@ -110,54 +109,55 @@ PRIMITIVE(modify_code_heap)
 /* Push the free space and total size of the code heap */
 PRIMITIVE(code_room)
 {
-	CELL used, total_free, max_free;
-	heap_usage(&code_heap,&used,&total_free,&max_free);
-	dpush(tag_fixnum((code_heap.segment->size) / 1024));
+	cell used, total_free, max_free;
+	heap_usage(&code,&used,&total_free,&max_free);
+	dpush(tag_fixnum(code.seg->size / 1024));
 	dpush(tag_fixnum(used / 1024));
 	dpush(tag_fixnum(total_free / 1024));
 	dpush(tag_fixnum(max_free / 1024));
 }
 
-F_CODE_BLOCK *forward_xt(F_CODE_BLOCK *compiled)
+code_block *forward_xt(code_block *compiled)
 {
-	return (F_CODE_BLOCK *)compiled->block.forwarding;
+	return (code_block *)compiled->block.forwarding;
 }
 
-void forward_frame_xt(F_STACK_FRAME *frame)
+void forward_frame_xt(stack_frame *frame)
 {
-	CELL offset = (CELL)FRAME_RETURN_ADDRESS(frame) - (CELL)frame_code(frame);
-	F_CODE_BLOCK *forwarded = forward_xt(frame_code(frame));
-	frame->xt = (XT)(forwarded + 1);
-	FRAME_RETURN_ADDRESS(frame) = (XT)((CELL)forwarded + offset);
+	cell offset = (cell)FRAME_RETURN_ADDRESS(frame) - (cell)frame_code(frame);
+	code_block *forwarded = forward_xt(frame_code(frame));
+	frame->xt = forwarded->xt();
+	FRAME_RETURN_ADDRESS(frame) = (void *)((cell)forwarded + offset);
 }
 
 void forward_object_xts(void)
 {
 	begin_scan();
 
-	CELL obj;
+	cell obj;
 
 	while((obj = next_object()) != F)
 	{
-		switch(tagged<F_OBJECT>(obj).type())
+		switch(tagged<object>(obj).type())
 		{
 		case WORD_TYPE:
-			F_WORD *word = untag<F_WORD>(obj);
+			word *w = untag<word>(obj);
 
-			word->code = forward_xt(word->code);
-			if(word->profiling)
-				word->profiling = forward_xt(word->profiling);
+			if(w->code)
+				w->code = forward_xt(w->code);
+			if(w->profiling)
+				w->profiling = forward_xt(w->profiling);
 			
 			break;
 		case QUOTATION_TYPE:
-			F_QUOTATION *quot = untag<F_QUOTATION>(obj);
+			quotation *quot = untag<quotation>(obj);
 
 			if(quot->compiledp != F)
 				quot->code = forward_xt(quot->code);
 			
 			break;
 		case CALLSTACK_TYPE:
-			F_CALLSTACK *stack = untag<F_CALLSTACK>(obj);
+			callstack *stack = untag<callstack>(obj);
 			iterate_callstack_object(stack,forward_frame_xt);
 			
 			break;
@@ -175,17 +175,17 @@ void fixup_object_xts(void)
 {
 	begin_scan();
 
-	CELL obj;
+	cell obj;
 
 	while((obj = next_object()) != F)
 	{
-		switch(tagged<F_OBJECT>(obj).type())
+		switch(tagged<object>(obj).type())
 		{
 		case WORD_TYPE:
 			update_word_xt(obj);
 			break;
 		case QUOTATION_TYPE:
-			F_QUOTATION *quot = untag<F_QUOTATION>(obj);
+			quotation *quot = untag<quotation>(obj);
 			if(quot->compiledp != F)
 				set_quot_xt(quot,quot->code);
 			break;
@@ -208,20 +208,20 @@ void compact_code_heap(void)
 	gc();
 
 	/* Figure out where the code heap blocks are going to end up */
-	CELL size = compute_heap_forwarding(&code_heap);
+	cell size = compute_heap_forwarding(&code);
 
 	/* Update word and quotation code pointers */
 	forward_object_xts();
 
 	/* Actually perform the compaction */
-	compact_heap(&code_heap);
+	compact_heap(&code);
 
 	/* Update word and quotation XTs */
 	fixup_object_xts();
 
 	/* Now update the free list; there will be a single free block at
 	the end */
-	build_free_list(&code_heap,size);
+	build_free_list(&code,size);
 }
 
 }

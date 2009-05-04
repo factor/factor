@@ -3,7 +3,7 @@ namespace factor
 
 extern bool profiling_p;
 void init_profiler(void);
-F_CODE_BLOCK *compile_profiling_stub(CELL word);
+code_block *compile_profiling_stub(cell word);
 PRIMITIVE(profiling);
 
 }

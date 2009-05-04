@@ -1,37 +1,37 @@
 namespace factor
 {
 
-template<typename T> CELL array_capacity(T *array)
+template<typename T> cell array_capacity(T *array)
 {
 #ifdef FACTOR_DEBUG
-	assert(array->header.hi_tag() == T::type_number);
+	assert(array->h.hi_tag() == T::type_number);
 #endif
 	return array->capacity >> TAG_BITS;
 }
 
-template <typename T> CELL array_size(CELL capacity)
+template <typename T> cell array_size(cell capacity)
 {
 	return sizeof(T) + capacity * T::element_size;
 }
 
-template <typename T> CELL array_size(T *array)
+template <typename T> cell array_size(T *array)
 {
 	return array_size<T>(array_capacity(array));
 }
 
-template <typename T> T *allot_array_internal(CELL capacity)
+template <typename T> T *allot_array_internal(cell capacity)
 {
 	T *array = allot<T>(array_size<T>(capacity));
 	array->capacity = tag_fixnum(capacity);
 	return array;
 }
 
-template <typename T> bool reallot_array_in_place_p(T *array, CELL capacity)
+template <typename T> bool reallot_array_in_place_p(T *array, cell capacity)
 {
 	return in_zone(&nursery,array) && capacity <= array_capacity(array);
 }
 
-template <typename T> T *reallot_array(T *array_, CELL capacity)
+template <typename T> T *reallot_array(T *array_, cell capacity)
 {
 	gc_root<T> array(array_);
 
@@ -42,7 +42,7 @@ template <typename T> T *reallot_array(T *array_, CELL capacity)
 	}
 	else
 	{
-		CELL to_copy = array_capacity(array.untagged());
+		cell to_copy = array_capacity(array.untagged());
 		if(capacity < to_copy)
 			to_copy = capacity;
 

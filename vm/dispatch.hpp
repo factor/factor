@@ -1,18 +1,18 @@
 namespace factor
 {
 
-CELL lookup_method(CELL object, CELL methods);
+cell lookup_method(cell object, cell methods);
 PRIMITIVE(lookup_method);
 
-CELL object_class(CELL object);
+cell object_class(cell object);
 
 PRIMITIVE(mega_cache_miss);
 
 PRIMITIVE(reset_dispatch_stats);
 PRIMITIVE(dispatch_stats);
 
-void jit_emit_class_lookup(jit *jit, F_FIXNUM index, CELL type);
+void jit_emit_class_lookup(jit *jit, fixnum index, cell type);
 
-void jit_emit_mega_cache_lookup(jit *jit, CELL methods, F_FIXNUM index, CELL cache);
+void jit_emit_mega_cache_lookup(jit *jit, cell methods, fixnum index, cell cache);
 
 }

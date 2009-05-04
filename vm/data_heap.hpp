@@ -5,89 +5,89 @@ namespace factor
 extern bool secure_gc;
 
 /* generational copying GC divides memory into zones */
-struct F_ZONE {
+struct zone {
 	/* allocation pointer is 'here'; its offset is hardcoded in the
 	compiler backends */
-	CELL start;
-	CELL here;
-	CELL size;
-	CELL end;
+	cell start;
+	cell here;
+	cell size;
+	cell end;
 };
 
-struct F_DATA_HEAP {
-	F_SEGMENT *segment;
+struct data_heap {
+	segment *seg;
 
-	CELL young_size;
-	CELL aging_size;
-	CELL tenured_size;
+	cell young_size;
+	cell aging_size;
+	cell tenured_size;
 
-	CELL gen_count;
+	cell gen_count;
 
-	F_ZONE *generations;
-	F_ZONE* semispaces;
+	zone *generations;
+	zone *semispaces;
 
-	CELL *allot_markers;
-	CELL *allot_markers_end;
+	cell *allot_markers;
+	cell *allot_markers_end;
 
-	CELL *cards;
-	CELL *cards_end;
+	cell *cards;
+	cell *cards_end;
 
-	CELL *decks;
-	CELL *decks_end;
+	cell *decks;
+	cell *decks_end;
 };
 
-extern F_DATA_HEAP *data_heap;
+extern data_heap *data;
 
 /* the 0th generation is where new objects are allocated. */
 #define NURSERY 0
 /* where objects hang around */
-#define AGING (data_heap->gen_count-2)
-#define HAVE_AGING_P (data_heap->gen_count>2)
+#define AGING (data->gen_count-2)
+#define HAVE_AGING_P (data->gen_count>2)
 /* the oldest generation */
-#define TENURED (data_heap->gen_count-1)
+#define TENURED (data->gen_count-1)
 
 #define MIN_GEN_COUNT 1
 #define MAX_GEN_COUNT 3
 
-inline static bool in_zone(F_ZONE *z, F_OBJECT *pointer)
+inline static bool in_zone(zone *z, object *pointer)
 {
-	return (CELL)pointer >= z->start && (CELL)pointer < z->end;
+	return (cell)pointer >= z->start && (cell)pointer < z->end;
 }
 
-CELL init_zone(F_ZONE *z, CELL size, CELL base);
+cell init_zone(zone *z, cell size, cell base);
 
 void init_card_decks(void);
 
-F_DATA_HEAP *grow_data_heap(F_DATA_HEAP *data_heap, CELL requested_bytes);
+data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
 
-void dealloc_data_heap(F_DATA_HEAP *data_heap);
+void dealloc_data_heap(data_heap *data);
 
-void clear_cards(CELL from, CELL to);
-void clear_decks(CELL from, CELL to);
-void clear_allot_markers(CELL from, CELL to);
-void reset_generation(CELL i);
-void reset_generations(CELL from, CELL to);
+void clear_cards(cell from, cell to);
+void clear_decks(cell from, cell to);
+void clear_allot_markers(cell from, cell to);
+void reset_generation(cell i);
+void reset_generations(cell from, cell to);
 
-void set_data_heap(F_DATA_HEAP *data_heap_);
+void set_data_heap(data_heap *data_heap_);
 
-void init_data_heap(CELL gens,
-	CELL young_size,
-	CELL aging_size,
-	CELL tenured_size,
+void init_data_heap(cell gens,
+	cell young_size,
+	cell aging_size,
+	cell tenured_size,
 	bool secure_gc_);
 
 /* set up guard pages to check for under/overflow.
 size must be a multiple of the page size */
-F_SEGMENT *alloc_segment(CELL size);
-void dealloc_segment(F_SEGMENT *block);
+segment *alloc_segment(cell size);
+void dealloc_segment(segment *block);
 
-CELL untagged_object_size(F_OBJECT *pointer);
-CELL unaligned_object_size(F_OBJECT *pointer);
-CELL binary_payload_start(F_OBJECT *pointer);
-CELL object_size(CELL tagged);
+cell untagged_object_size(object *pointer);
+cell unaligned_object_size(object *pointer);
+cell binary_payload_start(object *pointer);
+cell object_size(cell tagged);
 
 void begin_scan(void);
-CELL next_object(void);
+cell next_object(void);
 
 PRIMITIVE(data_room);
 PRIMITIVE(size);
@@ -99,36 +99,27 @@ PRIMITIVE(end_scan);
 /* GC is off during heap walking */
 extern bool gc_off;
 
-inline static F_OBJECT *allot_zone(F_ZONE *z, CELL a)
-{
-	CELL h = z->here;
-	z->here = h + align8(a);
-	F_OBJECT *object = (F_OBJECT *)h;
-	allot_barrier(object);
-	return object;
-}
-
-CELL find_all_words(void);
+cell find_all_words(void);
 
 /* Every object has a regular representation in the runtime, which makes GC
 much simpler. Every slot of the object until binary_payload_start is a pointer
 to some other object. */
-inline static void do_slots(CELL obj, void (* iter)(CELL *))
+inline static void do_slots(cell obj, void (* iter)(cell *))
 {
-	CELL scan = obj;
-	CELL payload_start = binary_payload_start((F_OBJECT *)obj);
-	CELL end = obj + payload_start;
+	cell scan = obj;
+	cell payload_start = binary_payload_start((object *)obj);
+	cell end = obj + payload_start;
 
-	scan += CELLS;
+	scan += sizeof(cell);
 
 	while(scan < end)
 	{
-		iter((CELL *)scan);
-		scan += CELLS;
+		iter((cell *)scan);
+		scan += sizeof(cell);
 	}
 }
 
 }
 
 /* new objects are allocated here */
-VM_C_API factor::F_ZONE nursery;
+VM_C_API factor::zone nursery;

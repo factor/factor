@@ -3,79 +3,76 @@
 namespace factor
 {
 
-F_WORD *allot_word(CELL vocab_, CELL name_)
+word *allot_word(cell vocab_, cell name_)
 {
-	gc_root<F_OBJECT> vocab(vocab_);
-	gc_root<F_OBJECT> name(name_);
+	gc_root<object> vocab(vocab_);
+	gc_root<object> name(name_);
 
-	gc_root<F_WORD> word(allot<F_WORD>(sizeof(F_WORD)));
+	gc_root<word> new_word(allot<word>(sizeof(word)));
 
-	word->hashcode = tag_fixnum((rand() << 16) ^ rand());
-	word->vocabulary = vocab.value();
-	word->name = name.value();
-	word->def = userenv[UNDEFINED_ENV];
-	word->props = F;
-	word->counter = tag_fixnum(0);
-	word->direct_entry_def = F;
-	word->subprimitive = F;
-	word->profiling = NULL;
-	word->code = NULL;
+	new_word->hashcode = tag_fixnum((rand() << 16) ^ rand());
+	new_word->vocabulary = vocab.value();
+	new_word->name = name.value();
+	new_word->def = userenv[UNDEFINED_ENV];
+	new_word->props = F;
+	new_word->counter = tag_fixnum(0);
+	new_word->direct_entry_def = F;
+	new_word->subprimitive = F;
+	new_word->profiling = NULL;
+	new_word->code = NULL;
 
-	jit_compile_word(word.value(),word->def,true);
-	update_word_xt(word.value());
+	jit_compile_word(new_word.value(),new_word->def,true);
+	update_word_xt(new_word.value());
 
 	if(profiling_p)
-		relocate_code_block(word->profiling);
+		relocate_code_block(new_word->profiling);
 
-	return word.untagged();
+	return new_word.untagged();
 }
 
 /* <word> ( name vocabulary -- word ) */
 PRIMITIVE(word)
 {
-	CELL vocab = dpop();
-	CELL name = dpop();
-	dpush(tag<F_WORD>(allot_word(vocab,name)));
+	cell vocab = dpop();
+	cell name = dpop();
+	dpush(tag<word>(allot_word(vocab,name)));
 }
 
 /* word-xt ( word -- start end ) */
 PRIMITIVE(word_xt)
 {
-	F_WORD *word = untag_check<F_WORD>(dpop());
-	F_CODE_BLOCK *code = (profiling_p ? word->profiling : word->code);
-	dpush(allot_cell((CELL)code + sizeof(F_CODE_BLOCK)));
-	dpush(allot_cell((CELL)code + code->block.size));
+	word *w = untag_check<word>(dpop());
+	code_block *code = (profiling_p ? w->profiling : w->code);
+	dpush(allot_cell((cell)code->xt()));
+	dpush(allot_cell((cell)code + code->block.size));
 }
 
 /* Allocates memory */
-void update_word_xt(CELL word_)
+void update_word_xt(cell w_)
 {
-	gc_root<F_WORD> word(word_);
+	gc_root<word> w(w_);
 
 	if(profiling_p)
 	{
-		if(!word->profiling)
-		{
-			F_CODE_BLOCK *profiling = compile_profiling_stub(word.value());
-			word->profiling = profiling;
-		}
+		if(!w->profiling)
+			w->profiling = compile_profiling_stub(w.value());
 
-		word->xt = (XT)(word->profiling + 1);
+		w->xt = w->profiling->xt();
 	}
 	else
-		word->xt = (XT)(word->code + 1);
+		w->xt = w->code->xt();
 }
 
 PRIMITIVE(optimized_p)
 {
-	drepl(tag_boolean(word_optimized_p(untag_check<F_WORD>(dpeek()))));
+	drepl(tag_boolean(word_optimized_p(untag_check<word>(dpeek()))));
 }
 
 PRIMITIVE(wrapper)
 {
-	F_WRAPPER *wrapper = allot<F_WRAPPER>(sizeof(F_WRAPPER));
-	wrapper->object = dpeek();
-	drepl(tag<F_WRAPPER>(wrapper));
+	wrapper *new_wrapper = allot<wrapper>(sizeof(wrapper));
+	new_wrapper->object = dpeek();
+	drepl(tag<wrapper>(new_wrapper));
 }
 
 }

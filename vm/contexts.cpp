@@ -1,29 +1,29 @@
 #include "master.hpp"
 
-factor::F_CONTEXT *stack_chain;
+factor::context *stack_chain;
 
 namespace factor
 {
 
-CELL ds_size, rs_size;
-F_CONTEXT *unused_contexts;
+cell ds_size, rs_size;
+context *unused_contexts;
 
 void reset_datastack(void)
 {
-	ds = ds_bot - CELLS;
+	ds = ds_bot - sizeof(cell);
 }
 
 void reset_retainstack(void)
 {
-	rs = rs_bot - CELLS;
+	rs = rs_bot - sizeof(cell);
 }
 
-#define RESERVED (64 * CELLS)
+#define RESERVED (64 * sizeof(cell))
 
 void fix_stacks(void)
 {
-	if(ds + CELLS < ds_bot || ds + RESERVED >= ds_top) reset_datastack();
-	if(rs + CELLS < rs_bot || rs + RESERVED >= rs_top) reset_retainstack();
+	if(ds + sizeof(cell) < ds_bot || ds + RESERVED >= ds_top) reset_datastack();
+	if(rs + sizeof(cell) < rs_bot || rs + RESERVED >= rs_top) reset_retainstack();
 }
 
 /* called before entry into foreign C code. Note that ds and rs might
@@ -37,38 +37,38 @@ void save_stacks(void)
 	}
 }
 
-F_CONTEXT *alloc_context(void)
+context *alloc_context(void)
 {
-	F_CONTEXT *context;
+	context *new_context;
 
 	if(unused_contexts)
 	{
-		context = unused_contexts;
+		new_context = unused_contexts;
 		unused_contexts = unused_contexts->next;
 	}
 	else
 	{
-		context = (F_CONTEXT *)safe_malloc(sizeof(F_CONTEXT));
-		context->datastack_region = alloc_segment(ds_size);
-		context->retainstack_region = alloc_segment(rs_size);
+		new_context = (context *)safe_malloc(sizeof(context));
+		new_context->datastack_region = alloc_segment(ds_size);
+		new_context->retainstack_region = alloc_segment(rs_size);
 	}
 
-	return context;
+	return new_context;
 }
 
-void dealloc_context(F_CONTEXT *context)
+void dealloc_context(context *old_context)
 {
-	context->next = unused_contexts;
-	unused_contexts = context;
+	old_context->next = unused_contexts;
+	unused_contexts = old_context;
 }
 
 /* called on entry into a compiled callback */
 void nest_stacks(void)
 {
-	F_CONTEXT *new_stacks = alloc_context();
+	context *new_context = alloc_context();
 
-	new_stacks->callstack_bottom = (F_STACK_FRAME *)-1;
-	new_stacks->callstack_top = (F_STACK_FRAME *)-1;
+	new_context->callstack_bottom = (stack_frame *)-1;
+	new_context->callstack_top = (stack_frame *)-1;
 
 	/* note that these register values are not necessarily valid stack
 	pointers. they are merely saved non-volatile registers, and are
@@ -80,15 +80,15 @@ void nest_stacks(void)
 	- Factor callback returns
 	- C function restores registers
 	- C function returns to Factor code */
-	new_stacks->datastack_save = ds;
-	new_stacks->retainstack_save = rs;
+	new_context->datastack_save = ds;
+	new_context->retainstack_save = rs;
 
 	/* save per-callback userenv */
-	new_stacks->current_callback_save = userenv[CURRENT_CALLBACK_ENV];
-	new_stacks->catchstack_save = userenv[CATCHSTACK_ENV];
+	new_context->current_callback_save = userenv[CURRENT_CALLBACK_ENV];
+	new_context->catchstack_save = userenv[CATCHSTACK_ENV];
 
-	new_stacks->next = stack_chain;
-	stack_chain = new_stacks;
+	new_context->next = stack_chain;
+	stack_chain = new_context;
 
 	reset_datastack();
 	reset_retainstack();
@@ -104,13 +104,13 @@ void unnest_stacks(void)
 	userenv[CURRENT_CALLBACK_ENV] = stack_chain->current_callback_save;
 	userenv[CATCHSTACK_ENV] = stack_chain->catchstack_save;
 
-	F_CONTEXT *old_stacks = stack_chain;
+	context *old_stacks = stack_chain;
 	stack_chain = old_stacks->next;
 	dealloc_context(old_stacks);
 }
 
 /* called on startup */
-void init_stacks(CELL ds_size_, CELL rs_size_)
+void init_stacks(cell ds_size_, cell rs_size_)
 {
 	ds_size = ds_size_;
 	rs_size = rs_size_;
@@ -118,17 +118,17 @@ void init_stacks(CELL ds_size_, CELL rs_size_)
 	unused_contexts = NULL;
 }
 
-bool stack_to_array(CELL bottom, CELL top)
+bool stack_to_array(cell bottom, cell top)
 {
-	F_FIXNUM depth = (F_FIXNUM)(top - bottom + CELLS);
+	fixnum depth = (fixnum)(top - bottom + sizeof(cell));
 
 	if(depth < 0)
 		return false;
 	else
 	{
-		F_ARRAY *a = allot_array_internal<F_ARRAY>(depth / CELLS);
+		array *a = allot_array_internal<array>(depth / sizeof(cell));
 		memcpy(a + 1,(void*)bottom,depth);
-		dpush(tag<F_ARRAY>(a));
+		dpush(tag<array>(a));
 		return true;
 	}
 }
@@ -146,40 +146,40 @@ PRIMITIVE(retainstack)
 }
 
 /* returns pointer to top of stack */
-CELL array_to_stack(F_ARRAY *array, CELL bottom)
+cell array_to_stack(array *array, cell bottom)
 {
-	CELL depth = array_capacity(array) * CELLS;
+	cell depth = array_capacity(array) * sizeof(cell);
 	memcpy((void*)bottom,array + 1,depth);
-	return bottom + depth - CELLS;
+	return bottom + depth - sizeof(cell);
 }
 
 PRIMITIVE(set_datastack)
 {
-	ds = array_to_stack(untag_check<F_ARRAY>(dpop()),ds_bot);
+	ds = array_to_stack(untag_check<array>(dpop()),ds_bot);
 }
 
 PRIMITIVE(set_retainstack)
 {
-	rs = array_to_stack(untag_check<F_ARRAY>(dpop()),rs_bot);
+	rs = array_to_stack(untag_check<array>(dpop()),rs_bot);
 }
 
 /* Used to implement call( */
 PRIMITIVE(check_datastack)
 {
-	F_FIXNUM out = to_fixnum(dpop());
-	F_FIXNUM in = to_fixnum(dpop());
-	F_FIXNUM height = out - in;
-	F_ARRAY *array = untag_check<F_ARRAY>(dpop());
-	F_FIXNUM length = array_capacity(array);
-	F_FIXNUM depth = (ds - ds_bot + CELLS) / CELLS;
-	if(depth - height != length)
+	fixnum out = to_fixnum(dpop());
+	fixnum in = to_fixnum(dpop());
+	fixnum height = out - in;
+	array *saved_datastack = untag_check<array>(dpop());
+	fixnum saved_height = array_capacity(saved_datastack);
+	fixnum current_height = (ds - ds_bot + sizeof(cell)) / sizeof(cell);
+	if(current_height - height != saved_height)
 		dpush(F);
 	else
 	{
-		F_FIXNUM i;
-		for(i = 0; i < length - in; i++)
+		fixnum i;
+		for(i = 0; i < saved_height - in; i++)
 		{
-			if(((CELL *)ds_bot)[i] != array_nth(array,i))
+			if(((cell *)ds_bot)[i] != array_nth(saved_datastack,i))
 			{
 				dpush(F);
 				return;

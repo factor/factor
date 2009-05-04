@@ -5,9 +5,9 @@ namespace factor
 
 /* Global variables used to pass fault handler state from signal handler to
 user-space */
-CELL signal_number;
-CELL signal_fault_addr;
-F_STACK_FRAME *signal_callstack_top;
+cell signal_number;
+cell signal_fault_addr;
+stack_frame *signal_callstack_top;
 
 void out_of_memory(void)
 {
@@ -16,14 +16,14 @@ void out_of_memory(void)
 	exit(1);
 }
 
-void fatal_error(char* msg, CELL tagged)
+void fatal_error(char* msg, cell tagged)
 {
 	print_string("fatal_error: "); print_string(msg);
 	print_string(": "); print_cell_hex(tagged); nl();
 	exit(1);
 }
 
-void critical_error(char* msg, CELL tagged)
+void critical_error(char* msg, cell tagged)
 {
 	print_string("You have triggered a bug in Factor. Please report.\n");
 	print_string("critical_error: "); print_string(msg);
@@ -31,7 +31,7 @@ void critical_error(char* msg, CELL tagged)
 	factorbug();
 }
 
-void throw_error(CELL error, F_STACK_FRAME *callstack_top)
+void throw_error(cell error, stack_frame *callstack_top)
 {
 	/* If the error handler is set, we rewind any C stack frames and
 	pass the error to user-space. */
@@ -41,8 +41,8 @@ void throw_error(CELL error, F_STACK_FRAME *callstack_top)
 		gc_off = false;
 
 		/* Reset local roots */
-		gc_locals = gc_locals_region->start - CELLS;
-		gc_bignums = gc_bignums_region->start - CELLS;
+		gc_locals = gc_locals_region->start - sizeof(cell);
+		gc_bignums = gc_bignums_region->start - sizeof(cell);
 
 		/* If we had an underflow or overflow, stack pointers might be
 		out of bounds */
@@ -76,14 +76,14 @@ void throw_error(CELL error, F_STACK_FRAME *callstack_top)
 	}
 }
 
-void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2,
-	F_STACK_FRAME *callstack_top)
+void general_error(vm_error_type error, cell arg1, cell arg2,
+	stack_frame *callstack_top)
 {
 	throw_error(allot_array_4(userenv[ERROR_ENV],
 		tag_fixnum(error),arg1,arg2),callstack_top);
 }
 
-void type_error(CELL type, CELL tagged)
+void type_error(cell type, cell tagged)
 {
 	general_error(ERROR_TYPE,tag_fixnum(type),tagged,NULL);
 }
@@ -95,7 +95,7 @@ void not_implemented_error(void)
 
 /* Test if 'fault' is in the guard page at the top or bottom (depending on
 offset being 0 or -1) of area+area_size */
-bool in_page(CELL fault, CELL area, CELL area_size, int offset)
+bool in_page(cell fault, cell area, cell area_size, int offset)
 {
 	int pagesize = getpagesize();
 	area += area_size;
@@ -104,7 +104,7 @@ bool in_page(CELL fault, CELL area, CELL area_size, int offset)
 	return fault >= area && fault <= area + pagesize;
 }
 
-void memory_protection_error(CELL addr, F_STACK_FRAME *native_stack)
+void memory_protection_error(cell addr, stack_frame *native_stack)
 {
 	if(in_page(addr, ds_bot, 0, -1))
 		general_error(ERROR_DS_UNDERFLOW,F,F,native_stack);
@@ -120,7 +120,7 @@ void memory_protection_error(CELL addr, F_STACK_FRAME *native_stack)
 		general_error(ERROR_MEMORY,allot_cell(addr),F,native_stack);
 }
 
-void signal_error(int signal, F_STACK_FRAME *native_stack)
+void signal_error(int signal, stack_frame *native_stack)
 {
 	general_error(ERROR_SIGNAL,tag_fixnum(signal),F,native_stack);
 }

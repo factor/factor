@@ -24,7 +24,7 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 	if(e->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
 	{
 		signal_fault_addr = e->ExceptionInformation[1];
-		c->EIP = (CELL)memory_signal_handler_impl;
+		c->EIP = (cell)memory_signal_handler_impl;
 	}
 	/* If the Widcomm bluetooth stack is installed, the BTTray.exe process
 	injects code into running programs. For some reason this results in
@@ -35,13 +35,13 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 	else if(e->ExceptionCode != 0x40010006)
 	{
 		signal_number = e->ExceptionCode;
-		c->EIP = (CELL)misc_signal_handler_impl;
+		c->EIP = (cell)misc_signal_handler_impl;
 	}
 
 	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
-void c_to_factor_toplevel(CELL quot)
+void c_to_factor_toplevel(cell quot)
 {
 	if(!AddVectoredExceptionHandler(0, (void*)exception_handler))
 		fatal_error("AddVectoredExceptionHandler failed", 0);

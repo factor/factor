@@ -19,7 +19,7 @@ char *strerror(int err)
 	return "strerror() is not defined on WinCE. Use native I/O.";
 }
 
-void flush_icache(CELL start, CELL end)
+void flush_icache(cell start, cell end)
 {
 	FlushInstructionCache(GetCurrentProcess(), 0, 0);
 }
@@ -35,7 +35,7 @@ PRIMITIVE(os_envs)
 	not_implemented_error();
 }
 
-void c_to_factor_toplevel(CELL quot)
+void c_to_factor_toplevel(cell quot)
 {
 	c_to_factor(quot);
 }

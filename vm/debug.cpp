@@ -6,23 +6,23 @@ namespace factor
 static bool fep_disabled;
 static bool full_output;
 
-void print_chars(F_STRING* str)
+void print_chars(string* str)
 {
-	CELL i;
+	cell i;
 	for(i = 0; i < string_capacity(str); i++)
 		putchar(string_nth(str,i));
 }
 
-void print_word(F_WORD* word, CELL nesting)
+void print_word(word* word, cell nesting)
 {
-	if(tagged<F_OBJECT>(word->vocabulary).type_p(STRING_TYPE))
+	if(tagged<object>(word->vocabulary).type_p(STRING_TYPE))
 	{
-		print_chars(untag<F_STRING>(word->vocabulary));
+		print_chars(untag<string>(word->vocabulary));
 		print_string(":");
 	}
 
-	if(tagged<F_OBJECT>(word->name).type_p(STRING_TYPE))
-		print_chars(untag<F_STRING>(word->name));
+	if(tagged<object>(word->name).type_p(STRING_TYPE))
+		print_chars(untag<string>(word->name));
 	else
 	{
 		print_string("#<not a string: ");
@@ -31,17 +31,17 @@ void print_word(F_WORD* word, CELL nesting)
 	}
 }
 
-void print_factor_string(F_STRING* str)
+void print_factor_string(string* str)
 {
 	putchar('"');
 	print_chars(str);
 	putchar('"');
 }
 
-void print_array(F_ARRAY* array, CELL nesting)
+void print_array(array* array, cell nesting)
 {
-	CELL length = array_capacity(array);
-	CELL i;
+	cell length = array_capacity(array);
+	cell i;
 	bool trimmed;
 
 	if(length > 10 && !full_output)
@@ -62,15 +62,15 @@ void print_array(F_ARRAY* array, CELL nesting)
 		print_string("...");
 }
 
-void print_tuple(F_TUPLE* tuple, CELL nesting)
+void print_tuple(tuple *tuple, cell nesting)
 {
-	F_TUPLE_LAYOUT *layout = untag<F_TUPLE_LAYOUT>(tuple->layout);
-	CELL length = to_fixnum(layout->size);
+	tuple_layout *layout = untag<tuple_layout>(tuple->layout);
+	cell length = to_fixnum(layout->size);
 
 	print_string(" ");
 	print_nested_obj(layout->klass,nesting);
 
-	CELL i;
+	cell i;
 	bool trimmed;
 
 	if(length > 10 && !full_output)
@@ -84,14 +84,14 @@ void print_tuple(F_TUPLE* tuple, CELL nesting)
 	for(i = 0; i < length; i++)
 	{
 		print_string(" ");
-		print_nested_obj(tuple_nth(tuple,i),nesting);
+		print_nested_obj(tuple->data()[i],nesting);
 	}
 
 	if(trimmed)
 		print_string("...");
 }
 
-void print_nested_obj(CELL obj, F_FIXNUM nesting)
+void print_nested_obj(cell obj, fixnum nesting)
 {
 	if(nesting <= 0 && !full_output)
 	{
@@ -99,41 +99,41 @@ void print_nested_obj(CELL obj, F_FIXNUM nesting)
 		return;
 	}
 
-	F_QUOTATION *quot;
+	quotation *quot;
 
-	switch(tagged<F_OBJECT>(obj).type())
+	switch(tagged<object>(obj).type())
 	{
 	case FIXNUM_TYPE:
 		print_fixnum(untag_fixnum(obj));
 		break;
 	case WORD_TYPE:
-		print_word(untag<F_WORD>(obj),nesting - 1);
+		print_word(untag<word>(obj),nesting - 1);
 		break;
 	case STRING_TYPE:
-		print_factor_string(untag<F_STRING>(obj));
+		print_factor_string(untag<string>(obj));
 		break;
 	case F_TYPE:
 		print_string("f");
 		break;
 	case TUPLE_TYPE:
 		print_string("T{");
-		print_tuple(untag<F_TUPLE>(obj),nesting - 1);
+		print_tuple(untag<tuple>(obj),nesting - 1);
 		print_string(" }");
 		break;
 	case ARRAY_TYPE:
 		print_string("{");
-		print_array(untag<F_ARRAY>(obj),nesting - 1);
+		print_array(untag<array>(obj),nesting - 1);
 		print_string(" }");
 		break;
 	case QUOTATION_TYPE:
 		print_string("[");
-		quot = untag<F_QUOTATION>(obj);
-		print_array(untag<F_ARRAY>(quot->array),nesting - 1);
+		quot = untag<quotation>(obj);
+		print_array(untag<array>(quot->array),nesting - 1);
 		print_string(" ]");
 		break;
 	default:
 		print_string("#<type ");
-		print_cell(tagged<F_OBJECT>(obj).type());
+		print_cell(tagged<object>(obj).type());
 		print_string(" @ ");
 		print_cell_hex(obj);
 		print_string(">");
@@ -141,12 +141,12 @@ void print_nested_obj(CELL obj, F_FIXNUM nesting)
 	}
 }
 
-void print_obj(CELL obj)
+void print_obj(cell obj)
 {
 	print_nested_obj(obj,10);
 }
 
-void print_objects(CELL *start, CELL *end)
+void print_objects(cell *start, cell *end)
 {
 	for(; start <= end; start++)
 	{
@@ -158,52 +158,52 @@ void print_objects(CELL *start, CELL *end)
 void print_datastack(void)
 {
 	print_string("==== DATA STACK:\n");
-	print_objects((CELL *)ds_bot,(CELL *)ds);
+	print_objects((cell *)ds_bot,(cell *)ds);
 }
 
 void print_retainstack(void)
 {
 	print_string("==== RETAIN STACK:\n");
-	print_objects((CELL *)rs_bot,(CELL *)rs);
+	print_objects((cell *)rs_bot,(cell *)rs);
 }
 
-void print_stack_frame(F_STACK_FRAME *frame)
+void print_stack_frame(stack_frame *frame)
 {
 	print_obj(frame_executing(frame));
 	print_string("\n");
 	print_obj(frame_scan(frame));
 	print_string("\n");
-	print_cell_hex((CELL)frame_executing(frame));
+	print_cell_hex((cell)frame_executing(frame));
 	print_string(" ");
-	print_cell_hex((CELL)frame->xt);
+	print_cell_hex((cell)frame->xt);
 	print_string("\n");
 }
 
 void print_callstack(void)
 {
 	print_string("==== CALL STACK:\n");
-	CELL bottom = (CELL)stack_chain->callstack_bottom;
-	CELL top = (CELL)stack_chain->callstack_top;
+	cell bottom = (cell)stack_chain->callstack_bottom;
+	cell top = (cell)stack_chain->callstack_top;
 	iterate_callstack(top,bottom,print_stack_frame);
 }
 
-void dump_cell(CELL cell)
+void dump_cell(cell x)
 {
-	print_cell_hex_pad(cell); print_string(": ");
-	cell = *(CELL *)cell;
-	print_cell_hex_pad(cell); print_string(" tag "); print_cell(TAG(cell));
+	print_cell_hex_pad(x); print_string(": ");
+	x = *(cell *)x;
+	print_cell_hex_pad(x); print_string(" tag "); print_cell(TAG(x));
 	nl();
 }
 
-void dump_memory(CELL from, CELL to)
+void dump_memory(cell from, cell to)
 {
 	from = UNTAG(from);
 
-	for(; from <= to; from += CELLS)
+	for(; from <= to; from += sizeof(cell))
 		dump_cell(from);
 }
 
-void dump_zone(F_ZONE *z)
+void dump_zone(zone *z)
 {
 	print_string("Start="); print_cell(z->start);
 	print_string(", size="); print_cell(z->size);
@@ -212,39 +212,39 @@ void dump_zone(F_ZONE *z)
 
 void dump_generations(void)
 {
-	CELL i;
+	cell i;
 
 	print_string("Nursery: ");
 	dump_zone(&nursery);
 	
-	for(i = 1; i < data_heap->gen_count; i++)
+	for(i = 1; i < data->gen_count; i++)
 	{
 		print_string("Generation "); print_cell(i); print_string(": ");
-		dump_zone(&data_heap->generations[i]);
+		dump_zone(&data->generations[i]);
 	}
 
-	for(i = 0; i < data_heap->gen_count; i++)
+	for(i = 0; i < data->gen_count; i++)
 	{
 		print_string("Semispace "); print_cell(i); print_string(": ");
-		dump_zone(&data_heap->semispaces[i]);
+		dump_zone(&data->semispaces[i]);
 	}
 
 	print_string("Cards: base=");
-	print_cell((CELL)data_heap->cards);
+	print_cell((cell)data->cards);
 	print_string(", size=");
-	print_cell((CELL)(data_heap->cards_end - data_heap->cards));
+	print_cell((cell)(data->cards_end - data->cards));
 	nl();
 }
 
-void dump_objects(CELL type)
+void dump_objects(cell type)
 {
 	gc();
 	begin_scan();
 
-	CELL obj;
+	cell obj;
 	while((obj = next_object()) != F)
 	{
-		if(type == TYPE_COUNT || tagged<F_OBJECT>(obj).type_p(type))
+		if(type == TYPE_COUNT || tagged<object>(obj).type_p(type))
 		{
 			print_cell_hex_pad(obj);
 			print_string(" ");
@@ -257,10 +257,10 @@ void dump_objects(CELL type)
 	gc_off = false;
 }
 
-CELL look_for;
-CELL obj;
+cell look_for;
+cell obj;
 
-void find_data_references_step(CELL *scan)
+void find_data_references_step(cell *scan)
 {
 	if(look_for == *scan)
 	{
@@ -271,7 +271,7 @@ void find_data_references_step(CELL *scan)
 	}
 }
 
-void find_data_references(CELL look_for_)
+void find_data_references(cell look_for_)
 {
 	look_for = look_for_;
 
@@ -287,9 +287,9 @@ void find_data_references(CELL look_for_)
 /* Dump all code blocks for debugging */
 void dump_code_heap(void)
 {
-	CELL reloc_size = 0, literal_size = 0;
+	cell reloc_size = 0, literal_size = 0;
 
-	F_BLOCK *scan = first_block(&code_heap);
+	heap_block *scan = first_block(&code);
 
 	while(scan)
 	{
@@ -300,13 +300,13 @@ void dump_code_heap(void)
 			status = "free";
 			break;
 		case B_ALLOCATED:
-			reloc_size += object_size(((F_CODE_BLOCK *)scan)->relocation);
-			literal_size += object_size(((F_CODE_BLOCK *)scan)->literals);
+			reloc_size += object_size(((code_block *)scan)->relocation);
+			literal_size += object_size(((code_block *)scan)->literals);
 			status = "allocated";
 			break;
 		case B_MARKED:
-			reloc_size += object_size(((F_CODE_BLOCK *)scan)->relocation);
-			literal_size += object_size(((F_CODE_BLOCK *)scan)->literals);
+			reloc_size += object_size(((code_block *)scan)->relocation);
+			literal_size += object_size(((code_block *)scan)->literals);
 			status = "marked";
 			break;
 		default:
@@ -314,11 +314,11 @@ void dump_code_heap(void)
 			break;
 		}
 
-		print_cell_hex((CELL)scan); print_string(" ");
+		print_cell_hex((cell)scan); print_string(" ");
 		print_cell_hex(scan->size); print_string(" ");
 		print_string(status); print_string("\n");
 
-		scan = next_block(&code_heap,scan);
+		scan = next_block(&code,scan);
 	}
 	
 	print_cell(reloc_size); print_string(" bytes of relocation data\n");
@@ -389,20 +389,20 @@ void factorbug(void)
 
 		if(strcmp(cmd,"d") == 0)
 		{
-			CELL addr = read_cell_hex();
+			cell addr = read_cell_hex();
 			if(scanf(" ") < 0) break;
-			CELL count = read_cell_hex();
+			cell count = read_cell_hex();
 			dump_memory(addr,addr+count);
 		}
 		else if(strcmp(cmd,"u") == 0)
 		{
-			CELL addr = read_cell_hex();
-			CELL count = object_size(addr);
+			cell addr = read_cell_hex();
+			cell count = object_size(addr);
 			dump_memory(addr,addr+count);
 		}
 		else if(strcmp(cmd,".") == 0)
 		{
-			CELL addr = read_cell_hex();
+			cell addr = read_cell_hex();
 			print_obj(addr);
 			print_string("\n");
 		}
@@ -422,20 +422,20 @@ void factorbug(void)
 		{
 			int i;
 			for(i = 0; i < USER_ENV; i++)
-				dump_cell((CELL)&userenv[i]);
+				dump_cell((cell)&userenv[i]);
 		}
 		else if(strcmp(cmd,"g") == 0)
 			dump_generations();
 		else if(strcmp(cmd,"card") == 0)
 		{
-			CELL addr = read_cell_hex();
-			print_cell_hex((CELL)ADDR_TO_CARD(addr));
+			cell addr = read_cell_hex();
+			print_cell_hex((cell)addr_to_card(addr));
 			nl();
 		}
 		else if(strcmp(cmd,"addr") == 0)
 		{
-			CELL card = read_cell_hex();
-			print_cell_hex((CELL)CARD_TO_ADDR(card));
+			card *ptr = (card *)read_cell_hex();
+			print_cell_hex(card_to_addr(ptr));
 			nl();
 		}
 		else if(strcmp(cmd,"q") == 0)
@@ -448,7 +448,7 @@ void factorbug(void)
 			dump_objects(TYPE_COUNT);
 		else if(strcmp(cmd,"refs") == 0)
 		{
-			CELL addr = read_cell_hex();
+			cell addr = read_cell_hex();
 			print_string("Data heap references:\n");
 			find_data_references(addr);
 			nl();
@@ -459,7 +459,7 @@ void factorbug(void)
 			dump_objects(TUPLE_TYPE);
 		else if(strcmp(cmd,"push") == 0)
 		{
-			CELL addr = read_cell_hex();
+			cell addr = read_cell_hex();
 			dpush(addr);
 		}
 		else if(strcmp(cmd,"code") == 0)

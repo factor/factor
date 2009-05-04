@@ -3,39 +3,39 @@
 namespace factor
 {
 
-CELL string_nth(F_STRING* string, CELL index)
+cell string_nth(string* str, cell index)
 {
 	/* If high bit is set, the most significant 16 bits of the char
 	come from the aux vector. The least significant bit of the
 	corresponding aux vector entry is negated, so that we can
 	XOR the two components together and get the original code point
 	back. */
-	CELL lo_bits = string->data()[index];
+	cell lo_bits = str->data()[index];
 
 	if((lo_bits & 0x80) == 0)
 		return lo_bits;
 	else
 	{
-		F_BYTE_ARRAY *aux = untag<F_BYTE_ARRAY>(string->aux);
-		CELL hi_bits = aux->data<u16>()[index];
+		byte_array *aux = untag<byte_array>(str->aux);
+		cell hi_bits = aux->data<u16>()[index];
 		return (hi_bits << 7) ^ lo_bits;
 	}
 }
 
-void set_string_nth_fast(F_STRING *string, CELL index, CELL ch)
+void set_string_nth_fast(string *str, cell index, cell ch)
 {
-	string->data()[index] = ch;
+	str->data()[index] = ch;
 }
 
-void set_string_nth_slow(F_STRING *string_, CELL index, CELL ch)
+void set_string_nth_slow(string *str_, cell index, cell ch)
 {
-	gc_root<F_STRING> string(string_);
+	gc_root<string> str(str_);
 
-	F_BYTE_ARRAY *aux;
+	byte_array *aux;
 
-	string->data()[index] = ((ch & 0x7f) | 0x80);
+	str->data()[index] = ((ch & 0x7f) | 0x80);
 
-	if(string->aux == F)
+	if(str->aux == F)
 	{
 		/* We don't need to pre-initialize the
 		byte array with any data, since we
@@ -43,146 +43,144 @@ void set_string_nth_slow(F_STRING *string_, CELL index, CELL ch)
 		if the most significant bit of a
 		character is set. Initially all of
 		the bits are clear. */
-		aux = allot_array_internal<F_BYTE_ARRAY>(
-			untag_fixnum(string->length)
-			* sizeof(u16));
+		aux = allot_array_internal<byte_array>(untag_fixnum(str->length) * sizeof(u16));
 
-		write_barrier(string.untagged());
-		string->aux = tag<F_BYTE_ARRAY>(aux);
+		write_barrier(str.untagged());
+		str->aux = tag<byte_array>(aux);
 	}
 	else
-		aux = untag<F_BYTE_ARRAY>(string->aux);
+		aux = untag<byte_array>(str->aux);
 
 	aux->data<u16>()[index] = ((ch >> 7) ^ 1);
 }
 
 /* allocates memory */
-void set_string_nth(F_STRING* string, CELL index, CELL ch)
+void set_string_nth(string *str, cell index, cell ch)
 {
 	if(ch <= 0x7f)
-		set_string_nth_fast(string,index,ch);
+		set_string_nth_fast(str,index,ch);
 	else
-		set_string_nth_slow(string,index,ch);
+		set_string_nth_slow(str,index,ch);
 }
 
 /* Allocates memory */
-F_STRING *allot_string_internal(CELL capacity)
+string *allot_string_internal(cell capacity)
 {
-	F_STRING *string = allot<F_STRING>(string_size(capacity));
+	string *str = allot<string>(string_size(capacity));
 
-	string->length = tag_fixnum(capacity);
-	string->hashcode = F;
-	string->aux = F;
+	str->length = tag_fixnum(capacity);
+	str->hashcode = F;
+	str->aux = F;
 
-	return string;
+	return str;
 }
 
 /* Allocates memory */
-void fill_string(F_STRING *string_, CELL start, CELL capacity, CELL fill)
+void fill_string(string *str_, cell start, cell capacity, cell fill)
 {
-	gc_root<F_STRING> string(string_);
+	gc_root<string> str(str_);
 
 	if(fill <= 0x7f)
-		memset(&string->data()[start],fill,capacity - start);
+		memset(&str->data()[start],fill,capacity - start);
 	else
 	{
-		CELL i;
+		cell i;
 
 		for(i = start; i < capacity; i++)
-			set_string_nth(string.untagged(),i,fill);
+			set_string_nth(str.untagged(),i,fill);
 	}
 }
 
 /* Allocates memory */
-F_STRING *allot_string(CELL capacity, CELL fill)
+string *allot_string(cell capacity, cell fill)
 {
-	gc_root<F_STRING> string(allot_string_internal(capacity));
-	fill_string(string.untagged(),0,capacity,fill);
-	return string.untagged();
+	gc_root<string> str(allot_string_internal(capacity));
+	fill_string(str.untagged(),0,capacity,fill);
+	return str.untagged();
 }
 
 PRIMITIVE(string)
 {
-	CELL initial = to_cell(dpop());
-	CELL length = unbox_array_size();
-	dpush(tag<F_STRING>(allot_string(length,initial)));
+	cell initial = to_cell(dpop());
+	cell length = unbox_array_size();
+	dpush(tag<string>(allot_string(length,initial)));
 }
 
-static bool reallot_string_in_place_p(F_STRING *string, CELL capacity)
+static bool reallot_string_in_place_p(string *str, cell capacity)
 {
-	return in_zone(&nursery,string) && capacity <= string_capacity(string);
+	return in_zone(&nursery,str) && capacity <= string_capacity(str);
 }
 
-F_STRING* reallot_string(F_STRING *string_, CELL capacity)
+string* reallot_string(string *str_, cell capacity)
 {
-	gc_root<F_STRING> string(string_);
+	gc_root<string> str(str_);
 
-	if(reallot_string_in_place_p(string.untagged(),capacity))
+	if(reallot_string_in_place_p(str.untagged(),capacity))
 	{
-		string->length = tag_fixnum(capacity);
+		str->length = tag_fixnum(capacity);
 
-		if(string->aux != F)
+		if(str->aux != F)
 		{
-			F_BYTE_ARRAY *aux = untag<F_BYTE_ARRAY>(string->aux);
+			byte_array *aux = untag<byte_array>(str->aux);
 			aux->capacity = tag_fixnum(capacity * 2);
 		}
 
-		return string.untagged();
+		return str.untagged();
 	}
 	else
 	{
-		CELL to_copy = string_capacity(string.untagged());
+		cell to_copy = string_capacity(str.untagged());
 		if(capacity < to_copy)
 			to_copy = capacity;
 
-		gc_root<F_STRING> new_string(allot_string_internal(capacity));
+		gc_root<string> new_str(allot_string_internal(capacity));
 
-		memcpy(new_string->data(),string->data(),to_copy);
+		memcpy(new_str->data(),str->data(),to_copy);
 
-		if(string->aux != F)
+		if(str->aux != F)
 		{
-			F_BYTE_ARRAY *new_aux = allot_byte_array(capacity * sizeof(u16));
+			byte_array *new_aux = allot_byte_array(capacity * sizeof(u16));
 
-			write_barrier(new_string.untagged());
-			new_string->aux = tag<F_BYTE_ARRAY>(new_aux);
+			write_barrier(new_str.untagged());
+			new_str->aux = tag<byte_array>(new_aux);
 
-			F_BYTE_ARRAY *aux = untag<F_BYTE_ARRAY>(string->aux);
+			byte_array *aux = untag<byte_array>(str->aux);
 			memcpy(new_aux->data<u16>(),aux->data<u16>(),to_copy * sizeof(u16));
 		}
 
-		fill_string(new_string.untagged(),to_copy,capacity,'\0');
-		return new_string.untagged();
+		fill_string(new_str.untagged(),to_copy,capacity,'\0');
+		return new_str.untagged();
 	}
 }
 
 PRIMITIVE(resize_string)
 {
-	F_STRING* string = untag_check<F_STRING>(dpop());
-	CELL capacity = unbox_array_size();
-	dpush(tag<F_STRING>(reallot_string(string,capacity)));
+	string* str = untag_check<string>(dpop());
+	cell capacity = unbox_array_size();
+	dpush(tag<string>(reallot_string(str,capacity)));
 }
 
 PRIMITIVE(string_nth)
 {
-	F_STRING *string = untag<F_STRING>(dpop());
-	CELL index = untag_fixnum(dpop());
-	dpush(tag_fixnum(string_nth(string,index)));
+	string *str = untag<string>(dpop());
+	cell index = untag_fixnum(dpop());
+	dpush(tag_fixnum(string_nth(str,index)));
 }
 
 PRIMITIVE(set_string_nth_fast)
 {
-	F_STRING *string = untag<F_STRING>(dpop());
-	CELL index = untag_fixnum(dpop());
-	CELL value = untag_fixnum(dpop());
-	set_string_nth_fast(string,index,value);
+	string *str = untag<string>(dpop());
+	cell index = untag_fixnum(dpop());
+	cell value = untag_fixnum(dpop());
+	set_string_nth_fast(str,index,value);
 }
 
 PRIMITIVE(set_string_nth_slow)
 {
-	F_STRING *string = untag<F_STRING>(dpop());
-	CELL index = untag_fixnum(dpop());
-	CELL value = untag_fixnum(dpop());
-	set_string_nth_slow(string,index,value);
+	string *str = untag<string>(dpop());
+	cell index = untag_fixnum(dpop());
+	cell value = untag_fixnum(dpop());
+	set_string_nth_slow(str,index,value);
 }
 
 }

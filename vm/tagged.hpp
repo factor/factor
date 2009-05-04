@@ -1,33 +1,33 @@
 namespace factor
 {
 
-template <typename T> CELL tag(T *value)
+template <typename T> cell tag(T *value)
 {
 	return RETAG(value,tag_for(T::type_number));
 }
 
-inline static CELL tag_dynamic(F_OBJECT *value)
+inline static cell tag_dynamic(object *value)
 {
-	return RETAG(value,tag_for(value->header.hi_tag()));
+	return RETAG(value,tag_for(value->h.hi_tag()));
 }
 
 template <typename T>
 struct tagged
 {
-	CELL value_;
+	cell value_;
 
-	CELL value() const { return value_; }
+	cell value() const { return value_; }
 	T *untagged() const { return (T *)(UNTAG(value_)); }
 
-	CELL type() const {
-		CELL tag = TAG(value_);
+	cell type() const {
+		cell tag = TAG(value_);
 		if(tag == OBJECT_TYPE)
-			return untagged()->header.hi_tag();
+			return untagged()->h.hi_tag();
 		else
 			return tag;
 	}
 
-	bool type_p(CELL type_) const { return type() == type_; }
+	bool type_p(cell type_) const { return type() == type_; }
 
 	T *untag_check() const {
 		if(T::type_number != TYPE_COUNT && !type_p(T::type_number))
@@ -35,7 +35,7 @@ struct tagged
 		return untagged();
 	}
 
-	explicit tagged(CELL tagged) : value_(tagged) {
+	explicit tagged(cell tagged) : value_(tagged) {
 #ifdef FACTOR_DEBUG
 		untag_check();
 #endif
@@ -48,10 +48,10 @@ struct tagged
 	}
 
 	T *operator->() const { return untagged(); }
-	CELL *operator&() const { return &value_; }
+	cell *operator&() const { return &value_; }
 
 	const tagged<T>& operator=(const T *x) { value_ = tag(x); return *this; }
-	const tagged<T>& operator=(const CELL &x) { value_ = x; return *this; }
+	const tagged<T>& operator=(const cell &x) { value_ = x; return *this; }
 
 	bool operator==(const tagged<T> &x) { return value_ == x.value_; }
 	bool operator!=(const tagged<T> &x) { return value_ != x.value_; }
@@ -59,12 +59,12 @@ struct tagged
 	template<typename X> tagged<X> as() { return tagged<X>(value_); }
 };
 
-template <typename T> T *untag_check(CELL value)
+template <typename T> T *untag_check(cell value)
 {
 	return tagged<T>(value).untag_check();
 }
 
-template <typename T> T *untag(CELL value)
+template <typename T> T *untag(cell value)
 {
 	return tagged<T>(value).untagged();
 }

@@ -2,17 +2,17 @@ namespace factor
 {
 
 /* compiled code */
-extern F_HEAP code_heap;
+extern heap code;
 
-void init_code_heap(CELL size);
+void init_code_heap(cell size);
 
-bool in_code_heap_p(CELL ptr);
+bool in_code_heap_p(cell ptr);
 
-void jit_compile_word(CELL word, CELL def, bool relocate);
+void jit_compile_word(cell word, cell def, bool relocate);
 
-typedef void (*CODE_HEAP_ITERATOR)(F_CODE_BLOCK *compiled);
+typedef void (*code_heap_iterator)(code_block *compiled);
 
-void iterate_code_heap(CODE_HEAP_ITERATOR iter);
+void iterate_code_heap(code_heap_iterator iter);
 
 void copy_code_heap_roots(void);
 
@@ -22,10 +22,10 @@ PRIMITIVE(code_room);
 
 void compact_code_heap(void);
 
-inline static void check_code_pointer(CELL pointer)
+inline static void check_code_pointer(cell ptr)
 {
 #ifdef FACTOR_DEBUG
-	assert(pointer >= code_heap.segment->start && pointer < code_heap.segment->end);
+	assert(in_code_heap_p(ptr));
 #endif
 }
 

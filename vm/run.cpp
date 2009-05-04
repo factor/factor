@@ -1,22 +1,22 @@
 #include "master.hpp"
 
-factor::CELL userenv[USER_ENV];
+factor::cell userenv[USER_ENV];
 
 namespace factor
 {
 
-CELL T;
+cell T;
 
 PRIMITIVE(getenv)
 {
-	F_FIXNUM e = untag_fixnum(dpeek());
+	fixnum e = untag_fixnum(dpeek());
 	drepl(userenv[e]);
 }
 
 PRIMITIVE(setenv)
 {
-	F_FIXNUM e = untag_fixnum(dpop());
-	CELL value = dpop();
+	fixnum e = untag_fixnum(dpop());
+	cell value = dpop();
 	userenv[e] = value;
 }
 
@@ -37,33 +37,33 @@ PRIMITIVE(sleep)
 
 PRIMITIVE(set_slot)
 {
-	F_FIXNUM slot = untag_fixnum(dpop());
-	F_OBJECT *object = untag<F_OBJECT>(dpop());
-	CELL value = dpop();
+	fixnum slot = untag_fixnum(dpop());
+	object *obj = untag<object>(dpop());
+	cell value = dpop();
 
-	object->slots()[slot] = value;
-	write_barrier(object);
+	obj->slots()[slot] = value;
+	write_barrier(obj);
 }
 
 PRIMITIVE(load_locals)
 {
-	F_FIXNUM count = untag_fixnum(dpop());
-	memcpy((CELL *)(rs + CELLS),(CELL *)(ds - CELLS * (count - 1)),CELLS * count);
-	ds -= CELLS * count;
-	rs += CELLS * count;
+	fixnum count = untag_fixnum(dpop());
+	memcpy((cell *)(rs + sizeof(cell)),(cell *)(ds - sizeof(cell) * (count - 1)),sizeof(cell) * count);
+	ds -= sizeof(cell) * count;
+	rs += sizeof(cell) * count;
 }
 
-static CELL clone_object(CELL object_)
+static cell clone_object(cell obj_)
 {
-	gc_root<F_OBJECT> object(object_);
+	gc_root<object> obj(obj_);
 
-	if(immediate_p(object.value()))
-		return object.value();
+	if(immediate_p(obj.value()))
+		return obj.value();
 	else
 	{
-		CELL size = object_size(object.value());
-		F_OBJECT *new_obj = allot_object(object.type(),size);
-		memcpy(new_obj,object.untagged(),size);
+		cell size = object_size(obj.value());
+		object *new_obj = allot_object(obj.type(),size);
+		memcpy(new_obj,obj.untagged(),size);
 		return tag_dynamic(new_obj);
 	}
 }
