@@ -69,7 +69,7 @@ M: c-io-backend (init-stdio) init-c-stdio t ;
 
 M: c-io-backend io-multiplex 60 60 * 1000 * 1000 * or (sleep) ;
 
-: fopen ( path mode -- handle )
+: fopen ( path mode -- alien )
     [ utf8 string>alien ] bi@ (fopen) ;
 
 M: c-io-backend (file-reader)

@@ -1,12 +1,12 @@
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
-namespaces models kernel accessors ;
+namespaces models kernel accessors arrays ;
 IN: ui.gadgets.worlds.tests
 
 ! Test focus behavior
 <gadget> "g1" set
 
 : <test-world> ( gadget -- world )
-    "Hi" f <world> ;
+    <world-attributes> "Hi" >>title swap 1array >>gadgets <world> ;
 
 [ ] [
     "g1" get <test-world> "w" set

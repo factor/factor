@@ -498,7 +498,7 @@ tuple
     { "set-innermost-frame-quot" "kernel.private" (( n callstack -- )) }
     { "call-clear" "kernel" (( quot -- )) }
     { "resize-byte-array" "byte-arrays" (( n byte-array -- newbyte-array )) }
-    { "dll-valid?" "alien" (( dll -- ? )) }
+    { "dll-valid?" "alien.libraries" (( dll -- ? )) }
     { "unimplemented" "kernel.private" (( -- * )) }
     { "gc-reset" "memory" (( -- )) }
     { "jit-compile" "quotations" (( quot -- )) }

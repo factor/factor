@@ -218,10 +218,7 @@ void update_word_references(code_block *compiled)
 	   the code heap with dead PICs that will be freed on the next
 	   GC, we add them to the free list immediately. */
 	else if(compiled->block.type == PIC_TYPE)
-	{
-		fflush(stdout);
 		heap_free(&code,&compiled->block);
-	}
 	else
 	{
 		iterate_relocations(compiled,update_word_references_step);
