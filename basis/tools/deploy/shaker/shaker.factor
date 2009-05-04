@@ -37,7 +37,7 @@ IN: tools.deploy.shaker
     ] when
     strip-dictionary? [
         "compiler.units" init-hooks get delete-at
-        "tools.vocabs" init-hooks get delete-at
+        "vocabs.cache" init-hooks get delete-at
     ] when ;
 
 : strip-debugger ( -- )

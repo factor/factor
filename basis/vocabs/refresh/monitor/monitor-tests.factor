@@ -1,5 +1,5 @@
-USING: tools.test tools.vocabs.monitor io.pathnames ;
-IN: tools.vocabs.monitor.tests
+USING: tools.test vocabs.refresh.monitor io.pathnames ;
+IN: vocabs.refresh.monitor.tests
 
 [ "kernel" ] [ "core/kernel/kernel.factor" path>vocab ] unit-test
 [ "kernel" ] [ "core/kernel/" path>vocab ] unit-test

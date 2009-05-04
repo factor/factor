@@ -1,5 +1,5 @@
-IN: tools.vocabs.tests
-USING: continuations namespaces tools.test tools.vocabs tools.vocabs.private ;
+IN: vocabs.hierarchy.tests
+USING: continuations namespaces tools.test vocabs.hierarchy vocabs.hierarchy.private ;
 
 [ ] [
     changed-vocabs get-global
