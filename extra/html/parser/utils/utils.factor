@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs circular combinators continuations hashtables
 hashtables.private io kernel math namespaces prettyprint
-quotations sequences splitting html.parser.state strings
-combinators.short-circuit quoting ;
+quotations sequences splitting strings quoting
+combinators.short-circuit ;
 IN: html.parser.utils
 
 : trim1 ( seq ch -- newseq )

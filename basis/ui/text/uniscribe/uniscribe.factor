@@ -16,7 +16,7 @@ M: uniscribe-renderer flush-layout-cache
 
 : rendered-script-string ( font string -- texture )
     world get world-text-handle
-    [ cached-script-string [ image>> { 0 0 } ] [ size>> ] bi <texture> ]
+    [ cached-script-string image>> { 0 0 } <texture> ]
     2cache ;
 
 M: uniscribe-renderer draw-string ( font string -- )

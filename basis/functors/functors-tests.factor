@@ -43,8 +43,6 @@ WHERE
 
 >>
 
-\ sqsq must-infer
-
 [ 16 ] [ 2 sqsq ] unit-test
 
 <<
@@ -65,7 +63,44 @@ WHERE
 
 [ 4 ] [ 1 3 blah ] unit-test
 
-GENERIC: some-generic ( a -- b )
+<<
+
+FUNCTOR: symbol-test ( W -- )
+
+W DEFINES ${W}
+
+WHERE
+
+SYMBOL: W
+
+;FUNCTOR
+
+"blorgh" symbol-test
+
+>>
+
+[ blorgh ] [ blorgh ] unit-test
+
+<<
+
+FUNCTOR: generic-test ( W -- )
+
+W DEFINES ${W}
+
+WHERE
+
+GENERIC: W ( a -- b )
+M: object W ;
+M: integer W 1 + ;
+
+;FUNCTOR
+
+"snurv" generic-test
+
+>>
+
+[ 2   ] [ 1   snurv ] unit-test
+[ 3.0 ] [ 3.0 snurv ] unit-test
 
 ! Does replacing an ordinary word with a functor-generated one work?
 [ [ ] ] [
@@ -73,17 +108,21 @@ GENERIC: some-generic ( a -- b )
 
     TUPLE: some-tuple ;
     : some-word ( -- ) ;
+    GENERIC: some-generic ( a -- b )
     M: some-tuple some-generic ;
+    SYMBOL: some-symbol
     "> <string-reader> "functors-test" parse-stream
 ] unit-test
 
 : test-redefinition ( -- )
     [ t ] [ "some-word" "functors.tests" lookup >boolean ] unit-test
     [ t ] [ "some-tuple" "functors.tests" lookup >boolean ] unit-test
+    [ t ] [ "some-generic" "functors.tests" lookup >boolean ] unit-test
     [ t ] [
         "some-tuple" "functors.tests" lookup
         "some-generic" "functors.tests" lookup method >boolean
     ] unit-test ;
+    [ t ] [ "some-symbol" "functors.tests" lookup >boolean ] unit-test
 
 test-redefinition
 
@@ -91,13 +130,16 @@ FUNCTOR: redefine-test ( W -- )
 
 W-word DEFINES ${W}-word
 W-tuple DEFINES-CLASS ${W}-tuple
-W-generic IS ${W}-generic
+W-generic DEFINES ${W}-generic
+W-symbol DEFINES ${W}-symbol
 
 WHERE
 
 TUPLE: W-tuple ;
 : W-word ( -- ) ;
+GENERIC: W-generic ( a -- b )
 M: W-tuple W-generic ;
+SYMBOL: W-symbol
 
 ;FUNCTOR
 
@@ -108,3 +150,4 @@ M: W-tuple W-generic ;
 ] unit-test
 
 test-redefinition
+

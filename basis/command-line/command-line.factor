@@ -1,14 +1,14 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: init continuations hashtables io io.encodings.utf8
 io.files io.pathnames kernel kernel.private namespaces parser
-sequences strings system splitting vocabs.loader ;
+sequences strings system splitting vocabs.loader alien.strings ;
 IN: command-line
 
 SYMBOL: script
 SYMBOL: command-line
 
-: (command-line) ( -- args ) 10 getenv sift ;
+: (command-line) ( -- args ) 10 getenv sift [ alien>native-string ] map ;
 
 : rc-path ( name -- path )
     os windows? [ "." prepend ] unless
@@ -60,7 +60,6 @@ SYMBOL: main-vocab-hook
 : default-cli-args ( -- )
     global [
         "quiet" off
-        "script" off
         "e" off
         "user-init" on
         embedded? "quiet" set

@@ -1,6 +1,6 @@
 USING: eval tools.test compiler.units vocabs multiline words
 kernel classes.mixin arrays ;
-IN: compiler.tests
+IN: compiler.tests.redefine11
 
 ! Mixin redefinition did not recompile all necessary words.
 
@@ -17,7 +17,7 @@ IN: compiler.tests
     M: my-mixin my-generic drop 0 ;
     M: object my-generic drop 1 ;
     : my-inline ( -- b ) { } my-generic ;
-    "> eval
+    "> eval( -- )
 ] unit-test
 
 [ ] [

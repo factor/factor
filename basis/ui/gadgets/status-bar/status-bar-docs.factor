@@ -18,7 +18,7 @@ HELP: <status-bar>
 { $notes "If the " { $snippet "model" } " is " { $snippet "status" } ", this gadget will display mouse over help for " { $link "ui.gadgets.presentations" } "." } ;
 
 HELP: open-status-window
-{ $values { "gadget" gadget } { "title" string } }
+{ $values { "gadget" gadget } { "title/attributes" { "a " { $link string } " or a " { $link world-attributes } " tuple" } } }
 { $description "Like " { $link open-window } ", with the additional feature that the new window iwll have a status bar displaying the value stored in the world's " { $slot "status" } " slot." }
 { $see-also show-status hide-status } ;
 

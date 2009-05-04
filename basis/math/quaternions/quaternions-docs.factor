@@ -1,6 +1,16 @@
 USING: help.markup help.syntax math math.vectors vectors ;
 IN: math.quaternions
 
+HELP: q+
+{ $values { "u" "a quaternion" } { "v" "a quaternion" } { "u+v" "a quaternion" } }
+{ $description "Add quaternions." }
+{ $examples { $example "USING: math.quaternions prettyprint ;" "{ C{ 0 1 } 0 } { 0 1 } q+ ." "{ C{ 0 1 } 1 }" } } ;
+
+HELP: q-
+{ $values { "u" "a quaternion" } { "v" "a quaternion" } { "u-v" "a quaternion" } }
+{ $description "Subtract quaternions." }
+{ $examples { $example "USING: math.quaternions prettyprint ;" "{ C{ 0 1 } 0 } { 0 1 } q- ." "{ C{ 0 1 } -1 }" } } ;
+
 HELP: q*
 { $values { "u" "a quaternion" } { "v" "a quaternion" } { "u*v" "a quaternion" } }
 { $description "Multiply quaternions." }

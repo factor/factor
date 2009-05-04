@@ -1,1 +1,1 @@
-PLAF_DLL_OBJS += vm/cpu-arm.o
+PLAF_DLL_OBJS += vmpp/cpu-arm.o

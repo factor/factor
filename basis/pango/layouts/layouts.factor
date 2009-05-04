@@ -44,7 +44,7 @@ FUNCTION: PangoLayoutLine*
 pango_layout_get_line_readonly ( PangoLayout* layout, int line ) ;
                                                          
 FUNCTION: void
-pango_layout_line_index_to_x ( PangoLayoutLine* line, int index_, gboolean trailing, int* x_pos ) ;
+pango_layout_line_index_to_x ( PangoLayoutLine* line, int index_, uint trailing, int* x_pos ) ;
 
 FUNCTION: gboolean
 pango_layout_line_x_to_index ( PangoLayoutLine* line, int x_pos, int* index_, int* trailing ) ;
@@ -122,7 +122,7 @@ MEMO: missing-font-metrics ( font -- metrics )
 : line-offset>x ( layout n -- x )
     #! n is an index into the UTF8 encoding of the text
     [ drop first-line ] [ swap string>> >utf8-index ] 2bi
-    f 0 <int> [ pango_layout_line_index_to_x ] keep
+    0 0 <int> [ pango_layout_line_index_to_x ] keep
     *int pango>float ;
 
 : x>line-offset ( layout x -- n )

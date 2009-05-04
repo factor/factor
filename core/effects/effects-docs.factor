@@ -1,16 +1,20 @@
-USING: help.markup help.syntax math strings words kernel ;
+USING: help.markup help.syntax math strings words kernel combinators ;
 IN: effects
 
-ARTICLE: "effect-declaration" "Stack effect declaration"
-"Stack effects of words must be declared, with the exception of words which only push literals on the stack."
-$nl
-"A stack effect declaration is written in parentheses and lists word inputs and outputs, separated by " { $snippet "--" } ". Here is an example:"
-{ $synopsis sq }
+ARTICLE: "effects" "Stack effect declarations"
+"Word definition words such as " { $link POSTPONE: : } " and " { $link POSTPONE: GENERIC: } " have a " { $emphasis "stack effect declaration" } " as part of their syntax. A stack effect declaration takes the following form:"
+{ $code "( input1 input2 ... -- output1 ... )" }
+"Stack elements in a stack effect are ordered so that the top of the stack is on the right side. Here is an example:"
+{ $synopsis + }
 "Parameters which are quotations can be declared by suffixing the parameter name with " { $snippet ":" } " and then writing a nested stack effect declaration:"
 { $synopsis while }
-"Stack effect declarations are read in using a parsing word:"
-{ $subsection POSTPONE: ( }
-"Stack elements in a stack effect are ordered so that the top of the stack is on the right side. Each value can be named by a data type or description. The following are some examples of value names:"
+"Only the number of inputs and outputs carries semantic meaning."
+$nl
+"Nested quotation declaration only has semantic meaning for " { $link POSTPONE: inline } " " { $link POSTPONE: recursive } " words. See " { $link "inference-recursive-combinators" } "."
+$nl
+"In concatenative code, input and output names are for documentation purposes only and certain conventions have been established to make them more descriptive. For code written with " { $link "locals" } ", stack values are bound to local variables named by the stack effect's input parameters."
+$nl
+"Inputs and outputs are typically named after some pun on their data type, or a description of the value's purpose if the type is very general. The following are some examples of value names:"
 { $table
     { { { $snippet "?" } } "a boolean" }
     { { { $snippet "<=>" } } { "an ordering sepcifier; see " { $link "order-specifiers" } } }
@@ -26,25 +30,6 @@ $nl
     { { $snippet "dim" } "a screen dimension specified as a two-element array holding width and height values" }
     { { $snippet "*" } "when this symbol appears by itself in the list of outputs, it means the word unconditionally throws an error" }
 }
-"The stack effect inferencer verifies stack effect comments to ensure the correct number of inputs and outputs is listed. Value names are ignored; only their number matters. An error is thrown if a word's declared stack effect does not match its inferred stack effect. See " { $link "inference" } "." ;
-
-ARTICLE: "effects" "Stack effects"
-"A " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that an operation takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output."
-$nl
-"Stack effects of words can be declared."
-{ $subsection "effect-declaration" }
-"Stack effects are first-class, and words for working with them are found in the " { $vocab-link "effects" } " vocabulary."
-{ $subsection effect }
-{ $subsection effect? }
-"There is a literal syntax for stack objects. It is most often used with " { $link define-declared } "."
-{ $subsection POSTPONE: (( }
-"Getting a word's declared stack effect:"
-{ $subsection stack-effect }
-"Converting a stack effect to a string form:"
-{ $subsection effect>string }
-"Comparing effects:"
-{ $subsection effect-height }
-{ $subsection effect<= }
 { $see-also "inference" } ;
 
 ABOUT: "effects"
@@ -57,8 +42,15 @@ HELP: effect-height
 { $description "Outputs the number of objects added to the data stack by the stack effect. This will be negative if the stack effect only removes objects from the stack." } ;
 
 HELP: effect<=
-{ $values { "eff1" effect } { "eff2" effect } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "eff1" } " is substitutable for " { $snippet "eff2" } ". What this means is that both stack effects change the stack height by the same amount, the first takes a smaller or equal number of inputs as the second, and either both or neither one terminate execution by throwing an error." } ;
+{ $values { "effect1" effect } { "effect2" effect } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "effect1" } " is substitutable for " { $snippet "effect2" } ". What this means is that both stack effects change the stack height by the same amount, the first takes a smaller or equal number of inputs as the second, and either both or neither one terminate execution by throwing an error." } ;
+
+HELP: effect=
+{ $values { "effect1" effect } { "effect2" effect } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "effect1" } " and " { $snippet "effect2" } " represent the same stack transformation, without looking parameter names." }
+{ $examples
+  { $example "USING: effects prettyprint ;" "(( a -- b )) (( x -- y )) effect= ." "t" }
+} ;
 
 HELP: effect>string
 { $values { "obj" object } { "str" string } }

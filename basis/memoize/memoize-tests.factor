@@ -9,7 +9,7 @@ MEMO: fib ( m -- n )
 
 [ 89 ] [ 10 fib ] unit-test
 
-[ "USING: kernel math memoize generalizations ; IN: memoize.tests MEMO: x ( a b c d e -- f g h i j ) [ 1+ ] 4 ndip ;" eval ] must-fail
+[ "USING: kernel math memoize generalizations ; IN: memoize.tests MEMO: x ( a b c d e -- f g h i j ) [ 1+ ] 4 ndip ;" eval( -- ) ] must-fail
 
 MEMO: see-test ( a -- b ) reverse ;
 
@@ -17,7 +17,7 @@ MEMO: see-test ( a -- b ) reverse ;
 [ [ \ see-test see ] with-string-writer ]
 unit-test
 
-[ ] [ "IN: memoize.tests : fib ( -- ) ;" eval ] unit-test
+[ ] [ "IN: memoize.tests : fib ( -- ) ;" eval( -- ) ] unit-test
 
 [ "IN: memoize.tests\n: fib ( -- ) ;\n" ] [ [ \ fib see ] with-string-writer ] unit-test
 

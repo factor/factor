@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces make dlists
 deques sequences threads sequences words continuations init
-combinators hashtables concurrency.flags sets accessors calendar fry
-destructors ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gadgets.tracks ui.gestures ui.backend ui.render ;
+combinators combinators.short-circuit hashtables concurrency.flags
+sets accessors calendar fry destructors ui.gadgets ui.gadgets.private
+ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend ui.render
+strings ;
 IN: ui
 
 <PRIVATE
@@ -28,7 +29,7 @@ SYMBOL: windows
     [ [ length 1- dup 1- ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
-    windows global [ [ first = not ] with filter ] change-at ;
+    windows [ [ first = not ] with filter ] change-global ;
 
 : raised-window ( world -- )
     windows get-global
@@ -49,8 +50,20 @@ SYMBOL: windows
     f >>focused?
     focus-path f swap focus-gestures ;
 
+: try-to-open-window ( world -- )
+    {
+        [ (open-window) ]
+        [ handle>> select-gl-context ]
+        [
+            [ begin-world ]
+            [ [ handle>> (close-window) ] [ ui-error ] bi* ]
+            recover
+        ]
+        [ resize-world ]
+    } cleave ;
+
 M: world graft*
-    [ (open-window) ]
+    [ try-to-open-window ]
     [ [ title>> ] keep set-title ]
     [ request-focus ] tri ;
 
@@ -66,6 +79,7 @@ M: world graft*
         [ images>> [ dispose ] when* ]
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
+        [ end-world ]
     } cleave ;
 
 M: world ungraft*
@@ -117,12 +131,10 @@ M: world ungraft*
     gesture-queue [ send-queued-gesture notify-queued ] slurp-deque ;
 
 : update-ui ( -- )
-    [
-        notify-queued
-        layout-queued
-        redraw-worlds
-        send-queued-gestures
-    ] [ ui-error ] recover ;
+    notify-queued
+    layout-queued
+    redraw-worlds
+    send-queued-gestures ;
 
 SYMBOL: ui-thread
 
@@ -133,8 +145,7 @@ SYMBOL: ui-thread
 PRIVATE>
 
 : find-window ( quot -- world )
-    windows get values
-    [ gadget-child swap call ] with find-last nip ; inline
+    [ windows get values ] dip '[ gadget-child @ ] find-last nip ; inline
 
 : ui-running? ( -- ? )
     \ ui-running get-global ;
@@ -142,9 +153,15 @@ PRIVATE>
 <PRIVATE
 
 : update-ui-loop ( -- )
-    [ ui-running? ui-thread get-global self eq? and ]
-    [ ui-notify-flag get lower-flag update-ui ]
-    while ;
+    #! Note the logic: if update-ui fails, we open an error window
+    #! and run one iteration of update-ui. If that also fails, well,
+    #! the whole UI subsystem is broken so we exit out of the
+    #! update-ui-loop.
+    [ { [ ui-running? ] [ ui-thread get-global self eq? ] } 0&& ]
+    [
+        ui-notify-flag get lower-flag
+        [ update-ui ] [ ui-error update-ui ] recover
+    ] while ;
 
 : start-ui-thread ( -- )
     [ self ui-thread set-global update-ui-loop ]
@@ -163,13 +180,17 @@ PRIVATE>
 : restore-windows? ( -- ? )
     windows get empty? not ;
 
+: ?attributes ( gadget title/attributes -- attributes )
+    dup string? [ world-attributes new swap >>title ] when
+    swap [ [ [ 1array ] [ f ] if* ] curry unless* ] curry change-gadgets ;
+
 PRIVATE>
 
 : open-world-window ( world -- )
     dup pref-dim >>dim dup relayout graft ;
 
-: open-window ( gadget title -- )
-    f <world> open-world-window ;
+: open-window ( gadget title/attributes -- )
+    ?attributes <world> open-world-window ;
 
 : set-fullscreen? ( ? gadget -- )
     find-world set-fullscreen* ;

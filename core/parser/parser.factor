@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
-sequences strings vectors words words.symbol quotations io combinators
-sorting splitting math.parser effects continuations io.files vocabs
-io.encodings.utf8 source-files classes hashtables compiler.errors
-compiler.units accessors sets lexer vocabs.parser effects.parser slots ;
+sequences strings vectors words words.symbol quotations io
+combinators sorting splitting math.parser effects continuations
+io.files vocabs io.encodings.utf8 source-files classes
+hashtables compiler.units accessors sets lexer vocabs.parser
+effects.parser slots ;
 IN: parser
 
 : location ( -- loc )
@@ -179,6 +180,7 @@ SYMBOL: interactive-vocabs
     "math.order"
     "memory"
     "namespaces"
+    "parser"
     "prettyprint"
     "see"
     "sequences"
@@ -190,14 +192,16 @@ SYMBOL: interactive-vocabs
     "tools.annotations"
     "tools.crossref"
     "tools.disassembler"
+    "tools.errors"
     "tools.memory"
     "tools.profiler"
     "tools.test"
     "tools.threads"
     "tools.time"
-    "tools.vocabs"
     "vocabs"
     "vocabs.loader"
+    "vocabs.refresh"
+    "vocabs.hierarchy"
     "words"
     "scratchpad"
 } interactive-vocabs set-global
@@ -261,7 +265,7 @@ print-use-hook [ [ ] ] initialize
 
 : finish-parsing ( lines quot -- )
     file get
-    [ record-form ]
+    [ record-top-level-form ]
     [ record-definitions ]
     [ record-checksum ]
     tri ;
@@ -269,7 +273,7 @@ print-use-hook [ [ ] ] initialize
 : parse-stream ( stream name -- quot )
     [
         [
-            lines dup parse-fresh
+            stream-lines dup parse-fresh
             [ nip ] [ finish-parsing ] 2bi
             forget-smudged
         ] with-source-file
@@ -280,11 +284,9 @@ print-use-hook [ [ ] ] initialize
 
 : parse-file ( file -- quot )
     [
-        [
-            [ parsing-file ] keep
-            [ utf8 <file-reader> ] keep
-            parse-stream
-        ] with-compiler-errors
+        [ parsing-file ] keep
+        [ utf8 <file-reader> ] keep
+        parse-stream
     ] [
         over parse-file-restarts rethrow-restarts
         drop parse-file

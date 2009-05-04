@@ -1,6 +1,6 @@
 USING: accessors arrays combinators definitions generalizations
 help help.markup help.topics kernel sequences sorting vocabs
-words combinators.smart ;
+words combinators.smart tools.crossref ;
 IN: annotations
 
 <PRIVATE

@@ -3,11 +3,12 @@
 USING: accessors alien alien.c-types arrays ui ui.private ui.gadgets
 ui.gadgets.private ui.gestures ui.backend ui.clipboards
 ui.gadgets.worlds ui.render ui.event-loop assocs kernel math
-namespaces opengl sequences strings x11.xlib x11.events x11.xim
-x11.glx x11.clipboard x11.constants x11.windows io.encodings.string
-io.encodings.ascii io.encodings.utf8 combinators command-line
-math.vectors classes.tuple opengl.gl threads math.rectangles
-environment ascii ;
+namespaces opengl sequences strings x11 x11.xlib x11.events x11.xim
+x11.glx x11.clipboard x11.constants x11.windows x11.io
+io.encodings.string io.encodings.ascii io.encodings.utf8 combinators
+command-line math.vectors classes.tuple opengl.gl threads
+math.rectangles environment ascii literals
+ui.pixel-formats ui.pixel-formats.private ;
 IN: ui.backend.x11
 
 SINGLETON: x11-ui-backend
@@ -28,6 +29,40 @@ M: world configure-event
     swap configured-dim >>dim
     ! In case dimensions didn't change
     relayout-1 ;
+
+PIXEL-FORMAT-ATTRIBUTE-TABLE: glx-visual { $ GLX_USE_GL $ GLX_RGBA } H{
+    { double-buffered { $ GLX_DOUBLEBUFFER } }
+    { stereo { $ GLX_STEREO } }
+    { color-bits { $ GLX_BUFFER_SIZE } }
+    { red-bits { $ GLX_RED_SIZE } }
+    { green-bits { $ GLX_GREEN_SIZE } }
+    { blue-bits { $ GLX_BLUE_SIZE } }
+    { alpha-bits { $ GLX_ALPHA_SIZE } }
+    { accum-red-bits { $ GLX_ACCUM_RED_SIZE } }
+    { accum-green-bits { $ GLX_ACCUM_GREEN_SIZE } }
+    { accum-blue-bits { $ GLX_ACCUM_BLUE_SIZE } }
+    { accum-alpha-bits { $ GLX_ACCUM_ALPHA_SIZE } }
+    { depth-bits { $ GLX_DEPTH_SIZE } }
+    { stencil-bits { $ GLX_STENCIL_SIZE } }
+    { aux-buffers { $ GLX_AUX_BUFFERS } }
+    { sample-buffers { $ GLX_SAMPLE_BUFFERS } }
+    { samples { $ GLX_SAMPLES } }
+}
+
+M: x11-ui-backend (make-pixel-format)
+    [ drop dpy get scr get ] dip
+    >glx-visual-int-array glXChooseVisual ;
+
+M: x11-ui-backend (free-pixel-format)
+    handle>> XFree ;
+
+M: x11-ui-backend (pixel-format-attribute)
+    [ dpy get ] 2dip
+    [ handle>> ] [ >glx-visual ] bi*
+    [ 2drop f ] [
+        first
+        0 <int> [ glXGetConfig drop ] keep *int
+    ] if-empty ;
 
 CONSTANT: modifiers
     {
@@ -187,7 +222,8 @@ M: world client-event
 
 : gadget-window ( world -- )
     dup
-    [ window-loc>> ] [ dim>> ] bi glx-window swap
+    [ [ [ window-loc>> ] [ dim>> ] bi ] dip handle>> glx-window ]
+    with-world-pixel-format swap
     dup "Factor" create-xic
     <x11-handle>
     [ window>> register-window ] [ >>handle drop ] 2bi ;
@@ -196,7 +232,7 @@ M: world client-event
     QueuedAfterFlush events-queued 0 > [
         next-event dup
         None XFilterEvent 0 = [ drop wait-event ] unless
-    ] [ ui-wait wait-event ] if ;
+    ] [ wait-for-display wait-event ] if ;
 
 M: x11-ui-backend do-events
     wait-event dup XAnyEvent-window window dup
@@ -224,6 +260,10 @@ M: x-clipboard paste-clipboard
     [ XA_NET_WM_NAME XA_UTF8_STRING 8 PropModeReplace ] dip
     utf8 encode dup length XChangeProperty drop ;
 
+: set-class ( dpy window -- )
+    XA_WM_CLASS XA_UTF8_STRING 8 PropModeReplace "Factor"
+    utf8 encode dup length XChangeProperty drop ;
+
 M: x11-ui-backend set-title ( string world -- )
     handle>> window>> swap
     [ dpy get ] 2dip [ set-title-old ] [ set-title-new ] 3bi ;
@@ -242,11 +282,15 @@ M: x11-ui-backend set-fullscreen* ( ? world -- )
 
 M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
-    handle>> window>> dup set-closable map-window ;
+    handle>> window>>
+    [ set-closable ] [ dpy get swap set-class ] [ map-window ] tri ;
 
 M: x11-ui-backend raise-window* ( world -- )
     handle>> [
-        dpy get swap window>> XRaiseWindow drop
+        dpy get swap window>>
+        [ RevertToPointerRoot CurrentTime XSetInputFocus drop ]
+        [ XRaiseWindow drop ]
+        2bi
     ] when* ;
 
 M: x11-handle select-gl-context ( handle -- )
@@ -266,7 +310,9 @@ M: x11-pixmap-handle flush-gl-context ( handle -- )
     drop ;
 
 M: x11-ui-backend (open-offscreen-buffer) ( world -- )
-    dup dim>> glx-pixmap <x11-pixmap-handle> >>handle drop ;
+    dup [ [ dim>> ] [ handle>> ] bi* glx-pixmap ]
+    with-world-pixel-format
+    <x11-pixmap-handle> >>handle drop ;
 M: x11-ui-backend (close-offscreen-buffer) ( handle -- )
     dpy get swap
     [ glx-pixmap>> glXDestroyGLXPixmap ]

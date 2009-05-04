@@ -2,7 +2,7 @@ USING: tools.test xml.tokenize xml.state io.streams.string kernel io strings asc
 IN: xml.test.state
 
 : string-parse ( str quot -- )
-    [ <string-reader> ] dip with-state ;
+    [ <string-reader> ] dip with-state ; inline
 
 : take-rest ( -- string )
     [ f ] take-until ;

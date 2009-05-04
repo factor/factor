@@ -6,6 +6,7 @@ IN: bootstrap.tools
     "bootstrap.image"
     "tools.annotations"
     "tools.crossref"
+    "tools.errors"
     "tools.deploy"
     "tools.disassembler"
     "tools.memory"
@@ -13,7 +14,8 @@ IN: bootstrap.tools
     "tools.test"
     "tools.time"
     "tools.threads"
-    "tools.vocabs"
-    "tools.vocabs.monitor"
+    "vocabs.hierarchy"
+    "vocabs.refresh"
+    "vocabs.refresh.monitor"
     "editors"
 } [ require ] each

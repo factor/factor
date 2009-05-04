@@ -8,7 +8,7 @@ ARTICLE: "help.home" "Factor documentation"
   { $link "handbook" }
   { $link "vocab-index" }
   { $link "ui-tools" }
-  { $link "handbook-library-reference" }
+  { $link "ui-listener" }
 }
 { $heading "Recently visited" }
 { $table

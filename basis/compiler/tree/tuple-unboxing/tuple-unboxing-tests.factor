@@ -8,8 +8,6 @@ compiler.tree.def-use kernel accessors sequences math
 math.private sorting math.order binary-search sequences.private
 slots.private ;
 
-\ unbox-tuples must-infer
-
 : test-unboxing ( quot -- )
     build-tree
     analyze-recursive
@@ -34,7 +32,6 @@ TUPLE: empty-tuple ;
     [ dup [ drop f ] [ "A" throw ] if ]
     [ [ ] [ ] curry curry dup 2 slot swap 3 slot dup 2 slot swap 3 slot drop ]
     [ [ ] [ ] curry curry call ]
-    [ <complex> <complex> dup 1 slot drop 2 slot drop ]
     [ 1 cons boa over [ "A" throw ] when car>> ]
     [ [ <=> ] sort ]
     [ [ <=> ] with search ]

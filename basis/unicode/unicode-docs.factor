@@ -1,7 +1,7 @@
 USING: help.markup help.syntax strings ;
 IN: unicode
 
-ARTICLE: "unicode" "Unicode"
+ARTICLE: "unicode" "Unicode support"
 "The " { $vocab-link "unicode" } " vocabulary and its sub-vocabularies implement support for the Unicode 5.1 character set."
 $nl
 "The Unicode character set contains most of the world's writing systems. Unicode is intended as a replacement for, and is a superset of, such legacy character sets as ASCII, Latin1, MacRoman, and so on. Unicode characters are called " { $emphasis "code points" } "; Factor's " { $link "strings" } " are sequences of code points."

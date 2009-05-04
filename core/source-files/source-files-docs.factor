@@ -3,7 +3,7 @@ definitions quotations compiler.units ;
 IN: source-files
 
 ARTICLE: "source-files" "Source files"
-"Words in the " { $vocab-link "source-files" } " vocabulary are used to keep track of loaded source files. This is used to implement " { $link "tools.vocabs" } "."
+"Words in the " { $vocab-link "source-files" } " vocabulary are used to keep track of loaded source files. This is used to implement " { $link "vocabs.refresh" } "."
 $nl
 "The source file database:"
 { $subsection source-files }
@@ -11,9 +11,7 @@ $nl
 { $subsection source-file }
 "Words intended for the parser:"
 { $subsection record-checksum }
-{ $subsection record-form }
-{ $subsection xref-source }
-{ $subsection unxref-source }
+{ $subsection record-definitions }
 "Removing a source file from the database:"
 { $subsection forget-source }
 "Updating the database:"
@@ -42,27 +40,8 @@ HELP: record-checksum
 { $description "Records the CRC32 checksm of the source file's contents." } 
 $low-level-note ;
 
-HELP: xref-source
-{ $values { "source-file" source-file } }
-{ $description "Adds the source file to the " { $link crossref } " graph enabling words to find source files which reference them in their top level forms." }
-$low-level-note ;
-
-HELP: unxref-source
-{ $values { "source-file" source-file } }
-{ $description "Removes the source file from the " { $link crossref } " graph." }
-$low-level-note ;
-
-HELP: xref-sources
-{ $description "Adds all loaded source files to the " { $link crossref } " graph. This is done during bootstrap." }
-$low-level-note ;
-
-HELP: record-form
-{ $values { "quot" quotation } { "source-file" source-file } }
-{ $description "Records usage information for a source file's top level form." }
-$low-level-note ;
-
 HELP: reset-checksums
-{ $description "Resets recorded modification times and CRC32 checksums for all loaded source files, creating a checkpoint for " { $link "tools.vocabs" } "." } ;
+{ $description "Resets recorded modification times and CRC32 checksums for all loaded source files, creating a checkpoint for " { $link "vocabs.refresh" } "." } ;
 
 HELP: forget-source
 { $values { "path" "a pathname string" } }

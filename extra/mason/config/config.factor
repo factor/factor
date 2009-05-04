@@ -11,11 +11,16 @@ builds-dir get-global [
     home "builds" append-path builds-dir set-global
 ] unless
 
-! Who sends build reports.
+! Who sends build report e-mails.
 SYMBOL: builder-from
 
-! Who receives build reports.
+! Who receives build report e-mails.
 SYMBOL: builder-recipients
+
+! (Optional) twitter credentials for status updates.
+SYMBOL: builder-twitter-username
+
+SYMBOL: builder-twitter-password
 
 ! (Optional) CPU architecture to build for.
 SYMBOL: target-cpu
@@ -33,6 +38,12 @@ target-os get-global [
 
 ! Keep test-log around?
 SYMBOL: builder-debug
+
+! Host to send status notifications to.
+SYMBOL: status-host
+
+! Username to log in.
+SYMBOL: status-username
 
 SYMBOL: upload-help?
 

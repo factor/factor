@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions graphs assocs kernel
-kernel.private slots.private math namespaces sequences strings
-vectors sbufs quotations assocs hashtables sorting words.private
-vocabs math.order sets ;
+kernel.private kernel.private slots.private math namespaces sequences
+strings vectors sbufs quotations assocs hashtables sorting vocabs
+math.order sets ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -62,37 +62,7 @@ SYMBOL: bootstrapping?
 GENERIC: crossref? ( word -- ? )
 
 M: word crossref?
-    dup "forgotten" word-prop [
-        drop f
-    ] [
-        vocabulary>> >boolean
-    ] if ;
-
-GENERIC: compiled-crossref? ( word -- ? )
-
-M: word compiled-crossref? crossref? ;
-
-GENERIC# (quot-uses) 1 ( obj assoc -- )
-
-M: object (quot-uses) 2drop ;
-
-M: word (quot-uses) over crossref? [ conjoin ] [ 2drop ] if ;
-
-: seq-uses ( seq assoc -- ) [ (quot-uses) ] curry each ;
-
-M: array (quot-uses) seq-uses ;
-
-M: hashtable (quot-uses) [ >alist ] dip seq-uses ;
-
-M: callable (quot-uses) seq-uses ;
-
-M: wrapper (quot-uses) [ wrapped>> ] dip (quot-uses) ;
-
-: quot-uses ( quot -- assoc )
-    global [ H{ } clone [ (quot-uses) ] keep ] bind ;
-
-M: word uses ( word -- seq )
-    def>> quot-uses keys ;
+    dup "forgotten" word-prop [ drop f ] [ vocabulary>> >boolean ] if ;
 
 SYMBOL: compiled-crossref
 
@@ -131,44 +101,22 @@ compiled-generic-crossref [ H{ } clone ] initialize
 
 : inline? ( word -- ? ) "inline" word-prop ; inline
 
-SYMBOL: visited
+GENERIC: subwords ( word -- seq )
 
-CONSTANT: reset-on-redefine { "inferred-effect" "cannot-infer" }
-
-: (redefined) ( word -- )
-    dup visited get key? [ drop ] [
-        [ reset-on-redefine reset-props ]
-        [ visited get conjoin ]
-        [
-            crossref get at keys
-            [ word? ] filter
-            [
-                [ reset-on-redefine [ word-prop ] with any? ]
-                [ inline? ]
-                bi or
-            ] filter
-            [ (redefined) ] each
-        ] tri
-    ] if ;
-
-: redefined ( word -- )
-    [ H{ } clone visited [ (redefined) ] with-variable ]
-    [ changed-definition ]
-    bi ;
+M: word subwords drop f ;
 
 : define ( word def -- )
-    [ ] like
-    over unxref
-    over redefined
-    >>def
-    dup crossref? [ dup xref ] when drop ;
+    over changed-definition [ ] like >>def drop ;
+
+: changed-effect ( word -- )
+    [ dup changed-effects get set-in-unit ]
+    [ dup primitive? [ drop ] [ changed-definition ] if ] bi ;
 
 : set-stack-effect ( effect word -- )
     2dup "declared-effect" word-prop = [ 2drop ] [
-        swap
-        [ drop changed-effect ]
-        [ "declared-effect" set-word-prop ]
-        [ drop dup primitive? [ drop ] [ redefined ] if ]
+        [ nip changed-effect ]
+        [ nip subwords [ changed-effect ] each ]
+        [ swap "declared-effect" set-word-prop ]
         2tri
     ] if ;
 
@@ -176,7 +124,11 @@ CONSTANT: reset-on-redefine { "inferred-effect" "cannot-infer" }
     [ nip swap set-stack-effect ] [ drop define ] 3bi ;
 
 : make-inline ( word -- )
-    t "inline" set-word-prop ;
+    dup inline? [ drop ] [
+        [ t "inline" set-word-prop ]
+        [ changed-effect ]
+        bi
+    ] if ;
 
 : make-recursive ( word -- )
     t "recursive" set-word-prop ;
@@ -199,15 +151,19 @@ M: word reset-word
         "writer" "delimiter"
     } reset-props ;
 
-GENERIC: subwords ( word -- seq )
-
-M: word subwords drop f ;
-
 : reset-generic ( word -- )
     [ subwords forget-all ]
     [ reset-word ]
-    [ { "methods" "combination" "default-method" } reset-props ]
-    tri ;
+    [
+        f >>direct-entry-def
+        {
+            "methods"
+            "combination"
+            "default-method"
+            "engines"
+            "decision-tree"
+        } reset-props
+    ] tri ;
 
 : gensym ( -- word )
     "( gensym )" f <word> ;
@@ -250,17 +206,14 @@ M: word set-where swap "loc" set-word-prop ;
 
 M: word forget*
     dup "forgotten" word-prop [ drop ] [
-        [ delete-xref ]
         [ [ name>> ] [ vocabulary>> vocab-words ] bi delete-at ]
         [ t "forgotten" set-word-prop ]
-        tri
+        bi
     ] if ;
 
 M: word hashcode*
     nip 1 slot { fixnum } declare ; foldable
 
 M: word literalize <wrapper> ;
-
-: xref-words ( -- ) all-words [ xref ] each ;
 
 INSTANCE: word definition

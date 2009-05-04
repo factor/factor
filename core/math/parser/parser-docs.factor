@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math math.private prettyprint
+USING: help.markup help.syntax math math.parser.private prettyprint
 namespaces make strings ;
 IN: math.parser
 
@@ -25,7 +25,7 @@ $nl
 ABOUT: "number-strings"
 
 HELP: digits>integer
-{ $values { "seq" "a sequence of integers" } { "radix" "an integer between 2 and 36" } { "n" integer } }
+{ $values { "seq" "a sequence of integers" } { "radix" "an integer between 2 and 36" } { "n/f" { $maybe integer } } }
 { $description "Converts a sequence of digits (with most significant digit first) into an integer." }
 { $notes "This is one of the factors of " { $link string>number } "." } ;
 
@@ -102,7 +102,7 @@ HELP: string>float ( str -- n/f )
 $nl
 "Outputs " { $link f } " if the string does not represent a float." } ;
 
-HELP: float>string ( n -- str )
+HELP: float>string
 { $values { "n" real } { "str" string } }
 { $description "Primitive for getting a string representation of a float." }
 { $notes "The " { $link number>string } " word is more general." } ;

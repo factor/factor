@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry irc.client irc.client.private kernel namespaces
+USING: fry irc.client irc.client.chats kernel namespaces
 sequences threads io.encodings.8-bit io.launcher io splitting
 make mason.common mason.updates calendar math alarms ;
 IN: irc.gitbot
@@ -33,7 +33,7 @@ M: object handle-message drop ;
         "--pretty=format:%h %an: %s" ,
         ".." glue ,
     ] { } make
-    latin1 [ input-stream get lines ] with-process-reader ;
+    latin1 [ lines ] with-process-reader ;
 
 : updates ( from to -- lines )
     git-log reverse

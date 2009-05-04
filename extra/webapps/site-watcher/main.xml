@@ -1,7 +1,0 @@
-<?xml version='1.0' ?>
-
-<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
-
-<p>SiteWatcher is a free service for web masters. It periodically tries fetching your web site via HTTP, and sends you an e-mail, SMS or Tweet if this fails. <t:a t:href="$site-watcher-app/list">Sign up now!</t:a></p>
-
-</t:chloe>

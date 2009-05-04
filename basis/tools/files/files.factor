@@ -75,7 +75,7 @@ M: object file-spec>string ( file-listing spec -- string )
 : list-files-slow ( listing-tool -- array )
     [ path>> ] [ sort>> ] [ specs>> ] tri '[
             [ dup name>> file-info file-listing boa ] map
-            _ [ sort-by-slots ] when*
+            _ [ sort-by ] when*
             [ _ [ file-spec>string ] with map ] map
     ] with-directory-entries ; inline
 

@@ -12,10 +12,11 @@ IN: macros
 PRIVATE>
 
 : define-macro ( word definition effect -- )
-    real-macro-effect
-    [ [ memoize-quot [ call ] append ] keep define-declared ]
-    [ drop "macro" set-word-prop ]
-    3bi ;
+    real-macro-effect {
+        [ [ memoize-quot [ call ] append ] keep define-declared ]
+        [ drop "macro" set-word-prop ]
+        [ 2drop changed-effect ]
+    } 3cleave ;
 
 SYNTAX: MACRO: (:) define-macro ;
 

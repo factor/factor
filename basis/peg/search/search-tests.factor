@@ -17,5 +17,3 @@ IN: peg.search.tests
   "abc 123 def 456" 'integer' [ 2 * number>string ] action replace
 ] unit-test
 
-\ search must-infer
-\ replace must-infer
