@@ -44,7 +44,7 @@ M: standard-combination inline-cache-quot ( word methods -- )
     #! Direct calls to the generic word (not tail calls or indirect calls)
     #! will jump to the inline cache entry point instead of the megamorphic
     #! dispatch entry point.
-    combination get #>> [ f inline-cache-miss ] 3curry [ ] like ;
+    combination get #>> [ { } inline-cache-miss ] 3curry [ ] like ;
 
 : make-empty-cache ( -- array )
     mega-cache-size get f <array> ;

@@ -14,7 +14,8 @@ IN: bootstrap.tools
     "tools.test"
     "tools.time"
     "tools.threads"
-    "tools.vocabs"
-    "tools.vocabs.monitor"
+    "vocabs.hierarchy"
+    "vocabs.refresh"
+    "vocabs.refresh.monitor"
     "editors"
 } [ require ] each

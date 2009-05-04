@@ -48,8 +48,8 @@ HELP: world
 } ;
 
 HELP: <world>
-{ $values { "gadget" gadget } { "title" string } { "status" model } { "world" "a new " { $link world } } }
-{ $description "Creates a new " { $link world } " delegating to the given gadget." } ;
+{ $values { "world-attributes" world-attributes } { "world" "a new " { $link world } } }
+{ $description "Creates a new " { $link world } " or world subclass with the given attributes." } ;
 
 HELP: find-world
 { $values { "gadget" gadget } { "world/f" { $maybe world } } }
@@ -65,6 +65,30 @@ HELP: find-gl-context
 { $description "Makes the OpenGL context of the gadget's containing native window the current OpenGL context." }
 { $notes "This word should be called from " { $link graft* } " and " { $link ungraft* } " methods which need to allocate and deallocate OpenGL resources, such as textures, display lists, and so on." } ;
 
+HELP: begin-world
+{ $values { "world" world } }
+{ $description "Called immediately after " { $snippet "world" } "'s OpenGL context has been created. The world's OpenGL context is current when this method is called." } ;
+
+HELP: end-world
+{ $values { "world" world } }
+{ $description "Called immediately before " { $snippet "world" } "'s OpenGL context is destroyed. The world's OpenGL context is current when this method is called." } ;
+
+HELP: resize-world
+{ $values { "world" world } }
+{ $description "Called when the window containing " { $snippet "world" } " is resized. The " { $snippet "loc" } " and " { $snippet "dim" } " slots of " { $snippet "world" } " will be updated with the world's new position and size. The world's OpenGL context is current when this method is called." } ;
+
+HELP: draw-world*
+{ $values { "world" world } }
+{ $description "Called when " { $snippet "world" } " needs to be redrawn. The world's OpenGL context is current when this method is called." } ;
+
+ARTICLE: "ui.gadgets.worlds-subclassing" "Subclassing worlds"
+"The " { $link world } " gadget can be subclassed, giving Factor code full control of the window's OpenGL context. The following generic words can be overridden to replace standard UI behavior:"
+{ $subsection begin-world }
+{ $subsection end-world }
+{ $subsection resize-world }
+{ $subsection draw-world* }
+"See the " { $vocab-link "spheres" } " and " { $vocab-link "bunny" } " demos for examples." ;
+
 ARTICLE: "ui-paint-custom" "Implementing custom drawing logic"
 "The UI uses OpenGL to render gadgets. Custom rendering logic can be plugged in with the " { $link "ui-pen-protocol" } ", or by implementing a generic word:"
 { $subsection draw-gadget* }
@@ -72,7 +96,8 @@ ARTICLE: "ui-paint-custom" "Implementing custom drawing logic"
 $nl
 "Gadgets which need to allocate and deallocate OpenGL resources such as textures, display lists, and so on, should perform the allocation in the " { $link graft* } " method, and the deallocation in the " { $link ungraft* } " method. Since those words are not necessarily called with the gadget's OpenGL context active, a utility word can be used to find and make the correct OpenGL context current:"
 { $subsection find-gl-context }
-"OpenGL state must not be altered as a result of drawing a gadget, so any flags which were enabled should be disabled, and vice versa."
+"OpenGL state must not be altered as a result of drawing a gadget, so any flags which were enabled should be disabled, and vice versa. To take full control of the OpenGL context, see " { $link "ui.gadgets.worlds-subclassing" } "."
 { $subsection "ui-paint-coord" }
+{ $subsection "ui.gadgets.worlds-subclassing" }
 { $subsection "gl-utilities" }
 { $subsection "text-rendering" } ;

@@ -1,26 +1,28 @@
 USING: accessors assocs classes.mixin classes.tuple
 classes.tuple.parser compiler.units fry kernel sequences mongodb.driver
-mongodb.msg mongodb.tuple.collection mongodb.tuple.index
+mongodb.msg mongodb.tuple.collection 
 mongodb.tuple.persistent mongodb.tuple.state strings ;
 
 IN: mongodb.tuple
+
+SINGLETONS: +fieldindex+ +compoundindex+ +deepindex+ +unique+ ;
 
 SYNTAX: MDBTUPLE:
     parse-tuple-definition
     mdb-check-slots
     define-tuple-class ; 
 
-: define-persistent ( class collection options -- )
-    [ [ <mdb-tuple-collection> dupd link-collection ] when* ] dip 
-    [ dup '[ _ mdb-persistent add-mixin-instance ] with-compilation-unit ] dip
-    ! [ dup annotate-writers ] dip 
-    set-slot-map ;
+: define-persistent ( class collection slot-options index -- )
+    [ [ <mdb-tuple-collection> dupd link-collection ] when* ] 2dip 
+    [ dup '[ _ mdb-persistent add-mixin-instance ] with-compilation-unit ] 2dip
+    [ drop set-slot-map ] 
+    [ nip set-index-map ] 3bi ; inline
 
 : ensure-table ( class -- )
     tuple-collection
     [ create-collection ]
-    [ [ tuple-index-list ] keep
-      '[ _ name>> swap [ name>> ] [ spec>> ] bi <index-spec> ensure-index ] each
+    [ [ mdb-index-map values ] keep
+      '[ _ name>> >>ns ensure-index ] each
     ] bi ;
 
 : ensure-tables ( classes -- )
@@ -28,7 +30,7 @@ SYNTAX: MDBTUPLE:
 
 : drop-table ( class -- )
       tuple-collection
-      [ [ tuple-index-list ] keep
+      [ [ mdb-index-map values ] keep
         '[ _ name>> swap name>> drop-index ] each ]
       [ name>> drop-collection ] bi ;
 
@@ -40,11 +42,11 @@ SYNTAX: MDBTUPLE:
 
 GENERIC: id-selector ( object -- selector )
 
-M: string id-selector ( objid -- selector )
-   "_id" H{ } clone [ set-at ] keep ; inline
+M: toid id-selector
+   [ value>> ] [ key>> ] bi H{ } clone [ set-at ] keep ; inline
 
-M: mdb-persistent id-selector ( mdb-persistent -- selector )
-   _id>> id-selector ;
+M: mdb-persistent id-selector
+   >toid id-selector ;
 
 : (save-tuples) ( collection assoc -- )
    swap '[ [ _ ] 2dip
@@ -62,9 +64,8 @@ PRIVATE>
    save-tuple ;
 
 : delete-tuple ( tuple -- )
-   dup persistent?
-   [ [ tuple-collection name>> ] keep
-     id-selector delete ] [ drop ] if ;
+   [ tuple-collection name>> ] keep
+   id-selector delete ;
 
 : tuple>query ( tuple -- query )
    [ tuple-collection name>> ] keep
