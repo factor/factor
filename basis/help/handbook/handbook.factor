@@ -281,7 +281,7 @@ ARTICLE: "handbook-tools-reference" "Developer tools"
 { $heading "Workflow" }
 { $subsection "listener" }
 { $subsection "editor" }
-{ $subsection "tools.vocabs" }
+{ $subsection "vocabs.refresh" }
 { $subsection "tools.test" }
 { $subsection "help" }
 { $heading "Debugging" }
@@ -292,6 +292,7 @@ ARTICLE: "handbook-tools-reference" "Developer tools"
 { $heading "Browsing" }
 { $subsection "see" }
 { $subsection "tools.crossref" }
+{ $subsection "vocabs.hierarchy" }
 { $heading "Performance" }
 { $subsection "timing" }
 { $subsection "profiling" }

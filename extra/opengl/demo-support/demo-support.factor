@@ -1,6 +1,6 @@
 USING: arrays kernel math math.functions math.order math.vectors
 namespaces opengl opengl.gl sequences ui ui.gadgets ui.gestures
-ui.render accessors combinators ;
+ui.gadgets.worlds ui.render accessors combinators ;
 IN: opengl.demo-support
 
 : FOV ( -- x ) 2.0 sqrt 1+ ; inline
@@ -9,62 +9,62 @@ CONSTANT: KEY-ROTATE-STEP 10.0
 
 SYMBOL: last-drag-loc
 
-TUPLE: demo-gadget < gadget yaw pitch distance ;
+TUPLE: demo-world < world yaw pitch distance ;
 
-: new-demo-gadget ( yaw pitch distance class -- gadget )
-    new
-        swap >>distance
-        swap >>pitch
-        swap >>yaw ; inline
+: set-demo-orientation ( world yaw pitch distance -- world )
+    [ >>yaw ] [ >>pitch ] [ >>distance ] tri* ;
 
 GENERIC: far-plane ( gadget -- z )
 GENERIC: near-plane ( gadget -- z )
 GENERIC: distance-step ( gadget -- dz )
 
-M: demo-gadget far-plane ( gadget -- z )
+M: demo-world far-plane ( gadget -- z )
     drop 4.0 ;
-M: demo-gadget near-plane ( gadget -- z )
+M: demo-world near-plane ( gadget -- z )
     drop 1.0 64.0 / ;
-M: demo-gadget distance-step ( gadget -- dz )
+M: demo-world distance-step ( gadget -- dz )
     drop 1.0 64.0 / ;
 
 : fov-ratio ( gadget -- fov ) dim>> dup first2 min v/n ;
 
-: yaw-demo-gadget ( yaw gadget -- )
+: yaw-demo-world ( yaw gadget -- )
     [ + ] with change-yaw relayout-1 ;
 
-: pitch-demo-gadget ( pitch gadget -- )
+: pitch-demo-world ( pitch gadget -- )
     [ + ] with change-pitch relayout-1 ;
 
-: zoom-demo-gadget ( distance gadget -- )
+: zoom-demo-world ( distance gadget -- )
     [ + ] with change-distance relayout-1 ;
 
-M: demo-gadget pref-dim* ( gadget -- dim )
+M: demo-world focusable-child* ( world -- gadget )
+    drop t ;
+
+M: demo-world pref-dim* ( gadget -- dim )
     drop { 640 480 } ;
 
 : -+ ( x -- -x x )
     [ neg ] keep ;
 
-: demo-gadget-frustum ( gadget -- -x x -y y near far )
+: demo-world-frustum ( world -- -x x -y y near far )
     [ near-plane ] [ far-plane ] [ fov-ratio ] tri [
         nip swap FOV / v*n
         first2 [ -+ ] bi@
     ] 3keep drop ;
 
-: demo-gadget-set-matrices ( gadget -- )
+M: demo-world resize-world
+    GL_PROJECTION glMatrixMode
+    glLoadIdentity
+    [ [ 0 0 ] dip dim>> first2 glViewport ]
+    [ demo-world-frustum glFrustum ] bi ;
+
+: demo-world-set-matrix ( gadget -- )
     GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
-    [
-        GL_PROJECTION glMatrixMode
-        glLoadIdentity
-        demo-gadget-frustum glFrustum
-    ] [
-        GL_MODELVIEW glMatrixMode
-        glLoadIdentity
-        [ [ 0.0 0.0 ] dip distance>> neg glTranslatef ]
-        [ pitch>> 1.0 0.0 0.0 glRotatef ]
-        [ yaw>>   0.0 1.0 0.0 glRotatef ]
-        tri
-    ] bi ;
+    GL_MODELVIEW glMatrixMode
+    glLoadIdentity
+    [ [ 0.0 0.0 ] dip distance>> neg glTranslatef ]
+    [ pitch>> 1.0 0.0 0.0 glRotatef ]
+    [ yaw>>   0.0 1.0 0.0 glRotatef ]
+    tri ;
 
 : reset-last-drag-rel ( -- )
     { 0 0 } last-drag-loc set-global ;
@@ -94,16 +94,16 @@ M: demo-gadget pref-dim* ( gadget -- dim )
         swap first swap second glVertex2d
     ] do-state ;
 
-demo-gadget H{
-    { T{ key-down f f "LEFT"  } [ KEY-ROTATE-STEP neg swap yaw-demo-gadget ] }
-    { T{ key-down f f "RIGHT" } [ KEY-ROTATE-STEP     swap yaw-demo-gadget ] }
-    { T{ key-down f f "DOWN"  } [ KEY-ROTATE-STEP neg swap pitch-demo-gadget ] }
-    { T{ key-down f f "UP"    } [ KEY-ROTATE-STEP     swap pitch-demo-gadget ] }
-    { T{ key-down f f "="     } [ dup distance-step neg swap zoom-demo-gadget ] }
-    { T{ key-down f f "-"     } [ dup distance-step     swap zoom-demo-gadget ] }
+demo-world H{
+    { T{ key-down f f "LEFT"  } [ KEY-ROTATE-STEP neg swap yaw-demo-world ] }
+    { T{ key-down f f "RIGHT" } [ KEY-ROTATE-STEP     swap yaw-demo-world ] }
+    { T{ key-down f f "DOWN"  } [ KEY-ROTATE-STEP neg swap pitch-demo-world ] }
+    { T{ key-down f f "UP"    } [ KEY-ROTATE-STEP     swap pitch-demo-world ] }
+    { T{ key-down f f "="     } [ dup distance-step neg swap zoom-demo-world ] }
+    { T{ key-down f f "-"     } [ dup distance-step     swap zoom-demo-world ] }
     
     { T{ button-down f f 1 }    [ drop reset-last-drag-rel ] }
-    { T{ drag f 1 }             [ drag-yaw-pitch rot [ pitch-demo-gadget ] keep yaw-demo-gadget ] }
-    { mouse-scroll              [ scroll-direction get second over distance-step * swap zoom-demo-gadget ] }
+    { T{ drag f 1 }             [ drag-yaw-pitch rot [ pitch-demo-world ] keep yaw-demo-world ] }
+    { mouse-scroll              [ scroll-direction get second over distance-step * swap zoom-demo-world ] }
 } set-gestures
 

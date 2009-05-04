@@ -4,6 +4,8 @@
 	#define F_STDCALL
 #endif
 
+#define DLLEXPORT
+
 DLLEXPORT void ffi_test_0(void);
 DLLEXPORT int ffi_test_1(void);
 DLLEXPORT int ffi_test_2(int x, int y);
