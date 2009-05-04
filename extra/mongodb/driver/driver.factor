@@ -178,7 +178,7 @@ M: mdb-query-msg skip
 GENERIC# sort 1 ( mdb-query-msg sort-quot -- mdb-query-msg )
 
 M: mdb-query-msg sort
-    output>array >>orderby ; inline
+    output>array [ 1array >hashtable ] map >>orderby ; inline
 
 : key-spec ( spec-quot -- spec-assoc )
     output>array >hashtable ; inline
