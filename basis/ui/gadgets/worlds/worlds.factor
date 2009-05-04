@@ -24,6 +24,7 @@ TUPLE: world-attributes
     status
     gadgets
     { pixel-format-attributes initial: $ default-world-pixel-format-attributes } ;
+
 C: <world-attributes> world-attributes
 
 : find-world ( gadget -- world/f ) [ world? ] find-parent ;
@@ -97,10 +98,22 @@ flush-layout-cache-hook [ [ ] ] initialize
 GENERIC: begin-world ( world -- )
 GENERIC: end-world ( world -- )
 
+GENERIC: resize-world ( world -- )
+
 M: world begin-world
     drop ;
 M: world end-world
     drop ;
+M: world resize-world
+    drop ;
+
+M: world (>>dim)
+    [ call-next-method ]
+    [
+        dup handle>>
+        [ select-gl-context resize-world ]
+        [ drop ] if*
+    ] bi ;
 
 GENERIC: draw-world* ( world -- )
 
