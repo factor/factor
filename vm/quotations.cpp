@@ -323,11 +323,11 @@ fixnum quot_code_offset_to_scan(cell quot_, cell offset)
 	gc_root<quotation> quot(quot_);
 	gc_root<array> array(quot->array);
 
-	quotation_jit jit(quot.value(),false,false);
-	jit.compute_position(offset);
-	jit.iterate_quotation();
+	quotation_jit compiler(quot.value(),false,false);
+	compiler.compute_position(offset);
+	compiler.iterate_quotation();
 
-	return jit.get_position();
+	return compiler.get_position();
 }
 
 VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack)
