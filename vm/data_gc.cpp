@@ -637,7 +637,7 @@ void clear_gc_stats(void)
 {
 	int i;
 	for(i = 0; i < MAX_GEN_COUNT; i++)
-		memset(&stats[i],0,sizeof(stats));
+		memset(&stats[i],0,sizeof(gc_stats));
 
 	cards_scanned = 0;
 	decks_scanned = 0;

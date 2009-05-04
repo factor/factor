@@ -10,10 +10,12 @@ char *pinned_alien_offset(cell obj)
 	switch(tagged<object>(obj).type())
 	{
 	case ALIEN_TYPE:
-		alien *ptr = untag<alien>(obj);
-		if(ptr->expired != F)
-			general_error(ERROR_EXPIRED,obj,F,NULL);
-		return pinned_alien_offset(ptr->alien) + ptr->displacement;
+		{
+			alien *ptr = untag<alien>(obj);
+			if(ptr->expired != F)
+				general_error(ERROR_EXPIRED,obj,F,NULL);
+			return pinned_alien_offset(ptr->alien) + ptr->displacement;
+		}
 	case F_TYPE:
 		return NULL;
 	default:
@@ -165,10 +167,12 @@ VM_C_API char *alien_offset(cell obj)
 	case BYTE_ARRAY_TYPE:
 		return untag<byte_array>(obj)->data<char>();
 	case ALIEN_TYPE:
-		alien *ptr = untag<alien>(obj);
-		if(ptr->expired != F)
-			general_error(ERROR_EXPIRED,obj,F,NULL);
-		return alien_offset(ptr->alien) + ptr->displacement;
+		{
+			alien *ptr = untag<alien>(obj);
+			if(ptr->expired != F)
+				general_error(ERROR_EXPIRED,obj,F,NULL);
+			return alien_offset(ptr->alien) + ptr->displacement;
+		}
 	case F_TYPE:
 		return NULL;
 	default:

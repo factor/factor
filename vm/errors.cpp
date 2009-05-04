@@ -16,14 +16,14 @@ void out_of_memory(void)
 	exit(1);
 }
 
-void fatal_error(char* msg, cell tagged)
+void fatal_error(const char* msg, cell tagged)
 {
 	print_string("fatal_error: "); print_string(msg);
 	print_string(": "); print_cell_hex(tagged); nl();
 	exit(1);
 }
 
-void critical_error(char* msg, cell tagged)
+void critical_error(const char* msg, cell tagged)
 {
 	print_string("You have triggered a bug in Factor. Please report.\n");
 	print_string("critical_error: "); print_string(msg);
