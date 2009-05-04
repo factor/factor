@@ -266,4 +266,4 @@ M: object run-pipeline-element
     [ ]
 } cond
 
-: run-desc ( desc -- result ) ascii <process-reader> f swap stream-read-until drop ;
+: run-desc ( desc -- result ) ascii <process-reader> f swap stream-read-until drop but-last ;
