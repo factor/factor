@@ -205,15 +205,21 @@ M: vocab-link summary vocab-summary ;
 : set-vocab-authors ( authors vocab -- )
     dup vocab-authors-path set-vocab-file-contents ;
 
-: subdirs ( dir -- dirs )
+
+<PRIVATE
+: valid-vocab-dirname ( dirname -- ? )
+    dup empty? [ drop f ] [ first CHAR: . = not ] if ;
+PRIVATE>
+
+: vocab-subdirs ( dir -- dirs )
     [
-        [ link-info directory? ] filter
+        [ [ link-info directory? ] [ valid-vocab-dirname ] bi and ] filter
     ] with-directory-files natural-sort ;
 
 : (all-child-vocabs) ( root name -- vocabs )
     [
         vocab-dir append-path dup exists?
-        [ subdirs ] [ drop { } ] if
+        [ vocab-subdirs ] [ drop { } ] if
     ] keep [
         swap [ "." glue ] with map
     ] unless-empty ;
@@ -235,6 +241,11 @@ M: vocab-link summary vocab-summary ;
         dup [ "" vocabs-in-dir ] { } make
     ] { } map>assoc ;
 
+: all-vocabs-under ( prefix -- vocabs )
+    [
+        vocab-roots get [ over vocabs-in-dir ] each drop
+    ] { } make ;
+
 MEMO: all-vocabs-seq ( -- seq )
     all-vocabs values concat ;
 
@@ -251,6 +262,9 @@ MEMO: all-vocabs-seq ( -- seq )
 
 : load-everything ( -- )
     try-everything load-failures. ;
+
+: load-all-under ( prefix -- )
+    all-vocabs-under filter-unportable require-all load-failures. ;
 
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . suffix ] unless
