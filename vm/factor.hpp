@@ -10,7 +10,7 @@ VM_C_API void start_standalone_factor(int argc, vm_char **argv);
 
 VM_C_API char *factor_eval_string(char *string);
 VM_C_API void factor_eval_free(char *result);
-VM_C_API void factor_yield(void);
+VM_C_API void factor_yield();
 VM_C_API void factor_sleep(long ms);
 
 }

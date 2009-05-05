@@ -5,11 +5,11 @@ namespace factor
 #define FACTOR_OS_STRING "macosx"
 #define NULL_DLL "libfactor.dylib"
 
-void init_signals(void);
-void early_init(void);
+void init_signals();
+void early_init();
 
-const char *vm_executable_path(void);
-const char *default_image_path(void);
+const char *vm_executable_path();
+const char *default_image_path();
 
 inline static void *ucontext_stack_pointer(void *uap)
 {
