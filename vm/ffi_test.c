@@ -319,3 +319,8 @@ _Complex float ffi_test_47(_Complex float x, _Complex double y)
 {
 	return x + 2 * y;
 }
+
+short ffi_test_48(struct bool_field_test x)
+{
+	return x.parents;
+}
