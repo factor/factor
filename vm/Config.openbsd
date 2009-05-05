@@ -1,5 +1,6 @@
 include vm/Config.unix
 PLAF_DLL_OBJS += vm/os-genunix.o vm/os-openbsd.o
 CC = egcc
+CPP = eg++
 CFLAGS += -export-dynamic
 LIBS = -L/usr/local/lib/ -lm $(X11_UI_LIBS) -lz -lssl -lcrypto -lpthread

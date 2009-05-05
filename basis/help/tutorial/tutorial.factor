@@ -1,6 +1,6 @@
 USING: help.markup help.syntax ui.commands ui.operations
 editors vocabs.loader kernel sequences prettyprint tools.test
-tools.vocabs strings unicode.categories unicode.case
+vocabs.refresh strings unicode.categories unicode.case
 ui.tools.browser ui.tools.common ;
 IN: help.tutorial
 

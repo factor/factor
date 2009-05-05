@@ -20,7 +20,7 @@ implementation. It is not an introduction to the language itself.
 
 * Compiling the Factor VM
 
-The Factor runtime is written in GNU C99, and is built with GNU make and
+The Factor runtime is written in GNU C++, and is built with GNU make and
 gcc.
 
 Factor supports various platforms. For an up-to-date list, see
@@ -138,7 +138,7 @@ usage documentation, enter the following in the UI listener:
 The Factor source tree is organized as follows:
 
   build-support/ - scripts used for compiling Factor
-  vm/ - sources for the Factor VM, written in C
+  vm/ - sources for the Factor VM, written in C++
   core/ - Factor core library
   basis/ - Factor basis library, compiler, tools
   extra/ - more libraries and applications

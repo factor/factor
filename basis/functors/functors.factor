@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel quotations classes.tuple make combinators generic
-words interpolate namespaces sequences io.streams.string fry
-classes.mixin effects lexer parser classes.tuple.parser
-effects.parser locals.types locals.parser generic.parser
-locals.rewrite.closures vocabs.parser classes.parser
-arrays accessors words.symbol ;
+USING: accessors arrays classes.mixin classes.parser
+classes.tuple classes.tuple.parser combinators effects
+effects.parser fry generic generic.parser generic.standard
+interpolate io.streams.string kernel lexer locals.parser
+locals.rewrite.closures locals.types make namespaces parser
+quotations sequences vocabs.parser words words.symbol ;
 IN: functors
 
 ! This is a hack
@@ -17,6 +17,8 @@ IN: functors
 : define* ( word def -- ) over set-word define ;
 
 : define-declared* ( word def effect -- ) pick set-word define-declared ;
+
+: define-simple-generic* ( word effect -- ) over set-word define-simple-generic ;
 
 TUPLE: fake-call-next-method ;
 
@@ -104,6 +106,11 @@ SYNTAX: `INSTANCE:
     scan-param parsed
     \ add-mixin-instance parsed ;
 
+SYNTAX: `GENERIC:
+    scan-param parsed
+    complete-effect parsed
+    \ define-simple-generic* parsed ;
+
 SYNTAX: `inline [ word make-inline ] over push-all ;
 
 SYNTAX: `call-next-method T{ fake-call-next-method } parsed ;
@@ -130,6 +137,7 @@ DEFER: ;FUNCTOR delimiter
         { "M:" POSTPONE: `M: }
         { "C:" POSTPONE: `C: }
         { ":" POSTPONE: `: }
+        { "GENERIC:" POSTPONE: `GENERIC: }
         { "INSTANCE:" POSTPONE: `INSTANCE: }
         { "SYNTAX:" POSTPONE: `SYNTAX: }
         { "SYMBOL:" POSTPONE: `SYMBOL: }

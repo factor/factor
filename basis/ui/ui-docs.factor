@@ -2,17 +2,28 @@ USING: help.markup help.syntax strings quotations debugger
 namespaces ui.backend ui.gadgets ui.gadgets.worlds
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
 ui.gadgets.private math.rectangles colors ui.text fonts
-kernel ui.private ;
+kernel ui.private classes sequences ;
 IN: ui
 
 HELP: windows
 { $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." } ;
 
-{ windows open-window find-window } related-words
+{ windows open-window find-window world-attributes } related-words
 
 HELP: open-window
-{ $values { "gadget" gadget } { "title" string } }
-{ $description "Opens a native window with the specified title." } ;
+{ $values { "gadget" gadget } { "title/attributes" { "a " { $link string } " or a " { $link world-attributes } " tuple" } } }
+{ $description "Opens a native window containing " { $snippet "gadget" } " with the specified attributes. If a string is provided, it is used as the window title; otherwise, the window attributes are specified in a " { $link world-attributes } " tuple." } ;
+
+HELP: world-attributes
+{ $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } }
+{ $class-description "Tuples of this class can be passed to " { $link open-window } " to control attributes of the window opened. The following attributes can be set:" }
+{ $list
+    { { $snippet "world-class" } " specifies the class of world to construct. " { $link world } " is the default." }
+    { { $snippet "title" } " is the window title." }
+    { { $snippet "status" } ", if specified, is a gadget that will be used as the window's status bar." }
+    { { $snippet "gadgets" } " is a sequence of gadgets that will be placed inside the window." }
+    { { $snippet "pixel-format-attributes" } " is a sequence of " { $link "ui.pixel-formats-attributes" } " that the window will request for its OpenGL pixel format." }
+} ;
 
 HELP: set-fullscreen?
 { $values { "?" "a boolean" } { "gadget" gadget } }
