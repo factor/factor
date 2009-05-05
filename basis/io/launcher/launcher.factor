@@ -5,7 +5,7 @@ assocs combinators vocabs.loader init threads continuations
 math accessors concurrency.flags destructors environment
 io io.encodings.ascii io.backend io.timeouts io.pipes
 io.pipes.private io.encodings io.streams.duplex io.ports
-debugger prettyprint summary calendar ;
+debugger prettyprint summary calendar io.pathnames ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -266,4 +266,4 @@ M: object run-pipeline-element
     [ ]
 } cond
 
-: run-desc ( desc -- result ) ascii <process-reader> f swap stream-read-until drop but-last ;
+: run-desc ( desc -- result ) ascii <process-reader> stream-contents but-last ;
