@@ -25,7 +25,8 @@ TUPLE: world-attributes
     gadgets
     { pixel-format-attributes initial: $ default-world-pixel-format-attributes } ;
 
-C: <world-attributes> world-attributes
+: <world-attributes> ( -- world-attributes )
+    world-attributes new ; inline
 
 : find-world ( gadget -- world/f ) [ world? ] find-parent ;
 
