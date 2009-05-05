@@ -134,7 +134,7 @@ VM_C_API void init_factor(vm_parameters *p)
 
 	userenv[CPU_ENV] = allot_alien(F,(cell)FACTOR_CPU_STRING);
 	userenv[OS_ENV] = allot_alien(F,(cell)FACTOR_OS_STRING);
-	userenv[cell_SIZE_ENV] = tag_fixnum(sizeof(cell));
+	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(cell));
 	userenv[EXECUTABLE_ENV] = allot_alien(F,(cell)p->executable_path);
 	userenv[ARGS_ENV] = F;
 	userenv[EMBEDDED_ENV] = F;
