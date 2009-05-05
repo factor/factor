@@ -4,7 +4,7 @@ USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
 sequences.private assocs models models.arrow arrays accessors
-generic generic.single definitions make sbufs tools.crossref ;
+generic generic.single definitions make sbufs tools.crossref fry ;
 IN: tools.continuations
 
 <PRIVATE
@@ -79,21 +79,18 @@ M: object add-breakpoint ;
     (step-into-call-next-method)
 } [ t "no-compile" set-word-prop ] each >>
 
+: >innermost-frame< ( callstack -- n quot )
+    [ innermost-frame-scan 1 + ] [ innermost-frame-executing ] bi ;
+
+: (change-frame) ( callstack quot -- callstack' )
+    [ dup innermost-frame-executing quotation? ] dip '[
+        clone [ >innermost-frame< @ ] [ set-innermost-frame-quot ] [ ] tri
+    ] when ; inline
+
 : change-frame ( continuation quot -- continuation' )
     #! Applies quot to innermost call frame of the
     #! continuation.
-    [ clone ] dip [
-        [ clone ] dip
-        [
-            [
-                [ innermost-frame-scan 1+ ]
-                [ innermost-frame-quot ] bi
-            ] dip call
-        ]
-        [ drop set-innermost-frame-quot ]
-        [ drop ]
-        2tri
-    ] curry change-call ; inline
+    [ clone ] dip '[ _ (change-frame) ] change-call ; inline
 
 PRIVATE>
 
@@ -101,14 +98,13 @@ PRIVATE>
     [
         2dup length = [ nip [ break ] append ] [
             2dup nth \ break = [ nip ] [
-                swap 1+ cut [ break ] glue 
+                swap 1 + cut [ break ] glue 
             ] if
         ] if
     ] change-frame ;
 
 : continuation-step-out ( continuation -- continuation' )
     [ nip \ break suffix ] change-frame ;
-
 
 {
     { call [ (step-into-quot) ] }
@@ -124,7 +120,7 @@ PRIVATE>
 
 ! Never step into these words
 : don't-step-into ( word -- )
-    dup [ execute break ] curry "step-into" set-word-prop ;
+    dup '[ _ execute break ] "step-into" set-word-prop ;
 
 {
     >n ndrop >c c>
@@ -151,6 +147,4 @@ PRIVATE>
     ] change-frame ;
 
 : continuation-current ( continuation -- obj )
-    call>>
-    [ innermost-frame-scan 1+ ]
-    [ innermost-frame-quot ] bi ?nth ;
+    call>> >innermost-frame< ?nth ;

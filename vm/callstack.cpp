@@ -195,9 +195,9 @@ stack_frame *innermost_stack_frame_quot(callstack *callstack)
 
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
-PRIMITIVE(innermost_stack_frame_quot)
+PRIMITIVE(innermost_stack_frame_executing)
 {
-	dpush(frame_executing(innermost_stack_frame_quot(untag_check<callstack>(dpop()))));
+	dpush(frame_executing(innermost_stack_frame(untag_check<callstack>(dpop()))));
 }
 
 PRIMITIVE(innermost_stack_frame_scan)
