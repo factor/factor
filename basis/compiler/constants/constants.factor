@@ -23,7 +23,7 @@ CONSTANT: deck-bits 18
 : quot-xt-offset ( -- n ) 5 bootstrap-cells quotation tag-number - ; inline
 : word-code-offset ( -- n ) 10 bootstrap-cells \ word tag-number - ; inline
 : array-start-offset ( -- n ) 2 bootstrap-cells array tag-number - ; inline
-: compiled-header-size ( -- n ) 5 bootstrap-cells ; inline
+: compiled-header-size ( -- n ) 4 bootstrap-cells ; inline
 
 ! Relocation classes
 CONSTANT: rc-absolute-cell    0
