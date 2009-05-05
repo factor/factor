@@ -25,8 +25,8 @@ void unmark_marked(heap *heap);
 void free_unmarked(heap *heap, heap_iterator iter);
 void heap_usage(heap *h, cell *used, cell *total_free, cell *max_free);
 cell heap_size(heap *h);
-cell compute_heap_forwarding(heap *h, std::tr1::unordered_map<heap_block *,char *> &forwarding);
-void compact_heap(heap *h, std::tr1::unordered_map<heap_block *,char *> &forwarding);
+cell compute_heap_forwarding(heap *h, unordered_map<heap_block *,char *> &forwarding);
+void compact_heap(heap *h, unordered_map<heap_block *,char *> &forwarding);
 
 inline static heap_block *next_block(heap *h, heap_block *block)
 {
