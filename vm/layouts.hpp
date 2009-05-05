@@ -193,26 +193,19 @@ struct heap_block
 	unsigned char status; /* free or allocated? */
 	unsigned char type; /* this is WORD_TYPE or QUOTATION_TYPE */
 	unsigned char last_scan; /* the youngest generation in which this block's literals may live */
-	char needs_fixup; /* is this a new block that needs full fixup? */
+	unsigned char needs_fixup; /* is this a new block that needs full fixup? */
 
 	/* In bytes, includes this header */
 	cell size;
-
-	/* Used during compaction */
-	heap_block *forwarding;
 };
 
-struct free_heap_block
+struct free_heap_block : public heap_block
 {
-	heap_block block;
-
-	/* Filled in on image load */
         free_heap_block *next_free;
 };
 
-struct code_block
+struct code_block : public heap_block
 {
-	heap_block block;
 	cell literals; /* # bytes */
 	cell relocation; /* tagged pointer to byte-array or f */
 	

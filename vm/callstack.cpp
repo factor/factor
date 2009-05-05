@@ -100,7 +100,7 @@ code_block *frame_code(stack_frame *frame)
 
 cell frame_type(stack_frame *frame)
 {
-	return frame_code(frame)->block.type;
+	return frame_code(frame)->type;
 }
 
 cell frame_executing(stack_frame *frame)

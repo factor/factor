@@ -119,9 +119,11 @@ PRIMITIVE(code_room)
 	dpush(tag_fixnum(max_free / 1024));
 }
 
+static std::tr1::unordered_map<heap_block *,char *> forwarding;
+
 code_block *forward_xt(code_block *compiled)
 {
-	return (code_block *)compiled->block.forwarding;
+	return (code_block *)forwarding[compiled];
 }
 
 void forward_frame_xt(stack_frame *frame)
@@ -132,7 +134,7 @@ void forward_frame_xt(stack_frame *frame)
 	FRAME_RETURN_ADDRESS(frame) = (void *)((cell)forwarded + offset);
 }
 
-void forward_object_xts(void)
+void forward_object_xts()
 {
 	begin_scan();
 
@@ -215,13 +217,13 @@ void compact_code_heap(void)
 	gc();
 
 	/* Figure out where the code heap blocks are going to end up */
-	cell size = compute_heap_forwarding(&code);
+	cell size = compute_heap_forwarding(&code, forwarding);
 
 	/* Update word and quotation code pointers */
 	forward_object_xts();
 
 	/* Actually perform the compaction */
-	compact_heap(&code);
+	compact_heap(&code,forwarding);
 
 	/* Update word and quotation XTs */
 	fixup_object_xts();

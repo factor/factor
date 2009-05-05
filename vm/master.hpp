@@ -9,6 +9,7 @@
 #include <assert.h>
 #endif
 
+/* C headers */
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
@@ -20,6 +21,10 @@
 #include <time.h>
 #include <sys/param.h>
 
+/* C++ headers */
+#include <tr1/unordered_map>
+
+/* Factor headers */
 #include "layouts.hpp"
 #include "platform.hpp"
 #include "primitives.hpp"
