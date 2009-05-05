@@ -39,7 +39,7 @@ PRIMITIVE(dlclose);
 PRIMITIVE(dll_validp);
 
 VM_C_API char *alien_offset(cell object);
-VM_C_API char *unbox_alien(void);
+VM_C_API char *unbox_alien();
 VM_C_API void box_alien(void *ptr);
 VM_C_API void to_value_struct(cell src, void *dest, cell size);
 VM_C_API void box_value_struct(void *src, cell size);

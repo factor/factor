@@ -5,7 +5,7 @@ namespace factor
 
 HMODULE hFactorDll;
 
-void init_ffi(void)
+void init_ffi()
 {
 	hFactorDll = GetModuleHandle(FACTOR_DLL);
 	if(!hFactorDll)
@@ -63,7 +63,7 @@ void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int len
 }
 
 /* You must free() this yourself. */
-const vm_char *default_image_path(void)
+const vm_char *default_image_path()
 {
 	vm_char full_path[MAX_UNICODE_PATH];
 	vm_char *ptr;
@@ -82,7 +82,7 @@ const vm_char *default_image_path(void)
 }
 
 /* You must free() this yourself. */
-const vm_char *vm_executable_path(void)
+const vm_char *vm_executable_path()
 {
 	vm_char full_path[MAX_UNICODE_PATH];
 	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
@@ -131,7 +131,7 @@ void dealloc_segment(segment *block)
 	free(block);
 }
 
-long getpagesize(void)
+long getpagesize()
 {
 	static long g_pagesize = 0;
 	if (! g_pagesize)

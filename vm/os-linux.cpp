@@ -4,7 +4,7 @@ namespace factor
 {
 
 /* Snarfed from SBCL linux-so.c. You must free() this yourself. */
-const char *vm_executable_path(void)
+const char *vm_executable_path()
 {
 	char *path = (char *)safe_malloc(PATH_MAX + 1);
 
@@ -23,7 +23,7 @@ const char *vm_executable_path(void)
 
 #ifdef SYS_inotify_init
 
-int inotify_init(void)
+int inotify_init()
 {
 	return syscall(SYS_inotify_init);
 }
@@ -40,7 +40,7 @@ int inotify_rm_watch(int fd, u32 wd)
 
 #else
 
-int inotify_init(void)
+int inotify_init()
 {
 	not_implemented_error();
 	return -1;
