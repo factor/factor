@@ -94,7 +94,6 @@ const vm_char *vm_executable_path()
 PRIMITIVE(existsp)
 {
 	vm_char *path = untag_check<byte_array>(dpop())->data<vm_char>();
-	wprintf(L"existsp: path is %s\n",path);
 	box_boolean(windows_stat(path));
 }
 
