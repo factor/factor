@@ -6,6 +6,9 @@ card has a slot written to.
 
 the offset of the first object is set by the allocator. */
 
+VM_C_API factor::cell cards_offset;
+VM_C_API factor::cell decks_offset;
+
 namespace factor
 {
 
@@ -18,8 +21,6 @@ typedef u8 card;
 #define CARD_BITS 8
 #define CARD_SIZE (1<<CARD_BITS)
 #define ADDR_CARD_MASK (CARD_SIZE-1)
-
-VM_C_API cell cards_offset;
 
 inline static card *addr_to_card(cell a)
 {
@@ -42,8 +43,6 @@ typedef u8 card_deck;
 #define DECK_SIZE (1<<DECK_BITS)
 #define ADDR_DECK_MASK (DECK_SIZE-1)
 
-VM_C_API cell decks_offset;
-
 inline static card_deck *addr_to_deck(cell a)
 {
 	return (card_deck *)(((cell)a >> DECK_BITS) + decks_offset);
@@ -61,7 +60,7 @@ inline static card *deck_to_card(card_deck *d)
 
 #define INVALID_ALLOT_MARKER 0xff
 
-VM_C_API cell allot_markers_offset;
+extern cell allot_markers_offset;
 
 inline static card *addr_to_allot_marker(object *a)
 {

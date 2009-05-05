@@ -106,14 +106,8 @@ bool save_image(const vm_char *filename)
 	h.bignum_pos_one = bignum_pos_one;
 	h.bignum_neg_one = bignum_neg_one;
 
-	cell i;
-	for(i = 0; i < USER_ENV; i++)
-	{
-		if(i < FIRST_SAVE_ENV)
-			h.userenv[i] = F;
-		else
-			h.userenv[i] = userenv[i];
-	}
+	for(cell i = 0; i < USER_ENV; i++)
+		h.userenv[i] = (save_env_p(i) ? userenv[i] : F);
 
 	bool ok = true;
 
@@ -149,12 +143,10 @@ PRIMITIVE(save_image_and_exit)
 	path.untag_check();
 
 	/* strip out userenv data which is set on startup anyway */
-	cell i;
-	for(i = 0; i < FIRST_SAVE_ENV; i++)
-		userenv[i] = F;
-
-	for(i = LAST_SAVE_ENV + 1; i < STACK_TRACES_ENV; i++)
-		userenv[i] = F;
+	for(cell i = 0; i < USER_ENV; i++)
+	{
+		if(!save_env_p(i)) userenv[i] = F;
+	}
 
 	/* do a full GC + code heap compaction */
 	performing_compaction = true;

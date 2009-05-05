@@ -20,8 +20,10 @@ IN: literals.tests
 
 [ { 1.0 { 0.5 1.5 } 4.0 } ] [ { 1.0 { $[ 1.0 2.0 / ] 1.5 } $[ 2.0 2.0 * ] } ] unit-test
 
-<<
 CONSTANT: constant-a 3
->>
 
 [ { 3 10 "ftw" } ] [ ${ constant-a 10 "ftw" } ] unit-test
+
+: sixty-nine ( -- a b ) 6 9 ;
+
+[ { 6 9 } ] [ ${ sixty-nine } ] unit-test

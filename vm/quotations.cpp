@@ -251,7 +251,7 @@ void quotation_jit::iterate_quotation()
 
 void set_quot_xt(quotation *quot, code_block *code)
 {
-	if(code->block.type != QUOTATION_TYPE)
+	if(code->type != QUOTATION_TYPE)
 		critical_error("Bad param to set_quot_xt",(cell)code);
 
 	quot->code = code;
@@ -297,7 +297,7 @@ PRIMITIVE(quotation_xt)
 	drepl(allot_cell((cell)quot->xt));
 }
 
-void compile_all_words(void)
+void compile_all_words()
 {
 	gc_root<array> words(find_all_words());
 
