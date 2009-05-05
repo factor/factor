@@ -128,7 +128,7 @@ PRIMITIVE(dlsym)
 	gc_root<byte_array> name(dpop());
 	name.untag_check();
 
-	vm_char *sym = (vm_char *)(name.untagged() + 1);
+	symbol_char *sym = name->data<symbol_char>();
 
 	if(library.value() == F)
 		box_alien(ffi_dlsym(NULL,sym));
