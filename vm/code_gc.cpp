@@ -22,9 +22,9 @@ void new_heap(heap *heap, cell size)
 
 static void add_to_free_list(heap *heap, free_heap_block *block)
 {
-	if(block->block.size < FREE_LIST_COUNT * BLOCK_SIZE_INCREMENT)
+	if(block->size < FREE_LIST_COUNT * BLOCK_SIZE_INCREMENT)
 	{
-		int index = block->block.size / BLOCK_SIZE_INCREMENT;
+		int index = block->size / BLOCK_SIZE_INCREMENT;
 		block->next_free = heap->free.small_blocks[index];
 		heap->free.small_blocks[index] = block;
 	}
@@ -73,8 +73,8 @@ void build_free_list(heap *heap, cell size)
 	branch is only taken after loading a new image, not after code GC */
 	if((cell)(end + 1) <= heap->seg->end)
 	{
-		end->block.status = B_FREE;
-		end->block.size = heap->seg->end - (cell)end;
+		end->status = B_FREE;
+		end->size = heap->seg->end - (cell)end;
 
 		/* add final free block */
 		add_to_free_list(heap,end);
@@ -93,7 +93,7 @@ void build_free_list(heap *heap, cell size)
 
 static void assert_free_block(free_heap_block *block)
 {
-	if(block->block.status != B_FREE)
+	if(block->status != B_FREE)
 		critical_error("Invalid block in free list",(cell)block);
 }
 		
@@ -121,7 +121,7 @@ static free_heap_block *find_free_block(heap *heap, cell size)
 	while(block)
 	{
 		assert_free_block(block);
-		if(block->block.size >= size)
+		if(block->size >= size)
 		{
 			if(prev)
 				prev->next_free = block->next_free;
@@ -139,14 +139,14 @@ static free_heap_block *find_free_block(heap *heap, cell size)
 
 static free_heap_block *split_free_block(heap *heap, free_heap_block *block, cell size)
 {
-	if(block->block.size != size )
+	if(block->size != size )
 	{
 		/* split the block in two */
 		free_heap_block *split = (free_heap_block *)((cell)block + size);
-		split->block.status = B_FREE;
-		split->block.size = block->block.size - size;
+		split->status = B_FREE;
+		split->size = block->size - size;
 		split->next_free = block->next_free;
-		block->block.size = size;
+		block->size = size;
 		add_to_free_list(heap,split);
 	}
 
@@ -163,8 +163,8 @@ heap_block *heap_allot(heap *heap, cell size)
 	{
 		block = split_free_block(heap,block,size);
 
-		block->block.status = B_ALLOCATED;
-		return &block->block;
+		block->status = B_ALLOCATED;
+		return block;
 	}
 	else
 		return NULL;
@@ -303,16 +303,16 @@ cell heap_size(heap *heap)
 }
 
 /* Compute where each block is going to go, after compaction */
-cell compute_heap_forwarding(heap *heap)
+	cell compute_heap_forwarding(heap *heap, std::tr1::unordered_map<heap_block *,char *> &forwarding)
 {
 	heap_block *scan = first_block(heap);
-	cell address = (cell)first_block(heap);
+	char *address = (char *)first_block(heap);
 
 	while(scan)
 	{
 		if(scan->status == B_ALLOCATED)
 		{
-			scan->forwarding = (heap_block *)address;
+			forwarding[scan] = address;
 			address += scan->size;
 		}
 		else if(scan->status == B_MARKED)
@@ -321,10 +321,10 @@ cell compute_heap_forwarding(heap *heap)
 		scan = next_block(heap,scan);
 	}
 
-	return address - heap->seg->start;
+	return (cell)address - heap->seg->start;
 }
 
-void compact_heap(heap *heap)
+	void compact_heap(heap *heap, std::tr1::unordered_map<heap_block *,char *> &forwarding)
 {
 	heap_block *scan = first_block(heap);
 
@@ -332,8 +332,8 @@ void compact_heap(heap *heap)
 	{
 		heap_block *next = next_block(heap,scan);
 
-		if(scan->status == B_ALLOCATED && scan != scan->forwarding)
-			memcpy(scan->forwarding,scan,scan->size);
+		if(scan->status == B_ALLOCATED)
+			memmove(forwarding[scan],scan,scan->size);
 		scan = next;
 	}
 }
