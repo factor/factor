@@ -16,7 +16,7 @@ IN: math.polynomials
 PRIVATE>
 
 : powers ( n x -- seq )
-    <array> 1 [ * ] accumulate nip ;
+    <repetition> 1 [ * ] accumulate nip ;
 
 : p= ( p q -- ? ) pextend = ;
 
