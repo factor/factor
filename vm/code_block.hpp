@@ -82,7 +82,7 @@ void mark_object_code_block(object *scan);
 
 void relocate_code_block(code_block *relocating);
 
-inline static bool stack_traces_p(void)
+inline static bool stack_traces_p()
 {
 	return userenv[STACK_TRACES_ENV] != F;
 }

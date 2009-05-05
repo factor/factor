@@ -19,6 +19,6 @@ typedef char symbol_char;
 
 void c_to_factor_toplevel(cell quot);
 long exception_handler(PEXCEPTION_POINTERS pe);
-void open_console(void);
+void open_console();
 
 }
