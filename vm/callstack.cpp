@@ -54,7 +54,7 @@ This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-stack_frame *capture_start(void)
+stack_frame *capture_start()
 {
 	stack_frame *frame = stack_chain->callstack_bottom - 1;
 	while(frame >= stack_chain->callstack_top

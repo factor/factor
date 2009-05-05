@@ -33,7 +33,7 @@ cell last_code_heap_scan;
 bool growing_data_heap;
 data_heap *old_data_heap;
 
-void init_data_gc(void)
+void init_data_gc()
 {
 	performing_gc = false;
 	last_code_heap_scan = NURSERY;
@@ -244,7 +244,7 @@ static void copy_gen_cards(cell gen)
 
 /* Scan cards in all generations older than the one being collected, copying
 old->new references */
-static void copy_cards(void)
+static void copy_cards()
 {
 	u64 start = current_micros();
 
@@ -264,7 +264,7 @@ static void copy_stack_elements(segment *region, cell top)
 		copy_handle((cell*)ptr);
 }
 
-static void copy_registered_locals(void)
+static void copy_registered_locals()
 {
 	cell scan = gc_locals_region->start;
 
@@ -272,7 +272,7 @@ static void copy_registered_locals(void)
 		copy_handle(*(cell **)scan);
 }
 
-static void copy_registered_bignums(void)
+static void copy_registered_bignums()
 {
 	cell scan = gc_bignums_region->start;
 
@@ -295,7 +295,7 @@ static void copy_registered_bignums(void)
 
 /* Copy roots over at the start of GC, namely various constants, stacks,
 the user environment and extra roots registered by local_roots.hpp */
-static void copy_roots(void)
+static void copy_roots()
 {
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
@@ -593,7 +593,7 @@ void garbage_collection(cell gen,
 	performing_gc = false;
 }
 
-void gc(void)
+void gc()
 {
 	garbage_collection(TENURED,false,0);
 }
@@ -633,7 +633,7 @@ PRIMITIVE(gc_stats)
 	dpush(result.elements.value());
 }
 
-void clear_gc_stats(void)
+void clear_gc_stats()
 {
 	int i;
 	for(i = 0; i < MAX_GEN_COUNT; i++)
@@ -681,7 +681,7 @@ PRIMITIVE(become)
 	compile_all_words();
 }
 
-VM_C_API void minor_gc(void)
+VM_C_API void minor_gc()
 {
 	garbage_collection(NURSERY,false,0);
 }

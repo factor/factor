@@ -59,7 +59,7 @@ inline static cell allot_cell(cell x)
 		return tag_fixnum(x);
 }
 
-cell unbox_array_size(void);
+cell unbox_array_size();
 
 inline static double untag_float(cell tagged)
 {

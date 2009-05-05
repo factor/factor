@@ -56,7 +56,7 @@ inline static bool in_zone(zone *z, object *pointer)
 
 cell init_zone(zone *z, cell size, cell base);
 
-void init_card_decks(void);
+void init_card_decks();
 
 data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
 
@@ -86,8 +86,8 @@ cell unaligned_object_size(object *pointer);
 cell binary_payload_start(object *pointer);
 cell object_size(cell tagged);
 
-void begin_scan(void);
-cell next_object(void);
+void begin_scan();
+cell next_object();
 
 PRIMITIVE(data_room);
 PRIMITIVE(size);
@@ -99,7 +99,7 @@ PRIMITIVE(end_scan);
 /* GC is off during heap walking */
 extern bool gc_off;
 
-cell find_all_words(void);
+cell find_all_words();
 
 /* Every object has a regular representation in the runtime, which makes GC
 much simpler. Every slot of the object until binary_payload_start is a pointer

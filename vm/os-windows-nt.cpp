@@ -3,7 +3,7 @@
 namespace factor
 {
 
-s64 current_micros(void)
+s64 current_micros()
 {
 	FILETIME t;
 	GetSystemTimeAsFileTime(&t);
@@ -49,7 +49,7 @@ void c_to_factor_toplevel(cell quot)
 	RemoveVectoredExceptionHandler((void*)exception_handler);
 }
 
-void open_console(void)
+void open_console()
 {
 }
 
