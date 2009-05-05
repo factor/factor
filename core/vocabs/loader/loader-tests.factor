@@ -2,7 +2,7 @@ USING: vocabs.loader tools.test continuations vocabs math
 kernel arrays sequences namespaces io.streams.string
 parser source-files words assocs classes.tuple definitions
 debugger compiler.units accessors eval
-combinators vocabs.parser grouping ;
+combinators vocabs.parser grouping vocabs.files vocabs.refresh ;
 IN: vocabs.loader.tests
 
 ! This vocab should not exist, but just in case...
@@ -17,13 +17,6 @@ IN: vocabs.loader.tests
 
 [ t ]
 [ "kernel" >vocab-link "kernel" vocab = ] unit-test
-
-[ t ] [
-    "kernel" vocab-files
-    "kernel" vocab vocab-files
-    "kernel" <vocab-link> vocab-files
-    3array all-equal?
-] unit-test
 
 IN: vocabs.loader.test.2
 

@@ -152,7 +152,7 @@ M: ratio >base
         [ ".0" append ]
     } cond ;
 
-: float>string ( x -- str )
+: float>string ( n -- str )
     (float>string)
     [ 0 = ] trim-tail >string
     fix-float ;
