@@ -23,8 +23,9 @@ implementation. It is not an introduction to the language itself.
 Factor supports various platforms. For an up-to-date list, see
 <http://factorcode.org>.
 
-The Factor VM is written in C++ and uses the GNU and TR1 extensions.
-As a result, it requires GCC 4.x to compile.
+The Factor VM is written in C++ and uses GNU extensions. When compiling
+with GCC 3.x, boost::unordered_map must be installed. On GCC 4.x, Factor
+uses std::tr1::unordered_map which is shipped as part of GCC.
 
 Run 'make' ('gmake' on *BSD) with no parameters to build the Factor VM.
 
