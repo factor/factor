@@ -115,10 +115,10 @@ PRIMITIVE(dlopen)
 {
 	gc_root<byte_array> path(dpop());
 	path.untag_check();
-	gc_root<dll> dll(allot<dll>(sizeof(dll)));
-	dll->path = path.value();
-	ffi_dlopen(dll.untagged());
-	dpush(dll.value());
+	gc_root<dll> library(allot<dll>(sizeof(dll)));
+	library->path = path.value();
+	ffi_dlopen(library.untagged());
+	dpush(library.value());
 }
 
 /* look up a symbol in a native library */
