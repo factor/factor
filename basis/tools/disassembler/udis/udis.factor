@@ -18,54 +18,54 @@ LIBRARY: libudis86
 
 C-STRUCT: ud_operand
     { "int" "type" }
-    { "uint8_t" "size" }
-    { "uint64_t" "lval" }
+    { "uchar" "size" }
+    { "ulonglong" "lval" }
     { "int" "base" }
     { "int" "index" }
-    { "uint8_t" "offset" }
-    { "uint8_t" "scale" } ;
+    { "uchar" "offset" }
+    { "uchar" "scale" } ;
 
 C-STRUCT: ud
     { "void*" "inp_hook" }
-    { "uint8_t" "inp_curr" }
-    { "uint8_t" "inp_fill" }
+    { "uchar" "inp_curr" }
+    { "uchar" "inp_fill" }
     { "FILE*" "inp_file" }
-    { "uint8_t" "inp_ctr" }
-    { "uint8_t*" "inp_buff" }
-    { "uint8_t*" "inp_buff_end" }
-    { "uint8_t" "inp_end" }
+    { "uchar" "inp_ctr" }
+    { "uchar*" "inp_buff" }
+    { "uchar*" "inp_buff_end" }
+    { "uchar" "inp_end" }
     { "void*" "translator" }
-    { "uint64_t" "insn_offset" }
+    { "ulonglong" "insn_offset" }
     { "char[32]" "insn_hexcode" }
     { "char[64]" "insn_buffer" }
     { "uint" "insn_fill" }
-    { "uint8_t" "dis_mode" }
-    { "uint64_t" "pc" }
-    { "uint8_t" "vendor" }
+    { "uchar" "dis_mode" }
+    { "ulonglong" "pc" }
+    { "uchar" "vendor" }
     { "struct map_entry*" "mapen" }
     { "int" "mnemonic" }
     { "ud_operand[3]" "operand" }
-    { "uint8_t" "error" }
-    { "uint8_t" " " "pfx_rex" }
-    { "uint8_t" "pfx_seg" }
-    { "uint8_t" "pfx_opr" }
-    { "uint8_t" "pfx_adr" }
-    { "uint8_t" "pfx_lock" }
-    { "uint8_t" "pfx_rep" }
-    { "uint8_t" "pfx_repe" }
-    { "uint8_t" "pfx_repne" }
-    { "uint8_t" "pfx_insn" }
-    { "uint8_t" "default64" }
-    { "uint8_t" "opr_mode" }
-    { "uint8_t" "adr_mode" }
-    { "uint8_t" "br_far" }
-    { "uint8_t" "br_near" }
-    { "uint8_t" "implicit_addr" }
-    { "uint8_t" "c1" }
-    { "uint8_t" "c2" }
-    { "uint8_t" "c3" }
-    { "uint8_t[256]" "inp_cache" }
-    { "uint8_t[64]" "inp_sess" }
+    { "uchar" "error" }
+    { "uchar" "pfx_rex" }
+    { "uchar" "pfx_seg" }
+    { "uchar" "pfx_opr" }
+    { "uchar" "pfx_adr" }
+    { "uchar" "pfx_lock" }
+    { "uchar" "pfx_rep" }
+    { "uchar" "pfx_repe" }
+    { "uchar" "pfx_repne" }
+    { "uchar" "pfx_insn" }
+    { "uchar" "default64" }
+    { "uchar" "opr_mode" }
+    { "uchar" "adr_mode" }
+    { "uchar" "br_far" }
+    { "uchar" "br_near" }
+    { "uchar" "implicit_addr" }
+    { "uchar" "c1" }
+    { "uchar" "c2" }
+    { "uchar" "c3" }
+    { "uchar[256]" "inp_cache" }
+    { "uchar[64]" "inp_sess" }
     { "ud_itab_entry*" "itab_entry" } ;
 
 FUNCTION: void ud_translate_intel ( ud* u ) ;
