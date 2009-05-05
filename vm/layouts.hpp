@@ -93,6 +93,9 @@ class object;
 struct header {
 	cell value;
 
+        /* Default ctor to make gcc 3.x happy */
+        header() { abort(); }
+
 	header(cell value_) : value(value_ << TAG_BITS) {}
 
 	void check_header() {

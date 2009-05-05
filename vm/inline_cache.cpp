@@ -70,7 +70,7 @@ static cell determine_inline_cache_type(array *cache_entries)
 	if(!seen_hi_tag && !seen_tuple) return PIC_TAG;
 
 	critical_error("Oops",0);
-	return -1;
+	return 0;
 }
 
 static void update_pic_count(cell type)

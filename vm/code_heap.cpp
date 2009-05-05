@@ -119,7 +119,7 @@ PRIMITIVE(code_room)
 	dpush(tag_fixnum(max_free / 1024));
 }
 
-static std::tr1::unordered_map<heap_block *,char *> forwarding;
+static unordered_map<heap_block *,char *> forwarding;
 
 code_block *forward_xt(code_block *compiled)
 {
