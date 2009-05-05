@@ -16,7 +16,57 @@ IN: tools.disassembler.udis
 
 LIBRARY: libudis86
 
-TYPEDEF: char[592] ud
+C-STRUCT: ud_operand
+    { "int" "type" }
+    { "uint8_t" "size" }
+    { "uint64_t" "lval" }
+    { "int" "base" }
+    { "int" "index" }
+    { "uint8_t" "offset" }
+    { "uint8_t" "scale" } ;
+
+C-STRUCT: ud
+    { "void*" "inp_hook" }
+    { "uint8_t" "inp_curr" }
+    { "uint8_t" "inp_fill" }
+    { "FILE*" "inp_file" }
+    { "uint8_t" "inp_ctr" }
+    { "uint8_t*" "inp_buff" }
+    { "uint8_t*" "inp_buff_end" }
+    { "uint8_t" "inp_end" }
+    { "void*" "translator" }
+    { "uint64_t" "insn_offset" }
+    { "char[32]" "insn_hexcode" }
+    { "char[64]" "insn_buffer" }
+    { "uint" "insn_fill" }
+    { "uint8_t" "dis_mode" }
+    { "uint64_t" "pc" }
+    { "uint8_t" "vendor" }
+    { "struct map_entry*" "mapen" }
+    { "int" "mnemonic" }
+    { "ud_operand[3]" "operand" }
+    { "uint8_t" "error" }
+    { "uint8_t" " " "pfx_rex" }
+    { "uint8_t" "pfx_seg" }
+    { "uint8_t" "pfx_opr" }
+    { "uint8_t" "pfx_adr" }
+    { "uint8_t" "pfx_lock" }
+    { "uint8_t" "pfx_rep" }
+    { "uint8_t" "pfx_repe" }
+    { "uint8_t" "pfx_repne" }
+    { "uint8_t" "pfx_insn" }
+    { "uint8_t" "default64" }
+    { "uint8_t" "opr_mode" }
+    { "uint8_t" "adr_mode" }
+    { "uint8_t" "br_far" }
+    { "uint8_t" "br_near" }
+    { "uint8_t" "implicit_addr" }
+    { "uint8_t" "c1" }
+    { "uint8_t" "c2" }
+    { "uint8_t" "c3" }
+    { "uint8_t[256]" "inp_cache" }
+    { "uint8_t[64]" "inp_sess" }
+    { "ud_itab_entry*" "itab_entry" } ;
 
 FUNCTION: void ud_translate_intel ( ud* u ) ;
 FUNCTION: void ud_translate_att ( ud* u ) ;
