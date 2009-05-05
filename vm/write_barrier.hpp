@@ -60,7 +60,7 @@ inline static card *deck_to_card(card_deck *d)
 
 #define INVALID_ALLOT_MARKER 0xff
 
-cell allot_markers_offset;
+extern cell allot_markers_offset;
 
 inline static card *addr_to_allot_marker(object *a)
 {
