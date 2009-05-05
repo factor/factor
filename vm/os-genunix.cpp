@@ -8,17 +8,17 @@ void c_to_factor_toplevel(cell quot)
 	c_to_factor(quot);
 }
 
-void init_signals(void)
+void init_signals()
 {
 	unix_init_signals();
 }
 
-void early_init(void) { }
+void early_init() { }
 
 #define SUFFIX ".image"
 #define SUFFIX_LEN 6
 
-const char *default_image_path(void)
+const char *default_image_path()
 {
 	const char *path = vm_executable_path();
 
