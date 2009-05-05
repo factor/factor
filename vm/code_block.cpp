@@ -329,7 +329,6 @@ void *get_rel_symbol(array *literals, cell index)
 				return sym;
 			else
 			{
-				printf("%s\n",name);
 				return (void *)undefined_symbol;
 			}
 		}

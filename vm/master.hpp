@@ -22,7 +22,15 @@
 #include <sys/param.h>
 
 /* C++ headers */
-#include <tr1/unordered_map>
+#if __GNUC__ == 4
+        #include <tr1/unordered_map>
+        #define unordered_map std::tr1::unordered_map
+#elif __GNUC__ == 3
+        #include <boost/unordered_map.hpp>
+        #define unordered_map boost::unordered_map
+#else
+        #error Factor requires GCC 3.x or later
+#endif
 
 /* Factor headers */
 #include "layouts.hpp"
