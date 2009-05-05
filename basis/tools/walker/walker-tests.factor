@@ -2,7 +2,7 @@ USING: tools.walker io io.streams.string kernel math
 math.private namespaces prettyprint sequences tools.test
 continuations math.parser threads arrays tools.walker.debug
 generic.single sequences.private kernel.private
-tools.continuations accessors words ;
+tools.continuations accessors words combinators ;
 IN: tools.walker.tests
 
 [ { } ] [
@@ -132,3 +132,17 @@ M: method-breakpoint-tuple method-breakpoint-test break drop 1 2 + ;
 
 [ { 3 } ]
 [ [ T{ method-breakpoint-tuple } method-breakpoint-test ] test-walker ] unit-test
+
+: case-breakpoint-test ( -- x )
+    5 { [ break 1 + ] } case ;
+
+\ case-breakpoint-test don't-step-into
+
+[ { 6 } ] [ [ case-breakpoint-test ] test-walker ] unit-test
+
+: call(-breakpoint-test ( -- x )
+    [ break 1 ] call( -- x ) 2 + ;
+
+\ call(-breakpoint-test don't-step-into
+
+[ { 3 } ] [ [ call(-breakpoint-test ] test-walker ] unit-test

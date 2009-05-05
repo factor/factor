@@ -49,13 +49,13 @@ SYMBOL: mega-cache-size
     cell-bits (first-bignum) ; inline
 
 : most-positive-fixnum ( -- n )
-    first-bignum 1- ; inline
+    first-bignum 1 - ; inline
 
 : most-negative-fixnum ( -- n )
     first-bignum neg ; inline
 
 : (max-array-capacity) ( b -- n )
-    5 - 2^ 1- ; inline
+    5 - 2^ 1 - ; inline
 
 : max-array-capacity ( -- n )
     cell-bits (max-array-capacity) ; inline
@@ -64,7 +64,7 @@ SYMBOL: mega-cache-size
     bootstrap-cell-bits (first-bignum) ;
 
 : bootstrap-most-positive-fixnum ( -- n )
-    bootstrap-first-bignum 1- ;
+    bootstrap-first-bignum 1 - ;
 
 : bootstrap-most-negative-fixnum ( -- n )
     bootstrap-first-bignum neg ;
