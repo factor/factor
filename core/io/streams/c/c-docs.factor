@@ -30,7 +30,7 @@ HELP: <c-writer>
 { $description "Creates a stream which writes data by calling C standard library functions." }
 { $notes "Usually C streams are only used during bootstrap, and non-blocking OS-specific I/O routines are used during normal operation." } ;
 
-HELP: fopen ( path mode -- alien )
+HELP: fopen
 { $values { "path" "a pathname string" } { "mode" "an access mode specifier" } { "alien" "a C FILE* handle" } }
 { $description "Opens a file named by " { $snippet "path" } ". The " { $snippet "mode" } " parameter should be something like " { $snippet "\"r\"" } " or " { $snippet "\"rw\"" } "; consult the " { $snippet "fopen(3)" } " manual page for details." }
 { $errors "Throws an error if the file could not be opened." }

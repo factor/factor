@@ -8,9 +8,7 @@ IN: generic.standard
 
 TUPLE: standard-combination < single-combination # ;
 
-: <standard-combination> ( n -- standard-combination )
-    dup 0 2 between? [ "Bad dispatch position" throw ] unless
-    standard-combination boa ;
+C: <standard-combination> standard-combination
 
 PREDICATE: standard-generic < generic
     "combination" word-prop standard-combination? ;
@@ -28,7 +26,7 @@ CONSTANT: simple-combination T{ standard-combination f 0 }
         { 0 [ [ dup ] ] }
         { 1 [ [ over ] ] }
         { 2 [ [ pick ] ] }
-        [ 1- (picker) [ dip swap ] curry ]
+        [ 1 - (picker) [ dip swap ] curry ]
     } case ;
 
 M: standard-combination picker
@@ -44,7 +42,7 @@ M: standard-combination inline-cache-quot ( word methods -- )
     #! Direct calls to the generic word (not tail calls or indirect calls)
     #! will jump to the inline cache entry point instead of the megamorphic
     #! dispatch entry point.
-    combination get #>> [ f inline-cache-miss ] 3curry [ ] like ;
+    combination get #>> [ { } inline-cache-miss ] 3curry [ ] like ;
 
 : make-empty-cache ( -- array )
     mega-cache-size get f <array> ;

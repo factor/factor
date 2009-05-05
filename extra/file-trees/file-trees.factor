@@ -1,10 +1,10 @@
-USING: accessors delegate delegate.protocols io.pathnames
-kernel locals namespaces sequences vectors
-tools.annotations prettyprint ;
+USING: accessors arrays delegate delegate.protocols
+io.pathnames kernel locals namespaces prettyprint sequences
+ui.frp vectors ;
 IN: file-trees
 
 TUPLE: tree node children ;
-CONSULT: sequence-protocol tree children>> [ node>> ] map ;
+CONSULT: sequence-protocol tree children>> ;
 
 : <tree> ( start -- tree ) V{ } clone
    [ tree boa dup children>> ] [ ".." swap tree boa ] bi swap push ;
@@ -21,3 +21,8 @@ DEFER: (tree-insert)
    ] if* ;
 : create-tree ( file-list -- tree ) [ path-components ] map
    t <tree> [ [ tree-insert ] curry each ] keep ;
+
+: <dir-table> ( tree-model -- table )
+   <frp-list*> [ node>> 1array ] >>quot
+   [ selected-value>> <switch> ]
+   [ swap >>model ] bi ;

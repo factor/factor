@@ -37,7 +37,7 @@ IN: tools.deploy.shaker
     ] when
     strip-dictionary? [
         "compiler.units" init-hooks get delete-at
-        "tools.vocabs" init-hooks get delete-at
+        "vocabs.cache" init-hooks get delete-at
     ] when ;
 
 : strip-debugger ( -- )
@@ -346,13 +346,6 @@ IN: tools.deploy.shaker
 : compress-wrappers ( -- )
     [ wrapper? ] [ ] "wrappers" compress ;
 
-: finish-deploy ( final-image -- )
-    "Finishing up" show
-    V{ } set-namestack
-    V{ } set-catchstack
-    "Saving final image" show
-    save-image-and-exit ;
-
 SYMBOL: deploy-vocab
 
 : [:c] ( -- word ) ":c" "debugger" lookup ;
@@ -437,7 +430,8 @@ SYMBOL: deploy-vocab
                 "Vocabulary has no MAIN: word." print flush 1 exit
             ] unless
             strip
-            finish-deploy
+            "Saving final image" show
+            save-image-and-exit
         ] deploy-error-handler
     ] bind ;
 

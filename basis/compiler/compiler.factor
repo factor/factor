@@ -112,19 +112,18 @@ M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
     } cond ;
 
 : optimize? ( word -- ? )
-    {
-        [ predicate-engine-word? ]
-        [ contains-breakpoints? ]
-        [ single-generic? ]
-    } 1|| not ;
+    { [ predicate-engine-word? ] [ single-generic? ] } 1|| not ;
+
+: contains-breakpoints? ( -- ? )
+    dependencies get keys [ "break?" word-prop ] any? ;
 
 : frontend ( word -- nodes )
     #! If the word contains breakpoints, don't optimize it, since
     #! the walker does not support this.
-    dup optimize?
-    [ [ build-tree ] [ deoptimize ] recover optimize-tree ]
-    [ dup def>> deoptimize-with ]
-    if ;
+    dup optimize? [
+        [ [ build-tree ] [ deoptimize ] recover optimize-tree ] keep
+        contains-breakpoints? [ nip dup def>> deoptimize-with ] [ drop ] if
+    ] [ dup def>> deoptimize-with ] if ;
 
 : compile-dependency ( word -- )
     #! If a word calls an unoptimized word, try to compile the callee.

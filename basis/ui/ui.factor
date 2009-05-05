@@ -4,7 +4,8 @@ USING: arrays assocs io kernel math models namespaces make dlists
 deques sequences threads sequences words continuations init
 combinators combinators.short-circuit hashtables concurrency.flags
 sets accessors calendar fry destructors ui.gadgets ui.gadgets.private
-ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend ui.render ;
+ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend ui.render
+strings ;
 IN: ui
 
 <PRIVATE
@@ -49,8 +50,20 @@ SYMBOL: windows
     f >>focused?
     focus-path f swap focus-gestures ;
 
+: try-to-open-window ( world -- )
+    {
+        [ (open-window) ]
+        [ handle>> select-gl-context ]
+        [
+            [ begin-world ]
+            [ [ handle>> (close-window) ] [ ui-error ] bi* ]
+            recover
+        ]
+        [ resize-world ]
+    } cleave ;
+
 M: world graft*
-    [ (open-window) ]
+    [ try-to-open-window ]
     [ [ title>> ] keep set-title ]
     [ request-focus ] tri ;
 
@@ -66,6 +79,7 @@ M: world graft*
         [ images>> [ dispose ] when* ]
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
+        [ end-world ]
     } cleave ;
 
 M: world ungraft*
@@ -166,13 +180,17 @@ PRIVATE>
 : restore-windows? ( -- ? )
     windows get empty? not ;
 
+: ?attributes ( gadget title/attributes -- attributes )
+    dup string? [ world-attributes new swap >>title ] when
+    swap [ [ [ 1array ] [ f ] if* ] curry unless* ] curry change-gadgets ;
+
 PRIVATE>
 
 : open-world-window ( world -- )
     dup pref-dim >>dim dup relayout graft ;
 
-: open-window ( gadget title -- )
-    f <world> open-world-window ;
+: open-window ( gadget title/attributes -- )
+    ?attributes <world> open-world-window ;
 
 : set-fullscreen? ( ? gadget -- )
     find-world set-fullscreen* ;

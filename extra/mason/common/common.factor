@@ -90,8 +90,8 @@ SYMBOL: stamp
 : ?prepare-build-machine ( -- )
     builds/factor exists? [ prepare-build-machine ] unless ;
 
-CONSTANT: load-everything-vocabs-file "load-everything-vocabs"
-CONSTANT: load-everything-errors-file "load-everything-errors"
+CONSTANT: load-all-vocabs-file "load-everything-vocabs"
+CONSTANT: load-all-errors-file "load-everything-errors"
 
 CONSTANT: test-all-vocabs-file "test-all-vocabs"
 CONSTANT: test-all-errors-file "test-all-errors"
