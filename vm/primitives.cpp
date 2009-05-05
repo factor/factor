@@ -135,7 +135,7 @@ const primitive_type primitives[] = {
 	primitive_sleep,
 	primitive_tuple_boa,
 	primitive_callstack_to_array,
-	primitive_innermost_stack_frame_quot,
+	primitive_innermost_stack_frame_executing,
 	primitive_innermost_stack_frame_scan,
 	primitive_set_innermost_stack_frame_quot,
 	primitive_call_clear,

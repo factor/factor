@@ -9,7 +9,7 @@ cell signal_number;
 cell signal_fault_addr;
 stack_frame *signal_callstack_top;
 
-void out_of_memory(void)
+void out_of_memory()
 {
 	print_string("Out of memory\n\n");
 	dump_generations();
@@ -88,7 +88,7 @@ void type_error(cell type, cell tagged)
 	general_error(ERROR_TYPE,tag_fixnum(type),tagged,NULL);
 }
 
-void not_implemented_error(void)
+void not_implemented_error()
 {
 	general_error(ERROR_NOT_IMPLEMENTED,F,F,NULL);
 }
@@ -125,7 +125,7 @@ void signal_error(int signal, stack_frame *native_stack)
 	general_error(ERROR_SIGNAL,tag_fixnum(signal),F,native_stack);
 }
 
-void divide_by_zero_error(void)
+void divide_by_zero_error()
 {
 	general_error(ERROR_DIVIDE_BY_ZERO,F,F,NULL);
 }
@@ -141,12 +141,12 @@ PRIMITIVE(unimplemented)
 	not_implemented_error();
 }
 
-void memory_signal_handler_impl(void)
+void memory_signal_handler_impl()
 {
 	memory_protection_error(signal_fault_addr,signal_callstack_top);
 }
 
-void misc_signal_handler_impl(void)
+void misc_signal_handler_impl()
 {
 	signal_error(signal_number,signal_callstack_top);
 }
