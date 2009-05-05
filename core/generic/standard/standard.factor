@@ -8,9 +8,7 @@ IN: generic.standard
 
 TUPLE: standard-combination < single-combination # ;
 
-: <standard-combination> ( n -- standard-combination )
-    dup 0 2 between? [ "Bad dispatch position" throw ] unless
-    standard-combination boa ;
+C: <standard-combination> standard-combination
 
 PREDICATE: standard-generic < generic
     "combination" word-prop standard-combination? ;
