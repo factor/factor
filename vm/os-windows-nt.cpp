@@ -17,7 +17,7 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
 
 	if(in_code_heap_p(c->EIP))
-		signal_callstack_top = (void *)c->ESP;
+		signal_callstack_top = (stack_frame *)c->ESP;
 	else
 		signal_callstack_top = NULL;
 
@@ -43,7 +43,7 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 
 void c_to_factor_toplevel(cell quot)
 {
-	if(!AddVectoredExceptionHandler(0, (void*)exception_handler))
+	if(!AddVectoredExceptionHandler(0, exception_handler))
 		fatal_error("AddVectoredExceptionHandler failed", 0);
 	c_to_factor(quot);
 	RemoveVectoredExceptionHandler((void*)exception_handler);
