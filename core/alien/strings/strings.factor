@@ -34,15 +34,15 @@ M: string string>alien
 
 HOOK: alien>native-string os ( alien -- string )
 
-HOOK: native-string>alien os ( string -- alien )
-
 M: windows alien>native-string utf16n alien>string ;
+
+M: unix alien>native-string utf8 alien>string ;
+
+HOOK: native-string>alien os ( string -- alien )
 
 M: wince native-string>alien utf16n string>alien ;
 
 M: winnt native-string>alien utf8 string>alien ;
-
-M: unix alien>native-string utf8 alien>string ;
 
 M: unix native-string>alien utf8 string>alien ;
 
