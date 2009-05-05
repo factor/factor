@@ -14,12 +14,12 @@ void init_ffi(void)
 
 void ffi_dlopen(dll *dll)
 {
-	dll->dll = LoadLibraryEx(alien_offset(dll->path), NULL, 0);
+	dll->dll = LoadLibraryEx((WCHAR *)alien_offset(dll->path), NULL, 0);
 }
 
 void *ffi_dlsym(dll *dll, symbol_char *symbol)
 {
-	return GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
+	return (void *)GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
 }
 
 void ffi_dlclose(dll *dll)
@@ -93,7 +93,8 @@ const vm_char *vm_executable_path(void)
 
 PRIMITIVE(existsp)
 {
-	vm_char *path = (vm_char *)(untag_check<byte_array>(dpop()) + 1);
+	vm_char *path = untag_check<byte_array>(dpop())->data<vm_char>();
+	wprintf(L"existsp: path is %s\n",path);
 	box_boolean(windows_stat(path));
 }
 
@@ -113,7 +114,7 @@ segment *alloc_segment(cell size)
 		getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate high guard page", (cell)mem);
 
-	segment *block = safe_malloc(sizeof(segment));
+	segment *block = (segment *)safe_malloc(sizeof(segment));
 
 	block->start = (cell)mem + getpagesize();
 	block->size = size;
