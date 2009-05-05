@@ -302,7 +302,7 @@ void mark_object_code_block(object *object)
 
 /* References to undefined symbols are patched up to call this function on
 image load */
-void undefined_symbol(void)
+void undefined_symbol()
 {
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
 }

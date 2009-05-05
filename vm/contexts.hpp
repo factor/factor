@@ -46,9 +46,9 @@ extern cell ds_size, rs_size;
 DEFPUSHPOP(d,ds)
 DEFPUSHPOP(r,rs)
 
-void reset_datastack(void);
-void reset_retainstack(void);
-void fix_stacks(void);
+void reset_datastack();
+void reset_retainstack();
+void fix_stacks();
 void init_stacks(cell ds_size, cell rs_size);
 
 PRIMITIVE(datastack);
@@ -57,9 +57,9 @@ PRIMITIVE(set_datastack);
 PRIMITIVE(set_retainstack);
 PRIMITIVE(check_datastack);
 
-VM_C_API void save_stacks(void);
-VM_C_API void nest_stacks(void);
-VM_C_API void unnest_stacks(void);
+VM_C_API void save_stacks();
+VM_C_API void nest_stacks();
+VM_C_API void unnest_stacks();
 
 }
 

@@ -42,18 +42,18 @@ typedef char symbol_char;
 
 void start_thread(void *(*start_routine)(void *));
 
-void init_ffi(void);
+void init_ffi();
 void ffi_dlopen(dll *dll);
 void *ffi_dlsym(dll *dll, symbol_char *symbol);
 void ffi_dlclose(dll *dll);
 
-void unix_init_signals(void);
+void unix_init_signals();
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);
 void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 
-s64 current_micros(void);
+s64 current_micros();
 void sleep_micros(cell usec);
 
-void open_console(void);
+void open_console();
 
 }

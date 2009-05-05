@@ -40,9 +40,7 @@ M: unix alien>native-string utf8 alien>string ;
 
 HOOK: native-string>alien os ( string -- alien )
 
-M: wince native-string>alien utf16n string>alien ;
-
-M: winnt native-string>alien utf8 string>alien ;
+M: windows native-string>alien utf16n string>alien ;
 
 M: unix native-string>alien utf8 string>alien ;
 
