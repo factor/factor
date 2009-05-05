@@ -8,19 +8,19 @@ namespace factor
 cell ds_size, rs_size;
 context *unused_contexts;
 
-void reset_datastack(void)
+void reset_datastack()
 {
 	ds = ds_bot - sizeof(cell);
 }
 
-void reset_retainstack(void)
+void reset_retainstack()
 {
 	rs = rs_bot - sizeof(cell);
 }
 
 #define RESERVED (64 * sizeof(cell))
 
-void fix_stacks(void)
+void fix_stacks()
 {
 	if(ds + sizeof(cell) < ds_bot || ds + RESERVED >= ds_top) reset_datastack();
 	if(rs + sizeof(cell) < rs_bot || rs + RESERVED >= rs_top) reset_retainstack();
@@ -28,7 +28,7 @@ void fix_stacks(void)
 
 /* called before entry into foreign C code. Note that ds and rs might
 be stored in registers, so callbacks must save and restore the correct values */
-void save_stacks(void)
+void save_stacks()
 {
 	if(stack_chain)
 	{
@@ -37,7 +37,7 @@ void save_stacks(void)
 	}
 }
 
-context *alloc_context(void)
+context *alloc_context()
 {
 	context *new_context;
 
@@ -63,7 +63,7 @@ void dealloc_context(context *old_context)
 }
 
 /* called on entry into a compiled callback */
-void nest_stacks(void)
+void nest_stacks()
 {
 	context *new_context = alloc_context();
 
@@ -95,7 +95,7 @@ void nest_stacks(void)
 }
 
 /* called when leaving a compiled callback */
-void unnest_stacks(void)
+void unnest_stacks()
 {
 	ds = stack_chain->datastack_save;
 	rs = stack_chain->retainstack_save;

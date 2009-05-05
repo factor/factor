@@ -219,7 +219,7 @@ PRIMITIVE(byte_array_to_bignum)
 	drepl(tag<bignum>(result));
 }
 
-cell unbox_array_size(void)
+cell unbox_array_size()
 {
 	switch(tagged<object>(dpeek()).type())
 	{

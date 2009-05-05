@@ -24,7 +24,7 @@ cell init_zone(zone *z, cell size, cell start)
 	return z->end;
 }
 
-void init_card_decks(void)
+void init_card_decks()
 {
 	cell start = align(data->seg->start,DECK_SIZE);
 	allot_markers_offset = (cell)data->allot_markers - (start >> CARD_BITS);
@@ -312,7 +312,7 @@ references to an object for debugging purposes. */
 cell heap_scan_ptr;
 
 /* Disables GC and activates next-object ( -- obj ) primitive */
-void begin_scan(void)
+void begin_scan()
 {
 	heap_scan_ptr = data->generations[TENURED].start;
 	gc_off = true;
@@ -323,7 +323,7 @@ PRIMITIVE(begin_scan)
 	begin_scan();
 }
 
-cell next_object(void)
+cell next_object()
 {
 	if(!gc_off)
 		general_error(ERROR_HEAP_SCAN,F,F,NULL);
@@ -348,7 +348,7 @@ PRIMITIVE(end_scan)
 	gc_off = false;
 }
 
-cell find_all_words(void)
+cell find_all_words()
 {
 	growable_array words;
 

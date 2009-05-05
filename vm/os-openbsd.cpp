@@ -3,7 +3,7 @@
 namespace factor
 {
 
-const char *vm_executable_path(void)
+const char *vm_executable_path()
 {
 	return NULL;
 }

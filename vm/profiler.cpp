@@ -5,7 +5,7 @@ namespace factor
 
 bool profiling_p;
 
-void init_profiler(void)
+void init_profiler()
 {
 	profiling_p = false;
 }
