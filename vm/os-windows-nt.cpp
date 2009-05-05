@@ -11,7 +11,7 @@ s64 current_micros()
 		- EPOCH_OFFSET) / 10;
 }
 
-long exception_handler(PEXCEPTION_POINTERS pe)
+FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 {
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
@@ -43,10 +43,10 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 
 void c_to_factor_toplevel(cell quot)
 {
-	if(!AddVectoredExceptionHandler(0, exception_handler))
+	if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)exception_handler))
 		fatal_error("AddVectoredExceptionHandler failed", 0);
 	c_to_factor(quot);
-	RemoveVectoredExceptionHandler((void*)exception_handler);
+	RemoveVectoredExceptionHandler((void *)exception_handler);
 }
 
 void open_console()

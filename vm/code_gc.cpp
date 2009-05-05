@@ -303,7 +303,7 @@ cell heap_size(heap *heap)
 }
 
 /* Compute where each block is going to go, after compaction */
-	cell compute_heap_forwarding(heap *heap, std::tr1::unordered_map<heap_block *,char *> &forwarding)
+	cell compute_heap_forwarding(heap *heap, unordered_map<heap_block *,char *> &forwarding)
 {
 	heap_block *scan = first_block(heap);
 	char *address = (char *)first_block(heap);
@@ -324,7 +324,7 @@ cell heap_size(heap *heap)
 	return (cell)address - heap->seg->start;
 }
 
-	void compact_heap(heap *heap, std::tr1::unordered_map<heap_block *,char *> &forwarding)
+	void compact_heap(heap *heap, unordered_map<heap_block *,char *> &forwarding)
 {
 	heap_block *scan = first_block(heap);
 
