@@ -241,7 +241,7 @@ cell unaligned_object_size(object *pointer)
 		return callstack_size(untag_fixnum(((callstack *)pointer)->length));
 	default:
 		critical_error("Invalid header",(cell)pointer);
-		return -1; /* can't happen */
+		return 0; /* can't happen */
 	}
 }
 
@@ -283,7 +283,7 @@ cell binary_payload_start(object *pointer)
 		return sizeof(wrapper);
 	default:
 		critical_error("Invalid header",(cell)pointer);
-		return -1; /* can't happen */
+                return 0; /* can't happen */
 	}
 }
 
