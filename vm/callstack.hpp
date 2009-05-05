@@ -22,7 +22,7 @@ cell frame_type(stack_frame *frame);
 PRIMITIVE(callstack);
 PRIMITIVE(set_callstack);
 PRIMITIVE(callstack_to_array);
-PRIMITIVE(innermost_stack_frame_quot);
+PRIMITIVE(innermost_stack_frame_executing);
 PRIMITIVE(innermost_stack_frame_scan);
 PRIMITIVE(set_innermost_stack_frame_quot);
 
