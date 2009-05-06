@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.codegen.fixup cpu.architecture
-compiler.constants kernel namespaces make sequences words math
-math.bitwise io.binary parser lexer ;
+USING:  kernel namespaces make sequences words math
+math.bitwise io.binary parser lexer fry ;
 IN: cpu.ppc.assembler.backend
 
 : insn ( operand opcode -- ) { 26 0 } bitfield 4 >be % ;
@@ -74,21 +73,16 @@ SYNTAX: XO1: (XO) (1) (( a s -- )) define-declared ;
 
 GENERIC# (B) 2 ( dest aa lk -- )
 M: integer (B) 18 i-insn ;
-M: word (B) [ 0 ] 2dip (B) rc-relative-ppc-3 rel-word ;
-M: label (B) [ 0 ] 2dip (B) rc-relative-ppc-3 label-fixup ;
 
 GENERIC: BC ( a b c -- )
 M: integer BC 0 0 16 b-insn ;
-M: word BC [ 0 BC ] dip rc-relative-ppc-2 rel-word ;
-M: label BC [ 0 BC ] dip rc-relative-ppc-2 label-fixup ;
 
 : CREATE-B ( -- word ) scan "B" prepend create-in ;
 
 SYNTAX: BC:
     CREATE-B scan-word scan-word
-    [ rot BC ] 2curry (( c -- )) define-declared ;
+    '[ [ _ _ ] dip BC ] (( c -- )) define-declared ;
 
 SYNTAX: B:
     CREATE-B scan-word scan-word scan-word scan-word scan-word
-    [ b-insn ] curry curry curry curry curry
-    (( bo -- )) define-declared ;
+    '[ _ _ _ _ _ b-insn ] (( bo -- )) define-declared ;
