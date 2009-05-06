@@ -10,7 +10,7 @@ TUPLE: range
 { step read-only } ;
 
 : <range> ( a b step -- range )
-    [ over - ] dip [ /i 1+ 0 max ] keep range boa ; inline
+    [ over - ] dip [ /i 1 + 0 max ] keep range boa ; inline
 
 M: range length ( seq -- n )
     length>> ;
