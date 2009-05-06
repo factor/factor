@@ -23,7 +23,7 @@ M: real sqrt
 
 <PRIVATE
 
-GENERIC# ^n 1 ( z w -- z^w )
+GENERIC# ^n 1 ( z w -- z^w ) foldable
 
 : (^n) ( z w -- z^w )
     make-bits 1 [ [ dupd * ] when [ sq ] dip ] reduce nip ; inline
