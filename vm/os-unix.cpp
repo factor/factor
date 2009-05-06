@@ -19,7 +19,7 @@ void start_thread(void *(*start_routine)(void *))
 
 static void *null_dll;
 
-s64 current_micros(void)
+s64 current_micros()
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
@@ -31,7 +31,7 @@ void sleep_micros(cell usec)
 	usleep(usec);
 }
 
-void init_ffi(void)
+void init_ffi()
 {
 	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic unix */
 	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
@@ -145,7 +145,7 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 		fatal_error("sigaction failed", 0);
 }
 
-void unix_init_signals(void)
+void unix_init_signals()
 {
 	struct sigaction memory_sigaction;
 	struct sigaction misc_sigaction;
@@ -279,7 +279,7 @@ void *stdin_loop(void *arg)
 	return NULL;
 }
 
-void open_console(void)
+void open_console()
 {
 	int filedes[2];
 
@@ -304,7 +304,7 @@ void open_console(void)
 	start_thread(stdin_loop);
 }
 
-VM_C_API void wait_for_stdin(void)
+VM_C_API void wait_for_stdin()
 {
 	if(write(control_write,"X",1) != 1)
 	{

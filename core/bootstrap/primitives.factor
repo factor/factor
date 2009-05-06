@@ -493,7 +493,7 @@ tuple
     { "(sleep)" "threads.private" (( us -- )) }
     { "<tuple-boa>" "classes.tuple.private" (( ... layout -- tuple )) }
     { "callstack>array" "kernel" (( callstack -- array )) }
-    { "innermost-frame-quot" "kernel.private" (( callstack -- quot )) }
+    { "innermost-frame-executing" "kernel.private" (( callstack -- obj )) }
     { "innermost-frame-scan" "kernel.private" (( callstack -- n )) }
     { "set-innermost-frame-quot" "kernel.private" (( n callstack -- )) }
     { "call-clear" "kernel" (( quot -- )) }

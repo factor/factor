@@ -14,13 +14,13 @@ typedef void (*code_heap_iterator)(code_block *compiled);
 
 void iterate_code_heap(code_heap_iterator iter);
 
-void copy_code_heap_roots(void);
+void copy_code_heap_roots();
 
 PRIMITIVE(modify_code_heap);
 
 PRIMITIVE(code_room);
 
-void compact_code_heap(void);
+void compact_code_heap();
 
 inline static void check_code_pointer(cell ptr)
 {
