@@ -15,10 +15,16 @@ IN: cpu.ppc
 ! f0-f29: float vregs
 ! f30: float scratch
 
+! Add some methods to the assembler that are useful to us
+M: label (B) [ 0 ] 2dip (B) rc-relative-ppc-3 label-fixup ;
+M: label BC [ 0 BC ] dip rc-relative-ppc-2 label-fixup ;
+
 enable-float-intrinsics
 
-<< \ ##integer>float t frame-required? set-word-prop
-\ ##float>integer t frame-required? set-word-prop >>
+<<
+\ ##integer>float t frame-required? set-word-prop
+\ ##float>integer t frame-required? set-word-prop
+>>
 
 M: ppc machine-registers
     {
@@ -107,7 +113,8 @@ M: ppc stack-frame-size ( stack-frame -- i )
     factor-area-size +
     4 cells align ;
 
-M: ppc %call ( label -- ) BL ;
+M: ppc %call ( word -- ) 0 BL rc-relative-ppc-3 rel-word-pic ;
+M: ppc %jump ( word -- ) 0 B rc-relative-ppc-3 rel-word ;
 M: ppc %jump-label ( label -- ) B ;
 M: ppc %return ( -- ) BLR ;
 
