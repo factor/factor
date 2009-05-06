@@ -84,6 +84,9 @@ void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value)
 	case RC_ABSOLUTE_PPC_2_2:
 		store_address_2_2((cell *)offset,absolute_value);
 		break;
+	case RC_ABSOLUTE_PPC_2:
+		store_address_masked((cell *)offset,absolute_value,REL_ABSOLUTE_PPC_2_MASK,0);
+		break;
 	case RC_RELATIVE_PPC_2:
 		store_address_masked((cell *)offset,relative_value,REL_RELATIVE_PPC_2_MASK,0);
 		break;
