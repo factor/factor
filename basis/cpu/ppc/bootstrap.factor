@@ -9,8 +9,8 @@ IN: bootstrap.ppc
 4 \ cell set
 big-endian on
 
-CONSTANT: ds-reg 29
-CONSTANT: rs-reg 30
+CONSTANT: ds-reg 13
+CONSTANT: rs-reg 14
 
 : factor-area-size ( -- n ) 4 bootstrap-cells ;
 
@@ -58,7 +58,7 @@ CONSTANT: rs-reg 30
     BCTR
 ] jit-primitive jit-define
 
-[ 0 BL rc-relative-ppc-3 rt-xt-direct jit-rel ] jit-word-call jit-define
+[ 0 BL rc-relative-ppc-3 rt-xt-pic jit-rel ] jit-word-call jit-define
 
 [ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-word-jump jit-define
 
@@ -138,6 +138,16 @@ CONSTANT: rs-reg 30
     jit-3r>
 ] jit-3dip jit-define
 
+: prepare-(execute) ( -- operand )
+    3 ds-reg 0 LWZ
+    ds-reg dup 4 SUBI
+    4 3 word-xt-offset LWZ
+    4 ;
+
+[ prepare-(execute) MTCTR BCTR ] jit-execute-jump jit-define
+
+[ prepare-(execute) MTLR BLRL ] jit-execute-call jit-define
+
 [
     0 1 lr-save stack-frame + LWZ
     1 1 stack-frame ADDI
@@ -146,7 +156,91 @@ CONSTANT: rs-reg 30
 
 [ BLR ] jit-return jit-define
 
-! Sub-primitives
+! ! ! Polymorphic inline caches
+
+! Load a value from a stack position
+[
+    4 ds-reg 0 LWZ rc-absolute-ppc-2 rt-untagged jit-rel
+] pic-load jit-define
+
+! Tag
+: load-tag ( -- )
+    4 4 tag-mask get ANDI
+    4 4 tag-bits get SLWI ;
+
+[ load-tag ] pic-tag jit-define
+
+! Hi-tag
+[
+    3 4 MR
+    load-tag
+    0 4 object tag-number tag-fixnum CMPI
+    2 BNE
+    4 3 object tag-number neg LWZ
+] pic-hi-tag jit-define
+
+! Tuple
+[
+    3 4 MR
+    load-tag
+    0 4 tuple tag-number tag-fixnum CMPI
+    2 BNE
+    4 3 tuple tag-number neg bootstrap-cell + LWZ
+] pic-tuple jit-define
+
+! Hi-tag and tuple
+[
+    3 4 MR
+    load-tag
+    ! If bits 2 and 3 are set, the tag is either 6 (object) or 7 (tuple)
+    0 4 BIN: 110 tag-fixnum CMPI
+    5 BLT
+    ! Untag r3
+    3 3 0 0 31 tag-bits get - RLWINM
+    ! Set r4 to 0 for objects, and bootstrap-cell for tuples
+    4 4 1 tag-fixnum ANDI
+    4 4 1 SRAWI
+    ! Load header cell or tuple layout cell
+    4 4 3 LWZX
+] pic-hi-tag-tuple jit-define
+
+[
+    0 4 0 CMPI rc-absolute-ppc-2 rt-immediate jit-rel
+] pic-check-tag jit-define
+
+[
+    0 5 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
+    4 0 5 CMP
+] pic-check jit-define
+
+[ 2 BNE 0 B rc-relative-ppc-3 rt-xt jit-rel ] pic-hit jit-define
+
+! ! ! Megamorphic caches
+
+[
+    ! cache = ...
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
+    ! key = class
+    5 4 MR
+    ! key &= cache.length - 1
+    5 5 mega-cache-size get 1- bootstrap-cell * ANDI
+    ! cache += array-start-offset
+    3 3 array-start-offset ADDI
+    ! cache += key
+    3 3 5 ADD
+    ! if(get(cache) == class)
+    6 3 0 LWZ
+    6 0 4 CMP
+    5 BNE
+    ! ... goto get(cache + bootstrap-cell)
+    3 3 4 LWZ
+    3 3 word-xt-offset LWZ
+    3 MTCTR
+    BCTR
+    ! fall-through on miss
+] mega-lookup jit-define
+
+! ! ! Sub-primitives
 
 ! Quotations and words
 [
@@ -156,14 +250,6 @@ CONSTANT: rs-reg 30
     4 MTCTR
     BCTR
 ] \ (call) define-sub-primitive
-
-[
-    3 ds-reg 0 LWZ
-    ds-reg dup 4 SUBI
-    4 3 word-xt-offset LWZ
-    4 MTCTR
-    BCTR
-] \ (execute) define-sub-primitive
 
 ! Objects
 [

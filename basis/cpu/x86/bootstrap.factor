@@ -42,11 +42,11 @@ big-endian off
 ] jit-push-immediate jit-define
 
 [
-    f JMP rc-relative rt-xt jit-rel
+    0 JMP rc-relative rt-xt jit-rel
 ] jit-word-jump jit-define
 
 [
-    f CALL rc-relative rt-xt-direct jit-rel
+    0 CALL rc-relative rt-xt-pic jit-rel
 ] jit-word-call jit-define
 
 [
@@ -57,12 +57,12 @@ big-endian off
     ! compare boolean with f
     temp0 \ f tag-number CMP
     ! jump to true branch if not equal
-    f JNE rc-relative rt-xt jit-rel
+    0 JNE rc-relative rt-xt jit-rel
 ] jit-if-1 jit-define
 
 [
     ! jump to false branch if equal
-    f JMP rc-relative rt-xt jit-rel
+    0 JMP rc-relative rt-xt jit-rel
 ] jit-if-2 jit-define
 
 : jit->r ( -- )
@@ -115,19 +115,19 @@ big-endian off
 
 [
     jit->r
-    f CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-xt jit-rel
     jit-r>
 ] jit-dip jit-define
 
 [
     jit-2>r
-    f CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-xt jit-rel
     jit-2r>
 ] jit-2dip jit-define
 
 [
     jit-3>r
-    f CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-xt jit-rel
     jit-3r>
 ] jit-3dip jit-define
 
@@ -194,7 +194,7 @@ big-endian off
     [
         ! Untag temp0
         temp0 tag-mask get bitnot AND
-        ! Set temp1 to 0 for objects, and 8 for tuples
+        ! Set temp1 to 0 for objects, and bootstrap-cell for tuples
         temp1 1 tag-fixnum AND
         bootstrap-cell 4 = [ temp1 1 SHR ] when
         ! Load header cell or tuple layout cell
@@ -211,7 +211,7 @@ big-endian off
     temp1 temp2 CMP
 ] pic-check jit-define
 
-[ f JE rc-relative rt-xt jit-rel ] pic-hit jit-define
+[ 0 JE rc-relative rt-xt jit-rel ] pic-hit jit-define
 
 ! ! ! Megamorphic caches
 

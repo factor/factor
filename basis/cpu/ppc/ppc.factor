@@ -1,33 +1,38 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
-alien alien.c-types cpu.architecture cpu.ppc.assembler
-compiler.cfg.registers compiler.cfg.instructions
+alien alien.c-types literals cpu.architecture cpu.ppc.assembler
+literals compiler.cfg.registers compiler.cfg.instructions
 compiler.constants compiler.codegen compiler.codegen.fixup
 compiler.cfg.intrinsics compiler.cfg.stack-frame ;
 IN: cpu.ppc
 
 ! PowerPC register assignments:
-! r2-r27: integer vregs
-! r28: integer scratch
-! r29: data stack
-! r30: retain stack
+! r2-r12: integer vregs
+! r15-r29
+! r30: integer scratch
 ! f0-f29: float vregs
-! f30, f31: float scratch
+! f30: float scratch
+
+! Add some methods to the assembler that are useful to us
+M: label (B) [ 0 ] 2dip (B) rc-relative-ppc-3 label-fixup ;
+M: label BC [ 0 BC ] dip rc-relative-ppc-2 label-fixup ;
 
 enable-float-intrinsics
 
-<< \ ##integer>float t frame-required? set-word-prop
-\ ##float>integer t frame-required? set-word-prop >>
+<<
+\ ##integer>float t frame-required? set-word-prop
+\ ##float>integer t frame-required? set-word-prop
+>>
 
 M: ppc machine-registers
     {
-        { int-regs T{ range f 2 26 1 } }
-        { double-float-regs T{ range f 0 29 1 } }
+        { int-regs $[ 2 12 [a,b] 15 29 [a,b] append ] }
+        { double-float-regs $[ 0 29 [a,b] ] }
     } ;
 
-CONSTANT: scratch-reg 28
+CONSTANT: scratch-reg 30
 CONSTANT: fp-scratch-reg 30
 
 M: ppc two-operand? f ;
@@ -40,8 +45,8 @@ M: ppc %load-reference ( reg obj -- )
 M: ppc %alien-global ( register symbol dll -- )
     [ 0 swap LOAD32 ] 2dip rc-absolute-ppc-2/2 rel-dlsym ;
 
-CONSTANT: ds-reg 29
-CONSTANT: rs-reg 30
+CONSTANT: ds-reg 13
+CONSTANT: rs-reg 14
 
 GENERIC: loc-reg ( loc -- reg )
 
@@ -108,7 +113,8 @@ M: ppc stack-frame-size ( stack-frame -- i )
     factor-area-size +
     4 cells align ;
 
-M: ppc %call ( label -- ) BL ;
+M: ppc %call ( word -- ) 0 BL rc-relative-ppc-3 rel-word-pic ;
+M: ppc %jump ( word -- ) 0 B rc-relative-ppc-3 rel-word ;
 M: ppc %jump-label ( label -- ) B ;
 M: ppc %return ( -- ) BLR ;
 
