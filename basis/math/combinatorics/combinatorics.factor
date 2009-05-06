@@ -52,7 +52,7 @@ PRIVATE>
     [ [ length factorial ] keep ] dip
     '[ _ permutation @ ] each ; inline
 
-: reduce-permutations ( seq initial quot -- result )
+: reduce-permutations ( seq identity quot -- result )
     swapd each-permutation ; inline
 
 : inverse-permutation ( seq -- permutation )
@@ -61,16 +61,13 @@ PRIVATE>
 
 ! Combinadic-based combination methodology
 
-TUPLE: combination
-    { n integer }
-    { k integer } ;
-
-C: <combination> combination
-
 <PRIVATE
 
-: dual-index ( combination m -- x )
-    [ [ n>> ] [ k>> ] bi nCk 1 - ] dip - ;
+TUPLE: combo
+    { seq sequence }
+    { k integer } ;
+
+C: <combo> combo
 
 : largest-value ( a b x -- v )
     #! TODO: use a binary search instead of find-last
@@ -82,14 +79,36 @@ C: <combination> combination
     x v b nCk -                   ! x'
     v ;                           ! v == a'
 
-: initial-values ( combination m -- a b x )
-    [ [ n>> ] [ k>> ] [ ] tri ] dip dual-index ;
+: dual-index ( combo m -- x )
+    [ [ seq>> length ] [ k>> ] bi nCk 1 - ] dip - ;
 
-: combinadic ( combination m -- combinadic )
+: initial-values ( combo m -- a b x )
+    [ [ seq>> length ] [ k>> ] [ ] tri ] dip dual-index ;
+
+: combinadic ( combo m -- combinadic )
     initial-values [ over 0 > ] [ next-values ] produce
     [ 3drop ] dip ;
 
+: combination-indices ( m combo -- seq )
+    [ swap combinadic ] keep
+    seq>> length 1 - swap [ - ] with map ;
+
+: apply-combination ( m combo -- seq )
+    [ combination-indices ] keep seq>> nths ;
+
+: choose ( combo -- nCk )
+    [ seq>> length ] [ k>> ] bi nCk ;
+
 PRIVATE>
 
-: combination ( m combination -- seq )
-    swap [ drop n>> 1 - ] [ combinadic ] 2bi [ - ] with map ;
+: combination ( m seq k -- seq )
+    <combo> apply-combination ;
+
+: all-combinations ( seq k -- seq )
+    <combo> [ choose [0,b) ] keep
+    '[ _ apply-combination ] map ;
+
+: each-combination ( seq k quot -- )
+    [ <combo> [ choose [0,b) ] keep ] dip
+    '[ _ apply-combination @ ] each ; inline
+
