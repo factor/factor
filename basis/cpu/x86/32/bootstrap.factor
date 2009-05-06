@@ -29,7 +29,7 @@ IN: bootstrap.x86
 ] jit-save-stack jit-define
 
 [
-    (JMP) drop rc-relative rt-primitive jit-rel
+    0 JMP rc-relative rt-primitive jit-rel
 ] jit-primitive jit-define
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file parsed >>
