@@ -6,6 +6,11 @@ IN: math.vectors
 
 : vneg ( u -- v ) [ neg ] map ;
 
+: v+n ( u n -- v ) [ + ] curry map ;
+: n+v ( n u -- v ) [ + ] with map ;
+: v-n ( u n -- v ) [ - ] curry map ;
+: n-v ( n u -- v ) [ - ] with map ;
+
 : v*n ( u n -- v ) [ * ] curry map ;
 : n*v ( n u -- v ) [ * ] with map ;
 : v/n ( u n -- v ) [ / ] curry map ;
@@ -18,6 +23,10 @@ IN: math.vectors
 : v/   ( u v -- w ) [ / ] 2map ;
 : vmax ( u v -- w ) [ max ] 2map ;
 : vmin ( u v -- w ) [ min ] 2map ;
+
+: vfloor    ( v -- _v_ ) [ floor    ] map ;
+: vceiling  ( v -- ^v^ ) [ ceiling  ] map ;
+: vtruncate ( v -- -v- ) [ truncate ] map ;
 
 : vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; 
 : vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; 
