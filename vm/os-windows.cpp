@@ -5,7 +5,7 @@ namespace factor
 
 HMODULE hFactorDll;
 
-void init_ffi(void)
+void init_ffi()
 {
 	hFactorDll = GetModuleHandle(FACTOR_DLL);
 	if(!hFactorDll)
@@ -14,12 +14,12 @@ void init_ffi(void)
 
 void ffi_dlopen(dll *dll)
 {
-	dll->dll = LoadLibraryEx(alien_offset(dll->path), NULL, 0);
+	dll->dll = LoadLibraryEx((WCHAR *)alien_offset(dll->path), NULL, 0);
 }
 
 void *ffi_dlsym(dll *dll, symbol_char *symbol)
 {
-	return GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
+	return (void *)GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
 }
 
 void ffi_dlclose(dll *dll)
@@ -63,7 +63,7 @@ void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int len
 }
 
 /* You must free() this yourself. */
-const vm_char *default_image_path(void)
+const vm_char *default_image_path()
 {
 	vm_char full_path[MAX_UNICODE_PATH];
 	vm_char *ptr;
@@ -82,7 +82,7 @@ const vm_char *default_image_path(void)
 }
 
 /* You must free() this yourself. */
-const vm_char *vm_executable_path(void)
+const vm_char *vm_executable_path()
 {
 	vm_char full_path[MAX_UNICODE_PATH];
 	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
@@ -93,7 +93,7 @@ const vm_char *vm_executable_path(void)
 
 PRIMITIVE(existsp)
 {
-	vm_char *path = (vm_char *)(untag_check<byte_array>(dpop()) + 1);
+	vm_char *path = untag_check<byte_array>(dpop())->data<vm_char>();
 	box_boolean(windows_stat(path));
 }
 
@@ -113,7 +113,7 @@ segment *alloc_segment(cell size)
 		getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate high guard page", (cell)mem);
 
-	segment *block = safe_malloc(sizeof(segment));
+	segment *block = (segment *)safe_malloc(sizeof(segment));
 
 	block->start = (cell)mem + getpagesize();
 	block->size = size;
@@ -131,7 +131,7 @@ void dealloc_segment(segment *block)
 	free(block);
 }
 
-long getpagesize(void)
+long getpagesize()
 {
 	static long g_pagesize = 0;
 	if (! g_pagesize)

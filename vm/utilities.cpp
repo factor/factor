@@ -20,7 +20,7 @@ vm_char *safe_strdup(const vm_char *str)
 
 /* We don't use printf directly, because format directives are not portable.
 Instead we define the common cases here. */
-void nl(void)
+void nl()
 {
 	fputs("\n",stdout);
 }
@@ -50,7 +50,7 @@ void print_fixnum(fixnum x)
 	printf(FIXNUM_FORMAT,x);
 }
 
-cell read_cell_hex(void)
+cell read_cell_hex()
 {
 	cell cell;
 	if(scanf(cell_HEX_FORMAT,&cell) < 0) exit(1);

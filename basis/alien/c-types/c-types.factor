@@ -409,10 +409,10 @@ CONSTANT: primitive-types
     "uchar" define-primitive-type
 
     <c-type>
-        [ alien-unsigned-4 zero? not ] >>getter
-        [ [ 1 0 ? ] 2dip set-alien-unsigned-4 ] >>setter
-        4 >>size
-        4 >>align
+        [ alien-unsigned-1 zero? not ] >>getter
+        [ [ 1 0 ? ] 2dip set-alien-unsigned-1 ] >>setter
+        1 >>size
+        1 >>align
         "box_boolean" >>boxer
         "to_boolean" >>unboxer
     "bool" define-primitive-type
