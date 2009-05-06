@@ -1,36 +1,34 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel locals math math.functions math.ranges
-random sequences sets ;
+random sequences sets combinators.short-circuit math.bitwise ;
 IN: math.miller-rabin
 
 <PRIVATE
 
-: >odd ( n -- int ) dup even? [ 1+ ] when ; foldable
+: >odd ( n -- int ) dup even? [ 1 + ] when ; foldable
 
 TUPLE: positive-even-expected n ;
 
 :: (miller-rabin) ( n trials -- ? )
-    [let | r [ n 1- factor-2s drop ]
-           s [ n 1- factor-2s nip ]
-           prime?! [ t ]
-           a! [ 0 ]
-           count! [ 0 ] |
-        trials [
-            n 1- [1,b] random a!
-            a s n ^mod 1 = [
-                0 count!
-                r [
-                    2^ s * a swap n ^mod n - -1 =
-                    [ count 1+ count! r + ] when
-                ] each
-                count zero? [ f prime?! trials + ] when
-            ] unless drop
-        ] each prime? ] ;
+    n 1 - :> n-1
+    n-1 factor-2s :> s :> r
+    0 :> a!
+    trials [
+        drop
+        n 1 - [1,b] random a!
+        a s n ^mod 1 = [
+            f
+        ] [
+            r iota [
+                2^ s * a swap n ^mod n - -1 =
+            ] any? not 
+        ] if
+    ] any? not ;
 
 PRIVATE>
 
-: next-odd ( m -- n ) dup even? [ 1+ ] [ 2 + ] if ;
+: next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ;
 
 : miller-rabin* ( n numtrials -- ? )
     over {
@@ -74,3 +72,38 @@ ERROR: too-few-primes ;
     dup 5 < [ too-few-primes ] when
     2dup [ random-prime ] curry replicate
     dup all-unique? [ 2nip ] [ drop unique-primes ] if ;
+
+! Safe primes are of the form p = 2q + 1, p,q are prime
+! See http://en.wikipedia.org/wiki/Safe_prime
+
+<PRIVATE
+
+: >safe-prime-form ( q -- p ) 2 * 1 + ;
+
+: safe-prime-candidate? ( n -- ? )
+    >safe-prime-form
+    1 + 6 divisor? ;
+
+: next-safe-prime-candidate ( n -- candidate )
+    next-prime dup safe-prime-candidate?
+    [ next-safe-prime-candidate ] unless ;
+
+PRIVATE>
+
+: safe-prime? ( q -- ? )
+    {
+        [ 1 - 2 / dup integer? [ miller-rabin ] [ drop f ] if ]
+        [ miller-rabin ]
+    } 1&& ;
+
+: next-safe-prime ( n -- q )
+    next-safe-prime-candidate
+    dup >safe-prime-form
+    dup miller-rabin
+    [ nip ] [ drop next-safe-prime ] if ;
+
+: random-bits* ( numbits -- n )
+    [ random-bits ] keep set-bit ;
+
+: random-safe-prime ( numbits -- p )
+    1- random-bits* next-safe-prime ;

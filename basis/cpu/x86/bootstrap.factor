@@ -152,9 +152,6 @@ big-endian off
 
 ! ! ! Polymorphic inline caches
 
-! temp0 contains the object being dispatched on
-! temp1 contains its class
-
 ! Load a value from a stack position
 [
     temp1 ds-reg HEX: ffffffff [+] MOV rc-absolute rt-untagged jit-rel
