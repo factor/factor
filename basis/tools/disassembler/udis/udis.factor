@@ -16,7 +16,57 @@ IN: tools.disassembler.udis
 
 LIBRARY: libudis86
 
-TYPEDEF: char[592] ud
+C-STRUCT: ud_operand
+    { "int" "type" }
+    { "uchar" "size" }
+    { "ulonglong" "lval" }
+    { "int" "base" }
+    { "int" "index" }
+    { "uchar" "offset" }
+    { "uchar" "scale" } ;
+
+C-STRUCT: ud
+    { "void*" "inp_hook" }
+    { "uchar" "inp_curr" }
+    { "uchar" "inp_fill" }
+    { "FILE*" "inp_file" }
+    { "uchar" "inp_ctr" }
+    { "uchar*" "inp_buff" }
+    { "uchar*" "inp_buff_end" }
+    { "uchar" "inp_end" }
+    { "void*" "translator" }
+    { "ulonglong" "insn_offset" }
+    { "char[32]" "insn_hexcode" }
+    { "char[64]" "insn_buffer" }
+    { "uint" "insn_fill" }
+    { "uchar" "dis_mode" }
+    { "ulonglong" "pc" }
+    { "uchar" "vendor" }
+    { "struct map_entry*" "mapen" }
+    { "int" "mnemonic" }
+    { "ud_operand[3]" "operand" }
+    { "uchar" "error" }
+    { "uchar" "pfx_rex" }
+    { "uchar" "pfx_seg" }
+    { "uchar" "pfx_opr" }
+    { "uchar" "pfx_adr" }
+    { "uchar" "pfx_lock" }
+    { "uchar" "pfx_rep" }
+    { "uchar" "pfx_repe" }
+    { "uchar" "pfx_repne" }
+    { "uchar" "pfx_insn" }
+    { "uchar" "default64" }
+    { "uchar" "opr_mode" }
+    { "uchar" "adr_mode" }
+    { "uchar" "br_far" }
+    { "uchar" "br_near" }
+    { "uchar" "implicit_addr" }
+    { "uchar" "c1" }
+    { "uchar" "c2" }
+    { "uchar" "c3" }
+    { "uchar[256]" "inp_cache" }
+    { "uchar[64]" "inp_sess" }
+    { "ud_itab_entry*" "itab_entry" } ;
 
 FUNCTION: void ud_translate_intel ( ud* u ) ;
 FUNCTION: void ud_translate_att ( ud* u ) ;

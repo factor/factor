@@ -5,7 +5,7 @@ namespace factor
 
 extern "C" int main();
 
-const char *vm_executable_path(void)
+const char *vm_executable_path()
 {
 	static Dl_info info = {0};
 	if (!info.dli_fname)
