@@ -42,7 +42,7 @@ CONSTANT: rt-primitive   0
 CONSTANT: rt-dlsym       1
 CONSTANT: rt-dispatch    2
 CONSTANT: rt-xt          3
-CONSTANT: rt-xt-direct   4
+CONSTANT: rt-xt-pic      4
 CONSTANT: rt-here        5
 CONSTANT: rt-this        6
 CONSTANT: rt-immediate   7
