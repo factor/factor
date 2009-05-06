@@ -6,31 +6,28 @@ IN: math.miller-rabin
 
 <PRIVATE
 
-: >odd ( n -- int ) dup even? [ 1+ ] when ; foldable
+: >odd ( n -- int ) dup even? [ 1 + ] when ; foldable
 
 TUPLE: positive-even-expected n ;
 
 :: (miller-rabin) ( n trials -- ? )
-    [let | r [ n 1- factor-2s drop ]
-           s [ n 1- factor-2s nip ]
-           prime?! [ t ]
-           a! [ 0 ]
-           count! [ 0 ] |
-        trials [
-            n 1- [1,b] random a!
-            a s n ^mod 1 = [
-                0 count!
-                r [
-                    2^ s * a swap n ^mod n - -1 =
-                    [ count 1+ count! r + ] when
-                ] each
-                count zero? [ f prime?! trials + ] when
-            ] unless drop
-        ] each prime? ] ;
+    n 1 - :> n-1
+    n-1 factor-2s :> s :> r
+    0 :> a!
 
+    trials [
+        drop
+        n-1 [1,b] random a!
+        a s n ^mod 1 = [
+            f
+        ] [
+            r [ 2^ s * a swap n ^mod n - -1 = ] any?
+        ] if
+    ] any? ;
+    
 PRIVATE>
 
-: next-odd ( m -- n ) dup even? [ 1+ ] [ 2 + ] if ;
+: next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ;
 
 : miller-rabin* ( n numtrials -- ? )
     over {
