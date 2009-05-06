@@ -1,10 +1,13 @@
-USING: byte-arrays combinators images kernel locals math math.affine-transforms
-math.functions math.polynomials math.vectors random sequences
-sequences.product ;
-IN: perlin-noise
+USING: byte-arrays combinators fry images kernel locals math
+math.affine-transforms math.functions math.order
+math.polynomials math.vectors random random.mersenne-twister
+sequences sequences.product ;
+IN: noise
 
-: <noise-table> ( -- table )
+: <perlin-noise-table> ( -- table )
     256 iota >byte-array randomize dup append ;
+
+<PRIVATE
 
 : fade ( point -- point' )
     { 0.0 0.0 0.0 10.0 -15.0 6.0 } swap [ polyval ] with map ;
@@ -51,7 +54,18 @@ IN: perlin-noise
     v w quot call
     ; inline
 
-:: noise ( table point -- value )
+: with-seed ( seed quot -- )
+    [ <mersenne-twister> ] dip with-random ; inline
+
+: >byte-map ( floats -- bytes )
+    [ 255.0 * >fixnum ] B{ } map-as ;
+
+: >image ( bytes dim -- image )
+    swap [ L f ] dip image boa ;
+
+PRIVATE>
+
+:: perlin-noise ( table point -- value )
     point unit-cube :> cube
     point dup vfloor v- :> gradients
     gradients fade :> faded
@@ -70,14 +84,38 @@ IN: perlin-noise
     [ faded second lerp ] 2bi@
     faded third lerp ;
 
-: noise-map ( table transform dim -- map ) 
-    [ iota ] map [ a.v 0.0 suffix noise ] with with product-map ;
-
 : normalize-0-1 ( sequence -- sequence' )
     [ supremum ] [ infimum [ - ] keep ] [ ] tri
     [ swap - ] with map [ swap / ] with map ;
 
-: noise-image ( table transform dim -- image )
-    [ noise-map normalize-0-1 [ 255.0 * >fixnum ] B{ } map-as ]
-    [ swap [ L f ] dip image boa ] bi ;
+: clamp-0-1 ( sequence -- sequence' )
+    [ 0.0 max 1.0 min ] map ;
 
+: perlin-noise-map ( table transform dim -- map ) 
+    [ iota ] map [ a.v 0.0 suffix perlin-noise ] with with product-map ;
+
+: perlin-noise-byte-map ( table transform dim -- map )
+    perlin-noise-map normalize-0-1 >byte-map ;
+
+: perlin-noise-image ( table transform dim -- image )
+    [ perlin-noise-byte-map ] [ >image ] bi ;
+
+: uniform-noise-map ( seed dim -- map )
+    [ product [ 0.0 1.0 uniform-random-float ] replicate ]
+    curry with-seed ;
+
+: uniform-noise-byte-map ( seed dim -- map )
+    uniform-noise-map >byte-map ;
+
+: uniform-noise-image ( seed dim -- image )
+    [ uniform-noise-byte-map ] [ >image ] bi ;
+
+: normal-noise-map ( seed sigma dim -- map )
+    swap '[ _ product [ 0.5 _ normal-random-float ] replicate ]
+    with-seed ;
+
+: normal-noise-byte-map ( seed sigma dim -- map )
+    normal-noise-map clamp-0-1 >byte-map ;
+
+: normal-noise-image ( seed sigma dim -- image )
+    [ normal-noise-byte-map ] [ >image ] bi ;
