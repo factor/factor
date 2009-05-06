@@ -1,11 +1,11 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler.codegen.fixup cpu.architecture
 compiler.constants kernel namespaces make sequences words math
 math.bitwise io.binary parser lexer ;
 IN: cpu.ppc.assembler.backend
 
-: insn ( operand opcode -- ) { 26 0 } bitfield , ;
+: insn ( operand opcode -- ) { 26 0 } bitfield 4 >be % ;
 
 : a-insn ( d a b c xo rc opcode -- )
     [ { 0 1 6 11 16 21 } bitfield ] dip insn ;

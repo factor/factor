@@ -31,8 +31,10 @@ enum relocation_class {
 	RC_ABSOLUTE,
 	/* relative address in a 32-bit location */
 	RC_RELATIVE,
-	/* relative address in a PowerPC LIS/ORI sequence */
+	/* absolute address in a PowerPC LIS/ORI sequence */
 	RC_ABSOLUTE_PPC_2_2,
+	/* absolute address in a PowerPC LWZ instruction */
+	RC_ABSOLUTE_PPC_2,
 	/* relative address in a PowerPC LWZ/STW/BC instruction */
 	RC_RELATIVE_PPC_2,
 	/* relative address in a PowerPC B/BL instruction */
@@ -45,6 +47,7 @@ enum relocation_class {
 	RC_INDIRECT_ARM_PC
 };
 
+#define REL_ABSOLUTE_PPC_2_MASK 0xffff
 #define REL_RELATIVE_PPC_2_MASK 0xfffc
 #define REL_RELATIVE_PPC_3_MASK 0x3fffffc
 #define REL_INDIRECT_ARM_MASK 0xfff
