@@ -5,7 +5,8 @@ windows.user32 windows.messages sequences combinators locals
 math.rectangles accessors math alien alien.strings
 io.encodings.utf16 io.encodings.utf16n continuations
 byte-arrays game-input.dinput.keys-array game-input
-ui.backend.windows windows.errors ;
+ui.backend.windows windows.errors struct-arrays
+math.bitwise ;
 IN: game-input.dinput
 
 CONSTANT: MOUSE-BUFFER-SIZE 16
@@ -70,8 +71,8 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     GUID_SysMouse device-for-guid
     [ configure-mouse ]
     [ +mouse-device+ set-global ] bi
-    0 0 0 0 8 <vector> mouse-state boa
-    +mouse-device+ set-global ;
+    0 0 0 0 8 f <array> mouse-state boa
+    +mouse-state+ set-global
     MOUSE-BUFFER-SIZE "DIDEVICEOBJECTDATA" <c-array>
     +mouse-buffer+ set-global ;
 
@@ -301,17 +302,17 @@ CONSTANT: pov-values
     [ "DIDEVICEOBJECTDATA" heap-size ] 2dip <uint>
     [ 0 IDirectInputDevice8W::GetDeviceData ole32-error ] 2keep *uint ;
 
-: (fill-mouse-state) ( state DIDEVICEOBJECTDATA -- )
-    [ DIDEVICEOBJECTDATA-dwData ] [ DIDEVICEOBJECTDATA-dwOfs ] bi {
-        { DIMOFS_X [ [ + ] curry change-dx drop ] }
-        { DIMOFS_Y [ [ + ] curry change-dy drop ] }
-        { DIMOFS_Z [ [ + ] curry change-scroll-dy drop ] }
-        [ [ c-bool> ] [ DIMOFS_BUTTON0 - ] bi* rot buttons>> set-nth ] 
+: (fill-mouse-state) ( state DIDEVICEOBJECTDATA -- state )
+    [ DIDEVICEOBJECTDATA-dwData 32 >signed ] [ DIDEVICEOBJECTDATA-dwOfs ] bi {
+        { DIMOFS_X [ [ + ] curry change-dx ] }
+        { DIMOFS_Y [ [ + ] curry change-dy ] }
+        { DIMOFS_Z [ [ + ] curry change-scroll-dy ] }
+        [ [ c-bool> ] [ DIMOFS_BUTTON0 - ] bi* rot [ buttons>> set-nth ] keep ]
     } case ;
 
-: fill-mouse-state ( buffer count -- )
+: fill-mouse-state ( buffer count -- state )
     [ +mouse-state+ get ] 2dip swap
-    [ DIDEVICEOBJECTDATA-nth (fill-mouse-state) ] curry each ;
+    [ "DIDEVICEOBJECTDATA" byte-array>struct-array nth (fill-mouse-state) ] curry each ;
 
 : get-device-state ( device byte-array -- )
     [ dup IDirectInputDevice8W::Poll ole32-error ] dip
@@ -340,4 +341,10 @@ M: dinput-game-input-backend read-mouse
 
 M: dinput-game-input-backend reset-mouse
     +mouse-device+ get [ f MOUSE-BUFFER-SIZE read-device-buffer ]
-    [ 2drop ] [ ] with-acquisition ;
+    [ 2drop ] [ ] with-acquisition
+    +mouse-state+ get
+        0 >>dx
+        0 >>dy
+        0 >>scroll-dx
+        0 >>scroll-dy
+        drop ;
