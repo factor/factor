@@ -2,7 +2,7 @@
 in the public domain. */
 #include "asm.h"
 
-#define DS_REG r29
+#define DS_REG r13
 
 DEF(void,primitive_fixnum_add,(void)):
 	lwz r3,0(DS_REG)
@@ -45,7 +45,7 @@ multiply_overflow:
 	
 /* Note that the XT is passed to the quotation in r11 */
 #define CALL_OR_JUMP_QUOT \
-	lwz r11,14(r3)	   /* load quotation-xt slot */ XX \
+	lwz r11,16(r3)	   /* load quotation-xt slot */ XX \
 
 #define CALL_QUOT \
 	CALL_OR_JUMP_QUOT XX \
@@ -100,22 +100,22 @@ the Factor compiler treats the entire register file as volatile. */
 DEF(void,c_to_factor,(CELL quot)):
 	PROLOGUE
 
-	SAVE_INT(r13,0)	   /* save GPRs */
-	SAVE_INT(r14,1)
-	SAVE_INT(r15,2)
-	SAVE_INT(r16,3)
-	SAVE_INT(r17,4)
-	SAVE_INT(r18,5)
-	SAVE_INT(r19,6)
-	SAVE_INT(r20,7)
-	SAVE_INT(r21,8)
-	SAVE_INT(r22,9)
-	SAVE_INT(r23,10)
-	SAVE_INT(r24,11)
-	SAVE_INT(r25,12)
-	SAVE_INT(r26,13)
-	SAVE_INT(r27,14)
-	SAVE_INT(r28,15)
+	SAVE_INT(r15,0)	   /* save GPRs */
+	SAVE_INT(r16,1)
+	SAVE_INT(r17,2)
+	SAVE_INT(r18,3)
+	SAVE_INT(r19,4)
+	SAVE_INT(r20,5)
+	SAVE_INT(r21,6)
+	SAVE_INT(r22,7)
+	SAVE_INT(r23,8)
+	SAVE_INT(r24,9)
+	SAVE_INT(r25,10)
+	SAVE_INT(r26,11)
+	SAVE_INT(r27,12)
+	SAVE_INT(r28,13)
+	SAVE_INT(r29,14)
+	SAVE_INT(r30,15)
 	SAVE_INT(r31,16)
 
 	SAVE_FP(f14,20)	/* save FPRs */
@@ -165,22 +165,22 @@ DEF(void,c_to_factor,(CELL quot)):
 	RESTORE_FP(f14,20)	/* save FPRs */
 
 	RESTORE_INT(r31,16)   /* restore GPRs */
-	RESTORE_INT(r28,15)
-	RESTORE_INT(r27,14)
-	RESTORE_INT(r26,13)
-	RESTORE_INT(r25,12)
-	RESTORE_INT(r24,11)
-	RESTORE_INT(r23,10)
-	RESTORE_INT(r22,9)
-	RESTORE_INT(r21,8)
-	RESTORE_INT(r20,7)
-	RESTORE_INT(r19,6)
-	RESTORE_INT(r18,5)
-	RESTORE_INT(r17,4)
-	RESTORE_INT(r16,3)
-	RESTORE_INT(r15,2)
-	RESTORE_INT(r14,1)
-	RESTORE_INT(r13,0)
+	RESTORE_INT(r30,15)
+	RESTORE_INT(r29,14)
+	RESTORE_INT(r28,13)
+	RESTORE_INT(r27,12)
+	RESTORE_INT(r26,11)
+	RESTORE_INT(r25,10)
+	RESTORE_INT(r24,9)
+	RESTORE_INT(r23,8)
+	RESTORE_INT(r22,7)
+	RESTORE_INT(r21,6)
+	RESTORE_INT(r20,5)
+	RESTORE_INT(r19,4)
+	RESTORE_INT(r18,3)
+	RESTORE_INT(r17,2)
+	RESTORE_INT(r16,1)
+	RESTORE_INT(r15,0)
 
 	EPILOGUE
 	blr
@@ -234,3 +234,11 @@ DEF(void,flush_icache,(void *start, int len)):
 	sync		   /* finish up */
 	isync
 	blr
+
+DEF(void,primitive_inline_cache_miss,(void)):
+    mflr r3
+    PROLOGUE
+    bl MANGLE(inline_cache_miss)
+    EPILOGUE
+    mtctr r3
+    bctr
