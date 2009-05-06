@@ -32,6 +32,12 @@ IN: math.vectors
 : set-axis ( u v axis -- w )
     [ [ zero? 2over ? ] dip swap nth ] map-index 2nip ;
 
+: vlerp ( a b t -- a_t )
+    [ lerp ] 3map ;
+
+: vnlerp ( a b t -- a_t )
+    [ lerp ] curry 2map ;
+
 HINTS: vneg { array } ;
 HINTS: norm-sq { array } ;
 HINTS: norm { array } ;
@@ -50,3 +56,6 @@ HINTS: v/ { array array } ;
 HINTS: vmax { array array } ;
 HINTS: vmin { array array } ;
 HINTS: v. { array array } ;
+
+HINTS: vlerp { array array array } ;
+HINTS: vnlerp { array array object } ;
