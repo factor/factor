@@ -73,6 +73,15 @@ M: keyboard-state clone
 
 HOOK: read-keyboard game-input-backend ( -- keyboard-state )
 
+TUPLE: mouse-state dx dy scroll-dx scroll-dy buttons ;
+
+M: mouse-state clone
+    call-next-method dup buttons>> clone >>buttons ;
+
+HOOK: read-mouse game-input-backend ( -- mouse-state )
+
+HOOK: reset-mouse game-input-backend ( -- )
+
 {
     { [ os windows? ] [ "game-input.dinput" require ] }
     { [ os macosx? ] [ "game-input.iokit" require ] }

@@ -651,7 +651,7 @@ M: object infer-call*
 
 \ become { array array } { } define-primitive
 
-\ innermost-frame-quot { callstack } { quotation } define-primitive
+\ innermost-frame-executing { callstack } { object } define-primitive
 
 \ innermost-frame-scan { callstack } { fixnum } define-primitive
 

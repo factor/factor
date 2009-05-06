@@ -18,7 +18,7 @@ M: real sqrt
 : factor-2s ( n -- r s )
     #! factor an integer into 2^r * s
     dup 0 = [ 1 ] [
-        0 swap [ dup even? ] [ [ 1+ ] [ 2/ ] bi* ] while
+        0 swap [ dup even? ] [ [ 1 + ] [ 2/ ] bi* ] while
     ] if ; inline
 
 <PRIVATE
@@ -216,17 +216,17 @@ M: real tanh ftanh ;
 : coth ( x -- y ) tanh recip ; inline
 
 : acosh ( x -- y )
-    dup sq 1- sqrt + log ; inline
+    dup sq 1 - sqrt + log ; inline
 
 : asech ( x -- y ) recip acosh ; inline
 
 : asinh ( x -- y )
-    dup sq 1+ sqrt + log ; inline
+    dup sq 1 + sqrt + log ; inline
 
 : acosech ( x -- y ) recip asinh ; inline
 
 : atanh ( x -- y )
-    [ 1+ ] [ 1- neg ] bi / log 2 / ; inline
+    [ 1 + ] [ 1 - neg ] bi / log 2 / ; inline
 
 : acoth ( x -- y ) recip atanh ; inline
 
@@ -259,6 +259,9 @@ M: real atan fatan ;
 
 : floor ( x -- y )
     dup 1 mod dup zero?
-    [ drop ] [ dup 0 < [ - 1- ] [ - ] if ] if ; foldable
+    [ drop ] [ dup 0 < [ - 1 - ] [ - ] if ] if ; foldable
 
 : ceiling ( x -- y ) neg floor neg ; foldable
+
+: lerp ( a b t -- a_t ) [ over - ] dip * + ; inline
+

@@ -6,6 +6,11 @@ IN: math.vectors
 
 : vneg ( u -- v ) [ neg ] map ;
 
+: v+n ( u n -- v ) [ + ] curry map ;
+: n+v ( n u -- v ) [ + ] with map ;
+: v-n ( u n -- v ) [ - ] curry map ;
+: n-v ( n u -- v ) [ - ] with map ;
+
 : v*n ( u n -- v ) [ * ] curry map ;
 : n*v ( n u -- v ) [ * ] with map ;
 : v/n ( u n -- v ) [ / ] curry map ;
@@ -19,6 +24,10 @@ IN: math.vectors
 : vmax ( u v -- w ) [ max ] 2map ;
 : vmin ( u v -- w ) [ min ] 2map ;
 
+: vfloor    ( v -- _v_ ) [ floor    ] map ;
+: vceiling  ( v -- ^v^ ) [ ceiling  ] map ;
+: vtruncate ( v -- -v- ) [ truncate ] map ;
+
 : vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; 
 : vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; 
 
@@ -31,6 +40,12 @@ IN: math.vectors
 
 : set-axis ( u v axis -- w )
     [ [ zero? 2over ? ] dip swap nth ] map-index 2nip ;
+
+: vlerp ( a b t -- a_t )
+    [ lerp ] 3map ;
+
+: vnlerp ( a b t -- a_t )
+    [ lerp ] curry 2map ;
 
 HINTS: vneg { array } ;
 HINTS: norm-sq { array } ;
@@ -50,3 +65,6 @@ HINTS: v/ { array array } ;
 HINTS: vmax { array array } ;
 HINTS: vmin { array array } ;
 HINTS: v. { array array } ;
+
+HINTS: vlerp { array array array } ;
+HINTS: vnlerp { array array object } ;

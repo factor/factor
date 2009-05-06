@@ -164,7 +164,7 @@ M: VECTOR element-type
 M: VECTOR Vswap
     (prepare-swap) [ XSWAP ] 2dip ;
 M: VECTOR Viamax
-    (prepare-nrm2) IXAMAX 1- ;
+    (prepare-nrm2) IXAMAX 1 - ;
 
 M: VECTOR (blas-vector-like)
     drop <VECTOR> ;
