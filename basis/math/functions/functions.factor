@@ -262,3 +262,6 @@ M: real atan fatan ;
     [ drop ] [ dup 0 < [ - 1- ] [ - ] if ] if ; foldable
 
 : ceiling ( x -- y ) neg floor neg ; foldable
+
+: lerp ( a b t -- a_t ) [ over - ] dip * + ; inline
+
