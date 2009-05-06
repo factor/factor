@@ -15,7 +15,7 @@ IN: math.statistics
 
 : median ( seq -- n )
     natural-sort dup length even? [
-        [ midpoint@ dup 1- 2array ] keep nths mean
+        [ midpoint@ dup 1 - 2array ] keep nths mean
     ] [
         [ midpoint@ ] keep nth
     ] if ;
@@ -33,7 +33,7 @@ IN: math.statistics
         drop 0
     ] [
         [ [ mean ] keep [ - sq ] with sigma ] keep
-        length 1- /
+        length 1 - /
     ] if ;
 
 : std ( seq -- x )
@@ -47,7 +47,7 @@ IN: math.statistics
     0 [ [ [ pick ] dip swap - ] bi@ * + ] 2reduce 2nip ;
 
 : (r) ( mean(x) mean(y) {x} {y} sx sy -- r )
-    * recip [ [ ((r)) ] keep length 1- / ] dip * ;
+    * recip [ [ ((r)) ] keep length 1 - / ] dip * ;
 
 : [r] ( {{x,y}...} -- mean(x) mean(y) {x} {y} sx sy )
     first2 [ [ [ mean ] bi@ ] 2keep ] 2keep [ std ] bi@ ;

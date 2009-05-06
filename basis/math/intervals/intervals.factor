@@ -380,7 +380,7 @@ SYMBOL: incomparable
         [
             to>> first 1 max dup most-positive-fixnum >
             [ drop full-interval interval-log2 ]
-            [ 1+ >integer log2 0 swap [a,b] ]
+            [ 1 + >integer log2 0 swap [a,b] ]
             if
         ]
     } case ;
@@ -407,7 +407,7 @@ SYMBOL: incomparable
 
 : integral-closure ( i1 -- i2 )
     dup special-interval? [
-        [ from>> first2 [ 1+ ] unless ]
-        [ to>> first2 [ 1- ] unless ]
+        [ from>> first2 [ 1 + ] unless ]
+        [ to>> first2 [ 1 - ] unless ]
         bi [a,b]
     ] unless ;
