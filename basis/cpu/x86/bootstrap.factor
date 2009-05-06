@@ -194,7 +194,7 @@ big-endian off
     [
         ! Untag temp0
         temp0 tag-mask get bitnot AND
-        ! Set temp1 to 0 for objects, and 8 for tuples
+        ! Set temp1 to 0 for objects, and bootstrap-cell for tuples
         temp1 1 tag-fixnum AND
         bootstrap-cell 4 = [ temp1 1 SHR ] when
         ! Load header cell or tuple layout cell
