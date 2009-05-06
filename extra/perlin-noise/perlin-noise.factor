@@ -1,4 +1,4 @@
-USING: byte-arrays combinators images kernel locals math
+USING: byte-arrays combinators images kernel locals math math.affine-transforms
 math.functions math.polynomials math.vectors random sequences
 sequences.product ;
 IN: perlin-noise
@@ -70,14 +70,14 @@ IN: perlin-noise
     [ faded second lerp ] 2bi@
     faded third lerp ;
 
-: noise-map ( table scale dim -- map ) 
-    [ iota ] map [ v* 0.0 suffix noise ] with with product-map ;
+: noise-map ( table transform dim -- map ) 
+    [ iota ] map [ a.v 0.0 suffix noise ] with with product-map ;
 
-: normalize ( sequence -- sequence' )
+: normalize-0-1 ( sequence -- sequence' )
     [ supremum ] [ infimum [ - ] keep ] [ ] tri
     [ swap - ] with map [ swap / ] with map ;
 
-: noise-image ( table scale dim -- image )
-    [ noise-map normalize [ 255.0 * >fixnum ] B{ } map-as ]
+: noise-image ( table transform dim -- image )
+    [ noise-map normalize-0-1 [ 255.0 * >fixnum ] B{ } map-as ]
     [ swap [ L f ] dip image boa ] bi ;
 
