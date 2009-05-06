@@ -14,7 +14,7 @@ enum special_object {
 	BREAK_ENV            = 5, /* quotation called by throw primitive */
 	ERROR_ENV,                /* a marker consed onto kernel errors */
 
-	cell_SIZE_ENV        = 7, /* sizeof(cell) */
+	CELL_SIZE_ENV        = 7, /* sizeof(cell) */
 	CPU_ENV,                  /* CPU architecture */
 	OS_ENV,                   /* operating system name */
 
@@ -92,6 +92,11 @@ enum special_object {
 
 #define FIRST_SAVE_ENV BOOT_ENV
 #define LAST_SAVE_ENV STAGE2_ENV
+
+inline static bool save_env_p(cell i)
+{
+	return (i >= FIRST_SAVE_ENV && i <= LAST_SAVE_ENV) || i == STACK_TRACES_ENV;
+}
 
 /* Canonical T object. It's just a word */
 extern cell T;

@@ -18,11 +18,11 @@ extern bool collecting_aging_again;
 
 extern cell last_code_heap_scan;
 
-void init_data_gc(void);
+void init_data_gc();
 
-void gc(void);
+void gc();
 
-inline static bool collecting_accumulation_gen_p(void)
+inline static bool collecting_accumulation_gen_p()
 {
 	return ((HAVE_AGING_P
 		&& collecting_gen == AGING
@@ -114,7 +114,7 @@ void copy_reachable_objects(cell scan, cell *end);
 
 PRIMITIVE(gc);
 PRIMITIVE(gc_stats);
-void clear_gc_stats(void);
+void clear_gc_stats();
 PRIMITIVE(clear_gc_stats);
 PRIMITIVE(become);
 
@@ -143,6 +143,6 @@ inline static void check_tagged_pointer(cell tagged)
 #endif
 }
 
-VM_C_API void minor_gc(void);
+VM_C_API void minor_gc();
 
 }

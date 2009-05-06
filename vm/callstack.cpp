@@ -54,7 +54,7 @@ This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-stack_frame *capture_start(void)
+stack_frame *capture_start()
 {
 	stack_frame *frame = stack_chain->callstack_bottom - 1;
 	while(frame >= stack_chain->callstack_top
@@ -100,7 +100,7 @@ code_block *frame_code(stack_frame *frame)
 
 cell frame_type(stack_frame *frame)
 {
-	return frame_code(frame)->block.type;
+	return frame_code(frame)->type;
 }
 
 cell frame_executing(stack_frame *frame)
@@ -195,9 +195,9 @@ stack_frame *innermost_stack_frame_quot(callstack *callstack)
 
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
-PRIMITIVE(innermost_stack_frame_quot)
+PRIMITIVE(innermost_stack_frame_executing)
 {
-	dpush(frame_executing(innermost_stack_frame_quot(untag_check<callstack>(dpop()))));
+	dpush(frame_executing(innermost_stack_frame(untag_check<callstack>(dpop()))));
 }
 
 PRIMITIVE(innermost_stack_frame_scan)

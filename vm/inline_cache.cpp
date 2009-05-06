@@ -22,7 +22,7 @@ void deallocate_inline_cache(cell return_address)
 	/* Find the call target. */
 	void *old_xt = get_call_target(return_address);
 	code_block *old_block = (code_block *)old_xt - 1;
-	cell old_type = old_block->block.type;
+	cell old_type = old_block->type;
 
 #ifdef FACTOR_DEBUG
 	/* The call target was either another PIC,
@@ -31,7 +31,7 @@ void deallocate_inline_cache(cell return_address)
 #endif
 
 	if(old_type == PIC_TYPE)
-		heap_free(&code,&old_block->block);
+		heap_free(&code,old_block);
 }
 
 /* Figure out what kind of type check the PIC needs based on the methods
@@ -70,7 +70,7 @@ static cell determine_inline_cache_type(array *cache_entries)
 	if(!seen_hi_tag && !seen_tuple) return PIC_TAG;
 
 	critical_error("Oops",0);
-	return -1;
+	return 0;
 }
 
 static void update_pic_count(cell type)

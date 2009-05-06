@@ -34,25 +34,32 @@ M: string string>alien
 
 HOOK: alien>native-string os ( alien -- string )
 
-HOOK: native-string>alien os ( string -- alien )
-
 M: windows alien>native-string utf16n alien>string ;
 
-M: wince native-string>alien utf16n string>alien ;
-
-M: winnt native-string>alien utf8 string>alien ;
-
 M: unix alien>native-string utf8 alien>string ;
+
+HOOK: native-string>alien os ( string -- alien )
+
+M: windows native-string>alien utf16n string>alien ;
 
 M: unix native-string>alien utf8 string>alien ;
 
 : dll-path ( dll -- string )
     path>> alien>native-string ;
 
-: string>symbol ( str -- alien )
-    dup string?
-    [ native-string>alien ]
-    [ [ native-string>alien ] map ] if ;
+HOOK: string>symbol* os ( str/seq -- alien )
+
+M: winnt string>symbol* utf8 string>alien ;
+
+M: wince string>symbol* utf16n string>alien ;
+
+M: unix string>symbol* utf8 string>alien ;
+
+GENERIC: string>symbol ( str -- alien )
+
+M: string string>symbol string>symbol* ;
+
+M: sequence string>symbol [ string>symbol* ] map ;
 
 [
     8 getenv utf8 alien>string string>cpu \ cpu set-global

@@ -5,7 +5,7 @@ namespace factor
 
 void flush_icache_for(code_block *block)
 {
-	flush_icache((cell)block,block->block.size);
+	flush_icache((cell)block,block->size);
 }
 
 void iterate_relocations(code_block *compiled, relocation_iterator iter)
@@ -122,7 +122,7 @@ void update_literal_references_step(relocation_entry rel, cell index, code_block
 /* Update pointers to literals from compiled code. */
 void update_literal_references(code_block *compiled)
 {
-	if(!compiled->block.needs_fixup)
+	if(!compiled->needs_fixup)
 	{
 		iterate_relocations(compiled,update_literal_references_step);
 		flush_icache_for(compiled);
@@ -133,12 +133,12 @@ void update_literal_references(code_block *compiled)
 aging and nursery collections */
 void copy_literal_references(code_block *compiled)
 {
-	if(collecting_gen >= compiled->block.last_scan)
+	if(collecting_gen >= compiled->last_scan)
 	{
 		if(collecting_accumulation_gen_p())
-			compiled->block.last_scan = collecting_gen;
+			compiled->last_scan = collecting_gen;
 		else
-			compiled->block.last_scan = collecting_gen + 1;
+			compiled->last_scan = collecting_gen + 1;
 
 		/* initialize chase pointer */
 		cell scan = newspace->here;
@@ -208,7 +208,7 @@ to update references to other words, without worrying about literals
 or dlsyms. */
 void update_word_references(code_block *compiled)
 {
-	if(compiled->block.needs_fixup)
+	if(compiled->needs_fixup)
 		relocate_code_block(compiled);
 	/* update_word_references() is always applied to every block in
 	   the code heap. Since it resets all call sites to point to
@@ -217,8 +217,8 @@ void update_word_references(code_block *compiled)
 	   are referenced after this is done. So instead of polluting
 	   the code heap with dead PICs that will be freed on the next
 	   GC, we add them to the free list immediately. */
-	else if(compiled->block.type == PIC_TYPE)
-		heap_free(&code,&compiled->block);
+	else if(compiled->type == PIC_TYPE)
+		heap_free(&code,compiled);
 	else
 	{
 		iterate_relocations(compiled,update_word_references_step);
@@ -248,7 +248,7 @@ void mark_code_block(code_block *compiled)
 {
 	check_code_address((cell)compiled);
 
-	mark_block(&compiled->block);
+	mark_block(compiled);
 
 	copy_handle(&compiled->literals);
 	copy_handle(&compiled->relocation);
@@ -302,7 +302,7 @@ void mark_object_code_block(object *object)
 
 /* References to undefined symbols are patched up to call this function on
 image load */
-void undefined_symbol(void)
+void undefined_symbol()
 {
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
 }
@@ -329,7 +329,6 @@ void *get_rel_symbol(array *literals, cell index)
 				return sym;
 			else
 			{
-				printf("%s\n",name);
 				return (void *)undefined_symbol;
 			}
 		}
@@ -405,8 +404,8 @@ void relocate_code_block_step(relocation_entry rel, cell index, code_block *comp
 /* Perform all fixups on a code block */
 void relocate_code_block(code_block *compiled)
 {
-	compiled->block.last_scan = NURSERY;
-	compiled->block.needs_fixup = false;
+	compiled->last_scan = NURSERY;
+	compiled->needs_fixup = false;
 	iterate_relocations(compiled,relocate_code_block_step);
 	flush_icache_for(compiled);
 }
@@ -474,9 +473,9 @@ code_block *add_code_block(
 	code_block *compiled = allot_code_block(code_length);
 
 	/* compiled header */
-	compiled->block.type = type;
-	compiled->block.last_scan = NURSERY;
-	compiled->block.needs_fixup = true;
+	compiled->type = type;
+	compiled->last_scan = NURSERY;
+	compiled->needs_fixup = true;
 	compiled->relocation = relocation.value();
 
 	/* slight space optimization */
