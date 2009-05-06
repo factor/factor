@@ -21,6 +21,8 @@ void deallocate_inline_cache(cell return_address)
 {
 	/* Find the call target. */
 	void *old_xt = get_call_target(return_address);
+	check_code_pointer((cell)old_xt);
+
 	code_block *old_block = (code_block *)old_xt - 1;
 	cell old_type = old_block->type;
 
