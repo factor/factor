@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel locals math math.functions math.ranges
-random sequences sets combinators.short-circuit ;
+random sequences sets combinators.short-circuit math.bitwise ;
 IN: math.miller-rabin
 
 <PRIVATE
@@ -14,15 +14,17 @@ TUPLE: positive-even-expected n ;
     n 1 - :> n-1
     n-1 factor-2s :> s :> r
     0 :> a!
-    t :> prime?!
     trials [
+        drop
         n 1 - [1,b] random a!
         a s n ^mod 1 = [
+            f
+        ] [
             r iota [
                 2^ s * a swap n ^mod n - -1 =
-            ] any? not [ f prime?! trials + ] when
-        ] unless drop
-    ] each prime? ;
+            ] any? not 
+        ] if
+    ] any? not ;
 
 PRIVATE>
 
@@ -83,7 +85,6 @@ ERROR: too-few-primes ;
     1 + 6 divisor? ;
 
 : next-safe-prime-candidate ( n -- candidate )
-    1 - 2/
     next-prime dup safe-prime-candidate?
     [ next-safe-prime-candidate ] unless ;
 
@@ -101,5 +102,8 @@ PRIVATE>
     dup miller-rabin
     [ nip ] [ drop next-safe-prime ] if ;
 
+: random-bits* ( numbits -- n )
+    [ random-bits ] keep set-bit ;
+
 : random-safe-prime ( numbits -- p )
-    random-bits next-safe-prime ;
+    1- random-bits* next-safe-prime ;
