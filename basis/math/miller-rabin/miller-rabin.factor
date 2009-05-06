@@ -8,6 +8,8 @@ IN: math.miller-rabin
 
 : >odd ( n -- int ) dup even? [ 1 + ] when ; foldable
 
+: >even ( n -- int ) 0 clear-bit ; foldable
+
 TUPLE: positive-even-expected n ;
 
 :: (miller-rabin) ( n trials -- ? )
@@ -97,6 +99,7 @@ PRIVATE>
     } 1&& ;
 
 : next-safe-prime ( n -- q )
+    1 - >even 2 /
     next-safe-prime-candidate
     dup >safe-prime-form
     dup miller-rabin
