@@ -390,3 +390,9 @@ DEFER: loop-bbb
 [ f ] [ \ broken-declaration optimized? ] unit-test
 
 [ ] [ [ \ broken-declaration forget ] with-compilation-unit ] unit-test
+
+! Modular arithmetic bug
+: modular-arithmetic-bug ( a -- b ) >integer 256 mod ;
+
+[ 1 ] [ 257 modular-arithmetic-bug ] unit-test
+[ -10 ] [ -10 modular-arithmetic-bug ] unit-test
