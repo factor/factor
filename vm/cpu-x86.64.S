@@ -72,9 +72,9 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	call *ARG3                         /* call memcpy */
 	ret                                /* return _with new stack_ */
 
-DEF(F_FASTCALL void,primitive_inline_cache_miss,(void)):
+DEF(void,primitive_inline_cache_miss,(void)):
 	mov (%rsp),%rbx
-DEF(F_FASTCALL void,primitive_inline_cache_miss_tail,(void)):
+DEF(void,primitive_inline_cache_miss_tail,(void)):
 	sub $STACK_PADDING,%rsp
 	mov %rbx,ARG0
 	call MANGLE(inline_cache_miss)
