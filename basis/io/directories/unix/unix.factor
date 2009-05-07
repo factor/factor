@@ -34,7 +34,9 @@ M: unix copy-file ( from to -- )
     [ opendir dup [ (io-error) ] unless ] dip
     dupd curry swap '[ _ closedir io-error ] [ ] cleanup ; inline
 
-: find-next-file ( DIR* -- byte-array )
+HOOK: find-next-file os ( DIR* -- byte-array )
+
+M: unix find-next-file ( DIR* -- byte-array )
     "dirent" <c-object>
     f <void*>
     [ readdir_r 0 = [ (io-error) ] unless ] 2keep
@@ -53,9 +55,16 @@ M: unix copy-file ( from to -- )
         [ drop +unknown+ ]
     } case ;
 
+TUPLE: unix-directory-entry < directory-entry ino off reclen ;
+
 M: unix >directory-entry ( byte-array -- directory-entry )
-    [ dirent-d_name utf8 alien>string ]
-    [ dirent-d_type dirent-type>file-type ] bi directory-entry boa ;
+    {
+        [ dirent-d_name utf8 alien>string ]
+        [ dirent-d_type dirent-type>file-type ]
+        [ dirent-d_ino ]
+        [ dirent-d_off ]
+        [ dirent-d_reclen ]
+    } cleave unix-directory-entry boa ;
 
 M: unix (directory-entries) ( path -- seq )
     [
