@@ -195,7 +195,8 @@ M: hand equal?
     hand-rank VALUE_STR nth ;
 
 : best-hand ( str -- hand )
-    " " split 5 all-combinations [ " " join <hand> ] map infimum ;
+    parse-cards 5 all-combinations
+    [ dup hand-value hand boa ] map infimum ;
 
 TUPLE: deck
     { cards sequence } ;
