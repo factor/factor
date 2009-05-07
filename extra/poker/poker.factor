@@ -194,8 +194,12 @@ M: hand equal?
 : >value ( hand -- str )
     hand-rank VALUE_STR nth ;
 
-: <deck> ( -- deck )
-    RANK_STR SUIT_STR 2array [ concat >ckf ] product-map ;
+TUPLE: deck
+    { cards sequence } ;
 
-ALIAS: shuffle randomize
+: <deck> ( -- deck )
+    RANK_STR SUIT_STR 2array [ concat >ckf ] product-map deck boa ;
+
+: shuffle ( deck -- deck )
+    [ randomize ] change-cards ;
 
