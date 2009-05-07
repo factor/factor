@@ -25,11 +25,17 @@ struct jit {
 	}
 
 	void word_jump(cell word) {
-		emit_with(userenv[JIT_WORD_JUMP],word);
+		literal(tag_fixnum(xt_tail_pic_offset));
+		literal(word);
+		emit(userenv[JIT_WORD_JUMP]);
 	}
 
 	void word_call(cell word) {
 		emit_with(userenv[JIT_WORD_CALL],word);
+	}
+
+	void word_special(cell word) {
+		emit_with(userenv[JIT_WORD_SPECIAL],word);
 	}
 
 	void emit_subprimitive(cell word_) {
