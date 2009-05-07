@@ -226,6 +226,11 @@ CONSTANT: rs-reg 14
     6 3 0 LWZ
     6 0 4 CMP
     5 BNE
+    ! megamorphic_cache_hits++
+    0 4 LOAD32 rc-absolute-ppc-2/2 rt-megamorphic-cache-hits jit-rel
+    5 4 0 LWZ
+    5 5 1 ADDI
+    5 4 0 STW
     ! ... goto get(cache + bootstrap-cell)
     3 3 4 LWZ
     3 3 word-xt-offset LWZ
