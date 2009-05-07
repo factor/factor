@@ -46,7 +46,8 @@ PRIVATE>
     [ permutation-indices ] keep nths ;
 
 : all-permutations ( seq -- seq )
-    [ length factorial ] keep '[ _ permutation ] map ;
+    [ length factorial ] keep
+    '[ _ permutation ] map ;
 
 : each-permutation ( seq quot -- )
     [ [ length factorial ] keep ] dip
@@ -69,6 +70,9 @@ TUPLE: combo
 
 C: <combo> combo
 
+: choose ( combo -- nCk )
+    [ seq>> length ] [ k>> ] bi nCk ;
+
 : largest-value ( a b x -- v )
     #! TODO: use a binary search instead of find-last
     [ [0,b) ] 2dip '[ _ nCk _ <= ] find-last nip ;
@@ -79,25 +83,22 @@ C: <combo> combo
     x v b nCk -                   ! x'
     v ;                           ! v == a'
 
-: dual-index ( combo m -- x )
-    [ [ seq>> length ] [ k>> ] bi nCk 1 - ] dip - ;
+: dual-index ( m combo -- m' )
+    choose 1 - swap - ;
 
-: initial-values ( combo m -- a b x )
-    [ [ seq>> length ] [ k>> ] [ ] tri ] dip dual-index ;
+: initial-values ( combo m -- n k m )
+    [ [ seq>> length ] [ k>> ] bi ] dip ;
 
 : combinadic ( combo m -- combinadic )
     initial-values [ over 0 > ] [ next-values ] produce
     [ 3drop ] dip ;
 
 : combination-indices ( m combo -- seq )
-    [ swap combinadic ] keep
+    [ tuck dual-index combinadic ] keep
     seq>> length 1 - swap [ - ] with map ;
 
 : apply-combination ( m combo -- seq )
     [ combination-indices ] keep seq>> nths ;
-
-: choose ( combo -- nCk )
-    [ seq>> length ] [ k>> ] bi nCk ;
 
 PRIVATE>
 
