@@ -77,7 +77,7 @@ PRIMITIVE(alien_address)
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
-static void *alien_pointer(void)
+static void *alien_pointer()
 {
 	fixnum offset = to_fixnum(dpop());
 	return unbox_alien() + offset;
@@ -128,7 +128,7 @@ PRIMITIVE(dlsym)
 	gc_root<byte_array> name(dpop());
 	name.untag_check();
 
-	vm_char *sym = (vm_char *)(name.untagged() + 1);
+	symbol_char *sym = name->data<symbol_char>();
 
 	if(library.value() == F)
 		box_alien(ffi_dlsym(NULL,sym));
@@ -182,7 +182,7 @@ VM_C_API char *alien_offset(cell obj)
 }
 
 /* pop an object representing a C pointer */
-VM_C_API char *unbox_alien(void)
+VM_C_API char *unbox_alien()
 {
 	return alien_offset(dpop());
 }

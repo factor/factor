@@ -5,7 +5,7 @@ IN: alien.libraries
 
 : dlopen ( path -- dll ) native-string>alien (dlopen) ;
 
-: dlsym ( name dll -- alien ) [ native-string>alien ] dip (dlsym) ;
+: dlsym ( name dll -- alien ) [ string>symbol ] dip (dlsym) ;
 
 SYMBOL: libraries
 

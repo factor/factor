@@ -21,6 +21,8 @@ void deallocate_inline_cache(cell return_address)
 {
 	/* Find the call target. */
 	void *old_xt = get_call_target(return_address);
+	check_code_pointer((cell)old_xt);
+
 	code_block *old_block = (code_block *)old_xt - 1;
 	cell old_type = old_block->type;
 
@@ -70,7 +72,7 @@ static cell determine_inline_cache_type(array *cache_entries)
 	if(!seen_hi_tag && !seen_tuple) return PIC_TAG;
 
 	critical_error("Oops",0);
-	return -1;
+	return 0;
 }
 
 static void update_pic_count(cell type)
@@ -84,7 +86,11 @@ struct inline_cache_jit : public jit {
 	inline_cache_jit(cell generic_word_) : jit(PIC_TYPE,generic_word_) {};
 
 	void emit_check(cell klass);
-	void compile_inline_cache(fixnum index, cell generic_word_, cell methods_, cell cache_entries_);
+	void compile_inline_cache(fixnum index,
+				  cell generic_word_,
+				  cell methods_,
+				  cell cache_entries_,
+				  bool tail_call_p);
 };
 
 void inline_cache_jit::emit_check(cell klass)
@@ -100,7 +106,11 @@ void inline_cache_jit::emit_check(cell klass)
 
 /* index: 0 = top of stack, 1 = item underneath, etc
    cache_entries: array of class/method pairs */
-void inline_cache_jit::compile_inline_cache(fixnum index, cell generic_word_, cell methods_, cell cache_entries_)
+void inline_cache_jit::compile_inline_cache(fixnum index,
+					    cell generic_word_,
+					    cell methods_,
+					    cell cache_entries_,
+					    bool tail_call_p)
 {
 	gc_root<word> generic_word(generic_word_);
 	gc_root<array> methods(methods_);
@@ -134,20 +144,25 @@ void inline_cache_jit::compile_inline_cache(fixnum index, cell generic_word_, ce
 	push(methods.value());
 	push(tag_fixnum(index));
 	push(cache_entries.value());
-	word_jump(userenv[PIC_MISS_WORD]);
+	word_special(userenv[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
 }
 
 static code_block *compile_inline_cache(fixnum index,
-					  cell generic_word_,
-					  cell methods_,
-					  cell cache_entries_)
+					cell generic_word_,
+					cell methods_,
+					cell cache_entries_,
+					bool tail_call_p)
 {
 	gc_root<word> generic_word(generic_word_);
 	gc_root<array> methods(methods_);
 	gc_root<array> cache_entries(cache_entries_);
 
 	inline_cache_jit jit(generic_word.value());
-	jit.compile_inline_cache(index,generic_word.value(),methods.value(),cache_entries.value());
+	jit.compile_inline_cache(index,
+				 generic_word.value(),
+				 methods.value(),
+				 cache_entries.value(),
+				 tail_call_p);
 	code_block *code = jit.to_code_block();
 	relocate_code_block(code);
 	return code;
@@ -225,14 +240,18 @@ void *inline_cache_miss(cell return_address)
 		xt = compile_inline_cache(index,
 					  generic_word.value(),
 					  methods.value(),
-					  new_cache_entries.value()) + 1;
+					  new_cache_entries.value(),
+					  tail_call_site_p(return_address))->xt();
 	}
 
 	/* Install the new stub. */
 	set_call_target(return_address,xt);
 
 #ifdef PIC_DEBUG
-	printf("Updated call site 0x%lx with 0x%lx\n",return_address,(cell)xt);
+	printf("Updated %s call site 0x%lx with 0x%lx\n",
+	       tail_call_site_p(return_address) ? "tail" : "non-tail",
+	       return_address,
+	       (cell)xt);
 #endif
 
 	return xt;

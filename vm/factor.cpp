@@ -81,7 +81,7 @@ VM_C_API void init_parameters_from_args(vm_parameters *p, int argc, vm_char **ar
 }
 
 /* Do some initialization that we do once only */
-static void do_stage1_init(void)
+static void do_stage1_init()
 {
 	print_string("*** Stage 2 early init... ");
 	fflush(stdout);
@@ -198,9 +198,9 @@ VM_C_API void factor_eval_free(char *result)
 	free(result);
 }
 
-VM_C_API void factor_yield(void)
+VM_C_API void factor_yield()
 {
-	void (*callback)(void) = (void (*)(void))alien_offset(userenv[YIELD_CALLBACK_ENV]);
+	void (*callback)() = (void (*)())alien_offset(userenv[YIELD_CALLBACK_ENV]);
 	callback();
 }
 

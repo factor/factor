@@ -4,7 +4,7 @@ namespace factor
 {
 
 /* From SBCL */
-const char *vm_executable_path(void)
+const char *vm_executable_path()
 {
 	char path[PATH_MAX + 1];
 
