@@ -229,7 +229,9 @@ struct word : public object {
 	/* TAGGED property assoc for library code */
 	cell props;
 	/* TAGGED alternative entry point for direct non-tail calls. Used for inline caching */
-	cell direct_entry_def;
+	cell pic_def;
+	/* TAGGED alternative entry point for direct tail calls. Used for inline caching */
+	cell pic_tail_def;
 	/* TAGGED call count for profiling */
 	cell counter;
 	/* TAGGED machine code for sub-primitive */

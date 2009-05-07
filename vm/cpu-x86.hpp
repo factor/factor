@@ -7,15 +7,19 @@ namespace factor
 
 inline static void flush_icache(cell start, cell len) {}
 
+static const unsigned char call_opcode = 0xe8;
+static const unsigned char jmp_opcode = 0xe9;
+
+inline static unsigned char call_site_opcode(cell return_address)
+{
+	return *(unsigned char *)(return_address - 5);
+}
+
 inline static void check_call_site(cell return_address)
 {
-	/* An x86 CALL instruction looks like so:
-	   |e8|..|..|..|..|
-	   where the ... are a PC-relative jump address.
-	   The return_address points to right after the
-	   instruction. */
 #ifdef FACTOR_DEBUG
-	assert(*(unsigned char *)(return_address - 5) == 0xe8);
+	unsigned char opcode = call_site_opcode(return_address);
+	assert(opcode == call_opcode || opcode == jmp_opcode);
 #endif
 }
 
@@ -29,6 +33,11 @@ inline static void set_call_target(cell return_address, void *target)
 {
 	check_call_site(return_address);
 	*(int *)(return_address - 4) = ((cell)target - return_address);
+}
+
+inline static bool tail_call_site_p(cell return_address)
+{
+	return call_site_opcode(return_address) == jmp_opcode;
 }
 
 /* Defined in assembly */

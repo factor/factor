@@ -26,8 +26,8 @@ void jit_compile_word(cell word_, cell def_, bool relocate)
 
 	word->code = def->code;
 
-	if(word->direct_entry_def != F)
-		jit_compile(word->direct_entry_def,relocate);
+	if(word->pic_def != F) jit_compile(word->pic_def,relocate);
+	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
 }
 
 /* Apply a function to every code block */
