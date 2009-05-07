@@ -28,3 +28,11 @@ HELP: >value
         "\"AC KC QC JC TC\" <hand> >value ." "\"Straight Flush\"" }
 }
 { $notes "This should not be used as a basis for hand comparison." } ;
+
+HELP: best-hand
+{ $values { "str" string } { "hand" "a new hand" } }
+{ $description "Creates a new poker hand containing the best possible combination of the cards specified in " { $snippet "str" } "." }
+{ $examples
+    { $example "USING: kernel poker prettyprint ;"
+        "\"AS KD JC KH 2D 2S KH\" best-hand >value ." "\"Full House\"" }
+} ;
