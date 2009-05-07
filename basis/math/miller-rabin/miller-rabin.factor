@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (c) 2008-2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel locals math math.functions math.ranges
 random sequences sets combinators.short-circuit math.bitwise
@@ -12,8 +12,6 @@ IN: math.miller-rabin
 : >even ( n -- int ) 0 clear-bit ; foldable
 
 : next-even ( m -- n ) >even 2 + ;
-
-: next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ;
 
 TUPLE: positive-even-expected n ;
 
@@ -29,11 +27,13 @@ TUPLE: positive-even-expected n ;
         ] [
             r iota [
                 2^ s * a swap n ^mod n - -1 =
-            ] any? not 
+            ] any? not
         ] if
     ] any? not ;
 
 PRIVATE>
+
+: next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ;
 
 : miller-rabin* ( n numtrials -- ? )
     over {
