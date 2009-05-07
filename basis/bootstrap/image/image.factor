@@ -168,6 +168,7 @@ SYMBOL: pic-check-tag
 SYMBOL: pic-check
 SYMBOL: pic-hit
 SYMBOL: pic-miss-word
+SYMBOL: pic-miss-tail-word
 
 ! Megamorphic dispatch
 SYMBOL: mega-lookup
@@ -193,25 +194,26 @@ SYMBOL: undefined-quot
         { jit-return 34 }
         { jit-profiling 35 }
         { jit-push-immediate 36 }
-        { jit-save-stack 38 }
-        { jit-dip-word 39 }
-        { jit-dip 40 }
-        { jit-2dip-word 41 }
-        { jit-2dip 42 }
-        { jit-3dip-word 43 }
-        { jit-3dip 44 }
-        { jit-execute-word 45 }
-        { jit-execute-jump 46 }
-        { jit-execute-call 47 }
-        { pic-load 48 }
-        { pic-tag 49 }
-        { pic-hi-tag 50 }
-        { pic-tuple 51 }
-        { pic-hi-tag-tuple 52 }
-        { pic-check-tag 53 }
-        { pic-check 54 }
-        { pic-hit 55 }
-        { pic-miss-word 56 }
+        { jit-save-stack 37 }
+        { jit-dip-word 38 }
+        { jit-dip 39 }
+        { jit-2dip-word 40 }
+        { jit-2dip 41 }
+        { jit-3dip-word 42 }
+        { jit-3dip 43 }
+        { jit-execute-word 44 }
+        { jit-execute-jump 45 }
+        { jit-execute-call 46 }
+        { pic-load 47 }
+        { pic-tag 48 }
+        { pic-hi-tag 49 }
+        { pic-tuple 50 }
+        { pic-hi-tag-tuple 51 }
+        { pic-check-tag 52 }
+        { pic-check 53 }
+        { pic-hit 54 }
+        { pic-miss-word 55 }
+        { pic-miss-tail-word 56 }
         { mega-lookup 57 }
         { mega-lookup-word 58 }
         { mega-miss-word 59 }
@@ -351,7 +353,8 @@ M: f '
                     [ vocabulary>> , ]
                     [ def>> , ]
                     [ props>> , ]
-                    [ direct-entry-def>> , ] ! direct-entry-def
+                    [ pic-def>> , ]
+                    [ pic-tail-def>> , ]
                     [ drop 0 , ] ! count
                     [ word-sub-primitive , ]
                     [ drop 0 , ] ! xt
@@ -524,6 +527,7 @@ M: quotation '
     \ 3dip jit-3dip-word set
     \ (execute) jit-execute-word set
     \ inline-cache-miss \ pic-miss-word set
+    \ inline-cache-miss-tail \ pic-miss-tail-word set
     \ mega-cache-lookup \ mega-lookup-word set
     \ mega-cache-miss \ mega-miss-word set
     [ undefined ] undefined-quot set
@@ -559,6 +563,7 @@ M: quotation '
         pic-check
         pic-hit
         pic-miss-word
+        pic-miss-tail-word
         mega-lookup
         mega-lookup-word
         mega-miss-word

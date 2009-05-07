@@ -114,7 +114,11 @@ M: ppc stack-frame-size ( stack-frame -- i )
     4 cells align ;
 
 M: ppc %call ( word -- ) 0 BL rc-relative-ppc-3 rel-word-pic ;
-M: ppc %jump ( word -- ) 0 B rc-relative-ppc-3 rel-word ;
+
+M: ppc %jump ( word -- )
+    0 3 LOAD32 rc-absolute-ppc-2/2 rel-here
+    0 B rc-relative-ppc-3 rel-word-pic-tail ;
+
 M: ppc %jump-label ( label -- ) B ;
 M: ppc %return ( -- ) BLR ;
 

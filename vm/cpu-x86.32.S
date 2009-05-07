@@ -60,9 +60,10 @@ DEF(bool,check_sse2,(void)):
 	ret
 
 DEF(F_FASTCALL void,primitive_inline_cache_miss,(void)):
-	mov (%esp),%eax
+	mov (%esp),%ebx
+DEF(F_FASTCALL void,primitive_inline_cache_miss_tail,(void)):
 	sub $8,%esp
-	push %eax
+	push %ebx
 	call MANGLE(inline_cache_miss)
 	add $12,%esp
 	jmp *%eax
