@@ -3,7 +3,7 @@
 USING: system kernel namespaces strings hashtables sequences 
 assocs combinators vocabs.loader init threads continuations
 math accessors concurrency.flags destructors environment
-io io.encodings.ascii io.backend io.timeouts io.pipes
+io io.encodings.utf8 io.backend io.timeouts io.pipes
 io.pipes.private io.encodings io.streams.duplex io.ports
 debugger prettyprint summary calendar io.pathnames ;
 IN: io.launcher
@@ -266,4 +266,4 @@ M: object run-pipeline-element
     [ ]
 } cond
 
-: run-desc ( desc -- result ) ascii <process-reader> stream-contents but-last ;
+: run-desc ( desc -- result ) utf8 <process-reader> stream-contents but-last ;
