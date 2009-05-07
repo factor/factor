@@ -12,6 +12,14 @@ HELP: <hand>
 }
 { $notes "Cards may be specified in any order. Hands are directly comparable to each other on the basis of their computed value. Two hands are considered equal when they would tie in a game (despite being composed of different cards)." } ;
 
+HELP: best-hand
+{ $values { "str" string } { "hand" "a new hand" } }
+{ $description "Creates a new poker hand containing the best possible combination of the cards specified in " { $snippet "str" } "." }
+{ $examples
+    { $example "USING: kernel poker prettyprint ;"
+        "\"AS KD JC KH 2D 2S KH\" best-hand >value ." "\"Full House\"" }
+} ;
+
 HELP: >cards
 { $values { "hand" "a hand" } { "str" string } }
 { $description "Outputs a string representation of a hand's cards." }
@@ -28,11 +36,3 @@ HELP: >value
         "\"AC KC QC JC TC\" <hand> >value ." "\"Straight Flush\"" }
 }
 { $notes "This should not be used as a basis for hand comparison." } ;
-
-HELP: best-hand
-{ $values { "str" string } { "hand" "a new hand" } }
-{ $description "Creates a new poker hand containing the best possible combination of the cards specified in " { $snippet "str" } "." }
-{ $examples
-    { $example "USING: kernel poker prettyprint ;"
-        "\"AS KD JC KH 2D 2S KH\" best-hand >value ." "\"Full House\"" }
-} ;
