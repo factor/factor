@@ -2,8 +2,8 @@
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
 USING: accessors arrays ascii binary-search combinators kernel locals math
-    math.bitwise math.order poker.arrays random sequences sequences.product
-    splitting ;
+    math.bitwise math.combinatorics math.order poker.arrays random sequences
+    sequences.product splitting ;
 IN: poker
 
 ! The algorithm used is based on Cactus Kev's Poker Hand Evaluator with
@@ -193,6 +193,9 @@ M: hand equal?
 
 : >value ( hand -- str )
     hand-rank VALUE_STR nth ;
+
+: best-hand ( str -- hand )
+    " " split 5 all-combinations [ " " join <hand> ] map infimum ;
 
 TUPLE: deck
     { cards sequence } ;
