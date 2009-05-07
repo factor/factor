@@ -233,7 +233,7 @@ big-endian off
     temp0 temp2 ADD
     ! if(get(cache) == class)
     temp0 [] temp1 CMP
-    bootstrap-cell 4 = 14 18 ? JNE ! Yuck!
+    bootstrap-cell 4 = 14 22 ? JNE ! Yuck!
     ! megamorphic_cache_hits++
     temp1 0 MOV rc-absolute-cell rt-megamorphic-cache-hits jit-rel
     temp1 [] 1 ADD
