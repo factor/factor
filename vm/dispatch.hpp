@@ -1,6 +1,9 @@
 namespace factor
 {
 
+extern cell megamorphic_cache_hits;
+extern cell megamorphic_cache_misses;
+
 cell lookup_method(cell object, cell methods);
 PRIMITIVE(lookup_method);
 

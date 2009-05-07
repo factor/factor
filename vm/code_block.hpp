@@ -24,6 +24,8 @@ enum relocation_type {
 	RT_STACK_CHAIN,
 	/* untagged fixnum literal */
 	RT_UNTAGGED,
+	/* address of megamorphic_cache_hits var */
+	RT_MEGAMORPHIC_CACHE_HITS,
 };
 
 enum relocation_class {
