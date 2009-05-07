@@ -8,6 +8,159 @@ void flush_icache_for(code_block *block)
 	flush_icache((cell)block,block->size);
 }
 
+static int number_of_parameters(relocation_type type)
+{
+	switch(type)
+	{
+	case RT_PRIMITIVE:
+	case RT_XT:
+	case RT_XT_PIC:
+	case RT_XT_PIC_TAIL:
+	case RT_IMMEDIATE:
+	case RT_HERE:
+	case RT_UNTAGGED:
+		return 1;
+	case RT_DLSYM:
+		return 2;
+	case RT_THIS:
+	case RT_STACK_CHAIN:
+	case RT_MEGAMORPHIC_CACHE_HITS:
+		return 0;
+	default:
+		critical_error("Bad rel type",type);
+		return -1; /* Can't happen */
+	}
+}
+
+void *object_xt(cell obj)
+{
+	switch(tagged<object>(obj).type())
+	{
+	case WORD_TYPE:
+		return untag<word>(obj)->xt;
+	case QUOTATION_TYPE:
+		return untag<quotation>(obj)->xt;
+	default:
+		critical_error("Expected word or quotation",obj);
+		return NULL;
+	}
+}
+
+static void *xt_pic(word *w, cell tagged_quot)
+{
+	if(tagged_quot == F || max_pic_size == 0)
+		return w->xt;
+	else
+	{
+		quotation *quot = untag<quotation>(tagged_quot);
+		if(quot->compiledp == F)
+			return w->xt;
+		else
+			return quot->xt;
+	}
+}
+
+void *word_xt_pic(word *w)
+{
+	return xt_pic(w,w->pic_def);
+}
+
+void *word_xt_pic_tail(word *w)
+{
+	return xt_pic(w,w->pic_tail_def);
+}
+
+/* References to undefined symbols are patched up to call this function on
+image load */
+void undefined_symbol()
+{
+	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
+}
+
+/* Look up an external library symbol referenced by a compiled code block */
+void *get_rel_symbol(array *literals, cell index)
+{
+	cell symbol = array_nth(literals,index);
+	cell library = array_nth(literals,index + 1);
+
+	dll *d = (library == F ? NULL : untag<dll>(library));
+
+	if(d != NULL && !d->dll)
+		return (void *)undefined_symbol;
+
+	switch(tagged<object>(symbol).type())
+	{
+	case BYTE_ARRAY_TYPE:
+		{
+			symbol_char *name = alien_offset(symbol);
+			void *sym = ffi_dlsym(d,name);
+
+			if(sym)
+				return sym;
+			else
+			{
+				return (void *)undefined_symbol;
+			}
+		}
+	case ARRAY_TYPE:
+		{
+			cell i;
+			array *names = untag<array>(symbol);
+			for(i = 0; i < array_capacity(names); i++)
+			{
+				symbol_char *name = alien_offset(array_nth(names,i));
+				void *sym = ffi_dlsym(d,name);
+
+				if(sym)
+					return sym;
+			}
+			return (void *)undefined_symbol;
+		}
+	default:
+		critical_error("Bad symbol specifier",symbol);
+		return (void *)undefined_symbol;
+	}
+}
+
+cell compute_relocation(relocation_entry rel, cell index, code_block *compiled)
+{
+	array *literals = untag<array>(compiled->literals);
+	cell offset = REL_OFFSET(rel) + (cell)compiled->xt();
+
+#define ARG array_nth(literals,index)
+
+	switch(REL_TYPE(rel))
+	{
+	case RT_PRIMITIVE:
+		return (cell)primitives[untag_fixnum(ARG)];
+	case RT_DLSYM:
+		return (cell)get_rel_symbol(literals,index);
+	case RT_IMMEDIATE:
+		return ARG;
+	case RT_XT:
+		return (cell)object_xt(ARG);
+	case RT_XT_PIC:
+		return (cell)word_xt_pic(untag<word>(ARG));
+	case RT_XT_PIC_TAIL:
+		return (cell)word_xt_pic_tail(untag<word>(ARG));
+	case RT_HERE:
+		return offset + (short)untag_fixnum(ARG);
+	case RT_THIS:
+		return (cell)(compiled + 1);
+	case RT_STACK_CHAIN:
+		return (cell)&stack_chain;
+	case RT_UNTAGGED:
+		return untag_fixnum(ARG);
+	case RT_MEGAMORPHIC_CACHE_HITS:
+		return (cell)&megamorphic_cache_hits;
+	default:
+		critical_error("Bad rel type",rel);
+		return 0; /* Can't happen */
+	}
+
+#undef ARG
+}
+
 void iterate_relocations(code_block *compiled, relocation_iterator iter)
 {
 	if(compiled->relocation != F)
@@ -20,30 +173,8 @@ void iterate_relocations(code_block *compiled, relocation_iterator iter)
 		for(cell i = 0; i < length; i++)
 		{
 			relocation_entry rel = relocation->data<relocation_entry>()[i];
-
 			iter(rel,index,compiled);
-
-			switch(REL_TYPE(rel))
-			{
-			case RT_PRIMITIVE:
-			case RT_XT:
-			case RT_XT_PIC:
-			case RT_XT_PIC_TAIL:
-			case RT_IMMEDIATE:
-			case RT_HERE:
-			case RT_UNTAGGED:
-				index++;
-				break;
-			case RT_DLSYM:
-				index += 2;
-				break;
-			case RT_THIS:
-			case RT_STACK_CHAIN:
-				break;
-			default:
-				critical_error("Bad rel type",rel);
-				return; /* Can't happen */
-			}
+			index += number_of_parameters(REL_TYPE(rel));			
 		}
 	}
 }
@@ -158,73 +289,24 @@ void copy_literal_references(code_block *compiled)
 	}
 }
 
-void *object_xt(cell obj)
+/* Compute an address to store at a relocation */
+void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled)
 {
-	switch(tagged<object>(obj).type())
-	{
-	case WORD_TYPE:
-		return untag<word>(obj)->xt;
-	case QUOTATION_TYPE:
-		return untag<quotation>(obj)->xt;
-	default:
-		critical_error("Expected word or quotation",obj);
-		return NULL;
-	}
-}
+#ifdef FACTOR_DEBUG
+	tagged<array>(compiled->literals).untag_check();
+	tagged<byte_array>(compiled->relocation).untag_check();
+#endif
 
-static void *xt_pic(word *w, cell tagged_quot)
-{
-	if(tagged_quot == F || max_pic_size == 0)
-		return w->xt;
-	else
-	{
-		quotation *quot = untag<quotation>(tagged_quot);
-		if(quot->compiledp == F)
-			return w->xt;
-		else
-			return quot->xt;
-	}
-}
-
-void *word_xt_pic(word *w)
-{
-	return xt_pic(w,w->pic_def);
-}
-
-void *word_xt_pic_tail(word *w)
-{
-	return xt_pic(w,w->pic_tail_def);
+	store_address_in_code_block(REL_CLASS(rel),
+				    REL_OFFSET(rel) + (cell)compiled->xt(),
+				    compute_relocation(rel,index,compiled));
 }
 
 void update_word_references_step(relocation_entry rel, cell index, code_block *compiled)
 {
 	relocation_type type = REL_TYPE(rel);
 	if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
-	{
-		cell offset = REL_OFFSET(rel) + (cell)(compiled + 1);
-		array *literals = untag<array>(compiled->literals);
-		cell obj = array_nth(literals,index);
-
-		void *xt;
-		switch(type)
-		{
-		case RT_XT:
-			xt = object_xt(obj);
-			break;
-		case RT_XT_PIC:
-			xt = word_xt_pic(untag<word>(obj));
-			break;
-		case RT_XT_PIC_TAIL:
-			xt = word_xt_pic_tail(untag<word>(obj));
-			break;
-		default:
-			critical_error("Oops",type);
-			xt = NULL;
-			break;
-		}
-
-		store_address_in_code_block(REL_CLASS(rel),offset,(cell)xt);
-	}
+		relocate_code_block_step(rel,index,compiled);
 }
 
 /* Relocate new code blocks completely; updating references to literals,
@@ -323,114 +405,6 @@ void mark_object_code_block(object *object)
 			break;
 		}
 	}
-}
-
-/* References to undefined symbols are patched up to call this function on
-image load */
-void undefined_symbol()
-{
-	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
-}
-
-/* Look up an external library symbol referenced by a compiled code block */
-void *get_rel_symbol(array *literals, cell index)
-{
-	cell symbol = array_nth(literals,index);
-	cell library = array_nth(literals,index + 1);
-
-	dll *d = (library == F ? NULL : untag<dll>(library));
-
-	if(d != NULL && !d->dll)
-		return (void *)undefined_symbol;
-
-	switch(tagged<object>(symbol).type())
-	{
-	case BYTE_ARRAY_TYPE:
-		{
-			symbol_char *name = alien_offset(symbol);
-			void *sym = ffi_dlsym(d,name);
-
-			if(sym)
-				return sym;
-			else
-			{
-				return (void *)undefined_symbol;
-			}
-		}
-	case ARRAY_TYPE:
-		{
-			cell i;
-			array *names = untag<array>(symbol);
-			for(i = 0; i < array_capacity(names); i++)
-			{
-				symbol_char *name = alien_offset(array_nth(names,i));
-				void *sym = ffi_dlsym(d,name);
-
-				if(sym)
-					return sym;
-			}
-			return (void *)undefined_symbol;
-		}
-	default:
-		critical_error("Bad symbol specifier",symbol);
-		return (void *)undefined_symbol;
-	}
-}
-
-/* Compute an address to store at a relocation */
-void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled)
-{
-#ifdef FACTOR_DEBUG
-	tagged<array>(compiled->literals).untag_check();
-	tagged<byte_array>(compiled->relocation).untag_check();
-#endif
-
-	cell offset = REL_OFFSET(rel) + (cell)(compiled + 1);
-	array *literals = untag<array>(compiled->literals);
-	fixnum absolute_value;
-
-#define ARG array_nth(literals,index)
-
-	switch(REL_TYPE(rel))
-	{
-	case RT_PRIMITIVE:
-		absolute_value = (cell)primitives[untag_fixnum(ARG)];
-		break;
-	case RT_DLSYM:
-		absolute_value = (cell)get_rel_symbol(literals,index);
-		break;
-	case RT_IMMEDIATE:
-		absolute_value = ARG;
-		break;
-	case RT_XT:
-		absolute_value = (cell)object_xt(ARG);
-		break;
-	case RT_XT_PIC:
-		absolute_value = (cell)word_xt_pic(untag<word>(ARG));
-		break;
-	case RT_XT_PIC_TAIL:
-		absolute_value = (cell)word_xt_pic_tail(untag<word>(ARG));
-		break;
-	case RT_HERE:
-		absolute_value = offset + (short)untag_fixnum(ARG);
-		break;
-	case RT_THIS:
-		absolute_value = (cell)(compiled + 1);
-		break;
-	case RT_STACK_CHAIN:
-		absolute_value = (cell)&stack_chain;
-		break;
-	case RT_UNTAGGED:
-		absolute_value = untag_fixnum(ARG);
-		break;
-	default:
-		critical_error("Bad rel type",rel);
-		return; /* Can't happen */
-	}
-
-#undef ARG
-
-	store_address_in_code_block(REL_CLASS(rel),offset,absolute_value);
 }
 
 /* Perform all fixups on a code block */
