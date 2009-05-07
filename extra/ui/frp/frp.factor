@@ -1,7 +1,8 @@
-USING: accessors arrays colors fonts kernel math models
+USING: accessors arrays colors fonts fry kernel math models
 models.product monads sequences ui.gadgets ui.gadgets.buttons
 ui.gadgets.editors ui.gadgets.line-support ui.gadgets.tables
-ui.gadgets.tracks ui.render ui.gadgets.scrollers ui.baseline-alignment ;
+ui.gadgets.tracks ui.render ui.gadgets.scrollers ui.baseline-alignment
+math.parser lexer ;
 QUALIFIED: make
 IN: ui.frp
 
@@ -26,27 +27,29 @@ M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 : <frp-field> ( -- field ) "" <model> <model-field> ;
 
 ! Layout utilities
+TUPLE: layout gadget width ; C: <layout> layout
 
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
 M: frp-table output-model selected-value>> ;
 M: model-field output-model field-model>> ;
-M: scroller output-model children>> first model>> ;
+M: scroller output-model viewport>> children>> first model>> ;
+M: table output-model selected-value>> ;
 
 GENERIC: , ( uiitem -- )
-M: gadget , make:, ;
+M: gadget , f <layout> make:, ;
 M: model , activate-model ;
 
-GENERIC: -> ( uiitem -- model )
-M: gadget -> dup make:, output-model ;
-M: model -> dup , ;
-M: table -> dup , selected-value>> ;
+SYNTAX: ,% scan string>number [ <layout> make:, ] curry over push-all ;
+SYNTAX: ->% scan string>number '[ [ _ <layout> make:, ] [ output-model ] bi ] over push-all ;
 
+GENERIC: -> ( uiitem -- model )
+M: gadget -> dup , output-model ;
+M: model -> dup , ;
 
 ! : <spacer> ( -- ) <gadget> ,( 100% 100% ) ;
-! Add a % object as a possibility for pref-dim
 : <box> ( gadgets type -- track )
-   [ { } make:make ] dip <track> +baseline+ >>align swap [ f track-add ] each ; inline
+   [ { } make:make ] dip <track> +baseline+ >>align swap [ [ gadget>> ] [ width>> ] bi track-add ] each ; inline
 : <box*> ( gadgets type -- track ) [ <box> ] [ [ model>> ] map <product> ] bi >>model ; inline
 : <hbox> ( gadgets -- track ) horizontal <box> ; inline
 : <hbox*> ( gadgets -- track ) horizontal <box*> ; inline
