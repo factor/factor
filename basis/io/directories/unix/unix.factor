@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.strings combinators
 continuations destructors fry io io.backend io.backend.unix
 io.directories io.encodings.binary io.encodings.utf8 io.files
 io.pathnames io.files.types kernel math.bitwise sequences system
-unix unix.stat ;
+unix unix.stat vocabs.loader ;
 IN: io.directories.unix
 
 : touch-mode ( -- n )
@@ -72,3 +72,5 @@ M: unix (directory-entries) ( path -- seq )
         [ >directory-entry ]
         produce nip
     ] with-unix-directory ;
+
+os linux? [ "io.directories.unix.linux" require ] when

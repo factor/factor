@@ -94,7 +94,7 @@ C-STRUCT: passwd
     { "char*"  "pw_shell" } ;
 
 ! dirent64
-C-STRUCT: dirent64
+C-STRUCT: dirent
     { "ulonglong" "d_ino" }
     { "longlong" "d_off" }
     { "ushort" "d_reclen" }
@@ -103,7 +103,7 @@ C-STRUCT: dirent64
 
 FUNCTION: int open64 ( char* path, int flags, int prot ) ;
 FUNCTION: dirent64* readdir64 ( DIR* dirp ) ;
-FUNCTION: int readdir64_r ( void* dirp, dirent64* entry, dirent64** result ) ;
+FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result ) ;
 
 M: linux open-file [ open64 ] unix-system-call ;
 
