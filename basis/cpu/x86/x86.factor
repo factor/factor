@@ -61,8 +61,12 @@ M: x86 stack-frame-size ( stack-frame -- i )
 
 M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
 
+: xt-tail-pic-offset ( -- n )
+    #! See the comment in vm/cpu-x86.hpp
+    cell 4 + 1 + ; inline
+
 M: x86 %jump ( word -- )
-    pic-tail-reg 0 MOV 2 cells 1 + rc-absolute-cell rel-here
+    pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here
     0 JMP rc-relative rel-word-pic-tail ;
 
 M: x86 %jump-label ( label -- ) 0 JMP rc-relative label-fixup ;
