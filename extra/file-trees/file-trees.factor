@@ -1,6 +1,6 @@
 USING: accessors arrays delegate delegate.protocols
 io.pathnames kernel locals models.arrow namespaces prettyprint sequences
-ui.frp vectors tools.continuations make ;
+ui.frp vectors make ;
 IN: file-trees
 
 TUPLE: walkable-vector vector father ;
@@ -14,8 +14,6 @@ CONSULT: sequence-protocol tree children>> ;
 
 : <dir-tree> ( {start,comment} -- tree ) first2 walkable-vector new vector new >>vector
    [ tree boa dup children>> ] [ ".." -rot tree boa ] 2bi swap (>>father) ;
-
-! If this was added to all grandchildren
 
 DEFER: (tree-insert)
 
