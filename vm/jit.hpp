@@ -14,7 +14,7 @@ struct jit {
 	jit(cell jit_type, cell owner);
 	void compute_position(cell offset);
 
-	relocation_entry rel_to_emit(cell code_template, bool *rel_p);
+	void emit_relocation(cell code_template);
 	void emit(cell code_template);
 
 	void literal(cell literal) { literals.add(literal); }
@@ -35,7 +35,7 @@ struct jit {
 	void emit_subprimitive(cell word_) {
 		gc_root<word> word(word_);
 		gc_root<array> code_template(word->subprimitive);
-		if(array_nth(code_template.untagged(),1) != F) literal(T);
+		if(array_capacity(code_template.untagged()) > 1) literal(T);
 		emit(code_template.value());
 	}
 

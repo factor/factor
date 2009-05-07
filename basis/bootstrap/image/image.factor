@@ -93,24 +93,19 @@ CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
 
-SYMBOL: jit-define-rc
-SYMBOL: jit-define-rt
-SYMBOL: jit-define-offset
+SYMBOL: jit-relocations
 
-: compute-offset ( -- offset )
-    building get length jit-define-rc get rc-absolute-cell = bootstrap-cell 4 ? - ;
+: compute-offset ( rc -- offset )
+    [ building get length ] dip rc-absolute-cell = bootstrap-cell 4 ? - ;
 
 : jit-rel ( rc rt -- )
-    jit-define-rt set
-    jit-define-rc set
-    compute-offset jit-define-offset set ;
+    over compute-offset 3array jit-relocations get push-all ;
 
-: make-jit ( quot -- quad )
+: make-jit ( quot -- jit-data )
     [
+        V{ } clone jit-relocations set
         call( -- )
-        jit-define-rc get
-        jit-define-rt get
-        jit-define-offset get 3array
+        jit-relocations get >array
     ] B{ } make prefix ;
 
 : jit-define ( quot name -- )
@@ -142,8 +137,7 @@ SYMBOL: jit-word-jump
 SYMBOL: jit-word-call
 SYMBOL: jit-push-immediate
 SYMBOL: jit-if-word
-SYMBOL: jit-if-1
-SYMBOL: jit-if-2
+SYMBOL: jit-if
 SYMBOL: jit-dip-word
 SYMBOL: jit-dip
 SYMBOL: jit-2dip-word
@@ -156,7 +150,6 @@ SYMBOL: jit-execute-call
 SYMBOL: jit-epilog
 SYMBOL: jit-return
 SYMBOL: jit-profiling
-SYMBOL: jit-save-stack
 
 ! PIC stubs
 SYMBOL: pic-load
@@ -188,13 +181,11 @@ SYMBOL: undefined-quot
         { jit-word-jump 26 }
         { jit-word-call 27 }
         { jit-if-word 28 }
-        { jit-if-1 29 }
-        { jit-if-2 30 }
+        { jit-if 29 }
         { jit-epilog 33 }
         { jit-return 34 }
         { jit-profiling 35 }
         { jit-push-immediate 36 }
-        { jit-save-stack 37 }
         { jit-dip-word 38 }
         { jit-dip 39 }
         { jit-2dip-word 40 }
@@ -539,8 +530,7 @@ M: quotation '
         jit-word-call
         jit-push-immediate
         jit-if-word
-        jit-if-1
-        jit-if-2
+        jit-if
         jit-dip-word
         jit-dip
         jit-2dip-word
@@ -553,7 +543,6 @@ M: quotation '
         jit-epilog
         jit-return
         jit-profiling
-        jit-save-stack
         pic-load
         pic-tag
         pic-hi-tag

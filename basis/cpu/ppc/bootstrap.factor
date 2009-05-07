@@ -50,9 +50,6 @@ CONSTANT: rs-reg 14
     0 6 LOAD32 rc-absolute-ppc-2/2 rt-stack-chain jit-rel
     7 6 0 LWZ
     1 7 0 STW
-] jit-save-stack jit-define
-
-[
     0 6 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
     6 MTCTR
     BCTR
@@ -68,11 +65,8 @@ CONSTANT: rs-reg 14
     0 3 \ f tag-number CMPI
     2 BEQ
     0 B rc-relative-ppc-3 rt-xt jit-rel
-] jit-if-1 jit-define
-
-[
     0 B rc-relative-ppc-3 rt-xt jit-rel
-] jit-if-2 jit-define
+] jit-if jit-define
 
 : jit->r ( -- )
     4 ds-reg 0 LWZ
