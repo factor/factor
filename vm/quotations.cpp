@@ -152,7 +152,14 @@ void quotation_jit::iterate_quotation()
 				{
 					if(stack_frame) emit(userenv[JIT_EPILOG]);
 					tail_call = true;
-					/* Inline cache misses are special-cased */
+					/* Inline cache misses are special-cased.
+					   The calling convention for tail
+					   calls stores the address of the next
+					   instruction in a register. However,
+					   PIC miss stubs themselves tail-call
+					   the inline cache miss primitive, and
+					   we don't want to clobber the saved
+					   address. */
 					if(obj.value() == userenv[PIC_MISS_WORD]
 					   || obj.value() == userenv[PIC_MISS_TAIL_WORD])
 					{
