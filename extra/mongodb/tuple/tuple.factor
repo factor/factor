@@ -69,7 +69,7 @@ PRIVATE>
 : insert-tuple ( tuple -- )
    [ tuple-collection name>> ]
    [ tuple>assoc ] bi
-   <mdb-insert-msg> save ;
+   save ;
 
 : delete-tuple ( tuple -- )
    [ tuple-collection name>> ] keep
