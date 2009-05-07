@@ -144,7 +144,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 	push(methods.value());
 	push(tag_fixnum(index));
 	push(cache_entries.value());
-	word_jump(userenv[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
+	word_special(userenv[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
 }
 
 static code_block *compile_inline_cache(fixnum index,

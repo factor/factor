@@ -7,6 +7,8 @@ namespace factor
 
 inline static void flush_icache(cell start, cell len) {}
 
+static const fixnum xt_tail_pic_offset = 2 * sizeof(cell) + 1;
+
 static const unsigned char call_opcode = 0xe8;
 static const unsigned char jmp_opcode = 0xe9;
 
