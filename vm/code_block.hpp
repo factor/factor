@@ -8,10 +8,12 @@ enum relocation_type {
 	RT_DLSYM,
 	/* a pointer to a compiled word reference */
 	RT_DISPATCH,
-	/* a word's general entry point XT */
+	/* a word or quotation's general entry point */
 	RT_XT,
-	/* a word's direct entry point XT */
-	RT_XT_DIRECT,
+	/* a word's PIC entry point */
+	RT_XT_PIC,
+	/* a word's tail-call PIC entry point */
+	RT_XT_PIC_TAIL,
 	/* current offset */
 	RT_HERE,
 	/* current code block */
