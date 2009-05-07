@@ -58,12 +58,9 @@ big-endian off
     temp0 \ f tag-number CMP
     ! jump to true branch if not equal
     0 JNE rc-relative rt-xt jit-rel
-] jit-if-1 jit-define
-
-[
     ! jump to false branch if equal
     0 JMP rc-relative rt-xt jit-rel
-] jit-if-2 jit-define
+] jit-if jit-define
 
 : jit->r ( -- )
     rs-reg bootstrap-cell ADD
