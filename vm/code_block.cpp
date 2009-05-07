@@ -27,7 +27,8 @@ void iterate_relocations(code_block *compiled, relocation_iterator iter)
 			{
 			case RT_PRIMITIVE:
 			case RT_XT:
-			case RT_XT_DIRECT:
+			case RT_XT_PIC:
+			case RT_XT_PIC_TAIL:
 			case RT_IMMEDIATE:
 			case RT_HERE:
 			case RT_UNTAGGED:
@@ -171,9 +172,8 @@ void *object_xt(cell obj)
 	}
 }
 
-void *word_direct_xt(word *w)
+static void *xt_pic(word *w, cell tagged_quot)
 {
-	cell tagged_quot = w->direct_entry_def;
 	if(tagged_quot == F || max_pic_size == 0)
 		return w->xt;
 	else
@@ -186,20 +186,42 @@ void *word_direct_xt(word *w)
 	}
 }
 
+void *word_xt_pic(word *w)
+{
+	return xt_pic(w,w->pic_def);
+}
+
+void *word_xt_pic_tail(word *w)
+{
+	return xt_pic(w,w->pic_tail_def);
+}
+
 void update_word_references_step(relocation_entry rel, cell index, code_block *compiled)
 {
 	relocation_type type = REL_TYPE(rel);
-	if(type == RT_XT || type == RT_XT_DIRECT)
+	if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
 	{
 		cell offset = REL_OFFSET(rel) + (cell)(compiled + 1);
 		array *literals = untag<array>(compiled->literals);
 		cell obj = array_nth(literals,index);
 
 		void *xt;
-		if(type == RT_XT)
+		switch(type)
+		{
+		case RT_XT:
 			xt = object_xt(obj);
-		else
-			xt = word_direct_xt(untag<word>(obj));
+			break;
+		case RT_XT_PIC:
+			xt = word_xt_pic(untag<word>(obj));
+			break;
+		case RT_XT_PIC_TAIL:
+			xt = word_xt_pic_tail(untag<word>(obj));
+			break;
+		default:
+			critical_error("Oops",type);
+			xt = NULL;
+			break;
+		}
 
 		store_address_in_code_block(REL_CLASS(rel),offset,(cell)xt);
 	}
@@ -367,25 +389,30 @@ void relocate_code_block_step(relocation_entry rel, cell index, code_block *comp
 	array *literals = untag<array>(compiled->literals);
 	fixnum absolute_value;
 
+#define ARG array_nth(literals,index)
+
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
-		absolute_value = (cell)primitives[untag_fixnum(array_nth(literals,index))];
+		absolute_value = (cell)primitives[untag_fixnum(ARG)];
 		break;
 	case RT_DLSYM:
 		absolute_value = (cell)get_rel_symbol(literals,index);
 		break;
 	case RT_IMMEDIATE:
-		absolute_value = array_nth(literals,index);
+		absolute_value = ARG;
 		break;
 	case RT_XT:
-		absolute_value = (cell)object_xt(array_nth(literals,index));
+		absolute_value = (cell)object_xt(ARG);
 		break;
-	case RT_XT_DIRECT:
-		absolute_value = (cell)word_direct_xt(untag<word>(array_nth(literals,index)));
+	case RT_XT_PIC:
+		absolute_value = (cell)word_xt_pic(untag<word>(ARG));
+		break;
+	case RT_XT_PIC_TAIL:
+		absolute_value = (cell)word_xt_pic_tail(untag<word>(ARG));
 		break;
 	case RT_HERE:
-		absolute_value = offset + (short)untag_fixnum(array_nth(literals,index));
+		absolute_value = offset + (short)untag_fixnum(ARG);
 		break;
 	case RT_THIS:
 		absolute_value = (cell)(compiled + 1);
@@ -394,12 +421,14 @@ void relocate_code_block_step(relocation_entry rel, cell index, code_block *comp
 		absolute_value = (cell)&stack_chain;
 		break;
 	case RT_UNTAGGED:
-		absolute_value = untag_fixnum(array_nth(literals,index));
+		absolute_value = untag_fixnum(ARG);
 		break;
 	default:
 		critical_error("Bad rel type",rel);
 		return; /* Can't happen */
 	}
+
+#undef ARG
 
 	store_address_in_code_block(REL_CLASS(rel),offset,absolute_value);
 }

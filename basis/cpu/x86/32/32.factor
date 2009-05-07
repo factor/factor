@@ -42,6 +42,8 @@ M:: x86.32 %dispatch ( src temp offset -- )
 M: x86.32 param-reg-1 EAX ;
 M: x86.32 param-reg-2 EDX ;
 
+M: x86.32 pic-tail-reg EBX ;
+
 M: x86.32 reserved-area-size 0 ;
 
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;

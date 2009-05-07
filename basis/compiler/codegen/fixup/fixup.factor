@@ -59,6 +59,9 @@ SYMBOL: literal-table
 : rel-word-pic ( word class -- )
     [ add-literal ] dip rt-xt-pic rel-fixup ;
 
+: rel-word-pic-tail ( word class -- )
+    [ add-literal ] dip rt-xt-pic-tail rel-fixup ;
+
 : rel-primitive ( word class -- )
     [ def>> first add-literal ] dip rt-primitive rel-fixup ;
 

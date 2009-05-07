@@ -42,12 +42,17 @@ big-endian off
 ] jit-push-immediate jit-define
 
 [
-    0 JMP rc-relative rt-xt jit-rel
+    temp3 0 MOV rc-absolute-cell rt-here jit-rel
+    0 JMP rc-relative rt-xt-pic-tail jit-rel
 ] jit-word-jump jit-define
 
 [
     0 CALL rc-relative rt-xt-pic jit-rel
 ] jit-word-call jit-define
+
+[
+    0 JMP rc-relative rt-xt jit-rel
+] jit-word-special jit-define
 
 [
     ! load boolean
@@ -58,12 +63,9 @@ big-endian off
     temp0 \ f tag-number CMP
     ! jump to true branch if not equal
     0 JNE rc-relative rt-xt jit-rel
-] jit-if-1 jit-define
-
-[
     ! jump to false branch if equal
     0 JMP rc-relative rt-xt jit-rel
-] jit-if-2 jit-define
+] jit-if jit-define
 
 : jit->r ( -- )
     rs-reg bootstrap-cell ADD
@@ -151,6 +153,8 @@ big-endian off
 [ 0 RET ] jit-return jit-define
 
 ! ! ! Polymorphic inline caches
+
+! The PIC and megamorphic code stubs are not permitted to touch temp3.
 
 ! Load a value from a stack position
 [
