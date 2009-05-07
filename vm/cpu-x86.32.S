@@ -1,9 +1,5 @@
 #include "asm.h"
 
-/* Note that primitive word definitions are compiled with
-__attribute__((regparm 2), so the pointer to the word object is passed in EAX,
-and the callstack top is passed in EDX */
-
 #define ARG0 %eax
 #define ARG1 %edx
 #define STACK_REG %esp
@@ -59,9 +55,9 @@ DEF(bool,check_sse2,(void)):
 	mov %edx,%eax
 	ret
 
-DEF(F_FASTCALL void,primitive_inline_cache_miss,(void)):
+DEF(void,primitive_inline_cache_miss,(void)):
 	mov (%esp),%ebx
-DEF(F_FASTCALL void,primitive_inline_cache_miss_tail,(void)):
+DEF(void,primitive_inline_cache_miss_tail,(void)):
 	sub $8,%esp
 	push %ebx
 	call MANGLE(inline_cache_miss)
