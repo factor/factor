@@ -1,7 +1,7 @@
 ! Copyright (c) 2007-2009 Slava Pestov, Doug Coleman, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry kernel locals math math.order math.ranges mirrors
-    namespaces sequences sorting ;
+USING: accessors assocs binary-search fry kernel locals math math.order
+    math.ranges mirrors namespaces sequences sorting ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -74,8 +74,11 @@ C: <combo> combo
     [ seq>> length ] [ k>> ] bi nCk ;
 
 : largest-value ( a b x -- v )
-    #! TODO: use a binary search instead of find-last
-    [ [0,b) ] 2dip '[ _ nCk _ <= ] find-last nip ;
+    dup 0 = [
+        drop 1 - nip
+    ] [
+        [ [0,b) ] 2dip '[ _ nCk _ >=< ] search nip
+    ] if ;
 
 :: next-values ( a b x -- a' b' x' v )
     a b x largest-value dup :> v  ! a'
