@@ -165,7 +165,6 @@ void quotation_jit::iterate_quotation()
 			/* Primitive calls */
 			if(primitive_call_p(i))
 			{
-				emit(userenv[JIT_SAVE_STACK]);
 				emit_with(userenv[JIT_PRIMITIVE],obj.value());
 
 				i++;
@@ -187,8 +186,9 @@ void quotation_jit::iterate_quotation()
 					jit_compile(array_nth(elements.untagged(),i + 1),relocate);
 				}
 
-				emit_with(userenv[JIT_IF_1],array_nth(elements.untagged(),i));
-				emit_with(userenv[JIT_IF_2],array_nth(elements.untagged(),i + 1));
+				literal(array_nth(elements.untagged(),i));
+				literal(array_nth(elements.untagged(),i + 1));
+				emit(userenv[JIT_IF]);
 
 				i += 2;
 
