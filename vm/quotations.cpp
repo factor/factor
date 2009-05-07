@@ -152,7 +152,16 @@ void quotation_jit::iterate_quotation()
 				{
 					if(stack_frame) emit(userenv[JIT_EPILOG]);
 					tail_call = true;
-					word_jump(obj.value());
+					/* Inline cache misses are special-cased */
+					if(obj.value() == userenv[PIC_MISS_WORD]
+					   || obj.value() == userenv[PIC_MISS_TAIL_WORD])
+					{
+						word_special(obj.value());
+					}
+					else
+					{
+						word_jump(obj.value());
+					}
 				}
 				else
 					word_call(obj.value());

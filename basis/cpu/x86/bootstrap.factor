@@ -42,12 +42,17 @@ big-endian off
 ] jit-push-immediate jit-define
 
 [
-    0 JMP rc-relative rt-xt jit-rel
+    temp3 0 MOV rc-absolute-cell rt-here jit-rel
+    0 JMP rc-relative rt-xt-pic-tail jit-rel
 ] jit-word-jump jit-define
 
 [
     0 CALL rc-relative rt-xt-pic jit-rel
 ] jit-word-call jit-define
+
+[
+    0 JMP rc-relative rt-xt jit-rel
+] jit-word-special jit-define
 
 [
     ! load boolean
