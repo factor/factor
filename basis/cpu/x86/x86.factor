@@ -23,6 +23,8 @@ HOOK: temp-reg-2 cpu ( -- reg )
 HOOK: param-reg-1 cpu ( -- reg )
 HOOK: param-reg-2 cpu ( -- reg )
 
+HOOK: pic-tail-reg cpu ( -- reg )
+
 M: x86 %load-immediate MOV ;
 
 M: x86 %load-reference swap 0 MOV rc-absolute-cell rel-immediate ;
@@ -58,8 +60,17 @@ M: x86 stack-frame-size ( stack-frame -- i )
     align-stack ;
 
 M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
-M: x86 %jump ( word -- ) 0 JMP rc-relative rel-word ;
+
+: xt-tail-pic-offset ( -- n )
+    #! See the comment in vm/cpu-x86.hpp
+    cell 4 + 1 + ; inline
+
+M: x86 %jump ( word -- )
+    pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here
+    0 JMP rc-relative rel-word-pic-tail ;
+
 M: x86 %jump-label ( label -- ) 0 JMP rc-relative label-fixup ;
+
 M: x86 %return ( -- ) 0 RET ;
 
 : code-alignment ( align -- n )

@@ -145,7 +145,9 @@ SYMBOL: ui-thread
 PRIVATE>
 
 : find-window ( quot -- world )
-    [ windows get values ] dip '[ gadget-child @ ] find-last nip ; inline
+    [ windows get values ] dip
+    '[ dup children>> [ ] [ nip first ] if-empty @ ]
+    find-last nip ; inline
 
 : ui-running? ( -- ? )
     \ ui-running get-global ;
