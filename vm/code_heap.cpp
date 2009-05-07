@@ -26,8 +26,8 @@ void jit_compile_word(cell word_, cell def_, bool relocate)
 
 	word->code = def->code;
 
-	if(word->direct_entry_def != F)
-		jit_compile(word->direct_entry_def,relocate);
+	if(word->pic_def != F) jit_compile(word->pic_def,relocate);
+	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
 }
 
 /* Apply a function to every code block */
@@ -45,14 +45,14 @@ void iterate_code_heap(code_heap_iterator iter)
 
 /* Copy literals referenced from all code blocks to newspace. Only for
 aging and nursery collections */
-void copy_code_heap_roots(void)
+void copy_code_heap_roots()
 {
 	iterate_code_heap(copy_literal_references);
 }
 
 /* Update pointers to words referenced from all code blocks. Only after
 defining a new word. */
-void update_code_heap_words(void)
+void update_code_heap_words()
 {
 	iterate_code_heap(update_word_references);
 }
@@ -119,7 +119,7 @@ PRIMITIVE(code_room)
 	dpush(tag_fixnum(max_free / 1024));
 }
 
-static std::tr1::unordered_map<heap_block *,char *> forwarding;
+static unordered_map<heap_block *,char *> forwarding;
 
 code_block *forward_xt(code_block *compiled)
 {
@@ -178,7 +178,7 @@ void forward_object_xts()
 }
 
 /* Set the XT fields now that the heap has been compacted */
-void fixup_object_xts(void)
+void fixup_object_xts()
 {
 	begin_scan();
 
@@ -211,7 +211,7 @@ void fixup_object_xts(void)
 since it makes several passes over the code and data heaps, but we only ever
 do this before saving a deployed image and exiting, so performaance is not
 critical here */
-void compact_code_heap(void)
+void compact_code_heap()
 {
 	/* Free all unreachable code blocks */
 	gc();

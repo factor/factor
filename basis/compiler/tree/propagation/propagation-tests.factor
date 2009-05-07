@@ -691,3 +691,6 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 TUPLE: circle me ;
 
 [ ] [ circle new dup >>me 1quotation final-info drop ] unit-test
+
+! Joe found an oversight
+[ V{ integer } ] [ [ >integer ] final-classes ] unit-test

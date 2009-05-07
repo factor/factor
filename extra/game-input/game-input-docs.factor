@@ -3,7 +3,7 @@ sequences strings math ;
 IN: game-input
 
 ARTICLE: "game-input" "Game controller input"
-"The " { $vocab-link "game-input" } " vocabulary provides cross-platform access to game controller devices such as joysticks and gamepads. It also provides an interface for polling raw keyboard input." $nl
+"The " { $vocab-link "game-input" } " vocabulary provides cross-platform access to game controller devices such as joysticks and gamepads. It also provides an interface for polling raw keyboard and mouse input." $nl
 "The game input interface must be initialized before being used:"
 { $subsection open-game-input }
 { $subsection close-game-input }
@@ -18,11 +18,13 @@ ARTICLE: "game-input" "Game controller input"
 { $subsection instance-id }
 "A hook is provided for invoking the system calibration tool:"
 { $subsection calibrate-controller }
-"The current state of a controller or the keyboard can be read:"
+"The current state of a controller, the keyboard, and the mouse can be read:"
 { $subsection read-controller }
 { $subsection read-keyboard }
+{ $subsection read-mouse }
 { $subsection controller-state }
-{ $subsection keyboard-state } ;
+{ $subsection keyboard-state }
+{ $subsection mouse-state } ;
 
 HELP: open-game-input
 { $description "Initializes the game input interface. An exception will be thrown if the initialization fails. If the game input interface is already opened, nothing happens." } ;
@@ -86,6 +88,14 @@ HELP: read-keyboard
 { $warning "For efficiency, the implementation may reuse the returned " { $snippet "keyboard-state" } " object next time " { $snippet "read-keyboard" } " is called. You should " { $link clone } " any values from the returned tuple you need to preserve."
 $nl "The keyboard state returned by this word is unprocessed by any keymaps, modifier keys, key repeat settings, or other operating environment postprocessing. Because of this, " { $snippet "read-keyboard" } " should not be used for text entry purposes. The Factor UI's standard gesture mechanism should be used in cases where the logical meaning of keypresses is needed; see " { $link "keyboard-gestures" } "." } ;
 
+HELP: read-mouse
+{ $values { "mouse-state" mouse-state } }
+{ $description "Reads the current mouse state relative to either when the game input interface was opened with " { $link open-game-input } " or when the mouse state was reset with " { $link reset-mouse } "." }
+{ $warning "For efficiency, the implementation may reuse the returned " { $snippet "mouse-state" } " object for future " { $snippet "read-mouse" } " or " { $snippet "reset-mouse" } " calls. You should " { $link clone } " the " { $snippet "mouse-state" } " object if you need to preserve it." } ;
+
+HELP: reset-mouse
+{ $description "Resets the mouse state. Future " { $link read-mouse } " values will be relative to the time this word is called." } ;
+
 HELP: controller-state
 { $class-description "The " { $link read-controller } " word returns objects of this class. " { $snippet "controller-state" } " objects have the following slots:"
 { $list
@@ -120,6 +130,19 @@ HELP: controller-state
 HELP: keyboard-state
 { $class-description "The " { $link read-keyboard } " word returns objects of this class. The " { $snippet "keys" } " slot of a " { $snippet "keyboard-state" } " object contains a " { $link sequence } " of 256 members representing the state of the keys on the keyboard. Each element is a boolean value indicating whether the corresponding key is pressed. The sequence is indexed by scancode as defined under usage page 7 of the USB HID standard. Named scancode constants are provided in the " { $vocab-link "game-input.scancodes" } " vocabulary." }
 { $warning "The scancodes used to index " { $snippet "keyboard-state" } " objects correspond to physical key positions on the keyboard--they are unaffected by keymaps, modifier keys, or other operating environment postprocessing. The face value of the constants in " { $vocab-link "game-input.scancodes" } " do not necessarily correspond to what the user expects the key to type. Because of this, " { $link read-keyboard } " should not be used for text entry purposes. The Factor UI's standard gesture mechanism should be used in cases where the logical meaning of keypresses is needed; see " { $link "keyboard-gestures" } "." } ;
+
+HELP: mouse-state
+{ $class-description "The " { $link read-mouse } " word returns objects of this class. " { $snippet "mouse-state" } " objects have the following slots:"
+{ $list
+    { { $snippet "dx" } " contains the mouse's X axis movement." }
+    { { $snippet "dy" } " contains the mouse's Y axis movement." }
+    { { $snippet "scroll-dx" } " contains the scroller's X axis movement." }
+    { { $snippet "scroll-dy" } " contains the scroller's Y axis movement." }
+    { { $snippet "buttons" } " contains a sequence of boolean values indicate the state of the mouse's buttons." }
+}
+"Mouse movement is recorded relative to when the game input interface was opened with " { $link open-game-input } " or the mouse state is reset with " { $link reset-mouse } "."
+} ;
+
 
 { keyboard-state read-keyboard } related-words
 

@@ -41,14 +41,13 @@ enum special_object {
 	JIT_PRIMITIVE,
 	JIT_WORD_JUMP,
 	JIT_WORD_CALL,
+	JIT_WORD_SPECIAL,
 	JIT_IF_WORD,
-	JIT_IF_1,
-	JIT_IF_2,
-	JIT_EPILOG          = 33,
+	JIT_IF,
+	JIT_EPILOG,
 	JIT_RETURN,
 	JIT_PROFILING,
 	JIT_PUSH_IMMEDIATE,
-	JIT_SAVE_STACK = 38,
 	JIT_DIP_WORD,
 	JIT_DIP,
 	JIT_2DIP_WORD,
@@ -60,7 +59,7 @@ enum special_object {
 	JIT_EXECUTE_CALL,
 
 	/* Polymorphic inline cache generation in inline_cache.c */
-	PIC_LOAD            = 48,
+	PIC_LOAD            = 47,
 	PIC_TAG,
 	PIC_HI_TAG,
 	PIC_TUPLE,
@@ -69,6 +68,7 @@ enum special_object {
 	PIC_CHECK,
 	PIC_HIT,
 	PIC_MISS_WORD,
+	PIC_MISS_TAIL_WORD,
 
 	/* Megamorphic cache generation in dispatch.c */
 	MEGA_LOOKUP         = 57,

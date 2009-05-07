@@ -5,23 +5,28 @@ opengl opengl.gl opengl.textures sequences strings ui ui.gadgets
 ui.gadgets.panes ui.render ui.images ;
 IN: images.viewer
 
-TUPLE: image-gadget < gadget image-name ;
+TUPLE: image-gadget < gadget image texture ;
 
-M: image-gadget pref-dim*
-    image-name>> image-dim ;
+M: image-gadget pref-dim* image>> dim>> ;
+
+: image-gadget-texture ( gadget -- texture )
+    dup texture>> [ ] [ dup image>> { 0 0 } <texture> >>texture texture>> ] ?if ;
 
 M: image-gadget draw-gadget* ( gadget -- )
-    image-name>> draw-image ;
+    [ dim>> ] [ image-gadget-texture ] bi draw-scaled-texture ;
 
-: <image-gadget> ( image-name -- gadget )
+! Todo: delete texture on ungraft
+
+GENERIC: <image-gadget> ( object -- gadget )
+
+M: image <image-gadget>
     \ image-gadget new
-        swap >>image-name ;
+        swap >>image ;
 
-: image-window ( path -- gadget )
-    [ <image-name> <image-gadget> dup ] [ open-window ] bi ;
+M: string <image-gadget> load-image <image-gadget> ;
 
-GENERIC: image. ( object -- )
+M: pathname <image-gadget> load-image <image-gadget> ;
 
-M: string image. ( image -- ) <image-name> <image-gadget> gadget. ;
+: image-window ( object -- ) <image-gadget> "Image" open-window ;
 
-M: pathname image. ( image -- ) <image-name> <image-gadget> gadget. ;
+: image. ( object -- ) <image-gadget> gadget. ;

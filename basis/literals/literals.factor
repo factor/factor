@@ -1,8 +1,21 @@
 ! (c) Joe Groff, see license for details
 USING: accessors continuations kernel parser words quotations
-combinators.smart vectors sequences ;
+combinators.smart vectors sequences fry ;
 IN: literals
 
-SYNTAX: $ scan-word [ def>> call ] curry with-datastack >vector ;
+<PRIVATE
+
+! Use def>> call so that CONSTANT:s defined in the same file can
+! be called
+
+: expand-literal ( seq obj -- seq' )
+    '[ _ dup word? [ def>> call ] when ] with-datastack ;
+
+: expand-literals ( seq -- seq' )
+    [ [ { } ] dip expand-literal ] map concat ;
+
+PRIVATE>
+
+SYNTAX: $ scan-word expand-literal >vector ;
 SYNTAX: $[ parse-quotation with-datastack >vector ;
-SYNTAX: ${ \ } [ [ ?execute ] { } map-as ] parse-literal ;
+SYNTAX: ${ \ } [ expand-literals ] parse-literal ;
