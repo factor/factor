@@ -152,6 +152,8 @@ big-endian off
 
 ! ! ! Polymorphic inline caches
 
+! The PIC and megamorphic code stubs are not permitted to touch temp3.
+
 ! Load a value from a stack position
 [
     temp1 ds-reg HEX: ffffffff [+] MOV rc-absolute rt-untagged jit-rel
