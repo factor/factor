@@ -20,25 +20,18 @@ implementation. It is not an introduction to the language itself.
 
 * Compiling the Factor VM
 
-The Factor runtime is written in GNU C++, and is built with GNU make and
-gcc.
-
 Factor supports various platforms. For an up-to-date list, see
 <http://factorcode.org>.
 
-Factor requires gcc 3.4 or later.
-
-On x86, Factor /will not/ build using gcc 3.3 or earlier.
-
-If you are using gcc 4.3, you might get an unusable Factor binary unless
-you add 'SITE_CFLAGS=-fno-forward-propagate' to the command-line
-arguments for make.
+The Factor VM is written in C++ and uses GNU extensions. When compiling
+with GCC 3.x, boost::unordered_map must be installed. On GCC 4.x, Factor
+uses std::tr1::unordered_map which is shipped as part of GCC.
 
 Run 'make' ('gmake' on *BSD) with no parameters to build the Factor VM.
 
 * Bootstrapping the Factor image
 
-Once you have compiled the Factor runtime, you must bootstrap the Factor
+Once you have compiled the Factor VM, you must bootstrap the Factor
 system using the image that corresponds to your CPU architecture.
 
 Boot images can be obtained from <http://factorcode.org/images/latest/>.
@@ -97,7 +90,7 @@ When compiling Factor, pass the X11=1 parameter:
 
 Then bootstrap with the following switches:
 
-  ./factor -i=boot.<cpu>.image -ui-backend=x11 -ui-text-backend=pango
+  ./factor -i=boot.<cpu>.image -ui-backend=x11
 
 Now if $DISPLAY is set, running ./factor will start the UI.
 
@@ -138,7 +131,7 @@ usage documentation, enter the following in the UI listener:
 The Factor source tree is organized as follows:
 
   build-support/ - scripts used for compiling Factor
-  vm/ - sources for the Factor VM, written in C++
+  vm/ - Factor VM
   core/ - Factor core library
   basis/ - Factor basis library, compiler, tools
   extra/ - more libraries and applications

@@ -157,3 +157,8 @@ IN: math.functions.tests
     2135623355842621559
     [ >bignum ] tri@ ^mod
 ] unit-test
+
+[ 1.0  ] [ 1.0 2.5 0.0 lerp ] unit-test
+[ 2.5  ] [ 1.0 2.5 1.0 lerp ] unit-test
+[ 1.75 ] [ 1.0 2.5 0.5 lerp ] unit-test
+

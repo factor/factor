@@ -5,8 +5,8 @@
 #define UNICODE
 #endif
 
-#include <shellapi.h>
 #include <windows.h>
+#include <shellapi.h>
 
 namespace factor
 {
@@ -17,8 +17,10 @@ typedef char symbol_char;
 #define FACTOR_DLL L"factor.dll"
 #define FACTOR_DLL_NAME "factor.dll"
 
+#define FACTOR_STDCALL __attribute__((stdcall))
+
 void c_to_factor_toplevel(cell quot);
-long exception_handler(PEXCEPTION_POINTERS pe);
-void open_console(void);
+FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe);
+void open_console();
 
 }

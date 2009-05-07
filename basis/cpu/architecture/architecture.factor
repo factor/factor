@@ -47,6 +47,7 @@ HOOK: %inc-r cpu ( n -- )
 
 HOOK: stack-frame-size cpu ( stack-frame -- n )
 HOOK: %call cpu ( word -- )
+HOOK: %jump cpu ( word -- )
 HOOK: %jump-label cpu ( label -- )
 HOOK: %return cpu ( -- )
 

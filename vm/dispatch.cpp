@@ -103,7 +103,7 @@ static cell lookup_hairy_method(cell obj, cell methods)
 			break;
 		default:
 			critical_error("Bad methods array",methods);
-			return -1;
+			return 0;
 		}
 	}
 }

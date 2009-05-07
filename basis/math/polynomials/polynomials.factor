@@ -16,7 +16,7 @@ IN: math.polynomials
 PRIVATE>
 
 : powers ( n x -- seq )
-    <array> 1 [ * ] accumulate nip ;
+    <repetition> 1 [ * ] accumulate nip ;
 
 : p= ( p q -- ? ) pextend = ;
 
@@ -29,7 +29,7 @@ PRIVATE>
 : n*p ( n p -- n*p ) n*v ;
 
 : pextend-conv ( p q -- p q )
-    2dup [ length ] bi@ + 1- 2pad-tail [ >vector ] bi@ ;
+    2dup [ length ] bi@ + 1 - 2pad-tail [ >vector ] bi@ ;
 
 : p* ( p q -- r )
     2unempty pextend-conv <reversed> dup length
@@ -44,7 +44,7 @@ PRIVATE>
     2ptrim
     2dup [ length ] bi@ -
     dup 1 < [ drop 1 ] when
-    [ over length + 0 pad-head pextend ] keep 1+ ;
+    [ over length + 0 pad-head pextend ] keep 1 + ;
 
 : /-last ( seq seq -- a )
     #! divide the last two numbers in the sequences
