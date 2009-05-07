@@ -1,14 +1,19 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel locals math math.functions math.ranges
-random sequences sets combinators.short-circuit math.bitwise ;
+random sequences sets combinators.short-circuit math.bitwise
+math math.order ;
 IN: math.miller-rabin
 
 <PRIVATE
 
-: >odd ( n -- int ) dup even? [ 1 + ] when ; foldable
+: >odd ( n -- int ) 0 set-bit ; foldable
 
 : >even ( n -- int ) 0 clear-bit ; foldable
+
+: next-even ( m -- n ) >even 2 + ;
+
+: next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ;
 
 TUPLE: positive-even-expected n ;
 
@@ -18,7 +23,7 @@ TUPLE: positive-even-expected n ;
     0 :> a!
     trials [
         drop
-        n 1 - [1,b] random a!
+        2 n 2 - [a,b] random a!
         a s n ^mod 1 = [
             f
         ] [
@@ -30,8 +35,6 @@ TUPLE: positive-even-expected n ;
 
 PRIVATE>
 
-: next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ;
-
 : miller-rabin* ( n numtrials -- ? )
     over {
         { [ dup 1 <= ] [ 3drop f ] }
@@ -42,11 +45,21 @@ PRIVATE>
 
 : miller-rabin ( n -- ? ) 10 miller-rabin* ;
 
+ERROR: prime-range-error n ;
+
 : next-prime ( n -- p )
-    next-odd dup miller-rabin [ next-prime ] unless ;
+    dup 1 < [ prime-range-error ] when
+    dup 1 = [
+        drop 2
+    ] [
+        next-odd dup miller-rabin [ next-prime ] unless
+    ] if ;
+
+: random-bits* ( numbits -- n )
+    1 - [ random-bits ] keep set-bit ;
 
 : random-prime ( numbits -- p )
-    random-bits next-prime ;
+    random-bits* next-prime ;
 
 ERROR: no-relative-prime n ;
 
@@ -80,10 +93,7 @@ ERROR: too-few-primes ;
 
 <PRIVATE
 
-: >safe-prime-form ( q -- p ) 2 * 1 + ;
-
 : safe-prime-candidate? ( n -- ? )
-    >safe-prime-form
     1 + 6 divisor? ;
 
 : next-safe-prime-candidate ( n -- candidate )
@@ -99,14 +109,8 @@ PRIVATE>
     } 1&& ;
 
 : next-safe-prime ( n -- q )
-    1 - >even 2 /
     next-safe-prime-candidate
-    dup >safe-prime-form
-    dup miller-rabin
-    [ nip ] [ drop next-safe-prime ] if ;
-
-: random-bits* ( numbits -- n )
-    [ random-bits ] keep set-bit ;
+    dup safe-prime? [ next-safe-prime ] unless ;
 
 : random-safe-prime ( numbits -- p )
-    1- random-bits* next-safe-prime ;
+    random-bits* next-safe-prime ;
