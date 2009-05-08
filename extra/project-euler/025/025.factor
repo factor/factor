@@ -39,7 +39,7 @@ IN: project-euler.025
 ! Memoized brute force
 
 MEMO: fib ( m -- n )
-    dup 1 > [ 1- dup fib swap 1- fib + ] when ;
+    dup 1 > [ [ 1 - fib ] [ 2 - fib ] bi + ] when ;
 
 <PRIVATE
 
