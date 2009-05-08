@@ -79,7 +79,6 @@ $nl
 { $subsection continue-with }
 "Continuations as control-flow:"
 { $subsection attempt-all }
-{ $subsection retry }
 { $subsection with-return }
 "Continuations serve as the building block for a number of higher-level abstractions, such as " { $link "errors" } " and " { $link "threads" } "."
 { $subsection "continuations.private" } ;
@@ -231,21 +230,6 @@ HELP: attempt-all
     "5"
     }
 } ;
-
-HELP: retry
-{ $values
-     { "quot" quotation } { "n" integer }
-}
-{ $description "Tries the quotation up to " { $snippet "n" } " times until it returns true. Retries the quotation if an exception is thrown or if the quotation returns " { $link f } ". The quotation is expected to have side effects that may fail, such as generating a random name for a new file until successful." }
-{ $examples
-    "Try to get a 0 as a random number:"
-    { $unchecked-example "USING: continuations math prettyprint random ;"
-        "[ 5 random 0 = ] 5 retry"
-        "t"
-    }
-} ;
-
-{ attempt-all retry } related-words
 
 HELP: return
 { $description "Returns early from a quotation by reifying the continuation captured by " { $link with-return } " ; execution is resumed starting immediately after " { $link with-return } "." } ;
