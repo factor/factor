@@ -49,21 +49,21 @@ CONSTANT: QUEEN  10
 CONSTANT: KING   11
 CONSTANT: ACE    12
 
-CONSTANT: STRAIGHT_FLUSH   1
-CONSTANT: FOUR_OF_A_KIND   2
-CONSTANT: FULL_HOUSE       3
-CONSTANT: FLUSH            4
-CONSTANT: STRAIGHT         5
-CONSTANT: THREE_OF_A_KIND  6
-CONSTANT: TWO_PAIR         7
-CONSTANT: ONE_PAIR         8
-CONSTANT: HIGH_CARD        9
+CONSTANT: STRAIGHT_FLUSH   0
+CONSTANT: FOUR_OF_A_KIND   1
+CONSTANT: FULL_HOUSE       2
+CONSTANT: FLUSH            3
+CONSTANT: STRAIGHT         4
+CONSTANT: THREE_OF_A_KIND  5
+CONSTANT: TWO_PAIR         6
+CONSTANT: ONE_PAIR         7
+CONSTANT: HIGH_CARD        8
 
 CONSTANT: SUIT_STR { "C" "D" "H" "S" }
 
 CONSTANT: RANK_STR { "2" "3" "4" "5" "6" "7" "8" "9" "T" "J" "Q" "K" "A" }
 
-CONSTANT: VALUE_STR { "" "Straight Flush" "Four of a Kind" "Full House" "Flush"
+CONSTANT: VALUE_STR { "Straight Flush" "Four of a Kind" "Full House" "Flush"
     "Straight" "Three of a Kind" "Two Pair" "One Pair" "High Card" }
 
 : card-rank-prime ( rank -- n )
@@ -159,8 +159,8 @@ CONSTANT: VALUE_STR { "" "Straight Flush" "Four of a Kind" "Full House" "Flush"
         [ drop "S" ]
     } cond ;
 
-: hand-rank ( hand -- rank )
-    value>> {
+: hand-rank ( value -- rank )
+    {
         { [ dup 6185 > ] [ drop HIGH_CARD ] }        ! 1277 high card
         { [ dup 3325 > ] [ drop ONE_PAIR ] }         ! 2860 one pair
         { [ dup 2467 > ] [ drop TWO_PAIR ] }         !  858 two pair
@@ -196,7 +196,7 @@ M: hand equal?
     cards>> [ card>string ] map " " join ;
 
 : >value ( hand -- str )
-    hand-rank VALUE_STR nth ;
+    value>> hand-rank VALUE_STR nth ;
 
 TUPLE: deck
     { cards sequence } ;
