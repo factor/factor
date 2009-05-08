@@ -652,7 +652,7 @@ FUNCTION: HDC BeginPaint ( HWND hwnd, LPPAINTSTRUCT lpPaint ) ;
 FUNCTION: HWND ChildWindowFromPoint ( HWND hWndParent, POINT point ) ;
 ! FUNCTION: ChildWindowFromPointEx
 ! FUNCTION: ClientThreadSetup
-! FUNCTION: ClientToScreen
+FUNCTION: BOOL ClientToScreen ( HWND hWnd, POINT* point ) ;
 ! FUNCTION: CliImmSetHotKey
 FUNCTION: int ClipCursor ( RECT* clipRect ) ;
 FUNCTION: BOOL CloseClipboard ( ) ;
