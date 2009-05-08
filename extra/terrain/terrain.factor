@@ -111,6 +111,7 @@ TUPLE: terrain-world < world
     key-s keys nth [ world move-backward ] when 
     key-a keys nth [ world move-leftward ] when 
     key-d keys nth [ world move-rightward ] when 
+    key-escape keys nth [ world close-window ] when
     world read-mouse rotate-with-mouse
     reset-mouse ;
 
