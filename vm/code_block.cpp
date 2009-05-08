@@ -3,6 +3,21 @@
 namespace factor
 {
 
+static relocation_type relocation_type_of(relocation_entry r)
+{
+	return (relocation_type)((r & 0xf0000000) >> 28);
+}
+
+static relocation_class relocation_class_of(relocation_entry r)
+{
+	return (relocation_class)((r & 0x0f000000) >> 24);
+}
+
+static cell relocation_offset_of(relocation_entry r)
+{
+	return  (r & 0x00ffffff);
+}
+
 void flush_icache_for(code_block *block)
 {
 	flush_icache((cell)block,block->size);
@@ -125,11 +140,11 @@ void *get_rel_symbol(array *literals, cell index)
 cell compute_relocation(relocation_entry rel, cell index, code_block *compiled)
 {
 	array *literals = untag<array>(compiled->literals);
-	cell offset = REL_OFFSET(rel) + (cell)compiled->xt();
+	cell offset = relocation_offset_of(rel) + (cell)compiled->xt();
 
 #define ARG array_nth(literals,index)
 
-	switch(REL_TYPE(rel))
+	switch(relocation_type_of(rel))
 	{
 	case RT_PRIMITIVE:
 		return (cell)primitives[untag_fixnum(ARG)];
@@ -174,7 +189,7 @@ void iterate_relocations(code_block *compiled, relocation_iterator iter)
 		{
 			relocation_entry rel = relocation->data<relocation_entry>()[i];
 			iter(rel,index,compiled);
-			index += number_of_parameters(REL_TYPE(rel));			
+			index += number_of_parameters(relocation_type_of(rel));			
 		}
 	}
 }
@@ -217,25 +232,25 @@ void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value)
 		store_address_2_2((cell *)offset,absolute_value);
 		break;
 	case RC_ABSOLUTE_PPC_2:
-		store_address_masked((cell *)offset,absolute_value,REL_ABSOLUTE_PPC_2_MASK,0);
+		store_address_masked((cell *)offset,absolute_value,rel_absolute_ppc_2_mask,0);
 		break;
 	case RC_RELATIVE_PPC_2:
-		store_address_masked((cell *)offset,relative_value,REL_RELATIVE_PPC_2_MASK,0);
+		store_address_masked((cell *)offset,relative_value,rel_relative_ppc_2_mask,0);
 		break;
 	case RC_RELATIVE_PPC_3:
-		store_address_masked((cell *)offset,relative_value,REL_RELATIVE_PPC_3_MASK,0);
+		store_address_masked((cell *)offset,relative_value,rel_relative_ppc_3_mask,0);
 		break;
 	case RC_RELATIVE_ARM_3:
 		store_address_masked((cell *)offset,relative_value - sizeof(cell) * 2,
-			REL_RELATIVE_ARM_3_MASK,2);
+			rel_relative_arm_3_mask,2);
 		break;
 	case RC_INDIRECT_ARM:
 		store_address_masked((cell *)offset,relative_value - sizeof(cell),
-			REL_INDIRECT_ARM_MASK,0);
+			rel_indirect_arm_mask,0);
 		break;
 	case RC_INDIRECT_ARM_PC:
 		store_address_masked((cell *)offset,relative_value - sizeof(cell) * 2,
-			REL_INDIRECT_ARM_MASK,0);
+			rel_indirect_arm_mask,0);
 		break;
 	default:
 		critical_error("Bad rel class",klass);
@@ -245,12 +260,12 @@ void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value)
 
 void update_literal_references_step(relocation_entry rel, cell index, code_block *compiled)
 {
-	if(REL_TYPE(rel) == RT_IMMEDIATE)
+	if(relocation_type_of(rel) == RT_IMMEDIATE)
 	{
-		cell offset = REL_OFFSET(rel) + (cell)(compiled + 1);
+		cell offset = relocation_offset_of(rel) + (cell)(compiled + 1);
 		array *literals = untag<array>(compiled->literals);
 		fixnum absolute_value = array_nth(literals,index);
-		store_address_in_code_block(REL_CLASS(rel),offset,absolute_value);
+		store_address_in_code_block(relocation_class_of(rel),offset,absolute_value);
 	}
 }
 
@@ -297,14 +312,14 @@ void relocate_code_block_step(relocation_entry rel, cell index, code_block *comp
 	tagged<byte_array>(compiled->relocation).untag_check();
 #endif
 
-	store_address_in_code_block(REL_CLASS(rel),
-				    REL_OFFSET(rel) + (cell)compiled->xt(),
+	store_address_in_code_block(relocation_class_of(rel),
+				    relocation_offset_of(rel) + (cell)compiled->xt(),
 				    compute_relocation(rel,index,compiled));
 }
 
 void update_word_references_step(relocation_entry rel, cell index, code_block *compiled)
 {
-	relocation_type type = REL_TYPE(rel);
+	relocation_type type = relocation_type_of(rel);
 	if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
 		relocate_code_block_step(rel,index,compiled);
 }
@@ -369,7 +384,7 @@ void mark_stack_frame_step(stack_frame *frame)
 /* Mark code blocks executing in currently active stack frames. */
 void mark_active_blocks(context *stacks)
 {
-	if(collecting_gen == TENURED)
+	if(collecting_gen == data->tenured())
 	{
 		cell top = (cell)stacks->callstack_top;
 		cell bottom = (cell)stacks->callstack_bottom;
@@ -410,7 +425,7 @@ void mark_object_code_block(object *object)
 /* Perform all fixups on a code block */
 void relocate_code_block(code_block *compiled)
 {
-	compiled->last_scan = NURSERY;
+	compiled->last_scan = data->nursery();
 	compiled->needs_fixup = false;
 	iterate_relocations(compiled,relocate_code_block_step);
 	flush_icache_for(compiled);
@@ -480,7 +495,7 @@ code_block *add_code_block(
 
 	/* compiled header */
 	compiled->type = type;
-	compiled->last_scan = NURSERY;
+	compiled->last_scan = data->nursery();
 	compiled->needs_fixup = true;
 	compiled->relocation = relocation.value();
 
@@ -499,7 +514,7 @@ code_block *add_code_block(
 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */
-	last_code_heap_scan = NURSERY;
+	last_code_heap_scan = data->nursery();
 
 	return compiled;
 }
