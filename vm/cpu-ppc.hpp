@@ -27,7 +27,7 @@ inline static void check_call_site(cell return_address)
 #endif
 }
 
-#define B_MASK 0x3fffffc
+static const cell b_mask = 0x3fffffc;
 
 inline static void *get_call_target(cell return_address)
 {
