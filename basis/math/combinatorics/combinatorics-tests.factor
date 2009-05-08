@@ -1,4 +1,4 @@
-USING: math.combinatorics math.combinatorics.private tools.test ;
+USING: math.combinatorics math.combinatorics.private tools.test sequences ;
 IN: math.combinatorics.tests
 
 [ 1 ] [ 0 factorial ] unit-test
