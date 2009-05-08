@@ -3,7 +3,7 @@
 USING: kernel splitting grouping math sequences namespaces make
 io.binary math.bitwise checksums checksums.common
 sbufs strings combinators.smart math.ranges fry combinators
-accessors ;
+accessors locals ;
 IN: checksums.sha2
 
 <PRIVATE
@@ -83,26 +83,31 @@ CONSTANT: K-256
     } 2cleave set-nth ; inline
 
 : ch ( x y z -- x' )
-    [ bitxor bitand ] keep bitxor ;
+    [ bitxor bitand ] keep bitxor ; inline
 
 : maj ( x y z -- x' )
-    [ [ bitand ] [ bitor ] 2bi ] dip bitand bitor ;
-
-: prepare-message-schedule ( seq -- w-seq )
-    sha2 get word-size>> <sliced-groups> [ be> ] map sha2 get block-size>> 0 pad-tail
-    16 64 [a,b) over '[ _ process-M-256 ] each ;
+    [ [ bitand ] [ bitor ] 2bi ] dip bitand bitor ; inline
 
 : slice3 ( n seq -- a b c )
     [ dup 3 + ] dip <slice> first3 ; inline
 
-: T1 ( W n H -- T1 )
-    [
-        [ swap nth ] keep
-        sha2 get K>> nth +
-    ] dip
-    [ e swap slice3 ch w+ ]
-    [ e swap nth S1-256 w+ ]
-    [ h swap nth w+ ] tri ;
+: pad-initial-bytes ( string -- padded-string )
+    dup [
+        HEX: 80 ,
+        length
+        [ HEX: 3f bitand calculate-pad-length 0 <string> % ]
+        [ 3 shift 8 >be % ] bi
+    ] "" make append ;
+
+: seq>byte-array ( seq n -- string )
+    '[ _ >be ] map B{ } join ;
+
+:: T1 ( n M H sha2 -- T1 )
+    n M nth
+    n sha2 K>> nth +
+    e H slice3 ch w+
+    e H nth S1-256 w+
+    h H nth w+ ;
 
 : T2 ( H -- T2 )
     [ a swap nth S0-256 ]
@@ -116,37 +121,28 @@ CONSTANT: K-256
     d c pick exchange
     c b pick exchange
     b a pick exchange
-    [ w+ a ] dip set-nth ;
+    [ w+ a ] dip set-nth ; inline
 
-: process-chunk ( M block-size H-cloned -- )
-    [
-        '[
-            _
-            [ T1 ]
-            [ T2 ]
-            [ update-H ] tri 
-        ] with each
-    ] keep sha2 get H>> [ w+ ] 2map sha2 get (>>H) ;
+: prepare-message-schedule ( seq sha2 -- w-seq )
+    [ word-size>> <sliced-groups> [ be> ] map ]
+    [ block-size>> 0 pad-tail 16 64 [a,b) over '[ _ process-M-256 ] each ] bi ;
 
-: pad-initial-bytes ( string -- padded-string )
-    dup [
-        HEX: 80 ,
-        length 
-        [ HEX: 3f bitand calculate-pad-length 0 <string> % ]
-        [ 3 shift 8 >be % ] bi
-    ] "" make append ;
-
-: seq>byte-array ( seq n -- string )
-    '[ _ >be ] map B{ } join ;
-
-: byte-array>sha2 ( byte-array -- string )
-    pad-initial-bytes
-    sha2 get block-size>> <sliced-groups>
-    [
-        prepare-message-schedule
-        sha2 get [ block-size>> ] [ H>> clone ] bi process-chunk
+:: process-chunk ( M block-size cloned-H sha2 -- )
+    block-size [
+        M cloned-H sha2 T1
+        cloned-H T2
+        cloned-H update-H 
     ] each
-    sha2 get H>> 4 seq>byte-array ;
+    cloned-H sha2 H>> [ w+ ] 2map sha2 (>>H) ;
+
+:: byte-array>sha2 ( bytes state -- string )
+    bytes pad-initial-bytes
+    state block-size>> <sliced-groups>
+    [
+        state prepare-message-schedule
+        state [ block-size>> ] [ H>> clone ] bi state process-chunk
+    ] each
+    state H>> 4 seq>byte-array ;
 
 PRIVATE>
 
@@ -163,10 +159,7 @@ TUPLE: sha-256-state < sha2-state ;
         K-256 >>K
         initial-H-256 >>H
         4 >>word-size
-        64 >>block-size ; 
+        64 >>block-size ;
 
 M: sha-256 checksum-bytes
-    drop
-    <sha-256-state> sha2 [
-        byte-array>sha2
-    ] with-variable ;
+    drop <sha-256-state> byte-array>sha2 ;
