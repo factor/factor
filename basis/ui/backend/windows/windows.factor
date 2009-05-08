@@ -11,7 +11,7 @@ threads libc combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render ascii math.bitwise locals
 accessors math.rectangles math.order ascii calendar
 io.encodings.utf16n windows.errors literals ui.pixel-formats 
-ui.pixel-formats.private memoize classes ;
+ui.pixel-formats.private memoize classes struct-arrays ;
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
@@ -703,12 +703,18 @@ M: windows-ui-backend beep ( -- )
     "MONITORINFOEX" <c-object> dup length over set-MONITORINFOEX-cbSize
     [ GetMonitorInfo win32-error=0/f ] keep MONITORINFOEX-rcMonitor ;
 
+: client-area>RECT ( hwnd -- RECT )
+    "RECT" <c-object>
+    [ GetClientRect win32-error=0/f ]
+    [ "POINT" byte-array>struct-array [ ClientToScreen drop ] with each ]
+    [ nip ] 2tri ;
+
 : hwnd>RECT ( hwnd -- RECT )
     "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep ;
 
 M: windows-ui-backend (grab-input) ( handle -- )
     0 ShowCursor drop
-    hWnd>> hwnd>RECT ClipCursor drop ;
+    hWnd>> client-area>RECT ClipCursor drop ;
 M: windows-ui-backend (ungrab-input) ( handle -- )
     drop
     f ClipCursor drop
