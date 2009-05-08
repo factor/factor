@@ -28,11 +28,6 @@ inline static cell align8(cell a)
 	return align(a,8);
 }
 
-inline static cell align_page(cell a)
-{
-	return align(a,getpagesize());
-}
-
 #define WORD_SIZE (signed)(sizeof(cell)*8)
 
 #define TAG_MASK 7
