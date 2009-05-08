@@ -5,8 +5,6 @@ random sequences sets combinators.short-circuit math.bitwise
 math math.order ;
 IN: math.miller-rabin
 
-<PRIVATE
-
 : >odd ( n -- int ) 0 set-bit ; foldable
 
 : >even ( n -- int ) 0 clear-bit ; foldable
@@ -15,7 +13,7 @@ IN: math.miller-rabin
 
 : next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ;
 
-TUPLE: positive-even-expected n ;
+<PRIVATE
 
 :: (miller-rabin) ( n trials -- ? )
     n 1 - :> n-1
