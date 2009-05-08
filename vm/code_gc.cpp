@@ -22,9 +22,9 @@ void new_heap(heap *heap, cell size)
 
 static void add_to_free_list(heap *heap, free_heap_block *block)
 {
-	if(block->size < FREE_LIST_COUNT * BLOCK_SIZE_INCREMENT)
+	if(block->size < free_list_count * block_size_increment)
 	{
-		int index = block->size / BLOCK_SIZE_INCREMENT;
+		int index = block->size / block_size_increment;
 		block->next_free = heap->free.small_blocks[index];
 		heap->free.small_blocks[index] = block;
 	}
@@ -45,7 +45,7 @@ void build_free_list(heap *heap, cell size)
 
 	clear_free_list(heap);
 
-	size = (size + BLOCK_SIZE_INCREMENT - 1) & ~(BLOCK_SIZE_INCREMENT - 1);
+	size = (size + block_size_increment - 1) & ~(block_size_increment - 1);
 
 	heap_block *scan = first_block(heap);
 	free_heap_block *end = (free_heap_block *)(heap->seg->start + size);
@@ -101,9 +101,9 @@ static free_heap_block *find_free_block(heap *heap, cell size)
 {
 	cell attempt = size;
 
-	while(attempt < FREE_LIST_COUNT * BLOCK_SIZE_INCREMENT)
+	while(attempt < free_list_count * block_size_increment)
 	{
-		int index = attempt / BLOCK_SIZE_INCREMENT;
+		int index = attempt / block_size_increment;
 		free_heap_block *block = heap->free.small_blocks[index];
 		if(block)
 		{
@@ -156,7 +156,7 @@ static free_heap_block *split_free_block(heap *heap, free_heap_block *block, cel
 /* Allocate a block of memory from the mark and sweep GC heap */
 heap_block *heap_allot(heap *heap, cell size)
 {
-	size = (size + BLOCK_SIZE_INCREMENT - 1) & ~(BLOCK_SIZE_INCREMENT - 1);
+	size = (size + block_size_increment - 1) & ~(block_size_increment - 1);
 
 	free_heap_block *block = find_free_block(heap,size);
 	if(block)
