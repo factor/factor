@@ -3,9 +3,10 @@
 USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
 alien alien.c-types literals cpu.architecture cpu.ppc.assembler
-literals compiler.cfg.registers compiler.cfg.instructions
-compiler.constants compiler.codegen compiler.codegen.fixup
-compiler.cfg.intrinsics compiler.cfg.stack-frame ;
+cpu.ppc.assembler.backend literals compiler.cfg.registers
+compiler.cfg.instructions compiler.constants compiler.codegen
+compiler.codegen.fixup compiler.cfg.intrinsics
+compiler.cfg.stack-frame ;
 IN: cpu.ppc
 
 ! PowerPC register assignments:
@@ -116,7 +117,7 @@ M: ppc stack-frame-size ( stack-frame -- i )
 M: ppc %call ( word -- ) 0 BL rc-relative-ppc-3 rel-word-pic ;
 
 M: ppc %jump ( word -- )
-    0 3 LOAD32 rc-absolute-ppc-2/2 rel-here
+    0 6 LOAD32 8 rc-absolute-ppc-2/2 rel-here
     0 B rc-relative-ppc-3 rel-word-pic-tail ;
 
 M: ppc %jump-label ( label -- ) B ;
@@ -130,7 +131,7 @@ M:: ppc %dispatch ( src temp offset -- )
     BCTR ;
 
 M: ppc %dispatch-label ( word -- )
-    0 , rc-absolute-cell rel-word ;
+    B{ 0 0 0 0 } % rc-absolute-cell rel-word ;
 
 :: (%slot) ( obj slot tag temp -- reg offset )
     temp slot obj ADD
