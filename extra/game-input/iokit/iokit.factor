@@ -304,6 +304,7 @@ M: iokit-game-input-backend (close-game-input)
             f
         ] change-global
         f +keyboard-state+ set-global
+        f +mouse-state+ set-global
         f +controller-states+ set-global
     ] when ;
 
