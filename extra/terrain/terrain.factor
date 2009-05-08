@@ -186,5 +186,6 @@ M: terrain-world pref-dim* drop { 640 480 } ;
                 double-buffered
                 T{ depth-bits { value 24 } }
             } }
+            { grab-input? t }
         } open-window
     ] with-ui ;

@@ -706,6 +706,14 @@ M: windows-ui-backend beep ( -- )
 : hwnd>RECT ( hwnd -- RECT )
     "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep ;
 
+M: windows-ui-backend (grab-input) ( handle -- )
+    0 ShowCursor drop
+    hWnd>> hwnd>RECT ClipCursor drop ;
+M: windows-ui-backend (ungrab-input) ( handle -- )
+    drop
+    f ClipCursor drop
+    1 ShowCursor drop ;
+
 : fullscreen-flags ( -- n )
     { WS_CAPTION WS_BORDER WS_THICKFRAME } flags ; inline
 
