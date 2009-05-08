@@ -17,7 +17,7 @@ HELP: best-hand
 { $description "Creates a new poker hand containing the best possible combination of the cards specified in " { $snippet "str" } "." }
 { $examples
     { $example "USING: kernel poker prettyprint ;"
-        "\"AS KD JC KH 2D 2S KH\" best-hand >value ." "\"Full House\"" }
+        "\"AS KD JC KH 2D 2S KC\" best-hand >value ." "\"Full House\"" }
 } ;
 
 HELP: >cards
