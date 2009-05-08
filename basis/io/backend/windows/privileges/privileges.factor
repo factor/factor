@@ -1,12 +1,13 @@
 USING: io.backend kernel continuations sequences
-system vocabs.loader combinators ;
+system vocabs.loader combinators fry ;
 IN: io.backend.windows.privileges
 
-HOOK: set-privilege io-backend ( name ? -- ) inline
+HOOK: set-privilege io-backend ( name ? -- )
 
 : with-privileges ( seq quot -- )
-    over [ [ t set-privilege ] each ] curry compose
-    swap [ [ f set-privilege ] each ] curry [ ] cleanup ; inline
+    [ '[ _ [ t set-privilege ] each @ ] ]
+    [ drop '[ _ [ f set-privilege ] each ] ]
+    2bi [ ] cleanup ; inline
 
 {
     { [ os winnt? ] [ "io.backend.windows.nt.privileges" require ] }

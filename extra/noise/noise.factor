@@ -7,6 +7,9 @@ IN: noise
 : <perlin-noise-table> ( -- table )
     256 iota >byte-array randomize dup append ;
 
+: with-seed ( seed quot -- )
+    [ <mersenne-twister> ] dip with-random ; inline
+
 <PRIVATE
 
 : fade ( point -- point' )
@@ -53,9 +56,6 @@ IN: noise
     t u quot call
     v w quot call
     ; inline
-
-: with-seed ( seed quot -- )
-    [ <mersenne-twister> ] dip with-random ; inline
 
 : >byte-map ( floats -- bytes )
     [ 255.0 * >fixnum ] B{ } map-as ;

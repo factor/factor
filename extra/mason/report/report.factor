@@ -12,7 +12,7 @@ IN: mason.report
     target-cpu get
     host-name
     build-dir
-    "git-id" eval-file
+    current-git-id get
     [XML
     <h1>Build report for <->/<-></h1>
     <table>
