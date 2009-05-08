@@ -1,4 +1,4 @@
-USING: accessors destructors kernel math math.order namespaces
+USING: accessors calendar destructors kernel math math.order namespaces
 system threads ;
 IN: game-loop
 
@@ -50,7 +50,7 @@ CONSTANT: MAX-FRAMES-TO-SKIP 5
 
 : (run-loop) ( loop -- )
     dup running?>>
-    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] [ yield (run-loop) ] tri ]
+    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] [ 1 milliseconds sleep (run-loop) ] tri ]
     [ drop ] if ;
 
 : run-loop ( loop -- )
