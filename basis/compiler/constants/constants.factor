@@ -26,29 +26,30 @@ CONSTANT: deck-bits 18
 : compiled-header-size ( -- n ) 4 bootstrap-cells ; inline
 
 ! Relocation classes
-CONSTANT: rc-absolute-cell    0
-CONSTANT: rc-absolute         1
-CONSTANT: rc-relative         2
+CONSTANT: rc-absolute-cell 0
+CONSTANT: rc-absolute 1
+CONSTANT: rc-relative 2
 CONSTANT: rc-absolute-ppc-2/2 3
-CONSTANT: rc-absolute-ppc-2   4
-CONSTANT: rc-relative-ppc-2   5
-CONSTANT: rc-relative-ppc-3   6
-CONSTANT: rc-relative-arm-3   7
-CONSTANT: rc-indirect-arm     8
-CONSTANT: rc-indirect-arm-pc  9
+CONSTANT: rc-absolute-ppc-2 4
+CONSTANT: rc-relative-ppc-2 5
+CONSTANT: rc-relative-ppc-3 6
+CONSTANT: rc-relative-arm-3 7
+CONSTANT: rc-indirect-arm 8
+CONSTANT: rc-indirect-arm-pc 9
 
 ! Relocation types
-CONSTANT: rt-primitive   0
-CONSTANT: rt-dlsym       1
-CONSTANT: rt-dispatch    2
-CONSTANT: rt-xt          3
-CONSTANT: rt-xt-pic      4
+CONSTANT: rt-primitive 0
+CONSTANT: rt-dlsym 1
+CONSTANT: rt-dispatch 2
+CONSTANT: rt-xt 3
+CONSTANT: rt-xt-pic 4
 CONSTANT: rt-xt-pic-tail 5
-CONSTANT: rt-here        6
-CONSTANT: rt-this        7
-CONSTANT: rt-immediate   8
+CONSTANT: rt-here 6
+CONSTANT: rt-this 7
+CONSTANT: rt-immediate 8
 CONSTANT: rt-stack-chain 9
-CONSTANT: rt-untagged    10
+CONSTANT: rt-untagged 10
+CONSTANT: rt-megamorphic-cache-hits 11
 
 : rc-absolute? ( n -- ? )
     ${ rc-absolute-ppc-2/2 rc-absolute-cell rc-absolute } member? ;

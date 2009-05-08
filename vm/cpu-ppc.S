@@ -236,8 +236,10 @@ DEF(void,flush_icache,(void *start, int len)):
 	blr
 
 DEF(void,primitive_inline_cache_miss,(void)):
-    mflr r3
+    mflr r6
+DEF(void,primitive_inline_cache_miss_tail,(void)):
     PROLOGUE
+    mr r3,r6
     bl MANGLE(inline_cache_miss)
     EPILOGUE
     mtctr r3

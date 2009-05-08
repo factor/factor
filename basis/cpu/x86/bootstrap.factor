@@ -233,12 +233,13 @@ big-endian off
     temp0 temp2 ADD
     ! if(get(cache) == class)
     temp0 [] temp1 CMP
-    ! ... goto get(cache + bootstrap-cell)
-    [
-        temp0 temp0 bootstrap-cell [+] MOV
-        temp0 word-xt-offset [+] JMP
-    ] [ ] make
-    [ length JNE ] [ % ] bi
+    bootstrap-cell 4 = 14 22 ? JNE ! Yuck!
+    ! megamorphic_cache_hits++
+    temp1 0 MOV rc-absolute-cell rt-megamorphic-cache-hits jit-rel
+    temp1 [] 1 ADD
+    ! goto get(cache + bootstrap-cell)
+    temp0 temp0 bootstrap-cell [+] MOV
+    temp0 word-xt-offset [+] JMP
     ! fall-through on miss
 ] mega-lookup jit-define
 
