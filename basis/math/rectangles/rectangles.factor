@@ -21,6 +21,8 @@ M: rect pprint*
 
 : rect-extent ( rect -- loc ext ) rect-bounds over v+ ;
 
+: rect-center ( rect -- center ) rect-bounds 2 v/n v+ ;
+
 : with-rect-extents ( rect1 rect2 loc-quot: ( loc1 loc2 -- ) ext-quot: ( ext1 ext2 -- ) -- )
     [ [ rect-extent ] bi@ ] 2dip bi-curry* bi* ; inline
 
