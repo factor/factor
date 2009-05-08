@@ -25,7 +25,7 @@ M: image <image-gadget>
 
 M: string <image-gadget> load-image <image-gadget> ;
 
-M: pathname <image-gadget> load-image <image-gadget> ;
+M: pathname <image-gadget> string>> load-image <image-gadget> ;
 
 : image-window ( object -- ) <image-gadget> "Image" open-window ;
 
