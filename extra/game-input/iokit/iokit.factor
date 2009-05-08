@@ -8,6 +8,8 @@ IN: game-input.iokit
 
 SINGLETON: iokit-game-input-backend
 
+SYMBOLS: +hid-manager+ +keyboard-state+ +mouse-state+ +controller-states+ ;
+
 iokit-game-input-backend game-input-backend set-global
 
 : hid-manager-matching ( matching-seq -- alien )
@@ -23,7 +25,6 @@ iokit-game-input-backend game-input-backend set-global
 
 CONSTANT: game-devices-matching-seq
     {
-        H{ { "DeviceUsage" 1 } { "DeviceUsagePage" 1 } } ! pointers
         H{ { "DeviceUsage" 2 } { "DeviceUsagePage" 1 } } ! mouses
         H{ { "DeviceUsage" 4 } { "DeviceUsagePage" 1 } } ! joysticks
         H{ { "DeviceUsage" 5 } { "DeviceUsagePage" 1 } } ! gamepads
@@ -88,17 +89,17 @@ CONSTANT: hat-switch-matching-hash
     game-devices-matching-seq hid-manager-matching ;
 
 : device-property ( device key -- value )
-    <NSString> IOHIDDeviceGetProperty plist> ;
+    <NSString> IOHIDDeviceGetProperty [ plist> ] [ f ] if* ;
 : element-property ( element key -- value )
-    <NSString> IOHIDElementGetProperty plist> ;
+    <NSString> IOHIDElementGetProperty [ plist> ] [ f ] if* ;
 : set-element-property ( element key value -- )
     [ <NSString> ] [ >plist ] bi* IOHIDElementSetProperty drop ;
 : transfer-element-property ( element from-key to-key -- )
-    [ dupd element-property ] dip swap set-element-property ;
+    [ dupd element-property ] dip swap
+    [ set-element-property ] [ 2drop ] if* ;
 
 : mouse-device? ( device -- ? )
     {
-        [ 1 1 IOHIDDeviceConformsTo ]
         [ 1 2 IOHIDDeviceConformsTo ]
     } 1|| ;
 
@@ -113,28 +114,31 @@ CONSTANT: hat-switch-matching-hash
     [ IOHIDElementGetUsagePage ] [ IOHIDElementGetUsage ] bi
     2array ;
 
-: button? ( {usage-page,usage} -- ? )
-    first 9 = ; inline
-: keyboard-key? ( {usage-page,usage} -- ? )
-    first 7 = ; inline
+: button? ( element -- ? )
+    IOHIDElementGetUsagePage 9 = ; inline
+: keyboard-key? ( element -- ? )
+    IOHIDElementGetUsagePage 7 = ; inline
+: axis? ( element -- ? )
+    IOHIDElementGetUsagePage 1 = ; inline
+
 : x-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 30 } = ; inline
+    IOHIDElementGetUsage HEX: 30 = ; inline
 : y-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 31 } = ; inline
+    IOHIDElementGetUsage HEX: 31 = ; inline
 : z-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 32 } = ; inline
+    IOHIDElementGetUsage HEX: 32 = ; inline
 : rx-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 33 } = ; inline
+    IOHIDElementGetUsage HEX: 33 = ; inline
 : ry-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 34 } = ; inline
+    IOHIDElementGetUsage HEX: 34 = ; inline
 : rz-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 35 } = ; inline
+    IOHIDElementGetUsage HEX: 35 = ; inline
 : slider? ( {usage-page,usage} -- ? )
-    { 1 HEX: 36 } = ; inline
+    IOHIDElementGetUsage HEX: 36 = ; inline
 : wheel? ( {usage-page,usage} -- ? )
-    { 1 HEX: 38 } = ; inline
+    IOHIDElementGetUsage HEX: 38 = ; inline
 : hat-switch? ( {usage-page,usage} -- ? )
-    { 1 HEX: 39 } = ; inline
+    IOHIDElementGetUsage HEX: 39 = ; inline
 
 CONSTANT: pov-values
     {
@@ -152,42 +156,46 @@ CONSTANT: pov-values
 : pov-value ( value -- pov-direction )
     IOHIDValueGetIntegerValue pov-values ?nth [ pov-neutral ] unless* ;
 
-: record-button ( hid-value usage state -- )
-    [ button-value ] [ second 1- ] [ buttons>> ] tri* set-nth ;
+: record-button ( hid-value element state -- )
+    [ button-value ] [ IOHIDElementGetUsage 1- ] [ buttons>> ] tri* set-nth ;
 
 : record-controller ( controller-state value -- )
-    dup IOHIDValueGetElement element-usage {
+    dup IOHIDValueGetElement {
         { [ dup button? ] [ rot record-button ] } 
-        { [ dup x-axis? ] [ drop axis-value >>x drop ] }
-        { [ dup y-axis? ] [ drop axis-value >>y drop ] }
-        { [ dup z-axis? ] [ drop axis-value >>z drop ] }
-        { [ dup rx-axis? ] [ drop axis-value >>rx drop ] }
-        { [ dup ry-axis? ] [ drop axis-value >>ry drop ] }
-        { [ dup rz-axis? ] [ drop axis-value >>rz drop ] }
-        { [ dup slider? ] [ drop axis-value >>slider drop ] }
-        { [ dup hat-switch? ] [ drop pov-value >>pov drop ] }
+        { [ dup axis? ] [ {
+            { [ dup x-axis? ] [ drop axis-value >>x drop ] }
+            { [ dup y-axis? ] [ drop axis-value >>y drop ] }
+            { [ dup z-axis? ] [ drop axis-value >>z drop ] }
+            { [ dup rx-axis? ] [ drop axis-value >>rx drop ] }
+            { [ dup ry-axis? ] [ drop axis-value >>ry drop ] }
+            { [ dup rz-axis? ] [ drop axis-value >>rz drop ] }
+            { [ dup slider? ] [ drop axis-value >>slider drop ] }
+            { [ dup hat-switch? ] [ drop pov-value >>pov drop ] }
+            [ 3drop ]
+        } cond ] }
         [ 3drop ]
     } cond ;
-
-SYMBOLS: +hid-manager+ +keyboard-state+ +mouse-state+ +controller-states+ ;
 
 : ?set-nth ( value nth seq -- )
     2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ;
 
 : record-keyboard ( value -- )
-    dup IOHIDValueGetElement element-usage keyboard-key? [
+    dup IOHIDValueGetElement keyboard-key? [
         [ IOHIDValueGetIntegerValue c-bool> ]
         [ IOHIDValueGetElement IOHIDElementGetUsage ] bi
         +keyboard-state+ get ?set-nth
     ] [ drop ] if ;
 
 : record-mouse ( value -- )
-    dup IOHIDValueGetElement element-usage {
+    dup IOHIDValueGetElement {
         { [ dup button? ] [ +mouse-state+ get record-button ] }
-        { [ dup x-axis? ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-dx drop ] }
-        { [ dup y-axis? ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-dy drop ] }
-        { [ dup wheel?  ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-scroll-dx drop ] }
-        { [ dup z-axis? ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-scroll-dy drop ] }
+        { [ dup axis? ] [ {
+            { [ dup x-axis? ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-dx drop ] }
+            { [ dup y-axis? ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-dy drop ] }
+            { [ dup wheel?  ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-scroll-dx drop ] }
+            { [ dup z-axis? ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-scroll-dy drop ] }
+            [ 2drop ]
+        } cond ] }
         [ 2drop ]
     } cond ;
 
