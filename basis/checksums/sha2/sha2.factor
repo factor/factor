@@ -8,7 +8,7 @@ IN: checksums.sha2
 
 <PRIVATE
 
-SYMBOLS: H word-size block-size ;
+SYMBOL: sha2
 
 CONSTANT: a 0
 CONSTANT: b 1
@@ -89,7 +89,7 @@ CONSTANT: K-256
     [ [ bitand ] [ bitor ] 2bi ] dip bitand bitor ;
 
 : prepare-message-schedule ( seq -- w-seq )
-    word-size get <sliced-groups> [ be> ] map block-size get 0 pad-tail
+    sha2 get word-size>> <sliced-groups> [ be> ] map sha2 get block-size>> 0 pad-tail
     16 64 [a,b) over '[ _ process-M-256 ] each ;
 
 : slice3 ( n seq -- a b c )
@@ -98,7 +98,7 @@ CONSTANT: K-256
 : T1 ( W n H -- T1 )
     [
         [ swap nth ] keep
-        K-256 nth +
+        sha2 get K>> nth +
     ] dip
     [ e swap slice3 ch w+ ]
     [ e swap nth S1-256 w+ ]
@@ -126,7 +126,7 @@ CONSTANT: K-256
             [ T2 ]
             [ update-H ] tri 
         ] with each
-    ] keep H get [ w+ ] 2map H set ;
+    ] keep sha2 get H>> [ w+ ] 2map sha2 get (>>H) ;
 
 : pad-initial-bytes ( string -- padded-string )
     dup [
@@ -141,12 +141,12 @@ CONSTANT: K-256
 
 : byte-array>sha2 ( byte-array -- string )
     pad-initial-bytes
-    block-size get <sliced-groups>
+    sha2 get block-size>> <sliced-groups>
     [
         prepare-message-schedule
-        block-size get H get clone process-chunk
+        sha2 get [ block-size>> ] [ H>> clone ] bi process-chunk
     ] each
-    H get 4 seq>byte-array ;
+    sha2 get H>> 4 seq>byte-array ;
 
 PRIVATE>
 
@@ -154,11 +154,19 @@ SINGLETON: sha-256
 
 INSTANCE: sha-256 checksum
 
-M: sha-256 checksum-bytes
-    drop [
-        initial-H-256 H set
-        4 word-size set
-        64 block-size set
-        byte-array>sha2
+TUPLE: sha2-state K H word-size block-size ;
 
-    ] with-scope ;
+TUPLE: sha-256-state < sha2-state ;
+
+: <sha-256-state> ( -- sha2-state )
+    sha-256-state new
+        K-256 >>K
+        initial-H-256 >>H
+        4 >>word-size
+        64 >>block-size ; 
+
+M: sha-256 checksum-bytes
+    drop
+    <sha-256-state> sha2 [
+        byte-array>sha2
+    ] with-variable ;
