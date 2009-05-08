@@ -21,43 +21,48 @@ CONSTANT: rs-reg 14
 : xt-save ( -- n ) stack-frame 2 bootstrap-cells - ;
 
 [
-    0 6 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
-    11 6 profile-count-offset LWZ
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
+    11 3 profile-count-offset LWZ
     11 11 1 tag-fixnum ADDI
-    11 6 profile-count-offset STW
-    11 6 word-code-offset LWZ
+    11 3 profile-count-offset STW
+    11 3 word-code-offset LWZ
     11 11 compiled-header-size ADDI
     11 MTCTR
     BCTR
 ] jit-profiling jit-define
 
 [
-    0 6 LOAD32 rc-absolute-ppc-2/2 rt-this jit-rel
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-this jit-rel
     0 MFLR
     1 1 stack-frame SUBI
-    6 1 xt-save STW
-    stack-frame 6 LI
-    6 1 next-save STW
+    3 1 xt-save STW
+    stack-frame 3 LI
+    3 1 next-save STW
     0 1 lr-save stack-frame + STW
 ] jit-prolog jit-define
 
 [
-    0 6 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
-    6 ds-reg 4 STWU
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
+    3 ds-reg 4 STWU
 ] jit-push-immediate jit-define
 
 [
-    0 6 LOAD32 rc-absolute-ppc-2/2 rt-stack-chain jit-rel
-    7 6 0 LWZ
-    1 7 0 STW
-    0 6 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
-    6 MTCTR
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-stack-chain jit-rel
+    4 3 0 LWZ
+    1 4 0 STW
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
+    3 MTCTR
     BCTR
 ] jit-primitive jit-define
 
 [ 0 BL rc-relative-ppc-3 rt-xt-pic jit-rel ] jit-word-call jit-define
 
-[ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-word-jump jit-define
+[
+    0 6 LOAD32 rc-absolute-ppc-2/2 rt-here jit-rel
+    0 B rc-relative-ppc-3 rt-xt-pic-tail jit-rel
+] jit-word-jump jit-define
+
+[ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-word-special jit-define
 
 [
     3 ds-reg 0 LWZ
@@ -152,6 +157,9 @@ CONSTANT: rs-reg 14
 
 ! ! ! Polymorphic inline caches
 
+! Don't touch r6 here; it's used to pass the tail call site
+! address for tail PICs
+
 ! Load a value from a stack position
 [
     4 ds-reg 0 LWZ rc-absolute-ppc-2 rt-untagged jit-rel
@@ -225,7 +233,7 @@ CONSTANT: rs-reg 14
     ! if(get(cache) == class)
     6 3 0 LWZ
     6 0 4 CMP
-    5 BNE
+    10 BNE
     ! megamorphic_cache_hits++
     0 4 LOAD32 rc-absolute-ppc-2/2 rt-megamorphic-cache-hits jit-rel
     5 4 0 LWZ
