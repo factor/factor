@@ -652,10 +652,10 @@ M: ppc %alien-callback ( quot -- )
 
 M: ppc %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    13 3 MR ;
+    15 3 MR ;
 
 M: ppc %alien-indirect ( -- )
-    13 MTLR BLRL ;
+    15 MTLR BLRL ;
 
 M: ppc %callback-value ( ctype -- )
     ! Save top of data stack
