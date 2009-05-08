@@ -116,3 +116,10 @@ PRIVATE>
     [ <combo> [ choose [0,b) ] keep ] dip
     '[ _ apply-combination @ ] each ; inline
 
+: map-combinations ( seq k quot -- )
+    [ <combo> [ choose [0,b) ] keep ] dip
+    '[ _ apply-combination @ ] map ; inline
+
+: reduce-combinations ( seq k identity quot -- result )
+    [ -rot ] dip each-combination ; inline
+
