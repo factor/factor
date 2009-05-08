@@ -29,7 +29,7 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
     { fullscreen { $ NSOpenGLPFAFullScreen } }
     { windowed { $ NSOpenGLPFAWindow } }
     { accelerated { $ NSOpenGLPFAAccelerated } }
-    { software-rendered { $ NSOpenGLPFASingleRenderer $ kCGLRendererGenericFloatID } }
+    { software-rendered { $ NSOpenGLPFARendererID $ kCGLRendererGenericFloatID } }
     { backing-store { $ NSOpenGLPFABackingStore } }
     { multisampled { $ NSOpenGLPFAMultisample } }
     { supersampled { $ NSOpenGLPFASupersample } }
