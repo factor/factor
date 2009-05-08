@@ -55,7 +55,7 @@ ERROR: game-input-not-open ;
     game-input-opened? [
         (close-game-input) 
         reset-game-input
-    ] when ;
+    ] unless ;
 
 : with-game-input ( quot -- )
     open-game-input [ close-game-input ] [ ] cleanup ; inline
