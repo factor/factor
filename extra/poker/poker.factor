@@ -179,7 +179,7 @@ PRIVATE>
 
 TUPLE: hand
     { cards sequence }
-    { value integer } ;
+    { value integer initial: 9999 } ;
 
 M: hand <=> [ value>> ] compare ;
 M: hand equal?
@@ -189,8 +189,8 @@ M: hand equal?
     parse-cards dup hand-value hand boa ;
 
 : best-hand ( str -- hand )
-    parse-cards 5 all-combinations
-    [ dup hand-value hand boa ] map infimum ;
+    parse-cards 5 hand new
+    [ dup hand-value hand boa min ] reduce-combinations ;
 
 : >cards ( hand -- str )
     cards>> [ card>string ] map " " join ;
