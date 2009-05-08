@@ -64,7 +64,7 @@ HELP: combination
 { $description "Outputs the " { $snippet "mth" } " lexicographical combination of " { $snippet "seq" } " choosing " { $snippet "k" } " elements." }
 { $notes "Combinations are 0-based and a bounds error will be thrown if " { $snippet "m" } " is larger than " { $snippet "seq length k nCk" } "." }
 { $examples
-    { $example "USING: math.combinatorics prettyprint ;"
+    { $example "USING: math.combinatorics sequences prettyprint ;"
         "6 7 iota 4 combination ." "{ 0 1 3 6 }" }
     { $example "USING: math.combinatorics prettyprint ;"
         "0 { \"a\" \"b\" \"c\" \"d\" } 2 combination ." "{ \"a\" \"b\" }" }
