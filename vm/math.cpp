@@ -461,7 +461,7 @@ VM_C_API s64 to_signed_8(cell obj)
 
 VM_C_API void box_unsigned_8(u64 n)
 {
-	if(n > fixnum_max)
+	if(n > (u64)fixnum_max)
 		dpush(tag<bignum>(ulong_long_to_bignum(n)));
 	else
 		dpush(tag_fixnum(n));
