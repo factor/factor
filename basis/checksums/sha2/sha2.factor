@@ -2,12 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel splitting grouping math sequences namespaces make
 io.binary math.bitwise checksums checksums.common
-sbufs strings combinators.smart math.ranges fry combinators ;
+sbufs strings combinators.smart math.ranges fry combinators
+accessors ;
 IN: checksums.sha2
 
 <PRIVATE
 
-SYMBOLS: vars K H process-M word-size block-size ;
+SYMBOLS: H word-size block-size ;
 
 CONSTANT: a 0
 CONSTANT: b 1
@@ -58,25 +59,6 @@ CONSTANT: K-256
         [ -10 shift ] tri
     ] [ bitxor ] reduce-outputs ; inline
 
-: process-M-256 ( n seq -- )
-    {
-        [ [ 16 - ] dip nth ]
-        [ [ 15 - ] dip nth s0-256 ]
-        [ [ 7 - ] dip nth ]
-        [ [ 2 - ] dip nth s1-256 w+ w+ w+ ]
-        [ ]
-    } 2cleave set-nth ; inline
-
-: prepare-message-schedule ( seq -- w-seq )
-    word-size get group [ be> ] map block-size get 0 pad-tail
-    16 64 [a,b) over '[ _ process-M-256 ] each ;
-
-: ch ( x y z -- x' )
-    [ bitxor bitand ] keep bitxor ;
-
-: maj ( x y z -- x' )
-    [ [ bitand ] [ bitor ] 2bi ] dip bitand bitor ;
-
 : S0-256 ( x -- x' )
     [
         [ -2 bitroll-32 ]
@@ -91,21 +73,42 @@ CONSTANT: K-256
         [ -25 bitroll-32 ] tri
     ] [ bitxor ] reduce-outputs ; inline
 
-: slice3 ( n seq -- a b c ) [ dup 3 + ] dip <slice> first3 ; inline
+: process-M-256 ( n seq -- )
+    {
+        [ [ 16 - ] dip nth ]
+        [ [ 15 - ] dip nth s0-256 ]
+        [ [ 7 - ] dip nth ]
+        [ [ 2 - ] dip nth s1-256 w+ w+ w+ ]
+        [ ]
+    } 2cleave set-nth ; inline
 
-: T1 ( W n -- T1 )
-    [ swap nth ] keep
-    K get nth +
-    e vars get slice3 ch +
-    e vars get nth S1-256 +
-    h vars get nth w+ ;
+: ch ( x y z -- x' )
+    [ bitxor bitand ] keep bitxor ;
 
-: T2 ( -- T2 )
-    a vars get nth S0-256
-    a vars get slice3 maj w+ ;
+: maj ( x y z -- x' )
+    [ [ bitand ] [ bitor ] 2bi ] dip bitand bitor ;
 
-: update-vars ( T1 T2 -- )
-    vars get
+: prepare-message-schedule ( seq -- w-seq )
+    word-size get <sliced-groups> [ be> ] map block-size get 0 pad-tail
+    16 64 [a,b) over '[ _ process-M-256 ] each ;
+
+: slice3 ( n seq -- a b c )
+    [ dup 3 + ] dip <slice> first3 ; inline
+
+: T1 ( W n H -- T1 )
+    [
+        [ swap nth ] keep
+        K-256 nth +
+    ] dip
+    [ e swap slice3 ch w+ ]
+    [ e swap nth S1-256 w+ ]
+    [ h swap nth w+ ] tri ;
+
+: T2 ( H -- T2 )
+    [ a swap nth S0-256 ]
+    [ a swap slice3 maj w+ ] bi ;
+
+: update-H ( T1 T2 H -- )
     h g pick exchange
     g f pick exchange
     f e pick exchange
@@ -115,28 +118,35 @@ CONSTANT: K-256
     b a pick exchange
     [ w+ a ] dip set-nth ;
 
-: process-chunk ( M -- )
-    H get clone vars set
-    prepare-message-schedule block-size get [
-        T1 T2 update-vars
-    ] with each vars get H get [ w+ ] 2map H set ;
+: process-chunk ( M block-size H-cloned -- )
+    [
+        '[
+            _
+            [ T1 ]
+            [ T2 ]
+            [ update-H ] tri 
+        ] with each
+    ] keep H get [ w+ ] 2map H set ;
 
-: seq>byte-array ( n seq -- string )
-    [ swap '[ _ >be % ] each ] B{ } make ;
-
-: preprocess-plaintext ( string big-endian? -- padded-string )
-    #! pad 0x80 then 00 til 8 bytes left, then 64bit length in bits
-    [ >sbuf ] dip over [
+: pad-initial-bytes ( string -- padded-string )
+    dup [
         HEX: 80 ,
-        dup length HEX: 3f bitand
-        calculate-pad-length 0 <string> %
-        length 3 shift 8 rot [ >be ] [ >le ] if %
-    ] "" make over push-all ;
+        length 
+        [ HEX: 3f bitand calculate-pad-length 0 <string> % ]
+        [ 3 shift 8 >be % ] bi
+    ] "" make append ;
+
+: seq>byte-array ( seq n -- string )
+    '[ _ >be ] map B{ } join ;
 
 : byte-array>sha2 ( byte-array -- string )
-    t preprocess-plaintext
-    block-size get group [ process-chunk ] each
-    4 H get seq>byte-array ;
+    pad-initial-bytes
+    block-size get <sliced-groups>
+    [
+        prepare-message-schedule
+        block-size get H get clone process-chunk
+    ] each
+    H get 4 seq>byte-array ;
 
 PRIVATE>
 
@@ -146,9 +156,9 @@ INSTANCE: sha-256 checksum
 
 M: sha-256 checksum-bytes
     drop [
-        K-256 K set
         initial-H-256 H set
         4 word-size set
         64 block-size set
         byte-array>sha2
+
     ] with-scope ;
