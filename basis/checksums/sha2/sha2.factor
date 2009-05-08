@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel splitting grouping math sequences namespaces make
 io.binary math.bitwise checksums checksums.common
-sbufs strings ;
+sbufs strings combinators.smart ;
 IN: checksums.sha2
 
 <PRIVATE
 
-SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
+SYMBOLS: vars K H process-M word-size block-size ;
 
 CONSTANT: a 0
 CONSTANT: b 1
@@ -18,13 +18,13 @@ CONSTANT: f 5
 CONSTANT: g 6
 CONSTANT: h 7
 
-: initial-H-256 ( -- seq )
+CONSTANT: initial-H-256
     {
         HEX: 6a09e667 HEX: bb67ae85 HEX: 3c6ef372 HEX: a54ff53a
         HEX: 510e527f HEX: 9b05688c HEX: 1f83d9ab HEX: 5be0cd19
-    } ;
+    }
 
-: K-256 ( -- seq )
+CONSTANT: K-256
     {
         HEX: 428a2f98 HEX: 71374491 HEX: b5c0fbcf HEX: e9b5dba5
         HEX: 3956c25b HEX: 59f111f1 HEX: 923f82a4 HEX: ab1c5ed5
@@ -42,17 +42,21 @@ CONSTANT: h 7
         HEX: 391c0cb3 HEX: 4ed8aa4a HEX: 5b9cca4f HEX: 682e6ff3
         HEX: 748f82ee HEX: 78a5636f HEX: 84c87814 HEX: 8cc70208
         HEX: 90befffa HEX: a4506ceb HEX: bef9a3f7 HEX: c67178f2
-    } ;
+    }
 
 : s0-256 ( x -- x' )
-    [ -7 bitroll-32 ] keep
-    [ -18 bitroll-32 ] keep
-    -3 shift bitxor bitxor ; inline
+    [
+        [ -7 bitroll-32 ]
+        [ -18 bitroll-32 ]
+        [ -3 shift ] tri
+    ] [ bitxor ] reduce-outputs ; inline
 
 : s1-256 ( x -- x' )
-    [ -17 bitroll-32 ] keep
-    [ -19 bitroll-32 ] keep
-    -10 shift bitxor bitxor ; inline
+    [
+        [ -17 bitroll-32 ]
+        [ -19 bitroll-32 ]
+        [ -10 shift ] tri
+    ] [ bitxor ] reduce-outputs ; inline
 
 : process-M-256 ( seq n -- )
     [ 16 - swap nth ] 2keep
