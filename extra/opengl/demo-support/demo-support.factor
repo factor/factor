@@ -1,9 +1,9 @@
 USING: arrays kernel math math.functions math.order math.vectors
 namespaces opengl opengl.gl sequences ui ui.gadgets ui.gestures
-ui.gadgets.worlds ui.render accessors combinators ;
+ui.gadgets.worlds ui.render accessors combinators literals ;
 IN: opengl.demo-support
 
-: FOV ( -- x ) 2.0 sqrt 1+ ; inline
+CONSTANT: FOV $[ 2.0 sqrt 1+ ]
 CONSTANT: MOUSE-MOTION-SCALE 0.5
 CONSTANT: KEY-ROTATE-STEP 10.0
 

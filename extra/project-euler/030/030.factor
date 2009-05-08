@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions project-euler.common sequences ;
+USING: kernel math math.functions math.ranges project-euler.common sequences ;
 IN: project-euler.030
 
 ! http://projecteuler.net/index.php?section=problems&id=30
@@ -38,7 +38,7 @@ IN: project-euler.030
 PRIVATE>
 
 : euler030 ( -- answer )
-    325537 [ dup sum-fifth-powers = ] filter sum 1- ;
+    325537 [0,b) [ dup sum-fifth-powers = ] filter sum 1- ;
 
 ! [ euler030 ] 100 ave-time
 ! 1700 ms ave run time - 64.84 SD (100 trials)
