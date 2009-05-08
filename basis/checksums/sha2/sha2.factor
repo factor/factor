@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel splitting grouping math sequences namespaces make
 io.binary math.bitwise checksums checksums.common
-sbufs strings combinators.smart ;
+sbufs strings combinators.smart math.ranges fry combinators ;
 IN: checksums.sha2
 
 <PRIVATE
@@ -58,34 +58,38 @@ CONSTANT: K-256
         [ -10 shift ] tri
     ] [ bitxor ] reduce-outputs ; inline
 
-: process-M-256 ( seq n -- )
-    [ 16 - swap nth ] 2keep
-    [ 15 - swap nth s0-256 ] 2keep
-    [ 7 - swap nth ] 2keep
-    [ 2 - swap nth s1-256 ] 2keep
-    [ + + w+ ] 2dip swap set-nth ; inline
+: process-M-256 ( n seq -- )
+    {
+        [ [ 16 - ] dip nth ]
+        [ [ 15 - ] dip nth s0-256 ]
+        [ [ 7 - ] dip nth ]
+        [ [ 2 - ] dip nth s1-256 w+ w+ w+ ]
+        [ ]
+    } 2cleave set-nth ; inline
 
 : prepare-message-schedule ( seq -- w-seq )
     word-size get group [ be> ] map block-size get 0 pad-tail
-    dup 16 64 dup <slice> [
-        process-M-256
-    ] with each ;
+    16 64 [a,b) over '[ _ process-M-256 ] each ;
 
 : ch ( x y z -- x' )
     [ bitxor bitand ] keep bitxor ;
 
 : maj ( x y z -- x' )
-    [ [ bitand ] 2keep bitor ] dip bitand bitor ;
+    [ [ bitand ] [ bitor ] 2bi ] dip bitand bitor ;
 
 : S0-256 ( x -- x' )
-    [ -2 bitroll-32 ] keep
-    [ -13 bitroll-32 ] keep
-    -22 bitroll-32 bitxor bitxor ; inline
+    [
+        [ -2 bitroll-32 ]
+        [ -13 bitroll-32 ]
+        [ -22 bitroll-32 ] tri
+    ] [ bitxor ] reduce-outputs ; inline
 
 : S1-256 ( x -- x' )
-    [ -6 bitroll-32 ] keep
-    [ -11 bitroll-32 ] keep
-    -25 bitroll-32 bitxor bitxor ; inline
+    [
+        [ -6 bitroll-32 ]
+        [ -11 bitroll-32 ]
+        [ -25 bitroll-32 ] tri
+    ] [ bitxor ] reduce-outputs ; inline
 
 : slice3 ( n seq -- a b c ) [ dup 3 + ] dip <slice> first3 ; inline
 
@@ -118,7 +122,7 @@ CONSTANT: K-256
     ] with each vars get H get [ w+ ] 2map H set ;
 
 : seq>byte-array ( n seq -- string )
-    [ swap [ >be % ] curry each ] B{ } make ;
+    [ swap '[ _ >be % ] each ] B{ } make ;
 
 : preprocess-plaintext ( string big-endian? -- padded-string )
     #! pad 0x80 then 00 til 8 bytes left, then 64bit length in bits
