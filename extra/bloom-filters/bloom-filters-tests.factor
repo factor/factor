@@ -29,20 +29,20 @@ IN: bloom-filters.tests
 
 ! Should not generate bignum hash codes.  Enhanced double hashing may generate a
 ! lot of hash codes, and it's better to do this earlier than later.
-[ t ] [ 10000 iota [ hashcodes-from-object [ fixnum? ] both? ] map [ t = ] all? ] unit-test
+[ t ] [ 10000 iota [ hashcodes-from-object [ fixnum? ] both? ] map [ ] all? ] unit-test
 
 [ ?{ t f t f t f } ] [ { 0 2 4 } 6 <bit-array> [ set-indices ] keep ] unit-test
 
 : empty-bloom-filter ( -- bloom-filter )
     0.01 2000 <bloom-filter> ;
 
-[ 1 ] [ empty-bloom-filter [ increment-n-objects ] keep current-n-objects>> ] unit-test
+[ 1 ] [ empty-bloom-filter increment-n-objects current-n-objects>> ] unit-test
 
 : basic-insert-test-setup ( -- bloom-filter )
     1 empty-bloom-filter [ bloom-filter-insert ] keep ;
 
 ! Basic tests that insert does something
-[ t ] [ basic-insert-test-setup bits>> [ t = ] any? ] unit-test
+[ t ] [ basic-insert-test-setup bits>> [ ] any? ] unit-test
 [ 1 ] [ basic-insert-test-setup current-n-objects>> ] unit-test
 
 : non-empty-bloom-filter ( -- bloom-filter )
@@ -59,13 +59,13 @@ IN: bloom-filters.tests
 [ t ] [ 2000 iota
         full-bloom-filter
         [ bloom-filter-member? ] curry map
-        [ t = ] all? ] unit-test
+        [ ] all? ] unit-test
 
 ! We shouldn't have more than 0.01 false-positive rate.
 [ t ] [ 1000 iota [ drop most-positive-fixnum random 1000 + ] map
         full-bloom-filter
         [ bloom-filter-member? ] curry map
-        [ t = ] filter
+        [ ] filter
         ! TODO: This should be 10, but the false positive rate is currently very
         ! high.  It shouldn't be much more than this.
         length 150 <= ] unit-test
