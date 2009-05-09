@@ -1,11 +1,11 @@
-USING: accessors arrays combinators game-input
-game-input.scancodes game-loop grouping kernel literals locals
+USING: accessors arrays combinators game-input game-loop
+game-input.scancodes grouping kernel literals locals
 math math.constants math.functions math.matrices math.order
 math.vectors opengl opengl.capabilities opengl.gl
 opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays.float
 terrain.generation terrain.shaders ui ui.gadgets
-ui.gadgets.worlds ui.pixel-formats ;
+ui.gadgets.worlds ui.pixel-formats game-worlds method-chains ;
 IN: terrain
 
 CONSTANT: FOV $[ 2.0 sqrt 1+ ]
@@ -15,7 +15,6 @@ CONSTANT: PLAYER-START-LOCATION { 0.5 0.51 0.5 }
 CONSTANT: PLAYER-HEIGHT $[ 3.0 1024.0 / ]
 CONSTANT: GRAVITY $[ 1.0 4096.0 / ]
 CONSTANT: JUMP $[ 1.0 1024.0 / ]
-CONSTANT: TICK-LENGTH $[ 1000 30 /i ]
 CONSTANT: MOUSE-SCALE $[ 1.0 10.0 / ]
 CONSTANT: MOVEMENT-SPEED $[ 1.0 16384.0 / ]
 CONSTANT: FRICTION 0.95
@@ -28,11 +27,13 @@ CONSTANT: terrain-vertex-row-length $[ 512 1 + 2 * ]
 TUPLE: player
     location yaw pitch velocity ;
 
-TUPLE: terrain-world < world
+TUPLE: terrain-world < game-world
     player
     terrain terrain-segment terrain-texture terrain-program
-    terrain-vertex-buffer
-    game-loop ;
+    terrain-vertex-buffer ;
+
+M: terrain-world tick-length
+    drop 1000 30 /i ;
 
 : frustum ( dim -- -x x -y y near far )
     dup first2 min v/n
@@ -171,9 +172,6 @@ M: terrain-world tick*
     [ dup focused?>> [ handle-input ] [ drop ] if ]
     [ dup player>> tick-player ] bi ;
 
-M: terrain-world draw*
-    nip draw-world ;
-
 : set-heightmap-texture-parameters ( texture -- )
     GL_TEXTURE_2D GL_TEXTURE0 bind-texture-unit
     GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
@@ -181,7 +179,7 @@ M: terrain-world draw*
     GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP_TO_EDGE glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri ;
 
-M: terrain-world begin-world
+BEFORE: terrain-world begin-world
     "2.0" { "GL_ARB_vertex_buffer_object" "GL_ARB_shader_objects" }
     require-gl-version-or-extensions
     GL_DEPTH_TEST glEnable
@@ -195,14 +193,10 @@ M: terrain-world begin-world
     terrain-vertex-shader terrain-pixel-shader <simple-gl-program>
     >>terrain-program
     vertex-array >vertex-buffer >>terrain-vertex-buffer
-    TICK-LENGTH over <game-loop> [ >>game-loop ] keep start-loop
-    open-game-input
     drop ;
 
-M: terrain-world end-world
-    close-game-input
+AFTER: terrain-world end-world
     {
-        [ game-loop>> stop-loop ]
         [ terrain-vertex-buffer>> delete-gl-buffer ]
         [ terrain-program>> delete-gl-program ]
         [ terrain-texture>> delete-texture ]
@@ -224,7 +218,6 @@ M: terrain-world draw-world*
     ] with-gl-program ]
     tri gl-error ;
 
-M: terrain-world focusable-child* drop t ;
 M: terrain-world pref-dim* drop { 640 480 } ;
 
 : terrain-window ( -- )
