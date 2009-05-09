@@ -4,15 +4,14 @@ IN: terrain.shaders
 STRING: terrain-vertex-shader
 
 uniform sampler2D heightmap;
+uniform vec4 component_scale;
 
 varying vec2 heightcoords;
-
-const vec4 COMPONENT_SCALE = vec4(0.5, 0.01, 0.002, 0.0);
 
 float height(sampler2D map, vec2 coords)
 {
     vec4 v = texture2D(map, coords);
-    return dot(v, COMPONENT_SCALE);
+    return dot(v, component_scale);
 }
 
 void main()
@@ -27,15 +26,14 @@ void main()
 STRING: terrain-pixel-shader
 
 uniform sampler2D heightmap;
+uniform vec4 component_scale;
 
 varying vec2 heightcoords;
-
-const vec4 COMPONENT_SCALE = vec4(0.5, 0.01, 0.002, 0.0);
 
 float height(sampler2D map, vec2 coords)
 {
     vec4 v = texture2D(map, coords);
-    return dot(v, COMPONENT_SCALE);
+    return dot(v, component_scale);
 }
 
 void main()
