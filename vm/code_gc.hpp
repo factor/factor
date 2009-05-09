@@ -1,11 +1,11 @@
 namespace factor
 {
 
-#define FREE_LIST_COUNT 16
-#define BLOCK_SIZE_INCREMENT 32
+static const cell free_list_count = 16;
+static const cell block_size_increment = 32;
 
 struct heap_free_list {
-	free_heap_block *small_blocks[FREE_LIST_COUNT];
+	free_heap_block *small_blocks[free_list_count];
 	free_heap_block *large_blocks;
 };
 

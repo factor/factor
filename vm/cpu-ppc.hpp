@@ -27,7 +27,7 @@ inline static void check_call_site(cell return_address)
 #endif
 }
 
-#define B_MASK 0x3fffffc
+static const cell b_mask = 0x3fffffc;
 
 inline static void *get_call_target(cell return_address)
 {
@@ -35,7 +35,7 @@ inline static void *get_call_target(cell return_address)
 	check_call_site(return_address);
 
 	cell insn = *(cell *)return_address;
-	cell unsigned_addr = (insn & B_MASK);
+	cell unsigned_addr = (insn & b_mask);
 	fixnum signed_addr = (fixnum)(unsigned_addr << 6) >> 6;
 	return (void *)(signed_addr + return_address);
 }
@@ -48,7 +48,7 @@ inline static void set_call_target(cell return_address, void *target)
 	cell insn = *(cell *)return_address;
 
 	fixnum relative_address = ((cell)target - return_address);
-	insn = ((insn & ~B_MASK) | (relative_address & B_MASK));
+	insn = ((insn & ~b_mask) | (relative_address & b_mask));
 	*(cell *)return_address = insn;
 
 	/* Flush the cache line containing the call we just patched */
