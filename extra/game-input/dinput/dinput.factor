@@ -5,8 +5,11 @@ windows.user32 windows.messages sequences combinators locals
 math.rectangles accessors math alien alien.strings
 io.encodings.utf16 io.encodings.utf16n continuations
 byte-arrays game-input.dinput.keys-array game-input
-ui.backend.windows windows.errors ;
+ui.backend.windows windows.errors struct-arrays
+math.bitwise ;
 IN: game-input.dinput
+
+CONSTANT: MOUSE-BUFFER-SIZE 16
 
 SINGLETON: dinput-game-input-backend
 
@@ -14,7 +17,8 @@ dinput-game-input-backend game-input-backend set-global
 
 SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     +controller-devices+ +controller-guids+
-    +device-change-window+ +device-change-handle+ ;
+    +device-change-window+ +device-change-handle+
+    +mouse-device+ +mouse-state+ +mouse-buffer+ ;
 
 : create-dinput ( -- )
     f GetModuleHandle DIRECTINPUT_VERSION IDirectInput8W-iid
@@ -35,8 +39,24 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 : set-data-format ( device format-symbol -- )
     get IDirectInputDevice8W::SetDataFormat ole32-error ;
 
+: <buffer-size-diprop> ( size -- DIPROPDWORD )
+    "DIPROPDWORD" <c-object>
+        "DIPROPDWORD" heap-size over set-DIPROPHEADER-dwSize
+        "DIPROPHEADER" heap-size over set-DIPROPHEADER-dwHeaderSize
+        0 over set-DIPROPHEADER-dwObj
+        DIPH_DEVICE over set-DIPROPHEADER-dwHow
+        swap over set-DIPROPDWORD-dwData ;
+
+: set-buffer-size ( device size -- )
+    DIPROP_BUFFERSIZE swap <buffer-size-diprop>
+    IDirectInputDevice8W::SetProperty ole32-error ;
+
 : configure-keyboard ( keyboard -- )
     [ c_dfDIKeyboard_HID set-data-format ] [ set-coop-level ] bi ;
+: configure-mouse ( mouse -- )
+    [ c_dfDIMouse2 set-data-format ]
+    [ MOUSE-BUFFER-SIZE set-buffer-size ]
+    [ set-coop-level ] tri ;
 : configure-controller ( controller -- )
     [ c_dfDIJoystick2 set-data-format ] [ set-coop-level ] bi ;
 
@@ -46,6 +66,15 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     [ +keyboard-device+ set-global ] bi
     256 <byte-array> <keys-array> keyboard-state boa
     +keyboard-state+ set-global ;
+
+: find-mouse ( -- )
+    GUID_SysMouse device-for-guid
+    [ configure-mouse ]
+    [ +mouse-device+ set-global ] bi
+    0 0 0 0 8 f <array> mouse-state boa
+    +mouse-state+ set-global
+    MOUSE-BUFFER-SIZE "DIDEVICEOBJECTDATA" <c-array>
+    +mouse-buffer+ set-global ;
 
 : device-info ( device -- DIDEVICEIMAGEINFOW )
     "DIDEVICEINSTANCEW" <c-object>
@@ -190,16 +219,22 @@ TUPLE: window-rect < rect window-loc ;
     +keyboard-device+ [ com-release f ] change-global
     f +keyboard-state+ set-global ;
 
+: release-mouse ( -- )
+    +mouse-device+ [ com-release f ] change-global
+    f +mouse-state+ set-global ;
+
 M: dinput-game-input-backend (open-game-input)
     create-dinput
     create-device-change-window
     find-keyboard
+    find-mouse
     set-up-controllers
     add-wm-devicechange ;
 
 M: dinput-game-input-backend (close-game-input)
     remove-wm-devicechange
     release-controllers
+    release-mouse
     release-keyboard
     close-device-change-window
     delete-dinput ;
@@ -263,6 +298,22 @@ CONSTANT: pov-values
         [ DIJOYSTATE2-rgbButtons over buttons>> length >buttons >>buttons ]
     } 2cleave ;
 
+: read-device-buffer ( device buffer count -- buffer count' )
+    [ "DIDEVICEOBJECTDATA" heap-size ] 2dip <uint>
+    [ 0 IDirectInputDevice8W::GetDeviceData ole32-error ] 2keep *uint ;
+
+: (fill-mouse-state) ( state DIDEVICEOBJECTDATA -- state )
+    [ DIDEVICEOBJECTDATA-dwData 32 >signed ] [ DIDEVICEOBJECTDATA-dwOfs ] bi {
+        { DIMOFS_X [ [ + ] curry change-dx ] }
+        { DIMOFS_Y [ [ + ] curry change-dy ] }
+        { DIMOFS_Z [ [ + ] curry change-scroll-dy ] }
+        [ [ c-bool> ] [ DIMOFS_BUTTON0 - ] bi* rot [ buttons>> set-nth ] keep ]
+    } case ;
+
+: fill-mouse-state ( buffer count -- state )
+    [ +mouse-state+ get ] 2dip swap
+    [ "DIDEVICEOBJECTDATA" byte-array>struct-array nth (fill-mouse-state) ] curry each ;
+
 : get-device-state ( device byte-array -- )
     [ dup IDirectInputDevice8W::Poll ole32-error ] dip
     [ length ] keep
@@ -283,3 +334,17 @@ M: dinput-game-input-backend read-keyboard
     +keyboard-device+ get
     [ +keyboard-state+ get [ keys>> underlying>> get-device-state ] keep ]
     [ ] [ f ] with-acquisition ;
+
+M: dinput-game-input-backend read-mouse
+    +mouse-device+ get [ +mouse-buffer+ get MOUSE-BUFFER-SIZE read-device-buffer ]
+    [ fill-mouse-state ] [ f ] with-acquisition ;
+
+M: dinput-game-input-backend reset-mouse
+    +mouse-device+ get [ f MOUSE-BUFFER-SIZE read-device-buffer ]
+    [ 2drop ] [ ] with-acquisition
+    +mouse-state+ get
+        0 >>dx
+        0 >>dy
+        0 >>scroll-dx
+        0 >>scroll-dy
+        drop ;

@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math math.partial-dispatch namespaces sequences sets
 accessors assocs words kernel memoize fry combinators
+combinators.short-circuit
 compiler.tree
 compiler.tree.combinators
 compiler.tree.def-use
@@ -69,6 +70,12 @@ GENERIC: optimize-modular-arithmetic* ( node -- nodes )
 : optimize->fixnum ( #call -- nodes )
     dup redundant->fixnum? [ drop f ] when ;
 
+: optimize->integer ( #call -- nodes )
+    dup out-d>> first actually-used-by dup length 1 = [
+        first node>> { [ #call? ] [ word>> \ >fixnum eq? ] } 1&&
+        [ drop { } ] when
+    ] [ drop ] if ;
+
 MEMO: fixnum-coercion ( flags -- nodes )
     [ [ ] [ >fixnum ] ? ] map '[ _ spread ] splice-quot ;
 
@@ -87,6 +94,7 @@ MEMO: fixnum-coercion ( flags -- nodes )
 M: #call optimize-modular-arithmetic*
     dup word>> {
         { [ dup \ >fixnum eq? ] [ drop optimize->fixnum ] }
+        { [ dup \ >integer eq? ] [ drop optimize->integer ] }
         { [ dup "modular-arithmetic" word-prop ] [ drop optimize-modular-op ] }
         [ drop ]
     } cond ;

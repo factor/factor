@@ -12,7 +12,7 @@ IN: mason.report
     target-cpu get
     host-name
     build-dir
-    "git-id" eval-file
+    current-git-id get
     [XML
     <h1>Build report for <->/<-></h1>
     <table>
@@ -89,8 +89,8 @@ IN: mason.report
             timings-table
 
             "Load failures"
-            load-everything-vocabs-file
-            load-everything-errors-file
+            load-all-vocabs-file
+            load-all-errors-file
             error-dump
 
             "Compiler errors"
@@ -112,15 +112,14 @@ IN: mason.report
             benchmark-error-vocabs-file
             benchmark-error-messages-file
             error-dump
-            
-            "Benchmark timings"
+
             benchmarks-file eval-file benchmarks-table
         ] output>array
     ] with-report ;
 
 : build-clean? ( -- ? )
     {
-        [ load-everything-vocabs-file eval-file empty? ]
+        [ load-all-vocabs-file eval-file empty? ]
         [ test-all-vocabs-file eval-file empty? ]
         [ help-lint-vocabs-file eval-file empty? ]
         [ compiler-errors-file eval-file empty? ]

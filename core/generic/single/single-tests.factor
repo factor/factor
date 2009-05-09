@@ -273,5 +273,5 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
 [ ] [ "IN: generic.single.tests GENERIC: xyz ( a -- b )" eval( -- ) ] unit-test
 [ ] [ "IN: generic.single.tests MATH: xyz ( a b -- c )" eval( -- ) ] unit-test
 
-[ f ] [ "xyz" "generic.single.tests" lookup direct-entry-def>> ] unit-test
+[ f ] [ "xyz" "generic.single.tests" lookup pic-def>> ] unit-test
 [ f ] [ "xyz" "generic.single.tests" lookup "decision-tree" word-prop ] unit-test

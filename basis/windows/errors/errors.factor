@@ -1,7 +1,7 @@
 USING: alien.c-types kernel locals math math.bitwise
 windows.kernel32 sequences byte-arrays unicode.categories
 io.encodings.string io.encodings.utf16n alien.strings
-arrays ;
+arrays literals ;
 IN: windows.errors
 
 CONSTANT: ERROR_SUCCESS                               0
@@ -732,11 +732,13 @@ ERROR: error-message-failed id ;
         win32-error-string throw
     ] when ;
 
-: expected-io-errors ( -- seq )
-    ERROR_SUCCESS
-    ERROR_IO_INCOMPLETE
-    ERROR_IO_PENDING
-    WAIT_TIMEOUT 4array ; foldable
+CONSTANT: expected-io-errors
+    ${
+        ERROR_SUCCESS
+        ERROR_IO_INCOMPLETE
+        ERROR_IO_PENDING
+        WAIT_TIMEOUT
+    }
 
 : expected-io-error? ( error-code -- ? )
     expected-io-errors member? ;
