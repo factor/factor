@@ -652,9 +652,9 @@ FUNCTION: HDC BeginPaint ( HWND hwnd, LPPAINTSTRUCT lpPaint ) ;
 FUNCTION: HWND ChildWindowFromPoint ( HWND hWndParent, POINT point ) ;
 ! FUNCTION: ChildWindowFromPointEx
 ! FUNCTION: ClientThreadSetup
-! FUNCTION: ClientToScreen
+FUNCTION: BOOL ClientToScreen ( HWND hWnd, POINT* point ) ;
 ! FUNCTION: CliImmSetHotKey
-! FUNCTION: ClipCursor
+FUNCTION: int ClipCursor ( RECT* clipRect ) ;
 FUNCTION: BOOL CloseClipboard ( ) ;
 ! FUNCTION: CloseDesktop
 ! FUNCTION: CloseWindow
@@ -1363,7 +1363,7 @@ CONSTANT: HWND_TOP f
 ! FUNCTION: SetWindowWord
 ! FUNCTION: SetWinEventHook
 ! FUNCTION: ShowCaret
-! FUNCTION: ShowCursor
+FUNCTION: int ShowCursor ( BOOL show ) ;
 ! FUNCTION: ShowOwnedPopups
 ! FUNCTION: ShowScrollBar
 ! FUNCTION: ShowStartGlass
