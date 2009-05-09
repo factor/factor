@@ -1,16 +1,15 @@
 ! Copyright (C) 2009 Alec Berryman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays bit-arrays fry kernel layouts locals math math.functions
-math.ranges multiline sequences ;
+multiline sequences ;
 IN: bloom-filters
+
+FROM: math.ranges => [1,b] [0,b) ;
+FROM: math.intervals => (a,b) interval-contains? ;
 
 /*
 
 TODO:
-
-- How to singal an error when too many bits?  It looks like a built-in for some
-  types of arrays, but bit-array just returns a zero-length array.  What we do
-  now is completely broken: -1 hash codes?  Really?
 
 - The false positive rate is 10x what it should be, based on informal testing.
   Better object hashes or a better method of generating extra hash codes would
@@ -25,7 +24,9 @@ TODO:
   - Be sure to adjust the test that asserts the number of false positives isn't
     unreasonable.
 
-- Should round bits up to next power of two, use wrap instead of mod.
+- Could round bits up to next power of two and use wrap instead of mod.  This
+  would cost a lot of bits on 32-bit platforms, though, and limit the bit-array
+  to 8MB.
 
 - Should allow user to specify the hash codes, either as inputs to enhanced
   double hashing or for direct use.
@@ -47,6 +48,10 @@ TUPLE: bloom-filter
 { maximum-n-objects fixnum read-only }
 { current-n-objects fixnum } ;
 
+ERROR: capacity-error ;
+ERROR: invalid-error-rate ;
+ERROR: invalid-n-objects ;
+
 <PRIVATE
 
 ! number-bits = -(n-objects * n-hashes) / ln(1 - error-rate ^ 1/n-hashes)
@@ -56,22 +61,21 @@ TUPLE: bloom-filter
     /
     ceiling >integer ; ! should check that it's below max-array-capacity
 
-! TODO: this should be a constant
-!
-! TODO: after very little experimentation, I never see this increase after about
-! 20 or so.  Maybe it should be smaller.
+! 100 hashes ought to be enough for anybody.
 : n-hashes-range ( -- range )
     100 [1,b] ;
 
-! Ends up with a list of arrays - { n-bits position }
-: find-bloom-filter-sizes ( error-rate number-objects -- seq )
-    [ bits-to-satisfy-error-rate ] 2curry
-    n-hashes-range swap
-    map
-    n-hashes-range zip ;
+! { n-hashes n-bits }
+: identity-configuration ( -- 2seq )
+    0 max-array-capacity 2array ;
 
-: smallest-first ( seq1 seq2 -- seq )
-    [ [ first ] bi@ <= ] most ;
+: smaller-second ( 2seq 2seq -- 2seq )
+    [ [ second ] bi@ <= ] most ;
+
+! If the number of hashes isn't positive, we haven't found anything smaller than the
+! identity configuration.
+: validate-sizes ( 2seq -- )
+    first 0 <= [ capacity-error ] when* ;
 
 ! The consensus on the tradeoff between increasing the number of bits and
 ! increasing the number of hash functions seems to be "go for the smallest
@@ -80,17 +84,31 @@ TUPLE: bloom-filter
 ! seen any usage studies from the implementations that made this tradeoff to
 ! support it, and I haven't done my own, but we'll go with it anyway.
 !
-! TODO: check that error-rate is reasonable.
 : size-bloom-filter ( error-rate number-objects -- number-hashes number-bits )
-    find-bloom-filter-sizes
-    max-array-capacity -1 2array
-    [ smallest-first ]
-    reduce
-    [ second ] [ first ] bi ;
+    '[ _ _ bits-to-satisfy-error-rate ]
+    '[ dup _ call 2array smaller-second ]
+    '[ n-hashes-range identity-configuration _ reduce ]
+    call
+    dup validate-sizes
+    first2 ;
+
+: validate-n-objects ( n-objects -- )
+    0 <= [ invalid-n-objects ] when ;
+
+: valid-error-rate-interval ( -- interval )
+    0 1 (a,b) ;
+
+: validate-error-rate ( error-rate -- )
+    valid-error-rate-interval interval-contains?
+    [ invalid-error-rate ] unless ;
+
+: validate-constraints ( error-rate n-objects -- )
+    validate-n-objects validate-error-rate ;
 
 PRIVATE>
 
 : <bloom-filter> ( error-rate number-objects -- bloom-filter )
+    [ validate-constraints ] 2keep
     [ size-bloom-filter <bit-array> ] keep
     0 ! initially empty
     bloom-filter boa ;

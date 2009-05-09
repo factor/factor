@@ -2,6 +2,10 @@ USING: accessors bit-arrays bloom-filters bloom-filters.private kernel layouts
 math random sequences tools.test ;
 IN: bloom-filters.tests
 
+
+[ { 200 5 } ] [ { 100 7 } { 200 5 } smaller-second ] unit-test
+[ { 200 5 } ] [ { 200 5 } { 100 7 } smaller-second ] unit-test
+
 ! The sizing information was generated using the subroutine
 ! calculate_shortest_filter_length from
 ! http://www.perl.com/pub/a/2004/04/08/bloom_filters.html.
@@ -19,13 +23,19 @@ IN: bloom-filters.tests
 [ 32 ] [ 5 0.05 5 bits-to-satisfy-error-rate ] unit-test
 [ 4 32 ] [ 0.05 5 size-bloom-filter ] unit-test
 
-! This is a lot of bits.  On linux-x86-32, max-array-capacity is 134217727,
-! which is about 16MB (assuming I can do math), which is sort of pithy.  I'm
-! not sure how to handle this case.  Returning a smaller-than-requested
-! arrays is not the least surprising behavior, but is still surprising.
-[ 383718189 ] [ 7 0.01 40000000 bits-to-satisfy-error-rate ] unit-test
-! [ 7 383718189 ] [ 0.01 40000000 size-bloom-filter ] unit-test
-! [ 383718189 ] [ 0.01 40000000 <bloom-filter> bits>> length ] unit-test
+! This is a lot of bits.
+: oversized-filter-params ( -- error-rate n-objects )
+    0.00000001 400000000000000 ;
+[ oversized-filter-params size-bloom-filter ] [ capacity-error? ]  must-fail-with
+[ oversized-filter-params <bloom-filter> ] [ capacity-error? ] must-fail-with
+
+! Other error conditions.
+[ 1.0 2000 <bloom-filter> ] [ invalid-error-rate? ] must-fail-with
+[ 20 2000 <bloom-filter> ] [ invalid-error-rate? ] must-fail-with
+[ 0.0 2000 <bloom-filter> ] [ invalid-error-rate? ] must-fail-with
+[ -2 2000 <bloom-filter> ] [ invalid-error-rate? ] must-fail-with
+[ 0.5 0 <bloom-filter> ] [ invalid-n-objects? ] must-fail-with
+[ 0.5 -5 <bloom-filter> ] [ invalid-n-objects? ] must-fail-with
 
 ! Should not generate bignum hash codes.  Enhanced double hashing may generate a
 ! lot of hash codes, and it's better to do this earlier than later.
