@@ -1,12 +1,11 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays cpu.architecture compiler.constants
-compiler.codegen.fixup io.binary kernel combinators
-kernel.private math namespaces make sequences words system
-layouts math.order accessors cpu.x86.assembler.syntax ;
+USING: arrays io.binary kernel combinators
+kernel.private math namespaces make sequences words system layouts
+math.order accessors cpu.x86.assembler.syntax ;
 IN: cpu.x86.assembler
 
-! A postfix assembler for x86 and AMD64.
+! A postfix assembler for x86-32 and x86-64.
 
 ! In 32-bit mode, { 1234 } is absolute indirect addressing.
 ! In 64-bit mode, { 1234 } is RIP-relative.
@@ -296,36 +295,23 @@ M: operand (MOV-I)
     { BIN: 000 t HEX: c6 }
     pick byte? [ immediate-1 ] [ immediate-4 ] if ;
 
-PREDICATE: callable < word register? not ;
-
 GENERIC: MOV ( dst src -- )
 M: immediate MOV swap (MOV-I) ;
-M: callable MOV [ 0 ] 2dip (MOV-I) rc-absolute-cell rel-word ;
 M: operand MOV HEX: 88 2-operand ;
 
 : LEA ( dst src -- ) swap HEX: 8d 2-operand ;
 
 ! Control flow
 GENERIC: JMP ( op -- )
-: (JMP) ( -- rel-class ) HEX: e9 , 0 4, rc-relative ;
-M: f JMP (JMP) 2drop ;
-M: callable JMP (JMP) rel-word ;
-M: label JMP (JMP) label-fixup ;
+M: integer JMP HEX: e9 , 4, ;
 M: operand JMP { BIN: 100 t HEX: ff } 1-operand ;
 
 GENERIC: CALL ( op -- )
-: (CALL) ( -- rel-class ) HEX: e8 , 0 4, rc-relative ;
-M: f CALL (CALL) 2drop ;
-M: callable CALL (CALL) rel-word-direct ;
-M: label CALL (CALL) label-fixup ;
+M: integer CALL HEX: e8 , 4, ;
 M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 
 GENERIC# JUMPcc 1 ( addr opcode -- )
-: (JUMPcc) ( addr n -- rel-class ) extended-opcode, 4, rc-relative ;
-M: f JUMPcc [ 0 ] dip (JUMPcc) 2drop ;
-M: integer JUMPcc (JUMPcc) drop ;
-M: callable JUMPcc [ 0 ] dip (JUMPcc) rel-word ;
-M: label JUMPcc [ 0 ] dip (JUMPcc) label-fixup ;
+M: integer JUMPcc extended-opcode, 4, ;
 
 : JO  ( dst -- ) HEX: 80 JUMPcc ;
 : JNO ( dst -- ) HEX: 81 JUMPcc ;

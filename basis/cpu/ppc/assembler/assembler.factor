@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.codegen.fixup kernel namespaces words
-io.binary math math.order cpu.ppc.assembler.backend ;
+USING: kernel namespaces words io.binary math math.order
+cpu.ppc.assembler.backend ;
 IN: cpu.ppc.assembler
 
 ! See the Motorola or IBM documentation for details. The opcode

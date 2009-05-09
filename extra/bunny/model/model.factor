@@ -89,7 +89,7 @@ M: bunny-buffers bunny-geom
             GL_FLOAT 0 0 buffer-offset glNormalPointer
             [
                 nv>> "float" heap-size * buffer-offset
-                3 GL_FLOAT 0 roll glVertexPointer
+                [ 3 GL_FLOAT 0 ] dip glVertexPointer
             ] [
                 ni>>
                 GL_TRIANGLES swap GL_UNSIGNED_INT 0 buffer-offset glDrawElements

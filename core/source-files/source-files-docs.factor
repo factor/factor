@@ -3,7 +3,7 @@ definitions quotations compiler.units ;
 IN: source-files
 
 ARTICLE: "source-files" "Source files"
-"Words in the " { $vocab-link "source-files" } " vocabulary are used to keep track of loaded source files. This is used to implement " { $link "tools.vocabs" } "."
+"Words in the " { $vocab-link "source-files" } " vocabulary are used to keep track of loaded source files. This is used to implement " { $link "vocabs.refresh" } "."
 $nl
 "The source file database:"
 { $subsection source-files }
@@ -41,7 +41,7 @@ HELP: record-checksum
 $low-level-note ;
 
 HELP: reset-checksums
-{ $description "Resets recorded modification times and CRC32 checksums for all loaded source files, creating a checkpoint for " { $link "tools.vocabs" } "." } ;
+{ $description "Resets recorded modification times and CRC32 checksums for all loaded source files, creating a checkpoint for " { $link "vocabs.refresh" } "." } ;
 
 HELP: forget-source
 { $values { "path" "a pathname string" } }

@@ -18,7 +18,7 @@ IN: benchmark.pidigits
 : >matrix ( q s r t -- z )
     4array 2 group ;
 
-: produce ( z n -- z' )
+: produce ( z y -- z' )
     [ 10 ] dip -10 * 0 1 >matrix swap m. ;
 
 : gen-x ( x -- matrix )

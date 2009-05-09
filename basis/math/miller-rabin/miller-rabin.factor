@@ -1,36 +1,37 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (c) 2008-2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel locals math math.functions math.ranges
-random sequences sets ;
+random sequences sets combinators.short-circuit math.bitwise
+math math.order ;
 IN: math.miller-rabin
+
+: >odd ( n -- int ) 0 set-bit ; foldable
+
+: >even ( n -- int ) 0 clear-bit ; foldable
+
+: next-even ( m -- n ) >even 2 + ;
+
+: next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ;
 
 <PRIVATE
 
-: >odd ( n -- int ) dup even? [ 1+ ] when ; foldable
-
-TUPLE: positive-even-expected n ;
-
 :: (miller-rabin) ( n trials -- ? )
-    [let | r [ n 1- factor-2s drop ]
-           s [ n 1- factor-2s nip ]
-           prime?! [ t ]
-           a! [ 0 ]
-           count! [ 0 ] |
-        trials [
-            n 1- [1,b] random a!
-            a s n ^mod 1 = [
-                0 count!
-                r [
-                    2^ s * a swap n ^mod n - -1 =
-                    [ count 1+ count! r + ] when
-                ] each
-                count zero? [ f prime?! trials + ] when
-            ] unless drop
-        ] each prime? ] ;
+    n 1 - :> n-1
+    n-1 factor-2s :> s :> r
+    0 :> a!
+    trials [
+        drop
+        2 n 2 - [a,b] random a!
+        a s n ^mod 1 = [
+            f
+        ] [
+            r iota [
+                2^ s * a swap n ^mod n - -1 =
+            ] any? not
+        ] if
+    ] any? not ;
 
 PRIVATE>
-
-: next-odd ( m -- n ) dup even? [ 1+ ] [ 2 + ] if ;
 
 : miller-rabin* ( n numtrials -- ? )
     over {
@@ -42,11 +43,21 @@ PRIVATE>
 
 : miller-rabin ( n -- ? ) 10 miller-rabin* ;
 
+ERROR: prime-range-error n ;
+
 : next-prime ( n -- p )
-    next-odd dup miller-rabin [ next-prime ] unless ;
+    dup 1 < [ prime-range-error ] when
+    dup 1 = [
+        drop 2
+    ] [
+        next-odd dup miller-rabin [ next-prime ] unless
+    ] if ;
+
+: random-bits* ( numbits -- n )
+    1 - [ random-bits ] keep set-bit ;
 
 : random-prime ( numbits -- p )
-    random-bits next-prime ;
+    random-bits* next-prime ;
 
 ERROR: no-relative-prime n ;
 
@@ -74,3 +85,30 @@ ERROR: too-few-primes ;
     dup 5 < [ too-few-primes ] when
     2dup [ random-prime ] curry replicate
     dup all-unique? [ 2nip ] [ drop unique-primes ] if ;
+
+! Safe primes are of the form p = 2q + 1, p,q are prime
+! See http://en.wikipedia.org/wiki/Safe_prime
+
+<PRIVATE
+
+: safe-prime-candidate? ( n -- ? )
+    1 + 6 divisor? ;
+
+: next-safe-prime-candidate ( n -- candidate )
+    next-prime dup safe-prime-candidate?
+    [ next-safe-prime-candidate ] unless ;
+
+PRIVATE>
+
+: safe-prime? ( q -- ? )
+    {
+        [ 1 - 2 / dup integer? [ miller-rabin ] [ drop f ] if ]
+        [ miller-rabin ]
+    } 1&& ;
+
+: next-safe-prime ( n -- q )
+    next-safe-prime-candidate
+    dup safe-prime? [ next-safe-prime ] unless ;
+
+: random-safe-prime ( numbits -- p )
+    random-bits* next-safe-prime ;

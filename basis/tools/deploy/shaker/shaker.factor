@@ -23,7 +23,13 @@ IN: tools.deploy.shaker
 
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
-    { "cpu.x86" "command-line" "libc" "system" "environment" }
+    {
+        "command-line"
+        "cpu.x86"
+        "environment"
+        "libc"
+        "alien.strings"
+    }
     [ init-hooks get delete-at ] each
     deploy-threads? get [
         "threads" init-hooks get delete-at
@@ -36,8 +42,12 @@ IN: tools.deploy.shaker
         "io.backend" init-hooks get delete-at
     ] when
     strip-dictionary? [
-        "compiler.units" init-hooks get delete-at
-        "tools.vocabs" init-hooks get delete-at
+        {
+            "compiler.units"
+            "vocabs"
+            "vocabs.cache"
+            "source-files.errors"
+        } [ init-hooks get delete-at ] each
     ] when ;
 
 : strip-debugger ( -- )
@@ -260,20 +270,19 @@ IN: tools.deploy.shaker
                 compiler.errors:compiler-errors
                 definition-observers
                 interactive-vocabs
-                layouts:num-tags
-                layouts:num-types
-                layouts:tag-mask
-                layouts:tag-numbers
-                layouts:type-numbers
                 lexer-factory
                 print-use-hook
                 root-cache
                 source-files.errors:error-types
+                source-files.errors:error-observers
                 vocabs:dictionary
                 vocabs:load-vocab-hook
+                vocabs:vocab-observers
                 word
                 parser-notes
             } %
+
+            { } { "layouts" } strip-vocab-globals %
 
             { } { "math.partial-dispatch" } strip-vocab-globals %
 
@@ -345,13 +354,6 @@ IN: tools.deploy.shaker
 
 : compress-wrappers ( -- )
     [ wrapper? ] [ ] "wrappers" compress ;
-
-: finish-deploy ( final-image -- )
-    "Finishing up" show
-    V{ } set-namestack
-    V{ } set-catchstack
-    "Saving final image" show
-    save-image-and-exit ;
 
 SYMBOL: deploy-vocab
 
@@ -437,7 +439,8 @@ SYMBOL: deploy-vocab
                 "Vocabulary has no MAIN: word." print flush 1 exit
             ] unless
             strip
-            finish-deploy
+            "Saving final image" show
+            save-image-and-exit
         ] deploy-error-handler
     ] bind ;
 

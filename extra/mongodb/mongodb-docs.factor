@@ -15,9 +15,9 @@ ARTICLE: "mongodb" "MongoDB factor integration"
 { $heading "Highlevel tuple integration" }
 "The " { $vocab-link "mongodb.tuple" } " vocabulary lets you define persistent tuples that can be stored to and retrieved from a MongoDB database"
 { $unchecked-example
-  "USING: mongodb.driver mongodb.tuple fry ;"
+  "USING: mongodb.driver mongodb.tuple fry literals ;"
   "MDBTUPLE: person name age ; "
-  "person \"persons\" { { \"age\" +fieldindex+ } } define-persistent "
+  "person \"persons\" { } { $[ \"ageIdx\" [ \"age\" asc ] key-spec <tuple-index> ] } define-persistent "
   "\"db\" \"127.0.0.1\" 27017 <mdb>"
   "person new \"Alfred\" >>name 57 >>age"
   "'[ _ save-tuple person new 57 >>age select-tuple ] with-db"
