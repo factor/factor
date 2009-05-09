@@ -25,7 +25,7 @@ HELP: <frp-button>
 { $description "Creates an button whose model updates on clicks" } ;
 
 HELP: <merge>
-{ $values { "models" "a list of models" } { "model" merge-model } }
+{ $values { "models" "a list of models" } { "model" basic-model } }
 { $description "Creates a model that merges the updates of others" } ;
 
 HELP: <filter>
