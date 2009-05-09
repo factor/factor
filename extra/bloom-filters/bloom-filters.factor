@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Alec Berryman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bit-arrays kernel layouts locals math
-math.functions math.ranges multiline sequences ;
+USING: accessors arrays bit-arrays fry kernel layouts locals math math.functions
+math.ranges multiline sequences ;
 IN: bloom-filters
 
 /*
@@ -70,8 +70,8 @@ TUPLE: bloom-filter
     map
     n-hashes-range zip ;
 
-:: smallest-first ( seq1 seq2 -- seq )
-    seq1 first seq2 first <= [ seq1 ] [ seq2 ] if ;
+: smallest-first ( seq1 seq2 -- seq )
+    [ [ first ] bi@ <= ] most ;
 
 ! The consensus on the tradeoff between increasing the number of bits and
 ! increasing the number of hash functions seems to be "go for the smallest
@@ -118,9 +118,7 @@ PRIVATE>
     array-size mod ;
 
 : enhanced-double-hashes ( n hash0 hash1 array-size -- seq )
-    [ enhanced-double-hash ] 3curry
-    [ [0,b) ] dip
-    map ;
+    '[ _ _ _ enhanced-double-hash ] [ [0,b) ] dip map ;
 
 ! Stupid, should pick something good.
 : hashcodes-from-hashcode ( n -- n n )
@@ -138,24 +136,23 @@ PRIVATE>
 : set-indices ( indices bit-array -- )
     [ [ drop t ] change-nth ] curry each ;
 
-: increment-n-objects ( bloom-filter -- )
-    dup current-n-objects>> 1 + >>current-n-objects drop ;
+: increment-n-objects ( bloom-filter -- bloom-filter )
+    [ 1 + ] change-current-n-objects ;
 
-! This would be better as an each-relevant-hash that didn't cons.
+: n-hashes-and-bits ( bloom-filter -- n-hashes n-bits )
+    [ n-hashes>> ] [ bits>> length ] bi ;
+
 : relevant-indices ( value bloom-filter -- indices )
-    [ n-hashes>> ] [ bits>> length ] bi ! value n array-size
-    swapd [ hashcodes-from-object ] dip ! n value1 value2 array-size
+    n-hashes-and-bits
+    [ swap hashcodes-from-object ] dip
     enhanced-double-hashes ;
 
 PRIVATE>
 
 : bloom-filter-insert ( object bloom-filter -- )
-    [ relevant-indices ]
-    [ bits>> set-indices ]
-    [ increment-n-objects ]
-    tri ;
+    increment-n-objects
+    [ relevant-indices ] [ bits>> set-indices ] bi ;
 
 : bloom-filter-member? ( value bloom-filter -- ? )
-    [ relevant-indices ]
-    [ bits>> [ nth ] curry map [ t = ] all? ]
-    bi ;
+    [ relevant-indices ] keep
+    bits>> nths [ ] all? ;
