@@ -95,7 +95,7 @@ M: dlist pop-front* ( dlist -- )
     [
         [
             [ empty-dlist ] unless*
-            [ f ] change-next drop
+            next>>
             f over set-prev-when
         ] change-front drop
     ] keep
@@ -108,7 +108,7 @@ M: dlist pop-back* ( dlist -- )
     [
         [
             [ empty-dlist ] unless*
-            [ f ] change-prev drop
+            prev>>
             f over set-next-when
         ] change-back drop
     ] keep
@@ -156,6 +156,9 @@ M: dlist clear-deque ( dlist -- )
     [ ] accumulator [ dlist-each ] dip ;
 
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
+
+: dlist-filter ( dlist quot -- dlist )
+    over [ '[ dup obj>> @ [ drop ] [ _ delete-node ] if ] dlist-each-node ] keep ; inline
 
 M: dlist clone
     <dlist> [ '[ _ push-back ] dlist-each ] keep ;
