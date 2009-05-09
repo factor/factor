@@ -81,6 +81,8 @@ TUPLE: complex { real real read-only } { imaginary real read-only } ;
 
 UNION: number real complex ;
 
+: fp-bitwise= ( x y -- ? ) [ double>bits ] bi@ = ; inline
+
 GENERIC: fp-special? ( x -- ? )
 GENERIC: fp-nan? ( x -- ? )
 GENERIC: fp-qnan? ( x -- ? )
