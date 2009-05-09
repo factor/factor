@@ -26,10 +26,10 @@ cell init_zone(zone *z, cell size, cell start)
 
 void init_card_decks()
 {
-	cell start = align(data->seg->start,DECK_SIZE);
-	allot_markers_offset = (cell)data->allot_markers - (start >> CARD_BITS);
-	cards_offset = (cell)data->cards - (start >> CARD_BITS);
-	decks_offset = (cell)data->decks - (start >> DECK_BITS);
+	cell start = align(data->seg->start,deck_size);
+	allot_markers_offset = (cell)data->allot_markers - (start >> card_bits);
+	cards_offset = (cell)data->cards - (start >> card_bits);
+	decks_offset = (cell)data->decks - (start >> deck_bits);
 }
 
 data_heap *alloc_data_heap(cell gens,
@@ -37,9 +37,9 @@ data_heap *alloc_data_heap(cell gens,
 	cell aging_size,
 	cell tenured_size)
 {
-	young_size = align(young_size,DECK_SIZE);
-	aging_size = align(aging_size,DECK_SIZE);
-	tenured_size = align(tenured_size,DECK_SIZE);
+	young_size = align(young_size,deck_size);
+	aging_size = align(aging_size,deck_size);
+	tenured_size = align(tenured_size,deck_size);
 
 	data_heap *data = (data_heap *)safe_malloc(sizeof(data_heap));
 	data->young_size = young_size;
@@ -58,42 +58,42 @@ data_heap *alloc_data_heap(cell gens,
 		return NULL; /* can't happen */
 	}
 
-	total_size += DECK_SIZE;
+	total_size += deck_size;
 
 	data->seg = alloc_segment(total_size);
 
 	data->generations = (zone *)safe_malloc(sizeof(zone) * data->gen_count);
 	data->semispaces = (zone *)safe_malloc(sizeof(zone) * data->gen_count);
 
-	cell cards_size = total_size >> CARD_BITS;
+	cell cards_size = total_size >> card_bits;
 	data->allot_markers = (cell *)safe_malloc(cards_size);
 	data->allot_markers_end = data->allot_markers + cards_size;
 
 	data->cards = (cell *)safe_malloc(cards_size);
 	data->cards_end = data->cards + cards_size;
 
-	cell decks_size = total_size >> DECK_BITS;
+	cell decks_size = total_size >> deck_bits;
 	data->decks = (cell *)safe_malloc(decks_size);
 	data->decks_end = data->decks + decks_size;
 
-	cell alloter = align(data->seg->start,DECK_SIZE);
+	cell alloter = align(data->seg->start,deck_size);
 
-	alloter = init_zone(&data->generations[TENURED],tenured_size,alloter);
-	alloter = init_zone(&data->semispaces[TENURED],tenured_size,alloter);
+	alloter = init_zone(&data->generations[data->tenured()],tenured_size,alloter);
+	alloter = init_zone(&data->semispaces[data->tenured()],tenured_size,alloter);
 
 	if(data->gen_count == 3)
 	{
-		alloter = init_zone(&data->generations[AGING],aging_size,alloter);
-		alloter = init_zone(&data->semispaces[AGING],aging_size,alloter);
+		alloter = init_zone(&data->generations[data->aging()],aging_size,alloter);
+		alloter = init_zone(&data->semispaces[data->aging()],aging_size,alloter);
 	}
 
 	if(data->gen_count >= 2)
 	{
-		alloter = init_zone(&data->generations[NURSERY],young_size,alloter);
-		alloter = init_zone(&data->semispaces[NURSERY],0,alloter);
+		alloter = init_zone(&data->generations[data->nursery()],young_size,alloter);
+		alloter = init_zone(&data->semispaces[data->nursery()],0,alloter);
 	}
 
-	if(data->seg->end - alloter > DECK_SIZE)
+	if(data->seg->end - alloter > deck_size)
 		critical_error("Bug in alloc_data_heap",alloter);
 
 	return data;
@@ -141,12 +141,12 @@ void clear_allot_markers(cell from, cell to)
 	/* NOTE: reverse order due to heap layout. */
 	card *first_card = addr_to_allot_marker((object *)data->generations[to].start);
 	card *last_card = addr_to_allot_marker((object *)data->generations[from].end);
-	memset(first_card,INVALID_ALLOT_MARKER,last_card - first_card);
+	memset(first_card,invalid_allot_marker,last_card - first_card);
 }
 
 void reset_generation(cell i)
 {
-	zone *z = (i == NURSERY ? &nursery : &data->generations[i]);
+	zone *z = (i == data->nursery() ? &nursery : &data->generations[i]);
 
 	z->here = z->start;
 	if(secure_gc)
@@ -169,11 +169,11 @@ void reset_generations(cell from, cell to)
 void set_data_heap(data_heap *data_)
 {
 	data = data_;
-	nursery = data->generations[NURSERY];
+	nursery = data->generations[data->nursery()];
 	init_card_decks();
-	clear_cards(NURSERY,TENURED);
-	clear_decks(NURSERY,TENURED);
-	clear_allot_markers(NURSERY,TENURED);
+	clear_cards(data->nursery(),data->tenured());
+	clear_decks(data->nursery(),data->tenured());
+	clear_allot_markers(data->nursery(),data->tenured());
 }
 
 void init_data_heap(cell gens,
@@ -298,7 +298,7 @@ PRIMITIVE(data_room)
 	cell gen;
 	for(gen = 0; gen < data->gen_count; gen++)
 	{
-		zone *z = (gen == NURSERY ? &nursery : &data->generations[gen]);
+		zone *z = (gen == data->nursery() ? &nursery : &data->generations[gen]);
 		a.add(tag_fixnum((z->end - z->here) >> 10));
 		a.add(tag_fixnum((z->size) >> 10));
 	}
@@ -314,7 +314,7 @@ cell heap_scan_ptr;
 /* Disables GC and activates next-object ( -- obj ) primitive */
 void begin_scan()
 {
-	heap_scan_ptr = data->generations[TENURED].start;
+	heap_scan_ptr = data->generations[data->tenured()].start;
 	gc_off = true;
 }
 
@@ -328,7 +328,7 @@ cell next_object()
 	if(!gc_off)
 		general_error(ERROR_HEAP_SCAN,F,F,NULL);
 
-	if(heap_scan_ptr >= data->generations[TENURED].here)
+	if(heap_scan_ptr >= data->generations[data->tenured()].here)
 		return F;
 
 	object *obj = (object *)heap_scan_ptr;

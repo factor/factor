@@ -41,14 +41,23 @@ SYMBOL: windows
     lose-focus swap each-gesture
     gain-focus swap each-gesture ;
 
+: ?grab-input ( world -- )
+    dup grab-input?>> [ handle>> (grab-input) ] [ drop ] if ;
+
+: ?ungrab-input ( world -- )
+    dup grab-input?>> [ handle>> (ungrab-input) ] [ drop ] if ;
+
 : focus-world ( world -- )
     t >>focused?
-    dup raised-window
-    focus-path f focus-gestures ;
+    [ ?grab-input ] [
+        dup raised-window
+        focus-path f focus-gestures
+    ] bi ;
 
 : unfocus-world ( world -- )
     f >>focused?
-    focus-path f swap focus-gestures ;
+    [ ?ungrab-input ]
+    [ focus-path f swap focus-gestures ] bi ;
 
 : try-to-open-window ( world -- )
     {
