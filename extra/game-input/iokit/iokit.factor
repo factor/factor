@@ -1,7 +1,7 @@
 USING: cocoa cocoa.plists core-foundation iokit iokit.hid
 kernel cocoa.enumeration destructors math.parser cocoa.application 
 sequences locals combinators.short-circuit threads
-namespaces assocs vectors arrays combinators
+namespaces assocs vectors arrays combinators hints alien
 core-foundation.run-loop accessors sequences.private
 alien.c-types math parser game-input vectors ;
 IN: game-input.iokit
@@ -99,9 +99,7 @@ CONSTANT: hat-switch-matching-hash
     [ set-element-property ] [ 2drop ] if* ;
 
 : mouse-device? ( device -- ? )
-    {
-        [ 1 2 IOHIDDeviceConformsTo ]
-    } 1|| ;
+    1 2 IOHIDDeviceConformsTo ;
 
 : controller-device? ( device -- ? )
     {
@@ -156,12 +154,12 @@ CONSTANT: pov-values
 : pov-value ( value -- pov-direction )
     IOHIDValueGetIntegerValue pov-values ?nth [ pov-neutral ] unless* ;
 
-: record-button ( hid-value element state -- )
-    [ button-value ] [ IOHIDElementGetUsage 1- ] [ buttons>> ] tri* set-nth ;
+: record-button ( state hid-value element -- )
+    [ buttons>> ] [ button-value ] [ IOHIDElementGetUsage 1- ] tri* rot set-nth ;
 
 : record-controller ( controller-state value -- )
     dup IOHIDValueGetElement {
-        { [ dup button? ] [ rot record-button ] } 
+        { [ dup button? ] [ record-button ] } 
         { [ dup axis? ] [ {
             { [ dup x-axis? ] [ drop axis-value >>x drop ] }
             { [ dup y-axis? ] [ drop axis-value >>y drop ] }
@@ -176,28 +174,34 @@ CONSTANT: pov-values
         [ 3drop ]
     } cond ;
 
+HINTS: record-controller { controller-state alien } ;
+
 : ?set-nth ( value nth seq -- )
     2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ;
 
-: record-keyboard ( value -- )
-    dup IOHIDValueGetElement keyboard-key? [
+: record-keyboard ( keyboard-state value -- )
+    dup IOHIDValueGetElement dup keyboard-key? [
         [ IOHIDValueGetIntegerValue c-bool> ]
-        [ IOHIDValueGetElement IOHIDElementGetUsage ] bi
-        +keyboard-state+ get ?set-nth
-    ] [ drop ] if ;
+        [ IOHIDElementGetUsage ] bi*
+        rot ?set-nth
+    ] [ 3drop ] if ;
 
-: record-mouse ( value -- )
+HINTS: record-keyboard { array alien } ;
+
+: record-mouse ( mouse-state value -- )
     dup IOHIDValueGetElement {
-        { [ dup button? ] [ +mouse-state+ get record-button ] }
+        { [ dup button? ] [ record-button ] }
         { [ dup axis? ] [ {
-            { [ dup x-axis? ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-dx drop ] }
-            { [ dup y-axis? ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-dy drop ] }
-            { [ dup wheel?  ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-scroll-dx drop ] }
-            { [ dup z-axis? ] [ drop mouse-axis-value +mouse-state+ get [ + ] change-scroll-dy drop ] }
-            [ 2drop ]
+            { [ dup x-axis? ] [ drop mouse-axis-value [ + ] curry change-dx drop ] }
+            { [ dup y-axis? ] [ drop mouse-axis-value [ + ] curry change-dy drop ] }
+            { [ dup wheel?  ] [ drop mouse-axis-value [ + ] curry change-scroll-dx drop ] }
+            { [ dup z-axis? ] [ drop mouse-axis-value [ + ] curry change-scroll-dy drop ] }
+            [ 3drop ]
         } cond ] }
-        [ 2drop ]
+        [ 3drop ]
     } cond ;
+
+HINTS: record-mouse { mouse-state alien } ;
 
 M: iokit-game-input-backend read-mouse
     +mouse-state+ get ;
@@ -271,8 +275,8 @@ M: iokit-game-input-backend reset-mouse
             { [ sender controller-device? ] [
                 sender +controller-states+ get at value record-controller
             ] }
-            { [ sender mouse-device? ] [ value record-mouse ] }
-            [ value record-keyboard ]
+            { [ sender mouse-device? ] [ +mouse-state+ get value record-mouse ] }
+            [ +keyboard-state+ get value record-keyboard ]
         } cond
     ] IOHIDValueCallback ;
 
@@ -297,7 +301,7 @@ M: iokit-game-input-backend (open-game-input)
     } cleave ;
 
 M: iokit-game-input-backend (reset-game-input)
-    { +hid-manager+ +keyboard-state+ +controller-states+ }
+    { +hid-manager+ +keyboard-state+ +mouse-state+ +controller-states+ }
     [ f swap set-global ] each ;
 
 M: iokit-game-input-backend (close-game-input)
