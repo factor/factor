@@ -1,5 +1,5 @@
 USING: accessors arrays delegate delegate.protocols
-io.pathnames kernel locals models.arrow namespaces prettyprint sequences
+io.pathnames kernel locals sequences
 ui.frp vectors make ;
 IN: file-trees
 
@@ -11,6 +11,8 @@ M: walkable-vector set-nth [ vector>> set-nth ] 3keep nip
 
 TUPLE: tree node comment children ;
 CONSULT: sequence-protocol tree children>> ;
+
+: file? ( tree -- ? ) children>> [ node>> ".." = not ] filter empty? ;
 
 : <dir-tree> ( {start,comment} -- tree ) first2 walkable-vector new vector new >>vector
    [ tree boa dup children>> ] [ ".." -rot tree boa ] 2bi swap (>>father) ;
@@ -26,7 +28,6 @@ DEFER: (tree-insert)
       path-rest [ path-head tree-insert ] unless-empty
    ] if* ;
 
-! Use an accumulator for this
 : add-paths ( pathseq -- {{name,path}} )
    "" [ [ "/" glue dup ] keep swap 2array , ] [ reduce drop ] f make ;
 
@@ -35,6 +36,5 @@ DEFER: (tree-insert)
 
 : <dir-table> ( tree-model -- table )
    <frp-list*> [ node>> 1array ] >>quot
-   [ selected-value>> [ dup [ first ] when ] <arrow> <switch> ]
-   [ swap >>model ] bi
-   [ dup comment>> 2array ] >>val-quot ;
+   [ selected-value>> <switch> ]
+   [ swap >>model ] bi ;

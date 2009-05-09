@@ -1,0 +1,34 @@
+USING: accessors arrays delegate delegate.protocols
+io.pathnames kernel locals namespaces prettyprint sequences
+ui.frp vectors ;
+IN: file-trees
+
+! There should be optional extra information you can provide
+TUPLE: tree node children ;
+CONSULT: sequence-protocol tree children>> ;
+
+: <dir-tree> ( start -- tree ) V{ } clone
+   [ tree boa dup children>> ] [ ".." swap tree boa ] bi swap push ;
+
+DEFER: (tree-insert)
+
+: tree-insert ( path tree -- ) [ unclip <dir-tree> ] [ children>> ] bi* (tree-insert) ;
+:: (tree-insert) ( path-rest path-head tree-children -- )
+   tree-children [ node>> path-head node>> = ] find nip
+   [ path-rest swap tree-insert ]
+   [ 
+      path-head tree-children push
+      path-rest [ path-head tree-insert ] unless-empty
+   ] if* ;
+
+: create-tree ( file-list -- tree ) [ path-components ] map
+   t <dir-tree> [ [ tree-insert ] curry each ] keep ;
+
+: find-path ( tree -- string ) dup node>> tuck t =
+   [ 2drop f ] [ children>> first find-path "/" glue ] if ;
+
+: <dir-table> ( tree-model -- table )
+   <frp-list*> [ node>> 1array ] >>quot
+   [ selected-value>> <switch> ]
+   [ swap >>model ] bi
+   [ find-path ] >>val-quot ;
