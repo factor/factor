@@ -5,20 +5,23 @@ math.vectors opengl opengl.capabilities opengl.gl
 opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays.float
 terrain.generation terrain.shaders ui ui.gadgets
-ui.gadgets.worlds ui.pixel-formats game-worlds method-chains ;
+ui.gadgets.worlds ui.pixel-formats game-worlds method-chains
+math.affine-transforms noise ;
 IN: terrain
 
 CONSTANT: FOV $[ 2.0 sqrt 1+ ]
-CONSTANT: NEAR-PLANE $[ 1.0 2048.0 / ]
-CONSTANT: FAR-PLANE 1.0
+CONSTANT: NEAR-PLANE $[ 1.0 1024.0 / ]
+CONSTANT: FAR-PLANE 2.0
 CONSTANT: PLAYER-START-LOCATION { 0.5 0.51 0.5 }
-CONSTANT: PLAYER-HEIGHT $[ 3.0 1024.0 / ]
+CONSTANT: PLAYER-HEIGHT $[ 1.0 256.0 / ]
 CONSTANT: GRAVITY $[ 1.0 4096.0 / ]
 CONSTANT: JUMP $[ 1.0 1024.0 / ]
 CONSTANT: MOUSE-SCALE $[ 1.0 10.0 / ]
 CONSTANT: MOVEMENT-SPEED $[ 1.0 16384.0 / ]
 CONSTANT: FRICTION 0.95
-CONSTANT: COMPONENT-SCALE { 0.5 0.01 0.002 0.0 }
+CONSTANT: COMPONENT-SCALE { 0.5 0.01 0.0005 0.0 }
+CONSTANT: SKY-PERIOD 1200
+CONSTANT: SKY-SPEED 0.0005
 
 CONSTANT: terrain-vertex-size { 512 512 }
 CONSTANT: terrain-vertex-distance { $[ 1.0 512.0 / ] $[ 1.0 512.0 / ] }
@@ -29,6 +32,7 @@ TUPLE: player
 
 TUPLE: terrain-world < game-world
     player
+    sky-image sky-texture sky-program
     terrain terrain-segment terrain-texture terrain-program
     terrain-vertex-buffer ;
 
@@ -41,7 +45,7 @@ M: terrain-world tick-length
     NEAR-PLANE FAR-PLANE ;
 
 : set-modelview-matrix ( gadget -- )
-    GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
+    GL_DEPTH_BUFFER_BIT glClear
     GL_MODELVIEW glMatrixMode
     glLoadIdentity
     player>>
@@ -138,8 +142,11 @@ M: terrain-world tick-length
 : apply-gravity ( velocity -- velocity' )
     1 over [ GRAVITY - ] change-nth ;
 
+: clamp-coords ( coords dim -- coords' )
+    [ { 0 0 } vmax ] dip { 2 2 } v- vmin ;
+
 :: pixel-indices ( coords dim -- indices )
-    coords vfloor [ >integer ] map :> floor-coords
+    coords vfloor [ >integer ] map dim clamp-coords :> floor-coords
     floor-coords first2 dim first * + :> base-index
     base-index dim first + :> next-row-index
 
@@ -172,12 +179,17 @@ M: terrain-world tick*
     [ dup focused?>> [ handle-input ] [ drop ] if ]
     [ dup player>> tick-player ] bi ;
 
-: set-heightmap-texture-parameters ( texture -- )
+: set-texture-parameters ( texture -- )
     GL_TEXTURE_2D GL_TEXTURE0 bind-texture-unit
     GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP_TO_EDGE glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri ;
+
+: sky-gradient ( world -- t )
+    game-loop>> tick-number>> SKY-PERIOD mod SKY-PERIOD /f ;
+: sky-theta ( world -- theta )
+    game-loop>> tick-number>> SKY-SPEED * ;
 
 BEFORE: terrain-world begin-world
     "2.0" { "GL_ARB_vertex_buffer_object" "GL_ARB_shader_objects" }
@@ -185,11 +197,15 @@ BEFORE: terrain-world begin-world
     GL_DEPTH_TEST glEnable
     GL_TEXTURE_2D glEnable
     GL_VERTEX_ARRAY glEnableClientState
-    0.5 0.5 0.5 1.0 glClearColor
     PLAYER-START-LOCATION 0.0 0.0 { 0.0 0.0 0.0 } player boa >>player
+    <perlin-noise-table> 0.01 0.01 <scale> { 512 512 } perlin-noise-image
+    [ >>sky-image ] keep
+    make-texture [ set-texture-parameters ] keep >>sky-texture
     <terrain> [ >>terrain ] keep
     { 0 0 } terrain-segment [ >>terrain-segment ] keep
-    make-texture [ set-heightmap-texture-parameters ] keep >>terrain-texture
+    make-texture [ set-texture-parameters ] keep >>terrain-texture
+    sky-vertex-shader sky-pixel-shader <simple-gl-program>
+    >>sky-program
     terrain-vertex-shader terrain-pixel-shader <simple-gl-program>
     >>terrain-program
     vertex-array >vertex-buffer >>terrain-vertex-buffer
@@ -200,6 +216,8 @@ AFTER: terrain-world end-world
         [ terrain-vertex-buffer>> delete-gl-buffer ]
         [ terrain-program>> delete-gl-program ]
         [ terrain-texture>> delete-texture ]
+        [ sky-program>> delete-gl-program ]
+        [ sky-texture>> delete-texture ]
     } cleave ;
 
 M: terrain-world resize-world
@@ -209,14 +227,22 @@ M: terrain-world resize-world
     [ frustum glFrustum ] bi ;
 
 M: terrain-world draw-world*
-    [ set-modelview-matrix ]
-    [ terrain-texture>> GL_TEXTURE_2D GL_TEXTURE0 bind-texture-unit ]
-    [ dup terrain-program>> [
-        [ "heightmap" glGetUniformLocation 0 glUniform1i ]
-        [ "component_scale" glGetUniformLocation COMPONENT-SCALE first4 glUniform4f ] bi
-        terrain-vertex-buffer>> draw-vertex-buffer
-    ] with-gl-program ]
-    tri gl-error ;
+    {
+        [ set-modelview-matrix ]
+        [ terrain-texture>> GL_TEXTURE_2D GL_TEXTURE0 bind-texture-unit ]
+        [ sky-texture>> GL_TEXTURE_2D GL_TEXTURE1 bind-texture-unit ]
+        [ GL_DEPTH_TEST glDisable dup sky-program>> [
+            [ nip "sky" glGetUniformLocation 1 glUniform1i ]
+            [ "sky_gradient" glGetUniformLocation swap sky-gradient glUniform1f ]
+            [ "sky_theta" glGetUniformLocation swap sky-theta glUniform1f ] 2tri
+            { -1.0 -1.0 } { 2.0 2.0 } gl-fill-rect
+        ] with-gl-program ]
+        [ GL_DEPTH_TEST glEnable dup terrain-program>> [
+            [ "heightmap" glGetUniformLocation 0 glUniform1i ]
+            [ "component_scale" glGetUniformLocation COMPONENT-SCALE first4 glUniform4f ] bi
+            terrain-vertex-buffer>> draw-vertex-buffer
+        ] with-gl-program ]
+    } cleave gl-error ;
 
 M: terrain-world pref-dim* drop { 640 480 } ;
 

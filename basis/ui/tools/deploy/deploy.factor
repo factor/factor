@@ -29,7 +29,6 @@ TUPLE: deploy-gadget < pack vocab settings ;
 
 : advanced-settings ( parent -- parent )
     "Advanced:" <label> add-gadget
-    deploy-compiler? get "Use optimizing compiler" <checkbox> add-gadget
     deploy-math? get "Rational and complex number support" <checkbox> add-gadget
     deploy-threads? get "Threading support" <checkbox> add-gadget
     deploy-unicode? get "Unicode character literal support" <checkbox> add-gadget

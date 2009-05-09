@@ -6,7 +6,6 @@ H{
     { "stop-after-last-window?" t }
     { deploy-word-defs? f }
     { deploy-reflection 1 }
-    { deploy-compiler? t }
     { deploy-threads? t }
     { deploy-io 3 }
     { deploy-math? t }

@@ -5,7 +5,6 @@ IN: tools.deploy.config
 ARTICLE: "deploy-flags" "Deployment flags"
 "There are two sets of deployment flags. The first set controls the major subsystems which are to be included in the deployment image:"
 { $subsection deploy-math?     }
-{ $subsection deploy-compiler? }
 { $subsection deploy-unicode?   }
 { $subsection deploy-threads?  }
 { $subsection deploy-ui?       }
@@ -52,11 +51,6 @@ HELP: deploy-math?
 { $description "Deploy flag. If set, the deployed image will contain support for " { $link ratio } " and " { $link complex } " types."
 $nl
 "On by default. Often the programmer will use rationals without realizing it. A small amount of space can be saved by stripping these features out, but some code may require changes to work properly." } ;
-
-HELP: deploy-compiler?
-{ $description "Deploy flag. If set, words in the deployed image will be compiled with the optimizing compiler when possible."
-$nl
-"On by default. Most programs should be compiled, not only for performance but because features which depend on the C library interface only function after compilation." } ;
 
 HELP: deploy-unicode?
 { $description "Deploy flag. If set, full Unicode " { $link POSTPONE: CHAR: } " syntax is included."

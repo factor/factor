@@ -57,7 +57,6 @@ $nl
 "Here are some built-in combinators rewritten in terms of fried quotations:"
 { $table
     { { $link literalize } { $snippet ": literalize '[ _ ] ;" } }
-    { { $link slip } { $snippet ": slip '[ @ _ ] call ;" } }
     { { $link curry } { $snippet ": curry '[ _ @ ] ;" } }
     { { $link compose } { $snippet ": compose '[ @ @ ] ;" } }
     { { $link bi@ } { $snippet ": bi@ tuck '[ _ @ _ @ ] call ;" } }
