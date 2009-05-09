@@ -155,7 +155,7 @@ TUPLE: terrain-world < world
     pixel dim pixel-indices :> indices
     
     indices [ pixels nth COMPONENT-SCALE v. 255.0 / ] map
-    first4 [ pixel-mantissa first lerp ] 2bi@ pixel-mantissa second lerp ;
+    first4 pixel-mantissa bilerp ;
 
 : collide ( segment location -- location' )
     [ [ first ] [ third ] bi 2array terrain-height-at PLAYER-HEIGHT + ]
