@@ -4,7 +4,7 @@
 USING: strings arrays hashtables assocs sequences fry macros
 cocoa.messages cocoa.classes cocoa.application cocoa kernel
 namespaces io.backend math cocoa.enumeration byte-arrays
-combinators alien.c-types words core-foundation
+combinators alien.c-types words core-foundation quotations
 core-foundation.data core-foundation.utilities ;
 IN: cocoa.plists
 
@@ -41,9 +41,15 @@ DEFER: plist>
     *void* [ -> release "read-plist failed" throw ] when* ;
 
 MACRO: objc-class-case ( alist -- quot )
-    [ [ '[ dup _ execute -> isKindOfClass: c-bool> ] ] dip ] assoc-map '[ _ cond ] ;
+    [
+        dup callable?
+        [ first2 [ '[ dup _ execute -> isKindOfClass: c-bool> ] ] dip 2array ]
+        unless
+    ] map '[ _ cond ] ;
 
 PRIVATE>
+
+ERROR: invalid-plist-object object ;
 
 : plist> ( plist -- value )
     {
@@ -53,6 +59,7 @@ PRIVATE>
         { NSArray [ (plist-NSArray>) ] }
         { NSDictionary [ (plist-NSDictionary>) ] }
         { NSObject [ ] }
+        [ invalid-plist-object ]
     } objc-class-case ;
 
 : read-plist ( path -- assoc )
