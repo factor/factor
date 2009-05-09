@@ -9,6 +9,9 @@ SYMBOL: bytes-read
 : calculate-pad-length ( length -- length' )
     [ 56 < 55 119 ? ] keep - ;
 
+: calculate-pad-length-long ( length -- length' )
+    [ 112 < 111 249 ? ] keep - ;
+
 : pad-last-block ( str big-endian? length -- str )
     [
         [ % ] 2dip HEX: 80 ,

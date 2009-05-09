@@ -6,9 +6,31 @@ sbufs strings combinators.smart math.ranges fry combinators
 accessors locals ;
 IN: checksums.sha2
 
-<PRIVATE
+SINGLETON: sha-224
+SINGLETON: sha-256
+SINGLETON: sha-384
+SINGLETON: sha-512
 
-SYMBOL: sha2
+INSTANCE: sha-224 checksum
+INSTANCE: sha-256 checksum
+INSTANCE: sha-384 checksum
+INSTANCE: sha-512 checksum
+
+TUPLE: sha2-state K H word-size block-size ;
+
+TUPLE: sha2-short < sha2-state ;
+
+TUPLE: sha2-long < sha2-state ;
+
+TUPLE: sha-224-state < sha2-short ;
+
+TUPLE: sha-256-state < sha2-short ;
+
+TUPLE: sha-384-state < sha2-long ;
+
+TUPLE: sha-512-state < sha2-long ;
+
+<PRIVATE
 
 CONSTANT: a 0
 CONSTANT: b 1
@@ -77,6 +99,10 @@ CONSTANT: K-256
 
 CONSTANT: K-384
     {
+
+        HEX: 428a2f98d728ae22 HEX: 7137449123ef65cd HEX: b5c0fbcfec4d3b2f HEX: e9b5dba58189dbbc 
+        HEX: 3956c25bf348b538 HEX: 59f111f1b605d019 HEX: 923f82a4af194f9b HEX: ab1c5ed5da6d8118 
+        HEX: d807aa98a3030242 HEX: 12835b0145706fbe HEX: 243185be4ee4b28c HEX: 550c7dc3d5ffb4e2
         HEX: 72be5d74f27b896f HEX: 80deb1fe3b1696b1 HEX: 9bdc06a725c71235 HEX: c19bf174cf692694 
         HEX: e49b69c19ef14ad2 HEX: efbe4786384f25e3 HEX: 0fc19dc68b8cd5b5 HEX: 240ca1cc77ac9c65 
         HEX: 2de92c6f592b0275 HEX: 4a7484aa6ea6e483 HEX: 5cb0a9dcbd41fbd4 HEX: 76f988da831153b5 
@@ -144,12 +170,23 @@ ALIAS: K-512 K-384
 : slice3 ( n seq -- a b c )
     [ dup 3 + ] dip <slice> first3 ; inline
 
-: pad-initial-bytes ( string -- padded-string )
+GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
+
+M: sha2-short pad-initial-bytes ( string sha2 -- padded-string )
+    drop
     dup [
         HEX: 80 ,
         length
-        [ HEX: 3f bitand calculate-pad-length 0 <string> % ]
+        [ 64 mod calculate-pad-length 0 <string> % ]
         [ 3 shift 8 >be % ] bi
+    ] "" make append ;
+
+M: sha2-long pad-initial-bytes ( string sha2 -- padded-string )
+    drop dup [
+        HEX: 80 ,
+        length
+        [ 128 mod calculate-pad-length-long 0 <string> % ]
+        [ 3 shift 16 >be % ] bi
     ] "" make append ;
 
 : seq>byte-array ( seq n -- string )
@@ -179,7 +216,7 @@ ALIAS: K-512 K-384
 : prepare-message-schedule ( seq sha2 -- w-seq )
     [ word-size>> <sliced-groups> [ be> ] map ]
     [
-        block-size>> 0 pad-tail 16 64 [a,b) over
+        block-size>> [ 0 pad-tail 16 ] keep [a,b) over
         '[ _ process-M-256 ] each
     ] bi ; inline
 
@@ -199,24 +236,8 @@ ALIAS: K-512 K-384
     ] each ;
 
 : byte-array>sha2 ( bytes state -- )
-    [ [ pad-initial-bytes ] [ block-size>> ] bi* <sliced-groups> ]
+    [ [ pad-initial-bytes ] [ nip block-size>> ] 2bi <sliced-groups> ]
     [ sha2-steps ] bi ;
-
-PRIVATE>
-
-SINGLETON: sha-224
-SINGLETON: sha-256
-SINGLETON: sha-384
-SINGLETON: sha-512
-
-INSTANCE: sha-224 checksum
-INSTANCE: sha-256 checksum
-INSTANCE: sha-384 checksum
-INSTANCE: sha-512 checksum
-
-TUPLE: sha2-state K H word-size block-size ;
-
-TUPLE: sha-224-state < sha2-state ;
 
 : <sha-224-state> ( -- sha2-state )
     sha-224-state new
@@ -225,14 +246,28 @@ TUPLE: sha-224-state < sha2-state ;
         4 >>word-size
         64 >>block-size ;
 
-TUPLE: sha-256-state < sha2-state ;
-
 : <sha-256-state> ( -- sha2-state )
     sha-256-state new
         K-256 >>K
         initial-H-256 >>H
         4 >>word-size
         64 >>block-size ;
+
+: <sha-384-state> ( -- sha2-state )
+    sha-384-state new
+        K-384 >>K
+        initial-H-384 >>H
+        8 >>word-size
+        80 >>block-size ;
+
+: <sha-512-state> ( -- sha2-state )
+    sha-512-state new
+        K-512 >>K
+        initial-H-512 >>H
+        8 >>word-size
+        80 >>block-size ;
+
+PRIVATE>
 
 M: sha-224 checksum-bytes
     drop <sha-224-state>
@@ -243,3 +278,13 @@ M: sha-256 checksum-bytes
     drop <sha-256-state>
     [ byte-array>sha2 ]
     [ H>> 4 seq>byte-array ] bi ;
+
+M: sha-384 checksum-bytes
+    drop <sha-384-state>
+    [ byte-array>sha2 ]
+    [ H>> 6 head 8 seq>byte-array ] bi ;
+
+M: sha-512 checksum-bytes
+    drop <sha-512-state>
+    [ byte-array>sha2 ]
+    [ H>> 8 seq>byte-array ] bi ;
