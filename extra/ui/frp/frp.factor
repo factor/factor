@@ -1,7 +1,7 @@
 USING: accessors arrays colors fonts fry kernel math models
 models.product monads sequences ui.gadgets ui.gadgets.buttons
 ui.gadgets.editors ui.gadgets.line-support ui.gadgets.tables
-ui.gadgets.tracks ui.render ui.gadgets.scrollers ui.baseline-alignment
+ui.gadgets.tracks ui.render ui.gadgets.scrollers
 math.parser lexer ;
 QUALIFIED: make
 IN: ui.frp
@@ -91,7 +91,7 @@ M: model -> dup , ;
 
 : <spacer> ( -- ) <gadget> 1 <layout> make:, ;
 : <box> ( gadgets type -- track )
-   [ { } make:make ] dip <track> +baseline+ >>align swap [ [ gadget>> ] [ width>> ] bi track-add ] each ; inline
+   [ { } make:make ] dip <track> swap [ [ gadget>> ] [ width>> ] bi track-add ] each ; inline
 : <box*> ( gadgets type -- track ) [ <box> ] [ [ model>> ] map <product> ] bi >>model ; inline
 : <hbox> ( gadgets -- track ) horizontal <box> ; inline
 : <hbox*> ( gadgets -- track ) horizontal <box*> ; inline
