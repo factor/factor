@@ -24,8 +24,8 @@ PRIMITIVE(fixnum_divint)
 	fixnum y = untag_fixnum(dpop()); \
 	fixnum x = untag_fixnum(dpeek());
 	fixnum result = x / y;
-	if(result == -FIXNUM_MIN)
-		drepl(allot_integer(-FIXNUM_MIN));
+	if(result == -fixnum_min)
+		drepl(allot_integer(-fixnum_min));
 	else
 		drepl(tag_fixnum(result));
 }
@@ -34,9 +34,9 @@ PRIMITIVE(fixnum_divmod)
 {
 	cell y = ((cell *)ds)[0];
 	cell x = ((cell *)ds)[-1];
-	if(y == tag_fixnum(-1) && x == tag_fixnum(FIXNUM_MIN))
+	if(y == tag_fixnum(-1) && x == tag_fixnum(fixnum_min))
 	{
-		((cell *)ds)[-1] = allot_integer(-FIXNUM_MIN);
+		((cell *)ds)[-1] = allot_integer(-fixnum_min);
 		((cell *)ds)[0] = tag_fixnum(0);
 	}
 	else
@@ -50,9 +50,20 @@ PRIMITIVE(fixnum_divmod)
  * If we're shifting right by n bits, we won't overflow as long as none of the
  * high WORD_SIZE-TAG_BITS-n bits are set.
  */
-#define SIGN_MASK(x) ((x) >> (WORD_SIZE - 1))
-#define BRANCHLESS_MAX(x,y) ((x) - (((x) - (y)) & SIGN_MASK((x) - (y))))
-#define BRANCHLESS_ABS(x) ((x ^ SIGN_MASK(x)) - SIGN_MASK(x))
+static inline fixnum sign_mask(fixnum x)
+{
+	return x >> (WORD_SIZE - 1);
+}
+
+static inline fixnum branchless_max(fixnum x, fixnum y)
+{
+	return (x - ((x - y) & sign_mask(x - y)));
+}
+
+static inline fixnum branchless_abs(fixnum x)
+{
+	return (x ^ sign_mask(x)) - sign_mask(x);
+}
 
 PRIMITIVE(fixnum_shift)
 {
@@ -63,14 +74,14 @@ PRIMITIVE(fixnum_shift)
 		return;
 	else if(y < 0)
 	{
-		y = BRANCHLESS_MAX(y,-WORD_SIZE + 1);
+		y = branchless_max(y,-WORD_SIZE + 1);
 		drepl(tag_fixnum(x >> -y));
 		return;
 	}
 	else if(y < WORD_SIZE - TAG_BITS)
 	{
 		fixnum mask = -((fixnum)1 << (WORD_SIZE - 1 - TAG_BITS - y));
-		if(!(BRANCHLESS_ABS(x) & mask))
+		if(!(branchless_abs(x) & mask))
 		{
 			drepl(tag_fixnum(x << y));
 			return;
@@ -226,7 +237,7 @@ cell unbox_array_size()
 	case FIXNUM_TYPE:
 		{
 			fixnum n = untag_fixnum(dpeek());
-			if(n >= 0 && n < (fixnum)ARRAY_SIZE_MAX)
+			if(n >= 0 && n < (fixnum)array_size_max)
 			{
 				dpop();
 				return n;
@@ -236,7 +247,7 @@ cell unbox_array_size()
 	case BIGNUM_TYPE:
 		{
 			bignum * zero = untag<bignum>(bignum_zero);
-			bignum * max = cell_to_bignum(ARRAY_SIZE_MAX);
+			bignum * max = cell_to_bignum(array_size_max);
 			bignum * n = untag<bignum>(dpeek());
 			if(bignum_compare(n,zero) != bignum_comparison_less
 				&& bignum_compare(n,max) == bignum_comparison_less)
@@ -248,7 +259,7 @@ cell unbox_array_size()
 		}
 	}
 
-	general_error(ERROR_ARRAY_SIZE,dpop(),tag_fixnum(ARRAY_SIZE_MAX),NULL);
+	general_error(ERROR_ARRAY_SIZE,dpop(),tag_fixnum(array_size_max),NULL);
 	return 0; /* can't happen */
 }
 
@@ -428,7 +439,7 @@ VM_C_API void box_unsigned_cell(cell cell)
 
 VM_C_API void box_signed_8(s64 n)
 {
-	if(n < FIXNUM_MIN || n > FIXNUM_MAX)
+	if(n < fixnum_min || n > fixnum_max)
 		dpush(tag<bignum>(long_long_to_bignum(n)));
 	else
 		dpush(tag_fixnum(n));
@@ -450,7 +461,7 @@ VM_C_API s64 to_signed_8(cell obj)
 
 VM_C_API void box_unsigned_8(u64 n)
 {
-	if(n > FIXNUM_MAX)
+	if(n > (u64)fixnum_max)
 		dpush(tag<bignum>(ulong_long_to_bignum(n)));
 	else
 		dpush(tag_fixnum(n));

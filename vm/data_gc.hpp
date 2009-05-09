@@ -24,10 +24,10 @@ void gc();
 
 inline static bool collecting_accumulation_gen_p()
 {
-	return ((HAVE_AGING_P
-		&& collecting_gen == AGING
+	return ((data->have_aging_p()
+		&& collecting_gen == data->aging()
 		&& !collecting_aging_again)
-		|| collecting_gen == TENURED);
+		|| collecting_gen == data->tenured());
 }
 
 void copy_handle(cell *handle);
@@ -39,7 +39,7 @@ void garbage_collection(volatile cell gen,
 /* We leave this many bytes free at the top of the nursery so that inline
 allocation (which does not call GC because of possible roots in volatile
 registers) does not run out of memory */
-#define ALLOT_BUFFER_ZONE 1024
+static const cell allot_buffer_zone = 1024;
 
 inline static object *allot_zone(zone *z, cell a)
 {
@@ -63,11 +63,11 @@ inline static object *allot_object(header header, cell size)
 
 	object *obj;
 
-	if(nursery.size - ALLOT_BUFFER_ZONE > size)
+	if(nursery.size - allot_buffer_zone > size)
 	{
 		/* If there is insufficient room, collect the nursery */
-		if(nursery.here + ALLOT_BUFFER_ZONE + size > nursery.end)
-			garbage_collection(NURSERY,false,0);
+		if(nursery.here + allot_buffer_zone + size > nursery.end)
+			garbage_collection(data->nursery(),false,0);
 
 		cell h = nursery.here;
 		nursery.here = h + align8(size);
@@ -77,20 +77,20 @@ inline static object *allot_object(header header, cell size)
 	tenured space */
 	else
 	{
-		zone *tenured = &data->generations[TENURED];
+		zone *tenured = &data->generations[data->tenured()];
 
 		/* If tenured space does not have enough room, collect */
 		if(tenured->here + size > tenured->end)
 		{
 			gc();
-			tenured = &data->generations[TENURED];
+			tenured = &data->generations[data->tenured()];
 		}
 
 		/* If it still won't fit, grow the heap */
 		if(tenured->here + size > tenured->end)
 		{
-			garbage_collection(TENURED,true,size);
-			tenured = &data->generations[TENURED];
+			garbage_collection(data->tenured(),true,size);
+			tenured = &data->generations[data->tenured()];
 		}
 
 		obj = allot_zone(tenured,size);

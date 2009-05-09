@@ -18,12 +18,12 @@ void reset_retainstack()
 	rs = rs_bot - sizeof(cell);
 }
 
-#define RESERVED (64 * sizeof(cell))
+static const cell stack_reserved = (64 * sizeof(cell));
 
 void fix_stacks()
 {
-	if(ds + sizeof(cell) < ds_bot || ds + RESERVED >= ds_top) reset_datastack();
-	if(rs + sizeof(cell) < rs_bot || rs + RESERVED >= rs_top) reset_retainstack();
+	if(ds + sizeof(cell) < ds_bot || ds + stack_reserved >= ds_top) reset_datastack();
+	if(rs + sizeof(cell) < rs_bot || rs + stack_reserved >= rs_top) reset_retainstack();
 }
 
 /* called before entry into foreign C code. Note that ds and rs might
