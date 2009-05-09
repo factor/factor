@@ -31,8 +31,8 @@ MEMO: opad ( -- seq ) 64 HEX: 5c <array> ;
 
 : init-hmac ( K -- o i )
     64 0 pad-tail 
-    [ opad seq-bitxor ] keep
-    ipad seq-bitxor ;
+    [ opad seq-bitxor ]
+    [ ipad seq-bitxor ] bi ;
 
 PRIVATE>
 
