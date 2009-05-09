@@ -34,3 +34,9 @@ IN: checksums.sha2.tests
     "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
     sha-256 test-checksum
 ] unit-test
+
+
+
+
+[ "8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909" ]
+[ "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" sha-512 test-checksum ] unit-test
