@@ -3,7 +3,7 @@
 USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
-alien.strings alien.arrays alien.complex sets libc alien.libraries
+alien.strings alien.arrays alien.complex alien.libraries sets libc
 continuations.private fry cpu.architecture
 source-files.errors
 compiler.errors
@@ -88,7 +88,7 @@ M: ##call generate-insn
     word>> dup sub-primitive>>
     [ first % ] [ [ add-call ] [ %call ] bi ] ?if ;
 
-M: ##jump generate-insn word>> [ add-call ] [ %jump-label ] bi ;
+M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 
 M: ##return generate-insn drop %return ;
 

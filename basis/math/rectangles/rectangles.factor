@@ -1,11 +1,17 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays sequences math math.vectors accessors ;
+USING: kernel arrays sequences math math.vectors accessors
+parser prettyprint.custom prettyprint.backend ;
 IN: math.rectangles
 
 TUPLE: rect { loc initial: { 0 0 } } { dim initial: { 0 0 } } ;
 
 : <rect> ( loc dim -- rect ) rect boa ; inline
+
+SYNTAX: RECT: scan-object scan-object <rect> parsed ;
+
+M: rect pprint*
+    \ RECT: [ [ loc>> ] [ dim>> ] bi [ pprint* ] bi@ ] pprint-prefix ;
 
 : <zero-rect> ( -- rect ) rect new ; inline
 
@@ -14,6 +20,8 @@ TUPLE: rect { loc initial: { 0 0 } } { dim initial: { 0 0 } } ;
 : rect-bounds ( rect -- loc dim ) [ loc>> ] [ dim>> ] bi ;
 
 : rect-extent ( rect -- loc ext ) rect-bounds over v+ ;
+
+: rect-center ( rect -- center ) rect-bounds 2 v/n v+ ;
 
 : with-rect-extents ( rect1 rect2 loc-quot: ( loc1 loc2 -- ) ext-quot: ( ext1 ext2 -- ) -- )
     [ [ rect-extent ] bi@ ] 2dip bi-curry* bi* ; inline

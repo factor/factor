@@ -3,7 +3,7 @@
 
 USING: accessors arrays assocs definitions help.topics io.pathnames
 kernel math math.order memoize namespaces sequences sets sorting
-tools.completion tools.crossref tools.vocabs vocabs vocabs.parser
+tools.completion tools.crossref vocabs vocabs.parser vocabs.hierarchy
 words ;
 
 IN: fuel.xref

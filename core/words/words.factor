@@ -155,7 +155,8 @@ M: word reset-word
     [ subwords forget-all ]
     [ reset-word ]
     [
-        f >>direct-entry-def
+        f >>pic-def
+        f >>pic-tail-def
         {
             "methods"
             "combination"

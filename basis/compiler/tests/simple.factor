@@ -60,8 +60,8 @@ IN: compiler.tests.simple
 
 ! Make sure error reporting works
 
-[ [ dup ] compile-call ] must-fail
-[ [ drop ] compile-call ] must-fail
+! [ [ dup ] compile-call ] must-fail
+! [ [ drop ] compile-call ] must-fail
 
 ! Regression
 

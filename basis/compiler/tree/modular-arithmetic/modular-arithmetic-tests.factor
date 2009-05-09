@@ -98,10 +98,15 @@ TUPLE: declared-fixnum { x fixnum } ;
     ] { mod fixnum-mod } inlined?
 ] unit-test
 
-
 [ f ] [
     [
         256 mod
+    ] { mod fixnum-mod } inlined?
+] unit-test
+
+[ f ] [
+    [
+        >fixnum 256 mod
     ] { mod fixnum-mod } inlined?
 ] unit-test
 
@@ -128,3 +133,6 @@ TUPLE: declared-fixnum { x fixnum } ;
         { integer } declare [ 256 rem ] map
     ] { mod fixnum-mod rem } inlined?
 ] unit-test
+
+[ [ >fixnum 255 fixnum-bitand ] ]
+[ [ >integer 256 rem ] test-modular-arithmetic ] unit-test

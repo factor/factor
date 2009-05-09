@@ -1,4 +1,5 @@
 CC = gcc
+CPP = g++
 AR = ar
 LD = ld
 
@@ -9,7 +10,7 @@ VERSION = 0.92
 
 BUNDLE = Factor.app
 LIBPATH = -L/usr/X11R6/lib
-CFLAGS = -Wall -Werror
+CFLAGS = -Wall
 
 ifdef DEBUG
 	CFLAGS += -g -DFACTOR_DEBUG
@@ -35,6 +36,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/code_block.o \
 	vm/code_gc.o \
 	vm/code_heap.o \
+	vm/contexts.o \
 	vm/data_gc.o \
 	vm/data_heap.o \
 	vm/debug.o \
@@ -45,6 +47,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/inline_cache.o \
 	vm/io.o \
 	vm/jit.o \
+	vm/local_roots.o \
 	vm/math.o \
 	vm/primitives.o \
 	vm/profiler.o \
@@ -53,7 +56,8 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/strings.o \
 	vm/tuples.o \
 	vm/utilities.o \
-	vm/words.o
+	vm/words.o \
+	vm/write_barrier.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
@@ -161,12 +165,12 @@ macosx.app: factor
 
 $(EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
-	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+	$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
 $(CONSOLE_EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
-	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+	$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION) $(EXE_OBJS)
 
 $(TEST_LIBRARY): vm/ffi_test.o
@@ -174,7 +178,13 @@ $(TEST_LIBRARY): vm/ffi_test.o
 
 clean:
 	rm -f vm/*.o
-	rm -f factor*.dll libfactor.{a,so,dylib} libfactor-ffi-test.{a,so,dylib} Factor.app/Contents/Frameworks/libfactor.dylib
+	rm -f factor.dll
+	rm -f libfactor.*
+	rm -f libfactor-ffi-test.*
+	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
+
+tags:
+	etags vm/*.{cpp,hpp,mm,S,c}
 
 vm/resources.o:
 	$(WINDRES) vm/factor.rs vm/resources.o
@@ -185,10 +195,15 @@ vm/ffi_test.o: vm/ffi_test.c
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
 
+.cpp.o:
+	$(CPP) -c $(CFLAGS) -o $@ $<
+
 .S.o:
 	$(CC) -x assembler-with-cpp -c $(CFLAGS) -o $@ $<
 
-.m.o:
-	$(CC) -c $(CFLAGS) -o $@ $<
+.mm.o:
+	$(CPP) -c $(CFLAGS) -o $@ $<
 
-.PHONY: factor
+.PHONY: factor tags clean
+
+.SUFFIXES: .mm

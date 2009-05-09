@@ -84,19 +84,16 @@ X-FUNCTION: void* glXGetProcAddress ( char* procname ) ;
 ! GLX_ARB_get_proc_address extension
 X-FUNCTION: void* glXGetProcAddressARB ( char* procname ) ;
 
+! GLX_ARB_multisample
+CONSTANT: GLX_SAMPLE_BUFFERS 100000
+CONSTANT: GLX_SAMPLES 100001
+
+! GLX_ARB_fbconfig_float
+CONSTANT: GLX_RGBA_FLOAT_TYPE HEX: 20B9
+CONSTANT: GLX_RGBA_FLOAT_BIT  HEX: 0004
+
 ! GLX Events
 ! (also skipped for now. only has GLXPbufferClobberEvent, the rest is handled by xlib methinks)
-
-: choose-visual ( flags -- XVisualInfo* )
-    [ dpy get scr get ] dip
-    [
-        %
-        GLX_RGBA ,
-        GLX_DEPTH_SIZE , 16 ,
-        0 ,
-    ] int-array{ } make
-    glXChooseVisual
-    [ "Could not get a double-buffered GLX RGBA visual" throw ] unless* ;
 
 : create-glx ( XVisualInfo* -- GLXContext )
     [ dpy get ] dip f 1 glXCreateContext

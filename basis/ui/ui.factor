@@ -4,7 +4,8 @@ USING: arrays assocs io kernel math models namespaces make dlists
 deques sequences threads sequences words continuations init
 combinators combinators.short-circuit hashtables concurrency.flags
 sets accessors calendar fry destructors ui.gadgets ui.gadgets.private
-ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend ui.render ;
+ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend ui.render
+strings ;
 IN: ui
 
 <PRIVATE
@@ -40,17 +41,38 @@ SYMBOL: windows
     lose-focus swap each-gesture
     gain-focus swap each-gesture ;
 
+: ?grab-input ( world -- )
+    dup grab-input?>> [ handle>> (grab-input) ] [ drop ] if ;
+
+: ?ungrab-input ( world -- )
+    dup grab-input?>> [ handle>> (ungrab-input) ] [ drop ] if ;
+
 : focus-world ( world -- )
     t >>focused?
-    dup raised-window
-    focus-path f focus-gestures ;
+    [ ?grab-input ] [
+        dup raised-window
+        focus-path f focus-gestures
+    ] bi ;
 
 : unfocus-world ( world -- )
     f >>focused?
-    focus-path f swap focus-gestures ;
+    [ ?ungrab-input ]
+    [ focus-path f swap focus-gestures ] bi ;
+
+: try-to-open-window ( world -- )
+    {
+        [ (open-window) ]
+        [ handle>> select-gl-context ]
+        [
+            [ begin-world ]
+            [ [ handle>> (close-window) ] [ ui-error ] bi* ]
+            recover
+        ]
+        [ resize-world ]
+    } cleave ;
 
 M: world graft*
-    [ (open-window) ]
+    [ try-to-open-window ]
     [ [ title>> ] keep set-title ]
     [ request-focus ] tri ;
 
@@ -66,6 +88,7 @@ M: world graft*
         [ images>> [ dispose ] when* ]
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
+        [ end-world ]
     } cleave ;
 
 M: world ungraft*
@@ -131,7 +154,9 @@ SYMBOL: ui-thread
 PRIVATE>
 
 : find-window ( quot -- world )
-    [ windows get values ] dip '[ gadget-child @ ] find-last nip ; inline
+    [ windows get values ] dip
+    '[ dup children>> [ ] [ nip first ] if-empty @ ]
+    find-last nip ; inline
 
 : ui-running? ( -- ? )
     \ ui-running get-global ;
@@ -166,13 +191,17 @@ PRIVATE>
 : restore-windows? ( -- ? )
     windows get empty? not ;
 
+: ?attributes ( gadget title/attributes -- attributes )
+    dup string? [ world-attributes new swap >>title ] when
+    swap [ [ [ 1array ] [ f ] if* ] curry unless* ] curry change-gadgets ;
+
 PRIVATE>
 
 : open-world-window ( world -- )
     dup pref-dim >>dim dup relayout graft ;
 
-: open-window ( gadget title -- )
-    f <world> open-world-window ;
+: open-window ( gadget title/attributes -- )
+    ?attributes <world> open-world-window ;
 
 : set-fullscreen? ( ? gadget -- )
     find-world set-fullscreen* ;

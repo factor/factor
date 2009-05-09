@@ -13,10 +13,10 @@ IN: math.bitwise
 : unmask? ( x n -- ? ) unmask 0 > ; inline
 : mask ( x n -- ? ) bitand ; inline
 : mask? ( x n -- ? ) mask 0 > ; inline
-: wrap ( m n -- m' ) 1- bitand ; inline
+: wrap ( m n -- m' ) 1 - bitand ; inline
 : bits ( m n -- m' ) 2^ wrap ; inline
 : mask-bit ( m n -- m' ) 2^ mask ; inline
-: on-bits ( n -- m ) 2^ 1- ; inline
+: on-bits ( n -- m ) 2^ 1 - ; inline
 : toggle-bit ( m n -- m' ) 2^ bitxor ; inline
 
 : shift-mod ( n s w -- n )
@@ -64,8 +64,8 @@ DEFER: byte-bit-count
 <<
 
 \ byte-bit-count
-256 [
-    8 <bits> 0 [ [ 1+ ] when ] reduce
+256 iota [
+    8 <bits> 0 [ [ 1 + ] when ] reduce
 ] B{ } map-as '[ HEX: ff bitand _ nth-unsafe ]
 (( byte -- table )) define-declared
 
@@ -97,12 +97,12 @@ PRIVATE>
 
 ! Signed byte array to integer conversion
 : signed-le> ( bytes -- x )
-    [ le> ] [ length 8 * 1- on-bits ] bi
+    [ le> ] [ length 8 * 1 - on-bits ] bi
     2dup > [ bitnot bitor ] [ drop ] if ;
 
 : signed-be> ( bytes -- x )
     <reversed> signed-le> ;
 
 : >signed ( x n -- y )
-    2dup neg 1+ shift 1 = [ 2^ - ] [ drop ] if ;
+    2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
 
