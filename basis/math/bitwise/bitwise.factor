@@ -35,6 +35,11 @@ IN: math.bitwise
 : w- ( int int -- int ) - 32 bits ; inline
 : w* ( int int -- int ) * 32 bits ; inline
 
+! 64-bit arithmetic
+: W+ ( int int -- int ) + 64 bits ; inline
+: W- ( int int -- int ) - 64 bits ; inline
+: W* ( int int -- int ) * 64 bits ; inline
+
 ! flags
 MACRO: flags ( values -- )
     [ 0 ] [ [ ?execute bitor ] curry compose ] reduce ;
