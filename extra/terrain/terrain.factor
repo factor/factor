@@ -137,12 +137,25 @@ TUPLE: terrain-world < world
 : apply-gravity ( velocity -- velocity' )
     1 over [ GRAVITY - ] change-nth ;
 
-: pixel ( coords dim -- index )
-    [ drop first ] [ [ second ] [ first ] bi* * ] 2bi + ;
+:: pixel-indices ( coords dim -- indices )
+    coords vfloor [ >integer ] map :> floor-coords
+    floor-coords first2 dim first * + :> base-index
+    base-index dim first + :> next-row-index
 
-: terrain-height-at ( segment point -- height )
-    over dim>> [ v* vfloor ] [ pixel >integer ] bi
-    swap bitmap>> 4 <groups> nth COMPONENT-SCALE v. 255.0 / ;
+    base-index
+    base-index 1 +
+    next-row-index
+    next-row-index 1 + 4array ;
+
+:: terrain-height-at ( segment point -- height )
+    segment dim>> :> dim
+    dim point v* :> pixel
+    pixel dup vfloor v- :> pixel-mantissa
+    segment bitmap>> 4 <groups> :> pixels
+    pixel dim pixel-indices :> indices
+    
+    indices [ pixels nth COMPONENT-SCALE v. 255.0 / ] map
+    first4 [ pixel-mantissa first lerp ] 2bi@ pixel-mantissa second lerp ;
 
 : collide ( segment location -- location' )
     [ [ first ] [ third ] bi 2array terrain-height-at PLAYER-HEIGHT + ]
@@ -152,7 +165,6 @@ TUPLE: terrain-world < world
 : tick-player ( world player -- )
     [ apply-friction apply-gravity ] change-velocity
     dup velocity>> [ v+ [ terrain-segment>> ] dip collide ] curry with change-location
-    P
     drop ;
 
 M: terrain-world tick*
