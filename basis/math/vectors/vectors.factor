@@ -41,6 +41,10 @@ IN: math.vectors
 : set-axis ( u v axis -- w )
     [ [ zero? 2over ? ] dip swap nth ] map-index 2nip ;
 
+: bilerp ( aa ba ab bb {t,u} -- a_tu )
+    [ first lerp ] [ second lerp ] bi-curry
+    [ 2bi@ ] [ call ] bi* ;
+
 : vlerp ( a b t -- a_t )
     [ lerp ] 3map ;
 
