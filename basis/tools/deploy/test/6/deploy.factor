@@ -5,7 +5,6 @@ H{
     { deploy-io 1 }
     { deploy-name "tools.deploy.test.6" }
     { deploy-math? t }
-    { deploy-compiler? t }
     { deploy-ui? f }
     { deploy-c-types? f }
     { deploy-word-defs? f }

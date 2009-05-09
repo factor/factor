@@ -14,7 +14,7 @@ NSApplicationDelegateReplyCancel
 NSApplicationDelegateReplyFailure ;
 
 : with-autorelease-pool ( quot -- )
-    NSAutoreleasePool -> new slip -> release ; inline
+    NSAutoreleasePool -> new [ call ] [ -> release ] bi* ; inline
 
 : NSApp ( -- app ) NSApplication -> sharedApplication ;
 

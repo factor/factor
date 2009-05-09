@@ -62,7 +62,6 @@ M: t bson-type? ( boolean -- type ) drop T_Boolean ;
 M: f bson-type? ( boolean -- type ) drop T_Boolean ; 
 
 M: real bson-type? ( real -- type ) drop T_Double ; 
-M: word bson-type? ( word -- type ) drop T_String ; 
 M: tuple bson-type? ( tuple -- type ) drop T_Object ;  
 M: sequence bson-type? ( seq -- type ) drop T_Array ;
 M: string bson-type? ( string -- type ) drop T_String ; 
@@ -73,6 +72,7 @@ M: mdbregexp bson-type? ( regexp -- type ) drop T_Regexp ;
 
 M: oid bson-type? ( word -- type ) drop T_OID ;
 M: objref bson-type? ( objref -- type ) drop T_Binary ;
+M: word bson-type? ( word -- type ) drop T_Binary ;
 M: quotation bson-type? ( quotation -- type ) drop T_Binary ; 
 M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
 
@@ -112,21 +112,8 @@ M: byte-array bson-write ( binary -- )
     T_Binary_Bytes write-byte
     write ; 
 
-M: quotation bson-write ( quotation -- )
-    object>bytes [ length write-int32 ] keep
-    T_Binary_Function write-byte
-    write ; 
-
 M: oid bson-write ( oid -- )
     [ a>> write-longlong ] [ b>> write-int32 ] bi ;
-
-M: objref bson-write ( objref -- )
-    [ binary ] dip
-    '[ _
-       [ ns>> write-cstring ]
-       [ objid>> write-cstring ] bi ] with-byte-writer
-    [ length write-int32 ] keep
-    T_Binary_Custom write-byte write ;
        
 M: mdbregexp bson-write ( regexp -- )
    [ regexp>> write-cstring ]
@@ -149,7 +136,16 @@ M: assoc bson-write ( assoc -- )
        [ over skip-field? [ 2drop ] [ write-pair ] if ] assoc-each
        write-eoo ] with-length-prefix ; 
 
-M: word bson-write name>> bson-write ;
+: (serialize-code) ( code -- )
+    object>bytes [ length write-int32 ] keep
+    T_Binary_Custom write-byte
+    write ;
+
+M: quotation bson-write ( quotation -- )
+    (serialize-code) ;
+    
+M: word bson-write ( word -- )
+    (serialize-code) ;
 
 PRIVATE>
 
