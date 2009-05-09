@@ -266,4 +266,4 @@ M: object run-pipeline-element
     [ ]
 } cond
 
-: run-desc ( desc -- result ) utf8 <process-reader> stream-contents but-last ;
+: run-desc ( desc -- result ) utf8 [ contents [ but-last ] [ f ] if* ] with-process-reader ;
