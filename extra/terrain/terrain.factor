@@ -10,7 +10,7 @@ IN: terrain
 
 CONSTANT: FOV $[ 2.0 sqrt 1+ ]
 CONSTANT: NEAR-PLANE $[ 1.0 1024.0 / ]
-CONSTANT: FAR-PLANE 1.0
+CONSTANT: FAR-PLANE 2.0
 CONSTANT: EYE-START { 0.5 0.5 1.2 }
 CONSTANT: TICK-LENGTH $[ 1000 30 /i ]
 CONSTANT: MOUSE-SCALE $[ 1.0 10.0 / ]
@@ -111,6 +111,7 @@ TUPLE: terrain-world < world
     key-s keys nth [ world move-backward ] when 
     key-a keys nth [ world move-leftward ] when 
     key-d keys nth [ world move-rightward ] when 
+    key-escape keys nth [ world close-window ] when
     world read-mouse rotate-with-mouse
     reset-mouse ;
 
@@ -126,8 +127,8 @@ M: terrain-world draw*
     GL_TEXTURE_2D GL_TEXTURE0 bind-texture-unit
     GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameteri ;
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP_TO_EDGE glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri ;
 
 M: terrain-world begin-world
     "2.0" { "GL_ARB_vertex_buffer_object" "GL_ARB_shader_objects" }
@@ -146,10 +147,11 @@ M: terrain-world begin-world
     >>terrain-program
     vertex-array >vertex-buffer >>terrain-vertex-buffer
     TICK-LENGTH over <game-loop> [ >>game-loop ] keep start-loop
-    reset-mouse
+    open-game-input
     drop ;
 
 M: terrain-world end-world
+    close-game-input
     {
         [ game-loop>> stop-loop ]
         [ terrain-vertex-buffer>> delete-gl-buffer ]
@@ -177,7 +179,6 @@ M: terrain-world pref-dim* drop { 640 480 } ;
 
 : terrain-window ( -- )
     [
-        open-game-input
         f T{ world-attributes
             { world-class terrain-world }
             { title "Terrain" }
@@ -186,5 +187,6 @@ M: terrain-world pref-dim* drop { 640 480 } ;
                 double-buffered
                 T{ depth-bits { value 24 } }
             } }
+            { grab-input? t }
         } open-window
     ] with-ui ;
