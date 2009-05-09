@@ -112,8 +112,7 @@ IN: mason.report
             benchmark-error-vocabs-file
             benchmark-error-messages-file
             error-dump
-            
-            "Benchmark timings"
+
             benchmarks-file eval-file benchmarks-table
         ] output>array
     ] with-report ;
