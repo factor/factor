@@ -52,6 +52,9 @@ GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 M: integer (eql?) = ;
 
+M: float (eql?)
+    over float? [ fp-bitwise= ] [ 2drop f ] if ;
+
 M: sequence (eql?)
     over sequence? [
         2dup [ length ] bi@ =

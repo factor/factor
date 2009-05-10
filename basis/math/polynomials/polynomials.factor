@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math math.order math.vectors sequences
-    splitting vectors ;
+    splitting vectors macros combinators ;
 IN: math.polynomials
 
 <PRIVATE
@@ -80,6 +80,12 @@ PRIVATE>
 : pdiff ( p -- p' )
     dup length v* { 0 } ?head drop ;
 
-: polyval ( p x -- p[x] )
-    [ dup length ] dip powers v. ;
+: polyval ( x p -- p[x] )
+    [ length swap powers ] [ nip ] 2bi v. ;
+
+MACRO: polyval* ( p -- )
+    reverse
+    [ 1 tail [ \ * swap \ + [ ] 3sequence ] map ]
+    [ first \ drop swap [ ] 2sequence ] bi
+    prefix \ cleave [ ] 2sequence ;
 
