@@ -75,6 +75,9 @@ PRIVATE>
    [ tuple-collection name>> ] keep
    id-selector delete ;
 
+: delete-tuples ( seq -- )
+    [ delete-tuple ] each ;
+
 : tuple>query ( tuple -- query )
    [ tuple-collection name>> ] keep
    tuple>selector <query> ;
