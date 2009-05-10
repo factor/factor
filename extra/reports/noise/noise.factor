@@ -19,13 +19,11 @@ IN: reports.noise
         { 2keep 1 }
         { 2nip 2 }
         { 2over 4 }
-        { 2slip 2 }
         { 2swap 3 }
         { 3curry 2 }
         { 3drop 1 }
         { 3dup 2 }
         { 3keep 3 }
-        { 3slip 3 }
         { 4drop 2 }
         { 4dup 3 }
         { compose 1/2 }
@@ -58,7 +56,6 @@ IN: reports.noise
         { pick 4 }
         { roll 4 }
         { rot 3 }
-        { slip 1 }
         { spin 3 }
         { swap 1 }
         { swapd 3 }
