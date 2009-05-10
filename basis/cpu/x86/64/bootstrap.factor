@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
 cpu.x86.assembler layouts vocabs parser compiler.constants math ;
@@ -20,15 +20,16 @@ IN: bootstrap.x86
 : rex-length ( -- n ) 1 ;
 
 [
-    temp0 0 MOV                                 ! load stack_chain
+    ! load stack_chain
+    temp0 0 MOV rc-absolute-cell rt-stack-chain jit-rel
     temp0 temp0 [] MOV
-    temp0 [] stack-reg MOV                      ! save stack pointer
-] rc-absolute-cell rt-stack-chain 1 rex-length + jit-save-stack jit-define
-
-[
-    temp1 0 MOV                                 ! load XT
-    temp1 JMP                                   ! go
-] rc-absolute-cell rt-primitive 1 rex-length + jit-primitive jit-define
+    ! save stack pointer
+    temp0 [] stack-reg MOV
+    ! load XT
+    temp1 0 MOV rc-absolute-cell rt-primitive jit-rel
+    ! go
+    temp1 JMP
+] jit-primitive jit-define
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file parsed >>
 call

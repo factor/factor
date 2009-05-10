@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel vocabs vocabs.loader tools.time tools.vocabs
+USING: kernel vocabs vocabs.loader tools.time vocabs.hierarchy
 arrays assocs io.styles io help.markup prettyprint sequences
-continuations debugger math namespaces ;
+continuations debugger math namespaces memory ;
 IN: benchmark
 
 <PRIVATE
@@ -14,7 +14,7 @@ PRIVATE>
 
 : run-benchmark ( vocab -- )
     [ "=== " write vocab-name print flush ] [
-        [ [ require ] [ [ run ] benchmark ] [ ] tri timings ]
+        [ [ require ] [ gc [ run ] benchmark ] [ ] tri timings ]
         [ swap errors ]
         recover get set-at
     ] bi ;

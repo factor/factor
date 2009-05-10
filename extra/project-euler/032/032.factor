@@ -28,7 +28,7 @@ IN: project-euler.032
 
 : source-032 ( -- seq )
     9 factorial iota [
-        9 permutation [ 1+ ] map 10 digits>integer
+        9 permutation [ 1 + ] map 10 digits>integer
     ] map ;
 
 : 1and4 ( n -- ? )

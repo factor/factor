@@ -17,7 +17,7 @@ SYMBOL: current-directory
     [ path-separator? ] trim-head ;
 
 : last-path-separator ( path -- n ? )
-    [ length 1- ] keep [ path-separator? ] find-last-from ;
+    [ length 1 - ] keep [ path-separator? ] find-last-from ;
 
 HOOK: root-directory? io-backend ( path -- ? )
 
@@ -30,7 +30,7 @@ ERROR: no-parent-directory path ;
     dup root-directory? [
         trim-tail-separators
         dup last-path-separator [
-            1+ cut
+            1 + cut
         ] [
             drop "." swap
         ] if
@@ -113,7 +113,7 @@ PRIVATE>
 : file-name ( path -- string )
     dup root-directory? [
         trim-tail-separators
-        dup last-path-separator [ 1+ tail ] [
+        dup last-path-separator [ 1 + tail ] [
             drop special-path? [ file-name ] when
         ] if
     ] unless ;

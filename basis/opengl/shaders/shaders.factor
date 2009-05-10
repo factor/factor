@@ -92,11 +92,16 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 : gl-program-shaders-length ( program -- shaders-length )
     GL_ATTACHED_SHADERS gl-program-get-int ; inline
 
+! On some macosx-x86-64 graphics drivers, glGetAttachedShaders tries to treat the
+! shaders parameter as a ulonglong array rather than a GLuint array as documented.
+! We hack around this by allocating a buffer twice the size and sifting out the zero
+! values
+
 : gl-program-shaders ( program -- shaders )
-    dup gl-program-shaders-length
+    dup gl-program-shaders-length 2 *
     0 <int>
     over <uint-array>
-    [ glGetAttachedShaders ] keep ;
+    [ glGetAttachedShaders ] keep [ zero? not ] filter ;
 
 : delete-gl-program-only ( program -- )
     glDeleteProgram ; inline

@@ -3,7 +3,7 @@
 USING: accessors ascii assocs biassocs combinators hashtables kernel lists literals math namespaces make multiline openal parser sequences splitting strings synth synth.buffers ;
 IN: morse
 
-ERROR: no-morse-code ch ;
+ERROR: no-morse-ch ch ;
 
 <PRIVATE
 
@@ -11,7 +11,7 @@ CONSTANT: dot-char CHAR: .
 CONSTANT: dash-char CHAR: -
 CONSTANT: char-gap-char CHAR: \s
 CONSTANT: word-gap-char CHAR: /
-CONSTANT: unknown-char "?"
+CONSTANT: unknown-char CHAR: ?
 
 PRIVATE>
 
@@ -76,7 +76,7 @@ CONSTANT: morse-code-table $[
 ]
 
 : ch>morse ( ch -- morse )
-    ch>lower morse-code-table at unknown-char or ;
+    ch>lower morse-code-table at unknown-char 1string or ;
 
 : morse>ch ( str -- ch )
     morse-code-table value-at char-gap-char or ;
@@ -156,7 +156,8 @@ CONSTANT: beep-freq 880
             { dot-char [ dot ] }
             { dash-char [ dash ] }
             { word-gap-char [ intra-char-gap ] }
-            [ drop intra-char-gap ]
+            { unknown-char [ intra-char-gap ] }
+            [ no-morse-ch ]
         } case
     ] interleave ;
 

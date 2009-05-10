@@ -3,7 +3,7 @@
 USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
-alien.strings alien.arrays alien.complex sets libc alien.libraries
+alien.strings alien.arrays alien.complex alien.libraries sets libc
 continuations.private fry cpu.architecture
 source-files.errors
 compiler.errors
@@ -44,7 +44,7 @@ SYMBOL: calls
 
 SYMBOL: compiling-word
 
-: compiled-stack-traces? ( -- ? ) 59 getenv ;
+: compiled-stack-traces? ( -- ? ) 67 getenv ;
 
 ! Mapping _label IDs to label instances
 SYMBOL: labels
@@ -88,7 +88,7 @@ M: ##call generate-insn
     word>> dup sub-primitive>>
     [ first % ] [ [ add-call ] [ %call ] bi ] ?if ;
 
-M: ##jump generate-insn word>> [ add-call ] [ %jump-label ] bi ;
+M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 
 M: ##return generate-insn drop %return ;
 
@@ -444,8 +444,7 @@ TUPLE: callback-context ;
 
 : do-callback ( quot token -- )
     init-catchstack
-    dup 2 setenv
-    slip
+    [ 2 setenv call ] keep
     wait-to-return ; inline
 
 : callback-return-quot ( ctype -- quot )

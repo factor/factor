@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io.streams.string quotations strings urls http tools.vocabs math io.servers.connection ;
+USING: help.markup help.syntax io.streams.string quotations strings urls http vocabs.refresh math io.servers.connection ;
 IN: http.server
 
 HELP: trivial-responder

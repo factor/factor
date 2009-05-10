@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hints kernel locals math math.order sequences sequences.private project-euler.common ;
+USING: hints kernel locals math math.order math.ranges project-euler.common
+    sequences sequences.private ;
 IN: project-euler.150
 
 ! http://projecteuler.net/index.php?section=problems&id=150
@@ -50,13 +51,13 @@ IN: project-euler.150
     615949 * 797807 + 20 2^ rem dup 19 2^ - ; inline
 
 : sums-triangle ( -- seq )
-    0 1000 iota [ 1+ [ next ] replicate partial-sums ] map nip ;
+    0 1000 [1,b] [ [ next ] replicate partial-sums ] map nip ;
 
 :: (euler150) ( m -- n )
     [let | table [ sums-triangle ] |
         m [| x |
             x 1+ [| y |
-                m x - iota [| z |
+                m x - [0,b) [| z |
                     x z + table nth-unsafe
                     [ y z + 1+ swap nth-unsafe ]
                     [ y        swap nth-unsafe ] bi -

@@ -9,7 +9,7 @@ IN: math.ratios
 <PRIVATE
 
 : fraction> ( a b -- a/b )
-    dup 1 number= [ drop ] [ <ratio> ] if ; inline
+    dup 1 number= [ drop ] [ ratio boa ] if ; inline
 
 : scale ( a/b c/d -- a*d b*c )
     2>fraction [ * swap ] dip * swap ; inline

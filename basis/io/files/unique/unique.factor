@@ -35,6 +35,9 @@ SYMBOL: unique-retries
 : random-name ( -- string )
     unique-length get [ random-ch ] "" replicate-as ;
 
+: retry ( quot: ( -- ? )  n -- )
+    swap [ drop ] prepose attempt-all ; inline
+
 : (make-unique-file) ( path prefix suffix -- path )
     '[
         _ _ _ random-name glue append-path

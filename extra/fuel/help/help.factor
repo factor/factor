@@ -3,8 +3,8 @@
 
 USING: accessors arrays assocs combinators help help.crossref
 help.markup help.topics io io.streams.string kernel make namespaces
-parser prettyprint sequences summary tools.vocabs help.vocabs
-vocabs vocabs.loader words see ;
+parser prettyprint sequences summary help.vocabs
+vocabs vocabs.loader vocabs.hierarchy vocabs.metadata words see ;
 
 IN: fuel.help
 
@@ -21,9 +21,9 @@ IN: fuel.help
     [ see ] with-string-writer ; inline
 
 : fuel-methods-str ( word -- str )
-    methods dup empty? not [
+    methods [ f ] [
         [ [ see nl ] each ] with-string-writer
-    ] [ drop f ] if ; inline
+    ] if-empty ; inline
 
 : fuel-related-words ( word -- seq )
     dup "related" word-prop remove ; inline

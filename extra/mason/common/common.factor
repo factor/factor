@@ -4,10 +4,13 @@ USING: kernel namespaces sequences splitting system accessors
 math.functions make io io.files io.pathnames io.directories
 io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
 combinators.short-circuit parser combinators calendar
-calendar.format arrays mason.config locals system debugger ;
+calendar.format arrays mason.config locals system debugger fry
+continuations strings ;
 IN: mason.common
 
-ERROR: output-process-error output process ;
+SYMBOL: current-git-id
+
+ERROR: output-process-error { output string } { process process } ;
 
 M: output-process-error error.
     [ "Process:" print process>> . nl ]
@@ -16,7 +19,7 @@ M: output-process-error error.
 
 : try-output-process ( command -- )
     >process +stdout+ >>stderr utf8 <process-reader*>
-    [ contents ] [ dup wait-for-process ] bi*
+    [ stream-contents ] [ dup wait-for-process ] bi*
     0 = [ 2drop ] [ output-process-error ] if ;
 
 HOOK: really-delete-tree os ( path -- )
@@ -35,15 +38,19 @@ M: unix really-delete-tree delete-tree ;
     <process>
         swap >>command
         15 minutes >>timeout
+        +closed+ >>stdin
     try-output-process ;
+
+: retry ( n quot -- )
+    '[ drop @ f ] attempt-all drop ; inline
 
 :: upload-safely ( local username host remote -- )
     [let* | temp [ remote ".incomplete" append ]
             scp-remote [ { username "@" host ":" temp } concat ]
             scp [ scp-command get ]
             ssh [ ssh-command get ] |
-        { scp local scp-remote } short-running-process
-        { ssh host "-l" username "mv" temp remote } short-running-process
+        5 [ { scp local scp-remote } short-running-process ] retry
+        5 [ { ssh host "-l" username "mv" temp remote } short-running-process ] retry
     ] ;
 
 : eval-file ( file -- obj )
@@ -90,8 +97,8 @@ SYMBOL: stamp
 : ?prepare-build-machine ( -- )
     builds/factor exists? [ prepare-build-machine ] unless ;
 
-CONSTANT: load-everything-vocabs-file "load-everything-vocabs"
-CONSTANT: load-everything-errors-file "load-everything-errors"
+CONSTANT: load-all-vocabs-file "load-everything-vocabs"
+CONSTANT: load-all-errors-file "load-everything-errors"
 
 CONSTANT: test-all-vocabs-file "test-all-vocabs"
 CONSTANT: test-all-errors-file "test-all-errors"

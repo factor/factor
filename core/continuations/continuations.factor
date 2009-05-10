@@ -155,8 +155,6 @@ ERROR: attempt-all-error ;
         ] { } make peek swap [ rethrow ] when
     ] if ; inline
 
-: retry ( quot: ( -- ? )  n -- ) swap [ drop ] prepose attempt-all ; inline
-
 TUPLE: condition error restarts continuation ;
 
 C: <condition> condition ( error restarts cc -- condition )

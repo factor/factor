@@ -1,11 +1,10 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays generic hashtables io assocs
-kernel math namespaces make sequences strings sbufs vectors
+USING: accessors arrays byte-arrays byte-vectors generic hashtables io
+assocs kernel math namespaces make sequences strings sbufs vectors
 words prettyprint.config prettyprint.custom prettyprint.sections
-quotations io io.pathnames io.styles math.parser effects
-classes.tuple math.order classes.tuple.private classes
-combinators colors ;
+quotations io io.pathnames io.styles math.parser effects classes.tuple
+math.order classes.tuple.private classes combinators colors ;
 IN: prettyprint.backend
 
 M: effect pprint* effect>string "(" ")" surround text ;
@@ -135,8 +134,8 @@ M: pathname pprint*
     [ text ] [ f <inset pprint* block> ] bi*
     \ } pprint-word block> ;
 
-M: tuple pprint*
-    boa-tuples? get [ call-next-method ] [
+: pprint-tuple ( tuple -- )
+    boa-tuples? get [ pprint-object ] [
         [
             <flow
             \ T{ pprint-word
@@ -148,6 +147,9 @@ M: tuple pprint*
             block>
         ] check-recursion
     ] if ;
+
+M: tuple pprint*
+    pprint-tuple ;
 
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [
@@ -165,6 +167,7 @@ M: curry pprint-delims drop \ [ \ ] ;
 M: compose pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
+M: byte-vector pprint-delims drop \ BV{ \ } ;
 M: vector pprint-delims drop \ V{ \ } ;
 M: hashtable pprint-delims drop \ H{ \ } ;
 M: tuple pprint-delims drop \ T{ \ } ;
@@ -173,6 +176,7 @@ M: callstack pprint-delims drop \ CS{ \ } ;
 
 M: object >pprint-sequence ;
 M: vector >pprint-sequence ;
+M: byte-vector >pprint-sequence ;
 M: curry >pprint-sequence ;
 M: compose >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
@@ -202,6 +206,7 @@ M: object pprint-object ( obj -- )
 
 M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
+M: byte-vector pprint* pprint-object ;
 M: hashtable pprint* pprint-object ;
 M: curry pprint* pprint-object ;
 M: compose pprint* pprint-object ;

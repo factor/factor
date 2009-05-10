@@ -122,7 +122,7 @@ ERROR: bad-slot-value value class ;
         [
             \ over ,
             over reader-word 1quotation
-            [ dip call ] curry [ dip swap ] curry %
+            [ dip call ] curry [ ] like [ dip swap ] curry %
             swap setter-word ,
         ] [ ] make (( object quot -- object )) define-inline
     ] [ 2drop ] if ;

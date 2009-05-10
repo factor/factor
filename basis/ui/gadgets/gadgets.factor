@@ -393,3 +393,7 @@ M: f request-focus-on 2drop ;
 
 : focus-path ( gadget -- seq )
     [ focus>> ] follow ;
+
+USING: vocabs vocabs.loader ;
+
+"prettyprint" vocab [ "ui.gadgets.prettyprint" require ] when

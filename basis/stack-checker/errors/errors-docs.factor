@@ -84,8 +84,11 @@ HELP: inconsistent-recursive-call-error
 } ;
 
 ARTICLE: "inference-errors" "Stack checker errors"
-"These conditions are thrown by " { $link "inference" } ", as well as the " { $link "compiler" } "."
-$nl
+"These " { $link "inference" } " failure conditions are reported in one of two ways:"
+{ $list
+    { { $link "tools.inference" } " throws them as errors" }
+    { "The " { $link "compiler" } " reports them via " { $link "tools.errors" } }
+}
 "Error thrown when insufficient information is available to calculate the stack effect of a combinator call (see " { $link "inference-combinators" } "):"
 { $subsection literal-expected }
 "Error thrown when a word's stack effect declaration does not match the composition of the stack effects of its factors:"

@@ -1,0 +1,1 @@
+mongo-message-monitor - a small proxy to introspect messages send to MongoDB

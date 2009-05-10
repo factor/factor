@@ -3,7 +3,7 @@
 USING: alien.c-types kernel math namespaces sequences
 io.backend io.binary combinators system vocabs.loader
 summary math.bitwise byte-vectors fry byte-arrays
-math.ranges ;
+math.ranges math.constants math.functions accessors ;
 IN: random
 
 SYMBOL: system-random-generator
@@ -45,7 +45,10 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 
 PRIVATE>
 
-: random-bits ( n -- r ) 2^ random-integer ;
+: random-bits ( numbits -- r ) 2^ random-integer ;
+
+: random-bits* ( numbits -- n )
+    1 - [ random-bits ] keep set-bit ;
 
 : random ( seq -- elt )
     [ f ] [
@@ -54,7 +57,7 @@ PRIVATE>
 
 : randomize ( seq -- seq )
     dup length [ dup 1 > ]
-    [ [ random ] [ 1- ] bi [ pick exchange ] keep ]
+    [ [ iota random ] [ 1- ] bi [ pick exchange ] keep ]
     while drop ;
 
 : delete-random ( seq -- elt )
@@ -68,6 +71,20 @@ PRIVATE>
 
 : with-secure-random ( quot -- )
     secure-random-generator get swap with-random ; inline
+
+: uniform-random-float ( min max -- n )
+    4 random-bytes underlying>> *uint >float
+    4 random-bytes underlying>> *uint >float
+    2.0 32 ^ * +
+    [ over - 2.0 -64 ^ * ] dip
+    * + ; inline
+
+: normal-random-float ( mean sigma -- n )
+    0.0 1.0 uniform-random-float
+    0.0 1.0 uniform-random-float
+    [ 2 pi * * cos ]
+    [ 1.0 swap - log -2.0 * sqrt ]
+    bi* * * + ;
 
 USE: vocabs.loader
 
