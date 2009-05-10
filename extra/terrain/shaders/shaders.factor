@@ -1,18 +1,51 @@
 USING: multiline ;
 IN: terrain.shaders
 
+STRING: sky-vertex-shader
+
+uniform float sky_theta;
+varying vec3 direction;
+
+void main()
+{
+    vec4 v = vec4(gl_Vertex.xy, -1.0, 1.0);
+    gl_Position = v;
+    float s = sin(sky_theta), c = cos(sky_theta);
+    direction = mat3(1, 0, 0,  0, c, s,  0, -s, c)
+        * (gl_ModelViewMatrixInverse * vec4(v.xyz, 0.0)).xyz;
+}
+
+;
+
+STRING: sky-pixel-shader
+
+uniform sampler2D sky;
+uniform float sky_gradient, sky_theta;
+
+const vec4 SKY_COLOR_A = vec4(0.25, 0.0, 0.5,  1.0),
+           SKY_COLOR_B = vec4(0.6,  0.5, 0.75, 1.0);
+
+varying vec3 direction;
+
+void main()
+{
+    float t = texture2D(sky, normalize(direction.xyz).xy * 0.5 + vec2(0.5)).x + sky_gradient;
+    gl_FragColor = mix(SKY_COLOR_A, SKY_COLOR_B, sin(6.28*t));
+}
+
+;
+
 STRING: terrain-vertex-shader
 
 uniform sampler2D heightmap;
+uniform vec4 component_scale;
 
 varying vec2 heightcoords;
-
-const vec4 COMPONENT_SCALE = vec4(0.5, 0.01, 0.002, 0.0);
 
 float height(sampler2D map, vec2 coords)
 {
     vec4 v = texture2D(map, coords);
-    return dot(v, COMPONENT_SCALE);
+    return dot(v, component_scale);
 }
 
 void main()
@@ -27,15 +60,14 @@ void main()
 STRING: terrain-pixel-shader
 
 uniform sampler2D heightmap;
+uniform vec4 component_scale;
 
 varying vec2 heightcoords;
-
-const vec4 COMPONENT_SCALE = vec4(0.5, 0.01, 0.002, 0.0);
 
 float height(sampler2D map, vec2 coords)
 {
     vec4 v = texture2D(map, coords);
-    return dot(v, COMPONENT_SCALE);
+    return dot(v, component_scale);
 }
 
 void main()

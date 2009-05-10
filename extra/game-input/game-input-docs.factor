@@ -27,10 +27,10 @@ ARTICLE: "game-input" "Game controller input"
 { $subsection mouse-state } ;
 
 HELP: open-game-input
-{ $description "Initializes the game input interface. An exception will be thrown if the initialization fails. If the game input interface is already opened, nothing happens." } ;
+{ $description "Initializes the game input interface. An exception will be thrown if the initialization fails. Calls to open-game-input are reference counted; each call to open-game-input needs a corresponding call to close-game-input to close the game input interface." } ;
 
 HELP: close-game-input
-{ $description "Closes the game input interface, releasing any allocated resources. Once this word is called, any remaining " { $link controller } " objects are invalid. If the game input interface is not opened, nothing happens." } ;
+{ $description "Closes the game input interface, releasing any allocated resources. Once this word is called, any remaining " { $link controller } " objects are invalid." } ;
 
 HELP: game-input-opened?
 { $values { "?" "a boolean" } }

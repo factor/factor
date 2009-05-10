@@ -6,8 +6,6 @@ inline static cell callstack_size(cell size)
 	return sizeof(callstack) + size;
 }
 
-#define FIRST_STACK_FRAME(stack) (stack_frame *)((stack) + 1)
-
 typedef void (*CALLSTACK_ITER)(stack_frame *frame);
 
 stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom);

@@ -31,7 +31,7 @@ static void load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	clear_gc_stats();
 
-	zone *tenured = &data->generations[TENURED];
+	zone *tenured = &data->generations[data->tenured()];
 
 	fixnum bytes_read = fread((void*)tenured->start,1,h->data_size,file);
 
@@ -92,10 +92,10 @@ bool save_image(const vm_char *filename)
 		return false;
 	}
 
-	zone *tenured = &data->generations[TENURED];
+	zone *tenured = &data->generations[data->tenured()];
 
-	h.magic = IMAGE_MAGIC;
-	h.version = IMAGE_VERSION;
+	h.magic = image_magic;
+	h.version = image_version;
 	h.data_relocation_base = tenured->start;
 	h.data_size = tenured->here - tenured->start;
 	h.code_relocation_base = code.seg->start;
@@ -165,7 +165,7 @@ static void data_fixup(cell *cell)
 	if(immediate_p(*cell))
 		return;
 
-	zone *tenured = &data->generations[TENURED];
+	zone *tenured = &data->generations[data->tenured()];
 	*cell += (tenured->start - data_relocation_base);
 }
 
@@ -271,7 +271,7 @@ void relocate_data()
 	data_fixup(&bignum_pos_one);
 	data_fixup(&bignum_neg_one);
 
-	zone *tenured = &data->generations[TENURED];
+	zone *tenured = &data->generations[data->tenured()];
 
 	for(relocating = tenured->start;
 		relocating < tenured->here;
@@ -313,10 +313,10 @@ void load_image(vm_parameters *p)
 	if(fread(&h,sizeof(image_header),1,file) != 1)
 		fatal_error("Cannot read image header",0);
 
-	if(h.magic != IMAGE_MAGIC)
+	if(h.magic != image_magic)
 		fatal_error("Bad image: magic number check failed",h.magic);
 
-	if(h.version != IMAGE_VERSION)
+	if(h.version != image_version)
 		fatal_error("Bad image: version number check failed",h.version);
 	
 	load_data_heap(file,&h,p);
