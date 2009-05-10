@@ -274,7 +274,7 @@ HELP: fp-nan-payload
 { $description "If " { $snippet "x" } " is an IEEE Not-a-Number value, returns the payload encoded in the value. Returns " { $link f } " if " { $snippet "x" } " is not a " { $link float } "." } ;
 
 HELP: <fp-nan>
-{ $values { "payload" integer } { "float" float } }
+{ $values { "payload" integer } { "nan" float } }
 { $description "Constructs an IEEE Not-a-Number value with a payload of " { $snippet "payload" } "." }
 { $notes "A " { $snippet "payload" } " of " { $snippet "0" } " will construct an Infinity value." } ;
 
