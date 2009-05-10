@@ -49,9 +49,8 @@ HELP: unique-primes
 }
 { $description "Generates a sequence of " { $snippet "n" } " unique prime numbers with exactly " { $snippet "numbits" } " bits." } ;
 
-
 ARTICLE: "math.primes" "Prime numbers"
-"The " { $vocab-link "math.primes" } " vocabulary implements words related to prime numbers." $nl
+"The " { $vocab-link "math.primes" } " vocabulary implements words related to prime numbers. Serveral useful vocabularies exist for testing primality. The Sieve of Eratosthenes in " { $vocab-link "math.primes.erato" } " is useful for testing primality below five million. For larger integers, " { $vocab-link "math.primes.miller-rabin" } " is a fast probabilstic primality test. The " { $vocab-link "math.primes.lucas-lehmer" } " vocabulary implements an algorithm for finding huge Mersenne prime numbers." $nl
 "Testing if a number is prime:"
 { $subsection prime? }
 "Generating prime numbers:"
