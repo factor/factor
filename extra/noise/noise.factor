@@ -1,61 +1,60 @@
 USING: byte-arrays combinators fry images kernel locals math
 math.affine-transforms math.functions math.order
 math.polynomials math.vectors random random.mersenne-twister
-sequences sequences.product ;
+sequences sequences.product hints arrays sequences.private
+combinators.short-circuit math.private ;
 IN: noise
 
 : <perlin-noise-table> ( -- table )
-    256 iota >byte-array randomize dup append ;
+    256 iota >byte-array randomize dup append ; inline
 
 : with-seed ( seed quot -- )
     [ <mersenne-twister> ] dip with-random ; inline
 
 <PRIVATE
 
-: fade ( point -- point' )
-    { 0.0 0.0 0.0 10.0 -15.0 6.0 } swap [ polyval ] with map ;
+: (fade) ( x y z -- x' y' z' )
+    [ { 0.0 0.0 0.0 10.0 -15.0 6.0 } polyval* ] tri@ ;
 
-:: grad ( hash gradients -- gradient )
-    hash 8  bitand zero? [ gradients first ] [ gradients second ] if
+HINTS: (fade) { float float float } ;
+
+: fade ( point -- point' )
+    first3 (fade) 3array ; inline
+
+:: grad ( hash x y z -- gradient )
+    hash 8  bitand zero? [ x ] [ y ] if
         :> u
     hash 12 bitand zero?
-    [ gradients second ]
-    [ hash 13 bitand 12 = [ gradients first ] [ gradients third ] if ] if
+    [ y ] [ hash 13 bitand 12 = [ x ] [ z ] if ] if
         :> v
 
     hash 1 bitand zero? [ u ] [ u neg ] if
     hash 2 bitand zero? [ v ] [ v neg ] if + ;
 
+HINTS: grad { fixnum float float float } ;
+
 : unit-cube ( point -- cube )
-    [ floor >fixnum 256 mod ] map ;
+    [ floor >fixnum 256 rem ] map ;
 
-:: hashes ( table cube -- aaa baa aba bba aab bab abb bbb )
-    cube first  :> x
-    cube second :> y
-    cube third  :> z
-    x     table nth y + :> a
-    x 1 + table nth y + :> b
+:: hashes ( table x y z -- aaa baa aba bba aab bab abb bbb )
+    x               table nth-unsafe y fixnum+fast :> a
+    x 1 fixnum+fast table nth-unsafe y fixnum+fast :> b
 
-    a     table nth z + :> aa
-    b     table nth z + :> ba
-    a 1 + table nth z + :> ab
-    b 1 + table nth z + :> bb
+    a               table nth-unsafe z fixnum+fast :> aa
+    b               table nth-unsafe z fixnum+fast :> ba
+    a 1 fixnum+fast table nth-unsafe z fixnum+fast :> ab
+    b 1 fixnum+fast table nth-unsafe z fixnum+fast :> bb
 
-    aa     table nth 
-    ba     table nth 
-    ab     table nth 
-    bb     table nth 
-    aa 1 + table nth 
-    ba 1 + table nth 
-    ab 1 + table nth 
-    bb 1 + table nth ;
+    aa               table nth-unsafe 
+    ba               table nth-unsafe 
+    ab               table nth-unsafe 
+    bb               table nth-unsafe 
+    aa 1 fixnum+fast table nth-unsafe 
+    ba 1 fixnum+fast table nth-unsafe 
+    ab 1 fixnum+fast table nth-unsafe 
+    bb 1 fixnum+fast table nth-unsafe ; inline
 
-:: 2tetra@ ( p q r s t u v w quot -- )
-    p q quot call
-    r s quot call
-    t u quot call
-    v w quot call
-    ; inline
+HINTS: hashes { byte-array fixnum fixnum fixnum } ;
 
 : >byte-map ( floats -- bytes )
     [ 255.0 * >fixnum ] B{ } map-as ;
@@ -63,26 +62,33 @@ IN: noise
 : >image ( bytes dim -- image )
     swap [ L f ] dip image boa ;
 
-PRIVATE>
-
-:: perlin-noise ( table point -- value )
+:: perlin-noise-unsafe ( table point -- value )
     point unit-cube :> cube
     point dup vfloor v- :> gradients
     gradients fade :> faded
 
-    table cube hashes {
-        [ gradients                       grad ]
-        [ gradients { -1.0  0.0  0.0 } v+ grad ]
-        [ gradients {  0.0 -1.0  0.0 } v+ grad ]
-        [ gradients { -1.0 -1.0  0.0 } v+ grad ]
-        [ gradients {  0.0  0.0 -1.0 } v+ grad ]
-        [ gradients { -1.0  0.0 -1.0 } v+ grad ]
-        [ gradients {  0.0 -1.0 -1.0 } v+ grad ]
-        [ gradients { -1.0 -1.0 -1.0 } v+ grad ]
+    table cube first3 hashes {
+        [ gradients first3                                    grad ]
+        [ gradients first3 [ 1.0 - ] [       ] [       ] tri* grad ]
+        [ gradients first3 [       ] [ 1.0 - ] [       ] tri* grad ]
+        [ gradients first3 [ 1.0 - ] [ 1.0 - ] [       ] tri* grad ]
+        [ gradients first3 [       ] [       ] [ 1.0 - ] tri* grad ]
+        [ gradients first3 [ 1.0 - ] [       ] [ 1.0 - ] tri* grad ]
+        [ gradients first3 [       ] [ 1.0 - ] [ 1.0 - ] tri* grad ]
+        [ gradients first3 [ 1.0 - ] [ 1.0 - ] [ 1.0 - ] tri* grad ]
     } spread
-    [ faded first lerp ] 2tetra@
-    [ faded second lerp ] 2bi@
-    faded third lerp ;
+    faded trilerp ;
+
+ERROR: invalid-perlin-noise-table table ;
+
+: validate-table ( table -- table )
+    dup { [ byte-array? ] [ length 512 >= ] } 1&&
+    [ invalid-perlin-noise-table ] unless ;
+
+PRIVATE>
+
+: perlin-noise ( table point -- value )
+    [ validate-table ] dip perlin-noise-unsafe ; inline
 
 : normalize-0-1 ( sequence -- sequence' )
     [ supremum ] [ infimum [ - ] keep ] [ ] tri
@@ -92,7 +98,8 @@ PRIVATE>
     [ 0.0 max 1.0 min ] map ;
 
 : perlin-noise-map ( table transform dim -- map ) 
-    [ iota ] map [ a.v 0.0 suffix perlin-noise ] with with product-map ;
+    [ validate-table ] 2dip
+    [ iota ] map [ a.v 0.0 suffix perlin-noise-unsafe ] with with product-map ;
 
 : perlin-noise-byte-map ( table transform dim -- map )
     perlin-noise-map normalize-0-1 >byte-map ;
