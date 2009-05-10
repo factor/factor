@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.miller-rabin kernel math math.functions namespaces
-sequences accessors ;
+USING: math.primes.miller-rabin kernel math math.functions
+namespaces sequences accessors ;
 IN: crypto.rsa
 
 ! The private key is the only secret.

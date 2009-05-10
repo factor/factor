@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences math ;
-IN: math.miller-rabin
+IN: math.primes.miller-rabin
 
 HELP: find-relative-prime
 { $values
@@ -82,8 +82,8 @@ HELP: unique-primes
 }
 { $description "Generates a sequence of " { $snippet "n" } " unique prime numbers with exactly " { $snippet "numbits" } " bits." } ;
 
-ARTICLE: "math.miller-rabin" "Miller-Rabin probabilistic primality test"
-"The " { $vocab-link "math.miller-rabin" } " vocabulary implements the Miller-Rabin probabilistic primality test and utility words that use it in order to generate random prime numbers." $nl
+ARTICLE: "math.primes.miller-rabin" "Miller-Rabin probabilistic primality test"
+"The " { $vocab-link "math.primes.miller-rabin" } " vocabulary implements the Miller-Rabin probabilistic primality test and utility words that use it in order to generate random prime numbers." $nl
 "The Miller-Rabin probabilistic primality test:"
 { $subsection miller-rabin }
 { $subsection miller-rabin* }
@@ -97,4 +97,4 @@ ARTICLE: "math.miller-rabin" "Miller-Rabin probabilistic primality test"
 { $subsection next-safe-prime }
 { $subsection random-safe-prime } ;
 
-ABOUT: "math.miller-rabin"
+ABOUT: "math.primes.miller-rabin"
