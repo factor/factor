@@ -33,4 +33,6 @@ ERROR: unknown-primitive-error < inference-error ;
 
 ERROR: transform-expansion-error < inference-error word error ;
 
+ERROR: bad-declaration-error < inference-error declaration ;
+
 M: object (literal) "literal value" literal-expected ;

@@ -32,3 +32,7 @@ HOOK: offscreen-pixels ui-backend ( world -- alien w h )
     [ flush-gl-context gl-error ] bi ; inline
 
 HOOK: (with-ui) ui-backend ( quot -- )
+
+HOOK: (grab-input) ui-backend ( handle -- )
+
+HOOK: (ungrab-input) ui-backend ( handle -- )

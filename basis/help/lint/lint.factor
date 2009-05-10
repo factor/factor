@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs continuations fry help help.lint.checks
 help.topics io kernel namespaces parser sequences
-source-files.errors tools.vocabs vocabs words classes
+source-files.errors vocabs.hierarchy vocabs words classes
 locals tools.errors ;
 FROM: help.lint.checks => all-vocabs ;
 IN: help.lint
@@ -87,7 +87,7 @@ PRIVATE>
 
 : help-lint-all ( -- ) "" help-lint ;
 
-: :lint-failures ( -- ) lint-failures get errors. ;
+: :lint-failures ( -- ) lint-failures get values errors. ;
 
 : unlinked-words ( words -- seq )
     all-word-help [ article-parent not ] filter ;

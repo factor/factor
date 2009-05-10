@@ -3,14 +3,13 @@
 USING: alien arrays byte-arrays generic assocs hashtables assocs
 hashtables.private io io.binary io.files io.encodings.binary
 io.pathnames kernel kernel.private math namespaces make parser
-prettyprint sequences sequences.private strings sbufs
-vectors words quotations assocs system layouts splitting
-grouping growable classes classes.builtin classes.tuple
-classes.tuple.private words.private vocabs
-vocabs.loader source-files definitions debugger
-quotations.private sequences.private combinators
-math.order math.private accessors
-slots.private compiler.units fry ;
+prettyprint sequences sequences.private strings sbufs vectors words
+quotations assocs system layouts splitting grouping growable classes
+classes.builtin classes.tuple classes.tuple.private vocabs
+vocabs.loader source-files definitions debugger quotations.private
+sequences.private combinators math.order math.private accessors
+slots.private generic.single.private compiler.units compiler.constants
+fry bootstrap.image.syntax ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -53,6 +52,9 @@ GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 M: integer (eql?) = ;
 
+M: float (eql?)
+    over float? [ fp-bitwise= ] [ 2drop f ] if ;
+
 M: sequence (eql?)
     over sequence? [
         2dup [ length ] bi@ =
@@ -94,13 +96,25 @@ CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
 
-: make-jit ( quot rc rt offset -- quad )
-    [ [ call( -- ) ] { } make ] 3dip 4array ;
+SYMBOL: jit-relocations
 
-: jit-define ( quot rc rt offset name -- )
+: compute-offset ( rc -- offset )
+    [ building get length ] dip rc-absolute-cell = bootstrap-cell 4 ? - ;
+
+: jit-rel ( rc rt -- )
+    over compute-offset 3array jit-relocations get push-all ;
+
+: make-jit ( quot -- jit-data )
+    [
+        V{ } clone jit-relocations set
+        call( -- )
+        jit-relocations get >array
+    ] B{ } make prefix ;
+
+: jit-define ( quot name -- )
     [ make-jit ] dip set ;
 
-: define-sub-primitive ( quot rc rt offset word -- )
+: define-sub-primitive ( quot word -- )
     [ make-jit ] dip sub-primitives get set-at ;
 
 ! The image being constructed; a vector of word-size integers
@@ -112,72 +126,59 @@ SYMBOL: big-endian
 ! Bootstrap architecture name
 SYMBOL: architecture
 
-! Bootstrap global namesapce
-SYMBOL: bootstrap-global
+RESET
 
 ! Boot quotation, set in stage1.factor
-SYMBOL: bootstrap-boot-quot
+USERENV: bootstrap-boot-quot 20
+
+! Bootstrap global namesapce
+USERENV: bootstrap-global 21
 
 ! JIT parameters
-SYMBOL: jit-code-format
-SYMBOL: jit-prolog
-SYMBOL: jit-primitive-word
-SYMBOL: jit-primitive
-SYMBOL: jit-word-jump
-SYMBOL: jit-word-call
-SYMBOL: jit-push-immediate
-SYMBOL: jit-if-word
-SYMBOL: jit-if-1
-SYMBOL: jit-if-2
-SYMBOL: jit-dispatch-word
-SYMBOL: jit-dispatch
-SYMBOL: jit-dip-word
-SYMBOL: jit-dip
-SYMBOL: jit-2dip-word
-SYMBOL: jit-2dip
-SYMBOL: jit-3dip-word
-SYMBOL: jit-3dip
-SYMBOL: jit-epilog
-SYMBOL: jit-return
-SYMBOL: jit-profiling
-SYMBOL: jit-declare-word
-SYMBOL: jit-save-stack
+USERENV: jit-prolog 23
+USERENV: jit-primitive-word 24
+USERENV: jit-primitive 25
+USERENV: jit-word-jump 26
+USERENV: jit-word-call 27
+USERENV: jit-word-special 28
+USERENV: jit-if-word 29
+USERENV: jit-if 30
+USERENV: jit-epilog 31
+USERENV: jit-return 32
+USERENV: jit-profiling 33
+USERENV: jit-push-immediate 34
+USERENV: jit-dip-word 35
+USERENV: jit-dip 36
+USERENV: jit-2dip-word 37
+USERENV: jit-2dip 38
+USERENV: jit-3dip-word 39
+USERENV: jit-3dip 40
+USERENV: jit-execute-word 41
+USERENV: jit-execute-jump 42
+USERENV: jit-execute-call 43
+
+! PIC stubs
+USERENV: pic-load 47
+USERENV: pic-tag 48
+USERENV: pic-hi-tag 49
+USERENV: pic-tuple 50
+USERENV: pic-hi-tag-tuple 51
+USERENV: pic-check-tag 52
+USERENV: pic-check 53
+USERENV: pic-hit 54
+USERENV: pic-miss-word 55
+USERENV: pic-miss-tail-word 56
+
+! Megamorphic dispatch
+USERENV: mega-lookup 57
+USERENV: mega-lookup-word 58
+USERENV: mega-miss-word 59
 
 ! Default definition for undefined words
-SYMBOL: undefined-quot
-
-: userenvs ( -- assoc )
-    H{
-        { bootstrap-boot-quot 20 }
-        { bootstrap-global 21 }
-        { jit-code-format 22 }
-        { jit-prolog 23 }
-        { jit-primitive-word 24 }
-        { jit-primitive 25 }
-        { jit-word-jump 26 }
-        { jit-word-call 27 }
-        { jit-if-word 28 }
-        { jit-if-1 29 }
-        { jit-if-2 30 }
-        { jit-dispatch-word 31 }
-        { jit-dispatch 32 }
-        { jit-epilog 33 }
-        { jit-return 34 }
-        { jit-profiling 35 }
-        { jit-push-immediate 36 }
-        { jit-declare-word 42 }
-        { jit-save-stack 43 }
-        { jit-dip-word 44 }
-        { jit-dip 45 }
-        { jit-2dip-word 46 }
-        { jit-2dip 47 }
-        { jit-3dip-word 48 }
-        { jit-3dip 49 }
-        { undefined-quot 60 }
-    } ; inline
+USERENV: undefined-quot 60
 
 : userenv-offset ( symbol -- n )
-    userenvs at header-size + ;
+    userenvs get at header-size + ;
 
 : emit ( cell -- ) image get push ;
 
@@ -205,8 +206,8 @@ SYMBOL: undefined-quot
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
-: emit-object ( header tag quot -- addr )
-    swap here-as [ swap tag-fixnum emit call align-here ] dip ;
+: emit-object ( class quot -- addr )
+    over tag-number here-as [ swap type-number tag-fixnum emit call align-here ] dip ;
     inline
 
 ! Write an object to the image.
@@ -251,7 +252,7 @@ GENERIC: ' ( obj -- ptr )
 
 M: bignum '
     [
-        bignum tag-number dup [ emit-bignum ] emit-object
+        bignum [ emit-bignum ] emit-object
     ] cache-object ;
 
 ! Fixnums
@@ -274,7 +275,7 @@ M: fake-bignum ' n>> tag-fixnum ;
 
 M: float '
     [
-        float tag-number dup [
+        float [
             align-here double>bits emit-64
         ] emit-object
     ] cache-object ;
@@ -309,7 +310,8 @@ M: f '
                     [ vocabulary>> , ]
                     [ def>> , ]
                     [ props>> , ]
-                    [ drop f , ]
+                    [ pic-def>> , ]
+                    [ pic-tail-def>> , ]
                     [ drop 0 , ] ! count
                     [ word-sub-primitive , ]
                     [ drop 0 , ] ! xt
@@ -318,8 +320,7 @@ M: f '
                 } cleave
             ] { } make [ ' ] map
         ] bi
-        \ word type-number object tag-number
-        [ emit-seq ] emit-object
+        \ word [ emit-seq ] emit-object
     ] keep put-object ;
 
 : word-error ( word msg -- * )
@@ -340,8 +341,7 @@ M: word ' ;
 ! Wrappers
 
 M: wrapper '
-    wrapped>> ' wrapper type-number object tag-number
-    [ emit ] emit-object ;
+    wrapped>> ' wrapper [ emit ] emit-object ;
 
 ! Strings
 : native> ( object -- object )
@@ -370,7 +370,7 @@ M: wrapper '
 
 : emit-string ( string -- ptr )
     [ length ] [ extended-part ' ] [ ] tri
-    string type-number object tag-number [
+    string [
         [ emit-fixnum ]
         [ emit ]
         [ f ' emit ascii-part pad-bytes emit-bytes ]
@@ -387,12 +387,11 @@ M: string '
 
 : emit-dummy-array ( obj type -- ptr )
     [ assert-empty ] [
-        type-number object tag-number
         [ 0 emit-fixnum ] emit-object
     ] bi* ;
 
 M: byte-array '
-    byte-array type-number object tag-number [
+    byte-array [
         dup length emit-fixnum
         pad-bytes emit-bytes
     ] emit-object ;
@@ -406,7 +405,7 @@ ERROR: tuple-removed class ;
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]
     [ class transfer-word require-tuple-layout ] bi prefix [ ' ] map
-    tuple type-number dup [ emit-seq ] emit-object ;
+    tuple [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
     dup class name>> "tombstone" =
@@ -421,8 +420,7 @@ M: tombstone '
 
 ! Arrays
 : emit-array ( array -- offset )
-    [ ' ] map array type-number object tag-number
-    [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
+    [ ' ] map array [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
 
 M: array ' emit-array ;
 
@@ -448,7 +446,7 @@ M: tuple-layout-array '
 M: quotation '
     [
         array>> '
-        quotation type-number object tag-number [
+        quotation [
             emit ! array
             f ' emit ! compiled
             f ' emit ! cached-effect
@@ -472,47 +470,23 @@ M: quotation '
         class<=-cache class-not-cache classes-intersect-cache
         class-and-cache class-or-cache next-method-quot-cache
     } [ H{ } clone ] H{ } map>assoc assoc-union
-    bootstrap-global set
-    bootstrap-global emit-userenv ;
-
-: emit-boot-quot ( -- )
-    bootstrap-boot-quot emit-userenv ;
+    bootstrap-global set ;
 
 : emit-jit-data ( -- )
     \ if jit-if-word set
-    \ dispatch jit-dispatch-word set
     \ do-primitive jit-primitive-word set
-    \ declare jit-declare-word set
     \ dip jit-dip-word set
     \ 2dip jit-2dip-word set
     \ 3dip jit-3dip-word set
-    [ undefined ] undefined-quot set
-    {
-        jit-code-format
-        jit-prolog
-        jit-primitive-word
-        jit-primitive
-        jit-word-jump
-        jit-word-call
-        jit-push-immediate
-        jit-if-word
-        jit-if-1
-        jit-if-2
-        jit-dispatch-word
-        jit-dispatch
-        jit-dip-word
-        jit-dip
-        jit-2dip-word
-        jit-2dip
-        jit-3dip-word
-        jit-3dip
-        jit-epilog
-        jit-return
-        jit-profiling
-        jit-declare-word
-        jit-save-stack
-        undefined-quot
-    } [ emit-userenv ] each ;
+    \ (execute) jit-execute-word set
+    \ inline-cache-miss \ pic-miss-word set
+    \ inline-cache-miss-tail \ pic-miss-tail-word set
+    \ mega-cache-lookup \ mega-lookup-word set
+    \ mega-cache-miss \ mega-miss-word set
+    [ undefined ] undefined-quot set ;
+
+: emit-userenvs ( -- )
+    userenvs get keys [ emit-userenv ] each ;
 
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;
@@ -529,8 +503,8 @@ M: quotation '
     emit-jit-data
     "Serializing global namespace..." print flush
     emit-global
-    "Serializing boot quotation..." print flush
-    emit-boot-quot
+    "Serializing user environment..." print flush
+    emit-userenvs
     "Performing word fixups..." print flush
     fixup-words
     "Performing header fixups..." print flush
