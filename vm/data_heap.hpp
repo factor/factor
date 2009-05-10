@@ -34,20 +34,22 @@ struct data_heap {
 
 	cell *decks;
 	cell *decks_end;
+	
+	/* the 0th generation is where new objects are allocated. */
+	cell nursery() { return 0; }
+	
+	/* where objects hang around */
+	cell aging() { return gen_count - 2; }
+	
+	/* the oldest generation */
+	cell tenured() { return gen_count - 1; }
+	
+	bool have_aging_p() { return gen_count > 2; }
 };
 
 extern data_heap *data;
 
-/* the 0th generation is where new objects are allocated. */
-#define NURSERY 0
-/* where objects hang around */
-#define AGING (data->gen_count-2)
-#define HAVE_AGING_P (data->gen_count>2)
-/* the oldest generation */
-#define TENURED (data->gen_count-1)
-
-#define MIN_GEN_COUNT 1
-#define MAX_GEN_COUNT 3
+static const cell max_gen_count = 3;
 
 inline static bool in_zone(zone *z, object *pointer)
 {
