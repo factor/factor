@@ -3,7 +3,7 @@
 USING: combinators kernel locals math math.functions math.ranges
 random sequences sets combinators.short-circuit math.bitwise
 math math.order ;
-IN: math.miller-rabin
+IN: math.primes.miller-rabin
 
 : >odd ( n -- int ) 0 set-bit ; foldable
 
