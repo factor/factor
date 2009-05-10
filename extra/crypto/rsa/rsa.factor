@@ -21,7 +21,7 @@ C: <rsa> rsa
 CONSTANT: public-key 65537
 
 : rsa-primes ( numbits -- p q )
-    2/ 2 unique-primes first2 ;
+    2/ 2 swap unique-primes first2 ;
 
 : modulus-phi ( numbits -- n phi ) 
     #! Loop until phi is not divisible by the public key.
