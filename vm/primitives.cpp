@@ -147,6 +147,7 @@ const primitive_type primitives[] = {
 	primitive_load_locals,
 	primitive_check_datastack,
 	primitive_inline_cache_miss,
+	primitive_inline_cache_miss_tail,
 	primitive_mega_cache_miss,
 	primitive_lookup_method,
 	primitive_reset_dispatch_stats,

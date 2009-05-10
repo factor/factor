@@ -3,7 +3,7 @@
 USING: accessors definitions generic generic.single kernel
 namespaces words math math.order combinators sequences
 generic.single.private quotations kernel.private
-assocs arrays layouts ;
+assocs arrays layouts make ;
 IN: generic.standard
 
 TUPLE: standard-combination < single-combination # ;
@@ -38,17 +38,22 @@ M: standard-generic effective-method
     [ datastack ] dip [ "combination" word-prop #>> swap <reversed> nth ] keep
     (effective-method) ;
 
-M: standard-combination inline-cache-quot ( word methods -- )
+: inline-cache-quot ( word methods miss-word -- quot )
+    [ [ literalize , ] [ , ] [ combination get #>> , { } , , ] tri* ] [ ] make ;
+
+M: standard-combination inline-cache-quots
     #! Direct calls to the generic word (not tail calls or indirect calls)
     #! will jump to the inline cache entry point instead of the megamorphic
     #! dispatch entry point.
-    combination get #>> [ { } inline-cache-miss ] 3curry [ ] like ;
+    [ \ inline-cache-miss inline-cache-quot ]
+    [ \ inline-cache-miss-tail inline-cache-quot ]
+    2bi ;
 
 : make-empty-cache ( -- array )
     mega-cache-size get f <array> ;
 
 M: standard-combination mega-cache-quot
-    combination get #>> make-empty-cache [ mega-cache-lookup ] 3curry [ ] like ;
+    combination get #>> make-empty-cache \ mega-cache-lookup [ ] 4sequence ;
 
 M: standard-generic definer drop \ GENERIC# f ;
 

@@ -117,6 +117,7 @@ HELP: seek-relative
 }
 { $description "Seeks to an offset from the current position of the stream pointer." } ;
 
+{ seek-absolute seek-relative seek-end } related-words
 
 HELP: seek-input
 { $values
@@ -343,6 +344,10 @@ $nl
 { $subsection bl }
 "Seeking on the default output stream:"
 { $subsection seek-output }
+"Seeking descriptors:"
+{ $subsection seek-absolute }
+{ $subsection seek-relative }
+{ $subsection seek-end }
 "A pair of combinators for rebinding the " { $link output-stream } " variable:"
 { $subsection with-output-stream }
 { $subsection with-output-stream* }

@@ -39,6 +39,8 @@ SLOT: display-list
 
 GENERIC: draw-scaled-texture ( dim texture -- )
 
+DEFER: make-texture
+
 <PRIVATE
 
 TUPLE: single-texture image dim loc texture-coords texture display-list disposed ;
@@ -60,18 +62,6 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
     [ GL_TEXTURE_2D 0 0 0 ] dip
     [ dim>> first2 ] [ component-order>> component-order>format ] [ bitmap>> ] tri
     glTexSubImage2D ;
-
-: make-texture ( image -- id )
-    #! We use glTexSubImage2D to work around the power of 2 texture size
-    #! limitation
-    gen-texture [
-        GL_TEXTURE_BIT [
-            GL_TEXTURE_2D swap glBindTexture
-            non-power-of-2-textures? get
-            [ dup bitmap>> (tex-image) ]
-            [ [ f (tex-image) ] [ (tex-sub-image) ] bi ] if
-        ] do-attribs
-    ] keep ;
 
 : init-texture ( -- )
     GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_NEAREST glTexParameteri
@@ -175,6 +165,18 @@ M: multi-texture dispose* grid>> [ [ dispose ] each ] each ;
 CONSTANT: max-texture-size { 512 512 }
 
 PRIVATE>
+
+: make-texture ( image -- id )
+    #! We use glTexSubImage2D to work around the power of 2 texture size
+    #! limitation
+    gen-texture [
+        GL_TEXTURE_BIT [
+            GL_TEXTURE_2D swap glBindTexture
+            non-power-of-2-textures? get
+            [ dup bitmap>> (tex-image) ]
+            [ [ f (tex-image) ] [ (tex-sub-image) ] bi ] if
+        ] do-attribs
+    ] keep ;
 
 : <texture> ( image loc -- texture )
     over dim>> max-texture-size [ <= ] 2all?

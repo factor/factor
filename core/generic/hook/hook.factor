@@ -17,8 +17,6 @@ M: hook-combination picker
 
 M: hook-combination dispatch# drop 0 ;
 
-M: hook-combination inline-cache-quot 2drop f ;
-
 M: hook-combination mega-cache-quot
     1quotation picker [ lookup-method (execute) ] surround ;
 

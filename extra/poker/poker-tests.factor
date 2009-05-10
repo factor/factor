@@ -1,4 +1,4 @@
-USING: accessors poker poker.private tools.test math.order kernel ;
+USING: accessors kernel math.order poker poker.private tools.test ;
 IN: poker.tests
 
 [ 134236965 ] [ "KD" >ckf ] unit-test
@@ -26,3 +26,5 @@ IN: poker.tests
 
 [ t ] [ "7C 5D 4H 3S 2C" "7D 5D 4D 3C 2S" [ <hand> ] bi@ = ] unit-test
 [ f ] [ "7C 5D 4H 3S 2C" "7D 5D 4D 3C 2S" [ <hand> ] bi@ eq? ] unit-test
+
+[ 190 ] [ "AS KD JC KH 2D 2S KC" best-hand value>> ] unit-test

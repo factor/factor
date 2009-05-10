@@ -12,7 +12,7 @@ IN: mason.report
     target-cpu get
     host-name
     build-dir
-    "git-id" eval-file
+    current-git-id get
     [XML
     <h1>Build report for <->/<-></h1>
     <table>
@@ -112,8 +112,7 @@ IN: mason.report
             benchmark-error-vocabs-file
             benchmark-error-messages-file
             error-dump
-            
-            "Benchmark timings"
+
             benchmarks-file eval-file benchmarks-table
         ] output>array
     ] with-report ;
