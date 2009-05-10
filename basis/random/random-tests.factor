@@ -23,3 +23,5 @@ IN: random.tests
 
 [ f ]
 [ 100 [ { 0 1 } random ] replicate all-equal? ] unit-test
+
+[ 49 ] [ 50 random-bits* log2 ] unit-test
