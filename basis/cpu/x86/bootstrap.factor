@@ -42,12 +42,17 @@ big-endian off
 ] jit-push-immediate jit-define
 
 [
-    f JMP rc-relative rt-xt jit-rel
+    temp3 0 MOV rc-absolute-cell rt-here jit-rel
+    0 JMP rc-relative rt-xt-pic-tail jit-rel
 ] jit-word-jump jit-define
 
 [
-    f CALL rc-relative rt-xt-direct jit-rel
+    0 CALL rc-relative rt-xt-pic jit-rel
 ] jit-word-call jit-define
+
+[
+    0 JMP rc-relative rt-xt jit-rel
+] jit-word-special jit-define
 
 [
     ! load boolean
@@ -57,13 +62,10 @@ big-endian off
     ! compare boolean with f
     temp0 \ f tag-number CMP
     ! jump to true branch if not equal
-    f JNE rc-relative rt-xt jit-rel
-] jit-if-1 jit-define
-
-[
+    0 JNE rc-relative rt-xt jit-rel
     ! jump to false branch if equal
-    f JMP rc-relative rt-xt jit-rel
-] jit-if-2 jit-define
+    0 JMP rc-relative rt-xt jit-rel
+] jit-if jit-define
 
 : jit->r ( -- )
     rs-reg bootstrap-cell ADD
@@ -115,19 +117,19 @@ big-endian off
 
 [
     jit->r
-    f CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-xt jit-rel
     jit-r>
 ] jit-dip jit-define
 
 [
     jit-2>r
-    f CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-xt jit-rel
     jit-2r>
 ] jit-2dip jit-define
 
 [
     jit-3>r
-    f CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-xt jit-rel
     jit-3r>
 ] jit-3dip jit-define
 
@@ -151,6 +153,8 @@ big-endian off
 [ 0 RET ] jit-return jit-define
 
 ! ! ! Polymorphic inline caches
+
+! The PIC and megamorphic code stubs are not permitted to touch temp3.
 
 ! Load a value from a stack position
 [
@@ -194,7 +198,7 @@ big-endian off
     [
         ! Untag temp0
         temp0 tag-mask get bitnot AND
-        ! Set temp1 to 0 for objects, and 8 for tuples
+        ! Set temp1 to 0 for objects, and bootstrap-cell for tuples
         temp1 1 tag-fixnum AND
         bootstrap-cell 4 = [ temp1 1 SHR ] when
         ! Load header cell or tuple layout cell
@@ -211,7 +215,7 @@ big-endian off
     temp1 temp2 CMP
 ] pic-check jit-define
 
-[ f JE rc-relative rt-xt jit-rel ] pic-hit jit-define
+[ 0 JE rc-relative rt-xt jit-rel ] pic-hit jit-define
 
 ! ! ! Megamorphic caches
 
@@ -229,12 +233,13 @@ big-endian off
     temp0 temp2 ADD
     ! if(get(cache) == class)
     temp0 [] temp1 CMP
-    ! ... goto get(cache + bootstrap-cell)
-    [
-        temp0 temp0 bootstrap-cell [+] MOV
-        temp0 word-xt-offset [+] JMP
-    ] [ ] make
-    [ length JNE ] [ % ] bi
+    bootstrap-cell 4 = 14 22 ? JNE ! Yuck!
+    ! megamorphic_cache_hits++
+    temp1 0 MOV rc-absolute-cell rt-megamorphic-cache-hits jit-rel
+    temp1 [] 1 ADD
+    ! goto get(cache + bootstrap-cell)
+    temp0 temp0 bootstrap-cell [+] MOV
+    temp0 word-xt-offset [+] JMP
     ! fall-through on miss
 ] mega-lookup jit-define
 

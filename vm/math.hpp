@@ -5,10 +5,9 @@ extern cell bignum_zero;
 extern cell bignum_pos_one;
 extern cell bignum_neg_one;
 
-#define cell_MAX (cell)(-1)
-#define FIXNUM_MAX (((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
-#define FIXNUM_MIN (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)))
-#define ARRAY_SIZE_MAX ((cell)1 << (WORD_SIZE - TAG_BITS - 2))
+static const fixnum fixnum_max = (((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)) - 1);
+static const fixnum fixnum_min = (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)));
+static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));
 
 PRIMITIVE(fixnum_add);
 PRIMITIVE(fixnum_subtract);
@@ -45,7 +44,7 @@ PRIMITIVE(byte_array_to_bignum);
 
 inline static cell allot_integer(fixnum x)
 {
-	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
+	if(x < fixnum_min || x > fixnum_max)
 		return tag<bignum>(fixnum_to_bignum(x));
 	else
 		return tag_fixnum(x);
@@ -53,7 +52,7 @@ inline static cell allot_integer(fixnum x)
 
 inline static cell allot_cell(cell x)
 {
-	if(x > (cell)FIXNUM_MAX)
+	if(x > (cell)fixnum_max)
 		return tag<bignum>(cell_to_bignum(x));
 	else
 		return tag_fixnum(x);

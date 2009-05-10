@@ -139,14 +139,14 @@ M: hashtable set-at ( value key hash -- )
 PRIVATE>
 
 M: hashtable >alist
-    [ array>> [ length 2/ iota ] keep ] [ assoc-size <vector> ] bi [
+    [ array>> [ length 2/ ] keep ] [ assoc-size <vector> ] bi [
         [
             [
                 [ 1 fixnum-shift-fast ] dip
                 [ array-nth ] [ [ 1 fixnum+fast ] dip array-nth ] 2bi
             ] dip
             pick tombstone? [ 3drop ] [ [ 2array ] dip push-unsafe ] if
-        ] 2curry each
+        ] 2curry each-integer
     ] keep { } like ;
 
 M: hashtable clone

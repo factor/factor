@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
 cpu.x86.assembler layouts vocabs parser compiler.constants math ;
@@ -25,9 +25,6 @@ IN: bootstrap.x86
     temp0 temp0 [] MOV
     ! save stack pointer
     temp0 [] stack-reg MOV
-] jit-save-stack jit-define
-
-[
     ! load XT
     temp1 0 MOV rc-absolute-cell rt-primitive jit-rel
     ! go

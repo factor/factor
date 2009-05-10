@@ -23,8 +23,10 @@ inline static cell align(cell a, cell b)
 	return (a + (b-1)) & ~(b-1);
 }
 
-#define align8(a) align(a,8)
-#define align_page(a) align(a,getpagesize())
+inline static cell align8(cell a)
+{
+	return align(a,8);
+}
 
 #define WORD_SIZE (signed)(sizeof(cell)*8)
 
@@ -229,7 +231,9 @@ struct word : public object {
 	/* TAGGED property assoc for library code */
 	cell props;
 	/* TAGGED alternative entry point for direct non-tail calls. Used for inline caching */
-	cell direct_entry_def;
+	cell pic_def;
+	/* TAGGED alternative entry point for direct tail calls. Used for inline caching */
+	cell pic_tail_def;
 	/* TAGGED call count for profiling */
 	cell counter;
 	/* TAGGED machine code for sub-primitive */
@@ -295,17 +299,20 @@ struct dll : public object {
 	void *dll;
 };
 
-struct callstack : public object {
-	static const cell type_number = CALLSTACK_TYPE;
-	/* tagged */
-	cell length;
-};
-
 struct stack_frame
 {
 	void *xt;
 	/* Frame size in bytes */
 	cell size;
+};
+
+struct callstack : public object {
+	static const cell type_number = CALLSTACK_TYPE;
+	/* tagged */
+	cell length;
+	
+	stack_frame *top() { return (stack_frame *)(this + 1); }
+	stack_frame *bottom() { return (stack_frame *)((cell)(this + 1) + untag_fixnum(length)); }
 };
 
 struct tuple : public object {

@@ -163,7 +163,7 @@ M: hi-tag-dispatch-engine compile-engine
 
 : build-fast-hash ( methods -- buckets )
     >alist V{ } clone [ hashcode 1array ] distribute-buckets
-    [ compile-engines* >alist >array ] map ;
+    [ compile-engines* >alist { } join ] map ;
 
 M: echelon-dispatch-engine compile-engine
     dup n>> 0 = [
@@ -238,10 +238,14 @@ M: f compile-engine ;
         [ <engine> compile-engine ] bi
     ] tri ;
 
-HOOK: inline-cache-quot combination ( word methods -- quot/f )
+HOOK: inline-cache-quots combination ( word methods -- pic-quot/f pic-tail-quot/f )
+
+M: single-combination inline-cache-quots 2drop f f ;
 
 : define-inline-cache-quot ( word methods -- )
-    [ drop ] [ inline-cache-quot ] 2bi >>direct-entry-def drop ;
+    [ drop ] [ inline-cache-quots ] 2bi
+    [ >>pic-def ] [ >>pic-tail-def ] bi*
+    drop ;
 
 HOOK: mega-cache-quot combination ( methods -- quot/f )
 
