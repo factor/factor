@@ -15,6 +15,7 @@ $nl
 "Iterating over elements:"
 { $subsection dlist-each }
 { $subsection dlist-find }
+{ $subsection dlist-filter }
 { $subsection dlist-any? }
 "Deleting a node matching a predicate:"
 { $subsection delete-node-if* }
@@ -39,6 +40,11 @@ HELP: dlist-find
     $nl
     "This operation is O(n)."
 } ;
+
+HELP: dlist-filter
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "dlist" { $link dlist } } }
+{ $description "Applies the quotation to each element of the " { $link dlist } " in turn, removing the corresponding nodes if the quotation returns " { $link f } "." }
+{ $side-effects { "dlist" } } ;
 
 HELP: dlist-any?
 { $values { "dlist" { $link dlist } } { "quot" quotation } { "?" "a boolean" } }

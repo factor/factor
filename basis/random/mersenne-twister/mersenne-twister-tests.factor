@@ -11,7 +11,7 @@ IN: random.mersenne-twister.tests
     100 [ 100 random ] replicate ;
 
 : test-rng ( seed quot -- )
-    [  <mersenne-twister> ] dip with-random ; inline
+    [ <mersenne-twister> ] dip with-random ; inline
 
 [ f ] [ 1234 [ randoms randoms = ] test-rng ] unit-test
 

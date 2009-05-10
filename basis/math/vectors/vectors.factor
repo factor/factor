@@ -41,6 +41,17 @@ IN: math.vectors
 : set-axis ( u v axis -- w )
     [ [ zero? 2over ? ] dip swap nth ] map-index 2nip ;
 
+: 2tetra@ ( p q r s t u v w quot -- )
+    dup [ [ 2bi@ ] curry 4dip ] dip 2bi@ ; inline
+
+: trilerp ( aaa baa aba bba aab bab abb bbb {t,u,v} -- a_tuv )
+    [ first lerp ] [ second lerp ] [ third lerp ] tri-curry
+    [ 2tetra@ ] [ 2bi@ ] [ call ] tri* ;
+
+: bilerp ( aa ba ab bb {t,u} -- a_tu )
+    [ first lerp ] [ second lerp ] bi-curry
+    [ 2bi@ ] [ call ] bi* ;
+
 : vlerp ( a b t -- a_t )
     [ lerp ] 3map ;
 
@@ -68,3 +79,6 @@ HINTS: v. { array array } ;
 
 HINTS: vlerp { array array array } ;
 HINTS: vnlerp { array array object } ;
+
+HINTS: bilerp { object object object object array } ;
+HINTS: trilerp { object object object object object object object object array } ;
