@@ -12,7 +12,7 @@ SLOT: i
     [ i>> ] [ underlying>> ] bi ; inline
 
 : next ( stream -- )
-    [ 1+ ] change-i drop ; inline
+    [ 1 + ] change-i drop ; inline
 
 : sequence-read1 ( stream -- elt/f )
     [ >sequence-stream< ?nth ] [ next ] bi ; inline

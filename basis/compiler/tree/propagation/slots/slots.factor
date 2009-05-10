@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry assocs arrays byte-arrays strings accessors sequences
 kernel slots classes.algebra classes.tuple classes.tuple.private
@@ -7,9 +7,6 @@ slots.private classes compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.slots
 
 ! Propagation of immutable slots and array lengths
-
-! Revisit this code when delegation is removed and when complex
-! numbers become tuples.
 
 UNION: fixed-length-sequence array byte-array string ;
 
@@ -29,33 +26,26 @@ UNION: fixed-length-sequence array byte-array string ;
     [ constructor-output-class <class-info> ]
     bi* value-info-intersect 1array ;
 
-: tuple-constructor? ( word -- ? )
-    { <tuple-boa> <complex> } memq? ;
-
 : fold-<tuple-boa> ( values class -- info )
     [ [ literal>> ] map ] dip prefix >tuple
     <literal-info> ;
 
+: read-only-slots ( values class -- slots )
+    all-slots
+    [ read-only>> [ value-info ] [ drop f ] if ] 2map
+    f prefix ;
+
 : (propagate-tuple-constructor) ( values class -- info )
-    [ [ value-info ] map ] dip [ read-only-slots ] keep
+    [ read-only-slots ] keep
     over rest-slice [ dup [ literal?>> ] when ] all? [
         [ rest-slice ] dip fold-<tuple-boa>
     ] [
         <tuple-info>
     ] if ;
 
-: propagate-<tuple-boa> ( #call -- info )
+: propagate-<tuple-boa> ( #call -- infos )
     in-d>> unclip-last
-    value-info literal>> first (propagate-tuple-constructor) ;
-
-: propagate-<complex> ( #call -- info )
-    in-d>> [ value-info ] map complex <tuple-info> ;
-
-: propagate-tuple-constructor ( #call word -- infos )
-    {
-        { \ <tuple-boa> [ propagate-<tuple-boa> ] }
-        { \ <complex> [ propagate-<complex> ] }
-    } case 1array ;
+    value-info literal>> first (propagate-tuple-constructor) 1array ;
 
 : read-only-slot? ( n class -- ? )
     all-slots [ offset>> = ] with find nip

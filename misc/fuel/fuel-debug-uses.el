@@ -88,9 +88,16 @@
         fuel-debug--uses nil
         fuel-debug--uses-restarts nil))
 
+(defun fuel-debug--current-usings (file)
+  (with-current-buffer (find-file-noselect file)
+    (sort (fuel-syntax--find-usings t) 'string<)))
+
 (defun fuel-debug--uses-for-file (file)
   (let* ((lines (fuel-debug--file-lines file))
-         (cmd `(:fuel ((V{ ,@lines } fuel-get-uses)) t t)))
+         (old-usings (fuel-debug--current-usings file))
+         (cmd `(:fuel ((V{ ,@old-usings }
+                           [ V{ ,@lines } fuel-get-uses ]
+                           fuel-use-suggested-vocabs)) t t)))
     (fuel-debug--uses-prepare file)
     (fuel--with-popup (fuel-debug--uses-buffer)
       (insert "Asking Factor. Please, wait ...\n")
@@ -105,8 +112,7 @@
 
 (defun fuel-debug--uses-display (uses)
   (let* ((inhibit-read-only t)
-         (old (with-current-buffer (find-file-noselect fuel-debug--uses-file)
-                (sort (fuel-syntax--find-usings t) 'string<)))
+         (old (fuel-debug--current-usings fuel-debug--uses-file))
          (new (sort uses 'string<)))
     (erase-buffer)
     (fuel-debug--uses-insert-title)

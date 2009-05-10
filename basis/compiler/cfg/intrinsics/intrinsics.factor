@@ -52,8 +52,6 @@ IN: compiler.cfg.intrinsics
     arrays:<array>
     byte-arrays:<byte-array>
     byte-arrays:(byte-array)
-    math.private:<complex>
-    math.private:<ratio>
     kernel:<wrapper>
     alien.accessors:alien-unsigned-1
     alien.accessors:set-alien-unsigned-1
@@ -140,8 +138,6 @@ IN: compiler.cfg.intrinsics
         { \ arrays:<array> [ emit-<array> iterate-next ] }
         { \ byte-arrays:<byte-array> [ emit-<byte-array> iterate-next ] }
         { \ byte-arrays:(byte-array) [ emit-(byte-array) iterate-next ] }
-        { \ math.private:<complex> [ emit-simple-allot iterate-next ] }
-        { \ math.private:<ratio> [ emit-simple-allot iterate-next ] }
         { \ kernel:<wrapper> [ emit-simple-allot iterate-next ] }
         { \ alien.accessors:alien-unsigned-1 [ 1 emit-alien-unsigned-getter iterate-next ] }
         { \ alien.accessors:set-alien-unsigned-1 [ 1 emit-alien-integer-setter iterate-next ] }

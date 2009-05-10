@@ -2,4 +2,4 @@ BOOT_ARCH = x86
 PLAF_DLL_OBJS += vm/cpu-x86.32.o
 
 # gcc bug workaround
-CFLAGS += -fno-builtin-strlen -fno-builtin-strcat -mtune=pentium4
+CFLAGS += -fno-builtin-strlen -fno-builtin-strcat

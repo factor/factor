@@ -588,3 +588,16 @@ FUNCTION: complex-float ffi_test_47 ( complex-float x, complex-double y ) ;
     C{ 1.0 2.0 }
     C{ 1.5 1.0 } ffi_test_47
 ] unit-test
+
+! Reported by jedahu
+C-STRUCT: bool-field-test
+   { "char*" "name" }
+   { "bool"  "on" }
+   { "short" "parents" } ;
+
+FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
+
+[ 123 ] [
+    "bool-field-test" <c-object> 123 over set-bool-field-test-parents
+    ffi_test_48
+] unit-test

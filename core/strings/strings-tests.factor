@@ -58,7 +58,7 @@ unit-test
 [ "\u001234bc\0\0\0" ] [ 6 "\u001234bc" resize-string ] unit-test
 
 ! Random tester found this
-[ 2 -7 resize-string ] [ { "kernel-error" 3 12 -7 } = ] must-fail-with
+[ 2 -7 resize-string ] [ { "kernel-error" 3 11 -7 } = ] must-fail-with
 
 ! Make sure 24-bit strings work
 "hello world" "s" set

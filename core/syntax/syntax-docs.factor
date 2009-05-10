@@ -1,7 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes generic.standard classes.tuple generic.math
-generic.standard arrays io.pathnames vocabs.loader io sequences
-assocs words.symbol words.alias words.constant combinators ;
+generic.standard generic.single arrays io.pathnames vocabs.loader io
+sequences assocs words.symbol words.alias words.constant combinators ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -749,7 +749,7 @@ HELP: <PRIVATE
         "<PRIVATE"
         ""
         ": (fac) ( accum n -- n! )"
-        "    dup 1 <= [ drop ] [ [ * ] keep 1- (fac) ] if ;"
+        "    dup 1 <= [ drop ] [ [ * ] keep 1 - (fac) ] if ;"
         ""
         "PRIVATE>"
         ""
@@ -760,7 +760,7 @@ HELP: <PRIVATE
         "IN: factorial.private"
         ""
         ": (fac) ( accum n -- n! )"
-        "    dup 1 <= [ drop ] [ [ * ] keep 1- (fac) ] if ;"
+        "    dup 1 <= [ drop ] [ [ * ] keep 1 - (fac) ] if ;"
         ""
         "IN: factorial"
         ""

@@ -1,4 +1,4 @@
-USING: kernel help.markup help.syntax sequences quotations ;
+USING: kernel help.markup help.syntax sequences quotations assocs ;
 IN: sets
 
 ARTICLE: "sets" "Set-theoretic operations on sequences"
@@ -42,7 +42,7 @@ HELP: adjoin
 { $side-effects "seq" } ;
 
 HELP: conjoin
-{ $values { "elt" object } { "assoc" "an assoc" } }
+{ $values { "elt" object } { "assoc" assoc } }
 { $description "Stores a key/value pair, both equal to " { $snippet "elt" } ", into the assoc." }
 { $examples
     { $example
@@ -54,7 +54,7 @@ HELP: conjoin
 { $side-effects "assoc" } ;
 
 HELP: unique
-{ $values { "seq" "a sequence" } { "assoc" "an assoc" } }
+{ $values { "seq" "a sequence" } { "assoc" assoc } }
 { $description "Outputs a new assoc where the keys and values are equal." }
 { $examples
     { $example "USING: sets prettyprint ;" "{ 1 1 2 2 3 3 } unique ." "H{ { 1 1 } { 2 2 } { 3 3 } }" }

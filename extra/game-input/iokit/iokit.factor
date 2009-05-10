@@ -1,12 +1,14 @@
 USING: cocoa cocoa.plists core-foundation iokit iokit.hid
 kernel cocoa.enumeration destructors math.parser cocoa.application 
 sequences locals combinators.short-circuit threads
-namespaces assocs vectors arrays combinators
+namespaces assocs vectors arrays combinators hints alien
 core-foundation.run-loop accessors sequences.private
-alien.c-types math parser game-input ;
+alien.c-types math parser game-input vectors ;
 IN: game-input.iokit
 
 SINGLETON: iokit-game-input-backend
+
+SYMBOLS: +hid-manager+ +keyboard-state+ +mouse-state+ +controller-states+ ;
 
 iokit-game-input-backend game-input-backend set-global
 
@@ -23,9 +25,12 @@ iokit-game-input-backend game-input-backend set-global
 
 CONSTANT: game-devices-matching-seq
     {
+        H{ { "DeviceUsage" 2 } { "DeviceUsagePage" 1 } } ! mouses
         H{ { "DeviceUsage" 4 } { "DeviceUsagePage" 1 } } ! joysticks
         H{ { "DeviceUsage" 5 } { "DeviceUsagePage" 1 } } ! gamepads
         H{ { "DeviceUsage" 6 } { "DeviceUsagePage" 1 } } ! keyboards
+        H{ { "DeviceUsage" 7 } { "DeviceUsagePage" 1 } } ! keypads
+        H{ { "DeviceUsage" 8 } { "DeviceUsagePage" 1 } } ! multiaxis controllers
     }
 
 CONSTANT: buttons-matching-hash
@@ -46,6 +51,8 @@ CONSTANT: rz-axis-matching-hash
     H{ { "UsagePage" 1 } { "Usage" HEX: 35 } { "Type" 1 } }
 CONSTANT: slider-matching-hash
     H{ { "UsagePage" 1 } { "Usage" HEX: 36 } { "Type" 1 } }
+CONSTANT: wheel-matching-hash
+    H{ { "UsagePage" 1 } { "Usage" HEX: 38 } { "Type" 1 } }
 CONSTANT: hat-switch-matching-hash
     H{ { "UsagePage" 1 } { "Usage" HEX: 39 } { "Type" 1 } }
 
@@ -82,44 +89,54 @@ CONSTANT: hat-switch-matching-hash
     game-devices-matching-seq hid-manager-matching ;
 
 : device-property ( device key -- value )
-    <NSString> IOHIDDeviceGetProperty plist> ;
+    <NSString> IOHIDDeviceGetProperty [ plist> ] [ f ] if* ;
 : element-property ( element key -- value )
-    <NSString> IOHIDElementGetProperty plist> ;
+    <NSString> IOHIDElementGetProperty [ plist> ] [ f ] if* ;
 : set-element-property ( element key value -- )
     [ <NSString> ] [ >plist ] bi* IOHIDElementSetProperty drop ;
 : transfer-element-property ( element from-key to-key -- )
-    [ dupd element-property ] dip swap set-element-property ;
+    [ dupd element-property ] dip swap
+    [ set-element-property ] [ 2drop ] if* ;
+
+: mouse-device? ( device -- ? )
+    1 2 IOHIDDeviceConformsTo ;
 
 : controller-device? ( device -- ? )
     {
         [ 1 4 IOHIDDeviceConformsTo ]
         [ 1 5 IOHIDDeviceConformsTo ]
+        [ 1 8 IOHIDDeviceConformsTo ]
     } 1|| ;
 
 : element-usage ( element -- {usage-page,usage} )
     [ IOHIDElementGetUsagePage ] [ IOHIDElementGetUsage ] bi
     2array ;
 
-: button? ( {usage-page,usage} -- ? )
-    first 9 = ; inline
-: keyboard-key? ( {usage-page,usage} -- ? )
-    first 7 = ; inline
+: button? ( element -- ? )
+    IOHIDElementGetUsagePage 9 = ; inline
+: keyboard-key? ( element -- ? )
+    IOHIDElementGetUsagePage 7 = ; inline
+: axis? ( element -- ? )
+    IOHIDElementGetUsagePage 1 = ; inline
+
 : x-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 30 } = ; inline
+    IOHIDElementGetUsage HEX: 30 = ; inline
 : y-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 31 } = ; inline
+    IOHIDElementGetUsage HEX: 31 = ; inline
 : z-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 32 } = ; inline
+    IOHIDElementGetUsage HEX: 32 = ; inline
 : rx-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 33 } = ; inline
+    IOHIDElementGetUsage HEX: 33 = ; inline
 : ry-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 34 } = ; inline
+    IOHIDElementGetUsage HEX: 34 = ; inline
 : rz-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 35 } = ; inline
+    IOHIDElementGetUsage HEX: 35 = ; inline
 : slider? ( {usage-page,usage} -- ? )
-    { 1 HEX: 36 } = ; inline
+    IOHIDElementGetUsage HEX: 36 = ; inline
+: wheel? ( {usage-page,usage} -- ? )
+    IOHIDElementGetUsage HEX: 38 = ; inline
 : hat-switch? ( {usage-page,usage} -- ? )
-    { 1 HEX: 39 } = ; inline
+    IOHIDElementGetUsage HEX: 39 = ; inline
 
 CONSTANT: pov-values
     {
@@ -132,34 +149,70 @@ CONSTANT: pov-values
     IOHIDValueGetIntegerValue dup zero? [ drop f ] when ;
 : axis-value ( value -- [-1,1] )
     kIOHIDValueScaleTypeCalibrated IOHIDValueGetScaledValue ;
+: mouse-axis-value ( value -- n )
+    IOHIDValueGetIntegerValue ;
 : pov-value ( value -- pov-direction )
     IOHIDValueGetIntegerValue pov-values ?nth [ pov-neutral ] unless* ;
 
+: record-button ( state hid-value element -- )
+    [ buttons>> ] [ button-value ] [ IOHIDElementGetUsage 1- ] tri* rot set-nth ;
+
 : record-controller ( controller-state value -- )
-    dup IOHIDValueGetElement element-usage {
-        { [ dup button? ] [ [ button-value ] [ second 1- ] bi* rot buttons>> set-nth ] } 
-        { [ dup x-axis? ] [ drop axis-value >>x drop ] }
-        { [ dup y-axis? ] [ drop axis-value >>y drop ] }
-        { [ dup z-axis? ] [ drop axis-value >>z drop ] }
-        { [ dup rx-axis? ] [ drop axis-value >>rx drop ] }
-        { [ dup ry-axis? ] [ drop axis-value >>ry drop ] }
-        { [ dup rz-axis? ] [ drop axis-value >>rz drop ] }
-        { [ dup slider? ] [ drop axis-value >>slider drop ] }
-        { [ dup hat-switch? ] [ drop pov-value >>pov drop ] }
+    dup IOHIDValueGetElement {
+        { [ dup button? ] [ record-button ] } 
+        { [ dup axis? ] [ {
+            { [ dup x-axis? ] [ drop axis-value >>x drop ] }
+            { [ dup y-axis? ] [ drop axis-value >>y drop ] }
+            { [ dup z-axis? ] [ drop axis-value >>z drop ] }
+            { [ dup rx-axis? ] [ drop axis-value >>rx drop ] }
+            { [ dup ry-axis? ] [ drop axis-value >>ry drop ] }
+            { [ dup rz-axis? ] [ drop axis-value >>rz drop ] }
+            { [ dup slider? ] [ drop axis-value >>slider drop ] }
+            { [ dup hat-switch? ] [ drop pov-value >>pov drop ] }
+            [ 3drop ]
+        } cond ] }
         [ 3drop ]
     } cond ;
 
-SYMBOLS: +hid-manager+ +keyboard-state+ +controller-states+ ;
+HINTS: record-controller { controller-state alien } ;
 
 : ?set-nth ( value nth seq -- )
     2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ;
 
-: record-keyboard ( value -- )
-    dup IOHIDValueGetElement element-usage keyboard-key? [
+: record-keyboard ( keyboard-state value -- )
+    dup IOHIDValueGetElement dup keyboard-key? [
         [ IOHIDValueGetIntegerValue c-bool> ]
-        [ IOHIDValueGetElement IOHIDElementGetUsage ] bi
-        +keyboard-state+ get ?set-nth
-    ] [ drop ] if ;
+        [ IOHIDElementGetUsage ] bi*
+        rot ?set-nth
+    ] [ 3drop ] if ;
+
+HINTS: record-keyboard { array alien } ;
+
+: record-mouse ( mouse-state value -- )
+    dup IOHIDValueGetElement {
+        { [ dup button? ] [ record-button ] }
+        { [ dup axis? ] [ {
+            { [ dup x-axis? ] [ drop mouse-axis-value [ + ] curry change-dx drop ] }
+            { [ dup y-axis? ] [ drop mouse-axis-value [ + ] curry change-dy drop ] }
+            { [ dup wheel?  ] [ drop mouse-axis-value [ + ] curry change-scroll-dx drop ] }
+            { [ dup z-axis? ] [ drop mouse-axis-value [ + ] curry change-scroll-dy drop ] }
+            [ 3drop ]
+        } cond ] }
+        [ 3drop ]
+    } cond ;
+
+HINTS: record-mouse { mouse-state alien } ;
+
+M: iokit-game-input-backend read-mouse
+    +mouse-state+ get ;
+
+M: iokit-game-input-backend reset-mouse
+    +mouse-state+ get
+        0 >>dx
+        0 >>dy
+        0 >>scroll-dx 
+        0 >>scroll-dy
+        drop ;
 
 : default-calibrate-saturation ( element -- )
     [ kIOHIDElementMinKey kIOHIDElementCalibrationSaturationMinKey transfer-element-property ]
@@ -194,12 +247,21 @@ SYMBOLS: +hid-manager+ +keyboard-state+ +controller-states+ ;
         [ button-count f <array> ]
     } cleave controller-state boa ;
 
+: ?add-mouse-buttons ( device -- )
+    button-count +mouse-state+ get buttons>> 
+    2dup length >
+    [ set-length ] [ 2drop ] if ;
+
 : device-matched-callback ( -- alien )
     [| context result sender device |
-        device controller-device? [
-            device <device-controller-state>
-            device +controller-states+ get set-at
-        ] when
+        {
+            { [ device controller-device? ] [
+                device <device-controller-state>
+                device +controller-states+ get set-at
+            ] }
+            { [ device mouse-device? ] [ device ?add-mouse-buttons ] }
+            [ ]
+        } cond
     ] IOHIDDeviceCallback ;
 
 : device-removed-callback ( -- alien )
@@ -209,15 +271,20 @@ SYMBOLS: +hid-manager+ +keyboard-state+ +controller-states+ ;
 
 : device-input-callback ( -- alien )
     [| context result sender value |
-        sender controller-device?
-        [ sender +controller-states+ get at value record-controller ]
-        [ value record-keyboard ]
-        if
+        {
+            { [ sender controller-device? ] [
+                sender +controller-states+ get at value record-controller
+            ] }
+            { [ sender mouse-device? ] [ +mouse-state+ get value record-mouse ] }
+            [ +keyboard-state+ get value record-keyboard ]
+        } cond
     ] IOHIDValueCallback ;
 
 : initialize-variables ( manager -- )
     +hid-manager+ set-global
     4 <vector> +controller-states+ set-global
+    0 0 0 0 2 <vector> mouse-state boa
+        +mouse-state+ set-global
     256 f <array> +keyboard-state+ set-global ;
 
 M: iokit-game-input-backend (open-game-input)
@@ -234,12 +301,12 @@ M: iokit-game-input-backend (open-game-input)
     } cleave ;
 
 M: iokit-game-input-backend (reset-game-input)
-    { +hid-manager+ +keyboard-state+ +controller-states+ }
+    { +hid-manager+ +keyboard-state+ +mouse-state+ +controller-states+ }
     [ f swap set-global ] each ;
 
 M: iokit-game-input-backend (close-game-input)
     +hid-manager+ get-global [
-        +hid-manager+ global [ 
+        +hid-manager+ [ 
             [
                 CFRunLoopGetMain CFRunLoopDefaultMode
                 IOHIDManagerUnscheduleFromRunLoop
@@ -247,8 +314,9 @@ M: iokit-game-input-backend (close-game-input)
             [ 0 IOHIDManagerClose drop ]
             [ CFRelease ] tri
             f
-        ] change-at
+        ] change-global
         f +keyboard-state+ set-global
+        f +mouse-state+ set-global
         f +controller-states+ set-global
     ] when ;
 

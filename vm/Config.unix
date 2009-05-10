@@ -18,6 +18,7 @@ else
 endif
 
 # CFLAGS += -fPIC
+FFI_TEST_CFLAGS = -fPIC
 
 # LINKER = gcc -shared -o
 # LINK_WITH_ENGINE = '-Wl,-rpath,$$ORIGIN' -lfactor

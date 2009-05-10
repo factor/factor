@@ -23,3 +23,10 @@ TUPLE-ARRAY: baz
 
 [ 0 ] [ 1 <baz-array> first bing>> ] unit-test
 [ f ] [ 1 <baz-array> first bong>> ] unit-test
+
+TUPLE: broken x ;
+: broken ( -- ) ;
+
+TUPLE-ARRAY: broken
+
+[ 100 ] [ 100 <broken-array> length ] unit-test

@@ -61,20 +61,16 @@ IN: kernel.tests
 [ 2 ] [ f 2 xor ] unit-test
 [ f ] [ f f xor ] unit-test
 
-[ slip ] must-fail
+[ dip ] must-fail
 [ ] [ :c ] unit-test
 
-[ 1 slip ] must-fail
+[ 1 [ call ] dip ] must-fail
 [ ] [ :c ] unit-test
 
-[ 1 2 slip ] must-fail
+[ 1 2 [ call ] dip ] must-fail
 [ ] [ :c ] unit-test
 
-[ 1 2 3 slip ] must-fail
-[ ] [ :c ] unit-test
-
-
-[ 5 ] [ [ 2 2 + ] 1 slip + ] unit-test
+[ 5 ] [ 1 [ 2 2 + ] dip + ] unit-test
 
 [ [ ] keep ] must-fail
 
@@ -114,7 +110,7 @@ IN: kernel.tests
 ! Regression
 : (loop) ( a b c d -- )
     [ pick ] dip swap [ pick ] dip swap
-    < [ [ 1+ ] 3dip (loop) ] [ 2drop 2drop ] if ; inline recursive
+    < [ [ 1 + ] 3dip (loop) ] [ 2drop 2drop ] if ; inline recursive
 
 : loop ( obj -- )
     H{ } values swap [ dup length swap ] dip 0 -roll (loop) ;

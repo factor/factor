@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel arrays sequences math namespaces
-strings io fry vectors words assocs combinators sorting
-unicode.case unicode.categories math.order vocabs
-tools.vocabs unicode.data locals ;
+USING: accessors kernel arrays sequences math namespaces strings io
+fry vectors words assocs combinators sorting unicode.case
+unicode.categories math.order vocabs vocabs.hierarchy unicode.data
+locals ;
 IN: tools.completion
 
 :: (fuzzy) ( accum i full ch -- accum i full ? )
