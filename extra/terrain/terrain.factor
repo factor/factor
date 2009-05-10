@@ -138,8 +138,11 @@ M: terrain-world tick-length
 : apply-gravity ( velocity -- velocity' )
     1 over [ GRAVITY - ] change-nth ;
 
+: clamp-coords ( coords dim -- coords' )
+    [ { 0 0 } vmax ] dip { 2 2 } v- vmin ;
+
 :: pixel-indices ( coords dim -- indices )
-    coords vfloor [ >integer ] map :> floor-coords
+    coords vfloor [ >integer ] map dim clamp-coords :> floor-coords
     floor-coords first2 dim first * + :> base-index
     base-index dim first + :> next-row-index
 
