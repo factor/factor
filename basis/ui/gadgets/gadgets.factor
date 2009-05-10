@@ -3,8 +3,7 @@
 USING: accessors arrays hashtables kernel models math namespaces
 make sequences quotations math.vectors combinators sorting
 binary-search vectors dlists deques models threads
-concurrency.flags math.order math.rectangles fry locals
-prettyprint.backend prettyprint.custom ;
+concurrency.flags math.order math.rectangles fry locals ;
 IN: ui.gadgets
 
 ! Values for orientation slot
@@ -27,9 +26,6 @@ graft-node
 interior
 boundary
 model ;
-
-! Don't print gadgets with RECT: syntax
-M: gadget pprint* pprint-tuple ;
 
 M: gadget equal? 2drop f ;
 
@@ -397,3 +393,7 @@ M: f request-focus-on 2drop ;
 
 : focus-path ( gadget -- seq )
     [ focus>> ] follow ;
+
+USING: vocabs vocabs.loader ;
+
+"prettyprint" vocab [ "ui.gadgets.prettyprint" require ] when
