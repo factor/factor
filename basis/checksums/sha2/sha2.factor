@@ -8,13 +8,9 @@ IN: checksums.sha2
 
 SINGLETON: sha-224
 SINGLETON: sha-256
-SINGLETON: sha-384
-SINGLETON: sha-512
 
 INSTANCE: sha-224 checksum
 INSTANCE: sha-256 checksum
-INSTANCE: sha-384 checksum
-INSTANCE: sha-512 checksum
 
 TUPLE: sha2-state K H word-size block-size ;
 
@@ -25,10 +21,6 @@ TUPLE: sha2-long < sha2-state ;
 TUPLE: sha-224-state < sha2-short ;
 
 TUPLE: sha-256-state < sha2-short ;
-
-TUPLE: sha-384-state < sha2-long ;
-
-TUPLE: sha-512-state < sha2-long ;
 
 <PRIVATE
 
@@ -152,12 +144,49 @@ ALIAS: K-512 K-384
         [ -25 bitroll-32 ] tri
     ] [ bitxor ] reduce-outputs ; inline
 
+: s0-512 ( x -- x' )
+    [
+        [ -1 bitroll-64 ]
+        [ -8 bitroll-64 ]
+        [ -7 shift ] tri
+    ] [ bitxor ] reduce-outputs ; inline
+
+: s1-512 ( x -- x' )
+    [
+        [ -19 bitroll-64 ]
+        [ -61 bitroll-64 ]
+        [ -6 shift ] tri
+    ] [ bitxor ] reduce-outputs ; inline
+
+: S0-512 ( x -- x' )
+    [
+        [ -28 bitroll-64 ]
+        [ -34 bitroll-64 ]
+        [ -39 bitroll-64 ] tri
+    ] [ bitxor ] reduce-outputs ; inline
+
+: S1-512 ( x -- x' )
+    [
+        [ -14 bitroll-64 ]
+        [ -18 bitroll-64 ]
+        [ -41 bitroll-64 ] tri
+    ] [ bitxor ] reduce-outputs ; inline
+
 : process-M-256 ( n seq -- )
     {
         [ [ 16 - ] dip nth ]
         [ [ 15 - ] dip nth s0-256 ]
         [ [ 7 - ] dip nth ]
         [ [ 2 - ] dip nth s1-256 w+ w+ w+ ]
+        [ ]
+    } 2cleave set-nth ; inline
+
+: process-M-512 ( n seq -- )
+    {
+        [ [ 16 - ] dip nth ]
+        [ [ 15 - ] dip nth s0-512 ]
+        [ [ 7 - ] dip nth ]
+        [ [ 2 - ] dip nth s1-512 w+ w+ w+ ]
         [ ]
     } 2cleave set-nth ; inline
 
@@ -186,21 +215,32 @@ M: sha2-long pad-initial-bytes ( string sha2 -- padded-string )
         HEX: 80 ,
         length
         [ 128 mod calculate-pad-length-long 0 <string> % ]
-        [ 3 shift 16 >be % ] bi
+        [ 3 shift 8 >be % ] bi
     ] "" make append ;
 
 : seq>byte-array ( seq n -- string )
     '[ _ >be ] map B{ } join ;
 
-:: T1 ( n M H sha2 -- T1 )
+:: T1-256 ( n M H sha2 -- T1 )
     n M nth
     n sha2 K>> nth +
     e H slice3 ch w+
     e H nth S1-256 w+
     h H nth w+ ; inline
 
-: T2 ( H -- T2 )
+: T2-256 ( H -- T2 )
     [ a swap nth S0-256 ]
+    [ a swap slice3 maj w+ ] bi ; inline
+
+:: T1-512 ( n M H sha2 -- T1 )
+    n M nth
+    n sha2 K>> nth +
+    e H slice3 ch w+
+    e H nth S1-512 w+
+    h H nth w+ ; inline
+
+: T2-512 ( H -- T2 )
+    [ a swap nth S0-512 ]
     [ a swap slice3 maj w+ ] bi ; inline
 
 : update-H ( T1 T2 H -- )
@@ -222,8 +262,8 @@ M: sha2-long pad-initial-bytes ( string sha2 -- padded-string )
 
 :: process-chunk ( M block-size cloned-H sha2 -- )
     block-size [
-        M cloned-H sha2 T1
-        cloned-H T2
+        M cloned-H sha2 T1-256
+        cloned-H T2-256
         cloned-H update-H
     ] each
     cloned-H sha2 H>> [ w+ ] 2map sha2 (>>H) ; inline
@@ -253,20 +293,6 @@ M: sha2-long pad-initial-bytes ( string sha2 -- padded-string )
         4 >>word-size
         64 >>block-size ;
 
-: <sha-384-state> ( -- sha2-state )
-    sha-384-state new
-        K-384 >>K
-        initial-H-384 >>H
-        8 >>word-size
-        80 >>block-size ;
-
-: <sha-512-state> ( -- sha2-state )
-    sha-512-state new
-        K-512 >>K
-        initial-H-512 >>H
-        8 >>word-size
-        80 >>block-size ;
-
 PRIVATE>
 
 M: sha-224 checksum-bytes
@@ -278,13 +304,3 @@ M: sha-256 checksum-bytes
     drop <sha-256-state>
     [ byte-array>sha2 ]
     [ H>> 4 seq>byte-array ] bi ;
-
-M: sha-384 checksum-bytes
-    drop <sha-384-state>
-    [ byte-array>sha2 ]
-    [ H>> 6 head 8 seq>byte-array ] bi ;
-
-M: sha-512 checksum-bytes
-    drop <sha-512-state>
-    [ byte-array>sha2 ]
-    [ H>> 8 seq>byte-array ] bi ;
