@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
 cpu.x86.assembler layouts vocabs parser compiler.constants ;
@@ -26,10 +26,8 @@ IN: bootstrap.x86
     temp0 0 [] MOV rc-absolute-cell rt-stack-chain jit-rel
     ! save stack pointer
     temp0 [] stack-reg MOV
-] jit-save-stack jit-define
-
-[
-    (JMP) drop rc-relative rt-primitive jit-rel
+    ! call the primitive
+    0 JMP rc-relative rt-primitive jit-rel
 ] jit-primitive jit-define
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file parsed >>

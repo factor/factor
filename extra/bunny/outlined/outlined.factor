@@ -120,7 +120,7 @@ TUPLE: bunny-outlined
 
 : outlining-supported? ( -- ? )
     "2.0" {
-        "GL_ARB_shading_objects"
+        "GL_ARB_shader_objects"
         "GL_ARB_draw_buffers"
         "GL_ARB_multitexture"
     } has-gl-version-or-extensions? {

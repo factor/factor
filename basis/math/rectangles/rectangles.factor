@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays sequences math math.vectors accessors
-parser prettyprint.custom prettyprint.backend ;
+parser ;
 IN: math.rectangles
 
 TUPLE: rect { loc initial: { 0 0 } } { dim initial: { 0 0 } } ;
@@ -10,9 +10,6 @@ TUPLE: rect { loc initial: { 0 0 } } { dim initial: { 0 0 } } ;
 
 SYNTAX: RECT: scan-object scan-object <rect> parsed ;
 
-M: rect pprint*
-    \ RECT: [ [ loc>> ] [ dim>> ] bi [ pprint* ] bi@ ] pprint-prefix ;
-
 : <zero-rect> ( -- rect ) rect new ; inline
 
 : point>rect ( loc -- rect ) { 0 0 } <rect> ; inline
@@ -20,6 +17,8 @@ M: rect pprint*
 : rect-bounds ( rect -- loc dim ) [ loc>> ] [ dim>> ] bi ;
 
 : rect-extent ( rect -- loc ext ) rect-bounds over v+ ;
+
+: rect-center ( rect -- center ) rect-bounds 2 v/n v+ ;
 
 : with-rect-extents ( rect1 rect2 loc-quot: ( loc1 loc2 -- ) ext-quot: ( ext1 ext2 -- ) -- )
     [ [ rect-extent ] bi@ ] 2dip bi-curry* bi* ; inline
@@ -62,3 +61,7 @@ M: rect contains-point?
     [ [ loc>> ] dip (>>loc) ]
     [ [ dim>> ] dip (>>dim) ]
     2bi ; inline
+
+USING: vocabs vocabs.loader ;
+
+"prettyprint" vocab [ "math.rectangles.prettyprint" require ] when
