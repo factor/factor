@@ -38,8 +38,6 @@ TODO:
 - Should we signal an error when inserting past the number of objects the filter
   is sized for?  The filter will continue to work, just not very well.
 
-- The other TODOs sprinkled through the code.
-
 */
 
 TUPLE: bloom-filter
@@ -76,7 +74,7 @@ ERROR: invalid-n-objects ;
 ! If the number of hashes isn't positive, we haven't found anything smaller than the
 ! identity configuration.
 : validate-sizes ( 2seq -- )
-    first 0 <= [ capacity-error ] when* ;
+    first 0 <= [ capacity-error ] when ;
 
 ! The consensus on the tradeoff between increasing the number of bits and
 ! increasing the number of hash functions seems to be "go for the smallest
@@ -119,45 +117,41 @@ PRIVATE>
 ! See "Bloom Filters in Probabilistic Verification" by Peter C. Dillinger and
 ! Panagiotis Manolios, section 5.2, "Enhanced Double Hashing":
 ! http://www.cc.gatech.edu/~manolios/research/bloom-filters-verification.html
-:: enhanced-double-hash ( index hash0 hash1 array-size -- hash )
-    [infix hash0 + (index * hash1) + ((pow(index, 3) - index) / 6) infix]
-    array-size mod ;
+:: enhanced-double-hash ( index hash0 hash1 -- hash )
+    [infix hash0 + (index * hash1) + ((pow(index, 3) - index) / 6) infix] ;
 
-: enhanced-double-hashes ( n hash0 hash1 array-size -- seq )
-    '[ _ _ _ enhanced-double-hash ] [ [0,b) ] dip map ;
+: enhanced-double-hashes ( hash0 hash1 n -- seq )
+    [0,b)
+    [ '[ _ _ enhanced-double-hash ] ] dip
+    swap map ;
 
-! Stupid, should pick something good.
+! Make sure it's a fixnum here to speed up double-hashing.
 : hashcodes-from-hashcode ( n -- n n )
-    dup
-    ! we could be running this through a lot of double hashing, make sure it's a
-    ! fixnum here
-    most-positive-fixnum >fixnum bitxor ;
+    dup most-positive-fixnum >fixnum bitxor ;
 
-! TODO: This code calls abs because all the double-hashing stuff outputs array
-! indices and those aren't good negative.  Are we throwing away bits?  -1000
-! b. actually prints -1111101000, which confuses me.
 : hashcodes-from-object ( obj -- n n )
     hashcode abs hashcodes-from-hashcode ;
 
 : set-indices ( indices bit-array -- )
     [ [ drop t ] change-nth ] curry each ;
 
-: increment-n-objects ( bloom-filter -- bloom-filter )
-    [ 1 + ] change-current-n-objects ;
+: increment-n-objects ( bloom-filter -- )
+    [ 1 + ] change-current-n-objects drop ;
 
-: n-hashes-and-bits ( bloom-filter -- n-hashes n-bits )
+: n-hashes-and-length ( bloom-filter -- n-hashes length )
     [ n-hashes>> ] [ bits>> length ] bi ;
 
 : relevant-indices ( value bloom-filter -- indices )
-    n-hashes-and-bits
-    [ swap hashcodes-from-object ] dip
-    enhanced-double-hashes ;
+    [ hashcodes-from-object ] [ n-hashes-and-length ] bi*
+    [ enhanced-double-hashes ] dip '[ _ mod ] map ;
 
 PRIVATE>
 
 : bloom-filter-insert ( object bloom-filter -- )
-    increment-n-objects
-    [ relevant-indices ] [ bits>> set-indices ] bi ;
+    [ increment-n-objects ]
+    [ relevant-indices ]
+    [ bits>> set-indices ]
+    tri ;
 
 : bloom-filter-member? ( object bloom-filter -- ? )
     [ relevant-indices ] keep
