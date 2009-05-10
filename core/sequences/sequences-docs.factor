@@ -533,12 +533,18 @@ HELP: concat
 { $description "Concatenates a sequence of sequences together into one sequence. If " { $snippet "seq" } " is empty, outputs " { $snippet "{ }" } ", otherwise the resulting sequence is of the same class as the first element of " { $snippet "seq" } "." }
 { $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as the first element of " { $snippet "seq" } "." } ;
 
+HELP: concat-as
+{ $values { "seq" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Concatenates a sequence of sequences together into one sequence with the same type as " { $snippet "exemplar" } "." }
+{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." } ;
+
 HELP: join
 { $values { "seq" sequence } { "glue" sequence } { "newseq" sequence } }
 { $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
+{ $notes "If the " { $snippet "glue" } " sequence is empty, this word calls " { $link concat-as } "." }
 { $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." } ;
 
-{ join concat } related-words
+{ join concat concat-as } related-words
 
 HELP: peek
 { $values { "seq" sequence } { "elt" object } }

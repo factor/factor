@@ -52,7 +52,6 @@ IN: reports.noise
         { nkeep 5 }
         { npick 6 }
         { nrot 5 }
-        { nslip 5 }
         { ntuck 6 }
         { nwith 4 }
         { over 2 }
