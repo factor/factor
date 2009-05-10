@@ -5,12 +5,12 @@ math.functions make io io.files io.pathnames io.directories
 io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
 combinators.short-circuit parser combinators calendar
 calendar.format arrays mason.config locals system debugger fry
-continuations ;
+continuations strings ;
 IN: mason.common
 
 SYMBOL: current-git-id
 
-ERROR: output-process-error output process ;
+ERROR: output-process-error { output string } { process process } ;
 
 M: output-process-error error.
     [ "Process:" print process>> . nl ]
