@@ -143,7 +143,7 @@ PRIVATE>
 <PRIVATE
 
 : call-under ( quot object -- quot )
-    swap dup slip ; inline
+    swap [ call ] keep ; inline
 
 : xml-loop ( quot: ( xml-elem -- ) -- )
     parse-text call-under

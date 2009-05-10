@@ -1,17 +1,18 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors alien alien.accessors arrays byte-arrays
-classes sequences.private continuations.private effects generic
-hashtables hashtables.private io io.backend io.files
-io.files.private io.streams.c kernel kernel.private math
-math.private memory namespaces namespaces.private parser
-quotations quotations.private sbufs sbufs.private
-sequences sequences.private slots.private strings
+USING: fry accessors alien alien.accessors arrays byte-arrays classes
+sequences.private continuations.private effects generic hashtables
+hashtables.private io io.backend io.files io.files.private
+io.streams.c kernel kernel.private math math.private
+math.parser.private memory memory.private namespaces
+namespaces.private parser quotations quotations.private sbufs
+sbufs.private sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
-classes.tuple.private vectors vectors.private words definitions
-words.private assocs summary compiler.units system.private
-combinators locals locals.backend locals.types words.private
+classes.tuple.private vectors vectors.private words definitions assocs
+summary compiler.units system.private combinators
+combinators.short-circuit locals locals.backend locals.types
 quotations.private combinators.private stack-checker.values
+generic.single generic.single.private
 alien.libraries
 stack-checker.alien
 stack-checker.state
@@ -57,8 +58,12 @@ IN: stack-checker.known-words
 : infer-shuffle-word ( word -- )
     "shuffle" word-prop infer-shuffle ;
 
+: check-declaration ( declaration -- declaration )
+    dup { [ array? ] [ [ class? ] all? ] } 1&&
+    [ bad-declaration-error ] unless ;
+
 : infer-declare ( -- )
-    pop-literal nip
+    pop-literal nip check-declaration
     [ length ensure-d ] keep zip
     #declare, ;
 
@@ -89,15 +94,6 @@ M: composed infer-call*
 
 M: object infer-call*
     "literal quotation" literal-expected ;
-
-: infer-nslip ( n -- )
-    [ infer->r infer-call ] [ infer-r> ] bi ;
-
-: infer-slip ( -- ) 1 infer-nslip ;
-
-: infer-2slip ( -- ) 2 infer-nslip ;
-
-: infer-3slip ( -- ) 3 infer-nslip ;
 
 : infer-ndip ( word n -- )
     [ literals get ] 2dip
@@ -142,7 +138,7 @@ M: object infer-call*
     apply-word/effect ;
 
 : infer-execute-effect-unsafe ( -- )
-    \ execute infer-effect-unsafe ;
+    \ (execute) infer-effect-unsafe ;
 
 : infer-call-effect-unsafe ( -- )
     \ call infer-effect-unsafe ;
@@ -175,9 +171,6 @@ M: object infer-call*
         { \ declare [ infer-declare ] }
         { \ call [ infer-call ] }
         { \ (call) [ infer-call ] }
-        { \ slip [ infer-slip ] }
-        { \ 2slip [ infer-2slip ] }
-        { \ 3slip [ infer-3slip ] }
         { \ dip [ infer-dip ] }
         { \ 2dip [ infer-2dip ] }
         { \ 3dip [ infer-3dip ] }
@@ -211,7 +204,7 @@ M: object infer-call*
     "local-word-def" word-prop infer-quot-here ;
 
 {
-    declare call (call) slip 2slip 3slip dip 2dip 3dip curry compose
+    declare call (call) dip 2dip 3dip curry compose
     execute (execute) call-effect-unsafe execute-effect-unsafe if
     dispatch <tuple-boa> exit load-local load-locals get-local
     drop-locals do-primitive alien-invoke alien-indirect
@@ -227,14 +220,7 @@ M: object infer-call*
 
 ! More words not to compile
 \ call t "no-compile" set-word-prop
-\ call subwords [ t "no-compile" set-word-prop ] each
-
 \ execute t "no-compile" set-word-prop
-\ execute subwords [ t "no-compile" set-word-prop ] each
-
-\ effective-method t "no-compile" set-word-prop
-\ effective-method subwords [ t "no-compile" set-word-prop ] each
-
 \ clear t "no-compile" set-word-prop
 
 : non-inline-word ( word -- )
@@ -292,14 +278,11 @@ M: object infer-call*
 \ bignum>float { bignum } { float } define-primitive
 \ bignum>float make-foldable
 
-\ <ratio> { integer integer } { ratio } define-primitive
-\ <ratio> make-foldable
+\ (string>float) { byte-array } { float } define-primitive
+\ (string>float) make-foldable
 
-\ string>float { string } { float } define-primitive
-\ string>float make-foldable
-
-\ float>string { float } { string } define-primitive
-\ float>string make-foldable
+\ (float>string) { float } { byte-array } define-primitive
+\ (float>string) make-foldable
 
 \ float>bits { real } { integer } define-primitive
 \ float>bits make-foldable
@@ -312,9 +295,6 @@ M: object infer-call*
 
 \ bits>double { integer } { float } define-primitive
 \ bits>double make-foldable
-
-\ <complex> { real real } { complex } define-primitive
-\ <complex> make-foldable
 
 \ both-fixnums? { object object } { object } define-primitive
 
@@ -473,9 +453,9 @@ M: object infer-call*
 
 \ gc-stats { } { array } define-primitive
 
-\ save-image { string } { } define-primitive
+\ (save-image) { byte-array } { } define-primitive
 
-\ save-image-and-exit { string } { } define-primitive
+\ (save-image-and-exit) { byte-array } { } define-primitive
 
 \ data-room { } { integer integer array } define-primitive
 \ data-room make-flushable
@@ -489,9 +469,9 @@ M: object infer-call*
 \ tag { object } { fixnum } define-primitive
 \ tag make-foldable
 
-\ dlopen { string } { dll } define-primitive
+\ (dlopen) { byte-array } { dll } define-primitive
 
-\ dlsym { string object } { c-ptr } define-primitive
+\ (dlsym) { byte-array object } { c-ptr } define-primitive
 
 \ dlclose { dll } { } define-primitive
 
@@ -606,7 +586,7 @@ M: object infer-call*
 
 \ die { } { } define-primitive
 
-\ fopen { string string } { alien } define-primitive
+\ (fopen) { byte-array byte-array } { alien } define-primitive
 
 \ fgetc { alien } { object } define-primitive
 
@@ -659,7 +639,7 @@ M: object infer-call*
 
 \ become { array array } { } define-primitive
 
-\ innermost-frame-quot { callstack } { quotation } define-primitive
+\ innermost-frame-executing { callstack } { object } define-primitive
 
 \ innermost-frame-scan { callstack } { fixnum } define-primitive
 
@@ -676,3 +656,12 @@ M: object infer-call*
 \ gc-stats { } { array } define-primitive
 
 \ jit-compile { quotation } { } define-primitive
+
+\ lookup-method { object array } { word } define-primitive
+
+\ reset-dispatch-stats { } { } define-primitive
+\ dispatch-stats { } { array } define-primitive
+\ reset-inline-cache-stats { } { } define-primitive
+\ inline-cache-stats { } { array } define-primitive
+
+\ optimized? { word } { object } define-primitive

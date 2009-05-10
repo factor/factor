@@ -1,10 +1,14 @@
 IN: ui.gadgets.glass.tests
 USING: tools.test ui.gadgets.glass ui.gadgets.worlds ui.gadgets
-math.rectangles namespaces accessors models sequences ;
+math.rectangles namespaces accessors models sequences arrays ;
 
-<gadget> "" f <model> <world>
-{ 1000 1000 } >>dim
-"w" set
+[ ] [
+    <world-attributes>
+    <gadget> 1array >>gadgets
+    <world>
+    { 1000 1000 } >>dim
+    "w" set
+] unit-test
 
 [ ] [ <gadget> "g" set ] unit-test
 

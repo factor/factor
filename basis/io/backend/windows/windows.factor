@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2008 Mackenzie Straight, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays destructors io io.backend
-io.buffers io.files io.ports io.binary io.timeouts
-windows.errors strings kernel math namespaces sequences windows
-windows.kernel32 windows.shell32 windows.types windows.winsock
-splitting continuations math.bitwise system accessors ;
+io.buffers io.files io.ports io.binary io.timeouts system
+windows.errors strings kernel math namespaces sequences
+windows.errors windows.kernel32 windows.shell32 windows.types
+windows.winsock splitting continuations math.bitwise accessors ;
 IN: io.backend.windows
 
 : set-inherit ( handle ? -- )

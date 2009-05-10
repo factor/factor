@@ -34,7 +34,7 @@ TUPLE: hashtable
     [ no-key ] [ 2dup hash@ (key@) ] if ; inline
 
 : <hash-array> ( n -- array )
-    1+ next-power-of-2 4 * ((empty)) <array> ; inline
+    1 + next-power-of-2 4 * ((empty)) <array> ; inline
 
 : init-hash ( hash -- )
     0 >>count 0 >>deleted drop ; inline
@@ -61,10 +61,10 @@ TUPLE: hashtable
     1 fixnum+fast set-slot ; inline
 
 : hash-count+ ( hash -- )
-    [ 1+ ] change-count drop ; inline
+    [ 1 + ] change-count drop ; inline
 
 : hash-deleted+ ( hash -- )
-    [ 1+ ] change-deleted drop ; inline
+    [ 1 + ] change-deleted drop ; inline
 
 : (rehash) ( hash alist -- )
     swap [ swapd set-at ] curry assoc-each ; inline
@@ -77,7 +77,7 @@ TUPLE: hashtable
     [ deleted>> 10 fixnum*fast ] [ count>> ] bi fixnum> ; inline
 
 : grow-hash ( hash -- )
-    [ [ >alist ] [ assoc-size 1+ ] bi ] keep
+    [ [ >alist ] [ assoc-size 1 + ] bi ] keep
     [ reset-hash ] keep
     swap (rehash) ;
 
@@ -146,7 +146,7 @@ M: hashtable >alist
                 [ array-nth ] [ [ 1 fixnum+fast ] dip array-nth ] 2bi
             ] dip
             pick tombstone? [ 3drop ] [ [ 2array ] dip push-unsafe ] if
-        ] 2curry each
+        ] 2curry each-integer
     ] keep { } like ;
 
 M: hashtable clone

@@ -26,11 +26,14 @@ MACRO: narray ( n -- )
 MACRO: nsum ( n -- )
     1- [ + ] n*quot ;
 
+MACRO: firstn-unsafe ( n -- )
+    [ '[ [ _ ] dip nth-unsafe ] ] map '[ _ cleave ] ;
+
 MACRO: firstn ( n -- )
     dup zero? [ drop [ drop ] ] [
-        [ [ '[ [ _ ] dip nth-unsafe ] ] map ]
-        [ 1- '[ [ _ ] dip bounds-check 2drop ] ]
-        bi prefix '[ _ cleave ]
+        [ 1- swap bounds-check 2drop ]
+        [ firstn-unsafe ]
+        bi-curry '[ _ _ bi ]
     ] if ;
 
 MACRO: npick ( n -- )
@@ -56,9 +59,6 @@ MACRO: ntuck ( n -- )
 
 MACRO: ndip ( quot n -- )
     [ '[ _ dip ] ] times ;
-
-MACRO: nslip ( n -- )
-    '[ [ call ] _ ndip ] ;
 
 MACRO: nkeep ( quot n -- )
     tuck '[ _ ndup _ _ ndip ] ;

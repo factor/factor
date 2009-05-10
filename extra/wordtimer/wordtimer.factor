@@ -56,9 +56,6 @@ SYMBOL: *calling*
 : subtract-overhead ( {oldtime,n} overhead -- {newtime,n} )
   [ first2 ] dip
   swap [ * - ] keep 2array ;
-  
-: change-global ( variable quot -- )
-  global swap change-at ; inline
 
 : (correct-for-timing-overhead) ( timingshash -- timingshash )
   time-dummy-word [ subtract-overhead ] curry assoc-map ;  

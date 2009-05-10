@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors models models.delay models.arrow
 sequences ui.gadgets.labels ui.gadgets.tracks
-ui.gadgets.worlds ui.gadgets ui kernel calendar summary ;
+ui.gadgets.worlds ui.gadgets ui ui.private kernel calendar summary ;
 IN: ui.gadgets.status-bar
 
 : <status-bar> ( model -- gadget )
@@ -10,9 +10,9 @@ IN: ui.gadgets.status-bar
     reverse-video-theme
     t >>root? ;
 
-: open-status-window ( gadget title -- )
-    f <model> [ <world> ] keep
-    <status-bar> f track-add
+: open-status-window ( gadget title/attributes -- )
+    ?attributes f <model> >>status <world>
+    dup status>> <status-bar> f track-add
     open-world-window ;
 
 : show-summary ( object gadget -- )

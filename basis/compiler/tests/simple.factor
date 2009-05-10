@@ -60,8 +60,8 @@ IN: compiler.tests.simple
 
 ! Make sure error reporting works
 
-[ [ dup ] compile-call ] must-fail
-[ [ drop ] compile-call ] must-fail
+! [ [ dup ] compile-call ] must-fail
+! [ [ drop ] compile-call ] must-fail
 
 ! Regression
 
@@ -235,6 +235,6 @@ M: f single-combination-test-2 single-combination-test-4 ;
 10 [
     [ "compiler.tests.foo" forget-vocab ] with-compilation-unit
     [ t ] [
-        "USING: prettyprint words accessors ; IN: compiler.tests.foo : (recursive) ( -- ) (recursive) (recursive) ; inline recursive : recursive ( -- ) (recursive) ; \\ (recursive) optimized>>" eval( -- obj )
+        "USING: prettyprint words accessors ; IN: compiler.tests.foo : (recursive) ( -- ) (recursive) (recursive) ; inline recursive : recursive ( -- ) (recursive) ; \\ (recursive) optimized?" eval( -- obj )
     ] unit-test
 ] times
