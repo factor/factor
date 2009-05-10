@@ -60,9 +60,6 @@ MACRO: ntuck ( n -- )
 MACRO: ndip ( quot n -- )
     [ '[ _ dip ] ] times ;
 
-MACRO: nslip ( n -- )
-    '[ [ call ] _ ndip ] ;
-
 MACRO: nkeep ( quot n -- )
     tuck '[ _ ndup _ _ ndip ] ;
 
