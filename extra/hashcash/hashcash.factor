@@ -74,10 +74,10 @@ M: hashcash string>>
 
 PRIVATE>
 
-: mint* ( tuple -- str )
+: mint* ( tuple -- stamp )
     0 (mint) string>> ;
 
-: mint ( resource -- str )
+: mint ( resource -- stamp )
     <hashcash>
         swap >>resource
     mint* ;
