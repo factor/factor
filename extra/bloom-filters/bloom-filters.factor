@@ -84,10 +84,10 @@ ERROR: invalid-n-objects ;
 ! support it, and I haven't done my own, but we'll go with it anyway.
 !
 : size-bloom-filter ( error-rate number-objects -- number-hashes number-bits )
-    '[ _ _ bits-to-satisfy-error-rate ]
-    '[ dup _ call 2array smaller-second ]
-    '[ n-hashes-range identity-configuration _ reduce ]
-    call
+    [ n-hashes-range identity-configuration ] 2dip
+    '[ dup [ _ _ bits-to-satisfy-error-rate ]
+       call 2array smaller-second ]
+    reduce
     dup validate-sizes
     first2 ;
 
