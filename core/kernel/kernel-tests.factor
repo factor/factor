@@ -61,20 +61,16 @@ IN: kernel.tests
 [ 2 ] [ f 2 xor ] unit-test
 [ f ] [ f f xor ] unit-test
 
-[ slip ] must-fail
+[ dip ] must-fail
 [ ] [ :c ] unit-test
 
-[ 1 slip ] must-fail
+[ 1 [ call ] dip ] must-fail
 [ ] [ :c ] unit-test
 
-[ 1 2 slip ] must-fail
+[ 1 2 [ call ] dip ] must-fail
 [ ] [ :c ] unit-test
 
-[ 1 2 3 slip ] must-fail
-[ ] [ :c ] unit-test
-
-
-[ 5 ] [ [ 2 2 + ] 1 slip + ] unit-test
+[ 5 ] [ 1 [ 2 2 + ] dip + ] unit-test
 
 [ [ ] keep ] must-fail
 
