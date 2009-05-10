@@ -9,7 +9,7 @@ threads combinators math.rectangles ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
-    [ mouse-location ] [ drop window ] 2bi move-hand fire-motion ;
+    [ mouse-location ] [ drop window ] 2bi move-hand fire-motion yield ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
@@ -365,8 +365,8 @@ CLASS: {
     -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 <int>
     CGLSetParameter drop ;
 
-: <FactorView> ( dim -- view )
-    FactorView swap <GLView> [ sync-refresh-to-screen ] keep ;
+: <FactorView> ( dim pixel-format -- view )
+    [ FactorView ] 2dip <GLView> [ sync-refresh-to-screen ] keep ;
 
 : save-position ( world window -- )
     -> frame CGRect-top-left 2array >>window-loc drop ;

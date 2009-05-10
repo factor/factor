@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
 sequences words namespaces.private quotations vectors
-math.parser math words.symbol ;
+math.parser math words.symbol assocs ;
 IN: namespaces
 
 ARTICLE: "namespaces-combinators" "Namespace combinators"
@@ -14,7 +14,8 @@ ARTICLE: "namespaces-change" "Changing variable values"
 { $subsection off }
 { $subsection inc }
 { $subsection dec }
-{ $subsection change } ;
+{ $subsection change }
+{ $subsection change-global } ;
 
 ARTICLE: "namespaces-global" "Global variables"
 { $subsection namespace }
@@ -73,6 +74,11 @@ HELP: change
 { $description "Applies the quotation to the old value of the variable, and assigns the resulting value to the variable." }
 { $side-effects "variable" } ;
 
+HELP: change-global
+{ $values { "variable" "a variable, by convention a symbol" } { "quot" { $quotation "( old -- new )" } } }
+{ $description "Applies the quotation to the old value of the global variable, and assigns the resulting value to the global variable." }
+{ $side-effects "variable" } ;
+
 HELP: +@
 { $values { "n" "a number" } { "variable" "a variable, by convention a symbol" } }
 { $description "Adds " { $snippet "n" } " to the value of the variable. A variable value of " { $link f } " is interpreted as being zero." }
@@ -113,19 +119,19 @@ HELP: with-variable
 } ;
 
 HELP: make-assoc
-{ $values { "quot" quotation } { "exemplar" "an assoc" } { "hash" "a new hashtable" } }
+{ $values { "quot" quotation } { "exemplar" assoc } { "hash" "a new assoc" } }
 { $description "Calls the quotation in a new namespace of the same type as " { $snippet "exemplar" } ", and outputs this namespace when the quotation returns. Useful for quickly building assocs." } ;
 
 HELP: bind
-{ $values { "ns" "a hashtable" } { "quot" quotation } }
+{ $values { "ns" assoc } { "quot" quotation } }
 { $description "Calls the quotation in the dynamic scope of " { $snippet "ns" } ". When variables are looked up by the quotation, " { $snippet "ns" } " is checked first, and setting variables in the quotation stores them in " { $snippet "ns" } "." } ;
 
 HELP: namespace
-{ $values { "namespace" "an assoc" } }
+{ $values { "namespace" assoc } }
 { $description "Outputs the current namespace. Calls to " { $link set } " modify this namespace." } ;
 
 HELP: global
-{ $values { "g" "an assoc" } }
+{ $values { "g" assoc } }
 { $description "Outputs the global namespace. The global namespace is always checked last when looking up variable values." } ;
 
 HELP: get-global
@@ -150,7 +156,7 @@ HELP: set-namestack
 { $description "Replaces the name stack with a copy of the given vector." } ;
 
 HELP: >n
-{ $values { "namespace" "an assoc" } }
+{ $values { "namespace" assoc } }
 { $description "Pushes a namespace on the name stack." } ;
 
 HELP: ndrop

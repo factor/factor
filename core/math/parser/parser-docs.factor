@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math math.private prettyprint
+USING: help.markup help.syntax math math.parser.private prettyprint
 namespaces make strings ;
 IN: math.parser
 
@@ -102,7 +102,7 @@ HELP: string>float ( str -- n/f )
 $nl
 "Outputs " { $link f } " if the string does not represent a float." } ;
 
-HELP: float>string ( n -- str )
+HELP: float>string
 { $values { "n" real } { "str" string } }
 { $description "Primitive for getting a string representation of a float." }
 { $notes "The " { $link number>string } " word is more general." } ;

@@ -109,7 +109,7 @@ M: #declare propagate-before
 
 : output-value-infos ( #call word -- infos )
     {
-        { [ dup tuple-constructor? ] [ propagate-tuple-constructor ] }
+        { [ dup \ <tuple-boa> eq? ] [ drop propagate-<tuple-boa> ] }
         { [ dup sequence-constructor? ] [ propagate-sequence-constructor ] }
         { [ dup predicate? ] [ propagate-predicate ] }
         { [ dup "outputs" word-prop ] [ call-outputs-quot ] }

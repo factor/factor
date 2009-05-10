@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser words definitions kernel sequences assocs arrays
 kernel.private fry combinators accessors vectors strings sbufs
 byte-arrays byte-vectors io.binary io.streams.string splitting math
-math.parser generic generic.standard generic.standard.engines classes
+math.parser generic generic.single generic.standard classes
 hashtables namespaces ;
 IN: hints
 
@@ -42,13 +42,13 @@ SYMBOL: specialize-method?
 
 t specialize-method? set-global
 
+: method-declaration ( method -- quot )
+    [ "method-generic" word-prop dispatch# object <array> ]
+    [ "method-class" word-prop ]
+    bi prefix [ declare ] curry [ ] like ;
+
 : specialize-method ( quot method -- quot' )
-    [
-        specialize-method? get [
-            [ "method-class" word-prop ] [ "method-generic" word-prop ] bi
-            method-declaration prepend
-        ] [ drop ] if
-    ]
+    [ specialize-method? get [ method-declaration prepend ] [ drop ] if ]
     [ "method-generic" word-prop "specializer" word-prop ] bi
     [ specialize-quot ] when* ;
 
@@ -71,7 +71,7 @@ t specialize-method? set-global
 SYNTAX: HINTS:
     scan-object
     [ changed-definition ]
-    [ parse-definition "specializer" set-word-prop ] bi ;
+    [ parse-definition { } like "specializer" set-word-prop ] bi ;
 
 ! Default specializers
 { first first2 first3 first4 }

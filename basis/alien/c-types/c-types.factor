@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces make parser sequences strings words assocs splitting
-math.parser cpu.architecture alien alien.accessors quotations
-layouts system compiler.units io.files io.encodings.binary
-accessors combinators effects continuations fry classes ;
+math.parser cpu.architecture alien alien.accessors alien.strings
+quotations layouts system compiler.units io io.files
+io.encodings.binary io.streams.memory accessors combinators effects
+continuations fry classes ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -213,6 +214,15 @@ M: f byte-length drop 0 ;
 : memory>byte-array ( alien len -- byte-array )
     [ nip (byte-array) dup ] 2keep memcpy ;
 
+: malloc-string ( string encoding -- alien )
+    string>alien malloc-byte-array ;
+
+M: memory-stream stream-read
+    [
+        [ index>> ] [ alien>> ] bi <displaced-alien>
+        swap memory>byte-array
+    ] [ [ + ] change-index drop ] 2bi ;
+
 : byte-array>memory ( byte-array base -- )
     swap dup byte-length memcpy ;
 
@@ -399,10 +409,10 @@ CONSTANT: primitive-types
     "uchar" define-primitive-type
 
     <c-type>
-        [ alien-unsigned-4 zero? not ] >>getter
-        [ [ 1 0 ? ] 2dip set-alien-unsigned-4 ] >>setter
-        4 >>size
-        4 >>align
+        [ alien-unsigned-1 zero? not ] >>getter
+        [ [ 1 0 ? ] 2dip set-alien-unsigned-1 ] >>setter
+        1 >>size
+        1 >>align
         "box_boolean" >>boxer
         "to_boolean" >>unboxer
     "bool" define-primitive-type

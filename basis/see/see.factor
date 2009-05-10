@@ -1,13 +1,13 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.builtin
-classes.intersection classes.mixin classes.predicate
-classes.singleton classes.tuple classes.union combinators
-definitions effects generic generic.standard io io.pathnames
+classes.intersection classes.mixin classes.predicate classes.singleton
+classes.tuple classes.union combinators definitions effects generic
+generic.single generic.standard generic.hook io io.pathnames
 io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint.sections sequences sets sorting strings summary
-words words.symbol words.constant words.alias ;
+prettyprint.sections sequences sets sorting strings summary words
+words.symbol words.constant words.alias ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )

@@ -198,9 +198,10 @@ SYMBOL: interactive-vocabs
     "tools.test"
     "tools.threads"
     "tools.time"
-    "tools.vocabs"
     "vocabs"
     "vocabs.loader"
+    "vocabs.refresh"
+    "vocabs.hierarchy"
     "words"
     "scratchpad"
 } interactive-vocabs set-global
@@ -272,7 +273,7 @@ print-use-hook [ [ ] ] initialize
 : parse-stream ( stream name -- quot )
     [
         [
-            lines dup parse-fresh
+            stream-lines dup parse-fresh
             [ nip ] [ finish-parsing ] 2bi
             forget-smudged
         ] with-source-file

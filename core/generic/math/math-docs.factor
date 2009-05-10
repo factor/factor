@@ -1,5 +1,5 @@
 USING: kernel generic help.markup help.syntax math classes
-sequences quotations ;
+sequences quotations generic.math.private ;
 IN: generic.math
 
 HELP: math-upgrade

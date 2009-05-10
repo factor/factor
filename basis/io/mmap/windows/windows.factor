@@ -2,7 +2,7 @@ USING: alien alien.c-types arrays destructors generic io.mmap
 io.ports io.backend.windows io.files.windows io.backend.windows.privileges
 kernel libc math math.bitwise namespaces quotations sequences
 windows windows.advapi32 windows.kernel32 io.backend system
-accessors locals ;
+accessors locals windows.errors ;
 IN: io.mmap.windows
 
 : create-file-mapping ( hFile lpAttributes flProtect dwMaximumSizeHigh dwMaximumSizeLow lpName -- HANDLE )
@@ -12,8 +12,8 @@ IN: io.mmap.windows
     MapViewOfFile [ win32-error=0/f ] keep ;
 
 :: mmap-open ( path length access-mode create-mode protect access -- handle handle address )
-    [let | lo [ length HEX: ffffffff bitand ]
-           hi [ length -32 shift HEX: ffffffff bitand ] |
+    [let | lo [ length 32 bits ]
+           hi [ length -32 shift 32 bits ] |
         { "SeCreateGlobalPrivilege" "SeLockMemoryPrivilege" } [
             path access-mode create-mode 0 open-file |dispose
             dup handle>> f protect hi lo f create-file-mapping |dispose

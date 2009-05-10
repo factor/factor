@@ -40,8 +40,16 @@ HELP: random-bytes
 } ;
 
 HELP: random-bits
-{ $values { "n" "an integer" } { "r" "a random integer" } }
+{ $values { "numbits" integer } { "r" "a random integer" } }
 { $description "Outputs an random integer n bits in length." } ;
+
+HELP: random-bits*
+{ $values
+    { "numbits" integer }
+    { "n" integer }
+}
+{ $description "Returns an integer exactly " { $snippet "numbits" } " in length, with the topmost bit set to one." } ;
+
 
 HELP: with-random
 { $values { "tuple" "a random generator" } { "quot" "a quotation" } }
@@ -93,6 +101,9 @@ $nl
 "Randomizing a sequence:"
 { $subsection randomize }
 "Deleting a random element from a sequence:"
-{ $subsection delete-random } ;
+{ $subsection delete-random }
+"Random numbers with " { $snippet "n" } " bits:"
+{ $subsection random-bits }
+{ $subsection random-bits* } ;
 
 ABOUT: "random"
