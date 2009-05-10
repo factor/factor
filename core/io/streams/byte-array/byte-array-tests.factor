@@ -1,6 +1,7 @@
 USING: tools.test io.streams.byte-array io.encodings.binary
 io.encodings.utf8 io kernel arrays strings namespaces ;
 
+[ B{ } ] [ B{ } binary [ contents ] with-byte-reader ] unit-test
 [ B{ 1 2 3 } ] [ binary [ B{ 1 2 3 } write ] with-byte-writer ] unit-test
 [ B{ 1 2 3 } ] [ { 1 2 3 } binary [ 3 read ] with-byte-reader ] unit-test
 

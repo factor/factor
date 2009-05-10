@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables generic kernel math namespaces make sequences
-continuations destructors assocs ;
+continuations destructors assocs combinators ;
 IN: io
 
 SYMBOLS: +byte+ +character+ ;
@@ -20,7 +20,9 @@ GENERIC: stream-flush ( stream -- )
 GENERIC: stream-nl ( stream -- )
 
 ERROR: bad-seek-type type ;
+
 SINGLETONS: seek-absolute seek-relative seek-end ;
+
 GENERIC: stream-seek ( n seek-type stream -- )
 
 : stream-print ( str stream -- ) [ stream-write ] keep stream-nl ;
@@ -68,29 +70,39 @@ SYMBOL: error-stream
 
 : bl ( -- ) " " write ;
 
-: stream-lines ( stream -- seq )
-    [ [ readln dup ] [ ] produce nip ] with-input-stream ;
-
-: lines ( -- seq )
-    input-stream get stream-lines ;
-
 <PRIVATE
 
 : each-morsel ( handler: ( data -- ) reader: ( -- data ) -- )
     [ dup ] compose swap while drop ; inline
+
+: stream-element-exemplar ( type -- exemplar )
+    {
+        { +byte+ [ B{ } ] }
+        { +character+ [ "" ] }
+    } case ;
+
+: element-exemplar ( -- exemplar )
+    input-stream get
+    stream-element-type
+    stream-element-exemplar ;
 
 PRIVATE>
 
 : each-line ( quot -- )
     [ readln ] each-morsel ; inline
 
-: stream-contents ( stream -- seq )
-    [
-        [ 65536 read-partial dup ] [ ] produce nip concat f like
-    ] with-input-stream ;
+: lines ( -- seq )
+    [ ] accumulator [ each-line ] dip { } like ;
+
+: stream-lines ( stream -- seq )
+    [ lines ] with-input-stream ;
 
 : contents ( -- seq )
-    input-stream get stream-contents ;
+    [ 65536 read-partial dup ] [ ] produce nip
+    element-exemplar concat-as ;
+
+: stream-contents ( stream -- seq )
+    [ contents ] with-input-stream ;
 
 : each-block ( quot: ( block -- ) -- )
     [ 8192 read-partial ] each-morsel ; inline
