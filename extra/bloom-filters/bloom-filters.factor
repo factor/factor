@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Alec Berryman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays bit-arrays fry kernel layouts locals math math.functions
-multiline sequences ;
+USING: accessors arrays bit-arrays fry infix kernel layouts locals math
+math.functions multiline sequences ;
 IN: bloom-filters
 
 FROM: math.ranges => [1,b] [0,b) ;
@@ -54,12 +54,13 @@ ERROR: invalid-n-objects ;
 
 <PRIVATE
 
-! number-bits = -(n-objects * n-hashes) / ln(1 - error-rate ^ 1/n-hashes)
-:: bits-to-satisfy-error-rate ( n-hashes error-rate n-objects -- size )
-    n-objects n-hashes * -1 *
-    1 error-rate 1 n-hashes / ^ - log
-    /
-    ceiling >integer ; ! should check that it's below max-array-capacity
+! infix doesn't like ^
+: pow ( x y -- z )
+    ^ ; inline
+
+:: bits-to-satisfy-error-rate ( hashes error objects -- size )
+    [infix -(objects * hashes) / log(1 - pow(error, (1/hashes))) infix]
+    ceiling >integer ;
 
 ! 100 hashes ought to be enough for anybody.
 : n-hashes-range ( -- range )
@@ -118,21 +119,8 @@ PRIVATE>
 ! See "Bloom Filters in Probabilistic Verification" by Peter C. Dillinger and
 ! Panagiotis Manolios, section 5.2, "Enhanced Double Hashing":
 ! http://www.cc.gatech.edu/~manolios/research/bloom-filters-verification.html
-!
-! This is taken from the definition at the top of page 12:
-!
-! F(i) = (A(s) + (i * B(s)) + ((i^3 - i) / 6)) mod m
-!
-! Where i is the hash number, A and B are hash functions for object s, and m is
-! the length of the array.
-
 :: enhanced-double-hash ( index hash0 hash1 array-size -- hash )
-    hash0
-    index hash1 *
-    +
-    index 3 ^ index -
-    6 /
-    +
+    [infix hash0 + (index * hash1) + ((pow(index, 3) - index) / 6) infix]
     array-size mod ;
 
 : enhanced-double-hashes ( n hash0 hash1 array-size -- seq )
