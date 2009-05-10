@@ -1,7 +1,8 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math math.functions math.miller-rabin
-math.order math.primes.erato math.ranges sequences ;
+USING: combinators kernel math math.functions
+math.primes.miller-rabin math.order math.primes.erato
+math.ranges sequences ;
 IN: math.primes
 
 <PRIVATE
