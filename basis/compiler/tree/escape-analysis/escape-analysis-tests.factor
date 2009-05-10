@@ -302,7 +302,7 @@ C: <ro-box> ro-box
 [ 0 ] [ [ 1 cons boa "x" get slot ] count-unboxed-allocations ] unit-test
 
 : impeach-node ( quot: ( node -- ) -- )
-    dup slip impeach-node ; inline recursive
+    [ call ] keep impeach-node ; inline recursive
 
 : bleach-node ( quot: ( node -- ) -- )
     [ bleach-node ] curry [ ] compose impeach-node ; inline recursive

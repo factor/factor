@@ -180,7 +180,7 @@ DEFER: blah4
     over [
         2drop
     ] [
-        [ swap slip ] keep swap bad-combinator
+        [ dip ] keep swap bad-combinator
     ] if ; inline recursive
 
 [ [ [ 1 ] [ ] bad-combinator ] infer ] must-fail
