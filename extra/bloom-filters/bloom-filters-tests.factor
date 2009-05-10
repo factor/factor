@@ -46,7 +46,7 @@ IN: bloom-filters.tests
 : empty-bloom-filter ( -- bloom-filter )
     0.01 2000 <bloom-filter> ;
 
-[ 1 ] [ empty-bloom-filter increment-n-objects current-n-objects>> ] unit-test
+[ 1 ] [ empty-bloom-filter dup increment-n-objects current-n-objects>> ] unit-test
 
 : basic-insert-test-setup ( -- bloom-filter )
     1 empty-bloom-filter [ bloom-filter-insert ] keep ;
