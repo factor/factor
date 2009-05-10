@@ -159,6 +159,6 @@ PRIVATE>
     increment-n-objects
     [ relevant-indices ] [ bits>> set-indices ] bi ;
 
-: bloom-filter-member? ( value bloom-filter -- ? )
+: bloom-filter-member? ( object bloom-filter -- ? )
     [ relevant-indices ] keep
     bits>> nths [ ] all? ;
