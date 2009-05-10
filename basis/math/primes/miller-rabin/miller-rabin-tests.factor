@@ -1,5 +1,6 @@
-USING: math.primes.miller-rabin tools.test kernel sequences
-math.primes.miller-rabin.private math ;
+USING: kernel math math.primes math.primes.miller-rabin
+math.primes.miller-rabin.private math.primes.safe
+math.primes.safe.private random sequences tools.test ;
 IN: math.primes.miller-rabin.tests
 
 [ f ] [ 473155932665450549999756893736999469773678960651272093993257221235459777950185377130233556540099119926369437865330559863 miller-rabin ] unit-test
