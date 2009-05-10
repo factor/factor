@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math project-euler.common sequences ;
+USING: kernel math math.ranges project-euler.common sequences ;
 IN: project-euler.018
 
 ! http://projecteuler.net/index.php?section=problems&id=18
@@ -66,7 +66,7 @@ IN: project-euler.018
            91  71  52  38  17  14  91  43  58  50  27  29  48
          63  66  04  68  89  53  67  30  73  16  69  87  40  31
        04  62  98  27  23  09  70  98  73  93  38  53  60  04  23
-     } 15 iota [ 1+ cut swap ] map nip ;
+     } 15 [1,b] [ cut swap ] map nip ;
 
 PRIVATE>
 

@@ -6,7 +6,7 @@ hashtables sorting arrays combinators math.bitwise strings
 system accessors threads splitting io.backend io.backend.windows
 io.backend.windows.nt io.files.windows.nt io.monitors io.ports
 io.buffers io.files io.timeouts io.encodings.string
-io.encodings.utf16n io windows windows.kernel32 windows.types
+io.encodings.utf16n io windows.errors windows.kernel32 windows.types
 io.pathnames ;
 IN: io.monitors.windows.nt
 

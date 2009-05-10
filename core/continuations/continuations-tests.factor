@@ -4,7 +4,7 @@ kernel.private accessors eval ;
 IN: continuations.tests
 
 : (callcc1-test) ( n obj -- n' obj )
-    [ 1- dup ] dip ?push
+    [ 1 - dup ] dip ?push
     over 0 = [ "test-cc" get continue-with ] when
     (callcc1-test) ;
 
@@ -64,7 +64,7 @@ IN: continuations.tests
 
 [ 1 2 ] [ bar ] unit-test
 
-[ t ] [ \ bar def>> "c" get innermost-frame-quot = ] unit-test
+[ t ] [ \ bar def>> "c" get innermost-frame-executing = ] unit-test
 
 [ 1 ] [ "c" get innermost-frame-scan ] unit-test
 

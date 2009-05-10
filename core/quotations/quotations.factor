@@ -19,7 +19,7 @@ M: quotation call (call) ;
 
 M: curry call uncurry call ;
 
-M: compose call uncompose slip call ;
+M: compose call uncompose [ call ] dip call ;
 
 M: wrapper equal?
     over wrapper? [ [ wrapped>> ] bi@ = ] [ 2drop f ] if ;
@@ -48,12 +48,12 @@ M: object literalize ;
 
 M: wrapper literalize <wrapper> ;
 
-M: curry length quot>> length 1+ ;
+M: curry length quot>> length 1 + ;
 
 M: curry nth
     over 0 =
     [ nip obj>> literalize ]
-    [ [ 1- ] dip quot>> nth ]
+    [ [ 1 - ] dip quot>> nth ]
     if ;
 
 INSTANCE: curry immutable-sequence

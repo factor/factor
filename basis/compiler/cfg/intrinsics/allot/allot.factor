@@ -27,11 +27,11 @@ IN: compiler.cfg.intrinsics.allot
         [ tuple ##set-slots ] [ ds-push drop ] 2bi
     ] [ drop emit-primitive ] if ;
 
-: store-length ( len reg -- )
-    [ ^^load-literal ] dip 1 object tag-number ##set-slot-imm ;
+: store-length ( len reg class -- )
+    [ [ ^^load-literal ] dip 1 ] dip tag-number ##set-slot-imm ;
 
-: store-initial-element ( elt reg len -- )
-    [ 2 + object tag-number ##set-slot-imm ] with with each ;
+:: store-initial-element ( len reg elt class -- )
+    len [ [ elt reg ] dip 2 + class tag-number ##set-slot-imm ] each ;
 
 : expand-<array>? ( obj -- ? )
     dup integer? [ 0 8 between? ] [ drop f ] if ;
@@ -42,8 +42,8 @@ IN: compiler.cfg.intrinsics.allot
             [let | elt [ ds-pop ]
                    reg [ len ^^allot-array ] |
                 ds-drop
-                len reg store-length
-                elt reg len store-initial-element
+                len reg array store-length
+                len reg elt array store-initial-element
                 reg ds-push
             ]
         ] [ node emit-primitive ] if
@@ -57,16 +57,16 @@ IN: compiler.cfg.intrinsics.allot
 : emit-allot-byte-array ( len -- dst )
     ds-drop
     dup ^^allot-byte-array
-    [ store-length ] [ ds-push ] [ ] tri ;
+    [ byte-array store-length ] [ ds-push ] [ ] tri ;
 
 : emit-(byte-array) ( node -- )
     dup node-input-infos first literal>> dup expand-<byte-array>?
     [ nip emit-allot-byte-array drop ] [ drop emit-primitive ] if ;
 
-: emit-<byte-array> ( node -- )
-    dup node-input-infos first literal>> dup expand-<byte-array>? [
-        nip
-        [ 0 ^^load-literal ] dip
-        [ emit-allot-byte-array ] keep
-        bytes>cells store-initial-element
-    ] [ drop emit-primitive ] if ;
+:: emit-<byte-array> ( node -- )
+    node node-input-infos first literal>> dup expand-<byte-array>? [
+        :> len
+        0 ^^load-literal :> elt
+        len emit-allot-byte-array :> reg
+        len reg elt byte-array store-initial-element
+    ] [ drop node emit-primitive ] if ;

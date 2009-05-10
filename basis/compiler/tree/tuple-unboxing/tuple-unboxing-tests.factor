@@ -32,7 +32,6 @@ TUPLE: empty-tuple ;
     [ dup [ drop f ] [ "A" throw ] if ]
     [ [ ] [ ] curry curry dup 2 slot swap 3 slot dup 2 slot swap 3 slot drop ]
     [ [ ] [ ] curry curry call ]
-    [ <complex> <complex> dup 1 slot drop 2 slot drop ]
     [ 1 cons boa over [ "A" throw ] when car>> ]
     [ [ <=> ] sort ]
     [ [ <=> ] with search ]
@@ -40,7 +39,7 @@ TUPLE: empty-tuple ;
 
 ! A more complicated example
 : impeach-node ( quot: ( node -- ) -- )
-    dup slip impeach-node ; inline recursive
+    [ call ] keep impeach-node ; inline recursive
 
 : bleach-node ( quot: ( node -- ) -- )
     [ bleach-node ] curry [ ] compose impeach-node ; inline recursive

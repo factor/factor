@@ -42,8 +42,15 @@ HELP: effect-height
 { $description "Outputs the number of objects added to the data stack by the stack effect. This will be negative if the stack effect only removes objects from the stack." } ;
 
 HELP: effect<=
-{ $values { "eff1" effect } { "eff2" effect } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "eff1" } " is substitutable for " { $snippet "eff2" } ". What this means is that both stack effects change the stack height by the same amount, the first takes a smaller or equal number of inputs as the second, and either both or neither one terminate execution by throwing an error." } ;
+{ $values { "effect1" effect } { "effect2" effect } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "effect1" } " is substitutable for " { $snippet "effect2" } ". What this means is that both stack effects change the stack height by the same amount, the first takes a smaller or equal number of inputs as the second, and either both or neither one terminate execution by throwing an error." } ;
+
+HELP: effect=
+{ $values { "effect1" effect } { "effect2" effect } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "effect1" } " and " { $snippet "effect2" } " represent the same stack transformation, without looking parameter names." }
+{ $examples
+  { $example "USING: effects prettyprint ;" "(( a -- b )) (( x -- y )) effect= ." "t" }
+} ;
 
 HELP: effect>string
 { $values { "obj" object } { "str" string } }
