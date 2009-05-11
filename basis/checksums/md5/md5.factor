@@ -7,49 +7,40 @@ io.encodings.binary math.bitwise checksums accessors
 checksums.common checksums.stream combinators combinators.smart ;
 IN: checksums.md5
 
-TUPLE: md5-state bytes-read a b c d old-a old-b old-c old-d ;
+TUPLE: md5-state bytes-read state old-state ;
 
 : <md5-state> ( -- md5-state )
     md5-state new
         0 >>bytes-read
-        HEX: 67452301 [ >>a ] [ >>old-a ] bi
-        HEX: efcdab89 [ >>b ] [ >>old-b ] bi
-        HEX: 98badcfe [ >>c ] [ >>old-c ] bi
-        HEX: 10325476 [ >>d ] [ >>old-d ] bi ;
+        { HEX: 67452301 HEX: efcdab89 HEX: 98badcfe HEX: 10325476 }
+        [ clone >>state ] [ clone >>old-state ] bi ;
 
 <PRIVATE
 
-: update-md5-state ( md5-state -- md5-state )
-    {
-        [ [ a>> ] [ ] [ old-a>> ] tri [ w+ ] change-a (>>old-a) ]
-        [ [ b>> ] [ ] [ old-b>> ] tri [ w+ ] change-b (>>old-b) ]
-        [ [ c>> ] [ ] [ old-c>> ] tri [ w+ ] change-c (>>old-c) ]
-        [ [ d>> ] [ ] [ old-d>> ] tri [ w+ ] change-d (>>old-d) ]
-        [ ]
-    } cleave ;
+: v-w+ ( v1 v2 -- v3 ) [ w+ ] 2map ;
 
-: md5-state>bytes ( md5-state -- str )
-    [ { [ a>> ] [ b>> ] [ c>> ] [ d>> ] } cleave ] output>array
-    [ 4 >le ] map B{ } concat-as ;
+: update-md5-state ( md5-state -- )
+    [ state>> ] [ old-state>> v-w+ dup clone ] [ ] tri
+    [ (>>old-state) ] [ (>>state) ] bi ;
 
 : T ( N -- Y )
     sin abs 32 2^ * >integer ; foldable
 
 :: F ( X Y Z -- FXYZ )
     #! F(X,Y,Z) = XY v not(X) Z
-    X Y bitand X bitnot Z bitand bitor ;
+    X Y bitand X bitnot Z bitand bitor ; inline
 
 :: G ( X Y Z -- GXYZ )
     #! G(X,Y,Z) = XZ v Y not(Z)
-    X Z bitand Y Z bitnot bitand bitor ;
+    X Z bitand Y Z bitnot bitand bitor ; inline
 
 : H ( X Y Z -- HXYZ )
     #! H(X,Y,Z) = X xor Y xor Z
-    bitxor bitxor ;
+    bitxor bitxor ; inline
 
 :: I ( X Y Z -- IXYZ )
     #! I(X,Y,Z) = Y xor (X v not(Z))
-    Z bitnot X bitor Y bitxor ;
+    Z bitnot X bitor Y bitxor ; inline
 
 CONSTANT: S11 7
 CONSTANT: S12 12
@@ -68,39 +59,27 @@ CONSTANT: S42 10
 CONSTANT: S43 15
 CONSTANT: S44 21
 
+CONSTANT: a 0
+CONSTANT: b 1
+CONSTANT: c 2
+CONSTANT: d 3
 
-
-
-SYMBOLS: a b c d old-a old-b old-c old-d ;
-
-: initialize-md5 ( -- )
-    0 bytes-read set
-    HEX: 67452301 dup a set old-a set
-    HEX: efcdab89 dup b set old-b set
-    HEX: 98badcfe dup c set old-c set
-    HEX: 10325476 dup d set old-d set ;
-
-: update-md ( -- )
-    old-a a update-old-new
-    old-b b update-old-new
-    old-c c update-old-new
-    old-d d update-old-new ;
-
-
-:: (ABCD) ( x a b c d k s i func -- )
+:: (ABCD) ( x V a b c d k s i quot -- )
     #! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
-    a [
-        b get c get d get func call w+
+    a V [
+        b V nth-unsafe
+        c V nth-unsafe
+        d V nth-unsafe quot call w+
         k x nth-unsafe w+
         i T w+
         s bitroll-32
-        b get w+
-    ] change ; inline
+        b V nth-unsafe w+
+    ] change-nth ; inline
 
-MACRO: with-md5-round ( ops func -- )
-    '[ [ _ (ABCD) ] compose ] map '[ _ cleave ] ;
+MACRO: with-md5-round ( ops quot -- )
+    '[ [ _ (ABCD) ] compose ] map '[ _ 2cleave ] ;
 
-: (process-md5-block-F) ( block -- )
+: (process-md5-block-F) ( block v -- )
     {
         [ a b c d 0  S11 1  ]
         [ d a b c 1  S12 2  ]
@@ -118,9 +97,9 @@ MACRO: with-md5-round ( ops func -- )
         [ d a b c 13 S12 14 ]
         [ c d a b 14 S13 15 ]
         [ b c d a 15 S14 16 ]
-    } [ F ] with-md5-round ;
+    } [ F ] with-md5-round ; inline
 
-: (process-md5-block-G) ( block -- )
+: (process-md5-block-G) ( block v -- )
     {
         [ a b c d 1  S21 17 ]
         [ d a b c 6  S22 18 ]
@@ -138,9 +117,9 @@ MACRO: with-md5-round ( ops func -- )
         [ d a b c 2  S22 30 ]
         [ c d a b 7  S23 31 ]
         [ b c d a 12 S24 32 ]
-    } [ G ] with-md5-round ;
+    } [ G ] with-md5-round ; inline
 
-: (process-md5-block-H) ( block -- )
+: (process-md5-block-H) ( block v -- )
     {
         [ a b c d 5  S31 33 ]
         [ d a b c 8  S32 34 ]
@@ -158,9 +137,9 @@ MACRO: with-md5-round ( ops func -- )
         [ d a b c 12 S32 46 ]
         [ c d a b 15 S33 47 ]
         [ b c d a 2  S34 48 ]
-    } [ H ] with-md5-round ;
+    } [ H ] with-md5-round ; inline
 
-: (process-md5-block-I) ( block -- )
+: (process-md5-block-I) ( block v -- )
     {
         [ a b c d 0  S41 49 ]
         [ d a b c 7  S42 50 ]
@@ -178,33 +157,36 @@ MACRO: with-md5-round ( ops func -- )
         [ d a b c 11 S42 62 ]
         [ c d a b 2  S43 63 ]
         [ b c d a 9  S44 64 ]
-    } [ I ] with-md5-round ;
+    } [ I ] with-md5-round ; inline
 
-: (process-md5-block) ( block -- )
-    4 <groups> [ le> ] map {
-        [ (process-md5-block-F) ]
-        [ (process-md5-block-G) ]
-        [ (process-md5-block-H) ]
-        [ (process-md5-block-I) ]
-    } cleave
-
-    update-md ;
-
-: process-md5-block ( str -- )
-    dup length [ bytes-read [ + ] change ] keep 64 = [
-        (process-md5-block)
+: (process-md5-block) ( block state -- )
+    [
+        [ 4 <groups> [ le> ] map ] [ state>> ] bi* {
+            [ (process-md5-block-F) ]
+            [ (process-md5-block-G) ]
+            [ (process-md5-block-H) ]
+            [ (process-md5-block-I) ]
+        } 2cleave
     ] [
-        f bytes-read get pad-last-block
-        [ (process-md5-block) ] each
+        nip update-md5-state
+    ] 2bi ;
+
+:: process-md5-block ( block state -- )
+    block length
+    [ state [ + ] change-bytes-read drop ] [ 64 = ] bi [
+        block state (process-md5-block)
+    ] [
+        block f state bytes-read>> pad-last-block
+        [ state (process-md5-block) ] each
     ] if ;
     
-: stream>md5 ( stream -- )
-    64 over stream-read
-    [ process-md5-block ] [ length 64 = ] bi
-    [ stream>md5 ] [ drop ] if ;
+:: stream>md5 ( stream state -- )
+    64 stream stream-read
+    [ state process-md5-block ] [ length 64 = ] bi
+    [ stream state stream>md5 ] when ;
 
-: get-md5 ( -- str )
-    [ a b c d ] [ get 4 >le ] map concat >byte-array ;
+: get-md5 ( md5-state -- bytes )
+    state>> [ 4 >le ] map B{ } concat-as ;
 
 PRIVATE>
 
@@ -213,4 +195,4 @@ SINGLETON: md5
 INSTANCE: md5 stream-checksum
 
 M: md5 checksum-stream
-    drop initialize-md5 stream>md5 get-md5 ;
+    drop <md5-state> [ stream>md5 ] [ get-md5 ] bi ;
