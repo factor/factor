@@ -43,14 +43,14 @@ CONSTANT: theme-path "basis/ui/gadgets/theme/"
     [ my-arch make-image ] unless ;
 
 : bootstrap-profile ( -- profile )
-    {
-        { "math"     deploy-math?     }
-        { "compiler" deploy-compiler? }
-        { "threads"  deploy-threads?  }
-        { "ui"       deploy-ui?       }
-        { "unicode"  deploy-unicode?  }
-    } [ nip get ] assoc-filter keys
-    native-io? [ "io" suffix ] when ;
+    [
+        deploy-math? get [ "math" , ] when
+        deploy-threads? get [ "threads" , ] when
+        "compiler" ,
+        deploy-ui? get [ "ui" , ] when
+        deploy-unicode? get [ "unicode" , ] when
+        native-io? [ "io" , ] when
+    ] { } make ;
 
 : staging-image-name ( profile -- name )
     "staging."

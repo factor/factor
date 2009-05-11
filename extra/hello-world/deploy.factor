@@ -2,7 +2,6 @@ USING: tools.deploy.config ;
 H{
     { deploy-unicode? f }
     { deploy-ui? f }
-    { deploy-compiler? t }
     { deploy-name "Hello world (console)" }
     { deploy-io 2 }
     { deploy-threads? f }
