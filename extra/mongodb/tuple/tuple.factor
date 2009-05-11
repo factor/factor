@@ -61,7 +61,7 @@ PRIVATE>
     [ tuple-collection name>> ]
     [ id-selector ]
     [ tuple>assoc ] tri
-    <mdb-update-msg> update ;
+    <update> update ;
 
 : save-tuple ( tuple -- )
     update-tuple ;
