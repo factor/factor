@@ -6,7 +6,7 @@ H{
     { deploy-math? t }
     { deploy-io 2 }
     { deploy-c-types? f }
-    { deploy-name "Spheres" }
+    { deploy-name "Terrain" }
     { deploy-word-props? f }
     { deploy-word-defs? f }
     { "stop-after-last-window?" t }
