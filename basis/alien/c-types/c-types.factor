@@ -259,8 +259,9 @@ M: long-long-type box-return ( type -- )
     [ dup c-setter '[ _ <c-object> [ 0 @ ] keep ] ] bi
     (( value -- c-ptr )) define-inline ;
 
-: c-bool> ( int -- ? )
-    0 = not ; inline
+: >c-bool ( ? -- int ) 1 0 ? ; inline
+
+: c-bool> ( int -- ? ) 0 = not ; inline
 
 : define-primitive-type ( type name -- )
     [ typedef ]
@@ -409,10 +410,10 @@ CONSTANT: primitive-types
     "uchar" define-primitive-type
 
     <c-type>
-        [ alien-unsigned-4 zero? not ] >>getter
-        [ [ 1 0 ? ] 2dip set-alien-unsigned-4 ] >>setter
-        4 >>size
-        4 >>align
+        [ alien-unsigned-1 c-bool> ] >>getter
+        [ [ >c-bool ] 2dip set-alien-unsigned-1 ] >>setter
+        1 >>size
+        1 >>align
         "box_boolean" >>boxer
         "to_boolean" >>unboxer
     "bool" define-primitive-type

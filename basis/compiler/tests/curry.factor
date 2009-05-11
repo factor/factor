@@ -33,7 +33,7 @@ IN: compiler.tests.curry
 ] unit-test
 
 : foobar ( quot: ( -- ) -- )
-    dup slip swap [ foobar ] [ drop ] if ; inline recursive
+    [ call ] keep swap [ foobar ] [ drop ] if ; inline recursive
 
 [ ] [ [ [ f ] foobar ] compile-call ] unit-test
 

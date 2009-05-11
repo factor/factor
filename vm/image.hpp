@@ -1,8 +1,8 @@
 namespace factor
 {
 
-#define IMAGE_MAGIC 0x0f0e0d0c
-#define IMAGE_VERSION 4
+static const cell image_magic = 0x0f0e0d0c;
+static const cell image_version = 4;
 
 struct image_header {
 	cell magic;

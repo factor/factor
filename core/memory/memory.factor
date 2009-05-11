@@ -26,6 +26,6 @@ IN: memory
     normalize-path native-string>alien (save-image) ;
 
 : save-image-and-exit ( path -- )
-    normalize-path native-string>alien (save-image) ;
+    normalize-path native-string>alien (save-image-and-exit) ;
 
 : save ( -- ) image save-image ;

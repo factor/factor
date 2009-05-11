@@ -1,4 +1,4 @@
-! Copyright (c) 2007, 2008 Aaron Schaefer, Slava Pestov.
+! Copyright (c) 2007-2009 Aaron Schaefer, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions math.ranges project-euler.common sequences
     sets ;
@@ -47,14 +47,14 @@ PRIVATE>
 
 
 : euler001b ( -- answer )
-    1000 [ [ 5 mod ] [ 3 mod ] bi [ 0 = ] either? ] filter sum ;
+    1000 [0,b) [ [ 5 mod ] [ 3 mod ] bi [ 0 = ] either? ] filter sum ;
 
 ! [ euler001b ] 100 ave-time
 ! 0 ms ave run time - 0.06 SD (100 trials)
 
 
 : euler001c ( -- answer )
-    1000 [ { 3 5 } [ divisor? ] with any? ] filter sum ;
+    1000 [0,b) [ { 3 5 } [ divisor? ] with any? ] filter sum ;
 
 ! [ euler001c ] 100 ave-time
 ! 0 ms ave run time - 0.06 SD (100 trials)

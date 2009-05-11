@@ -88,7 +88,7 @@ M: ##call generate-insn
     word>> dup sub-primitive>>
     [ first % ] [ [ add-call ] [ %call ] bi ] ?if ;
 
-M: ##jump generate-insn word>> [ add-call ] [ %jump-label ] bi ;
+M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 
 M: ##return generate-insn drop %return ;
 
@@ -444,8 +444,7 @@ TUPLE: callback-context ;
 
 : do-callback ( quot token -- )
     init-catchstack
-    dup 2 setenv
-    slip
+    [ 2 setenv call ] keep
     wait-to-return ; inline
 
 : callback-return-quot ( ctype -- quot )

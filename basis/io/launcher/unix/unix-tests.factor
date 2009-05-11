@@ -48,7 +48,7 @@ concurrency.promises threads unix.process ;
     try-process
 ] unit-test
 
-[ f ] [
+[ "" ] [
     "cat"
     "launcher-test-1" temp-file
     2array

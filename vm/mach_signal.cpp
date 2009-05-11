@@ -169,7 +169,7 @@ mach_exception_thread (void *arg)
 }
 
 /* Initialize the Mach exception handler thread. */
-void mach_initialize (void)
+void mach_initialize ()
 {
 	mach_port_t self;
 	exception_mask_t mask;

@@ -62,9 +62,6 @@ $nl
     ": dip   [ ] bi* ;"
     ": 2dip  [ ] [ ] tri* ;"
     ""
-    ": slip  [ call ] [ ] bi* ;"
-    ": 2slip [ call ] [ ] [ ] tri* ;"
-    ""
     ": nip   [ drop ] [ ] bi* ;"
     ": 2nip  [ drop ] [ drop ] [ ] tri* ;"
     ""
@@ -121,7 +118,7 @@ $nl
 { $subsection both? }
 { $subsection either? } ;
 
-ARTICLE: "slip-keep-combinators" "Retain stack combinators"
+ARTICLE: "retainstack-combinators" "Retain stack combinators"
 "Sometimes an additional storage area is needed to hold objects. The " { $emphasis "retain stack" } " is an auxilliary stack for this purpose. Objects can be moved between the data and retain stacks using a set of combinators."
 $nl
 "The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
@@ -129,10 +126,6 @@ $nl
 { $subsection 2dip }
 { $subsection 3dip }
 { $subsection 4dip }
-"The slip combinators invoke a quotation further down on the stack. They are most useful for implementing other combinators:"
-{ $subsection slip }
-{ $subsection 2slip }
-{ $subsection 3slip }
 "The keep combinators invoke a quotation which takes a number of values off the stack, and then they restore those values:"
 { $subsection keep }
 { $subsection 2keep }
@@ -259,7 +252,7 @@ ARTICLE: "conditionals" "Conditional combinators"
 
 ARTICLE: "dataflow-combinators" "Data flow combinators"
 "Data flow combinators pass values between quotations:"
-{ $subsection "slip-keep-combinators" }
+{ $subsection "retainstack-combinators" }
 { $subsection "cleave-combinators" }
 { $subsection "spread-combinators" }
 { $subsection "apply-combinators" }

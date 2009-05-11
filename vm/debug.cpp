@@ -155,13 +155,13 @@ void print_objects(cell *start, cell *end)
 	}
 }
 
-void print_datastack(void)
+void print_datastack()
 {
 	print_string("==== DATA STACK:\n");
 	print_objects((cell *)ds_bot,(cell *)ds);
 }
 
-void print_retainstack(void)
+void print_retainstack()
 {
 	print_string("==== RETAIN STACK:\n");
 	print_objects((cell *)rs_bot,(cell *)rs);
@@ -179,7 +179,7 @@ void print_stack_frame(stack_frame *frame)
 	print_string("\n");
 }
 
-void print_callstack(void)
+void print_callstack()
 {
 	print_string("==== CALL STACK:\n");
 	cell bottom = (cell)stack_chain->callstack_bottom;
@@ -210,7 +210,7 @@ void dump_zone(zone *z)
 	print_string(", here="); print_cell(z->here - z->start); nl();
 }
 
-void dump_generations(void)
+void dump_generations()
 {
 	cell i;
 
@@ -285,7 +285,7 @@ void find_data_references(cell look_for_)
 }
 
 /* Dump all code blocks for debugging */
-void dump_code_heap(void)
+void dump_code_heap()
 {
 	cell reloc_size = 0, literal_size = 0;
 
@@ -325,7 +325,7 @@ void dump_code_heap(void)
 	print_cell(literal_size); print_string(" bytes of literal data\n");
 }
 
-void factorbug(void)
+void factorbug()
 {
 	if(fep_disabled)
 	{

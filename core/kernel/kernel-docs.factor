@@ -212,18 +212,6 @@ HELP: call-clear ( quot -- )
 { $description "Calls a quotation with an empty call stack. If the quotation returns, Factor will exit.." }
 { $notes "Used to implement " { $link "threads" } "." } ;
 
-HELP: slip
-{ $values { "quot" quotation } { "x" object } }
-{ $description "Calls a quotation while hiding the top of the stack." } ;
-
-HELP: 2slip
-{ $values { "quot" quotation } { "x" object } { "y" object } }
-{ $description "Calls a quotation while hiding the top two stack elements." } ;
-
-HELP: 3slip
-{ $values { "quot" quotation } { "x" object } { "y" object } { "z" object } }
-{ $description "Calls a quotation while hiding the top three stack elements." } ;
-
 HELP: keep
 { $values { "quot" { $quotation "( x -- ... )" } } { "x" object } }
 { $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
