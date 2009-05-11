@@ -6,7 +6,6 @@ H{
     { deploy-name "none" }
     { "stop-after-last-window?" t }
     { deploy-c-types? f }
-    { deploy-compiler? f }
     { deploy-io 1 }
     { deploy-ui? f }
     { deploy-reflection 1 }

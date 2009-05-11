@@ -16,7 +16,8 @@ word *allot_word(cell vocab_, cell name_)
 	new_word->def = userenv[UNDEFINED_ENV];
 	new_word->props = F;
 	new_word->counter = tag_fixnum(0);
-	new_word->direct_entry_def = F;
+	new_word->pic_def = F;
+	new_word->pic_tail_def = F;
 	new_word->subprimitive = F;
 	new_word->profiling = NULL;
 	new_word->code = NULL;
@@ -44,7 +45,7 @@ PRIMITIVE(word_xt)
 	word *w = untag_check<word>(dpop());
 	code_block *code = (profiling_p ? w->profiling : w->code);
 	dpush(allot_cell((cell)code->xt()));
-	dpush(allot_cell((cell)code + code->block.size));
+	dpush(allot_cell((cell)code + code->size));
 }
 
 /* Allocates memory */

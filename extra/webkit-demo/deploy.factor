@@ -4,7 +4,6 @@ H{
     { deploy-threads? f }
     { deploy-word-defs? f }
     { deploy-ui? f }
-    { deploy-compiler? t }
     { deploy-word-props? f }
     { "stop-after-last-window?" t }
     { deploy-unicode? f }

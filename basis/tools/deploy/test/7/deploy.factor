@@ -6,7 +6,6 @@ H{
     { deploy-io 2 }
     { deploy-math? t }
     { "stop-after-last-window?" t }
-    { deploy-compiler? t }
     { deploy-unicode? f }
     { deploy-c-types? f }
     { deploy-reflection 1 }

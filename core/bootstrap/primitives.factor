@@ -231,7 +231,8 @@ bi
     "vocabulary"
     { "def" { "quotation" "quotations" } initial: [ ] }
     "props"
-    { "direct-entry-def" }
+    "pic-def"
+    "pic-tail-def"
     { "counter" { "fixnum" "math" } }
     { "sub-primitive" read-only }
 } define-builtin
@@ -493,7 +494,7 @@ tuple
     { "(sleep)" "threads.private" (( us -- )) }
     { "<tuple-boa>" "classes.tuple.private" (( ... layout -- tuple )) }
     { "callstack>array" "kernel" (( callstack -- array )) }
-    { "innermost-frame-quot" "kernel.private" (( callstack -- quot )) }
+    { "innermost-frame-executing" "kernel.private" (( callstack -- obj )) }
     { "innermost-frame-scan" "kernel.private" (( callstack -- n )) }
     { "set-innermost-frame-quot" "kernel.private" (( n callstack -- )) }
     { "call-clear" "kernel" (( quot -- )) }
@@ -505,6 +506,7 @@ tuple
     { "load-locals" "locals.backend" (( ... n -- )) }
     { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
     { "inline-cache-miss" "generic.single.private" (( generic methods index cache -- )) }
+    { "inline-cache-miss-tail" "generic.single.private" (( generic methods index cache -- )) }
     { "mega-cache-miss" "generic.single.private" (( methods index cache -- method )) }
     { "lookup-method" "generic.single.private" (( object methods -- method )) }
     { "reset-dispatch-stats" "generic.single" (( -- )) }

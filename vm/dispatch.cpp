@@ -8,15 +8,14 @@ cell megamorphic_cache_misses;
 
 static cell search_lookup_alist(cell table, cell klass)
 {
-	array *pairs = untag<array>(table);
-	fixnum index = array_capacity(pairs) - 1;
+	array *elements = untag<array>(table);
+	fixnum index = array_capacity(elements) - 2;
 	while(index >= 0)
 	{
-		array *pair = untag<array>(array_nth(pairs,index));
-		if(array_nth(pair,0) == klass)
-			return array_nth(pair,1);
+		if(array_nth(elements,index) == klass)
+			return array_nth(elements,index + 1);
 		else
-			index--;
+			index -= 2;
 	}
 
 	return F;
@@ -103,7 +102,7 @@ static cell lookup_hairy_method(cell obj, cell methods)
 			break;
 		default:
 			critical_error("Bad methods array",methods);
-			return -1;
+			return 0;
 		}
 	}
 }

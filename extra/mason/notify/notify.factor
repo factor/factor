@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors io io.sockets io.encodings.utf8 io.files
 io.launcher kernel make mason.config mason.common mason.email
-mason.twitter namespaces sequences prettyprint ;
+mason.twitter namespaces sequences prettyprint fry ;
 IN: mason.notify
 
 : status-notify ( input-file args -- )
@@ -14,10 +14,12 @@ IN: mason.notify
             target-cpu get ,
             target-os get ,
         ] { } make prepend
-        <process>
-            swap >>command
-            swap [ +closed+ ] unless* >>stdin
-        try-output-process
+        [ 5 ] 2dip '[
+            <process>
+                _ >>command
+                _ [ +closed+ ] unless* >>stdin
+            try-output-process
+        ] retry
     ] [ 2drop ] if ;
 
 : notify-begin-build ( git-id -- )

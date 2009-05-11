@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.miller-rabin kernel math math.functions namespaces
+USING: math.primes kernel math math.functions namespaces
 sequences accessors ;
 IN: crypto.rsa
 
@@ -21,7 +21,7 @@ C: <rsa> rsa
 CONSTANT: public-key 65537
 
 : rsa-primes ( numbits -- p q )
-    2/ 2 unique-primes first2 ;
+    2/ 2 swap unique-primes first2 ;
 
 : modulus-phi ( numbits -- n phi ) 
     #! Loop until phi is not divisible by the public key.
