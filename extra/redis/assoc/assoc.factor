@@ -15,7 +15,7 @@ M: redis set-at [ redis-set drop ] with-redis ;
 
 M: redis delete-at [ redis-del drop ] with-redis ;
 
-M: redis clear-assoc [ "*" redis-keys [ redis-del drop ] each ] with-redis ;
+M: redis clear-assoc [ redis-flushdb drop ] with-redis ;
 
 M: redis equal? assoc= ;
 
