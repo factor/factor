@@ -4,7 +4,7 @@ USING: accessors arrays assocs continuations kernel math models
 namespaces opengl opengl.textures sequences io combinators
 combinators.short-circuit fry math.vectors math.rectangles cache
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-ui.commands ui.pixel-formats destructors literals ;
+ui.commands ui.pixel-formats destructors literals strings ;
 IN: ui.gadgets.worlds
 
 CONSTANT: default-world-pixel-format-attributes
@@ -21,7 +21,7 @@ TUPLE: world < track
 TUPLE: world-attributes
     { world-class initial: world }
     grab-input?
-    title
+    { title string initial: "Factor Window" }
     status
     gadgets
     { pixel-format-attributes initial: $ default-world-pixel-format-attributes } ;
@@ -63,7 +63,7 @@ M: world request-focus-on ( child gadget -- )
 : new-world ( class -- world )
     vertical swap new-track
         t >>root?
-        t >>active?
+        f >>active?
         { 0 0 } >>window-loc
         f >>grab-input? ;
 
