@@ -233,8 +233,7 @@ PRIVATE>
 : genre ( id3 -- string/f )
     "TCON" find-id3-frame parse-genre ;
 
-: find-mp3s ( path -- seq )
-    [ >lower ".mp3" tail? ] find-all-files ;
+: find-mp3s ( path -- seq ) ".mp3" find-by-extension ;
 
 ERROR: id3-parse-error path error ;
 
