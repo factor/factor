@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io redis.response-parser redis.command-writer ;
+USING: io redis.response-parser redis.command-writer splitting ;
 IN: redis
 
 #! Connection
@@ -23,7 +23,7 @@ IN: redis
 : redis-type ( key -- response ) type flush read-response ;
 
 #! Key space
-: redis-keys ( pattern -- response ) keys flush read-response ;
+: redis-keys ( pattern -- response ) keys flush read-response " " split ;
 : redis-randomkey ( -- response ) randomkey flush read-response ;
 : redis-rename ( newkey key -- response ) rename flush read-response ;
 : redis-renamenx ( newkey key -- response ) renamenx flush read-response ;
