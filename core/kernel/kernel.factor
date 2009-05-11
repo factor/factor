@@ -58,37 +58,19 @@ DEFER: if
 : ?if ( default cond true false -- )
     pick [ drop [ drop ] 2dip call ] [ 2nip call ] if ; inline
 
-! Slippers and dippers.
+! Dippers.
 ! Not declared inline because the compiler special-cases them
 
-: slip ( quot x -- x )
-    #! 'slip' and 'dip' can be defined in terms of each other
-    #! because the JIT special-cases a 'dip' preceeded by
-    #! a literal quotation.
-    [ call ] dip ;
+: dip ( x quot -- x ) swap [ call ] dip ;
 
-: 2slip ( quot x y -- x y )
-    #! '2slip' and '2dip' can be defined in terms of each other
-    #! because the JIT special-cases a '2dip' preceeded by
-    #! a literal quotation.
-    [ call ] 2dip ;
+: 2dip ( x y quot -- x y ) -rot [ call ] 2dip ;
 
-: 3slip ( quot x y z -- x y z )
-    #! '3slip' and '3dip' can be defined in terms of each other
-    #! because the JIT special-cases a '3dip' preceeded by
-    #! a literal quotation.
-    [ call ] 3dip ;
-
-: dip ( x quot -- x ) swap slip ;
-
-: 2dip ( x y quot -- x y ) -rot 2slip ;
-
-: 3dip ( x y z quot -- x y z ) -roll 3slip ;
+: 3dip ( x y z quot -- x y z ) -roll [ call ] 3dip ;
 
 : 4dip ( w x y z quot -- w x y z ) swap [ 3dip ] dip ; inline
 
 ! Keepers
-: keep ( x quot -- x ) over slip ; inline
+: keep ( x quot -- x ) over [ call ] dip ; inline
 
 : 2keep ( x y quot -- x y ) [ 2dup ] dip 2dip ; inline
 

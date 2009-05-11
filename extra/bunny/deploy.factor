@@ -3,7 +3,6 @@ H{
     { deploy-io 3 }
     { deploy-word-defs? f }
     { deploy-reflection 1 }
-    { deploy-compiler? t }
     { deploy-c-types? f }
     { deploy-name "Bunny" }
     { deploy-word-props? f }

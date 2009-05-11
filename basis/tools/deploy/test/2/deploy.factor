@@ -8,7 +8,6 @@ H{
     { deploy-math? t }
     { deploy-io 2 }
     { deploy-name "tools.deploy.test.2" }
-    { deploy-compiler? t }
     { deploy-reflection 1 }
     { "stop-after-last-window?" t }
 }
