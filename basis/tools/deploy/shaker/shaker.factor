@@ -41,7 +41,7 @@ IN: tools.deploy.shaker
     ] when
     strip-dictionary? [
         {
-            "compiler.units"
+            ! "compiler.units"
             "vocabs"
             "vocabs.cache"
             "source-files.errors"
@@ -271,7 +271,7 @@ IN: tools.deploy.shaker
                 compiled-generic-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
-                definition-observers
+                ! definition-observers
                 interactive-vocabs
                 lexer-factory
                 print-use-hook
@@ -301,15 +301,15 @@ IN: tools.deploy.shaker
                 compiler.errors:compiler-errors
                 continuations:thread-error-hook
             } %
+            
+            deploy-ui? get [
+                "ui-error-hook" "ui.gadgets.worlds" lookup ,
+            ] when
         ] when
 
         deploy-c-types? get [
             "c-types" "alien.c-types" lookup ,
         ] unless
-
-        deploy-ui? get [
-            "ui-error-hook" "ui.gadgets.worlds" lookup ,
-        ] when
 
         "windows-messages" "windows.messages" lookup [ , ] when*
     ] { } make ;
@@ -443,6 +443,9 @@ SYMBOL: deploy-vocab
             strip-debugger? [
                 "debugger" require
                 "inspector" require
+                deploy-ui? get [
+                    "ui.debugger" require
+                ] when
             ] unless
             deploy-vocab set
             deploy-vocab get require
