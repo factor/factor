@@ -3,57 +3,53 @@
 USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting grouping strings
 sequences byte-arrays locals sequences.private macros fry
-io.encodings.binary math.bitwise checksums
-checksums.common checksums.stream combinators ;
+io.encodings.binary math.bitwise checksums accessors
+checksums.common checksums.stream combinators combinators.smart ;
 IN: checksums.md5
 
-! See http://www.faqs.org/rfcs/rfc1321.html
+TUPLE: md5-state bytes-read a b c d old-a old-b old-c old-d ;
+
+: <md5-state> ( -- md5-state )
+    md5-state new
+        0 >>bytes-read
+        HEX: 67452301 [ >>a ] [ >>old-a ] bi
+        HEX: efcdab89 [ >>b ] [ >>old-b ] bi
+        HEX: 98badcfe [ >>c ] [ >>old-c ] bi
+        HEX: 10325476 [ >>d ] [ >>old-d ] bi ;
 
 <PRIVATE
 
-SYMBOLS: a b c d old-a old-b old-c old-d ;
+: update-md5-state ( md5-state -- md5-state )
+    {
+        [ [ a>> ] [ ] [ old-a>> ] tri [ w+ ] change-a (>>old-a) ]
+        [ [ b>> ] [ ] [ old-b>> ] tri [ w+ ] change-b (>>old-b) ]
+        [ [ c>> ] [ ] [ old-c>> ] tri [ w+ ] change-c (>>old-c) ]
+        [ [ d>> ] [ ] [ old-d>> ] tri [ w+ ] change-d (>>old-d) ]
+        [ ]
+    } cleave ;
+
+: md5-state>bytes ( md5-state -- str )
+    [ { [ a>> ] [ b>> ] [ c>> ] [ d>> ] } cleave ] output>array
+    [ 4 >le ] map B{ } concat-as ;
 
 : T ( N -- Y )
     sin abs 32 2^ * >integer ; foldable
 
-: initialize-md5 ( -- )
-    0 bytes-read set
-    HEX: 67452301 dup a set old-a set
-    HEX: efcdab89 dup b set old-b set
-    HEX: 98badcfe dup c set old-c set
-    HEX: 10325476 dup d set old-d set ;
-
-: update-md ( -- )
-    old-a a update-old-new
-    old-b b update-old-new
-    old-c c update-old-new
-    old-d d update-old-new ;
-
-:: (ABCD) ( x a b c d k s i func -- )
-    #! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
-    a [
-        b get c get d get func call w+
-        k x nth-unsafe w+
-        i T w+
-        s bitroll-32
-        b get w+
-    ] change ; inline
-
-: F ( X Y Z -- FXYZ )
+:: F ( X Y Z -- FXYZ )
     #! F(X,Y,Z) = XY v not(X) Z
-    pick bitnot bitand [ bitand ] [ bitor ] bi* ;
+    X Y bitand X bitnot Z bitand bitor ;
 
-: G ( X Y Z -- GXYZ )
+:: G ( X Y Z -- GXYZ )
     #! G(X,Y,Z) = XZ v Y not(Z)
-    dup bitnot rot bitand [ bitand ] [ bitor ] bi* ;
+    X Z bitand Y Z bitnot bitand bitor ;
 
 : H ( X Y Z -- HXYZ )
     #! H(X,Y,Z) = X xor Y xor Z
     bitxor bitxor ;
 
-: I ( X Y Z -- IXYZ )
+:: I ( X Y Z -- IXYZ )
     #! I(X,Y,Z) = Y xor (X v not(Z))
-    rot swap bitnot bitor bitxor ;
+    Z bitnot X bitor Y bitxor ;
 
 CONSTANT: S11 7
 CONSTANT: S12 12
@@ -71,6 +67,35 @@ CONSTANT: S41 6
 CONSTANT: S42 10
 CONSTANT: S43 15
 CONSTANT: S44 21
+
+
+
+
+SYMBOLS: a b c d old-a old-b old-c old-d ;
+
+: initialize-md5 ( -- )
+    0 bytes-read set
+    HEX: 67452301 dup a set old-a set
+    HEX: efcdab89 dup b set old-b set
+    HEX: 98badcfe dup c set old-c set
+    HEX: 10325476 dup d set old-d set ;
+
+: update-md ( -- )
+    old-a a update-old-new
+    old-b b update-old-new
+    old-c c update-old-new
+    old-d d update-old-new ;
+
+
+:: (ABCD) ( x a b c d k s i func -- )
+    #! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
+    a [
+        b get c get d get func call w+
+        k x nth-unsafe w+
+        i T w+
+        s bitroll-32
+        b get w+
+    ] change ; inline
 
 MACRO: with-md5-round ( ops func -- )
     '[ [ _ (ABCD) ] compose ] map '[ _ cleave ] ;
@@ -173,9 +198,10 @@ MACRO: with-md5-round ( ops func -- )
         [ (process-md5-block) ] each
     ] if ;
     
-: stream>md5 ( -- )
-    64 read [ process-md5-block ] keep
-    length 64 = [ stream>md5 ] when ;
+: stream>md5 ( stream -- )
+    64 over stream-read
+    [ process-md5-block ] [ length 64 = ] bi
+    [ stream>md5 ] [ drop ] if ;
 
 : get-md5 ( -- str )
     [ a b c d ] [ get 4 >le ] map concat >byte-array ;
@@ -186,5 +212,5 @@ SINGLETON: md5
 
 INSTANCE: md5 stream-checksum
 
-M: md5 checksum-stream ( stream -- byte-array )
-    drop [ initialize-md5 stream>md5 get-md5 ] with-input-stream ;
+M: md5 checksum-stream
+    drop initialize-md5 stream>md5 get-md5 ;
