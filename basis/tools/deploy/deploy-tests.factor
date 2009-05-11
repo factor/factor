@@ -98,3 +98,7 @@ M: quit-responder call-responder*
         run-temp-image
     ] curry unit-test
 ] each
+
+os windows? os macosx? or [
+    [ ] [ "tools.deploy.test.8" shake-and-bake run-temp-image ] unit-test
+] when
