@@ -6,7 +6,6 @@ H{
     { deploy-word-props? f }
     { deploy-ui? f }
     { deploy-io 1 }
-    { deploy-compiler? t }
     { deploy-reflection 1 }
     { "stop-after-last-window?" t }
     { deploy-unicode? f }

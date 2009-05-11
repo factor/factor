@@ -1,6 +1,6 @@
 USING: accessors assocs classes destructors functors kernel
 lexer math parser sequences specialized-arrays.int ui.backend
-words.symbol ;
+words ;
 IN: ui.pixel-formats
 
 SYMBOLS:
@@ -71,7 +71,7 @@ GENERIC: >PFA ( attribute -- pfas )
 
 M: object >PFA
     drop { } ;
-M: symbol >PFA
+M: word >PFA
     TABLE at [ { } ] unless* ;
 M: pixel-format-attribute >PFA
     dup class TABLE at

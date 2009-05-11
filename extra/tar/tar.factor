@@ -18,7 +18,7 @@ ERROR: checksum-error header ;
 : trim-string ( seq -- newseq ) [ "\0 " member? ] trim ;
 
 : read-c-string ( n -- str/f )
-    read [ zero? ] trim-tail [ f ] when-empty ;
+    read [ zero? ] trim-tail [ f ] when-empty >string ;
 
 : read-tar-header ( -- obj )
     \ tar-header new

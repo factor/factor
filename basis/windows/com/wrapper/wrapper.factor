@@ -93,7 +93,7 @@ unless
 
 : compile-alien-callback ( word return parameters abi quot -- word )
     '[ _ _ _ _ alien-callback ]
-    [ [ (( -- alien )) define-declared ] pick slip ]
+    [ [ (( -- alien )) define-declared ] pick [ call ] dip ]
     with-compilation-unit ;
 
 : (callback-word) ( function-name interface-name counter -- word )

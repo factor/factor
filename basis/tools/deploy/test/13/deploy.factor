@@ -1,7 +1,6 @@
 USING: tools.deploy.config ;
 H{
     { deploy-threads? t }
-    { deploy-compiler? t }
     { deploy-math? t }
     { deploy-io 2 }
     { "stop-after-last-window?" t }
