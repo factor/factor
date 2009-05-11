@@ -31,6 +31,20 @@ TUPLE: world-attributes
 
 : find-world ( gadget -- world/f ) [ world? ] find-parent ;
 
+: grab-input ( gadget -- )
+    find-world dup grab-input?>>
+    [ drop ] [
+        t >>grab-input?
+        dup focused?>> [ handle>> (grab-input) ] [ drop ] if
+    ] if ;
+
+: ungrab-input ( gadget -- )
+    find-world dup grab-input?>>
+    [
+        f >>grab-input?
+        dup focused?>> [ handle>> (ungrab-input) ] [ drop ] if
+    ] [ drop ] if ;
+    
 : show-status ( string/f gadget -- )
     dup find-world dup [
         dup status>> [
