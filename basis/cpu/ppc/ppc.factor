@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
-alien alien.c-types literals cpu.architecture cpu.ppc.assembler
-cpu.ppc.assembler.backend literals compiler.cfg.registers
+alien alien.accessors alien.c-types literals cpu.architecture
+cpu.ppc.assembler cpu.ppc.assembler.backend literals compiler.cfg.registers
 compiler.cfg.instructions compiler.constants compiler.codegen
 compiler.codegen.fixup compiler.cfg.intrinsics
-compiler.cfg.stack-frame ;
+compiler.cfg.stack-frame compiler.units ;
 IN: cpu.ppc
 
 ! PowerPC register assignments:
@@ -714,9 +714,13 @@ USE: vocabs.loader
 
 "complex-double" c-type t >>return-in-registers? drop
 
-"bool" c-type
-4 >>size
-4 >>align
-[ alien-unsigned-1 c-bool> ] >>getter
-[ [ >c-bool ] 2dip set-alien-unsigned-1 ] >>setter
-drop
+[
+    <c-type>
+        [ alien-unsigned-4 c-bool> ] >>getter
+        [ [ >c-bool ] 2dip set-alien-unsigned-4 ] >>setter
+        4 >>size
+        4 >>align
+        "box_boolean" >>boxer
+        "to_boolean" >>unboxer
+    "bool" define-primitive-type
+] with-compilation-unit
