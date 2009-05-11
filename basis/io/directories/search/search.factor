@@ -3,7 +3,7 @@
 USING: accessors arrays continuations deques dlists fry
 io.directories io.files io.files.info io.pathnames kernel
 sequences system vocabs.loader locals math namespaces
-sorting assocs calendar threads io math.parser ;
+sorting assocs calendar threads io math.parser unicode.case ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )
@@ -105,5 +105,12 @@ ERROR: file-not-found path bfs? quot ;
             [ path>usage ] [ drop name>> 0 ] recover
         ] { } map>assoc
     ] with-qualified-directory-entries sort-values ;
+
+: find-by-extensions ( path extensions -- seq )
+    [ >lower ] map
+    '[ >lower _ [ tail? ] with any? ] find-all-files ;
+    
+: find-by-extension ( path extension -- seq )
+    1array find-by-extensions ;
 
 os windows? [ "io.directories.search.windows" require ] when

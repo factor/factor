@@ -95,15 +95,6 @@ M: composed infer-call*
 M: object infer-call*
     "literal quotation" literal-expected ;
 
-: infer-nslip ( n -- )
-    [ infer->r infer-call ] [ infer-r> ] bi ;
-
-: infer-slip ( -- ) 1 infer-nslip ;
-
-: infer-2slip ( -- ) 2 infer-nslip ;
-
-: infer-3slip ( -- ) 3 infer-nslip ;
-
 : infer-ndip ( word n -- )
     [ literals get ] 2dip
     [ '[ _ def>> infer-quot-here ] ]
@@ -180,9 +171,6 @@ M: object infer-call*
         { \ declare [ infer-declare ] }
         { \ call [ infer-call ] }
         { \ (call) [ infer-call ] }
-        { \ slip [ infer-slip ] }
-        { \ 2slip [ infer-2slip ] }
-        { \ 3slip [ infer-3slip ] }
         { \ dip [ infer-dip ] }
         { \ 2dip [ infer-2dip ] }
         { \ 3dip [ infer-3dip ] }
@@ -216,7 +204,7 @@ M: object infer-call*
     "local-word-def" word-prop infer-quot-here ;
 
 {
-    declare call (call) slip 2slip 3slip dip 2dip 3dip curry compose
+    declare call (call) dip 2dip 3dip curry compose
     execute (execute) call-effect-unsafe execute-effect-unsafe if
     dispatch <tuple-boa> exit load-local load-locals get-local
     drop-locals do-primitive alien-invoke alien-indirect
