@@ -17,6 +17,8 @@ CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0
     [ drop origin>> ] 2tri
     v+ v+ ;
 
+: <identity> ( -- a )
+    { 1.0 0.0 } { 0.0 1.0 } { 0.0 0.0 } <affine-transform> ;
 : <translation> ( origin -- a )
     [ { 1.0 0.0 } { 0.0 1.0 } ] dip <affine-transform> ;
 : <rotation> ( theta -- transform )

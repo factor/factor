@@ -9,15 +9,15 @@ bool performing_gc;
 bool performing_compaction;
 cell collecting_gen;
 
-/* if true, we collecting AGING space for the second time, so if it is still
-full, we go on to collect TENURED */
+/* if true, we collecting aging space for the second time, so if it is still
+full, we go on to collect tenured */
 bool collecting_aging_again;
 
 /* in case a generation fills up in the middle of a gc, we jump back
 up to try collecting the next generation. */
 jmp_buf gc_jmp;
 
-gc_stats stats[MAX_GEN_COUNT];
+gc_stats stats[max_gen_count];
 u64 cards_scanned;
 u64 decks_scanned;
 u64 card_scan_time;
@@ -33,10 +33,10 @@ cell last_code_heap_scan;
 bool growing_data_heap;
 data_heap *old_data_heap;
 
-void init_data_gc(void)
+void init_data_gc()
 {
 	performing_gc = false;
-	last_code_heap_scan = NURSERY;
+	last_code_heap_scan = data->nursery();
 	collecting_aging_again = false;
 }
 
@@ -66,11 +66,11 @@ static bool should_copy_p(object *untagged)
 {
 	if(in_zone(newspace,untagged))
 		return false;
-	if(collecting_gen == TENURED)
+	if(collecting_gen == data->tenured())
 		return true;
-	else if(HAVE_AGING_P && collecting_gen == AGING)
-		return !in_zone(&data->generations[TENURED],untagged);
-	else if(collecting_gen == NURSERY)
+	else if(data->have_aging_p() && collecting_gen == data->aging())
+		return !in_zone(&data->generations[data->tenured()],untagged);
+	else if(collecting_gen == data->nursery())
 		return in_zone(&nursery,untagged);
 	else
 	{
@@ -186,19 +186,19 @@ static void copy_gen_cards(cell gen)
 
 	/* if we are collecting the nursery, we care about old->nursery pointers
 	but not old->aging pointers */
-	if(collecting_gen == NURSERY)
+	if(collecting_gen == data->nursery())
 	{
-		mask = CARD_POINTS_TO_NURSERY;
+		mask = card_points_to_nursery;
 
 		/* after the collection, no old->nursery pointers remain
 		anywhere, but old->aging pointers might remain in tenured
 		space */
-		if(gen == TENURED)
-			unmask = CARD_POINTS_TO_NURSERY;
+		if(gen == data->tenured())
+			unmask = card_points_to_nursery;
 		/* after the collection, all cards in aging space can be
 		cleared */
-		else if(HAVE_AGING_P && gen == AGING)
-			unmask = CARD_MARK_MASK;
+		else if(data->have_aging_p() && gen == data->aging())
+			unmask = card_mark_mask;
 		else
 		{
 			critical_error("bug in copy_gen_cards",gen);
@@ -208,20 +208,20 @@ static void copy_gen_cards(cell gen)
 	/* if we are collecting aging space into tenured space, we care about
 	all old->nursery and old->aging pointers. no old->aging pointers can
 	remain */
-	else if(HAVE_AGING_P && collecting_gen == AGING)
+	else if(data->have_aging_p() && collecting_gen == data->aging())
 	{
 		if(collecting_aging_again)
 		{
-			mask = CARD_POINTS_TO_AGING;
-			unmask = CARD_MARK_MASK;
+			mask = card_points_to_aging;
+			unmask = card_mark_mask;
 		}
 		/* after we collect aging space into the aging semispace, no
 		old->nursery pointers remain but tenured space might still have
 		pointers to aging space. */
 		else
 		{
-			mask = CARD_POINTS_TO_AGING;
-			unmask = CARD_POINTS_TO_NURSERY;
+			mask = card_points_to_aging;
+			unmask = card_points_to_nursery;
 		}
 	}
 	else
@@ -244,7 +244,7 @@ static void copy_gen_cards(cell gen)
 
 /* Scan cards in all generations older than the one being collected, copying
 old->new references */
-static void copy_cards(void)
+static void copy_cards()
 {
 	u64 start = current_micros();
 
@@ -264,7 +264,7 @@ static void copy_stack_elements(segment *region, cell top)
 		copy_handle((cell*)ptr);
 }
 
-static void copy_registered_locals(void)
+static void copy_registered_locals()
 {
 	cell scan = gc_locals_region->start;
 
@@ -272,7 +272,7 @@ static void copy_registered_locals(void)
 		copy_handle(*(cell **)scan);
 }
 
-static void copy_registered_bignums(void)
+static void copy_registered_bignums()
 {
 	cell scan = gc_bignums_region->start;
 
@@ -295,7 +295,7 @@ static void copy_registered_bignums(void)
 
 /* Copy roots over at the start of GC, namely various constants, stacks,
 the user environment and extra roots registered by local_roots.hpp */
-static void copy_roots(void)
+static void copy_roots()
 {
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
@@ -366,8 +366,8 @@ static cell copy_next_from_aging(cell scan)
 	{
 		obj++;
 
-		cell tenured_start = data->generations[TENURED].start;
-		cell tenured_end = data->generations[TENURED].end;
+		cell tenured_start = data->generations[data->tenured()].start;
+		cell tenured_end = data->generations[data->tenured()].end;
 
 		cell newspace_start = newspace->start;
 		cell newspace_end = newspace->end;
@@ -421,17 +421,17 @@ static cell copy_next_from_tenured(cell scan)
 
 void copy_reachable_objects(cell scan, cell *end)
 {
-	if(collecting_gen == NURSERY)
+	if(collecting_gen == data->nursery())
 	{
 		while(scan < *end)
 			scan = copy_next_from_nursery(scan);
 	}
-	else if(HAVE_AGING_P && collecting_gen == AGING)
+	else if(data->have_aging_p() && collecting_gen == data->aging())
 	{
 		while(scan < *end)
 			scan = copy_next_from_aging(scan);
 	}
-	else if(collecting_gen == TENURED)
+	else if(collecting_gen == data->tenured())
 	{
 		while(scan < *end)
 			scan = copy_next_from_tenured(scan);
@@ -443,12 +443,12 @@ static void begin_gc(cell requested_bytes)
 {
 	if(growing_data_heap)
 	{
-		if(collecting_gen != TENURED)
+		if(collecting_gen != data->tenured())
 			critical_error("Invalid parameters to begin_gc",0);
 
 		old_data_heap = data;
 		set_data_heap(grow_data_heap(old_data_heap,requested_bytes));
-		newspace = &data->generations[TENURED];
+		newspace = &data->generations[data->tenured()];
 	}
 	else if(collecting_accumulation_gen_p())
 	{
@@ -491,12 +491,12 @@ static void end_gc(cell gc_elapsed)
 	if(collecting_accumulation_gen_p())
 	{
 		/* all younger generations except are now empty.
-		if collecting_gen == NURSERY here, we only have 1 generation;
+		if collecting_gen == data->nursery() here, we only have 1 generation;
 		old-school Cheney collector */
-		if(collecting_gen != NURSERY)
-			reset_generations(NURSERY,collecting_gen - 1);
+		if(collecting_gen != data->nursery())
+			reset_generations(data->nursery(),collecting_gen - 1);
 	}
-	else if(collecting_gen == NURSERY)
+	else if(collecting_gen == data->nursery())
 	{
 		nursery.here = nursery.start;
 	}
@@ -504,7 +504,7 @@ static void end_gc(cell gc_elapsed)
 	{
 		/* all generations up to and including the one
 		collected are now empty */
-		reset_generations(NURSERY,collecting_gen);
+		reset_generations(data->nursery(),collecting_gen);
 	}
 
 	collecting_aging_again = false;
@@ -534,17 +534,17 @@ void garbage_collection(cell gen,
 	{
 		/* We have no older generations we can try collecting, so we
 		resort to growing the data heap */
-		if(collecting_gen == TENURED)
+		if(collecting_gen == data->tenured())
 		{
 			growing_data_heap = true;
 
 			/* see the comment in unmark_marked() */
 			unmark_marked(&code);
 		}
-		/* we try collecting AGING space twice before going on to
-		collect TENURED */
-		else if(HAVE_AGING_P
-			&& collecting_gen == AGING
+		/* we try collecting aging space twice before going on to
+		collect tenured */
+		else if(data->have_aging_p()
+			&& collecting_gen == data->aging()
 			&& !collecting_aging_again)
 		{
 			collecting_aging_again = true;
@@ -575,7 +575,7 @@ void garbage_collection(cell gen,
 	{
 		code_heap_scans++;
 
-		if(collecting_gen == TENURED)
+		if(collecting_gen == data->tenured())
 			free_unmarked(&code,(heap_iterator)update_literal_and_word_references);
 		else
 			copy_code_heap_roots();
@@ -593,9 +593,9 @@ void garbage_collection(cell gen,
 	performing_gc = false;
 }
 
-void gc(void)
+void gc()
 {
-	garbage_collection(TENURED,false,0);
+	garbage_collection(data->tenured(),false,0);
 }
 
 PRIMITIVE(gc)
@@ -610,7 +610,7 @@ PRIMITIVE(gc_stats)
 	cell i;
 	u64 total_gc_time = 0;
 
-	for(i = 0; i < MAX_GEN_COUNT; i++)
+	for(i = 0; i < max_gen_count; i++)
 	{
 		gc_stats *s = &stats[i];
 		result.add(allot_cell(s->collections));
@@ -633,10 +633,9 @@ PRIMITIVE(gc_stats)
 	dpush(result.elements.value());
 }
 
-void clear_gc_stats(void)
+void clear_gc_stats()
 {
-	int i;
-	for(i = 0; i < MAX_GEN_COUNT; i++)
+	for(cell i = 0; i < max_gen_count; i++)
 		memset(&stats[i],0,sizeof(gc_stats));
 
 	cards_scanned = 0;
@@ -681,9 +680,9 @@ PRIMITIVE(become)
 	compile_all_words();
 }
 
-VM_C_API void minor_gc(void)
+VM_C_API void minor_gc()
 {
-	garbage_collection(NURSERY,false,0);
+	garbage_collection(data->nursery(),false,0);
 }
 
 }

@@ -41,19 +41,19 @@ typedef wchar_t vm_char;
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
 
-void init_ffi(void);
+void init_ffi();
 void ffi_dlopen(dll *dll);
 void *ffi_dlsym(dll *dll, symbol_char *symbol);
 void ffi_dlclose(dll *dll);
 
 void sleep_micros(u64 msec);
 
-inline static void init_signals(void) {}
-inline static void early_init(void) {}
-const vm_char *vm_executable_path(void);
-const vm_char *default_image_path(void);
-long getpagesize (void);
+inline static void init_signals() {}
+inline static void early_init() {}
+const vm_char *vm_executable_path();
+const vm_char *default_image_path();
+long getpagesize ();
 
-s64 current_micros(void);
+s64 current_micros();
 
 }

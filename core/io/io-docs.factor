@@ -117,6 +117,7 @@ HELP: seek-relative
 }
 { $description "Seeks to an offset from the current position of the stream pointer." } ;
 
+{ seek-absolute seek-relative seek-end } related-words
 
 HELP: seek-input
 { $values
@@ -238,13 +239,13 @@ HELP: each-block
 { $description "Calls the quotation with successive blocks of data, until the current " { $link input-stream } " is exhausted." } ;
 
 HELP: stream-contents
-{ $values { "stream" "an input stream" } { "seq" "a string, byte array or " { $link f } } }
-{ $description "Reads the entire contents of a stream. If the stream is empty, outputs "  { $link f } "." }
+{ $values { "stream" "an input stream" } { "seq" { $or string byte-array } } }
+{ $description "Reads all elements in the given stream until the stream is exhausted. The type of the sequence depends on the stream's element type." }
 $io-error ;
 
 HELP: contents
-{ $values { "seq" "a string, byte array or " { $link f } } }
-{ $description "Reads the entire contents of a the stream stored in " { $link input-stream } ". If the stream is empty, outputs " { $link f } "." }
+{ $values { "seq" { $or string byte-array } } }
+{ $description "Reads all elements in the " { $link input-stream } " until the stream is exhausted. The type of the sequence depends on the stream's element type." }
 $io-error ;
 
 ARTICLE: "stream-protocol" "Stream protocol"
@@ -343,6 +344,10 @@ $nl
 { $subsection bl }
 "Seeking on the default output stream:"
 { $subsection seek-output }
+"Seeking descriptors:"
+{ $subsection seek-absolute }
+{ $subsection seek-relative }
+{ $subsection seek-end }
 "A pair of combinators for rebinding the " { $link output-stream } " variable:"
 { $subsection with-output-stream }
 { $subsection with-output-stream* }

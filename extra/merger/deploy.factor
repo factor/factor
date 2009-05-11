@@ -7,7 +7,6 @@ H{
     { "stop-after-last-window?" t }
     { deploy-ui? t }
     { deploy-reflection 1 }
-    { deploy-compiler? t }
     { deploy-name "Merger" }
     { deploy-word-props? f }
     { deploy-threads? t }

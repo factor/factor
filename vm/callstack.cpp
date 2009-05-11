@@ -24,10 +24,7 @@ void iterate_callstack(cell top, cell bottom, CALLSTACK_ITER iterator)
 
 void iterate_callstack_object(callstack *stack, CALLSTACK_ITER iterator)
 {
-	cell top = (cell)FIRST_STACK_FRAME(stack);
-	cell bottom = top + untag_fixnum(stack->length);
-
-	iterate_callstack(top,bottom,iterator);
+	iterate_callstack((cell)stack->top(),(cell)stack->bottom(),iterator);
 }
 
 callstack *allot_callstack(cell size)
@@ -54,7 +51,7 @@ This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-stack_frame *capture_start(void)
+stack_frame *capture_start()
 {
 	stack_frame *frame = stack_chain->callstack_bottom - 1;
 	while(frame >= stack_chain->callstack_top
@@ -75,7 +72,7 @@ PRIMITIVE(callstack)
 		size = 0;
 
 	callstack *stack = allot_callstack(size);
-	memcpy(FIRST_STACK_FRAME(stack),top,size);
+	memcpy(stack->top(),top,size);
 	dpush(tag<callstack>(stack));
 }
 
@@ -84,7 +81,7 @@ PRIMITIVE(set_callstack)
 	callstack *stack = untag_check<callstack>(dpop());
 
 	set_callstack(stack_chain->callstack_bottom,
-		FIRST_STACK_FRAME(stack),
+		stack->top(),
 		untag_fixnum(stack->length),
 		memcpy);
 
@@ -100,7 +97,7 @@ code_block *frame_code(stack_frame *frame)
 
 cell frame_type(stack_frame *frame)
 {
-	return frame_code(frame)->block.type;
+	return frame_code(frame)->type;
 }
 
 cell frame_executing(stack_frame *frame)
@@ -173,12 +170,11 @@ PRIMITIVE(callstack_to_array)
 	dpush(tag<array>(frames));
 }
 
-stack_frame *innermost_stack_frame(callstack *callstack)
+stack_frame *innermost_stack_frame(callstack *stack)
 {
-	stack_frame *top = FIRST_STACK_FRAME(callstack);
-	cell bottom = (cell)top + untag_fixnum(callstack->length);
-
-	stack_frame *frame = (stack_frame *)bottom - 1;
+	stack_frame *top = stack->top();
+	stack_frame *bottom = stack->bottom();
+	stack_frame *frame = bottom - 1;
 
 	while(frame >= top && frame_successor(frame) >= top)
 		frame = frame_successor(frame);
@@ -195,9 +191,9 @@ stack_frame *innermost_stack_frame_quot(callstack *callstack)
 
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
-PRIMITIVE(innermost_stack_frame_quot)
+PRIMITIVE(innermost_stack_frame_executing)
 {
-	dpush(frame_executing(innermost_stack_frame_quot(untag_check<callstack>(dpop()))));
+	dpush(frame_executing(innermost_stack_frame(untag_check<callstack>(dpop()))));
 }
 
 PRIMITIVE(innermost_stack_frame_scan)

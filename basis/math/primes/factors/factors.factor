@@ -1,6 +1,7 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel make math math.functions math.primes sequences ;
+USING: arrays combinators kernel make math math.functions
+math.primes sequences ;
 IN: math.primes.factors
 
 <PRIVATE

@@ -245,9 +245,21 @@ HELP: times
     { $example "USING: io math ;" "3 [ \"Hi\" print ] times" "Hi\nHi\nHi" }
 } ;
 
+HELP: fp-special?
+{ $values { "x" real } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is an IEEE special value (Not-a-Number or Infinity). While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
+
 HELP: fp-nan?
 { $values { "x" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
+
+HELP: fp-qnan?
+{ $values { "x" real } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is an IEEE Quiet Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
+
+HELP: fp-snan?
+{ $values { "x" real } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is an IEEE Signaling Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
 HELP: fp-infinity?
 { $values { "x" real } { "?" "a boolean" } }
@@ -257,7 +269,26 @@ HELP: fp-infinity?
     { $example "USING: io kernel math ;" "-1/0. [ fp-infinity? ] [ 0 < ] bi and [ \"negative infinity\" print ] when" "negative infinity" }
 } ;
 
-{ fp-nan? fp-infinity? } related-words
+HELP: fp-nan-payload
+{ $values { "x" real } { "bits" integer } }
+{ $description "If " { $snippet "x" } " is an IEEE Not-a-Number value, returns the payload encoded in the value. Returns " { $link f } " if " { $snippet "x" } " is not a " { $link float } "." } ;
+
+HELP: <fp-nan>
+{ $values { "payload" integer } { "nan" float } }
+{ $description "Constructs an IEEE Not-a-Number value with a payload of " { $snippet "payload" } "." }
+{ $notes "A " { $snippet "payload" } " of " { $snippet "0" } " will construct an Infinity value." } ;
+
+{ fp-special? fp-nan? fp-qnan? fp-snan? fp-infinity? fp-nan-payload <fp-nan> } related-words
+
+HELP: next-float
+{ $values { "m" float } { "n" float } }
+{ $description "Returns the least representable " { $link float } " value greater than " { $snippet "m" } "." } ;
+
+HELP: prev-float
+{ $values { "m" float } { "n" float } }
+{ $description "Returns the greatest representable " { $link float } " value less than " { $snippet "m" } "." } ;
+
+{ next-float prev-float } related-words
 
 HELP: real-part
 { $values { "z" number } { "x" real } }
