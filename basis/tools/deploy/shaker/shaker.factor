@@ -337,16 +337,17 @@ IN: tools.deploy.shaker
     [ instances dup H{ } clone [ [ ] cache ] curry map ] dip call
     become ; inline
 
+: compress-object? ( obj -- ? )
+    {
+        { [ dup array? ] [ empty? ] }
+        { [ dup byte-array? ] [ drop t ] }
+        { [ dup string? ] [ drop t ] }
+        { [ dup wrapper? ] [ drop t ] }
+        [ drop f ]
+    } cond ;
+
 : compress-objects ( -- )
-    [
-        {
-            [ dup array? [ empty? ] [ drop f ] if ]
-            [ byte-array? ]
-            [ string? ]
-            [ wrapper? ]
-        } cleave
-        or or or
-    ] [ ] "objects" compress ;
+    [ compress-object? ] [ ] "objects" compress ;
 
 : remain-compiled ( old new -- old new )
     #! Quotations which were formerly compiled must remain

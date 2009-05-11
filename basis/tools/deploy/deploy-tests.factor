@@ -11,7 +11,7 @@ io.directories tools.deploy.test ;
 
 [ t ] [ "hello-ui" shake-and-bake 1300000 small-enough? ] unit-test
 
-[ "staging.math-compiler-threads-ui-strip.image" ] [
+[ "staging.math-threads-compiler-ui-strip.image" ] [
     "hello-ui" deploy-config
     [ bootstrap-profile staging-image-name file-name ] bind
 ] unit-test
@@ -88,7 +88,6 @@ M: quit-responder call-responder*
 {
     "tools.deploy.test.6"
     "tools.deploy.test.7"
-    "tools.deploy.test.8"
     "tools.deploy.test.9"
     "tools.deploy.test.10"
     "tools.deploy.test.11"
