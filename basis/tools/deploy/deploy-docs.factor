@@ -29,6 +29,8 @@ ARTICLE: "tools.deploy.caveats" "Deploy tool caveats"
 "In deployed applications, the " { $link boa } " word does not verify that the parameters on the stack satisfy the tuple's slot declarations, if any. This reduces deploy image size but can make bugs harder to track down. Make sure your program is fully debugged before deployment."
 { $heading "Behavior of " { $link POSTPONE: execute( } }
 "Similarly, the " { $link POSTPONE: execute( } " word does not check word stack effects in deployed applications, since stack effects are stripped out, and so it behaves exactly like " { $link POSTPONE: execute-effect-unsafe } "."
+{ $heading "Behavior of " { $link POSTPONE: call-next-method } }
+"The " { $link POSTPONE: call-next-method } " word does not check if the input is of the right type in deployed applications."
 { $heading "Error reporting" }
 "If the " { $link deploy-reflection } " level in the configuration is low enough, the debugger is stripped out, and error messages can be rather cryptic. Increase the reflection level to get readable error messages."
 { $heading "Choosing the right deploy flags" }

@@ -4,7 +4,7 @@ USING: accessors arrays assocs continuations kernel math models
 namespaces opengl opengl.textures sequences io combinators
 combinators.short-circuit fry math.vectors math.rectangles cache
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-ui.commands ui.pixel-formats destructors literals ;
+ui.pixel-formats destructors literals ;
 IN: ui.gadgets.worlds
 
 CONSTANT: default-world-pixel-format-attributes
