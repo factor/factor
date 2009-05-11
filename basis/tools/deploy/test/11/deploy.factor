@@ -9,7 +9,6 @@ H{
     { deploy-math? f }
     { deploy-unicode? f }
     { deploy-threads? f }
-    { deploy-compiler? f }
     { deploy-io 2 }
     { deploy-ui? f }
 }

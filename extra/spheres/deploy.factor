@@ -10,6 +10,5 @@ H{
     { deploy-word-props? f }
     { deploy-word-defs? f }
     { "stop-after-last-window?" t }
-    { deploy-compiler? t }
     { deploy-threads? t }
 }
