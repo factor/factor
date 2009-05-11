@@ -13,7 +13,7 @@ TUPLE: md5-state bytes-read state old-state ;
     md5-state new
         0 >>bytes-read
         { HEX: 67452301 HEX: efcdab89 HEX: 98badcfe HEX: 10325476 }
-        [ clone >>state ] [ clone >>old-state ] bi ;
+        [ clone >>state ] [ >>old-state ] bi ;
 
 <PRIVATE
 
@@ -21,10 +21,10 @@ TUPLE: md5-state bytes-read state old-state ;
 
 : update-md5-state ( md5-state -- )
     [ state>> ] [ old-state>> v-w+ dup clone ] [ ] tri
-    [ (>>old-state) ] [ (>>state) ] bi ;
+    [ (>>old-state) ] [ (>>state) ] bi ; inline
 
 : T ( N -- Y )
-    sin abs 32 2^ * >integer ; foldable
+    sin abs 32 2^ * >integer ; inline
 
 :: F ( X Y Z -- FXYZ )
     #! F(X,Y,Z) = XY v not(X) Z
@@ -179,14 +179,14 @@ MACRO: with-md5-round ( ops quot -- )
         block f state bytes-read>> pad-last-block
         [ state (process-md5-block) ] each
     ] if ;
-    
-:: stream>md5 ( stream state -- )
-    64 stream stream-read
-    [ state process-md5-block ] [ length 64 = ] bi
-    [ stream state stream>md5 ] when ;
 
 : get-md5 ( md5-state -- bytes )
     state>> [ 4 >le ] map B{ } concat-as ;
+
+:: stream>md5 ( state stream -- )
+    64 stream stream-read
+    [ state process-md5-block ] [ length 64 = ] bi
+    [ state stream stream>md5 ] when ;
 
 PRIVATE>
 
@@ -195,4 +195,17 @@ SINGLETON: md5
 INSTANCE: md5 stream-checksum
 
 M: md5 checksum-stream
-    drop <md5-state> [ stream>md5 ] [ get-md5 ] bi ;
+    drop [ <md5-state> ] dip [ stream>md5 ] [ drop get-md5 ] 2bi ;
+
+GENERIC: initialize-checksum ( checksum -- state )
+GENERIC# add-bytes 1 ( state bytes -- state )
+GENERIC# add-stream 1 ( state stream -- state )
+GENERIC: finish-checksum ( state -- bytes )
+
+M: md5 initialize-checksum drop <md5-state> ;
+
+M: md5-state finish-checksum get-md5 ;
+
+M: md5-state add-bytes over [ binary <byte-reader> stream>md5 ] dip ;
+
+M: md5-state add-stream over [ stream>md5 ] dip ;
