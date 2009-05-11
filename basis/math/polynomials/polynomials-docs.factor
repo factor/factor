@@ -93,7 +93,13 @@ HELP: pdiff
 { $description "Finds the derivative of " { $snippet "p" } "." } ;
 
 HELP: polyval
-{ $values { "p" "a polynomial" } { "x" number } { "p[x]" number } }
+{ $values { "x" number } { "p" "a polynomial" } { "p[x]" number } }
 { $description "Evaluate " { $snippet "p" } " with the input " { $snippet "x" } "." }
-{ $examples { $example "USING: math.polynomials prettyprint ;" "{ 1 0 1 } 2 polyval ." "5" } } ;
+{ $examples { $example "USING: math.polynomials prettyprint ;" "2 { 1 0 1 } polyval ." "5" } } ;
 
+HELP: polyval*
+{ $values { "p" "a literal polynomial" } }
+{ $description "Macro version of " { $link polyval } ". Evaluates the literal polynomial " { $snippet "p" } " at the value off the top of the stack." }
+{ $examples { $example "USING: math.polynomials prettyprint ;" "2 { 1 0 1 } polyval* ." "5" } } ;
+
+{ polyval polyval* } related-words

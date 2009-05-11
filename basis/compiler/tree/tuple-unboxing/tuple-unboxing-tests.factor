@@ -39,7 +39,7 @@ TUPLE: empty-tuple ;
 
 ! A more complicated example
 : impeach-node ( quot: ( node -- ) -- )
-    dup slip impeach-node ; inline recursive
+    [ call ] keep impeach-node ; inline recursive
 
 : bleach-node ( quot: ( node -- ) -- )
     [ bleach-node ] curry [ ] compose impeach-node ; inline recursive

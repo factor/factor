@@ -1,7 +1,7 @@
 ! Copyright (c) 2007-2009 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel lists make math math.functions math.matrices
-    math.miller-rabin math.order math.parser math.primes.factors
+    math.primes.miller-rabin math.order math.parser math.primes.factors
     math.primes.lists math.ranges math.ratios namespaces parser prettyprint
     quotations sequences sorting strings unicode.case vocabs vocabs.parser
     words ;

@@ -1,8 +1,8 @@
-! Copyright (C) 2007, 2008 Slava Pestov
+! Copyright (C) 2007, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cocoa cocoa.messages cocoa.application cocoa.nibs assocs
 namespaces kernel kernel.private words compiler.units sequences
-init vocabs ;
+init vocabs memoize accessors ;
 IN: tools.deploy.shaker.cocoa
 
 : pool ( obj -- obj' ) \ pool get [ ] cache ;
@@ -42,3 +42,8 @@ H{ } clone \ pool [
         [ get values compile ] each
     ] bind
 ] with-variable
+
+\ make-prepare-send reset-memoized
+\ <selector> reset-memoized
+
+\ (send) def>> second clear-assoc

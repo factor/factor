@@ -7,7 +7,6 @@ H{
     { deploy-unicode? f }
     { deploy-c-types? f }
     { deploy-word-defs? f }
-    { deploy-compiler? t }
     { deploy-io 2 }
     { deploy-reflection 1 }
     { "stop-after-last-window?" t }
