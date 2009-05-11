@@ -45,7 +45,10 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 
 PRIVATE>
 
-: random-bits ( n -- r ) 2^ random-integer ;
+: random-bits ( numbits -- r ) 2^ random-integer ;
+
+: random-bits* ( numbits -- n )
+    1 - [ random-bits ] keep set-bit ;
 
 : random ( seq -- elt )
     [ f ] [

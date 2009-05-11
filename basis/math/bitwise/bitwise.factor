@@ -35,6 +35,11 @@ IN: math.bitwise
 : w- ( int int -- int ) - 32 bits ; inline
 : w* ( int int -- int ) * 32 bits ; inline
 
+! 64-bit arithmetic
+: W+ ( int int -- int ) + 64 bits ; inline
+: W- ( int int -- int ) - 64 bits ; inline
+: W* ( int int -- int ) * 64 bits ; inline
+
 ! flags
 MACRO: flags ( values -- )
     [ 0 ] [ [ ?execute bitor ] curry compose ] reduce ;
@@ -106,3 +111,10 @@ PRIVATE>
 : >signed ( x n -- y )
     2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
 
+: >odd ( n -- int ) 0 set-bit ; foldable
+
+: >even ( n -- int ) 0 clear-bit ; foldable
+
+: next-even ( m -- n ) >even 2 + ; foldable
+
+: next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ; foldable
