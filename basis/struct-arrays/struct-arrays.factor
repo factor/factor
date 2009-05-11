@@ -35,6 +35,6 @@ ERROR: bad-byte-array-length byte-array ;
     heap-size struct-array boa ; inline
 
 : malloc-struct-array ( length c-type -- struct-array )
-    [ heap-size calloc ] 2keep <direct-struct-array> ;
+    [ heap-size calloc ] 2keep <direct-struct-array> ; inline
 
 INSTANCE: struct-array sequence
