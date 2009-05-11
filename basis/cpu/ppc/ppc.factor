@@ -713,4 +713,10 @@ USE: vocabs.loader
 } cond
 
 "complex-double" c-type t >>return-in-registers? drop
-"bool" c-type 4 >>size 4 >>align drop
+
+"bool" c-type
+4 >>size
+4 >>align
+[ alien-unsigned-1 c-bool> ] >>getter
+[ [ >c-bool ] 2dip set-alien-unsigned-1 ] >>setter
+drop
