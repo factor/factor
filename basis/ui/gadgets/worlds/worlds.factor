@@ -101,7 +101,7 @@ M: world layout*
     [ call-next-method ]
     [ dup layers>> [ as-big-as-possible ] with each ] bi ;
 
-M: world focusable-child* gadget-child ;
+M: world focusable-child* children>> [ t ] [ first ] if-empty ;
 
 M: world children-on nip children>> ;
 

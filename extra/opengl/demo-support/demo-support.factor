@@ -36,9 +36,6 @@ M: demo-world distance-step ( gadget -- dz )
 : zoom-demo-world ( distance gadget -- )
     [ + ] with change-distance relayout-1 ;
 
-M: demo-world focusable-child* ( world -- gadget )
-    drop t ;
-
 M: demo-world pref-dim* ( gadget -- dim )
     drop { 640 480 } ;
 

@@ -21,5 +21,3 @@ M: game-world end-world
     [ [ stop-loop ] when* f ] change-game-loop
     drop ;
 
-M: game-world focusable-child* drop t ;
-
