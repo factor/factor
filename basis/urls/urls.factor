@@ -25,12 +25,14 @@ TUPLE: url protocol username password host port path query anchor ;
     ] if ;
 
 : parse-host ( string -- host port )
-    ":" split1 [ url-decode ] [
-        dup [
-            string>number
-            dup [ "Invalid port" throw ] unless
-        ] when
-    ] bi* ;
+    [
+        ":" split1 [ url-decode ] [
+            dup [
+                string>number
+                dup [ "Invalid port" throw ] unless
+            ] when
+        ] bi*
+    ] [ f f ] if* ;
 
 GENERIC: >url ( obj -- url )
 
