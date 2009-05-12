@@ -272,14 +272,13 @@ void set_quot_xt(quotation *quot, code_block *code)
 
 	quot->code = code;
 	quot->xt = code->xt();
-	quot->compiledp = T;
 }
 
 /* Allocates memory */
 void jit_compile(cell quot_, bool relocating)
 {
 	gc_root<quotation> quot(quot_);
-	if(quot->compiledp != F) return;
+	if(quot->code) return;
 
 	quotation_jit compiler(quot.value(),true,relocating);
 	compiler.iterate_quotation();
@@ -300,10 +299,10 @@ PRIMITIVE(array_to_quotation)
 {
 	quotation *quot = allot<quotation>(sizeof(quotation));
 	quot->array = dpeek();
-	quot->xt = (void *)lazy_jit_compile;
-	quot->compiledp = F;
 	quot->cached_effect = F;
 	quot->cache_counter = F;
+	quot->xt = (void *)lazy_jit_compile;
+	quot->code = NULL;
 	drepl(tag<quotation>(quot));
 }
 
@@ -352,6 +351,13 @@ VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 	stack_chain->callstack_top = stack;
 	jit_compile(quot.value(),true);
 	return quot.value();
+}
+
+PRIMITIVE(quot_compiled_p)
+{
+	tagged<quotation> quot(dpop());
+	quot.untag_check();
+	dpush(tag_boolean(quot->code != NULL));
 }
 
 }

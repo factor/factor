@@ -68,10 +68,10 @@ static void *xt_pic(word *w, cell tagged_quot)
 	else
 	{
 		quotation *quot = untag<quotation>(tagged_quot);
-		if(quot->compiledp == F)
-			return w->xt;
-		else
+		if(quot->code)
 			return quot->xt;
+		else
+			return w->xt;
 	}
 }
 
@@ -409,7 +409,7 @@ void mark_object_code_block(object *object)
 	case QUOTATION_TYPE:
 		{
 			quotation *q = (quotation *)object;
-			if(q->compiledp != F)
+			if(q->code)
 				mark_code_block(q->code);
 			break;
 		}
