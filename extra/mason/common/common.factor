@@ -10,24 +10,24 @@ IN: mason.common
 
 SYMBOL: current-git-id
 
+: short-running-process ( command -- )
+    #! Give network operations and shell commands at most
+    #! 15 minutes to complete, to catch hangs.
+    >process
+        15 minutes >>timeout
+        +closed+ >>stdin
+    try-output-process ;
+
 HOOK: really-delete-tree os ( path -- )
 
 M: windows really-delete-tree
     #! Workaround: Cygwin GIT creates read-only files for
     #! some reason.
-    [ { "chmod" "ug+rw" "-R" } swap (normalize-path) suffix try-output-process ]
+    [ { "chmod" "ug+rw" "-R" } swap (normalize-path) suffix short-running-process ]
     [ delete-tree ]
     bi ;
 
 M: unix really-delete-tree delete-tree ;
-
-: short-running-process ( command -- )
-    #! Give network operations at most 15 minutes to complete.
-    <process>
-        swap >>command
-        15 minutes >>timeout
-        +closed+ >>stdin
-    try-output-process ;
 
 : retry ( n quot -- )
     '[ drop @ f ] attempt-all drop ; inline
