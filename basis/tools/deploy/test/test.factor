@@ -1,5 +1,5 @@
 USING: accessors arrays continuations io.directories io.files.info
-io.files.temp io.launcher kernel layouts math sequences system
+io.files.temp io.launcher io.backend kernel layouts math sequences system
 tools.deploy.backend tools.deploy.config.editor ;
 IN: tools.deploy.test
 
@@ -14,7 +14,6 @@ IN: tools.deploy.test
     [ "test.image" temp-file file-info size>> ] [ cell 4 / * ] bi* <= ;
 
 : run-temp-image ( -- )
-    vm
-    "-i=" "test.image" temp-file append
-    2array
-    <process> swap >>command +closed+ >>stdin try-process ;
+    os macosx?
+    "resource:Factor.app/Contents/MacOS/factor" normalize-path vm ?
+    "-i=" "test.image" temp-file append 2array try-output-process ;
