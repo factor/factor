@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.strings alien.c-types alien.accessors alien.structs
 arrays words sequences math kernel namespaces fry libc cpu.architecture
-io.encodings.utf8 io.encodings.utf16n ;
+io.encodings.utf8 ;
 IN: alien.arrays
 
 UNION: value-type array struct-type ;
@@ -95,5 +95,4 @@ M: string-type c-type-setter
 
 { "char*" utf8 } "char*" typedef
 "char*" "uchar*" typedef
-{ "char*" utf16n } "wchar_t*" typedef
 

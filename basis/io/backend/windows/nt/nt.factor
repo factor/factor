@@ -1,9 +1,9 @@
-USING: alien alien.c-types arrays assocs combinators
-continuations destructors io io.backend io.ports io.timeouts
-io.backend.windows io.files.windows io.files.windows.nt io.files
-io.pathnames io.buffers io.streams.c libc kernel math namespaces
-sequences threads windows windows.errors windows.kernel32
-strings splitting ascii system accessors locals ;
+USING: alien alien.c-types arrays assocs combinators continuations
+destructors io io.backend io.ports io.timeouts io.backend.windows
+io.files.windows io.files.windows.nt io.files io.pathnames io.buffers
+io.streams.c io.streams.null libc kernel math namespaces sequences
+threads windows windows.errors windows.kernel32 strings splitting
+ascii system accessors locals ;
 QUALIFIED: windows.winsock
 IN: io.backend.windows.nt
 
@@ -140,7 +140,9 @@ M: winnt (wait-to-read) ( port -- )
 
 : console-app? ( -- ? ) GetConsoleWindow >boolean ;
 
-M: winnt (init-stdio)
-    console-app? [ init-c-stdio t ] [ f f f f ] if ;
+M: winnt init-stdio
+    console-app?
+    [ init-c-stdio ]
+    [ null-reader null-writer null-writer set-stdio ] if ;
 
 winnt set-io-backend

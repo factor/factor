@@ -448,7 +448,6 @@ M: quotation '
         array>> '
         quotation [
             emit ! array
-            f ' emit ! compiled
             f ' emit ! cached-effect
             f ' emit ! cache-counter
             0 emit ! xt
