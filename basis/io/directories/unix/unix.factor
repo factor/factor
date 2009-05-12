@@ -55,15 +55,11 @@ M: unix find-next-file ( DIR* -- byte-array )
         [ drop +unknown+ ]
     } case ;
 
-TUPLE: unix-directory-entry < directory-entry ino reclen ;
-
 M: unix >directory-entry ( byte-array -- directory-entry )
     {
         [ dirent-d_name utf8 alien>string ]
         [ dirent-d_type dirent-type>file-type ]
-        [ dirent-d_ino ]
-        [ dirent-d_reclen ]
-    } cleave unix-directory-entry boa ;
+    } cleave directory-entry boa ;
 
 M: unix (directory-entries) ( path -- seq )
     [
