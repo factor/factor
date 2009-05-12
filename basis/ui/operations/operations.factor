@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel ui.commands
 ui.gestures sequences strings math words generic namespaces
-hashtables help.markup quotations assocs fry linked-assocs ;
+hashtables quotations assocs fry linked-assocs ;
 IN: ui.operations
 
 SYMBOL: +keyboard+
