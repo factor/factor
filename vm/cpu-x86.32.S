@@ -25,7 +25,7 @@
 	pop %ebp ; \
 	pop %ebx
 
-#define QUOT_XT_OFFSET 16
+#define QUOT_XT_OFFSET 12
 
 /* We pass a function pointer to memcpy to work around a Mac OS X
 ABI limitation which would otherwise require us to do a bizzaro PC-relative

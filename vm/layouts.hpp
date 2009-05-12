@@ -269,8 +269,6 @@ struct quotation : public object {
 	/* tagged */
 	cell array;
 	/* tagged */
-	cell compiledp;
-	/* tagged */
 	cell cached_effect;
 	/* tagged */
 	cell cache_counter;

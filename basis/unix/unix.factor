@@ -140,9 +140,11 @@ FUNCTION: int shutdown ( int fd, int how ) ;
 
 FUNCTION: int open ( char* path, int flags, int prot ) ;
 
-FUNCTION: DIR* opendir ( char* path ) ;
+HOOK: open-file os ( path flags mode -- fd )
 
-: open-file ( path flags mode -- fd ) [ open ] unix-system-call ;
+M: unix open-file [ open ] unix-system-call ;
+
+FUNCTION: DIR* opendir ( char* path ) ;
 
 C-STRUCT: utimbuf
     { "time_t" "actime"  }
@@ -165,7 +167,6 @@ FUNCTION: ssize_t read ( int fd, void* buf, size_t nbytes ) ;
 
 FUNCTION: dirent* readdir ( DIR* dirp ) ;
 FUNCTION: int readdir_r ( void* dirp, dirent* entry, dirent** result ) ;
-
 FUNCTION: ssize_t readlink ( char* path, char* buf, size_t bufsize ) ;
 
 CONSTANT: PATH_MAX 1024
