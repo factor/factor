@@ -16,8 +16,8 @@ IN: mason.notify
         ] { } make prepend
         [ 5 ] 2dip '[
             <process>
-                _ >>command
                 _ [ +closed+ ] unless* >>stdin
+                _ >>command
             try-output-process
         ] retry
     ] [ 2drop ] if ;
