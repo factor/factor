@@ -173,10 +173,11 @@ M: stdin refill
         size-read-fd <fd> init-fd <input-port> >>size
         data-read-fd <fd> >>data ;
 
-M: unix (init-stdio)
+M: unix init-stdio
     <stdin> <input-port>
     1 <fd> <output-port>
-    2 <fd> <output-port> t ;
+    2 <fd> <output-port>
+    set-stdio ;
 
 ! mx io-task for embedding an fd-based mx inside another mx
 TUPLE: mx-port < port mx ;

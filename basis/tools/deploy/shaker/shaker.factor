@@ -1,10 +1,12 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors io.backend io.streams.c init fry namespaces
-make assocs kernel parser lexer strings.parser vocabs sequences words
-memory kernel.private continuations io vocabs.loader system strings
-sets vectors quotations byte-arrays sorting compiler.units definitions
-generic generic.standard tools.deploy.config combinators classes ;
+math make assocs kernel parser lexer strings.parser vocabs sequences
+sequences.private words memory kernel.private continuations io
+vocabs.loader system strings sets vectors quotations byte-arrays
+sorting compiler.units definitions generic generic.standard
+generic.single tools.deploy.config combinators classes
+slots.private ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: command-line
 QUALIFIED: compiler.errors
@@ -38,6 +40,7 @@ IN: tools.deploy.shaker
     strip-io? [
         "io.files" init-hooks get delete-at
         "io.backend" init-hooks get delete-at
+        "io.thread" init-hooks get delete-at
     ] when
     strip-dictionary? [
         {
@@ -193,7 +196,8 @@ IN: tools.deploy.shaker
 
 : strip-compiler-classes ( -- )
     "Stripping compiler classes" show
-    "compiler" child-vocabs [ words ] map concat [ class? ] filter
+    { "compiler" "stack-checker" }
+    [ child-vocabs [ words ] map concat [ class? ] filter ] map concat
     [ dup implementors [ "methods" word-prop delete-at ] with each ] each ;
 
 : strip-default-methods ( -- )
@@ -325,12 +329,17 @@ IN: tools.deploy.shaker
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
-    deploy-io get 2 = os windows? or [
+    strip-io?
+    deploy-io get 3 = os windows? not and
+    or [
         [
             c-io-backend forget
             "io.streams.c" forget-vocab
+            "io-thread-running?" "io.thread" lookup [
+                global delete-at
+            ] when*
         ] with-compilation-unit
-    ] unless ;
+    ] when ;
 
 : compress ( pred post-process string -- )
     "Compressing " prepend show
@@ -353,7 +362,7 @@ IN: tools.deploy.shaker
     #! Quotations which were formerly compiled must remain
     #! compiled.
     2dup [
-        2dup [ compiled>> ] [ compiled>> not ] bi* and
+        2dup [ quot-compiled? ] [ quot-compiled? not ] bi* and
         [ nip jit-compile ] [ 2drop ] if
     ] 2each ;
 
@@ -406,6 +415,23 @@ SYMBOL: deploy-vocab
     ] each
     "vocab:tools/deploy/shaker/next-methods.factor" run-file ;
 
+: (clear-megamorphic-cache) ( i array -- )
+    2dup 1 slot < [
+        2dup [ f ] 2dip set-array-nth
+        [ 1 + ] dip (clear-megamorphic-cache)
+    ] [ 2drop ] if ;
+
+: clear-megamorphic-cache ( array -- )
+    [ 0 ] dip (clear-megamorphic-cache) ;
+
+: find-megamorphic-caches ( -- seq )
+    "Finding megamorphic caches" show
+    [ standard-generic? ] instances [ def>> third ] map ;
+
+: clear-megamorphic-caches ( cache -- )
+    "Clearing megamorphic caches" show
+    [ clear-megamorphic-cache ] each ;
+
 : strip ( -- )
     init-stripper
     strip-libc
@@ -419,11 +445,13 @@ SYMBOL: deploy-vocab
     strip-default-methods
     f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
     deploy-vocab get vocab-main deploy-boot-quot
+    find-megamorphic-caches
     stripped-word-props
     stripped-globals strip-globals
     compress-objects
     compress-quotations
-    strip-words ;
+    strip-words
+    clear-megamorphic-caches ;
 
 : deploy-error-handler ( quot -- )
     [
