@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system kernel namespaces strings hashtables sequences 
-assocs combinators vocabs.loader init threads continuations
-math accessors concurrency.flags destructors environment
-io io.encodings.ascii io.backend io.timeouts io.pipes
-io.pipes.private io.encodings io.streams.duplex io.ports
-debugger prettyprint summary calendar ;
+USING: system kernel namespaces strings hashtables sequences assocs
+combinators vocabs.loader init threads continuations math accessors
+concurrency.flags destructors environment io io.encodings.ascii
+io.backend io.timeouts io.pipes io.pipes.private io.encodings
+io.encodings.utf8 io.streams.duplex io.ports debugger prettyprint
+summary calendar ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -253,6 +253,21 @@ M: object run-pipeline-element
     [ <process-stream*> ] dip
     swap [ with-stream ] dip
     wait-for-success ; inline
+
+ERROR: output-process-error { output string } { process process } ;
+
+M: output-process-error error.
+    [ "Process:" print process>> . nl ]
+    [ "Output:" print output>> print ]
+    bi ;
+
+: try-output-process ( command -- )
+    >process
+    +stdout+ >>stderr
+    +closed+ >>stdin
+    utf8 <process-reader*>
+    [ stream-contents ] [ dup wait-for-process ] bi*
+    0 = [ 2drop ] [ output-process-error ] if ;
 
 : notify-exit ( process status -- )
     >>status

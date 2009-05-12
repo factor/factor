@@ -211,7 +211,6 @@ bi
 
 "quotation" "quotations" create {
     { "array" { "array" "arrays" } read-only }
-    { "compiled" read-only }
     "cached-effect"
     "cache-counter"
 } define-builtin
@@ -514,6 +513,7 @@ tuple
     { "reset-inline-cache-stats" "generic.single" (( -- )) }
     { "inline-cache-stats" "generic.single" (( -- stats )) }
     { "optimized?" "words" (( word -- ? )) }
+    { "quot-compiled?" "quotations" (( quot -- ? )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number
