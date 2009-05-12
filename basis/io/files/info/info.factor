@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel system sequences combinators
-vocabs.loader io.files.types ;
+vocabs.loader io.files.types math ;
 IN: io.files.info
 
 ! File info
@@ -13,6 +13,9 @@ HOOK: file-info os ( path -- info )
 HOOK: link-info os ( path -- info )
 
 : directory? ( file-info -- ? ) type>> +directory+ = ;
+
+: sparse-file? ( file-info -- ? )
+    [ size-on-disk>> ] [ size>> ] bi < ;
 
 ! File systems
 HOOK: file-systems os ( -- array )
