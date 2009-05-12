@@ -158,7 +158,7 @@ void forward_object_xts()
 			{
 				quotation *quot = untag<quotation>(obj);
 
-				if(quot->compiledp != F)
+				if(quot->code)
 					quot->code = forward_xt(quot->code);
 			}
 			break;
@@ -194,7 +194,7 @@ void fixup_object_xts()
 		case QUOTATION_TYPE:
 			{
 				quotation *quot = untag<quotation>(obj);
-				if(quot->compiledp != F)
+				if(quot->code)
 					set_quot_xt(quot,quot->code);
 				break;
 			}

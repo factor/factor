@@ -35,4 +35,6 @@ PRIMITIVE(quotation_xt);
 
 VM_ASM_API cell lazy_jit_compile_impl(cell quot, stack_frame *stack);
 
+PRIMITIVE(quot_compiled_p);
+
 }
