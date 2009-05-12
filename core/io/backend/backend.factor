@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: init kernel system namespaces io io.encodings
-io.encodings.utf8 init assocs splitting alien io.streams.null ;
+io.encodings.utf8 init assocs splitting alien ;
 IN: io.backend
 
 SYMBOL: io-backend
@@ -12,22 +12,12 @@ io-backend [ c-io-backend ] initialize
 
 HOOK: init-io io-backend ( -- )
 
-HOOK: (init-stdio) io-backend ( -- stdin stdout stderr ? )
+HOOK: init-stdio io-backend ( -- )
 
-: set-stdio ( input-handle output-handle error-handle -- )
-    [ input-stream set-global ]
-    [ output-stream set-global ]
-    [ error-stream set-global ] tri* ;
-
-: init-stdio ( -- )
-    (init-stdio) [
-        [ utf8 <decoder> ]
-        [ utf8 <encoder> ]
-        [ utf8 <encoder> ] tri*
-    ] [
-        3drop
-        null-reader null-writer null-writer
-    ] if set-stdio ;
+: set-stdio ( input output error -- )
+    [ utf8 <decoder> input-stream set-global ]
+    [ utf8 <encoder> output-stream set-global ]
+    [ utf8 <encoder> error-stream set-global ] tri* ;
 
 HOOK: io-multiplex io-backend ( us -- )
 

@@ -40,12 +40,12 @@ HELP: find-window
 { $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;
 
 HELP: register-window
-{ $values { "world" world } { "handle" "a baackend-specific handle" } }
+{ $values { "world" world } { "handle" "a backend-specific handle" } }
 { $description "Adds a window to the global " { $link windows } " variable." }
 { $notes "This word should only be called by the UI backend.  User code can open new windows with " { $link open-window } "." } ;
 
 HELP: unregister-window
-{ $values { "handle" "a baackend-specific handle" } }
+{ $values { "handle" "a backend-specific handle" } }
 { $description "Removes a window from the global " { $link windows } " variable." }
 { $notes "This word should only be called only by the UI backend, and not user code." } ;
 

@@ -92,6 +92,8 @@ GENERIC: mdb-index-map ( tuple -- sequence )
       [ ] [ name>> ] bi  H{ } clone [ set-at ] keep
     ] [ 2drop H{ } clone ] if ;
 
+
+
 PRIVATE>
 
 : MDB_ADDON_SLOTS ( -- slots )
@@ -116,7 +118,7 @@ PRIVATE>
     [ drop MDB_USER_KEY set-word-prop ] [ 3drop ] if ; inline
 
 : set-index-map ( class index-list -- )
-    [ [ dup user-defined-key-index ] dip index-list>map  ] output>sequence
+    [ dup user-defined-key-index ] dip index-list>map 2array
     assoc-combine MDB_INDEX_MAP set-word-prop ; inline
 
 M: tuple-class tuple-collection ( tuple -- mdb-collection )
