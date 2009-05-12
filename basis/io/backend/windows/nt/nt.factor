@@ -143,6 +143,6 @@ M: winnt (wait-to-read) ( port -- )
 M: winnt init-stdio
     console-app?
     [ init-c-stdio ]
-    [ null-reader null-writer null-writer init-stdio ] if ;
+    [ null-reader null-writer null-writer set-stdio ] if ;
 
 winnt set-io-backend
