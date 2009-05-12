@@ -10,18 +10,6 @@ IN: mason.common
 
 SYMBOL: current-git-id
 
-ERROR: output-process-error { output string } { process process } ;
-
-M: output-process-error error.
-    [ "Process:" print process>> . nl ]
-    [ "Output:" print output>> print ]
-    bi ;
-
-: try-output-process ( command -- )
-    >process +stdout+ >>stderr utf8 <process-reader*>
-    [ stream-contents ] [ dup wait-for-process ] bi*
-    0 = [ 2drop ] [ output-process-error ] if ;
-
 HOOK: really-delete-tree os ( path -- )
 
 M: windows really-delete-tree

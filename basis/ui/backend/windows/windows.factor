@@ -616,10 +616,8 @@ M: windows-ui-backend do-events
     GetDoubleClickTime milliseconds double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
-    class-name-ptr [
-        [ [ f UnregisterClass drop ] [ free ] bi ] when* f
-    ] change-global
-    msg-obj change-global [ [ free ] when* f ] ;
+    class-name-ptr [ [ [ f UnregisterClass drop ] [ free ] bi ] when* f ] change-global
+    msg-obj [ [ free ] when* f ] change-global ;
 
 : get-dc ( world -- )
     handle>> dup hWnd>> GetDC dup win32-error=0/f >>hDC drop ;
