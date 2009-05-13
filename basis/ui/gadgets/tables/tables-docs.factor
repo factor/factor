@@ -20,13 +20,15 @@ ARTICLE: "ui.gadgets.tables.selection" "Table row selection"
 $nl
 "A few slots in the table gadget concern row selection:"
 { $table
-  { { $slot "selected-value" } { " - if set to a model, the currently selected row's value, as determined by a " { $link row-value } " call to the renderer, is stored in this model. See " { $link "models" } "." } }
-  { { $slot "selected-index" } " - the index of the currently selected row." }
+  { { $slot "selected-values" } { " - if set to a model, an array of the currently selected rows' values, as determined by a " { $link row-value } " call to the renderer, is stored in this model. See " { $link "models" } "." } }
+  { { $slot "selected-indices" } " - the indices of the currently selected rows." }
   { { $slot "selection-required?" } { " - if set to a true value, the table ensures that some row is always selected, if the model is non-empty. If set to " { $link f } ", a state where nothing is selected is permitted to occur. The default is " { $link f } "." } }
+  { { $slot "multiple-selection?" } { " - if set to a true value, users are allowed to select more than one value." } }
+
 }
 "Some words for row selection:"
-{ $subsection selected-row }
-{ $subsection (selected-row) } ;
+{ $subsection selected-rows }
+{ $subsection (selected-rows) } ;
 
 ARTICLE: "ui.gadgets.tables.actions" "Table row actions"
 "When the user double-clicks on a row, or presses " { $command table "row" row-action } " while a row is selected, optional action and hook quotations are invoked. The action receives the row value and the hook receives the table gadget itself. These quotations are stored in the " { $slot "action" } " and " { $snippet "hook" } " slots of a table, respectively."
