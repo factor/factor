@@ -34,7 +34,7 @@ IN: mason.report
 :: failed-report ( error file what -- status )
     [
         error [ error. ] with-string-writer :> error
-        file utf8 file-contents 400 short tail* :> output
+        file utf8 file-lines 400 short tail* :> output
         
         [XML
         <h2><-what-></h2>
