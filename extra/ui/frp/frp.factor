@@ -60,7 +60,7 @@ M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 
 : <frp-table> ( model -- table )
     frp-table new-line-gadget dup >>renderer swap >>model
-    f basic-model new-model >>selected-value sans-serif-font >>font
+    f basic-model new-model >>selected-values sans-serif-font >>font
     focus-border-color >>focus-border-color
     transparent >>column-line-color ;
 : <frp-table*> ( -- table ) f <model> <frp-table> ;
@@ -74,7 +74,7 @@ TUPLE: layout gadget width ; C: <layout> layout
 
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
-M: frp-table output-model selected-value>> ;
+M: table output-model dup multiple-selection?>> [ selected-values>> ] [ selected-value>> ] if ;
 M: model-field output-model field-model>> ;
 M: scroller output-model viewport>> children>> first output-model ;
 
