@@ -11,6 +11,12 @@ GENERIC: >log-line ( object -- line )
 
 M: irc-message >log-line line>> ;
 
+M: ctcp >log-line
+    [ "CTCP: " % dup sender>> % " " % text>> % ] "" make ;
+
+M: action >log-line
+    [ "* " % dup sender>> % " " % text>> % ] "" make ;
+
 M: privmsg >log-line
     [ "<" % dup sender>> % "> " % text>> % ] "" make ;
 
@@ -35,3 +41,7 @@ M: participant-mode >log-line
 
 M: nick >log-line
     [ "* " % dup sender>> % " is now known as " % nickname>> % ] "" make ;
+
+M: topic >log-line
+    [ "* " % dup sender>> % " has set the topic for " % dup channel>> %
+      ": \"" % topic>> % "\"" % ] "" make ;
