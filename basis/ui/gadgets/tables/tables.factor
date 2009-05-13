@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors colors.constants fry kernel math
-math.functions math.rectangles math.order math.vectors namespaces
-opengl sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.worlds ui.gestures ui.render ui.pens.solid ui.text
-ui.commands ui.images ui.gadgets.menus ui.gadgets.line-support
+math.functions math.ranges math.rectangles math.order math.vectors models.arrow
+namespaces opengl sequences ui.gadgets ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.worlds ui.gestures ui.render ui.pens.solid
+ui.text ui.commands ui.images ui.gadgets.menus ui.gadgets.line-support
 math.rectangles models math.ranges sequences combinators
-combinators.short-circuit fonts locals strings ;
+combinators.short-circuit fonts locals strings vectors ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -41,16 +41,33 @@ focus-border-color
 { mouse-color initial: COLOR: black }
 column-line-color
 selection-required?
-selected-index selected-value
+selected-indices selected-values
 mouse-index
 { takes-focus? initial: t }
-focused? ;
+focused?
+multiple-selection? ;
+
+IN: accessors
+GENERIC: selected-value>> ( table -- n )
+GENERIC: selected-index>> ( table -- n )
+GENERIC: (>>selected-index) ( n table -- )
+GENERIC: (>>selected-value) ( val table -- )
+: >>selected-index ( table n -- table ) over (>>selected-index) ;
+: >>selected-value ( table val -- table ) over (>>selected-value) ;
+
+M: table selected-value>> selected-values>> [ [ peek ] [ f ] if* ] <arrow> ;
+M: table (>>selected-value) [ [ 1vector ] <arrow> ] dip (>>selected-values) ;
+M: table selected-index>> selected-indices>> [ peek ] [ f ] if* ;
+M: table (>>selected-index) [ 1vector ] dip (>>selected-indices) ;
+
+IN: ui.gadgets.tables
+: push-selected-index ( table n -- table ) over selected-indices>> push ;
 
 : new-table ( rows renderer class -- table )
     new-line-gadget
         swap >>renderer
         swap >>model
-        f <model> >>selected-value
+        f <model> >>selected-values
         sans-serif-font >>font
         focus-border-color >>focus-border-color
         transparent >>column-line-color ; inline
@@ -131,12 +148,12 @@ M: table layout*
 : row-bounds ( table row -- loc dim )
     row-rect rect-bounds ; inline
 
-: draw-selected-row ( table -- )
+: draw-selected-rows ( table -- )
     {
-        { [ dup selected-index>> not ] [ drop ] }
+        { [ dup selected-indices>> not ] [ drop ] }
         [
-            [ ] [ selected-index>> ] [ selection-color>> gl-color ] tri
-            row-bounds gl-fill-rect
+            [ selected-indices>> ] [ selection-color>> gl-color ] [ ] tri
+            [ swap row-bounds gl-fill-rect ] curry each
         ]
     } cond ;
 
@@ -189,10 +206,10 @@ M: table layout*
     dup renderer>> column-alignment
     [ ] [ column-widths>> length 0 <repetition> ] ?if ;
 
-:: row-font ( row index table -- font )
+:: row-font ( row ind table -- font )
     table font>> clone
     row table renderer>> row-color [ >>foreground ] when*
-    index table selected-index>> = [ table selection-color>> >>background ] when ;
+    ind table selected-indices>> index [ table selection-color>> >>background ] when ;
 
 : draw-columns ( columns widths alignment font gap -- )
     '[ [ _ ] 3dip _ draw-column ] 3each ;
@@ -213,7 +230,7 @@ M: table draw-gadget*
     dup control-value empty? [ drop ] [
         dup line-height \ line-height [
             {
-                [ draw-selected-row ]
+                [ draw-selected-rows ]
                 [ draw-lines ]
                 [ draw-column-lines ]
                 [ draw-focused-row ]
@@ -236,17 +253,19 @@ M: table pref-dim*
 
 PRIVATE>
 
-: (selected-row) ( table -- value/f ? )
-    [ selected-index>> ] keep nth-row ;
+: (selected-rows) ( table -- {row} )
+    [ selected-indices>> ] keep
+    [ nth-row [ 1array ] [ drop { } ] if ] curry map concat ;
 
-: selected-row ( table -- value/f ? )
-    [ (selected-row) ] keep
-    swap [ renderer>> row-value t ] [ 2drop f f ] if ;
+: selected-rows ( table -- {value} )
+    [ (selected-rows) ] [ renderer>> ] bi [ row-value ] curry map ;
+
+: selected-row ( table -- value ? ) selected-rows [ f f ] [ peek t ] if-empty ;
 
 <PRIVATE
 
-: update-selected-value ( table -- )
-    [ selected-row drop ] [ selected-value>> ] bi set-model ;
+: update-selected-values ( table -- )
+    [ selected-rows ] [ selected-values>> ] bi set-model ;
 
 : show-row-summary ( table n -- )
     over nth-row
@@ -260,54 +279,68 @@ PRIVATE>
 : find-row-index ( value table -- n/f )
     [ model>> value>> ] [ renderer>> '[ _ row-value ] map index ] bi ;
 
-: initial-selected-index ( table -- n/f )
+: initial-selected-indices ( table -- n/f )
     {
         [ model>> value>> empty? not ]
         [ selection-required?>> ]
-        [ drop 0 ]
+        [ drop V{ 0 } ]
     } 1&& ;
 
-: (update-selected-index) ( table -- n/f )
-    [ selected-value>> value>> ] keep over
-    [ find-row-index ] [ 2drop f ] if ;
+: (update-selected-indices) ( table -- {n}/f )
+    [ selected-values>> value>> ] keep
+    [ find-row-index ] curry map [ ] filter [ f ] when-empty ;
 
-: update-selected-index ( table -- n/f )
+: update-selected-indices ( table -- {n}/f )
     {
-        [ (update-selected-index) ]
-        [ initial-selected-index ]
+        [ (update-selected-indices) ]
+        [ initial-selected-indices ]
     } 1|| ;
 
 M: table model-changed
-    nip dup update-selected-index {
-        [ >>selected-index f >>mouse-index drop ]
-        [ show-row-summary ]
-        [ drop update-selected-value ]
+    nip dup update-selected-indices {
+        [ >>selected-indices f >>mouse-index drop ]
+        [ peek show-row-summary ]
+        [ drop update-selected-values ]
         [ drop relayout ]
     } 2cleave ;
 
 : thin-row-rect ( table row -- rect )
     row-rect [ { 0 1 } v* ] change-dim ;
 
+: scroll-to-row ( table n -- )
+    dup [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ] [ 2drop ] if ;
+
+: add-selected-row ( table n -- )
+    [ scroll-to-row ]
+    [ push-selected-index relayout-1 ] 2bi ;
+
 : (select-row) ( table n -- )
-    [ dup [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ] [ 2drop ] if ]
+    [ scroll-to-row ]
     [ >>selected-index relayout-1 ]
     2bi ;
 
 : mouse-row ( table -- n )
     [ hand-rel second ] keep y>line ;
 
-: if-mouse-row ( table true: ( table mouse-index -- ) false: ( table -- ) -- )
+: if-mouse-row ( table true: ( mouse-index table -- ) false: ( table -- ) -- )
     [ [ mouse-row ] keep 2dup valid-line? ]
     [ ] [ '[ nip @ ] ] tri* if ; inline
 
-: table-button-down ( table -- )
-    dup takes-focus?>> [ dup request-focus ] when
-    [ swap [ >>mouse-index ] [ (select-row) ] bi ] [ drop ] if-mouse-row ;
+: (table-button-down) ( quot table -- )
+    dup takes-focus?>> [ dup request-focus ] when swap
+   '[ swap [ >>mouse-index ] _ bi ] [ drop ] if-mouse-row ; inline
+
+: table-button-down ( table -- ) [ (select-row) ] swap (table-button-down) ;
+: continued-button-down ( table -- ) dup multiple-selection?>> [ [ add-selected-row ] swap (table-button-down) ] [ table-button-down ] if ;
+: thru-button-down ( table -- ) dup multiple-selection?>> [
+    [ over selected-index>> (a,b] over
+      [ swap push-selected-index drop ] curry each continued-button-down ]
+    swap (table-button-down) ] [ table-button-down ] if ;
 
 PRIVATE>
 
 : row-action ( table -- )
-    dup selected-row
+    dup [ selected-rows peek ]
     [ swap [ action>> call( value -- ) ] [ dup hook>> call( table -- ) ] bi ]
     [ 2drop ]
     if ;
@@ -319,14 +352,14 @@ PRIVATE>
 <PRIVATE
 
 : table-button-up ( table -- )
-    dup row-action? [ row-action ] [ update-selected-value ] if ;
+    dup row-action? [ row-action ] [ update-selected-values ] if ;
 
 PRIVATE>
 
 : select-row ( table n -- )
     over validate-line
     [ (select-row) ]
-    [ drop update-selected-value ]
+    [ drop update-selected-values ]
     [ show-row-summary ]
     2tri ;
 
@@ -385,6 +418,8 @@ table "sundry" f {
     { mouse-enter show-mouse-help }
     { mouse-leave hide-mouse-help }
     { motion show-mouse-help }
+    { T{ button-down f { A+ } 1 } continued-button-down }
+    { T{ button-down f { S+ } 1 } thru-button-down }
     { T{ button-down } table-button-down }
     { T{ button-up } table-button-up }
     { gain-focus focus-table }
