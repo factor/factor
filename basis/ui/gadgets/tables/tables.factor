@@ -55,9 +55,9 @@ GENERIC: (>>selected-value) ( val table -- )
 : >>selected-index ( table n -- table ) over (>>selected-index) ;
 : >>selected-value ( table val -- table ) over (>>selected-value) ;
 
-M: table selected-value>> selected-values>> [ [ peek ] [ f ] if* ] <arrow> ;
+M: table selected-value>> selected-values>> [ [ f ] [ peek ] if-empty ] <arrow> ;
 M: table (>>selected-value) [ [ 1vector ] <arrow> ] dip (>>selected-values) ;
-M: table selected-index>> selected-indices>> [ peek ] [ f ] if* ;
+M: table selected-index>> selected-indices>> [ f ] [ peek ] if-empty ;
 M: table (>>selected-index) [ 1vector ] dip (>>selected-indices) ;
 
 IN: ui.gadgets.tables
@@ -67,7 +67,7 @@ IN: ui.gadgets.tables
     new-line-gadget
         swap >>renderer
         swap >>model
-        f <model> >>selected-values
+        V{ } clone <model> >>selected-values
         sans-serif-font >>font
         focus-border-color >>focus-border-color
         transparent >>column-line-color ; inline
@@ -150,7 +150,7 @@ M: table layout*
 
 : draw-selected-rows ( table -- )
     {
-        { [ dup selected-indices>> not ] [ drop ] }
+        { [ dup selected-indices>> empty? ] [ drop ] }
         [
             [ selected-indices>> ] [ selection-color>> gl-color ] [ ] tri
             [ swap row-bounds gl-fill-rect ] curry each
@@ -279,11 +279,11 @@ PRIVATE>
 : find-row-index ( value table -- n/f )
     [ model>> value>> ] [ renderer>> '[ _ row-value ] map index ] bi ;
 
-: initial-selected-indices ( table -- n/f )
+: initial-selected-indices ( table -- {n}/f )
     {
         [ model>> value>> empty? not ]
         [ selection-required?>> ]
-        [ drop V{ 0 } ]
+        [ drop V{ 0 } clone ]
     } 1&& ;
 
 : (update-selected-indices) ( table -- {n}/f )
@@ -297,9 +297,9 @@ PRIVATE>
     } 1|| ;
 
 M: table model-changed
-    nip dup update-selected-indices {
+    nip dup update-selected-indices [ V{ } clone ] unless* {
         [ >>selected-indices f >>mouse-index drop ]
-        [ peek show-row-summary ]
+        [ [ f ] [ peek ] if-empty show-row-summary ]
         [ drop update-selected-values ]
         [ drop relayout ]
     } 2cleave ;
