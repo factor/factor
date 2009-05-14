@@ -1,13 +1,14 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors compiler cpu.architecture vocabs.loader system
+USING: accessors cpu.architecture vocabs.loader system
 sequences namespaces parser kernel kernel.private classes
 classes.private arrays hashtables vectors classes.tuple sbufs
 hashtables.private sequences.private math classes.tuple.private
 growable namespaces.private assocs words command-line vocabs io
-io.encodings.string libc splitting math.parser memory
-compiler.units math.order compiler.tree.builder
-compiler.tree.optimizer compiler.cfg.optimizer ;
+io.encodings.string libc splitting math.parser memory compiler.units
+math.order compiler.tree.builder compiler.tree.optimizer
+compiler.cfg.optimizer ;
+FROM: compiler => enable-optimizer compile-word ;
 IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a

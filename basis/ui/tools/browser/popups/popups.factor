@@ -6,6 +6,7 @@ sorting definitions.icons tools.crossref ui.gadgets ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
 ui.gadgets.search-tables ui.gadgets.wrappers ui.gestures ui.operations
 ui.pens.solid ui.images ;
+FROM: ui.gadgets.wrappers => wrapper ;
 IN: ui.tools.browser.popups
 
 SINGLETON: link-renderer

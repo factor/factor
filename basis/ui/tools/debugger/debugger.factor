@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables io kernel math models
-colors.constants namespaces sequences sequences words continuations
+colors.constants namespaces sequences words continuations
 debugger prettyprint help editors fonts ui ui.commands ui.gestures
 ui.gadgets ui.pens.solid ui.gadgets.worlds ui.gadgets.packs
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.panes

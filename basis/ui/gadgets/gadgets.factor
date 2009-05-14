@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables kernel models math namespaces
+USING: accessors arrays hashtables kernel math namespaces
 make sequences quotations math.vectors combinators sorting
 binary-search vectors dlists deques models threads
 concurrency.flags math.order math.rectangles fry locals ;

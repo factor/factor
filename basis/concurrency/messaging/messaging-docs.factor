@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup concurrency.messaging.private
-threads kernel arrays quotations threads strings ;
+threads kernel arrays quotations strings ;
 IN: concurrency.messaging
 
 HELP: send
