@@ -55,7 +55,7 @@ SYMBOL: auto-use?
 : no-word-restarted ( restart-value -- word )
     dup word? [
         dup vocabulary>>
-        [ (use+) ]
+        [ (add-use) ]
         [ amended-use get dup [ push ] [ 2drop ] if ]
         [ "Added \"" "\" vocabulary to search path" surround note. ]
         tri
@@ -67,19 +67,6 @@ SYMBOL: auto-use?
     [ nip first no-word-restarted ]
     [ <no-word-error> throw-restarts no-word-restarted ]
     if ;
-
-: check-forward ( str word -- word/f )
-    dup forward-reference? [
-        drop
-        use get
-        [ at ] with map sift
-        [ forward-reference? not ] find nip
-    ] [
-        nip
-    ] if ;
-
-: search ( str -- word/f )
-    dup use get assoc-stack check-forward ;
 
 : scan-word ( -- word/number/f )
     scan dup [

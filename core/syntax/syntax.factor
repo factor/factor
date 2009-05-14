@@ -49,9 +49,9 @@ IN: bootstrap.syntax
         POSTPONE: PRIVATE> in get ".private" append set-in
     ] define-core-syntax
 
-    "USE:" [ scan use+ ] define-core-syntax
+    "USE:" [ scan add-use ] define-core-syntax
 
-    "USING:" [ ";" parse-tokens add-use ] define-core-syntax
+    "USING:" [ ";" parse-tokens [ add-use ] each ] define-core-syntax
 
     "QUALIFIED:" [ scan dup add-qualified ] define-core-syntax
 

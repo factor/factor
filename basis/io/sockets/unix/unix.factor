@@ -7,7 +7,7 @@ io.backend io.ports io.pathnames io.files.private
 io.encodings.utf8 math.parser continuations libc combinators
 system accessors destructors unix locals init ;
 
-EXCLUDE: io => read write close ;
+EXCLUDE: io => read write ;
 EXCLUDE: io.sockets => accept ;
 
 IN: io.sockets.unix

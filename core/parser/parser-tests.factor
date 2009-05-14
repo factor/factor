@@ -4,7 +4,7 @@ sequences strings io.files io.pathnames definitions
 continuations sorting classes.tuple compiler.units debugger
 vocabs vocabs.loader accessors eval combinators lexer
 vocabs.parser words.symbol multiline source-files.errors
-tools.crossref ;
+tools.crossref grouping ;
 IN: parser.tests
 
 [
@@ -583,3 +583,41 @@ EXCLUDE: qualified.tests.bar => x ;
 
 [ t ] [ "is-not-deferred" "parser.tests" lookup >boolean ] unit-test
 [ t ] [ "is-not-deferred" "parser.tests" lookup deferred? ] unit-test
+
+! Forward-reference resolution case iterated using list in the wrong direction
+[ [ ] ] [
+    "IN: parser.tests.forward-ref-1 DEFER: x DEFER: y"
+    <string-reader> "forward-ref-1" parse-stream
+] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests.forward-ref-2 DEFER: x DEFER: y"
+    <string-reader> "forward-ref-2" parse-stream
+] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests.forward-ref-3 USING: parser.tests.forward-ref-1 parser.tests.forward-ref-2 ; : z ( -- ) x y ;"
+    <string-reader> "forward-ref-3" parse-stream
+] unit-test
+
+[ t ] [
+    "z" "parser.tests.forward-ref-3" lookup def>> [ vocabulary>> ] map all-equal?
+] unit-test
+
+[ [ ] ] [
+    "USING: parser.tests.forward-ref-1 parser.tests.forward-ref-2 ; IN: parser.tests.forward-ref-3 : x ( -- ) ; : z ( -- ) x y ;"
+    <string-reader> "forward-ref-3" parse-stream
+] unit-test
+
+[ f ] [
+    "z" "parser.tests.forward-ref-3" lookup def>> [ vocabulary>> ] map all-equal?
+] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests.forward-ref-3 USING: parser.tests.forward-ref-1 parser.tests.forward-ref-2 ; : z ( -- ) x y ;"
+    <string-reader> "forward-ref-3" parse-stream
+] unit-test
+
+[ t ] [
+    "z" "parser.tests.forward-ref-3" lookup def>> [ vocabulary>> ] map all-equal?
+] unit-test
