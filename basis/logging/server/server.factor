@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel io io.files io.pathnames io.directories
-io.sockets io.encodings.utf8
-calendar calendar.format sequences continuations destructors
-prettyprint assocs math.parser words debugger math combinators
-concurrency.messaging threads arrays init math.ranges strings ;
+io.encodings.utf8 calendar calendar.format sequences continuations
+destructors prettyprint assocs math.parser words debugger math
+combinators concurrency.messaging threads arrays init math.ranges
+strings ;
 IN: logging.server
 
 : log-root ( -- string )

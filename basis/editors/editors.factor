@@ -4,7 +4,7 @@ USING: parser lexer kernel namespaces sequences definitions
 io.files io.backend io.pathnames io summary continuations
 tools.crossref vocabs.hierarchy prettyprint source-files
 source-files.errors assocs vocabs vocabs.loader splitting
-accessors debugger prettyprint help.topics ;
+accessors debugger help.topics ;
 IN: editors
 
 TUPLE: no-edit-hook ;
