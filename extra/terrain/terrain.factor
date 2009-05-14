@@ -134,7 +134,7 @@ M: terrain-world tick-length
 
 
 terrain-world H{
-    { T{ key-up { mods { A+ } } { sym "RET" } } [ toggle-fullscreen ] }
+    { T{ key-down { mods { A+ } } { sym "RET" } } [ toggle-fullscreen ] }
 } set-gestures
 
 :: handle-input ( world -- )
