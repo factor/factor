@@ -31,8 +31,8 @@ SYMBOLS: host-name target-os target-cpu message message-arg ;
     [
         {
             [ host-name set ]
-            [ target-os set ]
             [ target-cpu set ]
+            [ target-os set ]
             [ message set ]
         } spread
     ] input<sequence ;
