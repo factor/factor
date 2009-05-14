@@ -3,7 +3,7 @@
 USING: accessors constructors images io io.binary io.encodings.ascii
 io.encodings.binary io.encodings.string io.files io.files.info kernel
 sequences io.streams.limited fry combinators arrays math
-checksums checksums.crc32 ;
+checksums checksums.crc32 compression.inflate grouping byte-arrays ;
 IN: images.png
 
 TUPLE: png-image < image chunks
@@ -17,7 +17,8 @@ TUPLE: png-chunk length type data ;
 
 CONSTRUCTOR: png-chunk ( -- png-chunk ) ;
 
-CONSTANT: png-header B{ HEX: 89 HEX: 50 HEX: 4e HEX: 47 HEX: 0d HEX: 0a HEX: 1a HEX: 0a }
+CONSTANT: png-header
+    B{ HEX: 89 HEX: 50 HEX: 4e HEX: 47 HEX: 0d HEX: 0a HEX: 1a HEX: 0a }
 
 ERROR: bad-png-header header ;
 
@@ -61,6 +62,18 @@ ERROR: bad-checksum ;
 : fill-image-data ( image -- image )
     dup [ width>> ] [ height>> ] bi 2array >>dim ;
 
+: zlib-data ( png-image -- bytes ) 
+    chunks>> [ type>> "IDAT" = ] find nip data>> ;
+
+: decode-png ( image -- image ) 
+    {
+        [ zlib-data zlib-inflate ] 
+        [ dim>> first 3 * 1 + group reverse-png-filter ]
+        [ swap >byte-array >>bitmap drop ]
+        [ RGB >>component-order drop ]
+        [ ]
+    } cleave ;
+
 : load-png ( path -- image )
     [ binary <file-reader> ] [ file-info size>> ] bi
     stream-throws <limited-stream> [
@@ -69,4 +82,8 @@ ERROR: bad-checksum ;
         read-png-chunks
         parse-ihdr-chunk
         fill-image-data
+        decode-png
     ] with-input-stream ;
+
+M: png-image load-image*
+    drop load-png ;
