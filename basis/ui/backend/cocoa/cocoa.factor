@@ -126,7 +126,9 @@ M: cocoa-ui-backend (grab-input) ( handle -- )
     0 CGAssociateMouseAndMouseCursorPosition drop
     CGMainDisplayID CGDisplayHideCursor drop
     window>> -> frame CGRect>rect rect-center
-    first2 <CGPoint> CGWarpMouseCursorPosition drop ;
+    NSScreen -> screens 0 -> objectAtIndex: -> frame CGRect-h
+    [ drop first ] [ swap second - ] 2bi <CGPoint>
+    CGWarpMouseCursorPosition drop ;
 
 M: cocoa-ui-backend (ungrab-input) ( handle -- )
     drop
