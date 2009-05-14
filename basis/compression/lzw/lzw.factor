@@ -1,9 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs bitstreams byte-vectors combinators io
-io.encodings.binary io.streams.byte-array kernel math sequences
-vectors ;
-IN: compression.lzw
+USING: accessors alien.accessors byte-arrays combinators
+constructors destructors fry io io.binary kernel locals macros
+math math.ranges multiline sequences sequences.private ;
+IN: bitstreams
+
+QUALIFIED-WITH: bitstreams bs
 
 CONSTANT: clear-code 256
 CONSTANT: end-of-information 257
@@ -52,7 +54,8 @@ ERROR: index-too-big n ;
 : <lzw-compress> ( input -- obj )
     lzw new
         swap >>input
-        binary <byte-writer> <bitstream-writer> >>output
+        ! binary <byte-writer> <bitstream-writer> >>output
+        V{ } clone >>output ! TODO
         reset-lzw-compress ;
 
 : <lzw-uncompress> ( input -- obj )
@@ -76,7 +79,7 @@ ERROR: not-in-table value ;
         [ omega>> ] [ table>> ] bi ?at [ not-in-table ] unless
     ] [
         [ lzw-bit-width-compress ]
-        [ output>> write-bits ] bi
+        [ output>> bs:poke ] bi
     ] bi ;
 
 : omega-k>omega ( lzw -- lzw )
@@ -114,18 +117,18 @@ ERROR: not-in-table value ;
         [
             [ clear-code ] dip
             [ lzw-bit-width-compress ]
-            [ output>> write-bits ] bi
+            [ output>> bs:poke ] bi
         ]
         [ (lzw-compress-chars) ]
         [
             [ k>> ]
             [ lzw-bit-width-compress ]
-            [ output>> write-bits ] tri
+            [ output>> bs:poke ] tri
         ]
         [
             [ end-of-information ] dip
             [ lzw-bit-width-compress ]
-            [ output>> write-bits ] bi
+            [ output>> bs:poke ] bi
         ]
         [ ]
     } cleave dup end-of-input?>> [ drop ] [ lzw-compress-chars ] if ;
@@ -152,7 +155,7 @@ ERROR: not-in-table value ;
 : add-to-table ( seq lzw -- ) table>> push ;
 
 : lzw-read ( lzw -- lzw n )
-    [ ] [ lzw-bit-width-uncompress ] [ input>> ] tri read-bits 2drop ;
+    [ ] [ lzw-bit-width-uncompress ] [ input>> ] tri bs:peek ;
 
 DEFER: lzw-uncompress-char
 : handle-clear-code ( lzw -- )
@@ -200,5 +203,6 @@ DEFER: lzw-uncompress-char
     ] if* ;
 
 : lzw-uncompress ( seq -- byte-array )
-    binary <byte-reader> <bitstream-reader>
+    <lsb0-bitstream>
+    ! binary <byte-reader> ! <bitstream-reader>
     <lzw-uncompress> [ lzw-uncompress-char ] [ output>> ] bi ;
