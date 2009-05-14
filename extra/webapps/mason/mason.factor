@@ -2,8 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators db db.tuples furnace.actions
 http.server.responses kernel mason.platform mason.notify.server
-math.order sequences sorting splitting xml.syntax xml.writer ;
+math.order sequences sorting splitting xml.syntax xml.writer
+io.pathnames io.encodings.utf8 io.files ;
 IN: webapps.mason
+
+: log-file ( -- path ) home "mason.log" append-path ;
+
+: recent-events ( -- xml )
+    log-file utf8 file-lines 10 short tail* "\n" join [XML <pre><-></pre> XML] ;
 
 : git-link ( id -- link )
     [ "http://github.com/slavapestov/factor/commit/" prepend ] keep
@@ -55,20 +61,24 @@ IN: webapps.mason
     </table>
     XML] ;
 
-: machine-report ( builders -- xml )
-    [ machine-table ] map
+: machine-report ( -- xml )
+    builder new select-tuples
+    [ [ [ os>> ] [ cpu>> ] bi 2array ] compare ] sort
+    [ machine-table ] map ;
+
+: build-farm-report ( -- xml )
+    recent-events
+    machine-report
     [XML
-    <h1>Build farm status</h1>
-    <->
+    <html>
+    <head><title>Factor build farm</title></head>
+    <body><h1>Recent events</h1><-> <h1>Machine status</h1><-></body>
+    </html>
     XML] ;
 
 : <machine-report-action> ( -- action )
     <action>
         [
-            mason-db [
-                builder new select-tuples
-                [ [ [ os>> ] [ cpu>> ] bi 2array ] compare ] sort
-                machine-report xml>string
-            ] with-db
+            mason-db [ build-farm-report xml>string ] with-db
             "text/html" <content>
         ] >>display ;
