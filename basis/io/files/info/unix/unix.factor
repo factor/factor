@@ -3,7 +3,7 @@
 USING: accessors kernel system math math.bitwise strings arrays
 sequences combinators combinators.short-circuit alien.c-types
 vocabs.loader calendar calendar.unix io.files.info
-io.files.types io.backend unix unix.stat unix.time unix.users
+io.files.types io.backend io.directories unix unix.stat unix.time unix.users
 unix.groups ;
 IN: io.files.info.unix
 
@@ -173,6 +173,9 @@ CONSTANT: OTHER-EXECUTE OCT: 0000001
 
 : file-permissions ( path -- n )
     normalize-path file-info permissions>> ;
+
+M: unix copy-file-and-info ( from to -- )
+    [ copy-file ] [ swap file-permissions set-file-permissions ] 2bi ;
 
 <PRIVATE
 
