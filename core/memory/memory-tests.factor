@@ -27,16 +27,8 @@ TUPLE: testing x y z ;
 
 [ save-image-and-exit ] must-fail
 
-[ ] [
-    num-types get [
-        type>class [
-            dup . flush
-            "predicate" word-prop instances [
-                class drop
-            ] each
-        ] when*
-    ] each
-] unit-test
-
 ! Erg's bug
 2 [ [ [ 3 throw ] instances ] must-fail ] times
+
+! Bug found on Windows build box, having too many words in the image breaks 'become'
+[ ] [ 100000 [ f f <word> ] replicate { } { } become drop ] unit-test

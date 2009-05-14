@@ -11,22 +11,6 @@ static void check_frame(stack_frame *frame)
 #endif
 }
 
-void iterate_callstack(cell top, cell bottom, CALLSTACK_ITER iterator)
-{
-	stack_frame *frame = (stack_frame *)bottom - 1;
-
-	while((cell)frame >= top)
-	{
-		iterator(frame);
-		frame = frame_successor(frame);
-	}
-}
-
-void iterate_callstack_object(callstack *stack, CALLSTACK_ITER iterator)
-{
-	iterate_callstack((cell)stack->top(),(cell)stack->bottom(),iterator);
-}
-
 callstack *allot_callstack(cell size)
 {
 	callstack *stack = allot<callstack>(callstack_size(size));
@@ -138,36 +122,39 @@ cell frame_scan(stack_frame *frame)
 		return F;
 }
 
-/* C doesn't have closures... */
-static cell frame_count;
-
-void count_stack_frame(stack_frame *frame)
+namespace
 {
-	frame_count += 2; 
-}
 
-static cell frame_index;
-static array *frames;
+struct stack_frame_counter {
+	cell count;
+	stack_frame_counter() : count(0) {}
+	void operator()(stack_frame *frame) { count += 2; }
+};
 
-void stack_frame_to_array(stack_frame *frame)
-{
-	set_array_nth(frames,frame_index++,frame_executing(frame));
-	set_array_nth(frames,frame_index++,frame_scan(frame));
+struct stack_frame_accumulator {
+	cell index;
+	array *frames;
+	stack_frame_accumulator(cell count) : index(0), frames(allot_array_internal<array>(count)) {}
+	void operator()(stack_frame *frame)
+	{
+		set_array_nth(frames,index++,frame_executing(frame));
+		set_array_nth(frames,index++,frame_scan(frame));
+	}
+};
+
 }
 
 PRIMITIVE(callstack_to_array)
 {
 	gc_root<callstack> callstack(dpop());
 
-	frame_count = 0;
-	iterate_callstack_object(callstack.untagged(),count_stack_frame);
+	stack_frame_counter counter;
+	iterate_callstack_object(callstack.untagged(),counter);
 
-	frames = allot_array_internal<array>(frame_count);
+	stack_frame_accumulator accum(counter.count);
+	iterate_callstack_object(callstack.untagged(),accum);
 
-	frame_index = 0;
-	iterate_callstack_object(callstack.untagged(),stack_frame_to_array);
-
-	dpush(tag<array>(frames));
+	dpush(tag<array>(accum.frames));
 }
 
 stack_frame *innermost_stack_frame(callstack *stack)

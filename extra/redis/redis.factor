@@ -1,6 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io redis.response-parser redis.command-writer ;
+USING: accessors io io.encodings.8-bit io.sockets
+io.streams.duplex kernel redis.command-writer
+redis.response-parser splitting ;
 IN: redis
 
 #! Connection
@@ -23,7 +25,7 @@ IN: redis
 : redis-type ( key -- response ) type flush read-response ;
 
 #! Key space
-: redis-keys ( pattern -- response ) keys flush read-response ;
+: redis-keys ( pattern -- response ) keys flush read-response " " split ;
 : redis-randomkey ( -- response ) randomkey flush read-response ;
 : redis-rename ( newkey key -- response ) rename flush read-response ;
 : redis-renamenx ( newkey key -- response ) renamenx flush read-response ;
@@ -72,3 +74,24 @@ IN: redis
 #! Remote server control
 : redis-info ( -- response ) info flush read-response ;
 : redis-monitor ( -- response ) monitor flush read-response ;
+
+#! Redis object
+TUPLE: redis host port encoding password ;
+
+CONSTANT: default-redis-port 6379
+
+: <redis> ( -- redis )
+    redis new
+        "127.0.0.1" >>host
+        default-redis-port >>port
+        latin1 >>encoding ;
+
+: redis-do-connect ( redis -- stream )
+    [ host>> ] [ port>> ] [ encoding>> ] tri
+    [ <inet> ] dip <client> drop ;
+
+: with-redis ( redis quot -- )
+    [
+        [ redis-do-connect ] [ password>> ] bi
+        [ swap [ [ redis-auth drop ] with-stream* ] keep ] when*
+    ] dip with-stream ; inline
