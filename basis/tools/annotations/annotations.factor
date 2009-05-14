@@ -43,29 +43,17 @@ PRIVATE>
 
 <PRIVATE
 
-: word-inputs ( word -- seq )
-    stack-effect [
-        [ datastack ] dip in>> length tail*
-    ] [
-        datastack
-    ] if* ;
+: stack-values ( names -- alist )
+    [ datastack ] dip [ nip ] [ length tail* ] 2bi zip ;
 
-: entering ( str -- )
-    "/-- Entering: " write dup .
-    word-inputs stack.
-    "\\--" print flush ;
+: trace-message ( word quot str -- )
+    "--- " write write bl over .
+    [ stack-effect ] dip '[ @ stack-values ] [ f ] if*
+    [ simple-table. ] unless-empty flush ; inline
 
-: word-outputs ( word -- seq )
-    stack-effect [
-        [ datastack ] dip out>> length tail*
-    ] [
-        datastack
-    ] if* ;
+: entering ( str -- ) [ in>> ] "Entering" trace-message ;
 
-: leaving ( str -- )
-    "/-- Leaving: " write dup .
-    word-outputs stack.
-     "\\--" print flush ;
+: leaving ( str -- ) [ out>> ] "Leaving" trace-message ;
 
 : (watch) ( word def -- def )
     over '[ _ entering @ _ leaving ] ;

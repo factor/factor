@@ -76,7 +76,7 @@ M: mb-writer dispose drop ;
 ! Test connect
 { V{ "NICK factorbot" "USER factorbot hostname servername :irc.factor" } } [
     "someserver" irc-port "factorbot" f <irc-profile> <irc-client>
-    [ 2drop <test-stream> t ] >>connect
+    [ 2drop <test-stream> ] >>connect
     [
         (connect-irc)
         (do-login)

@@ -33,7 +33,8 @@ TUPLE: irc-profile server port nickname password ;
 C: <irc-profile> irc-profile
 
 TUPLE: irc-client profile stream in-messages out-messages
-       chats is-running nick connect reconnect-time is-ready
+       chats is-running nick connect is-ready
+       reconnect-time reconnect-attempts
        exceptions ;
 
 : <irc-client> ( profile -- irc-client )
@@ -43,8 +44,9 @@ TUPLE: irc-client profile stream in-messages out-messages
         <mailbox>  >>in-messages
         <mailbox>  >>out-messages
         H{ } clone >>chats
-        15 seconds >>reconnect-time
+        30 seconds >>reconnect-time
+        10         >>reconnect-attempts
         V{ } clone >>exceptions
-        [ <inet> latin1 <client> ] >>connect ;
+        [ <inet> latin1 <client> drop ] >>connect ;
 
 SINGLETONS: irc-chat-end irc-end irc-disconnected irc-connected ;
