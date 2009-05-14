@@ -253,8 +253,7 @@ void dump_objects(cell type)
 		}
 	}
 
-	/* end scan */
-	gc_off = false;
+	end_scan();
 }
 
 cell look_for;
@@ -280,8 +279,7 @@ void find_data_references(cell look_for_)
 	while((obj = next_object()) != F)
 		do_slots(UNTAG(obj),find_data_references_step);
 
-	/* end scan */
-	gc_off = false;
+	end_scan();
 }
 
 /* Dump all code blocks for debugging */
