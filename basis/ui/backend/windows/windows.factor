@@ -761,6 +761,11 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
 M: windows-ui-backend set-fullscreen* ( ? world -- )
     swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
+M: windows-ui-backend fullscreen* ( world -- ? )
+    [ handle>> hWnd>> hwnd>RECT ]
+    [ handle>> hWnd>> fullscreen-RECT ] bi
+    [ get-RECT-dimensions 2array 2nip ] bi@ = ;
+
 windows-ui-backend ui-backend set-global
 
 [ "ui.tools" ] main-vocab-hook set-global

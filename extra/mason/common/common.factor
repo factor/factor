@@ -79,8 +79,8 @@ SYMBOL: stamp
     with-directory ;
 
 : git-id ( -- id )
-    { "git" "show" } utf8 [ readln ] with-process-reader
-    " " split second ;
+    { "git" "show" } utf8 [ lines ] with-process-reader
+    first " " split second ;
 
 : ?prepare-build-machine ( -- )
     builds/factor exists? [ prepare-build-machine ] unless ;

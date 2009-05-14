@@ -3,9 +3,16 @@
 USING: accessors assocs arrays concurrency.mailboxes continuations destructors
 hashtables io irc.client.base irc.client.chats irc.messages kernel namespaces
 strings words.symbol irc.messages.base irc.client.participants fry threads
-combinators irc.messages.parser ;
+combinators irc.messages.parser math ;
 EXCLUDE: sequences => join ;
 IN: irc.client.internals
+
+: do-connect ( server port quot: ( host port -- stream ) attempts -- stream/f )
+    dup 0 > [
+        [ drop call( host port -- stream ) ]
+        [ drop 15 sleep 1- do-connect ]
+        recover
+    ] [ 2drop 2drop f ] if ;
 
 : /NICK ( nick -- ) "NICK " prepend irc-print ;
 : /PONG ( text -- ) "PONG " prepend irc-print ;
@@ -15,18 +22,27 @@ IN: irc.client.internals
     "USER " prepend " hostname servername :irc.factor" append irc-print ;
 
 : /CONNECT ( server port -- stream )
-    irc> connect>> call( host port -- stream local ) drop ;
+    irc> [ connect>> ] [ reconnect-attempts>> ] bi do-connect ;
 
 : /JOIN ( channel password -- )
     [ " :" swap 3append ] when* "JOIN " prepend irc-print ;
 
+: try-connect ( -- stream/f )
+    irc> profile>> [ server>> ] [ port>> ] bi /CONNECT ;
+
+: (terminate-irc) ( -- )
+    irc> dup is-running>> [
+        f >>is-running
+        [ stream>> dispose ] keep
+        [ in-messages>> ] [ out-messages>> ] bi 2array
+        [ irc-end swap mailbox-put ] each
+    ] [ drop ] if ;
+
 : (connect-irc) ( -- )
-    irc> {
-        [ profile>> [ server>> ] [ port>> ] bi /CONNECT ]
-        [ (>>stream) ]
-        [ t swap (>>is-running) ]
-        [ in-messages>> [ irc-connected ] dip mailbox-put ]
-    } cleave ;
+    try-connect [
+        [ irc> ] dip >>stream t >>is-running
+        in-messages>> [ irc-connected ] dip mailbox-put
+    ] [ (terminate-irc) ] if* ;
 
 : (do-login) ( -- ) irc> nick>> /LOGIN ;
 
@@ -52,7 +68,7 @@ M: to-all-chats  message-forwards drop chats> ;
 M: to-many-chats message-forwards sender>> participant-chats ;
 
 GENERIC: process-message ( irc-message -- )
-M: object process-message drop ; 
+M: object process-message drop ;
 M: ping   process-message trailing>> /PONG ;
 M: join   process-message [ sender>> ] [ chat> ] bi join-participant ;
 M: part   process-message [ sender>> ] [ chat> ] bi part-participant ;
@@ -92,9 +108,7 @@ M: irc-message handle-outgoing-irc irc-message>string irc-print t ;
 
 : (handle-disconnect) ( -- )
     irc-disconnected irc> in-messages>> mailbox-put
-    irc> reconnect-time>> sleep
-    (connect-irc)
-    (do-login) ;
+    (connect-irc) (do-login) ;
 
 : handle-disconnect ( error -- ? )
     [ irc> exceptions>> push ] when*
@@ -154,13 +168,5 @@ M: irc-server-chat remove-chat drop +server-chat+ unregister-chat ;
 M: irc-channel-chat remove-chat
     [ part new annotate-message irc-send ]
     [ name>> unregister-chat ] bi ;
-
-: (terminate-irc) ( -- )
-    irc> dup is-running>> [
-        f >>is-running
-        [ stream>> dispose ] keep
-        [ in-messages>> ] [ out-messages>> ] bi 2array
-        [ irc-end swap mailbox-put ] each
-    ] [ drop ] if ;
 
 : (speak) ( message irc-chat -- ) swap annotate-message irc-send ;
