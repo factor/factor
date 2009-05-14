@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
-generic.single combinators deques search-deques macros io
+generic.single combinators deques search-deques macros
 source-files.errors stack-checker stack-checker.state
 stack-checker.inlining stack-checker.errors combinators.short-circuit
 compiler.errors compiler.units compiler.tree.builder

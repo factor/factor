@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences accessors kernel assocs sequences
+USING: sequences accessors kernel assocs
 compiler.tree
 compiler.tree.propagation.copy
 compiler.tree.propagation.info ;

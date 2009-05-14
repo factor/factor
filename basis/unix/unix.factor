@@ -5,7 +5,7 @@ USING: alien alien.c-types alien.syntax kernel libc
 sequences continuations byte-arrays strings math namespaces
 system combinators vocabs.loader accessors
 stack-checker macros locals generalizations unix.types
-io vocabs vocabs.loader ;
+io vocabs ;
 IN: unix
 
 CONSTANT: PROT_NONE   0
@@ -132,6 +132,7 @@ FUNCTION: int ioctl ( int fd, ulong request, char* argp ) ;
 FUNCTION: int lchown ( char* path, uid_t owner, gid_t group ) ;
 FUNCTION: int listen ( int s, int backlog ) ;
 FUNCTION: off_t lseek ( int fildes, off_t offset, int whence ) ;
+FUNCTION: int mkdir ( char* path, mode_t mode ) ;
 FUNCTION: void* mmap ( void* addr, size_t len, int prot, int flags, int fd, off_t offset ) ;
 FUNCTION: int munmap ( void* addr, size_t len ) ;
 FUNCTION: uint ntohl ( uint n ) ;

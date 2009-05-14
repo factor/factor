@@ -1,5 +1,5 @@
 USING: kernel alien.c-types alien.strings sequences math alien.syntax unix
-vectors kernel namespaces continuations threads assocs vectors
+vectors namespaces continuations threads assocs vectors
 io.backend.unix io.encodings.utf8 unix.utilities fry ;
 IN: unix.process
 

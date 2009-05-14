@@ -86,8 +86,6 @@ PRIVATE>
     [ 1.0 swap - log -2.0 * sqrt ]
     bi* * * + ;
 
-USE: vocabs.loader
-
 {
     { [ os windows? ] [ "random.windows" require ] }
     { [ os unix? ] [ "random.unix" require ] }

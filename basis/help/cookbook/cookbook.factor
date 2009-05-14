@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io kernel math namespaces parser
+USING: help.markup help.syntax io kernel math parser
 prettyprint sequences vocabs.loader namespaces stack-checker
 help command-line multiline see ;
 IN: help.cookbook
