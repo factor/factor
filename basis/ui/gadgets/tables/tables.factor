@@ -6,7 +6,7 @@ namespaces opengl sequences ui.gadgets ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.worlds ui.gestures ui.render ui.pens.solid
 ui.text ui.commands ui.images ui.gadgets.menus ui.gadgets.line-support
 math.rectangles models math.ranges sequences combinators
-combinators.short-circuit fonts locals strings vectors ;
+combinators.short-circuit fonts locals strings vectors tools.annotations ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -61,7 +61,7 @@ M: table selected-index>> selected-indices>> [ f ] [ peek ] if-empty ;
 M: table (>>selected-index) [ 1vector ] dip (>>selected-indices) ;
 
 IN: ui.gadgets.tables
-: push-selected-index ( table n -- table ) over selected-indices>> push ;
+: push-selected-index ( table n -- table ) 2dup swap selected-indices>> index [ drop ] [ over selected-indices>> push ] if ;
 
 : new-table ( rows renderer class -- table )
     new-line-gadget
@@ -335,8 +335,8 @@ M: table model-changed
 : table-button-down ( table -- ) [ (select-row) ] swap (table-button-down) ;
 : continued-button-down ( table -- ) dup multiple-selection?>> [ [ add-selected-row ] swap (table-button-down) ] [ table-button-down ] if ;
 : thru-button-down ( table -- ) dup multiple-selection?>> [
-    [ over selected-index>> (a,b] over
-      [ swap push-selected-index drop ] curry each continued-button-down ]
+    [ 2dup over selected-index>> (a,b) swap
+      [ swap push-selected-index drop ] curry each add-selected-row ]
     swap (table-button-down) ] [ table-button-down ] if ;
 
 PRIVATE>
@@ -420,10 +420,10 @@ table "sundry" f {
     { mouse-enter show-mouse-help }
     { mouse-leave hide-mouse-help }
     { motion show-mouse-help }
+    { T{ button-down f { C+ } 1 } thru-button-down }
     { T{ button-down f { A+ } 1 } continued-button-down }
-    { T{ button-down f { S+ } 1 } thru-button-down }
-    { T{ button-down } table-button-down }
     { T{ button-up } table-button-up }
+    { T{ button-down } table-button-down }
     { gain-focus focus-table }
     { lose-focus unfocus-table }
     { T{ drag } table-button-down }
