@@ -100,10 +100,13 @@ M: terrain-world tick-length
 
 : forward-vector ( player -- v )
     yaw>> 0.0
-    { 0.0 0.0 $ MOVEMENT-SPEED } vneg eye-rotate ;
+    ${ 0.0 0.0 MOVEMENT-SPEED } vneg eye-rotate ;
 : rightward-vector ( player -- v )
     yaw>> 0.0
-    { $ MOVEMENT-SPEED 0.0 0.0 } eye-rotate ;
+    ${ MOVEMENT-SPEED 0.0 0.0 } eye-rotate ;
+: clamp-pitch ( pitch -- pitch' )
+    90.0 min -90.0 max ;
+
 
 : walk-forward ( player -- )
     dup forward-vector [ v+ ] curry change-velocity drop ;
@@ -114,15 +117,20 @@ M: terrain-world tick-length
 : walk-rightward ( player -- )
     dup rightward-vector [ v+ ] curry change-velocity drop ;
 : jump ( player -- )
-    [ { 0.0 $ JUMP 0.0 } v+ ] change-velocity drop ;
+    [ ${ 0.0 JUMP 0.0 } v+ ] change-velocity drop ;
+: rotate-leftward ( player x -- )
+    [ - ] curry change-yaw drop ;
+: rotate-rightward ( player x -- )
+    [ + ] curry change-yaw drop ;
+: look-horizontally ( player x -- )
+    [ + ] curry change-yaw drop ;
+: look-vertically ( player x -- )
+    [ - clamp-pitch ] curry change-pitch drop ;
 
-: clamp-pitch ( pitch -- pitch' )
-    90.0 min -90.0 max ;
 
 : rotate-with-mouse ( player mouse -- )
-    [ dx>> MOUSE-SCALE * [ + ] curry change-yaw ]
-    [ dy>> MOUSE-SCALE * [ + clamp-pitch ] curry change-pitch ] bi
-    drop ;
+    [ dx>> MOUSE-SCALE * look-horizontally ]
+    [ dy>> MOUSE-SCALE * look-vertically ] 2bi ;
 
 :: handle-input ( world -- )
     world player>> :> player
@@ -131,6 +139,10 @@ M: terrain-world tick-length
     key-s keys nth [ player walk-backward ] when 
     key-a keys nth [ player walk-leftward ] when 
     key-d keys nth [ player walk-rightward ] when 
+    key-left-arrow keys nth [ player -1 look-horizontally ] when 
+    key-right-arrow keys nth [ player 1 look-horizontally ] when 
+    key-down-arrow keys nth [ player -1 look-vertically ] when 
+    key-up-arrow keys nth [ player 1 look-vertically ] when 
     key-space keys nth [ player jump ] when 
     key-escape keys nth [ world close-window ] when
     player read-mouse rotate-with-mouse
