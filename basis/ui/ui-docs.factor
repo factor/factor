@@ -26,7 +26,7 @@ HELP: world-attributes
 } ;
 
 HELP: set-fullscreen
-{ $values { "?" "a boolean" } { "gadget" gadget } }
+{ $values { "gadget" gadget } { "?" "a boolean" } }
 { $description "Sets and unsets fullscreen mode for the gadget's world." } ;
 
 HELP: fullscreen?
