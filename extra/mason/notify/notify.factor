@@ -42,8 +42,10 @@ IN: mason.notify
 : notify-report ( status -- )
     [ "Build finished with status: " write . flush ]
     [
-        [ "report" utf8 file-contents ] dip email-report
-        "report" { "report" } status-notify
+        [ "report" ] dip
+        [ [ utf8 file-contents ] dip email-report ]
+        [ "report" swap name>> 2array status-notify ]
+        2bi
     ] bi ;
 
 : notify-release ( archive-name -- )
