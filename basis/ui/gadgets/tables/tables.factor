@@ -56,7 +56,7 @@ GENERIC: (>>selected-value) ( val table -- )
 : >>selected-value ( table val -- table ) over (>>selected-value) ;
 
 M: table selected-value>> selected-values>> [ [ f ] [ peek ] if-empty ] <arrow> ;
-M: table (>>selected-value) [ [ 1vector ] change-model ] dip (>>selected-values) ;
+M: table (>>selected-value) [ [ 1vector ] <arrow> ] dip (>>selected-values) ;
 M: table selected-index>> selected-indices>> [ f ] [ peek ] if-empty ;
 M: table (>>selected-index) [ 1vector ] dip (>>selected-indices) ;
 
@@ -342,7 +342,7 @@ M: table model-changed
 PRIVATE>
 
 : row-action ( table -- )
-    dup [ selected-rows peek ]
+    dup selected-row
     [ swap [ action>> call( value -- ) ] [ dup hook>> call( table -- ) ] bi ]
     [ 2drop ]
     if ;
