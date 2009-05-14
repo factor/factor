@@ -64,7 +64,7 @@ M: jamshred-gadget ungraft* ( gadget -- )
     [ second mouse-scroll-y ] 2bi ;
 
 : quit ( gadget -- )
-    [ no-fullscreen ] [ close-window ] bi ;
+    [ f set-fullscreen ] [ close-window ] bi ;
 
 jamshred-gadget H{
     { T{ key-down f f "r" } [ jamshred-restart ] }

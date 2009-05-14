@@ -758,10 +758,10 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
         [ SW_RESTORE ShowWindow win32-error=0/f ]
     } cleave ;
 
-M: windows-ui-backend set-fullscreen* ( ? world -- )
-    swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
+M: windows-ui-backend (set-fullscreen) ( ? world -- )
+    [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
-M: windows-ui-backend fullscreen* ( world -- ? )
+M: windows-ui-backend (fullscreen?) ( world -- ? )
     [ handle>> hWnd>> hwnd>RECT ]
     [ handle>> hWnd>> fullscreen-RECT ] bi
     [ get-RECT-dimensions 2array 2nip ] bi@ = ;
