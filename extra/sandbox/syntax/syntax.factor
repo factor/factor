@@ -9,7 +9,7 @@ IN: sandbox.syntax
 ERROR: sandbox-error vocab ;
 
 : sandbox-use+ ( alias -- )
-    dup whitelist get at [ use+ ] [ sandbox-error ] ?if ;
+    dup whitelist get at [ add-use ] [ sandbox-error ] ?if ;
 
 PRIVATE>
 

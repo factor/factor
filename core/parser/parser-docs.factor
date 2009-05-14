@@ -119,45 +119,7 @@ HELP: parser-notes?
 HELP: bad-number
 { $error-description "Indicates the parser encountered an invalid numeric literal." } ;
 
-HELP: use
-{ $var-description "A variable holding the current vocabulary search path as a sequence of assocs." } ;
-
-{ use in use+ (use+) set-use set-in POSTPONE: USING: POSTPONE: USE: with-file-vocabs with-interactive-vocabs } related-words
-
-HELP: in
-{ $var-description "A variable holding the name of the current vocabulary for new definitions." } ;
-
-HELP: current-vocab
-{ $values { "str" "a vocabulary" } }
-{ $description "Returns the vocabulary stored in the " { $link in } " symbol. Throws an error if the current vocabulary is " { $link f } "." } ;
-
-HELP: (use+)
-{ $values { "vocab" "an assoc mapping strings to words" } }
-{ $description "Adds an assoc at the front of the search path." }
-$parsing-note ;
-
-HELP: use+
-{ $values { "vocab" string } }
-{ $description "Adds a new vocabulary at the front of the search path after loading it if necessary. Subsequent word lookups by the parser will search this vocabulary first." }
-$parsing-note
-{ $errors "Throws an error if the vocabulary does not exist." } ;
-
-HELP: set-use
-{ $values { "seq" "a sequence of strings" } }
-{ $description "Sets the vocabulary search path. Later vocabularies take precedence." }
-{ $errors "Throws an error if one of the vocabularies does not exist." }
-$parsing-note ;
-
-HELP: add-use
-{ $values { "seq" "a sequence of strings" } }
-{ $description "Adds multiple vocabularies to the search path, with later vocabularies taking precedence." }
-{ $errors "Throws an error if one of the vocabularies does not exist." }
-$parsing-note ;
-
-HELP: set-in
-{ $values { "name" string } }
-{ $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist." }
-$parsing-note ;
+{ use in add-use (add-use) set-use set-in POSTPONE: USING: POSTPONE: USE: with-file-vocabs with-interactive-vocabs } related-words
 
 HELP: create-in
 { $values { "str" "a word name" } { "word" "a new word" } }
@@ -177,11 +139,6 @@ HELP: no-word-error
 HELP: no-word
 { $values { "name" string } { "newword" word } }
 { $description "Throws a " { $link no-word-error } "." } ;
-
-HELP: search
-{ $values { "str" string } { "word/f" "a word or " { $link f } } }
-{ $description "Searches for a word by name in the current vocabulary search path. If no such word could be found, outputs " { $link f } "." }
-$parsing-note ;
 
 HELP: scan-word
 { $values { "word/number/f" "a word, number or " { $link f } } }

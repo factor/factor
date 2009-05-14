@@ -25,7 +25,7 @@ HELP: see-methods
 { $contract "Prettyprints the methods defined on a generic word or class." } ;
 
 HELP: definer
-{ $values { "defspec" "a definition specifier" } { "start" word } { "end" "a word or " { $link f } } }
+{ $values { "defspec" "a definition specifier" } { "start" word } { "end" { $maybe word } } }
 { $contract "Outputs the parsing words which delimit the definition." }
 { $examples
     { $example "USING: definitions prettyprint ;"

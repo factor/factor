@@ -5,7 +5,7 @@ sequences quotations vectors namespaces make math assocs
 continuations peg peg.parsers unicode.categories multiline
 splitting accessors effects sequences.deep peg.search
 combinators.short-circuit lexer io.streams.string stack-checker
-io combinators parser summary ;
+io combinators parser vocabs.parser summary ;
 IN: peg.ebnf
 
 : rule ( name word -- parser )

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax parser ;
+USING: help.markup help.syntax parser strings words ;
 IN: vocabs.parser
 
 ARTICLE: "vocabulary-search-shadow" "Shadowing word names"
@@ -78,3 +78,40 @@ $nl
 { $see-also "words" } ;
 
 ABOUT: "vocabulary-search"
+
+HELP: use
+{ $var-description "A variable holding the current vocabulary search path as a sequence of assocs." } ;
+
+HELP: in
+{ $var-description "A variable holding the name of the current vocabulary for new definitions." } ;
+
+HELP: current-vocab
+{ $values { "str" "a vocabulary" } }
+{ $description "Returns the vocabulary stored in the " { $link in } " symbol. Throws an error if the current vocabulary is " { $link f } "." } ;
+
+HELP: (add-use)
+{ $values { "vocab" "an assoc mapping strings to words" } }
+{ $description "Adds an assoc at the front of the search path." }
+$parsing-note ;
+
+HELP: add-use
+{ $values { "vocab" string } }
+{ $description "Adds a new vocabulary at the front of the search path after loading it if necessary. Subsequent word lookups by the parser will search this vocabulary first." }
+$parsing-note
+{ $errors "Throws an error if the vocabulary does not exist." } ;
+
+HELP: set-use
+{ $values { "seq" "a sequence of strings" } }
+{ $description "Sets the vocabulary search path. Later vocabularies take precedence." }
+{ $errors "Throws an error if one of the vocabularies does not exist." }
+$parsing-note ;
+
+HELP: set-in
+{ $values { "name" string } }
+{ $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist." }
+$parsing-note ;
+
+HELP: search
+{ $values { "str" string } { "word/f" { $maybe word } } }
+{ $description "Searches for a word by name in the current vocabulary search path. If no such word could be found, outputs " { $link f } "." }
+$parsing-note ;
