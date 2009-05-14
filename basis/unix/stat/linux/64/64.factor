@@ -13,9 +13,9 @@ C-STRUCT: stat
     { "gid_t"     "st_gid" }
     { "int"       "pad0" }
     { "dev_t"     "st_rdev" }
-    { "off_t"     "st_size" }
+    { "off64_t"     "st_size" }
     { "blksize_t" "st_blksize" }
-    { "blkcnt_t"  "st_blocks" }
+    { "blkcnt64_t"  "st_blocks" }
     { "timespec"  "st_atimespec" }
     { "timespec"  "st_mtimespec" }
     { "timespec"  "st_ctimespec" }
@@ -23,8 +23,8 @@ C-STRUCT: stat
     { "long"      "__unused1" }
     { "long"      "__unused2" } ;
 
-FUNCTION: int __xstat  ( int ver, char* pathname, stat* buf ) ;
-FUNCTION: int __lxstat ( int ver, char* pathname, stat* buf ) ;
+FUNCTION: int __xstat64  ( int ver, char* pathname, stat* buf ) ;
+FUNCTION: int __lxstat64 ( int ver, char* pathname, stat* buf ) ;
 
-:  stat ( pathname buf -- int ) [ 1 ] 2dip __xstat ;
-: lstat ( pathname buf -- int ) [ 1 ] 2dip __lxstat ;
+:  stat ( pathname buf -- int ) [ 1 ] 2dip __xstat64 ;
+: lstat ( pathname buf -- int ) [ 1 ] 2dip __lxstat64 ;

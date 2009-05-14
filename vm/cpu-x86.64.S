@@ -61,7 +61,7 @@
 
 #endif
 
-#define QUOT_XT_OFFSET 36
+#define QUOT_XT_OFFSET 28
 
 /* We pass a function pointer to memcpy to work around a Mac OS X
 ABI limitation which would otherwise require us to do a bizzaro PC-relative

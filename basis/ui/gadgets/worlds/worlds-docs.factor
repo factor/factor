@@ -13,6 +13,17 @@ HELP: origin
 HELP: hand-world
 { $var-description "Global variable. The " { $link world } " containing the gadget at the mouse location." } ;
 
+HELP: grab-input
+{ $values { "gadget" gadget } }
+{ $description "Sets the " { $link world } " containing " { $snippet "gadget" } " to grab mouse and keyboard input while focused." }
+{ $notes "Normal mouse gestures may not be available while input is grabbed." } ;
+
+HELP: ungrab-input
+{ $values { "gadget" gadget } }
+{ $description "Sets the " { $link world } " containing " { $snippet "gadget" } " not to grab mouse and keyboard input while focused." } ;
+
+{ grab-input ungrab-input } related-words
+
 HELP: set-title
 { $values { "string" string } { "world" world } }
 { $description "Sets the title bar of the native window containing the world." }
@@ -42,6 +53,7 @@ HELP: world
         { { $snippet "focus" } " - the current owner of the keyboard focus in the world." }
         { { $snippet "focused?" } " - a boolean indicating if the native window containing the world has keyboard focus." }
         { { $snippet "fonts" } " - a hashtable used by the " { $link font-renderer } "." }
+        { { $snippet "grab-input?" } " - if set to " { $link t } ", the world will hide the mouse cursor and disable normal mouse input while focused. Use " { $link grab-input } " and " { $link ungrab-input } " to change this setting." }
         { { $snippet "handle" } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
         { { $snippet "window-loc" } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
     }

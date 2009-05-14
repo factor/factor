@@ -11,8 +11,8 @@ MACRO: output>sequence ( quot exemplar -- newquot )
     [ dup infer out>> ] dip
     '[ @ _ _ nsequence ] ;
 
-: output>array ( quot -- newquot )
-    { } output>sequence ; inline
+MACRO: output>array ( quot -- newquot )
+    '[ _ { } output>sequence ] ;
 
 MACRO: input<sequence ( quot -- newquot )
     [ infer in>> ] keep
@@ -25,8 +25,8 @@ MACRO: input<sequence-unsafe ( quot -- newquot )
 MACRO: reduce-outputs ( quot operation -- newquot )
     [ dup infer out>> 1 [-] ] dip n*quot compose ;
 
-: sum-outputs ( quot -- n )
-    [ + ] reduce-outputs ; inline
+MACRO: sum-outputs ( quot -- n )
+    '[ _ [ + ] reduce-outputs ] ;
 
 MACRO: map-reduce-outputs ( quot mapper reducer -- newquot )
     [ dup infer out>> ] 2dip
@@ -37,5 +37,5 @@ MACRO: map-reduce-outputs ( quot mapper reducer -- newquot )
 MACRO: append-outputs-as ( quot exemplar -- newquot )
     [ dup infer out>> ] dip '[ @ _ _ nappend-as ] ;
 
-: append-outputs ( quot -- seq )
-    { } append-outputs-as ; inline
+MACRO: append-outputs ( quot -- seq )
+    '[ _ { } append-outputs-as ] ;

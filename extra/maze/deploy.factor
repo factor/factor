@@ -1,14 +1,14 @@
 USING: tools.deploy.config ;
 H{
-    { deploy-threads? t }
-    { deploy-math? t }
-    { deploy-name "Maze" }
-    { deploy-c-types? f }
-    { deploy-word-props? f }
-    { deploy-io 2 }
     { deploy-ui? t }
-    { "stop-after-last-window?" t }
-    { deploy-word-defs? f }
-    { deploy-compiler? t }
     { deploy-reflection 1 }
+    { deploy-unicode? f }
+    { deploy-math? t }
+    { deploy-io 2 }
+    { deploy-c-types? f }
+    { deploy-name "Maze" }
+    { deploy-word-props? f }
+    { deploy-word-defs? f }
+    { "stop-after-last-window?" t }
+    { deploy-threads? t }
 }

@@ -616,19 +616,19 @@ M: windows-ui-backend do-events
     GetDoubleClickTime milliseconds double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
-    class-name-ptr get-global [ dup f UnregisterClass drop free ] when*
-    msg-obj get-global [ free ] when*
-    f class-name-ptr set-global
-    f msg-obj set-global ;
+    class-name-ptr [ [ [ f UnregisterClass drop ] [ free ] bi ] when* f ] change-global
+    msg-obj [ [ free ] when* f ] change-global ;
 
-: get-dc ( world -- ) handle>> dup hWnd>> GetDC dup win32-error=0/f >>hDC drop ;
+: get-dc ( world -- )
+    handle>> dup hWnd>> GetDC dup win32-error=0/f >>hDC drop ;
 
 : get-rc ( world -- )
     handle>> dup hDC>> dup wglCreateContext dup win32-error=0/f
     [ wglMakeCurrent win32-error=0/f ] keep >>hRC drop ;
 
 : set-pixel-format ( pixel-format hdc -- )
-    swap handle>> "PIXELFORMATDESCRIPTOR" <c-object> SetPixelFormat win32-error=0/f ;
+    swap handle>>
+    "PIXELFORMATDESCRIPTOR" <c-object> SetPixelFormat win32-error=0/f ;
 
 : setup-gl ( world -- )
     [ get-dc ] keep
@@ -715,6 +715,7 @@ M: windows-ui-backend beep ( -- )
 M: windows-ui-backend (grab-input) ( handle -- )
     0 ShowCursor drop
     hWnd>> client-area>RECT ClipCursor drop ;
+
 M: windows-ui-backend (ungrab-input) ( handle -- )
     drop
     f ClipCursor drop

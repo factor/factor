@@ -3,7 +3,6 @@ H{
     { deploy-word-defs? f }
     { deploy-name "Sudoku" }
     { deploy-threads? f }
-    { deploy-compiler? t }
     { deploy-math? t }
     { deploy-c-types? f }
     { deploy-io 2 }

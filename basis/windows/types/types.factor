@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax namespaces kernel words
-sequences math math.bitwise math.vectors colors ;
+sequences math math.bitwise math.vectors colors
+io.encodings.utf16n ;
 IN: windows.types
 
 TYPEDEF: char                CHAR
@@ -67,6 +68,8 @@ TYPEDEF: longlong    LARGE_INTEGER
 TYPEDEF: ulonglong   ULARGE_INTEGER
 TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
 TYPEDEF: ULARGE_INTEGER* PULARGE_INTEGER
+
+<< { "char*" utf16n } "wchar_t*" typedef >>
 
 TYPEDEF: wchar_t*  LPCSTR
 TYPEDEF: wchar_t*  LPWSTR

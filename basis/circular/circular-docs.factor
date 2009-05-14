@@ -43,6 +43,11 @@ HELP: push-growing-circular
      { "elt" object } { "circular" circular } }
 { $description "Pushes an element onto a " { $link growing-circular } " object." } ;
 
+HELP: rotate-circular
+{ $values
+    { "circular" circular } }
+{ $description "Advances the start index of a circular object by one." } ;
+
 ARTICLE: "circular" "Circular sequences"
 "The " { $vocab-link "circular" } " vocabulary implements the " { $link "sequence-protocol" } " to allow an arbitrary start index and wrap-around indexing." $nl
 "Creating a new circular object:"
@@ -51,6 +56,7 @@ ARTICLE: "circular" "Circular sequences"
 { $subsection <growing-circular> }
 "Changing the start index:"
 { $subsection change-circular-start }
+{ $subsection rotate-circular }
 "Pushing new elements:"
 { $subsection push-circular }
 { $subsection push-growing-circular } ;
