@@ -8,7 +8,7 @@ varying vec3 direction;
 
 void main()
 {
-    vec4 v = vec4(gl_Vertex.xy, -1.0, 1.0);
+    vec4 v = vec4(gl_Vertex.xy, 1.0, 1.0);
     gl_Position = v;
 
     vec4 p = gl_ProjectionMatrixInverse * v;
