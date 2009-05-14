@@ -125,7 +125,7 @@ M: terrain-world tick-length
 : look-horizontally ( player x -- )
     [ + ] curry change-yaw drop ;
 : look-vertically ( player x -- )
-    [ - clamp-pitch ] curry change-pitch drop ;
+    [ + clamp-pitch ] curry change-pitch drop ;
 
 
 : rotate-with-mouse ( player mouse -- )
@@ -139,10 +139,12 @@ M: terrain-world tick-length
     key-s keys nth [ player walk-backward ] when 
     key-a keys nth [ player walk-leftward ] when 
     key-d keys nth [ player walk-rightward ] when 
+    key-q keys nth [ player -1 look-horizontally ] when 
+    key-e keys nth [ player 1 look-horizontally ] when 
     key-left-arrow keys nth [ player -1 look-horizontally ] when 
     key-right-arrow keys nth [ player 1 look-horizontally ] when 
-    key-down-arrow keys nth [ player -1 look-vertically ] when 
-    key-up-arrow keys nth [ player 1 look-vertically ] when 
+    key-down-arrow keys nth [ player 1 look-vertically ] when 
+    key-up-arrow keys nth [ player -1 look-vertically ] when 
     key-space keys nth [ player jump ] when 
     key-escape keys nth [ world close-window ] when
     player read-mouse rotate-with-mouse
