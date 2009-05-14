@@ -137,7 +137,7 @@ M: word com-stack-effect 1quotation com-stack-effect ;
     { +listener+ t }
 } define-operation
 
-: com-use-vocab ( vocab -- ) vocab-name use+ ;
+: com-use-vocab ( vocab -- ) vocab-name add-use ;
 
 [ vocab-spec? ] \ com-use-vocab H{
     { +secondary+ t }

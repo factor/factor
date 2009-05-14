@@ -12,7 +12,7 @@ IN: io.sockets
 << {
     { [ os windows? ] [ "windows.winsock" ] }
     { [ os unix? ] [ "unix" ] }
-} cond use+ >>
+} cond add-use >>
 
 ! Addressing
 GENERIC: protocol-family ( addrspec -- af )

@@ -60,7 +60,7 @@ t fuel-eval-res-flag set-global
     [ print-error ] recover ;
 
 : (fuel-eval-usings) ( usings -- )
-    [ [ use+ ] curry [ drop ] recover ] each
+    [ [ add-use ] curry [ drop ] recover ] each
     fuel-forget-error fuel-forget-output ;
 
 : (fuel-eval-in) ( in -- )
