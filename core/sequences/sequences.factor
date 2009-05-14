@@ -704,13 +704,14 @@ PRIVATE>
 : sum-lengths ( seq -- n )
     0 [ length + ] reduce ;
 
+: concat-as ( seq exemplar -- newseq )
+    swap [ { } ] [
+        [ sum-lengths over new-resizable ] keep
+        [ over push-all ] each
+    ] if-empty swap like ;
+
 : concat ( seq -- newseq )
-    [ { } ] [
-        [ sum-lengths ] keep
-        [ first new-resizable ] keep
-        [ [ over push-all ] each ] keep
-        first like
-    ] if-empty ;
+    [ { } ] [ dup first concat-as ] if-empty ;
 
 <PRIVATE
 
@@ -720,12 +721,14 @@ PRIVATE>
 PRIVATE>
 
 : join ( seq glue -- newseq )
-    [
-        2dup joined-length over new-resizable [
-            [ [ push-all ] 2curry ] [ [ nip push-all ] 2curry ] 2bi
-            interleave
-        ] keep
-    ] keep like ;
+    dup empty? [ concat-as ] [
+        [
+            2dup joined-length over new-resizable [
+                [ [ push-all ] 2curry ] [ [ nip push-all ] 2curry ] 2bi
+                interleave
+            ] keep
+        ] keep like
+    ] if ;
 
 : padding ( seq n elt quot -- newseq )
     [

@@ -3,7 +3,6 @@ H{
     { deploy-word-defs? f }
     { deploy-word-props? f }
     { deploy-math? f }
-    { deploy-compiler? t }
     { deploy-ui? f }
     { deploy-c-types? f }
     { "stop-after-last-window?" t }

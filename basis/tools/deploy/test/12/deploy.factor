@@ -9,7 +9,6 @@ H{
     { deploy-io 2 }
     { deploy-ui? f }
     { deploy-name "tools.deploy.test.12" }
-    { deploy-compiler? f }
     { deploy-word-defs? f }
     { deploy-threads? f }
 }

@@ -1,13 +1,13 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io.backend io.streams.c init fry
-namespaces make assocs kernel parser lexer strings.parser vocabs
-sequences words memory kernel.private
-continuations io vocabs.loader system strings sets
-vectors quotations byte-arrays sorting compiler.units
-definitions generic generic.standard tools.deploy.config ;
+USING: arrays accessors io.backend io.streams.c init fry namespaces
+math make assocs kernel parser lexer strings.parser vocabs sequences
+sequences.private words memory kernel.private continuations io
+vocabs.loader system strings sets vectors quotations byte-arrays
+sorting compiler.units definitions generic generic.standard
+generic.single tools.deploy.config combinators classes
+slots.private ;
 QUALIFIED: bootstrap.stage2
-QUALIFIED: classes
 QUALIFIED: command-line
 QUALIFIED: compiler.errors
 QUALIFIED: continuations
@@ -40,10 +40,11 @@ IN: tools.deploy.shaker
     strip-io? [
         "io.files" init-hooks get delete-at
         "io.backend" init-hooks get delete-at
+        "io.thread" init-hooks get delete-at
     ] when
     strip-dictionary? [
         {
-            "compiler.units"
+            ! "compiler.units"
             "vocabs"
             "vocabs.cache"
             "source-files.errors"
@@ -193,6 +194,14 @@ IN: tools.deploy.shaker
     strip-word-names? [ dup strip-word-names ] when
     2drop ;
 
+: strip-compiler-classes ( -- )
+    strip-dictionary? [
+        "Stripping compiler classes" show
+        { "compiler" "stack-checker" }
+        [ child-vocabs [ words ] map concat [ class? ] filter ] map concat
+        [ dup implementors [ "methods" word-prop delete-at ] with each ] each
+    ] when ;
+
 : strip-default-methods ( -- )
     strip-debugger? [
         "Stripping default methods" show
@@ -255,20 +264,20 @@ IN: tools.deploy.shaker
             {
                 gensym
                 name>char-hook
-                classes:next-method-quot-cache
-                classes:class-and-cache
-                classes:class-not-cache
-                classes:class-or-cache
-                classes:class<=-cache
-                classes:classes-intersect-cache
-                classes:implementors-map
-                classes:update-map
+                next-method-quot-cache
+                class-and-cache
+                class-not-cache
+                class-or-cache
+                class<=-cache
+                classes-intersect-cache
+                implementors-map
+                update-map
                 command-line:main-vocab-hook
                 compiled-crossref
                 compiled-generic-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
-                definition-observers
+                ! definition-observers
                 interactive-vocabs
                 lexer-factory
                 print-use-hook
@@ -298,15 +307,15 @@ IN: tools.deploy.shaker
                 compiler.errors:compiler-errors
                 continuations:thread-error-hook
             } %
+            
+            deploy-ui? get [
+                "ui-error-hook" "ui.gadgets.worlds" lookup ,
+            ] when
         ] when
 
         deploy-c-types? get [
             "c-types" "alien.c-types" lookup ,
         ] unless
-
-        deploy-ui? get [
-            "ui-error-hook" "ui.gadgets.worlds" lookup ,
-        ] when
 
         "windows-messages" "windows.messages" lookup [ , ] when*
     ] { } make ;
@@ -322,38 +331,46 @@ IN: tools.deploy.shaker
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
-    deploy-io get 2 = os windows? or [
+    strip-io?
+    deploy-io get 3 = os windows? not and
+    or [
         [
             c-io-backend forget
             "io.streams.c" forget-vocab
+            "io-thread-running?" "io.thread" lookup [
+                global delete-at
+            ] when*
         ] with-compilation-unit
-    ] unless ;
+    ] when ;
 
 : compress ( pred post-process string -- )
     "Compressing " prepend show
     [ instances dup H{ } clone [ [ ] cache ] curry map ] dip call
     become ; inline
 
-: compress-byte-arrays ( -- )
-    [ byte-array? ] [ ] "byte arrays" compress ;
+: compress-object? ( obj -- ? )
+    {
+        { [ dup array? ] [ empty? ] }
+        { [ dup byte-array? ] [ drop t ] }
+        { [ dup string? ] [ drop t ] }
+        { [ dup wrapper? ] [ drop t ] }
+        [ drop f ]
+    } cond ;
+
+: compress-objects ( -- )
+    [ compress-object? ] [ ] "objects" compress ;
 
 : remain-compiled ( old new -- old new )
     #! Quotations which were formerly compiled must remain
     #! compiled.
     2dup [
-        2dup [ compiled>> ] [ compiled>> not ] bi* and
+        2dup [ quot-compiled? ] [ quot-compiled? not ] bi* and
         [ nip jit-compile ] [ 2drop ] if
     ] 2each ;
 
 : compress-quotations ( -- )
     [ quotation? ] [ remain-compiled ] "quotations" compress
     [ quotation? ] instances [ f >>cached-effect f >>cache-counter drop ] each ;
-
-: compress-strings ( -- )
-    [ string? ] [ ] "strings" compress ;
-
-: compress-wrappers ( -- )
-    [ wrapper? ] [ ] "wrappers" compress ;
 
 SYMBOL: deploy-vocab
 
@@ -385,18 +402,40 @@ SYMBOL: deploy-vocab
     t "quiet" set-global
     f output-stream set-global ;
 
+: unsafe-next-method-quot ( method -- quot )
+    [ "method-class" word-prop ]
+    [ "method-generic" word-prop ] bi
+    next-method 1quotation ;
+
 : compute-next-methods ( -- )
     [ standard-generic? ] instances [
         "methods" word-prop [
-            nip
-            dup next-method-quot "next-method-quot" set-word-prop
+            nip dup
+            unsafe-next-method-quot
+            "next-method-quot" set-word-prop
         ] assoc-each
     ] each
     "vocab:tools/deploy/shaker/next-methods.factor" run-file ;
 
+: (clear-megamorphic-cache) ( i array -- )
+    2dup 1 slot < [
+        2dup [ f ] 2dip set-array-nth
+        [ 1 + ] dip (clear-megamorphic-cache)
+    ] [ 2drop ] if ;
+
+: clear-megamorphic-cache ( array -- )
+    [ 0 ] dip (clear-megamorphic-cache) ;
+
+: find-megamorphic-caches ( -- seq )
+    "Finding megamorphic caches" show
+    [ standard-generic? ] instances [ def>> third ] map ;
+
+: clear-megamorphic-caches ( cache -- )
+    "Clearing megamorphic caches" show
+    [ clear-megamorphic-cache ] each ;
+
 : strip ( -- )
     init-stripper
-    strip-default-methods
     strip-libc
     strip-call
     strip-cocoa
@@ -404,15 +443,17 @@ SYMBOL: deploy-vocab
     compute-next-methods
     strip-init-hooks
     strip-c-io
+    strip-compiler-classes
+    strip-default-methods
     f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
     deploy-vocab get vocab-main deploy-boot-quot
+    find-megamorphic-caches
     stripped-word-props
     stripped-globals strip-globals
-    compress-byte-arrays
+    compress-objects
     compress-quotations
-    compress-strings
-    compress-wrappers
-    strip-words ;
+    strip-words
+    clear-megamorphic-caches ;
 
 : deploy-error-handler ( quot -- )
     [
@@ -432,6 +473,9 @@ SYMBOL: deploy-vocab
             strip-debugger? [
                 "debugger" require
                 "inspector" require
+                deploy-ui? get [
+                    "ui.debugger" require
+                ] when
             ] unless
             deploy-vocab set
             deploy-vocab get require

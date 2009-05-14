@@ -2,8 +2,8 @@ IN: urls.encoding.tests
 USING: urls.encoding tools.test arrays kernel assocs present accessors ;
 
 [ "~hello world" ] [ "%7ehello world" url-decode ] unit-test
-[ f ] [ "%XX%XX%XX" url-decode ] unit-test
-[ f ] [ "%XX%XX%X" url-decode ] unit-test
+[ "" ] [ "%XX%XX%XX" url-decode ] unit-test
+[ "" ] [ "%XX%XX%X" url-decode ] unit-test
 
 [ "hello world" ] [ "hello%20world" url-decode ] unit-test
 [ " ! "         ] [ "%20%21%20"     url-decode ] unit-test

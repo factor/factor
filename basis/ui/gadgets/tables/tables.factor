@@ -56,7 +56,7 @@ GENERIC: (>>selected-value) ( val table -- )
 : >>selected-value ( table val -- table ) over (>>selected-value) ;
 
 M: table selected-value>> selected-values>> [ [ f ] [ peek ] if-empty ] <arrow> ;
-M: table (>>selected-value) [ [ 1vector ] <arrow> ] dip (>>selected-values) ;
+M: table (>>selected-value) [ [ 1vector ] change-model ] dip (>>selected-values) ;
 M: table selected-index>> selected-indices>> [ f ] [ peek ] if-empty ;
 M: table (>>selected-index) [ 1vector ] dip (>>selected-indices) ;
 
@@ -260,7 +260,9 @@ PRIVATE>
 : selected-rows ( table -- {value} )
     [ (selected-rows) ] [ renderer>> ] bi [ row-value ] curry map ;
 
-: selected-row ( table -- value ? ) selected-rows [ f f ] [ peek t ] if-empty ;
+: multiple>single ( values -- value/f ? ) [ f f ] [ peek t ] if-empty ;
+: (selected-row) ( table -- value/f ? ) (selected-rows) multiple>single ;
+: selected-row ( table -- value/f ? ) selected-rows multiple>single ;
 
 <PRIVATE
 

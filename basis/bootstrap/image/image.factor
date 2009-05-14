@@ -52,6 +52,9 @@ GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 M: integer (eql?) = ;
 
+M: float (eql?)
+    over float? [ fp-bitwise= ] [ 2drop f ] if ;
+
 M: sequence (eql?)
     over sequence? [
         2dup [ length ] bi@ =
@@ -445,7 +448,6 @@ M: quotation '
         array>> '
         quotation [
             emit ! array
-            f ' emit ! compiled
             f ' emit ! cached-effect
             f ' emit ! cache-counter
             0 emit ! xt

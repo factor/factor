@@ -5,41 +5,29 @@ math.functions make io io.files io.pathnames io.directories
 io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
 combinators.short-circuit parser combinators calendar
 calendar.format arrays mason.config locals system debugger fry
-continuations ;
+continuations strings ;
 IN: mason.common
 
 SYMBOL: current-git-id
 
-ERROR: output-process-error output process ;
-
-M: output-process-error error.
-    [ "Process:" print process>> . nl ]
-    [ "Output:" print output>> print ]
-    bi ;
-
-: try-output-process ( command -- )
-    >process +stdout+ >>stderr utf8 <process-reader*>
-    [ stream-contents ] [ dup wait-for-process ] bi*
-    0 = [ 2drop ] [ output-process-error ] if ;
+: short-running-process ( command -- )
+    #! Give network operations and shell commands at most
+    #! 15 minutes to complete, to catch hangs.
+    >process
+        15 minutes >>timeout
+        +closed+ >>stdin
+    try-output-process ;
 
 HOOK: really-delete-tree os ( path -- )
 
 M: windows really-delete-tree
     #! Workaround: Cygwin GIT creates read-only files for
     #! some reason.
-    [ { "chmod" "ug+rw" "-R" } swap (normalize-path) suffix try-output-process ]
+    [ { "chmod" "ug+rw" "-R" } swap (normalize-path) suffix short-running-process ]
     [ delete-tree ]
     bi ;
 
 M: unix really-delete-tree delete-tree ;
-
-: short-running-process ( command -- )
-    #! Give network operations at most 15 minutes to complete.
-    <process>
-        swap >>command
-        15 minutes >>timeout
-        +closed+ >>stdin
-    try-output-process ;
 
 : retry ( n quot -- )
     '[ drop @ f ] attempt-all drop ; inline
@@ -91,8 +79,8 @@ SYMBOL: stamp
     with-directory ;
 
 : git-id ( -- id )
-    { "git" "show" } utf8 [ readln ] with-process-reader
-    " " split second ;
+    { "git" "show" } utf8 [ lines ] with-process-reader
+    first " " split second ;
 
 : ?prepare-build-machine ( -- )
     builds/factor exists? [ prepare-build-machine ] unless ;

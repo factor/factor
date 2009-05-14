@@ -79,3 +79,8 @@ IN: dlists.tests
 [ V{ f 3 1 f } ] [ <dlist> 1 over push-front 3 over push-front f over push-front f over push-back dlist>seq ] unit-test
 
 [ V{ } ] [ <dlist> dlist>seq ] unit-test
+
+[ V{ 0 2 4 } ] [ <dlist> { 0 1 2 3 4 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
+[ V{ 2 4 } ] [ <dlist> { 1 2 3 4 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
+[ V{ 2 4 } ] [ <dlist> { 1 2 3 4 5 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
+[ V{ 0 2 4 } ] [ <dlist> { 0 1 2 3 4 5 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
