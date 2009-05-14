@@ -420,9 +420,10 @@ table "sundry" f {
     { mouse-enter show-mouse-help }
     { mouse-leave hide-mouse-help }
     { motion show-mouse-help }
-    { T{ button-down f { C+ } 1 } thru-button-down }
+    { T{ button-down f { S+ } 1 } thru-button-down }
     { T{ button-down f { A+ } 1 } continued-button-down }
     { T{ button-up } table-button-up }
+    { T{ button-up f { S+ } } table-button-up }
     { T{ button-down } table-button-down }
     { gain-focus focus-table }
     { lose-focus unfocus-table }
