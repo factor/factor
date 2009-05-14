@@ -76,7 +76,7 @@ IN: webapps.mason
     </html>
     XML] ;
 
-: <machine-report-action> ( -- action )
+: <build-farm-report-action> ( -- action )
     <action>
         [
             mason-db [ build-farm-report xml>string ] with-db
