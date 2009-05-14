@@ -6,9 +6,13 @@ generic.single.private quotations kernel.private
 assocs arrays layouts make ;
 IN: generic.standard
 
+ERROR: bad-dispatch-position # ;
+
 TUPLE: standard-combination < single-combination # ;
 
-C: <standard-combination> standard-combination
+: <standard-combination> ( # -- standard-combination )
+    dup 0 < [ bad-dispatch-position ] when
+    standard-combination boa ;
 
 PREDICATE: standard-generic < generic
     "combination" word-prop standard-combination? ;
