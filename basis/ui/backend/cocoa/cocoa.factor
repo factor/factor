@@ -128,6 +128,7 @@ M: cocoa-ui-backend (grab-input) ( handle -- )
     window>> -> frame CGRect>rect rect-center
     NSScreen -> screens 0 -> objectAtIndex: -> frame CGRect-h
     [ drop first ] [ swap second - ] 2bi <CGPoint>
+    [ GetCurrentButtonState zero? not ] [ yield ] while
     CGWarpMouseCursorPosition drop ;
 
 M: cocoa-ui-backend (ungrab-input) ( handle -- )

@@ -116,6 +116,8 @@ FUNCTION: CGError CGAssociateMouseAndMouseCursorPosition ( boolean_t connected )
 
 FUNCTION: CGError CGWarpMouseCursorPosition ( CGPoint newCursorPosition ) ;
 
+FUNCTION: uint GetCurrentButtonState ( ) ;
+
 <PRIVATE
 
 : bitmap-flags ( -- flags )
