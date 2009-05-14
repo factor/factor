@@ -6,7 +6,7 @@ opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays.float
 terrain.generation terrain.shaders ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats game-worlds method-chains
-math.affine-transforms noise ;
+math.affine-transforms noise ui.gestures ;
 IN: terrain
 
 CONSTANT: FOV $[ 2.0 sqrt 1+ ]
@@ -18,7 +18,7 @@ CONSTANT: GRAVITY $[ 1.0 4096.0 / ]
 CONSTANT: JUMP $[ 1.0 1024.0 / ]
 CONSTANT: MOUSE-SCALE $[ 1.0 10.0 / ]
 CONSTANT: MOVEMENT-SPEED $[ 1.0 16384.0 / ]
-CONSTANT: FRICTION 0.95
+CONSTANT: FRICTION { 0.95 0.99 0.95 }
 CONSTANT: COMPONENT-SCALE { 0.5 0.01 0.0005 0.0 }
 CONSTANT: SKY-PERIOD 1200
 CONSTANT: SKY-SPEED 0.0005
@@ -28,7 +28,7 @@ CONSTANT: terrain-vertex-distance { $[ 1.0 512.0 / ] $[ 1.0 512.0 / ] }
 CONSTANT: terrain-vertex-row-length $[ 512 1 + 2 * ]
 
 TUPLE: player
-    location yaw pitch velocity ;
+    location yaw pitch velocity velocity-modifier ;
 
 TUPLE: terrain-world < game-world
     player
@@ -132,9 +132,21 @@ M: terrain-world tick-length
     [ dx>> MOUSE-SCALE * look-horizontally ]
     [ dy>> MOUSE-SCALE * look-vertically ] 2bi ;
 
+
+terrain-world H{
+    { T{ key-up { mods { A+ } } { sym "RET" } } [ toggle-fullscreen ] }
+} set-gestures
+
 :: handle-input ( world -- )
     world player>> :> player
     read-keyboard keys>> :> keys
+    key-left-shift keys nth [
+        { 2.0 1.0 2.0 } player (>>velocity-modifier)
+    ] when
+    key-left-shift keys nth [
+        { 1.0 1.0 1.0 } player (>>velocity-modifier)
+    ] unless
+
     key-w keys nth [ player walk-forward ] when 
     key-s keys nth [ player walk-backward ] when 
     key-a keys nth [ player walk-leftward ] when 
@@ -151,7 +163,7 @@ M: terrain-world tick-length
     reset-mouse ;
 
 : apply-friction ( velocity -- velocity' )
-    FRICTION v*n ;
+    FRICTION v* ;
 
 : apply-gravity ( velocity -- velocity' )
     1 over [ GRAVITY - ] change-nth ;
@@ -184,9 +196,12 @@ M: terrain-world tick-length
     [ [ 1 ] 2dip [ max ] with change-nth ]
     [ ] tri ;
 
+: scaled-velocity ( player -- velocity )
+    [ velocity>> ] [ velocity-modifier>> ] bi v* ;
+
 : tick-player ( world player -- )
     [ apply-friction apply-gravity ] change-velocity
-    dup velocity>> [ v+ [ terrain-segment>> ] dip collide ] curry with change-location
+    dup scaled-velocity [ v+ [ terrain-segment>> ] dip collide ] curry with change-location
     drop ;
 
 M: terrain-world tick*
@@ -211,7 +226,7 @@ BEFORE: terrain-world begin-world
     GL_DEPTH_TEST glEnable
     GL_TEXTURE_2D glEnable
     GL_VERTEX_ARRAY glEnableClientState
-    PLAYER-START-LOCATION 0.0 0.0 { 0.0 0.0 0.0 } player boa >>player
+    PLAYER-START-LOCATION 0.0 0.0 { 0.0 0.0 0.0 } { 1.0 1.0 1.0 } player boa >>player
     <perlin-noise-table> 0.01 0.01 <scale> { 512 512 } perlin-noise-image
     [ >>sky-image ] keep
     make-texture [ set-texture-parameters ] keep >>sky-texture
