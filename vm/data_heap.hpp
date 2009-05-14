@@ -89,6 +89,7 @@ cell binary_payload_start(object *pointer);
 cell object_size(cell tagged);
 
 void begin_scan();
+void end_scan();
 cell next_object();
 
 PRIMITIVE(data_room);

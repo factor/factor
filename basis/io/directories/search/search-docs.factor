@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations ;
+USING: help.markup help.syntax kernel quotations sequences ;
 IN: io.directories.search
 
 HELP: each-file
@@ -57,6 +57,32 @@ HELP: find-all-in-directories
 }
 { $description "Finds all files in the input directories matching the predicate quotation in a breadth-first or depth-first traversal." } ;
 
+HELP: find-by-extension
+{ $values
+    { "path" "a pathname string" } { "extension" "a file extension" }
+    { "seq" sequence }
+}
+{ $description "Searches a directory for all files with the given extension. File extension and filenames are converted to lower-case and compared using the " { $link tail? } " word. The file extension should contain the period." }
+{ $examples
+    { $unchecked-example
+        "USING: io.directories.search ;"
+        "\"/\" \".mp3\" find-by-extension"
+    }
+} ;
+
+HELP: find-by-extensions
+{ $values
+    { "path" "a pathname string" } { "extensions" "a sequence of file extensions" }
+    { "seq" sequence }
+}
+{ $description "Searches a directory for all files in the given list of extensions. File extensions and filenames are converted to lower-case and compared using the " { $link tail? } " word. File extensions should contain the period." }
+{ $examples
+    { $unchecked-example
+        "USING: io.directories.search ;"
+        "\"/\" { \".jpg\" \".gif\" \".tiff\" \".png\" \".bmp\" } find-by-extensions"
+    }
+} ;
+
 { find-file find-all-files find-in-directories find-all-in-directories } related-words
 
 ARTICLE: "io.directories.search" "Searching directories"
@@ -65,10 +91,13 @@ ARTICLE: "io.directories.search" "Searching directories"
 { $subsection recursive-directory-files }
 { $subsection recursive-directory-entries }
 { $subsection each-file }
-"Finding files:"
+"Finding files by name:"
 { $subsection find-file }
 { $subsection find-all-files }
 { $subsection find-in-directories }
-{ $subsection find-all-in-directories } ;
+{ $subsection find-all-in-directories }
+"Finding files by extension:"
+{ $subsection find-by-extension }
+{ $subsection find-by-extensions } ;
 
 ABOUT: "io.directories.search"

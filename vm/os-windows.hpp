@@ -22,14 +22,14 @@ typedef wchar_t vm_char;
 #define FSEEK fseek
 
 #ifdef WIN64
-	#define cell_FORMAT "%Iu"
-	#define cell_HEX_FORMAT "%Ix"
-	#define cell_HEX_PAD_FORMAT "%016Ix"
+	#define CELL_FORMAT "%Iu"
+	#define CELL_HEX_FORMAT "%Ix"
+	#define CELL_HEX_PAD_FORMAT "%016Ix"
 	#define FIXNUM_FORMAT "%Id"
 #else
-	#define cell_FORMAT "%lu"
-	#define cell_HEX_FORMAT "%lx"
-	#define cell_HEX_PAD_FORMAT "%08lx"
+	#define CELL_FORMAT "%lu"
+	#define CELL_HEX_FORMAT "%lx"
+	#define CELL_HEX_PAD_FORMAT "%08lx"
 	#define FIXNUM_FORMAT "%ld"
 #endif
 

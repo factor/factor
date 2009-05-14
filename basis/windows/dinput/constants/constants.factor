@@ -2,7 +2,7 @@ USING: windows.dinput windows.kernel32 windows.ole32 windows.com
 windows.com.syntax alien alien.c-types alien.syntax kernel system namespaces
 combinators sequences fry math accessors macros words quotations
 libc continuations generalizations splitting locals assocs init
-struct-arrays ;
+struct-arrays memoize ;
 IN: windows.dinput.constants
 
 ! Some global variables aren't provided by the DirectInput DLL (they're in the
@@ -18,12 +18,15 @@ SYMBOLS:
 
 <PRIVATE
 
+MEMO: c-type* ( name -- c-type ) c-type ;
+MEMO: heap-size* ( c-type -- n ) heap-size ;
+
 : (field-spec-of) ( field struct -- field-spec )
-    c-type fields>> [ name>> = ] with find nip ;
+    c-type* fields>> [ name>> = ] with find nip ;
 : (offsetof) ( field struct -- offset )
     [ (field-spec-of) offset>> ] [ drop 0 ] if* ;
 : (sizeof) ( field struct -- size )
-    [ (field-spec-of) type>> "[" split1 drop heap-size ] [ drop 1 ] if* ;
+    [ (field-spec-of) type>> "[" split1 drop heap-size* ] [ drop 1 ] if* ;
 
 : (flag) ( thing -- integer )
     {
@@ -78,6 +81,9 @@ SYMBOLS:
     [ "DIDATAFORMAT" heap-size "DIOBJECTDATAFORMAT" heap-size ] 4 ndip
     [ nip length ] [ malloc-DIOBJECTDATAFORMAT-array ] 2bi
     "DIDATAFORMAT" <c-object> (DIDATAFORMAT) ;
+
+: initialize ( symbol quot -- )
+    call swap set-global ; inline
 
 : (malloc-guid-symbol) ( symbol guid -- )
     '[

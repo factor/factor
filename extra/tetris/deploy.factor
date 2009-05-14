@@ -1,7 +1,6 @@
 USING: tools.deploy.config ;
 H{
     { deploy-ui? t }
-    { deploy-compiler? t }
     { deploy-threads? t }
     { deploy-word-props? f }
     { deploy-reflection 1 }

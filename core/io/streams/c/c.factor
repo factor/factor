@@ -60,12 +60,13 @@ M: c-io-backend init-io ;
 : stdout-handle ( -- alien ) 12 getenv ;
 : stderr-handle ( -- alien ) 61 getenv ;
 
-: init-c-stdio ( -- stdin stdout stderr )
+: init-c-stdio ( -- )
     stdin-handle <c-reader>
     stdout-handle <c-writer>
-    stderr-handle <c-writer> ;
+    stderr-handle <c-writer>
+    set-stdio ;
 
-M: c-io-backend (init-stdio) init-c-stdio t ;
+M: c-io-backend init-stdio init-c-stdio ;
 
 M: c-io-backend io-multiplex 60 60 * 1000 * 1000 * or (sleep) ;
 

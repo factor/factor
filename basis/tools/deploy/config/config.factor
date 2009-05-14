@@ -7,7 +7,6 @@ IN: tools.deploy.config
 SYMBOL: deploy-name
 
 SYMBOL: deploy-ui?
-SYMBOL: deploy-compiler?
 SYMBOL: deploy-math?
 SYMBOL: deploy-unicode?
 SYMBOL: deploy-threads?
@@ -55,7 +54,6 @@ SYMBOL: deploy-image
         { deploy-ui?                f }
         { deploy-io                 2 }
         { deploy-reflection         1 }
-        { deploy-compiler?          t }
         { deploy-threads?           t }
         { deploy-unicode?           f }
         { deploy-math?              t }
