@@ -268,10 +268,12 @@ M: x11-ui-backend set-title ( string world -- )
     handle>> window>> swap
     [ dpy get ] 2dip [ set-title-old ] [ set-title-new ] 3bi ;
 
-M: x11-ui-backend set-fullscreen* ( ? world -- )
-    handle>> window>> "XClientMessageEvent" <c-object>
-    [ set-XClientMessageEvent-window ] keep
-    swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ?
+M: x11-ui-backend (set-fullscreen) ( world ? -- )
+    [
+        handle>> window>> "XClientMessageEvent" <c-object>
+        [ set-XClientMessageEvent-window ] keep
+    ] dip
+    _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ?
     over set-XClientMessageEvent-data0
     ClientMessage over set-XClientMessageEvent-type
     dpy get over set-XClientMessageEvent-display
