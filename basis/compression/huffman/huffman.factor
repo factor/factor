@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alt.bitstreams arrays assocs constructors fry
+USING: accessors arrays assocs constructors fry
 hashtables io kernel locals math math.order math.parser
 math.ranges multiline sequences ;
 IN: compression.huffman
 
-QUALIFIED-WITH: alt.bitstreams bs
+QUALIFIED-WITH: bitstreams bs
 
 <PRIVATE
 
