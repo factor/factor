@@ -31,16 +31,6 @@ t parser-notes set-global
 
 M: parsing-word stack-effect drop (( parsed -- parsed )) ;
 
-TUPLE: no-current-vocab ;
-
-: no-current-vocab ( -- vocab )
-    \ no-current-vocab boa
-    { { "Define words in scratchpad vocabulary" "scratchpad" } }
-    throw-restarts dup set-in ;
-
-: current-vocab ( -- str )
-    in get [ no-current-vocab ] unless* ;
-
 : create-in ( str -- word )
     current-vocab create dup set-word dup save-location ;
 
@@ -55,7 +45,7 @@ SYMBOL: auto-use?
 : no-word-restarted ( restart-value -- word )
     dup word? [
         dup vocabulary>>
-        [ (add-use) ]
+        [ use-vocab ]
         [ amended-use get dup [ push ] [ 2drop ] if ]
         [ "Added \"" "\" vocabulary to search path" surround note. ]
         tri
@@ -134,8 +124,9 @@ SYMBOL: bootstrap-syntax
 
 : with-file-vocabs ( quot -- )
     [
-        f in set { "syntax" } set-use
-        bootstrap-syntax get [ use get push ] when*
+        <manifest> manifest set
+        "syntax" use-vocab
+        bootstrap-syntax get [ use-words ] when*
         call
     ] with-scope ; inline
 
@@ -195,8 +186,9 @@ SYMBOL: interactive-vocabs
 
 : with-interactive-vocabs ( quot -- )
     [
-        "scratchpad" in set
-        interactive-vocabs get set-use
+        <manifest> manifest set
+        "scratchpad" set-current-vocab
+        interactive-vocabs get only-use-vocabs
         call
     ] with-scope ; inline
 

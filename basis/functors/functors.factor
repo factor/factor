@@ -146,10 +146,10 @@ DEFER: ;FUNCTOR delimiter
     } ;
 
 : push-functor-words ( -- )
-    functor-words use get push ;
+    functor-words use-words ;
 
 : pop-functor-words ( -- )
-    functor-words use get delq ;
+    functor-words unuse-words ;
 
 : parse-functor-body ( -- form )
     push-functor-words

@@ -15,7 +15,7 @@ SYNTAX: hello "Hi" print ;
 ] with-file-vocabs
 
 [
-    "debugger" add-use
+    "debugger" add-ambiguous-use
 
     [ [ \ + 1 2 3 4 ] ]
     [
