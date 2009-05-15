@@ -2,10 +2,166 @@
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel namespaces sequences
-sets strings vocabs sorting accessors arrays compiler.units ;
+sets strings vocabs sorting accessors arrays compiler.units
+combinators vectors splitting continuations ;
 IN: vocabs.parser
 
 ERROR: no-word-error name ;
+
+TUPLE: manifest
+current-vocab
+{ search-vocabs vector }
+{ qualified-vocabs vector }
+{ extra-words vector } ;
+
+: <manifest> ( -- manifest )
+    manifest new
+        V{ } clone >>search-vocabs
+        V{ } clone >>qualified-vocabs
+        V{ } clone >>extra-words ;
+
+M: manifest clone
+    call-next-method
+        [ clone ] change-search-vocabs
+        [ clone ] change-qualified-vocabs
+        [ clone ] change-extra-words ;
+
+<PRIVATE
+
+: clear-manifest ( -- )
+    manifest get
+    [ search-vocabs>> delete-all ]
+    [ qualified-vocabs>> delete-all ]
+    [ extra-words>> delete-all ]
+    tri ;
+
+: (use-vocab) ( vocab -- vocab seq )
+    load-vocab manifest get search-vocabs>> ;
+
+: (add-qualified) ( qualified -- )
+    manifest get qualified-vocabs>> push ;
+
+: (from) ( vocab words -- vocab words words' assoc )
+    2dup swap load-vocab words>> ;
+
+: (use-words) ( assoc -- assoc seq )
+    manifest get extra-words>> ;
+
+: extract-words ( seq assoc -- assoc' )
+    extract-keys dup [ [ drop ] [ no-word-error ] if ] assoc-each ;
+
+: (lookup) ( name assoc -- word/f )
+    at dup forward-reference? [ drop f ] when ;
+
+PRIVATE>
+
+: set-current-vocab ( name -- )
+    create-vocab manifest get
+    [ (>>current-vocab) ]
+    [ [ words>> ] dip extra-words>> push ]
+    2bi ; 
+
+TUPLE: no-current-vocab ;
+
+: no-current-vocab ( -- vocab )
+    \ no-current-vocab boa
+    { { "Define words in scratchpad vocabulary" "scratchpad" } }
+    throw-restarts dup set-current-vocab ;
+
+: current-vocab ( -- vocab )
+    manifest get current-vocab>> [ no-current-vocab ] unless* ;
+
+: begin-private ( -- )
+    manifest get current-vocab>> vocab-name ".private" ?tail
+    [ drop ] [ ".private" append set-current-vocab ] if ;
+
+: end-private ( -- )
+    manifest get current-vocab>> vocab-name ".private" ?tail
+    [ set-current-vocab ] [ drop ] if ;
+
+: use-vocab ( vocab -- ) (use-vocab) push ;
+
+: unuse-vocab ( vocab -- ) (use-vocab) delq ;
+
+: only-use-vocabs ( vocabs -- )
+    clear-manifest
+    [ vocab ] V{ } map-as sift
+    manifest get search-vocabs>> push-all ;
+
+TUPLE: qualified vocab prefix words ;
+
+: <qualified> ( vocab prefix -- qualified )
+    2dup
+    [ load-vocab words>> ] [ CHAR: : suffix ] bi*
+    [ swap [ prepend ] dip ] curry assoc-map
+    qualified boa ;
+
+: add-qualified ( vocab prefix -- )
+    <qualified> (add-qualified) ;
+
+TUPLE: from vocab names words ;
+
+: <from> ( vocab words -- from )
+    (from) extract-words from boa ;
+
+: add-words-from ( vocab words -- )
+    <from> (add-qualified) ;
+
+TUPLE: exclude vocab names words ;
+
+: <exclude> ( vocab words -- from )
+    (from) [ nip ] [ extract-words ] 2bi assoc-diff exclude boa ;
+
+: add-words-excluding ( vocab words -- )
+    <exclude> (add-qualified) ;
+
+TUPLE: rename word vocab words ;
+
+: <rename> ( word vocab new-name -- rename )
+    [ 2dup load-vocab words>> dupd at [ ] [ no-word-error ] ?if ] dip
+    associate rename boa ;
+
+: add-renamed-word ( word vocab new-name -- )
+    <rename> (add-qualified) ;
+
+: use-words ( words -- ) (use-words) push ;
+
+: unuse-words ( words -- ) (use-words) delq ;
+
+ERROR: ambiguous-use-error words ;
+
+<PRIVATE
+
+: (vocab-search) ( name assocs -- words n )
+    [ words>> (lookup) ] with map
+    sift dup length ;
+
+: vocab-search ( name manifest -- word/f )
+    search-vocabs>>
+    (vocab-search) {
+        { 0 [ drop f ] }
+        { 1 [ first ] }
+        [ drop ambiguous-use-error ]
+    } case ;
+
+: qualified-search ( name manifest -- word/f )
+    qualified-vocabs>>
+    (vocab-search) 0 = [ drop f ] [ peek ] if ;
+
+: word-search ( name manifest -- word/f )
+    extra-words>> [ (lookup) ] with map-find-last drop ;
+
+PRIVATE>
+
+: search-manifest ( name manifest -- word/f )
+    2dup word-search dup [ 2nip ] [
+        drop 2dup qualified-search dup [ 2nip ] [
+            drop vocab-search
+        ] if
+    ] if ;
+
+: search ( name -- word/f )
+    manifest get search-manifest ;
 
 : word-restarts ( name possibilities -- restarts )
     natural-sort
@@ -15,58 +171,3 @@ ERROR: no-word-error name ;
 
 : <no-word-error> ( name possibilities -- error restarts )
     [ drop \ no-word-error boa ] [ word-restarts ] 2bi ;
-
-SYMBOL: use
-SYMBOL: in
-
-: (add-use) ( vocab -- )
-    vocab-words use get push ;
-
-: add-use ( vocab -- )
-    load-vocab (add-use) ;
-
-: set-use ( seq -- )
-    [ vocab-words ] V{ } map-as sift use set ;
-
-: add-qualified ( vocab prefix -- )
-    [ load-vocab vocab-words ] [ CHAR: : suffix ] bi*
-    [ swap [ prepend ] dip ] curry assoc-map
-    use get push ;
-
-: words-named-in ( words assoc -- assoc' )
-    [ dupd at [ no-word-error ] unless* ] curry { } map>assoc ;
-
-: partial-vocab-including ( words vocab -- assoc )
-    load-vocab vocab-words words-named-in ;
-
-: add-words-from ( words vocab -- )
-    partial-vocab-including use get push ;
-
-: partial-vocab-excluding ( words vocab -- assoc )
-    load-vocab vocab-words [ nip ] [ words-named-in ] 2bi assoc-diff ;
-
-: add-words-excluding ( words vocab -- )
-    partial-vocab-excluding use get push ;
-
-: add-renamed-word ( word vocab new-name -- )
-    [ load-vocab vocab-words dupd at [ ] [ no-word-error ] ?if ] dip
-    associate use get push ;
-
-: check-vocab-string ( name -- name )
-    dup string? [ "Vocabulary name must be a string" throw ] unless ;
-
-: set-in ( name -- )
-    check-vocab-string dup in set create-vocab (add-use) ;
-
-: check-forward ( str word -- word/f )
-    dup forward-reference? [
-        drop
-        use get
-        [ at ] with map sift
-        [ forward-reference? not ] find-last nip
-    ] [
-        nip
-    ] if ;
-
-: search ( str -- word/f )
-    dup use get assoc-stack check-forward ;

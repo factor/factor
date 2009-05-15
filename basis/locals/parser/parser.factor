@@ -25,12 +25,6 @@ SYMBOL: in-lambda?
     [ <local-word> [ dup name>> set ] [ ] [ ] tri ] dip
     "local-word-def" set-word-prop ;
 
-: push-locals ( assoc -- )
-    use get push ;
-
-: pop-locals ( assoc -- )
-    use get delq ;
-
 SINGLETON: lambda-parser
 
 SYMBOL: locals
@@ -39,7 +33,9 @@ SYMBOL: locals
     '[
         in-lambda? on
         lambda-parser quotation-parser set
-        [ locals set ] [ push-locals @ ] [ pop-locals ] tri
+        [ locals set ]
+        [ use-words @ ]
+        [ unuse-words ] tri
     ] with-scope ; inline
     
 : (parse-lambda) ( assoc -- quot )
@@ -81,9 +77,9 @@ M: lambda-parser parse-quotation ( -- quotation )
 
 : parse-bindings* ( end -- words assoc )
     [
-        namespace push-locals
+        namespace use-words
         (parse-bindings)
-        namespace pop-locals
+        namespace unuse-words
     ] with-bindings ;
 
 : parse-let* ( -- form )
