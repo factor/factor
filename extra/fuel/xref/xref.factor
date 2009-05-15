@@ -35,7 +35,11 @@ MEMO: (vocab-words) ( name -- seq )
     >vocab-link words [ name>> ] map ;
 
 : current-words ( -- seq )
-    use get [ keys ] map concat ; inline
+    manifest get
+    [ search-vocabs>> [ words>> ] map ]
+    [ qualified-vocabs>> [ words>> ] map ]
+    [ extra-words>> ]
+    tri 3append assoc-combine keys ; inline
 
 : vocabs-words ( names -- seq )
     prune [ (vocab-words) ] map concat ; inline
