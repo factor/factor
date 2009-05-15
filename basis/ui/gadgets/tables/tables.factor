@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors colors.constants fry kernel math
-math.functions math.ranges math.rectangles math.order math.vectors models.arrow
-namespaces opengl sequences ui.gadgets ui.gadgets.scrollers
+math.functions math.ranges math.rectangles math.order math.vectors
+models.illusion namespaces opengl sequences ui.gadgets ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.worlds ui.gestures ui.render ui.pens.solid
 ui.text ui.commands ui.images ui.gadgets.menus ui.gadgets.line-support
 math.rectangles models math.ranges sequences combinators
-combinators.short-circuit fonts locals strings vectors tools.annotations ;
+combinators.short-circuit fonts locals strings vectors tools.continuations ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -55,8 +55,8 @@ GENERIC: (>>selected-value) ( val table -- )
 : >>selected-index ( table n -- table ) over (>>selected-index) ;
 : >>selected-value ( table val -- table ) over (>>selected-value) ;
 
-M: table selected-value>> selected-values>> [ [ f ] [ peek ] if-empty ] <arrow> ;
-M: table (>>selected-value) [ [ 1vector ] <arrow> ] dip (>>selected-values) ;
+M: table selected-value>> selected-values>> [ [ f ] [ peek ] if-empty ] <illusion> ;
+M: table (>>selected-value) [ [ 1vector ] <illusion> ] dip (>>selected-values) ;
 M: table selected-index>> selected-indices>> [ f ] [ peek ] if-empty ;
 M: table (>>selected-index) [ 1vector ] dip (>>selected-indices) ;
 
