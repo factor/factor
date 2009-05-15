@@ -209,11 +209,14 @@ PRIVATE>
 : open-window ( gadget title/attributes -- )
     ?attributes <world> open-world-window ;
 
-: set-fullscreen? ( ? gadget -- )
-    find-world set-fullscreen* ;
+: set-fullscreen ( gadget ? -- )
+    [ find-world ] dip (set-fullscreen) ;
 
 : fullscreen? ( gadget -- ? )
-    find-world fullscreen* ;
+    find-world (fullscreen?) ;
+
+: toggle-fullscreen ( gadget -- )
+    dup fullscreen? not set-fullscreen ;
 
 : raise-window ( gadget -- )
     find-world raise-window* ;

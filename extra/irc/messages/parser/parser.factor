@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel fry splitting ascii calendar accessors combinators
+USING: kernel fry splitting ascii accessors combinators
        arrays classes.tuple math.order words assocs
        irc.messages.base sequences ;
 IN: irc.messages.parser
@@ -32,4 +32,4 @@ PRIVATE>
     [ >>trailing ]
     tri*
     [ (>>prefix) ] [ fill-irc-message-slots ] [ swap >>line ] tri
-    now >>timestamp dup sender >>sender ;
+    dup sender >>sender ;

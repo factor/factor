@@ -1,3 +1,5 @@
+#include <unistd.h>
+#include <sys/param.h>
 #include <dirent.h>
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -24,13 +26,13 @@ typedef char symbol_char;
 #define FSEEK fseeko
 
 #define FIXNUM_FORMAT "%ld"
-#define cell_FORMAT "%lu"
-#define cell_HEX_FORMAT "%lx"
+#define CELL_FORMAT "%lu"
+#define CELL_HEX_FORMAT "%lx"
 
 #ifdef FACTOR_64
-	#define cell_HEX_PAD_FORMAT "%016lx"
+	#define CELL_HEX_PAD_FORMAT "%016lx"
 #else
-	#define cell_HEX_PAD_FORMAT "%08lx"
+	#define CELL_HEX_PAD_FORMAT "%08lx"
 #endif
 
 #define FIXNUM_FORMAT "%ld"

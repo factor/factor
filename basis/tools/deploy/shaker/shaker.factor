@@ -195,10 +195,12 @@ IN: tools.deploy.shaker
     2drop ;
 
 : strip-compiler-classes ( -- )
-    "Stripping compiler classes" show
-    { "compiler" "stack-checker" }
-    [ child-vocabs [ words ] map concat [ class? ] filter ] map concat
-    [ dup implementors [ "methods" word-prop delete-at ] with each ] each ;
+    strip-dictionary? [
+        "Stripping compiler classes" show
+        { "compiler" "stack-checker" }
+        [ child-vocabs [ words ] map concat [ class? ] filter ] map concat
+        [ dup implementors [ "methods" word-prop delete-at ] with each ] each
+    ] when ;
 
 : strip-default-methods ( -- )
     strip-debugger? [

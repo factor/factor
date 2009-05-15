@@ -318,6 +318,11 @@ void begin_scan()
 	gc_off = true;
 }
 
+void end_scan()
+{
+	gc_off = false;
+}
+
 PRIMITIVE(begin_scan)
 {
 	begin_scan();
@@ -348,24 +353,40 @@ PRIMITIVE(end_scan)
 	gc_off = false;
 }
 
-cell find_all_words()
+template<typename T> void each_object(T &functor)
 {
-	growable_array words;
-
 	begin_scan();
-
 	cell obj;
 	while((obj = next_object()) != F)
-	{
-		if(tagged<object>(obj).type_p(WORD_TYPE))
-			words.add(obj);
-	}
+		functor(tagged<object>(obj));
+	end_scan();
+}
 
-	/* End heap scan */
-	gc_off = false;
+namespace
+{
 
-	words.trim();
-	return words.elements.value();
+struct word_counter {
+	cell count;
+	word_counter() : count(0) {}
+	void operator()(tagged<object> obj) { if(obj.type_p(WORD_TYPE)) count++; }
+};
+
+struct word_accumulator {
+	growable_array words;
+	word_accumulator(int count) : words(count) {}
+	void operator()(tagged<object> obj) { if(obj.type_p(WORD_TYPE)) words.add(obj.value()); }
+};
+
+}
+
+cell find_all_words()
+{
+	word_counter counter;
+	each_object(counter);
+	word_accumulator accum(counter.count);
+	each_object(accum);
+	accum.words.trim();
+	return accum.words.elements.value();
 }
 
 }

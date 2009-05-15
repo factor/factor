@@ -25,15 +25,15 @@ HELP: world-attributes
     { { $snippet "pixel-format-attributes" } " is a sequence of " { $link "ui.pixel-formats-attributes" } " that the window will request for its OpenGL pixel format." }
 } ;
 
-HELP: set-fullscreen?
-{ $values { "?" "a boolean" } { "gadget" gadget } }
+HELP: set-fullscreen
+{ $values { "gadget" gadget } { "?" "a boolean" } }
 { $description "Sets and unsets fullscreen mode for the gadget's world." } ;
 
 HELP: fullscreen?
 { $values { "gadget" gadget } { "?" "a boolean" } }
 { $description "Queries the gadget's world to see if it is running in fullscreen mode." } ;
 
-{ fullscreen? set-fullscreen? } related-words
+{ fullscreen? set-fullscreen } related-words
 
 HELP: find-window
 { $values { "quot" { $quotation "( world -- ? )" } } { "world" { $maybe world } } }
