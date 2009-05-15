@@ -23,7 +23,7 @@ ERROR: invalid-widthed bits #bits ;
     widthed boa ;
 
 : zero-widthed ( -- widthed ) 0 0 <widthed> ;
-: zero-widthed? ( widthed -- ? ) zero-widthed = ; 
+: zero-widthed? ( widthed -- ? ) zero-widthed = ;
 
 TUPLE: bit-reader
     { bytes byte-array }
@@ -41,72 +41,31 @@ CONSTRUCTOR: lsb0-bit-reader ( bytes -- bs ) ;
 
 TUPLE: msb0-bit-writer < bit-writer ;
 TUPLE: lsb0-bit-writer < bit-writer ;
-CONSTRUCTOR: msb0-bit-writer ( -- bs )
-    BV{ } clone >>bytes
-    0 0 <widthed> >>widthed ;
-CONSTRUCTOR: lsb0-bit-writer ( -- bs )
-    BV{ } clone >>bytes
-    0 0 <widthed> >>widthed ;
 
-! interface
+: new-bit-writer ( class -- bs )
+    new
+        BV{ } clone >>bytes
+        0 0 <widthed> >>widthed ; inline
+
+: <msb0-bit-writer> ( -- bs )
+    msb0-bit-writer new-bit-writer ;
+
+: <lsb0-bit-writer> ( -- bs )
+    lsb0-bit-writer new-bit-writer ;
 
 GENERIC: peek ( n bitstream -- value )
 GENERIC: poke ( value n bitstream -- )
 
 : seek ( n bitstream -- )
     {
-        [ byte-pos>> 8 * ] 
-        [ bit-pos>> + + 8 /mod ] 
-        [ (>>bit-pos) ] 
+        [ byte-pos>> 8 * ]
+        [ bit-pos>> + + 8 /mod ]
+        [ (>>bit-pos) ]
         [ (>>byte-pos) ]
     } cleave ; inline
 
 : read ( n bitstream -- value )
     [ peek ] [ seek ] 2bi ; inline
-
-
-! reading
-
-<PRIVATE
-
-MACRO: multi-alien-unsigned-1 ( seq -- quot ) 
-    [ '[ _ + alien-unsigned-1 ] ] map 2cleave>quot ;
-
-GENERIC: fetch3-le-unsafe ( n byte-array -- value )
-GENERIC: fetch3-be-unsafe ( n byte-array -- value )
-
-: fetch3-unsafe ( byte-array n offsets -- value ) 
-    multi-alien-unsigned-1 8 2^ * + 8 2^ * + ; inline
-
-M: byte-array fetch3-le-unsafe ( n byte-array -- value ) 
-    swap { 0 1 2 } fetch3-unsafe ; inline
-M: byte-array fetch3-be-unsafe ( n byte-array -- value ) 
-    swap { 2 1 0 } fetch3-unsafe ; inline
-
-: fetch3 ( n byte-array -- value ) 
-    [ 3 [0,b) [ + ] with map ] dip [ nth ] curry map ;
-    
-: fetch3-le ( n byte-array -- value ) fetch3 le> ;
-: fetch3-be ( n byte-array -- value ) fetch3 be> ;
-    
-GENERIC: peek16 ( n bitstream -- value )
-
-M:: lsb0-bit-reader peek16 ( n bs -- v )
-    bs byte-pos>> bs bytes>> fetch3-le
-    bs bit-pos>> 2^ /i
-    n 2^ mod ;
-
-M:: msb0-bit-reader peek16 ( n bs -- v )
-    bs byte-pos>> bs bytes>> fetch3-be
-    24 n bs bit-pos>> + - 2^ /i
-    n 2^ mod ;
-
-PRIVATE>
-
-M: lsb0-bit-reader peek ( n bs -- v ) peek16 ;
-M: msb0-bit-reader peek ( n bs -- v ) peek16 ;
-
-! writing
 
 <PRIVATE
 
@@ -130,18 +89,69 @@ ERROR: not-enough-bits widthed n ;
     [ 8 split-widthed dup zero-widthed? not ]
     [ swap bits>> ] B{ } produce-as nip swap ;
 
+:: |widthed ( widthed1 widthed2 -- widthed3 )
+    widthed1 bits>> :> bits1
+    widthed1 #bits>> :> #bits1
+    widthed2 bits>> :> bits2
+    widthed2 #bits>> :> #bits2
+    bits1 #bits2 shift bits2 bitor
+    #bits1 #bits2 + <widthed> ;
+
 PRIVATE>
 
 M:: lsb0-bit-writer poke ( value n bs -- )
     value n <widthed> :> widthed
     widthed
     bs widthed>> #bits>> 8 swap - split-widthed :> remainder :> byte
-
-    byte #bits>> 8 = [
-        byte bits>> bs bytes>> push
+    byte bs widthed>> |widthed :> new-byte
+    new-byte #bits>> dup 8 > [ "oops" throw ] when 8 = [
+        new-byte bits>> bs bytes>> push
         zero-widthed bs (>>widthed)
         remainder widthed>bytes
-        [ bs bytes>> push-all ] [ B bs (>>widthed) ] bi*
+        [ bs bytes>> push-all ] [ bs (>>widthed) ] bi*
     ] [
         byte bs (>>widthed)
     ] if ;
+
+: enough-bits? ( n bs -- ? )
+    [ bytes>> length ]
+    [ byte-pos>> - 8 * ]
+    [ bit-pos>> - ] tri <= ;
+
+ERROR: not-enough-bits n bit-reader ;
+
+: #bits>#bytes ( #bits -- #bytes )
+    8 /mod 0 = [ 1 + ] unless ; inline
+
+:: subseq>bits ( bignum n bs -- bits )
+    bignum 
+    8 bs bit-pos>> - n - 8 mod dup 0 < [ 8 + ] when
+    neg shift n bits ;
+
+:: adjust-bits ( n bs -- )
+    n 8 /mod :> #bits :> #bytes
+    bs [ #bytes + ] change-byte-pos
+    bit-pos>> #bits + dup 8 >= [
+        8 - bs (>>bit-pos)
+        bs [ 1 + ] change-byte-pos drop
+    ] [
+        bs (>>bit-pos)
+    ] if ;
+
+:: (peek) ( n bs word -- bits )
+    n bs enough-bits? [ n bs not-enough-bits ] unless
+    bs [ byte-pos>> ] [ bit-pos>> n + ] bi #bits>#bytes dupd +
+    bs bytes>> subseq word execute( seq -- x ) :> bignum
+    bignum n bs subseq>bits ;
+
+M: lsb0-bit-reader peek ( n bs -- bits ) \ le> (peek) ;
+
+M: msb0-bit-reader peek ( n bs -- bits ) \ be> (peek) ;
+
+:: bit-writer-bytes ( writer -- bytes )
+    writer widthed>> #bits>> :> n
+    n 0 = [
+        writer widthed>> bits>> 8 n - shift
+        writer bytes>> swap push
+    ] unless
+    writer bytes>> ;
