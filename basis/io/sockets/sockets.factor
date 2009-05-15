@@ -11,7 +11,7 @@ IN: io.sockets
 << {
     { [ os windows? ] [ "windows.winsock" ] }
     { [ os unix? ] [ "unix" ] }
-} cond add-ambiguous-use >>
+} cond use-vocab >>
 
 ! Addressing
 GENERIC: protocol-family ( addrspec -- af )
