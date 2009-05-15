@@ -90,7 +90,7 @@ inline static cell tag_for(cell type)
 	return type < HEADER_TYPE ? type : OBJECT_TYPE;
 }
 
-class object;
+struct object;
 
 struct header {
 	cell value;

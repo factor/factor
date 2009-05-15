@@ -20,7 +20,7 @@ DEFER: copy-tree-into
     {
         { +symbolic-link+ [ copy-link ] }
         { +directory+ [ '[ [ _ copy-tree-into ] each ] with-directory-files ] }
-        [ drop copy-file ]
+        [ drop copy-file-and-info ]
     } case ;
 
 : copy-tree-into ( from to -- )

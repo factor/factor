@@ -556,11 +556,9 @@ M: windows-ui-backend do-events
         [ DispatchMessage drop ] bi
     ] if ;
 
-: register-wndclassex ( -- class )
-    "WNDCLASSEX" <c-object>
-    f GetModuleHandle
-    class-name-ptr get-global
-    pick GetClassInfoEx zero? [
+:: register-window-class ( class-name-ptr -- )
+    "WNDCLASSEX" <c-object> f GetModuleHandle
+    class-name-ptr pick GetClassInfoEx 0 = [
         "WNDCLASSEX" heap-size over set-WNDCLASSEX-cbSize
         { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags over set-WNDCLASSEX-style
         ui-wndproc over set-WNDCLASSEX-lpfnWndProc
@@ -571,9 +569,9 @@ M: windows-ui-backend do-events
         over set-WNDCLASSEX-hIcon
         f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
 
-        class-name-ptr get-global over set-WNDCLASSEX-lpszClassName
-        RegisterClassEx dup win32-error=0/f
-    ] when ;
+        class-name-ptr over set-WNDCLASSEX-lpszClassName
+        RegisterClassEx win32-error=0/f
+    ] [ drop ] if ;
 
 : adjust-RECT ( RECT -- )
     style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
@@ -594,9 +592,16 @@ M: windows-ui-backend do-events
     dup adjust-RECT
     swap [ dup default-position-RECT ] when ;
 
+: get-window-class ( -- class-name )
+    class-name-ptr [
+        dup expired? [ drop "Factor-window" utf16n malloc-string ] when
+        dup register-window-class
+        dup
+    ] change-global ;
+
 : create-window ( rect -- hwnd )
     make-adjusted-RECT
-    [ class-name-ptr get-global f ] dip
+    [ get-window-class f ] dip
     [
         [ ex-style ] 2dip
         { WS_CLIPSIBLINGS WS_CLIPCHILDREN style } flags
@@ -611,8 +616,6 @@ M: windows-ui-backend do-events
 : init-win32-ui ( -- )
     V{ } clone nc-buttons set-global
     "MSG" malloc-object msg-obj set-global
-    "Factor-window" utf16n malloc-string class-name-ptr set-global
-    register-wndclassex drop
     GetDoubleClickTime milliseconds double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
@@ -758,8 +761,13 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
         [ SW_RESTORE ShowWindow win32-error=0/f ]
     } cleave ;
 
-M: windows-ui-backend set-fullscreen* ( ? world -- )
-    swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
+M: windows-ui-backend (set-fullscreen) ( ? world -- )
+    [ enter-fullscreen ] [ exit-fullscreen ] if ;
+
+M: windows-ui-backend (fullscreen?) ( world -- ? )
+    [ handle>> hWnd>> hwnd>RECT ]
+    [ handle>> hWnd>> fullscreen-RECT ] bi
+    [ get-RECT-dimensions 2array 2nip ] bi@ = ;
 
 windows-ui-backend ui-backend set-global
 
