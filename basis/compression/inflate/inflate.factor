@@ -7,7 +7,7 @@ math math.bitwise math.order math.ranges multiline sequences
 sorting ;
 IN: compression.inflate
 
-QUALIFIED-WITH: alt.bitstreams bs
+QUALIFIED-WITH: bitstreams bs
 
 <PRIVATE
 
@@ -203,7 +203,7 @@ PRIVATE>
     2 clump [ first2 dup [ third ] [ 0 2 rot set-nth ] bi png-unfilter-line ] map concat ;
 
 : zlib-inflate ( bytes -- bytes )
-    bs:<lsb0-bitstream>
+    bs:<lsb0-bit-reader>
     [ check-zlib-header ]
     [ inflate-loop ] bi
     inflate-lz77 ;
