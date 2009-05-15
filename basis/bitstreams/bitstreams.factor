@@ -123,7 +123,10 @@ ERROR: not-enough-bits n bit-reader ;
 : #bits>#bytes ( #bits -- #bytes )
     8 /mod 0 = [ 1 + ] unless ; inline
 
-:: subseq>bits ( bignum n bs -- bits )
+:: subseq>bits-le ( bignum n bs -- bits )
+    bignum bs bit-pos>> neg shift n bits ;
+
+:: subseq>bits-be ( bignum n bs -- bits )
     bignum 
     8 bs bit-pos>> - n - 8 mod dup 0 < [ 8 + ] when
     neg shift n bits ;
@@ -138,15 +141,15 @@ ERROR: not-enough-bits n bit-reader ;
         bs (>>bit-pos)
     ] if ;
 
-:: (peek) ( n bs word -- bits )
+:: (peek) ( n bs endian> subseq-endian -- bits )
     n bs enough-bits? [ n bs not-enough-bits ] unless
     bs [ byte-pos>> ] [ bit-pos>> n + ] bi #bits>#bytes dupd +
-    bs bytes>> subseq word execute( seq -- x ) :> bignum
-    bignum n bs subseq>bits ;
+    bs bytes>> subseq endian> execute( seq -- x ) :> bignum
+    bignum n bs subseq-endian execute( bignum n bs -- bits ) ;
 
-M: lsb0-bit-reader peek ( n bs -- bits ) \ le> (peek) ;
+M: lsb0-bit-reader peek ( n bs -- bits ) \ le> \ subseq>bits-le (peek) ;
 
-M: msb0-bit-reader peek ( n bs -- bits ) \ be> (peek) ;
+M: msb0-bit-reader peek ( n bs -- bits ) \ be> \ subseq>bits-be (peek) ;
 
 :: bit-writer-bytes ( writer -- bytes )
     writer widthed>> #bits>> :> n
