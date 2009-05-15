@@ -9,7 +9,7 @@ math.ranges math.vectors memoize multiline namespaces
 sequences sequences.deep ;
 IN: images.jpeg
 
-QUALIFIED-WITH: alt.bitstreams bs
+QUALIFIED-WITH: bitstreams bs
 
 TUPLE: jpeg-image < image
     { headers }
@@ -274,7 +274,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
 
 : baseline-decompress ( -- )
     jpeg> bitstream>> cleanup-bitstream { 255 255 255 255 } append
-    >byte-array bs:<msb0-bitstream> jpeg> (>>bitstream)
+    >byte-array bs:<msb0-bit-reader> jpeg> (>>bitstream)
     jpeg> [ bitstream>> ] [ [ [ <huffman-decoder> ] with map ] change-huff-tables drop ] bi
     jpeg> components>> [ fetch-tables ] each
     jpeg> setup-bitmap
