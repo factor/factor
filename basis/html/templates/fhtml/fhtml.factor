@@ -60,7 +60,7 @@ SYNTAX: %> lexer get parse-%> ;
     [
         "quiet" on
         parser-notes off
-        "html.templates.fhtml" use+
+        "html.templates.fhtml" use-vocab
         string-lines parse-template-lines
     ] with-file-vocabs ;
 

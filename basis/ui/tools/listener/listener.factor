@@ -55,7 +55,7 @@ M: vocab-completion (word-at-caret)
     drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ;
 
 M: word-completion (word-at-caret)
-    manifest>> search-manifest ;
+    manifest>> dup [ search-manifest ] [ 2drop f ] if ;
 
 M: char-completion (word-at-caret)
     2drop f ;
