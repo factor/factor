@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
-math.parser io prettyprint db.types continuations
+math.parser io prettyprint continuations
 destructors mirrors sets db.types db.private fry
 combinators.short-circuit db.errors ;
 IN: db.tuples

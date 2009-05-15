@@ -3,7 +3,7 @@
 USING: accessors assocs combinators combinators.short-circuit
 effects fry infix.parser infix.ast kernel locals.parser
 locals.types math multiline namespaces parser quotations
-sequences summary words ;
+sequences summary words vocabs.parser ;
 IN: infix
 
 <PRIVATE
