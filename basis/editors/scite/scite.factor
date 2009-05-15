@@ -25,7 +25,7 @@ IN: editors.scite
         number>string "-goto:" prepend ,
     ] { } make ;
 
-: scite-location ( file line -- )
+: scite ( file line -- )
     scite-command run-detached drop ;
 
-[ scite-location ] edit-hook set-global
+[ scite ] edit-hook set-global
