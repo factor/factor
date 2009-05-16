@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel namespaces sequences
 sets strings vocabs sorting accessors arrays compiler.units
-combinators vectors splitting continuations ;
+combinators vectors splitting continuations math ;
 IN: vocabs.parser
 
 ERROR: no-word-error name ;
@@ -12,21 +12,27 @@ TUPLE: manifest
 current-vocab
 { search-vocabs vector }
 { qualified-vocabs vector }
-{ extra-words vector } ;
+{ extra-words vector }
+{ auto-used vector } ;
 
 : <manifest> ( -- manifest )
     manifest new
         V{ } clone >>search-vocabs
         V{ } clone >>qualified-vocabs
-        V{ } clone >>extra-words ;
+        V{ } clone >>extra-words
+        V{ } clone >>auto-used ;
 
 M: manifest clone
     call-next-method
         [ clone ] change-search-vocabs
         [ clone ] change-qualified-vocabs
-        [ clone ] change-extra-words ;
+        [ clone ] change-extra-words
+        [ clone ] change-auto-used ;
 
 TUPLE: extra-words words ;
+
+M: extra-words equal?
+    over extra-words? [ [ words>> ] bi@ eq? ] [ 2drop f ] if ;
 
 C: <extra-words> extra-words
 
@@ -83,6 +89,11 @@ TUPLE: no-current-vocab ;
 
 : use-vocab ( vocab -- ) (use-vocab) push ;
 
+: auto-use-vocab ( vocab -- )
+    [ use-vocab ] [ manifest get auto-used>> push ] bi ;
+
+: auto-used? ( -- ? ) manifest get auto-used>> length 0 > ;
+
 : unuse-vocab ( vocab -- ) (use-vocab) delq ;
 
 : only-use-vocabs ( vocabs -- )
@@ -128,7 +139,7 @@ TUPLE: rename word vocab words ;
 
 : use-words ( assoc -- ) (use-words) push ;
 
-: unuse-words ( assoc -- ) (use-words) delq ;
+: unuse-words ( assoc -- ) (use-words) delete ;
 
 ERROR: ambiguous-use-error words ;
 

@@ -38,17 +38,13 @@ M: parsing-word stack-effect drop (( parsed -- parsed )) ;
 
 : CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
-SYMBOL: amended-use
-
 SYMBOL: auto-use?
 
 : no-word-restarted ( restart-value -- word )
     dup word? [
         dup vocabulary>>
-        [ use-vocab ]
-        [ amended-use get dup [ push ] [ 2drop ] if ]
-        [ "Added \"" "\" vocabulary to search path" surround note. ]
-        tri
+        [ auto-use-vocab ]
+        [ "Added \"" "\" vocabulary to search path" surround note. ] bi
     ] [ create-in ] if ;
 
 : no-word ( name -- newword )
@@ -198,9 +194,8 @@ print-use-hook [ [ ] ] initialize
 
 : parse-fresh ( lines -- quot )
     [
-        V{ } clone amended-use set
         parse-lines
-        amended-use get empty? [ print-use-hook get call( -- ) ] unless
+        auto-used? [ print-use-hook get call( -- ) ] when
     ] with-file-vocabs ;
 
 : parsing-file ( file -- )
