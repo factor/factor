@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators kernel io io.encodings.binary io.files
-io.streams.byte-array math.vectors strings sequences namespaces
+io.streams.byte-array math.vectors strings namespaces
 make math parser sequences assocs grouping vectors io.binary
 hashtables math.bitwise checksums checksums.common
 checksums.stream ;

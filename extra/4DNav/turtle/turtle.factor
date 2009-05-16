@@ -1,9 +1,6 @@
-USING: kernel math arrays math.vectors math.matrices
-namespaces make
-math.constants math.functions
-math.vectors
-splitting grouping math.trig
-  sequences accessors 4DNav.deep models vars ;
+USING: kernel math arrays math.vectors math.matrices namespaces make
+math.constants math.functions splitting grouping math.trig sequences
+accessors 4DNav.deep models vars ;
 IN: 4DNav.turtle
 
 ! replacement of self

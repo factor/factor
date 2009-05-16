@@ -1,5 +1,6 @@
 USING: accessors kernel tetris.game tetris.board tetris.piece tools.test
 sequences ;
+FROM: tetris.game => level>> ;
 
 [ t ] [ <default-tetris> [ current-piece ] [ next-piece ] bi and t f ? ] unit-test
 [ t ] [ <default-tetris> { 1 1 } can-move? ] unit-test

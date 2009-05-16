@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax kernel
 layouts sequences system unix environment io.encodings.utf8
-unix.utilities vocabs.loader combinators alien.accessors
-alien.syntax ;
+unix.utilities vocabs.loader combinators alien.accessors ;
 IN: environment.unix
 
 HOOK: environ os ( -- void* )

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences grouping assocs kernel ascii ascii tr ;
+USING: sequences grouping assocs kernel ascii tr ;
 IN: soundex
 
 TR: soundex-tr

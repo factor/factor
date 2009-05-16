@@ -1,6 +1,6 @@
+USING: help.markup help.syntax strings definitions generic words classes ;
+FROM: prettyprint.sections => with-pprint ;
 IN: see
-USING: help.markup help.syntax strings prettyprint.private
-definitions generic words classes ;
 
 HELP: synopsis
 { $values { "defspec" "a definition specifier" } { "str" string } }
@@ -25,7 +25,7 @@ HELP: see-methods
 { $contract "Prettyprints the methods defined on a generic word or class." } ;
 
 HELP: definer
-{ $values { "defspec" "a definition specifier" } { "start" word } { "end" "a word or " { $link f } } }
+{ $values { "defspec" "a definition specifier" } { "start" word } { "end" { $maybe word } } }
 { $contract "Outputs the parsing words which delimit the definition." }
 { $examples
     { $example "USING: definitions prettyprint ;"

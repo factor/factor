@@ -1,12 +1,11 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables io kernel math models
-colors.constants namespaces sequences sequences words continuations
-debugger prettyprint help editors fonts ui ui.commands ui.gestures
-ui.gadgets ui.pens.solid ui.gadgets.worlds ui.gadgets.packs
-ui.gadgets.buttons ui.gadgets.labels ui.gadgets.panes
-ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.tables
-ui.gadgets.tracks ui.gadgets.scrollers ui.gadgets.panes
+colors.constants namespaces sequences words continuations debugger
+prettyprint help editors fonts ui ui.commands ui.gestures ui.gadgets
+ui.pens.solid ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
+ui.gadgets.labels ui.gadgets.presentations ui.gadgets.viewports
+ui.gadgets.tables ui.gadgets.tracks ui.gadgets.scrollers
 ui.gadgets.borders ui.gadgets.status-bar ui.tools.traceback
 ui.tools.inspector ui.tools.browser ui.debugger ;
 IN: ui.tools.debugger
@@ -60,7 +59,8 @@ M: debugger focusable-child*
 
 GENERIC: error-in-debugger? ( error -- ? )
 
-M: world-error error-in-debugger? world>> children>> [ f ] [ first debugger? ] if-empty ;
+M: world-error error-in-debugger?
+    world>> children>> [ f ] [ first debugger? ] if-empty ;
 
 M: object error-in-debugger? drop f ;
 

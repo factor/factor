@@ -1,6 +1,5 @@
-USING: accessors alien.c-types strings help.markup help.syntax
-alien.syntax sequences io arrays kernel words assocs namespaces
-accessors ;
+USING: alien.c-types strings help.markup help.syntax alien.syntax
+sequences io arrays kernel words assocs namespaces ;
 IN: alien.structs
 
 ARTICLE: "c-structs" "C structure types"

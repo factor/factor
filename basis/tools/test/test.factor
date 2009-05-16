@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.units
 continuations debugger effects fry generalizations io io.files
-io.styles kernel lexer locals macros math.parser namespaces
-parser prettyprint quotations sequences source-files splitting
+io.styles kernel lexer locals macros math.parser namespaces parser
+vocabs.parser prettyprint quotations sequences source-files splitting
 stack-checker summary unicode.case vectors vocabs vocabs.loader
-vocabs.files words tools.errors source-files.errors
-io.streams.string make compiler.errors ;
+vocabs.files words tools.errors source-files.errors io.streams.string
+make compiler.errors ;
 IN: tools.test
 
 TUPLE: test-failure < source-file-error continuation ;

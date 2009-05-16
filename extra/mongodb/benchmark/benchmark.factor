@@ -1,7 +1,7 @@
 USING: calendar math fry kernel assocs math.ranges bson.reader io.streams.byte-array
 sequences formatting combinators namespaces io tools.time prettyprint io.encodings.binary
-accessors words mongodb.driver strings math.parser tools.walker bson.writer
-tools.continuations ;
+accessors words mongodb.driver strings math.parser bson.writer ;
+FROM: mongodb.driver => find ;
 
 IN: mongodb.benchmark
 
