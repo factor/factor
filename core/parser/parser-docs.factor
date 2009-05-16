@@ -1,7 +1,7 @@
 USING: help.markup help.syntax kernel sequences words
 math strings vectors quotations generic effects classes
 vocabs.loader definitions io vocabs source-files
-quotations namespaces compiler.units assocs lexer
+namespaces compiler.units assocs lexer
 words.symbol words.alias words.constant vocabs.parser ;
 IN: parser
 
@@ -70,7 +70,8 @@ $nl
 { $subsection "reading-ahead" }
 { $subsection "parsing-word-nest" }
 { $subsection "defining-words" }
-{ $subsection "parsing-tokens" } ;
+{ $subsection "parsing-tokens" }
+{ $subsection "word-search-parsing" } ;
 
 ARTICLE: "parser-files" "Parsing source files"
 "The parser can run source files:"
@@ -84,7 +85,7 @@ $nl
 ARTICLE: "top-level-forms" "Top level forms"
 "Any code outside of a definition is known as a " { $emphasis "top-level form" } "; top-level forms are run after the entire source file has been parsed, regardless of their position in the file."
 $nl
-"Top-level forms do not have access to the " { $link in } " and " { $link use } " variables that were set at parse time, nor do they run inside " { $link with-compilation-unit } "; so meta-programming might require extra work in a top-level form compared with a parsing word."
+"Top-level forms cannot access the parse-time manifest (" { $link "word-search-parsing" } "), nor do they run inside " { $link with-compilation-unit } "; as a result, meta-programming might require extra work in a top-level form compared with a parsing word."
 $nl
 "Also, top-level forms run in a new dynamic scope, so using " { $link set } " to store values is almost always wrong, since the values will be lost after the top-level form completes. To save values computed by a top-level form, either use " { $link set-global } " or define a new word with the value." ;
 
@@ -118,8 +119,6 @@ HELP: parser-notes?
 
 HELP: bad-number
 { $error-description "Indicates the parser encountered an invalid numeric literal." } ;
-
-{ use in add-use (add-use) set-use set-in POSTPONE: USING: POSTPONE: USE: with-file-vocabs with-interactive-vocabs } related-words
 
 HELP: create-in
 { $values { "str" "a word name" } { "word" "a new word" } }
@@ -247,4 +246,4 @@ HELP: staging-violation
 
 HELP: auto-use?
 { $var-description "If set to a true value, the behavior of the parser when encountering an unknown word name is changed. If only one loaded vocabulary has a word with this name, instead of throwing an error, the parser adds the vocabulary to the search path and prints a parse note. Off by default." }
-{ $notes "This feature is intended to help during development. To generate a " { $link POSTPONE: USING: } " form automatically, enable " { $link auto-use? } ", load the source file, and copy and paste the " { $link POSTPONE: USING: } " form printed by the parser back into the file, then disable " { $link auto-use? } ". See " { $link "vocabulary-search-errors" } "." } ;
+{ $notes "This feature is intended to help during development. To generate a " { $link POSTPONE: USING: } " form automatically, enable " { $link auto-use? } ", load the source file, and copy and paste the " { $link POSTPONE: USING: } " form printed by the parser back into the file, then disable " { $link auto-use? } ". See " { $link "word-search-errors" } "." } ;

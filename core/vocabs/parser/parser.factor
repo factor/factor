@@ -32,8 +32,7 @@ M: manifest clone
     manifest get
     [ search-vocabs>> delete-all ]
     [ qualified-vocabs>> delete-all ]
-    [ extra-words>> delete-all ]
-    tri ;
+    bi ;
 
 : (use-vocab) ( vocab -- vocab seq )
     load-vocab manifest get search-vocabs>> ;
@@ -44,22 +43,25 @@ M: manifest clone
 : (from) ( vocab words -- vocab words words' assoc )
     2dup swap load-vocab words>> ;
 
-: (use-words) ( assoc -- assoc seq )
-    manifest get extra-words>> ;
-
 : extract-words ( seq assoc -- assoc' )
     extract-keys dup [ [ drop ] [ no-word-error ] if ] assoc-each ;
 
 : (lookup) ( name assoc -- word/f )
     at dup forward-reference? [ drop f ] when ;
 
+TUPLE: extra-words words ;
+
+C: <extra-words> extra-words
+
+: (use-words) ( assoc -- extra-words seq )
+    <extra-words> manifest get qualified-vocabs>> ;
+
 PRIVATE>
 
 : set-current-vocab ( name -- )
-    create-vocab manifest get
-    [ (>>current-vocab) ]
-    [ [ words>> ] dip extra-words>> push ]
-    2bi ; 
+    create-vocab
+    [ manifest get (>>current-vocab) ]
+    [ words>> <extra-words> (add-qualified) ] bi ;
 
 TUPLE: no-current-vocab ;
 
@@ -124,9 +126,9 @@ TUPLE: rename word vocab words ;
 : add-renamed-word ( word vocab new-name -- )
     <rename> (add-qualified) ;
 
-: use-words ( words -- ) (use-words) push ;
+: use-words ( assoc -- ) (use-words) push ;
 
-: unuse-words ( words -- ) (use-words) delq ;
+: unuse-words ( assoc -- ) (use-words) delq ;
 
 ERROR: ambiguous-use-error words ;
 
@@ -148,17 +150,10 @@ ERROR: ambiguous-use-error words ;
     qualified-vocabs>>
     (vocab-search) 0 = [ drop f ] [ peek ] if ;
 
-: word-search ( name manifest -- word/f )
-    extra-words>> [ (lookup) ] with map-find-last drop ;
-
 PRIVATE>
 
 : search-manifest ( name manifest -- word/f )
-    2dup word-search dup [ 2nip ] [
-        drop 2dup qualified-search dup [ 2nip ] [
-            drop vocab-search
-        ] if
-    ] if ;
+    2dup qualified-search dup [ 2nip ] [ drop vocab-search ] if ;
 
 : search ( name -- word/f )
     manifest get search-manifest ;

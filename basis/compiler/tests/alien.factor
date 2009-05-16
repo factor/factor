@@ -1,9 +1,8 @@
-USING: alien alien.c-types alien.syntax compiler kernel
-namespaces namespaces tools.test sequences stack-checker
-stack-checker.errors words arrays parser quotations
-continuations effects namespaces.private io io.streams.string
-memory system threads tools.test math accessors combinators
-specialized-arrays.float alien.libraries io.pathnames
+USING: alien alien.c-types alien.syntax compiler kernel namespaces
+sequences stack-checker stack-checker.errors words arrays parser
+quotations continuations effects namespaces.private io
+io.streams.string memory system threads tools.test math accessors
+combinators specialized-arrays.float alien.libraries io.pathnames
 io.backend ;
 IN: compiler.tests.alien
 

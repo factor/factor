@@ -65,7 +65,7 @@ ${ five six 7 } .
 ARTICLE: "literals" "Interpolating code results into literal values"
 "The " { $vocab-link "literals" } " vocabulary contains words to run code at parse time and insert the results into more complex literal values."
 { $example <"
-USING: kernel literals math prettyprint ;
+USE: literals
 IN: scratchpad
 
 CONSTANT: five 5

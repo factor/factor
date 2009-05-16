@@ -49,6 +49,8 @@ IN: bootstrap.syntax
 
     "USE:" [ scan use-vocab ] define-core-syntax
 
+    "UNUSE:" [ scan unuse-vocab ] define-core-syntax
+
     "USING:" [ ";" parse-tokens [ use-vocab ] each ] define-core-syntax
 
     "QUALIFIED:" [ scan dup add-qualified ] define-core-syntax

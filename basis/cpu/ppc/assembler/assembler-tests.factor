@@ -1,6 +1,7 @@
 IN: cpu.ppc.assembler.tests
 USING: cpu.ppc.assembler tools.test arrays kernel namespaces
 make vocabs sequences ;
+FROM: cpu.ppc.assembler => B ;
 
 : test-assembler ( expected quot -- )
     [ 1array ] [ [ B{ } make ] curry ] bi* unit-test ;

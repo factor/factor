@@ -4,9 +4,9 @@ IN: math.complex
 
 ARTICLE: "complex-numbers-zero" "Embedding of real numbers in complex numbers"
 "Constructing a complex number with an imaginary component equal to an integer zero simply returns the real number corresponding to the real component:"
-{ $example "USING: math prettyprint ;" "C{ 1 2 } C{ 3 -2 } + ." "4" }
+{ $example "C{ 1 2 } C{ 3 -2 } + ." "4" }
 "Constructing a complex number with an imaginary component equal to floating point zero will still output a new complex number, however:"
-{ $example "USING: math prettyprint ;" "C{ 0.0 2.0 } C{ 0.0 1.0 } * ." "C{ -2.0 0.0 }" }
+{ $example "C{ 0.0 2.0 } C{ 0.0 1.0 } * ." "C{ -2.0 0.0 }" }
 "Unlike math, where all real numbers are also complex numbers, Factor only considers a number to be a complex number if its imaginary part is non-zero. However, complex number operations are fully supported for real numbers; they are treated as having an imaginary part of zero." ;
 
 ARTICLE: "complex-numbers" "Complex numbers"
