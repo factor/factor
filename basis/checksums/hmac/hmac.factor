@@ -49,5 +49,5 @@ PRIVATE>
 : hmac-file ( K path checksum -- value )
     [ binary <file-reader> ] dip hmac-stream ;
 
-: hmac-bytes ( K path checksum -- value )
+: hmac-bytes ( K seq checksum -- value )
     [ binary <byte-reader> ] dip hmac-stream ;

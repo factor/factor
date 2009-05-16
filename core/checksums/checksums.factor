@@ -1,10 +1,40 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences math.parser io io.backend io.files
-kernel ;
+USING: accessors io io.backend io.files kernel math math.parser
+sequences vectors io.encodings.binary ;
 IN: checksums
 
 MIXIN: checksum
+
+TUPLE: checksum-state bytes-read block-size bytes ;
+
+: new-checksum-state ( block-size class -- checksum-state )
+    new
+        swap >>block-size
+        0 >>bytes-read
+        V{ } clone >>bytes ; inline
+
+GENERIC: checksum-block ( bytes checksum -- )
+
+GENERIC: get-checksum ( checksum -- value )
+
+: add-checksum-bytes ( checksum-state data -- checksum-state )
+    over bytes>> [ push-all ] keep
+    [ dup length pick block-size>> >= ]
+    [
+        64 cut-slice [
+            over [ checksum-block ]
+            [ [ 64 + ] change-bytes-read drop ] bi
+        ] dip
+    ] while >vector >>bytes ;
+
+: add-checksum-stream ( checksum-state stream -- checksum-state )
+    [
+        [ '[ [ _ ] dip add-checksum-bytes drop ] each-block ] keep
+    ] with-input-stream ;
+
+: add-checksum-file ( checksum-state path -- checksum-state )
+    binary <file-reader> add-checksum-stream ;
 
 GENERIC: checksum-bytes ( bytes checksum -- value )
 

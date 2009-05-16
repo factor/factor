@@ -7,11 +7,13 @@ io.encodings.binary math.bitwise checksums accessors
 checksums.common checksums.stream combinators combinators.smart ;
 IN: checksums.md5
 
-TUPLE: md5-state bytes-read state old-state ;
+SINGLETON: md5
+INSTANCE: md5 stream-checksum
+
+TUPLE: md5-state < checksum-state state old-state ;
 
 : <md5-state> ( -- md5-state )
-    md5-state new
-        0 >>bytes-read
+    64 md5-state new-checksum-state
         { HEX: 67452301 HEX: efcdab89 HEX: 98badcfe HEX: 10325476 }
         [ clone >>state ] [ >>old-state ] bi ;
 
@@ -159,7 +161,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ b c d a 9  S44 64 ]
     } [ I ] with-md5-round ; inline
 
-: (process-md5-block) ( block state -- )
+M: md5-state checksum-block ( block state -- )
     [
         [ 4 <groups> [ le> ] map ] [ state>> ] bi* {
             [ (process-md5-block-F) ]
@@ -171,41 +173,11 @@ MACRO: with-md5-round ( ops quot -- )
         nip update-md5-state
     ] 2bi ;
 
-:: process-md5-block ( block state -- )
-    block length
-    [ state [ + ] change-bytes-read drop ] [ 64 = ] bi [
-        block state (process-md5-block)
-    ] [
-        block f state bytes-read>> pad-last-block
-        [ state (process-md5-block) ] each
-    ] if ;
-
-: get-md5 ( md5-state -- bytes )
+: md5-state>checksum ( md5-state -- bytes )
     state>> [ 4 >le ] map B{ } concat-as ;
 
-:: stream>md5 ( state stream -- )
-    64 stream stream-read
-    [ state process-md5-block ] [ length 64 = ] bi
-    [ state stream stream>md5 ] when ;
+M: md5-state get-checksum ( md5-state -- bytes )
+    clone [ bytes>> f ] [ bytes-read>> pad-last-block ] [ ] tri
+    [ [ checksum-block ] curry each ] [ md5-state>checksum ] bi ;
 
 PRIVATE>
-
-SINGLETON: md5
-
-INSTANCE: md5 stream-checksum
-
-M: md5 checksum-stream
-    drop [ <md5-state> ] dip [ stream>md5 ] [ drop get-md5 ] 2bi ;
-
-GENERIC: initialize-checksum ( checksum -- state )
-GENERIC# add-bytes 1 ( state bytes -- state )
-GENERIC# add-stream 1 ( state stream -- state )
-GENERIC: finish-checksum ( state -- bytes )
-
-M: md5 initialize-checksum drop <md5-state> ;
-
-M: md5-state finish-checksum get-md5 ;
-
-M: md5-state add-bytes over [ binary <byte-reader> stream>md5 ] dip ;
-
-M: md5-state add-stream over [ stream>md5 ] dip ;
