@@ -5,7 +5,7 @@ sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
 io.files vocabs io.encodings.utf8 source-files classes
 hashtables compiler.units accessors sets lexer vocabs.parser
-effects.parser slots ;
+effects.parser slots parser.notes ;
 IN: parser
 
 : location ( -- loc )
@@ -15,31 +15,7 @@ IN: parser
 : save-location ( definition -- )
     location remember-definition ;
 
-SYMBOL: parser-notes
-
-t parser-notes set-global
-
-: parser-notes? ( -- ? )
-    parser-notes get "quiet" get not and ;
-
-: note. ( str -- )
-    parser-notes? [
-        file get [ path>> write ":" write ] when* 
-        lexer get [ line>> number>string write ": " write ] when*
-        "Note:" print dup print
-    ] when drop ;
-
 M: parsing-word stack-effect drop (( parsed -- parsed )) ;
-
-TUPLE: no-current-vocab ;
-
-: no-current-vocab ( -- vocab )
-    \ no-current-vocab boa
-    { { "Define words in scratchpad vocabulary" "scratchpad" } }
-    throw-restarts dup set-in ;
-
-: current-vocab ( -- str )
-    in get [ no-current-vocab ] unless* ;
 
 : create-in ( str -- word )
     current-vocab create dup set-word dup save-location ;
@@ -48,17 +24,13 @@ TUPLE: no-current-vocab ;
 
 : CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
-SYMBOL: amended-use
-
 SYMBOL: auto-use?
 
 : no-word-restarted ( restart-value -- word )
     dup word? [
         dup vocabulary>>
-        [ (use+) ]
-        [ amended-use get dup [ push ] [ 2drop ] if ]
-        [ "Added \"" "\" vocabulary to search path" surround note. ]
-        tri
+        [ auto-use-vocab ]
+        [ "Added \"" "\" vocabulary to search path" surround note. ] bi
     ] [ create-in ] if ;
 
 : no-word ( name -- newword )
@@ -67,19 +39,6 @@ SYMBOL: auto-use?
     [ nip first no-word-restarted ]
     [ <no-word-error> throw-restarts no-word-restarted ]
     if ;
-
-: check-forward ( str word -- word/f )
-    dup forward-reference? [
-        drop
-        use get
-        [ at ] with map sift
-        [ forward-reference? not ] find nip
-    ] [
-        nip
-    ] if ;
-
-: search ( str -- word/f )
-    dup use get assoc-stack check-forward ;
 
 : scan-word ( -- word/number/f )
     scan dup [
@@ -147,8 +106,9 @@ SYMBOL: bootstrap-syntax
 
 : with-file-vocabs ( quot -- )
     [
-        f in set { "syntax" } set-use
-        bootstrap-syntax get [ use get push ] when*
+        <manifest> manifest set
+        "syntax" use-vocab
+        bootstrap-syntax get [ use-words ] when*
         call
     ] with-scope ; inline
 
@@ -208,8 +168,9 @@ SYMBOL: interactive-vocabs
 
 : with-interactive-vocabs ( quot -- )
     [
-        "scratchpad" in set
-        interactive-vocabs get set-use
+        <manifest> manifest set
+        "scratchpad" set-current-vocab
+        interactive-vocabs get only-use-vocabs
         call
     ] with-scope ; inline
 
@@ -219,9 +180,8 @@ print-use-hook [ [ ] ] initialize
 
 : parse-fresh ( lines -- quot )
     [
-        V{ } clone amended-use set
         parse-lines
-        amended-use get empty? [ print-use-hook get call( -- ) ] unless
+        auto-used? [ print-use-hook get call( -- ) ] when
     ] with-file-vocabs ;
 
 : parsing-file ( file -- )

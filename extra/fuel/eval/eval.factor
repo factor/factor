@@ -6,7 +6,7 @@ vectors vocabs.parser ;
 
 IN: fuel.eval
 
-TUPLE: fuel-status in use restarts ;
+TUPLE: fuel-status manifest restarts ;
 
 SYMBOL: fuel-status-stack
 V{ } clone fuel-status-stack set-global
@@ -24,7 +24,7 @@ t fuel-eval-res-flag set-global
     fuel-eval-res-flag get-global ;
 
 : fuel-push-status ( -- )
-    in get use get clone restarts get-global clone
+    manifest get clone restarts get-global clone
     fuel-status boa
     fuel-status-stack get push ;
 
@@ -34,9 +34,9 @@ t fuel-eval-res-flag set-global
 : fuel-pop-status ( -- )
     fuel-status-stack get empty? [
         fuel-status-stack get pop
-        [ in>> in set ]
-        [ use>> clone use set ]
-        [ restarts>> fuel-pop-restarts ] tri
+        [ manifest>> clone manifest set ]
+        [ restarts>> fuel-pop-restarts ]
+        bi
     ] unless ;
 
 : fuel-forget-error ( -- ) f error set-global ;
@@ -60,11 +60,11 @@ t fuel-eval-res-flag set-global
     [ print-error ] recover ;
 
 : (fuel-eval-usings) ( usings -- )
-    [ [ use+ ] curry [ drop ] recover ] each
+    [ [ use-vocab ] curry [ drop ] recover ] each
     fuel-forget-error fuel-forget-output ;
 
 : (fuel-eval-in) ( in -- )
-    [ in set ] when* ;
+    [ set-current-vocab ] when* ;
 
 : (fuel-eval-in-context) ( lines in usings -- )
     (fuel-begin-eval)

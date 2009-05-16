@@ -16,4 +16,4 @@ SYNTAX: ARTICLE:
     ] dip remember-definition ;
 
 SYNTAX: ABOUT:
-    in get vocab scan-object >>help changed-definition ;
+    current-vocab scan-object >>help changed-definition ;

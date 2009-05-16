@@ -8,7 +8,7 @@ ARTICLE: "interned-words" "Looking up and creating words"
 $nl
 "Words whose names are known at parse time -- that is, most words making up your program -- can be referenced in source code by stating their name. However, the parser itself, and sometimes code you write, will need to create look up words dynamically."
 $nl
-"Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link POSTPONE: IN: } " parsing word (see " { $link "vocabulary-search" } ")."
+"Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link POSTPONE: IN: } " parsing word (see " { $link "word-search" } ")."
 { $subsection create }
 { $subsection create-in }
 { $subsection lookup } ;
@@ -237,7 +237,7 @@ HELP: set-word
 { $description "Sets the recently defined word." } ;
 
 HELP: lookup
-{ $values { "name" string } { "vocab" string } { "word" "a word or " { $link f } } }
+{ $values { "name" string } { "vocab" string } { "word" { $maybe word } } }
 { $description "Looks up a word in the dictionary. If the vocabulary or the word is not defined, outputs " { $link f } "." } ;
 
 HELP: reveal

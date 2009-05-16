@@ -5,6 +5,7 @@ hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots fry
 sets vocabs help.stylesheet help.topics vocabs.loader quotations
 combinators see present ;
+FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
 
 PREDICATE: simple-element < array
@@ -347,8 +348,6 @@ M: f ($instance)
 : $io-error ( children -- )
     drop
     "Throws an error if the I/O operation fails." $errors ;
-
-FROM: prettyprint.private => with-pprint ;
 
 : $prettyprinting-note ( children -- )
     drop {

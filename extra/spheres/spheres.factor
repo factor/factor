@@ -3,6 +3,7 @@ opengl.shaders opengl.framebuffers opengl.capabilities multiline
 ui.gadgets accessors sequences ui.render ui math locals arrays
 generalizations combinators ui.gadgets.worlds
 literals ui.pixel-formats ;
+FROM: opengl.demo-support => rect-vertices ;
 IN: spheres
 
 STRING: plane-vertex-shader

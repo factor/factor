@@ -41,28 +41,28 @@ IN: bootstrap.syntax
 
     "#!" [ POSTPONE: ! ] define-core-syntax
 
-    "IN:" [ scan set-in ] define-core-syntax
+    "IN:" [ scan set-current-vocab ] define-core-syntax
 
-    "PRIVATE>" [ in get ".private" ?tail drop set-in ] define-core-syntax
+    "<PRIVATE" [ begin-private ] define-core-syntax
 
-    "<PRIVATE" [
-        POSTPONE: PRIVATE> in get ".private" append set-in
-    ] define-core-syntax
+    "PRIVATE>" [ end-private ] define-core-syntax
 
-    "USE:" [ scan use+ ] define-core-syntax
+    "USE:" [ scan use-vocab ] define-core-syntax
 
-    "USING:" [ ";" parse-tokens add-use ] define-core-syntax
+    "UNUSE:" [ scan unuse-vocab ] define-core-syntax
+
+    "USING:" [ ";" parse-tokens [ use-vocab ] each ] define-core-syntax
 
     "QUALIFIED:" [ scan dup add-qualified ] define-core-syntax
 
     "QUALIFIED-WITH:" [ scan scan add-qualified ] define-core-syntax
 
     "FROM:" [
-        scan "=>" expect ";" parse-tokens swap add-words-from
+        scan "=>" expect ";" parse-tokens add-words-from
     ] define-core-syntax
 
     "EXCLUDE:" [
-        scan "=>" expect ";" parse-tokens swap add-words-excluding
+        scan "=>" expect ";" parse-tokens add-words-excluding
     ] define-core-syntax
 
     "RENAME:" [
@@ -227,7 +227,7 @@ IN: bootstrap.syntax
         "))" parse-effect parsed
     ] define-core-syntax
 
-    "MAIN:" [ scan-word in get vocab (>>main) ] define-core-syntax
+    "MAIN:" [ scan-word current-vocab (>>main) ] define-core-syntax
 
     "<<" [
         [

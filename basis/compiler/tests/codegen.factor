@@ -1,9 +1,9 @@
-USING: generalizations accessors arrays compiler kernel
-kernel.private math hashtables.private math.private namespaces
-sequences sequences.private tools.test namespaces.private
-slots.private sequences.private byte-arrays alien
+USING: generalizations accessors arrays compiler kernel kernel.private
+math hashtables.private math.private namespaces sequences tools.test
+namespaces.private slots.private sequences.private byte-arrays alien
 alien.accessors layouts words definitions compiler.units io
 combinators vectors grouping make ;
+QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
 
 ! Originally, this file did black box testing of templating
@@ -48,7 +48,7 @@ unit-test
 [ 3 ]
 [
     global [ 3 \ foo set ] bind
-    \ foo [ global >n get ndrop ] compile-call
+    \ foo [ global >n get namespaces.private:ndrop ] compile-call
 ] unit-test
 
 : blech ( x -- ) drop ;
@@ -62,7 +62,7 @@ unit-test
 [ 3 ]
 [
     global [ 3 \ foo set ] bind
-    \ foo [ global [ get ] swap >n call ndrop ] compile-call
+    \ foo [ global [ get ] swap >n call namespaces.private:ndrop ] compile-call
 ] unit-test
 
 [ 3 ]
