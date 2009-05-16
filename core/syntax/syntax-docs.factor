@@ -1,8 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
-effects classes generic.standard classes.tuple generic.math
-generic.standard generic.single arrays io.pathnames vocabs.loader io
-sequences assocs words.symbol words.alias words.constant combinators 
-vocabs.parser ;
+effects classes classes.tuple generic.math generic.single arrays
+io.pathnames vocabs.loader io sequences assocs words.symbol
+words.alias words.constant combinators vocabs.parser ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
