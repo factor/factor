@@ -15,7 +15,7 @@ furnace.auth.login
 furnace.boilerplate
 furnace.syndication
 validators
-db.types db.tuples lcs farkup urls ;
+db.types db.tuples lcs urls ;
 IN: webapps.wiki
 
 : wiki-url ( rest path -- url )

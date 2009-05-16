@@ -3,7 +3,7 @@
 
 USING: accessors assocs compiler.units continuations fuel.eval fuel.help
 fuel.remote fuel.xref help.topics io.pathnames kernel namespaces parser
-sequences tools.scaffold vocabs.loader words ;
+sequences tools.scaffold vocabs.loader vocabs.parser words ;
 
 IN: fuel
 
@@ -46,7 +46,7 @@ SYMBOL: :uses-suggestions
     dup length 1 = [ first restart ] [ drop ] if ;
 
 : fuel-set-use-hook ( -- )
-    [ amended-use get clone :uses prefix fuel-eval-set-result ]
+    [ manifest get auto-used>> clone :uses prefix fuel-eval-set-result ]
     print-use-hook set ;
 
 : (fuel-get-uses) ( lines -- )

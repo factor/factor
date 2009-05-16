@@ -104,7 +104,7 @@ M:: lsb0-bit-writer poke ( value n bs -- )
     widthed
     bs widthed>> #bits>> 8 swap - split-widthed :> remainder :> byte
     byte bs widthed>> |widthed :> new-byte
-    new-byte #bits>> dup 8 > [ "oops" throw ] when 8 = [
+    new-byte #bits>> 8 = [
         new-byte bits>> bs bytes>> push
         zero-widthed bs (>>widthed)
         remainder widthed>bytes

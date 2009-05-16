@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sets namespaces make sequences parser
 lexer combinators words classes.parser classes.tuple arrays
-slots math assocs ;
+slots math assocs parser.notes ;
 IN: classes.tuple.parser
 
 : slot-names ( slots -- seq )

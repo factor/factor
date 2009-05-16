@@ -17,7 +17,6 @@ io.servers.connection
 io.timeouts
 io.crlf
 fry logging logging.insomniac calendar urls urls.encoding
-mime.multipart
 unicode.categories
 http
 http.parsers
@@ -27,6 +26,7 @@ html.templates
 html.streams
 html
 xml.writer ;
+FROM: mime.multipart => parse-multipart ;
 IN: http.server
 
 : check-absolute ( url -- url )
@@ -282,8 +282,6 @@ M: http-server handle-client*
 
 : http-insomniac ( -- )
     "http.server" { "httpd-hit" } schedule-insomniac ;
-
-USE: vocabs.loader
 
 "http.server.filters" require
 "http.server.dispatchers" require

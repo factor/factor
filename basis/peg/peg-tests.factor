@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test strings namespaces make arrays sequences 
-       peg peg.private peg.parsers accessors words math accessors ;
+       peg peg.private peg.parsers words math accessors ;
 IN: peg.tests
 
 [ ] [ reset-pegs ] unit-test

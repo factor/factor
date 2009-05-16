@@ -14,7 +14,7 @@ ARTICLE: "lists" "Lists"
 { $vocab-subsection "Lazy lists" "lists.lazy" } ;
 
 ARTICLE: { "lists" "protocol" } "The list protocol"
-"Lists are instances of a mixin class"
+"Lists are instances of a mixin class:"
 { $subsection list }
 "Instances of the mixin must implement the following words:"
 { $subsection car }
@@ -25,8 +25,7 @@ ARTICLE: { "lists" "strict" } "Constructing strict lists"
 "Strict lists are simply cons cells where the car and cdr have already been evaluated. These are the lists of Lisp. To construct a strict list, the following words are provided:"
 { $subsection cons }
 { $subsection swons }
-{ $subsection sequence>cons }
-{ $subsection deep-sequence>cons }
+{ $subsection sequence>list }
 { $subsection 1list }
 { $subsection 2list }
 { $subsection 3list } ;
@@ -38,7 +37,6 @@ ARTICLE: { "lists" "combinators" } "Combinators for lists"
 { $subsection foldl }
 { $subsection foldr }
 { $subsection lmap>array }
-{ $subsection lmap-as }
 { $subsection traverse } ;
 
 ARTICLE: { "lists" "manipulation" } "Manipulating lists"
@@ -54,21 +52,21 @@ ARTICLE: { "lists" "manipulation" } "Manipulating lists"
 { $subsection lcut } ;
 
 HELP: cons 
-{ $values { "car" "the head of the list cell" } { "cdr" "the tail of the list cell" } { "cons" "a cons object" } }
+{ $values { "car" "the head of the list cell" } { "cdr" "the tail of the list cell" } { "cons" list } }
 { $description "Constructs a cons cell." } ;
 
 HELP: swons 
-{ $values { "cdr" "the tail of the list cell" } { "car" "the head of the list cell" } { "cons" "a cons object" } }
+{ $values { "cdr" "the tail of the list cell" } { "car" "the head of the list cell" } { "cons" list } }
 { $description "Constructs a cons cell." } ;
 
 { cons swons uncons unswons } related-words
 
 HELP: car
-{ $values { "cons" "a cons object" } { "car" "the first item in the list" } }
+{ $values { "cons" list } { "car" "the first item in the list" } }
 { $description "Returns the first item in the list." } ;
 
 HELP: cdr
-{ $values { "cons" "a cons object" } { "cdr" "a cons object" } }
+{ $values { "cons" list } { "cdr" list } }
 { $description "Returns the tail of the list." } ;
 
 { car cdr } related-words
@@ -86,51 +84,51 @@ HELP: nil?
 { 1list 2list 3list } related-words
 
 HELP: 1list
-{ $values { "obj" "an object" } { "cons" "a cons object" } }
+{ $values { "obj" "an object" } { "cons" list } }
 { $description "Create a list with 1 element." } ;
 
 HELP: 2list
-{ $values { "a" "an object" } { "b" "an object" } { "cons" "a cons object" } }
+{ $values { "a" "an object" } { "b" "an object" } { "cons" list } }
 { $description "Create a list with 2 elements." } ;
 
 HELP: 3list
-{ $values { "a" "an object" } { "b" "an object" } { "c" "an object" } { "cons" "a cons object" } }
+{ $values { "a" "an object" } { "b" "an object" } { "c" "an object" } { "cons" list } }
 { $description "Create a list with 3 elements." } ;
 
 HELP: lnth
-{ $values { "n" "an integer index" } { "list" "a cons object" } { "elt" "the element at the nth index" } }
+{ $values { "n" "an integer index" } { "list" list } { "elt" "the element at the nth index" } }
 { $description "Outputs the nth element of the list." } 
 { $see-also llength cons car cdr } ;
 
 HELP: llength
-{ $values { "list" "a cons object" } { "n" "a non-negative integer" } }
+{ $values { "list" list } { "n" "a non-negative integer" } }
 { $description "Outputs the length of the list. This should not be called on an infinite list." } 
 { $see-also lnth cons car cdr } ;
 
 HELP: uncons
-{ $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
+{ $values { "cons" list } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
 { $description "Put the head and tail of the list on the stack." } ;
 
 HELP: unswons
-{ $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
+{ $values { "cons" list } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
 { $description "Put the head and tail of the list on the stack." } ;
 
 { leach foldl lmap>array } related-words
 
 HELP: leach
-{ $values { "list" "a cons object" } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "list" list } { "quot" { $quotation "( obj -- )" } } }
 { $description "Call the quotation for each item in the list." } ;
 
 HELP: foldl
-{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
+{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a left-assocative order) using a binary operation and outputs the final result." } ;
 
 HELP: foldr
-{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
+{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a right-assocative order) using a binary operation, and outputs the final result." } ;
 
 HELP: lmap
-{ $values { "list" "a cons object" } { "quot" { $quotation "( old -- new )" } } { "result" "the final result" } }
+{ $values { "list" list } { "quot" { $quotation "( old -- new )" } } { "result" "the final result" } }
 { $description "Applies the quotation to each element of the list in order, collecting the new elements into a new list." } ;
 
 HELP: lreverse
@@ -138,23 +136,11 @@ HELP: lreverse
 { $description "Reverses the input list, outputing a new, reversed list. The output is a strict cons list." } ;
 
 HELP: list>array    
-{ $values { "list" "a cons object" } { "array" array } }
-{ $description "Turns the given cons object into an array, maintaing order." } ;
-
-HELP: sequence>cons
-{ $values { "sequence" sequence } { "list" cons } }
-{ $description "Turns the given array into a cons object, maintaing order." } ;
-
-HELP: deep-list>array
 { $values { "list" list } { "array" array } }
-{ $description "Recursively turns the given cons object into an array, maintaing order and also converting nested lists." } ;
-
-HELP: deep-sequence>cons
-{ $values { "sequence" sequence } { "cons" cons } }
-{ $description "Recursively turns the given sequence into a cons object, maintaing order and also converting nested lists." } ;
+{ $description "Convert a list into an array." } ;
 
 HELP: traverse    
-{ $values { "list"  "a cons object" } { "pred" { $quotation "( list/elt -- ? )" } }
+{ $values { "list"  list } { "pred" { $quotation "( list/elt -- ? )" } }
           { "quot" { $quotation "( list/elt -- result)" } }  { "result" "a new cons object" } }
 { $description "Recursively traverses the list object, replacing any elements (which can themselves be sublists) that pred" 
  " returns true for with the result of applying quot to." } ;
@@ -178,6 +164,3 @@ HELP: lmap>array
 { $values { "list" list } { "quot" quotation } { "array" array } }
 { $description "Executes the quotation on each element of the list, collecting the results in an array." } ;
 
-HELP: lmap-as
-{ $values { "list" list } { "quot" quotation } { "exemplar" sequence } { "sequence" sequence } }
-{ $description "Executes the quotation on each element of the list, collecting the results in a sequence of the type given by the exemplar." } ;

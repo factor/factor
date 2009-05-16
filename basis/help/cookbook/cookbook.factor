@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io kernel math namespaces parser
+USING: help.markup help.syntax io kernel math parser
 prettyprint sequences vocabs.loader namespaces stack-checker
 help command-line multiline see ;
 IN: help.cookbook
@@ -136,7 +136,7 @@ ARTICLE: "cookbook-variables" "Dynamic variables cookbook"
 } ;
 
 ARTICLE: "cookbook-vocabs" "Vocabularies cookbook"
-"Rather than being in one flat list, words belong to vocabularies; every word is contained in exactly one. When parsing a word name, the parser searches the " { $emphasis "vocabulary search path" } ". When working at the listener, a useful set of vocabularies is already available. In a source file, all used vocabularies must be imported."
+"Rather than being in one flat list, words belong to vocabularies; every word is contained in exactly one. When parsing a word name, the parser searches through vocabularies. When working at the listener, a useful set of vocabularies is already available. In a source file, all used vocabularies must be imported."
 $nl
 "For example, a source file containing the following code will print a parse error if you try loading it:"
 { $code "\"Hello world\" print" }
@@ -161,7 +161,7 @@ $nl
 "You would have to place the first definition after the two others for the parser to accept the file."
 { $references
     { }
-    "vocabulary-search"
+    "word-search"
     "words"
     "parser"
 } ;
@@ -286,7 +286,6 @@ ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
 { $list
     "Factor only makes use of one native thread, and Factor threads are scheduled co-operatively. C library calls block the entire VM."
     "Factor does not hide anything from the programmer, all internals are exposed. It is your responsibility to avoid writing fragile code which depends too much on implementation detail."
-    { "When a source file uses two vocabularies which define words with the same name, the order of the vocabularies in the " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " forms is important. The " { $link POSTPONE: QUALIFIED: } " word implements qualified naming, which can be used to resolve ambiguities." }
     { "If a literal object appears in a word definition, the object itself is pushed on the stack when the word executes, not a copy. If you intend to mutate this object, you must " { $link clone } " it first. See " { $link "syntax-literals" } "." }
     { "For a discussion of potential issues surrounding the " { $link f } " object, see " { $link "booleans" } "." }
     { "Factor's object system is quite flexible. Careless usage of union, mixin and predicate classes can lead to similar problems to those caused by “multiple inheritance” in other languages. In particular, it is possible to have two classes such that they have a non-empty intersection and yet neither is a subclass of the other. If a generic word defines methods on two such classes, various disambiguation rules are applied to ensure method dispatch remains deterministic, however they may not be what you expect. See " { $link "method-order" } " for details." }

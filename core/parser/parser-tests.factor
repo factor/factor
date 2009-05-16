@@ -4,7 +4,7 @@ sequences strings io.files io.pathnames definitions
 continuations sorting classes.tuple compiler.units debugger
 vocabs vocabs.loader accessors eval combinators lexer
 vocabs.parser words.symbol multiline source-files.errors
-tools.crossref ;
+tools.crossref grouping ;
 IN: parser.tests
 
 [
@@ -87,18 +87,6 @@ IN: parser.tests
     [ "OCT: 999" eval( -- obj ) ] must-fail
     [ "BIN: --0" eval( -- obj ) ] must-fail
 
-    ! Another funny bug
-    [ t ] [
-        [
-            "scratchpad" in set
-            { "scratchpad" "arrays" } set-use
-            [
-                ! This shouldn't modify in/use in the outer scope!
-            ] with-file-vocabs
-
-            use get { "scratchpad" "arrays" } set-use use get =
-        ] with-scope
-    ] unit-test
     DEFER: foo
 
     "IN: parser.tests USING: math prettyprint ; SYNTAX: foo 2 2 + . ;" eval( -- )
@@ -493,8 +481,6 @@ DEFER: blahy
 [ "IN: parser.tests USE: kernel TUPLE: blahy < tuple ; : blahy ( -- ) ; TUPLE: blahy < tuple ; : blahy ( -- ) ;" eval( -- ) ]
 [ error>> error>> def>> \ blahy eq? ] must-fail-with
 
-[ ] [ f lexer set f file set "Hello world" note. ] unit-test
-
 [ "CHAR: \\u9999999999999" eval( -- n ) ] must-fail
 
 SYMBOLS: a b c ;
@@ -583,3 +569,53 @@ EXCLUDE: qualified.tests.bar => x ;
 
 [ t ] [ "is-not-deferred" "parser.tests" lookup >boolean ] unit-test
 [ t ] [ "is-not-deferred" "parser.tests" lookup deferred? ] unit-test
+
+! Forward-reference resolution case iterated using list in the wrong direction
+[ [ ] ] [
+    "IN: parser.tests.forward-ref-1 DEFER: x DEFER: y"
+    <string-reader> "forward-ref-1" parse-stream
+] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests.forward-ref-2 DEFER: x DEFER: y"
+    <string-reader> "forward-ref-2" parse-stream
+] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests.forward-ref-3 FROM: parser.tests.forward-ref-1 => x y ; FROM: parser.tests.forward-ref-2 => x y ; : z ( -- ) x y ;"
+    <string-reader> "forward-ref-3" parse-stream
+] unit-test
+
+[ t ] [
+    "z" "parser.tests.forward-ref-3" lookup def>> [ vocabulary>> ] map all-equal?
+] unit-test
+
+[ [ ] ] [
+    "FROM: parser.tests.forward-ref-1 => x y ; FROM: parser.tests.forward-ref-2 => x y ; IN: parser.tests.forward-ref-3 : x ( -- ) ; : z ( -- ) x y ;"
+    <string-reader> "forward-ref-3" parse-stream
+] unit-test
+
+[ f ] [
+    "z" "parser.tests.forward-ref-3" lookup def>> [ vocabulary>> ] map all-equal?
+] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests.forward-ref-3 FROM: parser.tests.forward-ref-1 => x y ; FROM: parser.tests.forward-ref-2 => x y ; : z ( -- ) x y ;"
+    <string-reader> "forward-ref-3" parse-stream
+] unit-test
+
+[ t ] [
+    "z" "parser.tests.forward-ref-3" lookup def>> [ vocabulary>> ] map all-equal?
+] unit-test
+
+[ [ dup ] ] [
+    "USE: kernel dup" <string-reader> "unuse-test" parse-stream
+] unit-test
+
+[
+    "dup" <string-reader> "unuse-test" parse-stream
+] [ error>> error>> error>> no-word-error? ] must-fail-with
+
+[
+    "USE: kernel UNUSE: kernel dup" <string-reader> "unuse-test" parse-stream
+] [ error>> error>> error>> no-word-error? ] must-fail-with
