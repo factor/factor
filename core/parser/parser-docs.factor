@@ -110,13 +110,6 @@ HELP: save-location
 { $values { "definition" "a definition specifier" } }
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
-HELP: parser-notes
-{ $var-description "A boolean controlling whether the parser will print various notes. Switched on by default. If a source file is being run for its effect on " { $link output-stream } ", this variable should be switched off, to prevent parser notes from polluting the output." } ;
-
-HELP: parser-notes?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if the parser will print various notes and warnings. To disable parser notes, either set " { $link parser-notes } " to " { $link f } ", or pass the " { $snippet "-quiet" } " command line switch." } ;
-
 HELP: bad-number
 { $error-description "Indicates the parser encountered an invalid numeric literal." } ;
 
