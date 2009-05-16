@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays kernel kernel.private math namespaces
-make sequences strings words effects generic generic.standard
+make sequences strings effects generic generic.standard
 classes classes.algebra slots.private combinators accessors
 words sequences.private assocs alien quotations hashtables ;
 IN: slots

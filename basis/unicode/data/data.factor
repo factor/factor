@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit assocs math kernel sequences
 io.files hashtables quotations splitting grouping arrays io
-math.parser hash2 math.order byte-arrays words namespaces words
+math.parser hash2 math.order byte-arrays namespaces
 compiler.units parser io.encodings.ascii values interval-maps
 ascii sets combinators locals math.ranges sorting make
 strings.parser io.encodings.utf8 memoize simple-flat-file ;

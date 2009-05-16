@@ -7,6 +7,7 @@ cpu.ppc.assembler cpu.ppc.assembler.backend literals compiler.cfg.registers
 compiler.cfg.instructions compiler.constants compiler.codegen
 compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.units ;
+FROM: cpu.ppc.assembler => B ;
 IN: cpu.ppc
 
 ! PowerPC register assignments:

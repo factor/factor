@@ -14,7 +14,7 @@ ARTICLE: "lists.lazy" "Lazy lists"
 
 ARTICLE: { "lists.lazy" "combinators" } "Combinators for manipulating lazy lists"
 "The following combinators create lazy lists from other lazy lists:"
-{ $subsection lmap }
+{ $subsection lazy-map }
 { $subsection lfilter }
 { $subsection luntil }
 { $subsection lwhile }
@@ -93,22 +93,12 @@ HELP: luntil
 { $values { "list" "a cons object" } { "quot" { $quotation "( X -- ? )" } } { "result" "resulting cons object" } }
 { $description "Outputs a lazy list containing the first items in the list until after " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link <lazy-while> } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
-HELP: list>vector
-{ $values { "list" "a cons object" } { "vector" "the list converted to a vector" } }
-{ $description "Convert a list to a vector. If the list is a lazy infinite list then this will enter an infinite loop." } 
-{ $see-also list>array } ;
-
-HELP: list>array
-{ $values { "list" "a cons object" } { "array" "the list converted to an array" } }
-{ $description "Convert a list to an array. If the list is a lazy infinite list then this will enter an infinite loop." } 
-{ $see-also list>vector } ;
-
 HELP: lappend
 { $values { "list1" "a cons object" } { "list2" "a cons object" } { "result" "a lazy list of list2 appended to list1" } }
 { $description "Perform a similar functionality to that of the " { $link append } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-append> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required. Successive calls to " { $link cdr } " will iterate through list1, followed by list2." } ;
 
 HELP: lfrom-by
-{ $values { "n" "an integer" } { "quot" { $quotation "( -- int )" } } { "lazy-from-by" "a lazy list of integers" } }
+{ $values { "n" "an integer" } { "quot" { $quotation "( -- n )" } } { "lazy-from-by" "a lazy list of integers" } }
 { $description "Return an infinite lazy list of values starting from n, with each successive value being the result of applying quot to n." } ;
 
 HELP: lfrom
@@ -117,7 +107,7 @@ HELP: lfrom
 
 HELP: seq>list
 { $values { "index" "an integer 0 or greater" } { "seq" "a sequence" } { "list" "a list" } }
-{ $description "Convert the sequence into a list, starting from the 'index' offset into the sequence." } 
+{ $description "Convert the sequence into a list, starting from " { $snippet "index" } "." }
 { $see-also >list } ;
 
 HELP: >list
@@ -154,7 +144,7 @@ HELP: lmerge
 { $values { "list1" "a list" } { "list2" "a list" } { "result" "lazy list merging list1 and list2" } }
 { $description "Return the result of merging the two lists in a lazy manner." } 
 { $examples
-  { $example "USING: lists.lazy prettyprint ;" "{ 1 2 3 } >list { 4 5 6 } >list lmerge list>array ." "{ 1 4 2 5 3 6 }" }
+  { $example "USING: lists lists.lazy prettyprint ;" "{ 1 2 3 } >list { 4 5 6 } >list lmerge list>array ." "{ 1 4 2 5 3 6 }" }
 } ;
 
 HELP: lcontents

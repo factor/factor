@@ -3,6 +3,7 @@ USING: tools.test concurrency.distributed kernel io.files
 io.files.temp io.directories arrays io.sockets system
 combinators threads math sequences concurrency.messaging
 continuations accessors prettyprint ;
+FROM: concurrency.messaging => receive send ;
 
 : test-node ( -- addrspec )
     {

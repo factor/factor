@@ -16,6 +16,7 @@ compiler.tree.builder
 compiler.tree.optimizer
 compiler.tree.combinators
 compiler.tree.checker ;
+FROM: fry => _ ;
 RENAME: _ match => __
 IN: compiler.tree.debugger
 

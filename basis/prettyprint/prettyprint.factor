@@ -4,78 +4,16 @@ USING: arrays accessors assocs colors combinators grouping io
 io.streams.string io.styles kernel make math math.parser namespaces
 parser prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections quotations sequences sorting strings vocabs
-vocabs.parser words sets ;
+vocabs.prettyprint words sets ;
 IN: prettyprint
 
-<PRIVATE
-
-: make-pprint ( obj quot -- block in use )
-    [
-        0 position set
-        H{ } clone pprinter-use set
-        V{ } clone recursion-check set
-        V{ } clone pprinter-stack set
-        over <object
-        call
-        pprinter-block
-        pprinter-in get
-        pprinter-use get keys
-    ] with-scope ; inline
-
-: with-pprint ( obj quot -- )
-    make-pprint 2drop do-pprint ; inline
-
-: pprint-vocab ( vocab -- )
-    dup vocab present-text ;
-
-: write-in ( vocab -- )
-    [ \ IN: pprint-word pprint-vocab ] with-pprint ;
-
-: in. ( vocab -- )
-    [ write-in ] when* ;
-
-: use. ( seq -- )
-    [
-        natural-sort [
-            \ USING: pprint-word
-            [ pprint-vocab ] each
-            \ ; pprint-word
-        ] with-pprint
-    ] unless-empty ;
-
-: use/in. ( in use -- )
-    over "syntax" 2array diff
-    [ nip use. ]
-    [ empty? not and [ nl ] when ]
-    [ drop in. ]
-    2tri ;
-
-: vocab-names ( words -- vocabs )
-    dictionary get
-    [ [ words>> eq? nip ] with assoc-find 2drop ] curry map sift ;
-
-: prelude. ( -- )
-    in get use get vocab-names prune in get ".private" append swap remove use/in. ;
-
-[
-    nl
-    { { font-style bold } { font-name "sans-serif" } } [
-        "Restarts were invoked adding vocabularies to the search path." print
-        "To avoid doing this in the future, add the following USING:" print
-        "and IN: forms at the top of the source file:" print nl
-    ] with-style
-    { { page-color T{ rgba f 0.8 0.8 0.8 1.0 } } } [ prelude. ] with-nesting
-    nl nl
-] print-use-hook set-global
-
-PRIVATE>
-
 : with-use ( obj quot -- )
-    make-pprint [ use/in. ] [ empty? not or [ nl ] when ] 2bi
+    make-pprint (pprint-manifest
+    [ pprint-manifest) ] [ [ drop nl ] unless-empty ] bi
     do-pprint ; inline
 
 : with-in ( obj quot -- )
-    make-pprint drop [ write-in bl ] when* do-pprint ; inline
+    make-pprint current-vocab>> [ pprint-in bl ] when* do-pprint ; inline
 
 : pprint ( obj -- ) [ pprint* ] with-pprint ;
 

@@ -1,10 +1,10 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays debugger generic hashtables io assocs
-kernel.private kernel math memory namespaces make parser
-prettyprint sequences vectors words system splitting
-init io.files bootstrap.image bootstrap.image.private vocabs
-vocabs.loader system debugger continuations ;
+USING: arrays debugger generic hashtables io assocs kernel.private
+kernel math memory namespaces make parser prettyprint sequences
+vectors words system splitting init io.files vocabs vocabs.loader
+debugger continuations ;
+QUALIFIED: bootstrap.image.private
 IN: bootstrap.stage1
 
 "Bootstrap stage 1..." print flush
@@ -51,4 +51,4 @@ load-help? off
         ] if
     ] %
 ] [ ] make
-bootstrap-boot-quot set
+bootstrap.image.private:bootstrap-boot-quot set

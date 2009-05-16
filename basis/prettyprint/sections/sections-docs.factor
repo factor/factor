@@ -1,6 +1,6 @@
 USING: prettyprint io kernel help.markup help.syntax
 prettyprint.config words hashtables math
-strings definitions ;
+strings definitions quotations ;
 IN: prettyprint.sections
 
 HELP: position
@@ -12,7 +12,6 @@ HELP: recursion-check
 HELP: line-limit?
 { $values { "?" "a boolean" } }
 { $description "Tests if the line number limit has been reached, and thus if prettyprinting should stop." } ;
-
 
 HELP: do-indent
 { $description "Outputs the current indent nesting to " { $link output-stream } "." } ;
@@ -211,3 +210,7 @@ $prettyprinting-note ;
 HELP: do-pprint
 { $values { "block" block } }
 { $description "Recursively output all children of the given block. The continuation is restored and output terminates if the line length is exceeded; this test is performed in " { $link fresh-line } "." } ;
+
+HELP: with-pprint
+{ $values { "obj" object } { "quot" quotation } }
+{ $description "Sets up the prettyprinter and calls the quotation in a new scope. The quotation should add sections to the top-level block. When the quotation returns, the top-level block is printed to " { $link output-stream } "." } ;

@@ -1,7 +1,7 @@
 USING: help.markup help.syntax kernel sequences words
 math strings vectors quotations generic effects classes
 vocabs.loader definitions io vocabs source-files
-quotations namespaces compiler.units assocs lexer
+namespaces compiler.units assocs lexer
 words.symbol words.alias words.constant vocabs.parser ;
 IN: parser
 
@@ -70,7 +70,8 @@ $nl
 { $subsection "reading-ahead" }
 { $subsection "parsing-word-nest" }
 { $subsection "defining-words" }
-{ $subsection "parsing-tokens" } ;
+{ $subsection "parsing-tokens" }
+{ $subsection "word-search-parsing" } ;
 
 ARTICLE: "parser-files" "Parsing source files"
 "The parser can run source files:"
@@ -84,7 +85,7 @@ $nl
 ARTICLE: "top-level-forms" "Top level forms"
 "Any code outside of a definition is known as a " { $emphasis "top-level form" } "; top-level forms are run after the entire source file has been parsed, regardless of their position in the file."
 $nl
-"Top-level forms do not have access to the " { $link in } " and " { $link use } " variables that were set at parse time, nor do they run inside " { $link with-compilation-unit } "; so meta-programming might require extra work in a top-level form compared with a parsing word."
+"Top-level forms cannot access the parse-time manifest (" { $link "word-search-parsing" } "), nor do they run inside " { $link with-compilation-unit } "; as a result, meta-programming might require extra work in a top-level form compared with a parsing word."
 $nl
 "Also, top-level forms run in a new dynamic scope, so using " { $link set } " to store values is almost always wrong, since the values will be lost after the top-level form completes. To save values computed by a top-level form, either use " { $link set-global } " or define a new word with the value." ;
 
@@ -109,55 +110,8 @@ HELP: save-location
 { $values { "definition" "a definition specifier" } }
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
-HELP: parser-notes
-{ $var-description "A boolean controlling whether the parser will print various notes. Switched on by default. If a source file is being run for its effect on " { $link output-stream } ", this variable should be switched off, to prevent parser notes from polluting the output." } ;
-
-HELP: parser-notes?
-{ $values { "?" "a boolean" } }
-{ $description "Tests if the parser will print various notes and warnings. To disable parser notes, either set " { $link parser-notes } " to " { $link f } ", or pass the " { $snippet "-quiet" } " command line switch." } ;
-
 HELP: bad-number
 { $error-description "Indicates the parser encountered an invalid numeric literal." } ;
-
-HELP: use
-{ $var-description "A variable holding the current vocabulary search path as a sequence of assocs." } ;
-
-{ use in use+ (use+) set-use set-in POSTPONE: USING: POSTPONE: USE: with-file-vocabs with-interactive-vocabs } related-words
-
-HELP: in
-{ $var-description "A variable holding the name of the current vocabulary for new definitions." } ;
-
-HELP: current-vocab
-{ $values { "str" "a vocabulary" } }
-{ $description "Returns the vocabulary stored in the " { $link in } " symbol. Throws an error if the current vocabulary is " { $link f } "." } ;
-
-HELP: (use+)
-{ $values { "vocab" "an assoc mapping strings to words" } }
-{ $description "Adds an assoc at the front of the search path." }
-$parsing-note ;
-
-HELP: use+
-{ $values { "vocab" string } }
-{ $description "Adds a new vocabulary at the front of the search path after loading it if necessary. Subsequent word lookups by the parser will search this vocabulary first." }
-$parsing-note
-{ $errors "Throws an error if the vocabulary does not exist." } ;
-
-HELP: set-use
-{ $values { "seq" "a sequence of strings" } }
-{ $description "Sets the vocabulary search path. Later vocabularies take precedence." }
-{ $errors "Throws an error if one of the vocabularies does not exist." }
-$parsing-note ;
-
-HELP: add-use
-{ $values { "seq" "a sequence of strings" } }
-{ $description "Adds multiple vocabularies to the search path, with later vocabularies taking precedence." }
-{ $errors "Throws an error if one of the vocabularies does not exist." }
-$parsing-note ;
-
-HELP: set-in
-{ $values { "name" string } }
-{ $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist." }
-$parsing-note ;
 
 HELP: create-in
 { $values { "str" "a word name" } { "word" "a new word" } }
@@ -177,11 +131,6 @@ HELP: no-word-error
 HELP: no-word
 { $values { "name" string } { "newword" word } }
 { $description "Throws a " { $link no-word-error } "." } ;
-
-HELP: search
-{ $values { "str" string } { "word/f" "a word or " { $link f } } }
-{ $description "Searches for a word by name in the current vocabulary search path. If no such word could be found, outputs " { $link f } "." }
-$parsing-note ;
 
 HELP: scan-word
 { $values { "word/number/f" "a word, number or " { $link f } } }
@@ -290,4 +239,4 @@ HELP: staging-violation
 
 HELP: auto-use?
 { $var-description "If set to a true value, the behavior of the parser when encountering an unknown word name is changed. If only one loaded vocabulary has a word with this name, instead of throwing an error, the parser adds the vocabulary to the search path and prints a parse note. Off by default." }
-{ $notes "This feature is intended to help during development. To generate a " { $link POSTPONE: USING: } " form automatically, enable " { $link auto-use? } ", load the source file, and copy and paste the " { $link POSTPONE: USING: } " form printed by the parser back into the file, then disable " { $link auto-use? } ". See " { $link "vocabulary-search-errors" } "." } ;
+{ $notes "This feature is intended to help during development. To generate a " { $link POSTPONE: USING: } " form automatically, enable " { $link auto-use? } ", load the source file, and copy and paste the " { $link POSTPONE: USING: } " form printed by the parser back into the file, then disable " { $link auto-use? } ". See " { $link "word-search-errors" } "." } ;
