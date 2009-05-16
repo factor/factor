@@ -6,13 +6,15 @@ opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays.float
 terrain.generation terrain.shaders ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats game-worlds method-chains
-math.affine-transforms noise ui.gestures ;
+math.affine-transforms noise ui.gestures combinators.short-circuit ;
 IN: terrain
 
 CONSTANT: FOV $[ 2.0 sqrt 1+ ]
 CONSTANT: NEAR-PLANE $[ 1.0 1024.0 / ]
 CONSTANT: FAR-PLANE 2.0
 CONSTANT: PLAYER-START-LOCATION { 0.5 0.51 0.5 }
+CONSTANT: VELOCITY-MODIFIER-NORMAL { 1.0 1.0 1.0 }
+CONSTANT: VELOCITY-MODIFIER-FAST { 2.0 1.0 2.0 }
 CONSTANT: PLAYER-HEIGHT $[ 1.0 256.0 / ]
 CONSTANT: GRAVITY $[ 1.0 4096.0 / ]
 CONSTANT: JUMP $[ 1.0 1024.0 / ]
@@ -28,13 +30,23 @@ CONSTANT: terrain-vertex-distance { $[ 1.0 512.0 / ] $[ 1.0 512.0 / ] }
 CONSTANT: terrain-vertex-row-length $[ 512 1 + 2 * ]
 
 TUPLE: player
-    location yaw pitch velocity velocity-modifier ;
+    location yaw pitch velocity velocity-modifier
+    reverse-time ;
 
 TUPLE: terrain-world < game-world
     player
     sky-image sky-texture sky-program
     terrain terrain-segment terrain-texture terrain-program
-    terrain-vertex-buffer ;
+    terrain-vertex-buffer
+    history ;
+
+: <player> ( -- player )
+    player new
+        PLAYER-START-LOCATION >>location
+        0.0 >>yaw
+        0.0 >>pitch
+        { 0.0 0.0 0.0 } >>velocity
+        VELOCITY-MODIFIER-NORMAL >>velocity-modifier ;
 
 M: terrain-world tick-length
     drop 1000 30 /i ;
@@ -134,18 +146,23 @@ M: terrain-world tick-length
 
 
 terrain-world H{
-    { T{ key-up { mods { A+ } } { sym "RET" } } [ toggle-fullscreen ] }
+    { T{ key-down { mods { A+ } } { sym "RET" } } [ toggle-fullscreen ] }
 } set-gestures
 
 :: handle-input ( world -- )
     world player>> :> player
     read-keyboard keys>> :> keys
-    key-left-shift keys nth [
-        { 2.0 1.0 2.0 } player (>>velocity-modifier)
-    ] when
-    key-left-shift keys nth [
-        { 1.0 1.0 1.0 } player (>>velocity-modifier)
-    ] unless
+
+    key-left-shift keys nth
+    VELOCITY-MODIFIER-FAST VELOCITY-MODIFIER-NORMAL ? player (>>velocity-modifier)
+
+    {
+        [ key-1 keys nth 1  f ? ]
+        [ key-2 keys nth 2  f ? ]
+        [ key-3 keys nth 3  f ? ]
+        [ key-4 keys nth 4  f ? ]
+        [ key-5 keys nth 10000 f ? ]
+    } 0|| player (>>reverse-time)
 
     key-w keys nth [ player walk-forward ] when 
     key-s keys nth [ player walk-backward ] when 
@@ -199,10 +216,29 @@ terrain-world H{
 : scaled-velocity ( player -- velocity )
     [ velocity>> ] [ velocity-modifier>> ] bi v* ;
 
-: tick-player ( world player -- )
+: save-history ( world player -- )
+    clone swap history>> push ;
+
+:: tick-player-reverse ( world player -- )
+    player reverse-time>> :> reverse-time
+    world history>> :> history
+    history length 0 > [
+        history length reverse-time 1 - - 1 max history set-length
+        history pop world (>>player)
+    ] when ;
+
+: tick-player-forward ( world player -- )
+    2dup save-history
     [ apply-friction apply-gravity ] change-velocity
     dup scaled-velocity [ v+ [ terrain-segment>> ] dip collide ] curry with change-location
     drop ;
+
+: tick-player ( world player -- )
+    dup reverse-time>> [
+        tick-player-reverse
+    ] [
+        tick-player-forward
+    ] if ;
 
 M: terrain-world tick*
     [ dup focused?>> [ handle-input ] [ drop ] if ]
@@ -226,7 +262,8 @@ BEFORE: terrain-world begin-world
     GL_DEPTH_TEST glEnable
     GL_TEXTURE_2D glEnable
     GL_VERTEX_ARRAY glEnableClientState
-    PLAYER-START-LOCATION 0.0 0.0 { 0.0 0.0 0.0 } { 1.0 1.0 1.0 } player boa >>player
+    <player> >>player
+    V{ } clone >>history
     <perlin-noise-table> 0.01 0.01 <scale> { 512 512 } perlin-noise-image
     [ >>sky-image ] keep
     make-texture [ set-texture-parameters ] keep >>sky-texture
