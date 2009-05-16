@@ -188,6 +188,7 @@ M: tuple >pprint-sequence
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
 
 M: object pprint-narrow? drop f ;
+M: byte-vector pprint-narrow? drop f ;
 M: array pprint-narrow? drop t ;
 M: vector pprint-narrow? drop t ;
 M: hashtable pprint-narrow? drop t ;
