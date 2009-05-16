@@ -8,3 +8,24 @@ USING: kernel math namespaces checksums checksums.md5 tools.test byte-arrays ;
 [ "d174ab98d277d9f5a5611c2c9f419d9f" ] [ "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" >byte-array md5 checksum-bytes hex-string ] unit-test
 [ "57edf4a22be3c955ac49da2e2107b67a" ] [ "12345678901234567890123456789012345678901234567890123456789012345678901234567890" >byte-array md5 checksum-bytes hex-string ] unit-test
 
+
+[
+    t
+] [
+    <md5-state> "asdf" add-checksum-bytes
+    [ get-checksum ] [ get-checksum ] bi =
+] unit-test
+
+[
+    t
+] [
+    <md5-state> "" add-checksum-bytes
+    [ get-checksum ] [ get-checksum ] bi =
+] unit-test
+
+[
+    t
+] [
+    <md5-state> "asdf" binary <byte-reader> add-checksum-stream
+    [ get-checksum ] [ get-checksum ] bi =
+] unit-test

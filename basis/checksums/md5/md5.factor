@@ -8,11 +8,12 @@ checksums.common checksums.stream combinators combinators.smart ;
 IN: checksums.md5
 
 SINGLETON: md5
+
 INSTANCE: md5 stream-checksum
 
 TUPLE: md5-state < checksum-state state old-state ;
 
-: <md5-state> ( -- md5-state )
+: <md5-state> ( -- md5 )
     64 md5-state new-checksum-state
         { HEX: 67452301 HEX: efcdab89 HEX: 98badcfe HEX: 10325476 }
         [ clone >>state ] [ >>old-state ] bi ;
@@ -21,7 +22,7 @@ TUPLE: md5-state < checksum-state state old-state ;
 
 : v-w+ ( v1 v2 -- v3 ) [ w+ ] 2map ;
 
-: update-md5-state ( md5-state -- )
+: update-md5 ( md5 -- )
     [ state>> ] [ old-state>> v-w+ dup clone ] [ ] tri
     [ (>>old-state) ] [ (>>state) ] bi ; inline
 
@@ -69,13 +70,13 @@ CONSTANT: d 3
 :: (ABCD) ( x V a b c d k s i quot -- )
     #! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
     a V [
-        b V nth-unsafe
-        c V nth-unsafe
-        d V nth-unsafe quot call w+
-        k x nth-unsafe w+
+        b V nth
+        c V nth
+        d V nth quot call w+
+        k x nth w+
         i T w+
         s bitroll-32
-        b V nth-unsafe w+
+        b V nth w+
     ] change-nth ; inline
 
 MACRO: with-md5-round ( ops quot -- )
@@ -170,14 +171,23 @@ M: md5-state checksum-block ( block state -- )
             [ (process-md5-block-I) ]
         } 2cleave
     ] [
-        nip update-md5-state
+        nip update-md5
     ] 2bi ;
 
-: md5-state>checksum ( md5-state -- bytes )
+: md5>checksum ( md5 -- bytes )
     state>> [ 4 >le ] map B{ } concat-as ;
 
-M: md5-state get-checksum ( md5-state -- bytes )
+M: md5-state clone ( md5 -- new-md5 )
+    call-next-method
+    [ clone ] change-state
+    [ clone ] change-old-state ;
+
+M: md5-state get-checksum ( md5 -- bytes )
     clone [ bytes>> f ] [ bytes-read>> pad-last-block ] [ ] tri
-    [ [ checksum-block ] curry each ] [ md5-state>checksum ] bi ;
+    [ [ checksum-block ] curry each ] [ md5>checksum ] bi ;
+
+M: md5 checksum-stream ( stream checksum -- byte-array )
+    drop
+    [ <md5-state> ] dip add-checksum-stream get-checksum ;
 
 PRIVATE>

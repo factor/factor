@@ -14,6 +14,10 @@ TUPLE: checksum-state bytes-read block-size bytes ;
         0 >>bytes-read
         V{ } clone >>bytes ; inline
 
+M: checksum-state clone
+    call-next-method
+    [ clone ] change-bytes ;
+
 GENERIC: checksum-block ( bytes checksum -- )
 
 GENERIC: get-checksum ( checksum -- value )
@@ -26,7 +30,7 @@ GENERIC: get-checksum ( checksum -- value )
             over [ checksum-block ]
             [ [ 64 + ] change-bytes-read drop ] bi
         ] dip
-    ] while >vector >>bytes ;
+    ] while >vector [ >>bytes ] [ length [ + ] curry change-bytes-read ] bi ;
 
 : add-checksum-stream ( checksum-state stream -- checksum-state )
     [
