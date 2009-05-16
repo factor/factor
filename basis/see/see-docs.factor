@@ -1,6 +1,6 @@
+USING: help.markup help.syntax strings definitions generic words classes ;
+FROM: prettyprint.sections => with-pprint ;
 IN: see
-USING: help.markup help.syntax strings prettyprint.private
-definitions generic words classes ;
 
 HELP: synopsis
 { $values { "defspec" "a definition specifier" } { "str" string } }
