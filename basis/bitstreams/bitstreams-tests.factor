@@ -5,23 +5,51 @@ grouping compression.lzw multiline byte-arrays io.encodings.binary
 io.streams.byte-array ;
 IN: bitstreams.tests
 
-[ 1 t ]
-[ B{ 254 } binary <byte-reader> <bitstream-reader> read-bit ] unit-test
 
-[ 254 8 t ]
-[ B{ 254 } binary <byte-reader> <bitstream-reader> 8 swap read-bits ] unit-test
-
-[ 4095 12 t ]
-[ B{ 255 255 } binary <byte-reader> <bitstream-reader> 12 swap read-bits ] unit-test
-
-[ B{ 254 } ]
+[ BIN: 1111111111 ]
 [
-    binary <byte-writer> <bitstream-writer> 254 8 rot
-    [ write-bits ] keep stream>> >byte-array
+    B{ HEX: 0f HEX: ff HEX: ff HEX: ff } <msb0-bit-reader>
+    2 >>byte-pos 6 >>bit-pos
+    10 swap peek
 ] unit-test
 
-[ 255 8 t ]
-[ B{ 255 } binary <byte-reader> <bitstream-reader> 8 swap read-bits ] unit-test
+[ BIN: 111111111 ]
+[
+    B{ HEX: 0f HEX: ff HEX: ff HEX: ff } <msb0-bit-reader>
+    2 >>byte-pos 6 >>bit-pos
+    9 swap peek
+] unit-test
 
-[ 255 8 f ]
-[ B{ 255 } binary <byte-reader> <bitstream-reader> 9 swap read-bits ] unit-test
+[ BIN: 11111111 ]
+[
+    B{ HEX: 0f HEX: ff HEX: ff HEX: ff } <msb0-bit-reader>
+    2 >>byte-pos 6 >>bit-pos
+    8 swap peek
+] unit-test
+
+[ BIN: 1111111 ]
+[
+    B{ HEX: 0f HEX: ff HEX: ff HEX: ff } <msb0-bit-reader>
+    2 >>byte-pos 6 >>bit-pos
+    7 swap peek
+] unit-test
+
+[ BIN: 111111 ]
+[
+    B{ HEX: 0f HEX: ff HEX: ff HEX: ff } <msb0-bit-reader>
+    2 >>byte-pos 6 >>bit-pos
+    6 swap peek
+] unit-test
+
+[ BIN: 11111 ]
+[
+    B{ HEX: 0f HEX: ff HEX: ff HEX: ff } <msb0-bit-reader>
+    2 >>byte-pos 6 >>bit-pos
+    5 swap peek
+] unit-test
+
+[ B{ } <msb0-bit-reader> 5 swap peek ] must-fail
+[ B{ } <msb0-bit-reader> 1 swap peek ] must-fail
+[ B{ } <msb0-bit-reader> 8 swap peek ] must-fail
+
+[ 0 ] [ B{ } <msb0-bit-reader> 0 swap peek ] unit-test
