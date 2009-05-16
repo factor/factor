@@ -6,6 +6,7 @@ io.files.unix kernel math.order namespaces sequences sorting
 system unix unix.statfs.linux unix.statvfs.linux io.files.links
 specialized-arrays.direct.uint arrays io.files.info.unix assocs
 io.pathnames unix.types ;
+FROM: csv => delimiter ;
 IN: io.files.info.unix.linux
 
 TUPLE: linux-file-system-info < unix-file-system-info

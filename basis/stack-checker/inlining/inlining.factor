@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces assocs kernel sequences words accessors
 definitions math math.order effects classes arrays combinators
-vectors arrays hints
+vectors hints
 stack-checker.state
 stack-checker.errors
 stack-checker.values

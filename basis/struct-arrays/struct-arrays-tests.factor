@@ -1,7 +1,6 @@
 IN: struct-arrays.tests
 USING: struct-arrays tools.test kernel math sequences
-alien.syntax alien.c-types destructors libc accessors
-destructors ;
+alien.syntax alien.c-types destructors libc accessors ;
 
 C-STRUCT: test-struct
 { "int" "x" }

@@ -69,8 +69,6 @@ M: mersenne-twister random-32* ( mt -- r )
     [ seq>> nth-unsafe mt-temper ]
     [ [ 1+ ] change-i drop ] tri ;
 
-USE: init
-
 [
     [ 32 random-bits ] with-system-random
     <mersenne-twister> random-generator set-global

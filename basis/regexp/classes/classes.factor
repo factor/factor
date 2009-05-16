@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.order words combinators locals
-ascii unicode.categories combinators.short-circuit sequences
+unicode.categories combinators.short-circuit sequences
 fry macros arrays assocs sets classes mirrors unicode.script
 unicode.data ;
+FROM: ascii => ascii? ;
 IN: regexp.classes
 
 SINGLETONS: dot letter-class LETTER-class Letter-class digit-class

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays namespaces assocs sequences kernel generic assocs
+USING: arrays namespaces sequences kernel generic assocs
 classes vectors accessors combinators sets
 stack-checker.state
 stack-checker.branches

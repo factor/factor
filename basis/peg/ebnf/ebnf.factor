@@ -1,11 +1,13 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel compiler.units words arrays strings math.parser
+USING: kernel words arrays strings math.parser
 sequences quotations vectors namespaces make math assocs
 continuations peg peg.parsers unicode.categories multiline
 splitting accessors effects sequences.deep peg.search
 combinators.short-circuit lexer io.streams.string stack-checker
 io combinators parser summary ;
+FROM: compiler.units => with-compilation-unit ;
+FROM: vocabs.parser => search ;
 IN: peg.ebnf
 
 : rule ( name word -- parser )
@@ -441,7 +443,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
       drop 
     ] [ 
       [
-        "USING: locals sequences ;  [let* | " %
+        "FROM: locals => [let* ; FROM: sequences => nth ; [let* | " %
           dup length swap [
             dup ebnf-var? [
               name>> % 
@@ -459,7 +461,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
 
 M: ebnf-var build-locals ( code ast -- )
   [
-    "USING: locals kernel ;  [let* | " %
+    "FROM: locals => [let* ; FROM: kernel => dup nip ; [let* | " %
     name>> % " [ dup ] " %
     " | " %
     %  

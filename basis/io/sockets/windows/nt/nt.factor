@@ -1,6 +1,6 @@
 USING: alien alien.accessors alien.c-types byte-arrays
 continuations destructors io.ports io.timeouts io.sockets
-io.sockets io namespaces io.streams.duplex io.backend.windows
+io namespaces io.streams.duplex io.backend.windows
 io.sockets.windows io.backend.windows.nt windows.winsock kernel
 libc math sequences threads system combinators accessors ;
 IN: io.sockets.windows.nt

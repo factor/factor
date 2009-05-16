@@ -23,7 +23,7 @@ WHERE
 : *T ( alien -- z )
     [ T-real ] [ T-imaginary ] bi rect> ; inline
 
-T in get
+T current-vocab
 { { N "real" } { N "imaginary" } }
 define-struct
 

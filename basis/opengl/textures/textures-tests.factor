@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test opengl.textures opengl.textures.private
-opengl.textures.private images kernel namespaces accessors
-sequences ;
+images kernel namespaces accessors sequences ;
 IN: opengl.textures.tests
 
 [

@@ -4,7 +4,7 @@ USING: accessors combinators kernel system unicode.case io.files
 io.files.info io.files.info.unix generalizations
 strings arrays sequences math.parser unix.groups unix.users
 tools.files.private unix.stat math fry macros combinators.smart
-io.files.info.unix io tools.files math.order prettyprint ;
+io tools.files math.order prettyprint ;
 IN: tools.files.unix
 
 <PRIVATE

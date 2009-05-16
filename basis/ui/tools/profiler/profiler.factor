@@ -6,10 +6,9 @@ vocabs tools.profiler words prettyprint combinators.smart
 definitions.icons see ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.tracks ui.gestures ui.gadgets.buttons
 ui.gadgets.tables ui.gadgets.search-tables ui.gadgets.labeled
-ui.gadgets.buttons ui.gadgets.packs ui.gadgets.labels
-ui.gadgets.tabbed ui.gadgets.status-bar ui.gadgets.borders
-ui.tools.browser ui.tools.common ui.baseline-alignment
-ui.operations ui.images ;
+ui.gadgets.packs ui.gadgets.labels ui.gadgets.tabbed
+ui.gadgets.status-bar ui.gadgets.borders ui.tools.browser
+ui.tools.common ui.baseline-alignment ui.operations ui.images ;
 FROM: models.arrow => <arrow> ;
 FROM: models.arrow.smart => <smart-arrow> ;
 FROM: models.product => <product> ;

@@ -4,6 +4,7 @@ USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.ppc.assembler compiler.codegen.fixup compiler.units
 compiler.constants math math.private layouts words
 vocabs slots.private locals.backend ;
+FROM: cpu.ppc.assembler => B ;
 IN: bootstrap.ppc
 
 4 \ cell set
