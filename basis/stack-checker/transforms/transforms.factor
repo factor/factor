@@ -3,7 +3,7 @@
 USING: fry accessors arrays kernel kernel.private combinators.private
 words sequences generic math math.order namespaces quotations
 assocs combinators combinators.short-circuit classes.tuple
-classes.tuple.private effects summary hashtables classes generic sets
+classes.tuple.private effects summary hashtables classes sets
 definitions generic.standard slots.private continuations locals
 sequences.private generalizations stack-checker.backend
 stack-checker.state stack-checker.visitor stack-checker.errors

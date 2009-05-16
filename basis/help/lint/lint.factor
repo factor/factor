@@ -66,11 +66,12 @@ PRIVATE>
     ] check-something ;
 
 : check-about ( vocab -- )
-    dup '[ _ vocab-help [ article drop ] when* ] check-something ;
+    vocab-link boa dup
+    '[ _ vocab-help [ article drop ] when* ] check-something ;
 
 : check-vocab ( vocab -- )
     "Checking " write dup write "..." print
-    [ vocab check-about ]
+    [ check-about ]
     [ words [ check-word ] each ]
     [ vocab-articles get at [ check-article ] each ]
     tri ;

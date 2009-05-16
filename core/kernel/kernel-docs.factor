@@ -1,6 +1,6 @@
 USING: generic help.markup help.syntax math memory
 namespaces sequences kernel.private layouts classes
-kernel.private vectors combinators quotations strings words
+vectors combinators quotations strings words
 assocs arrays math.order ;
 IN: kernel
 

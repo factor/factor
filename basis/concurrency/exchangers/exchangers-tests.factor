@@ -1,7 +1,8 @@
 IN: concurrency.exchangers.tests
-USING: sequences tools.test concurrency.exchangers
+USING: tools.test concurrency.exchangers
 concurrency.count-downs concurrency.promises locals kernel
 threads ;
+FROM: sequences => 3append ;
 
 :: exchanger-test ( -- string )
     [let |

@@ -8,8 +8,8 @@ math.vectors namespaces make sequences strings vectors words
 windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
 windows.messages windows.types windows.offscreen windows.nt
 threads libc combinators fry combinators.short-circuit continuations
-command-line shuffle opengl ui.render ascii math.bitwise locals
-accessors math.rectangles math.order ascii calendar
+command-line shuffle opengl ui.render math.bitwise locals
+accessors math.rectangles math.order calendar ascii
 io.encodings.utf16n windows.errors literals ui.pixel-formats 
 ui.pixel-formats.private memoize classes struct-arrays ;
 IN: ui.backend.windows

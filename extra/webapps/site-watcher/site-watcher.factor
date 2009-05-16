@@ -37,7 +37,7 @@ IN: webapps.site-watcher
             "twitter" value >>twitter
             "sms" value >>sms
             update-tuple
-            site-list-url <redirect>
+            f <redirect>
         ] >>submit
     <protected>
         "update notification details" >>description ;
