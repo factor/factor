@@ -11,7 +11,10 @@ SINGLETON: gvim
 HOOK: gvim-path io-backend ( -- path )
 
 M: gvim vim-command ( file line -- string )
-    [ gvim-path , "+" swap number>string append , , ] { } make ;
+    [
+        gvim-path ,
+        number>string "+" prepend , ,
+    ] { } make ;
 
 gvim vim-editor set-global
 
