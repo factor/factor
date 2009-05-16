@@ -20,7 +20,7 @@ CONSTANT: deck-bits 18
 : underlying-alien-offset ( -- n ) bootstrap-cell alien tag-number - ; inline
 : tuple-class-offset ( -- n ) bootstrap-cell tuple tag-number - ; inline
 : word-xt-offset ( -- n ) 10 bootstrap-cells \ word tag-number - ; inline
-: quot-xt-offset ( -- n ) 5 bootstrap-cells quotation tag-number - ; inline
+: quot-xt-offset ( -- n ) 4 bootstrap-cells quotation tag-number - ; inline
 : word-code-offset ( -- n ) 11 bootstrap-cells \ word tag-number - ; inline
 : array-start-offset ( -- n ) 2 bootstrap-cells array tag-number - ; inline
 : compiled-header-size ( -- n ) 4 bootstrap-cells ; inline

@@ -158,7 +158,7 @@ void forward_object_xts()
 			{
 				quotation *quot = untag<quotation>(obj);
 
-				if(quot->compiledp != F)
+				if(quot->code)
 					quot->code = forward_xt(quot->code);
 			}
 			break;
@@ -173,8 +173,7 @@ void forward_object_xts()
 		}
 	}
 
-	/* End the heap scan */
-	gc_off = false;
+	end_scan();
 }
 
 /* Set the XT fields now that the heap has been compacted */
@@ -194,7 +193,7 @@ void fixup_object_xts()
 		case QUOTATION_TYPE:
 			{
 				quotation *quot = untag<quotation>(obj);
-				if(quot->compiledp != F)
+				if(quot->code)
 					set_quot_xt(quot,quot->code);
 				break;
 			}
@@ -203,8 +202,7 @@ void fixup_object_xts()
 		}
 	}
 
-	/* End the heap scan */
-	gc_off = false;
+	end_scan();
 }
 
 /* Move all free space to the end of the code heap. This is not very efficient,

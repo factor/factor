@@ -12,6 +12,16 @@ SYMBOL: core-bootstrap-time
 
 SYMBOL: bootstrap-time
 
+: strip-encodings ( -- )
+    os unix? [
+        [
+            P" resource:core/io/encodings/utf16/utf16.factor" 
+            P" resource:core/io/encodings/utf16n/utf16n.factor" [ forget ] bi@
+            "io.encodings.utf16" 
+            "io.encodings.utf16n" [ child-vocabs [ forget-vocab ] each ] bi@
+        ] with-compilation-unit
+    ] when ;
+
 : default-image-name ( -- string )
     vm file-name os windows? [ "." split1-last drop ] when
     ".image" append resource-path ;
@@ -54,6 +64,8 @@ SYMBOL: bootstrap-time
 
     "math compiler threads help io tools ui ui.tools unicode handbook" "include" set-global
     "" "exclude" set-global
+
+    strip-encodings
 
     (command-line) parse-command-line
 

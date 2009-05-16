@@ -16,9 +16,9 @@ IN: mason.notify
         ] { } make prepend
         [ 5 ] 2dip '[
             <process>
-                _ >>command
                 _ [ +closed+ ] unless* >>stdin
-            try-output-process
+                _ >>command
+            short-running-process
         ] retry
     ] [ 2drop ] if ;
 
@@ -42,8 +42,10 @@ IN: mason.notify
 : notify-report ( status -- )
     [ "Build finished with status: " write . flush ]
     [
-        [ "report" utf8 file-contents ] dip email-report
-        "report" { "report" } status-notify
+        [ "report" ] dip
+        [ [ utf8 file-contents ] dip email-report ]
+        [ "report" swap name>> 2array status-notify ]
+        2bi
     ] bi ;
 
 : notify-release ( archive-name -- )

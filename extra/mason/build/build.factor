@@ -15,7 +15,7 @@ QUALIFIED: continuations
 : enter-build-dir  ( -- ) build-dir set-current-directory ;
 
 : clone-builds-factor ( -- )
-    "git" "clone" builds/factor 3array try-output-process ;
+    "git" "clone" builds/factor 3array short-running-process ;
 
 : begin-build ( -- )
     "factor" [ git-id ] with-directory
