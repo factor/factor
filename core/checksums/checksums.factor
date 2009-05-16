@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io io.backend io.files kernel math math.parser
-sequences vectors io.encodings.binary ;
+sequences vectors io.encodings.binary quotations ;
 IN: checksums
 
 MIXIN: checksum
@@ -30,7 +30,7 @@ GENERIC: get-checksum ( checksum -- value )
 
 : add-checksum-stream ( checksum-state stream -- checksum-state )
     [
-        [ '[ [ _ ] dip add-checksum-bytes drop ] each-block ] keep
+        [ [ swap add-checksum-bytes drop ] curry each-block ] keep
     ] with-input-stream ;
 
 : add-checksum-file ( checksum-state path -- checksum-state )
