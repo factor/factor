@@ -481,8 +481,6 @@ DEFER: blahy
 [ "IN: parser.tests USE: kernel TUPLE: blahy < tuple ; : blahy ( -- ) ; TUPLE: blahy < tuple ; : blahy ( -- ) ;" eval( -- ) ]
 [ error>> error>> def>> \ blahy eq? ] must-fail-with
 
-[ ] [ f lexer set f file set "Hello world" note. ] unit-test
-
 [ "CHAR: \\u9999999999999" eval( -- n ) ] must-fail
 
 SYMBOLS: a b c ;
