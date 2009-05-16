@@ -3,7 +3,7 @@
 USING: kernel sequences strings fry namespaces make math assocs
 io vectors arrays math.parser math.order combinators
 classes sets unicode.categories compiler.units parser words
-quotations effects memoize accessors locals effects splitting
+quotations memoize accessors locals splitting
 combinators.short-circuit generalizations ;
 IN: peg
 
