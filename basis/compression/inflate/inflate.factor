@@ -200,7 +200,9 @@ PRIVATE>
 : reverse-png-filter ( lines -- filtered )
     dup first [ 0 ] replicate prefix
     [ { 0 0 } prepend  ] map
-    2 clump [ first2 dup [ third ] [ 0 2 rot set-nth ] bi png-unfilter-line ] map concat ;
+    2 clump [
+        first2 dup [ third ] [ 0 2 rot set-nth ] bi png-unfilter-line
+    ] map concat ;
 
 : zlib-inflate ( bytes -- bytes )
     bs:<lsb0-bit-reader>
