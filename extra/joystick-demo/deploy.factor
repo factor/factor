@@ -10,5 +10,4 @@ H{
     { deploy-math? t }
     { "stop-after-last-window?" t }
     { deploy-ui? t }
-    { deploy-compiler? t }
 }

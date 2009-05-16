@@ -32,17 +32,17 @@ void print_string(const char *str)
 
 void print_cell(cell x)
 {
-	printf(cell_FORMAT,x);
+	printf(CELL_FORMAT,x);
 }
 
 void print_cell_hex(cell x)
 {
-	printf(cell_HEX_FORMAT,x);
+	printf(CELL_HEX_FORMAT,x);
 }
 
 void print_cell_hex_pad(cell x)
 {
-	printf(cell_HEX_PAD_FORMAT,x);
+	printf(CELL_HEX_PAD_FORMAT,x);
 }
 
 void print_fixnum(fixnum x)
@@ -53,7 +53,7 @@ void print_fixnum(fixnum x)
 cell read_cell_hex()
 {
 	cell cell;
-	if(scanf(cell_HEX_FORMAT,&cell) < 0) exit(1);
+	if(scanf(CELL_HEX_FORMAT,&cell) < 0) exit(1);
 	return cell;
 };
 

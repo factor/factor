@@ -90,7 +90,7 @@ inline static cell tag_for(cell type)
 	return type < HEADER_TYPE ? type : OBJECT_TYPE;
 }
 
-class object;
+struct object;
 
 struct header {
 	cell value;
@@ -268,8 +268,6 @@ struct quotation : public object {
 	static const cell type_number = QUOTATION_TYPE;
 	/* tagged */
 	cell array;
-	/* tagged */
-	cell compiledp;
 	/* tagged */
 	cell cached_effect;
 	/* tagged */

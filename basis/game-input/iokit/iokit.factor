@@ -3,7 +3,7 @@ kernel cocoa.enumeration destructors math.parser cocoa.application
 sequences locals combinators.short-circuit threads
 namespaces assocs vectors arrays combinators hints alien
 core-foundation.run-loop accessors sequences.private
-alien.c-types math parser game-input vectors ;
+alien.c-types math parser game-input vectors bit-arrays ;
 IN: game-input.iokit
 
 SINGLETON: iokit-game-input-backend
@@ -12,10 +12,11 @@ SYMBOLS: +hid-manager+ +keyboard-state+ +mouse-state+ +controller-states+ ;
 
 iokit-game-input-backend game-input-backend set-global
 
-: hid-manager-matching ( matching-seq -- alien )
-    f 0 IOHIDManagerCreate
-    [ swap >plist IOHIDManagerSetDeviceMatchingMultiple ]
-    keep ;
+: make-hid-manager ( -- alien )
+    f 0 IOHIDManagerCreate ;
+
+: set-hid-manager-matching ( alien matching-seq -- )
+    >plist IOHIDManagerSetDeviceMatchingMultiple ;
 
 : devices-from-hid-manager ( manager -- vector )
     [
@@ -84,9 +85,6 @@ CONSTANT: hat-switch-matching-hash
     slider-matching-hash ?axis ;
 : ?hat-switch ( device -- ? )
     hat-switch-matching-hash ?axis ;
-
-: hid-manager-matching-game-devices ( -- alien )
-    game-devices-matching-seq hid-manager-matching ;
 
 : device-property ( device key -- value )
     <NSString> IOHIDDeviceGetProperty [ plist> ] [ f ] if* ;
@@ -186,7 +184,7 @@ HINTS: record-controller { controller-state alien } ;
         rot ?set-nth
     ] [ 3drop ] if ;
 
-HINTS: record-keyboard { array alien } ;
+HINTS: record-keyboard { bit-array alien } ;
 
 : record-mouse ( mouse-state value -- )
     dup IOHIDValueGetElement {
@@ -285,15 +283,16 @@ M: iokit-game-input-backend reset-mouse
     4 <vector> +controller-states+ set-global
     0 0 0 0 2 <vector> mouse-state boa
         +mouse-state+ set-global
-    256 f <array> +keyboard-state+ set-global ;
+    256 <bit-array> +keyboard-state+ set-global ;
 
 M: iokit-game-input-backend (open-game-input)
-    hid-manager-matching-game-devices {
+    make-hid-manager {
         [ initialize-variables ]
         [ device-matched-callback f IOHIDManagerRegisterDeviceMatchingCallback ]
         [ device-removed-callback f IOHIDManagerRegisterDeviceRemovalCallback ]
         [ device-input-callback f IOHIDManagerRegisterInputValueCallback ]
         [ 0 IOHIDManagerOpen mach-error ]
+        [ game-devices-matching-seq set-hid-manager-matching ]
         [
             CFRunLoopGetMain CFRunLoopDefaultMode
             IOHIDManagerScheduleWithRunLoop

@@ -155,6 +155,7 @@ const primitive_type primitives[] = {
 	primitive_reset_inline_cache_stats,
 	primitive_inline_cache_stats,
 	primitive_optimized_p,
+	primitive_quot_compiled_p,
 };
 
 }

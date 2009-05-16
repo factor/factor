@@ -1,11 +1,21 @@
-USING: kernel ;
+USING: calendar game-input threads ui ui.gadgets.worlds kernel
+method-chains system ;
 IN: tools.deploy.test.8
 
-: literal-merge-test-1 ( -- x ) H{ { "lil" "wayne" } } ;
-: literal-merge-test-2 ( -- x ) H{ { "lil" "wayne" } } ;
+TUPLE: my-world < world ;
 
-: literal-merge-test ( -- )
-    literal-merge-test-1
-    literal-merge-test-2 eq? t assert= ;
+BEFORE: my-world begin-world drop open-game-input ;
 
-MAIN: literal-merge-test
+AFTER: my-world end-world drop close-game-input ;
+
+: test-game-input ( -- )
+    [
+        f T{ world-attributes
+             { world-class my-world }
+             { title "Test" }
+        } open-window
+        1 seconds sleep
+        0 exit
+    ] with-ui ;
+
+MAIN: test-game-input

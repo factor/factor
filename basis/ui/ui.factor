@@ -59,22 +59,28 @@ SYMBOL: windows
     [ ?ungrab-input ]
     [ focus-path f swap focus-gestures ] bi ;
 
-: try-to-open-window ( world -- )
+: set-up-window ( world -- )
     {
-        [ (open-window) ]
         [ handle>> select-gl-context ]
-        [
-            [ begin-world ]
-            [ [ handle>> (close-window) ] [ ui-error ] bi* ]
-            recover
-        ]
+        [ [ title>> ] keep set-title ]
+        [ begin-world ]
         [ resize-world ]
+        [ t >>active? drop ]
+        [ request-focus ]
     } cleave ;
 
+: clean-up-broken-window ( world -- )
+    [
+        dup { [ focused?>> ] [ grab-input?>> ] } 1&&
+        [ handle>> (ungrab-input) ] [ drop ] if
+    ] [ handle>> (close-window) ] bi ;
+
 M: world graft*
-    [ try-to-open-window ]
-    [ [ title>> ] keep set-title ]
-    [ request-focus ] tri ;
+    [ (open-window) ]
+    [
+        [ set-up-window ]
+        [ [ clean-up-broken-window ] [ ui-error ] bi* ] recover
+    ] bi ;
 
 : reset-world ( world -- )
     #! This is used when a window is being closed, but also
@@ -203,11 +209,14 @@ PRIVATE>
 : open-window ( gadget title/attributes -- )
     ?attributes <world> open-world-window ;
 
-: set-fullscreen? ( ? gadget -- )
-    find-world set-fullscreen* ;
+: set-fullscreen ( gadget ? -- )
+    [ find-world ] dip (set-fullscreen) ;
 
 : fullscreen? ( gadget -- ? )
-    find-world fullscreen* ;
+    find-world (fullscreen?) ;
+
+: toggle-fullscreen ( gadget -- )
+    dup fullscreen? not set-fullscreen ;
 
 : raise-window ( gadget -- )
     find-world raise-window* ;

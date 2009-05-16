@@ -181,18 +181,15 @@ M: bson-oid element-data-read ( type -- oid )
     read-longlong
     read-int32 oid boa ;
 
-M: bson-binary-custom element-binary-read ( size type -- dbref )
-    2drop
-    read-cstring
-    read-cstring objref boa ;
-
 M: bson-binary-bytes element-binary-read ( size type -- bytes )
     drop read ;
 
-M: bson-binary-function element-binary-read ( size type -- quot )
+M: bson-binary-custom element-binary-read ( size type -- quot )
     drop read bytes>object ;
 
 PRIVATE>
+
+USE: tools.continuations
 
 : stream>assoc ( exemplar -- assoc bytes-read )
     <state> dup state
