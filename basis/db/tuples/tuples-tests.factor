@@ -1,11 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.files.temp kernel tools.test db db.tuples classes
-db.types continuations namespaces math math.ranges
+db.types continuations namespaces math
 prettyprint calendar sequences db.sqlite math.intervals
 db.postgresql accessors random math.bitwise system
 math.ranges strings urls fry db.tuples.private db.private
 db.tester ;
+FROM: math.ranges => [a,b] ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real

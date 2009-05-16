@@ -4,12 +4,9 @@ USING: accessors alien.c-types arrays assocs combinators
 continuations environment io io.backend io.backend.unix
 io.files io.files.private io.files.unix io.launcher
 io.launcher.unix.parser io.pathnames io.ports kernel math
-namespaces sequences strings system threads unix unix
+namespaces sequences strings system threads unix
 unix.process ;
 IN: io.launcher.unix
-
-! Search unix first
-USE: unix
 
 : get-arguments ( process -- seq )
     command>> dup string? [ tokenize-command ] when ;

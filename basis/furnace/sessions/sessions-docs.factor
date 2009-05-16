@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.streams.string quotations
-strings calendar serialize kernel furnace.db words words.symbol
+strings calendar serialize furnace.db words words.symbol
 kernel ;
 IN: furnace.sessions
 

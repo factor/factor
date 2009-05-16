@@ -1,13 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: debugger classes help help.topics help.crossref help.home kernel models
-compiler.units assocs words vocabs accessors fry arrays
-combinators.short-circuit namespaces sequences models help.apropos
+USING: debugger classes help help.topics help.crossref help.home
+kernel models compiler.units assocs words vocabs accessors fry arrays
+combinators.short-circuit namespaces sequences help.apropos
 combinators ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.tracks ui.gestures ui.gadgets.buttons
 ui.gadgets.packs ui.gadgets.editors ui.gadgets.labels
-ui.gadgets.status-bar ui.gadgets.glass ui.gadgets.borders ui.gadgets.viewports
-ui.tools.common ui.tools.browser.popups ui.tools.browser.history ;
+ui.gadgets.status-bar ui.gadgets.glass ui.gadgets.borders
+ui.gadgets.viewports ui.tools.common ui.tools.browser.popups
+ui.tools.browser.history ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history pane scroller search-field popup ;

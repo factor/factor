@@ -31,7 +31,7 @@ ARTICLE: { "regexp" "intro" } "A quick introduction to regular expressions"
 "To search a file for all lines that match a given regular expression, you could use code like this:"
 { $code <" "file.txt" ascii file-lines [ R/ (f|b)oo+/ re-contains? ] filter "> }
 "To test if a string in its entirety matches a regular expression, the following can be used:"
-{ $example <" USING: regexp prettyprint ; "fooo" R/ (b|f)oo+/ matches? . "> "t" }
+{ $example <" USE: regexp "fooo" R/ (b|f)oo+/ matches? . "> "t" }
 "Regular expressions can't be used for all parsing tasks. For example, they are not powerful enough to match balancing parentheses." ;
 
 ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
