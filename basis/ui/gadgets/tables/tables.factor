@@ -6,7 +6,7 @@ models.illusion namespaces opengl sequences ui.gadgets ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.worlds ui.gestures ui.render ui.pens.solid
 ui.text ui.commands ui.images ui.gadgets.menus ui.gadgets.line-support
 math.rectangles models math.ranges sequences combinators
-combinators.short-circuit fonts locals strings vectors tools.continuations ;
+combinators.short-circuit fonts locals strings vectors ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -67,6 +67,7 @@ IN: ui.gadgets.tables
     new-line-gadget
         swap >>renderer
         swap >>model
+        V{ } clone >>selected-indices
         V{ } clone <model> >>selected-values
         sans-serif-font >>font
         focus-border-color >>focus-border-color
@@ -255,7 +256,7 @@ PRIVATE>
 
 : (selected-rows) ( table -- {row} )
     [ selected-indices>> ] keep
-    [ nth-row [ 1array ] [ drop { } ] if ] curry map concat ;
+    [ nth-row [ 1vector ] [ drop V{ } clone ] if ] curry map concat ;
 
 : selected-rows ( table -- {value} )
     [ (selected-rows) ] [ renderer>> ] bi [ row-value ] curry map ;
