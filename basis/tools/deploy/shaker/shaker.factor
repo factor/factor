@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors io.backend io.streams.c init fry namespaces
-math make assocs kernel parser lexer strings.parser vocabs sequences
-sequences.private words memory kernel.private continuations io
-vocabs.loader system strings sets vectors quotations byte-arrays
-sorting compiler.units definitions generic generic.standard
-generic.single tools.deploy.config combinators classes
-slots.private ;
+math make assocs kernel parser parser.notes lexer strings.parser
+vocabs sequences sequences.private words memory kernel.private
+continuations io vocabs.loader system strings sets vectors quotations
+byte-arrays sorting compiler.units definitions generic
+generic.standard generic.single tools.deploy.config combinators
+classes slots.private ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: command-line
 QUALIFIED: compiler.errors
