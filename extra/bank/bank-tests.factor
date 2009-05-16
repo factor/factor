@@ -1,5 +1,6 @@
 USING: accessors arrays bank calendar kernel math math.functions
 namespaces make tools.test tools.walker ;
+FROM: bank => balance>> ;
 IN: bank.tests
 
 SYMBOL: my-account

@@ -1,4 +1,4 @@
-USING: stack-checker.call-effect tools.test math kernel math effects ;
+USING: stack-checker.call-effect tools.test kernel math effects ;
 IN: stack-checker.call-effect.tests
 
 [ t ] [ \ + (( a b -- c )) execute-effect-unsafe? ] unit-test

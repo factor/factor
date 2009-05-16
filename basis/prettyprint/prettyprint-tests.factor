@@ -91,15 +91,13 @@ unit-test
 
 : check-see ( expect name -- ? )
     [
-        use [ clone ] change
-
         [
             [ parse-fresh drop ] with-compilation-unit
             [
                 "prettyprint.tests" lookup see
             ] with-string-writer "\n" split but-last
         ] keep =
-    ] with-scope ;
+    ] with-interactive-vocabs ;
 
 GENERIC: method-layout ( a -- b )
 

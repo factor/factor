@@ -1,7 +1,7 @@
 USING: html.templates html.templates.chloe
 tools.test io.streams.string kernel sequences ascii boxes
 namespaces xml html.components html.forms
-splitting unicode.categories furnace accessors
+splitting furnace accessors
 html.templates.chloe.compiler ;
 IN: html.templates.chloe.tests
 

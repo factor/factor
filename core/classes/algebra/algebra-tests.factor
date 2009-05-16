@@ -1,6 +1,6 @@
 USING: alien arrays definitions generic assocs hashtables io
 kernel math namespaces parser prettyprint sequences strings
-tools.test vectors words quotations classes classes.algebra
+tools.test words quotations classes classes.algebra
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units growable
 random stack-checker effects kernel.private sbufs math.order

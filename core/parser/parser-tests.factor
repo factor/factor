@@ -87,18 +87,6 @@ IN: parser.tests
     [ "OCT: 999" eval( -- obj ) ] must-fail
     [ "BIN: --0" eval( -- obj ) ] must-fail
 
-    ! Another funny bug
-    [ t ] [
-        [
-            "scratchpad" in set
-            { "scratchpad" "arrays" } set-use
-            [
-                ! This shouldn't modify in/use in the outer scope!
-            ] with-file-vocabs
-
-            use get { "scratchpad" "arrays" } set-use use get =
-        ] with-scope
-    ] unit-test
     DEFER: foo
 
     "IN: parser.tests USING: math prettyprint ; SYNTAX: foo 2 2 + . ;" eval( -- )
@@ -596,7 +584,7 @@ EXCLUDE: qualified.tests.bar => x ;
 ] unit-test
 
 [ [ ] ] [
-    "IN: parser.tests.forward-ref-3 USING: parser.tests.forward-ref-1 parser.tests.forward-ref-2 ; : z ( -- ) x y ;"
+    "IN: parser.tests.forward-ref-3 FROM: parser.tests.forward-ref-1 => x y ; FROM: parser.tests.forward-ref-2 => x y ; : z ( -- ) x y ;"
     <string-reader> "forward-ref-3" parse-stream
 ] unit-test
 
@@ -605,7 +593,7 @@ EXCLUDE: qualified.tests.bar => x ;
 ] unit-test
 
 [ [ ] ] [
-    "USING: parser.tests.forward-ref-1 parser.tests.forward-ref-2 ; IN: parser.tests.forward-ref-3 : x ( -- ) ; : z ( -- ) x y ;"
+    "FROM: parser.tests.forward-ref-1 => x y ; FROM: parser.tests.forward-ref-2 => x y ; IN: parser.tests.forward-ref-3 : x ( -- ) ; : z ( -- ) x y ;"
     <string-reader> "forward-ref-3" parse-stream
 ] unit-test
 
@@ -614,7 +602,7 @@ EXCLUDE: qualified.tests.bar => x ;
 ] unit-test
 
 [ [ ] ] [
-    "IN: parser.tests.forward-ref-3 USING: parser.tests.forward-ref-1 parser.tests.forward-ref-2 ; : z ( -- ) x y ;"
+    "IN: parser.tests.forward-ref-3 FROM: parser.tests.forward-ref-1 => x y ; FROM: parser.tests.forward-ref-2 => x y ; : z ( -- ) x y ;"
     <string-reader> "forward-ref-3" parse-stream
 ] unit-test
 

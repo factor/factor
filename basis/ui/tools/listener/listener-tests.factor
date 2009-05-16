@@ -2,7 +2,7 @@ USING: continuations documents
 ui.tools.listener hashtables kernel namespaces parser sequences
 tools.test ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.panes vocabs words ui.gadgets.debug slots.private
-threads arrays generic threads accessors listener math
+arrays generic threads accessors listener math
 calendar concurrency.promises io ui.tools.common ;
 IN: ui.tools.listener.tests
 
@@ -146,7 +146,7 @@ CONSTANT: text "Hello world.\nThis is a test."
     [ ] [ "listener" get com-end ] unit-test
 ] with-grafted-gadget
 
-[ ] [ \ + <interactor> vocabs>> use-if-necessary ] unit-test
+[ ] [ \ + <interactor> manifest>> use-if-necessary ] unit-test
 
 [ ] [ <listener-gadget> "l" set ] unit-test
 [ ] [ "l" get com-scroll-up ] unit-test
