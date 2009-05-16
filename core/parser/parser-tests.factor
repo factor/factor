@@ -609,3 +609,15 @@ EXCLUDE: qualified.tests.bar => x ;
 [ t ] [
     "z" "parser.tests.forward-ref-3" lookup def>> [ vocabulary>> ] map all-equal?
 ] unit-test
+
+[ [ dup ] ] [
+    "USE: kernel dup" <string-reader> "unuse-test" parse-stream
+] unit-test
+
+[
+    "dup" <string-reader> "unuse-test" parse-stream
+] [ error>> error>> error>> no-word-error? ] must-fail-with
+
+[
+    "USE: kernel UNUSE: kernel dup" <string-reader> "unuse-test" parse-stream
+] [ error>> error>> error>> no-word-error? ] must-fail-with

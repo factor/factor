@@ -251,8 +251,15 @@ M: already-disposed summary drop "Attempting to operate on disposed object" ;
 M: no-current-vocab summary
     drop "Not in a vocabulary; IN: form required" ;
 
-M: no-word-error error.
-    "No word named ``" write name>> write "'' found in current vocabulary search path" print ;
+M: no-word-error summary
+    name>> "No word named ``" "'' found in current vocabulary search path" surround ;
+
+M: no-word-error error. summary print ;
+
+M: ambiguous-use-error summary
+    words>> first name>> "More than one vocabulary defines a word named ``" "''" surround ;
+
+M: ambiguous-use-error error. summary print ;
 
 M: staging-violation summary
     drop

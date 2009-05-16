@@ -8,8 +8,21 @@ IN: vocabs.parser
 
 ERROR: no-word-error name ;
 
+: word-restarts ( possibilities -- restarts )
+    natural-sort
+    [ [ vocabulary>> "Use the " " vocabulary" surround ] keep ] { } map>assoc ;
+
+: word-restarts-with-defer ( name possibilities -- restarts )
+    word-restarts
+    swap "Defer word in current vocabulary" swap 2array
+    suffix ;
+
+: <no-word-error> ( name possibilities -- error restarts )
+    [ drop \ no-word-error boa ] [ word-restarts-with-defer ] 2bi ;
+
 TUPLE: manifest
 current-vocab
+{ search-vocab-names hashtable }
 { search-vocabs vector }
 { qualified-vocabs vector }
 { extra-words vector }
@@ -17,6 +30,7 @@ current-vocab
 
 : <manifest> ( -- manifest )
     manifest new
+        H{ } clone >>search-vocab-names
         V{ } clone >>search-vocabs
         V{ } clone >>qualified-vocabs
         V{ } clone >>extra-words
@@ -24,6 +38,7 @@ current-vocab
 
 M: manifest clone
     call-next-method
+        [ clone ] change-search-vocab-names
         [ clone ] change-search-vocabs
         [ clone ] change-qualified-vocabs
         [ clone ] change-extra-words
@@ -40,12 +55,10 @@ C: <extra-words> extra-words
 
 : clear-manifest ( -- )
     manifest get
+    [ search-vocab-names>> clear-assoc ]
     [ search-vocabs>> delete-all ]
     [ qualified-vocabs>> delete-all ]
-    bi ;
-
-: (use-vocab) ( vocab -- vocab seq )
-    load-vocab manifest get search-vocabs>> ;
+    tri ;
 
 : (add-qualified) ( qualified -- )
     manifest get qualified-vocabs>> push ;
@@ -87,19 +100,33 @@ TUPLE: no-current-vocab ;
     manifest get current-vocab>> vocab-name ".private" ?tail
     [ set-current-vocab ] [ drop ] if ;
 
-: use-vocab ( vocab -- ) (use-vocab) push ;
+: using-vocab? ( vocab -- ? )
+    vocab-name manifest get search-vocab-names>> key? ;
+
+: use-vocab ( vocab -- )
+    dup using-vocab?
+    [ drop ] [
+        manifest get
+        [ [ vocab-name ] dip search-vocab-names>> conjoin ]
+        [ [ load-vocab ] dip search-vocabs>> push ]
+        2bi
+    ] if ;
 
 : auto-use-vocab ( vocab -- )
     [ use-vocab ] [ manifest get auto-used>> push ] bi ;
 
 : auto-used? ( -- ? ) manifest get auto-used>> length 0 > ;
 
-: unuse-vocab ( vocab -- ) (use-vocab) delq ;
+: unuse-vocab ( vocab -- )
+    dup using-vocab? [
+        manifest get
+        [ [ vocab-name ] dip search-vocab-names>> delete-at ]
+        [ [ load-vocab ] dip search-vocabs>> delq ]
+        2bi
+    ] [ drop ] if ;
 
 : only-use-vocabs ( vocabs -- )
-    clear-manifest
-    [ vocab ] V{ } map-as sift
-    manifest get search-vocabs>> push-all ;
+    clear-manifest [ vocab ] filter [ use-vocab ] each ;
 
 TUPLE: qualified vocab prefix words ;
 
@@ -141,7 +168,10 @@ TUPLE: rename word vocab words ;
 
 : unuse-words ( assoc -- ) (use-words) delete ;
 
-ERROR: ambiguous-use-error words ;
+TUPLE: ambiguous-use-error words ;
+
+: <ambiguous-use-error> ( words -- error restarts )
+    [ \ ambiguous-use-error boa ] [ word-restarts ] bi ;
 
 <PRIVATE
 
@@ -154,7 +184,10 @@ ERROR: ambiguous-use-error words ;
     (vocab-search) {
         { 0 [ drop f ] }
         { 1 [ first ] }
-        [ drop ambiguous-use-error ]
+        [
+            drop <ambiguous-use-error> throw-restarts
+            dup [ vocabulary>> ] [ name>> 1array ] bi add-words-from
+        ]
     } case ;
 
 : qualified-search ( name manifest -- word/f )
@@ -168,12 +201,3 @@ PRIVATE>
 
 : search ( name -- word/f )
     manifest get search-manifest ;
-
-: word-restarts ( name possibilities -- restarts )
-    natural-sort
-    [ [ vocabulary>> "Use the " " vocabulary" surround ] keep ] { } map>assoc
-    swap "Defer word in current vocabulary" swap 2array
-    suffix ;
-
-: <no-word-error> ( name possibilities -- error restarts )
-    [ drop \ no-word-error boa ] [ word-restarts ] 2bi ;
