@@ -1,4 +1,4 @@
-USING: alien arrays definitions generic assocs hashtables io
+USING: alien arrays generic assocs hashtables io
 io.streams.string kernel math namespaces parser prettyprint
 sequences strings tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate

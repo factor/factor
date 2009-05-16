@@ -461,7 +461,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
 
 M: ebnf-var build-locals ( code ast -- )
   [
-    "FROM: locals => [let* ; FROM: kernel => dup ; [let* | " %
+    "FROM: locals => [let* ; FROM: kernel => dup nip ; [let* | " %
     name>> % " [ dup ] " %
     " | " %
     %  

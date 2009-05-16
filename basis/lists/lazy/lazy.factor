@@ -178,12 +178,6 @@ M: lazy-filter nil? ( lazy-filter -- bool )
         ] if
     ] if ;
 
-: list>vector ( list -- vector )
-    [ [ , ] leach ] V{ } make ;
-
-: list>array ( list -- array )
-    [ [ , ] leach ] { } make ;
-
 TUPLE: lazy-append list1 list2 ;
 
 C: <lazy-append> lazy-append
