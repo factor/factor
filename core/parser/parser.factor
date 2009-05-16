@@ -5,7 +5,7 @@ sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
 io.files vocabs io.encodings.utf8 source-files classes
 hashtables compiler.units accessors sets lexer vocabs.parser
-effects.parser slots ;
+effects.parser slots parser.notes ;
 IN: parser
 
 : location ( -- loc )
@@ -14,20 +14,6 @@ IN: parser
 
 : save-location ( definition -- )
     location remember-definition ;
-
-SYMBOL: parser-notes
-
-t parser-notes set-global
-
-: parser-notes? ( -- ? )
-    parser-notes get "quiet" get not and ;
-
-: note. ( str -- )
-    parser-notes? [
-        file get [ path>> write ":" write ] when* 
-        lexer get [ line>> number>string write ": " write ] when*
-        "Note:" print dup print
-    ] when drop ;
 
 M: parsing-word stack-effect drop (( parsed -- parsed )) ;
 

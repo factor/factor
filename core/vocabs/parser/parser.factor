@@ -3,7 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel namespaces sequences
 sets strings vocabs sorting accessors arrays compiler.units
-combinators vectors splitting continuations math ;
+combinators vectors splitting continuations math
+parser.notes ;
 IN: vocabs.parser
 
 ERROR: no-word-error name ;
@@ -105,7 +106,7 @@ TUPLE: no-current-vocab ;
 
 : use-vocab ( vocab -- )
     dup using-vocab?
-    [ drop ] [
+    [ vocab-name "Already using ``" "'' vocabulary" surround note. ] [
         manifest get
         [ [ vocab-name ] dip search-vocab-names>> conjoin ]
         [ [ load-vocab ] dip search-vocabs>> push ]
