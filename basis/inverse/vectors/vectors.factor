@@ -5,7 +5,7 @@ IN: inverse.vectors
 
 : undo-nvector ( array n -- ... )
     [ assure-vector ] dip
-    [ assure-length ] [ firstn ] 2bi ; inline
+    firstn ; inline
 
 \ 1vector [ 1 undo-nvector ] define-inverse
 
