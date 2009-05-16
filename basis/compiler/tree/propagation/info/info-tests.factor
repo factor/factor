@@ -1,5 +1,5 @@
 USING: accessors math math.intervals sequences classes.algebra
-math kernel tools.test compiler.tree.propagation.info arrays ;
+kernel tools.test compiler.tree.propagation.info arrays ;
 IN: compiler.tree.propagation.info.tests
 
 [ f ] [ 0.0 -0.0 eql? ] unit-test

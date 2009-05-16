@@ -22,7 +22,7 @@ SYNTAX: TYPEDEF:
     scan scan typedef ;
 
 SYNTAX: C-STRUCT:
-    scan in get parse-definition define-struct ;
+    scan current-vocab parse-definition define-struct ;
 
 SYNTAX: C-UNION:
     scan parse-definition define-union ;

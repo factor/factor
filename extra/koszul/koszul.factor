@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs hashtables assocs io kernel math
+USING: accessors arrays hashtables assocs io kernel math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
 splitting sorting shuffle sets math.order ;

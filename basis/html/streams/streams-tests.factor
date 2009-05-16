@@ -1,6 +1,6 @@
 USING: html.streams html.streams.private accessors io
 io.streams.string io.styles kernel namespaces tools.test
-xml.writer sbufs sequences inspector colors xml.writer
+sbufs sequences inspector colors xml.writer
 classes.predicate prettyprint ;
 IN: html.streams.tests
 

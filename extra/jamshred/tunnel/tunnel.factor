@@ -1,6 +1,7 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors combinators kernel literals locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences specialized-arrays.float vectors jamshred.oint ;
+FROM: jamshred.oint => distance ;
 IN: jamshred.tunnel
 
 CONSTANT: n-segments 5000

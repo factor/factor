@@ -1,12 +1,11 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: colors kernel namespaces models tools.deploy.config
-tools.deploy.config.editor tools.deploy vocabs
-namespaces models.mapping sequences system accessors fry
-ui.gadgets ui.render ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.labels ui.gadgets.editors ui.gadgets.borders ui.gestures
-ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
-ui.tools.browser ;
+USING: colors kernel models tools.deploy.config
+tools.deploy.config.editor tools.deploy vocabs namespaces
+models.mapping sequences system accessors fry ui.gadgets ui.render
+ui.gadgets.buttons ui.gadgets.packs ui.gadgets.labels
+ui.gadgets.editors ui.gadgets.borders ui.gestures ui.commands assocs
+ui.gadgets.tracks ui ui.tools.listener ui.tools.browser ;
 IN: ui.tools.deploy
 
 TUPLE: deploy-gadget < pack vocab settings ;

@@ -38,13 +38,12 @@ output history flag mailbox thread waiting token-model word-model popup ;
         [ thread>> dup [ thread-registered? ] when ]
     } 1&& not ;
 
-SLOT: vocabs
+SLOT: manifest
 
-M: interactor vocabs>>
+M: interactor manifest>>
     dup interactor-busy? [ drop f ] [
-        use swap
         interactor-continuation name>>
-        assoc-stack
+        manifest swap assoc-stack
     ] if ;
 
 : vocab-exists? ( name -- ? )
@@ -56,7 +55,9 @@ M: vocab-completion (word-at-caret)
     drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ;
 
 M: word-completion (word-at-caret)
-    vocabs>> assoc-stack ;
+    manifest>> dup [
+        '[ _ _ search-manifest ] [ drop f ] recover
+    ] [ 2drop f ] if ;
 
 M: char-completion (word-at-caret)
     2drop f ;
@@ -300,15 +301,15 @@ M: listener-operation invoke-command ( target command -- )
 : clear-stack ( listener -- )
     [ [ clear ] \ clear ] dip (call-listener) ;
 
-: use-if-necessary ( word seq -- )
+: use-if-necessary ( word manifest -- )
     2dup [ vocabulary>> ] dip and [
-        2dup [ assoc-stack ] keep = [ 2drop ] [
-            [ vocabulary>> vocab-words ] dip push
-        ] if
+        manifest [
+            vocabulary>> use-vocab
+        ] with-variable
     ] [ 2drop ] if ;
 
 M: word accept-completion-hook
-    interactor>> vocabs>> use-if-necessary ;
+    interactor>> manifest>> use-if-necessary ;
 
 M: object accept-completion-hook 2drop ;
 

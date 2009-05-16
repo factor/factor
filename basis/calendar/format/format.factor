@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math math.order math.parser math.functions kernel
 sequences io accessors arrays io.streams.string splitting
-combinators accessors calendar calendar.format.macros present ;
+combinators calendar calendar.format.macros present ;
 IN: calendar.format
 
 : pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;

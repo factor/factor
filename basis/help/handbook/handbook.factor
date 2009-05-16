@@ -248,14 +248,14 @@ ARTICLE: "handbook-language-reference" "The language"
 { $subsection "namespaces-global" }
 { $subsection "values" }
 { $heading "Abstractions" }
-{ $subsection "errors" }
+{ $subsection "fry" }
 { $subsection "objects" }
+{ $subsection "errors" }
 { $subsection "destructors" }
-{ $subsection "continuations" }
 { $subsection "memoize" }
 { $subsection "parsing-words" }
 { $subsection "macros" }
-{ $subsection "fry" }
+{ $subsection "continuations" }
 { $heading "Program organization" }
 { $subsection "vocabs.loader" }
 "Vocabularies tagged " { $link T{ vocab-tag { name "extensions" } } } " implement various additional language abstractions." ;

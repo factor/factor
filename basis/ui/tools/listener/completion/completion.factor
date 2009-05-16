@@ -20,7 +20,7 @@ SLOT: history
     [ dup string>> { { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
     <reversed> ;
 
-TUPLE: word-completion vocabs ;
+TUPLE: word-completion manifest ;
 C: <word-completion> word-completion
 
 SINGLETONS: vocab-completion char-completion history-completion ;
@@ -62,8 +62,8 @@ M: definition-completion row-columns
     2array ;
 
 M: word-completion row-color
-    [ vocabulary>> ] [ vocabs>> ] bi* {
-        { [ 2dup [ vocab-words ] dip memq? ] [ COLOR: black ] }
+    [ vocabulary>> ] [ manifest>> ] bi* {
+        { [ 2dup search-vocabs>> memq? ] [ COLOR: black ] }
         { [ over ".private" tail? ] [ COLOR: dark-red ] }
         [ COLOR: dark-gray ]
     } cond 2nip ;
@@ -87,7 +87,7 @@ M: vocab-completion row-color
     [ { 0 0 } ] 2dip doc-range ;
 
 : completion-mode ( interactor -- symbol )
-    [ vocabs>> ] [ editor-caret ] [ model>> ] tri up-to-caret " \r\n" split
+    [ manifest>> ] [ editor-caret ] [ model>> ] tri up-to-caret " \r\n" split
     {
         { [ dup { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ] [ 2drop vocab-completion ] }
         { [ dup complete-CHAR:? ] [ 2drop char-completion ] }

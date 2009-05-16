@@ -1,5 +1,4 @@
-USING: kernel system alien.syntax combinators vocabs.loader
-system ;
+USING: kernel system alien.syntax combinators vocabs.loader ;
 IN: unix.types
 
 TYPEDEF: char int8_t

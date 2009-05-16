@@ -90,16 +90,6 @@ M: float (serialize) ( obj -- )
     CHAR: F write1
     double>bits serialize-cell ;
 
-M: complex (serialize) ( obj -- )
-    CHAR: c write1
-    [ real-part (serialize) ]
-    [ imaginary-part (serialize) ] bi ;
-
-M: ratio (serialize) ( obj -- )
-    CHAR: r write1
-    [ numerator (serialize) ]
-    [ denominator (serialize) ] bi ;
-
 : serialize-seq ( obj code -- )
     [
         write1
@@ -205,12 +195,6 @@ SYMBOL: deserialized
 : deserialize-float ( -- float )
     deserialize-cell bits>double ;
 
-: deserialize-ratio ( -- ratio )
-    (deserialize) (deserialize) / ;
-
-: deserialize-complex ( -- complex )
-    (deserialize) (deserialize) rect> ;
-
 : (deserialize-string) ( -- string )
     deserialize-cell read utf8 decode ;
 
@@ -279,7 +263,6 @@ SYMBOL: deserialized
             { CHAR: T [ deserialize-tuple ] }
             { CHAR: W [ deserialize-wrapper ] }
             { CHAR: a [ deserialize-array ] }
-            { CHAR: c [ deserialize-complex ] }
             { CHAR: h [ deserialize-hashtable ] }
             { CHAR: m [ deserialize-negative-integer ] }
             { CHAR: n [ deserialize-false ] }
@@ -287,7 +270,6 @@ SYMBOL: deserialized
             { CHAR: o [ deserialize-unknown ] }
             { CHAR: p [ deserialize-positive-integer ] }
             { CHAR: q [ deserialize-quotation ] }
-            { CHAR: r [ deserialize-ratio ] }
             { CHAR: s [ deserialize-string ] }
             { CHAR: w [ deserialize-word ] }
             { CHAR: G [ deserialize-word ] }

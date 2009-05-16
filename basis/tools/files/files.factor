@@ -74,9 +74,9 @@ M: object file-spec>string ( file-listing spec -- string )
 
 : list-files-slow ( listing-tool -- array )
     [ path>> ] [ sort>> ] [ specs>> ] tri '[
-            [ dup name>> file-info file-listing boa ] map
-            _ [ sort-by ] when*
-            [ _ [ file-spec>string ] with map ] map
+        [ dup name>> link-info file-listing boa ] map
+        _ [ sort-by ] when*
+        [ _ [ file-spec>string ] with map ] map
     ] with-directory-entries ; inline
 
 : list-files ( listing-tool -- array ) 
@@ -115,11 +115,14 @@ SYMBOLS: +device-name+ +mount-point+ +type+
     [ file-systems-info ]
     [ [ unparse ] map ] bi prefix simple-table. ;
 
-: file-systems. ( -- )
+CONSTANT: default-file-systems-spec
     {
         +device-name+ +available-space+ +free-space+ +used-space+
         +total-space+ +percent-used+ +mount-point+
-    } print-file-systems ;
+    }
+
+: file-systems. ( -- )
+    default-file-systems-spec print-file-systems ;
 
 {
     { [ os unix? ] [ "tools.files.unix" ] }
