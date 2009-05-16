@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays byte-vectors generic hashtables io
+USING: accessors arrays byte-arrays byte-vectors generic hashtables
 assocs kernel math namespaces make sequences strings sbufs vectors
 words prettyprint.config prettyprint.custom prettyprint.sections
 quotations io io.pathnames io.styles math.parser effects classes.tuple
