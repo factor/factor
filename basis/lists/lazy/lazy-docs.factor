@@ -14,7 +14,7 @@ ARTICLE: "lists.lazy" "Lazy lists"
 
 ARTICLE: { "lists.lazy" "combinators" } "Combinators for manipulating lazy lists"
 "The following combinators create lazy lists from other lazy lists:"
-{ $subsection lmap }
+{ $subsection lazy-map }
 { $subsection lfilter }
 { $subsection luntil }
 { $subsection lwhile }
