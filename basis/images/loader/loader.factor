@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: constructors kernel splitting unicode.case combinators
 accessors images.bitmap images.tiff images io.pathnames
-images.jpeg images.png ;
+images.png ;
 IN: images.loader
 
 ERROR: unknown-image-extension extension ;
@@ -12,8 +12,8 @@ ERROR: unknown-image-extension extension ;
         { "bmp" [ bitmap-image ] }
         { "tif" [ tiff-image ] }
         { "tiff" [ tiff-image ] }
-        { "jpg" [ jpeg-image ] }
-        { "jpeg" [ jpeg-image ] }
+        ! { "jpg" [ jpeg-image ] }
+        ! { "jpeg" [ jpeg-image ] }
         { "png" [ png-image ] }
         [ unknown-image-extension ]
     } case ;

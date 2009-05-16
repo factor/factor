@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
-namespaces sequences words arrays layouts effects math
-layouts classes.private classes.union classes.mixin
+namespaces sequences words arrays effects math
+classes.private classes.union classes.mixin
 classes.predicate quotations ;
 IN: classes
 

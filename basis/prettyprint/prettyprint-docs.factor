@@ -1,5 +1,5 @@
 USING: prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint.sections prettyprint.private help.markup help.syntax
+prettyprint.sections help.markup help.syntax
 io kernel words definitions quotations strings generic classes
 prettyprint.private ;
 IN: prettyprint
@@ -161,10 +161,6 @@ $nl
 
 ABOUT: "prettyprint"
 
-HELP: with-pprint
-{ $values { "obj" object } { "quot" quotation } }
-{ $description "Sets up the prettyprinter and calls the quotation in a new scope. The quotation should add sections to the top-level block. When the quotation returns, the top-level block is printed to " { $link output-stream } "." } ;
-
 HELP: pprint
 { $values { "obj" object } }
 { $description "Prettyprints an object to " { $link output-stream } ". Output is influenced by many variables; see " { $link "prettyprint-variables" } "." }
@@ -225,8 +221,3 @@ HELP: .r
 
 HELP: .s
 { $description "Displays the contents of the data stack, with the top of the stack printed first." } ;
-
-HELP: in.
-{ $values { "vocab" "a vocabulary specifier" } }
-{ $description "Prettyprints a " { $snippet "IN:" } " declaration." }
-$prettyprinting-note ;

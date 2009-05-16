@@ -29,6 +29,6 @@ PREDICATE: tuple-c < tuple-b slot>> ;
 
 GENERIC: ptest ( tuple -- )
 M: tuple-a ptest drop ;
-IN: classes.predicate.tests USING: kernel ; M: tuple-c ptest drop ;
+M: tuple-c ptest drop ;
 
 [ ] [ tuple-b new ptest ] unit-test

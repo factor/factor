@@ -152,7 +152,6 @@ ARTICLE: "compositional-examples" "Examples of compositional combinator usage"
 { $code ": subtract-n ( seq n -- seq' ) swap [ over - ] map nip ;" }
 "Three shuffle words are required to pass the value around. Instead, the loop-invariant value can be partially applied to a quotation using " { $link curry } ", yielding a new quotation that is passed to " { $link map } ":"
 { $example
-  "USING: kernel math prettyprint sequences ;"
   ": subtract-n ( seq n -- seq' ) [ - ] curry map ;"
   "{ 10 20 30 } 5 subtract-n ."
   "{ 5 15 25 }"
@@ -163,7 +162,6 @@ $nl
 { $code ": n-subtract ( n seq -- seq' ) swap [ swap - ] curry map ;" }
 "Since this pattern comes up often, " { $link with } " encapsulates it:"
 { $example
-  "USING: kernel math prettyprint sequences ;"
   ": n-subtract ( n seq -- seq' ) [ - ] with map ;"
   "30 { 10 20 30 } n-subtract ."
   "{ 20 10 0 }"

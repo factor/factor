@@ -54,21 +54,21 @@ ARTICLE: { "lists" "manipulation" } "Manipulating lists"
 { $subsection lcut } ;
 
 HELP: cons 
-{ $values { "car" "the head of the list cell" } { "cdr" "the tail of the list cell" } { "cons" "a cons object" } }
+{ $values { "car" "the head of the list cell" } { "cdr" "the tail of the list cell" } { "cons" list } }
 { $description "Constructs a cons cell." } ;
 
 HELP: swons 
-{ $values { "cdr" "the tail of the list cell" } { "car" "the head of the list cell" } { "cons" "a cons object" } }
+{ $values { "cdr" "the tail of the list cell" } { "car" "the head of the list cell" } { "cons" list } }
 { $description "Constructs a cons cell." } ;
 
 { cons swons uncons unswons } related-words
 
 HELP: car
-{ $values { "cons" "a cons object" } { "car" "the first item in the list" } }
+{ $values { "cons" list } { "car" "the first item in the list" } }
 { $description "Returns the first item in the list." } ;
 
 HELP: cdr
-{ $values { "cons" "a cons object" } { "cdr" "a cons object" } }
+{ $values { "cons" list } { "cdr" list } }
 { $description "Returns the tail of the list." } ;
 
 { car cdr } related-words
@@ -86,51 +86,51 @@ HELP: nil?
 { 1list 2list 3list } related-words
 
 HELP: 1list
-{ $values { "obj" "an object" } { "cons" "a cons object" } }
+{ $values { "obj" "an object" } { "cons" list } }
 { $description "Create a list with 1 element." } ;
 
 HELP: 2list
-{ $values { "a" "an object" } { "b" "an object" } { "cons" "a cons object" } }
+{ $values { "a" "an object" } { "b" "an object" } { "cons" list } }
 { $description "Create a list with 2 elements." } ;
 
 HELP: 3list
-{ $values { "a" "an object" } { "b" "an object" } { "c" "an object" } { "cons" "a cons object" } }
+{ $values { "a" "an object" } { "b" "an object" } { "c" "an object" } { "cons" list } }
 { $description "Create a list with 3 elements." } ;
 
 HELP: lnth
-{ $values { "n" "an integer index" } { "list" "a cons object" } { "elt" "the element at the nth index" } }
+{ $values { "n" "an integer index" } { "list" list } { "elt" "the element at the nth index" } }
 { $description "Outputs the nth element of the list." } 
 { $see-also llength cons car cdr } ;
 
 HELP: llength
-{ $values { "list" "a cons object" } { "n" "a non-negative integer" } }
+{ $values { "list" list } { "n" "a non-negative integer" } }
 { $description "Outputs the length of the list. This should not be called on an infinite list." } 
 { $see-also lnth cons car cdr } ;
 
 HELP: uncons
-{ $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
+{ $values { "cons" list } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
 { $description "Put the head and tail of the list on the stack." } ;
 
 HELP: unswons
-{ $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
+{ $values { "cons" list } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
 { $description "Put the head and tail of the list on the stack." } ;
 
 { leach foldl lmap>array } related-words
 
 HELP: leach
-{ $values { "list" "a cons object" } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "list" list } { "quot" { $quotation "( obj -- )" } } }
 { $description "Call the quotation for each item in the list." } ;
 
 HELP: foldl
-{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
+{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a left-assocative order) using a binary operation and outputs the final result." } ;
 
 HELP: foldr
-{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
+{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a right-assocative order) using a binary operation, and outputs the final result." } ;
 
 HELP: lmap
-{ $values { "list" "a cons object" } { "quot" { $quotation "( old -- new )" } } { "result" "the final result" } }
+{ $values { "list" list } { "quot" { $quotation "( old -- new )" } } { "result" "the final result" } }
 { $description "Applies the quotation to each element of the list in order, collecting the new elements into a new list." } ;
 
 HELP: lreverse
@@ -138,23 +138,15 @@ HELP: lreverse
 { $description "Reverses the input list, outputing a new, reversed list. The output is a strict cons list." } ;
 
 HELP: list>array    
-{ $values { "list" "a cons object" } { "array" array } }
-{ $description "Turns the given cons object into an array, maintaing order." } ;
-
-HELP: sequence>cons
-{ $values { "sequence" sequence } { "list" cons } }
-{ $description "Turns the given array into a cons object, maintaing order." } ;
+{ $values { "list" list } { "array" array } }
+{ $description "Convert a list into an array." } ;
 
 HELP: deep-list>array
 { $values { "list" list } { "array" array } }
-{ $description "Recursively turns the given cons object into an array, maintaing order and also converting nested lists." } ;
-
-HELP: deep-sequence>cons
-{ $values { "sequence" sequence } { "cons" cons } }
-{ $description "Recursively turns the given sequence into a cons object, maintaing order and also converting nested lists." } ;
+{ $description "Recursively turns the given cons object into an array, maintaining order and also converting nested lists." } ;
 
 HELP: traverse    
-{ $values { "list"  "a cons object" } { "pred" { $quotation "( list/elt -- ? )" } }
+{ $values { "list"  list } { "pred" { $quotation "( list/elt -- ? )" } }
           { "quot" { $quotation "( list/elt -- result)" } }  { "result" "a new cons object" } }
 { $description "Recursively traverses the list object, replacing any elements (which can themselves be sublists) that pred" 
  " returns true for with the result of applying quot to." } ;

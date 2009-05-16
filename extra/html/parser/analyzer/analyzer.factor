@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs html.parser kernel math sequences strings ascii
-arrays generalizations shuffle unicode.case namespaces make
+arrays generalizations shuffle namespaces make
 splitting http accessors io combinators http.client urls
 urls.encoding fry prettyprint sets ;
 IN: html.parser.analyzer

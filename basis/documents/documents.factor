@@ -3,6 +3,7 @@
 USING: accessors arrays io kernel math models namespaces make
 sequences strings splitting combinators unicode.categories
 math.order math.ranges fry locals ;
+FROM: models => change-model ;
 IN: documents
 
 : +col ( loc n -- newloc ) [ first2 ] dip + 2array ;

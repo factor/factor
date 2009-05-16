@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel db.errors peg.ebnf strings sequences math
-combinators.short-circuit accessors math.parser quoting ;
+combinators.short-circuit accessors math.parser quoting
+locals ;
 IN: db.errors.postgresql
 
 EBNF: parse-postgresql-sql-error

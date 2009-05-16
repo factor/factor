@@ -1,7 +1,7 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel math sequences vectors math.order
-sequences sequences.private math.order ;
+USING: accessors arrays kernel math vectors math.order
+sequences sequences.private ;
 IN: sorting
 
 ! Optimized merge-sort:
