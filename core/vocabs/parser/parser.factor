@@ -26,6 +26,10 @@ M: manifest clone
         [ clone ] change-qualified-vocabs
         [ clone ] change-extra-words ;
 
+TUPLE: extra-words words ;
+
+C: <extra-words> extra-words
+
 <PRIVATE
 
 : clear-manifest ( -- )
@@ -48,10 +52,6 @@ M: manifest clone
 
 : (lookup) ( name assoc -- word/f )
     at dup forward-reference? [ drop f ] when ;
-
-TUPLE: extra-words words ;
-
-C: <extra-words> extra-words
 
 : (use-words) ( assoc -- extra-words seq )
     <extra-words> manifest get qualified-vocabs>> ;

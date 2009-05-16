@@ -326,3 +326,19 @@ M: block long-section ( block -- )
             ] each
         ] each
     ] if-nonempty ;
+
+: make-pprint ( obj quot -- block in use )
+    [
+        0 position set
+        H{ } clone pprinter-use set
+        V{ } clone recursion-check set
+        V{ } clone pprinter-stack set
+        over <object
+        call
+        pprinter-block
+        pprinter-in get
+        pprinter-use get keys
+    ] with-scope ; inline
+
+: with-pprint ( obj quot -- )
+    make-pprint 2drop do-pprint ; inline
