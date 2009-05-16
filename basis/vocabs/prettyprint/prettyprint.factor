@@ -77,8 +77,8 @@ PRIVATE>
     nl
     { { font-style bold } { font-name "sans-serif" } } [
         "Restarts were invoked adding vocabularies to the search path." print
-        "To avoid doing this in the future, add the following USING:" print
-        "and IN: forms at the top of the source file:" print nl
+        "To avoid doing this in the future, add the following forms" print
+        "at the top of the source file:" print nl
     ] with-style
     { { page-color T{ rgba f 0.8 0.8 0.8 1.0 } } }
     [ manifest get pprint-manifest ] with-nesting
