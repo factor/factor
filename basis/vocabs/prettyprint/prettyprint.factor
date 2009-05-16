@@ -64,14 +64,19 @@ M: rename pprint-qualified ( rename -- )
 
 PRIVATE>
 
-: pprint-manifest ( manifest -- )
+: (pprint-manifest ( manifest -- quots )
     [
         [ search-vocabs>> [ '[ _ pprint-using ] , ] unless-empty ]
         [ qualified-vocabs>> [ extra-words? not ] filter [ '[ _ pprint-qualified ] , ] each ]
         [ current-vocab>> [ '[ _ pprint-in ] , ] when* ]
         tri
-    ] { } make
+    ] { } make ;
+
+: pprint-manifest) ( quots -- )
     [ nl ] [ call( -- ) ] interleave ;
+
+: pprint-manifest ( manifest -- )
+    (pprint-manifest pprint-manifest) ;
 
 [
     nl

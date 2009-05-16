@@ -1,9 +1,9 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables io kernel math assocs
 namespaces make sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
-accessors sets ;
+accessors sets vocabs.parser combinators vocabs ;
 IN: prettyprint.sections
 
 ! State
@@ -19,8 +19,16 @@ TUPLE: pprinter last-newline line-count indent ;
 
 : <pprinter> ( -- pprinter ) 0 1 0 pprinter boa ;
 
+: (record-vocab) ( vocab -- )
+    dup pprinter-in get dup [ vocab-name ] when =
+    [ drop ] [ pprinter-use get conjoin ] if ;
+
 : record-vocab ( word -- )
-    vocabulary>> [ pprinter-use get conjoin ] when* ;
+    vocabulary>> {
+        { f [ ] }
+        { "syntax" [ ] }
+        [ (record-vocab) ]
+    } case ;
 
 ! Utility words
 : line-limit? ( -- ? )
@@ -327,7 +335,14 @@ M: block long-section ( block -- )
         ] each
     ] if-nonempty ;
 
-: make-pprint ( obj quot -- block in use )
+: pprinter-manifest ( -- manifest )
+    <manifest>
+    [ [ pprinter-use get keys >vector ] dip (>>search-vocabs) ]
+    [ [ pprinter-in get ] dip (>>current-vocab) ]
+    [ ]
+    tri ;
+
+: make-pprint ( obj quot -- block manifest )
     [
         0 position set
         H{ } clone pprinter-use set
@@ -336,9 +351,8 @@ M: block long-section ( block -- )
         over <object
         call
         pprinter-block
-        pprinter-in get
-        pprinter-use get keys
+        pprinter-manifest
     ] with-scope ; inline
 
 : with-pprint ( obj quot -- )
-    make-pprint 2drop do-pprint ; inline
+    make-pprint drop do-pprint ; inline
