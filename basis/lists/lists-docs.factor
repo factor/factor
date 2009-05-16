@@ -14,7 +14,7 @@ ARTICLE: "lists" "Lists"
 { $vocab-subsection "Lazy lists" "lists.lazy" } ;
 
 ARTICLE: { "lists" "protocol" } "The list protocol"
-"Lists are instances of a mixin class"
+"Lists are instances of a mixin class:"
 { $subsection list }
 "Instances of the mixin must implement the following words:"
 { $subsection car }
@@ -25,8 +25,7 @@ ARTICLE: { "lists" "strict" } "Constructing strict lists"
 "Strict lists are simply cons cells where the car and cdr have already been evaluated. These are the lists of Lisp. To construct a strict list, the following words are provided:"
 { $subsection cons }
 { $subsection swons }
-{ $subsection sequence>cons }
-{ $subsection deep-sequence>cons }
+{ $subsection sequence>list }
 { $subsection 1list }
 { $subsection 2list }
 { $subsection 3list } ;
@@ -38,7 +37,6 @@ ARTICLE: { "lists" "combinators" } "Combinators for lists"
 { $subsection foldl }
 { $subsection foldr }
 { $subsection lmap>array }
-{ $subsection lmap-as }
 { $subsection traverse } ;
 
 ARTICLE: { "lists" "manipulation" } "Manipulating lists"
@@ -141,10 +139,6 @@ HELP: list>array
 { $values { "list" list } { "array" array } }
 { $description "Convert a list into an array." } ;
 
-HELP: deep-list>array
-{ $values { "list" list } { "array" array } }
-{ $description "Recursively turns the given cons object into an array, maintaining order and also converting nested lists." } ;
-
 HELP: traverse    
 { $values { "list"  list } { "pred" { $quotation "( list/elt -- ? )" } }
           { "quot" { $quotation "( list/elt -- result)" } }  { "result" "a new cons object" } }
@@ -170,6 +164,3 @@ HELP: lmap>array
 { $values { "list" list } { "quot" quotation } { "array" array } }
 { $description "Executes the quotation on each element of the list, collecting the results in an array." } ;
 
-HELP: lmap-as
-{ $values { "list" list } { "quot" quotation } { "exemplar" sequence } { "sequence" sequence } }
-{ $description "Executes the quotation on each element of the list, collecting the results in a sequence of the type given by the exemplar." } ;
