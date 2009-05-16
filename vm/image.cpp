@@ -187,13 +187,13 @@ static void fixup_word(word *word)
 
 static void fixup_quotation(quotation *quot)
 {
-	if(quot->compiledp == F)
-		quot->xt = (void *)lazy_jit_compile;
-	else
+	if(quot->code)
 	{
 		code_fixup(&quot->xt);
 		code_fixup(&quot->code);
 	}
+	else
+		quot->xt = (void *)lazy_jit_compile;
 }
 
 static void fixup_alien(alien *d)

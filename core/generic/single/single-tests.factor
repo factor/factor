@@ -275,3 +275,8 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
 
 [ f ] [ "xyz" "generic.single.tests" lookup pic-def>> ] unit-test
 [ f ] [ "xyz" "generic.single.tests" lookup "decision-tree" word-prop ] unit-test
+
+! Corner case
+[ "IN: generic.single.tests GENERIC# broken-generic# -1 ( a -- b )" eval( -- ) ]
+[ error>> bad-dispatch-position? ]
+must-fail-with

@@ -12,14 +12,12 @@ M: game-world draw*
     swap >>tick-slice draw-world ;
 
 M: game-world begin-world
+    open-game-input 
     dup [ tick-length ] [ ] bi <game-loop> [ >>game-loop ] keep start-loop
-    drop
-    open-game-input ;
-
-M: game-world end-world
-    close-game-input
-    [ [ stop-loop ] when* f ] change-game-loop
     drop ;
 
-M: game-world focusable-child* drop t ;
+M: game-world end-world
+    [ [ stop-loop ] when* f ] change-game-loop
+    close-game-input
+    drop ;
 

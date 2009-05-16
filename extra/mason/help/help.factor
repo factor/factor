@@ -6,7 +6,7 @@ IN: mason.help
 
 : make-help-archive ( -- )
     "factor/temp" [
-        { "tar" "cfz" "docs.tar.gz" "docs" } try-output-process
+        { "tar" "cfz" "docs.tar.gz" "docs" } short-running-process
     ] with-directory ;
 
 : upload-help-archive ( -- )
