@@ -56,9 +56,9 @@ GENERIC: (>>selected-value) ( val table -- )
 : >>selected-value ( table val -- table ) over (>>selected-value) ;
 
 M: table selected-value>> selected-values>> [ [ f ] [ peek ] if-empty ] <illusion> ;
-M: table (>>selected-value) [ [ 1vector ] <illusion> ] dip (>>selected-values) ;
+M: table (>>selected-value) [ [ [ 1vector ] [ V{ } clone ] if* ] <illusion> ] dip (>>selected-values) ;
 M: table selected-index>> selected-indices>> [ f ] [ peek ] if-empty ;
-M: table (>>selected-index) [ 1vector ] dip (>>selected-indices) ;
+M: table (>>selected-index) [ [ 1vector ] [ V{ } clone ] if* ] dip (>>selected-indices) ;
 
 IN: ui.gadgets.tables
 : push-selected-index ( table n -- table ) 2dup swap selected-indices>> index [ drop ] [ over selected-indices>> push ] if ;
