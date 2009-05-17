@@ -122,16 +122,22 @@ CONSTANT: K-384
 ALIAS: K-512 K-384
 
 : <sha-224-state> ( -- sha2-state )
-    64 sha-224-state new-checksum-state
+    sha-224-state new-checksum-state
+        64 >>block-size
         K-256 >>K
         initial-H-224 >>H
         4 >>word-size ;
 
 : <sha-256-state> ( -- sha2-state )
-    64 sha-256-state new-checksum-state
+    sha-256-state new-checksum-state
+        64 >>block-size
         K-256 >>K
         initial-H-256 >>H
         4 >>word-size ;
+
+M: sha-224 initialize-checksum-state drop <sha-224-state> ;
+
+M: sha-256 initialize-checksum-state drop <sha-256-state> ;
 
 : s0-256 ( x -- x' )
     [
