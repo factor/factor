@@ -56,6 +56,16 @@ M: mapped-model (model-changed)
     set-model ;
 M: mapped-model model-activated [ model>> ] keep model-changed ;
 
+TUPLE: frp-product < multi-model ;
+: <frp-product> ( models -- product ) frp-product <multi-model> ;
+M: frp-product model-changed
+    nip
+    dup dependencies>> [ value>> ] all?
+    [ dup [ value>> ] product-value >>value notify-connections
+    ] [ drop ] if ;
+M: frp-product update-model
+    dup value>> swap [ set-model ] set-product-value ;
+M: frp-product model-activated dup model-changed ;
 
 ! Gadgets
 : <frp-button> ( text -- button ) [ t swap set-control-value ] <border-button> f <basic> >>model ;
