@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays debugger generic hashtables io assocs kernel.private
-kernel math memory namespaces make parser prettyprint sequences
-vectors words system splitting init io.files vocabs vocabs.loader
-debugger continuations ;
+USING: arrays assocs continuations debugger generic hashtables
+init io io.files kernel kernel.private make math memory
+namespaces parser prettyprint sequences splitting system
+vectors vocabs vocabs.loader words ;
 QUALIFIED: bootstrap.image.private
 IN: bootstrap.stage1
 
