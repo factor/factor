@@ -44,7 +44,7 @@ M: word print-stack-effect? drop t ;
 <PRIVATE
 
 : seeing-word ( word -- )
-    vocabulary>> vocab pprinter-in set ;
+    vocabulary>> dup [ vocab ] when pprinter-in set ;
 
 : word-synopsis ( word -- )
     {
