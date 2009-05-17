@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays checksums checksums.md5 checksums.md5.private
-checksums.sha1 combinators fry io io.binary io.encodings.binary
-io.files io.streams.byte-array kernel math math.vectors memoize
-sequences locals accessors ;
+USING: accessors arrays checksums combinators fry io io.binary
+io.encodings.binary io.files io.streams.byte-array kernel
+locals math math.vectors memoize sequences ;
 IN: checksums.hmac
 
 <PRIVATE
