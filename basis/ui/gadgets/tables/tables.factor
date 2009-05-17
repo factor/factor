@@ -57,8 +57,8 @@ M: table selected-value>> selected-values>> [ in>out ] <illusion> ;
 M: table (>>selected-value) [ [ out>in ] <illusion> ] dip (>>selected-values) ;
 M: table selected-index>> selected-indices>> in>out ;
 M: table (>>selected-index) [ out>in ] dip (>>selected-indices) ;
-M: table selected-index*>> selected-indices*>> in>out ;
-M: table (>>selected-index*) [ out>in ] dip (>>selected-indices*) ;
+M: table selected-index*>> selected-indices*>> [ in>out ] <illusion> ;
+M: table (>>selected-index*) [ [ out>in ] <illusion> ] dip (>>selected-indices*) ;
 
 IN: ui.gadgets.tables
 : push-selected-index ( table n -- table ) 2dup swap selected-indices>> index [ drop ] [ over selected-indices>> push ] if ;
