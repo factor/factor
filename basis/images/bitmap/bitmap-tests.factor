@@ -17,9 +17,9 @@ CONSTANT: test-41 "vocab:images/test-images/41red24bit.bmp"
 CONSTANT: test-42 "vocab:images/test-images/42red24bit.bmp"
 CONSTANT: test-43 "vocab:images/test-images/43red24bit.bmp"
 
-{
-    $ test-bitmap8
-    $ test-bitmap24
+${
+    test-bitmap8
+    test-bitmap24
     "vocab:ui/render/test/reference.bmp"
 } [ [ ] swap [ load-image drop ] curry unit-test ] each
 
@@ -34,11 +34,11 @@ CONSTANT: test-43 "vocab:images/test-images/43red24bit.bmp"
 [
     t   
 ] [
-    {
-        $ test-40
-        $ test-41
-        $ test-42
-        $ test-43
-        $ test-bitmap24
+    ${
+        test-40
+        test-41
+        test-42
+        test-43
+        test-bitmap24
     } [ test-bitmap-save ] all?
 ] unit-test
