@@ -14,9 +14,12 @@ INSTANCE: md5 stream-checksum
 TUPLE: md5-state < checksum-state state old-state ;
 
 : <md5-state> ( -- md5 )
-    64 md5-state new-checksum-state
+    md5-state new-checksum-state
+        64 >>block-size
         { HEX: 67452301 HEX: efcdab89 HEX: 98badcfe HEX: 10325476 }
         [ clone >>state ] [ >>old-state ] bi ;
+
+M: md5 initialize-checksum-state drop <md5-state> ;
 
 <PRIVATE
 
