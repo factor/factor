@@ -8,15 +8,16 @@ MIXIN: checksum
 
 TUPLE: checksum-state bytes-read block-size bytes ;
 
-: new-checksum-state ( block-size class -- checksum-state )
+: new-checksum-state ( class -- checksum-state )
     new
-        swap >>block-size
         0 >>bytes-read
         V{ } clone >>bytes ; inline
 
 M: checksum-state clone
     call-next-method
     [ clone ] change-bytes ;
+
+GENERIC: initialize-checksum-state ( class -- checksum-state )
 
 GENERIC: checksum-block ( bytes checksum -- )
 
