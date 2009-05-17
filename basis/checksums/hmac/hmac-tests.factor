@@ -1,6 +1,6 @@
 USING: kernel io strings byte-arrays sequences namespaces math
-parser checksums.hmac tools.test checksums.md5 checksums.sha1
-checksums.sha2 checksums ;
+parser checksums.hmac tools.test checksums.md5 checksums.sha2
+checksums ;
 IN: checksums.hmac.tests
 
 [
