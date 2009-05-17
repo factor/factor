@@ -27,6 +27,13 @@ M: fold-model (model-changed) [ [ value>> ] [ [ oldval>> ] [ quot>> ] bi ] bi*
 : <fold> ( oldval quot model -- model' ) 1array fold-model <multi-model> swap >>quot
    swap [ >>oldval ] [ >>value ] bi ;
 
+TUPLE: updater-model < multi-model values updates ;
+M: updater-model (model-changed) tuck updates>> =
+   [ [ values>> value>> ] keep set-model ]
+   [ drop ] if ;
+: <updates> ( values updates -- updater ) [ 2array updater-model <multi-model> ] 2keep
+   [ >>values ] [ >>updates ] bi* ;
+
 TUPLE: switch-model < multi-model original switcher on ;
 M: switch-model (model-changed) 2dup switcher>> =
    [ [ value>> ] [ t >>on ] bi* set-model ]
@@ -66,6 +73,7 @@ M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 : <frp-table*> ( -- table ) f <model> <frp-table> ;
 : <frp-list> ( model -- table ) <frp-table> [ 1array ] >>quot ;
 : <frp-list*> ( -- table ) f <model> <frp-list> ;
+: indexed ( table -- table ) f >>val-quot ;
 
 : <frp-field> ( -- field ) "" <model> <model-field> ;
 
@@ -74,7 +82,9 @@ TUPLE: layout gadget width ; C: <layout> layout
 
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
-M: table output-model dup multiple-selection?>> [ selected-values>> ] [ selected-value>> ] if ;
+M: table output-model dup multiple-selection?>>
+   [ dup val-quot>> [ selected-values>> ] [ selected-indices*>> ] if ]
+   [ dup val-quot>> [ selected-value>> ] [ selected-index*>> ] if ] if ;
 M: model-field output-model field-model>> ;
 M: scroller output-model viewport>> children>> first output-model ;
 
