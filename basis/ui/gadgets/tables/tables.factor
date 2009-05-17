@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors colors.constants fry kernel math
 math.functions math.ranges math.rectangles math.order math.vectors
-models.illusion namespaces opengl sequences ui.gadgets ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.worlds ui.gestures ui.render ui.pens.solid
-ui.text ui.commands ui.images ui.gadgets.menus ui.gadgets.line-support
-math.rectangles models math.ranges sequences combinators
-combinators.short-circuit fonts locals strings vectors ;
+models.illusion namespaces opengl pseudo-slots sequences ui.gadgets
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
+ui.gestures ui.render ui.pens.solid ui.text ui.commands ui.images
+ui.gadgets.menus ui.gadgets.line-support math.rectangles models
+math.ranges sequences combinators combinators.short-circuit
+fonts locals strings vectors ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -42,23 +43,22 @@ focus-border-color
 column-line-color
 selection-required?
 selected-indices selected-values
+selected-indices*
 mouse-index
 { takes-focus? initial: t }
 focused?
 multiple-selection? ;
 
+: in>out ( vector -- val/f ) [ f ] [ peek ] if-empty ;
+: out>in ( val/f -- vector ) [ 1vector ] [ V{ } clone ] if* ;
 IN: accessors
-GENERIC: selected-value>> ( table -- n )
-GENERIC: selected-index>> ( table -- n )
-GENERIC: (>>selected-index) ( n table -- )
-GENERIC: (>>selected-value) ( val table -- )
-: >>selected-index ( table n -- table ) over (>>selected-index) ;
-: >>selected-value ( table val -- table ) over (>>selected-value) ;
-
-M: table selected-value>> selected-values>> [ [ f ] [ peek ] if-empty ] <illusion> ;
-M: table (>>selected-value) [ [ [ 1vector ] [ V{ } clone ] if* ] <illusion> ] dip (>>selected-values) ;
-M: table selected-index>> selected-indices>> [ f ] [ peek ] if-empty ;
-M: table (>>selected-index) [ [ 1vector ] [ V{ } clone ] if* ] dip (>>selected-indices) ;
+PSEUDO-SLOTS: selected-value selected-index selected-index* ;
+M: table selected-value>> selected-values>> [ in>out ] <illusion> ;
+M: table (>>selected-value) [ [ out>in ] <illusion> ] dip (>>selected-values) ;
+M: table selected-index>> selected-indices>> in>out ;
+M: table (>>selected-index) [ out>in ] dip (>>selected-indices) ;
+M: table selected-index*>> selected-indices*>> in>out ;
+M: table (>>selected-index*) [ out>in ] dip (>>selected-indices*) ;
 
 IN: ui.gadgets.tables
 : push-selected-index ( table n -- table ) 2dup swap selected-indices>> index [ drop ] [ over selected-indices>> push ] if ;
@@ -69,6 +69,7 @@ IN: ui.gadgets.tables
         swap >>model
         V{ } clone >>selected-indices
         V{ } clone <model> >>selected-values
+        V{ } clone <model> >>selected-indices*
         sans-serif-font >>font
         focus-border-color >>focus-border-color
         transparent >>column-line-color ; inline
@@ -268,7 +269,8 @@ PRIVATE>
 <PRIVATE
 
 : update-selected-values ( table -- )
-    [ selected-rows ] [ selected-values>> ] bi set-model ;
+    [ [ selected-rows ] [ selected-values>> ] bi set-model ]
+    [ [ selected-indices>> ] [ selected-indices*>> ] bi set-model ] bi ;
 
 : show-row-summary ( table n -- )
     over nth-row
