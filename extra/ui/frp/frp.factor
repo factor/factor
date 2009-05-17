@@ -15,6 +15,7 @@ M: multi-model model-changed over value>> [ (model-changed) ] [ 2drop ] if ;
 TUPLE: basic-model < multi-model ;
 M: basic-model (model-changed) [ value>> ] dip set-model ;
 : <merge> ( models -- model ) basic-model <multi-model> ;
+: <basic> ( value -- model ) basic-model new-model ;
 
 TUPLE: filter-model < multi-model quot ;
 M: filter-model (model-changed) [ value>> ] dip 2dup quot>> call( a -- ? )
@@ -57,7 +58,7 @@ M: mapped-model model-activated [ model>> ] keep model-changed ;
 
 
 ! Gadgets
-: <frp-button> ( text -- button ) [ t swap set-control-value ] <border-button> f <model> >>model ;
+: <frp-button> ( text -- button ) [ t swap set-control-value ] <border-button> f <basic> >>model ;
 TUPLE: frp-table < table { quot initial: [ ] } { val-quot initial: [ ] } color-quot column-titles column-alignment ;
 M: frp-table column-titles column-titles>> ;
 M: frp-table column-alignment column-alignment>> ;
@@ -65,10 +66,11 @@ M: frp-table row-columns quot>> [ call( a -- b ) ] [ drop f ] if* ;
 M: frp-table row-value val-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 
-: <frp-table> ( model -- table ) f frp-table new-table dup >>renderer ;
-: <frp-table*> ( -- table ) f <model> <frp-table> ;
+: <frp-table> ( model -- table ) f frp-table new-table dup >>renderer
+   V{ } clone <basic> >>selected-values V{ } clone <basic> >>selected-indices* ;
+: <frp-table*> ( -- table ) V{ } clone <model> <frp-table> ;
 : <frp-list> ( model -- table ) <frp-table> [ 1array ] >>quot ;
-: <frp-list*> ( -- table ) f <model> <frp-list> ;
+: <frp-list*> ( -- table ) V{ } clone <model> <frp-list> ;
 : indexed ( table -- table ) f >>val-quot ;
 
 : <frp-field> ( -- field ) "" <model> <model-field> ;
