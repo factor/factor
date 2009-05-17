@@ -1,5 +1,6 @@
-USING: arrays kernel math namespaces sequences tools.test
-checksums.sha checksums ;
+USING: arrays checksums checksums.sha checksums.sha.private
+io.encodings.binary io.streams.byte-array kernel math
+namespaces sequences tools.test ;
 IN: checksums.sha.tests
 
 : test-checksum ( text identifier -- checksum )
@@ -45,3 +46,25 @@ IN: checksums.sha.tests
 
 ! [ "8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909" ]
 ! [ "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" sha-512 test-checksum ] unit-test
+
+[
+    t
+] [
+    <sha1-state> "asdf" binary <byte-reader> add-checksum-stream
+    [ get-checksum ] [ get-checksum ] bi =
+] unit-test
+
+[
+    t
+] [
+    <sha-256-state> "asdf" binary <byte-reader> add-checksum-stream
+    [ get-checksum ] [ get-checksum ] bi =
+] unit-test
+
+[
+    t
+] [
+    <sha-224-state> "asdf" binary <byte-reader> add-checksum-stream
+    [ get-checksum ] [ get-checksum ] bi =
+] unit-test
+
