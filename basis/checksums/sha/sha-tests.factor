@@ -1,6 +1,6 @@
 USING: arrays kernel math namespaces sequences tools.test
-checksums.sha2 checksums ;
-IN: checksums.sha2.tests
+checksums.sha checksums ;
+IN: checksums.sha.tests
 
 : test-checksum ( text identifier -- checksum )
     checksum-bytes hex-string ;

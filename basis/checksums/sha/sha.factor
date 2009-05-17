@@ -5,7 +5,7 @@ io.binary math.bitwise checksums checksums.common
 sbufs strings combinators.smart math.ranges fry combinators
 accessors locals checksums.stream multiline literals
 generalizations ;
-IN: checksums.sha2
+IN: checksums.sha
 
 SINGLETON: sha1
 INSTANCE: sha1 stream-checksum

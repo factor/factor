@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Maxim Savchenko
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: namespaces ecdsa tools.test checksums checksums.sha2 ;
+USING: namespaces ecdsa tools.test checksums checksums.sha ;
 IN: ecdsa.tests
 
 SYMBOLS: priv-key pub-key signature ;
