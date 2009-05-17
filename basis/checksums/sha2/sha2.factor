@@ -3,16 +3,16 @@
 USING: kernel splitting grouping math sequences namespaces make
 io.binary math.bitwise checksums checksums.common
 sbufs strings combinators.smart math.ranges fry combinators
-accessors locals ;
+accessors locals checksums.stream multiline ;
 IN: checksums.sha2
 
 SINGLETON: sha-224
 SINGLETON: sha-256
 
-INSTANCE: sha-224 checksum
-INSTANCE: sha-256 checksum
+INSTANCE: sha-224 stream-checksum
+INSTANCE: sha-256 stream-checksum
 
-TUPLE: sha2-state K H word-size block-size ;
+TUPLE: sha2-state < checksum-state K H word-size ;
 
 TUPLE: sha2-short < sha2-state ;
 
@@ -21,6 +21,11 @@ TUPLE: sha2-long < sha2-state ;
 TUPLE: sha-224-state < sha2-short ;
 
 TUPLE: sha-256-state < sha2-short ;
+
+M: sha2-state clone
+    call-next-method
+    [ clone ] change-H
+    [ clone ] change-K ;
 
 <PRIVATE
 
@@ -116,6 +121,18 @@ CONSTANT: K-384
 
 ALIAS: K-512 K-384
 
+: <sha-224-state> ( -- sha2-state )
+    64 sha-224-state new-checksum-state
+        K-256 >>K
+        initial-H-224 >>H
+        4 >>word-size ;
+
+: <sha-256-state> ( -- sha2-state )
+    64 sha-256-state new-checksum-state
+        K-256 >>K
+        initial-H-256 >>H
+        4 >>word-size ;
+
 : s0-256 ( x -- x' )
     [
         [ -7 bitroll-32 ]
@@ -172,7 +189,7 @@ ALIAS: K-512 K-384
         [ -41 bitroll-64 ] tri
     ] [ bitxor ] reduce-outputs ; inline
 
-: process-M-256 ( n seq -- )
+: prepare-M-256 ( n seq -- )
     {
         [ [ 16 - ] dip nth ]
         [ [ 15 - ] dip nth s0-256 ]
@@ -181,7 +198,7 @@ ALIAS: K-512 K-384
         [ ]
     } 2cleave set-nth ; inline
 
-: process-M-512 ( n seq -- )
+: prepare-M-512 ( n seq -- )
     {
         [ [ 16 - ] dip nth ]
         [ [ 15 - ] dip nth s0-512 ]
@@ -200,23 +217,6 @@ ALIAS: K-512 K-384
     [ dup 3 + ] dip <slice> first3 ; inline
 
 GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
-
-M: sha2-short pad-initial-bytes ( string sha2 -- padded-string )
-    drop
-    dup [
-        HEX: 80 ,
-        length
-        [ 64 mod calculate-pad-length 0 <string> % ]
-        [ 3 shift 8 >be % ] bi
-    ] "" make append ;
-
-M: sha2-long pad-initial-bytes ( string sha2 -- padded-string )
-    drop dup [
-        HEX: 80 ,
-        length
-        [ 128 mod calculate-pad-length-long 0 <string> % ]
-        [ 3 shift 8 >be % ] bi
-    ] "" make append ;
 
 : seq>byte-array ( seq n -- string )
     '[ _ >be ] map B{ } join ;
@@ -257,7 +257,7 @@ M: sha2-long pad-initial-bytes ( string sha2 -- padded-string )
     [ word-size>> <sliced-groups> [ be> ] map ]
     [
         block-size>> [ 0 pad-tail 16 ] keep [a,b) over
-        '[ _ process-M-256 ] each
+        '[ _ prepare-M-256 ] each
     ] bi ; inline
 
 :: process-chunk ( M block-size cloned-H sha2 -- )
@@ -268,39 +268,34 @@ M: sha2-long pad-initial-bytes ( string sha2 -- padded-string )
     ] each
     cloned-H sha2 H>> [ w+ ] 2map sha2 (>>H) ; inline
 
-: sha2-steps ( sliced-groups state -- )
-    '[
-        _
-        [ prepare-message-schedule ]
-        [ [ block-size>> ] [ H>> clone ] [ ] tri process-chunk ] bi
-    ] each ;
+M: sha2-short checksum-block
+    [ prepare-message-schedule ]
+    [ [ block-size>> ] [ H>> clone ] [ ] tri process-chunk ] bi ;
 
-: byte-array>sha2 ( bytes state -- )
-    [ [ pad-initial-bytes ] [ nip block-size>> ] 2bi <sliced-groups> ]
-    [ sha2-steps ] bi ;
+: sha-224>checksum ( sha2 -- bytes )
+    H>> 7 head 4 seq>byte-array ;
 
-: <sha-224-state> ( -- sha2-state )
-    sha-224-state new
-        K-256 >>K
-        initial-H-224 >>H
-        4 >>word-size
-        64 >>block-size ;
+: sha-256>checksum ( sha2 -- bytes )
+    H>> 4 seq>byte-array ;
 
-: <sha-256-state> ( -- sha2-state )
-    sha-256-state new
-        K-256 >>K
-        initial-H-256 >>H
-        4 >>word-size
-        64 >>block-size ;
+: pad-last-short-block ( state -- )
+    [ bytes>> t ] [ bytes-read>> pad-last-block ] [ ] tri
+    [ checksum-block ] curry each ;
 
 PRIVATE>
 
-M: sha-224 checksum-bytes
-    drop <sha-224-state>
-    [ byte-array>sha2 ]
-    [ H>> 7 head 4 seq>byte-array ] bi ;
+M: sha-224-state get-checksum
+    clone
+    [ pad-last-short-block ] [ sha-224>checksum ] bi ;
 
-M: sha-256 checksum-bytes
-    drop <sha-256-state>
-    [ byte-array>sha2 ]
-    [ H>> 4 seq>byte-array ] bi ;
+M: sha-256-state get-checksum
+    clone
+    [ pad-last-short-block ] [ sha-256>checksum ] bi ;
+
+M: sha-224 checksum-stream ( stream checksum -- byte-array )
+    drop
+    [ <sha-224-state> ] dip add-checksum-stream get-checksum ;
+
+M: sha-256 checksum-stream ( stream checksum -- byte-array )
+    drop
+    [ <sha-256-state> ] dip add-checksum-stream get-checksum ;
