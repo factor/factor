@@ -1,5 +1,5 @@
 USING: kernel io strings byte-arrays sequences namespaces math
-parser checksums.hmac tools.test checksums.md5 checksums.sha2
+parser checksums.hmac tools.test checksums.md5 checksums.sha
 checksums ;
 IN: checksums.hmac.tests
 
@@ -46,4 +46,3 @@ IN: checksums.hmac.tests
     "JefeJefeJefeJefeJefeJefeJefeJefe"
     "what do ya want for nothing?" sha-256 hmac-bytes hex-string
 ] unit-test
-
