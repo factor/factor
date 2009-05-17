@@ -16,9 +16,6 @@ DEFER: get-words
       [ remote-quot ] 2keep create-in -rot define-declared word make-inline
    ] with-compilation-unit ;
 
-: with-in ( vocab quot -- vocab ) over
-   [ '[ _ set-in @ ] in get swap dip set-in ] dip vocab ; inline
-
 : remote-vocab ( addrspec vocabspec -- vocab )
    dup "-remote" append [ 
       [ (( -- words )) [ "get-words" remote-quot ] keep call-effect ] 2keep

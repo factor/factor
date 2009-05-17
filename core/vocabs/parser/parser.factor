@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Bruno Deferrari,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables kernel namespaces sequences
+USING: assocs fry hashtables kernel namespaces sequences
 sets strings vocabs sorting accessors arrays ;
 IN: vocabs.parser
 
@@ -57,3 +57,6 @@ SYMBOL: in
 
 : set-in ( name -- )
     check-vocab-string dup in set create-vocab (use+) ;
+
+: with-in ( vocab quot -- vocab ) over
+   [ '[ _ set-in @ ] in get swap dip set-in ] dip vocab ; inline
