@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Chris Double, Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences math arrays namespaces
-parser effects generalizations fry words accessors ;
+USING: accessors arrays effects fry generalizations kernel math
+namespaces parser sequences words ;
 IN: promises
 
 TUPLE: promise quot forced? value ;
