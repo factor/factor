@@ -1,8 +1,8 @@
-USING: accessors arrays colors fonts fry kernel math models
-models.product monads sequences ui.gadgets ui.gadgets.buttons
-ui.gadgets.editors ui.gadgets.line-support ui.gadgets.tables
-ui.gadgets.tracks ui.render ui.gadgets.scrollers
-math.parser lexer ;
+USING: accessors arrays colors fonts fry generalizations kernel
+lexer macros math math.parser models models.product monads
+sequences ui.gadgets ui.gadgets.buttons ui.gadgets.buttons.private
+ui.gadgets.editors ui.gadgets.line-support ui.gadgets.scrollers
+ui.gadgets.tables ui.gadgets.tracks ui.render ;
 QUALIFIED: make
 IN: ui.frp
 
@@ -56,6 +56,14 @@ M: mapped-model (model-changed)
     set-model ;
 M: mapped-model model-activated [ model>> ] keep model-changed ;
 
+TUPLE: side-effect-model < mapped-model ;
+M: side-effect-model (model-changed) [ value>> ] [ quot>> ] bi* call( old -- ) ;
+: <$ ( model quot -- side-effect-model )
+   f side-effect-model new-model
+     swap >>quot
+     over >>model
+     [ add-dependency ] keep ;
+
 TUPLE: frp-product < multi-model ;
 : <frp-product> ( models -- product ) frp-product <multi-model> ;
 M: frp-product model-changed
@@ -68,7 +76,11 @@ M: frp-product update-model
 M: frp-product model-activated dup model-changed ;
 
 ! Gadgets
-: <frp-button> ( text -- button ) [ t swap set-control-value ] <border-button> f <basic> >>model ;
+TUPLE: frp-button < button hook ;
+: <frp-button> ( text -- button ) [ [ t swap set-control-value ] keep
+   dup hook>> [ call( button -- ) ] [ drop ] if* ]
+   frp-button new-button border-button-theme f <basic> >>model ;
+
 TUPLE: frp-table < table { quot initial: [ ] } { val-quot initial: [ ] } color-quot column-titles column-alignment ;
 M: frp-table column-titles column-titles>> ;
 M: frp-table column-alignment column-alignment>> ;
@@ -125,3 +137,17 @@ INSTANCE: gadget monad
 M: gadget monad-of drop gadget-monad ;
 M: gadget-monad return drop <gadget> swap >>model ;
 M: gadget >>= output-model [ swap call( x -- y ) ] curry ; 
+
+! Macros
+
+MACRO: liftA-n ( int -- quot ) dup
+   '[ [ _ narray <frp-product> ] dip [ _ firstn ] prepend <mapped> ] ;
+
+MACRO: <$-n ( int -- quot ) dup
+   '[ [ _ narray <frp-product> ] dip [ _ firstn ] prepend <$ ] ;
+
+: liftA2 ( a b quot -- arrow ) 2 liftA-n ; inline
+: liftA3 ( a b c quot -- arrow ) 3 liftA-n ; inline
+
+: <$2 ( a b quot -- arrow ) 2 <$-n ; inline
+: <$3 ( a b c quot -- arrow ) 3 <$-n ; inline
