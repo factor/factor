@@ -11,7 +11,7 @@ threads libc combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render ascii math.bitwise locals
 accessors math.rectangles math.order ascii calendar
 io.encodings.utf16n windows.errors literals ui.pixel-formats 
-ui.pixel-formats.private memoize classes ;
+ui.pixel-formats.private memoize classes struct-arrays ;
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
@@ -556,11 +556,9 @@ M: windows-ui-backend do-events
         [ DispatchMessage drop ] bi
     ] if ;
 
-: register-wndclassex ( -- class )
-    "WNDCLASSEX" <c-object>
-    f GetModuleHandle
-    class-name-ptr get-global
-    pick GetClassInfoEx zero? [
+:: register-window-class ( class-name-ptr -- )
+    "WNDCLASSEX" <c-object> f GetModuleHandle
+    class-name-ptr pick GetClassInfoEx 0 = [
         "WNDCLASSEX" heap-size over set-WNDCLASSEX-cbSize
         { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags over set-WNDCLASSEX-style
         ui-wndproc over set-WNDCLASSEX-lpfnWndProc
@@ -571,9 +569,9 @@ M: windows-ui-backend do-events
         over set-WNDCLASSEX-hIcon
         f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
 
-        class-name-ptr get-global over set-WNDCLASSEX-lpszClassName
-        RegisterClassEx dup win32-error=0/f
-    ] when ;
+        class-name-ptr over set-WNDCLASSEX-lpszClassName
+        RegisterClassEx win32-error=0/f
+    ] [ drop ] if ;
 
 : adjust-RECT ( RECT -- )
     style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
@@ -594,9 +592,16 @@ M: windows-ui-backend do-events
     dup adjust-RECT
     swap [ dup default-position-RECT ] when ;
 
+: get-window-class ( -- class-name )
+    class-name-ptr [
+        dup expired? [ drop "Factor-window" utf16n malloc-string ] when
+        dup register-window-class
+        dup
+    ] change-global ;
+
 : create-window ( rect -- hwnd )
     make-adjusted-RECT
-    [ class-name-ptr get-global f ] dip
+    [ get-window-class f ] dip
     [
         [ ex-style ] 2dip
         { WS_CLIPSIBLINGS WS_CLIPCHILDREN style } flags
@@ -611,24 +616,22 @@ M: windows-ui-backend do-events
 : init-win32-ui ( -- )
     V{ } clone nc-buttons set-global
     "MSG" malloc-object msg-obj set-global
-    "Factor-window" utf16n malloc-string class-name-ptr set-global
-    register-wndclassex drop
     GetDoubleClickTime milliseconds double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
-    class-name-ptr get-global [ dup f UnregisterClass drop free ] when*
-    msg-obj get-global [ free ] when*
-    f class-name-ptr set-global
-    f msg-obj set-global ;
+    class-name-ptr [ [ [ f UnregisterClass drop ] [ free ] bi ] when* f ] change-global
+    msg-obj [ [ free ] when* f ] change-global ;
 
-: get-dc ( world -- ) handle>> dup hWnd>> GetDC dup win32-error=0/f >>hDC drop ;
+: get-dc ( world -- )
+    handle>> dup hWnd>> GetDC dup win32-error=0/f >>hDC drop ;
 
 : get-rc ( world -- )
     handle>> dup hDC>> dup wglCreateContext dup win32-error=0/f
     [ wglMakeCurrent win32-error=0/f ] keep >>hRC drop ;
 
 : set-pixel-format ( pixel-format hdc -- )
-    swap handle>> "PIXELFORMATDESCRIPTOR" <c-object> SetPixelFormat win32-error=0/f ;
+    swap handle>>
+    "PIXELFORMATDESCRIPTOR" <c-object> SetPixelFormat win32-error=0/f ;
 
 : setup-gl ( world -- )
     [ get-dc ] keep
@@ -703,8 +706,23 @@ M: windows-ui-backend beep ( -- )
     "MONITORINFOEX" <c-object> dup length over set-MONITORINFOEX-cbSize
     [ GetMonitorInfo win32-error=0/f ] keep MONITORINFOEX-rcMonitor ;
 
+: client-area>RECT ( hwnd -- RECT )
+    "RECT" <c-object>
+    [ GetClientRect win32-error=0/f ]
+    [ "POINT" byte-array>struct-array [ ClientToScreen drop ] with each ]
+    [ nip ] 2tri ;
+
 : hwnd>RECT ( hwnd -- RECT )
     "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep ;
+
+M: windows-ui-backend (grab-input) ( handle -- )
+    0 ShowCursor drop
+    hWnd>> client-area>RECT ClipCursor drop ;
+
+M: windows-ui-backend (ungrab-input) ( handle -- )
+    drop
+    f ClipCursor drop
+    1 ShowCursor drop ;
 
 : fullscreen-flags ( -- n )
     { WS_CAPTION WS_BORDER WS_THICKFRAME } flags ; inline
@@ -743,8 +761,13 @@ M: windows-ui-backend beep ( -- )
         [ SW_RESTORE ShowWindow win32-error=0/f ]
     } cleave ;
 
-M: windows-ui-backend set-fullscreen* ( ? world -- )
-    swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
+M: windows-ui-backend (set-fullscreen) ( ? world -- )
+    [ enter-fullscreen ] [ exit-fullscreen ] if ;
+
+M: windows-ui-backend (fullscreen?) ( world -- ? )
+    [ handle>> hWnd>> hwnd>RECT ]
+    [ handle>> hWnd>> fullscreen-RECT ] bi
+    [ get-RECT-dimensions 2array 2nip ] bi@ = ;
 
 windows-ui-backend ui-backend set-global
 

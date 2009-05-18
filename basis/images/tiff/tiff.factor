@@ -5,7 +5,7 @@ compression.lzw constructors endian fry grouping images io
 io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
-strings math.vectors specialized-arrays.float ;
+strings math.vectors specialized-arrays.float locals ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
@@ -184,7 +184,7 @@ samples-per-pixel new-subfile-type subfile-type orientation
 software date-time photoshop exif-ifd sub-ifd inter-color-profile
 xmp iptc fill-order document-name page-number page-name
 x-position y-position host-computer copyright artist
-min-sample-value max-sample-value make model cell-width cell-length
+min-sample-value max-sample-value tiff-make tiff-model cell-width cell-length
 gray-response-unit gray-response-curve color-map threshholding
 image-description free-offsets free-byte-counts tile-width tile-length
 matteing data-type image-depth tile-depth
@@ -243,10 +243,13 @@ ERROR: bad-tiff-magic bytes ;
 
 ERROR: no-tag class ;
 
-: find-tag ( idf class -- tag )
-    swap processed-tags>> ?at [ no-tag ] unless ;
+: find-tag* ( ifd class -- tag/class ? )
+    swap processed-tags>> ?at ;
 
-: tag? ( idf class -- tag )
+: find-tag ( ifd class -- tag )
+    find-tag* [ no-tag ] unless ;
+
+: tag? ( ifd class -- tag )
     swap processed-tags>> key? ;
 
 : read-strips ( ifd -- ifd )
@@ -339,8 +342,8 @@ ERROR: bad-small-ifd-type n ;
         { 266 [ fill-order ] }
         { 269 [ ascii decode document-name ] }
         { 270 [ ascii decode image-description ] }
-        { 271 [ ascii decode make ] }
-        { 272 [ ascii decode model ] }
+        { 271 [ ascii decode tiff-make ] }
+        { 272 [ ascii decode tiff-model ] }
         { 273 [ strip-offsets ] }
         { 274 [ orientation ] }
         { 277 [ samples-per-pixel ] }
@@ -350,7 +353,7 @@ ERROR: bad-small-ifd-type n ;
         { 281 [ max-sample-value ] }
         { 282 [ first x-resolution ] }
         { 283 [ first y-resolution ] }
-        { 284 [ planar-configuration ] }
+        { 284 [ lookup-planar-configuration planar-configuration ] }
         { 285 [ page-name ] }
         { 286 [ x-position ] }
         { 287 [ y-position ] }
@@ -437,8 +440,8 @@ ERROR: unhandled-compression compression ;
     [ samples-per-pixel find-tag ] tri
     [ * ] keep
     '[
-        _ group [ _ group [ rest ] [ first ] bi
-        [ v+ ] accumulate swap suffix concat ] map
+        _ group
+        [ _ group unclip [ v+ ] accumulate swap suffix concat ] map
         concat >byte-array
     ] change-bitmap ;
 
@@ -521,23 +524,39 @@ ERROR: unknown-component-order ifd ;
         ] with-tiff-endianness
     ] with-file-reader ;
 
-: process-tif-ifds ( parsed-tiff -- parsed-tiff )
-    dup ifds>> [
-        read-strips
-        uncompress-strips
-        strips>bitmap
-        fix-bitmap-endianness
-        strips-predictor
-        dup extra-samples tag? [ handle-alpha-data ] when
-        drop
-    ] each ;
+: process-chunky-ifd ( ifd -- )
+    read-strips
+    uncompress-strips
+    strips>bitmap
+    fix-bitmap-endianness
+    strips-predictor
+    dup extra-samples tag? [ handle-alpha-data ] when
+    drop ;
+
+: process-planar-ifd ( ifd -- )
+    "planar ifd not supported" throw ;
+
+: dispatch-planar-configuration ( ifd planar-configuration -- )
+    {
+        { planar-configuration-chunky [ process-chunky-ifd ] }
+        { planar-configuration-planar [ process-planar-ifd ] }
+    } case ;
+
+: process-ifd ( ifd -- )
+    dup planar-configuration find-tag* [
+        dispatch-planar-configuration
+    ] [
+        drop "no planar configuration" throw
+    ] if ;
+
+: process-tif-ifds ( parsed-tiff -- )
+    ifds>> [ process-ifd ] each ;
 
 : load-tiff ( path -- parsed-tiff )
-    [ load-tiff-ifds ] [
-        binary [
-            [ process-tif-ifds ] with-tiff-endianness
-        ] with-file-reader
-    ] bi ;
+    [ load-tiff-ifds dup ] keep
+    binary [
+        [ process-tif-ifds ] with-tiff-endianness
+    ] with-file-reader ;
 
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image load-image* ( path tiff-image -- image )

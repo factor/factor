@@ -152,7 +152,23 @@ void quotation_jit::iterate_quotation()
 				{
 					if(stack_frame) emit(userenv[JIT_EPILOG]);
 					tail_call = true;
-					word_jump(obj.value());
+					/* Inline cache misses are special-cased.
+					   The calling convention for tail
+					   calls stores the address of the next
+					   instruction in a register. However,
+					   PIC miss stubs themselves tail-call
+					   the inline cache miss primitive, and
+					   we don't want to clobber the saved
+					   address. */
+					if(obj.value() == userenv[PIC_MISS_WORD]
+					   || obj.value() == userenv[PIC_MISS_TAIL_WORD])
+					{
+						word_special(obj.value());
+					}
+					else
+					{
+						word_jump(obj.value());
+					}
 				}
 				else
 					word_call(obj.value());
@@ -165,7 +181,6 @@ void quotation_jit::iterate_quotation()
 			/* Primitive calls */
 			if(primitive_call_p(i))
 			{
-				emit(userenv[JIT_SAVE_STACK]);
 				emit_with(userenv[JIT_PRIMITIVE],obj.value());
 
 				i++;
@@ -187,8 +202,9 @@ void quotation_jit::iterate_quotation()
 					jit_compile(array_nth(elements.untagged(),i + 1),relocate);
 				}
 
-				emit_with(userenv[JIT_IF_1],array_nth(elements.untagged(),i));
-				emit_with(userenv[JIT_IF_2],array_nth(elements.untagged(),i + 1));
+				literal(array_nth(elements.untagged(),i));
+				literal(array_nth(elements.untagged(),i + 1));
+				emit(userenv[JIT_IF]);
 
 				i += 2;
 
@@ -251,19 +267,18 @@ void quotation_jit::iterate_quotation()
 
 void set_quot_xt(quotation *quot, code_block *code)
 {
-	if(code->block.type != QUOTATION_TYPE)
+	if(code->type != QUOTATION_TYPE)
 		critical_error("Bad param to set_quot_xt",(cell)code);
 
 	quot->code = code;
 	quot->xt = code->xt();
-	quot->compiledp = T;
 }
 
 /* Allocates memory */
 void jit_compile(cell quot_, bool relocating)
 {
 	gc_root<quotation> quot(quot_);
-	if(quot->compiledp != F) return;
+	if(quot->code) return;
 
 	quotation_jit compiler(quot.value(),true,relocating);
 	compiler.iterate_quotation();
@@ -284,10 +299,10 @@ PRIMITIVE(array_to_quotation)
 {
 	quotation *quot = allot<quotation>(sizeof(quotation));
 	quot->array = dpeek();
-	quot->xt = (void *)lazy_jit_compile;
-	quot->compiledp = F;
 	quot->cached_effect = F;
 	quot->cache_counter = F;
+	quot->xt = (void *)lazy_jit_compile;
+	quot->code = NULL;
 	drepl(tag<quotation>(quot));
 }
 
@@ -297,7 +312,7 @@ PRIMITIVE(quotation_xt)
 	drepl(allot_cell((cell)quot->xt));
 }
 
-void compile_all_words(void)
+void compile_all_words()
 {
 	gc_root<array> words(find_all_words());
 
@@ -336,6 +351,13 @@ VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 	stack_chain->callstack_top = stack;
 	jit_compile(quot.value(),true);
 	return quot.value();
+}
+
+PRIMITIVE(quot_compiled_p)
+{
+	tagged<quotation> quot(dpop());
+	quot.untag_check();
+	dpush(tag_boolean(quot->code != NULL));
 }
 
 }

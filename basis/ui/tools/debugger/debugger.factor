@@ -8,7 +8,7 @@ ui.gadgets.buttons ui.gadgets.labels ui.gadgets.panes
 ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.tables
 ui.gadgets.tracks ui.gadgets.scrollers ui.gadgets.panes
 ui.gadgets.borders ui.gadgets.status-bar ui.tools.traceback
-ui.tools.inspector ui.tools.browser ;
+ui.tools.inspector ui.tools.browser ui.debugger ;
 IN: ui.tools.debugger
 
 TUPLE: debugger < track error restarts restart-hook restart-list continuation ;
@@ -26,9 +26,6 @@ M: restart-renderer row-columns
         swap restart-hook>> >>hook
         t >>selection-required?
         t >>single-click? ; inline
-
-: <error-pane> ( error -- pane )
-    <pane> [ [ print-error ] with-pane ] keep ; inline
 
 : <error-display> ( debugger -- gadget )
     [ <filled-pile> ] dip
@@ -63,7 +60,7 @@ M: debugger focusable-child*
 
 GENERIC: error-in-debugger? ( error -- ? )
 
-M: world-error error-in-debugger? world>> gadget-child debugger? ;
+M: world-error error-in-debugger? world>> children>> [ f ] [ first debugger? ] if-empty ;
 
 M: object error-in-debugger? drop f ;
 
@@ -71,12 +68,6 @@ M: object error-in-debugger? drop f ;
     dup error-in-debugger?
     [ rethrow ] [ error-continuation get debugger-window ] if 
 ] ui-error-hook set-global
-
-M: world-error error.
-    "An error occurred while drawing the world " write
-    dup world>> pprint-short "." print
-    "This world has been deactivated to prevent cascading errors." print
-    error>> error. ;
 
 debugger "gestures" f {
     { T{ button-down } request-focus }

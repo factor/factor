@@ -64,7 +64,7 @@ IN: continuations.tests
 
 [ 1 2 ] [ bar ] unit-test
 
-[ t ] [ \ bar def>> "c" get innermost-frame-quot = ] unit-test
+[ t ] [ \ bar def>> "c" get innermost-frame-executing = ] unit-test
 
 [ 1 ] [ "c" get innermost-frame-scan ] unit-test
 

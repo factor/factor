@@ -3,7 +3,7 @@
 namespace factor
 {
 
-s64 current_micros(void)
+s64 current_micros()
 {
 	SYSTEMTIME st;
 	FILETIME ft;
@@ -40,6 +40,6 @@ void c_to_factor_toplevel(cell quot)
 	c_to_factor(quot);
 }
 
-void open_console(void) { }
+void open_console() { }
 
 }

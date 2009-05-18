@@ -1,5 +1,5 @@
 IN: vocabs.files.tests
-USING: tools.test vocabs.files vocabs arrays sets ;
+USING: tools.test vocabs.files vocabs arrays grouping ;
 
 [ t ] [
     "kernel" vocab-files

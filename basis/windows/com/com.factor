@@ -40,6 +40,6 @@ COM-INTERFACE: IDropTarget IUnknown {00000122-0000-0000-C000-000000000046}
     IUnknown::Release drop ; inline
 
 : with-com-interface ( interface quot -- )
-    over [ slip ] [ com-release ] [ ] cleanup ; inline
+    over [ com-release ] curry [ ] cleanup ; inline
 
 DESTRUCTOR: com-release

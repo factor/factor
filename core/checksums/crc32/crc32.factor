@@ -12,12 +12,12 @@ CONSTANT: crc32-table V{ }
 256 iota [
     8 [
         [ 2/ ] [ even? ] bi [ crc32-polynomial bitxor ] unless
-    ] times >bignum
+    ] times
 ] map 0 crc32-table copy
 
 : (crc32) ( crc ch -- crc )
-    >bignum dupd bitxor
-    mask-byte crc32-table nth-unsafe >bignum
+    dupd bitxor
+    mask-byte crc32-table nth-unsafe
     swap -8 shift bitxor ; inline
 
 SINGLETON: crc32

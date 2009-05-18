@@ -13,6 +13,7 @@ IN: openssl.libcrypto
 <<
 {
     { [ os openbsd? ] [ ] } ! VM is linked with it
+    { [ os netbsd? ] [ ] }
     { [ os winnt? ] [ "libcrypto" "libeay32.dll" "cdecl" add-library ] }
     { [ os macosx? ] [ "libcrypto" "libcrypto.dylib" "cdecl" add-library ] }
     { [ os unix? ] [ "libcrypto" "libcrypto.so" "cdecl" add-library ] }

@@ -27,6 +27,9 @@ M: circular virtual-seq seq>> ;
     #! change start to (start + n) mod length
     circular-wrap (>>start) ;
 
+: rotate-circular ( circular -- )
+    [ start>> 1 + ] keep circular-wrap (>>start) ;
+
 : push-circular ( elt circular -- )
     [ set-first ] [ 1 swap change-circular-start ] bi ;
 

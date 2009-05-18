@@ -41,31 +41,46 @@ SYMBOL: windows
     lose-focus swap each-gesture
     gain-focus swap each-gesture ;
 
+: ?grab-input ( world -- )
+    dup grab-input?>> [ handle>> (grab-input) ] [ drop ] if ;
+
+: ?ungrab-input ( world -- )
+    dup grab-input?>> [ handle>> (ungrab-input) ] [ drop ] if ;
+
 : focus-world ( world -- )
     t >>focused?
-    dup raised-window
-    focus-path f focus-gestures ;
+    [ ?grab-input ] [
+        dup raised-window
+        focus-path f focus-gestures
+    ] bi ;
 
 : unfocus-world ( world -- )
     f >>focused?
-    focus-path f swap focus-gestures ;
+    [ ?ungrab-input ]
+    [ focus-path f swap focus-gestures ] bi ;
 
-: try-to-open-window ( world -- )
+: set-up-window ( world -- )
     {
-        [ (open-window) ]
         [ handle>> select-gl-context ]
-        [
-            [ begin-world ]
-            [ [ handle>> (close-window) ] [ ui-error ] bi* ]
-            recover
-        ]
+        [ [ title>> ] keep set-title ]
+        [ begin-world ]
         [ resize-world ]
+        [ t >>active? drop ]
+        [ request-focus ]
     } cleave ;
 
+: clean-up-broken-window ( world -- )
+    [
+        dup { [ focused?>> ] [ grab-input?>> ] } 1&&
+        [ handle>> (ungrab-input) ] [ drop ] if
+    ] [ handle>> (close-window) ] bi ;
+
 M: world graft*
-    [ try-to-open-window ]
-    [ [ title>> ] keep set-title ]
-    [ request-focus ] tri ;
+    [ (open-window) ]
+    [
+        [ set-up-window ]
+        [ [ clean-up-broken-window ] [ ui-error ] bi* ] recover
+    ] bi ;
 
 : reset-world ( world -- )
     #! This is used when a window is being closed, but also
@@ -145,7 +160,9 @@ SYMBOL: ui-thread
 PRIVATE>
 
 : find-window ( quot -- world )
-    [ windows get values ] dip '[ gadget-child @ ] find-last nip ; inline
+    [ windows get values ] dip
+    '[ dup children>> [ ] [ nip first ] if-empty @ ]
+    find-last nip ; inline
 
 : ui-running? ( -- ? )
     \ ui-running get-global ;
@@ -192,11 +209,14 @@ PRIVATE>
 : open-window ( gadget title/attributes -- )
     ?attributes <world> open-world-window ;
 
-: set-fullscreen? ( ? gadget -- )
-    find-world set-fullscreen* ;
+: set-fullscreen ( gadget ? -- )
+    [ find-world ] dip (set-fullscreen) ;
 
 : fullscreen? ( gadget -- ? )
-    find-world fullscreen* ;
+    find-world (fullscreen?) ;
+
+: toggle-fullscreen ( gadget -- )
+    dup fullscreen? not set-fullscreen ;
 
 : raise-window ( gadget -- )
     find-world raise-window* ;

@@ -105,6 +105,19 @@ CONSTANT: kCGLRendererGenericFloatID HEX: 00020400
 
 FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
 
+FUNCTION: CGDirectDisplayID CGMainDisplayID ( ) ;
+
+FUNCTION: CGError CGDisplayHideCursor ( CGDirectDisplayID display ) ;
+FUNCTION: CGError CGDisplayShowCursor ( CGDirectDisplayID display ) ;
+
+FUNCTION: CGError CGDisplayMoveCursorToPoint ( CGDirectDisplayID display, CGPoint point ) ;
+
+FUNCTION: CGError CGAssociateMouseAndMouseCursorPosition ( boolean_t connected ) ;
+
+FUNCTION: CGError CGWarpMouseCursorPosition ( CGPoint newCursorPosition ) ;
+
+FUNCTION: uint GetCurrentButtonState ( ) ;
+
 <PRIVATE
 
 : bitmap-flags ( -- flags )

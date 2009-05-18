@@ -161,22 +161,6 @@ HELP: ndip
     }
 } ;
 
-HELP: nslip
-{ $values { "n" integer } }
-{ $description "A generalization of " { $link slip } " that can work " 
-"for any stack depth. The first " { $snippet "n" } " items after the quotation will be "
-"removed from the stack, the quotation called, and the items restored."
-} 
-{ $examples
-  { $example "USING: generalizations kernel prettyprint ;" "[ 99 ] 1 2 3 4 5 5 nslip 6 narray ." "{ 99 1 2 3 4 5 }" }
-  "Some core words expressed in terms of " { $link nslip } ":"
-    { $table
-        { { $link slip } { $snippet "1 nslip" } }
-        { { $link 2slip } { $snippet "2 nslip" } }
-        { { $link 3slip } { $snippet "3 nslip" } }
-    }
-} ;
-
 HELP: nkeep
 { $values { "quot" quotation } { "n" integer } }
 { $description "A generalization of " { $link keep } " that can work " 
@@ -339,7 +323,6 @@ ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
 
 ARTICLE: "combinator-generalizations" "Generalized combinators"
 { $subsection ndip }
-{ $subsection nslip }
 { $subsection nkeep }
 { $subsection napply }
 { $subsection ncleave }

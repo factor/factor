@@ -4,7 +4,7 @@ IN: base64.tests
 
 [ "abcdefghijklmnopqrstuvwxyz" ] [ "abcdefghijklmnopqrstuvwxyz" ascii encode >base64 base64> ascii decode
 ] unit-test
-[ f ] [ "" ascii encode >base64 base64> ascii decode ] unit-test
+[ "" ] [ "" ascii encode >base64 base64> ascii decode ] unit-test
 [ "a" ] [ "a" ascii encode >base64 base64> ascii decode ] unit-test
 [ "ab" ] [ "ab" ascii encode >base64 base64> ascii decode ] unit-test
 [ "abc" ] [ "abc" ascii encode >base64 base64> ascii decode ] unit-test

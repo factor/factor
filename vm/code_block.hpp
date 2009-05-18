@@ -8,10 +8,12 @@ enum relocation_type {
 	RT_DLSYM,
 	/* a pointer to a compiled word reference */
 	RT_DISPATCH,
-	/* a word's general entry point XT */
+	/* a word or quotation's general entry point */
 	RT_XT,
-	/* a word's direct entry point XT */
-	RT_XT_DIRECT,
+	/* a word's PIC entry point */
+	RT_XT_PIC,
+	/* a word's tail-call PIC entry point */
+	RT_XT_PIC_TAIL,
 	/* current offset */
 	RT_HERE,
 	/* current code block */
@@ -22,6 +24,8 @@ enum relocation_type {
 	RT_STACK_CHAIN,
 	/* untagged fixnum literal */
 	RT_UNTAGGED,
+	/* address of megamorphic_cache_hits var */
+	RT_MEGAMORPHIC_CACHE_HITS,
 };
 
 enum relocation_class {
@@ -31,8 +35,10 @@ enum relocation_class {
 	RC_ABSOLUTE,
 	/* relative address in a 32-bit location */
 	RC_RELATIVE,
-	/* relative address in a PowerPC LIS/ORI sequence */
+	/* absolute address in a PowerPC LIS/ORI sequence */
 	RC_ABSOLUTE_PPC_2_2,
+	/* absolute address in a PowerPC LWZ instruction */
+	RC_ABSOLUTE_PPC_2,
 	/* relative address in a PowerPC LWZ/STW/BC instruction */
 	RC_RELATIVE_PPC_2,
 	/* relative address in a PowerPC B/BL instruction */
@@ -45,16 +51,14 @@ enum relocation_class {
 	RC_INDIRECT_ARM_PC
 };
 
-#define REL_RELATIVE_PPC_2_MASK 0xfffc
-#define REL_RELATIVE_PPC_3_MASK 0x3fffffc
-#define REL_INDIRECT_ARM_MASK 0xfff
-#define REL_RELATIVE_ARM_3_MASK 0xffffff
+static const cell rel_absolute_ppc_2_mask = 0xffff;
+static const cell rel_relative_ppc_2_mask = 0xfffc;
+static const cell rel_relative_ppc_3_mask = 0x3fffffc;
+static const cell rel_indirect_arm_mask = 0xfff;
+static const cell rel_relative_arm_3_mask = 0xffffff;
 
 /* code relocation table consists of a table of entries for each fixup */
 typedef u32 relocation_entry;
-#define REL_TYPE(r) (relocation_type)(((r) & 0xf0000000) >> 28)
-#define REL_CLASS(r) (relocation_class)(((r) & 0x0f000000) >> 24)
-#define REL_OFFSET(r) ((r) & 0x00ffffff)
 
 void flush_icache_for(code_block *compiled);
 
@@ -82,7 +86,7 @@ void mark_object_code_block(object *scan);
 
 void relocate_code_block(code_block *relocating);
 
-inline static bool stack_traces_p(void)
+inline static bool stack_traces_p()
 {
 	return userenv[STACK_TRACES_ENV] != F;
 }

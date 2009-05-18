@@ -11,25 +11,6 @@ static void check_frame(stack_frame *frame)
 #endif
 }
 
-void iterate_callstack(cell top, cell bottom, CALLSTACK_ITER iterator)
-{
-	stack_frame *frame = (stack_frame *)bottom - 1;
-
-	while((cell)frame >= top)
-	{
-		iterator(frame);
-		frame = frame_successor(frame);
-	}
-}
-
-void iterate_callstack_object(callstack *stack, CALLSTACK_ITER iterator)
-{
-	cell top = (cell)FIRST_STACK_FRAME(stack);
-	cell bottom = top + untag_fixnum(stack->length);
-
-	iterate_callstack(top,bottom,iterator);
-}
-
 callstack *allot_callstack(cell size)
 {
 	callstack *stack = allot<callstack>(callstack_size(size));
@@ -54,7 +35,7 @@ This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-stack_frame *capture_start(void)
+stack_frame *capture_start()
 {
 	stack_frame *frame = stack_chain->callstack_bottom - 1;
 	while(frame >= stack_chain->callstack_top
@@ -75,7 +56,7 @@ PRIMITIVE(callstack)
 		size = 0;
 
 	callstack *stack = allot_callstack(size);
-	memcpy(FIRST_STACK_FRAME(stack),top,size);
+	memcpy(stack->top(),top,size);
 	dpush(tag<callstack>(stack));
 }
 
@@ -84,7 +65,7 @@ PRIMITIVE(set_callstack)
 	callstack *stack = untag_check<callstack>(dpop());
 
 	set_callstack(stack_chain->callstack_bottom,
-		FIRST_STACK_FRAME(stack),
+		stack->top(),
 		untag_fixnum(stack->length),
 		memcpy);
 
@@ -100,7 +81,7 @@ code_block *frame_code(stack_frame *frame)
 
 cell frame_type(stack_frame *frame)
 {
-	return frame_code(frame)->block.type;
+	return frame_code(frame)->type;
 }
 
 cell frame_executing(stack_frame *frame)
@@ -141,44 +122,46 @@ cell frame_scan(stack_frame *frame)
 		return F;
 }
 
-/* C doesn't have closures... */
-static cell frame_count;
-
-void count_stack_frame(stack_frame *frame)
+namespace
 {
-	frame_count += 2; 
-}
 
-static cell frame_index;
-static array *frames;
+struct stack_frame_counter {
+	cell count;
+	stack_frame_counter() : count(0) {}
+	void operator()(stack_frame *frame) { count += 2; }
+};
 
-void stack_frame_to_array(stack_frame *frame)
-{
-	set_array_nth(frames,frame_index++,frame_executing(frame));
-	set_array_nth(frames,frame_index++,frame_scan(frame));
+struct stack_frame_accumulator {
+	cell index;
+	array *frames;
+	stack_frame_accumulator(cell count) : index(0), frames(allot_array_internal<array>(count)) {}
+	void operator()(stack_frame *frame)
+	{
+		set_array_nth(frames,index++,frame_executing(frame));
+		set_array_nth(frames,index++,frame_scan(frame));
+	}
+};
+
 }
 
 PRIMITIVE(callstack_to_array)
 {
 	gc_root<callstack> callstack(dpop());
 
-	frame_count = 0;
-	iterate_callstack_object(callstack.untagged(),count_stack_frame);
+	stack_frame_counter counter;
+	iterate_callstack_object(callstack.untagged(),counter);
 
-	frames = allot_array_internal<array>(frame_count);
+	stack_frame_accumulator accum(counter.count);
+	iterate_callstack_object(callstack.untagged(),accum);
 
-	frame_index = 0;
-	iterate_callstack_object(callstack.untagged(),stack_frame_to_array);
-
-	dpush(tag<array>(frames));
+	dpush(tag<array>(accum.frames));
 }
 
-stack_frame *innermost_stack_frame(callstack *callstack)
+stack_frame *innermost_stack_frame(callstack *stack)
 {
-	stack_frame *top = FIRST_STACK_FRAME(callstack);
-	cell bottom = (cell)top + untag_fixnum(callstack->length);
-
-	stack_frame *frame = (stack_frame *)bottom - 1;
+	stack_frame *top = stack->top();
+	stack_frame *bottom = stack->bottom();
+	stack_frame *frame = bottom - 1;
 
 	while(frame >= top && frame_successor(frame) >= top)
 		frame = frame_successor(frame);
@@ -195,9 +178,9 @@ stack_frame *innermost_stack_frame_quot(callstack *callstack)
 
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
-PRIMITIVE(innermost_stack_frame_quot)
+PRIMITIVE(innermost_stack_frame_executing)
 {
-	dpush(frame_executing(innermost_stack_frame_quot(untag_check<callstack>(dpop()))));
+	dpush(frame_executing(innermost_stack_frame(untag_check<callstack>(dpop()))));
 }
 
 PRIMITIVE(innermost_stack_frame_scan)

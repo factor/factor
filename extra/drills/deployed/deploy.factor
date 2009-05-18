@@ -5,7 +5,6 @@ H{
     { deploy-math? t }
     { deploy-name "drills" }
     { deploy-ui? t }
-    { deploy-compiler? t }
     { "stop-after-last-window?" t }
     { deploy-word-props? f }
     { deploy-c-types? f }
