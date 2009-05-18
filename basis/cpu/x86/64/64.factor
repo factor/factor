@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math namespaces make sequences
 system layouts alien alien.c-types alien.accessors alien.structs
-slots splitting assocs combinators make locals cpu.x86.assembler
+slots splitting assocs combinators locals cpu.x86.assembler
 cpu.x86 cpu.architecture compiler.constants
 compiler.codegen compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
