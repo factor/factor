@@ -31,10 +31,13 @@ IN: mason.report
         write-xml
     ] with-file-writer ; inline
 
+: file-tail ( file encoding lines -- seq )
+    [ file-lines ] dip short tail* "\n" join ;
+
 :: failed-report ( error file what -- status )
     [
         error [ error. ] with-string-writer :> error
-        file utf8 file-lines 400 short tail* :> output
+        file utf8 400 file-tail :> output
         
         [XML
         <h2><-what-></h2>
