@@ -11,5 +11,5 @@ IN: ui.gadgets.alerts
             fldm [ <frp-field> ->% 1 ]
             btn  [ "okay" <frp-button> ] |
          btn -> [ fldm swap <updates> ]
-                [ [ drop lbl close-window f ] <mapped> , ] bi
+                [ [ drop lbl close-window ] <$ , ] bi
    ] ] <vbox> { 161 86 } >>pref-dim "" open-window ;
