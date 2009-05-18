@@ -5,21 +5,14 @@ math.functions math.order sequences sorting locals
 sequences.private ;
 IN: math.statistics
 
-: mean ( seq -- n )
+: mean ( seq -- x )
     [ sum ] [ length ] bi / ;
 
-: geometric-mean ( seq -- n )
+: geometric-mean ( seq -- x )
     [ length ] [ product ] bi nth-root ;
 
-: harmonic-mean ( seq -- n )
+: harmonic-mean ( seq -- x )
     [ recip ] sigma recip ;
-
-: slow-median ( seq -- n )
-    natural-sort dup length even? [
-        [ midpoint@ dup 1 - 2array ] keep nths mean
-    ] [
-        [ midpoint@ ] keep nth
-    ] if ;
 
 :: kth-smallest ( seq k -- elt )
     #! Wirth's method, Algorithm's + Data structues = Programs p. 84
@@ -67,7 +60,7 @@ IN: math.statistics
     #! find the min and max of a seq in one pass
     [ 1/0. -1/0. ] dip [ [ min ] [ max ] bi-curry bi* ] each ;
 
-: range ( seq -- n )
+: range ( seq -- x )
     minmax swap - ;
 
 : var ( seq -- x )
