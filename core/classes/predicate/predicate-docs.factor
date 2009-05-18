@@ -1,6 +1,6 @@
 USING: generic help.markup help.syntax kernel kernel.private
 namespaces sequences words arrays layouts help effects math
-layouts classes.private classes compiler.units ;
+classes.private classes compiler.units ;
 IN: classes.predicate
 
 ARTICLE: "predicates" "Predicate classes"
