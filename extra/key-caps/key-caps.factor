@@ -162,18 +162,19 @@ M: key-caps-gadget pref-dim* drop KEYBOARD-SIZE ;
     relayout-1 ;
 
 M: key-caps-gadget graft*
+    open-game-input
     dup '[ _ update-key-caps-state ] FREQUENCY every >>alarm
     drop ;
 
 M: key-caps-gadget ungraft*
-    alarm>> [ cancel-alarm ] when* ;
+    alarm>> [ cancel-alarm ] when*
+    close-game-input ;
 
 M: key-caps-gadget handle-gesture
     drop [ key-down? ] [ key-up? ] bi or not ;
 
 : key-caps ( -- )
     [
-        open-game-input
         <key-caps-gadget> { 5 5 } <border> "Key Caps" open-window
     ] with-ui ;
 

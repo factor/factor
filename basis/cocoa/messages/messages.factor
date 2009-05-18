@@ -68,7 +68,7 @@ MACRO: (send) ( selector super? -- quot )
     [ dup lookup-method ] dip
     [ make-prepare-send ] 2keep
     super-message-senders message-senders ? get at
-    '[ _ call _ execute ] ;
+    1quotation append ;
 
 : send ( receiver args... selector -- return... ) f (send) ; inline
 

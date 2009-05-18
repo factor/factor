@@ -4,14 +4,14 @@ USING: accessors arrays assocs continuations kernel math models
 namespaces opengl opengl.textures sequences io combinators
 combinators.short-circuit fry math.vectors math.rectangles cache
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-ui.commands ui.pixel-formats destructors literals ;
+ui.pixel-formats destructors literals strings ;
 IN: ui.gadgets.worlds
 
 CONSTANT: default-world-pixel-format-attributes
     { windowed double-buffered T{ depth-bits { value 16 } } }
 
 TUPLE: world < track
-    active? focused?
+    active? focused? grab-input?
     layers
     title status status-owner
     text-handle handle images
@@ -20,7 +20,8 @@ TUPLE: world < track
 
 TUPLE: world-attributes
     { world-class initial: world }
-    title
+    grab-input?
+    { title string initial: "Factor Window" }
     status
     gadgets
     { pixel-format-attributes initial: $ default-world-pixel-format-attributes } ;
@@ -30,6 +31,20 @@ TUPLE: world-attributes
 
 : find-world ( gadget -- world/f ) [ world? ] find-parent ;
 
+: grab-input ( gadget -- )
+    find-world dup grab-input?>>
+    [ drop ] [
+        t >>grab-input?
+        dup focused?>> [ handle>> (grab-input) ] [ drop ] if
+    ] if ;
+
+: ungrab-input ( gadget -- )
+    find-world dup grab-input?>>
+    [
+        f >>grab-input?
+        dup focused?>> [ handle>> (ungrab-input) ] [ drop ] if
+    ] [ drop ] if ;
+    
 : show-status ( string/f gadget -- )
     dup find-world dup [
         dup status>> [
@@ -62,14 +77,16 @@ M: world request-focus-on ( child gadget -- )
 : new-world ( class -- world )
     vertical swap new-track
         t >>root?
-        t >>active?
-        { 0 0 } >>window-loc ;
+        f >>active?
+        { 0 0 } >>window-loc
+        f >>grab-input? ;
 
 : apply-world-attributes ( world attributes -- world )
     {
         [ title>> >>title ]
         [ status>> >>status ]
         [ pixel-format-attributes>> >>pixel-format-attributes ]
+        [ grab-input?>> >>grab-input? ]
         [ gadgets>> [ 1 track-add ] each ]
     } cleave ;
 
@@ -84,7 +101,7 @@ M: world layout*
     [ call-next-method ]
     [ dup layers>> [ as-big-as-possible ] with each ] bi ;
 
-M: world focusable-child* gadget-child ;
+M: world focusable-child* children>> [ t ] [ first ] if-empty ;
 
 M: world children-on nip children>> ;
 

@@ -9,7 +9,7 @@ void update_word_xt(cell word);
 
 inline bool word_optimized_p(word *word)
 {
-	return word->code->block.type == WORD_TYPE;
+	return word->code->type == WORD_TYPE;
 }
 
 PRIMITIVE(optimized_p);

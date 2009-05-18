@@ -1,9 +1,5 @@
 #include "asm.h"
 
-/* Note that primitive word definitions are compiled with
-__attribute__((regparm 2), so the pointer to the word object is passed in EAX,
-and the callstack top is passed in EDX */
-
 #define ARG0 %eax
 #define ARG1 %edx
 #define STACK_REG %esp
@@ -29,8 +25,7 @@ and the callstack top is passed in EDX */
 	pop %ebp ; \
 	pop %ebx
 
-#define QUOT_XT_OFFSET 16
-#define WORD_XT_OFFSET 30
+#define QUOT_XT_OFFSET 12
 
 /* We pass a function pointer to memcpy to work around a Mac OS X
 ABI limitation which would otherwise require us to do a bizzaro PC-relative
@@ -60,10 +55,11 @@ DEF(bool,check_sse2,(void)):
 	mov %edx,%eax
 	ret
 
-DEF(F_FASTCALL void,primitive_inline_cache_miss,(void)):
-	mov (%esp),%eax
+DEF(void,primitive_inline_cache_miss,(void)):
+	mov (%esp),%ebx
+DEF(void,primitive_inline_cache_miss_tail,(void)):
 	sub $8,%esp
-	push %eax
+	push %ebx
 	call MANGLE(inline_cache_miss)
 	add $12,%esp
 	jmp *%eax

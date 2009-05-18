@@ -1,8 +1,8 @@
 namespace factor
 {
 
-void init_c_io(void);
-void io_error(void);
+void init_c_io();
+void io_error();
 
 PRIMITIVE(fopen);
 PRIMITIVE(fgetc);
@@ -18,7 +18,7 @@ PRIMITIVE(open_file);
 PRIMITIVE(existsp);
 PRIMITIVE(read_dir);
 
-VM_C_API int err_no(void);
-VM_C_API void clear_err_no(void);
+VM_C_API int err_no();
+VM_C_API void clear_err_no();
 
 }

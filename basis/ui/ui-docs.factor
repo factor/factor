@@ -25,27 +25,27 @@ HELP: world-attributes
     { { $snippet "pixel-format-attributes" } " is a sequence of " { $link "ui.pixel-formats-attributes" } " that the window will request for its OpenGL pixel format." }
 } ;
 
-HELP: set-fullscreen?
-{ $values { "?" "a boolean" } { "gadget" gadget } }
+HELP: set-fullscreen
+{ $values { "gadget" gadget } { "?" "a boolean" } }
 { $description "Sets and unsets fullscreen mode for the gadget's world." } ;
 
 HELP: fullscreen?
 { $values { "gadget" gadget } { "?" "a boolean" } }
 { $description "Queries the gadget's world to see if it is running in fullscreen mode." } ;
 
-{ fullscreen? set-fullscreen? } related-words
+{ fullscreen? set-fullscreen } related-words
 
 HELP: find-window
 { $values { "quot" { $quotation "( world -- ? )" } } { "world" { $maybe world } } }
 { $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;
 
 HELP: register-window
-{ $values { "world" world } { "handle" "a baackend-specific handle" } }
+{ $values { "world" world } { "handle" "a backend-specific handle" } }
 { $description "Adds a window to the global " { $link windows } " variable." }
 { $notes "This word should only be called by the UI backend.  User code can open new windows with " { $link open-window } "." } ;
 
 HELP: unregister-window
-{ $values { "handle" "a baackend-specific handle" } }
+{ $values { "handle" "a backend-specific handle" } }
 { $description "Removes a window from the global " { $link windows } " variable." }
 { $notes "This word should only be called only by the UI backend, and not user code." } ;
 

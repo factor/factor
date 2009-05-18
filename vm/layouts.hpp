@@ -23,8 +23,10 @@ inline static cell align(cell a, cell b)
 	return (a + (b-1)) & ~(b-1);
 }
 
-#define align8(a) align(a,8)
-#define align_page(a) align(a,getpagesize())
+inline static cell align8(cell a)
+{
+	return align(a,8);
+}
 
 #define WORD_SIZE (signed)(sizeof(cell)*8)
 
@@ -88,10 +90,13 @@ inline static cell tag_for(cell type)
 	return type < HEADER_TYPE ? type : OBJECT_TYPE;
 }
 
-class object;
+struct object;
 
 struct header {
 	cell value;
+
+        /* Default ctor to make gcc 3.x happy */
+        header() { abort(); }
 
 	header(cell value_) : value(value_ << TAG_BITS) {}
 
@@ -193,26 +198,19 @@ struct heap_block
 	unsigned char status; /* free or allocated? */
 	unsigned char type; /* this is WORD_TYPE or QUOTATION_TYPE */
 	unsigned char last_scan; /* the youngest generation in which this block's literals may live */
-	char needs_fixup; /* is this a new block that needs full fixup? */
+	unsigned char needs_fixup; /* is this a new block that needs full fixup? */
 
 	/* In bytes, includes this header */
 	cell size;
-
-	/* Used during compaction */
-	heap_block *forwarding;
 };
 
-struct free_heap_block
+struct free_heap_block : public heap_block
 {
-	heap_block block;
-
-	/* Filled in on image load */
         free_heap_block *next_free;
 };
 
-struct code_block
+struct code_block : public heap_block
 {
-	heap_block block;
 	cell literals; /* # bytes */
 	cell relocation; /* tagged pointer to byte-array or f */
 	
@@ -233,7 +231,9 @@ struct word : public object {
 	/* TAGGED property assoc for library code */
 	cell props;
 	/* TAGGED alternative entry point for direct non-tail calls. Used for inline caching */
-	cell direct_entry_def;
+	cell pic_def;
+	/* TAGGED alternative entry point for direct tail calls. Used for inline caching */
+	cell pic_tail_def;
 	/* TAGGED call count for profiling */
 	cell counter;
 	/* TAGGED machine code for sub-primitive */
@@ -269,8 +269,6 @@ struct quotation : public object {
 	/* tagged */
 	cell array;
 	/* tagged */
-	cell compiledp;
-	/* tagged */
 	cell cached_effect;
 	/* tagged */
 	cell cache_counter;
@@ -299,17 +297,20 @@ struct dll : public object {
 	void *dll;
 };
 
-struct callstack : public object {
-	static const cell type_number = CALLSTACK_TYPE;
-	/* tagged */
-	cell length;
-};
-
 struct stack_frame
 {
 	void *xt;
 	/* Frame size in bytes */
 	cell size;
+};
+
+struct callstack : public object {
+	static const cell type_number = CALLSTACK_TYPE;
+	/* tagged */
+	cell length;
+	
+	stack_frame *top() { return (stack_frame *)(this + 1); }
+	stack_frame *bottom() { return (stack_frame *)((cell)(this + 1) + untag_fixnum(length)); }
 };
 
 struct tuple : public object {

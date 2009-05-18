@@ -1,0 +1,1 @@
+Definitions of messages sent to Redis

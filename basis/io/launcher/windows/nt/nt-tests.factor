@@ -42,7 +42,7 @@ IN: io.launcher.windows.nt.tests
         console-vm "-run=listener" 2array >>command
         +closed+ >>stdin
         +stdout+ >>stderr
-    ascii [ input-stream get contents ] with-process-reader
+    ascii [ contents ] with-process-reader
 ] unit-test
 
 : launcher-test-path ( -- str )
@@ -85,7 +85,7 @@ IN: io.launcher.windows.nt.tests
         <process>
             console-vm "-script" "stderr.factor" 3array >>command
             "err2.txt" temp-file >>stderr
-        ascii <process-reader> lines first
+        ascii <process-reader> stream-lines first
     ] with-directory
 ] unit-test
 
@@ -97,7 +97,7 @@ IN: io.launcher.windows.nt.tests
     launcher-test-path [
         <process>
             console-vm "-script" "env.factor" 3array >>command
-        ascii <process-reader> contents
+        ascii <process-reader> stream-contents
     ] with-directory eval( -- alist )
 
     os-envs =
@@ -109,7 +109,7 @@ IN: io.launcher.windows.nt.tests
             console-vm "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
             os-envs >>environment
-        ascii <process-reader> contents
+        ascii <process-reader> stream-contents
     ] with-directory eval( -- alist )
     
     os-envs =
@@ -120,7 +120,7 @@ IN: io.launcher.windows.nt.tests
         <process>
             console-vm "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
-        ascii <process-reader> contents
+        ascii <process-reader> stream-contents
     ] with-directory eval( -- alist )
 
     "A" swap at
@@ -132,7 +132,7 @@ IN: io.launcher.windows.nt.tests
             console-vm "-script" "env.factor" 3array >>command
             { { "USERPROFILE" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
-        ascii <process-reader> contents
+        ascii <process-reader> stream-contents
     ] with-directory eval( -- alist )
 
     "USERPROFILE" swap at "XXX" =

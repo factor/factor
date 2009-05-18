@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser project-euler.common sequences ;
+USING: kernel math math.parser math.ranges project-euler.common sequences ;
 IN: project-euler.055
 
 ! http://projecteuler.net/index.php?section=problems&id=55
@@ -61,7 +61,7 @@ IN: project-euler.055
 PRIVATE>
 
 : euler055 ( -- answer )
-    10000 [ lychrel? ] count ;
+    10000 [0,b) [ lychrel? ] count ;
 
 ! [ euler055 ] 100 ave-time
 ! 478 ms ave run time - 30.63 SD (100 trials)

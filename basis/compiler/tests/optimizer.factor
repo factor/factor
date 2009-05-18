@@ -390,3 +390,25 @@ DEFER: loop-bbb
 [ f ] [ \ broken-declaration optimized? ] unit-test
 
 [ ] [ [ \ broken-declaration forget ] with-compilation-unit ] unit-test
+
+! Modular arithmetic bug
+: modular-arithmetic-bug ( a -- b ) >integer 256 mod ;
+
+[ 1 ] [ 257 modular-arithmetic-bug ] unit-test
+[ -10 ] [ -10 modular-arithmetic-bug ] unit-test
+
+! Optimizer needs to ignore invalid generics
+GENERIC# bad-dispatch-position-test* 3 ( -- )
+
+M: object bad-dispatch-position-test* ;
+
+: bad-dispatch-position-test ( -- ) bad-dispatch-position-test* ;
+
+[ 1 2 3 4 bad-dispatch-position-test ] must-fail
+
+[ ] [
+    [
+        \ bad-dispatch-position-test forget
+        \ bad-dispatch-position-test* forget
+    ] with-compilation-unit
+] unit-test

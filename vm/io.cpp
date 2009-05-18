@@ -14,14 +14,14 @@ The Factor library provides platform-specific code for Unix and Windows
 with many more capabilities so these words are not usually used in
 normal operation. */
 
-void init_c_io(void)
+void init_c_io()
 {
 	userenv[STDIN_ENV] = allot_alien(F,(cell)stdin);
 	userenv[STDOUT_ENV] = allot_alien(F,(cell)stdout);
 	userenv[STDERR_ENV] = allot_alien(F,(cell)stderr);
 }
 
-void io_error(void)
+void io_error()
 {
 #ifndef WINCE
 	if(errno == EINTR)
@@ -216,12 +216,12 @@ PRIMITIVE(fclose)
 /* This function is used by FFI I/O. Accessing the errno global directly is
 not portable, since on some libc's errno is not a global but a funky macro that
 reads thread-local storage. */
-VM_C_API int err_no(void)
+VM_C_API int err_no()
 {
 	return errno;
 }
 
-VM_C_API void clear_err_no(void)
+VM_C_API void clear_err_no()
 {
 	errno = 0;
 }

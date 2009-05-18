@@ -58,13 +58,13 @@ M: single-combination make-default-method
     ] unless ;
 
 ! 1. Flatten methods
-TUPLE: predicate-engine methods ;
+TUPLE: predicate-engine class methods ;
 
-: <predicate-engine> ( methods -- engine ) predicate-engine boa ;
+C: <predicate-engine> predicate-engine
 
 : push-method ( method specializer atomic assoc -- )
-    [
-        [ H{ } clone <predicate-engine> ] unless*
+    dupd [
+        [ ] [ H{ } clone <predicate-engine> ] ?if
         [ methods>> set-at ] keep
     ] change-at ;
 
@@ -163,7 +163,7 @@ M: hi-tag-dispatch-engine compile-engine
 
 : build-fast-hash ( methods -- buckets )
     >alist V{ } clone [ hashcode 1array ] distribute-buckets
-    [ compile-engines* >alist >array ] map ;
+    [ compile-engines* >alist { } join ] map ;
 
 M: echelon-dispatch-engine compile-engine
     dup n>> 0 = [
@@ -182,14 +182,27 @@ M: tuple-dispatch-engine compile-engine
         [ <enum> swap update ] keep
     ] with-variable ;
 
+PREDICATE: predicate-engine-word < word "owner-generic" word-prop ;
+
+SYMBOL: predicate-engines
+
 : sort-methods ( assoc -- assoc' )
     >alist [ keys sort-classes ] keep extract-keys ;
 
 : quote-methods ( assoc -- assoc' )
     [ 1quotation \ drop prefix ] assoc-map ;
 
+: find-predicate-engine ( classes -- word )
+    predicate-engines get [ at ] curry map-find drop ;
+
+: next-predicate-engine ( engine -- word )
+    class>> superclasses
+    find-predicate-engine
+    default get or ;
+
 : methods-with-default ( engine -- assoc )
-    methods>> clone default get object bootstrap-word pick set-at ;
+    [ methods>> clone ] [ next-predicate-engine ] bi
+    object bootstrap-word pick set-at ;
 
 : keep-going? ( assoc -- ? )
     assumed get swap second first class<= ;
@@ -205,8 +218,6 @@ M: tuple-dispatch-engine compile-engine
 : class-predicates ( assoc -- assoc )
     [ [ "predicate" word-prop [ dup ] prepend ] dip ] assoc-map ;
 
-PREDICATE: predicate-engine-word < word "owner-generic" word-prop ;
-
 : <predicate-engine-word> ( -- word )
     generic-word get name>> "/predicate-engine" append f <word>
     dup generic-word get "owner-generic" set-word-prop ;
@@ -217,13 +228,17 @@ M: predicate-engine-word stack-effect "owner-generic" word-prop stack-effect ;
     [ <predicate-engine-word> ] dip
     [ define ] [ drop generic-word get "engines" word-prop push ] [ drop ] 2tri ;
 
-M: predicate-engine compile-engine
+: compile-predicate-engine ( engine -- word )
     methods-with-default
     sort-methods
     quote-methods
     prune-redundant-predicates
     class-predicates
     [ peek ] [ alist>quot picker prepend define-predicate-engine ] if-empty ;
+
+M: predicate-engine compile-engine
+    [ compile-predicate-engine ] [ class>> ] bi
+    [ drop ] [ predicate-engines get set-at ] 2bi ;
 
 M: word compile-engine ;
 
@@ -238,15 +253,20 @@ M: f compile-engine ;
         [ <engine> compile-engine ] bi
     ] tri ;
 
-HOOK: inline-cache-quot combination ( word methods -- quot/f )
+HOOK: inline-cache-quots combination ( word methods -- pic-quot/f pic-tail-quot/f )
+
+M: single-combination inline-cache-quots 2drop f f ;
 
 : define-inline-cache-quot ( word methods -- )
-    [ drop ] [ inline-cache-quot ] 2bi >>direct-entry-def drop ;
+    [ drop ] [ inline-cache-quots ] 2bi
+    [ >>pic-def ] [ >>pic-tail-def ] bi*
+    drop ;
 
 HOOK: mega-cache-quot combination ( methods -- quot/f )
 
 M: single-combination perform-combination
     [
+        H{ } clone predicate-engines set
         dup generic-word set
         dup build-decision-tree
         [ "decision-tree" set-word-prop ]
