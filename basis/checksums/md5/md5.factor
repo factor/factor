@@ -4,7 +4,8 @@ USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting grouping strings
 sequences byte-arrays locals sequences.private macros fry
 io.encodings.binary math.bitwise checksums accessors
-checksums.common checksums.stream combinators combinators.smart ;
+checksums.common checksums.stream combinators combinators.smart
+specialized-arrays.uint literals ;
 IN: checksums.md5
 
 SINGLETON: md5
@@ -16,7 +17,7 @@ TUPLE: md5-state < checksum-state state old-state ;
 : <md5-state> ( -- md5 )
     md5-state new-checksum-state
         64 >>block-size
-        { HEX: 67452301 HEX: efcdab89 HEX: 98badcfe HEX: 10325476 }
+        uint-array{ HEX: 67452301 HEX: efcdab89 HEX: 98badcfe HEX: 10325476 }
         [ clone >>state ] [ >>old-state ] bi ;
 
 M: md5 initialize-checksum-state drop <md5-state> ;
@@ -29,8 +30,10 @@ M: md5 initialize-checksum-state drop <md5-state> ;
     [ state>> ] [ old-state>> v-w+ dup clone ] [ ] tri
     [ (>>old-state) ] [ (>>state) ] bi ; inline
 
-: T ( N -- Y )
-    sin abs 32 2^ * >integer ; inline
+CONSTANT: T
+    $[
+        80 iota [ sin abs 32 2^ * >integer ] uint-array{ } map-as
+    ]
 
 :: F ( X Y Z -- FXYZ )
     #! F(X,Y,Z) = XY v not(X) Z
@@ -70,22 +73,22 @@ CONSTANT: b 1
 CONSTANT: c 2
 CONSTANT: d 3
 
-:: (ABCD) ( x V a b c d k s i quot -- )
+:: (ABCD) ( x state a b c d k s i quot -- )
     #! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
-    a V [
-        b V nth
-        c V nth
-        d V nth quot call w+
-        k x nth w+
-        i T w+
+    a state [
+        b state nth-unsafe
+        c state nth-unsafe
+        d state nth-unsafe quot call w+
+        k x nth-unsafe w+
+        i T nth-unsafe w+
         s bitroll-32
-        b V nth w+
-    ] change-nth ; inline
+        b state nth-unsafe w+ 32 bits
+    ] change-nth-unsafe ; inline
 
 MACRO: with-md5-round ( ops quot -- )
     '[ [ _ (ABCD) ] compose ] map '[ _ 2cleave ] ;
 
-: (process-md5-block-F) ( block v -- )
+: (process-md5-block-F) ( block state -- )
     {
         [ a b c d 0  S11 1  ]
         [ d a b c 1  S12 2  ]
@@ -105,7 +108,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ b c d a 15 S14 16 ]
     } [ F ] with-md5-round ; inline
 
-: (process-md5-block-G) ( block v -- )
+: (process-md5-block-G) ( block state -- )
     {
         [ a b c d 1  S21 17 ]
         [ d a b c 6  S22 18 ]
@@ -125,7 +128,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ b c d a 12 S24 32 ]
     } [ G ] with-md5-round ; inline
 
-: (process-md5-block-H) ( block v -- )
+: (process-md5-block-H) ( block state -- )
     {
         [ a b c d 5  S31 33 ]
         [ d a b c 8  S32 34 ]
@@ -145,7 +148,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ b c d a 2  S34 48 ]
     } [ H ] with-md5-round ; inline
 
-: (process-md5-block-I) ( block v -- )
+: (process-md5-block-I) ( block state -- )
     {
         [ a b c d 0  S41 49 ]
         [ d a b c 7  S42 50 ]
@@ -167,7 +170,7 @@ MACRO: with-md5-round ( ops quot -- )
 
 M: md5-state checksum-block ( block state -- )
     [
-        [ 4 <groups> [ le> ] map ] [ state>> ] bi* {
+        [ byte-array>uint-array ] [ state>> ] bi* {
             [ (process-md5-block-F) ]
             [ (process-md5-block-G) ]
             [ (process-md5-block-H) ]
@@ -177,8 +180,7 @@ M: md5-state checksum-block ( block state -- )
         nip update-md5
     ] 2bi ;
 
-: md5>checksum ( md5 -- bytes )
-    state>> [ 4 >le ] map B{ } concat-as ;
+: md5>checksum ( md5 -- bytes ) state>> underlying>> ;
 
 M: md5-state clone ( md5 -- new-md5 )
     call-next-method

@@ -33,7 +33,7 @@ ARTICLE: { "lists.lazy" "construction" } "Constructing lazy lists"
 { $subsection 1lazy-list }
 { $subsection 2lazy-list }
 { $subsection 3lazy-list }
-{ $subsection seq>list }
+{ $subsection sequence-tail>list }
 { $subsection >list }
 { $subsection lfrom } ;
 
@@ -105,15 +105,15 @@ HELP: lfrom
 { $values { "n" "an integer" } { "list" "a lazy list of integers" } }
 { $description "Return an infinite lazy list of incrementing integers starting from n." } ;
 
-HELP: seq>list
+HELP: sequence-tail>list
 { $values { "index" "an integer 0 or greater" } { "seq" "a sequence" } { "list" "a list" } }
 { $description "Convert the sequence into a list, starting from " { $snippet "index" } "." }
 { $see-also >list } ;
 
 HELP: >list
 { $values { "object" "an object" } { "list" "a list" } }
-{ $description "Convert the object into a list. Existing lists are passed through intact, sequences are converted using " { $link seq>list } " and other objects cause an error to be thrown." } 
-{ $see-also seq>list } ;
+{ $description "Convert the object into a list. Existing lists are passed through intact, sequences are converted using " { $link sequence-tail>list } " and other objects cause an error to be thrown." } 
+{ $see-also sequence-tail>list } ;
     
 { leach foldl lazy-map ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
