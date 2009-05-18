@@ -5,6 +5,9 @@ IN: modules.rpc
 
 DEFER: get-words
 
+: with-in-vocab ( vocab quot -- vocab ) over
+  [ '[ _ set-in @ ] in get swap dip set-in ] dip vocab ; inline
+
 : remote-quot ( addrspec vocabspec effect str -- quot )
    '[ _ 5000 <inet> binary
       [
@@ -20,4 +23,4 @@ DEFER: get-words
    dup "-remote" append [ 
       [ (( -- words )) [ "get-words" remote-quot ] keep call-effect ] 2keep
       [ rot first2 swap define-remote ] 2curry each
-   ] with-in ;
+   ] with-in-vocab ;
