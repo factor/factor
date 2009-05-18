@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Slava Pestov
+! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler io kernel cocoa.runtime cocoa.subclassing
 cocoa.messages cocoa.types sequences words vocabs parser
@@ -27,21 +27,15 @@ SYMBOL: frameworks
 
 frameworks [ V{ } clone ] initialize
 
-[ frameworks get [ load-framework ] each ] "cocoa.messages" add-init-hook
+[ frameworks get [ load-framework ] each ] "cocoa" add-init-hook
 
 SYNTAX: FRAMEWORK: scan [ load-framework ] [ frameworks get push ] bi ;
 
 SYNTAX: IMPORT: scan [ ] import-objc-class ;
 
-"Compiling Objective C bridge..." print
+"Importing Cocoa classes..." print
 
 "cocoa.classes" create-vocab drop
-
-{
-    "cocoa" "cocoa.runtime" "cocoa.messages" "cocoa.subclassing"
-} [ words ] map concat compile
-
-"Importing Cocoa classes..." print
 
 [
     {

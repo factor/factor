@@ -11,6 +11,10 @@ IN: cpu.x86
 
 << enable-fixnum-log2 >>
 
+! Add some methods to the assembler to be more useful to the backend
+M: label JMP 0 JMP rc-relative label-fixup ;
+M: label JUMPcc [ 0 ] dip JUMPcc rc-relative label-fixup ;
+
 M: x86 two-operand? t ;
 
 HOOK: temp-reg-1 cpu ( -- reg )
@@ -18,6 +22,8 @@ HOOK: temp-reg-2 cpu ( -- reg )
 
 HOOK: param-reg-1 cpu ( -- reg )
 HOOK: param-reg-2 cpu ( -- reg )
+
+HOOK: pic-tail-reg cpu ( -- reg )
 
 M: x86 %load-immediate MOV ;
 
@@ -53,8 +59,18 @@ M: x86 stack-frame-size ( stack-frame -- i )
     reserved-area-size +
     align-stack ;
 
-M: x86 %call ( label -- ) CALL ;
-M: x86 %jump-label ( label -- ) JMP ;
+M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
+
+: xt-tail-pic-offset ( -- n )
+    #! See the comment in vm/cpu-x86.hpp
+    cell 4 + 1 + ; inline
+
+M: x86 %jump ( word -- )
+    pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here
+    0 JMP rc-relative rel-word-pic-tail ;
+
+M: x86 %jump-label ( label -- ) 0 JMP rc-relative label-fixup ;
+
 M: x86 %return ( -- ) 0 RET ;
 
 : code-alignment ( align -- n )

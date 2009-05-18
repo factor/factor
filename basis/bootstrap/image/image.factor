@@ -9,7 +9,7 @@ classes.builtin classes.tuple classes.tuple.private vocabs
 vocabs.loader source-files definitions debugger quotations.private
 sequences.private combinators math.order math.private accessors
 slots.private generic.single.private compiler.units compiler.constants
-fry ;
+fry bootstrap.image.syntax ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -52,6 +52,9 @@ GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 M: integer (eql?) = ;
 
+M: float (eql?)
+    over float? [ fp-bitwise= ] [ 2drop f ] if ;
+
 M: sequence (eql?)
     over sequence? [
         2dup [ length ] bi@ =
@@ -93,24 +96,19 @@ CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
 
-SYMBOL: jit-define-rc
-SYMBOL: jit-define-rt
-SYMBOL: jit-define-offset
+SYMBOL: jit-relocations
 
-: compute-offset ( -- offset )
-    building get length jit-define-rc get rc-absolute-cell = bootstrap-cell 4 ? - ;
+: compute-offset ( rc -- offset )
+    [ building get length ] dip rc-absolute-cell = bootstrap-cell 4 ? - ;
 
 : jit-rel ( rc rt -- )
-    jit-define-rt set
-    jit-define-rc set
-    compute-offset jit-define-offset set ;
+    over compute-offset 3array jit-relocations get push-all ;
 
-: make-jit ( quot -- quad )
+: make-jit ( quot -- jit-data )
     [
+        V{ } clone jit-relocations set
         call( -- )
-        jit-define-rc get
-        jit-define-rt get
-        jit-define-offset get 3array
+        jit-relocations get >array
     ] B{ } make prefix ;
 
 : jit-define ( quot name -- )
@@ -128,98 +126,59 @@ SYMBOL: big-endian
 ! Bootstrap architecture name
 SYMBOL: architecture
 
-! Bootstrap global namesapce
-SYMBOL: bootstrap-global
+RESET
 
 ! Boot quotation, set in stage1.factor
-SYMBOL: bootstrap-boot-quot
+USERENV: bootstrap-boot-quot 20
+
+! Bootstrap global namesapce
+USERENV: bootstrap-global 21
 
 ! JIT parameters
-SYMBOL: jit-prolog
-SYMBOL: jit-primitive-word
-SYMBOL: jit-primitive
-SYMBOL: jit-word-jump
-SYMBOL: jit-word-call
-SYMBOL: jit-push-immediate
-SYMBOL: jit-if-word
-SYMBOL: jit-if-1
-SYMBOL: jit-if-2
-SYMBOL: jit-dip-word
-SYMBOL: jit-dip
-SYMBOL: jit-2dip-word
-SYMBOL: jit-2dip
-SYMBOL: jit-3dip-word
-SYMBOL: jit-3dip
-SYMBOL: jit-execute-word
-SYMBOL: jit-execute-jump
-SYMBOL: jit-execute-call
-SYMBOL: jit-epilog
-SYMBOL: jit-return
-SYMBOL: jit-profiling
-SYMBOL: jit-save-stack
+USERENV: jit-prolog 23
+USERENV: jit-primitive-word 24
+USERENV: jit-primitive 25
+USERENV: jit-word-jump 26
+USERENV: jit-word-call 27
+USERENV: jit-word-special 28
+USERENV: jit-if-word 29
+USERENV: jit-if 30
+USERENV: jit-epilog 31
+USERENV: jit-return 32
+USERENV: jit-profiling 33
+USERENV: jit-push-immediate 34
+USERENV: jit-dip-word 35
+USERENV: jit-dip 36
+USERENV: jit-2dip-word 37
+USERENV: jit-2dip 38
+USERENV: jit-3dip-word 39
+USERENV: jit-3dip 40
+USERENV: jit-execute-word 41
+USERENV: jit-execute-jump 42
+USERENV: jit-execute-call 43
 
 ! PIC stubs
-SYMBOL: pic-load
-SYMBOL: pic-tag
-SYMBOL: pic-hi-tag
-SYMBOL: pic-tuple
-SYMBOL: pic-hi-tag-tuple
-SYMBOL: pic-check-tag
-SYMBOL: pic-check
-SYMBOL: pic-hit
-SYMBOL: pic-miss-word
+USERENV: pic-load 47
+USERENV: pic-tag 48
+USERENV: pic-hi-tag 49
+USERENV: pic-tuple 50
+USERENV: pic-hi-tag-tuple 51
+USERENV: pic-check-tag 52
+USERENV: pic-check 53
+USERENV: pic-hit 54
+USERENV: pic-miss-word 55
+USERENV: pic-miss-tail-word 56
 
 ! Megamorphic dispatch
-SYMBOL: mega-lookup
-SYMBOL: mega-lookup-word
-SYMBOL: mega-miss-word
+USERENV: mega-lookup 57
+USERENV: mega-lookup-word 58
+USERENV: mega-miss-word 59
 
 ! Default definition for undefined words
-SYMBOL: undefined-quot
-
-: userenvs ( -- assoc )
-    H{
-        { bootstrap-boot-quot 20 }
-        { bootstrap-global 21 }
-        { jit-prolog 23 }
-        { jit-primitive-word 24 }
-        { jit-primitive 25 }
-        { jit-word-jump 26 }
-        { jit-word-call 27 }
-        { jit-if-word 28 }
-        { jit-if-1 29 }
-        { jit-if-2 30 }
-        { jit-epilog 33 }
-        { jit-return 34 }
-        { jit-profiling 35 }
-        { jit-push-immediate 36 }
-        { jit-save-stack 38 }
-        { jit-dip-word 39 }
-        { jit-dip 40 }
-        { jit-2dip-word 41 }
-        { jit-2dip 42 }
-        { jit-3dip-word 43 }
-        { jit-3dip 44 }
-        { jit-execute-word 45 }
-        { jit-execute-jump 46 }
-        { jit-execute-call 47 }
-        { pic-load 48 }
-        { pic-tag 49 }
-        { pic-hi-tag 50 }
-        { pic-tuple 51 }
-        { pic-hi-tag-tuple 52 }
-        { pic-check-tag 53 }
-        { pic-check 54 }
-        { pic-hit 55 }
-        { pic-miss-word 56 }
-        { mega-lookup 57 }
-        { mega-lookup-word 58 }
-        { mega-miss-word 59 }
-        { undefined-quot 60 }
-    } ; inline
+USERENV: undefined-quot 60
 
 : userenv-offset ( symbol -- n )
-    userenvs at header-size + ;
+    userenvs get at header-size + ;
 
 : emit ( cell -- ) image get push ;
 
@@ -351,7 +310,8 @@ M: f '
                     [ vocabulary>> , ]
                     [ def>> , ]
                     [ props>> , ]
-                    [ direct-entry-def>> , ] ! direct-entry-def
+                    [ pic-def>> , ]
+                    [ pic-tail-def>> , ]
                     [ drop 0 , ] ! count
                     [ word-sub-primitive , ]
                     [ drop 0 , ] ! xt
@@ -488,7 +448,6 @@ M: quotation '
         array>> '
         quotation [
             emit ! array
-            f ' emit ! compiled
             f ' emit ! cached-effect
             f ' emit ! cache-counter
             0 emit ! xt
@@ -510,11 +469,7 @@ M: quotation '
         class<=-cache class-not-cache classes-intersect-cache
         class-and-cache class-or-cache next-method-quot-cache
     } [ H{ } clone ] H{ } map>assoc assoc-union
-    bootstrap-global set
-    bootstrap-global emit-userenv ;
-
-: emit-boot-quot ( -- )
-    bootstrap-boot-quot emit-userenv ;
+    bootstrap-global set ;
 
 : emit-jit-data ( -- )
     \ if jit-if-word set
@@ -524,46 +479,13 @@ M: quotation '
     \ 3dip jit-3dip-word set
     \ (execute) jit-execute-word set
     \ inline-cache-miss \ pic-miss-word set
+    \ inline-cache-miss-tail \ pic-miss-tail-word set
     \ mega-cache-lookup \ mega-lookup-word set
     \ mega-cache-miss \ mega-miss-word set
-    [ undefined ] undefined-quot set
-    {
-        jit-prolog
-        jit-primitive-word
-        jit-primitive
-        jit-word-jump
-        jit-word-call
-        jit-push-immediate
-        jit-if-word
-        jit-if-1
-        jit-if-2
-        jit-dip-word
-        jit-dip
-        jit-2dip-word
-        jit-2dip
-        jit-3dip-word
-        jit-3dip
-        jit-execute-word
-        jit-execute-jump
-        jit-execute-call
-        jit-epilog
-        jit-return
-        jit-profiling
-        jit-save-stack
-        pic-load
-        pic-tag
-        pic-hi-tag
-        pic-tuple
-        pic-hi-tag-tuple
-        pic-check-tag
-        pic-check
-        pic-hit
-        pic-miss-word
-        mega-lookup
-        mega-lookup-word
-        mega-miss-word
-        undefined-quot
-    } [ emit-userenv ] each ;
+    [ undefined ] undefined-quot set ;
+
+: emit-userenvs ( -- )
+    userenvs get keys [ emit-userenv ] each ;
 
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;
@@ -580,8 +502,8 @@ M: quotation '
     emit-jit-data
     "Serializing global namespace..." print flush
     emit-global
-    "Serializing boot quotation..." print flush
-    emit-boot-quot
+    "Serializing user environment..." print flush
+    emit-userenvs
     "Performing word fixups..." print flush
     fixup-words
     "Performing header fixups..." print flush

@@ -23,24 +23,21 @@ jit::jit(cell type_, cell owner_)
 	if(stack_traces_p()) literal(owner.value());
 }
 
-relocation_entry jit::rel_to_emit(cell code_template, bool *rel_p)
+void jit::emit_relocation(cell code_template_)
 {
-	array *quadruple = untag<array>(code_template);
-	cell rel_class = array_nth(quadruple,1);
-	cell rel_type = array_nth(quadruple,2);
-	cell offset = array_nth(quadruple,3);
+	gc_root<array> code_template(code_template_);
+	cell capacity = array_capacity(code_template.untagged());
+	for(cell i = 1; i < capacity; i += 3)
+	{
+		cell rel_class = array_nth(code_template.untagged(),i);
+		cell rel_type = array_nth(code_template.untagged(),i + 1);
+		cell offset = array_nth(code_template.untagged(),i + 2);
 
-	if(rel_class == F)
-	{
-		*rel_p = false;
-		return 0;
-	}
-	else
-	{
-		*rel_p = true;
-		return (untag_fixnum(rel_type) << 28)
+		relocation_entry new_entry
+			= (untag_fixnum(rel_type) << 28)
 			| (untag_fixnum(rel_class) << 24)
 			| ((code.count + untag_fixnum(offset)));
+		relocation.append_bytes(&new_entry,sizeof(relocation_entry));
 	}
 }
 
@@ -49,9 +46,7 @@ void jit::emit(cell code_template_)
 {
 	gc_root<array> code_template(code_template_);
 
-	bool rel_p;
-	relocation_entry rel = rel_to_emit(code_template.value(),&rel_p);
-	if(rel_p) relocation.append_bytes(&rel,sizeof(relocation_entry));
+	emit_relocation(code_template.value());
 
 	gc_root<byte_array> insns(array_nth(code_template.untagged(),0));
 

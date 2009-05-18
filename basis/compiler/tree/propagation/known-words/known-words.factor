@@ -148,10 +148,6 @@ most-negative-fixnum most-positive-fixnum [a,b]
 comparison-ops
 [ dup '[ _ define-comparison-constraints ] each-derived-op ] each
 
-! generic-comparison-ops [
-!     dup specific-comparison define-comparison-constraints
-! ] each
-
 ! Remove redundant comparisons
 : fold-comparison ( info1 info2 word -- info )
     [ [ interval>> ] bi@ ] dip interval-comparison {
@@ -217,6 +213,8 @@ generic-comparison-ops [
     { >float float }
     { fixnum>float float }
     { bignum>float float }
+
+    { >integer integer }
 } [
     '[
         _
@@ -228,18 +226,25 @@ generic-comparison-ops [
     ] "outputs" set-word-prop
 ] assoc-each
 
+: rem-custom-inlining ( #call -- quot/f )
+    second value-info literal>> dup integer?
+    [ power-of-2? [ 1- bitand ] f ? ] [ drop f ] if ;
+
 {
     mod-integer-integer
     mod-integer-fixnum
     mod-fixnum-integer
     fixnum-mod
-    rem
 } [
     [
-        in-d>> second value-info >literal<
-        [ dup integer? [ power-of-2? [ 1- bitand ] f ? ] [ drop f ] if ] when
+        in-d>> dup first value-info interval>> [0,inf] interval-subset?
+        [ rem-custom-inlining ] [ drop f ] if
     ] "custom-inlining" set-word-prop
 ] each
+
+\ rem [
+    in-d>> rem-custom-inlining
+] "custom-inlining" set-word-prop
 
 {
     bitand-integer-integer

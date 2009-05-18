@@ -41,7 +41,7 @@ nl
 ! which are also quick to compile are replaced by
 ! compiled definitions as soon as possible.
 {
-    roll -roll declare not
+    not
 
     array? hashtable? vector?
     tuple? sbuf? tombstone?

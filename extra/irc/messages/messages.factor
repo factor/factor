@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel fry splitting ascii calendar accessors combinators
-arrays classes.tuple math.order words assocs strings irc.messages.base ;
+arrays classes.tuple math.order words assocs strings irc.messages.base
+combinators.short-circuit math ;
 EXCLUDE: sequences => join ;
 IN: irc.messages
 
@@ -61,8 +62,17 @@ IRC: rpl-names-end       "366" nickname channel : comment ;
 IRC: rpl-nickname-in-use "433" _ name ;
 IRC: rpl-nick-collision  "436" nickname : comment ;
 
+PREDICATE: channel-mode < mode name>> first "#&" member? ;
+PREDICATE: participant-mode < channel-mode parameter>> ;
+PREDICATE: ctcp < privmsg
+    trailing>> { [ length 1 > ] [ first 1 = ] [ peek 1 = ] } 1&& ;
+PREDICATE: action < ctcp trailing>> rest "ACTION" head? ;
+
 M: rpl-names post-process-irc-message ( rpl-names -- )
     [ [ blank? ] trim " " split ] change-nicks drop ;
 
-PREDICATE: channel-mode < mode name>> first "#&" member? ;
-PREDICATE: participant-mode < channel-mode parameter>> ;
+M: ctcp post-process-irc-message ( ctcp -- )
+    [ rest but-last ] change-text drop ;
+
+M: action post-process-irc-message ( action -- )
+    [ 7 tail ] change-text call-next-method ;

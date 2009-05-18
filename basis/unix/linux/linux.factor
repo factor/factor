@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.syntax alien system ;
 IN: unix
 
 ! Linux.
@@ -93,12 +93,19 @@ C-STRUCT: passwd
     { "char*"  "pw_dir" }
     { "char*"  "pw_shell" } ;
 
+! dirent64
 C-STRUCT: dirent
-    { "__ino_t" "d_ino" }
-    { "__off_t" "d_off" }
+    { "ulonglong" "d_ino" }
+    { "longlong" "d_off" }
     { "ushort" "d_reclen" }
     { "uchar" "d_type" }
     { { "char" 256 } "d_name" } ;
+
+FUNCTION: int open64 ( char* path, int flags, int prot ) ;
+FUNCTION: dirent64* readdir64 ( DIR* dirp ) ;
+FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result ) ;
+
+M: linux open-file [ open64 ] unix-system-call ;
 
 CONSTANT: EPERM 1
 CONSTANT: ENOENT 2

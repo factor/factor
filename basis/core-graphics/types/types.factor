@@ -90,5 +90,8 @@ TYPEDEF: void* CGContextRef
 TYPEDEF: uint CGBitmapInfo
 
 TYPEDEF: int CGLError
+TYPEDEF: int CGError
+TYPEDEF: uint CGDirectDisplayID
+TYPEDEF: int boolean_t
 TYPEDEF: void* CGLContextObj
 TYPEDEF: int CGLContextParameter

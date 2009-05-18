@@ -29,7 +29,7 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
     { fullscreen { $ NSOpenGLPFAFullScreen } }
     { windowed { $ NSOpenGLPFAWindow } }
     { accelerated { $ NSOpenGLPFAAccelerated } }
-    { software-rendered { $ NSOpenGLPFASingleRenderer $ kCGLRendererGenericFloatID } }
+    { software-rendered { $ NSOpenGLPFARendererID $ kCGLRendererGenericFloatID } }
     { backing-store { $ NSOpenGLPFABackingStore } }
     { multisampled { $ NSOpenGLPFAMultisample } }
     { supersampled { $ NSOpenGLPFASupersample } }
@@ -101,10 +101,10 @@ M: cocoa-ui-backend set-title ( string world -- )
 : exit-fullscreen ( world -- )
     handle>> view>> f -> exitFullScreenModeWithOptions: ;
 
-M: cocoa-ui-backend set-fullscreen* ( ? world -- )
-    swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
+M: cocoa-ui-backend (set-fullscreen) ( world ? -- )
+    [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
-M: cocoa-ui-backend fullscreen* ( world -- ? )
+M: cocoa-ui-backend (fullscreen?) ( world -- ? )
     handle>> view>> -> isInFullScreenMode zero? not ;
 
 M:: cocoa-ui-backend (open-window) ( world -- )
@@ -121,6 +121,20 @@ M:: cocoa-ui-backend (open-window) ( world -- )
 
 M: cocoa-ui-backend (close-window) ( handle -- )
     window>> -> release ;
+
+M: cocoa-ui-backend (grab-input) ( handle -- )
+    0 CGAssociateMouseAndMouseCursorPosition drop
+    CGMainDisplayID CGDisplayHideCursor drop
+    window>> -> frame CGRect>rect rect-center
+    NSScreen -> screens 0 -> objectAtIndex: -> frame CGRect-h
+    [ drop first ] [ swap second - ] 2bi <CGPoint>
+    [ GetCurrentButtonState zero? not ] [ yield ] while
+    CGWarpMouseCursorPosition drop ;
+
+M: cocoa-ui-backend (ungrab-input) ( handle -- )
+    drop
+    CGMainDisplayID CGDisplayShowCursor drop
+    1 CGAssociateMouseAndMouseCursorPosition drop ;
 
 M: cocoa-ui-backend close-window ( gadget -- )
     find-world [

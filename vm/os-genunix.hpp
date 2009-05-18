@@ -5,9 +5,9 @@ namespace factor
 #define NULL_DLL NULL
 
 void c_to_factor_toplevel(cell quot);
-void init_signals(void);
-void early_init(void);
-const char *vm_executable_path(void);
-const char *default_image_path(void);
+void init_signals();
+void early_init();
+const char *vm_executable_path();
+const char *default_image_path();
 
 }

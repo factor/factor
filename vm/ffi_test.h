@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #if defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
 	#define F_STDCALL __attribute__((stdcall))
 #else
@@ -102,3 +104,11 @@ F_EXPORT _Complex float ffi_test_45(int x);
 F_EXPORT _Complex double ffi_test_46(int x);
 
 F_EXPORT _Complex float ffi_test_47(_Complex float x, _Complex double y);
+
+struct bool_field_test {
+	char *name;
+	bool on;
+	short parents;
+};
+
+F_EXPORT short ffi_test_48(struct bool_field_test x);

@@ -61,8 +61,7 @@
 
 #endif
 
-#define QUOT_XT_OFFSET 36
-#define WORD_XT_OFFSET 66
+#define QUOT_XT_OFFSET 28
 
 /* We pass a function pointer to memcpy to work around a Mac OS X
 ABI limitation which would otherwise require us to do a bizzaro PC-relative
@@ -73,9 +72,11 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	call *ARG3                         /* call memcpy */
 	ret                                /* return _with new stack_ */
 
-DEF(F_FASTCALL void,primitive_inline_cache_miss,(void)):
-	mov (%rsp),ARG0
+DEF(void,primitive_inline_cache_miss,(void)):
+	mov (%rsp),%rbx
+DEF(void,primitive_inline_cache_miss_tail,(void)):
 	sub $STACK_PADDING,%rsp
+	mov %rbx,ARG0
 	call MANGLE(inline_cache_miss)
 	add $STACK_PADDING,%rsp
 	jmp *%rax

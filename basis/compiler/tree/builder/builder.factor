@@ -65,5 +65,3 @@ PRIVATE>
         ] [ dup inference-error? [ drop f ] [ rethrow ] if ] recover
     ] with-variable ;
 
-: contains-breakpoints? ( word -- ? )
-    def>> [ word? ] filter [ "break?" word-prop ] any? ;

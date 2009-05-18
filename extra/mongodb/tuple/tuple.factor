@@ -54,18 +54,29 @@ M: mdb-persistent id-selector
            <update> >upsert update ] assoc-each ; inline
 PRIVATE>
  
-: save-tuple ( tuple -- )
-   tuple>storable [ (save-tuples) ] assoc-each ;
+: save-tuple-deep ( tuple -- )
+    tuple>storable [ (save-tuples) ] assoc-each ; 
  
 : update-tuple ( tuple -- )
-   save-tuple ;
+    [ tuple-collection name>> ]
+    [ id-selector ]
+    [ tuple>assoc ] tri
+    <update> update ;
+
+: save-tuple ( tuple -- )
+    update-tuple ;
 
 : insert-tuple ( tuple -- )
-   save-tuple ;
+   [ tuple-collection name>> ]
+   [ tuple>assoc ] bi
+   save ;
 
 : delete-tuple ( tuple -- )
    [ tuple-collection name>> ] keep
    id-selector delete ;
+
+: delete-tuples ( seq -- )
+    [ delete-tuple ] each ;
 
 : tuple>query ( tuple -- query )
    [ tuple-collection name>> ] keep

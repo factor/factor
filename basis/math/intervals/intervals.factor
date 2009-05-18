@@ -48,6 +48,8 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : (a,inf] ( a -- interval ) 1/0. (a,b] ; inline
 
+: [0,inf] ( -- interval ) 0 [a,inf] ; foldable
+
 : [-inf,inf] ( -- interval ) full-interval ; inline
 
 : compare-endpoints ( p1 p2 quot -- ? )
@@ -262,7 +264,7 @@ TUPLE: interval { from read-only } { to read-only } ;
 : interval-abs ( i1 -- i2 )
     {
         { [ dup empty-interval eq? ] [ ] }
-        { [ dup full-interval eq? ] [ drop 0 [a,inf] ] }
+        { [ dup full-interval eq? ] [ drop [0,inf] ] }
         { [ 0 over interval-contains? ] [ (interval-abs) { 0 t } suffix points>interval ] }
         [ (interval-abs) points>interval ]
     } cond ;
@@ -376,11 +378,11 @@ SYMBOL: incomparable
 : interval-log2 ( i1 -- i2 )
     {
         { empty-interval [ empty-interval ] }
-        { full-interval [ 0 [a,inf] ] }
+        { full-interval [ [0,inf] ] }
         [
             to>> first 1 max dup most-positive-fixnum >
             [ drop full-interval interval-log2 ]
-            [ 1+ >integer log2 0 swap [a,b] ]
+            [ 1 + >integer log2 0 swap [a,b] ]
             if
         ]
     } case ;
@@ -407,7 +409,7 @@ SYMBOL: incomparable
 
 : integral-closure ( i1 -- i2 )
     dup special-interval? [
-        [ from>> first2 [ 1+ ] unless ]
-        [ to>> first2 [ 1- ] unless ]
+        [ from>> first2 [ 1 + ] unless ]
+        [ to>> first2 [ 1 - ] unless ]
         bi [a,b]
     ] unless ;
