@@ -88,6 +88,9 @@ M: sequence set-nth bounds-check set-nth-unsafe ;
 M: sequence nth-unsafe nth ;
 M: sequence set-nth-unsafe set-nth ;
 
+: change-nth-unsafe ( i seq quot -- )
+    [ [ nth-unsafe ] dip call ] 3keep drop set-nth-unsafe ; inline
+
 ! The f object supports the sequence protocol trivially
 M: f length drop 0 ;
 M: f nth-unsafe nip ;
