@@ -30,8 +30,8 @@ ARTICLE: "checksums.openssl" "OpenSSL checksums"
 "An error thrown if the digest name is unrecognized:"
 { $subsection unknown-digest }
 "An example where we compute the SHA1 checksum of a string using the OpenSSL implementation of SHA1:"
-{ $example "USING: byte-arrays checksums checksums.openssl prettyprint ;" "\"hello world\" >byte-array openssl-sha1 checksum-bytes hex-string ." "\"2aae6c35c94fcfb415dbe95f408b9ce91ee846ed\"" }
+{ $example "USING: byte-arrays checksums checksums.openssl ;" "\"hello world\" >byte-array openssl-sha1 checksum-bytes hex-string ." "\"2aae6c35c94fcfb415dbe95f408b9ce91ee846ed\"" }
 "If we use the Factor implementation, we get the same result, just slightly slower:"
-{ $example "USING: byte-arrays checksums checksums.sha1 prettyprint ;" "\"hello world\" >byte-array sha1 checksum-bytes hex-string ." "\"2aae6c35c94fcfb415dbe95f408b9ce91ee846ed\"" } ;
+{ $example "USING: byte-arrays checksums checksums.sha ;" "\"hello world\" >byte-array sha1 checksum-bytes hex-string ." "\"2aae6c35c94fcfb415dbe95f408b9ce91ee846ed\"" } ;
 
 ABOUT: "checksums.openssl"

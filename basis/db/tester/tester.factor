@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: concurrency.combinators db.pools db.sqlite db.tuples
 db.types kernel math random threads tools.test db sequences
-io prettyprint db.postgresql db.sqlite accessors io.files.temp
+io prettyprint db.postgresql accessors io.files.temp
 namespaces fry system math.parser ;
 IN: db.tester
 

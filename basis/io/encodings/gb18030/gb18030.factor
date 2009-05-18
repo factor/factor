@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml xml.data kernel io io.encodings interval-maps splitting fry
 math.parser sequences combinators assocs locals accessors math arrays
-byte-arrays values io.encodings.ascii ascii io.files biassocs
-math.order combinators.short-circuit io.binary io.encodings.iana ;
+byte-arrays values ascii io.files biassocs math.order
+combinators.short-circuit io.binary io.encodings.iana ;
+FROM: io.encodings.ascii => ascii ;
 IN: io.encodings.gb18030
 
 SINGLETON: gb18030

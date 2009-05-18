@@ -1,4 +1,4 @@
-! Copyright (C) 2008 James Cash
+! Copyright (C) 2008 James Cash, Daniel Ehrenberg, Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors math arrays vectors classes words
 combinators.short-circuit combinators locals ;
@@ -14,57 +14,45 @@ TUPLE: cons { car read-only } { cdr read-only } ;
 
 C: cons cons
 
-M: cons car ( cons -- car )
-    car>> ;
+M: cons car ( cons -- car ) car>> ;
 
-M: cons cdr ( cons -- cdr )
-    cdr>> ;
+M: cons cdr ( cons -- cdr ) cdr>> ;
 
 SINGLETON: +nil+
 M: +nil+ nil? drop t ;
 M: object nil? drop f ;
 
-: atom? ( obj -- ? )
-    list? not ;
+: atom? ( obj -- ? ) list? not ; inline
 
-: nil ( -- symbol ) +nil+ ; 
+: nil ( -- symbol ) +nil+ ; inline
 
-: uncons ( cons -- car cdr )
-    [ car ] [ cdr ] bi ;
+: uncons ( cons -- car cdr ) [ car ] [ cdr ] bi ; inline
 
-: swons ( cdr car -- cons )
-    swap cons ;
+: swons ( cdr car -- cons ) swap cons ; inline
 
-: unswons ( cons -- cdr car )
-    uncons swap ;
+: unswons ( cons -- cdr car ) uncons swap ; inline
 
-: 1list ( obj -- cons )
-    nil cons ;
+: 1list ( obj -- cons ) nil cons ; inline
 
-: 1list? ( list -- ? )
-    { [ nil? not ] [ cdr nil? ] } 1&& ;
+: 1list? ( list -- ? ) { [ nil? not ] [ cdr nil? ] } 1&& ; inline
 
-: 2list ( a b -- cons )
-    nil cons cons ;
+: 2list ( a b -- cons ) nil cons cons ; inline
 
-: 3list ( a b c -- cons )
-    nil cons cons cons ;
+: 3list ( a b c -- cons ) nil cons cons cons ; inline
 
-: cadr ( list -- elt )    
-    cdr car ;
+: cadr ( list -- elt ) cdr car ; inline
  
-: 2car ( list -- car caar )    
-    [ car ] [ cdr car ] bi ;
+: 2car ( list -- car caar ) [ car ] [ cdr car ] bi ; inline
  
-: 3car ( list -- car cadr caddr )    
-    [ car ] [ cdr car ] [ cdr cdr car ] tri ;
+: 3car ( list -- car cadr caddr ) [ car ] [ cdr car ] [ cdr cdr car ] tri ; inline
 
-: lnth ( n list -- elt )
-    swap [ cdr ] times car ;
+: lnth ( n list -- elt ) swap [ cdr ] times car ; inline
 
 <PRIVATE
+
 : (leach) ( list quot -- cdr quot )
     [ [ car ] dip call ] [ [ cdr ] dip ] 2bi ; inline
+
 PRIVATE>
 
 : leach ( list quot: ( elt -- ) -- )
@@ -93,49 +81,16 @@ PRIVATE>
 
 : lcut ( list index -- before after )
     [ nil ] dip
-    [ [ [ cdr ] [ car ] bi ] dip cons ] times
+    [ [ unswons ] dip cons ] times
     lreverse swap ;
 
-: sequence>cons ( sequence -- list )    
-    <reversed> nil [ swap cons ] reduce ;
-
-<PRIVATE
-: same? ( obj1 obj2 -- ? ) 
-    [ class ] bi@ = ;
-PRIVATE>
-
-: deep-sequence>cons ( sequence -- cons )
-    [ <reversed> ] keep nil
-    [ [ nip ] [ same? ] 2bi [ deep-sequence>cons ] when swons ]
-    with reduce ;
-
-<PRIVATE
-:: (lmap>vector) ( acc list quot: ( elt -- elt' ) -- acc )
-    list nil? [ acc ] [
-        list car quot call acc push
-        acc list cdr quot (lmap>vector)
-    ] if ; inline recursive
-
-: lmap>vector ( list quot -- array )
-    [ V{ } clone ] 2dip (lmap>vector) ; inline
-PRIVATE>
-
-: lmap-as ( list quot exemplar -- sequence )
-    [ lmap>vector ] dip like ; inline
+: sequence>list ( sequence -- list )    
+    <reversed> nil [ swons ] reduce ;
 
 : lmap>array ( list quot -- array )
-    { } lmap-as ; inline
+    accumulator [ leach ] dip { } like ; inline
 
-: deep-list>array ( list -- array )    
-    [
-        {
-            { [ dup nil? ] [ drop { } ] }
-            { [ dup list? ] [ deep-list>array ] }
-            [ ]
-        } cond
-    ] lmap>array ;
-
-: list>array ( list -- array )    
+: list>array ( list -- array )  
     [ ] lmap>array ;
 
 :: traverse ( list pred quot: ( list/elt -- result ) -- result )

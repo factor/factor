@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Diego Martinelli.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays calendar calendar.format 
-checksums checksums.openssl classes.tuple 
-fry kernel make math math.functions math.parser math.ranges 
-present random sequences splitting strings syntax ;
+USING: accessors byte-arrays calendar calendar.format checksums
+checksums.openssl classes.tuple fry kernel make math math.functions
+math.parser math.ranges present random sequences splitting strings ;
 IN: hashcash
 
 ! Hashcash implementation

@@ -322,3 +322,9 @@ C: <ro-box> ro-box
 [ 0 ] [
     [ { null } declare [ 1 ] [ 2 ] if ] count-unboxed-allocations
 ] unit-test
+
+! Doug found a regression
+
+TUPLE: empty-tuple ;
+
+[ ] [ [ empty-tuple boa layout-of ] count-unboxed-allocations drop ] unit-test

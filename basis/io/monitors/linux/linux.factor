@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io.backend io.monitors io.monitors.recursive
-io.files io.pathnames io.buffers io.monitors io.ports io.timeouts
+io.files io.pathnames io.buffers io.ports io.timeouts
 io.backend.unix io.encodings.utf8 unix.linux.inotify assocs
 namespaces make threads continuations init math math.bitwise
 sets alien alien.strings alien.c-types vocabs.loader accessors

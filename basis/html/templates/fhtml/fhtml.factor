@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations sequences kernel namespaces debugger
 combinators math quotations generic strings splitting accessors
-assocs fry vocabs.parser parser lexer io io.files
+assocs fry vocabs.parser parser parser.notes lexer io io.files
 io.streams.string io.encodings.utf8 html.templates ;
 IN: html.templates.fhtml
 
@@ -60,7 +60,7 @@ SYNTAX: %> lexer get parse-%> ;
     [
         "quiet" on
         parser-notes off
-        "html.templates.fhtml" use+
+        "html.templates.fhtml" use-vocab
         string-lines parse-template-lines
     ] with-file-vocabs ;
 

@@ -99,7 +99,9 @@ M: cocoa-ui-backend set-title ( string world -- )
     drop ;
 
 : exit-fullscreen ( world -- )
-    handle>> view>> f -> exitFullScreenModeWithOptions: ;
+    handle>>
+    [ view>> f -> exitFullScreenModeWithOptions: ] 
+    [ [ window>> ] [ view>> ] bi -> makeFirstResponder: drop ] bi ;
 
 M: cocoa-ui-backend (set-fullscreen) ( world ? -- )
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
@@ -120,7 +122,11 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     window f -> makeKeyAndOrderFront: ;
 
 M: cocoa-ui-backend (close-window) ( handle -- )
-    window>> -> release ;
+    [
+        view>> dup -> isInFullScreenMode zero?
+        [ drop ]
+        [ f -> exitFullScreenModeWithOptions: ] if
+    ] [ window>> -> release ] bi ;
 
 M: cocoa-ui-backend (grab-input) ( handle -- )
     0 CGAssociateMouseAndMouseCursorPosition drop

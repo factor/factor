@@ -1,6 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alarms arrays calendar kernel make math math.rectangles math.parser namespaces sequences system tetris.game tetris.gl ui.gadgets ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures ui.render ui ;
+FROM: tetris.game => level>> ;
 IN: tetris
 
 TUPLE: tetris-gadget < gadget { tetris tetris } { alarm } ;

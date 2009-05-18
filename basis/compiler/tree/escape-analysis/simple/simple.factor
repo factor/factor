@@ -49,14 +49,10 @@ M: #push escape-analysis*
 
 : slot-offset ( #call -- n/f )
     dup in-d>>
-    [ first node-value-info class>> ]
-    [ second node-value-info literal>> ] 2bi
-    dup fixnum? [
-        {
-            { [ over tuple class<= ] [ 2 - ] }
-            { [ over complex class<= ] [ 1 - ] }
-            [ drop f ]
-        } cond nip
+    [ second node-value-info literal>> ]
+    [ first node-value-info class>> ] 2bi
+    2dup [ fixnum? ] [ tuple class<= ] bi* and [
+        over 2 >= [ drop 2 - ] [ 2drop f ] if
     ] [ 2drop f ] if ;
 
 : record-slot-call ( #call -- )

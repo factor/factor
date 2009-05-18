@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings fry namespaces make math assocs
-io vectors arrays math.parser math.order vectors combinators
+io vectors arrays math.parser math.order combinators
 classes sets unicode.categories compiler.units parser words
-quotations effects memoize accessors locals effects splitting
+quotations memoize accessors locals splitting
 combinators.short-circuit generalizations ;
 IN: peg
 
