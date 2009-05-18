@@ -65,14 +65,42 @@ ERROR: bad-checksum ;
 : zlib-data ( png-image -- bytes ) 
     chunks>> [ type>> "IDAT" = ] find nip data>> ;
 
-: decode-png ( image -- image ) 
+ERROR: unknown-color-type n ;
+ERROR: unimplemented-color-type image ;
+
+: inflate-data ( image -- bytes )
+    zlib-data zlib-inflate ; 
+
+: decode-greyscale ( image -- image )
+    unimplemented-color-type ;
+
+: decode-truecolor ( image -- image )
     {
-        [ zlib-data zlib-inflate ] 
+        [ inflate-data ]
         [ dim>> first 3 * 1 + group reverse-png-filter ]
         [ swap >byte-array >>bitmap drop ]
         [ RGB >>component-order drop ]
         [ ]
     } cleave ;
+    
+: decode-indexed-color ( image -- image )
+    unimplemented-color-type ;
+
+: decode-greyscale-alpha ( image -- image )
+    unimplemented-color-type ;
+
+: decode-truecolor-alpha ( image -- image )
+    unimplemented-color-type ;
+
+: decode-png ( image -- image ) 
+    dup color-type>> {
+        { 0 [ decode-greyscale ] }
+        { 2 [ decode-truecolor ] }
+        { 3 [ decode-indexed-color ] }
+        { 4 [ decode-greyscale-alpha ] }
+        { 6 [ decode-truecolor-alpha ] }
+        [ unknown-color-type ]
+    } case ;
 
 : load-png ( path -- image )
     [ binary <file-reader> ] [ file-info size>> ] bi
