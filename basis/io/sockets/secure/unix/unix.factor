@@ -7,6 +7,7 @@ openssl.libcrypto openssl.libssl io io.files io.ports
 io.backend.unix io.sockets.unix io.encodings.ascii io.buffers
 io.sockets io.sockets.secure io.sockets.secure.openssl
 io.timeouts system summary fry ;
+FROM: io.ports => shutdown ;
 IN: io.sockets.secure.unix
 
 M: ssl-handle handle-fd file>> handle-fd ;

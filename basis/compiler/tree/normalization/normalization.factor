@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces sequences math math.order accessors kernel arrays
-combinators compiler.utilities assocs
+combinators assocs
 stack-checker.backend
 stack-checker.branches
 stack-checker.inlining
