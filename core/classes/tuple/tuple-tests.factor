@@ -5,7 +5,7 @@ generic.standard effects classes.tuple classes.tuple.private arrays
 vectors strings compiler.units accessors classes.algebra calendar
 prettyprint io.streams.string splitting summary columns math.order
 classes.private slots slots.private eval see words.symbol
-compiler.errors ;
+compiler.errors parser.notes ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;

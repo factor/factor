@@ -15,10 +15,6 @@ CONSTANT: S_IFLNK  OCT: 120000   ! Symbolic link.
 CONSTANT: S_IFSOCK OCT: 140000   ! Socket.
 CONSTANT: S_IFWHT  OCT: 160000   ! Whiteout.
 
-FUNCTION: int chmod ( char* path, mode_t mode ) ;
-FUNCTION: int fchmod ( int fd, mode_t mode ) ;
-FUNCTION: int mkdir ( char* path, mode_t mode ) ;
-
 C-STRUCT: fsid
     { { "int" 2 } "__val" } ;
 

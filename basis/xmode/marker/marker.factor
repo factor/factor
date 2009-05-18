@@ -3,8 +3,7 @@
 USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators strings
-regexp splitting unicode.case ascii
-combinators.short-circuit accessors ;
+regexp splitting ascii combinators.short-circuit accessors ;
 IN: xmode.marker
 
 ! Next two words copied from parser-combinators

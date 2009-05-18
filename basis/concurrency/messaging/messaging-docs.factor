@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup concurrency.messaging.private
-threads kernel arrays quotations threads strings ;
+threads kernel arrays quotations strings ;
 IN: concurrency.messaging
 
 HELP: send
@@ -53,7 +53,7 @@ ARTICLE: { "concurrency" "synchronous-sends" } "Synchronous sends"
 { $subsection reply-synchronous }
 "An example:"
 { $example
-    "USING: concurrency.messaging kernel prettyprint threads ;"
+    "USING: concurrency.messaging threads ;"
     "IN: scratchpad"
     ": pong-server ( -- )"
     "    receive [ \"pong\" ] dip reply-synchronous ;"

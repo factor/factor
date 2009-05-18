@@ -391,7 +391,10 @@ CLASS: {
 { "windowDidResignKey:" "void" { "id" "SEL" "id" }
     [
         forget-rollover
-        2nip -> object -> contentView window unfocus-world
+        2nip -> object -> contentView
+        dup -> isInFullScreenMode zero? 
+        [ window unfocus-world ]
+        [ drop ] if
     ]
 }
 

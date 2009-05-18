@@ -126,14 +126,6 @@ write-test-2 "q" set
 
 [ 9 ] [ 4 write-test-5 ] unit-test
 
-SYMBOL: a
-
-:: use-test ( a b c -- a b c )
-    USE: kernel
-    a b c ;
-
-[ t ] [ a symbol? ] unit-test
-
 :: let-let-test ( n -- n ) [let | n [ n 3 + ] | n ] ;
 
 [ 13 ] [ 10 let-let-test ] unit-test

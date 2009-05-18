@@ -15,7 +15,6 @@ accessors
 namespaces
 adsoda 
 models
-accessors
 prettyprint
 ;
 

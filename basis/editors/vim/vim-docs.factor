@@ -3,7 +3,7 @@ USING: definitions editors help help.markup help.syntax io io.files
 IN: editors.vim
 
 ARTICLE: { "vim" "vim" } "Vim support"
-"This module makes the " { $link edit } " word work with Vim by setting the " { $link edit-hook } " global variable to call " { $link vim-location } ". The " { $link vim-path } " variable contains the name of the vim executable.  The default " { $link vim-path } " is " { $snippet "\"gvim\"" } "."
+"This module makes the " { $link edit } " word work with Vim by setting the " { $link edit-hook } " global variable to call " { $link vim } ". The " { $link vim-path } " variable contains the name of the vim executable.  The default " { $link vim-path } " is " { $snippet "\"gvim\"" } "."
 $nl
 "If you intend to use this module regularly, it helps to have it load during stage 2 bootstrap. On Windows, place the following example " { $snippet ".factor-boot-rc" } " in the directory returned by " { $link home } ":"
 { $code

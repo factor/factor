@@ -21,7 +21,7 @@ ARTICLE: "enums" "Enumerations"
 { $subsection enum }
 { $subsection <enum> }
 "Inverting a permutation using enumerations:"
-{ $example "USING: assocs sorting prettyprint ;" "IN: scratchpad" ": invert ( perm -- perm' )" "    <enum> >alist sort-values keys ;" "{ 2 0 4 1 3 } invert ." "{ 1 3 0 4 2 }" } ;
+{ $example "IN: scratchpad" ": invert ( perm -- perm' )" "    <enum> >alist sort-values keys ;" "{ 2 0 4 1 3 } invert ." "{ 1 3 0 4 2 }" } ;
 
 HELP: enum
 { $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."

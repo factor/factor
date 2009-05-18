@@ -48,7 +48,7 @@ $nl
 "The accumulator sequence can be accessed directly from inside a " { $link make } ":"
 { $subsection building }
 { $example
-  "USING: make math.parser io ;"
+  "USING: make math.parser ;"
   "[ \"Language #\" % CHAR: \\s , 5 # ] \"\" make print"
   "Language # 5"
 }

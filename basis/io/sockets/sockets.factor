@@ -1,18 +1,17 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman,
 ! Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic kernel io.backend namespaces continuations
-sequences arrays io.encodings io.ports io.streams.duplex
-io.encodings.ascii alien.strings io.binary accessors destructors
-classes byte-arrays system combinators parser
-alien.c-types math.parser splitting grouping math assocs summary
-system vocabs.loader combinators present fry vocabs.parser ;
+USING: generic kernel io.backend namespaces continuations sequences
+arrays io.encodings io.ports io.streams.duplex io.encodings.ascii
+alien.strings io.binary accessors destructors classes byte-arrays
+parser alien.c-types math.parser splitting grouping math assocs
+summary system vocabs.loader combinators present fry vocabs.parser ;
 IN: io.sockets
 
 << {
     { [ os windows? ] [ "windows.winsock" ] }
     { [ os unix? ] [ "unix" ] }
-} cond use+ >>
+} cond use-vocab >>
 
 ! Addressing
 GENERIC: protocol-family ( addrspec -- af )
