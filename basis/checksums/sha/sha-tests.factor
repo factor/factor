@@ -1,9 +1,17 @@
-USING: arrays kernel math namespaces sequences tools.test
-checksums.sha2 checksums ;
-IN: checksums.sha2.tests
+USING: arrays checksums checksums.sha checksums.sha.private
+io.encodings.binary io.streams.byte-array kernel math
+namespaces sequences tools.test ;
+IN: checksums.sha.tests
 
 : test-checksum ( text identifier -- checksum )
     checksum-bytes hex-string ;
+
+[ "a9993e364706816aba3e25717850c26c9cd0d89d" ] [ "abc" sha1 checksum-bytes hex-string ] unit-test
+[ "84983e441c3bd26ebaae4aa1f95129e5e54670f1" ] [ "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" sha1 checksum-bytes hex-string ] unit-test
+! [ "34aa973cd4c4daa4f61eeb2bdbad27316534016f" ] [ 1000000 CHAR: a fill string>sha1str ] unit-test ! takes a long time...
+[ "dea356a2cddd90c7a7ecedc5ebb563934f460452" ] [ "0123456701234567012345670123456701234567012345670123456701234567"
+10 swap <array> concat sha1 checksum-bytes hex-string ] unit-test
+
 
 [ "75388b16512776cc5dba5da1fd890150b0c6455cb4f58b1952522525" ]
 [
@@ -36,7 +44,27 @@ IN: checksums.sha2.tests
 ] unit-test
 
 
-
-
 ! [ "8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909" ]
 ! [ "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" sha-512 test-checksum ] unit-test
+
+[
+    t
+] [
+    <sha1-state> "asdf" binary <byte-reader> add-checksum-stream
+    [ get-checksum ] [ get-checksum ] bi =
+] unit-test
+
+[
+    t
+] [
+    <sha-256-state> "asdf" binary <byte-reader> add-checksum-stream
+    [ get-checksum ] [ get-checksum ] bi =
+] unit-test
+
+[
+    t
+] [
+    <sha-224-state> "asdf" binary <byte-reader> add-checksum-stream
+    [ get-checksum ] [ get-checksum ] bi =
+] unit-test
+
