@@ -3,57 +3,50 @@
 USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting grouping strings
 sequences byte-arrays locals sequences.private macros fry
-io.encodings.binary math.bitwise checksums
-checksums.common checksums.stream combinators ;
+io.encodings.binary math.bitwise checksums accessors
+checksums.common checksums.stream combinators combinators.smart ;
 IN: checksums.md5
 
-! See http://www.faqs.org/rfcs/rfc1321.html
+SINGLETON: md5
+
+INSTANCE: md5 stream-checksum
+
+TUPLE: md5-state < checksum-state state old-state ;
+
+: <md5-state> ( -- md5 )
+    md5-state new-checksum-state
+        64 >>block-size
+        { HEX: 67452301 HEX: efcdab89 HEX: 98badcfe HEX: 10325476 }
+        [ clone >>state ] [ >>old-state ] bi ;
+
+M: md5 initialize-checksum-state drop <md5-state> ;
 
 <PRIVATE
 
-SYMBOLS: a b c d old-a old-b old-c old-d ;
+: v-w+ ( v1 v2 -- v3 ) [ w+ ] 2map ;
+
+: update-md5 ( md5 -- )
+    [ state>> ] [ old-state>> v-w+ dup clone ] [ ] tri
+    [ (>>old-state) ] [ (>>state) ] bi ; inline
 
 : T ( N -- Y )
-    sin abs 32 2^ * >integer ; foldable
+    sin abs 32 2^ * >integer ; inline
 
-: initialize-md5 ( -- )
-    0 bytes-read set
-    HEX: 67452301 dup a set old-a set
-    HEX: efcdab89 dup b set old-b set
-    HEX: 98badcfe dup c set old-c set
-    HEX: 10325476 dup d set old-d set ;
-
-: update-md ( -- )
-    old-a a update-old-new
-    old-b b update-old-new
-    old-c c update-old-new
-    old-d d update-old-new ;
-
-:: (ABCD) ( x a b c d k s i func -- )
-    #! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
-    a [
-        b get c get d get func call w+
-        k x nth-unsafe w+
-        i T w+
-        s bitroll-32
-        b get w+
-    ] change ; inline
-
-: F ( X Y Z -- FXYZ )
+:: F ( X Y Z -- FXYZ )
     #! F(X,Y,Z) = XY v not(X) Z
-    pick bitnot bitand [ bitand ] [ bitor ] bi* ;
+    X Y bitand X bitnot Z bitand bitor ; inline
 
-: G ( X Y Z -- GXYZ )
+:: G ( X Y Z -- GXYZ )
     #! G(X,Y,Z) = XZ v Y not(Z)
-    dup bitnot rot bitand [ bitand ] [ bitor ] bi* ;
+    X Z bitand Y Z bitnot bitand bitor ; inline
 
 : H ( X Y Z -- HXYZ )
     #! H(X,Y,Z) = X xor Y xor Z
-    bitxor bitxor ;
+    bitxor bitxor ; inline
 
-: I ( X Y Z -- IXYZ )
+:: I ( X Y Z -- IXYZ )
     #! I(X,Y,Z) = Y xor (X v not(Z))
-    rot swap bitnot bitor bitxor ;
+    Z bitnot X bitor Y bitxor ; inline
 
 CONSTANT: S11 7
 CONSTANT: S12 12
@@ -72,10 +65,27 @@ CONSTANT: S42 10
 CONSTANT: S43 15
 CONSTANT: S44 21
 
-MACRO: with-md5-round ( ops func -- )
-    '[ [ _ (ABCD) ] compose ] map '[ _ cleave ] ;
+CONSTANT: a 0
+CONSTANT: b 1
+CONSTANT: c 2
+CONSTANT: d 3
 
-: (process-md5-block-F) ( block -- )
+:: (ABCD) ( x V a b c d k s i quot -- )
+    #! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
+    a V [
+        b V nth
+        c V nth
+        d V nth quot call w+
+        k x nth w+
+        i T w+
+        s bitroll-32
+        b V nth w+
+    ] change-nth ; inline
+
+MACRO: with-md5-round ( ops quot -- )
+    '[ [ _ (ABCD) ] compose ] map '[ _ 2cleave ] ;
+
+: (process-md5-block-F) ( block v -- )
     {
         [ a b c d 0  S11 1  ]
         [ d a b c 1  S12 2  ]
@@ -93,9 +103,9 @@ MACRO: with-md5-round ( ops func -- )
         [ d a b c 13 S12 14 ]
         [ c d a b 14 S13 15 ]
         [ b c d a 15 S14 16 ]
-    } [ F ] with-md5-round ;
+    } [ F ] with-md5-round ; inline
 
-: (process-md5-block-G) ( block -- )
+: (process-md5-block-G) ( block v -- )
     {
         [ a b c d 1  S21 17 ]
         [ d a b c 6  S22 18 ]
@@ -113,9 +123,9 @@ MACRO: with-md5-round ( ops func -- )
         [ d a b c 2  S22 30 ]
         [ c d a b 7  S23 31 ]
         [ b c d a 12 S24 32 ]
-    } [ G ] with-md5-round ;
+    } [ G ] with-md5-round ; inline
 
-: (process-md5-block-H) ( block -- )
+: (process-md5-block-H) ( block v -- )
     {
         [ a b c d 5  S31 33 ]
         [ d a b c 8  S32 34 ]
@@ -133,9 +143,9 @@ MACRO: with-md5-round ( ops func -- )
         [ d a b c 12 S32 46 ]
         [ c d a b 15 S33 47 ]
         [ b c d a 2  S34 48 ]
-    } [ H ] with-md5-round ;
+    } [ H ] with-md5-round ; inline
 
-: (process-md5-block-I) ( block -- )
+: (process-md5-block-I) ( block v -- )
     {
         [ a b c d 0  S41 49 ]
         [ d a b c 7  S42 50 ]
@@ -153,38 +163,34 @@ MACRO: with-md5-round ( ops func -- )
         [ d a b c 11 S42 62 ]
         [ c d a b 2  S43 63 ]
         [ b c d a 9  S44 64 ]
-    } [ I ] with-md5-round ;
+    } [ I ] with-md5-round ; inline
 
-: (process-md5-block) ( block -- )
-    4 <groups> [ le> ] map {
-        [ (process-md5-block-F) ]
-        [ (process-md5-block-G) ]
-        [ (process-md5-block-H) ]
-        [ (process-md5-block-I) ]
-    } cleave
-
-    update-md ;
-
-: process-md5-block ( str -- )
-    dup length [ bytes-read [ + ] change ] keep 64 = [
-        (process-md5-block)
+M: md5-state checksum-block ( block state -- )
+    [
+        [ 4 <groups> [ le> ] map ] [ state>> ] bi* {
+            [ (process-md5-block-F) ]
+            [ (process-md5-block-G) ]
+            [ (process-md5-block-H) ]
+            [ (process-md5-block-I) ]
+        } 2cleave
     ] [
-        f bytes-read get pad-last-block
-        [ (process-md5-block) ] each
-    ] if ;
-    
-: stream>md5 ( -- )
-    64 read [ process-md5-block ] keep
-    length 64 = [ stream>md5 ] when ;
+        nip update-md5
+    ] 2bi ;
 
-: get-md5 ( -- str )
-    [ a b c d ] [ get 4 >le ] map concat >byte-array ;
+: md5>checksum ( md5 -- bytes )
+    state>> [ 4 >le ] map B{ } concat-as ;
+
+M: md5-state clone ( md5 -- new-md5 )
+    call-next-method
+    [ clone ] change-state
+    [ clone ] change-old-state ;
+
+M: md5-state get-checksum ( md5 -- bytes )
+    clone [ bytes>> f ] [ bytes-read>> pad-last-block ] [ ] tri
+    [ [ checksum-block ] curry each ] [ md5>checksum ] bi ;
+
+M: md5 checksum-stream ( stream checksum -- byte-array )
+    drop
+    [ <md5-state> ] dip add-checksum-stream get-checksum ;
 
 PRIVATE>
-
-SINGLETON: md5
-
-INSTANCE: md5 stream-checksum
-
-M: md5 checksum-stream ( stream -- byte-array )
-    drop [ initialize-md5 stream>md5 get-md5 ] with-input-stream ;

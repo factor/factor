@@ -92,7 +92,9 @@ cell frame_executing(stack_frame *frame)
 	else
 	{
 		array *literals = untag<array>(compiled->literals);
-		return array_nth(literals,0);
+		cell executing = array_nth(literals,0);
+		check_data_pointer((object *)executing);
+		return executing;
 	}
 }
 
@@ -102,6 +104,7 @@ stack_frame *frame_successor(stack_frame *frame)
 	return (stack_frame *)((cell)frame - frame->size);
 }
 
+/* Allocates memory */
 cell frame_scan(stack_frame *frame)
 {
 	if(frame_type(frame) == QUOTATION_TYPE)
@@ -133,12 +136,12 @@ struct stack_frame_counter {
 
 struct stack_frame_accumulator {
 	cell index;
-	array *frames;
-	stack_frame_accumulator(cell count) : index(0), frames(allot_array_internal<array>(count)) {}
+	gc_root<array> frames;
+	stack_frame_accumulator(cell count) : index(0), frames(allot_array(count,F)) {}
 	void operator()(stack_frame *frame)
 	{
-		set_array_nth(frames,index++,frame_executing(frame));
-		set_array_nth(frames,index++,frame_scan(frame));
+		set_array_nth(frames.untagged(),index++,frame_executing(frame));
+		set_array_nth(frames.untagged(),index++,frame_scan(frame));
 	}
 };
 
@@ -154,7 +157,7 @@ PRIMITIVE(callstack_to_array)
 	stack_frame_accumulator accum(counter.count);
 	iterate_callstack_object(callstack.untagged(),accum);
 
-	dpush(tag<array>(accum.frames));
+	dpush(accum.frames.value());
 }
 
 stack_frame *innermost_stack_frame(callstack *stack)
