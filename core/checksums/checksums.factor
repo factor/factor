@@ -1,17 +1,17 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io io.backend io.files kernel math math.parser
-sequences vectors quotations ;
+sequences byte-arrays byte-vectors quotations ;
 IN: checksums
 
 MIXIN: checksum
 
-TUPLE: checksum-state bytes-read block-size bytes ;
+TUPLE: checksum-state
+    { bytes-read integer } { block-size integer } { bytes byte-vector } ;
 
 : new-checksum-state ( class -- checksum-state )
     new
-        0 >>bytes-read
-        V{ } clone >>bytes ; inline
+        BV{ } clone >>bytes ; inline
 
 M: checksum-state clone
     call-next-method
@@ -27,11 +27,13 @@ GENERIC: get-checksum ( checksum -- value )
     over bytes>> [ push-all ] keep
     [ dup length pick block-size>> >= ]
     [
-        64 cut-slice [
+        64 cut-slice [ >byte-array ] dip [
             over [ checksum-block ]
             [ [ 64 + ] change-bytes-read drop ] bi
         ] dip
-    ] while >vector [ >>bytes ] [ length [ + ] curry change-bytes-read ] bi ;
+    ] while
+    >byte-vector
+    [ >>bytes ] [ length [ + ] curry change-bytes-read ] bi ;
 
 : add-checksum-stream ( checksum-state stream -- checksum-state )
     [
