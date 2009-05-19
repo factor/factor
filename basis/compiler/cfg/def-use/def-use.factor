@@ -43,6 +43,7 @@ M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: insn uses-vregs drop f ;
 
+! Instructions that use vregs
 UNION: vreg-insn
 ##flushable
 ##write-barrier
