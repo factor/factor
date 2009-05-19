@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators db db.tuples furnace.actions
 http.server.responses kernel mason.platform mason.notify.server
-math.order sequences sorting splitting xml.syntax xml.writer
-io.pathnames io.encodings.utf8 io.files ;
+mason.report math.order sequences sorting splitting xml.syntax
+xml.writer io.pathnames io.encodings.utf8 io.files ;
 IN: webapps.mason
 
 : log-file ( -- path ) home "mason.log" append-path ;
