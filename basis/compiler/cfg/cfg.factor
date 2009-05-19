@@ -10,6 +10,8 @@ number
 { successors vector }
 { predecessors vector } ;
 
+M: basic-block hashcode* nip id>> ;
+
 : <basic-block> ( -- basic-block )
     basic-block new
         V{ } clone >>instructions
