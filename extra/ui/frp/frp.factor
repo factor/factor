@@ -77,9 +77,10 @@ M: frp-product model-activated dup model-changed ;
 
 ! Gadgets
 TUPLE: frp-button < button hook ;
-: <frp-button> ( text -- button ) [ [ t swap set-control-value ] keep
-   dup hook>> [ call( button -- ) ] [ drop ] if* ]
-   frp-button new-button border-button-theme f <basic> >>model ;
+: <frp-button> ( text -- button ) [
+      [ t swap set-control-value ] keep
+      dup hook>> [ call( button -- ) ] [ drop ] if*
+   ] frp-button new-button border-button-theme f <basic> >>model ;
 
 TUPLE: frp-table < table { quot initial: [ ] } { val-quot initial: [ ] } color-quot column-titles column-alignment ;
 M: frp-table column-titles column-titles>> ;
