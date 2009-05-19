@@ -9,7 +9,7 @@ IN: webapps.mason
 : log-file ( -- path ) home "mason.log" append-path ;
 
 : recent-events ( -- xml )
-    log-file utf8 file-lines 10 short tail* "\n" join [XML <pre><-></pre> XML] ;
+    log-file utf8 10 file-tail [XML <pre><-></pre> XML] ;
 
 : git-link ( id -- link )
     [ "http://github.com/slavapestov/factor/commit/" prepend ] keep
@@ -21,8 +21,9 @@ IN: webapps.mason
 
 : current-status ( builder -- xml )
     dup status>> {
-        { "dirty" [ drop "Dirty" ] }
-        { "clean" [ drop "Clean" ] }
+        { "status-dirty" [ drop "Dirty" ] }
+        { "status-clean" [ drop "Clean" ] }
+        { "status-error" [ drop "Error" ] }
         { "starting" [ "Starting" building ] }
         { "make-vm" [ "Compiling VM" building ] }
         { "boot" [ "Bootstrapping" building ] }
