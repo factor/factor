@@ -57,7 +57,7 @@ TUPLE: stack-frame
 spill-counts ;
 
 INSN: ##stack-frame stack-frame ;
-INSN: ##call word ;
+INSN: ##call word height ;
 INSN: ##jump word ;
 INSN: ##return ;
 
