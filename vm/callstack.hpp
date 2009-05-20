@@ -33,9 +33,19 @@ template<typename T> void iterate_callstack(cell top, cell bottom, T &iterator)
 	}
 }
 
-template<typename T> void iterate_callstack_object(callstack *stack, T &iterator)
+/* This is a little tricky. The iterator may allocate memory, so we
+keep the callstack in a GC root and use relative offsets */
+template<typename T> void iterate_callstack_object(callstack *stack_, T &iterator)
 {
-	iterate_callstack((cell)stack->top(),(cell)stack->bottom(),iterator);
+	gc_root<callstack> stack(stack_);
+	fixnum frame_offset = untag_fixnum(stack->length) - sizeof(stack_frame);
+
+	while(frame_offset >= 0)
+	{
+		stack_frame *frame = stack->frame_at(frame_offset);
+		frame_offset -= frame->size;
+		iterator(frame);
+	}
 }
 
 }

@@ -107,8 +107,9 @@ stack_frame *frame_successor(stack_frame *frame)
 /* Allocates memory */
 cell frame_scan(stack_frame *frame)
 {
-	if(frame_type(frame) == QUOTATION_TYPE)
+	switch(frame_type(frame))
 	{
+	case QUOTATION_TYPE:
 		cell quot = frame_executing(frame);
 		if(quot == F)
 			return F;
@@ -120,28 +121,27 @@ cell frame_scan(stack_frame *frame)
 			return tag_fixnum(quot_code_offset_to_scan(
 				quot,(cell)(return_addr - quot_xt)));
 		}
-	}
-	else
+	case WORD_TYPE:
 		return F;
+	default:
+		critical_error("Bad frame type",frame_type(frame));
+		return F;
+	}
 }
 
 namespace
 {
 
-struct stack_frame_counter {
-	cell count;
-	stack_frame_counter() : count(0) {}
-	void operator()(stack_frame *frame) { count += 2; }
-};
-
 struct stack_frame_accumulator {
-	cell index;
-	gc_root<array> frames;
-	stack_frame_accumulator(cell count) : index(0), frames(allot_array(count,F)) {}
+	growable_array frames;
+
 	void operator()(stack_frame *frame)
 	{
-		set_array_nth(frames.untagged(),index++,frame_executing(frame));
-		set_array_nth(frames.untagged(),index++,frame_scan(frame));
+		gc_root<object> executing(frame_executing(frame));
+		gc_root<object> scan(frame_scan(frame));
+
+		frames.add(executing.value());
+		frames.add(scan.value());
 	}
 };
 
@@ -151,13 +151,11 @@ PRIMITIVE(callstack_to_array)
 {
 	gc_root<callstack> callstack(dpop());
 
-	stack_frame_counter counter;
-	iterate_callstack_object(callstack.untagged(),counter);
-
-	stack_frame_accumulator accum(counter.count);
+	stack_frame_accumulator accum;
 	iterate_callstack_object(callstack.untagged(),accum);
+	accum.frames.trim();
 
-	dpush(accum.frames.value());
+	dpush(accum.frames.elements.value());
 }
 
 stack_frame *innermost_stack_frame(callstack *stack)
