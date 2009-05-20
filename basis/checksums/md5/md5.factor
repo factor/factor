@@ -5,7 +5,7 @@ math.functions math.parser namespaces splitting grouping strings
 sequences byte-arrays locals sequences.private macros fry
 io.encodings.binary math.bitwise checksums accessors
 checksums.common checksums.stream combinators combinators.smart
-specialized-arrays.uint literals ;
+specialized-arrays.uint literals hints ;
 IN: checksums.md5
 
 SINGLETON: md5
@@ -28,7 +28,7 @@ M: md5 initialize-checksum-state drop <md5-state> ;
 
 : update-md5 ( md5 -- )
     [ state>> ] [ old-state>> v-w+ dup clone ] [ ] tri
-    [ (>>old-state) ] [ (>>state) ] bi ; inline
+    [ (>>old-state) ] [ (>>state) ] bi ;
 
 CONSTANT: T
     $[
@@ -106,7 +106,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 13 S12 14 ]
         [ c d a b 14 S13 15 ]
         [ b c d a 15 S14 16 ]
-    } [ F ] with-md5-round ; inline
+    } [ F ] with-md5-round ;
 
 : (process-md5-block-G) ( block state -- )
     {
@@ -126,7 +126,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 2  S22 30 ]
         [ c d a b 7  S23 31 ]
         [ b c d a 12 S24 32 ]
-    } [ G ] with-md5-round ; inline
+    } [ G ] with-md5-round ;
 
 : (process-md5-block-H) ( block state -- )
     {
@@ -146,7 +146,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 12 S32 46 ]
         [ c d a b 15 S33 47 ]
         [ b c d a 2  S34 48 ]
-    } [ H ] with-md5-round ; inline
+    } [ H ] with-md5-round ;
 
 : (process-md5-block-I) ( block state -- )
     {
@@ -166,7 +166,12 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 11 S42 62 ]
         [ c d a b 2  S43 63 ]
         [ b c d a 9  S44 64 ]
-    } [ I ] with-md5-round ; inline
+    } [ I ] with-md5-round ;
+
+HINTS: (process-md5-block-F) { uint-array md5-state } ;
+HINTS: (process-md5-block-G) { uint-array md5-state } ;
+HINTS: (process-md5-block-H) { uint-array md5-state } ;
+HINTS: (process-md5-block-I) { uint-array md5-state } ;
 
 M: md5-state checksum-block ( block state -- )
     [
