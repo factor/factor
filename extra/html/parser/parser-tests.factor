@@ -73,3 +73,26 @@ V{
     T{ tag f "head" H{ } f t }
 }
 ] [ "<head<title>Spagna</title></head" parse-html ] unit-test
+
+[
+V{
+    T{ tag
+        { name dtd }
+        { text
+            "DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Draft//EN\""
+        }
+    }
+}
+]
+[
+    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Draft//EN\">"
+    parse-html
+] unit-test
+
+[
+V{
+    T{ tag { name comment } { text "comment" } }
+}
+] [
+    "<!--comment-->" parse-html
+] unit-test
