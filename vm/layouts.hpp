@@ -309,6 +309,11 @@ struct callstack : public object {
 	/* tagged */
 	cell length;
 	
+	stack_frame *frame_at(cell offset)
+	{
+		return (stack_frame *)((char *)(this + 1) + offset);
+	}
+
 	stack_frame *top() { return (stack_frame *)(this + 1); }
 	stack_frame *bottom() { return (stack_frame *)((cell)(this + 1) + untag_fixnum(length)); }
 };

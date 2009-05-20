@@ -1,4 +1,5 @@
-USING: alien.syntax kernel math windows.types math.bitwise ;
+USING: alien.syntax kernel math windows.types windows.kernel32
+math.bitwise ;
 IN: windows.advapi32
 
 LIBRARY: advapi32
