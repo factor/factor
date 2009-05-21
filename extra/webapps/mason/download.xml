@@ -1,0 +1,23 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+<html>
+  <head>
+    <title>Factor binary package for <t:label t:name="platform" /></title>
+  </head>
+  <body>
+    <h1>Factor binary package for <t:label t:name="platform" /></h1>
+
+    <p>Requirements:</p>
+    <t:xml t:name="requirements" />
+
+    <h2>Download <t:xml t:name="package" /></h2>
+
+    <p>This package was built from GIT ID <t:xml t:name="git-id" />.</p>
+
+    <p>Once you download Factor, you can <a href="http://concatenative.org/wiki/view/Factor/Getting started">get started</a> with the language.</p>
+  </body>
+</html>
+
+</t:chloe>

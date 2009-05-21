@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: slides help.markup math arrays hashtables namespaces
-sequences kernel sequences parser memoize io.encodings.binary
+sequences kernel parser memoize io.encodings.binary
 locals kernel.private help.vocabs assocs quotations
 urls peg.ebnf tools.annotations tools.crossref
 help.topics math.functions compiler.tree.optimizer
