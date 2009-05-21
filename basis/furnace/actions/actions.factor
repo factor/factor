@@ -12,7 +12,6 @@ furnace.conversations
 furnace.chloe-tags
 html.forms
 html.components
-html.components
 html.templates.chloe
 html.templates.chloe.syntax
 html.templates.chloe.compiler ;
