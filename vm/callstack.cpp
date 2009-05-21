@@ -110,16 +110,18 @@ cell frame_scan(stack_frame *frame)
 	switch(frame_type(frame))
 	{
 	case QUOTATION_TYPE:
-		cell quot = frame_executing(frame);
-		if(quot == F)
-			return F;
-		else
 		{
-			char *return_addr = (char *)FRAME_RETURN_ADDRESS(frame);
-			char *quot_xt = (char *)(frame_code(frame) + 1);
+			cell quot = frame_executing(frame);
+			if(quot == F)
+				return F;
+			else
+			{
+				char *return_addr = (char *)FRAME_RETURN_ADDRESS(frame);
+				char *quot_xt = (char *)(frame_code(frame) + 1);
 
-			return tag_fixnum(quot_code_offset_to_scan(
-				quot,(cell)(return_addr - quot_xt)));
+				return tag_fixnum(quot_code_offset_to_scan(
+					quot,(cell)(return_addr - quot_xt)));
+			}
 		}
 	case WORD_TYPE:
 		return F;
