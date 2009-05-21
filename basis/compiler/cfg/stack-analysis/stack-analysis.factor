@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel namespaces math sequences fry deques
+USING: accessors assocs kernel namespaces math sequences fry deques grouping
 search-deques dlists sets make combinators compiler.cfg.copy-prop
 compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.rpo ;
+compiler.cfg.rpo compiler.cfg.hats ;
 IN: compiler.cfg.stack-analysis
 
 ! Convert stack operations to register operations
@@ -67,10 +67,11 @@ M: state clone
         [ vregs>locs>> clear-assoc ]
     } cleave ;
 
+ERROR: poisoned-state state ;
+
 : sync-state ( -- )
-    ! also: update height
-    ! but first, sync outputs
     state get {
+        [ dup poisoned?>> [ poisoned-state ] [ drop ] if ]
         [ save-changed-locs ]
         [ d-height>> dup 0 = [ drop ] [ ##inc-d ] if ]
         [ r-height>> dup 0 = [ drop ] [ ##inc-r ] if ]
@@ -181,11 +182,72 @@ SYMBOL: work-list
 ! Maps basic-blocks to states
 SYMBOLS: state-in state-out ;
 
-: merge-states ( seq -- state )
-    [ <state> ] [ first ] if-empty ;
+: sync-unpoisoned-states ( predecessors states -- )
+    [
+        dup poisoned?>> [ 2drop ] [
+            state [
+                instructions>> building set
+                sync-state
+            ] with-variable
+        ] if
+    ] 2each ;
+
+ERROR: must-equal-failed seq ;
+
+: must-equal ( seq -- elt )
+    dup all-equal? [ first ] [ must-equal-failed ] if ;
+
+: merge-heights ( state predecessors states -- state )
+    nip
+    [ [ d-height>> ] map must-equal >>d-height ]
+    [ [ r-height>> ] map must-equal >>r-height ] bi ;
+
+ERROR: inconsistent-vreg>loc states ;
+
+: check-vreg>loc ( states -- )
+    ! The same vreg should not store different locs in
+    ! different branches
+    dup
+    [ vregs>locs>> ] map
+    [ [ keys ] map concat prune ] keep
+    '[ _ [ at ] with map sift all-equal? ] all?
+    [ drop ] [ inconsistent-vreg>loc ] if ;
+
+: insert-peek ( predecessor loc -- vreg )
+    ! XXX critical edges
+    [ instructions>> building ] dip '[ _ ^^peek ] with-variable ;
+
+: merge-loc ( predecessors locs>vregs loc -- vreg )
+    ! Insert a ##phi in the current block where the input
+    ! is the vreg storing loc from each predecessor block
+    [ '[ [ _ ] dip at ] map ] keep
+    '[ [ ] [ _ insert-peek ] if ] 2map
+    ^^phi ;
+
+: merge-locs ( state predecessors states -- state )
+    [ locs>vregs>> ] map dup [ keys ] map prune
+    [
+        [ 2nip ] [ merge-loc ] 3bi
+    ] with with H{ } map>assoc
+    >>locs>vregs ;
+
+: merge-states ( predecessors states -- state )
+    ! If any states are poisoned, save all registers
+    ! to the stack in each branch
+    [ drop <state> ] [
+        dup [ poisoned?>> ] any? [
+            sync-unpoisoned-states <state>
+        ] [
+            dup check-vreg>loc
+            [ state new ] 2dip
+            [ merge-heights ]
+            [ merge-locs ] 2bi
+            ! what about vregs>locs
+        ] if
+    ] if-empty ;
 
 : block-in-state ( bb -- states )
-    predecessors>> state-out get '[ _ at ] map merge-states ;
+    predecessors>> dup state-out get '[ _ at ] map merge-states ;
 
 : maybe-set-at ( value key assoc -- changed? )
     3dup at* [ = [ 3drop f ] [ set-at t ] if ] [ 2drop set-at t ] if ;
@@ -201,14 +263,19 @@ SYMBOLS: state-in state-out ;
     [ successors>> [ add-to-work-list ] each ] [ drop ] if ;
 
 : visit-block ( bb -- )
-    dup block-in-state
-    [ swap set-block-in-state ] [
-        state [
-            [ [ [ [ visit ] each ] V{ } make ] change-instructions drop ]
-            [ state get finish-block ]
-            bi
-        ] with-variable
-    ] 2bi ;
+    ! block-in-state may add phi nodes at the start of the basic block
+    ! so we wrap the whole thing with a 'make'
+    [
+        dup block-in-state
+        [ swap set-block-in-state ] [
+            state [
+                [ instructions>> [ visit ] each ]
+                [ state get finish-block ]
+                [ ]
+                tri
+            ] with-variable
+        ] 2bi
+    ] V{ } make >>instructions drop ;
 
 : visit-blocks ( bb -- )
     reverse-post-order work-list get
@@ -223,16 +290,8 @@ SYMBOLS: state-in state-out ;
         dup entry>> visit-blocks
     ] with-scope ;
 
-! To do:
-! - implement merge-states
-! - insert loads to convert partially available values into available values
-
-! if any state is poisoned, then we need to sync in every predecessor that didn't sync
-! and begin with a new state.
-
-! if heights differ, throw an error.
-
-! changed-locs is the union of the changed-locs of all predecessors
-! locs>vregs: take the union, then for each predecessor, diff its locs>vregs against the union.
-! those are the ones that need to be loaded in.
-! think about phi insertion.
+! XXX: what if our height doesn't match
+! a future block we're merging with?
+! - we should only poison tail calls
+! - non-tail poisoning nodes: ##alien-callback, ##call of a non-tail dispatch
+! do we need a distinction between height changes in code and height changes done by the callee
