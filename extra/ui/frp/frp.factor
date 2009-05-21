@@ -43,26 +43,22 @@ M: switch-model (model-changed) 2dup switcher>> =
    [ >>original ] [ >>switcher ] bi* ;
 M: switch-model model-activated [ original>> ] keep model-changed ;
 
-
 TUPLE: mapped-model < multi-model model quot ;
- 
-: <mapped> ( model quot -- mapped )
-    f mapped-model new-model
-        swap >>quot
-        over >>model
-        [ add-dependency ] keep ;
+: new-mapped-model ( model quot class -- const-model ) [ over 1array ] dip
+   <multi-model> swap >>quot swap >>model ;
+: <mapped> ( model quot -- mapped ) mapped-model new-mapped-model ;
 M: mapped-model (model-changed)
     [ [ value>> ] [ quot>> ] bi* call( old -- new ) ] [ nip ] 2bi
     set-model ;
 M: mapped-model model-activated [ model>> ] keep model-changed ;
 
 TUPLE: side-effect-model < mapped-model ;
-M: side-effect-model (model-changed) [ value>> ] [ quot>> ] bi* call( old -- ) ;
-: <$ ( model quot -- side-effect-model )
-   f side-effect-model new-model
-     swap >>quot
-     over >>model
-     [ add-dependency ] keep ;
+M: side-effect-model (model-changed) [ [ value>> ] [ quot>> ] bi* call( old -- ) ] keep t swap set-model ;
+: $> ( model quot -- side-effect-model ) side-effect-model new-mapped-model ;
+
+TUPLE: quot-model < mapped-model ;
+M: quot-model (model-changed) nip [ quot>> call( -- b ) ] keep set-model ;
+: <$ ( model quot -- quot-model ) quot-model new-mapped-model ;
 
 TUPLE: frp-product < multi-model ;
 : <frp-product> ( models -- product ) frp-product <multi-model> ;
@@ -74,6 +70,15 @@ M: frp-product model-changed
 M: frp-product update-model
     dup value>> swap [ set-model ] set-product-value ;
 M: frp-product model-activated dup model-changed ;
+
+TUPLE: action-value < basic-model parent ;
+: <action-value> ( parent value -- model ) action-value new-model swap >>parent ;
+M: action-value model-activated parent>> activate-model ; ! a fake dependency of sorts
+
+TUPLE: action < multi-model quot ;
+M: action (model-changed) [ [ value>> ] [ quot>> ] bi* call( a -- b ) ] keep value>>
+   swap add-connection ;
+: <action> ( model quot -- action ) [ 1array action <multi-model> ] dip >>quot dup f <action-value> >>value value>> ;
 
 ! Gadgets
 TUPLE: frp-button < button hook ;
@@ -131,6 +136,7 @@ M: model -> dup , ;
 
 ! Instances
 M: model fmap <mapped> ;
+M: model >>= [ swap <action> ] curry ;
 
 SINGLETON: gadget-monad
 INSTANCE: gadget-monad monad
@@ -140,15 +146,20 @@ M: gadget-monad return drop <gadget> swap >>model ;
 M: gadget >>= output-model [ swap call( x -- y ) ] curry ; 
 
 ! Macros
+: lift ( int -- quot ) dup
+   '[ [ _ narray <frp-product> ] dip [ _ firstn ] prepend ] ; inline
 
-MACRO: liftA-n ( int -- quot ) dup
-   '[ [ _ narray <frp-product> ] dip [ _ firstn ] prepend <mapped> ] ;
+MACRO: liftA-n ( int -- quot ) lift [ <mapped> ] append ;
 
-MACRO: <$-n ( int -- quot ) dup
-   '[ [ _ narray <frp-product> ] dip [ _ firstn ] prepend <$ ] ;
+MACRO: $>-n ( int -- quot ) lift [ $> ] append ;
+
+MACRO: <$-n ( int -- quot ) lift [ <$ ] append ;
 
 : liftA2 ( a b quot -- arrow ) 2 liftA-n ; inline
 : liftA3 ( a b c quot -- arrow ) 3 liftA-n ; inline
+
+: $>2 ( a b quot -- arrow ) 2 $>-n ; inline
+: $>3 ( a b c quot -- arrow ) 3 $>-n ; inline
 
 : <$2 ( a b quot -- arrow ) 2 <$-n ; inline
 : <$3 ( a b c quot -- arrow ) 3 <$-n ; inline
