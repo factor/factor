@@ -3,7 +3,6 @@ opengl.shaders opengl.framebuffers opengl.capabilities multiline
 ui.gadgets accessors sequences ui.render ui math locals arrays
 generalizations combinators ui.gadgets.worlds
 literals ui.pixel-formats ;
-FROM: opengl.demo-support => rect-vertices ;
 IN: spheres
 
 STRING: plane-vertex-shader
@@ -117,11 +116,11 @@ TUPLE: spheres-world < demo-world
     reflection-framebuffer reflection-depthbuffer
     reflection-texture ;
 
-M: spheres-world near-plane ( gadget -- z )
+M: spheres-world near-plane
     drop 1.0 ;
-M: spheres-world far-plane ( gadget -- z )
+M: spheres-world far-plane
     drop 512.0 ;
-M: spheres-world distance-step ( gadget -- dz )
+M: spheres-world distance-step
     drop 0.5 ;
 
 : (reflection-dim) ( -- w h )
@@ -175,6 +174,9 @@ M: spheres-world distance-step ( gadget -- dz )
 M: spheres-world begin-world
     "2.0" { "GL_ARB_shader_objects" } require-gl-version-or-extensions
     { "GL_EXT_framebuffer_object" } require-gl-extensions
+    GL_DEPTH_TEST glEnable
+    GL_VERTEX_ARRAY glEnableClientState
+    0.15 0.15 1.0 1.0 glClearColor 
     20.0 10.0 20.0 set-demo-orientation
     (plane-program) >>plane-program
     (solid-sphere-program) >>solid-sphere-program
@@ -194,13 +196,13 @@ M: spheres-world end-world
         [ plane-program>> [ delete-gl-program ] when* ]
     } cleave ;
 
-M: spheres-world pref-dim* ( gadget -- dim )
+M: spheres-world pref-dim*
     drop { 640 480 } ;
 
 :: (draw-sphere) ( program center radius -- )
     program "center" glGetAttribLocation center first3 glVertexAttrib3f
     program "radius" glGetAttribLocation radius glVertexAttrib1f
-    { -1.0 -1.0 } { 1.0 1.0 } rect-vertices ;
+    { -1.0 -1.0 } { 2.0 2.0 } gl-fill-rect ;
     
 :: (draw-colored-sphere) ( program center radius surfacecolor -- )
     program "surface_color" glGetAttribLocation surfacecolor first4 glVertexAttrib4f
@@ -283,9 +285,7 @@ M: spheres-world pref-dim* ( gadget -- dim )
     } cleave ] with-framebuffer ;
 
 M: spheres-world draw-world*
-    GL_DEPTH_TEST glEnable
-    GL_SCISSOR_TEST glDisable
-    0.15 0.15 1.0 1.0 glClearColor {
+    {
         [ (draw-reflection-texture) ]
         [ demo-world-set-matrix ]
         [ sphere-scene ]
