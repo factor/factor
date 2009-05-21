@@ -178,6 +178,8 @@ INSN: ##branch ;
 
 INSN: ##loop-entry ;
 
+INSN: ##phi < ##pure inputs ;
+
 ! Condition codes
 SYMBOL: cc<
 SYMBOL: cc<=
