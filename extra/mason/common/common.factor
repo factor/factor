@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences splitting system accessors
 math.functions make io io.files io.pathnames io.directories
@@ -13,10 +13,7 @@ SYMBOL: current-git-id
 : short-running-process ( command -- )
     #! Give network operations and shell commands at most
     #! 15 minutes to complete, to catch hangs.
-    >process
-        15 minutes >>timeout
-        +closed+ >>stdin
-    try-output-process ;
+    >process 15 minutes >>timeout try-output-process ;
 
 HOOK: really-delete-tree os ( path -- )
 
@@ -44,10 +41,6 @@ M: unix really-delete-tree delete-tree ;
 : eval-file ( file -- obj )
     dup utf8 file-lines parse-fresh
     [ "Empty file: " swap append throw ] [ nip first ] if-empty ;
-
-: cat ( file -- ) utf8 file-contents print ;
-
-: cat-n ( file n -- ) [ utf8 file-lines ] dip short tail* [ print ] each ;
 
 : to-file ( object file -- ) utf8 [ . ] with-file-writer ;
 
