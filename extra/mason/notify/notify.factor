@@ -16,7 +16,7 @@ IN: mason.notify
         ] { } make prepend
         [ 5 ] 2dip '[
             <process>
-                _ [ +closed+ ] unless* >>stdin
+                _ >>stdin
                 _ >>command
             short-running-process
         ] retry
@@ -49,4 +49,6 @@ IN: mason.notify
     ] bi ;
 
 : notify-release ( archive-name -- )
-    "Uploaded " prepend [ print flush ] [ mason-tweet ] bi ;
+    [ "Uploaded " prepend [ print flush ] [ mason-tweet ] bi ]
+    [ f swap "release" swap 2array status-notify ]
+    bi ;

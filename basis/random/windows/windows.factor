@@ -1,6 +1,7 @@
-USING: accessors alien.c-types byte-arrays continuations
-kernel windows.advapi32 init namespaces random destructors
-locals windows.errors ;
+USING: accessors alien.c-types byte-arrays
+combinators.short-circuit continuations destructors init kernel
+locals namespaces random windows.advapi32 windows.errors
+windows.kernel32 ;
 IN: random.windows
 
 TUPLE: windows-rng provider type ;
@@ -12,25 +13,40 @@ C: <windows-crypto-context> windows-crypto-context
 M: windows-crypto-context dispose ( tuple -- )
     handle>> 0 CryptReleaseContext win32-error=0/f ;
 
-: factor-crypto-container ( -- string ) "FactorCryptoContainer" ; inline
+CONSTANT: factor-crypto-container "FactorCryptoContainer"
 
-:: (acquire-crypto-context) ( provider type flags -- handle )
-    [let | handle [ "HCRYPTPROV" <c-object> ] |
-        handle
-        factor-crypto-container
-        provider
-        type
-        flags
-        CryptAcquireContextW win32-error=0/f
-        handle *void* ] ;
+:: (acquire-crypto-context) ( provider type flags -- handle ret )
+    "HCRYPTPROV" <c-object> :> handle
+    handle
+    factor-crypto-container
+    provider
+    type
+    flags
+    CryptAcquireContextW handle swap ;
 
 : acquire-crypto-context ( provider type -- handle )
-    [ 0 (acquire-crypto-context) ]
-    [ drop CRYPT_NEWKEYSET (acquire-crypto-context) ] recover ;
+    0 (acquire-crypto-context)
+    0 = [
+        GetLastError NTE_BAD_KEYSET =
+        [ drop f ] [ win32-error-string throw ] if
+    ] [
+        *void*
+    ] if ;
 
+: create-crypto-context ( provider type -- handle )
+    CRYPT_NEWKEYSET (acquire-crypto-context) win32-error=0/f *void* ;
+
+ERROR: acquire-crypto-context-failed provider type ;
+
+: attempt-crypto-context ( provider type -- handle )
+    {
+        [ acquire-crypto-context ] 
+        [ create-crypto-context ] 
+        [ acquire-crypto-context-failed ]
+    } 2|| ;
 
 : windows-crypto-context ( provider type -- context )
-    acquire-crypto-context <windows-crypto-context> ;
+    attempt-crypto-context <windows-crypto-context> ;
 
 M: windows-rng random-bytes* ( n tuple -- bytes )
     [
@@ -44,9 +60,8 @@ M: windows-rng random-bytes* ( n tuple -- bytes )
     MS_DEF_PROV
     PROV_RSA_FULL <windows-rng> system-random-generator set-global
 
-    MS_STRONG_PROV
-    PROV_RSA_FULL <windows-rng> secure-random-generator set-global
+    [ MS_STRONG_PROV PROV_RSA_FULL <windows-rng> ]
+    [ drop MS_ENH_RSA_AES_PROV PROV_RSA_AES <windows-rng> ] recover
+    secure-random-generator set-global
 
-    ! MS_ENH_RSA_AES_PROV
-    ! PROV_RSA_AES <windows-rng> secure-random-generator set-global
 ] "random.windows" add-init-hook
