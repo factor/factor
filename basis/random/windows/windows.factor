@@ -46,7 +46,7 @@ ERROR: acquire-crypto-context-failed provider type ;
     } 2|| ;
 
 : windows-crypto-context ( provider type -- context )
-    acquire-crypto-context <windows-crypto-context> ;
+    attempt-crypto-context <windows-crypto-context> ;
 
 M: windows-rng random-bytes* ( n tuple -- bytes )
     [
