@@ -25,7 +25,8 @@ CONSTANT: factor-crypto-container "FactorCryptoContainer"
     CryptAcquireContextW handle swap ;
 
 : acquire-crypto-context ( provider type -- handle )
-    0 (acquire-crypto-context)
+    CRYPT_MACHINE_KEYSET
+    (acquire-crypto-context)
     0 = [
         GetLastError NTE_BAD_KEYSET =
         [ drop f ] [ win32-error-string throw ] if
@@ -34,7 +35,7 @@ CONSTANT: factor-crypto-container "FactorCryptoContainer"
     ] if ;
 
 : create-crypto-context ( provider type -- handle )
-    CRYPT_NEWKEYSET (acquire-crypto-context) win32-error=0/f *void* ;
+    { CRYPT_MACHINE_KEYSET CRYPT_NEWKEYSET } (acquire-crypto-context) win32-error=0/f *void* ;
 
 ERROR: acquire-crypto-context-failed provider type ;
 
