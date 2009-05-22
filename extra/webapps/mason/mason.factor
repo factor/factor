@@ -26,7 +26,7 @@ TUPLE: mason-app < dispatcher ;
         [ "." split1 drop 16 tail* 6 head* download-link ] [ 2drop f ] if
         [XML <td class="supported"><div class="bigdiv"><-></div></td> XML]
     ] [
-        [XML <td /> XML]
+        [XML <td class="doesnotexist" /> XML]
     ] if* ;
 
 CONSTANT: oses
@@ -58,7 +58,12 @@ CONSTANT: cpus
             [XML <tr><th align='center' scope='row'><-></th><-></tr> XML]
         ] with map
     ] bi
-    [XML <table id="downloads" cellspacing="0"><tr><th/><-></tr><-></table> XML] ;
+    [XML
+        <table id="downloads" cellspacing="0">
+            <tr><th class="nobg">OS/CPU</th><-></tr>
+            <->
+        </table>
+    XML] ;
 
 : <download-grid-action> ( -- action )
     <action>
