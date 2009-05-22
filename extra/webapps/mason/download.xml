@@ -17,6 +17,19 @@
     <p>This package was built from GIT ID <t:xml t:name="git-id" />.</p>
 
     <p>Once you download Factor, you can <a href="http://concatenative.org/wiki/view/Factor/Getting started">get started</a> with the language.</p>
+
+    <h1>Build machine information</h1>
+
+    <table border="1">
+      <tr><td>Host name:</td><td><t:xml t:name="host-name" /></td></tr>
+      <tr><td>Current status:</td><td><t:xml t:name="status" /></td></tr>
+      <tr><td>Last build:</td><td><t:xml t:name="last-build" /></td></tr>
+      <tr><td>Last clean build:</td><td><t:xml t:name="last-clean-build" /></td></tr>
+      <tr><td>Binaries:</td><td><t:xml t:name="binaries" /></td></tr>
+      <tr><td>Clean images:</td><td><t:xml t:name="clean-images" /></td></tr>
+    </table>
+
+    <p><t:xml t:name="last-report" /></p>
   </body>
 </html>
 
