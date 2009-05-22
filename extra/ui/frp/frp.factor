@@ -1,8 +1,8 @@
 USING: accessors arrays colors fonts fry generalizations kernel
 lexer macros math math.parser models models.product monads
 sequences ui.gadgets ui.gadgets.buttons ui.gadgets.buttons.private
-ui.gadgets.editors ui.gadgets.line-support ui.gadgets.scrollers
-ui.gadgets.tables ui.gadgets.tracks ui.render ;
+ui.gadgets.editors ui.gadgets.scrollers ui.gadgets.tables
+ui.gadgets.tracks ;
 QUALIFIED: make
 IN: ui.frp
 
@@ -11,6 +11,8 @@ TUPLE: multi-model < model ;
 GENERIC: (model-changed) ( model observer -- )
 : <multi-model> ( models kind -- model ) f swap new-model [ [ add-dependency ] curry each ] keep ;
 M: multi-model model-changed over value>> [ (model-changed) ] [ 2drop ] if ;
+M: multi-model model-activated dup dependencies>> dup length 1 =
+   [ first swap model-changed ] [ 2drop ] if ;
 
 TUPLE: basic-model < multi-model ;
 M: basic-model (model-changed) [ value>> ] dip set-model ;
@@ -50,7 +52,6 @@ TUPLE: mapped-model < multi-model model quot ;
 M: mapped-model (model-changed)
     [ [ value>> ] [ quot>> ] bi* call( old -- new ) ] [ nip ] 2bi
     set-model ;
-M: mapped-model model-activated [ model>> ] keep model-changed ;
 
 TUPLE: side-effect-model < mapped-model ;
 M: side-effect-model (model-changed) [ [ value>> ] [ quot>> ] bi* call( old -- ) ] keep t swap set-model ;
@@ -73,11 +74,12 @@ M: frp-product model-activated dup model-changed ;
 
 TUPLE: action-value < basic-model parent ;
 : <action-value> ( parent value -- model ) action-value new-model swap >>parent ;
-M: action-value model-activated parent>> activate-model ; ! a fake dependency of sorts
+M: action-value model-activated dup parent>> dup activate-model model-changed ; ! a fake dependency of sorts
 
+! Update at start
 TUPLE: action < multi-model quot ;
 M: action (model-changed) [ [ value>> ] [ quot>> ] bi* call( a -- b ) ] keep value>>
-   swap add-connection ;
+   [ swap add-connection ] 2keep model-changed ;
 : <action> ( model quot -- action ) [ 1array action <multi-model> ] dip >>quot dup f <action-value> >>value value>> ;
 
 ! Gadgets
