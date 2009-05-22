@@ -21,12 +21,13 @@ TUPLE: mason-app < dispatcher ;
     ] dip link ;
 
 : download-grid-cell ( cpu os -- xml )
-    builder new swap >>os swap >>cpu select-tuple dup
-    [
+    builder new swap >>os swap >>cpu select-tuple [
         dup last-release>> dup
         [ "." split1 drop 16 tail* 6 head* download-link ] [ 2drop f ] if
-    ] when
-    [XML <td><-></td> XML] ;
+        [XML <td class="supported"><div class="bigdiv"><-></div></td> XML]
+    ] [
+        [XML <td /> XML]
+    ] if* ;
 
 CONSTANT: oses
 {
@@ -47,22 +48,21 @@ CONSTANT: cpus
 
 : download-grid ( -- xml )
     oses
-    [ values [ [XML <th><-></th> XML] ] map ]
+    [ values [ [XML <th align='center' scope='col'><-></th> XML] ] map ]
     [
         keys
         cpus [
             [ nip second ] [ first ] 2bi [
                 swap download-grid-cell
-            ] curry map [XML <tr><th><-></th><-></tr> XML]
+            ] curry map
+            [XML <tr><th align='center' scope='row'><-></th><-></tr> XML]
         ] with map
-    ] bi [XML <table><tr><th/><-></tr><-></table> XML]  ;
+    ] bi
+    [XML <table id="downloads" cellspacing="0"><tr><th/><-></tr><-></table> XML] ;
 
 : <download-grid-action> ( -- action )
     <action>
-    [
-        download-grid
-        xml>string "text/html" <content>
-    ] >>display ;
+    [ download-grid xml>string "text/html" <content> ] >>display ;
 
 : validate-os/cpu ( -- )
     {
