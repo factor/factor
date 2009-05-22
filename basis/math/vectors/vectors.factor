@@ -62,6 +62,9 @@ IN: math.vectors
     [ first vnlerp ] [ second vnlerp ] bi-curry
     [ 2bi@ ] [ call ] bi* ;
 
+: v~ ( a b epsilon -- ? )
+    [ ~ ] curry 2all? ;
+
 HINTS: vneg { array } ;
 HINTS: norm-sq { array } ;
 HINTS: norm { array } ;
