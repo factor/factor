@@ -4,9 +4,12 @@
 
 <html>
   <head>
+    <link rel="stylesheet" href="http://factorcode.org/css/master.css" type="text/css" media="screen" title="no title" charset="utf-8" />
     <title>Factor binary package for <t:label t:name="platform" /></title>
   </head>
   <body>
+    <div><img src="http://factorcode.org/graphics/logo.png" alt="Logo" /></div>
+
     <h1>Factor binary package for <t:label t:name="platform" /></h1>
 
     <p>Requirements:</p>
