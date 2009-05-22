@@ -7,9 +7,6 @@ prettyprint sequences xml.syntax xml.writer combinators.short-circuit
 literals splitting ;
 IN: mason.report
 
-: short-host-name ( -- string )
-    host-name "." split1 drop ;
-
 : common-report ( -- xml )
     target-os get
     target-cpu get

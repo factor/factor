@@ -5,8 +5,11 @@ math.functions make io io.files io.pathnames io.directories
 io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
 combinators.short-circuit parser combinators calendar
 calendar.format arrays mason.config locals debugger fry
-continuations strings ;
+continuations strings io.sockets ;
 IN: mason.common
+
+: short-host-name ( -- string )
+    host-name "." split1 drop ;
 
 SYMBOL: current-git-id
 
