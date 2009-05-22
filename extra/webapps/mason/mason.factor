@@ -15,7 +15,7 @@ TUPLE: mason-app < dispatcher ;
 
 : download-link ( builder label -- xml )
     [
-        [ URL" download" ] dip
+        [ URL" http://builds.factorcode.org/download" ] dip
         [ os>> "os" set-query-param ]
         [ cpu>> "cpu" set-query-param ] bi
     ] dip link ;
@@ -137,16 +137,16 @@ CONSTANT: cpus
         os>> {
             { "winnt" "Windows XP (also tested on Vista)" }
             { "macosx" "Mac OS X 10.5 Leopard" }
-            { "linux" "Linux 2.6.16 with GLIBC 2.4" }
+            { "linux" "Ubuntu Linux 9.04 (other distributions may also work)" }
             { "freebsd" "FreeBSD 7.0" }
             { "netbsd" "NetBSD 4.0" }
-            { "openbsd" "OpenBSD 4.2" }
+            { "openbsd" "OpenBSD 4.4" }
         } at
     ] [
         dup cpu>> "x86.32" = [
             os>> {
-                { [ dup { "winnt" "linux" } member? ] [ drop "Intel Pentium 4, Core Duo, or other x86 chip with SSE2 support. Note that 32-bit Athlon XP processors do not support SSE2." ] }
-                { [ dup { "freebsd" "netbsd" "openbsd" } member? ] [ drop "Intel Pentium Pro or better" ] }
+                { [ dup { "winnt" "linux" "freebsd" } member? ] [ drop "Intel Pentium 4, Core Duo, or other x86 chip with SSE2 support. Note that 32-bit Athlon XP processors do not support SSE2." ] }
+                { [ dup { "netbsd" "openbsd" } member? ] [ drop "Intel Pentium Pro or better" ] }
                 { [ t ] [ drop f ] }
             } cond
         ] [ drop f ] if
