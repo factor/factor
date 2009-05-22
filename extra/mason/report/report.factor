@@ -4,13 +4,16 @@ USING: benchmark combinators.smart debugger fry io assocs
 io.encodings.utf8 io.files io.sockets io.streams.string kernel
 locals mason.common mason.config mason.platform math namespaces
 prettyprint sequences xml.syntax xml.writer combinators.short-circuit
-literals ;
+literals splitting ;
 IN: mason.report
+
+: short-host-name ( -- string )
+    host-name "." split1 drop ;
 
 : common-report ( -- xml )
     target-os get
     target-cpu get
-    host-name
+    short-host-name
     build-dir
     current-git-id get
     [XML
