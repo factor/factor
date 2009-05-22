@@ -1,7 +1,7 @@
 USING: accessors alien.c-types byte-arrays
 combinators.short-circuit continuations destructors init kernel
 locals namespaces random windows.advapi32 windows.errors
-windows.kernel32 ;
+windows.kernel32 math.bitwise ;
 IN: random.windows
 
 TUPLE: windows-rng provider type ;
@@ -35,7 +35,8 @@ CONSTANT: factor-crypto-container "FactorCryptoContainer"
     ] if ;
 
 : create-crypto-context ( provider type -- handle )
-    { CRYPT_MACHINE_KEYSET CRYPT_NEWKEYSET } (acquire-crypto-context) win32-error=0/f *void* ;
+    { CRYPT_MACHINE_KEYSET CRYPT_NEWKEYSET } flags
+    (acquire-crypto-context) win32-error=0/f *void* ;
 
 ERROR: acquire-crypto-context-failed provider type ;
 
