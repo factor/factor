@@ -64,7 +64,10 @@ IN: mason.child
 
 MACRO: recover-cond ( alist -- )
     dup { [ length 1 = ] [ first callable? ] } 1&&
-    [ first ] [ [ first first2 ] [ rest ] bi '[ _ _ [ _ recover-cond ] recover-else ] ] if ;
+    [ first ] [
+        [ first first2 ] [ rest ] bi
+        '[ _ _ [ _ recover-cond ] recover-else ]
+    ] if ;
 
 : build-child ( -- status )
     copy-image
