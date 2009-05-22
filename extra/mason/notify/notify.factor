@@ -10,7 +10,7 @@ IN: mason.notify
         [
             "ssh" , status-host get , "-l" , status-username get ,
             "./mason-notify" ,
-            host-name ,
+            short-host-name ,
             target-cpu get ,
             target-os get ,
         ] { } make prepend
