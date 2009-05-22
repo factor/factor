@@ -65,9 +65,6 @@ CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0
     } 2cleave
     [ [ 2array ] 2bi@ ] dip <affine-transform> ;
 
-: v~ ( a b epsilon -- ? )
-    [ ~ ] curry 2all? ;
-
 : a~ ( a b epsilon -- ? )
     {
         [ [ [ x>>      ] bi@ ] dip v~ ]
