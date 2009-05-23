@@ -85,8 +85,8 @@ M: action (model-changed) [ [ value>> ] [ quot>> ] bi* call( a -- b ) ] keep val
 ! Gadgets
 TUPLE: frp-button < button hook ;
 : <frp-button> ( text -- button ) [
-      [ t swap set-control-value ] keep
-      dup hook>> [ call( button -- ) ] [ drop ] if*
+      [ dup hook>> [ call( button -- ) ] [ drop ] if* ] keep
+      t swap set-control-value
    ] frp-button new-button border-button-theme f <basic> >>model ;
 
 TUPLE: frp-table < table { quot initial: [ ] } { val-quot initial: [ ] } color-quot column-titles column-alignment ;
