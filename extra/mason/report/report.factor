@@ -4,13 +4,13 @@ USING: benchmark combinators.smart debugger fry io assocs
 io.encodings.utf8 io.files io.sockets io.streams.string kernel
 locals mason.common mason.config mason.platform math namespaces
 prettyprint sequences xml.syntax xml.writer combinators.short-circuit
-literals ;
+literals splitting ;
 IN: mason.report
 
 : common-report ( -- xml )
     target-os get
     target-cpu get
-    host-name
+    short-host-name
     build-dir
     current-git-id get
     [XML
@@ -59,13 +59,13 @@ IN: mason.report
     "test-log" "Tests failed" failed-report ;
 
 : timings-table ( -- xml )
-    {
-        $ boot-time-file
-        $ load-time-file
-        $ test-time-file
-        $ help-lint-time-file
-        $ benchmark-time-file
-        $ html-help-time-file
+    ${
+        boot-time-file
+        load-time-file
+        test-time-file
+        help-lint-time-file
+        benchmark-time-file
+        html-help-time-file
     } [
         dup eval-file milli-seconds>time
         [XML <tr><td><-></td><td><-></td></tr> XML]
@@ -121,13 +121,13 @@ IN: mason.report
     ] with-report ;
 
 : build-clean? ( -- ? )
-    {
-        [ load-all-vocabs-file eval-file empty? ]
-        [ test-all-vocabs-file eval-file empty? ]
-        [ help-lint-vocabs-file eval-file empty? ]
-        [ compiler-errors-file eval-file empty? ]
-        [ benchmark-error-vocabs-file eval-file empty? ]
-    } 0&& ;
+    ${
+        load-all-vocabs-file
+        test-all-vocabs-file
+        help-lint-vocabs-file
+        compiler-errors-file
+        benchmark-error-vocabs-file
+    } [ eval-file empty? ] all? ;
 
 : success ( -- status )
     successful-report build-clean? status-clean status-dirty ? ;

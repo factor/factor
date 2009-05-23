@@ -108,8 +108,8 @@ TUPLE: no-current-vocab ;
     dup using-vocab?
     [ vocab-name "Already using ``" "'' vocabulary" surround note. ] [
         manifest get
-        [ [ vocab-name ] dip search-vocab-names>> conjoin ]
         [ [ load-vocab ] dip search-vocabs>> push ]
+        [ [ vocab-name ] dip search-vocab-names>> conjoin ]
         2bi
     ] if ;
 
@@ -121,8 +121,8 @@ TUPLE: no-current-vocab ;
 : unuse-vocab ( vocab -- )
     dup using-vocab? [
         manifest get
-        [ [ vocab-name ] dip search-vocab-names>> delete-at ]
         [ [ load-vocab ] dip search-vocabs>> delq ]
+        [ [ vocab-name ] dip search-vocab-names>> delete-at ]
         2bi
     ] [ drop ] if ;
 

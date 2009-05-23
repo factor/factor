@@ -112,10 +112,10 @@ $nl
 { $code
     "USE: io.monitors"
     ": watch-loop ( monitor -- )"
-    "    dup next-change . nl nl flush watch-loop ;"
+    "    dup next-change path>> print nl nl flush watch-loop ;"
     ""
     ": watch-directory ( path -- )"
-    "    [ t [ watch-loop ] with-monitor ] with-monitors"
+    "    [ t [ watch-loop ] with-monitor ] with-monitors ;"
 } ;
 
 ABOUT: "io.monitors"
