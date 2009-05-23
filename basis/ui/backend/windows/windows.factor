@@ -51,10 +51,8 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     { samples { $ WGL_SAMPLES_ARB } }
 }
 
-MEMO: (has-wglChoosePixelFormatARB?) ( dc -- ? )
-    { "WGL_ARB_pixel_format" } has-wgl-extensions? ;
 : has-wglChoosePixelFormatARB? ( world -- ? )
-    handle>> hDC>> (has-wglChoosePixelFormatARB?) ;
+    drop f ;
 
 : arb-make-pixel-format ( world attributes -- pf )
     [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 0 <int> 0 <int>
