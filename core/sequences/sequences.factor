@@ -920,6 +920,8 @@ PRIVATE>
         ] [ generic-flip ] if
     ] unless ;
 
+: reduce1 ( seq quot -- result ) [ unclip ] dip reduce ; inline
+
 :: reduce-r
     ( list identity quot: ( obj1 obj2 -- obj ) -- result )
     list empty?
