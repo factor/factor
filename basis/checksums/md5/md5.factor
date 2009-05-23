@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io io.binary io.files io.streams.byte-array math
+USING: alien.c-types kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting grouping strings
 sequences byte-arrays locals sequences.private macros fry
 io.encodings.binary math.bitwise checksums accessors
@@ -173,9 +173,27 @@ HINTS: (process-md5-block-G) { uint-array md5-state } ;
 HINTS: (process-md5-block-H) { uint-array md5-state } ;
 HINTS: (process-md5-block-I) { uint-array md5-state } ;
 
+: byte-array>le ( byte-array -- byte-array )
+    little-endian? [
+        dup 4 <sliced-groups> [
+            [ [ 1 2 ] dip exchange-unsafe ]
+            [ [ 0 3 ] dip exchange-unsafe ] bi
+        ] each
+    ] unless ;
+
+: byte-array>uint-array-le ( byte-array -- uint-array )
+    byte-array>le byte-array>uint-array ;
+
+HINTS: byte-array>uint-array-le byte-array ;
+
+: uint-array>byte-array-le ( uint-array -- byte-array )
+    underlying>> byte-array>le ;
+
+HINTS: uint-array>byte-array-le uint-array ;
+
 M: md5-state checksum-block ( block state -- )
     [
-        [ byte-array>uint-array ] [ state>> ] bi* {
+        [ byte-array>uint-array-le ] [ state>> ] bi* {
             [ (process-md5-block-F) ]
             [ (process-md5-block-G) ]
             [ (process-md5-block-H) ]
@@ -185,7 +203,7 @@ M: md5-state checksum-block ( block state -- )
         nip update-md5
     ] 2bi ;
 
-: md5>checksum ( md5 -- bytes ) state>> underlying>> ;
+: md5>checksum ( md5 -- bytes ) state>> uint-array>byte-array-le ;
 
 M: md5-state clone ( md5 -- new-md5 )
     call-next-method
