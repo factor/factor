@@ -101,11 +101,11 @@ M: neutral-insn visit , ;
 
 : adjust-d ( n -- ) state get [ + ] change-d-height drop ;
 
-M: ##inc-d visit n>> adjust-d ;
+M: ##inc-d visit [ , ] [ n>> adjust-d ] bi ;
 
 : adjust-r ( n -- ) state get [ + ] change-r-height drop ;
 
-M: ##inc-r visit n>> adjust-r ;
+M: ##inc-r visit [ , ] [ n>> adjust-r ] bi ;
 
 : eliminate-peek ( dst src -- )
     ! the requested stack location is already in 'src'
