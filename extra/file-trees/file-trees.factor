@@ -1,6 +1,6 @@
 USING: accessors arrays delegate delegate.protocols
 io.pathnames kernel locals sequences
-ui.frp vectors make ;
+ui.frp vectors make strings ;
 IN: file-trees
 
 TUPLE: walkable-vector vector father ;
@@ -31,8 +31,16 @@ DEFER: (tree-insert)
 : add-paths ( pathseq -- {{name,path}} )
    "" [ [ "/" glue dup ] keep swap 2array , ] [ reduce drop ] f make ;
 
-: create-tree ( file-list -- tree ) [ path-components add-paths ] map
-   { "/" "/" } <dir-tree> [ [ tree-insert ] curry each ] keep ;
+: go-to-path ( path tree -- tree' ) over empty? [ nip ]
+   [ [ unclip ] [ children>> ] bi* swap [ swap node>> = ] curry find nip go-to-path ] if ;
+
+: find-root ( pathseq -- root ) dup flip
+   [ [ dupd = [ ] [ drop f ] if ] reduce1 ] find-last drop
+      [ first ] dip head-slice >string path-components ;
+
+: create-tree ( file-list -- tree ) [ find-root ]
+   [ [ path-components add-paths ] map { "/" "/" } <dir-tree> [ [ tree-insert ] curry each ] keep ] bi
+   go-to-path ;
 
 : <dir-table> ( tree-model -- table )
    <frp-list*> [ node>> 1array ] >>quot
