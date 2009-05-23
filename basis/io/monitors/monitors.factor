@@ -60,9 +60,6 @@ SYMBOL: +rename-file+
 : run-monitor ( path recursive? quot -- )
     '[ [ @ t ] loop ] with-monitor ; inline
 
-: spawn-monitor ( path recursive? quot -- )
-    [ '[ _ _ _ run-monitor ] ] [ 2drop "Monitoring " prepend ] 3bi
-    spawn drop ;
 {
     { [ os macosx? ] [ "io.monitors.macosx" require ] }
     { [ os linux? ] [ "io.monitors.linux" require ] }

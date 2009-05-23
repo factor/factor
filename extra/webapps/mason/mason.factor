@@ -15,18 +15,19 @@ TUPLE: mason-app < dispatcher ;
 
 : download-link ( builder label -- xml )
     [
-        [ URL" download" ] dip
+        [ URL" http://builds.factorcode.org/download" ] dip
         [ os>> "os" set-query-param ]
         [ cpu>> "cpu" set-query-param ] bi
     ] dip link ;
 
 : download-grid-cell ( cpu os -- xml )
-    builder new swap >>os swap >>cpu select-tuple dup
-    [
+    builder new swap >>os swap >>cpu select-tuple [
         dup last-release>> dup
         [ "." split1 drop 16 tail* 6 head* download-link ] [ 2drop f ] if
-    ] when
-    [XML <td><-></td> XML] ;
+        [XML <td class="supported"><div class="bigdiv"><-></div></td> XML]
+    ] [
+        [XML <td class="doesnotexist" /> XML]
+    ] if* ;
 
 CONSTANT: oses
 {
@@ -47,22 +48,26 @@ CONSTANT: cpus
 
 : download-grid ( -- xml )
     oses
-    [ values [ [XML <th><-></th> XML] ] map ]
+    [ values [ [XML <th align='center' scope='col'><-></th> XML] ] map ]
     [
         keys
         cpus [
             [ nip second ] [ first ] 2bi [
                 swap download-grid-cell
-            ] curry map [XML <tr><th><-></th><-></tr> XML]
+            ] curry map
+            [XML <tr><th align='center' scope='row'><-></th><-></tr> XML]
         ] with map
-    ] bi [XML <table><tr><th/><-></tr><-></table> XML]  ;
+    ] bi
+    [XML
+        <table id="downloads" cellspacing="0">
+            <tr><th class="nobg">OS/CPU</th><-></tr>
+            <->
+        </table>
+    XML] ;
 
 : <download-grid-action> ( -- action )
     <action>
-    [
-        download-grid
-        xml>string "text/html" <content>
-    ] >>display ;
+    [ download-grid xml>string "text/html" <content> ] >>display ;
 
 : validate-os/cpu ( -- )
     {
@@ -132,16 +137,16 @@ CONSTANT: cpus
         os>> {
             { "winnt" "Windows XP (also tested on Vista)" }
             { "macosx" "Mac OS X 10.5 Leopard" }
-            { "linux" "Linux 2.6.16 with GLIBC 2.4" }
+            { "linux" "Ubuntu Linux 9.04 (other distributions may also work)" }
             { "freebsd" "FreeBSD 7.0" }
             { "netbsd" "NetBSD 4.0" }
-            { "openbsd" "OpenBSD 4.2" }
+            { "openbsd" "OpenBSD 4.4" }
         } at
     ] [
         dup cpu>> "x86.32" = [
             os>> {
-                { [ dup { "winnt" "linux" } member? ] [ drop "Intel Pentium 4, Core Duo, or other x86 chip with SSE2 support. Note that 32-bit Athlon XP processors do not support SSE2." ] }
-                { [ dup { "freebsd" "netbsd" "openbsd" } member? ] [ drop "Intel Pentium Pro or better" ] }
+                { [ dup { "winnt" "linux" "freebsd" } member? ] [ drop "Intel Pentium 4, Core Duo, or other x86 chip with SSE2 support. Note that 32-bit Athlon XP processors do not support SSE2." ] }
+                { [ dup { "netbsd" "openbsd" } member? ] [ drop "Intel Pentium Pro or better" ] }
                 { [ t ] [ drop f ] }
             } cond
         ] [ drop f ] if
