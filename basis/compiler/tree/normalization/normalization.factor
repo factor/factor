@@ -60,7 +60,7 @@ M: #branch normalize*
 : eliminate-phi-introductions ( introductions seq terminated -- seq' )
     [
         [ nip ] [
-            dup [ +bottom+ eq? ] trim-head
+            dup [ +top+ eq? ] trim-head
             [ [ length ] bi@ - tail* ] keep append
         ] if
     ] 3map ;
