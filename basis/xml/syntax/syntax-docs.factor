@@ -50,7 +50,7 @@ ARTICLE: { "xml.syntax" "interpolation" } "XML interpolation syntax"
 $nl
 "These forms can be used where a tag might go, as in " { $snippet "[XML <foo><-></foo> XML]" } " or where an attribute might go, as in " { $snippet "[XML <foo bar=<->/> XML]" } ". When an attribute is spliced in, it is not included if the value is " { $snippet "f" } " and if the value is not a string, the value is put through " { $link present } ". Here is an example of the fry style of XML interpolation:"
 { $example 
-{" USING: splitting sequences xml.writer xml.syntax ;
+{" USING: splitting xml.writer xml.syntax ;
 "one two three" " " split
 [ [XML <item><-></item> XML] ] map
 <XML <doc><-></doc> XML> pprint-xml"}
@@ -86,7 +86,7 @@ $nl
 {" <?xml version="1.0" encoding="UTF-8"?>
 <x number="3" url="http://factorcode.org/" string="hello" word="drop"/>"} }
 "XML interpolation can also be used, in conjunction with " { $vocab-link "inverse" } " in pattern matching. For example:"
-{ $example {" USING: sequences xml.syntax inverse ;
+{ $example {" USING: xml.syntax inverse ;
 : dispatch ( xml -- string )
     {
         { [ [XML <a><-></a> XML] ] [ "a" prepend ] }

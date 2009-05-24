@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences vectors arrays generic assocs io math
-namespaces parser prettyprint strings io.styles vectors words
+USING: kernel sequences arrays generic assocs io math
+namespaces parser prettyprint strings io.styles words
 system sorting splitting grouping math.parser classes memory
 combinators fry ;
 IN: tools.memory

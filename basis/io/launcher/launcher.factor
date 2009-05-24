@@ -264,7 +264,7 @@ M: output-process-error error.
 : try-output-process ( command -- )
     >process
     +stdout+ >>stderr
-    +closed+ >>stdin
+    [ +closed+ or ] change-stdin
     utf8 <process-reader*>
     [ stream-contents ] [ dup wait-for-process ] bi*
     0 = [ 2drop ] [ output-process-error ] if ;

@@ -1,6 +1,6 @@
+USING: accessors byte-arrays checksums checksums.openssl
+combinators.short-circuit kernel system tools.test ;
 IN: checksums.openssl.tests
-USING: byte-arrays checksums.openssl checksums tools.test
-accessors kernel system ;
 
 [
     B{ 201 238 222 100 92 200 182 188 138 255 129 163 115 88 240 136 }
@@ -22,7 +22,7 @@ accessors kernel system ;
     "Bad checksum test" >byte-array
     "no such checksum" <openssl-checksum>
     checksum-bytes
-] [ [ unknown-digest? ] [ name>> "no such checksum" = ] bi and ]
+] [ { [ unknown-digest? ] [ name>> "no such checksum" = ] } 1&& ]
 must-fail-with
 
 [ ] [ image openssl-sha1 checksum-file drop ] unit-test

@@ -12,7 +12,7 @@ DEFPUSHPOP(gc_local_,gc_locals)
 template <typename T>
 struct gc_root : public tagged<T>
 {
-	void push() { gc_local_push((cell)this); }
+	void push() { check_tagged_pointer(tagged<T>::value()); gc_local_push((cell)this); }
 	
 	explicit gc_root(cell value_) : tagged<T>(value_) { push(); }
 	explicit gc_root(T *value_) : tagged<T>(value_) { push(); }

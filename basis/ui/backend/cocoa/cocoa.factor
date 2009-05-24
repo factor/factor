@@ -99,12 +99,14 @@ M: cocoa-ui-backend set-title ( string world -- )
     drop ;
 
 : exit-fullscreen ( world -- )
-    handle>> view>> f -> exitFullScreenModeWithOptions: ;
+    handle>>
+    [ view>> f -> exitFullScreenModeWithOptions: ] 
+    [ [ window>> ] [ view>> ] bi -> makeFirstResponder: drop ] bi ;
 
-M: cocoa-ui-backend set-fullscreen* ( ? world -- )
-    swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
+M: cocoa-ui-backend (set-fullscreen) ( world ? -- )
+    [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
-M: cocoa-ui-backend fullscreen* ( world -- ? )
+M: cocoa-ui-backend (fullscreen?) ( world -- ? )
     handle>> view>> -> isInFullScreenMode zero? not ;
 
 M:: cocoa-ui-backend (open-window) ( world -- )
@@ -120,13 +122,20 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     window f -> makeKeyAndOrderFront: ;
 
 M: cocoa-ui-backend (close-window) ( handle -- )
-    window>> -> release ;
+    [
+        view>> dup -> isInFullScreenMode zero?
+        [ drop ]
+        [ f -> exitFullScreenModeWithOptions: ] if
+    ] [ window>> -> release ] bi ;
 
 M: cocoa-ui-backend (grab-input) ( handle -- )
     0 CGAssociateMouseAndMouseCursorPosition drop
     CGMainDisplayID CGDisplayHideCursor drop
     window>> -> frame CGRect>rect rect-center
-    first2 <CGPoint> CGWarpMouseCursorPosition drop ;
+    NSScreen -> screens 0 -> objectAtIndex: -> frame CGRect-h
+    [ drop first ] [ swap second - ] 2bi <CGPoint>
+    [ GetCurrentButtonState zero? not ] [ yield ] while
+    CGWarpMouseCursorPosition drop ;
 
 M: cocoa-ui-backend (ungrab-input) ( handle -- )
     drop

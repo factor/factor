@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel models arrays sequences math math.order
 models.product ;
+FROM: models.product => product ;
 IN: models.range
 
 TUPLE: range < product ;

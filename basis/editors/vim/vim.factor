@@ -4,7 +4,6 @@ make ;
 IN: editors.vim
 
 SYMBOL: vim-path
-
 SYMBOL: vim-editor
 HOOK: vim-command vim-editor ( file line -- array )
 
@@ -12,12 +11,13 @@ SINGLETON: vim
 
 M: vim vim-command
     [
-        vim-path get , swap , "+" swap number>string append ,
+        vim-path get ,
+        [ , ] [ number>string "+" prepend , ] bi*
     ] { } make ;
 
-: vim-location ( file line -- )
-    vim-command try-process ;
+: vim ( file line -- )
+    vim-command run-detached drop ;
 
 "vim" vim-path set-global
-[ vim-location ] edit-hook set-global
-vim vim-editor set-global
+[ vim ] edit-hook set-global
+\ vim vim-editor set-global

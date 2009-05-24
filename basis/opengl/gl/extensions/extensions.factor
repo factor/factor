@@ -9,7 +9,7 @@ ERROR: unknown-gl-platform ;
     { [ os macosx? ]  [ "opengl.gl.macosx" ] }
     { [ os unix? ] [ "opengl.gl.unix" ] }
     [ unknown-gl-platform ]
-} cond use+ >>
+} cond use-vocab >>
 
 SYMBOL: +gl-function-number-counter+
 SYMBOL: +gl-function-pointers+
