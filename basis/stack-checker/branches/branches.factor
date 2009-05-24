@@ -9,12 +9,16 @@ IN: stack-checker.branches
 : balanced? ( pairs -- ? )
     [ second ] filter [ first2 length - ] map all-equal? ;
 
-SYMBOL: +bottom+
+SYMBOLS: +bottom+ +top+ ;
 
 : unify-inputs ( max-d-in d-in meta-d -- new-meta-d )
-    dup [ [ - +bottom+ <repetition> ] dip append ] [ 3drop f ] if ;
+    ! Introduced values can be anything, and don't unify with
+    ! literals.
+    dup [ [ - +top+ <repetition> ] dip append ] [ 3drop f ] if ;
 
 : pad-with-bottom ( seq -- newseq )
+    ! Terminated branches are padded with bottom values which
+    ! unify with literals.
     dup empty? [
         dup [ length ] [ max ] map-reduce
         '[ _ +bottom+ pad-head ] map

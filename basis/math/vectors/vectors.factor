@@ -58,6 +58,13 @@ IN: math.vectors
 : vnlerp ( a b t -- a_t )
     [ lerp ] curry 2map ;
 
+: vbilerp ( aa ba ab bb {t,u} -- a_tu )
+    [ first vnlerp ] [ second vnlerp ] bi-curry
+    [ 2bi@ ] [ call ] bi* ;
+
+: v~ ( a b epsilon -- ? )
+    [ ~ ] curry 2all? ;
+
 HINTS: vneg { array } ;
 HINTS: norm-sq { array } ;
 HINTS: norm { array } ;
