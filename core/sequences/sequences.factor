@@ -928,3 +928,5 @@ PRIVATE>
     [ identity ]
     [ list rest identity quot reduce-r list first quot call ] if ;
     inline recursive
+
+:: combos ( list1 list2 -- result ) list2 [ [ 2array ] curry list1 swap map ] map concat ;
