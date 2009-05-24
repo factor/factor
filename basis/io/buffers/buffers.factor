@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.c-types
 alien.syntax kernel libc math sequences byte-arrays strings
-hints accessors math.order destructors combinators ;
+hints math.order destructors combinators ;
 IN: io.buffers
 
 TUPLE: buffer

@@ -3,7 +3,7 @@
 !
 ! Channels - based on ideas from newsqueak
 USING: kernel sequences threads continuations
-random math accessors random ;
+random math accessors ;
 IN: channels
 
 TUPLE: channel receivers senders ;

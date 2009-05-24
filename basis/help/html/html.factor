@@ -1,11 +1,13 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings.utf8 io.encodings.ascii io.encodings.binary
+USING: io.encodings.utf8 io.encodings.binary
 io.files io.files.temp io.directories html.streams help kernel
 assocs sequences make words accessors arrays help.topics vocabs
 vocabs.hierarchy help.vocabs namespaces prettyprint io
-vocabs.loader serialize fry memoize ascii unicode.case math.order
+vocabs.loader serialize fry memoize unicode.case math.order
 sorting debugger html xml.syntax xml.writer math.parser ;
+FROM: io.encodings.ascii => ascii ;
+FROM: ascii => ascii? ;
 IN: help.html
 
 : escape-char ( ch -- )

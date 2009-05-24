@@ -1,8 +1,9 @@
 IN: html.templates.chloe
-USING: xml.data help.markup help.syntax html.components html.forms
+USING: help.markup help.syntax html.components html.forms
 html.templates html.templates.chloe.syntax
 html.templates.chloe.compiler html.templates.chloe.components
 math strings quotations namespaces ;
+FROM: xml.data => tag ;
 
 HELP: <chloe>
 { $values { "path" "a pathname string without the trailing " { $snippet ".xml" } " extension" } { "chloe" chloe } }

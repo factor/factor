@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings arrays assocs
 continuations combinators compiler compiler.alien stack-checker kernel
-math namespaces make parser quotations sequences strings words
+math namespaces make quotations sequences strings words
 cocoa.runtime io macros memoize io.encodings.utf8 effects libc
-libc.private parser lexer init core-foundation fry generalizations
+libc.private lexer init core-foundation fry generalizations
 specialized-arrays.direct.alien ;
 IN: cocoa.messages
 

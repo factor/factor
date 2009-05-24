@@ -8,7 +8,7 @@ models.arrow.smart models.search models.mapping debugger
 namespaces summary locals ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.tables ui.gadgets.labeled ui.gadgets.tracks ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.gadgets.scrollers
-ui.tools.inspector ui.gadgets.status-bar ui.operations
+ui.tools.inspector ui.gadgets.status-bar
 ui.gadgets.buttons ui.gadgets.borders ui.gadgets.packs
 ui.gadgets.labels ui.baseline-alignment ui.images
 compiler.errors tools.errors tools.errors.model ;

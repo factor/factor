@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces make dlists
-deques sequences threads sequences words continuations init
+deques sequences threads words continuations init
 combinators combinators.short-circuit hashtables concurrency.flags
 sets accessors calendar fry destructors ui.gadgets ui.gadgets.private
 ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend ui.render
@@ -209,11 +209,14 @@ PRIVATE>
 : open-window ( gadget title/attributes -- )
     ?attributes <world> open-world-window ;
 
-: set-fullscreen? ( ? gadget -- )
-    find-world set-fullscreen* ;
+: set-fullscreen ( gadget ? -- )
+    [ find-world ] dip (set-fullscreen) ;
 
 : fullscreen? ( gadget -- ? )
-    find-world fullscreen* ;
+    find-world (fullscreen?) ;
+
+: toggle-fullscreen ( gadget -- )
+    dup fullscreen? not set-fullscreen ;
 
 : raise-window ( gadget -- )
     find-world raise-window* ;

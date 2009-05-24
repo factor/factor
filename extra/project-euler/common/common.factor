@@ -143,6 +143,6 @@ PRIVATE>
 SYNTAX: SOLUTION:
     scan-word
     [ name>> "-main" append create-in ] keep
-    [ drop in get vocab (>>main) ]
+    [ drop current-vocab (>>main) ]
     [ [ . ] swap prefix (( -- )) define-declared ]
     2bi ;

@@ -1,5 +1,5 @@
 USING: http help.markup help.syntax io.pathnames io.streams.string
-io.encodings.8-bit io.encodings.binary kernel strings urls
+io.encodings.8-bit io.encodings.binary kernel urls
 urls.encoding byte-arrays strings assocs sequences destructors
 http.client.post-data.private ;
 IN: http.client

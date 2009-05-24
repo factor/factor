@@ -68,8 +68,7 @@ SYMBOL: line-ideal
     0 <paragraph> ;
 
 : post-process ( paragraph -- array )
-    lines>> deep-list>array
-    [ [ contents>> ] map ] map ;
+    lines>> [ [ contents>> ] lmap>array ] lmap>array ;
 
 : initialize ( elements -- elements paragraph )
     <reversed> unclip-slice 1paragraph 1array ;

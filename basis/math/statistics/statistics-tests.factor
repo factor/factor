@@ -13,6 +13,24 @@ IN: math.statistics.tests
 [ 2 ] [ { 1 2 3 } median ] unit-test
 [ 5/2 ] [ { 1 2 3 4 } median ] unit-test
 
+[ { } median ] must-fail
+[ { } upper-median ] must-fail
+[ { } lower-median ] must-fail
+
+[ 2 ] [ { 1 2 3 4 } lower-median ] unit-test
+[ 3 ] [ { 1 2 3 4 } upper-median ] unit-test
+[ 3 ] [ { 1 2 3 4 5 } lower-median ] unit-test
+[ 3 ] [ { 1 2 3 4 5 } upper-median ] unit-test
+
+
+[ 1 ] [ { 1 } lower-median ] unit-test
+[ 1 ] [ { 1 } upper-median ] unit-test
+[ 1 ] [ { 1 } median ] unit-test
+
+[ 1 ] [ { 1 2 } lower-median ] unit-test
+[ 2 ] [ { 1 2 } upper-median ] unit-test
+[ 3/2 ] [ { 1 2 } median ] unit-test
+
 [ 1 ] [ { 1 2 3 } var ] unit-test
 [ 1.0 ] [ { 1 2 3 } std ] unit-test
 [ t ] [ { 1 2 3 4 } ste 0.6454972243679028 - .0001 < ] unit-test
