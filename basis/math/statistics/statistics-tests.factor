@@ -13,6 +13,9 @@ IN: math.statistics.tests
 [ 2 ] [ { 1 2 3 } median ] unit-test
 [ 5/2 ] [ { 1 2 3 4 } median ] unit-test
 
+[ 1 ] [ { 1 } mode ] unit-test
+[ 3 ] [ { 1 2 3 3 3 4 5 6 76 7 2 21 1 3 3 3 } mode ] unit-test
+
 [ { } median ] must-fail
 [ { } upper-median ] must-fail
 [ { } lower-median ] must-fail
