@@ -38,6 +38,7 @@ M: switch-model (model-changed) 2dup switcher>> =
 : <switch> ( signal1 signal2 -- signal' ) [ 2array switch-model <multi-model> ] 2keep
    [ >>original ] [ >>switcher ] bi* ;
 M: switch-model model-activated [ original>> ] keep model-changed ;
+: >behavior ( event -- behavior ) t <model> swap <switch> ;
 
 TUPLE: mapped-model < multi-model model quot ;
 : new-mapped-model ( model quot class -- const-model ) [ over 1array ] dip

@@ -4,10 +4,12 @@ ui.gadgets.editors ui.gadgets.tables ;
 IN: ui.frp.gadgets
 
 TUPLE: frp-button < button hook ;
-: <frp-button> ( text -- button ) [
+: <frp-button> ( gadget -- button ) [
       [ dup hook>> [ call( button -- ) ] [ drop ] if* ] keep
       t swap set-control-value
-   ] frp-button new-button border-button-theme f <basic> >>model ;
+   ] frp-button new-button f <basic> >>model ;
+
+: <frp-bevel-button> ( text -- button ) <frp-button> border-button-theme ;
 
 TUPLE: frp-table < table { quot initial: [ ] } { val-quot initial: [ ] } color-quot column-titles column-alignment ;
 M: frp-table column-titles column-titles>> ;
