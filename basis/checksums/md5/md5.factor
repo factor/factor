@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io io.binary io.files io.streams.byte-array math
+USING: alien.c-types kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting grouping strings
 sequences byte-arrays locals sequences.private macros fry
 io.encodings.binary math.bitwise checksums accessors
 checksums.common checksums.stream combinators combinators.smart
-specialized-arrays.uint literals ;
+specialized-arrays.uint literals hints ;
 IN: checksums.md5
 
 SINGLETON: md5
@@ -28,7 +28,7 @@ M: md5 initialize-checksum-state drop <md5-state> ;
 
 : update-md5 ( md5 -- )
     [ state>> ] [ old-state>> v-w+ dup clone ] [ ] tri
-    [ (>>old-state) ] [ (>>state) ] bi ; inline
+    [ (>>old-state) ] [ (>>state) ] bi ;
 
 CONSTANT: T
     $[
@@ -106,7 +106,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 13 S12 14 ]
         [ c d a b 14 S13 15 ]
         [ b c d a 15 S14 16 ]
-    } [ F ] with-md5-round ; inline
+    } [ F ] with-md5-round ;
 
 : (process-md5-block-G) ( block state -- )
     {
@@ -126,7 +126,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 2  S22 30 ]
         [ c d a b 7  S23 31 ]
         [ b c d a 12 S24 32 ]
-    } [ G ] with-md5-round ; inline
+    } [ G ] with-md5-round ;
 
 : (process-md5-block-H) ( block state -- )
     {
@@ -146,7 +146,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 12 S32 46 ]
         [ c d a b 15 S33 47 ]
         [ b c d a 2  S34 48 ]
-    } [ H ] with-md5-round ; inline
+    } [ H ] with-md5-round ;
 
 : (process-md5-block-I) ( block state -- )
     {
@@ -166,11 +166,34 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 11 S42 62 ]
         [ c d a b 2  S43 63 ]
         [ b c d a 9  S44 64 ]
-    } [ I ] with-md5-round ; inline
+    } [ I ] with-md5-round ;
+
+HINTS: (process-md5-block-F) { uint-array md5-state } ;
+HINTS: (process-md5-block-G) { uint-array md5-state } ;
+HINTS: (process-md5-block-H) { uint-array md5-state } ;
+HINTS: (process-md5-block-I) { uint-array md5-state } ;
+
+: byte-array>le ( byte-array -- byte-array )
+    little-endian? [
+        dup 4 <sliced-groups> [
+            [ [ 1 2 ] dip exchange-unsafe ]
+            [ [ 0 3 ] dip exchange-unsafe ] bi
+        ] each
+    ] unless ;
+
+: byte-array>uint-array-le ( byte-array -- uint-array )
+    byte-array>le byte-array>uint-array ;
+
+HINTS: byte-array>uint-array-le byte-array ;
+
+: uint-array>byte-array-le ( uint-array -- byte-array )
+    underlying>> byte-array>le ;
+
+HINTS: uint-array>byte-array-le uint-array ;
 
 M: md5-state checksum-block ( block state -- )
     [
-        [ byte-array>uint-array ] [ state>> ] bi* {
+        [ byte-array>uint-array-le ] [ state>> ] bi* {
             [ (process-md5-block-F) ]
             [ (process-md5-block-G) ]
             [ (process-md5-block-H) ]
@@ -180,7 +203,7 @@ M: md5-state checksum-block ( block state -- )
         nip update-md5
     ] 2bi ;
 
-: md5>checksum ( md5 -- bytes ) state>> underlying>> ;
+: md5>checksum ( md5 -- bytes ) state>> uint-array>byte-array-le ;
 
 M: md5-state clone ( md5 -- new-md5 )
     call-next-method

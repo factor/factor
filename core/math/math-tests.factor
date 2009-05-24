@@ -26,6 +26,9 @@ IN: math.tests
 [ f ] [ 0 <fp-nan> fp-nan? ] unit-test
 [ t ] [ 0 <fp-nan> fp-infinity? ] unit-test
 
+[ t ] [  0.0 neg -0.0 fp-bitwise= ] unit-test
+[ t ] [ -0.0 neg  0.0 fp-bitwise= ] unit-test
+
 [ 0.0 ] [ -0.0 next-float ] unit-test
 [ t ] [ 1.0 dup next-float < ] unit-test
 [ t ] [ -1.0 dup next-float < ] unit-test

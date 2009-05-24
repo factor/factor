@@ -619,3 +619,12 @@ EXCLUDE: qualified.tests.bar => x ;
 [
     "USE: kernel UNUSE: kernel dup" <string-reader> "unuse-test" parse-stream
 ] [ error>> error>> error>> no-word-error? ] must-fail-with
+
+[ ] [ [ "vocabs.loader.test.l" forget-vocab ] with-compilation-unit ] unit-test
+
+[
+    [ "vocabs.loader.test.l" use-vocab ] must-fail
+    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> key? ] unit-test
+    [ ] [ "vocabs.loader.test.l" unuse-vocab ] unit-test
+    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> key? ] unit-test    
+] with-file-vocabs

@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff, Doug Coleman. bsd license
 USING: accessors arrays combinators game-input game-loop
 game-input.scancodes grouping kernel literals locals
 math math.constants math.functions math.matrices math.order
@@ -6,7 +7,8 @@ opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays.float
 terrain.generation terrain.shaders ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats game-worlds method-chains
-math.affine-transforms noise ui.gestures combinators.short-circuit ;
+math.affine-transforms noise ui.gestures combinators.short-circuit
+destructors grid-meshes ;
 IN: terrain
 
 CONSTANT: FOV $[ 2.0 sqrt 1+ ]
@@ -26,8 +28,6 @@ CONSTANT: SKY-PERIOD 1200
 CONSTANT: SKY-SPEED 0.0005
 
 CONSTANT: terrain-vertex-size { 512 512 }
-CONSTANT: terrain-vertex-distance { $[ 1.0 512.0 / ] $[ 1.0 512.0 / ] }
-CONSTANT: terrain-vertex-row-length $[ 512 1 + 2 * ]
 
 TUPLE: player
     location yaw pitch velocity velocity-modifier
@@ -37,7 +37,7 @@ TUPLE: terrain-world < game-world
     player
     sky-image sky-texture sky-program
     terrain terrain-segment terrain-texture terrain-program
-    terrain-vertex-buffer
+    terrain-mesh
     history ;
 
 : <player> ( -- player )
@@ -65,35 +65,6 @@ M: terrain-world tick-length
     [ yaw>> 0.0 1.0 0.0 glRotatef ]
     [ location>> vneg first3 glTranslatef ] tri ;
 
-: vertex-array-vertex ( x z -- vertex )
-    [ terrain-vertex-distance first * ]
-    [ terrain-vertex-distance second * ] bi*
-    [ 0 ] dip float-array{ } 3sequence ;
-
-: vertex-array-row ( z -- vertices )
-    dup 1 + 2array
-    terrain-vertex-size first 1 + iota
-    2array [ first2 swap vertex-array-vertex ] product-map
-    concat ;
-
-: vertex-array ( -- vertices )
-    terrain-vertex-size second iota
-    [ vertex-array-row ] map concat ;
-
-: >vertex-buffer ( bytes -- buffer )
-    [ GL_ARRAY_BUFFER ] dip GL_STATIC_DRAW <gl-buffer> ;
-
-: draw-vertex-buffer-row ( i -- )
-    [ GL_TRIANGLE_STRIP ] dip
-    terrain-vertex-row-length * terrain-vertex-row-length
-    glDrawArrays ;
-
-: draw-vertex-buffer ( buffer -- )
-    [ GL_ARRAY_BUFFER ] dip [
-        3 GL_FLOAT 0 f glVertexPointer
-        terrain-vertex-size second iota [ draw-vertex-buffer-row ] each
-    ] with-gl-buffer ;
-
 : degrees ( deg -- rad )
     pi 180.0 / * ;
 
@@ -118,7 +89,6 @@ M: terrain-world tick-length
     ${ MOVEMENT-SPEED 0.0 0.0 } eye-rotate ;
 : clamp-pitch ( pitch -- pitch' )
     90.0 min -90.0 max ;
-
 
 : walk-forward ( player -- )
     dup forward-vector [ v+ ] curry change-velocity drop ;
@@ -274,12 +244,12 @@ BEFORE: terrain-world begin-world
     >>sky-program
     terrain-vertex-shader terrain-pixel-shader <simple-gl-program>
     >>terrain-program
-    vertex-array >vertex-buffer >>terrain-vertex-buffer
+    terrain-vertex-size <grid-mesh> >>terrain-mesh
     drop ;
 
 AFTER: terrain-world end-world
     {
-        [ terrain-vertex-buffer>> delete-gl-buffer ]
+        [ terrain-mesh>> dispose ]
         [ terrain-program>> delete-gl-program ]
         [ terrain-texture>> delete-texture ]
         [ sky-program>> delete-gl-program ]
@@ -306,7 +276,7 @@ M: terrain-world draw-world*
         [ GL_DEPTH_TEST glEnable dup terrain-program>> [
             [ "heightmap" glGetUniformLocation 0 glUniform1i ]
             [ "component_scale" glGetUniformLocation COMPONENT-SCALE first4 glUniform4f ] bi
-            terrain-vertex-buffer>> draw-vertex-buffer
+            terrain-mesh>> draw-grid-mesh
         ] with-gl-program ]
     } cleave gl-error ;
 
