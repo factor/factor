@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
-USING: byte-arrays checksums checksums.md5 checksums.sha1 
+USING: byte-arrays checksums checksums.md5 checksums.sha
 kernel math math.parser math.ranges random unicode.case 
 sequences strings system io.binary ;
 

@@ -78,7 +78,13 @@ GENERIC: vocabs-changed ( obj -- )
 : notify-vocab-observers ( -- )
     vocab-observers get [ vocabs-changed ] each ;
 
+ERROR: bad-vocab-name name ;
+
+: check-vocab-name ( name -- name )
+    dup string? [ bad-vocab-name ] unless ;
+
 : create-vocab ( name -- vocab )
+    check-vocab-name
     dictionary get [ <vocab> ] cache
     notify-vocab-observers ;
 

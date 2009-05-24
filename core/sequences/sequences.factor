@@ -88,6 +88,9 @@ M: sequence set-nth bounds-check set-nth-unsafe ;
 M: sequence nth-unsafe nth ;
 M: sequence set-nth-unsafe set-nth ;
 
+: change-nth-unsafe ( i seq quot -- )
+    [ [ nth-unsafe ] dip call ] 3keep drop set-nth-unsafe ; inline
+
 ! The f object supports the sequence protocol trivially
 M: f length drop 0 ;
 M: f nth-unsafe nip ;
@@ -834,10 +837,19 @@ PRIVATE>
     [ [ 2unclip-slice ] dip [ call ] keep ] dip
     compose 2reduce ; inline
 
-: map-find ( seq quot -- result elt )
-    [ f ] 2dip
-    [ [ nip ] dip call dup ] curry find
+<PRIVATE
+
+: (map-find) ( seq quot find-quot -- result elt )
+    [ [ f ] 2dip [ [ nip ] dip call dup ] curry ] dip call
     [ [ drop f ] unless ] dip ; inline
+
+PRIVATE>
+
+: map-find ( seq quot -- result elt )
+    [ find ] (map-find) ; inline
+
+: map-find-last ( seq quot -- result elt )
+    [ find-last ] (map-find) ; inline
 
 : unclip-last-slice ( seq -- butlast-slice last )
     [ but-last-slice ] [ peek ] bi ; inline

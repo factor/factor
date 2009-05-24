@@ -1,5 +1,5 @@
 USING: slides help.markup math arrays hashtables namespaces
-sequences kernel sequences parser memoize ;
+sequences kernel parser memoize ;
 IN: minneapolis-talk
 
 CONSTANT: minneapolis-slides

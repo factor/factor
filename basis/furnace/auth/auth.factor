@@ -3,7 +3,7 @@
 USING: accessors assocs namespaces kernel sequences sets
 destructors combinators fry logging
 io.encodings.utf8 io.encodings.string io.binary random
-checksums checksums.sha2 urls
+checksums checksums.sha urls
 html.forms
 http.server
 http.server.filters

@@ -2,26 +2,26 @@ USING: help.markup help.syntax debugger ;
 IN: math.statistics
 
 HELP: geometric-mean
-{ $values { "seq" "a sequence of numbers" } { "n" "a non-negative real number"} }
+{ $values { "seq" "a sequence of numbers" } { "x" "a non-negative real number"} }
 { $description "Computes the geometric mean of all elements in " { $snippet "seq" } ". The geometric mean measures the central tendency of a data set that minimizes the effects of extreme values." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } geometric-mean ." "1.81712059283214" } }
 { $errors "Throws a " { $link signal-error. } " (square-root of 0) if the sequence is empty." } ;
 
 HELP: harmonic-mean
-{ $values { "seq" "a sequence of numbers" } { "n" "a non-negative real number"} }
+{ $values { "seq" "a sequence of numbers" } { "x" "a non-negative real number"} }
 { $description "Computes the harmonic mean of the elements in " { $snippet "seq" } ". The harmonic mean is appropriate when the average of rates is desired." }
 { $notes "Positive reals only." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } harmonic-mean ." "6/11" } }
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
 HELP: mean
-{ $values { "seq" "a sequence of numbers" } { "n" "a non-negative real number"} }
+{ $values { "seq" "a sequence of numbers" } { "x" "a non-negative real number"} }
 { $description "Computes the arithmetic mean of all elements in " { $snippet "seq" } "." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } mean ." "2" } }
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
 HELP: median
-{ $values { "seq" "a sequence of numbers" } { "n" "a non-negative real number"} }
+{ $values { "seq" "a sequence of numbers" } { "x" "a non-negative real number"} }
 { $description "Computes the median of " { $snippet "seq" } " by sorting the sequence from lowest value to highest and outputting the middle one. If there is an even number of elements in the sequence, the median is not unique, so the mean of the two middle values is outputted." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } median ." "2" }
@@ -29,7 +29,7 @@ HELP: median
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
 HELP: range
-{ $values { "seq" "a sequence of numbers" } { "n" "a non-negative real number"} }
+{ $values { "seq" "a sequence of numbers" } { "x" "a non-negative real number"} }
 { $description "Computes the distance of the maximum and minimum values in " { $snippet "seq" } "." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } range ." "2" }

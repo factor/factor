@@ -54,7 +54,7 @@ $nl
 }
 "The standard precedence rules apply: Grouping with parentheses before " { $snippet "*" } ", " { $snippet "/" } "and " { $snippet "%" } " before " { $snippet "+" } " and " { $snippet "-" } "."
 { $example
-    "USING: infix prettyprint ;"
+    "USE: infix"
     "[infix 5-40/10*2 infix] ."
     "-3"
 }
@@ -65,7 +65,7 @@ $nl
     "The word name must consist of the letters a-z, A-Z, _ or 0-9, and the first character can't be a number."
 }
 { $example
-    "USING: infix locals math math.functions prettyprint ;"
+    "USING: infix locals math.functions ;"
     ":: binary_entropy ( p -- h )"
     "    [infix -(p*log(p) + (1-p)*log(1-p)) / log(2) infix] ;"
     "[infix binary_entropy( sqrt(0.25) ) infix] ."
@@ -74,13 +74,13 @@ $nl
 $nl
 "You can access " { $vocab-link "sequences" } " inside infix expressions with the familiar " { $snippet "arr[index]" } " notation."
 { $example
-    "USING: arrays infix prettyprint ;"
+    "USING: arrays infix ;"
     "[infix| myarr [ { 1 2 3 4 } ] | myarr[4/2]*3 infix] ."
     "9"
 }
 "Please note: in Factor " { $emphasis "fixnums are sequences too." } " If you are not careful with sequence accesses you may introduce subtle bugs:"
 { $example
-    "USING: arrays infix locals prettyprint ;"
+    "USING: arrays infix locals ;"
     ":: add-2nd-element ( x y -- res )"
     "    [infix x[1] + y[1] infix] ;"
     "{ 1 2 3 } 5 add-2nd-element ."

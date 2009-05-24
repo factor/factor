@@ -23,7 +23,8 @@ webapps.pastebin
 webapps.planet
 webapps.wiki
 webapps.user-admin
-webapps.help ;
+webapps.help
+webapps.mason ;
 IN: websites.concatenative
 
 : test-db ( -- db ) "resource:test.db" <sqlite-db> ;
@@ -95,6 +96,7 @@ SYMBOL: dh-file
         <planet> <login-config> <factor-boilerplate> test-db <alloy> "planet.factorcode.org" add-responder
         home "docs" append-path <help-webapp> test-db <alloy> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
+        <mason-app> "builds.factorcode.org" add-responder
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )

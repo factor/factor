@@ -91,6 +91,8 @@ M: #terminate unbox-tuples*
     [ flatten-values ] change-in-r ;
 
 M: #phi unbox-tuples*
+    ! pad-with-bottom is only needed if some branches are terminated,
+    ! which means all output values are bottom
     [ [ flatten-values ] map pad-with-bottom ] change-phi-in-d
     [ flatten-values ] change-out-d ;
 

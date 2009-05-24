@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test math.floating-point math.constants kernel
-math.constants fry sequences kernel math ;
+USING: tools.test math.floating-point kernel
+math.constants fry sequences math ;
 IN: math.floating-point.tests
 
 [ t ] [ pi >double< >double pi = ] unit-test

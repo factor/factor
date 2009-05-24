@@ -26,15 +26,6 @@ M: jamshred-gadget draw-gadget* ( gadget -- )
         [ 100 milliseconds sleep jamshred-loop ] tri 
     ] if ;
 
-: fullscreen ( gadget -- )
-    find-world t swap set-fullscreen* ;
-
-: no-fullscreen ( gadget -- )
-    find-world f swap set-fullscreen* ;
-
-: toggle-fullscreen ( world -- )
-    [ fullscreen? not ] keep set-fullscreen* ;
-
 M: jamshred-gadget graft* ( gadget -- )
     [ find-gl-context init-graphics ]
     [ [ jamshred-loop ] curry in-thread ] bi ;
@@ -73,12 +64,12 @@ M: jamshred-gadget ungraft* ( gadget -- )
     [ second mouse-scroll-y ] 2bi ;
 
 : quit ( gadget -- )
-    [ no-fullscreen ] [ close-window ] bi ;
+    [ f set-fullscreen ] [ close-window ] bi ;
 
 jamshred-gadget H{
     { T{ key-down f f "r" } [ jamshred-restart ] }
     { T{ key-down f f " " } [ jamshred>> toggle-running ] }
-    { T{ key-down f f "f" } [ find-world toggle-fullscreen ] }
+    { T{ key-down f f "f" } [ toggle-fullscreen ] }
     { T{ key-down f f "UP" } [ jamshred>> jamshred-player 1 swap change-player-speed ] }
     { T{ key-down f f "DOWN" } [ jamshred>> jamshred-player -1 swap change-player-speed ] }
     { T{ key-down f f "LEFT" } [ jamshred>> 1 jamshred-roll ] }

@@ -96,7 +96,7 @@ link-no-follow? off
 [ "<pre><span class=\"KEYWORD3\">int</span> <span class=\"FUNCTION\">main</span><span class=\"OPERATOR\">(</span><span class=\"OPERATOR\">)</span></pre>" ]
 [ "[c{int main()}]" convert-farkup ] unit-test
 
-[ "<p><img src=\"lol.jpg\" alt=\"image:lol.jpg\"/></p>" ] [ "[[image:lol.jpg]]" convert-farkup ] unit-test
+[ "<p><img src=\"lol.jpg\" alt=\"lol.jpg\"/></p>" ] [ "[[image:lol.jpg]]" convert-farkup ] unit-test
 [ "<p><img src=\"lol.jpg\" alt=\"teh lol\"/></p>" ] [ "[[image:lol.jpg|teh lol]]" convert-farkup ] unit-test
 [ "<p><a href=\"http://lol.com\">http://lol.com</a></p>" ] [ "[[http://lol.com]]" convert-farkup ] unit-test
 [ "<p><a href=\"http://lol.com\">haha</a></p>" ] [ "[[http://lol.com|haha]]" convert-farkup ] unit-test
@@ -207,3 +207,5 @@ link-no-follow? off
         [ convert-farkup drop t ] [ drop print f ] recover
     ] all?
 ] unit-test
+
+[ "<p><a href=\"http://foo.com/~foo\">http://foo.com/~foo</a></p>" ] [ "[[http://foo.com/~foo]]" convert-farkup ] unit-test

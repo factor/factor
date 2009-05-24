@@ -1,7 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
-effects classes generic.standard classes.tuple generic.math
-generic.standard generic.single arrays io.pathnames vocabs.loader io
-sequences assocs words.symbol words.alias words.constant combinators ;
+effects classes classes.tuple generic.math generic.single arrays
+io.pathnames vocabs.loader io sequences assocs words.symbol
+words.alias words.constant combinators vocabs.parser ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -179,7 +179,7 @@ $nl
 ARTICLE: "syntax" "Syntax"
 "Factor has two main forms of syntax: " { $emphasis "definition" } " syntax and " { $emphasis "literal" } " syntax. Code is data, so the syntax for code is a special case of object literal syntax. This section documents literal syntax. Definition syntax is covered in " { $link "words" } ". Extending the parser is the main topic of " { $link "parser" } "."
 { $subsection "parser-algorithm" }
-{ $subsection "vocabulary-search" }
+{ $subsection "word-search" }
 { $subsection "top-level-forms" }
 { $subsection "syntax-comments" }
 { $subsection "syntax-literals" }
@@ -427,18 +427,33 @@ HELP: FORGET:
 HELP: USE:
 { $syntax "USE: vocabulary" }
 { $values { "vocabulary" "a vocabulary name" } }
-{ $description "Adds a new vocabulary at the front of the search path. Subsequent word lookups by the parser will search this vocabulary first." }
+{ $description "Adds a new vocabulary to the search path, loading it first if necessary." }
+{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw a " { $link ambiguous-use-error } "." }
+{ $errors "Throws an error if the vocabulary does not exist or could not be loaded." } ;
+
+HELP: UNUSE:
+{ $syntax "UNUSE: vocabulary" }
+{ $values { "vocabulary" "a vocabulary name" } }
+{ $description "Removes a vocabulary from the search path." }
 { $errors "Throws an error if the vocabulary does not exist." } ;
 
 HELP: USING:
 { $syntax "USING: vocabularies... ;" }
 { $values { "vocabularies" "a list of vocabulary names" } }
-{ $description "Adds a list of vocabularies to the front of the search path, with later vocabularies taking precedence." }
+{ $description "Adds a list of vocabularies to the search path." }
+{ $notes "If adding the vocabularies introduces ambiguity, referencing the ambiguous names will throw a " { $link ambiguous-use-error } "." }
 { $errors "Throws an error if one of the vocabularies does not exist." } ;
 
 HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
-{ $description "Similar to " { $link POSTPONE: USE: } " but loads vocabulary with prefix." }
+{ $description "Adds the vocabulary's words, prefixed with the vocabulary name, to the search path." }
+{ $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "finishing" } ". Then, the following will call the latter word:"
+  { $code
+  "USE: fish"
+  "QUALIFIED: go"
+  "go:fishing"
+  }
+}
 { $examples { $example
     "USING: prettyprint ;"
     "QUALIFIED: math"
@@ -447,7 +462,7 @@ HELP: QUALIFIED:
 
 HELP: QUALIFIED-WITH:
 { $syntax "QUALIFIED-WITH: vocab word-prefix" }
-{ $description "Works like " { $link POSTPONE: QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
+{ $description "Like " { $link POSTPONE: QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
 { $examples { $code
     "USING: prettyprint ;"
     "QUALIFIED-WITH: math m"
@@ -457,19 +472,25 @@ HELP: QUALIFIED-WITH:
 
 HELP: FROM:
 { $syntax "FROM: vocab => words ... ;" }
-{ $description "Imports " { $snippet "words" } " from " { $snippet "vocab" } "." }
-{ $examples { $code
-    "FROM: math.parser => bin> hex> ; ! imports only bin> and hex>" } } ;
+{ $description "Adds " { $snippet "words" } " from " { $snippet "vocab" } " to the search path." }
+{ $notes "If adding the words introduces ambiguity, the words will take precedence when resolving any ambiguous names." }
+{ $examples
+  "Both the " { $vocab-link "vocabs.parser" } " and " { $vocab-link "binary-search" } " vocabularies define a word named " { $snippet "search" } ". The following will throw an " { $link ambiguous-use-error } ":"
+  { $code "USING: vocabs.parser binary-search ;" "... search ..." }
+  "Because " { $link POSTPONE: FROM: } " takes precedence over a " { $link POSTPONE: USING: } ", the ambiguity can be resolved explicitly. Suppose you wanted the " { $vocab-link "binary-search" } " vocabulary's " { $snippet "search" } " word:"
+  { $code "USING: vocabs.parser binary-search ;" "FROM: binary-search => search ;" "... search ..." }
+ } ;
 
 HELP: EXCLUDE:
 { $syntax "EXCLUDE: vocab => words ... ;" }
-{ $description "Imports everything from " { $snippet "vocab" } " excluding " { $snippet "words" } "." }
+{ $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } "  to the search path." }
 { $examples { $code
-    "EXCLUDE: math.parser => bin> hex> ; ! imports everything but bin> and hex>" } } ;
+    "EXCLUDE: math.parser => bin> hex> ;" "! imports everything but bin> and hex>" } } ;
 
 HELP: RENAME:
-{ $syntax "RENAME: word vocab => newname" }
-{ $description "Imports " { $snippet "word" } " from " { $snippet "vocab" } ", but renamed to " { $snippet "newname" } "." }
+{ $syntax "RENAME: word vocab => new-name" }
+{ $description "Imports " { $snippet "word" } " from " { $snippet "vocab" } ", but renamed to " { $snippet "new-name" } "." }
+{ $notes "If adding the words introduces ambiguity, the words will take precedence when resolving any ambiguous names." }
 { $examples { $example
     "USING: prettyprint ;"
     "RENAME: + math => -"
@@ -740,7 +761,7 @@ HELP: MAIN:
 
 HELP: <PRIVATE
 { $syntax "<PRIVATE ... PRIVATE>" }
-{ $description "Marks the start of a block of private word definitions. Private word definitions are placed in a vocabulary named by suffixing the current vocabulary with " { $snippet ".private" } "." }
+{ $description "Begins a block of private word definitions. Private word definitions are placed in the current vocabulary name, suffixed with " { $snippet ".private" } "." }
 { $notes
     "The following is an example of usage:"
     { $code
@@ -770,7 +791,7 @@ HELP: <PRIVATE
 
 HELP: PRIVATE>
 { $syntax "<PRIVATE ... PRIVATE>" }
-{ $description "Marks the end of a block of private word definitions." } ;
+{ $description "Ends a block of private word definitions." } ;
 
 { POSTPONE: <PRIVATE POSTPONE: PRIVATE> } related-words
 

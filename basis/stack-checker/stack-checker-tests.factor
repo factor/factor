@@ -372,3 +372,7 @@ DEFER: eee'
 [ at ] must-infer
 
 [ [ [ "OOPS" throw ] dip ] [ drop ] if ] must-infer
+
+! Found during code review
+[ [ [ drop [ ] ] when call ] infer ] must-fail
+[ swap [ [ drop [ ] ] when call ] infer ] must-fail
