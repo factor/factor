@@ -60,7 +60,7 @@ PRIVATE>
 : 1- ( x -- y ) 1 - ; inline
 : 2/ ( x -- y ) -1 shift ; inline
 : sq ( x -- y ) dup * ; inline
-: neg ( x -- -x ) 0 swap - ; inline
+: neg ( x -- -x ) -1 * ; inline
 : recip ( x -- y ) 1 swap / ; inline
 : sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
 : ?1+ ( x -- y ) [ 1 + ] [ 0 ] if* ; inline

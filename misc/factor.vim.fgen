@@ -1,15 +1,26 @@
-<% USING: kernel io prettyprint vocabs sequences ;
-%>" Vim syntax file
-" Language:	factor
-" Maintainer:	Alex Chapman <chapman.alex@gmail.com>
-" Last Change:	2008 Apr 28
+<%
+USING: kernel io prettyprint vocabs sequences multiline ;
+IN: factor.vim.fgen
+
+: print-keywords ( vocab -- )
+    words [
+        "syn keyword factorKeyword " write
+        [ bl ] [ pprint ] interleave nl
+    ] when* ;
+
+%>
+" Vim syntax file
+" Language: factor
+" Maintainer: Alex Chapman <chapman.alex@gmail.com>
+" Last Change: 2009 May 19
+" To run: USE: html.templates.fhtml "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
 if version < 600
-  syntax clear
+    syntax clear
 elseif exists("b:current_syntax")
-  finish
+    finish
 endif
 
 " factor is case sensitive.
@@ -47,25 +58,27 @@ syn keyword factorBoolean boolean f general-t t
 syn keyword factorCompileDirective inline foldable parsing
 
 <%
+
 ! uncomment this if you want all words from all vocabularies highlighted. Note
 ! that this changes factor.vim from around 8k to around 100k (and is a bit
 ! broken)
 
-! vocabs [ words [ "syn keyword factorKeyword " write [ pprint " " write ] each "\n" write ] when* ] each
+! vocabs [ print-keywords ] each
+
+    {
+        "kernel" "assocs" "combinators" "math" "sequences"
+        "namespaces" "arrays" "io" "strings" "vectors"
+        "continuations"
+    } [ print-keywords ] each
 %>
 
-" kernel vocab keywords
-<% { "kernel" "assocs" "combinators" "math" "sequences" "namespaces" "arrays" "io" "strings" "vectors" "continuations" } [
-       words "syn keyword factorKeyword " write [ pprint " " write ] each "\n" write
-   ] each %>
-
-syn cluster factorReal   contains=factorInt,factorFloat,factorRatio,factorBinary,factorHex,factorOctal
-syn cluster factorNumber contains=@factorReal,factorComplex
-syn cluster factorNumErr contains=factorBinErr,factorHexErr,factorOctErr
-syn match   factorInt 		/\<-\=\d\+\>/
-syn match   factorFloat		/\<-\=\d*\.\d\+\>/
-syn match   factorRatio		/\<-\=\d*\.*\d\+\/-\=\d*\.*\d\+\>/
-syn region  factorComplex	start=/\<C{\>/ end=/\<}\>/ contains=@factorReal
+syn cluster factorReal          contains=factorInt,factorFloat,factorRatio,factorBinary,factorHex,factorOctal
+syn cluster factorNumber        contains=@factorReal,factorComplex
+syn cluster factorNumErr        contains=factorBinErr,factorHexErr,factorOctErr
+syn match   factorInt           /\<-\=\d\+\>/
+syn match   factorFloat         /\<-\=\d*\.\d\+\>/
+syn match   factorRatio         /\<-\=\d*\.*\d\+\/-\=\d*\.*\d\+\>/
+syn region  factorComplex       start=/\<C{\>/ end=/\<}\>/ contains=@factorReal
 syn match   factorBinErr        /\<BIN:\s\+[01]*[^\s01]\S*\>/
 syn match   factorBinary        /\<BIN:\s\+[01]\+\>/
 syn match   factorHexErr        /\<HEX:\s\+\x*[^\x\s]\S*\>/
@@ -73,31 +86,36 @@ syn match   factorHex           /\<HEX:\s\+\x\+\>/
 syn match   factorOctErr        /\<OCT:\s\+\o*[^\o\s]\S*\>/
 syn match   factorOctal         /\<OCT:\s\+\o\+\>/
 
-syn match factorIn /\<IN:\s\+\S\+\>/
-syn match factorUse /\<USE:\s\+\S\+\>/
+syn match   factorIn            /\<IN:\s\+\S\+\>/
+syn match   factorUse           /\<USE:\s\+\S\+\>/
+syn match   factorUnuse         /\<UNUSE:\s\+\S\+\>/
 
-syn match factorCharErr /\<CHAR:\s\+\S\+/
-syn match factorChar /\<CHAR:\s\+\\\=\S\>/
+syn match   factorCharErr       /\<CHAR:\s\+\S\+/
+syn match   factorChar          /\<CHAR:\s\+\\\=\S\>/
 
-syn match factorBackslash /\<\\\>\s\+\S\+\>/
+syn match   factorBackslash     /\<\\\>\s\+\S\+\>/
 
-syn region factorUsing start=/\<USING:\>/ end=/;/
-syn region factorRequires start=/\<REQUIRES:\>/ end=/;/
+syn region  factorUsing         start=/\<USING:\>/       end=/;/
+syn region  factorSingletons    start=/\<SINGLETONS:\>/  end=/;/
+syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
+syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
+syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/
+syn region  factorTuple         start=/\<TUPLE:\>/ end=/\<;\>/
 
-syn cluster factorWordOps contains=factorSymbol,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
-syn match factorSymbol /\<SYMBOL:\s\+\S\+\>/
-syn match factorPostpone /\<POSTPONE:\s\+\S\+\>/
-syn match factorDefer /\<DEFER:\s\+\S\+\>/
-syn match factorForget /\<FORGET:\s\+\S\+\>/
-syn match factorMixin /\<MIXIN:\s\+\S\+\>/
-syn match factorInstance /\<INSTANCE:\s\+\S\+\s\+\S\+\>/
-syn match factorHook /\<HOOK:\s\+\S\+\s\+\S\+\>/
-syn match factorMain /\<MAIN:\s\+\S\+\>/
-syn match factorConstructor /\<C:\s\+\S\+\s\+\S\+\>/
+syn match   factorConstant      /\<CONSTANT:\s\+\S\+\>/
+syn match   factorSingleton     /\<SINGLETON:\s\+\S\+\>/
+syn match   factorPostpone      /\<POSTPONE:\s\+\S\+\>/
+syn match   factorDefer         /\<DEFER:\s\+\S\+\>/
+syn match   factorForget        /\<FORGET:\s\+\S\+\>/
+syn match   factorMixin         /\<MIXIN:\s\+\S\+\>/
+syn match   factorInstance      /\<INSTANCE:\s\+\S\+\s\+\S\+\>/
+syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/
+syn match   factorMain          /\<MAIN:\s\+\S\+\>/
+syn match   factorConstructor   /\<C:\s\+\S\+\s\+\S\+\>/
+syn match   factorAlien         /\<ALIEN:\s\+\d\+\>/
 
-syn match factorAlien /\<ALIEN:\s\+\d\+\>/
+syn cluster factorWordOps       contains=factorSymbol,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
 
-syn region factorTuple start=/\<TUPLE:\>/ end=/\<;\>/
 
 "TODO:
 "misc:
@@ -116,6 +134,12 @@ syn region factorTuple start=/\<TUPLE:\>/ end=/\<;\>/
 " TYPEDEF:
 " LIBRARY:
 " C-UNION:
+"QUALIFIED:
+"QUALIFIED-WITH:
+"FROM:
+"ALIAS:
+"! POSTPONE: "
+"#\ "
 
 syn region factorString start=/"/ skip=/\\"/ end=/"/ oneline
 syn region factorSbuf start=/SBUF" / skip=/\\"/ end=/"/ oneline
@@ -165,88 +189,92 @@ syn sync lines=100
 
 if version >= 508 || !exists("did_factor_syn_inits")
     if version <= 508
-	let did_factor_syn_inits = 1
-	command -nargs=+ HiLink hi link <args>
+        let did_factor_syn_inits = 1
+        command -nargs=+ HiLink hi link <args>
     else
-	command -nargs=+ HiLink hi def link <args>
+        command -nargs=+ HiLink hi def link <args>
     endif
 
-    HiLink factorComment	Comment
-    HiLink factorStackEffect	Typedef
-    HiLink factorTodo		Todo
-    HiLink factorInclude	Include
-    HiLink factorRepeat		Repeat
-    HiLink factorConditional	Conditional
-    HiLink factorKeyword	Keyword
-    HiLink factorOperator	Operator
-    HiLink factorBoolean	Boolean
-    HiLink factorDefnDelims	Typedef
-    HiLink factorMethodDelims	Typedef
-    HiLink factorGenericDelims        Typedef
-    HiLink factorGenericNDelims        Typedef
-    HiLink factorConstructor	Typedef
-    HiLink factorPrivate	Special
-    HiLink factorPrivateDefnDelims	Special
-    HiLink factorPrivateMethodDelims	Special
-    HiLink factorPGenericDelims        Special
+    HiLink factorComment                Comment
+    HiLink factorStackEffect            Typedef
+    HiLink factorTodo                   Todo
+    HiLink factorInclude                Include
+    HiLink factorRepeat                 Repeat
+    HiLink factorConditional            Conditional
+    HiLink factorKeyword                Keyword
+    HiLink factorOperator               Operator
+    HiLink factorBoolean                Boolean
+    HiLink factorDefnDelims             Typedef
+    HiLink factorMethodDelims           Typedef
+    HiLink factorGenericDelims          Typedef
+    HiLink factorGenericNDelims         Typedef
+    HiLink factorConstructor            Typedef
+    HiLink factorConstructor2           Typedef
+    HiLink factorPrivate                Special
+    HiLink factorPrivateDefnDelims      Special
+    HiLink factorPrivateMethodDelims    Special
+    HiLink factorPGenericDelims         Special
     HiLink factorPGenericNDelims        Special
-    HiLink factorString		String
-    HiLink factorSbuf		String
-    HiLink factorMultiStringContents		String
-    HiLink factorMultiStringDelims Typedef
-    HiLink factorBracketErr     Error
-    HiLink factorComplex	Number
-    HiLink factorRatio          Number
-    HiLink factorBinary         Number
-    HiLink factorBinErr         Error
-    HiLink factorHex            Number
-    HiLink factorHexErr         Error
-    HiLink factorOctal          Number
-    HiLink factorOctErr         Error
-    HiLink factorFloat		Float
-    HiLink factorInt		Number
-    HiLink factorUsing          Include
-    HiLink factorUse            Include
-    HiLink factorRequires       Include
-    HiLink factorIn             Define
-    HiLink factorChar           Character
-    HiLink factorCharErr        Error
-    HiLink factorDelimiter      Delimiter
-    HiLink factorBackslash      Special
-    HiLink factorCompileDirective Typedef
-    HiLink factorSymbol         Define
-    HiLink factorMixin         Typedef
-    HiLink factorInstance         Typedef
-    HiLink factorHook         Typedef
-    HiLink factorMain         Define
-    HiLink factorPostpone       Define
-    HiLink factorDefer          Define
-    HiLink factorForget         Define
-    HiLink factorAlien          Define
-    HiLink factorTuple          Typedef
+    HiLink factorString                 String
+    HiLink factorSbuf                   String
+    HiLink factorMultiStringContents    String
+    HiLink factorMultiStringDelims      Typedef
+    HiLink factorBracketErr             Error
+    HiLink factorComplex                Number
+    HiLink factorRatio                  Number
+    HiLink factorBinary                 Number
+    HiLink factorBinErr                 Error
+    HiLink factorHex                    Number
+    HiLink factorHexErr                 Error
+    HiLink factorOctal                  Number
+    HiLink factorOctErr                 Error
+    HiLink factorFloat                  Float
+    HiLink factorInt                    Number
+    HiLink factorUsing                  Include
+    HiLink factorUse                    Include
+    HiLink factorUnuse                  Include
+    HiLink factorIn                     Define
+    HiLink factorChar                   Character
+    HiLink factorCharErr                Error
+    HiLink factorDelimiter              Delimiter
+    HiLink factorBackslash              Special
+    HiLink factorCompileDirective       Typedef
+    HiLink factorSymbol                 Define
+    HiLink factorConstant               Define
+    HiLink factorSingleton              Define
+    HiLink factorSingletons             Define
+    HiLink factorMixin                  Typedef
+    HiLink factorInstance               Typedef
+    HiLink factorHook                   Typedef
+    HiLink factorMain                   Define
+    HiLink factorPostpone               Define
+    HiLink factorDefer                  Define
+    HiLink factorForget                 Define
+    HiLink factorAlien                  Define
+    HiLink factorTuple                  Typedef
 
     if &bg == "dark"
-	hi   hlLevel0 ctermfg=red         guifg=red1
-	hi   hlLevel1 ctermfg=yellow      guifg=orange1
-	hi   hlLevel2 ctermfg=green       guifg=yellow1
-	hi   hlLevel3 ctermfg=cyan        guifg=greenyellow
-	hi   hlLevel4 ctermfg=magenta     guifg=green1
-	hi   hlLevel5 ctermfg=red         guifg=springgreen1
-	hi   hlLevel6 ctermfg=yellow      guifg=cyan1
-	hi   hlLevel7 ctermfg=green       guifg=slateblue1
-	hi   hlLevel8 ctermfg=cyan        guifg=magenta1
-	hi   hlLevel9 ctermfg=magenta     guifg=purple1
+        hi   hlLevel0 ctermfg=red         guifg=red1
+        hi   hlLevel1 ctermfg=yellow      guifg=orange1
+        hi   hlLevel2 ctermfg=green       guifg=yellow1
+        hi   hlLevel3 ctermfg=cyan        guifg=greenyellow
+        hi   hlLevel4 ctermfg=magenta     guifg=green1
+        hi   hlLevel5 ctermfg=red         guifg=springgreen1
+        hi   hlLevel6 ctermfg=yellow      guifg=cyan1
+        hi   hlLevel7 ctermfg=green       guifg=slateblue1
+        hi   hlLevel8 ctermfg=cyan        guifg=magenta1
+        hi   hlLevel9 ctermfg=magenta     guifg=purple1
     else
-	hi   hlLevel0 ctermfg=red         guifg=red3
-	hi   hlLevel1 ctermfg=darkyellow  guifg=orangered3
-	hi   hlLevel2 ctermfg=darkgreen   guifg=orange2
-	hi   hlLevel3 ctermfg=blue        guifg=yellow3
-	hi   hlLevel4 ctermfg=darkmagenta guifg=olivedrab4
-	hi   hlLevel5 ctermfg=red         guifg=green4
-	hi   hlLevel6 ctermfg=darkyellow  guifg=paleturquoise3
-	hi   hlLevel7 ctermfg=darkgreen   guifg=deepskyblue4
-	hi   hlLevel8 ctermfg=blue        guifg=darkslateblue
-	hi   hlLevel9 ctermfg=darkmagenta guifg=darkviolet
+        hi   hlLevel0 ctermfg=red         guifg=red3
+        hi   hlLevel1 ctermfg=darkyellow  guifg=orangered3
+        hi   hlLevel2 ctermfg=darkgreen   guifg=orange2
+        hi   hlLevel3 ctermfg=blue        guifg=yellow3
+        hi   hlLevel4 ctermfg=darkmagenta guifg=olivedrab4
+        hi   hlLevel5 ctermfg=red         guifg=green4
+        hi   hlLevel6 ctermfg=darkyellow  guifg=paleturquoise3
+        hi   hlLevel7 ctermfg=darkgreen   guifg=deepskyblue4
+        hi   hlLevel8 ctermfg=blue        guifg=darkslateblue
+        hi   hlLevel9 ctermfg=darkmagenta guifg=darkviolet
     endif
 
     delcommand HiLink

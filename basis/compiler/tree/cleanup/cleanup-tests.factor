@@ -136,8 +136,6 @@ M: object xyz ;
     \ +-integer-fixnum inlined?
 ] unit-test
 
-[ f ] [ [ dup 0 < [ neg ] when ] \ - inlined? ] unit-test
-
 [ t ] [
     [
         [ no-cond ] 1
