@@ -22,6 +22,7 @@ M: monad return monad-of return ;
 M: monad fail   monad-of fail   ;
 
 : bind ( mvalue quot -- mvalue' ) swap >>= call( quot -- mvalue ) ;
+: bind* ( mvalue quot -- mvalue' ) '[ drop @ ] bind ;
 : >>   ( mvalue k -- mvalue' ) '[ drop _ ] bind ;
 
 :: lift-m2 ( m1 m2 f monad -- m3 )
