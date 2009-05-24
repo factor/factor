@@ -71,3 +71,9 @@ MACRO: amb-execute ( seq -- quot )
 
 : cut-amb ( -- )
     f failure set ;
+
+: amb-all ( quot -- )
+    [ { t f } amb [ call fail ] [ drop ] if ] amb-preserve ; inline
+
+: bag-of ( quot -- seq )
+    V{ } clone [ '[ @ _ push ] amb-all ] keep ; inline
