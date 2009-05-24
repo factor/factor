@@ -7,6 +7,8 @@ IN: ui.gadgets.alerts
    string 22 wrap-lines <label> T{ font { name "sans-serif" } { size 18 } } >>font { 200 100 } >>pref-dim add-gadget 
    "okay" [ close-window ] quot append <border-button> add-gadget "" open-window ;
 
+: alert* ( str -- ) [ ] swap alert ;
+
 :: ask-user* ( model string -- model' )
    [ [let | lbl  [ string <label>  T{ font { name "sans-serif" } { size 14 } } >>font dup , ]
             fldm [ <frp-field> ->% 1 ]
