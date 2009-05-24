@@ -66,16 +66,18 @@ M: action (model-changed) [ [ value>> ] [ quot>> ] bi* call( a -- b ) ] keep val
 
 TUPLE: | < multi-model ;
 : <|> ( models -- product ) | <multi-model> ;
+GENERIC: models-changed ( product -- )
+M: | models-changed drop ;
 M: | model-changed
     nip
     dup dependencies>> [ value>> ] all?
-    [ dup [ value>> ] product-value >>value notify-connections
-    ] [ drop ] if ;
+    [ [ dup [ value>> ] product-value >>value notify-connections ] keep models-changed ]
+    [ drop ] if ;
 M: | update-model
     dup value>> swap [ set-model ] set-product-value ;
 M: | model-activated dup model-changed ;
 
+! Only when everything's true does he make it false
 TUPLE: & < | ;
 : <&> ( models -- product ) & <multi-model> ;
-M: & model-changed [ call-next-method ] keep
-   [ dependencies>> [ f swap set-model ] each ] with-locked-model ;
+M: & models-changed dependencies>> [ f swap (>>value) ] each ;
