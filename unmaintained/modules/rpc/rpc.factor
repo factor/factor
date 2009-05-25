@@ -1,12 +1,12 @@
 USING: accessors compiler.units combinators fry generalizations io
-io.encodings.binary io.sockets kernel namespaces
+io.encodings.binary io.sockets kernel
 parser sequences serialize vocabs vocabs.parser words ;
 IN: modules.rpc
 
 DEFER: get-words
 
 : with-in-vocab ( vocab quot -- vocab ) over
-  [ '[ _ set-in @ ] in get swap dip set-in ] dip vocab ; inline
+  [ '[ _ set-current-vocab @ ] current-vocab name>> swap dip set-current-vocab ] dip vocab ; inline
 
 : remote-quot ( addrspec vocabspec effect str -- quot )
    '[ _ 5000 <inet> binary

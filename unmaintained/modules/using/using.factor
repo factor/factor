@@ -1,4 +1,4 @@
-USING: assocs kernel modules.remote-loading modules.rpc
+USING: accessors assocs kernel modules.remote-loading modules.rpc
 namespaces peg peg.ebnf peg-lexer sequences vocabs vocabs.parser
 strings ;
 IN: modules.using
@@ -9,9 +9,9 @@ IN: modules.using
 : >partial-vocab ( words assoc -- assoc )
     [ dupd at [ no-word-error ] unless* ] curry { } map>assoc ;
 
-: remote-load ( addr vocabspec -- voab ) [ "modules.remote-loading" remote-vocab (use+) ] dip get-vocab ;
+: remote-load ( addr vocabspec -- voab ) [ "modules.remote-loading" remote-vocab use-vocab ] dip get-vocab ;
 
-: load'em ( vocab words/? -- ) [ swap >partial-vocab ] when* use get push ;
+: load'em ( vocab words/? -- ) [ swap >partial-vocab ] when* manifest get qualified-vocabs>> push ;
 
 EBNF: modulize
 tokenpart = (!(':').)+ => [[ >string ]]
@@ -30,7 +30,7 @@ qualified = modspec sym => [[ first2 >qualified ]]
 unqualified = modspec => [[ vocab-words ]]
 words = ("=>" sym+ )? => [[ [ f ] [ second ] if-empty ]]
 long = "{" ( qualified | unqualified ) words "}" => [[ rest first2 load'em ignore ]]
-short = modspec => [[ use+ ignore ]]
+short = modspec => [[ use-vocab ignore ]]
 wordSpec = long | short
 using = wordSpec+ ";" => [[ drop ignore ]]
 ;ON-BNF
