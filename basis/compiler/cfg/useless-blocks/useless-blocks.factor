@@ -37,7 +37,7 @@ IN: compiler.cfg.useless-blocks
 
 : delete-conditional? ( bb -- ? )
     dup instructions>> [ drop f ] [
-        peek class {
+        last class {
             ##compare-branch
             ##compare-imm-branch
             ##compare-float-branch

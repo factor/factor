@@ -193,7 +193,7 @@ TUPLE: ambiguous-use-error words ;
 
 : qualified-search ( name manifest -- word/f )
     qualified-vocabs>>
-    (vocab-search) 0 = [ drop f ] [ peek ] if ;
+    (vocab-search) 0 = [ drop f ] [ last ] if ;
 
 PRIVATE>
 

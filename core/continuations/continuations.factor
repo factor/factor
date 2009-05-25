@@ -152,7 +152,7 @@ ERROR: attempt-all-error ;
     ] [
         [
             [ [ , f ] compose [ , drop t ] recover ] curry all?
-        ] { } make peek swap [ rethrow ] when
+        ] { } make last swap [ rethrow ] when
     ] if ; inline
 
 TUPLE: condition error restarts continuation ;

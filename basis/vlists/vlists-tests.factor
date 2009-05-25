@@ -16,7 +16,7 @@ IN: vlists.tests
 [ "foo" VL{ "hi" "there" } t ]
 [
     VL{ "hi" "there" "foo" } dup "v" set
-    [ peek ] [ ppop ] bi
+    [ last ] [ ppop ] bi
     dup "v" get [ vector>> ] bi@ eq?
 ] unit-test
 

@@ -77,7 +77,7 @@ SYNTAX: HINTS:
 { first first2 first3 first4 }
 [ { array } "specializer" set-word-prop ] each
 
-{ peek pop* pop } [
+{ last pop* pop } [
     { vector } "specializer" set-word-prop
 ] each
 

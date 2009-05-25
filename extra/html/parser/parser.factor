@@ -21,7 +21,7 @@ SYMBOL: tagstack
 
 : closing-tag? ( string -- ? )
     [ f ]
-    [ { [ first CHAR: / = ] [ peek CHAR: / = ] } 1|| ] if-empty ;
+    [ { [ first CHAR: / = ] [ last CHAR: / = ] } 1|| ] if-empty ;
 
 : <tag> ( name attributes closing? -- tag )
     tag new

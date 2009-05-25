@@ -86,7 +86,7 @@ CONSTANT: doc-start { 0 0 }
         ] [
             first swap length 1- + 0
         ] if
-    ] dip peek length + 2array ;
+    ] dip last length + 2array ;
 
 : prepend-first ( str seq -- )
     0 swap [ append ] change-nth ;

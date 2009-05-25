@@ -244,7 +244,7 @@ SYMBOL: max-uses
                 swap int-regs swap vreg boa >>vreg
                 max-uses get random 2 max [ not-taken ] replicate natural-sort
                 [ >>uses ] [ first >>start ] bi
-                dup uses>> peek >>end
+                dup uses>> last >>end
         ] map
     ] with-scope ;
 
