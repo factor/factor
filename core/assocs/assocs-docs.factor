@@ -66,7 +66,7 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 { $see-also at* assoc-size } ;
 
 ARTICLE: "assocs-values" "Transposed assoc operations"
-"Most assoc words take a key and find the corresponding value. The following words take a value and find the corresponding key:"
+"default Most assoc words take a key and find the corresponding value. The following words take a value and find the corresponding key:"
 { $subsection value-at }
 { $subsection value-at* }
 { $subsection value? }
@@ -119,6 +119,7 @@ $nl
 { $subsection assoc-any? }
 { $subsection assoc-all? }
 "Additional combinators:"
+{ $subsection assoc-partition }
 { $subsection cache }
 { $subsection map>assoc }
 { $subsection assoc>map }
