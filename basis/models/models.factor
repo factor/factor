@@ -109,5 +109,4 @@ GENERIC: set-range-min-value ( value model -- )
 GENERIC: set-range-max-value ( value model -- )
 
 : clamp-value ( value range -- newvalue )
-    [ range-min-value max ] keep
-    range-max-value* min ;
+    [ range-min-value ] [ range-max-value* ] bi clamp ;
