@@ -1,4 +1,5 @@
-USING: modules.using modules.rpc-server help.syntax help.markup strings ;
+USING: modules.rpc-server help.syntax help.markup strings ;
+QUALIFIED-WITH: modules.using m
 IN: modules
 
 HELP: service
@@ -6,7 +7,7 @@ HELP: service
 { $description "Starts a server for requests for remote procedure calls." } ;
 
 ARTICLE: { "modules" "remote-loading" } "Using the remote-loading vocabulary"
-"If loaded, starts serving vocabularies, accessable through a " { $link POSTPONE: USING: } " form" ;
+"If loaded, starts serving vocabularies, accessable through a " { $link POSTPONE: m:USING: } " form" ;
 
 HELP: USING:
 { $syntax "USING: rpc-server::module fetch-sever::module { module qualified-name } { module => word ... } ... ;" }

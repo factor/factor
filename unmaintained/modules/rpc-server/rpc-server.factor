@@ -25,7 +25,7 @@ MEMO: mem-do-rpc ( args word -- bytes ) do-rpc ; inline
 : (service) ( -- ) serving-vocabs get-global empty? [ start-serving-vocabs ] when
    current-vocab serving-vocabs get-global adjoin
    "get-words" create-in
-   in get [ vocab vocab-words [ stack-effect ] { } assoc-map-as ] curry
+   current-vocab name>> [ vocab vocab-words [ stack-effect ] { } assoc-map-as ] curry
    (( -- words )) define-inline ;
 
 SYNTAX: service \ do-rpc  "executer" set (service) ;
