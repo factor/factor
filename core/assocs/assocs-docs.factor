@@ -121,6 +121,7 @@ $nl
 "Additional combinators:"
 { $subsection assoc-partition }
 { $subsection cache }
+{ $subsection 2cache }
 { $subsection map>assoc }
 { $subsection assoc>map }
 { $subsection assoc-map-as } ;
@@ -237,6 +238,13 @@ HELP: assoc-filter-as
 
 { assoc-filter assoc-filter-as } related-words
 
+HELP: assoc-partition
+{ $values
+    { "assoc" assoc } { "quot" quotation }
+    { "true-assoc" assoc } { "false-assoc" assoc }
+}
+{ $description "Calls a predicate quotation on each key of the input assoc. If the test yields true, the key/value pair is added to " { $snippet "true-assoc" } "; if false, it's added to " { $snippet "false-assoc" } "." } ;
+
 HELP: assoc-any?
 { $values { "assoc" assoc } { "quot" { $quotation "( key value -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the assoc contains an entry satisfying a predicate by applying the quotation to each entry in turn. Iteration stops if an entry is found for which the quotation outputs a true value." } ;
@@ -332,7 +340,12 @@ HELP: substitute
 
 HELP: cache
 { $values { "key" "a key" } { "assoc" assoc } { "quot" { $quotation "( key -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
-{ $description "If the key is present in the assoc, outputs the associated value, otherwise calls the quotation to produce a value and stores the key/value pair into the assoc." }
+{ $description "If the key is present in the assoc, outputs the associated value, otherwise calls the quotation to produce a value and stores the key/value pair into the assoc. Returns a value either looked up or newly stored in the assoc." }
+{ $side-effects "assoc" } ;
+
+HELP: 2cache
+{ $values { "key1" "a key" } { "key2" "a key" } { "assoc" assoc } { "quot" { $quotation "( key -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
+{ $description "If a single key composed of the input keys is present in the assoc, outputs the associated value, otherwise calls the quotation to produce a value and stores the keys/value pair into the assoc. Returns the value stored in the assoc. Returns a value either looked up or newly stored in the assoc." }
 { $side-effects "assoc" } ;
 
 HELP: map>assoc
