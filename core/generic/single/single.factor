@@ -235,7 +235,7 @@ M: predicate-engine-word stack-effect "owner-generic" word-prop stack-effect ;
     quote-methods
     prune-redundant-predicates
     class-predicates
-    [ peek ] [ alist>quot picker prepend define-predicate-engine ] if-empty ;
+    [ last ] [ alist>quot picker prepend define-predicate-engine ] if-empty ;
 
 M: predicate-engine compile-engine
     [ compile-predicate-engine ] [ class>> ] bi

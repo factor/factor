@@ -56,14 +56,14 @@ PRIVATE>
 : range-decreasing? ( range -- ? )
     step>> 0 < ;
 
-: first-or-peek ( seq head? -- elt )
-    [ first ] [ peek ] if ;
+: first-or-last ( seq head? -- elt )
+    [ first ] [ last ] if ;
 
 : range-min ( range -- min )
-    dup range-increasing? first-or-peek ;
+    dup range-increasing? first-or-last ;
 
 : range-max ( range -- max )
-    dup range-decreasing? first-or-peek ;
+    dup range-decreasing? first-or-last ;
 
 : clamp-to-range ( n range -- n )
     [ range-min ] [ range-max ] bi clamp ;

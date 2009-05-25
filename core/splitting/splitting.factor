@@ -75,7 +75,7 @@ M: string string-lines
             but-last-slice [
                 "\r" ?tail drop "\r" split
             ] map
-        ] keep peek "\r" split suffix concat
+        ] keep last "\r" split suffix concat
     ] [
         1array
     ] if ;

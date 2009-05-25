@@ -546,12 +546,12 @@ HELP: join
 
 { join concat concat-as } related-words
 
-HELP: peek
+HELP: last
 { $values { "seq" sequence } { "elt" object } }
 { $description "Outputs the last element of a sequence." }
 { $errors "Throws an error if the sequence is empty." } ;
 
-{ peek pop pop* } related-words
+{ last pop pop* } related-words
 
 HELP: pop*
 { $values { "seq" "a resizable mutable sequence" } }
@@ -1382,7 +1382,7 @@ ARTICLE: "sequences-access" "Accessing sequence elements"
 { $subsection first2 }
 { $subsection first3 }
 { $subsection first4 }
-{ $see-also nth peek } ;
+{ $see-also nth last } ;
 
 ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 "Adding elements:"
@@ -1579,7 +1579,6 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 
 ARTICLE: "sequences-stacks" "Treating sequences as stacks"
 "The classical stack operations, modifying a sequence in place:"
-{ $subsection peek }
 { $subsection push }
 { $subsection pop }
 { $subsection pop* }
