@@ -88,7 +88,7 @@ M: terrain-world tick-length
     yaw>> 0.0
     ${ MOVEMENT-SPEED 0.0 0.0 } eye-rotate ;
 : clamp-pitch ( pitch -- pitch' )
-    90.0 min -90.0 max ;
+    -90.0 90.0 clamp ;
 
 : walk-forward ( player -- )
     dup forward-vector [ v+ ] curry change-velocity drop ;
