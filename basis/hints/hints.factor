@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser words definitions kernel sequences assocs arrays
-kernel.private fry combinators accessors vectors strings sbufs
-byte-arrays byte-vectors io.binary io.streams.string splitting math
-math.parser generic generic.single generic.standard classes
-hashtables namespaces ;
+USING: accessors arrays assocs byte-arrays byte-vectors classes
+combinators definitions fry generic generic.single
+generic.standard hashtables io.binary io.streams.string kernel
+kernel.private math math.parser namespaces parser sbufs
+sequences splitting splitting.private strings vectors words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
