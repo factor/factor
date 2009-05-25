@@ -551,7 +551,7 @@ HELP: last
 { $description "Outputs the last element of a sequence." }
 { $errors "Throws an error if the sequence is empty." } ;
 
-{ last pop pop* } related-words
+{ pop pop* } related-words
 
 HELP: pop*
 { $values { "seq" "a resizable mutable sequence" } }
@@ -1378,11 +1378,13 @@ ARTICLE: "sequences-access" "Accessing sequence elements"
 { $subsection second }
 { $subsection third }
 { $subsection fourth }
+"Extracting the last element:"
+{ $subsection last }
 "Unpacking sequences:"
 { $subsection first2 }
 { $subsection first3 }
 { $subsection first4 }
-{ $see-also nth last } ;
+{ $see-also nth } ;
 
 ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 "Adding elements:"
