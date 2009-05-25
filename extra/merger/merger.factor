@@ -1,4 +1,5 @@
-USING: accessors arrays fry io.directories kernel models sequences sets ui
+USING: accessors arrays fry io.directories kernel
+models sequences sets ui
 ui.gadgets ui.gadgets.buttons ui.gadgets.labeled
 ui.gadgets.tracks ui.gadgets.labels ui.gadgets.glass
 math.rectangles cocoa.dialogs ;

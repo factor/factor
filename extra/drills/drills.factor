@@ -1,10 +1,11 @@
-USING: accessors arrays cocoa.dialogs combinators continuations
+USING: arrays cocoa.dialogs combinators continuations
 fry grouping io.encodings.utf8 io.files io.styles kernel math
 math.parser models models.arrow models.history namespaces random
 sequences splitting ui ui.gadgets.alerts ui.gadgets.book-extras
 ui.gadgets.books ui.gadgets.buttons ui.gadgets.frames
 ui.gadgets.grids ui.gadgets.labels ui.gadgets.tracks fonts
 wrap.strings ;
+EXCLUDE: accessors => change-model ;
 
 IN: drills
 SYMBOLS: it startLength ;

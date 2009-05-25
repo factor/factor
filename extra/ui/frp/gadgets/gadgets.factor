@@ -21,7 +21,7 @@ M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 : <frp-table> ( model -- table ) f frp-table new-table dup >>renderer
    V{ } clone <basic> >>selected-values V{ } clone <basic> >>selected-indices* ;
 : <frp-table*> ( -- table ) V{ } clone <model> <frp-table> ;
-: <frp-list> ( model -- table ) <frp-table> [ 1array ] >>quot ;
+: <frp-list> ( column-model -- table ) <frp-table> [ 1array ] >>quot ;
 : <frp-list*> ( -- table ) V{ } clone <model> <frp-list> ;
 : indexed ( table -- table ) f >>val-quot ;
 
