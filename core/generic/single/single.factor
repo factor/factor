@@ -3,7 +3,8 @@
 USING: accessors arrays assocs classes classes.algebra
 combinators definitions generic hashtables kernel
 kernel.private layouts math namespaces quotations
-sequences words generic.single.private effects make ;
+sequences words generic.single.private effects make
+combinators.private ;
 IN: generic.single
 
 ERROR: no-method object generic ;
