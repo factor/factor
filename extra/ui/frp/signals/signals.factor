@@ -10,25 +10,25 @@ M: multi-model model-activated dup dependencies>> dup length 1 =
 
 TUPLE: basic-model < multi-model ;
 M: basic-model (model-changed) [ value>> ] dip set-model ;
-: <merge> ( models -- model ) basic-model <multi-model> ;
-: <basic> ( value -- model ) basic-model new-model ;
+: <merge> ( models -- signal ) basic-model <multi-model> ;
+: <basic> ( value -- signal ) basic-model new-model ;
 
 TUPLE: filter-model < multi-model quot ;
 M: filter-model (model-changed) [ value>> ] dip 2dup quot>> call( a -- ? )
    [ set-model ] [ 2drop ] if ;
-: <filter> ( model quot -- filter-model ) [ 1array filter-model <multi-model> ] dip >>quot ;
+: <filter> ( model quot -- filter-signal ) [ 1array filter-model <multi-model> ] dip >>quot ;
 
 TUPLE: fold-model < multi-model oldval quot ;
 M: fold-model (model-changed) [ [ value>> ] [ [ oldval>> ] [ quot>> ] bi ] bi*
    call( val oldval -- newval ) ] keep set-model ;
-: <fold> ( oldval quot model -- model' ) 1array fold-model <multi-model> swap >>quot
+: <fold> ( oldval quot model -- signal ) 1array fold-model <multi-model> swap >>quot
    swap [ >>oldval ] [ >>value ] bi ;
 
 TUPLE: updater-model < multi-model values updates ;
 M: updater-model (model-changed) tuck updates>> =
    [ [ values>> value>> ] keep set-model ]
    [ drop ] if ;
-: <updates> ( values updates -- updater ) [ 2array updater-model <multi-model> ] 2keep
+: <updates> ( values updates -- signal ) [ 2array updater-model <multi-model> ] 2keep
    [ >>values ] [ >>updates ] bi* ;
 
 TUPLE: switch-model < multi-model original switcher on ;
@@ -41,20 +41,20 @@ M: switch-model model-activated [ original>> ] keep model-changed ;
 : >behavior ( event -- behavior ) t <model> swap <switch> ;
 
 TUPLE: mapped-model < multi-model model quot ;
-: new-mapped-model ( model quot class -- const-model ) [ over 1array ] dip
+: new-mapped-model ( model quot class -- mapped-model ) [ over 1array ] dip
    <multi-model> swap >>quot swap >>model ;
-: <mapped> ( model quot -- mapped ) mapped-model new-mapped-model ;
+: <mapped> ( model quot -- signal ) mapped-model new-mapped-model ;
 M: mapped-model (model-changed)
     [ [ value>> ] [ quot>> ] bi* call( old -- new ) ] [ nip ] 2bi
     set-model ;
 
 TUPLE: side-effect-model < mapped-model ;
 M: side-effect-model (model-changed) [ [ value>> ] [ quot>> ] bi* call( old -- ) ] keep t swap set-model ;
-: $> ( model quot -- side-effect-model ) side-effect-model new-mapped-model ;
+: $> ( model quot -- signal ) side-effect-model new-mapped-model ;
 
 TUPLE: quot-model < mapped-model ;
 M: quot-model (model-changed) nip [ quot>> call( -- b ) ] keep set-model ;
-: <$ ( model quot -- quot-model ) quot-model new-mapped-model ;
+: <$ ( model quot -- signal ) quot-model new-mapped-model ;
 
 TUPLE: action-value < basic-model parent ;
 : <action-value> ( parent value -- model ) action-value new-model swap >>parent ;
@@ -63,7 +63,7 @@ M: action-value model-activated dup parent>> dup activate-model model-changed ; 
 TUPLE: action < multi-model quot ;
 M: action (model-changed) [ [ value>> ] [ quot>> ] bi* call( a -- b ) ] keep value>>
    [ swap add-connection ] 2keep model-changed ;
-: <action> ( model quot -- action ) [ 1array action <multi-model> ] dip >>quot dup f <action-value> >>value value>> ;
+: <action> ( model quot -- action-signal ) [ 1array action <multi-model> ] dip >>quot dup f <action-value> >>value value>> ;
 
 TUPLE: | < multi-model ;
 : <|> ( models -- product ) | <multi-model> ;
