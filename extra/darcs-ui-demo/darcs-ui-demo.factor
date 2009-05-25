@@ -17,7 +17,7 @@ IN: darcs-ui-demo
 
 : patches-quot ( -- model-of-quot )
    [ whatsnew [ length <model> ] keep <model>
-      [ <change-list> ->% 1 "okay" <frp-button> [ close-window ] >>hook
+      [ <change-list> ->% 1 "okay" <frp-bevel-button> [ close-window ] >>hook
          -> <updates> [ [ answer ] 2curry ] 2fmap-&
       ] <vbox> { 229 200 } >>pref-dim "select changes" open-window
    ] [ drop [ ] "No changes!" alert f <model> ] recover ;
