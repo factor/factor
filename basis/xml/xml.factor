@@ -11,7 +11,7 @@ IN: xml
 <PRIVATE
 
 : add-child ( object -- )
-    xml-stack get peek second push ;
+    xml-stack get last second push ;
 
 : push-xml ( object -- )
     V{ } clone 2array xml-stack get push ;

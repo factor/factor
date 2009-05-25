@@ -59,7 +59,7 @@ SYMBOL: locale ! Just casing locale, or overall?
 
 : fix-sigma-end ( string -- string )
     [ "" ] [
-        dup peek CHAR: greek-small-letter-sigma =
+        dup last CHAR: greek-small-letter-sigma =
         [ 1 head* CHAR: greek-small-letter-final-sigma suffix ] when
     ] if-empty ; inline
 

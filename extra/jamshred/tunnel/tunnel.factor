@@ -25,7 +25,7 @@ CONSTANT: random-rotation-angle $[ pi 20 / ]
 
 : (random-segments) ( segments n -- segments )
     dup 0 > [
-        [ dup peek random-segment over push ] dip 1- (random-segments)
+        [ dup last random-segment over push ] dip 1- (random-segments)
     ] [ drop ] if ;
 
 CONSTANT: default-segment-radius 1

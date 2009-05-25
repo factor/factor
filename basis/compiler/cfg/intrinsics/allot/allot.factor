@@ -19,7 +19,7 @@ IN: compiler.cfg.intrinsics.allot
     [ second ds-load ] [ ^^load-literal ] bi prefix ;
 
 : emit-<tuple-boa> ( node -- )
-    dup node-input-infos peek literal>>
+    dup node-input-infos last literal>>
     dup array? [
         nip
         ds-drop

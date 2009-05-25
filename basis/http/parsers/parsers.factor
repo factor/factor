@@ -142,7 +142,7 @@ PEG: parse-header-line ( string -- pair )
         'space' ,
         'attr' ,
         'space' ,
-        [ "=" token , 'space' , 'value' , ] seq* [ peek ] action optional ,
+        [ "=" token , 'space' , 'value' , ] seq* [ last ] action optional ,
         'space' ,
     ] seq* ;
 

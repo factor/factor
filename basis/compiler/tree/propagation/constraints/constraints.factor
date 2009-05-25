@@ -83,7 +83,7 @@ TUPLE: implication p q ;
 C: --> implication
 
 : assume-implication ( p q -- )
-    [ constraints get [ assoc-stack swap suffix ] 2keep peek set-at ]
+    [ constraints get [ assoc-stack swap suffix ] 2keep last set-at ]
     [ satisfied? [ assume ] [ drop ] if ] 2bi ;
 
 M: implication assume*
