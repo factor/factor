@@ -49,7 +49,7 @@ mouse-index
 focused?
 multiple-selection? ;
 
-: in>out ( vector -- val/f ) [ f ] [ peek ] if-empty ;
+: in>out ( vector -- val/f ) [ f ] [ last ] if-empty ;
 : out>in ( val/f -- vector ) [ 1vector ] [ V{ } clone ] if* ;
 IN: accessors
 SLOT: selected-value
@@ -264,7 +264,7 @@ PRIVATE>
 : selected-rows ( table -- {value} )
     [ (selected-rows) ] [ renderer>> ] bi [ row-value ] curry map ;
 
-: multiple>single ( values -- value/f ? ) [ f f ] [ peek t ] if-empty ;
+: multiple>single ( values -- value/f ? ) [ f f ] [ last t ] if-empty ;
 : (selected-row) ( table -- value/f ? ) (selected-rows) multiple>single ;
 : selected-row ( table -- value/f ? ) selected-rows multiple>single ;
 
@@ -306,7 +306,7 @@ PRIVATE>
 M: table model-changed
     nip dup update-selected-indices [ V{ } clone ] unless* {
         [ >>selected-indices f >>mouse-index drop ]
-        [ [ f ] [ peek ] if-empty show-row-summary ]
+        [ [ f ] [ last ] if-empty show-row-summary ]
         [ drop update-selected-values ]
         [ drop relayout ]
     } 2cleave ;

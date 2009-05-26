@@ -9,7 +9,7 @@ IN: inverse.vectors
 
 \ 1vector [ 1 undo-nvector ] define-inverse
 
-\ peek [ 1vector ] define-inverse
+\ last [ 1vector ] define-inverse
 
 ! if is too general to undo, but its derivatives aren't
 
