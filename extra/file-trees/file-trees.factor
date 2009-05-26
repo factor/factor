@@ -1,7 +1,6 @@
 USING: accessors arrays delegate delegate.protocols
 io.pathnames kernel locals sequences
-vectors make strings ;
-EXCLUDE: ui.frp => , ;
+vectors make strings ui.frp.signals ui.frp.gadgets ;
 IN: file-trees
 
 TUPLE: walkable-vector vector father ;
