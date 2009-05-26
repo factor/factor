@@ -278,9 +278,6 @@ ERROR: cannot-merge-poisoned states ;
 : block-in-state ( bb -- states )
     dup predecessors>> state-out get '[ _ at ] map merge-states ;
 
-: maybe-set-at ( value key assoc -- changed? )
-    3dup at* [ = [ 3drop f ] [ set-at t ] if ] [ 2drop set-at t ] if ;
-
 : set-block-in-state ( state bb -- )
     [ clone ] dip state-in get set-at ;
 
