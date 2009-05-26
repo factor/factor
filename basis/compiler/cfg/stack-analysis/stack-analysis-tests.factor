@@ -101,3 +101,9 @@ IN: compiler.cfg.stack-analysis.tests
     [ [ ##replace? ] count 1 assert= ]
     tri
 ] unit-test
+
+! Sync before a back-edge, not after
+[ 1 ] [
+    [ 1000 [ ] times ] test-stack-analysis eliminate-dead-code linearize-basic-blocks
+    [ ##add-imm? ] count
+] unit-test
