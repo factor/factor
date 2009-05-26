@@ -1,7 +1,8 @@
 USING: accessors arrays cocoa.dialogs closures continuations
 darcs-ui.commands fry file-trees io io.files io.directories
 io.encodings.utf8 kernel math models monads sequences
-splitting ui ui.gadgets.alerts ui.frp ui.gadgets.comboboxes
+splitting ui ui.gadgets.alerts ui.frp.gadgets ui.frp.layout
+ui.frp.signals ui.frp.instances ui.gadgets.comboboxes
 ui.gadgets.labels ui.gadgets.scrollers ui.baseline-alignment
 ui.images unicode.case ;
 EXCLUDE: fries => _ ;

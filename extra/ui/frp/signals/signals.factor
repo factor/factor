@@ -1,4 +1,4 @@
-USING: accessors arrays kernel models models.product sequences ;
+USING: accessors arrays kernel monads models models.product sequences ui.frp.functors ;
 IN: ui.frp.signals
 
 TUPLE: multi-model < model ;
@@ -82,3 +82,5 @@ M: | model-activated dup model-changed ;
 TUPLE: & < | ;
 : <&> ( models -- product ) & <multi-model> ;
 M: & models-changed dependencies>> [ f swap (>>value) ] each ;
+
+FMAPS: $> <$ fmap FOR & | ;
