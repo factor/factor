@@ -3,7 +3,8 @@
 USING: accessors arrays assocs classes classes.algebra
 combinators definitions generic hashtables kernel
 kernel.private layouts math namespaces quotations
-sequences words generic.single.private effects make ;
+sequences words generic.single.private effects make
+combinators.private ;
 IN: generic.single
 
 ERROR: no-method object generic ;
@@ -234,7 +235,7 @@ M: predicate-engine-word stack-effect "owner-generic" word-prop stack-effect ;
     quote-methods
     prune-redundant-predicates
     class-predicates
-    [ peek ] [ alist>quot picker prepend define-predicate-engine ] if-empty ;
+    [ last ] [ alist>quot picker prepend define-predicate-engine ] if-empty ;
 
 M: predicate-engine compile-engine
     [ compile-predicate-engine ] [ class>> ] bi

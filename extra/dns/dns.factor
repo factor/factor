@@ -495,7 +495,7 @@ ERROR: name-error name ;
 : fully-qualified ( name -- name )
     {
       { [ dup empty?         ] [ "." append ] }
-      { [ dup peek CHAR: . = ] [            ] }
+      { [ dup last CHAR: . = ] [            ] }
       { [ t                  ] [ "." append ] }
     }
   cond ;

@@ -1,5 +1,4 @@
 USING: help.syntax help.markup arrays sequences ;
-
 IN: math.ranges
 
 ARTICLE: "math.ranges" "Numeric ranges"

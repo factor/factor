@@ -53,12 +53,16 @@ PRIVATE>
     [ <reversed> ] bi@ split1-slice [ <reversed> ] bi@
     [ f ] [ swap ] if-empty ;
 
+<PRIVATE
+
 : (split) ( separators n seq -- )
     3dup rot [ member? ] curry find-from drop
     [ [ swap subseq , ] 2keep 1 + swap (split) ]
     [ swap dup zero? [ drop ] [ tail ] if , drop ] if* ; inline recursive
 
 : split, ( seq separators -- ) 0 rot (split) ;
+
+PRIVATE>
 
 : split ( seq separators -- pieces )
     [ split, ] { } make ;
@@ -71,7 +75,7 @@ M: string string-lines
             but-last-slice [
                 "\r" ?tail drop "\r" split
             ] map
-        ] keep peek "\r" split suffix concat
+        ] keep last "\r" split suffix concat
     ] [
         1array
     ] if ;

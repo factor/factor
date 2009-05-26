@@ -15,7 +15,7 @@ PREDICATE: math-class < class
 
 <PRIVATE
 
-: last/first ( seq -- pair ) [ peek ] [ first ] bi 2array ;
+: last/first ( seq -- pair ) [ last ] [ first ] bi 2array ;
 
 : bootstrap-words ( classes -- classes' )
     [ bootstrap-word ] map ;

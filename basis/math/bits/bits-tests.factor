@@ -23,9 +23,9 @@ IN: math.bits.tests
 ] unit-test
 
 [ t ] [
-    1067811677921310779 make-bits peek
+    1067811677921310779 make-bits last
 ] unit-test
 
 [ t ] [
-    1067811677921310779 >bignum make-bits peek
+    1067811677921310779 >bignum make-bits last
 ] unit-test

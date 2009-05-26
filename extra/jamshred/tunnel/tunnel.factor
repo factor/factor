@@ -1,6 +1,9 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors combinators kernel literals locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences specialized-arrays.float vectors jamshred.oint ;
+USING: accessors arrays colors combinators fry jamshred.oint
+kernel literals locals math math.constants math.matrices
+math.order math.quadratic math.ranges math.vectors random
+sequences specialized-arrays.float vectors ;
 FROM: jamshred.oint => distance ;
 IN: jamshred.tunnel
 
@@ -11,6 +14,9 @@ C: <segment> segment
 
 : segment-number++ ( segment -- )
     [ number>> 1+ ] keep (>>number) ;
+
+: clamp-length ( n seq -- n' )
+    0 swap length clamp ;
 
 : random-color ( -- color )
     { 100 100 100 } [ random 100 / >float ] map first3 1.0 <rgba> ;
@@ -25,7 +31,7 @@ CONSTANT: random-rotation-angle $[ pi 20 / ]
 
 : (random-segments) ( segments n -- segments )
     dup 0 > [
-        [ dup peek random-segment over push ] dip 1- (random-segments)
+        [ dup last random-segment over push ] dip 1- (random-segments)
     ] [ drop ] if ;
 
 CONSTANT: default-segment-radius 1
@@ -53,7 +59,7 @@ CONSTANT: default-segment-radius 1
 : sub-tunnel ( from to segments -- segments )
     #! return segments between from and to, after clamping from and to to
     #! valid values
-    [ sequence-index-range [ clamp-to-range ] curry bi@ ] keep <slice> ;
+    [ '[ _ clamp-length ] bi@ ] keep <slice> ;
 
 : nearer-segment ( segment segment oint -- segment )
     #! return whichever of the two segments is nearer to the oint
@@ -82,7 +88,7 @@ CONSTANT: default-segment-radius 1
     ] dip nearer-segment ;
 
 : get-segment ( segments n -- segment )
-    over sequence-index-range clamp-to-range swap nth ;
+    over clamp-length swap nth ;
 
 : next-segment ( segments current-segment -- segment )
     number>> 1+ get-segment ;

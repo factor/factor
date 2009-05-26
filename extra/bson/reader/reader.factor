@@ -83,7 +83,7 @@ GENERIC: element-binary-read ( length type -- object )
     get-state element>> pop ; inline
 
 : peek-scope ( -- ht )
-    get-state scope>> peek ; inline
+    get-state scope>> last ; inline
 
 : read-elements ( -- )
     read-element-type
@@ -136,7 +136,7 @@ M: bson-not-eoo element-read ( type -- cont? )
     read-int32 drop
     get-state
     [scope-changer] change-scope
-    scope>> peek ; inline
+    scope>> last ; inline
     
 M: bson-object element-data-read ( type -- object )
     (object-data-read) ;

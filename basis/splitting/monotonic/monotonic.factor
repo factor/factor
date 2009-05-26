@@ -6,9 +6,9 @@ IN: splitting.monotonic
 
 <PRIVATE
 
-: ,, ( obj -- ) building get peek push ;
+: ,, ( obj -- ) building get last push ;
 : v, ( -- ) V{ } clone , ;
-: ,v ( -- ) building get dup peek empty? [ dup pop* ] when drop ;
+: ,v ( -- ) building get dup last empty? [ dup pop* ] when drop ;
 
 : (monotonic-split) ( seq quot -- newseq )
     [

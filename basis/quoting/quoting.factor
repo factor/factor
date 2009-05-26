@@ -9,7 +9,7 @@ IN: quoting
     {
         [ length 1 > ]
         [ first quote? ]
-        [ [ first ] [ peek ] bi = ]
+        [ [ first ] [ last ] bi = ]
     } 1&& ;
 
 : unquote ( str -- newstr )
