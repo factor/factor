@@ -259,12 +259,12 @@ SYMBOL: value-infos
     resolve-copy value-infos get assoc-stack null-info or ;
 
 : set-value-info ( info value -- )
-    resolve-copy value-infos get peek set-at ;
+    resolve-copy value-infos get last set-at ;
 
 : refine-value-info ( info value -- )
     resolve-copy value-infos get
     [ assoc-stack value-info-intersect ] 2keep
-    peek set-at ;
+    last set-at ;
 
 : value-literal ( value -- obj ? )
     value-info >literal< ;
@@ -294,10 +294,10 @@ SYMBOL: value-infos
     dup in-d>> first node-value-info literal>> ;
 
 : last-literal ( #call -- obj )
-    dup out-d>> peek node-value-info literal>> ;
+    dup out-d>> last node-value-info literal>> ;
 
 : immutable-tuple-boa? ( #call -- ? )
     dup word>> \ <tuple-boa> eq? [
-        dup in-d>> peek node-value-info
+        dup in-d>> last node-value-info
         literal>> first immutable-tuple-class?
     ] [ drop f ] if ;

@@ -1,6 +1,6 @@
 USING: alien strings kernel math tools.test io prettyprint
 namespaces combinators words classes sequences accessors 
-math.functions arrays ;
+math.functions arrays combinators.private ;
 IN: combinators.tests
 
 [ 3 ] [ 1 2 [ + ] call( x y -- z ) ] unit-test

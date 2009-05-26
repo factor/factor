@@ -62,7 +62,7 @@ IN: vectors.tests
 [ ] [ V{ 1 5 } "funny-stack" get push ] unit-test
 [ ] [ V{ 2 3 } "funny-stack" get push ] unit-test
 [ V{ 2 3 } ] [ "funny-stack" get pop ] unit-test
-[ V{ 1 5 } ] [ "funny-stack" get peek ] unit-test
+[ V{ 1 5 } ] [ "funny-stack" get last ] unit-test
 [ V{ 1 5 } ] [ "funny-stack" get pop ] unit-test
 [ "funny-stack" get pop ] must-fail
 [ "funny-stack" get pop ] must-fail

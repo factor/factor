@@ -626,7 +626,7 @@ PRIVATE>
         [ 0 swap copy ] keep
     ] new-like ;
 
-: peek ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
+: last ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
 
 : pop* ( seq -- ) [ length 1 - ] [ shorten ] bi ;
 
@@ -821,7 +821,7 @@ PRIVATE>
     [ rest ] [ first-unsafe ] bi ;
 
 : unclip-last ( seq -- butlast last )
-    [ but-last ] [ peek ] bi ;
+    [ but-last ] [ last ] bi ;
 
 : unclip-slice ( seq -- rest-slice first )
     [ rest-slice ] [ first-unsafe ] bi ; inline
@@ -852,7 +852,7 @@ PRIVATE>
     [ find-last ] (map-find) ; inline
 
 : unclip-last-slice ( seq -- butlast-slice last )
-    [ but-last-slice ] [ peek ] bi ; inline
+    [ but-last-slice ] [ last ] bi ; inline
 
 : <flat-slice> ( seq -- slice )
     dup slice? [ { } like ] when

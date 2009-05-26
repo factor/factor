@@ -191,7 +191,7 @@ SYMBOL: node-count
     propagate
     compute-def-use
     dup check-nodes
-    peek node-input-infos ;
+    last node-input-infos ;
 
 : final-classes ( quot -- seq )
     final-info [ class>> ] map ;
