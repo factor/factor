@@ -18,7 +18,8 @@ ERROR: last-insn-not-a-jump insn ;
         [ ##dispatch-label? ]
     } 1|| [ drop ] [ last-insn-not-a-jump ] if ;
 
+: check-rpo ( rpo -- )
+    [ instructions>> check-basic-block ] each ;
+
 : check-cfg ( cfg -- )
-    entry>> reverse-post-order [
-        instructions>> check-basic-block
-    ] each ;
+    entry>> reverse-post-order check-rpo ;
