@@ -6,4 +6,15 @@ IN: sorting.human
 : find-numbers ( string -- seq )
     [EBNF Result = ([0-9]+ => [[ string>number ]] | (!([0-9]) .)+)* EBNF] ;
 
-<< "human" [ find-numbers ] define-sorting >>
+! For comparing integers or sequences
+TUPLE: hybrid obj ;
+
+M: hybrid <=>
+    [ obj>> ] bi@
+    2dup [ integer? ] bi@ xor [
+        drop integer? [ +lt+ ] [ +gt+ ] if
+    ] [
+        <=>
+    ] if ;
+
+<< "human" [ find-numbers [ hybrid boa ] map ] define-sorting >>
