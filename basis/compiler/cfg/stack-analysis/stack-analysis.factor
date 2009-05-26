@@ -10,12 +10,12 @@ IN: compiler.cfg.stack-analysis
 
 ! If 'poisoned' is set, disregard height information. This is set if we don't have
 ! height change information for an instruction.
-TUPLE: state locs>vregs vregs>locs changed-locs d-height r-height poisoned? ;
+TUPLE: state locs>vregs actual-locs>vregs changed-locs d-height r-height poisoned? ;
 
 : <state> ( -- state )
     state new
         H{ } clone >>locs>vregs
-        H{ } clone >>vregs>locs
+        H{ } clone >>actual-locs>vregs
         H{ } clone >>changed-locs
         0 >>d-height
         0 >>r-height ;
@@ -23,34 +23,25 @@ TUPLE: state locs>vregs vregs>locs changed-locs d-height r-height poisoned? ;
 M: state clone
     call-next-method
         [ clone ] change-locs>vregs
-        [ clone ] change-vregs>locs
+        [ clone ] change-actual-locs>vregs
         [ clone ] change-changed-locs ;
 
 : loc>vreg ( loc -- vreg ) state get locs>vregs>> at ;
 
 : record-peek ( dst loc -- )
-    state get
-    [ locs>vregs>> set-at ]
-    [ swapd vregs>locs>> set-at ]
-    3bi ;
-
-: delete-old-vreg ( loc -- )
-    state get locs>vregs>> at [ state get vregs>locs>> delete-at ] when* ;
+    state get [ locs>vregs>> set-at ] [ actual-locs>vregs>> set-at ] 3bi ;
 
 : changed-loc ( loc -- )
     state get changed-locs>> conjoin ;
 
-: redundant-replace? ( src loc -- ? )
-    loc>vreg = ;
+: changed-loc? ( loc -- ? )
+    state get changed-locs>> key? ;
 
 : record-replace ( src loc -- )
-    ! Locs are not single assignment, which means we have to forget
-    ! that the previous vreg, if any, points at this loc. Also, record
-    ! that the loc changed so that all the right ##replace instructions
-    ! are emitted at a sync point.
-    2dup redundant-replace? [ 2drop ] [
-        dup delete-old-vreg dup changed-loc record-peek
-    ] if ;
+    dup changed-loc state get locs>vregs>> set-at ;
+
+: redundant-replace? ( vreg loc -- ? )
+    state get actual-locs>vregs>> at = ;
 
 : save-changed-locs ( state -- )
     [ changed-locs>> ] [ locs>vregs>> ] bi '[
@@ -59,13 +50,10 @@ M: state clone
     ] assoc-each ;
 
 : clear-state ( state -- )
-    {
-        [ 0 >>d-height drop ]
-        [ 0 >>r-height drop ]
-        [ changed-locs>> clear-assoc ]
-        [ locs>vregs>> clear-assoc ]
-        [ vregs>locs>> clear-assoc ]
-    } cleave ;
+    [ locs>vregs>> clear-assoc ]
+    [ actual-locs>vregs>> clear-assoc ]
+    [ changed-locs>> clear-assoc ]
+    tri ;
 
 ERROR: poisoned-state state ;
 
@@ -73,8 +61,6 @@ ERROR: poisoned-state state ;
     state get {
         [ dup poisoned?>> [ poisoned-state ] [ drop ] if ]
         [ save-changed-locs ]
-        [ d-height>> dup 0 = [ drop ] [ ##inc-d ] if ]
-        [ r-height>> dup 0 = [ drop ] [ ##inc-r ] if ]
         [ clear-state ]
     } cleave ;
 
@@ -95,7 +81,8 @@ UNION: neutral-insn
     ##effect
     ##branch
     ##loop-entry
-    ##conditional-branch ;
+    ##conditional-branch
+    ##compare-imm-branch ;
 
 M: neutral-insn visit , ;
 
@@ -140,8 +127,6 @@ UNION: poison-insn
     ##jump
     ##return
     ##dispatch
-    ##dispatch-label
-    ##alien-callback
     ##callback-return
     ##fixnum-mul-tail
     ##fixnum-add-tail
@@ -173,6 +158,10 @@ M: ##alien-invoke visit
 M: ##alien-indirect visit
     [ call-next-method ] [ visit-alien-node ] bi ;
 
+M: ##alien-callback visit , ;
+
+M: ##dispatch-label visit , ;
+
 ! Basic blocks we still need to look at
 SYMBOL: work-list
 
@@ -182,14 +171,18 @@ SYMBOL: work-list
 ! Maps basic-blocks to states
 SYMBOLS: state-in state-out ;
 
-: sync-unpoisoned-states ( predecessors states -- )
-    [
-        dup poisoned?>> [ 2drop ] [
-            state [
-                instructions>> building set
-                sync-state
-            ] with-variable
-        ] if
+: modify-instructions ( predecessor quot -- )
+    [ instructions>> building ] dip
+    '[ building get pop _ dip building get push ] with-variable ; inline
+
+: with-state ( state quot -- )
+    [ state ] dip with-variable ; inline
+
+: handle-back-edge ( bb states -- )
+    [ predecessors>> ] dip [
+        dup [
+            [ [ sync-state ] modify-instructions ] with-state
+        ] [ 2drop ] if
     ] 2each ;
 
 ERROR: must-equal-failed seq ;
@@ -202,64 +195,82 @@ ERROR: must-equal-failed seq ;
     [ [ d-height>> ] map must-equal >>d-height ]
     [ [ r-height>> ] map must-equal >>r-height ] bi ;
 
-ERROR: inconsistent-vreg>loc states ;
-
-: check-vreg>loc ( states -- )
-    ! The same vreg should not store different locs in
-    ! different branches
-    dup
-    [ vregs>locs>> ] map
-    [ [ keys ] map concat prune ] keep
-    '[ _ [ at ] with map sift all-equal? ] all?
-    [ drop ] [ inconsistent-vreg>loc ] if ;
-
 : insert-peek ( predecessor loc -- vreg )
     ! XXX critical edges
-    [ instructions>> building ] dip '[ _ ^^peek ] with-variable ;
+    '[ _ ^^peek ] modify-instructions ;
+
+SYMBOL: phi-nodes
+
+: find-phis ( insns -- assoc )
+    [ ##phi? ] filter [ [ inputs>> ] [ dst>> ] bi ] H{ } map>assoc ;
+
+: insert-phi ( inputs -- vreg )
+    phi-nodes get [ ^^phi ] cache ;
 
 : merge-loc ( predecessors locs>vregs loc -- vreg )
     ! Insert a ##phi in the current block where the input
     ! is the vreg storing loc from each predecessor block
     [ '[ [ _ ] dip at ] map ] keep
-    '[ [ ] [ _ insert-peek ] if ] 2map
-    ^^phi ;
+    '[ [ ] [ _ insert-peek ] ?if ] 2map
+    dup all-equal? [ first ] [ insert-phi ] if ;
+
+: (merge-locs) ( predecessors assocs -- assoc )
+    dup [ keys ] map concat prune
+    [ [ 2nip ] [ merge-loc ] 3bi ] with with
+    H{ } map>assoc ;
 
 : merge-locs ( state predecessors states -- state )
-    [ locs>vregs>> ] map dup [ keys ] map prune
-    [
-        [ 2nip ] [ merge-loc ] 3bi
-    ] with with H{ } map>assoc
-    >>locs>vregs ;
+    [ locs>vregs>> ] map (merge-locs) >>locs>vregs ;
 
-: merge-states ( predecessors states -- state )
+: merge-actual-locs ( state predecessors states -- state )
+    [ actual-locs>vregs>> ] map (merge-locs) >>actual-locs>vregs ;
+
+: merge-changed-locs ( state predecessors states -- state )
+    nip [ changed-locs>> ] map assoc-combine >>changed-locs ;
+
+ERROR: cannot-merge-poisoned states ;
+
+: merge-states ( bb states -- state )
     ! If any states are poisoned, save all registers
     ! to the stack in each branch
-    [ drop <state> ] [
-        dup [ poisoned?>> ] any? [
-            sync-unpoisoned-states <state>
-        ] [
-            dup check-vreg>loc
-            [ state new ] 2dip
-            [ merge-heights ]
-            [ merge-locs ] 2bi
-            ! what about vregs>locs
-        ] if
-    ] if-empty ;
+    dup length {
+        { 0 [ 2drop <state> ] }
+        { 1 [ nip first clone ] }
+        [
+            drop
+            dup [ not ] any? [
+                handle-back-edge <state>
+            ] [
+                dup [ poisoned?>> ] any? [
+                    cannot-merge-poisoned
+                ] [
+                    [ state new ] 2dip
+                    [ [ instructions>> find-phis phi-nodes set ] [ predecessors>> ] bi ] dip
+                    {
+                        [ merge-locs ]
+                        [ merge-actual-locs ]
+                        [ merge-heights ]
+                        [ merge-changed-locs ]
+                    } 2cleave
+                ] if
+            ] if
+        ]
+    } case ;
 
 : block-in-state ( bb -- states )
-    predecessors>> dup state-out get '[ _ at ] map merge-states ;
+    dup predecessors>> state-out get '[ _ at ] map merge-states ;
 
 : maybe-set-at ( value key assoc -- changed? )
     3dup at* [ = [ 3drop f ] [ set-at t ] if ] [ 2drop set-at t ] if ;
 
-: set-block-in-state ( state b -- )
-    state-in get set-at ;
+: set-block-in-state ( state bb -- )
+    [ clone ] dip state-in get set-at ;
 
-: set-block-out-state ( bb state -- changed? )
-    swap state-out get maybe-set-at ;
+: set-block-out-state ( state bb -- changed? )
+    [ clone ] dip state-out get maybe-set-at ;
 
 : finish-block ( bb state -- )
-    [ drop ] [ set-block-out-state ] 2bi
+    [ drop ] [ swap set-block-out-state ] 2bi
     [ successors>> [ add-to-work-list ] each ] [ drop ] if ;
 
 : visit-block ( bb -- )
@@ -268,18 +279,17 @@ ERROR: inconsistent-vreg>loc states ;
     [
         dup block-in-state
         [ swap set-block-in-state ] [
-            state [
+            [
                 [ instructions>> [ visit ] each ]
                 [ state get finish-block ]
                 [ ]
                 tri
-            ] with-variable
+            ] with-state
         ] 2bi
     ] V{ } make >>instructions drop ;
 
 : visit-blocks ( bb -- )
-    reverse-post-order work-list get
-    [ '[ _ push-front ] each ] [ [ visit-block ] slurp-deque ] bi ;
+    reverse-post-order [ visit-block ] each ;
 
 : optimize-stack ( cfg -- cfg )
     [
@@ -289,9 +299,3 @@ ERROR: inconsistent-vreg>loc states ;
         <hashed-dlist> work-list set
         dup entry>> visit-blocks
     ] with-scope ;
-
-! XXX: what if our height doesn't match
-! a future block we're merging with?
-! - we should only poison tail calls
-! - non-tail poisoning nodes: ##alien-callback, ##call of a non-tail dispatch
-! do we need a distinction between height changes in code and height changes done by the callee
