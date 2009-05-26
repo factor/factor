@@ -84,6 +84,7 @@ GENERIC: emit-node ( node -- next )
 : emit-call ( word height -- next )
     {
         { [ over loops get key? ] [ drop loops get at local-recursive-call ] }
+        { [ terminate-call? ] [ ##call stop-iterating ] }
         { [ tail-call? not ] [ ##call ##branch begin-basic-block iterate-next ] }
         { [ dup current-label get eq? ] [ 2drop first-basic-block get local-recursive-call ] }
         [ drop ##epilogue ##jump stop-iterating ]
@@ -102,6 +103,7 @@ GENERIC: emit-node ( node -- next )
 
 : emit-loop ( node -- next )
     ##loop-entry
+    ##branch
     begin-basic-block
     [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi
     iterate-next ;
