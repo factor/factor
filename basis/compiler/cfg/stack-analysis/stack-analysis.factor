@@ -3,7 +3,7 @@
 USING: accessors assocs kernel namespaces math sequences fry grouping
 sets make combinators compiler.cfg.copy-prop compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
-compiler.cfg.hats ;
+compiler.cfg.hats compiler.cfg ;
 IN: compiler.cfg.stack-analysis
 
 ! Convert stack operations to register operations
@@ -95,6 +95,16 @@ UNION: neutral-insn
 
 M: neutral-insn visit , ;
 
+UNION: sync-if-back-edge
+    ##branch
+    ##conditional-branch
+    ##compare-imm-branch ;
+
+M: sync-if-back-edge visit
+    basic-block get [ successors>> ] [ number>> ] bi '[ number>> _ < ] any?
+    [ sync-state ] when
+    , ;
+
 : adjust-d ( n -- ) state get [ + ] change-d-height drop ;
 
 M: ##inc-d visit [ , ] [ n>> adjust-d ] bi ;
@@ -181,13 +191,6 @@ SYMBOLS: state-in state-out ;
 : with-state ( state quot -- )
     [ state ] dip with-variable ; inline
 
-: handle-back-edge ( bb states -- )
-    [ predecessors>> ] dip [
-        dup [
-            [ [ sync-state ] modify-instructions ] with-state
-        ] [ 2drop ] if
-    ] 2each ;
-
 ERROR: must-equal-failed seq ;
 
 : must-equal ( seq -- elt )
@@ -254,7 +257,7 @@ ERROR: cannot-merge-poisoned states ;
         [
             drop
             dup [ not ] any? [
-                handle-back-edge <state>
+                2drop <state>
             ] [
                 dup [ poisoned?>> ] any? [
                     cannot-merge-poisoned
@@ -288,6 +291,7 @@ ERROR: cannot-merge-poisoned states ;
     ! block-in-state may add phi nodes at the start of the basic block
     ! so we wrap the whole thing with a 'make'
     [
+        dup basic-block set
         dup block-in-state
         [ swap set-block-in-state ] [
             [
