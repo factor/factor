@@ -153,7 +153,7 @@ TUPLE: block < section sections ;
 : <block> ( style -- block )
     block new-block ;
 
-: pprinter-block ( -- block ) pprinter-stack get peek ;
+: pprinter-block ( -- block ) pprinter-stack get last ;
 
 : add-section ( section -- )
     pprinter-block sections>> push ;
@@ -292,7 +292,7 @@ M: colon unindent-first-line? drop t ;
 
 ! Long section layout algorithm
 : chop-break ( seq -- seq )
-    dup peek line-break? [ but-last-slice chop-break ] when ;
+    dup last line-break? [ but-last-slice chop-break ] when ;
 
 SYMBOL: prev
 SYMBOL: next
@@ -317,7 +317,7 @@ SYMBOL: next
     ] { } make { t } split harvest ;
 
 : break-group? ( seq -- ? )
-    [ first section-fits? ] [ peek section-fits? not ] bi and ;
+    [ first section-fits? ] [ last section-fits? not ] bi and ;
 
 : ?break-group ( seq -- )
     dup break-group? [ first <fresh-line ] [ drop ] if ;

@@ -5,7 +5,7 @@ IN: math.vectors.homogeneous
 : (homogeneous-xyz) ( h -- xyz )
     1 head* ; inline
 : (homogeneous-w) ( h -- w )
-    peek ; inline
+    last ; inline
 
 : h+ ( a b -- c )
     2dup [ (homogeneous-w) ] bi@ over =

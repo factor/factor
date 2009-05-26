@@ -149,15 +149,15 @@ DEFER: (parse-paragraph)
 
 : trim-row ( seq -- seq' )
     rest
-    dup peek empty? [ but-last ] when ;
+    dup last empty? [ but-last ] when ;
 
-: ?peek ( seq -- elt/f )
-    [ f ] [ peek ] if-empty ;
+: ?last ( seq -- elt/f )
+    [ f ] [ last ] if-empty ;
 
 : coalesce ( rows -- rows' )
     V{ } clone [
         '[
-            _ dup ?peek ?peek CHAR: \\ =
+            _ dup ?last ?last CHAR: \\ =
             [ [ pop "|" rot 3append ] keep ] when
             push 
         ] each

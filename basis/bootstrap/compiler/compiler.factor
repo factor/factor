@@ -69,7 +69,7 @@ nl
 "." write flush
 
 {
-    new-sequence nth push pop peek flip
+    new-sequence nth push pop last flip
 } compile-unoptimized
 
 "." write flush

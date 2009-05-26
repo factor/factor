@@ -27,4 +27,4 @@ and we didn't know hów tö do thât"> latin2 encode >quoted ] unit-test
 [ 1 ] [ message >quoted string-lines length ] unit-test
 [ t ] [ message >quoted-lines "=\r\n" swap subseq? ] unit-test
 [ 4 ] [ message >quoted-lines string-lines length ] unit-test
-[ "===o" ] [ message >quoted-lines string-lines [ peek ] "" map-as ] unit-test
+[ "===o" ] [ message >quoted-lines string-lines [ last ] "" map-as ] unit-test

@@ -58,7 +58,6 @@ t to: remove-hidden-solids?
 : with-pv ( i quot -- ) [ swap >pv call ] with-scope  ; inline
 
 : dimension ( array -- x )      length 1- ; inline 
-: last ( seq -- x )           [ dimension ] [ nth ] bi ; inline
 : change-last ( seq quot -- ) 
     [ [ dimension ] keep ] dip change-nth  ; inline
 
