@@ -49,24 +49,3 @@ PRIVATE>
 : [1,b] ( b -- range ) 1 swap [a,b] ; inline
 
 : [0,b) ( b -- range ) 0 swap [a,b) ; inline
-
-: range-increasing? ( range -- ? )
-    step>> 0 > ;
-
-: range-decreasing? ( range -- ? )
-    step>> 0 < ;
-
-: first-or-last ( seq head? -- elt )
-    [ first ] [ last ] if ;
-
-: range-min ( range -- min )
-    dup range-increasing? first-or-last ;
-
-: range-max ( range -- max )
-    dup range-decreasing? first-or-last ;
-
-: clamp-to-range ( n range -- n )
-    [ range-min ] [ range-max ] bi clamp ;
-
-: sequence-index-range  ( seq -- range )
-    length [0,b) ;
