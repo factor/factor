@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.parser peg.ebnf sorting.functor ;
+USING: accessors kernel math math.order math.parser peg.ebnf
+sequences sorting.functor ;
 IN: sorting.human
 
 : find-numbers ( string -- seq )
