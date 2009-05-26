@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel namespaces math sequences fry deques grouping
-search-deques dlists sets make combinators compiler.cfg.copy-prop
-compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.rpo compiler.cfg.hats ;
+USING: accessors assocs kernel namespaces math sequences fry grouping
+sets make combinators compiler.cfg.copy-prop compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
+compiler.cfg.hats ;
 IN: compiler.cfg.stack-analysis
 
 ! Convert stack operations to register operations
@@ -34,19 +34,34 @@ M: state clone
 : changed-loc ( loc -- )
     state get changed-locs>> conjoin ;
 
-: changed-loc? ( loc -- ? )
-    state get changed-locs>> key? ;
-
 : record-replace ( src loc -- )
     dup changed-loc state get locs>vregs>> set-at ;
 
+GENERIC: height-for ( loc -- n )
+
+M: ds-loc height-for drop state get d-height>> ;
+M: rs-loc height-for drop state get r-height>> ;
+
+: (translate-loc) ( loc -- n height ) [ n>> ] [ height-for ] bi ; inline
+
+GENERIC: translate-loc ( loc -- loc' )
+
+M: ds-loc translate-loc (translate-loc) - <ds-loc> ;
+M: rs-loc translate-loc (translate-loc) - <rs-loc> ;
+
+GENERIC: untranslate-loc ( loc -- loc' )
+
+M: ds-loc untranslate-loc (translate-loc) + <ds-loc> ;
+M: rs-loc untranslate-loc (translate-loc) + <rs-loc> ;
+
 : redundant-replace? ( vreg loc -- ? )
-    state get actual-locs>vregs>> at = ;
+    dup untranslate-loc n>> 0 <
+    [ 2drop t ] [ state get actual-locs>vregs>> at = ] if ;
 
 : save-changed-locs ( state -- )
     [ changed-locs>> ] [ locs>vregs>> ] bi '[
         _ at swap 2dup redundant-replace?
-        [ 2drop ] [ ##replace ] if
+        [ 2drop ] [ untranslate-loc ##replace ] if
     ] assoc-each ;
 
 : clear-state ( state -- )
@@ -65,12 +80,6 @@ ERROR: poisoned-state state ;
     } cleave ;
 
 : poison-state ( -- ) state get t >>poisoned? drop ;
-
-GENERIC: translate-loc ( loc -- loc' )
-
-M: ds-loc translate-loc n>> state get d-height>> + <ds-loc> ;
-
-M: rs-loc translate-loc n>> state get r-height>> + <rs-loc> ;
 
 ! Abstract interpretation
 GENERIC: visit ( insn -- )
@@ -162,12 +171,6 @@ M: ##alien-callback visit , ;
 
 M: ##dispatch-label visit , ;
 
-! Basic blocks we still need to look at
-SYMBOL: work-list
-
-: add-to-work-list ( basic-block -- )
-    work-list get push-front ;
-
 ! Maps basic-blocks to states
 SYMBOLS: state-in state-out ;
 
@@ -222,8 +225,20 @@ SYMBOL: phi-nodes
 : merge-locs ( state predecessors states -- state )
     [ locs>vregs>> ] map (merge-locs) >>locs>vregs ;
 
+: merge-loc' ( locs>vregs loc -- vreg )
+    ! Insert a ##phi in the current block where the input
+    ! is the vreg storing loc from each predecessor block
+    '[ [ _ ] dip at ] map
+    dup all-equal? [ first ] [ drop f ] if ;
+
 : merge-actual-locs ( state predecessors states -- state )
-    [ actual-locs>vregs>> ] map (merge-locs) >>actual-locs>vregs ;
+    nip
+    [ actual-locs>vregs>> ] map
+    dup [ keys ] map concat prune
+    [ [ nip ] [ merge-loc' ] 2bi ] with
+    H{ } map>assoc
+    [ nip ] assoc-filter
+    >>actual-locs>vregs ;
 
 : merge-changed-locs ( state predecessors states -- state )
     nip [ changed-locs>> ] map assoc-combine >>changed-locs ;
@@ -266,12 +281,8 @@ ERROR: cannot-merge-poisoned states ;
 : set-block-in-state ( state bb -- )
     [ clone ] dip state-in get set-at ;
 
-: set-block-out-state ( state bb -- changed? )
-    [ clone ] dip state-out get maybe-set-at ;
-
-: finish-block ( bb state -- )
-    [ drop ] [ swap set-block-out-state ] 2bi
-    [ successors>> [ add-to-work-list ] each ] [ drop ] if ;
+: set-block-out-state ( state bb -- )
+    [ clone ] dip state-out get set-at ;
 
 : visit-block ( bb -- )
     ! block-in-state may add phi nodes at the start of the basic block
@@ -281,21 +292,17 @@ ERROR: cannot-merge-poisoned states ;
         [ swap set-block-in-state ] [
             [
                 [ instructions>> [ visit ] each ]
-                [ state get finish-block ]
+                [ [ state get ] dip set-block-out-state ]
                 [ ]
                 tri
             ] with-state
         ] 2bi
     ] V{ } make >>instructions drop ;
 
-: visit-blocks ( bb -- )
-    reverse-post-order [ visit-block ] each ;
-
-: optimize-stack ( cfg -- cfg )
+: optimize-stack ( rpo -- rpo )
     [
         H{ } clone copies set
         H{ } clone state-in set
         H{ } clone state-out set
-        <hashed-dlist> work-list set
-        dup entry>> visit-blocks
+        dup [ visit-block ] each
     ] with-scope ;
