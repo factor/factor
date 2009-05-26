@@ -45,10 +45,10 @@ CONSTANT: max-speed 30.0
     max-speed [0,b] ;
 
 : change-player-speed ( inc player -- )
-    [ + speed-range clamp-to-range ] change-speed drop ;
+    [ + 0 max-speed clamp ] change-speed drop ;
 
 : multiply-player-speed ( n player -- )
-    [ * speed-range clamp-to-range ] change-speed drop ; 
+    [ * 0 max-speed clamp ] change-speed drop ; 
 
 : distance-to-move ( seconds-passed player -- distance )
     speed>> * ;
