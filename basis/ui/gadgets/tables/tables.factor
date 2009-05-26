@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors colors.constants fry kernel math
 math.functions math.ranges math.rectangles math.order math.vectors
-models.illusion namespaces opengl pseudo-slots sequences ui.gadgets
+models.illusion namespaces opengl sequences ui.gadgets
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
 ui.gestures ui.render ui.pens.solid ui.text ui.commands ui.images
-ui.gadgets.menus ui.gadgets.line-support math.rectangles models
-math.ranges sequences combinators combinators.short-circuit
+ui.gadgets.menus ui.gadgets.line-support models
+combinators combinators.short-circuit
 fonts locals strings vectors ;
 IN: ui.gadgets.tables
 
@@ -52,7 +52,9 @@ multiple-selection? ;
 : in>out ( vector -- val/f ) [ f ] [ peek ] if-empty ;
 : out>in ( val/f -- vector ) [ 1vector ] [ V{ } clone ] if* ;
 IN: accessors
-PSEUDO-SLOTS: selected-value selected-index selected-index* ;
+SLOT: selected-value
+SLOT: selected-index
+SLOT: selected-index*
 M: table selected-value>> selected-values>> [ in>out ] <illusion> ;
 M: table (>>selected-value) [ [ out>in ] <illusion> ] dip (>>selected-values) ;
 M: table selected-index>> selected-indices>> in>out ;
@@ -257,7 +259,7 @@ PRIVATE>
 
 : (selected-rows) ( table -- {row} )
     [ selected-indices>> ] keep
-    [ nth-row [ 1vector ] [ drop V{ } clone ] if ] curry map concat ;
+    [ nth-row [ 1array ] [ drop { } ] if ] curry map concat >vector ;
 
 : selected-rows ( table -- {value} )
     [ (selected-rows) ] [ renderer>> ] bi [ row-value ] curry map ;
