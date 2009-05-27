@@ -63,13 +63,13 @@ ducet insert-helpers
     [ drop { } ]
     [ [ AAAA ] [ BBBB ] bi 2array ] if ;
 
-: last ( -- char )
-    building get empty? [ 0 ] [ building get peek peek ] if ;
+: building-last ( -- char )
+    building get empty? [ 0 ] [ building get last last ] if ;
 
 : blocked? ( char -- ? )
     combining-class dup { 0 f } member?
-    [ drop last non-starter? ]
-    [ last combining-class = ] if ;
+    [ drop building-last non-starter? ]
+    [ building-last combining-class = ] if ;
 
 : possible-bases ( -- slice-of-building )
     building get dup [ first non-starter? not ] find-last

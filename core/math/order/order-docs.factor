@@ -51,6 +51,10 @@ HELP: min
 { $values { "x" real } { "y" real } { "z" real } }
 { $description "Outputs the smallest of two real numbers." } ;
 
+HELP: clamp
+{ $values { "x" real } { "min" real } { "max" real } { "y" real } }
+{ $description "Outputs " { $snippet "x" } " if contained in the interval " { $snippet "[min,max]" } " or outputs one of the endpoints." } ;
+
 HELP: between?
 { $values { "x" real } { "y" real } { "z" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is in the interval " { $snippet "[y,z]" } "." }
@@ -104,6 +108,7 @@ ARTICLE: "math.order" "Linear order protocol"
 "The above words output order specifiers."
 { $subsection "order-specifiers" }
 "Utilities for comparing objects:"
+{ $subsection after? }
 { $subsection after? }
 { $subsection before? }
 { $subsection after=? }

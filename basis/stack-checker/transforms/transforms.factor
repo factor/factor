@@ -57,8 +57,8 @@ IN: stack-checker.transforms
     [
         [ no-case ]
     ] [
-        dup peek callable? [
-            dup peek swap but-last
+        dup last callable? [
+            dup last swap but-last
         ] [
             [ no-case ] swap
         ] if case>quot

@@ -7,7 +7,7 @@ IN: windows.fonts
         { "sans-serif" "Tahoma" }
         { "serif" "Times New Roman" }
         { "monospace" "Courier New" }
-    } at-default ;
+    } ?at drop ;
     
 MEMO:: (cache-font) ( font -- HFONT )
     font size>> neg ! nHeight
