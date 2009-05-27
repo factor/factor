@@ -48,8 +48,8 @@ M: insn normalize-height* ;
     0 rs-height set
     [ [ compute-heights ] each ]
     [ [ [ normalize-height* ] map sift ] with-scope ] bi
-    ds-height get dup zero? [ drop ] [ f \ ##inc-d boa prefix ] if
-    rs-height get dup zero? [ drop ] [ f \ ##inc-r boa prefix ] if ;
+    ds-height get dup 0 = [ drop ] [ f \ ##inc-d boa prefix ] if
+    rs-height get dup 0 = [ drop ] [ f \ ##inc-r boa prefix ] if ;
 
 : normalize-height ( rpo -- )
-    [ ] [ height-step ] local-optimization ;
+    [ drop ] [ height-step ] local-optimization ;

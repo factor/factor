@@ -31,7 +31,7 @@ SYMBOL: visited
     [ reverse-post-order ] dip each ; inline
 
 : optimize-basic-block ( bb init-quot insn-quot -- )
-    [ '[ live-in keys _ each ] ] [ '[ _ change-instructions drop ] ] bi* bi ; inline
+    [ '[ live-in keys _ call ] ] [ '[ _ change-instructions drop ] ] bi* bi ; inline
 
 : local-optimization ( rpo init-quot: ( live-in -- ) insn-quot: ( insns -- insns' ) -- )
     '[ _ _ optimize-basic-block ] each ;
