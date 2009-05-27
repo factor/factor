@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Kobie Lurie, Doug Coleman.
+! Copyright (C) 2009 Kobi Lurie, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry images.loader images.normalization
 images.processing.rotation kernel literals math sequences
