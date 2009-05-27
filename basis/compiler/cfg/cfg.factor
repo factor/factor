@@ -1,6 +1,7 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays vectors accessors namespaces ;
+USING: kernel arrays vectors accessors
+namespaces make fry sequences ;
 IN: compiler.cfg
 
 TUPLE: basic-block < identity-tuple
@@ -12,12 +13,19 @@ number
 
 M: basic-block hashcode* nip id>> ;
 
-: <basic-block> ( -- basic-block )
+: <basic-block> ( -- bb )
     basic-block new
         V{ } clone >>instructions
         V{ } clone >>successors
         V{ } clone >>predecessors
         \ basic-block counter >>id ;
+
+: add-instructions ( bb quot -- )
+    [ instructions>> building ] dip '[
+        building get pop
+        _ dip
+        building get push
+    ] with-variable ; inline
 
 TUPLE: cfg { entry basic-block } word label ;
 
