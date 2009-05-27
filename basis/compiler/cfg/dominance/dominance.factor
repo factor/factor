@@ -37,5 +37,5 @@ PRIVATE>
 
 : compute-dominance ( cfg -- cfg )
     H{ } clone idoms set
-    dup entry>> reverse-post-order
+    dup reverse-post-order
     unclip dup set-idom drop '[ _ iterate ] loop ;

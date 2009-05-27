@@ -22,4 +22,4 @@ ERROR: last-insn-not-a-jump insn ;
     [ instructions>> check-basic-block ] each ;
 
 : check-cfg ( cfg -- )
-    entry>> reverse-post-order check-rpo ;
+    reverse-post-order check-rpo ;
