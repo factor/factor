@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel words summary slots quotations
+USING: accessors kernel locals words summary slots quotations
 sequences assocs math arrays stack-checker effects
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
@@ -230,6 +230,18 @@ DEFER: __
 
 \ output>sequence 2 [ [undo] '[ dup _ assure-same-class _ input<sequence ] ] define-pop-inverse
 \ input<sequence 1 [ [undo] '[ _ { } output>sequence ] ] define-pop-inverse
+
+! conditionals
+
+:: undo-if-empty ( result a b -- seq )
+   a call( -- b ) result = [ { } ] [ result b [undo] call( a -- b ) ] if ;
+
+:: undo-if* ( result a b -- boolean )
+   b call( -- b ) result = [ f ] [ result a [undo] call( a -- b ) ] if ;
+
+\ if-empty 2 [ swap [ undo-if-empty ] 2curry ] define-pop-inverse
+
+\ if* 2 [ swap [ undo-if* ] 2curry ] define-pop-inverse
 
 ! Constructor inverse
 : deconstruct-pred ( class -- quot )
