@@ -160,6 +160,9 @@ INSN: ##set-alien-double < ##alien-setter ;
 
 ! Memory allocation
 INSN: ##allot < ##flushable size class { temp vreg } ;
+
+UNION: ##allocation ##allot ##box-float ##box-alien ##integer>bignum ;
+
 INSN: ##write-barrier < ##effect card# table ;
 
 INSN: ##alien-global < ##read symbol library ;
@@ -225,7 +228,7 @@ INSN: _epilogue stack-frame ;
 
 INSN: _label id ;
 
-INSN: _gc ;
+INSN: _gc live-in ;
 
 INSN: _branch label ;
 
