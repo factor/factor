@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces assocs sets sequences locals
-compiler.cfg compiler.cfg.instructions compiler.cfg.copy-prop ;
+compiler.cfg compiler.cfg.instructions compiler.cfg.copy-prop
+compiler.cfg.rpo ;
 IN: compiler.cfg.write-barrier
 
 ! Eliminate redundant write barrier hits.
@@ -35,11 +36,11 @@ M: ##set-slot-imm eliminate-write-barrier
 
 M: insn eliminate-write-barrier ;
 
-: write-barriers-step ( basic-block -- )
+: write-barriers-step ( insns -- insns' )
     H{ } clone safe set
     H{ } clone mutated set
     H{ } clone copies set
-    [ [ eliminate-write-barrier ] map sift ] change-instructions drop ;
+    [ eliminate-write-barrier ] map sift ;
 
 : eliminate-write-barriers ( rpo -- )
-    [ write-barriers-step ] each ;
+    [ ] [ write-barriers-step ] local-optimization ;
