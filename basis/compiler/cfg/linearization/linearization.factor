@@ -1,9 +1,11 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math accessors sequences namespaces make
-combinators classes
+combinators assocs
+cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
+compiler.cfg.liveness
 compiler.cfg.instructions ;
 IN: compiler.cfg.linearization
 
@@ -18,7 +20,7 @@ M: insn linearize-insn , drop ;
 : useless-branch? ( basic-block successor -- ? )
     #! If our successor immediately follows us in RPO, then we
     #! don't need to branch.
-    [ number>> ] bi@ 1- = ; inline
+    [ number>> ] bi@ 1 - = ; inline
 
 : branch-to-branch? ( successor -- ? )
     #! A branch to a block containing just a jump return is cloned.
@@ -56,18 +58,14 @@ M: ##compare-float-branch linearize-insn
     binary-conditional _compare-float-branch emit-branch ;
 
 : gc? ( bb -- ? )
-    instructions>> [
-        class {
-            ##allot
-            ##integer>bignum
-            ##box-float
-            ##box-alien
-        } memq?
-    ] any? ;
+    instructions>> [ ##allocation? ] any? ;
+
+: object-pointer-regs ( basic-block -- vregs )
+    live-in keys [ reg-class>> int-regs eq? ] filter ;
 
 : linearize-basic-block ( bb -- )
     [ number>> _label ]
-    [ gc? [ _gc ] when ]
+    [ dup gc? [ object-pointer-regs _gc ] [ drop ] if ]
     [ linearize-insns ]
     tri ;
 

@@ -220,17 +220,7 @@ M: ##load-reference analyze-aliases*
 M: ##alien-global analyze-aliases*
     dup dst>> set-heap-ac ;
 
-M: ##allot analyze-aliases*
-    #! A freshly allocated object is distinct from any other
-    #! object.
-    dup dst>> set-new-ac ;
-
-M: ##box-float analyze-aliases*
-    #! A freshly allocated object is distinct from any other
-    #! object.
-    dup dst>> set-new-ac ;
-
-M: ##box-alien analyze-aliases*
+M: ##allocation analyze-aliases*
     #! A freshly allocated object is distinct from any other
     #! object.
     dup dst>> set-new-ac ;
