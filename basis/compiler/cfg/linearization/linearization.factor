@@ -75,6 +75,6 @@ M: ##compare-float-branch linearize-insn
     [ [ linearize-basic-block ] each ] { } make ;
 
 : build-mr ( cfg -- mr )
-    [ entry>> reverse-post-order linearize-basic-blocks ]
+    [ reverse-post-order linearize-basic-blocks ]
     [ word>> ] [ label>> ]
     tri <mr> ;

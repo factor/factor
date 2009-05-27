@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences combinators classes vectors
-compiler.cfg compiler.cfg.rpo compiler.cfg.instructions ;
+compiler.cfg compiler.cfg.instructions compiler.cfg.rpo ;
 IN: compiler.cfg.useless-blocks
 
 : update-predecessor-for-delete ( bb -- )
@@ -30,8 +30,8 @@ IN: compiler.cfg.useless-blocks
         [ t ]
     } cond nip ;
 
-: delete-useless-blocks ( cfg -- cfg' )
-    dup [
+: delete-useless-blocks ( cfg -- )
+    [
         dup delete-basic-block? [ delete-basic-block ] [ drop ] if
     ] each-basic-block ;
 
@@ -49,7 +49,7 @@ IN: compiler.cfg.useless-blocks
     [ but-last f \ ##branch boa suffix ] change-instructions
     drop ;
 
-: delete-useless-conditionals ( cfg -- cfg' )
-    dup [
+: delete-useless-conditionals ( cfg -- )
+    [
         dup delete-conditional? [ delete-conditional ] [ drop ] if
     ] each-basic-block ;

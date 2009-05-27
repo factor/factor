@@ -44,8 +44,8 @@ M: fixnum ##load-literal tag-fixnum ##load-immediate ;
 M: f ##load-literal drop \ f tag-number ##load-immediate ;
 M: object ##load-literal ##load-reference ;
 
-INSN: ##peek < ##read { loc loc } ;
-INSN: ##replace < ##write { loc loc } ;
+INSN: ##peek < ##flushable { loc loc } ;
+INSN: ##replace < ##effect { loc loc } ;
 INSN: ##inc-d { n integer } ;
 INSN: ##inc-r { n integer } ;
 

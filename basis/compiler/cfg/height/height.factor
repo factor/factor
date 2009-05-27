@@ -1,7 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors math namespaces sequences kernel fry
-compiler.cfg compiler.cfg.registers compiler.cfg.instructions ;
+compiler.cfg compiler.cfg.registers compiler.cfg.instructions
+compiler.cfg.rpo ;
 IN: compiler.cfg.height
 
 ! Combine multiple stack height changes into one at the
@@ -42,10 +43,15 @@ M: ##replace normalize-height* normalize-peek/replace ;
 
 M: insn normalize-height* ;
 
-: normalize-height ( insns -- insns' )
+: height-step ( insns -- insns' )
     0 ds-height set
     0 rs-height set
-    [ [ compute-heights ] each ]
-    [ [ [ normalize-height* ] map sift ] with-scope ] bi
-    ds-height get dup zero? [ drop ] [ f \ ##inc-d boa prefix ] if
-    rs-height get dup zero? [ drop ] [ f \ ##inc-r boa prefix ] if ;
+    [
+        [ [ compute-heights ] each ]
+        [ [ [ normalize-height* ] map sift ] with-scope ] bi
+        ds-height get dup zero? [ drop ] [ f \ ##inc-d boa prefix ] if
+        rs-height get dup zero? [ drop ] [ f \ ##inc-r boa prefix ] if
+    ] change-instructions drop ;
+
+: normalize-height ( rpo -- )
+    [ height-step ] each ;
