@@ -66,7 +66,7 @@ PEG: parse-log-line ( string -- entry ) 'log-line' ;
     building get empty? [
         "Warning: log begins with multiline entry" print drop
     ] [
-        message>> first building get peek message>> push
+        message>> first building get last message>> push
     ] if ;
 
 : parse-log ( lines -- entries )

@@ -33,9 +33,9 @@ VALUE: name-map
 : name>char ( name -- char ) name-map at ; inline
 : char>name ( char -- name ) name-map value-at ; inline
 : property? ( char property -- ? ) properties at interval-key? ; inline
-: ch>lower ( ch -- lower ) simple-lower at-default ; inline
-: ch>upper ( ch -- upper ) simple-upper at-default ; inline
-: ch>title ( ch -- title ) simple-title at-default ; inline
+: ch>lower ( ch -- lower ) simple-lower ?at drop ; inline
+: ch>upper ( ch -- upper ) simple-upper ?at drop ; inline
+: ch>title ( ch -- title ) simple-title ?at drop ; inline
 : special-case ( ch -- casing-tuple ) special-casing at ; inline
 
 ! For non-existent characters, use Cn

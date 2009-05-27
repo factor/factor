@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators kernel math math.analysis
 math.functions math.order sequences sorting locals
-sequences.private ;
+sequences.private assocs fry ;
 IN: math.statistics
 
 : mean ( seq -- x )
@@ -55,6 +55,13 @@ IN: math.statistics
 
 : median ( seq -- x )
     dup length odd? [ lower-median ] [ medians + 2 / ] if ;
+
+: frequency ( seq -- hashtable )
+    H{ } clone [ '[ _ inc-at ] each ] keep ;
+
+: mode ( seq -- x )
+    frequency >alist
+    [ ] [ [ [ second ] bi@ > ] 2keep ? ] map-reduce first ;
 
 : minmax ( seq -- min max )
     #! find the min and max of a seq in one pass

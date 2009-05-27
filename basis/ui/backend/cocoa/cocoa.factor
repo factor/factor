@@ -83,7 +83,7 @@ M: pasteboard set-clipboard-contents
     dup { 0 0 } = [
         drop
         windows get length 1 <= [ -> center ] [
-            windows get peek second window-loc>>
+            windows get last second window-loc>>
             dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
             -> setFrameTopLeftPoint:
         ] if

@@ -91,7 +91,7 @@ PRIVATE>
 
 : &back ( -- )
     inspector-stack get
-    dup length 1 <= [ drop ] [ [ pop* ] [ peek reinspect ] bi ] if ;
+    dup length 1 <= [ drop ] [ [ pop* ] [ last reinspect ] bi ] if ;
 
 : &add ( value key -- ) mirror get set-at &push reinspect ;
 

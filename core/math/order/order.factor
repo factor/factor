@@ -34,6 +34,7 @@ M: real after=? ( obj1 obj2 -- ? ) >= ;
 
 : min ( x y -- z ) [ before? ] most ; inline 
 : max ( x y -- z ) [ after? ] most ; inline
+: clamp ( x min max -- y ) [ max ] dip min ; inline
 
 : between? ( x y z -- ? )
     pick after=? [ after=? ] [ 2drop f ] if ; inline

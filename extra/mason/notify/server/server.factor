@@ -45,7 +45,7 @@ builder "BUILDERS" {
 SYMBOLS: host-name target-os target-cpu message message-arg ;
 
 : parse-args ( command-line -- )
-    dup peek message-arg set
+    dup last message-arg set
     [
         {
             [ host-name set ]
