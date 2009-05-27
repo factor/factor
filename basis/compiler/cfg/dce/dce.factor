@@ -14,9 +14,9 @@ SYMBOL: live-vregs
     H{ } clone liveness-graph set
     H{ } clone live-vregs set ;
 
-GENERIC: compute-liveness ( insn -- )
+GENERIC: update-liveness-graph ( insn -- )
 
-M: ##flushable compute-liveness
+M: ##flushable update-liveness-graph
     [ uses-vregs ] [ dst>> ] bi liveness-graph get set-at ;
 
 : record-live ( vregs -- )
@@ -28,7 +28,7 @@ M: ##flushable compute-liveness
         ] if
     ] each ;
 
-M: insn compute-liveness uses-vregs record-live ;
+M: insn update-liveness-graph uses-vregs record-live ;
 
 GENERIC: live-insn? ( insn -- ? )
 
@@ -36,9 +36,8 @@ M: ##flushable live-insn? dst>> live-vregs get key? ;
 
 M: insn live-insn? drop t ;
 
-: eliminate-dead-code ( rpo -- rpo )
+: eliminate-dead-code ( rpo -- )
     init-dead-code
-    [ [ instructions>> [ compute-liveness ] each ] each ]
+    [ [ instructions>> [ update-liveness-graph ] each ] each ]
     [ [ [ [ live-insn? ] filter ] change-instructions drop ] each ]
-    [ ]
-    tri ;
+    bi ;

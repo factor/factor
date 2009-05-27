@@ -1,15 +1,13 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces assocs hashtables sequences arrays
 accessors vectors combinators sets classes compiler.cfg
 compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.copy-prop ;
+compiler.cfg.copy-prop compiler.cfg.rpo
+compiler.cfg.liveness ;
 IN: compiler.cfg.alias-analysis
 
-! Alias analysis -- assumes compiler.cfg.height has already run.
-!
-! We try to eliminate redundant slot and stack
-! traffic using some simple heuristics.
+! We try to eliminate redundant slot operations using some simple heuristics.
 ! 
 ! All heap-allocated objects which are loaded from the stack, or
 ! other object slots are pessimistically assumed to belong to
@@ -17,9 +15,6 @@ IN: compiler.cfg.alias-analysis
 !
 ! Freshly-allocated objects get their own alias class.
 !
-! The data and retain stack pointer registers are treated
-! uniformly, and each one gets its own alias class.
-! 
 ! Simple pseudo-C example showing load elimination:
 ! 
 ! int *x, *y, z: inputs
@@ -189,23 +184,19 @@ SYMBOL: constants
 GENERIC: insn-slot# ( insn -- slot#/f )
 GENERIC: insn-object ( insn -- vreg )
 
-M: ##peek insn-slot# loc>> n>> ;
-M: ##replace insn-slot# loc>> n>> ;
 M: ##slot insn-slot# slot>> constant ;
 M: ##slot-imm insn-slot# slot>> ;
 M: ##set-slot insn-slot# slot>> constant ;
 M: ##set-slot-imm insn-slot# slot>> ;
 M: ##alien-global insn-slot# [ library>> ] [ symbol>> ] bi 2array ;
 
-M: ##peek insn-object loc>> class ;
-M: ##replace insn-object loc>> class ;
 M: ##slot insn-object obj>> resolve ;
 M: ##slot-imm insn-object obj>> resolve ;
 M: ##set-slot insn-object obj>> resolve ;
 M: ##set-slot-imm insn-object obj>> resolve ;
 M: ##alien-global insn-object drop \ ##alien-global ;
 
-: init-alias-analysis ( -- )
+: init-alias-analysis ( basic-block -- )
     H{ } clone histories set
     H{ } clone vregs>acs set
     H{ } clone acs>vregs set
@@ -213,11 +204,10 @@ M: ##alien-global insn-object drop \ ##alien-global ;
     H{ } clone constants set
     H{ } clone copies set
 
+    live-in keys [ set-heap-ac ] each
+    
     0 ac-counter set
-    next-ac heap-ac set
-
-    ds-loc next-ac set-ac
-    rs-loc next-ac set-ac ;
+    next-ac heap-ac set ;
 
 GENERIC: analyze-aliases* ( insn -- insn' )
 
@@ -292,15 +282,6 @@ GENERIC: eliminate-dead-stores* ( insn -- insn' )
         ] unless
     ] when ;
 
-M: ##replace eliminate-dead-stores*
-    #! Writes to above the top of the stack can be pruned also.
-    #! This is sound since any such writes are not observable
-    #! after the basic block, and any reads of those locations
-    #! will have been converted to copies by analyze-slot,
-    #! and the final stack height of the basic block is set at
-    #! the beginning by compiler.cfg.stack.
-    dup loc>> n>> 0 < [ drop f ] [ (eliminate-dead-stores) ] if ;
-
 M: ##set-slot eliminate-dead-stores* (eliminate-dead-stores) ;
 
 M: ##set-slot-imm eliminate-dead-stores* (eliminate-dead-stores) ;
@@ -310,8 +291,13 @@ M: insn eliminate-dead-stores* ;
 : eliminate-dead-stores ( insns -- insns' )
     [ insn# set eliminate-dead-stores* ] map-index sift ;
 
-: alias-analysis ( insns -- insns' )
-    init-alias-analysis
-    analyze-aliases
-    compute-live-stores
-    eliminate-dead-stores ;
+: alias-analysis-step ( basic-block -- )
+    dup init-alias-analysis
+    [
+        analyze-aliases
+        compute-live-stores
+        eliminate-dead-stores
+    ] change-instructions drop ;
+
+: alias-analysis ( rpo -- )
+    [ alias-analysis-step ] each ;

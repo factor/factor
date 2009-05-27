@@ -10,15 +10,15 @@ IN: compiler.cfg.stack-analysis
 
 ! If 'poisoned' is set, disregard height information. This is set if we don't have
 ! height change information for an instruction.
-TUPLE: state locs>vregs actual-locs>vregs changed-locs d-height r-height poisoned? ;
+TUPLE: state locs>vregs actual-locs>vregs changed-locs ds-height rs-height poisoned? ;
 
 : <state> ( -- state )
     state new
         H{ } clone >>locs>vregs
         H{ } clone >>actual-locs>vregs
         H{ } clone >>changed-locs
-        0 >>d-height
-        0 >>r-height ;
+        0 >>ds-height
+        0 >>rs-height ;
 
 M: state clone
     call-next-method
@@ -39,8 +39,8 @@ M: state clone
 
 GENERIC: height-for ( loc -- n )
 
-M: ds-loc height-for drop state get d-height>> ;
-M: rs-loc height-for drop state get r-height>> ;
+M: ds-loc height-for drop state get ds-height>> ;
+M: rs-loc height-for drop state get rs-height>> ;
 
 : (translate-loc) ( loc -- n height ) [ n>> ] [ height-for ] bi ; inline
 
@@ -105,11 +105,11 @@ M: sync-if-back-edge visit
     [ sync-state ] when
     , ;
 
-: adjust-d ( n -- ) state get [ + ] change-d-height drop ;
+: adjust-d ( n -- ) state get [ + ] change-ds-height drop ;
 
 M: ##inc-d visit [ , ] [ n>> adjust-d ] bi ;
 
-: adjust-r ( n -- ) state get [ + ] change-r-height drop ;
+: adjust-r ( n -- ) state get [ + ] change-rs-height drop ;
 
 M: ##inc-r visit [ , ] [ n>> adjust-r ] bi ;
 
@@ -198,8 +198,8 @@ ERROR: must-equal-failed seq ;
 
 : merge-heights ( state predecessors states -- state )
     nip
-    [ [ d-height>> ] map must-equal >>d-height ]
-    [ [ r-height>> ] map must-equal >>r-height ] bi ;
+    [ [ ds-height>> ] map must-equal >>ds-height ]
+    [ [ rs-height>> ] map must-equal >>rs-height ] bi ;
 
 : insert-peek ( predecessor loc -- vreg )
     ! XXX critical edges
@@ -300,10 +300,10 @@ ERROR: cannot-merge-poisoned states ;
         ] 2bi
     ] V{ } make >>instructions drop ;
 
-: optimize-stack ( rpo -- rpo )
+: stack-analysis ( rpo -- )
     [
         H{ } clone copies set
         H{ } clone state-in set
         H{ } clone state-out set
-        dup [ visit-block ] each
+        [ visit-block ] each
     ] with-scope ;

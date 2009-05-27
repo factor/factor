@@ -6,10 +6,6 @@ compiler.cfg.checker compiler.cfg.height compiler.cfg.rpo
 compiler.cfg.dce compiler.cfg.registers sets ;
 IN: compiler.cfg.stack-analysis.tests
 
-[ f ] [ 1 2 H{ { 2 1 } } maybe-set-at ] unit-test
-[ t ] [ 1 3 H{ { 2 1 } } clone maybe-set-at ] unit-test
-[ t ] [ 3 2 H{ { 2 1 } } clone maybe-set-at ] unit-test
-
 ! Fundamental invariant: a basic block should not load or store a value more than once
 : check-for-redundant-ops ( rpo -- )
     [
@@ -25,11 +21,12 @@ IN: compiler.cfg.stack-analysis.tests
 
 : test-stack-analysis ( quot -- mr )
     dup cfg? [ test-cfg first ] unless
-    compute-predecessors
-    entry>> reverse-post-order
-    optimize-stack
-    dup [ [ normalize-height ] change-instructions drop ] each
-    dup check-rpo dup check-for-redundant-ops ;
+    dup compute-predecessors
+    reverse-post-order
+    dup stack-analysis
+    dup normalize-height
+    dup check-rpo
+    dup check-for-redundant-ops ;
 
 [ ] [ [ ] test-stack-analysis drop ] unit-test
 
@@ -81,13 +78,13 @@ IN: compiler.cfg.stack-analysis.tests
 
 ! Make sure the replace stores a value with the right height
 [ ] [
-    [ [ . ] [ 2drop 1 ] if ] test-stack-analysis eliminate-dead-code linearize-basic-blocks
+    [ [ . ] [ 2drop 1 ] if ] test-stack-analysis dup eliminate-dead-code linearize-basic-blocks
     [ ##replace? ] filter [ length 1 assert= ] [ first loc>> D 0 assert= ] bi
 ] unit-test
 
 ! translate-loc was the wrong way round
 [ ] [
-    [ 1 2 rot ] test-stack-analysis eliminate-dead-code linearize-basic-blocks
+    [ 1 2 rot ] test-stack-analysis dup eliminate-dead-code linearize-basic-blocks
     [ [ ##load-immediate? ] count 2 assert= ]
     [ [ ##peek? ] count 1 assert= ]
     [ [ ##replace? ] count 3 assert= ]
@@ -95,7 +92,7 @@ IN: compiler.cfg.stack-analysis.tests
 ] unit-test
 
 [ ] [
-    [ 1 2 ? ] test-stack-analysis eliminate-dead-code linearize-basic-blocks
+    [ 1 2 ? ] test-stack-analysis dup eliminate-dead-code linearize-basic-blocks
     [ [ ##load-immediate? ] count 2 assert= ]
     [ [ ##peek? ] count 1 assert= ]
     [ [ ##replace? ] count 1 assert= ]
@@ -104,6 +101,6 @@ IN: compiler.cfg.stack-analysis.tests
 
 ! Sync before a back-edge, not after
 [ 1 ] [
-    [ 1000 [ ] times ] test-stack-analysis eliminate-dead-code linearize-basic-blocks
+    [ 1000 [ ] times ] test-stack-analysis dup eliminate-dead-code linearize-basic-blocks
     [ ##add-imm? ] count
 ] unit-test
