@@ -5,8 +5,8 @@ TUPLE: multi-model < model ;
 GENERIC: (model-changed) ( model observer -- )
 : <multi-model> ( models kind -- model ) f swap new-model [ [ add-dependency ] curry each ] keep ;
 M: multi-model model-changed over value>> [ (model-changed) ] [ 2drop ] if ;
-M: multi-model model-activated dup dependencies>> dup length 1 =
-   [ first swap model-changed ] [ 2drop ] if ;
+M: multi-model model-activated dup dependencies>> [ value>> ] find nip
+   [ swap model-changed ] [ drop ] if* ;
 
 TUPLE: basic-model < multi-model ;
 M: basic-model (model-changed) [ value>> ] dip set-model ;
