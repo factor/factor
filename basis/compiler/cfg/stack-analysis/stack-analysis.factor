@@ -184,10 +184,6 @@ M: ##dispatch-label visit , ;
 ! Maps basic-blocks to states
 SYMBOLS: state-in state-out ;
 
-: modify-instructions ( predecessor quot -- )
-    [ instructions>> building ] dip
-    '[ building get pop _ dip building get push ] with-variable ; inline
-
 : with-state ( state quot -- )
     [ state ] dip with-variable ; inline
 
@@ -203,22 +199,14 @@ ERROR: must-equal-failed seq ;
 
 : insert-peek ( predecessor loc -- vreg )
     ! XXX critical edges
-    '[ _ ^^peek ] modify-instructions ;
-
-SYMBOL: phi-nodes
-
-: find-phis ( insns -- assoc )
-    [ ##phi? ] filter [ [ inputs>> ] [ dst>> ] bi ] H{ } map>assoc ;
-
-: insert-phi ( inputs -- vreg )
-    phi-nodes get [ ^^phi ] cache ;
+    '[ _ ^^peek ] add-instructions ;
 
 : merge-loc ( predecessors locs>vregs loc -- vreg )
     ! Insert a ##phi in the current block where the input
     ! is the vreg storing loc from each predecessor block
     [ '[ [ _ ] dip at ] map ] keep
     '[ [ ] [ _ insert-peek ] ?if ] 2map
-    dup all-equal? [ first ] [ insert-phi ] if ;
+    dup all-equal? [ first ] [ ^^phi ] if ;
 
 : (merge-locs) ( predecessors assocs -- assoc )
     dup [ keys ] map concat prune
@@ -263,7 +251,7 @@ ERROR: cannot-merge-poisoned states ;
                     cannot-merge-poisoned
                 ] [
                     [ state new ] 2dip
-                    [ [ instructions>> find-phis phi-nodes set ] [ predecessors>> ] bi ] dip
+                    [ predecessors>> ] dip
                     {
                         [ merge-locs ]
                         [ merge-actual-locs ]

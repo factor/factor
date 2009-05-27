@@ -100,6 +100,7 @@ IN: compiler.cfg.stack-analysis.tests
 ] unit-test
 
 ! Sync before a back-edge, not after
+! ##peeks should be inserted before a ##loop-entry
 [ 1 ] [
     [ 1000 [ ] times ] test-stack-analysis dup eliminate-dead-code linearize-basic-blocks
     [ ##add-imm? ] count
