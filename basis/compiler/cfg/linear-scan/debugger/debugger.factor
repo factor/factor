@@ -23,7 +23,7 @@ IN: compiler.cfg.linear-scan.debugger
     [ split-children ] map concat check-assigned ;
 
 : picture ( uses -- str )
-    dup peek 1 + CHAR: space <string>
+    dup last 1 + CHAR: space <string>
     [ '[ CHAR: * swap _ set-nth ] each ] keep ;
 
 : interval-picture ( interval -- str )

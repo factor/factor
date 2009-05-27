@@ -119,18 +119,6 @@ unit-test
     } extract-keys
 ] unit-test
 
-[ f ] [
-    "a" H{ { "a" f } } at-default
-] unit-test
-
-[ "b" ] [
-    "b" H{ { "a" f } } at-default
-] unit-test
-
-[ "x" ] [
-    "a" H{ { "a" "x" } } at-default
-] unit-test
-
 [ H{ { "b" [ 2 ] } { "d" [ 4 ] } } H{ { "a" [ 1 ] } { "c" [ 3 ] } } ] [
     H{
         { "a" [ 1 ] }

@@ -82,9 +82,6 @@ PRIVATE>
 : at ( key assoc -- value/f )
     at* drop ; inline
 
-: at-default ( key assoc -- value/key )
-    ?at drop ; inline
-
 M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ dup assoc-size ] dip new-assoc
     [ [ set-at ] with-assoc assoc-each ] keep ;
