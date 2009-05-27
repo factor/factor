@@ -43,4 +43,4 @@ M: insn eliminate-write-barrier ;
     [ eliminate-write-barrier ] map sift ;
 
 : eliminate-write-barriers ( rpo -- )
-    [ ] [ write-barriers-step ] local-optimization ;
+    [ drop ] [ write-barriers-step ] local-optimization ;

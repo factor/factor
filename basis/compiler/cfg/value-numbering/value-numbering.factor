@@ -11,7 +11,7 @@ compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering
 
 : number-input-values ( live-in -- )
-    [ [ f next-input-expr ] dip set-vn ] each ;
+    [ [ f next-input-expr simplify ] dip set-vn ] each ;
 
 : init-value-numbering ( live-in -- )
     init-value-graph
