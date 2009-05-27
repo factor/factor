@@ -46,12 +46,10 @@ M: insn normalize-height* ;
 : height-step ( insns -- insns' )
     0 ds-height set
     0 rs-height set
-    [
-        [ [ compute-heights ] each ]
-        [ [ [ normalize-height* ] map sift ] with-scope ] bi
-        ds-height get dup zero? [ drop ] [ f \ ##inc-d boa prefix ] if
-        rs-height get dup zero? [ drop ] [ f \ ##inc-r boa prefix ] if
-    ] change-instructions drop ;
+    [ [ compute-heights ] each ]
+    [ [ [ normalize-height* ] map sift ] with-scope ] bi
+    ds-height get dup zero? [ drop ] [ f \ ##inc-d boa prefix ] if
+    rs-height get dup zero? [ drop ] [ f \ ##inc-r boa prefix ] if ;
 
 : normalize-height ( rpo -- )
-    [ height-step ] each ;
+    [ ] [ height-step ] local-optimization ;

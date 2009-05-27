@@ -196,7 +196,7 @@ M: ##set-slot insn-object obj>> resolve ;
 M: ##set-slot-imm insn-object obj>> resolve ;
 M: ##alien-global insn-object drop \ ##alien-global ;
 
-: init-alias-analysis ( basic-block -- )
+: init-alias-analysis ( live-in -- )
     H{ } clone histories set
     H{ } clone vregs>acs set
     H{ } clone acs>vregs set
@@ -204,7 +204,7 @@ M: ##alien-global insn-object drop \ ##alien-global ;
     H{ } clone constants set
     H{ } clone copies set
 
-    live-in keys [ set-heap-ac ] each
+    [ set-heap-ac ] each
     
     0 ac-counter set
     next-ac heap-ac set ;
@@ -291,13 +291,10 @@ M: insn eliminate-dead-stores* ;
 : eliminate-dead-stores ( insns -- insns' )
     [ insn# set eliminate-dead-stores* ] map-index sift ;
 
-: alias-analysis-step ( basic-block -- )
-    dup init-alias-analysis
-    [
-        analyze-aliases
-        compute-live-stores
-        eliminate-dead-stores
-    ] change-instructions drop ;
+: alias-analysis-step ( insns -- insns' )
+    analyze-aliases
+    compute-live-stores
+    eliminate-dead-stores ;
 
 : alias-analysis ( rpo -- )
-    [ alias-analysis-step ] each ;
+    [ init-alias-analysis ] [ alias-analysis-step ] local-optimization ;
