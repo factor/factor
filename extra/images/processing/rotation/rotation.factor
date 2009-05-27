@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Kobie Lurie.
+! Copyright (C) 2009 Kobi Lurie.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors combinators
 combinators.short-circuit fry grouping images images.bitmap
