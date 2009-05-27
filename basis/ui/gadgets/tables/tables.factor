@@ -7,7 +7,7 @@ ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
 ui.gestures ui.render ui.pens.solid ui.text ui.commands ui.images
 ui.gadgets.menus ui.gadgets.line-support models
 combinators combinators.short-circuit
-fonts locals strings vectors ;
+fonts locals strings sorting ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -49,8 +49,8 @@ mouse-index
 focused?
 multiple-selection? ;
 
-: in>out ( vector -- val/f ) [ f ] [ last ] if-empty ;
-: out>in ( val/f -- vector ) [ 1vector ] [ V{ } clone ] if* ;
+: in>out ( array -- val/f ) [ f ] [ first ] if-empty ;
+: out>in ( val/f -- array ) [ 1array ] [ { } ] if* ;
 IN: accessors
 SLOT: selected-value
 SLOT: selected-index
@@ -63,15 +63,16 @@ M: table selected-index*>> selected-indices*>> [ in>out ] <illusion> ;
 M: table (>>selected-index*) [ [ out>in ] <illusion> ] dip (>>selected-indices*) ;
 
 IN: ui.gadgets.tables
-: push-selected-index ( table n -- table ) 2dup swap selected-indices>> index [ drop ] [ over selected-indices>> push ] if ;
+: push-selected-index ( table n -- table ) 2dup swap selected-indices>> index
+   [ drop ] [ over selected-indices>> swap suffix natural-sort >>selected-indices ] if ;
 
 : new-table ( rows renderer class -- table )
     new-line-gadget
         swap >>renderer
         swap >>model
-        V{ } clone >>selected-indices
-        V{ } clone <model> >>selected-values
-        V{ } clone <model> >>selected-indices*
+        { } >>selected-indices
+        { } <model> >>selected-values
+        { } <model> >>selected-indices*
         sans-serif-font >>font
         focus-border-color >>focus-border-color
         transparent >>column-line-color ; inline
@@ -259,12 +260,12 @@ PRIVATE>
 
 : (selected-rows) ( table -- {row} )
     [ selected-indices>> ] keep
-    [ nth-row [ 1array ] [ drop { } ] if ] curry map concat >vector ;
+    [ nth-row [ 1array ] [ drop { } ] if ] curry map concat ;
 
 : selected-rows ( table -- {value} )
     [ (selected-rows) ] [ renderer>> ] bi [ row-value ] curry map ;
 
-: multiple>single ( values -- value/f ? ) [ f f ] [ last t ] if-empty ;
+: multiple>single ( values -- value/f ? ) [ f f ] [ first t ] if-empty ;
 : (selected-row) ( table -- value/f ? ) (selected-rows) multiple>single ;
 : selected-row ( table -- value/f ? ) selected-rows multiple>single ;
 
@@ -290,7 +291,7 @@ PRIVATE>
     {
         [ model>> value>> empty? not ]
         [ selection-required?>> ]
-        [ drop V{ 0 } clone ]
+        [ drop { 0 } ]
     } 1&& ;
 
 : (update-selected-indices) ( table -- {n}/f )
@@ -304,9 +305,9 @@ PRIVATE>
     } 1|| ;
 
 M: table model-changed
-    nip dup update-selected-indices [ V{ } clone ] unless* {
+    nip dup update-selected-indices [ { } ] unless* {
         [ >>selected-indices f >>mouse-index drop ]
-        [ [ f ] [ last ] if-empty show-row-summary ]
+        [ [ f ] [ first ] if-empty show-row-summary ]
         [ drop update-selected-values ]
         [ drop relayout ]
     } 2cleave ;
