@@ -14,8 +14,8 @@ sequences compiler.cfg vectors arrays ;
     ] map ;
 
 : test-value-numbering ( insns -- insns )
-    basic-block new swap >vector >>instructions
-    dup value-numbering-step instructions>> >array ;
+    { } init-value-numbering
+    value-numbering-step ;
 
 [
     {
@@ -155,4 +155,17 @@ sequences compiler.cfg vectors arrays ;
         T{ ##compare f V int-regs 33 V int-regs 29 V int-regs 30 cc<= }
         T{ ##compare-imm-branch f V int-regs 33 5 cc/= }
     } test-value-numbering trim-temps
+] unit-test
+
+[
+    {
+        T{ ##copy f V int-regs 48 V int-regs 45 }
+        T{ ##compare-imm-branch f V int-regs 45 7 cc/= }
+    }
+] [
+    { V int-regs 45 } init-value-numbering
+    {
+        T{ ##copy f V int-regs 48 V int-regs 45 }
+        T{ ##compare-imm-branch f V int-regs 48 7 cc/= }
+    } value-numbering-step
 ] unit-test

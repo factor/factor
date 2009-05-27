@@ -4,8 +4,7 @@ arrays tools.test vectors compiler.cfg kernel accessors ;
 IN: compiler.cfg.write-barrier.tests
 
 : test-write-barrier ( insns -- insns )
-    basic-block new swap >vector >>instructions
-    dup write-barriers-step instructions>> >array ;
+    write-barriers-step ;
 
 [
     {
