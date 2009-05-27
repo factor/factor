@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces deques accessors sets sequences assocs fry dlists
-compiler.cfg.def-use compiler.cfg.rpo ;
+USING: kernel namespaces deques accessors sets sequences assocs fry
+dlists compiler.cfg.def-use ;
 IN: compiler.cfg.liveness
 
 ! This is a backward dataflow analysis. See http://en.wikipedia.org/wiki/Liveness_analysis
