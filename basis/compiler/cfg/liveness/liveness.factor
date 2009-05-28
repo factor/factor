@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces deques accessors sets sequences assocs fry
-dlists compiler.cfg.def-use ;
+dlists compiler.cfg.def-use compiler.cfg.instructions ;
 IN: compiler.cfg.liveness
 
 ! This is a backward dataflow analysis. See http://en.wikipedia.org/wiki/Liveness_analysis
@@ -10,6 +10,14 @@ IN: compiler.cfg.liveness
 SYMBOL: live-ins
 
 : live-in ( basic-block -- set ) live-ins get at ;
+
+! Assoc mapping basic blocks to sequences of sets of vregs; each sequence
+! is in conrrespondence with a predecessor
+SYMBOL: phi-live-ins
+
+: phi-live-in ( predecessor basic-block -- set )
+    [ predecessors>> index ] keep phi-live-ins get at
+    dup [ nth ] [ 2drop f ] if ;
 
 ! Assoc mapping basic blocks to sets of vregs
 SYMBOL: live-outs
@@ -24,21 +32,34 @@ SYMBOL: work-list
 : map-unique ( seq quot -- assoc )
     map concat unique ; inline
 
-: gen-set ( basic-block -- seq )
-    instructions>> [ uses-vregs ] map-unique ;
+: gen-set ( instructions -- seq )
+    [ ##phi? not ] filter [ uses-vregs ] map-unique ;
 
-: kill-set ( basic-block -- seq )
-    instructions>> [ defs-vregs ] map-unique ;
+: kill-set ( instructions -- seq )
+    [ defs-vregs ] map-unique ;
+
+: compute-live-in ( basic-block -- live-in )
+    dup instructions>>
+    [ [ live-out ] [ gen-set ] bi* assoc-union ]
+    [ nip kill-set ]
+    2bi assoc-diff ;
+
+: compute-phi-live-in ( basic-block -- phi-live-in )
+    instructions>> [ ##phi? ] filter
+    [ f ] [ [ inputs>> ] map flip [ unique ] map ] if-empty ;
 
 : update-live-in ( basic-block -- changed? )
-    [
-        [ [ gen-set ] [ live-out ] bi assoc-union ]
-        [ kill-set ]
-        bi assoc-diff
-    ] keep live-ins get maybe-set-at ;
+    [ [ compute-live-in ] keep live-ins get maybe-set-at ]
+    [ [ compute-phi-live-in ] keep phi-live-ins get maybe-set-at ]
+    bi and ; 
+
+: compute-live-out ( basic-block -- live-out )
+    [ successors>> [ live-in ] map ]
+    [ dup successors>> [ phi-live-in ] with map ] bi
+    append assoc-combine ;
 
 : update-live-out ( basic-block -- changed? )
-    [ successors>> [ live-in ] map assoc-combine ] keep
+    [ compute-live-out ] keep
     live-outs get maybe-set-at ;
 
 : liveness-step ( basic-block -- )
@@ -50,6 +71,7 @@ SYMBOL: work-list
 : compute-liveness ( rpo -- )
     <hashed-dlist> work-list set
     H{ } clone live-ins set
+    H{ } clone phi-live-ins set
     H{ } clone live-outs set
     <reversed> add-to-work-list
     work-list get [ liveness-step ] slurp-deque ;
