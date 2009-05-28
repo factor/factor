@@ -63,15 +63,14 @@ IN: compiler.cfg.alias-analysis
 ! Map vregs -> alias classes
 SYMBOL: vregs>acs
 
-: check ( obj -- obj )
-    [ "BUG: static type error detected" throw ] unless* ; inline
- 
+ERROR: vreg-ac-not-set vreg ;
+
 : vreg>ac ( vreg -- ac )
     #! Only vregs produced by ##allot, ##peek and ##slot can
     #! ever be used as valid inputs to ##slot and ##set-slot,
     #! so we assert this fact by not giving alias classes to
     #! other vregs.
-    vregs>acs get at check ;
+    vregs>acs get ?at [ vreg-ac-not-set ] unless ;
 
 ! Map alias classes -> sequence of vregs
 SYMBOL: acs>vregs
@@ -117,8 +116,10 @@ SYMBOL: histories
     #! value.
     over [ live-slots get at at ] [ 2drop f ] if ;
 
+ERROR: vreg-has-no-slots vreg ;
+
 : load-constant-slot ( value slot# vreg -- )
-    live-slots get at check set-at ;
+    live-slots get ?at [ vreg-has-no-slots ] unless set-at ;
 
 : load-slot ( value slot#/f vreg -- )
     over [ load-constant-slot ] [ 3drop ] if ;
@@ -213,6 +214,9 @@ GENERIC: analyze-aliases* ( insn -- insn' )
 
 M: ##load-immediate analyze-aliases*
     dup [ val>> ] [ dst>> ] bi constants get set-at ;
+
+M: ##peek analyze-aliases*
+    dup dst>> set-heap-ac ;
 
 M: ##load-reference analyze-aliases*
     dup dst>> set-heap-ac ;
