@@ -3,7 +3,8 @@ compiler.cfg.predecessors compiler.cfg.stack-analysis
 compiler.cfg.instructions sequences kernel tools.test accessors
 sequences.private alien math combinators.private compiler.cfg
 compiler.cfg.checker compiler.cfg.height compiler.cfg.rpo
-compiler.cfg.dce compiler.cfg.registers sets ;
+compiler.cfg.dce compiler.cfg.registers compiler.cfg.useless-blocks
+sets ;
 IN: compiler.cfg.stack-analysis.tests
 
 ! Fundamental invariant: a basic block should not load or store a value more than once
@@ -22,9 +23,11 @@ IN: compiler.cfg.stack-analysis.tests
 : test-stack-analysis ( quot -- mr )
     dup cfg? [ test-cfg first ] unless
     dup compute-predecessors
+    dup delete-useless-blocks
+    dup delete-useless-conditionals
     reverse-post-order
-    dup stack-analysis
     dup normalize-height
+    dup stack-analysis
     dup check-rpo
     dup check-for-redundant-ops ;
 
