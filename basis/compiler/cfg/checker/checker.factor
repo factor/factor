@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel compiler.cfg.instructions compiler.cfg.rpo compiler.cfg.def-use
-compiler.cfg.linearization combinators.short-circuit accessors math
-sequences sets ;
+USING: kernel compiler.cfg.instructions compiler.cfg.rpo
+compiler.cfg.def-use compiler.cfg.linearization compiler.cfg.liveness
+combinators.short-circuit accessors math sequences sets assocs ;
 IN: compiler.cfg.checker
 
 ERROR: last-insn-not-a-jump insn ;
@@ -27,11 +27,25 @@ ERROR: bad-loop-entry ;
         [ bad-loop-entry ] when
     ] [ drop ] if ;
 
+ERROR: bad-successors ;
+
+: check-successors ( bb -- )
+    dup successors>> [ predecessors>> memq? ] with all?
+    [ bad-successors ] unless ;
+
 : check-basic-block ( bb -- )
-    [ check-last-instruction ] [ check-loop-entry ] bi ;
+    [ instructions>> check-last-instruction ]
+    [ instructions>> check-loop-entry ]
+    [ check-successors ]
+    tri ;
+
+ERROR: bad-live-in ;
 
 : check-rpo ( rpo -- )
-    [ instructions>> check-basic-block ] each ;
+    [ compute-liveness ]
+    [ first live-in assoc-empty? [ bad-live-in ] unless ]
+    [ [ check-basic-block ] each ]
+    tri ;
 
 ERROR: undefined-values uses defs ;
 
