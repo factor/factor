@@ -166,9 +166,7 @@ posting "POSTINGS"
         [
             f <blog>
             [ deposit-blog-slots ]
-            [ "id" value >>id ]
-            [ update-tuple ]
-            tri
+            [ "id" value >>id update-tuple ] bi
 
             <url>
                 "$planet/admin" >>path
