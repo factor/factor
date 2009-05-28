@@ -203,11 +203,11 @@ M: ##alien-global insn-object drop \ ##alien-global ;
     H{ } clone live-slots set
     H{ } clone constants set
     H{ } clone copies set
-
-    [ set-heap-ac ] each
     
     0 ac-counter set
-    next-ac heap-ac set ;
+    next-ac heap-ac set
+
+    [ set-heap-ac ] each ;
 
 GENERIC: analyze-aliases* ( insn -- insn' )
 
