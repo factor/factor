@@ -9,8 +9,7 @@ IN: tools.annotations
 GENERIC: reset ( word -- )
 
 M: generic reset
-    [ call-next-method ]
-    [ subwords [ reset ] each ] bi ;
+    subwords [ reset ] each ;
 
 M: word reset
     dup "unannotated-def" word-prop [
@@ -22,6 +21,8 @@ M: word reset
 
 ERROR: cannot-annotate-twice word ;
 
+M: cannot-annotate-twice summary drop "Cannot annotate a word twice" ;
+
 <PRIVATE
 
 : check-annotate-twice ( word -- word )
@@ -29,17 +30,19 @@ ERROR: cannot-annotate-twice word ;
         cannot-annotate-twice
     ] when ;
 
-: save-unannotated-def ( word -- )
-    dup def>> "unannotated-def" set-word-prop ;
-
-: (annotate) ( word quot -- )
-    [ dup def>> ] dip call( old -- new ) define ;
-
 PRIVATE>
 
-: annotate ( word quot -- )
+GENERIC# annotate 1 ( word quot -- )
+
+M: generic annotate
+    [ "methods" word-prop values ] dip '[ _ annotate ] each ;
+
+M: word annotate
     [ check-annotate-twice ] dip
-    [ over save-unannotated-def (annotate) ] with-compilation-unit ;
+    [
+        [ dup def>> 2dup "unannotated-def" set-word-prop ] dip
+        call( old -- new ) define
+    ] with-compilation-unit ;
 
 <PRIVATE
 
@@ -77,19 +80,11 @@ PRIVATE>
 : watch-vars ( word vars -- )
     dupd '[ [ _ _ ] dip (watch-vars) ] annotate ;
 
-GENERIC# annotate-methods 1 ( word quot -- )
-
-M: generic annotate-methods
-    [ "methods" word-prop values ] dip [ annotate ] curry each ;
-
-M: word annotate-methods
-    annotate ;
-
 : breakpoint ( word -- )
-    [ add-breakpoint ] annotate-methods ;
+    [ add-breakpoint ] annotate ;
 
 : breakpoint-if ( word quot -- )
-    '[ [ _ [ [ break ] when ] ] dip 3append ] annotate-methods ;
+    '[ [ _ [ [ break ] when ] ] dip 3append ] annotate ;
 
 SYMBOL: word-timing
 

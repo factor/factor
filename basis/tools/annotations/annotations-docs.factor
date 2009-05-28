@@ -39,11 +39,6 @@ HELP: breakpoint-if
 { $values { "quot" { $quotation "( -- ? )" } } { "word" word } }
 { $description "Annotates a word definition to enter the single stepper if the quotation yields true." } ;
 
-HELP: annotate-methods
-{ $values
-     { "word" word } { "quot" quotation } }
-{ $description "Annotates the word -- for generic words, all its methods -- with the quotation." } ;
-
 HELP: reset
 { $values
      { "word" word } }
