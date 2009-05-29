@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs biassocs classes kernel math accessors
 sorting sets sequences
-compiler.cfg.rpo
+compiler.cfg.liveness
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.propagate
@@ -21,5 +21,5 @@ IN: compiler.cfg.value-numbering
 : value-numbering-step ( insns -- insns' )
     [ [ number-values ] [ rewrite propagate ] bi ] map ;
 
-: value-numbering ( rpo -- )
+: value-numbering ( cfg -- cfg' )
     [ init-value-numbering ] [ value-numbering-step ] local-optimization ;

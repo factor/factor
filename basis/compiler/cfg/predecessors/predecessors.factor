@@ -6,5 +6,5 @@ IN: compiler.cfg.predecessors
 : predecessors-step ( bb -- )
     dup successors>> [ predecessors>> push ] with each ;
 
-: compute-predecessors ( cfg -- )
-    [ predecessors-step ] each-basic-block ;
+: compute-predecessors ( cfg -- cfg' )
+    dup [ predecessors-step ] each-basic-block ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors math namespaces sequences kernel fry
 compiler.cfg compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.rpo ;
+compiler.cfg.liveness ;
 IN: compiler.cfg.height
 
 ! Combine multiple stack height changes into one at the
@@ -48,8 +48,8 @@ M: insn normalize-height* ;
     0 rs-height set
     [ [ compute-heights ] each ]
     [ [ [ normalize-height* ] map sift ] with-scope ] bi
-    ds-height get dup 0 = [ drop ] [ f \ ##inc-d boa prefix ] if
-    rs-height get dup 0 = [ drop ] [ f \ ##inc-r boa prefix ] if ;
+    ds-height get dup 0 = [ drop ] [ \ ##inc-d new-insn prefix ] if
+    rs-height get dup 0 = [ drop ] [ \ ##inc-r new-insn prefix ] if ;
 
-: normalize-height ( rpo -- )
+: normalize-height ( cfg -- cfg' )
     [ drop ] [ height-step ] local-optimization ;

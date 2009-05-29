@@ -11,12 +11,12 @@ IN: compiler.cfg.instructions.syntax
     "insn" "compiler.cfg.instructions" lookup ;
 
 : insn-effect ( word -- effect )
-    boa-effect in>> but-last f <effect> ;
+    boa-effect in>> 2 head* f <effect> ;
 
 SYNTAX: INSN:
-    parse-tuple-definition "regs" suffix
+    parse-tuple-definition { "regs" "insn#" } append
     [ dup tuple eq? [ drop insn-word ] when ] dip
     [ define-tuple-class ]
     [ 2drop save-location ]
-    [ 2drop [ ] [ '[ f _ boa , ] ] [ insn-effect ] tri define-inline ]
+    [ 2drop [ ] [ '[ f f _ boa , ] ] [ insn-effect ] tri define-inline ]
     3tri ;

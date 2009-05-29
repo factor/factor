@@ -278,10 +278,10 @@ ERROR: cannot-merge-poisoned states ;
         ] 2bi
     ] V{ } make >>instructions drop ;
 
-: stack-analysis ( rpo -- )
+: stack-analysis ( cfg -- cfg' )
     [
         H{ } clone copies set
         H{ } clone state-in set
         H{ } clone state-out set
-        [ visit-block ] each
+        dup [ visit-block ] each-basic-block
     ] with-scope ;

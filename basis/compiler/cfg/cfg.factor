@@ -27,11 +27,11 @@ M: basic-block hashcode* nip id>> ;
         building get push
     ] with-variable ; inline
 
-TUPLE: cfg { entry basic-block } word label ;
+TUPLE: cfg { entry basic-block } word label spill-counts post-order ;
 
-C: <cfg> cfg
+: <cfg> ( entry word label -- cfg ) f f cfg boa ;
 
-TUPLE: mr { instructions array } word label spill-counts ;
+TUPLE: mr { instructions array } word label ;
 
 : <mr> ( instructions word label -- mr )
     mr new
