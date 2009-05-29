@@ -21,6 +21,7 @@ M: ##compare-imm defs-vregs dst/tmp-vregs ;
 M: ##compare-float defs-vregs dst/tmp-vregs ;
 M: ##fixnum-mul defs-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
 M: ##fixnum-mul-tail defs-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
+M: _dispatch defs-vregs temp>> 1array ;
 M: insn defs-vregs drop f ;
 
 M: ##unary uses-vregs src>> 1array ;
@@ -42,6 +43,7 @@ M: ##fixnum-overflow uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: ##phi uses-vregs inputs>> ;
 M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
+M: _dispatch uses-vregs src>> 1array ;
 M: insn uses-vregs drop f ;
 
 ! Instructions that use vregs
@@ -54,4 +56,5 @@ UNION: vreg-insn
 ##conditional-branch
 ##compare-imm-branch
 _conditional-branch
-_compare-imm-branch ;
+_compare-imm-branch
+_dispatch ;

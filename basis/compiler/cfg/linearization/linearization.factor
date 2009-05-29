@@ -12,8 +12,38 @@ IN: compiler.cfg.linearization
 ! Convert CFG IR to machine IR.
 GENERIC: linearize-insn ( basic-block insn -- )
 
-: linearize-insns ( basic-block -- )
-    dup instructions>> [ linearize-insn ] with each ; inline
+: linearize-insns ( bb insns -- )
+    [ linearize-insn ] with each ;
+
+: gc? ( bb -- ? )
+    instructions>> [ ##allocation? ] any? ;
+
+: object-pointer-regs ( basic-block -- vregs )
+    live-out keys [ reg-class>> int-regs eq? ] filter ;
+
+: gc-check-position ( insns -- n )
+    #! We want to insert the GC check before the final branch in a basic block.
+    #! If there is a ##epilogue or ##loop-entry we want to insert it before that too.
+    dup length
+    dup 2 >= [
+        2 - swap nth [ ##loop-entry? ] [ ##epilogue? ] bi or
+        2 1 ?
+    ] [ 2drop 1 ] if ;
+
+: linearize-basic-block/gc ( bb -- )
+    dup instructions>> dup gc-check-position
+    [ head* linearize-insns ]
+    [ 2drop object-pointer-regs _gc ]
+    [ tail* linearize-insns ]
+    3tri ;
+
+: linearize-basic-block ( bb -- )
+    [ number>> _label ]
+    [
+        dup gc?
+        [ linearize-basic-block/gc ]
+        [ dup instructions>> linearize-insns ] if
+    ] bi ;
 
 M: insn linearize-insn , drop ;
 
@@ -32,7 +62,7 @@ M: insn linearize-insn , drop ;
 : emit-branch ( basic-block successor -- )
     {
         { [ 2dup useless-branch? ] [ 2drop ] }
-        { [ dup branch-to-branch? ] [ nip linearize-insns ] }
+        { [ dup branch-to-branch? ] [ nip linearize-basic-block ] }
         [ nip number>> _branch ]
     } cond ;
 
@@ -57,17 +87,11 @@ M: ##compare-imm-branch linearize-insn
 M: ##compare-float-branch linearize-insn
     binary-conditional _compare-float-branch emit-branch ;
 
-: gc? ( bb -- ? )
-    instructions>> [ ##allocation? ] any? ;
-
-: object-pointer-regs ( basic-block -- vregs )
-    live-in keys [ reg-class>> int-regs eq? ] filter ;
-
-: linearize-basic-block ( bb -- )
-    [ number>> _label ]
-    [ dup gc? [ object-pointer-regs _gc ] [ drop ] if ]
-    [ linearize-insns ]
-    tri ;
+M: ##dispatch linearize-insn
+    swap
+    [ [ src>> ] [ temp>> ] bi _dispatch ]
+    [ successors>> [ number>> _dispatch-label ] each ]
+    bi* ;
 
 : linearize-basic-blocks ( rpo -- insns )
     [ [ linearize-basic-block ] each ] { } make ;
