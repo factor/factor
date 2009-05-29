@@ -59,29 +59,35 @@ SYMBOL: unhandled-intervals
         ] [ 2drop ] if
     ] if ;
 
-GENERIC: (assign-registers) ( insn -- )
+GENERIC: assign-registers-in-insn ( insn -- )
 
-M: vreg-insn (assign-registers)
-    dup
-    [ defs-vregs ] [ uses-vregs ] bi append
-    active-intervals get swap '[ vreg>> _ member? ] filter
+: all-vregs ( insn -- vregs )
+    [ defs-vregs ] [ temp-vregs ] [ uses-vregs ] tri 3append ;
+
+M: vreg-insn assign-registers-in-insn
+    active-intervals get over all-vregs '[ vreg>> _ member? ] filter
     [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc
     >>regs drop ;
 
-M: insn (assign-registers) drop ;
+M: insn assign-registers-in-insn drop ;
 
 : init-assignment ( live-intervals -- )
     V{ } clone active-intervals set
     <min-heap> unhandled-intervals set
     init-unhandled ;
 
-: assign-registers ( insns live-intervals -- insns' )
+: assign-registers-in-block ( bb -- )
     [
-        init-assignment
         [
-            [ activate-new-intervals ]
-            [ drop [ (assign-registers) ] [ , ] bi ]
-            [ expire-old-intervals ]
-            tri
-        ] each-index
-    ] { } make ;
+            [
+                [ insn#>> activate-new-intervals ]
+                [ [ assign-registers-in-insn ] [ , ] bi ]
+                [ insn#>> expire-old-intervals ]
+                tri
+            ] each
+        ] V{ } make
+    ] change-instructions drop ;
+
+: assign-registers ( rpo live-intervals -- )
+    init-assignment
+    [ assign-registers-in-block ] each ;

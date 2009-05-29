@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces deques accessors sets sequences assocs fry
-dlists compiler.cfg.def-use compiler.cfg.instructions ;
+dlists compiler.cfg.def-use compiler.cfg.instructions
+compiler.cfg.rpo ;
 IN: compiler.cfg.liveness
 
 ! This is a backward dataflow analysis. See http://en.wikipedia.org/wiki/Liveness_analysis
@@ -36,7 +37,7 @@ SYMBOL: work-list
     [ ##phi? not ] filter [ uses-vregs ] map-unique ;
 
 : kill-set ( instructions -- seq )
-    [ defs-vregs ] map-unique ;
+    [ [ defs-vregs ] [ temp-vregs ] bi append ] map-unique ;
 
 : compute-live-in ( basic-block -- live-in )
     dup instructions>>
@@ -68,10 +69,13 @@ SYMBOL: work-list
         [ predecessors>> add-to-work-list ] [ drop ] if
     ] [ drop ] if ;
 
-: compute-liveness ( rpo -- )
+: compute-liveness ( cfg -- cfg' )
     <hashed-dlist> work-list set
     H{ } clone live-ins set
     H{ } clone phi-live-ins set
     H{ } clone live-outs set
-    <reversed> add-to-work-list
+    dup post-order add-to-work-list
     work-list get [ liveness-step ] slurp-deque ;
+
+: local-optimization ( cfg init-quot: ( live-in -- ) insn-quot: ( insns -- insns' ) -- cfg' )
+    [ dup ] 2dip '[ _ _ optimize-basic-block ] each-basic-block ;

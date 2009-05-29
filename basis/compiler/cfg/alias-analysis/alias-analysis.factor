@@ -227,7 +227,7 @@ M: ##read analyze-aliases*
     call-next-method
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri
     2dup live-slot dup [
-        2nip f \ ##copy boa analyze-aliases* nip
+        2nip \ ##copy new-insn analyze-aliases* nip
     ] [
         drop remember-slot
     ] if ;
@@ -284,5 +284,5 @@ M: insn eliminate-dead-stores* ;
     compute-live-stores
     eliminate-dead-stores ;
 
-: alias-analysis ( rpo -- )
+: alias-analysis ( cfg -- cfg' )
     [ init-alias-analysis ] [ alias-analysis-step ] local-optimization ;

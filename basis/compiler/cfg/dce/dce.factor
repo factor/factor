@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sets kernel namespaces sequences
-compiler.cfg.instructions compiler.cfg.def-use ;
+compiler.cfg.instructions compiler.cfg.def-use
+compiler.cfg.rpo ;
 IN: compiler.cfg.dce
 
 ! Maps vregs to sequences of vregs
@@ -36,8 +37,9 @@ M: ##flushable live-insn? dst>> live-vregs get key? ;
 
 M: insn live-insn? drop t ;
 
-: eliminate-dead-code ( rpo -- )
+: eliminate-dead-code ( cfg -- cfg' )
     init-dead-code
-    [ [ instructions>> [ update-liveness-graph ] each ] each ]
-    [ [ [ [ live-insn? ] filter ] change-instructions drop ] each ]
-    bi ;
+    [ [ instructions>> [ update-liveness-graph ] each ] each-basic-block ]
+    [ [ [ [ live-insn? ] filter ] change-instructions drop ] each-basic-block ]
+    [ ]
+    tri ;

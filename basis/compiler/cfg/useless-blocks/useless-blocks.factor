@@ -35,10 +35,11 @@ IN: compiler.cfg.useless-blocks
         [ instructions>> first ##branch? ]
     } 1&& ;
 
-: delete-useless-blocks ( cfg -- )
-    [
+: delete-useless-blocks ( cfg -- cfg' )
+    dup [
         dup delete-basic-block? [ delete-basic-block ] [ drop ] if
-    ] each-basic-block ;
+    ] each-basic-block
+    f >>post-order ;
 
 : delete-conditional? ( bb -- ? )
     dup instructions>> [ drop f ] [
@@ -51,10 +52,11 @@ IN: compiler.cfg.useless-blocks
 
 : delete-conditional ( bb -- )
     dup successors>> first 1vector >>successors
-    [ but-last f \ ##branch boa suffix ] change-instructions
+    [ but-last \ ##branch new-insn suffix ] change-instructions
     drop ;
 
-: delete-useless-conditionals ( cfg -- )
-    [
+: delete-useless-conditionals ( cfg -- cfg' )
+    dup [
         dup delete-conditional? [ delete-conditional ] [ drop ] if
-    ] each-basic-block ;
+    ] each-basic-block
+    f >>post-order ;

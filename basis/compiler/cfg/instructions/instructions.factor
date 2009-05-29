@@ -1,10 +1,12 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces words
 math math.order layouts classes.algebra alien byte-arrays
 compiler.constants combinators compiler.cfg.registers
 compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.instructions
+
+: new-insn ( ... class -- insn ) [ f f ] dip boa ; inline
 
 ! Virtual CPU instructions, used by CFG and machine IRs
 TUPLE: insn ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors compiler.cfg compiler.cfg.instructions fry
-kernel sequences ;
+USING: accessors compiler.cfg compiler.cfg.instructions
+compiler.cfg.rpo fry kernel sequences ;
 IN: compiler.cfg.phi-elimination
 
 : insert-copy ( predecessor input output -- )
@@ -17,5 +17,5 @@ IN: compiler.cfg.phi-elimination
         [ [ eliminate-phi ] with each ] dip
     ] change-instructions drop ;
 
-: eliminate-phis ( rpo -- )
-    [ eliminate-phi-step ] each ;
+: eliminate-phis ( cfg -- cfg' )
+    dup [ eliminate-phi-step ] each-basic-block ;

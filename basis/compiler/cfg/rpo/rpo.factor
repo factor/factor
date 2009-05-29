@@ -16,22 +16,24 @@ SYMBOL: visited
         ] [ , ] bi
     ] if ;
 
-: post-order ( cfg -- blocks )
-    [ entry>> post-order-traversal ] { } make ;
-
 : number-blocks ( blocks -- )
-    [ >>number drop ] each-index ;
+    dup length iota <reversed>
+    [ >>number drop ] 2each ;
+
+: post-order ( cfg -- blocks )
+    dup post-order>> [ ] [
+        [
+            H{ } clone visited set
+            dup entry>> post-order-traversal
+        ] { } make dup number-blocks
+        >>post-order post-order>>
+    ] ?if ;
 
 : reverse-post-order ( cfg -- blocks )
-    H{ } clone visited [
-        post-order <reversed> dup number-blocks
-    ] with-variable ; inline
+    post-order <reversed> ; inline
 
 : each-basic-block ( cfg quot -- )
     [ reverse-post-order ] dip each ; inline
 
 : optimize-basic-block ( bb init-quot insn-quot -- )
-    [ '[ live-in keys _ call ] ] [ '[ _ change-instructions drop ] ] bi* bi ; inline
-
-: local-optimization ( rpo init-quot: ( live-in -- ) insn-quot: ( insns -- insns' ) -- )
-    '[ _ _ optimize-basic-block ] each ;
+    [ '[ live-in keys @ ] ] [ '[ _ change-instructions drop ] ] bi* bi ; inline
