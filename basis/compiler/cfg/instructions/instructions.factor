@@ -231,6 +231,9 @@ INSN: _gc live-in ;
 
 INSN: _branch label ;
 
+INSN: _dispatch src temp ;
+INSN: _dispatch-label label ;
+
 TUPLE: _conditional-branch < insn label { src1 vreg } { src2 vreg } cc ;
 
 INSN: _compare-branch < _conditional-branch ;
