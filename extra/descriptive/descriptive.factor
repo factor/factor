@@ -28,7 +28,7 @@ PRIVATE>
 
 : make-descriptive ( word -- )
     dup [ ] [ def>> ] [ stack-effect ] tri [descriptive]
-    '[ drop _ ] annotate-methods ;
+    '[ drop _ ] annotate ;
 
 : define-descriptive ( word def effect -- )
     [ drop "descriptive-definition" set-word-prop ]

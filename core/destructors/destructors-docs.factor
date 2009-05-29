@@ -26,7 +26,7 @@ HELP: with-disposal
 
 HELP: with-destructors
 { $values { "quot" "a quotation" } }
-{ $description "Calls a quotation within a new dynamic scope. This quotation may register destructors, on any object, by wrapping the object in a destructor and implementing " { $link dispose } " on that object type.  After the quotation finishes, if an error was thrown, all destructors are called and the error is then rethrown.  However, if the quotation was successful, only those destructors created with an 'always cleanup' flag will be destroyed." }
+{ $description "Calls a quotation within a new dynamic scope. This quotation may register destructors using " { $link &dispose } " or " { $link |dispose } ". The former registers a destructor that will always run whether or not the quotation threw an error, and the latter registers a destructor that only runs if the quotation throws an error only. Destructors are run in reverse order from the order in which they were registered." }
 { $notes
     "Destructors generalize " { $link with-disposal } ". The following two lines are equivalent, except that the second line establishes a new dynamic scope:"
     { $code
