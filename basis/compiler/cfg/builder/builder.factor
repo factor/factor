@@ -159,63 +159,8 @@ M: #if emit-node
     } cond iterate-next ;
 
 ! #dispatch
-: trivial-dispatch-branch? ( nodes -- ? )
-    dup length 1 = [
-        first dup #call? [
-            word>> "intrinsic" word-prop not
-        ] [ drop f ] if
-    ] [ drop f ] if ;
-
-: dispatch-branch ( nodes word -- label )
-    over trivial-dispatch-branch? [
-        drop first word>>
-    ] [
-        gensym [
-            [
-                V{ } clone node-stack set
-                ##prologue
-                begin-basic-block
-                emit-nodes
-                basic-block get [
-                    ##epilogue
-                    ##return
-                    end-basic-block
-                ] when
-            ] with-cfg-builder
-        ] keep
-    ] if ;
-
-: dispatch-branches ( node -- )
-    children>> [
-        current-word get dispatch-branch
-        ##dispatch-label
-    ] each ;
-
-: emit-dispatch ( node -- )
-    ##epilogue
-    ds-pop ^^offset>slot i 0 ##dispatch
-    dispatch-branches ;
-
-! If a dispatch is not in tail position, we compile a new word where the dispatch is in
-! tail position, then call this word.
-
-: (non-tail-dispatch) ( -- word )
-    gensym dup t "inlined-block" set-word-prop ;
-
-: <non-tail-dispatch> ( node -- word )
-    current-word get (non-tail-dispatch) [
-        [
-            begin-word
-            emit-dispatch
-        ] with-cfg-builder
-    ] keep ;
-
 M: #dispatch emit-node
-    tail-call? [
-        emit-dispatch stop-iterating
-    ] [
-       <non-tail-dispatch> f emit-call
-    ] if ;
+    ds-pop ^^offset>slot i ##dispatch emit-if iterate-next ;
 
 ! #call
 M: #call emit-node

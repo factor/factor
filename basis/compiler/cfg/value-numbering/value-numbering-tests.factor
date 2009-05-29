@@ -50,7 +50,7 @@ sequences compiler.cfg vectors arrays ;
 [ t ] [
     {
         T{ ##peek f V int-regs 1 D 0 }
-        T{ ##dispatch f V int-regs 1 V int-regs 2 0 }
+        T{ ##dispatch f V int-regs 1 V int-regs 2 }
     } dup test-value-numbering =
 ] unit-test
 

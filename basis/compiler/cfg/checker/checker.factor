@@ -10,13 +10,13 @@ ERROR: last-insn-not-a-jump insn ;
 : check-last-instruction ( bb -- )
     peek dup {
         [ ##branch? ]
+        [ ##dispatch? ]
         [ ##conditional-branch? ]
         [ ##compare-imm-branch? ]
         [ ##return? ]
         [ ##callback-return? ]
         [ ##jump? ]
         [ ##call? ]
-        [ ##dispatch-label? ]
     } 1|| [ drop ] [ last-insn-not-a-jump ] if ;
 
 ERROR: bad-loop-entry ;
