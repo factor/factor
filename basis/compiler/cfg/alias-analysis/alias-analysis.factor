@@ -215,13 +215,7 @@ GENERIC: analyze-aliases* ( insn -- insn' )
 M: ##load-immediate analyze-aliases*
     dup [ val>> ] [ dst>> ] bi constants get set-at ;
 
-M: ##peek analyze-aliases*
-    dup dst>> set-heap-ac ;
-
-M: ##load-reference analyze-aliases*
-    dup dst>> set-heap-ac ;
-
-M: ##alien-global analyze-aliases*
+M: ##flushable analyze-aliases*
     dup dst>> set-heap-ac ;
 
 M: ##allocation analyze-aliases*
@@ -230,7 +224,7 @@ M: ##allocation analyze-aliases*
     dup dst>> set-new-ac ;
 
 M: ##read analyze-aliases*
-    dup dst>> set-heap-ac
+    call-next-method
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri
     2dup live-slot dup [
         2nip f \ ##copy boa analyze-aliases* nip

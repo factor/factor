@@ -92,10 +92,8 @@ M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 
 M: ##return generate-insn drop %return ;
 
-M: ##dispatch-label generate-insn label>> %dispatch-label ;
-
 M: ##dispatch generate-insn
-    [ src>> register ] [ temp>> register ] [ offset>> ] tri %dispatch ;
+    [ src>> register ] [ temp>> register ] bi %dispatch ;
 
 : >slot< ( insn -- dst obj slot tag )
     {

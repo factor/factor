@@ -91,7 +91,8 @@ UNION: neutral-insn
     ##branch
     ##loop-entry
     ##conditional-branch
-    ##compare-imm-branch ;
+    ##compare-imm-branch
+    ##dispatch ;
 
 M: neutral-insn visit , ;
 
@@ -130,22 +131,12 @@ M: ##copy visit
     [ call-next-method ] [ record-copy ] bi ;
 
 M: ##call visit
-    [ call-next-method ] [ height>> [ adjust-d ] [ poison-state ] if* ] bi ;
-
-M: ##fixnum-mul visit
-    call-next-method -1 adjust-d ;
-
-M: ##fixnum-add visit
-    call-next-method -1 adjust-d ;
-
-M: ##fixnum-sub visit
-    call-next-method -1 adjust-d ;
+    [ call-next-method ] [ height>> adjust-d ] bi ;
 
 ! Instructions that poison the stack state
 UNION: poison-insn
     ##jump
     ##return
-    ##dispatch
     ##callback-return
     ##fixnum-mul-tail
     ##fixnum-add-tail
@@ -178,8 +169,6 @@ M: ##alien-indirect visit
     [ call-next-method ] [ visit-alien-node ] bi ;
 
 M: ##alien-callback visit , ;
-
-M: ##dispatch-label visit , ;
 
 ! Maps basic-blocks to states
 SYMBOLS: state-in state-out ;
@@ -245,7 +234,8 @@ ERROR: cannot-merge-poisoned states ;
         [
             drop
             dup [ not ] any? [
-                2drop <state>
+                [ <state> ] 2dip
+                sift merge-heights
             ] [
                 dup [ poisoned?>> ] any? [
                     cannot-merge-poisoned
