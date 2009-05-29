@@ -39,6 +39,9 @@ M: object another-generic ;
 
 [ "" ] [ [ 3 another-generic drop ] with-string-writer ] unit-test
 
+! reset should do the right thing for generic words
+[ ] [ \ another-generic watch ] unit-test
+
 GENERIC: blah-generic ( a -- b )
 
 M: string blah-generic ;
