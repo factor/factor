@@ -85,6 +85,18 @@ M: mb-writer dispose drop ;
     ] with-irc
 ] unit-test
 
+! Test connect with password
+{ V{ "PASS password" "NICK factorbot" "USER factorbot hostname servername :irc.factor" } } [
+    "someserver" irc-port "factorbot" "password" <irc-profile> <irc-client>
+    [ 2drop <test-stream> ] >>connect
+    [
+        (connect-irc)
+        (do-login)
+        irc> stream>> out>> lines>>
+        (terminate-irc)
+    ] with-irc
+] unit-test
+
 ! Test join
 [ { "JOIN #factortest" } [
       "#factortest" %join %pop-output-line
