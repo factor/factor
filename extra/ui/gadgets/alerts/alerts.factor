@@ -24,6 +24,6 @@ MACRO: ask-buttons ( buttons -- quot ) dup length [
       [ swap
          [ 22 wrap-lines <label> T{ font { name "sans-serif" } { size 18 } } >>font ,
          [ [ <frp-bevel-button> [ close-window ] >>hook -> ] map ] <hbox> , ] <vbox>
-         { 200 110 } >>pref-dim "" open-window
+         "" open-window
       ] dip firstn
    ] 2curry ;
