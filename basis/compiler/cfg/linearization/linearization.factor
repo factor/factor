@@ -13,37 +13,19 @@ IN: compiler.cfg.linearization
 GENERIC: linearize-insn ( basic-block insn -- )
 
 : linearize-insns ( bb insns -- )
-    [ linearize-insn ] with each ;
+    dup instructions>> [ linearize-insn ] with each ;
 
 : gc? ( bb -- ? )
     instructions>> [ ##allocation? ] any? ;
 
 : object-pointer-regs ( basic-block -- vregs )
-    live-out keys [ reg-class>> int-regs eq? ] filter ;
-
-: gc-check-position ( insns -- n )
-    #! We want to insert the GC check before the final branch in a basic block.
-    #! If there is a ##epilogue or ##loop-entry we want to insert it before that too.
-    dup length
-    dup 2 >= [
-        2 - swap nth [ ##loop-entry? ] [ ##epilogue? ] bi or
-        2 1 ?
-    ] [ 2drop 1 ] if ;
-
-: linearize-basic-block/gc ( bb -- )
-    dup instructions>> dup gc-check-position
-    [ head* linearize-insns ]
-    [ 2drop object-pointer-regs _gc ]
-    [ tail* linearize-insns ]
-    3tri ;
+    live-in keys [ reg-class>> int-regs eq? ] filter ;
 
 : linearize-basic-block ( bb -- )
     [ number>> _label ]
-    [
-        dup gc?
-        [ linearize-basic-block/gc ]
-        [ dup instructions>> linearize-insns ] if
-    ] bi ;
+    [ dup gc? [ object-pointer-regs _gc ] [ drop ] if ]
+    [ linearize-insns ]
+    tri ;
 
 M: insn linearize-insn , drop ;
 
