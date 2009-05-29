@@ -1,24 +1,46 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar continuations io
+USING: accessors assocs calendar continuations destructors io
 io.encodings.binary io.servers.connection io.sockets
-io.streams.duplex kernel locals math math.ranges multiline
+io.streams.duplex fry kernel locals math math.ranges multiline
 namespaces prettyprint random sequences sets splitting threads
 tools.continuations ;
 IN: managed-server
 
-SYMBOL: client
-
 TUPLE: managed-server < threaded-server clients ;
 
-TUPLE: managed-client input-stream output-stream local-address
-remote-address username ;
+TUPLE: managed-client
+input-stream output-stream local-address remote-address
+username object ;
 
-GENERIC: login ( managed-server -- username )
-GENERIC: handle-managed-client* ( threaded-server -- )
+HOOK: login threaded-server ( -- username )
+HOOK: handle-already-logged-in managed-server ( -- )
+HOOK: handle-client-join managed-server ( -- )
+HOOK: handle-client-disconnect managed-server ( -- )
+HOOK: handle-managed-client* managed-server ( -- )
+
+M: managed-server handle-already-logged-in ;
+M: managed-server handle-client-join ;
+M: managed-server handle-client-disconnect ;
+M: managed-server handle-managed-client* ;
+
+: server ( -- managed-client ) managed-server get ;
+: client ( -- managed-client ) managed-client get ;
+: clients ( -- assoc ) server clients>> ;
+: client-streams ( -- assoc ) clients values ;
+: username ( -- string ) client username>> ;
+
+: send-everyone ( seq -- )
+    client-streams swap '[
+        output-stream>> [ _ print flush ] with-output-stream*
+    ] each ;
+
+: print-client ( string -- )
+    client output-stream>>
+    [ stream-print ] [ stream-flush ] bi ;
 
 ERROR: already-logged-in username ;
-ERROR: bad-login username ;
+ERROR: normal-quit ;
 
 <PRIVATE
 
@@ -31,29 +53,31 @@ ERROR: bad-login username ;
         remote-address get >>remote-address ;
 
 : check-logged-in ( username -- username )
-    dup threaded-server get clients>> key? [ already-logged-in ] when ;
+    dup server clients>> key? [
+        [ server ] dip
+        [ handle-already-logged-in ] [ already-logged-in ] bi
+    ] when ;
 
-: add-managed-client ( managed-client -- )
-    dup username>>
-    threaded-server get clients>> set-at ;
+: add-managed-client ( -- )
+    client username check-logged-in clients set-at ;
 
 : delete-managed-client ( -- )
-    client get username>>
-    threaded-server get clients>> delete-at ;
+    username server clients>> delete-at ;
 
 : handle-managed-client ( -- )
-    [ [ threaded-server get handle-managed-client* t ] loop ]
-    [ delete-managed-client ]
+    [ [ handle-managed-client* t ] loop ]
+    [ delete-managed-client handle-client-disconnect ]
     [ ] cleanup ;
 
 PRIVATE>
 
-M: managed-server login drop readln ;
+M: managed-server login readln ;
 
 M: managed-server handle-client*
-    login <managed-client>
-    [ client set ] [ add-managed-client ] bi
-    handle-managed-client ;
+    managed-server set
+    login <managed-client> managed-client set
+    add-managed-client
+    handle-client-join handle-managed-client ;
 
 : new-managed-server ( port name class -- server )
     new-threaded-server
