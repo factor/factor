@@ -1,4 +1,4 @@
-USING: accessors models models.arrow inverse inverse.vectors kernel ;
+USING: accessors models models.arrow inverse kernel ;
 IN: models.illusion
 
 TUPLE: illusion < arrow ;
