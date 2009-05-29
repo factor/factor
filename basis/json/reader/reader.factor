@@ -1,61 +1,97 @@
-! Copyright (C) 2008 Peter Burns.
+! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel peg peg.ebnf math.parser math.parser.private strings math
-math.functions sequences arrays vectors hashtables assocs
-prettyprint json ;
+USING: arrays assocs combinators io io.streams.string json
+kernel math math.parser math.parser.private sequences strings ;
 IN: json.reader
 
 <PRIVATE
+: value ( char -- num char )
+    1string " \t\r\n,:}]" read-until
+    [
+        append
+        [ string>float ]
+        [ [ "eE." index ] any? [ >integer ] unless ] bi
+    ] dip ;
 
-: grammar-list>vector ( seq -- vec ) first2 values swap prefix ;
+DEFER: j-string
+    
+: convert-string ( str -- str )
+    read1
+    {
+        { CHAR: b [ 8 ] }
+        { CHAR: f [ 12 ] }
+        { CHAR: n [ CHAR: \n ] }
+        { CHAR: r [ CHAR: \r ] }
+        { CHAR: t [ CHAR: \t ] }
+        { CHAR: u [ 4 read hex> ] }
+        [ ]
+    } case
+    dup
+    [ 1string append j-string append ]
+    [ drop ] if ;
+    
+: j-string ( -- str )
+    "\\\"" read-until CHAR: \" =
+    [ convert-string ] unless ;
+    
+: second-last ( seq -- second-last )
+    [ length 2 - ] keep nth ; inline
 
-! Grammar for JSON from RFC 4627
-EBNF: (json>)
+: third-last ( seq -- third-last )
+    [ length 3 - ] keep nth ; inline
+    
+: last2 ( seq -- second-last last )
+    [ second-last ] [ last ] bi ; inline
 
-ws = (" " | "\r" | "\t" | "\n")*
+: last3 ( seq -- third-last second-last last )
+    [ third-last ] [ last2 ] bi ; inline
 
-true = "true" => [[ t ]]
-false = "false" => [[ f ]]
-null = "null" => [[ json-null ]]
+: v-over-push ( vec -- vec' )
+    dup length 2 >=
+    [
+        dup
+        [ pop ]
+        [ last ] bi push
+    ] when ;
 
-hex = [0-9a-fA-F]
-char = '\\"'  [[ CHAR: "  ]]
-     | "\\\\" [[ CHAR: \  ]]
-     | "\\/"  [[ CHAR: /  ]]
-     | "\\b"  [[ 8        ]]
-     | "\\f"  [[ 12       ]]
-     | "\\n"  [[ CHAR: \n ]]
-     | "\\r"  [[ CHAR: \r ]]
-     | "\\t"  [[ CHAR: \t ]]
-     | "\\u" (hex hex hex hex) [[ hex> ]] => [[ second ]]
-     | [^"\]
-string = '"' char*:cs '"' => [[ cs >string ]]
+: v-pick-push ( vec -- vec' )
+    dup length 3 >=
+    [
+        dup
+        [ pop ]
+        [ second-last ] bi push
+    ] when ;
 
-sign = ("-" | "+")? => [[ "-" = "-" "" ? ]]
-digits = [0-9]+     => [[ >string ]]
-decimal = "." digits  => [[ concat ]]
-exp = ("e" | "E") sign digits => [[ concat ]]
-number = sign digits decimal? exp? => [[ dup concat swap fourth [ string>float ] [ string>number ] if ]]
+: (close-hash) ( accum -- accum' )
+    dup length 3 >= [ v-over-push ] when
+    dup dup [ pop ] dip pop swap
+    zip H{ } assoc-clone-like over push ;
+                                                 
+: scan ( accum char -- accum )
+    [
+        {
+            { CHAR: \" [ j-string over push ] }
+            { CHAR: [  [ V{ } clone over push ] }
+            { CHAR: ,  [ v-over-push ] }
+            { CHAR: ]  [ v-over-push dup pop >array over push ] }
+            { CHAR: {  [ 2 [ V{ } clone over push ] times ] }
+            { CHAR: :  [ v-pick-push ] }
+            { CHAR: }  [ (close-hash) ] }
+            { CHAR: \u000020 [ ] }
+            { CHAR: \t [ ] }
+            { CHAR: \r [ ] }
+            { CHAR: \n [ ] }
+            { CHAR: t  [ 3 read drop t over push ] }
+            { CHAR: f  [ 4 read drop f over push ] }
+            { CHAR: n  [ 3 read drop json-null over push ] }
+            [ value [ over push ] dip [ scan ] when*  ]
+        } case 
+    ] when* ;
 
-elements = value ("," value)* => [[ grammar-list>vector ]]
-array = "[" elements?:arr "]" => [[ arr >array ]]
-
-pair = ws string:key ws ":" value:val => [[ { key val } ]]
-members = pair ("," pair)* => [[ grammar-list>vector ]]
-object = "{" members?:hash "}" => [[ hash >hashtable ]]
-
-val = true
-    | false
-    | null
-    | string
-    | number
-    | array
-    | object
-
-value = ws val:v ws => [[ v ]]
-
-;EBNF
-
+: (json-parser>) ( string -- object )
+    [ V{ } clone [ read1 dup ] [ scan ] while drop first ] with-string-reader ;
+    
 PRIVATE>
-
-: json> ( string -- object ) (json>) ;
+    
+: json> ( string -- object )
+    (json-parser>) ;

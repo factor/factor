@@ -19,6 +19,8 @@ IN: json.reader.tests
 { 10.25 } [ "1025e-2" json> ] unit-test
 { 0.125 } [ "0.125" json> ] unit-test
 { -0.125 } [ "-0.125" json> ] unit-test
+{ -0.00125 } [ "-0.125e-2" json> ] unit-test
+{ -012.5 } [ "-0.125e+2" json> ] unit-test
 
 ! not widely supported by javascript, but allowed in the grammar, and a nice
 ! feature to get
