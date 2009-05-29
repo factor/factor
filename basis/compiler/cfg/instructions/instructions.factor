@@ -57,13 +57,12 @@ TUPLE: stack-frame
 spill-counts ;
 
 INSN: ##stack-frame stack-frame ;
-INSN: ##call word height ;
+INSN: ##call word { height integer } ;
 INSN: ##jump word ;
 INSN: ##return ;
 
 ! Jump tables
-INSN: ##dispatch src temp offset ;
-INSN: ##dispatch-label label ;
+INSN: ##dispatch src temp ;
 
 ! Slot access
 INSN: ##slot < ##read { obj vreg } { slot vreg } { tag integer } { temp vreg } ;
@@ -165,7 +164,7 @@ UNION: ##allocation ##allot ##box-float ##box-alien ##integer>bignum ;
 
 INSN: ##write-barrier < ##effect card# table ;
 
-INSN: ##alien-global < ##read symbol library ;
+INSN: ##alien-global < ##flushable symbol library ;
 
 ! FFI
 INSN: ##alien-invoke params ;
