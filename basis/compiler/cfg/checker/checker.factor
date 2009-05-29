@@ -41,20 +41,18 @@ ERROR: bad-successors ;
 
 ERROR: bad-live-in ;
 
-: check-rpo ( rpo -- )
-    [ compute-liveness ]
-    [ first live-in assoc-empty? [ bad-live-in ] unless ]
-    [ [ check-basic-block ] each ]
-    tri ;
-
 ERROR: undefined-values uses defs ;
 
 : check-mr ( mr -- )
     ! Check that every used register has a definition
     instructions>>
     [ [ uses-vregs ] map concat ]
-    [ [ defs-vregs ] map concat ] bi
+    [ [ [ defs-vregs ] [ temp-vregs ] bi append ] map concat ] bi
     2dup subset? [ 2drop ] [ undefined-values ] if ;
 
 : check-cfg ( cfg -- )
-    [ reverse-post-order check-rpo ] [ build-mr check-mr ] bi ;
+    compute-liveness
+    [ entry>> live-in assoc-empty? [ bad-live-in ] unless ]
+    [ [ check-basic-block ] each-basic-block ]
+    [ build-mr check-mr ]
+    tri ;

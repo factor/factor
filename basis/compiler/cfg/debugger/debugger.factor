@@ -23,10 +23,10 @@ SYMBOL: allocate-registers?
 : test-mr ( quot -- mrs )
     test-cfg [
         optimize-cfg
-        build-mr
         convert-two-operand
-        allocate-registers? get
-        [ linear-scan build-stack-frame ] when
+        allocate-registers? get [ linear-scan ] when
+        build-mr
+        allocate-registers? get [ build-stack-frame ] when
     ] map ;
 
 : insn. ( insn -- )

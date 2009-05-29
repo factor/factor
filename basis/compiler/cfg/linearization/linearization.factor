@@ -60,25 +60,31 @@ M: ##branch linearize-insn
     [ drop dup successors>> second useless-branch? ] 2bi
     [ [ swap number>> ] 3dip ] [ [ number>> ] 3dip negate-cc ] if ;
 
+: with-regs ( insn quot -- )
+    over regs>> [ call ] dip building get peek (>>regs) ; inline
+
 M: ##compare-branch linearize-insn
-    binary-conditional _compare-branch emit-branch ;
+    [ binary-conditional _compare-branch ] with-regs emit-branch ;
 
 M: ##compare-imm-branch linearize-insn
-    binary-conditional _compare-imm-branch emit-branch ;
+    [ binary-conditional _compare-imm-branch ] with-regs emit-branch ;
 
 M: ##compare-float-branch linearize-insn
-    binary-conditional _compare-float-branch emit-branch ;
+    [ binary-conditional _compare-float-branch ] with-regs emit-branch ;
 
 M: ##dispatch linearize-insn
     swap
-    [ [ src>> ] [ temp>> ] bi _dispatch ]
+    [ [ [ src>> ] [ temp>> ] bi _dispatch ] with-regs ]
     [ successors>> [ number>> _dispatch-label ] each ]
     bi* ;
 
-: linearize-basic-blocks ( rpo -- insns )
-    [ [ linearize-basic-block ] each ] { } make ;
+: linearize-basic-blocks ( cfg -- insns )
+    [
+        [ [ linearize-basic-block ] each-basic-block ]
+        [ spill-counts>> _spill-counts ]
+        bi
+    ] { } make ;
 
 : build-mr ( cfg -- mr )
-    [ reverse-post-order linearize-basic-blocks ]
-    [ word>> ] [ label>> ]
-    tri <mr> ;
+    [ linearize-basic-blocks ] [ word>> ] [ label>> ] tri
+    <mr> ;

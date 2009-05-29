@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel sequences compiler.utilities
-compiler.cfg.instructions cpu.architecture ;
+USING: accessors arrays kernel sequences make compiler.cfg.instructions
+compiler.cfg.rpo cpu.architecture ;
 IN: compiler.cfg.two-operand
 
 ! On x86, instructions take the form x = x op y
@@ -11,26 +11,26 @@ IN: compiler.cfg.two-operand
 ! has a LEA instruction which is effectively a three-operand
 ! addition
 
-: make-copy ( dst src -- insn ) f \ ##copy boa ; inline
+: make-copy ( dst src -- insn ) \ ##copy new-insn ; inline
 
-: make-copy/float ( dst src -- insn ) f \ ##copy-float boa ; inline
+: make-copy/float ( dst src -- insn ) \ ##copy-float new-insn ; inline
 
 : convert-two-operand/integer ( insn -- insns )
-    [ [ dst>> ] [ src1>> ] bi make-copy ]
-    [ dup dst>> >>src1 ]
-    bi 2array ; inline
+    [ [ dst>> ] [ src1>> ] bi ##copy ]
+    [ dup dst>> >>src1 , ]
+    bi ; inline
 
 : convert-two-operand/float ( insn -- insns )
-    [ [ dst>> ] [ src1>> ] bi make-copy/float ]
-    [ dup dst>> >>src1 ]
-    bi 2array ; inline
+    [ [ dst>> ] [ src1>> ] bi ##copy-float ]
+    [ dup dst>> >>src1 , ]
+    bi ; inline
 
-GENERIC: convert-two-operand* ( insn -- insns )
+GENERIC: convert-two-operand* ( insn -- )
 
 M: ##not convert-two-operand*
-    [ [ dst>> ] [ src>> ] bi make-copy ]
-    [ dup dst>> >>src ]
-    bi 2array ;
+    [ [ dst>> ] [ src>> ] bi ##copy ]
+    [ dup dst>> >>src , ]
+    bi ;
 
 M: ##sub convert-two-operand* convert-two-operand/integer ;
 M: ##mul convert-two-operand* convert-two-operand/integer ;
@@ -50,11 +50,13 @@ M: ##sub-float convert-two-operand* convert-two-operand/float ;
 M: ##mul-float convert-two-operand* convert-two-operand/float ;
 M: ##div-float convert-two-operand* convert-two-operand/float ;
 
-M: insn convert-two-operand* ;
+M: insn convert-two-operand* , ;
 
-: convert-two-operand ( mr -- mr' )
-    [
-        two-operand? [
-            [ convert-two-operand* ] map-flat
-        ] when
-    ] change-instructions ;
+: convert-two-operand ( cfg -- cfg' )
+    two-operand? [
+        dup [
+            [
+                [ [ convert-two-operand* ] each ] V{ } make
+            ] change-instructions drop
+        ] each-basic-block
+    ] when ;

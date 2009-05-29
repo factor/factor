@@ -14,23 +14,17 @@ compiler.cfg.rpo
 compiler.cfg.phi-elimination ;
 IN: compiler.cfg.optimizer
 
-: optimize-cfg ( cfg -- cfg )
+: optimize-cfg ( cfg -- cfg' )
     [
-        [
-            [ compute-predecessors ]
-            [ delete-useless-blocks ]
-            [ delete-useless-conditionals ] tri
-        ] [
-            reverse-post-order
-            {
-                [ normalize-height ]
-                [ stack-analysis ]
-                [ compute-liveness ]
-                [ alias-analysis ]
-                [ value-numbering ]
-                [ eliminate-dead-code ]
-                [ eliminate-write-barriers ]
-                [ eliminate-phis ]
-            } cleave
-        ] [ ] tri
+        compute-predecessors
+        delete-useless-blocks
+        delete-useless-conditionals
+        normalize-height
+        stack-analysis
+        compute-liveness
+        alias-analysis
+        value-numbering
+        eliminate-dead-code
+        eliminate-write-barriers
+        eliminate-phis
     ] with-scope ;

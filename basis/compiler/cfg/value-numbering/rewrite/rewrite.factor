@@ -13,7 +13,7 @@ GENERIC: rewrite ( insn -- insn' )
 
 M: ##mul-imm rewrite
     dup src2>> dup power-of-2? [
-        [ [ dst>> ] [ src1>> ] bi ] [ log2 ] bi* f \ ##shl-imm boa
+        [ [ dst>> ] [ src1>> ] bi ] [ log2 ] bi* \ ##shl-imm new-insn
         dup number-values
     ] [ drop ] if ;
 
@@ -36,9 +36,9 @@ M: ##mul-imm rewrite
 
 : rewrite-boolean-comparison ( expr -- insn )
     src1>> vreg>expr dup op>> {
-        { \ ##compare [ >compare-expr< f \ ##compare-branch boa ] }
-        { \ ##compare-imm [ >compare-imm-expr< f \ ##compare-imm-branch boa ] }
-        { \ ##compare-float [ >compare-expr< f \ ##compare-float-branch boa ] }
+        { \ ##compare [ >compare-expr< \ ##compare-branch new-insn ] }
+        { \ ##compare-imm [ >compare-imm-expr< \ ##compare-imm-branch new-insn ] }
+        { \ ##compare-float [ >compare-expr< \ ##compare-float-branch new-insn ] }
     } case ;
 
 : tag-fixnum-expr? ( expr -- ? )
@@ -60,11 +60,11 @@ M: ##mul-imm rewrite
 GENERIC: rewrite-tagged-comparison ( insn -- insn' )
 
 M: ##compare-imm-branch rewrite-tagged-comparison
-    (rewrite-tagged-comparison) f \ ##compare-imm-branch boa ;
+    (rewrite-tagged-comparison) \ ##compare-imm-branch new-insn ;
 
 M: ##compare-imm rewrite-tagged-comparison
     [ dst>> ] [ (rewrite-tagged-comparison) ] bi
-    i f \ ##compare-imm boa ;
+    i \ ##compare-imm new-insn ;
 
 M: ##compare-imm-branch rewrite
     dup rewrite-boolean-comparison? [ rewrite-boolean-comparison ] when
@@ -96,9 +96,9 @@ M: ##compare rewrite
 
 : rewrite-redundant-comparison ( insn -- insn' )
     [ cc>> ] [ dst>> ] [ src1>> vreg>expr dup op>> ] tri {
-        { \ ##compare [ >compare-expr< i f \ ##compare boa ] }
-        { \ ##compare-imm [ >compare-imm-expr< i f \ ##compare-imm boa ] }
-        { \ ##compare-float [ >compare-expr< i f \ ##compare-float boa ] }
+        { \ ##compare [ >compare-expr< i \ ##compare new-insn ] }
+        { \ ##compare-imm [ >compare-imm-expr< i \ ##compare-imm new-insn ] }
+        { \ ##compare-float [ >compare-expr< i \ ##compare-float new-insn ] }
     } case
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 
