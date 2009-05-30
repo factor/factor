@@ -243,10 +243,6 @@ DEFER: __
 
 \ if* 2 [ swap [ undo-if* ] 2curry ] define-pop-inverse
 
-! misc
-\ join 1 [ [ split ] curry ] define-pop-inverse
-\ split 1 [ [ join ] curry ] define-pop-inverse
-
 ! Constructor inverse
 : deconstruct-pred ( class -- quot )
     "predicate" word-prop [ dupd call assure ] curry ;
