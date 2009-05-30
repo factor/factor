@@ -21,7 +21,7 @@ M: filter-model (model-changed) [ value>> ] dip 2dup quot>> call( a -- ? )
 TUPLE: fold-model < multi-model oldval quot ;
 M: fold-model (model-changed) [ [ value>> ] [ [ oldval>> ] [ quot>> ] bi ] bi*
    call( val oldval -- newval ) ] keep set-model ;
-: <fold> ( oldval quot model -- signal ) 1array fold-model <multi-model> swap >>quot
+: <fold> ( model oldval quot -- signal ) rot 1array fold-model <multi-model> swap >>quot
    swap [ >>oldval ] [ >>value ] bi ;
 
 TUPLE: updater-model < multi-model values updates ;

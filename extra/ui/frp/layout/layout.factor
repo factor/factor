@@ -1,17 +1,9 @@
-USING: accessors fry kernel lexer math.parser models sequences
-ui.frp.signals ui.gadgets ui.gadgets.editors ui.gadgets.scrollers
-ui.gadgets.tables ui.gadgets.tracks ;
+USING: accessors fry kernel lexer math.parser models
+sequences ui.frp.signals ui.gadgets.tracks ui.gadgets
+ui.frp.gadgets ui.gadgets.books ;
 QUALIFIED: make
 IN: ui.frp.layout
 TUPLE: layout gadget width ; C: <layout> layout
-
-GENERIC: output-model ( gadget -- model )
-M: gadget output-model model>> ;
-M: table output-model dup multiple-selection?>>
-   [ dup val-quot>> [ selected-values>> ] [ selected-indices*>> ] if ]
-   [ dup val-quot>> [ selected-value>> ] [ selected-index*>> ] if ] if ;
-M: model-field output-model field-model>> ;
-M: scroller output-model viewport>> children>> first output-model ;
 
 GENERIC: , ( uiitem -- )
 M: gadget , f <layout> make:, ;
@@ -32,3 +24,5 @@ M: model -> dup , ;
 : <hbox*> ( gadgets -- track ) horizontal <box*> ; inline
 : <vbox> ( gadgets -- track ) vertical <box> ; inline
 : <vbox*> ( gadgets -- track ) vertical <box*> ; inline
+
+: <frp-book> ( gadgets -- book ) { } make:make [ gadget>> ] map f <book> ; inline

@@ -11,7 +11,7 @@ IN: drills
 SYMBOLS: it startLength ;
 : big ( gadget -- gadget ) T{ font { name "sans-serif" } { size 30 } } >>font ;
 : card ( model quot -- button ) <arrow> <label-control> big [ next ] <book-btn> ;
-: op ( quot str -- gadget ) <label> big swap <book-bevel-btn> ;
+: op ( quot str -- gadget ) <label> big swap <book-border-btn> ;
 
 : show ( model -- gadget ) dup it set-global [ random ] <arrow>
    { [ [ first ] card ]
