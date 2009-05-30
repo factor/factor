@@ -14,15 +14,14 @@ input-stream output-stream local-address remote-address
 username object quit? ;
 
 HOOK: handle-login threaded-server ( -- username )
+HOOK: handle-managed-client* managed-server ( -- )
 HOOK: handle-already-logged-in managed-server ( -- )
 HOOK: handle-client-join managed-server ( -- )
 HOOK: handle-client-disconnect managed-server ( -- )
-HOOK: handle-managed-client* managed-server ( -- )
 
 M: managed-server handle-already-logged-in ;
 M: managed-server handle-client-join ;
 M: managed-server handle-client-disconnect ;
-M: managed-server handle-managed-client* ;
 
 : server ( -- managed-client ) managed-server get ;
 : client ( -- managed-client ) managed-client get ;
@@ -76,17 +75,17 @@ ERROR: already-logged-in username ;
     username server clients>> delete-at ;
 
 : handle-managed-client ( -- )
-    [ [ handle-managed-client* client quit?>> not ] loop ]
-    [ delete-managed-client handle-client-disconnect ]
-    [ ] cleanup ;
+    handle-login <managed-client> managed-client set
+    add-managed-client handle-client-join
+    [ handle-managed-client* client quit?>> not ] loop ;
 
 PRIVATE>
 
 M: managed-server handle-client*
     managed-server set
-    handle-login <managed-client> managed-client set
-    add-managed-client
-    handle-client-join handle-managed-client ;
+    [ handle-managed-client ]
+    [ delete-managed-client handle-client-disconnect ]
+    [ ] cleanup ;
 
 : new-managed-server ( port name class -- server )
     new-threaded-server
