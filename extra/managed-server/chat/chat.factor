@@ -4,7 +4,8 @@ USING: accessors assocs combinators combinators.smart
 destructors fry io io.encodings.utf8 kernel managed-server
 namespaces parser sequences sorting splitting strings.parser
 unicode.case unicode.categories calendar calendar.format
-locals multiline ;
+locals multiline io.encodings.binary io.encodings.string
+prettyprint ;
 IN: managed-server.chat
 
 TUPLE: chat-server < managed-server ;
@@ -35,6 +36,31 @@ CONSTANT: line-beginning "-!- "
         [ "Unknown command: " prepend print flush ] if
     ] if-empty ;
 
+: usage ( string -- )
+    chat-docs get at print flush ;
+
+: username-taken-string ( username -- string )
+    "The username ``" "'' is already in use; try again." surround ;
+
+: warn-name-changed ( old new -- )
+    [
+        [ line-beginning "``" ] 2dip
+        [ "'' is now known as ``" ] dip "''"
+    ] "" append-outputs-as send-everyone ;
+
+: handle-nick ( string -- )
+    [
+        "nick" usage
+    ] [
+        dup clients key? [
+            username-taken-string print flush
+        ] [
+            [ username swap warn-name-changed ]
+            [ username clients rename-at ]
+            [ client (>>username) ] tri
+        ] if
+    ] if-empty ;
+
 :: add-command ( quot docs key -- )
     quot key commands get set-at
     docs key chat-docs get set-at ;
@@ -44,7 +70,7 @@ CONSTANT: line-beginning "-!- "
 Displays the documentation for a command.">
 "help" add-command
 
-[ drop clients keys ", " join print flush ]
+[ drop clients keys [ "``" "''" surround ] map ", " join print flush ]
 <" Syntax: /who
 Shows the list of connected users.">
 "who" add-command
@@ -52,6 +78,11 @@ Shows the list of connected users.">
 [ drop gmt timestamp>rfc822 print flush ]
 <" Syntax: /time
 Returns the current GMT time."> "time" add-command
+
+[ handle-nick ]
+<" Syntax: /nick nickname
+Changes your nickname.">
+"nick" add-command
 
 [ handle-me ]
 <" Syntax: /me action">
@@ -93,8 +124,7 @@ M: chat-server handle-client-disconnect
     ] "" append-outputs-as send-everyone ;
 
 M: chat-server handle-already-logged-in
-    "The username ``" username "'' is already in use; try again."
-    3append print flush ;
+    username username-taken-string print flush ;
 
 M: chat-server handle-managed-client*
     readln dup f = [ t client (>>quit?) ] when
