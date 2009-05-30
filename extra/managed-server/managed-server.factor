@@ -11,9 +11,9 @@ TUPLE: managed-server < threaded-server clients ;
 
 TUPLE: managed-client
 input-stream output-stream local-address remote-address
-username object ;
+username object quit? ;
 
-HOOK: login threaded-server ( -- username )
+HOOK: handle-login threaded-server ( -- username )
 HOOK: handle-already-logged-in managed-server ( -- )
 HOOK: handle-client-join managed-server ( -- )
 HOOK: handle-client-disconnect managed-server ( -- )
@@ -31,16 +31,11 @@ M: managed-server handle-managed-client* ;
 : username ( -- string ) client username>> ;
 
 : send-everyone ( seq -- )
-    client-streams swap '[
+    [ client-streams ] dip '[
         output-stream>> [ _ print flush ] with-output-stream*
     ] each ;
 
-: print-client ( string -- )
-    client output-stream>>
-    [ stream-print ] [ stream-flush ] bi ;
-
 ERROR: already-logged-in username ;
-ERROR: normal-quit ;
 
 <PRIVATE
 
@@ -65,17 +60,15 @@ ERROR: normal-quit ;
     username server clients>> delete-at ;
 
 : handle-managed-client ( -- )
-    [ [ handle-managed-client* t ] loop ]
+    [ [ handle-managed-client* client quit?>> not ] loop ]
     [ delete-managed-client handle-client-disconnect ]
     [ ] cleanup ;
 
 PRIVATE>
 
-M: managed-server login readln ;
-
 M: managed-server handle-client*
     managed-server set
-    login <managed-client> managed-client set
+    handle-login <managed-client> managed-client set
     add-managed-client
     handle-client-join handle-managed-client ;
 
