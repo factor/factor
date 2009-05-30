@@ -21,15 +21,17 @@ SYMBOL: current-stream
 : timestamp-path ( timestamp -- path )
     timestamp>ymd ".log" append log-directory prepend-path ;
 
+: update-current-stream ( timestamp -- )
+    current-stream get [ dispose ] when*
+    [ day-of-year current-day set ]
+    [ timestamp-path latin1 <file-appender> ] bi
+    current-stream set ;
+
+: same-day? ( timestamp -- ? ) day-of-year current-day get = ;
+
 : timestamp>stream ( timestamp  -- stream )
-    dup day-of-year current-day get = [
-        drop
-    ] [
-        current-stream get [ dispose ] when*
-        [ day-of-year current-day set ]
-        [ timestamp-path latin1 <file-appender> ] bi
-        current-stream set
-    ] if current-stream get ;
+    dup same-day? [ drop ] [ update-current-stream ] if
+    current-stream get ;
 
 : log-message ( string timestamp -- )
     [ add-timestamp ] [ timestamp>stream ] bi
