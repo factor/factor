@@ -1,7 +1,7 @@
 USING: accessors arrays kernel models monads ui.frp.signals ui.gadgets
 ui.gadgets.buttons ui.gadgets.buttons.private ui.gadgets.editors
-ui.gadgets.tables sequences splitting models.illusion
-ui.gadgets.scrollers documents ;
+ui.gadgets.tables sequences splitting
+ui.gadgets.scrollers ui.gadgets.borders ;
 IN: ui.frp.gadgets
 
 TUPLE: frp-button < button hook ;
@@ -32,10 +32,13 @@ M: table output-model dup multiple-selection?>>
    [ dup val-quot>> [ selected-value>> ] [ selected-index*>> ] if ] if ;
 M: model-field output-model field-model>> ;
 M: scroller output-model viewport>> children>> first output-model ;
-M: multiline-editor output-model model>> [ "\n" join ] <illusion> ;
 
 : <frp-field> ( -- field ) "" <model> <model-field> ;
-: <frp-editor> ( model -- editor ) [ "\n" split document new-model ] bind <multiline-editor> swap >>model ;
+: <frp-field*> ( model -- field ) "" <model> swap <switch> <model-field> ;
+: <frp-editor> ( model -- gadget )
+    model-field [ <multiline-editor> ] dip new-border dup gadget-child >>editor
+    field-theme swap >>field-model { 1 0 } >>align ;
+: <frp-editor*> ( model -- editor ) "" <model> swap <switch> <frp-editor> ;
 
 IN: accessors
 M: frp-button text>> children>> first text>> ;
