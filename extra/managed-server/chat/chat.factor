@@ -1,23 +1,21 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.smart
-destructors fry io kernel managed-server namespaces
-sequences splitting unicode.case ;
+destructors fry io io.encodings.utf8 kernel managed-server
+namespaces parser sequences sorting splitting strings.parser
+unicode.case unicode.categories calendar calendar.format
+locals multiline ;
 IN: managed-server.chat
-
-CONSTANT: line-beginning "-!- "
 
 TUPLE: chat-server < managed-server ;
 
-: <chat-server> ( port -- managed-server )
-    "chat-server" chat-server new-managed-server ;
+SYMBOL: commands
+commands [ H{ } clone ] initialize
 
-: unknown-command ( string -- )
-    "Unknown command: " prepend print-client ;
+SYMBOL: chat-docs
+chat-docs [ H{ } clone ] initialize
 
-: handle-who ( string -- )
-    drop
-    clients keys ", " join print flush ;
+CONSTANT: line-beginning "-!- "
 
 : handle-me ( string -- )
     [
@@ -25,20 +23,63 @@ TUPLE: chat-server < managed-server ;
     ] "" append-outputs-as send-everyone ;
 
 : handle-quit ( string -- )
-    client [ (>>object) ] [ output-stream>> dispose ] bi ;
+    client [ (>>object) ] [ t >>quit? drop ] bi ;
+
+: handle-help ( string -- )
+    [
+        "Commands: "
+        commands get keys natural-sort ", " join append print flush
+    ] [
+        chat-docs get ?at
+        [ print flush ]
+        [ "Unknown command: " prepend print flush ] if
+    ] if-empty ;
+
+:: add-command ( quot docs key -- )
+    quot key commands get set-at
+    docs key chat-docs get set-at ;
+
+[ handle-help ]
+<" Syntax: /help [command]
+Displays the documentation for a command.">
+"help" add-command
+
+[ drop clients keys ", " join print flush ]
+<" Syntax: /who
+Shows the list of connected users.">
+"who" add-command
+
+[ drop gmt timestamp>rfc822 print flush ]
+<" Syntax: /time
+Returns the current GMT time."> "time" add-command
+
+[ handle-me ]
+<" Syntax: /me action">
+"me" add-command
+
+[ handle-quit ]
+<" Syntax: /quit [message]
+Disconnects a user from the chat server."> "quit" add-command
 
 : handle-command ( string -- )
-    " " split1 swap >lower {
-        { "who" [ handle-who ] }
-        { "me" [ handle-me ] }
-        { "quit" [ handle-quit ] }
-        [ " " glue unknown-command ]
-    } case ;
+    dup " " split1 swap >lower commands get at* [
+        call( string -- ) drop
+    ] [
+        2drop "Unknown command: " prepend print flush
+    ] if ;
+
+: <chat-server> ( port -- managed-server )
+    "chat-server" chat-server new-managed-server
+        utf8 >>encoding ;
 
 : handle-chat ( string -- )
     [
         [ username ": " ] dip
     ] "" append-outputs-as send-everyone ;
+
+M: chat-server handle-login
+    "Username: " write flush
+    readln ;
 
 M: chat-server handle-client-join
     [
@@ -56,6 +97,7 @@ M: chat-server handle-already-logged-in
     3append print flush ;
 
 M: chat-server handle-managed-client*
-    readln [
+    readln dup f = [ t client (>>quit?) ] when
+    [
         "/" ?head [ handle-command ] [ handle-chat ] if
     ] unless-empty ;
