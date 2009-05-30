@@ -174,6 +174,7 @@ find_os() {
         CYGWIN_NT-5.2-WOW64) OS=winnt;;
         *CYGWIN_NT*) OS=winnt;;
         *CYGWIN*) OS=winnt;;
+        MINGW32*) OS=winnt;;
         *darwin*) OS=macosx;;
         *Darwin*) OS=macosx;;
         *linux*) OS=linux;;
