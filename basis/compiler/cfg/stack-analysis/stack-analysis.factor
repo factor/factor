@@ -88,21 +88,19 @@ GENERIC: visit ( insn -- )
 UNION: neutral-insn
     ##flushable
     ##effect
-    ##branch
-    ##loop-entry
-    ##conditional-branch
-    ##compare-imm-branch
-    ##dispatch ;
+    ##loop-entry ;
 
 M: neutral-insn visit , ;
 
 UNION: sync-if-back-edge
     ##branch
     ##conditional-branch
-    ##compare-imm-branch ;
+    ##compare-imm-branch
+    ##dispatch ;
 
 M: sync-if-back-edge visit
-    basic-block get [ successors>> ] [ number>> ] bi '[ number>> _ < ] any?
+    basic-block get [ successors>> ] [ number>> ] bi
+    '[ number>> _ < ] any?
     [ sync-state ] when
     , ;
 
@@ -173,8 +171,9 @@ M: ##alien-callback visit , ;
 ! Maps basic-blocks to states
 SYMBOLS: state-in state-out ;
 
-: with-state ( state quot -- )
-    [ state ] dip with-variable ; inline
+: initial-state ( bb states -- state ) 2drop <state> ;
+
+: single-predecessor ( bb states -- state ) nip first clone ;
 
 ERROR: must-equal-failed seq ;
 
@@ -225,32 +224,32 @@ ERROR: must-equal-failed seq ;
 
 ERROR: cannot-merge-poisoned states ;
 
+: multiple-predecessors ( bb states -- state )
+    dup [ not ] any? [
+        [ <state> ] 2dip
+        sift merge-heights
+    ] [
+        dup [ poisoned?>> ] any? [
+            cannot-merge-poisoned
+        ] [
+            [ state new ] 2dip
+            [ predecessors>> ] dip
+            {
+                [ merge-locs ]
+                [ merge-actual-locs ]
+                [ merge-heights ]
+                [ merge-changed-locs ]
+            } 2cleave
+        ] if
+    ] if ;
+
 : merge-states ( bb states -- state )
     ! If any states are poisoned, save all registers
     ! to the stack in each branch
     dup length {
-        { 0 [ 2drop <state> ] }
-        { 1 [ nip first clone ] }
-        [
-            drop
-            dup [ not ] any? [
-                [ <state> ] 2dip
-                sift merge-heights
-            ] [
-                dup [ poisoned?>> ] any? [
-                    cannot-merge-poisoned
-                ] [
-                    [ state new ] 2dip
-                    [ predecessors>> ] dip
-                    {
-                        [ merge-locs ]
-                        [ merge-actual-locs ]
-                        [ merge-heights ]
-                        [ merge-changed-locs ]
-                    } 2cleave
-                ] if
-            ] if
-        ]
+        { 0 [ initial-state ] }
+        { 1 [ single-predecessor ] }
+        [ drop multiple-predecessors ]
     } case ;
 
 : block-in-state ( bb -- states )
@@ -269,12 +268,12 @@ ERROR: cannot-merge-poisoned states ;
         dup basic-block set
         dup block-in-state
         [ swap set-block-in-state ] [
-            [
+            state [
                 [ instructions>> [ visit ] each ]
                 [ [ state get ] dip set-block-out-state ]
                 [ ]
                 tri
-            ] with-state
+            ] with-variable
         ] 2bi
     ] V{ } make >>instructions drop ;
 
