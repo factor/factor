@@ -37,8 +37,8 @@ ERROR: no-such-client username ;
 
 <PRIVATE
 
-: (send-client) ( seq managed-client -- )
-    swap output-stream>> '[ _ print flush ] with-output-stream* ;
+: (send-client) ( managed-client seq -- )
+    [ output-stream>> ] dip '[ _ print flush ] with-output-stream* ;
 
 PRIVATE>
 
