@@ -29,11 +29,27 @@ M: managed-server handle-managed-client* ;
 : clients ( -- assoc ) server clients>> ;
 : client-streams ( -- assoc ) clients values ;
 : username ( -- string ) client username>> ;
+: everyone-else ( -- assoc )
+    clients [ drop username = not ] assoc-filter ;
+: everyone-else-streams ( -- assoc ) everyone-else values ;
+
+ERROR: no-such-client username ;
+
+<PRIVATE
+
+: (send-client) ( seq managed-client -- )
+    swap output-stream>> '[ _ print flush ] with-output-stream* ;
+
+PRIVATE>
+
+: send-client ( seq username -- )
+    clients ?at [ no-such-client ] [ (send-client) ] if ;
 
 : send-everyone ( seq -- )
-    [ client-streams ] dip '[
-        output-stream>> [ _ print flush ] with-output-stream*
-    ] each ;
+    [ client-streams ] dip '[ _ (send-client) ] each ;
+
+: send-everyone-else ( seq -- )
+    [ everyone-else-streams ] dip '[ _ (send-client) ] each ;
 
 ERROR: already-logged-in username ;
 
