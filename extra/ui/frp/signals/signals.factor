@@ -18,11 +18,11 @@ M: filter-model (model-changed) [ value>> ] dip 2dup quot>> call( a -- ? )
    [ set-model ] [ 2drop ] if ;
 : <filter> ( model quot -- filter-signal ) [ 1array filter-model <multi-model> ] dip >>quot ;
 
-TUPLE: fold-model < multi-model oldval quot ;
-M: fold-model (model-changed) [ [ value>> ] [ [ oldval>> ] [ quot>> ] bi ] bi*
+TUPLE: fold-model < multi-model quot ;
+M: fold-model (model-changed) [ [ value>> ] [ [ value>> ] [ quot>> ] bi ] bi*
    call( val oldval -- newval ) ] keep set-model ;
 : <fold> ( model oldval quot -- signal ) rot 1array fold-model <multi-model> swap >>quot
-   swap [ >>oldval ] [ >>value ] bi ;
+   swap >>value ;
 
 TUPLE: updater-model < multi-model values updates ;
 M: updater-model (model-changed) tuck updates>> =
