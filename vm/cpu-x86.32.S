@@ -55,6 +55,10 @@ DEF(bool,check_sse2,(void)):
 	mov %edx,%eax
 	ret
 
+DEF(long long,read_timestamp_counter,(void)):
+	rdtsc
+	ret
+
 DEF(void,primitive_inline_cache_miss,(void)):
 	mov (%esp),%ebx
 DEF(void,primitive_inline_cache_miss_tail,(void)):
