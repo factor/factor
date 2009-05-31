@@ -35,10 +35,10 @@ TUPLE: switch-model < multi-model original switcher on ;
 M: switch-model (model-changed) 2dup switcher>> =
    [ [ value>> ] [ t >>on ] bi* set-model ]
    [ dup on>> [ 2drop ] [ [ value>> ] dip set-model ] if ] if ;
-: <switch> ( signal1 signal2 -- signal' ) [ 2array switch-model <multi-model> ] 2keep
+: <switch> ( signal1 signal2 -- signal' ) swap [ 2array switch-model <multi-model> ] 2keep
    [ >>original ] [ >>switcher ] bi* ;
 M: switch-model model-activated [ original>> ] keep model-changed ;
-: >behavior ( event -- behavior ) t <model> swap <switch> ;
+: >behavior ( event -- behavior ) t <model> <switch> ;
 
 TUPLE: mapped-model < multi-model model quot ;
 : new-mapped-model ( model quot class -- mapped-model ) [ over 1array ] dip
@@ -64,7 +64,7 @@ TUPLE: action < multi-model quot ;
 M: action (model-changed) [ [ value>> ] [ quot>> ] bi* call( a -- b ) ] keep value>>
    [ swap add-connection ] 2keep model-changed ;
 : <action> ( model quot -- action-signal ) [ 1array action <multi-model> ] dip >>quot dup f <action-value> >>value value>> ;
-
+<PRIVATE
 TUPLE: | < multi-model ;
 : <|> ( models -- product ) | <multi-model> ;
 GENERIC: models-changed ( product -- )
@@ -82,5 +82,5 @@ M: | model-activated dup model-changed ;
 TUPLE: & < | ;
 : <&> ( models -- product ) & <multi-model> ;
 M: & models-changed dependencies>> [ f swap (>>value) ] each ;
-
+PRIVATE>
 FMAPS: $> <$ fmap FOR & | ;

@@ -33,12 +33,29 @@ M: table output-model dup multiple-selection?>>
 M: model-field output-model field-model>> ;
 M: scroller output-model viewport>> children>> first output-model ;
 
+TUPLE: frp-field < field frp-model ;
+
+M: model-field graft*
+    [ [ field-model>> value>> ] [ editor>> ] bi set-editor-string ]
+    [ dup editor>> model>> add-connection ]
+    bi ;
+
+! frp-fields observe the underlying editor, relaying the string to the
+! frp-model.  Also, however, they relay the frp-model to the document and
+! relayout 
+
+! Frp boxes should unactivate all models attatched to them
+
+! Table gadgets should have slots for their illusions, not requireing manual activation
+! and allowing deactivation an superior memory management
+
 : <frp-field> ( -- field ) "" <model> <model-field> ;
-: <frp-field*> ( model -- field ) "" <model> swap <switch> <model-field> ;
+: <frp-field*> ( model -- field ) "" <model> <switch> <model-field> ;
 : <frp-editor> ( model -- gadget )
     model-field [ <multiline-editor> ] dip new-border dup gadget-child >>editor
     field-theme swap >>field-model { 1 0 } >>align ;
-: <frp-editor*> ( model -- editor ) "" <model> swap <switch> <frp-editor> ;
+: <frp-editor*> ( model -- editor ) "" <model> <switch> <frp-editor> ;
+: after-empty ( model quot -- model' ) fmap "" <model> <switch> ; inline
 
 IN: accessors
 M: frp-button text>> children>> first text>> ;
