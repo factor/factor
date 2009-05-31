@@ -73,4 +73,5 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
 #ifdef WINDOWS
 	.section .drectve
 	.ascii " -export:check_sse2"
+	.ascii " -export:read_timestamp_counter"
 #endif
