@@ -79,7 +79,7 @@ HELP: threaded-server
 { $class-description "The class of threaded servers. New instances are created with " { $link <threaded-server> } ". This class may be subclassed, and instances of subclasses should be created with " { $link new-threaded-server } ". See " { $link "server-config" } " for slot documentation." } ;
 
 HELP: new-threaded-server
-{ $values { "class" class } { "threaded-server" threaded-server } }
+{ $values { "encoding" "an encoding descriptor" } { "class" class } { "threaded-server" threaded-server } }
 { $description "Creates a new instance of a subclass of " { $link threaded-server } ". Subclasses can implement the " { $link handle-client* } " generic word." } ;
 
 HELP: <threaded-server>
