@@ -54,6 +54,7 @@ M: ##phi uses-vregs inputs>> ;
 M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: _dispatch uses-vregs src>> 1array ;
+M: _gc uses-vregs live-in>> ;
 M: insn uses-vregs drop f ;
 
 ! Instructions that use vregs
@@ -67,4 +68,5 @@ UNION: vreg-insn
 ##compare-imm-branch
 _conditional-branch
 _compare-imm-branch
-_dispatch ;
+_dispatch
+_gc ;

@@ -3,13 +3,20 @@
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
 generic.single combinators deques search-deques macros
-source-files.errors stack-checker stack-checker.state
-stack-checker.inlining stack-checker.errors combinators.short-circuit
-compiler.errors compiler.units compiler.tree.builder
-compiler.tree.optimizer compiler.cfg.builder compiler.cfg.optimizer
-compiler.cfg.linearization compiler.cfg.two-operand
-compiler.cfg.linear-scan compiler.cfg.stack-frame compiler.cfg.rpo
-compiler.codegen compiler.utilities ;
+source-files.errors combinators.short-circuit
+
+stack-checker stack-checker.state stack-checker.inlining stack-checker.errors
+
+compiler.errors compiler.units compiler.utilities
+
+compiler.tree.builder
+compiler.tree.optimizer
+
+compiler.cfg.builder
+compiler.cfg.optimizer
+compiler.cfg.mr
+
+compiler.codegen ;
 IN: compiler
 
 SYMBOL: compile-queue
@@ -146,10 +153,7 @@ t compile-dependencies? set-global
 : backend ( nodes word -- )
     build-cfg [
         optimize-cfg
-        convert-two-operand
-        linear-scan
         build-mr
-        build-stack-frame
         generate
         save-asm
     ] each ;

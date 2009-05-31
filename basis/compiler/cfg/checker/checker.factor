@@ -54,5 +54,5 @@ ERROR: undefined-values uses defs ;
     compute-liveness
     [ entry>> live-in assoc-empty? [ bad-live-in ] unless ]
     [ [ check-basic-block ] each-basic-block ]
-    [ build-mr check-mr ]
+    [ flatten-cfg check-mr ]
     tri ;
