@@ -19,7 +19,9 @@ HOOK: handle-already-logged-in managed-server ( -- )
 HOOK: handle-client-join managed-server ( -- )
 HOOK: handle-client-disconnect managed-server ( -- )
 
-M: managed-server handle-already-logged-in ;
+ERROR: already-logged-in username ;
+
+M: managed-server handle-already-logged-in already-logged-in ;
 M: managed-server handle-client-join ;
 M: managed-server handle-client-disconnect ;
 
@@ -50,8 +52,6 @@ PRIVATE>
 : send-everyone-else ( seq -- )
     [ everyone-else-streams ] dip '[ _ (send-client) ] each ;
 
-ERROR: already-logged-in username ;
-
 <PRIVATE
 
 : <managed-client> ( username -- managed-client )
@@ -63,10 +63,7 @@ ERROR: already-logged-in username ;
         remote-address get >>remote-address ;
 
 : check-logged-in ( username -- username )
-    dup server clients>> key? [
-        [ server ] dip
-        [ handle-already-logged-in ] [ already-logged-in ] bi
-    ] when ;
+    dup clients key? [ handle-already-logged-in ] when ;
 
 : add-managed-client ( -- )
     client username check-logged-in clients set-at ;
@@ -87,7 +84,7 @@ M: managed-server handle-client*
     [ delete-managed-client handle-client-disconnect ]
     [ ] cleanup ;
 
-: new-managed-server ( port name class -- server )
+: new-managed-server ( port name encoding class -- server )
     new-threaded-server
         swap >>name
         swap >>insecure
