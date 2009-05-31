@@ -4,7 +4,7 @@ USING: kernel math namespaces assocs hashtables sequences arrays
 accessors vectors combinators sets classes compiler.cfg
 compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.copy-prop compiler.cfg.rpo
-compiler.cfg.liveness ;
+compiler.cfg.liveness compiler.cfg.local ;
 IN: compiler.cfg.alias-analysis
 
 ! We try to eliminate redundant slot operations using some simple heuristics.

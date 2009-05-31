@@ -76,6 +76,3 @@ SYMBOL: work-list
     H{ } clone live-outs set
     dup post-order add-to-work-list
     work-list get [ liveness-step ] slurp-deque ;
-
-: local-optimization ( cfg init-quot: ( live-in -- ) insn-quot: ( insns -- insns' ) -- cfg' )
-    [ dup ] 2dip '[ _ _ optimize-basic-block ] each-basic-block ;

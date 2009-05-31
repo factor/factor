@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs biassocs classes kernel math accessors
 sorting sets sequences
+compiler.cfg.local
 compiler.cfg.liveness
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.expressions

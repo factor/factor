@@ -12,20 +12,10 @@ IN: compiler.cfg.linearization
 ! Convert CFG IR to machine IR.
 GENERIC: linearize-insn ( basic-block insn -- )
 
-: linearize-insns ( bb insns -- )
-    dup instructions>> [ linearize-insn ] with each ;
-
-: gc? ( bb -- ? )
-    instructions>> [ ##allocation? ] any? ;
-
-: object-pointer-regs ( basic-block -- vregs )
-    live-in keys [ reg-class>> int-regs eq? ] filter ;
-
 : linearize-basic-block ( bb -- )
     [ number>> _label ]
-    [ dup gc? [ object-pointer-regs _gc ] [ drop ] if ]
-    [ linearize-insns ]
-    tri ;
+    [ dup instructions>> [ linearize-insn ] with each ]
+    bi ;
 
 M: insn linearize-insn , drop ;
 
@@ -85,6 +75,6 @@ M: ##dispatch linearize-insn
         bi
     ] { } make ;
 
-: build-mr ( cfg -- mr )
+: flatten-cfg ( cfg -- mr )
     [ linearize-basic-blocks ] [ word>> ] [ label>> ] tri
     <mr> ;

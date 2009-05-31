@@ -7,7 +7,8 @@ parser compiler.tree.builder compiler.tree.optimizer
 compiler.cfg.builder compiler.cfg.linearization
 compiler.cfg.registers compiler.cfg.stack-frame
 compiler.cfg.linear-scan compiler.cfg.two-operand
-compiler.cfg.optimizer ;
+compiler.cfg.liveness compiler.cfg.optimizer
+compiler.cfg.mr ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-cfg ( quot -- cfgs )
@@ -18,20 +19,14 @@ M: callable test-cfg
 M: word test-cfg
     [ build-tree optimize-tree ] keep build-cfg ;
 
-SYMBOL: allocate-registers?
-
 : test-mr ( quot -- mrs )
     test-cfg [
         optimize-cfg
-        convert-two-operand
-        allocate-registers? get [ linear-scan ] when
         build-mr
-        allocate-registers? get [ build-stack-frame ] when
     ] map ;
 
 : insn. ( insn -- )
-    tuple>array allocate-registers? get [ but-last ] unless
-    [ pprint bl ] each nl ;
+    tuple>array [ pprint bl ] each nl ;
 
 : mr. ( mrs -- )
     [

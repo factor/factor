@@ -31,7 +31,7 @@ IN: compiler.cfg.stack-analysis.tests
     dup check-for-redundant-ops ;
 
 : linearize ( cfg -- mr )
-    build-mr instructions>> ;
+    flatten-cfg instructions>> ;
 
 [ ] [ [ ] test-stack-analysis drop ] unit-test
 

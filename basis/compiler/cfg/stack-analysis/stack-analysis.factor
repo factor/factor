@@ -98,9 +98,13 @@ UNION: sync-if-back-edge
     ##compare-imm-branch
     ##dispatch ;
 
+SYMBOL: local-only?
+
+t local-only? set-global
+
 M: sync-if-back-edge visit
     basic-block get [ successors>> ] [ number>> ] bi
-    '[ number>> _ < ] any?
+    '[ number>> _ < local-only? get or ] any?
     [ sync-state ] when
     , ;
 

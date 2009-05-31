@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors math namespaces sequences kernel fry
 compiler.cfg compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.liveness ;
+compiler.cfg.liveness compiler.cfg.local ;
 IN: compiler.cfg.height
 
 ! Combine multiple stack height changes into one at the
