@@ -34,6 +34,3 @@ SYMBOL: visited
 
 : each-basic-block ( cfg quot -- )
     [ reverse-post-order ] dip each ; inline
-
-: optimize-basic-block ( bb init-quot insn-quot -- )
-    [ '[ live-in keys @ ] ] [ '[ _ change-instructions drop ] ] bi* bi ; inline
