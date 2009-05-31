@@ -100,8 +100,7 @@ Disconnects a user from the chat server."> "quit" add-command
     ] if ;
 
 : <chat-server> ( port -- managed-server )
-    "chat-server" chat-server new-managed-server
-        utf8 >>encoding ;
+    "chat-server" utf8 chat-server new-managed-server ;
 
 : handle-chat ( string -- )
     [

@@ -3,9 +3,8 @@ accessors kernel ;
 IN: tty-server
 
 : <tty-server> ( port -- )
-    <threaded-server>
+    utf8 <threaded-server>
         "tty-server" >>name
-        utf8 >>encoding
         swap local-server >>insecure
         [ listener ] >>handler
     start-server ;
