@@ -72,6 +72,13 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	call *ARG3                         /* call memcpy */
 	ret                                /* return _with new stack_ */
 
+DEF(long long,read_timestamp_counter,(void)):
+	mov $0,%rax
+	rdtsc
+	shl $32,%rdx
+	or %rdx,%rax
+	ret
+
 DEF(void,primitive_inline_cache_miss,(void)):
 	mov (%rsp),%rbx
 DEF(void,primitive_inline_cache_miss_tail,(void)):
