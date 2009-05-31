@@ -14,7 +14,7 @@ IN: compiler.cfg.gc-checks
 : insert-gc-check ( basic-block -- )
     dup gc? [
         dup
-        [ swap object-pointer-regs \ _gc new-insn suffix ]
+        [ swap object-pointer-regs \ ##gc new-insn prefix ]
         change-instructions drop
     ] [ drop ] if ;
 
