@@ -7,7 +7,7 @@ IN: ui.frp.gadgets
 TUPLE: frp-button < button hook ;
 : <frp-button> ( gadget -- button ) [
       [ dup hook>> [ call( button -- ) ] [ drop ] if* ] keep
-      dup set-control-value
+      [ dup set-control-value ] [ f swap set-control-value ] bi
    ] frp-button new-button f <basic> >>model ;
 : <frp-border-button> ( text -- button ) <frp-button> border-button-theme ;
 
@@ -25,37 +25,35 @@ M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 : <frp-list*> ( -- table ) V{ } clone <model> <frp-list> ;
 : indexed ( table -- table ) f >>val-quot ;
 
+TUPLE: frp-field < field frp-model ;
+: <frp-field> ( model -- gadget ) frp-field new-field swap >>frp-model ;
+M: frp-field graft*
+    [ [ frp-model>> value>> ] [ editor>> ] bi set-editor-string ]
+    [ dup editor>> model>> add-connection ]
+    [ dup frp-model>> add-connection ] tri ;
+M: frp-field ungraft*
+   [ dup editor>> model>> remove-connection ]
+   [ dup frp-model>> remove-connection ] bi ;
+M: frp-field model-changed 2dup frp-model>> =
+    [ [ value>> ] [ editor>> ] bi* set-editor-string ]
+    [ nip [ editor>> editor-string ] [ frp-model>> ] bi set-model ] if ;
+: after-empty ( model quot -- model' ) fmap "" <model> <switch> ; inline ! pattern for editors, labels
+
+: <frp-field*> ( -- field ) "" <model> <frp-field> ;
+: <empty-field> ( model -- field ) "" <model> <switch> <frp-field> ;
+: <frp-editor> ( model -- gadget )
+    frp-field [ <multiline-editor> ] dip new-border dup gadget-child >>editor
+    field-theme swap >>frp-model { 1 0 } >>align ;
+: <empty-editor> ( model -- editor ) "" <model> <switch> <frp-editor> ;
+: <frp-editor*> ( -- editor ) "" <model> <frp-editor> ;
+
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
 M: table output-model dup multiple-selection?>>
    [ dup val-quot>> [ selected-values>> ] [ selected-indices*>> ] if ]
    [ dup val-quot>> [ selected-value>> ] [ selected-index*>> ] if ] if ;
-M: model-field output-model field-model>> ;
+M: frp-field output-model frp-model>> ;
 M: scroller output-model viewport>> children>> first output-model ;
-
-TUPLE: frp-field < field frp-model ;
-
-M: model-field graft*
-    [ [ field-model>> value>> ] [ editor>> ] bi set-editor-string ]
-    [ dup editor>> model>> add-connection ]
-    bi ;
-
-! frp-fields observe the underlying editor, relaying the string to the
-! frp-model.  Also, however, they relay the frp-model to the document and
-! relayout 
-
-! Frp boxes should unactivate all models attatched to them
-
-! Table gadgets should have slots for their illusions, not requireing manual activation
-! and allowing deactivation an superior memory management
-
-: <frp-field> ( -- field ) "" <model> <model-field> ;
-: <frp-field*> ( model -- field ) "" <model> <switch> <model-field> ;
-: <frp-editor> ( model -- gadget )
-    model-field [ <multiline-editor> ] dip new-border dup gadget-child >>editor
-    field-theme swap >>field-model { 1 0 } >>align ;
-: <frp-editor*> ( model -- editor ) "" <model> <switch> <frp-editor> ;
-: after-empty ( model quot -- model' ) fmap "" <model> <switch> ; inline
 
 IN: accessors
 M: frp-button text>> children>> first text>> ;
