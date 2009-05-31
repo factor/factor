@@ -223,13 +223,13 @@ INSN: ##compare-imm < ##binary-imm cc temp ;
 INSN: ##compare-float-branch < ##conditional-branch ;
 INSN: ##compare-float < ##binary cc temp ;
 
+INSN: ##gc live-in ;
+
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;
 INSN: _epilogue stack-frame ;
 
 INSN: _label id ;
-
-INSN: _gc live-in ;
 
 INSN: _branch label ;
 

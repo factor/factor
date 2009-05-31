@@ -51,10 +51,10 @@ M: ##alien-getter uses-vregs src>> 1array ;
 M: ##alien-setter uses-vregs [ src>> ] [ value>> ] bi 2array ;
 M: ##fixnum-overflow uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: ##phi uses-vregs inputs>> ;
+M: ##gc uses-vregs live-in>> ;
 M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: _dispatch uses-vregs src>> 1array ;
-M: _gc uses-vregs live-in>> ;
 M: insn uses-vregs drop f ;
 
 ! Instructions that use vregs
@@ -66,7 +66,8 @@ UNION: vreg-insn
 ##fixnum-overflow
 ##conditional-branch
 ##compare-imm-branch
+##phi
+##gc
 _conditional-branch
 _compare-imm-branch
-_dispatch
-_gc ;
+_dispatch ;
