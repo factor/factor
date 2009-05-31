@@ -14,28 +14,43 @@ input-stream output-stream local-address remote-address
 username object quit? ;
 
 HOOK: handle-login threaded-server ( -- username )
+HOOK: handle-managed-client* managed-server ( -- )
 HOOK: handle-already-logged-in managed-server ( -- )
 HOOK: handle-client-join managed-server ( -- )
 HOOK: handle-client-disconnect managed-server ( -- )
-HOOK: handle-managed-client* managed-server ( -- )
 
-M: managed-server handle-already-logged-in ;
+ERROR: already-logged-in username ;
+
+M: managed-server handle-already-logged-in already-logged-in ;
 M: managed-server handle-client-join ;
 M: managed-server handle-client-disconnect ;
-M: managed-server handle-managed-client* ;
 
 : server ( -- managed-client ) managed-server get ;
 : client ( -- managed-client ) managed-client get ;
 : clients ( -- assoc ) server clients>> ;
 : client-streams ( -- assoc ) clients values ;
 : username ( -- string ) client username>> ;
+: everyone-else ( -- assoc )
+    clients [ drop username = not ] assoc-filter ;
+: everyone-else-streams ( -- assoc ) everyone-else values ;
+
+ERROR: no-such-client username ;
+
+<PRIVATE
+
+: (send-client) ( managed-client seq -- )
+    [ output-stream>> ] dip '[ _ print flush ] with-output-stream* ;
+
+PRIVATE>
+
+: send-client ( seq username -- )
+    clients ?at [ no-such-client ] [ (send-client) ] if ;
 
 : send-everyone ( seq -- )
-    [ client-streams ] dip '[
-        output-stream>> [ _ print flush ] with-output-stream*
-    ] each ;
+    [ client-streams ] dip '[ _ (send-client) ] each ;
 
-ERROR: already-logged-in username ;
+: send-everyone-else ( seq -- )
+    [ everyone-else-streams ] dip '[ _ (send-client) ] each ;
 
 <PRIVATE
 
@@ -48,10 +63,7 @@ ERROR: already-logged-in username ;
         remote-address get >>remote-address ;
 
 : check-logged-in ( username -- username )
-    dup server clients>> key? [
-        [ server ] dip
-        [ handle-already-logged-in ] [ already-logged-in ] bi
-    ] when ;
+    dup clients key? [ handle-already-logged-in ] when ;
 
 : add-managed-client ( -- )
     client username check-logged-in clients set-at ;
@@ -60,19 +72,19 @@ ERROR: already-logged-in username ;
     username server clients>> delete-at ;
 
 : handle-managed-client ( -- )
-    [ [ handle-managed-client* client quit?>> not ] loop ]
-    [ delete-managed-client handle-client-disconnect ]
-    [ ] cleanup ;
+    handle-login <managed-client> managed-client set
+    add-managed-client handle-client-join
+    [ handle-managed-client* client quit?>> not ] loop ;
 
 PRIVATE>
 
 M: managed-server handle-client*
     managed-server set
-    handle-login <managed-client> managed-client set
-    add-managed-client
-    handle-client-join handle-managed-client ;
+    [ handle-managed-client ]
+    [ delete-managed-client handle-client-disconnect ]
+    [ ] cleanup ;
 
-: new-managed-server ( port name class -- server )
+: new-managed-server ( port name encoding class -- server )
     new-threaded-server
         swap >>name
         swap >>insecure
