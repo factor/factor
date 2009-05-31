@@ -12,7 +12,7 @@ IN: ui.gadgets.alerts
 
 :: ask-user* ( model string -- model' )
    [ [let | lbl  [ string <label>  T{ font { name "sans-serif" } { size 14 } } >>font dup , ]
-            fldm [ <frp-field> ->% 1 ]
+            fldm [ <frp-field*> ->% 1 ]
             btn  [ "okay" <frp-border-button> model >>model ] |
          btn -> [ fldm swap <updates> ]
                 [ [ drop lbl close-window ] $> , ] bi
