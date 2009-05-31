@@ -13,13 +13,13 @@ IN: compiler.cfg.linear-scan.assignment
 ! but since we never have too many machine registers (around 30
 ! at most) and we probably won't have that many live at any one
 ! time anyway, it is not a problem to check each element.
-SYMBOL: active-intervals
+TUPLE: active-intervals seq ;
 
 : add-active ( live-interval -- )
-    active-intervals get push ;
+    active-intervals get seq>> push ;
 
 : lookup-register ( vreg -- reg )
-    active-intervals get [ vreg>> = ] with find nip reg>> ;
+    active-intervals get seq>> [ vreg>> = ] with find nip reg>> ;
 
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
@@ -41,8 +41,7 @@ SYMBOL: unhandled-intervals
 
 : expire-old-intervals ( n -- )
     active-intervals get
-    swap '[ end>> _ = ] partition
-    active-intervals set
+    [ swap '[ end>> _ = ] partition ] change-seq drop
     [ insert-spill ] each ;
 
 : insert-reload ( live-interval -- )
@@ -65,14 +64,17 @@ GENERIC: assign-registers-in-insn ( insn -- )
     [ defs-vregs ] [ temp-vregs ] [ uses-vregs ] tri 3append ;
 
 M: vreg-insn assign-registers-in-insn
-    active-intervals get over all-vregs '[ vreg>> _ member? ] filter
+    active-intervals get seq>> over all-vregs '[ vreg>> _ member? ] filter
     [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc
     >>regs drop ;
 
 M: insn assign-registers-in-insn drop ;
 
+: <active-intervals> ( -- obj )
+    V{ } clone active-intervals boa ;
+
 : init-assignment ( live-intervals -- )
-    V{ } clone active-intervals set
+    <active-intervals> active-intervals set
     <min-heap> unhandled-intervals set
     init-unhandled ;
 
