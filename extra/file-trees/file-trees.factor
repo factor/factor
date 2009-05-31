@@ -44,5 +44,5 @@ DEFER: (tree-insert)
 
 : <dir-table> ( tree-model -- table )
    <frp-list*> [ node>> 1array ] >>quot
-   [ selected-value>> [ file? not ] <filter> <switch> ]
+   [ selected-value>> [ file? not ] <filter> swap <switch> ]
    [ swap >>model ] bi ;
