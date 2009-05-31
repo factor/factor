@@ -15,7 +15,7 @@ HELP: <fold>
 
 HELP: <switch>
 { $values { "signal1" model } { "signal2" model } { "signal'" model } }
-{ $description "Creates a signal that starts with the behavior of signal1 and switches to the behavior of signal2 on its update" } ;
+{ $description "Creates a signal that starts with the behavior of signal2 and switches to the behavior of signal1 on its update" } ;
 
 HELP: <mapped>
 { $values { "model" model } { "quot" "applied to model's value on updates" } { "signal" model } }
