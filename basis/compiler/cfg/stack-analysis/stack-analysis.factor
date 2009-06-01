@@ -87,8 +87,7 @@ GENERIC: visit ( insn -- )
 ! Instructions which don't have any effect on the stack
 UNION: neutral-insn
     ##flushable
-    ##effect
-    ##loop-entry ;
+    ##effect ;
 
 M: neutral-insn visit , ;
 
@@ -96,17 +95,23 @@ UNION: sync-if-back-edge
     ##branch
     ##conditional-branch
     ##compare-imm-branch
-    ##dispatch ;
+    ##dispatch
+    ##loop-entry ;
 
 SYMBOL: local-only?
 
 t local-only? set-global
 
+: back-edge? ( from to -- ? )
+    [ number>> ] bi@ > ;
+
+: sync-state? ( -- ? )
+    basic-block get successors>>
+    [ [ predecessors>> ] keep '[ _ back-edge? ] any? ] any?
+    local-only? get or ;
+
 M: sync-if-back-edge visit
-    basic-block get [ successors>> ] [ number>> ] bi
-    '[ number>> _ < local-only? get or ] any?
-    [ sync-state ] when
-    , ;
+    sync-state? [ sync-state ] when , ;
 
 : adjust-d ( n -- ) state get [ + ] change-ds-height drop ;
 
