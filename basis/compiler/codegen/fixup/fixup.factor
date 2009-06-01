@@ -82,7 +82,7 @@ SYMBOL: relocation-table
     dup resolve-offset neg add-literal
     [ rt-here ] dip [ class>> ] [ offset>> ] bi add-relocation-entry ;
 
-: resolve-relative-label ( label-fixup -- )
+: resolve-relative-label ( label-fixup -- label )
     [ class>> ] [ offset>> ] [ resolve-offset ] tri 3array ;
 
 : resolve-labels ( label-fixups -- labels' )

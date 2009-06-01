@@ -7,4 +7,4 @@ IN: compiler.cfg.local
     [ '[ live-in keys @ ] ] [ '[ _ change-instructions drop ] ] bi* bi ; inline
 
 : local-optimization ( cfg init-quot: ( live-in -- ) insn-quot: ( insns -- insns' ) -- cfg' )
-    [ dup ] 2dip '[ _ _ optimize-basic-block ] each-basic-block ;
+    [ dup ] 2dip '[ _ _ optimize-basic-block ] each-basic-block ; inline

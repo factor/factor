@@ -15,12 +15,12 @@ IN: compiler.cfg.two-operand
 
 : make-copy/float ( dst src -- insn ) \ ##copy-float new-insn ; inline
 
-: convert-two-operand/integer ( insn -- insns )
+: convert-two-operand/integer ( insn -- )
     [ [ dst>> ] [ src1>> ] bi ##copy ]
     [ dup dst>> >>src1 , ]
     bi ; inline
 
-: convert-two-operand/float ( insn -- insns )
+: convert-two-operand/float ( insn -- )
     [ [ dst>> ] [ src1>> ] bi ##copy-float ]
     [ dup dst>> >>src1 , ]
     bi ; inline

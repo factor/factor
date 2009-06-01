@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces make math sequences sets
-assocs fry compiler.cfg compiler.cfg.instructions
-compiler.cfg.liveness ;
+assocs fry compiler.cfg compiler.cfg.instructions ;
 IN: compiler.cfg.rpo
 
 SYMBOL: visited
