@@ -79,6 +79,9 @@ M: x86 %return ( -- ) 0 RET ;
 : align-code ( n -- )
     0 <repetition> % ;
 
+M: x86 %dispatch-label ( label -- )
+    0 cell, rc-absolute-cell label-fixup ;
+
 :: (%slot) ( obj slot tag temp -- op )
     temp slot obj [+] LEA
     temp tag neg [+] ; inline
