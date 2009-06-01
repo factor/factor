@@ -37,9 +37,9 @@ DEFER: (tail-call?)
 : tail-call? ( -- ? )
     node-stack get [
         rest-slice
-        [ t ] [
-            [ (tail-call?) ]
-            [ first #terminate? not ]
-            bi and
-        ] if-empty
+        [ t ] [ (tail-call?) ] if-empty
     ] all? ;
+
+: terminate-call? ( -- ? )
+    node-stack get last
+    rest-slice [ f ] [ first #terminate? ] if-empty ;

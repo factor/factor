@@ -22,16 +22,16 @@ M: constant-expr equal?
         and
     ] [ 2drop f ] if ;
 
-SYMBOL: input-expr-counter
-
-: next-input-expr ( -- n )
-    input-expr-counter [ dup 1 + ] change ;
-
 ! Expressions whose values are inputs to the basic block. We
 ! can eliminate a second computation having the same 'n' as
 ! the first one; we can also eliminate input-exprs whose
 ! result is not used.
 TUPLE: input-expr < expr n ;
+
+SYMBOL: input-expr-counter
+
+: next-input-expr ( class -- expr )
+    input-expr-counter [ dup 1 + ] change input-expr boa ;
 
 : constant>vn ( constant -- vn ) <constant> expr>vn ; inline
 
@@ -80,7 +80,7 @@ M: ##compare-imm >expr compare-imm>expr ;
 
 M: ##compare-float >expr compare>expr ;
 
-M: ##flushable >expr class next-input-expr input-expr boa ;
+M: ##flushable >expr class next-input-expr ;
 
 : init-expressions ( -- )
     0 input-expr-counter set ;
