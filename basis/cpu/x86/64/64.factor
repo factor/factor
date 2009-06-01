@@ -22,10 +22,10 @@ M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
 
-M:: x86.64 %dispatch ( src temp offset -- )
+M:: x86.64 %dispatch ( src temp -- )
     ! Load jump table base.
     temp HEX: ffffffff MOV
-    offset cells rc-absolute-cell rel-here
+    0 rc-absolute-cell rel-here
     ! Add jump table base
     src temp ADD
     src HEX: 7f [+] JMP
