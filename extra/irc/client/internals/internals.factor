@@ -16,6 +16,7 @@ IN: irc.client.internals
 
 : /NICK ( nick -- ) "NICK " prepend irc-print ;
 : /PONG ( text -- ) "PONG " prepend irc-print ;
+: /PASS ( password -- ) "PASS " prepend irc-print ;
 
 : /LOGIN ( nick -- )
     dup /NICK
@@ -44,7 +45,11 @@ IN: irc.client.internals
         in-messages>> [ irc-connected ] dip mailbox-put
     ] [ (terminate-irc) ] if* ;
 
-: (do-login) ( -- ) irc> nick>> /LOGIN ;
+: (do-login) ( -- )
+     irc>
+     [ profile>> password>> [ /PASS ] when* ]
+     [ nick>> /LOGIN ]
+     bi ;
 
 GENERIC: initialize-chat ( chat -- )
 M: irc-chat         initialize-chat drop ;
