@@ -305,10 +305,7 @@ os windows? [
     4 "double" c-type (>>align)
 ] unless
 
-FUNCTION: bool check_sse2 ( ) ;
-
-: sse2? ( -- ? )
-    check_sse2 ;
+USING: cpu.x86.features cpu.x86.features.private ;
 
 "-no-sse2" (command-line) member? [
     [ { check_sse2 } compile ] with-optimizer
