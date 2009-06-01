@@ -28,6 +28,7 @@ IN: compiler.cfg.optimizer.tests
     [ [ 2 fixnum* ] when 3 ]
     [ [ 2 fixnum+ ] when 3 ]
     [ [ 2 fixnum- ] when 3 ]
+    [ 10000 [ ] times ]
 } [
     [ [ ] ] dip '[ _ test-mr first check-mr ] unit-test
 ] each
