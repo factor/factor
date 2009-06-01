@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math fry
 compiler.cfg.instructions compiler.cfg.registers
@@ -38,27 +38,29 @@ SYMBOL: live-intervals
         [ [ <live-interval> ] keep ] dip set-at
     ] if ;
 
-GENERIC# compute-live-intervals* 1 ( insn n -- )
+GENERIC: compute-live-intervals* ( insn -- )
 
-M: insn compute-live-intervals* 2drop ;
+M: insn compute-live-intervals* drop ;
 
 M: vreg-insn compute-live-intervals*
+    dup insn#>>
     live-intervals get
     [ [ uses-vregs ] 2dip '[ _ swap _ at add-use ] each ]
     [ [ defs-vregs ] 2dip '[ _ swap _ new-live-interval ] each ]
-    3bi ;
+    [ [ temp-vregs ] 2dip '[ _ swap _ new-live-interval ] each ]
+    3tri ;
 
 : record-copy ( insn -- )
     [ dst>> live-intervals get at ] [ src>> ] bi >>copy-from drop ;
 
 M: ##copy compute-live-intervals*
-    [ call-next-method ] [ drop record-copy ] 2bi ;
+    [ call-next-method ] [ record-copy ] bi ;
 
 M: ##copy-float compute-live-intervals*
-    [ call-next-method ] [ drop record-copy ] 2bi ;
+    [ call-next-method ] [ record-copy ] bi ;
 
-: compute-live-intervals ( instructions -- live-intervals )
+: compute-live-intervals ( rpo -- live-intervals )
     H{ } clone [
         live-intervals set
-        [ compute-live-intervals* ] each-index
+        [ instructions>> [ compute-live-intervals* ] each ] each
     ] keep values ;

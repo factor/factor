@@ -81,30 +81,35 @@ GENERIC: emit-node ( node -- next )
     basic-block get successors>> push
     stop-iterating ;
 
-: emit-call ( word -- next )
+: emit-call ( word height -- next )
     {
-        { [ dup loops get key? ] [ loops get at local-recursive-call ] }
+        { [ over loops get key? ] [ drop loops get at local-recursive-call ] }
+        { [ terminate-call? ] [ ##call stop-iterating ] }
         { [ tail-call? not ] [ ##call ##branch begin-basic-block iterate-next ] }
-        { [ dup current-label get eq? ] [ drop first-basic-block get local-recursive-call ] }
-        [ ##epilogue ##jump stop-iterating ]
+        { [ dup current-label get eq? ] [ 2drop first-basic-block get local-recursive-call ] }
+        [ drop ##epilogue ##jump stop-iterating ]
     } cond ;
 
 ! #recursive
-: compile-recursive ( node -- next )
-    [ label>> id>> emit-call ]
+: recursive-height ( #recursive -- n )
+    [ label>> return>> in-d>> length ] [ in-d>> length ] bi - ;
+
+: emit-recursive ( #recursive -- next )
+    [ [ label>> id>> ] [ recursive-height ] bi emit-call ]
     [ [ child>> ] [ label>> word>> ] [ label>> id>> ] tri (build-cfg) ] bi ;
 
 : remember-loop ( label -- )
     basic-block get swap loops get set-at ;
 
-: compile-loop ( node -- next )
+: emit-loop ( node -- next )
     ##loop-entry
+    ##branch
     begin-basic-block
     [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi
     iterate-next ;
 
 M: #recursive emit-node
-    dup label>> loop?>> [ compile-loop ] [ compile-recursive ] if ;
+    dup label>> loop?>> [ emit-loop ] [ emit-recursive ] if ;
 
 ! #if
 : emit-branch ( obj -- final-bb )
@@ -154,65 +159,16 @@ M: #if emit-node
     } cond iterate-next ;
 
 ! #dispatch
-: trivial-dispatch-branch? ( nodes -- ? )
-    dup length 1 = [
-        first dup #call? [
-            word>> "intrinsic" word-prop not
-        ] [ drop f ] if
-    ] [ drop f ] if ;
-
-: dispatch-branch ( nodes word -- label )
-    over trivial-dispatch-branch? [
-        drop first word>>
-    ] [
-        gensym [
-            [
-                V{ } clone node-stack set
-                ##prologue
-                begin-basic-block
-                emit-nodes
-                basic-block get [
-                    ##epilogue
-                    ##return
-                    end-basic-block
-                ] when
-            ] with-cfg-builder
-        ] keep
-    ] if ;
-
-: dispatch-branches ( node -- )
-    children>> [
-        current-word get dispatch-branch
-        ##dispatch-label
-    ] each ;
-
-: emit-dispatch ( node -- )
-    ##epilogue
-    ds-pop ^^offset>slot i 0 ##dispatch
-    dispatch-branches ;
-
-: <dispatch-block> ( -- word )
-    gensym dup t "inlined-block" set-word-prop ;
-
 M: #dispatch emit-node
-    tail-call? [
-        emit-dispatch stop-iterating
-    ] [
-        current-word get <dispatch-block> [
-            [
-                begin-word
-                emit-dispatch
-            ] with-cfg-builder
-        ] keep emit-call
-    ] if ;
+    ds-pop ^^offset>slot i ##dispatch emit-if iterate-next ;
 
 ! #call
 M: #call emit-node
     dup word>> dup "intrinsic" word-prop
-    [ emit-intrinsic ] [ nip emit-call ] if ;
+    [ emit-intrinsic ] [ swap call-height emit-call ] if ;
 
 ! #call-recursive
-M: #call-recursive emit-node label>> id>> emit-call ;
+M: #call-recursive emit-node [ label>> id>> ] [ call-height ] bi emit-call ;
 
 ! #push
 M: #push emit-node
