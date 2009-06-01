@@ -101,6 +101,8 @@ ERROR: no-case object ;
         [ \ drop prefix ] bi*
     ] assoc-map alist>quot ;
 
+<PRIVATE
+
 : (distribute-buckets) ( buckets pair keys -- )
     dup t eq? [
         drop [ swap adjoin ] curry each
@@ -150,6 +152,8 @@ ERROR: no-case object ;
         ] [ ] make , , \ if ,
     ] [ ] make ;
 
+PRIVATE>
+
 : case>quot ( default assoc -- quot )
     dup keys {
         { [ dup empty? ] [ 2drop ] }
@@ -160,7 +164,6 @@ ERROR: no-case object ;
         [ drop linear-case-quot ]
     } cond ;
 
-! recursive-hashcode
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
 

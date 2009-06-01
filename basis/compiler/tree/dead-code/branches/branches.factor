@@ -28,7 +28,7 @@ M: #branch remove-dead-code*
 
 : remove-phi-inputs ( #phi -- )
     if-node get children>>
-    [ dup ends-with-terminate? [ drop f ] [ peek out-d>> ] if ] map
+    [ dup ends-with-terminate? [ drop f ] [ last out-d>> ] if ] map
     pad-with-bottom >>phi-in-d drop ;
 
 : live-value-indices ( values -- indices )

@@ -76,7 +76,7 @@ M: heap heap-size ( heap -- n )
     data>> pop* ; inline
 
 : data-peek ( heap -- entry )
-    data>> peek ; inline
+    data>> last ; inline
 
 : data-first ( heap -- entry )
     data>> first ; inline

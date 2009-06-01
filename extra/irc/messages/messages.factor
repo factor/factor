@@ -65,7 +65,7 @@ IRC: rpl-nick-collision  "436" nickname : comment ;
 PREDICATE: channel-mode < mode name>> first "#&" member? ;
 PREDICATE: participant-mode < channel-mode parameter>> ;
 PREDICATE: ctcp < privmsg
-    trailing>> { [ length 1 > ] [ first 1 = ] [ peek 1 = ] } 1&& ;
+    trailing>> { [ length 1 > ] [ first 1 = ] [ last 1 = ] } 1&& ;
 PREDICATE: action < ctcp trailing>> rest "ACTION" head? ;
 
 M: rpl-names post-process-irc-message ( rpl-names -- )

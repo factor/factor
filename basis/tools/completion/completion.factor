@@ -24,7 +24,7 @@ IN: tools.completion
             2dup number=
             [ drop ] [ nip V{ } clone pick push ] if
             1+
-        ] keep pick peek push
+        ] keep pick last push
     ] each ;
 
 : runs ( seq -- newseq )

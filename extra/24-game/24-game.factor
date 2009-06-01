@@ -40,7 +40,7 @@ SYMBOL: commands
     if ;
 DEFER: check-status
 : quit-game ( vector -- ) drop "you're a quitter" print ;
-: quit? ( vector -- t/f ) peek "quit" = ;
+: quit? ( vector -- t/f ) last "quit" = ;
 : end-game ( vector -- )
     dup victory? 
         [ drop "You WON!" ]

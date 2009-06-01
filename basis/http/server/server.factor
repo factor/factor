@@ -269,7 +269,7 @@ M: http-server handle-client*
     ] with-destructors ;
 
 : <http-server> ( -- server )
-    http-server new-threaded-server
+    ascii http-server new-threaded-server
         "http.server" >>name
         "http" protocol-port >>insecure
         "https" protocol-port >>secure ;

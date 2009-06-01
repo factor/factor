@@ -23,9 +23,10 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
 "Incrementing, decrementing:"
 { $subsection 1+ }
 { $subsection 1- }
-"Minimum, maximum:"
+"Minimum, maximum, clamping:"
 { $subsection min }
 { $subsection max }
+{ $subsection clamp }
 "Complex conjugation:"
 { $subsection conjugate }
 "Tests:"

@@ -215,7 +215,7 @@ M: anonymous-complement (classes-intersect?)
 : min-class ( class seq -- class/f )
     over [ classes-intersect? ] curry filter
     [ drop f ] [
-        [ nip ] [ [ class<= ] with all? ] 2bi [ peek ] [ drop f ] if
+        [ nip ] [ [ class<= ] with all? ] 2bi [ last ] [ drop f ] if
     ] if-empty ;
 
 GENERIC: (flatten-class) ( class -- )
