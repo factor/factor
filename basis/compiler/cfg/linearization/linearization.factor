@@ -51,7 +51,7 @@ M: ##branch linearize-insn
     [ [ swap number>> ] 3dip ] [ [ number>> ] 3dip negate-cc ] if ;
 
 : with-regs ( insn quot -- )
-    over regs>> [ call ] dip building get peek (>>regs) ; inline
+    over regs>> [ call ] dip building get last (>>regs) ; inline
 
 M: ##compare-branch linearize-insn
     [ binary-conditional _compare-branch ] with-regs emit-branch ;

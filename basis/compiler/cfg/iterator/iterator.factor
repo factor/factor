@@ -41,5 +41,5 @@ DEFER: (tail-call?)
     ] all? ;
 
 : terminate-call? ( -- ? )
-    node-stack get peek
+    node-stack get last
     rest-slice [ f ] [ first #terminate? ] if-empty ;
