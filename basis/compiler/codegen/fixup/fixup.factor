@@ -4,51 +4,48 @@ USING: arrays byte-arrays byte-vectors generic assocs hashtables
 io.binary kernel kernel.private math namespaces make sequences
 words quotations strings alien.accessors alien.strings layouts
 system combinators math.bitwise math.order
-accessors growable cpu.architecture compiler.constants ;
+accessors growable compiler.constants ;
 IN: compiler.codegen.fixup
 
-GENERIC: fixup* ( obj -- )
+! Literal table
+SYMBOL: literal-table
+
+: add-literal ( obj -- ) literal-table get push ;
+
+! Labels
+SYMBOL: label-table
+
+TUPLE: label offset ;
+
+: <label> ( -- label ) label new ;
+: define-label ( name -- ) <label> swap set ;
 
 : compiled-offset ( -- n ) building get length ;
 
-SYMBOL: relocation-table
-SYMBOL: label-table
-
-M: label fixup* compiled-offset >>offset drop ;
+: resolve-label ( label/name -- )
+    dup label? [ get ] unless
+    compiled-offset >>offset drop ;
 
 : offset-for-class ( class -- n )
     rc-absolute-cell = cell 4 ? compiled-offset swap - ;
 
-TUPLE: label-fixup { label label } { class integer } ;
+TUPLE: label-fixup { label label } { class integer } { offset integer } ;
 
-: label-fixup ( label class -- ) \ label-fixup boa , ;
+: label-fixup ( label class -- )
+    dup offset-for-class \ label-fixup boa label-table get push ;
+
+! Relocation table
+SYMBOL: relocation-table
 
 : push-4 ( value vector -- )
     [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying>> ] tri
     swap set-alien-unsigned-4 ;
 
 : add-relocation-entry ( type class offset -- )
-      { 0 24 28 } bitfield relocation-table get push-4 ;
+    { 0 24 28 } bitfield relocation-table get push-4 ;
 
-M: label-fixup fixup*
-    [ class>> dup offset-for-class ] [ label>> ] bi
-    [ drop [ rt-here ] 2dip add-relocation-entry ]
-    [ 3array label-table get push ]
-    3bi ;
-
-TUPLE: rel-fixup { class integer } { type integer } ;
-
-: rel-fixup ( class type -- ) \ rel-fixup boa , ;
-
-M: rel-fixup fixup*
-    [ type>> ] [ class>> dup offset-for-class ] bi
-    add-relocation-entry ;
-
-M: integer fixup* , ;
-
-SYMBOL: literal-table
-
-: add-literal ( obj -- ) literal-table get push ;
+: rel-fixup ( class type -- )
+    swap dup offset-for-class add-relocation-entry ;
 
 : add-dlsym-literals ( symbol dll -- )
     [ string>symbol add-literal ] [ add-literal ] bi* ;
@@ -77,22 +74,34 @@ SYMBOL: literal-table
 : rel-here ( offset class -- )
     [ add-literal ] dip rt-here rel-fixup ;
 
+! And the rest
+: resolve-offset ( label-fixup -- offset )
+    label>> offset>> [ "Unresolved label" throw ] unless* ;
+
+: resolve-absolute-label ( label-fixup -- )
+    dup resolve-offset neg add-literal
+    [ rt-here ] dip [ class>> ] [ offset>> ] bi add-relocation-entry ;
+
+: resolve-relative-label ( label-fixup -- )
+    [ class>> ] [ offset>> ] [ resolve-offset ] tri 3array ;
+
+: resolve-labels ( label-fixups -- labels' )
+    [ class>> rc-absolute? ] partition
+    [ [ resolve-absolute-label ] each ]
+    [ [ resolve-relative-label ] map concat ]
+    bi* ;
+
 : init-fixup ( -- )
-    BV{ } clone relocation-table set
-    V{ } clone label-table set ;
+    V{ } clone literal-table set
+    V{ } clone label-table set
+    BV{ } clone relocation-table set ;
 
-: resolve-labels ( labels -- labels' )
-    [
-        first3 offset>>
-        [ "Unresolved label" throw ] unless*
-        3array
-    ] map concat ;
-
-: fixup ( fixup-directives -- code )
+: with-fixup ( quot -- code )
     [
         init-fixup
-        [ fixup* ] each
+        call
+        label-table [ resolve-labels ] change
         literal-table get >array
         relocation-table get >byte-array
-        label-table get resolve-labels
-    ] B{ } make 4array ;
+        label-table get
+    ] B{ } make 4array ; inline
