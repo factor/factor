@@ -89,9 +89,8 @@ M: mdb-msg dump-message ( message -- )
 
 : start-mmm-server ( -- )
     output-stream get mmm-dump-output set
-    <threaded-server> [ mmm-t-srv set ] keep 
+    binary <threaded-server> [ mmm-t-srv set ] keep 
     "127.0.0.1" mmm-port get <inet4> >>insecure
-    binary >>encoding
     [ handle-mmm-connection ] >>handler
     start-server* ;
 

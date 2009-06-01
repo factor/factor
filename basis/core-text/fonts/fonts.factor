@@ -82,7 +82,7 @@ CONSTANT: font-names
     }
 
 : font-name ( string -- string' )
-    font-names at-default ;
+    font-names ?at drop ;
 
 : (bold) ( x -- y ) kCTFontBoldTrait bitor ; inline
 

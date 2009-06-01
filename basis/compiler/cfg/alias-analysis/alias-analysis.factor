@@ -161,7 +161,7 @@ SYMBOL: heap-ac
 
 : record-constant-set-slot ( slot# vreg -- )
     history [
-        dup empty? [ dup peek store? [ dup pop* ] when ] unless
+        dup empty? [ dup last store? [ dup pop* ] when ] unless
         store new-action swap ?push
     ] change-at ;
 

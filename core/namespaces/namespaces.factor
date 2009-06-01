@@ -12,7 +12,7 @@ IN: namespaces
 
 PRIVATE>
 
-: namespace ( -- namespace ) namestack* peek ; inline
+: namespace ( -- namespace ) namestack* last ; inline
 : namestack ( -- namestack ) namestack* clone ;
 : set-namestack ( namestack -- ) >vector 0 setenv ;
 : global ( -- g ) 21 getenv { hashtable } declare ; inline

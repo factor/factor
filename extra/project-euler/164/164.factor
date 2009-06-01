@@ -18,7 +18,7 @@ IN: project-euler.164
 <PRIVATE
 
 : next-keys ( key -- keys )
-    [ peek ] [ 10 swap sum - ] bi [ 2array ] with map ;
+    [ last ] [ 10 swap sum - ] bi [ 2array ] with map ;
 
 : next-table ( assoc -- assoc )
     H{ } clone swap

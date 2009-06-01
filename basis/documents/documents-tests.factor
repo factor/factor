@@ -120,7 +120,7 @@ namespaces tools.test make arrays kernel fry ;
 [ "Goodbye, cruel world." ] [ "d" get doc-string ] unit-test
 
 [ "" { 0 9 } { 0 15 } ] [
-    "d" get undos>> peek
+    "d" get undos>> last
     [ old-string>> ] [ from>> ] [ new-to>> ] tri
 ] unit-test
 

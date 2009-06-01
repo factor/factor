@@ -8,6 +8,9 @@ IN: sorting.title.tests
         "The Beatles"
         "A river runs through it"
         "Another"
+        "The"
+        "A"
+        "Los"
         "la vida loca"
         "Basketball"
         "racquetball"
@@ -21,6 +24,7 @@ IN: sorting.title.tests
     } ;
 [
     {
+        "A"
         "Another"
         "Basketball"
         "The Beatles"
@@ -29,10 +33,12 @@ IN: sorting.title.tests
         "for the horde"
         "Los Fujis"
         "los Fujis"
+        "Los"
         "of mice and men"
         "on belay"
         "racquetball"
         "A river runs through it"
+        "The"
         "la vida loca"
     }
 ] [
