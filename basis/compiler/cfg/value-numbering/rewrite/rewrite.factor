@@ -79,7 +79,7 @@ M: ##compare-imm-branch rewrite
     [ dst>> ]
     [ src2>> ]
     [ src1>> vreg>vn vn>constant ] tri
-    cc= f i \ ##compare-imm boa ;
+    cc= i \ ##compare-imm new-insn ;
 
 M: ##compare rewrite
     dup flip-comparison? [
