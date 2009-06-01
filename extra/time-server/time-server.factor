@@ -1,14 +1,14 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.servers.connection accessors threads
-calendar calendar.format ;
+USING: accessors calendar calendar.format io io.encodings.ascii
+io.servers.connection threads ;
 IN: time-server
 
 : handle-time-client ( -- )
     now timestamp>rfc822 print ;
 
 : <time-server> ( -- threaded-server )
-    <threaded-server>
+    ascii <threaded-server>
         "time-server" >>name
         1234 >>insecure
         [ handle-time-client ] >>handler ;
