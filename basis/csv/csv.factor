@@ -63,7 +63,7 @@ PRIVATE>
 
 : csv ( stream -- rows )
     [ [ (csv) ] { } make ] with-input-stream
-    dup peek { "" } = [ but-last ] when ;
+    dup last { "" } = [ but-last ] when ;
 
 : file>csv ( path encoding -- csv )
     <file-reader> csv ;

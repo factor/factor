@@ -59,7 +59,7 @@ M: utf16be decode-char
     ] [ append-nums ] if ;
 
 : begin-utf16le ( stream byte -- stream char )
-    over stream-read1 [ double-le ] [ drop replacement-char ] if* ;
+    over stream-read1 dup [ double-le ] [ 2drop replacement-char ] if ;
 
 M: utf16le decode-char
     drop dup stream-read1 dup [ begin-utf16le ] when nip ;
@@ -68,36 +68,34 @@ M: utf16le decode-char
 
 : encode-first ( char -- byte1 byte2 )
     -10 shift
-    dup -8 shift BIN: 11011000 bitor
-    swap HEX: FF bitand ;
+    [ -8 shift BIN: 11011000 bitor ] [ HEX: FF bitand ] bi ;
 
 : encode-second ( char -- byte3 byte4 )
     BIN: 1111111111 bitand
-    dup -8 shift BIN: 11011100 bitor
-    swap BIN: 11111111 bitand ;
+    [ -8 shift BIN: 11011100 bitor ] [ BIN: 11111111 bitand ] bi ;
 
-: stream-write2 ( stream char1 char2 -- )
-    rot [ stream-write1 ] curry bi@ ;
+: stream-write2 ( char1 char2 stream -- )
+    [ stream-write1 ] curry bi@ ;
 
-: char>utf16be ( stream char -- )
-    dup HEX: FFFF > [
-        HEX: 10000 -
-        2dup encode-first stream-write2
-        encode-second stream-write2
-    ] [ h>b/b swap stream-write2 ] if ;
+: char>utf16be ( char stream -- )
+    over HEX: FFFF > [
+        [ HEX: 10000 - ] dip
+        [ [ encode-first ] dip stream-write2 ]
+        [ [ encode-second ] dip stream-write2 ] 2bi
+    ] [ [ h>b/b swap ] dip stream-write2 ] if ;
 
 M: utf16be encode-char ( char stream encoding -- )
-    drop swap char>utf16be ;
+    drop char>utf16be ;
 
-: char>utf16le ( char stream -- )
-    dup HEX: FFFF > [
-        HEX: 10000 -
-        2dup encode-first swap stream-write2
-        encode-second swap stream-write2
-    ] [ h>b/b stream-write2 ] if ; 
+: char>utf16le ( stream char -- )
+    over HEX: FFFF > [
+        [ HEX: 10000 - ] dip
+        [ [ encode-first swap ] dip stream-write2 ]
+        [ [ encode-second swap ] dip stream-write2 ] 2bi
+    ] [ [ h>b/b ] dip stream-write2 ] if ; 
 
 M: utf16le encode-char ( char stream encoding -- )
-    drop swap char>utf16le ;
+    drop char>utf16le ;
 
 ! UTF-16
 

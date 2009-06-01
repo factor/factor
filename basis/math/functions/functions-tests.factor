@@ -162,3 +162,4 @@ IN: math.functions.tests
 [ 2.5  ] [ 1.0 2.5 1.0 lerp ] unit-test
 [ 1.75 ] [ 1.0 2.5 0.5 lerp ] unit-test
 
+[ C{ 1 2 } ] [ C{ 1 2 } 1 ^ ] unit-test

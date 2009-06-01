@@ -6,7 +6,7 @@ IN: classes.parser
 : save-class-location ( class -- )
     location remember-class ;
 
-: create-class-in ( word -- word )
+: create-class-in ( string -- word )
     current-vocab create
     dup save-class-location
     dup predicate-word dup set-word save-location ;

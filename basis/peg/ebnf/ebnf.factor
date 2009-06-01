@@ -370,7 +370,7 @@ SYMBOL: ignore-ws
   ] bind ;
 
 M: ebnf (transform) ( ast -- parser )
-  rules>> [ (transform) ] map peek ;
+  rules>> [ (transform) ] map last ;
 
 M: ebnf-tokenizer (transform) ( ast -- parser )
   elements>> dup "default" = [
