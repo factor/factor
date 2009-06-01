@@ -52,6 +52,7 @@ HOOK: %jump-label cpu ( label -- )
 HOOK: %return cpu ( -- )
 
 HOOK: %dispatch cpu ( src temp -- )
+HOOK: %dispatch-label cpu ( src temp -- )
 
 HOOK: %slot cpu ( dst obj slot tag temp -- )
 HOOK: %slot-imm cpu ( dst obj slot tag -- )

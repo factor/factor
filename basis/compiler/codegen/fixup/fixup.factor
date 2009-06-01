@@ -16,30 +16,33 @@ SYMBOL: label-table
 
 M: label fixup* compiled-offset >>offset drop ;
 
-TUPLE: label-fixup label class ;
+: offset-for-class ( class -- n )
+    rc-absolute-cell = cell 4 ? compiled-offset swap - ;
+
+TUPLE: label-fixup { label label } { class integer } ;
 
 : label-fixup ( label class -- ) \ label-fixup boa , ;
-
-M: label-fixup fixup*
-    dup class>> rc-absolute?
-    [ "Absolute labels not supported" throw ] when
-    [ class>> ] [ label>> ] bi compiled-offset 4 - swap
-    3array label-table get push ;
-
-TUPLE: rel-fixup class type ;
-
-: rel-fixup ( class type -- ) \ rel-fixup boa , ;
 
 : push-4 ( value vector -- )
     [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying>> ] tri
     swap set-alien-unsigned-4 ;
 
+: add-relocation-entry ( type class offset -- )
+      { 0 24 28 } bitfield relocation-table get push-4 ;
+
+M: label-fixup fixup*
+    [ class>> dup offset-for-class ] [ label>> ] bi
+    [ drop [ rt-here ] 2dip add-relocation-entry ]
+    [ 3array label-table get push ]
+    3bi ;
+
+TUPLE: rel-fixup { class integer } { type integer } ;
+
+: rel-fixup ( class type -- ) \ rel-fixup boa , ;
+
 M: rel-fixup fixup*
-    [ type>> ]
-    [ class>> ]
-    [ class>> rc-absolute-cell = cell 4 ? compiled-offset swap - ] tri
-    { 0 24 28 } bitfield
-    relocation-table get push-4 ;
+    [ type>> ] [ class>> dup offset-for-class ] bi
+    add-relocation-entry ;
 
 M: integer fixup* , ;
 
