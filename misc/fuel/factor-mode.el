@@ -36,6 +36,13 @@ When set to false, you'll be asked only once."
   :type 'boolean
   :group 'factor-mode)
 
+(defcustom factor-mode-cycle-insert-docs-p 'ask
+  "Whether to insert documentation templates upon creation of doc
+file during cycling."
+  :type '(choice (const :tag "Never" nil)
+                 (const :tag "Always" 'always)
+                 (const :tag "Ask me" 'ask)))
+
 (defcustom factor-mode-use-fuel t
   "Whether to use the full FUEL facilities in factor mode.
 
@@ -125,7 +132,8 @@ code in the buffer."
 (defun factor-mode--indent-setter-line ()
   (when (fuel-syntax--at-setter-line)
     (save-excursion
-      (let ((indent (and (fuel-syntax--at-constructor-line) (current-indentation))))
+      (let ((indent (and (fuel-syntax--at-constructor-line)
+                         (current-indentation))))
         (while (not (or indent
                         (bobp)
                         (fuel-syntax--at-begin-of-def)
@@ -225,12 +233,32 @@ code in the buffer."
 (defsubst factor-mode--cycling-setup ()
   (setq factor-mode--cycling-no-ask nil))
 
+(defun factor-mode--other-file-doc-p (file)
+  (let ((bn (file-name-nondirectory file)))
+    (and (string-match "\\(.+\\)-docs.factor" bn)
+         (expand-file-name (concat (match-string 1 bn) ".factor")
+                           (file-name-directory file)))))
+
+(defun factor-mode--other-file-check-docs (file)
+  (when (and factor-mode-cycle-insert-docs-p
+             (boundp 'fuel-mode)
+             fuel-mode)
+    (let ((code-file (factor-mode--other-file-doc-p file)))
+      (when (and code-file
+                 (or (eq factor-mode-cycle-insert-docs-p 'always)
+                     (y-or-n-p "Insert doc templates? ")))
+        (save-excursion
+          (set-buffer (find-file-noselect code-file))
+          (fuel-scaffold-help))))))
+
 (defun factor-mode-visit-other-file (&optional skip)
   "Cycle between code, tests and docs factor files.
 With prefix, non-existing files will be skipped."
   (interactive "P")
   (let ((file (factor-mode--cycle-next (buffer-file-name) skip)))
     (unless file (error "No other file found"))
+    (unless (file-exists-p file)
+      (factor-mode--other-file-check-docs file))
     (find-file file)
     (unless (file-exists-p file)
       (set-buffer-modified-p t)
