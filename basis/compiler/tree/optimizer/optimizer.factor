@@ -25,18 +25,20 @@ SYMBOL: check-optimizer?
     ] when ;
 
 : optimize-tree ( nodes -- nodes' )
-    analyze-recursive
-    normalize
-    propagate
-    cleanup
-    dup run-escape-analysis? [
-        escape-analysis
-        unbox-tuples
-    ] when
-    apply-identities
-    compute-def-use
-    remove-dead-code
-    ?check
-    compute-def-use
-    optimize-modular-arithmetic
-    finalize ;
+    [
+        analyze-recursive
+        normalize
+        propagate
+        cleanup
+        dup run-escape-analysis? [
+            escape-analysis
+            unbox-tuples
+        ] when
+        apply-identities
+        compute-def-use
+        remove-dead-code
+        ?check
+        compute-def-use
+        optimize-modular-arithmetic
+        finalize
+    ] with-scope ;
