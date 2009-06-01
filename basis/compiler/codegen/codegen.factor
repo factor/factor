@@ -92,8 +92,11 @@ M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 
 M: ##return generate-insn drop %return ;
 
-M: ##dispatch generate-insn
+M: _dispatch generate-insn
     [ src>> register ] [ temp>> register ] bi %dispatch ;
+
+M: _dispatch-label generate-insn
+    label>> lookup-label %dispatch-label ;
 
 : >slot< ( insn -- dst obj slot tag )
     {
@@ -234,7 +237,7 @@ M: ##write-barrier generate-insn
     [ table>> register ]
     tri %write-barrier ;
 
-M: _gc generate-insn drop %gc ;
+M: ##gc generate-insn drop %gc ;
 
 M: ##loop-entry generate-insn drop %loop-entry ;
 
