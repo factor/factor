@@ -33,7 +33,7 @@ M: updater-model (model-changed) tuck updates>> =
 
 TUPLE: switch-model < multi-model original switcher on ;
 M: switch-model model-changed 2dup switcher>> =
-   [ [ value>> ] dip over [ t >>on set-model ] [ nip f swap (>>on) ] if ]
+   [ [ value>> ] dip over [ t >>on set-model ] [ nip [ original>> ] keep f >>on model-changed ] if ]
    [ dup on>> [ 2drop ] [ [ value>> ] dip over [ set-model ] [ 2drop ] if ] if ] if ;
 : <switch> ( signal1 signal2 -- signal' ) swap [ 2array switch-model <multi-model> ] 2keep
    [ >>original ] [ >>switcher ] bi* ;
