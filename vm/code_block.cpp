@@ -159,7 +159,10 @@ cell compute_relocation(relocation_entry rel, cell index, code_block *compiled)
 	case RT_XT_PIC_TAIL:
 		return (cell)word_xt_pic_tail(untag<word>(ARG));
 	case RT_HERE:
-		return offset + untag_fixnum(ARG);
+	{
+		fixnum arg = untag_fixnum(ARG);
+		return (arg >= 0 ? offset + arg : (cell)(compiled +1) - arg);
+	}
 	case RT_THIS:
 		return (cell)(compiled + 1);
 	case RT_STACK_CHAIN:
