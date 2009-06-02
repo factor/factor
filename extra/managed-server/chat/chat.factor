@@ -18,6 +18,9 @@ chat-docs [ H{ } clone ] initialize
 
 CONSTANT: line-beginning "-!- "
 
+: send-line ( string -- )
+    write "\r\n" write flush ;
+
 : handle-me ( string -- )
     [
         [ "* " username " " ] dip
@@ -29,15 +32,15 @@ CONSTANT: line-beginning "-!- "
 : handle-help ( string -- )
     [
         "Commands: "
-        commands get keys natural-sort ", " join append print flush
+        commands get keys natural-sort ", " join append send-line
     ] [
         chat-docs get ?at
-        [ print flush ]
-        [ "Unknown command: " prepend print flush ] if
+        [ send-line ]
+        [ "Unknown command: " prepend send-line ] if
     ] if-empty ;
 
 : usage ( string -- )
-    chat-docs get at print flush ;
+    chat-docs get at send-line ;
 
 : username-taken-string ( username -- string )
     "The username ``" "'' is already in use; try again." surround ;
@@ -53,7 +56,7 @@ CONSTANT: line-beginning "-!- "
         "nick" usage
     ] [
         dup clients key? [
-            username-taken-string print flush
+            username-taken-string send-line
         ] [
             [ username swap warn-name-changed ]
             [ username clients rename-at ]
@@ -70,12 +73,12 @@ CONSTANT: line-beginning "-!- "
 Displays the documentation for a command.">
 "help" add-command
 
-[ drop clients keys [ "``" "''" surround ] map ", " join print flush ]
+[ drop clients keys [ "``" "''" surround ] map ", " join send-line ]
 <" Syntax: /who
 Shows the list of connected users.">
 "who" add-command
 
-[ drop gmt timestamp>rfc822 print flush ]
+[ drop gmt timestamp>rfc822 send-line ]
 <" Syntax: /time
 Returns the current GMT time."> "time" add-command
 
@@ -96,7 +99,7 @@ Disconnects a user from the chat server."> "quit" add-command
     dup " " split1 swap >lower commands get at* [
         call( string -- ) drop
     ] [
-        2drop "Unknown command: " prepend print flush
+        2drop "Unknown command: " prepend send-line
     ] if ;
 
 : <chat-server> ( port -- managed-server )
@@ -123,7 +126,7 @@ M: chat-server handle-client-disconnect
     ] "" append-outputs-as send-everyone ;
 
 M: chat-server handle-already-logged-in
-    username username-taken-string print flush ;
+    username username-taken-string send-line ;
 
 M: chat-server handle-managed-client*
     readln dup f = [ t client (>>quit?) ] when

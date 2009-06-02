@@ -26,14 +26,6 @@ SYMBOL: registers
 : ?register ( obj -- operand )
     dup vreg? [ register ] when ;
 
-: generate-insns ( insns -- code )
-    [
-        [
-            dup regs>> registers set
-            generate-insn
-        ] each
-    ] { } make fixup ;
-
 TUPLE: asm label code calls ;
 
 SYMBOL: calls
@@ -51,17 +43,22 @@ SYMBOL: labels
 
 : init-generator ( word -- )
     H{ } clone labels set
-    V{ } clone literal-table set
     V{ } clone calls set
     compiling-word set
     compiled-stack-traces? [ compiling-word get add-literal ] when ;
 
+: generate-insns ( asm -- code )
+    [
+        [ word>> init-generator ]
+        [
+            instructions>>
+            [ [ regs>> registers set ] [ generate-insn ] bi ] each
+        ] bi
+    ] with-fixup ;
+
 : generate ( mr -- asm )
     [
-        [ label>> ]
-        [ word>> init-generator ]
-        [ instructions>> generate-insns ] tri
-        calls get
+        [ label>> ] [ generate-insns ] bi calls get
         asm boa
     ] with-scope ;
 
@@ -92,10 +89,11 @@ M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 
 M: ##return generate-insn drop %return ;
 
-M: ##dispatch-label generate-insn label>> %dispatch-label ;
+M: _dispatch generate-insn
+    [ src>> register ] [ temp>> register ] bi %dispatch ;
 
-M: ##dispatch generate-insn
-    [ src>> register ] [ temp>> register ] [ offset>> ] tri %dispatch ;
+M: _dispatch-label generate-insn
+    label>> lookup-label %dispatch-label ;
 
 : >slot< ( insn -- dst obj slot tag )
     {
@@ -236,7 +234,7 @@ M: ##write-barrier generate-insn
     [ table>> register ]
     tri %write-barrier ;
 
-M: _gc generate-insn drop %gc ;
+M: ##gc generate-insn drop %gc ;
 
 M: ##loop-entry generate-insn drop %loop-entry ;
 
@@ -486,7 +484,7 @@ M: _epilogue generate-insn
     stack-frame>> total-size>> %epilogue ;
 
 M: _label generate-insn
-    id>> lookup-label , ;
+    id>> lookup-label resolve-label ;
 
 M: _branch generate-insn
     label>> lookup-label %jump-label ;

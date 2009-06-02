@@ -74,13 +74,13 @@ M: x86 %jump-label ( label -- ) 0 JMP rc-relative label-fixup ;
 M: x86 %return ( -- ) 0 RET ;
 
 : code-alignment ( align -- n )
-    [ building get [ integer? ] count dup ] dip align swap - ;
+    [ building get length dup ] dip align swap - ;
 
 : align-code ( n -- )
     0 <repetition> % ;
 
-M: x86 %dispatch-label ( word -- )
-    0 cell, rc-absolute-cell rel-word ;
+M: x86 %dispatch-label ( label -- )
+    0 cell, rc-absolute-cell label-fixup ;
 
 :: (%slot) ( obj slot tag temp -- op )
     temp slot obj [+] LEA

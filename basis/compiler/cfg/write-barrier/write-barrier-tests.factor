@@ -1,7 +1,10 @@
 USING: compiler.cfg.write-barrier compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger cpu.architecture
-arrays tools.test ;
+arrays tools.test vectors compiler.cfg kernel accessors ;
 IN: compiler.cfg.write-barrier.tests
+
+: test-write-barrier ( insns -- insns )
+    write-barriers-step ;
 
 [
     {
@@ -24,7 +27,7 @@ IN: compiler.cfg.write-barrier.tests
         T{ ##set-slot-imm f V int-regs 6 V int-regs 7 2 3 }
         T{ ##write-barrier f V int-regs 7 V int-regs 12 V int-regs 13 }
         T{ ##replace f V int-regs 7 D 0 }
-    } eliminate-write-barriers
+    } test-write-barrier
 ] unit-test
 
 [
@@ -42,7 +45,7 @@ IN: compiler.cfg.write-barrier.tests
         T{ ##peek f V int-regs 6 D -2 }
         T{ ##set-slot-imm f V int-regs 5 V int-regs 6 3 2 }
         T{ ##write-barrier f V int-regs 6 V int-regs 7 V int-regs 8 }
-    } eliminate-write-barriers
+    } test-write-barrier
 ] unit-test
 
 [
@@ -69,5 +72,5 @@ IN: compiler.cfg.write-barrier.tests
         T{ ##copy f V int-regs 29 V int-regs 19 }
         T{ ##set-slot-imm f V int-regs 28 V int-regs 29 4 2 }
         T{ ##write-barrier f V int-regs 29 V int-regs 30 V int-regs 3 }
-    } eliminate-write-barriers
+    } test-write-barrier
 ] unit-test
