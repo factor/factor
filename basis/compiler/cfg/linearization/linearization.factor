@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math accessors sequences namespaces make
-combinators assocs
-cpu.architecture
+combinators assocs arrays locals cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.liveness
+compiler.cfg.stack-frame
 compiler.cfg.instructions ;
 IN: compiler.cfg.linearization
 
@@ -67,6 +67,57 @@ M: ##dispatch linearize-insn
     [ [ [ src>> ] [ temp>> ] bi _dispatch ] with-regs ]
     [ successors>> [ number>> _dispatch-label ] each ]
     bi* ;
+
+: gc-root-registers ( n live-registers -- n )
+    [
+        [ second 2array , ]
+        [ first reg-class>> reg-size + ]
+        2bi
+    ] each ;
+
+: gc-root-spill-slots ( n live-spill-slots -- n )
+    [
+        dup first reg-class>> int-regs eq? [
+            [ second <spill-slot> 2array , ]
+            [ first reg-class>> reg-size + ]
+            2bi
+        ] [ drop ] if
+    ] each ;
+
+: oop-registers ( regs -- regs' )
+    [ first reg-class>> int-regs eq? ] filter ;
+
+: data-registers ( regs -- regs' )
+    [ first reg-class>> double-float-regs eq? ] filter ;
+
+:: compute-gc-roots ( live-registers live-spill-slots -- alist )
+    [
+        0
+        ! we put float registers last; the GC doesn't actually scan them
+        live-registers oop-registers gc-root-registers
+        live-spill-slots gc-root-spill-slots
+        live-registers data-registers gc-root-registers
+        drop
+    ] { } make ;
+
+: count-gc-roots ( live-registers live-spill-slots -- n )
+    ! Size of GC root area, minus the float registers
+    [ oop-registers length ] bi@ + ;
+
+M: ##gc linearize-insn
+    nip
+    [
+        [ temp1>> ]
+        [ temp2>> ]
+        [
+            [ live-registers>> ] [ live-spill-slots>> ] bi
+            [ compute-gc-roots ]
+            [ count-gc-roots ]
+            [ gc-roots-size ]
+            2tri
+        ] tri
+        _gc
+    ] with-regs ;
 
 : linearize-basic-blocks ( cfg -- insns )
     [
