@@ -26,7 +26,7 @@
   "Options for FUEL's scaffolding."
   :group 'fuel)
 
-(defcustom fuel-scaffold-developer-name user-full-name
+(defcustom fuel-scaffold-developer-name nil
   "The name to be inserted as yours in scaffold templates."
   :type '(choice string
                  (const :tag "Factor's value for developer-name" nil))
