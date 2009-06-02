@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler.cfg.linearization compiler.cfg.two-operand
 compiler.cfg.liveness compiler.cfg.gc-checks compiler.cfg.linear-scan
-compiler.cfg.stack-frame compiler.cfg.rpo ;
+compiler.cfg.build-stack-frame compiler.cfg.rpo ;
 IN: compiler.cfg.mr
 
 : build-mr ( cfg -- mr )
