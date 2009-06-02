@@ -119,18 +119,6 @@ unit-test
     } extract-keys
 ] unit-test
 
-[ f ] [
-    "a" H{ { "a" f } } at-default
-] unit-test
-
-[ "b" ] [
-    "b" H{ { "a" f } } at-default
-] unit-test
-
-[ "x" ] [
-    "a" H{ { "a" "x" } } at-default
-] unit-test
-
 [ H{ { "b" [ 2 ] } { "d" [ 4 ] } } H{ { "a" [ 1 ] } { "c" [ 3 ] } } ] [
     H{
         { "a" [ 1 ] }
@@ -142,3 +130,7 @@ unit-test
 
 [ 1 f ] [ 1 H{ } ?at ] unit-test
 [ 2 t ] [ 1 H{ { 1 2 } } ?at ] unit-test
+
+[ f ] [ 1 2 H{ { 2 1 } } maybe-set-at ] unit-test
+[ t ] [ 1 3 H{ { 2 1 } } clone maybe-set-at ] unit-test
+[ t ] [ 3 2 H{ { 2 1 } } clone maybe-set-at ] unit-test

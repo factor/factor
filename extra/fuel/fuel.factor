@@ -3,7 +3,7 @@
 
 USING: accessors assocs compiler.units continuations fuel.eval fuel.help
 fuel.remote fuel.xref help.topics io.pathnames kernel namespaces parser
-sequences tools.scaffold vocabs.loader words ;
+sequences tools.scaffold vocabs.loader vocabs.parser words ;
 
 IN: fuel
 
@@ -46,7 +46,7 @@ SYMBOL: :uses-suggestions
     dup length 1 = [ first restart ] [ drop ] if ;
 
 : fuel-set-use-hook ( -- )
-    [ amended-use get clone :uses prefix fuel-eval-set-result ]
+    [ manifest get auto-used>> clone :uses prefix fuel-eval-set-result ]
     print-use-hook set ;
 
 : (fuel-get-uses) ( lines -- )
@@ -134,14 +134,16 @@ PRIVATE>
 
 ! Scaffold support
 
+: fuel-scaffold-name ( devname -- )
+    [ developer-name set ] when* ;
+
 : fuel-scaffold-vocab ( root name devname -- )
-    developer-name set dup [ scaffold-vocab ] dip
+    [ fuel-scaffold-name dup [ scaffold-vocab ] dip ] with-scope
     dup require vocab-source-path (normalize-path) fuel-eval-set-result ;
 
 : fuel-scaffold-help ( name devname -- )
-    developer-name set
-    dup require dup scaffold-help vocab-docs-path
-    (normalize-path) fuel-eval-set-result ;
+    [ fuel-scaffold-name dup require dup scaffold-help ] with-scope
+    vocab-docs-path (normalize-path) fuel-eval-set-result ;
 
 : fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
 

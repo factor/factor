@@ -172,7 +172,7 @@ M: or-parser parse ( input parser1 -- list )
     #! Return the combined list resulting from the parses
     #! of parser1 and parser2 being applied to the same
     #! input. This implements the choice parsing operator.
-    parsers>> 0 swap seq>list
+    parsers>> sequence>list
     [ parse ] with lazy-map lconcat ;
 
 : trim-head-slice ( string -- string )

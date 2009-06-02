@@ -10,7 +10,7 @@ IN: listener
 GENERIC: stream-read-quot ( stream -- quot/f )
 
 : parse-lines-interactive ( lines -- quot/f )
-    [ parse-lines in get ] with-compilation-unit in set ;
+    [ parse-lines ] with-compilation-unit ;
 
 : read-quot-step ( lines -- quot/f )
     [ parse-lines-interactive ] [
@@ -98,7 +98,7 @@ t error-summary? set-global
     ] [ drop ] if ;
 
 : prompt. ( -- )
-    in get auto-use? get [ " - auto" append ] when "( " " )" surround
+    current-vocab name>> auto-use? get [ " - auto" append ] when "( " " )" surround
     H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl flush ;
 
 :: (listener) ( datastack -- )

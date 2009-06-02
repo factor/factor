@@ -1,6 +1,7 @@
 ! Copyright (C) 2006 Matthew Willis and Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lists lists.lazy tools.test kernel math io sequences ;
+USING: io io.encodings.utf8 io.files kernel lists lists.lazy
+math sequences tools.test ;
 IN: lists.lazy.tests
 
 [ { 1 2 3 4 } ] [
@@ -33,3 +34,6 @@ IN: lists.lazy.tests
 [ [ drop ] foldl ] must-infer
 [ [ drop ] leach ] must-infer
 [ lnth ] must-infer
+
+[ ] [ "resource:license.txt" utf8 <file-reader> llines list>array drop ] unit-test
+[ ] [ "resource:license.txt" utf8 <file-reader> lcontents list>array drop ] unit-test

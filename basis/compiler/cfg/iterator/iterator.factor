@@ -7,7 +7,7 @@ SYMBOL: node-stack
 
 : >node ( cursor -- ) node-stack get push ;
 : node> ( -- cursor ) node-stack get pop ;
-: node@ ( -- cursor ) node-stack get peek ;
+: node@ ( -- cursor ) node-stack get last ;
 : current-node ( -- node ) node@ first ;
 : iterate-next ( -- cursor ) node@ rest-slice ;
 : skip-next ( -- next ) node> rest-slice [ first ] [ >node ] bi ;
@@ -37,9 +37,9 @@ DEFER: (tail-call?)
 : tail-call? ( -- ? )
     node-stack get [
         rest-slice
-        [ t ] [
-            [ (tail-call?) ]
-            [ first #terminate? not ]
-            bi and
-        ] if-empty
+        [ t ] [ (tail-call?) ] if-empty
     ] all? ;
+
+: terminate-call? ( -- ? )
+    node-stack get last
+    rest-slice [ f ] [ first #terminate? ] if-empty ;

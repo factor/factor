@@ -1,6 +1,6 @@
 USING: generic help.markup help.syntax kernel kernel.private
-namespaces sequences words arrays layouts help effects math
-layouts classes.private classes compiler.units ;
+namespaces sequences words arrays help effects math
+classes.private classes compiler.units ;
 IN: classes.union
 
 ARTICLE: "unions" "Union classes"

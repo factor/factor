@@ -25,7 +25,7 @@ SYMBOL: vocab-articles
             [ (eval>string) ] call( code -- output )
             "\n" ?tail drop
         ] keep
-        peek assert=
+        last assert=
     ] vocabs-quot get call( quot -- ) ;
 
 : check-examples ( element -- )

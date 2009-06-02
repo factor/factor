@@ -50,7 +50,7 @@ HINTS: count-digits fixnum ;
 
 : (find-unusual-terms) ( n seq -- seq/f )
     [ [ arithmetic-terms ] with map ] keep
-    '[ _ [ peek ] dip member? ] find nip ;
+    '[ _ [ last ] dip member? ] find nip ;
 
 : find-unusual-terms ( seq -- seq/? )
     unclip-slice over (find-unusual-terms) [

@@ -11,6 +11,7 @@ ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
 ui.gadgets.icons ui.gadgets.grid-lines ui.baseline-alignment
 colors io.styles ;
+FROM: io.styles => foreground background ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < track

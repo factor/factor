@@ -3,7 +3,7 @@
 USING: accessors assocs combinators combinators.short-circuit
 effects fry infix.parser infix.ast kernel locals.parser
 locals.types math multiline namespaces parser quotations
-sequences summary words ;
+sequences summary words vocabs.parser ;
 IN: infix
 
 <PRIVATE
@@ -85,12 +85,10 @@ SYNTAX: [infix
     "infix]" [infix-parse parsed \ call parsed ;
 
 <PRIVATE
+
 : parse-infix-locals ( assoc end -- quot )
-    [
-        in-lambda? on
-        [ dup [ locals set ] [ push-locals ] bi ] dip
-        [infix-parse prepare-operand swap pop-locals
-    ] with-scope ;
+    '[ _ [infix-parse prepare-operand ] ((parse-lambda)) ;
+
 PRIVATE>
 
 SYNTAX: [infix|

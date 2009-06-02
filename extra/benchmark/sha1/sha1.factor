@@ -1,4 +1,4 @@
-USING: checksums checksums.sha1 sequences byte-arrays kernel ;
+USING: checksums checksums.sha sequences byte-arrays kernel ;
 IN: benchmark.sha1
 
 : sha1-file ( -- )

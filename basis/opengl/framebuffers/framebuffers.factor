@@ -28,6 +28,7 @@ IN: opengl.framebuffers
         { GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT [ "framebuffer incomplete (format mismatch)" ] }
         { GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT [ "framebuffer incomplete (draw buffer(s) have no attachment)" ] }
         { GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT [ "framebuffer incomplete (read buffer has no attachment)" ] }
+        { GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT [ "framebuffer incomplete (multisample counts don't match)" ] }
         [ drop gl-error "unknown framebuffer error" ]
     } case throw ;
 
@@ -35,8 +36,18 @@ IN: opengl.framebuffers
     framebuffer-incomplete? [ framebuffer-error ] when* ;
 
 : with-framebuffer ( id quot -- )
-    GL_FRAMEBUFFER_EXT rot glBindFramebufferEXT
+    [ GL_FRAMEBUFFER_EXT swap glBindFramebufferEXT ] dip
     [ GL_FRAMEBUFFER_EXT 0 glBindFramebufferEXT ] [ ] cleanup ; inline
+
+: with-draw-read-framebuffers ( draw-id read-id quot -- )
+    [
+        [ GL_DRAW_FRAMEBUFFER_EXT swap glBindFramebufferEXT ]
+        [ GL_READ_FRAMEBUFFER_EXT swap glBindFramebufferEXT ] bi*
+    ] dip
+    [ 
+        GL_DRAW_FRAMEBUFFER_EXT 0 glBindFramebufferEXT
+        GL_READ_FRAMEBUFFER_EXT 0 glBindFramebufferEXT
+    ] [ ] cleanup ; inline
 
 : framebuffer-attachment ( attachment -- id )
     GL_FRAMEBUFFER_EXT swap GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT

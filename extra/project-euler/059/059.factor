@@ -75,7 +75,7 @@ INSTANCE: rollover immutable-sequence
     ] { } make nip ; inline
 
 : most-frequent ( seq -- elt )
-    frequency-analysis sort-values keys peek ;
+    frequency-analysis sort-values keys last ;
 
 : crack-key ( seq key-length -- key )
     [ " " decrypt ] dip group but-last-slice

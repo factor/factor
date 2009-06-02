@@ -34,7 +34,7 @@ PRIVATE>
 
 : levenshtein ( old new -- n )
     [ levenshtein-initialize ] [ levenshtein-step ]
-    run-lcs peek peek ;
+    run-lcs last last ;
 
 TUPLE: retain item ;
 TUPLE: delete item ;

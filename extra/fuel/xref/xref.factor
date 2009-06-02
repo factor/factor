@@ -23,22 +23,24 @@ IN: fuel.xref
     dup dup >vocab-link where normalize-loc 4array ;
 
 : sort-xrefs ( seq -- seq' )
-    [ [ first ] dip first <=> ] sort ; inline
+    [ [ first ] dip first <=> ] sort ;
 
 : format-xrefs ( seq -- seq' )
-    [ word? ] filter [ word>xref ] map ; inline
+    [ word? ] filter [ word>xref ] map ;
 
 : filter-prefix ( seq prefix -- seq )
-    [ drop-prefix nip length 0 = ] curry filter prune ; inline
+    [ drop-prefix nip length 0 = ] curry filter prune ;
 
 MEMO: (vocab-words) ( name -- seq )
     >vocab-link words [ name>> ] map ;
 
 : current-words ( -- seq )
-    use get [ keys ] map concat ; inline
+    manifest get
+    [ search-vocabs>> ] [ qualified-vocabs>> ] bi [ words>> ] bi@
+    assoc-union keys ;
 
 : vocabs-words ( names -- seq )
-    prune [ (vocab-words) ] map concat ; inline
+    prune [ (vocab-words) ] map concat ;
 
 PRIVATE>
 

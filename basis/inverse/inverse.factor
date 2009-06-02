@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel words summary slots quotations
-sequences assocs math arrays stack-checker effects generalizations
+sequences assocs math arrays stack-checker effects
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
 sequences.private combinators mirrors splitting combinators.smart
@@ -220,7 +220,7 @@ DEFER: __
 \ first4 [ 4array ] define-inverse
 
 \ prefix \ unclip define-dual
-\ suffix [ dup but-last swap peek ] define-inverse
+\ suffix [ dup but-last swap last ] define-inverse
 
 \ append 1 [ [ ?tail assure ] curry ] define-pop-inverse
 \ prepend 1 [ [ ?head assure ] curry ] define-pop-inverse

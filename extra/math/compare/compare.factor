@@ -14,6 +14,3 @@ IN: math.compare
 
 : negmin ( a b -- x )
     0 min min ;
-
-: clamp ( a value b -- x )
-    min max ;

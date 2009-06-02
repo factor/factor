@@ -22,6 +22,9 @@ M: assoc assoc-like drop ;
 : ?at ( key assoc -- value/key ? )
     2dup at* [ 2nip t ] [ 2drop f ] if ; inline
 
+: maybe-set-at ( value key assoc -- changed? )
+    3dup at* [ = [ 3drop f ] [ set-at t ] if ] [ 2drop set-at t ] if ;
+
 <PRIVATE
 
 : (assoc-each) ( assoc quot -- seq quot' )
@@ -81,9 +84,6 @@ PRIVATE>
 
 : at ( key assoc -- value/f )
     at* drop ; inline
-
-: at-default ( key assoc -- value/key )
-    ?at drop ; inline
 
 M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ dup assoc-size ] dip new-assoc

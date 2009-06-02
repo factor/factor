@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions graphs assocs kernel
-kernel.private kernel.private slots.private math namespaces sequences
+USING: accessors arrays definitions graphs kernel
+kernel.private slots.private math namespaces sequences
 strings vectors sbufs quotations assocs hashtables sorting vocabs
 math.order sets ;
 IN: words
@@ -180,12 +180,12 @@ M: word reset-word
 ERROR: bad-create name vocab ;
 
 : check-create ( name vocab -- name vocab )
-    2dup [ string? ] both?
+    2dup [ string? ] [ [ string? ] [ vocab? ] bi or ] bi* and
     [ bad-create ] unless ;
 
 : create ( name vocab -- word )
     check-create 2dup lookup
-    dup [ 2nip ] [ drop <word> dup reveal ] if ;
+    dup [ 2nip ] [ drop vocab-name <word> dup reveal ] if ;
 
 : constructor-word ( name vocab -- word )
     [ "<" ">" surround ] dip create ;

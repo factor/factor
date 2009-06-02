@@ -39,7 +39,7 @@ PRIVATE>
 
 : vocab-dir+ ( vocab str/f -- path )
     [ vocab-name "." split ] dip
-    [ [ dup peek ] dip append suffix ] when*
+    [ [ dup last ] dip append suffix ] when*
     "/" join ;
 
 : find-vocab-root ( vocab -- path/f )

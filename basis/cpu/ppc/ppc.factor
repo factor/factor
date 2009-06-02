@@ -7,6 +7,7 @@ cpu.ppc.assembler cpu.ppc.assembler.backend literals compiler.cfg.registers
 compiler.cfg.instructions compiler.constants compiler.codegen
 compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.units ;
+FROM: cpu.ppc.assembler => B ;
 IN: cpu.ppc
 
 ! PowerPC register assignments:
@@ -123,15 +124,12 @@ M: ppc %jump ( word -- )
 M: ppc %jump-label ( label -- ) B ;
 M: ppc %return ( -- ) BLR ;
 
-M:: ppc %dispatch ( src temp offset -- )
+M:: ppc %dispatch ( src temp -- )
     0 temp LOAD32
-    4 offset + cells rc-absolute-ppc-2/2 rel-here
+    4 cells rc-absolute-ppc-2/2 rel-here
     temp temp src LWZX
     temp MTCTR
     BCTR ;
-
-M: ppc %dispatch-label ( word -- )
-    B{ 0 0 0 0 } % rc-absolute-cell rel-word ;
 
 :: (%slot) ( obj slot tag temp -- reg offset )
     temp slot obj ADD

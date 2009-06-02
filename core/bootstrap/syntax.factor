@@ -51,6 +51,7 @@ IN: bootstrap.syntax
     "UNION:"
     "INTERSECTION:"
     "USE:"
+    "UNUSE:"
     "USING:"
     "QUALIFIED:"
     "QUALIFIED-WITH:"
