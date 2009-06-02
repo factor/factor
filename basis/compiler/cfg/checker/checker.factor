@@ -8,7 +8,7 @@ IN: compiler.cfg.checker
 ERROR: last-insn-not-a-jump insn ;
 
 : check-last-instruction ( bb -- )
-    peek dup {
+    last dup {
         [ ##branch? ]
         [ ##dispatch? ]
         [ ##conditional-branch? ]
