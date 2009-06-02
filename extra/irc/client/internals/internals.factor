@@ -75,8 +75,9 @@ M: to-many-chats message-forwards sender>> participant-chats ;
 GENERIC: process-message ( irc-message -- )
 M: object process-message drop ;
 M: ping   process-message trailing>> /PONG ;
-M: join   process-message [ sender>> ] [ chat> ] bi join-participant ;
-M: part   process-message [ sender>> ] [ chat> ] bi part-participant ;
+! FIXME: it shouldn't be checking for the presence of chat here...
+M: join   process-message [ sender>> ] [ chat> ] bi [ join-participant ] [ drop ] if* ;
+M: part   process-message [ sender>> ] [ chat> ] bi [ part-participant ] [ drop ] if* ;
 M: quit   process-message sender>> quit-participant ;
 M: nick   process-message [ trailing>> ] [ sender>> ] bi rename-participant* ;
 M: rpl-nickname-in-use process-message name>> "_" append /NICK ;
