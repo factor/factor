@@ -113,20 +113,23 @@
                            fuel-table-corner-rb
                            fuel-table-tee-b))
 
+(defun fuel-table--insert-row (r)
+  (let ((ln (length (car r)))
+        (l 0))
+    (while (< l ln)
+      (insert (concat fuel-table-sep " "
+                      (mapconcat 'identity
+                                 (mapcar `(lambda (x) (nth ,l x)) r)
+                                 (concat " " fuel-table-sep " "))
+                      "  " fuel-table-sep "\n"))
+      (setq l (1+ l)))))
+
 (defun fuel-table--insert (rows)
   (let* ((widths (fuel-table--col-widths rows))
          (rows (fuel-table--format-rows rows widths)))
     (fuel-table--insert-first-line widths)
     (dolist (r rows)
-      (let ((ln (length (car r)))
-            (l 0))
-        (while (< l ln)
-          (insert (concat fuel-table-sep " "
-                          (mapconcat 'identity
-                                     (mapcar `(lambda (x) (nth ,l x)) r)
-                                     (concat " " fuel-table-sep " "))
-                          "  " fuel-table-sep "\n"))
-          (setq l (1+ l))))
+      (fuel-table--insert-row r)
       (fuel-table--insert-middle-line widths))
     (kill-line -1)
     (fuel-table--insert-last-line widths)))
