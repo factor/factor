@@ -1,24 +1,28 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math accessors sequences namespaces make
-combinators classes
+combinators assocs
+cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
+compiler.cfg.liveness
 compiler.cfg.instructions ;
 IN: compiler.cfg.linearization
 
 ! Convert CFG IR to machine IR.
 GENERIC: linearize-insn ( basic-block insn -- )
 
-: linearize-insns ( basic-block -- )
-    dup instructions>> [ linearize-insn ] with each ; inline
+: linearize-basic-block ( bb -- )
+    [ number>> _label ]
+    [ dup instructions>> [ linearize-insn ] with each ]
+    bi ;
 
 M: insn linearize-insn , drop ;
 
 : useless-branch? ( basic-block successor -- ? )
     #! If our successor immediately follows us in RPO, then we
     #! don't need to branch.
-    [ number>> ] bi@ 1- = ; inline
+    [ number>> ] bi@ 1 - = ; inline
 
 : branch-to-branch? ( successor -- ? )
     #! A branch to a block containing just a jump return is cloned.
@@ -30,7 +34,7 @@ M: insn linearize-insn , drop ;
 : emit-branch ( basic-block successor -- )
     {
         { [ 2dup useless-branch? ] [ 2drop ] }
-        { [ dup branch-to-branch? ] [ nip linearize-insns ] }
+        { [ dup branch-to-branch? ] [ nip linearize-basic-block ] }
         [ nip number>> _branch ]
     } cond ;
 
@@ -46,35 +50,31 @@ M: ##branch linearize-insn
     [ drop dup successors>> second useless-branch? ] 2bi
     [ [ swap number>> ] 3dip ] [ [ number>> ] 3dip negate-cc ] if ;
 
+: with-regs ( insn quot -- )
+    over regs>> [ call ] dip building get last (>>regs) ; inline
+
 M: ##compare-branch linearize-insn
-    binary-conditional _compare-branch emit-branch ;
+    [ binary-conditional _compare-branch ] with-regs emit-branch ;
 
 M: ##compare-imm-branch linearize-insn
-    binary-conditional _compare-imm-branch emit-branch ;
+    [ binary-conditional _compare-imm-branch ] with-regs emit-branch ;
 
 M: ##compare-float-branch linearize-insn
-    binary-conditional _compare-float-branch emit-branch ;
+    [ binary-conditional _compare-float-branch ] with-regs emit-branch ;
 
-: gc? ( bb -- ? )
-    instructions>> [
-        class {
-            ##allot
-            ##integer>bignum
-            ##box-float
-            ##box-alien
-        } memq?
-    ] any? ;
+M: ##dispatch linearize-insn
+    swap
+    [ [ [ src>> ] [ temp>> ] bi _dispatch ] with-regs ]
+    [ successors>> [ number>> _dispatch-label ] each ]
+    bi* ;
 
-: linearize-basic-block ( bb -- )
-    [ number>> _label ]
-    [ gc? [ _gc ] when ]
-    [ linearize-insns ]
-    tri ;
+: linearize-basic-blocks ( cfg -- insns )
+    [
+        [ [ linearize-basic-block ] each-basic-block ]
+        [ spill-counts>> _spill-counts ]
+        bi
+    ] { } make ;
 
-: linearize-basic-blocks ( rpo -- insns )
-    [ [ linearize-basic-block ] each ] { } make ;
-
-: build-mr ( cfg -- mr )
-    [ entry>> reverse-post-order linearize-basic-blocks ]
-    [ word>> ] [ label>> ]
-    tri <mr> ;
+: flatten-cfg ( cfg -- mr )
+    [ linearize-basic-blocks ] [ word>> ] [ label>> ] tri
+    <mr> ;

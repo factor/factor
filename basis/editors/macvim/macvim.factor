@@ -3,11 +3,9 @@ namespaces prettyprint editors make ;
 
 IN: editors.macvim
 
-: macvim-location ( file line -- )
+: macvim ( file line -- )
     drop
     [ "open" , "-a" , "MacVim", , ] { } make
-    try-process ;
+    run-detached drop ;
 
-[ macvim-location ] edit-hook set-global
-
-
+[ macvim ] edit-hook set-global

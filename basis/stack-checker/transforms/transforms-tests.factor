@@ -6,7 +6,7 @@ classes classes.tuple ;
 : compose-n ( quot n -- ) "OOPS" throw ;
 
 <<
-: compose-n-quot ( word n -- quot' ) <repetition> >quotation ;
+: compose-n-quot ( n word -- quot' ) <repetition> >quotation ;
 \ compose-n [ compose-n-quot ] 2 define-transform
 \ compose-n t "no-compile" set-word-prop
 >>

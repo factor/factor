@@ -27,18 +27,18 @@ ready ;
 
 : internet-server ( port -- addrspec ) f swap <inet> ;
 
-: new-threaded-server ( class -- threaded-server )
+: new-threaded-server ( encoding class -- threaded-server )
     new
+        swap >>encoding
         "server" >>name
         DEBUG >>log-level
-        ascii >>encoding
         1 minutes >>timeout
         V{ } clone >>sockets
         <secure-config> >>secure-config
         [ "No handler quotation" throw ] >>handler
         <flag> >>ready ; inline
 
-: <threaded-server> ( -- threaded-server )
+: <threaded-server> ( encoding -- threaded-server )
     threaded-server new-threaded-server ;
 
 GENERIC: handle-client* ( threaded-server -- )

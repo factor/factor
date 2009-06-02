@@ -100,8 +100,6 @@ XML-NS: foo http://blah.com
 
 [ "" ] [ [XML XML] concat ] unit-test
 
-USE: inverse
-
 [ "foo" ] [ [XML <a>foo</a> XML] [ [XML <a><-></a> XML] ] undo ] unit-test
 [ "foo" ] [ [XML <a bar='foo'/> XML] [ [XML <a bar=<-> /> XML] ] undo ] unit-test
 [ "foo" "baz" ] [ [XML <a bar='foo'>baz</a> XML] [ [XML <a bar=<->><-></a> XML] ] undo ] unit-test

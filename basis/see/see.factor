@@ -7,7 +7,7 @@ generic.single generic.standard generic.hook io io.pathnames
 io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections sequences sets sorting strings summary words
-words.symbol words.constant words.alias ;
+words.symbol words.constant words.alias vocabs ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -44,7 +44,7 @@ M: word print-stack-effect? drop t ;
 <PRIVATE
 
 : seeing-word ( word -- )
-    vocabulary>> pprinter-in set ;
+    vocabulary>> dup [ vocab ] when pprinter-in set ;
 
 : word-synopsis ( word -- )
     {

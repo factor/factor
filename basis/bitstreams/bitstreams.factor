@@ -1,96 +1,160 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays destructors fry io kernel locals
-math sequences ;
+USING: accessors alien.accessors assocs byte-arrays combinators
+constructors destructors fry io io.binary io.encodings.binary
+io.streams.byte-array kernel locals macros math math.ranges
+multiline sequences sequences.private vectors byte-vectors
+combinators.short-circuit math.bitwise ;
 IN: bitstreams
 
-TUPLE: bitstream stream end-of-stream? current-bits #bits disposed ;
-TUPLE: bitstream-reader < bitstream ;
+TUPLE: widthed { bits integer read-only } { #bits integer read-only } ;
 
-: reset-bitstream ( stream -- stream )
-    0 >>#bits 0 >>current-bits ; inline
+ERROR: invalid-widthed bits #bits ;
 
-: new-bitstream ( stream class -- bitstream )
+: check-widthed ( bits #bits -- bits #bits )
+    dup 0 < [ invalid-widthed ] when
+    2dup { [ nip 0 = ] [ drop 0 = not ] } 2&& [ invalid-widthed ] when
+    over 0 = [
+        2dup [ dup 0 < [ neg ] when log2 1 + ] dip > [ invalid-widthed ] when
+    ] unless ;
+
+: <widthed> ( bits #bits -- widthed )
+    check-widthed
+    widthed boa ;
+
+: zero-widthed ( -- widthed ) 0 0 <widthed> ;
+: zero-widthed? ( widthed -- ? ) zero-widthed = ;
+
+TUPLE: bit-reader
+    { bytes byte-array }
+    { byte-pos array-capacity initial: 0 }
+    { bit-pos array-capacity initial: 0 } ;
+
+TUPLE: bit-writer
+    { bytes byte-vector }
+    { widthed widthed } ;
+
+TUPLE: msb0-bit-reader < bit-reader ;
+TUPLE: lsb0-bit-reader < bit-reader ;
+CONSTRUCTOR: msb0-bit-reader ( bytes -- bs ) ;
+CONSTRUCTOR: lsb0-bit-reader ( bytes -- bs ) ;
+
+TUPLE: msb0-bit-writer < bit-writer ;
+TUPLE: lsb0-bit-writer < bit-writer ;
+
+: new-bit-writer ( class -- bs )
     new
-        swap >>stream
-        reset-bitstream ; inline
+        BV{ } clone >>bytes
+        0 0 <widthed> >>widthed ; inline
 
-M: bitstream-reader dispose ( stream -- )
-    stream>> dispose ;
+: <msb0-bit-writer> ( -- bs )
+    msb0-bit-writer new-bit-writer ;
 
-: <bitstream-reader> ( stream -- bitstream )
-    bitstream-reader new-bitstream ; inline
+: <lsb0-bit-writer> ( -- bs )
+    lsb0-bit-writer new-bit-writer ;
 
-: read-next-byte ( bitstream -- bitstream )
-    dup stream>> stream-read1 [
-        >>current-bits 8 >>#bits
+GENERIC: peek ( n bitstream -- value )
+GENERIC: poke ( value n bitstream -- )
+
+: seek ( n bitstream -- )
+    {
+        [ byte-pos>> 8 * ]
+        [ bit-pos>> + + 8 /mod ]
+        [ (>>bit-pos) ]
+        [ (>>byte-pos) ]
+    } cleave ; inline
+
+: read ( n bitstream -- value )
+    [ peek ] [ seek ] 2bi ; inline
+
+<PRIVATE
+
+ERROR: not-enough-bits widthed n ;
+
+: widthed-bits ( widthed n -- bits )
+    dup 0 < [ not-enough-bits ] when
+    2dup [ #bits>> ] dip < [ not-enough-bits ] when
+    [ [ bits>> ] [ #bits>> ] bi ] dip
+    [ - neg shift ] keep <widthed> ;
+
+: split-widthed ( widthed n -- widthed1 widthed2 )
+    2dup [ #bits>> ] dip < [
+        drop zero-widthed
     ] [
-        0 >>#bits
-        t >>end-of-stream?
-    ] if* ;
-
-: maybe-read-next-byte ( bitstream -- bitstream )
-    dup #bits>> 0 = [ read-next-byte ] when ; inline
-
-: shift-one-bit ( bitstream -- n )
-    [ current-bits>> ] [ #bits>> ] bi 1- neg shift 1 bitand ; inline
-
-: next-bit ( bitstream -- n/f ? )
-    maybe-read-next-byte
-    dup end-of-stream?>> [
-        drop f
-    ] [
-        [ shift-one-bit ]
-        [ [ 1- ] change-#bits maybe-read-next-byte drop ] bi
-    ] if dup >boolean ;
-
-: read-bit ( bitstream -- n ? )
-    dup #bits>> 1 = [
-        [ current-bits>> 1 bitand ]
-        [ read-next-byte drop ] bi t
-    ] [
-        next-bit
-    ] if ; inline
-
-: bits>integer ( seq -- n )
-    0 [ [ 1 shift ] dip bitor ] reduce ; inline
-
-: read-bits ( width bitstream -- n width ? )
-    [
-        '[ _ read-bit drop ] replicate
-        [ f = ] trim-tail
-        [ bits>integer ] [ length ] bi
-    ] 2keep drop over = ;
-
-TUPLE: bitstream-writer < bitstream ;
-
-: <bitstream-writer> ( stream -- bitstream )
-    bitstream-writer new-bitstream ; inline
-
-: write-bit ( n bitstream -- )
-    [ 1 shift bitor ] change-current-bits
-    [ 1+ ] change-#bits
-    dup #bits>> 8 = [
-        [ [ current-bits>> ] [ stream>> stream-write1 ] bi ]
-        [ reset-bitstream drop ] bi
-    ] [
-        drop
-    ] if ; inline
-
-ERROR: invalid-bit-width n ;
-
-:: write-bits ( n width bitstream -- )
-    n 0 < [ n invalid-bit-width ] when
-    n 0 = [
-        width [ 0 bitstream write-bit ] times
-    ] [
-        width n log2 1+ dup :> n-length - [ 0 bitstream write-bit ] times
-        n-length [
-            n-length swap - 1- neg n swap shift 1 bitand
-            bitstream write-bit
-        ] each
+        [ widthed-bits ]
+        [ [ [ bits>> ] [ #bits>> ] bi ] dip - [ bits ] keep <widthed> ] 2bi
     ] if ;
 
-: flush-bits ( bitstream -- ) stream>> stream-flush ;
+: widthed>bytes ( widthed -- bytes widthed )
+    [ 8 split-widthed dup zero-widthed? not ]
+    [ swap bits>> ] B{ } produce-as nip swap ;
 
-: bitstream-output ( bitstream -- bytes ) stream>> >byte-array ;
+:: |widthed ( widthed1 widthed2 -- widthed3 )
+    widthed1 bits>> :> bits1
+    widthed1 #bits>> :> #bits1
+    widthed2 bits>> :> bits2
+    widthed2 #bits>> :> #bits2
+    bits1 #bits2 shift bits2 bitor
+    #bits1 #bits2 + <widthed> ;
+
+PRIVATE>
+
+M:: lsb0-bit-writer poke ( value n bs -- )
+    value n <widthed> :> widthed
+    widthed
+    bs widthed>> #bits>> 8 swap - split-widthed :> remainder :> byte
+    byte bs widthed>> |widthed :> new-byte
+    new-byte #bits>> 8 = [
+        new-byte bits>> bs bytes>> push
+        zero-widthed bs (>>widthed)
+        remainder widthed>bytes
+        [ bs bytes>> push-all ] [ bs (>>widthed) ] bi*
+    ] [
+        byte bs (>>widthed)
+    ] if ;
+
+: enough-bits? ( n bs -- ? )
+    [ bytes>> length ]
+    [ byte-pos>> - 8 * ]
+    [ bit-pos>> - ] tri <= ;
+
+ERROR: not-enough-bits n bit-reader ;
+
+: #bits>#bytes ( #bits -- #bytes )
+    8 /mod 0 = [ 1 + ] unless ; inline
+
+:: subseq>bits-le ( bignum n bs -- bits )
+    bignum bs bit-pos>> neg shift n bits ;
+
+:: subseq>bits-be ( bignum n bs -- bits )
+    bignum 
+    8 bs bit-pos>> - n - 8 mod dup 0 < [ 8 + ] when
+    neg shift n bits ;
+
+:: adjust-bits ( n bs -- )
+    n 8 /mod :> #bits :> #bytes
+    bs [ #bytes + ] change-byte-pos
+    bit-pos>> #bits + dup 8 >= [
+        8 - bs (>>bit-pos)
+        bs [ 1 + ] change-byte-pos drop
+    ] [
+        bs (>>bit-pos)
+    ] if ;
+
+:: (peek) ( n bs endian> subseq-endian -- bits )
+    n bs enough-bits? [ n bs not-enough-bits ] unless
+    bs [ byte-pos>> ] [ bit-pos>> n + ] bi #bits>#bytes dupd +
+    bs bytes>> subseq endian> execute( seq -- x ) :> bignum
+    bignum n bs subseq-endian execute( bignum n bs -- bits ) ;
+
+M: lsb0-bit-reader peek ( n bs -- bits ) \ le> \ subseq>bits-le (peek) ;
+
+M: msb0-bit-reader peek ( n bs -- bits ) \ be> \ subseq>bits-be (peek) ;
+
+:: bit-writer-bytes ( writer -- bytes )
+    writer widthed>> #bits>> :> n
+    n 0 = [
+        writer widthed>> bits>> 8 n - shift
+        writer bytes>> swap push
+    ] unless
+    writer bytes>> ;

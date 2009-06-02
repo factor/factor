@@ -52,7 +52,7 @@ USING: kernel math parser sequences combinators splitting ;
 : consonant-end? ( n seq -- ? )
     [ length swap - ] keep consonant? ;
 
-: last-is? ( str possibilities -- ? ) [ peek ] dip member? ;
+: last-is? ( str possibilities -- ? ) [ last ] dip member? ;
 
 : cvc? ( str -- ? )
     {
@@ -67,7 +67,7 @@ USING: kernel math parser sequences combinators splitting ;
     pick consonant-seq 0 > [ nip ] [ drop ] if append ;
 
 : step1a ( str -- newstr )
-    dup peek CHAR: s = [
+    dup last CHAR: s = [
         {
             { [ "sses" ?tail ] [ "ss" append ] }
             { [ "ies" ?tail ] [ "i" append ] }
@@ -199,13 +199,13 @@ USING: kernel math parser sequences combinators splitting ;
     [ 1 = [ but-last-slice cvc? not ] [ drop f ] if ] if ;
 
 : remove-e ( str -- newstr )
-    dup peek CHAR: e = [
+    dup last CHAR: e = [
         dup remove-e? [ but-last-slice ] when
     ] when ;
 
 : ll->l ( str -- newstr )
     {
-        { [ dup peek CHAR: l = not ] [ ] }
+        { [ dup last CHAR: l = not ] [ ] }
         { [ dup length 1- over double-consonant? not ] [ ] }
         { [ dup consonant-seq 1 > ] [ but-last-slice ] }
         [ ]

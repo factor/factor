@@ -173,10 +173,10 @@ Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
 ] unit-test
 
 ! Live-fire exercise
-USING: http.server http.server.static furnace.sessions furnace.alloy
-furnace.actions furnace.auth furnace.auth.login furnace.db http.client
-io.servers.connection io.files io.files.temp io.directories io io.encodings.ascii
-accessors namespaces threads
+USING: http.server.static furnace.sessions furnace.alloy
+furnace.actions furnace.auth furnace.auth.login furnace.db
+io.servers.connection io.files io.files.temp io.directories io
+threads
 http.server.responses http.server.redirection furnace.redirection
 http.server.dispatchers db.tuples ;
 

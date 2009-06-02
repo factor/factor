@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays arrays assocs kernel kernel.private libc math
-namespaces make parser sequences strings words assocs splitting
-math.parser cpu.architecture alien alien.accessors alien.strings
-quotations layouts system compiler.units io io.files
-io.encodings.binary io.streams.memory accessors combinators effects
-continuations fry classes ;
+namespaces make parser sequences strings words splitting math.parser
+cpu.architecture alien alien.accessors alien.strings quotations
+layouts system compiler.units io io.files io.encodings.binary
+io.streams.memory accessors combinators effects continuations fry
+classes ;
 IN: alien.c-types
 
 DEFER: <int>

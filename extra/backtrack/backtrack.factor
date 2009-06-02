@@ -29,6 +29,10 @@ MACRO: checkpoint ( quot -- quot' )
 
 <PRIVATE
 
+: preserve ( quot var -- ) [ get [ call ] dip ] keep set ; inline
+
+: amb-preserve ( quot -- ) failure preserve ; inline
+
 : unsafe-number-from-to ( to from -- to from+n )
     2dup = [ [ 1 + unsafe-number-from-to ] checkpoint ] unless ;
 
@@ -57,13 +61,19 @@ MACRO: amb-execute ( seq -- quot )
     [ length 1 - ] [ <enum> [ 1quotation ] assoc-map ] bi
     '[ _ 0 unsafe-number-from-to nip _ case ] ;
 
-: if-amb ( true false -- )
+: if-amb ( true false -- ? )
     [
         [ { t f } amb ]
         [ '[ @ require t ] ]
         [ '[ @ f ] ]
         tri* if
-    ] with-scope ; inline
+    ] amb-preserve ; inline
 
 : cut-amb ( -- )
     f failure set ;
+
+: amb-all ( quot -- )
+    [ { t f } amb [ call fail ] [ drop ] if ] amb-preserve ; inline
+
+: bag-of ( quot -- seq )
+    V{ } clone [ '[ @ _ push ] amb-all ] keep ; inline

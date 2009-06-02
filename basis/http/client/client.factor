@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math math.parser namespaces make
+USING: assocs kernel math math.parser namespaces make
 sequences strings splitting calendar continuations accessors vectors
 math.order hashtables byte-arrays destructors
 io io.sockets io.streams.string io.files io.timeouts

@@ -26,11 +26,15 @@ M: range hashcode* tuple-hashcode ;
 
 INSTANCE: range immutable-sequence
 
+<PRIVATE
+
 : twiddle ( a b -- a b step ) 2dup > -1 1 ? ; inline
 
 : (a, ( a b step -- a' b' step ) dup [ + ] curry 2dip ; inline
 
 : ,b) ( a b step -- a' b' step ) dup [ - ] curry dip ; inline
+
+PRIVATE>
 
 : [a,b] ( a b -- range ) twiddle <range> ; inline
 
@@ -45,24 +49,3 @@ INSTANCE: range immutable-sequence
 : [1,b] ( b -- range ) 1 swap [a,b] ; inline
 
 : [0,b) ( b -- range ) 0 swap [a,b) ; inline
-
-: range-increasing? ( range -- ? )
-    step>> 0 > ;
-
-: range-decreasing? ( range -- ? )
-    step>> 0 < ;
-
-: first-or-peek ( seq head? -- elt )
-    [ first ] [ peek ] if ;
-
-: range-min ( range -- min )
-    dup range-increasing? first-or-peek ;
-
-: range-max ( range -- max )
-    dup range-decreasing? first-or-peek ;
-
-: clamp-to-range ( n range -- n )
-    [ range-min max ] [ range-max min ] bi ;
-
-: sequence-index-range  ( seq -- range )
-    length [0,b) ;

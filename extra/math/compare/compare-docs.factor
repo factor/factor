@@ -16,8 +16,3 @@ HELP: posmax
 HELP: negmin
 { $values { "a" number } { "b" number } { "x" number } }
 { $description "Returns the most-negative value, or zero if both are positive." } ;
-
-HELP: clamp
-{ $values { "a" number } { "value" number } { "b" number } { "x" number } }
-{ $description "Returns the value when between " { $snippet "a" } " and " { $snippet "b" } ", " { $snippet "a" } " if <= " { $snippet "a" } ", or " { $snippet "b" } " if >= " { $snippet "b" } "." } ;
-

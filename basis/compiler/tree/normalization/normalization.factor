@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces sequences math math.order accessors kernel arrays
-combinators compiler.utilities assocs
+combinators assocs
 stack-checker.backend
 stack-checker.branches
 stack-checker.inlining
@@ -60,7 +60,7 @@ M: #branch normalize*
 : eliminate-phi-introductions ( introductions seq terminated -- seq' )
     [
         [ nip ] [
-            dup [ +bottom+ eq? ] trim-head
+            dup [ +top+ eq? ] trim-head
             [ [ length ] bi@ - tail* ] keep append
         ] if
     ] 3map ;

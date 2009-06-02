@@ -76,7 +76,7 @@ MACRO: ncleave ( quots n -- )
 MACRO: nspread ( quots n -- )
     over empty? [ 2drop [ ] ] [
         [ [ but-last ] dip ]
-        [ [ peek ] dip ] 2bi
+        [ [ last ] dip ] 2bi
         swap
         '[ [ _ _ nspread ] _ ndip @ ]
     ] if ;

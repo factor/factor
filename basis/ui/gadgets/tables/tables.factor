@@ -5,7 +5,7 @@ math.functions math.rectangles math.order math.vectors namespaces
 opengl sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.worlds ui.gestures ui.render ui.pens.solid ui.text
 ui.commands ui.images ui.gadgets.menus ui.gadgets.line-support
-math.rectangles models math.ranges sequences combinators
+models math.ranges combinators
 combinators.short-circuit fonts locals strings ;
 IN: ui.gadgets.tables
 

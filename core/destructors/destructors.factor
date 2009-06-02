@@ -21,7 +21,7 @@ M: object dispose
 : dispose-each ( seq -- )
     [
         [ [ dispose ] curry [ , ] recover ] each
-    ] { } make [ peek rethrow ] unless-empty ;
+    ] { } make [ last rethrow ] unless-empty ;
 
 : with-disposal ( object quot -- )
     over [ dispose ] curry [ ] cleanup ; inline

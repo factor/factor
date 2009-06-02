@@ -1,15 +1,13 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces assocs hashtables sequences arrays
 accessors vectors combinators sets classes compiler.cfg
 compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.copy-prop ;
+compiler.cfg.copy-prop compiler.cfg.rpo
+compiler.cfg.liveness compiler.cfg.local ;
 IN: compiler.cfg.alias-analysis
 
-! Alias analysis -- assumes compiler.cfg.height has already run.
-!
-! We try to eliminate redundant slot and stack
-! traffic using some simple heuristics.
+! We try to eliminate redundant slot operations using some simple heuristics.
 ! 
 ! All heap-allocated objects which are loaded from the stack, or
 ! other object slots are pessimistically assumed to belong to
@@ -17,9 +15,6 @@ IN: compiler.cfg.alias-analysis
 !
 ! Freshly-allocated objects get their own alias class.
 !
-! The data and retain stack pointer registers are treated
-! uniformly, and each one gets its own alias class.
-! 
 ! Simple pseudo-C example showing load elimination:
 ! 
 ! int *x, *y, z: inputs
@@ -68,15 +63,14 @@ IN: compiler.cfg.alias-analysis
 ! Map vregs -> alias classes
 SYMBOL: vregs>acs
 
-: check ( obj -- obj )
-    [ "BUG: static type error detected" throw ] unless* ; inline
- 
+ERROR: vreg-ac-not-set vreg ;
+
 : vreg>ac ( vreg -- ac )
     #! Only vregs produced by ##allot, ##peek and ##slot can
     #! ever be used as valid inputs to ##slot and ##set-slot,
     #! so we assert this fact by not giving alias classes to
     #! other vregs.
-    vregs>acs get at check ;
+    vregs>acs get ?at [ vreg-ac-not-set ] unless ;
 
 ! Map alias classes -> sequence of vregs
 SYMBOL: acs>vregs
@@ -122,8 +116,10 @@ SYMBOL: histories
     #! value.
     over [ live-slots get at at ] [ 2drop f ] if ;
 
+ERROR: vreg-has-no-slots vreg ;
+
 : load-constant-slot ( value slot# vreg -- )
-    live-slots get at check set-at ;
+    live-slots get ?at [ vreg-has-no-slots ] unless set-at ;
 
 : load-slot ( value slot#/f vreg -- )
     over [ load-constant-slot ] [ 3drop ] if ;
@@ -165,7 +161,7 @@ SYMBOL: heap-ac
 
 : record-constant-set-slot ( slot# vreg -- )
     history [
-        dup empty? [ dup peek store? [ dup pop* ] when ] unless
+        dup empty? [ dup last store? [ dup pop* ] when ] unless
         store new-action swap ?push
     ] change-at ;
 
@@ -189,67 +185,49 @@ SYMBOL: constants
 GENERIC: insn-slot# ( insn -- slot#/f )
 GENERIC: insn-object ( insn -- vreg )
 
-M: ##peek insn-slot# loc>> n>> ;
-M: ##replace insn-slot# loc>> n>> ;
 M: ##slot insn-slot# slot>> constant ;
 M: ##slot-imm insn-slot# slot>> ;
 M: ##set-slot insn-slot# slot>> constant ;
 M: ##set-slot-imm insn-slot# slot>> ;
 M: ##alien-global insn-slot# [ library>> ] [ symbol>> ] bi 2array ;
 
-M: ##peek insn-object loc>> class ;
-M: ##replace insn-object loc>> class ;
 M: ##slot insn-object obj>> resolve ;
 M: ##slot-imm insn-object obj>> resolve ;
 M: ##set-slot insn-object obj>> resolve ;
 M: ##set-slot-imm insn-object obj>> resolve ;
 M: ##alien-global insn-object drop \ ##alien-global ;
 
-: init-alias-analysis ( -- )
+: init-alias-analysis ( live-in -- )
     H{ } clone histories set
     H{ } clone vregs>acs set
     H{ } clone acs>vregs set
     H{ } clone live-slots set
     H{ } clone constants set
     H{ } clone copies set
-
+    
     0 ac-counter set
     next-ac heap-ac set
 
-    ds-loc next-ac set-ac
-    rs-loc next-ac set-ac ;
+    [ set-heap-ac ] each ;
 
 GENERIC: analyze-aliases* ( insn -- insn' )
 
 M: ##load-immediate analyze-aliases*
     dup [ val>> ] [ dst>> ] bi constants get set-at ;
 
-M: ##load-reference analyze-aliases*
+M: ##flushable analyze-aliases*
     dup dst>> set-heap-ac ;
 
-M: ##alien-global analyze-aliases*
-    dup dst>> set-heap-ac ;
-
-M: ##allot analyze-aliases*
-    #! A freshly allocated object is distinct from any other
-    #! object.
-    dup dst>> set-new-ac ;
-
-M: ##box-float analyze-aliases*
-    #! A freshly allocated object is distinct from any other
-    #! object.
-    dup dst>> set-new-ac ;
-
-M: ##box-alien analyze-aliases*
+M: ##allocation analyze-aliases*
     #! A freshly allocated object is distinct from any other
     #! object.
     dup dst>> set-new-ac ;
 
 M: ##read analyze-aliases*
-    dup dst>> set-heap-ac
+    call-next-method
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri
     2dup live-slot dup [
-        2nip f \ ##copy boa analyze-aliases* nip
+        2nip \ ##copy new-insn analyze-aliases* nip
     ] [
         drop remember-slot
     ] if ;
@@ -292,15 +270,6 @@ GENERIC: eliminate-dead-stores* ( insn -- insn' )
         ] unless
     ] when ;
 
-M: ##replace eliminate-dead-stores*
-    #! Writes to above the top of the stack can be pruned also.
-    #! This is sound since any such writes are not observable
-    #! after the basic block, and any reads of those locations
-    #! will have been converted to copies by analyze-slot,
-    #! and the final stack height of the basic block is set at
-    #! the beginning by compiler.cfg.stack.
-    dup loc>> n>> 0 < [ drop f ] [ (eliminate-dead-stores) ] if ;
-
 M: ##set-slot eliminate-dead-stores* (eliminate-dead-stores) ;
 
 M: ##set-slot-imm eliminate-dead-stores* (eliminate-dead-stores) ;
@@ -310,8 +279,10 @@ M: insn eliminate-dead-stores* ;
 : eliminate-dead-stores ( insns -- insns' )
     [ insn# set eliminate-dead-stores* ] map-index sift ;
 
-: alias-analysis ( insns -- insns' )
-    init-alias-analysis
+: alias-analysis-step ( insns -- insns' )
     analyze-aliases
     compute-live-stores
     eliminate-dead-stores ;
+
+: alias-analysis ( cfg -- cfg' )
+    [ init-alias-analysis ] [ alias-analysis-step ] local-optimization ;

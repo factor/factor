@@ -70,7 +70,7 @@ M: persistent-vector nth-unsafe
     dup level>> 1 = [
         new-child
     ] [
-        tuck children>> peek (ppush-new-tail)
+        tuck children>> last (ppush-new-tail)
         [ swap new-child ] [ swap node-set-last f ] ?if
     ] if ;
 
@@ -127,13 +127,13 @@ M: persistent-vector new-nth ( obj i pvec -- pvec' )
 
 : ppop-contraction ( node -- node' tail' )
     dup children>> length 1 =
-    [ children>> peek f swap ]
+    [ children>> last f swap ]
     [ (ppop-contraction) ]
     if ;
 
 : (ppop-new-tail) ( root -- root' tail' )
     dup level>> 1 > [
-        dup children>> peek (ppop-new-tail) [
+        dup children>> last (ppop-new-tail) [
             dup
             [ swap node-set-last ]
             [ drop ppop-contraction drop ]

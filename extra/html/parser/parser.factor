@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables sequence-parser
-html.parser.utils kernel namespaces sequences
+html.parser.utils kernel namespaces sequences math
 unicode.case unicode.categories combinators.short-circuit
 quoting fry ;
 IN: html.parser
@@ -21,7 +21,7 @@ SYMBOL: tagstack
 
 : closing-tag? ( string -- ? )
     [ f ]
-    [ { [ first CHAR: / = ] [ peek CHAR: / = ] } 1|| ] if-empty ;
+    [ { [ first CHAR: / = ] [ last CHAR: / = ] } 1|| ] if-empty ;
 
 : <tag> ( name attributes closing? -- tag )
     tag new
@@ -63,10 +63,12 @@ SYMBOL: tagstack
     [ blank? ] trim ;
 
 : read-comment ( sequence-parser -- )
-    "-->" take-until-sequence comment new-tag push-tag ;
+    [ "-->" take-until-sequence comment new-tag push-tag ]
+    [ '[ _ advance drop ] 3 swap times ] bi ;
 
 : read-dtd ( sequence-parser -- )
-    ">" take-until-sequence dtd new-tag push-tag ;
+    [ ">" take-until-sequence dtd new-tag push-tag ]
+    [ advance drop ] bi ;
 
 : read-bang ( sequence-parser -- )
     advance dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&&

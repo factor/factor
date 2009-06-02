@@ -3,6 +3,8 @@ USING: tools.test random sorting sequences sets hashtables assocs
 kernel fry arrays splitting namespaces math accessors vectors
 math.order grouping
 cpu.architecture
+compiler.cfg
+compiler.cfg.optimizer
 compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.linear-scan
@@ -244,7 +246,7 @@ SYMBOL: max-uses
                 swap int-regs swap vreg boa >>vreg
                 max-uses get random 2 max [ not-taken ] replicate natural-sort
                 [ >>uses ] [ first >>start ] bi
-                dup uses>> peek >>end
+                dup uses>> last >>end
         ] map
     ] with-scope ;
 
@@ -264,18 +266,27 @@ SYMBOL: max-uses
 
 USING: math.private compiler.cfg.debugger ;
 
-[ ] [ [ float+ float>fixnum 3 fixnum*fast ] test-mr first linear-scan drop ] unit-test
+[ ] [
+    [ float+ float>fixnum 3 fixnum*fast ]
+    test-cfg first optimize-cfg linear-scan drop
+] unit-test
 
 [ f ] [
-    T{ ##allot
-        f
-        T{ vreg f int-regs 1 }
-        40
-        array
-        T{ vreg f int-regs 2 }
-        f
-    } clone
-    1array (linear-scan) first regs>> values all-equal?
+    T{ basic-block
+       { instructions
+         V{
+             T{ ##allot
+                f
+                T{ vreg f int-regs 1 }
+                40
+                array
+                T{ vreg f int-regs 2 }
+                f
+             }
+         }
+       }
+    } clone [ [ clone ] map ] change-instructions
+    dup 1array (linear-scan) instructions>> first regs>> values all-equal?
 ] unit-test
 
 [ 0 1 ] [

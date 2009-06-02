@@ -1,9 +1,9 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables io kernel math assocs
 namespaces make sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
-accessors sets ;
+accessors sets vocabs.parser combinators vocabs ;
 IN: prettyprint.sections
 
 ! State
@@ -19,8 +19,16 @@ TUPLE: pprinter last-newline line-count indent ;
 
 : <pprinter> ( -- pprinter ) 0 1 0 pprinter boa ;
 
+: (record-vocab) ( vocab -- )
+    dup pprinter-in get dup [ vocab-name ] when =
+    [ drop ] [ pprinter-use get conjoin ] if ;
+
 : record-vocab ( word -- )
-    vocabulary>> [ pprinter-use get conjoin ] when* ;
+    vocabulary>> {
+        { f [ ] }
+        { "syntax" [ ] }
+        [ (record-vocab) ]
+    } case ;
 
 ! Utility words
 : line-limit? ( -- ? )
@@ -145,7 +153,7 @@ TUPLE: block < section sections ;
 : <block> ( style -- block )
     block new-block ;
 
-: pprinter-block ( -- block ) pprinter-stack get peek ;
+: pprinter-block ( -- block ) pprinter-stack get last ;
 
 : add-section ( section -- )
     pprinter-block sections>> push ;
@@ -284,7 +292,7 @@ M: colon unindent-first-line? drop t ;
 
 ! Long section layout algorithm
 : chop-break ( seq -- seq )
-    dup peek line-break? [ but-last-slice chop-break ] when ;
+    dup last line-break? [ but-last-slice chop-break ] when ;
 
 SYMBOL: prev
 SYMBOL: next
@@ -309,7 +317,7 @@ SYMBOL: next
     ] { } make { t } split harvest ;
 
 : break-group? ( seq -- ? )
-    [ first section-fits? ] [ peek section-fits? not ] bi and ;
+    [ first section-fits? ] [ last section-fits? not ] bi and ;
 
 : ?break-group ( seq -- )
     dup break-group? [ first <fresh-line ] [ drop ] if ;
@@ -326,3 +334,25 @@ M: block long-section ( block -- )
             ] each
         ] each
     ] if-nonempty ;
+
+: pprinter-manifest ( -- manifest )
+    <manifest>
+    [ [ pprinter-use get keys >vector ] dip (>>search-vocabs) ]
+    [ [ pprinter-in get ] dip (>>current-vocab) ]
+    [ ]
+    tri ;
+
+: make-pprint ( obj quot -- block manifest )
+    [
+        0 position set
+        H{ } clone pprinter-use set
+        V{ } clone recursion-check set
+        V{ } clone pprinter-stack set
+        over <object
+        call
+        pprinter-block
+        pprinter-manifest
+    ] with-scope ; inline
+
+: with-pprint ( obj quot -- )
+    make-pprint drop do-pprint ; inline
