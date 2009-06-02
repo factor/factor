@@ -130,3 +130,7 @@ unit-test
 
 [ 1 f ] [ 1 H{ } ?at ] unit-test
 [ 2 t ] [ 1 H{ { 1 2 } } ?at ] unit-test
+
+[ f ] [ 1 2 H{ { 2 1 } } maybe-set-at ] unit-test
+[ t ] [ 1 3 H{ { 2 1 } } clone maybe-set-at ] unit-test
+[ t ] [ 3 2 H{ { 2 1 } } clone maybe-set-at ] unit-test

@@ -5,13 +5,6 @@ memory namespaces make sequences layouts system hashtables
 classes alien byte-arrays combinators words sets fry ;
 IN: cpu.architecture
 
-! Labels
-TUPLE: label offset ;
-
-: <label> ( -- label ) label new ;
-: define-label ( name -- ) <label> swap set ;
-: resolve-label ( label/name -- ) dup label? [ get ] unless , ;
-
 ! Register classes
 SINGLETON: int-regs
 SINGLETON: single-float-regs
@@ -51,8 +44,8 @@ HOOK: %jump cpu ( word -- )
 HOOK: %jump-label cpu ( label -- )
 HOOK: %return cpu ( -- )
 
-HOOK: %dispatch cpu ( src temp offset -- )
-HOOK: %dispatch-label cpu ( word -- )
+HOOK: %dispatch cpu ( src temp -- )
+HOOK: %dispatch-label cpu ( label -- )
 
 HOOK: %slot cpu ( dst obj slot tag temp -- )
 HOOK: %slot-imm cpu ( dst obj slot tag -- )
