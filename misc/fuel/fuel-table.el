@@ -72,21 +72,64 @@
         (push (fuel-table--pad-row (reverse frow)) frows)))
     (reverse frows)))
 
+(defvar fuel-table-corner-lt "┌")
+(defvar fuel-table-corner-lb "└")
+(defvar fuel-table-corner-rt "┐")
+(defvar fuel-table-corner-rb "┘")
+(defvar fuel-table-line "─")
+(defvar fuel-table-tee-t "┬")
+(defvar fuel-table-tee-b "┴")
+(defvar fuel-table-tee-l "├")
+(defvar fuel-table-tee-r "┤")
+(defvar fuel-table-crux "┼")
+(defvar fuel-table-sep "│")
+
+(defun fuel-table--insert-line (widths first last sep)
+  (insert first fuel-table-line)
+  (dolist (w widths)
+    (while (> w 0)
+      (insert fuel-table-line)
+      (setq w (1- w)))
+    (insert fuel-table-line sep fuel-table-line))
+  (delete-char -2)
+  (insert fuel-table-line last)
+  (newline))
+
+(defun fuel-table--insert-first-line (widths)
+  (fuel-table--insert-line widths
+                           fuel-table-corner-lt
+                           fuel-table-corner-rt
+                           fuel-table-tee-t))
+
+(defun fuel-table--insert-middle-line (widths)
+  (fuel-table--insert-line widths
+                           fuel-table-tee-l
+                           fuel-table-tee-r
+                           fuel-table-crux))
+
+(defun fuel-table--insert-last-line (widths)
+  (fuel-table--insert-line widths
+                           fuel-table-corner-lb
+                           fuel-table-corner-rb
+                           fuel-table-tee-b))
+
 (defun fuel-table--insert (rows)
   (let* ((widths (fuel-table--col-widths rows))
-         (rows (fuel-table--format-rows rows widths))
-         (ls (concat "+" (mapconcat (lambda (n) (make-string n ?-)) widths "-+") "-+")))
-    (insert ls "\n")
+         (rows (fuel-table--format-rows rows widths)))
+    (fuel-table--insert-first-line widths)
     (dolist (r rows)
       (let ((ln (length (car r)))
             (l 0))
         (while (< l ln)
-          (insert (concat "|" (mapconcat 'identity
-                                         (mapcar `(lambda (x) (nth ,l x)) r)
-                                         " |")
-                          " |\n"))
+          (insert (concat fuel-table-sep " "
+                          (mapconcat 'identity
+                                     (mapcar `(lambda (x) (nth ,l x)) r)
+                                     (concat " " fuel-table-sep " "))
+                          "  " fuel-table-sep "\n"))
           (setq l (1+ l))))
-      (insert ls "\n"))))
+      (fuel-table--insert-middle-line widths))
+    (kill-line -1)
+    (fuel-table--insert-last-line widths)))
 
 
 (provide 'fuel-table)
