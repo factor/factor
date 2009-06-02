@@ -1,11 +1,10 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit sequences io.files
-io.encodings.ascii kernel values splitting accessors math.parser
-ascii io assocs strings math namespaces make sorting combinators
-math.order arrays unicode.normalize unicode.data locals
-macros sequences.deep words unicode.breaks
-quotations combinators.short-circuit simple-flat-file ;
+USING: sequences io.files io.encodings.ascii kernel values splitting
+accessors math.parser ascii io assocs strings math namespaces make
+sorting combinators math.order arrays unicode.normalize unicode.data
+locals macros sequences.deep words unicode.breaks quotations
+combinators.short-circuit simple-flat-file ;
 IN: unicode.collation
 
 <PRIVATE
@@ -64,13 +63,13 @@ ducet insert-helpers
     [ drop { } ]
     [ [ AAAA ] [ BBBB ] bi 2array ] if ;
 
-: last ( -- char )
-    building get empty? [ 0 ] [ building get peek peek ] if ;
+: building-last ( -- char )
+    building get empty? [ 0 ] [ building get last last ] if ;
 
 : blocked? ( char -- ? )
     combining-class dup { 0 f } member?
-    [ drop last non-starter? ]
-    [ last combining-class = ] if ;
+    [ drop building-last non-starter? ]
+    [ building-last combining-class = ] if ;
 
 : possible-bases ( -- slice-of-building )
     building get dup [ first non-starter? not ] find-last

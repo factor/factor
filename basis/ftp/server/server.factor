@@ -341,12 +341,11 @@ M: ftp-server handle-client* ( server -- )
     ] with-destructors ;
 
 : <ftp-server> ( directory port -- server )
-    ftp-server new-threaded-server
+    latin1 ftp-server new-threaded-server
         swap >>insecure
         swap canonicalize-path >>serving-directory
         "ftp.server" >>name
-        5 minutes >>timeout
-        latin1 >>encoding ;
+        5 minutes >>timeout ;
 
 : ftpd ( directory port -- )
     <ftp-server> start-server ;

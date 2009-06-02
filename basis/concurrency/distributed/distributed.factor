@@ -13,9 +13,8 @@ SYMBOL: local-node
     [ first2 get-process send ] [ stop-this-server ] if* ;
 
 : <node-server> ( addrspec -- threaded-server )
-    <threaded-server>
+    binary <threaded-server>
         swap >>insecure
-        binary >>encoding
         "concurrency.distributed" >>name
         [ handle-node-client ] >>handler ;
 

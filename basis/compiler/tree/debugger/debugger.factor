@@ -16,6 +16,7 @@ compiler.tree.builder
 compiler.tree.optimizer
 compiler.tree.combinators
 compiler.tree.checker ;
+FROM: fry => _ ;
 RENAME: _ match => __
 IN: compiler.tree.debugger
 
@@ -190,7 +191,7 @@ SYMBOL: node-count
     propagate
     compute-def-use
     dup check-nodes
-    peek node-input-infos ;
+    last node-input-infos ;
 
 : final-classes ( quot -- seq )
     final-info [ class>> ] map ;

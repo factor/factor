@@ -131,13 +131,13 @@ M: quotation com-stack-effect infer. ;
 
 M: word com-stack-effect 1quotation com-stack-effect ;
 
-: com-enter-in ( vocab -- ) vocab-name set-in ;
+: com-enter-in ( vocab -- ) vocab-name set-current-vocab ;
 
 [ vocab? ] \ com-enter-in H{
     { +listener+ t }
 } define-operation
 
-: com-use-vocab ( vocab -- ) vocab-name use+ ;
+: com-use-vocab ( vocab -- ) vocab-name use-vocab ;
 
 [ vocab-spec? ] \ com-use-vocab H{
     { +secondary+ t }

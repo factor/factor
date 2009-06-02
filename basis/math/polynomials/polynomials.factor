@@ -48,7 +48,7 @@ PRIVATE>
 
 : /-last ( seq seq -- a )
     #! divide the last two numbers in the sequences
-    [ peek ] bi@ / ;
+    [ last ] bi@ / ;
 
 : (p/mod) ( p p -- p p )
     2dup /-last

@@ -197,7 +197,7 @@ IN: compiler.tree.propagation.tests
         { fixnum byte-array } declare
         [ nth-unsafe ] 2keep [ nth-unsafe ] 2keep nth-unsafe
         [ [ 298 * ] dip 100 * - ] dip 208 * - 128 + -8 shift
-        255 min 0 max
+        0 255 clamp
     ] final-classes
 ] unit-test
 
@@ -210,7 +210,7 @@ IN: compiler.tree.propagation.tests
 ] unit-test
 
 [ V{ 1.5 } ] [
-    [ /f 1.5 min 1.5 max ] final-literals
+    [ /f 1.5 1.5 clamp ] final-literals
 ] unit-test
 
 [ V{ 1.5 } ] [

@@ -447,9 +447,6 @@ X-FUNCTION: Status XDrawString (
 
 ! 8.7 - Transferring Images between Client and Server
 
-CONSTANT: XYBitmap 0
-CONSTANT: XYPixmap 1
-CONSTANT: ZPixmap  2
 CONSTANT: AllPlanes -1
 
 C-STRUCT: XImage-funcs

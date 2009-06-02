@@ -70,11 +70,15 @@ DEFER: (parse-paragraph)
         { CHAR: % inline-code }
     } at ;
 
+: or-simple-title ( url title/f quot: ( title -- title' ) -- url title' )
+    [ "" like dup simple-link-title ] if* ; inline
+
 : parse-link ( string -- paragraph-list )
     rest-slice "]]" split1-slice [
         "|" split1
-        [ "" like dup simple-link-title ] unless*
-        [ "image:" ?head ] dip swap [ image boa ] [ parse-paragraph link boa ] if
+        [ "image:" ?head ] dip swap
+        [ [ ] or-simple-title image boa ]
+        [ [ parse-paragraph ] or-simple-title link boa ] if
     ] dip [ (parse-paragraph) cons ] [ 1list ] if* ;
 
 : ?first ( seq -- elt ) 0 swap ?nth ;
@@ -145,15 +149,15 @@ DEFER: (parse-paragraph)
 
 : trim-row ( seq -- seq' )
     rest
-    dup peek empty? [ but-last ] when ;
+    dup last empty? [ but-last ] when ;
 
-: ?peek ( seq -- elt/f )
-    [ f ] [ peek ] if-empty ;
+: ?last ( seq -- elt/f )
+    [ f ] [ last ] if-empty ;
 
 : coalesce ( rows -- rows' )
     V{ } clone [
         '[
-            _ dup ?peek ?peek CHAR: \\ =
+            _ dup ?last ?last CHAR: \\ =
             [ [ pop "|" rot 3append ] keep ] when
             push 
         ] each

@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser words kernel classes compiler.units lexer ;
+USING: parser vocabs.parser words kernel classes compiler.units lexer ;
 IN: classes.parser
 
 : save-class-location ( class -- )
     location remember-class ;
 
-: create-class-in ( word -- word )
+: create-class-in ( string -- word )
     current-vocab create
     dup save-class-location
     dup predicate-word dup set-word save-location ;

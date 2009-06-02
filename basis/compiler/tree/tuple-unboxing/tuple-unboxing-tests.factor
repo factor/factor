@@ -1,5 +1,5 @@
 IN: compiler.tree.tuple-unboxing.tests
-USING: tools.test compiler.tree.tuple-unboxing compiler.tree
+USING: tools.test compiler.tree
 compiler.tree.builder compiler.tree.recursive
 compiler.tree.normalization compiler.tree.propagation
 compiler.tree.cleanup compiler.tree.escape-analysis

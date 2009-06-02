@@ -421,7 +421,7 @@ PRIVATE>
 : define-fortran-record ( name vocab fields -- )
     [ >lower ] [ ] [ fortran-record>c-struct ] tri* define-struct ;
 
-SYNTAX: RECORD: scan in get parse-definition define-fortran-record ;
+SYNTAX: RECORD: scan current-vocab parse-definition define-fortran-record ;
 
 : set-fortran-abi ( library -- )
     library-fortran-abis get-global at fortran-abi set ;

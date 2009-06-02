@@ -11,9 +11,8 @@ IN: fuel.remote
     [ [ print-error-and-restarts ] error-hook set listener ] with-scope ;
 
 : server ( port -- server )
-    <threaded-server>
+    utf8 <threaded-server>
         "tty-server" >>name
-        utf8 >>encoding
         swap local-server >>insecure
         [ start-listener ] >>handler
         f >>timeout ;

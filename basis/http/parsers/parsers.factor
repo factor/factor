@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit math math.order math.parser
 kernel sequences sequences.deep peg peg.parsers assocs arrays
-hashtables strings unicode.case namespaces make ascii ;
+hashtables strings namespaces make ascii ;
 IN: http.parsers
 
 : except ( quot -- parser )
@@ -142,7 +142,7 @@ PEG: parse-header-line ( string -- pair )
         'space' ,
         'attr' ,
         'space' ,
-        [ "=" token , 'space' , 'value' , ] seq* [ peek ] action optional ,
+        [ "=" token , 'space' , 'value' , ] seq* [ last ] action optional ,
         'space' ,
     ] seq* ;
 

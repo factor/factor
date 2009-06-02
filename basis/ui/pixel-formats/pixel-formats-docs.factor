@@ -1,12 +1,12 @@
 USING: destructors help.markup help.syntax kernel math multiline sequences
-vocabs vocabs.parser words ;
+vocabs vocabs.parser words namespaces ;
 IN: ui.pixel-formats
 
 ! break circular dependency
 <<
     "ui.gadgets.worlds" create-vocab drop
     "world" "ui.gadgets.worlds" create drop
-    "ui.gadgets.worlds" (use+)
+    "ui.gadgets.worlds" vocab-words use-words
 >>
 
 ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"

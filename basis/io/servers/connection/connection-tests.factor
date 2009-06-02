@@ -3,10 +3,10 @@ USING: tools.test io.servers.connection io.sockets namespaces
 io.servers.connection.private kernel accessors sequences
 concurrency.promises io.encodings.ascii io threads calendar ;
 
-[ t ] [ <threaded-server> listen-on empty? ] unit-test
+[ t ] [ ascii <threaded-server> listen-on empty? ] unit-test
 
 [ f ] [
-    <threaded-server>
+    ascii <threaded-server>
         25 internet-server >>insecure
     listen-on
     empty?
@@ -19,16 +19,16 @@ concurrency.promises io.encodings.ascii io threads calendar ;
     and
 ] unit-test
 
-[ ] [ <threaded-server> init-server drop ] unit-test
+[ ] [ ascii <threaded-server> init-server drop ] unit-test
 
 [ 10 ] [
-    <threaded-server>
+    ascii <threaded-server>
         10 >>max-connections
     init-server semaphore>> count>> 
 ] unit-test
 
 [ ] [
-    <threaded-server>
+    ascii <threaded-server>
         5 >>max-connections
         0 >>insecure
         [ "Hello world." write stop-this-server ] >>handler

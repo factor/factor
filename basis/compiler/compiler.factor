@@ -2,14 +2,21 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
-generic.single combinators deques search-deques macros io
-source-files.errors stack-checker stack-checker.state
-stack-checker.inlining stack-checker.errors combinators.short-circuit
-compiler.errors compiler.units compiler.tree.builder
-compiler.tree.optimizer compiler.cfg.builder compiler.cfg.optimizer
-compiler.cfg.linearization compiler.cfg.two-operand
-compiler.cfg.linear-scan compiler.cfg.stack-frame compiler.codegen
-compiler.utilities ;
+generic.single combinators deques search-deques macros
+source-files.errors combinators.short-circuit
+
+stack-checker stack-checker.state stack-checker.inlining stack-checker.errors
+
+compiler.errors compiler.units compiler.utilities
+
+compiler.tree.builder
+compiler.tree.optimizer
+
+compiler.cfg.builder
+compiler.cfg.optimizer
+compiler.cfg.mr
+
+compiler.codegen ;
 IN: compiler
 
 SYMBOL: compile-queue
@@ -89,11 +96,11 @@ M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
 : not-compiled-def ( word error -- def )
     '[ _ _ not-compiled ] [ ] like ;
 
+: deoptimize* ( word -- * )
+    dup def>> deoptimize-with ;
+
 : ignore-error ( word error -- * )
-    drop
-    [ clear-compiler-error ]
-    [ dup def>> deoptimize-with ]
-    bi ;
+    drop [ clear-compiler-error ] [ deoptimize* ] bi ;
 
 : remember-error ( word error -- * )
     [ swap <compiler-error> compiler-error ]
@@ -117,13 +124,13 @@ M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
 : contains-breakpoints? ( -- ? )
     dependencies get keys [ "break?" word-prop ] any? ;
 
-: frontend ( word -- nodes )
+: frontend ( word -- tree )
     #! If the word contains breakpoints, don't optimize it, since
     #! the walker does not support this.
     dup optimize? [
         [ [ build-tree ] [ deoptimize ] recover optimize-tree ] keep
-        contains-breakpoints? [ nip dup def>> deoptimize-with ] [ drop ] if
-    ] [ dup def>> deoptimize-with ] if ;
+        contains-breakpoints? [ nip deoptimize* ] [ drop ] if
+    ] [ deoptimize* ] if ;
 
 : compile-dependency ( word -- )
     #! If a word calls an unoptimized word, try to compile the callee.
@@ -143,13 +150,10 @@ t compile-dependencies? set-global
     [ compile-dependencies ]
     bi ;
 
-: backend ( nodes word -- )
+: backend ( tree word -- )
     build-cfg [
         optimize-cfg
         build-mr
-        convert-two-operand
-        linear-scan
-        build-stack-frame
         generate
         save-asm
     ] each ;
