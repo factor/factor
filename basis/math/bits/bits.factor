@@ -14,3 +14,6 @@ M: bits length length>> ;
 M: bits nth-unsafe number>> swap bit? ;
 
 INSTANCE: bits immutable-sequence
+
+: unbits ( seq -- number )
+    <reversed> 0 [ [ 1 shift ] dip [ 1+ ] when ] reduce ;

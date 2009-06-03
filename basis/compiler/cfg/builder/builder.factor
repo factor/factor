@@ -15,6 +15,7 @@ compiler.cfg.iterator
 compiler.cfg.utilities
 compiler.cfg.registers
 compiler.cfg.intrinsics
+compiler.cfg.stack-frame
 compiler.cfg.instructions
 compiler.alien ;
 IN: compiler.cfg.builder

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences assocs
 cpu.architecture compiler.cfg.rpo
-compiler.cfg.liveness compiler.cfg.instructions ;
+compiler.cfg.liveness compiler.cfg.instructions
+compiler.cfg.hats ;
 IN: compiler.cfg.gc-checks
 
 : gc? ( bb -- ? )
@@ -13,9 +14,7 @@ IN: compiler.cfg.gc-checks
 
 : insert-gc-check ( basic-block -- )
     dup gc? [
-        dup
-        [ swap object-pointer-regs \ ##gc new-insn prefix ]
-        change-instructions drop
+        [ i i f f \ ##gc new-insn prefix ] change-instructions drop
     ] [ drop ] if ;
 
 : insert-gc-checks ( cfg -- cfg' )
