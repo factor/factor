@@ -242,11 +242,12 @@ SYMBOL: max-uses
         max-insns get [ 0 ] replicate taken set
         max-insns get [ dup ] H{ } map>assoc available set
         [
-            live-interval new
+            \ live-interval new
                 swap int-regs swap vreg boa >>vreg
                 max-uses get random 2 max [ not-taken ] replicate natural-sort
                 [ >>uses ] [ first >>start ] bi
                 dup uses>> last >>end
+                dup [ start>> ] [ end>> ] bi <live-range> 1vector >>ranges
         ] map
     ] with-scope ;
 
@@ -269,24 +270,6 @@ USING: math.private compiler.cfg.debugger ;
 [ ] [
     [ float+ float>fixnum 3 fixnum*fast ]
     test-cfg first optimize-cfg linear-scan drop
-] unit-test
-
-[ f ] [
-    T{ basic-block
-       { instructions
-         V{
-             T{ ##allot
-                f
-                T{ vreg f int-regs 1 }
-                40
-                array
-                T{ vreg f int-regs 2 }
-                f
-             }
-         }
-       }
-    } clone [ [ clone ] map ] change-instructions
-    dup 1array (linear-scan) instructions>> first regs>> values all-equal?
 ] unit-test
 
 [ 0 1 ] [
