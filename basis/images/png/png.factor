@@ -3,7 +3,8 @@
 USING: accessors constructors images io io.binary io.encodings.ascii
 io.encodings.binary io.encodings.string io.files io.files.info kernel
 sequences io.streams.limited fry combinators arrays math
-checksums checksums.crc32 compression.inflate grouping byte-arrays ;
+checksums checksums.crc32 compression.inflate grouping byte-arrays
+images.loader ;
 IN: images.png
 
 TUPLE: png-image < image chunks
@@ -115,3 +116,5 @@ ERROR: unimplemented-color-type image ;
 
 M: png-image load-image*
     drop load-png ;
+
+"png" png-image register-image-class
