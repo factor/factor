@@ -8,14 +8,6 @@ GENERIC: temp-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
 
 M: ##flushable defs-vregs dst>> 1array ;
-M: ##unary/temp defs-vregs dst>> 1array ;
-M: ##allot defs-vregs dst>> 1array ;
-M: ##slot defs-vregs dst>> 1array ;
-M: ##set-slot defs-vregs temp>> 1array ;
-M: ##string-nth defs-vregs dst>> 1array ;
-M: ##compare defs-vregs dst>> 1array ;
-M: ##compare-imm defs-vregs dst>> 1array ;
-M: ##compare-float defs-vregs dst>> 1array ;
 M: insn defs-vregs drop f ;
 
 M: ##write-barrier temp-vregs [ card#>> ] [ table>> ] bi 2array ;
