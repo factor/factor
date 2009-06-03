@@ -143,6 +143,6 @@ inline static void check_tagged_pointer(cell tagged)
 #endif
 }
 
-VM_C_API void minor_gc();
+VM_ASM_API void inline_gc(cell *gc_roots_base, cell gc_roots_size);
 
 }

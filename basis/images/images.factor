@@ -1,6 +1,6 @@
-! Copyright (C) 2009 Doug Coleman.
+! Copyright (C) 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel accessors ;
+USING: combinators kernel accessors sequences math arrays ;
 IN: images
 
 SINGLETONS: L LA BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
@@ -35,3 +35,28 @@ TUPLE: image dim component-order upside-down? bitmap ;
 : has-alpha? ( image -- ? ) component-order>> alpha-channel? ;
 
 GENERIC: load-image* ( path tuple -- image )
+
+: make-image ( bitmap -- image )
+    ! bitmap is a sequence of sequences of pixels which are RGBA
+    <image>
+        over [ first length ] [ length ] bi 2array >>dim
+        RGBA >>component-order
+        swap concat concat B{ } like >>bitmap ;
+
+<PRIVATE
+
+: pixel@ ( x y image -- start end bitmap )
+    [ dim>> first * + ]
+    [ component-order>> bytes-per-pixel [ * dup ] keep + ]
+    [ bitmap>> ] tri ;
+
+: set-subseq ( new-value from to victim -- )
+    <slice> 0 swap copy ; inline
+
+PRIVATE>
+
+: pixel-at ( x y image -- pixel )
+    pixel@ subseq ;
+
+: set-pixel-at ( pixel x y image -- )
+    pixel@ set-subseq ;

@@ -6,7 +6,7 @@ images.processing io io.binary io.encodings.binary io.files
 io.streams.byte-array kernel locals math math.bitwise
 math.constants math.functions math.matrices math.order
 math.ranges math.vectors memoize multiline namespaces
-sequences sequences.deep ;
+sequences sequences.deep images.loader ;
 IN: images.jpeg
 
 QUALIFIED-WITH: bitstreams bs
@@ -302,3 +302,5 @@ PRIVATE>
 
 M: jpeg-image load-image* ( path jpeg-image -- bitmap )
     drop load-jpeg ;
+
+{ "jpg" "jpeg" } [ jpeg-image register-image-class ] each
