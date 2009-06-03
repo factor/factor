@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays byte-arrays columns
-combinators fry grouping io io.binary io.encodings.binary io.files
-kernel macros math math.bitwise math.functions namespaces sequences
-strings images endian summary locals images.loader ;
+combinators compression.run-length endian fry grouping images
+images.loader io io.binary io.encodings.binary io.files kernel
+locals macros math math.bitwise math.functions namespaces
+sequences strings summary ;
 IN: images.bitmap
 
 : assert-sequence= ( a b -- )
@@ -54,7 +55,7 @@ ERROR: unsupported-bitmap-compression compression ;
 : uncompress-bitmap ( loading-bitmap -- loading-bitmap' )
     dup compression>> {
         { 0 [ ] }
-        { 1 [ "run-length encoding 8" unsupported-bitmap-compression ] }
+        { 1 [ [ run-length-uncompress8 ] change-color-index ] }
         { 2 [ "run-length encoding 4" unsupported-bitmap-compression ] }
         { 3 [ "bitfields" unsupported-bitmap-compression ] }
         { 4 [ "jpeg" unsupported-bitmap-compression ] }
