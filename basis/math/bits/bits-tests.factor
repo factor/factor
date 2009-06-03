@@ -29,3 +29,6 @@ IN: math.bits.tests
 [ t ] [
     1067811677921310779 >bignum make-bits last
 ] unit-test
+
+[ 6 ] [ 6 make-bits unbits ] unit-test
+[ 6 ] [ 6 3 <bits> >array unbits ] unit-test
