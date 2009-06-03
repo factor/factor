@@ -31,6 +31,7 @@ M: ##compare-imm temp-vregs temp>> 1array ;
 M: ##compare-float temp-vregs temp>> 1array ;
 M: ##fixnum-mul temp-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
 M: ##fixnum-mul-tail temp-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
+M: ##gc temp-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
 M: _dispatch temp-vregs temp>> 1array ;
 M: insn temp-vregs drop f ;
 
@@ -51,7 +52,6 @@ M: ##alien-getter uses-vregs src>> 1array ;
 M: ##alien-setter uses-vregs [ src>> ] [ value>> ] bi 2array ;
 M: ##fixnum-overflow uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: ##phi uses-vregs inputs>> ;
-M: ##gc uses-vregs live-in>> ;
 M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: _dispatch uses-vregs src>> 1array ;
