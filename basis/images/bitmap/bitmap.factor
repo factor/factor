@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types arrays byte-arrays columns
 combinators fry grouping io io.binary io.encodings.binary io.files
 kernel macros math math.bitwise math.functions namespaces sequences
-strings images endian summary locals ;
+strings images endian summary locals images.loader ;
 IN: images.bitmap
 
 : assert-sequence= ( a b -- )
@@ -128,6 +128,8 @@ ERROR: unknown-component-order bitmap ;
 
 M: bitmap-image load-image* ( path loading-bitmap -- bitmap )
     swap load-bitmap-data loading-bitmap>bitmap-image ;
+
+"bmp" bitmap-image register-image-class
 
 PRIVATE>
 
