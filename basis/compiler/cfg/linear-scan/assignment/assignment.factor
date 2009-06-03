@@ -58,17 +58,34 @@ SYMBOL: unhandled-intervals
         ] [ 2drop ] if
     ] if ;
 
-GENERIC: assign-registers-in-insn ( insn -- )
+GENERIC: assign-before ( insn -- )
+
+GENERIC: assign-after ( insn -- )
 
 : all-vregs ( insn -- vregs )
     [ defs-vregs ] [ temp-vregs ] [ uses-vregs ] tri 3append ;
 
-M: vreg-insn assign-registers-in-insn
+M: vreg-insn assign-before
     active-intervals get seq>> over all-vregs '[ vreg>> _ member? ] filter
     [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc
     >>regs drop ;
 
-M: insn assign-registers-in-insn drop ;
+M: insn assign-before drop ;
+
+: compute-live-registers ( -- regs )
+    active-intervals get seq>> [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc ;
+
+: compute-live-spill-slots ( -- spill-slots )
+    unhandled-intervals get
+    heap-values [ reload-from>> ] filter
+    [ [ vreg>> ] [ reload-from>> ] bi ] { } map>assoc ;
+
+M: ##gc assign-after
+    compute-live-registers >>live-registers
+    compute-live-spill-slots >>live-spill-slots
+    drop ;
+
+M: insn assign-after drop ;
 
 : <active-intervals> ( -- obj )
     V{ } clone active-intervals boa ;
@@ -82,10 +99,13 @@ M: insn assign-registers-in-insn drop ;
     [
         [
             [
-                [ insn#>> activate-new-intervals ]
-                [ [ assign-registers-in-insn ] [ , ] bi ]
-                [ insn#>> expire-old-intervals ]
-                tri
+                {
+                    [ insn#>> activate-new-intervals ]
+                    [ assign-before ]
+                    [ , ]
+                    [ insn#>> expire-old-intervals ]
+                    [ assign-after ]
+                } cleave
             ] each
         ] V{ } make
     ] change-instructions drop ;

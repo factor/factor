@@ -5,7 +5,8 @@ compression.lzw constructors endian fry grouping images io
 io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
-strings math.vectors specialized-arrays.float locals ;
+strings math.vectors specialized-arrays.float locals
+images.loader ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
@@ -561,3 +562,5 @@ ERROR: unknown-component-order ifd ;
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image load-image* ( path tiff-image -- image )
     drop load-tiff tiff>image ;
+
+{ "tif" "tiff" } [ tiff-image register-image-class ] each
