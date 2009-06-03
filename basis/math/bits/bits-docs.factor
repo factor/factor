@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup math ;
+USING: help.syntax help.markup math sequences ;
 IN: math.bits
 
 ABOUT: "math.bits"
@@ -24,3 +24,7 @@ HELP: make-bits
     { $example "USING: math.bits prettyprint arrays ;" "BIN: 1101 make-bits >array ." "{ t f t t }" }
     { $example "USING: math.bits prettyprint arrays ;" "-3 make-bits >array ." "{ t f }" }
 } ;
+
+HELP: unbits
+{ $values { "seq" sequence } { "number" integer } }
+{ $description "Turns a sequence of booleans, of the same format made by the " { $link bits } " class, and calculates the number that it represents as little-endian." } ;
