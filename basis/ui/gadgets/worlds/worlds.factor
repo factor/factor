@@ -217,4 +217,3 @@ M: world check-world-pixel-format
 : with-world-pixel-format ( world quot -- )
     [ dup dup world-pixel-format-attributes <pixel-format> ]
     dip [ 2dup check-world-pixel-format ] prepose with-disposal ; inline
-

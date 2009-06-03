@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays byte-arrays columns
-combinators fry grouping io io.binary io.encodings.binary io.files
-kernel macros math math.bitwise math.functions namespaces sequences
-strings images endian summary locals images.loader ;
+combinators compression.run-length endian fry grouping images
+images.loader io io.binary io.encodings.binary io.files kernel
+locals macros math math.bitwise math.functions namespaces
+sequences strings summary ;
 IN: images.bitmap
 
 : assert-sequence= ( a b -- )
@@ -21,7 +22,8 @@ TUPLE: bitmap-image < image ;
 TUPLE: loading-bitmap 
 size reserved offset header-length width
 height planes bit-count compression size-image
-x-pels y-pels color-used color-important rgb-quads color-index ;
+x-pels y-pels color-used color-important color-palette color-index
+uncompressed-bytes ;
 
 ERROR: bitmap-magic magic ;
 
@@ -31,7 +33,7 @@ M: bitmap-magic summary
 <PRIVATE
 
 : 8bit>buffer ( bitmap -- array )
-    [ rgb-quads>> 4 <sliced-groups> [ 3 head-slice ] map ]
+    [ color-palette>> 4 <sliced-groups> [ 3 head-slice ] map ]
     [ color-index>> >array ] bi [ swap nth ] with map concat ;
 
 ERROR: bmp-not-supported n ;
@@ -39,7 +41,7 @@ ERROR: bmp-not-supported n ;
 : reverse-lines ( byte-array width -- byte-array )
     <sliced-groups> <reversed> concat ; inline
 
-: raw-bitmap>seq ( loading-bitmap -- array )
+: bitmap>bytes ( loading-bitmap -- array )
     dup bit-count>>
     {
         { 32 [ color-index>> ] }
@@ -47,6 +49,21 @@ ERROR: bmp-not-supported n ;
         { 8 [ [ 8bit>buffer ] [ width>> 3 * ] bi reverse-lines ] }
         [ bmp-not-supported ]
     } case >byte-array ;
+
+ERROR: unsupported-bitmap-compression compression ;
+
+: uncompress-bitmap ( loading-bitmap -- loading-bitmap' )
+    dup compression>> {
+        { 0 [ ] }
+        { 1 [ [ run-length-uncompress8 ] change-color-index ] }
+        { 2 [ "run-length encoding 4" unsupported-bitmap-compression ] }
+        { 3 [ "bitfields" unsupported-bitmap-compression ] }
+        { 4 [ "jpeg" unsupported-bitmap-compression ] }
+        { 5 [ "png" unsupported-bitmap-compression ] }
+    } case ;
+
+: loading-bitmap>bytes ( loading-bitmap -- byte-array )
+    uncompress-bitmap bitmap>bytes ;
 
 : parse-file-header ( loading-bitmap -- loading-bitmap )
     2 read "BM" assert-sequence=
@@ -67,7 +84,7 @@ ERROR: bmp-not-supported n ;
     read4 >>color-used
     read4 >>color-important ;
 
-: rgb-quads-length ( loading-bitmap -- n )
+: color-palette-length ( loading-bitmap -- n )
     [ offset>> 14 - ] [ header-length>> ] bi - ;
 
 : color-index-length ( loading-bitmap -- n )
@@ -98,11 +115,11 @@ ERROR: bmp-not-supported n ;
     ] when ;
 
 : parse-bitmap ( loading-bitmap -- loading-bitmap )
-    dup rgb-quads-length read >>rgb-quads
+    dup color-palette-length read >>color-palette
     dup color-index-length read >>color-index
     fixup-color-index ;
 
-: load-bitmap-data ( path -- loading-bitmap )
+: load-bitmap ( path -- loading-bitmap )
     binary [
         loading-bitmap new
         parse-file-header parse-bitmap-header parse-bitmap
@@ -120,14 +137,14 @@ ERROR: unknown-component-order bitmap ;
 
 : loading-bitmap>bitmap-image ( bitmap-image loading-bitmap -- bitmap-image )
     {
-        [ raw-bitmap>seq >>bitmap ]
+        [ loading-bitmap>bytes >>bitmap ]
         [ [ width>> ] [ height>> abs ] bi 2array >>dim ]
         [ height>> 0 < [ t >>upside-down? ] when ]
         [ bitmap>component-order >>component-order ]
     } cleave ;
 
 M: bitmap-image load-image* ( path loading-bitmap -- bitmap )
-    swap load-bitmap-data loading-bitmap>bitmap-image ;
+    swap load-bitmap loading-bitmap>bitmap-image ;
 
 "bmp" bitmap-image register-image-class
 
@@ -185,7 +202,7 @@ PRIVATE>
                 ! color-important
                 [ drop 0 write4 ]
 
-                ! rgb-quads
+                ! color-palette
                 [
                     [ bitmap>color-index ]
                     [ dim>> first 3 * ]
