@@ -3,5 +3,5 @@
 USING: arrays grouping sequences ;
 IN: compression.run-length
 
-: run-length-uncompress8 ( byte-array -- byte-array' )
+: run-length-uncompress ( byte-array -- byte-array' )
     2 group [ first2 <array> ] map concat ;
