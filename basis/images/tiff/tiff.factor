@@ -9,7 +9,7 @@ strings math.vectors specialized-arrays.float locals
 images.loader ;
 IN: images.tiff
 
-TUPLE: tiff-image < image ;
+SINGLETON: tiff-image
 
 TUPLE: parsed-tiff endianness the-answer ifd-offset ifds ;
 CONSTRUCTOR: parsed-tiff ( -- tiff ) V{ } clone >>ifds ;
@@ -483,18 +483,6 @@ ERROR: unknown-component-order ifd ;
         [ unknown-component-order ]
     } case ;
 
-: normalize-alpha-data ( seq -- byte-array )
-    B{ } like dup
-    byte-array>float-array
-    4 <sliced-groups>
-    [
-        dup fourth dup 0 = [
-            2drop
-        ] [
-            [ 3 head-slice ] dip '[ _ / ] change-each
-        ] if
-    ] each ;
-
 : handle-alpha-data ( ifd -- ifd )
     dup extra-samples find-tag {
         { extra-samples-associated-alpha-data [ ] }
@@ -508,7 +496,7 @@ ERROR: unknown-component-order ifd ;
         [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
         [ ifd-component-order f ]
         [ bitmap>> ]
-    } cleave tiff-image boa ;
+    } cleave image boa ;
 
 : tiff>image ( image -- image )
     ifds>> [ ifd>image ] map first ;
