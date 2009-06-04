@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slots kernel sequences fry accessors parser lexer words
-effects.parser macros generalizations locals classes.tuple
-vocabs generic.standard ;
+USING: accessors assocs classes.tuple effects.parser fry
+generalizations generic.standard kernel lexer locals macros
+parser sequences slots vocabs words ;
 IN: constructors
 
 ! An experiment
@@ -26,14 +26,13 @@ IN: constructors
     [ [ dup lookup-initializer ] dip H{ } clone define-typecheck ] 2bi ;
 
 MACRO:: slots>constructor ( class slots -- quot )
-    slots class
-    all-slots [ name>> ] map
-    [ '[ _ = ] find drop ] with map
-    [ [ ] count ] [ ] [ length ] tri
+    class all-slots [ [ name>> ] [ initial>> ] bi ] { } map>assoc :> params
+    slots length
+    params length
     '[
-        _ narray _
-        [ swap over [ nth ] [ drop ] if ] with map
-        _ firstn class boa
+        _ narray slots swap zip 
+        params swap assoc-union
+        values _ firstn class boa
     ] ;
 
 :: define-constructor ( constructor-word class effect def -- )
