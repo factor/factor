@@ -50,3 +50,5 @@ SYNTAX: CONSTRUCTOR:
     complete-effect
     parse-definition
     define-constructor ;
+
+"initializers" create-vocab drop
