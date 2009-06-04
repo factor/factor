@@ -327,17 +327,29 @@ M:: x86 %box-alien ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
-: small-reg-4 ( reg -- reg' )
+: small-reg-8 ( reg -- reg' )
     H{
-        { EAX EAX }
-        { ECX ECX }
-        { EDX EDX }
-        { EBX EBX }
-        { ESP ESP }
-        { EBP EBP }
-        { ESI ESP }
-        { EDI EDI }
+        { EAX RAX }
+        { ECX RCX }
+        { EDX RDX }
+        { EBX RBX }
+        { ESP RSP }
+        { EBP RBP }
+        { ESI RSP }
+        { EDI RDI }
 
+        { RAX RAX }
+        { RCX RCX }
+        { RDX RDX }
+        { RBX RBX }
+        { RSP RSP }
+        { RBP RBP }
+        { RSI RSP }
+        { RDI RDI }
+    } at ; inline
+
+: small-reg-4 ( reg -- reg' )
+    small-reg-8 H{
         { RAX EAX }
         { RCX ECX }
         { RDX EDX }
@@ -373,12 +385,21 @@ M:: x86 %box-alien ( dst src temp -- )
         { 1 [ small-reg-1 ] }
         { 2 [ small-reg-2 ] }
         { 4 [ small-reg-4 ] }
+        { 8 [ small-reg-8 ] }
     } case ;
 
-: small-regs ( -- regs ) { EAX ECX EDX EBX } ; inline
+HOOK: small-regs cpu ( -- regs )
+
+M: x86.32 small-regs { EAX ECX EDX EBX } ;
+M: x86.64 small-regs { RAX RCX RDX RBX } ;
+
+HOOK: small-reg-native cpu ( reg -- reg' )
+
+M: x86.32 small-reg-native small-reg-4 ;
+M: x86.64 small-reg-native small-reg-8 ;
 
 : small-reg-that-isn't ( exclude -- reg' )
-    small-regs swap [ small-reg-4 ] map '[ _ memq? not ] find nip ;
+    small-regs swap [ small-reg-native ] map '[ _ memq? not ] find nip ;
 
 : with-save/restore ( reg quot -- )
     [ drop PUSH ] [ call ] [ drop POP ] 2tri ; inline
@@ -388,7 +409,7 @@ M:: x86 %box-alien ( dst src temp -- )
     #! call the quot with that. Otherwise, we find a small
     #! register that is not in exclude, and call quot, saving
     #! and restoring the small register.
-    dst small-reg-4 small-regs memq? [ dst quot call ] [
+    dst small-reg-native small-regs memq? [ dst quot call ] [
         exclude small-reg-that-isn't
         [ quot call ] with-save/restore
     ] if ; inline
