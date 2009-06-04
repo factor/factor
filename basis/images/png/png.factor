@@ -104,8 +104,7 @@ ERROR: unimplemented-color-type image ;
     } case ;
 
 : load-png ( path -- image )
-    [ binary <file-reader> ] [ file-info size>> ] bi
-    stream-throws <limited-stream> [
+    binary stream-throws <limited-file-reader> [
         <png-image>
         read-png-header
         read-png-chunks
