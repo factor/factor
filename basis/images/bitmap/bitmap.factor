@@ -212,11 +212,11 @@ ERROR: unknown-bitmap-header n ;
 
 : parse-bitmap ( loading-bitmap -- loading-bitmap )
     dup color-palette-length read >>color-palette
-    dup size-image>> [
+    dup size-image>> dup 0 > [
         read >>color-index
     ] [
-        dup color-index-length read >>color-index
-    ] if* ;
+        drop dup color-index-length read >>color-index
+    ] if ;
 
 ERROR: unsupported-bitmap-file magic ;
 
