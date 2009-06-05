@@ -6,12 +6,14 @@ images.processing io io.binary io.encodings.binary io.files
 io.streams.byte-array kernel locals math math.bitwise
 math.constants math.functions math.matrices math.order
 math.ranges math.vectors memoize multiline namespaces
-sequences sequences.deep ;
+sequences sequences.deep images.loader ;
+QUALIFIED-WITH: bitstreams bs
 IN: images.jpeg
 
-QUALIFIED-WITH: bitstreams bs
+SINGLETON: jpeg-image
+{ "jpg" "jpeg" } [ jpeg-image register-image-class ] each
 
-TUPLE: jpeg-image < image
+TUPLE: loading-jpeg < image
     { headers }
     { bitstream }
     { color-info initial: { f f f f } }
@@ -21,7 +23,7 @@ TUPLE: jpeg-image < image
 
 <PRIVATE
 
-CONSTRUCTOR: jpeg-image ( headers bitstream -- image ) ;
+CONSTRUCTOR: loading-jpeg ( headers bitstream -- image ) ;
 
 SINGLETONS: SOF DHT DAC RST SOI EOI SOS DQT DNL DRI DHP EXP
 APP JPG COM TEM RES ;
@@ -63,7 +65,7 @@ TUPLE: jpeg-color-info
 
 CONSTRUCTOR: jpeg-color-info ( h v quant-table -- jpeg-color-info ) ;
 
-: jpeg> ( -- jpeg-image ) jpeg-image get ;
+: jpeg> ( -- jpeg-image ) loading-jpeg get ;
 
 : apply-diff ( dc color -- dc' )
     [ diff>> + dup ] [ (>>diff) ] bi ;
@@ -291,9 +293,9 @@ PRIVATE>
     binary [
         parse-marker { SOI } assert=
         parse-headers
-        contents <jpeg-image>
+        contents <loading-jpeg>
     ] with-file-reader
-    dup jpeg-image [
+    dup loading-jpeg [
         baseline-parse
         baseline-decompress
         jpeg> bitmap>> 3 <groups> [ color-transform ] change-each

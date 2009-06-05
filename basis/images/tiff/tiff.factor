@@ -5,13 +5,14 @@ compression.lzw constructors endian fry grouping images io
 io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
-strings math.vectors specialized-arrays.float locals ;
+strings math.vectors specialized-arrays.float locals
+images.loader ;
 IN: images.tiff
 
-TUPLE: tiff-image < image ;
+SINGLETON: tiff-image
 
-TUPLE: parsed-tiff endianness the-answer ifd-offset ifds ;
-CONSTRUCTOR: parsed-tiff ( -- tiff ) V{ } clone >>ifds ;
+TUPLE: loading-tiff endianness the-answer ifd-offset ifds ;
+CONSTRUCTOR: loading-tiff ( -- tiff ) V{ } clone >>ifds ;
 
 TUPLE: ifd count ifd-entries next
 processed-tags strips bitmap ;
@@ -409,7 +410,7 @@ ERROR: bad-small-ifd-type n ;
         [ nip unhandled-ifd-entry swap ]
     } case ;
 
-: process-ifds ( parsed-tiff -- parsed-tiff )
+: process-ifds ( loading-tiff -- loading-tiff )
     [
         [
             dup ifd-entries>>
@@ -482,18 +483,6 @@ ERROR: unknown-component-order ifd ;
         [ unknown-component-order ]
     } case ;
 
-: normalize-alpha-data ( seq -- byte-array )
-    B{ } like dup
-    byte-array>float-array
-    4 <sliced-groups>
-    [
-        dup fourth dup 0 = [
-            2drop
-        ] [
-            [ 3 head-slice ] dip '[ _ / ] change-each
-        ] if
-    ] each ;
-
 : handle-alpha-data ( ifd -- ifd )
     dup extra-samples find-tag {
         { extra-samples-associated-alpha-data [ ] }
@@ -507,17 +496,17 @@ ERROR: unknown-component-order ifd ;
         [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
         [ ifd-component-order f ]
         [ bitmap>> ]
-    } cleave tiff-image boa ;
+    } cleave image boa ;
 
 : tiff>image ( image -- image )
     ifds>> [ ifd>image ] map first ;
 
-: with-tiff-endianness ( parsed-tiff quot -- )
+: with-tiff-endianness ( loading-tiff quot -- )
     [ dup endianness>> ] dip with-endianness ; inline
 
-: load-tiff-ifds ( path -- parsed-tiff )
+: load-tiff-ifds ( path -- loading-tiff )
     binary [
-        <parsed-tiff>
+        <loading-tiff>
         read-header [
             dup ifd-offset>> read-ifds
             process-ifds
@@ -549,10 +538,10 @@ ERROR: unknown-component-order ifd ;
         drop "no planar configuration" throw
     ] if ;
 
-: process-tif-ifds ( parsed-tiff -- )
+: process-tif-ifds ( loading-tiff -- )
     ifds>> [ process-ifd ] each ;
 
-: load-tiff ( path -- parsed-tiff )
+: load-tiff ( path -- loading-tiff )
     [ load-tiff-ifds dup ] keep
     binary [
         [ process-tif-ifds ] with-tiff-endianness
@@ -561,3 +550,5 @@ ERROR: unknown-component-order ifd ;
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image load-image* ( path tiff-image -- image )
     drop load-tiff tiff>image ;
+
+{ "tif" "tiff" } [ tiff-image register-image-class ] each
