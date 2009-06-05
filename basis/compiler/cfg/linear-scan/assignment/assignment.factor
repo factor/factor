@@ -25,12 +25,7 @@ TUPLE: active-intervals seq ;
 SYMBOL: unhandled-intervals
 
 : add-unhandled ( live-interval -- )
-    dup split-before>> [
-        [ split-before>> ] [ split-after>> ] bi
-        [ add-unhandled ] bi@
-    ] [
-        dup start>> unhandled-intervals get heap-push
-    ] if ;
+    dup start>> unhandled-intervals get heap-push ;
 
 : init-unhandled ( live-intervals -- )
     [ add-unhandled ] each ;
