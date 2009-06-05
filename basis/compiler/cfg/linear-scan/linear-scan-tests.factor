@@ -1290,3 +1290,28 @@ USING: math.private compiler.cfg.debugger ;
     { { int-regs { 0 1 2 3 } } }
     allocate-registers drop
 ] unit-test
+
+! Spill slot liveness was computed incorrectly, leading to a FEP
+! early in bootstrap on x86-32
+[ t ] [
+    T{ basic-block
+       { instructions
+         V{
+             T{ ##gc f V int-regs 6 V int-regs 7 }
+             T{ ##peek f V int-regs 0 D 0 }
+             T{ ##peek f V int-regs 1 D 1 }
+             T{ ##peek f V int-regs 2 D 2 }
+             T{ ##peek f V int-regs 3 D 3 }
+             T{ ##peek f V int-regs 4 D 4 }
+             T{ ##peek f V int-regs 5 D 5 }
+             T{ ##replace f V int-regs 0 D 1 }
+             T{ ##replace f V int-regs 1 D 2 }
+             T{ ##replace f V int-regs 2 D 3 }
+             T{ ##replace f V int-regs 3 D 4 }
+             T{ ##replace f V int-regs 4 D 5 }
+             T{ ##replace f V int-regs 5 D 0 }
+         }
+       }
+    } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
+    instructions>> first live-spill-slots>> empty?
+] unit-test
