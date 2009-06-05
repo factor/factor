@@ -16,6 +16,9 @@ ERROR: last-insn-not-a-jump insn ;
         [ ##return? ]
         [ ##callback-return? ]
         [ ##jump? ]
+        [ ##fixnum-add-tail? ]
+        [ ##fixnum-sub-tail? ]
+        [ ##fixnum-mul-tail? ]
         [ ##call? ]
     } 1|| [ drop ] [ last-insn-not-a-jump ] if ;
 
