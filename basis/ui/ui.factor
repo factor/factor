@@ -206,8 +206,11 @@ PRIVATE>
 : open-world-window ( world -- )
     dup pref-dim >>dim dup relayout graft ;
 
+: open-window* ( gadget title/attributes -- window )
+    ?attributes <world> [ open-world-window ] keep ;
+
 : open-window ( gadget title/attributes -- )
-    ?attributes <world> open-world-window ;
+    open-window* drop ;
 
 : set-fullscreen ( gadget ? -- )
     [ find-world ] dip (set-fullscreen) ;

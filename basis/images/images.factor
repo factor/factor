@@ -34,14 +34,7 @@ TUPLE: image dim component-order upside-down? bitmap ;
 
 : has-alpha? ( image -- ? ) component-order>> alpha-channel? ;
 
-GENERIC: load-image* ( path tuple -- image )
-
-: make-image ( bitmap -- image )
-    ! bitmap is a sequence of sequences of pixels which are RGBA
-    <image>
-        over [ first length ] [ length ] bi 2array >>dim
-        RGBA >>component-order
-        swap concat concat B{ } like >>bitmap ;
+GENERIC: load-image* ( path class -- image )
 
 <PRIVATE
 
