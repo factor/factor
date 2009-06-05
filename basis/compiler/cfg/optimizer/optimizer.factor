@@ -17,8 +17,6 @@ IN: compiler.cfg.optimizer
 
 SYMBOL: check-optimizer?
 
-t check-optimizer? set-global
-
 : ?check ( cfg -- cfg' )
     check-optimizer? get [
         dup check-cfg
