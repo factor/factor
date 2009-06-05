@@ -15,7 +15,8 @@ IN: images.bitmap
 : write2 ( n -- ) 2 >le write ;
 : write4 ( n -- ) 4 >le write ;
 
-TUPLE: bitmap-image < image ;
+SINGLETON: bitmap-image
+"bmp" bitmap-image register-image-class
 
 TUPLE: loading-bitmap 
 magic size reserved1 reserved2 offset header-length width
@@ -212,11 +213,11 @@ ERROR: unknown-bitmap-header n ;
 
 : parse-bitmap ( loading-bitmap -- loading-bitmap )
     dup color-palette-length read >>color-palette
-    dup size-image>> [
+    dup size-image>> dup 0 > [
         read >>color-index
     ] [
-        dup color-index-length read >>color-index
-    ] if* ;
+        drop dup color-index-length read >>color-index
+    ] if ;
 
 ERROR: unsupported-bitmap-file magic ;
 
@@ -247,7 +248,9 @@ ERROR: unknown-component-order bitmap ;
         [ unknown-component-order ]
     } case ;
 
-: loading-bitmap>image ( image loading-bitmap -- bitmap-image )
+M: bitmap-image load-image* ( path bitmap-image -- bitmap )
+    drop load-bitmap
+    [ image new ] dip
     {
         [ loading-bitmap>bytes >>bitmap ]
         [ [ width>> ] [ height>> abs ] bi 2array >>dim ]
@@ -255,11 +258,6 @@ ERROR: unknown-component-order bitmap ;
         [ compression>> 3 = [ t >>upside-down? ] when ]
         [ bitmap>component-order >>component-order ]
     } cleave ;
-
-M: bitmap-image load-image* ( path loading-bitmap -- bitmap )
-    swap load-bitmap loading-bitmap>image ;
-
-"bmp" bitmap-image register-image-class
 
 PRIVATE>
 
