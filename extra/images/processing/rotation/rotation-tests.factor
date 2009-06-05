@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Kobi Lurie, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry images.loader images.normalization
+USING: accessors fry images.loader
 images.processing.rotation kernel literals math sequences
 tools.test images.processing.rotation.private ;
 IN: images.processing.rotation.tests
@@ -24,13 +24,13 @@ IN: images.processing.rotation.tests
 CONSTANT: pasted-image
     $[
         "vocab:images/processing/rotation/test-bitmaps/PastedImage.bmp"
-        load-image normalize-image clone-image
+        load-image clone-image
     ]
 
 CONSTANT: pasted-image90
     $[
         "vocab:images/processing/rotation/test-bitmaps/PastedImage90.bmp"
-        load-image normalize-image clone-image
+        load-image clone-image
     ]
 
 CONSTANT: lake-image
@@ -55,7 +55,7 @@ CONSTANT: lake-image
     "vocab:images/processing/rotation/test-bitmaps/small.bmp"
     load-image 90 rotate 
     "vocab:images/processing/rotation/test-bitmaps/small-rotated.bmp"
-    load-image normalize-image =
+    load-image =
 ] unit-test
     
 [ t ] [

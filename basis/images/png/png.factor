@@ -3,15 +3,19 @@
 USING: accessors constructors images io io.binary io.encodings.ascii
 io.encodings.binary io.encodings.string io.files io.files.info kernel
 sequences io.streams.limited fry combinators arrays math
-checksums checksums.crc32 compression.inflate grouping byte-arrays ;
+checksums checksums.crc32 compression.inflate grouping byte-arrays
+images.loader ;
 IN: images.png
 
-TUPLE: png-image < image chunks
+SINGLETON: png-image
+"png" png-image register-image-class
+
+TUPLE: loading-png < image chunks
 width height bit-depth color-type compression-method
 filter-method interlace-method uncompressed ;
 
-CONSTRUCTOR: png-image ( -- image )
-V{ } clone >>chunks ;
+CONSTRUCTOR: loading-png ( -- image )
+    V{ } clone >>chunks ;
 
 TUPLE: png-chunk length type data ;
 
@@ -103,9 +107,8 @@ ERROR: unimplemented-color-type image ;
     } case ;
 
 : load-png ( path -- image )
-    [ binary <file-reader> ] [ file-info size>> ] bi
-    stream-throws <limited-stream> [
-        <png-image>
+    binary stream-throws <limited-file-reader> [
+        <loading-png>
         read-png-header
         read-png-chunks
         parse-ihdr-chunk

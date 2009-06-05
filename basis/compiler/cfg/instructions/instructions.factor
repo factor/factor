@@ -52,12 +52,6 @@ INSN: ##inc-d { n integer } ;
 INSN: ##inc-r { n integer } ;
 
 ! Subroutine calls
-TUPLE: stack-frame
-{ params integer }
-{ return integer }
-{ total-size integer }
-spill-counts ;
-
 INSN: ##stack-frame stack-frame ;
 INSN: ##call word { height integer } ;
 INSN: ##jump word ;
@@ -223,7 +217,7 @@ INSN: ##compare-imm < ##binary-imm cc temp ;
 INSN: ##compare-float-branch < ##conditional-branch ;
 INSN: ##compare-float < ##binary cc temp ;
 
-INSN: ##gc live-in ;
+INSN: ##gc { temp1 vreg } { temp2 vreg } live-registers live-spill-slots ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;
@@ -242,6 +236,10 @@ INSN: _compare-branch < _conditional-branch ;
 INSN: _compare-imm-branch label { src1 vreg } { src2 integer } cc ;
 
 INSN: _compare-float-branch < _conditional-branch ;
+
+TUPLE: spill-slot n ; C: <spill-slot> spill-slot
+
+INSN: _gc { temp1 vreg } { temp2 vreg } gc-roots gc-root-count gc-root-size ;
 
 ! These instructions operate on machine registers and not
 ! virtual registers
