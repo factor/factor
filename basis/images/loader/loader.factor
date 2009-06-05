@@ -7,16 +7,18 @@ IN: images.loader
 ERROR: unknown-image-extension extension ;
 
 <PRIVATE
+
 SYMBOL: types
 types [ H{ } clone ] initialize
 
 : image-class ( path -- class )
     file-extension >lower types get ?at
     [ unknown-image-extension ] unless ;
+
 PRIVATE>
 
 : register-image-class ( extension class -- )
     swap types get set-at ;
 
 : load-image ( path -- image )
-    dup image-class new load-image* ;
+    dup image-class load-image* ;

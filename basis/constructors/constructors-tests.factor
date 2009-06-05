@@ -20,7 +20,6 @@ SYMBOL: AAPL
     } 1&&
 ] unit-test
 
-
 TUPLE: ct1 a ;
 TUPLE: ct2 < ct1 b ;
 TUPLE: ct3 < ct2 c ;
@@ -41,7 +40,20 @@ CONSTRUCTOR: ct4 ( a b c d -- obj )
     initialize-ct3
     [ 1 + ] change-a ;
 
-[ 1 ] [ 0 <ct1> a>> ] unit-test
+[ 1001 ] [ 1000 <ct1> a>> ] unit-test
 [ 2 ] [ 0 0 <ct2> a>> ] unit-test
 [ 2 ] [ 0 0 0 <ct3> a>> ] unit-test
 [ 3 ] [ 0 0 0 0 <ct4> a>> ] unit-test
+
+
+TUPLE: rofl a b c ;
+CONSTRUCTOR: rofl ( b c a  -- obj ) ;
+
+[ T{ rofl { a 3 } { b 1 } { c 2 } } ] [ 1 2 3 <rofl> ] unit-test
+
+
+TUPLE: default { a integer initial: 0 } ;
+
+CONSTRUCTOR: default ( -- obj ) ;
+
+[ 0 ] [ <default> a>> ] unit-test
