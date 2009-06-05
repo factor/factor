@@ -127,7 +127,10 @@ TUPLE: no-current-vocab ;
     ] [ drop ] if ;
 
 : only-use-vocabs ( vocabs -- )
-    clear-manifest [ vocab ] filter [ use-vocab ] each ;
+    clear-manifest
+    [ vocab ] filter
+    [ vocab source-loaded?>> +done+ eq? ] filter
+    [ use-vocab ] each ;
 
 TUPLE: qualified vocab prefix words ;
 
