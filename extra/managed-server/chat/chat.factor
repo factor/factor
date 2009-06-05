@@ -126,7 +126,8 @@ M: chat-server handle-client-disconnect
     ] "" append-outputs-as send-everyone ;
 
 M: chat-server handle-already-logged-in
-    username username-taken-string send-line ;
+    username username-taken-string send-line
+    t client (>>quit?) ;
 
 M: chat-server handle-managed-client*
     readln dup f = [ t client (>>quit?) ] when

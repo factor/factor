@@ -2,7 +2,7 @@ USING: generalizations accessors arrays compiler kernel kernel.private
 math hashtables.private math.private namespaces sequences tools.test
 namespaces.private slots.private sequences.private byte-arrays alien
 alien.accessors layouts words definitions compiler.units io
-combinators vectors grouping make ;
+combinators vectors grouping make alien.c-types ;
 QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
 
@@ -282,3 +282,10 @@ TUPLE: cucumber ;
 M: cucumber equal? "The cucumber has no equal" throw ;
 
 [ t ] [ [ cucumber ] compile-call cucumber eq? ] unit-test
+
+[ 4294967295 B{ 255 255 255 255 } -1 ]
+[
+    -1 <int> -1 <int>
+    [ [ 0 alien-unsigned-cell swap ] [ 0 alien-signed-2 ] bi ]
+    compile-call
+] unit-test

@@ -192,6 +192,9 @@ M: heap heap-pop ( heap -- value key )
     [ dup heap-pop swap 2array ]
     produce nip ;
 
+: heap-values ( heap -- alist )
+    data>> [ value>> ] { } map-as ;
+
 : slurp-heap ( heap quot: ( elt -- ) -- )
     over heap-empty? [ 2drop ] [
         [ [ heap-pop drop ] dip call ] [ slurp-heap ] 2bi
