@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math io io.encodings destructors accessors
-sequences namespaces byte-vectors fry combinators ;
+USING: accessors byte-vectors combinators destructors fry io
+io.encodings io.files io.files.info kernel math namespaces
+sequences ;
 IN: io.streams.limited
 
 TUPLE: limited-stream stream count limit mode stack ;
@@ -15,6 +16,12 @@ SINGLETONS: stream-throws stream-eofs ;
         swap >>limit
         swap >>stream
         0 >>count ;
+
+: <limited-file-reader> ( path encoding mode -- stream' )
+    [
+        [ <file-reader> ]
+        [ drop file-info size>> ] 2bi
+    ] dip <limited-stream> ;
 
 GENERIC# limit 2 ( stream limit mode -- stream' )
 
