@@ -226,18 +226,41 @@ SYMBOL: spill-counts
 : assign-free-register ( new registers -- )
     pop >>reg add-active ;
 
-: next-intersection ( new inactive -- n )
-    2drop 0 ;
+: relevant-ranges ( new inactive -- new' inactive' )
+    ! Slice off all ranges of 'inactive' that precede the start of 'new'
+    [ [ ranges>> ] bi@ ] [ nip start>> ] 2bi '[ to>> _ >= ] filter ;
+
+: intersect-live-range ( range1 range2 -- n/f )
+    2dup [ from>> ] bi@ > [ swap ] when
+    2dup [ to>> ] [ from>> ] bi* >= [ nip from>> ] [ 2drop f ] if ;
+
+: intersect-live-ranges ( ranges1 ranges2 -- n )
+    {
+        { [ over empty? ] [ 2drop 1/0. ] }
+        { [ dup empty? ] [ 2drop 1/0. ] }
+        [
+            2dup [ first ] bi@ intersect-live-range dup [ 2nip ] [
+                drop
+                2dup [ first from>> ] bi@ <
+                [ [ rest-slice ] dip ] [ rest-slice ] if
+                intersect-live-ranges
+            ] if
+        ]
+    } cond ;
+
+: intersect-inactive ( new inactive -- n )
+    relevant-ranges intersect-live-ranges ;
 
 : intersecting-inactive ( new -- live-intervals )
     dup vreg>> inactive-intervals-for
-    [ tuck next-intersection ] with { } map>assoc ;
+    [ tuck intersect-inactive ] with { } map>assoc ;
 
 : fits-in-hole ( new pair -- )
     first reuse-register ;
 
 : split-before-use ( new pair -- before after )
     ! Find optimal split position
+    ! Insert move instruction
     second split-interval ;
 
 : assign-inactive-register ( new live-intervals -- )
