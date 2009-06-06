@@ -264,7 +264,7 @@ SYMBOL: spill-counts
     ] if ;
 
 ! Main loop
-: reg-classes ( -- seq ) { int-regs double-float-regs } ; inline
+CONSTANT: reg-classes { int-regs double-float-regs }
 
 : reg-class-assoc ( quot -- assoc )
     [ reg-classes ] dip { } map>assoc ; inline
