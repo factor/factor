@@ -1,93 +1,74 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs combinators io io.streams.string kernel math 
-namespaces sequences strings ;
+USING: accessors assocs fry io io.streams.string kernel macros math peg.ebnf sequences strings ;
 
 IN: brainfuck
 
 <PRIVATE
 
-TUPLE: brainfuck code cp dp steps memory loop ;
+TUPLE: brainfuck ptr mem ops ;
 
-: (set-loop) ( brainfuck in out -- brainfuck )
-    pick loop>> [ set-at ] [ [ swap ] dip set-at ] 3bi ;
+: <brainfuck> ( -- brainfuck ) 
+    0 H{ } clone 0 brainfuck boa ;
 
-SYMBOL: tmp
+: ops? ( brainfuck -- brainfuck ) 
+    [ 1 + ] change-ops
+    dup ops>> 10000 > [ "Max operations" throw ] when ;
 
-: <brainfuck> ( code -- brainfuck ) 
-    0 0 0 H{ } clone H{ } clone brainfuck boa 
-    V{ } clone tmp set
-    dup code>> <enum> [ 
-        {
-            { CHAR: [ [ tmp get push ] }
-            { CHAR: ] [ tmp get pop (set-loop) ] }
-            [ 2drop ]
-        } case
-    ] assoc-each ;
+: (get-mem) ( brainfuck -- brainfuck value )
+    dup [ ptr>> ] [ mem>> ] bi at 0 or ;
 
+: (set-mem) ( brainfuck value -- brainfuck )
+    over [ ptr>> ] [ mem>> ] bi set-at ;
 
-: (get-memory) ( brainfuck -- brainfuck value ) 
-    dup [ dp>> ] [ memory>> ] bi at 0 or ;
+: mem++ ( brainfuck -- brainfuck )
+    (get-mem) 1 + 255 bitand (set-mem) ops? ;
 
-: (set-memory) ( intepreter value -- brainfuck ) 
-    over [ dp>> ] [ memory>> ] bi set-at ;
+: mem-- ( brainfuck -- brainfuck )
+    (get-mem) 1 - 255 bitand (set-mem) ops? ;
 
-: (inc-memory) ( brainfuck -- brainfuck ) 
-    (get-memory) 1 + 255 bitand (set-memory) ; 
+: mem? ( brainfuck -- brainfuck t/f )
+    ops? (get-mem) 0 = not ;
 
-: (dec-memory) ( brainfuck -- brainfuck ) 
-    (get-memory) 1 - 255 bitand (set-memory)  ; 
+: out ( brainfuck -- brainfuck )
+    (get-mem) 1string write ops? ;
 
-: (out-memory) ( brainfuck -- brainfuck )
-    (get-memory) 1string write ;
+: in ( brainfuck -- brainfuck )
+    read1 (set-mem) ops? ;
 
+: ptr++ ( brainfuck -- brainfuck )
+    [ 1 + ] change-ptr ops? ;
 
-: (inc-data) ( brainfuck -- brainfuck )
-    [ 1 + ] change-dp ;
+: ptr-- ( brainfuck -- brainfuck )
+    [ 1 - ] change-ptr ops? ;
 
-: (dec-data) ( brainfuck -- brainfuck )
-    [ 1 - ] change-dp ;
+: compose-all ( seq -- quot ) 
+    [ ] [ compose ] reduce ;
 
+EBNF: parse-brainfuck
 
-: (loop-start) ( brainfuck -- brainfuck ) 
-    (get-memory) 0 = [ dup [ cp>> ] [ loop>> ] bi at >>cp ] when ;
+inc-ptr  = ">"  => [[ [ ptr++ ] ]]
+dec-ptr  = "<"  => [[ [ ptr-- ] ]]
+inc-mem  = "+"  => [[ [ mem++ ] ]]
+dec-mem  = "-"  => [[ [ mem-- ] ]]
+output   = "."  => [[ [ out ] ]]
+input    = ","  => [[ [ in ] ]]
+space    = (" "|"\t"|"\r\n"|"\n") => [[ [ ] ]] 
+unknown  = (.)  => [[ "Invalid input" throw ]]
 
-: (loop-end) ( brainfuck -- brainfuck ) 
-    dup [ cp>> ] [ loop>> ] bi at 1 - >>cp ;
+ops   = inc-ptr | dec-ptr | inc-mem | dec-mem | output | input | space
+loop  = "[" {loop|ops}* "]" => [[ second compose-all '[ [ mem? ] _ while ] ]]
 
+code  = (loop|ops|unknown)*  => [[ compose-all ]]
 
-: (get-input) ( brainfuck -- brainfuck ) 
-    read1 (set-memory) ;
-
-
-: can-step ( brainfuck -- brainfuck t/f )
-    dup [ steps>> 100000 < ] [ cp>> ] [ code>> length ] tri < and ;
-
-: step ( brainfuck -- brainfuck ) 
-    dup [ cp>> ] [ code>> ] bi nth 
-    { 
-        { CHAR: >  [ (inc-data) ] }
-        { CHAR: <  [ (dec-data) ] }
-        { CHAR: +  [ (inc-memory) ] } 
-        { CHAR: -  [ (dec-memory) ] }
-        { CHAR: .  [ (out-memory) ] }
-        { CHAR: ,  [ (get-input) ] }
-        { CHAR: [  [ (loop-start) ] }
-        { CHAR: ]  [ (loop-end) ] }
-        { CHAR: \s [ ] }
-        { CHAR: \t [ ] }
-        { CHAR: \r [ ] }
-        { CHAR: \n [ ] }
-        [ "invalid input" throw ] 
-    } case [ 1 + ] change-cp [ 1 + ] change-steps ;
+;EBNF
 
 PRIVATE>
 
-: run-brainfuck ( code -- )
-    <brainfuck> [ can-step ] [ step ] while drop ;
+MACRO: run-brainfuck ( code -- )
+    [ <brainfuck> ] swap parse-brainfuck [ drop ] 3append ;
 
-: get-brainfuck ( code -- result )
-    [ run-brainfuck ] with-string-writer ;
-
+: get-brainfuck ( code -- result ) 
+    [ run-brainfuck ] with-string-writer ; inline 
 
