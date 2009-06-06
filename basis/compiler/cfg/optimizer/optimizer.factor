@@ -11,8 +11,16 @@ compiler.cfg.dce
 compiler.cfg.write-barrier
 compiler.cfg.liveness
 compiler.cfg.rpo
-compiler.cfg.phi-elimination ;
+compiler.cfg.phi-elimination
+compiler.cfg.checker ;
 IN: compiler.cfg.optimizer
+
+SYMBOL: check-optimizer?
+
+: ?check ( cfg -- cfg' )
+    check-optimizer? get [
+        dup check-cfg
+    ] when ;
 
 : optimize-cfg ( cfg -- cfg' )
     [
@@ -27,4 +35,5 @@ IN: compiler.cfg.optimizer
         eliminate-dead-code
         eliminate-write-barriers
         eliminate-phis
+        ?check
     ] with-scope ;
