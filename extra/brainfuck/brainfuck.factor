@@ -19,11 +19,11 @@ TUPLE: brainfuck pointer memory ;
 : set-memory ( brainfuck value -- brainfuck )
     over [ pointer>> ] [ memory>> ] bi set-at ;
 
-: (+) ( brainfuck -- brainfuck )
-    get-memory 1 + 255 bitand set-memory ;
+: (+) ( brainfuck n -- brainfuck )
+    [ get-memory ] dip + 255 bitand set-memory ;
 
-: (-) ( brainfuck -- brainfuck )
-    get-memory 1 - 255 bitand set-memory ;
+: (-) ( brainfuck n -- brainfuck )
+    [ get-memory ] dip - 255 bitand set-memory ;
 
 : (?) ( brainfuck -- brainfuck t/f )
     get-memory 0 = not ;
@@ -34,24 +34,24 @@ TUPLE: brainfuck pointer memory ;
 : (,) ( brainfuck -- brainfuck )
     read1 set-memory ;
 
-: (>) ( brainfuck -- brainfuck )
-    [ 1 + ] change-pointer ;
+: (>) ( brainfuck n -- brainfuck )
+    [ dup pointer>> ] dip + >>pointer ;
 
-: (<) ( brainfuck -- brainfuck ) 
-    [ 1 - ] change-pointer ;
+: (<) ( brainfuck n -- brainfuck ) 
+    [ dup pointer>> ] dip - >>pointer ;
 
 : compose-all ( seq -- quot ) 
     [ ] [ compose ] reduce ;
 
 EBNF: parse-brainfuck
 
-inc-ptr  = ">"  => [[ [ (>) ] ]]
-dec-ptr  = "<"  => [[ [ (<) ] ]]
-inc-mem  = "+"  => [[ [ (+) ] ]]
-dec-mem  = "-"  => [[ [ (-) ] ]]
+inc-ptr  = (">")+  => [[ length 1quotation [ (>) ] append ]]
+dec-ptr  = ("<")+  => [[ length 1quotation [ (<) ] append ]]
+inc-mem  = ("+")+  => [[ length 1quotation [ (+) ] append ]]
+dec-mem  = ("-")+  => [[ length 1quotation [ (-) ] append ]]
 output   = "."  => [[ [ (.) ] ]]
 input    = ","  => [[ [ (,) ] ]]
-space    = (" "|"\t"|"\r\n"|"\n") => [[ [ ] ]] 
+space    = (" "|"\t"|"\r\n"|"\n")+ => [[ [ ] ]] 
 unknown  = (.)  => [[ "Invalid input" throw ]]
 
 ops   = inc-ptr | dec-ptr | inc-mem | dec-mem | output | input | space
