@@ -33,6 +33,7 @@ IN: json.reader.tests
 { 8 9 10 12 13 34 47 92 } >string 1array [ <" "\b\t\n\f\r\"\/\\" "> json> ] unit-test
 { HEX: abcd } >string 1array [ <" "\uaBCd" "> json> ] unit-test
 
+{ H{ { "a" { } } { "b" 123 } } } [ "{\"a\":[],\"b\":123}" json> ] unit-test
 { { } } [ "[]" json> ] unit-test 
 { { 1 "two" 3.0 } } [ <" [1, "two", 3.0] "> json> ] unit-test
 { H{ } } [ "{}" json> ] unit-test

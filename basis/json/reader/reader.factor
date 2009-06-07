@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators io io.streams.string json
-kernel math math.parser math.parser.private sequences strings ;
+kernel math math.parser math.parser.private prettyprint
+sequences strings vectors ;
 IN: json.reader
 
 <PRIVATE
@@ -62,18 +63,23 @@ DEFER: j-string
         [ second-last ] bi push
     ] when ;
 
+: (close-array) ( accum -- accum' )
+    dup last vector? [ v-over-push ] unless
+    dup pop >array over push ;
+
 : (close-hash) ( accum -- accum' )
     dup length 3 >= [ v-over-push ] when
     dup dup [ pop ] dip pop swap
     zip H{ } assoc-clone-like over push ;
                                                  
 : scan ( accum char -- accum )
+    ! 2dup . . ! Great for debug...
     [
         {
             { CHAR: \" [ j-string over push ] }
             { CHAR: [  [ V{ } clone over push ] }
             { CHAR: ,  [ v-over-push ] }
-            { CHAR: ]  [ v-over-push dup pop >array over push ] }
+            { CHAR: ]  [ (close-array) ] }
             { CHAR: {  [ 2 [ V{ } clone over push ] times ] }
             { CHAR: :  [ v-pick-push ] }
             { CHAR: }  [ (close-hash) ] }
