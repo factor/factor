@@ -6,11 +6,12 @@ IN: persistency
 
 TUPLE: persistent id ;
 UNION: bool word POSTPONE: f ;
-PREDICATE: short-string < string length 100 <= ;
+UNION: short-string string ;
+
 : db-ize ( class -- db-class ) {
    { bool [ BOOLEAN ] }
-   { string [ TEXT ] }
    { short-string [ { VARCHAR 100 } ] }
+   { string [ TEXT ] }
    { float [ DOUBLE ] }
    { timestamp [ TIMESTAMP ] }
    { fixnum [ INTEGER ] }
