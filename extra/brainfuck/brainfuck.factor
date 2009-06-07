@@ -8,13 +8,10 @@ IN: brainfuck
 
 <PRIVATE
 
-TUPLE: brainfuck pointer memory ops ;
+TUPLE: brainfuck pointer memory ;
 
 : <brainfuck> ( -- brainfuck ) 
-    0 H{ } clone 0 brainfuck boa ;
-
-: max-ops? ( brainfuck -- brainfuck ) 
-    [ 1 + dup 10000 > [ "Max operations" throw ] when ] change-ops ;
+    0 H{ } clone brainfuck boa ;
 
 : get-memory ( brainfuck -- brainfuck value )
     dup [ pointer>> ] [ memory>> ] bi at 0 or ;
@@ -23,25 +20,25 @@ TUPLE: brainfuck pointer memory ops ;
     over [ pointer>> ] [ memory>> ] bi set-at ;
 
 : (+) ( brainfuck -- brainfuck )
-    get-memory 1 + 255 bitand set-memory max-ops? ;
+    get-memory 1 + 255 bitand set-memory ;
 
 : (-) ( brainfuck -- brainfuck )
-    get-memory 1 - 255 bitand set-memory max-ops? ;
+    get-memory 1 - 255 bitand set-memory ;
 
 : (?) ( brainfuck -- brainfuck t/f )
-    max-ops? get-memory 0 = not ;
+    get-memory 0 = not ;
 
 : (.) ( brainfuck -- brainfuck )
-    get-memory 1string write max-ops? ;
+    get-memory 1string write ;
 
 : (,) ( brainfuck -- brainfuck )
-    read1 set-memory max-ops? ;
+    read1 set-memory ;
 
 : (>) ( brainfuck -- brainfuck )
-    [ 1 + ] change-pointer max-ops? ;
+    [ 1 + ] change-pointer ;
 
 : (<) ( brainfuck -- brainfuck ) 
-    [ 1 - ] change-pointer max-ops? ;
+    [ 1 - ] change-pointer ;
 
 : compose-all ( seq -- quot ) 
     [ ] [ compose ] reduce ;
