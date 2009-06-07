@@ -2,33 +2,22 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays byte-arrays columns
 combinators compression.run-length endian fry grouping images
-images.loader io io.binary io.encodings.binary io.files
-io.streams.limited kernel locals macros math math.bitwise
-math.functions namespaces sequences specialized-arrays.uint
-specialized-arrays.ushort strings summary io.encodings.8-bit
-io.encodings.string ;
+images.bitmap.loading images.loader io io.binary
+io.encodings.8-bit io.encodings.binary io.encodings.string
+io.files io.streams.limited kernel locals macros math
+math.bitwise math.functions namespaces sequences
+specialized-arrays.uint specialized-arrays.ushort strings
+summary ;
 QUALIFIED-WITH: bitstreams b
 IN: images.bitmap
-
-: read2 ( -- n ) 2 read le> ;
-: read4 ( -- n ) 4 read le> ;
-: write2 ( n -- ) 2 >le write ;
-: write4 ( n -- ) 4 >le write ;
 
 SINGLETON: bitmap-image
 "bmp" bitmap-image register-image-class
 
-TUPLE: loading-bitmap 
-magic size reserved1 reserved2 offset header-length width
-height planes bit-count compression size-image
-x-pels y-pels color-used color-important
-red-mask green-mask blue-mask alpha-mask
-cs-type end-points
-gamma-red gamma-green gamma-blue
-intent profile-data profile-size reserved3
-color-palette color-index bitfields ;
-
 ! endpoints-triple is ciexyzX/Y/Z, 3x fixed-point-2.30 aka 3x uint
+
+: write2 ( n -- ) 2 >le write ;
+: write4 ( n -- ) 4 >le write ;
 
 <PRIVATE
 
@@ -48,7 +37,7 @@ color-palette color-index bitfields ;
     '[ _ nth ] map concat ;
 
 : color-lookup ( loading-bitmap -- seq )
-    dup header-length>> {
+    dup file-header>> header-length>> {
         { 12 [ os2-color-lookup ] }
         { 64 [ os2v2-color-lookup ] }
         { 40 [ v3-color-lookup ] }
@@ -66,7 +55,7 @@ ERROR: bmp-not-supported n ;
     ] { } map-as B{ } concat-as ;
 
 : bitmap>bytes ( loading-bitmap -- byte-array )
-    dup bit-count>>
+    dup header>> bit-count>>
     {
         { 32 [ color-index>> ] }
         { 24 [ color-index>> ] }
@@ -82,13 +71,13 @@ ERROR: bmp-not-supported n ;
             color-index>>
         ] }
         { 8 [ color-lookup ] }
-        { 4 [ [ 4 b:byte-array-n>seq ] change-color-index color-lookup ] }
+        { 4 [ B [ 4 b:byte-array-n>seq ] change-color-index color-lookup ] }
         { 1 [ [ 1 b:byte-array-n>seq ] change-color-index color-lookup ] }
         [ bmp-not-supported ]
     } case >byte-array ;
 
 : set-bitfield-widths ( loading-bitmap -- loading-bitmap' )
-    dup bit-count>> {
+    dup header>> bit-count>> {
         { 16 [ dup color-palette>> 4 group [ le> ] map ] }
         { 32 [ { HEX: ff0000 HEX: ff00 HEX: ff } ] }
     } case reverse >>bitfields ;
@@ -100,7 +89,7 @@ M: unsupported-bitfield-widths summary
 
 : uncompress-bitfield-widths ( loading-bitmap -- loading-bitmap' )
     set-bitfield-widths
-    dup bit-count>> {
+    dup header>> bit-count>> {
         { 16 [
             dup bitfields>> '[
                 byte-array>ushort-array _ uncompress-bitfield
@@ -116,8 +105,16 @@ M: unsupported-bitfield-widths summary
 
 ERROR: unsupported-bitmap-compression compression ;
 
-: uncompress-bitmap ( loading-bitmap -- loading-bitmap' )
-    dup compression>> {
+GENERIC: uncompress-bitmap* ( loading-bitmap header -- loading-bitmap )
+
+: uncompress-bitmap ( loading-bitmap -- loading-bitmap )
+    dup header>> uncompress-bitmap* ;
+
+M: os2-header uncompress-bitmap* ( loading-bitmap header -- loading-bitmap' )
+    drop ;
+
+M: v-header uncompress-bitmap* ( loading-bitmap header -- loading-bitmap' )
+    compression>> {
         { f [ ] }
         { 0 [ ] }
         { 1 [ [ run-length-uncompress ] change-color-index ] }
@@ -134,73 +131,11 @@ ERROR: unsupported-bitmap-compression compression ;
     uncompress-bitmap
     bitmap>bytes ;
 
-: parse-file-header ( loading-bitmap -- loading-bitmap )
-    2 read latin1 decode >>magic
-    read4 >>size
-    read2 >>reserved1
-    read2 >>reserved2
-    read4 >>offset ;
-
-: read-v3-header ( loading-bitmap -- loading-bitmap )
-    read4 >>width
-    read4 32 >signed >>height
-    read2 >>planes
-    read2 >>bit-count
-    read4 >>compression
-    read4 >>size-image
-    read4 >>x-pels
-    read4 >>y-pels
-    read4 >>color-used
-    read4 >>color-important ;
-
-: read-v4-header ( loading-bitmap -- loading-bitmap )
-    read-v3-header
-    read4 >>red-mask
-    read4 >>green-mask
-    read4 >>blue-mask
-    read4 >>alpha-mask
-    read4 >>cs-type
-    read4 read4 read4 3array >>end-points
-    read4 >>gamma-red
-    read4 >>gamma-green
-    read4 >>gamma-blue ;
-
-: read-v5-header ( loading-bitmap -- loading-bitmap )
-    read-v4-header
-    read4 >>intent
-    read4 >>profile-data
-    read4 >>profile-size
-    read4 >>reserved3 ;
-
-: read-os2-header ( loading-bitmap -- loading-bitmap )
-    read2 >>width
-    read2 16 >signed >>height
-    read2 >>planes
-    read2 >>bit-count ;
-
-: read-os2v2-header ( loading-bitmap -- loading-bitmap )
-    read4 >>width
-    read4 32 >signed >>height
-    read2 >>planes
-    read2 >>bit-count ;
-
-ERROR: unknown-bitmap-header n ;
-
-: parse-bitmap-header ( loading-bitmap -- loading-bitmap )
-    read4 [ >>header-length ] keep
-    {
-        { 12 [ read-os2-header ] }
-        { 64 [ read-os2v2-header ] }
-        { 40 [ read-v3-header ] }
-        { 108 [ read-v4-header ] }
-        { 124 [ read-v5-header ] }
-        [ unknown-bitmap-header ]
-    } case ;
-
 : color-palette-length ( loading-bitmap -- n )
+    file-header>>
     [ offset>> 14 - ] [ header-length>> ] bi - ;
 
-: color-index-length ( loading-bitmap -- n )
+: color-index-length ( header -- n )
     {
         [ width>> ]
         [ planes>> * ]
@@ -208,56 +143,7 @@ ERROR: unknown-bitmap-header n ;
         [ height>> abs * ]
     } cleave ;
 
-: image-size ( loading-bitmap -- n )
-    [ [ width>> ] [ height>> ] bi * ] [ bit-count>> 8 /i ] bi * abs ;
-
-: parse-bitmap ( loading-bitmap -- loading-bitmap )
-    dup color-palette-length read >>color-palette
-    dup size-image>> dup 0 > [
-        read >>color-index
-    ] [
-        drop dup color-index-length read >>color-index
-    ] if ;
-
 ERROR: unsupported-bitmap-file magic ;
-
-: load-bitmap ( path -- loading-bitmap )
-    binary stream-throws <limited-file-reader> [
-        loading-bitmap new
-        parse-file-header dup magic>> {
-            { "BM" [ parse-bitmap-header parse-bitmap ] }
-            ! { "BA" [ parse-os2-bitmap-array ] }
-            ! { "CI" [ parse-os2-color-icon ] }
-            ! { "CP" [ parse-os2-color-pointer ] }
-            ! { "IC" [ parse-os2-icon ] }
-            ! { "PT" [ parse-os2-pointer ] }
-            [ unsupported-bitmap-file ]
-        } case 
-    ] with-input-stream ;
-
-ERROR: unknown-component-order bitmap ;
-
-: bitmap>component-order ( loading-bitmap -- object )
-    bit-count>> {
-        { 32 [ BGR ] }
-        { 24 [ BGR ] }
-        { 16 [ BGR ] }
-        { 8 [ BGR ] }
-        { 4 [ BGR ] }
-        { 1 [ BGR ] }
-        [ unknown-component-order ]
-    } case ;
-
-M: bitmap-image load-image* ( path bitmap-image -- bitmap )
-    drop load-bitmap
-    [ image new ] dip
-    {
-        [ loading-bitmap>bytes >>bitmap ]
-        [ [ width>> ] [ height>> abs ] bi 2array >>dim ]
-        [ height>> 0 < not >>upside-down? ]
-        [ compression>> 3 = [ t >>upside-down? ] when ]
-        [ bitmap>component-order >>component-order ]
-    } cleave ;
 
 PRIVATE>
 
@@ -301,7 +187,7 @@ PRIVATE>
                 ! compression
                 [ drop 0 write4 ]
 
-                ! size-image
+                ! image-size
                 [ bitmap>color-index length write4 ]
 
                 ! x-pels
