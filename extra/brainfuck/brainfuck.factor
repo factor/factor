@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs fry io io.streams.string kernel macros math 
-peg.ebnf quotations sequences strings ;
+peg.ebnf prettyprint quotations sequences strings ;
 
 IN: brainfuck
 
@@ -40,6 +40,11 @@ TUPLE: brainfuck pointer memory ;
 : (<) ( brainfuck n -- brainfuck ) 
     [ dup pointer>> ] dip - >>pointer ;
 
+: (#) ( brainfuck -- brainfuck ) 
+    dup 
+    [ "ptr=" write pointer>> pprint ] 
+    [ ",mem=" write memory>> pprint nl ] bi ;
+
 : compose-all ( seq -- quot ) 
     [ ] [ compose ] reduce ;
 
@@ -51,10 +56,11 @@ inc-mem  = ("+")+  => [[ length 1quotation [ (+) ] append ]]
 dec-mem  = ("-")+  => [[ length 1quotation [ (-) ] append ]]
 output   = "."  => [[ [ (.) ] ]]
 input    = ","  => [[ [ (,) ] ]]
+debug    = "#"  => [[ [ (#) ] ]]
 space    = (" "|"\t"|"\r\n"|"\n")+ => [[ [ ] ]] 
 unknown  = (.)  => [[ "Invalid input" throw ]]
 
-ops   = inc-ptr | dec-ptr | inc-mem | dec-mem | output | input | space
+ops   = inc-ptr|dec-ptr|inc-mem|dec-mem|output|input|debug|space
 loop  = "[" {loop|ops}* "]" => [[ second compose-all 1quotation [ [ (?) ] ] prepend [ while ] append ]]
 
 code  = (loop|ops|unknown)*  => [[ compose-all ]]
