@@ -1,7 +1,6 @@
 USING: arrays vectors combinators effects kernel math sequences splitting
-strings.parser parser ;
+strings.parser parser fry ;
 IN: fries
-SYMBOL: _
 : str-fry ( str on -- quot ) split
     [ unclip-last [ [ spin glue ] reduce-r ] 2curry ]
     [ length 1 - 1 <effect> [ call-effect ] 2curry ] bi ;
