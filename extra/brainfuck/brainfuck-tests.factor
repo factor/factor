@@ -4,6 +4,9 @@
 USING: brainfuck io.streams.string multiline tools.test ;
 
 
+[ "+" run-brainfuck ] must-infer
+[ "+" get-brainfuck ] must-infer
+
 ! Hello World!
 
 [ "Hello World!\n" ] [ <" ++++++++++[>+++++++>++++++++++>+++>+<<<<-]
