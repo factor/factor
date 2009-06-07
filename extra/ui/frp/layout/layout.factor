@@ -34,16 +34,19 @@ SYMBOL: wordnames
 
 : <frp-book> ( quot: ( -- model ) -- book ) f make-layout roll dup activate-model <book> handle-words
    swap [ no-models ] unless-empty ; inline
+: <frp-book*> ( quot -- book ) f make-layout f <book> handle-words
+   swap [ no-models ] unless-empty ; inline
 
 SYNTAX: $ CREATE-WORD dup [ , ] curry (( -- )) define-declared "$" expect
    word [ [ building get length swap wordnames get set-at ] [ , ] bi ] curry over push-all ;
 
 : insert-gadget ( number parent gadget -- ) -rot [ but-last insert-nth ] change-children drop ;
+: insert-size ( number parent size -- ) -rot [ but-last insert-nth ] change-sizes drop ;
 
 GENERIC# insert-item 1 ( item location -- )
 M: gadget insert-item dup first book? [ first2 spin [ add-gadget ] keep insert-gadget ]
    [ [ f <layout> ] dip insert-item ] if ;
-M: layout insert-item first2 spin [ insert-layout ] keep gadget>> insert-gadget ;
+M: layout insert-item first2 spin [ insert-layout ] keep [ gadget>> insert-gadget ] [ size>> insert-size ] 3bi ;
 M: model insert-item dup first book? [ no-models ]
    [ first model>> swap add-connection ] if ;
 
@@ -54,3 +57,5 @@ M: model insert-item dup first book? [ no-models ]
 
 : with-interface ( quot: ( -- gadget ) -- gadget ) H{ } clone wordnames
    [ { } make insert-items ] with-variable ; inline
+
+! while children are changed, sizes aren't
