@@ -5,6 +5,7 @@ words tools.continuations ;
 IN: ui.frp.layout
 
 TUPLE: layout gadget size ; C: <layout> layout
+ERROR: no-models models ;
 
 SYNTAX: ,% scan string>number [ <layout> , ] curry over push-all ;
 SYNTAX: ->% scan string>number '[ [ _ <layout> , ] [ output-model ] bi ] over push-all ;
@@ -31,7 +32,8 @@ SYMBOL: wordnames
 : <hbox> ( gadgets -- track ) horizontal <box> ; inline
 : <vbox> ( gadgets -- track ) vertical <box> ; inline
 
-: <frp-book> ( gadgets -- book ) f make-layout f <book> handle-words ; inline
+: <frp-book> ( quot: ( -- model ) -- book ) f make-layout roll dup activate-model <book> handle-words
+   swap [ no-models ] unless-empty ; inline
 
 SYNTAX: $ CREATE-WORD dup [ , ] curry (( -- )) define-declared "$" expect
    word [ [ building get length swap wordnames get set-at ] [ , ] bi ] curry over push-all ;
@@ -42,7 +44,7 @@ GENERIC# insert-item 1 ( item location -- )
 M: gadget insert-item dup first book? [ first2 spin [ add-gadget ] keep insert-gadget ]
    [ [ f <layout> ] dip insert-item ] if ;
 M: layout insert-item first2 spin [ insert-layout ] keep gadget>> insert-gadget ;
-M: model insert-item dup first book? [ "Books can't contain models" throw ]
+M: model insert-item dup first book? [ no-models ]
    [ first model>> swap add-connection ] if ;
 
 : insert-items ( makelist -- ) f swap [ dup word?
