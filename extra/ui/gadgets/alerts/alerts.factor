@@ -1,7 +1,8 @@
-USING: accessors models macros generalizations kernel ui
-ui.frp.gadgets ui.frp.signals ui.frp.layout ui.gadgets
+USING: accessors models macros make generalizations kernel
+ui ui.frp.gadgets ui.frp.signals ui.frp.layout ui.gadgets
 ui.gadgets.labels ui.gadgets.editors ui.gadgets.buttons
-ui.gadgets.packs locals sequences fonts io.styles wrap.strings ;
+ui.gadgets.packs locals sequences fonts io.styles
+wrap.strings ;
 
 IN: ui.gadgets.alerts
 :: alert ( quot string -- ) <pile> { 10 10 } >>gap 1 >>align
