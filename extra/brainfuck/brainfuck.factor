@@ -67,7 +67,7 @@ code  = (loop|ops|unknown)*  => [[ compose-all ]]
 PRIVATE>
 
 MACRO: run-brainfuck ( code -- )
-    [ <brainfuck> ] swap parse-brainfuck [ drop ] 3append ;
+    [ <brainfuck> ] swap parse-brainfuck [ drop flush ] 3append ;
 
 : get-brainfuck ( code -- result ) 
     [ run-brainfuck ] with-string-writer ; inline 
