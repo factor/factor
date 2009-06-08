@@ -125,7 +125,8 @@ code in the buffer."
 (defun factor-mode--indent-setter-line ()
   (when (fuel-syntax--at-setter-line)
     (save-excursion
-      (let ((indent (and (fuel-syntax--at-constructor-line) (current-indentation))))
+      (let ((indent (and (fuel-syntax--at-constructor-line)
+                         (current-indentation))))
         (while (not (or indent
                         (bobp)
                         (fuel-syntax--at-begin-of-def)
@@ -224,6 +225,19 @@ code in the buffer."
 
 (defsubst factor-mode--cycling-setup ()
   (setq factor-mode--cycling-no-ask nil))
+
+(defun factor-mode--code-file (kind &optional file)
+  (let* ((file (or file (buffer-file-name)))
+         (bn (file-name-nondirectory file)))
+    (and (string-match (format "\\(.+\\)-%s\\.factor$" kind) bn)
+         (expand-file-name (concat (match-string 1 bn) ".factor")
+                           (file-name-directory file)))))
+
+(defsubst factor-mode--in-docs (&optional file)
+  (factor-mode--code-file "docs"))
+
+(defsubst factor-mode--in-tests (&optional file)
+  (factor-mode--code-file "tests"))
 
 (defun factor-mode-visit-other-file (&optional skip)
   "Cycle between code, tests and docs factor files.
