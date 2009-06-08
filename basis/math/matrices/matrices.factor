@@ -1,12 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.order math.vectors
+USING: arrays fry kernel math math.order math.vectors
 sequences sequences.private accessors columns ;
 IN: math.matrices
 
 ! Matrices
 : zero-matrix ( m n -- matrix )
-    [ nip 0 <array> ] curry map ;
+    '[ _ 0 <array> ] replicate ;
 
 : identity-matrix ( n -- matrix )
     #! Make a nxn identity matrix.
