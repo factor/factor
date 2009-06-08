@@ -4,7 +4,8 @@
 USING: accessors arrays assocs combinators help help.crossref
 help.markup help.topics io io.streams.string kernel make namespaces
 parser prettyprint sequences summary help.vocabs
-vocabs vocabs.loader vocabs.hierarchy vocabs.metadata words see ;
+vocabs vocabs.loader vocabs.hierarchy vocabs.metadata words see
+listener ;
 
 IN: fuel.help
 
