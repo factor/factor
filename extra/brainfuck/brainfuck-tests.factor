@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: brainfuck io.streams.string multiline tools.test ;
+USING: brainfuck kernel io.streams.string math math.parser math.ranges 
+multiline quotations sequences tools.test ;
 
 
 [ "+" run-brainfuck ] must-infer
@@ -47,5 +48,15 @@ USING: brainfuck io.streams.string multiline tools.test ;
 ! cat
 
 [ "ABC" ] [ "ABC\0" [ ",[.,]" get-brainfuck ] with-string-reader ] unit-test
+
+! Squares of numbers from 0 to 100
+
+100 [0,b] [ dup * number>string ] map "\n" join "\n" append 1quotation
+[ <" ++++[>+++++<-]>[<+++++>-]+<+[
+     >[>+>+<<-]++>>[<<+>>-]>>>[-]++>[-]+
+     >>>+[[-]++++++>>>]<<<[[<++++++++<++>>-]+<.<[>----<-]<]
+     <<[>>>>>[>>>[-]+++++++++<[>-<-]+++++++++>
+     [-[<->-]+[<<<]]<[>+<-]>]<<-]<<-] ">
+  get-brainfuck ] unit-test
 
 
