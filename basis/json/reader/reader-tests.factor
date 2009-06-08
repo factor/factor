@@ -19,6 +19,8 @@ IN: json.reader.tests
 { 10.25 } [ "1025e-2" json> ] unit-test
 { 0.125 } [ "0.125" json> ] unit-test
 { -0.125 } [ "-0.125" json> ] unit-test
+{ -0.00125 } [ "-0.125e-2" json> ] unit-test
+{ -012.5 } [ "-0.125e+2" json> ] unit-test
 
 ! not widely supported by javascript, but allowed in the grammar, and a nice
 ! feature to get
@@ -31,6 +33,7 @@ IN: json.reader.tests
 { 8 9 10 12 13 34 47 92 } >string 1array [ <" "\b\t\n\f\r\"\/\\" "> json> ] unit-test
 { HEX: abcd } >string 1array [ <" "\uaBCd" "> json> ] unit-test
 
+{ H{ { "a" { } } { "b" 123 } } } [ "{\"a\":[],\"b\":123}" json> ] unit-test
 { { } } [ "[]" json> ] unit-test 
 { { 1 "two" 3.0 } } [ <" [1, "two", 3.0] "> json> ] unit-test
 { H{ } } [ "{}" json> ] unit-test

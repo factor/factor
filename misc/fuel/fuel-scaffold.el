@@ -39,6 +39,64 @@
   (let ((cmd '(:fuel* (vocab-roots get :get) "fuel")))
     (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
 
+(defun fuel-scaffold--dev-name ()
+  (or fuel-scaffold-developer-name
+      (let ((cmd '(:fuel* (developer-name get :get) "fuel")))
+        (fuel-eval--retort-result (fuel-eval--send/wait cmd)))
+      "Your name"))
+
+(defun fuel-scaffold--first-vocab ()
+  (goto-char (point-min))
+  (re-search-forward fuel-syntax--current-vocab-regex nil t))
+
+(defsubst fuel-scaffold--vocab (file)
+  (save-excursion
+    (set-buffer (find-file-noselect file))
+    (fuel-scaffold--first-vocab)
+    (fuel-syntax--current-vocab)))
+
+(defconst fuel-scaffold--tests-header-format
+  "! Copyright (C) %s %s
+! See http://factorcode.org/license.txt for BSD license.
+USING: %s tools.test ;
+IN: %s
+")
+
+(defsubst fuel-scaffold--check-auto (var)
+  (and var (or (eq var 'always) (y-or-n-p "Insert template? "))))
+
+(defun fuel-scaffold--tests (parent)
+  (when (and parent (fuel-scaffold--check-auto fuel-scaffold-test-autoinsert-p))
+    (let ((year (format-time-string "%Y"))
+          (name (fuel-scaffold--dev-name))
+          (vocab (fuel-scaffold--vocab parent)))
+      (insert (format fuel-scaffold--tests-header-format
+                      year name vocab vocab))
+      t)))
+
+(defsubst fuel-scaffold--create-docs (vocab)
+  (let ((cmd `(:fuel* (,vocab ,fuel-scaffold-developer-name fuel-scaffold-help)
+                      "fuel")))
+    (fuel-eval--send/wait cmd)))
+
+(defun fuel-scaffold--help (parent)
+  (when (and parent (fuel-scaffold--check-auto fuel-scaffold-help-autoinsert-p))
+    (let* ((ret (fuel-scaffold--create-docs (fuel-scaffold--vocab parent)))
+           (file (fuel-eval--retort-result ret)))
+      (when file
+        (revert-buffer t t t)
+        (when (and fuel-scaffold-help-header-only-p
+                   (fuel-scaffold--first-vocab))
+          (delete-region (1+ (point)) (point-max))
+          (save-buffer))
+        (message "Inserting template ... done."))
+      (goto-char (point-min)))))
+
+(defun fuel-scaffold--maybe-insert ()
+  (ignore-errors
+    (or (fuel-scaffold--tests (factor-mode--in-tests))
+        (fuel-scaffold--help (factor-mode--in-docs)))))
+
 
 ;;; User interface:
 
@@ -73,9 +131,7 @@ You can configure `fuel-scaffold-developer-name' (set by default to
   (interactive "P")
   (let* ((vocab (or (and (not arg) (fuel-syntax--current-vocab))
                     (fuel-completion--read-vocab nil)))
-         (cmd `(:fuel* (,vocab ,fuel-scaffold-developer-name fuel-scaffold-help)
-                       "fuel"))
-         (ret (fuel-eval--send/wait cmd))
+         (ret (fuel-scaffold--create-docs vocab))
          (file (fuel-eval--retort-result ret)))
         (unless file
           (error "Error creating help file" (car (fuel-eval--retort-error ret))))

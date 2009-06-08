@@ -1315,3 +1315,63 @@ USING: math.private compiler.cfg.debugger ;
     } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
     instructions>> first live-spill-slots>> empty?
 ] unit-test
+
+[ f ] [
+    T{ live-range f 0 10 }
+    T{ live-range f 20 30 }
+    intersect-live-range
+] unit-test
+
+[ 10 ] [
+    T{ live-range f 0 10 }
+    T{ live-range f 10 30 }
+    intersect-live-range
+] unit-test
+
+[ 5 ] [
+    T{ live-range f 0 10 }
+    T{ live-range f 5 30 }
+    intersect-live-range
+] unit-test
+
+[ 5 ] [
+    T{ live-range f 5 30 }
+    T{ live-range f 0 10 }
+    intersect-live-range
+] unit-test
+
+[ 5 ] [
+    T{ live-range f 5 10 }
+    T{ live-range f 0 15 }
+    intersect-live-range
+] unit-test
+
+[ 50 ] [
+    {
+        T{ live-range f 0 10 }
+        T{ live-range f 20 30 }
+        T{ live-range f 40 50 }
+    }
+    {
+        T{ live-range f 11 15 }
+        T{ live-range f 31 35 }
+        T{ live-range f 50 55 }
+    }
+    intersect-live-ranges
+] unit-test
+
+[ 5 ] [
+    T{ live-interval
+       { start 0 }
+       { end 10 }
+       { uses { 0 10 } }
+       { ranges V{ T{ live-range f 0 10 } } }
+    }
+    T{ live-interval
+       { start 5 }
+       { end 10 }
+       { uses { 5 10 } }
+       { ranges V{ T{ live-range f 5 10 } } }
+    }
+    intersect-inactive
+] unit-test
