@@ -4,7 +4,7 @@ USING: arrays hashtables io kernel math math.parser memory
 namespaces parser lexer sequences strings io.styles
 vectors words generic system combinators continuations debugger
 definitions compiler.units accessors colors prettyprint fry
-sets vocabs.parser source-files.errors locals ;
+sets vocabs.parser source-files.errors locals vocabs vocabs.loader ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -123,6 +123,78 @@ t error-summary? set-global
     (listener) ;
 
 PRIVATE>
+
+SYMBOL: interactive-vocabs
+
+{
+    "accessors"
+    "arrays"
+    "assocs"
+    "combinators"
+    "compiler"
+    "compiler.errors"
+    "compiler.units"
+    "continuations"
+    "debugger"
+    "definitions"
+    "editors"
+    "help"
+    "help.apropos"
+    "help.lint"
+    "help.vocabs"
+    "inspector"
+    "io"
+    "io.files"
+    "io.pathnames"
+    "kernel"
+    "listener"
+    "math"
+    "math.order"
+    "memory"
+    "namespaces"
+    "parser"
+    "prettyprint"
+    "see"
+    "sequences"
+    "slicing"
+    "sorting"
+    "stack-checker"
+    "strings"
+    "syntax"
+    "tools.annotations"
+    "tools.crossref"
+    "tools.disassembler"
+    "tools.errors"
+    "tools.memory"
+    "tools.profiler"
+    "tools.test"
+    "tools.threads"
+    "tools.time"
+    "vocabs"
+    "vocabs.loader"
+    "vocabs.refresh"
+    "vocabs.hierarchy"
+    "words"
+    "scratchpad"
+} interactive-vocabs set-global
+
+: only-use-vocabs ( vocabs -- )
+    clear-manifest
+    [ vocab ] filter
+    [
+        vocab
+        [ find-vocab-root not ]
+        [ source-loaded?>> +done+ eq? ] bi or
+    ] filter
+    [ use-vocab ] each ;
+
+: with-interactive-vocabs ( quot -- )
+    [
+        <manifest> manifest set
+        "scratchpad" set-current-vocab
+        interactive-vocabs get only-use-vocabs
+        call
+    ] with-scope ; inline
 
 : listener ( -- )
     [ [ { } (listener) ] with-interactive-vocabs ] with-return ;
