@@ -61,7 +61,7 @@ space    = (" "|"\t"|"\r\n"|"\n")+ => [[ [ ] ]]
 unknown  = (.)  => [[ "Invalid input" throw ]]
 
 ops   = inc-ptr|dec-ptr|inc-mem|dec-mem|output|input|debug|space
-loop  = "[" {loop|ops}* "]" => [[ second compose-all 1quotation [ [ (?) ] ] prepend [ while ] append ]]
+loop  = "[" {loop|ops}+ "]" => [[ second compose-all 1quotation [ [ (?) ] ] prepend [ while ] append ]]
 
 code  = (loop|ops|unknown)*  => [[ compose-all ]]
 
