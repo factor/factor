@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.tuple effects.parser
 fry generalizations generic.standard kernel lexer locals macros
-parser sequences slots vocabs words ;
+parser sequences slots vocabs words arrays ;
 IN: constructors
 
 ! An experiment
@@ -25,14 +25,17 @@ IN: constructors
     [ drop define-initializer-generic ]
     [ [ dup lookup-initializer ] dip H{ } clone define-typecheck ] 2bi ;
 
+: all-slots-assoc ( class -- slots )
+    superclasses [ [ "slots" word-prop ] keep '[ _ ] { } map>assoc ] map concat ;
+
 MACRO:: slots>constructor ( class slots -- quot )
-    class all-slots [ [ name>> ] [ initial>> ] bi ] { } map>assoc :> params
+    class all-slots-assoc slots [ '[ first name>> _ = ] find-last nip ] with map :> slot-assoc
+    class all-slots-assoc [ [ ] [ first initial>> ] bi ] { } map>assoc :> default-params
     slots length
-    params length
+    default-params length
     '[
-        _ narray slots swap zip 
-        params swap assoc-union
-        values _ firstn class boa
+        _ narray slot-assoc swap zip 
+        default-params swap assoc-union values _ firstn class boa
     ] ;
 
 :: (define-constructor) ( constructor-word class effect def -- word quot )

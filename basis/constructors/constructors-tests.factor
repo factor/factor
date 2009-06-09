@@ -57,3 +57,11 @@ TUPLE: default { a integer initial: 0 } ;
 CONSTRUCTOR: default ( -- obj ) ;
 
 [ 0 ] [ <default> a>> ] unit-test
+
+
+TUPLE: inherit1 a ;
+TUPLE: inherit2 < inherit1 a ;
+
+CONSTRUCTOR: inherit2 ( a -- obj ) ;
+
+[ T{ inherit2 f f 100 } ] [ 100 <inherit2> ] unit-test
