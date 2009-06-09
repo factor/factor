@@ -1,15 +1,15 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel sequences make compiler.cfg.instructions
-compiler.cfg.rpo cpu.architecture ;
+USING: accessors kernel sequences make compiler.cfg.instructions
+compiler.cfg.local cpu.architecture ;
 IN: compiler.cfg.two-operand
 
 ! On x86, instructions take the form x = x op y
 ! Our SSA IR is x = y op z
 
-! We don't bother with ##add, ##add-imm or ##sub-imm since x86
-! has a LEA instruction which is effectively a three-operand
-! addition
+! We don't bother with ##add, ##add-imm, ##sub-imm or ##mul-imm
+! since x86 has LEA and IMUL instructions which are effectively
+! three-operand addition and multiplication, respectively.
 
 : make-copy ( dst src -- insn ) \ ##copy new-insn ; inline
 
@@ -34,7 +34,6 @@ M: ##not convert-two-operand*
 
 M: ##sub convert-two-operand* convert-two-operand/integer ;
 M: ##mul convert-two-operand* convert-two-operand/integer ;
-M: ##mul-imm convert-two-operand* convert-two-operand/integer ;
 M: ##and convert-two-operand* convert-two-operand/integer ;
 M: ##and-imm convert-two-operand* convert-two-operand/integer ;
 M: ##or convert-two-operand* convert-two-operand/integer ;
@@ -54,9 +53,7 @@ M: insn convert-two-operand* , ;
 
 : convert-two-operand ( cfg -- cfg' )
     two-operand? [
-        dup [
-            [
-                [ [ convert-two-operand* ] each ] V{ } make
-            ] change-instructions drop
-        ] each-basic-block
+        [ drop ]
+        [ [ [ convert-two-operand* ] each ] V{ } make ]
+        local-optimization
     ] when ;
