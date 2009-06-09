@@ -40,20 +40,17 @@ ERROR: unsupported-rotation degrees ;
 : flatten-table ( seq^3 -- seq )
     [ concat ] map concat ;
 
-: preprocess ( image -- pixelrows )
-    normalize-image image>pixel-rows ;
-
 : ?reverse-dimensions ( image n -- )
     { 270 90 } member? [ [ reverse ] change-dim ] when drop ;
 
 :  normalize-degree ( n -- n' ) 360 rem ;
 
 : processing-effect ( image quot -- image' )
-    '[ preprocess @ flatten-table ] [ (>>bitmap) ] [ ] tri ; inline
+    '[ image>pixel-rows @ flatten-table ] [ (>>bitmap) ] [ ] tri ; inline
 
 :: rotate' ( image n -- image )
     n normalize-degree :> n'
-    image preprocess :> pixel-table
+    image image>pixel-rows :> pixel-table
     image n' ?reverse-dimensions
     pixel-table n' (rotate) :> table-rotated
     image table-rotated flatten-table >>bitmap ;
