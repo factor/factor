@@ -3,10 +3,12 @@
 USING: accessors arrays combinators images images.bitmap
 images.bitmap.private io io.binary io.encodings.8-bit
 io.encodings.binary io.encodings.string io.streams.limited
-kernel math math.bitwise ;
+kernel math math.bitwise grouping sequences ;
+QUALIFIED-WITH: syntax S
 IN: images.bitmap.loading
 
 ! http://www.fileformat.info/format/bmp/egff.htm
+! http://www.digicamsoft.com/bmp/bmp.html
 
 ERROR: unknown-component-order bitmap ;
 ERROR: unknown-bitmap-header n ;
@@ -19,26 +21,63 @@ TUPLE: loading-bitmap
     color-palette color-index bitfields ;
 
 TUPLE: file-header
-    magic size reserved1 reserved2 offset header-length ;
+    { magic initial: "BM" }
+    { size }
+    { reserved1 initial: 0 }
+    { reserved2 initial: 0 }
+    { offset }
+    { header-length } ;
 
 TUPLE: v3-header
-    width height planes bit-count
-    compression image-size x-resolution y-resolution
-    colors-used colors-important ;
+    { width initial: 0 }
+    { height initial: 0 }
+    { planes initial: 0 }
+    { bit-count initial: 0 }
+    { compression initial: 0 }
+    { image-size initial: 0 }
+    { x-resolution initial: 0 }
+    { y-resolution initial: 0 }
+    { colors-used initial: 0 }
+    { colors-important initial: 0 } ;
 
 TUPLE: v4-header < v3-header
-    red-mask green-mask blue-mask alpha-mask
-    cs-type end-points
-    gamma-red gamma-green gamma-blue ;
+    { red-mask initial: 0 }
+    { green-mask initial: 0 }
+    { blue-mask initial: 0 }
+    { alpha-mask initial: 0 }
+    { cs-type initial: 0 }
+    { end-points initial: 0 }
+    { gamma-red initial: 0 }
+    { gamma-green initial: 0 }
+    { gamma-blue initial: 0 } ;
 
 TUPLE: v5-header < v4-header
-    intent profile-data profile-size reserved3 ;
+    { intent initial: 0 }
+    { profile-data initial: 0 }
+    { profile-size initial: 0 }
+    { reserved3 initial: 0 } ;
 
-TUPLE: os2v1-header width height planes bit-count ;
+TUPLE: os2v1-header
+    { width initial: 0 }
+    { height initial: 0 }
+    { planes initial: 0 }
+    { bit-count initial: 0 } ;
+
 TUPLE: os2v2-header < os2v1-header
-    compression image-size x-resolution y-resolution
-    colors-used colors-important units reserved
-    recording rendering size1 size2 color-encoding identifier ;
+    { compression initial: 0 }
+    { image-size initial: 0 }
+    { x-resolution initial: 0 }
+    { y-resolution initial: 0 }
+    { colors-used initial: 0 }
+    { colors-important initial: 0 }
+    { units initial: 0 }
+    { reserved initial: 0 }
+    { recording initial: 0 }
+    { rendering initial: 0 }
+    { size1 initial: 0 }
+    { size2 initial: 0 }
+    { color-encoding initial: 0 }
+    { identifier initial: 0 } ;
 
 UNION: v-header v3-header v4-header v5-header ;
 UNION: os2-header os2v1-header os2v2-header ;
@@ -121,7 +160,7 @@ UNION: os2-header os2v1-header os2v2-header ;
     read4 >>size1
     read4 >>size2
     read4 >>color-encoding
-    4 read >>identifier ;
+    read4 >>identifier ;
 
 : read-os2v2-header ( -- os2v2-header )
     \ os2v2-header new
@@ -149,15 +188,20 @@ M: os2v1-header parse-color-data* ( loading-bitmap header -- loading-bitmap )
     color-index-length read >>color-index ;
 
 M: object parse-color-data* ( loading-bitmap header -- loading-bitmap )
-    dup image-size>> [
-        nip
-    ] [
-        color-index-length
-    ] if* read >>color-index ;
+    dup image-size>> [ 0 ] unless* dup 0 >
+    [ nip ] [ drop color-index-length ] if read >>color-index ;
+
+: alpha-used? ( loading-bitmap -- ? )
+    color-index>> 4 <sliced-groups> [ fourth 0 = ] all? not ;
+
+GENERIC: bitmap>component-order* ( loading-bitmap header -- object )
 
 : bitmap>component-order ( loading-bitmap -- object )
+    dup header>> bitmap>component-order* ;
+
+: simple-bitmap>component-order ( loading-bitamp -- object )
     header>> bit-count>> {
-        { 32 [ BGR ] }
+        { 32 [ BGRX ] }
         { 24 [ BGR ] }
         { 16 [ BGR ] }
         { 8 [ BGR ] }
@@ -165,6 +209,19 @@ M: object parse-color-data* ( loading-bitmap header -- loading-bitmap )
         { 1 [ BGR ] }
         [ unknown-component-order ]
     } case ;
+
+: advanced-bitmap>component-order ( loading-bitmap -- object )
+    [ ] [ header>> bit-count>> ] [ alpha-used? ] tri 2array {
+        { { 32 t } [ drop BGRA ] }
+        { { 32 f } [ drop BGRX ] }
+        [ drop simple-bitmap>component-order ]
+    } case ;
+
+M: os2v1-header bitmap>component-order* drop simple-bitmap>component-order ;
+M: os2v2-header bitmap>component-order* drop simple-bitmap>component-order ;
+M: v3-header bitmap>component-order* drop simple-bitmap>component-order ;
+M: v4-header bitmap>component-order* drop advanced-bitmap>component-order ;
+M: v5-header bitmap>component-order* drop advanced-bitmap>component-order ;
 
 ERROR: unsupported-bitmap-file magic ;
 
