@@ -1,7 +1,6 @@
 USING: images.bitmap images.viewer io.encodings.binary
 io.files io.files.unique kernel tools.test images.loader
-literals sequences checksums.md5 checksums
-images.normalization ;
+literals sequences checksums.md5 checksums ;
 IN: images.bitmap.tests
 
 CONSTANT: test-bitmap24 "vocab:images/test-images/thiswayup24.bmp"
@@ -26,8 +25,8 @@ ${
 
 : test-bitmap-save ( path -- ? )
     [ md5 checksum-file ]
-    [ load-image normalize-image ] bi
-    "bitmap-save-test" unique-file
+    [ load-image ] bi
+    "bitmap-save-test" ".bmp" make-unique-file
     [ save-bitmap ]
     [ md5 checksum-file ] bi = ;
 
