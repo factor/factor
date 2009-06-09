@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays byte-arrays columns
 combinators compression.run-length endian fry grouping images
-images.bitmap.loading images.loader io io.binary
-io.encodings.8-bit io.encodings.binary io.encodings.string
-io.files io.streams.limited kernel locals macros math
-math.bitwise math.functions namespaces sequences
+images.bitmap.loading images.bitmap.saving images.loader io
+io.binary io.encodings.8-bit io.encodings.binary
+io.encodings.string io.files io.streams.limited kernel locals
+macros math math.bitwise math.functions namespaces sequences
 specialized-arrays.uint specialized-arrays.ushort strings
 summary ;
 QUALIFIED-WITH: bitstreams b
@@ -16,33 +16,26 @@ SINGLETON: bitmap-image
 
 ! endpoints-triple is ciexyzX/Y/Z, 3x fixed-point-2.30 aka 3x uint
 
-: write2 ( n -- ) 2 >le write ;
-: write4 ( n -- ) 4 >le write ;
-
 <PRIVATE
 
-: os2-color-lookup ( loading-bitmap -- seq )
+: color-lookup3 ( loading-bitmap -- seq )
     [ color-index>> >array ]
     [ color-palette>> 3 <sliced-groups> ] bi
     '[ _ nth ] map concat ;
 
-: os2v2-color-lookup ( loading-bitmap -- seq )
-    [ color-index>> >array ]
-    [ color-palette>> 3 <sliced-groups> ] bi
-    '[ _ nth ] map concat ;
-
-: v3-color-lookup ( loading-bitmap -- seq )
+: color-lookup4 ( loading-bitmap -- seq )
     [ color-index>> >array ]
     [ color-palette>> 4 <sliced-groups> [ 3 head-slice ] map ] bi
     '[ _ nth ] map concat ;
 
+! os2v1 is 3bytes each, all others are 3 + 1 unused
 : color-lookup ( loading-bitmap -- seq )
     dup file-header>> header-length>> {
-        { 12 [ os2-color-lookup ] }
-        { 64 [ os2v2-color-lookup ] }
-        { 40 [ v3-color-lookup ] }
-        ! { 108 [ v4-color-lookup ] }
-        ! { 124 [ v5-color-lookup ] }
+        { 12 [ color-lookup3 ] }
+        { 64 [ color-lookup4 ] }
+        { 40 [ color-lookup4 ] }
+        { 108 [ color-lookup4 ] }
+        { 124 [ color-lookup4 ] }
     } case ;
 
 ERROR: bmp-not-supported n ;
@@ -71,7 +64,7 @@ ERROR: bmp-not-supported n ;
             color-index>>
         ] }
         { 8 [ color-lookup ] }
-        { 4 [ B [ 4 b:byte-array-n>seq ] change-color-index color-lookup ] }
+        { 4 [ [ 4 b:byte-array-n>seq ] change-color-index color-lookup ] }
         { 1 [ [ 1 b:byte-array-n>seq ] change-color-index color-lookup ] }
         [ bmp-not-supported ]
     } case >byte-array ;
@@ -95,11 +88,7 @@ M: unsupported-bitfield-widths summary
                 byte-array>ushort-array _ uncompress-bitfield
             ] change-color-index
         ] }
-        { 32 [
-            dup bitfields>> '[
-                byte-array>uint-array _ uncompress-bitfield
-            ] change-color-index
-        ] }
+        { 32 [ ] }
         [ unsupported-bitfield-widths ]
     } case ;
 
@@ -113,12 +102,20 @@ GENERIC: uncompress-bitmap* ( loading-bitmap header -- loading-bitmap )
 M: os2-header uncompress-bitmap* ( loading-bitmap header -- loading-bitmap' )
     drop ;
 
+: do-run-length-uncompress ( loading-bitmap -- loading-bitmap )
+    dup '[
+        _ header>> [ width>> ] [ height>> ] bi
+        run-length-uncompress-bitmap
+    ] change-color-index ;
+
 M: v-header uncompress-bitmap* ( loading-bitmap header -- loading-bitmap' )
     compression>> {
         { f [ ] }
         { 0 [ ] }
         { 1 [ [ run-length-uncompress ] change-color-index ] }
-        { 2 [ [ 4 b:byte-array-n>seq run-length-uncompress >byte-array ] change-color-index ] }
+        { 2 [ [ 4 b:byte-array-n>seq run-length-uncompress ] change-color-index ] }
+        ! { 1 [ do-run-length-uncompress ] }
+        ! { 2 [ [ 4 b:byte-array-n>seq ] change-color-index do-run-length-uncompress ] }
         { 3 [ uncompress-bitfield-widths ] }
         { 4 [ "jpeg" unsupported-bitmap-compression ] }
         { 5 [ "png" unsupported-bitmap-compression ] }
@@ -128,8 +125,7 @@ M: v-header uncompress-bitmap* ( loading-bitmap header -- loading-bitmap' )
     3 * 4 mod 4 swap - 4 mod ; inline
 
 : loading-bitmap>bytes ( loading-bitmap -- byte-array )
-    uncompress-bitmap
-    bitmap>bytes ;
+    uncompress-bitmap bitmap>bytes ;
 
 : color-palette-length ( loading-bitmap -- n )
     file-header>>
@@ -169,7 +165,7 @@ PRIVATE>
     binary [
         B{ CHAR: B CHAR: M } write
         [
-            bitmap>color-index length 14 + 40 + write4
+            bitmap>> length 14 + 40 + write4
             0 write4
             54 write4
             40 write4
@@ -188,7 +184,7 @@ PRIVATE>
                 [ drop 0 write4 ]
 
                 ! image-size
-                [ bitmap>color-index length write4 ]
+                [ bitmap>> length write4 ]
 
                 ! x-pels
                 [ drop 0 write4 ]
@@ -203,12 +199,7 @@ PRIVATE>
                 [ drop 0 write4 ]
 
                 ! color-palette
-                [
-                    [ bitmap>color-index ]
-                    [ dim>> first 3 * ]
-                    [ dim>> first bitmap-padding + ] tri
-                    reverse-lines write
-                ]
+                [ bitmap>> write ]
             } cleave
         ] bi
     ] with-file-writer ;
