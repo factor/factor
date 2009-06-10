@@ -37,15 +37,16 @@ M: frp-field ungraft*
 M: frp-field model-changed 2dup frp-model>> =
     [ [ value>> ] [ editor>> ] bi* set-editor-string ]
     [ nip [ editor>> editor-string ] [ frp-model>> ] bi set-model ] if ;
-: after-empty ( model quot -- model' ) fmap "" <model> <switch> ; inline ! pattern for editors, labels
 
-: <frp-field*> ( -- field ) "" <model> <frp-field> ;
+: <frp-field*> ( -- field ) f <model> <frp-field> ;
 : <empty-field> ( model -- field ) "" <model> <switch> <frp-field> ;
+: <empty-field*> ( -- field ) "" <model> <frp-field> ;
 : <frp-editor> ( model -- gadget )
     frp-field [ <multiline-editor> ] dip new-border dup gadget-child >>editor
     field-theme swap >>frp-model { 1 0 } >>align ;
-: <empty-editor> ( model -- editor ) "" <model> <switch> <frp-editor> ;
-: <frp-editor*> ( -- editor ) "" <model> <frp-editor> ;
+: <frp-editor*> ( -- editor ) f <model> <frp-editor> ;
+: <empty-editor*> ( -- field ) "" <model> <frp-editor> ;
+: <empty-editor> ( model -- field ) "" <model> <switch> <frp-editor> ;
 
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;

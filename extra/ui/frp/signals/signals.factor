@@ -1,4 +1,5 @@
 USING: accessors arrays kernel monads models models.product sequences ui.frp.functors ;
+FROM: models.product => product ;
 IN: ui.frp.signals
 
 TUPLE: multi-model < model ;
@@ -36,7 +37,7 @@ M: switch-model model-changed 2dup switcher>> =
    [ [ value>> ] dip over [ t >>on set-model ] [ nip [ original>> ] keep f >>on model-changed ] if ]
    [ dup on>> [ 2drop ] [ [ value>> ] dip over [ set-model ] [ 2drop ] if ] if ] if ;
 : <switch> ( signal1 signal2 -- signal' ) swap [ 2array switch-model <multi-model> ] 2keep
-   [ >>original ] [ >>switcher ] bi* ;
+   [ [ value>> >>value ] [ >>original ] bi ] [ >>switcher ] bi* ;
 M: switch-model model-activated [ original>> ] keep model-changed ;
 : >behavior ( event -- behavior ) t <model> <switch> ;
 
@@ -65,6 +66,7 @@ M: action (model-changed) [ [ value>> ] [ quot>> ] bi* call( a -- b ) ] keep val
    [ swap add-connection ] 2keep model-changed ;
 : <action> ( model quot -- action-signal ) [ 1array action <multi-model> ] dip >>quot dup f <action-value> >>value value>> ;
 <PRIVATE
+
 TUPLE: | < multi-model ;
 : <|> ( models -- product ) | <multi-model> ;
 GENERIC: models-changed ( product -- )
@@ -83,4 +85,4 @@ TUPLE: & < | ;
 : <&> ( models -- product ) & <multi-model> ;
 M: & models-changed dependencies>> [ f swap (>>value) ] each ;
 PRIVATE>
-FMAPS: $> <$ fmap FOR & | ;
+FMAPS: $> <$ fmap FOR & | product ;
