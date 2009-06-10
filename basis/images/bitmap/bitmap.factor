@@ -102,20 +102,18 @@ GENERIC: uncompress-bitmap* ( loading-bitmap header -- loading-bitmap )
 M: os2-header uncompress-bitmap* ( loading-bitmap header -- loading-bitmap' )
     drop ;
 
-: do-run-length-uncompress ( loading-bitmap -- loading-bitmap )
-    dup '[
+: do-run-length-uncompress ( loading-bitmap word -- loading-bitmap )
+    dupd '[
         _ header>> [ width>> ] [ height>> ] bi
-        run-length-uncompress-bitmap
-    ] change-color-index ;
+        _ execute
+    ] change-color-index ; inline
 
 M: v-header uncompress-bitmap* ( loading-bitmap header -- loading-bitmap' )
     compression>> {
         { f [ ] }
         { 0 [ ] }
-        { 1 [ [ run-length-uncompress ] change-color-index ] }
-        { 2 [ [ 4 b:byte-array-n>seq run-length-uncompress ] change-color-index ] }
-        ! { 1 [ do-run-length-uncompress ] }
-        ! { 2 [ [ 4 b:byte-array-n>seq ] change-color-index do-run-length-uncompress ] }
+        { 1 [ \ run-length-uncompress-bitmap8 do-run-length-uncompress ] }
+        { 2 [ \ run-length-uncompress-bitmap4 do-run-length-uncompress ] }
         { 3 [ uncompress-bitfield-widths ] }
         { 4 [ "jpeg" unsupported-bitmap-compression ] }
         { 5 [ "png" unsupported-bitmap-compression ] }
