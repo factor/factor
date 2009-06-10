@@ -91,9 +91,6 @@ M: x86 %return ( -- ) 0 RET ;
 : align-code ( n -- )
     0 <repetition> % ;
 
-M: x86 %dispatch-label ( label -- )
-    0 cell, rc-absolute-cell label-fixup ;
-
 :: (%slot) ( obj slot tag temp -- op )
     temp slot obj [+] LEA
     temp tag neg [+] ; inline
@@ -111,7 +108,7 @@ M: x86 %add-imm [+] LEA ;
 M: x86 %sub     nip SUB ;
 M: x86 %sub-imm neg [+] LEA ;
 M: x86 %mul     nip swap IMUL2 ;
-M: x86 %mul-imm nip IMUL2 ;
+M: x86 %mul-imm IMUL3 ;
 M: x86 %and     nip AND ;
 M: x86 %and-imm nip AND ;
 M: x86 %or      nip OR ;
