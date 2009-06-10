@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math sequences sequences.private ;
+USING: accessors arrays generalizations kernel math sequences
+sequences.private ;
 IN: cursors
 
 GENERIC: cursor-done? ( cursor -- ? )
@@ -40,7 +41,7 @@ ERROR: cursor-ended cursor ;
     [ [ call ] dip cursor-write ] 2curry ; inline
 
 : cursor-map ( from to quot -- )
-   swap cursor-map-quot cursor-each ; inline
+    swap cursor-map-quot cursor-each ; inline
 
 : cursor-write-if ( obj quot to -- )
     [ over [ call ] dip ] dip
@@ -99,3 +100,53 @@ M: to-sequence cursor-write
 
 : map ( seq quot -- ) [ cursor-map ] transform ; inline
 : filter ( seq quot -- newseq ) [ cursor-filter ] transform ; inline
+
+: find-done2? ( cursor cursor quot -- ? )
+    2over [ cursor-done? ] either?
+    [ 3drop t ] [ [ [ cursor-get-unsafe ] bi@ ] dip call ] if ; inline
+
+: cursor-until2 ( cursor cursor quot -- )
+    [ find-done2? not ]
+    [ drop [ cursor-advance ] bi@ ] bi-curry bi-curry bi-curry while ; inline
+
+: cursor-each2 ( cursor cursor quot -- )
+    [ f ] compose cursor-until2 ; inline
+
+: cursor-map2 ( from to quot -- )
+    swap cursor-map-quot cursor-each2 ; inline
+
+: iterate2 ( seq1 seq2 quot iterator -- )
+    [ [ >input ] bi@ ] 2dip call ; inline
+
+: transform2 ( seq1 seq2 quot transformer -- newseq )
+    [ over >output [ [ >input ] [ >input ] bi* ] dip ] 2dip
+    [ call ]
+    [ 2drop nip freeze ] 4 nbi ; inline
+
+: 2each ( seq1 seq2 quot -- ) [ cursor-each2 ] iterate2 ; inline
+: 2map ( seq1 seq2 quot -- ) [ cursor-map2 ] transform2 ; inline
+
+: find-done3? ( cursor1 cursor2 cursor3 quot -- ? )
+    3 nover 3array [ cursor-done? ] any?
+    [ 4 ndrop t ] [ [ [ cursor-get-unsafe ] tri@ ] dip call ] if ; inline
+
+: cursor-until3 ( cursor cursor quot -- )
+    [ find-done3? not ]
+    [ drop [ cursor-advance ] tri@ ] bi-curry bi-curry bi-curry bi-curry while ; inline
+
+: cursor-each3 ( cursor cursor quot -- )
+    [ f ] compose cursor-until3 ; inline
+
+: cursor-map3 ( from to quot -- )
+    swap cursor-map-quot cursor-each3 ; inline
+
+: iterate3 ( seq1 seq2 seq3 quot iterator -- )
+    [ [ >input ] tri@ ] 2dip call ; inline
+
+: transform3 ( seq1 seq2 seq3 quot transformer -- newseq )
+    [ pick >output [ [ >input ] [ >input ] [ >input ] tri* ] dip ] 2dip
+    [ call ]
+    [ 2drop 2nip freeze ] 5 nbi ; inline
+
+: 3each ( seq1 seq2 seq3 quot -- ) [ cursor-each3 ] iterate3 ; inline
+: 3map ( seq1 seq2 seq3 quot -- ) [ cursor-map3 ] transform3 ; inline
