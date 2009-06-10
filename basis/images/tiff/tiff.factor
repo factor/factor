@@ -492,11 +492,11 @@ ERROR: unknown-component-order ifd ;
     } case ;
 
 : ifd>image ( ifd -- image )
-    {
-        [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
-        [ ifd-component-order f ]
-        [ bitmap>> ]
-    } cleave image boa ;
+    [ <image> ] dip {
+        [ [ image-width find-tag ] [ image-length find-tag ] bi 2array >>dim ]
+        [ ifd-component-order >>component-order ]
+        [ bitmap>> >>bitmap ]
+    } cleave ;
 
 : tiff>image ( image -- image )
     ifds>> [ ifd>image ] map first ;
