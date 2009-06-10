@@ -32,7 +32,7 @@ M: #branch remove-dead-code*
     pad-with-bottom >>phi-in-d drop ;
 
 : live-value-indices ( values -- indices )
-    [ length ] keep live-values get
+    [ length iota ] keep live-values get
     '[ _ nth _ key? ] filter ; inline
 
 : drop-indexed-values ( values indices -- node )
