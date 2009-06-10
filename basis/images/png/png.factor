@@ -10,9 +10,10 @@ IN: images.png
 SINGLETON: png-image
 "png" png-image register-image-class
 
-TUPLE: loading-png < image chunks
-width height bit-depth color-type compression-method
-filter-method interlace-method uncompressed ;
+TUPLE: loading-png
+    chunks
+    width height bit-depth color-type compression-method
+    filter-method interlace-method uncompressed ;
 
 CONSTRUCTOR: loading-png ( -- image )
     V{ } clone >>chunks ;
@@ -33,22 +34,21 @@ ERROR: bad-png-header header ;
 
 ERROR: bad-checksum ;
 
-: read-png-chunks ( image -- image )
+: read-png-chunks ( loading-png -- loading-png )
     <png-chunk>
     4 read be> [ >>length ] [ 4 + ] bi
     read dup crc32 checksum-bytes
     4 read = [ bad-checksum ] unless
     4 cut-slice
-    [ ascii decode >>type ]
-    [ B{ } like >>data ] bi*
+    [ ascii decode >>type ] [ B{ } like >>data ] bi*
     [ over chunks>> push ] 
     [ type>> ] bi "IEND" =
     [ read-png-chunks ] unless ;
 
-: find-chunk ( image string -- chunk )
+: find-chunk ( loading-png string -- chunk )
     [ chunks>> ] dip '[ type>> _ = ] find nip ;
 
-: parse-ihdr-chunk ( image -- image )
+: parse-ihdr-chunk ( loading-png -- loading-png )
     dup "IHDR" find-chunk data>> {
         [ [ 0 4 ] dip subseq be> >>width ]
         [ [ 4 8 ] dip subseq be> >>height ]
@@ -59,44 +59,44 @@ ERROR: bad-checksum ;
         [ [ 12 ] dip nth >>interlace-method ]
     } cleave ;
 
-: find-compressed-bytes ( image -- bytes )
+: find-compressed-bytes ( loading-png -- bytes )
     chunks>> [ type>> "IDAT" = ] filter
     [ data>> ] map concat ;
 
-: fill-image-data ( image -- image )
-    dup [ width>> ] [ height>> ] bi 2array >>dim ;
 
-: zlib-data ( png-image -- bytes ) 
+: zlib-data ( loading-png -- bytes ) 
     chunks>> [ type>> "IDAT" = ] find nip data>> ;
 
 ERROR: unknown-color-type n ;
 ERROR: unimplemented-color-type image ;
 
-: inflate-data ( image -- bytes )
+: inflate-data ( loading-png -- bytes )
     zlib-data zlib-inflate ; 
 
-: decode-greyscale ( image -- image )
+: decode-greyscale ( loading-png -- loading-png )
     unimplemented-color-type ;
 
-: decode-truecolor ( image -- image )
-    {
-        [ inflate-data ]
-        [ dim>> first 3 * 1 + group reverse-png-filter ]
-        [ swap >byte-array >>bitmap drop ]
-        [ RGB >>component-order drop ]
-        [ ]
+: png-image-bytes ( loading-png -- byte-array )
+    [ inflate-data ] [ width>> 3 * 1 + ] bi group
+    reverse-png-filter ;
+
+: decode-truecolor ( loading-png -- loading-png )
+    [ <image> ] dip {
+        [ png-image-bytes >>bitmap ]
+        [ [ width>> ] [ height>> ] bi 2array >>dim ]
+        [ drop RGB >>component-order ]
     } cleave ;
     
-: decode-indexed-color ( image -- image )
+: decode-indexed-color ( loading-png -- loading-png )
     unimplemented-color-type ;
 
-: decode-greyscale-alpha ( image -- image )
+: decode-greyscale-alpha ( loading-png -- loading-png )
     unimplemented-color-type ;
 
-: decode-truecolor-alpha ( image -- image )
+: decode-truecolor-alpha ( loading-png -- loading-png )
     unimplemented-color-type ;
 
-: decode-png ( image -- image ) 
+: decode-png ( loading-png -- loading-png ) 
     dup color-type>> {
         { 0 [ decode-greyscale ] }
         { 2 [ decode-truecolor ] }
@@ -112,7 +112,6 @@ ERROR: unimplemented-color-type image ;
         read-png-header
         read-png-chunks
         parse-ihdr-chunk
-        fill-image-data
         decode-png
     ] with-input-stream ;
 
