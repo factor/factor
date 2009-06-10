@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math math.order fry
-compiler.cfg.instructions compiler.cfg.registers
+binary-search compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.def-use compiler.cfg.liveness compiler.cfg ;
 IN: compiler.cfg.linear-scan.live-intervals
 
@@ -109,6 +109,7 @@ M: ##copy-float compute-live-intervals*
 
 : compute-start/end ( live-interval -- )
     dup ranges>> [ first from>> ] [ last to>> ] bi
+    2dup > [ "BUG: start > end" throw ] when
     [ >>start ] [ >>end ] bi* drop ;
 
 : finish-live-intervals ( live-intervals -- )

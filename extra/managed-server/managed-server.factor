@@ -11,7 +11,7 @@ TUPLE: managed-server < threaded-server clients ;
 
 TUPLE: managed-client
 input-stream output-stream local-address remote-address
-username object quit? ;
+username object quit? logged-in? ;
 
 HOOK: handle-login threaded-server ( -- username )
 HOOK: handle-managed-client* managed-server ( -- )
@@ -62,26 +62,39 @@ PRIVATE>
         local-address get >>local-address
         remote-address get >>remote-address ;
 
-: check-logged-in ( username -- username )
-    dup clients key? [ handle-already-logged-in ] when ;
+: maybe-login-client ( -- )
+    username clients key? [
+        handle-already-logged-in
+    ] [
+        t client (>>logged-in?)
+        client username clients set-at
+    ] if ;
 
-: add-managed-client ( -- )
-    client username check-logged-in clients set-at ;
+: when-logged-in ( quot -- )
+    client logged-in?>> [ call ] [ drop ] if ; inline
 
 : delete-managed-client ( -- )
-    username server clients>> delete-at ;
+    [ username server clients>> delete-at ] when-logged-in ;
 
 : handle-managed-client ( -- )
     handle-login <managed-client> managed-client set
-    add-managed-client handle-client-join
-    [ handle-managed-client* client quit?>> not ] loop ;
+    maybe-login-client [
+        handle-client-join
+        [ handle-managed-client* client quit?>> not ] loop
+    ] when-logged-in ;
+
+: cleanup-client ( -- )
+    [
+        delete-managed-client
+        handle-client-disconnect
+    ] when-logged-in ;
 
 PRIVATE>
 
 M: managed-server handle-client*
     managed-server set
     [ handle-managed-client ]
-    [ delete-managed-client handle-client-disconnect ]
+    [ cleanup-client ]
     [ ] cleanup ;
 
 : new-managed-server ( port name encoding class -- server )

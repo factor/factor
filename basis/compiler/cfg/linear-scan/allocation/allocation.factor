@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences math math.order kernel assocs
-accessors vectors fry heaps cpu.architecture combinators
-compiler.cfg.registers
-compiler.cfg.linear-scan.live-intervals ;
+accessors vectors fry heaps cpu.architecture sorting locals
+combinators compiler.cfg.registers
+compiler.cfg.linear-scan.live-intervals hints ;
 IN: compiler.cfg.linear-scan.allocation
 
 ! Mapping from register classes to sequences of machine registers
@@ -27,13 +27,61 @@ SYMBOL: active-intervals
 : delete-active ( live-interval -- )
     dup vreg>> active-intervals-for delq ;
 
-: expire-old-intervals ( n -- )
-    active-intervals swap '[
-        [
-            [ end>> _ < ] partition
-            [ [ deallocate-register ] each ] dip
-        ] assoc-map
-    ] change ;
+! Vector of inactive live intervals
+SYMBOL: inactive-intervals
+
+: inactive-intervals-for ( vreg -- seq )
+    reg-class>> inactive-intervals get at ;
+
+: add-inactive ( live-interval -- )
+    dup vreg>> inactive-intervals-for push ;
+
+! Vector of handled live intervals
+SYMBOL: handled-intervals
+
+: add-handled ( live-interval -- )
+    handled-intervals get push ;
+
+: finished? ( n live-interval -- ? ) end>> swap < ;
+
+: finish ( n live-interval -- keep? )
+    nip [ deallocate-register ] [ add-handled ] bi f ;
+
+: activate ( n live-interval -- keep? )
+    nip add-active f ;
+
+: deactivate ( n live-interval -- keep? )
+    nip add-inactive f ;
+
+: don't-change ( n live-interval -- keep? ) 2drop t ;
+
+! Moving intervals between active and inactive sets
+: process-intervals ( n symbol quots -- )
+    ! symbol stores an alist mapping register classes to vectors
+    [ get values ] dip '[ [ _ cond ] with filter-here ] with each ; inline
+
+: covers? ( insn# live-interval -- ? )
+    ranges>> [ [ from>> ] [ to>> ] bi between? ] with any? ;
+
+: deactivate-intervals ( n -- )
+    ! Any active intervals which have ended are moved to handled
+    ! Any active intervals which cover the current position
+    ! are moved to inactive
+    active-intervals {
+        { [ 2dup finished? ] [ finish ] }
+        { [ 2dup covers? not ] [ deactivate ] }
+        [ don't-change ]
+    } process-intervals ;
+
+: activate-intervals ( n -- )
+    ! Any inactive intervals which have ended are moved to handled
+    ! Any inactive intervals which do not cover the current position
+    ! are moved to active
+    inactive-intervals {
+        { [ 2dup finished? ] [ finish ] }
+        { [ 2dup covers? ] [ activate ] }
+        [ don't-change ]
+    } process-intervals ;
 
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
@@ -66,35 +114,73 @@ SYMBOL: progress
 
 : coalesce ( live-interval -- )
     dup copy-from>> active-interval
-    [ [ add-active ] [ delete-active ] bi* ]
+    [ [ add-active ] [ [ delete-active ] [ add-handled ] bi ] bi* ]
     [ reg>> >>reg drop ]
     2bi ;
 
 ! Splitting
-: find-use ( live-interval n quot -- i elt )
-    [ uses>> ] 2dip curry find ; inline
+: split-range ( live-range n -- before after )
+    [ [ from>> ] dip <live-range> ]
+    [ 1 + swap to>> <live-range> ]
+    2bi ;
 
-: split-before ( live-interval i -- before )
-    [ clone dup uses>> ] dip
-    [ head >>uses ] [ 1- swap nth >>end ] 2bi ;
+: split-last-range? ( last n -- ? )
+    swap to>> <= ;
 
-: split-after ( live-interval i -- after )
-    [ clone dup uses>> ] dip
-    [ tail >>uses ] [ swap nth >>start ] 2bi
-    f >>reg f >>copy-from ;
+: split-last-range ( before after last n -- before' after' )
+    split-range [ [ but-last ] dip suffix ] [ prefix ] bi-curry* bi* ;
 
-: split-interval ( live-interval n -- before after )
-    [ drop ] [ [ > ] find-use drop ] 2bi
-    [ split-before ] [ split-after ] 2bi ;
+: split-ranges ( live-ranges n -- before after )
+    [ '[ from>> _ <= ] partition ]
+    [
+        pick empty? [ drop ] [
+            [ over last ] dip 2dup split-last-range?
+            [ split-last-range ] [ 2drop ] if
+        ] if
+    ] bi ;
+
+: split-uses ( uses n -- before after )
+    '[ _ <= ] partition ;
 
 : record-split ( live-interval before after -- )
-    [ >>split-before ] [ >>split-after ] bi* drop ;
+    [ >>split-before ] [ >>split-after ] bi* drop ; inline
+
+: check-split ( live-interval -- )
+    [ end>> ] [ start>> ] bi - 0 =
+    [ "BUG: splitting atomic interval" throw ] when ; inline
+
+: split-before ( before -- before' )
+    [ [ ranges>> last ] [ uses>> last ] bi >>to drop ]
+    [ compute-start/end ]
+    [ ]
+    tri ; inline
+
+: split-after ( after -- after' )
+    [ [ ranges>> first ] [ uses>> first ] bi >>from drop ]
+    [ compute-start/end ]
+    [ ]
+    tri ; inline
+
+:: split-interval ( live-interval n -- before after )
+    live-interval check-split
+    live-interval clone :> before
+    live-interval clone f >>copy-from f >>reg :> after
+    live-interval uses>> n split-uses before after [ (>>uses) ] bi-curry@ bi*
+    live-interval ranges>> n split-ranges before after [ (>>ranges) ] bi-curry@ bi*
+    live-interval before after record-split
+    before split-before
+    after split-after ;
+
+HINTS: split-interval live-interval object ;
 
 ! Spilling
 SYMBOL: spill-counts
 
 : next-spill-location ( reg-class -- n )
     spill-counts get [ dup 1+ ] change-at ;
+
+: find-use ( live-interval n quot -- i elt )
+    [ uses>> ] 2dip curry find ; inline
 
 : interval-to-spill ( active-intervals current -- live-interval )
     #! We spill the interval with the most distant use location.
@@ -108,8 +194,7 @@ SYMBOL: spill-counts
     [ >>spill-to ] [ >>reload-from ] bi-curry bi* ;
 
 : split-and-spill ( new existing -- before after )
-    dup rot start>> split-interval
-    [ record-split ] [ assign-spill ] 2bi ;
+    swap start>> split-interval assign-spill ;
 
 : reuse-register ( new existing -- )
     reg>> >>reg add-active ;
@@ -121,7 +206,7 @@ SYMBOL: spill-counts
     #! of the existing interval again.
     [ reuse-register ]
     [ nip delete-active ]
-    [ split-and-spill [ drop ] [ add-unhandled ] bi* ] 2tri ;
+    [ split-and-spill [ add-handled ] [ add-unhandled ] bi* ] 2tri ;
 
 : spill-new ( new existing -- )
     #! Our new interval will be used after the active interval
@@ -141,37 +226,101 @@ SYMBOL: spill-counts
 : assign-free-register ( new registers -- )
     pop >>reg add-active ;
 
-: assign-register ( new -- )
-    dup coalesce? [
-        coalesce
+: relevant-ranges ( new inactive -- new' inactive' )
+    ! Slice off all ranges of 'inactive' that precede the start of 'new'
+    [ [ ranges>> ] bi@ ] [ nip start>> ] 2bi '[ to>> _ >= ] filter ;
+
+: intersect-live-range ( range1 range2 -- n/f )
+    2dup [ from>> ] bi@ > [ swap ] when
+    2dup [ to>> ] [ from>> ] bi* >= [ nip from>> ] [ 2drop f ] if ;
+
+: intersect-live-ranges ( ranges1 ranges2 -- n )
+    {
+        { [ over empty? ] [ 2drop 1/0. ] }
+        { [ dup empty? ] [ 2drop 1/0. ] }
+        [
+            2dup [ first ] bi@ intersect-live-range dup [ 2nip ] [
+                drop
+                2dup [ first from>> ] bi@ <
+                [ [ rest-slice ] dip ] [ rest-slice ] if
+                intersect-live-ranges
+            ] if
+        ]
+    } cond ;
+
+: intersect-inactive ( new inactive -- n )
+    relevant-ranges intersect-live-ranges ;
+
+: intersecting-inactive ( new -- live-intervals )
+    dup vreg>> inactive-intervals-for
+    [ tuck intersect-inactive ] with { } map>assoc ;
+
+: fits-in-hole ( new pair -- )
+    first reuse-register ;
+
+: split-before-use ( new pair -- before after )
+    ! Find optimal split position
+    ! Insert move instruction
+    second split-interval ;
+
+: assign-inactive-register ( new live-intervals -- )
+    ! If there is an interval which is inactive for the entire lifetime
+    ! if the new interval, reuse its vreg. Otherwise, split new so that
+    ! the first half fits.
+    sort-values last
+    2dup [ end>> ] [ second ] bi* < [
+        fits-in-hole
     ] [
-        dup vreg>> free-registers-for
-        [ assign-blocked-register ]
-        [ assign-free-register ]
+        [ split-before-use ] keep
+       '[ _ fits-in-hole ] [ add-unhandled ] bi*
+    ] if ;
+
+: assign-register ( new -- )
+    dup coalesce? [ coalesce ] [
+        dup vreg>> free-registers-for [
+            dup intersecting-inactive
+            [ assign-blocked-register ]
+            [ assign-inactive-register ]
+            if-empty
+        ] [ assign-free-register ]
         if-empty
     ] if ;
 
 ! Main loop
-: reg-classes ( -- seq ) { int-regs double-float-regs } ; inline
+CONSTANT: reg-classes { int-regs double-float-regs }
+
+: reg-class-assoc ( quot -- assoc )
+    [ reg-classes ] dip { } map>assoc ; inline
 
 : init-allocator ( registers -- )
-    <min-heap> unhandled-intervals set
     [ reverse >vector ] assoc-map free-registers set
-    reg-classes [ 0 ] { } map>assoc spill-counts set
-    reg-classes [ V{ } clone ] { } map>assoc active-intervals set
+    [ 0 ] reg-class-assoc spill-counts set
+    <min-heap> unhandled-intervals set
+    [ V{ } clone ] reg-class-assoc active-intervals set
+    [ V{ } clone ] reg-class-assoc inactive-intervals set
+    V{ } clone handled-intervals set
     -1 progress set ;
 
 : handle-interval ( live-interval -- )
-    [ start>> progress set ]
-    [ start>> expire-old-intervals ]
-    [ assign-register ]
-    tri ;
+    [
+        start>>
+        [ progress set ]
+        [ deactivate-intervals ]
+        [ activate-intervals ] tri
+    ] [ assign-register ] bi ;
 
 : (allocate-registers) ( -- )
     unhandled-intervals get [ handle-interval ] slurp-heap ;
 
+: finish-allocation ( -- )
+    ! Sanity check: all live intervals should've been processed
+    active-intervals inactive-intervals
+    [ get values [ handled-intervals get push-all ] each ] bi@ ;
+
 : allocate-registers ( live-intervals machine-registers -- live-intervals )
     #! This modifies the input live-intervals.
     init-allocator
-    dup init-unhandled
-    (allocate-registers) ;
+    init-unhandled
+    (allocate-registers)
+    finish-allocation
+    handled-intervals get ;

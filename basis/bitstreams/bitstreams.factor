@@ -158,3 +158,9 @@ M: msb0-bit-reader peek ( n bs -- bits ) \ be> \ subseq>bits-be (peek) ;
         writer bytes>> swap push
     ] unless
     writer bytes>> ;
+
+:: byte-array-n>seq ( byte-array n -- seq )
+    byte-array length 8 * n / iota
+    byte-array <msb0-bit-reader> '[
+        drop n _ read
+    ] { } map-as ;

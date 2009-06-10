@@ -13,6 +13,10 @@ ARTICLE: "listener-watch" "Watching variables in the listener"
 "Hiding all visible variables:"
 { $subsection hide-all-vars } ;
 
+HELP: only-use-vocabs
+{ $values { "vocabs" "a sequence of vocabulary specifiers" } }
+{ $description "Replaces the current manifest's vocabulary search path with the given set of vocabularies." } ;
+
 HELP: show-var
 { $values { "var" "a variable name" } }
 { $description "Adds a variable to the watch list; its value will be printed by the listener after every expression." } ;
