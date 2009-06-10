@@ -443,7 +443,7 @@ ERROR: unhandled-compression compression ;
     '[
         _ group
         [ _ group unclip [ v+ ] accumulate swap suffix concat ] map
-        concat >byte-array
+        B{ } concat-as
     ] change-bitmap ;
 
 : strips-predictor ( ifd -- ifd )
