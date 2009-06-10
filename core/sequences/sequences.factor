@@ -942,3 +942,4 @@ PRIVATE>
     inline recursive
 
 :: combos ( list1 list2 -- result ) list2 [ [ 2array ] curry list1 swap map ] map concat ;
+: (head-slice) ( seq n -- seq' ) over length over < [ drop ] [ head-slice ] if ;
