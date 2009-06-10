@@ -195,16 +195,16 @@ CONSTANT: dist-table
 PRIVATE>
 
 ! for debug -- shows residual values
-: reverse-png-filter' ( lines -- filtered )
+: reverse-png-filter' ( lines -- byte-array )
     [ first ] [ 1 tail ] [ map ] bi-curry@ bi nip
-    concat [ 128 + 256 wrap ] map ;
+    concat [ 128 + ] B{ } map-as ;
     
-: reverse-png-filter ( lines -- filtered )
+: reverse-png-filter ( lines -- byte-array )
     dup first [ 0 ] replicate prefix
     [ { 0 0 } prepend  ] map
     2 clump [
         first2 dup [ third ] [ 0 2 rot set-nth ] bi png-unfilter-line
-    ] map concat ;
+    ] map B{ } concat-as ;
 
 : zlib-inflate ( bytes -- bytes )
     bs:<lsb0-bit-reader>
