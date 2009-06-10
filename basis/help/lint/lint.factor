@@ -3,7 +3,7 @@
 USING: assocs continuations fry help help.lint.checks
 help.topics io kernel namespaces parser sequences
 source-files.errors vocabs.hierarchy vocabs words classes
-locals tools.errors ;
+locals tools.errors listener ;
 FROM: help.lint.checks => all-vocabs ;
 IN: help.lint
 

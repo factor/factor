@@ -3,10 +3,11 @@
 USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
 alien alien.accessors alien.c-types literals cpu.architecture
-cpu.ppc.assembler cpu.ppc.assembler.backend literals compiler.cfg.registers
+cpu.ppc.assembler cpu.ppc.assembler.backend compiler.cfg.registers
 compiler.cfg.instructions compiler.constants compiler.codegen
 compiler.codegen.fixup compiler.cfg.intrinsics
-compiler.cfg.stack-frame compiler.units ;
+compiler.cfg.stack-frame compiler.cfg.build-stack-frame
+compiler.units ;
 FROM: cpu.ppc.assembler => B ;
 IN: cpu.ppc
 
@@ -461,16 +462,18 @@ M:: ppc %write-barrier ( src card# table -- )
     src card# deck-bits SRWI
     table scratch-reg card# STBX ;
 
-M: ppc %gc
+M:: ppc %gc ( temp1 temp2 gc-roots gc-root-count -- )
     "end" define-label
-    12 load-zone-ptr
-    11 12 cell LWZ ! nursery.here -> r11
-    12 12 3 cells LWZ ! nursery.end -> r12
-    11 11 1024 ADDI ! add ALLOT_BUFFER_ZONE to here
-    11 0 12 CMP ! is here >= end?
+    temp2 load-zone-ptr
+    temp1 temp2 cell LWZ
+    temp2 temp2 3 cells LWZ
+    temp1 temp1 1024 ADDI ! add ALLOT_BUFFER_ZONE to here
+    temp1 0 temp2 CMP ! is here >= end?
     "end" get BLE
     %prepare-alien-invoke
-    "minor_gc" f %alien-invoke
+    0 3 LI
+    0 4 LI
+    "inline_gc" f %alien-invoke
     "end" resolve-label ;
 
 M: ppc %prologue ( n -- )

@@ -382,7 +382,7 @@
         (when (looking-at "Word *\\(Stack effect\\|Syntax\\)$")
           (push (list "Word" (match-string-no-properties 1)) rows)
           (forward-line))
-        (while (looking-at "\\(.+?\\)\\( +\\(.+\\)\\)?$")
+        (while (looking-at " ?\\(.+?\\)\\( +\\(.+\\)\\)?$")
           (let ((word `($link ,(match-string-no-properties 1)
                               ,(match-string-no-properties 1)
                               word))
