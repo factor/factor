@@ -8,6 +8,7 @@ continuations.private fry cpu.architecture
 source-files.errors
 compiler.errors
 compiler.alien
+compiler.constants
 compiler.cfg
 compiler.cfg.instructions
 compiler.cfg.stack-frame
@@ -94,7 +95,9 @@ M: _dispatch generate-insn
     [ src>> register ] [ temp>> register ] bi %dispatch ;
 
 M: _dispatch-label generate-insn
-    label>> lookup-label %dispatch-label ;
+    label>> lookup-label
+    cell 0 <repetition> %
+    rc-absolute-cell label-fixup ;
 
 : >slot< ( insn -- dst obj slot tag )
     {
