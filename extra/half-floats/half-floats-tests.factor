@@ -1,4 +1,4 @@
-USING: alien.c-types alien.syntax half-floats kernel tools.test ;
+USING: alien.c-types alien.syntax half-floats kernel math tools.test ;
 IN: half-floats.tests
 
 [ HEX: 0000 ] [  0.0  half>bits ] unit-test
@@ -7,7 +7,7 @@ IN: half-floats.tests
 [ HEX: be00 ] [ -1.5  half>bits ] unit-test
 [ HEX: 7c00 ] [  1/0. half>bits ] unit-test
 [ HEX: fc00 ] [ -1/0. half>bits ] unit-test
-[ HEX: fe00 ] [  0/0. half>bits ] unit-test
+[ HEX: 7eaa ] [ HEX: aaaaaaaaaaaaa <fp-nan> half>bits ] unit-test
 
 ! too-big floats overflow to infinity
 [ HEX: 7c00 ] [   65536.0 half>bits ] unit-test
@@ -25,7 +25,7 @@ IN: half-floats.tests
 [ -1.5  ] [ HEX: be00 bits>half ] unit-test
 [  1/0. ] [ HEX: 7c00 bits>half ] unit-test
 [ -1/0. ] [ HEX: fc00 bits>half ] unit-test
-[  0/0. ] [ HEX: 7e00 bits>half ] unit-test
+[ t ] [ HEX: 7e00 bits>half fp-nan? ] unit-test
 
 C-STRUCT: halves
     { "half" "tom" }
