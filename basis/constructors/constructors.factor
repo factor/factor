@@ -63,6 +63,6 @@ MACRO:: slots>constructor ( class slots -- quot )
 SYNTAX: CONSTRUCTOR: parse-constructor define-constructor ;
 SYNTAX: FORWARD-CONSTRUCTOR: parse-constructor f define-auto-constructor ;
 SYNTAX: BACKWARD-CONSTRUCTOR: parse-constructor t define-auto-constructor ;
-ALIAS: AUTO-CONSTRUCTOR: FORWARD-CONSTRUCTOR:
+SYNTAX: AUTO-CONSTRUCTOR: parse-constructor f define-auto-constructor ;
 
 "initializers" create-vocab drop
