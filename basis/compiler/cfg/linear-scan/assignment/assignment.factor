@@ -7,20 +7,16 @@ compiler.cfg.def-use
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation
+compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.assignment
 
-! A vector of live intervals. There is linear searching involved
-! but since we never have too many machine registers (around 30
-! at most) and we probably won't have that many live at any one
-! time anyway, it is not a problem to check each element.
-TUPLE: active-intervals seq ;
+! This contains both active and inactive intervals; any interval
+! such that start <= insn# <= end is in this set.
+SYMBOL: pending-intervals
 
 : add-active ( live-interval -- )
-    active-intervals get seq>> push ;
-
-: lookup-register ( vreg -- reg )
-    active-intervals get seq>> [ vreg>> = ] with find nip reg>> ;
+    pending-intervals get push ;
 
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
@@ -37,9 +33,11 @@ SYMBOL: spill-slots
 : spill-slots-for ( vreg -- assoc )
     reg-class>> spill-slots get at ;
 
+ERROR: already-spilled ;
+
 : record-spill ( live-interval -- )
     [ dup spill-to>> ] [ vreg>> spill-slots-for ] bi
-    2dup key? [ "BUG: Already spilled" throw ] [ set-at ] if ;
+    2dup key? [ already-spilled ] [ set-at ] if ;
 
 : insert-spill ( live-interval -- )
     [ reg>> ] [ vreg>> reg-class>> ] [ spill-to>> ] tri _spill ;
@@ -47,14 +45,27 @@ SYMBOL: spill-slots
 : handle-spill ( live-interval -- )
     dup spill-to>> [ [ record-spill ] [ insert-spill ] bi ] [ drop ] if ;
 
+: insert-copy ( live-interval -- )
+    [ split-next>> reg>> ]
+    [ reg>> ]
+    [ vreg>> reg-class>> ]
+    tri _copy ;
+
+: handle-copy ( live-interval -- )
+    dup [ spill-to>> not ] [ split-next>> ] bi and
+    [ insert-copy ] [ drop ] if ;
+
 : expire-old-intervals ( n -- )
-    active-intervals get
-    [ swap '[ end>> _ = ] partition ] change-seq drop
-    [ handle-spill ] each ;
+    [ pending-intervals get ] dip '[
+        dup end>> _ <
+        [ [ handle-spill ] [ handle-copy ] bi f ] [ drop t ] if
+    ] filter-here ;
+
+ERROR: already-reloaded ;
 
 : record-reload ( live-interval -- )
     [ reload-from>> ] [ vreg>> spill-slots-for ] bi
-    2dup key? [ delete-at ] [ "BUG: Already reloaded" throw ] if ;
+    2dup key? [ delete-at ] [ already-reloaded ] if ;
 
 : insert-reload ( live-interval -- )
     [ reg>> ] [ vreg>> reg-class>> ] [ reload-from>> ] tri _reload ;
@@ -73,39 +84,40 @@ SYMBOL: spill-slots
         ] [ 2drop ] if
     ] if ;
 
-GENERIC: assign-before ( insn -- )
+GENERIC: assign-registers-in-insn ( insn -- )
 
-GENERIC: assign-after ( insn -- )
+: register-mapping ( live-intervals -- alist )
+    [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc ;
 
 : all-vregs ( insn -- vregs )
     [ defs-vregs ] [ temp-vregs ] [ uses-vregs ] tri 3append ;
 
-M: vreg-insn assign-before
-    active-intervals get seq>> over all-vregs '[ vreg>> _ member? ] filter
-    [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc
+: active-intervals ( insn -- intervals )
+    insn#>> pending-intervals get [ covers? ] with filter ;
+
+M: vreg-insn assign-registers-in-insn
+    dup [ active-intervals ] [ all-vregs ] bi
+    '[ vreg>> _ member? ] filter
+    register-mapping
     >>regs drop ;
 
-M: insn assign-before drop ;
-
-: compute-live-registers ( -- regs )
-    active-intervals get seq>> [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc ;
+: compute-live-registers ( insn -- regs )
+    active-intervals register-mapping ;
 
 : compute-live-spill-slots ( -- spill-slots )
     spill-slots get values [ values ] map concat
     [ [ vreg>> ] [ reload-from>> ] bi ] { } map>assoc ;
 
-M: ##gc assign-after
-    compute-live-registers >>live-registers
+M: ##gc assign-registers-in-insn
+    dup call-next-method
+    dup compute-live-registers >>live-registers
     compute-live-spill-slots >>live-spill-slots
     drop ;
 
-M: insn assign-after drop ;
-
-: <active-intervals> ( -- obj )
-    V{ } clone active-intervals boa ;
+M: insn assign-registers-in-insn drop ;
 
 : init-assignment ( live-intervals -- )
-    <active-intervals> active-intervals set
+    V{ } clone pending-intervals set
     <min-heap> unhandled-intervals set
     [ H{ } clone ] reg-class-assoc spill-slots set 
     init-unhandled ;
@@ -114,13 +126,15 @@ M: insn assign-after drop ;
     [
         [
             [
-                {
-                    [ insn#>> activate-new-intervals ]
-                    [ assign-before ]
-                    [ , ]
-                    [ insn#>> expire-old-intervals ]
-                    [ assign-after ]
-                } cleave
+                [
+                    insn#>>
+                    [ activate-new-intervals ]
+                    [ expire-old-intervals ]
+                    bi
+                ]
+                [ assign-registers-in-insn ]
+                [ , ]
+                tri
             ] each
         ] V{ } make
     ] change-instructions drop ;

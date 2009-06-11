@@ -8,6 +8,7 @@ compiler.cfg.instructions
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
+compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.assignment ;
 IN: compiler.cfg.linear-scan
 
