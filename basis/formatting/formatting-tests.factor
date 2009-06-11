@@ -77,6 +77,9 @@ IN: formatting.tests
 [ t ] [ "[####monkey]" "monkey" "[%'#10s]" sprintf = ] unit-test
 [ t ] [ "[many monke]" "many monkeys" "[%10.10s]" sprintf = ] unit-test
 
+[ t ] [ "{ 1, 2, 3 }" { 1 2 3 } "%[%s, %]" sprintf = ] unit-test
+[ t ] [ "{ 1:2, 3:4 }" H{ { 1 2 } { 3 4 } } "%[%s: %s %]" sprintf = ] unit-test
+
 
 [ "%H:%M:%S" strftime ] must-infer
 
@@ -94,4 +97,5 @@ IN: formatting.tests
 [ t ] [ "October" testtime "%B" strftime = ] unit-test
 [ t ] [ "Thu Oct 09 12:03:15 2008" testtime "%c" strftime = ] unit-test
 [ t ] [ "PM" testtime "%p" strftime = ] unit-test
+
 

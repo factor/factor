@@ -12,6 +12,60 @@ compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.debugger ;
 
+[
+    { T{ live-range f 1 10 } T{ live-range f 15 15 } }
+    { T{ live-range f 16 20 } }
+] [
+    {
+        T{ live-range f 1 10 }
+        T{ live-range f 15 20 }
+    } 15 split-ranges
+] unit-test
+
+[
+    { T{ live-range f 1 10 } T{ live-range f 15 16 } }
+    { T{ live-range f 17 20 } }
+] [
+    {
+        T{ live-range f 1 10 }
+        T{ live-range f 15 20 }
+    } 16 split-ranges
+] unit-test
+
+[
+    { T{ live-range f 1 10 } }
+    { T{ live-range f 15 20 } }
+] [
+    {
+        T{ live-range f 1 10 }
+        T{ live-range f 15 20 }
+    } 12 split-ranges
+] unit-test
+
+[
+    { T{ live-range f 1 10 } T{ live-range f 15 17 } }
+    { T{ live-range f 18 20 } }
+] [
+    {
+        T{ live-range f 1 10 }
+        T{ live-range f 15 20 }
+    } 17 split-ranges
+] unit-test
+
+[
+    { }
+    { T{ live-range f 1 10 } }
+] [
+    { T{ live-range f 1 10 } } 0 split-ranges
+] unit-test
+
+[
+    { T{ live-range f 0 0 } }
+    { T{ live-range f 1 5 } }
+] [
+    { T{ live-range f 0 5 } } 0 split-ranges
+] unit-test
+
 [ 7 ] [
     T{ live-interval
         { vreg T{ vreg { reg-class int-regs } { n 2 } } }
@@ -44,23 +98,26 @@ compiler.cfg.linear-scan.debugger ;
 
 [
     T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 0 }
-        { end 1 }
-        { uses V{ 0 1 } }
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 0 }
+       { end 1 }
+       { uses V{ 0 1 } }
+       { ranges V{ T{ live-range f 0 1 } } }
     }
     T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 5 }
-        { end 5 }
-        { uses V{ 5 } }
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 5 }
+       { end 5 }
+       { uses V{ 5 } }
+       { ranges V{ T{ live-range f 5 5 } } }
     }
 ] [
     T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 0 }
-        { end 5 }
-        { uses V{ 0 1 5 } }
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 0 }
+       { end 5 }
+       { uses V{ 0 1 5 } }
+       { ranges V{ T{ live-range f 0 5 } } }
     } 2 split-interval
 ] unit-test
 
@@ -70,12 +127,14 @@ compiler.cfg.linear-scan.debugger ;
         { start 0 }
         { end 0 }
         { uses V{ 0 } }
+        { ranges V{ T{ live-range f 0 0 } } }
     }
     T{ live-interval
         { vreg T{ vreg { reg-class int-regs } { n 1 } } }
         { start 1 }
         { end 5 }
         { uses V{ 1 5 } }
+        { ranges V{ T{ live-range f 1 5 } } }
     }
 ] [
     T{ live-interval
@@ -83,6 +142,7 @@ compiler.cfg.linear-scan.debugger ;
         { start 0 }
         { end 5 }
         { uses V{ 0 1 5 } }
+         { ranges V{ T{ live-range f 0 5 } } }
     } 0 split-interval
 ] unit-test
 
@@ -173,7 +233,13 @@ compiler.cfg.linear-scan.debugger ;
 
 [ ] [
     {
-        T{ live-interval { vreg T{ vreg { n 1 } { reg-class int-regs } } } { start 0 } { end 100 } { uses V{ 0 100 } } }
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 100 }
+           { uses V{ 0 100 } }
+           { ranges V{ T{ live-range f 0 100 } } }
+        }
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
@@ -181,8 +247,20 @@ compiler.cfg.linear-scan.debugger ;
 
 [ ] [
     {
-        T{ live-interval { vreg T{ vreg { n 1 } { reg-class int-regs } } } { start 0 } { end 10 } { uses V{ 0 10 } } }
-        T{ live-interval { vreg T{ vreg { n 2 } { reg-class int-regs } } } { start 11 } { end 20 } { uses V{ 11 20 } } }
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 10 }
+           { uses V{ 0 10 } }
+           { ranges V{ T{ live-range f 0 10 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 2 } { reg-class int-regs } } }
+           { start 11 }
+           { end 20 }
+           { uses V{ 11 20 } }
+           { ranges V{ T{ live-range f 11 20 } } }
+        }
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
@@ -190,8 +268,20 @@ compiler.cfg.linear-scan.debugger ;
 
 [ ] [
     {
-        T{ live-interval { vreg T{ vreg { n 1 } { reg-class int-regs } } } { start 0 } { end 100 } { uses V{ 0 100 } } }
-        T{ live-interval { vreg T{ vreg { n 2 } { reg-class int-regs } } } { start 30 } { end 60 } { uses V{ 30 60 } } }
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 100 }
+           { uses V{ 0 100 } }
+           { ranges V{ T{ live-range f 0 100 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 2 } { reg-class int-regs } } }
+           { start 30 }
+           { end 60 }
+           { uses V{ 30 60 } }
+           { ranges V{ T{ live-range f 30 60 } } }
+        }
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
@@ -199,8 +289,20 @@ compiler.cfg.linear-scan.debugger ;
 
 [ ] [
     {
-        T{ live-interval { vreg T{ vreg { n 1 } { reg-class int-regs } } } { start 0 } { end 100 } { uses V{ 0 100 } } }
-        T{ live-interval { vreg T{ vreg { n 2 } { reg-class int-regs } } } { start 30 } { end 200 } { uses V{ 30 200 } } }
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 100 }
+           { uses V{ 0 100 } }
+           { ranges V{ T{ live-range f 0 100 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 2 } { reg-class int-regs } } }
+           { start 30 }
+           { end 200 }
+           { uses V{ 30 200 } }
+           { ranges V{ T{ live-range f 30 200 } } }
+        }
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
@@ -208,8 +310,20 @@ compiler.cfg.linear-scan.debugger ;
 
 [
     {
-        T{ live-interval { vreg T{ vreg { n 1 } { reg-class int-regs } } } { start 0 } { end 100 } { uses V{ 0 100 } } }
-        T{ live-interval { vreg T{ vreg { n 2 } { reg-class int-regs } } } { start 30 } { end 100 } { uses V{ 30 100 } } }
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 100 }
+           { uses V{ 0 100 } }
+           { ranges V{ T{ live-range f 0 100 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 2 } { reg-class int-regs } } }
+           { start 30 }
+           { end 100 }
+           { uses V{ 30 100 } }
+           { ranges V{ T{ live-range f 30 100 } } }
+        }
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
@@ -272,31 +386,10 @@ USING: math.private compiler.cfg.debugger ;
     test-cfg first optimize-cfg linear-scan drop
 ] unit-test
 
-[ 0 1 ] [
-    {
-        T{ live-interval
-            { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-            { start 0 }
-            { end 5 }
-            { uses V{ 0 1 5 } }
-        }
-        T{ live-interval
-            { vreg T{ vreg { reg-class int-regs } { n 2 } } }
-            { start 3 }
-            { end 4 }
-            { uses V{ 3 4 } }
-        }
-        T{ live-interval
-            { vreg T{ vreg { reg-class int-regs } { n 3 } } }
-            { start 2 }
-            { end 6 }
-            { uses V{ 2 4 6 } }
-        }
-    } [ clone ] map
-    H{ { int-regs { "A" "B" } } }
-    allocate-registers
-    first split-before>> [ start>> ] [ end>> ] bi
-] unit-test
+: fake-live-ranges ( seq -- seq' )
+    [
+        clone dup [ start>> ] [ end>> ] bi <live-range> 1vector >>ranges
+    ] map ;
 
 ! Coalescing interacted badly with splitting
 [ ] [
@@ -345,7 +438,7 @@ USING: math.private compiler.cfg.debugger ;
             { end 10 }
             { uses V{ 9 10 } }
         }
-    }
+    } fake-live-ranges
     { { int-regs { 0 1 2 3 } } }
     allocate-registers drop
 ] unit-test
@@ -1100,7 +1193,7 @@ USING: math.private compiler.cfg.debugger ;
             { end 109 }
             { uses V{ 103 109 } }
         }
-    }
+    } fake-live-ranges
     { { int-regs { 0 1 2 3 4 } } }
     allocate-registers drop
 ] unit-test
@@ -1193,7 +1286,92 @@ USING: math.private compiler.cfg.debugger ;
             { end 92 }
             { uses V{ 42 45 78 80 92 } }
         }
-    }
+    } fake-live-ranges
     { { int-regs { 0 1 2 3 } } }
     allocate-registers drop
+] unit-test
+
+! Spill slot liveness was computed incorrectly, leading to a FEP
+! early in bootstrap on x86-32
+[ t ] [
+    T{ basic-block
+       { instructions
+         V{
+             T{ ##gc f V int-regs 6 V int-regs 7 }
+             T{ ##peek f V int-regs 0 D 0 }
+             T{ ##peek f V int-regs 1 D 1 }
+             T{ ##peek f V int-regs 2 D 2 }
+             T{ ##peek f V int-regs 3 D 3 }
+             T{ ##peek f V int-regs 4 D 4 }
+             T{ ##peek f V int-regs 5 D 5 }
+             T{ ##replace f V int-regs 0 D 1 }
+             T{ ##replace f V int-regs 1 D 2 }
+             T{ ##replace f V int-regs 2 D 3 }
+             T{ ##replace f V int-regs 3 D 4 }
+             T{ ##replace f V int-regs 4 D 5 }
+             T{ ##replace f V int-regs 5 D 0 }
+         }
+       }
+    } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
+    instructions>> first live-spill-slots>> empty?
+] unit-test
+
+[ f ] [
+    T{ live-range f 0 10 }
+    T{ live-range f 20 30 }
+    intersect-live-range
+] unit-test
+
+[ 10 ] [
+    T{ live-range f 0 10 }
+    T{ live-range f 10 30 }
+    intersect-live-range
+] unit-test
+
+[ 5 ] [
+    T{ live-range f 0 10 }
+    T{ live-range f 5 30 }
+    intersect-live-range
+] unit-test
+
+[ 5 ] [
+    T{ live-range f 5 30 }
+    T{ live-range f 0 10 }
+    intersect-live-range
+] unit-test
+
+[ 5 ] [
+    T{ live-range f 5 10 }
+    T{ live-range f 0 15 }
+    intersect-live-range
+] unit-test
+
+[ 50 ] [
+    {
+        T{ live-range f 0 10 }
+        T{ live-range f 20 30 }
+        T{ live-range f 40 50 }
+    }
+    {
+        T{ live-range f 11 15 }
+        T{ live-range f 31 35 }
+        T{ live-range f 50 55 }
+    }
+    intersect-live-ranges
+] unit-test
+
+[ 5 ] [
+    T{ live-interval
+       { start 0 }
+       { end 10 }
+       { uses { 0 10 } }
+       { ranges V{ T{ live-range f 0 10 } } }
+    }
+    T{ live-interval
+       { start 5 }
+       { end 10 }
+       { uses { 5 10 } }
+       { ranges V{ T{ live-range f 5 10 } } }
+    }
+    intersect-inactive
 ] unit-test

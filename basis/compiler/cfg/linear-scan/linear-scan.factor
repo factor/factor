@@ -25,13 +25,15 @@ IN: compiler.cfg.linear-scan
 ! by Omri Traub, Glenn Holloway, Michael D. Smith
 ! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.34.8435
 
-: (linear-scan) ( rpo -- )
-    dup number-instructions
-    dup compute-live-intervals
-    machine-registers allocate-registers assign-registers ;
+: (linear-scan) ( rpo machine-registers -- )
+    [
+        dup number-instructions
+        dup compute-live-intervals
+    ] dip
+    allocate-registers assign-registers ;
 
 : linear-scan ( cfg -- cfg' )
     [
-        dup reverse-post-order (linear-scan)
+        dup reverse-post-order machine-registers (linear-scan)
         spill-counts get >>spill-counts
     ] with-scope ;

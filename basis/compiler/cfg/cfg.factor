@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays vectors accessors
-namespaces make fry sequences ;
+namespaces math make fry sequences ;
 IN: compiler.cfg
 
 TUPLE: basic-block < identity-tuple
-id
+{ id integer }
 number
 { instructions vector }
 { successors vector }

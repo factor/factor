@@ -65,7 +65,6 @@ $nl
 "Words for working with the current manifest:"
 { $subsection use-vocab }
 { $subsection unuse-vocab }
-{ $subsection only-use-vocabs }
 { $subsection add-qualified }
 { $subsection add-words-from }
 { $subsection add-words-excluding }
@@ -116,10 +115,6 @@ HELP: unuse-vocab
 { $values { "vocab" "a vocabulary specifier" } }
 { $description "Removes a vocabulary from the current manifest." }
 { $notes "This word is used to implement " { $link POSTPONE: UNUSE: } "." } ;
-
-HELP: only-use-vocabs
-{ $values { "vocabs" "a sequence of vocabulary specifiers" } }
-{ $description "Replaces the current manifest's vocabulary search path with the given set of vocabularies." } ;
 
 HELP: add-qualified
 { $values { "vocab" "a vocabulary specifier" } { "prefix" string } }

@@ -28,10 +28,10 @@ M: circular virtual-seq seq>> ;
     circular-wrap (>>start) ;
 
 : rotate-circular ( circular -- )
-    [ start>> 1 + ] keep circular-wrap (>>start) ;
+    [ 1 ] dip change-circular-start ;
 
 : push-circular ( elt circular -- )
-    [ set-first ] [ 1 swap change-circular-start ] bi ;
+    [ set-first ] [ rotate-circular ] bi ;
 
 : <circular-string> ( n -- circular )
     0 <string> <circular> ;
