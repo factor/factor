@@ -60,3 +60,10 @@ IN: generalizations.tests
 
 [ { 0 1 2 } { 3 5 4 } { 7 8 6 } ]
 [ 9 [ ] each { [ 3array ] [ swap 3array ] [ rot 3array ] } 3 nspread ] unit-test
+
+[ 1 2 3 4 1 2 3 ] [ 1 2 3 4 3 nover ] unit-test
+
+[ [ 1 2 3 ] [ 1 2 3 ] ]
+[ 1 2 3 [ ] [ ] 3 nbi-curry ] unit-test
+
+[ 15 3 ] [ 1 2 3 4 5 [ + + + + ] [ - - - - ] 5 nbi ] unit-test
