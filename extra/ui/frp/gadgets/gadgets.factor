@@ -1,7 +1,7 @@
 USING: accessors arrays kernel models monads ui.frp.signals ui.gadgets
 ui.gadgets.buttons ui.gadgets.buttons.private ui.gadgets.editors
-ui.gadgets.tables sequences splitting
-ui.gadgets.scrollers ui.gadgets.borders ;
+ui.gadgets.tables sequences splitting ui.gadgets.labels
+ui.gadgets.scrollers ui.gadgets.borders classes ;
 IN: ui.frp.gadgets
 
 TUPLE: frp-button < button hook ;
@@ -58,3 +58,13 @@ M: scroller output-model viewport>> children>> first output-model ;
 
 IN: accessors
 M: frp-button text>> children>> first text>> ;
+
+IN: ui.frp.gadgets
+GENERIC: (unique) ( gadget -- a )
+M: label (unique) text>> ;
+M: button (unique) text>> ;
+M: editor (unique) editor-string ;
+M: gadget (unique) children>> ;
+M: frp-field (unique) frp-model>> (unique) ;
+M: model (unique) [ dependencies>> ] [ value>> ] bi@ 2array ;
+: unique ( a -- b ) [ class ] [ (unique) ] bi 2array ;
