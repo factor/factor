@@ -1,11 +1,15 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators images images.bitmap
-images.bitmap.private io io.binary io.encodings.8-bit
-io.encodings.binary io.encodings.string io.streams.limited
-kernel math math.bitwise grouping sequences ;
-QUALIFIED-WITH: syntax S
+USING: accessors arrays byte-arrays combinators
+compression.run-length fry grouping images images.loader io
+io.binary io.encodings.8-bit io.encodings.binary
+io.encodings.string io.streams.limited kernel math math.bitwise
+sequences specialized-arrays.ushort summary ;
+QUALIFIED-WITH: bitstreams b
 IN: images.bitmap.loading
+
+SINGLETON: bitmap-image
+"bmp" bitmap-image register-image-class
 
 ! http://www.fileformat.info/format/bmp/egff.htm
 ! http://www.digicamsoft.com/bmp/bmp.html
@@ -176,6 +180,18 @@ UNION: os2-header os2v1-header os2v2-header ;
         [ unknown-bitmap-header ]
     } case ;
 
+: color-index-length ( header -- n )
+    {
+        [ width>> ]
+        [ planes>> * ]
+        [ bit-count>> * 31 + 32 /i 4 * ]
+        [ height>> abs * ]
+    } cleave ;
+
+: color-palette-length ( loading-bitmap -- n )
+    file-header>>
+    [ offset>> 14 - ] [ header-length>> ] bi - ;
+
 : parse-color-palette ( loading-bitmap -- loading-bitmap )
     dup color-palette-length read >>color-palette ;
 
@@ -217,11 +233,112 @@ GENERIC: bitmap>component-order* ( loading-bitmap header -- object )
         [ drop simple-bitmap>component-order ]
     } case ;
 
+: color-lookup3 ( loading-bitmap -- seq )
+    [ color-index>> >array ]
+    [ color-palette>> 3 <sliced-groups> ] bi
+    '[ _ nth ] map concat ;
+
+: color-lookup4 ( loading-bitmap -- seq )
+    [ color-index>> >array ]
+    [ color-palette>> 4 <sliced-groups> [ 3 head-slice ] map ] bi
+    '[ _ nth ] map concat ;
+
+! os2v1 is 3bytes each, all others are 3 + 1 unused
+: color-lookup ( loading-bitmap -- seq )
+    dup file-header>> header-length>> {
+        { 12 [ color-lookup3 ] }
+        { 64 [ color-lookup4 ] }
+        { 40 [ color-lookup4 ] }
+        { 108 [ color-lookup4 ] }
+        { 124 [ color-lookup4 ] }
+    } case ;
+
 M: os2v1-header bitmap>component-order* drop simple-bitmap>component-order ;
 M: os2v2-header bitmap>component-order* drop simple-bitmap>component-order ;
 M: v3-header bitmap>component-order* drop simple-bitmap>component-order ;
 M: v4-header bitmap>component-order* drop advanced-bitmap>component-order ;
 M: v5-header bitmap>component-order* drop advanced-bitmap>component-order ;
+
+: uncompress-bitfield ( seq masks -- bytes' )
+    '[
+        _ [
+            [ bitand ] [ bit-count ] [ log2 ] tri - shift
+        ] with map
+    ] { } map-as B{ } concat-as ;
+
+ERROR: bmp-not-supported n ;
+
+: bitmap>bytes ( loading-bitmap -- byte-array )
+    dup header>> bit-count>>
+    {
+        { 32 [ color-index>> ] }
+        { 24 [ color-index>> ] }
+        { 16 [
+            [
+                ! byte-array>ushort-array
+                2 group [ le> ] map
+                ! 5 6 5
+                ! { HEX: f800 HEX: 7e0 HEX: 1f } uncompress-bitfield
+                ! 5 5 5
+                { HEX: 7c00 HEX: 3e0 HEX: 1f } uncompress-bitfield
+            ] change-color-index
+            color-index>>
+        ] }
+        { 8 [ color-lookup ] }
+        { 4 [ [ 4 b:byte-array-n>seq ] change-color-index color-lookup ] }
+        { 1 [ [ 1 b:byte-array-n>seq ] change-color-index color-lookup ] }
+        [ bmp-not-supported ]
+    } case >byte-array ;
+
+: set-bitfield-widths ( loading-bitmap -- loading-bitmap' )
+    dup header>> bit-count>> {
+        { 16 [ dup color-palette>> 4 group [ le> ] map ] }
+        { 32 [ { HEX: ff0000 HEX: ff00 HEX: ff } ] }
+    } case reverse >>bitfields ;
+
+ERROR: unsupported-bitfield-widths n ;
+
+M: unsupported-bitfield-widths summary
+    drop "Bitmaps only support bitfield compression in 16/32bit images" ;
+
+: uncompress-bitfield-widths ( loading-bitmap -- loading-bitmap' )
+    set-bitfield-widths
+    dup header>> bit-count>> {
+        { 16 [
+            dup bitfields>> '[
+                byte-array>ushort-array _ uncompress-bitfield
+            ] change-color-index
+        ] }
+        { 32 [ ] }
+        [ unsupported-bitfield-widths ]
+    } case ;
+
+ERROR: unsupported-bitmap-compression compression ;
+
+GENERIC: uncompress-bitmap* ( loading-bitmap header -- loading-bitmap )
+
+: uncompress-bitmap ( loading-bitmap -- loading-bitmap )
+    dup header>> uncompress-bitmap* ;
+
+M: os2-header uncompress-bitmap* ( loading-bitmap header -- loading-bitmap' )
+    drop ;
+
+: do-run-length-uncompress ( loading-bitmap word -- loading-bitmap )
+    dupd '[
+        _ header>> [ width>> ] [ height>> ] bi
+        _ execute
+    ] change-color-index ; inline
+
+M: v-header uncompress-bitmap* ( loading-bitmap header -- loading-bitmap' )
+    compression>> {
+        { f [ ] }
+        { 0 [ ] }
+        { 1 [ \ run-length-uncompress-bitmap8 do-run-length-uncompress ] }
+        { 2 [ \ run-length-uncompress-bitmap4 do-run-length-uncompress ] }
+        { 3 [ uncompress-bitfield-widths ] }
+        { 4 [ "jpeg" unsupported-bitmap-compression ] }
+        { 5 [ "png" unsupported-bitmap-compression ] }
+    } case ;
 
 ERROR: unsupported-bitmap-file magic ;
 
@@ -242,6 +359,9 @@ ERROR: unsupported-bitmap-file magic ;
             [ unsupported-bitmap-file ]
         } case
     ] with-input-stream ;
+
+: loading-bitmap>bytes ( loading-bitmap -- byte-array )
+    uncompress-bitmap bitmap>bytes ;
 
 M: bitmap-image load-image* ( path bitmap-image -- bitmap )
     drop load-bitmap
