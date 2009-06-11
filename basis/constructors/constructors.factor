@@ -50,7 +50,7 @@ MACRO:: slots>constructor ( class slots -- quot )
 
 :: define-auto-constructor ( constructor-word class effect def -- )
     constructor-word class effect def (define-constructor)
-    class superclasses [ lookup-initializer ] map sift
+    class superclasses [ lookup-initializer ] map sift reverse
     '[ @ _ [ execute( obj -- obj ) ] each ] effect define-declared ;
 
 : scan-constructor ( -- class word )

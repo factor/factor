@@ -65,3 +65,15 @@ TUPLE: inherit2 < inherit1 a ;
 CONSTRUCTOR: inherit2 ( a -- obj ) ;
 
 [ T{ inherit2 f f 100 } ] [ 100 <inherit2> ] unit-test
+
+
+TUPLE: inherit3 hp max-hp ;
+TUPLE: inherit4 < inherit3 ;
+
+CONSTRUCTOR: inherit3 ( -- obj )
+    dup max-hp>> >>hp ;
+
+AUTO-CONSTRUCTOR: inherit4 ( -- obj )
+    10 >>max-hp ;
+
+[ 10 ] [ <inherit4> hp>> ] unit-test
