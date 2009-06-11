@@ -193,7 +193,8 @@ M: optimizing-compiler recompile ( words -- alist )
         ] each
         compile-queue get compile-loop
         compiled get >alist
-    ] with-scope ;
+    ] with-scope
+    "trace-compilation" get [ "--- compile done" print flush ] when ;
 
 : with-optimizer ( quot -- )
     [ optimizing-compiler compiler-impl ] dip with-variable ; inline

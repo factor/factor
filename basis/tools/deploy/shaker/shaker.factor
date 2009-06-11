@@ -277,8 +277,6 @@ IN: tools.deploy.shaker
                 compiled-generic-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
-                ! definition-observers
-                interactive-vocabs
                 lexer-factory
                 print-use-hook
                 root-cache

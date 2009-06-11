@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.binary kernel combinators
-kernel.private math namespaces make sequences words system layouts
-math.order accessors cpu.x86.assembler.syntax ;
+USING: arrays io.binary kernel combinators kernel.private math
+namespaces make sequences words system layouts math.order accessors
+cpu.x86.assembler.syntax ;
 IN: cpu.x86.assembler
 
 ! A postfix assembler for x86-32 and x86-64.
@@ -402,20 +402,26 @@ M: operand TEST OCT: 204 2-operand ;
 : SHR ( dst n -- ) BIN: 101 (SHIFT) ;
 : SAR ( dst n -- ) BIN: 111 (SHIFT) ;
 
-GENERIC: IMUL2 ( dst src -- )
-M: immediate IMUL2 swap dup reg-code t HEX: 68 3array immediate-1/4 ;
-M: operand IMUL2 OCT: 257 extended-opcode (2-operand) ;
+: IMUL2 ( dst src -- )
+    OCT: 257 extended-opcode (2-operand) ;
+
+: IMUL3 ( dst src imm -- )
+    dup fits-in-byte? [
+        [ swap HEX: 6a 2-operand ] dip 1,
+    ] [
+        [ swap HEX: 68 2-operand ] dip 4,
+    ] if ;
 
 : MOVSX ( dst src -- )
-    dup register-32? OCT: 143 OCT: 276 extended-opcode ?
-    over register-16? [ BIN: 1 opcode-or ] when
-    swapd
+    swap
+    over register-32? OCT: 143 OCT: 276 extended-opcode ?
+    pick register-16? [ BIN: 1 opcode-or ] when
     (2-operand) ;
 
 : MOVZX ( dst src -- )
+    swap
     OCT: 266 extended-opcode
-    over register-16? [ BIN: 1 opcode-or ] when
-    swapd
+    pick register-16? [ BIN: 1 opcode-or ] when
     (2-operand) ;
 
 ! Conditional move
