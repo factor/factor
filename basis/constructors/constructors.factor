@@ -48,9 +48,10 @@ MACRO:: slots>constructor ( class slots -- quot )
     class lookup-initializer
     '[ @ _ execute( obj -- obj ) ] effect define-declared ;
 
-:: define-auto-constructor ( constructor-word class effect def -- )
+:: define-auto-constructor ( constructor-word class effect def reverse? -- )
     constructor-word class effect def (define-constructor)
-    class superclasses [ lookup-initializer ] map sift reverse
+    class superclasses [ lookup-initializer ] map sift
+    reverse? [ reverse ] when
     '[ @ _ [ execute( obj -- obj ) ] each ] effect define-declared ;
 
 : scan-constructor ( -- class word )
@@ -60,7 +61,7 @@ MACRO:: slots>constructor ( class slots -- quot )
     scan-constructor complete-effect parse-definition ;
 
 SYNTAX: CONSTRUCTOR: parse-constructor define-constructor ;
-
-SYNTAX: AUTO-CONSTRUCTOR: parse-constructor define-auto-constructor ;
+SYNTAX: FORWARD-CONSTRUCTOR: parse-constructor f define-auto-constructor ;
+SYNTAX: BACKWARD-CONSTRUCTOR: parse-constructor t define-auto-constructor ;
 
 "initializers" create-vocab drop

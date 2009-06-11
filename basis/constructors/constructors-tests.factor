@@ -69,11 +69,18 @@ CONSTRUCTOR: inherit2 ( a -- obj ) ;
 
 TUPLE: inherit3 hp max-hp ;
 TUPLE: inherit4 < inherit3 ;
+TUPLE: inherit5 < inherit3 ;
 
 CONSTRUCTOR: inherit3 ( -- obj )
     dup max-hp>> >>hp ;
 
-AUTO-CONSTRUCTOR: inherit4 ( -- obj )
+BACKWARD-CONSTRUCTOR: inherit4 ( -- obj )
     10 >>max-hp ;
 
 [ 10 ] [ <inherit4> hp>> ] unit-test
+
+FORWARD-CONSTRUCTOR: inherit5 ( -- obj )
+    5 >>hp
+    10 >>max-hp ;
+
+[ 5 ] [ <inherit5> hp>> ] unit-test
