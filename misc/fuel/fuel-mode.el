@@ -172,7 +172,10 @@ interacting with a factor listener is at your disposal.
   (when fuel-mode-autodoc-p (fuel-autodoc-mode fuel-mode))
 
   (setq fuel-stack-mode-string "/S")
-  (when fuel-mode-stack-p (fuel-stack-mode fuel-mode)))
+  (when fuel-mode-stack-p (fuel-stack-mode fuel-mode))
+
+  (when (and fuel-mode (not (file-exists-p (buffer-file-name))))
+    (fuel-scaffold--maybe-insert)))
 
 
 ;;; Keys:
