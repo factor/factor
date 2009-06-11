@@ -531,4 +531,10 @@ M: _reload generate-insn
         { double-float-regs [ %reload-float ] }
     } case ;
 
+M: _copy generate-insn
+    [ dst>> ] [ src>> ] [ class>> ] tri {
+        { int-regs [ %copy ] }
+        { double-float-regs [ %copy-float ] }
+    } case ;
+
 M: _spill-counts generate-insn drop ;
