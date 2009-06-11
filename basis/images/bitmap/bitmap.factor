@@ -2,12 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays byte-arrays columns
 combinators compression.run-length endian fry grouping images
-images.bitmap.loading images.loader io
-io.encodings.string io.files io.streams.limited kernel locals
-macros math math.bitwise math.functions namespaces sequences
-specialized-arrays.uint specialized-arrays.ushort strings
-summary ;
-QUALIFIED-WITH: bitstreams b
+images.bitmap.loading images.loader io io.binary
+io.encodings.binary io.encodings.string io.files
+io.streams.limited kernel locals macros math math.bitwise
+math.functions namespaces sequences specialized-arrays.uint
+specialized-arrays.ushort strings summary ;
 IN: images.bitmap
 
 : write2 ( n -- ) 2 >le write ;
