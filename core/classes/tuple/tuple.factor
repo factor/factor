@@ -149,12 +149,22 @@ ERROR: bad-superclass class ;
 : define-boa-check ( class -- )
     dup boa-check-quot "boa-check" set-word-prop ;
 
+: tuple-initial-quots-quot ( class -- quot )
+    all-slots [ initial-quot>> ] filter
+    [
+        [
+            [ initial-quot>> , (( -- obj )) , \ call-effect , \ over , ]
+            [ offset>> , ] bi \ set-slot ,
+        ] each
+    ] [ ] make f like ;
+
 : tuple-prototype ( class -- prototype )
     [ initial-values ] [ over [ ] any? ] [ initial-quots? or ] tri
     [ slots>tuple ] [ 2drop f ] if ;
 
 : define-tuple-prototype ( class -- )
-    dup tuple-prototype "prototype" set-word-prop ;
+    dup [ tuple-prototype ] [ tuple-initial-quots-quot ] bi 2array
+    dup [ ] any? [ drop f ] unless "prototype" set-word-prop ;
 
 : prepare-slots ( slots superclass -- slots' )
     [ make-slots ] [ class-size 2 + ] bi* finalize-slots ;
@@ -175,25 +185,6 @@ ERROR: bad-superclass class ;
 
 : define-tuple-layout ( class -- )
     dup make-tuple-layout "layout" set-word-prop ;
-
-: define-tuple-constructor ( class -- )
-    {
-        { [ dup initial-quots? ] [ "initial-quots" ] }
-        { [ dup "prototype" word-prop ] [ "prototype" ] }
-        [ f ]
-    } cond "constructor" set-word-prop ;
-
-: define-tuple-initial-quots ( class -- )
-    dup all-slots [ initial-quot>> ] filter
-    [
-        [
-            [ initial-quot>> , (( -- obj )) , \ call-effect , \ over , ]
-            [ offset>> , ] bi \ set-slot ,
-        ] each
-    ] [ ] make "initial-quots-setter" set-word-prop ;
-
-: set-initial-quots ( tuple -- tuple' )
-    dup class "initial-quots-setter" word-prop call( obj -- obj ) ;
 
 : calculate-initial-value ( slot-spec -- value )
     dup initial>> [
@@ -257,8 +248,6 @@ M: tuple-class update-class
         [ define-tuple-slots ]
         [ define-tuple-predicate ]
         [ define-tuple-prototype ]
-        [ define-tuple-constructor ]
-        [ define-tuple-initial-quots ]
     } cleave ;
 
 : define-new-tuple-class ( class superclass slots -- )
@@ -375,11 +364,11 @@ M: tuple tuple-hashcode
 M: tuple hashcode* tuple-hashcode ;
 
 M: tuple-class new
-    dup "constructor" word-prop {
-        { "initial-quots" [ "prototype" word-prop (clone) set-initial-quots ] }
-        { "prototype" [ "prototype" word-prop (clone) ] }
-        [ drop tuple-layout <tuple> ]
-    } case ;
+    dup "prototype" word-prop [
+        first2 [ (clone) ] dip [ call( obj -- obj ) ] when*
+    ] [
+        tuple-layout <tuple>
+    ] ?if ;
 
 M: tuple-class boa
     [ "boa-check" word-prop [ call ] when* ]
