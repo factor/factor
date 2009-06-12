@@ -61,8 +61,11 @@ PRIVATE>
 
 : cross-zip ( seq1 seq2 -- seq1xseq2 )
     [ [ 2array ] with map ] curry map ;
+
+<PRIVATE
     
-: m^n ( m n -- n ) 
+: m^n ( m n -- m ) 
     make-bits over first length identity-matrix
     [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
 
+PRIVATE>
