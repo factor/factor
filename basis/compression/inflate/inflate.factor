@@ -151,7 +151,16 @@ CONSTANT: dist-table
         ] when
     ] map ;
     
-: inflate-raw ( bitstream -- bytes ) zlib-unimplemented ;
+:: inflate-raw ( bitstream -- bytes ) 
+    8 bitstream bs:align 
+    16 bitstream bs:read :> len
+    16 bitstream bs:read :> nlen
+    len nlen + 16 >signed -1 assert= ! len + ~len = -1
+    bitstream byte-pos>>
+    bitstream byte-pos>> len +
+    bitstream bytes>> <slice>
+    len 8 * bitstream bs:seek ;
+
 : inflate-static ( bitstream -- bytes ) zlib-unimplemented ;
 
 :: inflate-loop ( bitstream -- bytes )
@@ -194,11 +203,10 @@ CONSTANT: dist-table
 
 PRIVATE>
 
-! for debug -- shows residual values
 : reverse-png-filter' ( lines -- byte-array )
     [ first ] [ 1 tail ] [ map ] bi-curry@ bi nip
     concat [ 128 + ] B{ } map-as ;
-    
+
 : reverse-png-filter ( lines -- byte-array )
     dup first [ 0 ] replicate prefix
     [ { 0 0 } prepend  ] map
