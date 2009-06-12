@@ -80,6 +80,7 @@ IN: bootstrap.syntax
     ">>"
     "call-next-method"
     "initial:"
+    "initial-quot:"
     "read-only"
     "call("
     "execute("
