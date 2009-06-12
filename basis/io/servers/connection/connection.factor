@@ -11,17 +11,17 @@ combinators.short-circuit ;
 IN: io.servers.connection
 
 TUPLE: threaded-server
-{ name initial: "server" }
-{ log-level initial: DEBUG }
+name
+log-level
 secure insecure
-{ secure-config initial-quot: [ <secure-config> ] }
-{ sockets initial-quot: [ V{ } clone ] }
+secure-config
+sockets
 max-connections
 semaphore
-{ timeout initial-quot: [ 1 minutes ] }
+timeout
 encoding
-{ handler initial: [ "No handler quotation" throw ] }
-{ ready initial-quot: [ <flag> ] } ;
+handler
+ready ;
 
 : local-server ( port -- addrspec ) "localhost" swap <inet> ;
 
@@ -29,7 +29,14 @@ encoding
 
 : new-threaded-server ( encoding class -- threaded-server )
     new
-        swap >>encoding ;
+        swap >>encoding
+        "server" >>name
+        DEBUG >>log-level
+        1 minutes >>timeout
+        V{ } clone >>sockets
+        <secure-config> >>secure-config
+        [ "No handler quotation" throw ] >>handler
+        <flag> >>ready ; inline
 
 : <threaded-server> ( encoding -- threaded-server )
     threaded-server new-threaded-server ;
