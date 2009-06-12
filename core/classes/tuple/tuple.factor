@@ -50,19 +50,11 @@ M: tuple class layout-of 2 slot { word } declare ;
 
 PRIVATE>
 
-: initial-value ( slot -- obj )
-    dup initial>> [
-        nip
-    ] [
-        dup initial-quot>> [
-            nip call( -- obj )
-        ] [
-            drop f
-        ] if*
-    ] if* ;
+: initial-quots? ( class -- ? )
+    all-slots [ initial-quot>> ] any? ;
 
 : initial-values ( class -- slots )
-    all-slots [ initial-value ] map ;
+    all-slots [ initial>> ] map ;
 
 : pad-slots ( slots class -- slots' class )
     [ initial-values over length tail append ] keep ; inline
@@ -75,7 +67,9 @@ PRIVATE>
 : tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
 
-: slots>tuple ( seq class -- tuple )
+GENERIC: slots>tuple ( seq class -- tuple )
+
+M: tuple-class slots>tuple ( seq class -- tuple )
     check-slots pad-slots
     tuple-layout <tuple> [
         [ tuple-size ]
@@ -156,8 +150,8 @@ ERROR: bad-superclass class ;
     dup boa-check-quot "boa-check" set-word-prop ;
 
 : tuple-prototype ( class -- prototype )
-    [ initial-values ] keep
-    over [ ] any? [ slots>tuple ] [ 2drop f ] if ;
+    [ initial-values ] [ over [ ] any? ] [ initial-quots? or ] tri
+    [ slots>tuple ] [ 2drop f ] if ;
 
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;
@@ -182,10 +176,40 @@ ERROR: bad-superclass class ;
 : define-tuple-layout ( class -- )
     dup make-tuple-layout "layout" set-word-prop ;
 
+: define-tuple-constructor ( class -- )
+    {
+        { [ dup initial-quots? ] [ "initial-quots" ] }
+        { [ dup "prototype" word-prop ] [ "prototype" ] }
+        [ f ]
+    } cond "constructor" set-word-prop ;
+
+: define-tuple-initial-quots ( class -- )
+    dup all-slots [ initial-quot>> ] filter
+    [
+        [
+            [ initial-quot>> , (( -- obj )) , \ call-effect , \ over , ]
+            [ offset>> , ] bi \ set-slot ,
+        ] each
+    ] [ ] make "initial-quots-setter" set-word-prop ;
+
+: set-initial-quots ( tuple -- tuple' )
+    dup class "initial-quots-setter" word-prop call( obj -- obj ) ;
+
+: calculate-initial-value ( slot-spec -- value )
+    dup initial>> [
+        nip
+    ] [
+        dup initial-quot>> [
+            nip call( -- obj )
+        ] [
+            drop f
+        ] if*
+    ] if* ;
+
 : compute-slot-permutation ( new-slots old-slots -- triples )
     [ [ [ name>> ] map ] bi@ [ index ] curry map ]
     [ drop [ class>> ] map ]
-    [ drop [ initial-value ] map ]
+    [ drop [ calculate-initial-value ] map ]
     2tri 3array flip ;
 
 : update-slot ( old-values n class initial -- value )
@@ -233,6 +257,8 @@ M: tuple-class update-class
         [ define-tuple-slots ]
         [ define-tuple-predicate ]
         [ define-tuple-prototype ]
+        [ define-tuple-constructor ]
+        [ define-tuple-initial-quots ]
     } cleave ;
 
 : define-new-tuple-class ( class superclass slots -- )
@@ -349,8 +375,11 @@ M: tuple tuple-hashcode
 M: tuple hashcode* tuple-hashcode ;
 
 M: tuple-class new
-    dup "prototype" word-prop
-    [ (clone) ] [ tuple-layout <tuple> ] ?if ;
+    dup "constructor" word-prop {
+        { "initial-quots" [ "prototype" word-prop (clone) set-initial-quots ] }
+        { "prototype" [ "prototype" word-prop (clone) ] }
+        [ drop tuple-layout <tuple> ]
+    } case ;
 
 M: tuple-class boa
     [ "boa-check" word-prop [ call ] when* ]
