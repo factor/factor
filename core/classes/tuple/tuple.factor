@@ -75,9 +75,7 @@ PRIVATE>
 : tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
 
-GENERIC: slots>tuple ( seq class -- tuple )
-
-M: tuple-class slots>tuple
+: slots>tuple ( seq class -- tuple )
     check-slots pad-slots
     tuple-layout <tuple> [
         [ tuple-size ]
