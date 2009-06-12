@@ -50,8 +50,19 @@ M: tuple class layout-of 2 slot { word } declare ;
 
 PRIVATE>
 
+: initial-value ( slot -- obj )
+    dup initial>> [
+        nip
+    ] [
+        dup initial-quot>> [
+            nip call( -- obj )
+        ] [
+            drop f
+        ] if*
+    ] if* ;
+
 : initial-values ( class -- slots )
-    all-slots [ initial>> ] map ;
+    all-slots [ initial-value ] map ;
 
 : pad-slots ( slots class -- slots' class )
     [ initial-values over length tail append ] keep ; inline
@@ -64,9 +75,7 @@ PRIVATE>
 : tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
 
-GENERIC: slots>tuple ( seq class -- tuple )
-
-M: tuple-class slots>tuple
+: slots>tuple ( seq class -- tuple )
     check-slots pad-slots
     tuple-layout <tuple> [
         [ tuple-size ]
@@ -176,7 +185,7 @@ ERROR: bad-superclass class ;
 : compute-slot-permutation ( new-slots old-slots -- triples )
     [ [ [ name>> ] map ] bi@ [ index ] curry map ]
     [ drop [ class>> ] map ]
-    [ drop [ initial>> ] map ]
+    [ drop [ initial-value ] map ]
     2tri 3array flip ;
 
 : update-slot ( old-values n class initial -- value )
