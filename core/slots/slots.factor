@@ -3,10 +3,10 @@
 USING: arrays byte-arrays kernel kernel.private math namespaces
 make sequences strings effects generic generic.standard
 classes classes.algebra slots.private combinators accessors
-words sequences.private assocs alien quotations hashtables summary ;
+words sequences.private assocs alien quotations hashtables ;
 IN: slots
 
-TUPLE: slot-spec name offset class initial initial-quot read-only ;
+TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;
 
@@ -190,7 +190,6 @@ ERROR: bad-slot-attribute key ;
     dup empty? [
         unclip {
             { initial: [ [ first >>initial ] [ rest ] bi ] }
-            { initial-quot: [ [ first >>initial-quot ] [ rest ] bi ] }
             { read-only [ [ t >>read-only ] dip ] }
             [ bad-slot-attribute ]
         } case
@@ -198,17 +197,7 @@ ERROR: bad-slot-attribute key ;
 
 ERROR: bad-initial-value name ;
 
-ERROR: duplicate-initial-values slot ;
-
-M: duplicate-initial-values summary
-    drop "Slots can either define initial: or initial-quot:, but not both" ;
-
-: check-duplicate-initial-values ( slot-spec -- slot-spec )
-    dup [ initial>> ] [ initial-quot>> ] bi and
-    [ duplicate-initial-values ] when ;
-
 : check-initial-value ( slot-spec -- slot-spec )
-    check-duplicate-initial-values
     dup initial>> [
         [ ] [
             dup [ initial>> ] [ class>> ] bi instance?
