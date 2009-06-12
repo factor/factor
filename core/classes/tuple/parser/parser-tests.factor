@@ -150,9 +150,3 @@ TUPLE: parsing-corner-case x ;
     TUPLE: book { name initial-quot: [ "Lord of the " "Rings" append ] } ;">
     eval( -- )
 ] unit-test
-
-[ ] [
-    <" IN: classes.tuple.tests
-    TUPLE: monster { hp virtual } ;">
-    eval( -- )
-] unit-test
