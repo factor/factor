@@ -1,13 +1,14 @@
-USING: accessors alien alien.c-types alien.strings arrays
-assocs byte-arrays combinators continuations game-input
-game-input.dinput.keys-array io.encodings.utf16
-io.encodings.utf16n kernel locals math math.bitwise
-math.rectangles namespaces parser sequences shuffle
-struct-arrays ui.backend.windows vectors windows.com
-windows.dinput windows.dinput.constants windows.errors
-windows.kernel32 windows.messages windows.ole32
-windows.user32 ;
+USING: windows.dinput windows.dinput.constants parser
+alien.c-types windows.ole32 namespaces assocs kernel arrays
+vectors windows.kernel32 windows.com windows.dinput shuffle
+windows.user32 windows.messages sequences combinators locals
+math.rectangles accessors math alien alien.strings
+io.encodings.utf16 io.encodings.utf16n continuations
+byte-arrays game-input.dinput.keys-array game-input
+ui.backend.windows windows.errors struct-arrays
+math.bitwise ;
 IN: game-input.dinput
+
 CONSTANT: MOUSE-BUFFER-SIZE 16
 
 SINGLETON: dinput-game-input-backend
