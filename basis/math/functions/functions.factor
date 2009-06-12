@@ -89,7 +89,7 @@ PRIVATE>
 
 : ^ ( x y -- z )
     {
-        { [ over zero? ] [ nip 0^ ] }
+        { [ over 0 = ] [ nip 0^ ] }
         { [ dup integer? ] [ integer^ ] }
         { [ 2dup real^? ] [ fpow ] }
         [ ^complex ]
