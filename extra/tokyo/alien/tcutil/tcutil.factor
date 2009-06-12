@@ -9,8 +9,8 @@ C-ENUM:
     TCDBTFIXED
     TCDBTTABLE ;
 
-! FIXME: time_t varies from system to system, right?
-TYPEDEF: longlong time_t
+! long seems safe enough
+TYPEDEF: long time_t
 
 TYPEDEF: void* TCLIST*
 
