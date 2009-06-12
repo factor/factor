@@ -9,7 +9,7 @@ C-ENUM:
     TCDBTFIXED
     TCDBTTABLE ;
 
-! long seems safe enough
+! FIXME: on windows 64bits this isn't correct, because long is 32bits there, and time_t is int64
 TYPEDEF: long time_t
 
 TYPEDEF: void* TCLIST*
