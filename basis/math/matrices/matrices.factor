@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays fry kernel math math.order math.vectors
-sequences sequences.private accessors columns ;
+USING: accessors arrays columns kernel math math.bits
+math.order math.vectors sequences sequences.private ;
 IN: math.matrices
 
 ! Matrices
@@ -61,3 +61,7 @@ PRIVATE>
 
 : cross-zip ( seq1 seq2 -- seq1xseq2 )
     [ [ 2array ] with map ] curry map ;
+    
+: m^n ( m n -- n ) 
+    make-bits over first length identity-matrix
+    [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
