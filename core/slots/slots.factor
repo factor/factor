@@ -3,7 +3,7 @@
 USING: arrays byte-arrays kernel kernel.private math namespaces
 make sequences strings effects generic generic.standard
 classes classes.algebra slots.private combinators accessors
-words sequences.private assocs alien quotations hashtables summary ;
+words sequences.private assocs alien quotations hashtables ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial initial-quot read-only ;
@@ -199,9 +199,6 @@ ERROR: bad-slot-attribute key ;
 ERROR: bad-initial-value name ;
 
 ERROR: duplicate-initial-values slot ;
-
-M: duplicate-initial-values summary
-    drop "Slots can either define initial: or initial-quot:, but not both" ;
 
 : check-duplicate-initial-values ( slot-spec -- slot-spec )
     dup [ initial>> ] [ initial-quot>> ] bi and
