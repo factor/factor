@@ -117,7 +117,7 @@ M: invalid-inet6 summary drop "Invalid IPv6 address" ;
     <byte-array> glue ;
 
 : inet6-bytes ( seq -- bytes )
-    [ 2 >be ] { } map-as concat >byte-array ;
+    [ 2 >be ] { } map-as B{ } concat-as ;
 
 PRIVATE>
 

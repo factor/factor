@@ -245,7 +245,9 @@ IN: bootstrap.syntax
     ] define-core-syntax
     
     "initial:" "syntax" lookup define-symbol
-    
+
+    "initial-quot:" "syntax" lookup define-symbol
+
     "read-only" "syntax" lookup define-symbol
 
     "call(" [ \ call-effect parse-call( ] define-core-syntax
