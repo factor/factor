@@ -443,7 +443,7 @@ ERROR: unhandled-compression compression ;
     '[
         _ group
         [ _ group unclip [ v+ ] accumulate swap suffix concat ] map
-        concat >byte-array
+        B{ } concat-as
     ] change-bitmap ;
 
 : strips-predictor ( ifd -- ifd )
@@ -492,11 +492,11 @@ ERROR: unknown-component-order ifd ;
     } case ;
 
 : ifd>image ( ifd -- image )
-    {
-        [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
-        [ ifd-component-order f ]
-        [ bitmap>> ]
-    } cleave image boa ;
+    [ <image> ] dip {
+        [ [ image-width find-tag ] [ image-length find-tag ] bi 2array >>dim ]
+        [ ifd-component-order >>component-order ]
+        [ bitmap>> >>bitmap ]
+    } cleave ;
 
 : tiff>image ( image -- image )
     ifds>> [ ifd>image ] map first ;

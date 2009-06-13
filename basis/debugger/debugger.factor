@@ -104,8 +104,8 @@ HOOK: signal-error. os ( obj -- )
     "Cannot do next-object outside begin/end-scan" print drop ;
 
 : undefined-symbol-error. ( obj -- )
-    "The image refers to a library or symbol that was not found"
-    " at load time" append print drop ;
+    "The image refers to a library or symbol that was not found at load time"
+    print drop ;
 
 : stack-underflow. ( obj name -- )
     write " stack underflow" print drop ;
@@ -252,12 +252,15 @@ M: no-current-vocab summary
     drop "Not in a vocabulary; IN: form required" ;
 
 M: no-word-error summary
-    name>> "No word named ``" "'' found in current vocabulary search path" surround ;
+    name>>
+    "No word named ``"
+    "'' found in current vocabulary search path" surround ;
 
 M: no-word-error error. summary print ;
 
 M: ambiguous-use-error summary
-    words>> first name>> "More than one vocabulary defines a word named ``" "''" surround ;
+    words>> first name>>
+    "More than one vocabulary defines a word named ``" "''" surround ;
 
 M: ambiguous-use-error error. summary print ;
 
