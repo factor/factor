@@ -1,7 +1,9 @@
-USING: kernel alien combinators alien.syntax
-       alien.c-types
-       alien.libraries tokyo.alien.tcutil tokyo.alien.tctdb ;
-IN: tokyo.alient.tcrdb
+! Copyright (C) 2009 Bruno Deferrari
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien alien.c-types alien.libraries alien.syntax
+combinators kernel tokyo.alien.tchdb tokyo.alien.tcutil
+tokyo.alien.tctdb ;
+IN: tokyo.alien.tcrdb
 
 TYPEDEF: void* TCRDB*
 ! C-STRUCT: TCRDB
@@ -115,17 +117,17 @@ CONSTANT: RDBQOSTRDESC TDBQOSTRDESC
 CONSTANT: RDBQONUMASC  TDBQONUMASC
 CONSTANT: RDBQONUMDESC TDBQONUMDESC
 
-FUNCTION: bool tcrdbtblput ( TCRDB* rdb, const void* pkbuf, int pksiz, TCMAP* cols ) ;
-FUNCTION: bool tcrdbtblputkeep ( TCRDB* rdb, const void* pkbuf, int pksiz, TCMAP* cols ) ;
-FUNCTION: bool tcrdbtblputcat ( TCRDB* rdb, const void* pkbuf, int pksiz, TCMAP* cols ) ;
-FUNCTION: bool tcrdbtblout ( TCRDB* rdb, const void* pkbuf, int pksiz ) ;
-FUNCTION: TCMAP* tcrdbtblget ( TCRDB* rdb, const void* pkbuf, int pksiz ) ;
-FUNCTION: bool tcrdbtblsetindex ( TCRDB* rdb, const char* name, int type ) ;
+FUNCTION: bool tcrdbtblput ( TCRDB* rdb, void* pkbuf, int pksiz, TCMAP* cols ) ;
+FUNCTION: bool tcrdbtblputkeep ( TCRDB* rdb, void* pkbuf, int pksiz, TCMAP* cols ) ;
+FUNCTION: bool tcrdbtblputcat ( TCRDB* rdb, void* pkbuf, int pksiz, TCMAP* cols ) ;
+FUNCTION: bool tcrdbtblout ( TCRDB* rdb, void* pkbuf, int pksiz ) ;
+FUNCTION: TCMAP* tcrdbtblget ( TCRDB* rdb, void* pkbuf, int pksiz ) ;
+FUNCTION: bool tcrdbtblsetindex ( TCRDB* rdb, char* name, int type ) ;
 FUNCTION: longlong tcrdbtblgenuid ( TCRDB* rdb ) ;
 FUNCTION: RDBQRY* tcrdbqrynew ( TCRDB* rdb ) ;
 FUNCTION: void tcrdbqrydel ( RDBQRY* qry ) ;
-FUNCTION: void tcrdbqryaddcond ( RDBQRY* qry, const char* name, int op, const char* expr ) ;
-FUNCTION: void tcrdbqrysetorder ( RDBQRY* qry, const char* name, int type ) ;
+FUNCTION: void tcrdbqryaddcond ( RDBQRY* qry, char* name, int op, char* expr ) ;
+FUNCTION: void tcrdbqrysetorder ( RDBQRY* qry, char* name, int type ) ;
 FUNCTION: void tcrdbqrysetlimit ( RDBQRY* qry, int max, int skip ) ;
 FUNCTION: TCLIST* tcrdbqrysearch ( RDBQRY* qry ) ;
 FUNCTION: bool tcrdbqrysearchout ( RDBQRY* qry ) ;

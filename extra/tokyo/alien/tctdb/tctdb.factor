@@ -1,7 +1,9 @@
-USING: kernel alien combinators alien.syntax
-       alien.c-types
-       alien.libraries tokyo.alien.tcutil ;
-IN: tokyo.alient.tctdb
+! Copyright (C) 2009 Bruno Deferrari
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien alien.c-types alien.libraries alien.syntax
+combinators kernel tokyo.alien.tchdb tokyo.alien.tcutil
+tokyo.alien.tchdb ;
+IN: tokyo.alien.tctdb
 
 TYPEDEF: void* TDBIDX*
 TYPEDEF: void* TCTDB*
@@ -68,7 +70,7 @@ CONSTANT: TDBQPSTOP 16777216
 TYPEDEF: void* TDBQRYPROC
 
 FUNCTION: char* tctdberrmsg ( int ecode ) ;
-FUNCTION: TCTDB* tctdbnew ( void ) ;
+FUNCTION: TCTDB* tctdbnew ( ) ;
 FUNCTION: void tctdbdel ( TCTDB* tdb ) ;
 FUNCTION: int tctdbecode ( TCTDB* tdb ) ;
 FUNCTION: bool tctdbsetmutex ( TCTDB* tdb ) ;
