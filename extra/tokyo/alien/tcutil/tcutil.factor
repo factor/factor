@@ -5,7 +5,7 @@ combinators kernel system ;
 IN: tokyo.alien.tcutil
 
 << "tokyocabinet" {
-    { [ os macosx? ] [ "libtokyocabinet.dylib" ] }
+    { [ os macosx? ] [ "/opt/local/lib/libtokyocabinet.dylib" ] }
     { [ os unix? ] [ "libtokyocabinet.so" ] }
     { [ os windows? ] [ "tokyocabinet.dll" ] }
 } cond "cdecl" add-library >>
