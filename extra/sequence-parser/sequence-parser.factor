@@ -35,6 +35,8 @@ TUPLE: sequence-parser sequence n ;
 : advance* ( sequence-parser -- )
     advance drop ; inline
 
+: next ( sequence-parser -- obj ) [ current ] [ advance* ] bi ;
+
 : get+increment ( sequence-parser -- char/f )
     [ current ] [ advance drop ] bi ; inline
 
@@ -148,7 +150,7 @@ TUPLE: sequence-parser sequence n ;
     2dup [ length ] dip < [ 2drop f ] [ tail-slice ] if ; inline
 
 : take-rest ( sequence-parser -- sequence )
-    [ take-rest-slice ] [ sequence>> like ] bi ;
+    [ take-rest-slice ] [ sequence>> like ] bi f like ;
 
 : take-until-object ( sequence-parser obj -- sequence )
     '[ current _ = ] take-until ;
@@ -190,7 +192,7 @@ TUPLE: sequence-parser sequence n ;
 
 :: take-n ( sequence-parser n -- seq/f )
     n sequence-parser [ n>> + ] [ sequence>> length ] bi > [
-        f
+        sequence-parser take-rest
     ] [
         sequence-parser n>> dup n + sequence-parser sequence>> subseq
         sequence-parser [ n + ] change-n drop

@@ -56,13 +56,20 @@ TUPLE: lsb0-bit-writer < bit-writer ;
 GENERIC: peek ( n bitstream -- value )
 GENERIC: poke ( value n bitstream -- )
 
+: get-abp ( bitstream -- abp ) 
+    [ byte-pos>> 8 * ] [ bit-pos>> + ] bi ; inline
+    
+: set-abp ( abp bitstream -- ) 
+    [ 8 /mod ] dip [ (>>bit-pos) ] [ (>>byte-pos) ] bi ; inline
+
 : seek ( n bitstream -- )
-    {
-        [ byte-pos>> 8 * ]
-        [ bit-pos>> + + 8 /mod ]
-        [ (>>bit-pos) ]
-        [ (>>byte-pos) ]
-    } cleave ; inline
+    [ get-abp + ] [ set-abp ] bi ; inline
+    
+: (align) ( n m -- n' )
+    [ /mod 0 > [ 1+ ] when ] [ * ] bi ; inline
+    
+: align ( n bitstream -- )
+    [ get-abp swap (align) ] [ set-abp ] bi ; inline
 
 : read ( n bitstream -- value )
     [ peek ] [ seek ] 2bi ; inline
