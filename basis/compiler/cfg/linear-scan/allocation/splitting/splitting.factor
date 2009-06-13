@@ -20,10 +20,8 @@ IN: compiler.cfg.linear-scan.allocation.splitting
 : split-ranges ( live-ranges n -- before after )
     [ '[ from>> _ <= ] partition ]
     [
-        pick empty? [ drop ] [
-            [ over last ] dip 2dup split-last-range?
-            [ split-last-range ] [ 2drop ] if
-        ] if
+        [ over last ] dip 2dup split-last-range?
+        [ split-last-range ] [ 2drop ] if
     ] bi ;
 
 : split-uses ( uses n -- before after )
@@ -34,11 +32,14 @@ IN: compiler.cfg.linear-scan.allocation.splitting
     [ [ >>split-before ] [ >>split-after ] bi* drop ]
     2bi ; inline
 
+ERROR: splitting-too-early ;
+
 ERROR: splitting-atomic-interval ;
 
-: check-split ( live-interval -- )
-    [ end>> ] [ start>> ] bi - 0 =
-    [ splitting-atomic-interval ] when ; inline
+: check-split ( live-interval n -- )
+    [ [ start>> ] dip > [ splitting-too-early ] when ]
+    [ drop [ end>> ] [ start>> ] bi - 0 = [ splitting-atomic-interval ] when ]
+    2bi ; inline
 
 : split-before ( before -- before' )
     f >>spill-to ; inline
@@ -47,7 +48,7 @@ ERROR: splitting-atomic-interval ;
     f >>copy-from f >>reg f >>reload-from ; inline
 
 :: split-interval ( live-interval n -- before after )
-    live-interval check-split
+    live-interval n check-split
     live-interval clone :> before
     live-interval clone :> after
     live-interval uses>> n split-uses before after [ (>>uses) ] bi-curry@ bi*
@@ -83,18 +84,18 @@ HINTS: split-interval live-interval object ;
         ]
     } cond ;
 
-: intersect-inactive ( new inactive active-regs -- n )
-    2dup [ reg>> ] dip key? [
-        2drop start>>
-    ] [
-        drop relevant-ranges intersect-live-ranges
-    ] if ;
+: intersect-inactive ( new inactive active-regs -- n/f )
+    ! If the interval's register is currently in use, we cannot
+    ! re-use it.
+    2dup [ reg>> ] dip key?
+    [ 3drop f ] [ drop relevant-ranges intersect-live-ranges ] if ;
 
 : intersecting-inactive ( new -- live-intervals )
     dup vreg>>
     [ inactive-intervals-for ]
     [ active-intervals-for [ reg>> ] map unique ] bi
-    '[ tuck _ intersect-inactive ] with { } map>assoc ;
+    '[ tuck _ intersect-inactive ] with { } map>assoc
+    [ nip ] assoc-filter ;
 
 : insert-use-for-copy ( seq n -- seq' )
     [ 1array split1 ] keep [ 1 - ] keep 2array glue ;
@@ -115,5 +116,5 @@ HINTS: split-interval live-interval object ;
         first reuse-register
     ] [
         [ second split-before-use ] keep
-       '[ _ first reuse-register ] [ add-unhandled ] bi*
+        '[ _ first reuse-register ] [ add-unhandled ] bi*
     ] if ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math math.order fry
-binary-search compiler.cfg.instructions compiler.cfg.registers
+binary-search combinators compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.def-use compiler.cfg.liveness compiler.cfg ;
 IN: compiler.cfg.linear-scan.live-intervals
 
@@ -120,17 +120,23 @@ M: ##copy-float compute-live-intervals*
 
 : compute-start/end ( live-interval -- )
     dup ranges>> [ first from>> ] [ last to>> ] bi
-    2dup > [ "BUG: start > end" throw ] when
     [ >>start ] [ >>end ] bi* drop ;
+
+: check-start/end ( live-interval -- )
+    [ [ start>> ] [ uses>> first ] bi assert= ]
+    [ [ end>> ] [ uses>> last ] bi assert= ]
+    bi ;
 
 : finish-live-intervals ( live-intervals -- )
     ! Since live intervals are computed in a backward order, we have
     ! to reverse some sequences, and compute the start and end.
     [
-        [ ranges>> reverse-here ]
-        [ uses>> reverse-here ]
-        [ compute-start/end ]
-        tri
+        {
+            [ ranges>> reverse-here ]
+            [ uses>> reverse-here ]
+            [ compute-start/end ]
+            [ check-start/end ]
+        } cleave
     ] each ;
 
 : compute-live-intervals ( rpo -- live-intervals )

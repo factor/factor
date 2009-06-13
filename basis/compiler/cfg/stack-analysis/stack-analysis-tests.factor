@@ -4,7 +4,7 @@ compiler.cfg.instructions sequences kernel tools.test accessors
 sequences.private alien math combinators.private compiler.cfg
 compiler.cfg.checker compiler.cfg.height compiler.cfg.rpo
 compiler.cfg.dce compiler.cfg.registers compiler.cfg.useless-blocks
-sets ;
+sets namespaces ;
 IN: compiler.cfg.stack-analysis.tests
 
 ! Fundamental invariant: a basic block should not load or store a value more than once
@@ -32,6 +32,8 @@ IN: compiler.cfg.stack-analysis.tests
 
 : linearize ( cfg -- mr )
     flatten-cfg instructions>> ;
+
+local-only? off
 
 [ ] [ [ ] test-stack-analysis drop ] unit-test
 
