@@ -6,8 +6,8 @@ tokyo.alien.tctdb ;
 IN: tokyo.alien.tcrdb
 
 << "tokyotyrant" {
-    { [ os macosx? ] [ "libtokyotyrant.3.dylib" ] }
-    { [ os unix? ] [ "libtokyotyrant.3.so" ] }
+    { [ os macosx? ] [ "/opt/local/lib/libtokyotyrant.dylib" ] }
+    { [ os unix? ] [ "libtokyotyrant.so" ] }
     { [ os windows? ] [ "tokyotyrant.dll" ] }
 } cond "cdecl" add-library >>
 
