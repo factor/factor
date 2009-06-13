@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays classes combinators
-compression.lzw constructors endian fry grouping images io
+compression.lzw endian fry grouping images io
 io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
@@ -12,14 +12,27 @@ IN: images.tiff
 SINGLETON: tiff-image
 
 TUPLE: loading-tiff endianness the-answer ifd-offset ifds ;
-CONSTRUCTOR: loading-tiff ( -- tiff ) V{ } clone >>ifds ;
+
+: <loading-tiff> ( -- tiff )
+    loading-tiff new V{ } clone >>ifds ;
 
 TUPLE: ifd count ifd-entries next
 processed-tags strips bitmap ;
-CONSTRUCTOR: ifd ( count ifd-entries next -- ifd ) ;
+
+: <ifd> ( count ifd-entries next -- ifd )
+    ifd new
+        swap >>next
+        swap >>ifd-entries
+        swap >>count ;
 
 TUPLE: ifd-entry tag type count offset/value ;
-CONSTRUCTOR: ifd-entry ( tag type count offset/value -- ifd-entry ) ;
+
+: <ifd-entry> ( tag type count offset/value -- ifd-entry )
+    ifd-entry new
+        swap >>offset/value
+        swap >>count
+        swap >>type
+        swap >>tag ;
 
 SINGLETONS: photometric-interpretation
 photometric-interpretation-white-is-zero

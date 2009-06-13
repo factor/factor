@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays combinators
-constructors grouping compression.huffman images
+grouping compression.huffman images
 images.processing io io.binary io.encodings.binary io.files
 io.streams.byte-array kernel locals math math.bitwise
 math.constants math.functions math.matrices math.order
@@ -21,7 +21,8 @@ TUPLE: jpeg-image < image
 
 <PRIVATE
 
-CONSTRUCTOR: jpeg-image ( headers bitstream -- image ) ;
+: <jpeg-image> ( headers bitstream -- image )
+    jpeg-image new swap >>bitstream swap >>headers ;
 
 SINGLETONS: SOF DHT DAC RST SOI EOI SOS DQT DNL DRI DHP EXP
 APP JPG COM TEM RES ;
@@ -56,12 +57,20 @@ APP JPG COM TEM RES ;
 
 TUPLE: jpeg-chunk length type data ;
 
-CONSTRUCTOR: jpeg-chunk ( type length data -- jpeg-chunk ) ;
+: <jpeg-chunk> ( type length data -- jpeg-chunk )
+    jpeg-chunk new
+        swap >>data
+        swap >>length
+        swap >>type ;
 
 TUPLE: jpeg-color-info
     h v quant-table dc-huff-table ac-huff-table { diff initial: 0 } id ;
 
-CONSTRUCTOR: jpeg-color-info ( h v quant-table -- jpeg-color-info ) ;
+: <jpeg-color-info> ( h v quant-table -- jpeg-color-info )
+    jpeg-color-info new
+        swap >>quant-table
+        swap >>v
+        swap >>h ;
 
 : jpeg> ( -- jpeg-image ) jpeg-image get ;
 
