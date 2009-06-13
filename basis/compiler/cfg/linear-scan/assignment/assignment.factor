@@ -128,8 +128,8 @@ M: insn assign-registers-in-insn drop ;
             [
                 [
                     insn#>>
-                    [ activate-new-intervals ]
                     [ expire-old-intervals ]
+                    [ activate-new-intervals ]
                     bi
                 ]
                 [ assign-registers-in-insn ]
