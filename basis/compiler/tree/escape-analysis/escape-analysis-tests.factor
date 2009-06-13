@@ -328,3 +328,10 @@ C: <ro-box> ro-box
 TUPLE: empty-tuple ;
 
 [ ] [ [ empty-tuple boa layout-of ] count-unboxed-allocations drop ] unit-test
+
+! Make sure that initial-quot: doesn't inhibit unboxing
+TUPLE: initial-quot-tuple { x read-only initial-quot: [ 0 ] } ;
+
+[ 1 ] [
+    [ initial-quot-tuple new x>> ] count-unboxed-allocations
+] unit-test
