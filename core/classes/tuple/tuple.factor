@@ -153,8 +153,7 @@ ERROR: bad-superclass class ;
     all-slots [ initial-quot>> ] filter
     [
         [
-            [ initial-quot>> , (( -- obj )) , \ call-effect , \ over , ]
-            [ offset>> , ] bi \ set-slot ,
+            [ initial-quot>> % \ over , ] [ offset>> , ] bi \ set-slot ,
         ] each
     ] [ ] make f like ;
 
@@ -187,15 +186,10 @@ ERROR: bad-superclass class ;
     dup make-tuple-layout "layout" set-word-prop ;
 
 : calculate-initial-value ( slot-spec -- value )
-    dup initial>> [
-        nip
-    ] [
-        dup initial-quot>> [
-            nip call( -- obj )
-        ] [
-            drop f
-        ] if*
-    ] if* ;
+    dup initial>> [ ] [
+        dup initial-quot>>
+        [ call( -- obj ) ] [ drop f ] ?if
+    ] ?if ;
 
 : compute-slot-permutation ( new-slots old-slots -- triples )
     [ [ [ name>> ] map ] bi@ [ index ] curry map ]
