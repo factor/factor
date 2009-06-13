@@ -1,8 +1,16 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax
-combinators kernel ;
+combinators kernel system ;
 IN: tokyo.alien.tcutil
+
+<< "tokyocabinet" {
+    { [ os macosx? ] [ "libtokyocabinet.dylib" ] }
+    { [ os unix? ] [ "libtokyocabinet.so" ] }
+    { [ os windows? ] [ "tokyocabinet.dll" ] }
+} cond "cdecl" add-library >>
+
+LIBRARY: tokyocabinet
 
 C-ENUM:
     TCDBTHASH

@@ -5,6 +5,8 @@ combinators kernel tokyo.alien.tchdb tokyo.alien.tcutil
 tokyo.alien.tchdb ;
 IN: tokyo.alien.tcbdb
 
+LIBRARY: tokyocabinet
+
 TYPEDEF: void* TCBDB
 
 CONSTANT: BDBFOPEN HDBFOPEN

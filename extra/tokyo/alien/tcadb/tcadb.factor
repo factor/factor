@@ -5,6 +5,8 @@ combinators kernel tokyo.alien.tchdb tokyo.alien.tcutil
 tokyo.alien.tcbdb tokyo.alien.tcfdb tokyo.alien.tctdb ;
 IN: tokyo.alien.tcrdb
 
+LIBRARY: tokyocabinet
+
 TYPEDEF: void* TCADB
 
 C-ENUM:
@@ -48,8 +50,8 @@ FUNCTION: bool tcadbtranbegin ( TCADB* adb ) ;
 FUNCTION: bool tcadbtrancommit ( TCADB* adb ) ;
 FUNCTION: bool tcadbtranabort ( TCADB* adb ) ;
 FUNCTION: char* tcadbpath ( TCADB* adb ) ;
-FUNCTION: uint64_t tcadbrnum ( TCADB* adb ) ;
-FUNCTION: uint64_t tcadbsize ( TCADB* adb ) ;
+FUNCTION: ulonglong tcadbrnum ( TCADB* adb ) ;
+FUNCTION: ulonglong tcadbsize ( TCADB* adb ) ;
 FUNCTION: TCLIST* tcadbmisc ( TCADB* adb, char* name, TCLIST* args ) ;
 
 ! -----
@@ -63,5 +65,5 @@ FUNCTION: int tcadbomode ( TCADB* adb ) ;
 FUNCTION: void* tcadbreveal ( TCADB* adb ) ;
 FUNCTION: bool tcadbputproc ( TCADB* adb, void* kbuf, int ksiz, void* vbuf, int vsiz, TCPDPROC proc, void* op ) ;
 FUNCTION: bool tcadbforeach ( TCADB* adb, TCITER iter, void* op ) ;
-FUNCTION: bool tcadbmapbdb ( TCADB* adb, TCLIST* keys, TCBDB* bdb, ADBMAPPROC proc, void* op, int64_t csiz ) ;
+FUNCTION: bool tcadbmapbdb ( TCADB* adb, TCLIST* keys, TCBDB* bdb, ADBMAPPROC proc, void* op, longlong csiz ) ;
 FUNCTION: bool tcadbmapbdbemit ( void* map, char* kbuf, int ksiz, char* vbuf, int vsiz ) ;
