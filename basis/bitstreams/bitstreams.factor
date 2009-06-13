@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors assocs byte-arrays combinators
-constructors destructors fry io io.binary io.encodings.binary
-io.streams.byte-array kernel locals macros math math.ranges
-multiline sequences sequences.private vectors byte-vectors
-combinators.short-circuit math.bitwise ;
+destructors fry io io.binary io.encodings.binary io.streams.byte-array
+kernel locals macros math math.ranges multiline sequences
+sequences.private vectors byte-vectors combinators.short-circuit
+math.bitwise ;
 IN: bitstreams
 
 TUPLE: widthed { bits integer read-only } { #bits integer read-only } ;
@@ -36,8 +36,12 @@ TUPLE: bit-writer
 
 TUPLE: msb0-bit-reader < bit-reader ;
 TUPLE: lsb0-bit-reader < bit-reader ;
-CONSTRUCTOR: msb0-bit-reader ( bytes -- bs ) ;
-CONSTRUCTOR: lsb0-bit-reader ( bytes -- bs ) ;
+
+: <msb0-bit-reader> ( bytes -- bs )
+    msb0-bit-reader new swap >>bytes ; inline
+
+: <lsb0-bit-reader> ( bytes -- bs )
+    lsb0-bit-reader new swap >>bytes ; inline
 
 TUPLE: msb0-bit-writer < bit-writer ;
 TUPLE: lsb0-bit-writer < bit-writer ;

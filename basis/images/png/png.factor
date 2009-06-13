@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors constructors images io io.binary io.encodings.ascii
+USING: accessors images io io.binary io.encodings.ascii
 io.encodings.binary io.encodings.string io.files io.files.info kernel
-sequences io.streams.limited fry combinators arrays math
-checksums checksums.crc32 compression.inflate grouping byte-arrays
-images.loader ;
+sequences io.streams.limited fry combinators arrays math checksums
+checksums.crc32 compression.inflate grouping byte-arrays images.loader ;
 IN: images.png
 
 SINGLETON: png-image
@@ -15,12 +14,14 @@ TUPLE: loading-png
     width height bit-depth color-type compression-method
     filter-method interlace-method uncompressed ;
 
-CONSTRUCTOR: loading-png ( -- image )
+: <loading-png> ( -- image )
+    loading-png new
     V{ } clone >>chunks ;
 
 TUPLE: png-chunk length type data ;
 
-CONSTRUCTOR: png-chunk ( -- png-chunk ) ;
+: <png-chunk> ( -- png-chunk )
+    png-chunk new ; inline
 
 CONSTANT: png-header
     B{ HEX: 89 HEX: 50 HEX: 4e HEX: 47 HEX: 0d HEX: 0a HEX: 1a HEX: 0a }

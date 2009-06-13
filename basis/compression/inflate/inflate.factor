@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays
-byte-vectors combinators constructors fry grouping hashtables
+byte-vectors combinators fry grouping hashtables
 compression.huffman images io.binary kernel locals
 math math.bitwise math.order math.ranges multiline sequences
 sorting ;
