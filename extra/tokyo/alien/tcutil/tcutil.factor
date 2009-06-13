@@ -1,7 +1,8 @@
-USING: kernel alien combinators alien.syntax
-       alien.c-types
-       alien.libraries ;
-IN: tokyo.alient.tcutil
+! Copyright (C) 2009 Bruno Deferrari
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien alien.c-types alien.libraries alien.syntax
+combinators kernel ;
+IN: tokyo.alien.tcutil
 
 C-ENUM:
     TCDBTHASH
@@ -22,3 +23,8 @@ FUNCTION: void* tclistval ( TCLIST* list, int index, int* sp ) ;
 FUNCTION: char* tclistval2 ( TCLIST* list, int index ) ;
 FUNCTION: void tclistpush ( TCLIST* list, void* ptr, int size ) ;
 FUNCTION: void tclistpush2 ( TCLIST* list, char* str ) ;
+
+TYPEDEF: void* TCCMP
+TYPEDEF: void* TCCODEC
+TYPEDEF: void* TCPDPROC
+TYPEDEF: voud* TCITER
