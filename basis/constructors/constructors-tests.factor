@@ -57,3 +57,30 @@ TUPLE: default { a integer initial: 0 } ;
 CONSTRUCTOR: default ( -- obj ) ;
 
 [ 0 ] [ <default> a>> ] unit-test
+
+
+TUPLE: inherit1 a ;
+TUPLE: inherit2 < inherit1 a ;
+
+CONSTRUCTOR: inherit2 ( a -- obj ) ;
+
+[ T{ inherit2 f f 100 } ] [ 100 <inherit2> ] unit-test
+
+
+TUPLE: inherit3 hp max-hp ;
+TUPLE: inherit4 < inherit3 ;
+TUPLE: inherit5 < inherit3 ;
+
+CONSTRUCTOR: inherit3 ( -- obj )
+    dup max-hp>> >>hp ;
+
+BACKWARD-CONSTRUCTOR: inherit4 ( -- obj )
+    10 >>max-hp ;
+
+[ 10 ] [ <inherit4> hp>> ] unit-test
+
+FORWARD-CONSTRUCTOR: inherit5 ( -- obj )
+    5 >>hp
+    10 >>max-hp ;
+
+[ 5 ] [ <inherit5> hp>> ] unit-test

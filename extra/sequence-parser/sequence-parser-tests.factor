@@ -118,10 +118,10 @@ IN: sequence-parser.tests
 [ "abcd e \\\"f g" ]
 [ "\"abcd e \\\"f g\"" <sequence-parser> CHAR: \ CHAR: " take-token* ] unit-test
 
-[ "" ]
+[ f ]
 [ "" <sequence-parser> take-rest ] unit-test
 
-[ "" ]
+[ f ]
 [ "abc" <sequence-parser> dup "abc" take-sequence drop take-rest ] unit-test
 
 [ f ]

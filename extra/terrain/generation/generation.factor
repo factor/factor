@@ -1,6 +1,7 @@
-USING: accessors arrays byte-arrays combinators fry grouping
-images kernel math math.affine-transforms math.order
-math.vectors noise random sequences ;
+USING: accessors arrays byte-arrays combinators
+combinators.smart fry grouping images kernel math
+math.affine-transforms math.order math.vectors noise random
+sequences ;
 IN: terrain.generation
 
 CONSTANT: terrain-segment-size { 512 512 }
@@ -31,15 +32,21 @@ TUPLE: terrain big-noise-table small-noise-table tiny-noise-seed ;
 
 TUPLE: segment image ;
 
+: <terrain-image> ( bytes -- image )
+    <image>
+        swap >>bitmap
+        RGBA >>component-order
+        terrain-segment-size >>dim ;
+
 : terrain-segment ( terrain at -- image )
-    {
-        [ big-noise-segment ]
-        [ small-noise-segment ]
-        [ tiny-noise-segment ]
-        [ padding ]
-    } 2cleave
-    4array flip concat >byte-array
-    [ terrain-segment-size RGBA f ] dip image boa ;
+    [
+        {
+            [ big-noise-segment ]
+            [ small-noise-segment ]
+            [ tiny-noise-segment ]
+            [ padding ]
+        } 2cleave
+    ] output>array flip B{ } concat-as <terrain-image> ;
 
 : 4max ( a b c d -- max )
     max max max ; inline

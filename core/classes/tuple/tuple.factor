@@ -50,6 +50,9 @@ M: tuple class layout-of 2 slot { word } declare ;
 
 PRIVATE>
 
+: initial-quots? ( class -- ? )
+    all-slots [ initial-quot>> ] any? ;
+
 : initial-values ( class -- slots )
     all-slots [ initial>> ] map ;
 
@@ -66,7 +69,7 @@ PRIVATE>
 
 GENERIC: slots>tuple ( seq class -- tuple )
 
-M: tuple-class slots>tuple
+M: tuple-class slots>tuple ( seq class -- tuple )
     check-slots pad-slots
     tuple-layout <tuple> [
         [ tuple-size ]
@@ -146,12 +149,22 @@ ERROR: bad-superclass class ;
 : define-boa-check ( class -- )
     dup boa-check-quot "boa-check" set-word-prop ;
 
+: tuple-initial-quots-quot ( class -- quot )
+    all-slots [ initial-quot>> ] filter
+    [
+        [
+            [ initial-quot>> , (( -- obj )) , \ call-effect , \ over , ]
+            [ offset>> , ] bi \ set-slot ,
+        ] each
+    ] [ ] make f like ;
+
 : tuple-prototype ( class -- prototype )
-    [ initial-values ] keep
-    over [ ] any? [ slots>tuple ] [ 2drop f ] if ;
+    [ initial-values ] [ over [ ] any? ] [ initial-quots? or ] tri
+    [ slots>tuple ] [ 2drop f ] if ;
 
 : define-tuple-prototype ( class -- )
-    dup tuple-prototype "prototype" set-word-prop ;
+    dup [ tuple-prototype ] [ tuple-initial-quots-quot ] bi 2array
+    dup [ ] any? [ drop f ] unless "prototype" set-word-prop ;
 
 : prepare-slots ( slots superclass -- slots' )
     [ make-slots ] [ class-size 2 + ] bi* finalize-slots ;
@@ -173,10 +186,21 @@ ERROR: bad-superclass class ;
 : define-tuple-layout ( class -- )
     dup make-tuple-layout "layout" set-word-prop ;
 
+: calculate-initial-value ( slot-spec -- value )
+    dup initial>> [
+        nip
+    ] [
+        dup initial-quot>> [
+            nip call( -- obj )
+        ] [
+            drop f
+        ] if*
+    ] if* ;
+
 : compute-slot-permutation ( new-slots old-slots -- triples )
     [ [ [ name>> ] map ] bi@ [ index ] curry map ]
     [ drop [ class>> ] map ]
-    [ drop [ initial>> ] map ]
+    [ drop [ calculate-initial-value ] map ]
     2tri 3array flip ;
 
 : update-slot ( old-values n class initial -- value )
@@ -340,8 +364,11 @@ M: tuple tuple-hashcode
 M: tuple hashcode* tuple-hashcode ;
 
 M: tuple-class new
-    dup "prototype" word-prop
-    [ (clone) ] [ tuple-layout <tuple> ] ?if ;
+    dup "prototype" word-prop [
+        first2 [ (clone) ] dip [ call( obj -- obj ) ] when*
+    ] [
+        tuple-layout <tuple>
+    ] ?if ;
 
 M: tuple-class boa
     [ "boa-check" word-prop [ call ] when* ]
