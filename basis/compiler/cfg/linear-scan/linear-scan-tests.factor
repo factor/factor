@@ -62,11 +62,8 @@ check-allocation? on
 ] unit-test
 
 [
-    { }
-    { T{ live-range f 1 10 } }
-] [
     { T{ live-range f 1 10 } } 0 split-ranges
-] unit-test
+] must-fail
 
 [
     { T{ live-range f 0 0 } }
@@ -1733,6 +1730,12 @@ test-diamond
 
 T{ basic-block
    { id 0 }
+   { number 0 }
+   { instructions V{ T{ ##prologue } T{ ##branch } } }
+} 0 set
+
+T{ basic-block
+   { id 1 }
    { instructions
      V{
          T{ ##peek
@@ -1746,10 +1749,10 @@ T{ basic-block
          }
      }
    }
-} 0 set
+} 1 set
 
 T{ basic-block
-   { id 1 }
+   { id 2 }
    { instructions
      V{
          T{ ##peek
@@ -1763,10 +1766,10 @@ T{ basic-block
          T{ ##branch }
      }
    }
-} 1 set
+} 2 set
 
 T{ basic-block
-   { id 2 }
+   { id 3 }
    { instructions
      V{
          T{ ##peek
@@ -1780,10 +1783,10 @@ T{ basic-block
          T{ ##branch }
      }
    }
-} 2 set
+} 3 set
 
 T{ basic-block
-   { id 3 }
+   { id 4 }
    { instructions
      V{
          T{ ##replace
@@ -1793,7 +1796,7 @@ T{ basic-block
          T{ ##return }
      }
    }
-} 3 set
+} 4 set
 
 test-diamond
 
