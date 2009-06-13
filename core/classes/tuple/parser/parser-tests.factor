@@ -1,7 +1,7 @@
 IN: classes.tuple.parser.tests
 USING: accessors classes.tuple.parser lexer words classes
 sequences math kernel slots tools.test parser compiler.units
-arrays classes.tuple eval ;
+arrays classes.tuple eval multiline ;
 
 TUPLE: test-1 ;
 
@@ -142,3 +142,11 @@ TUPLE: parsing-corner-case x ;
         "    x 3 }"
     } "\n" join eval( -- tuple )
 ] [ error>> unexpected-eof? ] must-fail-with
+
+
+[ ] [
+    <" USE: sequences
+    IN: classes.tuple.tests
+    TUPLE: book { name initial-quot: [ "Lord of the " "Rings" append ] } ;">
+    eval( -- )
+] unit-test
