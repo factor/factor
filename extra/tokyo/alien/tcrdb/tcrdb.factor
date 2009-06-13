@@ -1,9 +1,17 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax
-combinators kernel tokyo.alien.tchdb tokyo.alien.tcutil
+combinators kernel system tokyo.alien.tchdb tokyo.alien.tcutil
 tokyo.alien.tctdb ;
 IN: tokyo.alien.tcrdb
+
+<< "tokyotyrant" {
+    { [ os macosx? ] [ "libtokyotyrant.3.dylib" ] }
+    { [ os unix? ] [ "libtokyotyrant.3.so" ] }
+    { [ os windows? ] [ "tokyotyrant.dll" ] }
+} cond "cdecl" add-library >>
+
+LIBRARY: tokyotyrant
 
 TYPEDEF: void* TCRDB*
 ! C-STRUCT: TCRDB
