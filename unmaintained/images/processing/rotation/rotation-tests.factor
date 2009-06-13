@@ -21,23 +21,17 @@ IN: images.processing.rotation.tests
 
 >>
 
-CONSTANT: pasted-image
-    $[
-        "vocab:images/processing/rotation/test-bitmaps/PastedImage.bmp"
-        load-image clone-image
-    ]
+: pasted-image ( -- image )
+    "vocab:images/processing/rotation/test-bitmaps/PastedImage.bmp"
+    load-image clone-image ;
 
-CONSTANT: pasted-image90
-    $[
-        "vocab:images/processing/rotation/test-bitmaps/PastedImage90.bmp"
-        load-image clone-image
-    ]
+: pasted-image90 ( -- image )
+    "vocab:images/processing/rotation/test-bitmaps/PastedImage90.bmp"
+    load-image clone-image ;
 
-CONSTANT: lake-image
-    $[
-        "vocab:images/processing/rotation/test-bitmaps/lake.bmp"
-        load-image preprocess
-    ]
+: lake-image ( -- image )
+    "vocab:images/processing/rotation/test-bitmaps/lake.bmp"
+    load-image clone-image image>pixel-rows ;
 
 [ t ] [ pasted-image dup clone-image 4 [ 90 rotate ] times = ] unit-test
 [ t ] [ pasted-image dup clone-image 2 [ 180 rotate ] times = ] unit-test
