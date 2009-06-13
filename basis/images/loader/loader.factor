@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: constructors kernel splitting unicode.case combinators
-accessors images io.pathnames namespaces assocs ;
+USING: kernel splitting unicode.case combinators accessors images
+io.pathnames namespaces assocs ;
 IN: images.loader
 
 ERROR: unknown-image-extension extension ;
