@@ -35,5 +35,8 @@ IN: compiler.cfg.utilities
 
 : stop-iterating ( -- next ) end-basic-block f ;
 
+: call-height ( ##call -- n )
+    [ out-d>> length ] [ in-d>> length ] bi - ;
+
 : emit-primitive ( node -- )
-    word>> ##call ##branch begin-basic-block ;
+    [ word>> ] [ call-height ] bi ##call ##branch begin-basic-block ;

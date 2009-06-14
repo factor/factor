@@ -1,5 +1,5 @@
-USING: accessors calendar destructors kernel math math.order namespaces
-system threads ;
+USING: accessors calendar continuations destructors kernel math
+math.order namespaces system threads ui ui.gadgets.worlds ;
 IN: game-loop
 
 TUPLE: game-loop
@@ -26,6 +26,16 @@ SYMBOL: game-loop
     [ since-last-tick ] [ tick-length>> ] bi /f 1.0 min ;
 
 CONSTANT: MAX-FRAMES-TO-SKIP 5
+
+DEFER: stop-loop
+
+TUPLE: game-loop-error game-loop error ;
+
+: ?ui-error ( error -- )
+    ui-running? [ ui-error ] [ rethrow ] if ;
+
+: game-loop-error ( game-loop error -- )
+    [ drop stop-loop ] [ \ game-loop-error boa ?ui-error ] 2bi ;
 
 <PRIVATE
 
@@ -54,7 +64,9 @@ CONSTANT: MAX-FRAMES-TO-SKIP 5
     [ drop ] if ;
 
 : run-loop ( loop -- )
-    dup game-loop [ (run-loop) ] with-variable ;
+    dup game-loop
+    [ [ (run-loop) ] [ game-loop-error ] recover ]
+    with-variable ;
 
 : benchmark-millis ( loop -- millis )
     millis swap benchmark-time>> - ;
@@ -91,3 +103,6 @@ PRIVATE>
 M: game-loop dispose
     stop-loop ;
 
+USING: vocabs vocabs.loader ;
+
+"prettyprint" vocab [ "game-loop.prettyprint" require ] when

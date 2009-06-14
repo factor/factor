@@ -6,7 +6,7 @@ kernel kernel.private math memory namespaces make sequences
 words system layouts combinators math.order fry locals
 compiler.constants compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.intrinsics
-compiler.codegen compiler.codegen.fixup ;
+compiler.cfg.stack-frame compiler.codegen compiler.codegen.fixup ;
 IN: cpu.x86
 
 << enable-fixnum-log2 >>
@@ -16,6 +16,32 @@ M: label JMP 0 JMP rc-relative label-fixup ;
 M: label JUMPcc [ 0 ] dip JUMPcc rc-relative label-fixup ;
 
 M: x86 two-operand? t ;
+
+HOOK: stack-reg cpu ( -- reg )
+
+HOOK: reserved-area-size cpu ( -- n )
+
+: stack@ ( n -- op ) stack-reg swap [+] ;
+
+: param@ ( n -- op ) reserved-area-size + stack@ ;
+
+: spill-integer@ ( n -- op ) spill-integer-offset param@ ;
+
+: spill-float@ ( n -- op ) spill-float-offset param@ ;
+
+: gc-root@ ( n -- op ) gc-root-offset param@ ;
+
+: decr-stack-reg ( n -- )
+    dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
+
+: incr-stack-reg ( n -- )
+    dup 0 = [ drop ] [ stack-reg swap ADD ] if ;
+
+: align-stack ( n -- n' )
+    os macosx? cpu x86.64? or [ 16 align ] when ;
+
+M: x86 stack-frame-size ( stack-frame -- i )
+    (stack-frame-size) 3 cells reserved-area-size + + align-stack ;
 
 HOOK: temp-reg-1 cpu ( -- reg )
 HOOK: temp-reg-2 cpu ( -- reg )
@@ -45,20 +71,6 @@ M: x86 %replace loc>operand swap MOV ;
 M: x86 %inc-d ( n -- ) ds-reg (%inc) ;
 M: x86 %inc-r ( n -- ) rs-reg (%inc) ;
 
-: align-stack ( n -- n' )
-    os macosx? cpu x86.64? or [ 16 align ] when ;
-
-HOOK: reserved-area-size cpu ( -- n )
-
-M: x86 stack-frame-size ( stack-frame -- i )
-    [ spill-counts>> [ swap reg-size * ] { } assoc>map sum ]
-    [ params>> ]
-    [ return>> ]
-    tri + +
-    3 cells +
-    reserved-area-size +
-    align-stack ;
-
 M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
 
 : xt-tail-pic-offset ( -- n )
@@ -74,13 +86,10 @@ M: x86 %jump-label ( label -- ) 0 JMP rc-relative label-fixup ;
 M: x86 %return ( -- ) 0 RET ;
 
 : code-alignment ( align -- n )
-    [ building get [ integer? ] count dup ] dip align swap - ;
+    [ building get length dup ] dip align swap - ;
 
 : align-code ( n -- )
     0 <repetition> % ;
-
-M: x86 %dispatch-label ( word -- )
-    0 cell, rc-absolute-cell rel-word ;
 
 :: (%slot) ( obj slot tag temp -- op )
     temp slot obj [+] LEA
@@ -99,7 +108,7 @@ M: x86 %add-imm [+] LEA ;
 M: x86 %sub     nip SUB ;
 M: x86 %sub-imm neg [+] LEA ;
 M: x86 %mul     nip swap IMUL2 ;
-M: x86 %mul-imm nip IMUL2 ;
+M: x86 %mul-imm IMUL3 ;
 M: x86 %and     nip AND ;
 M: x86 %and-imm nip AND ;
 M: x86 %or      nip OR ;
@@ -315,17 +324,29 @@ M:: x86 %box-alien ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
-: small-reg-4 ( reg -- reg' )
+: small-reg-8 ( reg -- reg' )
     H{
-        { EAX EAX }
-        { ECX ECX }
-        { EDX EDX }
-        { EBX EBX }
-        { ESP ESP }
-        { EBP EBP }
-        { ESI ESP }
-        { EDI EDI }
+        { EAX RAX }
+        { ECX RCX }
+        { EDX RDX }
+        { EBX RBX }
+        { ESP RSP }
+        { EBP RBP }
+        { ESI RSP }
+        { EDI RDI }
 
+        { RAX RAX }
+        { RCX RCX }
+        { RDX RDX }
+        { RBX RBX }
+        { RSP RSP }
+        { RBP RBP }
+        { RSI RSP }
+        { RDI RDI }
+    } at ; inline
+
+: small-reg-4 ( reg -- reg' )
+    small-reg-8 H{
         { RAX EAX }
         { RCX ECX }
         { RDX EDX }
@@ -361,12 +382,21 @@ M:: x86 %box-alien ( dst src temp -- )
         { 1 [ small-reg-1 ] }
         { 2 [ small-reg-2 ] }
         { 4 [ small-reg-4 ] }
+        { 8 [ small-reg-8 ] }
     } case ;
 
-: small-regs ( -- regs ) { EAX ECX EDX EBX } ; inline
+HOOK: small-regs cpu ( -- regs )
+
+M: x86.32 small-regs { EAX ECX EDX EBX } ;
+M: x86.64 small-regs { RAX RCX RDX RBX } ;
+
+HOOK: small-reg-native cpu ( reg -- reg' )
+
+M: x86.32 small-reg-native small-reg-4 ;
+M: x86.64 small-reg-native small-reg-8 ;
 
 : small-reg-that-isn't ( exclude -- reg' )
-    small-regs swap [ small-reg-4 ] map '[ _ memq? not ] find nip ;
+    small-regs swap [ small-reg-native ] map '[ _ memq? not ] find nip ;
 
 : with-save/restore ( reg quot -- )
     [ drop PUSH ] [ call ] [ drop POP ] 2tri ; inline
@@ -376,7 +406,7 @@ M:: x86 %box-alien ( dst src temp -- )
     #! call the quot with that. Otherwise, we find a small
     #! register that is not in exclude, and call quot, saving
     #! and restoring the small register.
-    dst small-reg-4 small-regs memq? [ dst quot call ] [
+    dst small-reg-native small-regs memq? [ dst quot call ] [
         exclude small-reg-that-isn't
         [ quot call ] with-save/restore
     ] if ; inline
@@ -492,28 +522,57 @@ M:: x86 %write-barrier ( src card# table -- )
     table table [] MOV
     table card# [+] card-mark <byte> MOV ;
 
-M: x86 %gc ( -- )
-    "end" define-label
-    temp-reg-1 load-zone-ptr
-    temp-reg-2 temp-reg-1 cell [+] MOV
-    temp-reg-2 1024 ADD
-    temp-reg-1 temp-reg-1 3 cells [+] MOV
-    temp-reg-2 temp-reg-1 CMP
-    "end" get JLE
+:: check-nursery ( temp1 temp2 -- )
+    temp1 load-zone-ptr
+    temp2 temp1 cell [+] MOV
+    temp2 1024 ADD
+    temp1 temp1 3 cells [+] MOV
+    temp2 temp1 CMP ;
+
+GENERIC# save-gc-root 1 ( gc-root operand temp -- )
+
+M:: spill-slot save-gc-root ( gc-root spill-slot temp -- )
+    temp spill-slot n>> spill-integer@ MOV
+    gc-root gc-root@ temp MOV ;
+
+M:: word save-gc-root ( gc-root register temp -- )
+    gc-root gc-root@ register MOV ;
+
+: save-gc-roots ( gc-roots temp -- )
+    '[ _ save-gc-root ] assoc-each ;
+
+GENERIC# load-gc-root 1 ( gc-root operand temp -- )
+
+M:: spill-slot load-gc-root ( gc-root spill-slot temp -- )
+    temp gc-root gc-root@ MOV
+    spill-slot n>> spill-integer@ temp MOV ;
+
+M:: word load-gc-root ( gc-root register temp -- )
+    register gc-root gc-root@ MOV ;
+
+: load-gc-roots ( gc-roots temp -- )
+    '[ _ load-gc-root ] assoc-each ;
+
+:: call-gc ( gc-root-count -- )
+    ! Pass pointer to start of GC roots as first parameter
+    param-reg-1 gc-root-base param@ LEA
+    ! Pass number of roots as second parameter
+    param-reg-2 gc-root-count MOV
+    ! Call GC
     %prepare-alien-invoke
-    "minor_gc" f %alien-invoke
+    "inline_gc" f %alien-invoke ;
+
+M:: x86 %gc ( temp1 temp2 gc-roots gc-root-count -- )
+    "end" define-label
+    temp1 temp2 check-nursery
+    "end" get JLE
+    gc-roots temp1 save-gc-roots
+    gc-root-count call-gc
+    gc-roots temp1 load-gc-roots
     "end" resolve-label ;
 
 M: x86 %alien-global
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
-
-HOOK: stack-reg cpu ( -- reg )
-
-: decr-stack-reg ( n -- )
-    dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
-
-: incr-stack-reg ( n -- )
-    dup 0 = [ drop ] [ stack-reg swap ADD ] if ;
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
@@ -567,28 +626,6 @@ M: x86 %compare-float-branch ( label cc src1 src2 -- )
         { cc= [ JE ] }
         { cc/= [ JNE ] }
     } case ;
-
-: stack@ ( n -- op ) stack-reg swap [+] ;
-
-: param@ ( n -- op ) reserved-area-size + stack@ ;
-
-: spill-integer-base ( stack-frame -- n )
-    [ params>> ] [ return>> ] bi + reserved-area-size + ;
-
-: spill-integer@ ( n -- op )
-    cells
-    stack-frame get spill-integer-base
-    + stack@ ;
-
-: spill-float-base ( stack-frame -- n )
-    [ spill-integer-base ]
-    [ spill-counts>> int-regs swap at int-regs reg-size * ]
-    bi + ;
-
-: spill-float@ ( n -- op )
-    double-float-regs reg-size *
-    stack-frame get spill-float-base
-    + stack@ ;
 
 M: x86 %spill-integer ( src n -- ) spill-integer@ swap MOV ;
 M: x86 %reload-integer ( dst n -- ) spill-integer@ MOV ;

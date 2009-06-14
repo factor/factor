@@ -3,7 +3,8 @@ kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
 continuations generic compiler.units tools.continuations
-tools.continuations.private eval accessors make vocabs.parser see ;
+tools.continuations.private eval accessors make vocabs.parser see
+listener ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test

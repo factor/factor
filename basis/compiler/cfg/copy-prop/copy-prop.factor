@@ -6,7 +6,7 @@ IN: compiler.cfg.copy-prop
 SYMBOL: copies
 
 : resolve ( vreg -- vreg )
-    dup copies get at swap or ;
+    [ copies get at ] keep or ;
 
 : record-copy ( insn -- )
     [ src>> resolve ] [ dst>> ] bi copies get set-at ; inline

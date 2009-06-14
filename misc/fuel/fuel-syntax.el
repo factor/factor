@@ -59,7 +59,7 @@
     "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
-    "SINGLETON:" "SINGLETONS:" "SLOT:" "SYMBOL:" "SYMBOLS:"
+    "SINGLETON:" "SINGLETONS:" "SLOT:" "SYMBOL:" "SYMBOLS:" "SYNTAX:"
     "TUPLE:" "t" "t?" "TYPEDEF:"
     "UNION:" "USE:" "USING:"
     "VARS:"))
@@ -109,7 +109,7 @@
   (format "\\_<\\(%s\\)?: +\\_<\\(\\w+\\)\\_>"
           (regexp-opt
            '(":" "GENERIC" "DEFER" "HOOK" "MAIN" "MATH" "POSTPONE"
-             "SYMBOL" "RENAME"))))
+             "SYMBOL" "SYNTAX" "RENAME"))))
 
 (defconst fuel-syntax--alias-definition-regex
   "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
@@ -156,6 +156,7 @@
                                            "INTERSECTION:"
                                            "M" "MACRO" "MACRO:"
                                            "MEMO" "MEMO:" "METHOD"
+                                           "SYNTAX"
                                            "PREDICATE" "PRIMITIVE"
                                            "UNION"))
 

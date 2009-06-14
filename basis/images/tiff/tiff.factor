@@ -1,24 +1,38 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays classes combinators
-compression.lzw constructors endian fry grouping images io
+compression.lzw endian fry grouping images io
 io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
-strings math.vectors specialized-arrays.float locals ;
+strings math.vectors specialized-arrays.float locals
+images.loader ;
 IN: images.tiff
 
-TUPLE: tiff-image < image ;
+SINGLETON: tiff-image
 
-TUPLE: parsed-tiff endianness the-answer ifd-offset ifds ;
-CONSTRUCTOR: parsed-tiff ( -- tiff ) V{ } clone >>ifds ;
+TUPLE: loading-tiff endianness the-answer ifd-offset ifds ;
+
+: <loading-tiff> ( -- tiff )
+    loading-tiff new V{ } clone >>ifds ;
 
 TUPLE: ifd count ifd-entries next
 processed-tags strips bitmap ;
-CONSTRUCTOR: ifd ( count ifd-entries next -- ifd ) ;
+
+: <ifd> ( count ifd-entries next -- ifd )
+    ifd new
+        swap >>next
+        swap >>ifd-entries
+        swap >>count ;
 
 TUPLE: ifd-entry tag type count offset/value ;
-CONSTRUCTOR: ifd-entry ( tag type count offset/value -- ifd-entry ) ;
+
+: <ifd-entry> ( tag type count offset/value -- ifd-entry )
+    ifd-entry new
+        swap >>offset/value
+        swap >>count
+        swap >>type
+        swap >>tag ;
 
 SINGLETONS: photometric-interpretation
 photometric-interpretation-white-is-zero
@@ -409,7 +423,7 @@ ERROR: bad-small-ifd-type n ;
         [ nip unhandled-ifd-entry swap ]
     } case ;
 
-: process-ifds ( parsed-tiff -- parsed-tiff )
+: process-ifds ( loading-tiff -- loading-tiff )
     [
         [
             dup ifd-entries>>
@@ -442,7 +456,7 @@ ERROR: unhandled-compression compression ;
     '[
         _ group
         [ _ group unclip [ v+ ] accumulate swap suffix concat ] map
-        concat >byte-array
+        B{ } concat-as
     ] change-bitmap ;
 
 : strips-predictor ( ifd -- ifd )
@@ -482,18 +496,6 @@ ERROR: unknown-component-order ifd ;
         [ unknown-component-order ]
     } case ;
 
-: normalize-alpha-data ( seq -- byte-array )
-    B{ } like dup
-    byte-array>float-array
-    4 <sliced-groups>
-    [
-        dup fourth dup 0 = [
-            2drop
-        ] [
-            [ 3 head-slice ] dip '[ _ / ] change-each
-        ] if
-    ] each ;
-
 : handle-alpha-data ( ifd -- ifd )
     dup extra-samples find-tag {
         { extra-samples-associated-alpha-data [ ] }
@@ -503,21 +505,21 @@ ERROR: unknown-component-order ifd ;
     } case ;
 
 : ifd>image ( ifd -- image )
-    {
-        [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
-        [ ifd-component-order f ]
-        [ bitmap>> ]
-    } cleave tiff-image boa ;
+    [ <image> ] dip {
+        [ [ image-width find-tag ] [ image-length find-tag ] bi 2array >>dim ]
+        [ ifd-component-order >>component-order ]
+        [ bitmap>> >>bitmap ]
+    } cleave ;
 
 : tiff>image ( image -- image )
     ifds>> [ ifd>image ] map first ;
 
-: with-tiff-endianness ( parsed-tiff quot -- )
+: with-tiff-endianness ( loading-tiff quot -- )
     [ dup endianness>> ] dip with-endianness ; inline
 
-: load-tiff-ifds ( path -- parsed-tiff )
+: load-tiff-ifds ( path -- loading-tiff )
     binary [
-        <parsed-tiff>
+        <loading-tiff>
         read-header [
             dup ifd-offset>> read-ifds
             process-ifds
@@ -549,10 +551,10 @@ ERROR: unknown-component-order ifd ;
         drop "no planar configuration" throw
     ] if ;
 
-: process-tif-ifds ( parsed-tiff -- )
+: process-tif-ifds ( loading-tiff -- )
     ifds>> [ process-ifd ] each ;
 
-: load-tiff ( path -- parsed-tiff )
+: load-tiff ( path -- loading-tiff )
     [ load-tiff-ifds dup ] keep
     binary [
         [ process-tif-ifds ] with-tiff-endianness
@@ -561,3 +563,5 @@ ERROR: unknown-component-order ifd ;
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image load-image* ( path tiff-image -- image )
     drop load-tiff tiff>image ;
+
+{ "tif" "tiff" } [ tiff-image register-image-class ] each

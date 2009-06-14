@@ -1,8 +1,9 @@
-USING: byte-arrays combinators fry images kernel locals math
+USING: accessors arrays byte-arrays combinators
+combinators.short-circuit fry hints images kernel locals math
 math.affine-transforms math.functions math.order
-math.polynomials math.vectors random random.mersenne-twister
-sequences sequences.product hints arrays sequences.private
-combinators.short-circuit math.private ;
+math.polynomials math.private math.vectors random
+random.mersenne-twister sequences sequences.private
+sequences.product ;
 IN: noise
 
 : <perlin-noise-table> ( -- table )
@@ -60,7 +61,10 @@ HINTS: hashes { byte-array fixnum fixnum fixnum } ;
     [ 255.0 * >fixnum ] B{ } map-as ;
 
 : >image ( bytes dim -- image )
-    swap [ L f ] dip image boa ;
+    image new
+        swap >>dim
+        swap >>bitmap
+        L >>component-order ;
 
 :: perlin-noise-unsafe ( table point -- value )
     point unit-cube :> cube
