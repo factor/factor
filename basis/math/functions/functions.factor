@@ -34,8 +34,9 @@ M: integer ^n
 M: ratio ^n
     [ >fraction ] dip [ ^n ] curry bi@ / ;
 
-M: float ^n
-    (^n) ;
+M: float ^n (^n) ;
+
+M: complex ^n (^n) ;
 
 : integer^ ( x y -- z )
     dup 0 > [ ^n ] [ neg ^n recip ] if ; inline
@@ -88,7 +89,7 @@ PRIVATE>
 
 : ^ ( x y -- z )
     {
-        { [ over zero? ] [ nip 0^ ] }
+        { [ over 0 = ] [ nip 0^ ] }
         { [ dup integer? ] [ integer^ ] }
         { [ 2dup real^? ] [ fpow ] }
         [ ^complex ]

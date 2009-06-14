@@ -8,16 +8,16 @@ HELP: dispose
 $nl
 "No further operations can be performed on a disposable object after this call."
 $nl
-"Disposing an object which has already been disposed should have no effect, and in particular it should not fail with an error. To help implement this pattern, add a " { $snippet "disposed" } " slot to your object and implement the " { $link dispose* } " method instead." }
+"Disposing an object which has already been disposed should have no effect, and in particular it should not fail with an error. To help implement this pattern, add a " { $slot "disposed" } " slot to your object and implement the " { $link dispose* } " method instead." }
 { $notes "You must close disposable objects after you are finished working with them, to avoid leaking operating system resources. A convenient way to automate this is by using the " { $link with-disposal } " word."
 $nl
-"The default implementation assumes the object has a " { $snippet "disposable" } " slot. If the slot is set to " { $link f } ", it calls " { $link dispose* } " and sets the slot to " { $link f } "." } ;
+"The default implementation assumes the object has a " { $snippet "disposed" } " slot. If the slot is set to " { $link f } ", it calls " { $link dispose* } " and sets the slot to " { $link t } "." } ;
 
 HELP: dispose*
 { $values { "disposable" "a disposable object" } }
 { $contract "Releases operating system resources associated with a disposable object. Disposable objects include streams, memory mapped files, and so on." }
 { $notes
-    "This word should not be called directly. It can be implemented on objects with a " { $snippet "disposable" } " slot to ensure that the object is only disposed once."
+    "This word should not be called directly. It can be implemented on objects with a " { $slot "disposed" } " slot to ensure that the object is only disposed once."
 } ;
 
 HELP: with-disposal

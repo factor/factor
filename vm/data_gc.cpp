@@ -680,9 +680,15 @@ PRIMITIVE(become)
 	compile_all_words();
 }
 
-VM_C_API void minor_gc()
+VM_ASM_API void inline_gc(cell *gc_roots_base, cell gc_roots_size)
 {
+	for(cell i = 0; i < gc_roots_size; i++)
+		gc_local_push((cell)&gc_roots_base[i]);
+
 	garbage_collection(data->nursery(),false,0);
+
+	for(cell i = 0; i < gc_roots_size; i++)
+		gc_local_pop();
 }
 
 }

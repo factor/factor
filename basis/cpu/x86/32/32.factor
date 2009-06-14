@@ -3,10 +3,11 @@
 USING: locals alien.c-types alien.syntax arrays kernel
 math namespaces sequences system layouts io vocabs.loader
 accessors init combinators command-line cpu.x86.assembler
-cpu.x86 cpu.architecture compiler compiler.units
+cpu.x86 cpu.architecture make compiler compiler.units
 compiler.constants compiler.alien compiler.codegen
 compiler.codegen.fixup compiler.cfg.instructions
-compiler.cfg.builder compiler.cfg.intrinsics make ;
+compiler.cfg.builder compiler.cfg.intrinsics
+compiler.cfg.stack-frame ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -26,10 +27,10 @@ M: x86.32 stack-reg ESP ;
 M: x86.32 temp-reg-1 ECX ;
 M: x86.32 temp-reg-2 EDX ;
 
-M:: x86.32 %dispatch ( src temp offset -- )
+M:: x86.32 %dispatch ( src temp -- )
     ! Load jump table base.
     src HEX: ffffffff ADD
-    offset cells rc-absolute-cell rel-here
+    0 rc-absolute-cell rel-here
     ! Go
     src HEX: 7f [+] JMP
     ! Fix up the displacement above
@@ -305,10 +306,7 @@ os windows? [
     4 "double" c-type (>>align)
 ] unless
 
-FUNCTION: bool check_sse2 ( ) ;
-
-: sse2? ( -- ? )
-    check_sse2 ;
+USING: cpu.x86.features cpu.x86.features.private ;
 
 "-no-sse2" (command-line) member? [
     [ { check_sse2 } compile ] with-optimizer

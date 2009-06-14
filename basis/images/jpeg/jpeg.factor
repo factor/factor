@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays combinators
-constructors grouping compression.huffman images
+grouping compression.huffman images
 images.processing io io.binary io.encodings.binary io.files
 io.streams.byte-array kernel locals math math.bitwise
 math.constants math.functions math.matrices math.order
@@ -21,7 +21,8 @@ TUPLE: jpeg-image < image
 
 <PRIVATE
 
-CONSTRUCTOR: jpeg-image ( headers bitstream -- image ) ;
+: <jpeg-image> ( headers bitstream -- image )
+    jpeg-image new swap >>bitstream swap >>headers ;
 
 SINGLETONS: SOF DHT DAC RST SOI EOI SOS DQT DNL DRI DHP EXP
 APP JPG COM TEM RES ;
@@ -56,12 +57,20 @@ APP JPG COM TEM RES ;
 
 TUPLE: jpeg-chunk length type data ;
 
-CONSTRUCTOR: jpeg-chunk ( type length data -- jpeg-chunk ) ;
+: <jpeg-chunk> ( type length data -- jpeg-chunk )
+    jpeg-chunk new
+        swap >>data
+        swap >>length
+        swap >>type ;
 
 TUPLE: jpeg-color-info
     h v quant-table dc-huff-table ac-huff-table { diff initial: 0 } id ;
 
-CONSTRUCTOR: jpeg-color-info ( h v quant-table -- jpeg-color-info ) ;
+: <jpeg-color-info> ( h v quant-table -- jpeg-color-info )
+    jpeg-color-info new
+        swap >>quant-table
+        swap >>v
+        swap >>h ;
 
 : jpeg> ( -- jpeg-image ) jpeg-image get ;
 
@@ -74,7 +83,6 @@ CONSTRUCTOR: jpeg-color-info ( h v quant-table -- jpeg-color-info ) ;
     [ [ 2 + jpeg> huff-tables>> nth ] change-ac-huff-table drop ] tri ;
 
 : read4/4 ( -- a b ) read1 16 /mod ;
-
 
 ! headers
 
@@ -186,6 +194,9 @@ MEMO: dct-matrix ( -- m ) 64 [0,b) [ 8 /mod dct-vect flatten ] map ;
 
 : mb-dim ( component -- dim )  [ h>> ] [ v>> ] bi 2array ;
 
+! : blocks ( component -- seq )
+!    mb-dim ! coord-matrix flip concat [ [ { 2 2 } v* ] [ v+ ] bi* ] with map ;
+
 : all-macroblocks ( quot: ( mb -- ) -- )
     [
         jpeg>
@@ -209,12 +220,12 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
 
 : idct ( b -- b' ) idct-blas ;
 
-:: draw-block ( block x,y color jpeg-image -- )
+:: draw-block ( block x,y color-id jpeg-image -- )
     block dup length>> sqrt >fixnum group flip
     dup matrix-dim coord-matrix flip
     [
         [ first2 spin nth nth ]
-        [ x,y v+ color id>> 1- jpeg-image draw-color ] bi
+        [ x,y v+ color-id jpeg-image draw-color ] bi
     ] with each^2 ;
 
 : sign-extend ( bits v -- v' )
@@ -227,7 +238,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
 : read1-jpeg-ac ( decoder -- run/ac )
     [ read1-huff 16 /mod dup ] [ bs>> bs:read ] bi sign-extend 2array ;
 
-:: decode-block ( pos color -- )
+:: decode-block ( color -- pixels )
     color dc-huff-table>> read1-jpeg-dc color apply-diff
     64 0 <array> :> coefs
     0 coefs set-nth
@@ -239,19 +250,38 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
         k 63 < and
     ] loop
     coefs color quant-table>> v*
-    reverse-zigzag idct
-    ! %fixme: color hack
-    ! this eat 50% cpu time
-    color h>> 2 =
-    [ 8 group 2 matrix-zoom concat ] unless
-    pos { 8 8 } v* color jpeg> draw-block ;
+    reverse-zigzag idct ;
+    
+:: draw-macroblock-yuv420 ( mb blocks -- )
+    mb { 16 16 } v* :> pos
+    0 blocks nth pos { 0 0 } v+ 0 jpeg> draw-block
+    1 blocks nth pos { 8 0 } v+ 0 jpeg> draw-block
+    2 blocks nth pos { 0 8 } v+ 0 jpeg> draw-block
+    3 blocks nth pos { 8 8 } v+ 0 jpeg> draw-block
+    4 blocks nth 8 group 2 matrix-zoom concat pos 1 jpeg> draw-block
+    5 blocks nth 8 group 2 matrix-zoom concat pos 2 jpeg> draw-block ;
+    
+:: draw-macroblock-yuv444 ( mb blocks -- )
+    mb { 8 8 } v* :> pos
+    3 iota [ [ blocks nth pos ] [ jpeg> draw-block ] bi ] each ;
 
-: decode-macroblock ( mb -- )
+:: draw-macroblock-y ( mb blocks -- )
+    mb { 8 8 } v* :> pos
+    0 blocks nth pos 0 jpeg> draw-block
+    64 0 <array> pos 1 jpeg> draw-block
+    64 0 <array> pos 2 jpeg> draw-block ;
+ 
+    ! %fixme: color hack
+ !   color h>> 2 =
+ !   [ 8 group 2 matrix-zoom concat ] unless
+ !   pos { 8 8 } v* color jpeg> draw-block ;
+
+: decode-macroblock ( -- blocks )
     jpeg> components>>
     [
-        [ mb-dim coord-matrix flip concat [ [ { 2 2 } v* ] [ v+ ] bi* ] with map ]
-        [ [ decode-block ] curry each ] bi
-    ] with each ;
+        [ mb-dim first2 * iota ]
+        [ [ decode-block ] curry replicate ] bi
+    ] map concat ;
 
 : cleanup-bitstream ( bytes -- bytes' )
     binary [
@@ -272,33 +302,67 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
     dup dim>> first2 * 3 * 0 <array> >>bitmap
     drop ;
 
-: baseline-decompress ( -- )
-    jpeg> bitstream>> cleanup-bitstream { 255 255 255 255 } append
-    >byte-array bs:<msb0-bit-reader> jpeg> (>>bitstream)
-    jpeg> [ bitstream>> ] [ [ [ <huffman-decoder> ] with map ] change-huff-tables drop ] bi
-    jpeg> components>> [ fetch-tables ] each
-    jpeg> setup-bitmap
-    [ decode-macroblock ] all-macroblocks ;
+ERROR: unsupported-colorspace ;
+SINGLETONS: YUV420 YUV444 Y MAGIC! ;
+
+:: detect-colorspace ( jpeg-image -- csp )
+    jpeg-image color-info>> sift :> colors
+    MAGIC!
+    colors length 1 = [ drop Y ] when
+    colors length 3 =
+    [
+        colors [ mb-dim { 1 1 } = ] all?
+        [ drop YUV444 ] when
+
+        colors unclip
+        [ [ mb-dim { 1 1 } = ] all? ]
+        [ mb-dim { 2 2 } =  ] bi* and
+        [ drop YUV420 ] when
+    ] when ;
+    
+! this eats ~50% cpu time
+: draw-macroblocks ( mbs -- )
+    jpeg> detect-colorspace
+    {
+        { YUV420 [ [ first2 draw-macroblock-yuv420 ] each ] }
+        { YUV444 [ [ first2 draw-macroblock-yuv444 ] each ] }
+        { Y      [ [ first2 draw-macroblock-y ] each ] }
+        [ unsupported-colorspace ]
+    } case ;
 
 ! this eats ~25% cpu time
 : color-transform ( yuv -- rgb )
     { 128 0 0 } v+ yuv>bgr-matrix swap m.v
     [ 0 max 255 min >fixnum ] map ;
 
+: baseline-decompress ( -- )
+    jpeg> bitstream>> cleanup-bitstream { 255 255 255 255 } append
+    >byte-array bs:<msb0-bit-reader> jpeg> (>>bitstream)
+    jpeg> 
+    [ bitstream>> ] 
+    [ [ [ <huffman-decoder> ] with map ] change-huff-tables drop ] bi
+    jpeg> components>> [ fetch-tables ] each
+    [ decode-macroblock 2array ] accumulator 
+    [ all-macroblocks ] dip
+    jpeg> setup-bitmap draw-macroblocks 
+    jpeg> bitmap>> 3 <groups> [ color-transform ] change-each
+    jpeg> [ >byte-array ] change-bitmap drop ;
+
+ERROR: not-a-jpeg-image ;
+
 PRIVATE>
 
 : load-jpeg ( path -- image )
     binary [
-        parse-marker { SOI } assert=
+        parse-marker { SOI } = [ not-a-jpeg-image ] unless
         parse-headers
         contents <jpeg-image>
     ] with-file-reader
     dup jpeg-image [
         baseline-parse
         baseline-decompress
-        jpeg> bitmap>> 3 <groups> [ color-transform ] change-each
-        jpeg> [ >byte-array ] change-bitmap drop
     ] with-variable ;
 
 M: jpeg-image load-image* ( path jpeg-image -- bitmap )
     drop load-jpeg ;
+

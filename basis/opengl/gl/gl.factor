@@ -1872,7 +1872,7 @@ GL-FUNCTION: void glUniform4uivEXT { } ( GLint location, GLsizei count, GLuint* 
 GL-FUNCTION: void glGetUniformuivEXT { } ( GLuint program, GLint location, GLuint* params ) ;
 
 GL-FUNCTION: void glBindFragDataLocationEXT { } ( GLuint program, GLuint colorNumber, GLchar* name ) ;
-GL-FUNCTION: GLint GetFragDataLocationEXT { } ( GLuint program, GLchar* name ) ;
+GL-FUNCTION: GLint glGetFragDataLocationEXT { } ( GLuint program, GLchar* name ) ;
 
 CONSTANT: GL_VERTEX_ATTRIB_ARRAY_INTEGER_EXT HEX: 88FD
 CONSTANT: GL_SAMPLER_1D_ARRAY_EXT HEX: 8DC0

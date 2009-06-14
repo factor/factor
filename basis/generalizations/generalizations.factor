@@ -39,6 +39,9 @@ MACRO: firstn ( n -- )
 MACRO: npick ( n -- )
     1- [ dup ] [ '[ _ dip swap ] ] repeat ;
 
+MACRO: nover ( n -- )
+    dup '[ _ 1 + npick ] n*quot ;
+
 MACRO: ndup ( n -- )
     dup '[ _ npick ] n*quot ;
 
@@ -69,6 +72,9 @@ MACRO: ncurry ( n -- )
 MACRO: nwith ( n -- )
     [ with ] n*quot ;
 
+MACRO: nbi ( n -- )
+    '[ [ _ nkeep ] dip call ] ;
+
 MACRO: ncleave ( quots n -- )
     [ '[ _ '[ _ _ nkeep ] ] map [ ] join ] [ '[ _ ndrop ] ] bi
     compose ;
@@ -90,6 +96,9 @@ MACRO: mnswap ( m n -- )
 MACRO: nweave ( n -- )
     [ dup <reversed> [ '[ _ _ mnswap ] ] with map ] keep
     '[ _ _ ncleave ] ;
+
+MACRO: nbi-curry ( n -- )
+    [ bi-curry ] n*quot ;
 
 : nappend-as ( n exemplar -- seq )
     [ narray concat ] dip like ; inline

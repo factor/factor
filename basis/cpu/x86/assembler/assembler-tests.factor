@@ -64,3 +64,11 @@ IN: cpu.x86.assembler.tests
 [ { HEX: 48 HEX: d3 HEX: e9 } ] [ [ RCX CL SHR ] { } make ] unit-test
 
 [ { HEX: f7 HEX: c1 HEX: d2 HEX: 04 HEX: 00 HEX: 00 } ] [ [ ECX 1234 TEST ] { } make ] unit-test
+
+[ { HEX: 4d HEX: 6b HEX: c0 HEX: 03 } ] [ [ R8 R8 3 IMUL3 ] { } make ] unit-test
+[ { HEX: 49 HEX: 6b HEX: c0 HEX: 03 } ] [ [ RAX R8 3 IMUL3 ] { } make ] unit-test
+[ { HEX: 4c HEX: 6b HEX: c0 HEX: 03 } ] [ [ R8 RAX 3 IMUL3 ] { } make ] unit-test
+[ { HEX: 48 HEX: 6b HEX: c1 HEX: 03 } ] [ [ RAX RCX 3 IMUL3 ] { } make ] unit-test
+[ { HEX: 48 HEX: 69 HEX: c1 HEX: 44 HEX: 03 HEX: 00 HEX: 00 } ] [ [ RAX RCX HEX: 344 IMUL3 ] { } make ] unit-test
+
+[ { 15 183 195 } ] [ [ EAX BX MOVZX ] { } make ] unit-test
