@@ -943,3 +943,5 @@ PRIVATE>
 
 :: combos ( list1 list2 -- result ) list2 [ [ 2array ] curry list1 swap map ] map concat ;
 : (head-slice) ( seq n -- seq' ) over length over < [ drop ] [ head-slice ] if ;
+: find-all ( seq quot -- elts ) [ [ length iota ] keep ] dip
+    [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry 2map [ ] filter ; inline
