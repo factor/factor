@@ -508,9 +508,11 @@ PRIVATE>
     (each-index) each-integer ; inline
 
 : interleave ( seq between quot -- )
-    swap [ drop ] [ [ 2dip call ] 2curry ] 2bi
-    [ [ 0 = ] 2dip if ] 2curry
-    each-index ; inline
+    pick empty? [ 3drop ] [
+        [ [ drop first-unsafe ] dip call ]
+        [ [ rest-slice ] 2dip [ [ call ] bi@ ] 2curry each ]
+        3bi
+    ] if ; inline
 
 : map-index ( seq quot -- newseq )
     [ dup length iota ] dip 2map ; inline
