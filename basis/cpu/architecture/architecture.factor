@@ -5,13 +5,6 @@ memory namespaces make sequences layouts system hashtables
 classes alien byte-arrays combinators words sets fry ;
 IN: cpu.architecture
 
-! Labels
-TUPLE: label offset ;
-
-: <label> ( -- label ) label new ;
-: define-label ( name -- ) <label> swap set ;
-: resolve-label ( label/name -- ) dup label? [ get ] unless , ;
-
 ! Register classes
 SINGLETON: int-regs
 SINGLETON: single-float-regs
@@ -19,11 +12,21 @@ SINGLETON: double-float-regs
 UNION: float-regs single-float-regs double-float-regs ;
 UNION: reg-class int-regs float-regs ;
 
-! Mapping from register class to machine registers
-HOOK: machine-registers cpu ( -- assoc )
-
 ! A pseudo-register class for parameters spilled on the stack
 SINGLETON: stack-params
+
+GENERIC: reg-size ( register-class -- n )
+
+M: int-regs reg-size drop cell ;
+
+M: single-float-regs reg-size drop 4 ;
+
+M: double-float-regs reg-size drop 8 ;
+
+M: stack-params reg-size drop cell ;
+
+! Mapping from register class to machine registers
+HOOK: machine-registers cpu ( -- assoc )
 
 ! Return values of this class go here
 GENERIC: return-reg ( register-class -- reg )
@@ -51,8 +54,7 @@ HOOK: %jump cpu ( word -- )
 HOOK: %jump-label cpu ( label -- )
 HOOK: %return cpu ( -- )
 
-HOOK: %dispatch cpu ( src temp offset -- )
-HOOK: %dispatch-label cpu ( word -- )
+HOOK: %dispatch cpu ( src temp -- )
 
 HOOK: %slot cpu ( dst obj slot tag temp -- )
 HOOK: %slot-imm cpu ( dst obj slot tag -- )
@@ -126,7 +128,7 @@ HOOK: %alien-global cpu ( dst symbol library -- )
 
 HOOK: %allot cpu ( dst size class temp -- )
 HOOK: %write-barrier cpu ( src card# table -- )
-HOOK: %gc cpu ( -- )
+HOOK: %gc cpu ( temp1 temp2 live-registers live-spill-slots -- )
 
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )

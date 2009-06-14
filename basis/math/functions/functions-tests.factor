@@ -22,6 +22,7 @@ IN: math.functions.tests
 [ t ] [ e pi i* ^ imaginary-part -0.00001 0.00001 between? ] unit-test
 
 [ t ] [ 0 0 ^ fp-nan? ] unit-test
+[ 0.0 ] [ 0.0 1.0 ^ ] unit-test
 [ 1/0. ] [ 0 -2 ^ ] unit-test
 [ t ] [ 0 0.0 ^ fp-nan? ] unit-test
 [ 1/0. ] [ 0 -2.0 ^ ] unit-test
@@ -162,3 +163,4 @@ IN: math.functions.tests
 [ 2.5  ] [ 1.0 2.5 1.0 lerp ] unit-test
 [ 1.75 ] [ 1.0 2.5 0.5 lerp ] unit-test
 
+[ C{ 1 2 } ] [ C{ 1 2 } 1 ^ ] unit-test

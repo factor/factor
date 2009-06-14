@@ -52,14 +52,14 @@ M: extra-words equal?
 
 C: <extra-words> extra-words
 
-<PRIVATE
-
 : clear-manifest ( -- )
     manifest get
     [ search-vocab-names>> clear-assoc ]
     [ search-vocabs>> delete-all ]
     [ qualified-vocabs>> delete-all ]
     tri ;
+
+<PRIVATE
 
 : (add-qualified) ( qualified -- )
     manifest get qualified-vocabs>> push ;
@@ -125,9 +125,6 @@ TUPLE: no-current-vocab ;
         [ [ vocab-name ] dip search-vocab-names>> delete-at ]
         2bi
     ] [ drop ] if ;
-
-: only-use-vocabs ( vocabs -- )
-    clear-manifest [ vocab ] filter [ use-vocab ] each ;
 
 TUPLE: qualified vocab prefix words ;
 

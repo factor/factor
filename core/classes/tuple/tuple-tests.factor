@@ -1,11 +1,12 @@
-USING: definitions generic kernel kernel.private math math.constants
-parser sequences tools.test words assocs namespaces quotations
-sequences.private classes continuations generic.single
-generic.standard effects classes.tuple classes.tuple.private arrays
-vectors strings compiler.units accessors classes.algebra calendar
-prettyprint io.streams.string splitting summary columns math.order
-classes.private slots slots.private eval see words.symbol
-compiler.errors parser.notes ;
+USING: accessors arrays assocs calendar classes classes.algebra
+classes.private classes.tuple classes.tuple.private columns
+compiler.errors compiler.units continuations definitions
+effects eval generic generic.single generic.standard grouping
+io.streams.string kernel kernel.private math math.constants
+math.order namespaces parser parser.notes prettyprint
+quotations random see sequences sequences.private slots
+slots.private splitting strings summary threads tools.test
+vectors vocabs words words.symbol ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -421,7 +422,6 @@ TUPLE: redefinition-problem-2 ;
 [ t ] [ 3 redefinition-problem'? ] unit-test
 
 ! Hardcore unit tests
-USE: threads
 
 \ thread "slots" word-prop "slots" set
 
@@ -438,8 +438,6 @@ USE: threads
         define-tuple-class
     ] with-compilation-unit
 ] unit-test
-
-USE: vocabs
 
 \ vocab "slots" word-prop "slots" set
 
@@ -731,3 +729,50 @@ DEFER: redefine-tuple-twice
 [ ] [ "IN: classes.tuple.tests TUPLE: redefine-tuple-twice ;" eval( -- ) ] unit-test
 
 [ t ] [ \ redefine-tuple-twice symbol? ] unit-test
+
+TUPLE: lucky-number { n initial-quot: [ 64 random-bits ] } ;
+SLOT: winner?
+
+[ t ] [ lucky-number new n>> integer? ] unit-test
+
+: compiled-lucky-number ( -- tuple ) lucky-number new ;
+
+[ t ] [ compiled-lucky-number n>> integer? ] unit-test
+
+! Reshaping initial-quot:
+lucky-number new dup n>> 2array "luckiest-number" set
+
+[ t ] [ "luckiest-number" get first2 [ n>> ] dip = ] unit-test
+
+[ ] [ "USING: accessors random ; IN: classes.tuple.tests TUPLE: lucky-number { n initial-quot: [ 64 random-bits ] } { winner? initial-quot: [ t ] } ;" eval( -- ) ] unit-test
+
+[ t ] [ "luckiest-number" get first2 [ n>> ] dip = ] unit-test
+[ t ] [ "luckiest-number" get first winner?>> ] unit-test
+
+! invalid-quot: together with type declaration
+TUPLE: decl-initial-quot { x integer initial-quot: [ 1 ] } ;
+
+[ t ] [ decl-initial-quot new x>> integer? ] unit-test
+
+: compiled-decl-initial-quot ( -- tuple ) decl-initial-quot new ;
+
+[ t ] [ compiled-decl-initial-quot x>> integer? ] unit-test
+
+! invalid-quot: with read-only
+TUPLE: read-only-initial-quot { x integer read-only initial-quot: [ 1 ] } ;
+
+[ t ] [ read-only-initial-quot new x>> integer? ] unit-test
+
+: compiled-read-only-initial-quot ( -- tuple ) read-only-initial-quot new ;
+
+[ t ] [ compiled-read-only-initial-quot x>> integer? ] unit-test
+
+! Specifying both initial: and initial-quot: should fail
+2 [
+    [
+        "IN: classes.tuple.test TUPLE: redundant-decl { x initial: 0 initial-quot: [ 0 ] } ;"
+        eval( -- )
+    ]
+    [ error>> duplicate-initial-values? ]
+    must-fail-with
+] times

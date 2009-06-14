@@ -1,14 +1,76 @@
 IN: compiler.cfg.linear-scan.tests
 USING: tools.test random sorting sequences sets hashtables assocs
-kernel fry arrays splitting namespaces math accessors vectors
+kernel fry arrays splitting namespaces math accessors vectors locals
 math.order grouping
 cpu.architecture
+compiler.cfg
+compiler.cfg.optimizer
 compiler.cfg.instructions
 compiler.cfg.registers
+compiler.cfg.liveness
+compiler.cfg.predecessors
+compiler.cfg.rpo
 compiler.cfg.linear-scan
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.allocation.splitting
+compiler.cfg.linear-scan.allocation.spilling
+compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.debugger ;
+
+check-allocation? on
+
+[
+    { T{ live-range f 1 10 } T{ live-range f 15 15 } }
+    { T{ live-range f 16 20 } }
+] [
+    {
+        T{ live-range f 1 10 }
+        T{ live-range f 15 20 }
+    } 15 split-ranges
+] unit-test
+
+[
+    { T{ live-range f 1 10 } T{ live-range f 15 16 } }
+    { T{ live-range f 17 20 } }
+] [
+    {
+        T{ live-range f 1 10 }
+        T{ live-range f 15 20 }
+    } 16 split-ranges
+] unit-test
+
+[
+    { T{ live-range f 1 10 } }
+    { T{ live-range f 15 20 } }
+] [
+    {
+        T{ live-range f 1 10 }
+        T{ live-range f 15 20 }
+    } 12 split-ranges
+] unit-test
+
+[
+    { T{ live-range f 1 10 } T{ live-range f 15 17 } }
+    { T{ live-range f 18 20 } }
+] [
+    {
+        T{ live-range f 1 10 }
+        T{ live-range f 15 20 }
+    } 17 split-ranges
+] unit-test
+
+[
+    { T{ live-range f 1 10 } } 0 split-ranges
+] must-fail
+
+[
+    { T{ live-range f 0 0 } }
+    { T{ live-range f 1 5 } }
+] [
+    { T{ live-range f 0 5 } } 0 split-ranges
+] unit-test
 
 [ 7 ] [
     T{ live-interval
@@ -42,46 +104,77 @@ compiler.cfg.linear-scan.debugger ;
 
 [
     T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 0 }
-        { end 1 }
-        { uses V{ 0 1 } }
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 0 }
+       { end 1 }
+       { uses V{ 0 1 } }
+       { ranges V{ T{ live-range f 0 1 } } }
     }
     T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 5 }
-        { end 5 }
-        { uses V{ 5 } }
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 5 }
+       { end 5 }
+       { uses V{ 5 } }
+       { ranges V{ T{ live-range f 5 5 } } }
     }
 ] [
     T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 0 }
-        { end 5 }
-        { uses V{ 0 1 5 } }
-    } 2 split-interval
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 0 }
+       { end 5 }
+       { uses V{ 0 1 5 } }
+       { ranges V{ T{ live-range f 0 5 } } }
+    } 2 split-for-spill [ f >>split-next ] bi@
+] unit-test
+
+[
+    T{ live-interval
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 0 }
+       { end 0 }
+       { uses V{ 0 } }
+       { ranges V{ T{ live-range f 0 0 } } }
+    }
+    T{ live-interval
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 1 }
+       { end 5 }
+       { uses V{ 1 5 } }
+       { ranges V{ T{ live-range f 1 5 } } }
+    }
+] [
+    T{ live-interval
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 0 }
+       { end 5 }
+       { uses V{ 0 1 5 } }
+       { ranges V{ T{ live-range f 0 5 } } }
+    } 0 split-for-spill [ f >>split-next ] bi@
 ] unit-test
 
 [
     T{ live-interval
         { vreg T{ vreg { reg-class int-regs } { n 1 } } }
         { start 0 }
-        { end 0 }
-        { uses V{ 0 } }
+        { end 4 }
+        { uses V{ 0 1 4 } }
+        { ranges V{ T{ live-range f 0 4 } } }
     }
     T{ live-interval
         { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 1 }
+        { start 5 }
         { end 5 }
-        { uses V{ 1 5 } }
+        { uses V{ 5 } }
+        { ranges V{ T{ live-range f 5 5 } } }
     }
 ] [
     T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 0 }
-        { end 5 }
-        { uses V{ 0 1 5 } }
-    } 0 split-interval
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 0 }
+       { end 5 }
+       { uses V{ 0 1 5 } }
+       { ranges V{ T{ live-range f 0 5 } } }
+    } 5 split-before-use [ f >>split-next ] bi@
 ] unit-test
 
 [
@@ -171,7 +264,13 @@ compiler.cfg.linear-scan.debugger ;
 
 [ ] [
     {
-        T{ live-interval { vreg T{ vreg { n 1 } { reg-class int-regs } } } { start 0 } { end 100 } { uses V{ 0 100 } } }
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 100 }
+           { uses V{ 0 100 } }
+           { ranges V{ T{ live-range f 0 100 } } }
+        }
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
@@ -179,8 +278,20 @@ compiler.cfg.linear-scan.debugger ;
 
 [ ] [
     {
-        T{ live-interval { vreg T{ vreg { n 1 } { reg-class int-regs } } } { start 0 } { end 10 } { uses V{ 0 10 } } }
-        T{ live-interval { vreg T{ vreg { n 2 } { reg-class int-regs } } } { start 11 } { end 20 } { uses V{ 11 20 } } }
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 10 }
+           { uses V{ 0 10 } }
+           { ranges V{ T{ live-range f 0 10 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 2 } { reg-class int-regs } } }
+           { start 11 }
+           { end 20 }
+           { uses V{ 11 20 } }
+           { ranges V{ T{ live-range f 11 20 } } }
+        }
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
@@ -188,8 +299,20 @@ compiler.cfg.linear-scan.debugger ;
 
 [ ] [
     {
-        T{ live-interval { vreg T{ vreg { n 1 } { reg-class int-regs } } } { start 0 } { end 100 } { uses V{ 0 100 } } }
-        T{ live-interval { vreg T{ vreg { n 2 } { reg-class int-regs } } } { start 30 } { end 60 } { uses V{ 30 60 } } }
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 100 }
+           { uses V{ 0 100 } }
+           { ranges V{ T{ live-range f 0 100 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 2 } { reg-class int-regs } } }
+           { start 30 }
+           { end 60 }
+           { uses V{ 30 60 } }
+           { ranges V{ T{ live-range f 30 60 } } }
+        }
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
@@ -197,8 +320,20 @@ compiler.cfg.linear-scan.debugger ;
 
 [ ] [
     {
-        T{ live-interval { vreg T{ vreg { n 1 } { reg-class int-regs } } } { start 0 } { end 100 } { uses V{ 0 100 } } }
-        T{ live-interval { vreg T{ vreg { n 2 } { reg-class int-regs } } } { start 30 } { end 200 } { uses V{ 30 200 } } }
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 100 }
+           { uses V{ 0 100 } }
+           { ranges V{ T{ live-range f 0 100 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 2 } { reg-class int-regs } } }
+           { start 30 }
+           { end 200 }
+           { uses V{ 30 200 } }
+           { ranges V{ T{ live-range f 30 200 } } }
+        }
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
@@ -206,8 +341,20 @@ compiler.cfg.linear-scan.debugger ;
 
 [
     {
-        T{ live-interval { vreg T{ vreg { n 1 } { reg-class int-regs } } } { start 0 } { end 100 } { uses V{ 0 100 } } }
-        T{ live-interval { vreg T{ vreg { n 2 } { reg-class int-regs } } } { start 30 } { end 100 } { uses V{ 30 100 } } }
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 100 }
+           { uses V{ 0 100 } }
+           { ranges V{ T{ live-range f 0 100 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 2 } { reg-class int-regs } } }
+           { start 30 }
+           { end 100 }
+           { uses V{ 30 100 } }
+           { ranges V{ T{ live-range f 30 100 } } }
+        }
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
@@ -240,11 +387,12 @@ SYMBOL: max-uses
         max-insns get [ 0 ] replicate taken set
         max-insns get [ dup ] H{ } map>assoc available set
         [
-            live-interval new
+            \ live-interval new
                 swap int-regs swap vreg boa >>vreg
                 max-uses get random 2 max [ not-taken ] replicate natural-sort
                 [ >>uses ] [ first >>start ] bi
                 dup uses>> last >>end
+                dup [ start>> ] [ end>> ] bi <live-range> 1vector >>ranges
         ] map
     ] with-scope ;
 
@@ -264,45 +412,15 @@ SYMBOL: max-uses
 
 USING: math.private compiler.cfg.debugger ;
 
-[ ] [ [ float+ float>fixnum 3 fixnum*fast ] test-mr first linear-scan drop ] unit-test
-
-[ f ] [
-    T{ ##allot
-        f
-        T{ vreg f int-regs 1 }
-        40
-        array
-        T{ vreg f int-regs 2 }
-        f
-    } clone
-    1array (linear-scan) first regs>> values all-equal?
+[ ] [
+    [ float+ float>fixnum 3 fixnum*fast ]
+    test-cfg first optimize-cfg linear-scan drop
 ] unit-test
 
-[ 0 1 ] [
-    {
-        T{ live-interval
-            { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-            { start 0 }
-            { end 5 }
-            { uses V{ 0 1 5 } }
-        }
-        T{ live-interval
-            { vreg T{ vreg { reg-class int-regs } { n 2 } } }
-            { start 3 }
-            { end 4 }
-            { uses V{ 3 4 } }
-        }
-        T{ live-interval
-            { vreg T{ vreg { reg-class int-regs } { n 3 } } }
-            { start 2 }
-            { end 6 }
-            { uses V{ 2 4 6 } }
-        }
-    } [ clone ] map
-    H{ { int-regs { "A" "B" } } }
-    allocate-registers
-    first split-before>> [ start>> ] [ end>> ] bi
-] unit-test
+: fake-live-ranges ( seq -- seq' )
+    [
+        clone dup [ start>> ] [ end>> ] bi <live-range> 1vector >>ranges
+    ] map ;
 
 ! Coalescing interacted badly with splitting
 [ ] [
@@ -351,7 +469,7 @@ USING: math.private compiler.cfg.debugger ;
             { end 10 }
             { uses V{ 9 10 } }
         }
-    }
+    } fake-live-ranges
     { { int-regs { 0 1 2 3 } } }
     allocate-registers drop
 ] unit-test
@@ -1106,7 +1224,7 @@ USING: math.private compiler.cfg.debugger ;
             { end 109 }
             { uses V{ 103 109 } }
         }
-    }
+    } fake-live-ranges
     { { int-regs { 0 1 2 3 4 } } }
     allocate-registers drop
 ] unit-test
@@ -1199,7 +1317,487 @@ USING: math.private compiler.cfg.debugger ;
             { end 92 }
             { uses V{ 42 45 78 80 92 } }
         }
-    }
+    } fake-live-ranges
     { { int-regs { 0 1 2 3 } } }
     allocate-registers drop
 ] unit-test
+
+! Spill slot liveness was computed incorrectly, leading to a FEP
+! early in bootstrap on x86-32
+[ t ] [
+    [
+        H{ } clone live-ins set
+        H{ } clone live-outs set
+        H{ } clone phi-live-ins set
+        T{ basic-block
+           { id 12345 }
+           { instructions
+             V{
+                 T{ ##gc f V int-regs 6 V int-regs 7 }
+                 T{ ##peek f V int-regs 0 D 0 }
+                 T{ ##peek f V int-regs 1 D 1 }
+                 T{ ##peek f V int-regs 2 D 2 }
+                 T{ ##peek f V int-regs 3 D 3 }
+                 T{ ##peek f V int-regs 4 D 4 }
+                 T{ ##peek f V int-regs 5 D 5 }
+                 T{ ##replace f V int-regs 0 D 1 }
+                 T{ ##replace f V int-regs 1 D 2 }
+                 T{ ##replace f V int-regs 2 D 3 }
+                 T{ ##replace f V int-regs 3 D 4 }
+                 T{ ##replace f V int-regs 4 D 5 }
+                 T{ ##replace f V int-regs 5 D 0 }
+             }
+           }
+        } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
+        instructions>> first live-spill-slots>> empty?
+    ] with-scope
+] unit-test
+
+[ f ] [
+    T{ live-range f 0 10 }
+    T{ live-range f 20 30 }
+    intersect-live-range
+] unit-test
+
+[ 10 ] [
+    T{ live-range f 0 10 }
+    T{ live-range f 10 30 }
+    intersect-live-range
+] unit-test
+
+[ 5 ] [
+    T{ live-range f 0 10 }
+    T{ live-range f 5 30 }
+    intersect-live-range
+] unit-test
+
+[ 5 ] [
+    T{ live-range f 5 30 }
+    T{ live-range f 0 10 }
+    intersect-live-range
+] unit-test
+
+[ 5 ] [
+    T{ live-range f 5 10 }
+    T{ live-range f 0 15 }
+    intersect-live-range
+] unit-test
+
+[ 50 ] [
+    {
+        T{ live-range f 0 10 }
+        T{ live-range f 20 30 }
+        T{ live-range f 40 50 }
+    }
+    {
+        T{ live-range f 11 15 }
+        T{ live-range f 31 35 }
+        T{ live-range f 50 55 }
+    }
+    intersect-live-ranges
+] unit-test
+
+[ 5 ] [
+    T{ live-interval
+       { start 0 }
+       { end 10 }
+       { uses { 0 10 } }
+       { ranges V{ T{ live-range f 0 10 } } }
+    }
+    T{ live-interval
+       { start 5 }
+       { end 10 }
+       { uses { 5 10 } }
+       { ranges V{ T{ live-range f 5 10 } } }
+    }
+    H{ }
+    intersect-inactive
+] unit-test
+
+! Bug in live spill slots calculation
+
+T{ basic-block
+   { id 205651 }
+   { number 0 }
+   { instructions V{ T{ ##prologue } T{ ##branch } } }
+} 0 set
+
+T{ basic-block
+   { id 205652 }
+   { number 1 }
+   { instructions
+     V{
+         T{ ##peek
+            { dst V int-regs 703128 }
+            { loc D 1 }
+         }
+         T{ ##peek
+            { dst V int-regs 703129 }
+            { loc D 0 }
+         }
+         T{ ##copy
+            { dst V int-regs 703134 }
+            { src V int-regs 703128 }
+         }
+         T{ ##copy
+            { dst V int-regs 703135 }
+            { src V int-regs 703129 }
+         }
+         T{ ##compare-imm-branch
+            { src1 V int-regs 703128 }
+            { src2 5 }
+            { cc cc/= }
+         }
+     }
+   }
+} 1 set
+
+T{ basic-block
+   { id 205653 }
+   { number 2 }
+   { instructions
+     V{
+         T{ ##copy
+            { dst V int-regs 703134 }
+            { src V int-regs 703129 }
+         }
+         T{ ##copy
+            { dst V int-regs 703135 }
+            { src V int-regs 703128 }
+         }
+         T{ ##branch }
+     }
+   }
+} 2 set
+
+T{ basic-block
+   { id 205655 }
+   { number 3 }
+   { instructions
+     V{
+         T{ ##replace
+            { src V int-regs 703134 }
+            { loc D 0 }
+         }
+         T{ ##replace
+            { src V int-regs 703135 }
+            { loc D 1 }
+         }
+         T{ ##epilogue }
+         T{ ##return }
+     }
+   }
+} 3 set
+
+1 get 1vector 0 get (>>successors)
+2 get 3 get V{ } 2sequence 1 get (>>successors)
+3 get 1vector 2 get (>>successors)
+
+:: test-linear-scan-on-cfg ( regs -- )
+    [ ] [
+        cfg new 0 get >>entry
+        compute-predecessors
+        compute-liveness
+        reverse-post-order
+        { { int-regs regs } } (linear-scan)
+    ] unit-test ;
+
+{ 1 2 } test-linear-scan-on-cfg
+
+! Bug in inactive interval handling
+! [ rot dup [ -rot ] when ]
+T{ basic-block
+   { id 201486 }
+   { number 0 }
+   { instructions V{ T{ ##prologue } T{ ##branch } } }
+} 0 set
+    
+T{ basic-block
+   { id 201487 }
+   { number 1 }
+   { instructions
+     V{
+         T{ ##peek
+            { dst V int-regs 689473 }
+            { loc D 2 }
+         }
+         T{ ##peek
+            { dst V int-regs 689474 }
+            { loc D 1 }
+         }
+         T{ ##peek
+            { dst V int-regs 689475 }
+            { loc D 0 }
+         }
+         T{ ##compare-imm-branch
+            { src1 V int-regs 689473 }
+            { src2 5 }
+            { cc cc/= }
+         }
+     }
+   }
+} 1 set
+
+T{ basic-block
+   { id 201488 }
+   { number 2 }
+   { instructions
+     V{
+         T{ ##copy
+            { dst V int-regs 689481 }
+            { src V int-regs 689475 }
+         }
+         T{ ##copy
+            { dst V int-regs 689482 }
+            { src V int-regs 689474 }
+         }
+         T{ ##copy
+            { dst V int-regs 689483 }
+            { src V int-regs 689473 }
+         }
+         T{ ##branch }
+     }
+   }
+} 2 set
+
+T{ basic-block
+   { id 201489 }
+   { number 3 }
+   { instructions
+     V{
+         T{ ##copy
+            { dst V int-regs 689481 }
+            { src V int-regs 689473 }
+         }
+         T{ ##copy
+            { dst V int-regs 689482 }
+            { src V int-regs 689475 }
+         }
+         T{ ##copy
+            { dst V int-regs 689483 }
+            { src V int-regs 689474 }
+         }
+         T{ ##branch }
+     }
+   }
+} 3 set
+
+T{ basic-block
+   { id 201490 }
+   { number 4 }
+   { instructions
+     V{
+         T{ ##replace
+            { src V int-regs 689481 }
+            { loc D 0 }
+         }
+         T{ ##replace
+            { src V int-regs 689482 }
+            { loc D 1 }
+         }
+         T{ ##replace
+            { src V int-regs 689483 }
+            { loc D 2 }
+         }
+         T{ ##epilogue }
+         T{ ##return }
+     }
+   }
+} 4 set
+
+: test-diamond ( -- )
+    1 get 1vector 0 get (>>successors)
+    2 get 3 get V{ } 2sequence 1 get (>>successors)
+    4 get 1vector 2 get (>>successors)
+    4 get 1vector 3 get (>>successors) ;
+
+test-diamond
+
+{ 1 2 3 4 } test-linear-scan-on-cfg
+
+! Similar to the above
+! [ swap dup [ rot ] when ]
+
+T{ basic-block
+   { id 201537 }
+   { number 0 }
+   { instructions V{ T{ ##prologue } T{ ##branch } } }
+} 0 set
+    
+T{ basic-block
+   { id 201538 }
+   { number 1 }
+   { instructions
+     V{
+         T{ ##peek
+            { dst V int-regs 689600 }
+            { loc D 1 }
+         }
+         T{ ##peek
+            { dst V int-regs 689601 }
+            { loc D 0 }
+         }
+         T{ ##compare-imm-branch
+            { src1 V int-regs 689600 }
+            { src2 5 }
+            { cc cc/= }
+         }
+     }
+   }
+} 1 set
+    
+T{ basic-block
+   { id 201539 }
+   { number 2 }
+   { instructions
+     V{
+         T{ ##peek
+            { dst V int-regs 689604 }
+            { loc D 2 }
+         }
+         T{ ##copy
+            { dst V int-regs 689607 }
+            { src V int-regs 689604 }
+         }
+         T{ ##copy
+            { dst V int-regs 689608 }
+            { src V int-regs 689600 }
+         }
+         T{ ##copy
+            { dst V int-regs 689610 }
+            { src V int-regs 689601 }
+         }
+         T{ ##branch }
+     }
+   }
+} 2 set
+    
+T{ basic-block
+   { id 201540 }
+   { number 3 }
+   { instructions
+     V{
+         T{ ##peek
+            { dst V int-regs 689609 }
+            { loc D 2 }
+         }
+         T{ ##copy
+            { dst V int-regs 689607 }
+            { src V int-regs 689600 }
+         }
+         T{ ##copy
+            { dst V int-regs 689608 }
+            { src V int-regs 689601 }
+         }
+         T{ ##copy
+            { dst V int-regs 689610 }
+            { src V int-regs 689609 }
+         }
+         T{ ##branch }
+     }
+   }
+} 3 set
+    
+T{ basic-block
+   { id 201541 }
+   { number 4 }
+   { instructions
+     V{
+         T{ ##replace
+            { src V int-regs 689607 }
+            { loc D 0 }
+         }
+         T{ ##replace
+            { src V int-regs 689608 }
+            { loc D 1 }
+         }
+         T{ ##replace
+            { src V int-regs 689610 }
+            { loc D 2 }
+         }
+         T{ ##epilogue }
+         T{ ##return }
+     }
+   }
+} 4 set
+
+test-diamond
+
+{ 1 2 3 4 } test-linear-scan-on-cfg
+
+! compute-live-registers was inaccurate since it didn't take
+! lifetime holes into account
+
+T{ basic-block
+   { id 0 }
+   { number 0 }
+   { instructions V{ T{ ##prologue } T{ ##branch } } }
+} 0 set
+
+T{ basic-block
+   { id 1 }
+   { instructions
+     V{
+         T{ ##peek
+            { dst V int-regs 0 }
+            { loc D 0 }
+         }
+         T{ ##compare-imm-branch
+            { src1 V int-regs 0 }
+            { src2 5 }
+            { cc cc/= }
+         }
+     }
+   }
+} 1 set
+
+T{ basic-block
+   { id 2 }
+   { instructions
+     V{
+         T{ ##peek
+            { dst V int-regs 1 }
+            { loc D 1 }
+         }
+         T{ ##copy
+            { dst V int-regs 2 }
+            { src V int-regs 1 }
+         }
+         T{ ##branch }
+     }
+   }
+} 2 set
+
+T{ basic-block
+   { id 3 }
+   { instructions
+     V{
+         T{ ##peek
+            { dst V int-regs 3 }
+            { loc D 2 }
+         }
+         T{ ##copy
+            { dst V int-regs 2 }
+            { src V int-regs 3 }
+         }
+         T{ ##branch }
+     }
+   }
+} 3 set
+
+T{ basic-block
+   { id 4 }
+   { instructions
+     V{
+         T{ ##replace
+            { src V int-regs 2 }
+            { loc D 0 }
+         }
+         T{ ##return }
+     }
+   }
+} 4 set
+
+test-diamond
+
+{ 1 2 3 4 } test-linear-scan-on-cfg

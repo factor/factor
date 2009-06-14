@@ -1,10 +1,12 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces words
 math math.order layouts classes.algebra alien byte-arrays
 compiler.constants combinators compiler.cfg.registers
 compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.instructions
+
+: new-insn ( ... class -- insn ) [ f f ] dip boa ; inline
 
 ! Virtual CPU instructions, used by CFG and machine IRs
 TUPLE: insn ;
@@ -44,26 +46,19 @@ M: fixnum ##load-literal tag-fixnum ##load-immediate ;
 M: f ##load-literal drop \ f tag-number ##load-immediate ;
 M: object ##load-literal ##load-reference ;
 
-INSN: ##peek < ##read { loc loc } ;
-INSN: ##replace < ##write { loc loc } ;
+INSN: ##peek < ##flushable { loc loc } ;
+INSN: ##replace < ##effect { loc loc } ;
 INSN: ##inc-d { n integer } ;
 INSN: ##inc-r { n integer } ;
 
 ! Subroutine calls
-TUPLE: stack-frame
-{ params integer }
-{ return integer }
-{ total-size integer }
-spill-counts ;
-
 INSN: ##stack-frame stack-frame ;
-INSN: ##call word ;
+INSN: ##call word { height integer } ;
 INSN: ##jump word ;
 INSN: ##return ;
 
 ! Jump tables
-INSN: ##dispatch src temp offset ;
-INSN: ##dispatch-label label ;
+INSN: ##dispatch src temp ;
 
 ! Slot access
 INSN: ##slot < ##read { obj vreg } { slot vreg } { tag integer } { temp vreg } ;
@@ -160,9 +155,12 @@ INSN: ##set-alien-double < ##alien-setter ;
 
 ! Memory allocation
 INSN: ##allot < ##flushable size class { temp vreg } ;
+
+UNION: ##allocation ##allot ##box-float ##box-alien ##integer>bignum ;
+
 INSN: ##write-barrier < ##effect card# table ;
 
-INSN: ##alien-global < ##read symbol library ;
+INSN: ##alien-global < ##flushable symbol library ;
 
 ! FFI
 INSN: ##alien-invoke params ;
@@ -177,6 +175,8 @@ INSN: ##epilogue ;
 INSN: ##branch ;
 
 INSN: ##loop-entry ;
+
+INSN: ##phi < ##pure inputs ;
 
 ! Condition codes
 SYMBOL: cc<
@@ -217,15 +217,18 @@ INSN: ##compare-imm < ##binary-imm cc temp ;
 INSN: ##compare-float-branch < ##conditional-branch ;
 INSN: ##compare-float < ##binary cc temp ;
 
+INSN: ##gc { temp1 vreg } { temp2 vreg } live-registers live-spill-slots ;
+
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;
 INSN: _epilogue stack-frame ;
 
 INSN: _label id ;
 
-INSN: _gc ;
-
 INSN: _branch label ;
+
+INSN: _dispatch src temp ;
+INSN: _dispatch-label label ;
 
 TUPLE: _conditional-branch < insn label { src1 vreg } { src2 vreg } cc ;
 
@@ -234,8 +237,13 @@ INSN: _compare-imm-branch label { src1 vreg } { src2 integer } cc ;
 
 INSN: _compare-float-branch < _conditional-branch ;
 
+TUPLE: spill-slot n ; C: <spill-slot> spill-slot
+
+INSN: _gc { temp1 vreg } { temp2 vreg } gc-roots gc-root-count gc-root-size ;
+
 ! These instructions operate on machine registers and not
 ! virtual registers
 INSN: _spill src class n ;
 INSN: _reload dst class n ;
+INSN: _copy dst src class ;
 INSN: _spill-counts counts ;
