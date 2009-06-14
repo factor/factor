@@ -1,5 +1,4 @@
-USING: accessors arrays kernel monads models models.product sequences ui.frp.functors
-classes ui.tools.inspector tools.continuations ;
+USING: accessors arrays kernel monads models models.product sequences classes ;
 FROM: models.product => product ;
 IN: ui.frp.signals
 
@@ -106,4 +105,5 @@ PRIVATE>
 
 M: model >>= [ swap <action> ] curry ;
 M: model fmap <mapped> ;
+USE: ui.frp.functors
 FMAPS: $> <$ fmap FOR & | product ;
