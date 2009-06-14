@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.libraries alien.syntax
 combinators kernel tokyo.alien.tchdb tokyo.alien.tcutil
 tokyo.alien.tcbdb tokyo.alien.tcfdb tokyo.alien.tctdb ;
-IN: tokyo.alien.tcrdb
+IN: tokyo.alien.tcadb
 
 LIBRARY: tokyocabinet
 
