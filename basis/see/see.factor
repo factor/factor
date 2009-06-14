@@ -165,11 +165,13 @@ M: array pprint-slot-name
         dup name>> ,
         dup class>> object eq? [
             dup class>> ,
-            initial: ,
-            dup initial>> ,
         ] unless
         dup read-only>> [
             read-only ,
+        ] when
+        dup [ class>> object eq? not ] [ initial>> ] bi or [
+            initial: ,
+            dup initial>> ,
         ] when
         drop
     ] { } make ;
