@@ -21,7 +21,7 @@ IN: compiler.cfg.linear-scan.resolve
     ;
 
 : resolve-edge-data-flow ( bb to -- )
-    [ 2dup live-in [ resolve-value-data-flow ] with with each ]
+    [ dup live-in [ resolve-value-data-flow ] with with each ]
     [ resolve-mappings ]
     2bi ; 
 
