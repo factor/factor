@@ -1,7 +1,7 @@
 USING: accessors arrays fry kernel lexer make math.parser models
 models.product namespaces parser sequences ui.frp.gadgets
 ui.gadgets ui.gadgets.books ui.gadgets.tracks vectors words
-combinators ;
+combinators ui.frp.signals ;
 QUALIFIED: make
 IN: ui.frp.layout
 
@@ -26,7 +26,7 @@ M: gadget -> dup , output-model ;
 M: model -> dup , ;
 
 : ,? ( uiitem -- ) inserting get parent>> children>> over
-    [ [ unique ] bi@ = ] curry find drop [ drop ] [ , ] if ;
+    [ unique= ] curry find drop [ drop ] [ , ] if ;
 
 : ->? ( uiitem -- model ) dup ,? output-model ;
 

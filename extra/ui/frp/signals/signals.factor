@@ -1,13 +1,31 @@
-USING: accessors arrays kernel monads models models.product sequences ui.frp.functors ;
+USING: accessors arrays kernel monads models models.product sequences ui.frp.functors
+classes ui.tools.inspector tools.continuations ;
 FROM: models.product => product ;
 IN: ui.frp.signals
 
-TUPLE: multi-model < model ;
+GENERIC: (unique) ( gadget -- a )
+M: model (unique) ;
+: unique ( a -- b ) [ class ] [ (unique) ] bi 2array ;
+: unique= ( a b -- ? ) [ unique ] bi@ = ;
+
+GENERIC: null-val ( gadget -- model )
+M: model null-val drop f ;
+
+TUPLE: multi-model < model important? ;
 GENERIC: (model-changed) ( model observer -- )
 : <multi-model> ( models kind -- model ) f swap new-model [ [ add-dependency ] curry each ] keep ;
 M: multi-model model-changed over value>> [ (model-changed) ] [ 2drop ] if ;
 M: multi-model model-activated dup dependencies>> [ value>> ] find nip
    [ swap model-changed ] [ drop ] if* ;
+
+: #1 ( model -- model' ) t >>important? ;
+
+IN: models
+: notify-connections ( model -- )
+    dup connections>> dup [ dup multi-model? [ important?>> ] [ drop f ] if ] find-all
+    [ second tuck [ remove ] dip prefix ] each
+    [ model-changed ] with each ;
+IN: ui.frp.signals
 
 TUPLE: basic-model < multi-model ;
 M: basic-model (model-changed) [ value>> ] dip set-model ;
@@ -32,9 +50,10 @@ M: updater-model (model-changed) tuck updates>> =
 : <updates> ( values updates -- signal ) [ 2array updater-model <multi-model> ] 2keep
    [ >>values ] [ >>updates ] bi* ;
 
+SYMBOL: switch
 TUPLE: switch-model < multi-model original switcher on ;
-M: switch-model model-changed 2dup switcher>> =
-   [ [ value>> ] dip over [ t >>on set-model ] [ nip [ original>> ] keep f >>on model-changed ] if ]
+M: switch-model (model-changed) 2dup switcher>> =
+   [ [ value>> ] dip over switch = [ nip [ original>> ] keep f >>on model-changed ] [ t >>on set-model ] if ]
    [ dup on>> [ 2drop ] [ [ value>> ] dip over [ set-model ] [ 2drop ] if ] if ] if ;
 : <switch> ( signal1 signal2 -- signal' ) swap [ 2array switch-model <multi-model> ] 2keep
    [ [ value>> >>value ] [ >>original ] bi ] [ >>switcher ] bi* ;
@@ -80,9 +99,11 @@ M: | update-model
     dup value>> swap [ set-model ] set-product-value ;
 M: | model-activated dup model-changed ;
 
-! Only when everything's true does he make it false
 TUPLE: & < | ;
 : <&> ( models -- product ) & <multi-model> ;
-M: & models-changed dependencies>> [ f swap (>>value) ] each ;
+M: & models-changed dependencies>> [ [ null-val ] keep (>>value) ] each ;
 PRIVATE>
+
+M: model >>= [ swap <action> ] curry ;
+M: model fmap <mapped> ;
 FMAPS: $> <$ fmap FOR & | product ;
