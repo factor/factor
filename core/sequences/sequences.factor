@@ -358,8 +358,14 @@ PRIVATE>
 
 <PRIVATE
 
+: ((each)) ( seq -- n quot )
+    [ length ] keep [ nth-unsafe ] curry ; inline
+
 : (each) ( seq quot -- n quot' )
-    [ [ length ] keep [ nth-unsafe ] curry ] dip compose ; inline
+    [ ((each)) ] dip compose ; inline
+
+: (each-index) ( seq quot -- n quot' )
+    [ ((each)) [ keep ] curry ] dip compose ; inline
 
 : (collect) ( quot into -- quot' )
     [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
@@ -498,11 +504,8 @@ PRIVATE>
 : follow ( obj quot -- seq )
     [ dup ] swap [ keep ] curry produce nip ; inline
 
-: prepare-index ( seq quot -- seq n quot )
-    [ dup length ] dip ; inline
-
 : each-index ( seq quot -- )
-    prepare-index 2each ; inline
+    (each-index) each-integer ; inline
 
 : interleave ( seq between quot -- )
     swap [ drop ] [ [ 2dip call ] 2curry ] 2bi
@@ -510,7 +513,7 @@ PRIVATE>
     each-index ; inline
 
 : map-index ( seq quot -- newseq )
-    prepare-index 2map ; inline
+    [ dup length iota ] dip 2map ; inline
 
 : reduce-index ( seq identity quot -- )
     swapd each-index ; inline
