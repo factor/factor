@@ -1,4 +1,4 @@
-USING: central help.markup help.syntax ;
+USING: central destructors help.markup help.syntax ;
 
 HELP: CENTRAL:
 { $description
@@ -7,4 +7,10 @@ HELP: CENTRAL:
     { $snippet "with-symbol" } ".  This is a middle ground between excessive "
     "stack manipulation and full-out locals, meant to solve the case where "
     "one object is operated on by several related words."
+} ;
+
+HELP: DISPOSABLE-CENTRAL:
+{ $description
+    "Like " { $link POSTPONE: CENTRAL: } ", but generates " { $snippet "with-" }
+    " words that are wrapped in a " { $link with-disposal } "."
 } ;
