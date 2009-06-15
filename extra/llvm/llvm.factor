@@ -5,7 +5,7 @@ quotations sequences specialized-arrays.alien ;
 IN: llvm
 
 : llvm-throw ( char** -- )
-    *void* [ alien>string ] [ LLVMDisposeMessage ] bi throw ;
+    [ alien>string ] [ LLVMDisposeMessage ] bi throw ;
 
 DISPOSABLE-CENTRAL: module
 CENTRAL: function
@@ -77,9 +77,3 @@ M: LLVMExecutionEngine dispose* value>> LLVMDisposeExecutionEngine ;
 
 : find-function ( name -- fn )
     engine value>> swap f <void*> [ LLVMFindFunction drop ] keep *void* ;
-
-: llvm-int ( n -- Value )
-    32 LLVMIntType swap 1 LLVMCreateGenericValueOfInt ;
-
-: prepare-args ( function seq -- f numargs args )
-    over LLVMCountParams swap [ llvm-int ] map f suffix >void*-array ;
