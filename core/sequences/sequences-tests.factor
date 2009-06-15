@@ -286,3 +286,8 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 [ f f ] [
     { 1 2 3 4 5 6 7 8 } [ H{ { 11 "hi" } } at ] map-find
 ] unit-test
+
+USE: make
+
+[ { "a" 1 "b" 1 "c" } ]
+[ 1 { "a" "b" "c" } [ [ dup , ] [ , ] interleave drop ] { } make ] unit-test
