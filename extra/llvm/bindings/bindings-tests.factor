@@ -1,5 +1,5 @@
 USING: accessors alien compiler.units kernel
-llvm tools.test words llvm.core ;
+llvm.bindings llvm.core tools.test words ;
 
 IN: scratchpad
 
