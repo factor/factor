@@ -406,9 +406,6 @@ PRIVATE>
     [ 2drop f f ]
     if ; inline
 
-: interleave-step ( elt between quot -- )
-    [ dip ] dip call ; inline
-
 PRIVATE>
 
 : each ( seq quot -- )
@@ -513,7 +510,7 @@ PRIVATE>
 : interleave ( seq between quot -- )
     pick empty? [ 3drop ] [
         [ [ drop first-unsafe ] dip call ]
-        [ [ rest-slice ] 2dip [ interleave-step ] 2curry each ]
+        [ [ rest-slice ] 2dip [ bi* ] 2curry each ]
         3bi
     ] if ; inline
 
