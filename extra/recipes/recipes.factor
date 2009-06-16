@@ -32,21 +32,22 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
       <frp-table*> :> tbl
       "okay" <frp-border-button> BUTTON -> :> ok
       "submit" <image-button> [ store-tuple ] >>value TOOLBAR -> :> submit
-      "love" <image-button> TOOLBAR -> [ 1 ] <$
-      "hate" <image-button> -> [ -1 ] <$ 2array <merge> :> votes
+      "love" <image-button> 1 >>value TOOLBAR ->
+      "hate" <image-button> -1 >>value -> 2array <merge> :> votes
       "back" <image-button> -> [ -30 ] <$
       "more" <image-button> -> [ 30 ] <$ 2array <merge> :> viewed
       <frp-field*> SEARCH ->% 1 :> search
       submit ok [ [ drop ] ] <$ 2array <merge> [ drop ] >>value :> quot
-      viewed 0 [ + ] <fold> search ok t <basic> "all" <frp-button> GENRES -> 3array <merge>
+      viewed 0 [ + ] <fold> search ok t <basic> "all" <frp-button> GENRES ->
+      tbl selected-value>> votes [ [ + ] curry change-votes modify-tuple ] 2$>-|
+        4array <merge>
         [ drop [ f ] [ "%" dup surround <pattern> ] if-empty top-recipes ] 3fmap-| :> updates
       updates [ top-genres UI[ <frp-button> GENRES ->? ] map <merge> ] bind*
         [ text>> T{ recipe } swap >>genre get-tuples ] fmap
       tbl swap updates 2array <merge> >>model
         [ [ title>> ] [ genre>> ] bi 2array ] >>quot
-        { "Title" "Genre" } >>column-titles dup <scroller> RECIPES ,% 1 actions>> :> val
-      val votes [ [ + ] curry change-votes store-tuple ] 2$>-| ,
-      val submit [ "" dup dup <recipe> ] <$ 2array <merge>
+        { "Title" "Genre" } >>column-titles dup <scroller> RECIPES ,% 1 actions>>
+      submit [ "" dup dup <recipe> ] <$ 2array <merge>
         { [ [ title>> ] fmap <frp-field> TITLE ->% .5 ]
           [ [ genre>> ] fmap <frp-field> GENRE ->% .5 ]
           [ [ txt>> ] fmap <frp-editor> BODY ->% 1 ]
