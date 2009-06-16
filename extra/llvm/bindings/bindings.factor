@@ -2,7 +2,7 @@ USING: accessors alien.c-types alien.strings arrays
 central destructors kernel llvm.core llvm.engine
 quotations sequences specialized-arrays.alien ;
 
-IN: llvm
+IN: llvm.bindings
 
 : llvm-throw ( char** -- )
     [ alien>string ] [ LLVMDisposeMessage ] bi throw ;
