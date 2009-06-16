@@ -5,10 +5,6 @@ IN: ui.gadgets.sliders
 HELP: elevator
 { $class-description "An elevator is the part of a " { $link slider } " between the up/down arrow buttons, where a " { $link thumb } " may be moved up and down." } ;
 
-HELP: find-elevator
-{ $values { "gadget" gadget } { "elevator/f" { $maybe elevator } } }
-{ $description "Finds the first parent of " { $snippet "gadget" } " which is an " { $link elevator } ". Outputs " { $link f } " if the gadget is not contained in an " { $link elevator } "." } ;
-
 HELP: slider
 { $class-description "A slider is a control for graphically manipulating a " { $link "models-range" } "."
 $nl
