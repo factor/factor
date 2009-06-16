@@ -58,8 +58,6 @@ M: object (fake-quotations>) , ;
     [ parse-definition* ] dip
     parsed ;
 
-: DEFINE* ( accum -- accum ) \ define-declared* parsed ;
-
 SYNTAX: `TUPLE:
     scan-param parsed
     scan {
