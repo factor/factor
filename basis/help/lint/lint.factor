@@ -55,8 +55,6 @@ PRIVATE>
         ] check-something
     ] [ drop ] if ;
 
-: check-words ( words -- ) [ check-word ] each ;
-
 : check-article ( article -- )
     [ with-interactive-vocabs ] vocabs-quot set
     >link dup '[
