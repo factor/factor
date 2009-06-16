@@ -6,10 +6,13 @@ IN: persistency
 
 TUPLE: persistent id ;
 
-: add-types ( table -- table' ) [ dup array? [ first ] when dup >upper FACTOR-BLOB 3array ] map
-    { "id" "ID" +db-assigned-id+ } prefix ;
+: add-types ( table -- table' ) [ dup array? [ [ first dup >upper ] [ second ] bi 3array ]
+        [ dup >upper FACTOR-BLOB 3array ] if
+    ] map { "id" "ID" +db-assigned-id+ } prefix ;
 
-SYNTAX: STORED-TUPLE: parse-tuple-definition [ drop persistent ] dip [ define-tuple-class ]
+: remove-types ( table -- table' ) [ dup array? [ first ] when ] map ;
+
+SYNTAX: STORED-TUPLE: parse-tuple-definition [ drop persistent ] dip [ remove-types define-tuple-class ]
    [ nip [ dup unparse >upper ] [ add-types ] bi* define-persistent ] 3bi ;
 
 : define-db ( database class -- ) swap [ [ ensure-table ] with-db ] [ "database" set-word-prop ] 2bi ;
