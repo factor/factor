@@ -92,10 +92,8 @@ M: | models-changed drop ;
 M: | model-changed
     nip
     dup dependencies>> [ value>> ] all?
-    [ [ dup [ value>> ] product-value >>value notify-connections ] keep models-changed ]
+    [ [ dup [ value>> ] product-value swap set-model ] keep models-changed ]
     [ drop ] if ;
-M: | update-model
-    dup value>> swap [ set-model ] set-product-value ;
 M: | model-activated dup model-changed ;
 
 TUPLE: & < | ;
