@@ -51,9 +51,6 @@ M: heap heap-size ( heap -- n )
 : data-nth ( n heap -- entry )
     data>> nth-unsafe ; inline
 
-: up-value ( n heap -- entry )
-    [ up ] dip data-nth ; inline
-
 : left-value ( n heap -- entry )
     [ left ] dip data-nth ; inline
 
@@ -74,9 +71,6 @@ M: heap heap-size ( heap -- n )
 
 : data-pop* ( heap -- )
     data>> pop* ; inline
-
-: data-peek ( heap -- entry )
-    data>> last ; inline
 
 : data-first ( heap -- entry )
     data>> first ; inline
@@ -129,9 +123,6 @@ DEFER: up-heap
 : child ( m heap -- n )
     2dup right-bounds-check?
     [ drop left ] [ (child) ] if ;
-
-: swap-down ( m heap -- )
-    [ child ] 2keep data-exchange ;
 
 DEFER: down-heap
 
