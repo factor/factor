@@ -1,21 +1,22 @@
-USING: accessors arrays fry kernel lexer make math.parser models
+USING: accessors assocs arrays fry kernel lexer make math.parser models
 models.product namespaces parser sequences ui.frp.gadgets
 ui.gadgets ui.gadgets.books ui.gadgets.tracks vectors words
 combinators ui.frp.signals ;
 QUALIFIED: make
 IN: ui.frp.layout
 
-PREDICATE: true < word t = ;
 SYMBOL: inserting
 TUPLE: layout gadget size ; C: <layout> layout
 TUPLE: placeholder < gadget ;
 ERROR: no-models-in-books models ;
 
 DEFER: insert-item
-HOOK: , inserting ( uiitem -- )
-M: f , make:, ;
-M: placeholder , [ inserting get insert-item ] keep relayout ;
-M: true , dup placeholder? [ inserting set ] [ "No location to add UI item" throw ] if ;
+: , ( uiitem -- ) inserting namespace at {
+    { f [ make:, ] }
+    { t [ dup placeholder? [ inserting set ] [ "No location to add UI item" throw ] if ] }
+    [ placeholder? [ [ inserting get insert-item ] keep relayout ] [ drop ] if ]
+} case ;
+
 SYNTAX: UI[ parse-quotation '[ [ t inserting _  with-variable ] ] over push-all ;
 
 SYNTAX: ,% scan string>number [ <layout> , ] curry over push-all ;
