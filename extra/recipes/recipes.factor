@@ -2,7 +2,7 @@ USING: accessors arrays db.tuples db.sqlite persistency db.queries
 io.files.temp kernel monads sequences ui ui.frp.gadgets
 ui.frp.layout ui.frp.signals ui.gadgets.scrollers ui.gadgets.labels
 colors.constants ui.pens.solid combinators math locals strings
-ui.images db.types ;
+ui.images db.types sequences.extras ;
 FROM: sets => prune ;
 IN: recipes
 STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { genre { VARCHAR 100 } } ;
