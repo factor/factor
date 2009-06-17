@@ -1410,7 +1410,6 @@ USING: math.private compiler.cfg.debugger ;
        { uses { 5 10 } }
        { ranges V{ T{ live-range f 5 10 } } }
     }
-    H{ }
     intersect-inactive
 ] unit-test
 
