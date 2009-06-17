@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types assocs destructors kernel libc locals
-sequences serialize tokyo.alien.tcadb ;
+USING: accessors alien.c-types arrays assocs destructors kernel libc locals
+sequences serialize tokyo.alien.tcadb tokyo.alien.tcutil vectors ;
 IN: tokyo.cabinet.abstract
 
 TUPLE: tokyo-abstractdb handle disposed ;
@@ -21,14 +21,22 @@ M:: tokyo-abstractdb at* ( key db -- value/f ? )
     kbytes length    :> key-size
     handle kbytes key-size sizeout tcadbget :> output
     output [
-        [ sizeout *int memory>byte-array bytes>object t ] [ drop ] bi
+        [ sizeout *int memory>byte-array ] [ tcfree ] bi bytes>object t
     ] [ f f ] if* ;
 
 M: tokyo-abstractdb assoc-size ( db -- size ) handle>> tcadbrnum ;
 
-! FIXME: implement
-! M: tokyo-abstractdb >alist ( db -- alist )
-!     handle>> ;
+! FIXME: make this nicer
+M:: tokyo-abstractdb >alist ( db -- alist )
+    db handle>>            :> handle
+    0 <int>                :> size-out
+    db assoc-size <vector> :> keys
+    handle tcadbiterinit drop
+    [ handle size-out tcadbiternext dup ] [
+        [ size-out *int memory>byte-array ] [ tcfree ] bi
+        bytes>object keys push
+    ] while drop
+    keys [ dup db at 2array ] { } map-as ;
 
 M:: tokyo-abstractdb set-at ( value key db -- )
     db handle>>        :> handle
