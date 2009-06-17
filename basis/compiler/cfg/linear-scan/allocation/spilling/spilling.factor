@@ -39,8 +39,8 @@ IN: compiler.cfg.linear-scan.allocation.spilling
     #! with the most distant use location. Spill the existing
     #! interval, then process the new interval and the tail end
     #! of the existing interval again.
-    [ reuse-register ]
-    [ nip delete-active ]
+    [ reg>> >>reg drop ]
+    [ [ add-handled ] [ delete-active ] bi* ]
     [ split-and-spill [ add-handled ] [ add-unhandled ] bi* ] 2tri ;
 
 : spill-new ( new existing -- )
