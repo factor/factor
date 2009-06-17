@@ -31,6 +31,7 @@ FUNCTION: void* tclistval ( TCLIST* list, int index, int* sp ) ;
 FUNCTION: char* tclistval2 ( TCLIST* list, int index ) ;
 FUNCTION: void tclistpush ( TCLIST* list, void* ptr, int size ) ;
 FUNCTION: void tclistpush2 ( TCLIST* list, char* str ) ;
+FUNCTION: void tcfree ( void* ptr ) ;
 
 TYPEDEF: void* TCCMP
 TYPEDEF: void* TCCODEC
