@@ -1,7 +1,7 @@
 USING: accessors arrays db.tuples db.sqlite persistency db.queries
 io.files.temp kernel monads sequences ui ui.frp.gadgets
 ui.frp.layout ui.frp.signals ui.gadgets.scrollers ui.gadgets.labels
-colors.constants ui.pens.solid combinators math locals strings fries
+colors.constants ui.pens.solid combinators math locals strings
 ui.images db.types ;
 FROM: sets => prune ;
 IN: recipes
@@ -11,7 +11,7 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
 : top-recipes ( offset search -- recipes ) <query> T{ recipe } rot >>title >>tuple
     "votes" >>order 30 >>limit swap >>offset get-tuples ;
 : top-genres ( -- genres ) f f top-recipes [ genre>> ] map prune 4 (head-slice) ;
-: <image-button> ( str -- button ) i" vocab:recipes/icons/_.tiff" <image-name> <frp-button> ;
+: <image-button> ( str -- button ) "vocab:recipes/icons/" ".tiff" surround <image-name> <frp-button> ;
 
 : interface ( -- book ) [ 
      [
