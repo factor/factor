@@ -6,8 +6,9 @@ IN: ui.frp.gadgets
 
 TUPLE: frp-button < button hook value ;
 : <frp-button> ( gadget -- button ) [
+      [ dup hook>> [ call( button -- ) ] [ drop ] if* ]
       [ [ [ value>> ] [ ] bi or ] keep set-control-value ]
-      [ dup hook>> [ call( button -- ) ] [ drop ] if* ] bi
+      [ model>> f swap (>>value) ] tri
    ] frp-button new-button f <basic> >>model ;
 : <frp-border-button> ( text -- button ) <frp-button> border-button-theme ;
 

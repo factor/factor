@@ -1,5 +1,5 @@
 USING: fry functors generalizations kernel macros peg peg-lexer
-sequences ;
+sequences sequences.extras ;
 FROM: ui.frp.signals => #1 ;
 IN: ui.frp.functors
 

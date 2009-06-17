@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel kernel.private locals slots.private math
+USING: accessors kernel kernel.private slots.private math
 math.private math.order ;
 IN: sequences
 
@@ -358,8 +358,14 @@ PRIVATE>
 
 <PRIVATE
 
+: ((each)) ( seq -- n quot )
+    [ length ] keep [ nth-unsafe ] curry ; inline
+
 : (each) ( seq quot -- n quot' )
-    [ [ length ] keep [ nth-unsafe ] curry ] dip compose ; inline
+    [ ((each)) ] dip compose ; inline
+
+: (each-index) ( seq quot -- n quot' )
+    [ ((each)) [ keep ] curry ] dip compose ; inline
 
 : (collect) ( quot into -- quot' )
     [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
@@ -498,19 +504,18 @@ PRIVATE>
 : follow ( obj quot -- seq )
     [ dup ] swap [ keep ] curry produce nip ; inline
 
-: prepare-index ( seq quot -- seq n quot )
-    [ dup length ] dip ; inline
-
 : each-index ( seq quot -- )
-    prepare-index 2each ; inline
+    (each-index) each-integer ; inline
 
 : interleave ( seq between quot -- )
-    swap [ drop ] [ [ 2dip call ] 2curry ] 2bi
-    [ [ 0 = ] 2dip if ] 2curry
-    each-index ; inline
+    pick empty? [ 3drop ] [
+        [ [ drop first-unsafe ] dip call ]
+        [ [ rest-slice ] 2dip [ bi* ] 2curry each ]
+        3bi
+    ] if ; inline
 
 : map-index ( seq quot -- newseq )
-    prepare-index 2map ; inline
+    [ dup length iota ] dip 2map ; inline
 
 : reduce-index ( seq identity quot -- )
     swapd each-index ; inline
@@ -931,17 +936,3 @@ PRIVATE>
             [ array-flip ] [ generic-flip ] if
         ] [ generic-flip ] if
     ] unless ;
-
-: reduce1 ( seq quot -- result ) [ unclip ] dip reduce ; inline
-
-:: reduce-r
-    ( list identity quot: ( obj1 obj2 -- obj ) -- result )
-    list empty?
-    [ identity ]
-    [ list rest identity quot reduce-r list first quot call ] if ;
-    inline recursive
-
-:: combos ( list1 list2 -- result ) list2 [ [ 2array ] curry list1 swap map ] map concat ;
-: (head-slice) ( seq n -- seq' ) over length over < [ drop ] [ head-slice ] if ;
-: find-all ( seq quot -- elts ) [ [ length iota ] keep ] dip
-    [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry 2map [ ] filter ; inline
