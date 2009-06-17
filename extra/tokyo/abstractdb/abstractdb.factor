@@ -1,19 +1,11 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs destructors
-io io.streams.memory kernel libc locals
-sequences serialize tokyo.alien.tcadb tokyo.alien.tcutil vectors ;
-IN: tokyo.cabinet.abstract
+kernel locals sequences serialize vectors
+tokyo.alien.tcadb tokyo.alien.tcutil tokyo.utils ;
+IN: tokyo.abstractdb
 
 TUPLE: tokyo-abstractdb handle disposed ;
-
-<PRIVATE
-: with-memory-reader ( memory quot -- )
-    [ <memory-stream> ] dip with-input-stream* ; inline
-
-: memory>object ( memory -- object )
-    [ deserialize ] with-memory-reader ;
-PRIVATE>
 
 INSTANCE: tokyo-abstractdb assoc
 
