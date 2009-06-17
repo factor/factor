@@ -6,7 +6,7 @@ sets strings vocabs sorting accessors arrays compiler.units
 combinators vectors splitting continuations math
 parser.notes ;
 IN: vocabs.parser
- 
+
 ERROR: no-word-error name ;
 
 : word-restarts ( possibilities -- restarts )
@@ -17,7 +17,7 @@ ERROR: no-word-error name ;
     word-restarts
     swap "Defer word in current vocabulary" swap 2array
     suffix ;
- 
+
 : <no-word-error> ( name possibilities -- error restarts )
     [ drop \ no-word-error boa ] [ word-restarts-with-defer ] 2bi ;
 
