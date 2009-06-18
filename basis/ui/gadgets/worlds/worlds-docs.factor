@@ -56,6 +56,7 @@ HELP: world
         { { $snippet "grab-input?" } " - if set to " { $link t } ", the world will hide the mouse cursor and disable normal mouse input while focused. Use " { $link grab-input } " and " { $link ungrab-input } " to change this setting." }
         { { $snippet "handle" } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
         { { $snippet "window-loc" } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
+        { { $snippet "window-controls" } " - the set of " { $link "ui.gadgets.worlds-window-controls" } " with which the world window was created." }
     }
 } ;
 
@@ -113,3 +114,4 @@ $nl
 { $subsection "ui.gadgets.worlds-subclassing" }
 { $subsection "gl-utilities" }
 { $subsection "text-rendering" } ;
+
