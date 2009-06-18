@@ -23,8 +23,6 @@ TUPLE: slider < track elevator thumb saved line ;
 
 TUPLE: elevator < gadget direction ;
 
-: find-elevator ( gadget -- elevator/f ) [ elevator? ] find-parent ;
-
 : find-slider ( gadget -- slider/f ) [ slider? ] find-parent ;
 
 CONSTANT: elevator-padding 4
