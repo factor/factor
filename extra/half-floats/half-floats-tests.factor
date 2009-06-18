@@ -25,7 +25,7 @@ IN: half-floats.tests
 [ -1.5  ] [ HEX: be00 bits>half ] unit-test
 [  1/0. ] [ HEX: 7c00 bits>half ] unit-test
 [ -1/0. ] [ HEX: fc00 bits>half ] unit-test
-[ t ] [ HEX: 7e00 bits>half fp-nan? ] unit-test
+[    t  ] [ HEX: 7e00 bits>half fp-nan? ] unit-test
 
 C-STRUCT: halves
     { "half" "tom" }
