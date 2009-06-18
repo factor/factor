@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel summary debugger io make math.parser
-prettyprint http.client accessors ;
+prettyprint http http.client accessors ;
 IN: http.client.debugger
 
 M: too-many-redirects summary
