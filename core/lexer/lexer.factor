@@ -22,9 +22,17 @@ TUPLE: lexer text line line-text line-length column ;
 : <lexer> ( text -- lexer )
     lexer new-lexer ;
 
+ERROR: unexpected want got ;
+
+PREDICATE: unexpected-tab < unexpected
+    got>> CHAR: \t = ;
+
+: forbid-tab ( c -- c )
+    [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ;
+
 : skip ( i seq ? -- n )
     over length
-    [ [ swap CHAR: \s eq? xor ] curry find-from drop ] dip or ;
+    [ [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop ] dip or ;
 
 : change-lexer-column ( lexer quot -- )
     [ [ column>> ] [ line-text>> ] bi ] prepose keep
@@ -64,8 +72,6 @@ M: lexer skip-word ( lexer -- )
     ] [ drop f ] if ;
 
 : scan ( -- str/f ) lexer get parse-token ;
-
-ERROR: unexpected want got ;
 
 PREDICATE: unexpected-eof < unexpected
     got>> not ;

@@ -1,7 +1,7 @@
 IN: classes.tuple.parser.tests
 USING: accessors classes.tuple.parser lexer words classes
 sequences math kernel slots tools.test parser compiler.units
-arrays classes.tuple eval ;
+arrays classes.tuple eval multiline ;
 
 TUPLE: test-1 ;
 

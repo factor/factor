@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors assocs byte-arrays combinators
-constructors destructors fry io io.binary io.encodings.binary
-io.streams.byte-array kernel locals macros math math.ranges
-multiline sequences sequences.private vectors byte-vectors
-combinators.short-circuit math.bitwise ;
+destructors fry io io.binary io.encodings.binary io.streams.byte-array
+kernel locals macros math math.ranges multiline sequences
+sequences.private vectors byte-vectors combinators.short-circuit
+math.bitwise ;
 IN: bitstreams
 
 TUPLE: widthed { bits integer read-only } { #bits integer read-only } ;
@@ -36,8 +36,12 @@ TUPLE: bit-writer
 
 TUPLE: msb0-bit-reader < bit-reader ;
 TUPLE: lsb0-bit-reader < bit-reader ;
-CONSTRUCTOR: msb0-bit-reader ( bytes -- bs ) ;
-CONSTRUCTOR: lsb0-bit-reader ( bytes -- bs ) ;
+
+: <msb0-bit-reader> ( bytes -- bs )
+    msb0-bit-reader new swap >>bytes ; inline
+
+: <lsb0-bit-reader> ( bytes -- bs )
+    lsb0-bit-reader new swap >>bytes ; inline
 
 TUPLE: msb0-bit-writer < bit-writer ;
 TUPLE: lsb0-bit-writer < bit-writer ;
@@ -56,13 +60,20 @@ TUPLE: lsb0-bit-writer < bit-writer ;
 GENERIC: peek ( n bitstream -- value )
 GENERIC: poke ( value n bitstream -- )
 
+: get-abp ( bitstream -- abp ) 
+    [ byte-pos>> 8 * ] [ bit-pos>> + ] bi ; inline
+    
+: set-abp ( abp bitstream -- ) 
+    [ 8 /mod ] dip [ (>>bit-pos) ] [ (>>byte-pos) ] bi ; inline
+
 : seek ( n bitstream -- )
-    {
-        [ byte-pos>> 8 * ]
-        [ bit-pos>> + + 8 /mod ]
-        [ (>>bit-pos) ]
-        [ (>>byte-pos) ]
-    } cleave ; inline
+    [ get-abp + ] [ set-abp ] bi ; inline
+    
+: (align) ( n m -- n' )
+    [ /mod 0 > [ 1+ ] when ] [ * ] bi ; inline
+    
+: align ( n bitstream -- )
+    [ get-abp swap (align) ] [ set-abp ] bi ; inline
 
 : read ( n bitstream -- value )
     [ peek ] [ seek ] 2bi ; inline
