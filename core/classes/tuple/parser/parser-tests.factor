@@ -142,11 +142,3 @@ TUPLE: parsing-corner-case x ;
         "    x 3 }"
     } "\n" join eval( -- tuple )
 ] [ error>> unexpected-eof? ] must-fail-with
-
-
-[ ] [
-    <" USE: sequences
-    IN: classes.tuple.tests
-    TUPLE: book { name initial-quot: [ "Lord of the " "Rings" append ] } ;">
-    eval( -- )
-] unit-test

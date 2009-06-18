@@ -25,6 +25,7 @@ IN: opengl
         { HEX: 0503 "Stack overflow" }
         { HEX: 0504 "Stack underflow" }
         { HEX: 0505 "Out of memory" }
+        { HEX: 0506 "Invalid framebuffer operation" }
     } at "Unknown error" or ;
 
 TUPLE: gl-error code string ;
