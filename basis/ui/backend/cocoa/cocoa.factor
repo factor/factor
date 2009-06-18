@@ -6,7 +6,7 @@ cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
 cocoa.views cocoa.windows combinators command-line
 core-foundation core-foundation.run-loop core-graphics
 core-graphics.types destructors fry generalizations io.thread
-kernel libc literals locals math math.rectangles memory
+kernel libc literals locals math math.bitwise math.rectangles memory
 namespaces sequences specialized-arrays.int threads ui
 ui.backend ui.backend.cocoa.views ui.clipboards ui.gadgets
 ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private
@@ -120,7 +120,7 @@ CONSTANT: window-control>styleMask
     }
 
 : world>styleMask ( world -- n )
-    window-controls>> [ window-control>styleMask at ] map 0 [ bitor ] reduce ;
+    window-controls>> window-control>styleMask symbols>flags ;
 
 M:: cocoa-ui-backend (open-window) ( world -- )
     world [ [ dim>> ] dip <FactorView> ]

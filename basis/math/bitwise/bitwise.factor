@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math sequences accessors math.bits
-sequences.private words namespaces macros hints
-combinators fry io.binary combinators.smart ;
+USING: arrays assocs kernel math sequences accessors
+math.bits sequences.private words namespaces macros
+hints combinators fry io.binary combinators.smart ;
 IN: math.bitwise
 
 ! utilities
@@ -43,6 +43,10 @@ IN: math.bitwise
 ! flags
 MACRO: flags ( values -- )
     [ 0 ] [ [ ?execute bitor ] curry compose ] reduce ;
+
+: symbols>flags ( symbols assoc -- flag-bits )
+    [ at ] curry map
+    0 [ bitor ] reduce ;
 
 ! bitfield
 <PRIVATE
