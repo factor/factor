@@ -7,9 +7,10 @@ CONSTANT: window-control-sets-to-test
     H{
         { "No controls" { } }
         { "Normal title bar" { normal-title-bar } }
-        { "Small title bar" { small-title-bar } }
+        { "Small title bar" { small-title-bar close-button } }
         { "Close button" { normal-title-bar close-button } }
         { "Close and minimize buttons" { normal-title-bar close-button minimize-button } }
+        { "Minimize button" { normal-title-bar minimize-button } }
         { "Close, minimize, and maximize buttons" { normal-title-bar close-button minimize-button maximize-button } }
         { "Resizable" { normal-title-bar close-button minimize-button maximize-button resize-handles } }
     }
