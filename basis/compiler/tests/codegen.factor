@@ -289,3 +289,25 @@ M: cucumber equal? "The cucumber has no equal" throw ;
     [ [ 0 alien-unsigned-cell swap ] [ 0 alien-signed-2 ] bi ]
     compile-call
 ] unit-test
+
+! Regression found while working on global register allocation
+
+: linear-scan-regression-1 ( a b c -- ) 3array , ;
+: linear-scan-regression-2 ( a b -- ) 2array , ;
+
+: linear-scan-regression ( a b c -- )
+    [ linear-scan-regression-2 ]
+    [ linear-scan-regression-1 ]
+    bi-curry bi-curry interleave ;
+
+[
+    {
+        { 1 "x" "y" }
+        { "x" "y" }
+        { 2 "x" "y" }
+        { "x" "y" }
+        { 3 "x" "y" }
+    }
+] [
+    [ { 1 2 3 } "x" "y" linear-scan-regression ] { } make
+] unit-test

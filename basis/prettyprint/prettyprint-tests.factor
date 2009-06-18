@@ -303,3 +303,54 @@ M: started-out-hustlin' ended-up-ballin' ; inline
 [ "USING: prettyprint.tests ;\nM: started-out-hustlin' ended-up-ballin' ; inline\n" ] [
     [ M\ started-out-hustlin' ended-up-ballin' see ] with-string-writer
 ] unit-test
+
+TUPLE: tuple-with-declared-slot { x integer } ;
+
+[
+    {
+        "USING: math ;"
+        "IN: prettyprint.tests"
+        "TUPLE: tuple-with-declared-slot { x integer initial: 0 } ;"
+        ""
+    }
+] [
+    [ \ tuple-with-declared-slot see ] with-string-writer "\n" split
+] unit-test
+
+TUPLE: tuple-with-read-only-slot { x read-only } ;
+
+[
+    {
+        "IN: prettyprint.tests"
+        "TUPLE: tuple-with-read-only-slot { x read-only } ;"
+        ""
+    }
+] [
+    [ \ tuple-with-read-only-slot see ] with-string-writer "\n" split
+] unit-test
+
+TUPLE: tuple-with-initial-slot { x initial: 123 } ;
+
+[
+    {
+        "IN: prettyprint.tests"
+        "TUPLE: tuple-with-initial-slot { x initial: 123 } ;"
+        ""
+    }
+] [
+    [ \ tuple-with-initial-slot see ] with-string-writer "\n" split
+] unit-test
+
+TUPLE: tuple-with-initial-declared-slot { x integer initial: 123 } ;
+
+[
+    {
+        "USING: math ;"
+        "IN: prettyprint.tests"
+        "TUPLE: tuple-with-initial-declared-slot"
+        "    { x integer initial: 123 } ;"
+        ""
+    }
+] [
+    [ \ tuple-with-initial-declared-slot see ] with-string-writer "\n" split
+] unit-test

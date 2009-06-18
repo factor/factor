@@ -66,7 +66,7 @@ PRIVATE>
 
 GENERIC: slots>tuple ( seq class -- tuple )
 
-M: tuple-class slots>tuple
+M: tuple-class slots>tuple ( seq class -- tuple )
     check-slots pad-slots
     tuple-layout <tuple> [
         [ tuple-size ]
@@ -147,8 +147,8 @@ ERROR: bad-superclass class ;
     dup boa-check-quot "boa-check" set-word-prop ;
 
 : tuple-prototype ( class -- prototype )
-    [ initial-values ] keep
-    over [ ] any? [ slots>tuple ] [ 2drop f ] if ;
+    [ initial-values ] keep over [ ] any?
+    [ slots>tuple ] [ 2drop f ] if ;
 
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;
@@ -340,8 +340,7 @@ M: tuple tuple-hashcode
 M: tuple hashcode* tuple-hashcode ;
 
 M: tuple-class new
-    dup "prototype" word-prop
-    [ (clone) ] [ tuple-layout <tuple> ] ?if ;
+    dup "prototype" word-prop [ (clone) ] [ tuple-layout <tuple> ] ?if ;
 
 M: tuple-class boa
     [ "boa-check" word-prop [ call ] when* ]

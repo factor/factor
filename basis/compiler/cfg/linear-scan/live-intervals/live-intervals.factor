@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math math.order fry
-binary-search compiler.cfg.instructions compiler.cfg.registers
+binary-search combinators compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.def-use compiler.cfg.liveness compiler.cfg ;
 IN: compiler.cfg.linear-scan.live-intervals
 
@@ -11,9 +11,20 @@ C: <live-range> live-range
 
 TUPLE: live-interval
 vreg
-reg spill-to reload-from split-before split-after
+reg spill-to reload-from
+split-before split-after split-next
 start end ranges uses
 copy-from ;
+
+: covers? ( insn# live-interval -- ? )
+    ranges>> [ [ from>> ] [ to>> ] bi between? ] with any? ;
+
+: child-interval-at ( insn# interval -- interval' )
+    dup split-after>> [
+        2dup split-after>> start>> <
+        [ split-before>> ] [ split-after>> ] if
+        child-interval-at
+    ] [ nip ] if ;
 
 ERROR: dead-value-error vreg ;
 
@@ -46,11 +57,9 @@ ERROR: dead-value-error vreg ;
         V{ } clone >>ranges
         swap >>vreg ;
 
-: block-from ( -- n )
-    basic-block get instructions>> first insn#>> ;
+: block-from ( bb -- n ) instructions>> first insn#>> ;
 
-: block-to ( -- n )
-    basic-block get instructions>> last insn#>> ;
+: block-to ( bb -- n ) instructions>> last insn#>> ;
 
 M: live-interval hashcode*
     nip [ start>> ] [ end>> 1000 * ] bi + ;
@@ -74,7 +83,7 @@ M: insn compute-live-intervals* drop ;
 
 : handle-input ( n vreg live-intervals -- )
     live-interval
-    [ [ block-from ] 2dip add-range ] [ add-use ] 2bi ;
+    [ [ basic-block get block-from ] 2dip add-range ] [ add-use ] 2bi ;
 
 : handle-temp ( n vreg live-intervals -- )
     live-interval
@@ -98,7 +107,9 @@ M: ##copy-float compute-live-intervals*
     [ call-next-method ] [ record-copy ] bi ;
 
 : handle-live-out ( bb -- )
-    live-out keys block-from block-to live-intervals get '[
+    live-out keys
+    basic-block get [ block-from ] [ block-to ] bi
+    live-intervals get '[
         [ _ _ ] dip _ live-interval add-range
     ] each ;
 
@@ -109,17 +120,23 @@ M: ##copy-float compute-live-intervals*
 
 : compute-start/end ( live-interval -- )
     dup ranges>> [ first from>> ] [ last to>> ] bi
-    2dup > [ "BUG: start > end" throw ] when
     [ >>start ] [ >>end ] bi* drop ;
+
+: check-start/end ( live-interval -- )
+    [ [ start>> ] [ uses>> first ] bi assert= ]
+    [ [ end>> ] [ uses>> last ] bi assert= ]
+    bi ;
 
 : finish-live-intervals ( live-intervals -- )
     ! Since live intervals are computed in a backward order, we have
     ! to reverse some sequences, and compute the start and end.
     [
-        [ ranges>> reverse-here ]
-        [ uses>> reverse-here ]
-        [ compute-start/end ]
-        tri
+        {
+            [ ranges>> reverse-here ]
+            [ uses>> reverse-here ]
+            [ compute-start/end ]
+            [ check-start/end ]
+        } cleave
     ] each ;
 
 : compute-live-intervals ( rpo -- live-intervals )

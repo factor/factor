@@ -7,4 +7,7 @@ IN: compiler.cfg.predecessors
     dup successors>> [ predecessors>> push ] with each ;
 
 : compute-predecessors ( cfg -- cfg' )
-    dup [ predecessors-step ] each-basic-block ;
+    [ [ V{ } clone >>predecessors drop ] each-basic-block ]
+    [ [ predecessors-step ] each-basic-block ]
+    [ ]
+    tri ;

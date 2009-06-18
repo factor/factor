@@ -1,11 +1,12 @@
-USING: definitions generic kernel kernel.private math math.constants
-parser sequences tools.test words assocs namespaces quotations
-sequences.private classes continuations generic.single
-generic.standard effects classes.tuple classes.tuple.private arrays
-vectors strings compiler.units accessors classes.algebra calendar
-prettyprint io.streams.string splitting summary columns math.order
-classes.private slots slots.private eval see words.symbol
-compiler.errors parser.notes ;
+USING: accessors arrays assocs calendar classes classes.algebra
+classes.private classes.tuple classes.tuple.private columns
+compiler.errors compiler.units continuations definitions
+effects eval generic generic.single generic.standard grouping
+io.streams.string kernel kernel.private math math.constants
+math.order namespaces parser parser.notes prettyprint
+quotations random see sequences sequences.private slots
+slots.private splitting strings summary threads tools.test
+vectors vocabs words words.symbol ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -421,7 +422,6 @@ TUPLE: redefinition-problem-2 ;
 [ t ] [ 3 redefinition-problem'? ] unit-test
 
 ! Hardcore unit tests
-USE: threads
 
 \ thread "slots" word-prop "slots" set
 
@@ -438,8 +438,6 @@ USE: threads
         define-tuple-class
     ] with-compilation-unit
 ] unit-test
-
-USE: vocabs
 
 \ vocab "slots" word-prop "slots" set
 
