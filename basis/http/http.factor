@@ -10,6 +10,8 @@ http.parsers
 base64 ;
 IN: http
 
+CONSTANT: max-redirects 10
+
 : (read-header) ( -- alist )
     [ read-crlf dup f like ] [ parse-header-line ] produce nip ;
 
@@ -137,7 +139,8 @@ url
 version
 header
 post-data
-cookies ;
+cookies
+redirects ;
 
 : set-header ( request/response value key -- request/response )
     pick header>> set-at ;
@@ -154,7 +157,8 @@ cookies ;
         H{ } clone >>header
         V{ } clone >>cookies
         "close" "connection" set-header
-        "Factor http.client" "user-agent" set-header ;
+        "Factor http.client" "user-agent" set-header
+        max-redirects >>redirects ;
 
 : header ( request/response key -- value )
     swap header>> at ;
