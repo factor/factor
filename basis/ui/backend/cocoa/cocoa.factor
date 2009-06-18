@@ -158,7 +158,7 @@ M: cocoa-ui-backend (ungrab-input) ( handle -- )
 M: cocoa-ui-backend close-window ( gadget -- )
     find-world [
         handle>> [
-            window>> f -> performClose:
+            window>> -> close
         ] when*
     ] when* ;
 
