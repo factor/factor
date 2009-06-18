@@ -135,9 +135,6 @@ TUPLE: multi-texture grid display-list loc disposed ;
     [ dup image-locs ] dip
     '[ [ _ v+ <single-texture> |dispose ] 2map ] 2map ;
 
-: draw-textured-grid ( grid -- )
-    [ [ [ dim>> ] keep (draw-textured-rect) ] each ] each ;
-
 : grid-has-alpha? ( grid -- ? )
     first first image>> has-alpha? ;
 
