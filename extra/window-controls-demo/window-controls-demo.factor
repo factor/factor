@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors assocs kernel locals sequences ui
-ui.gadgets.worlds ;
+ui.gadgets ui.gadgets.worlds ;
 IN: window-controls-demo
 
 CONSTANT: window-control-sets-to-test
