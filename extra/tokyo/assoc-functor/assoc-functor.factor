@@ -28,7 +28,7 @@ INSTANCE: TYPE assoc
 M: TYPE dispose* [ DBDEL f ] change-handle drop ;
 
 M: TYPE at* ( key db -- value/f ? )
-    handle>> [ object>bytes dup length ] dip 0 <int>
+    handle>> swap object>bytes dup length 0 <int>
     DBGET [ [ memory>object ] [ tcfree ] bi t ] [ f f ] if* ;
 
 M: TYPE assoc-size ( db -- size ) handle>> DBRNUM ;
