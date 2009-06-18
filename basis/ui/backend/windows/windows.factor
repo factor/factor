@@ -9,7 +9,7 @@ windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
 windows.messages windows.types windows.offscreen windows.nt
 threads libc combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render math.bitwise locals
-accessors math.rectangles math.order calendar ascii
+accessors math.rectangles math.order calendar ascii sets
 io.encodings.utf16n windows.errors literals ui.pixel-formats 
 ui.pixel-formats.private memoize classes struct-arrays ;
 IN: ui.backend.windows
@@ -223,8 +223,36 @@ M: pasteboard set-clipboard-contents drop copy ;
 
 SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
-: style ( -- n ) WS_OVERLAPPEDWINDOW ; inline
-: ex-style ( -- n ) WS_EX_APPWINDOW WS_EX_WINDOWEDGE bitor ; inline
+CONSTANT: window-control>style
+    H{
+        { close-button 0 }
+        { minimize-button $ WS_MINIMIZEBOX }
+        { maximize-button $ WS_MAXIMIZEBOX }
+        { resize-handles $ WS_THICKFRAME }
+        { small-title-bar $ WS_CAPTION }
+        { normal-title-bar $ WS_CAPTION }
+    }
+
+CONSTANT: window-control>ex-style
+    H{
+        { close-button 0 }
+        { minimize-button 0 }
+        { maximize-button 0 }
+        { resize-handles $ WS_EX_WINDOWEDGE }
+        { small-title-bar $ WS_EX_TOOLWINDOW }
+        { normal-title-bar $ WS_EX_APPWINDOW }
+    }
+
+: needs-sysmenu? ( controls -- ? )
+    { close-button minimize-button maximize-button } intersects? ;
+
+: world>style ( world -- n )
+    window-controls>>
+    [ window-control>style symbols>flags ]
+    [ needs-sysmenu? [ WS_SYSMENU bitor ] when ] bi ;
+
+: world>ex-style ( world -- n )
+    window-controls>> window-control>ex-style symbols>flags ;
 
 : get-RECT-top-left ( RECT -- x y )
     [ RECT-left ] keep RECT-top ;
@@ -571,8 +599,8 @@ M: windows-ui-backend do-events
         RegisterClassEx win32-error=0/f
     ] [ drop ] if ;
 
-: adjust-RECT ( RECT -- )
-    style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
+: adjust-RECT ( RECT style ex-style -- )
+    [ 0 ] dip AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( world -- RECT )
     [ window-loc>> ] [ dim>> ] bi <RECT> ;
@@ -584,10 +612,12 @@ M: windows-ui-backend do-events
     CW_USEDEFAULT over set-RECT-left
     CW_USEDEFAULT swap set-RECT-top ;
 
-: make-adjusted-RECT ( rect -- RECT )
-    make-RECT
-    dup get-RECT-top-left [ zero? ] both? swap
-    dup adjust-RECT
+: make-adjusted-RECT ( rect style ex-style -- RECT )
+    [
+        make-RECT
+        dup get-RECT-top-left [ zero? ] both? swap
+        dup
+    ] 2dip adjust-RECT
     swap [ dup default-position-RECT ] when ;
 
 : get-window-class ( -- class-name )
@@ -597,12 +627,12 @@ M: windows-ui-backend do-events
         dup
     ] change-global ;
 
-: create-window ( rect -- hwnd )
-    make-adjusted-RECT
+:: create-window ( rect style ex-style -- hwnd )
+    rect style ex-style make-adjusted-RECT
     [ get-window-class f ] dip
     [
         [ ex-style ] 2dip
-        { WS_CLIPSIBLINGS WS_CLIPCHILDREN style } flags
+        WS_CLIPSIBLINGS WS_CLIPCHILDREN bitor style bitor
     ] dip get-RECT-dimensions
     f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;
 
@@ -636,8 +666,21 @@ M: windows-ui-backend do-events
     [ swap [ handle>> hDC>> set-pixel-format ] [ get-rc ] bi ]
     with-world-pixel-format ;
 
+: disable-close-button ( hwnd -- )
+    0 GetSystemMenu
+    SC_CLOSE MF_BYCOMMAND MF_GRAYED bitor EnableMenuItem drop ;
+
+: ?disable-close-button ( world hwnd -- )
+    swap window-controls>> close-button swap member? not
+    [ disable-close-button ] [ drop ] if ;
+
 M: windows-ui-backend (open-window) ( world -- )
-    [ dup create-window [ f f ] dip f f <win> >>handle setup-gl ]
+    [
+        dup
+        [ ] [ world>style ] [ world>ex-style ] tri create-window
+        [ ?disable-close-button ]
+        [ [ f f ] dip f f <win> >>handle setup-gl ] 2bi
+    ]
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
 
@@ -743,13 +786,9 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
     } cleave ;
 
 : exit-fullscreen ( world -- )
-    handle>> hWnd>>
+    dup handle>> hWnd>>
     {
-        [
-            GWL_STYLE GetWindowLong
-            fullscreen-flags bitor
-        ]
-        [ GWL_STYLE rot SetWindowLong win32-error=0/f ]
+        [ GWL_STYLE rot world>style SetWindowLong win32-error=0/f ]
         [
             f
             over hwnd>RECT get-RECT-dimensions
