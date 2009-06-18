@@ -17,6 +17,7 @@ $nl
     { { $slot "header" } { "An assoc of HTTP header values. See " { $link "http.headers" } } }
     { { $slot "post-data" } { "See " { $link "http.post-data" } } }
     { { $slot "cookies" } { "A sequence of HTTP cookies. See " { $link "http.cookies" } } }
+    { { $slot "redirects" } { "Number of redirects to attempt before throwing an error. Default is " { $snippet "max-redirects" } " ." } }
 } } ;
 
 HELP: <response>

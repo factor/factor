@@ -12,8 +12,6 @@ IN: http.client
 
 ERROR: too-many-redirects ;
 
-CONSTANT: max-redirects 10
-
 <PRIVATE
 
 : write-request-line ( request -- request )
@@ -79,7 +77,7 @@ SYMBOL: redirects
 
 :: do-redirect ( quot: ( chunk -- ) response -- response )
     redirects inc
-    redirects get max-redirects < [
+    redirects get request get redirects>> < [
         request get clone
         response "location" header redirect-url
         response code>> 307 = [ "GET" >>method ] unless
@@ -116,7 +114,8 @@ SYMBOL: redirects
                 with-output-stream*
             ] [
                 in>> [
-                    read-response dup redirect? [ t ] [
+                    read-response dup redirect?
+                    request get redirects>> 0 > and [ t ] [
                         [ nip response set ]
                         [ read-response-body ]
                         [ ]
