@@ -30,6 +30,7 @@ IN: ui.frp.signals
 TUPLE: basic-model < multi-model ;
 M: basic-model (model-changed) [ value>> ] dip set-model ;
 : <merge> ( models -- signal ) basic-model <multi-model> ;
+: <2merge> ( model1 model2 -- signal ) 2array <merge> ;
 : <basic> ( value -- signal ) basic-model new-model ;
 
 TUPLE: filter-model < multi-model quot ;
@@ -37,11 +38,18 @@ M: filter-model (model-changed) [ value>> ] dip 2dup quot>> call( a -- ? )
    [ set-model ] [ 2drop ] if ;
 : <filter> ( model quot -- filter-signal ) [ 1array filter-model <multi-model> ] dip >>quot ;
 
-TUPLE: fold-model < multi-model quot ;
-M: fold-model (model-changed) [ [ value>> ] [ [ value>> ] [ quot>> ] bi ] bi*
-   call( val oldval -- newval ) ] keep set-model ;
-: <fold> ( model oldval quot -- signal ) rot 1array fold-model <multi-model> swap >>quot
+TUPLE: fold-model < multi-model quot base values ;
+M: fold-model (model-changed) 2dup base>> =
+    [ [ [ value>> ] [ [ values>> ] [ quot>> ] bi ] bi* swapd reduce* ] keep set-model ]
+    [ [ [ value>> ] [ values>> ] bi* push ]
+      [ [ [ value>> ] [ [ value>> ] [ quot>> ] bi ] bi* call( val oldval -- newval ) ] keep set-model ] 2bi
+    ] if ;
+M: fold-model model-activated drop ;
+: new-fold-model ( deps -- model ) fold-model <multi-model> V{ } clone >>values ;
+: <fold> ( model oldval quot -- signal ) rot 1array new-fold-model swap >>quot
    swap >>value ;
+: <fold*> ( model oldmodel quot -- signal ) over [ [ 2array new-fold-model ] dip >>quot ]
+    dip [ >>base ] [ value>> >>value ] bi ;
 
 TUPLE: updater-model < multi-model values updates ;
 M: updater-model (model-changed) tuck updates>> =
@@ -106,3 +114,6 @@ M: model >>= [ swap <action> ] curry ;
 M: model fmap <mapped> ;
 USE: ui.frp.functors
 FMAPS: $> <$ fmap FOR & | product ;
+
+! only used in construction
+: with-self ( quot: ( model -- model ) -- model ) [ f <basic> dup ] dip call swap [ add-dependency ] keep ; inline

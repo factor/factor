@@ -27,7 +27,7 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
      ] <vbox> ,
   ] <frp-book*> { 350 245 } >>pref-dim ;
   
-:: recipe-browser ( -- ) [
+:: recipe-browser ( -- ) [ [
     interface
       <frp-table*> :> tbl
       "okay" <frp-border-button> BUTTON -> :> ok
@@ -56,6 +56,6 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
       [ [ 1 ] <$ ]
       [ quot ok <updates> #1 [ call( recipe -- ) 0 ] 2fmap-& ] bi
       2array <merge> 0 <basic> <switch> >>model
-   ] with-interface "recipes" open-window ;
+   ] with-interface "recipes" open-window ] with-ui ;
 
 MAIN: recipe-browser
