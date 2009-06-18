@@ -51,6 +51,9 @@ M: frp-field model-changed 2dup frp-model>> =
 : <empty-editor*> ( -- field ) "" <model> <frp-editor> ;
 : <empty-editor> ( model -- field ) "" <model> <switch> <frp-editor> ;
 
+: <frp-action-field> ( -- field ) f <action-field> dup [ set-control-value ] curry >>quot
+    f <model> >>model ;
+
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
 M: table output-model dup multiple-selection?>>
