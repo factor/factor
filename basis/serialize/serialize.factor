@@ -12,7 +12,7 @@ vectors byte-arrays quotations hashtables assocs help.syntax
 help.markup splitting io.streams.byte-array io.encodings.string
 io.encodings.utf8 io.encodings.binary combinators accessors
 locals prettyprint compiler.units sequences.private
-classes.tuple.private ;
+classes.tuple.private vocabs.loader ;
 IN: serialize
 
 GENERIC: (serialize) ( obj -- )
@@ -202,7 +202,7 @@ SYMBOL: deserialized
     (deserialize-string) dup intern-object ;
 
 : deserialize-word ( -- word )
-    (deserialize) (deserialize) 2dup lookup
+    (deserialize) (deserialize) 2dup [ require ] keep lookup
     dup [ 2nip ] [
         drop
         2array unparse "Unknown word: " prepend throw
