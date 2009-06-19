@@ -116,7 +116,7 @@ FUNCTION: ulonglong tcbdbbnum ( TCBDB* bdb ) ;
 FUNCTION: uint tcbdbalign ( TCBDB* bdb ) ;
 FUNCTION: uint tcbdbfbpmax ( TCBDB* bdb ) ;
 FUNCTION: ulonglong tcbdbinode ( TCBDB* bdb ) ;
-FUNCTION: time_t tcbdbmtime ( TCBDB* bdb ) ;
+FUNCTION: tokyo_time_t tcbdbmtime ( TCBDB* bdb ) ;
 FUNCTION: uchar tcbdbflags ( TCBDB* bdb ) ;
 FUNCTION: uchar tcbdbopts ( TCBDB* bdb ) ;
 FUNCTION: char* tcbdbopaque ( TCBDB* bdb ) ;
