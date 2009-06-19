@@ -83,7 +83,7 @@ FUNCTION: uint tchdbalign ( TCHDB* hdb ) ;
 FUNCTION: uint tchdbfbpmax ( TCHDB* hdb ) ;
 FUNCTION: ulonglong tchdbxmsiz ( TCHDB* hdb ) ;
 FUNCTION: ulonglong tchdbinode ( TCHDB* hdb ) ;
-FUNCTION: time_t tchdbmtime ( TCHDB* hdb ) ;
+FUNCTION: tokyo_time_t tchdbmtime ( TCHDB* hdb ) ;
 FUNCTION: int tchdbomode ( TCHDB* hdb ) ;
 FUNCTION: uchar tchdbtype ( TCHDB* hdb ) ;
 FUNCTION: uchar tchdbflags ( TCHDB* hdb ) ;
