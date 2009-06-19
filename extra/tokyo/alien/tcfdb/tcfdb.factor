@@ -84,7 +84,7 @@ FUNCTION: uint tcfdbwidth ( TCFDB* fdb ) ;
 FUNCTION: ulonglong tcfdblimsiz ( TCFDB* fdb ) ;
 FUNCTION: ulonglong tcfdblimid ( TCFDB* fdb ) ;
 FUNCTION: ulonglong tcfdbinode ( TCFDB* fdb ) ;
-FUNCTION: time_t tcfdbmtime ( TCFDB* fdb ) ;
+FUNCTION: tokyo_time_t tcfdbmtime ( TCFDB* fdb ) ;
 FUNCTION: int tcfdbomode ( TCFDB* fdb ) ;
 FUNCTION: uchar tcfdbtype ( TCFDB* fdb ) ;
 FUNCTION: uchar tcfdbflags ( TCFDB* fdb ) ;
