@@ -21,7 +21,7 @@ IN: ui.gadgets.scrollers.tests
 
 [ ] [
     <gadget> dup "g" set
-    10 1 0 100 <range> 20 1 0 100 <range> 2array <product>
+    10 1 0 100 1 <range> 20 1 0 100 1 <range> 2array <product>
     <viewport> "v" set
 ] unit-test
 
