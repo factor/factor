@@ -8,7 +8,7 @@ HELP: histogram
 }
 { $examples 
     { $example "! Count the number of times an element appears in a sequence."
-               "USING: prettyprint sets ;"
+               "USING: prettyprint histogram ;"
                "\"aaabc\" histogram ."
                "H{ { 97 3 } { 98 1 } { 99 1 } }"
     }
@@ -22,7 +22,7 @@ HELP: histogram*
 }
 { $examples 
     { $example "! Count the number of times the elements of two sequences appear."
-               "USING: prettyprint sets ;"
+               "USING: prettyprint histogram ;"
                "\"aaabc\" histogram \"aaaaaabc\" histogram* ."
                "H{ { 97 9 } { 98 2 } { 99 2 } }"
     }
@@ -36,7 +36,7 @@ HELP: sequence>assoc
 }
 { $examples 
     { $example "! Iterate over a sequence and increment the count at each element"
-               "USING: assocs prettyprint sets ;"
+               "USING: assocs prettyprint histogram ;"
                "\"aaabc\" [ inc-at ] H{ } sequence>assoc ."
                "H{ { 97 3 } { 98 1 } { 99 1 } }"
     }
@@ -50,7 +50,7 @@ HELP: sequence>assoc*
 }
 { $examples 
     { $example "! Iterate over a sequence and add the counts to an existing assoc"
-               "USING: assocs prettyprint sets kernel ;"
+               "USING: assocs prettyprint histogram kernel ;"
                "H{ { 97 2 } { 98 1 } } clone \"aaabc\" [ inc-at ] sequence>assoc* ."
                "H{ { 97 5 } { 98 2 } { 99 1 } }"
     }
@@ -64,7 +64,7 @@ HELP: sequence>hashtable
 }
 { $examples 
     { $example "! Count the number of times an element occurs in a sequence"
-               "USING: assocs prettyprint sets ;"
+               "USING: assocs prettyprint histogram ;"
                "\"aaabc\" [ inc-at ] sequence>hashtable ."
                "H{ { 97 3 } { 98 1 } { 99 1 } }"
     }
