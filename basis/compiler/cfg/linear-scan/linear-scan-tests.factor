@@ -79,7 +79,7 @@ check-allocation? on
         { end 10 }
         { uses V{ 0 1 3 7 10 } }
     }
-    4 [ >= ] find-use nip
+    4 [ >= ] find-use
 ] unit-test
 
 [ 4 ] [
@@ -89,7 +89,7 @@ check-allocation? on
         { end 10 }
         { uses V{ 0 1 3 4 10 } }
     }
-    4 [ >= ] find-use nip
+    4 [ >= ] find-use
 ] unit-test
 
 [ f ] [
@@ -99,7 +99,7 @@ check-allocation? on
         { end 10 }
         { uses V{ 0 1 3 4 10 } }
     }
-    100 [ >= ] find-use nip
+    100 [ >= ] find-use
 ] unit-test
 
 [
@@ -1324,7 +1324,7 @@ USING: math.private compiler.cfg.debugger ;
 
 ! Spill slot liveness was computed incorrectly, leading to a FEP
 ! early in bootstrap on x86-32
-[ t ] [
+[ t t ] [
     [
         H{ } clone live-ins set
         H{ } clone live-outs set
@@ -1349,7 +1349,9 @@ USING: math.private compiler.cfg.debugger ;
              }
            }
         } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
-        instructions>> first live-spill-slots>> empty?
+        instructions>> first
+        [ live-spill-slots>> empty? ]
+        [ live-registers>> empty? ] bi
     ] with-scope
 ] unit-test
 
