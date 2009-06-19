@@ -19,7 +19,7 @@ C-ENUM:
     TCDBTTABLE ;
 
 ! FIXME: on windows 64bits this isn't correct, because long is 32bits there, and time_t is int64
-TYPEDEF: long time_t
+TYPEDEF: long tokyo_time_t
 
 TYPEDEF: void* TCLIST*
 
@@ -36,4 +36,4 @@ FUNCTION: void tcfree ( void* ptr ) ;
 TYPEDEF: void* TCCMP
 TYPEDEF: void* TCCODEC
 TYPEDEF: void* TCPDPROC
-TYPEDEF: voud* TCITER
+TYPEDEF: void* TCITER

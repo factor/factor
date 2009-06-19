@@ -30,12 +30,3 @@ IN: sets.tests
 
 [ f ] [ { 1 } { } intersects? ] unit-test
 
-[
-    H{
-        { 97 2 }
-        { 98 2 }
-        { 99 2 }
-    }
-] [
-    "aabbcc" histogram
-] unit-test
