@@ -246,10 +246,14 @@ CONSTANT: window-control>ex-style
 : needs-sysmenu? ( controls -- ? )
     { close-button minimize-button maximize-button } intersects? ;
 
+: has-titlebar? ( controls -- ? )
+    { small-title-bar normal-title-bar } intersects? ;
+
 : world>style ( world -- n )
     window-controls>>
     [ window-control>style symbols>flags ]
-    [ needs-sysmenu? [ WS_SYSMENU bitor ] when ] bi ;
+    [ needs-sysmenu? [ WS_SYSMENU bitor ] when ]
+    [ has-titlebar? [ WS_POPUP bitor ] unless ] tri ;
 
 : world>ex-style ( world -- n )
     window-controls>> window-control>ex-style symbols>flags ;
@@ -270,12 +274,12 @@ CONSTANT: window-control>ex-style
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    dup { 0 0 } = [ 2drop ] [ swap window (>>dim) ] if ;
+    dup { 0 0 } = [ 2drop ] [ swap window [ (>>dim) ] [ drop ] if* ] if ;
 
 : handle-wm-move ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    swap window (>>window-loc) ;
+    swap window [ (>>window-loc) ] [ drop ] if* ;
 
 CONSTANT: wm-keydown-codes
     H{
