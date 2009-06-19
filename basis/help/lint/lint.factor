@@ -78,6 +78,7 @@ PRIVATE>
 
 : help-lint ( prefix -- )
     [
+        auto-use? off
         all-vocabs-seq [ vocab-name ] map all-vocabs set
         group-articles vocab-articles set
         child-vocabs
