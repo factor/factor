@@ -253,7 +253,7 @@ CONSTANT: window-control>ex-style
     window-controls>>
     [ window-control>style symbols>flags ]
     [ needs-sysmenu? [ WS_SYSMENU bitor ] when ]
-    [ has-titlebar? [ WS_POPUP flags bitor ] unless ] tri ;
+    [ has-titlebar? [ WS_POPUP bitor ] unless ] tri ;
 
 : world>ex-style ( world -- n )
     window-controls>> window-control>ex-style symbols>flags ;
