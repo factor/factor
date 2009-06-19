@@ -42,8 +42,6 @@ CONSTANT: RDBXOLCKGLB 2
 CONSTANT: RDBROCHKCON 1
 CONSTANT: RDBMONOULOG 1
 
-TYPEDEF: int bool
-
 FUNCTION: char* tcrdberrmsg ( int ecode ) ;
 FUNCTION: TCRDB* tcrdbnew ( ) ;
 FUNCTION: void tcrdbdel ( TCRDB* rdb ) ;
