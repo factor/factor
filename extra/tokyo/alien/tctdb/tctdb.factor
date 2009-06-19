@@ -136,7 +136,7 @@ FUNCTION: ulonglong tctdbbnum ( TCTDB* tdb ) ;
 FUNCTION: uint tctdbalign ( TCTDB* tdb ) ;
 FUNCTION: uint tctdbfbpmax ( TCTDB* tdb ) ;
 FUNCTION: ulonglong tctdbinode ( TCTDB* tdb ) ;
-FUNCTION: time_t tctdbmtime ( TCTDB* tdb ) ;
+FUNCTION: tokyo_time_t tctdbmtime ( TCTDB* tdb ) ;
 FUNCTION: uchar tctdbflags ( TCTDB* tdb ) ;
 FUNCTION: uchar tctdbopts ( TCTDB* tdb ) ;
 FUNCTION: char* tctdbopaque ( TCTDB* tdb ) ;
