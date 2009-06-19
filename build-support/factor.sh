@@ -97,7 +97,7 @@ set_md5sum() {
 set_gcc() {
     case $OS in
         openbsd) ensure_program_installed egcc; CC=egcc;;
-        *) CC=gcc;;
+        *) CC=${CC:=gcc};;
     esac
 }
 
