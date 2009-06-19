@@ -41,7 +41,7 @@ IN: compiler.cfg.linear-scan.allocation
     2tri 3array assoc-combine
     >alist sort-values ;
 
-: no-free-registers? ( new result -- ? )
+: no-free-registers? ( result -- ? )
     second 0 = ; inline
 
 : register-available? ( new result -- ? )
