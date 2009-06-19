@@ -7,7 +7,7 @@ HELP: range
 { $notes { $link "ui.gadgets.sliders" } " use range models." } ;
 
 HELP: <range>
-{ $values { "value" real } { "page" real } { "min" real } { "max" real } { "range" range } }
+{ $values { "value" real } { "page" real } { "min" real } { "max" real } { "step" real } { "range" range } }
 { $description "Creates a new " { $link range } " model." } ;
 
 HELP: range-model
