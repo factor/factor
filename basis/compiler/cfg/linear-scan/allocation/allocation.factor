@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs heaps kernel namespaces sequences fry math
-combinators arrays sorting
+combinators arrays sorting compiler.utilities
 compiler.cfg.linear-scan.allocation.coalescing
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.splitting
@@ -39,7 +39,7 @@ IN: compiler.cfg.linear-scan.allocation
     [ inactive-intervals-for [ [ reg>> swap ] keep intersect-inactive ] with H{ } map>assoc ]
     [ nip active-intervals-for [ reg>> 0 ] H{ } map>assoc ]
     2tri 3array assoc-combine
-    >alist sort-values ;
+    >alist alist-max ;
 
 : no-free-registers? ( result -- ? )
     second 0 = ; inline
@@ -56,7 +56,7 @@ IN: compiler.cfg.linear-scan.allocation
 
 : assign-register ( new -- )
     dup coalesce? [ coalesce ] [
-        dup compute-free-pos last {
+        dup compute-free-pos {
             { [ dup no-free-registers? ] [ drop assign-blocked-register ] }
             { [ 2dup register-available? ] [ register-available ] }
             [ register-partially-available ]
