@@ -54,25 +54,3 @@ PRIVATE>
 
 : set= ( seq1 seq2 -- ? )
     [ unique ] bi@ = ;
-
-<PRIVATE
-
-: (sequence>assoc) ( seq quot assoc -- assoc )
-    [ swap curry each ] keep ; inline
-
-PRIVATE>
-
-: sequence>assoc* ( assoc seq quot: ( obj assoc -- ) -- assoc )
-    rot (sequence>assoc) ; inline
-
-: sequence>assoc ( seq quot: ( obj assoc -- ) exemplar -- assoc )
-    clone (sequence>assoc) ; inline
-
-: sequence>hashtable ( seq quot: ( obj hashtable -- ) -- hashtable )
-    H{ } sequence>assoc ; inline
-
-: histogram* ( hashtable seq -- hashtable )
-    [ inc-at ] sequence>assoc* ;
-
-: histogram ( seq -- hashtable )
-    [ inc-at ] sequence>hashtable ;
