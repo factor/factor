@@ -102,7 +102,9 @@ M: vreg-insn assign-registers-in-insn
     >>regs drop ;
 
 : compute-live-registers ( insn -- regs )
-    active-intervals register-mapping ;
+    [ active-intervals ] [ temp-vregs ] bi
+    '[ vreg>> _ memq? not ] filter
+    register-mapping ;
 
 : compute-live-spill-slots ( -- spill-slots )
     spill-slots get values [ values ] map concat
