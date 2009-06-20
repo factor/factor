@@ -6,13 +6,7 @@ compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 ! Mapping from register classes to sequences of machine registers
-SYMBOL: free-registers
-
-: free-registers-for ( vreg -- seq )
-    reg-class>> free-registers get at ;
-
-: deallocate-register ( live-interval -- )
-    [ reg>> ] [ vreg>> ] bi free-registers-for push ;
+SYMBOL: registers
 
 ! Vector of active live intervals
 SYMBOL: active-intervals
@@ -47,7 +41,7 @@ SYMBOL: handled-intervals
 : finished? ( n live-interval -- ? ) end>> swap < ;
 
 : finish ( n live-interval -- keep? )
-    nip [ deallocate-register ] [ add-handled ] bi f ;
+    nip add-handled f ;
 
 SYMBOL: check-allocation?
 
@@ -121,7 +115,7 @@ SYMBOL: spill-counts
     spill-counts get [ dup 1 + ] change-at ;
 
 : init-allocator ( registers -- )
-    [ reverse >vector ] assoc-map free-registers set
+    registers set
     [ 0 ] reg-class-assoc spill-counts set
     <min-heap> unhandled-intervals set
     [ V{ } clone ] reg-class-assoc active-intervals set
