@@ -86,6 +86,30 @@ HELP: select-all-action
 { $class-description "Gesture sent when the " { $emphasis "select all" } " standard window system action is invoked." }
 { $examples { $code "select-all-action" } } ;
 
+HELP: new-action
+{ $class-description "Gesture sent when the " { $emphasis "new" } " standard window system action is invoked." }
+{ $examples { $code "new-action" } } ;
+
+HELP: open-action
+{ $class-description "Gesture sent when the " { $emphasis "open" } " standard window system action is invoked." }
+{ $examples { $code "open-action" } } ;
+
+HELP: save-action
+{ $class-description "Gesture sent when the " { $emphasis "save" } " standard window system action is invoked." }
+{ $examples { $code "save-action" } } ;
+
+HELP: save-as-action
+{ $class-description "Gesture sent when the " { $emphasis "save as" } " standard window system action is invoked." }
+{ $examples { $code "save-as-action" } } ;
+
+HELP: revert-action
+{ $class-description "Gesture sent when the " { $emphasis "revert" } " standard window system action is invoked." }
+{ $examples { $code "revert-action" } } ;
+
+HELP: close-action
+{ $class-description "Gesture sent when the " { $emphasis "close" } " standard window system action is invoked." }
+{ $examples { $code "close-action" } } ;
+
 HELP: C+
 { $description "Control key modifier." } ;
 
@@ -350,21 +374,34 @@ $nl
 { $subsection zoom-out-action } ;
 
 ARTICLE: "action-gestures" "Action gestures"
-"Action gestures exist to keep keyboard shortcuts for common clipboard operations consistent."
+"Action gestures exist to keep keyboard shortcuts for common application operations consistent."
+{ $subsection undo-action }
+{ $subsection redo-action }
 { $subsection cut-action }
 { $subsection copy-action }
 { $subsection paste-action }
 { $subsection delete-action }
 { $subsection select-all-action }
+{ $subsection new-action }
+{ $subsection open-action }
+{ $subsection save-action }
+{ $subsection save-as-action }
+{ $subsection revert-action }
+{ $subsection close-action }
 "The following keyboard gestures, if not handled directly, send action gestures:"
 { $table
     { { $strong "Keyboard gesture" } { $strong "Action gesture" } }
     { { $snippet "T{ key-down f { C+ } \"z\" }" } { $snippet "undo-action" } }
-    { { $snippet "T{ key-down f { C+ } \"Z\" }" } { $snippet "redo-action" } }
+    { { $snippet "T{ key-down f { C+ } \"y\" }" } { $snippet "redo-action" } }
     { { $snippet "T{ key-down f { C+ } \"x\" }" } { $snippet "cut-action" } }
     { { $snippet "T{ key-down f { C+ } \"c\" }" } { $snippet "copy-action" } }
     { { $snippet "T{ key-down f { C+ } \"v\" }" } { $snippet "paste-action" } }
     { { $snippet "T{ key-down f { C+ } \"a\" }" } { $snippet "select-all-action" } }
+    { { $snippet "T{ key-down f { C+ } \"n\" }" } { $snippet "new-action" } }
+    { { $snippet "T{ key-down f { C+ } \"o\" }" } { $snippet "open-action" } }
+    { { $snippet "T{ key-down f { C+ } \"s\" }" } { $snippet "save-action" } }
+    { { $snippet "T{ key-down f { C+ } \"S\" }" } { $snippet "save-as-action" } }
+    { { $snippet "T{ key-down f { C+ } \"w\" }" } { $snippet "close-action" } }
 }
 "Action gestures should be used in place of the above keyboard gestures if possible. For example, on Mac OS X, the standard " { $strong "Edit" } " menu items send action gestures." ;
 
