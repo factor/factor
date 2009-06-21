@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private arrays vectors fry
-math.order namespaces assocs ;
+math math.order namespaces assocs ;
 IN: compiler.utilities
 
 : flattener ( seq quot -- seq vector quot' )
@@ -25,3 +25,6 @@ IN: compiler.utilities
 SYMBOL: yield-hook
 
 yield-hook [ [ ] ] initialize
+
+: alist-max ( alist -- pair )
+    [ ] [ [ [ second ] bi@ > ] most ] map-reduce ;
