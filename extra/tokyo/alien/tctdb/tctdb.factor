@@ -76,7 +76,7 @@ FUNCTION: void tctdbdel ( TCTDB* tdb ) ;
 FUNCTION: int tctdbecode ( TCTDB* tdb ) ;
 FUNCTION: bool tctdbsetmutex ( TCTDB* tdb ) ;
 FUNCTION: bool tctdbtune ( TCTDB* tdb, longlong bnum, char apow, char fpow, uchar opts ) ;
-FUNCTION: bool tctdbsetcache ( TCTDB* tdb, int32_t rcnum, int32_t lcnum, int32_t ncnum ) ;
+FUNCTION: bool tctdbsetcache ( TCTDB* tdb, int rcnum, int lcnum, int ncnum ) ;
 FUNCTION: bool tctdbsetxmsiz ( TCTDB* tdb, longlong xmsiz ) ;
 FUNCTION: bool tctdbopen ( TCTDB* tdb, char* path, int omode ) ;
 FUNCTION: bool tctdbclose ( TCTDB* tdb ) ;
