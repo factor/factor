@@ -1417,9 +1417,6 @@ USING: math.private ;
     intersect-inactive
 ] unit-test
 
-: test-bb ( insns n -- )
-    [ <basic-block> swap >>number swap >>instructions ] keep set ;
-
 ! Bug in live spill slots calculation
 
 V{ T{ ##prologue } T{ ##branch } } 0 test-bb
@@ -1489,7 +1486,9 @@ SYMBOL: linear-scan-result
         flatten-cfg 1array mr.
     ] unit-test ;
 
-{ 1 2 } test-linear-scan-on-cfg
+! This test has a critical edge -- do we care about these?
+
+! { 1 2 } test-linear-scan-on-cfg
 
 ! Bug in inactive interval handling
 ! [ rot dup [ -rot ] when ]
