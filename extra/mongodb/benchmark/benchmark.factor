@@ -2,6 +2,7 @@ USING: calendar math fry kernel assocs math.ranges bson.reader io.streams.byte-a
 sequences formatting combinators namespaces io tools.time prettyprint io.encodings.binary
 accessors words mongodb.driver strings math.parser bson.writer ;
 FROM: mongodb.driver => find ;
+FROM: memory => gc ;
 
 IN: mongodb.benchmark
 
@@ -175,7 +176,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 
 : deserialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
     [ 0 ] dip call( i -- doc ) assoc>bv
-    '[ trial-size [  _ binary [ H{ } stream>assoc 2drop ] with-byte-reader ] times ] ; 
+    '[ trial-size [  _ binary [ H{ } stream>assoc drop ] with-byte-reader ] times ] ; 
 
 : check-for-key ( assoc key -- )
     CHECK-KEY [ swap key? [ "ups... where's the key" throw ] unless ] [ 2drop ] if ; 
@@ -246,7 +247,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 : [bench-quot] ( feat-seq op-word -- quot: ( doc-word -- ) )
     '[ _ swap _
        '[ [ [ _ execute( -- quot ) ] dip
-          [ execute( -- ) ] each _ execute( quot -- quot ) benchmark ] with-result ] each
+          [ execute( -- ) ] each _ execute( quot -- quot ) gc benchmark ] with-result ] each
        print-separator ] ; 
 
 : run-serialization-bench ( doc-word-seq feat-seq -- )

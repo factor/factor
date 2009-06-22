@@ -64,61 +64,13 @@ GENERIC: (read-message) ( message opcode -- message )
     [ opcode>> ] keep [ >>opcode ] dip
     flags>> >>flags ;
 
-M: mdb-query-op (read-message) ( msg-stub opcode -- message )
-    drop
-    [ mdb-query-msg new ] dip copy-header
-    read-cstring >>collection
-    read-int32 >>skip#
-    read-int32 >>return#
-    H{ } stream>assoc change-bytes-read >>query 
-    dup length>> bytes-read> >
-    [ H{ } stream>assoc change-bytes-read >>returnfields ] when ;
-
-M: mdb-insert-op (read-message) ( msg-stub opcode -- message )
-    drop
-    [ mdb-insert-msg new ] dip copy-header
-    read-cstring >>collection
-    V{ } clone >>objects
-    [ '[ _ length>> bytes-read> > ] ] keep tuck
-    '[ H{ } stream>assoc change-bytes-read _ objects>> push ]
-    while ;
-
-M: mdb-delete-op (read-message) ( msg-stub opcode -- message )
-    drop
-    [ mdb-delete-msg new ] dip copy-header
-    read-cstring >>collection
-    H{ } stream>assoc change-bytes-read >>selector ;
-
-M: mdb-getmore-op (read-message) ( msg-stub opcode -- message )
-    drop
-    [ mdb-getmore-msg new ] dip copy-header
-    read-cstring >>collection
-    read-int32 >>return#
-    read-longlong >>cursor ;
-
-M: mdb-killcursors-op (read-message) ( msg-stub opcode -- message )
-    drop
-    [ mdb-killcursors-msg new ] dip copy-header
-    read-int32 >>cursors#
-    V{ } clone >>cursors
-    [ [ cursors#>> ] keep 
-      '[ read-longlong _ cursors>> push ] times ] keep ;
-
-M: mdb-update-op (read-message) ( msg-stub opcode -- message )
-    drop
-    [ mdb-update-msg new ] dip copy-header
-    read-cstring >>collection
-    read-int32 >>upsert?
-    H{ } stream>assoc change-bytes-read >>selector
-    H{ } stream>assoc change-bytes-read >>object ;
-
 M: mdb-reply-op (read-message) ( msg-stub opcode -- message )
     drop
     [ <mdb-reply-msg> ] dip copy-header
     read-longlong >>cursor
     read-int32 >>start#
     read-int32 [ >>returned# ] keep
-    [ H{ } stream>assoc drop ] accumulator [ times ] dip >>objects ;    
+    [ H{ } stream>assoc ] accumulator [ times ] dip >>objects ;    
 
 : read-header ( message -- message )
     read-int32 >>length
