@@ -1,9 +1,9 @@
-USING: accessors arrays kernel models monads ui.frp.signals ui.gadgets
-ui.gadgets.buttons ui.gadgets.buttons.private ui.gadgets.editors
-ui.gadgets.tables sequences splitting ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.borders ;
+USING: accessors arrays kernel models monads
+sequences ui.frp.signals ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.buttons.private
+ui.gadgets.editors ui.gadgets.labels ui.gadgets.scrollers
+ui.gadgets.tables ui.images vocabs.parser ;
 IN: ui.frp.gadgets
-
 TUPLE: frp-button < button hook value ;
 : <frp-button> ( gadget -- button ) [
       [ dup hook>> [ call( button -- ) ] [ drop ] if* ]
@@ -53,6 +53,10 @@ M: frp-field model-changed 2dup frp-model>> =
 
 : <frp-action-field> ( -- field ) f <action-field> dup [ set-control-value ] curry >>quot
     f <model> >>model ;
+
+: image-button ( filename path -- button ) ".tiff" surround <image-name> <frp-button> ;
+SYNTAX: <image-button> current-vocab name>> "vocab:" "/icons/" surround
+    [ image-button ] curry over push-all ;
 
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
