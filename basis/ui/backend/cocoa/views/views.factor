@@ -225,6 +225,26 @@ CLASS: {
     [ nip select-all-action send-action$ ]
 }
 
+{ "newDocument:" "id" { "id" "SEL" "id" }
+    [ nip new-action send-action$ ]
+}
+
+{ "openDocument:" "id" { "id" "SEL" "id" }
+    [ nip open-action send-action$ ]
+}
+
+{ "saveDocument:" "id" { "id" "SEL" "id" }
+    [ nip save-action send-action$ ]
+}
+
+{ "saveDocumentAs:" "id" { "id" "SEL" "id" }
+    [ nip save-as-action send-action$ ]
+}
+
+{ "revertDocumentToSaved:" "id" { "id" "SEL" "id" }
+    [ nip revert-action send-action$ ]
+}
+
 ! Multi-touch gestures: this is undocumented.
 ! http://cocoadex.com/2008/02/nsevent-modifications-swipe-ro.html
 { "magnifyWithEvent:" "void" { "id" "SEL" "id" }
