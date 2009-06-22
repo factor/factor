@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences sets arrays math strings fry
-prettyprint compiler.cfg.linear-scan.live-intervals
-compiler.cfg.linear-scan.allocation ;
+namespaces prettyprint compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linear-scan.allocation compiler.cfg ;
 IN: compiler.cfg.linear-scan.debugger
 
 : check-assigned ( live-intervals -- )
@@ -34,3 +34,6 @@ IN: compiler.cfg.linear-scan.debugger
 
 : live-intervals. ( seq -- )
     [ interval-picture ] map simple-table. ;
+
+: test-bb ( insns n -- )
+    [ <basic-block> swap >>number swap >>instructions ] keep set ;
