@@ -77,7 +77,8 @@ M: mapped-model (model-changed)
     set-model ;
 
 TUPLE: side-effect-model < mapped-model ;
-M: side-effect-model (model-changed) [ [ value>> ] [ quot>> ] bi* call( old -- ) ] keep t swap set-model ;
+M: side-effect-model (model-changed) [ value>> ] dip [ quot>> call( old -- ) ] 2keep set-model ;
+
 : $> ( model quot -- signal ) side-effect-model new-mapped-model ;
 
 TUPLE: quot-model < mapped-model ;
@@ -114,6 +115,12 @@ M: model >>= [ swap <action> ] curry ;
 M: model fmap <mapped> ;
 USE: ui.frp.functors
 FMAPS: $> <$ fmap FOR & | product ;
+
+! for side effects
+TUPLE: (frp-when) < multi-model quot cond ;
+: frp-when ( model quot cond -- model ) rot 1array (frp-when) <multi-model> swap >>cond swap >>quot ;
+M: (frp-when) (model-changed) [ quot>> ] 2keep
+    [ value>> ] [ cond>> ] bi* call( a -- ? ) [ call( model -- ) ] [ 2drop ] if ;
 
 ! only used in construction
 : with-self ( quot: ( model -- model ) -- model ) [ f <basic> dup ] dip call swap [ add-dependency ] keep ; inline
