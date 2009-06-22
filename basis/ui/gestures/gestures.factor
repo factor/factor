@@ -82,23 +82,32 @@ undo-action redo-action
 cut-action copy-action paste-action
 delete-action select-all-action
 left-action right-action up-action down-action
-zoom-in-action zoom-out-action ;
+zoom-in-action zoom-out-action
+new-action open-action save-action save-as-action
+revert-action close-action ;
 
 UNION: action
 undo-action redo-action
 cut-action copy-action paste-action
 delete-action select-all-action
 left-action right-action up-action down-action
-zoom-in-action zoom-out-action ;
+zoom-in-action zoom-out-action
+new-action open-action save-action save-as-action
+revert-action close-action ;
 
 CONSTANT: action-gestures
     {
         { "z" undo-action }
-        { "Z" redo-action }
+        { "y" redo-action }
         { "x" cut-action }
         { "c" copy-action }
         { "v" paste-action }
         { "a" select-all-action }
+        { "n" new-action }
+        { "o" open-action }
+        { "s" save-action }
+        { "S" save-as-action }
+        { "w" close-action }
     }
 
 ! Modifiers
