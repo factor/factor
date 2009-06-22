@@ -4,7 +4,7 @@ USING: accessors assocs cache colors.constants destructors kernel
 opengl opengl.gl opengl.capabilities combinators images
 images.tesselation grouping specialized-arrays.float sequences math
 math.vectors math.matrices generalizations fry arrays namespaces
-system ;
+system locals ;
 IN: opengl.textures
 
 SYMBOL: non-power-of-2-textures?
@@ -22,16 +22,46 @@ SYMBOL: non-power-of-2-textures?
 
 : delete-texture ( id -- ) [ glDeleteTextures ] (delete-gl-object) ;
 
-GENERIC: component-order>format ( component-order -- format type )
+GENERIC: component-type>type ( component-type -- internal-format type )
+GENERIC: component-order>format ( type component-order -- type format )
+GENERIC: component-order>integer-format ( type component-order -- type format )
 
-M: RGB component-order>format drop GL_RGB GL_UNSIGNED_BYTE ;
-M: BGR component-order>format drop GL_BGR GL_UNSIGNED_BYTE ;
-M: RGBA component-order>format drop GL_RGBA GL_UNSIGNED_BYTE ;
-M: ARGB component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV ;
-M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
-M: BGRX component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
-M: LA component-order>format drop GL_LUMINANCE_ALPHA GL_UNSIGNED_BYTE ;
-M: L component-order>format drop GL_LUMINANCE GL_UNSIGNED_BYTE ;
+ERROR: unsupported-component-order component-order ;
+
+M: ubyte-components component-type>type drop GL_RGBA8 GL_UNSIGNED_BYTE ;
+M: ushort-components component-type>type drop GL_RGBA16 GL_UNSIGNED_SHORT ;
+M: half-components component-type>type drop GL_RGBA16F_ARB GL_HALF_FLOAT_ARB ;
+M: float-components component-type>type drop GL_RGBA32F_ARB GL_FLOAT ;
+M: byte-integer-components component-type>type drop GL_RGBA8I_EXT GL_BYTE ;
+M: short-integer-components component-type>type drop GL_RGBA16I_EXT GL_SHORT ;
+M: int-integer-components component-type>type drop GL_RGBA32I_EXT GL_INT ;
+M: ubyte-integer-components component-type>type drop GL_RGBA8I_EXT GL_UNSIGNED_BYTE ;
+M: ushort-integer-components component-type>type drop GL_RGBA16I_EXT GL_UNSIGNED_SHORT ;
+M: uint-integer-components component-type>type drop GL_RGBA32I_EXT GL_UNSIGNED_INT ;
+
+M: RGB component-order>format drop GL_RGB ;
+M: BGR component-order>format drop GL_BGR ;
+M: RGBA component-order>format drop GL_RGBA ;
+M: ARGB component-order>format
+    swap GL_UNSIGNED_BYTE =
+    [ drop GL_UNSIGNED_INT_8_8_8_8_REV GL_BGRA_EXT ]
+    [ unsupported-component-order ] if ;
+M: BGRA component-order>format drop GL_BGRA_EXT ;
+M: BGRX component-order>format drop GL_BGRA_EXT ;
+M: LA component-order>format drop GL_LUMINANCE_ALPHA ;
+M: L component-order>format drop GL_LUMINANCE ;
+
+M: object component-order>format unsupported-component-order ;
+
+M: RGB component-order>integer-format drop GL_RGB_INTEGER_EXT ;
+M: BGR component-order>integer-format drop GL_BGR_INTEGER_EXT ;
+M: RGBA component-order>integer-format drop GL_RGBA_INTEGER_EXT ;
+M: BGRA component-order>integer-format drop GL_BGRA_INTEGER_EXT ;
+M: BGRX component-order>integer-format drop GL_BGRA_INTEGER_EXT ;
+M: LA component-order>integer-format drop GL_LUMINANCE_ALPHA_INTEGER_EXT ;
+M: L component-order>integer-format drop GL_LUMINANCE_INTEGER_EXT ;
+
+M: object component-order>integer-format unsupported-component-order ;
 
 SLOT: display-list
 
@@ -50,18 +80,25 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
         [ dup 1 = [ next-power-of-2 ] unless ] map
     ] unless ;
 
-: tex-image ( image bitmap -- )
+: image-format ( image -- internal-format format type )
+    dup component-type>>
+    [ nip component-type>type ]
     [
-        [ GL_TEXTURE_2D 0 GL_RGBA ] dip
-        [ dim>> adjust-texture-dim first2 0 ]
-        [ component-order>> component-order>format ] bi
-    ] dip
-    glTexImage2D ;
+        unnormalized-integer-components?
+        [ component-order>> component-order>integer-format ]
+        [ component-order>> component-order>format ] if
+    ] 2bi swap ;
+
+:: tex-image ( image bitmap -- )
+    image image-format :> type :> format :> internal-format
+    GL_TEXTURE_2D 0 internal-format
+    image dim>> adjust-texture-dim first2 0
+    format type bitmap glTexImage2D ;
 
 : tex-sub-image ( image -- )
     [ GL_TEXTURE_2D 0 0 0 ] dip
     [ dim>> first2 ]
-    [ component-order>> component-order>format ]
+    [ image-format [ drop ] 2dip ]
     [ bitmap>> ] tri
     glTexSubImage2D ;
 
