@@ -2,13 +2,16 @@ USING: accessors assocs bson.constants byte-arrays byte-vectors fry io
 io.binary io.encodings.string io.encodings.utf8 kernel math namespaces
 sequences serialize arrays calendar io.encodings ;
 
+FROM: kernel.private => declare ;
+FROM: io.encodings.private => (read-until) ;
+
 IN: bson.reader
 
 <PRIVATE
 
 TUPLE: element { type integer } name ;
 TUPLE: state
-    { size initial: -1 } { read initial: 0 } exemplar
+    { size initial: -1 } exemplar
     result scope element ;
 
 : <state> ( exemplar -- state )
@@ -17,25 +20,25 @@ TUPLE: state
     clone [ >>result ] [ V{ } clone [ push ] keep >>scope ] bi
     V{ } clone [ T_Object "" element boa swap push ] keep >>element ; 
 
-PREDICATE: bson-eoo     < integer T_EOO = ;
 PREDICATE: bson-not-eoo < integer T_EOO > ;
+PREDICATE: bson-eoo     < integer T_EOO = ;
 
-PREDICATE: bson-double  < integer T_Double = ;
-PREDICATE: bson-integer < integer T_Integer = ;
 PREDICATE: bson-string  < integer T_String = ;
 PREDICATE: bson-object  < integer T_Object = ;
+PREDICATE: bson-oid     < integer T_OID = ;
 PREDICATE: bson-array   < integer T_Array = ;
+PREDICATE: bson-integer < integer T_Integer = ;
+PREDICATE: bson-double  < integer T_Double = ;
+PREDICATE: bson-date    < integer T_Date = ;
 PREDICATE: bson-binary  < integer T_Binary = ;
+PREDICATE: bson-boolean < integer T_Boolean = ;
 PREDICATE: bson-regexp  < integer T_Regexp = ;
+PREDICATE: bson-null    < integer T_NULL = ;
+PREDICATE: bson-ref     < integer T_DBRef = ;
 PREDICATE: bson-binary-bytes < integer T_Binary_Bytes = ;
 PREDICATE: bson-binary-function < integer T_Binary_Function = ;
 PREDICATE: bson-binary-uuid < integer T_Binary_UUID = ;
 PREDICATE: bson-binary-custom < integer T_Binary_Custom = ;
-PREDICATE: bson-oid     < integer T_OID = ;
-PREDICATE: bson-boolean < integer T_Boolean = ;
-PREDICATE: bson-date    < integer T_Date = ;
-PREDICATE: bson-null    < integer T_NULL = ;
-PREDICATE: bson-ref     < integer T_DBRef = ;
 
 GENERIC: element-read ( type -- cont? )
 GENERIC: element-data-read ( type -- object )
@@ -47,27 +50,27 @@ GENERIC: element-binary-read ( length type -- object )
 : get-state ( -- state )
     state get ; inline
 
-: count-bytes ( count -- )
-    [ get-state ] dip '[ _ + ] change-read drop ; inline
-
 : read-int32 ( -- int32 )
-    4 [ read byte-array>number ] [ count-bytes ] bi  ; inline
+    4 read byte-array>number ; inline
 
 : read-longlong ( -- longlong )
-    8 [ read byte-array>number ] [ count-bytes ] bi ; inline
+    8 read byte-array>number ; inline
 
 : read-double ( -- double )
-    8 [ read byte-array>number bits>double ] [ count-bytes ] bi ; inline
+    8 read byte-array>number bits>double ; inline
 
 : read-byte-raw ( -- byte-raw )
-    1 [ read ] [ count-bytes ] bi ; inline
+    1 read ; inline
 
 : read-byte ( -- byte )
     read-byte-raw first ; inline
 
+: utf8-read-until ( seps stream encoding -- string/f sep/f )
+    [ { utf8 } declare decode-char dup [ dup rot member? ] [ 2drop f t ] if ]
+    3curry (read-until) ;
+
 : read-cstring ( -- string )
-    input-stream get utf8 <decoder>
-    "\0" swap stream-read-until drop ; inline
+    "\0" input-stream get utf8 utf8-read-until drop ; inline
 
 : read-sized-string ( length -- string )
     drop read-cstring ; inline
@@ -141,13 +144,13 @@ M: bson-not-eoo element-read ( type -- cont? )
 M: bson-object element-data-read ( type -- object )
     (object-data-read) ;
 
-M: bson-array element-data-read ( type -- object )
-    (object-data-read) ;
-    
 M: bson-string element-data-read ( type -- object )
     drop
     read-int32 read-sized-string ;
 
+M: bson-array element-data-read ( type -- object )
+    (object-data-read) ;
+    
 M: bson-integer element-data-read ( type -- object )
     drop
     read-int32 ;
@@ -191,7 +194,7 @@ PRIVATE>
 
 USE: tools.continuations
 
-: stream>assoc ( exemplar -- assoc bytes-read )
+: stream>assoc ( exemplar -- assoc )
     <state> dup state
     [ read-int32 >>size read-elements ] with-variable 
-    [ result>> ] [ read>> ] bi ; 
+    result>> ; 
