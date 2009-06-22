@@ -11,7 +11,6 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
 : top-recipes ( offset search -- recipes ) <query> T{ recipe } rot >>title >>tuple
     "votes" >>order 30 >>limit swap >>offset get-tuples ;
 : top-genres ( -- genres ) f f top-recipes [ genre>> ] map prune 4 (head-slice) ;
-: <image-button> ( str -- button ) "vocab:recipes/icons/" ".tiff" surround <image-name> <frp-button> ;
 
 : interface ( -- book ) [ 
      [
