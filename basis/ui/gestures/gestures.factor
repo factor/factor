@@ -7,12 +7,23 @@ sets columns fry deques ui.gadgets ui.gadgets.private ascii
 combinators.short-circuit ;
 IN: ui.gestures
 
+: get-gesture-handler ( gesture gadget -- quot )
+    class superclasses [ "gestures" word-prop ] map assoc-stack ;
+
 GENERIC: handle-gesture ( gesture gadget -- ? )
 
 M: object handle-gesture
     [ nip ]
-    [ class superclasses [ "gestures" word-prop ] map assoc-stack ] 2bi
+    [ get-gesture-handler ] 2bi
     dup [ call( gadget -- ) f ] [ 2drop t ] if ;
+
+GENERIC: handles-gesture? ( gesture gadget -- ? )
+
+M: object handles-gesture? ( gesture gadget -- ? )
+    get-gesture-handler >boolean ;
+
+: parents-handle-gesture? ( gesture gadget -- ? )
+    [ handles-gesture? not ] with each-parent not ;
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 
@@ -82,23 +93,32 @@ undo-action redo-action
 cut-action copy-action paste-action
 delete-action select-all-action
 left-action right-action up-action down-action
-zoom-in-action zoom-out-action ;
+zoom-in-action zoom-out-action
+new-action open-action save-action save-as-action
+revert-action close-action ;
 
 UNION: action
 undo-action redo-action
 cut-action copy-action paste-action
 delete-action select-all-action
 left-action right-action up-action down-action
-zoom-in-action zoom-out-action ;
+zoom-in-action zoom-out-action
+new-action open-action save-action save-as-action
+revert-action close-action ;
 
 CONSTANT: action-gestures
     {
         { "z" undo-action }
-        { "Z" redo-action }
+        { "y" redo-action }
         { "x" cut-action }
         { "c" copy-action }
         { "v" paste-action }
         { "a" select-all-action }
+        { "n" new-action }
+        { "o" open-action }
+        { "s" save-action }
+        { "S" save-as-action }
+        { "w" close-action }
     }
 
 ! Modifiers

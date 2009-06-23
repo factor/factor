@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors namespaces make
+USING: kernel accessors namespaces make locals
 cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
@@ -9,7 +9,8 @@ compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.assignment ;
+compiler.cfg.linear-scan.assignment
+compiler.cfg.linear-scan.resolve ;
 IN: compiler.cfg.linear-scan
 
 ! References:
@@ -26,12 +27,11 @@ IN: compiler.cfg.linear-scan
 ! by Omri Traub, Glenn Holloway, Michael D. Smith
 ! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.34.8435
 
-: (linear-scan) ( rpo machine-registers -- )
-    [
-        dup number-instructions
-        dup compute-live-intervals
-    ] dip
-    allocate-registers assign-registers ;
+:: (linear-scan) ( rpo machine-registers -- )
+    rpo number-instructions
+    rpo compute-live-intervals machine-registers allocate-registers
+    rpo assign-registers
+    rpo resolve-data-flow ;
 
 : linear-scan ( cfg -- cfg' )
     [
