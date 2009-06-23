@@ -40,16 +40,23 @@ ERROR: already-spilled ;
     2dup key? [ already-spilled ] [ set-at ] if ;
 
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ vreg>> reg-class>> ] [ spill-to>> ] tri _spill ;
+    {
+        [ reg>> ]
+        [ vreg>> reg-class>> ]
+        [ spill-to>> ]
+        [ end>> ]
+    } cleave f swap \ _spill boa , ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ [ record-spill ] [ insert-spill ] bi ] [ drop ] if ;
 
 : insert-copy ( live-interval -- )
-    [ split-next>> reg>> ]
-    [ reg>> ]
-    [ vreg>> reg-class>> ]
-    tri _copy ;
+    {
+        [ split-next>> reg>> ]
+        [ reg>> ]
+        [ vreg>> reg-class>> ]
+        [ end>> ]
+    } cleave f swap \ _copy boa , ;
 
 : handle-copy ( live-interval -- )
     dup [ spill-to>> not ] [ split-next>> ] bi and
@@ -68,7 +75,12 @@ ERROR: already-reloaded ;
     2dup key? [ delete-at ] [ already-reloaded ] if ;
 
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ vreg>> reg-class>> ] [ reload-from>> ] tri _reload ;
+    {
+        [ reg>> ]
+        [ vreg>> reg-class>> ]
+        [ reload-from>> ]
+        [ end>> ]
+    } cleave f swap \ _reload boa , ;
 
 : handle-reload ( live-interval -- )
     dup reload-from>> [ [ record-reload ] [ insert-reload ] bi ] [ drop ] if ;
@@ -102,7 +114,9 @@ M: vreg-insn assign-registers-in-insn
     >>regs drop ;
 
 : compute-live-registers ( insn -- regs )
-    active-intervals register-mapping ;
+    [ active-intervals ] [ temp-vregs ] bi
+    '[ vreg>> _ memq? not ] filter
+    register-mapping ;
 
 : compute-live-spill-slots ( -- spill-slots )
     spill-slots get values [ values ] map concat
@@ -139,6 +153,6 @@ M: insn assign-registers-in-insn drop ;
         ] V{ } make
     ] change-instructions drop ;
 
-: assign-registers ( rpo live-intervals -- )
-    init-assignment
+: assign-registers ( live-intervals rpo -- )
+    [ init-assignment ] dip
     [ assign-registers-in-block ] each ;
