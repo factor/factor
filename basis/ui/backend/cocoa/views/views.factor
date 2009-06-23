@@ -1,11 +1,12 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays assocs cocoa kernel math
-cocoa.messages cocoa.subclassing cocoa.classes cocoa.views
-cocoa.application cocoa.pasteboard cocoa.types cocoa.windows sequences
-ui ui.private ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures core-foundation.strings core-graphics core-graphics.types
-threads combinators math.rectangles ;
+USING: accessors alien alien.c-types alien.strings arrays assocs
+cocoa kernel math cocoa.messages cocoa.subclassing cocoa.classes
+cocoa.views cocoa.application cocoa.pasteboard cocoa.types
+cocoa.windows sequences io.encodings.ascii ui ui.private ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures
+core-foundation.strings core-graphics core-graphics.types threads
+combinators math.rectangles ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -121,6 +122,25 @@ CONSTANT: key-codes
     [ drop dim>> first2 ]
     2bi <CGRect> ;
 
+CONSTANT: selector>action H{
+    { "undo:" undo-action }
+    { "redo:" redo-action }
+    { "cut:" cut-action }
+    { "copy:" copy-action }
+    { "paste:" paste-action }
+    { "delete:" delete-action }
+    { "selectAll:" select-all-action }
+    { "newDocument:" new-action }
+    { "openDocument:" open-action }
+    { "saveDocument:" save-action }
+    { "saveDocumentAs:" save-as-action }
+    { "revertDocumentToSaved:" revert-action }
+}
+
+: validate-action ( world selector -- ? validated? )
+    selector>action at 
+    [ swap world-focus parents-handle-gesture? t ] [ drop f f ] if* ; 
+
 CLASS: {
     { +superclass+ "NSOpenGLView" }
     { +name+ "FactorView" }
@@ -197,6 +217,14 @@ CLASS: {
     [ nip send-key-up-event ]
 }
 
+{ "validateUserInterfaceItem:" "char" { "id" "SEL" "id" }
+    [
+        nip -> action
+        2dup [ window ] [ ascii alien>string ] bi* validate-action
+        [ [ 2drop ] dip >c-bool ] [ SUPER-> validateUserInterfaceItem: ] if
+    ]
+}
+
 { "undo:" "id" { "id" "SEL" "id" }
     [ nip undo-action send-action$ ]
 }
@@ -223,6 +251,26 @@ CLASS: {
 
 { "selectAll:" "id" { "id" "SEL" "id" }
     [ nip select-all-action send-action$ ]
+}
+
+{ "newDocument:" "id" { "id" "SEL" "id" }
+    [ nip new-action send-action$ ]
+}
+
+{ "openDocument:" "id" { "id" "SEL" "id" }
+    [ nip open-action send-action$ ]
+}
+
+{ "saveDocument:" "id" { "id" "SEL" "id" }
+    [ nip save-action send-action$ ]
+}
+
+{ "saveDocumentAs:" "id" { "id" "SEL" "id" }
+    [ nip save-as-action send-action$ ]
+}
+
+{ "revertDocumentToSaved:" "id" { "id" "SEL" "id" }
+    [ nip revert-action send-action$ ]
 }
 
 ! Multi-touch gestures: this is undocumented.
