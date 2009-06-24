@@ -7,12 +7,23 @@ sets columns fry deques ui.gadgets ui.gadgets.private ascii
 combinators.short-circuit ;
 IN: ui.gestures
 
+: get-gesture-handler ( gesture gadget -- quot )
+    class superclasses [ "gestures" word-prop ] map assoc-stack ;
+
 GENERIC: handle-gesture ( gesture gadget -- ? )
 
 M: object handle-gesture
     [ nip ]
-    [ class superclasses [ "gestures" word-prop ] map assoc-stack ] 2bi
+    [ get-gesture-handler ] 2bi
     dup [ call( gadget -- ) f ] [ 2drop t ] if ;
+
+GENERIC: handles-gesture? ( gesture gadget -- ? )
+
+M: object handles-gesture? ( gesture gadget -- ? )
+    get-gesture-handler >boolean ;
+
+: parents-handle-gesture? ( gesture gadget -- ? )
+    [ handles-gesture? not ] with each-parent not ;
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 

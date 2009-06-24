@@ -224,6 +224,9 @@ PRIVATE>
 : raise-window ( gadget -- )
     find-world raise-window* ;
 
+: topmost-window ( -- world )
+    windows get last second ;
+
 HOOK: close-window ui-backend ( gadget -- )
 
 M: object close-window
