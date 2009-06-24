@@ -2,44 +2,27 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs heaps kernel namespaces sequences fry math
 combinators arrays sorting compiler.utilities
+compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation.coalescing
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.state ;
 IN: compiler.cfg.linear-scan.allocation
 
-: relevant-ranges ( new inactive -- new' inactive' )
-    ! Slice off all ranges of 'inactive' that precede the start of 'new'
-    [ [ ranges>> ] bi@ ] [ nip start>> ] 2bi '[ to>> _ >= ] filter ;
+: free-positions ( new -- assoc )
+    vreg>> reg-class>> registers get at [ 1/0. ] H{ } map>assoc ;
 
-: intersect-live-range ( range1 range2 -- n/f )
-    2dup [ from>> ] bi@ > [ swap ] when
-    2dup [ to>> ] [ from>> ] bi* >= [ nip from>> ] [ 2drop f ] if ;
+: active-positions ( new -- assoc )
+    vreg>> active-intervals-for [ reg>> 0 ] H{ } map>assoc ;
 
-: intersect-live-ranges ( ranges1 ranges2 -- n )
-    {
-        { [ over empty? ] [ 2drop 1/0. ] }
-        { [ dup empty? ] [ 2drop 1/0. ] }
-        [
-            2dup [ first ] bi@ intersect-live-range dup [ 2nip ] [
-                drop
-                2dup [ first from>> ] bi@ <
-                [ [ rest-slice ] dip ] [ rest-slice ] if
-                intersect-live-ranges
-            ] if
-        ]
-    } cond ;
-
-: intersect-inactive ( new inactive -- n )
-    relevant-ranges intersect-live-ranges ;
+: inactive-positions ( new -- assoc )
+    dup vreg>> inactive-intervals-for
+    [ [ reg>> swap ] keep relevant-ranges intersect-live-ranges ]
+    with H{ } map>assoc ;
 
 : compute-free-pos ( new -- free-pos )
-    dup vreg>>
-    [ nip reg-class>> registers get at [ 1/0. ] H{ } map>assoc ]
-    [ inactive-intervals-for [ [ reg>> swap ] keep intersect-inactive ] with H{ } map>assoc ]
-    [ nip active-intervals-for [ reg>> 0 ] H{ } map>assoc ]
-    2tri 3array assoc-combine
-    >alist alist-max ;
+    [ free-positions ] [ inactive-positions ] [ active-positions ] tri
+    3array assoc-combine >alist alist-max ;
 
 : no-free-registers? ( result -- ? )
     second 0 = ; inline
