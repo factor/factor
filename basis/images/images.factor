@@ -4,7 +4,8 @@ USING: combinators kernel accessors sequences math arrays ;
 IN: images
 
 SINGLETONS:
-    L LA BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
+    A L LA BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
+    INTENSITY DEPTH R RG
     ubyte-components ushort-components
     half-components float-components
     byte-integer-components ubyte-integer-components
@@ -12,7 +13,8 @@ SINGLETONS:
     int-integer-components uint-integer-components ;
 
 UNION: component-order 
-    L LA BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR ;
+    A L LA BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
+    INTENSITY DEPTH R RG ;
 
 UNION: component-type
     ubyte-components ushort-components
@@ -26,7 +28,7 @@ UNION: unnormalized-integer-components
     short-integer-components ushort-integer-components
     int-integer-components uint-integer-components ;
 
-UNION: alpha-channel BGRA RGBA ABGR ARGB ;
+UNION: alpha-channel BGRA RGBA ABGR ARGB LA A INTENSITY ;
 
 TUPLE: image dim component-order component-type upside-down? bitmap ;
 
@@ -56,6 +58,7 @@ DEFER: bytes-per-pixel
 
 : component-count ( component-order -- n )
     {
+        { A [ 1 ] }
         { L [ 1 ] }
         { LA [ 2 ] }
         { BGR [ 3 ] }
@@ -68,6 +71,10 @@ DEFER: bytes-per-pixel
         { XRGB [ 4 ] }
         { BGRX [ 4 ] }
         { XBGR [ 4 ] }
+        { INTENSITY [ 1 ] }
+        { DEPTH [ 1 ] }
+        { R [ 1 ] }
+        { RG [ 2 ] }
     } case ;
 
 : pixel@ ( x y image -- start end bitmap )
