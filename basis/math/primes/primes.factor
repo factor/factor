@@ -1,9 +1,9 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators fry kernel math math.bitwise math.functions
-math.order math.primes.erato math.primes.erato.private
-math.primes.miller-rabin math.ranges literals random sequences sets
-vectors ;
+USING: combinators combinators.short-circuit fry kernel math
+math.bitwise math.functions math.order math.primes.erato
+math.primes.erato.private math.primes.miller-rabin math.ranges
+literals random sequences sets vectors ;
 IN: math.primes
 
 <PRIVATE
@@ -28,12 +28,14 @@ IN: math.primes
     108 max 10000 min <vector> ] keep
     3 < [ [ 2 swap push ] keep ] when ;
 
+: simple? ( n -- ? ) { [ even? ] [ 3 mod 0 = ] [ 5 mod 0 = ] } 1|| ;
+
 PRIVATE>
 
 : prime? ( n -- ? )
     {
         { [ dup 7 < ] [ { 2 3 5 } member? ] }
-        { [ dup even? ] [ 2 = ] }
+        { [ dup simple? ] [ drop f ] }
         [ (prime?) ]
     } cond ; foldable
 
