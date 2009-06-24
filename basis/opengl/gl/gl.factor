@@ -322,7 +322,7 @@ CONSTANT: GL_DECR                           HEX: 1E03
 CONSTANT: GL_NONE                           HEX:    0
 CONSTANT: GL_LEFT                           HEX: 0406
 CONSTANT: GL_RIGHT                          HEX: 0407
-
+CONSTANT: GL_FRONT_LEFT                     HEX: 0400
 CONSTANT: GL_FRONT_RIGHT                    HEX: 0401
 CONSTANT: GL_BACK_LEFT                      HEX: 0402
 CONSTANT: GL_BACK_RIGHT                     HEX: 0403
@@ -1167,6 +1167,22 @@ GL-FUNCTION: void glTexImage3D { glTexImage3DEXT } ( GLenum target, GLint level,
 GL-FUNCTION: void glTexSubImage3D { glTexSubImage3DEXT } ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLvoid* pixels ) ;
 
 
+! GL_ARB_imaging
+
+
+CONSTANT: GL_CONSTANT_COLOR                 HEX: 8001
+CONSTANT: GL_ONE_MINUS_CONSTANT_COLOR       HEX: 8002
+CONSTANT: GL_CONSTANT_ALPHA                 HEX: 8003
+CONSTANT: GL_ONE_MINUS_CONSTANT_ALPHA       HEX: 8004
+CONSTANT: GL_BLEND_COLOR                    HEX: 8005
+CONSTANT: GL_FUNC_ADD                       HEX: 8006
+CONSTANT: GL_MIN                            HEX: 8007
+CONSTANT: GL_MAX                            HEX: 8008
+CONSTANT: GL_BLEND_EQUATION                 HEX: 8009
+CONSTANT: GL_FUNC_SUBTRACT                  HEX: 800A
+CONSTANT: GL_FUNC_REVERSE_SUBTRACT          HEX: 800B
+
+
 ! OpenGL 1.3
 
 
@@ -1370,6 +1386,8 @@ GL-FUNCTION: void glMultiDrawArrays { glMultiDrawArraysEXT } ( GLenum mode, GLin
 GL-FUNCTION: void glMultiDrawElements { glMultiDrawElementsEXT } ( GLenum mode, GLsizei* count, GLenum type, GLvoid** indices, GLsizei primcount ) ;
 GL-FUNCTION: void glPointParameterf { glPointParameterfARB } ( GLenum pname, GLfloat param ) ;
 GL-FUNCTION: void glPointParameterfv { glPointParameterfvARB } ( GLenum pname, GLfloat* params ) ;
+GL-FUNCTION: void glPointParameteri { glPointParameteriARB } ( GLenum pname, GLint param ) ;
+GL-FUNCTION: void glPointParameteriv { glPointParameterivARB } ( GLenum pname, GLint* params ) ;
 GL-FUNCTION: void glSecondaryColor3b { glSecondaryColor3bEXT } ( GLbyte red, GLbyte green, GLbyte blue ) ;
 GL-FUNCTION: void glSecondaryColor3bv { glSecondaryColor3bvEXT } ( GLbyte* v ) ;
 GL-FUNCTION: void glSecondaryColor3d { glSecondaryColor3dEXT } ( GLdouble red, GLdouble green, GLdouble blue ) ;
@@ -1567,7 +1585,6 @@ CONSTANT: GL_UPPER_LEFT HEX: 8CA2
 CONSTANT: GL_STENCIL_BACK_REF HEX: 8CA3
 CONSTANT: GL_STENCIL_BACK_VALUE_MASK HEX: 8CA4
 CONSTANT: GL_STENCIL_BACK_WRITEMASK HEX: 8CA5
-CONSTANT: GL_BLEND_EQUATION HEX: 8009
 ALIAS: GL_BLEND_EQUATION_RGB GL_BLEND_EQUATION
 
 TYPEDEF: char GLchar
@@ -1687,6 +1704,12 @@ CONSTANT: GL_COMPRESSED_SRGB HEX: 8C48
 CONSTANT: GL_COMPRESSED_SRGB_ALPHA HEX: 8C49
 CONSTANT: GL_COMPRESSED_SLUMINANCE HEX: 8C4A
 CONSTANT: GL_COMPRESSED_SLUMINANCE_ALPHA HEX: 8C4B
+CONSTANT: GL_FLOAT_MAT2x3  HEX: 8B65
+CONSTANT: GL_FLOAT_MAT2x4  HEX: 8B66
+CONSTANT: GL_FLOAT_MAT3x2  HEX: 8B67
+CONSTANT: GL_FLOAT_MAT3x4  HEX: 8B68
+CONSTANT: GL_FLOAT_MAT4x2  HEX: 8B69
+CONSTANT: GL_FLOAT_MAT4x3  HEX: 8B6A
 
 GL-FUNCTION: void glUniformMatrix2x3fv { } ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
 GL-FUNCTION: void glUniformMatrix2x4fv { } ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
@@ -1698,6 +1721,8 @@ GL-FUNCTION: void glUniformMatrix4x3fv { } ( GLint location, GLsizei count, GLbo
 
 ! OpenGL 3.0
 
+
+TYPEDEF: ushort  GLhalf
 
 CONSTANT: GL_VERTEX_ATTRIB_ARRAY_INTEGER HEX: 88FD
 CONSTANT: GL_SAMPLER_CUBE_SHADOW HEX: 8DC5
