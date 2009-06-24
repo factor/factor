@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test opengl.textures opengl.textures.private
-images kernel namespaces accessors sequences ;
+USING: tools.test opengl.gl opengl.textures opengl.textures.private
+images kernel namespaces accessors sequences literals ;
 IN: opengl.textures.tests
 
 [
@@ -16,3 +16,24 @@ IN: opengl.textures.tests
     }
     [ [ image new swap >>dim ] map ] map image-locs
 ] unit-test
+
+${ GL_RGBA8 GL_RGBA GL_UNSIGNED_BYTE }
+[ RGBA ubyte-components (image-format) ] unit-test
+
+${ GL_RGBA8 GL_BGRA GL_UNSIGNED_BYTE }
+[ BGRA ubyte-components (image-format) ] unit-test
+
+${ GL_RGBA8 GL_BGRA GL_UNSIGNED_INT_8_8_8_8_REV }
+[ ARGB ubyte-components (image-format) ] unit-test
+
+${ GL_RGBA32F_ARB GL_RGBA GL_FLOAT }
+[ RGBA float-components (image-format) ] unit-test
+
+${ GL_RGBA32UI_EXT GL_BGRA_INTEGER_EXT GL_UNSIGNED_INT }
+[ BGRA uint-integer-components (image-format) ] unit-test
+
+${ GL_RGB9_E5_EXT GL_RGB GL_UNSIGNED_INT_5_9_9_9_REV_EXT }
+[ BGR u-9-9-9-e5-components (image-format) ] unit-test
+
+${ GL_R11F_G11F_B10F_EXT GL_RGB GL_UNSIGNED_INT_10F_11F_11F_REV_EXT }
+[ BGR float-11-11-10-components (image-format) ] unit-test
