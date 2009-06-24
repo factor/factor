@@ -44,10 +44,10 @@ M: BGR component-order>format drop GL_BGR ;
 M: RGBA component-order>format drop GL_RGBA ;
 M: ARGB component-order>format
     swap GL_UNSIGNED_BYTE =
-    [ drop GL_UNSIGNED_INT_8_8_8_8_REV GL_BGRA_EXT ]
+    [ drop GL_UNSIGNED_INT_8_8_8_8_REV GL_BGRA ]
     [ unsupported-component-order ] if ;
-M: BGRA component-order>format drop GL_BGRA_EXT ;
-M: BGRX component-order>format drop GL_BGRA_EXT ;
+M: BGRA component-order>format drop GL_BGRA ;
+M: BGRX component-order>format drop GL_BGRA ;
 M: LA component-order>format drop GL_LUMINANCE_ALPHA ;
 M: L component-order>format drop GL_LUMINANCE ;
 
