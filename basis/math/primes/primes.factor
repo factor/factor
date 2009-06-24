@@ -1,31 +1,31 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel math math.bitwise math.functions
-math.order math.primes.erato math.primes.miller-rabin
-math.ranges random sequences sets fry ;
+math.order math.primes.erato math.primes.erato.private
+math.primes.miller-rabin math.ranges literals random sequences sets ;
 IN: math.primes
 
 <PRIVATE
 
-: look-in-bitmap ( n -- ? ) >index 4999999 sieve nth ;
+: look-in-bitmap ( n -- ? ) $[ 8999999 sieve ] marked-unsafe? ; inline
 
-: really-prime? ( n -- ? )
-    dup 5000000 < [ look-in-bitmap ] [ miller-rabin ] if ; foldable
+: (prime?) ( n -- ? )
+    dup 8999999 <= [ look-in-bitmap ] [ miller-rabin ] if ;
 
 PRIVATE>
 
 : prime? ( n -- ? )
     {
-        { [ dup 2 < ] [ drop f ] }
+        { [ dup 7 < ] [ { 2 3 5 } member? ] }
         { [ dup even? ] [ 2 = ] }
-        [ really-prime? ]
+        [ (prime?) ]
     } cond ; foldable
 
 : next-prime ( n -- p )
     dup 2 < [
         drop 2
     ] [
-        next-odd [ dup really-prime? ] [ 2 + ] until
+        next-odd [ dup prime? ] [ 2 + ] until
     ] if ; foldable
 
 : primes-between ( low high -- seq )
@@ -65,5 +65,5 @@ ERROR: too-few-primes n numbits ;
 
 : unique-primes ( n numbits -- seq )
     2dup 2^ estimated-primes > [ too-few-primes ] when
-    2dup '[ _ random-prime ] replicate
+    2dup [ random-prime ] curry replicate
     dup all-unique? [ 2nip ] [ drop unique-primes ] if ;
