@@ -14,6 +14,7 @@ SINGLETONS:
     u-5-5-5-1-components u-5-6-5-components
     u-10-10-10-2-components
     u-24-components u-24-8-components
+    float-32-u-8-components
     u-9-9-9-e5-components
     float-11-11-10-components ;
 
@@ -30,6 +31,7 @@ UNION: component-type
     u-5-5-5-1-components u-5-6-5-components
     u-10-10-10-2-components
     u-24-components u-24-8-components
+    float-32-u-8-components
     u-9-9-9-e5-components
     float-11-11-10-components ;
 
@@ -42,6 +44,7 @@ UNION: packed-components
     u-5-5-5-1-components u-5-6-5-components
     u-10-10-10-2-components
     u-24-components u-24-8-components
+    float-32-u-8-components
     u-9-9-9-e5-components
     float-11-11-10-components ;
 
@@ -81,6 +84,7 @@ GENERIC: load-image* ( path class -- image )
         { u-24-8-components [ 4 ] }
         { u-9-9-9-e5-components [ 4 ] }
         { float-11-11-10-components [ 4 ] }
+        { float-32-u-8-components [ 8 ] }
     } case ;
 
 : component-count ( component-order -- n )

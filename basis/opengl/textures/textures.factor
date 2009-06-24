@@ -69,9 +69,10 @@ CONSTANT: image-internal-formats H{
     { { INTENSITY int-integer-components    } $ GL_INTENSITY32I_EXT  }
     { { INTENSITY uint-integer-components   } $ GL_INTENSITY32UI_EXT }
 
-    { { DEPTH     ushort-components         } $ GL_DEPTH_COMPONENT16 }
-    { { DEPTH     u-24-components           } $ GL_DEPTH_COMPONENT24 }
-    { { DEPTH     uint-components           } $ GL_DEPTH_COMPONENT32 }
+    { { DEPTH     ushort-components         } $ GL_DEPTH_COMPONENT16  }
+    { { DEPTH     u-24-components           } $ GL_DEPTH_COMPONENT24  }
+    { { DEPTH     uint-components           } $ GL_DEPTH_COMPONENT32  }
+    { { DEPTH     float-components          } $ GL_DEPTH_COMPONENT32F }
 
     { { LA        ubyte-components          } $ GL_LUMINANCE8_ALPHA8       }
     { { LA        ushort-components         } $ GL_LUMINANCE16_ALPHA16     }
@@ -95,36 +96,37 @@ CONSTANT: image-internal-formats H{
     { { RG        int-integer-components    } $ GL_RG32I  }
     { { RG        uint-integer-components   } $ GL_RG32UI }
 
-    { { DEPTH-STENCIL u-24-8-components     } $ GL_DEPTH24_STENCIL8_EXT }
+    { { DEPTH-STENCIL u-24-8-components       } $ GL_DEPTH24_STENCIL8 }
+    { { DEPTH-STENCIL float-32-u-8-components } $ GL_DEPTH32F_STENCIL8 }
 
     { { RGB       ubyte-components          } $ GL_RGB8               }
     { { RGB       ushort-components         } $ GL_RGB16              }
-    { { RGB       half-components           } $ GL_RGB16F_ARB         }
-    { { RGB       float-components          } $ GL_RGB32F_ARB         }
-    { { RGB       byte-integer-components   } $ GL_RGB8I_EXT          }
-    { { RGB       ubyte-integer-components  } $ GL_RGB8UI_EXT         }
-    { { RGB       byte-integer-components   } $ GL_RGB8I_EXT          }
-    { { RGB       ubyte-integer-components  } $ GL_RGB8UI_EXT         }
-    { { RGB       short-integer-components  } $ GL_RGB16I_EXT         }
-    { { RGB       ushort-integer-components } $ GL_RGB16UI_EXT        }
-    { { RGB       int-integer-components    } $ GL_RGB32I_EXT         }
-    { { RGB       uint-integer-components   } $ GL_RGB32UI_EXT        }
+    { { RGB       half-components           } $ GL_RGB16F         }
+    { { RGB       float-components          } $ GL_RGB32F         }
+    { { RGB       byte-integer-components   } $ GL_RGB8I          }
+    { { RGB       ubyte-integer-components  } $ GL_RGB8UI         }
+    { { RGB       byte-integer-components   } $ GL_RGB8I          }
+    { { RGB       ubyte-integer-components  } $ GL_RGB8UI         }
+    { { RGB       short-integer-components  } $ GL_RGB16I         }
+    { { RGB       ushort-integer-components } $ GL_RGB16UI        }
+    { { RGB       int-integer-components    } $ GL_RGB32I         }
+    { { RGB       uint-integer-components   } $ GL_RGB32UI        }
     { { RGB       u-5-6-5-components        } $ GL_RGB5               }
-    { { RGB       u-9-9-9-e5-components     } $ GL_RGB9_E5_EXT        }
-    { { RGB       float-11-11-10-components } $ GL_R11F_G11F_B10F_EXT }
+    { { RGB       u-9-9-9-e5-components     } $ GL_RGB9_E5        }
+    { { RGB       float-11-11-10-components } $ GL_R11F_G11F_B10F }
 
     { { RGBA      ubyte-components          } $ GL_RGBA8              }
     { { RGBA      ushort-components         } $ GL_RGBA16             }
-    { { RGBA      half-components           } $ GL_RGBA16F_ARB        }
-    { { RGBA      float-components          } $ GL_RGBA32F_ARB        }
-    { { RGBA      byte-integer-components   } $ GL_RGBA8I_EXT         }
-    { { RGBA      ubyte-integer-components  } $ GL_RGBA8UI_EXT        }
-    { { RGBA      byte-integer-components   } $ GL_RGBA8I_EXT         }
-    { { RGBA      ubyte-integer-components  } $ GL_RGBA8UI_EXT        }
-    { { RGBA      short-integer-components  } $ GL_RGBA16I_EXT        }
-    { { RGBA      ushort-integer-components } $ GL_RGBA16UI_EXT       }
-    { { RGBA      int-integer-components    } $ GL_RGBA32I_EXT        }
-    { { RGBA      uint-integer-components   } $ GL_RGBA32UI_EXT       }
+    { { RGBA      half-components           } $ GL_RGBA16F        }
+    { { RGBA      float-components          } $ GL_RGBA32F        }
+    { { RGBA      byte-integer-components   } $ GL_RGBA8I         }
+    { { RGBA      ubyte-integer-components  } $ GL_RGBA8UI        }
+    { { RGBA      byte-integer-components   } $ GL_RGBA8I         }
+    { { RGBA      ubyte-integer-components  } $ GL_RGBA8UI        }
+    { { RGBA      short-integer-components  } $ GL_RGBA16I        }
+    { { RGBA      ushort-integer-components } $ GL_RGBA16UI       }
+    { { RGBA      int-integer-components    } $ GL_RGBA32I        }
+    { { RGBA      uint-integer-components   } $ GL_RGBA32UI       }
     { { RGBA      u-5-5-5-1-components      } $ GL_RGB5_A1            }
     { { RGBA      u-10-10-10-2-components   } $ GL_RGB10_A2           }
 }
@@ -154,15 +156,15 @@ M: XBGR fix-internal-component-order drop RGBA ;
         swap {
             { A [ drop GL_ALPHA_INTEGER_EXT ] }
             { L [ drop GL_LUMINANCE_INTEGER_EXT ] }
-            { R [ drop GL_RED_INTEGER_EXT ] }
+            { R [ drop GL_RED_INTEGER ] }
             { LA [ drop GL_LUMINANCE_ALPHA_INTEGER_EXT ] }
             { RG [ drop GL_RG_INTEGER ] }
-            { BGR [ drop GL_BGR_INTEGER_EXT ] }
-            { RGB [ drop GL_RGB_INTEGER_EXT ] }
-            { BGRA [ drop GL_BGRA_INTEGER_EXT ] }
-            { RGBA [ drop GL_RGBA_INTEGER_EXT ] }
-            { BGRX [ drop GL_BGRA_INTEGER_EXT ] }
-            { RGBX [ drop GL_RGBA_INTEGER_EXT ] }
+            { BGR [ drop GL_BGR_INTEGER ] }
+            { RGB [ drop GL_RGB_INTEGER ] }
+            { BGRA [ drop GL_BGRA_INTEGER ] }
+            { RGBA [ drop GL_RGBA_INTEGER ] }
+            { BGRX [ drop GL_BGRA_INTEGER ] }
+            { RGBX [ drop GL_RGBA_INTEGER ] }
             [ swap unsupported-component-order ]
         } case
     ] [
@@ -184,7 +186,7 @@ M: XBGR fix-internal-component-order drop RGBA ;
             { XBGR [ drop GL_RGBA ] }
             { INTENSITY [ drop GL_INTENSITY ] }
             { DEPTH [ drop GL_DEPTH_COMPONENT ] }
-            { DEPTH-STENCIL [ drop GL_DEPTH_STENCIL_EXT ] }
+            { DEPTH-STENCIL [ drop GL_DEPTH_STENCIL ] }
             [ swap unsupported-component-order ]
         } case
     ] if ;
@@ -210,7 +212,7 @@ M: ubyte-components          (component-type>type)
 
 M: ushort-components         (component-type>type) not-alpha-first GL_UNSIGNED_SHORT ;
 M: uint-components           (component-type>type) not-alpha-first GL_UNSIGNED_INT   ;
-M: half-components           (component-type>type) not-alpha-first GL_HALF_FLOAT_ARB ;
+M: half-components           (component-type>type) not-alpha-first GL_HALF_FLOAT ;
 M: float-components          (component-type>type) not-alpha-first GL_FLOAT          ;
 M: byte-integer-components   (component-type>type) not-alpha-first GL_BYTE           ;
 M: ubyte-integer-components  (component-type>type) not-alpha-first GL_UNSIGNED_BYTE  ;
@@ -237,15 +239,15 @@ M: u-24-components           (component-type>type)
 
 M: u-24-8-components         (component-type>type)
     over DEPTH-STENCIL =
-    [ 2drop GL_UNSIGNED_INT_24_8_EXT ] [ unsupported-component-order ] if ;
+    [ 2drop GL_UNSIGNED_INT_24_8 ] [ unsupported-component-order ] if ;
 
 M: u-9-9-9-e5-components     (component-type>type)
     over BGR =
-    [ 2drop GL_UNSIGNED_INT_5_9_9_9_REV_EXT ] [ unsupported-component-order ] if ;
+    [ 2drop GL_UNSIGNED_INT_5_9_9_9_REV ] [ unsupported-component-order ] if ;
 
 M: float-11-11-10-components (component-type>type)
     over BGR =
-    [ 2drop GL_UNSIGNED_INT_10F_11F_11F_REV_EXT ] [ unsupported-component-order ] if ;
+    [ 2drop GL_UNSIGNED_INT_10F_11F_11F_REV ] [ unsupported-component-order ] if ;
 
 : image-data-format ( component-order component-type -- gl-format gl-type )
     [ (component-order>format) ] [ (component-type>type) ] 2bi ;
