@@ -1,5 +1,5 @@
-USING: arrays math math.primes math.primes.miller-rabin
-tools.test ;
+USING: arrays kernel math math.primes math.primes.miller-rabin
+sequences tools.test ;
 IN: math.primes.tests
 
 { 1237 } [ 1234 next-prime ] unit-test
@@ -21,3 +21,8 @@ IN: math.primes.tests
 [ 100000000000031 ] [ 100000000000000 next-prime ] unit-test
 
 [ 49 ] [ 50 random-prime log2 ] unit-test
+
+[ t ] [ 5000077 dup find-relative-prime coprime? ] unit-test
+
+[ 5 t { 14 14 14 14 14 } ]
+[ 5 15 unique-primes [ length ] [ [ prime? ] all? ] [ [ log2 ] map ] tri ] unit-test
