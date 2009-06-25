@@ -42,6 +42,7 @@ IN: windows.offscreen
         swap >>dim
         swap >>bitmap
         BGRX >>component-order
+        ubyte-components >>component-type
         t >>upside-down? ;
 
 : with-memory-dc ( quot: ( hDC -- ) -- )
