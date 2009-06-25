@@ -115,6 +115,8 @@ TYPEDEF: void* LLVMModuleProviderRef
 
 TYPEDEF: void* LLVMTypeRef
 
+TYPEDEF: void* LLVMTypeHandleRef
+
 TYPEDEF: void* LLVMValueRef
 
 TYPEDEF: void* LLVMBasicBlockRef
@@ -138,14 +140,79 @@ LLVMCreateModuleProviderForExistingModule ( LLVMModuleRef M ) ;
 
 FUNCTION: void LLVMDisposeModuleProvider ( LLVMModuleProviderRef MP ) ;
 
-FUNCTION: LLVMTypeRef LLVMIntType ( unsigned NumBits ) ;
+! Types
 
+! LLVM types conform to the following hierarchy:
+!  
+!    types:
+!      integer type
+!      real type
+!      function type
+!      sequence types:
+!        array type
+!        pointer type
+!        vector type
+!      void type
+!      label type
+!      opaque type
+
+! See llvm::LLVMTypeKind::getTypeID.
+FUNCTION: LLVMTypeKind LLVMGetTypeKind ( LLVMTypeRef Ty ) ;
+
+! Operations on integer types
+FUNCTION: LLVMTypeRef LLVMInt1Type ( ) ;
+FUNCTION: LLVMTypeRef LLVMInt8Type ( ) ;
+FUNCTION: LLVMTypeRef LLVMInt16Type ( ) ;
+FUNCTION: LLVMTypeRef LLVMInt32Type ( ) ;
+FUNCTION: LLVMTypeRef LLVMInt64Type ( ) ;
+FUNCTION: LLVMTypeRef LLVMIntType ( unsigned NumBits ) ;
+FUNCTION: unsigned LLVMGetIntTypeWidth ( LLVMTypeRef IntegerTy ) ;
+
+! Operations on real types
+FUNCTION: LLVMTypeRef LLVMFloatType ( ) ;
+FUNCTION: LLVMTypeRef LLVMDoubleType ( ) ;
+FUNCTION: LLVMTypeRef LLVMX86FP80Type ( ) ;
+FUNCTION: LLVMTypeRef LLVMFP128Type ( ) ;
+FUNCTION: LLVMTypeRef LLVMPPCFP128Type ( ) ;
+
+! Operations on function types
 FUNCTION: LLVMTypeRef
-LLVMFunctionType ( LLVMTypeRef ReturnType,
-                   LLVMTypeRef* ParamTypes,
-                   unsigned ParamCount,
-                   int IsVarArg ) ;
-               
+LLVMFunctionType ( LLVMTypeRef ReturnType, LLVMTypeRef* ParamTypes, unsigned ParamCount, int IsVarArg ) ;
+FUNCTION: int LLVMIsFunctionVarArg ( LLVMTypeRef FunctionTy ) ;
+FUNCTION: LLVMTypeRef LLVMGetReturnType ( LLVMTypeRef FunctionTy ) ;
+FUNCTION: unsigned LLVMCountParamTypes ( LLVMTypeRef FunctionTy ) ;
+FUNCTION: void LLVMGetParamTypes ( LLVMTypeRef FunctionTy, LLVMTypeRef* Dest ) ;
+
+! Operations on struct types
+FUNCTION: LLVMTypeRef
+LLVMStructType ( LLVMTypeRef* ElementTypes, unsigned ElementCount, int Packed ) ;
+FUNCTION: unsigned LLVMCountStructElementTypes ( LLVMTypeRef StructTy ) ;
+FUNCTION: void LLVMGetStructElementTypes ( LLVMTypeRef StructTy, LLVMTypeRef* Dest ) ;
+FUNCTION: int LLVMIsPackedStruct ( LLVMTypeRef StructTy ) ;
+
+! Operations on array, pointer, and vector types (sequence types)
+FUNCTION: LLVMTypeRef LLVMArrayType ( LLVMTypeRef ElementType, unsigned ElementCount ) ;
+FUNCTION: LLVMTypeRef LLVMPointerType ( LLVMTypeRef ElementType, unsigned AddressSpace ) ;
+FUNCTION: LLVMTypeRef LLVMVectorType ( LLVMTypeRef ElementType, unsigned ElementCount ) ;
+
+FUNCTION: LLVMTypeRef LLVMGetElementType ( LLVMTypeRef Ty ) ;
+FUNCTION: unsigned LLVMGetArrayLength ( LLVMTypeRef ArrayTy ) ;
+FUNCTION: unsigned LLVMGetPointerAddressSpace ( LLVMTypeRef PointerTy ) ;
+FUNCTION: unsigned LLVMGetVectorSize ( LLVMTypeRef VectorTy ) ;
+
+! Operations on other types
+FUNCTION: LLVMTypeRef LLVMVoidType ( ) ;
+FUNCTION: LLVMTypeRef LLVMLabelType ( ) ;
+FUNCTION: LLVMTypeRef LLVMOpaqueType ( ) ;
+
+! Operations on type handles
+FUNCTION: LLVMTypeHandleRef LLVMCreateTypeHandle ( LLVMTypeRef PotentiallyAbstractTy ) ;
+FUNCTION: void LLVMRefineType ( LLVMTypeRef AbstractTy, LLVMTypeRef ConcreteTy ) ;
+FUNCTION: LLVMTypeRef LLVMResolveTypeHandle ( LLVMTypeHandleRef TypeHandle ) ;
+FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle ) ;
+
+! Types end
+
 FUNCTION: unsigned LLVMCountParams ( LLVMValueRef Fn ) ;
 
 FUNCTION: void LLVMGetParams ( LLVMValueRef Fn, LLVMValueRef* Params ) ;
@@ -200,7 +267,7 @@ FUNCTION: LLVMValueRef LLVMBuildCondBr
 FUNCTION: LLVMValueRef LLVMBuildSwitch
 ( LLVMBuilderRef Builder, LLVMValueRef V, LLVMBasicBlockRef Else, unsigned NumCases ) ;
 FUNCTION: LLVMValueRef LLVMBuildInvoke
-( LLVMBuilderRef Builder, LLVMValueRef Fn, LLVMValueRef *Args, unsigned NumArgs,
+( LLVMBuilderRef Builder, LLVMValueRef Fn, LLVMValueRef* Args, unsigned NumArgs,
   LLVMBasicBlockRef Then, LLVMBasicBlockRef Catch, char* Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildUnwind
 ( LLVMBuilderRef Builder ) ;
@@ -266,7 +333,7 @@ FUNCTION: LLVMValueRef LLVMBuildLoad
 FUNCTION: LLVMValueRef LLVMBuildStore
 ( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMValueRef Ptr ) ;
 FUNCTION: LLVMValueRef LLVMBuildGEP
-( LLVMBuilderRef B, LLVMValueRef Pointer, LLVMValueRef *Indices,
+( LLVMBuilderRef B, LLVMValueRef Pointer, LLVMValueRef* Indices,
   unsigned NumIndices, char* Name ) ;
 
 ! IB Casts
@@ -308,7 +375,7 @@ FUNCTION: LLVMValueRef LLVMBuildFCmp
 FUNCTION: LLVMValueRef LLVMBuildPhi
 ( LLVMBuilderRef Builder, LLVMTypeRef Ty, char* Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildCall
-( LLVMBuilderRef Builder, LLVMValueRef Fn, LLVMValueRef *Args, unsigned NumArgs, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Fn, LLVMValueRef* Args, unsigned NumArgs, char* Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildSelect
 ( LLVMBuilderRef Builder, LLVMValueRef If, LLVMValueRef Then, LLVMValueRef Else, char* Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildVAArg
