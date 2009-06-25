@@ -3,11 +3,6 @@ sequences.extras ;
 FROM: models.product => product ;
 IN: ui.frp.signals
 
-GENERIC: (unique) ( gadget -- a )
-M: model (unique) ;
-: unique ( a -- b ) [ class ] [ (unique) ] bi 2array ;
-: unique= ( a b -- ? ) [ unique ] bi@ = ;
-
 GENERIC: null-val ( gadget -- model )
 M: model null-val drop f ;
 
@@ -111,16 +106,15 @@ TUPLE: & < | ;
 M: & models-changed dependencies>> [ [ null-val ] keep (>>value) ] each ;
 PRIVATE>
 
-M: model >>= [ swap <action> ] curry ;
-M: model fmap <mapped> ;
-USE: ui.frp.functors
-FMAPS: $> <$ fmap FOR & | product ;
-
 ! for side effects
 TUPLE: (frp-when) < multi-model quot cond ;
 : frp-when ( model quot cond -- model ) rot 1array (frp-when) <multi-model> swap >>cond swap >>quot ;
 M: (frp-when) (model-changed) [ quot>> ] 2keep
     [ value>> ] [ cond>> ] bi* call( a -- ? ) [ call( model -- ) ] [ 2drop ] if ;
+
+M: model fmap <mapped> ;
+USE: ui.frp.functors
+FMAPS: $> <$ fmap FOR & | product ;
 
 ! only used in construction
 : with-self ( quot: ( model -- model ) -- model ) [ f <basic> dup ] dip call swap [ add-dependency ] keep ; inline
