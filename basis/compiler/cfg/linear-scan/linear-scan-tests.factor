@@ -1414,7 +1414,7 @@ USING: math.private ;
        { uses { 5 10 } }
        { ranges V{ T{ live-range f 5 10 } } }
     }
-    intersect-inactive
+    relevant-ranges intersect-live-ranges
 ] unit-test
 
 ! Bug in live spill slots calculation

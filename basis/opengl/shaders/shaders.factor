@@ -65,7 +65,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
     glCreateProgram 
     [
         [ swap [ glAttachShader ] with each ]
-        [ swap [ first2 swap glBindFragDataLocationEXT ] with each ] bi-curry bi*
+        [ swap [ first2 swap glBindFragDataLocation ] with each ] bi-curry bi*
     ]
     [ glLinkProgram ]
     [ ] tri
