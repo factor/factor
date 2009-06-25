@@ -5,30 +5,30 @@ alien.c-types ;
 IN: opengl.framebuffers
 
 : gen-framebuffer ( -- id )
-    [ glGenFramebuffersEXT ] (gen-gl-object) ;
+    [ glGenFramebuffers ] (gen-gl-object) ;
 : gen-renderbuffer ( -- id )
-    [ glGenRenderbuffersEXT ] (gen-gl-object) ;
+    [ glGenRenderbuffers ] (gen-gl-object) ;
 
 : delete-framebuffer ( id -- )
-    [ glDeleteFramebuffersEXT ] (delete-gl-object) ;
+    [ glDeleteFramebuffers ] (delete-gl-object) ;
 : delete-renderbuffer ( id -- )
-    [ glDeleteRenderbuffersEXT ] (delete-gl-object) ;
+    [ glDeleteRenderbuffers ] (delete-gl-object) ;
 
 : framebuffer-incomplete? ( -- status/f )
-    GL_FRAMEBUFFER_EXT glCheckFramebufferStatusEXT
-    dup GL_FRAMEBUFFER_COMPLETE_EXT = f rot ? ;
+    GL_DRAW_FRAMEBUFFER glCheckFramebufferStatus
+    dup GL_FRAMEBUFFER_COMPLETE = f rot ? ;
 
 : framebuffer-error ( status -- * )
     { 
-        { GL_FRAMEBUFFER_COMPLETE_EXT [ "framebuffer complete" ] }
-        { GL_FRAMEBUFFER_UNSUPPORTED_EXT [ "framebuffer configuration unsupported" ] }
-        { GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT [ "framebuffer incomplete (incomplete attachment)" ] }
-        { GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT [ "framebuffer incomplete (missing attachment)" ] }
+        { GL_FRAMEBUFFER_COMPLETE [ "framebuffer complete" ] }
+        { GL_FRAMEBUFFER_UNSUPPORTED [ "framebuffer configuration unsupported" ] }
+        { GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT [ "framebuffer incomplete (incomplete attachment)" ] }
+        { GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT [ "framebuffer incomplete (missing attachment)" ] }
         { GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT [ "framebuffer incomplete (dimension mismatch)" ] }
         { GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT [ "framebuffer incomplete (format mismatch)" ] }
-        { GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT [ "framebuffer incomplete (draw buffer(s) have no attachment)" ] }
-        { GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT [ "framebuffer incomplete (read buffer has no attachment)" ] }
-        { GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT [ "framebuffer incomplete (multisample counts don't match)" ] }
+        { GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER [ "framebuffer incomplete (draw buffer(s) have no attachment)" ] }
+        { GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER [ "framebuffer incomplete (read buffer has no attachment)" ] }
+        { GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE [ "framebuffer incomplete (multisample counts don't match)" ] }
         [ drop gl-error "unknown framebuffer error" ]
     } case throw ;
 
@@ -36,19 +36,19 @@ IN: opengl.framebuffers
     framebuffer-incomplete? [ framebuffer-error ] when* ;
 
 : with-framebuffer ( id quot -- )
-    [ GL_FRAMEBUFFER_EXT swap glBindFramebufferEXT ] dip
-    [ GL_FRAMEBUFFER_EXT 0 glBindFramebufferEXT ] [ ] cleanup ; inline
+    [ GL_DRAW_FRAMEBUFFER swap glBindFramebuffer ] dip
+    [ GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer ] [ ] cleanup ; inline
 
 : with-draw-read-framebuffers ( draw-id read-id quot -- )
     [
-        [ GL_DRAW_FRAMEBUFFER_EXT swap glBindFramebufferEXT ]
-        [ GL_READ_FRAMEBUFFER_EXT swap glBindFramebufferEXT ] bi*
+        [ GL_DRAW_FRAMEBUFFER swap glBindFramebuffer ]
+        [ GL_READ_FRAMEBUFFER swap glBindFramebuffer ] bi*
     ] dip
     [ 
-        GL_DRAW_FRAMEBUFFER_EXT 0 glBindFramebufferEXT
-        GL_READ_FRAMEBUFFER_EXT 0 glBindFramebufferEXT
+        GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer
+        GL_READ_FRAMEBUFFER 0 glBindFramebuffer
     ] [ ] cleanup ; inline
 
 : framebuffer-attachment ( attachment -- id )
-    GL_FRAMEBUFFER_EXT swap GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT
-    0 <uint> [ glGetFramebufferAttachmentParameterivEXT ] keep *uint ;
+    GL_FRAMEBUFFER swap GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME
+    0 <uint> [ glGetFramebufferAttachmentParameteriv ] keep *uint ;
