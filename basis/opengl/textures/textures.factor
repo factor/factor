@@ -4,7 +4,7 @@ USING: accessors assocs cache colors.constants destructors kernel
 opengl opengl.gl opengl.capabilities combinators images
 images.tesselation grouping specialized-arrays.float sequences math
 math.vectors math.matrices generalizations fry arrays namespaces
-system locals ;
+system locals literals ;
 IN: opengl.textures
 
 SYMBOL: non-power-of-2-textures?
@@ -22,46 +22,235 @@ SYMBOL: non-power-of-2-textures?
 
 : delete-texture ( id -- ) [ glDeleteTextures ] (delete-gl-object) ;
 
-GENERIC: component-type>type ( component-type -- internal-format type )
-GENERIC: component-order>format ( type component-order -- type format )
-GENERIC: component-order>integer-format ( type component-order -- type format )
+ERROR: unsupported-component-order component-order component-type ;
 
-ERROR: unsupported-component-order component-order ;
+CONSTANT: image-internal-formats H{
+    { { A         ubyte-components          } $ GL_ALPHA8            }
+    { { A         ushort-components         } $ GL_ALPHA16           }
+    { { A         half-components           } $ GL_ALPHA16F_ARB      }
+    { { A         float-components          } $ GL_ALPHA32F_ARB      }
+    { { A         byte-integer-components   } $ GL_ALPHA8I_EXT       }
+    { { A         ubyte-integer-components  } $ GL_ALPHA8UI_EXT      }
+    { { A         short-integer-components  } $ GL_ALPHA16I_EXT      }
+    { { A         ushort-integer-components } $ GL_ALPHA16UI_EXT     }
+    { { A         int-integer-components    } $ GL_ALPHA32I_EXT      }
+    { { A         uint-integer-components   } $ GL_ALPHA32UI_EXT     }
 
-M: ubyte-components component-type>type drop GL_RGBA8 GL_UNSIGNED_BYTE ;
-M: ushort-components component-type>type drop GL_RGBA16 GL_UNSIGNED_SHORT ;
-M: half-components component-type>type drop GL_RGBA16F_ARB GL_HALF_FLOAT_ARB ;
-M: float-components component-type>type drop GL_RGBA32F_ARB GL_FLOAT ;
-M: byte-integer-components component-type>type drop GL_RGBA8I_EXT GL_BYTE ;
-M: short-integer-components component-type>type drop GL_RGBA16I_EXT GL_SHORT ;
-M: int-integer-components component-type>type drop GL_RGBA32I_EXT GL_INT ;
-M: ubyte-integer-components component-type>type drop GL_RGBA8I_EXT GL_UNSIGNED_BYTE ;
-M: ushort-integer-components component-type>type drop GL_RGBA16I_EXT GL_UNSIGNED_SHORT ;
-M: uint-integer-components component-type>type drop GL_RGBA32I_EXT GL_UNSIGNED_INT ;
+    { { L         ubyte-components          } $ GL_LUMINANCE8        }
+    { { L         ushort-components         } $ GL_LUMINANCE16       }
+    { { L         half-components           } $ GL_LUMINANCE16F_ARB  }
+    { { L         float-components          } $ GL_LUMINANCE32F_ARB  }
+    { { L         byte-integer-components   } $ GL_LUMINANCE8I_EXT   }
+    { { L         ubyte-integer-components  } $ GL_LUMINANCE8UI_EXT  }
+    { { L         short-integer-components  } $ GL_LUMINANCE16I_EXT  }
+    { { L         ushort-integer-components } $ GL_LUMINANCE16UI_EXT }
+    { { L         int-integer-components    } $ GL_LUMINANCE32I_EXT  }
+    { { L         uint-integer-components   } $ GL_LUMINANCE32UI_EXT }
 
-M: RGB component-order>format drop GL_RGB ;
-M: BGR component-order>format drop GL_BGR ;
-M: RGBA component-order>format drop GL_RGBA ;
-M: ARGB component-order>format
-    swap GL_UNSIGNED_BYTE =
-    [ drop GL_UNSIGNED_INT_8_8_8_8_REV GL_BGRA ]
+    { { R         ubyte-components          } $ GL_R8    }
+    { { R         ushort-components         } $ GL_R16   }
+    { { R         half-components           } $ GL_R16F  }
+    { { R         float-components          } $ GL_R32F  }
+    { { R         byte-integer-components   } $ GL_R8I   }
+    { { R         ubyte-integer-components  } $ GL_R8UI  }
+    { { R         short-integer-components  } $ GL_R16I  }
+    { { R         ushort-integer-components } $ GL_R16UI }
+    { { R         int-integer-components    } $ GL_R32I  }
+    { { R         uint-integer-components   } $ GL_R32UI }
+
+    { { INTENSITY ubyte-components          } $ GL_INTENSITY8        }
+    { { INTENSITY ushort-components         } $ GL_INTENSITY16       }
+    { { INTENSITY half-components           } $ GL_INTENSITY16F_ARB  }
+    { { INTENSITY float-components          } $ GL_INTENSITY32F_ARB  }
+    { { INTENSITY byte-integer-components   } $ GL_INTENSITY8I_EXT   }
+    { { INTENSITY ubyte-integer-components  } $ GL_INTENSITY8UI_EXT  }
+    { { INTENSITY short-integer-components  } $ GL_INTENSITY16I_EXT  }
+    { { INTENSITY ushort-integer-components } $ GL_INTENSITY16UI_EXT }
+    { { INTENSITY int-integer-components    } $ GL_INTENSITY32I_EXT  }
+    { { INTENSITY uint-integer-components   } $ GL_INTENSITY32UI_EXT }
+
+    { { DEPTH     ushort-components         } $ GL_DEPTH_COMPONENT16  }
+    { { DEPTH     u-24-components           } $ GL_DEPTH_COMPONENT24  }
+    { { DEPTH     uint-components           } $ GL_DEPTH_COMPONENT32  }
+    { { DEPTH     float-components          } $ GL_DEPTH_COMPONENT32F }
+
+    { { LA        ubyte-components          } $ GL_LUMINANCE8_ALPHA8       }
+    { { LA        ushort-components         } $ GL_LUMINANCE16_ALPHA16     }
+    { { LA        half-components           } $ GL_LUMINANCE_ALPHA16F_ARB  }
+    { { LA        float-components          } $ GL_LUMINANCE_ALPHA32F_ARB  }
+    { { LA        byte-integer-components   } $ GL_LUMINANCE_ALPHA8I_EXT   }
+    { { LA        ubyte-integer-components  } $ GL_LUMINANCE_ALPHA8UI_EXT  }
+    { { LA        short-integer-components  } $ GL_LUMINANCE_ALPHA16I_EXT  }
+    { { LA        ushort-integer-components } $ GL_LUMINANCE_ALPHA16UI_EXT }
+    { { LA        int-integer-components    } $ GL_LUMINANCE_ALPHA32I_EXT  }
+    { { LA        uint-integer-components   } $ GL_LUMINANCE_ALPHA32UI_EXT }
+
+    { { RG        ubyte-components          } $ GL_RG8    }
+    { { RG        ushort-components         } $ GL_RG16   }
+    { { RG        half-components           } $ GL_RG16F  }
+    { { RG        float-components          } $ GL_RG32F  }
+    { { RG        byte-integer-components   } $ GL_RG8I   }
+    { { RG        ubyte-integer-components  } $ GL_RG8UI  }
+    { { RG        short-integer-components  } $ GL_RG16I  }
+    { { RG        ushort-integer-components } $ GL_RG16UI }
+    { { RG        int-integer-components    } $ GL_RG32I  }
+    { { RG        uint-integer-components   } $ GL_RG32UI }
+
+    { { DEPTH-STENCIL u-24-8-components       } $ GL_DEPTH24_STENCIL8 }
+    { { DEPTH-STENCIL float-32-u-8-components } $ GL_DEPTH32F_STENCIL8 }
+
+    { { RGB       ubyte-components          } $ GL_RGB8               }
+    { { RGB       ushort-components         } $ GL_RGB16              }
+    { { RGB       half-components           } $ GL_RGB16F         }
+    { { RGB       float-components          } $ GL_RGB32F         }
+    { { RGB       byte-integer-components   } $ GL_RGB8I          }
+    { { RGB       ubyte-integer-components  } $ GL_RGB8UI         }
+    { { RGB       byte-integer-components   } $ GL_RGB8I          }
+    { { RGB       ubyte-integer-components  } $ GL_RGB8UI         }
+    { { RGB       short-integer-components  } $ GL_RGB16I         }
+    { { RGB       ushort-integer-components } $ GL_RGB16UI        }
+    { { RGB       int-integer-components    } $ GL_RGB32I         }
+    { { RGB       uint-integer-components   } $ GL_RGB32UI        }
+    { { RGB       u-5-6-5-components        } $ GL_RGB5               }
+    { { RGB       u-9-9-9-e5-components     } $ GL_RGB9_E5        }
+    { { RGB       float-11-11-10-components } $ GL_R11F_G11F_B10F }
+
+    { { RGBA      ubyte-components          } $ GL_RGBA8              }
+    { { RGBA      ushort-components         } $ GL_RGBA16             }
+    { { RGBA      half-components           } $ GL_RGBA16F        }
+    { { RGBA      float-components          } $ GL_RGBA32F        }
+    { { RGBA      byte-integer-components   } $ GL_RGBA8I         }
+    { { RGBA      ubyte-integer-components  } $ GL_RGBA8UI        }
+    { { RGBA      byte-integer-components   } $ GL_RGBA8I         }
+    { { RGBA      ubyte-integer-components  } $ GL_RGBA8UI        }
+    { { RGBA      short-integer-components  } $ GL_RGBA16I        }
+    { { RGBA      ushort-integer-components } $ GL_RGBA16UI       }
+    { { RGBA      int-integer-components    } $ GL_RGBA32I        }
+    { { RGBA      uint-integer-components   } $ GL_RGBA32UI       }
+    { { RGBA      u-5-5-5-1-components      } $ GL_RGB5_A1            }
+    { { RGBA      u-10-10-10-2-components   } $ GL_RGB10_A2           }
+}
+
+GENERIC: fix-internal-component-order ( order -- order' )
+
+M: object fix-internal-component-order ;
+M: BGR fix-internal-component-order drop RGB ;
+M: BGRA fix-internal-component-order drop RGBA ;
+M: ARGB fix-internal-component-order drop RGBA ;
+M: ABGR fix-internal-component-order drop RGBA ;
+M: RGBX fix-internal-component-order drop RGBA ;
+M: BGRX fix-internal-component-order drop RGBA ;
+M: XRGB fix-internal-component-order drop RGBA ;
+M: XBGR fix-internal-component-order drop RGBA ;
+
+: image-internal-format ( component-order component-type -- internal-format )
+    2dup
+    [ fix-internal-component-order ] dip 2array image-internal-formats at
+    [ 2nip ] [ unsupported-component-order ] if* ;
+
+: reversed-type? ( component-type -- ? )
+    { u-9-9-9-e5-components float-11-11-10-components } member? ;
+
+: (component-order>format) ( component-order component-type -- gl-format )
+    dup unnormalized-integer-components? [
+        swap {
+            { A [ drop GL_ALPHA_INTEGER_EXT ] }
+            { L [ drop GL_LUMINANCE_INTEGER_EXT ] }
+            { R [ drop GL_RED_INTEGER ] }
+            { LA [ drop GL_LUMINANCE_ALPHA_INTEGER_EXT ] }
+            { RG [ drop GL_RG_INTEGER ] }
+            { BGR [ drop GL_BGR_INTEGER ] }
+            { RGB [ drop GL_RGB_INTEGER ] }
+            { BGRA [ drop GL_BGRA_INTEGER ] }
+            { RGBA [ drop GL_RGBA_INTEGER ] }
+            { BGRX [ drop GL_BGRA_INTEGER ] }
+            { RGBX [ drop GL_RGBA_INTEGER ] }
+            [ swap unsupported-component-order ]
+        } case
+    ] [
+        swap {
+            { A [ drop GL_ALPHA ] }
+            { L [ drop GL_LUMINANCE ] }
+            { R [ drop GL_RED ] }
+            { LA [ drop GL_LUMINANCE_ALPHA ] }
+            { RG [ drop GL_RG ] }
+            { BGR [ reversed-type? GL_RGB GL_BGR ? ] }
+            { RGB [ reversed-type? GL_BGR GL_RGB ? ] }
+            { BGRA [ drop GL_BGRA ] }
+            { RGBA [ drop GL_RGBA ] }
+            { ARGB [ drop GL_BGRA ] }
+            { ABGR [ drop GL_RGBA ] }
+            { BGRX [ drop GL_BGRA ] }
+            { RGBX [ drop GL_RGBA ] }
+            { XRGB [ drop GL_BGRA ] }
+            { XBGR [ drop GL_RGBA ] }
+            { INTENSITY [ drop GL_INTENSITY ] }
+            { DEPTH [ drop GL_DEPTH_COMPONENT ] }
+            { DEPTH-STENCIL [ drop GL_DEPTH_STENCIL ] }
+            [ swap unsupported-component-order ]
+        } case
+    ] if ;
+
+GENERIC: (component-type>type) ( component-order component-type -- gl-type )
+
+M: object (component-type>type) unsupported-component-order ;
+
+: four-channel-alpha-first? ( component-order component-type -- ? )
+    over component-count 4 =
+    [ drop alpha-channel-precedes-colors? ]
     [ unsupported-component-order ] if ;
-M: BGRA component-order>format drop GL_BGRA ;
-M: BGRX component-order>format drop GL_BGRA ;
-M: LA component-order>format drop GL_LUMINANCE_ALPHA ;
-M: L component-order>format drop GL_LUMINANCE ;
 
-M: object component-order>format unsupported-component-order ;
+: not-alpha-first ( component-order component-type -- )
+    over alpha-channel-precedes-colors?
+    [ unsupported-component-order ]
+    [ 2drop ] if ;
 
-M: RGB component-order>integer-format drop GL_RGB_INTEGER_EXT ;
-M: BGR component-order>integer-format drop GL_BGR_INTEGER_EXT ;
-M: RGBA component-order>integer-format drop GL_RGBA_INTEGER_EXT ;
-M: BGRA component-order>integer-format drop GL_BGRA_INTEGER_EXT ;
-M: BGRX component-order>integer-format drop GL_BGRA_INTEGER_EXT ;
-M: LA component-order>integer-format drop GL_LUMINANCE_ALPHA_INTEGER_EXT ;
-M: L component-order>integer-format drop GL_LUMINANCE_INTEGER_EXT ;
+M: ubyte-components          (component-type>type)
+    drop alpha-channel-precedes-colors?
+    [ GL_UNSIGNED_INT_8_8_8_8_REV ]
+    [ GL_UNSIGNED_BYTE ] if ;
 
-M: object component-order>integer-format unsupported-component-order ;
+M: ushort-components         (component-type>type) not-alpha-first GL_UNSIGNED_SHORT ;
+M: uint-components           (component-type>type) not-alpha-first GL_UNSIGNED_INT   ;
+M: half-components           (component-type>type) not-alpha-first GL_HALF_FLOAT ;
+M: float-components          (component-type>type) not-alpha-first GL_FLOAT          ;
+M: byte-integer-components   (component-type>type) not-alpha-first GL_BYTE           ;
+M: ubyte-integer-components  (component-type>type) not-alpha-first GL_UNSIGNED_BYTE  ;
+M: short-integer-components  (component-type>type) not-alpha-first GL_SHORT          ;
+M: ushort-integer-components (component-type>type) not-alpha-first GL_UNSIGNED_SHORT ;
+M: int-integer-components    (component-type>type) not-alpha-first GL_INT            ;
+M: uint-integer-components   (component-type>type) not-alpha-first GL_UNSIGNED_INT   ;
+
+M: u-5-5-5-1-components      (component-type>type)
+    four-channel-alpha-first?
+    [ GL_UNSIGNED_SHORT_1_5_5_5_REV ]
+    [ GL_UNSIGNED_SHORT_5_5_5_1     ] if ;
+
+M: u-5-6-5-components        (component-type>type) 2drop GL_UNSIGNED_SHORT_5_6_5 ;
+
+M: u-10-10-10-2-components   (component-type>type)
+    four-channel-alpha-first?
+    [ GL_UNSIGNED_INT_2_10_10_10_REV ]
+    [ GL_UNSIGNED_INT_10_10_10_2     ] if ;
+
+M: u-24-components           (component-type>type)
+    over DEPTH =
+    [ 2drop GL_UNSIGNED_INT ] [ unsupported-component-order ] if ;
+
+M: u-24-8-components         (component-type>type)
+    over DEPTH-STENCIL =
+    [ 2drop GL_UNSIGNED_INT_24_8 ] [ unsupported-component-order ] if ;
+
+M: u-9-9-9-e5-components     (component-type>type)
+    over BGR =
+    [ 2drop GL_UNSIGNED_INT_5_9_9_9_REV ] [ unsupported-component-order ] if ;
+
+M: float-11-11-10-components (component-type>type)
+    over BGR =
+    [ 2drop GL_UNSIGNED_INT_10F_11F_11F_REV ] [ unsupported-component-order ] if ;
+
+: image-data-format ( component-order component-type -- gl-format gl-type )
+    [ (component-order>format) ] [ (component-type>type) ] 2bi ;
 
 SLOT: display-list
 
@@ -71,6 +260,12 @@ GENERIC: draw-scaled-texture ( dim texture -- )
 
 DEFER: make-texture
 
+: (image-format) ( component-order component-type -- internal-format format type )
+    [ image-internal-format ] [ image-data-format ] 2bi ;
+
+: image-format ( image -- internal-format format type )
+    [ component-order>> ] [ component-type>> ] bi (image-format) ;
+
 <PRIVATE
 
 TUPLE: single-texture image dim loc texture-coords texture display-list disposed ;
@@ -79,15 +274,6 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
     non-power-of-2-textures? get [
         [ dup 1 = [ next-power-of-2 ] unless ] map
     ] unless ;
-
-: image-format ( image -- internal-format format type )
-    dup component-type>>
-    [ nip component-type>type ]
-    [
-        unnormalized-integer-components?
-        [ component-order>> component-order>integer-format ]
-        [ component-order>> component-order>format ] if
-    ] 2bi swap ;
 
 :: tex-image ( image bitmap -- )
     image image-format :> type :> format :> internal-format
