@@ -148,14 +148,14 @@ M: spheres-world distance-step
 
 : (make-reflection-depthbuffer) ( -- depthbuffer )
     gen-renderbuffer [
-        GL_RENDERBUFFER_EXT swap glBindRenderbufferEXT
-        GL_RENDERBUFFER_EXT GL_DEPTH_COMPONENT32 (reflection-dim) glRenderbufferStorageEXT
+        GL_RENDERBUFFER swap glBindRenderbuffer
+        GL_RENDERBUFFER GL_DEPTH_COMPONENT32 (reflection-dim) glRenderbufferStorage
     ] keep ;
 
 : (make-reflection-framebuffer) ( depthbuffer -- framebuffer )
     gen-framebuffer dup [
-        swap [ GL_FRAMEBUFFER_EXT GL_DEPTH_ATTACHMENT_EXT GL_RENDERBUFFER_EXT ] dip
-        glFramebufferRenderbufferEXT
+        swap [ GL_DRAW_FRAMEBUFFER GL_DEPTH_ATTACHMENT GL_RENDERBUFFER ] dip
+        glFramebufferRenderbuffer
     ] with-framebuffer ;
 
 : (plane-program) ( -- program )
@@ -244,9 +244,9 @@ M: spheres-world pref-dim*
 
 : (reflection-face) ( gadget face -- )
     swap reflection-texture>> [
-        GL_FRAMEBUFFER_EXT
-        GL_COLOR_ATTACHMENT0_EXT
-    ] 2dip 0 glFramebufferTexture2DEXT
+        GL_DRAW_FRAMEBUFFER
+        GL_COLOR_ATTACHMENT0
+    ] 2dip 0 glFramebufferTexture2D
     check-framebuffer ;
 
 : (draw-reflection-texture) ( gadget -- )

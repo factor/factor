@@ -322,7 +322,7 @@ CONSTANT: GL_DECR                           HEX: 1E03
 CONSTANT: GL_NONE                           HEX:    0
 CONSTANT: GL_LEFT                           HEX: 0406
 CONSTANT: GL_RIGHT                          HEX: 0407
-
+CONSTANT: GL_FRONT_LEFT                     HEX: 0400
 CONSTANT: GL_FRONT_RIGHT                    HEX: 0401
 CONSTANT: GL_BACK_LEFT                      HEX: 0402
 CONSTANT: GL_BACK_RIGHT                     HEX: 0403
@@ -1167,6 +1167,22 @@ GL-FUNCTION: void glTexImage3D { glTexImage3DEXT } ( GLenum target, GLint level,
 GL-FUNCTION: void glTexSubImage3D { glTexSubImage3DEXT } ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLvoid* pixels ) ;
 
 
+! GL_ARB_imaging
+
+
+CONSTANT: GL_CONSTANT_COLOR                 HEX: 8001
+CONSTANT: GL_ONE_MINUS_CONSTANT_COLOR       HEX: 8002
+CONSTANT: GL_CONSTANT_ALPHA                 HEX: 8003
+CONSTANT: GL_ONE_MINUS_CONSTANT_ALPHA       HEX: 8004
+CONSTANT: GL_BLEND_COLOR                    HEX: 8005
+CONSTANT: GL_FUNC_ADD                       HEX: 8006
+CONSTANT: GL_MIN                            HEX: 8007
+CONSTANT: GL_MAX                            HEX: 8008
+CONSTANT: GL_BLEND_EQUATION                 HEX: 8009
+CONSTANT: GL_FUNC_SUBTRACT                  HEX: 800A
+CONSTANT: GL_FUNC_REVERSE_SUBTRACT          HEX: 800B
+
+
 ! OpenGL 1.3
 
 
@@ -1370,6 +1386,8 @@ GL-FUNCTION: void glMultiDrawArrays { glMultiDrawArraysEXT } ( GLenum mode, GLin
 GL-FUNCTION: void glMultiDrawElements { glMultiDrawElementsEXT } ( GLenum mode, GLsizei* count, GLenum type, GLvoid** indices, GLsizei primcount ) ;
 GL-FUNCTION: void glPointParameterf { glPointParameterfARB } ( GLenum pname, GLfloat param ) ;
 GL-FUNCTION: void glPointParameterfv { glPointParameterfvARB } ( GLenum pname, GLfloat* params ) ;
+GL-FUNCTION: void glPointParameteri { glPointParameteriARB } ( GLenum pname, GLint param ) ;
+GL-FUNCTION: void glPointParameteriv { glPointParameterivARB } ( GLenum pname, GLint* params ) ;
 GL-FUNCTION: void glSecondaryColor3b { glSecondaryColor3bEXT } ( GLbyte red, GLbyte green, GLbyte blue ) ;
 GL-FUNCTION: void glSecondaryColor3bv { glSecondaryColor3bvEXT } ( GLbyte* v ) ;
 GL-FUNCTION: void glSecondaryColor3d { glSecondaryColor3dEXT } ( GLdouble red, GLdouble green, GLdouble blue ) ;
@@ -1567,7 +1585,6 @@ CONSTANT: GL_UPPER_LEFT HEX: 8CA2
 CONSTANT: GL_STENCIL_BACK_REF HEX: 8CA3
 CONSTANT: GL_STENCIL_BACK_VALUE_MASK HEX: 8CA4
 CONSTANT: GL_STENCIL_BACK_WRITEMASK HEX: 8CA5
-CONSTANT: GL_BLEND_EQUATION HEX: 8009
 ALIAS: GL_BLEND_EQUATION_RGB GL_BLEND_EQUATION
 
 TYPEDEF: char GLchar
@@ -1687,6 +1704,12 @@ CONSTANT: GL_COMPRESSED_SRGB HEX: 8C48
 CONSTANT: GL_COMPRESSED_SRGB_ALPHA HEX: 8C49
 CONSTANT: GL_COMPRESSED_SLUMINANCE HEX: 8C4A
 CONSTANT: GL_COMPRESSED_SLUMINANCE_ALPHA HEX: 8C4B
+CONSTANT: GL_FLOAT_MAT2x3  HEX: 8B65
+CONSTANT: GL_FLOAT_MAT2x4  HEX: 8B66
+CONSTANT: GL_FLOAT_MAT3x2  HEX: 8B67
+CONSTANT: GL_FLOAT_MAT3x4  HEX: 8B68
+CONSTANT: GL_FLOAT_MAT4x2  HEX: 8B69
+CONSTANT: GL_FLOAT_MAT4x3  HEX: 8B6A
 
 GL-FUNCTION: void glUniformMatrix2x3fv { } ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
 GL-FUNCTION: void glUniformMatrix2x4fv { } ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
@@ -1696,214 +1719,452 @@ GL-FUNCTION: void glUniformMatrix4x2fv { } ( GLint location, GLsizei count, GLbo
 GL-FUNCTION: void glUniformMatrix4x3fv { } ( GLint location, GLsizei count, GLboolean transpose, GLfloat* value ) ;
 
 
-! GL_EXT_framebuffer_object
+! OpenGL 3.0
 
 
-CONSTANT: GL_INVALID_FRAMEBUFFER_OPERATION_EXT HEX: 0506
-CONSTANT: GL_MAX_RENDERBUFFER_SIZE_EXT HEX: 84E8
-CONSTANT: GL_FRAMEBUFFER_BINDING_EXT HEX: 8CA6
-CONSTANT: GL_RENDERBUFFER_BINDING_EXT HEX: 8CA7
-CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT HEX: 8CD0
-CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT HEX: 8CD1
-CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL_EXT HEX: 8CD2
-CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE_EXT HEX: 8CD3
-CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_3D_ZOFFSET_EXT HEX: 8CD4
-CONSTANT: GL_FRAMEBUFFER_COMPLETE_EXT HEX: 8CD5
-CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT HEX: 8CD6
-CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT HEX: 8CD7
-CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT HEX: 8CD9
-CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT HEX: 8CDA
-CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT HEX: 8CDB
-CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT HEX: 8CDC
-CONSTANT: GL_FRAMEBUFFER_UNSUPPORTED_EXT HEX: 8CDD
-CONSTANT: GL_MAX_COLOR_ATTACHMENTS_EXT HEX: 8CDF
-CONSTANT: GL_COLOR_ATTACHMENT0_EXT HEX: 8CE0
-CONSTANT: GL_COLOR_ATTACHMENT1_EXT HEX: 8CE1
-CONSTANT: GL_COLOR_ATTACHMENT2_EXT HEX: 8CE2
-CONSTANT: GL_COLOR_ATTACHMENT3_EXT HEX: 8CE3
-CONSTANT: GL_COLOR_ATTACHMENT4_EXT HEX: 8CE4
-CONSTANT: GL_COLOR_ATTACHMENT5_EXT HEX: 8CE5
-CONSTANT: GL_COLOR_ATTACHMENT6_EXT HEX: 8CE6
-CONSTANT: GL_COLOR_ATTACHMENT7_EXT HEX: 8CE7
-CONSTANT: GL_COLOR_ATTACHMENT8_EXT HEX: 8CE8
-CONSTANT: GL_COLOR_ATTACHMENT9_EXT HEX: 8CE9
-CONSTANT: GL_COLOR_ATTACHMENT10_EXT HEX: 8CEA
-CONSTANT: GL_COLOR_ATTACHMENT11_EXT HEX: 8CEB
-CONSTANT: GL_COLOR_ATTACHMENT12_EXT HEX: 8CEC
-CONSTANT: GL_COLOR_ATTACHMENT13_EXT HEX: 8CED
-CONSTANT: GL_COLOR_ATTACHMENT14_EXT HEX: 8CEE
-CONSTANT: GL_COLOR_ATTACHMENT15_EXT HEX: 8CEF
-CONSTANT: GL_DEPTH_ATTACHMENT_EXT HEX: 8D00
-CONSTANT: GL_STENCIL_ATTACHMENT_EXT HEX: 8D20
-CONSTANT: GL_FRAMEBUFFER_EXT HEX: 8D40
-CONSTANT: GL_RENDERBUFFER_EXT HEX: 8D41
-CONSTANT: GL_RENDERBUFFER_WIDTH_EXT HEX: 8D42
-CONSTANT: GL_RENDERBUFFER_HEIGHT_EXT HEX: 8D43
-CONSTANT: GL_RENDERBUFFER_INTERNAL_FORMAT_EXT HEX: 8D44
-CONSTANT: GL_STENCIL_INDEX1_EXT HEX: 8D46
-CONSTANT: GL_STENCIL_INDEX4_EXT HEX: 8D47
-CONSTANT: GL_STENCIL_INDEX8_EXT HEX: 8D48
-CONSTANT: GL_STENCIL_INDEX16_EXT HEX: 8D49
-CONSTANT: GL_RENDERBUFFER_RED_SIZE_EXT HEX: 8D50
-CONSTANT: GL_RENDERBUFFER_GREEN_SIZE_EXT HEX: 8D51
-CONSTANT: GL_RENDERBUFFER_BLUE_SIZE_EXT HEX: 8D52
-CONSTANT: GL_RENDERBUFFER_ALPHA_SIZE_EXT HEX: 8D53
-CONSTANT: GL_RENDERBUFFER_DEPTH_SIZE_EXT HEX: 8D54
-CONSTANT: GL_RENDERBUFFER_STENCIL_SIZE_EXT HEX: 8D55
+TYPEDEF: ushort  GLhalf
 
-GL-FUNCTION: void glBindFramebufferEXT { } ( GLenum target, GLuint framebuffer ) ;
-GL-FUNCTION: void glBindRenderbufferEXT { } ( GLenum target, GLuint renderbuffer ) ;
-GL-FUNCTION: GLenum glCheckFramebufferStatusEXT { } ( GLenum target ) ;
-GL-FUNCTION: void glDeleteFramebuffersEXT { } ( GLsizei n, GLuint* framebuffers ) ;
-GL-FUNCTION: void glDeleteRenderbuffersEXT { } ( GLsizei n, GLuint* renderbuffers ) ;
-GL-FUNCTION: void glFramebufferRenderbufferEXT { } ( GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer ) ;
-GL-FUNCTION: void glFramebufferTexture1DEXT { } ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level ) ;
-GL-FUNCTION: void glFramebufferTexture2DEXT { } ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level ) ;
-GL-FUNCTION: void glFramebufferTexture3DEXT { } ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset ) ;
-GL-FUNCTION: void glGenFramebuffersEXT { } ( GLsizei n, GLuint* framebuffers ) ;
-GL-FUNCTION: void glGenRenderbuffersEXT { } ( GLsizei n, GLuint* renderbuffers ) ;
-GL-FUNCTION: void glGenerateMipmapEXT { } ( GLenum target ) ;
-GL-FUNCTION: void glGetFramebufferAttachmentParameterivEXT { } ( GLenum target, GLenum attachment, GLenum pname, GLint* params ) ;
-GL-FUNCTION: void glGetRenderbufferParameterivEXT { } ( GLenum target, GLenum pname, GLint* params ) ;
-GL-FUNCTION: GLboolean glIsFramebufferEXT { } ( GLuint framebuffer ) ;
-GL-FUNCTION: GLboolean glIsRenderbufferEXT { } ( GLuint renderbuffer ) ;
-GL-FUNCTION: void glRenderbufferStorageEXT { } ( GLenum target, GLenum internalformat, GLsizei width, GLsizei height ) ;
+CONSTANT: GL_VERTEX_ATTRIB_ARRAY_INTEGER HEX: 88FD
+CONSTANT: GL_SAMPLER_CUBE_SHADOW HEX: 8DC5
+CONSTANT: GL_UNSIGNED_INT_VEC2 HEX: 8DC6
+CONSTANT: GL_UNSIGNED_INT_VEC3 HEX: 8DC7
+CONSTANT: GL_UNSIGNED_INT_VEC4 HEX: 8DC8
+CONSTANT: GL_INT_SAMPLER_1D HEX: 8DC9
+CONSTANT: GL_INT_SAMPLER_2D HEX: 8DCA
+CONSTANT: GL_INT_SAMPLER_3D HEX: 8DCB
+CONSTANT: GL_INT_SAMPLER_CUBE HEX: 8DCC
+CONSTANT: GL_INT_SAMPLER_2D_RECT HEX: 8DCD
+CONSTANT: GL_INT_SAMPLER_1D_ARRAY HEX: 8DCE
+CONSTANT: GL_INT_SAMPLER_2D_ARRAY HEX: 8DCF
+CONSTANT: GL_UNSIGNED_INT_SAMPLER_1D HEX: 8DD1
+CONSTANT: GL_UNSIGNED_INT_SAMPLER_2D HEX: 8DD2
+CONSTANT: GL_UNSIGNED_INT_SAMPLER_3D HEX: 8DD3
+CONSTANT: GL_UNSIGNED_INT_SAMPLER_CUBE HEX: 8DD4
+CONSTANT: GL_UNSIGNED_INT_SAMPLER_2D_RECT HEX: 8DD5
+CONSTANT: GL_UNSIGNED_INT_SAMPLER_1D_ARRAY HEX: 8DD6
+CONSTANT: GL_UNSIGNED_INT_SAMPLER_2D_ARRAY HEX: 8DD7
+CONSTANT: GL_MIN_PROGRAM_TEXEL_OFFSET HEX: 8904
+CONSTANT: GL_MAX_PROGRAM_TEXEL_OFFSET HEX: 8905
 
+CONSTANT: GL_RGBA32F HEX: 8814
+CONSTANT: GL_RGB32F HEX: 8815
+CONSTANT: GL_RGBA16F HEX: 881A
+CONSTANT: GL_RGB16F HEX: 881B
+CONSTANT: GL_TEXTURE_RED_TYPE HEX: 8C10
+CONSTANT: GL_TEXTURE_GREEN_TYPE HEX: 8C11
+CONSTANT: GL_TEXTURE_BLUE_TYPE HEX: 8C12
+CONSTANT: GL_TEXTURE_ALPHA_TYPE HEX: 8C13
+CONSTANT: GL_TEXTURE_DEPTH_TYPE HEX: 8C16
+CONSTANT: GL_UNSIGNED_NORMALIZED HEX: 8C17
 
-! GL_EXT_framebuffer_blit
+CONSTANT: GL_QUERY_WAIT               HEX: 8E13
+CONSTANT: GL_QUERY_NO_WAIT            HEX: 8E14
+CONSTANT: GL_QUERY_BY_REGION_WAIT     HEX: 8E15
+CONSTANT: GL_QUERY_BY_REGION_NO_WAIT  HEX: 8E16
 
+CONSTANT: GL_HALF_FLOAT HEX: 140B
 
-GL-FUNCTION: void glBlitFramebufferEXT { } ( GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
+CONSTANT: GL_MAP_READ_BIT                   HEX: 0001
+CONSTANT: GL_MAP_WRITE_BIT                  HEX: 0002
+CONSTANT: GL_MAP_INVALIDATE_RANGE_BIT       HEX: 0004
+CONSTANT: GL_MAP_INVALIDATE_BUFFER_BIT      HEX: 0008
+CONSTANT: GL_MAP_FLUSH_EXPLICIT_BIT         HEX: 0010
+CONSTANT: GL_MAP_UNSYNCHRONIZED_BIT         HEX: 0020
+
+CONSTANT: GL_R8              HEX: 8229
+CONSTANT: GL_R16             HEX: 822A
+CONSTANT: GL_RG8             HEX: 822B
+CONSTANT: GL_RG16            HEX: 822C
+CONSTANT: GL_R16F            HEX: 822D
+CONSTANT: GL_R32F            HEX: 822E
+CONSTANT: GL_RG16F           HEX: 822F
+CONSTANT: GL_RG32F           HEX: 8230
+CONSTANT: GL_R8I             HEX: 8231
+CONSTANT: GL_R8UI            HEX: 8232
+CONSTANT: GL_R16I            HEX: 8233
+CONSTANT: GL_R16UI           HEX: 8234
+CONSTANT: GL_R32I            HEX: 8235
+CONSTANT: GL_R32UI           HEX: 8236
+CONSTANT: GL_RG8I            HEX: 8237
+CONSTANT: GL_RG8UI           HEX: 8238
+CONSTANT: GL_RG16I           HEX: 8239
+CONSTANT: GL_RG16UI          HEX: 823A
+CONSTANT: GL_RG32I           HEX: 823B
+CONSTANT: GL_RG32UI          HEX: 823C
+CONSTANT: GL_RG              HEX: 8227
+CONSTANT: GL_COMPRESSED_RED  HEX: 8225
+CONSTANT: GL_COMPRESSED_RG   HEX: 8226
+CONSTANT: GL_RG_INTEGER      HEX: 8228
+
+CONSTANT: GL_VERTEX_ARRAY_BINDING HEX: 85B5
+
+CONSTANT: GL_CLAMP_READ_COLOR      HEX: 891C
+CONSTANT: GL_FIXED_ONLY            HEX: 891D
+
+CONSTANT: GL_DEPTH_COMPONENT32F  HEX: 8CAC
+CONSTANT: GL_DEPTH32F_STENCIL8   HEX: 8CAD
+
+CONSTANT: GL_RGB9_E5                   HEX: 8C3D
+CONSTANT: GL_UNSIGNED_INT_5_9_9_9_REV  HEX: 8C3E
+CONSTANT: GL_TEXTURE_SHARED_SIZE       HEX: 8C3F
+
+CONSTANT: GL_R11F_G11F_B10F                HEX: 8C3A
+CONSTANT: GL_UNSIGNED_INT_10F_11F_11F_REV  HEX: 8C3B
+
+CONSTANT: GL_INVALID_FRAMEBUFFER_OPERATION HEX: 0506
+CONSTANT: GL_MAX_RENDERBUFFER_SIZE HEX: 84E8
+CONSTANT: GL_FRAMEBUFFER_BINDING HEX: 8CA6
+CONSTANT: GL_RENDERBUFFER_BINDING HEX: 8CA7
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE HEX: 8CD0
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME HEX: 8CD1
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL HEX: 8CD2
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE HEX: 8CD3
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING HEX: 8210
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE HEX: 8211
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE HEX: 8212
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE HEX: 8213
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE HEX: 8214
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE HEX: 8215
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE HEX: 8216
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE HEX: 8217
+CONSTANT: GL_FRAMEBUFFER_DEFAULT      HEX: 8218
+CONSTANT: GL_FRAMEBUFFER_UNDEFINED    HEX: 8219
+CONSTANT: GL_DEPTH_STENCIL_ATTACHMENT HEX: 821A
+CONSTANT: GL_FRAMEBUFFER_COMPLETE HEX: 8CD5
+CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT HEX: 8CD6
+CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT HEX: 8CD7
+CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER HEX: 8CDB
+CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER HEX: 8CDC
+CONSTANT: GL_FRAMEBUFFER_UNSUPPORTED HEX: 8CDD
+CONSTANT: GL_MAX_COLOR_ATTACHMENTS HEX: 8CDF
+CONSTANT: GL_COLOR_ATTACHMENT0 HEX: 8CE0
+CONSTANT: GL_COLOR_ATTACHMENT1 HEX: 8CE1
+CONSTANT: GL_COLOR_ATTACHMENT2 HEX: 8CE2
+CONSTANT: GL_COLOR_ATTACHMENT3 HEX: 8CE3
+CONSTANT: GL_COLOR_ATTACHMENT4 HEX: 8CE4
+CONSTANT: GL_COLOR_ATTACHMENT5 HEX: 8CE5
+CONSTANT: GL_COLOR_ATTACHMENT6 HEX: 8CE6
+CONSTANT: GL_COLOR_ATTACHMENT7 HEX: 8CE7
+CONSTANT: GL_COLOR_ATTACHMENT8 HEX: 8CE8
+CONSTANT: GL_COLOR_ATTACHMENT9 HEX: 8CE9
+CONSTANT: GL_COLOR_ATTACHMENT10 HEX: 8CEA
+CONSTANT: GL_COLOR_ATTACHMENT11 HEX: 8CEB
+CONSTANT: GL_COLOR_ATTACHMENT12 HEX: 8CEC
+CONSTANT: GL_COLOR_ATTACHMENT13 HEX: 8CED
+CONSTANT: GL_COLOR_ATTACHMENT14 HEX: 8CEE
+CONSTANT: GL_COLOR_ATTACHMENT15 HEX: 8CEF
+CONSTANT: GL_DEPTH_ATTACHMENT HEX: 8D00
+CONSTANT: GL_STENCIL_ATTACHMENT HEX: 8D20
+CONSTANT: GL_FRAMEBUFFER HEX: 8D40
+CONSTANT: GL_RENDERBUFFER HEX: 8D41
+CONSTANT: GL_RENDERBUFFER_WIDTH HEX: 8D42
+CONSTANT: GL_RENDERBUFFER_HEIGHT HEX: 8D43
+CONSTANT: GL_RENDERBUFFER_INTERNAL_FORMAT HEX: 8D44
+CONSTANT: GL_STENCIL_INDEX1 HEX: 8D46
+CONSTANT: GL_STENCIL_INDEX4 HEX: 8D47
+CONSTANT: GL_STENCIL_INDEX8 HEX: 8D48
+CONSTANT: GL_STENCIL_INDEX16 HEX: 8D49
+CONSTANT: GL_RENDERBUFFER_RED_SIZE HEX: 8D50
+CONSTANT: GL_RENDERBUFFER_GREEN_SIZE HEX: 8D51
+CONSTANT: GL_RENDERBUFFER_BLUE_SIZE HEX: 8D52
+CONSTANT: GL_RENDERBUFFER_ALPHA_SIZE HEX: 8D53
+CONSTANT: GL_RENDERBUFFER_DEPTH_SIZE HEX: 8D54
+CONSTANT: GL_RENDERBUFFER_STENCIL_SIZE HEX: 8D55
+
+CONSTANT: GL_READ_FRAMEBUFFER HEX: 8CA8
+CONSTANT: GL_DRAW_FRAMEBUFFER HEX: 8CA9
+
+ALIAS: GL_DRAW_FRAMEBUFFER_BINDING GL_FRAMEBUFFER_BINDING
+CONSTANT: GL_READ_FRAMEBUFFER_BINDING HEX: 8CAA
+
+CONSTANT: GL_RENDERBUFFER_SAMPLES HEX: 8CAB
+CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE HEX: 8D56
+CONSTANT: GL_MAX_SAMPLES HEX: 8D57
+
+CONSTANT: GL_DEPTH_STENCIL         HEX: 84F9
+CONSTANT: GL_UNSIGNED_INT_24_8     HEX: 84FA
+CONSTANT: GL_DEPTH24_STENCIL8      HEX: 88F0
+CONSTANT: GL_TEXTURE_STENCIL_SIZE  HEX: 88F1
+
+CONSTANT: GL_RGBA32UI HEX: 8D70
+CONSTANT: GL_RGB32UI HEX: 8D71
+
+CONSTANT: GL_RGBA16UI HEX: 8D76
+CONSTANT: GL_RGB16UI HEX: 8D77
+
+CONSTANT: GL_RGBA8UI HEX: 8D7C
+CONSTANT: GL_RGB8UI HEX: 8D7D
+
+CONSTANT: GL_RGBA32I HEX: 8D82
+CONSTANT: GL_RGB32I HEX: 8D83
+
+CONSTANT: GL_RGBA16I HEX: 8D88
+CONSTANT: GL_RGB16I HEX: 8D89
+
+CONSTANT: GL_RGBA8I HEX: 8D8E
+CONSTANT: GL_RGB8I HEX: 8D8F
+
+CONSTANT: GL_RED_INTEGER HEX: 8D94
+CONSTANT: GL_GREEN_INTEGER HEX: 8D95
+CONSTANT: GL_BLUE_INTEGER HEX: 8D96
+CONSTANT: GL_RGB_INTEGER HEX: 8D98
+CONSTANT: GL_RGBA_INTEGER HEX: 8D99
+CONSTANT: GL_BGR_INTEGER HEX: 8D9A
+CONSTANT: GL_BGRA_INTEGER HEX: 8D9B
+
+CONSTANT: GL_FLOAT_32_UNSIGNED_INT_24_8_REV  HEX: 8DAD
+
+CONSTANT: GL_TEXTURE_1D_ARRAY                      HEX: 8C18
+CONSTANT: GL_TEXTURE_2D_ARRAY                      HEX: 8C1A
+
+CONSTANT: GL_PROXY_TEXTURE_2D_ARRAY                HEX: 8C1B
+
+CONSTANT: GL_PROXY_TEXTURE_1D_ARRAY                HEX: 8C19
+
+CONSTANT: GL_TEXTURE_BINDING_1D_ARRAY              HEX: 8C1C
+CONSTANT: GL_TEXTURE_BINDING_2D_ARRAY              HEX: 8C1D
+CONSTANT: GL_MAX_ARRAY_TEXTURE_LAYERS              HEX: 88FF
+
+CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER  HEX: 8CD4
+
+CONSTANT: GL_SAMPLER_1D_ARRAY                      HEX: 8DC0
+CONSTANT: GL_SAMPLER_2D_ARRAY                      HEX: 8DC1
+CONSTANT: GL_SAMPLER_1D_ARRAY_SHADOW               HEX: 8DC3
+CONSTANT: GL_SAMPLER_2D_ARRAY_SHADOW               HEX: 8DC4
+
+CONSTANT: GL_COMPRESSED_RED_RGTC1               HEX: 8DBB
+CONSTANT: GL_COMPRESSED_SIGNED_RED_RGTC1        HEX: 8DBC
+CONSTANT: GL_COMPRESSED_RG_RGTC2            HEX: 8DBD
+CONSTANT: GL_COMPRESSED_SIGNED_RG_RGTC2     HEX: 8DBE
+
+CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER HEX: 8C8E
+CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_START HEX: 8C84
+CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_SIZE HEX: 8C85
+CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_BINDING HEX: 8C8F
+CONSTANT: GL_INTERLEAVED_ATTRIBS HEX: 8C8C
+CONSTANT: GL_SEPARATE_ATTRIBS HEX: 8C8D
+CONSTANT: GL_PRIMITIVES_GENERATED HEX: 8C87
+CONSTANT: GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN HEX: 8C88
+CONSTANT: GL_RASTERIZER_DISCARD HEX: 8C89
+CONSTANT: GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS HEX: 8C8A
+CONSTANT: GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS HEX: 8C8B
+CONSTANT: GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS HEX: 8C80
+CONSTANT: GL_TRANSFORM_FEEDBACK_VARYINGS HEX: 8C83
+CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_MODE HEX: 8C7F
+CONSTANT: GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH HEX: 8C76
+
+CONSTANT: GL_FRAMEBUFFER_SRGB          HEX: 8DB9
+
+CONSTANT: GL_MAJOR_VERSION                  HEX: 821B
+CONSTANT: GL_MINOR_VERSION                  HEX: 821C
+CONSTANT: GL_NUM_EXTENSIONS                 HEX: 821D
+CONSTANT: GL_CONTEXT_FLAGS                  HEX: 821E
+CONSTANT: GL_INDEX                          HEX: 8222
+CONSTANT: GL_DEPTH_BUFFER                   HEX: 8223
+CONSTANT: GL_STENCIL_BUFFER                 HEX: 8224
+CONSTANT: GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT HEX: 0001
+
+ALIAS: GL_COMPARE_REF_TO_TEXTURE GL_COMPARE_R_TO_TEXTURE
+ALIAS: GL_MAX_VARYING_COMPONENTS GL_MAX_VARYING_FLOATS
+ALIAS: GL_MAX_CLIP_DISTANCES GL_MAX_CLIP_PLANES
+ALIAS: GL_CLIP_DISTANCE0 GL_CLIP_PLANE0
+ALIAS: GL_CLIP_DISTANCE1 GL_CLIP_PLANE1
+ALIAS: GL_CLIP_DISTANCE2 GL_CLIP_PLANE2
+ALIAS: GL_CLIP_DISTANCE3 GL_CLIP_PLANE3
+ALIAS: GL_CLIP_DISTANCE4 GL_CLIP_PLANE4
+ALIAS: GL_CLIP_DISTANCE5 GL_CLIP_PLANE5
+
+GL-FUNCTION: void glVertexAttribIPointer { glVertexAttribIPointerEXT } ( GLuint index, GLint size, GLenum type, GLsizei stride, void* pointer ) ;
+
+GL-FUNCTION: void glGetVertexAttribIiv { glGetVertexAttribIivEXT } ( GLuint index, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glGetVertexAttribIuiv { glGetVertexAttribIuivEXT } ( GLuint index, GLenum pname, GLuint* params ) ;
+
+GL-FUNCTION: void glUniform1ui { glUniform1uiEXT } ( GLint location, GLuint v0 ) ;
+GL-FUNCTION: void glUniform2ui { glUniform2uiEXT } ( GLint location, GLuint v0, GLuint v1 ) ;
+GL-FUNCTION: void glUniform3ui { glUniform3uiEXT } ( GLint location, GLuint v0, GLuint v1, GLuint v2 ) ;
+GL-FUNCTION: void glUniform4ui { glUniform4uiEXT } ( GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3 ) ;
+
+GL-FUNCTION: void glUniform1uiv { glUniform1uivEXT } ( GLint location, GLsizei count, GLuint* value ) ;
+GL-FUNCTION: void glUniform2uiv { glUniform2uivEXT } ( GLint location, GLsizei count, GLuint* value ) ;
+GL-FUNCTION: void glUniform3uiv { glUniform3uivEXT } ( GLint location, GLsizei count, GLuint* value ) ;
+GL-FUNCTION: void glUniform4uiv { glUniform4uivEXT } ( GLint location, GLsizei count, GLuint* value ) ;
+
+GL-FUNCTION: void glGetUniformuiv { glGetUniformuivEXT } ( GLuint program, GLint location, GLuint* params ) ;
+
+GL-FUNCTION: void glBindFragDataLocation { glBindFragDataLocationEXT } ( GLuint program, GLuint colorNumber, GLchar* name ) ;
+GL-FUNCTION: GLint glGetFragDataLocation { glGetFragDataLocationEXT } ( GLuint program, GLchar* name ) ;
+
+GL-FUNCTION: void glBeginConditionalRender { glBeginConditionalRenderNV } ( GLuint id, GLenum mode ) ;
+GL-FUNCTION: void glEndConditionalRender { glEndConditionalRenderNV } ( ) ;
+
+GL-FUNCTION: void glBindVertexArray { glBindVertexArrayAPPLE } ( GLuint array ) ;
+GL-FUNCTION: void glDeleteVertexArrays { glDeleteVertexArraysAPPLE } ( GLsizei n, GLuint* arrays ) ;
+GL-FUNCTION: void glGenVertexArrays { glGenVertexArraysAPPLE } ( GLsizei n, GLuint* arrays ) ;
+GL-FUNCTION: GLboolean glIsVertexArray { glIsVertexArrayAPPLE } ( GLuint array ) ;
+
+GL-FUNCTION: void glClampColor { glClampColorARB } ( GLenum target, GLenum clamp ) ;
+
+GL-FUNCTION: void glBindFramebuffer { glBindFramebufferEXT } ( GLenum target, GLuint framebuffer ) ;
+GL-FUNCTION: void glBindRenderbuffer { glBindRenderbufferEXT } ( GLenum target, GLuint renderbuffer ) ;
+GL-FUNCTION: GLenum glCheckFramebufferStatus { glCheckFramebufferStatusEXT } ( GLenum target ) ;
+GL-FUNCTION: void glDeleteFramebuffers { glDeleteFramebuffersEXT } ( GLsizei n, GLuint* framebuffers ) ;
+GL-FUNCTION: void glDeleteRenderbuffers { glDeleteRenderbuffersEXT } ( GLsizei n, GLuint* renderbuffers ) ;
+GL-FUNCTION: void glFramebufferRenderbuffer { glFramebufferRenderbufferEXT } ( GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer ) ;
+GL-FUNCTION: void glFramebufferTexture1D { glFramebufferTexture1DEXT } ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level ) ;
+GL-FUNCTION: void glFramebufferTexture2D { glFramebufferTexture2DEXT } ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level ) ;
+GL-FUNCTION: void glFramebufferTexture3D { glFramebufferTexture3DEXT } ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset ) ;
+GL-FUNCTION: void glFramebufferTextureLayer { glFramebufferTextureLayerEXT }
+    ( GLenum target, GLenum attachment, 
+      GLuint texture, GLint level, GLint layer ) ;
+GL-FUNCTION: void glGenFramebuffers { glGenFramebuffersEXT } ( GLsizei n, GLuint* framebuffers ) ;
+GL-FUNCTION: void glGenRenderbuffers { glGenRenderbuffersEXT } ( GLsizei n, GLuint* renderbuffers ) ;
+GL-FUNCTION: void glGenerateMipmap { glGenerateMipmapEXT } ( GLenum target ) ;
+GL-FUNCTION: void glGetFramebufferAttachmentParameteriv { glGetFramebufferAttachmentParameterivEXT } ( GLenum target, GLenum attachment, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glGetRenderbufferParameteriv { glGetRenderbufferParameterivEXT } ( GLenum target, GLenum pname, GLint* params ) ;
+GL-FUNCTION: GLboolean glIsFramebuffer { glIsFramebufferEXT } ( GLuint framebuffer ) ;
+GL-FUNCTION: GLboolean glIsRenderbuffer { glIsRenderbufferEXT } ( GLuint renderbuffer ) ;
+GL-FUNCTION: void glRenderbufferStorage { glRenderbufferStorageEXT } ( GLenum target, GLenum internalformat, GLsizei width, GLsizei height ) ;
+
+GL-FUNCTION: void glBlitFramebuffer { glBlitFramebufferEXT }
+                                           ( GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
                                              GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
                                              GLbitfield mask, GLenum filter ) ;
 
-CONSTANT: GL_READ_FRAMEBUFFER_EXT HEX: 8CA8
-CONSTANT: GL_DRAW_FRAMEBUFFER_EXT HEX: 8CA9
-
-ALIAS: GL_DRAW_FRAMEBUFFER_BINDING_EXT GL_FRAMEBUFFER_BINDING_EXT
-CONSTANT: GL_READ_FRAMEBUFFER_BINDING_EXT HEX: 8CAA
-
-
-! GL_EXT_framebuffer_multisample
-
-
-GL-FUNCTION: void glRenderbufferStorageMultisampleEXT { } (
+GL-FUNCTION: void glRenderbufferStorageMultisample { glRenderbufferStorageMultisampleEXT } (
             GLenum target, GLsizei samples,
             GLenum internalformat,
             GLsizei width, GLsizei height ) ;
 
-CONSTANT: GL_RENDERBUFFER_SAMPLES_EXT HEX: 8CAB
-CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT HEX: 8D56
-CONSTANT: GL_MAX_SAMPLES_EXT HEX: 8D57
+GL-FUNCTION: void glTexParameterIiv { glTexParameterIivEXT } ( GLenum target, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glTexParameterIuiv { glTexParameterIuivEXT } ( GLenum target, GLenum pname, GLuint* params ) ;
+GL-FUNCTION: void glGetTexParameterIiv { glGetTexParameterIivEXT } ( GLenum target, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glGetTexParameterIuiv { glGetTexParameterIuivEXT } ( GLenum target, GLenum pname, GLuint* params ) ;
+
+GL-FUNCTION: void glColorMaski { glColorMaskIndexedEXT }
+    ( GLuint buf, GLboolean r, GLboolean g, GLboolean b, GLboolean a ) ;
+
+GL-FUNCTION: void glGetBooleani_v { glGetBooleanIndexedvEXT } ( GLenum value, GLuint index, GLboolean* data ) ;
+
+GL-FUNCTION: void glGetIntegeri_v { glGetIntegerIndexedvEXT } ( GLenum value, GLuint index, GLint* data ) ;
+
+GL-FUNCTION: void glEnablei { glEnableIndexedEXT } ( GLenum target, GLuint index ) ;
+
+GL-FUNCTION: void glDisablei { glDisableIndexedEXT } ( GLenum target, GLuint index ) ;
+
+GL-FUNCTION: GLboolean glIsEnabledi { glIsEnabledIndexedEXT } ( GLenum target, GLuint index ) ;
+
+GL-FUNCTION: void glBindBufferRange { glBindBufferRangeEXT } ( GLenum target, GLuint index, GLuint buffer,
+                           GLintptr offset, GLsizeiptr size ) ;
+GL-FUNCTION: void glBindBufferBase { glBindBufferBaseEXT } ( GLenum target, GLuint index, GLuint buffer ) ;
+
+GL-FUNCTION: void glBeginTransformFeedback { glBeginTransformFeedbackEXT } ( GLenum primitiveMode ) ;
+GL-FUNCTION: void glEndTransformFeedback { glEndTransformFeedbackEXT } ( ) ;
+
+GL-FUNCTION: void glTransformFeedbackVaryings { glTransformFeedbackVaryingsEXT } ( GLuint program, GLsizei count,
+                                      GLchar** varyings, GLenum bufferMode ) ;
+GL-FUNCTION: void glGetTransformFeedbackVarying { glGetTransformFeedbackVaryingEXT } ( GLuint program, GLuint index,
+                                        GLsizei bufSize, GLsizei* length, 
+                                        GLsizei* size, GLenum* type, GLchar* name ) ;
+
+GL-FUNCTION: void glClearBufferiv  { } ( GLenum buffer, GLint drawbuffer, GLint* value ) ;
+GL-FUNCTION: void glClearBufferuiv { } ( GLenum buffer, GLint drawbuffer, GLuint* value ) ;
+GL-FUNCTION: void glClearBufferfv  { } ( GLenum buffer, GLint drawbuffer, GLfloat* value ) ;
+GL-FUNCTION: void glClearBufferfi  { } ( GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil ) ;
+
+GL-FUNCTION: GLubyte* glGetStringi { } ( GLenum value, GLuint index ) ;
+
+GL-FUNCTION: GLvoid* glMapBufferRange { } ( GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access ) ;
+GL-FUNCTION: void glFlushMappedBufferRange { glFlushMappedBufferRangeAPPLE } ( GLenum target, GLintptr offset, GLsizeiptr size ) ;
 
 
-! GL_ARB_half_float_pixel, GL_ARB_half_float_vertex
+! OpenGL 3.1
 
+CONSTANT: GL_RED_SNORM                    HEX: 8F90
+CONSTANT: GL_RG_SNORM                     HEX: 8F91
+CONSTANT: GL_RGB_SNORM                    HEX: 8F92
+CONSTANT: GL_RGBA_SNORM                   HEX: 8F93
+CONSTANT: GL_R8_SNORM                     HEX: 8F94
+CONSTANT: GL_RG8_SNORM                    HEX: 8F95
+CONSTANT: GL_RGB8_SNORM                   HEX: 8F96
+CONSTANT: GL_RGBA8_SNORM                  HEX: 8F97
+CONSTANT: GL_R16_SNORM                    HEX: 8F98
+CONSTANT: GL_RG16_SNORM                   HEX: 8F99
+CONSTANT: GL_RGB16_SNORM                  HEX: 8F9A
+CONSTANT: GL_RGBA16_SNORM                 HEX: 8F9B
+CONSTANT: GL_SIGNED_NORMALIZED            HEX: 8F9C
 
-CONSTANT: GL_HALF_FLOAT_ARB HEX: 140B
+CONSTANT: GL_PRIMITIVE_RESTART            HEX: 8F9D
+CONSTANT: GL_PRIMITIVE_RESTART_INDEX      HEX: 8F9E
 
+CONSTANT: GL_COPY_READ_BUFFER             HEX: 8F36
+CONSTANT: GL_COPY_WRITE_BUFFER            HEX: 8F37
 
-! GL_ARB_texture_float
+CONSTANT: GL_UNIFORM_BUFFER                 HEX: 8A11
+CONSTANT: GL_UNIFORM_BUFFER_BINDING         HEX: 8A28
+CONSTANT: GL_UNIFORM_BUFFER_START           HEX: 8A29
+CONSTANT: GL_UNIFORM_BUFFER_SIZE            HEX: 8A2A
+CONSTANT: GL_MAX_VERTEX_UNIFORM_BLOCKS      HEX: 8A2B
+CONSTANT: GL_MAX_GEOMETRY_UNIFORM_BLOCKS    HEX: 8A2C
+CONSTANT: GL_MAX_FRAGMENT_UNIFORM_BLOCKS    HEX: 8A2D
+CONSTANT: GL_MAX_COMBINED_UNIFORM_BLOCKS    HEX: 8A2E
+CONSTANT: GL_MAX_UNIFORM_BUFFER_BINDINGS    HEX: 8A2F
+CONSTANT: GL_MAX_UNIFORM_BLOCK_SIZE         HEX: 8A30
+CONSTANT: GL_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS HEX: 8A31
+CONSTANT: GL_MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS HEX: 8A32
+CONSTANT: GL_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS HEX: 8A33
+CONSTANT: GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT HEX: 8A34
+CONSTANT: GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH HEX: 8A35
+CONSTANT: GL_ACTIVE_UNIFORM_BLOCKS          HEX: 8A36
+CONSTANT: GL_UNIFORM_TYPE                   HEX: 8A37
+CONSTANT: GL_UNIFORM_SIZE                   HEX: 8A38
+CONSTANT: GL_UNIFORM_NAME_LENGTH            HEX: 8A39
+CONSTANT: GL_UNIFORM_BLOCK_INDEX            HEX: 8A3A
+CONSTANT: GL_UNIFORM_OFFSET                 HEX: 8A3B
+CONSTANT: GL_UNIFORM_ARRAY_STRIDE           HEX: 8A3C
+CONSTANT: GL_UNIFORM_MATRIX_STRIDE          HEX: 8A3D
+CONSTANT: GL_UNIFORM_IS_ROW_MAJOR           HEX: 8A3E
+CONSTANT: GL_UNIFORM_BLOCK_BINDING          HEX: 8A3F
+CONSTANT: GL_UNIFORM_BLOCK_DATA_SIZE        HEX: 8A40
+CONSTANT: GL_UNIFORM_BLOCK_NAME_LENGTH      HEX: 8A41
+CONSTANT: GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS  HEX: 8A42
+CONSTANT: GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES HEX: 8A43
+CONSTANT: GL_UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER HEX: 8A44
+CONSTANT: GL_UNIFORM_BLOCK_REFERENCED_BY_GEOMETRY_SHADER HEX: 8A45
+CONSTANT: GL_UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER HEX: 8A46
+CONSTANT: GL_INVALID_INDEX                  HEX: FFFFFFFF
 
+CONSTANT: GL_TEXTURE_RECTANGLE            HEX: 84F5
+CONSTANT: GL_TEXTURE_BINDING_RECTANGLE    HEX: 84F6
+CONSTANT: GL_PROXY_TEXTURE_RECTANGLE      HEX: 84F7
+CONSTANT: GL_MAX_RECTANGLE_TEXTURE_SIZE   HEX: 84F8
+CONSTANT: GL_SAMPLER_2D_RECT              HEX: 8B63
+CONSTANT: GL_SAMPLER_2D_RECT_SHADOW       HEX: 8B64
 
-CONSTANT: GL_RGBA32F_ARB HEX: 8814
-CONSTANT: GL_RGB32F_ARB HEX: 8815
-CONSTANT: GL_ALPHA32F_ARB HEX: 8816
-CONSTANT: GL_INTENSITY32F_ARB HEX: 8817
-CONSTANT: GL_LUMINANCE32F_ARB HEX: 8818
-CONSTANT: GL_LUMINANCE_ALPHA32F_ARB HEX: 8819
-CONSTANT: GL_RGBA16F_ARB HEX: 881A
-CONSTANT: GL_RGB16F_ARB HEX: 881B
-CONSTANT: GL_ALPHA16F_ARB HEX: 881C
-CONSTANT: GL_INTENSITY16F_ARB HEX: 881D
-CONSTANT: GL_LUMINANCE16F_ARB HEX: 881E
-CONSTANT: GL_LUMINANCE_ALPHA16F_ARB HEX: 881F
-CONSTANT: GL_TEXTURE_RED_TYPE_ARB HEX: 8C10
-CONSTANT: GL_TEXTURE_GREEN_TYPE_ARB HEX: 8C11
-CONSTANT: GL_TEXTURE_BLUE_TYPE_ARB HEX: 8C12
-CONSTANT: GL_TEXTURE_ALPHA_TYPE_ARB HEX: 8C13
-CONSTANT: GL_TEXTURE_LUMINANCE_TYPE_ARB HEX: 8C14
-CONSTANT: GL_TEXTURE_INTENSITY_TYPE_ARB HEX: 8C15
-CONSTANT: GL_TEXTURE_DEPTH_TYPE_ARB HEX: 8C16
-CONSTANT: GL_UNSIGNED_NORMALIZED_ARB HEX: 8C17
+CONSTANT: GL_SAMPLER_BUFFER HEX: 8DC2
+CONSTANT: GL_INT_SAMPLER_BUFFER HEX: 8DD0
+CONSTANT: GL_UNSIGNED_INT_SAMPLER_BUFFER HEX: 8DD8
 
+CONSTANT: GL_TEXTURE_BUFFER HEX: 8C2A
 
-! GL_EXT_gpu_shader4
+CONSTANT: GL_MAX_TEXTURE_BUFFER_SIZE            HEX: 8C2B
+CONSTANT: GL_TEXTURE_BINDING_BUFFER             HEX: 8C2C
+CONSTANT: GL_TEXTURE_BUFFER_DATA_STORE_BINDING  HEX: 8C2D
+CONSTANT: GL_TEXTURE_BUFFER_FORMAT              HEX: 8C2E
 
+GL-FUNCTION: void glDrawArraysInstanced { glDrawArraysInstancedARB } ( GLenum mode, GLint first, GLsizei count, GLsizei primcount ) ;
+GL-FUNCTION: void glDrawElementsInstanced { glDrawElementsInstancedARB } ( GLenum mode, GLsizei count, GLenum type, GLvoid* indices, GLsizei primcount ) ;
+GL-FUNCTION: void glTexBuffer { glTexBufferEXT } ( GLenum target, GLenum internalformat, GLuint buffer ) ;
+GL-FUNCTION: void glPrimitiveRestartIndex { } ( GLuint index ) ;
 
-GL-FUNCTION: void glVertexAttribI1iEXT { } ( GLuint index, GLint x ) ;
-GL-FUNCTION: void glVertexAttribI2iEXT { } ( GLuint index, GLint x, GLint y ) ;
-GL-FUNCTION: void glVertexAttribI3iEXT { } ( GLuint index, GLint x, GLint y, GLint z ) ;
-GL-FUNCTION: void glVertexAttribI4iEXT { } ( GLuint index, GLint x, GLint y, GLint z, GLint w ) ;
+GL-FUNCTION: void glGetUniformIndices { } ( GLuint program, GLsizei uniformCount, GLchar** uniformNames, GLuint* uniformIndices ) ;
+GL-FUNCTION: void glGetActiveUniformsiv { } ( GLuint program, GLsizei uniformCount, GLuint* uniformIndices, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glGetActiveUniformName { } ( GLuint program, GLuint uniformIndex, GLsizei bufSize, GLsizei* length, GLchar* uniformName ) ;
+GL-FUNCTION: GLuint glGetUniformBlockIndex { } ( GLuint program, GLchar* uniformBlockName ) ;
+GL-FUNCTION: void glGetActiveUniformBlockiv { } ( GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glGetActiveUniformBlockName { } ( GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei* length, GLchar* uniformName ) ;
+GL-FUNCTION: void glUniformBlockBinding { } ( GLuint buffer, GLuint uniformBlockIndex, GLuint uniformBlockBinding ) ;
 
-GL-FUNCTION: void glVertexAttribI1uiEXT { } ( GLuint index, GLuint x ) ;
-GL-FUNCTION: void glVertexAttribI2uiEXT { } ( GLuint index, GLuint x, GLuint y ) ;
-GL-FUNCTION: void glVertexAttribI3uiEXT { } ( GLuint index, GLuint x, GLuint y, GLuint z ) ;
-GL-FUNCTION: void glVertexAttribI4uiEXT { } ( GLuint index, GLuint x, GLuint y, GLuint z, GLuint w ) ;
-
-GL-FUNCTION: void glVertexAttribI1ivEXT { } ( GLuint index, GLint* v ) ;
-GL-FUNCTION: void glVertexAttribI2ivEXT { } ( GLuint index, GLint* v ) ;
-GL-FUNCTION: void glVertexAttribI3ivEXT { } ( GLuint index, GLint* v ) ;
-GL-FUNCTION: void glVertexAttribI4ivEXT { } ( GLuint index, GLint* v ) ;
-
-GL-FUNCTION: void glVertexAttribI1uivEXT { } ( GLuint index, GLuint* v ) ;
-GL-FUNCTION: void glVertexAttribI2uivEXT { } ( GLuint index, GLuint* v ) ;
-GL-FUNCTION: void glVertexAttribI3uivEXT { } ( GLuint index, GLuint* v ) ;
-GL-FUNCTION: void glVertexAttribI4uivEXT { } ( GLuint index, GLuint* v ) ;
-
-GL-FUNCTION: void glVertexAttribI4bvEXT { } ( GLuint index, GLbyte* v ) ;
-GL-FUNCTION: void glVertexAttribI4svEXT { } ( GLuint index, GLshort* v ) ;
-GL-FUNCTION: void glVertexAttribI4ubvEXT { } ( GLuint index, GLubyte* v ) ;
-GL-FUNCTION: void glVertexAttribI4usvEXT { } ( GLuint index, GLushort* v ) ;
-
-GL-FUNCTION: void glVertexAttribIPointerEXT { } ( GLuint index, GLint size, GLenum type, GLsizei stride, void* pointer ) ;
-
-GL-FUNCTION: void glGetVertexAttribIivEXT { } ( GLuint index, GLenum pname, GLint* params ) ;
-GL-FUNCTION: void glGetVertexAttribIuivEXT { } ( GLuint index, GLenum pname, GLuint* params ) ;
-
-GL-FUNCTION: void glUniform1uiEXT { } ( GLint location, GLuint v0 ) ;
-GL-FUNCTION: void glUniform2uiEXT { } ( GLint location, GLuint v0, GLuint v1 ) ;
-GL-FUNCTION: void glUniform3uiEXT { } ( GLint location, GLuint v0, GLuint v1, GLuint v2 ) ;
-GL-FUNCTION: void glUniform4uiEXT { } ( GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3 ) ;
-
-GL-FUNCTION: void glUniform1uivEXT { } ( GLint location, GLsizei count, GLuint* value ) ;
-GL-FUNCTION: void glUniform2uivEXT { } ( GLint location, GLsizei count, GLuint* value ) ;
-GL-FUNCTION: void glUniform3uivEXT { } ( GLint location, GLsizei count, GLuint* value ) ;
-GL-FUNCTION: void glUniform4uivEXT { } ( GLint location, GLsizei count, GLuint* value ) ;
-
-GL-FUNCTION: void glGetUniformuivEXT { } ( GLuint program, GLint location, GLuint* params ) ;
-
-GL-FUNCTION: void glBindFragDataLocationEXT { } ( GLuint program, GLuint colorNumber, GLchar* name ) ;
-GL-FUNCTION: GLint glGetFragDataLocationEXT { } ( GLuint program, GLchar* name ) ;
-
-CONSTANT: GL_VERTEX_ATTRIB_ARRAY_INTEGER_EXT HEX: 88FD
-CONSTANT: GL_SAMPLER_1D_ARRAY_EXT HEX: 8DC0
-CONSTANT: GL_SAMPLER_2D_ARRAY_EXT HEX: 8DC1
-CONSTANT: GL_SAMPLER_BUFFER_EXT HEX: 8DC2
-CONSTANT: GL_SAMPLER_1D_ARRAY_SHADOW_EXT HEX: 8DC3
-CONSTANT: GL_SAMPLER_2D_ARRAY_SHADOW_EXT HEX: 8DC4
-CONSTANT: GL_SAMPLER_CUBE_SHADOW_EXT HEX: 8DC5
-CONSTANT: GL_UNSIGNED_INT_VEC2_EXT HEX: 8DC6
-CONSTANT: GL_UNSIGNED_INT_VEC3_EXT HEX: 8DC7
-CONSTANT: GL_UNSIGNED_INT_VEC4_EXT HEX: 8DC8
-CONSTANT: GL_INT_SAMPLER_1D_EXT HEX: 8DC9
-CONSTANT: GL_INT_SAMPLER_2D_EXT HEX: 8DCA
-CONSTANT: GL_INT_SAMPLER_3D_EXT HEX: 8DCB
-CONSTANT: GL_INT_SAMPLER_CUBE_EXT HEX: 8DCC
-CONSTANT: GL_INT_SAMPLER_2D_RECT_EXT HEX: 8DCD
-CONSTANT: GL_INT_SAMPLER_1D_ARRAY_EXT HEX: 8DCE
-CONSTANT: GL_INT_SAMPLER_2D_ARRAY_EXT HEX: 8DCF
-CONSTANT: GL_INT_SAMPLER_BUFFER_EXT HEX: 8DD0
-CONSTANT: GL_UNSIGNED_INT_SAMPLER_1D_EXT HEX: 8DD1
-CONSTANT: GL_UNSIGNED_INT_SAMPLER_2D_EXT HEX: 8DD2
-CONSTANT: GL_UNSIGNED_INT_SAMPLER_3D_EXT HEX: 8DD3
-CONSTANT: GL_UNSIGNED_INT_SAMPLER_CUBE_EXT HEX: 8DD4
-CONSTANT: GL_UNSIGNED_INT_SAMPLER_2D_RECT_EXT HEX: 8DD5
-CONSTANT: GL_UNSIGNED_INT_SAMPLER_1D_ARRAY_EXT HEX: 8DD6
-CONSTANT: GL_UNSIGNED_INT_SAMPLER_2D_ARRAY_EXT HEX: 8DD7
-CONSTANT: GL_UNSIGNED_INT_SAMPLER_BUFFER_EXT HEX: 8DD8
-CONSTANT: GL_MIN_PROGRAM_TEXEL_OFFSET_EXT HEX: 8904
-CONSTANT: GL_MAX_PROGRAM_TEXEL_OFFSET_EXT HEX: 8905
+GL-FUNCTION: void glCopyBufferSubData { glCopyBufferSubDataEXT } ( GLenum readtarget, GLenum writetarget, GLintptr readoffset, GLintptr writeoffset, GLsizeiptr size ) ;
 
 
 ! GL_EXT_geometry_shader4
@@ -1912,10 +2173,6 @@ CONSTANT: GL_MAX_PROGRAM_TEXEL_OFFSET_EXT HEX: 8905
 GL-FUNCTION: void glProgramParameteriEXT { } ( GLuint program, GLenum pname, GLint value ) ;
 GL-FUNCTION: void glFramebufferTextureEXT { } ( GLenum target, GLenum attachment, 
                                                 GLuint texture, GLint level ) ;
-GL-FUNCTION: void glFramebufferTextureLayerEXT { } ( GLenum target, GLenum attachment, 
-                                                     GLuint texture, GLint level, GLint layer ) ;
-GL-FUNCTION: void glFramebufferTextureFaceEXT { } ( GLenum target, GLenum attachment,
-                                                    GLuint texture, GLint level, GLenum face ) ;
 
 CONSTANT: GL_GEOMETRY_SHADER_EXT HEX: 8DD9
 CONSTANT: GL_GEOMETRY_VERTICES_OUT_EXT HEX: 8DDA
@@ -1924,7 +2181,6 @@ CONSTANT: GL_GEOMETRY_OUTPUT_TYPE_EXT HEX: 8DDC
 CONSTANT: GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_EXT HEX: 8C29
 CONSTANT: GL_MAX_GEOMETRY_VARYING_COMPONENTS_EXT HEX: 8DDD
 CONSTANT: GL_MAX_VERTEX_VARYING_COMPONENTS_EXT HEX: 8DDE
-CONSTANT: GL_MAX_VARYING_COMPONENTS_EXT HEX: 8B4B
 CONSTANT: GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_EXT HEX: 8DDF
 CONSTANT: GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT HEX: 8DE0
 CONSTANT: GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS_EXT HEX: 8DE1
@@ -1935,110 +2191,63 @@ CONSTANT: GL_TRIANGLE_STRIP_ADJACENCY_EXT HEX: D
 CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS_EXT HEX: 8DA8
 CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_LAYER_COUNT_EXT HEX: 8DA9
 CONSTANT: GL_FRAMEBUFFER_ATTACHMENT_LAYERED_EXT HEX: 8DA7
-ALIAS: GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER_EXT GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_3D_ZOFFSET_EXT
 CONSTANT: GL_PROGRAM_POINT_SIZE_EXT HEX: 8642
 
 
+! GL_EXT_framebuffer_object
+
+CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT HEX: 8CD9
+CONSTANT: GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT HEX: 8CDA
+
+! GL_ARB_texture_float
+
+CONSTANT: GL_ALPHA32F_ARB HEX: 8816
+CONSTANT: GL_INTENSITY32F_ARB HEX: 8817
+CONSTANT: GL_LUMINANCE32F_ARB HEX: 8818
+CONSTANT: GL_LUMINANCE_ALPHA32F_ARB HEX: 8819
+CONSTANT: GL_ALPHA16F_ARB HEX: 881C
+CONSTANT: GL_INTENSITY16F_ARB HEX: 881D
+CONSTANT: GL_LUMINANCE16F_ARB HEX: 881E
+CONSTANT: GL_LUMINANCE_ALPHA16F_ARB HEX: 881F
+CONSTANT: GL_TEXTURE_LUMINANCE_TYPE_ARB HEX: 8C14
+CONSTANT: GL_TEXTURE_INTENSITY_TYPE_ARB HEX: 8C15
+
 ! GL_EXT_texture_integer
 
-
-GL-FUNCTION: void glClearColorIiEXT { } ( GLint r, GLint g, GLint b, GLint a ) ;
-GL-FUNCTION: void glClearColorIuiEXT { } ( GLuint r, GLuint g, GLuint b, GLuint a ) ;
-GL-FUNCTION: void glTexParameterIivEXT { } ( GLenum target, GLenum pname, GLint* params ) ;
-GL-FUNCTION: void glTexParameterIuivEXT { } ( GLenum target, GLenum pname, GLuint* params ) ;
-GL-FUNCTION: void glGetTexParameterIivEXT { } ( GLenum target, GLenum pname, GLint* params ) ;
-GL-FUNCTION: void glGetTexParameterIuivEXT { } ( GLenum target, GLenum pname, GLuint* params ) ;
-
-CONSTANT: GL_RGBA_INTEGER_MODE_EXT HEX: 8D9E
-
-CONSTANT: GL_RGBA32UI_EXT HEX: 8D70
-CONSTANT: GL_RGB32UI_EXT HEX: 8D71
 CONSTANT: GL_ALPHA32UI_EXT HEX: 8D72
 CONSTANT: GL_INTENSITY32UI_EXT HEX: 8D73
 CONSTANT: GL_LUMINANCE32UI_EXT HEX: 8D74
 CONSTANT: GL_LUMINANCE_ALPHA32UI_EXT HEX: 8D75
 
-CONSTANT: GL_RGBA16UI_EXT HEX: 8D76
-CONSTANT: GL_RGB16UI_EXT HEX: 8D77
 CONSTANT: GL_ALPHA16UI_EXT HEX: 8D78
 CONSTANT: GL_INTENSITY16UI_EXT HEX: 8D79
 CONSTANT: GL_LUMINANCE16UI_EXT HEX: 8D7A
 CONSTANT: GL_LUMINANCE_ALPHA16UI_EXT HEX: 8D7B
 
-CONSTANT: GL_RGBA8UI_EXT HEX: 8D7C
-CONSTANT: GL_RGB8UI_EXT HEX: 8D7D
 CONSTANT: GL_ALPHA8UI_EXT HEX: 8D7E
 CONSTANT: GL_INTENSITY8UI_EXT HEX: 8D7F
 CONSTANT: GL_LUMINANCE8UI_EXT HEX: 8D80
 CONSTANT: GL_LUMINANCE_ALPHA8UI_EXT HEX: 8D81
 
-CONSTANT: GL_RGBA32I_EXT HEX: 8D82
-CONSTANT: GL_RGB32I_EXT HEX: 8D83
 CONSTANT: GL_ALPHA32I_EXT HEX: 8D84
 CONSTANT: GL_INTENSITY32I_EXT HEX: 8D85
 CONSTANT: GL_LUMINANCE32I_EXT HEX: 8D86
 CONSTANT: GL_LUMINANCE_ALPHA32I_EXT HEX: 8D87
 
-CONSTANT: GL_RGBA16I_EXT HEX: 8D88
-CONSTANT: GL_RGB16I_EXT HEX: 8D89
 CONSTANT: GL_ALPHA16I_EXT HEX: 8D8A
 CONSTANT: GL_INTENSITY16I_EXT HEX: 8D8B
 CONSTANT: GL_LUMINANCE16I_EXT HEX: 8D8C
 CONSTANT: GL_LUMINANCE_ALPHA16I_EXT HEX: 8D8D
 
-CONSTANT: GL_RGBA8I_EXT HEX: 8D8E
-CONSTANT: GL_RGB8I_EXT HEX: 8D8F
 CONSTANT: GL_ALPHA8I_EXT HEX: 8D90
 CONSTANT: GL_INTENSITY8I_EXT HEX: 8D91
 CONSTANT: GL_LUMINANCE8I_EXT HEX: 8D92
 CONSTANT: GL_LUMINANCE_ALPHA8I_EXT HEX: 8D93
 
-CONSTANT: GL_RED_INTEGER_EXT HEX: 8D94
-CONSTANT: GL_GREEN_INTEGER_EXT HEX: 8D95
-CONSTANT: GL_BLUE_INTEGER_EXT HEX: 8D96
 CONSTANT: GL_ALPHA_INTEGER_EXT HEX: 8D97
-CONSTANT: GL_RGB_INTEGER_EXT HEX: 8D98
-CONSTANT: GL_RGBA_INTEGER_EXT HEX: 8D99
-CONSTANT: GL_BGR_INTEGER_EXT HEX: 8D9A
-CONSTANT: GL_BGRA_INTEGER_EXT HEX: 8D9B
-CONSTANT: GL_LUMINANCE_INTEGER_EXT HEX: 8D9C
-CONSTANT: GL_LUMINANCE_ALPHA_INTEGER_EXT HEX: 8D9D
+CONSTANT: GL_LUMINANCE_INTEGER_EXT        HEX: 8D9C
+CONSTANT: GL_LUMINANCE_ALPHA_INTEGER_EXT  HEX: 8D9D
 
-
-! GL_EXT_transform_feedback
-
-
-GL-FUNCTION: void glBindBufferRangeEXT { } ( GLenum target, GLuint index, GLuint buffer,
-                           GLintptr offset, GLsizeiptr size ) ;
-GL-FUNCTION: void glBindBufferOffsetEXT { } ( GLenum target, GLuint index, GLuint buffer,
-                            GLintptr offset ) ;
-GL-FUNCTION: void glBindBufferBaseEXT { } ( GLenum target, GLuint index, GLuint buffer ) ;
-
-GL-FUNCTION: void glBeginTransformFeedbackEXT { } ( GLenum primitiveMode ) ;
-GL-FUNCTION: void glEndTransformFeedbackEXT { } ( ) ;
-
-GL-FUNCTION: void glTransformFeedbackVaryingsEXT { } ( GLuint program, GLsizei count,
-                                      GLchar** varyings, GLenum bufferMode ) ;
-GL-FUNCTION: void glGetTransformFeedbackVaryingEXT { } ( GLuint program, GLuint index,
-                                        GLsizei bufSize, GLsizei* length, 
-                                        GLsizei* size, GLenum* type, GLchar* name ) ;
-
-GL-FUNCTION: void glGetIntegerIndexedvEXT { } ( GLenum param, GLuint index, GLint* values ) ;
-GL-FUNCTION: void glGetBooleanIndexedvEXT { } ( GLenum param, GLuint index, GLboolean* values ) ;
-
-CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_EXT HEX: 8C8E
-CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_START_EXT HEX: 8C84
-CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_SIZE_EXT HEX: 8C85
-CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_BINDING_EXT HEX: 8C8F
-CONSTANT: GL_INTERLEAVED_ATTRIBS_EXT HEX: 8C8C
-CONSTANT: GL_SEPARATE_ATTRIBS_EXT HEX: 8C8D
-CONSTANT: GL_PRIMITIVES_GENERATED_EXT HEX: 8C87
-CONSTANT: GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN_EXT HEX: 8C88
-CONSTANT: GL_RASTERIZER_DISCARD_EXT HEX: 8C89
-CONSTANT: GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS_EXT HEX: 8C8A
-CONSTANT: GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS_EXT HEX: 8C8B
-CONSTANT: GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS_EXT HEX: 8C80
-CONSTANT: GL_TRANSFORM_FEEDBACK_VARYINGS_EXT HEX: 8C83
-CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_MODE_EXT HEX: 8C7F
-CONSTANT: GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH_EXT HEX: 8C76
+GL-FUNCTION: void glClearColorIiEXT { } ( GLint r, GLint g, GLint b, GLint a ) ;
+GL-FUNCTION: void glClearColorIuiEXT { } ( GLuint r, GLuint g, GLuint b, GLuint a ) ;
 
