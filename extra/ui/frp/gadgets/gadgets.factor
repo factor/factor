@@ -70,11 +70,6 @@ IN: accessors
 M: frp-button text>> children>> first text>> ;
 
 IN: ui.frp.gadgets
-M: label (unique) text>> ;
-M: button (unique) text>> ;
-M: editor (unique) editor-string ;
-M: gadget (unique) children>> ;
-M: frp-field (unique) frp-model>> (unique) ;
 M: gadget null-val drop f ;
 M: table null-val multiple-selection?>> [ V{ } clone ] [ f ] if ;
 M: frp-field null-val drop "" ;
