@@ -1,7 +1,7 @@
 USING: accessors assocs arrays fry kernel make math.parser models
 models.product namespaces sequences ui.frp.gadgets parser lexer
 ui.gadgets ui.gadgets.books ui.gadgets.tracks vectors words
-combinators ui.frp.signals monads sequences.extras ;
+combinators ui.frp.signals monads sequences.extras ui.tools.inspector ;
 QUALIFIED: make
 IN: ui.frp.layout
 
@@ -10,7 +10,8 @@ TUPLE: placeholder < gadget members ;
 : <placeholder> ( -- placeholder ) placeholder new V{ } clone >>members ;
 
 : (remove-members) ( placeholder members -- ) [ [ model? ] filter swap parent>> model>> [ remove-connection ] curry each ]
-    [ [ gadget? ] filter swap parent>> children>> [ delete ] curry each ] 2bi ;
+    [ nip [ gadget? ] filter [ unparent ] each ] 2bi ;
+
 : remove-members ( placeholder -- ) dup members>> [ drop ] [ [ (remove-members) ] keep empty ] if-empty ;
 : add-member ( obj placeholder -- ) over layout? [ [ gadget>> ] dip ] when members>> push ;
 
@@ -62,7 +63,7 @@ M: model (insert-item) parent>> dup book? [ "No models in books" throw ]
    [ dup model>> dup product? [ nip swap add-connection ] [ drop [ 1array <product> ] dip (>>model) ] if ] if ;
 : insert-item ( item location -- ) [ add-member ] 2keep (insert-item) ;
 
-: insert-items ( makelist -- ) f swap [ dup placeholder?
+: insert-items ( makelist -- ) t swap [ dup placeholder?
     [ nip [ dup get [ drop ] [ remove-members ] if ] [ on ] [ ] tri ]
     [ over insert-item ] if ] each drop ;
 
