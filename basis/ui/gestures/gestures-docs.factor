@@ -13,9 +13,20 @@ $nl
 "Outputs " { $link f } " if the gesture was handled, and " { $link t } " if the gesture should be passed on to the gadget's parent."
 $nl
 "The default implementation looks at the " { $snippet "\"gestures\"" } " word property of each superclass of the gadget's class." }
-{ $notes "Methods should be defined on this word if you desire to handle an arbitrary set of gestures. To define handlers for a fixed set, it is easier to use " { $link set-gestures } "." } ;
+{ $notes "Methods should be defined on this word if you desire to handle an arbitrary set of gestures. To define handlers for a fixed set, it is easier to use " { $link set-gestures } ". If you define a method on " { $snippet "handle-gesture" } ", you should also override " { $link handles-gesture? } "." } ;
 
-{ propagate-gesture handle-gesture set-gestures } related-words
+HELP: handles-gesture?
+{ $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" "a boolean" } }
+{ $contract "Returns a true value if " { $snippet "gadget" } " would handle " { $snippet "gesture" } " in its " { $link handle-gesture } " method."
+$nl
+"The default implementation looks at the " { $snippet "\"gestures\"" } " word property of each superclass of the gadget's class and returns true if a handler is present for " { $snippet "gesture" } "." }
+{ $notes "This word is used in Factor's MacOS X UI to validate menu items." } ;
+
+HELP: parents-handle-gesture?
+{ $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" "a boolean" } }
+{ $contract "Returns a true value if " { $snippet "gadget" } " or any of its ancestors would handle " { $snippet "gesture" } " in its " { $link handle-gesture } " method." } ;
+
+{ propagate-gesture handle-gesture handles-gesture? set-gestures } related-words
 
 HELP: propagate-gesture
 { $values { "gesture" "a gesture" } { "gadget" gadget } }
@@ -85,6 +96,30 @@ HELP: delete-action
 HELP: select-all-action
 { $class-description "Gesture sent when the " { $emphasis "select all" } " standard window system action is invoked." }
 { $examples { $code "select-all-action" } } ;
+
+HELP: new-action
+{ $class-description "Gesture sent when the " { $emphasis "new" } " standard window system action is invoked." }
+{ $examples { $code "new-action" } } ;
+
+HELP: open-action
+{ $class-description "Gesture sent when the " { $emphasis "open" } " standard window system action is invoked." }
+{ $examples { $code "open-action" } } ;
+
+HELP: save-action
+{ $class-description "Gesture sent when the " { $emphasis "save" } " standard window system action is invoked." }
+{ $examples { $code "save-action" } } ;
+
+HELP: save-as-action
+{ $class-description "Gesture sent when the " { $emphasis "save as" } " standard window system action is invoked." }
+{ $examples { $code "save-as-action" } } ;
+
+HELP: revert-action
+{ $class-description "Gesture sent when the " { $emphasis "revert" } " standard window system action is invoked." }
+{ $examples { $code "revert-action" } } ;
+
+HELP: close-action
+{ $class-description "Gesture sent when the " { $emphasis "close" } " standard window system action is invoked." }
+{ $examples { $code "close-action" } } ;
 
 HELP: C+
 { $description "Control key modifier." } ;
@@ -350,21 +385,34 @@ $nl
 { $subsection zoom-out-action } ;
 
 ARTICLE: "action-gestures" "Action gestures"
-"Action gestures exist to keep keyboard shortcuts for common clipboard operations consistent."
+"Action gestures exist to keep keyboard shortcuts for common application operations consistent."
+{ $subsection undo-action }
+{ $subsection redo-action }
 { $subsection cut-action }
 { $subsection copy-action }
 { $subsection paste-action }
 { $subsection delete-action }
 { $subsection select-all-action }
+{ $subsection new-action }
+{ $subsection open-action }
+{ $subsection save-action }
+{ $subsection save-as-action }
+{ $subsection revert-action }
+{ $subsection close-action }
 "The following keyboard gestures, if not handled directly, send action gestures:"
 { $table
     { { $strong "Keyboard gesture" } { $strong "Action gesture" } }
     { { $snippet "T{ key-down f { C+ } \"z\" }" } { $snippet "undo-action" } }
-    { { $snippet "T{ key-down f { C+ } \"Z\" }" } { $snippet "redo-action" } }
+    { { $snippet "T{ key-down f { C+ } \"y\" }" } { $snippet "redo-action" } }
     { { $snippet "T{ key-down f { C+ } \"x\" }" } { $snippet "cut-action" } }
     { { $snippet "T{ key-down f { C+ } \"c\" }" } { $snippet "copy-action" } }
     { { $snippet "T{ key-down f { C+ } \"v\" }" } { $snippet "paste-action" } }
     { { $snippet "T{ key-down f { C+ } \"a\" }" } { $snippet "select-all-action" } }
+    { { $snippet "T{ key-down f { C+ } \"n\" }" } { $snippet "new-action" } }
+    { { $snippet "T{ key-down f { C+ } \"o\" }" } { $snippet "open-action" } }
+    { { $snippet "T{ key-down f { C+ } \"s\" }" } { $snippet "save-action" } }
+    { { $snippet "T{ key-down f { C+ } \"S\" }" } { $snippet "save-as-action" } }
+    { { $snippet "T{ key-down f { C+ } \"w\" }" } { $snippet "close-action" } }
 }
 "Action gestures should be used in place of the above keyboard gestures if possible. For example, on Mac OS X, the standard " { $strong "Edit" } " menu items send action gestures." ;
 

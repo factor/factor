@@ -144,3 +144,25 @@ M: ##copy-float compute-live-intervals*
         live-intervals set
         <reversed> [ compute-live-intervals-step ] each
     ] keep values dup finish-live-intervals ;
+
+: relevant-ranges ( new inactive -- new' inactive' )
+    ! Slice off all ranges of 'inactive' that precede the start of 'new'
+    [ [ ranges>> ] bi@ ] [ nip start>> ] 2bi '[ to>> _ >= ] filter ;
+
+: intersect-live-range ( range1 range2 -- n/f )
+    2dup [ from>> ] bi@ > [ swap ] when
+    2dup [ to>> ] [ from>> ] bi* >= [ nip from>> ] [ 2drop f ] if ;
+
+: intersect-live-ranges ( ranges1 ranges2 -- n )
+    {
+        { [ over empty? ] [ 2drop 1/0. ] }
+        { [ dup empty? ] [ 2drop 1/0. ] }
+        [
+            2dup [ first ] bi@ intersect-live-range dup [ 2nip ] [
+                drop
+                2dup [ first from>> ] bi@ <
+                [ [ rest-slice ] dip ] [ rest-slice ] if
+                intersect-live-ranges
+            ] if
+        ]
+    } cond ;
