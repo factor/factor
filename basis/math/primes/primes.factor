@@ -1,37 +1,55 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math math.bitwise math.functions
-math.order math.primes.erato math.primes.miller-rabin
-math.ranges random sequences sets fry ;
+USING: combinators combinators.short-circuit fry kernel math
+math.bitwise math.functions math.order math.primes.erato
+math.primes.erato.private math.primes.miller-rabin math.ranges
+literals random sequences sets vectors ;
 IN: math.primes
 
 <PRIVATE
 
-: look-in-bitmap ( n -- ? ) >index 4999999 sieve nth ;
+: look-in-bitmap ( n -- ? ) $[ 8999999 sieve ] marked-unsafe? ; inline
 
-: really-prime? ( n -- ? )
-    dup 5000000 < [ look-in-bitmap ] [ miller-rabin ] if ; foldable
+: (prime?) ( n -- ? )
+    dup 8999999 <= [ look-in-bitmap ] [ miller-rabin ] if ;
+
+! In order not to reallocate large vectors, we compute the upper bound
+! of the number of primes in a given interval. We use a double inequality given
+! by Pierre Dusart in http://www.ams.org/mathscinet-getitem?mr=99d:11133
+! for x > 598. Under this limit, we know that there are at most 108 primes.
+: upper-pi ( x -- y )
+    dup log [ / ] [ 1.2762 swap / 1 + ] bi * ceiling ;
+
+: lower-pi ( x -- y )
+    dup log [ / ] [ 0.992 swap / 1 + ] bi * floor ;
+
+: <primes-vector> ( low high -- vector )
+    swap [ [ upper-pi ] [ lower-pi ] bi* - >integer
+    108 max 10000 min <vector> ] keep
+    3 < [ [ 2 swap push ] keep ] when ;
+
+: simple? ( n -- ? ) { [ even? ] [ 3 mod 0 = ] [ 5 mod 0 = ] } 1|| ;
 
 PRIVATE>
 
 : prime? ( n -- ? )
     {
-        { [ dup 2 < ] [ drop f ] }
-        { [ dup even? ] [ 2 = ] }
-        [ really-prime? ]
+        { [ dup 7 < ] [ { 2 3 5 } member? ] }
+        { [ dup simple? ] [ drop f ] }
+        [ (prime?) ]
     } cond ; foldable
 
 : next-prime ( n -- p )
     dup 2 < [
         drop 2
     ] [
-        next-odd [ dup really-prime? ] [ 2 + ] until
+        next-odd [ dup prime? ] [ 2 + ] until
     ] if ; foldable
 
 : primes-between ( low high -- seq )
-    [ dup 3 max dup even? [ 1 + ] when ] dip
-    2 <range> [ prime? ] filter
-    swap 3 < [ 2 prefix ] when ;
+    [ [ 3 max dup even? [ 1 + ] when ] dip 2 <range> ]
+    [ <primes-vector> ] 2bi
+    [ '[ [ prime? ] _ push-if ] each ] keep clone ;
 
 : primes-upto ( n -- seq ) 2 swap primes-between ;
 
@@ -65,5 +83,5 @@ ERROR: too-few-primes n numbits ;
 
 : unique-primes ( n numbits -- seq )
     2dup 2^ estimated-primes > [ too-few-primes ] when
-    2dup '[ _ random-prime ] replicate
+    2dup [ random-prime ] curry replicate
     dup all-unique? [ 2nip ] [ drop unique-primes ] if ;
