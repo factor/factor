@@ -10,6 +10,8 @@ compiler.cfg.registers
 compiler.cfg.liveness
 compiler.cfg.predecessors
 compiler.cfg.rpo
+compiler.cfg.linearization
+compiler.cfg.debugger
 compiler.cfg.linear-scan
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
@@ -410,7 +412,7 @@ SYMBOL: max-uses
 [ ] [ 10 20 2 400 random-test ] unit-test
 [ ] [ 10 20 4 300 random-test ] unit-test
 
-USING: math.private compiler.cfg.debugger ;
+USING: math.private ;
 
 [ ] [
     [ float+ float>fixnum 3 fixnum*fast ]
@@ -1412,199 +1414,154 @@ USING: math.private compiler.cfg.debugger ;
        { uses { 5 10 } }
        { ranges V{ T{ live-range f 5 10 } } }
     }
-    intersect-inactive
+    relevant-ranges intersect-live-ranges
 ] unit-test
 
 ! Bug in live spill slots calculation
 
-T{ basic-block
-   { id 205651 }
-   { number 0 }
-   { instructions V{ T{ ##prologue } T{ ##branch } } }
-} 0 set
+V{ T{ ##prologue } T{ ##branch } } 0 test-bb
 
-T{ basic-block
-   { id 205652 }
-   { number 1 }
-   { instructions
-     V{
-         T{ ##peek
-            { dst V int-regs 703128 }
-            { loc D 1 }
-         }
-         T{ ##peek
-            { dst V int-regs 703129 }
-            { loc D 0 }
-         }
-         T{ ##copy
-            { dst V int-regs 703134 }
-            { src V int-regs 703128 }
-         }
-         T{ ##copy
-            { dst V int-regs 703135 }
-            { src V int-regs 703129 }
-         }
-         T{ ##compare-imm-branch
-            { src1 V int-regs 703128 }
-            { src2 5 }
-            { cc cc/= }
-         }
-     }
-   }
-} 1 set
+V{
+    T{ ##peek
+       { dst V int-regs 703128 }
+       { loc D 1 }
+    }
+    T{ ##peek
+       { dst V int-regs 703129 }
+       { loc D 0 }
+    }
+    T{ ##copy
+       { dst V int-regs 703134 }
+       { src V int-regs 703128 }
+    }
+    T{ ##copy
+       { dst V int-regs 703135 }
+       { src V int-regs 703129 }
+    }
+    T{ ##compare-imm-branch
+       { src1 V int-regs 703128 }
+       { src2 5 }
+       { cc cc/= }
+    }
+} 1 test-bb
 
-T{ basic-block
-   { id 205653 }
-   { number 2 }
-   { instructions
-     V{
-         T{ ##copy
-            { dst V int-regs 703134 }
-            { src V int-regs 703129 }
-         }
-         T{ ##copy
-            { dst V int-regs 703135 }
-            { src V int-regs 703128 }
-         }
-         T{ ##branch }
-     }
-   }
-} 2 set
+V{
+    T{ ##copy
+       { dst V int-regs 703134 }
+       { src V int-regs 703129 }
+    }
+    T{ ##copy
+       { dst V int-regs 703135 }
+       { src V int-regs 703128 }
+    }
+    T{ ##branch }
+} 2 test-bb
 
-T{ basic-block
-   { id 205655 }
-   { number 3 }
-   { instructions
-     V{
-         T{ ##replace
-            { src V int-regs 703134 }
-            { loc D 0 }
-         }
-         T{ ##replace
-            { src V int-regs 703135 }
-            { loc D 1 }
-         }
-         T{ ##epilogue }
-         T{ ##return }
-     }
-   }
-} 3 set
+V{
+    T{ ##replace
+       { src V int-regs 703134 }
+       { loc D 0 }
+    }
+    T{ ##replace
+       { src V int-regs 703135 }
+       { loc D 1 }
+    }
+    T{ ##epilogue }
+    T{ ##return }
+} 3 test-bb
 
 1 get 1vector 0 get (>>successors)
 2 get 3 get V{ } 2sequence 1 get (>>successors)
 3 get 1vector 2 get (>>successors)
+
+SYMBOL: linear-scan-result
 
 :: test-linear-scan-on-cfg ( regs -- )
     [ ] [
         cfg new 0 get >>entry
         compute-predecessors
         compute-liveness
-        reverse-post-order
+        dup reverse-post-order
         { { int-regs regs } } (linear-scan)
+        flatten-cfg 1array mr.
     ] unit-test ;
 
-{ 1 2 } test-linear-scan-on-cfg
+! This test has a critical edge -- do we care about these?
+
+! { 1 2 } test-linear-scan-on-cfg
 
 ! Bug in inactive interval handling
 ! [ rot dup [ -rot ] when ]
-T{ basic-block
-   { id 201486 }
-   { number 0 }
-   { instructions V{ T{ ##prologue } T{ ##branch } } }
-} 0 set
+V{ T{ ##prologue } T{ ##branch } } 0 test-bb
     
-T{ basic-block
-   { id 201487 }
-   { number 1 }
-   { instructions
-     V{
-         T{ ##peek
-            { dst V int-regs 689473 }
-            { loc D 2 }
-         }
-         T{ ##peek
-            { dst V int-regs 689474 }
-            { loc D 1 }
-         }
-         T{ ##peek
-            { dst V int-regs 689475 }
-            { loc D 0 }
-         }
-         T{ ##compare-imm-branch
-            { src1 V int-regs 689473 }
-            { src2 5 }
-            { cc cc/= }
-         }
-     }
-   }
-} 1 set
+V{
+    T{ ##peek
+       { dst V int-regs 689473 }
+       { loc D 2 }
+    }
+    T{ ##peek
+       { dst V int-regs 689474 }
+       { loc D 1 }
+    }
+    T{ ##peek
+       { dst V int-regs 689475 }
+       { loc D 0 }
+    }
+    T{ ##compare-imm-branch
+       { src1 V int-regs 689473 }
+       { src2 5 }
+       { cc cc/= }
+    }
+} 1 test-bb
 
-T{ basic-block
-   { id 201488 }
-   { number 2 }
-   { instructions
-     V{
-         T{ ##copy
-            { dst V int-regs 689481 }
-            { src V int-regs 689475 }
-         }
-         T{ ##copy
-            { dst V int-regs 689482 }
-            { src V int-regs 689474 }
-         }
-         T{ ##copy
-            { dst V int-regs 689483 }
-            { src V int-regs 689473 }
-         }
-         T{ ##branch }
-     }
-   }
-} 2 set
+V{
+    T{ ##copy
+       { dst V int-regs 689481 }
+       { src V int-regs 689475 }
+    }
+    T{ ##copy
+       { dst V int-regs 689482 }
+       { src V int-regs 689474 }
+    }
+    T{ ##copy
+       { dst V int-regs 689483 }
+       { src V int-regs 689473 }
+    }
+    T{ ##branch }
+} 2 test-bb
 
-T{ basic-block
-   { id 201489 }
-   { number 3 }
-   { instructions
-     V{
-         T{ ##copy
-            { dst V int-regs 689481 }
-            { src V int-regs 689473 }
-         }
-         T{ ##copy
-            { dst V int-regs 689482 }
-            { src V int-regs 689475 }
-         }
-         T{ ##copy
-            { dst V int-regs 689483 }
-            { src V int-regs 689474 }
-         }
-         T{ ##branch }
-     }
-   }
-} 3 set
+V{
+    T{ ##copy
+       { dst V int-regs 689481 }
+       { src V int-regs 689473 }
+    }
+    T{ ##copy
+       { dst V int-regs 689482 }
+       { src V int-regs 689475 }
+    }
+    T{ ##copy
+       { dst V int-regs 689483 }
+       { src V int-regs 689474 }
+    }
+    T{ ##branch }
+} 3 test-bb
 
-T{ basic-block
-   { id 201490 }
-   { number 4 }
-   { instructions
-     V{
-         T{ ##replace
-            { src V int-regs 689481 }
-            { loc D 0 }
-         }
-         T{ ##replace
-            { src V int-regs 689482 }
-            { loc D 1 }
-         }
-         T{ ##replace
-            { src V int-regs 689483 }
-            { loc D 2 }
-         }
-         T{ ##epilogue }
-         T{ ##return }
-     }
-   }
-} 4 set
+V{
+    T{ ##replace
+       { src V int-regs 689481 }
+       { loc D 0 }
+    }
+    T{ ##replace
+       { src V int-regs 689482 }
+       { loc D 1 }
+    }
+    T{ ##replace
+       { src V int-regs 689483 }
+       { loc D 2 }
+    }
+    T{ ##epilogue }
+    T{ ##return }
+} 4 test-bb
 
 : test-diamond ( -- )
     1 get 1vector 0 get (>>successors)
@@ -1625,102 +1582,78 @@ T{ basic-block
    { instructions V{ T{ ##prologue } T{ ##branch } } }
 } 0 set
     
-T{ basic-block
-   { id 201538 }
-   { number 1 }
-   { instructions
-     V{
-         T{ ##peek
-            { dst V int-regs 689600 }
-            { loc D 1 }
-         }
-         T{ ##peek
-            { dst V int-regs 689601 }
-            { loc D 0 }
-         }
-         T{ ##compare-imm-branch
-            { src1 V int-regs 689600 }
-            { src2 5 }
-            { cc cc/= }
-         }
-     }
-   }
-} 1 set
+V{
+    T{ ##peek
+       { dst V int-regs 689600 }
+       { loc D 1 }
+    }
+    T{ ##peek
+       { dst V int-regs 689601 }
+       { loc D 0 }
+    }
+    T{ ##compare-imm-branch
+       { src1 V int-regs 689600 }
+       { src2 5 }
+       { cc cc/= }
+    }
+} 1 test-bb
     
-T{ basic-block
-   { id 201539 }
-   { number 2 }
-   { instructions
-     V{
-         T{ ##peek
-            { dst V int-regs 689604 }
-            { loc D 2 }
-         }
-         T{ ##copy
-            { dst V int-regs 689607 }
-            { src V int-regs 689604 }
-         }
-         T{ ##copy
-            { dst V int-regs 689608 }
-            { src V int-regs 689600 }
-         }
-         T{ ##copy
-            { dst V int-regs 689610 }
-            { src V int-regs 689601 }
-         }
-         T{ ##branch }
-     }
-   }
-} 2 set
+V{
+    T{ ##peek
+       { dst V int-regs 689604 }
+       { loc D 2 }
+    }
+    T{ ##copy
+       { dst V int-regs 689607 }
+       { src V int-regs 689604 }
+    }
+    T{ ##copy
+       { dst V int-regs 689608 }
+       { src V int-regs 689600 }
+    }
+    T{ ##copy
+       { dst V int-regs 689610 }
+       { src V int-regs 689601 }
+    }
+    T{ ##branch }
+} 2 test-bb
     
-T{ basic-block
-   { id 201540 }
-   { number 3 }
-   { instructions
-     V{
-         T{ ##peek
-            { dst V int-regs 689609 }
-            { loc D 2 }
-         }
-         T{ ##copy
-            { dst V int-regs 689607 }
-            { src V int-regs 689600 }
-         }
-         T{ ##copy
-            { dst V int-regs 689608 }
-            { src V int-regs 689601 }
-         }
-         T{ ##copy
-            { dst V int-regs 689610 }
-            { src V int-regs 689609 }
-         }
-         T{ ##branch }
-     }
-   }
-} 3 set
+V{
+    T{ ##peek
+       { dst V int-regs 689609 }
+       { loc D 2 }
+    }
+    T{ ##copy
+       { dst V int-regs 689607 }
+       { src V int-regs 689600 }
+    }
+    T{ ##copy
+       { dst V int-regs 689608 }
+       { src V int-regs 689601 }
+    }
+    T{ ##copy
+       { dst V int-regs 689610 }
+       { src V int-regs 689609 }
+    }
+    T{ ##branch }
+} 3 test-bb
     
-T{ basic-block
-   { id 201541 }
-   { number 4 }
-   { instructions
-     V{
-         T{ ##replace
-            { src V int-regs 689607 }
-            { loc D 0 }
-         }
-         T{ ##replace
-            { src V int-regs 689608 }
-            { loc D 1 }
-         }
-         T{ ##replace
-            { src V int-regs 689610 }
-            { loc D 2 }
-         }
-         T{ ##epilogue }
-         T{ ##return }
-     }
-   }
-} 4 set
+V{
+    T{ ##replace
+       { src V int-regs 689607 }
+       { loc D 0 }
+    }
+    T{ ##replace
+       { src V int-regs 689608 }
+       { loc D 1 }
+    }
+    T{ ##replace
+       { src V int-regs 689610 }
+       { loc D 2 }
+    }
+    T{ ##epilogue }
+    T{ ##return }
+} 4 test-bb
 
 test-diamond
 
@@ -1729,76 +1662,130 @@ test-diamond
 ! compute-live-registers was inaccurate since it didn't take
 ! lifetime holes into account
 
-T{ basic-block
-   { id 0 }
-   { number 0 }
-   { instructions V{ T{ ##prologue } T{ ##branch } } }
-} 0 set
+V{ T{ ##prologue } T{ ##branch } } 0 test-bb
 
-T{ basic-block
-   { id 1 }
-   { instructions
-     V{
-         T{ ##peek
-            { dst V int-regs 0 }
-            { loc D 0 }
-         }
-         T{ ##compare-imm-branch
-            { src1 V int-regs 0 }
-            { src2 5 }
-            { cc cc/= }
-         }
-     }
-   }
-} 1 set
+V{
+    T{ ##peek
+       { dst V int-regs 0 }
+       { loc D 0 }
+    }
+    T{ ##compare-imm-branch
+       { src1 V int-regs 0 }
+       { src2 5 }
+       { cc cc/= }
+    }
+} 1 test-bb
 
-T{ basic-block
-   { id 2 }
-   { instructions
-     V{
-         T{ ##peek
-            { dst V int-regs 1 }
-            { loc D 1 }
-         }
-         T{ ##copy
-            { dst V int-regs 2 }
-            { src V int-regs 1 }
-         }
-         T{ ##branch }
-     }
-   }
-} 2 set
+V{
+    T{ ##peek
+       { dst V int-regs 1 }
+       { loc D 1 }
+    }
+    T{ ##copy
+       { dst V int-regs 2 }
+       { src V int-regs 1 }
+    }
+    T{ ##branch }
+} 2 test-bb
 
-T{ basic-block
-   { id 3 }
-   { instructions
-     V{
-         T{ ##peek
-            { dst V int-regs 3 }
-            { loc D 2 }
-         }
-         T{ ##copy
-            { dst V int-regs 2 }
-            { src V int-regs 3 }
-         }
-         T{ ##branch }
-     }
-   }
-} 3 set
+V{
+    T{ ##peek
+       { dst V int-regs 3 }
+       { loc D 2 }
+    }
+    T{ ##copy
+       { dst V int-regs 2 }
+       { src V int-regs 3 }
+    }
+    T{ ##branch }
+} 3 test-bb
 
-T{ basic-block
-   { id 4 }
-   { instructions
-     V{
-         T{ ##replace
-            { src V int-regs 2 }
-            { loc D 0 }
-         }
-         T{ ##return }
-     }
-   }
-} 4 set
+V{
+    T{ ##replace
+       { src V int-regs 2 }
+       { loc D 0 }
+    }
+    T{ ##return }
+} 4 test-bb
 
 test-diamond
 
 { 1 2 3 4 } test-linear-scan-on-cfg
+
+! Inactive interval handling: splitting active interval
+! if it fits in lifetime hole only partially
+
+V{ T{ ##peek f V int-regs 3 R 1 } T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##peek f V int-regs 2 R 0 }
+    T{ ##compare-imm-branch f V int-regs 2 5 cc= }
+} 1 test-bb
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##branch }
+} 2 test-bb
+
+
+V{
+    T{ ##peek f V int-regs 1 D 1 }
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##replace f V int-regs 1 D 2 }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##replace f V int-regs 3 R 2 }
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##return }
+} 4 test-bb
+
+test-diamond
+
+{ 1 2 } test-linear-scan-on-cfg
+
+USING: classes ;
+
+[ ] [
+    1 get instructions>> first regs>> V int-regs 0 swap at
+    2 get instructions>> first regs>> V int-regs 1 swap at assert=
+] unit-test
+
+[ _copy ] [ 3 get instructions>> second class ] unit-test
+
+! Resolve pass; make sure the spilling is done correctly
+V{ T{ ##peek f V int-regs 3 R 1 } T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##peek f V int-regs 2 R 0 }
+    T{ ##compare-imm-branch f V int-regs 2 5 cc= }
+} 1 test-bb
+
+V{
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##replace f V int-regs 3 R 1 }
+    T{ ##peek f V int-regs 1 D 1 }
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##replace f V int-regs 1 D 2 }
+    T{ ##replace f V int-regs 0 D 2 }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##replace f V int-regs 3 R 2 }
+    T{ ##return }
+} 4 test-bb
+
+test-diamond
+
+{ 1 2 } test-linear-scan-on-cfg
+
+[ _spill ] [ 2 get instructions>> first class ] unit-test
+
+[ _spill ] [ 3 get instructions>> second class ] unit-test
+
+[ _reload ] [ 4 get instructions>> first class ] unit-test

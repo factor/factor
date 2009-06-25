@@ -3,7 +3,8 @@
 USING: kernel accessors grouping sequences combinators
 math specialized-arrays.direct.uint byte-arrays fry
 specialized-arrays.direct.ushort specialized-arrays.uint
-specialized-arrays.ushort specialized-arrays.float images ;
+specialized-arrays.ushort specialized-arrays.float images
+half-floats ;
 IN: images.normalization
 
 <PRIVATE
@@ -11,30 +12,31 @@ IN: images.normalization
 : add-dummy-alpha ( seq -- seq' )
     3 <groups> [ 255 suffix ] map concat ;
 
-: normalize-floats ( byte-array -- byte-array )
-    byte-array>float-array [ 255.0 * >integer ] B{ } map-as ;
+: normalize-floats ( float-array -- byte-array )
+    [ 255.0 * >integer ] B{ } map-as ;
 
+GENERIC: normalize-component-type* ( image component-type -- image )
 GENERIC: normalize-component-order* ( image component-order -- image )
 
 : normalize-component-order ( image -- image )
+    dup component-type>> '[ _ normalize-component-type* ] change-bitmap
     dup component-order>> '[ _ normalize-component-order* ] change-bitmap ;
 
-M: RGBA normalize-component-order* drop ;
+M: float-components normalize-component-type*
+    drop byte-array>float-array normalize-floats ;
+M: half-components normalize-component-type*
+    drop byte-array>half-array normalize-floats ;
 
-M: R32G32B32A32 normalize-component-order*
-    drop normalize-floats ;
-
-M: R32G32B32 normalize-component-order*
-    drop normalize-floats add-dummy-alpha ;
-
-: RGB16>8 ( bitmap -- bitmap' )
+: ushorts>ubytes ( bitmap -- bitmap' )
     byte-array>ushort-array [ -8 shift ] B{ } map-as ; inline
 
-M: R16G16B16A16 normalize-component-order*
-    drop RGB16>8 ;
+M: ushort-components normalize-component-type*
+    drop ushorts>ubytes ;
 
-M: R16G16B16 normalize-component-order*
-    drop RGB16>8 add-dummy-alpha ;
+M: ubyte-components normalize-component-type*
+    drop ;
+
+M: RGBA normalize-component-order* drop ;
 
 : BGR>RGB ( bitmap -- pixels )
     3 <sliced-groups> [ <reversed> ] map B{ } join ; inline

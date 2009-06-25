@@ -31,7 +31,8 @@ ERROR: cairo-error message ;
         <cairo> &cairo_destroy
         @
     ] make-memory-bitmap
-    BGRA >>component-order ; inline
+    BGRA >>component-order
+    ubyte-components >>component-type ; inline
 
 : dummy-cairo ( -- cr )
     #! Sometimes we want a dummy context; eg with Pango, we want

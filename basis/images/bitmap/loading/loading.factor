@@ -370,5 +370,5 @@ M: bitmap-image load-image* ( path bitmap-image -- bitmap )
         [ loading-bitmap>bytes >>bitmap ]
         [ header>> [ width>> ] [ height>> abs ] bi 2array >>dim ]
         [ header>> height>> 0 < not >>upside-down? ]
-        [ bitmap>component-order >>component-order ]
+        [ bitmap>component-order >>component-order ubyte-components >>component-type ]
     } cleave ;

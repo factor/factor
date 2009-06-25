@@ -81,6 +81,10 @@ HELP: with-ui
 HELP: beep
 { $description "Plays the system beep sound." } ;
 
+HELP: topmost-window
+{ $values { "world" world } }
+{ $description "Returns the " { $link world } " representing the currently focused window." } ;
+
 ARTICLE: "ui-glossary" "UI glossary"
 { $table
     { "color" { "an instance of " { $link color } } }
