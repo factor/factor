@@ -2,7 +2,7 @@ USING: accessors arrays db.tuples db.sqlite persistency db.queries
 io.files.temp kernel monads sequences ui ui.frp.gadgets
 ui.frp.layout ui.frp.signals ui.gadgets.scrollers ui.gadgets.labels
 colors.constants ui.pens.solid combinators math locals strings
-ui.images db.types sequences.extras ;
+ui.images db.types sequences.extras ui.tools.inspector ;
 FROM: sets => prune ;
 IN: recipes
 STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { genre { VARCHAR 100 } } ;
@@ -14,8 +14,8 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
 
 : interface ( -- book ) [ 
      [
-        [ $ TOOLBAR $ <spacer> $ SEARCH $ ] <hbox> COLOR: AliceBlue <solid> >>interior ,
-        [ "Genres:" <label> , <spacer> $ GENRES $ ] <hbox>
+        [ $ TOOLBAR $ ] <hbox> COLOR: AliceBlue <solid> >>interior ,
+        [ "Genres:" <label> , <spacer> $ ALL $ $ GENRES $ ] <hbox>
             { 5 0 } >>gap COLOR: gray <solid> >>interior ,
         $ RECIPES $
      ] <vbox> ,
@@ -35,13 +35,13 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
       "hate" <image-button> -1 >>value -> 2array <merge> :> votes
       "back" <image-button> -> [ -30 ] <$
       "more" <image-button> -> [ 30 ] <$ 2array <merge> :> viewed
-      <frp-field*> SEARCH ->% 1 :> search
+      <spacer> <frp-field*> ->% 1 :> search
       submit ok [ [ drop ] ] <$ 2array <merge> [ drop ] >>value :> quot
-      viewed 0 [ + ] <fold> search ok t <basic> "all" <frp-button> GENRES ->
+      viewed 0 [ + ] <fold> search ok t <basic> "all" <frp-button> ALL ->
       tbl selected-value>> votes [ [ + ] curry change-votes modify-tuple ] 2$>-|
         4array <merge>
         [ drop [ f ] [ "%" dup surround <pattern> ] if-empty top-recipes ] 3fmap-| :> updates
-      updates [ top-genres UI[ <frp-button> GENRES ->? ] map <merge> ] bind*
+      updates [ top-genres [ <frp-button> GENRES -> ] map <merge> ] bind*
         [ text>> T{ recipe } swap >>genre get-tuples ] fmap
       tbl swap updates 2array <merge> >>model
         [ [ title>> ] [ genre>> ] bi 2array ] >>quot
