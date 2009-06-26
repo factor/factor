@@ -6,7 +6,7 @@ cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
 cocoa.views cocoa.windows combinators command-line
 core-foundation core-foundation.run-loop core-graphics
 core-graphics.types destructors fry generalizations io.thread
-kernel libc literals locals math math.rectangles memory
+kernel libc literals locals math math.bitwise math.rectangles memory
 namespaces sequences specialized-arrays.int threads ui
 ui.backend ui.backend.cocoa.views ui.clipboards ui.gadgets
 ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private
@@ -109,10 +109,23 @@ M: cocoa-ui-backend (set-fullscreen) ( world ? -- )
 M: cocoa-ui-backend (fullscreen?) ( world -- ? )
     handle>> view>> -> isInFullScreenMode zero? not ;
 
+CONSTANT: window-control>styleMask
+    H{
+        { close-button $ NSClosableWindowMask }
+        { minimize-button $ NSMiniaturizableWindowMask }
+        { maximize-button 0 }
+        { resize-handles $ NSResizableWindowMask }
+        { small-title-bar $[ NSTitledWindowMask NSUtilityWindowMask bitor ] }
+        { normal-title-bar $ NSTitledWindowMask }
+    }
+
+: world>styleMask ( world -- n )
+    window-controls>> window-control>styleMask symbols>flags ;
+
 M:: cocoa-ui-backend (open-window) ( world -- )
     world [ [ dim>> ] dip <FactorView> ]
     with-world-pixel-format :> view
-    view world world>NSRect <ViewWindow> :> window
+    view world [ world>NSRect ] [ world>styleMask ] bi <ViewWindow> :> window
     view -> release
     world view register-window
     window world window-loc>> auto-position
@@ -145,7 +158,7 @@ M: cocoa-ui-backend (ungrab-input) ( handle -- )
 M: cocoa-ui-backend close-window ( gadget -- )
     find-world [
         handle>> [
-            window>> f -> performClose:
+            window>> -> close
         ] when*
     ] when* ;
 

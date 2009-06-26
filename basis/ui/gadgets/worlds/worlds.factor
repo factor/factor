@@ -7,8 +7,25 @@ ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
 ui.pixel-formats destructors literals strings ;
 IN: ui.gadgets.worlds
 
+SYMBOLS:
+    close-button
+    minimize-button
+    maximize-button
+    resize-handles
+    small-title-bar
+    normal-title-bar ;
+
 CONSTANT: default-world-pixel-format-attributes
     { windowed double-buffered T{ depth-bits { value 16 } } }
+
+CONSTANT: default-world-window-controls
+    {
+        normal-title-bar
+        close-button
+        minimize-button
+        maximize-button
+        resize-handles
+    }
 
 TUPLE: world < track
     active? focused? grab-input?
@@ -16,7 +33,8 @@ TUPLE: world < track
     title status status-owner
     text-handle handle images
     window-loc
-    pixel-format-attributes ;
+    pixel-format-attributes
+    window-controls ;
 
 TUPLE: world-attributes
     { world-class initial: world }
@@ -24,7 +42,8 @@ TUPLE: world-attributes
     { title string initial: "Factor Window" }
     status
     gadgets
-    { pixel-format-attributes initial: $ default-world-pixel-format-attributes } ;
+    { pixel-format-attributes initial: $ default-world-pixel-format-attributes }
+    { window-controls initial: $ default-world-window-controls } ;
 
 : <world-attributes> ( -- world-attributes )
     world-attributes new ; inline
@@ -86,6 +105,7 @@ M: world request-focus-on ( child gadget -- )
         [ title>> >>title ]
         [ status>> >>status ]
         [ pixel-format-attributes>> >>pixel-format-attributes ]
+        [ window-controls>> >>window-controls ]
         [ grab-input?>> >>grab-input? ]
         [ gadgets>> [ 1 track-add ] each ]
     } cleave ;

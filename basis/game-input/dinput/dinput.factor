@@ -190,7 +190,7 @@ TUPLE: window-rect < rect window-loc ;
     DBT_DEVTYP_DEVICEINTERFACE over set-DEV_BROADCAST_DEVICEW-dbcc_devicetype ;
 
 : create-device-change-window ( -- )
-    <zero-window-rect> create-window
+    <zero-window-rect> WS_OVERLAPPEDWINDOW 0 create-window
     [
         (device-notification-filter)
         DEVICE_NOTIFY_WINDOW_HANDLE DEVICE_NOTIFY_ALL_INTERFACE_CLASSES bitor

@@ -10,12 +10,12 @@ IN: images.tesselation
 [
     {
         {
-            T{ image f { 2 2 } L f B{ 1 2 5 6 } }
-            T{ image f { 2 2 } L f B{ 3 4 7 8 } }
+            T{ image f { 2 2 } L ubyte-components f B{ 1 2 5 6 } }
+            T{ image f { 2 2 } L ubyte-components f B{ 3 4 7 8 } }
         }
         {
-            T{ image f { 2 2 } L f B{ 9 10 13 14 } }
-            T{ image f { 2 2 } L f B{ 11 12 15 16 } }
+            T{ image f { 2 2 } L ubyte-components f B{ 9 10 13 14 } }
+            T{ image f { 2 2 } L ubyte-components f B{ 11 12 15 16 } }
         }
     }
 ] [
@@ -23,18 +23,19 @@ IN: images.tesselation
         1 16 [a,b] >byte-array >>bitmap
         { 4 4 } >>dim
         L >>component-order
+        ubyte-components >>component-type
     { 2 2 } tesselate
 ] unit-test
 
 [
     {
         {
-            T{ image f { 2 2 } L f B{ 1 2 4 5 } }
-            T{ image f { 1 2 } L f B{ 3 6 } }
+            T{ image f { 2 2 } L ubyte-components f B{ 1 2 4 5 } }
+            T{ image f { 1 2 } L ubyte-components f B{ 3 6 } }
         }
         {
-            T{ image f { 2 1 } L f B{ 7 8 } }
-            T{ image f { 1 1 } L f B{ 9 } }
+            T{ image f { 2 1 } L ubyte-components f B{ 7 8 } }
+            T{ image f { 1 1 } L ubyte-components f B{ 9 } }
         }
     }
 ] [
@@ -42,5 +43,6 @@ IN: images.tesselation
         1 9 [a,b] >byte-array >>bitmap
         { 3 3 } >>dim
         L >>component-order
+        ubyte-components >>component-type
     { 2 2 } tesselate
 ] unit-test
