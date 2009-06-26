@@ -1,5 +1,5 @@
-USING: accessors arrays kernel monads models models.product sequences classes
-sequences.extras ;
+USING: accessors arrays kernel models models.product monads
+sequences sequences.extras ;
 FROM: models.product => product ;
 IN: ui.frp.signals
 

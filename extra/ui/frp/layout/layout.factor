@@ -1,7 +1,7 @@
-USING: accessors assocs arrays fry kernel make math.parser models
-models.product namespaces sequences ui.frp.gadgets parser lexer
-ui.gadgets ui.gadgets.books ui.gadgets.tracks vectors words
-combinators ui.frp.signals monads sequences.extras ui.tools.inspector ;
+USING: accessors arrays fry kernel lexer make math.parser
+models models.product monads namespaces parser sequences
+sequences.extras ui.frp.gadgets ui.frp.signals ui.gadgets
+ui.gadgets.books ui.gadgets.tracks words ;
 QUALIFIED: make
 IN: ui.frp.layout
 
