@@ -40,6 +40,7 @@ C-ENUM:
   LLVMFP128TypeKind
   LLVMPPC_FP128TypeKind
   LLVMLabelTypeKind
+  LLVMMetadataTypeKind
   LLVMIntegerTypeKind
   LLVMFunctionTypeKind
   LLVMStructTypeKind
