@@ -1,10 +1,11 @@
-USING: accessors arrays db.tuples db.sqlite persistency db.queries
-io.files.temp kernel monads sequences ui ui.frp.gadgets
-ui.frp.layout ui.frp.signals ui.gadgets.scrollers ui.gadgets.labels
-colors.constants ui.pens.solid combinators math locals strings
-ui.images db.types sequences.extras ui.tools.inspector ;
+USING: accessors arrays colors.constants combinators db.queries
+db.sqlite db.tuples db.types io.files.temp kernel locals math
+monads persistency sequences sequences.extras ui ui.frp.gadgets
+ui.frp.layout ui.frp.signals ui.gadgets.labels
+ui.gadgets.scrollers ui.pens.solid ;
 FROM: sets => prune ;
 IN: recipes
+
 STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { genre { VARCHAR 100 } } ;
 : <recipe> ( title genre text -- recipe ) recipe new swap >>txt swap >>genre swap >>title 0 >>votes ;
 "recipes.db" temp-file <sqlite-db> recipe define-db
@@ -30,11 +31,11 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
     interface
       <frp-table*> :> tbl
       "okay" <frp-border-button> BUTTON -> :> ok
-      "submit" <image-button> [ store-tuple ] >>value TOOLBAR -> :> submit
-      "love" <image-button> 1 >>value TOOLBAR ->
-      "hate" <image-button> -1 >>value -> 2array <merge> :> votes
-      "back" <image-button> -> [ -30 ] <$
-      "more" <image-button> -> [ 30 ] <$ 2array <merge> :> viewed
+      IMAGE-BUTTON: submit [ store-tuple ] >>value TOOLBAR -> :> submit
+      IMAGE-BUTTON: love 1 >>value TOOLBAR ->
+      IMAGE-BUTTON: hate -1 >>value -> 2array <merge> :> votes
+      IMAGE-BUTTON: back -> [ -30 ] <$
+      IMAGE-BUTTON: more -> [ 30 ] <$ 2array <merge> :> viewed
       <spacer> <frp-field*> ->% 1 :> search
       submit ok [ [ drop ] ] <$ 2array <merge> [ drop ] >>value :> quot
       viewed 0 [ + ] <fold> search ok t <basic> "all" <frp-button> ALL ->

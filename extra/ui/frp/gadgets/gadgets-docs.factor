@@ -58,8 +58,8 @@ HELP: <frp-action-field>
 { $values { "field" action-field } }
 { $description "Field that updates its model with its contents when the user hits the return key" } ;
 
-HELP: <image-button>
-{ $syntax "filename <image-button>" }
+HELP: IMAGE-BUTTON:
+{ $syntax "IMAGE-BUTTON: filename" }
 { $description "Creates a button using a tiff image named as specified found in the icons subdirectory of the vocabulary path" } ;
 
 HELP: output-model
