@@ -3,7 +3,6 @@
 USING: kernel sequences accessors combinators namespaces
 compiler.cfg.predecessors
 compiler.cfg.useless-blocks
-compiler.cfg.height
 compiler.cfg.stack-analysis
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
