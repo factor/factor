@@ -2,7 +2,7 @@ USING: prettyprint compiler.cfg.debugger compiler.cfg.linearization
 compiler.cfg.predecessors compiler.cfg.stack-analysis
 compiler.cfg.instructions sequences kernel tools.test accessors
 sequences.private alien math combinators.private compiler.cfg
-compiler.cfg.checker compiler.cfg.height compiler.cfg.rpo
+compiler.cfg.checker compiler.cfg.rpo
 compiler.cfg.dce compiler.cfg.registers compiler.cfg.useless-blocks
 sets namespaces arrays cpu.architecture ;
 IN: compiler.cfg.stack-analysis.tests
@@ -25,7 +25,6 @@ IN: compiler.cfg.stack-analysis.tests
     compute-predecessors
     delete-useless-blocks
     delete-useless-conditionals
-    normalize-height
     stack-analysis
     dup check-cfg
     dup check-for-redundant-ops ;
@@ -115,10 +114,11 @@ local-only? off
 ] unit-test
 
 ! Correct height tracking
-[ D 1 D 0 ] [
+[ t ] [
     [ pick [ <array> ] [ drop ] if swap ] test-stack-analysis eliminate-dead-code
     reverse-post-order 2 swap nth
     instructions>> [ ##peek? ] filter first2 [ loc>> ] [ loc>> ] bi*
+    2array { D 1 D 0 } set=
 ] unit-test
 
 [ D 1 ] [
