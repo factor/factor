@@ -67,3 +67,8 @@ IN: generalizations.tests
 [ 1 2 3 [ ] [ ] 3 nbi-curry ] unit-test
 
 [ 15 3 ] [ 1 2 3 4 5 [ + + + + ] [ - - - - ] 5 nbi ] unit-test
+
+: nover-test ( -- a b c d e f g )
+   1 2 3 4 3 nover ;
+
+[ 1 2 3 4 1 2 3 ] [ nover-test ] unit-test

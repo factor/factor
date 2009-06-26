@@ -64,7 +64,8 @@ HINTS: hashes { byte-array fixnum fixnum fixnum } ;
     image new
         swap >>dim
         swap >>bitmap
-        L >>component-order ;
+        L >>component-order
+        ubyte-components >>component-type ;
 
 :: perlin-noise-unsafe ( table point -- value )
     point unit-cube :> cube

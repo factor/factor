@@ -198,7 +198,7 @@ PRIVATE>
     windows get empty? not ;
 
 : ?attributes ( gadget title/attributes -- attributes )
-    dup string? [ world-attributes new swap >>title ] when
+    dup string? [ world-attributes new swap >>title ] [ clone ] if
     swap [ [ [ 1array ] [ f ] if* ] curry unless* ] curry change-gadgets ;
 
 PRIVATE>
@@ -223,6 +223,9 @@ PRIVATE>
 
 : raise-window ( gadget -- )
     find-world raise-window* ;
+
+: topmost-window ( -- world )
+    windows get last second ;
 
 HOOK: close-window ui-backend ( gadget -- )
 

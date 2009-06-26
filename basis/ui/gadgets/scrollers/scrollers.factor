@@ -49,7 +49,7 @@ scroller H{
 } set-gestures
 
 : <scroller-model> ( -- model )
-    0 0 0 0 <range> 0 0 0 0 <range> 2array <product> ;
+    0 0 0 0 1 <range> 0 0 0 0 1 <range> 2array <product> ;
 
 M: viewport pref-dim* gadget-child pref-viewport-dim ;
 

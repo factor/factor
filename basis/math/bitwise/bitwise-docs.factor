@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax math sequences ;
+USING: assocs help.markup help.syntax math sequences ;
 IN: math.bitwise
 
 HELP: bitfield
@@ -141,6 +141,25 @@ HELP: flags
         "IN: scratchpad"
         "CONSTANT: x HEX: 1"
         "{ HEX: 20 x BIN: 100 } flags .h"
+        "25"
+    }
+} ;
+
+HELP: symbols>flags
+{ $values { "symbols" sequence } { "assoc" assoc } { "flag-bits" integer } }
+{ $description "Constructs an integer value by mapping the values in the " { $snippet "symbols" } " sequence to integer values using " { $snippet "assoc" } " and " { $link bitor } "ing the values together." }
+{ $examples
+    { $example "USING: math.bitwise prettyprint ui.gadgets.worlds ;"
+        "IN: scratchpad"
+        "CONSTANT: window-controls>flags H{"
+        "    { close-button 1 }"
+        "    { minimize-button 2 }"
+        "    { maximize-button 4 }"
+        "    { resize-handles 8 }"
+        "    { small-title-bar 16 }"
+        "    { normal-title-bar 32 }"
+        "}"
+        "{ resize-handles close-button small-title-bar } window-controls>flags symbols>flags ."
         "25"
     }
 } ;

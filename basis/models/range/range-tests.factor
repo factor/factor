@@ -3,12 +3,16 @@ USING: arrays generic kernel math models namespaces sequences assocs
 tools.test models.range ;
 
 ! Test <range> 
-: setup-range ( -- range ) 0 0 0 255 <range> ;
+: setup-range ( -- range ) 0 0 0 255 1 <range> ;
+: setup-stepped-range ( -- range ) 0 0 0 255 2 <range> ;
 
 ! clamp-value should not go past range ends
 [ 0   ] [ -10 setup-range clamp-value ] unit-test
 [ 255 ] [ 2000 setup-range clamp-value ] unit-test
 [ 14  ] [ 14 setup-range clamp-value ] unit-test
+
+! step-value
+[ 14  ] [ 15 setup-stepped-range step-value ] unit-test
 
 ! range min/max/page values should be correct
 [ 0 ] [ setup-range range-page-value ] unit-test

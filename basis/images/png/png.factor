@@ -85,7 +85,7 @@ ERROR: unimplemented-color-type image ;
     [ <image> ] dip {
         [ png-image-bytes >>bitmap ]
         [ [ width>> ] [ height>> ] bi 2array >>dim ]
-        [ drop RGB >>component-order ]
+        [ drop RGB >>component-order ubyte-components >>component-type ]
     } cleave ;
     
 : decode-indexed-color ( loading-png -- loading-png )
