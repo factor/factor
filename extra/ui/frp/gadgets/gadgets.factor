@@ -43,13 +43,11 @@ M: frp-field model-changed 2dup frp-model>> =
 
 : <frp-field*> ( -- field ) "" <model> <frp-field> ;
 : <empty-field> ( model -- field ) "" <model> <switch> <frp-field> ;
-: <empty-field*> ( -- field ) "" <model> <frp-field> ;
 : <frp-editor> ( model -- gadget )
     frp-field [ <multiline-editor> ] dip new-border dup gadget-child >>editor
     field-theme swap init-field >>frp-model { 1 0 } >>align ;
 : <frp-editor*> ( -- editor ) "" <model> <frp-editor> ;
-: <empty-editor*> ( -- field ) "" <model> <frp-editor> ;
-: <empty-editor> ( model -- field ) "" <model> <switch> <frp-editor> ;
+: <empty-editor> ( model -- editor ) "" <model> <switch> <frp-editor> ;
 
 : <frp-action-field> ( -- field ) f <action-field> dup [ set-control-value ] curry >>quot
     f <model> >>model ;
