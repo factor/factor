@@ -18,3 +18,21 @@ USING: kernel llvm.types sequences tools.test ;
 
 [ t ] [ TYPE: i32 ; TYPE: i32 ; [ >tref ] bi@ = ] unit-test
 [ t ] [ TYPE: i32 * ; TYPE: i32 * ; [ >tref ] bi@ = ] unit-test
+
+[ TYPE: i32 ; ] [ TYPE: i32 ; >tref tref> ] unit-test
+[ TYPE: float ; ] [ TYPE: float ; >tref tref> ] unit-test
+[ TYPE: double ; ] [ TYPE: double ; >tref tref> ] unit-test
+[ TYPE: x86_fp80 ; ] [ TYPE: x86_fp80 ; >tref tref> ] unit-test
+[ TYPE: fp128 ; ] [ TYPE: fp128 ; >tref tref> ] unit-test
+[ TYPE: ppc_fp128 ; ] [ TYPE: ppc_fp128 ; >tref tref> ] unit-test
+[ TYPE: opaque ; ] [ TYPE: opaque ; >tref tref> ] unit-test
+[ TYPE: label ; ] [ TYPE: label ; >tref tref> ] unit-test
+[ TYPE: void ; ] [ TYPE: void ; >tref tref> ] unit-test
+[ TYPE: i32* ; ] [ TYPE: i32* ; >tref tref> ] unit-test
+[ TYPE: < 2 x i32 > ; ] [ TYPE: < 2 x i32 > ; >tref tref> ] unit-test
+[ TYPE: [ 0 x i32 ] ; ] [ TYPE: [ 0 x i32 ] ; >tref tref> ] unit-test
+[ TYPE: { i32, i32 } ; ] [ TYPE: { i32, i32 } ; >tref tref> ] unit-test
+[ TYPE: < { i32, i32 } > ; ] [ TYPE: < { i32, i32 } > ; >tref tref> ] unit-test
+[ TYPE: i32 ( i32 ) ; ] [ TYPE: i32 ( i32 ) ; >tref tref> ] unit-test
+[ TYPE: \1* ; ] [ TYPE: \1* ; >tref tref> ] unit-test
+[ TYPE: { i32, \2* } ; ] [ TYPE: { i32, \2* } ; >tref tref> ] unit-test
