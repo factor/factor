@@ -17,13 +17,16 @@ IN: llvm.types
 !    resolve the first type to the second
 !
 GENERIC: (>tref) ( type -- LLVMTypeRef )
+GENERIC: ((tref>)) ( LLVMTypeRef type -- type )
 
-GENERIC: llvm> ( LLVMTypeRef -- type )
+! default implementation for simple types
+M: object ((tref>)) nip ;
 
 TUPLE: integer size ;
 C: <integer> integer
 
 M: integer (>tref) size>> LLVMIntType ;
+M: integer ((tref>)) swap LLVMGetIntTypeWidth >>size ;
 
 SINGLETONS: float double x86_fp80 fp128 ppc_fp128 ;
 
@@ -33,8 +36,9 @@ M: x86_fp80 (>tref) drop LLVMX86FP80Type ;
 M: fp128 (>tref) drop LLVMFP128Type ;
 M: ppc_fp128 (>tref) drop LLVMPPCFP128Type ;
 
-SINGLETONS: label void metadata ;
+SINGLETONS: opaque label void metadata ;
 
+M: opaque (>tref) drop LLVMOpaqueType ;
 M: label (>tref) drop LLVMLabelType ;
 M: void (>tref) drop LLVMVoidType ;
 M: metadata (>tref) drop
@@ -57,14 +61,30 @@ SYMBOL: types
     type quot call( type -- LLVMTypeRef )
     types get pop over >>cached drop ;
 
+DEFER: <up-ref>
+:: push-ref ( ref quot: ( LLVMTypeRef -- type ) -- type )
+    ref types get index
+    [ types get length swap - <up-ref> ] [
+        ref types get push
+        ref quot call( LLVMTypeRef -- type )
+        types get pop drop
+    ] if* ;   
+
 GENERIC: (>tref)* ( type -- LLVMTypeRef )
 M: enclosing (>tref) [ (>tref)* ] push-type ;
+
+DEFER: type-kind
+GENERIC: (tref>)* ( LLVMTypeRef type -- type )
+M: enclosing ((tref>)) [ (tref>)* ] curry push-ref ;
+
+: (tref>) ( LLVMTypeRef -- type ) dup type-kind ((tref>)) ;
 
 TUPLE: pointer < enclosing type ;
 : <pointer> ( t -- o ) pointer new swap >>type ;
 
 M: pointer (>tref)* type>> (>tref) 0 LLVMPointerType ;
 M: pointer clean* type>> clean ;
+M: pointer (tref>)* swap LLVMGetElementType (tref>) >>type ;
 
 TUPLE: vector < enclosing size type ;
 : <vector> ( s t -- o )
@@ -73,6 +93,9 @@ TUPLE: vector < enclosing size type ;
 
 M: vector (>tref)* [ type>> (>tref) ] [ size>> ] bi LLVMVectorType ;
 M: vector clean* type>> clean ;
+M: vector (tref>)*
+    over LLVMGetElementType (tref>) >>type
+    swap LLVMGetVectorSize >>size ;
 
 TUPLE: struct < enclosing types packed? ;
 : <struct> ( ts p? -- o )
@@ -84,6 +107,11 @@ M: struct (>tref)*
     [ types>> length ]
     [ packed?>> 1 0 ? ] tri LLVMStructType ;
 M: struct clean* types>> [ clean ] each ;
+M: struct (tref>)*
+    over LLVMIsPackedStruct 0 = not >>packed?
+    swap dup LLVMCountStructElementTypes <void*-array>
+    [ LLVMGetStructElementTypes ] keep >array
+    [ (tref>) ] map >>types ;
 
 TUPLE: array < enclosing size type ;
 : <array> ( s t -- o )
@@ -92,6 +120,9 @@ TUPLE: array < enclosing size type ;
 
 M: array (>tref)* [ type>> (>tref) ] [ size>> ] bi LLVMArrayType ;
 M: array clean* type>> clean ;
+M: array (tref>)*
+    over LLVMGetElementType (tref>) >>type
+    swap LLVMGetArrayLength >>size ;
 
 SYMBOL: ...
 TUPLE: function < enclosing return params vararg? ;
@@ -106,6 +137,30 @@ M: function (>tref)* {
     [ vararg?>> 1 0 ? ]
 } cleave LLVMFunctionType ;
 M: function clean* [ return>> clean ] [ params>> [ clean ] each ] bi ;
+M: function (tref>)*
+    over LLVMIsFunctionVarArg 0 = not >>vararg?
+    over LLVMGetReturnType (tref>) >>return
+    swap dup LLVMCountParamTypes <void*-array>
+    [ LLVMGetParamTypes ] keep >array
+    [ (tref>) ] map >>params ;
+
+: type-kind ( LLVMTypeRef -- class )
+    LLVMGetTypeKind {
+        { LLVMVoidTypeKind [ void ] }
+        { LLVMFloatTypeKind [ float ] }
+        { LLVMDoubleTypeKind [ double ] }
+        { LLVMX86_FP80TypeKind [ x86_fp80 ] }
+        { LLVMFP128TypeKind [ fp128 ] }
+        { LLVMPPC_FP128TypeKind [ ppc_fp128 ] }
+        { LLVMLabelTypeKind [ label ] }
+        { LLVMIntegerTypeKind [ integer new ] }
+        { LLVMFunctionTypeKind [ function new ] }
+        { LLVMStructTypeKind [ struct new ] }
+        { LLVMArrayTypeKind [ array new ] }
+        { LLVMPointerTypeKind [ pointer new ] }
+        { LLVMOpaqueTypeKind [ opaque ] }
+        { LLVMVectorTypeKind [ vector new ] }
+   } case ;
 
 TUPLE: up-ref height ;
 C: <up-ref> up-ref
@@ -124,6 +179,9 @@ M: up-ref (>tref)
 : >tref ( type -- LLVMTypeRef )
     [ >tref-caching ] [ >tref-caching ] [ clean ] tri
     2dup = [ drop ] [ resolve-types ] if ;
+
+: tref> ( LLVMTypeRef -- type )
+    V{ } clone types [ (tref>) ] with-variable ;
 
 : t. ( type -- )
     >tref
@@ -145,7 +203,7 @@ WhiteZeroSpace = WhiteSpace (Zero | Number):n WhiteSpace => [[ n ]]
 
 Integer = "i" Number:n => [[ n <integer> ]]
 FloatingPoint = ( "float" | "double" | "x86_fp80" | "fp128" | "ppc_fp128" ) => [[ "llvm.types" vocab lookup ]]
-LabelVoidMetadata = ( "label" | "void" | "metadata" ) => [[ "llvm.types" vocab lookup ]]
+LabelVoidMetadata = ( "label" | "void" | "metadata" | "opaque" ) => [[ "llvm.types" vocab lookup ]]
 Primitive = LabelVoidMetadata | FloatingPoint
 Pointer = T:t WhiteSpace "*" => [[ t <pointer> ]]
 Vector = "<" WhiteNumberSpace:n "x" Type:t ">" => [[ n t <vector> ]]
