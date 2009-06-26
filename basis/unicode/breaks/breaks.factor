@@ -72,9 +72,6 @@ SYMBOL: table
 : connect ( class1 class2 -- ) 1 set-table ;
 : disconnect ( class1 class2 -- ) 0 set-table ;
   
-: break-around ( classes1 classes2 -- )
-    [ disconnect ] [ swap disconnect ] 2bi ;
-
 : make-grapheme-table ( -- )
     { CR } { LF } connect
     { Control CR LF } graphemes disconnect
@@ -90,9 +87,6 @@ VALUE: grapheme-table
 
 : grapheme-break? ( class1 class2 -- ? )
     grapheme-table nth nth not ;
-
-: chars ( i str n -- str[i] str[i+n] )
-    swap [ dupd + ] dip [ ?nth ] curry bi@ ;
 
 PRIVATE>
 

@@ -40,7 +40,7 @@ MACRO: npick ( n -- )
     1- [ dup ] [ '[ _ dip swap ] ] repeat ;
 
 MACRO: nover ( n -- )
-    dup '[ _ 1 + npick ] n*quot ;
+    dup 1 + '[ _ npick ] n*quot ;
 
 MACRO: ndup ( n -- )
     dup '[ _ npick ] n*quot ;

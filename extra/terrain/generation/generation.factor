@@ -36,6 +36,7 @@ TUPLE: segment image ;
     <image>
         swap >>bitmap
         RGBA >>component-order
+        ubyte-components >>component-type
         terrain-segment-size >>dim ;
 
 : terrain-segment ( terrain at -- image )

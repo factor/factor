@@ -484,15 +484,15 @@ ERROR: unknown-component-order ifd ;
         [ unknown-component-order ]
     } case >>bitmap ;
 
-: ifd-component-order ( ifd -- byte-order )
+: ifd-component-order ( ifd -- component-order component-type )
     bits-per-sample find-tag {
-        { { 32 32 32 32 } [ R32G32B32A32 ] }
-        { { 32 32 32 } [ R32G32B32 ] }
-        { { 16 16 16 16 } [ R16G16B16A16 ] }
-        { { 16 16 16 } [ R16G16B16 ] }
-        { { 8 8 8 8 } [ RGBA ] }
-        { { 8 8 8 } [ RGB ] }
-        { 8 [ LA ] }
+        { { 32 32 32 32 } [ RGBA float-components ] }
+        { { 32 32 32 } [ RGB float-components ] }
+        { { 16 16 16 16 } [ RGBA ushort-components ] }
+        { { 16 16 16 } [ RGB ushort-components ] }
+        { { 8 8 8 8 } [ RGBA ubyte-components ] }
+        { { 8 8 8 } [ RGB ubyte-components ] }
+        { 8 [ LA ubyte-components ] }
         [ unknown-component-order ]
     } case ;
 
@@ -507,7 +507,7 @@ ERROR: unknown-component-order ifd ;
 : ifd>image ( ifd -- image )
     [ <image> ] dip {
         [ [ image-width find-tag ] [ image-length find-tag ] bi 2array >>dim ]
-        [ ifd-component-order >>component-order ]
+        [ ifd-component-order [ >>component-order ] [ >>component-type ] bi* ]
         [ bitmap>> >>bitmap ]
     } cleave ;
 

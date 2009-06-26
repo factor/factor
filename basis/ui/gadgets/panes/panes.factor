@@ -96,10 +96,6 @@ M: pane selected-children
         add-incremental
     ] [ next-line ] bi ;
 
-: ?pane-nl ( pane -- )
-    [ dup current>> children>> empty? [ pane-nl ] [ drop ] if ]
-    [ pane-nl ] bi ;
-
 : smash-pane ( pane -- gadget ) [ pane-nl ] [ output>> smash-line ] bi ;
 
 : pane-write ( seq pane -- )

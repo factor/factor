@@ -298,6 +298,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
 : setup-bitmap ( image -- )
     dup dim>> 16 v/n [ ceiling ] map 16 v*n >>dim
     BGR >>component-order
+    ubyte-components >>component-type
     f >>upside-down?
     dup dim>> first2 * 3 * 0 <array> >>bitmap
     drop ;

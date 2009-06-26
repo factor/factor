@@ -40,6 +40,4 @@ $nl
 HELP: math-generic
 { $class-description "The class of generic words using " { $link math-combination } "." } ;
 
-HELP: last/first
-{ $values { "seq" sequence } { "pair" "a two-element array" } }
-{ $description "Creates an array holding the first and last element of the sequence." } ;
+

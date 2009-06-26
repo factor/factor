@@ -1,4 +1,5 @@
-USING: kernel help.markup help.syntax sequences quotations assocs ;
+USING: assocs hashtables help.markup help.syntax kernel
+quotations sequences ;
 IN: sets
 
 ARTICLE: "sets" "Set-theoretic operations on sequences"
@@ -125,3 +126,4 @@ HELP: gather
      { "seq" sequence } { "quot" quotation }
      { "newseq" sequence } }
 { $description "Maps a quotation onto a sequence, concatenates the results of the mapping, and removes duplicates." } ;
+
