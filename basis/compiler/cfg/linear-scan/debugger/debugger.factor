@@ -34,6 +34,3 @@ IN: compiler.cfg.linear-scan.debugger
 
 : live-intervals. ( seq -- )
     [ interval-picture ] map simple-table. ;
-
-: test-bb ( insns n -- )
-    [ <basic-block> swap >>number swap >>instructions ] keep set ;
