@@ -25,9 +25,8 @@ SYMBOL: check-optimizer?
 : optimize-cfg ( cfg -- cfg' )
     [
         compute-predecessors
-        delete-useless-blocks
+        ! delete-useless-blocks
         delete-useless-conditionals
-        normalize-height
         stack-analysis
         compute-liveness
         alias-analysis

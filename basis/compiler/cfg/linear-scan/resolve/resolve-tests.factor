@@ -3,7 +3,8 @@ compiler.cfg.linear-scan.debugger
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.resolve compiler.cfg.predecessors
-compiler.cfg.registers compiler.cfg.rpo cpu.architecture kernel
+compiler.cfg.registers compiler.cfg.rpo
+compiler.cfg.debugger cpu.architecture kernel
 namespaces tools.test vectors ;
 IN: compiler.cfg.linear-scan.resolve.tests
 

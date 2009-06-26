@@ -4,7 +4,7 @@ compiler.cfg.instructions sequences kernel tools.test accessors
 sequences.private alien math combinators.private compiler.cfg
 compiler.cfg.checker compiler.cfg.height compiler.cfg.rpo
 compiler.cfg.dce compiler.cfg.registers compiler.cfg.useless-blocks
-sets namespaces ;
+sets namespaces arrays cpu.architecture ;
 IN: compiler.cfg.stack-analysis.tests
 
 ! Fundamental invariant: a basic block should not load or store a value more than once
@@ -112,4 +112,36 @@ local-only? off
 [ 1 t ] [
     [ 1000 [ ] times ] test-stack-analysis eliminate-dead-code linearize
     [ [ ##add-imm? ] count ] [ [ ##load-immediate? ] any? ] bi
+] unit-test
+
+! Correct height tracking
+[ D 1 D 0 ] [
+    [ pick [ <array> ] [ drop ] if swap ] test-stack-analysis eliminate-dead-code
+    reverse-post-order 2 swap nth
+    instructions>> [ ##peek? ] filter first2 [ loc>> ] [ loc>> ] bi*
+] unit-test
+
+[ D 1 ] [
+    V{ T{ ##branch } } 0 test-bb
+
+    V{ T{ ##peek f V int-regs 0 D 2 } T{ ##branch } } 1 test-bb
+
+    V{
+        T{ ##peek f V int-regs 1 D 2 }
+        T{ ##inc-d f -1 }
+        T{ ##branch }
+    } 2 test-bb
+
+    V{ T{ ##call f \ + -1 } T{ ##branch } } 3 test-bb
+
+    V{ T{ ##return } } 4 test-bb
+
+    test-diamond
+
+    cfg new 0 get >>entry
+    compute-predecessors
+    stack-analysis
+    drop
+
+    3 get instructions>> second loc>>
 ] unit-test
