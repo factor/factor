@@ -1,32 +1,40 @@
 USING: accessors arrays combinators.short-circuit grouping kernel lists
 lists.lazy locals math math.functions math.parser math.ranges
 models.product monads random sequences sets ui ui.frp.gadgets
-ui.frp.layout ui.frp.signals ui.gadgets.alerts vectors ;
+ui.frp.layout ui.frp.signals ui.gadgets.alerts vectors fry
+ui.gadgets.labels memoize ;
 IN: gui-sudoku
 
 : row ( index -- row ) 1 + 9 / ceiling ;
 : col ( index -- col ) 9 mod 1 + ;
 : sq ( index -- square ) [ row ] [ col ] bi [ 3 / ceiling ] bi@ 2array ;
 : near ( a pos -- ? ) { [ [ row ] bi@ = ] [ [ col ] bi@ = ] [ [ sq ] bi@ = ] } 2|| ;
-MEMO:: solutions ( puzzle -- solutions )
-    f puzzle index
+: nth-or-lower ( n seq -- elt ) [ length 1 - 2dup > [ nip ] [ drop ] if ] keep nth ;
+
+MEMO:: solutions ( puzzle random? -- solutions )
+    f puzzle random? [ indices [ f ] [ random? swap nth-or-lower ] if-empty ] [ index ] if
     [ :> pos
       1 9 [a,b] 80 iota [ pos near ] filter [ puzzle nth ] map prune diff
-      [ 1array puzzle pos cut-slice rest surround ] map >list [ solutions ] bind
+      [ 1array puzzle pos cut-slice rest surround ] map >list [ random? solutions ] bind
     ] [ puzzle list-monad return ] if* ;
 
-: solution ( puzzle -- solution ) dup solutions dup +nil+ = [ drop "Unsolvable" alert* ] [ nip car ] if ;
-: hint ( puzzle -- puzzle' ) [ [ f swap indices random dup ] [ solution ] bi nth ] keep swapd >vector [ set-nth ] keep ;
+: solution ( puzzle random? -- solution ) dupd solutions dup +nil+ = [ drop "Unsolvable" alert* ] [ nip car ] if \ solutions reset-memoized ;
+: hint ( puzzle -- puzzle' ) [ [ f swap indices random dup ] [ f solution ] bi nth ] keep swapd >vector [ set-nth ] keep ;
+: create ( difficulty -- puzzle ) 81 [ f ] replicate
+    40 random solution [ [ dup length random f spin set-nth ] curry times ] keep ;
 
-: do-sudoku ( -- ) [ [ [ $ SUDOKU $ ] <vbox> { 280 220 } >>pref-dim
+: do-sudoku ( -- ) [ [
         [
-            81 [ "" ] replicate <basic> <switch> [ SUDOKU [ <basic> ] map 9 group [ 3 group ] map 3 group
+            81 [ "" ] replicate <basic> <switch> [ [ <basic> ] map 9 group [ 3 group ] map 3 group
                [ [ [ <spacer> [ [ <frp-field> ->% 2 [ string>number ] fmap ]
-                    map <spacer> ] map concat ] <hbox> , ] map concat <spacer> ] map concat <product> dup
-               [ "Hint" <frp-border-button> -> "Solve" <frp-border-button> -> ] <hbox> , swapd [ <updates> ] 2bi@
-               [ [ hint ] fmap ] [ [ solution ] fmap ] bi* <2merge> [ [ [ number>string ] [ "" ] if* ] map ] fmap
+                    map <spacer> ] map concat ] <hbox> , ] map concat <spacer> ] map concat <product>
+               [ "Difficulty:" <label> , "1" <basic> <frp-field> -> [ string>number 1 or 1 + 10 * ] fmap
+               "Generate" <frp-border-button> -> <updates> [ create ] fmap <spacer>
+               "Hint" <frp-border-button> -> "Solve" <frp-border-button> -> ] <hbox> ,
+               roll [ swap <updates> ] curry bi@
+               [ [ hint ] fmap ] [ [ f solution ] fmap ] bi* 3array <merge> [ [ [ number>string ] [ "" ] if* ] map ] fmap
            ] bind
-        ] with-self SUDOKU ,
-    ] with-interface "Sudoku Sleuth" open-window ] with-ui ;
+        ] with-self , ] <vbox> { 280 220 } >>pref-dim
+    "Sudoku Sleuth" open-window ] with-ui ;
 
 MAIN: do-sudoku
