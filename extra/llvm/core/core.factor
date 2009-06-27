@@ -221,6 +221,10 @@ FUNCTION: void LLVMGetParams ( LLVMValueRef Fn, LLVMValueRef* Params ) ;
 FUNCTION: LLVMValueRef
 LLVMAddFunction ( LLVMModuleRef M, char* Name, LLVMTypeRef FunctionTy ) ;
 
+FUNCTION: LLVMValueRef LLVMGetFirstFunction ( LLVMModuleRef M ) ;
+
+FUNCTION: LLVMValueRef LLVMGetNextFunction ( LLVMValueRef Fn ) ;
+
 FUNCTION: unsigned LLVMGetFunctionCallConv ( LLVMValueRef Fn ) ;
 
 FUNCTION: void LLVMSetFunctionCallConv ( LLVMValueRef Fn, unsigned CC ) ;
