@@ -88,7 +88,6 @@ TUPLE: action < multi-model quot ;
 M: action (model-changed) [ [ value>> ] [ quot>> ] bi* call( a -- b ) ] keep value>>
    [ swap add-connection ] 2keep model-changed ;
 : <action> ( model quot -- action-signal ) [ 1array action <multi-model> ] dip >>quot dup f <action-value> >>value value>> ;
-<PRIVATE
 
 TUPLE: | < multi-model ;
 : <|> ( models -- product ) | <multi-model> ;
@@ -104,7 +103,6 @@ M: | model-activated dup model-changed ;
 TUPLE: & < | ;
 : <&> ( models -- product ) & <multi-model> ;
 M: & models-changed dependencies>> [ [ null-val ] keep (>>value) ] each ;
-PRIVATE>
 
 ! for side effects
 TUPLE: (frp-when) < multi-model quot cond ;
