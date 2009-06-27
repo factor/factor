@@ -1,10 +1,11 @@
 USING: accessors arrays classes compiler.cfg
-compiler.cfg.instructions compiler.cfg.linear-scan.debugger
+compiler.cfg.debugger compiler.cfg.instructions
+compiler.cfg.linear-scan.debugger
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.resolve compiler.cfg.predecessors
 compiler.cfg.registers compiler.cfg.rpo cpu.architecture kernel
-multiline namespaces tools.test vectors ;
+namespaces tools.test vectors ;
 IN: compiler.cfg.linear-scan.resolve.tests
 
 [ { 1 2 3 4 5 6 } ] [
