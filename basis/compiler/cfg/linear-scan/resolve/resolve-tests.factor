@@ -1,10 +1,10 @@
-USING: accessors arrays compiler.cfg compiler.cfg.instructions
-compiler.cfg.linear-scan.debugger
+USING: accessors arrays classes compiler.cfg
+compiler.cfg.instructions compiler.cfg.linear-scan.debugger
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.resolve compiler.cfg.predecessors
 compiler.cfg.registers compiler.cfg.rpo cpu.architecture kernel
-namespaces tools.test vectors ;
+multiline namespaces tools.test vectors ;
 IN: compiler.cfg.linear-scan.resolve.tests
 
 [ { 1 2 3 4 5 6 } ] [
@@ -62,4 +62,150 @@ T{ live-interval
 
 [ f ] [
     1 get test-live-interval-2 reload-from
+] unit-test
+
+[
+    {
+        T{ register->register { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+    }
+] [
+    {
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+        T{ register->register { from 1 } { to 2 } { reg-class int-regs } }
+    } trace-chains
+] unit-test
+
+[
+    {
+        T{ register->register { from 2 } { to 3 } { reg-class int-regs } }
+        T{ register->register { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+    }
+] [
+    {
+        T{ register->register { from 2 } { to 3 } { reg-class int-regs } }
+        T{ register->register { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+    } trace-chains
+] unit-test
+
+[
+    {
+        T{ register->register { from 2 } { to 3 } { reg-class int-regs } }
+        T{ register->register { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+    }
+] [
+    {
+        T{ register->register { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 2 } { to 3 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+    } trace-chains
+] unit-test
+
+[
+    {
+        T{ register->register { from 2 } { to 3 } { reg-class int-regs } }
+        T{ register->register { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+    }
+] [
+    {
+        T{ register->register { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 2 } { to 3 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+    } trace-chains
+] unit-test
+
+[
+    {
+        T{ register->register { from 2 } { to 3 } { reg-class int-regs } }
+        T{ register->memory { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+    }
+] [
+    {
+        T{ register->memory { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 2 } { to 3 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+    } trace-chains
+] unit-test
+
+[
+    {
+        T{ _copy { dst 5 } { src 4 } { class int-regs } }
+        T{ _spill { src 1 } { class int-regs } { n 6 } }
+        T{ _copy { dst 1 } { src 0 } { class int-regs } }
+        T{ _reload { dst 0 } { class int-regs } { n 6 } }
+        T{ _spill { src 1 } { class float-regs } { n 7 } }
+        T{ _copy { dst 1 } { src 0 } { class float-regs } }
+        T{ _reload { dst 0 } { class float-regs } { n 7 } }
+    }
+] [
+    {
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+        T{ register->register { from 1 } { to 0 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class float-regs } }
+        T{ register->register { from 1 } { to 0 } { reg-class float-regs } }
+        T{ register->register { from 4 } { to 5 } { reg-class int-regs } }
+    } mapping-instructions
+] unit-test
+
+[
+    {
+        T{ _spill { src 1 } { class int-regs } { n 3 } }
+        T{ _copy { dst 1 } { src 0 } { class int-regs } }
+        T{ _copy { dst 0 } { src 2 } { class int-regs } }
+        T{ _reload { dst 2 } { class int-regs } { n 3 } }
+    }
+] [
+    {
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+        T{ register->register { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 2 } { to 0 } { reg-class int-regs } }
+    } mapping-instructions
+] unit-test
+
+[
+    {
+        T{ _spill { src 1 } { class int-regs } { n 3 } }
+        T{ _copy { dst 1 } { src 0 } { class int-regs } }
+        T{ _copy { dst 0 } { src 2 } { class int-regs } }
+        T{ _reload { dst 2 } { class int-regs } { n 3 } }
+    }
+] [
+    {
+        T{ register->register { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->register { from 2 } { to 0 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+    } mapping-instructions
+] unit-test
+
+[
+    {
+        T{ _copy { dst 1 } { src 0 } { class int-regs } }
+        T{ _copy { dst 2 } { src 0 } { class int-regs } }
+    }
+] [
+    {
+        T{ register->register { from 0 } { to 1 } { reg-class int-regs } }
+        T{ register->register { from 0 } { to 2 } { reg-class int-regs } }
+    } mapping-instructions
+] unit-test
+
+[
+    { }
+] [
+    {
+       T{ register->register { from 4 } { to 4 } { reg-class int-regs } }
+    } mapping-instructions
+] unit-test
+
+[
+    { T{ _spill { src 4 } { class int-regs } { n 4 } } }
+] [
+    {
+       T{ register->memory { from 4 } { to 4 } { reg-class int-regs } }
+    } mapping-instructions
 ] unit-test
