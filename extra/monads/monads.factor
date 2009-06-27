@@ -7,6 +7,7 @@ IN: monads
 
 ! Functors
 GENERIC# fmap 1 ( functor quot -- functor' )
+GENERIC# <$ 1 ( functor quot -- functor' )
 
 ! Monads
 

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ui.frp.signals ui.frp.signals.private ;
+USING: help.markup help.syntax ui.frp.signals ;
 IN: ui.frp.functors
 
 ARTICLE: { "ui.frp.functors" "signal-collection" } "Signal Collection"
