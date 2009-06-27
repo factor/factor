@@ -1,7 +1,7 @@
 USING: accessors arrays fry kernel lexer make math.parser
 models monads namespaces parser sequences
 sequences.extras ui.frp.gadgets ui.frp.signals ui.gadgets
-ui.gadgets.books ui.gadgets.tracks words ui.tools.inspector ;
+ui.gadgets.books ui.gadgets.tracks words ;
 QUALIFIED: make
 IN: ui.frp.layout
 
@@ -62,7 +62,7 @@ GENERIC# (insert-item) 1 ( item location -- )
 M: gadget (insert-item) dup parent>> track? [ [ f <layout> ] dip (insert-item) ]
     [ insertion-point [ add-gadget ] keep insert-gadget ] if ;
 M: layout (insert-item) insertion-point [ add-layout ] keep [ gadget>> insert-gadget ] [ size>> insert-size ] 3bi ;
-M: model (insert-item) dup inspector parent>> dup book? [ "No models in books" throw ]
+M: model (insert-item) parent>> dup book? [ "No models in books" throw ]
    [ dup model>> dup |? [ nip swap add-connection ] [ drop [ 1array <|> ] dip (>>model) ] if ] if ;
 : insert-item ( item location -- ) [ dup get [ drop ] [ remove-members ] if ] [ on ] [ ] tri
     [ add-member ] 2keep (insert-item) ;

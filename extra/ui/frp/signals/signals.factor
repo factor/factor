@@ -78,7 +78,7 @@ M: side-effect-model (model-changed) [ value>> ] dip [ quot>> call( old -- ) ] 2
 
 TUPLE: quot-model < mapped-model ;
 M: quot-model (model-changed) nip [ quot>> call( -- b ) ] keep set-model ;
-: <$ ( model quot -- signal ) quot-model new-mapped-model ;
+M: model <$ quot-model new-mapped-model ;
 
 TUPLE: action-value < basic-model parent ;
 : <action-value> ( parent value -- model ) action-value new-model swap >>parent ;
