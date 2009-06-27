@@ -1563,12 +1563,6 @@ V{
     T{ ##return }
 } 4 test-bb
 
-: test-diamond ( -- )
-    1 get 1vector 0 get (>>successors)
-    2 get 3 get V{ } 2sequence 1 get (>>successors)
-    4 get 1vector 2 get (>>successors)
-    4 get 1vector 3 get (>>successors) ;
-
 test-diamond
 
 { 1 2 3 4 } test-linear-scan-on-cfg
