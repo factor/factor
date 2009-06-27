@@ -3,7 +3,6 @@
 USING: kernel sequences accessors combinators namespaces
 compiler.cfg.predecessors
 compiler.cfg.useless-blocks
-compiler.cfg.height
 compiler.cfg.stack-analysis
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
@@ -25,9 +24,8 @@ SYMBOL: check-optimizer?
 : optimize-cfg ( cfg -- cfg' )
     [
         compute-predecessors
-        delete-useless-blocks
+        ! delete-useless-blocks
         delete-useless-conditionals
-        normalize-height
         stack-analysis
         compute-liveness
         alias-analysis
