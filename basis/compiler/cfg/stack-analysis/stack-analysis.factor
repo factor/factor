@@ -13,32 +13,14 @@ compiler.cfg.stack-analysis.state
 compiler.cfg.stack-analysis.merge ;
 IN: compiler.cfg.stack-analysis
 
-! Convert stack operations to register operations
-GENERIC: height-for ( loc -- n )
-
-M: ds-loc height-for drop state get ds-height>> ;
-M: rs-loc height-for drop state get rs-height>> ;
-
-: (translate-loc) ( loc -- n height ) [ n>> ] [ height-for ] bi ; inline
-
-GENERIC: translate-loc ( loc -- loc' )
-
-M: ds-loc translate-loc (translate-loc) - <ds-loc> ;
-M: rs-loc translate-loc (translate-loc) - <rs-loc> ;
-
-GENERIC: untranslate-loc ( loc -- loc' )
-
-M: ds-loc untranslate-loc (translate-loc) + <ds-loc> ;
-M: rs-loc untranslate-loc (translate-loc) + <rs-loc> ;
-
 : redundant-replace? ( vreg loc -- ? )
-    dup untranslate-loc n>> 0 <
+    dup state get untranslate-loc n>> 0 <
     [ 2drop t ] [ state get actual-locs>vregs>> at = ] if ;
 
 : save-changed-locs ( state -- )
     [ changed-locs>> ] [ locs>vregs>> ] bi '[
         _ at swap 2dup redundant-replace?
-        [ 2drop ] [ untranslate-loc ##replace ] if
+        [ 2drop ] [ state get untranslate-loc ##replace ] if
     ] assoc-each ;
 
 ERROR: poisoned-state state ;
@@ -46,6 +28,8 @@ ERROR: poisoned-state state ;
 : sync-state ( -- )
     state get {
         [ dup poisoned?>> [ poisoned-state ] [ drop ] if ]
+        [ ds-height>> save-ds-height ]
+        [ rs-height>> save-rs-height ]
         [ save-changed-locs ]
         [ clear-state ]
     } cleave ;
@@ -55,18 +39,16 @@ ERROR: poisoned-state state ;
 ! Abstract interpretation
 GENERIC: visit ( insn -- )
 
-: adjust-ds ( n -- ) state get [ + ] change-ds-height drop ;
+M: ##inc-d visit
+    n>> state get [ + ] change-ds-height drop ;
 
-M: ##inc-d visit [ , ] [ n>> adjust-ds ] bi ;
-
-: adjust-rs ( n -- ) state get [ + ] change-rs-height drop ;
-
-M: ##inc-r visit [ , ] [ n>> adjust-rs ] bi ;
+M: ##inc-r visit
+    n>> state get [ + ] change-rs-height drop ;
 
 ! Instructions which don't have any effect on the stack
 UNION: neutral-insn
-    ##flushable
-    ##effect ;
+    ##effect
+    ##flushable ;
 
 M: neutral-insn visit , ;
 
@@ -97,19 +79,15 @@ M: sync-if-back-edge visit
     [ ##copy ] [ swap copies get set-at ] 2bi ;
 
 M: ##peek visit
-    dup
-    [ dst>> ] [ loc>> translate-loc ] bi
-    dup loc>vreg dup [ nip eliminate-peek drop ] [ drop record-peek , ] if ;
+    [ dst>> ] [ loc>> state get translate-loc ] bi dup loc>vreg
+    [ eliminate-peek ] [ [ record-peek ] [ ##peek ] 2bi ] ?if ;
 
 M: ##replace visit
-    [ src>> resolve ] [ loc>> translate-loc ] bi
+    [ src>> resolve ] [ loc>> state get translate-loc ] bi
     record-replace ;
 
 M: ##copy visit
     [ call-next-method ] [ record-copy ] bi ;
-
-M: ##call visit
-    [ call-next-method ] [ height>> adjust-ds ] bi ;
 
 ! Instructions that poison the stack state
 UNION: poison-insn
@@ -133,20 +111,10 @@ UNION: kill-vreg-insn
     ##fixnum-add
     ##fixnum-sub
     ##alien-invoke
-    ##alien-indirect ;
+    ##alien-indirect
+    ##alien-callback ;
 
 M: kill-vreg-insn visit sync-state , ;
-
-: visit-alien-node ( node -- )
-    params>> [ out-d>> length ] [ in-d>> length ] bi - adjust-ds ;
-
-M: ##alien-invoke visit
-    [ call-next-method ] [ visit-alien-node ] bi ;
-
-M: ##alien-indirect visit
-    [ call-next-method ] [ visit-alien-node ] bi ;
-
-M: ##alien-callback visit , ;
 
 ! Maps basic-blocks to states
 SYMBOLS: state-in state-out ;
