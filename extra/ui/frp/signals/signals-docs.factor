@@ -1,4 +1,4 @@
-USING: help.markup help.syntax models models.arrow sequences ui.frp.signals ;
+USING: help.markup help.syntax models models.arrow sequences ui.frp.signals monads ;
 IN: ui.frp.signals
 
 HELP: <merge>
