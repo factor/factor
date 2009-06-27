@@ -1,7 +1,7 @@
 USING: accessors arrays fry kernel lexer make math.parser
-models models.product monads namespaces parser sequences
+models monads namespaces parser sequences
 sequences.extras ui.frp.gadgets ui.frp.signals ui.gadgets
-ui.gadgets.books ui.gadgets.tracks words ;
+ui.gadgets.books ui.gadgets.tracks words ui.tools.inspector ;
 QUALIFIED: make
 IN: ui.frp.layout
 
@@ -18,8 +18,11 @@ TUPLE: placeholder < gadget members ;
 : , ( item -- ) make:, ;
 : make* ( quot -- list ) { } make ; inline
 
+! Just take the previous mentioned placeholder and use it
+! If there is no previously mentioned placeholder, we're probably making a box, and will create the placeholder ourselves
 DEFER: with-interface
-: insertion-quot ( quot -- quot' ) <placeholder> dup , swap '[ [ _ , @ ] with-interface ] ;
+: insertion-quot ( quot -- quot' ) make:building get [ placeholder? ] find-last nip [ <placeholder> dup , ] unless*
+    swap '[ [ _ , @ ] with-interface ] ;
 
 SYNTAX: ,% scan string>number [ <layout> , ] curry over push-all ;
 SYNTAX: ->% scan string>number '[ [ _ <layout> , ] [ output-model ] bi ] over push-all ;
@@ -39,7 +42,7 @@ M: model -> dup , ;
 : <box> ( gadgets type -- track )
    [ t make-layout ] dip <track>
    swap [ add-layout ] each
-   swap [ <product> >>model ] unless-empty ; inline
+   swap [ <|> >>model ] unless-empty ; inline
 : <hbox> ( gadgets -- track ) horizontal <box> ; inline
 : <vbox> ( gadgets -- track ) vertical <box> ; inline
 
@@ -59,14 +62,14 @@ GENERIC# (insert-item) 1 ( item location -- )
 M: gadget (insert-item) dup parent>> track? [ [ f <layout> ] dip (insert-item) ]
     [ insertion-point [ add-gadget ] keep insert-gadget ] if ;
 M: layout (insert-item) insertion-point [ add-layout ] keep [ gadget>> insert-gadget ] [ size>> insert-size ] 3bi ;
-M: model (insert-item) parent>> dup book? [ "No models in books" throw ]
-   [ dup model>> dup product? [ nip swap add-connection ] [ drop [ 1array <product> ] dip (>>model) ] if ] if ;
-: insert-item ( item location -- ) [ add-member ] 2keep (insert-item) ;
+M: model (insert-item) dup inspector parent>> dup book? [ "No models in books" throw ]
+   [ dup model>> dup |? [ nip swap add-connection ] [ drop [ 1array <|> ] dip (>>model) ] if ] if ;
+: insert-item ( item location -- ) [ dup get [ drop ] [ remove-members ] if ] [ on ] [ ] tri
+    [ add-member ] 2keep (insert-item) ;
 
-: insert-items ( makelist -- ) t swap [ dup placeholder?
-    [ nip [ dup get [ drop ] [ remove-members ] if ] [ on ] [ ] tri ]
-    [ over insert-item ] if ] each drop ;
+: insert-items ( makelist -- ) t swap [ dup placeholder? [ nip ] [ over insert-item ] if ] each drop ;
 
 : with-interface ( quot -- ) make* [ insert-items ] with-scope ; inline
 
 M: model >>= [ swap insertion-quot <action> ] curry ;
+! Temporary places should be cleared at insertion, not on mention
