@@ -50,6 +50,13 @@ FUNCTION: int LLVMCreateJITCompiler
 
 FUNCTION: void LLVMDisposeExecutionEngine ( LLVMExecutionEngineRef EE ) ;
 
+FUNCTION: void LLVMFreeMachineCodeForFunction ( LLVMExecutionEngineRef EE, LLVMValueRef F ) ;
+
+FUNCTION: void LLVMAddModuleProvider ( LLVMExecutionEngineRef EE, LLVMModuleProviderRef MP ) ;
+
+FUNCTION: int LLVMRemoveModuleProvider
+( LLVMExecutionEngineRef EE, LLVMModuleProviderRef MP, LLVMModuleRef* OutMod, char** OutError ) ;
+
 FUNCTION: int LLVMFindFunction
 ( LLVMExecutionEngineRef EE, char* Name, LLVMValueRef* OutFn ) ;
 
