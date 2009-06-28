@@ -3,9 +3,9 @@
 USING: accessors arrays assocs classes.parser classes.tuple
 combinators combinators.short-circuit compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals compiler.cfg.liveness
-fry hashtables histogram kernel locals make math math.order
+fry hashtables kernel locals make math math.order
 namespaces parser prettyprint random sequences sets
-sorting.functor sorting.slots words ;
+sorting.functor sorting.slots words io ;
 IN: compiler.cfg.linear-scan.resolve
 
 <<
@@ -114,20 +114,11 @@ M: register->register to-loc drop register ;
 : to-reg ( operation -- seq )
     [ to-loc ] [ to>> ] [ reg-class>> ] tri 3array ;
 
-: (trace-chain) ( pair -- )
-    to-reg froms get at [
-        dup length 1 = [
-            first [ , ] [ (trace-chain) ] bi
-        ] [
-            drop
-        ] if
-    ] when* ;
-
-: trace-chain ( pair -- seq )
-    [ [ , ] [ (trace-chain) ] bi ] { } make reverse ;
-
 : start? ( operations -- pair )
     from-reg tos get key? not ;
+
+: independent-assignment? ( operations -- pair )
+    to-reg froms get key? not ;
 
 : init-temp-spill ( operations -- )
     [ [ to>> ] [ from>> ] bi max ] [ max ] map-reduce
@@ -135,17 +126,28 @@ M: register->register to-loc drop register ;
 
 : set-tos/froms ( operations -- )
     {
-        [ [ from-reg ] collect-values froms set ]
-        [ [ to-reg ] collect-values tos set ]
+        [ [ [ from-reg ] keep ] H{ } map>assoc froms set ]
+        [ [ [ to-reg ] keep ] H{ } map>assoc tos set ]
     } cleave ;
 
-: trace-chains ( operations -- operations' )
-    [ set-tos/froms ]
-    [ [ start? ] filter [ trace-chain ] map concat ] bi ;
+:: (trace-chain) ( obj hashtable -- )
+    obj to-reg froms get at* [
+        obj over hashtable clone [ maybe-set-at ] keep swap
+        [ (trace-chain) ] [ , drop ] if
+    ] [
+        drop hashtable ,
+    ] if ;
+
+: trace-chain ( obj -- seq )
+    [
+        dup dup associate (trace-chain)
+    ] { } make [ keys ] map concat reverse ;
+
+: trace-chains ( seq -- seq' )
+    [ trace-chain ] map concat ;
 
 : break-cycle-n ( operations -- operations' )
-    unclip [ trace-chains ] dip
-    [
+    unclip [
         [ from>> temp-spill get ]
         [ reg-class>> ] bi \ register->memory boa
     ] [
@@ -155,32 +157,30 @@ M: register->register to-loc drop register ;
 
 : break-cycle ( operations -- operations' )
     dup length {
-        { 1 [ drop { } ] }
+        { 1 [ ] }
         [ drop break-cycle-n ]
     } case ;
 
-: follow-cycle ( obj -- seq )
-   dup dup associate [
-        [ to-reg froms get at first dup dup ] dip
-        [ maybe-set-at ] keep swap
-    ] loop nip keys ;
-
 : (group-cycles) ( seq -- )
     [
-        unclip follow-cycle [ diff ] keep , (group-cycles)
+        dup set-tos/froms
+        unclip trace-chain
+        [ diff ] keep , (group-cycles)
     ] unless-empty ;
 
 : group-cycles ( seq -- seqs )
     [ (group-cycles) ] { } make ;
 
-: partition-mappings ( mappings -- no-cycles cycles )
-    [ start? not ] partition
-    [ trace-chain ] map concat tuck diff ;
+: remove-dead-mappings ( seq -- seq' )
+    prune [ [ from-reg ] [ to-reg ] bi = not ] filter ;
 
 : parallel-mappings ( operations -- seq )
-    partition-mappings [
-        group-cycles [ break-cycle ] map concat append
-    ] unless-empty ;
+    [
+        [ independent-assignment? not ] partition %
+        [ start? not ] partition
+        [ trace-chain ] map concat dup %
+        diff group-cycles [ break-cycle ] map concat %
+    ] { } make remove-dead-mappings ;
 
 : mapping-instructions ( mappings -- insns )
     [
@@ -191,15 +191,19 @@ M: register->register to-loc drop register ;
     ] with-scope ;
 
 : fork? ( from to -- ? )
-    [ successors>> length 1 >= ]
-    [ predecessors>> length 1 = ] bi* and ; inline
+    {
+        [ drop successors>> length 1 >= ]
+        [ nip predecessors>> length 1 = ]
+    } 2&& ; inline
 
 : insert-position/fork ( from to -- before after )
     nip instructions>> [ >array ] [ dup delete-all ] bi swap ;
 
 : join? ( from to -- ? )
-    [ successors>> length 1 = ]
-    [ predecessors>> length 1 >= ] bi* and ; inline
+    {
+        [ drop successors>> length 1 = ]
+        [ nip predecessors>> length 1 >= ]
+    } 2&& ; inline
 
 : insert-position/join ( from to -- before after )
     drop instructions>> dup pop 1array ;
