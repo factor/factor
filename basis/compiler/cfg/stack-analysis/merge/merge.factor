@@ -42,20 +42,20 @@ IN: compiler.cfg.stack-analysis.merge
     [ [ keys ] map concat prune ] keep
     '[ dup _ [ at ] with map ] H{ } map>assoc ;
 
-: insert-peek ( predecessor state loc -- vreg )
-    '[ _ _ swap translate-loc ^^peek ] add-instructions ;
+: insert-peek ( predecessor loc -- vreg )
+    '[ _ ^^peek ] add-instructions ;
 
-: merge-loc ( predecessors states vregs loc -- vreg )
+: merge-loc ( predecessors vregs loc -- vreg )
     ! Insert a ##phi in the current block where the input
     ! is the vreg storing loc from each predecessor block
-    '[ dup [ 2nip ] [ drop _ insert-peek ] if ] 3map
+    '[ [ ] [ _ insert-peek ] ?if ] 2map
     dup all-equal? [ first ] [ ^^phi ] if ;
 
 :: merge-locs ( state predecessors states -- state )
     states [ locs>vregs>> ] map states collect-locs
     [| key value |
         key
-        predecessors states value key merge-loc
+        predecessors value key merge-loc
     ] assoc-map
     state translate-locs
     state (>>locs>vregs)
