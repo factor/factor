@@ -163,7 +163,7 @@ local-only? off
 
 ! Missing ##replace
 [ t ] [
-    [ 0 2over dup not [ [ /mod ] dip ] when ] test-stack-analysis
+    [ [ "B" ] 2dip dup [ [ /mod ] dip ] when ] test-stack-analysis
     reverse-post-order last
     instructions>> [ ##replace? ] filter [ loc>> ] map
     { D 0 D 1 D 2 } set=
@@ -174,7 +174,7 @@ local-only? off
     [ [ "B" ] 2dip dup [ [ /mod ] dip ] when ] test-stack-analysis
     eliminate-dead-code reverse-post-order 3 swap nth
     instructions>> [ ##peek? ] filter [ loc>> ] map
-    { D 1 D 2 } set=
+    { R 0 D 0 D 1 } set=
 ] unit-test
 
 [ D 0 ] [
