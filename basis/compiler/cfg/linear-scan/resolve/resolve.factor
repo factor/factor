@@ -1,11 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.parser classes.tuple
-combinators combinators.short-circuit compiler.cfg.instructions
-compiler.cfg.linear-scan.live-intervals compiler.cfg.liveness
-fry hashtables histogram kernel locals make math math.order
-namespaces parser prettyprint random sequences sets
-sorting.functor sorting.slots words ;
+combinators combinators.short-circuit fry hashtables kernel locals
+make math math.order namespaces sequences sets words parser histogram
+compiler.cfg.instructions compiler.cfg.linear-scan.live-intervals
+compiler.cfg.liveness ;
 IN: compiler.cfg.linear-scan.resolve
 
 <<
@@ -134,10 +133,9 @@ M: register->register to-loc drop register ;
     1 + temp-spill set ;
 
 : set-tos/froms ( operations -- )
-    {
-        [ [ from-reg ] collect-values froms set ]
-        [ [ to-reg ] collect-values tos set ]
-    } cleave ;
+    [ [ from-reg ] collect-values froms set ]
+    [ [ to-reg ] collect-values tos set ]
+    bi ;
 
 : trace-chains ( operations -- operations' )
     [ set-tos/froms ]
