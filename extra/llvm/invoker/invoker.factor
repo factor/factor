@@ -30,15 +30,15 @@ TUPLE: function name alien return params ;
     LLVMGetFirstFunction [ (functions) ] { } make [ <function> ] map ;
 
 : function-effect ( function -- effect )
-    [ params>> [ first ] map ] [ void? 0 1 ? ] bi <effect> ;
+    [ params>> [ first ] map ] [ return>> void? 0 1 ? ] bi <effect> ;
 
 : install-function ( function -- )
     dup name>> "alien.llvm" create-vocab drop
     "alien.llvm" create swap
     [
         dup name>> function-pointer ,
-        dup return>> drop "int" ,
-        dup params>> [ drop "int" ] map ,
+        dup return>> c-type ,
+        dup params>> [ second c-type ] map ,
         "cdecl" , \ alien-indirect ,
     ] [ ] make swap function-effect [ define-declared ] with-compilation-unit ;
 

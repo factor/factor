@@ -18,20 +18,32 @@ IN: llvm.types
 !
 GENERIC: (>tref) ( type -- LLVMTypeRef )
 GENERIC: ((tref>)) ( LLVMTypeRef type -- type )
+GENERIC: c-type ( type -- str )
 
 ! default implementation for simple types
 M: object ((tref>)) nip ;
+: unsupported-type ( -- )
+    "cannot generate c-type: unsupported llvm type" throw ;
+M: object c-type unsupported-type ;
 
 TUPLE: integer size ;
 C: <integer> integer
 
 M: integer (>tref) size>> LLVMIntType ;
 M: integer ((tref>)) swap LLVMGetIntTypeWidth >>size ;
+M: integer c-type size>> {
+    { 64 [ "longlong" ] }
+    { 32 [ "int" ] }
+    { 16 [ "short" ] }
+    { 8  [ "char" ] }
+    [ unsupported-type ]
+} case ;
 
 SINGLETONS: float double x86_fp80 fp128 ppc_fp128 ;
 
 M: float (>tref) drop LLVMFloatType ;
 M: double (>tref) drop LLVMDoubleType ;
+M: double c-type drop "double" ;
 M: x86_fp80 (>tref) drop LLVMX86FP80Type ;
 M: fp128 (>tref) drop LLVMFP128Type ;
 M: ppc_fp128 (>tref) drop LLVMPPCFP128Type ;
@@ -41,6 +53,7 @@ SINGLETONS: opaque label void metadata ;
 M: opaque (>tref) drop LLVMOpaqueType ;
 M: label (>tref) drop LLVMLabelType ;
 M: void (>tref) drop LLVMVoidType ;
+M: void c-type drop "void" ;
 M: metadata (>tref) drop
     "metadata types unsupported by llvm c bindings" throw ;
 
@@ -85,6 +98,7 @@ TUPLE: pointer < enclosing type ;
 M: pointer (>tref)* type>> (>tref) 0 LLVMPointerType ;
 M: pointer clean* type>> clean ;
 M: pointer (tref>)* swap LLVMGetElementType (tref>) >>type ;
+M: pointer c-type type>> 8 <integer> = "char*" "void*" ? ;
 
 TUPLE: vector < enclosing size type ;
 : <vector> ( s t -- o )
