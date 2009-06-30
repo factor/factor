@@ -160,3 +160,47 @@ local-only? off
 
     3 get instructions>> [ ##peek? ] find nip loc>>
 ] unit-test
+
+! Missing ##replace
+[ t ] [
+    [ [ "B" ] 2dip dup [ [ /mod ] dip ] when ] test-stack-analysis
+    reverse-post-order last
+    instructions>> [ ##replace? ] filter [ loc>> ] map
+    { D 0 D 1 D 2 } set=
+] unit-test
+
+! Inserted ##peeks reference the wrong stack location
+[ t ] [
+    [ [ "B" ] 2dip dup [ [ /mod ] dip ] when ] test-stack-analysis
+    eliminate-dead-code reverse-post-order 3 swap nth
+    instructions>> [ ##peek? ] filter [ loc>> ] map
+    { R 0 D 0 D 1 } set=
+] unit-test
+
+[ D 0 ] [
+    V{ T{ ##branch } } 0 test-bb
+
+    V{ T{ ##branch } } 1 test-bb
+
+    V{
+        T{ ##peek f V int-regs 1 D 0 }
+        T{ ##inc-d f 1 }
+        T{ ##branch }
+    } 2 test-bb
+
+    V{
+        T{ ##inc-d f 1 }
+        T{ ##branch }
+    } 3 test-bb
+
+    V{ T{ ##return } } 4 test-bb
+
+    test-diamond
+
+    cfg new 0 get >>entry
+    compute-predecessors
+    stack-analysis
+    drop
+
+    3 get instructions>> [ ##peek? ] find nip loc>>
+] unit-test

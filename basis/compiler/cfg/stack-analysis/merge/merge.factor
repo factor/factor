@@ -37,25 +37,25 @@ IN: compiler.cfg.stack-analysis.merge
     '[ _ untranslate-loc ] assoc-map-values ;
 
 : collect-locs ( loc-maps states -- assoc )
-    ! assoc maps locs to sequences of vregs
+    ! assoc maps locs to sequences
     [ untranslate-locs ] 2map
     [ [ keys ] map concat prune ] keep
     '[ dup _ [ at ] with map ] H{ } map>assoc ;
 
-: insert-peek ( predecessor loc -- vreg )
-    '[ _ ^^peek ] add-instructions ;
+: insert-peek ( predecessor loc state -- vreg )
+    '[ _ _ translate-loc ^^peek ] add-instructions ;
 
-: merge-loc ( predecessors vregs loc -- vreg )
+: merge-loc ( predecessors vregs loc state -- vreg )
     ! Insert a ##phi in the current block where the input
     ! is the vreg storing loc from each predecessor block
-    '[ [ ] [ _ insert-peek ] ?if ] 2map
+    '[ [ ] [ _ _ insert-peek ] ?if ] 2map
     dup all-equal? [ first ] [ ^^phi ] if ;
 
 :: merge-locs ( state predecessors states -- state )
     states [ locs>vregs>> ] map states collect-locs
     [| key value |
         key
-        predecessors value key merge-loc
+        predecessors value key state merge-loc
     ] assoc-map
     state translate-locs
     state (>>locs>vregs)
@@ -64,14 +64,17 @@ IN: compiler.cfg.stack-analysis.merge
 : merge-actual-loc ( vregs -- vreg/f )
     dup all-equal? [ first ] [ drop f ] if ;
 
-: merge-actual-locs ( state states -- state )
-    [ [ actual-locs>vregs>> ] map ] keep collect-locs
+:: merge-actual-locs ( state states -- state )
+    states [ actual-locs>vregs>> ] map states collect-locs
     [ merge-actual-loc ] assoc-map [ nip ] assoc-filter
-    over translate-locs
-    >>actual-locs>vregs ;
+    state translate-locs
+    state (>>actual-locs>vregs)
+    state ;
 
 : merge-changed-locs ( state states -- state )
-    [ changed-locs>> ] map assoc-combine >>changed-locs ;
+    [ [ changed-locs>> ] keep untranslate-locs ] map assoc-combine
+    over translate-locs
+    >>changed-locs ;
 
 ERROR: cannot-merge-poisoned states ;
 
