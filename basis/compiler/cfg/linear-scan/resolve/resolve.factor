@@ -68,10 +68,10 @@ M: memory->memory >insn
     [ from>> ] [ to>> ] bi = [ "Not allowed" throw ] unless ;
 
 M: register->memory >insn
-    [ from>> ] [ reg-class>> ] [ to>> ] tri _spill ;
+    [ from>> ] [ reg-class>> ] bi spill-temp _spill ;
 
 M: memory->register >insn
-    [ to>> ] [ reg-class>> ] [ from>> ] tri _reload ;
+    [ to>> ] [ reg-class>> ] bi spill-temp _reload ;
 
 M: register->register >insn
     [ to>> ] [ from>> ] [ reg-class>> ] tri _copy ;
@@ -82,10 +82,10 @@ M: memory->memory >collision-table
     [ from>> ] [ to>> ] bi = [ "Not allowed" throw ] unless ;
 
 M: register->memory >collision-table
-    [ from>> ] [ reg-class>> ] [ to>> ] tri _spill ;
+    [ from>> ] [ reg-class>> ] bi spill-temp _spill ;
 
 M: memory->register >collision-table
-    [ to>> ] [ reg-class>> ] [ from>> ] tri _reload ;
+    [ to>> ] [ reg-class>> ] bi spill-temp _reload ;
 
 M: register->register >collision-table
     [ to>> ] [ from>> ] [ reg-class>> ] tri _copy ;
@@ -119,10 +119,6 @@ M: register->register to-loc drop register ;
 : independent-assignment? ( operations -- pair )
     to-reg froms get key? not ;
 
-: init-temp-spill ( operations -- )
-    [ [ to>> ] [ from>> ] bi max ] [ max ] map-reduce
-    1 + temp-spill set ;
-
 : set-tos/froms ( operations -- )
     [ [ [ from-reg ] keep ] H{ } map>assoc froms set ]
     [ [ [ to-reg ] keep ] H{ } map>assoc tos set ]
@@ -146,10 +142,10 @@ M: register->register to-loc drop register ;
 
 : break-cycle-n ( operations -- operations' )
     unclip [
-        [ from>> temp-spill get ]
+        [ from>> spill-temp ]
         [ reg-class>> ] bi \ register->memory boa
     ] [
-        [ to>> temp-spill [ get ] [ inc ] bi swap ]
+        [ to>> spill-temp swap ]
         [ reg-class>> ] bi \ memory->register boa
     ] bi [ 1array ] bi@ surround ;
 
@@ -182,9 +178,7 @@ M: register->register to-loc drop register ;
 
 : mapping-instructions ( mappings -- insns )
     [
-        [ init-temp-spill ]
-        [ set-tos/froms ]
-        [ parallel-mappings ] tri
+        [ set-tos/froms ] [ parallel-mappings ] bi
         [ [ >insn ] each ] { } make
     ] with-scope ;
 
