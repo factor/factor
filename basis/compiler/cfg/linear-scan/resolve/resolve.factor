@@ -126,22 +126,36 @@ M: register->register to-loc drop register ;
 
 :: (trace-chain) ( obj hashtable -- )
     obj to-reg froms get at* [
+        dup ,
         obj over hashtable clone [ maybe-set-at ] keep swap
-        [ (trace-chain) ] [ , drop ] if
+        [ (trace-chain) ] [ 2drop ] if
     ] [
-        drop hashtable ,
+        drop
     ] if ;
 
 : trace-chain ( obj -- seq )
     [
+        dup ,
         dup dup associate (trace-chain)
-    ] { } make [ keys ] map concat reverse ;
+    ] { } make prune reverse ;
+
 
 : trace-chains ( seq -- seq' )
     [ trace-chain ] map concat ;
 
-: break-cycle-n ( operations -- operations' )
+ERROR: resolve-error ;
+
+: split-cycle ( operations -- chain spilled-operation )
     unclip [
+        [ set-tos/froms ]
+        [
+            [ start? ] find nip
+            [ resolve-error ] unless* trace-chain
+        ] bi
+    ] dip ;
+
+: break-cycle-n ( operations -- operations' )
+    split-cycle [
         [ from>> spill-temp ]
         [ reg-class>> ] bi \ register->memory boa
     ] [
