@@ -18,10 +18,10 @@ IN: compiler.cfg.stack-analysis
     [ 2drop t ] [ state get actual-locs>vregs>> at = ] if ;
 
 : save-changed-locs ( state -- )
-    [ changed-locs>> ] [ locs>vregs>> ] bi '[
-        _ at swap 2dup redundant-replace?
+    [ changed-locs>> keys ] [ locs>vregs>> ] bi '[
+        dup _ at swap 2dup redundant-replace?
         [ 2drop ] [ state get untranslate-loc ##replace ] if
-    ] assoc-each ;
+    ] each ;
 
 ERROR: poisoned-state state ;
 
