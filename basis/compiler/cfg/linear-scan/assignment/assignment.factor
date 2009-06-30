@@ -108,11 +108,14 @@ SYMBOL: check-assignment?
 
 ERROR: overlapping-registers intervals ;
 
+: check-assignment ( intervals -- )
+    dup [ copy-from>> ] map sift '[ vreg>> _ member? not ] filter
+    dup [ reg>> ] map all-unique? [ drop ] [ overlapping-registers ] if ;
+
 : active-intervals ( insn -- intervals )
     insn#>> pending-intervals get [ covers? ] with filter
     check-assignment? get [
-        dup [ reg>> ] map all-unique?
-        [ overlapping-registers ] unless
+        dup check-assignment
     ] when ;
 
 M: vreg-insn assign-registers-in-insn
