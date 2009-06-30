@@ -1,6 +1,7 @@
-USING: arrays sequences tools.test compiler.cfg.checker compiler.cfg.debugger
-compiler.cfg.def-use sets kernel kernel.private fry slots.private vectors
-sequences.private math sbufs math.private slots.private strings ;
+USING: arrays sequences tools.test compiler.cfg.checker
+compiler.cfg.debugger compiler.cfg.def-use sets kernel
+kernel.private fry slots.private vectors sequences.private
+math sbufs math.private strings ;
 IN: compiler.cfg.optimizer.tests
 
 ! Miscellaneous tests
