@@ -30,12 +30,14 @@ M: x86.32 temp-reg-2 EDX ;
 M:: x86.32 %dispatch ( src temp -- )
     ! Load jump table base.
     temp src HEX: ffffffff [+] LEA
+    building get length cell - :> start
     0 rc-absolute-cell rel-here
     ! Go
     temp HEX: 7f [+] JMP
+    building get length :> end
     ! Fix up the displacement above
     cell code-alignment
-    [ 7 + building get dup pop* push ]
+    [ end start - + building get dup pop* push ]
     [ align-code ]
     bi ;
 
