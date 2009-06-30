@@ -23,15 +23,17 @@ M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
 
 M:: x86.64 %dispatch ( src temp -- )
+    building get length :> start
     ! Load jump table base.
     temp HEX: ffffffff MOV
     0 rc-absolute-cell rel-here
     ! Add jump table base
     temp src ADD
     temp HEX: 7f [+] JMP
+    building get length :> end
     ! Fix up the displacement above
     cell code-alignment
-    [ 15 + building get dup pop* push ]
+    [ end start - 2 - + building get dup pop* push ]
     [ align-code ]
     bi ;
 
