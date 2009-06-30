@@ -27,8 +27,8 @@ M:: x86.64 %dispatch ( src temp -- )
     temp HEX: ffffffff MOV
     0 rc-absolute-cell rel-here
     ! Add jump table base
-    src temp ADD
-    src HEX: 7f [+] JMP
+    temp src ADD
+    temp HEX: 7f [+] JMP
     ! Fix up the displacement above
     cell code-alignment
     [ 15 + building get dup pop* push ]
