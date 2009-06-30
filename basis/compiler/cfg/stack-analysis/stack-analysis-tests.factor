@@ -17,8 +17,6 @@ IN: compiler.cfg.stack-analysis.tests
 : linearize ( cfg -- mr )
     flatten-cfg instructions>> ;
 
-local-only? off
-
 [ ] [ [ ] test-stack-analysis drop ] unit-test
 
 ! Only peek once
