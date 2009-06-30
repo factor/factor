@@ -10,6 +10,8 @@ IN: llvm.core
 
 "LLVMCore" "/usr/local/lib/libLLVMCore.dylib" "cdecl" add-library
 
+"LLVMBitReader" "/usr/local/lib/libLLVMBitReader.dylib" "cdecl" add-library
+
 >>
 
 ! llvm-c/Core.h
@@ -124,9 +126,11 @@ TYPEDEF: void* LLVMBasicBlockRef
 
 TYPEDEF: void* LLVMBuilderRef
 
+TYPEDEF: void* LLVMMemoryBufferRef
+
 ! Functions
 
-FUNCTION: void LLVMDisposeMessage ( char *Message ) ;
+FUNCTION: void LLVMDisposeMessage ( char* Message ) ;
 
 FUNCTION: LLVMModuleRef LLVMModuleCreateWithName ( char* ModuleID ) ;
 
@@ -395,3 +399,18 @@ FUNCTION: LLVMValueRef LLVMBuildExtractValue
 ( LLVMBuilderRef Builder, LLVMValueRef AggVal, unsigned Index, char* Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildInsertValue
 ( LLVMBuilderRef Builder, LLVMValueRef AggVal, LLVMValueRef EltVal, unsigned Index, char* Name ) ;
+
+! Memory Buffers/Bit Reader
+
+FUNCTION: int LLVMCreateMemoryBufferWithContentsOfFile
+( char* Path, LLVMMemoryBufferRef* OutMemBuf, char** OutMessage ) ;
+
+FUNCTION: void LLVMDisposeMemoryBuffer ( LLVMMemoryBufferRef MemBuf ) ;
+
+LIBRARY: LLVMBitReader
+
+FUNCTION: int LLVMParseBitcode
+( LLVMMemoryBufferRef MemBuf, LLVMModuleRef* OutModule, char** OutMessage ) ;
+ 
+FUNCTION: int LLVMGetBitcodeModuleProvider
+( LLVMMemoryBufferRef MemBuf, LLVMModuleProviderRef* OutMP, char** OutMessage ) ;
