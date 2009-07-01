@@ -25,13 +25,16 @@ SYNTAX: OPERATION:
 
 >>
 
-: reload-from ( bb live-interval -- n/f )
-    2dup [ block-from ] [ start>> ] bi* =
-    [ nip reload-from>> ] [ 2drop f ] if ;
+: insn-in-block? ( insn# bb -- ? )
+    [ block-from ] [ block-to ] bi between? ;
 
-: spill-to ( bb live-interval -- n/f )
-    2dup [ block-to ] [ end>> ] bi* =
-    [ nip spill-to>> ] [ 2drop f ] if ;
+: reload-from ( live-interval bb -- n/f )
+    2dup [ start>> ] dip insn-in-block?
+    [ drop reload-from>> ] [ 2drop f ] if ;
+
+: spill-to ( live-interval bb -- n/f )
+    2dup [ end>> ] dip insn-in-block?
+    [ drop spill-to>> ] [ 2drop f ] if ;
 
 OPERATION: memory->memory spill-to>> reload-from>>
 OPERATION: register->memory reg>> reload-from>>
@@ -39,12 +42,12 @@ OPERATION: memory->register spill-to>> reg>>
 OPERATION: register->register reg>> reg>>
 
 :: add-mapping ( bb1 bb2 li1 li2 -- )
-    bb2 li2 reload-from [
-        bb1 li1 spill-to
+    li2 bb2 reload-from [
+        li1 bb1 spill-to
         [ li1 li2 memory->memory ]
         [ li1 li2 register->memory ] if
     ] [
-        bb1 li1 spill-to
+        li1 bb1 spill-to
         [ li1 li2 memory->register ]
         [ li1 li2 register->register ] if
     ] if ;
@@ -68,10 +71,10 @@ M: memory->memory >insn
     [ from>> ] [ to>> ] bi = [ "Not allowed" throw ] unless ;
 
 M: register->memory >insn
-    [ from>> ] [ reg-class>> ] bi spill-temp _spill ;
+    [ from>> ] [ reg-class>> ] [ to>> ] tri _spill ;
 
 M: memory->register >insn
-    [ to>> ] [ reg-class>> ] bi spill-temp _reload ;
+    [ to>> ] [ reg-class>> ] [ from>> ] tri  _reload ;
 
 M: register->register >insn
     [ to>> ] [ from>> ] [ reg-class>> ] tri _copy ;
@@ -82,10 +85,10 @@ M: memory->memory >collision-table
     [ from>> ] [ to>> ] bi = [ "Not allowed" throw ] unless ;
 
 M: register->memory >collision-table
-    [ from>> ] [ reg-class>> ] bi spill-temp _spill ;
+    [ from>> ] [ reg-class>> ] [ to>> ] tri _spill ;
 
 M: memory->register >collision-table
-    [ to>> ] [ reg-class>> ] bi spill-temp _reload ;
+    [ to>> ] [ reg-class>> ] [ from>> ] tri _reload ;
 
 M: register->register >collision-table
     [ to>> ] [ from>> ] [ reg-class>> ] tri _copy ;
