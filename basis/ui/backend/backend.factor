@@ -27,10 +27,6 @@ GENERIC: flush-gl-context ( handle -- )
 
 HOOK: offscreen-pixels ui-backend ( world -- alien w h )
 
-: with-gl-context ( handle quot -- )
-    '[ select-gl-context @ ]
-    [ flush-gl-context gl-error ] bi ; inline
-
 HOOK: (with-ui) ui-backend ( quot -- )
 
 HOOK: (grab-input) ui-backend ( handle -- )
