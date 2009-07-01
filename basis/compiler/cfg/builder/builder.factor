@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators hashtables kernel
 math fry namespaces make sequences words byte-arrays
@@ -11,7 +11,6 @@ compiler.tree.propagation.info
 compiler.cfg
 compiler.cfg.hats
 compiler.cfg.stacks
-compiler.cfg.iterator
 compiler.cfg.utilities
 compiler.cfg.registers
 compiler.cfg.intrinsics
@@ -26,10 +25,6 @@ SYMBOL: procedures
 SYMBOL: current-word
 SYMBOL: current-label
 SYMBOL: loops
-SYMBOL: first-basic-block
-
-! Basic block after prologue, makes recursion faster
-SYMBOL: current-label-start
 
 : add-procedure ( -- )
     basic-block get current-word get current-label get
@@ -46,27 +41,22 @@ SYMBOL: current-label-start
 : with-cfg-builder ( nodes word label quot -- )
     '[ begin-procedure @ ] with-scope ; inline
 
-GENERIC: emit-node ( node -- next )
+GENERIC: emit-node ( node -- )
 
 : check-basic-block ( node -- node' )
     basic-block get [ drop f ] unless ; inline
 
 : emit-nodes ( nodes -- )
-    [ current-node emit-node check-basic-block ] iterate-nodes ;
+    [ basic-block get [ emit-node ] [ drop ] if ] each ;
 
 : begin-word ( -- )
-    #! We store the basic block after the prologue as a loop
-    #! labeled by the current word, so that self-recursive
-    #! calls can skip an epilogue/prologue.
     ##prologue
     ##branch
-    begin-basic-block
-    basic-block get first-basic-block set ;
+    begin-basic-block ;
 
 : (build-cfg) ( nodes word label -- )
     [
         begin-word
-        V{ } clone node-stack set
         emit-nodes
     ] with-cfg-builder ;
 
@@ -77,37 +67,30 @@ GENERIC: emit-node ( node -- next )
         ] with-variable
     ] keep ;
 
-: local-recursive-call ( basic-block -- next )
+: emit-loop-call ( basic-block -- )
     ##branch
     basic-block get successors>> push
-    stop-iterating ;
+    basic-block off ;
 
-: emit-call ( word height -- next )
-    {
-        { [ over loops get key? ] [ drop loops get at local-recursive-call ] }
-        { [ terminate-call? ] [ ##call stop-iterating ] }
-        { [ tail-call? not ] [ ##call ##branch begin-basic-block iterate-next ] }
-        { [ dup current-label get eq? ] [ 2drop first-basic-block get local-recursive-call ] }
-        [ drop ##epilogue ##jump stop-iterating ]
-    } cond ;
+: emit-call ( word -- )
+    dup loops get key?
+    [ loops get at emit-loop-call ]
+    [ ##call ##branch begin-basic-block ]
+    if ;
 
 ! #recursive
-: recursive-height ( #recursive -- n )
-    [ label>> return>> in-d>> length ] [ in-d>> length ] bi - ;
-
-: emit-recursive ( #recursive -- next )
-    [ [ label>> id>> ] [ recursive-height ] bi emit-call ]
+: emit-recursive ( #recursive -- )
+    [ label>> id>> emit-call ]
     [ [ child>> ] [ label>> word>> ] [ label>> id>> ] tri (build-cfg) ] bi ;
 
 : remember-loop ( label -- )
     basic-block get swap loops get set-at ;
 
-: emit-loop ( node -- next )
+: emit-loop ( node -- )
     ##loop-entry
     ##branch
     begin-basic-block
-    [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi
-    iterate-next ;
+    [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi ;
 
 M: #recursive emit-node
     dup label>> loop?>> [ emit-loop ] [ emit-recursive ] if ;
@@ -121,7 +104,7 @@ M: #recursive emit-node
     ] with-scope ;
 
 : emit-if ( node -- )
-    children>>  [ emit-branch ] map
+    children>> [ emit-branch ] map
     end-basic-block
     begin-basic-block
     basic-block get '[ [ _ swap successors>> push ] when* ] each ;
@@ -157,23 +140,23 @@ M: #if emit-node
         { [ dup trivial-if? ] [ drop emit-trivial-if ] }
         { [ dup trivial-not-if? ] [ drop emit-trivial-not-if ] }
         [ ds-pop ##branch-t emit-if ]
-    } cond iterate-next ;
+    } cond ;
 
 ! #dispatch
 M: #dispatch emit-node
-    ds-pop ^^offset>slot i ##dispatch emit-if iterate-next ;
+    ds-pop ^^offset>slot i ##dispatch emit-if ;
 
 ! #call
 M: #call emit-node
     dup word>> dup "intrinsic" word-prop
-    [ emit-intrinsic ] [ swap call-height emit-call ] if ;
+    [ emit-intrinsic ] [ nip emit-call ] if ;
 
 ! #call-recursive
-M: #call-recursive emit-node [ label>> id>> ] [ call-height ] bi emit-call ;
+M: #call-recursive emit-node label>> id>> emit-call ;
 
 ! #push
 M: #push emit-node
-    literal>> ^^load-literal ds-push iterate-next ;
+    literal>> ^^load-literal ds-push ;
 
 ! #shuffle
 M: #shuffle emit-node
@@ -183,19 +166,18 @@ M: #shuffle emit-node
     [ [ in-r>> [ length rs-load ] keep ] dip '[ _ set-at ] 2each ]
     [ nip ] 2tri
     [ [ [ out-d>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map ds-store ]
-    [ [ [ out-r>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map rs-store ] 2bi
-    iterate-next ;
+    [ [ [ out-r>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map rs-store ] 2bi ;
 
 ! #return
 M: #return emit-node
-    drop ##epilogue ##return stop-iterating ;
+    drop ##epilogue ##return ;
 
 M: #return-recursive emit-node
     label>> id>> loops get key?
-    [ iterate-next ] [ ##epilogue ##return stop-iterating ] if ;
+    [ ##epilogue ##return ] unless ;
 
 ! #terminate
-M: #terminate emit-node drop stop-iterating ;
+M: #terminate emit-node drop ##no-tco basic-block off ;
 
 ! FFI
 : return-size ( ctype -- n )
@@ -215,9 +197,9 @@ M: #terminate emit-node drop stop-iterating ;
 : alien-stack-frame ( params -- )
     <alien-stack-frame> ##stack-frame ;
 
-: emit-alien-node ( node quot -- next )
+: emit-alien-node ( node quot -- )
     [ params>> ] dip [ drop alien-stack-frame ] [ call ] 2bi
-    ##branch begin-basic-block iterate-next ; inline
+    ##branch begin-basic-block ; inline
 
 M: #alien-invoke emit-node
     [ ##alien-invoke ] emit-alien-node ;
@@ -229,17 +211,16 @@ M: #alien-callback emit-node
     dup params>> xt>> dup
     [
         ##prologue
-        dup [ ##alien-callback ] emit-alien-node drop
+        dup [ ##alien-callback ] emit-alien-node
         ##epilogue
         params>> ##callback-return
-    ] with-cfg-builder
-    iterate-next ;
+    ] with-cfg-builder ;
 
 ! No-op nodes
-M: #introduce emit-node drop iterate-next ;
+M: #introduce emit-node drop ;
 
-M: #copy emit-node drop iterate-next ;
+M: #copy emit-node drop ;
 
-M: #enter-recursive emit-node drop iterate-next ;
+M: #enter-recursive emit-node drop ;
 
-M: #phi emit-node drop iterate-next ;
+M: #phi emit-node drop ;

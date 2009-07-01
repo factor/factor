@@ -53,9 +53,12 @@ INSN: ##inc-r { n integer } ;
 
 ! Subroutine calls
 INSN: ##stack-frame stack-frame ;
-INSN: ##call word { height integer } ;
+INSN: ##call word ;
 INSN: ##jump word ;
 INSN: ##return ;
+
+! Dummy instruction that simply inhibits TCO
+INSN: ##no-tco ;
 
 ! Jump tables
 INSN: ##dispatch src temp ;
@@ -247,3 +250,5 @@ INSN: _spill src class n ;
 INSN: _reload dst class n ;
 INSN: _copy dst src class ;
 INSN: _spill-counts counts ;
+
+SYMBOL: spill-temp

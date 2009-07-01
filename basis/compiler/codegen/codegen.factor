@@ -67,6 +67,8 @@ SYMBOL: labels
 : lookup-label ( id -- label )
     labels get [ drop <label> ] cache ;
 
+M: ##no-tco generate-insn drop ;
+
 M: ##load-immediate generate-insn
     [ dst>> register ] [ val>> ] bi %load-immediate ;
 
