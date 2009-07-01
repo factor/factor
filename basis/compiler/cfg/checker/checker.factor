@@ -19,7 +19,7 @@ ERROR: last-insn-not-a-jump insn ;
         [ ##fixnum-add-tail? ]
         [ ##fixnum-sub-tail? ]
         [ ##fixnum-mul-tail? ]
-        [ ##call? ]
+        [ ##no-tco? ]
     } 1|| [ drop ] [ last-insn-not-a-jump ] if ;
 
 ERROR: bad-loop-entry ;

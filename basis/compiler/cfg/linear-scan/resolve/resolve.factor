@@ -1,9 +1,10 @@
-! Copyright (C) 2009 Slava Pestov
+! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math namespaces sequences
-classes.tuple classes.parser parser fry words make arrays
-locals combinators compiler.cfg.linear-scan.live-intervals
-compiler.cfg.liveness compiler.cfg.instructions ;
+USING: accessors arrays assocs classes.parser classes.tuple
+combinators combinators.short-circuit fry hashtables kernel locals
+make math math.order namespaces sequences sets words parser
+compiler.cfg.instructions compiler.cfg.linear-scan.live-intervals
+compiler.cfg.liveness ;
 IN: compiler.cfg.linear-scan.resolve
 
 <<
@@ -67,27 +68,148 @@ M: memory->memory >insn
     [ from>> ] [ to>> ] bi = [ "Not allowed" throw ] unless ;
 
 M: register->memory >insn
-    [ from>> ] [ reg-class>> ] [ to>> ] tri _spill ;
+    [ from>> ] [ reg-class>> ] bi spill-temp _spill ;
 
 M: memory->register >insn
-    [ to>> ] [ reg-class>> ] [ from>> ] tri _reload ;
+    [ to>> ] [ reg-class>> ] bi spill-temp _reload ;
 
 M: register->register >insn
     [ to>> ] [ from>> ] [ reg-class>> ] tri _copy ;
 
+GENERIC: >collision-table ( operation -- )
+
+M: memory->memory >collision-table
+    [ from>> ] [ to>> ] bi = [ "Not allowed" throw ] unless ;
+
+M: register->memory >collision-table
+    [ from>> ] [ reg-class>> ] bi spill-temp _spill ;
+
+M: memory->register >collision-table
+    [ to>> ] [ reg-class>> ] bi spill-temp _reload ;
+
+M: register->register >collision-table
+    [ to>> ] [ from>> ] [ reg-class>> ] tri _copy ;
+
+SYMBOL: froms
+SYMBOL: tos
+
+SINGLETONS: memory register ;
+
+GENERIC: from-loc ( operation -- obj )
+M: memory->memory from-loc drop memory ;
+M: register->memory from-loc drop register ;
+M: memory->register from-loc drop memory ;
+M: register->register from-loc drop register ;
+
+GENERIC: to-loc ( operation -- obj )
+M: memory->memory to-loc drop memory ;
+M: register->memory to-loc drop memory ;
+M: memory->register to-loc drop register ;
+M: register->register to-loc drop register ;
+
+: from-reg ( operation -- seq )
+    [ from-loc ] [ from>> ] [ reg-class>> ] tri 3array ;
+
+: to-reg ( operation -- seq )
+    [ to-loc ] [ to>> ] [ reg-class>> ] tri 3array ;
+
+: start? ( operations -- pair )
+    from-reg tos get key? not ;
+
+: independent-assignment? ( operations -- pair )
+    to-reg froms get key? not ;
+
+: set-tos/froms ( operations -- )
+    [ [ [ from-reg ] keep ] H{ } map>assoc froms set ]
+    [ [ [ to-reg ] keep ] H{ } map>assoc tos set ]
+    bi ;
+
+:: (trace-chain) ( obj hashtable -- )
+    obj to-reg froms get at* [
+        dup ,
+        obj over hashtable clone [ maybe-set-at ] keep swap
+        [ (trace-chain) ] [ 2drop ] if
+    ] [
+        drop
+    ] if ;
+
+: trace-chain ( obj -- seq )
+    [
+        dup ,
+        dup dup associate (trace-chain)
+    ] { } make prune reverse ;
+
+
+: trace-chains ( seq -- seq' )
+    [ trace-chain ] map concat ;
+
+ERROR: resolve-error ;
+
+: split-cycle ( operations -- chain spilled-operation )
+    unclip [
+        [ set-tos/froms ]
+        [
+            [ start? ] find nip
+            [ resolve-error ] unless* trace-chain
+        ] bi
+    ] dip ;
+
+: break-cycle-n ( operations -- operations' )
+    split-cycle [
+        [ from>> spill-temp ]
+        [ reg-class>> ] bi \ register->memory boa
+    ] [
+        [ to>> spill-temp swap ]
+        [ reg-class>> ] bi \ memory->register boa
+    ] bi [ 1array ] bi@ surround ;
+
+: break-cycle ( operations -- operations' )
+    dup length {
+        { 1 [ ] }
+        [ drop break-cycle-n ]
+    } case ;
+
+: (group-cycles) ( seq -- )
+    [
+        dup set-tos/froms
+        unclip trace-chain
+        [ diff ] keep , (group-cycles)
+    ] unless-empty ;
+
+: group-cycles ( seq -- seqs )
+    [ (group-cycles) ] { } make ;
+
+: remove-dead-mappings ( seq -- seq' )
+    prune [ [ from-reg ] [ to-reg ] bi = not ] filter ;
+
+: parallel-mappings ( operations -- seq )
+    [
+        [ independent-assignment? not ] partition %
+        [ start? not ] partition
+        [ trace-chain ] map concat dup %
+        diff group-cycles [ break-cycle ] map concat %
+    ] { } make remove-dead-mappings ;
+
 : mapping-instructions ( mappings -- insns )
-    [ [ >insn ] each ] { } make ;
+    [
+        [ set-tos/froms ] [ parallel-mappings ] bi
+        [ [ >insn ] each ] { } make
+    ] with-scope ;
 
 : fork? ( from to -- ? )
-    [ successors>> length 1 >= ]
-    [ predecessors>> length 1 = ] bi* and ; inline
+    {
+        [ drop successors>> length 1 >= ]
+        [ nip predecessors>> length 1 = ]
+    } 2&& ; inline
 
 : insert-position/fork ( from to -- before after )
     nip instructions>> [ >array ] [ dup delete-all ] bi swap ;
 
 : join? ( from to -- ? )
-    [ successors>> length 1 = ]
-    [ predecessors>> length 1 >= ] bi* and ; inline
+    {
+        [ drop successors>> length 1 = ]
+        [ nip predecessors>> length 1 >= ]
+    } 2&& ; inline
 
 : insert-position/join ( from to -- before after )
     drop instructions>> dup pop 1array ;

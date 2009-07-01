@@ -18,10 +18,12 @@ compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.spilling
-compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.debugger ;
 
+FROM: compiler.cfg.linear-scan.assignment => check-assignment? ;
+
 check-allocation? on
+check-assignment? on
 
 [
     { T{ live-range f 1 10 } T{ live-range f 15 15 } }
@@ -1417,6 +1419,58 @@ USING: math.private ;
     relevant-ranges intersect-live-ranges
 ] unit-test
 
+! compute-free-pos had problems because it used map>assoc where the sequence
+! had multiple keys
+[ { 0 10 } ] [
+    H{ { int-regs { 0 1 } } } registers set
+    H{
+        { int-regs
+          {
+              T{ live-interval
+                 { vreg V int-regs 1 }
+                 { start 0 }
+                 { end 20 }
+                 { reg 0 }
+                 { ranges V{ T{ live-range f 0 2 } T{ live-range f 10 20 } } }
+                 { uses V{ 0 2 10 20 } }
+              }
+
+              T{ live-interval
+                 { vreg V int-regs 2 }
+                 { start 4 }
+                 { end 40 }
+                 { reg 0 }
+                 { ranges V{ T{ live-range f 4 6 } T{ live-range f 30 40 } } }
+                 { uses V{ 4 6 30 40 } }
+              }
+          }
+        }
+    } inactive-intervals set
+    H{
+        { int-regs
+          {
+              T{ live-interval
+                 { vreg V int-regs 3 }
+                 { start 0 }
+                 { end 40 }
+                 { reg 1 }
+                 { ranges V{ T{ live-range f 0 40 } } }
+                 { uses V{ 0 40 } }
+              }
+          }
+        }
+    } active-intervals set
+
+    T{ live-interval
+       { vreg V int-regs 4 }
+        { start 8 }
+        { end 10 }
+        { ranges V{ T{ live-range f 8 10 } } }
+        { uses V{ 8 10 } }
+    }
+    compute-free-pos
+] unit-test
+
 ! Bug in live spill slots calculation
 
 V{ T{ ##prologue } T{ ##branch } } 0 test-bb
@@ -1562,12 +1616,6 @@ V{
     T{ ##epilogue }
     T{ ##return }
 } 4 test-bb
-
-: test-diamond ( -- )
-    1 get 1vector 0 get (>>successors)
-    2 get 3 get V{ } 2sequence 1 get (>>successors)
-    4 get 1vector 2 get (>>successors)
-    4 get 1vector 3 get (>>successors) ;
 
 test-diamond
 
