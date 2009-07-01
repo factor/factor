@@ -3,8 +3,9 @@
 USING: kernel sequences accessors combinators namespaces
 compiler.cfg.tco
 compiler.cfg.predecessors
-compiler.cfg.useless-blocks
+compiler.cfg.useless-conditionals
 compiler.cfg.stack-analysis
+compiler.cfg.branch-splitting
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.dce
@@ -26,8 +27,9 @@ SYMBOL: check-optimizer?
     [
         optimize-tail-calls
         compute-predecessors
-        ! delete-useless-blocks
         delete-useless-conditionals
+        split-branches
+        compute-predecessors
         stack-analysis
         compute-liveness
         alias-analysis
