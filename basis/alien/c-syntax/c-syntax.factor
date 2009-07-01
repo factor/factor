@@ -45,7 +45,7 @@ PRIVATE>
 
 SYNTAX: C-LIBRARY: (C-LIBRARY:) ;
 
-SYNTAX: C++-LIBRARY: (C-LIBRARY:) t "library-is-c++" set ;
+SYNTAX: COMPILE-AS-C++ t "library-is-c++" set ;
 
 SYNTAX: C-LINK: (C-LINK:) ;
 
@@ -65,5 +65,3 @@ SYNTAX: C-FUNCTION:
     "c-library-vector" get push ;
 
 SYNTAX: ;C-LIBRARY (;C-LIBRARY) ;
-
-SYNTAX: ;C++-LIBRARY (;C-LIBRARY) ;
