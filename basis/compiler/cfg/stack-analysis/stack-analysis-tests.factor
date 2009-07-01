@@ -3,7 +3,7 @@ compiler.cfg.predecessors compiler.cfg.stack-analysis
 compiler.cfg.instructions sequences kernel tools.test accessors
 sequences.private alien math combinators.private compiler.cfg
 compiler.cfg.checker compiler.cfg.rpo
-compiler.cfg.dce compiler.cfg.registers compiler.cfg.useless-blocks
+compiler.cfg.dce compiler.cfg.registers
 sets namespaces arrays cpu.architecture ;
 IN: compiler.cfg.stack-analysis.tests
 
