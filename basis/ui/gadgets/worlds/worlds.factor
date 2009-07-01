@@ -89,13 +89,13 @@ SYMBOL: context-world
 
 : with-gl-context ( world quot -- )
     '[ set-gl-context @ ]
-    [ flush-gl-context gl-error ] bi ; inline
+    [ handle>> flush-gl-context gl-error ] bi ; inline
 
 ERROR: no-world-found ;
 
 : find-gl-context ( gadget -- )
     find-world dup
-    [ handle>> set-gl-context ] [ no-world-found ] if ;
+    [ set-gl-context ] [ no-world-found ] if ;
 
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [
@@ -164,8 +164,8 @@ M: world (>>dim)
     [ call-next-method ]
     [
         dup handle>>
-        [ set-gl-context resize-world ]
-        [ drop ] if*
+        [ [ set-gl-context ] [ resize-world ] bi ]
+        [ drop ] if
     ] bi ;
 
 GENERIC: draw-world* ( world -- )
@@ -199,7 +199,7 @@ ui-error-hook [ [ rethrow ] ] initialize
     dup draw-world? [
         dup world [
             [
-                dup handle>> [ draw-world* ] with-gl-context
+                dup [ draw-world* ] with-gl-context
                 flush-layout-cache-hook get call( -- )
             ] [
                 over <world-error> ui-error
