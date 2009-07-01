@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays vectors accessors
+USING: kernel arrays vectors accessors assocs sets
 namespaces math make fry sequences
 combinators.short-circuit
 compiler.cfg.instructions ;
@@ -28,8 +28,18 @@ M: basic-block hashcode* nip id>> ;
         [ first ##branch? ]
     } 1&& ;
 
+SYMBOL: visited
+
+: (skip-empty-blocks) ( bb -- bb' )
+    dup visited get key? [
+        dup empty-block? [
+            dup visited get conjoin
+            successors>> first (skip-empty-blocks)
+        ] when
+    ] unless ;
+
 : skip-empty-blocks ( bb -- bb' )
-    dup empty-block? [ successors>> first skip-empty-blocks ] when ;
+    H{ } clone visited [ (skip-empty-blocks) ] with-variable ;
 
 : add-instructions ( bb quot -- )
     [ instructions>> building ] dip '[
