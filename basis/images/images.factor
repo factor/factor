@@ -23,7 +23,7 @@ UNION: component-order
     INTENSITY DEPTH DEPTH-STENCIL R RG ;
 
 UNION: component-type
-    ubyte-components ushort-components
+    ubyte-components ushort-components uint-components
     half-components float-components
     byte-integer-components ubyte-integer-components
     short-integer-components ushort-integer-components
@@ -39,6 +39,16 @@ UNION: unnormalized-integer-components
     byte-integer-components ubyte-integer-components
     short-integer-components ushort-integer-components
     int-integer-components uint-integer-components ;
+
+UNION: signed-unnormalized-integer-components
+    byte-integer-components 
+    short-integer-components 
+    int-integer-components ;
+
+UNION: unsigned-unnormalized-integer-components
+    ubyte-integer-components
+    ushort-integer-components
+    uint-integer-components ;
 
 UNION: packed-components
     u-5-5-5-1-components u-5-6-5-components
@@ -109,12 +119,14 @@ GENERIC: load-image* ( path class -- image )
         { RG [ 2 ] }
     } case ;
 
-: bytes-per-pixel ( image -- n )
-    dup component-type>> packed-components?
-    [ component-type>> bytes-per-packed-pixel ] [
-        [ component-order>> component-count ]
-        [ component-type>>  bytes-per-component ] bi *
+: (bytes-per-pixel) ( component-order component-type -- n )
+    dup packed-components?
+    [ nip bytes-per-packed-pixel ] [
+        [ component-count ] [ bytes-per-component ] bi* *
     ] if ;
+
+: bytes-per-pixel ( image -- n )
+    [ component-order>> ] [ component-type>> ] bi (bytes-per-pixel) ;
 
 <PRIVATE
 
