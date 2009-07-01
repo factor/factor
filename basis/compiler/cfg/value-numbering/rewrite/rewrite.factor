@@ -1,12 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences layouts accessors combinators namespaces
-math fry
-compiler.cfg.hats
-compiler.cfg.instructions
+USING: accessors combinators combinators.short-circuit
+compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.simplify
-compiler.cfg.value-numbering.expressions ;
+compiler.cfg.value-numbering.simplify fry kernel layouts math
+namespaces sequences ;
 IN: compiler.cfg.value-numbering.rewrite
 
 GENERIC: rewrite ( insn -- insn' )
@@ -19,8 +18,10 @@ M: ##mul-imm rewrite
 
 : ##branch-t? ( insn -- ? )
     dup ##compare-imm-branch? [
-        [ cc>> cc/= eq? ]
-        [ src2>> \ f tag-number eq? ] bi and
+        {
+            [ cc>> cc/= eq? ]
+            [ src2>> \ f tag-number eq? ]
+        } 1&&
     ] [ drop f ] if ; inline
 
 : rewrite-boolean-comparison? ( insn -- ? )
@@ -47,9 +48,10 @@ M: ##mul-imm rewrite
 
 : rewrite-tagged-comparison? ( insn -- ? )
     #! Are we comparing two tagged fixnums? Then untag them.
-    [ src1>> vreg>expr tag-fixnum-expr? ]
-    [ src2>> tag-mask get bitand 0 = ]
-    bi and ; inline
+    {
+        [ src1>> vreg>expr tag-fixnum-expr? ]
+        [ src2>> tag-mask get bitand 0 = ]
+    } 1&& ; inline
 
 : (rewrite-tagged-comparison) ( insn -- src1 src2 cc )
     [ src1>> vreg>expr in1>> vn>vreg ]
@@ -89,10 +91,11 @@ M: ##compare rewrite
     ] when ;
 
 : rewrite-redundant-comparison? ( insn -- ? )
-    [ src1>> vreg>expr compare-expr? ]
-    [ src2>> \ f tag-number = ]
-    [ cc>> { cc= cc/= } memq? ]
-    tri and and ; inline
+    {
+        [ src1>> vreg>expr compare-expr? ]
+        [ src2>> \ f tag-number = ]
+        [ cc>> { cc= cc/= } memq? ]
+    } 1&& ; inline
 
 : rewrite-redundant-comparison ( insn -- insn' )
     [ cc>> ] [ dst>> ] [ src1>> vreg>expr dup op>> ] tri {
@@ -112,6 +115,22 @@ M: ##compare-imm rewrite
             rewrite-tagged-comparison
             dup number-values rewrite
         ] when
+    ] when ;
+
+: combine-add-imm? ( insn -- ? )
+    {
+        [ src1>> vreg>expr op>> \ ##add-imm = ]
+        [ src2>> number? ]
+    } 1&& ;
+
+: combine-add-imm ( dst src n -- insn )
+    [ vreg>expr [ in1>> vn>vreg ] [ in2>> vn>constant ] bi ] dip
+    + \ ##add-imm new-insn ;
+
+M: ##add-imm rewrite
+    dup combine-add-imm? [
+        [ dst>> ] [ src1>> ] [ src2>> ] tri combine-add-imm
+        dup number-values
     ] when ;
 
 M: insn rewrite ;
