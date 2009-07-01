@@ -1,6 +1,6 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals alien.c-types alien.syntax arrays kernel
+USING: locals alien.c-types alien.syntax arrays kernel fry
 math namespaces sequences system layouts io vocabs.loader
 accessors init combinators command-line cpu.x86.assembler
 cpu.x86 cpu.architecture make compiler compiler.units
@@ -97,13 +97,12 @@ M: float-regs store-return-reg
     align-stack incr-stack-reg ;
 
 : with-aligned-stack ( n quot -- )
-    [ [ align-sub ] [ call ] bi* ]
-    [ [ align-add ] [ drop ] bi* ] 2bi ; inline
+    '[ align-sub @ ] [ align-add ] bi ; inline
 
 M: x86.32 %prologue ( n -- )
     dup PUSH
     0 PUSH rc-absolute-cell rel-this
-    stack-reg swap 3 cells - SUB ;
+    3 cells - decr-stack-reg ;
 
 M: object %load-param-reg 3drop ;
 
