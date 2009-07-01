@@ -6,7 +6,6 @@ IN: compiler.cfg.useless-conditionals
 
 : delete-conditional? ( bb -- ? )
     {
-        [ instructions>> length 1 > ]
         [ instructions>> last class { ##compare-branch ##compare-imm-branch ##compare-float-branch } memq? ]
         [ successors>> first2 [ skip-empty-blocks ] bi@ eq? ]
     } 1&& ;
