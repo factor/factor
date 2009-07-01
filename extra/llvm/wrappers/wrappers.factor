@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Matthew Willis.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings
 io.encodings.utf8 destructors kernel
 llvm.core llvm.engine ;

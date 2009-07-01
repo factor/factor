@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Matthew Willis.
+! See http://factorcode.org/license.txt for BSD license.
 USING: destructors kernel llvm.wrappers sequences tools.test vocabs ;
 
 [ ] [ "test" <module> dispose ] unit-test

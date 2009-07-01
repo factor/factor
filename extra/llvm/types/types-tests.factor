@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Matthew Willis.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel llvm.types sequences tools.test ;
 
 [ T{ integer f 32 }  ] [ " i32 " parse-type ] unit-test
