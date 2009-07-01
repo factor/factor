@@ -20,7 +20,6 @@ SYMBOL: check-optimizer?
 
 : ?check ( nodes -- nodes' )
     check-optimizer? get [
-        compute-def-use
         dup check-nodes
     ] when ;
 

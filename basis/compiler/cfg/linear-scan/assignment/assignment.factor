@@ -50,8 +50,11 @@ ERROR: already-spilled ;
 : handle-spill ( live-interval -- )
     dup spill-to>> [ [ record-spill ] [ insert-spill ] bi ] [ drop ] if ;
 
+: first-split ( live-interval -- live-interval' )
+    dup split-before>> [ first-split ] [ ] ?if ;
+
 : next-interval ( live-interval -- live-interval' )
-    split-next>> dup split-before>> [ next-interval ] [ ] ?if ;
+    split-next>> first-split ;
 
 : insert-copy ( live-interval -- )
     {
