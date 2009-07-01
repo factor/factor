@@ -82,7 +82,7 @@ GENERIC: emit-node ( node -- )
 : recursive-height ( #recursive -- n )
     [ label>> return>> in-d>> length ] [ in-d>> length ] bi - ;
 
-: emit-recursive ( #recursive -- next )
+: emit-recursive ( #recursive -- )
     [ [ label>> id>> ] [ recursive-height ] bi emit-call ]
     [ [ child>> ] [ label>> word>> ] [ label>> id>> ] tri (build-cfg) ] bi ;
 
