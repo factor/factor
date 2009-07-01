@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences accessors layouts kernel math namespaces
 combinators fry locals
@@ -17,13 +17,14 @@ IN: compiler.cfg.intrinsics.fixnum
     0 cc= ^^compare-imm
     ds-push ;
 
-: (emit-fixnum-imm-op) ( infos insn -- dst )
-    ds-drop
-    [ ds-pop ]
-    [ second literal>> [ tag-fixnum ] [ \ f tag-number ] if* ]
-    [ ]
-    tri*
-    call ; inline
+: tag-literal ( n -- tagged )
+    literal>> [ tag-fixnum ] [ \ f tag-number ] if* ;
+
+: emit-fixnum-imm-op1 ( infos insn -- dst )
+    [ ds-pop ds-drop ] [ first tag-literal ] [ ] tri* call ; inline
+
+: emit-fixnum-imm-op2 ( infos insn -- dst )
+    [ ds-drop ds-pop ] [ second tag-literal ] [ ] tri* call ; inline
 
 : (emit-fixnum-op) ( insn -- dst )
     [ 2inputs ] dip call ; inline
@@ -31,9 +32,22 @@ IN: compiler.cfg.intrinsics.fixnum
 :: emit-fixnum-op ( node insn imm-insn -- )
     [let | infos [ node node-input-infos ] |
         infos second value-info-small-tagged?
-        [ infos imm-insn (emit-fixnum-imm-op) ]
-        [ insn (emit-fixnum-op) ]
-        if
+        [ infos imm-insn emit-fixnum-imm-op2 ]
+        [ insn (emit-fixnum-op) ] if
+        ds-push
+    ] ; inline
+
+:: emit-commutative-fixnum-op ( node insn imm-insn -- )
+    [let | infos [ node node-input-infos ] |
+        infos first value-info-small-tagged?
+        [ infos imm-insn emit-fixnum-imm-op1 ]
+        [
+            infos second value-info-small-tagged? [
+                infos imm-insn emit-fixnum-imm-op2
+            ] [
+                insn (emit-fixnum-op)
+            ] if
+        ] if
         ds-push
     ] ; inline
 
@@ -68,9 +82,14 @@ IN: compiler.cfg.intrinsics.fixnum
     [ (emit-fixnum*fast-imm) ] [ drop (emit-fixnum*fast) ] if
     ds-push ;
 
+: (emit-fixnum-comparison) ( cc -- quot1 quot2 )
+    [ ^^compare ] [ ^^compare-imm ] bi-curry ; inline
+
+: emit-eq ( node -- )
+    cc= (emit-fixnum-comparison) emit-commutative-fixnum-op ;
+
 : emit-fixnum-comparison ( node cc -- )
-    [  ^^compare ] [ ^^compare-imm ] bi-curry
-    emit-fixnum-op ;
+    (emit-fixnum-comparison) emit-fixnum-op ;
 
 : emit-bignum>fixnum ( -- )
     ds-pop ^^bignum>integer ^^tag-fixnum ds-push ;
