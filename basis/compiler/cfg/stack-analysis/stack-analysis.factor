@@ -59,17 +59,12 @@ UNION: sync-if-back-edge
     ##dispatch
     ##loop-entry ;
 
-SYMBOL: local-only?
-
-t local-only? set-global
-
 : back-edge? ( from to -- ? )
     [ number>> ] bi@ > ;
 
 : sync-state? ( -- ? )
     basic-block get successors>>
-    [ [ predecessors>> ] keep '[ _ back-edge? ] any? ] any?
-    local-only? get or ;
+    [ [ predecessors>> ] keep '[ _ back-edge? ] any? ] any? ;
 
 M: sync-if-back-edge visit
     sync-state? [ sync-state ] when , ;

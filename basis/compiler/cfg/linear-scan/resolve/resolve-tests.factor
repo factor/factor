@@ -68,12 +68,12 @@ T{ live-interval
 [
     {
         T{ _copy { dst 5 } { src 4 } { class int-regs } }
-        T{ _spill { src 0 } { class int-regs } { n 6 } }
-        T{ _copy { dst 0 } { src 1 } { class int-regs } }
-        T{ _reload { dst 1 } { class int-regs } { n 6 } }
-        T{ _spill { src 0 } { class float-regs } { n 7 } }
-        T{ _copy { dst 0 } { src 1 } { class float-regs } }
-        T{ _reload { dst 1 } { class float-regs } { n 7 } }
+        T{ _spill { src 1 } { class int-regs } { n spill-temp } }
+        T{ _copy { dst 1 } { src 0 } { class int-regs } }
+        T{ _reload { dst 0 } { class int-regs } { n spill-temp } }
+        T{ _spill { src 1 } { class float-regs } { n spill-temp } }
+        T{ _copy { dst 1 } { src 0 } { class float-regs } }
+        T{ _reload { dst 0 } { class float-regs } { n spill-temp } }
     }
 ] [
     {
@@ -87,10 +87,10 @@ T{ live-interval
 
 [
     {
-        T{ _spill { src 0 } { class int-regs } { n 3 } }
-        T{ _copy { dst 0 } { src 2 } { class int-regs } }
+        T{ _spill { src 2 } { class int-regs } { n spill-temp } }
         T{ _copy { dst 2 } { src 1 } { class int-regs } }
-        T{ _reload { dst 1 } { class int-regs } { n 3 } }
+        T{ _copy { dst 1 } { src 0 } { class int-regs } }
+        T{ _reload { dst 0 } { class int-regs } { n spill-temp } }
     }
 ] [
     {
@@ -102,10 +102,10 @@ T{ live-interval
 
 [
     {
-        T{ _spill { src 0 } { class int-regs } { n 3 } }
+        T{ _spill { src 0 } { class int-regs } { n spill-temp } }
         T{ _copy { dst 0 } { src 2 } { class int-regs } }
         T{ _copy { dst 2 } { src 1 } { class int-regs } }
-        T{ _reload { dst 1 } { class int-regs } { n 3 } }
+        T{ _reload { dst 1 } { class int-regs } { n spill-temp } }
     }
 ] [
     {
@@ -136,7 +136,7 @@ T{ live-interval
 ] unit-test
 
 [
-    { T{ _spill { src 4 } { class int-regs } { n 4 } } }
+    { T{ _spill { src 4 } { class int-regs } { n spill-temp } } }
 ] [
     {
        T{ register->memory { from 4 } { to 4 } { reg-class int-regs } }
@@ -162,10 +162,10 @@ T{ live-interval
     {
         T{ _copy { dst 1 } { src 0 } { class int-regs } }
         T{ _copy { dst 2 } { src 0 } { class int-regs } }
-        T{ _spill { src 3 } { class int-regs } { n 5 } }
+        T{ _spill { src 4 } { class int-regs } { n spill-temp } }
         T{ _copy { dst 4 } { src 0 } { class int-regs } }
-        T{ _copy { dst 3 } { src 4 } { class int-regs } }
-        T{ _reload { dst 0 } { class int-regs } { n 5 } }
+        T{ _copy { dst 0 } { src 3 } { class int-regs } }
+        T{ _reload { dst 3 } { class int-regs } { n spill-temp } }
     }
 ] [
     {
@@ -182,10 +182,10 @@ T{ live-interval
         T{ _copy { dst 2 } { src 0 } { class int-regs } }
         T{ _copy { dst 9 } { src 1 } { class int-regs } }
         T{ _copy { dst 1 } { src 0 } { class int-regs } }
-        T{ _spill { src 3 } { class int-regs } { n 10 } }
+        T{ _spill { src 4 } { class int-regs } { n spill-temp } }
         T{ _copy { dst 4 } { src 0 } { class int-regs } }
-        T{ _copy { dst 3 } { src 4 } { class int-regs } }
-        T{ _reload { dst 0 } { class int-regs } { n 10 } }
+        T{ _copy { dst 0 } { src 3 } { class int-regs } }
+        T{ _reload { dst 3 } { class int-regs } { n spill-temp } }
     }
 ] [
     {
