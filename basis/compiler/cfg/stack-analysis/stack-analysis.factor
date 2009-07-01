@@ -48,7 +48,8 @@ M: ##inc-r visit
 ! Instructions which don't have any effect on the stack
 UNION: neutral-insn
     ##effect
-    ##flushable ;
+    ##flushable
+    ##no-tco ;
 
 M: neutral-insn visit , ;
 
