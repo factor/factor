@@ -5,7 +5,6 @@ combinators fry locals
 compiler.tree.propagation.info
 compiler.cfg.hats
 compiler.cfg.stacks
-compiler.cfg.iterator
 compiler.cfg.instructions
 compiler.cfg.utilities
 compiler.cfg.registers ;
@@ -79,15 +78,6 @@ IN: compiler.cfg.intrinsics.fixnum
 : emit-fixnum>bignum ( -- )
     ds-pop ^^untag-fixnum ^^integer>bignum ds-push ;
 
-: emit-fixnum-overflow-op ( quot quot-tail -- next )
-    [ 2inputs 1 ##inc-d ] 2dip
-    tail-call? [
-        ##epilogue
-        nip call
-        stop-iterating
-    ] [
-        drop call
-        ##branch
-        begin-basic-block
-        iterate-next
-    ] if ; inline
+: emit-fixnum-overflow-op ( quot -- next )
+    [ 2inputs 1 ##inc-d ] dip call ##branch
+    begin-basic-block ; inline
