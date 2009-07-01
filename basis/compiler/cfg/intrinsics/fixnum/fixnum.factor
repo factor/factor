@@ -51,18 +51,27 @@ IN: compiler.cfg.intrinsics.fixnum
         ds-push
     ] ; inline
 
-: emit-fixnum-shift-fast ( node -- )
-    dup node-input-infos dup second value-info-small-fixnum? [
-        nip
-        [ ds-drop ds-pop ] dip
-        second literal>> dup sgn {
-            { -1 [ neg tag-bits get + ^^sar-imm ^^tag-fixnum ] }
-            {  0 [ drop ] }
-            {  1 [ ^^shl-imm ] }
-        } case
-        ds-push
-    ] [ drop emit-primitive ] if ;
+: (emit-fixnum-shift-fast) ( obj node -- obj )
+    literal>> dup sgn {
+        { -1 [ neg tag-bits get + ^^sar-imm ^^tag-fixnum ] }
+        {  0 [ drop ] }
+        {  1 [ ^^shl-imm ] }
+    } case ;
 
+: emit-fixnum-shift-fast ( node -- )
+    dup node-input-infos dup first value-info-small-fixnum? [
+        nip
+        [ ds-pop ds-drop ] dip first (emit-fixnum-shift-fast) ds-push
+    ] [
+        drop
+        dup node-input-infos dup second value-info-small-fixnum? [
+            nip
+            [ ds-drop ds-pop ] dip second (emit-fixnum-shift-fast) ds-push
+        ] [
+            drop emit-primitive
+        ] if
+    ] if ;
+    
 : emit-fixnum-bitnot ( -- )
     ds-pop ^^not tag-mask get ^^xor-imm ds-push ;
 
@@ -72,14 +81,21 @@ IN: compiler.cfg.intrinsics.fixnum
 : (emit-fixnum*fast) ( -- dst )
     2inputs ^^untag-fixnum ^^mul ;
 
-: (emit-fixnum*fast-imm) ( infos -- dst )
-    ds-drop
-    [ ds-pop ] [ second literal>> ] bi* ^^mul-imm ;
+: (emit-fixnum*fast-imm1) ( infos -- dst )
+    [ ds-pop ds-drop ] [ first literal>> ] bi* ^^mul-imm ;
+
+: (emit-fixnum*fast-imm2) ( infos -- dst )
+    [ ds-drop ds-pop ] [ second literal>> ] bi* ^^mul-imm ;
 
 : emit-fixnum*fast ( node -- )
     node-input-infos
-    dup second value-info-small-fixnum?
-    [ (emit-fixnum*fast-imm) ] [ drop (emit-fixnum*fast) ] if
+    dup first value-info-small-fixnum?
+    [
+        (emit-fixnum*fast-imm1)
+    ] [
+        dup second value-info-small-fixnum?
+        [ (emit-fixnum*fast-imm2) ] [ drop (emit-fixnum*fast) ] if
+    ] if
     ds-push ;
 
 : (emit-fixnum-comparison) ( cc -- quot1 quot2 )
