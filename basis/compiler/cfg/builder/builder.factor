@@ -72,18 +72,15 @@ GENERIC: emit-node ( node -- )
     basic-block get successors>> push
     basic-block off ;
 
-: emit-call ( word height -- )
-    over loops get key?
-    [ drop loops get at local-recursive-call ]
+: emit-call ( word -- )
+    dup loops get key?
+    [ loops get at local-recursive-call ]
     [ ##call ##branch begin-basic-block ]
     if ;
 
 ! #recursive
-: recursive-height ( #recursive -- n )
-    [ label>> return>> in-d>> length ] [ in-d>> length ] bi - ;
-
 : emit-recursive ( #recursive -- )
-    [ [ label>> id>> ] [ recursive-height ] bi emit-call ]
+    [ label>> id>> emit-call ]
     [ [ child>> ] [ label>> word>> ] [ label>> id>> ] tri (build-cfg) ] bi ;
 
 : remember-loop ( label -- )
@@ -152,10 +149,10 @@ M: #dispatch emit-node
 ! #call
 M: #call emit-node
     dup word>> dup "intrinsic" word-prop
-    [ emit-intrinsic ] [ swap call-height emit-call ] if ;
+    [ emit-intrinsic ] [ nip emit-call ] if ;
 
 ! #call-recursive
-M: #call-recursive emit-node [ label>> id>> ] [ call-height ] bi emit-call ;
+M: #call-recursive emit-node label>> id>> emit-call ;
 
 ! #push
 M: #push emit-node
@@ -180,7 +177,7 @@ M: #return-recursive emit-node
     [ ##epilogue ##return ] unless ;
 
 ! #terminate
-M: #terminate emit-node drop ;
+M: #terminate emit-node drop ##no-tco ;
 
 ! FFI
 : return-size ( ctype -- n )
