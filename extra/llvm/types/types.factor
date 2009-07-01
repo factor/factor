@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Matthew Willis.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators kernel llvm.core
 locals math.parser math multiline
 namespaces parser peg.ebnf sequences

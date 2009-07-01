@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Matthew Willis.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs compiler.units effects
 io.backend io.pathnames kernel llvm.core llvm.jit llvm.reader
 llvm.types make namespaces sequences specialized-arrays.alien
