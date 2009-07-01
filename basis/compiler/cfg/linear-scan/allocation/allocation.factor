@@ -25,7 +25,7 @@ IN: compiler.cfg.linear-scan.allocation
         _ add-use-position
     ] each ;
 
-: compute-free-pos ( new -- free-pos )
+: register-status ( new -- free-pos )
     dup free-positions
     [ inactive-positions ] [ active-positions ] [ nip ] 2tri
     >alist alist-max ;
@@ -45,7 +45,7 @@ IN: compiler.cfg.linear-scan.allocation
 
 : assign-register ( new -- )
     dup coalesce? [ coalesce ] [
-        dup compute-free-pos {
+        dup register-status {
             { [ dup no-free-registers? ] [ drop assign-blocked-register ] }
             { [ 2dup register-available? ] [ register-available ] }
             [ register-partially-available ]
