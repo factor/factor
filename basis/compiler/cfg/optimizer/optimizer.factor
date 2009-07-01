@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors combinators namespaces
+compiler.cfg.tco
 compiler.cfg.predecessors
 compiler.cfg.useless-blocks
 compiler.cfg.stack-analysis
@@ -23,6 +24,7 @@ SYMBOL: check-optimizer?
 
 : optimize-cfg ( cfg -- cfg' )
     [
+        optimize-tail-calls
         compute-predecessors
         ! delete-useless-blocks
         delete-useless-conditionals
