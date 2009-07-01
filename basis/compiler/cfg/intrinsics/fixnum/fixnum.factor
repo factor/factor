@@ -1,11 +1,10 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences accessors layouts kernel math namespaces
 combinators fry locals
 compiler.tree.propagation.info
 compiler.cfg.hats
 compiler.cfg.stacks
-compiler.cfg.iterator
 compiler.cfg.instructions
 compiler.cfg.utilities
 compiler.cfg.registers ;
@@ -102,8 +101,8 @@ IN: compiler.cfg.intrinsics.fixnum
 : (emit-fixnum-comparison) ( cc -- quot1 quot2 )
     [ ^^compare ] [ ^^compare-imm ] bi-curry ; inline
 
-: emit-eq ( node cc -- )
-    (emit-fixnum-comparison) emit-commutative-fixnum-op ;
+: emit-eq ( node -- )
+    cc= (emit-fixnum-comparison) emit-commutative-fixnum-op ;
 
 : emit-fixnum-comparison ( node cc -- )
     (emit-fixnum-comparison) emit-fixnum-op ;
@@ -114,15 +113,6 @@ IN: compiler.cfg.intrinsics.fixnum
 : emit-fixnum>bignum ( -- )
     ds-pop ^^untag-fixnum ^^integer>bignum ds-push ;
 
-: emit-fixnum-overflow-op ( quot quot-tail -- next )
-    [ 2inputs 1 ##inc-d ] 2dip
-    tail-call? [
-        ##epilogue
-        nip call
-        stop-iterating
-    ] [
-        drop call
-        ##branch
-        begin-basic-block
-        iterate-next
-    ] if ; inline
+: emit-fixnum-overflow-op ( quot -- next )
+    [ 2inputs 1 ##inc-d ] dip call ##branch
+    begin-basic-block ; inline
