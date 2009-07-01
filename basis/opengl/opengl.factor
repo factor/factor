@@ -154,7 +154,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
 
 :: with-vertex-array ( id quot -- )
     id glBindVertexArray
-    quot [ binding 0 glBindVertexArray ] [ ] cleanup ; inline
+    quot [ 0 glBindVertexArray ] [ ] cleanup ; inline
 
 : <gl-buffer> ( target data hint -- id )
     pick gen-gl-buffer [
