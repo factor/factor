@@ -104,8 +104,19 @@ GENERIC: assign-registers-in-insn ( insn -- )
 : all-vregs ( insn -- vregs )
     [ defs-vregs ] [ temp-vregs ] [ uses-vregs ] tri 3append ;
 
+SYMBOL: check-assignment?
+
+ERROR: overlapping-registers intervals ;
+
+: check-assignment ( intervals -- )
+    dup [ copy-from>> ] map sift '[ vreg>> _ member? not ] filter
+    dup [ reg>> ] map all-unique? [ drop ] [ overlapping-registers ] if ;
+
 : active-intervals ( insn -- intervals )
-    insn#>> pending-intervals get [ covers? ] with filter ;
+    insn#>> pending-intervals get [ covers? ] with filter
+    check-assignment? get [
+        dup check-assignment
+    ] when ;
 
 M: vreg-insn assign-registers-in-insn
     dup [ active-intervals ] [ all-vregs ] bi
