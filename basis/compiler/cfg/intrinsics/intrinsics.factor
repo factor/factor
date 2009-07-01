@@ -103,11 +103,11 @@ IN: compiler.cfg.intrinsics
         { \ math.private:fixnum+ [ drop [ ##fixnum-add ] [ ##fixnum-add-tail ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum- [ drop [ ##fixnum-sub ] [ ##fixnum-sub-tail ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum* [ drop [ i i ##fixnum-mul ] [ i i ##fixnum-mul-tail ] emit-fixnum-overflow-op ] }
-        { \ math.private:fixnum+fast [ [ ^^add ] [ ^^add-imm ] emit-fixnum-op iterate-next ] }
+        { \ math.private:fixnum+fast [ [ ^^add ] [ ^^add-imm ] emit-commutative-fixnum-op iterate-next ] }
         { \ math.private:fixnum-fast [ [ ^^sub ] [ ^^sub-imm ] emit-fixnum-op iterate-next ] }
-        { \ math.private:fixnum-bitand [ [ ^^and ] [ ^^and-imm ] emit-fixnum-op iterate-next ] }
-        { \ math.private:fixnum-bitor [ [ ^^or ] [ ^^or-imm ] emit-fixnum-op iterate-next ] }
-        { \ math.private:fixnum-bitxor [ [ ^^xor ] [ ^^xor-imm ] emit-fixnum-op iterate-next ] }
+        { \ math.private:fixnum-bitand [ [ ^^and ] [ ^^and-imm ] emit-commutative-fixnum-op iterate-next ] }
+        { \ math.private:fixnum-bitor [ [ ^^or ] [ ^^or-imm ] emit-commutative-fixnum-op iterate-next ] }
+        { \ math.private:fixnum-bitxor [ [ ^^xor ] [ ^^xor-imm ] emit-commutative-fixnum-op iterate-next ] }
         { \ math.private:fixnum-shift-fast [ emit-fixnum-shift-fast iterate-next ] }
         { \ math.private:fixnum-bitnot [ drop emit-fixnum-bitnot iterate-next ] }
         { \ math.integers.private:fixnum-log2 [ drop emit-fixnum-log2 iterate-next ] }
@@ -116,7 +116,7 @@ IN: compiler.cfg.intrinsics
         { \ math.private:fixnum<= [ cc<= emit-fixnum-comparison iterate-next ] }
         { \ math.private:fixnum>= [ cc>= emit-fixnum-comparison iterate-next ] }
         { \ math.private:fixnum> [ cc> emit-fixnum-comparison iterate-next ] }
-        { \ kernel:eq? [ cc= emit-fixnum-comparison iterate-next ] }
+        { \ kernel:eq? [ cc= emit-eq iterate-next ] }
         { \ math.private:bignum>fixnum [ drop emit-bignum>fixnum iterate-next ] }
         { \ math.private:fixnum>bignum [ drop emit-fixnum>bignum iterate-next ] }
         { \ math.private:float+ [ drop [ ^^add-float ] emit-float-op iterate-next ] }
