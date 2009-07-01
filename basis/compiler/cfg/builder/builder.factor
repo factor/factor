@@ -67,14 +67,14 @@ GENERIC: emit-node ( node -- )
         ] with-variable
     ] keep ;
 
-: local-recursive-call ( basic-block -- )
+: emit-loop-call ( basic-block -- )
     ##branch
     basic-block get successors>> push
     basic-block off ;
 
 : emit-call ( word -- )
     dup loops get key?
-    [ loops get at local-recursive-call ]
+    [ loops get at emit-loop-call ]
     [ ##call ##branch begin-basic-block ]
     if ;
 
@@ -177,7 +177,7 @@ M: #return-recursive emit-node
     [ ##epilogue ##return ] unless ;
 
 ! #terminate
-M: #terminate emit-node drop ##no-tco ;
+M: #terminate emit-node drop ##no-tco basic-block off ;
 
 ! FFI
 : return-size ( ctype -- n )
