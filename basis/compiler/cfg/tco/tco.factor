@@ -4,6 +4,7 @@ USING: accessors combinators.short-circuit kernel math
 namespaces sequences fry combinators
 compiler.cfg
 compiler.cfg.rpo
+compiler.cfg.hats
 compiler.cfg.instructions ;
 IN: compiler.cfg.tco
 
@@ -59,7 +60,7 @@ GENERIC: convert-fixnum-tail-call* ( src1 src2 insn -- insn' )
 
 M: ##fixnum-add convert-fixnum-tail-call* drop \ ##fixnum-add-tail new-insn ;
 M: ##fixnum-sub convert-fixnum-tail-call* drop \ ##fixnum-sub-tail new-insn ;
-M: ##fixnum-mul convert-fixnum-tail-call* drop \ ##fixnum-mul-tail new-insn ;
+M: ##fixnum-mul convert-fixnum-tail-call* drop i i \ ##fixnum-mul-tail new-insn ;
 
 : convert-fixnum-tail-call ( bb -- )
     [
