@@ -158,6 +158,31 @@ check-assignment? on
 
 [
     T{ live-interval
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 0 }
+       { end 0 }
+       { uses V{ 0 } }
+       { ranges V{ T{ live-range f 0 0 } } }
+    }
+    T{ live-interval
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 20 }
+       { end 30 }
+       { uses V{ 20 30 } }
+       { ranges V{ T{ live-range f 20 30 } } }
+    }
+] [
+    T{ live-interval
+       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { start 0 }
+       { end 30 }
+       { uses V{ 0 20 30 } }
+       { ranges V{ T{ live-range f 0 8 } T{ live-range f 10 18 } T{ live-range f 20 30 } } }
+    } 10 split-for-spill [ f >>split-next ] bi@
+] unit-test
+
+[
+    T{ live-interval
         { vreg T{ vreg { reg-class int-regs } { n 1 } } }
         { start 0 }
         { end 4 }
@@ -1419,7 +1444,7 @@ USING: math.private ;
     relevant-ranges intersect-live-ranges
 ] unit-test
 
-! compute-free-pos had problems because it used map>assoc where the sequence
+! register-status had problems because it used map>assoc where the sequence
 ! had multiple keys
 [ { 0 10 } ] [
     H{ { int-regs { 0 1 } } } registers set
@@ -1468,7 +1493,7 @@ USING: math.private ;
         { ranges V{ T{ live-range f 8 10 } } }
         { uses V{ 8 10 } }
     }
-    compute-free-pos
+    register-status
 ] unit-test
 
 ! Bug in live spill slots calculation
@@ -1531,18 +1556,16 @@ V{
 SYMBOL: linear-scan-result
 
 :: test-linear-scan-on-cfg ( regs -- )
-    [ ] [
-        cfg new 0 get >>entry
-        compute-predecessors
-        compute-liveness
-        dup reverse-post-order
-        { { int-regs regs } } (linear-scan)
-        flatten-cfg 1array mr.
-    ] unit-test ;
+    cfg new 0 get >>entry
+    compute-predecessors
+    compute-liveness
+    dup reverse-post-order
+    { { int-regs regs } } (linear-scan)
+    flatten-cfg 1array mr. ;
 
 ! This test has a critical edge -- do we care about these?
 
-! { 1 2 } test-linear-scan-on-cfg
+! [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
 ! Bug in inactive interval handling
 ! [ rot dup [ -rot ] when ]
@@ -1619,7 +1642,7 @@ V{
 
 test-diamond
 
-{ 1 2 3 4 } test-linear-scan-on-cfg
+[ ] [ { 1 2 3 4 } test-linear-scan-on-cfg ] unit-test
 
 ! Similar to the above
 ! [ swap dup [ rot ] when ]
@@ -1705,7 +1728,7 @@ V{
 
 test-diamond
 
-{ 1 2 3 4 } test-linear-scan-on-cfg
+[ ] [ { 1 2 3 4 } test-linear-scan-on-cfg ] unit-test
 
 ! compute-live-registers was inaccurate since it didn't take
 ! lifetime holes into account
@@ -1758,7 +1781,7 @@ V{
 
 test-diamond
 
-{ 1 2 3 4 } test-linear-scan-on-cfg
+[ ] [ { 1 2 3 4 } test-linear-scan-on-cfg ] unit-test
 
 ! Inactive interval handling: splitting active interval
 ! if it fits in lifetime hole only partially
@@ -1791,7 +1814,7 @@ V{
 
 test-diamond
 
-{ 1 2 } test-linear-scan-on-cfg
+[ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
 USING: classes ;
 
@@ -1830,7 +1853,7 @@ V{
 
 test-diamond
 
-{ 1 2 } test-linear-scan-on-cfg
+[ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
 [ _spill ] [ 2 get instructions>> first class ] unit-test
 

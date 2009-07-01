@@ -128,11 +128,11 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : (gen-gl-object) ( quot -- id )
     [ 1 0 <uint> ] dip keep *uint ; inline
 
-: gen-gl-buffer ( -- id )
-    [ glGenBuffers ] (gen-gl-object) ;
-
 : (delete-gl-object) ( id quot -- )
     [ 1 swap <uint> ] dip call ; inline
+
+: gen-gl-buffer ( -- id )
+    [ glGenBuffers ] (gen-gl-object) ;
 
 : delete-gl-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
@@ -145,6 +145,16 @@ MACRO: all-enabled-client-state ( seq quot -- )
     [ GL_ELEMENT_ARRAY_BUFFER ] 2dip '[
         GL_ARRAY_BUFFER swap _ with-gl-buffer
     ] with-gl-buffer ; inline
+
+: gen-vertex-array ( -- id )
+    [ glGenVertexArrays ] (gen-gl-object) ;
+
+: delete-vertex-array ( id -- )
+    [ glDeleteVertexArrays ] (delete-gl-object) ;
+
+:: with-vertex-array ( id quot -- )
+    id glBindVertexArray
+    quot [ 0 glBindVertexArray ] [ ] cleanup ; inline
 
 : <gl-buffer> ( target data hint -- id )
     pick gen-gl-buffer [

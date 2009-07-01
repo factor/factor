@@ -40,11 +40,11 @@ T{ live-interval
 }
 
 [ f ] [
-    0 get test-live-interval-1 spill-to
+    test-live-interval-1 0 get spill-to
 ] unit-test
 
 [ 0 ] [
-    1 get test-live-interval-1 spill-to
+    test-live-interval-1 1 get spill-to
 ] unit-test
 
 CONSTANT: test-live-interval-2
@@ -58,11 +58,11 @@ T{ live-interval
 }
 
 [ 0 ] [
-    0 get test-live-interval-2 reload-from
+    test-live-interval-2 0 get reload-from
 ] unit-test
 
 [ f ] [
-    1 get test-live-interval-2 reload-from
+    test-live-interval-2 1 get reload-from
 ] unit-test
 
 [
@@ -136,10 +136,14 @@ T{ live-interval
 ] unit-test
 
 [
-    { T{ _spill { src 4 } { class int-regs } { n spill-temp } } }
+    {
+        T{ _spill { src 3 } { class int-regs } { n 4 } }
+        T{ _reload { dst 2 } { class int-regs } { n 1 } } 
+    }
 ] [
     {
-       T{ register->memory { from 4 } { to 4 } { reg-class int-regs } }
+       T{ register->memory { from 3 } { to 4 } { reg-class int-regs } }
+       T{ memory->register { from 1 } { to 2 } { reg-class int-regs } }
     } mapping-instructions
 ] unit-test
 

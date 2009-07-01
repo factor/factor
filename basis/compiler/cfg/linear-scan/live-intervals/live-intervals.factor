@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math math.order fry
-binary-search combinators compiler.cfg.instructions compiler.cfg.registers
+combinators compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.def-use compiler.cfg.liveness compiler.cfg ;
 IN: compiler.cfg.linear-scan.live-intervals
 
