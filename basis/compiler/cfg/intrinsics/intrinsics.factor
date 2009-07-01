@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel combinators cpu.architecture
 compiler.cfg.hats
@@ -102,11 +102,11 @@ IN: compiler.cfg.intrinsics
         { \ math.private:fixnum+ [ drop [ ##fixnum-add ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum- [ drop [ ##fixnum-sub ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum* [ drop [ i i ##fixnum-mul ] emit-fixnum-overflow-op ] }
-        { \ math.private:fixnum+fast [ [ ^^add ] [ ^^add-imm ] emit-fixnum-op ] }
+        { \ math.private:fixnum+fast [ [ ^^add ] [ ^^add-imm ] emit-commutative-fixnum-op ] }
         { \ math.private:fixnum-fast [ [ ^^sub ] [ ^^sub-imm ] emit-fixnum-op ] }
-        { \ math.private:fixnum-bitand [ [ ^^and ] [ ^^and-imm ] emit-fixnum-op ] }
-        { \ math.private:fixnum-bitor [ [ ^^or ] [ ^^or-imm ] emit-fixnum-op ] }
-        { \ math.private:fixnum-bitxor [ [ ^^xor ] [ ^^xor-imm ] emit-fixnum-op ] }
+        { \ math.private:fixnum-bitand [ [ ^^and ] [ ^^and-imm ] emit-commutative-fixnum-op ] }
+        { \ math.private:fixnum-bitor [ [ ^^or ] [ ^^or-imm ] emit-commutative-fixnum-op ] }
+        { \ math.private:fixnum-bitxor [ [ ^^xor ] [ ^^xor-imm ] emit-commutative-fixnum-op ] }
         { \ math.private:fixnum-shift-fast [ emit-fixnum-shift-fast ] }
         { \ math.private:fixnum-bitnot [ drop emit-fixnum-bitnot ] }
         { \ math.integers.private:fixnum-log2 [ drop emit-fixnum-log2 ] }
@@ -115,7 +115,7 @@ IN: compiler.cfg.intrinsics
         { \ math.private:fixnum<= [ cc<= emit-fixnum-comparison ] }
         { \ math.private:fixnum>= [ cc>= emit-fixnum-comparison ] }
         { \ math.private:fixnum> [ cc> emit-fixnum-comparison ] }
-        { \ kernel:eq? [ cc= emit-fixnum-comparison ] }
+        { \ kernel:eq? [ emit-eq ] }
         { \ math.private:bignum>fixnum [ drop emit-bignum>fixnum ] }
         { \ math.private:fixnum>bignum [ drop emit-fixnum>bignum ] }
         { \ math.private:float+ [ drop [ ^^add-float ] emit-float-op ] }
