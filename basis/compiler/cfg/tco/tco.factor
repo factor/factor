@@ -11,6 +11,7 @@ IN: compiler.cfg.tco
 ! Tail call optimization. You must run compute-predecessors after this
 
 : return? ( bb -- ? )
+    skip-empty-blocks
     instructions>> {
         [ length 2 = ]
         [ first ##epilogue? ]
