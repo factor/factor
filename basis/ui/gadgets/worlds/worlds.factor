@@ -34,7 +34,8 @@ TUPLE: world < track
     text-handle handle images
     window-loc
     pixel-format-attributes
-    window-controls ;
+    window-controls
+    window-resources ;
 
 TUPLE: world-attributes
     { world-class initial: world }
@@ -77,11 +78,24 @@ TUPLE: world-attributes
         '[ f _ [ (>>status-owner) ] [ status>> set-model ] 2bi ] when
     ] [ 2drop ] if ;
 
+SYMBOL: context-world
+
+: window-resource ( resource -- resource )
+    dup context-world get-global window-resources>> push ;
+
+: set-gl-context ( world -- )
+    [ context-world set-global ]
+    [ handle>> select-gl-context ] bi ;
+
+: with-gl-context ( world quot -- )
+    '[ set-gl-context @ ]
+    [ flush-gl-context gl-error ] bi ; inline
+
 ERROR: no-world-found ;
 
 : find-gl-context ( gadget -- )
     find-world dup
-    [ handle>> select-gl-context ] [ no-world-found ] if ;
+    [ handle>> set-gl-context ] [ no-world-found ] if ;
 
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [
@@ -98,7 +112,8 @@ M: world request-focus-on ( child gadget -- )
         t >>root?
         f >>active?
         { 0 0 } >>window-loc
-        f >>grab-input? ;
+        f >>grab-input?
+        V{ } clone >>window-resources ;
 
 : apply-world-attributes ( world attributes -- world )
     {
@@ -149,7 +164,7 @@ M: world (>>dim)
     [ call-next-method ]
     [
         dup handle>>
-        [ select-gl-context resize-world ]
+        [ set-gl-context resize-world ]
         [ drop ] if*
     ] bi ;
 

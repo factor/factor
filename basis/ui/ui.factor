@@ -61,7 +61,7 @@ SYMBOL: windows
 
 : set-up-window ( world -- )
     {
-        [ handle>> select-gl-context ]
+        [ handle>> set-gl-context ]
         [ [ title>> ] keep set-title ]
         [ begin-world ]
         [ resize-world ]
@@ -89,12 +89,13 @@ M: world graft*
 
 : (ungraft-world) ( world -- )
     {
-        [ handle>> select-gl-context ]
+        [ handle>> set-gl-context ]
         [ text-handle>> [ dispose ] when* ]
         [ images>> [ dispose ] when* ]
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
         [ end-world ]
+        [ [ [ [ dispose ] when* ] each V{ } clone ] change-window-resources ]
     } cleave ;
 
 M: world ungraft*
