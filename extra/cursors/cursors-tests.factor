@@ -37,3 +37,8 @@ IN: cursors.tests
 
 [ { 111 222 } ]
 [ { 1 2 } { 10 20 } { 100 200 } [ + + ] 3map ] unit-test
+
+: test-3map ( -- seq )
+     { 1 2 } { 10 20 } { 100 200 } [ + + ] 3map ;
+
+[ { 111 222 } ] [ test-3map ] unit-test
