@@ -1,6 +1,6 @@
 USING: accessors alien.compile alien.libraries alien.parser
-arrays fry generalizations io.files.info io.files.temp kernel
-lexer math.order multiline namespaces sequences system
+arrays fry generalizations io.files io.files.info io.files.temp
+kernel lexer math.order multiline namespaces sequences system
 vocabs.loader vocabs.parser words ;
 IN: alien.c-syntax
 
@@ -18,10 +18,17 @@ IN: alien.c-syntax
 
 : return-library-function-params ( -- return library function params )
     scan "c-library" get scan ")" parse-tokens
-    [ "(" subseq? not ] filter ;
+    [ "(" subseq? not ] filter [
+        [ dup CHAR: - = [ drop CHAR: space ] when ] map
+    ] 3dip ;
+
+: factor-function ( return library functions params -- )
+    [ dup "const " head? [ 6 tail ] when ] 3dip
+    make-function define-declared ;
 
 : (C-FUNCTION:) ( return library function params -- str )
-    [ nip ] dip " " join "(" prepend ")" append 3array " " join
+    [ nip ] dip
+    " " join "(" prepend ")" append 3array " " join
     "library-is-c++" get [ "extern \"C\" " prepend ] when ;
 
 : library-path ( -- str )
@@ -29,11 +36,13 @@ IN: alien.c-syntax
     3array concat temp-file ;
 
 : compile-library? ( -- ? )
-    library-path current-vocab vocab-source-path
-    [ file-info modified>> ] bi@ <=> +lt+ = ;
+    library-path dup exists? [
+        current-vocab vocab-source-path
+        [ file-info modified>> ] bi@ <=> +lt+ =
+    ] [ drop t ] if ;
 
 : compile-library ( -- )
-    "library-is-c++" get [ "g++" ] [ "gcc" ] if
+    "library-is-c++" get [ "C++" ] [ "C" ] if
     "c-compiler-args" get
     "c-library-vector" get "\n" join
     "c-library" get compile-to-library ;
@@ -52,14 +61,14 @@ SYNTAX: C-LINK: (C-LINK:) ;
 SYNTAX: C-FRAMEWORK: (C-FRAMEWORK:) ;
 
 SYNTAX: C-LINK/FRAMEWORK:
-    os macosx? [ (C-LINK:) ] [ (C-FRAMEWORK:) ] if ;
+    os macosx? [ (C-FRAMEWORK:) ] [ (C-LINK:) ] if ;
 
 SYNTAX: C-INCLUDE:
     "#include " scan append "c-library-vector" get push ;
 
 SYNTAX: C-FUNCTION:
     return-library-function-params
-    [ make-function define-declared ]
+    [ factor-function ]
     4 nkeep (C-FUNCTION:)
     " {\n" append parse-here append "\n}\n" append
     "c-library-vector" get push ;
