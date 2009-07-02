@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel compiler.cfg.instructions ;
+USING: accessors arrays kernel assocs compiler.cfg.instructions ;
 IN: compiler.cfg.def-use
 
 GENERIC: defs-vregs ( insn -- seq )
@@ -43,7 +43,7 @@ M: ##dispatch uses-vregs src>> 1array ;
 M: ##alien-getter uses-vregs src>> 1array ;
 M: ##alien-setter uses-vregs [ src>> ] [ value>> ] bi 2array ;
 M: ##fixnum-overflow uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
-M: ##phi uses-vregs inputs>> ;
+M: ##phi uses-vregs inputs>> values ;
 M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: _dispatch uses-vregs src>> 1array ;

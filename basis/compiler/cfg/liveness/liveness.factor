@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces deques accessors sets sequences assocs fry
-dlists compiler.cfg.def-use compiler.cfg.instructions
+hashtables dlists compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.rpo ;
 IN: compiler.cfg.liveness
 
@@ -16,9 +16,7 @@ SYMBOL: live-ins
 ! is in conrrespondence with a predecessor
 SYMBOL: phi-live-ins
 
-: phi-live-in ( predecessor basic-block -- set )
-    [ predecessors>> index ] keep phi-live-ins get at
-    dup [ nth ] [ 2drop f ] if ;
+: phi-live-in ( predecessor basic-block -- set ) phi-live-ins get at at ;
 
 ! Assoc mapping basic blocks to sets of vregs
 SYMBOL: live-outs
@@ -45,9 +43,15 @@ SYMBOL: work-list
     [ nip kill-set ]
     2bi assoc-diff ;
 
+: conjoin-at ( value key assoc -- )
+    [ dupd ?set-at ] change-at ;
+
 : compute-phi-live-in ( basic-block -- phi-live-in )
-    instructions>> [ ##phi? ] filter
-    [ f ] [ [ inputs>> ] map flip [ unique ] map ] if-empty ;
+    instructions>> [ ##phi? ] filter [ f ] [
+        H{ } clone [
+            '[ inputs>> [ swap _ conjoin-at ] assoc-each ] each
+        ] keep
+    ] if-empty ;
 
 : update-live-in ( basic-block -- changed? )
     [ [ compute-live-in ] keep live-ins get maybe-set-at ]
