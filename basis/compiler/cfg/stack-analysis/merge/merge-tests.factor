@@ -17,7 +17,7 @@ sequences kernel classes ;
     <state> H{ { D 0 V int-regs 0 } } >>locs>vregs
     <state> H{ { D 0 V int-regs 1 } } >>locs>vregs 2array
 
-    [ merge-locs locs>vregs>> keys ] { } make first inputs>>
+    [ merge-locs locs>vregs>> keys ] { } make first inputs>> values
 ] unit-test
 
 [
