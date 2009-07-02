@@ -5,16 +5,12 @@ compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.simplify fry kernel layouts math
-namespaces sequences ;
+namespaces sequences cpu.architecture math.bitwise locals ;
 IN: compiler.cfg.value-numbering.rewrite
 
 GENERIC: rewrite ( insn -- insn' )
 
-M: ##mul-imm rewrite
-    dup src2>> dup power-of-2? [
-        [ [ dst>> ] [ src1>> ] bi ] [ log2 ] bi* \ ##shl-imm new-insn
-        dup number-values
-    ] [ drop ] if ;
+M: insn rewrite ;
 
 : ##branch-t? ( insn -- ? )
     dup ##compare-imm-branch? [
@@ -80,7 +76,7 @@ M: ##compare-imm-branch rewrite
 : flip-comparison ( insn -- insn' )
     [ dst>> ]
     [ src2>> ]
-    [ src1>> vreg>vn vn>constant ] tri
+    [ src1>> vreg>constant ] tri
     cc= i \ ##compare-imm new-insn ;
 
 M: ##compare rewrite
@@ -117,20 +113,66 @@ M: ##compare-imm rewrite
         ] when
     ] when ;
 
-: combine-add-imm? ( insn -- ? )
-    {
-        [ src1>> vreg>expr op>> \ ##add-imm = ]
-        [ src2>> number? ]
-    } 1&& ;
+: combine-imm? ( insn op -- ? )
+    [ src1>> vreg>expr op>> ] dip = ;
 
-: combine-add-imm ( dst src n -- insn )
-    [ vreg>expr [ in1>> vn>vreg ] [ in2>> vn>constant ] bi ] dip
-    + \ ##add-imm new-insn ;
+:: combine-imm ( insn quot op -- insn )
+    insn
+    [ dst>> ]
+    [ src1>> vreg>expr [ in1>> vn>vreg ] [ in2>> vn>constant ] bi ]
+    [ src2>> ] tri
+
+    quot call cell-bits bits
+
+    dup small-enough? [
+        op new-insn dup number-values
+    ] [
+        3drop insn
+    ] if ; inline
 
 M: ##add-imm rewrite
-    dup combine-add-imm? [
-        [ dst>> ] [ src1>> ] [ src2>> ] tri combine-add-imm
+    {
+        { [ dup \ ##add-imm combine-imm? ]
+            [ [ + ] \ ##add-imm combine-imm ] }
+        { [ dup \ ##sub-imm combine-imm? ]
+            [ [ - ] \ ##sub-imm combine-imm ] }
+        [ ]
+    } cond ;
+
+M: ##sub-imm rewrite
+    {
+        { [ dup \ ##add-imm combine-imm? ]
+            [ [ - ] \ ##add-imm combine-imm ] }
+        { [ dup \ ##sub-imm combine-imm? ]
+            [ [ + ] \ ##sub-imm combine-imm ] }
+        [ ]
+    } cond ;
+
+M: ##mul-imm rewrite
+    dup src2>> dup power-of-2? [
+        [ [ dst>> ] [ src1>> ] bi ] [ log2 ] bi* \ ##shl-imm new-insn
+        dup number-values
+    ] [
+        drop dup \ ##mul-imm combine-imm?
+        [ [ * ] \ ##mul-imm combine-imm ] when
+    ] if ;
+
+M: ##and-imm rewrite
+    dup \ ##and-imm combine-imm?
+    [ [ bitand ] \ ##and-imm combine-imm ] when ;
+
+M: ##or-imm rewrite
+    dup \ ##or-imm combine-imm?
+    [ [ bitor ] \ ##or-imm combine-imm ] when ;
+
+M: ##xor-imm rewrite
+    dup \ ##xor-imm combine-imm?
+    [ [ bitxor ] \ ##xor-imm combine-imm ] when ;
+
+M: ##add rewrite
+    dup src2>> vreg>expr constant-expr? [
+        [ dst>> ]
+        [ src1>> ]
+        [ src2>> vreg>constant ] tri \ ##add-imm new-insn
         dup number-values
     ] when ;
-
-M: insn rewrite ;
