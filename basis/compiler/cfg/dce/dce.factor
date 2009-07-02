@@ -12,12 +12,12 @@ SYMBOL: liveness-graph
 SYMBOL: live-vregs
 
 ! vregs which are the result of an allocation
-SYMBOL: allocate
+SYMBOL: allocations
 
 : init-dead-code ( -- )
     H{ } clone liveness-graph set
     H{ } clone live-vregs set
-    H{ } clone allocate set ;
+    H{ } clone allocations set ;
 
 GENERIC: update-liveness-graph ( insn -- )
 
@@ -41,20 +41,20 @@ M: ##flushable update-liveness-graph
 
 M: insn update-liveness-graph record-live ;
 
-: update-allocator-liveness ( insn vreg -- )
-    dup allocate get key? [ add-edges ] [ drop record-live ] if ;
+: update-allocation-liveness ( insn vreg -- )
+    dup allocations get key? [ add-edges ] [ drop record-live ] if ;
 
 M: ##set-slot update-liveness-graph
-    dup obj>> update-allocator-liveness ;
+    dup obj>> update-allocation-liveness ;
 
 M: ##set-slot-imm update-liveness-graph
-    dup obj>> update-allocator-liveness ;
+    dup obj>> update-allocation-liveness ;
 
 M: ##write-barrier update-liveness-graph
-    dup src>> update-allocator-liveness ;
+    dup src>> update-allocation-liveness ;
 
 M: ##allot update-liveness-graph
-    [ dst>> allocate get conjoin ]
+    [ dst>> allocations get conjoin ]
     [ call-next-method ] bi ;
 
 GENERIC: live-insn? ( insn -- ? )
