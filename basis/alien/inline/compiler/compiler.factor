@@ -1,7 +1,7 @@
 USING: accessors arrays combinators fry generalizations
 io.encodings.ascii io.files io.files.temp io.launcher kernel
 locals sequences system ;
-IN: alien.compile
+IN: alien.inline.compiler
 
 SYMBOL: C
 SYMBOL: C++

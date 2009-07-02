@@ -1,8 +1,8 @@
-USING: accessors alien.compile alien.libraries alien.parser
-arrays fry generalizations io.files io.files.info io.files.temp
-kernel lexer math.order multiline namespaces sequences system
-vocabs.loader vocabs.parser words ;
-IN: alien.c-syntax
+USING: accessors alien.inline.compiler alien.libraries
+alien.parser arrays fry generalizations io.files io.files.info
+io.files.temp kernel lexer math.order multiline namespaces
+sequences system vocabs.loader vocabs.parser words ;
+IN: alien.inline
 
 <PRIVATE
 SYMBOL: c-library
