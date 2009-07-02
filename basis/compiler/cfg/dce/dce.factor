@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sets kernel namespaces sequences
 compiler.cfg.instructions compiler.cfg.def-use
@@ -11,29 +11,64 @@ SYMBOL: liveness-graph
 ! vregs which participate in side effects and thus are always live
 SYMBOL: live-vregs
 
+! vregs which are the result of an allocation
+SYMBOL: allocate
+
 : init-dead-code ( -- )
     H{ } clone liveness-graph set
-    H{ } clone live-vregs set ;
+    H{ } clone live-vregs set
+    H{ } clone allocate set ;
 
 GENERIC: update-liveness-graph ( insn -- )
 
-M: ##flushable update-liveness-graph
-    [ uses-vregs ] [ dst>> ] bi liveness-graph get set-at ;
+: add-edges ( insn register -- )
+    [ uses-vregs ] dip liveness-graph get [ union ] change-at ;
 
-: record-live ( vregs -- )
+M: ##flushable update-liveness-graph
+    dup dst>> add-edges ;
+
+: (record-live) ( vregs -- )
     [
         dup live-vregs get key? [ drop ] [
             [ live-vregs get conjoin ]
-            [ liveness-graph get at record-live ]
+            [ liveness-graph get at (record-live) ]
             bi
         ] if
     ] each ;
 
-M: insn update-liveness-graph uses-vregs record-live ;
+: record-live ( insn -- )
+    uses-vregs (record-live) ;
+
+M: insn update-liveness-graph record-live ;
+
+: update-allocator-liveness ( insn vreg -- )
+    dup allocate get key? [ add-edges ] [ drop record-live ] if ;
+
+M: ##set-slot update-liveness-graph
+    dup obj>> update-allocator-liveness ;
+
+M: ##set-slot-imm update-liveness-graph
+    dup obj>> update-allocator-liveness ;
+
+M: ##write-barrier update-liveness-graph
+    dup src>> update-allocator-liveness ;
+
+M: ##allot update-liveness-graph
+    [ dst>> allocate get conjoin ]
+    [ call-next-method ] bi ;
 
 GENERIC: live-insn? ( insn -- ? )
 
-M: ##flushable live-insn? dst>> live-vregs get key? ;
+: live-vreg? ( vreg -- ? )
+    live-vregs get key? ;
+
+M: ##flushable live-insn? dst>> live-vreg? ;
+
+M: ##set-slot live-insn? obj>> live-vreg? ;
+
+M: ##set-slot-imm live-insn? obj>> live-vreg? ;
+
+M: ##write-barrier live-insn? src>> live-vreg? ;
 
 M: insn live-insn? drop t ;
 
