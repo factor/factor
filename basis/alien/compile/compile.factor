@@ -3,6 +3,9 @@ io.encodings.ascii io.files io.files.temp io.launcher kernel
 locals sequences system ;
 IN: alien.compile
 
+SYMBOL: C
+SYMBOL: C++
+
 : library-suffix ( -- str )
     os {
         { [ dup macosx? ]  [ drop ".dylib" ] }

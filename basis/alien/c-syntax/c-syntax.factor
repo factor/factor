@@ -5,19 +5,24 @@ vocabs.loader vocabs.parser words ;
 IN: alien.c-syntax
 
 <PRIVATE
+SYMBOL: c-library
+SYMBOL: library-is-c++
+SYMBOL: compiler-args
+SYMBOL: c-strings
+
 : (C-LIBRARY:) ( -- )
-    scan "c-library" set
-    V{ } clone "c-library-vector" set
-    V{ } clone "c-compiler-args" set ;
+    scan c-library set
+    V{ } clone c-strings set
+    V{ } clone compiler-args set ;
 
 : (C-LINK:) ( -- )
-    "-l" scan append "c-compiler-args" get push ;
+    "-l" scan append compiler-args get push ;
 
 : (C-FRAMEWORK:) ( -- )
-    "-framework" scan "c-compiler-args" get '[ _ push ] bi@ ;
+    "-framework" scan compiler-args get '[ _ push ] bi@ ;
 
 : return-library-function-params ( -- return library function params )
-    scan "c-library" get scan ")" parse-tokens
+    scan c-library get scan ")" parse-tokens
     [ "(" subseq? not ] filter [
         [ dup CHAR: - = [ drop CHAR: space ] when ] map
     ] 3dip ;
@@ -29,10 +34,10 @@ IN: alien.c-syntax
 : (C-FUNCTION:) ( return library function params -- str )
     [ nip ] dip
     " " join "(" prepend ")" append 3array " " join
-    "library-is-c++" get [ "extern \"C\" " prepend ] when ;
+    library-is-c++ get [ "extern \"C\" " prepend ] when ;
 
 : library-path ( -- str )
-    "lib" "c-library" get library-suffix
+    "lib" c-library get library-suffix
     3array concat temp-file ;
 
 : compile-library? ( -- ? )
@@ -42,19 +47,19 @@ IN: alien.c-syntax
     ] [ drop t ] if ;
 
 : compile-library ( -- )
-    "library-is-c++" get [ "C++" ] [ "C" ] if
-    "c-compiler-args" get
-    "c-library-vector" get "\n" join
-    "c-library" get compile-to-library ;
+    library-is-c++ get [ C++ ] [ C ] if
+    compiler-args get
+    c-strings get "\n" join
+    c-library get compile-to-library ;
 
 : (;C-LIBRARY) ( -- )
     compile-library? [ compile-library ] when
-    "c-library" get library-path "cdecl" add-library ;
+    c-library get library-path "cdecl" add-library ;
 PRIVATE>
 
 SYNTAX: C-LIBRARY: (C-LIBRARY:) ;
 
-SYNTAX: COMPILE-AS-C++ t "library-is-c++" set ;
+SYNTAX: COMPILE-AS-C++ t library-is-c++ set ;
 
 SYNTAX: C-LINK: (C-LINK:) ;
 
@@ -64,13 +69,13 @@ SYNTAX: C-LINK/FRAMEWORK:
     os macosx? [ (C-FRAMEWORK:) ] [ (C-LINK:) ] if ;
 
 SYNTAX: C-INCLUDE:
-    "#include " scan append "c-library-vector" get push ;
+    "#include " scan append c-strings get push ;
 
 SYNTAX: C-FUNCTION:
     return-library-function-params
     [ factor-function ]
     4 nkeep (C-FUNCTION:)
     " {\n" append parse-here append "\n}\n" append
-    "c-library-vector" get push ;
+    c-strings get push ;
 
 SYNTAX: ;C-LIBRARY (;C-LIBRARY) ;
