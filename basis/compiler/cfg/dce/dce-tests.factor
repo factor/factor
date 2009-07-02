@@ -58,3 +58,15 @@ IN: compiler.cfg.dce.tests
     T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
     T{ ##replace { src V int-regs 1 } { loc D 0 } }
 } test-dce ] unit-test
+
+[ V{
+    T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
+    T{ ##replace { src V int-regs 1 } { loc D 0 } }
+    T{ ##load-immediate { dst V int-regs 3 } { val 8 } }
+    T{ ##set-slot-imm { obj V int-regs 1 } { src V int-regs 3 } }
+} ] [ V{
+    T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
+    T{ ##replace { src V int-regs 1 } { loc D 0 } }
+    T{ ##load-immediate { dst V int-regs 3 } { val 8 } }
+    T{ ##set-slot-imm { obj V int-regs 1 } { src V int-regs 3 } }
+} test-dce ] unit-test
