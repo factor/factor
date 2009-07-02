@@ -11,21 +11,47 @@ SYMBOL: liveness-graph
 ! vregs which participate in side effects and thus are always live
 SYMBOL: live-vregs
 
+: live-vreg? ( vreg -- ? )
+    live-vregs get key? ;
+
 ! vregs which are the result of an allocation
 SYMBOL: allocations
+
+: allocation? ( vreg -- ? )
+    allocations get key? ;
 
 : init-dead-code ( -- )
     H{ } clone liveness-graph set
     H{ } clone live-vregs set
     H{ } clone allocations set ;
 
-GENERIC: update-liveness-graph ( insn -- )
+GENERIC: build-liveness-graph ( insn -- )
 
 : add-edges ( insn register -- )
     [ uses-vregs ] dip liveness-graph get [ union ] change-at ;
 
-M: ##flushable update-liveness-graph
+: setter-liveness-graph ( insn vreg -- )
+    dup allocation? [ add-edges ] [ 2drop ] if ;
+
+M: ##set-slot build-liveness-graph
+    dup obj>> setter-liveness-graph ;
+
+M: ##set-slot-imm build-liveness-graph
+    dup obj>> setter-liveness-graph ;
+
+M: ##write-barrier build-liveness-graph
+    dup src>> setter-liveness-graph ;
+
+M: ##flushable build-liveness-graph
     dup dst>> add-edges ;
+
+M: ##allot build-liveness-graph
+    [ dst>> allocations get conjoin ]
+    [ call-next-method ] bi ;
+
+M: insn build-liveness-graph drop ;
+
+GENERIC: compute-live-vregs ( insn -- )
 
 : (record-live) ( vregs -- )
     [
@@ -39,28 +65,24 @@ M: ##flushable update-liveness-graph
 : record-live ( insn -- )
     uses-vregs (record-live) ;
 
-M: insn update-liveness-graph record-live ;
+: setter-live-vregs ( insn vreg -- )
+    allocation? [ drop ] [ record-live ] if ;
 
-: update-allocation-liveness ( insn vreg -- )
-    dup allocations get key? [ add-edges ] [ drop record-live ] if ;
+M: ##set-slot compute-live-vregs
+    dup obj>> setter-live-vregs ;
 
-M: ##set-slot update-liveness-graph
-    dup obj>> update-allocation-liveness ;
+M: ##set-slot-imm compute-live-vregs
+    dup obj>> setter-live-vregs ;
 
-M: ##set-slot-imm update-liveness-graph
-    dup obj>> update-allocation-liveness ;
+M: ##write-barrier compute-live-vregs
+    dup src>> setter-live-vregs ;
 
-M: ##write-barrier update-liveness-graph
-    dup src>> update-allocation-liveness ;
+M: ##flushable compute-live-vregs drop ;
 
-M: ##allot update-liveness-graph
-    [ dst>> allocations get conjoin ]
-    [ call-next-method ] bi ;
+M: insn compute-live-vregs
+    record-live ;
 
 GENERIC: live-insn? ( insn -- ? )
-
-: live-vreg? ( vreg -- ? )
-    live-vregs get key? ;
 
 M: ##flushable live-insn? dst>> live-vreg? ;
 
@@ -74,7 +96,8 @@ M: insn live-insn? drop t ;
 
 : eliminate-dead-code ( cfg -- cfg' )
     init-dead-code
-    [ [ instructions>> [ update-liveness-graph ] each ] each-basic-block ]
+    dup
+    [ [ instructions>> [ build-liveness-graph ] each ] each-basic-block ]
+    [ [ instructions>> [ compute-live-vregs ] each ] each-basic-block ]
     [ [ [ [ live-insn? ] filter ] change-instructions drop ] each-basic-block ]
-    [ ]
     tri ;
