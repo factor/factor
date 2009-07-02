@@ -48,8 +48,9 @@ IN: compiler.cfg.stack-analysis.merge
 : merge-loc ( predecessors vregs loc state -- vreg )
     ! Insert a ##phi in the current block where the input
     ! is the vreg storing loc from each predecessor block
+    [ dup ] 3dip
     '[ [ ] [ _ _ insert-peek ] ?if ] 2map
-    dup all-equal? [ first ] [ ^^phi ] if ;
+    dup all-equal? [ nip first ] [ zip ^^phi ] if ;
 
 :: merge-locs ( state predecessors states -- state )
     states [ locs>vregs>> ] map states collect-locs
