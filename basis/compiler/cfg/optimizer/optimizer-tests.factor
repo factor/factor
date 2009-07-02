@@ -39,6 +39,6 @@ IN: compiler.cfg.optimizer.tests
 [
     [
         HEX: 7fff fixnum-bitand 13 fixnum-shift-fast
-        112 23 fixnum-shift-fast fixnum+fast
+        112 203 fixnum-shift-fast fixnum+fast
     ] test-mr first instructions>> [ ##add? ] any?
 ] unit-test
