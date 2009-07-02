@@ -1,7 +1,8 @@
-USING: arrays sequences tools.test compiler.cfg.checker
-compiler.cfg.debugger compiler.cfg.def-use sets kernel
-kernel.private fry slots.private vectors sequences.private
-math sbufs math.private strings ;
+USING: accessors arrays compiler.cfg.checker
+compiler.cfg.debugger compiler.cfg.def-use
+compiler.cfg.instructions fry kernel kernel.private math
+math.private sbufs sequences sequences.private sets
+slots.private strings tools.test vectors ;
 IN: compiler.cfg.optimizer.tests
 
 ! Miscellaneous tests
@@ -33,3 +34,11 @@ IN: compiler.cfg.optimizer.tests
 } [
     [ [ ] ] dip '[ _ test-mr first check-mr ] unit-test
 ] each
+
+[ t ]
+[
+    [
+        HEX: 7fff fixnum-bitand 13 fixnum-shift-fast
+        112 23 fixnum-shift-fast fixnum+fast
+    ] test-mr first instructions>> [ ##add? ] any?
+] unit-test
