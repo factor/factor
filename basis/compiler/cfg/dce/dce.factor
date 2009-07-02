@@ -99,5 +99,5 @@ M: insn live-insn? drop t ;
     dup
     [ [ instructions>> [ build-liveness-graph ] each ] each-basic-block ]
     [ [ instructions>> [ compute-live-vregs ] each ] each-basic-block ]
-    [ [ [ [ live-insn? ] filter ] change-instructions drop ] each-basic-block ]
+    [ [ instructions>> [ live-insn? ] filter-here ] each-basic-block ]
     tri ;
