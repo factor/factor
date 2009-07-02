@@ -1,6 +1,6 @@
 USING: accessors arrays combinators fry generalizations
 io.encodings.ascii io.files io.files.temp io.launcher kernel
-sequences system ;
+locals sequences system ;
 IN: alien.compile
 
 : library-suffix ( -- str )
@@ -12,16 +12,15 @@ IN: alien.compile
 
 : src-suffix ( lang -- str )
     {
-        { "C" [ ".c" ] }
-        { "C++" [ ".cpp" ] }
+        { C [ ".c" ] }
+        { C++ [ ".cpp" ] }
     } case ;
 
-: compile-to-object ( lang contents name -- )
-    rot '[ _ src-suffix append ] [ ".o" append ] bi
-    [ temp-file ] bi@
-    [ tuck ascii set-file-contents ] dip
-    swap 2array { "gcc" "-fPIC" "-c" "-o" } prepend
-    try-process ;
+:: compile-to-object ( lang contents name -- )
+    name ".o" append temp-file
+    contents name lang src-suffix append temp-file
+    [ ascii set-file-contents ] keep 2array
+    { "gcc" "-fPIC" "-c" "-o" } prepend try-process ;
 
 : link-object ( args name -- )
     [ "lib" prepend library-suffix append ] [ ".o" append ] bi
@@ -34,6 +33,6 @@ IN: alien.compile
         [ name>> "unimplemented for: " prepend throw ]
     } cond prepend prepend try-process ;
 
-: compile-to-library ( lang args contents name -- )
-    [ [ nip ] dip compile-to-object ] 4 nkeep
-    nip link-object drop ;
+:: compile-to-library ( lang args contents name -- )
+    lang contents name compile-to-object
+    args name link-object ;
