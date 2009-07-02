@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Jeremy Hughes.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators fry generalizations
 io.encodings.ascii io.files io.files.temp io.launcher kernel
 locals sequences system ;
