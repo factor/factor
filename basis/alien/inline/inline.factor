@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Jeremy Hughes.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.inline.compiler alien.libraries
 alien.parser arrays fry generalizations io.files io.files.info
 io.files.temp kernel lexer math.order multiline namespaces
