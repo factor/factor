@@ -37,8 +37,8 @@ SYMBOL: check-optimizer?
         compute-liveness
         alias-analysis
         value-numbering
-        ! fold-branches
-        ! compute-predecessors
+        fold-branches
+        compute-predecessors
         eliminate-dead-code
         eliminate-write-barriers
         eliminate-phis
