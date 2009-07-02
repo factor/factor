@@ -39,38 +39,25 @@ IN: compiler.cfg.intrinsics.fixnum
 
 :: emit-commutative-fixnum-op ( node insn imm-insn -- )
     [let | infos [ node node-input-infos ] |
-        infos first value-info-small-tagged?
-        [ infos imm-insn emit-fixnum-imm-op1 ]
-        [
-            infos second value-info-small-tagged? [
-                infos imm-insn emit-fixnum-imm-op2
-            ] [
-                insn (emit-fixnum-op)
-            ] if
-        ] if
+        {
+            { [ infos first value-info-small-tagged? ] [ infos imm-insn emit-fixnum-imm-op1 ] }
+            { [ infos second value-info-small-tagged? ] [ infos imm-insn emit-fixnum-imm-op2 ] }
+            [ insn (emit-fixnum-op) ]
+        } cond
         ds-push
     ] ; inline
 
-: (emit-fixnum-shift-fast) ( obj node -- obj )
-    literal>> dup sgn {
-        { -1 [ neg tag-bits get + ^^sar-imm ^^tag-fixnum ] }
-        {  0 [ drop ] }
-        {  1 [ ^^shl-imm ] }
-    } case ;
-
 : emit-fixnum-shift-fast ( node -- )
-    dup node-input-infos dup first value-info-small-fixnum? [
+    dup node-input-infos dup second value-info-small-fixnum? [
         nip
-        [ ds-pop ds-drop ] dip first (emit-fixnum-shift-fast) ds-push
-    ] [
-        drop
-        dup node-input-infos dup second value-info-small-fixnum? [
-            nip
-            [ ds-drop ds-pop ] dip second (emit-fixnum-shift-fast) ds-push
-        ] [
-            drop emit-primitive
-        ] if
-    ] if ;
+        [ ds-drop ds-pop ] dip
+        second literal>> dup sgn {
+            { -1 [ neg tag-bits get + ^^sar-imm ^^tag-fixnum ] }
+            {  0 [ drop ] }
+            {  1 [ ^^shl-imm ] }
+        } case
+        ds-push
+    ] [ drop emit-primitive ] if ;
     
 : emit-fixnum-bitnot ( -- )
     ds-pop ^^not tag-mask get ^^xor-imm ds-push ;
@@ -89,7 +76,7 @@ IN: compiler.cfg.intrinsics.fixnum
 
 : emit-fixnum*fast ( node -- )
     node-input-infos
-    dup first value-info-small-fixnum?
+    dup first value-info-small-fixnum? drop f
     [
         (emit-fixnum*fast-imm1)
     ] [
