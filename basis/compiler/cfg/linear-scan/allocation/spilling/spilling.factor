@@ -26,13 +26,13 @@ ERROR: bad-live-ranges interval ;
         [ drop ] [ bad-live-ranges ] if
     ] [ drop ] if ;
 
-: trim-before-ranges ( live-interval n -- )
+: trim-before-ranges ( live-interval -- )
     [ ranges>> ] [ uses>> last ] bi
     [ '[ from>> _ <= ] filter-here ]
     [ swap last (>>to) ]
     2bi ;
 
-: trim-after-ranges ( live-interval n -- )
+: trim-after-ranges ( live-interval -- )
     [ ranges>> ] [ uses>> first ] bi
     [ '[ to>> _ >= ] filter-here ]
     [ swap first (>>from) ]
@@ -56,7 +56,7 @@ ERROR: bad-live-ranges interval ;
     over spill-to>> >>reload-from ;
 
 : split-and-spill ( new existing -- before after )
-    swap start>> split-for-spill assign-spill assign-reload ;
+    swap start>> split-for-spill [ assign-spill ] dip assign-reload ;
 
 : reuse-register ( new existing -- )
     [ nip delete-active ]

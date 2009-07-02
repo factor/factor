@@ -3,7 +3,7 @@
 USING: kernel accessors combinators classes math layouts
 compiler.cfg.instructions
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.expressions ;
+compiler.cfg.value-numbering.expressions locals ;
 IN: compiler.cfg.value-numbering.simplify
 
 ! Return value of f means we didn't simplify.
@@ -42,6 +42,13 @@ M: unary-expr simplify*
         [ 2drop f ]
     } cond ; inline
 
+: simplify-sub ( expr -- vn/expr/f )
+    >binary-expr< {
+        { [ 2dup eq? ] [ 2drop T{ constant-expr f f 0 } ] }
+        { [ dup expr-zero? ] [ drop ] }
+        [ 2drop f ]
+    } cond ; inline
+
 : useless-shift? ( in1 in2 -- ? )
     over op>> \ ##shl-imm eq?
     [ [ in2>> ] [ expr>vn ] bi* = ] [ 2drop f ] if ; inline
@@ -54,6 +61,8 @@ M: binary-expr simplify*
     dup op>> {
         { \ ##add [ simplify-add ] }
         { \ ##add-imm [ simplify-add ] }
+        { \ ##sub [ simplify-sub ] }
+        { \ ##sub-imm [ simplify-sub ] }
         { \ ##shr-imm [ simplify-shift ] }
         { \ ##sar-imm [ simplify-shift ] }
         [ 2drop f ]
