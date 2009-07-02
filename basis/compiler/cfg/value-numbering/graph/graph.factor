@@ -26,6 +26,8 @@ SYMBOL: vregs>vns
 
 : vn>constant ( vn -- constant ) vn>expr value>> ; inline
 
+: vreg>constant ( vreg -- constant ) vreg>vn vn>constant ; inline
+
 : init-value-graph ( -- )
     0 vn-counter set
     <bihash> exprs>vns set

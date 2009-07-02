@@ -136,8 +136,8 @@ M: vreg-insn assign-registers-in-insn
     register-mapping ;
 
 : compute-live-spill-slots ( -- spill-slots )
-    spill-slots get values [ values ] map concat
-    [ [ vreg>> ] [ reload-from>> ] bi ] { } map>assoc ;
+    spill-slots get values
+    [ [ vreg>> swap ] { } assoc-map-as ] map concat ;
 
 M: ##gc assign-registers-in-insn
     dup call-next-method
