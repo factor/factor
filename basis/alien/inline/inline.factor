@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.inline.compiler alien.libraries
-alien.parser arrays fry generalizations io.files io.files.info
-io.files.temp kernel lexer math.order multiline namespaces
-sequences system vocabs.loader vocabs.parser words ;
+alien.parser arrays assocs effects fry generalizations grouping
+io.files io.files.info io.files.temp kernel lexer math
+math.order math.ranges multiline namespaces sequences splitting
+strings system vocabs.loader vocabs.parser words ;
 IN: alien.inline
 
 <PRIVATE
@@ -12,20 +13,41 @@ SYMBOL: library-is-c++
 SYMBOL: compiler-args
 SYMBOL: c-strings
 
-: return-library-function-params ( -- return library function params )
-    scan c-library get scan ")" parse-tokens
-    [ "(" subseq? not ] filter [
-        [ dup CHAR: - = [ drop CHAR: space ] when ] map
-    ] 3dip ;
+: function-types-effect ( -- function types effect )
+    scan scan swap ")" parse-tokens
+    [ "(" subseq? not ] filter parse-arglist ;
 
-: factor-function ( return library function params -- )
-    [ dup "const " head? [ 6 tail ] when ] 3dip
+: types-effect>params-return ( types effect -- params return )
+    [ nip out>> first ] [ in>> zip ] 2bi ;
+
+: arg-list ( types -- params )
+    CHAR: a swap length CHAR: a + [a,b]
+    [ 1string ] map ;
+
+: factorize-type ( str -- str' )
+    "const-" ?head drop ;
+
+: cify-type ( str -- str' )
+    { { CHAR: ~ CHAR: space } } substitute ;
+
+: factor-function ( function types effect -- )
+    [ c-library get ] 3dip [ [ factorize-type ] map ] dip
+    types-effect>params-return factorize-type -roll
     make-function define-declared ;
 
-: c-function-string ( return library function params -- str )
-    [ nip ] dip
-    " " join "(" prepend ")" append 3array " " join
+: prototype-string ( function types effect -- str )
+    [ [ cify-type ] map ] dip
+    types-effect>params-return cify-type -rot
+    2 group [ " " join "," append ] map " " join
+    "(" prepend ")" append 3array " " join
     library-is-c++ get [ "extern \"C\" " prepend ] when ;
+
+: prototype-string' ( function types return -- str )
+    [ dup arg-list ] <effect> prototype-string ;
+
+: append-function-body ( prototype-str -- str )
+    " {\n" append parse-here append "\n}\n" append ;
+
 
 : library-path ( -- str )
     "lib" c-library get library-suffix
@@ -53,10 +75,14 @@ PRIVATE>
     compile-library? [ compile-library ] when
     c-library get library-path "cdecl" add-library ;
 
-: define-c-function ( return library function params -- )
-    [ factor-function ] 4 nkeep c-function-string
-    " {\n" append parse-here append "\n}\n" append
-    c-strings get push ;
+: define-c-function ( function types effect -- )
+    [ factor-function ] 3keep prototype-string
+    append-function-body c-strings get push ;
+
+: define-c-function' ( function effect -- )
+    [ in>> ] keep [ factor-function ] 3keep
+    out>> prototype-string'
+    append-function-body c-strings get push ;
 
 : define-c-link ( str -- )
     "-l" prepend compiler-args get push ;
@@ -82,7 +108,6 @@ SYNTAX: C-LINK/FRAMEWORK: scan define-c-link/framework ;
 
 SYNTAX: C-INCLUDE: scan define-c-include ;
 
-SYNTAX: C-FUNCTION:
-    return-library-function-params define-c-function ;
+SYNTAX: C-FUNCTION: function-types-effect define-c-function ;
 
 SYNTAX: ;C-LIBRARY compile-c-library ;
