@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays columns kernel math math.bits
-math.order math.vectors sequences sequences.private fry ;
+USING: accessors arrays columns kernel locals math math.bits
+math.functions math.order math.vectors sequences
+sequences.private fry ;
 IN: math.matrices
 
 ! Matrices
@@ -11,6 +12,70 @@ IN: math.matrices
 : identity-matrix ( n -- matrix )
     #! Make a nxn identity matrix.
     dup [ [ = 1 0 ? ] with map ] curry map ;
+
+:: rotation-matrix3 ( axis theta -- matrix )
+    theta cos :> c
+    theta sin :> s
+    axis first3 :> z :> y :> x
+    x sq 1.0 x sq - c * +     x y * 1.0 c - * z s * -   x z * 1.0 c - * y s * + 3array
+    x y * 1.0 c - * z s * +   y sq 1.0 y sq - c * +     y z * 1.0 c - * x s * - 3array
+    x z * 1.0 c - * y s * -   y z * 1.0 c - * x s * +   z sq 1.0 z sq - c * +   3array
+    3array ;
+
+:: rotation-matrix4 ( axis theta -- matrix )
+    theta cos :> c
+    theta sin :> s
+    axis first3 :> z :> y :> x
+    x sq 1.0 x sq - c * +     x y * 1.0 c - * z s * -   x z * 1.0 c - * y s * +   0 4array
+    x y * 1.0 c - * z s * +   y sq 1.0 y sq - c * +     y z * 1.0 c - * x s * -   0 4array
+    x z * 1.0 c - * y s * -   y z * 1.0 c - * x s * +   z sq 1.0 z sq - c * +     0 4array
+    { 0.0 0.0 0.0 1.0 } 4array ;
+
+:: translation-matrix4 ( offset -- matrix )
+    offset first3 :> z :> y :> x
+    {
+        { 1.0 0.0 0.0 x   }
+        { 0.0 1.0 0.0 y   }
+        { 0.0 0.0 1.0 z   }
+        { 0.0 0.0 0.0 1.0 }
+    } ;
+
+: >scale-factors ( number/sequence -- x y z )
+    dup number? [ dup dup ] [ first3 ] if ;
+
+:: scale-matrix3 ( factors -- matrix )
+    factors >scale-factors :> z :> y :> x
+    {
+        { x   0.0 0.0 }
+        { 0.0 y   0.0 }
+        { 0.0 0.0 z   }
+    } ;
+
+:: scale-matrix4 ( factors -- matrix )
+    factors >scale-factors :> z :> y :> x
+    {
+        { x   0.0 0.0 0.0 }
+        { 0.0 y   0.0 0.0 }
+        { 0.0 0.0 z   0.0 }
+        { 0.0 0.0 0.0 1.0 }
+    } ;
+
+: ortho-matrix4 ( dim -- matrix )
+    [ recip ] map scale-matrix4 ;
+
+:: frustum-matrix4 ( xy-dim near far -- matrix )
+    xy-dim first2 :> y :> x
+    near x /f :> xf
+    near y /f :> yf
+    near far + near far - /f :> zf
+    2 near far * * near far - /f :> wf
+
+    {
+        { xf  0.0  0.0 0.0 }
+        { 0.0 yf   0.0 0.0 }
+        { 0.0 0.0  zf  wf  }
+        { 0.0 0.0 -1.0 0.0 }
+    } ;
 
 ! Matrix operations
 : mneg ( m -- m ) [ vneg ] map ;
