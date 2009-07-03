@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test alien.inline alien.inline.private io.files io.directories kernel ;
+USING: tools.test alien.inline alien.inline.private io.files
+io.directories kernel ;
 IN: alien.inline.tests
 
 C-LIBRARY: const
