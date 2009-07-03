@@ -25,7 +25,9 @@ SYMBOL: c-strings
     [ 1string ] map ;
 
 : factorize-type ( str -- str' )
-    "const-" ?head drop ;
+    "const-" ?head drop
+    "unsigned-" ?head [ "u" prepend ] when
+    "long-" ?head [ "long" prepend ] when ;
 
 : cify-type ( str -- str' )
     { { CHAR: ~ CHAR: space } } substitute ;
