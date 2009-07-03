@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit
-compiler.cfg.hats compiler.cfg.instructions
+arrays compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.simplify fry kernel layouts math
@@ -113,38 +113,60 @@ M: ##compare-imm rewrite
         ] when
     ] when ;
 
+: constant-fold ( insn -- insn' )
+    dup dst>> vreg>expr dup constant-expr? [
+        [ dst>> ] [ value>> ] bi* \ ##load-immediate new-insn
+        dup number-values
+    ] [
+        drop
+    ] if ;
+
+: (new-imm-insn) ( insn dst src1 n op -- new-insn/insn )
+    [ cell-bits bits ] dip over small-enough? [
+        new-insn dup number-values nip
+    ] [
+        2drop 2drop
+    ] if constant-fold ; inline
+
+: new-imm-insn ( insn dst src n op -- n' op' )
+    2dup [ sgn ] dip 2array
+    {
+        { { -1 ##add-imm } [ drop neg \ ##sub-imm (new-imm-insn) ] }
+        { { -1 ##sub-imm } [ drop neg \ ##add-imm (new-imm-insn) ] }
+        [ drop (new-imm-insn) ]
+    } case ; inline
+
 : combine-imm? ( insn op -- ? )
     [ src1>> vreg>expr op>> ] dip = ;
 
+: (combine-imm) ( insn quot op -- insn )
+    [
+        {
+            [ ]
+            [ dst>> ]
+            [ src1>> vreg>expr [ in1>> vn>vreg ] [ in2>> vn>constant ] bi ]
+            [ src2>> ]
+        } cleave
+    ] [ call ] [ ] tri* new-imm-insn ; inline
+
 :: combine-imm ( insn quot op -- insn )
-    insn
-    [ dst>> ]
-    [ src1>> vreg>expr [ in1>> vn>vreg ] [ in2>> vn>constant ] bi ]
-    [ src2>> ] tri
-
-    quot call cell-bits bits
-
-    dup small-enough? [
-        op new-insn dup number-values
+    insn op combine-imm? [
+        insn quot op (combine-imm)
     ] [
-        3drop insn
+        insn
     ] if ; inline
 
 M: ##add-imm rewrite
     {
-        { [ dup \ ##add-imm combine-imm? ]
-            [ [ + ] \ ##add-imm combine-imm ] }
-        { [ dup \ ##sub-imm combine-imm? ]
-            [ [ - ] \ ##sub-imm combine-imm ] }
+        { [ dup \ ##add-imm combine-imm? ] [ [ + ] \ ##add-imm (combine-imm) ] }
+        { [ dup \ ##sub-imm combine-imm? ] [ [ - ] \ ##sub-imm (combine-imm) ] }
         [ ]
     } cond ;
 
 M: ##sub-imm rewrite
     {
-        { [ dup \ ##add-imm combine-imm? ]
-            [ [ - ] \ ##add-imm combine-imm ] }
-        { [ dup \ ##sub-imm combine-imm? ]
-            [ [ + ] \ ##sub-imm combine-imm ] }
+        { [ dup \ ##add-imm combine-imm? ] [ [ - ] \ ##add-imm (combine-imm) ] }
+        { [ dup \ ##sub-imm combine-imm? ] [ [ + ] \ ##sub-imm (combine-imm) ] }
         [ ]
     } cond ;
 
@@ -153,26 +175,27 @@ M: ##mul-imm rewrite
         [ [ dst>> ] [ src1>> ] bi ] [ log2 ] bi* \ ##shl-imm new-insn
         dup number-values
     ] [
-        drop dup \ ##mul-imm combine-imm?
-        [ [ * ] \ ##mul-imm combine-imm ] when
+        drop [ * ] \ ##mul-imm combine-imm
     ] if ;
 
-M: ##and-imm rewrite
-    dup \ ##and-imm combine-imm?
-    [ [ bitand ] \ ##and-imm combine-imm ] when ;
+M: ##and-imm rewrite [ bitand ] \ ##and-imm combine-imm ;
 
-M: ##or-imm rewrite
-    dup \ ##or-imm combine-imm?
-    [ [ bitor ] \ ##or-imm combine-imm ] when ;
+M: ##or-imm rewrite [ bitor ] \ ##or-imm combine-imm ;
 
-M: ##xor-imm rewrite
-    dup \ ##xor-imm combine-imm?
-    [ [ bitxor ] \ ##xor-imm combine-imm ] when ;
+M: ##xor-imm rewrite [ bitxor ] \ ##xor-imm combine-imm ;
+
+: rewrite-add? ( insn -- ? )
+    src2>> {
+        [ vreg>expr constant-expr? ]
+        [ vreg>constant small-enough? ]
+    } 1&& ;
 
 M: ##add rewrite
-    dup src2>> vreg>expr constant-expr? [
+    dup rewrite-add? [
         [ dst>> ]
         [ src1>> ]
         [ src2>> vreg>constant ] tri \ ##add-imm new-insn
         dup number-values
     ] when ;
+
+M: ##sub rewrite constant-fold ;
