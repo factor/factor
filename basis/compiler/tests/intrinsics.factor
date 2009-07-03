@@ -238,6 +238,13 @@ IN: compiler.tests.intrinsics
 
 [ t ] [ f [ f eq? ] compile-call ] unit-test
 
+cell 8 = [
+    [ HEX: 40400000 ] [
+        HEX: 4200 [ HEX: 7fff fixnum-bitand 13 fixnum-shift-fast 112 23 fixnum-shift-fast fixnum+fast ]
+        compile-call
+    ] unit-test
+] when
+
 ! regression
 [ 3 ] [
     100001 f <array> 3 100000 pick set-nth
