@@ -43,6 +43,6 @@ C-FUNCTION: char* breakme ( )
     return not a string;
 ;
 
-<< [ (;C-LIBRARY) ] must-fail >>
+<< [ compile-c-library ] must-fail >>
 
 << library-path dup exists? [ delete-file ] [ drop ] if >>
