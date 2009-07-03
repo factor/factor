@@ -39,3 +39,6 @@ word wrap.">
 [ "aaa bb\nccccccc\nddddddd" ] [ "aaa bb ccccccc ddddddd" 6 wrap-string ] unit-test
 
 [ "a b c d e f\ng h" ] [ "a b c d e f g h" 11 wrap-string ] unit-test
+
+[ "" ] [ "" 10 wrap-string ] unit-test
+[ "Hello" ] [ "\nHello\n" 10 wrap-string ] unit-test
