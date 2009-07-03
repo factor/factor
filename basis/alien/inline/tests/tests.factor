@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test alien.inline alien.inline.private io.files io.directories kernel ;
+USING: tools.test alien.inline alien.inline.private io.files
+io.directories kernel ;
 IN: alien.inline.tests
 
 C-LIBRARY: const
@@ -42,6 +43,6 @@ C-FUNCTION: char* breakme ( )
     return not a string;
 ;
 
-<< [ (;C-LIBRARY) ] must-fail >>
+<< [ compile-c-library ] must-fail >>
 
 << library-path dup exists? [ delete-file ] [ drop ] if >>
