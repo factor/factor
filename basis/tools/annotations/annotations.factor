@@ -3,7 +3,8 @@
 USING: accessors kernel math sorting words parser io summary
 quotations sequences prettyprint continuations effects
 definitions compiler.units namespaces assocs tools.walker
-tools.time generic inspector fry tools.continuations ;
+tools.time generic inspector fry tools.continuations
+locals generalizations macros ;
 IN: tools.annotations
 
 GENERIC: reset ( word -- )
@@ -46,17 +47,20 @@ M: word annotate
 
 <PRIVATE
 
-: stack-values ( names -- alist )
-    [ datastack ] dip [ nip ] [ length tail* ] 2bi zip ;
+:: trace-quot ( word effect quot str -- quot' )
+    effect quot call :> values
+    values length :> n
+    [
+        "--- " write str write bl word .
+        n ndup n narray values swap zip simple-table.
+        flush
+    ] ; inline
 
-: trace-message ( word quot str -- )
-    "--- " write write bl over .
-    [ stack-effect ] dip '[ @ stack-values ] [ f ] if*
-    [ simple-table. ] unless-empty flush ; inline
+MACRO: entering ( word -- quot )
+    dup stack-effect [ in>> ] "Entering" trace-quot ;
 
-: entering ( str -- ) [ in>> ] "Entering" trace-message ;
-
-: leaving ( str -- ) [ out>> ] "Leaving" trace-message ;
+MACRO: leaving ( word -- quot )
+    dup stack-effect [ out>> ] "Leaving" trace-quot ;
 
 : (watch) ( word def -- def )
     over '[ _ entering @ _ leaving ] ;
