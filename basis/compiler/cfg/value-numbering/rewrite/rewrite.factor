@@ -77,13 +77,13 @@ M: ##compare-imm-branch rewrite
     insn cc>> swap? [ swap-cc ] when
     i \ ##compare-imm new-insn ; inline
 
-M: ##compare rewrite
-    dup [ src1>> ] [ src2>> ] bi
-    [ vreg>expr constant-expr? ] bi@ 2array {
-        { { f t } [ f >compare-imm ] }
-        { { t f } [ t >compare-imm ] }
-        [ drop ]
-    } case ;
+! M: ##compare rewrite
+!     dup [ src1>> ] [ src2>> ] bi
+!     [ vreg>expr constant-expr? ] bi@ 2array {
+!         { { f t } [ f >compare-imm ] }
+!         { { t f } [ t >compare-imm ] }
+!         [ drop ]
+!     } case ;
 
 :: >compare-imm-branch ( insn swap? -- insn' )
     insn src1>>
@@ -91,13 +91,13 @@ M: ##compare rewrite
     insn cc>> swap? [ swap-cc ] when
     \ ##compare-imm-branch new-insn ; inline
 
-M: ##compare-branch rewrite
-    dup [ src1>> ] [ src2>> ] bi
-    [ vreg>expr constant-expr? ] bi@ 2array {
-        { { f t } [ f >compare-imm-branch ] }
-        { { t f } [ t >compare-imm-branch ] }
-        [ drop ]
-    } case ;
+! M: ##compare-branch rewrite
+!     dup [ src1>> ] [ src2>> ] bi
+!     [ vreg>expr constant-expr? ] bi@ 2array {
+!         { { f t } [ f >compare-imm-branch ] }
+!         { { t f } [ t >compare-imm-branch ] }
+!         [ drop ]
+!     } case ;
 
 : rewrite-redundant-comparison? ( insn -- ? )
     {
