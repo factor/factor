@@ -12,59 +12,6 @@ IN: compiler.cfg.linear-scan.resolve.tests
     { 3 4 } V{ 1 2 } clone [ { 5 6 } 3append-here ] keep >array
 ] unit-test
 
-V{
-    T{ ##peek f V int-regs 0 D 0 }
-    T{ ##branch }
-} 0 test-bb
-
-V{
-    T{ ##replace f V int-regs 0 D 1 }
-    T{ ##return }
-} 1 test-bb
-
-1 get 1vector 0 get (>>successors)
-
-cfg new 0 get >>entry
-compute-predecessors
-dup reverse-post-order number-instructions
-drop
-
-CONSTANT: test-live-interval-1
-T{ live-interval
-   { start 0 }
-   { end 6 }
-   { uses V{ 0 6 } }
-   { ranges V{ T{ live-range f 0 2 } T{ live-range f 4 6 } } }
-   { spill-to 0 }
-   { vreg V int-regs 0 }
-}
-
-[ f ] [
-    test-live-interval-1 0 get spill-to
-] unit-test
-
-[ 0 ] [
-    test-live-interval-1 1 get spill-to
-] unit-test
-
-CONSTANT: test-live-interval-2
-T{ live-interval
-   { start 0 }
-   { end 6 }
-   { uses V{ 0 6 } }
-   { ranges V{ T{ live-range f 0 2 } T{ live-range f 4 6 } } }
-   { reload-from 0 }
-   { vreg V int-regs 0 }
-}
-
-[ 0 ] [
-    test-live-interval-2 0 get reload-from
-] unit-test
-
-[ f ] [
-    test-live-interval-2 1 get reload-from
-] unit-test
-
 [
     {
         T{ _copy { dst 5 } { src 4 } { class int-regs } }
@@ -142,8 +89,8 @@ T{ live-interval
     }
 ] [
     {
-       T{ register->memory { from 3 } { to 4 } { reg-class int-regs } }
-       T{ memory->register { from 1 } { to 2 } { reg-class int-regs } }
+        T{ register->memory { from 3 } { to T{ spill-slot f 4 } } { reg-class int-regs } }
+        T{ memory->register { from T{ spill-slot f 1 } } { to 2 } { reg-class int-regs } }
     } mapping-instructions
 ] unit-test
 
