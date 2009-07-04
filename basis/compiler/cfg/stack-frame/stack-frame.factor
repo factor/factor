@@ -34,8 +34,8 @@ spill-counts ;
 
 : gc-root-offset ( n -- n' ) gc-root-base + ;
 
-: gc-roots-size ( live-registers live-spill-slots -- n )
-    [ keys [ reg-class>> reg-size ] sigma ] bi@ + ;
+: gc-roots-size ( live-values -- n )
+    keys [ reg-class>> reg-size ] sigma ;
 
 : (stack-frame-size) ( stack-frame -- n )
     [
