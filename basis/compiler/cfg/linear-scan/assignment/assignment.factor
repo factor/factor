@@ -171,7 +171,7 @@ M: ##gc assign-registers-in-insn
 M: insn assign-registers-in-insn drop ;
 
 : begin-block ( bb -- )
-    dup block-from prepare-insn
+    dup block-from 1 - prepare-insn
     [ block-from compute-live-values ] keep register-live-ins get set-at ;
 
 : end-block ( bb -- )
