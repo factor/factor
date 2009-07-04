@@ -7,6 +7,14 @@ math.order math.ranges multiline namespaces sequences splitting
 strings system vocabs.loader vocabs.parser words ;
 IN: alien.inline
 
+: factorize-type ( str -- str' )
+    "const-" ?head drop
+    "unsigned-" ?head [ "u" prepend ] when
+    "long-" ?head [ "long" prepend ] when ;
+
+: cify-type ( str -- str' )
+    { { CHAR: ~ CHAR: space } } substitute ;
+
 <PRIVATE
 SYMBOL: c-library
 SYMBOL: library-is-c++
@@ -33,14 +41,6 @@ SYMBOL: c-strings
 : arg-list ( types -- params )
     CHAR: a swap length CHAR: a + [a,b]
     [ 1string ] map ;
-
-: factorize-type ( str -- str' )
-    "const-" ?head drop
-    "unsigned-" ?head [ "u" prepend ] when
-    "long-" ?head [ "long" prepend ] when ;
-
-: cify-type ( str -- str' )
-    { { CHAR: - CHAR: space } } substitute ;
 
 : factor-function ( function types effect -- word quot effect )
     annotate-effect [ c-library get ] 3dip
