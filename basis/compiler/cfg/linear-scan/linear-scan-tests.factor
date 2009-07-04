@@ -1911,3 +1911,68 @@ V{
 [ t ] [ 3 get instructions>> [ _spill? ] any? ] unit-test
 
 [ t ] [ 5 get instructions>> [ _reload? ] any? ] unit-test
+
+! A more complicated failure case with resolve that came up after the above
+! got fixed
+V{ T{ ##branch } } 0 test-bb
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##peek f V int-regs 1 D 1 }
+    T{ ##peek f V int-regs 2 D 2 }
+    T{ ##peek f V int-regs 3 D 3 }
+    T{ ##peek f V int-regs 4 D 0 }
+    T{ ##branch }
+} 1 test-bb
+V{ T{ ##branch } } 2 test-bb
+V{ T{ ##branch } } 3 test-bb
+V{
+    
+    T{ ##replace f V int-regs 1 D 1 }
+    T{ ##replace f V int-regs 2 D 2 }
+    T{ ##replace f V int-regs 3 D 3 }
+    T{ ##replace f V int-regs 4 D 4 }
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##branch }
+} 4 test-bb
+V{ T{ ##replace f V int-regs 0 D 0 } T{ ##branch } } 5 test-bb
+V{ T{ ##return } } 6 test-bb
+V{ T{ ##branch } } 7 test-bb
+V{
+    T{ ##replace f V int-regs 1 D 1 }
+    T{ ##replace f V int-regs 2 D 2 }
+    T{ ##replace f V int-regs 3 D 3 }
+    T{ ##peek f V int-regs 5 D 1 }
+    T{ ##peek f V int-regs 6 D 2 }
+    T{ ##peek f V int-regs 7 D 3 }
+    T{ ##peek f V int-regs 8 D 4 }
+    T{ ##replace f V int-regs 5 D 1 }
+    T{ ##replace f V int-regs 6 D 2 }
+    T{ ##replace f V int-regs 7 D 3 }
+    T{ ##replace f V int-regs 8 D 4 }
+    T{ ##branch }
+} 8 test-bb
+V{
+    T{ ##replace f V int-regs 1 D 1 }
+    T{ ##replace f V int-regs 2 D 2 }
+    T{ ##replace f V int-regs 3 D 3 }
+    T{ ##return }
+} 9 test-bb
+
+0 get 1 get 1vector >>successors drop
+1 get 2 get 7 get V{ } 2sequence >>successors drop
+7 get 8 get 1vector >>successors drop
+8 get 9 get 1vector >>successors drop
+2 get 3 get 5 get V{ } 2sequence >>successors drop
+3 get 4 get 1vector >>successors drop
+4 get 9 get 1vector >>successors drop
+5 get 6 get 1vector >>successors drop
+
+[ ] [ { 1 2 3 4 } test-linear-scan-on-cfg ] unit-test
+
+[ _spill ] [ 1 get instructions>> second class ] unit-test
+[ _reload ] [ 4 get instructions>> 4 swap nth class ] unit-test
+[ V{ 3 2 1 } ] [ 8 get instructions>> [ _spill? ] filter [ n>> ] map ] unit-test
+[ V{ 3 2 1 } ] [ 9 get instructions>> [ _reload? ] filter [ n>> ] map ] unit-test
+
+! Resolve pass should insert this
+[ _reload ] [ 5 get instructions>> first class ] unit-test
