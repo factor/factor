@@ -52,3 +52,16 @@ IN: ui.tools.listener.history.tests
 [ ] [ "h" get history-recall-previous ] unit-test
 
 [ "22" ] [ "d" get doc-string ] unit-test
+
+[ ] [ <document> "d" set ] unit-test
+[ ] [ "d" get <history> "h" set ] unit-test
+
+[ ] [ "aaa" "d" get set-doc-string ] unit-test
+[ T{ input f "aaa" } ] [ "h" get history-add ] unit-test
+
+[ ] [ "" "d" get set-doc-string ] unit-test
+[ T{ input f "" } ] [ "h" get history-add ] unit-test
+[ T{ input f "" } ] [ "h" get history-add ] unit-test
+[ ] [ "   " "d" get set-doc-string ] unit-test
+[ ] [ "h" get history-recall-previous ] unit-test
+
