@@ -1,11 +1,11 @@
-! Copyright (C) 2008 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit
-arrays compiler.cfg.hats compiler.cfg.instructions
+USING: accessors locals combinators combinators.short-circuit arrays
+fry kernel layouts math namespaces sequences cpu.architecture
+math.bitwise compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.simplify fry kernel layouts math
-namespaces sequences cpu.architecture math.bitwise locals ;
+compiler.cfg.value-numbering.simplify ;
 IN: compiler.cfg.value-numbering.rewrite
 
 GENERIC: rewrite ( insn -- insn' )
@@ -70,16 +70,11 @@ M: ##compare-imm-branch rewrite
         dup rewrite-tagged-comparison? [ rewrite-tagged-comparison ] when
     ] when ;
 
-: >compare-imm ( insn swap? -- insn' )
-    [
-        {
-            [ dst>> ]
-            [ src1>> ]
-            [ src2>> ]
-            [ cc>> ]
-        } cleave
-    ] dip [ [ swap ] [ ] bi* ] when
-    [ vreg>constant ] dip
+:: >compare-imm ( insn swap? -- insn' )
+    insn dst>>
+    insn src1>>
+    insn src2>> swap? [ swap ] when vreg>constant
+    insn cc>> swap? [ swap-cc ] when
     i \ ##compare-imm new-insn ; inline
 
 M: ##compare rewrite
@@ -87,6 +82,20 @@ M: ##compare rewrite
     [ vreg>expr constant-expr? ] bi@ 2array {
         { { f t } [ f >compare-imm ] }
         { { t f } [ t >compare-imm ] }
+        [ drop ]
+    } case ;
+
+:: >compare-imm-branch ( insn swap? -- insn' )
+    insn src1>>
+    insn src2>> swap? [ swap ] when vreg>constant
+    insn cc>> swap? [ swap-cc ] when
+    \ ##compare-imm-branch new-insn ; inline
+
+M: ##compare-branch rewrite
+    dup [ src1>> ] [ src2>> ] bi
+    [ vreg>expr constant-expr? ] bi@ 2array {
+        { { f t } [ f >compare-imm-branch ] }
+        { { t f } [ t >compare-imm-branch ] }
         [ drop ]
     } case ;
 
