@@ -70,21 +70,25 @@ M: ##compare-imm-branch rewrite
         dup rewrite-tagged-comparison? [ rewrite-tagged-comparison ] when
     ] when ;
 
-: flip-comparison? ( insn -- ? )
-    dup cc>> cc= eq? [ src1>> vreg>expr constant-expr? ] [ drop f ] if ;
-
-: flip-comparison ( insn -- insn' )
-    [ dst>> ]
-    [ src2>> ]
-    [ src1>> vreg>constant ] tri
-    cc= i \ ##compare-imm new-insn ;
+: >compare-imm ( insn swap? -- insn' )
+    [
+        {
+            [ dst>> ]
+            [ src1>> ]
+            [ src2>> ]
+            [ cc>> ]
+        } cleave
+    ] dip [ [ swap ] [ ] bi* ] when
+    [ vreg>constant ] dip
+    i \ ##compare-imm new-insn ; inline
 
 M: ##compare rewrite
-    dup flip-comparison? [
-        flip-comparison
-        dup number-values
-        rewrite
-    ] when ;
+    dup [ src1>> ] [ src2>> ] bi
+    [ vreg>expr constant-expr? ] bi@ 2array {
+        { { f t } [ f >compare-imm ] }
+        { { t f } [ t >compare-imm ] }
+        [ drop ]
+    } case ;
 
 : rewrite-redundant-comparison? ( insn -- ? )
     {
