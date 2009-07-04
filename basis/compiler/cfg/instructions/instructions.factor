@@ -199,6 +199,16 @@ SYMBOL: cc/=
         { cc/= cc= }
     } at ;
 
+: swap-cc ( cc -- cc' )
+    H{
+        { cc< cc> }
+        { cc<= cc>= }
+        { cc> cc< }
+        { cc>= cc<= }
+        { cc= cc= }
+        { cc/= cc/= }
+    } at ;
+
 : evaluate-cc ( result cc -- ? )
     H{
         { cc<  { +lt+           } }
