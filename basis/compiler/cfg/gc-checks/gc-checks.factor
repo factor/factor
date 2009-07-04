@@ -10,7 +10,7 @@ IN: compiler.cfg.gc-checks
 
 : insert-gc-check ( basic-block -- )
     dup gc? [
-        [ i i f f \ ##gc new-insn prefix ] change-instructions drop
+        [ i i f \ ##gc new-insn prefix ] change-instructions drop
     ] [ drop ] if ;
 
 : insert-gc-checks ( cfg -- cfg' )

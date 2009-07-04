@@ -220,7 +220,7 @@ INSN: ##compare-imm < ##binary-imm cc temp ;
 INSN: ##compare-float-branch < ##conditional-branch ;
 INSN: ##compare-float < ##binary cc temp ;
 
-INSN: ##gc { temp1 vreg } { temp2 vreg } live-registers live-spill-slots ;
+INSN: ##gc { temp1 vreg } { temp2 vreg } live-values ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;
