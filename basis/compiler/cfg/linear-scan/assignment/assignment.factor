@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math assocs namespaces sequences heaps
-fry make combinators sets
+fry make combinators sets locals
 cpu.architecture
 compiler.cfg.def-use
 compiler.cfg.registers
@@ -116,8 +116,8 @@ ERROR: already-reloaded ;
         ] [ 2drop ] if
     ] if ;
 
-: prepare-insn ( insn -- )
-    insn#>> [ expire-old-intervals ] [ activate-new-intervals ] bi ;
+: prepare-insn ( n -- )
+    [ expire-old-intervals ] [ activate-new-intervals ] bi ;
 
 GENERIC: assign-registers-in-insn ( insn -- )
 
@@ -171,29 +171,33 @@ M: ##gc assign-registers-in-insn
 M: insn assign-registers-in-insn drop ;
 
 : begin-block ( bb -- )
+    dup block-from prepare-insn
     [ block-from compute-live-values ] keep register-live-ins get set-at ;
 
 : end-block ( bb -- )
     [ block-to compute-live-values ] keep register-live-outs get set-at ;
 
-: vreg-at-start ( vreg bb -- state ) register-live-ins get at at ;
+ERROR: bad-vreg vreg ;
 
-: vreg-at-end ( vreg bb -- state ) register-live-outs get at at ;
+: vreg-at-start ( vreg bb -- state )
+    register-live-ins get at ?at [ bad-vreg ] unless ;
 
-: assign-registers-in-block ( bb -- )
-    dup
-    begin-block
-    [
+: vreg-at-end ( vreg bb -- state )
+    register-live-outs get at ?at [ bad-vreg ] unless ;
+
+:: assign-registers-in-block ( bb -- )
+    bb [
         [
+            bb begin-block
             [
-                [ prepare-insn ]
+                [ insn#>> prepare-insn ]
                 [ assign-registers-in-insn ]
                 [ , ]
                 tri
             ] each
+            bb end-block
         ] V{ } make
-    ] change-instructions
-    end-block ;
+    ] change-instructions drop ;
 
 : assign-registers ( live-intervals rpo -- )
     [ init-assignment ] dip
