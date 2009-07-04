@@ -48,9 +48,7 @@ ERROR: bad-live-ranges interval ;
     } 2cleave ;
 
 : assign-spill ( live-interval -- live-interval )
-    dup reload-from>>
-    [ dup vreg>> reg-class>> next-spill-location ] unless*
-    >>spill-to ;
+    dup vreg>> assign-spill-slot >>spill-to ;
 
 : assign-reload ( before after -- before after )
     over spill-to>> >>reload-from ;
