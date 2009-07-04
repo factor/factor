@@ -240,7 +240,7 @@ INSN: _compare-imm-branch label { src1 vreg } { src2 integer } cc ;
 
 INSN: _compare-float-branch < _conditional-branch ;
 
-TUPLE: spill-slot { n integer } ; C: <spill-slot> spill-slot
+TUPLE: spill-slot n ; C: <spill-slot> spill-slot
 
 INSN: _gc { temp1 vreg } { temp2 vreg } gc-roots gc-root-count gc-root-size ;
 
