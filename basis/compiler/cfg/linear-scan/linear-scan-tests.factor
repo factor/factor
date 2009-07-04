@@ -1353,7 +1353,7 @@ USING: math.private ;
 
 ! Spill slot liveness was computed incorrectly, leading to a FEP
 ! early in bootstrap on x86-32
-[ t t ] [
+[ t ] [
     [
         H{ } clone live-ins set
         H{ } clone live-outs set
@@ -1379,8 +1379,7 @@ USING: math.private ;
            }
         } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
         instructions>> first
-        [ live-spill-slots>> empty? ]
-        [ live-registers>> empty? ] bi
+        live-values>> assoc-empty?
     ] with-scope
 ] unit-test
 
@@ -1860,3 +1859,55 @@ test-diamond
 [ _spill ] [ 3 get instructions>> second class ] unit-test
 
 [ _reload ] [ 4 get instructions>> first class ] unit-test
+
+! Resolve pass
+V{
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##compare-imm-branch f V int-regs 0 5 cc= }
+} 1 test-bb
+
+V{
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##peek f V int-regs 1 D 0 }
+    T{ ##peek f V int-regs 2 D 0 }
+    T{ ##replace f V int-regs 1 D 0 }
+    T{ ##replace f V int-regs 2 D 0 }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##peek f V int-regs 1 D 0 }
+    T{ ##compare-imm-branch f V int-regs 1 5 cc= }
+} 4 test-bb
+
+V{
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##return }
+} 5 test-bb
+
+V{
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##return }
+} 6 test-bb
+
+0 get 1 get V{ } 1sequence >>successors drop
+1 get 2 get 3 get V{ } 2sequence >>successors drop
+2 get 4 get V{ } 1sequence >>successors drop
+3 get 4 get V{ } 1sequence >>successors drop
+4 get 5 get 6 get V{ } 2sequence >>successors drop
+
+[ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
+
+[ t ] [ 2 get instructions>> [ _spill? ] any? ] unit-test
+
+[ t ] [ 3 get instructions>> [ _spill? ] any? ] unit-test
+
+[ t ] [ 5 get instructions>> [ _reload? ] any? ] unit-test

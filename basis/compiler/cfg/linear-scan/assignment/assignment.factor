@@ -33,6 +33,20 @@ SYMBOL: spill-slots
 : spill-slots-for ( vreg -- assoc )
     reg-class>> spill-slots get at ;
 
+! Mapping from basic blocks to values which are live at the start
+SYMBOL: register-live-ins
+
+! Mapping from basic blocks to values which are live at the end
+SYMBOL: register-live-outs
+
+: init-assignment ( live-intervals -- )
+    V{ } clone pending-intervals set
+    <min-heap> unhandled-intervals set
+    [ H{ } clone ] reg-class-assoc spill-slots set
+    H{ } clone register-live-ins set
+    H{ } clone register-live-outs set
+    init-unhandled ;
+
 ERROR: already-spilled ;
 
 : record-spill ( live-interval -- )
@@ -102,6 +116,9 @@ ERROR: already-reloaded ;
         ] [ 2drop ] if
     ] if ;
 
+: prepare-insn ( insn -- )
+    insn#>> [ expire-old-intervals ] [ activate-new-intervals ] bi ;
+
 GENERIC: assign-registers-in-insn ( insn -- )
 
 : register-mapping ( live-intervals -- alist )
@@ -118,60 +135,65 @@ ERROR: overlapping-registers intervals ;
     dup [ copy-from>> ] map sift '[ vreg>> _ member? not ] filter
     dup [ reg>> ] map all-unique? [ drop ] [ overlapping-registers ] if ;
 
-: active-intervals ( insn -- intervals )
-    insn#>> pending-intervals get [ covers? ] with filter
+: active-intervals ( n -- intervals )
+    pending-intervals get [ covers? ] with filter
     check-assignment? get [
         dup check-assignment
     ] when ;
 
 M: vreg-insn assign-registers-in-insn
-    dup [ active-intervals ] [ all-vregs ] bi
+    dup [ insn#>> active-intervals ] [ all-vregs ] bi
     '[ vreg>> _ member? ] filter
     register-mapping
     >>regs drop ;
 
-: compute-live-registers ( insn -- assoc )
-    [ active-intervals ] [ temp-vregs ] bi
-    '[ vreg>> _ memq? not ] filter
-    register-mapping ;
+: compute-live-registers ( n -- assoc )
+    active-intervals register-mapping ;
 
 : compute-live-spill-slots ( -- assocs )
-    spill-slots get values
-    [ [ vreg>> swap <spill-slot> ] H{ } assoc-map-as ] map ;
+    spill-slots get values first2
+    [ [ vreg>> swap <spill-slot> ] H{ } assoc-map-as ] bi@
+    assoc-union ;
 
-: compute-live-values ( insn -- assoc )
-    [ compute-live-spill-slots ] dip compute-live-registers suffix
-    assoc-combine ;
+: compute-live-values ( n -- assoc )
+    [ compute-live-spill-slots ] dip compute-live-registers
+    assoc-union ;
+
+: compute-live-gc-values ( insn -- assoc )
+    [ insn#>> compute-live-values ] [ temp-vregs ] bi
+    '[ drop _ memq? not ] assoc-filter ;
 
 M: ##gc assign-registers-in-insn
     dup call-next-method
-    dup compute-live-values >>live-values
+    dup compute-live-gc-values >>live-values
     drop ;
 
 M: insn assign-registers-in-insn drop ;
 
-: init-assignment ( live-intervals -- )
-    V{ } clone pending-intervals set
-    <min-heap> unhandled-intervals set
-    [ H{ } clone ] reg-class-assoc spill-slots set 
-    init-unhandled ;
+: begin-block ( bb -- )
+    [ block-from compute-live-values ] keep register-live-ins get set-at ;
+
+: end-block ( bb -- )
+    [ block-to compute-live-values ] keep register-live-outs get set-at ;
+
+: vreg-at-start ( vreg bb -- state ) register-live-ins get at at ;
+
+: vreg-at-end ( vreg bb -- state ) register-live-outs get at at ;
 
 : assign-registers-in-block ( bb -- )
+    dup
+    begin-block
     [
         [
             [
-                [
-                    insn#>>
-                    [ expire-old-intervals ]
-                    [ activate-new-intervals ]
-                    bi
-                ]
+                [ prepare-insn ]
                 [ assign-registers-in-insn ]
                 [ , ]
                 tri
             ] each
         ] V{ } make
-    ] change-instructions drop ;
+    ] change-instructions
+    end-block ;
 
 : assign-registers ( live-intervals rpo -- )
     [ init-assignment ] dip
