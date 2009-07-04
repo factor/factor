@@ -105,7 +105,7 @@ ERROR: already-reloaded ;
 GENERIC: assign-registers-in-insn ( insn -- )
 
 : register-mapping ( live-intervals -- alist )
-    [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc ;
+    [ [ vreg>> ] [ reg>> ] bi ] H{ } map>assoc ;
 
 : all-vregs ( insn -- vregs )
     [ defs-vregs ] [ temp-vregs ] [ uses-vregs ] tri 3append ;
@@ -130,19 +130,22 @@ M: vreg-insn assign-registers-in-insn
     register-mapping
     >>regs drop ;
 
-: compute-live-registers ( insn -- regs )
+: compute-live-registers ( insn -- assoc )
     [ active-intervals ] [ temp-vregs ] bi
     '[ vreg>> _ memq? not ] filter
     register-mapping ;
 
-: compute-live-spill-slots ( -- spill-slots )
+: compute-live-spill-slots ( -- assocs )
     spill-slots get values
-    [ [ vreg>> swap ] { } assoc-map-as ] map concat ;
+    [ [ vreg>> swap <spill-slot> ] H{ } assoc-map-as ] map ;
+
+: compute-live-values ( insn -- assoc )
+    [ compute-live-spill-slots ] dip compute-live-registers suffix
+    assoc-combine ;
 
 M: ##gc assign-registers-in-insn
     dup call-next-method
-    dup compute-live-registers >>live-registers
-    compute-live-spill-slots >>live-spill-slots
+    dup compute-live-values >>live-values
     drop ;
 
 M: insn assign-registers-in-insn drop ;
