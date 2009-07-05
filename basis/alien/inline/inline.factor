@@ -14,22 +14,9 @@ SYMBOL: library-is-c++
 SYMBOL: compiler-args
 SYMBOL: c-strings
 
-: annotate-effect ( types effect -- types effect' )
-    [ in>> ] [ out>> ] bi [
-        zip
-        [ over pointer-to-primitive? [ ">" prepend ] when ]
-        assoc-map unzip
-    ] dip <effect> ;
-
-
 : function-types-effect ( -- function types effect )
     scan scan swap ")" parse-tokens
     [ "(" subseq? not ] filter swap parse-arglist ;
-
-: types-effect>params-return ( types effect -- params return )
-    [ in>> zip ]
-    [ nip out>> dup length 0 > [ first ] [ drop "void" ] if ]
-    2bi ;
 
 : arg-list ( types -- params )
     CHAR: a swap length CHAR: a + [a,b]
