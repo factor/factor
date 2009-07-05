@@ -102,13 +102,15 @@ PRIVATE>
     out>> prototype-string'
     append-function-body c-strings get push ;
 
-: define-c-marshalled ( function types effect -- prototype )
+: define-c-marshalled ( function types effect -- )
     [ marshalled-function define-declared ] 3keep
-    prototype-string ;
+    prototype-string
+    append-function-body c-strings get push ;
 
-: define-c-marshalled' ( function effect -- prototype )
+: define-c-marshalled' ( function effect -- )
     [ in>> ] keep [ marshalled-function define-declared ] 3keep
-    out>> prototype-string' ;
+    out>> prototype-string'
+    append-function-body c-strings get push ;
 
 : define-c-link ( str -- )
     "-l" prepend compiler-args get push ;
@@ -138,7 +140,6 @@ SYNTAX: C-FUNCTION:
     function-types-effect define-c-function ;
 
 SYNTAX: C-MARSHALLED:
-    function-types-effect define-c-marshalled
-    append-function-body c-strings get push ;
+    function-types-effect define-c-marshalled ;
 
 SYNTAX: ;C-LIBRARY compile-c-library ;
