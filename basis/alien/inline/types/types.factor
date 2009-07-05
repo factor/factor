@@ -32,3 +32,15 @@ MEMO: resolved-primitives ( -- seq )
 
 : pointer-to-primitive? ( type -- ? )
     { [ pointer? ] [ type-sans-pointer primitive-type? ] } 1&& ;
+
+: types-effect>params-return ( types effect -- params return )
+    [ in>> zip ]
+    [ nip out>> dup length 0 > [ first ] [ drop "void" ] if ]
+    2bi ;
+
+: annotate-effect ( types effect -- types effect' )
+    [ in>> ] [ out>> ] bi [
+        zip
+        [ over pointer-to-primitive? [ ">" prepend ] when ]
+        assoc-map unzip
+    ] dip <effect> ;
