@@ -42,7 +42,7 @@ SYMBOL: c-strings
     concat make-function ;
 
 :: marshalled-function ( function types effect -- word quot effect )
-    function types effect factor-function
+    function types effect annotate-effect factor-function
     [ in>> ]
     [ out>> types [ pointer-to-primitive? ] filter append ]
     bi <effect>
