@@ -1,19 +1,12 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.inline.compiler alien.libraries
-alien.parser arrays assocs effects fry generalizations grouping
-io.files io.files.info io.files.temp kernel lexer math
-math.order math.ranges multiline namespaces sequences splitting
+USING: accessors alien.inline.compiler alien.inline.types
+alien.libraries alien.marshall alien.parser arrays assocs
+combinators effects fry generalizations grouping io.files
+io.files.info io.files.temp kernel lexer locals math math.order
+math.ranges multiline namespaces quotations sequences splitting
 strings system vocabs.loader vocabs.parser words ;
 IN: alien.inline
-
-: factorize-type ( str -- str' )
-    "const-" ?head drop
-    "unsigned-" ?head [ "u" prepend ] when
-    "long-" ?head [ "long" prepend ] when ;
-
-: cify-type ( str -- str' )
-    { { CHAR: ~ CHAR: space } } substitute ;
 
 <PRIVATE
 SYMBOL: c-library
@@ -47,6 +40,18 @@ SYMBOL: c-strings
     [ [ factorize-type ] map ] dip
     types-effect>params-return factorize-type -roll
     concat make-function ;
+
+:: marshalled-function ( function types effect -- word quot effect )
+    function types effect factor-function
+    [ in>> ]
+    [ out>> types [ pointer-to-primitive? ] filter append ]
+    bi <effect>
+    [
+        types [ marshaller ] map \ spread rot
+        types length \ nkeep
+        types [ out-arg-unmarshaller ] map \ spread
+        7 narray >quotation
+    ] dip ;
 
 : prototype-string ( function types effect -- str )
     [ [ cify-type ] map ] dip
@@ -95,6 +100,14 @@ PRIVATE>
     [ in>> ] keep [ factor-function define-declared ] 3keep
     out>> prototype-string' ;
 
+: define-c-marshalled ( function types effect -- prototype )
+    [ marshalled-function define-declared ] 3keep
+    prototype-string ;
+
+: define-c-marshalled' ( function effect -- prototype )
+    [ in>> ] keep [ marshalled-function define-declared ] 3keep
+    out>> prototype-string' ;
+
 : define-c-link ( str -- )
     "-l" prepend compiler-args get push ;
 
@@ -121,6 +134,10 @@ SYNTAX: C-INCLUDE: scan define-c-include ;
 
 SYNTAX: C-FUNCTION:
     function-types-effect define-c-function
+    append-function-body c-strings get push ;
+
+SYNTAX: C-MARSHALLED:
+    function-types-effect define-c-marshalled
     append-function-body c-strings get push ;
 
 SYNTAX: ;C-LIBRARY compile-c-library ;
