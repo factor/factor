@@ -27,3 +27,6 @@ IN: alien.marshall.syntax
 
 SYNTAX: C-MARSHALLED:
     function-types-effect define-c-marshalled ;
+
+SYNTAX: MARSHALLED:
+    function-types-effect marshalled-function define-declared ;
