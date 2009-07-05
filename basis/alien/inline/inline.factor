@@ -18,7 +18,9 @@ SYMBOL: c-strings
     [ "(" subseq? not ] filter swap parse-arglist ;
 
 : types-effect>params-return ( types effect -- params return )
-    [ nip out>> first ] [ in>> zip ] 2bi ;
+    [ in>> zip ]
+    [ nip out>> dup length 0 > [ first ] [ drop "void" ] if ]
+    2bi ;
 
 : arg-list ( types -- params )
     CHAR: a swap length CHAR: a + [a,b]
