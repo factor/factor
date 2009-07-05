@@ -1,8 +1,8 @@
-USING: accessors assocs bson.constants bson.writer combinators combinators.smart
-constructors continuations destructors formatting fry io io.pools
-io.encodings.binary io.sockets io.streams.duplex kernel linked-assocs hashtables
-namespaces parser prettyprint sequences sets splitting strings uuid arrays
-math math.parser memoize mongodb.connection mongodb.msg mongodb.operations  ;
+USING: accessors arrays assocs bson.constants combinators
+combinators.smart constructors destructors formatting fry hashtables
+io io.pools io.sockets kernel linked-assocs math mongodb.connection
+mongodb.msg parser prettyprint sequences sets splitting strings
+tools.continuations uuid memoize locals ;
 
 IN: mongodb.driver
 
@@ -22,9 +22,6 @@ TUPLE: index-spec
 { ns string } { name string } { key hashtable } { unique? boolean initial: f } ;
 
 CONSTRUCTOR: index-spec ( ns name key -- index-spec ) ;
-
-: unique-index ( index-spec -- index-spec )
-    t >>unique? ;
 
 M: mdb-pool make-connection
     mdb>> mdb-open ;
@@ -83,6 +80,15 @@ M: mdb-getmore-msg verify-query-result
     [ make-cursor ] 2tri
     swap objects>> ;
 
+: make-collection-assoc ( collection assoc -- )
+    [ [ name>> "create" ] dip set-at ]
+    [ [ [ capped>> ] keep ] dip
+      '[ _ _
+         [ [ drop t "capped" ] dip set-at ]
+         [ [ size>> "size" ] dip set-at ]
+         [ [ max>> "max" ] dip set-at ] 2tri ] when
+    ] 2bi ; 
+
 PRIVATE>
 
 SYNTAX: r/ ( token -- mdbregexp )
@@ -100,23 +106,17 @@ SYNTAX: r/ ( token -- mdbregexp )
    H{ } clone [ set-at ] keep <mdb-db>
    [ verify-nodes ] keep ;
 
-GENERIC: create-collection ( name -- )
+GENERIC: create-collection ( name/collection -- )
 
 M: string create-collection
     <mdb-collection> create-collection ;
 
 M: mdb-collection create-collection
-    [ cmd-collection ] dip
-    <linked-hash> [
-        [ [ name>> "create" ] dip set-at ]
-        [ [ [ capped>> ] keep ] dip
-          '[ _ _
-             [ [ drop t "capped" ] dip set-at ]
-             [ [ size>> "size" ] dip set-at ]
-             [ [ max>> "max" ] dip set-at ] 2tri ] when
-        ] 2bi
-    ] keep <mdb-query-msg> 1 >>return# send-query-plain drop ;
-
+    [ [ cmd-collection ] dip
+      <linked-hash> [ make-collection-assoc ] keep
+      <mdb-query-msg> 1 >>return# send-query-plain drop ] keep
+      [ ] [ name>> ] bi mdb-instance collections>> set-at ;
+  
 : load-collection-list ( -- collection-list )
     namespaces-collection
     H{ } clone <mdb-query-msg> send-query-plain objects>> ;
@@ -125,27 +125,36 @@ M: mdb-collection create-collection
 
 : ensure-valid-collection-name ( collection -- )
     [ ";$." intersect length 0 > ] keep
-    '[ _ "%s contains invalid characters ( . $ ; )" sprintf throw ] when ; inline
+    '[ _ "contains invalid characters ( . $ ; )" 2array "." join throw ] when ; inline
 
-: (ensure-collection) ( collection --  )
-    mdb-instance collections>> dup keys length 0 = 
-    [ load-collection-list      
-      [ [ "options" ] dip key? ] filter
-      [ [ "name" ] dip at "." split second <mdb-collection> ] map
-      over '[ [ ] [ name>> ] bi _ set-at ] each ] [ ] if
-    [ dup ] dip key? [ drop ]
-    [ [ ensure-valid-collection-name ] keep create-collection ] if ; 
+: build-collection-map ( -- assoc )
+    H{ } clone load-collection-list      
+    [ [ "name" ] dip at "." split second <mdb-collection> ] map
+    over '[ [ ] [ name>> ] bi _ set-at ] each ;
 
+: ensure-collection-map ( mdb-instance -- assoc )
+    dup collections>> dup keys length 0 = 
+    [ drop build-collection-map [ >>collections drop ] keep ]
+    [ nip ] if ; 
+
+: (ensure-collection) ( collection mdb-instance -- collection )
+    ensure-collection-map [ dup ] dip key?
+    [ ] [ [ ensure-valid-collection-name ]
+          [ create-collection ]
+          [ ] tri ] if ; 
+      
 : reserved-namespace? ( name -- ? )
     [ "$cmd" = ] [ "system" head? ] bi or ;
 
 : check-collection ( collection -- fq-collection )
-    dup mdb-collection? [ name>> ] when
-    "." split1 over mdb-instance name>> =
-    [ nip ] [ drop ] if
-    [ ] [ reserved-namespace? ] bi
-    [ [ (ensure-collection) ] keep ] unless
-    [ mdb-instance name>> ] dip "%s.%s" sprintf ; 
+    [let* | instance [ mdb-instance ]
+            instance-name [ instance name>> ] |        
+        dup mdb-collection? [ name>> ] when
+        "." split1 over instance-name =
+        [ nip ] [ drop ] if
+        [ ] [ reserved-namespace? ] bi
+        [ instance (ensure-collection) ] unless
+        [ instance-name ] dip 2array "." join ] ; 
 
 : fix-query-collection ( mdb-query -- mdb-query )
     [ check-collection ] change-collection ; inline
