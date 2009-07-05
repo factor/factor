@@ -32,7 +32,7 @@ SYMBOL: c-strings
     "long-" ?head [ "long" prepend ] when ;
 
 : cify-type ( str -- str' )
-    { { CHAR: ~ CHAR: space } } substitute ;
+    { { CHAR: - CHAR: space } } substitute ;
 
 : factor-function ( function types effect -- )
     [ c-library get ] 3dip [ [ factorize-type ] map ] dip
