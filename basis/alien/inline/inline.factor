@@ -15,7 +15,7 @@ SYMBOL: c-strings
 
 : function-types-effect ( -- function types effect )
     scan scan swap ")" parse-tokens
-    [ "(" subseq? not ] filter parse-arglist ;
+    [ "(" subseq? not ] filter swap parse-arglist ;
 
 : types-effect>params-return ( types effect -- params return )
     [ nip out>> first ] [ in>> zip ] 2bi ;
