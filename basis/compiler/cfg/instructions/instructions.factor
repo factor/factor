@@ -199,6 +199,16 @@ SYMBOL: cc/=
         { cc/= cc= }
     } at ;
 
+: swap-cc ( cc -- cc' )
+    H{
+        { cc< cc> }
+        { cc<= cc>= }
+        { cc> cc< }
+        { cc>= cc<= }
+        { cc= cc= }
+        { cc/= cc/= }
+    } at ;
+
 : evaluate-cc ( result cc -- ? )
     H{
         { cc<  { +lt+           } }
@@ -220,7 +230,7 @@ INSN: ##compare-imm < ##binary-imm cc temp ;
 INSN: ##compare-float-branch < ##conditional-branch ;
 INSN: ##compare-float < ##binary cc temp ;
 
-INSN: ##gc { temp1 vreg } { temp2 vreg } live-registers live-spill-slots ;
+INSN: ##gc { temp1 vreg } { temp2 vreg } live-values ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;
@@ -240,7 +250,7 @@ INSN: _compare-imm-branch label { src1 vreg } { src2 integer } cc ;
 
 INSN: _compare-float-branch < _conditional-branch ;
 
-TUPLE: spill-slot { n integer } ; C: <spill-slot> spill-slot
+TUPLE: spill-slot n ; C: <spill-slot> spill-slot
 
 INSN: _gc { temp1 vreg } { temp2 vreg } gc-roots gc-root-count gc-root-size ;
 

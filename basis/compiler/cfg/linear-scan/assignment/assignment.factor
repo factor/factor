@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math assocs namespaces sequences heaps
-fry make combinators sets
+fry make combinators sets locals
 cpu.architecture
 compiler.cfg.def-use
 compiler.cfg.registers
@@ -32,6 +32,20 @@ SYMBOL: spill-slots
 
 : spill-slots-for ( vreg -- assoc )
     reg-class>> spill-slots get at ;
+
+! Mapping from basic blocks to values which are live at the start
+SYMBOL: register-live-ins
+
+! Mapping from basic blocks to values which are live at the end
+SYMBOL: register-live-outs
+
+: init-assignment ( live-intervals -- )
+    V{ } clone pending-intervals set
+    <min-heap> unhandled-intervals set
+    [ H{ } clone ] reg-class-assoc spill-slots set
+    H{ } clone register-live-ins set
+    H{ } clone register-live-outs set
+    init-unhandled ;
 
 ERROR: already-spilled ;
 
@@ -102,10 +116,13 @@ ERROR: already-reloaded ;
         ] [ 2drop ] if
     ] if ;
 
+: prepare-insn ( n -- )
+    [ expire-old-intervals ] [ activate-new-intervals ] bi ;
+
 GENERIC: assign-registers-in-insn ( insn -- )
 
 : register-mapping ( live-intervals -- alist )
-    [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc ;
+    [ [ vreg>> ] [ reg>> ] bi ] H{ } map>assoc ;
 
 : all-vregs ( insn -- vregs )
     [ defs-vregs ] [ temp-vregs ] [ uses-vregs ] tri 3append ;
@@ -118,55 +135,67 @@ ERROR: overlapping-registers intervals ;
     dup [ copy-from>> ] map sift '[ vreg>> _ member? not ] filter
     dup [ reg>> ] map all-unique? [ drop ] [ overlapping-registers ] if ;
 
-: active-intervals ( insn -- intervals )
-    insn#>> pending-intervals get [ covers? ] with filter
+: active-intervals ( n -- intervals )
+    pending-intervals get [ covers? ] with filter
     check-assignment? get [
         dup check-assignment
     ] when ;
 
 M: vreg-insn assign-registers-in-insn
-    dup [ active-intervals ] [ all-vregs ] bi
+    dup [ insn#>> active-intervals ] [ all-vregs ] bi
     '[ vreg>> _ member? ] filter
     register-mapping
     >>regs drop ;
 
-: compute-live-registers ( insn -- regs )
-    [ active-intervals ] [ temp-vregs ] bi
-    '[ vreg>> _ memq? not ] filter
-    register-mapping ;
+: compute-live-registers ( n -- assoc )
+    active-intervals register-mapping ;
 
-: compute-live-spill-slots ( -- spill-slots )
-    spill-slots get values
-    [ [ vreg>> swap ] { } assoc-map-as ] map concat ;
+: compute-live-spill-slots ( -- assocs )
+    spill-slots get values first2
+    [ [ vreg>> swap <spill-slot> ] H{ } assoc-map-as ] bi@
+    assoc-union ;
+
+: compute-live-values ( n -- assoc )
+    [ compute-live-spill-slots ] dip compute-live-registers
+    assoc-union ;
+
+: compute-live-gc-values ( insn -- assoc )
+    [ insn#>> compute-live-values ] [ temp-vregs ] bi
+    '[ drop _ memq? not ] assoc-filter ;
 
 M: ##gc assign-registers-in-insn
     dup call-next-method
-    dup compute-live-registers >>live-registers
-    compute-live-spill-slots >>live-spill-slots
+    dup compute-live-gc-values >>live-values
     drop ;
 
 M: insn assign-registers-in-insn drop ;
 
-: init-assignment ( live-intervals -- )
-    V{ } clone pending-intervals set
-    <min-heap> unhandled-intervals set
-    [ H{ } clone ] reg-class-assoc spill-slots set 
-    init-unhandled ;
+: begin-block ( bb -- )
+    dup block-from 1 - prepare-insn
+    [ block-from compute-live-values ] keep register-live-ins get set-at ;
 
-: assign-registers-in-block ( bb -- )
-    [
+: end-block ( bb -- )
+    [ block-to compute-live-values ] keep register-live-outs get set-at ;
+
+ERROR: bad-vreg vreg ;
+
+: vreg-at-start ( vreg bb -- state )
+    register-live-ins get at ?at [ bad-vreg ] unless ;
+
+: vreg-at-end ( vreg bb -- state )
+    register-live-outs get at ?at [ bad-vreg ] unless ;
+
+:: assign-registers-in-block ( bb -- )
+    bb [
         [
+            bb begin-block
             [
-                [
-                    insn#>>
-                    [ expire-old-intervals ]
-                    [ activate-new-intervals ]
-                    bi
-                ]
+                [ insn#>> prepare-insn ]
                 [ assign-registers-in-insn ]
                 [ , ]
                 tri
             ] each
+            bb end-block
         ] V{ } make
     ] change-instructions drop ;
 

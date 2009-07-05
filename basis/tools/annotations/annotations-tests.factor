@@ -49,3 +49,14 @@ M: string blah-generic ;
 [ ] [ M\ string blah-generic watch ] unit-test
 
 [ "hi" ] [ "hi" blah-generic ] unit-test
+
+! See how well watch interacts with optimizations.
+GENERIC: my-generic ( a -- b )
+M: object my-generic ;
+
+\ my-generic watch
+
+: some-code ( -- )
+    f my-generic drop ;
+
+[ ] [ some-code ] unit-test

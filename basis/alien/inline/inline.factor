@@ -12,28 +12,17 @@ SYMBOL: library-is-c++
 SYMBOL: compiler-args
 SYMBOL: c-strings
 
-: (C-LIBRARY:) ( -- )
-    scan c-library set
-    V{ } clone c-strings set
-    V{ } clone compiler-args set ;
-
-: (C-LINK:) ( -- )
-    "-l" scan append compiler-args get push ;
-
-: (C-FRAMEWORK:) ( -- )
-    "-framework" scan compiler-args get '[ _ push ] bi@ ;
-
 : return-library-function-params ( -- return library function params )
     scan c-library get scan ")" parse-tokens
     [ "(" subseq? not ] filter [
         [ dup CHAR: - = [ drop CHAR: space ] when ] map
     ] 3dip ;
 
-: factor-function ( return library functions params -- )
+: factor-function ( return library function params -- )
     [ dup "const " head? [ 6 tail ] when ] 3dip
     make-function define-declared ;
 
-: (C-FUNCTION:) ( return library function params -- str )
+: c-function-string ( return library function params -- str )
     [ nip ] dip
     " " join "(" prepend ")" append 3array " " join
     library-is-c++ get [ "extern \"C\" " prepend ] when ;
@@ -53,31 +42,47 @@ SYMBOL: c-strings
     compiler-args get
     c-strings get "\n" join
     c-library get compile-to-library ;
-
-: (;C-LIBRARY) ( -- )
-    compile-library? [ compile-library ] when
-    c-library get library-path "cdecl" add-library ;
 PRIVATE>
 
-SYNTAX: C-LIBRARY: (C-LIBRARY:) ;
+: define-c-library ( name -- )
+    c-library set
+    V{ } clone c-strings set
+    V{ } clone compiler-args set ;
 
-SYNTAX: COMPILE-AS-C++ t library-is-c++ set ;
+: compile-c-library ( -- )
+    compile-library? [ compile-library ] when
+    c-library get library-path "cdecl" add-library ;
 
-SYNTAX: C-LINK: (C-LINK:) ;
-
-SYNTAX: C-FRAMEWORK: (C-FRAMEWORK:) ;
-
-SYNTAX: C-LINK/FRAMEWORK:
-    os macosx? [ (C-FRAMEWORK:) ] [ (C-LINK:) ] if ;
-
-SYNTAX: C-INCLUDE:
-    "#include " scan append c-strings get push ;
-
-SYNTAX: C-FUNCTION:
-    return-library-function-params
-    [ factor-function ]
-    4 nkeep (C-FUNCTION:)
+: define-c-function ( return library function params -- )
+    [ factor-function ] 4 nkeep c-function-string
     " {\n" append parse-here append "\n}\n" append
     c-strings get push ;
 
-SYNTAX: ;C-LIBRARY (;C-LIBRARY) ;
+: define-c-link ( str -- )
+    "-l" prepend compiler-args get push ;
+
+: define-c-framework ( str -- )
+    "-framework" swap compiler-args get '[ _ push ] bi@ ;
+
+: define-c-link/framework ( str -- )
+    os macosx? [ define-c-framework ] [ define-c-link ] if ;
+
+: define-c-include ( str -- )
+    "#include " prepend c-strings get push ;
+
+SYNTAX: C-LIBRARY: scan define-c-library ;
+
+SYNTAX: COMPILE-AS-C++ t library-is-c++ set ;
+
+SYNTAX: C-LINK: scan define-c-link ;
+
+SYNTAX: C-FRAMEWORK: scan define-c-framework ;
+
+SYNTAX: C-LINK/FRAMEWORK: scan define-c-link/framework ;
+
+SYNTAX: C-INCLUDE: scan define-c-include ;
+
+SYNTAX: C-FUNCTION:
+    return-library-function-params define-c-function ;
+
+SYNTAX: ;C-LIBRARY compile-c-library ;

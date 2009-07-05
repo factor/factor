@@ -311,3 +311,7 @@ M: cucumber equal? "The cucumber has no equal" throw ;
 ] [
     [ { 1 2 3 } "x" "y" linear-scan-regression ] { } make
 ] unit-test
+
+! Regression from Doug's value numbering changes
+[ t ] [ 2 [ 1 swap fixnum< ] compile-call ] unit-test
+[ 3 ] [ 2 [ 1 swap fixnum< [ 3 ] [ 4 ] if ] compile-call ] unit-test

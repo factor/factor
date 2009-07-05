@@ -1,11 +1,11 @@
-! Copyright (C) 2008 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit
-arrays compiler.cfg.hats compiler.cfg.instructions
+USING: accessors locals combinators combinators.short-circuit arrays
+fry kernel layouts math namespaces sequences cpu.architecture
+math.bitwise compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.simplify fry kernel layouts math
-namespaces sequences cpu.architecture math.bitwise locals ;
+compiler.cfg.value-numbering.simplify ;
 IN: compiler.cfg.value-numbering.rewrite
 
 GENERIC: rewrite ( insn -- insn' )
@@ -70,21 +70,34 @@ M: ##compare-imm-branch rewrite
         dup rewrite-tagged-comparison? [ rewrite-tagged-comparison ] when
     ] when ;
 
-: flip-comparison? ( insn -- ? )
-    dup cc>> cc= eq? [ src1>> vreg>expr constant-expr? ] [ drop f ] if ;
+:: >compare-imm ( insn swap? -- insn' )
+    insn dst>>
+    insn src1>>
+    insn src2>> swap? [ swap ] when vreg>constant
+    insn cc>> swap? [ swap-cc ] when
+    i \ ##compare-imm new-insn ; inline
 
-: flip-comparison ( insn -- insn' )
-    [ dst>> ]
-    [ src2>> ]
-    [ src1>> vreg>constant ] tri
-    cc= i \ ##compare-imm new-insn ;
+! M: ##compare rewrite
+!     dup [ src1>> ] [ src2>> ] bi
+!     [ vreg>expr constant-expr? ] bi@ 2array {
+!         { { f t } [ f >compare-imm ] }
+!         { { t f } [ t >compare-imm ] }
+!         [ drop ]
+!     } case ;
 
-M: ##compare rewrite
-    dup flip-comparison? [
-        flip-comparison
-        dup number-values
-        rewrite
-    ] when ;
+:: >compare-imm-branch ( insn swap? -- insn' )
+    insn src1>>
+    insn src2>> swap? [ swap ] when vreg>constant
+    insn cc>> swap? [ swap-cc ] when
+    \ ##compare-imm-branch new-insn ; inline
+
+! M: ##compare-branch rewrite
+!     dup [ src1>> ] [ src2>> ] bi
+!     [ vreg>expr constant-expr? ] bi@ 2array {
+!         { { f t } [ f >compare-imm-branch ] }
+!         { { t f } [ t >compare-imm-branch ] }
+!         [ drop ]
+!     } case ;
 
 : rewrite-redundant-comparison? ( insn -- ? )
     {

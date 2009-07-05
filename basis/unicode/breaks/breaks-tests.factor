@@ -12,6 +12,11 @@ IN: unicode.breaks.tests
 [ 3 ] [ 2 "hello" first-grapheme-from ] unit-test
 [ 1 ] [ 2 "hello" last-grapheme-from ] unit-test
 
+[ 4 ] [ 2 "what am I saying" first-word-from ] unit-test
+[ 0 ] [ 2 "what am I saying" last-word-from ] unit-test
+[ 16 ] [ 11 "what am I saying" first-word-from ] unit-test
+[ 10 ] [ 11 "what am I saying" last-word-from ] unit-test
+
 : grapheme-break-test ( -- filename )
     "vocab:unicode/breaks/GraphemeBreakTest.txt" ;
 
