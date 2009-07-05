@@ -95,7 +95,7 @@ M: world graft*
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
         [ end-world ]
-        [ [ [ [ dispose ] when* ] each V{ } clone ] change-window-resources drop ]
+        [ [ <reversed> [ [ dispose ] when* ] each V{ } clone ] change-window-resources drop ]
     } cleave ;
 
 M: world ungraft*
