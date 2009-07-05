@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes.parser classes.tuple
 combinators combinators.short-circuit fry hashtables kernel locals
 make math math.order namespaces sequences sets words parser
-compiler.cfg.instructions compiler.cfg.linear-scan.live-intervals
+compiler.cfg.instructions compiler.cfg.linear-scan.assignment
 compiler.cfg.liveness ;
 IN: compiler.cfg.linear-scan.resolve
 
@@ -14,50 +14,33 @@ TUPLE: operation from to reg-class ;
 SYNTAX: OPERATION:
     CREATE-CLASS dup save-location
     [ operation { } define-tuple-class ]
-    [
-        [ scan-word scan-word ] keep
-        '[
-            [ [ _ execute ] [ _ execute ] bi* ]
-            [ vreg>> reg-class>> ]
-            bi _ boa ,
-        ] (( from to -- )) define-declared
-    ] bi ;
+    [ dup '[ _ boa , ] (( from to reg-class -- )) define-declared ] bi ;
 
 >>
 
-: insn-in-block? ( insn# bb -- ? )
-    [ block-from ] [ block-to ] bi between? ;
+OPERATION: register->memory
+OPERATION: memory->register
+OPERATION: register->register
 
-: reload-from ( live-interval bb -- n/f )
-    2dup [ start>> ] dip insn-in-block?
-    [ drop reload-from>> ] [ 2drop f ] if ;
+! This should never come up because of how spill slots are assigned,
+! so make it an error.
+: memory->memory ( from to reg-class -- ) drop [ n>> ] bi@ assert= ;
 
-: spill-to ( live-interval bb -- n/f )
-    2dup [ end>> ] dip insn-in-block?
-    [ drop spill-to>> ] [ 2drop f ] if ;
-
-OPERATION: memory->memory spill-to>> reload-from>>
-OPERATION: register->memory reg>> reload-from>>
-OPERATION: memory->register spill-to>> reg>>
-OPERATION: register->register reg>> reg>>
-
-:: add-mapping ( bb1 bb2 li1 li2 -- )
-    li2 bb2 reload-from [
-        li1 bb1 spill-to
-        [ li1 li2 memory->memory ]
-        [ li1 li2 register->memory ] if
+: add-mapping ( from to reg-class -- )
+    over spill-slot? [
+        pick spill-slot?
+        [ memory->memory ]
+        [ register->memory ] if
     ] [
-        li1 bb1 spill-to
-        [ li1 li2 memory->register ]
-        [ li1 li2 register->register ] if
+        pick spill-slot?
+        [ memory->register ]
+        [ register->register ] if
     ] if ;
 
-: resolve-value-data-flow ( bb to vreg -- )
-    [ 2dup ] dip
-    live-intervals get at
-    [ [ block-to ] dip child-interval-at ]
-    [ [ block-from ] dip child-interval-at ]
-    bi-curry bi* 2dup eq? [ 2drop 2drop ] [ add-mapping ] if ;
+:: resolve-value-data-flow ( bb to vreg -- )
+    vreg bb vreg-at-end
+    vreg to vreg-at-start
+    2dup eq? [ 2drop ] [ vreg reg-class>> add-mapping ] if ;
 
 : compute-mappings ( bb to -- mappings )
     [
@@ -67,30 +50,13 @@ OPERATION: register->register reg>> reg>>
 
 GENERIC: >insn ( operation -- )
 
-M: memory->memory >insn
-    [ from>> ] [ to>> ] bi = [ "Not allowed" throw ] unless ;
-
 M: register->memory >insn
-    [ from>> ] [ reg-class>> ] [ to>> ] tri _spill ;
+    [ from>> ] [ reg-class>> ] [ to>> n>> ] tri _spill ;
 
 M: memory->register >insn
-    [ to>> ] [ reg-class>> ] [ from>> ] tri  _reload ;
+    [ to>> ] [ reg-class>> ] [ from>> n>> ] tri  _reload ;
 
 M: register->register >insn
-    [ to>> ] [ from>> ] [ reg-class>> ] tri _copy ;
-
-GENERIC: >collision-table ( operation -- )
-
-M: memory->memory >collision-table
-    [ from>> ] [ to>> ] bi = [ "Not allowed" throw ] unless ;
-
-M: register->memory >collision-table
-    [ from>> ] [ reg-class>> ] [ to>> ] tri _spill ;
-
-M: memory->register >collision-table
-    [ to>> ] [ reg-class>> ] [ from>> ] tri _reload ;
-
-M: register->register >collision-table
     [ to>> ] [ from>> ] [ reg-class>> ] tri _copy ;
 
 SYMBOL: froms
@@ -98,17 +64,9 @@ SYMBOL: tos
 
 SINGLETONS: memory register ;
 
-GENERIC: from-loc ( operation -- obj )
-M: memory->memory from-loc drop memory ;
-M: register->memory from-loc drop register ;
-M: memory->register from-loc drop memory ;
-M: register->register from-loc drop register ;
+: from-loc ( operation -- obj ) from>> spill-slot? memory register ? ;
 
-GENERIC: to-loc ( operation -- obj )
-M: memory->memory to-loc drop memory ;
-M: register->memory to-loc drop memory ;
-M: memory->register to-loc drop register ;
-M: register->register to-loc drop register ;
+: to-loc ( operation -- obj ) to>> spill-slot? memory register ? ;
 
 : from-reg ( operation -- seq )
     [ from-loc ] [ from>> ] [ reg-class>> ] tri 3array ;
@@ -142,7 +100,6 @@ M: register->register to-loc drop register ;
         dup dup associate (trace-chain)
     ] { } make prune reverse ;
 
-
 : trace-chains ( seq -- seq' )
     [ trace-chain ] map concat ;
 
@@ -159,10 +116,10 @@ ERROR: resolve-error ;
 
 : break-cycle-n ( operations -- operations' )
     split-cycle [
-        [ from>> spill-temp ]
+        [ from>> spill-temp <spill-slot> ]
         [ reg-class>> ] bi \ register->memory boa
     ] [
-        [ to>> spill-temp swap ]
+        [ to>> spill-temp <spill-slot> swap ]
         [ reg-class>> ] bi \ memory->register boa
     ] bi [ 1array ] bi@ surround ;
 

@@ -109,18 +109,26 @@ CONSTANT: reg-classes { int-regs double-float-regs }
 : reg-class-assoc ( quot -- assoc )
     [ reg-classes ] dip { } map>assoc ; inline
 
+! Mapping from register classes to spill counts
 SYMBOL: spill-counts
 
-: next-spill-location ( reg-class -- n )
+: next-spill-slot ( reg-class -- n )
     spill-counts get [ dup 1 + ] change-at ;
+
+! Mapping from vregs to spill slots
+SYMBOL: spill-slots
+
+: assign-spill-slot ( vreg -- n )
+    spill-slots get [ reg-class>> next-spill-slot ] cache ;
 
 : init-allocator ( registers -- )
     registers set
-    [ 0 ] reg-class-assoc spill-counts set
     <min-heap> unhandled-intervals set
     [ V{ } clone ] reg-class-assoc active-intervals set
     [ V{ } clone ] reg-class-assoc inactive-intervals set
     V{ } clone handled-intervals set
+    [ 0 ] reg-class-assoc spill-counts set
+    H{ } clone spill-slots set
     -1 progress set ;
 
 : init-unhandled ( live-intervals -- )
