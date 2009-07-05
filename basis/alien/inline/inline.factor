@@ -88,12 +88,14 @@ PRIVATE>
     compile-library? [ compile-library ] when
     c-library get library-path "cdecl" add-library ;
 
-: define-c-function ( function types effect -- prototype )
-    [ factor-function define-declared ] 3keep prototype-string ;
+: define-c-function ( function types effect -- )
+    [ factor-function define-declared ] 3keep prototype-string
+    append-function-body c-strings get push ;
 
-: define-c-function' ( function effect -- prototype )
+: define-c-function' ( function effect -- )
     [ in>> ] keep [ factor-function define-declared ] 3keep
-    out>> prototype-string' ;
+    out>> prototype-string'
+    append-function-body c-strings get push ;
 
 : define-c-link ( str -- )
     "-l" prepend compiler-args get push ;
@@ -120,7 +122,6 @@ SYNTAX: C-LINK/FRAMEWORK: scan define-c-link/framework ;
 SYNTAX: C-INCLUDE: scan define-c-include ;
 
 SYNTAX: C-FUNCTION:
-    function-types-effect define-c-function
-    append-function-body c-strings get push ;
+    function-types-effect define-c-function ;
 
 SYNTAX: ;C-LIBRARY compile-c-library ;
