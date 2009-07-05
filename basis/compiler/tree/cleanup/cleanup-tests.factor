@@ -6,6 +6,7 @@ definitions system layouts vectors math.partial-dispatch
 math.order math.functions accessors hashtables classes assocs
 io.encodings.utf8 io.encodings.ascii io.encodings fry slots
 sorting.private combinators.short-circuit grouping prettyprint
+generalizations
 compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
@@ -517,4 +518,24 @@ cell-bits 32 = [
 [ t ] [
     [ { integer integer } declare + drop ]
     { + +-integer-integer } inlined?
+] unit-test
+
+[ [ ] ] [
+    [
+        20 f <array>
+        [ 0 swap nth ] keep
+        [ 1 swap nth ] keep
+        [ 2 swap nth ] keep
+        [ 3 swap nth ] keep
+        [ 4 swap nth ] keep
+        [ 5 swap nth ] keep
+        [ 6 swap nth ] keep
+        [ 7 swap nth ] keep
+        [ 8 swap nth ] keep
+        [ 9 swap nth ] keep
+        [ 10 swap nth ] keep
+        [ 11 swap nth ] keep
+        [ 12 swap nth ] keep
+        14 ndrop
+    ] cleaned-up-tree nodes>quot
 ] unit-test
