@@ -34,10 +34,10 @@ SYMBOL: c-strings
 : cify-type ( str -- str' )
     { { CHAR: - CHAR: space } } substitute ;
 
-: factor-function ( function types effect -- )
+: factor-function ( function types effect -- word quot effect )
     [ c-library get ] 3dip [ [ factorize-type ] map ] dip
     types-effect>params-return factorize-type -roll
-    make-function define-declared ;
+    concat make-function ;
 
 : prototype-string ( function types effect -- str )
     [ [ cify-type ] map ] dip
@@ -79,14 +79,12 @@ PRIVATE>
     compile-library? [ compile-library ] when
     c-library get library-path "cdecl" add-library ;
 
-: define-c-function ( function types effect -- )
-    [ factor-function ] 3keep prototype-string
-    append-function-body c-strings get push ;
+: define-c-function ( function types effect -- prototype )
+    [ factor-function define-declared ] 3keep prototype-string ;
 
-: define-c-function' ( function effect -- )
-    [ in>> ] keep [ factor-function ] 3keep
-    out>> prototype-string'
-    append-function-body c-strings get push ;
+: define-c-function' ( function effect -- prototype )
+    [ in>> ] keep [ factor-function define-declared ] 3keep
+    out>> prototype-string' ;
 
 : define-c-link ( str -- )
     "-l" prepend compiler-args get push ;
@@ -112,6 +110,8 @@ SYNTAX: C-LINK/FRAMEWORK: scan define-c-link/framework ;
 
 SYNTAX: C-INCLUDE: scan define-c-include ;
 
-SYNTAX: C-FUNCTION: function-types-effect define-c-function ;
+SYNTAX: C-FUNCTION:
+    function-types-effect define-c-function
+    append-function-body c-strings get push ;
 
 SYNTAX: ;C-LIBRARY compile-c-library ;
