@@ -40,19 +40,20 @@ SYMBOL: c-strings
         7 narray >quotation
     ] dip ;
 
-: prototype-string ( function types effect -- str )
+: append-function-body ( prototype-str -- str )
+    " {\n" append parse-here append "\n}\n" append ;
+
+: c-function-string ( function types effect -- str )
     [ [ cify-type ] map ] dip
     types-effect>params-return cify-type -rot
     [ " " join ] map ", " join
     "(" prepend ")" append 3array " " join
-    library-is-c++ get [ "extern \"C\" " prepend ] when ;
+    library-is-c++ get [ "extern \"C\" " prepend ] when
+    append-function-body ;
 
-: prototype-string' ( function types return -- str )
-    [ dup arg-list ] <effect> prototype-string ;
-
-: append-function-body ( prototype-str -- str )
-    " {\n" append parse-here append "\n}\n" append ;
-
+: c-function-string' ( function types return -- str )
+    [ dup arg-list ] <effect> c-function-string
+    append-function-body ;
 
 : library-path ( -- str )
     "lib" c-library get library-suffix
@@ -81,23 +82,20 @@ PRIVATE>
     c-library get library-path "cdecl" add-library ;
 
 : define-c-function ( function types effect -- )
-    [ factor-function define-declared ] 3keep prototype-string
-    append-function-body c-strings get push ;
+    [ factor-function define-declared ] 3keep
+    c-function-string c-strings get push ;
 
 : define-c-function' ( function effect -- )
     [ in>> ] keep [ factor-function define-declared ] 3keep
-    out>> prototype-string'
-    append-function-body c-strings get push ;
+    out>> c-function-string' c-strings get push ;
 
 : define-c-marshalled ( function types effect -- )
     [ marshalled-function define-declared ] 3keep
-    prototype-string
-    append-function-body c-strings get push ;
+    c-function-string c-strings get push ;
 
 : define-c-marshalled' ( function effect -- )
     [ in>> ] keep [ marshalled-function define-declared ] 3keep
-    out>> prototype-string'
-    append-function-body c-strings get push ;
+    out>> c-function-string' c-strings get push ;
 
 : define-c-link ( str -- )
     "-l" prepend compiler-args get push ;
