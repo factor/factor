@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types assocs combinators.short-circuit
-continuations fry kernel memoize sequences splitting ;
+USING: accessors alien.c-types assocs combinators.short-circuit
+continuations effects fry kernel math memoize sequences
+splitting ;
 IN: alien.inline.types
 
 : factorize-type ( str -- str' )
