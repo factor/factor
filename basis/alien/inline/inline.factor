@@ -42,7 +42,7 @@ SYMBOL: c-strings
 : prototype-string ( function types effect -- str )
     [ [ cify-type ] map ] dip
     types-effect>params-return cify-type -rot
-    2 group [ " " join "," append ] map " " join
+    [ " " join ] map ", " join
     "(" prepend ")" append 3array " " join
     library-is-c++ get [ "extern \"C\" " prepend ] when ;
 
