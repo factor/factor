@@ -8,52 +8,18 @@ math.ranges multiline namespaces quotations sequences splitting
 strings system vocabs.loader vocabs.parser words ;
 IN: alien.inline
 
-<PRIVATE
 SYMBOL: c-library
 SYMBOL: library-is-c++
 SYMBOL: compiler-args
 SYMBOL: c-strings
 
-: function-types-effect ( -- function types effect )
-    scan scan swap ")" parse-tokens
-    [ "(" subseq? not ] filter swap parse-arglist ;
-
+<PRIVATE
 : arg-list ( types -- params )
     CHAR: a swap length CHAR: a + [a,b]
     [ 1string ] map ;
 
-: factor-function ( function types effect -- word quot effect )
-    annotate-effect [ c-library get ] 3dip
-    [ [ factorize-type ] map ] dip
-    types-effect>params-return factorize-type -roll
-    concat make-function ;
-
-:: marshalled-function ( function types effect -- word quot effect )
-    function types effect annotate-effect factor-function
-    [ in>> ]
-    [ out>> types [ pointer-to-primitive? ] filter append ]
-    bi <effect>
-    [
-        types [ marshaller ] map \ spread rot
-        types length \ nkeep
-        types [ out-arg-unmarshaller ] map \ spread
-        7 narray >quotation
-    ] dip ;
-
 : append-function-body ( prototype-str -- str )
     " {\n" append parse-here append "\n}\n" append ;
-
-: c-function-string ( function types effect -- str )
-    [ [ cify-type ] map ] dip
-    types-effect>params-return cify-type -rot
-    [ " " join ] map ", " join
-    "(" prepend ")" append 3array " " join
-    library-is-c++ get [ "extern \"C\" " prepend ] when
-    append-function-body ;
-
-: c-function-string' ( function types return -- str )
-    [ dup arg-list ] <effect> c-function-string
-    append-function-body ;
 
 : library-path ( -- str )
     "lib" c-library get library-suffix
@@ -72,6 +38,28 @@ SYMBOL: c-strings
     c-library get compile-to-library ;
 PRIVATE>
 
+: function-types-effect ( -- function types effect )
+    scan scan swap ")" parse-tokens
+    [ "(" subseq? not ] filter swap parse-arglist ;
+
+: c-function-string ( function types effect -- str )
+    [ [ cify-type ] map ] dip
+    types-effect>params-return cify-type -rot
+    [ " " join ] map ", " join
+    "(" prepend ")" append 3array " " join
+    library-is-c++ get [ "extern \"C\" " prepend ] when
+    append-function-body ;
+
+: c-function-string' ( function types return -- str )
+    [ dup arg-list ] <effect> c-function-string
+    append-function-body ;
+
+: factor-function ( function types effect -- word quot effect )
+    annotate-effect [ c-library get ] 3dip
+    [ [ factorize-type ] map ] dip
+    types-effect>params-return factorize-type -roll
+    concat make-function ;
+
 : define-c-library ( name -- )
     c-library set
     V{ } clone c-strings set
@@ -87,14 +75,6 @@ PRIVATE>
 
 : define-c-function' ( function effect -- )
     [ in>> ] keep [ factor-function define-declared ] 3keep
-    out>> c-function-string' c-strings get push ;
-
-: define-c-marshalled ( function types effect -- )
-    [ marshalled-function define-declared ] 3keep
-    c-function-string c-strings get push ;
-
-: define-c-marshalled' ( function effect -- )
-    [ in>> ] keep [ marshalled-function define-declared ] 3keep
     out>> c-function-string' c-strings get push ;
 
 : define-c-link ( str -- )
@@ -123,8 +103,5 @@ SYNTAX: C-INCLUDE: scan define-c-include ;
 
 SYNTAX: C-FUNCTION:
     function-types-effect define-c-function ;
-
-SYNTAX: C-MARSHALLED:
-    function-types-effect define-c-marshalled ;
 
 SYNTAX: ;C-LIBRARY compile-c-library ;
