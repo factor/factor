@@ -10,7 +10,7 @@ IN: alien.inline.types
     "long-" ?head [ "long" prepend ] when ;
 
 : cify-type ( str -- str' )
-    { { CHAR: ~ CHAR: space } } substitute ;
+    { { CHAR: - CHAR: space } } substitute ;
 
 : const-type? ( str -- ? )
     "const-" head? ;
