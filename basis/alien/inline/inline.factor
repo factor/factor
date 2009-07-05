@@ -13,6 +13,14 @@ SYMBOL: library-is-c++
 SYMBOL: compiler-args
 SYMBOL: c-strings
 
+: annotate-effect ( types effect -- types effect' )
+    [ in>> ] [ out>> ] bi [
+        zip
+        [ over pointer-to-primitive? [ ">" prepend ] when ]
+        assoc-map unzip
+    ] dip <effect> ;
+
+
 : function-types-effect ( -- function types effect )
     scan scan swap ")" parse-tokens
     [ "(" subseq? not ] filter swap parse-arglist ;
@@ -35,7 +43,8 @@ SYMBOL: c-strings
     { { CHAR: - CHAR: space } } substitute ;
 
 : factor-function ( function types effect -- word quot effect )
-    [ c-library get ] 3dip [ [ factorize-type ] map ] dip
+    annotate-effect [ c-library get ] 3dip
+    [ [ factorize-type ] map ] dip
     types-effect>params-return factorize-type -roll
     concat make-function ;
 
