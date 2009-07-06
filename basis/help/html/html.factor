@@ -72,16 +72,6 @@ M: topic url-of topic>filename ;
 : generate-help-file ( topic -- )
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
-: remove-redundant-prefixes ( seq -- seq' )
-    #! Hack.
-    [ vocab-prefix? ] partition
-    [
-        [ vocab-name ] map unique
-        '[ name>> _ key? not ] filter
-        [ name>> vocab-link boa ] map
-    ] keep
-    append ;
-
 : all-vocabs-really ( -- seq )
     all-vocabs >hashtable f over delete-at no-roots remove-redundant-prefixes ;
 

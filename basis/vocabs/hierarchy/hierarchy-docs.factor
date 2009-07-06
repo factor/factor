@@ -13,6 +13,9 @@ $nl
 "Getting all vocabularies from disk whose names which match a string prefix:"
 { $subsection child-vocabs }
 { $subsection child-vocabs-recursive }
+"Words for modifying output:"
+{ $subsection no-roots }
+{ $subsection no-prefixes }
 "Getting " { $link "vocabs.metadata" } " for all vocabularies from disk:"
 { $subsection all-tags }
 { $subsection all-authors } ;
