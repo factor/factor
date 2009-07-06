@@ -57,7 +57,7 @@ ERROR: dead-value-error vreg ;
         V{ } clone >>ranges
         swap >>vreg ;
 
-: block-from ( bb -- n ) instructions>> first insn#>> ;
+: block-from ( bb -- n ) instructions>> first insn#>> 1 - ;
 
 : block-to ( bb -- n ) instructions>> last insn#>> ;
 

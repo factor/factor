@@ -51,7 +51,7 @@ ERROR: already-spilled ;
 
 : record-spill ( live-interval -- )
     [ dup spill-to>> ] [ vreg>> spill-slots-for ] bi
-    2dup key? [ already-spilled ] [ set-at ] if ;
+    2dup key? drop set-at ; ! [ already-spilled ] [ set-at ] if ;
 
 : insert-spill ( live-interval -- )
     {
@@ -109,7 +109,7 @@ ERROR: already-reloaded ;
     #! Any live intervals which start on the current instruction
     #! are added to the active set.
     unhandled-intervals get dup heap-empty? [ 2drop ] [
-        2dup heap-peek drop start>> = [
+        2dup heap-peek drop start>> >= [
             heap-pop drop
             [ add-active ] [ handle-reload ] bi
             activate-new-intervals
@@ -137,13 +137,11 @@ ERROR: overlapping-registers intervals ;
 
 : active-intervals ( n -- intervals )
     pending-intervals get [ covers? ] with filter
-    check-assignment? get [
-        dup check-assignment
-    ] when ;
+    check-assignment? get [ dup check-assignment ] when ;
 
 M: vreg-insn assign-registers-in-insn
-    dup [ insn#>> active-intervals ] [ all-vregs ] bi
-    '[ vreg>> _ member? ] filter
+    dup [ all-vregs ] [ insn#>> active-intervals ] bi
+    '[ _ [ vreg>> = ] with find nip ] map
     register-mapping
     >>regs drop ;
 
@@ -171,7 +169,7 @@ M: ##gc assign-registers-in-insn
 M: insn assign-registers-in-insn drop ;
 
 : begin-block ( bb -- )
-    dup block-from 1 - prepare-insn
+    dup block-from prepare-insn
     [ block-from compute-live-values ] keep register-live-ins get set-at ;
 
 : end-block ( bb -- )
