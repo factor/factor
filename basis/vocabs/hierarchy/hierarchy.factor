@@ -107,7 +107,7 @@ MEMO: all-vocabs-recursive ( -- assoc )
 PRIVATE>
 
 : (load) ( prefix -- failures )
-    child-vocabs-recursive
+    child-vocabs-recursive no-roots no-prefixes
     filter-unportable
     require-all ;
 
