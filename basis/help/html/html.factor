@@ -24,6 +24,7 @@ IN: help.html
             { CHAR: / "__slash__" }
             { CHAR: , "__comma__" }
             { CHAR: @ "__at__" }
+            { CHAR: # "__hash__" }
         } at [ % ] [ , ] ?if
     ] [ number>string "__" "__" surround % ] if ;
 
