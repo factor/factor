@@ -75,7 +75,7 @@ IN: tools.completion
     all-words name-completions ;
 
 : vocabs-matching ( str -- seq )
-    all-vocabs-seq name-completions ;
+    all-vocabs-recursive no-roots no-prefixes name-completions ;
 
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;

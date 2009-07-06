@@ -58,6 +58,19 @@ PRIVATE>
 
 : no-prefixes ( seq -- seq' ) [ vocab-prefix? not ] filter ;
 
+: convert-prefixes ( seq -- seq' )
+    [ dup vocab-prefix? [ name>> vocab-link boa ] when ] map ;
+
+: remove-redundant-prefixes ( seq -- seq' )
+    #! Hack.
+    [ vocab-prefix? ] partition
+    [
+        [ vocab-name ] map unique
+        '[ name>> _ key? not ] filter
+        convert-prefixes
+    ] keep
+    append ;
+
 : no-roots ( assoc -- seq ) values concat ;
 
 : child-vocabs ( prefix -- assoc )
@@ -78,6 +91,9 @@ MEMO: all-vocabs-recursive ( -- assoc )
 
 : all-vocab-names ( -- seq )
     all-vocabs-recursive no-roots no-prefixes [ vocab-name ] map ;
+
+: child-vocab-names ( prefix -- seq )
+    child-vocabs no-roots no-prefixes [ vocab-name ] map ;
 
 <PRIVATE
 

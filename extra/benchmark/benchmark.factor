@@ -13,7 +13,7 @@ SYMBOL: errors
 PRIVATE>
 
 : run-benchmark ( vocab -- )
-    [ "=== " write vocab-name print flush ] [
+    [ "=== " write print flush ] [
         [ [ require ] [ gc [ run ] benchmark ] [ ] tri timings ]
         [ swap errors ]
         recover get set-at
@@ -23,7 +23,7 @@ PRIVATE>
     [
         V{ } clone timings set
         V{ } clone errors set
-        "benchmark" all-child-vocabs-seq
+        "benchmark" child-vocab-names
         [ run-benchmark ] each
         timings get
         errors get
