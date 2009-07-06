@@ -7,7 +7,7 @@ IN: vocabs.cache
 : reset-cache ( -- )
     root-cache get-global clear-assoc
     \ vocab-file-contents reset-memoized
-    \ all-vocabs-seq reset-memoized
+    \ all-vocabs-recursive reset-memoized
     \ all-authors reset-memoized
     \ all-tags reset-memoized ;
 

@@ -42,7 +42,8 @@ M: more-completions article-content
     [ dup name>> >lower ] { } map>assoc ;
 
 : vocab-candidates ( -- candidates )
-    all-vocabs-seq [ dup vocab-name >lower ] { } map>assoc ;
+    all-vocabs-recursive no-roots no-prefixes
+    [ dup vocab-name >lower ] { } map>assoc ;
 
 : help-candidates ( seq -- candidates )
     [ [ >link ] [ article-title >lower ] bi ] { } map>assoc
