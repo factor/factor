@@ -1,10 +1,11 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.inline.compiler alien.libraries
-alien.parser arrays assocs effects fry generalizations grouping
-io.files io.files.info io.files.temp kernel lexer math
-math.order math.ranges multiline namespaces sequences splitting
-strings system vocabs.loader vocabs.parser words ;
+USING: accessors alien.inline.compiler alien.inline.types
+alien.libraries alien.parser arrays assocs effects fry
+generalizations grouping io.files io.files.info io.files.temp
+kernel lexer math math.order math.ranges multiline namespaces
+sequences splitting strings system vocabs.loader
+vocabs.parser words ;
 IN: alien.inline
 
 <PRIVATE
@@ -13,34 +14,13 @@ SYMBOL: library-is-c++
 SYMBOL: compiler-args
 SYMBOL: c-strings
 
-: annotate-effect ( types effect -- types effect' )
-    [ in>> ] [ out>> ] bi [
-        zip
-        [ over pointer-to-primitive? [ ">" prepend ] when ]
-        assoc-map unzip
-    ] dip <effect> ;
-
-
 : function-types-effect ( -- function types effect )
     scan scan swap ")" parse-tokens
     [ "(" subseq? not ] filter swap parse-arglist ;
 
-: types-effect>params-return ( types effect -- params return )
-    [ in>> zip ]
-    [ nip out>> dup length 0 > [ first ] [ drop "void" ] if ]
-    2bi ;
-
 : arg-list ( types -- params )
     CHAR: a swap length CHAR: a + [a,b]
     [ 1string ] map ;
-
-: factorize-type ( str -- str' )
-    "const-" ?head drop
-    "unsigned-" ?head [ "u" prepend ] when
-    "long-" ?head [ "long" prepend ] when ;
-
-: cify-type ( str -- str' )
-    { { CHAR: - CHAR: space } } substitute ;
 
 : factor-function ( function types effect -- word quot effect )
     annotate-effect [ c-library get ] 3dip
