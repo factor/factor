@@ -77,6 +77,16 @@ IN: math.matrices
         { 0.0 0.0 -1.0 0.0 }
     } ;
 
+:: skew-matrix4 ( theta -- matrix )
+    theta tan :> zf
+
+    {
+        { 1.0 0.0 0.0 0.0 }
+        { 0.0 1.0 0.0 0.0 }
+        { 0.0 zf  1.0 0.0 }
+        { 0.0 0.0 0.0 1.0 }
+    } ;
+
 ! Matrix operations
 : mneg ( m -- m ) [ vneg ] map ;
 
