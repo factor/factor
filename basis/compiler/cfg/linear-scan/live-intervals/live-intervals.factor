@@ -11,7 +11,7 @@ C: <live-range> live-range
 
 TUPLE: live-interval
 vreg
-reg spill-to reload-from
+reg spill-to record-spill? reload-from record-reload?
 split-before split-after split-next
 start end ranges uses
 copy-from ;
@@ -145,8 +145,7 @@ M: ##copy-float compute-live-intervals*
         <reversed> [ compute-live-intervals-step ] each
     ] keep values dup finish-live-intervals ;
 
-: relevant-ranges ( new inactive -- new' inactive' )
-    ! Slice off all ranges of 'inactive' that precede the start of 'new'
+: relevant-ranges ( interval1 interval2 -- ranges1 ranges2 )
     [ [ ranges>> ] bi@ ] [ nip start>> ] 2bi '[ to>> _ >= ] filter ;
 
 : intersect-live-range ( range1 range2 -- n/f )
@@ -155,8 +154,8 @@ M: ##copy-float compute-live-intervals*
 
 : intersect-live-ranges ( ranges1 ranges2 -- n )
     {
-        { [ over empty? ] [ 2drop 1/0. ] }
-        { [ dup empty? ] [ 2drop 1/0. ] }
+        { [ over empty? ] [ 2drop f ] }
+        { [ dup empty? ] [ 2drop f ] }
         [
             2dup [ first ] bi@ intersect-live-range dup [ 2nip ] [
                 drop
@@ -166,3 +165,6 @@ M: ##copy-float compute-live-intervals*
             ] if
         ]
     } cond ;
+
+: intervals-intersect? ( interval1 interval2 -- ? )
+    relevant-ranges intersect-live-ranges >boolean ; inline
