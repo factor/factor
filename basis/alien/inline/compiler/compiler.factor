@@ -21,23 +21,33 @@ SYMBOL: C++
         { C++ [ ".cpp" ] }
     } case ;
 
+: compiler ( lang -- str )
+    {
+        { C [ "gcc" ] }
+        { C++ [ "g++" ] }
+    } case ;
+
+: link-command ( in out lang -- descr )
+    compiler os {
+        { [ dup linux? ]
+          [ drop { "-shared" "-o" } ] }
+        { [ dup macosx? ]
+          [ drop { "-g" "-prebind" "-dynamiclib" "-o" } ] }
+        [ name>> "unimplemented for: " prepend throw ]
+    } cond swap prefix prepend prepend ;
+
 :: compile-to-object ( lang contents name -- )
     name ".o" append temp-file
     contents name lang src-suffix append temp-file
     [ ascii set-file-contents ] keep 2array
-    { "gcc" "-fPIC" "-c" "-o" } prepend try-process ;
+    { "-fPIC" "-c" "-o" } lang compiler prefix prepend
+    try-process ;
 
-: link-object ( args name -- )
-    [ "lib" prepend library-suffix append ] [ ".o" append ] bi
-    [ temp-file ] bi@ 2array
-    os {
-        { [ dup linux? ]
-            [ drop { "gcc" "-shared" "-o" } ] }
-        { [ dup macosx? ]
-            [ drop { "gcc" "-g" "-prebind" "-dynamiclib" "-o" } ] }
-        [ name>> "unimplemented for: " prepend throw ]
-    } cond prepend prepend try-process ;
+:: link-object ( lang args name -- )
+    args name [ "lib" prepend library-suffix append ]
+    [ ".o" append ] bi [ temp-file ] bi@ 2array
+    lang link-command try-process ;
 
 :: compile-to-library ( lang args contents name -- )
     lang contents name compile-to-object
-    args name link-object ;
+    lang args name link-object ;

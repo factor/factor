@@ -36,3 +36,5 @@ C-STRUCT: test-struct
         &free drop
     ] with-destructors
 ] unit-test
+
+[ 15 ] [ 15 10 "point" <struct-array> resize length ] unit-test

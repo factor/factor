@@ -26,6 +26,8 @@ M: byte-vector new-sequence
 M: byte-vector equal?
     over byte-vector? [ sequence= ] [ 2drop f ] if ;
 
+M: byte-vector contract 2drop ;
+
 M: byte-array like
     #! If we have an byte-array, we're done.
     #! If we have a byte-vector, and it's at full capacity,

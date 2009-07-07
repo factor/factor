@@ -21,6 +21,10 @@ M: struct-array set-nth-unsafe
 M: struct-array new-sequence
     element-size>> [ * <byte-array> ] 2keep struct-array boa ; inline
 
+M: struct-array resize ( n seq -- newseq )
+    [ [ element-size>> * ] [ underlying>> ] bi resize ] [ element-size>> ] 2bi
+    struct-array boa ;
+
 : <struct-array> ( length c-type -- struct-array )
     heap-size [ * <byte-array> ] 2keep struct-array boa ; inline
 
