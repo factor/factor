@@ -62,11 +62,12 @@ HINTS: split-interval live-interval object ;
     2dup [ compute-start/end ] bi@ ;
 
 : insert-use-for-copy ( seq n -- seq' )
-    dup 1 + [ nip 1array split1 ] 2keep 2array glue ;
+    [ '[ _ < ] filter ]
+    [ nip dup 1 + 2array ]
+    [ 1 + '[ _ > ] filter ]
+    2tri 3append ;
 
 : split-before-use ( new n -- before after )
-    ! Find optimal split position
-    ! Insert move instruction
     1 -
     2dup swap covers? [
         [ '[ _ insert-use-for-copy ] change-uses ] keep

@@ -5,7 +5,8 @@ io.files io.files.temp io.directories html.streams help kernel
 assocs sequences make words accessors arrays help.topics vocabs
 vocabs.hierarchy help.vocabs namespaces prettyprint io
 vocabs.loader serialize fry memoize unicode.case math.order
-sorting debugger html xml.syntax xml.writer math.parser ;
+sorting debugger html xml.syntax xml.writer math.parser
+sets hashtables ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
@@ -24,6 +25,7 @@ IN: help.html
             { CHAR: / "__slash__" }
             { CHAR: , "__comma__" }
             { CHAR: @ "__at__" }
+            { CHAR: # "__hash__" }
         } at [ % ] [ , ] ?if
     ] [ number>string "__" "__" surround % ] if ;
 
@@ -71,9 +73,7 @@ M: topic url-of topic>filename ;
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )
-    #! Hack.
-    all-vocabs values concat
-    vocabs [ find-vocab-root not ] filter [ vocab ] map append ;
+    all-vocabs >hashtable f over delete-at no-roots remove-redundant-prefixes ;
 
 : all-topics ( -- topics )
     [

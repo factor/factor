@@ -8,6 +8,7 @@ help.topics io io.files io.pathnames io.styles kernel macros
 make namespaces prettyprint sequences sets sorting summary
 vocabs vocabs.files vocabs.hierarchy vocabs.loader
 vocabs.metadata words words.symbol definitions.icons ;
+FROM: vocabs.hierarchy => child-vocabs ;
 IN: help.vocabs
 
 : about ( vocab -- )
@@ -35,7 +36,7 @@ IN: help.vocabs
     $heading ;
 
 : $vocabs ( seq -- )
-    [ vocab-row ] map vocab-headings prefix $table ;
+    convert-prefixes [ vocab-row ] map vocab-headings prefix $table ;
 
 : $vocab-roots ( assoc -- )
     [
@@ -67,7 +68,8 @@ C: <vocab-author> vocab-author
     ] unless-empty ;
 
 : describe-children ( vocab -- )
-    vocab-name all-child-vocabs $vocab-roots ;
+    vocab-name child-vocabs
+    $vocab-roots ;
 
 : files. ( seq -- )
     snippet-style get [

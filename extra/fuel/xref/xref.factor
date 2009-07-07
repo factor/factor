@@ -64,7 +64,7 @@ PRIVATE>
 
 : article-location ( name -- loc ) article loc>> get-loc ;
 
-: get-vocabs ( -- seq ) all-vocabs-seq [ vocab-name ] map ;
+: get-vocabs ( -- seq ) all-vocab-names ;
 
 : get-vocabs/prefix ( prefix -- seq ) get-vocabs swap filter-prefix ;
 
