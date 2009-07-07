@@ -121,6 +121,8 @@ PRIVATE>
 
 SYNTAX: IS [ dup search [ ] [ no-word ] ?if ] (INTERPOLATE) ;
 
+SYNTAX: DEFERS [ current-vocab create ] (INTERPOLATE) ;
+
 SYNTAX: DEFINES [ create-in ] (INTERPOLATE) ;
 
 SYNTAX: DEFINES-CLASS [ create-class-in ] (INTERPOLATE) ;
