@@ -22,7 +22,8 @@ SYNTAX: TYPEDEF:
     scan scan typedef ;
 
 SYNTAX: C-STRUCT:
-    scan current-vocab parse-definition define-struct ;
+    scan current-vocab parse-definition [ define-struct ] 3keep
+    2drop define-struct-tuple ;
 
 SYNTAX: C-UNION:
     scan parse-definition define-union ;
