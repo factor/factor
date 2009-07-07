@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test alien.inline alien.inline.private io.files
-io.directories kernel ;
+USING: alien.inline alien.inline.private io.directories io.files
+kernel namespaces tools.test ;
 IN: alien.inline.tests
 
 C-LIBRARY: const
@@ -15,8 +15,7 @@ C-FUNCTION: const-int add ( int a, int b )
 { 2 1 } [ add ] must-infer-as
 [ 5 ] [ 2 3 add ] unit-test
 
-<< c-library get library-path dup exists?
-[ delete-file ] [ drop ] if >>
+DELETE-C-LIBRARY: const
 
 
 C-LIBRARY: cpplib
@@ -35,8 +34,7 @@ C-FUNCTION: const-char* hello ( )
 { 0 1 } [ hello ] must-infer-as
 [ "hello world" ] [ hello ] unit-test
 
-<< c-library get library-path dup exists?
-[ delete-file ] [ drop ] if >>
+DELETE-C-LIBRARY: cpplib
 
 
 C-LIBRARY: compile-error
@@ -47,5 +45,4 @@ C-FUNCTION: char* breakme ( )
 
 << [ compile-c-library ] must-fail >>
 
-<< c-library get library-path dup exists?
-[ delete-file ] [ drop ] if >>
+DELETE-C-LIBRARY: compile-error
