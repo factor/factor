@@ -1,19 +1,17 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.inline.types
-alien.marshall.private
-alien.strings byte-arrays classes combinators
-combinators.short-circuit destructors fry
-io.encodings.utf8 kernel sequences
-specialized-arrays.alien
-specialized-arrays.bool specialized-arrays.char
-specialized-arrays.double specialized-arrays.float
-specialized-arrays.int specialized-arrays.long
-specialized-arrays.longlong specialized-arrays.ulonglong
+alien.marshall.private alien.strings byte-arrays classes
+combinators combinators.short-circuit destructors fry
+io.encodings.utf8 kernel libc sequences
+specialized-arrays.alien specialized-arrays.bool
+specialized-arrays.char specialized-arrays.double
+specialized-arrays.float specialized-arrays.int
+specialized-arrays.long specialized-arrays.longlong
 specialized-arrays.short specialized-arrays.uchar
 specialized-arrays.uint specialized-arrays.ulong
-specialized-arrays.ushort strings unix.utilities
-vocabs.parser words ;
+specialized-arrays.ulonglong specialized-arrays.ushort strings
+unix.utilities vocabs.parser words ;
 IN: alien.marshall
 
 << primitive-types [ "void*" = not ] filter
@@ -40,7 +38,7 @@ M: alien-wrapper dynamic-cast ;
     [ marshall-void* ] map >void*-array malloc-underlying ;
 
 : (marshall-char*-or-string) ( n/string -- alien )
-    string?
+    dup string?
     [ utf8 string>alien malloc-byte-array ]
     [ (marshall-char*) ] if ;
 
@@ -51,15 +49,15 @@ M: alien-wrapper dynamic-cast ;
     [ (marshall-char*-or-string) &free ] ptr-pass-through ;
 
 : (marshall-char**-or-strings) ( seq -- alien )
-    first string?
+    dup first string?
     [ utf8 strings>alien malloc-byte-array ]
     [ (marshall-char**) ] if ;
 
-: marshall-char**-or-string ( n/string -- alien )
-    [ (marshall-char**-or-string) ] ptr-pass-through ;
+: marshall-char**-or-strings ( n/string -- alien )
+    [ (marshall-char**-or-strings) ] ptr-pass-through ;
 
-: marshall-char**-or-string-free ( n/string -- alien )
-    [ (marshall-char**-or-string) &free ] ptr-pass-through ;
+: marshall-char**-or-strings-free ( n/string -- alien )
+    [ (marshall-char**-or-strings) &free ] ptr-pass-through ;
 
 : primitive-marshaller ( type -- quot/f )
     {
@@ -163,7 +161,7 @@ M: alien-wrapper dynamic-cast ;
         [ drop f ]
     } case ;
 
-: marshall-non-ptr ( obj -- byte-array/f )
+: marshall-non-pointer ( obj -- byte-array/f )
     {
         { [ dup byte-array? ] [ ] }
         { [ dup alien-wrapper? ]
@@ -236,7 +234,7 @@ M: alien-wrapper dynamic-cast ;
     current-vocab lookup [
         dup superclasses [ struct-wrapper? ] any? [
             [ class name>> heap-size ] keep
-            '[ malloc-byte-array _ new swap >>underlying ]
+            '[ _ malloc-byte-array _ new swap >>underlying ]
         ] [ drop [ ] ] if
     ] [ [ ] ] if* ;
 
