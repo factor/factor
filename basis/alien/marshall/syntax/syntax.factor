@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.inline alien.inline.types alien.marshall
-combinators effects generalizations kernel locals namespaces
+combinators effects generalizations kernel locals make namespaces
 quotations sequences words ;
 IN: alien.marshall.syntax
 
@@ -11,10 +11,14 @@ IN: alien.marshall.syntax
     [ out>> types [ pointer-to-primitive? ] filter append ]
     bi <effect>
     [
-        types [ marshaller ] map \ spread rot
-        types length \ nkeep
-        types [ out-arg-unmarshaller ] map \ spread
-        7 narray >quotation
+        [
+            types [ marshaller ] map , \ spread , ,
+            types length , \ nkeep ,
+            types [ out-arg-unmarshaller ] map
+            effect out>> dup empty?
+            [ drop ] [ first unmarshaller prefix ] if
+            , \ spread ,
+        ] [ ] make
     ] dip ;
 
 : define-c-marshalled ( function types effect -- )
