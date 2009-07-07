@@ -6,7 +6,7 @@ quotations sequences words ;
 IN: alien.marshall.syntax
 
 :: marshalled-function ( function types effect -- word quot effect )
-    function types effect annotate-effect factor-function
+    function types effect factor-function
     [ in>> ]
     [ out>> types [ pointer-to-primitive? ] filter append ]
     bi <effect>
