@@ -278,7 +278,7 @@ M: struct-wrapper dynamic-cast ;
 
 : out-arg-unmarshaller ( type -- quot )
     dup {
-        [ const-type? not ]
+        [ pointer-to-const? not ]
         [ factorize-type pointer-to-primitive? ]
     } 1&&
     [ factorize-type primitive-unmarshaller ]
