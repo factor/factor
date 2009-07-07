@@ -68,8 +68,7 @@ SYMBOL: register-live-outs
     } cleave f swap \ _copy boa , ;
 
 : handle-copy ( live-interval -- )
-    dup [ spill-to>> not ] [ split-next>> ] bi and
-    [ insert-copy ] [ drop ] if ;
+    dup split-next>> [ insert-copy ] [ drop ] if ;
 
 : expire-old-intervals ( n -- )
     [ pending-intervals get ] dip '[
@@ -82,7 +81,7 @@ SYMBOL: register-live-outs
         [ reg>> ]
         [ vreg>> reg-class>> ]
         [ reload-from>> ]
-        [ end>> ]
+        [ start>> ]
     } cleave f swap \ _reload boa , ;
 
 : handle-reload ( live-interval -- )
@@ -92,7 +91,7 @@ SYMBOL: register-live-outs
     #! Any live intervals which start on the current instruction
     #! are added to the active set.
     unhandled-intervals get dup heap-empty? [ 2drop ] [
-        2dup heap-peek drop start>> >= [
+        2dup heap-peek drop start>> = [
             heap-pop drop
             [ add-active ] [ handle-reload ] bi
             activate-new-intervals
@@ -179,10 +178,12 @@ ERROR: bad-vreg vreg ;
         [
             bb begin-block
             [
-                [ insn#>> prepare-insn ]
-                [ assign-registers-in-insn ]
-                [ , ]
-                tri
+                {
+                    [ insn#>> 1 - prepare-insn ]
+                    [ insn#>> prepare-insn ]
+                    [ assign-registers-in-insn ]
+                    [ , ]
+                } cleave
             ] each
             bb end-block
         ] V{ } make

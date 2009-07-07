@@ -72,7 +72,13 @@ ERROR: bad-live-ranges interval ;
     [ uses>> first ] [ second ] bi* > ;
 
 : spill-new ( new pair -- )
-    "not sure what to do yet" throw ;
+    drop
+    {
+        [ trim-after-ranges ]
+        [ compute-start/end ]
+        [ assign-reload ]
+        [ add-unhandled ]
+    } cleave ;
 
 : split-intersecting? ( live-interval new reg -- ? )
     { [ [ drop reg>> ] dip = ] [ drop intervals-intersect? ] } 3&& ;
@@ -90,7 +96,7 @@ ERROR: bad-live-ranges interval ;
         [ trim-after-ranges ]
         [ compute-start/end ]
         [ assign-reload ]
-        [ add-handled ]
+        [ add-unhandled ]
     } cleave ;
 
 : (split-intersecting) ( live-interval new -- )
