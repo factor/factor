@@ -15,6 +15,9 @@ IN: alien.marshall.private
 MACRO: marshall-x* ( num-quot seq-quot -- alien )
     '[ bool>arg dup number? _ _ if ] ;
 
+: ptr-pass-through ( obj quot -- alien )
+    over c-ptr? [ drop ] [ call ] if ;
+
 : malloc-underlying ( obj -- alien )
     underlying>> malloc-byte-array ;
 
@@ -22,22 +25,30 @@ FUNCTOR: define-primitive-marshallers ( TYPE -- )
 <TYPE> IS <${TYPE}>
 >TYPE-array IS >${TYPE}-array
 marshall-TYPE DEFINES marshall-${TYPE}
+(marshall-TYPE*) DEFINES (marshall-${TYPE}*)
+(marshall-TYPE**) DEFINES (marshall-${TYPE}**)
 marshall-TYPE* DEFINES marshall-${TYPE}*
 marshall-TYPE** DEFINES marshall-${TYPE}**
+marshall-TYPE*-free DEFINES marshall-${TYPE}*-free
+marshall-TYPE**-free DEFINES marshall-${TYPE}**-free
 WHERE
 : marshall-TYPE ( n -- byte-array )
-    dup c-ptr? [ bool>arg ] unless ;
+    [ bool>arg ] ptr-pass-through ;
+: (marshall-TYPE*) ( n/seq -- alien )
+    [ <TYPE> malloc-byte-array ]
+    [ >TYPE-array malloc-underlying ]
+    marshall-x* ;
+: (marshall-TYPE**) ( seq -- alien )
+    [ >TYPE-array malloc-underlying ]
+    map >void*-array malloc-underlying ;
 : marshall-TYPE* ( n/seq -- alien )
-    dup c-ptr? [
-        [ <TYPE> malloc-byte-array ]
-        [ >TYPE-array malloc-underlying ]
-        marshall-x* &free
-    ] unless ;
+    [ (marshall-TYPE*) ] ptr-pass-through ;
 : marshall-TYPE** ( seq -- alien )
-    dup c-ptr? [
-        [ >TYPE-array malloc-underlying ]
-        map >void*-array malloc-underlying &free
-    ] unless ;
+    [ (marshall-TYPE**) ] ptr-pass-through ;
+: marshall-TYPE*-free ( n/seq -- alien )
+    [ (marshall-TYPE*) &free ] ptr-pass-through ;
+: marshall-TYPE**-free ( seq -- alien )
+    [ (marshall-TYPE**) &free ] ptr-pass-through ;
 ;FUNCTOR
 
 SYNTAX: PRIMITIVE-MARSHALLERS:
