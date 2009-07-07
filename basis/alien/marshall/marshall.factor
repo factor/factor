@@ -63,119 +63,119 @@ M: struct-wrapper dynamic-cast ;
 
 : primitive-marshaller ( type -- quot/f )
     {
-        { "bool"     [ [ marshall-bool ] ] }
-        { "char"     [ [ marshall-char ] ] }
-        { "uchar"    [ [ marshall-uchar ] ] }
-        { "short"    [ [ marshall-short ] ] }
-        { "ushort"   [ [ marshall-ushort ] ] }
-        { "int"      [ [ marshall-int ] ] }
-        { "uint"     [ [ marshall-uint ] ] }
-        { "long"     [ [ marshall-long ] ] }
-        { "ulong"    [ [ marshall-ulong ] ] }
-        { "long"     [ [ marshall-longlong ] ] }
-        { "ulong"    [ [ marshall-ulonglong ] ] }
-        { "float"    [ [ marshall-float ] ] }
-        { "double"   [ [ marshall-double ] ] }
-        { "bool*"    [ [ marshall-bool*-free ] ] }
-        { "char*"    [ [ marshall-char*-or-string-free ] ] }
-        { "uchar*"   [ [ marshall-uchar*-free ] ] }
-        { "short*"   [ [ marshall-short*-free ] ] }
-        { "ushort*"  [ [ marshall-ushort*-free ] ] }
-        { "int*"     [ [ marshall-int*-free ] ] }
-        { "uint*"    [ [ marshall-uint*-free ] ] }
-        { "long*"    [ [ marshall-long*-free ] ] }
-        { "ulong*"   [ [ marshall-ulong*-free ] ] }
-        { "longlong*"    [ [ marshall-longlong*-free ] ] }
-        { "ulonglong*"   [ [ marshall-ulonglong*-free ] ] }
-        { "float*"   [ [ marshall-float*-free ] ] }
-        { "double*"  [ [ marshall-double*-free ] ] }
-        { "bool&"    [ [ marshall-bool*-free ] ] }
-        { "char&"    [ [ marshall-char*-free ] ] }
-        { "uchar&"   [ [ marshall-uchar*-free ] ] }
-        { "short&"   [ [ marshall-short*-free ] ] }
-        { "ushort&"  [ [ marshall-ushort*-free ] ] }
-        { "int&"     [ [ marshall-int*-free ] ] }
-        { "uint&"    [ [ marshall-uint*-free ] ] }
-        { "long&"    [ [ marshall-long*-free ] ] }
-        { "ulong&"   [ [ marshall-ulong*-free ] ] }
-        { "longlong&"    [ [ marshall-longlong*-free ] ] }
-        { "ulonglong&"   [ [ marshall-ulonglong*-free ] ] }
-        { "float&"   [ [ marshall-float*-free ] ] }
-        { "double&"  [ [ marshall-double*-free ] ] }
-        { "void*"    [ [ marshall-void* ] ] }
-        { "bool**"   [ [ marshall-bool**-free ] ] }
-        { "char**"   [ [ marshall-char**-or-strings-free ] ] }
-        { "uchar**"  [ [ marshall-uchar**-free ] ] }
-        { "short**"  [ [ marshall-short**-free ] ] }
-        { "ushort**" [ [ marshall-ushort**-free ] ] }
-        { "int**"    [ [ marshall-int**-free ] ] }
-        { "uint**"   [ [ marshall-uint**-free ] ] }
-        { "long**"   [ [ marshall-long**-free ] ] }
-        { "ulong**"  [ [ marshall-ulong**-free ] ] }
-        { "longlong**"   [ [ marshall-longlong**-free ] ] }
-        { "ulonglong**"  [ [ marshall-ulonglong**-free ] ] }
-        { "float**"  [ [ marshall-float**-free ] ] }
-        { "double**" [ [ marshall-double**-free ] ] }
-        { "void**"   [ [ marshall-void** ] ] }
+        { "bool"        [ [ marshall-bool ] ] }
+        { "char"        [ [ marshall-char ] ] }
+        { "uchar"       [ [ marshall-uchar ] ] }
+        { "short"       [ [ marshall-short ] ] }
+        { "ushort"      [ [ marshall-ushort ] ] }
+        { "int"         [ [ marshall-int ] ] }
+        { "uint"        [ [ marshall-uint ] ] }
+        { "long"        [ [ marshall-long ] ] }
+        { "ulong"       [ [ marshall-ulong ] ] }
+        { "long"        [ [ marshall-longlong ] ] }
+        { "ulong"       [ [ marshall-ulonglong ] ] }
+        { "float"       [ [ marshall-float ] ] }
+        { "double"      [ [ marshall-double ] ] }
+        { "bool*"       [ [ marshall-bool*-free ] ] }
+        { "char*"       [ [ marshall-char*-or-string-free ] ] }
+        { "uchar*"      [ [ marshall-uchar*-free ] ] }
+        { "short*"      [ [ marshall-short*-free ] ] }
+        { "ushort*"     [ [ marshall-ushort*-free ] ] }
+        { "int*"        [ [ marshall-int*-free ] ] }
+        { "uint*"       [ [ marshall-uint*-free ] ] }
+        { "long*"       [ [ marshall-long*-free ] ] }
+        { "ulong*"      [ [ marshall-ulong*-free ] ] }
+        { "longlong*"   [ [ marshall-longlong*-free ] ] }
+        { "ulonglong*"  [ [ marshall-ulonglong*-free ] ] }
+        { "float*"      [ [ marshall-float*-free ] ] }
+        { "double*"     [ [ marshall-double*-free ] ] }
+        { "bool&"       [ [ marshall-bool*-free ] ] }
+        { "char&"       [ [ marshall-char*-free ] ] }
+        { "uchar&"      [ [ marshall-uchar*-free ] ] }
+        { "short&"      [ [ marshall-short*-free ] ] }
+        { "ushort&"     [ [ marshall-ushort*-free ] ] }
+        { "int&"        [ [ marshall-int*-free ] ] }
+        { "uint&"       [ [ marshall-uint*-free ] ] }
+        { "long&"       [ [ marshall-long*-free ] ] }
+        { "ulong&"      [ [ marshall-ulong*-free ] ] }
+        { "longlong&"   [ [ marshall-longlong*-free ] ] }
+        { "ulonglong&"  [ [ marshall-ulonglong*-free ] ] }
+        { "float&"      [ [ marshall-float*-free ] ] }
+        { "double&"     [ [ marshall-double*-free ] ] }
+        { "void*"       [ [ marshall-void* ] ] }
+        { "bool**"      [ [ marshall-bool**-free ] ] }
+        { "char**"      [ [ marshall-char**-or-strings-free ] ] }
+        { "uchar**"     [ [ marshall-uchar**-free ] ] }
+        { "short**"     [ [ marshall-short**-free ] ] }
+        { "ushort**"    [ [ marshall-ushort**-free ] ] }
+        { "int**"       [ [ marshall-int**-free ] ] }
+        { "uint**"      [ [ marshall-uint**-free ] ] }
+        { "long**"      [ [ marshall-long**-free ] ] }
+        { "ulong**"     [ [ marshall-ulong**-free ] ] }
+        { "longlong**"  [ [ marshall-longlong**-free ] ] }
+        { "ulonglong**" [ [ marshall-ulonglong**-free ] ] }
+        { "float**"     [ [ marshall-float**-free ] ] }
+        { "double**"    [ [ marshall-double**-free ] ] }
+        { "void**"      [ [ marshall-void** ] ] }
         [ drop f ]
     } case ;
 
 : struct-primitive-marshaller ( type -- quot/f )
     {
-        { "bool"     [ [ marshall-bool ] ] }
-        { "char"     [ [ marshall-char ] ] }
-        { "uchar"    [ [ marshall-uchar ] ] }
-        { "short"    [ [ marshall-short ] ] }
-        { "ushort"   [ [ marshall-ushort ] ] }
-        { "int"      [ [ marshall-int ] ] }
-        { "uint"     [ [ marshall-uint ] ] }
-        { "long"     [ [ marshall-long ] ] }
-        { "ulong"    [ [ marshall-ulong ] ] }
-        { "longlong"     [ [ marshall-longlong ] ] }
-        { "ulonglong"    [ [ marshall-ulonglong ] ] }
-        { "float"    [ [ marshall-float ] ] }
-        { "double"   [ [ marshall-double ] ] }
-        { "bool*"    [ [ marshall-bool* ] ] }
-        { "char*"    [ [ marshall-char*-or-string ] ] }
-        { "uchar*"   [ [ marshall-uchar* ] ] }
-        { "short*"   [ [ marshall-short* ] ] }
-        { "ushort*"  [ [ marshall-ushort* ] ] }
-        { "int*"     [ [ marshall-int* ] ] }
-        { "uint*"    [ [ marshall-uint* ] ] }
-        { "long*"    [ [ marshall-long* ] ] }
-        { "ulong*"   [ [ marshall-ulong* ] ] }
-        { "longlong*"    [ [ marshall-longlong* ] ] }
-        { "ulonglong*"   [ [ marshall-ulonglong* ] ] }
-        { "float*"   [ [ marshall-float* ] ] }
-        { "double*"  [ [ marshall-double* ] ] }
-        { "bool&"    [ [ marshall-bool* ] ] }
-        { "char&"    [ [ marshall-char* ] ] }
-        { "uchar&"   [ [ marshall-uchar* ] ] }
-        { "short&"   [ [ marshall-short* ] ] }
-        { "ushort&"  [ [ marshall-ushort* ] ] }
-        { "int&"     [ [ marshall-int* ] ] }
-        { "uint&"    [ [ marshall-uint* ] ] }
-        { "long&"    [ [ marshall-long* ] ] }
-        { "ulong&"   [ [ marshall-ulong* ] ] }
-        { "longlong&"    [ [ marshall-longlong* ] ] }
-        { "ulonglong&"   [ [ marshall-ulonglong* ] ] }
-        { "float&"   [ [ marshall-float* ] ] }
-        { "double&"  [ [ marshall-double* ] ] }
-        { "void*"    [ [ marshall-void* ] ] }
-        { "bool**"   [ [ marshall-bool** ] ] }
-        { "char**"   [ [ marshall-char**-or-strings ] ] }
-        { "uchar**"  [ [ marshall-uchar** ] ] }
-        { "short**"  [ [ marshall-short** ] ] }
-        { "ushort**" [ [ marshall-ushort** ] ] }
-        { "int**"    [ [ marshall-int** ] ] }
-        { "uint**"   [ [ marshall-uint** ] ] }
-        { "long**"   [ [ marshall-long** ] ] }
-        { "ulong**"  [ [ marshall-ulong** ] ] }
-        { "longlong**"   [ [ marshall-longlong** ] ] }
-        { "ulonglong**"  [ [ marshall-ulonglong** ] ] }
-        { "float**"  [ [ marshall-float** ] ] }
-        { "double**" [ [ marshall-double** ] ] }
-        { "void**"   [ [ marshall-void** ] ] }
+        { "bool"        [ [ marshall-bool ] ] }
+        { "char"        [ [ marshall-char ] ] }
+        { "uchar"       [ [ marshall-uchar ] ] }
+        { "short"       [ [ marshall-short ] ] }
+        { "ushort"      [ [ marshall-ushort ] ] }
+        { "int"         [ [ marshall-int ] ] }
+        { "uint"        [ [ marshall-uint ] ] }
+        { "long"        [ [ marshall-long ] ] }
+        { "ulong"       [ [ marshall-ulong ] ] }
+        { "longlong"    [ [ marshall-longlong ] ] }
+        { "ulonglong"   [ [ marshall-ulonglong ] ] }
+        { "float"       [ [ marshall-float ] ] }
+        { "double"      [ [ marshall-double ] ] }
+        { "bool*"       [ [ marshall-bool* ] ] }
+        { "char*"       [ [ marshall-char*-or-string ] ] }
+        { "uchar*"      [ [ marshall-uchar* ] ] }
+        { "short*"      [ [ marshall-short* ] ] }
+        { "ushort*"     [ [ marshall-ushort* ] ] }
+        { "int*"        [ [ marshall-int* ] ] }
+        { "uint*"       [ [ marshall-uint* ] ] }
+        { "long*"       [ [ marshall-long* ] ] }
+        { "ulong*"      [ [ marshall-ulong* ] ] }
+        { "longlong*"   [ [ marshall-longlong* ] ] }
+        { "ulonglong*"  [ [ marshall-ulonglong* ] ] }
+        { "float*"      [ [ marshall-float* ] ] }
+        { "double*"     [ [ marshall-double* ] ] }
+        { "bool&"       [ [ marshall-bool* ] ] }
+        { "char&"       [ [ marshall-char* ] ] }
+        { "uchar&"      [ [ marshall-uchar* ] ] }
+        { "short&"      [ [ marshall-short* ] ] }
+        { "ushort&"     [ [ marshall-ushort* ] ] }
+        { "int&"        [ [ marshall-int* ] ] }
+        { "uint&"       [ [ marshall-uint* ] ] }
+        { "long&"       [ [ marshall-long* ] ] }
+        { "ulong&"      [ [ marshall-ulong* ] ] }
+        { "longlong&"   [ [ marshall-longlong* ] ] }
+        { "ulonglong&"  [ [ marshall-ulonglong* ] ] }
+        { "float&"      [ [ marshall-float* ] ] }
+        { "double&"     [ [ marshall-double* ] ] }
+        { "void*"       [ [ marshall-void* ] ] }
+        { "bool**"      [ [ marshall-bool** ] ] }
+        { "char**"      [ [ marshall-char**-or-strings ] ] }
+        { "uchar**"     [ [ marshall-uchar** ] ] }
+        { "short**"     [ [ marshall-short** ] ] }
+        { "ushort**"    [ [ marshall-ushort** ] ] }
+        { "int**"       [ [ marshall-int** ] ] }
+        { "uint**"      [ [ marshall-uint** ] ] }
+        { "long**"      [ [ marshall-long** ] ] }
+        { "ulong**"     [ [ marshall-ulong** ] ] }
+        { "longlong**"  [ [ marshall-longlong** ] ] }
+        { "ulonglong**" [ [ marshall-ulonglong** ] ] }
+        { "float**"     [ [ marshall-float** ] ] }
+        { "double**"    [ [ marshall-double** ] ] }
+        { "void**"      [ [ marshall-void** ] ] }
         [ drop f ]
     } case ;
 
@@ -211,45 +211,45 @@ M: struct-wrapper dynamic-cast ;
 
 : primitive-unmarshaller ( type -- quot/f )
     {
-        { "bool" [ [ unmarshall-bool ] ] }
-        { "char"     [ [ ] ] }
-        { "uchar"    [ [ ] ] }
-        { "short"    [ [ ] ] }
-        { "ushort"   [ [ ] ] }
-        { "int"      [ [ ] ] }
-        { "uint"     [ [ ] ] }
-        { "long"     [ [ ] ] }
-        { "ulong"    [ [ ] ] }
-        { "longlong"     [ [ ] ] }
-        { "ulonglong"    [ [ ] ] }
-        { "float"    [ [ ] ] }
-        { "double"   [ [ ] ] }
-        { "bool*"   [ [ *bool ] ] }
-        { "char*"   [ [ unmarshall-char*-to-string ] ] }
-        { "uchar*"  [ [ *uchar ] ] }
-        { "short*"  [ [ *short ] ] }
-        { "ushort*" [ [ *ushort ] ] }
-        { "int*"    [ [ *int ] ] }
-        { "uint*"   [ [ *uint ] ] }
-        { "long*"   [ [ *long ] ] }
-        { "ulong*"  [ [ *ulong ] ] }
-        { "longlong*"   [ [ *long ] ] }
-        { "ulonglong*"  [ [ *ulong ] ] }
-        { "float*"  [ [ *float ] ] }
-        { "double*" [ [ *double ] ] }
-        { "bool&"   [ [ *bool ] ] }
-        { "char&"   [ [ *char ] ] }
-        { "uchar&"  [ [ *uchar ] ] }
-        { "short&"  [ [ *short ] ] }
-        { "ushort&" [ [ *ushort ] ] }
-        { "int&"    [ [ *int ] ] }
-        { "uint&"   [ [ *uint ] ] }
-        { "long&"   [ [ *long ] ] }
-        { "ulong&"  [ [ *ulong ] ] }
-        { "longlong&"   [ [ *long ] ] }
-        { "ulonglong&"  [ [ *ulong ] ] }
-        { "float&"  [ [ *float ] ] }
-        { "double&" [ [ *double ] ] }
+        { "bool"       [ [ unmarshall-bool ] ] }
+        { "char"       [ [ ] ] }
+        { "uchar"      [ [ ] ] }
+        { "short"      [ [ ] ] }
+        { "ushort"     [ [ ] ] }
+        { "int"        [ [ ] ] }
+        { "uint"       [ [ ] ] }
+        { "long"       [ [ ] ] }
+        { "ulong"      [ [ ] ] }
+        { "longlong"   [ [ ] ] }
+        { "ulonglong"  [ [ ] ] }
+        { "float"      [ [ ] ] }
+        { "double"     [ [ ] ] }
+        { "bool*"      [ [ *bool ] ] }
+        { "char*"      [ [ unmarshall-char*-to-string ] ] }
+        { "uchar*"     [ [ *uchar ] ] }
+        { "short*"     [ [ *short ] ] }
+        { "ushort*"    [ [ *ushort ] ] }
+        { "int*"       [ [ *int ] ] }
+        { "uint*"      [ [ *uint ] ] }
+        { "long*"      [ [ *long ] ] }
+        { "ulong*"     [ [ *ulong ] ] }
+        { "longlong*"  [ [ *long ] ] }
+        { "ulonglong*" [ [ *ulong ] ] }
+        { "float*"     [ [ *float ] ] }
+        { "double*"    [ [ *double ] ] }
+        { "bool&"      [ [ *bool ] ] }
+        { "char&"      [ [ *char ] ] }
+        { "uchar&"     [ [ *uchar ] ] }
+        { "short&"     [ [ *short ] ] }
+        { "ushort&"    [ [ *ushort ] ] }
+        { "int&"       [ [ *int ] ] }
+        { "uint&"      [ [ *uint ] ] }
+        { "long&"      [ [ *long ] ] }
+        { "ulong&"     [ [ *ulong ] ] }
+        { "longlong&"  [ [ *long ] ] }
+        { "ulonglong&" [ [ *ulong ] ] }
+        { "float&"     [ [ *float ] ] }
+        { "double&"    [ [ *double ] ] }
         [ drop f ]
     } case ;
 
@@ -281,4 +281,5 @@ M: struct-wrapper dynamic-cast ;
         [ const-type? not ]
         [ factorize-type pointer-to-primitive? ]
     } 1&&
-    [ factorize-type primitive-unmarshaller ] [ drop [ drop ] ] if ;
+    [ factorize-type primitive-unmarshaller ]
+    [ drop [ drop ] ] if ;
