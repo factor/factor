@@ -23,8 +23,10 @@ SYMBOL: c-strings
 
 : compile-library? ( -- ? )
     c-library get library-path dup exists? [
-        file get path>>
-        [ file-info modified>> ] bi@ <=> +lt+ =
+        file get [
+            path>>
+            [ file-info modified>> ] bi@ <=> +lt+ =
+        ] [ drop t ] if*
     ] [ drop t ] if ;
 
 : compile-library ( -- )
