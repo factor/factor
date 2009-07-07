@@ -5,4 +5,4 @@ USING: tools.test vocabs.hierarchy present math vocabs sequences kernel ;
 [ "Hi" ] [ "Hi" present ] unit-test
 [ "+" ] [ \ + present ] unit-test
 [ "kernel" ] [ "kernel" vocab present ] unit-test
-[ ] [ all-vocabs-seq [ present ] map drop ] unit-test
+[ ] [ all-vocabs-recursive no-roots no-prefixes [ present ] map drop ] unit-test

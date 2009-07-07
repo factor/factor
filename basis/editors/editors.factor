@@ -3,8 +3,9 @@
 USING: parser lexer kernel namespaces sequences definitions
 io.files io.backend io.pathnames io summary continuations
 tools.crossref vocabs.hierarchy prettyprint source-files
-source-files.errors assocs vocabs vocabs.loader splitting
+source-files.errors assocs vocabs.loader splitting
 accessors debugger help.topics ;
+FROM: vocabs => vocab-name >vocab-link ;
 IN: editors
 
 TUPLE: no-edit-hook ;
@@ -15,7 +16,7 @@ M: no-edit-hook summary
 SYMBOL: edit-hook
 
 : available-editors ( -- seq )
-    "editors" all-child-vocabs-seq [ vocab-name ] map ;
+    "editors" child-vocabs no-roots no-prefixes [ vocab-name ] map ;
 
 : editor-restarts ( -- alist )
     available-editors
