@@ -261,4 +261,3 @@ INSN: _reload dst class n ;
 INSN: _copy dst src class ;
 INSN: _spill-counts counts ;
 
-SYMBOL: spill-temp
