@@ -13,7 +13,7 @@ TUPLE: struct-vector
     [ <struct-array> 0 ] keep struct-vector boa ; inline
 
 M: struct-vector new-sequence
-    [ c-type>> <struct-array> ] [ [ >fixnum ] [ c-type>> ] bi ] 2bi
+    [ c-type>> <struct-array> ] [ [ >fixnum ] [ c-type>> ] bi* ] 2bi
     struct-vector boa ;
 
 M: struct-vector contract 2drop ;
