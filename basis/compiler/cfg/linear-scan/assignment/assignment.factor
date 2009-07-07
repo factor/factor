@@ -3,7 +3,9 @@
 USING: accessors kernel math assocs namespaces sequences heaps
 fry make combinators sets locals
 cpu.architecture
+compiler.cfg
 compiler.cfg.def-use
+compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation
@@ -27,12 +29,6 @@ SYMBOL: unhandled-intervals
 : init-unhandled ( live-intervals -- )
     [ add-unhandled ] each ;
 
-! Mapping spill slots to vregs
-SYMBOL: spill-slots
-
-: spill-slots-for ( vreg -- assoc )
-    reg-class>> spill-slots get at ;
-
 ! Mapping from basic blocks to values which are live at the start
 SYMBOL: register-live-ins
 
@@ -42,16 +38,9 @@ SYMBOL: register-live-outs
 : init-assignment ( live-intervals -- )
     V{ } clone pending-intervals set
     <min-heap> unhandled-intervals set
-    [ H{ } clone ] reg-class-assoc spill-slots set
     H{ } clone register-live-ins set
     H{ } clone register-live-outs set
     init-unhandled ;
-
-ERROR: already-spilled ;
-
-: record-spill ( live-interval -- )
-    [ dup spill-to>> ] [ vreg>> spill-slots-for ] bi
-    2dup key? [ already-spilled ] [ set-at ] if ;
 
 : insert-spill ( live-interval -- )
     {
@@ -62,7 +51,7 @@ ERROR: already-spilled ;
     } cleave f swap \ _spill boa , ;
 
 : handle-spill ( live-interval -- )
-    dup spill-to>> [ [ record-spill ] [ insert-spill ] bi ] [ drop ] if ;
+    dup spill-to>> [ insert-spill ] [ drop ] if ;
 
 : first-split ( live-interval -- live-interval' )
     dup split-before>> [ first-split ] [ ] ?if ;
@@ -79,8 +68,7 @@ ERROR: already-spilled ;
     } cleave f swap \ _copy boa , ;
 
 : handle-copy ( live-interval -- )
-    dup [ spill-to>> not ] [ split-next>> ] bi and
-    [ insert-copy ] [ drop ] if ;
+    dup split-next>> [ insert-copy ] [ drop ] if ;
 
 : expire-old-intervals ( n -- )
     [ pending-intervals get ] dip '[
@@ -88,22 +76,16 @@ ERROR: already-spilled ;
         [ [ handle-spill ] [ handle-copy ] bi f ] [ drop t ] if
     ] filter-here ;
 
-ERROR: already-reloaded ;
-
-: record-reload ( live-interval -- )
-    [ reload-from>> ] [ vreg>> spill-slots-for ] bi
-    2dup key? [ delete-at ] [ already-reloaded ] if ;
-
 : insert-reload ( live-interval -- )
     {
         [ reg>> ]
         [ vreg>> reg-class>> ]
         [ reload-from>> ]
-        [ end>> ]
+        [ start>> ]
     } cleave f swap \ _reload boa , ;
 
 : handle-reload ( live-interval -- )
-    dup reload-from>> [ [ record-reload ] [ insert-reload ] bi ] [ drop ] if ;
+    dup reload-from>> [ insert-reload ] [ drop ] if ;
 
 : activate-new-intervals ( n -- )
     #! Any live intervals which start on the current instruction
@@ -137,45 +119,51 @@ ERROR: overlapping-registers intervals ;
 
 : active-intervals ( n -- intervals )
     pending-intervals get [ covers? ] with filter
-    check-assignment? get [
-        dup check-assignment
-    ] when ;
+    check-assignment? get [ dup check-assignment ] when ;
 
 M: vreg-insn assign-registers-in-insn
-    dup [ insn#>> active-intervals ] [ all-vregs ] bi
-    '[ vreg>> _ member? ] filter
+    dup [ all-vregs ] [ insn#>> active-intervals ] bi
+    '[ _ [ vreg>> = ] with find nip ] map
     register-mapping
     >>regs drop ;
 
-: compute-live-registers ( n -- assoc )
-    active-intervals register-mapping ;
-
-: compute-live-spill-slots ( -- assocs )
-    spill-slots get values first2
-    [ [ vreg>> swap <spill-slot> ] H{ } assoc-map-as ] bi@
-    assoc-union ;
-
-: compute-live-values ( n -- assoc )
-    [ compute-live-spill-slots ] dip compute-live-registers
-    assoc-union ;
-
-: compute-live-gc-values ( insn -- assoc )
-    [ insn#>> compute-live-values ] [ temp-vregs ] bi
-    '[ drop _ memq? not ] assoc-filter ;
-
 M: ##gc assign-registers-in-insn
+    ! This works because ##gc is always the first instruction
+    ! in a block.
     dup call-next-method
-    dup compute-live-gc-values >>live-values
+    basic-block get register-live-ins get at >>live-values
     drop ;
 
 M: insn assign-registers-in-insn drop ;
 
+: compute-live-spill-slots ( vregs -- assoc )
+    spill-slots get '[ _ at dup [ <spill-slot> ] when ] assoc-map ;
+
+: compute-live-registers ( n -- assoc )
+    active-intervals register-mapping ;
+
+ERROR: bad-live-values live-values ;
+
+: check-live-values ( assoc -- assoc )
+    check-assignment? get [
+        dup values [ not ] any? [ bad-live-values ] when
+    ] when ;
+
+: compute-live-values ( vregs n -- assoc )
+    ! If a live vreg is not in active or inactive, then it must have been
+    ! spilled.
+    [ compute-live-spill-slots ] [ compute-live-registers ] bi*
+    assoc-union check-live-values ;
+
 : begin-block ( bb -- )
-    dup block-from 1 - prepare-insn
-    [ block-from compute-live-values ] keep register-live-ins get set-at ;
+    dup basic-block set
+    dup block-from prepare-insn
+    [ [ live-in ] [ block-from ] bi compute-live-values ] keep
+    register-live-ins get set-at ;
 
 : end-block ( bb -- )
-    [ block-to compute-live-values ] keep register-live-outs get set-at ;
+    [ [ live-out ] [ block-to ] bi compute-live-values ] keep
+    register-live-outs get set-at ;
 
 ERROR: bad-vreg vreg ;
 
@@ -190,10 +178,12 @@ ERROR: bad-vreg vreg ;
         [
             bb begin-block
             [
-                [ insn#>> prepare-insn ]
-                [ assign-registers-in-insn ]
-                [ , ]
-                tri
+                {
+                    [ insn#>> 1 - prepare-insn ]
+                    [ insn#>> prepare-insn ]
+                    [ assign-registers-in-insn ]
+                    [ , ]
+                } cleave
             ] each
             bb end-block
         ] V{ } make

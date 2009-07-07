@@ -9,11 +9,6 @@ compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.state ;
 IN: compiler.cfg.linear-scan.allocation
 
-: free-positions ( new -- assoc )
-    vreg>> reg-class>> registers get at [ 1/0. ] H{ } map>assoc ;
-
-: add-use-position ( n reg assoc -- ) [ [ min ] when* ] change-at ;
-
 : active-positions ( new assoc -- )
     [ vreg>> active-intervals-for ] dip
     '[ [ 0 ] dip reg>> _ add-use-position ] each ;
@@ -21,7 +16,7 @@ IN: compiler.cfg.linear-scan.allocation
 : inactive-positions ( new assoc -- )
     [ [ vreg>> inactive-intervals-for ] keep ] dip
     '[
-        [ _ relevant-ranges intersect-live-ranges ] [ reg>> ] bi
+        [ _ relevant-ranges intersect-live-ranges 1/0. or ] [ reg>> ] bi
         _ add-use-position
     ] each ;
 
@@ -32,12 +27,6 @@ IN: compiler.cfg.linear-scan.allocation
 
 : no-free-registers? ( result -- ? )
     second 0 = ; inline
-
-: register-available? ( new result -- ? )
-    [ end>> ] [ second ] bi* < ; inline
-
-: register-available ( new result -- )
-    first >>reg add-active ;
 
 : register-partially-available ( new result -- )
     [ second split-before-use ] keep

@@ -3,9 +3,14 @@
 USING: accessors arrays assocs classes.parser classes.tuple
 combinators combinators.short-circuit fry hashtables kernel locals
 make math math.order namespaces sequences sets words parser
-compiler.cfg.instructions compiler.cfg.linear-scan.assignment
-compiler.cfg.liveness ;
+compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.assignment compiler.cfg.liveness ;
 IN: compiler.cfg.linear-scan.resolve
+
+SYMBOL: spill-temps
+
+: spill-temp ( reg-class -- n )
+    spill-temps get [ next-spill-slot ] cache ;
 
 <<
 
@@ -116,11 +121,15 @@ ERROR: resolve-error ;
 
 : break-cycle-n ( operations -- operations' )
     split-cycle [
-        [ from>> spill-temp <spill-slot> ]
-        [ reg-class>> ] bi \ register->memory boa
+        [ from>> ]
+        [ reg-class>> spill-temp <spill-slot> ]
+        [ reg-class>> ]
+        tri \ register->memory boa
     ] [
-        [ to>> spill-temp <spill-slot> swap ]
-        [ reg-class>> ] bi \ memory->register boa
+        [ reg-class>> spill-temp <spill-slot> ]
+        [ to>> ]
+        [ reg-class>> ]
+        tri \ memory->register boa
     ] bi [ 1array ] bi@ surround ;
 
 : break-cycle ( operations -- operations' )
@@ -197,4 +206,5 @@ ERROR: resolve-error ;
     dup successors>> [ resolve-edge-data-flow ] with each ;
 
 : resolve-data-flow ( rpo -- )
+    H{ } clone spill-temps set
     [ resolve-block-data-flow ] each ;
