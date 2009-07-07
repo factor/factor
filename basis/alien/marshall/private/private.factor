@@ -16,7 +16,7 @@ MACRO: marshall-x* ( num-quot seq-quot -- alien )
     '[ bool>arg dup number? _ _ if ] ;
 
 : ptr-pass-through ( obj quot -- alien )
-    over c-ptr? [ drop ] [ call ] if ;
+    over c-ptr? [ drop ] [ call ] if ; inline
 
 : malloc-underlying ( obj -- alien )
     underlying>> malloc-byte-array ;
