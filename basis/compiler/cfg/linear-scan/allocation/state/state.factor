@@ -5,6 +5,20 @@ kernel math math.order namespaces sequences vectors
 compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation.state
 
+! Start index of current live interval. We ensure that all
+! live intervals added to the unhandled set have a start index
+! strictly greater than this one. This ensures that we can catch
+! infinite loop situations. We also ensure that all live
+! intervals added to the handled set have an end index strictly
+! smaller than this one. This helps catch bugs.
+SYMBOL: progress
+
+: check-unhandled ( live-interval -- )
+    start>> progress get <= [ "check-unhandled" throw ] when ; inline
+
+: check-handled ( live-interval -- )
+    end>> progress get > [ "check-handled" throw ] when ; inline
+
 ! Mapping from register classes to sequences of machine registers
 SYMBOL: registers
 
@@ -39,7 +53,7 @@ SYMBOL: inactive-intervals
 SYMBOL: handled-intervals
 
 : add-handled ( live-interval -- )
-    handled-intervals get push ;
+    [ check-handled ] [ handled-intervals get push ] bi ;
 
 : finished? ( n live-interval -- ? ) end>> swap < ;
 
@@ -93,17 +107,8 @@ ERROR: register-already-used live-interval ;
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
 
-! Start index of current live interval. We ensure that all
-! live intervals added to the unhandled set have a start index
-! strictly greater than ths one. This ensures that we can catch
-! infinite loop situations.
-SYMBOL: progress
-
-: check-progress ( live-interval -- )
-    start>> progress get <= [ "No progress" throw ] when ; inline
-
 : add-unhandled ( live-interval -- )
-    [ check-progress ]
+    [ check-unhandled ]
     [ dup start>> unhandled-intervals get heap-push ]
     bi ;
 
