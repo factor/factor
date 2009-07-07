@@ -4,7 +4,7 @@ USING: accessors alien.inline.compiler alien.inline.types
 alien.libraries alien.parser arrays assocs effects fry
 generalizations grouping io.files io.files.info io.files.temp
 kernel lexer math math.order math.ranges multiline namespaces
-sequences splitting strings system vocabs.loader
+sequences source-files splitting strings system vocabs.loader
 vocabs.parser words ;
 IN: alien.inline
 
@@ -48,7 +48,7 @@ SYMBOL: c-strings
 
 : compile-library? ( -- ? )
     library-path dup exists? [
-        current-vocab vocab-source-path
+        file get path>>
         [ file-info modified>> ] bi@ <=> +lt+ =
     ] [ drop t ] if ;
 
