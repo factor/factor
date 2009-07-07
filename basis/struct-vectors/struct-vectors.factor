@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays growable kernel math sequences
+USING: accessors alien.c-types byte-arrays growable kernel math sequences
 sequences.private struct-arrays ;
 IN: struct-vectors
 
