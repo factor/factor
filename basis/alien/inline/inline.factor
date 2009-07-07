@@ -5,7 +5,7 @@ alien.libraries alien.parser arrays assocs combinators effects
 fry generalizations grouping io.files io.files.info io.files.temp
 kernel lexer locals math math.order math.ranges multiline
 namespaces quotations sequences source-files splitting strings
-system vocabs.loader vocabs.parser words ;
+system vocabs.loader words ;
 IN: alien.inline
 
 SYMBOL: c-library
@@ -21,12 +21,8 @@ SYMBOL: c-strings
 : append-function-body ( prototype-str -- str )
     " {\n" append parse-here append "\n}\n" append ;
 
-: library-path ( -- str )
-    "lib" c-library get library-suffix
-    3array concat temp-file ;
-
 : compile-library? ( -- ? )
-    library-path dup exists? [
+    c-library get library-path dup exists? [
         file get path>>
         [ file-info modified>> ] bi@ <=> +lt+ =
     ] [ drop t ] if ;
@@ -67,7 +63,7 @@ PRIVATE>
 
 : compile-c-library ( -- )
     compile-library? [ compile-library ] when
-    c-library get library-path "cdecl" add-library ;
+    c-library get dup library-path "cdecl" add-library ;
 
 : define-c-function ( function types effect -- )
     [ factor-function define-declared ] 3keep
