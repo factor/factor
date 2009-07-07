@@ -10,6 +10,7 @@ TUPLE: struct-array
 { element-size array-capacity read-only } ;
 
 M: struct-array length length>> ;
+M: struct-array byte-length [ length>> ] [ element-size>> ] bi * ;
 
 M: struct-array nth-unsafe
     [ element-size>> * ] [ underlying>> ] bi <displaced-alien> ;
