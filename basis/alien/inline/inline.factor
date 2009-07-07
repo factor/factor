@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.inline.compiler alien.inline.types
-alien.libraries alien.parser arrays assocs
-combinators effects fry generalizations grouping io.files
-io.files.info io.files.temp kernel lexer locals math math.order
-math.ranges multiline namespaces quotations sequences splitting
-strings system vocabs.loader vocabs.parser words ;
+alien.libraries alien.parser arrays assocs combinators effects
+fry generalizations grouping io.files io.files.info io.files.temp
+kernel lexer locals math math.order math.ranges multiline
+namespaces quotations sequences source-files splitting strings
+system vocabs.loader vocabs.parser words ;
 IN: alien.inline
 
 SYMBOL: c-library
@@ -27,7 +27,7 @@ SYMBOL: c-strings
 
 : compile-library? ( -- ? )
     library-path dup exists? [
-        current-vocab vocab-source-path
+        file get path>>
         [ file-info modified>> ] bi@ <=> +lt+ =
     ] [ drop t ] if ;
 
