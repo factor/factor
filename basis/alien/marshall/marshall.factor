@@ -18,10 +18,12 @@ IN: alien.marshall
 [ define-primitive-marshallers ] each >>
 
 TUPLE: alien-wrapper { underlying alien } ;
+TUPLE: struct-wrapper < alien-wrapper disposed ;
 
 GENERIC: dynamic-cast ( alien-wrapper -- alien-wrapper' )
 
 M: alien-wrapper dynamic-cast ;
+M: struct-wrapper dynamic-cast ;
 
 : marshall-pointer ( obj -- alien )
     {

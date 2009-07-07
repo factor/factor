@@ -1,11 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.marshall
-alien.structs.fields arrays assocs byte-arrays classes.tuple
-combinators cpu.architecture destructors fry generalizations
-generic hashtables kernel kernel.private libc locals math
-math.order namespaces parser quotations sequences slots strings
-words ;
+USING: accessors arrays assocs generic hashtables kernel kernel.private
+math namespaces parser sequences strings words libc fry
+alien.c-types alien.structs.fields cpu.architecture math.order
+quotations byte-arrays ;
 IN: alien.structs
 
 TUPLE: struct-type
@@ -84,36 +82,3 @@ M: struct-type stack-size
 : offset-of ( field struct -- offset )
     c-types get at fields>> 
     [ name>> = ] with find nip offset>> ;
-
-TUPLE: struct-wrapper < alien-wrapper disposed ;
-
-M: struct-wrapper dispose* underlying>> free ;
-
-: define-struct-accessor ( class name quot -- )
-    [ "accessors" create create-method dup make-inline ] dip define ;
-
-: define-struct-getter ( class name word type -- )
-    [ ">>" append \ underlying>> ] 2dip 
-    unmarshaller \ call 4array >quotation
-    define-struct-accessor ;
-
-: define-struct-setter ( class name word type -- )
-    [ "(>>" prepend ")" append ] 2dip
-    marshaller [ underlying>> ] \ bi* roll 4array >quotation
-    define-struct-accessor ;
-
-: define-struct-accessors ( class name type reader writer -- )
-    [ dup define-protocol-slot ] 3dip
-    [ drop swap define-struct-getter ]
-    [ nip swap define-struct-setter ] 5 nbi ;
-
-:: define-struct-tuple ( name -- )
-    name create-in :> class
-    class struct-wrapper { } define-tuple-class
-    name c-type fields>> [
-        class swap
-        {
-            [ name>> { { CHAR: space CHAR: - } } substitute ]
-            [ type>> ] [ reader>> ] [ writer>> ]
-        } cleave define-struct-accessors
-    ] each ;
