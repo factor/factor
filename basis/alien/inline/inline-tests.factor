@@ -15,7 +15,8 @@ C-FUNCTION: const-int add ( int a, int b )
 { 2 1 } [ add ] must-infer-as
 [ 5 ] [ 2 3 add ] unit-test
 
-<< library-path dup exists? [ delete-file ] [ drop ] if >>
+<< c-library get library-path dup exists?
+[ delete-file ] [ drop ] if >>
 
 
 C-LIBRARY: cpplib
@@ -34,7 +35,8 @@ C-FUNCTION: const-char* hello ( )
 { 0 1 } [ hello ] must-infer-as
 [ "hello world" ] [ hello ] unit-test
 
-<< library-path dup exists? [ delete-file ] [ drop ] if >>
+<< c-library get library-path dup exists?
+[ delete-file ] [ drop ] if >>
 
 
 C-LIBRARY: compile-error
@@ -45,4 +47,5 @@ C-FUNCTION: char* breakme ( )
 
 << [ compile-c-library ] must-fail >>
 
-<< library-path dup exists? [ delete-file ] [ drop ] if >>
+<< c-library get library-path dup exists?
+[ delete-file ] [ drop ] if >>
