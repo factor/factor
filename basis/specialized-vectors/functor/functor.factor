@@ -19,6 +19,8 @@ WHERE
 
 V A <A> vectors.functor:define-vector
 
+M: V contract 2drop ;
+
 M: V pprint-delims drop \ V{ \ } ;
 
 M: V >pprint-sequence ;
