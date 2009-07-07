@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.inline.compiler alien.inline.types
 alien.libraries alien.parser arrays assocs combinators effects
-fry generalizations grouping io.files io.files.info io.files.temp
-kernel lexer locals math math.order math.ranges multiline
-namespaces quotations sequences source-files splitting strings
-system vocabs.loader words ;
+fry generalizations grouping io.directories io.files
+io.files.info io.files.temp kernel lexer locals math math.order
+math.ranges multiline namespaces quotations sequences
+source-files splitting strings system vocabs.loader words ;
 IN: alien.inline
 
 SYMBOL: c-library
@@ -85,6 +85,9 @@ PRIVATE>
 : define-c-include ( str -- )
     "#include " prepend c-strings get push ;
 
+: delete-inline-library ( str -- )
+    library-path dup exists? [ delete-file ] [ drop ] if ;
+
 SYNTAX: C-LIBRARY: scan define-c-library ;
 
 SYNTAX: COMPILE-AS-C++ t library-is-c++ set ;
@@ -101,3 +104,5 @@ SYNTAX: C-FUNCTION:
     function-types-effect define-c-function ;
 
 SYNTAX: ;C-LIBRARY compile-c-library ;
+
+SYNTAX: DELETE-C-LIBRARY: scan delete-inline-library ;
