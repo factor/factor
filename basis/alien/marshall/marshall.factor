@@ -72,6 +72,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint"     [ [ marshall-uint ] ] }
         { "long"     [ [ marshall-long ] ] }
         { "ulong"    [ [ marshall-ulong ] ] }
+        { "long"     [ [ marshall-longlong ] ] }
+        { "ulong"    [ [ marshall-ulonglong ] ] }
         { "float"    [ [ marshall-float ] ] }
         { "double"   [ [ marshall-double ] ] }
         { "bool*"    [ [ marshall-bool*-free ] ] }
@@ -83,6 +85,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint*"    [ [ marshall-uint*-free ] ] }
         { "long*"    [ [ marshall-long*-free ] ] }
         { "ulong*"   [ [ marshall-ulong*-free ] ] }
+        { "longlong*"    [ [ marshall-longlong*-free ] ] }
+        { "ulonglong*"   [ [ marshall-ulonglong*-free ] ] }
         { "float*"   [ [ marshall-float*-free ] ] }
         { "double*"  [ [ marshall-double*-free ] ] }
         { "bool&"    [ [ marshall-bool*-free ] ] }
@@ -94,6 +98,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint&"    [ [ marshall-uint*-free ] ] }
         { "long&"    [ [ marshall-long*-free ] ] }
         { "ulong&"   [ [ marshall-ulong*-free ] ] }
+        { "longlong&"    [ [ marshall-longlong*-free ] ] }
+        { "ulonglong&"   [ [ marshall-ulonglong*-free ] ] }
         { "float&"   [ [ marshall-float*-free ] ] }
         { "double&"  [ [ marshall-double*-free ] ] }
         { "void*"    [ [ marshall-void* ] ] }
@@ -106,6 +112,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint**"   [ [ marshall-uint**-free ] ] }
         { "long**"   [ [ marshall-long**-free ] ] }
         { "ulong**"  [ [ marshall-ulong**-free ] ] }
+        { "longlong**"   [ [ marshall-longlong**-free ] ] }
+        { "ulonglong**"  [ [ marshall-ulonglong**-free ] ] }
         { "float**"  [ [ marshall-float**-free ] ] }
         { "double**" [ [ marshall-double**-free ] ] }
         { "void**"   [ [ marshall-void** ] ] }
@@ -123,6 +131,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint"     [ [ marshall-uint ] ] }
         { "long"     [ [ marshall-long ] ] }
         { "ulong"    [ [ marshall-ulong ] ] }
+        { "longlong"     [ [ marshall-longlong ] ] }
+        { "ulonglong"    [ [ marshall-ulonglong ] ] }
         { "float"    [ [ marshall-float ] ] }
         { "double"   [ [ marshall-double ] ] }
         { "bool*"    [ [ marshall-bool* ] ] }
@@ -134,6 +144,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint*"    [ [ marshall-uint* ] ] }
         { "long*"    [ [ marshall-long* ] ] }
         { "ulong*"   [ [ marshall-ulong* ] ] }
+        { "longlong*"    [ [ marshall-longlong* ] ] }
+        { "ulonglong*"   [ [ marshall-ulonglong* ] ] }
         { "float*"   [ [ marshall-float* ] ] }
         { "double*"  [ [ marshall-double* ] ] }
         { "bool&"    [ [ marshall-bool* ] ] }
@@ -145,6 +157,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint&"    [ [ marshall-uint* ] ] }
         { "long&"    [ [ marshall-long* ] ] }
         { "ulong&"   [ [ marshall-ulong* ] ] }
+        { "longlong&"    [ [ marshall-longlong* ] ] }
+        { "ulonglong&"   [ [ marshall-ulonglong* ] ] }
         { "float&"   [ [ marshall-float* ] ] }
         { "double&"  [ [ marshall-double* ] ] }
         { "void*"    [ [ marshall-void* ] ] }
@@ -157,6 +171,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint**"   [ [ marshall-uint** ] ] }
         { "long**"   [ [ marshall-long** ] ] }
         { "ulong**"  [ [ marshall-ulong** ] ] }
+        { "longlong**"   [ [ marshall-longlong** ] ] }
+        { "ulonglong**"  [ [ marshall-ulonglong** ] ] }
         { "float**"  [ [ marshall-float** ] ] }
         { "double**" [ [ marshall-double** ] ] }
         { "void**"   [ [ marshall-void** ] ] }
@@ -204,6 +220,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint"     [ [ ] ] }
         { "long"     [ [ ] ] }
         { "ulong"    [ [ ] ] }
+        { "longlong"     [ [ ] ] }
+        { "ulonglong"    [ [ ] ] }
         { "float"    [ [ ] ] }
         { "double"   [ [ ] ] }
         { "bool*"   [ [ *bool ] ] }
@@ -215,6 +233,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint*"   [ [ *uint ] ] }
         { "long*"   [ [ *long ] ] }
         { "ulong*"  [ [ *ulong ] ] }
+        { "longlong*"   [ [ *long ] ] }
+        { "ulonglong*"  [ [ *ulong ] ] }
         { "float*"  [ [ *float ] ] }
         { "double*" [ [ *double ] ] }
         { "bool&"   [ [ *bool ] ] }
@@ -226,6 +246,8 @@ M: struct-wrapper dynamic-cast ;
         { "uint&"   [ [ *uint ] ] }
         { "long&"   [ [ *long ] ] }
         { "ulong&"  [ [ *ulong ] ] }
+        { "longlong&"   [ [ *long ] ] }
+        { "ulonglong&"  [ [ *ulong ] ] }
         { "float&"  [ [ *float ] ] }
         { "double&" [ [ *double ] ] }
         [ drop f ]
