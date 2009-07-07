@@ -44,9 +44,7 @@ ERROR: bad-live-ranges interval ;
     dup vreg>> assign-spill-slot >>reload-from drop ;
 
 : split-and-spill ( live-interval n -- before after )
-    split-for-spill
-    [ [ assign-spill ] [ assign-reload ] bi* ]
-    [ [ t >>record-spill? ] [ t >>record-reload? ] bi* ] 2bi ;
+    split-for-spill 2dup [ assign-spill ] [ assign-reload ] bi* ;
 
 : find-use-position ( live-interval new -- n )
     [ uses>> ] [ start>> '[ _ >= ] ] bi* find nip 1/0. or ;
@@ -80,7 +78,6 @@ ERROR: bad-live-ranges interval ;
     { [ [ drop reg>> ] dip = ] [ drop intervals-intersect? ] } 3&& ;
 
 : split-live-out ( live-interval -- )
-    f >>record-spill?
     {
         [ trim-before-ranges ]
         [ compute-start/end ]
@@ -89,11 +86,10 @@ ERROR: bad-live-ranges interval ;
     } cleave ;
 
 : split-live-in ( live-interval -- )
-    f >>record-reload?
     {
         [ trim-after-ranges ]
         [ compute-start/end ]
-        ! [ assign-reload ]
+        [ assign-reload ]
         [ add-handled ]
     } cleave ;
 
