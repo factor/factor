@@ -43,13 +43,15 @@ sleep-entry ;
 : thread-registered? ( thread -- ? )
     id>> threads key? ;
 
+ERROR: already-stopped thread ;
+
 : check-unregistered ( thread -- thread )
-    dup thread-registered?
-    [ "Thread already stopped" throw ] when ;
+    dup thread-registered? [ already-stopped ] when ;
+
+ERROR: not-running thread ;
 
 : check-registered ( thread -- thread )
-    dup thread-registered?
-    [ "Thread is not running" throw ] unless ;
+    dup thread-registered? [ not-running ] unless ;
 
 <PRIVATE
 
