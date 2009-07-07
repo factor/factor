@@ -259,4 +259,4 @@ M: struct-wrapper dynamic-cast ;
         [ const-type? not ]
         [ factorize-type pointer-to-primitive? ]
     } 1&&
-    [ primitive-unmarshaller ] [ drop [ drop ] ] if ;
+    [ factorize-type primitive-unmarshaller ] [ drop [ drop ] ] if ;
