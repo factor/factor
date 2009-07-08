@@ -20,9 +20,9 @@ C-MARSHALLED: unsigned-long* outarg2 ( unsigned-long a, unsigned-long* b )
 ;C-LIBRARY
 
 { 1 1 } [ outarg1 ] must-infer-as
-[ 3 ] [ [ 1 outarg1 ] with-destructors ] unit-test
+[ 3 ] [ 1 outarg1 ] unit-test
 
 { 2 2 } [ outarg2 ] must-infer-as
-[ 18 15 ] [ [ 3 5 outarg2 ] with-destructors ] unit-test
+[ 18 15 ] [ 3 5 outarg2 ] unit-test
 
 DELETE-C-LIBRARY: test

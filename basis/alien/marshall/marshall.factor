@@ -11,7 +11,7 @@ specialized-arrays.long specialized-arrays.longlong
 specialized-arrays.short specialized-arrays.uchar
 specialized-arrays.uint specialized-arrays.ulong
 specialized-arrays.ulonglong specialized-arrays.ushort strings
-unix.utilities vocabs.parser words ;
+unix.utilities vocabs.parser words libc.private ;
 IN: alien.marshall
 
 << primitive-types [ "void*" = not ] filter
@@ -47,9 +47,6 @@ M: struct-wrapper dynamic-cast ;
 : marshall-char*-or-string ( n/string -- alien )
     [ (marshall-char*-or-string) ] ptr-pass-through ;
 
-: marshall-char*-or-string-free ( n/string -- alien )
-    [ (marshall-char*-or-string) &free ] ptr-pass-through ;
-
 : (marshall-char**-or-strings) ( seq -- alien )
     dup first string?
     [ utf8 strings>alien malloc-byte-array ]
@@ -57,9 +54,6 @@ M: struct-wrapper dynamic-cast ;
 
 : marshall-char**-or-strings ( n/string -- alien )
     [ (marshall-char**-or-strings) ] ptr-pass-through ;
-
-: marshall-char**-or-strings-free ( n/string -- alien )
-    [ (marshall-char**-or-strings) &free ] ptr-pass-through ;
 
 : primitive-marshaller ( type -- quot/f )
     {
@@ -74,65 +68,6 @@ M: struct-wrapper dynamic-cast ;
         { "ulong"       [ [ marshall-ulong ] ] }
         { "long"        [ [ marshall-longlong ] ] }
         { "ulong"       [ [ marshall-ulonglong ] ] }
-        { "float"       [ [ marshall-float ] ] }
-        { "double"      [ [ marshall-double ] ] }
-        { "bool*"       [ [ marshall-bool*-free ] ] }
-        { "char*"       [ [ marshall-char*-or-string-free ] ] }
-        { "uchar*"      [ [ marshall-uchar*-free ] ] }
-        { "short*"      [ [ marshall-short*-free ] ] }
-        { "ushort*"     [ [ marshall-ushort*-free ] ] }
-        { "int*"        [ [ marshall-int*-free ] ] }
-        { "uint*"       [ [ marshall-uint*-free ] ] }
-        { "long*"       [ [ marshall-long*-free ] ] }
-        { "ulong*"      [ [ marshall-ulong*-free ] ] }
-        { "longlong*"   [ [ marshall-longlong*-free ] ] }
-        { "ulonglong*"  [ [ marshall-ulonglong*-free ] ] }
-        { "float*"      [ [ marshall-float*-free ] ] }
-        { "double*"     [ [ marshall-double*-free ] ] }
-        { "bool&"       [ [ marshall-bool*-free ] ] }
-        { "char&"       [ [ marshall-char*-free ] ] }
-        { "uchar&"      [ [ marshall-uchar*-free ] ] }
-        { "short&"      [ [ marshall-short*-free ] ] }
-        { "ushort&"     [ [ marshall-ushort*-free ] ] }
-        { "int&"        [ [ marshall-int*-free ] ] }
-        { "uint&"       [ [ marshall-uint*-free ] ] }
-        { "long&"       [ [ marshall-long*-free ] ] }
-        { "ulong&"      [ [ marshall-ulong*-free ] ] }
-        { "longlong&"   [ [ marshall-longlong*-free ] ] }
-        { "ulonglong&"  [ [ marshall-ulonglong*-free ] ] }
-        { "float&"      [ [ marshall-float*-free ] ] }
-        { "double&"     [ [ marshall-double*-free ] ] }
-        { "void*"       [ [ marshall-void* ] ] }
-        { "bool**"      [ [ marshall-bool**-free ] ] }
-        { "char**"      [ [ marshall-char**-or-strings-free ] ] }
-        { "uchar**"     [ [ marshall-uchar**-free ] ] }
-        { "short**"     [ [ marshall-short**-free ] ] }
-        { "ushort**"    [ [ marshall-ushort**-free ] ] }
-        { "int**"       [ [ marshall-int**-free ] ] }
-        { "uint**"      [ [ marshall-uint**-free ] ] }
-        { "long**"      [ [ marshall-long**-free ] ] }
-        { "ulong**"     [ [ marshall-ulong**-free ] ] }
-        { "longlong**"  [ [ marshall-longlong**-free ] ] }
-        { "ulonglong**" [ [ marshall-ulonglong**-free ] ] }
-        { "float**"     [ [ marshall-float**-free ] ] }
-        { "double**"    [ [ marshall-double**-free ] ] }
-        { "void**"      [ [ marshall-void** ] ] }
-        [ drop f ]
-    } case ;
-
-: struct-primitive-marshaller ( type -- quot/f )
-    {
-        { "bool"        [ [ marshall-bool ] ] }
-        { "char"        [ [ marshall-char ] ] }
-        { "uchar"       [ [ marshall-uchar ] ] }
-        { "short"       [ [ marshall-short ] ] }
-        { "ushort"      [ [ marshall-ushort ] ] }
-        { "int"         [ [ marshall-int ] ] }
-        { "uint"        [ [ marshall-uint ] ] }
-        { "long"        [ [ marshall-long ] ] }
-        { "ulong"       [ [ marshall-ulong ] ] }
-        { "longlong"    [ [ marshall-longlong ] ] }
-        { "ulonglong"   [ [ marshall-ulonglong ] ] }
         { "float"       [ [ marshall-float ] ] }
         { "double"      [ [ marshall-double ] ] }
         { "bool*"       [ [ marshall-bool* ] ] }
@@ -195,16 +130,12 @@ M: struct-wrapper dynamic-cast ;
         [ [ marshall-non-pointer ] ] if
     ] if* ;
 
-: struct-field-marshaller ( type -- quot )
-    factorize-type dup struct-primitive-marshaller [ nip ] [
-        pointer?
-        [ [ marshall-pointer ] ]
-        [ [ marshall-non-pointer ] ] if
-    ] if* ;
-
 
 : unmarshall-char*-to-string ( alien -- string )
     utf8 alien>string ;
+
+: unmarshall-char*-to-string-free ( alien -- string )
+    [ unmarshall-char*-to-string ] keep add-malloc free ;
 
 : unmarshall-bool ( n -- ? )
     0 = not ;
@@ -224,32 +155,76 @@ M: struct-wrapper dynamic-cast ;
         { "ulonglong"  [ [ ] ] }
         { "float"      [ [ ] ] }
         { "double"     [ [ ] ] }
-        { "bool*"      [ [ *bool ] ] }
+        { "bool*"      [ [ unmarshall-bool*-free ] ] }
+        { "char*"      [ [ unmarshall-char*-to-string-free ] ] }
+        { "uchar*"     [ [ unmarshall-uchar*-free ] ] }
+        { "short*"     [ [ unmarshall-short*-free ] ] }
+        { "ushort*"    [ [ unmarshall-ushort*-free ] ] }
+        { "int*"       [ [ unmarshall-int*-free ] ] }
+        { "uint*"      [ [ unmarshall-uint*-free ] ] }
+        { "long*"      [ [ unmarshall-long*-free ] ] }
+        { "ulong*"     [ [ unmarshall-ulong*-free ] ] }
+        { "longlong*"  [ [ unmarshall-long*-free ] ] }
+        { "ulonglong*" [ [ unmarshall-ulong*-free ] ] }
+        { "float*"     [ [ unmarshall-float*-free ] ] }
+        { "double*"    [ [ unmarshall-double*-free ] ] }
+        { "bool&"      [ [ unmarshall-bool*-free ] ] }
+        { "char&"      [ [ unmarshall-char*-free ] ] }
+        { "uchar&"     [ [ unmarshall-uchar*-free ] ] }
+        { "short&"     [ [ unmarshall-short*-free ] ] }
+        { "ushort&"    [ [ unmarshall-ushort*-free ] ] }
+        { "int&"       [ [ unmarshall-int*-free ] ] }
+        { "uint&"      [ [ unmarshall-uint*-free ] ] }
+        { "long&"      [ [ unmarshall-long*-free ] ] }
+        { "ulong&"     [ [ unmarshall-ulong*-free ] ] }
+        { "longlong&"  [ [ unmarshall-longlong*-free ] ] }
+        { "ulonglong&" [ [ unmarshall-ulonglong*-free ] ] }
+        { "float&"     [ [ unmarshall-float*-free ] ] }
+        { "double&"    [ [ unmarshall-double*-free ] ] }
+        [ drop f ]
+    } case ;
+
+: struct-primitive-unmarshaller ( type -- quot/f )
+    {
+        { "bool"       [ [ unmarshall-bool ] ] }
+        { "char"       [ [ ] ] }
+        { "uchar"      [ [ ] ] }
+        { "short"      [ [ ] ] }
+        { "ushort"     [ [ ] ] }
+        { "int"        [ [ ] ] }
+        { "uint"       [ [ ] ] }
+        { "long"       [ [ ] ] }
+        { "ulong"      [ [ ] ] }
+        { "longlong"   [ [ ] ] }
+        { "ulonglong"  [ [ ] ] }
+        { "float"      [ [ ] ] }
+        { "double"     [ [ ] ] }
+        { "bool*"      [ [ unmarshall-bool* ] ] }
         { "char*"      [ [ unmarshall-char*-to-string ] ] }
-        { "uchar*"     [ [ *uchar ] ] }
-        { "short*"     [ [ *short ] ] }
-        { "ushort*"    [ [ *ushort ] ] }
-        { "int*"       [ [ *int ] ] }
-        { "uint*"      [ [ *uint ] ] }
-        { "long*"      [ [ *long ] ] }
-        { "ulong*"     [ [ *ulong ] ] }
-        { "longlong*"  [ [ *long ] ] }
-        { "ulonglong*" [ [ *ulong ] ] }
-        { "float*"     [ [ *float ] ] }
-        { "double*"    [ [ *double ] ] }
-        { "bool&"      [ [ *bool ] ] }
-        { "char&"      [ [ *char ] ] }
-        { "uchar&"     [ [ *uchar ] ] }
-        { "short&"     [ [ *short ] ] }
-        { "ushort&"    [ [ *ushort ] ] }
-        { "int&"       [ [ *int ] ] }
-        { "uint&"      [ [ *uint ] ] }
-        { "long&"      [ [ *long ] ] }
-        { "ulong&"     [ [ *ulong ] ] }
-        { "longlong&"  [ [ *long ] ] }
-        { "ulonglong&" [ [ *ulong ] ] }
-        { "float&"     [ [ *float ] ] }
-        { "double&"    [ [ *double ] ] }
+        { "uchar*"     [ [ unmarshall-uchar* ] ] }
+        { "short*"     [ [ unmarshall-short* ] ] }
+        { "ushort*"    [ [ unmarshall-ushort* ] ] }
+        { "int*"       [ [ unmarshall-int* ] ] }
+        { "uint*"      [ [ unmarshall-uint* ] ] }
+        { "long*"      [ [ unmarshall-long* ] ] }
+        { "ulong*"     [ [ unmarshall-ulong* ] ] }
+        { "longlong*"  [ [ unmarshall-long* ] ] }
+        { "ulonglong*" [ [ unmarshall-ulong* ] ] }
+        { "float*"     [ [ unmarshall-float* ] ] }
+        { "double*"    [ [ unmarshall-double* ] ] }
+        { "bool&"      [ [ unmarshall-bool* ] ] }
+        { "char&"      [ [ unmarshall-char* ] ] }
+        { "uchar&"     [ [ unmarshall-uchar* ] ] }
+        { "short&"     [ [ unmarshall-short* ] ] }
+        { "ushort&"    [ [ unmarshall-ushort* ] ] }
+        { "int&"       [ [ unmarshall-int* ] ] }
+        { "uint&"      [ [ unmarshall-uint* ] ] }
+        { "long&"      [ [ unmarshall-long* ] ] }
+        { "ulong&"     [ [ unmarshall-ulong* ] ] }
+        { "longlong&"  [ [ unmarshall-longlong* ] ] }
+        { "ulonglong&" [ [ unmarshall-ulonglong* ] ] }
+        { "float&"     [ [ unmarshall-float* ] ] }
+        { "double&"    [ [ unmarshall-double* ] ] }
         [ drop f ]
     } case ;
 
@@ -271,6 +246,13 @@ M: struct-wrapper dynamic-cast ;
 
 : unmarshaller ( type -- quot )
     factorize-type dup primitive-unmarshaller [ nip ] [
+        dup pointer?
+        [ pointer-unmarshaller ]
+        [ struct-unmarshaller ] if
+    ] if* ;
+
+: struct-field-unmarshaller ( type -- quot )
+    factorize-type dup struct-primitive-unmarshaller [ nip ] [
         dup pointer?
         [ pointer-unmarshaller ]
         [ struct-unmarshaller ] if
