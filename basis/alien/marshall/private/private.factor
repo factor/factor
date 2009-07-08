@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.inline arrays
 combinators fry functors kernel lexer libc macros math
-sequences specialized-arrays.alien ;
+sequences specialized-arrays.alien libc.private ;
 IN: alien.marshall.private
 
 : bool>arg ( ? -- 1/0/obj )
@@ -23,6 +23,7 @@ MACRO: marshall-x* ( num-quot seq-quot -- alien )
 
 FUNCTOR: define-primitive-marshallers ( TYPE -- )
 <TYPE> IS <${TYPE}>
+*TYPE IS *${TYPE}
 >TYPE-array IS >${TYPE}-array
 marshall-TYPE DEFINES marshall-${TYPE}
 (marshall-TYPE*) DEFINES (marshall-${TYPE}*)
@@ -31,6 +32,8 @@ marshall-TYPE* DEFINES marshall-${TYPE}*
 marshall-TYPE** DEFINES marshall-${TYPE}**
 marshall-TYPE*-free DEFINES marshall-${TYPE}*-free
 marshall-TYPE**-free DEFINES marshall-${TYPE}**-free
+unmarshall-TYPE* DEFINES unmarshall-${TYPE}*
+unmarshall-TYPE*-free DEFINES unmarshall-${TYPE}*-free
 WHERE
 : marshall-TYPE ( n -- byte-array )
     [ bool>arg ] ptr-pass-through ;
@@ -49,6 +52,10 @@ WHERE
     [ (marshall-TYPE*) &free ] ptr-pass-through ;
 : marshall-TYPE**-free ( seq -- alien )
     [ (marshall-TYPE**) &free ] ptr-pass-through ;
+: unmarshall-TYPE* ( alien -- n )
+    *TYPE ; inline
+: unmarshall-TYPE*-free ( alien -- n )
+    [ unmarshall-TYPE* ] keep add-malloc free ;
 ;FUNCTOR
 
 SYNTAX: PRIMITIVE-MARSHALLERS:
