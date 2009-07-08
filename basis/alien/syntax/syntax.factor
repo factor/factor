@@ -4,8 +4,7 @@ USING: accessors arrays alien alien.c-types alien.structs
 alien.arrays alien.strings kernel math namespaces parser
 sequences words quotations math.parser splitting grouping
 effects assocs combinators lexer strings.parser alien.parser 
-fry vocabs.parser words.constant alien.libraries
-alien.marshall.structs ;
+fry vocabs.parser words.constant alien.libraries ;
 IN: alien.syntax
 
 SYNTAX: DLL" lexer get skip-blank parse-string dlopen parsed ;
@@ -23,8 +22,7 @@ SYNTAX: TYPEDEF:
     scan scan typedef ;
 
 SYNTAX: C-STRUCT:
-    scan current-vocab parse-definition [ define-struct ] 3keep
-    2drop define-struct-tuple ;
+    scan current-vocab parse-definition define-struct ;
 
 SYNTAX: C-UNION:
     scan parse-definition define-union ;

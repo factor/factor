@@ -34,3 +34,7 @@ SYNTAX: C-MARSHALLED:
 
 SYNTAX: MARSHALLED:
     function-types-effect marshalled-function define-declared ;
+
+SYNTAX: M-STRUCTURE:
+    scan current-vocab parse-definition
+    define-marshalled-struct ;
