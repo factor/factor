@@ -31,6 +31,7 @@ M: struct-wrapper dynamic-cast ;
         { [ dup not ] [ ] }
         { [ dup byte-array? ] [ malloc-byte-array ] }
         { [ dup alien-wrapper? ] [ underlying>> ] }
+        { [ dup struct-array? ] [ underlying>> ] }
     } cond ;
 
 : marshall-void* ( obj -- alien )
