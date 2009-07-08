@@ -1,22 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry hints kernel locals
-math sequences sets sorting splitting compiler.utilities namespaces
+math sequences sets sorting splitting namespaces
+combinators.short-circuit compiler.utilities
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation.spilling
-
-: find-use ( live-interval n quot -- elt )
-    [ uses>> ] 2dip curry find nip ; inline
-
-: interval-to-spill ( active-intervals current -- live-interval )
-    #! We spill the interval with the most distant use location.
-    #! If an active interval has no more use positions, find-use
-    #! returns f. This occurs if the interval is a split. In
-    #! this case, we prefer to spill this interval always.
-    start>> '[ dup _ [ >= ] find-use 1/0. or ] { } map>assoc
-    alist-max first ;
 
 ERROR: bad-live-ranges interval ;
 
@@ -47,52 +37,108 @@ ERROR: bad-live-ranges interval ;
         [ ]
     } 2cleave ;
 
-: assign-spill ( live-interval -- live-interval )
-    dup vreg>> assign-spill-slot >>spill-to ;
+: assign-spill ( live-interval -- )
+    dup vreg>> assign-spill-slot >>spill-to drop ;
 
-: assign-reload ( before after -- before after )
-    over spill-to>> >>reload-from ;
+: assign-reload ( live-interval -- )
+    dup vreg>> assign-spill-slot >>reload-from drop ;
 
-: split-and-spill ( new existing -- before after )
-    swap start>> split-for-spill [ assign-spill ] dip assign-reload ;
+: split-and-spill ( live-interval n -- before after )
+    split-for-spill 2dup [ assign-spill ] [ assign-reload ] bi* ;
 
-: reuse-register ( new existing -- )
-    [ nip delete-active ]
-    [ reg>> >>reg add-active ] 2bi ;
+: find-use-position ( live-interval new -- n )
+    [ uses>> ] [ start>> '[ _ >= ] ] bi* find nip 1/0. or ;
 
-: spill-existing? ( new existing -- ? )
-    #! Test if 'new' will be used before 'existing'.
-    over start>> '[ _ [ > ] find-use -1 or ] bi@ < ;
+: find-use-positions ( live-intervals new assoc -- )
+    '[ [ _ find-use-position ] [ reg>> ] bi _ add-use-position ] each ;
 
-: spill-existing ( new existing -- )
-    #! Our new interval will be used before the active interval
-    #! with the most distant use location. Spill the existing
-    #! interval, then process the new interval and the tail end
-    #! of the existing interval again.
-    [ reuse-register ]
-    [ split-and-spill [ add-handled ] [ add-unhandled ] bi* ] 2bi ;
+: active-positions ( new assoc -- )
+    [ [ vreg>> active-intervals-for ] keep ] dip
+    find-use-positions ;
 
-: spill-live-out? ( new existing -- ? )
-    [ start>> ] [ uses>> last ] bi* > ;
+: inactive-positions ( new assoc -- )
+    [
+        [ vreg>> inactive-intervals-for ] keep
+        [ '[ _ intervals-intersect? ] filter ] keep
+    ] dip
+    find-use-positions ;
 
-: spill-live-out ( new existing -- )
-    #! The existing interval is never used again. Spill it and
-    #! re-use the register.
-    assign-spill
-    [ reuse-register ]
-    [ nip add-handled ] 2bi ;
+: spill-status ( new -- use-pos )
+    H{ } clone
+    [ inactive-positions ] [ active-positions ] [ nip ] 2tri
+    >alist alist-max ;
 
-: spill-new ( new existing -- )
-    #! Our new interval will be used after the active interval
-    #! with the most distant use location. Split the new
-    #! interval, then process both parts of the new interval
-    #! again.
-    [ dup split-and-spill add-unhandled ] dip spill-existing ;
+: spill-new? ( new pair -- ? )
+    [ uses>> first ] [ second ] bi* > ;
 
-: assign-blocked-register ( new -- )
-    [ dup vreg>> active-intervals-for ] keep interval-to-spill {
-        { [ 2dup spill-live-out? ] [ spill-live-out ] }
-        { [ 2dup spill-existing? ] [ spill-existing ] }
-        [ spill-new ]
+: spill-new ( new pair -- )
+    drop
+    {
+        [ trim-after-ranges ]
+        [ compute-start/end ]
+        [ assign-reload ]
+        [ add-unhandled ]
+    } cleave ;
+
+: split-intersecting? ( live-interval new reg -- ? )
+    { [ [ drop reg>> ] dip = ] [ drop intervals-intersect? ] } 3&& ;
+
+: split-live-out ( live-interval -- )
+    {
+        [ trim-before-ranges ]
+        [ compute-start/end ]
+        [ assign-spill ]
+        [ add-handled ]
+    } cleave ;
+
+: split-live-in ( live-interval -- )
+    {
+        [ trim-after-ranges ]
+        [ compute-start/end ]
+        [ assign-reload ]
+        [ add-unhandled ]
+    } cleave ;
+
+: (split-intersecting) ( live-interval new -- )
+    start>> {
+        { [ 2dup [ uses>> last ] dip < ] [ drop split-live-out ] }
+        { [ 2dup [ uses>> first ] dip > ] [ drop split-live-in ] }
+        [ split-and-spill [ add-handled ] [ add-unhandled ] bi* ]
     } cond ;
 
+: (split-intersecting-active) ( active new -- )
+    [ drop delete-active ]
+    [ (split-intersecting) ] 2bi ;
+
+: split-intersecting-active ( new reg -- )
+    [ [ vreg>> active-intervals-for ] keep ] dip
+    [ '[ _ _ split-intersecting? ] filter ] 2keep drop
+    '[ _ (split-intersecting-active) ] each ;
+
+: (split-intersecting-inactive) ( inactive new -- )
+    [ drop delete-inactive ]
+    [ (split-intersecting) ] 2bi ;
+
+: split-intersecting-inactive ( new reg -- )
+    [ [ vreg>> inactive-intervals-for ] keep ] dip
+    [ '[ _ _ split-intersecting? ] filter ] 2keep drop
+    '[ _ (split-intersecting-inactive) ] each ;
+
+: split-intersecting ( new reg -- )
+    [ split-intersecting-active ]
+    [ split-intersecting-inactive ]
+    2bi ;
+
+: spill-available ( new pair -- )
+    [ first split-intersecting ] [ register-available ] 2bi ;
+
+: spill-partially-available ( new pair -- )
+    [ second 1 - split-and-spill add-unhandled ] keep
+    spill-available ;
+
+: assign-blocked-register ( new -- )
+    dup spill-status {
+        { [ 2dup spill-new? ] [ spill-new ] }
+        { [ 2dup register-available? ] [ spill-available ] }
+        [ spill-partially-available ]
+    } cond ;

@@ -1,7 +1,7 @@
 IN: compiler.cfg.linear-scan.tests
 USING: tools.test random sorting sequences sets hashtables assocs
 kernel fry arrays splitting namespaces math accessors vectors locals
-math.order grouping
+math.order grouping strings strings.private
 cpu.architecture
 compiler.cfg
 compiler.cfg.optimizer
@@ -13,6 +13,7 @@ compiler.cfg.rpo
 compiler.cfg.linearization
 compiler.cfg.debugger
 compiler.cfg.linear-scan
+compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
@@ -24,6 +25,7 @@ FROM: compiler.cfg.linear-scan.assignment => check-assignment? ;
 
 check-allocation? on
 check-assignment? on
+check-numbering? on
 
 [
     { T{ live-range f 1 10 } T{ live-range f 15 15 } }
@@ -74,36 +76,6 @@ check-assignment? on
     { T{ live-range f 1 5 } }
 ] [
     { T{ live-range f 0 5 } } 0 split-ranges
-] unit-test
-
-[ 7 ] [
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 2 } } }
-        { start 0 }
-        { end 10 }
-        { uses V{ 0 1 3 7 10 } }
-    }
-    4 [ >= ] find-use
-] unit-test
-
-[ 4 ] [
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 2 } } }
-        { start 0 }
-        { end 10 }
-        { uses V{ 0 1 3 4 10 } }
-    }
-    4 [ >= ] find-use
-] unit-test
-
-[ f ] [
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 2 } } }
-        { start 0 }
-        { end 10 }
-        { uses V{ 0 1 3 4 10 } }
-    }
-    100 [ >= ] find-use
 ] unit-test
 
 [
@@ -257,88 +229,82 @@ check-assignment? on
 ] unit-test
 
 [
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 3 }
-        { end 10 }
-        { uses V{ 3 10 } }
+    {
+        3
+        10
     }
 ] [
+    H{
+        { int-regs
+          V{
+              T{ live-interval
+                 { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+                 { reg 1 }
+                 { start 1 }
+                 { end 15 }
+                 { uses V{ 1 3 7 10 15 } }
+              }
+              T{ live-interval
+                 { vreg T{ vreg { reg-class int-regs } { n 2 } } }
+                 { reg 2 }
+                 { start 3 }
+                 { end 8 }
+                 { uses V{ 3 4 8 } }
+              }
+              T{ live-interval
+                 { vreg T{ vreg { reg-class int-regs } { n 3 } } }
+                 { reg 3 }
+                 { start 3 }
+                 { end 10 }
+                 { uses V{ 3 10 } }
+              }
+          }
+        }
+    } active-intervals set
+    H{ } inactive-intervals set
+    T{ live-interval
+        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+        { start 5 }
+        { end 5 }
+        { uses V{ 5 } }
+    }
+    spill-status
+] unit-test
+
+[
     {
-        T{ live-interval
-            { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-            { start 1 }
-            { end 15 }
-            { uses V{ 1 3 7 10 15 } }
-        }
-        T{ live-interval
-            { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-            { start 3 }
-            { end 8 }
-            { uses V{ 3 4 8 } }
-        }
-        T{ live-interval
-            { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-            { start 3 }
-            { end 10 }
-            { uses V{ 3 10 } }
-        }
+        1
+        1/0.
     }
+] [
+    H{
+        { int-regs
+          V{
+              T{ live-interval
+                 { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+                 { reg 1 }
+                 { start 1 }
+                 { end 15 }
+                 { uses V{ 1 } }
+              }
+              T{ live-interval
+                 { vreg T{ vreg { reg-class int-regs } { n 2 } } }
+                 { reg 2 }
+                 { start 3 }
+                 { end 8 }
+                 { uses V{ 3 8 } }
+              }
+          }
+        }
+    } active-intervals set
+    H{ } inactive-intervals set
     T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+        { vreg T{ vreg { reg-class int-regs } { n 3 } } }
         { start 5 }
         { end 5 }
         { uses V{ 5 } }
     }
-    interval-to-spill
-] unit-test
-
-[ t ] [
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 5 }
-        { end 15 }
-        { uses V{ 5 10 15 } }
-    }
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 1 }
-        { end 20 }
-        { uses V{ 1 20 } }
-    }
-    spill-existing?
-] unit-test
-
-[ f ] [
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 5 }
-        { end 15 }
-        { uses V{ 5 10 15 } }
-    }
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 1 }
-        { end 20 }
-        { uses V{ 1 7 20 } }
-    }
-    spill-existing?
-] unit-test
-
-[ t ] [
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 5 }
-        { end 5 }
-        { uses V{ 5 } }
-    }
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 1 }
-        { end 20 }
-        { uses V{ 1 7 20 } }
-    }
-    spill-existing?
+    spill-status
 ] unit-test
 
 [ ] [
@@ -1477,6 +1443,20 @@ USING: math.private ;
     intersect-live-ranges
 ] unit-test
 
+[ f ] [
+    {
+        T{ live-range f 0 10 }
+        T{ live-range f 20 30 }
+        T{ live-range f 40 50 }
+    }
+    {
+        T{ live-range f 11 15 }
+        T{ live-range f 31 36 }
+        T{ live-range f 51 55 }
+    }
+    intersect-live-ranges
+] unit-test
+
 [ 5 ] [
     T{ live-interval
        { start 0 }
@@ -1605,12 +1585,14 @@ V{
 SYMBOL: linear-scan-result
 
 :: test-linear-scan-on-cfg ( regs -- )
-    cfg new 0 get >>entry
-    compute-predecessors
-    compute-liveness
-    dup reverse-post-order
-    { { int-regs regs } } (linear-scan)
-    flatten-cfg 1array mr. ;
+    [
+        cfg new 0 get >>entry
+        compute-predecessors
+        compute-liveness
+        dup reverse-post-order
+        { { int-regs regs } } (linear-scan)
+        flatten-cfg 1array mr.
+    ] with-scope ;
 
 ! This test has a critical edge -- do we care about these?
 
@@ -2101,3 +2083,455 @@ V{
 5 get 1vector 3 get (>>successors)
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
+
+! Reduction of push-all regression, x86-32
+V{ T{ ##prologue } T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##load-immediate { dst V int-regs 61 } }
+    T{ ##peek { dst V int-regs 62 } { loc D 0 } }
+    T{ ##peek { dst V int-regs 64 } { loc D 1 } }
+    T{ ##slot-imm
+        { dst V int-regs 69 }
+        { obj V int-regs 64 }
+        { slot 1 }
+        { tag 2 }
+    }
+    T{ ##copy { dst V int-regs 79 } { src V int-regs 69 } }
+    T{ ##slot-imm
+        { dst V int-regs 85 }
+        { obj V int-regs 62 }
+        { slot 2 }
+        { tag 7 }
+    }
+    T{ ##compare-branch
+        { src1 V int-regs 69 }
+        { src2 V int-regs 85 }
+        { cc cc> }
+    }
+} 1 test-bb
+
+V{
+    T{ ##slot-imm
+        { dst V int-regs 97 }
+        { obj V int-regs 62 }
+        { slot 2 }
+        { tag 7 }
+    }
+    T{ ##replace { src V int-regs 79 } { loc D 3 } }
+    T{ ##replace { src V int-regs 62 } { loc D 4 } }
+    T{ ##replace { src V int-regs 79 } { loc D 1 } }
+    T{ ##replace { src V int-regs 62 } { loc D 2 } }
+    T{ ##replace { src V int-regs 61 } { loc D 5 } }
+    T{ ##replace { src V int-regs 62 } { loc R 0 } }
+    T{ ##replace { src V int-regs 69 } { loc R 1 } }
+    T{ ##replace { src V int-regs 97 } { loc D 0 } }
+    T{ ##call { word resize-array } }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##peek { dst V int-regs 98 } { loc R 0 } }
+    T{ ##peek { dst V int-regs 100 } { loc D 0 } }
+    T{ ##set-slot-imm
+        { src V int-regs 100 }
+        { obj V int-regs 98 }
+        { slot 2 }
+        { tag 7 }
+    }
+    T{ ##peek { dst V int-regs 108 } { loc D 2 } }
+    T{ ##peek { dst V int-regs 110 } { loc D 3 } }
+    T{ ##peek { dst V int-regs 112 } { loc D 0 } }
+    T{ ##peek { dst V int-regs 114 } { loc D 1 } }
+    T{ ##peek { dst V int-regs 116 } { loc D 4 } }
+    T{ ##peek { dst V int-regs 119 } { loc R 0 } }
+    T{ ##copy { dst V int-regs 109 } { src V int-regs 108 } }
+    T{ ##copy { dst V int-regs 111 } { src V int-regs 110 } }
+    T{ ##copy { dst V int-regs 113 } { src V int-regs 112 } }
+    T{ ##copy { dst V int-regs 115 } { src V int-regs 114 } }
+    T{ ##copy { dst V int-regs 117 } { src V int-regs 116 } }
+    T{ ##copy { dst V int-regs 120 } { src V int-regs 119 } }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##copy { dst V int-regs 109 } { src V int-regs 62 } }
+    T{ ##copy { dst V int-regs 111 } { src V int-regs 61 } }
+    T{ ##copy { dst V int-regs 113 } { src V int-regs 62 } }
+    T{ ##copy { dst V int-regs 115 } { src V int-regs 79 } }
+    T{ ##copy { dst V int-regs 117 } { src V int-regs 64 } }
+    T{ ##copy { dst V int-regs 120 } { src V int-regs 69 } }
+    T{ ##branch }
+} 4 test-bb
+
+V{
+    T{ ##replace { src V int-regs 120 } { loc D 0 } }
+    T{ ##replace { src V int-regs 109 } { loc D 3 } }
+    T{ ##replace { src V int-regs 111 } { loc D 4 } }
+    T{ ##replace { src V int-regs 113 } { loc D 1 } }
+    T{ ##replace { src V int-regs 115 } { loc D 2 } }
+    T{ ##replace { src V int-regs 117 } { loc D 5 } }
+    T{ ##epilogue }
+    T{ ##return }
+} 5 test-bb
+
+0 get 1 get 1vector >>successors drop
+1 get 2 get 4 get V{ } 2sequence >>successors drop
+2 get 3 get 1vector >>successors drop
+3 get 5 get 1vector >>successors drop
+4 get 5 get 1vector >>successors drop
+
+[ ] [ { 1 2 3 4 5 } test-linear-scan-on-cfg ] unit-test
+
+! Another reduction of push-all
+V{ T{ ##prologue } T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##peek { dst V int-regs 85 } { loc D 0 } }
+    T{ ##slot-imm
+        { dst V int-regs 89 }
+        { obj V int-regs 85 }
+        { slot 3 }
+        { tag 7 }
+    }
+    T{ ##peek { dst V int-regs 91 } { loc D 1 } }
+    T{ ##slot-imm
+        { dst V int-regs 96 }
+        { obj V int-regs 91 }
+        { slot 1 }
+        { tag 2 }
+    }
+    T{ ##add
+        { dst V int-regs 109 }
+        { src1 V int-regs 89 }
+        { src2 V int-regs 96 }
+    }
+    T{ ##slot-imm
+        { dst V int-regs 115 }
+        { obj V int-regs 85 }
+        { slot 2 }
+        { tag 7 }
+    }
+    T{ ##slot-imm
+        { dst V int-regs 118 }
+        { obj V int-regs 115 }
+        { slot 1 }
+        { tag 2 }
+    }
+    T{ ##compare-branch
+        { src1 V int-regs 109 }
+        { src2 V int-regs 118 }
+        { cc cc> }
+    }
+} 1 test-bb
+
+V{
+    T{ ##add-imm
+        { dst V int-regs 128 }
+        { src1 V int-regs 109 }
+        { src2 8 }
+    }
+    T{ ##load-immediate { dst V int-regs 129 } { val 24 } }
+    T{ ##inc-d { n 4 } }
+    T{ ##inc-r { n 1 } }
+    T{ ##replace { src V int-regs 109 } { loc D 2 } }
+    T{ ##replace { src V int-regs 85 } { loc D 3 } }
+    T{ ##replace { src V int-regs 128 } { loc D 0 } }
+    T{ ##replace { src V int-regs 85 } { loc D 1 } }
+    T{ ##replace { src V int-regs 89 } { loc D 4 } }
+    T{ ##replace { src V int-regs 96 } { loc R 0 } }
+    T{ ##fixnum-mul
+        { src1 V int-regs 128 }
+        { src2 V int-regs 129 }
+        { temp1 V int-regs 132 }
+        { temp2 V int-regs 133 }
+    }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##peek { dst V int-regs 134 } { loc D 1 } }
+    T{ ##slot-imm
+        { dst V int-regs 140 }
+        { obj V int-regs 134 }
+        { slot 2 }
+        { tag 7 }
+    }
+    T{ ##inc-d { n 1 } }
+    T{ ##inc-r { n 1 } }
+    T{ ##replace { src V int-regs 140 } { loc D 0 } }
+    T{ ##replace { src V int-regs 134 } { loc R 0 } }
+    T{ ##call { word resize-array } }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##peek { dst V int-regs 141 } { loc R 0 } }
+    T{ ##peek { dst V int-regs 143 } { loc D 0 } }
+    T{ ##set-slot-imm
+        { src V int-regs 143 }
+        { obj V int-regs 141 }
+        { slot 2 }
+        { tag 7 }
+    }
+    T{ ##write-barrier
+        { src V int-regs 141 }
+        { card# V int-regs 145 }
+        { table V int-regs 146 }
+    }
+    T{ ##inc-d { n -1 } }
+    T{ ##inc-r { n -1 } }
+    T{ ##peek { dst V int-regs 156 } { loc D 2 } }
+    T{ ##peek { dst V int-regs 158 } { loc D 3 } }
+    T{ ##peek { dst V int-regs 160 } { loc D 0 } }
+    T{ ##peek { dst V int-regs 162 } { loc D 1 } }
+    T{ ##peek { dst V int-regs 164 } { loc D 4 } }
+    T{ ##peek { dst V int-regs 167 } { loc R 0 } }
+    T{ ##copy { dst V int-regs 157 } { src V int-regs 156 } }
+    T{ ##copy { dst V int-regs 159 } { src V int-regs 158 } }
+    T{ ##copy { dst V int-regs 161 } { src V int-regs 160 } }
+    T{ ##copy { dst V int-regs 163 } { src V int-regs 162 } }
+    T{ ##copy { dst V int-regs 165 } { src V int-regs 164 } }
+    T{ ##copy { dst V int-regs 168 } { src V int-regs 167 } }
+    T{ ##branch }
+} 4 test-bb
+
+V{
+    T{ ##inc-d { n 3 } }
+    T{ ##inc-r { n 1 } }
+    T{ ##copy { dst V int-regs 157 } { src V int-regs 85 } }
+    T{ ##copy { dst V int-regs 159 } { src V int-regs 89 } }
+    T{ ##copy { dst V int-regs 161 } { src V int-regs 85 } }
+    T{ ##copy { dst V int-regs 163 } { src V int-regs 109 } }
+    T{ ##copy { dst V int-regs 165 } { src V int-regs 91 } }
+    T{ ##copy { dst V int-regs 168 } { src V int-regs 96 } }
+    T{ ##branch }
+} 5 test-bb
+
+V{
+    T{ ##set-slot-imm
+        { src V int-regs 163 }
+        { obj V int-regs 161 }
+        { slot 3 }
+        { tag 7 }
+    }
+    T{ ##inc-d { n 1 } }
+    T{ ##inc-r { n -1 } }
+    T{ ##replace { src V int-regs 168 } { loc D 0 } }
+    T{ ##replace { src V int-regs 157 } { loc D 3 } }
+    T{ ##replace { src V int-regs 159 } { loc D 4 } }
+    T{ ##replace { src V int-regs 161 } { loc D 1 } }
+    T{ ##replace { src V int-regs 163 } { loc D 2 } }
+    T{ ##replace { src V int-regs 165 } { loc D 5 } }
+    T{ ##epilogue }
+    T{ ##return }
+} 6 test-bb
+
+0 get 1 get 1vector >>successors drop
+1 get 2 get 5 get V{ } 2sequence >>successors drop
+2 get 3 get 1vector >>successors drop
+3 get 4 get 1vector >>successors drop
+4 get 6 get 1vector >>successors drop
+5 get 6 get 1vector >>successors drop
+
+[ ] [ { 1 2 3 4 5 } test-linear-scan-on-cfg ] unit-test
+
+! Another push-all reduction to demonstrate numbering anamoly
+V{ T{ ##prologue } T{ ##branch } }
+0 test-bb
+
+V{
+    T{ ##peek { dst V int-regs 1 } { loc D 0 } }
+    T{ ##slot-imm
+        { dst V int-regs 5 }
+        { obj V int-regs 1 }
+        { slot 3 }
+        { tag 7 }
+    }
+    T{ ##peek { dst V int-regs 7 } { loc D 1 } }
+    T{ ##slot-imm
+        { dst V int-regs 12 }
+        { obj V int-regs 7 }
+        { slot 1 }
+        { tag 6 }
+    }
+    T{ ##add
+        { dst V int-regs 25 }
+        { src1 V int-regs 5 }
+        { src2 V int-regs 12 }
+    }
+    T{ ##compare-branch
+        { src1 V int-regs 25 }
+        { src2 V int-regs 5 }
+        { cc cc> }
+    }
+}
+1 test-bb
+
+V{
+    T{ ##slot-imm
+        { dst V int-regs 41 }
+        { obj V int-regs 1 }
+        { slot 2 }
+        { tag 7 }
+    }
+    T{ ##slot-imm
+        { dst V int-regs 44 }
+        { obj V int-regs 41 }
+        { slot 1 }
+        { tag 6 }
+    }
+    T{ ##compare-branch
+        { src1 V int-regs 25 }
+        { src2 V int-regs 44 }
+        { cc cc> }
+    }
+}
+2 test-bb
+
+V{
+    T{ ##add-imm
+        { dst V int-regs 54 }
+        { src1 V int-regs 25 }
+        { src2 8 }
+    }
+    T{ ##load-immediate { dst V int-regs 55 } { val 24 } }
+    T{ ##inc-d { n 4 } }
+    T{ ##inc-r { n 1 } }
+    T{ ##replace { src V int-regs 25 } { loc D 2 } }
+    T{ ##replace { src V int-regs 1 } { loc D 3 } }
+    T{ ##replace { src V int-regs 5 } { loc D 4 } }
+    T{ ##replace { src V int-regs 1 } { loc D 1 } }
+    T{ ##replace { src V int-regs 54 } { loc D 0 } }
+    T{ ##replace { src V int-regs 12 } { loc R 0 } }
+    T{ ##fixnum-mul
+        { src1 V int-regs 54 }
+        { src2 V int-regs 55 }
+        { temp1 V int-regs 58 }
+        { temp2 V int-regs 59 }
+    }
+    T{ ##branch }
+}
+3 test-bb
+
+V{
+    T{ ##peek { dst V int-regs 60 } { loc D 1 } }
+    T{ ##slot-imm
+        { dst V int-regs 66 }
+        { obj V int-regs 60 }
+        { slot 2 }
+        { tag 7 }
+    }
+    T{ ##inc-d { n 1 } }
+    T{ ##inc-r { n 1 } }
+    T{ ##replace { src V int-regs 66 } { loc D 0 } }
+    T{ ##replace { src V int-regs 60 } { loc R 0 } }
+    T{ ##call { word resize-string } }
+    T{ ##branch }
+}
+4 test-bb
+
+V{
+    T{ ##peek { dst V int-regs 67 } { loc R 0 } }
+    T{ ##peek { dst V int-regs 68 } { loc D 0 } }
+    T{ ##set-slot-imm
+        { src V int-regs 68 }
+        { obj V int-regs 67 }
+        { slot 2 }
+        { tag 7 }
+    }
+    T{ ##write-barrier
+        { src V int-regs 67 }
+        { card# V int-regs 75 }
+        { table V int-regs 76 }
+    }
+    T{ ##inc-d { n -1 } }
+    T{ ##inc-r { n -1 } }
+    T{ ##peek { dst V int-regs 94 } { loc D 0 } }
+    T{ ##peek { dst V int-regs 96 } { loc D 1 } }
+    T{ ##peek { dst V int-regs 98 } { loc D 2 } }
+    T{ ##peek { dst V int-regs 100 } { loc D 3 } }
+    T{ ##peek { dst V int-regs 102 } { loc D 4 } }
+    T{ ##peek { dst V int-regs 106 } { loc R 0 } }
+    T{ ##copy { dst V int-regs 95 } { src V int-regs 94 } }
+    T{ ##copy { dst V int-regs 97 } { src V int-regs 96 } }
+    T{ ##copy { dst V int-regs 99 } { src V int-regs 98 } }
+    T{ ##copy { dst V int-regs 101 } { src V int-regs 100 } }
+    T{ ##copy { dst V int-regs 103 } { src V int-regs 102 } }
+    T{ ##copy { dst V int-regs 107 } { src V int-regs 106 } }
+    T{ ##branch }
+}
+5 test-bb
+
+V{
+    T{ ##inc-d { n 3 } }
+    T{ ##inc-r { n 1 } }
+    T{ ##copy { dst V int-regs 95 } { src V int-regs 1 } }
+    T{ ##copy { dst V int-regs 97 } { src V int-regs 25 } }
+    T{ ##copy { dst V int-regs 99 } { src V int-regs 1 } }
+    T{ ##copy { dst V int-regs 101 } { src V int-regs 5 } }
+    T{ ##copy { dst V int-regs 103 } { src V int-regs 7 } }
+    T{ ##copy { dst V int-regs 107 } { src V int-regs 12 } }
+    T{ ##branch }
+}
+6 test-bb
+
+V{
+    T{ ##load-immediate
+        { dst V int-regs 78 }
+        { val 4611686018427387896 }
+    }
+    T{ ##and
+        { dst V int-regs 81 }
+        { src1 V int-regs 97 }
+        { src2 V int-regs 78 }
+    }
+    T{ ##set-slot-imm
+        { src V int-regs 81 }
+        { obj V int-regs 95 }
+        { slot 3 }
+        { tag 7 }
+    }
+    T{ ##inc-d { n -2 } }
+    T{ ##copy { dst V int-regs 110 } { src V int-regs 99 } }
+    T{ ##copy { dst V int-regs 111 } { src V int-regs 101 } }
+    T{ ##copy { dst V int-regs 112 } { src V int-regs 103 } }
+    T{ ##copy { dst V int-regs 117 } { src V int-regs 107 } }
+    T{ ##branch }
+}
+7 test-bb
+
+V{
+    T{ ##inc-d { n 1 } }
+    T{ ##inc-r { n 1 } }
+    T{ ##copy { dst V int-regs 110 } { src V int-regs 1 } }
+    T{ ##copy { dst V int-regs 111 } { src V int-regs 5 } }
+    T{ ##copy { dst V int-regs 112 } { src V int-regs 7 } }
+    T{ ##copy { dst V int-regs 117 } { src V int-regs 12 } }
+    T{ ##branch }
+}
+8 test-bb
+
+V{
+    T{ ##inc-d { n 1 } }
+    T{ ##inc-r { n -1 } }
+    T{ ##replace { src V int-regs 117 } { loc D 0 } }
+    T{ ##replace { src V int-regs 110 } { loc D 1 } }
+    T{ ##replace { src V int-regs 111 } { loc D 2 } }
+    T{ ##replace { src V int-regs 112 } { loc D 3 } }
+    T{ ##epilogue }
+    T{ ##return }
+}
+9 test-bb
+
+0 get 1 get 1vector >>successors drop
+1 get 2 get 8 get V{ } 2sequence >>successors drop
+2 get 3 get 6 get V{ } 2sequence >>successors drop
+3 get 4 get 1vector >>successors drop
+4 get 5 get 1vector >>successors drop
+5 get 7 get 1vector >>successors drop
+6 get 7 get 1vector >>successors drop
+7 get 9 get 1vector >>successors drop
+8 get 9 get 1vector >>successors drop
+
+[ ] [ { 1 2 3 4 5 } test-linear-scan-on-cfg ] unit-test
