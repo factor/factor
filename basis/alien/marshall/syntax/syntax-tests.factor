@@ -7,11 +7,11 @@ IN: alien.marshall.syntax.tests
 DELETE-C-LIBRARY: test
 C-LIBRARY: test
 
-C-MARSHALLED: void outarg1 ( int* a )
+CM-FUNCTION: void outarg1 ( int* a )
     *a += 2;
 ;
 
-C-MARSHALLED: unsigned-long* outarg2 ( unsigned-long a, unsigned-long* b )
+CM-FUNCTION: unsigned-long* outarg2 ( unsigned-long a, unsigned-long* b )
     unsigned long* x = (unsigned long*) malloc(sizeof(unsigned long));
     *b = 10 + *b;
     *x = a + *b;
