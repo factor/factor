@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.inline alien.inline.types alien.marshall
 combinators effects generalizations kernel locals make namespaces
-quotations sequences words ;
+quotations sequences words alien.marshall.structs lexer parser
+vocabs.parser ;
 IN: alien.marshall.syntax
 
 :: marshalled-function ( function types effect -- word quot effect )
@@ -38,3 +39,7 @@ SYNTAX: M-FUNCTION:
 SYNTAX: M-STRUCTURE:
     scan current-vocab parse-definition
     define-marshalled-struct ;
+
+SYNTAX: CM-STRUCTURE:
+    scan current-vocab parse-definition
+    [ define-marshalled-struct ] [ define-c-struct ] 3bi ;
