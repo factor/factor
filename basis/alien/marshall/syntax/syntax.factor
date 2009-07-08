@@ -29,10 +29,10 @@ IN: alien.marshall.syntax
     [ in>> ] keep [ marshalled-function define-declared ] 3keep
     out>> c-function-string' c-strings get push ;
 
-SYNTAX: C-MARSHALLED:
+SYNTAX: CM-FUNCTION:
     function-types-effect define-c-marshalled ;
 
-SYNTAX: MARSHALLED:
+SYNTAX: M-FUNCTION:
     function-types-effect marshalled-function define-declared ;
 
 SYNTAX: M-STRUCTURE:
