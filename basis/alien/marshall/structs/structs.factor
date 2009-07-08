@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.marshall arrays assocs
 classes.tuple combinators destructors generalizations generic
 kernel libc locals parser quotations sequences slots words
-alien.structs ;
+alien.structs lexer vocabs.parser fry effects ;
 IN: alien.marshall.structs
 
 M: struct-wrapper dispose* underlying>> free ;

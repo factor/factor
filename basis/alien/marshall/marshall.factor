@@ -11,7 +11,7 @@ specialized-arrays.long specialized-arrays.longlong
 specialized-arrays.short specialized-arrays.uchar
 specialized-arrays.uint specialized-arrays.ulong
 specialized-arrays.ulonglong specialized-arrays.ushort strings
-unix.utilities vocabs.parser words libc.private ;
+unix.utilities vocabs.parser words libc.private struct-arrays ;
 IN: alien.marshall
 
 << primitive-types [ "void*" = not ] filter
