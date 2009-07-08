@@ -31,7 +31,8 @@ IN: compiler.cfg.linear-scan
     rpo number-instructions
     rpo compute-live-intervals machine-registers allocate-registers
     rpo assign-registers
-    rpo resolve-data-flow ;
+    rpo resolve-data-flow
+    rpo check-numbering ;
 
 : linear-scan ( cfg -- cfg' )
     [
