@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.marshall arrays assocs
 classes.tuple combinators destructors generalizations generic
-kernel libc locals parser quotations sequences slots words ;
+kernel libc locals parser quotations sequences slots words
+alien.structs ;
 IN: alien.marshall.structs
 
 M: struct-wrapper dispose* underlying>> free ;
@@ -35,3 +36,6 @@ M: struct-wrapper dispose* underlying>> free ;
             [ type>> ] [ reader>> ] [ writer>> ]
         } cleave define-struct-accessors
     ] each ;
+
+: define-marshalled-struct ( name vocab fields -- )
+    [ define-struct ] [ 2drop define-struct-tuple ] 3bi ;
