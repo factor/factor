@@ -4,6 +4,7 @@ USING: alien.inline alien.inline.private io.directories io.files
 kernel namespaces tools.test alien.c-types alien.structs ;
 IN: alien.inline.tests
 
+DELETE-C-LIBRARY: test
 C-LIBRARY: test
 
 C-FUNCTION: const-int add ( int a, int b )
@@ -42,9 +43,8 @@ C-FUNCTION: int area ( rectangle c )
     area
 ] unit-test
 
-DELETE-C-LIBRARY: const
 
-
+DELETE-C-LIBRARY: cpplib
 C-LIBRARY: cpplib
 
 COMPILE-AS-C++
@@ -61,9 +61,8 @@ C-FUNCTION: const-char* hello ( )
 { 0 1 } [ hello ] must-infer-as
 [ "hello world" ] [ hello ] unit-test
 
-DELETE-C-LIBRARY: cpplib
 
-
+DELETE-C-LIBRARY: compile-error
 C-LIBRARY: compile-error
 
 C-FUNCTION: char* breakme ( )
@@ -71,5 +70,3 @@ C-FUNCTION: char* breakme ( )
 ;
 
 << [ compile-c-library ] must-fail >>
-
-DELETE-C-LIBRARY: compile-error
