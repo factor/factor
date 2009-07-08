@@ -5,7 +5,8 @@ alien.libraries alien.parser arrays assocs effects fry
 generalizations grouping io.directories io.files
 io.files.info io.files.temp kernel lexer math math.order
 math.ranges multiline namespaces sequences source-files
-splitting strings system vocabs.loader vocabs.parser words ;
+splitting strings system vocabs.loader vocabs.parser words
+alien.c-types make ;
 IN: alien.inline
 
 <PRIVATE
@@ -86,6 +87,12 @@ PRIVATE>
 : define-c-include ( str -- )
     "#include " prepend c-strings get push ;
 
+: define-c-typedef ( old new -- )
+    [ typedef ] [
+        [ swap "typedef " % % " " % % ";" % ]
+        "" make c-strings get push
+    ] 2bi ;
+
 : delete-inline-library ( str -- )
     library-path dup exists? [ delete-file ] [ drop ] if ;
 
@@ -103,6 +110,8 @@ SYNTAX: C-INCLUDE: scan define-c-include ;
 
 SYNTAX: C-FUNCTION:
     function-types-effect define-c-function ;
+
+SYNTAX: C-TYPEDEF: scan scan define-c-typedef ;
 
 SYNTAX: ;C-LIBRARY compile-c-library ;
 
