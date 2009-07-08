@@ -9,15 +9,15 @@ IN: compiler.cfg.linear-scan.allocation.coalescing
 : active-interval ( vreg -- live-interval )
     dup [ dup active-intervals-for [ vreg>> = ] with find nip ] when ;
 
-: intersects-inactive-intervals? ( live-interval -- ? )
+: avoids-inactive-intervals? ( live-interval -- ? )
     dup vreg>> inactive-intervals-for
-    [ relevant-ranges intersect-live-ranges 1/0. = ] with all? ;
+    [ intervals-intersect? not ] with all? ;
 
 : coalesce? ( live-interval -- ? )
     {
         [ copy-from>> active-interval ]
         [ [ start>> ] [ copy-from>> active-interval end>> ] bi = ]
-        [ intersects-inactive-intervals? ]
+        [ avoids-inactive-intervals? ]
     } 1&& ;
 
 : coalesce ( live-interval -- )
