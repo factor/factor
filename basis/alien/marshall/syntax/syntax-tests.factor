@@ -4,6 +4,7 @@ USING: alien.inline alien.marshall.syntax destructors
 tools.test ;
 IN: alien.marshall.syntax.tests
 
+DELETE-C-LIBRARY: test
 C-LIBRARY: test
 
 C-MARSHALLED: void outarg1 ( int* a )
@@ -24,5 +25,3 @@ C-MARSHALLED: unsigned-long* outarg2 ( unsigned-long a, unsigned-long* b )
 
 { 2 2 } [ outarg2 ] must-infer-as
 [ 18 15 ] [ 3 5 outarg2 ] unit-test
-
-DELETE-C-LIBRARY: test
