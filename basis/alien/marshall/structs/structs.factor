@@ -12,8 +12,8 @@ M: struct-wrapper dispose* underlying>> free ;
     [ "accessors" create create-method dup make-inline ] dip define ;
 
 : define-struct-getter ( class name word type -- )
-    [ ">>" append \ underlying>> ] 2dip 
-    unmarshaller \ call 4array >quotation
+    [ ">>" append \ underlying>> ] 2dip
+    struct-field-unmarshaller \ call 4array >quotation
     define-struct-accessor ;
 
 : define-struct-setter ( class name word type -- )
