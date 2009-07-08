@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.inline alien.marshall.syntax destructors
-tools.test ;
+tools.test accessors kernel ;
 IN: alien.marshall.syntax.tests
 
 DELETE-C-LIBRARY: test
@@ -18,6 +18,21 @@ CM-FUNCTION: unsigned-long* outarg2 ( unsigned-long a, unsigned-long* b )
     return x;
 ;
 
+CM-STRUCTURE: wedge
+    { "double" "degrees" } ;
+
+CM-STRUCTURE: sundial
+    { "double" "radius" }
+    { "wedge" "wedge" } ;
+
+CM-FUNCTION: double hours ( sundial* d )
+    return d->wedge.degrees / 30;
+;
+
+CM-FUNCTION: void change_time ( double hours, sundial* d )
+    d->wedge.degrees = hours * 30;
+;
+
 ;C-LIBRARY
 
 { 1 1 } [ outarg1 ] must-infer-as
@@ -25,3 +40,9 @@ CM-FUNCTION: unsigned-long* outarg2 ( unsigned-long a, unsigned-long* b )
 
 { 2 2 } [ outarg2 ] must-infer-as
 [ 18 15 ] [ 3 5 outarg2 ] unit-test
+
+{ 1 1 } [ hours ] must-infer-as
+[ 5.0 ] [ <sundial> <wedge> 150 >>degrees >>wedge hours ] unit-test
+
+{ 2 0 } [ change_time ] must-infer-as
+[ 150.0 ] [ 5 <sundial> <wedge> 11 >>degrees >>wedge [ change_time ] keep wedge>> degrees>> ] unit-test
