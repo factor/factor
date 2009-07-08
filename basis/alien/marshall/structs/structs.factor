@@ -26,9 +26,18 @@ M: struct-wrapper dispose* underlying>> free ;
     [ drop swap define-struct-getter ]
     [ nip swap define-struct-setter ] 5 nbi ;
 
+: define-struct-constructor ( class -- )
+    {
+        [ name>> "<" prepend ">" append create-in ]
+        [ '[ _ new ] ]
+        [ name>> '[ _ malloc-object >>underlying ] append ]
+        [ name>> 1array ]
+    } cleave { } swap <effect> define-declared ;
+
 :: define-struct-tuple ( name -- )
     name create-in :> class
     class struct-wrapper { } define-tuple-class
+    class define-struct-constructor
     name c-type fields>> [
         class swap
         {
