@@ -130,3 +130,6 @@ SYNTAX: C-STRUCTURE:
 SYNTAX: ;C-LIBRARY compile-c-library ;
 
 SYNTAX: DELETE-C-LIBRARY: scan delete-inline-library ;
+
+SYNTAX: RAW-C:
+    [ "\n" % parse-here % "\n" % c-strings get push ] "" make ;
