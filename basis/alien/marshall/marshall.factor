@@ -230,17 +230,19 @@ M: struct-wrapper dynamic-cast ;
     } case ;
 
 
+: ?malloc-byte-array ( c-type -- alien )
+    dup alien? [ malloc-byte-array ] unless ;
+
 : struct-unmarshaller ( type -- quot )
     current-vocab lookup [
-        dup superclasses [ struct-wrapper? ] any? [
-            [ class name>> heap-size ] keep
-            '[ _ malloc-byte-array _ new swap >>underlying ]
+        dup superclasses [ \ struct-wrapper = ] any? [
+            '[ ?malloc-byte-array _ new swap >>underlying ]
         ] [ drop [ ] ] if
     ] [ [ ] ] if* ;
 
 : pointer-unmarshaller ( type -- quot )
     type-sans-pointer current-vocab lookup [
-        dup superclasses [ alien-wrapper? ] any? [
+        dup superclasses [ \ alien-wrapper = ] any? [
             '[ _ new swap >>underlying dynamic-cast ]
         ] [ drop [ ] ] if
     ] [ [ ] ] if* ;
