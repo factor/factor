@@ -27,10 +27,18 @@ SYMBOL: C++
         { C++ [ ".cpp" ] }
     } case ;
 
-: compiler ( lang -- str )
+HOOK: compiler os ( lang -- str )
+
+M: word compiler ( lang -- str )
     {
         { C [ "gcc" ] }
         { C++ [ "g++" ] }
+    } case ;
+
+M: openbsd compiler ( lang -- str )
+    {
+        { C [ "gcc" ] }
+        { C++ [ "eg++" ] }
     } case ;
 
 HOOK: compiler-descr os ( lang -- descr )
