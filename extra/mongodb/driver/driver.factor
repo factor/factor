@@ -125,7 +125,7 @@ M: mdb-collection create-collection
 
 : ensure-valid-collection-name ( collection -- )
     [ ";$." intersect length 0 > ] keep
-    '[ _ "contains invalid characters ( . $ ; )" 2array "." join throw ] when ; inline
+    '[ _ "contains invalid characters ( . $ ; )" "." glue throw ] when ; inline
 
 : build-collection-map ( -- assoc )
     H{ } clone load-collection-list      
@@ -154,7 +154,7 @@ M: mdb-collection create-collection
         [ nip ] [ drop ] if
         [ ] [ reserved-namespace? ] bi
         [ instance (ensure-collection) ] unless
-        [ instance-name ] dip 2array "." join ] ; 
+        [ instance-name ] dip "." glue ] ; 
 
 : fix-query-collection ( mdb-query -- mdb-query )
     [ check-collection ] change-collection ; inline
