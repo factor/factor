@@ -61,23 +61,3 @@ ERROR: splitting-atomic-interval ;
     after split-after ;
 
 HINTS: split-interval live-interval object ;
-
-: split-between-blocks ( new n -- before after )
-    split-interval
-    2dup [ compute-start/end ] bi@ ;
-
-: insert-use-for-copy ( seq n -- seq' )
-    [ '[ _ < ] filter ]
-    [ nip dup 1 + 2array ]
-    [ 1 + '[ _ > ] filter ]
-    2tri 3append ;
-
-: split-to-fit ( new n -- before after )
-    1 -
-    2dup swap covers? [
-        [ '[ _ insert-use-for-copy ] change-uses ] keep
-        split-between-blocks
-        2dup >>split-next drop
-    ] [
-        split-between-blocks
-    ] if ;

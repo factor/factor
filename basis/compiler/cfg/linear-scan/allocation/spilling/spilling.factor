@@ -80,6 +80,8 @@ ERROR: bad-live-ranges interval ;
         [ add-unhandled ]
     } cleave ;
 
+: spill-live-out? ( live-interval n -- ? ) [ uses>> last ] dip < ;
+
 : spill-live-out ( live-interval -- )
     ! The interval has no more usages after the spill location.  This
     !  means it is the first child of an interval that was split.  We
@@ -90,6 +92,8 @@ ERROR: bad-live-ranges interval ;
         [ assign-spill ]
         [ add-handled ]
     } cleave ;
+
+: spill-live-in? ( live-interval n -- ? ) [ uses>> first ] dip > ;
 
 : spill-live-in ( live-interval -- )
     ! The interval does not have any usages before the spill location.
@@ -103,10 +107,10 @@ ERROR: bad-live-ranges interval ;
         [ add-unhandled ]
     } cleave ;
 
-: (spill-intersecting) ( live-interval new -- )
-    start>> {
-        { [ 2dup [ uses>> last ] dip < ] [ drop spill-live-out ] }
-        { [ 2dup [ uses>> first ] dip > ] [ drop spill-live-in ] }
+: spill ( live-interval n -- )
+    {
+        { [ 2dup spill-live-out? ] [ drop spill-live-out ] }
+        { [ 2dup spill-live-in? ] [ drop spill-live-in ] }
         [ split-and-spill [ add-handled ] [ add-unhandled ] bi* ]
     } cond ;
 
@@ -115,7 +119,7 @@ ERROR: bad-live-ranges interval ;
     ! most one) are split and spilled and removed from the inactive
     ! set.
     new vreg>> active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
-    '[ _ delete-nth new (spill-intersecting) ] [ 2drop ] if ;
+    '[ _ delete-nth new start>> spill ] [ 2drop ] if ;
 
 :: spill-intersecting-inactive ( new reg -- )
     ! Any inactive intervals using 'reg' are split and spilled
@@ -123,7 +127,7 @@ ERROR: bad-live-ranges interval ;
     new vreg>> inactive-intervals-for [
         dup reg>> reg = [
             dup new intervals-intersect? [
-                new (spill-intersecting) f
+                new start>> spill f
             ] [ drop t ] if
         ] [ drop t ] if
     ] filter-here ;
