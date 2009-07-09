@@ -1,7 +1,7 @@
 IN: compiler.cfg.linear-scan.tests
 USING: tools.test random sorting sequences sets hashtables assocs
 kernel fry arrays splitting namespaces math accessors vectors locals
-math.order grouping strings strings.private
+math.order grouping strings strings.private classes
 cpu.architecture
 compiler.cfg
 compiler.cfg.optimizer
@@ -164,56 +164,6 @@ check-numbering? on
     T{ live-interval
         { vreg T{ vreg { reg-class int-regs } { n 1 } } }
         { start 5 }
-        { end 5 }
-        { uses V{ 5 } }
-        { ranges V{ T{ live-range f 5 5 } } }
-    }
-] [
-    T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-       { start 0 }
-       { end 5 }
-       { uses V{ 0 1 5 } }
-       { ranges V{ T{ live-range f 0 5 } } }
-    } 5 split-before-use [ f >>split-next ] bi@
-] unit-test
-
-[
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 0 }
-        { end 4 }
-        { uses V{ 0 1 4 } }
-        { ranges V{ T{ live-range f 0 4 } } }
-    }
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 5 }
-        { end 10 }
-        { uses V{ 5 10 } }
-        { ranges V{ T{ live-range f 5 10 } } }
-    }
-] [
-    T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-       { start 0 }
-       { end 10 }
-       { uses V{ 0 1 10 } }
-       { ranges V{ T{ live-range f 0 10 } } }
-    } 5 split-before-use [ f >>split-next ] bi@
-] unit-test
-
-[
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 0 }
-        { end 4 }
-        { uses V{ 0 1 4 } }
-        { ranges V{ T{ live-range f 0 4 } } }
-    }
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 5 }
         { end 10 }
         { uses V{ 5 10 } }
         { ranges V{ T{ live-range f 5 10 } } }
@@ -225,7 +175,7 @@ check-numbering? on
        { end 10 }
        { uses V{ 0 1 4 5 10 } }
        { ranges V{ T{ live-range f 0 10 } } }
-    } 5 split-before-use [ f >>split-next ] bi@
+    } 4 split-to-fit [ f >>split-next ] bi@
 ] unit-test
 
 [
@@ -1846,8 +1796,6 @@ V{
 test-diamond
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
-
-USING: classes ;
 
 [ ] [
     1 get instructions>> first regs>> V int-regs 0 swap at
