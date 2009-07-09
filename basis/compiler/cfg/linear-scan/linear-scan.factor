@@ -10,7 +10,8 @@ compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.assignment
-compiler.cfg.linear-scan.resolve ;
+compiler.cfg.linear-scan.resolve
+compiler.cfg.linear-scan.mapping ;
 IN: compiler.cfg.linear-scan
 
 ! References:
@@ -36,6 +37,7 @@ IN: compiler.cfg.linear-scan
 
 : linear-scan ( cfg -- cfg' )
     [
+        init-mapping
         dup reverse-post-order machine-registers (linear-scan)
         spill-counts get >>spill-counts
     ] with-scope ;
