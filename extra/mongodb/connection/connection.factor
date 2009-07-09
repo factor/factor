@@ -39,16 +39,16 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
     mdb-connection get instance>> ; inline
 
 : index-collection ( -- ns )
-    mdb-instance name>> "system.indexes" 2array "." join ; inline
+    mdb-instance name>> "system.indexes" "." glue ; inline
 
 : namespaces-collection ( -- ns )
-    mdb-instance name>> "system.namespaces" 2array "." join ; inline
+    mdb-instance name>> "system.namespaces" "." glue ; inline
 
 : cmd-collection ( -- ns )
-    mdb-instance name>> "$cmd" 2array "." join ; inline
+    mdb-instance name>> "$cmd" "." glue ; inline
 
 : index-ns ( colname -- index-ns )
-    [ mdb-instance name>> ] dip 2array "." join ; inline
+    [ mdb-instance name>> ] dip "." glue ; inline
 
 : send-message ( message -- )
     [ mdb-connection get handle>> ] dip '[ _ write-message ] with-stream* ;
