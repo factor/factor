@@ -80,10 +80,10 @@ ERROR: bad-live-ranges interval ;
         [ add-unhandled ]
     } cleave ;
 
-: split-intersecting? ( live-interval new reg -- ? )
-    { [ [ drop reg>> ] dip = ] [ drop intervals-intersect? ] } 3&& ;
-
-: split-live-out ( live-interval -- )
+: spill-live-out ( live-interval -- )
+    ! The interval has no more usages after the spill location.  This
+    !  means it is the first child of an interval that was split.  We
+    ! spill the value and let the resolve pass insert a reload later.
     {
         [ trim-before-ranges ]
         [ compute-start/end ]
@@ -91,7 +91,11 @@ ERROR: bad-live-ranges interval ;
         [ add-handled ]
     } cleave ;
 
-: split-live-in ( live-interval -- )
+: spill-live-in ( live-interval -- )
+    ! The interval does not have any usages before the spill location.
+    !  This means it is the second child of an interval that was
+    ! split.  We reload the value and let the resolve pass insert a
+    ! split later.
     {
         [ trim-after-ranges ]
         [ compute-start/end ]
@@ -99,40 +103,48 @@ ERROR: bad-live-ranges interval ;
         [ add-unhandled ]
     } cleave ;
 
-: (split-intersecting) ( live-interval new -- )
+: (spill-intersecting) ( live-interval new -- )
     start>> {
-        { [ 2dup [ uses>> last ] dip < ] [ drop split-live-out ] }
-        { [ 2dup [ uses>> first ] dip > ] [ drop split-live-in ] }
+        { [ 2dup [ uses>> last ] dip < ] [ drop spill-live-out ] }
+        { [ 2dup [ uses>> first ] dip > ] [ drop spill-live-in ] }
         [ split-and-spill [ add-handled ] [ add-unhandled ] bi* ]
     } cond ;
 
-: (split-intersecting-active) ( active new -- )
-    [ drop delete-active ]
-    [ (split-intersecting) ] 2bi ;
+:: spill-intersecting-active ( new reg -- )
+    ! If there is an active interval using 'reg' (there should be at
+    ! most one) are split and spilled and removed from the inactive
+    ! set.
+    new vreg>> active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
+    '[ _ delete-nth new (spill-intersecting) ] [ 2drop ] if ;
 
-: split-intersecting-active ( new reg -- )
-    [ [ vreg>> active-intervals-for ] keep ] dip
-    [ '[ _ _ split-intersecting? ] filter ] 2keep drop
-    '[ _ (split-intersecting-active) ] each ;
+:: spill-intersecting-inactive ( new reg -- )
+    ! Any inactive intervals using 'reg' are split and spilled
+    ! and removed from the inactive set.
+    new vreg>> inactive-intervals-for [
+        dup reg>> reg = [
+            dup new intervals-intersect? [
+                new (spill-intersecting) f
+            ] [ drop t ] if
+        ] [ drop t ] if
+    ] filter-here ;
 
-: (split-intersecting-inactive) ( inactive new -- )
-    [ drop delete-inactive ]
-    [ (split-intersecting) ] 2bi ;
-
-: split-intersecting-inactive ( new reg -- )
-    [ [ vreg>> inactive-intervals-for ] keep ] dip
-    [ '[ _ _ split-intersecting? ] filter ] 2keep drop
-    '[ _ (split-intersecting-inactive) ] each ;
-
-: split-intersecting ( new reg -- )
-    [ split-intersecting-active ]
-    [ split-intersecting-inactive ]
+: spill-intersecting ( new reg -- )
+    ! Split and spill all active and inactive intervals
+    ! which intersect 'new' and use 'reg'.
+    [ spill-intersecting-active ]
+    [ spill-intersecting-inactive ]
     2bi ;
 
 : spill-available ( new pair -- )
-    [ first split-intersecting ] [ register-available ] 2bi ;
+    ! A register would become fully available if all
+    ! active and inactive intervals using it were split
+    ! and spilled.
+    [ first spill-intersecting ] [ register-available ] 2bi ;
 
 : spill-partially-available ( new pair -- )
+    ! A register would be available for part of the new
+    ! interval's lifetime if all active and inactive intervals
+    ! using that register were split and spilled.
     [ second 1 - split-and-spill add-unhandled ] keep
     spill-available ;
 

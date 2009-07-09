@@ -29,7 +29,7 @@ IN: compiler.cfg.linear-scan.allocation
     second 0 = ; inline
 
 : register-partially-available ( new result -- )
-    [ second split-before-use ] keep
+    [ second split-to-fit ] keep
     '[ _ register-available ] [ add-unhandled ] bi* ;
 
 : assign-register ( new -- )

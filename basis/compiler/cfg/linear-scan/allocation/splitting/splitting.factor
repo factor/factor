@@ -72,7 +72,7 @@ HINTS: split-interval live-interval object ;
     [ 1 + '[ _ > ] filter ]
     2tri 3append ;
 
-: split-before-use ( new n -- before after )
+: split-to-fit ( new n -- before after )
     1 -
     2dup swap covers? [
         [ '[ _ insert-use-for-copy ] change-uses ] keep
