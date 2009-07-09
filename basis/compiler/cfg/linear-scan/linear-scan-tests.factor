@@ -175,7 +175,7 @@ check-numbering? on
        { end 5 }
        { uses V{ 0 1 5 } }
        { ranges V{ T{ live-range f 0 5 } } }
-    } 5 split-before-use [ f >>split-next ] bi@
+    } 5 split-to-fit [ f >>split-next ] bi@
 ] unit-test
 
 [
@@ -200,7 +200,7 @@ check-numbering? on
        { end 10 }
        { uses V{ 0 1 10 } }
        { ranges V{ T{ live-range f 0 10 } } }
-    } 5 split-before-use [ f >>split-next ] bi@
+    } 5 split-to-fit [ f >>split-next ] bi@
 ] unit-test
 
 [
@@ -225,7 +225,7 @@ check-numbering? on
        { end 10 }
        { uses V{ 0 1 4 5 10 } }
        { ranges V{ T{ live-range f 0 10 } } }
-    } 5 split-before-use [ f >>split-next ] bi@
+    } 5 split-to-fit [ f >>split-next ] bi@
 ] unit-test
 
 [
