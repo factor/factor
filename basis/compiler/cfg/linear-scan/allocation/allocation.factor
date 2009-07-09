@@ -28,16 +28,30 @@ IN: compiler.cfg.linear-scan.allocation
 : no-free-registers? ( result -- ? )
     second 0 = ; inline
 
+: split-to-fit ( new n -- before after )
+    split-interval
+    [ [ compute-start/end ] bi@ ]
+    [ >>split-next drop ]
+    [ ]
+    2tri ;
+
 : register-partially-available ( new result -- )
-    [ second split-to-fit ] keep
-    '[ _ register-available ] [ add-unhandled ] bi* ;
+    {
+        { [ 2dup second 1 - spill-live-out? ] [ drop spill-live-out ] }
+        { [ 2dup second 1 - spill-live-in? ] [ drop spill-live-in ] }
+        [
+            [ second 1 - split-to-fit ] keep
+            '[ _ register-available ] [ add-unhandled ] bi*
+        ]
+    } cond ;
 
 : assign-register ( new -- )
     dup coalesce? [ coalesce ] [
         dup register-status {
             { [ dup no-free-registers? ] [ drop assign-blocked-register ] }
             { [ 2dup register-available? ] [ register-available ] }
-            [ register-partially-available ]
+            ! [ register-partially-available ]
+            [ drop assign-blocked-register ]
         } cond
     ] if ;
 
