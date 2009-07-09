@@ -8,6 +8,7 @@ compiler.cfg.def-use
 compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
+compiler.cfg.linear-scan.mapping
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
@@ -42,16 +43,11 @@ SYMBOL: register-live-outs
     H{ } clone register-live-outs set
     init-unhandled ;
 
-: insert-spill ( live-interval -- )
-    {
-        [ reg>> ]
-        [ vreg>> reg-class>> ]
-        [ spill-to>> ]
-        [ end>> ]
-    } cleave f swap \ _spill boa , ;
-
 : handle-spill ( live-interval -- )
-    dup spill-to>> [ insert-spill ] [ drop ] if ;
+    dup spill-to>> [
+        [ reg>> ] [ spill-to>> <spill-slot> ] [ vreg>> reg-class>> ] tri
+        register->memory
+    ] [ drop ] if ;
 
 : first-split ( live-interval -- live-interval' )
     dup split-before>> [ first-split ] [ ] ?if ;
@@ -59,22 +55,19 @@ SYMBOL: register-live-outs
 : next-interval ( live-interval -- live-interval' )
     split-next>> first-split ;
 
-: insert-copy ( live-interval -- )
-    {
-        [ next-interval reg>> ]
-        [ reg>> ]
-        [ vreg>> reg-class>> ]
-        [ end>> ]
-    } cleave f swap \ _copy boa , ;
-
 : handle-copy ( live-interval -- )
-    dup split-next>> [ insert-copy ] [ drop ] if ;
+    dup split-next>> [
+        [ reg>> ] [ next-interval reg>> ] [ vreg>> reg-class>> ] tri
+        register->register
+    ] [ drop ] if ;
 
 : expire-old-intervals ( n -- )
-    [ pending-intervals get ] dip '[
-        dup end>> _ <
-        [ [ handle-spill ] [ handle-copy ] bi f ] [ drop t ] if
-    ] filter-here ;
+    [
+        [ pending-intervals get ] dip '[
+            dup end>> _ <
+            [ [ handle-spill ] [ handle-copy ] bi f ] [ drop t ] if
+        ] filter-here
+    ] { } make mapping-instructions % ;
 
 : insert-reload ( live-interval -- )
     {
