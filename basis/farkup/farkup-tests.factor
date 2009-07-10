@@ -128,7 +128,7 @@ link-no-follow? off
 
 [ "<p><a href=\"a\">a</a> <a href=\"b\">c</a></p>" ] [ "[[a]] [[b|c]]" convert-farkup ] unit-test
 
-[ "<p><a href=\"C%2b%2b\">C++</a></p>" ] [ "[[C++]]" convert-farkup ] unit-test
+[ "<p><a href=\"C%2B%2B\">C++</a></p>" ] [ "[[C++]]" convert-farkup ] unit-test
 
 [ "<p>&lt;foo&gt;</p>" ] [ "<foo>" convert-farkup ] unit-test
 
