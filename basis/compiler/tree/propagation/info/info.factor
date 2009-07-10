@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra classes.tuple
 classes.tuple.private kernel accessors math math.intervals
-namespaces sequences words combinators
+namespaces sequences words combinators byte-arrays strings
 arrays compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
@@ -66,12 +66,17 @@ DEFER: <literal-info>
     [ read-only>> [ <literal-info> ] [ drop f ] if ] 2map
     f prefix ;
 
+UNION: fixed-length array byte-array string ;
+
 : init-literal-info ( info -- info )
+    [-inf,inf] >>interval
     dup literal>> class >>class
-    dup literal>> dup real? [ [a,a] >>interval ] [
-        [ [-inf,inf] >>interval ] dip
-        dup tuple? [ tuple-slot-infos >>slots ] [ drop ] if
-    ] if ; inline
+    dup literal>> {
+        { [ dup real? ] [ [a,a] >>interval ] }
+        { [ dup tuple? ] [ tuple-slot-infos >>slots ] }
+        { [ dup fixed-length? ] [ length <literal-info> >>length ] }
+        [ drop ]
+    } cond ; inline
 
 : init-value-info ( info -- info )
     dup literal?>> [
