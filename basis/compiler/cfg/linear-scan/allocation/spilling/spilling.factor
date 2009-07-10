@@ -17,7 +17,7 @@ ERROR: bad-live-ranges interval ;
     ] [ drop ] if ;
 
 : trim-before-ranges ( live-interval -- )
-    [ ranges>> ] [ uses>> last ] bi
+    [ ranges>> ] [ uses>> last 1 + ] bi
     [ '[ from>> _ <= ] filter-here ]
     [ swap last (>>to) ]
     2bi ;
