@@ -126,18 +126,8 @@ SYMBOL: spill-counts
 ! Mapping from vregs to spill slots
 SYMBOL: spill-slots
 
-DEFER: assign-spill-slot
-
-: compute-spill-slot ( live-interval -- n )
-    dup copy-from>>
-    [ assign-spill-slot ]
-    [ vreg>> reg-class>> next-spill-slot ] ?if ;
-
-: assign-spill-slot ( live-interval -- n )
-    dup vreg>> spill-slots get at [ ] [
-        [ compute-spill-slot dup ] keep
-        vreg>> spill-slots get set-at
-    ] ?if ;
+: assign-spill-slot ( vreg -- n )
+    spill-slots get [ reg-class>> next-spill-slot ] cache ;
 
 : init-allocator ( registers -- )
     registers set
