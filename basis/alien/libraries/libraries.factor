@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.strings assocs io.backend kernel namespaces ;
+USING: accessors alien alien.strings assocs io.backend
+kernel namespaces destructors ;
 IN: alien.libraries
 
 : dlopen ( path -- dll ) native-string>alien (dlopen) ;
@@ -21,5 +22,12 @@ TUPLE: library path abi dll ;
 : load-library ( name -- dll )
     library dup [ dll>> ] when ;
 
-: add-library ( name path abi -- )
-    <library> swap libraries get set-at ;
+M: dll dispose dlclose ;
+
+M: library dispose dll>> [ dispose ] when* ;
+
+: remove-library ( name -- )
+    libraries get delete-at* [ dispose ] [ drop ] if ;
+
+: add-library ( name path abi -- )    
+    <library> swap libraries get [ delete-at ] [ set-at ] 2bi ;

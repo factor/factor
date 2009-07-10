@@ -163,7 +163,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     [ create-collection ] keep ; 
 
 : prepare-index ( collection -- )
-    "_x_idx" [ "x" asc ] key-spec <index-spec> unique-index ensure-index ; 
+    "_x_idx" [ "x" asc ] key-spec <index-spec> t >>unique? ensure-index ; 
 
 : insert ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
     prepare-collection
