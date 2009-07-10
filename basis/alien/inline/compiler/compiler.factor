@@ -23,8 +23,7 @@ SYMBOL: C++
     } cond ;
 
 : library-path ( str -- str' )
-    '[ "lib" % "-" % _ % library-suffix % ]
-    "" make inline-library-file ;
+    '[ "lib" % _ % library-suffix % ] "" make temp-file ;
 
 : src-suffix ( lang -- str )
     {
