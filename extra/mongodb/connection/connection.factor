@@ -1,6 +1,6 @@
 USING: accessors assocs fry io.encodings.binary io.sockets kernel math
 math.parser mongodb.msg mongodb.operations namespaces destructors
-constructors sequences splitting checksums checksums.md5 formatting
+constructors sequences splitting checksums checksums.md5 
 io.streams.duplex io.encodings.utf8 io.encodings.string combinators.smart
 arrays hashtables sequences.deep vectors locals ;
 
@@ -39,16 +39,16 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
     mdb-connection get instance>> ; inline
 
 : index-collection ( -- ns )
-    mdb-instance name>> "%s.system.indexes" sprintf ; inline
+    mdb-instance name>> "system.indexes" "." glue ; inline
 
 : namespaces-collection ( -- ns )
-    mdb-instance name>> "%s.system.namespaces" sprintf ; inline
+    mdb-instance name>> "system.namespaces" "." glue ; inline
 
 : cmd-collection ( -- ns )
-    mdb-instance name>> "%s.$cmd" sprintf ; inline
+    mdb-instance name>> "$cmd" "." glue ; inline
 
 : index-ns ( colname -- index-ns )
-    [ mdb-instance name>> ] dip "%s.%s" sprintf ; inline
+    [ mdb-instance name>> ] dip "." glue ; inline
 
 : send-message ( message -- )
     [ mdb-connection get handle>> ] dip '[ _ write-message ] with-stream* ;

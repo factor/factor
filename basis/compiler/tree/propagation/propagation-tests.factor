@@ -331,6 +331,16 @@ cell-bits 32 = [
     [ { fixnum } declare dup 10 eq? [ "A" throw ] unless ] final-literals
 ] unit-test
 
+[ V{ 3 } ] [ [ [ { 1 2 3 } ] [ { 4 5 6 } ] if length ] final-literals ] unit-test
+
+[ V{ 3 } ] [ [ [ B{ 1 2 3 } ] [ B{ 4 5 6 } ] if length ] final-literals ] unit-test
+
+[ V{ 3 } ] [ [ [ "yay" ] [ "hah" ] if length ] final-literals ] unit-test
+
+[ V{ 3 } ] [ [ 3 <byte-array> length ] final-literals ] unit-test
+
+[ V{ 3 } ] [ [ 3 f <string> length ] final-literals ] unit-test
+
 ! Slot propagation
 TUPLE: prop-test-tuple { x integer } ;
 
