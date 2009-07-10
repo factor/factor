@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math math.partial-dispatch namespaces sequences sets
 accessors assocs words kernel memoize fry combinators
-combinators.short-circuit
+combinators.short-circuit layouts alien.accessors
 compiler.tree
 compiler.tree.combinators
 compiler.tree.def-use
@@ -27,6 +27,16 @@ IN: compiler.tree.modular-arithmetic
 
 { bitand bitor bitxor bitnot }
 [ t "modular-arithmetic" set-word-prop ] each
+
+{
+    >fixnum
+    set-alien-unsigned-1 set-alien-signed-1
+    set-alien-unsigned-2 set-alien-signed-2
+}
+cell 8 = [
+    { set-alien-unsigned-4 set-alien-signed-4 } append
+] when
+[ t "low-order" set-word-prop ] each
 
 SYMBOL: modularize-values
 
@@ -54,7 +64,7 @@ M: node maybe-modularize* 2drop ;
 GENERIC: compute-modularized-values* ( node -- )
 
 M: #call compute-modularized-values*
-    dup word>> \ >fixnum eq?
+    dup word>> "low-order" word-prop
     [ in-d>> first maybe-modularize ] [ drop ] if ;
 
 M: node compute-modularized-values* drop ;
