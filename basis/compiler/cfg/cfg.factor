@@ -48,6 +48,9 @@ SYMBOL: visited
         building get push
     ] with-variable ; inline
 
+: back-edge? ( from to -- ? )
+    [ number>> ] bi@ > ;
+
 TUPLE: cfg { entry basic-block } word label spill-counts post-order ;
 
 : <cfg> ( entry word label -- cfg ) f f cfg boa ;
