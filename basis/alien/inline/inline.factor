@@ -55,10 +55,13 @@ SYMBOL: c-strings
     compiler-args get
     c-strings get "\n" join
     c-library get compile-to-library ;
+
+: c-library-name ( name -- name' )
+    [ current-vocab name>> % "_" % % ] "" make ;
 PRIVATE>
 
 : define-c-library ( name -- )
-    [ current-vocab name>> % "_" % % ] "" make c-library set
+    c-library-name c-library set
     V{ } clone c-strings set
     V{ } clone compiler-args set ;
 
@@ -104,7 +107,8 @@ PRIVATE>
     ] 3bi ;
 
 : delete-inline-library ( str -- )
-    library-path dup exists? [ delete-file ] [ drop ] if ;
+    c-library-name [ remove-library ]
+    [ library-path dup exists? [ delete-file ] [ drop ] if ] bi ;
 
 SYNTAX: C-LIBRARY: scan define-c-library ;
 
