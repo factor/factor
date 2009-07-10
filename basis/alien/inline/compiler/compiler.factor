@@ -8,6 +8,12 @@ IN: alien.inline.compiler
 SYMBOL: C
 SYMBOL: C++
 
+: inline-libs-directory ( -- path )
+    "resource:alien-inline-libs" dup make-directories ;
+
+: inline-library-file ( name -- path )
+    inline-libs-directory prepend-path ;
+
 : library-suffix ( -- str )
     os {
         { [ dup macosx? ]  [ drop ".dylib" ] }
@@ -17,9 +23,9 @@ SYMBOL: C++
 
 : library-path ( str -- str' )
     '[
-        "lib-" % current-vocab name>> %
+        "lib" % current-vocab name>> %
         "-" % _ % library-suffix %
-    ] "" make temp-file ;
+    ] "" make inline-library-file ;
 
 : src-suffix ( lang -- str )
     {
