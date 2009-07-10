@@ -1,9 +1,12 @@
+! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler.tree.modular-arithmetic.tests
 USING: kernel kernel.private tools.test math math.partial-dispatch
 math.private accessors slots.private sequences strings sbufs
 compiler.tree.builder
 compiler.tree.optimizer
-compiler.tree.debugger ;
+compiler.tree.debugger
+alien.accessors layouts combinators byte-arrays ;
 
 : test-modular-arithmetic ( quot -- quot' )
     build-tree optimize-tree nodes>quot ;
@@ -136,3 +139,35 @@ TUPLE: declared-fixnum { x fixnum } ;
 
 [ [ >fixnum 255 fixnum-bitand ] ]
 [ [ >integer 256 rem ] test-modular-arithmetic ] unit-test
+
+[ [ "COMPLEX SHUFFLE" fixnum+fast "COMPLEX SHUFFLE" set-alien-unsigned-1 ] ]
+[ [ [ { fixnum fixnum } declare + ] 2dip set-alien-unsigned-1 ] test-modular-arithmetic ] unit-test
+
+[ [ "COMPLEX SHUFFLE" fixnum+fast "COMPLEX SHUFFLE" set-alien-unsigned-2 ] ]
+[ [ [ { fixnum fixnum } declare + ] 2dip set-alien-unsigned-2 ] test-modular-arithmetic ] unit-test
+
+cell {
+    { 4 [ [ [ "COMPLEX SHUFFLE" fixnum+ "COMPLEX SHUFFLE" set-alien-unsigned-4 ] ] ] }
+    { 8 [ [ [ "COMPLEX SHUFFLE" fixnum+fast "COMPLEX SHUFFLE" set-alien-unsigned-4 ] ] ] }
+} case
+[ [ [ { fixnum fixnum } declare + ] 2dip set-alien-unsigned-4 ] test-modular-arithmetic ] unit-test
+
+[ [ "COMPLEX SHUFFLE" fixnum+ "COMPLEX SHUFFLE" set-alien-unsigned-8 ] ]
+[ [ [ { fixnum fixnum } declare + ] 2dip set-alien-unsigned-8 ] test-modular-arithmetic ] unit-test
+
+[ [ "COMPLEX SHUFFLE" fixnum+fast "COMPLEX SHUFFLE" set-alien-signed-1 ] ]
+[ [ [ { fixnum fixnum } declare + ] 2dip set-alien-signed-1 ] test-modular-arithmetic ] unit-test
+
+[ [ "COMPLEX SHUFFLE" fixnum+fast "COMPLEX SHUFFLE" set-alien-signed-2 ] ]
+[ [ [ { fixnum fixnum } declare + ] 2dip set-alien-signed-2 ] test-modular-arithmetic ] unit-test
+
+cell {
+    { 4 [ [ [ "COMPLEX SHUFFLE" fixnum+ "COMPLEX SHUFFLE" set-alien-signed-4 ] ] ] }
+    { 8 [ [ [ "COMPLEX SHUFFLE" fixnum+fast "COMPLEX SHUFFLE" set-alien-signed-4 ] ] ] }
+} case
+[ [ [ { fixnum fixnum } declare + ] 2dip set-alien-signed-4 ] test-modular-arithmetic ] unit-test
+
+[ [ "COMPLEX SHUFFLE" fixnum+ "COMPLEX SHUFFLE" set-alien-signed-8 ] ]
+[ [ [ { fixnum fixnum } declare + ] 2dip set-alien-signed-8 ] test-modular-arithmetic ] unit-test
+
+[ t ] [ [ { fixnum byte-array } declare [ + ] with map ] { + fixnum+ >fixnum } inlined? ] unit-test

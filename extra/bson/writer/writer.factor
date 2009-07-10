@@ -75,24 +75,23 @@ M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ;
 
 : write-utf8-string ( string -- ) output-stream get '[ _ swap char>utf8 ] each ; inline
 
-: write-byte ( byte -- ) CHAR-SIZE >le write ; inline
 : write-int32 ( int -- ) INT32-SIZE >le write ; inline
 : write-double ( real -- ) double>bits INT64-SIZE >le write ; inline
-: write-cstring ( string -- ) write-utf8-string 0 write-byte ; inline
+: write-cstring ( string -- ) write-utf8-string 0 write1 ; inline
 : write-longlong ( object -- ) INT64-SIZE >le write ; inline
 
-: write-eoo ( -- ) T_EOO write-byte ; inline
-: write-type ( obj -- obj ) [ bson-type? write-byte ] keep ; inline
+: write-eoo ( -- ) T_EOO write1 ; inline
+: write-type ( obj -- obj ) [ bson-type? write1 ] keep ; inline
 : write-pair ( name object -- ) write-type [ write-cstring ] dip bson-write ; inline
 
 M: string bson-write ( obj -- )
     '[ _ write-cstring ] with-length-prefix-excl ;
 
 M: f bson-write ( f -- )
-    drop 0 write-byte ; 
+    drop 0 write1 ; 
 
 M: t bson-write ( t -- )
-    drop 1 write-byte ;
+    drop 1 write1 ;
 
 M: integer bson-write ( num -- )
     write-int32 ;
@@ -105,7 +104,7 @@ M: timestamp bson-write ( timestamp -- )
 
 M: byte-array bson-write ( binary -- )
     [ length write-int32 ] keep
-    T_Binary_Bytes write-byte
+    T_Binary_Bytes write1
     write ; 
 
 M: oid bson-write ( oid -- )
@@ -134,7 +133,7 @@ M: assoc bson-write ( assoc -- )
 
 : (serialize-code) ( code -- )
     object>bytes [ length write-int32 ] keep
-    T_Binary_Custom write-byte
+    T_Binary_Custom write1
     write ;
 
 M: quotation bson-write ( quotation -- )
