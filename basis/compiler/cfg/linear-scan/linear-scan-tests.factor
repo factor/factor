@@ -82,9 +82,9 @@ check-numbering? on
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
        { start 0 }
-       { end 1 }
+       { end 2 }
        { uses V{ 0 1 } }
-       { ranges V{ T{ live-range f 0 1 } } }
+       { ranges V{ T{ live-range f 0 2 } } }
     }
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
@@ -107,9 +107,9 @@ check-numbering? on
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
        { start 0 }
-       { end 0 }
+       { end 1 }
        { uses V{ 0 } }
-       { ranges V{ T{ live-range f 0 0 } } }
+       { ranges V{ T{ live-range f 0 1 } } }
     }
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
@@ -132,9 +132,9 @@ check-numbering? on
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
        { start 0 }
-       { end 0 }
+       { end 1 }
        { uses V{ 0 } }
-       { ranges V{ T{ live-range f 0 0 } } }
+       { ranges V{ T{ live-range f 0 1 } } }
     }
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
@@ -1317,38 +1317,6 @@ USING: math.private ;
     allocate-registers drop
 ] unit-test
 
-! Spill slot liveness was computed incorrectly, leading to a FEP
-! early in bootstrap on x86-32
-[ t ] [
-    [
-        H{ } clone live-ins set
-        H{ } clone live-outs set
-        H{ } clone phi-live-ins set
-        T{ basic-block
-           { id 12345 }
-           { instructions
-             V{
-                 T{ ##gc f V int-regs 6 V int-regs 7 }
-                 T{ ##peek f V int-regs 0 D 0 }
-                 T{ ##peek f V int-regs 1 D 1 }
-                 T{ ##peek f V int-regs 2 D 2 }
-                 T{ ##peek f V int-regs 3 D 3 }
-                 T{ ##peek f V int-regs 4 D 4 }
-                 T{ ##peek f V int-regs 5 D 5 }
-                 T{ ##replace f V int-regs 0 D 1 }
-                 T{ ##replace f V int-regs 1 D 2 }
-                 T{ ##replace f V int-regs 2 D 3 }
-                 T{ ##replace f V int-regs 3 D 4 }
-                 T{ ##replace f V int-regs 4 D 5 }
-                 T{ ##replace f V int-regs 5 D 0 }
-             }
-           }
-        } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
-        instructions>> first
-        live-values>> assoc-empty?
-    ] with-scope
-] unit-test
-
 [ f ] [
     T{ live-range f 0 10 }
     T{ live-range f 20 30 }
@@ -2483,3 +2451,160 @@ V{
 8 get 9 get 1vector >>successors drop
 
 [ ] [ { 1 2 3 4 5 } test-linear-scan-on-cfg ] unit-test
+
+! Fencepost error in assignment pass
+V{ T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##compare-imm-branch f V int-regs 0 5 cc= }
+} 1 test-bb
+
+V{ T{ ##branch } } 2 test-bb
+
+V{
+    T{ ##peek f V int-regs 1 D 0 }
+    T{ ##peek f V int-regs 2 D 0 }
+    T{ ##replace f V int-regs 1 D 0 }
+    T{ ##replace f V int-regs 2 D 0 }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##return }
+} 4 test-bb
+
+test-diamond
+
+[ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
+
+[ 0 ] [ 1 get instructions>> [ _spill? ] count ] unit-test
+
+[ 1 ] [ 2 get instructions>> [ _spill? ] count ] unit-test
+
+[ 1 ] [ 3 get instructions>> [ _spill? ] count ] unit-test
+
+[ 1 ] [ 4 get instructions>> [ _reload? ] count ] unit-test
+
+! Another test case for fencepost error in assignment pass
+V{ T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##compare-imm-branch f V int-regs 0 5 cc= }
+} 1 test-bb
+
+V{
+    T{ ##peek f V int-regs 1 D 0 }
+    T{ ##peek f V int-regs 2 D 0 }
+    T{ ##replace f V int-regs 1 D 0 }
+    T{ ##replace f V int-regs 2 D 0 }
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##return }
+} 4 test-bb
+
+test-diamond
+
+[ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
+
+[ 0 ] [ 1 get instructions>> [ _spill? ] count ] unit-test
+
+[ 1 ] [ 2 get instructions>> [ _spill? ] count ] unit-test
+
+[ 1 ] [ 2 get instructions>> [ _reload? ] count ] unit-test
+
+[ 0 ] [ 3 get instructions>> [ _spill? ] count ] unit-test
+
+[ 0 ] [ 4 get instructions>> [ _reload? ] count ] unit-test
+
+! GC check tests
+
+! Spill slot liveness was computed incorrectly, leading to a FEP
+! early in bootstrap on x86-32
+[ t ] [
+    [
+        H{ } clone live-ins set
+        H{ } clone live-outs set
+        H{ } clone phi-live-ins set
+        T{ basic-block
+           { id 12345 }
+           { instructions
+             V{
+                 T{ ##gc f V int-regs 6 V int-regs 7 }
+                 T{ ##peek f V int-regs 0 D 0 }
+                 T{ ##peek f V int-regs 1 D 1 }
+                 T{ ##peek f V int-regs 2 D 2 }
+                 T{ ##peek f V int-regs 3 D 3 }
+                 T{ ##peek f V int-regs 4 D 4 }
+                 T{ ##peek f V int-regs 5 D 5 }
+                 T{ ##replace f V int-regs 0 D 1 }
+                 T{ ##replace f V int-regs 1 D 2 }
+                 T{ ##replace f V int-regs 2 D 3 }
+                 T{ ##replace f V int-regs 3 D 4 }
+                 T{ ##replace f V int-regs 4 D 5 }
+                 T{ ##replace f V int-regs 5 D 0 }
+             }
+           }
+        } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
+        instructions>> first
+        live-values>> assoc-empty?
+    ] with-scope
+] unit-test
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##peek f V int-regs 1 D 1 }
+    T{ ##replace f V int-regs 1 D 1 }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##gc f V int-regs 2 V int-regs 3 }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##return }
+} 2 test-bb
+
+0 get 1 get 1vector >>successors drop
+1 get 2 get 1vector >>successors drop
+
+[ ] [ { 1 2 3 } test-linear-scan-on-cfg ] unit-test
+
+[ H{ { V int-regs 0 3 } } ] [ 1 get instructions>> first live-values>> ] unit-test
+
+
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##peek f V int-regs 1 D 1 }
+    T{ ##compare-imm-branch f V int-regs 1 5 cc= }
+} 0 test-bb
+
+V{
+    T{ ##gc f V int-regs 2 V int-regs 3 }
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##return }
+} 1 test-bb
+
+V{
+    T{ ##return }
+} 2 test-bb
+
+0 get 1 get 2 get V{ } 2sequence >>successors drop
+
+[ ] [ { 1 2 3 } test-linear-scan-on-cfg ] unit-test
+
+[ H{ { V int-regs 0 3 } } ] [ 1 get instructions>> first live-values>> ] unit-test
