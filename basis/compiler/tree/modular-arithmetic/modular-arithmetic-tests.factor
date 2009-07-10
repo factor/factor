@@ -1,3 +1,5 @@
+! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler.tree.modular-arithmetic.tests
 USING: kernel kernel.private tools.test math math.partial-dispatch
 math.private accessors slots.private sequences strings sbufs
