@@ -1,5 +1,6 @@
 IN: struct-vectors.tests
-USING: struct-vectors tools.test alien.c-types kernel sequences ;
+USING: struct-vectors tools.test alien.c-types alien.syntax
+namespaces kernel sequences ;
 
 C-STRUCT: point
     { "float" "x" }

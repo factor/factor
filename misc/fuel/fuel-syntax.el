@@ -54,7 +54,8 @@
     "HELP:" "HEX:" "HOOK:"
     "IN:" "initial:" "INSTANCE:" "INTERSECTION:"
     "LIBRARY:"
-    "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
+    "M:" "M::" "MACRO:" "MACRO::" "MAIN:" "MATH:"
+    "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "OCT:"
     "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
     "QUALIFIED-WITH:" "QUALIFIED:"
@@ -83,7 +84,7 @@
   (format "%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
 (defconst fuel-syntax--method-definition-regex
-  "^M: +\\([^ ]+\\) +\\([^ ]+\\)")
+  "^M::? +\\([^ ]+\\) +\\([^ ]+\\)")
 
 (defconst fuel-syntax--integer-regex
   "\\_<-?[0-9]+\\_>")
@@ -154,7 +155,7 @@
                                            "C-ENUM" "C-STRUCT" "C-UNION"
                                            "FROM" "FUNCTION:"
                                            "INTERSECTION:"
-                                           "M" "MACRO" "MACRO:"
+                                           "M" "M:" "MACRO" "MACRO:"
                                            "MEMO" "MEMO:" "METHOD"
                                            "SYNTAX"
                                            "PREDICATE" "PRIMITIVE"
@@ -215,7 +216,9 @@
   (format ":[^ ]* \\([^ ]+\\)\\(%s\\)*" fuel-syntax--stack-effect-regex))
 
 (defconst fuel-syntax--defun-signature-regex
-  (format "\\(%s\\|%s\\)" fuel-syntax--word-signature-regex "M[^:]*: [^ ]+ [^ ]+"))
+  (format "\\(%s\\|%s\\)"
+          fuel-syntax--word-signature-regex
+          "M[^:]*: [^ ]+ [^ ]+"))
 
 (defconst fuel-syntax--constructor-decl-regex
   "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")

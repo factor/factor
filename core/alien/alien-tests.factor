@@ -71,10 +71,6 @@ cell 8 = [
 
 [ "( displaced alien )" ] [ 0 B{ 1 2 3 } <displaced-alien> unparse ] unit-test
 
-[ f ] [ DLL" fadfasdfsada" dll-valid? ] unit-test
-
-[ f ] [ "does not exist" DLL" fadsfasfdsaf" dlsym ] unit-test
-
 SYMBOL: initialize-test
 
 f initialize-test set-global

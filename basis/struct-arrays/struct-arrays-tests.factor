@@ -1,6 +1,6 @@
 IN: struct-arrays.tests
 USING: struct-arrays tools.test kernel math sequences
-alien.syntax alien.c-types destructors libc accessors ;
+alien.syntax alien.c-types destructors libc accessors sequences.private ;
 
 C-STRUCT: test-struct
 { "int" "x" }
@@ -37,4 +37,4 @@ C-STRUCT: test-struct
     ] with-destructors
 ] unit-test
 
-[ 15 ] [ 15 10 "point" <struct-array> resize length ] unit-test
+[ 15 ] [ 15 10 "test-struct" <struct-array> resize length ] unit-test

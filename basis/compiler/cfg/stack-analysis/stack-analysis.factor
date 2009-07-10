@@ -60,9 +60,6 @@ UNION: sync-if-back-edge
     ##dispatch
     ##loop-entry ;
 
-: back-edge? ( from to -- ? )
-    [ number>> ] bi@ > ;
-
 : sync-state? ( -- ? )
     basic-block get successors>>
     [ [ predecessors>> ] keep '[ _ back-edge? ] any? ] any? ;
