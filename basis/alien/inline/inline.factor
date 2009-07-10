@@ -60,7 +60,7 @@ PRIVATE>
     concat make-function ;
 
 : define-c-library ( name -- )
-    c-library set
+    [ current-vocab name>> % "_" % % ] "" make c-library set
     V{ } clone c-strings set
     V{ } clone compiler-args set ;
 
