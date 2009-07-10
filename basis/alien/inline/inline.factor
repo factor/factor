@@ -6,7 +6,7 @@ generalizations grouping io.directories io.files
 io.files.info io.files.temp kernel lexer math math.order
 math.ranges multiline namespaces sequences source-files
 splitting strings system vocabs.loader vocabs.parser words
-alien.c-types alien.structs make parser ;
+alien.c-types alien.structs make parser continuations ;
 IN: alien.inline
 
 <PRIVATE
@@ -14,6 +14,10 @@ SYMBOL: c-library
 SYMBOL: library-is-c++
 SYMBOL: compiler-args
 SYMBOL: c-strings
+
+: cleanup-variables ( -- )
+    { c-library library-is-c++ compiler-args c-strings }
+    [ off ] each ;
 
 : function-types-effect ( -- function types effect )
     scan scan swap ")" parse-tokens
@@ -113,6 +117,10 @@ PRIVATE>
 : delete-inline-library ( name -- )
     c-library-name [ remove-library ]
     [ library-path dup exists? [ delete-file ] [ drop ] if ] bi ;
+
+: with-c-library ( name quot -- )
+    [ [ define-c-library ] dip call compile-c-library ]
+    [ cleanup-variables ] [ ] cleanup ; inline
 
 SYNTAX: C-LIBRARY: scan define-c-library ;
 
