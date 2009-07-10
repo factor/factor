@@ -84,16 +84,16 @@ M: quotation cached-effect
     [ drop call-effect-slow ]
     if ; inline
 
-\ call-effect [
-    inline-cache new '[
-        _
-        3dup nip cache-hit? [
-            drop call-effect-unsafe
-        ] [
-            call-effect-fast
-        ] if
-    ]
-] 0 define-transform
+: call-effect-ic ( quot effect inline-cache -- )
+    3dup nip cache-hit?
+    [ drop call-effect-unsafe ]
+    [ call-effect-fast ]
+    if ; inline
+
+: call-effect>quot ( -- quot )
+    inline-cache new '[ _ call-effect-ic ] ;
+
+\ call-effect [ call-effect>quot ] 0 define-transform
 
 \ call-effect t "no-compile" set-word-prop
 
