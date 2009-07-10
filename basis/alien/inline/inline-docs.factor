@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel strings effects ;
+USING: help.markup help.syntax kernel strings effects quotations ;
 IN: alien.inline
 
 : $binding-note ( x -- )
@@ -197,6 +197,12 @@ HELP: delete-inline-library
 }
 { $description "Delete the shared library file corresponding to " { $snippet "name" } "." }
 { $notes "Must be executed in the vocabulary where " { $snippet "name" } " is defined. " } ;
+
+HELP: with-c-library
+{ $values
+    { "name" string } { "quot" quotation }
+}
+{ $description "Calls " { $link define-c-library } ", then the quotation, then " { $link compile-c-library } ", then sets all variables bound by " { $snippet "define-c-library" } " to " { $snippet "f" } "." } ;
 
 ARTICLE: "alien.inline" "Inline C"
 { $vocab-link "alien.inline" }
