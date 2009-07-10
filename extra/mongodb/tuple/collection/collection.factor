@@ -88,7 +88,7 @@ GENERIC: mdb-index-map ( tuple -- sequence )
 : user-defined-key-index ( class -- assoc )
     mdb-slot-map user-defined-key
     [ drop [ "user-defined-key-index" 1 ] dip
-      H{ } clone [ set-at ] keep <tuple-index> unique-index
+      H{ } clone [ set-at ] keep <tuple-index> t >>unique?
       [ ] [ name>> ] bi  H{ } clone [ set-at ] keep
     ] [ 2drop H{ } clone ] if ;
 
