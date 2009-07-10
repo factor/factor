@@ -100,15 +100,15 @@ PRIVATE>
         "" make c-strings get push
     ] 2bi ;
 
-: define-c-struct ( name vocab fields -- )
-    [ define-struct ] [
-        nip over
+: define-c-struct ( name fields -- )
+    [ current-vocab swap define-struct ] [
+        over
         [
             "typedef struct " % "_" % % " {\n" %
             [ first2 swap % " " % % ";\n" % ] each
             "} " % % ";\n" %
         ] "" make c-strings get push
-    ] 3bi ;
+    ] 2bi ;
 
 : delete-inline-library ( str -- )
     c-library-name [ remove-library ]
@@ -132,7 +132,7 @@ SYNTAX: C-FUNCTION:
 SYNTAX: C-TYPEDEF: scan scan define-c-typedef ;
 
 SYNTAX: C-STRUCTURE:
-    scan current-vocab parse-definition define-c-struct ;
+    scan parse-definition define-c-struct ;
 
 SYNTAX: ;C-LIBRARY compile-c-library ;
 
