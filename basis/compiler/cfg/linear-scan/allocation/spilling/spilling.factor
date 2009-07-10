@@ -38,10 +38,10 @@ ERROR: bad-live-ranges interval ;
     } 2cleave ;
 
 : assign-spill ( live-interval -- )
-    dup vreg>> assign-spill-slot >>spill-to f >>split-next drop ;
+    dup assign-spill-slot >>spill-to f >>split-next drop ;
 
 : assign-reload ( live-interval -- )
-    dup vreg>> assign-spill-slot >>reload-from drop ;
+    dup assign-spill-slot >>reload-from drop ;
 
 : split-and-spill ( live-interval n -- before after )
     split-for-spill 2dup [ assign-spill ] [ assign-reload ] bi* ;

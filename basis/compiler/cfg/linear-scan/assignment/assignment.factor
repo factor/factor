@@ -107,7 +107,7 @@ SYMBOL: check-assignment?
 ERROR: overlapping-registers intervals ;
 
 : check-assignment ( intervals -- )
-    dup [ copy-from>> ] map sift '[ vreg>> _ member? not ] filter
+    dup [ copy-from>> ] map sift [ vreg>> ] map '[ vreg>> _ member? not ] filter
     dup [ reg>> ] map all-unique? [ drop ] [ overlapping-registers ] if ;
 
 : active-intervals ( n -- intervals )
