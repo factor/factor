@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors alien alien.accessors arrays byte-arrays classes
 continuations.private effects generic hashtables
@@ -67,11 +67,17 @@ IN: stack-checker.known-words
     [ length ensure-d ] keep zip
     #declare, ;
 
+\ declare [ infer-declare ] "special" set-word-prop
+
 GENERIC: infer-call* ( value known -- )
 
 : (infer-call) ( value -- ) dup known infer-call* ;
 
 : infer-call ( -- ) pop-d (infer-call) ;
+
+\ call [ infer-call ] "special" set-word-prop
+
+\ (call) [ infer-call ] "special" set-word-prop
 
 M: literal infer-call*
     [ 1array #drop, ] [ infer-literal-quot ] bi* ;
@@ -103,9 +109,15 @@ M: object infer-call*
 
 : infer-dip ( -- ) \ dip 1 infer-ndip ;
 
+\ dip [ infer-dip ] "special" set-word-prop
+
 : infer-2dip ( -- ) \ 2dip 2 infer-ndip ;
 
+\ 2dip [ infer-2dip ] "special" set-word-prop
+
 : infer-3dip ( -- ) \ 3dip 3 infer-ndip ;
+
+\ 3dip [ infer-3dip ] "special" set-word-prop
 
 : infer-builder ( quot word -- )
     [
@@ -116,7 +128,11 @@ M: object infer-call*
 
 : infer-curry ( -- ) [ <curried> ] \ curry infer-builder ;
 
+\ curry [ infer-curry ] "special" set-word-prop
+
 : infer-compose ( -- ) [ <composed> ] \ compose infer-builder ;
+
+\ compose [ infer-compose ] "special" set-word-prop
 
 : infer-execute ( -- )
     pop-literal nip
@@ -127,10 +143,16 @@ M: object infer-call*
         "execute must be given a word" time-bomb
     ] if ;
 
+\ execute [ infer-execute ] "special" set-word-prop
+
+\ (execute) [ infer-execute ] "special" set-word-prop
+
 : infer-<tuple-boa> ( -- )
     \ <tuple-boa>
     peek-d literal value>> second 1+ { tuple } <effect>
     apply-word/effect ;
+
+\ <tuple-boa> [ infer-<tuple-boa> ] "special" set-word-prop
 
 : infer-effect-unsafe ( word -- )
     pop-literal nip
@@ -140,16 +162,29 @@ M: object infer-call*
 : infer-execute-effect-unsafe ( -- )
     \ (execute) infer-effect-unsafe ;
 
+\ execute-effect-unsafe [ infer-execute-effect-unsafe ] "special" set-word-prop
+
 : infer-call-effect-unsafe ( -- )
     \ call infer-effect-unsafe ;
 
+\ call-effect-unsafe [ infer-call-effect-unsafe ] "special" set-word-prop
+
 : infer-exit ( -- )
     \ exit (( n -- * )) apply-word/effect ;
+
+\ exit [ infer-exit ] "special" set-word-prop
 
 : infer-load-locals ( -- )
     pop-literal nip
     consume-d dup copy-values dup output-r
     [ [ f f ] dip ] [ swap zip ] 2bi #shuffle, ;
+
+\ load-locals [ infer-load-locals ] "special" set-word-prop
+
+: infer-load-local ( -- )
+    1 infer->r ;
+
+\ load-local [ infer-load-local ] "special" set-word-prop
 
 : infer-get-local ( -- )
     [let* | n [ pop-literal nip 1 swap - ]
@@ -163,36 +198,24 @@ M: object infer-call*
          #shuffle,
     ] ;
 
+\ get-local [ infer-get-local ] "special" set-word-prop
+
 : infer-drop-locals ( -- )
     f f pop-literal nip consume-r f f #shuffle, ;
 
+\ drop-locals [ infer-drop-locals ] "special" set-word-prop
+
+\ do-primitive [ unknown-primitive-error ] "special" set-word-prop
+
+\ if [ infer-if ] "special" set-word-prop
+\ dispatch [ infer-dispatch ] "special" set-word-prop
+
+\ alien-invoke [ infer-alien-invoke ] "special" set-word-prop
+\ alien-indirect [ infer-alien-indirect ] "special" set-word-prop
+\ alien-callback [ infer-alien-callback ] "special" set-word-prop
+
 : infer-special ( word -- )
-    {
-        { \ declare [ infer-declare ] }
-        { \ call [ infer-call ] }
-        { \ (call) [ infer-call ] }
-        { \ dip [ infer-dip ] }
-        { \ 2dip [ infer-2dip ] }
-        { \ 3dip [ infer-3dip ] }
-        { \ curry [ infer-curry ] }
-        { \ compose [ infer-compose ] }
-        { \ execute [ infer-execute ] }
-        { \ (execute) [ infer-execute ] }
-        { \ execute-effect-unsafe [ infer-execute-effect-unsafe ] }
-        { \ call-effect-unsafe [ infer-call-effect-unsafe ] }
-        { \ if [ infer-if ] }
-        { \ dispatch [ infer-dispatch ] }
-        { \ <tuple-boa> [ infer-<tuple-boa> ] }
-        { \ exit [ infer-exit ] }
-        { \ load-local [ 1 infer->r ] }
-        { \ load-locals [ infer-load-locals ] }
-        { \ get-local [ infer-get-local ] }
-        { \ drop-locals [ infer-drop-locals ] }
-        { \ do-primitive [ unknown-primitive-error ] }
-        { \ alien-invoke [ infer-alien-invoke ] }
-        { \ alien-indirect [ infer-alien-indirect ] }
-        { \ alien-callback [ infer-alien-callback ] }
-    } case ;
+    "special" word-prop call( -- ) ;
 
 : infer-local-reader ( word -- )
     (( -- value )) apply-word/effect ;
@@ -209,10 +232,7 @@ M: object infer-call*
     dispatch <tuple-boa> exit load-local load-locals get-local
     drop-locals do-primitive alien-invoke alien-indirect
     alien-callback
-} [
-    [ t "special" set-word-prop ]
-    [ t "no-compile" set-word-prop ] bi
-] each
+} [ t "no-compile" set-word-prop ] each
 
 ! Exceptions to the above
 \ curry f "no-compile" set-word-prop
