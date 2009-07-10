@@ -82,16 +82,16 @@ PRIVATE>
         [ out>> prototype-string' ] 3bi
     ] dip append-function-body c-strings get push ;
 
-: define-c-link ( str -- )
+: c-link-to ( str -- )
     "-l" prepend compiler-args get push ;
 
-: define-c-framework ( str -- )
+: c-use-framework ( str -- )
     "-framework" swap compiler-args get '[ _ push ] bi@ ;
 
-: define-c-link/framework ( str -- )
-    os macosx? [ define-c-framework ] [ define-c-link ] if ;
+: c-link-to/use-framework ( str -- )
+    os macosx? [ c-use-framework ] [ c-link-to ] if ;
 
-: define-c-include ( str -- )
+: c-include ( str -- )
     "#include " prepend c-strings get push ;
 
 : define-c-typedef ( old new -- )
@@ -110,7 +110,7 @@ PRIVATE>
         ] "" make c-strings get push
     ] 2bi ;
 
-: delete-inline-library ( str -- )
+: delete-inline-library ( name -- )
     c-library-name [ remove-library ]
     [ library-path dup exists? [ delete-file ] [ drop ] if ] bi ;
 
@@ -118,13 +118,13 @@ SYNTAX: C-LIBRARY: scan define-c-library ;
 
 SYNTAX: COMPILE-AS-C++ t library-is-c++ set ;
 
-SYNTAX: C-LINK: scan define-c-link ;
+SYNTAX: C-LINK: scan c-link-to ;
 
-SYNTAX: C-FRAMEWORK: scan define-c-framework ;
+SYNTAX: C-FRAMEWORK: scan c-use-framework ;
 
-SYNTAX: C-LINK/FRAMEWORK: scan define-c-link/framework ;
+SYNTAX: C-LINK/FRAMEWORK: scan c-link-to/use-framework ;
 
-SYNTAX: C-INCLUDE: scan define-c-include ;
+SYNTAX: C-INCLUDE: scan c-include ;
 
 SYNTAX: C-FUNCTION:
     function-types-effect parse-here define-c-function ;
