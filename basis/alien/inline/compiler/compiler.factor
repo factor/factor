@@ -2,11 +2,18 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators fry generalizations
 io.encodings.ascii io.files io.files.temp io.launcher kernel
-locals make sequences system vocabs.parser words ;
+locals make sequences system vocabs.parser words io.directories
+io.pathnames ;
 IN: alien.inline.compiler
 
 SYMBOL: C
 SYMBOL: C++
+
+: inline-libs-directory ( -- path )
+    "alien-inline-libs" resource-path dup make-directories ;
+
+: inline-library-file ( name -- path )
+    inline-libs-directory prepend-path ;
 
 : library-suffix ( -- str )
     os {
@@ -16,10 +23,8 @@ SYMBOL: C++
     } cond ;
 
 : library-path ( str -- str' )
-    '[
-        "lib-" % current-vocab name>> %
-        "-" % _ % library-suffix %
-    ] "" make temp-file ;
+    '[ "lib" % "-" % _ % library-suffix % ]
+    "" make inline-library-file ;
 
 : src-suffix ( lang -- str )
     {
