@@ -23,9 +23,6 @@ SYMBOL: c-strings
     CHAR: a swap length CHAR: a + [a,b]
     [ 1string ] map ;
 
-: append-function-body ( prototype-str body -- str )
-    [ swap % " {\n" % % "\n}\n" % ] "" make ;
-
 : compile-library? ( -- ? )
     c-library get library-path dup exists? [
         file get [
@@ -44,6 +41,9 @@ SYMBOL: c-strings
     [ current-vocab name>> % "_" % % ] "" make ;
 PRIVATE>
 
+: append-function-body ( prototype-str body -- str )
+    [ swap % " {\n" % % "\n}\n" % ] "" make ;
+
 : function-types-effect ( -- function types effect )
     scan scan swap ")" parse-tokens
     [ "(" subseq? not ] filter swap parse-arglist ;
@@ -56,7 +56,7 @@ PRIVATE>
     library-is-c++ get [ "extern \"C\" " prepend ] when ;
 
 : prototype-string' ( function types return -- str )
-    [ dup arg-list ] <effect> c-function-string ;
+    [ dup arg-list ] <effect> prototype-string ;
 
 : factor-function ( function types effect -- word quot effect )
     annotate-effect [ c-library get ] 3dip
