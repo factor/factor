@@ -60,7 +60,7 @@ M: word link-descr { "-shared" "-o" } ;
 M: macosx link-descr
     { "-g" "-prebind" "-dynamiclib" "-o" }
     cpu x86.64? [ { "-arch" "x86_64" } prepend ] when ;
-M: windows link-descr { "-lstdc++" "-o" } ;
+M: windows link-descr { "-lstdc++" "-mno-cygwin" "-o" } ;
 
 <PRIVATE
 : src-suffix ( lang -- str )
