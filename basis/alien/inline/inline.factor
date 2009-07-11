@@ -12,11 +12,11 @@ IN: alien.inline
 <PRIVATE
 SYMBOL: c-library
 SYMBOL: library-is-c++
-SYMBOL: compiler-args
+SYMBOL: linker-args
 SYMBOL: c-strings
 
 : cleanup-variables ( -- )
-    { c-library library-is-c++ compiler-args c-strings }
+    { c-library library-is-c++ linker-args c-strings }
     [ off ] each ;
 
 : function-types-effect ( -- function types effect )
@@ -56,7 +56,7 @@ SYMBOL: c-strings
 
 : compile-library ( -- )
     library-is-c++ get [ C++ ] [ C ] if
-    compiler-args get
+    linker-args get
     c-strings get "\n" join
     c-library get compile-to-library ;
 
@@ -67,7 +67,7 @@ PRIVATE>
 : define-c-library ( name -- )
     c-library-name c-library set
     V{ } clone c-strings set
-    V{ } clone compiler-args set ;
+    V{ } clone linker-args set ;
 
 : compile-c-library ( -- )
     compile-library? [ compile-library ] when
@@ -87,10 +87,10 @@ PRIVATE>
     ] dip append-function-body c-strings get push ;
 
 : c-link-to ( str -- )
-    "-l" prepend compiler-args get push ;
+    "-l" prepend linker-args get push ;
 
 : c-use-framework ( str -- )
-    "-framework" swap compiler-args get '[ _ push ] bi@ ;
+    "-framework" swap linker-args get '[ _ push ] bi@ ;
 
 : c-link-to/use-framework ( str -- )
     os macosx? [ c-use-framework ] [ c-link-to ] if ;
