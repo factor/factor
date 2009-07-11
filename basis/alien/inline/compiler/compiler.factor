@@ -2,14 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators fry generalizations
 io.encodings.ascii io.files io.files.temp io.launcher kernel
-locals make sequences system vocabs.parser words ;
+locals make sequences system vocabs.parser words io.directories
+io.pathnames ;
 IN: alien.inline.compiler
 
 SYMBOL: C
 SYMBOL: C++
 
 : inline-libs-directory ( -- path )
-    "resource:alien-inline-libs" dup make-directories ;
+    "alien-inline-libs" resource-path dup make-directories ;
 
 : inline-library-file ( name -- path )
     inline-libs-directory prepend-path ;
@@ -21,17 +22,8 @@ SYMBOL: C++
         { [ dup windows? ] [ drop ".dll" ] }
     } cond ;
 
-: library-path ( str -- str' )
-    '[
-        "lib" % current-vocab name>> %
-        "-" % _ % library-suffix %
-    ] "" make inline-library-file ;
-
-: src-suffix ( lang -- str )
-    {
-        { C [ ".c" ] }
-        { C++ [ ".cpp" ] }
-    } case ;
+: library-path ( str -- path )
+    '[ "lib" % _ % library-suffix % ] "" make inline-library-file ;
 
 HOOK: compiler os ( lang -- str )
 
@@ -61,8 +53,16 @@ M: macosx link-descr
     { "-g" "-prebind" "-dynamiclib" "-o" }
     cpu x86.64? [ { "-arch" "x86_64" } prepend ] when ;
 
-: link-command ( in out lang -- descr )
-    compiler-descr link-descr append prepend prepend ;
+<PRIVATE
+: src-suffix ( lang -- str )
+    {
+        { C [ ".c" ] }
+        { C++ [ ".cpp" ] }
+    } case ;
+
+: link-command ( args in out lang -- descr )
+    [ 2array ] dip compiler-descr link-descr
+    append prepend prepend ;
 
 :: compile-to-object ( lang contents name -- )
     name ".o" append temp-file
@@ -73,8 +73,9 @@ M: macosx link-descr
 
 :: link-object ( lang args name -- )
     args name [ library-path ]
-    [ ".o" append temp-file ] bi 2array
+    [ ".o" append temp-file ] bi
     lang link-command try-process ;
+PRIVATE>
 
 :: compile-to-library ( lang args contents name -- )
     lang contents name compile-to-object
