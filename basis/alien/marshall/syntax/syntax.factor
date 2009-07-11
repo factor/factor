@@ -3,7 +3,7 @@
 USING: accessors alien.inline alien.inline.types alien.marshall
 combinators effects generalizations kernel locals make namespaces
 quotations sequences words alien.marshall.structs lexer parser
-vocabs.parser ;
+vocabs.parser multiline ;
 IN: alien.marshall.syntax
 
 :: marshalled-function ( function types effect -- word quot effect )
@@ -22,16 +22,21 @@ IN: alien.marshall.syntax
         ] [ ] make
     ] dip ;
 
-: define-c-marshalled ( function types effect -- )
-    [ marshalled-function define-declared ] 3keep
-    c-function-string c-strings get push ;
+: define-c-marshalled ( function types effect body -- )
+    [
+        [ marshalled-function define-declared ]
+        [ prototype-string ] 3bi
+    ] dip append-function-body c-strings get push ;
 
-: define-c-marshalled' ( function effect -- )
-    [ in>> ] keep [ marshalled-function define-declared ] 3keep
-    out>> c-function-string' c-strings get push ;
+: define-c-marshalled' ( function effect body -- )
+    [
+        [ in>> ] keep
+        [ marshalled-function define-declared ]
+        [ out>> prototype-string' ] 3bi
+    ] dip append-function-body c-strings get push ;
 
 SYNTAX: CM-FUNCTION:
-    function-types-effect define-c-marshalled ;
+    function-types-effect parse-here define-c-marshalled ;
 
 SYNTAX: M-FUNCTION:
     function-types-effect marshalled-function define-declared ;
@@ -42,4 +47,4 @@ SYNTAX: M-STRUCTURE:
 
 SYNTAX: CM-STRUCTURE:
     scan current-vocab parse-definition
-    [ define-marshalled-struct ] [ define-c-struct ] 3bi ;
+    [ define-marshalled-struct ] [ nip define-c-struct ] 3bi ;
