@@ -20,10 +20,10 @@ IN: alien.marshall
 TUPLE: alien-wrapper { underlying alien } ;
 TUPLE: struct-wrapper < alien-wrapper disposed ;
 
-GENERIC: dynamic-cast ( alien-wrapper -- alien-wrapper' )
+GENERIC: unmarshall-cast ( alien-wrapper -- alien-wrapper' )
 
-M: alien-wrapper dynamic-cast ;
-M: struct-wrapper dynamic-cast ;
+M: alien-wrapper unmarshall-cast ;
+M: struct-wrapper unmarshall-cast ;
 
 : marshall-pointer ( obj -- alien )
     {
