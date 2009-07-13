@@ -36,6 +36,8 @@ M: struct-wrapper unmarshall-cast ;
 
 : marshall-void* ( obj -- alien )
     marshall-pointer ;
+: marshall-primitive ( n -- n )
+    [ bool>arg ] ptr-pass-through ;
 
 : marshall-void** ( obj -- alien )
     [ marshall-void* ] map >void*-array malloc-underlying ;
@@ -85,18 +87,18 @@ M: struct-wrapper unmarshall-cast ;
 : primitive-marshaller ( type -- quot/f )
     {
         { "bool"        [ [ marshall-bool ] ] }
-        { "char"        [ [ marshall-char ] ] }
-        { "uchar"       [ [ marshall-uchar ] ] }
-        { "short"       [ [ marshall-short ] ] }
-        { "ushort"      [ [ marshall-ushort ] ] }
-        { "int"         [ [ marshall-int ] ] }
-        { "uint"        [ [ marshall-uint ] ] }
-        { "long"        [ [ marshall-long ] ] }
-        { "ulong"       [ [ marshall-ulong ] ] }
-        { "long"        [ [ marshall-longlong ] ] }
-        { "ulong"       [ [ marshall-ulonglong ] ] }
-        { "float"       [ [ marshall-float ] ] }
-        { "double"      [ [ marshall-double ] ] }
+        { "char"        [ [ marshall-primitive ] ] }
+        { "uchar"       [ [ marshall-primitive ] ] }
+        { "short"       [ [ marshall-primitive ] ] }
+        { "ushort"      [ [ marshall-primitive ] ] }
+        { "int"         [ [ marshall-primitive ] ] }
+        { "uint"        [ [ marshall-primitive ] ] }
+        { "long"        [ [ marshall-primitive ] ] }
+        { "ulong"       [ [ marshall-primitive ] ] }
+        { "long"        [ [ marshall-primitive ] ] }
+        { "ulong"       [ [ marshall-primitive ] ] }
+        { "float"       [ [ marshall-primitive ] ] }
+        { "double"      [ [ marshall-primitive ] ] }
         { "bool*"       [ [ marshall-bool* ] ] }
         { "char*"       [ [ marshall-char*-or-string ] ] }
         { "uchar*"      [ [ marshall-uchar* ] ] }
