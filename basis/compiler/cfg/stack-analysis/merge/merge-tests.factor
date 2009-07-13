@@ -1,8 +1,8 @@
 IN: compiler.cfg.stack-analysis.merge.tests
 USING: compiler.cfg.stack-analysis.merge tools.test arrays accessors
-compiler.cfg.instructions compiler.cfg.stack-analysis.state
-compiler.cfg compiler.cfg.registers compiler.cfg.debugger
-cpu.architecture make assocs namespaces
+ compiler.cfg.instructions compiler.cfg.stack-analysis.state
+compiler.cfg.utilities compiler.cfg compiler.cfg.registers
+compiler.cfg.debugger cpu.architecture make assocs namespaces
 sequences kernel classes ;
 
 [

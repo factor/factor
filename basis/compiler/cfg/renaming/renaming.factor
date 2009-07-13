@@ -55,6 +55,12 @@ M: ##string-nth rename-insn-uses
     [ rename-value ] change-index
     drop ;
 
+M: ##set-string-nth-fast rename-insn-uses
+    dup call-next-method
+    [ rename-value ] change-obj
+    [ rename-value ] change-index
+    drop ;
+
 M: ##set-slot-imm rename-insn-uses
     dup call-next-method
     [ rename-value ] change-obj
