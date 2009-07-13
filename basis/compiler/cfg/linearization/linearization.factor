@@ -5,6 +5,7 @@ combinators assocs arrays locals cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.liveness
+compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.cfg.instructions ;
 IN: compiler.cfg.linearization
