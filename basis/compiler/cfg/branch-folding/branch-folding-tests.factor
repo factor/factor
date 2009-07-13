@@ -40,7 +40,10 @@ test-diamond
 [ 1 ] [ 1 get successors>> length ] unit-test
 [ t ] [ 1 get successors>> first 3 get eq? ] unit-test
 
-[ T{ ##copy f V int-regs 3 V int-regs 2 } ] [ 3 get instructions>> second ] unit-test
+[ T{ ##copy f V int-regs 3 V int-regs 2 } ]
+[ 3 get successors>> first instructions>> first ]
+unit-test
+
 [ 2 ] [ 4 get instructions>> length ] unit-test
 
 V{
