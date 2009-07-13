@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 compiler.cfg compiler.cfg.instructions cpu.architecture kernel
-layouts locals make math namespaces sequences sets vectors ;
+layouts locals make math namespaces sequences sets vectors fry ;
 IN: compiler.cfg.utilities
 
 : value-info-small-fixnum? ( value-info -- ? )
@@ -74,12 +74,12 @@ SYMBOL: added-instructions
     to predecessors>> [ dup from eq? [ drop bb ] when ] change-each
     from successors>> [ dup to eq? [ drop bb ] when ] change-each ;
 
-:: insert-basic-blocks ( bb -- )
-    added-instructions get
-    [| predecessor instructions |
-        \ ##branch new-insn instructions push
-        predecessor bb
-        <basic-block> instructions >>instructions
-        insert-basic-block
-    ] assoc-each ;
+: <simple-block> ( insns -- bb )
+    <basic-block>
+    swap >vector
+    \ ##branch new-insn over push
+    >>instructions ;
 
+: insert-basic-blocks ( bb -- )
+    [ added-instructions get ] dip
+    '[ [ _ ] dip <simple-block> insert-basic-block ] assoc-each ;
