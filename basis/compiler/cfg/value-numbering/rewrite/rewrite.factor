@@ -77,13 +77,19 @@ M: ##compare-imm-branch rewrite
     insn cc>> swap? [ swap-cc ] when
     i \ ##compare-imm new-insn ; inline
 
-! M: ##compare rewrite
-!     dup [ src1>> ] [ src2>> ] bi
-!     [ vreg>expr constant-expr? ] bi@ 2array {
-!         { { f t } [ f >compare-imm ] }
-!         { { t f } [ t >compare-imm ] }
-!         [ drop ]
-!     } case ;
+: vreg-small-constant? ( vreg -- ? )
+    vreg>expr {
+        [ constant-expr? ]
+        [ value>> small-enough? ]
+    } 1&& ;
+
+M: ##compare rewrite
+    dup [ src1>> ] [ src2>> ] bi
+    [ vreg-small-constant? ] bi@ 2array {
+        { { f t } [ f >compare-imm ] }
+        { { t f } [ t >compare-imm ] }
+        [ drop ]
+    } case ;
 
 :: >compare-imm-branch ( insn swap? -- insn' )
     insn src1>>
@@ -91,13 +97,13 @@ M: ##compare-imm-branch rewrite
     insn cc>> swap? [ swap-cc ] when
     \ ##compare-imm-branch new-insn ; inline
 
-! M: ##compare-branch rewrite
-!     dup [ src1>> ] [ src2>> ] bi
-!     [ vreg>expr constant-expr? ] bi@ 2array {
-!         { { f t } [ f >compare-imm-branch ] }
-!         { { t f } [ t >compare-imm-branch ] }
-!         [ drop ]
-!     } case ;
+M: ##compare-branch rewrite
+    dup [ src1>> ] [ src2>> ] bi
+    [ vreg-small-constant? ] bi@ 2array {
+        { { f t } [ f >compare-imm-branch ] }
+        { { t f } [ t >compare-imm-branch ] }
+        [ drop ]
+    } case ;
 
 : rewrite-redundant-comparison? ( insn -- ? )
     {
@@ -198,10 +204,7 @@ M: ##or-imm rewrite [ bitor ] \ ##or-imm combine-imm ;
 M: ##xor-imm rewrite [ bitxor ] \ ##xor-imm combine-imm ;
 
 : rewrite-add? ( insn -- ? )
-    src2>> {
-        [ vreg>expr constant-expr? ]
-        [ vreg>constant small-enough? ]
-    } 1&& ;
+    src2>> vreg-small-constant? ;
 
 M: ##add rewrite
     dup rewrite-add? [
