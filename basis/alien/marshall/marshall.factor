@@ -14,8 +14,8 @@ specialized-arrays.ulonglong specialized-arrays.ushort strings
 unix.utilities vocabs.parser words libc.private struct-arrays ;
 IN: alien.marshall
 
-<< primitive-types [ "void*" = not ] filter
-[ define-primitive-marshallers ] each >>
+<< primitive-types [ [ "void*" = ] [ "bool" = ] bi or not ]
+filter [ define-primitive-marshallers ] each >>
 
 TUPLE: alien-wrapper { underlying alien } ;
 TUPLE: struct-wrapper < alien-wrapper disposed ;
@@ -55,6 +55,32 @@ M: struct-wrapper unmarshall-cast ;
 
 : marshall-char**-or-strings ( n/string -- alien )
     [ (marshall-char**-or-strings) ] ptr-pass-through ;
+
+: marshall-bool ( ? -- n )
+    >boolean [ 1 ] [ 0 ] if ;
+
+: (marshall-bool*) ( ?/seq -- alien )
+    [ marshall-bool <bool> malloc-byte-array ]
+    [ >bool-array malloc-underlying ]
+    marshall-x* ;
+
+: marshall-bool* ( ?/seq -- alien )
+    [ (marshall-bool*) ] ptr-pass-through ;
+
+: (marshall-bool**) ( seq -- alien )
+    [ marshall-bool* ] map >void*-array malloc-underlying ;
+
+: marshall-bool** ( seq -- alien )
+    [ (marshall-bool**) ] ptr-pass-through ;
+
+: unmarshall-bool ( n -- ? )
+    0 = not ;
+
+: unmarshall-bool* ( alien -- ? )
+    *bool unmarshall-bool ;
+
+: unmarshall-bool*-free ( alien -- ? )
+    [ *bool unmarshall-bool ] keep add-malloc free ;
 
 : primitive-marshaller ( type -- quot/f )
     {
@@ -137,9 +163,6 @@ M: struct-wrapper unmarshall-cast ;
 
 : unmarshall-char*-to-string-free ( alien -- string )
     [ unmarshall-char*-to-string ] keep add-malloc free ;
-
-: unmarshall-bool ( n -- ? )
-    0 = not ;
 
 : primitive-unmarshaller ( type -- quot/f )
     {
