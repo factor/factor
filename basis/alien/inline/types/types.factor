@@ -5,19 +5,21 @@ continuations effects fry kernel math memoize sequences
 splitting ;
 IN: alien.inline.types
 
-: factorize-type ( str -- str' )
-    "const-" ?head drop
-    "unsigned-" ?head [ "u" prepend ] when
-    "long-" ?head [ "long" prepend ] when
-    "-const" ?tail drop ;
-
 : cify-type ( str -- str' )
     { { CHAR: - CHAR: space } } substitute ;
 
-: const-pointer? ( str -- ? )
-    { [ "-const" tail? ] [ "&" tail? ] } 1|| ;
+: factorize-type ( str -- str' )
+    cify-type
+    "const " ?head drop
+    "unsigned " ?head [ "u" prepend ] when
+    "long " ?head [ "long" prepend ] when
+    " const" ?tail drop ;
 
-: pointer-to-const? ( str -- ? ) "const-" head? ;
+: const-pointer? ( str -- ? )
+    cify-type { [ " const" tail? ] [ "&" tail? ] } 1|| ;
+
+: pointer-to-const? ( str -- ? )
+    cify-type "const " head? ;
 
 MEMO: resolved-primitives ( -- seq )
     primitive-types [ resolve-typedef ] map ;
