@@ -29,10 +29,9 @@ SYMBOL: check-optimizer?
     ! The passes that need this document it.
     [
         optimize-tail-calls
-        compute-predecessors
         delete-useless-conditionals
-        split-branches
         compute-predecessors
+        split-branches
         stack-analysis
         compute-liveness
         alias-analysis
