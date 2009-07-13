@@ -5,7 +5,8 @@ namespaces sequences fry combinators
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.hats
-compiler.cfg.instructions ;
+compiler.cfg.instructions
+compiler.cfg.utilities ;
 IN: compiler.cfg.tco
 
 ! Tail call optimization. You must run compute-predecessors after this
@@ -82,4 +83,4 @@ M: ##fixnum-mul convert-fixnum-tail-call* drop i i \ ##fixnum-mul-tail new-insn 
 : optimize-tail-calls ( cfg -- cfg' )
     dup cfg set
     dup [ optimize-tail-call ] each-basic-block
-    f >>post-order ;
+    cfg-changed ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel namespaces math sequences fry grouping
-sets make combinators
+sets make combinators dlists deques
 compiler.cfg
 compiler.cfg.copy-prop
 compiler.cfg.def-use
@@ -10,8 +10,13 @@ compiler.cfg.registers
 compiler.cfg.rpo
 compiler.cfg.hats
 compiler.cfg.stack-analysis.state
-compiler.cfg.stack-analysis.merge ;
+compiler.cfg.stack-analysis.merge
+compiler.cfg.utilities ;
 IN: compiler.cfg.stack-analysis
+
+SYMBOL: work-list
+
+: add-to-work-list ( bb -- ) work-list get push-front ;
 
 : redundant-replace? ( vreg loc -- ? )
     dup state get untranslate-loc n>> 0 <
@@ -137,10 +142,21 @@ SYMBOLS: state-in state-out ;
         ] 2bi
     ] V{ } make >>instructions drop ;
 
+: visit-successors ( bb -- )
+    dup successors>> [
+        2dup back-edge? [ 2drop ] [ nip add-to-work-list ] if
+    ] with each ;
+
+: process-work-list ( -- )
+    work-list get [ visit-block ] slurp-deque ;
+
 : stack-analysis ( cfg -- cfg' )
     [
+        <hashed-dlist> work-list set
         H{ } clone copies set
         H{ } clone state-in set
         H{ } clone state-out set
-        dup [ visit-block ] each-basic-block
+        dup [ add-to-work-list ] each-basic-block
+        process-work-list
+        cfg-changed
     ] with-scope ;
