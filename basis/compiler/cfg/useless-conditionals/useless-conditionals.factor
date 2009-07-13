@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences math combinators combinators.short-circuit
-classes vectors compiler.cfg compiler.cfg.instructions compiler.cfg.rpo ;
+classes vectors compiler.cfg compiler.cfg.instructions compiler.cfg.rpo
+compiler.cfg.utilities ;
 IN: compiler.cfg.useless-conditionals
 
 : delete-conditional? ( bb -- ? )
@@ -18,4 +19,4 @@ IN: compiler.cfg.useless-conditionals
     dup [
         dup delete-conditional? [ delete-conditional ] [ drop ] if
     ] each-basic-block
-    f >>post-order ;
+    cfg-changed ;
