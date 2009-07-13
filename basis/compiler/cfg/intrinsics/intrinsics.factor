@@ -8,7 +8,8 @@ compiler.cfg.intrinsics.allot
 compiler.cfg.intrinsics.fixnum
 compiler.cfg.intrinsics.float
 compiler.cfg.intrinsics.slots
-compiler.cfg.intrinsics.misc ;
+compiler.cfg.intrinsics.misc
+compiler.cfg.comparisons ;
 QUALIFIED: kernel
 QUALIFIED: arrays
 QUALIFIED: byte-arrays
