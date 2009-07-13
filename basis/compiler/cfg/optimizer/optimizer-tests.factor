@@ -2,7 +2,7 @@ USING: accessors arrays compiler.cfg.checker
 compiler.cfg.debugger compiler.cfg.def-use
 compiler.cfg.instructions fry kernel kernel.private math
 math.partial-dispatch math.private sbufs sequences sequences.private sets
-slots.private strings tools.test vectors layouts ;
+slots.private strings strings.private tools.test vectors layouts ;
 IN: compiler.cfg.optimizer.tests
 
 ! Miscellaneous tests
@@ -39,6 +39,10 @@ IN: compiler.cfg.optimizer.tests
                 [ ] [ ] if
             ] [ 2drop f ] if
         ] [ 2drop f ] if
+    ]
+    [
+        pick 10 fixnum>= [ [ 123 fixnum-bitand ] 2dip ] [ ] if
+        set-string-nth-fast
     ]
 } [
     [ [ ] ] dip '[ _ test-mr first check-mr ] unit-test
