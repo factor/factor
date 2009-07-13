@@ -34,13 +34,13 @@ M: struct-wrapper unmarshall-cast ;
         { [ dup struct-array? ] [ underlying>> ] }
     } cond ;
 
-: marshall-void* ( obj -- alien )
-    marshall-pointer ;
 : marshall-primitive ( n -- n )
     [ bool>arg ] ptr-pass-through ;
 
-: marshall-void** ( obj -- alien )
-    [ marshall-void* ] map >void*-array malloc-underlying ;
+ALIAS: marshall-void* marshall-pointer
+
+: marshall-void** ( seq -- alien )
+    [ marshall-void* ] void*-array{ } map-as malloc-underlying ;
 
 : (marshall-char*-or-string) ( n/string -- alien )
     dup string?
@@ -51,11 +51,10 @@ M: struct-wrapper unmarshall-cast ;
     [ (marshall-char*-or-string) ] ptr-pass-through ;
 
 : (marshall-char**-or-strings) ( seq -- alien )
-    dup first string?
-    [ utf8 strings>alien malloc-byte-array ]
-    [ (marshall-char**) ] if ;
+    [ marshall-char*-or-string ] void*-array{ } map-as
+    malloc-underlying ;
 
-: marshall-char**-or-strings ( n/string -- alien )
+: marshall-char**-or-strings ( seq -- alien )
     [ (marshall-char**-or-strings) ] ptr-pass-through ;
 
 : marshall-bool ( ? -- n )
@@ -143,7 +142,7 @@ M: struct-wrapper unmarshall-cast ;
         [ drop f ]
     } case ;
 
-: marshall-non-pointer ( obj -- byte-array/f )
+: marshall-non-pointer ( alien-wrapper/byte-array -- byte-array )
     {
         { [ dup byte-array? ] [ ] }
         { [ dup alien-wrapper? ]
@@ -268,7 +267,7 @@ M: struct-wrapper unmarshall-cast ;
 : pointer-unmarshaller ( type -- quot )
     type-sans-pointer current-vocab lookup [
         dup superclasses [ \ alien-wrapper = ] any? [
-            '[ _ new swap >>underlying dynamic-cast ]
+            '[ _ new swap >>underlying unmarshall-cast ]
         ] [ drop [ ] ] if
     ] [ [ ] ] if* ;
 
