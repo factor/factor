@@ -2,7 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors locals combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
-math.bitwise compiler.cfg.hats compiler.cfg.instructions
+math.bitwise
+compiler.cfg.hats
+compiler.cfg.comparisons
+compiler.cfg.instructions
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.simplify ;

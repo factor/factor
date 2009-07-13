@@ -14,6 +14,7 @@ compiler.cfg.stacks
 compiler.cfg.utilities
 compiler.cfg.registers
 compiler.cfg.intrinsics
+compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.cfg.instructions
 compiler.alien ;
