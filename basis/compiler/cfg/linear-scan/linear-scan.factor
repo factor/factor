@@ -40,4 +40,5 @@ IN: compiler.cfg.linear-scan
         init-mapping
         dup reverse-post-order machine-registers (linear-scan)
         spill-counts get >>spill-counts
+        cfg-changed
     ] with-scope ;
