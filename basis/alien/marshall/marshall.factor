@@ -183,7 +183,7 @@ ALIAS: marshall-void* marshall-pointer
         { "float"      [ [ ] ] }
         { "double"     [ [ ] ] }
         { "bool*"      [ [ unmarshall-bool*-free ] ] }
-        { "char*"      [ [ unmarshall-char*-to-string-free ] ] }
+        { "char*"      [ [ ] ] }
         { "uchar*"     [ [ unmarshall-uchar*-free ] ] }
         { "short*"     [ [ unmarshall-short*-free ] ] }
         { "ushort*"    [ [ unmarshall-ushort*-free ] ] }
@@ -196,7 +196,7 @@ ALIAS: marshall-void* marshall-pointer
         { "float*"     [ [ unmarshall-float*-free ] ] }
         { "double*"    [ [ unmarshall-double*-free ] ] }
         { "bool&"      [ [ unmarshall-bool*-free ] ] }
-        { "char&"      [ [ unmarshall-char*-free ] ] }
+        { "char&"      [ [ ] ] }
         { "uchar&"     [ [ unmarshall-uchar*-free ] ] }
         { "short&"     [ [ unmarshall-short*-free ] ] }
         { "ushort&"    [ [ unmarshall-ushort*-free ] ] }
@@ -227,7 +227,7 @@ ALIAS: marshall-void* marshall-pointer
         { "float"      [ [ ] ] }
         { "double"     [ [ ] ] }
         { "bool*"      [ [ unmarshall-bool* ] ] }
-        { "char*"      [ [ unmarshall-char*-to-string ] ] }
+        { "char*"      [ [ ] ] }
         { "uchar*"     [ [ unmarshall-uchar* ] ] }
         { "short*"     [ [ unmarshall-short* ] ] }
         { "ushort*"    [ [ unmarshall-ushort* ] ] }
