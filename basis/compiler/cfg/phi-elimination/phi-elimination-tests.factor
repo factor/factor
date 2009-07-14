@@ -1,7 +1,8 @@
 IN: compiler.cfg.phi-elimination.tests
 USING: compiler.cfg.instructions compiler.cfg compiler.cfg.registers
-compiler.cfg.debugger compiler.cfg.phi-elimination kernel accessors
-sequences classes namespaces tools.test cpu.architecture arrays ;
+compiler.cfg.comparisons compiler.cfg.debugger
+compiler.cfg.phi-elimination kernel accessors sequences classes
+namespaces tools.test cpu.architecture arrays ;
 
 V{ T{ ##branch } } 0 test-bb
 

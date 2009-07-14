@@ -2,8 +2,9 @@ IN: compiler.cfg.branch-folding.tests
 USING: compiler.cfg.branch-folding compiler.cfg.instructions
 compiler.cfg compiler.cfg.registers compiler.cfg.debugger
 arrays compiler.cfg.phi-elimination compiler.cfg.dce
-compiler.cfg.predecessors kernel accessors assocs
-sequences classes namespaces tools.test cpu.architecture ;
+compiler.cfg.predecessors compiler.cfg.comparisons
+kernel accessors assocs sequences classes namespaces
+tools.test cpu.architecture ;
 
 V{ T{ ##branch } } 0 test-bb
 
