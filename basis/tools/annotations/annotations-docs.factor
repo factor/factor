@@ -21,7 +21,7 @@ $nl
 ABOUT: "tools.annotations"
 
 HELP: annotate
-{ $values { "word" "a word" } { "quot" { $quotation "( word def -- def )" } } }
+{ $values { "word" "a word" } { "quot" { $quotation "( old-def -- new-def )" } } }
 { $description "Changes a word definition to the result of applying a quotation to the old definition." }
 { $notes "This word is used to implement " { $link watch } "." } ;
 
