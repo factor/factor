@@ -17,6 +17,7 @@ accessors sequences compiler.cfg vectors arrays ;
     { } init-value-numbering
     value-numbering-step ;
 
+! Copy propagation
 [
     {
         T{ ##peek f V int-regs 45 D 1 }
@@ -31,58 +32,7 @@ accessors sequences compiler.cfg vectors arrays ;
     } test-value-numbering
 ] unit-test
 
-[
-    {
-        T{ ##load-immediate f V int-regs 2 8 }
-        T{ ##peek f V int-regs 3 D 0 }
-        T{ ##slot-imm f V int-regs 4 V int-regs 3 1 3 }
-        T{ ##replace f V int-regs 4 D 0 }
-    }
-] [
-    {
-        T{ ##load-immediate f V int-regs 2 8 }
-        T{ ##peek f V int-regs 3 D 0 }
-        T{ ##slot-imm f V int-regs 4 V int-regs 3 1 3 }
-        T{ ##replace f V int-regs 4 D 0 }
-    } test-value-numbering
-] unit-test
-
-[ t ] [
-    {
-        T{ ##peek f V int-regs 1 D 0 }
-        T{ ##dispatch f V int-regs 1 V int-regs 2 }
-    } dup test-value-numbering =
-] unit-test
-
-[ t ] [
-    {
-        T{ ##peek f V int-regs 16 D 0 }
-        T{ ##peek f V int-regs 17 D -1 }
-        T{ ##sar-imm f V int-regs 18 V int-regs 17 3 }
-        T{ ##add-imm f V int-regs 19 V int-regs 16 13 }
-        T{ ##add f V int-regs 21 V int-regs 18 V int-regs 19 }
-        T{ ##alien-unsigned-1 f V int-regs 22 V int-regs 21 }
-        T{ ##shl-imm f V int-regs 23 V int-regs 22 3 }
-        T{ ##replace f V int-regs 23 D 0 }
-    } dup test-value-numbering =
-] unit-test
-
-[
-    {
-        T{ ##peek f V int-regs 1 D 0 }
-        T{ ##shl-imm f V int-regs 2 V int-regs 1 3 }
-        T{ ##shr-imm f V int-regs 3 V int-regs 2 3 }
-        T{ ##replace f V int-regs 1 D 0 }
-    }
-] [
-    {
-        T{ ##peek f V int-regs 1 D 0 }
-        T{ ##mul-imm f V int-regs 2 V int-regs 1 8 }
-        T{ ##shr-imm f V int-regs 3 V int-regs 2 3 }
-        T{ ##replace f V int-regs 3 D 0 }
-    } test-value-numbering
-] unit-test
-
+! Compare propagation
 [
     {
         T{ ##load-reference f V int-regs 1 + }
@@ -157,15 +107,531 @@ accessors sequences compiler.cfg vectors arrays ;
     } test-value-numbering trim-temps
 ] unit-test
 
+! Immediate operand conversion
 [
     {
-        T{ ##copy f V int-regs 48 V int-regs 45 }
-        T{ ##compare-imm-branch f V int-regs 45 7 cc/= }
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##add-imm f V int-regs 2 V int-regs 0 100 }
     }
 ] [
-    { V int-regs 45 } init-value-numbering
     {
-        T{ ##copy f V int-regs 48 V int-regs 45 }
-        T{ ##compare-imm-branch f V int-regs 48 7 cc/= }
-    } value-numbering-step
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##add f V int-regs 2 V int-regs 0 V int-regs 1 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##add-imm f V int-regs 2 V int-regs 0 100 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##add f V int-regs 2 V int-regs 1 V int-regs 0 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##sub-imm f V int-regs 2 V int-regs 0 100 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##sub f V int-regs 2 V int-regs 0 V int-regs 1 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##mul-imm f V int-regs 2 V int-regs 0 100 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##mul f V int-regs 2 V int-regs 0 V int-regs 1 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##mul-imm f V int-regs 2 V int-regs 0 100 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##mul f V int-regs 2 V int-regs 1 V int-regs 0 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 1 D 0 }
+        T{ ##shl-imm f V int-regs 2 V int-regs 1 3 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 1 D 0 }
+        T{ ##mul-imm f V int-regs 2 V int-regs 1 8 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##and-imm f V int-regs 2 V int-regs 0 100 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##and f V int-regs 2 V int-regs 0 V int-regs 1 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##and-imm f V int-regs 2 V int-regs 0 100 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##and f V int-regs 2 V int-regs 1 V int-regs 0 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##or-imm f V int-regs 2 V int-regs 0 100 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##or f V int-regs 2 V int-regs 0 V int-regs 1 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##or-imm f V int-regs 2 V int-regs 0 100 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##or f V int-regs 2 V int-regs 1 V int-regs 0 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##xor-imm f V int-regs 2 V int-regs 0 100 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##xor f V int-regs 2 V int-regs 0 V int-regs 1 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##xor-imm f V int-regs 2 V int-regs 0 100 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##xor f V int-regs 2 V int-regs 1 V int-regs 0 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##compare-imm f V int-regs 2 V int-regs 0 100 cc<= }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##compare f V int-regs 2 V int-regs 0 V int-regs 1 cc<= }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##compare-imm f V int-regs 2 V int-regs 0 100 cc>= }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##compare f V int-regs 2 V int-regs 1 V int-regs 0 cc<= }
+    } test-value-numbering trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##compare-imm-branch f V int-regs 0 100 cc<= }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##compare-branch f V int-regs 0 V int-regs 1 cc<= }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##compare-imm-branch f V int-regs 0 100 cc>= }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##compare-branch f V int-regs 1 V int-regs 0 cc<= }
+    } test-value-numbering trim-temps
+] unit-test
+
+! Reassociation
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##add-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##add-imm f V int-regs 4 V int-regs 0 150 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##add f V int-regs 2 V int-regs 0 V int-regs 1 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##add f V int-regs 4 V int-regs 2 V int-regs 3 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##add-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##add-imm f V int-regs 4 V int-regs 0 150 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##add f V int-regs 2 V int-regs 1 V int-regs 0 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##add f V int-regs 4 V int-regs 3 V int-regs 2 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##add-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##add-imm f V int-regs 4 V int-regs 0 50 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##add f V int-regs 2 V int-regs 0 V int-regs 1 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##sub f V int-regs 4 V int-regs 2 V int-regs 3 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##sub-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##sub-imm f V int-regs 4 V int-regs 0 150 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##sub f V int-regs 2 V int-regs 0 V int-regs 1 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##sub f V int-regs 4 V int-regs 2 V int-regs 3 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##mul-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##mul-imm f V int-regs 4 V int-regs 0 5000 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##mul f V int-regs 2 V int-regs 0 V int-regs 1 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##mul f V int-regs 4 V int-regs 2 V int-regs 3 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##mul-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##mul-imm f V int-regs 4 V int-regs 0 5000 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##mul f V int-regs 2 V int-regs 1 V int-regs 0 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##mul f V int-regs 4 V int-regs 3 V int-regs 2 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##and-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##and-imm f V int-regs 4 V int-regs 0 32 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##and f V int-regs 2 V int-regs 0 V int-regs 1 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##and f V int-regs 4 V int-regs 2 V int-regs 3 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##and-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##and-imm f V int-regs 4 V int-regs 0 32 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##and f V int-regs 2 V int-regs 1 V int-regs 0 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##and f V int-regs 4 V int-regs 3 V int-regs 2 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##or-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##or-imm f V int-regs 4 V int-regs 0 118 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##or f V int-regs 2 V int-regs 0 V int-regs 1 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##or f V int-regs 4 V int-regs 2 V int-regs 3 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##or-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##or-imm f V int-regs 4 V int-regs 0 118 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##or f V int-regs 2 V int-regs 1 V int-regs 0 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##or f V int-regs 4 V int-regs 3 V int-regs 2 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##xor-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##xor-imm f V int-regs 4 V int-regs 0 86 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##xor f V int-regs 2 V int-regs 0 V int-regs 1 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##xor f V int-regs 4 V int-regs 2 V int-regs 3 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##xor-imm f V int-regs 2 V int-regs 0 100 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##xor-imm f V int-regs 4 V int-regs 0 86 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 100 }
+        T{ ##xor f V int-regs 2 V int-regs 1 V int-regs 0 }
+        T{ ##load-immediate f V int-regs 3 50 }
+        T{ ##xor f V int-regs 4 V int-regs 3 V int-regs 2 }
+    } test-value-numbering
+] unit-test
+
+! Simplification
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##peek f V int-regs 1 D 1 }
+        T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
+        T{ ##add f V int-regs 3 V int-regs 0 V int-regs 2 }
+        T{ ##replace f V int-regs 0 D 0 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##peek f V int-regs 1 D 1 }
+        T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
+        T{ ##add f V int-regs 3 V int-regs 0 V int-regs 2 }
+        T{ ##replace f V int-regs 3 D 0 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##peek f V int-regs 1 D 1 }
+        T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
+        T{ ##sub f V int-regs 3 V int-regs 0 V int-regs 2 }
+        T{ ##replace f V int-regs 0 D 0 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##peek f V int-regs 1 D 1 }
+        T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
+        T{ ##sub f V int-regs 3 V int-regs 0 V int-regs 2 }
+        T{ ##replace f V int-regs 3 D 0 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##peek f V int-regs 1 D 1 }
+        T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
+        T{ ##or f V int-regs 3 V int-regs 0 V int-regs 2 }
+        T{ ##replace f V int-regs 0 D 0 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##peek f V int-regs 1 D 1 }
+        T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
+        T{ ##or f V int-regs 3 V int-regs 0 V int-regs 2 }
+        T{ ##replace f V int-regs 3 D 0 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##peek f V int-regs 1 D 1 }
+        T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
+        T{ ##xor f V int-regs 3 V int-regs 0 V int-regs 2 }
+        T{ ##replace f V int-regs 0 D 0 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##peek f V int-regs 1 D 1 }
+        T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
+        T{ ##xor f V int-regs 3 V int-regs 0 V int-regs 2 }
+        T{ ##replace f V int-regs 3 D 0 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##mul f V int-regs 2 V int-regs 0 V int-regs 1 }
+        T{ ##replace f V int-regs 0 D 0 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##mul f V int-regs 2 V int-regs 0 V int-regs 1 }
+        T{ ##replace f V int-regs 2 D 0 }
+    } test-value-numbering
 ] unit-test
