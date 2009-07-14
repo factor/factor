@@ -25,6 +25,8 @@ GENERIC: unmarshall-cast ( alien-wrapper -- alien-wrapper' )
 M: alien-wrapper unmarshall-cast ;
 M: struct-wrapper unmarshall-cast ;
 
+M: struct-wrapper dispose* underlying>> free ;
+
 : marshall-pointer ( obj -- alien )
     {
         { [ dup alien? ] [ ] }

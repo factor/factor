@@ -6,8 +6,6 @@ kernel libc locals parser quotations sequences slots words
 alien.structs lexer vocabs.parser fry effects ;
 IN: alien.marshall.structs
 
-M: struct-wrapper dispose* underlying>> free ;
-
 : define-struct-accessor ( class name quot -- )
     [ "accessors" create create-method dup make-inline ] dip define ;
 
