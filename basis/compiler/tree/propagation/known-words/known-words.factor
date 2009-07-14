@@ -13,7 +13,8 @@ compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.slots
 compiler.tree.propagation.simple
-compiler.tree.propagation.constraints ;
+compiler.tree.propagation.constraints
+compiler.tree.propagation.call-effect ;
 IN: compiler.tree.propagation.known-words
 
 \ fixnum

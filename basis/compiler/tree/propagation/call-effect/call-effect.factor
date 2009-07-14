@@ -1,9 +1,10 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.private effects fry
 kernel kernel.private make sequences continuations quotations
-stack-checker stack-checker.transforms words math ;
-IN: stack-checker.call-effect
+words math stack-checker stack-checker.transforms
+compiler.tree.propagation.info slots.private ;
+IN: compiler.tree.propagation.call-effect
 
 ! call( and execute( have complex expansions.
 
@@ -90,12 +91,8 @@ M: quotation cached-effect
     [ call-effect-fast ]
     if ; inline
 
-: call-effect>quot ( -- quot )
-    inline-cache new '[ _ call-effect-ic ] ;
-
-\ call-effect [ call-effect>quot ] 0 define-transform
-
-\ call-effect t "no-compile" set-word-prop
+: call-effect>quot ( effect -- quot )
+    inline-cache new '[ drop _ _ call-effect-ic ] ;
 
 : execute-effect-slow ( word effect -- )
     [ '[ _ execute ] ] dip call-effect-slow ; inline
@@ -116,8 +113,72 @@ M: quotation cached-effect
     if ; inline
 
 : execute-effect>quot ( effect -- quot )
-    inline-cache new '[ _ _ execute-effect-ic ] ;
+    inline-cache new '[ drop _ _ execute-effect-ic ] ;
 
-\ execute-effect [ execute-effect>quot ] 1 define-transform
+: last2 ( seq -- penultimate ultimate )
+    2 tail* first2 ;
 
-\ execute-effect t "no-compile" set-word-prop
+: top-two ( #call -- effect value )
+    in-d>> last2 [ value-info ] bi@
+    literal>> swap ;
+
+ERROR: uninferable ;
+
+: remove-effect-input ( effect -- effect' )
+    (( -- object )) swap compose-effects ;
+
+: (infer-value) ( value-info -- effect )
+    dup class>> {
+        { \ quotation [
+            literal>> [ uninferable ] unless* cached-effect
+            dup +unknown+ = [ uninferable ] when
+        ] }
+        { \ curry [
+            slots>> third (infer-value)
+            remove-effect-input
+        ] }
+        { \ compose [
+            slots>> last2 [ (infer-value) ] bi@
+            compose-effects
+        ] }
+        [ uninferable ]
+    } case ;
+
+: infer-value ( value-info -- effect/f )
+    [ (infer-value) ]
+    [ dup uninferable? [ 2drop f ] [ rethrow ] if ]
+    recover ;
+
+: (value>quot) ( value-info -- quot )
+    dup class>> {
+        { \ quotation [ literal>> '[ drop @ ] ] }
+        { \ curry [
+            slots>> third (value>quot)
+            '[ [ obj>> ] [ quot>> @ ] bi ]
+        ] }
+        { \ compose [
+            slots>> last2 [ (value>quot) ] bi@
+            '[ [ first>> @ ] [ second>> @ ] bi ]
+        ] }
+    } case ;
+
+: value>quot ( value-info -- quot: ( code effect -- ) )
+    (value>quot) '[ drop @ ] ;
+
+: call-inlining ( #call -- quot/f )
+    top-two dup infer-value [
+        pick effect<=
+        [ nip value>quot ]
+        [ drop call-effect>quot ] if
+    ] [ drop call-effect>quot ] if* ;
+
+\ call-effect [ call-inlining ] "custom-inlining" set-word-prop
+
+: execute-inlining ( #call -- quot/f )
+    top-two >literal< [
+        2dup swap execute-effect-unsafe?
+        [ nip '[ 2drop _ execute ] ]
+        [ drop execute-effect>quot ] if
+    ] [ drop execute-effect>quot ] if ;
+
+\ execute-effect [ execute-inlining ] "custom-inlining" set-word-prop
