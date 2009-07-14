@@ -7,7 +7,8 @@ compiler.cfg.hats
 compiler.cfg.stacks
 compiler.cfg.instructions
 compiler.cfg.utilities
-compiler.cfg.registers ;
+compiler.cfg.registers
+compiler.cfg.comparisons ;
 IN: compiler.cfg.intrinsics.fixnum
 
 : emit-both-fixnums? ( -- )

@@ -120,7 +120,7 @@ IN: math.matrices
 
 PRIVATE>
 
-: cross ( vec1 vec2 -- vec3 ) [ i ] [ j ] [ k ] 2tri 3array ;
+: cross ( vec1 vec2 -- vec3 ) [ [ i ] [ j ] [ k ] 2tri ] keep 3sequence ;
 
 : proj ( v u -- w )
     [ [ v. ] [ norm-sq ] bi / ] keep n*v ;

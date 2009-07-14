@@ -2,7 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors locals combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
-math.bitwise compiler.cfg.hats compiler.cfg.instructions
+math.bitwise
+compiler.cfg.hats
+compiler.cfg.comparisons
+compiler.cfg.instructions
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.simplify ;
@@ -49,9 +52,12 @@ M: insn rewrite ;
         [ src2>> tag-mask get bitand 0 = ]
     } 1&& ; inline
 
+: tagged>constant ( n -- n' )
+    tag-bits get neg shift ; inline
+
 : (rewrite-tagged-comparison) ( insn -- src1 src2 cc )
     [ src1>> vreg>expr in1>> vn>vreg ]
-    [ src2>> tag-bits get neg shift ]
+    [ src2>> tagged>constant ]
     [ cc>> ]
     tri ; inline
 
@@ -77,13 +83,19 @@ M: ##compare-imm-branch rewrite
     insn cc>> swap? [ swap-cc ] when
     i \ ##compare-imm new-insn ; inline
 
-! M: ##compare rewrite
-!     dup [ src1>> ] [ src2>> ] bi
-!     [ vreg>expr constant-expr? ] bi@ 2array {
-!         { { f t } [ f >compare-imm ] }
-!         { { t f } [ t >compare-imm ] }
-!         [ drop ]
-!     } case ;
+: vreg-small-constant? ( vreg -- ? )
+    vreg>expr {
+        [ constant-expr? ]
+        [ value>> small-enough? ]
+    } 1&& ;
+
+M: ##compare rewrite
+    dup [ src1>> ] [ src2>> ] bi
+    [ vreg-small-constant? ] bi@ 2array {
+        { { f t } [ f >compare-imm ] }
+        { { t f } [ t >compare-imm ] }
+        [ drop ]
+    } case ;
 
 :: >compare-imm-branch ( insn swap? -- insn' )
     insn src1>>
@@ -91,13 +103,13 @@ M: ##compare-imm-branch rewrite
     insn cc>> swap? [ swap-cc ] when
     \ ##compare-imm-branch new-insn ; inline
 
-! M: ##compare-branch rewrite
-!     dup [ src1>> ] [ src2>> ] bi
-!     [ vreg>expr constant-expr? ] bi@ 2array {
-!         { { f t } [ f >compare-imm-branch ] }
-!         { { t f } [ t >compare-imm-branch ] }
-!         [ drop ]
-!     } case ;
+M: ##compare-branch rewrite
+    dup [ src1>> ] [ src2>> ] bi
+    [ vreg-small-constant? ] bi@ 2array {
+        { { f t } [ f >compare-imm-branch ] }
+        { { t f } [ t >compare-imm-branch ] }
+        [ drop ]
+    } case ;
 
 : rewrite-redundant-comparison? ( insn -- ? )
     {
@@ -197,18 +209,20 @@ M: ##or-imm rewrite [ bitor ] \ ##or-imm combine-imm ;
 
 M: ##xor-imm rewrite [ bitxor ] \ ##xor-imm combine-imm ;
 
-: rewrite-add? ( insn -- ? )
-    src2>> {
-        [ vreg>expr constant-expr? ]
-        [ vreg>constant small-enough? ]
-    } 1&& ;
-
-M: ##add rewrite
-    dup rewrite-add? [
+: new-arithmetic ( obj op -- )
+    [
         [ dst>> ]
         [ src1>> ]
-        [ src2>> vreg>constant ] tri \ ##add-imm new-insn
-        dup number-values
-    ] when ;
+        [ src2>> vreg>constant ] tri
+    ] dip new-insn dup number-values ; inline
 
-M: ##sub rewrite constant-fold ;
+: rewrite-arithmetic ( insn op -- ? )
+    over src2>> vreg-small-constant? [
+        new-arithmetic constant-fold
+    ] [
+        drop
+    ] if ; inline
+
+M: ##add rewrite \ ##add-imm rewrite-arithmetic ;
+
+M: ##sub rewrite \ ##sub-imm rewrite-arithmetic ;

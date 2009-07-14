@@ -150,7 +150,7 @@ ERROR: bad-live-values live-values ;
 
 : begin-block ( bb -- )
     dup basic-block set
-    dup block-from prepare-insn
+    dup block-from activate-new-intervals
     [ [ live-in ] [ block-from ] bi compute-live-values ] keep
     register-live-ins get set-at ;
 
