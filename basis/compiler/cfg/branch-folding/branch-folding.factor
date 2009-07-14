@@ -1,7 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit kernel sequences vectors
-compiler.cfg.instructions compiler.cfg.rpo ;
+compiler.cfg.instructions
+compiler.cfg.comparisons
+compiler.cfg.rpo
+compiler.cfg ;
 IN: compiler.cfg.branch-folding
 
 ! Fold comparisons where both inputs are the same. Predecessors must be
@@ -27,4 +30,4 @@ IN: compiler.cfg.branch-folding
         dup fold-branch?
         [ fold-branch ] [ drop ] if
     ] each-basic-block
-    f >>post-order ;
+    cfg-changed ;

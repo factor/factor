@@ -35,6 +35,12 @@ test-diamond
 
 [ ] [ cfg new 0 get >>entry eliminate-phis drop ] unit-test
 
-[ T{ ##copy f V int-regs 3 V int-regs 1 } ] [ 2 get instructions>> second ] unit-test
-[ T{ ##copy f V int-regs 3 V int-regs 2 } ] [ 3 get instructions>> second ] unit-test
+[ T{ ##copy f V int-regs 3 V int-regs 1 } ]
+[ 2 get successors>> first instructions>> first ]
+unit-test
+
+[ T{ ##copy f V int-regs 3 V int-regs 2 } ]
+[ 3 get successors>> first instructions>> first ]
+unit-test
+
 [ 2 ] [ 4 get instructions>> length ] unit-test

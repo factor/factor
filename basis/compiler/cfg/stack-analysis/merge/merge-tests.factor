@@ -1,8 +1,8 @@
 IN: compiler.cfg.stack-analysis.merge.tests
 USING: compiler.cfg.stack-analysis.merge tools.test arrays accessors
-compiler.cfg.instructions compiler.cfg.stack-analysis.state
-compiler.cfg compiler.cfg.registers compiler.cfg.debugger
-cpu.architecture make assocs
+ compiler.cfg.instructions compiler.cfg.stack-analysis.state
+compiler.cfg.utilities compiler.cfg compiler.cfg.registers
+compiler.cfg.debugger cpu.architecture make assocs namespaces
 sequences kernel classes ;
 
 [
@@ -11,13 +11,15 @@ sequences kernel classes ;
 ] [
     <state>
 
-    <basic-block> V{ T{ ##branch } } >>instructions
-    <basic-block> V{ T{ ##branch } } >>instructions 2array
+    <basic-block> V{ T{ ##branch } } >>instructions dup 1 set
+    <basic-block> V{ T{ ##branch } } >>instructions dup 2 set 2array
 
     <state> H{ { D 0 V int-regs 0 } } >>locs>vregs
     <state> H{ { D 0 V int-regs 1 } } >>locs>vregs 2array
 
-    [ merge-locs locs>vregs>> keys ] { } make first inputs>> values
+    H{ } clone added-instructions set
+    V{ } clone added-phis set
+    merge-locs locs>vregs>> keys added-phis get values first
 ] unit-test
 
 [
@@ -26,15 +28,16 @@ sequences kernel classes ;
 ] [
     <state>
 
-    <basic-block> V{ T{ ##branch } } >>instructions
-    <basic-block> V{ T{ ##branch } } >>instructions 2array
+    <basic-block> V{ T{ ##branch } } >>instructions dup 1 set
+    <basic-block> V{ T{ ##branch } } >>instructions dup 2 set 2array
 
-    [
-        <state>
-        <state> H{ { D 0 V int-regs 1 } } >>locs>vregs 2array
+    <state>
+    <state> H{ { D 0 V int-regs 1 } } >>locs>vregs 2array
 
-        [ merge-locs locs>vregs>> keys ] { } make drop
-    ] keep first instructions>> first class
+    H{ } clone added-instructions set
+    V{ } clone added-phis set
+    [ merge-locs locs>vregs>> keys ] { } make drop
+    1 get added-instructions get at first class
 ] unit-test
 
 [
@@ -42,15 +45,17 @@ sequences kernel classes ;
 ] [
     <state>
 
-    <basic-block> V{ T{ ##branch } } >>instructions
-    <basic-block> V{ T{ ##branch } } >>instructions 2array
+    <basic-block> V{ T{ ##branch } } >>instructions dup 1 set
+    <basic-block> V{ T{ ##branch } } >>instructions dup 2 set 2array
 
-    [
-        <state> -1 >>ds-height
-        <state> 2array
+    H{ } clone added-instructions set
+    V{ } clone added-phis set
 
-        [ merge-ds-heights ds-height>> ] { } make drop
-    ] keep first instructions>> first class
+    <state> -1 >>ds-height
+    <state> 2array
+
+    [ merge-ds-heights ds-height>> ] { } make drop
+    1 get added-instructions get at first class
 ] unit-test
 
 [
@@ -63,6 +68,9 @@ sequences kernel classes ;
     <basic-block> V{ T{ ##branch } } >>instructions
     <basic-block> V{ T{ ##branch } } >>instructions 2array
 
+    H{ } clone added-instructions set
+    V{ } clone added-phis set
+    
     [
         <state> -1 >>ds-height H{ { D 1 V int-regs 0 } } >>locs>vregs
         <state> H{ { D 0 V int-regs 1 } } >>locs>vregs 2array
@@ -82,6 +90,9 @@ sequences kernel classes ;
     <basic-block> V{ T{ ##branch } } >>instructions
     <basic-block> V{ T{ ##branch } } >>instructions 2array
 
+    H{ } clone added-instructions set
+    V{ } clone added-phis set
+    
     [
         <state> -1 >>ds-height H{ { D -1 V int-regs 0 } } >>locs>vregs
         <state> -1 >>ds-height H{ { D -1 V int-regs 1 } } >>locs>vregs 2array

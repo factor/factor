@@ -26,7 +26,7 @@ HELP: assoc>query
         "USING: io urls.encoding ;"
         "{ { \"from\" \"Lead\" } { \"to\" \"Gold, please\" } }"
         "assoc>query print"
-        "from=Lead&to=Gold%2c%20please"
+        "from=Lead&to=Gold%2C%20please"
     }
 } ;
 

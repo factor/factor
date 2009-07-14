@@ -76,7 +76,7 @@ HELP: count
 
 HELP: create-collection
 { $values
-  { "name" "collection name" }
+  { "name/collection" "collection name" }
 }
 { $description "Creates a new collection with the given name." } ;
 

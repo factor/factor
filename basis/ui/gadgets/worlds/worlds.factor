@@ -163,9 +163,11 @@ M: world resize-world
 M: world (>>dim)
     [ call-next-method ]
     [
-        dup handle>>
-        [ [ set-gl-context ] [ resize-world ] bi ]
-        [ drop ] if
+        dup active?>> [
+            dup handle>>
+            [ [ set-gl-context ] [ resize-world ] bi ]
+            [ drop ] if
+        ] [ drop ] if
     ] bi ;
 
 GENERIC: draw-world* ( world -- )
