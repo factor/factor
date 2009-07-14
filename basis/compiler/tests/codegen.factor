@@ -316,4 +316,6 @@ M: cucumber equal? "The cucumber has no equal" throw ;
 [ t ] [ 2 [ 1 swap fixnum< ] compile-call ] unit-test
 [ 3 ] [ 2 [ 1 swap fixnum< [ 3 ] [ 4 ] if ] compile-call ] unit-test
 
-[ 0 ] [ 101 [ dup fixnum-fast 1 fixnum+fast 20 fixnum-shift-fast 20 fixnum-shift-fast ] compile-call ] unit-test
+cell 4 = [
+    [ 0 ] [ 101 [ dup fixnum-fast 1 fixnum+fast 20 fixnum-shift-fast 20 fixnum-shift-fast ] compile-call ] unit-test
+] when
