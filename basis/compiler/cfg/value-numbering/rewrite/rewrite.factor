@@ -49,9 +49,12 @@ M: insn rewrite ;
         [ src2>> tag-mask get bitand 0 = ]
     } 1&& ; inline
 
+: tagged>constant ( n -- n' )
+    tag-bits get neg shift ; inline
+
 : (rewrite-tagged-comparison) ( insn -- src1 src2 cc )
     [ src1>> vreg>expr in1>> vn>vreg ]
-    [ src2>> tag-bits get neg shift ]
+    [ src2>> tagged>constant ]
     [ cc>> ]
     tri ; inline
 
@@ -203,15 +206,20 @@ M: ##or-imm rewrite [ bitor ] \ ##or-imm combine-imm ;
 
 M: ##xor-imm rewrite [ bitxor ] \ ##xor-imm combine-imm ;
 
-: rewrite-add? ( insn -- ? )
-    src2>> vreg-small-constant? ;
-
-M: ##add rewrite
-    dup rewrite-add? [
+: new-arithmetic ( obj op -- )
+    [
         [ dst>> ]
         [ src1>> ]
-        [ src2>> vreg>constant ] tri \ ##add-imm new-insn
-        dup number-values
-    ] when ;
+        [ src2>> vreg>constant ] tri
+    ] dip new-insn dup number-values ; inline
 
-M: ##sub rewrite constant-fold ;
+: rewrite-arithmetic ( insn op -- ? )
+    over src2>> vreg-small-constant? [
+        new-arithmetic constant-fold
+    ] [
+        drop
+    ] if ; inline
+
+M: ##add rewrite \ ##add-imm rewrite-arithmetic ;
+
+M: ##sub rewrite \ ##sub-imm rewrite-arithmetic ;
