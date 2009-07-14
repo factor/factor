@@ -31,19 +31,20 @@ M: cannot-annotate-twice summary drop "Cannot annotate a word twice" ;
         cannot-annotate-twice
     ] when ;
 
+GENERIC# (annotate) 1 ( word quot -- )
+
+M: generic (annotate)
+    [ "methods" word-prop values ] dip '[ _ (annotate) ] each ;
+
+M: word (annotate)
+    [ check-annotate-twice ] dip
+    [ dup def>> 2dup "unannotated-def" set-word-prop ] dip
+    call( old -- new ) define ;
+
 PRIVATE>
 
-GENERIC# annotate 1 ( word quot -- )
-
-M: generic annotate
-    [ "methods" word-prop values ] dip '[ _ annotate ] each ;
-
-M: word annotate
-    [ check-annotate-twice ] dip
-    [
-        [ dup def>> 2dup "unannotated-def" set-word-prop ] dip
-        call( old -- new ) define
-    ] with-compilation-unit ;
+: annotate ( word quot -- )
+    [ (annotate) ] with-compilation-unit ;
 
 <PRIVATE
 
