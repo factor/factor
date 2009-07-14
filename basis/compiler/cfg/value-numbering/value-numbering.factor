@@ -29,8 +29,7 @@ IN: compiler.cfg.value-numbering
     ] with-variable ;
 
 : value-numbering-step ( insns -- insns' )
-    [ [ number-values ] [ rewrite ] bi ] map
-    dup rename-uses ;
+    [ rewrite ] map dup rename-uses ;
 
 : value-numbering ( cfg -- cfg' )
     [ init-value-numbering ] [ value-numbering-step ] local-optimization ;
