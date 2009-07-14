@@ -7,18 +7,23 @@ tools.time generic inspector fry tools.continuations
 locals generalizations macros ;
 IN: tools.annotations
 
-GENERIC: reset ( word -- )
+<PRIVATE
 
-M: generic reset
-    subwords [ reset ] each ;
+GENERIC: (reset) ( word -- )
 
-M: word reset
+M: generic (reset)
+    subwords [ (reset) ] each ;
+
+M: word (reset)
     dup "unannotated-def" word-prop [
-        [
-            dup dup "unannotated-def" word-prop define
-        ] with-compilation-unit
+        dup dup "unannotated-def" word-prop define
         f "unannotated-def" set-word-prop
     ] [ drop ] if ;
+
+PRIVATE>
+
+: reset ( word -- )
+    [ (reset) ] with-compilation-unit ;
 
 ERROR: cannot-annotate-twice word ;
 
