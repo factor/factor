@@ -3,10 +3,12 @@
 USING: help.markup help.syntax kernel strings effects quotations ;
 IN: alien.inline
 
+<PRIVATE
 : $binding-note ( x -- )
     drop
     { "This word requires that certain variables are correctly bound. "
         "Call " { $link POSTPONE: define-c-library } " to set them up." } print-element ;
+PRIVATE>
 
 HELP: ;C-LIBRARY
 { $syntax ";C-LIBRARY" }

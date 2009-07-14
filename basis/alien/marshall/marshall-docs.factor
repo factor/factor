@@ -4,6 +4,7 @@ USING: help.markup help.syntax kernel quotations sequences
 strings alien alien.c-types math byte-arrays ;
 IN: alien.marshall
 
+<PRIVATE
 : $memory-note ( arg -- )
     drop "This word returns a pointer to unmanaged memory."
     print-element ;
@@ -15,19 +16,7 @@ IN: alien.marshall
 : $see-article ( arg -- )
     drop { "See " { $vocab-link "alien.inline" } "." }
     print-element ;
-
-: $marshall-descr* ( arg -- )
-    dup
-    "When the argument is a sequence, returns a pointer to an array of"
-    print-element print-element
-    "otherwise returns a pointer to a single "
-    print-element print-element " value." print-element ;
-
-: $marshall-descr** ( arg -- )
-    "Takes a one or two dimensional array of "
-    print-element print-element
-    " and returns a pointer to the equivalent C structure."
-    print-element ;
+PRIVATE>
 
 HELP: ?malloc-byte-array
 { $values
@@ -62,7 +51,9 @@ HELP: marshall-bool*
     { "?/seq" "t/f or sequence" }
     { "alien" alien }
 }
-{ $description { $marshall-descr* "bool" } }
+{ $description "When the argument is a sequence, returns a pointer to an array of bool, "
+   "otherwise returns a pointer to a single bool value."
+}
 { $notes { $list $c-ptr-note $memory-note } } ;
 
 HELP: marshall-bool**
@@ -70,7 +61,9 @@ HELP: marshall-bool**
     { "seq" sequence }
     { "alien" alien }
 }
-{ $description { $marshall-descr** "generalized booleans" } }
+{ $description "Takes a one or two dimensional array of generalized booleans "
+  "and returns a pointer to the equivalent C structure."
+}
 { $notes { $list $c-ptr-note $memory-note } } ;
 
 HELP: marshall-primitive
