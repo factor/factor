@@ -6,8 +6,8 @@ quotations sequences words alien.marshall.structs lexer parser
 vocabs.parser multiline ;
 IN: alien.marshall.syntax
 
-:: marshalled-function ( function types effect -- word quot effect )
-    function types effect factor-function
+:: marshalled-function ( name types effect -- word quot effect )
+    name types effect factor-function
     [ in>> ]
     [ out>> types [ pointer-to-primitive? ] filter append ]
     bi <effect>
@@ -22,13 +22,13 @@ IN: alien.marshall.syntax
         ] [ ] make
     ] dip ;
 
-: define-c-marshalled ( function types effect body -- )
+: define-c-marshalled ( name types effect body -- )
     [
         [ marshalled-function define-declared ]
         [ prototype-string ] 3bi
     ] dip append-function-body c-strings get push ;
 
-: define-c-marshalled' ( function effect body -- )
+: define-c-marshalled' ( name effect body -- )
     [
         [ in>> ] keep
         [ marshalled-function define-declared ]
