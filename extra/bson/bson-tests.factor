@@ -6,9 +6,6 @@ IN: bson.tests
 : turnaround ( value -- value )
     assoc>bv >byte-array binary [ H{ } stream>assoc ] with-byte-reader ;
 
-M: timestamp equal? ( obj1 obj2 -- ? )
-    [ timestamp>millis ] bi@ = ;
-
 [ H{ { "a" "a string" } } ] [ H{ { "a" "a string" } } turnaround ] unit-test
 
 [ H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } ]
@@ -23,10 +20,9 @@ M: timestamp equal? ( obj1 obj2 -- ? )
 [ H{ { "a date" T{ timestamp { year 2009 }
                    { month 7 }
                    { day 11 }
-                   { hour 11 }
+                   { hour 9 }
                    { minute 8 }
-                   { second 40+15437/200000 }
-                   { gmt-offset T{ duration { hour 2 } } } } } }
+                   { second 40+77/1000 } } } }
 ]
 [ H{ { "a date" T{ timestamp { year 2009 }
                    { month 7 }
