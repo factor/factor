@@ -6,6 +6,7 @@ kernel libc locals parser quotations sequences slots words
 alien.structs lexer vocabs.parser fry effects ;
 IN: alien.marshall.structs
 
+<PRIVATE
 : define-struct-accessor ( class name quot -- )
     [ "accessors" create create-method dup make-inline ] dip define ;
 
@@ -31,6 +32,7 @@ IN: alien.marshall.structs
         [ name>> '[ _ malloc-object >>underlying ] append ]
         [ name>> 1array ]
     } cleave { } swap <effect> define-declared ;
+PRIVATE>
 
 :: define-struct-tuple ( name -- )
     name create-in :> class
