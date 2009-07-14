@@ -205,6 +205,16 @@ M: object infer-call*
 
 \ drop-locals [ infer-drop-locals ] "special" set-word-prop
 
+: infer-call-effect ( word -- )
+    1 ensure-d first literal value>>
+    add-effect-input add-effect-input
+    apply-word/effect ;
+
+{ call-effect execute-effect } [
+    dup t "no-compile" set-word-prop
+    dup '[ _ infer-call-effect ] "special" set-word-prop
+] each
+
 \ do-primitive [ unknown-primitive-error ] "special" set-word-prop
 
 \ if [ infer-if ] "special" set-word-prop
