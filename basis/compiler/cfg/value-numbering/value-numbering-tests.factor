@@ -1,8 +1,8 @@
 IN: compiler.cfg.value-numbering.tests
 USING: compiler.cfg.value-numbering compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.debugger cpu.architecture
-tools.test kernel math combinators.short-circuit accessors
-sequences compiler.cfg vectors arrays ;
+compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
+cpu.architecture tools.test kernel math combinators.short-circuit
+accessors sequences compiler.cfg vectors arrays ;
 
 : trim-temps ( insns -- insns )
     [

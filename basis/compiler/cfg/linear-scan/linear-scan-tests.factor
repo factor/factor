@@ -12,6 +12,7 @@ compiler.cfg.predecessors
 compiler.cfg.rpo
 compiler.cfg.linearization
 compiler.cfg.debugger
+compiler.cfg.comparisons
 compiler.cfg.linear-scan
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.live-intervals
