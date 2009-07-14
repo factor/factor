@@ -704,3 +704,16 @@ TUPLE: circle me ;
 
 ! Joe found an oversight
 [ V{ integer } ] [ [ >integer ] final-classes ] unit-test
+
+TUPLE: foo bar ;
+
+[ t ] [ [ foo new ] { new } inlined? ] unit-test
+
+GENERIC: whatever ( x -- y )
+M: number whatever drop foo ;
+
+[ t ] [ [ 1 whatever new ] { new } inlined? ] unit-test
+
+: that-thing ( -- class ) foo ;
+
+[ f ] [ [ that-thing new ] { new } inlined? ] unit-test
