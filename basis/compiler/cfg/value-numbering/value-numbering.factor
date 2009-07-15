@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs biassocs classes kernel math accessors
 sorting sets sequences fry
+compiler.cfg
 compiler.cfg.local
 compiler.cfg.liveness
 compiler.cfg.renaming
@@ -34,4 +35,5 @@ IN: compiler.cfg.value-numbering
     [ rewrite ] map dup rename-uses ;
 
 : value-numbering ( cfg -- cfg' )
-    [ init-value-numbering ] [ value-numbering-step ] local-optimization ;
+    [ init-value-numbering ] [ value-numbering-step ] local-optimization
+    cfg-changed ;
