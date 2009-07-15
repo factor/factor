@@ -9,7 +9,7 @@ IN: alien.marshall.syntax
 :: marshalled-function ( name types effect -- word quot effect )
     name types effect factor-function
     [ in>> ]
-    [ out>> types [ pointer-to-primitive? ] filter append ]
+    [ out>> types [ pointer-to-non-const-primitive? ] filter append ]
     bi <effect>
     [
         [
