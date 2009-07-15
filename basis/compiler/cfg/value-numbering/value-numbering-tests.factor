@@ -2,7 +2,9 @@ IN: compiler.cfg.value-numbering.tests
 USING: compiler.cfg.value-numbering compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
 cpu.architecture tools.test kernel math combinators.short-circuit
-accessors sequences compiler.cfg vectors arrays layouts namespaces ;
+accessors sequences compiler.cfg.predecessors
+compiler.cfg.phi-elimination compiler.cfg.dce compiler.cfg.liveness
+compiler.cfg assocs vectors arrays layouts namespaces ;
 
 : trim-temps ( insns -- insns )
     [
@@ -943,7 +945,79 @@ cell 8 = [
     } test-value-numbering
 ] unit-test
 
-: test-branch-folding ( insns -- insns' )
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 5 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc< }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-reference f V int-regs 1 t }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc<= }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 5 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc> }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-reference f V int-regs 1 t }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc>= }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-immediate f V int-regs 1 5 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc/= }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-reference f V int-regs 1 t }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc= }
+    } test-value-numbering
+] unit-test
+
+: test-branch-folding ( insns -- insns' n )
     <basic-block>
     [ V{ 0 1 } clone >>successors basic-block set test-value-numbering ] keep
     successors>> first ;
@@ -1008,3 +1082,188 @@ cell 8 = [
     } test-branch-folding
 ] unit-test
 
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##branch }
+    }
+    1
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare-branch f V int-regs 0 V int-regs 0 cc< }
+    } test-branch-folding
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##branch }
+    }
+    0
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare-branch f V int-regs 0 V int-regs 0 cc<= }
+    } test-branch-folding
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##branch }
+    }
+    1
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare-branch f V int-regs 0 V int-regs 0 cc> }
+    } test-branch-folding
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##branch }
+    }
+    0
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare-branch f V int-regs 0 V int-regs 0 cc>= }
+    } test-branch-folding
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##branch }
+    }
+    0
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare-branch f V int-regs 0 V int-regs 0 cc= }
+    } test-branch-folding
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##branch }
+    }
+    1
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare-branch f V int-regs 0 V int-regs 0 cc/= }
+    } test-branch-folding
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##load-reference f V int-regs 1 t }
+        T{ ##branch }
+    }
+    0
+] [
+    {
+        T{ ##peek f V int-regs 0 D 0 }
+        T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc<= }
+        T{ ##compare-imm-branch f V int-regs 1 5 cc/= }
+    } test-branch-folding
+] unit-test
+
+! More branch folding tests
+V{ T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##compare-branch f V int-regs 0 V int-regs 0 cc< }
+} 1 test-bb
+
+V{
+    T{ ##load-immediate f V int-regs 1 1 }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##load-immediate f V int-regs 2 2 }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##phi f V int-regs 3 { } }
+    T{ ##replace f V int-regs 3 D 0 }
+    T{ ##return }
+} 4 test-bb
+
+4 get instructions>> first
+2 get V int-regs 1 2array
+3 get V int-regs 2 2array 2array
+>>inputs drop
+
+test-diamond
+
+[ ] [
+    cfg new 0 get >>entry
+    compute-liveness
+    value-numbering
+    compute-predecessors
+    eliminate-phis drop
+] unit-test
+
+[ 1 ] [ 1 get successors>> length ] unit-test
+
+[ t ] [ 1 get successors>> first 3 get eq? ] unit-test
+
+[ T{ ##copy f V int-regs 3 V int-regs 2 } ]
+[ 3 get successors>> first instructions>> first ]
+unit-test
+
+[ 2 ] [ 4 get instructions>> length ] unit-test
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##peek f V int-regs 1 D 1 }
+    T{ ##compare-branch f V int-regs 1 V int-regs 1 cc< }
+} 1 test-bb
+
+V{
+    T{ ##copy f V int-regs 2 V int-regs 0 }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##phi f V int-regs 3 V{ } }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##replace f V int-regs 3 D 0 }
+    T{ ##return }
+} 4 test-bb
+
+1 get V int-regs 1 2array
+2 get V int-regs 0 2array 2array 3 get instructions>> first (>>inputs)
+
+test-diamond
+
+[ ] [
+    cfg new 0 get >>entry
+    compute-predecessors
+    compute-liveness
+    value-numbering
+    compute-predecessors
+    eliminate-dead-code
+    drop
+] unit-test
+
+[ t ] [ 1 get successors>> first 3 get eq? ] unit-test
+
+[ 1 ] [ 3 get instructions>> first inputs>> assoc-size ] unit-test
