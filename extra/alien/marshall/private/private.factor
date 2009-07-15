@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.inline arrays
 combinators fry functors kernel lexer libc macros math
-sequences specialized-arrays.alien libc.private ;
+sequences specialized-arrays.alien libc.private
+combinators.short-circuit ;
 IN: alien.marshall.private
 
 : bool>arg ( ? -- 1/0/obj )
@@ -16,7 +17,7 @@ MACRO: marshall-x* ( num-quot seq-quot -- alien )
     '[ bool>arg dup number? _ _ if ] ;
 
 : ptr-pass-through ( obj quot -- alien )
-    over c-ptr? [ drop ] [ call ] if ; inline
+    over { [ c-ptr? ] [ ] } 1&& [ drop ] [ call ] if ; inline
 
 : malloc-underlying ( obj -- alien )
     underlying>> malloc-byte-array ;
