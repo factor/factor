@@ -98,17 +98,30 @@ M: ##compare-imm rewrite-tagged-comparison
     } case
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 
+ERROR: bad-comparison ;
+
 : (fold-compare-imm) ( insn -- ? )
     [ [ src1>> vreg>constant ] [ src2>> ] bi ] [ cc>> ] bi
-    pick integer? [ [ <=> ] dip evaluate-cc ] [ 3drop f ] if ;
+    pick integer?
+    [ [ <=> ] dip evaluate-cc ]
+    [
+        2nip {
+            { cc= [ f ] }
+            { cc/= [ t ] }
+            [ bad-comparison ]
+        } case
+    ] if ;
 
 : fold-compare-imm? ( insn -- ? )
     src1>> vreg>expr [ constant-expr? ] [ reference-expr? ] bi or ;
 
-: fold-compare-imm-branch ( insn -- insn/f )
-    (fold-compare-imm) 0 1 ?
+: fold-branch ( ? -- insn )
+    0 1 ?
     basic-block get [ nth 1vector ] change-successors drop
     \ ##branch new-insn ;
+
+: fold-compare-imm-branch ( insn -- insn/f )
+    (fold-compare-imm) fold-branch ;
 
 M: ##compare-imm-branch rewrite*
     {
@@ -132,10 +145,20 @@ M: ##compare-imm-branch rewrite*
     [ vreg>constant ] dip
     \ ##compare-imm-branch new-insn ; inline
 
+: self-compare? ( insn -- ? )
+    [ src1>> ] [ src2>> ] bi [ vreg>vn ] bi@ = ; inline
+
+: (rewrite-self-compare) ( insn -- ? )
+    cc>> { cc= cc<= cc>= } memq? ;
+
+: rewrite-self-compare-branch ( insn -- insn' )
+    (rewrite-self-compare) fold-branch ;
+
 M: ##compare-branch rewrite*
     {
         { [ dup src1>> vreg-small-constant? ] [ t >compare-imm-branch ] }
         { [ dup src2>> vreg-small-constant? ] [ f >compare-imm-branch ] }
+        { [ dup self-compare? ] [ rewrite-self-compare-branch ] }
         [ drop f ]
     } cond ;
 
@@ -152,20 +175,26 @@ M: ##compare-branch rewrite*
     [ vreg>constant ] dip
     i \ ##compare-imm new-insn ; inline
 
-M: ##compare rewrite*
-    {
-        { [ dup src1>> vreg-small-constant? ] [ t >compare-imm ] }
-        { [ dup src2>> vreg-small-constant? ] [ f >compare-imm ] }
-        [ drop f ]
-    } cond ;
-
-: fold-compare-imm ( insn -- )
-    [ dst>> ]
-    [ (fold-compare-imm) ] bi
+: >boolean-insn ( insn ? -- insn' )
+    [ dst>> ] dip
     {
         { t [ t \ ##load-reference new-insn ] }
         { f [ \ f tag-number \ ##load-immediate new-insn ] }
     } case ;
+
+: rewrite-self-compare ( insn -- insn' )
+    dup (rewrite-self-compare) >boolean-insn ;
+
+M: ##compare rewrite*
+    {
+        { [ dup src1>> vreg-small-constant? ] [ t >compare-imm ] }
+        { [ dup src2>> vreg-small-constant? ] [ f >compare-imm ] }
+        { [ dup self-compare? ] [ rewrite-self-compare ] }
+        [ drop f ]
+    } cond ;
+
+: fold-compare-imm ( insn -- insn' )
+    dup (fold-compare-imm) >boolean-insn ;
 
 M: ##compare-imm rewrite*
     {
