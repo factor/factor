@@ -40,6 +40,12 @@ MEMO: resolved-primitives ( -- seq )
     factorize-type
     { [ pointer? ] [ type-sans-pointer primitive-type? ] } 1&& ;
 
+: pointer-to-non-const-primitive? ( str -- ? )
+    {
+        [ pointer-to-const? not ]
+        [ factorize-type pointer-to-primitive? ]
+    } 1&& ;
+
 : types-effect>params-return ( types effect -- params return )
     [ in>> zip ]
     [ nip out>> dup length 0 > [ first ] [ drop "void" ] if ]
