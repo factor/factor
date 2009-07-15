@@ -9,7 +9,6 @@ compiler.cfg.branch-splitting
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.dce
-compiler.cfg.branch-folding
 compiler.cfg.write-barrier
 compiler.cfg.liveness
 compiler.cfg.rpo
@@ -36,7 +35,6 @@ SYMBOL: check-optimizer?
         compute-liveness
         alias-analysis
         value-numbering
-        fold-branches
         compute-predecessors
         eliminate-dead-code
         eliminate-write-barriers
