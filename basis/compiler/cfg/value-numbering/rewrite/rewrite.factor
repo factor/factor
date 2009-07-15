@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors locals combinators combinators.short-circuit arrays
+USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
-math.bitwise classes
+math.bitwise math.order classes vectors
+compiler.cfg
 compiler.cfg.hats
 compiler.cfg.comparisons
 compiler.cfg.instructions
@@ -10,6 +11,12 @@ compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.simplify ;
 IN: compiler.cfg.value-numbering.rewrite
+
+: vreg-small-constant? ( vreg -- ? )
+    vreg>expr {
+        [ constant-expr? ]
+        [ value>> small-enough? ]
+    } 1&& ;
 
 ! Outputs f to mean no change
 
@@ -76,48 +83,6 @@ M: ##compare-imm rewrite-tagged-comparison
     [ dst>> ] [ (rewrite-tagged-comparison) ] bi
     i \ ##compare-imm new-insn ;
 
-M: ##compare-imm-branch rewrite*
-    {
-        { [ dup rewrite-boolean-comparison? ] [ rewrite-boolean-comparison ] }
-        { [ dup rewrite-tagged-comparison? ] [ rewrite-tagged-comparison ] }
-        [ drop f ]
-    } cond ;
-
-:: >compare-imm ( insn swap? -- insn' )
-    insn dst>>
-    insn src1>>
-    insn src2>> swap? [ swap ] when vreg>constant
-    insn cc>> swap? [ swap-cc ] when
-    i \ ##compare-imm new-insn ; inline
-
-: vreg-small-constant? ( vreg -- ? )
-    vreg>expr {
-        [ constant-expr? ]
-        [ value>> small-enough? ]
-    } 1&& ;
-
-M: ##compare rewrite*
-    dup [ src1>> ] [ src2>> ] bi
-    [ vreg-small-constant? ] bi@ 2array {
-        { { f t } [ f >compare-imm ] }
-        { { t f } [ t >compare-imm ] }
-        [ 2drop f ]
-    } case ;
-
-:: >compare-imm-branch ( insn swap? -- insn' )
-    insn src1>>
-    insn src2>> swap? [ swap ] when vreg>constant
-    insn cc>> swap? [ swap-cc ] when
-    \ ##compare-imm-branch new-insn ; inline
-
-M: ##compare-branch rewrite*
-    dup [ src1>> ] [ src2>> ] bi
-    [ vreg-small-constant? ] bi@ 2array {
-        { { f t } [ f >compare-imm-branch ] }
-        { { t f } [ t >compare-imm-branch ] }
-        [ 2drop f ]
-    } case ;
-
 : rewrite-redundant-comparison? ( insn -- ? )
     {
         [ src1>> vreg>expr compare-expr? ]
@@ -133,10 +98,80 @@ M: ##compare-branch rewrite*
     } case
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 
+: (fold-compare-imm) ( insn -- ? )
+    [ [ src1>> vreg>constant ] [ src2>> ] bi ] [ cc>> ] bi
+    pick integer? [ [ <=> ] dip evaluate-cc ] [ 3drop f ] if ;
+
+: fold-compare-imm? ( insn -- ? )
+    src1>> vreg>expr [ constant-expr? ] [ reference-expr? ] bi or ;
+
+: fold-compare-imm-branch ( insn -- insn/f )
+    (fold-compare-imm) 0 1 ?
+    basic-block get [ nth 1vector ] change-successors drop
+    \ ##branch new-insn ;
+
+M: ##compare-imm-branch rewrite*
+    {
+        { [ dup rewrite-boolean-comparison? ] [ rewrite-boolean-comparison ] }
+        { [ dup rewrite-tagged-comparison? ] [ rewrite-tagged-comparison ] }
+        { [ dup fold-compare-imm? ] [ fold-compare-imm-branch ] }
+        [ drop f ]
+    } cond ;
+
+: swap-compare ( src1 src2 cc swap? -- src1 src2 cc )
+    [ [ swap ] dip swap-cc ] when ; inline
+
+: >compare-imm-branch ( insn swap? -- insn' )
+    [
+        [ src1>> ]
+        [ src2>> ]
+        [ cc>> ]
+        tri
+    ] dip
+    swap-compare
+    [ vreg>constant ] dip
+    \ ##compare-imm-branch new-insn ; inline
+
+M: ##compare-branch rewrite*
+    {
+        { [ dup src1>> vreg-small-constant? ] [ t >compare-imm-branch ] }
+        { [ dup src2>> vreg-small-constant? ] [ f >compare-imm-branch ] }
+        [ drop f ]
+    } cond ;
+
+: >compare-imm ( insn swap? -- insn' )
+    [
+        {
+            [ dst>> ]
+            [ src1>> ]
+            [ src2>> ]
+            [ cc>> ]
+        } cleave
+    ] dip
+    swap-compare
+    [ vreg>constant ] dip
+    i \ ##compare-imm new-insn ; inline
+
+M: ##compare rewrite*
+    {
+        { [ dup src1>> vreg-small-constant? ] [ t >compare-imm ] }
+        { [ dup src2>> vreg-small-constant? ] [ f >compare-imm ] }
+        [ drop f ]
+    } cond ;
+
+: fold-compare-imm ( insn -- )
+    [ dst>> ]
+    [ (fold-compare-imm) ] bi
+    {
+        { t [ t \ ##load-reference new-insn ] }
+        { f [ \ f tag-number \ ##load-immediate new-insn ] }
+    } case ;
+
 M: ##compare-imm rewrite*
     {
         { [ dup rewrite-redundant-comparison? ] [ rewrite-redundant-comparison ] }
         { [ dup rewrite-tagged-comparison? ] [ rewrite-tagged-comparison ] }
+        { [ dup fold-compare-imm? ] [ fold-compare-imm ] }
         [ drop f ]
     } cond ;
 
@@ -160,22 +195,19 @@ M: ##shl-imm constant-fold* drop shift ;
     [ [ src1>> vreg>constant ] [ src2>> ] [ ] tri constant-fold* ] bi
     \ ##load-immediate new-insn ; inline
 
-:: new-imm-insn ( insn dst src1 src2 op -- new-insn/insn )
-    src2 small-enough? [ dst src1 src2 op new-insn ] [ insn ] if ; inline
-
 : reassociate? ( insn -- ? )
     [ src1>> vreg>expr op>> ] [ class ] bi = ; inline
 
 : reassociate ( insn op -- insn )
     [
         {
-            [ ]
             [ dst>> ]
             [ src1>> vreg>expr [ in1>> vn>vreg ] [ in2>> vn>constant ] bi ]
             [ src2>> ]
             [ ]
         } cleave constant-fold*
-    ] dip new-imm-insn ; inline
+    ] dip
+    over small-enough? [ new-insn ] [ 2drop 2drop f ] if ; inline
 
 M: ##add-imm rewrite*
     {
@@ -185,8 +217,8 @@ M: ##add-imm rewrite*
     } cond ;
 
 : sub-imm>add-imm ( insn -- insn' )
-    dup [ dst>> ] [ src1>> ] [ src2>> neg ] tri dup small-enough?
-    [ \ ##add-imm new-insn nip ] [ 2drop 2drop f ] if ;
+    [ dst>> ] [ src1>> ] [ src2>> neg ] tri dup small-enough?
+    [ \ ##add-imm new-insn ] [ 3drop f ] if ;
 
 M: ##sub-imm rewrite*
     {
@@ -247,12 +279,11 @@ M: ##sar-imm rewrite*
         [ drop f ]
     } cond ;
 
-:: insn>imm-insn ( insn op swap? -- )
-    insn
-    insn dst>>
-    insn src1>>
-    insn src2>> swap? [ swap ] when vreg>constant
-    op new-imm-insn ; inline
+: insn>imm-insn ( insn op swap? -- )
+    swap [
+        [ [ dst>> ] [ src1>> ] [ src2>> ] tri ] dip
+        [ swap ] when vreg>constant
+    ] dip new-insn ; inline
 
 : rewrite-arithmetic ( insn op -- ? )
     {
