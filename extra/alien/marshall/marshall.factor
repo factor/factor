@@ -88,6 +88,7 @@ ALIAS: marshall-void* marshall-pointer
 : primitive-marshaller ( type -- quot/f )
     {
         { "bool"        [ [ marshall-bool ] ] }
+        { "boolean"     [ [ marshall-bool ] ] }
         { "char"        [ [ marshall-primitive ] ] }
         { "uchar"       [ [ marshall-primitive ] ] }
         { "short"       [ [ marshall-primitive ] ] }
@@ -101,6 +102,7 @@ ALIAS: marshall-void* marshall-pointer
         { "float"       [ [ marshall-primitive ] ] }
         { "double"      [ [ marshall-primitive ] ] }
         { "bool*"       [ [ marshall-bool* ] ] }
+        { "boolean*"    [ [ marshall-bool* ] ] }
         { "char*"       [ [ marshall-char*-or-string ] ] }
         { "uchar*"      [ [ marshall-uchar* ] ] }
         { "short*"      [ [ marshall-short* ] ] }
@@ -114,6 +116,7 @@ ALIAS: marshall-void* marshall-pointer
         { "float*"      [ [ marshall-float* ] ] }
         { "double*"     [ [ marshall-double* ] ] }
         { "bool&"       [ [ marshall-bool* ] ] }
+        { "boolean&"    [ [ marshall-bool* ] ] }
         { "char&"       [ [ marshall-char* ] ] }
         { "uchar&"      [ [ marshall-uchar* ] ] }
         { "short&"      [ [ marshall-short* ] ] }
@@ -128,6 +131,7 @@ ALIAS: marshall-void* marshall-pointer
         { "double&"     [ [ marshall-double* ] ] }
         { "void*"       [ [ marshall-void* ] ] }
         { "bool**"      [ [ marshall-bool** ] ] }
+        { "boolean**"   [ [ marshall-bool** ] ] }
         { "char**"      [ [ marshall-char**-or-strings ] ] }
         { "uchar**"     [ [ marshall-uchar** ] ] }
         { "short**"     [ [ marshall-short** ] ] }
@@ -170,6 +174,7 @@ ALIAS: marshall-void* marshall-pointer
 : primitive-unmarshaller ( type -- quot/f )
     {
         { "bool"       [ [ unmarshall-bool ] ] }
+        { "boolean"    [ [ unmarshall-bool ] ] }
         { "char"       [ [ ] ] }
         { "uchar"      [ [ ] ] }
         { "short"      [ [ ] ] }
@@ -183,6 +188,7 @@ ALIAS: marshall-void* marshall-pointer
         { "float"      [ [ ] ] }
         { "double"     [ [ ] ] }
         { "bool*"      [ [ unmarshall-bool*-free ] ] }
+        { "boolean*"   [ [ unmarshall-bool*-free ] ] }
         { "char*"      [ [ ] ] }
         { "uchar*"     [ [ unmarshall-uchar*-free ] ] }
         { "short*"     [ [ unmarshall-short*-free ] ] }
@@ -196,6 +202,7 @@ ALIAS: marshall-void* marshall-pointer
         { "float*"     [ [ unmarshall-float*-free ] ] }
         { "double*"    [ [ unmarshall-double*-free ] ] }
         { "bool&"      [ [ unmarshall-bool*-free ] ] }
+        { "boolean&"   [ [ unmarshall-bool*-free ] ] }
         { "char&"      [ [ ] ] }
         { "uchar&"     [ [ unmarshall-uchar*-free ] ] }
         { "short&"     [ [ unmarshall-short*-free ] ] }
@@ -214,6 +221,7 @@ ALIAS: marshall-void* marshall-pointer
 : struct-primitive-unmarshaller ( type -- quot/f )
     {
         { "bool"       [ [ unmarshall-bool ] ] }
+        { "boolean"    [ [ unmarshall-bool ] ] }
         { "char"       [ [ ] ] }
         { "uchar"      [ [ ] ] }
         { "short"      [ [ ] ] }
@@ -227,6 +235,7 @@ ALIAS: marshall-void* marshall-pointer
         { "float"      [ [ ] ] }
         { "double"     [ [ ] ] }
         { "bool*"      [ [ unmarshall-bool* ] ] }
+        { "boolean*"   [ [ unmarshall-bool* ] ] }
         { "char*"      [ [ ] ] }
         { "uchar*"     [ [ unmarshall-uchar* ] ] }
         { "short*"     [ [ unmarshall-short* ] ] }
@@ -240,6 +249,7 @@ ALIAS: marshall-void* marshall-pointer
         { "float*"     [ [ unmarshall-float* ] ] }
         { "double*"    [ [ unmarshall-double* ] ] }
         { "bool&"      [ [ unmarshall-bool* ] ] }
+        { "boolean&"   [ [ unmarshall-bool* ] ] }
         { "char&"      [ [ unmarshall-char* ] ] }
         { "uchar&"     [ [ unmarshall-uchar* ] ] }
         { "short&"     [ [ unmarshall-short* ] ] }
