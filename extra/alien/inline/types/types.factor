@@ -31,12 +31,13 @@ MEMO: resolved-primitives ( -- seq )
     ] [ 2drop f ] recover ;
 
 : pointer? ( type -- ? )
-    [ "*" tail? ] [ "&" tail? ] bi or ;
+    factorize-type [ "*" tail? ] [ "&" tail? ] bi or ;
 
 : type-sans-pointer ( type -- type' )
-    [ '[ _ = ] "*&" swap any? ] trim-tail ;
+    factorize-type [ '[ _ = ] "*&" swap any? ] trim-tail ;
 
 : pointer-to-primitive? ( type -- ? )
+    factorize-type
     { [ pointer? ] [ type-sans-pointer primitive-type? ] } 1&& ;
 
 : types-effect>params-return ( types effect -- params return )
