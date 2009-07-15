@@ -65,15 +65,15 @@ UNION: irrelevant ##peek ##replace ##inc-d ##inc-r ;
 : split-instructions? ( insns -- ? )
     [ irrelevant? not ] count 5 <= ;
 
-: split-branches? ( bb -- ? )
+: split-branch? ( bb -- ? )
     {
         [ dup successors>> [ back-edge? ] with any? not ]
-        [ predecessors>> length 1 4 between? ]
+        [ predecessors>> length 2 4 between? ]
         [ instructions>> split-instructions? ]
     } 1&& ;
 
 : split-branches ( cfg -- cfg' )
     dup [
-        dup split-branches? [ split-branch ] [ drop ] if
+        dup split-branch? [ split-branch ] [ drop ] if
     ] each-basic-block
     cfg-changed ;

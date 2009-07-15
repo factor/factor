@@ -91,9 +91,9 @@ IN: compiler.cfg.stack-analysis.tests
 ! Sync before a back-edge, not after
 ! ##peeks should be inserted before a ##loop-entry
 ! Don't optimize out the constants
-[ 1 t ] [
+[ t ] [
     [ 1000 [ ] times ] test-stack-analysis eliminate-dead-code linearize
-    [ [ ##add-imm? ] count ] [ [ ##load-immediate? ] any? ] bi
+    [ ##load-immediate? ] any?
 ] unit-test
 
 ! Correct height tracking
