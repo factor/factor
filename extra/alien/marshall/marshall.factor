@@ -298,9 +298,6 @@ ALIAS: marshall-void* marshall-pointer
     ] if* ;
 
 : out-arg-unmarshaller ( type -- quot )
-    dup {
-        [ pointer-to-const? not ]
-        [ factorize-type pointer-to-primitive? ]
-    } 1&&
+    dup pointer-to-non-const-primitive?
     [ factorize-type primitive-unmarshaller ]
     [ drop [ drop ] ] if ;
