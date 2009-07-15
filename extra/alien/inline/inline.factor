@@ -122,6 +122,9 @@ PRIVATE>
     [ [ define-c-library ] dip call compile-c-library ]
     [ cleanup-variables ] [ ] cleanup ; inline
 
+: raw-c ( str -- )
+    [ "\n" % % "\n" % ] "" make c-strings get push ;
+
 SYNTAX: C-LIBRARY: scan define-c-library ;
 
 SYNTAX: COMPILE-AS-C++ t library-is-c++ set ;
@@ -146,5 +149,4 @@ SYNTAX: ;C-LIBRARY compile-c-library ;
 
 SYNTAX: DELETE-C-LIBRARY: scan delete-inline-library ;
 
-SYNTAX: RAW-C:
-    [ "\n" % parse-here % "\n" % c-strings get push ] "" make ;
+SYNTAX: RAW-C: parse-here raw-c ;
