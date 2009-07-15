@@ -1267,3 +1267,68 @@ test-diamond
 [ t ] [ 1 get successors>> first 3 get eq? ] unit-test
 
 [ 1 ] [ 3 get instructions>> first inputs>> assoc-size ] unit-test
+
+V{ T{ ##prologue } T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##peek { dst V int-regs 15 } { loc D 0 } }
+    T{ ##copy { dst V int-regs 16 } { src V int-regs 15 } }
+    T{ ##copy { dst V int-regs 17 } { src V int-regs 15 } }
+    T{ ##copy { dst V int-regs 18 } { src V int-regs 15 } }
+    T{ ##copy { dst V int-regs 19 } { src V int-regs 15 } }
+    T{ ##compare
+        { dst V int-regs 20 }
+        { src1 V int-regs 18 }
+        { src2 V int-regs 19 }
+        { cc cc= }
+        { temp V int-regs 22 }
+    }
+    T{ ##copy { dst V int-regs 21 } { src V int-regs 20 } }
+    T{ ##compare-imm-branch
+        { src1 V int-regs 21 }
+        { src2 5 }
+        { cc cc/= }
+    }
+} 1 test-bb
+
+V{
+    T{ ##copy { dst V int-regs 23 } { src V int-regs 15 } }
+    T{ ##copy { dst V int-regs 24 } { src V int-regs 15 } }
+    T{ ##load-reference { dst V int-regs 25 } { obj t } }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##replace { src V int-regs 25 } { loc D 0 } }
+    T{ ##epilogue }
+    T{ ##return }
+} 3 test-bb
+
+V{
+    T{ ##copy { dst V int-regs 26 } { src V int-regs 15 } }
+    T{ ##copy { dst V int-regs 27 } { src V int-regs 15 } }
+    T{ ##add
+        { dst V int-regs 28 }
+        { src1 V int-regs 26 }
+        { src2 V int-regs 27 }
+    }
+    T{ ##branch }
+} 4 test-bb
+
+V{
+    T{ ##replace { src V int-regs 28 } { loc D 0 } }
+    T{ ##epilogue }
+    T{ ##return }
+} 5 test-bb
+
+0 get 1 get 1vector >>successors drop
+1 get 2 get 4 get V{ } 2sequence >>successors drop
+2 get 3 get 1vector >>successors drop
+4 get 5 get 1vector >>successors drop
+
+[ ] [
+    cfg new 0 get >>entry
+    compute-liveness value-numbering eliminate-dead-code drop
+] unit-test
+
+[ f ] [ 1 get instructions>> [ ##peek? ] any? ] unit-test
