@@ -11,6 +11,8 @@ compiler.cfg.value-numbering.simplify
 compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering
 
+! Local value numbering. Predecessors must be recomputed after this
+
 : number-input-values ( live-in -- )
     [ [ f next-input-expr simplify ] dip set-vn ] each ;
 
