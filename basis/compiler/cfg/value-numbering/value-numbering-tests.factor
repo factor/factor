@@ -2,7 +2,7 @@ IN: compiler.cfg.value-numbering.tests
 USING: compiler.cfg.value-numbering compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
 cpu.architecture tools.test kernel math combinators.short-circuit
-accessors sequences compiler.cfg vectors arrays layouts ;
+accessors sequences compiler.cfg vectors arrays layouts namespaces ;
 
 : trim-temps ( insns -- insns )
     [
@@ -16,6 +16,55 @@ accessors sequences compiler.cfg vectors arrays layouts ;
 : test-value-numbering ( insns -- insns )
     { } init-value-numbering
     value-numbering-step ;
+
+! Folding constants together
+[
+    {
+        T{ ##load-reference f V int-regs 0 0.0 }
+        T{ ##load-reference f V int-regs 1 -0.0 }
+        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##replace f V int-regs 1 D 1 }
+    }
+] [
+    {
+        T{ ##load-reference f V int-regs 0 0.0 }
+        T{ ##load-reference f V int-regs 1 -0.0 }
+        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##replace f V int-regs 1 D 1 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##load-reference f V int-regs 0 0.0 }
+        T{ ##load-reference f V int-regs 1 0.0 }
+        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##replace f V int-regs 0 D 1 }
+    }
+] [
+    {
+        T{ ##load-reference f V int-regs 0 0.0 }
+        T{ ##load-reference f V int-regs 1 0.0 }
+        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##replace f V int-regs 1 D 1 }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##load-reference f V int-regs 0 t }
+        T{ ##load-reference f V int-regs 1 t }
+        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##replace f V int-regs 0 D 1 }
+    }
+] [
+    {
+        T{ ##load-reference f V int-regs 0 t }
+        T{ ##load-reference f V int-regs 1 t }
+        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##replace f V int-regs 1 D 1 }
+    } test-value-numbering
+] unit-test
 
 ! Copy propagation
 [
@@ -805,4 +854,157 @@ cell 8 = [
             T{ ##add f V int-regs 3 V int-regs 0 V int-regs 2 }
         } test-value-numbering
     ] unit-test
+
+    [
+        {
+            T{ ##peek f V int-regs 0 D 0 }
+            T{ ##load-immediate f V int-regs 2 140737488355328 }
+            T{ ##add f V int-regs 3 V int-regs 0 V int-regs 2 }
+        }
+    ] [
+        {
+            T{ ##peek f V int-regs 0 D 0 }
+            T{ ##load-immediate f V int-regs 2 140737488355328 }
+            T{ ##add f V int-regs 3 V int-regs 0 V int-regs 2 }
+        } test-value-numbering
+    ] unit-test
+
+    [
+        {
+            T{ ##peek f V int-regs 0 D 0 }
+            T{ ##load-immediate f V int-regs 2 2147483647 }
+            T{ ##add-imm f V int-regs 3 V int-regs 0 2147483647 }
+            T{ ##add-imm f V int-regs 4 V int-regs 3 2147483647 }
+        }
+    ] [
+        {
+            T{ ##peek f V int-regs 0 D 0 }
+            T{ ##load-immediate f V int-regs 2 2147483647 }
+            T{ ##add f V int-regs 3 V int-regs 0 V int-regs 2 }
+            T{ ##add f V int-regs 4 V int-regs 3 V int-regs 2 }
+        } test-value-numbering
+    ] unit-test
 ] when
+
+! Branch folding
+[
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##load-immediate f V int-regs 3 5 }
+    }
+] [
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##compare f V int-regs 3 V int-regs 1 V int-regs 2 cc= }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##load-reference f V int-regs 3 t }
+    }
+] [
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##compare f V int-regs 3 V int-regs 1 V int-regs 2 cc/= }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##load-reference f V int-regs 3 t }
+    }
+] [
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##compare f V int-regs 3 V int-regs 1 V int-regs 2 cc< }
+    } test-value-numbering
+] unit-test
+
+[
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##load-immediate f V int-regs 3 5 }
+    }
+] [
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##compare f V int-regs 3 V int-regs 2 V int-regs 1 cc< }
+    } test-value-numbering
+] unit-test
+
+: test-branch-folding ( insns -- insns' )
+    <basic-block>
+    [ V{ 0 1 } clone >>successors basic-block set test-value-numbering ] keep
+    successors>> first ;
+
+[
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##branch }
+    }
+    1
+] [
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##compare-branch f V int-regs 1 V int-regs 2 cc= }
+    } test-branch-folding
+] unit-test
+
+[
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##branch }
+    }
+    0
+] [
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##compare-branch f V int-regs 1 V int-regs 2 cc/= }
+    } test-branch-folding
+] unit-test
+
+[
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##branch }
+    }
+    0
+] [
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##compare-branch f V int-regs 1 V int-regs 2 cc< }
+    } test-branch-folding
+] unit-test
+
+[
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##branch }
+    }
+    1
+] [
+    {
+        T{ ##load-immediate f V int-regs 1 1 }
+        T{ ##load-immediate f V int-regs 2 2 }
+        T{ ##compare-branch f V int-regs 2 V int-regs 1 cc< }
+    } test-branch-folding
+] unit-test
+
