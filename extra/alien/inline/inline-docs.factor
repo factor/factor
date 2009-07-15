@@ -106,8 +106,6 @@ HELP: RAW-C:
 { $syntax "RAW-C:" "body" ";" }
 { $description "Insert a string into the generated source file. Useful for macros and other details not implemented in " { $snippet "alien.inline" } "." } ;
 
-CONSTANT: foo "abc"
-
 HELP: compile-c-library
 { $description "Writes, compiles, and links code generated since last invocation of " { $link POSTPONE: define-c-library } ". "
   "Also calls " { $snippet "add-library" } ". "
@@ -205,6 +203,10 @@ HELP: with-c-library
     { "name" string } { "quot" quotation }
 }
 { $description "Calls " { $link define-c-library } ", then the quotation, then " { $link compile-c-library } ", then sets all variables bound by " { $snippet "define-c-library" } " to " { $snippet "f" } "." } ;
+
+HELP: raw-c
+{ $values { "str" string } }
+{ $description "Insert a string into the generated source file. Useful for macros and other details not implemented in " { $snippet "alien.inline" } "." } ;
 
 ARTICLE: "alien.inline" "Inline C"
 { $vocab-link "alien.inline" }
