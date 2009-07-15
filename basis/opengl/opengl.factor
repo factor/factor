@@ -30,7 +30,7 @@ IN: opengl
         { HEX: 0506 "Invalid framebuffer operation" }
     } at "Unknown error" or ;
 
-TUPLE: gl-error code string ;
+TUPLE: gl-error function code string ;
 
 TUPLE: gl-error-log
     { function word initial: t }
@@ -39,17 +39,20 @@ TUPLE: gl-error-log
 
 gl-error-log [ V{ } clone ] initialize
 
-: <gl-error> ( code -- gl-error )
+: <gl-error> ( function code -- gl-error )
     dup error>string \ gl-error boa ; inline
 
 : <gl-error-log> ( function code -- gl-error-log )
-    <gl-error> now gl-error-log boa ;
+    [ dup ] dip <gl-error> now gl-error-log boa ;
 
 : gl-error-code ( -- code/f )
     glGetError dup 0 = [ drop f ] when ; inline
 
+: (gl-error) ( function -- )
+    gl-error-code [ <gl-error> throw ] [ drop ] if* ;
+
 : gl-error ( -- )
-    gl-error-code [ <gl-error> throw ] [ ] if* ;
+    f (gl-error) ; inline
 
 : log-gl-error ( function -- )
     gl-error-code [ <gl-error-log> gl-error-log get push ] [ drop ] if* ;
@@ -72,7 +75,7 @@ gl-error-log [ V{ } clone ] initialize
     V{ } clone gl-error-log set ;
 
 : throw-gl-errors ( -- )
-    [ drop '[ @ gl-error ] ] annotate-gl-functions ;
+    [ '[ @ _ (gl-error) ] ] annotate-gl-functions ;
 
 : log-gl-errors ( -- )
     [ '[ @ _ log-gl-error ] ] annotate-gl-functions ;
