@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit kernel math
 namespaces sequences fry combinators
+compiler.utilities
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.hats
@@ -18,8 +19,6 @@ IN: compiler.cfg.tco
         [ first ##epilogue? ]
         [ second ##return? ]
     } 1&& ;
-
-: penultimate ( seq -- elt ) [ length 2 - ] keep nth ;
 
 : tail-call? ( bb -- ? )
     {
