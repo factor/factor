@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.inline alien.marshall.syntax destructors
+USING: alien.inline.syntax alien.marshall.syntax destructors
 tools.test accessors kernel ;
 IN: alien.marshall.syntax.tests
 
