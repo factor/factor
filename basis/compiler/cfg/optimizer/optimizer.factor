@@ -6,6 +6,7 @@ compiler.cfg.predecessors
 compiler.cfg.useless-conditionals
 compiler.cfg.stack-analysis
 compiler.cfg.branch-splitting
+compiler.cfg.block-joining
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.dce
@@ -31,6 +32,8 @@ SYMBOL: check-optimizer?
         delete-useless-conditionals
         compute-predecessors
         split-branches
+        join-blocks
+        compute-predecessors
         stack-analysis
         compute-liveness
         alias-analysis
