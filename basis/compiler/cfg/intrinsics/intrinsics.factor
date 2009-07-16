@@ -100,9 +100,9 @@ IN: compiler.cfg.intrinsics
         { \ kernel.private:tag [ drop emit-tag ] }
         { \ kernel.private:getenv [ emit-getenv ] }
         { \ math.private:both-fixnums? [ drop emit-both-fixnums? ] }
-        { \ math.private:fixnum+ [ drop [ ##fixnum-add ] emit-fixnum-overflow-op ] }
-        { \ math.private:fixnum- [ drop [ ##fixnum-sub ] emit-fixnum-overflow-op ] }
-        { \ math.private:fixnum* [ drop [ i i ##fixnum-mul ] emit-fixnum-overflow-op ] }
+        { \ math.private:fixnum+ [ drop emit-fixnum+ ] }
+        { \ math.private:fixnum- [ drop emit-fixnum- ] }
+        { \ math.private:fixnum* [ drop emit-fixnum* ] }
         { \ math.private:fixnum+fast [ drop [ ^^add ] emit-fixnum-op ] }
         { \ math.private:fixnum-fast [ drop [ ^^sub ] emit-fixnum-op ] }
         { \ math.private:fixnum-bitand [ drop [ ^^and ] emit-fixnum-op ] }

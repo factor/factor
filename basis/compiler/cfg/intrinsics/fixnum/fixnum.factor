@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences accessors layouts kernel math namespaces
-combinators fry
+combinators fry arrays
 compiler.tree.propagation.info
 compiler.cfg.hats
 compiler.cfg.stacks
@@ -54,6 +54,28 @@ IN: compiler.cfg.intrinsics.fixnum
 : emit-fixnum>bignum ( -- )
     ds-pop ^^untag-fixnum ^^integer>bignum ds-push ;
 
-: emit-fixnum-overflow-op ( quot -- next )
-    [ 2inputs 1 ##inc-d ] dip call ##branch
-    begin-basic-block ; inline
+: emit-no-overflow-case ( dst -- final-bb )
+    [ -2 ##inc-d ds-push ] with-branch ;
+
+: emit-overflow-case ( word -- final-bb )
+    [ ##call ] with-branch ;
+
+: emit-fixnum-overflow-op ( quot word -- )
+    [ [ D 1 ^^peek D 0 ^^peek ] dip call ] dip
+    [ emit-no-overflow-case ] [ emit-overflow-case ] bi* 2array
+    emit-conditional ; inline
+
+: fixnum+overflow ( x y -- z ) [ >bignum ] bi@ + ;
+
+: fixnum-overflow ( x y -- z ) [ >bignum ] bi@ - ;
+
+: fixnum*overflow ( x y -- z ) [ >bignum ] bi@ * ;
+
+: emit-fixnum+ ( -- )
+    [ ^^fixnum-add ] \ fixnum+overflow emit-fixnum-overflow-op ;
+
+: emit-fixnum- ( -- )
+    [ ^^fixnum-sub ] \ fixnum-overflow emit-fixnum-overflow-op ;
+
+: emit-fixnum* ( -- )
+    [ ^^untag-fixnum ^^fixnum-mul ] \ fixnum*overflow emit-fixnum-overflow-op ;

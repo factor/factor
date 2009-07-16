@@ -51,8 +51,6 @@ M: x86.32 reserved-area-size 0 ;
 
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
-M: x86.32 %alien-invoke-tail 0 JMP rc-relative rel-dlsym ;
-
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
     c-type
     [ return-in-registers?>> ]
