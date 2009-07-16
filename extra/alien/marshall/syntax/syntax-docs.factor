@@ -28,10 +28,8 @@ HELP: CM-FUNCTION:
     ""
     ";C-LIBRARY"
     ""
-    "8 5 0 0 sum_diff .s"
-    "\"sum 13, diff 3\""
-    "13"
-    "3"
+    "8 5 0 0 sum_diff . . ."
+    "3\n13\n\"sum 13, diff 3\""
   }
 }
 { $see-also define-c-marshalled POSTPONE: C-FUNCTION: POSTPONE: M-FUNCTION: } ;
