@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel quotations words
 alien.inline alien.syntax effects alien.marshall
-alien.marshall.structs strings sequences ;
+alien.marshall.structs strings sequences alien.inline.syntax ;
 IN: alien.marshall.syntax
 
 HELP: CM-FUNCTION:
