@@ -98,17 +98,10 @@ M: #recursive emit-node
 
 ! #if
 : emit-branch ( obj -- final-bb )
-    [
-        begin-basic-block
-        emit-nodes
-        basic-block get dup [ ##branch ] when
-    ] with-scope ;
+    [ emit-nodes ] with-branch ;
 
 : emit-if ( node -- )
-    children>> [ emit-branch ] map
-    end-basic-block
-    begin-basic-block
-    basic-block get '[ [ _ swap successors>> push ] when* ] each ;
+    children>> [ emit-branch ] map emit-conditional ;
 
 : ##branch-t ( vreg -- )
     \ f tag-number cc/= ##compare-imm-branch ;
