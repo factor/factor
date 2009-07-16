@@ -8,7 +8,8 @@ compiler.cfg.intrinsics.allot
 compiler.cfg.intrinsics.fixnum
 compiler.cfg.intrinsics.float
 compiler.cfg.intrinsics.slots
-compiler.cfg.intrinsics.misc ;
+compiler.cfg.intrinsics.misc
+compiler.cfg.comparisons ;
 QUALIFIED: kernel
 QUALIFIED: arrays
 QUALIFIED: byte-arrays
@@ -102,20 +103,20 @@ IN: compiler.cfg.intrinsics
         { \ math.private:fixnum+ [ drop [ ##fixnum-add ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum- [ drop [ ##fixnum-sub ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum* [ drop [ i i ##fixnum-mul ] emit-fixnum-overflow-op ] }
-        { \ math.private:fixnum+fast [ [ ^^add ] [ ^^add-imm ] emit-commutative-fixnum-op ] }
-        { \ math.private:fixnum-fast [ [ ^^sub ] [ ^^sub-imm ] emit-fixnum-op ] }
-        { \ math.private:fixnum-bitand [ [ ^^and ] [ ^^and-imm ] emit-commutative-fixnum-op ] }
-        { \ math.private:fixnum-bitor [ [ ^^or ] [ ^^or-imm ] emit-commutative-fixnum-op ] }
-        { \ math.private:fixnum-bitxor [ [ ^^xor ] [ ^^xor-imm ] emit-commutative-fixnum-op ] }
+        { \ math.private:fixnum+fast [ drop [ ^^add ] emit-fixnum-op ] }
+        { \ math.private:fixnum-fast [ drop [ ^^sub ] emit-fixnum-op ] }
+        { \ math.private:fixnum-bitand [ drop [ ^^and ] emit-fixnum-op ] }
+        { \ math.private:fixnum-bitor [ drop [ ^^or ] emit-fixnum-op ] }
+        { \ math.private:fixnum-bitxor [ drop [ ^^xor ] emit-fixnum-op ] }
         { \ math.private:fixnum-shift-fast [ emit-fixnum-shift-fast ] }
         { \ math.private:fixnum-bitnot [ drop emit-fixnum-bitnot ] }
         { \ math.integers.private:fixnum-log2 [ drop emit-fixnum-log2 ] }
-        { \ math.private:fixnum*fast [ emit-fixnum*fast ] }
-        { \ math.private:fixnum< [ cc< emit-fixnum-comparison ] }
-        { \ math.private:fixnum<= [ cc<= emit-fixnum-comparison ] }
-        { \ math.private:fixnum>= [ cc>= emit-fixnum-comparison ] }
-        { \ math.private:fixnum> [ cc> emit-fixnum-comparison ] }
-        { \ kernel:eq? [ emit-eq ] }
+        { \ math.private:fixnum*fast [ drop emit-fixnum*fast ] }
+        { \ math.private:fixnum< [ drop cc< emit-fixnum-comparison ] }
+        { \ math.private:fixnum<= [ drop cc<= emit-fixnum-comparison ] }
+        { \ math.private:fixnum>= [ drop cc>= emit-fixnum-comparison ] }
+        { \ math.private:fixnum> [ drop cc> emit-fixnum-comparison ] }
+        { \ kernel:eq? [ drop cc= emit-fixnum-comparison ] }
         { \ math.private:bignum>fixnum [ drop emit-bignum>fixnum ] }
         { \ math.private:fixnum>bignum [ drop emit-fixnum>bignum ] }
         { \ math.private:float+ [ drop [ ^^add-float ] emit-float-op ] }

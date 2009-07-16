@@ -1,7 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes kernel math namespaces combinators
-compiler.cfg.instructions compiler.cfg.value-numbering.graph ;
+combinators.short-circuit compiler.cfg.instructions
+compiler.cfg.value-numbering.graph ;
 IN: compiler.cfg.value-numbering.expressions
 
 ! Referentially-transparent expressions
@@ -11,15 +12,29 @@ TUPLE: binary-expr < expr in1 in2 ;
 TUPLE: commutative-expr < binary-expr ;
 TUPLE: compare-expr < binary-expr cc ;
 TUPLE: constant-expr < expr value ;
+TUPLE: reference-expr < expr value ;
 
 : <constant> ( constant -- expr )
     f swap constant-expr boa ; inline
 
 M: constant-expr equal?
     over constant-expr? [
-        [ [ value>> ] bi@ = ]
-        [ [ value>> class ] bi@ = ] 2bi
-        and
+        {
+            [ [ value>> class ] bi@ = ]
+            [ [ value>> ] bi@ = ]
+        } 2&&
+    ] [ 2drop f ] if ;
+
+: <reference> ( constant -- expr )
+    f swap reference-expr boa ; inline
+
+M: reference-expr equal?
+    over reference-expr? [
+        [ value>> ] bi@ {
+            { [ 2dup eq? ] [ 2drop t ] }
+            { [ 2dup [ float? ] both? ] [ fp-bitwise= ] }
+            [ 2drop f ]
+        } cond
     ] [ 2drop f ] if ;
 
 ! Expressions whose values are inputs to the basic block. We
@@ -38,6 +53,8 @@ SYMBOL: input-expr-counter
 GENERIC: >expr ( insn -- expr )
 
 M: ##load-immediate >expr val>> <constant> ;
+
+M: ##load-reference >expr obj>> <reference> ;
 
 M: ##unary >expr
     [ class ] [ src>> vreg>vn ] bi unary-expr boa ;

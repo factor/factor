@@ -181,44 +181,6 @@ INSN: ##loop-entry ;
 
 INSN: ##phi < ##pure inputs ;
 
-! Condition codes
-SYMBOL: cc<
-SYMBOL: cc<=
-SYMBOL: cc=
-SYMBOL: cc>
-SYMBOL: cc>=
-SYMBOL: cc/=
-
-: negate-cc ( cc -- cc' )
-    H{
-        { cc< cc>= }
-        { cc<= cc> }
-        { cc> cc<= }
-        { cc>= cc< }
-        { cc= cc/= }
-        { cc/= cc= }
-    } at ;
-
-: swap-cc ( cc -- cc' )
-    H{
-        { cc< cc> }
-        { cc<= cc>= }
-        { cc> cc< }
-        { cc>= cc<= }
-        { cc= cc= }
-        { cc/= cc/= }
-    } at ;
-
-: evaluate-cc ( result cc -- ? )
-    H{
-        { cc<  { +lt+           } }
-        { cc<= { +lt+ +eq+      } }
-        { cc=  {      +eq+      } }
-        { cc>= {      +eq+ +gt+ } }
-        { cc>  {           +gt+ } }
-        { cc/= { +lt+      +gt+ } }
-    } at memq? ;
-
 TUPLE: ##conditional-branch < insn { src1 vreg } { src2 vreg } cc ;
 
 INSN: ##compare-branch < ##conditional-branch ;

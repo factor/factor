@@ -6,14 +6,15 @@ math.parser math.order layouts words sequences sequences.private
 arrays assocs classes classes.algebra combinators generic.math
 splitting fry locals classes.tuple alien.accessors
 classes.tuple.private slots.private definitions strings.private
-vectors hashtables generic
+vectors hashtables generic quotations
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.slots
 compiler.tree.propagation.simple
-compiler.tree.propagation.constraints ;
+compiler.tree.propagation.constraints
+compiler.tree.propagation.call-effect ;
 IN: compiler.tree.propagation.known-words
 
 \ fixnum
@@ -358,4 +359,16 @@ generic-comparison-ops [
         value-info class>> \ equal? specific-method
         [ swap equal? ] f ?
     ] [ drop f ] if
+] "custom-inlining" set-word-prop
+
+: inline-new ( class -- quot/f )
+    dup tuple-class? [
+        dup inlined-dependency depends-on
+        [ all-slots [ initial>> literalize ] map ]
+        [ tuple-layout '[ _ <tuple-boa> ] ]
+        bi append [ drop ] prepend >quotation
+    ] [ drop f ] if ;
+
+\ new [
+    in-d>> first value-info literal>> inline-new
 ] "custom-inlining" set-word-prop
