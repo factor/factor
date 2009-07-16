@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors namespaces assocs sets math
+USING: kernel accessors namespaces assocs sets math deques
 compiler.cfg.registers ;
 IN: compiler.cfg.stack-analysis.state
 
@@ -47,3 +47,7 @@ M: rs-loc translate-loc [ n>> ] [ rs-height>> ] bi* - <rs-loc> ;
 GENERIC# untranslate-loc 1 ( loc state -- loc' )
 M: ds-loc untranslate-loc [ n>> ] [ ds-height>> ] bi* + <ds-loc> ;
 M: rs-loc untranslate-loc [ n>> ] [ rs-height>> ] bi* + <rs-loc> ;
+
+SYMBOL: work-list
+
+: add-to-work-list ( bb -- ) work-list get push-front ;
