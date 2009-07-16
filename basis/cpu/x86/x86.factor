@@ -4,9 +4,14 @@ USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
 kernel kernel.private math memory namespaces make sequences
 words system layouts combinators math.order fry locals
-compiler.constants compiler.cfg.registers
-compiler.cfg.instructions compiler.cfg.intrinsics
-compiler.cfg.stack-frame compiler.codegen compiler.codegen.fixup ;
+compiler.constants
+compiler.cfg.registers
+compiler.cfg.instructions
+compiler.cfg.intrinsics
+compiler.cfg.comparisons
+compiler.cfg.stack-frame
+compiler.codegen
+compiler.codegen.fixup ;
 IN: cpu.x86
 
 << enable-fixnum-log2 >>

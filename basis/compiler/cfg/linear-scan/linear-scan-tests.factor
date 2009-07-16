@@ -12,6 +12,7 @@ compiler.cfg.predecessors
 compiler.cfg.rpo
 compiler.cfg.linearization
 compiler.cfg.debugger
+compiler.cfg.comparisons
 compiler.cfg.linear-scan
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.live-intervals
@@ -1509,6 +1510,7 @@ SYMBOL: linear-scan-result
         compute-liveness
         dup reverse-post-order
         { { int-regs regs } } (linear-scan)
+        cfg-changed
         flatten-cfg 1array mr.
     ] with-scope ;
 
@@ -1803,7 +1805,7 @@ test-diamond
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
-[ _spill ] [ 2 get instructions>> first class ] unit-test
+[ _spill ] [ 2 get successors>> first instructions>> first class ] unit-test
 
 [ _spill ] [ 3 get instructions>> second class ] unit-test
 
@@ -1859,7 +1861,7 @@ V{
 
 [ t ] [ 2 get instructions>> [ _spill? ] any? ] unit-test
 
-[ t ] [ 3 get instructions>> [ _spill? ] any? ] unit-test
+[ t ] [ 3 get predecessors>> first instructions>> [ _spill? ] any? ] unit-test
 
 [ t ] [ 5 get instructions>> [ _reload? ] any? ] unit-test
 
@@ -1926,7 +1928,7 @@ V{
 [ V{ 3 2 1 } ] [ 9 get instructions>> [ _reload? ] filter [ n>> ] map ] unit-test
 
 ! Resolve pass should insert this
-[ _reload ] [ 5 get instructions>> first class ] unit-test
+[ _reload ] [ 5 get predecessors>> first instructions>> first class ] unit-test
 
 ! Some random bug
 V{
@@ -2484,7 +2486,7 @@ test-diamond
 
 [ 1 ] [ 2 get instructions>> [ _spill? ] count ] unit-test
 
-[ 1 ] [ 3 get instructions>> [ _spill? ] count ] unit-test
+[ 1 ] [ 3 get predecessors>> first instructions>> [ _spill? ] count ] unit-test
 
 [ 1 ] [ 4 get instructions>> [ _reload? ] count ] unit-test
 

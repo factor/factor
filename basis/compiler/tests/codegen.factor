@@ -315,3 +315,10 @@ M: cucumber equal? "The cucumber has no equal" throw ;
 ! Regression from Doug's value numbering changes
 [ t ] [ 2 [ 1 swap fixnum< ] compile-call ] unit-test
 [ 3 ] [ 2 [ 1 swap fixnum< [ 3 ] [ 4 ] if ] compile-call ] unit-test
+
+cell 4 = [
+    [ 0 ] [ 101 [ dup fixnum-fast 1 fixnum+fast 20 fixnum-shift-fast 20 fixnum-shift-fast ] compile-call ] unit-test
+] when
+
+! Regression from Slava's value numbering changes
+[ 1 ] [ 31337 [ dup fixnum<= [ 1 ] [ 2 ] if ] compile-call ] unit-test
