@@ -3,6 +3,7 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry kernel locals
 make math sequences
+compiler.cfg.utilities
 compiler.cfg.instructions
 compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.mapping compiler.cfg.liveness ;
@@ -30,42 +31,14 @@ IN: compiler.cfg.linear-scan.resolve
         [ resolve-value-data-flow ] with with each
     ] { } make ;
 
-: fork? ( from to -- ? )
-    {
-        [ drop successors>> length 1 >= ]
-        [ nip predecessors>> length 1 = ]
-    } 2&& ; inline
-
-: insert-position/fork ( from to -- before after )
-    nip instructions>> [ >array ] [ dup delete-all ] bi swap ;
-
-: join? ( from to -- ? )
-    {
-        [ drop successors>> length 1 = ]
-        [ nip predecessors>> length 1 >= ]
-    } 2&& ; inline
-
-: insert-position/join ( from to -- before after )
-    drop instructions>> dup pop 1array ;
-
-: insert-position ( bb to -- before after )
-    {
-        { [ 2dup fork? ] [ insert-position/fork ] }
-        { [ 2dup join? ] [ insert-position/join ] }
-    } cond ;
-
-: 3append-here ( seq2 seq1 seq3 -- )
-    #! Mutate seq1
-    swap '[ _ push-all ] bi@ ;
-
-: perform-mappings ( mappings bb to -- )
-    pick empty? [ 3drop ] [
-        [ mapping-instructions ] 2dip
-        insert-position 3append-here
+: perform-mappings ( bb to mappings -- )
+    dup empty? [ 3drop ] [
+        mapping-instructions <simple-block>
+        insert-basic-block
     ] if ;
 
 : resolve-edge-data-flow ( bb to -- )
-    [ compute-mappings ] [ perform-mappings ] 2bi ;
+    2dup compute-mappings perform-mappings ;
 
 : resolve-block-data-flow ( bb -- )
     dup successors>> [ resolve-edge-data-flow ] with each ;

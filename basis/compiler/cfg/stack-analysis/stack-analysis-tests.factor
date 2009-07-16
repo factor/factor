@@ -91,15 +91,15 @@ IN: compiler.cfg.stack-analysis.tests
 ! Sync before a back-edge, not after
 ! ##peeks should be inserted before a ##loop-entry
 ! Don't optimize out the constants
-[ 1 t ] [
+[ t ] [
     [ 1000 [ ] times ] test-stack-analysis eliminate-dead-code linearize
-    [ [ ##add-imm? ] count ] [ [ ##load-immediate? ] any? ] bi
+    [ ##load-immediate? ] any?
 ] unit-test
 
 ! Correct height tracking
 [ t ] [
     [ pick [ <array> ] [ drop ] if swap ] test-stack-analysis eliminate-dead-code
-    reverse-post-order 3 swap nth
+    reverse-post-order 4 swap nth
     instructions>> [ ##peek? ] filter first2 [ loc>> ] [ loc>> ] bi*
     2array { D 1 D 0 } set=
 ] unit-test
@@ -126,7 +126,7 @@ IN: compiler.cfg.stack-analysis.tests
     stack-analysis
     drop
 
-    3 get instructions>> second loc>>
+    3 get successors>> first instructions>> first loc>>
 ] unit-test
 
 ! Do inserted ##peeks reference the correct stack location if
@@ -156,7 +156,7 @@ IN: compiler.cfg.stack-analysis.tests
     stack-analysis
     drop
 
-    3 get instructions>> [ ##peek? ] find nip loc>>
+    3 get successors>> first instructions>> [ ##peek? ] find nip loc>>
 ] unit-test
 
 ! Missing ##replace
@@ -170,9 +170,9 @@ IN: compiler.cfg.stack-analysis.tests
 ! Inserted ##peeks reference the wrong stack location
 [ t ] [
     [ [ "B" ] 2dip dup [ [ /mod ] dip ] when ] test-stack-analysis
-    eliminate-dead-code reverse-post-order 3 swap nth
+    eliminate-dead-code reverse-post-order 4 swap nth
     instructions>> [ ##peek? ] filter [ loc>> ] map
-    { R 0 D 0 D 1 } set=
+    { D 0 D 1 } set=
 ] unit-test
 
 [ D 0 ] [
@@ -200,5 +200,5 @@ IN: compiler.cfg.stack-analysis.tests
     stack-analysis
     drop
 
-    3 get instructions>> [ ##peek? ] find nip loc>>
+    3 get successors>> first instructions>> [ ##peek? ] find nip loc>>
 ] unit-test
