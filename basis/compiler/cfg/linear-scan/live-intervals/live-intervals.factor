@@ -122,10 +122,10 @@ M: ##copy-float compute-live-intervals*
     dup ranges>> [ first from>> ] [ last to>> ] bi
     [ >>start ] [ >>end ] bi* drop ;
 
-: check-start/end ( live-interval -- )
-    [ [ start>> ] [ uses>> first ] bi assert= ]
-    [ [ end>> ] [ uses>> last ] bi assert= ]
-    bi ;
+ERROR: bad-live-interval live-interval ;
+
+: check-start ( live-interval -- )
+    dup start>> -1 = [ bad-live-interval ] [ drop ] if ;
 
 : finish-live-intervals ( live-intervals -- )
     ! Since live intervals are computed in a backward order, we have
@@ -135,7 +135,7 @@ M: ##copy-float compute-live-intervals*
             [ ranges>> reverse-here ]
             [ uses>> reverse-here ]
             [ compute-start/end ]
-            [ check-start/end ]
+            [ check-start ]
         } cleave
     ] each ;
 
