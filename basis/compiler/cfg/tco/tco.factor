@@ -53,28 +53,11 @@ IN: compiler.cfg.tco
     [ [ cfg get entry>> successors>> first ] dip successors>> push ]
     tri ;
 
-: fixnum-tail-call? ( bb -- ? )
-    instructions>> penultimate
-    { [ ##fixnum-add? ] [ ##fixnum-sub? ] [ ##fixnum-mul? ] } 1|| ;
-
-GENERIC: convert-fixnum-tail-call* ( src1 src2 insn -- insn' )
-
-M: ##fixnum-add convert-fixnum-tail-call* drop \ ##fixnum-add-tail new-insn ;
-M: ##fixnum-sub convert-fixnum-tail-call* drop \ ##fixnum-sub-tail new-insn ;
-M: ##fixnum-mul convert-fixnum-tail-call* drop i i \ ##fixnum-mul-tail new-insn ;
-
-: convert-fixnum-tail-call ( bb -- )
-    [
-        [ src1>> ] [ src2>> ] [ ] tri
-        convert-fixnum-tail-call*
-    ] convert-tail-call ;
-
 : optimize-tail-call ( bb -- )
     dup tail-call? [
         {
             { [ dup loop-tail-call? ] [ convert-loop-tail-call ] }
             { [ dup word-tail-call? ] [ convert-word-tail-call ] }
-            { [ dup fixnum-tail-call? ] [ convert-fixnum-tail-call ] }
             [ drop ]
         } cond
     ] [ drop ] if ;

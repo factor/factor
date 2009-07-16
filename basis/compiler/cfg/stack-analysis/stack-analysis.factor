@@ -61,7 +61,8 @@ UNION: sync-if-back-edge
     ##conditional-branch
     ##compare-imm-branch
     ##dispatch
-    ##loop-entry ;
+    ##loop-entry
+    ##fixnum-overflow ;
 
 : sync-state? ( -- ? )
     basic-block get successors>>

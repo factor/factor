@@ -73,5 +73,7 @@ IN: compiler.cfg.hats
 : ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] when ; inline
 : ^^tag-fixnum ( src -- dst ) ^^i1 ##tag-fixnum ; inline
 : ^^untag-fixnum ( src -- dst ) ^^i1 ##untag-fixnum ; inline
-
+: ^^fixnum-add ( src1 src2 -- dst ) ^^i2 ##fixnum-add ; inline
+: ^^fixnum-sub ( src1 src2 -- dst ) ^^i2 ##fixnum-sub ; inline
+: ^^fixnum-mul ( src1 src2 -- dst ) ^^i2 ##fixnum-mul ; inline
 : ^^phi ( inputs -- dst ) ^^i1 ##phi ; inline
