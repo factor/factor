@@ -22,27 +22,27 @@ SYMBOL: C++
         { [ dup windows? ] [ drop ".dll" ] }
     } cond ;
 
-: library-path ( str -- str' )
-    '[ "lib" % _ % library-suffix % ] "" make temp-file ;
-
-: src-suffix ( lang -- str )
-    {
-        { C [ ".c" ] }
-        { C++ [ ".cpp" ] }
-    } case ;
+: library-path ( str -- path )
+    '[ "lib" % _ % library-suffix % ] "" make inline-library-file ;
 
 HOOK: compiler os ( lang -- str )
 
-M: word compiler ( lang -- str )
+M: word compiler
     {
         { C [ "gcc" ] }
         { C++ [ "g++" ] }
     } case ;
 
-M: openbsd compiler ( lang -- str )
+M: openbsd compiler
     {
         { C [ "gcc" ] }
         { C++ [ "eg++" ] }
+    } case ;
+
+M: windows compiler
+    {
+        { C [ "gcc" ] }
+        { C++ [ "gcc" ] }
     } case ;
 
 HOOK: compiler-descr os ( lang -- descr )
@@ -51,6 +51,8 @@ M: word compiler-descr compiler 1array ;
 M: macosx compiler-descr
     call-next-method cpu x86.64?
     [ { "-arch" "x86_64" } append ] when ;
+M: windows compiler-descr
+    call-next-method { "-x" "c++" } append ;
 
 HOOK: link-descr os ( -- descr )
 
@@ -58,9 +60,18 @@ M: word link-descr { "-shared" "-o" } ;
 M: macosx link-descr
     { "-g" "-prebind" "-dynamiclib" "-o" }
     cpu x86.64? [ { "-arch" "x86_64" } prepend ] when ;
+M: windows link-descr { "-lstdc++" "-mno-cygwin" "-o" } ;
 
-: link-command ( in out lang -- descr )
-    compiler-descr link-descr append prepend prepend ;
+<PRIVATE
+: src-suffix ( lang -- str )
+    {
+        { C [ ".c" ] }
+        { C++ [ ".cpp" ] }
+    } case ;
+
+: link-command ( args in out lang -- descr )
+    [ 2array ] dip compiler-descr link-descr
+    append prepend prepend ;
 
 :: compile-to-object ( lang contents name -- )
     name ".o" append temp-file
@@ -71,8 +82,9 @@ M: macosx link-descr
 
 :: link-object ( lang args name -- )
     args name [ library-path ]
-    [ ".o" append temp-file ] bi 2array
+    [ ".o" append temp-file ] bi
     lang link-command try-process ;
+PRIVATE>
 
 :: compile-to-library ( lang args contents name -- )
     lang contents name compile-to-object

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Jeremy Hughes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.inline alien.inline.private io.directories io.files
+USING: alien.inline alien.inline.syntax io.directories io.files
 kernel namespaces tools.test alien.c-types alien.structs ;
-IN: alien.inline.tests
+IN: alien.inline.syntax.tests
 
 DELETE-C-LIBRARY: test
 C-LIBRARY: test

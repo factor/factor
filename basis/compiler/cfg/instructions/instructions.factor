@@ -223,3 +223,25 @@ INSN: _reload dst class n ;
 INSN: _copy dst src class ;
 INSN: _spill-counts counts ;
 
+! Instructions that poison the stack state
+UNION: poison-insn
+    ##jump
+    ##return
+    ##callback-return
+    ##fixnum-mul-tail
+    ##fixnum-add-tail
+    ##fixnum-sub-tail ;
+
+! Instructions that kill all live vregs
+UNION: kill-vreg-insn
+    poison-insn
+    ##stack-frame
+    ##call
+    ##prologue
+    ##epilogue
+    ##fixnum-mul
+    ##fixnum-add
+    ##fixnum-sub
+    ##alien-invoke
+    ##alien-indirect
+    ##alien-callback ;
