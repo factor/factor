@@ -12,7 +12,7 @@ HELP: CM-FUNCTION:
 }
 { $examples
   { $example
-    "USING: alien.inline alien.marshall.syntax prettyprint ;"
+    "USING: alien.inline.syntax alien.marshall.syntax prettyprint ;"
     "IN: example"
     ""
     "C-LIBRARY: exlib"
