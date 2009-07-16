@@ -9,42 +9,19 @@ splitting strings system vocabs.loader vocabs.parser words
 alien.c-types alien.structs make parser continuations ;
 IN: alien.inline
 
-<PRIVATE
 SYMBOL: c-library
 SYMBOL: library-is-c++
 SYMBOL: linker-args
 SYMBOL: c-strings
 
+<PRIVATE
 : cleanup-variables ( -- )
     { c-library library-is-c++ linker-args c-strings }
     [ off ] each ;
 
-: function-types-effect ( -- function types effect )
-    scan scan swap ")" parse-tokens
-    [ "(" subseq? not ] filter swap parse-arglist ;
-
 : arg-list ( types -- params )
     CHAR: a swap length CHAR: a + [a,b]
     [ 1string ] map ;
-
-: factor-function ( function types effect -- word quot effect )
-    annotate-effect [ c-library get ] 3dip
-    [ [ factorize-type ] map ] dip
-    types-effect>params-return factorize-type -roll
-    concat make-function ;
-
-: prototype-string ( function types effect -- str )
-    [ [ cify-type ] map ] dip
-    types-effect>params-return cify-type -rot
-    [ " " join ] map ", " join
-    "(" prepend ")" append 3array " " join
-    library-is-c++ get [ "extern \"C\" " prepend ] when ;
-
-: prototype-string' ( function types return -- str )
-    [ dup arg-list ] <effect> prototype-string ;
-
-: append-function-body ( prototype-str body -- str )
-    [ swap % " {\n" % % "\n}\n" % ] "" make ;
 
 : compile-library? ( -- ? )
     c-library get library-path dup exists? [
@@ -63,6 +40,29 @@ SYMBOL: c-strings
 : c-library-name ( name -- name' )
     [ current-vocab name>> % "_" % % ] "" make ;
 PRIVATE>
+
+: append-function-body ( prototype-str body -- str )
+    [ swap % " {\n" % % "\n}\n" % ] "" make ;
+
+: function-types-effect ( -- function types effect )
+    scan scan swap ")" parse-tokens
+    [ "(" subseq? not ] filter swap parse-arglist ;
+
+: prototype-string ( function types effect -- str )
+    [ [ cify-type ] map ] dip
+    types-effect>params-return cify-type -rot
+    [ " " join ] map ", " join
+    "(" prepend ")" append 3array " " join
+    library-is-c++ get [ "extern \"C\" " prepend ] when ;
+
+: prototype-string' ( function types return -- str )
+    [ dup arg-list ] <effect> prototype-string ;
+
+: factor-function ( function types effect -- word quot effect )
+    annotate-effect [ c-library get ] 3dip
+    [ [ factorize-type ] map ] dip
+    types-effect>params-return factorize-type -roll
+    concat make-function ;
 
 : define-c-library ( name -- )
     c-library-name c-library set
@@ -122,29 +122,5 @@ PRIVATE>
     [ [ define-c-library ] dip call compile-c-library ]
     [ cleanup-variables ] [ ] cleanup ; inline
 
-SYNTAX: C-LIBRARY: scan define-c-library ;
-
-SYNTAX: COMPILE-AS-C++ t library-is-c++ set ;
-
-SYNTAX: C-LINK: scan c-link-to ;
-
-SYNTAX: C-FRAMEWORK: scan c-use-framework ;
-
-SYNTAX: C-LINK/FRAMEWORK: scan c-link-to/use-framework ;
-
-SYNTAX: C-INCLUDE: scan c-include ;
-
-SYNTAX: C-FUNCTION:
-    function-types-effect parse-here define-c-function ;
-
-SYNTAX: C-TYPEDEF: scan scan define-c-typedef ;
-
-SYNTAX: C-STRUCTURE:
-    scan parse-definition define-c-struct ;
-
-SYNTAX: ;C-LIBRARY compile-c-library ;
-
-SYNTAX: DELETE-C-LIBRARY: scan delete-inline-library ;
-
-SYNTAX: RAW-C:
-    [ "\n" % parse-here % "\n" % c-strings get push ] "" make ;
+: raw-c ( str -- )
+    [ "\n" % % "\n" % ] "" make c-strings get push ;
