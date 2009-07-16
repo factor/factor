@@ -61,20 +61,16 @@ IN: compiler.tree.propagation.transforms
     } case
 ] "custom-inlining" set-word-prop
 
-: prepare-partial-eval ( #call n -- value-infos ? )
-
 ERROR: bad-partial-eval quot word ;
 
 : check-effect ( quot word -- )
     2dup [ infer ] [ stack-effect ] bi* effect<=
     [ 2drop ] [ bad-partial-eval ] if ;
 
-: values ( #call n -- infos )
-    [ in-d>> ] dip tail* [ value-info ] map ;
-
 :: define-partial-eval ( word quot n -- )
     word [
-        n values
+        in-d>> n tail*
+        [ value-info ] map
         dup [ literal?>> ] all? [
             [ literal>> ] map
             n firstn
