@@ -20,7 +20,6 @@ IN: compiler.cfg.block-joining
 
 : join-block? ( bb -- ? )
     {
-        [ kill-vreg-block? not ]
         [ predecessors>> length 1 = ]
         [ predecessor kill-vreg-block? not ]
         [ predecessor successors>> length 1 = ]
