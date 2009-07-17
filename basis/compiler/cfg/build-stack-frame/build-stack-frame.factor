@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors math.order assocs kernel sequences
 combinators make classes words cpu.architecture
@@ -36,12 +36,6 @@ M: insn compute-stack-frame*
     ] when ;
 
 \ _spill t frame-required? set-word-prop
-\ ##fixnum-add t frame-required? set-word-prop
-\ ##fixnum-sub t frame-required? set-word-prop
-\ ##fixnum-mul t frame-required? set-word-prop
-\ ##fixnum-add-tail f frame-required? set-word-prop
-\ ##fixnum-sub-tail f frame-required? set-word-prop
-\ ##fixnum-mul-tail f frame-required? set-word-prop
 
 : compute-stack-frame ( insns -- )
     frame-required? off

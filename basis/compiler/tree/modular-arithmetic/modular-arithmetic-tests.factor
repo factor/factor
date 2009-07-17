@@ -4,12 +4,12 @@ IN: compiler.tree.modular-arithmetic.tests
 USING: kernel kernel.private tools.test math math.partial-dispatch
 math.private accessors slots.private sequences strings sbufs
 compiler.tree.builder
-compiler.tree.optimizer
+compiler.tree.normalization
 compiler.tree.debugger
 alien.accessors layouts combinators byte-arrays ;
 
 : test-modular-arithmetic ( quot -- quot' )
-    build-tree optimize-tree nodes>quot ;
+    cleaned-up-tree nodes>quot ;
 
 [ [ >R >fixnum R> >fixnum fixnum+fast ] ]
 [ [ { integer integer } declare + >fixnum ] test-modular-arithmetic ] unit-test

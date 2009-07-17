@@ -92,6 +92,7 @@ SYMBOL: added-phis
 :: multiple-predecessors ( bb states -- state )
     states [ not ] any? [
         <state>
+        bb add-to-work-list
     ] [
         [
             H{ } clone added-instructions set

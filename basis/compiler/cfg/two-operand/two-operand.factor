@@ -44,6 +44,8 @@ M: ##shl-imm convert-two-operand* convert-two-operand/integer ;
 M: ##shr-imm convert-two-operand* convert-two-operand/integer ;
 M: ##sar-imm convert-two-operand* convert-two-operand/integer ;
 
+M: ##fixnum-overflow convert-two-operand* convert-two-operand/integer ;
+
 M: ##add-float convert-two-operand* convert-two-operand/float ;
 M: ##sub-float convert-two-operand* convert-two-operand/float ;
 M: ##mul-float convert-two-operand* convert-two-operand/float ;
