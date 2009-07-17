@@ -40,8 +40,11 @@ M: ##or convert-two-operand* convert-two-operand/integer ;
 M: ##or-imm convert-two-operand* convert-two-operand/integer ;
 M: ##xor convert-two-operand* convert-two-operand/integer ;
 M: ##xor-imm convert-two-operand* convert-two-operand/integer ;
+M: ##shl convert-two-operand* convert-two-operand/integer ;
 M: ##shl-imm convert-two-operand* convert-two-operand/integer ;
+M: ##shr convert-two-operand* convert-two-operand/integer ;
 M: ##shr-imm convert-two-operand* convert-two-operand/integer ;
+M: ##sar convert-two-operand* convert-two-operand/integer ;
 M: ##sar-imm convert-two-operand* convert-two-operand/integer ;
 
 M: ##fixnum-overflow convert-two-operand* convert-two-operand/integer ;

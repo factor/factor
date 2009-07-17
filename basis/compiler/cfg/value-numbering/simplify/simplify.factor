@@ -109,8 +109,11 @@ M: binary-expr simplify*
         { \ ##or-imm [ simplify-or ] }
         { \ ##xor [ simplify-xor ] }
         { \ ##xor-imm [ simplify-xor ] }
+        { \ ##shr [ simplify-shr ] }
         { \ ##shr-imm [ simplify-shr ] }
+        { \ ##sar [ simplify-shr ] }
         { \ ##sar-imm [ simplify-shr ] }
+        { \ ##shl [ simplify-shl ] }
         { \ ##shl-imm [ simplify-shl ] }
         [ 2drop f ]
     } case ;
