@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences accessors layouts kernel math namespaces
-combinators fry arrays
+USING: sequences accessors layouts kernel math math.intervals
+namespaces combinators fry arrays
 compiler.tree.propagation.info
 compiler.cfg.hats
 compiler.cfg.stacks
@@ -21,20 +21,27 @@ IN: compiler.cfg.intrinsics.fixnum
 : tag-literal ( n -- tagged )
     literal>> [ tag-fixnum ] [ \ f tag-number ] if* ;
 
-: emit-fixnum-op ( insn -- dst )
+: emit-fixnum-op ( insn -- )
     [ 2inputs ] dip call ds-push ; inline
 
+: emit-fixnum-left-shift ( -- )
+    [ ^^untag-fixnum ^^shl ] emit-fixnum-op ;
+
+: emit-fixnum-right-shift ( -- )
+    [ ^^untag-fixnum ^^neg ^^sar dup tag-mask get ^^and-imm ^^xor ] emit-fixnum-op ;
+
+: emit-fixnum-shift-general ( -- )
+    D 0 ^^peek 0 cc> ##compare-imm-branch
+    [ emit-fixnum-left-shift ] with-branch
+    [ emit-fixnum-right-shift ] with-branch
+    2array emit-conditional ;
+
 : emit-fixnum-shift-fast ( node -- )
-    dup node-input-infos dup second value-info-small-fixnum? [
-        nip
-        [ ds-drop ds-pop ] dip
-        second literal>> dup sgn {
-            { -1 [ neg tag-bits get + ^^sar-imm ^^tag-fixnum ] }
-            {  0 [ drop ] }
-            {  1 [ ^^shl-imm ] }
-        } case
-        ds-push
-    ] [ drop emit-primitive ] if ;
+    node-input-infos second interval>> {
+        { [ dup 0 [a,inf] interval-subset? ] [ drop emit-fixnum-left-shift ] }
+        { [ dup 0 [-inf,a] interval-subset? ] [ drop emit-fixnum-right-shift ] }
+        [ drop emit-fixnum-shift-general ]
+    } cond ;
     
 : emit-fixnum-bitnot ( -- )
     ds-pop ^^not tag-mask get ^^xor-imm ds-push ;

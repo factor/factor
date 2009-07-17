@@ -351,6 +351,28 @@ M: x86.64 small-reg-native small-reg-8 ;
         [ quot call ] with-save/restore
     ] if ; inline
 
+: shift-count? ( reg -- ? ) { ECX RCX } memq? ;
+
+:: emit-shift ( dst src1 src2 quot -- )
+    src2 shift-count? [
+        dst CL quot call
+    ] [
+        dst shift-count? [
+            dst src2 XCHG
+            src2 CL quot call
+            dst src2 XCHG
+        ] [
+            ECX small-reg-native [
+                CL src2 MOV
+                drop dst CL quot call
+            ] with-save/restore
+        ] if
+    ] if ; inline
+
+M: x86 %shl [ SHL ] emit-shift ;
+M: x86 %shr [ SHR ] emit-shift ;
+M: x86 %sar [ SAR ] emit-shift ;
+
 M:: x86 %string-nth ( dst src index temp -- )
     "end" define-label
     dst { src index temp } [| new-dst |

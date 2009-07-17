@@ -242,6 +242,11 @@ M: float detect-float ;
     { fixnum-shift-fast } inlined?
 ] unit-test
 
+[ t ] [
+    [ 1 swap 7 bitand shift ]
+    { shift fixnum-shift } inlined?
+] unit-test
+
 cell-bits 32 = [
     [ t ] [
         [ { fixnum fixnum } declare 1 swap 31 bitand shift ]

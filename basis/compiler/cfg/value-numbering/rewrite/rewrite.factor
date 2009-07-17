@@ -348,3 +348,9 @@ M: ##and rewrite* \ ##and-imm rewrite-arithmetic-commutative ;
 M: ##or rewrite* \ ##or-imm rewrite-arithmetic-commutative ;
 
 M: ##xor rewrite* \ ##xor-imm rewrite-arithmetic-commutative ;
+
+M: ##shl rewrite* \ ##shl-imm rewrite-arithmetic ;
+
+M: ##shr rewrite* \ ##shr-imm rewrite-arithmetic ;
+
+M: ##sar rewrite* \ ##sar-imm rewrite-arithmetic ;
