@@ -1,6 +1,6 @@
 USING: accessors assocs compiler.cfg
 compiler.cfg.branch-splitting compiler.cfg.debugger
-compiler.cfg.predecessors compiler.cfg.rpo fry kernel
+compiler.cfg.predecessors compiler.cfg.rpo compiler.cfg.instructions fry kernel
 tools.test namespaces sequences vectors ;
 IN: compiler.cfg.branch-splitting.tests
 
@@ -20,31 +20,31 @@ IN: compiler.cfg.branch-splitting.tests
 : test-branch-splitting ( -- )
     cfg new 0 get >>entry check-branch-splitting ;
 
-V{ } 0 test-bb
+V{ T{ ##branch } } 0 test-bb
 
-V{ } 1 test-bb
+V{ T{ ##branch } } 1 test-bb
 
-V{ } 2 test-bb
+V{ T{ ##branch } } 2 test-bb
 
-V{ } 3 test-bb
+V{ T{ ##branch } } 3 test-bb
 
-V{ } 4 test-bb
+V{ T{ ##branch } } 4 test-bb
 
 test-diamond
 
 [ ] [ test-branch-splitting ] unit-test
 
-V{ } 0 test-bb
+V{ T{ ##branch } } 0 test-bb
 
-V{ } 1 test-bb
+V{ T{ ##branch } } 1 test-bb
 
-V{ } 2 test-bb
+V{ T{ ##branch } } 2 test-bb
 
-V{ } 3 test-bb
+V{ T{ ##branch } } 3 test-bb
 
-V{ } 4 test-bb
+V{ T{ ##branch } } 4 test-bb
 
-V{ } 5 test-bb
+V{ T{ ##branch } } 5 test-bb
 
 0 get 1 get 2 get V{ } 2sequence >>successors drop
 
@@ -54,15 +54,15 @@ V{ } 5 test-bb
 
 [ ] [ test-branch-splitting ] unit-test
 
-V{ } 0 test-bb
+V{ T{ ##branch } } 0 test-bb
 
-V{ } 1 test-bb
+V{ T{ ##branch } } 1 test-bb
 
-V{ } 2 test-bb
+V{ T{ ##branch } } 2 test-bb
 
-V{ } 3 test-bb
+V{ T{ ##branch } } 3 test-bb
 
-V{ } 4 test-bb
+V{ T{ ##branch } } 4 test-bb
 
 0 get 1 get 2 get V{ } 2sequence >>successors drop
 
@@ -72,11 +72,11 @@ V{ } 4 test-bb
 
 [ ] [ test-branch-splitting ] unit-test
 
-V{ } 0 test-bb
+V{ T{ ##branch } } 0 test-bb
 
-V{ } 1 test-bb
+V{ T{ ##branch } } 1 test-bb
 
-V{ } 2 test-bb
+V{ T{ ##branch } } 2 test-bb
 
 0 get 1 get 2 get V{ } 2sequence >>successors drop
 

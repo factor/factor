@@ -136,16 +136,6 @@ M: ##compare-imm fresh-insn-temps
 M: ##compare-float fresh-insn-temps
     [ fresh-vreg ] change-temp drop ;
 
-M: ##fixnum-mul fresh-insn-temps
-    [ fresh-vreg ] change-temp1
-    [ fresh-vreg ] change-temp2
-    drop ;
-
-M: ##fixnum-mul-tail fresh-insn-temps
-    [ fresh-vreg ] change-temp1
-    [ fresh-vreg ] change-temp2
-    drop ;
-
 M: ##gc fresh-insn-temps
     [ fresh-vreg ] change-temp1
     [ fresh-vreg ] change-temp2

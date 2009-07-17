@@ -63,7 +63,9 @@ IN: compiler.cfg.branch-splitting
 UNION: irrelevant ##peek ##replace ##inc-d ##inc-r ;
 
 : split-instructions? ( insns -- ? )
-    [ irrelevant? not ] count 5 <= ;
+    [ [ irrelevant? not ] count 5 <= ]
+    [ last ##fixnum-overflow? not ]
+    bi and ;
 
 : split-branch? ( bb -- ? )
     {
