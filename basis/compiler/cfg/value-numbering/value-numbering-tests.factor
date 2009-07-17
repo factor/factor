@@ -2,7 +2,7 @@ IN: compiler.cfg.value-numbering.tests
 USING: compiler.cfg.value-numbering compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
 cpu.architecture tools.test kernel math combinators.short-circuit
-accessors sequences compiler.cfg.predecessors
+accessors sequences compiler.cfg.predecessors locals
 compiler.cfg.phi-elimination compiler.cfg.dce compiler.cfg.liveness
 compiler.cfg assocs vectors arrays layouts namespaces ;
 
@@ -1218,11 +1218,18 @@ test-diamond
 
 [ t ] [ 1 get successors>> first 3 get eq? ] unit-test
 
-[ T{ ##copy f V int-regs 3 V int-regs 2 } ]
-[ 3 get successors>> first instructions>> first ]
-unit-test
+[let | n! [ f ] |
 
-[ 2 ] [ 4 get instructions>> length ] unit-test
+[ ] [ 2 get successors>> first instructions>> first src>> n>> n! ] unit-test
+
+[ t ] [
+    T{ ##copy f V int-regs n V int-regs 2 }
+    3 get successors>> first instructions>> first =
+] unit-test
+
+]
+
+[ 3 ] [ 4 get instructions>> length ] unit-test
 
 V{
     T{ ##peek f V int-regs 0 D 0 }
