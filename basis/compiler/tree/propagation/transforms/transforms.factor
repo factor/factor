@@ -63,7 +63,7 @@ IN: compiler.tree.propagation.transforms
                 ] if
             ] if
         ]
-    ] [ drop f ] if
+    ] [ f ] if
 ] "custom-inlining" set-word-prop
 
 ! Generate more efficient code for common idiom
