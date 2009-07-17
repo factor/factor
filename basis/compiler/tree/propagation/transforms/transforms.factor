@@ -6,8 +6,7 @@ classes.tuple.private math math.partial-dispatch math.private
 math.intervals layouts math.order vectors hashtables
 combinators effects generalizations assocs sets
 combinators.short-circuit sequences.private locals
-stack-checker
-compiler.tree.propagation.info ;
+stack-checker namespaces compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.transforms
 
 \ equal? [
@@ -43,6 +42,7 @@ IN: compiler.tree.propagation.transforms
     bitand-integer-integer
     bitand-integer-fixnum
     bitand-fixnum-integer
+    bitand
 } [
     [
         in-d>> second value-info >literal< [
@@ -51,6 +51,20 @@ IN: compiler.tree.propagation.transforms
         ] when
     ] "custom-inlining" set-word-prop
 ] each
+
+! Speeds up 2^
+\ shift [
+    in-d>> first value-info literal>> 1 = [
+        cell-bits tag-bits get - 1 -
+        '[
+            >fixnum dup 0 < [ 2drop 0 ] [
+                dup _ < [ fixnum-shift ] [
+                    fixnum-shift
+                ] if
+            ] if
+        ]
+    ] [ drop f ] if
+] "custom-inlining" set-word-prop
 
 ! Generate more efficient code for common idiom
 \ clone [

@@ -27,6 +27,7 @@ IN: compiler.cfg.hats
 : ^^add-imm ( src1 src2 -- dst ) ^^i2 ##add-imm ; inline
 : ^^sub ( src1 src2 -- dst ) ^^i2 ##sub ; inline
 : ^^sub-imm ( src1 src2 -- dst ) ^^i2 ##sub-imm ; inline
+: ^^neg ( src -- dst ) [ 0 ^^load-literal ] dip ^^sub ; inline
 : ^^mul ( src1 src2 -- dst ) ^^i2 ##mul ; inline
 : ^^mul-imm ( src1 src2 -- dst ) ^^i2 ##mul-imm ; inline
 : ^^and ( input mask -- output ) ^^i2 ##and ; inline
@@ -35,8 +36,11 @@ IN: compiler.cfg.hats
 : ^^or-imm ( src1 src2 -- dst ) ^^i2 ##or-imm ; inline
 : ^^xor ( src1 src2 -- dst ) ^^i2 ##xor ; inline
 : ^^xor-imm ( src1 src2 -- dst ) ^^i2 ##xor-imm ; inline
+: ^^shl ( src1 src2 -- dst ) ^^i2 ##shl ; inline
 : ^^shl-imm ( src1 src2 -- dst ) ^^i2 ##shl-imm ; inline
+: ^^shr ( src1 src2 -- dst ) ^^i2 ##shr ; inline
 : ^^shr-imm ( src1 src2 -- dst ) ^^i2 ##shr-imm ; inline
+: ^^sar ( src1 src2 -- dst ) ^^i2 ##sar ; inline
 : ^^sar-imm ( src1 src2 -- dst ) ^^i2 ##sar-imm ; inline
 : ^^not ( src -- dst ) ^^i1 ##not ; inline
 : ^^log2 ( src -- dst ) ^^i1 ##log2 ; inline

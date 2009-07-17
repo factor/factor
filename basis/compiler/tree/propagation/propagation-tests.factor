@@ -84,9 +84,9 @@ IN: compiler.tree.propagation.tests
 
 [ float ] [ [ { float float } declare mod ] final-math-class ] unit-test
 
-[ V{ integer } ] [ [ 255 bitand ] final-classes ] unit-test
+[ V{ fixnum } ] [ [ 255 bitand ] final-classes ] unit-test
 
-[ V{ integer } ] [
+[ V{ fixnum } ] [
     [ [ 255 bitand ] [ 65535 bitand ] bi + ] final-classes
 ] unit-test
 
@@ -639,6 +639,10 @@ MIXIN: empty-mixin
 [ V{ bignum integer } ] [
     [ { bignum integer } declare [ shift ] keep ] final-classes
 ] unit-test
+
+[ V{ fixnum } ] [ [ >fixnum 15 bitand 1 swap shift ] final-classes ] unit-test
+
+[ V{ fixnum } ] [ [ 15 bitand 1 swap shift ] final-classes ] unit-test
 
 [ V{ fixnum } ] [
     [ { fixnum } declare log2 ] final-classes
