@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel vocabs vocabs.loader tools.time vocabs.hierarchy
 arrays assocs io.styles io help.markup prettyprint sequences
-continuations debugger math namespaces memory ;
+continuations debugger math namespaces memory fry ;
 IN: benchmark
 
 <PRIVATE
@@ -12,9 +12,12 @@ SYMBOL: errors
 
 PRIVATE>
 
+: (run-benchmark) ( vocab -- time )
+    [ 5 ] dip '[ gc [ _ run ] benchmark ] replicate infimum ;
+
 : run-benchmark ( vocab -- )
     [ "=== " write print flush ] [
-        [ [ require ] [ gc [ run ] benchmark ] [ ] tri timings ]
+        [ [ require ] [ (run-benchmark) ] [ ] tri timings ]
         [ swap errors ]
         recover get set-at
     ] bi ;
@@ -24,6 +27,7 @@ PRIVATE>
         V{ } clone timings set
         V{ } clone errors set
         "benchmark" child-vocab-names
+        [ find-vocab-root ] filter
         [ run-benchmark ] each
         timings get
         errors get

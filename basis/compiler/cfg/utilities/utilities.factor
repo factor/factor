@@ -36,6 +36,18 @@ IN: compiler.cfg.utilities
 : emit-primitive ( node -- )
     word>> ##call ##branch begin-basic-block ;
 
+: with-branch ( quot -- final-bb )
+    [
+        begin-basic-block
+        call
+        basic-block get dup [ ##branch ] when
+    ] with-scope ; inline
+
+: emit-conditional ( branches -- )
+    end-basic-block
+    begin-basic-block
+    basic-block get '[ [ _ swap successors>> push ] when* ] each ;
+
 : back-edge? ( from to -- ? )
     [ number>> ] bi@ >= ;
 

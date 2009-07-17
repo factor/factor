@@ -18,7 +18,7 @@ HELP: C-FUNCTION:
 { $description "Appends a function to the C library in scope and defines an FFI word that calls it." }
 { $examples
   { $example
-    "USING: alien.inline prettyprint ;"
+    "USING: alien.inline.syntax prettyprint ;"
     "IN: cmath.ffi"
     ""
     "C-LIBRARY: cmathlib"
@@ -44,7 +44,7 @@ HELP: C-LIBRARY:
 { $description "Starts a new C library scope. Other " { $snippet "alien.inline" } " syntax can be used after this word." }
 { $examples
   { $example
-    "USING: alien.inline ;"
+    "USING: alien.inline.syntax ;"
     "IN: rectangle.ffi"
     ""
     "C-LIBRARY: rectlib"

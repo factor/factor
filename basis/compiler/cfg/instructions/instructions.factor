@@ -92,15 +92,6 @@ INSN: ##sar-imm < ##binary-imm ;
 INSN: ##not < ##unary ;
 INSN: ##log2 < ##unary ;
 
-! Overflowing arithmetic
-TUPLE: ##fixnum-overflow < insn src1 src2 ;
-INSN: ##fixnum-add < ##fixnum-overflow ;
-INSN: ##fixnum-add-tail < ##fixnum-overflow ;
-INSN: ##fixnum-sub < ##fixnum-overflow ;
-INSN: ##fixnum-sub-tail < ##fixnum-overflow ;
-INSN: ##fixnum-mul < ##fixnum-overflow temp1 temp2 ;
-INSN: ##fixnum-mul-tail < ##fixnum-overflow temp1 temp2 ;
-
 : ##tag-fixnum ( dst src -- ) tag-bits get ##shl-imm ; inline
 : ##untag-fixnum ( dst src -- ) tag-bits get ##sar-imm ; inline
 
@@ -181,6 +172,7 @@ INSN: ##loop-entry ;
 
 INSN: ##phi < ##pure inputs ;
 
+! Conditionals
 TUPLE: ##conditional-branch < insn { src1 vreg } { src2 vreg } cc ;
 
 INSN: ##compare-branch < ##conditional-branch ;
@@ -191,6 +183,12 @@ INSN: ##compare-imm < ##binary-imm cc temp ;
 
 INSN: ##compare-float-branch < ##conditional-branch ;
 INSN: ##compare-float < ##binary cc temp ;
+
+! Overflowing arithmetic
+TUPLE: ##fixnum-overflow < insn { dst vreg } { src1 vreg } { src2 vreg } ;
+INSN: ##fixnum-add < ##fixnum-overflow ;
+INSN: ##fixnum-sub < ##fixnum-overflow ;
+INSN: ##fixnum-mul < ##fixnum-overflow ;
 
 INSN: ##gc { temp1 vreg } { temp2 vreg } live-values ;
 
@@ -212,6 +210,12 @@ INSN: _compare-imm-branch label { src1 vreg } { src2 integer } cc ;
 
 INSN: _compare-float-branch < _conditional-branch ;
 
+! Overflowing arithmetic
+TUPLE: _fixnum-overflow < insn label { dst vreg } { src1 vreg } { src2 vreg } ;
+INSN: _fixnum-add < _fixnum-overflow ;
+INSN: _fixnum-sub < _fixnum-overflow ;
+INSN: _fixnum-mul < _fixnum-overflow ;
+
 TUPLE: spill-slot n ; C: <spill-slot> spill-slot
 
 INSN: _gc { temp1 vreg } { temp2 vreg } gc-roots gc-root-count gc-root-size ;
@@ -223,3 +227,19 @@ INSN: _reload dst class n ;
 INSN: _copy dst src class ;
 INSN: _spill-counts counts ;
 
+! Instructions that poison the stack state
+UNION: poison-insn
+    ##jump
+    ##return
+    ##callback-return ;
+
+! Instructions that kill all live vregs
+UNION: kill-vreg-insn
+    poison-insn
+    ##stack-frame
+    ##call
+    ##prologue
+    ##epilogue
+    ##alien-invoke
+    ##alien-indirect
+    ##alien-callback ;

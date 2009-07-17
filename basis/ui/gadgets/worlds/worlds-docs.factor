@@ -29,9 +29,6 @@ HELP: set-title
 { $description "Sets the title bar of the native window containing the world." }
 { $notes "This word should not be called directly by user code. Instead, change the " { $snippet "title" } " slot model; see " { $link "models" } "." } ;
 
-HELP: context-world
-{ $var-description "Holds the " { $link world } " whose OpenGL context was most recently made active by " { $link set-gl-context } "." } ;
-
 HELP: set-gl-context
 { $values { "world" world } }
 { $description "Selects an OpenGL context to be the implicit destination for subsequent GL rendering calls. This word is called automatically by the UI before drawing a " { $link world } "." } ;
