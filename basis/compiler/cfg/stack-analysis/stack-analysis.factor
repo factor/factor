@@ -92,13 +92,10 @@ M: poison-insn visit call-next-method poison-state ;
 M: kill-vreg-insn visit sync-state , ;
 
 ! Maps basic-blocks to states
-SYMBOLS: state-in state-out ;
+SYMBOL: state-out
 
 : block-in-state ( bb -- states )
     dup predecessors>> state-out get '[ _ at ] map merge-states ;
-
-: set-block-in-state ( state bb -- )
-    [ clone ] dip state-in get set-at ;
 
 : set-block-out-state ( state bb -- )
     [ clone ] dip state-out get set-at ;
@@ -109,21 +106,18 @@ SYMBOLS: state-in state-out ;
     [
         dup basic-block set
         dup block-in-state
-        [ swap set-block-in-state ] [
-            state [
-                [ instructions>> [ visit ] each ]
-                [ [ state get ] dip set-block-out-state ]
-                [ ]
-                tri
-            ] with-variable
-        ] 2bi
+        state [
+            [ instructions>> [ visit ] each ]
+            [ [ state get ] dip set-block-out-state ]
+            [ ]
+            tri
+        ] with-variable
     ] V{ } make >>instructions drop ;
 
 : stack-analysis ( cfg -- cfg' )
     [
         <hashed-dlist> work-list set
         H{ } clone copies set
-        H{ } clone state-in set
         H{ } clone state-out set
         dup [ visit-block ] each-basic-block
         global-optimization? get [ work-list get [ visit-block ] slurp-deque ] when
