@@ -11,10 +11,6 @@ IN: compiler.cfg.two-operand
 ! since x86 has LEA and IMUL instructions which are effectively
 ! three-operand addition and multiplication, respectively.
 
-: make-copy ( dst src -- insn ) \ ##copy new-insn ; inline
-
-: make-copy/float ( dst src -- insn ) \ ##copy-float new-insn ; inline
-
 : convert-two-operand/integer ( insn -- )
     [ [ dst>> ] [ src1>> ] bi ##copy ]
     [ dup dst>> >>src1 , ]
