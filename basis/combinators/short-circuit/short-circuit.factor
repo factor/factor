@@ -12,10 +12,10 @@ MACRO:: n&& ( quots n -- quot )
     n '[ _ nnip ] suffix 1array
     [ cond ] 3append ;
 
-MACRO: 0&& ( quots -- quot ) '[ _ 0 n&& ] ;
-MACRO: 1&& ( quots -- quot ) '[ _ 1 n&& ] ;
-MACRO: 2&& ( quots -- quot ) '[ _ 2 n&& ] ;
-MACRO: 3&& ( quots -- quot ) '[ _ 3 n&& ] ;
+: 0&& ( quots -- ? ) [ call ] all? ;
+: 1&& ( obj quots -- ? ) [ call ] with all? ;
+: 2&& ( obj quots -- ? ) [ call ] with with all? ;
+: 3&& ( obj quots -- ? ) [ call ] with with with all? ;
 
 MACRO:: n|| ( quots n -- quot )
     [ f ] quots [| q |
@@ -27,7 +27,8 @@ MACRO:: n|| ( quots n -- quot )
     n '[ drop _ ndrop t ] [ f ] 2array suffix 1array
     [ cond ] 3append ;
 
-MACRO: 0|| ( quots -- quot ) '[ _ 0 n|| ] ;
-MACRO: 1|| ( quots -- quot ) '[ _ 1 n|| ] ;
-MACRO: 2|| ( quots -- quot ) '[ _ 2 n|| ] ;
-MACRO: 3|| ( quots -- quot ) '[ _ 3 n|| ] ;
+: 0|| ( quots -- ? ) [ call ] any? ;
+: 1|| ( obj quots -- ? ) [ call ] with any? ;
+: 2|| ( obj quots -- ? ) [ call ] with with any? ;
+: 3|| ( obj quots -- ? ) [ call ] with with with any? ;
+
