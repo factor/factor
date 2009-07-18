@@ -83,6 +83,38 @@ IN: stack-checker.transforms
 
 \ spread t "no-compile" set-word-prop
 
+\ 0&& [ '[ _ 0 n&& ] ] 1 define-transform
+
+\ 0&& t "no-compile" set-word-prop
+
+\ 1&& [ '[ _ 1 n&& ] ] 1 define-transform
+
+\ 1&& t "no-compile" set-word-prop
+
+\ 2&& [ '[ _ 2 n&& ] ] 1 define-transform
+
+\ 2&& t "no-compile" set-word-prop
+
+\ 3&& [ '[ _ 3 n&& ] ] 1 define-transform
+
+\ 3&& t "no-compile" set-word-prop
+
+\ 0|| [ '[ _ 0 n|| ] ] 1 define-transform
+
+\ 0|| t "no-compile" set-word-prop
+
+\ 1|| [ '[ _ 1 n|| ] ] 1 define-transform
+
+\ 1|| t "no-compile" set-word-prop
+
+\ 2|| [ '[ _ 2 n|| ] ] 1 define-transform
+
+\ 2|| t "no-compile" set-word-prop
+
+\ 3|| [ '[ _ 3 n|| ] ] 1 define-transform
+
+\ 3|| t "no-compile" set-word-prop
+
 \ (call-next-method) [
     [
         [ "method-class" word-prop ]
