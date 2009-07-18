@@ -41,8 +41,8 @@ IN: compiler.cfg.intrinsics
     math.private:fixnum<=
     math.private:fixnum>=
     math.private:fixnum>
-    math.private:bignum>fixnum
-    math.private:fixnum>bignum
+    ! math.private:bignum>fixnum
+    ! math.private:fixnum>bignum
     kernel:eq?
     slots.private:slot
     slots.private:set-slot
