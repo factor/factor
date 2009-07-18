@@ -19,7 +19,7 @@ IN: compiler.cfg.linear-scan.assignment
 SYMBOL: pending-intervals
 
 : add-active ( live-interval -- )
-    pending-intervals get push ;
+    dup end>> pending-intervals get heap-push ;
 
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
@@ -37,7 +37,7 @@ SYMBOL: register-live-ins
 SYMBOL: register-live-outs
 
 : init-assignment ( live-intervals -- )
-    V{ } clone pending-intervals set
+    <min-heap> pending-intervals set
     <min-heap> unhandled-intervals set
     H{ } clone register-live-ins set
     H{ } clone register-live-outs set
@@ -61,12 +61,17 @@ SYMBOL: register-live-outs
         register->register
     ] [ drop ] if ;
 
+: (expire-old-intervals) ( n heap -- )
+    dup heap-empty? [ 2drop ] [
+        2dup heap-peek nip <= [ 2drop ] [
+            dup heap-pop drop [ handle-spill ] [ handle-copy ] bi
+            (expire-old-intervals)
+        ] if
+    ] if ;
+
 : expire-old-intervals ( n -- )
     [
-        [ pending-intervals get ] dip '[
-            dup end>> _ <
-            [ [ handle-spill ] [ handle-copy ] bi f ] [ drop t ] if
-        ] filter-here
+        pending-intervals get (expire-old-intervals)
     ] { } make mapping-instructions % ;
 
 : insert-reload ( live-interval -- )
@@ -111,14 +116,12 @@ ERROR: overlapping-registers intervals ;
     dup [ reg>> ] map all-unique? [ drop ] [ overlapping-registers ] if ;
 
 : active-intervals ( n -- intervals )
-    pending-intervals get [ covers? ] with filter
+    pending-intervals get heap-values [ covers? ] with filter
     check-assignment? get [ dup check-assignment ] when ;
 
 M: vreg-insn assign-registers-in-insn
-    dup [ all-vregs ] [ insn#>> active-intervals ] bi
-    '[ _ [ vreg>> = ] with find nip ] map
-    register-mapping
-    >>regs drop ;
+    dup [ all-vregs ] [ insn#>> active-intervals register-mapping ] bi
+    extract-keys >>regs drop ;
 
 M: ##gc assign-registers-in-insn
     ! This works because ##gc is always the first instruction
