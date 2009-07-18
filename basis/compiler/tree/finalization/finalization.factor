@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences words memoize combinators
 classes classes.builtin classes.tuple math.partial-dispatch
@@ -17,22 +17,11 @@ IN: compiler.tree.finalization
 ! propagation since we need to see 'fixnum?' instead of
 ! 'tag 0 eq?' and so on, for semantic reasoning.
 
-! We also delete empty stack shuffles and copies to facilitate
-! tail call optimization in the code generator.
-
 GENERIC: finalize* ( node -- nodes )
 
 : finalize ( nodes -- nodes' ) [ finalize* ] map-nodes ;
 
 : splice-final ( quot -- nodes ) splice-quot finalize ;
-
-M: #copy finalize* drop f ;
-
-M: #shuffle finalize*
-    dup
-    [ [ in-d>> ] [ out-d>> ] [ mapping>> ] tri '[ _ at ] map sequence= ]
-    [ [ in-r>> ] [ out-r>> ] [ mapping>> ] tri '[ _ at ] map sequence= ]
-    bi and [ drop f ] when ;
 
 MEMO: cached-expansion ( word -- nodes )
     def>> splice-final ;

@@ -28,7 +28,6 @@ SYMBOL: check-optimizer?
     ! Note that compute-predecessors has to be called several times.
     ! The passes that need this document it.
     [
-        optimize-tail-calls
         delete-useless-conditionals
         compute-predecessors
         split-branches
@@ -42,5 +41,6 @@ SYMBOL: check-optimizer?
         eliminate-dead-code
         eliminate-write-barriers
         eliminate-phis
+        optimize-tail-calls
         ?check
     ] with-scope ;
