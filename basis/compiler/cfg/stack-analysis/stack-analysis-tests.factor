@@ -99,7 +99,7 @@ IN: compiler.cfg.stack-analysis.tests
 ! Correct height tracking
 [ t ] [
     [ pick [ <array> ] [ drop ] if swap ] test-stack-analysis eliminate-dead-code
-    reverse-post-order 3 swap nth
+    reverse-post-order 4 swap nth
     instructions>> [ ##peek? ] filter first2 [ loc>> ] [ loc>> ] bi*
     2array { D 1 D 0 } set=
 ] unit-test
@@ -170,9 +170,9 @@ IN: compiler.cfg.stack-analysis.tests
 ! Inserted ##peeks reference the wrong stack location
 [ t ] [
     [ [ "B" ] 2dip dup [ [ /mod ] dip ] when ] test-stack-analysis
-    eliminate-dead-code reverse-post-order 3 swap nth
+    eliminate-dead-code reverse-post-order 4 swap nth
     instructions>> [ ##peek? ] filter [ loc>> ] map
-    { R 0 D 0 D 1 } set=
+    { D 0 D 1 } set=
 ] unit-test
 
 [ D 0 ] [
