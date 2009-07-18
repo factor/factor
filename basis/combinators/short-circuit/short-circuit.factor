@@ -12,10 +12,17 @@ MACRO:: n&& ( quots n -- quot )
     n '[ _ nnip ] suffix 1array
     [ cond ] 3append ;
 
-: 0&& ( quots -- ? ) [ call ] all? ;
-: 1&& ( obj quots -- ? ) [ call ] with all? ;
-: 2&& ( obj quots -- ? ) [ call ] with with all? ;
-: 3&& ( obj quots -- ? ) [ call ] with with with all? ;
+<PRIVATE
+
+: unoptimized-&& ( quots quot -- ? )
+    [ [ call dup ] ] dip call [ nip ] prepose [ f ] 2dip all? swap and ; inline
+
+PRIVATE>
+
+: 0&& ( quots -- ? ) [ ] unoptimized-&& ;
+: 1&& ( obj quots -- ? ) [ with ] unoptimized-&& ;
+: 2&& ( obj1 obj2 quots -- ? ) [ with with ] unoptimized-&& ;
+: 3&& ( obj1 obj2 obj3 quots -- ? ) [ with with with ] unoptimized-&& ;
 
 MACRO:: n|| ( quots n -- quot )
     [ f ] quots [| q |
@@ -27,8 +34,14 @@ MACRO:: n|| ( quots n -- quot )
     n '[ drop _ ndrop t ] [ f ] 2array suffix 1array
     [ cond ] 3append ;
 
-: 0|| ( quots -- ? ) [ call ] any? ;
-: 1|| ( obj quots -- ? ) [ call ] with any? ;
-: 2|| ( obj quots -- ? ) [ call ] with with any? ;
-: 3|| ( obj quots -- ? ) [ call ] with with with any? ;
+<PRIVATE
 
+: unoptimized-|| ( quots quot -- ? )
+    [ [ call ] ] dip call map-find drop ; inline
+
+PRIVATE>
+
+: 0|| ( quots -- ? ) [ ] unoptimized-|| ;
+: 1|| ( obj quots -- ? ) [ with ] unoptimized-|| ;
+: 2|| ( obj1 obj2 quots -- ? ) [ with with ] unoptimized-|| ;
+: 3|| ( obj1 obj2 obj3 quots -- ? ) [ with with with ] unoptimized-|| ;
