@@ -1,62 +1,46 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.streams.string quotations
-math ;
+math kernel ;
 IN: combinators.short-circuit
 
 HELP: 0&&
-{ $values
-     { "quots" "a sequence of quotations" }
-     { "quot" quotation } }
-{ $description "Returns true if every quotation in the sequence of quotations returns true." } ;
+{ $values { "quots" "a sequence of quotations with stack effect " { $snippet "( -- )" } } { "?" "the result of the last quotation, or " { $link f } } }
+{ $description "If every quotation in the sequence outputs a true value, outputs the result of the last quotation, otherwise outputs " { $link f } "." } ;
 
 HELP: 0||
-{ $values
-     { "quots" "a sequence of quotations" }
-     { "quot" quotation } }
-{ $description "Returns true if any quotation in the sequence returns true." } ;
+{ $values { "quots" "a sequence of quotations with stack effect " { $snippet "( -- )" } } { "?" "the first true result, or " { $link f } } }
+{ $description "If every quotation in the sequence outputs " { $link f } ", outputs " { $link f } ", otherwise outputs the result of the first quotation that did not yield " { $link f } "." } ;
 
 HELP: 1&&
-{ $values
-     { "quots" "a sequence of quotations" }
-     { "quot" quotation } }
-{ $description "Returns true if every quotation in the sequence of quotations returns true. Each quotation gets the same element from the datastack and must output a boolean." } ;
+{ $values { "obj" object } { "quots" "a sequence of quotations with stack effect " { $snippet "( -- )" } } { "?" "the result of the last quotation, or " { $link f } } }
+{ $description "If every quotation in the sequence outputs a true value, outputs the result of the last quotation, otherwise outputs " { $link f } "." } ;
 
 HELP: 1||
-{ $values
-     { "quots" "a sequence of quotations" }
-     { "quot" quotation } }
+{ $values { "obj" object } { "quots" "a sequence of quotations" } { "?" "the first true result, or " { $link f } } }
 { $description "Returns true if any quotation in the sequence returns true. Each quotation takes the same element from the datastack and must return a boolean." } ;
 
 HELP: 2&&
-{ $values
-     { "quots" "a sequence of quotations" }
-     { "quot" quotation } }
-{ $description "Returns true if every quotation in the sequence of quotations returns true. Each quotation gets the same two elements from the datastack and must output a boolean." } ;
+{ $values { "obj1" object } { "obj2" object } { "quots" "a sequence of quotations with stack effect " { $snippet "( -- )" } } { "?" "the result of the last quotation, or " { $link f } } }
+{ $description "If every quotation in the sequence outputs a true value, outputs the result of the last quotation, otherwise outputs " { $link f } "." } ;
 
 HELP: 2||
-{ $values
-     { "quots" "a sequence of quotations" }
-     { "quot" quotation } }
+{ $values { "obj1" object } { "obj2" object } { "quots" "a sequence of quotations" } { "?" "the first true result, or " { $link f } } }
 { $description "Returns true if any quotation in the sequence returns true. Each quotation takes the same two elements from the datastack and must return a boolean." } ;
 
 HELP: 3&&
-{ $values
-     { "quots" "a sequence of quotations" }
-     { "quot" quotation } }
-{ $description "Returns true if every quotation in the sequence of quotations returns true. Each quotation gets the same three elements from the datastack and must output a boolean." } ;
+{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "quots" "a sequence of quotations with stack effect " { $snippet "( -- )" } } { "?" "the result of the last quotation, or " { $link f } } }
+{ $description "If every quotation in the sequence outputs a true value, outputs the result of the last quotation, otherwise outputs " { $link f } "." } ;
 
 HELP: 3||
-{ $values
-     { "quots" "a sequence of quotations" }
-     { "quot" quotation } }
+{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "quots" "a sequence of quotations" } { "?" "the first true result, or " { $link f } } }
 { $description "Returns true if any quotation in the sequence returns true. Each quotation takes the same three elements from the datastack and must return a boolean." } ;
 
 HELP: n&&
 { $values
-     { "quots" "a sequence of quotations" } { "N" integer }
+     { "quots" "a sequence of quotations" } { "n" integer }
      { "quot" quotation } }
-{ $description "A macro that rewrites the code to pass " { $snippet "n" } " parameters from the stack to each AND quotation." } ;
+{ $description "A macro that rewrites the code to pass " { $snippet "n" } " parameters from the stack to each quotation, evaluating the result in the same manner as " { $link 0&& } "." } ;
 
 HELP: n||
 { $values
