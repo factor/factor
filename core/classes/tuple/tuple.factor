@@ -32,7 +32,7 @@ PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
 M: tuple class layout-of 2 slot { word } declare ;
 
 : tuple-size ( tuple -- size )
-    layout-of second ; inline
+    layout-of 3 slot { fixnum } declare ; inline
 
 : prepare-tuple>array ( tuple -- n tuple layout )
     check-tuple [ tuple-size ] [ ] [ layout-of ] tri ;

@@ -385,7 +385,7 @@ SYMBOL: max-uses
         [
             \ live-interval new
                 swap int-regs swap vreg boa >>vreg
-                max-uses get random 2 max [ not-taken ] replicate natural-sort
+                max-uses get random 2 max [ not-taken 2 * ] replicate natural-sort
                 [ >>uses ] [ first >>start ] bi
                 dup uses>> last >>end
                 dup [ start>> ] [ end>> ] bi <live-range> 1vector >>ranges
