@@ -53,7 +53,7 @@ INSN: ##inc-r { n integer } ;
 
 ! Subroutine calls
 INSN: ##stack-frame stack-frame ;
-INSN: ##call word ;
+INSN: ##call word { height integer } ;
 INSN: ##jump word ;
 INSN: ##return ;
 

@@ -65,7 +65,7 @@ IN: compiler.cfg.intrinsics.fixnum
     [ -2 ##inc-d ds-push ] with-branch ;
 
 : emit-overflow-case ( word -- final-bb )
-    [ ##call ] with-branch ;
+    [ -1 ##call ] with-branch ;
 
 : emit-fixnum-overflow-op ( quot word -- )
     [ [ D 1 ^^peek D 0 ^^peek ] dip call ] dip
