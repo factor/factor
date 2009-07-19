@@ -17,14 +17,14 @@ M: insn ds-height-change drop 0 ;
 
 M: ##inc-d ds-height-change n>> ;
 
-! XXX
-! M: ##call ds-height-change height>> ;
+M: ##call ds-height-change height>> ;
 
-M: ##call ds-height-change drop 0 ;
+: alien-node-height ( node -- )
+    params>> [ out-d>> length ] [ in-d>> length ] bi - ;
 
-M: ##alien-invoke ds-height-change height>> ;
+M: ##alien-invoke ds-height-change alien-node-height ;
 
-M: ##alien-indirect ds-height-change height>> ;
+M: ##alien-indirect ds-height-change alien-node-height ;
 
 GENERIC: rs-height-change ( insn -- n )
 
