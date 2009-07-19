@@ -33,8 +33,11 @@ IN: compiler.cfg.utilities
     building off
     basic-block off ;
 
+: call-height ( #call -- n )
+    [ out-d>> length ] [ in-d>> length ] bi - ;
+
 : emit-primitive ( node -- )
-    word>> ##call ##branch begin-basic-block ;
+    [ word>> ] [ call-height ] bi ##call ##branch begin-basic-block ;
 
 : with-branch ( quot -- final-bb )
     [
