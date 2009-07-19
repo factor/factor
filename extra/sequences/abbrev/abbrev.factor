@@ -6,7 +6,7 @@ IN: sequences.abbrev
 <PRIVATE
 
 : prefixes ( seq -- prefixes )
-    dup length [1,b] [ dupd head ] map nip ;
+    dup length [1,b] [ head ] with map ;
 
 : (abbrev) ( seq -- assoc )
     [ prefixes ] keep 1array '[ _ ] H{ } map>assoc ;
