@@ -23,18 +23,20 @@ compiler.cfg.dcn.rewrite ;
         T{ ##copy f V int-regs 1 V int-regs 0 }
         T{ ##copy f V int-regs 3 V int-regs 2 }
         T{ ##copy f V int-regs 5 V int-regs 4 }
+        T{ ##inc-d f -1 }
     }
 ] [
     V{
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##peek f V int-regs 1 D 0 }
-        T{ ##peek f V int-regs 2 D 1 }
-        T{ ##peek f V int-regs 3 D 1 }
-        T{ ##replace f V int-regs 2 D 1 }
-        T{ ##replace f V int-regs 4 D 2 }
-        T{ ##peek f V int-regs 5 D 2 }
-        T{ ##replace f V int-regs 5 D 2 }
-        T{ ##replace f V int-regs 6 D 0 }
+        T{ ##inc-d f -1 }
+        T{ ##peek f V int-regs 2 D 0 }
+        T{ ##peek f V int-regs 3 D 0 }
+        T{ ##replace f V int-regs 2 D 0 }
+        T{ ##replace f V int-regs 4 D 1 }
+        T{ ##peek f V int-regs 5 D 1 }
+        T{ ##replace f V int-regs 5 D 1 }
+        T{ ##replace f V int-regs 6 D -1 }
     } test-local-dcn
 ] unit-test
 
@@ -79,8 +81,9 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f V int-regs 0 D 0 }
-    T{ ##replace f V int-regs 1 D 1 }
+    T{ ##inc-d f 1 }
+    T{ ##peek f V int-regs 0 D 1 }
+    T{ ##replace f V int-regs 1 D 2 }
 } 1 test-bb
 
 V{
@@ -118,11 +121,35 @@ V{
 } 0 test-bb
 
 V{
+    T{ ##peek f V int-regs 0 D 1 }
+} 1 test-bb
+
+V{
+    T{ ##inc-d f -1 }
+    T{ ##peek f V int-regs 0 D 0 }
+} 2 test-bb
+
+0 get 1 get 1vector >>successors drop
+1 get 2 get 1vector >>successors drop
+
+[ ] [ test-global-dcn ] unit-test
+
+[ t ] [ D 1 2 get peek-in key? ] unit-test
+[ { D 1 } ] [ 0 get 1 get inserting-peeks ] unit-test
+[ { } ] [ 1 get 2 get inserting-peeks ] unit-test
+
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
     T{ ##branch }
 } 1 test-bb
 
 V{
-    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##inc-d f 1 }
+    T{ ##peek f V int-regs 0 D 1 }
     T{ ##branch }
 } 2 test-bb
 
@@ -134,7 +161,8 @@ V{
 V{
     T{ ##peek f V int-regs 1 D 0 }
     T{ ##peek f V int-regs 2 D 1 }
-    T{ ##replace f V int-regs 2 D 0 }
+    T{ ##inc-d f 1 }
+    T{ ##replace f V int-regs 2 D 1 }
     T{ ##branch }
 } 4 test-bb
 
@@ -180,17 +208,19 @@ V{
 
 V{
     T{ ##peek f V int-regs 1 D 1 }
+    T{ ##inc-d f -1 }
     T{ ##branch }
 } 2 test-bb
 
 V{
     T{ ##replace f V int-regs 2 D 1 }
-    T{ ##peek f V int-regs 4 D 2 }
+    T{ ##inc-d f -1 }
+    T{ ##peek f V int-regs 4 D 1 }
     T{ ##branch }
 } 3 test-bb
 
 V{
-    T{ ##replace f V int-regs 3 D 1 }
+    T{ ##replace f V int-regs 3 D 0 }
     T{ ##branch }
 } 4 test-bb
 
@@ -229,16 +259,17 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##peek f V int-regs 0 D 1 }
     T{ ##branch }
 } 1 test-bb
 
 V{
+    T{ ##inc-d f -1 }
     T{ ##branch }
 } 2 test-bb
 
 V{
-    T{ ##call f drop }
+    T{ ##call f drop -1 }
     T{ ##branch }
 } 3 test-bb
 
@@ -257,16 +288,16 @@ V{
 
 [ ] [ test-global-dcn ] unit-test
 
-[ t ] [ D 0 2 get avail-out key? ] unit-test
-[ f ] [ D 0 3 get peek-out key? ] unit-test
-[ f ] [ D 0 3 get avail-out key? ] unit-test
-[ f ] [ D 0 4 get avail-in key? ] unit-test
+[ t ] [ D 1 2 get avail-out key? ] unit-test
+[ f ] [ D 1 3 get peek-out key? ] unit-test
+[ f ] [ D 1 3 get avail-out key? ] unit-test
+[ f ] [ D 1 4 get avail-in key? ] unit-test
 
-[ { D 0 } ] [ 0 get 1 get inserting-peeks ] unit-test
+[ { D 1 } ] [ 0 get 1 get inserting-peeks ] unit-test
 [ { } ] [ 1 get 2 get inserting-peeks ] unit-test
 [ { } ] [ 1 get 3 get inserting-peeks ] unit-test
 [ { } ] [ 2 get 4 get inserting-peeks ] unit-test
-[ { D 0 } ] [ 3 get 4 get inserting-peeks ] unit-test
+[ { D 1 } ] [ 3 get 4 get inserting-peeks ] unit-test
 
 V{
     T{ ##prologue }

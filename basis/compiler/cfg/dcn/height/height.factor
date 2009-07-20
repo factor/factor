@@ -19,7 +19,7 @@ M: ##inc-d ds-height-change n>> ;
 
 M: ##call ds-height-change height>> ;
 
-: alien-node-height ( node -- )
+: alien-node-height ( node -- n )
     params>> [ out-d>> length ] [ in-d>> length ] bi - ;
 
 M: ##alien-invoke ds-height-change alien-node-height ;
@@ -67,13 +67,13 @@ PRIVATE>
 
 GENERIC# translate-in-loc 1 ( loc bb -- loc' )
 
-M: ds-loc translate-in-loc n>> in-ds-heights get at + <ds-loc> ;
-M: rs-loc translate-in-loc n>> in-rs-heights get at + <ds-loc> ;
+M: ds-loc translate-in-loc [ n>> ] [ in-ds-heights get at ] bi* - <ds-loc> ;
+M: rs-loc translate-in-loc [ n>> ] [ in-rs-heights get at ] bi* - <ds-loc> ;
 
 GENERIC# translate-out-loc 1 ( loc bb -- loc' )
 
-M: ds-loc translate-out-loc n>> out-ds-heights get at + <ds-loc> ;
-M: rs-loc translate-out-loc n>> out-rs-heights get at + <ds-loc> ;
+M: ds-loc translate-out-loc [ n>> ] [ out-ds-heights get at ] bi* + <ds-loc> ;
+M: rs-loc translate-out-loc [ n>> ] [ out-rs-heights get at ] bi* + <ds-loc> ;
 
 : translate-in-set ( assoc bb -- assoc' )
     '[ [ _ translate-in-loc ] dip ] assoc-map ;
