@@ -2,6 +2,7 @@ IN: compiler.cfg.dcn.tests
 USING: tools.test kernel accessors namespaces assocs
 cpu.architecture vectors sequences
 compiler.cfg
+compiler.cfg.utilities
 compiler.cfg.debugger
 compiler.cfg.registers
 compiler.cfg.predecessors

@@ -52,7 +52,6 @@ INSN: ##inc-d { n integer } ;
 INSN: ##inc-r { n integer } ;
 
 ! Subroutine calls
-INSN: ##stack-frame stack-frame ;
 INSN: ##call word { height integer } ;
 INSN: ##jump word ;
 INSN: ##return ;
@@ -160,9 +159,9 @@ INSN: ##write-barrier < ##effect card# table ;
 INSN: ##alien-global < ##flushable symbol library ;
 
 ! FFI
-INSN: ##alien-invoke params ;
-INSN: ##alien-indirect params ;
-INSN: ##alien-callback params ;
+INSN: ##alien-invoke params stack-frame ;
+INSN: ##alien-indirect params stack-frame ;
+INSN: ##alien-callback params stack-frame ;
 INSN: ##callback-return params ;
 
 ! Instructions used by CFG IR only.
@@ -230,16 +229,23 @@ INSN: _reload dst class n ;
 INSN: _copy dst src class ;
 INSN: _spill-counts counts ;
 
-! Instructions that poison the stack state
-UNION: poison-insn
-    ##jump
-    ##return
-    ##callback-return ;
+! Instructions that use vregs
+UNION: vreg-insn
+    ##flushable
+    ##write-barrier
+    ##dispatch
+    ##effect
+    ##fixnum-overflow
+    ##conditional-branch
+    ##compare-imm-branch
+    ##phi
+    ##gc
+    _conditional-branch
+    _compare-imm-branch
+    _dispatch ;
 
 ! Instructions that kill all live vregs
 UNION: kill-vreg-insn
-    poison-insn
-    ##stack-frame
     ##call
     ##prologue
     ##epilogue

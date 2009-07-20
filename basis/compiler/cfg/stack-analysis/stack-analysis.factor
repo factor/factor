@@ -26,18 +26,13 @@ SYMBOL: global-optimization?
         [ 2drop ] [ state get untranslate-loc ##replace ] if
     ] each ;
 
-ERROR: poisoned-state state ;
-
 : sync-state ( -- )
     state get {
-        [ dup poisoned?>> [ poisoned-state ] [ drop ] if ]
         [ ds-height>> save-ds-height ]
         [ rs-height>> save-rs-height ]
         [ save-changed-locs ]
         [ clear-state ]
     } cleave ;
-
-: poison-state ( -- ) state get t >>poisoned? drop ;
 
 ! Abstract interpretation
 GENERIC: visit ( insn -- )
@@ -87,7 +82,11 @@ M: ##replace visit
 M: ##copy visit
     [ call-next-method ] [ record-copy ] bi ;
 
-M: poison-insn visit call-next-method poison-state ;
+M: ##jump visit sync-state , ;
+
+M: ##return visit sync-state , ;
+
+M: ##callback-return visit sync-state , ;
 
 M: kill-vreg-insn visit sync-state , ;
 
