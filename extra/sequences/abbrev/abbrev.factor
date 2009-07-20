@@ -12,7 +12,7 @@ IN: sequences.abbrev
     [ prefixes ] keep 1array '[ _ ] H{ } map>assoc ;
 
 : assoc-merge ( assoc1 assoc2 -- assoc3 )
-    swap over '[ over _ at dup [ prepend ] [ drop ] if ] assoc-map assoc-union ;
+    tuck '[ over _ at dup [ prepend ] [ drop ] if ] assoc-map assoc-union ;
 
 PRIVATE>
 
