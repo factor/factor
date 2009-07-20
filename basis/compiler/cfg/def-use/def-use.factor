@@ -9,6 +9,7 @@ GENERIC: uses-vregs ( insn -- seq )
 
 M: ##flushable defs-vregs dst>> 1array ;
 M: ##fixnum-overflow defs-vregs dst>> 1array ;
+M: _fixnum-overflow defs-vregs dst>> 1array ;
 M: insn defs-vregs drop f ;
 
 M: ##write-barrier temp-vregs [ card#>> ] [ table>> ] bi 2array ;
@@ -47,18 +48,3 @@ M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: _dispatch uses-vregs src>> 1array ;
 M: insn uses-vregs drop f ;
-
-! Instructions that use vregs
-UNION: vreg-insn
-##flushable
-##write-barrier
-##dispatch
-##effect
-##fixnum-overflow
-##conditional-branch
-##compare-imm-branch
-##phi
-##gc
-_conditional-branch
-_compare-imm-branch
-_dispatch ;

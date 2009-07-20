@@ -1,12 +1,13 @@
 IN: compiler.cfg.builder.tests
-USING: tools.test kernel sequences
-words sequences.private fry prettyprint alien alien.accessors
-math.private compiler.tree.builder compiler.tree.optimizer
-compiler.cfg.builder compiler.cfg.debugger arrays locals byte-arrays
-kernel.private math ;
+USING: tools.test kernel sequences words sequences.private fry
+prettyprint alien alien.accessors math.private compiler.tree.builder
+compiler.tree.optimizer compiler.cfg.builder compiler.cfg.debugger
+compiler.cfg.predecessors compiler.cfg.checker arrays locals
+byte-arrays kernel.private math slots.private ;
 
 ! Just ensure that various CFGs build correctly.
-: unit-test-cfg ( quot -- ) '[ _ test-cfg drop ] [ ] swap unit-test ;
+: unit-test-cfg ( quot -- )
+    '[ _ test-cfg [ compute-predecessors check-cfg ] each ] [ ] swap unit-test ;
 
 {
     [ ]
@@ -49,6 +50,8 @@ kernel.private math ;
     [ "int" f "malloc" { "int" } alien-invoke ]
     [ "int" { "int" } "cdecl" alien-indirect ]
     [ "int" { "int" } "cdecl" [ ] alien-callback ]
+    [ swap - + * ]
+    [ swap slot ]
 } [
     unit-test-cfg
 ] each

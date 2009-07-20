@@ -63,10 +63,15 @@ GENERIC: emit-node ( node -- )
     basic-block get successors>> push
     basic-block off ;
 
+: emit-trivial-block ( quot -- )
+    basic-block get instructions>> empty? [ ##branch begin-basic-block ] unless
+    call
+    ##branch begin-basic-block ; inline
+
 : emit-call ( word height -- )
     over loops get key?
     [ drop loops get at emit-loop-call ]
-    [ ##call ##branch begin-basic-block ]
+    [ [ ##call ] emit-trivial-block ]
     if ;
 
 ! #recursive
@@ -157,7 +162,7 @@ M: #shuffle emit-node
 
 ! #return
 M: #return emit-node
-    drop ##epilogue ##return ;
+    drop ##branch begin-basic-block ##epilogue ##return ;
 
 M: #return-recursive emit-node
     label>> id>> loops get key?
@@ -181,12 +186,10 @@ M: #terminate emit-node drop ##no-tco basic-block off ;
         [ return>> return-size >>return ]
         [ alien-parameters parameter-sizes drop >>params ] bi ;
 
-: alien-stack-frame ( params -- )
-    <alien-stack-frame> ##stack-frame ;
-
 : emit-alien-node ( node quot -- )
-    [ params>> ] dip [ drop alien-stack-frame ] [ call ] 2bi
-    ##branch begin-basic-block ; inline
+    [
+        [ params>> dup <alien-stack-frame> ] dip call
+    ] emit-trivial-block ; inline
 
 M: #alien-invoke emit-node
     [ ##alien-invoke ] emit-alien-node ;
