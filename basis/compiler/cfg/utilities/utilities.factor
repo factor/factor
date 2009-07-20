@@ -33,11 +33,16 @@ IN: compiler.cfg.utilities
     building off
     basic-block off ;
 
+: emit-trivial-block ( quot -- )
+    basic-block get instructions>> empty? [ ##branch begin-basic-block ] unless
+    call
+    ##branch begin-basic-block ; inline
+
 : call-height ( #call -- n )
     [ out-d>> length ] [ in-d>> length ] bi - ;
 
 : emit-primitive ( node -- )
-    [ word>> ] [ call-height ] bi ##call ##branch begin-basic-block ;
+    [ [ word>> ] [ call-height ] bi ##call ] emit-trivial-block ;
 
 : with-branch ( quot -- final-bb )
     [
