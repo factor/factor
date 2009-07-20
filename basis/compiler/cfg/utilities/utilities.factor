@@ -51,6 +51,12 @@ IN: compiler.cfg.utilities
     begin-basic-block
     basic-block get '[ [ _ swap successors>> push ] when* ] each ;
 
+PREDICATE: kill-block < basic-block
+    instructions>> {
+        [ length 2 = ]
+        [ first kill-vreg-insn? ]
+    } 1&& ;
+
 : back-edge? ( from to -- ? )
     [ number>> ] bi@ >= ;
 

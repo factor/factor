@@ -2,16 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs deques dlists fry kernel namespaces sequences
 combinators combinators.short-circuit compiler.cfg.instructions
-compiler.cfg.dcn.local compiler.cfg.rpo compiler.cfg ;
+compiler.cfg.dcn.local compiler.cfg.rpo compiler.cfg.utilities
+compiler.cfg ;
 IN: compiler.cfg.dcn.global
 
 <PRIVATE
-
-PREDICATE: kill-block < basic-block
-    instructions>> {
-        [ length 2 = ]
-        [ first kill-vreg-insn? ]
-    } 1&& ;
 
 : assoc-refine ( seq -- assoc )
     [ f ] [ [ ] [ assoc-intersect ] map-reduce ] if-empty ;
