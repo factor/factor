@@ -16,13 +16,14 @@ IN: compiler.cfg.dcn.rewrite
         assoc-union assoc-diff
     ] keep untranslate-locs ;
 
+: remove-dead-stores ( assoc -- assoc' )
+    [ drop n>> 0 >= ] assoc-filter ;
+
 : inserting-replaces ( from to -- assoc )
     [
         [ replace-out ] [ [ kill-in ] [ replace-in ] bi ] bi*
         assoc-union assoc-diff
-    ] keep
-    untranslate-locs
-    [ drop n>> 0 >= ] assoc-filter ;
+    ] keep untranslate-locs remove-dead-stores ;
 
 SYMBOL: locs>vregs
 
