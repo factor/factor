@@ -108,13 +108,13 @@ V{
 
 [ f ] [ D 0 0 get avail-out key? ] unit-test
 
-[ { D 0 } ] [ 0 get 1 get inserting-peeks ] unit-test
+[ { D 0 } ] [ 0 get 1 get inserting-peeks keys ] unit-test
 
-[ { } ] [ 1 get 2 get inserting-peeks ] unit-test
+[ { } ] [ 1 get 2 get inserting-peeks keys ] unit-test
 
-[ { } ] [ 0 get 1 get inserting-replaces ] unit-test
+[ { } ] [ 0 get 1 get inserting-replaces keys ] unit-test
 
-[ { D 1 } ] [ 1 get 2 get inserting-replaces ] unit-test
+[ { D 2 } ] [ 1 get 2 get inserting-replaces keys ] unit-test
 
 V{
     T{ ##prologue }
@@ -136,8 +136,8 @@ V{
 [ ] [ test-global-dcn ] unit-test
 
 [ t ] [ D 1 2 get peek-in key? ] unit-test
-[ { D 1 } ] [ 0 get 1 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 2 get inserting-peeks ] unit-test
+[ { D 1 } ] [ 0 get 1 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 2 get inserting-peeks keys ] unit-test
 
 V{
     T{ ##prologue }
@@ -179,16 +179,21 @@ V{
 
 [ ] [ test-global-dcn ] unit-test
 
-[ { D 0 } ] [ 0 get 1 get inserting-peeks ] unit-test
-[ { } ] [ 0 get 1 get inserting-replaces ] unit-test
-[ { } ] [ 1 get 2 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 2 get inserting-replaces ] unit-test
-[ { } ] [ 1 get 3 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 3 get inserting-replaces ] unit-test
-[ { D 1 } ] [ 2 get 4 get inserting-peeks ] unit-test
-[ { } ] [ 2 get 4 get inserting-replaces ] unit-test
-[ { } ] [ 4 get 5 get inserting-peeks ] unit-test
-[ { D 0 } ] [ 4 get 5 get inserting-replaces ] unit-test
+[ f ] [ D 0 1 get avail-out key? ] unit-test
+[ f ] [ D 1 1 get avail-out key? ] unit-test
+[ t ] [ D 0 4 get peek-in key? ] unit-test
+[ t ] [ D 1 4 get peek-in key? ] unit-test
+
+[ { D 0 } ] [ 0 get 1 get inserting-peeks keys ] unit-test
+[ { } ] [ 0 get 1 get inserting-replaces keys ] unit-test
+[ { } ] [ 1 get 2 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 2 get inserting-replaces keys ] unit-test
+[ { } ] [ 1 get 3 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 3 get inserting-replaces keys ] unit-test
+[ { D 1 } ] [ 1 get 4 get inserting-peeks keys ] unit-test
+[ { } ] [ 2 get 4 get inserting-replaces keys ] unit-test
+[ { } ] [ 4 get 5 get inserting-peeks keys ] unit-test
+[ { D 1 } ] [ 4 get 5 get inserting-replaces keys ] unit-test
 
 [ t ] [ D 0 1 get peek-out key? ] unit-test
 [ f ] [ D 1 1 get peek-out key? ] unit-test
@@ -243,16 +248,16 @@ V{
 [ t ] [ D 1 2 get peek-in key? ] unit-test
 [ f ] [ D 1 3 get peek-in key? ] unit-test
 
-[ { D 0 } ] [ 0 get 1 get inserting-peeks ] unit-test
-[ { } ] [ 0 get 1 get inserting-replaces ] unit-test
-[ { D 1 } ] [ 1 get 2 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 2 get inserting-replaces ] unit-test
-[ { D 2 } ] [ 1 get 3 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 3 get inserting-replaces ] unit-test
-[ { } ] [ 3 get 4 get inserting-peeks ] unit-test
-[ { } ] [ 2 get 4 get inserting-replaces ] unit-test
-[ { } ] [ 3 get 4 get inserting-replaces ] unit-test
-[ { D 1 } ] [ 4 get 5 get inserting-replaces ] unit-test
+[ { D 0 } ] [ 0 get 1 get inserting-peeks keys ] unit-test
+[ { } ] [ 0 get 1 get inserting-replaces keys ] unit-test
+[ { D 1 } ] [ 1 get 2 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 2 get inserting-replaces keys ] unit-test
+[ { D 2 } ] [ 1 get 3 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 3 get inserting-replaces keys ] unit-test
+[ { } ] [ 3 get 4 get inserting-peeks keys ] unit-test
+[ { } ] [ 2 get 4 get inserting-replaces keys ] unit-test
+[ { } ] [ 3 get 4 get inserting-replaces keys ] unit-test
+[ { D 0 } ] [ 4 get 5 get inserting-replaces keys ] unit-test
 
 V{
     T{ ##prologue }
@@ -294,11 +299,11 @@ V{
 [ f ] [ D 1 3 get avail-out key? ] unit-test
 [ f ] [ D 1 4 get avail-in key? ] unit-test
 
-[ { D 1 } ] [ 0 get 1 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 2 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 3 get inserting-peeks ] unit-test
-[ { } ] [ 2 get 4 get inserting-peeks ] unit-test
-[ { D 1 } ] [ 3 get 4 get inserting-peeks ] unit-test
+[ { D 1 } ] [ 0 get 1 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 2 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 3 get inserting-peeks keys ] unit-test
+[ { } ] [ 2 get 4 get inserting-peeks keys ] unit-test
+[ { D 0 } ] [ 3 get 4 get inserting-peeks keys ] unit-test
 
 V{
     T{ ##prologue }
@@ -322,10 +327,10 @@ V{ T{ ##branch } } 3 test-bb
 
 [ t ] [ D 0 1 get avail-out key? ] unit-test
 
-[ { D 0 } ] [ 0 get 1 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 2 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 3 get inserting-peeks ] unit-test
-[ { } ] [ 3 get 1 get inserting-peeks ] unit-test
+[ { D 0 } ] [ 0 get 1 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 2 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 3 get inserting-peeks keys ] unit-test
+[ { } ] [ 3 get 1 get inserting-peeks keys ] unit-test
 
 V{
     T{ ##prologue }
@@ -369,13 +374,13 @@ V{
 
 [ ] [ test-global-dcn ] unit-test
 
-[ { } ] [ 0 get 1 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 2 get inserting-peeks ] unit-test
-[ { } ] [ 3 get 4 get inserting-peeks ] unit-test
-[ { D 0 } ] [ 2 get 4 get inserting-peeks ] unit-test
-[ { D 0 } ] [ 1 get 3 get inserting-peeks ] unit-test
-[ { } ] [ 4 get 5 get inserting-peeks ] unit-test
-[ { } ] [ 5 get 6 get inserting-peeks ] unit-test
+[ { } ] [ 0 get 1 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 2 get inserting-peeks keys ] unit-test
+[ { } ] [ 3 get 4 get inserting-peeks keys ] unit-test
+[ { D 0 } ] [ 2 get 4 get inserting-peeks keys ] unit-test
+[ { D 0 } ] [ 1 get 3 get inserting-peeks keys ] unit-test
+[ { } ] [ 4 get 5 get inserting-peeks keys ] unit-test
+[ { } ] [ 5 get 6 get inserting-peeks keys ] unit-test
 
 V{
     T{ ##prologue }
@@ -414,13 +419,87 @@ V{
 
 [ ] [ test-global-dcn ] unit-test
 
-[ { } ] [ 1 get 2 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 2 get inserting-replaces ] unit-test
-[ { D 0 } ] [ 1 get 3 get inserting-peeks ] unit-test
-[ { } ] [ 1 get 3 get inserting-replaces ] unit-test
-[ { } ] [ 2 get 4 get inserting-peeks ] unit-test
-[ { D 0 } ] [ 2 get 4 get inserting-replaces ] unit-test
-[ { } ] [ 3 get 4 get inserting-peeks ] unit-test
-[ { } ] [ 3 get 4 get inserting-replaces ] unit-test
-[ { } ] [ 4 get 5 get inserting-peeks ] unit-test
-[ { } ] [ 4 get 5 get inserting-replaces ] unit-test
+[ { } ] [ 1 get 2 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 2 get inserting-replaces keys ] unit-test
+[ { D 0 } ] [ 1 get 3 get inserting-peeks keys ] unit-test
+[ { } ] [ 1 get 3 get inserting-replaces keys ] unit-test
+[ { } ] [ 2 get 4 get inserting-peeks keys ] unit-test
+[ { D 0 } ] [ 2 get 4 get inserting-replaces keys ] unit-test
+[ { } ] [ 3 get 4 get inserting-peeks keys ] unit-test
+[ { } ] [ 3 get 4 get inserting-replaces keys ] unit-test
+[ { } ] [ 4 get 5 get inserting-peeks keys ] unit-test
+[ { } ] [ 4 get 5 get inserting-replaces keys ] unit-test
+
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##replace f V int-regs 1 D 0 }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##replace f V int-regs 2 D 0 }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##branch }
+} 4 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 5 test-bb
+
+0 get 1 get 1vector >>successors drop
+1 get 2 get 3 get V{ } 2sequence >>successors drop
+2 get 4 get 1vector >>successors drop
+3 get 4 get 1vector >>successors drop
+4 get 5 get 1vector >>successors drop
+
+[ ] [ test-global-dcn ] unit-test
+
+[ { } ] [ 2 get 4 get inserting-replaces keys ] unit-test
+
+[ { } ] [ 3 get 4 get inserting-replaces keys ] unit-test
+
+[ { D 0 } ] [ 4 get 5 get inserting-replaces keys ] unit-test
+
+! Dead replace elimination
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##peek f V int-regs 1 D 1 }
+    T{ ##replace f V int-regs 1 D 0 }
+    T{ ##replace f V int-regs 0 D 1 }
+} 1 test-bb
+
+V{
+    T{ ##inc-d f -2 }
+} 2 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 3 test-bb
+
+0 get 1 get 1vector >>successors drop
+1 get 2 get 1vector >>successors drop
+2 get 3 get 1vector >>successors drop
+
+[ ] [ test-global-dcn ] unit-test
+
+[ { } ] [ 0 get 1 get inserting-replaces keys ] unit-test
+[ { } ] [ 1 get 2 get inserting-replaces keys ] unit-test
+[ { } ] [ 2 get 3 get inserting-replaces keys ] unit-test

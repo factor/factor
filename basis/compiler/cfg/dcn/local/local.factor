@@ -82,8 +82,8 @@ SYMBOLS: peeks replaces ;
 
 : visit-block ( bb -- )
     [ local-analysis ]
-    [ [ reads-locations get ] dip [ translate-in-set ] keep peeks get set-at ]
-    [ [ writes-locations get ] dip [ translate-in-set ] keep replaces get set-at ]
+    [ [ reads-locations get ] dip [ translate-locs ] keep peeks get set-at ]
+    [ [ writes-locations get ] dip [ translate-locs ] keep replaces get set-at ]
     tri ;
 
 PRIVATE>
