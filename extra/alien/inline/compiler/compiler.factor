@@ -42,7 +42,7 @@ M: openbsd compiler
 M: windows compiler
     {
         { C [ "gcc" ] }
-        { C++ [ "gcc" ] }
+        { C++ [ "g++" ] }
     } case ;
 
 HOOK: compiler-descr os ( lang -- descr )
@@ -51,16 +51,18 @@ M: word compiler-descr compiler 1array ;
 M: macosx compiler-descr
     call-next-method cpu x86.64?
     [ { "-arch" "x86_64" } append ] when ;
-M: windows compiler-descr
-    call-next-method { "-x" "c++" } append ;
 
-HOOK: link-descr os ( -- descr )
+HOOK: link-descr os ( lang -- descr )
 
-M: word link-descr { "-shared" "-o" } ;
+M: word link-descr drop { "-shared" "-o" } ;
 M: macosx link-descr
-    { "-g" "-prebind" "-dynamiclib" "-o" }
+    drop { "-g" "-prebind" "-dynamiclib" "-o" }
     cpu x86.64? [ { "-arch" "x86_64" } prepend ] when ;
-M: windows link-descr { "-lstdc++" "-mno-cygwin" "-o" } ;
+M: windows link-descr
+    {
+        { C [ { "-mno-cygwin" "-shared" "-o" } ] }
+        { C++ [ { "-lstdc++" "-mno-cygwin" "-shared" "-o" } ] }
+    } case ;
 
 <PRIVATE
 : src-suffix ( lang -- str )
@@ -70,7 +72,7 @@ M: windows link-descr { "-lstdc++" "-mno-cygwin" "-o" } ;
     } case ;
 
 : link-command ( args in out lang -- descr )
-    [ 2array ] dip compiler-descr link-descr
+    [ 2array ] dip [ compiler 1array ] [ link-descr ] bi
     append prepend prepend ;
 
 :: compile-to-object ( lang contents name -- )
