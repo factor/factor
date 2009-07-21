@@ -43,9 +43,6 @@ SYMBOL: work-list
     [ nip kill-set ]
     2bi assoc-diff ;
 
-: conjoin-at ( value key assoc -- )
-    [ dupd ?set-at ] change-at ;
-
 : compute-phi-live-in ( basic-block -- phi-live-in )
     instructions>> [ ##phi? ] filter [ f ] [
         H{ } clone [
