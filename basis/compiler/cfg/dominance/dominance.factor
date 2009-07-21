@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators sets math compiler.cfg.rpo
-compiler.cfg.stack-analysis fry kernel math.order namespaces
-sequences ;
+USING: accessors assocs combinators sets math fry kernel math.order
+namespaces sequences sorting compiler.cfg.rpo ;
 IN: compiler.cfg.dominance
 
 ! Reference:
@@ -66,7 +65,7 @@ SYMBOL: dom-frontiers
 
 PRIVATE>
 
-: dom-frontier ( bb -- set ) dom-frontiers get at ;
+: dom-frontier ( bb -- set ) dom-frontiers get at keys ;
 
 <PRIVATE
 
