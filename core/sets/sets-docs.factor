@@ -23,6 +23,7 @@ $nl
 "Adding elements to sets:"
 { $subsection adjoin }
 { $subsection conjoin }
+{ $subsection conjoin-at }
 { $see-also member? memq? any? all? "assocs-sets" } ;
 
 ABOUT: "sets"
@@ -53,6 +54,10 @@ HELP: conjoin
     }
 }
 { $side-effects "assoc" } ;
+
+HELP: conjoin-at
+{ $values { "value" object } { "key" object } { "assoc" assoc } }
+{ $description "Adds " { $snippet "value" } " to the set stored at " { $snippet "key" } " of " { $snippet "assoc" } "." } ;
 
 HELP: unique
 { $values { "seq" "a sequence" } { "assoc" assoc } }
