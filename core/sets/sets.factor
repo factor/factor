@@ -7,6 +7,9 @@ IN: sets
 
 : conjoin ( elt assoc -- ) dupd set-at ;
 
+: conjoin-at ( value key assoc -- )
+    [ dupd ?set-at ] change-at ;
+
 : (prune) ( elt hash vec -- )
     3dup drop key? [ 3drop ] [
         [ drop conjoin ] [ nip push ] 3bi
