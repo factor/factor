@@ -66,6 +66,7 @@ HELP: library-suffix
 
 HELP: link-descr
 { $values
+    { "lang" "a language" }
     { "descr" sequence }
 }
 { $description "Returns part of a process description. OS dependent." } ;

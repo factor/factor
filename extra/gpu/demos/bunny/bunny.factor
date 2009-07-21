@@ -1,0 +1,305 @@
+USING: accessors alien.c-types arrays combinators combinators.short-circuit
+game-worlds gpu gpu.buffers gpu.util.wasd gpu.framebuffers gpu.render
+gpu.shaders gpu.state gpu.textures gpu.util grouping http.client images
+images.loader io io.encodings.ascii io.files io.files.temp
+kernel math math.matrices math.parser math.vectors
+method-chains sequences specialized-arrays.direct.float
+specialized-arrays.float specialized-vectors.uint splitting
+struct-vectors threads ui ui.gadgets ui.gadgets.worlds
+ui.pixel-formats ;
+IN: gpu.demos.bunny
+
+GLSL-SHADER-FILE: bunny-vertex-shader vertex-shader "bunny.v.glsl"
+GLSL-SHADER-FILE: bunny-fragment-shader fragment-shader "bunny.f.glsl"
+GLSL-PROGRAM: bunny-program
+    bunny-vertex-shader bunny-fragment-shader ;
+
+GLSL-SHADER-FILE: window-vertex-shader vertex-shader "window.v.glsl"
+
+GLSL-SHADER-FILE: sobel-fragment-shader fragment-shader "sobel.f.glsl"
+GLSL-PROGRAM: sobel-program
+    window-vertex-shader sobel-fragment-shader ;
+
+GLSL-SHADER-FILE: loading-fragment-shader fragment-shader "loading.f.glsl"
+GLSL-PROGRAM: loading-program
+    window-vertex-shader loading-fragment-shader ;
+
+TUPLE: bunny-state
+    vertexes
+    indexes
+    vertex-array
+    index-elements ;
+
+TUPLE: sobel-state
+    vertex-array
+    color-texture
+    normal-texture
+    depth-texture
+    framebuffer ;
+
+TUPLE: loading-state
+    vertex-array
+    texture ;
+
+TUPLE: bunny-world < wasd-world
+    bunny sobel loading ;
+
+VERTEX-FORMAT: bunny-vertex
+    { "vertex" float-components 3 f }
+    { f        float-components 1 f }
+    { "normal" float-components 3 f }
+    { f        float-components 1 f } ;
+VERTEX-STRUCT: bunny-vertex-struct bunny-vertex
+
+UNIFORM-TUPLE: bunny-uniforms < mvp-uniforms
+    { "light_position" float-uniform 3 }
+    { "color"          float-uniform 4 }
+    { "ambient"        float-uniform 4 }
+    { "diffuse"        float-uniform 4 }
+    { "shininess"      float-uniform 1 } ;
+
+UNIFORM-TUPLE: sobel-uniforms
+    { "texcoord_scale" float-uniform   2 }
+    { "color_texture"  texture-uniform 1 }
+    { "normal_texture" texture-uniform 1 }
+    { "depth_texture"  texture-uniform 1 }
+    { "line_color"     float-uniform   4 } ; 
+
+UNIFORM-TUPLE: loading-uniforms
+    { "texcoord_scale"  float-uniform   2 }
+    { "loading_texture" texture-uniform 1 } ;
+
+: numbers ( str -- seq )
+    " " split [ string>number ] map sift ;
+
+: <bunny-vertex> ( vertex -- struct )
+    >float-array
+    "bunny-vertex-struct" <c-object>
+    [ set-bunny-vertex-struct-vertex ] keep ;
+
+: (parse-bunny-model) ( vs is -- vs is )
+    readln [
+        numbers {
+            { [ dup length 5 = ] [ 3 head <bunny-vertex> pick push ] }
+            { [ dup first 3 = ] [ rest over push-all ] }
+            [ drop ]
+        } cond (parse-bunny-model)
+    ] when* ;
+
+: parse-bunny-model ( -- vertexes indexes )
+    100000 "bunny-vertex-struct" <struct-vector>
+    100000 <uint-vector>
+    (parse-bunny-model) ;
+
+: normal ( vertexes -- normal )
+    [ [ second ] [ first ] bi v- ]
+    [ [ third  ] [ first ] bi v- ] bi cross
+    vneg normalize ; inline
+
+: calc-bunny-normal ( vertexes indexes -- )
+    swap
+    [ [ nth bunny-vertex-struct-vertex 3 <direct-float-array> ] curry { } map-as normal ]
+    [
+        [
+            nth [ bunny-vertex-struct-normal 3 <direct-float-array> v+ ] keep
+            set-bunny-vertex-struct-normal
+        ] curry with each
+    ] 2bi ;
+
+: calc-bunny-normals ( vertexes indexes -- )
+    3 <groups>
+    [ calc-bunny-normal ] with each ;
+
+: normalize-bunny-normals ( vertexes -- )
+    [
+        [ bunny-vertex-struct-normal 3 <direct-float-array> normalize ] keep
+        set-bunny-vertex-struct-normal
+    ] each ;
+
+: bunny-data ( filename -- vertexes indexes )
+    ascii [ parse-bunny-model ] with-file-reader
+    [ calc-bunny-normals ]
+    [ drop normalize-bunny-normals ]
+    [ ] 2tri ;
+
+: <bunny-buffers> ( vertexes indexes -- vertex-buffer index-buffer index-count )
+    [ underlying>> static-upload draw-usage vertex-buffer byte-array>buffer ]
+    [
+        [ underlying>> static-upload draw-usage index-buffer  byte-array>buffer ]
+        [ length ] bi
+    ] bi* ;
+
+: bunny-model-path ( -- path ) "bun_zipper.ply" temp-file ;
+
+CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
+
+: download-bunny ( -- path )
+    bunny-model-path dup exists? [
+        bunny-model-url dup print flush
+        over download-to
+    ] unless ;
+
+: get-bunny-data ( bunny-state -- )
+    download-bunny bunny-data
+    [ >>vertexes ] [ >>indexes ] bi* drop ;
+
+: fill-bunny-state ( bunny-state -- )
+    dup [ vertexes>> ] [ indexes>> ] bi <bunny-buffers>
+    [ bunny-program <program-instance> bunny-vertex buffer>vertex-array >>vertex-array ]
+    [ 0 <buffer-ptr> ]
+    [ uint-indexes <index-elements> >>index-elements ] tri*
+    drop ;
+
+: <bunny-state> ( -- bunny-state )
+    bunny-state new
+    dup [ get-bunny-data ] curry "Downloading bunny model" spawn drop ;
+
+: bunny-loaded? ( bunny-state -- ? )
+    { [ vertexes>> ] [ indexes>> ] } 1&& ;
+
+: bunny-state-filled? ( bunny-state -- ? )
+    { [ vertex-array>> ] [ index-elements>> ] } 1&& ;
+
+: <sobel-state> ( window-vertex-buffer -- sobel-state )
+    sobel-state new
+        swap sobel-program <program-instance> window-vertex buffer>vertex-array >>vertex-array
+
+        RGBA half-components T{ texture-parameters
+            { wrap clamp-texcoord-to-edge }
+            { min-filter filter-linear }
+            { min-mipmap-filter f }
+        } <texture-2d> >>color-texture
+        RGBA half-components T{ texture-parameters
+            { wrap clamp-texcoord-to-edge }
+            { min-filter filter-linear }
+            { min-mipmap-filter f }
+        } <texture-2d> >>normal-texture
+        DEPTH u-24-components T{ texture-parameters
+            { wrap clamp-texcoord-to-edge }
+            { min-filter filter-linear }
+            { min-mipmap-filter f }
+        } <texture-2d> >>depth-texture
+
+        dup
+        [
+            [ color-texture>>  0 <texture-2d-attachment> ]
+            [ normal-texture>> 0 <texture-2d-attachment> ] bi 2array
+        ] [ depth-texture>> 0 <texture-2d-attachment> ] bi f { 1024 768 } <framebuffer> >>framebuffer ;
+
+: <loading-state> ( window-vertex-buffer -- loading-state )
+    loading-state new
+        swap
+        loading-program <program-instance> window-vertex buffer>vertex-array >>vertex-array
+
+        RGBA ubyte-components T{ texture-parameters
+            { wrap clamp-texcoord-to-edge }
+            { min-filter filter-linear }
+            { min-mipmap-filter f }
+        } <texture-2d>
+        dup 0 "vocab:gpu/demos/bunny/loading.tiff" load-image allocate-texture-image
+        >>texture ;
+
+BEFORE: bunny-world begin-world
+    init-gpu
+    
+    { -0.2 0.13 0.1 } 1.1 0.2 set-wasd-view
+
+    <bunny-state> >>bunny
+    <window-vertex-buffer>
+    [ <sobel-state> >>sobel ]
+    [ <loading-state> >>loading ] bi
+    drop ;
+
+: <bunny-uniforms> ( world -- uniforms )
+    [ wasd-mv-matrix ] [ wasd-p-matrix ] bi
+    { -10000.0 10000.0 10000.0 } ! light position
+    { 0.6 0.5 0.5 1.0 } ! color
+    { 0.2 0.2 0.2 0.2 } ! ambient
+    { 0.8 0.8 0.8 0.8 } ! diffuse
+    100.0 ! shininess
+    bunny-uniforms boa ;
+
+: draw-bunny ( world -- )
+    T{ depth-state { comparison cmp-less } } set-gpu-state*
+    
+    [
+        sobel>> framebuffer>> {
+            { T{ color-attachment f 0 } { 0.15 0.15 0.15 1.0 } }
+            { T{ color-attachment f 1 } { 0.0 0.0 0.0 0.0 } }
+            { depth-attachment 1.0 }
+        } clear-framebuffer
+    ] [
+        render-set new
+            triangles-mode >>primitive-mode
+            { T{ color-attachment f 0 } T{ color-attachment f 1 } } >>output-attachments
+            swap {
+                [ <bunny-uniforms> >>uniforms ]
+                [ bunny>> vertex-array>> >>vertex-array ]
+                [ bunny>> index-elements>> >>indexes ]
+                [ sobel>> framebuffer>> >>framebuffer ]
+            } cleave
+        render
+    ] bi ;
+
+: <sobel-uniforms> ( sobel -- uniforms )
+    { 1.0 1.0 } swap
+    [ color-texture>> ] [ normal-texture>> ] [ depth-texture>> ] tri
+    { 0.1 0.0 0.1 1.0 } ! line_color
+    sobel-uniforms boa ;
+
+: draw-sobel ( world -- )
+    T{ depth-state { comparison f } } set-gpu-state*
+
+    render-set new
+        triangle-strip-mode >>primitive-mode
+        T{ index-range f 0 4 } >>indexes
+        swap sobel>>
+        [ <sobel-uniforms> >>uniforms ]
+        [ vertex-array>> >>vertex-array ] bi
+    render ;
+
+: draw-sobeled-bunny ( world -- )
+    [ draw-bunny ] [ draw-sobel ] bi ;
+
+: draw-loading ( world -- )
+    T{ depth-state { comparison f } } set-gpu-state*
+
+    render-set new
+        triangle-strip-mode >>primitive-mode
+        T{ index-range f 0 4 } >>indexes
+        swap loading>>
+        [ { 1.0 -1.0 } swap texture>> loading-uniforms boa >>uniforms ]
+        [ vertex-array>> >>vertex-array ] bi
+    render ;
+
+M: bunny-world draw-world*
+    dup bunny>>
+    dup bunny-loaded? [
+        dup bunny-state-filled? [ drop ] [ fill-bunny-state ] if
+        draw-sobeled-bunny
+    ] [ drop draw-loading ] if ;
+
+AFTER: bunny-world resize-world
+    [ sobel>> framebuffer>> ] [ dim>> ] bi resize-framebuffer ;
+
+M: bunny-world pref-dim* drop { 1024 768 } ;
+M: bunny-world tick-length drop 1000 30 /i ;
+M: bunny-world wasd-movement-speed drop 1/160. ;
+M: bunny-world wasd-near-plane drop 1/32. ;
+M: bunny-world wasd-far-plane drop 256.0 ;
+
+: bunny-window ( -- )
+    [
+        f T{ world-attributes
+            { world-class bunny-world }
+            { title "Bunny" }
+            { pixel-format-attributes {
+                windowed
+                double-buffered
+                T{ depth-bits { value 24 } }
+            } }
+            { grab-input? t }
+        } open-window
+    ] with-ui ;
+
+MAIN: bunny-window
