@@ -53,6 +53,16 @@ M: ##inc-r rs-height-change n>> ;
 : compute-rs-height ( bb -- )
     in-rs-heights out-rs-heights [ rs-height-change ] compute-height ;
 
+GENERIC# translate-loc 1 ( loc bb -- loc' )
+
+M: ds-loc translate-loc [ n>> ] [ in-ds-heights get at ] bi* - <ds-loc> ;
+M: rs-loc translate-loc [ n>> ] [ in-rs-heights get at ] bi* - <ds-loc> ;
+
+GENERIC# untranslate-loc 1 ( loc bb -- loc' )
+
+M: ds-loc untranslate-loc [ n>> ] [ in-ds-heights get at ] bi* + <ds-loc> ;
+M: rs-loc untranslate-loc [ n>> ] [ in-rs-heights get at ] bi* + <ds-loc> ;
+
 PRIVATE>
 
 : compute-heights ( cfg -- )
@@ -65,18 +75,8 @@ PRIVATE>
         [ compute-ds-height ] bi
     ] each-basic-block ;
 
-GENERIC# translate-in-loc 1 ( loc bb -- loc' )
+: translate-locs ( assoc bb -- assoc' )
+    '[ [ _ translate-loc ] dip ] assoc-map ;
 
-M: ds-loc translate-in-loc [ n>> ] [ in-ds-heights get at ] bi* - <ds-loc> ;
-M: rs-loc translate-in-loc [ n>> ] [ in-rs-heights get at ] bi* - <ds-loc> ;
-
-GENERIC# translate-out-loc 1 ( loc bb -- loc' )
-
-M: ds-loc translate-out-loc [ n>> ] [ out-ds-heights get at ] bi* + <ds-loc> ;
-M: rs-loc translate-out-loc [ n>> ] [ out-rs-heights get at ] bi* + <ds-loc> ;
-
-: translate-in-set ( assoc bb -- assoc' )
-    '[ [ _ translate-in-loc ] dip ] assoc-map ;
-
-: translate-out-set ( assoc bb -- assoc' )
-    '[ [ _ translate-out-loc ] dip ] assoc-map ;
+: untranslate-locs ( assoc bb -- assoc' )
+    '[ [ _ untranslate-loc ] dip ] assoc-map ;

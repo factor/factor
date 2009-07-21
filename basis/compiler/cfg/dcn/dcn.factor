@@ -1,6 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ;
+USING: combinators
+compiler.cfg
+compiler.cfg.dcn.height
+compiler.cfg.dcn.local
+compiler.cfg.dcn.global
+compiler.cfg.dcn.rewrite ;
 IN: compiler.cfg.dcn
 
 ! "DeConcatenatizatioN" -- dataflow analysis to recover registers
@@ -28,3 +33,12 @@ IN: compiler.cfg.dcn
 ! P_in(b) - (P_out(pred) \/ A_out(pred))
 
 ! Locations are height-normalized.
+
+: deconcatenatize ( cfg -- cfg' )
+    {
+        [ compute-heights ]
+        [ compute-local-sets ]
+        [ compute-global-sets ]
+        [ rewrite ]
+        [ cfg-changed ]
+    } cleave ;
