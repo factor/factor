@@ -12,7 +12,7 @@ specialized-arrays.short specialized-arrays.uchar
 specialized-arrays.uint specialized-arrays.ulong
 specialized-arrays.ulonglong specialized-arrays.ushort strings
 unix.utilities vocabs.parser words libc.private struct-arrays
-locals generalizations ;
+locals generalizations math ;
 IN: alien.marshall
 
 << primitive-types [ [ "void*" = ] [ "bool" = ] bi or not ]
@@ -20,6 +20,7 @@ filter [ define-primitive-marshallers ] each >>
 
 TUPLE: alien-wrapper { underlying alien } ;
 TUPLE: struct-wrapper < alien-wrapper disposed ;
+TUPLE: class-wrapper < alien-wrapper disposed ;
 
 GENERIC: unmarshall-cast ( alien-wrapper -- alien-wrapper' )
 
@@ -27,6 +28,8 @@ M: alien-wrapper unmarshall-cast ;
 M: struct-wrapper unmarshall-cast ;
 
 M: struct-wrapper dispose* underlying>> free ;
+
+M: class-wrapper c++-type class name>> parse-c++-type ;
 
 : marshall-pointer ( obj -- alien )
     {
@@ -288,16 +291,8 @@ ALIAS: marshall-void* marshall-pointer
     [ ]
     x-unmarshaller ;
 
-: template-class-unmarshaller ( type -- quot/f )
-    [ parse-c++-type [ name>> ] keep swap ] [ \ template-wrapper = ]
-    [ '[ _ _ new swap >>type swap >>underlying unmarshall-cast ] ]
-    [ drop ]
-    x-unmarshaller ;
-
 : non-primitive-unmarshaller ( type -- quot/f )
     {
-        { [ dup template-class? ]
-          [ template-class-unmarshaller ] }
         { [ dup pointer? ] [ class-unmarshaller ] }
         [ struct-unmarshaller ]
     } cond ;
