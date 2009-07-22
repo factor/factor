@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel namespaces math sequences fry grouping
-sets make combinators
+sets make combinators dlists deques
 compiler.cfg
 compiler.cfg.copy-prop
 compiler.cfg.def-use
@@ -10,8 +10,11 @@ compiler.cfg.registers
 compiler.cfg.rpo
 compiler.cfg.hats
 compiler.cfg.stack-analysis.state
-compiler.cfg.stack-analysis.merge ;
+compiler.cfg.stack-analysis.merge
+compiler.cfg.utilities ;
 IN: compiler.cfg.stack-analysis
+
+SYMBOL: global-optimization?
 
 : redundant-replace? ( vreg loc -- ? )
     dup state get untranslate-loc n>> 0 <
@@ -58,17 +61,16 @@ UNION: sync-if-back-edge
     ##conditional-branch
     ##compare-imm-branch
     ##dispatch
-    ##loop-entry ;
-
-: back-edge? ( from to -- ? )
-    [ number>> ] bi@ > ;
+    ##loop-entry
+    ##fixnum-overflow ;
 
 : sync-state? ( -- ? )
     basic-block get successors>>
     [ [ predecessors>> ] keep '[ _ back-edge? ] any? ] any? ;
 
 M: sync-if-back-edge visit
-    sync-state? [ sync-state ] when , ;
+    global-optimization? get [ sync-state? [ sync-state ] when ] unless
+    , ;
 
 : eliminate-peek ( dst src -- )
     ! the requested stack location is already in 'src'
@@ -85,41 +87,15 @@ M: ##replace visit
 M: ##copy visit
     [ call-next-method ] [ record-copy ] bi ;
 
-! Instructions that poison the stack state
-UNION: poison-insn
-    ##jump
-    ##return
-    ##callback-return
-    ##fixnum-mul-tail
-    ##fixnum-add-tail
-    ##fixnum-sub-tail ;
-
 M: poison-insn visit call-next-method poison-state ;
-
-! Instructions that kill all live vregs
-UNION: kill-vreg-insn
-    poison-insn
-    ##stack-frame
-    ##call
-    ##prologue
-    ##epilogue
-    ##fixnum-mul
-    ##fixnum-add
-    ##fixnum-sub
-    ##alien-invoke
-    ##alien-indirect
-    ##alien-callback ;
 
 M: kill-vreg-insn visit sync-state , ;
 
 ! Maps basic-blocks to states
-SYMBOLS: state-in state-out ;
+SYMBOL: state-out
 
 : block-in-state ( bb -- states )
     dup predecessors>> state-out get '[ _ at ] map merge-states ;
-
-: set-block-in-state ( state bb -- )
-    [ clone ] dip state-in get set-at ;
 
 : set-block-out-state ( state bb -- )
     [ clone ] dip state-out get set-at ;
@@ -130,20 +106,20 @@ SYMBOLS: state-in state-out ;
     [
         dup basic-block set
         dup block-in-state
-        [ swap set-block-in-state ] [
-            state [
-                [ instructions>> [ visit ] each ]
-                [ [ state get ] dip set-block-out-state ]
-                [ ]
-                tri
-            ] with-variable
-        ] 2bi
+        state [
+            [ instructions>> [ visit ] each ]
+            [ [ state get ] dip set-block-out-state ]
+            [ ]
+            tri
+        ] with-variable
     ] V{ } make >>instructions drop ;
 
 : stack-analysis ( cfg -- cfg' )
     [
+        <hashed-dlist> work-list set
         H{ } clone copies set
-        H{ } clone state-in set
         H{ } clone state-out set
         dup [ visit-block ] each-basic-block
+        global-optimization? get [ work-list get [ visit-block ] slurp-deque ] when
+        cfg-changed
     ] with-scope ;

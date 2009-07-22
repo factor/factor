@@ -42,9 +42,13 @@ M: bit-array set-nth-unsafe
     [ byte/bit set-bit ] 2keep
     swap n>byte set-alien-unsigned-1 ;
 
-: clear-bits ( bit-array -- ) 0 (set-bits) ;
+GENERIC: clear-bits ( bit-array -- )
 
-: set-bits ( bit-array -- ) -1 (set-bits) ;
+M: bit-array clear-bits 0 (set-bits) ;
+
+GENERIC: set-bits ( bit-array -- )
+
+M: bit-array set-bits -1 (set-bits) ;
 
 M: bit-array clone
     [ length>> ] [ underlying>> clone ] bi bit-array boa ;

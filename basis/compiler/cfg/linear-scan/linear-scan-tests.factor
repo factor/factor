@@ -12,6 +12,7 @@ compiler.cfg.predecessors
 compiler.cfg.rpo
 compiler.cfg.linearization
 compiler.cfg.debugger
+compiler.cfg.comparisons
 compiler.cfg.linear-scan
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.live-intervals
@@ -82,9 +83,9 @@ check-numbering? on
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
        { start 0 }
-       { end 1 }
+       { end 2 }
        { uses V{ 0 1 } }
-       { ranges V{ T{ live-range f 0 1 } } }
+       { ranges V{ T{ live-range f 0 2 } } }
     }
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
@@ -107,9 +108,9 @@ check-numbering? on
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
        { start 0 }
-       { end 0 }
+       { end 1 }
        { uses V{ 0 } }
-       { ranges V{ T{ live-range f 0 0 } } }
+       { ranges V{ T{ live-range f 0 1 } } }
     }
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
@@ -132,9 +133,9 @@ check-numbering? on
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
        { start 0 }
-       { end 0 }
+       { end 1 }
        { uses V{ 0 } }
-       { ranges V{ T{ live-range f 0 0 } } }
+       { ranges V{ T{ live-range f 0 1 } } }
     }
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
@@ -384,7 +385,7 @@ SYMBOL: max-uses
         [
             \ live-interval new
                 swap int-regs swap vreg boa >>vreg
-                max-uses get random 2 max [ not-taken ] replicate natural-sort
+                max-uses get random 2 max [ not-taken 2 * ] replicate natural-sort
                 [ >>uses ] [ first >>start ] bi
                 dup uses>> last >>end
                 dup [ start>> ] [ end>> ] bi <live-range> 1vector >>ranges
@@ -1317,38 +1318,6 @@ USING: math.private ;
     allocate-registers drop
 ] unit-test
 
-! Spill slot liveness was computed incorrectly, leading to a FEP
-! early in bootstrap on x86-32
-[ t ] [
-    [
-        H{ } clone live-ins set
-        H{ } clone live-outs set
-        H{ } clone phi-live-ins set
-        T{ basic-block
-           { id 12345 }
-           { instructions
-             V{
-                 T{ ##gc f V int-regs 6 V int-regs 7 }
-                 T{ ##peek f V int-regs 0 D 0 }
-                 T{ ##peek f V int-regs 1 D 1 }
-                 T{ ##peek f V int-regs 2 D 2 }
-                 T{ ##peek f V int-regs 3 D 3 }
-                 T{ ##peek f V int-regs 4 D 4 }
-                 T{ ##peek f V int-regs 5 D 5 }
-                 T{ ##replace f V int-regs 0 D 1 }
-                 T{ ##replace f V int-regs 1 D 2 }
-                 T{ ##replace f V int-regs 2 D 3 }
-                 T{ ##replace f V int-regs 3 D 4 }
-                 T{ ##replace f V int-regs 4 D 5 }
-                 T{ ##replace f V int-regs 5 D 0 }
-             }
-           }
-        } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
-        instructions>> first
-        live-values>> assoc-empty?
-    ] with-scope
-] unit-test
-
 [ f ] [
     T{ live-range f 0 10 }
     T{ live-range f 20 30 }
@@ -1541,6 +1510,7 @@ SYMBOL: linear-scan-result
         compute-liveness
         dup reverse-post-order
         { { int-regs regs } } (linear-scan)
+        cfg-changed
         flatten-cfg 1array mr.
     ] with-scope ;
 
@@ -1802,7 +1772,8 @@ test-diamond
     2 get instructions>> first regs>> V int-regs 1 swap at assert=
 ] unit-test
 
-[ _copy ] [ 3 get instructions>> second class ] unit-test
+! Not until splitting is finished
+! [ _copy ] [ 3 get instructions>> second class ] unit-test
 
 ! Resolve pass; make sure the spilling is done correctly
 V{ T{ ##peek f V int-regs 3 R 1 } T{ ##branch } } 0 test-bb
@@ -1834,7 +1805,7 @@ test-diamond
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
-[ _spill ] [ 2 get instructions>> first class ] unit-test
+[ _spill ] [ 2 get successors>> first instructions>> first class ] unit-test
 
 [ _spill ] [ 3 get instructions>> second class ] unit-test
 
@@ -1890,7 +1861,7 @@ V{
 
 [ t ] [ 2 get instructions>> [ _spill? ] any? ] unit-test
 
-[ t ] [ 3 get instructions>> [ _spill? ] any? ] unit-test
+[ t ] [ 3 get predecessors>> first instructions>> [ _spill? ] any? ] unit-test
 
 [ t ] [ 5 get instructions>> [ _reload? ] any? ] unit-test
 
@@ -1957,7 +1928,7 @@ V{
 [ V{ 3 2 1 } ] [ 9 get instructions>> [ _reload? ] filter [ n>> ] map ] unit-test
 
 ! Resolve pass should insert this
-[ _reload ] [ 5 get instructions>> first class ] unit-test
+[ _reload ] [ 5 get predecessors>> first instructions>> first class ] unit-test
 
 ! Some random bug
 V{
@@ -2188,12 +2159,7 @@ V{
     T{ ##replace { src V int-regs 85 } { loc D 1 } }
     T{ ##replace { src V int-regs 89 } { loc D 4 } }
     T{ ##replace { src V int-regs 96 } { loc R 0 } }
-    T{ ##fixnum-mul
-        { src1 V int-regs 128 }
-        { src2 V int-regs 129 }
-        { temp1 V int-regs 132 }
-        { temp2 V int-regs 133 }
-    }
+    T{ ##replace { src V int-regs 129 } { loc R 0 } }
     T{ ##branch }
 } 2 test-bb
 
@@ -2284,202 +2250,159 @@ V{
 
 [ ] [ { 1 2 3 4 5 } test-linear-scan-on-cfg ] unit-test
 
-! Another push-all reduction to demonstrate numbering anamoly
-V{ T{ ##prologue } T{ ##branch } }
-0 test-bb
+! Fencepost error in assignment pass
+V{ T{ ##branch } } 0 test-bb
 
 V{
-    T{ ##peek { dst V int-regs 1 } { loc D 0 } }
-    T{ ##slot-imm
-        { dst V int-regs 5 }
-        { obj V int-regs 1 }
-        { slot 3 }
-        { tag 7 }
-    }
-    T{ ##peek { dst V int-regs 7 } { loc D 1 } }
-    T{ ##slot-imm
-        { dst V int-regs 12 }
-        { obj V int-regs 7 }
-        { slot 1 }
-        { tag 6 }
-    }
-    T{ ##add
-        { dst V int-regs 25 }
-        { src1 V int-regs 5 }
-        { src2 V int-regs 12 }
-    }
-    T{ ##compare-branch
-        { src1 V int-regs 25 }
-        { src2 V int-regs 5 }
-        { cc cc> }
-    }
-}
-1 test-bb
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##compare-imm-branch f V int-regs 0 5 cc= }
+} 1 test-bb
+
+V{ T{ ##branch } } 2 test-bb
 
 V{
-    T{ ##slot-imm
-        { dst V int-regs 41 }
-        { obj V int-regs 1 }
-        { slot 2 }
-        { tag 7 }
-    }
-    T{ ##slot-imm
-        { dst V int-regs 44 }
-        { obj V int-regs 41 }
-        { slot 1 }
-        { tag 6 }
-    }
-    T{ ##compare-branch
-        { src1 V int-regs 25 }
-        { src2 V int-regs 44 }
-        { cc cc> }
-    }
-}
-2 test-bb
-
-V{
-    T{ ##add-imm
-        { dst V int-regs 54 }
-        { src1 V int-regs 25 }
-        { src2 8 }
-    }
-    T{ ##load-immediate { dst V int-regs 55 } { val 24 } }
-    T{ ##inc-d { n 4 } }
-    T{ ##inc-r { n 1 } }
-    T{ ##replace { src V int-regs 25 } { loc D 2 } }
-    T{ ##replace { src V int-regs 1 } { loc D 3 } }
-    T{ ##replace { src V int-regs 5 } { loc D 4 } }
-    T{ ##replace { src V int-regs 1 } { loc D 1 } }
-    T{ ##replace { src V int-regs 54 } { loc D 0 } }
-    T{ ##replace { src V int-regs 12 } { loc R 0 } }
-    T{ ##fixnum-mul
-        { src1 V int-regs 54 }
-        { src2 V int-regs 55 }
-        { temp1 V int-regs 58 }
-        { temp2 V int-regs 59 }
-    }
+    T{ ##peek f V int-regs 1 D 0 }
+    T{ ##peek f V int-regs 2 D 0 }
+    T{ ##replace f V int-regs 1 D 0 }
+    T{ ##replace f V int-regs 2 D 0 }
     T{ ##branch }
-}
-3 test-bb
+} 3 test-bb
 
 V{
-    T{ ##peek { dst V int-regs 60 } { loc D 1 } }
-    T{ ##slot-imm
-        { dst V int-regs 66 }
-        { obj V int-regs 60 }
-        { slot 2 }
-        { tag 7 }
-    }
-    T{ ##inc-d { n 1 } }
-    T{ ##inc-r { n 1 } }
-    T{ ##replace { src V int-regs 66 } { loc D 0 } }
-    T{ ##replace { src V int-regs 60 } { loc R 0 } }
-    T{ ##call { word resize-string } }
-    T{ ##branch }
-}
-4 test-bb
-
-V{
-    T{ ##peek { dst V int-regs 67 } { loc R 0 } }
-    T{ ##peek { dst V int-regs 68 } { loc D 0 } }
-    T{ ##set-slot-imm
-        { src V int-regs 68 }
-        { obj V int-regs 67 }
-        { slot 2 }
-        { tag 7 }
-    }
-    T{ ##write-barrier
-        { src V int-regs 67 }
-        { card# V int-regs 75 }
-        { table V int-regs 76 }
-    }
-    T{ ##inc-d { n -1 } }
-    T{ ##inc-r { n -1 } }
-    T{ ##peek { dst V int-regs 94 } { loc D 0 } }
-    T{ ##peek { dst V int-regs 96 } { loc D 1 } }
-    T{ ##peek { dst V int-regs 98 } { loc D 2 } }
-    T{ ##peek { dst V int-regs 100 } { loc D 3 } }
-    T{ ##peek { dst V int-regs 102 } { loc D 4 } }
-    T{ ##peek { dst V int-regs 106 } { loc R 0 } }
-    T{ ##copy { dst V int-regs 95 } { src V int-regs 94 } }
-    T{ ##copy { dst V int-regs 97 } { src V int-regs 96 } }
-    T{ ##copy { dst V int-regs 99 } { src V int-regs 98 } }
-    T{ ##copy { dst V int-regs 101 } { src V int-regs 100 } }
-    T{ ##copy { dst V int-regs 103 } { src V int-regs 102 } }
-    T{ ##copy { dst V int-regs 107 } { src V int-regs 106 } }
-    T{ ##branch }
-}
-5 test-bb
-
-V{
-    T{ ##inc-d { n 3 } }
-    T{ ##inc-r { n 1 } }
-    T{ ##copy { dst V int-regs 95 } { src V int-regs 1 } }
-    T{ ##copy { dst V int-regs 97 } { src V int-regs 25 } }
-    T{ ##copy { dst V int-regs 99 } { src V int-regs 1 } }
-    T{ ##copy { dst V int-regs 101 } { src V int-regs 5 } }
-    T{ ##copy { dst V int-regs 103 } { src V int-regs 7 } }
-    T{ ##copy { dst V int-regs 107 } { src V int-regs 12 } }
-    T{ ##branch }
-}
-6 test-bb
-
-V{
-    T{ ##load-immediate
-        { dst V int-regs 78 }
-        { val 4611686018427387896 }
-    }
-    T{ ##and
-        { dst V int-regs 81 }
-        { src1 V int-regs 97 }
-        { src2 V int-regs 78 }
-    }
-    T{ ##set-slot-imm
-        { src V int-regs 81 }
-        { obj V int-regs 95 }
-        { slot 3 }
-        { tag 7 }
-    }
-    T{ ##inc-d { n -2 } }
-    T{ ##copy { dst V int-regs 110 } { src V int-regs 99 } }
-    T{ ##copy { dst V int-regs 111 } { src V int-regs 101 } }
-    T{ ##copy { dst V int-regs 112 } { src V int-regs 103 } }
-    T{ ##copy { dst V int-regs 117 } { src V int-regs 107 } }
-    T{ ##branch }
-}
-7 test-bb
-
-V{
-    T{ ##inc-d { n 1 } }
-    T{ ##inc-r { n 1 } }
-    T{ ##copy { dst V int-regs 110 } { src V int-regs 1 } }
-    T{ ##copy { dst V int-regs 111 } { src V int-regs 5 } }
-    T{ ##copy { dst V int-regs 112 } { src V int-regs 7 } }
-    T{ ##copy { dst V int-regs 117 } { src V int-regs 12 } }
-    T{ ##branch }
-}
-8 test-bb
-
-V{
-    T{ ##inc-d { n 1 } }
-    T{ ##inc-r { n -1 } }
-    T{ ##replace { src V int-regs 117 } { loc D 0 } }
-    T{ ##replace { src V int-regs 110 } { loc D 1 } }
-    T{ ##replace { src V int-regs 111 } { loc D 2 } }
-    T{ ##replace { src V int-regs 112 } { loc D 3 } }
-    T{ ##epilogue }
+    T{ ##replace f V int-regs 0 D 0 }
     T{ ##return }
-}
-9 test-bb
+} 4 test-bb
+
+test-diamond
+
+[ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
+
+[ 0 ] [ 1 get instructions>> [ _spill? ] count ] unit-test
+
+[ 1 ] [ 2 get instructions>> [ _spill? ] count ] unit-test
+
+[ 1 ] [ 3 get predecessors>> first instructions>> [ _spill? ] count ] unit-test
+
+[ 1 ] [ 4 get instructions>> [ _reload? ] count ] unit-test
+
+! Another test case for fencepost error in assignment pass
+V{ T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##compare-imm-branch f V int-regs 0 5 cc= }
+} 1 test-bb
+
+V{
+    T{ ##peek f V int-regs 1 D 0 }
+    T{ ##peek f V int-regs 2 D 0 }
+    T{ ##replace f V int-regs 1 D 0 }
+    T{ ##replace f V int-regs 2 D 0 }
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##return }
+} 4 test-bb
+
+test-diamond
+
+[ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
+
+[ 0 ] [ 1 get instructions>> [ _spill? ] count ] unit-test
+
+[ 1 ] [ 2 get instructions>> [ _spill? ] count ] unit-test
+
+[ 1 ] [ 2 get instructions>> [ _reload? ] count ] unit-test
+
+[ 0 ] [ 3 get instructions>> [ _spill? ] count ] unit-test
+
+[ 0 ] [ 4 get instructions>> [ _reload? ] count ] unit-test
+
+! GC check tests
+
+! Spill slot liveness was computed incorrectly, leading to a FEP
+! early in bootstrap on x86-32
+[ t ] [
+    [
+        H{ } clone live-ins set
+        H{ } clone live-outs set
+        H{ } clone phi-live-ins set
+        T{ basic-block
+           { id 12345 }
+           { instructions
+             V{
+                 T{ ##gc f V int-regs 6 V int-regs 7 }
+                 T{ ##peek f V int-regs 0 D 0 }
+                 T{ ##peek f V int-regs 1 D 1 }
+                 T{ ##peek f V int-regs 2 D 2 }
+                 T{ ##peek f V int-regs 3 D 3 }
+                 T{ ##peek f V int-regs 4 D 4 }
+                 T{ ##peek f V int-regs 5 D 5 }
+                 T{ ##replace f V int-regs 0 D 1 }
+                 T{ ##replace f V int-regs 1 D 2 }
+                 T{ ##replace f V int-regs 2 D 3 }
+                 T{ ##replace f V int-regs 3 D 4 }
+                 T{ ##replace f V int-regs 4 D 5 }
+                 T{ ##replace f V int-regs 5 D 0 }
+             }
+           }
+        } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
+        instructions>> first
+        live-values>> assoc-empty?
+    ] with-scope
+] unit-test
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##peek f V int-regs 1 D 1 }
+    T{ ##replace f V int-regs 1 D 1 }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##gc f V int-regs 2 V int-regs 3 }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##return }
+} 2 test-bb
 
 0 get 1 get 1vector >>successors drop
-1 get 2 get 8 get V{ } 2sequence >>successors drop
-2 get 3 get 6 get V{ } 2sequence >>successors drop
-3 get 4 get 1vector >>successors drop
-4 get 5 get 1vector >>successors drop
-5 get 7 get 1vector >>successors drop
-6 get 7 get 1vector >>successors drop
-7 get 9 get 1vector >>successors drop
-8 get 9 get 1vector >>successors drop
+1 get 2 get 1vector >>successors drop
 
-[ ] [ { 1 2 3 4 5 } test-linear-scan-on-cfg ] unit-test
+[ ] [ { 1 2 3 } test-linear-scan-on-cfg ] unit-test
+
+[ H{ { V int-regs 0 3 } } ] [ 1 get instructions>> first live-values>> ] unit-test
+
+
+
+V{
+    T{ ##peek f V int-regs 0 D 0 }
+    T{ ##peek f V int-regs 1 D 1 }
+    T{ ##compare-imm-branch f V int-regs 1 5 cc= }
+} 0 test-bb
+
+V{
+    T{ ##gc f V int-regs 2 V int-regs 3 }
+    T{ ##replace f V int-regs 0 D 0 }
+    T{ ##return }
+} 1 test-bb
+
+V{
+    T{ ##return }
+} 2 test-bb
+
+0 get 1 get 2 get V{ } 2sequence >>successors drop
+
+[ ] [ { 1 2 3 } test-linear-scan-on-cfg ] unit-test
+
+[ H{ { V int-regs 0 3 } } ] [ 1 get instructions>> first live-values>> ] unit-test

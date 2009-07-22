@@ -165,24 +165,21 @@ M: ##or      generate-insn dst/src1/src2 %or      ;
 M: ##or-imm  generate-insn dst/src1/src2 %or-imm  ;
 M: ##xor     generate-insn dst/src1/src2 %xor     ;
 M: ##xor-imm generate-insn dst/src1/src2 %xor-imm ;
+M: ##shl     generate-insn dst/src1/src2 %shl     ;
 M: ##shl-imm generate-insn dst/src1/src2 %shl-imm ;
+M: ##shr     generate-insn dst/src1/src2 %shr     ;
 M: ##shr-imm generate-insn dst/src1/src2 %shr-imm ;
+M: ##sar     generate-insn dst/src1/src2 %sar     ;
 M: ##sar-imm generate-insn dst/src1/src2 %sar-imm ;
 M: ##not     generate-insn dst/src       %not     ;
 M: ##log2    generate-insn dst/src       %log2    ;
 
-: src1/src2 ( insn -- src1 src2 )
-    [ src1>> register ] [ src2>> register ] bi ; inline
+: label/dst/src1/src2 ( insn -- label dst src1 src2 )
+    [ label>> lookup-label ] [ dst/src1/src2 ] bi ; inline
 
-: src1/src2/temp1/temp2 ( insn -- src1 src2 temp1 temp2 )
-    [ src1/src2 ] [ temp1>> register ] [ temp2>> register ] tri ; inline
-
-M: ##fixnum-add generate-insn src1/src2 %fixnum-add ;
-M: ##fixnum-add-tail generate-insn src1/src2 %fixnum-add-tail ;
-M: ##fixnum-sub generate-insn src1/src2 %fixnum-sub ;
-M: ##fixnum-sub-tail generate-insn src1/src2 %fixnum-sub-tail ;
-M: ##fixnum-mul generate-insn src1/src2/temp1/temp2 %fixnum-mul ;
-M: ##fixnum-mul-tail generate-insn src1/src2/temp1/temp2 %fixnum-mul-tail ;
+M: _fixnum-add generate-insn label/dst/src1/src2 %fixnum-add ;
+M: _fixnum-sub generate-insn label/dst/src1/src2 %fixnum-sub ;
+M: _fixnum-mul generate-insn label/dst/src1/src2 %fixnum-mul ;
 
 : dst/src/temp ( insn -- dst src temp )
     [ dst/src ] [ temp>> register ] bi ; inline

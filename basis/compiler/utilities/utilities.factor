@@ -28,3 +28,5 @@ yield-hook [ [ ] ] initialize
 
 : alist-max ( alist -- pair )
     [ ] [ [ [ second ] bi@ > ] most ] map-reduce ;
+
+: penultimate ( seq -- elt ) [ length 2 - ] keep nth ;

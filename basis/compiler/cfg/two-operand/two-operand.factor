@@ -11,10 +11,6 @@ IN: compiler.cfg.two-operand
 ! since x86 has LEA and IMUL instructions which are effectively
 ! three-operand addition and multiplication, respectively.
 
-: make-copy ( dst src -- insn ) \ ##copy new-insn ; inline
-
-: make-copy/float ( dst src -- insn ) \ ##copy-float new-insn ; inline
-
 : convert-two-operand/integer ( insn -- )
     [ [ dst>> ] [ src1>> ] bi ##copy ]
     [ dup dst>> >>src1 , ]
@@ -40,9 +36,14 @@ M: ##or convert-two-operand* convert-two-operand/integer ;
 M: ##or-imm convert-two-operand* convert-two-operand/integer ;
 M: ##xor convert-two-operand* convert-two-operand/integer ;
 M: ##xor-imm convert-two-operand* convert-two-operand/integer ;
+M: ##shl convert-two-operand* convert-two-operand/integer ;
 M: ##shl-imm convert-two-operand* convert-two-operand/integer ;
+M: ##shr convert-two-operand* convert-two-operand/integer ;
 M: ##shr-imm convert-two-operand* convert-two-operand/integer ;
+M: ##sar convert-two-operand* convert-two-operand/integer ;
 M: ##sar-imm convert-two-operand* convert-two-operand/integer ;
+
+M: ##fixnum-overflow convert-two-operand* convert-two-operand/integer ;
 
 M: ##add-float convert-two-operand* convert-two-operand/float ;
 M: ##sub-float convert-two-operand* convert-two-operand/float ;

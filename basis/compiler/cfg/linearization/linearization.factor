@@ -5,6 +5,7 @@ combinators assocs arrays locals cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.liveness
+compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.cfg.instructions ;
 IN: compiler.cfg.linearization
@@ -30,8 +31,10 @@ M: insn linearize-insn , drop ;
 M: ##branch linearize-insn
     drop dup successors>> first emit-branch ;
 
+: successors ( bb -- first second ) successors>> first2 ; inline
+
 : (binary-conditional) ( basic-block insn -- basic-block successor1 successor2 src1 src2 cc )
-    [ dup successors>> first2 ]
+    [ dup successors ]
     [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] bi* ; inline
 
 : binary-conditional ( basic-block insn -- basic-block successor label2 src1 src2 cc )
@@ -50,6 +53,19 @@ M: ##compare-imm-branch linearize-insn
 
 M: ##compare-float-branch linearize-insn
     [ binary-conditional _compare-float-branch ] with-regs emit-branch ;
+
+: overflow-conditional ( basic-block insn -- basic-block successor label2 dst src1 src2 )
+    [ dup successors number>> ]
+    [ [ dst>> ] [ src1>> ] [ src2>> ] tri ] bi* ; inline
+
+M: ##fixnum-add linearize-insn
+    [ overflow-conditional _fixnum-add ] with-regs emit-branch ;
+
+M: ##fixnum-sub linearize-insn
+    [ overflow-conditional _fixnum-sub ] with-regs emit-branch ;
+
+M: ##fixnum-mul linearize-insn
+    [ overflow-conditional _fixnum-mul ] with-regs emit-branch ;
 
 M: ##dispatch linearize-insn
     swap
