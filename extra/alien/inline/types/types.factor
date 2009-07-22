@@ -68,7 +68,7 @@ EBNF: (parse-c++-type)
 dig  = [0-9]
 alpha = [a-zA-Z]
 alphanum = [1-9a-zA-Z]
-name = [_a-zA-Z] [_a-zA-Z1-9]* => [[ first2 swap prefix >string ]]
+name = [_a-zA-Z] [_a-zA-Z1-9:]* => [[ first2 swap prefix >string ]]
 ptr = [*&] => [[ empty? not ]]
 
 param = "," " "* type " "* => [[ third ]]
@@ -79,7 +79,7 @@ type = name " "* params? " "* ptr? => [[ { 0 2 4 } [ swap nth ] with map first3 
 ;EBNF
 
 : parse-c++-type ( str -- c++-type )
-    factorize-type parse-c++-type ;
+    factorize-type (parse-c++-type) ;
 
 DEFER: c++-type>string
 
