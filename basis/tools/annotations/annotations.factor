@@ -7,18 +7,23 @@ tools.time generic inspector fry tools.continuations
 locals generalizations macros ;
 IN: tools.annotations
 
-GENERIC: reset ( word -- )
+<PRIVATE
 
-M: generic reset
-    subwords [ reset ] each ;
+GENERIC: (reset) ( word -- )
 
-M: word reset
+M: generic (reset)
+    subwords [ (reset) ] each ;
+
+M: word (reset)
     dup "unannotated-def" word-prop [
-        [
-            dup dup "unannotated-def" word-prop define
-        ] with-compilation-unit
+        dup dup "unannotated-def" word-prop define
         f "unannotated-def" set-word-prop
     ] [ drop ] if ;
+
+PRIVATE>
+
+: reset ( word -- )
+    [ (reset) ] with-compilation-unit ;
 
 ERROR: cannot-annotate-twice word ;
 
@@ -31,19 +36,20 @@ M: cannot-annotate-twice summary drop "Cannot annotate a word twice" ;
         cannot-annotate-twice
     ] when ;
 
+GENERIC# (annotate) 1 ( word quot -- )
+
+M: generic (annotate)
+    [ "methods" word-prop values ] dip '[ _ (annotate) ] each ;
+
+M: word (annotate)
+    [ check-annotate-twice ] dip
+    [ dup def>> 2dup "unannotated-def" set-word-prop ] dip
+    call( old -- new ) define ;
+
 PRIVATE>
 
-GENERIC# annotate 1 ( word quot -- )
-
-M: generic annotate
-    [ "methods" word-prop values ] dip '[ _ annotate ] each ;
-
-M: word annotate
-    [ check-annotate-twice ] dip
-    [
-        [ dup def>> 2dup "unannotated-def" set-word-prop ] dip
-        call( old -- new ) define
-    ] with-compilation-unit ;
+: annotate ( word quot -- )
+    [ (annotate) ] with-compilation-unit ;
 
 <PRIVATE
 

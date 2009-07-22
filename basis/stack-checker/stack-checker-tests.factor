@@ -376,3 +376,9 @@ DEFER: eee'
 ! Found during code review
 [ [ [ drop [ ] ] when call ] infer ] must-fail
 [ swap [ [ drop [ ] ] when call ] infer ] must-fail
+
+{ 3 1 } [ call( a b -- c ) ] must-infer-as
+{ 3 1 } [ execute( a b -- c ) ] must-infer-as
+
+[ [ call-effect ] infer ] must-fail
+[ [ execute-effect ] infer ] must-fail

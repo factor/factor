@@ -6,10 +6,10 @@ compiler.cfg.predecessors
 compiler.cfg.useless-conditionals
 compiler.cfg.stack-analysis
 compiler.cfg.branch-splitting
+compiler.cfg.block-joining
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.dce
-compiler.cfg.branch-folding
 compiler.cfg.write-barrier
 compiler.cfg.liveness
 compiler.cfg.rpo
@@ -29,15 +29,15 @@ SYMBOL: check-optimizer?
     ! The passes that need this document it.
     [
         optimize-tail-calls
-        compute-predecessors
         delete-useless-conditionals
+        compute-predecessors
         split-branches
+        join-blocks
         compute-predecessors
         stack-analysis
         compute-liveness
         alias-analysis
         value-numbering
-        fold-branches
         compute-predecessors
         eliminate-dead-code
         eliminate-write-barriers
