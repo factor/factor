@@ -22,6 +22,8 @@ TUPLE: alien-wrapper { underlying alien } ;
 TUPLE: struct-wrapper < alien-wrapper disposed ;
 TUPLE: class-wrapper < alien-wrapper disposed ;
 
+MIXIN: c++-root
+
 GENERIC: unmarshall-cast ( alien-wrapper -- alien-wrapper' )
 
 M: alien-wrapper unmarshall-cast ;
