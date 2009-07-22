@@ -23,15 +23,17 @@ M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
 
 M:: x86.64 %dispatch ( src temp -- )
+    building get length :> start
     ! Load jump table base.
     temp HEX: ffffffff MOV
     0 rc-absolute-cell rel-here
     ! Add jump table base
-    src temp ADD
-    src HEX: 7f [+] JMP
+    temp src ADD
+    temp HEX: 7f [+] JMP
+    building get length :> end
     ! Fix up the displacement above
     cell code-alignment
-    [ 15 + building get dup pop* push ]
+    [ end start - 2 - + building get dup pop* push ]
     [ align-code ]
     bi ;
 
@@ -164,11 +166,6 @@ M: x86.64 %alien-invoke
     R11 0 MOV
     rc-absolute-cell rel-dlsym
     R11 CALL ;
-
-M: x86.64 %alien-invoke-tail
-    R11 0 MOV
-    rc-absolute-cell rel-dlsym
-    R11 JMP ;
 
 M: x86.64 %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke

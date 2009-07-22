@@ -280,5 +280,3 @@ M: output-process-error error.
     { [ os winnt? ] [ "io.launcher.windows.nt" require ] }
     [ ]
 } cond
-
-: run-desc ( desc -- result ) utf8 [ contents [ but-last ] [ f ] if* ] with-process-reader ;

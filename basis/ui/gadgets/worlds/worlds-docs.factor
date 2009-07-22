@@ -1,6 +1,6 @@
 USING: ui.gadgets ui.render ui.text ui.text.private
 ui.gestures ui.backend help.markup help.syntax
-models opengl sequences strings ;
+models opengl sequences strings destructors ;
 IN: ui.gadgets.worlds
 
 HELP: user-input
@@ -29,9 +29,13 @@ HELP: set-title
 { $description "Sets the title bar of the native window containing the world." }
 { $notes "This word should not be called directly by user code. Instead, change the " { $snippet "title" } " slot model; see " { $link "models" } "." } ;
 
-HELP: select-gl-context
-{ $values { "handle" "a backend-specific handle" } }
+HELP: set-gl-context
+{ $values { "world" world } }
 { $description "Selects an OpenGL context to be the implicit destination for subsequent GL rendering calls. This word is called automatically by the UI before drawing a " { $link world } "." } ;
+
+HELP: window-resource
+{ $values { "resource" disposable } { "resource" disposable } }
+{ $description "Marks " { $snippet "resource" } " to be destroyed with " { $link dispose } " when the window with the currently active OpenGL context (set by " { $link set-gl-context } ") is closed. " { $snippet "resource" } " is left unmodified at the top of the stack." } ;
 
 HELP: flush-gl-context
 { $values { "handle" "a backend-specific handle" } }

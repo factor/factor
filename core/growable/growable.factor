@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.private
 sequences sequences.private ;
@@ -18,10 +18,12 @@ M: growable set-nth-unsafe underlying>> set-nth-unsafe ;
 : expand ( len seq -- )
     [ resize ] change-underlying drop ; inline
 
-: contract ( len seq -- )
+GENERIC: contract ( len seq -- )
+
+M: growable contract ( len seq -- )
     [ length ] keep
     [ [ 0 ] 2dip set-nth-unsafe ] curry
-    (each-integer) ; inline
+    (each-integer) ;
 
 : growable-check ( n seq -- n seq )
     over 0 < [ bounds-error ] when ; inline

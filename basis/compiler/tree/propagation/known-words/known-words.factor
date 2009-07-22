@@ -6,14 +6,16 @@ math.parser math.order layouts words sequences sequences.private
 arrays assocs classes classes.algebra combinators generic.math
 splitting fry locals classes.tuple alien.accessors
 classes.tuple.private slots.private definitions strings.private
-vectors hashtables generic
+vectors hashtables generic quotations
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.slots
 compiler.tree.propagation.simple
-compiler.tree.propagation.constraints ;
+compiler.tree.propagation.constraints
+compiler.tree.propagation.call-effect
+compiler.tree.propagation.transforms ;
 IN: compiler.tree.propagation.known-words
 
 \ fixnum
@@ -226,39 +228,6 @@ generic-comparison-ops [
     ] "outputs" set-word-prop
 ] assoc-each
 
-: rem-custom-inlining ( #call -- quot/f )
-    second value-info literal>> dup integer?
-    [ power-of-2? [ 1- bitand ] f ? ] [ drop f ] if ;
-
-{
-    mod-integer-integer
-    mod-integer-fixnum
-    mod-fixnum-integer
-    fixnum-mod
-} [
-    [
-        in-d>> dup first value-info interval>> [0,inf] interval-subset?
-        [ rem-custom-inlining ] [ drop f ] if
-    ] "custom-inlining" set-word-prop
-] each
-
-\ rem [
-    in-d>> rem-custom-inlining
-] "custom-inlining" set-word-prop
-
-{
-    bitand-integer-integer
-    bitand-integer-fixnum
-    bitand-fixnum-integer
-} [
-    [
-        in-d>> second value-info >literal< [
-            0 most-positive-fixnum between?
-            [ [ >fixnum ] bi@ fixnum-bitand ] f ?
-        ] when
-    ] "custom-inlining" set-word-prop
-] each
-
 { numerator denominator }
 [ [ drop integer <class-info> ] "outputs" set-word-prop ] each
 
@@ -313,15 +282,6 @@ generic-comparison-ops [
     "outputs" set-word-prop
 ] each
 
-! Generate more efficient code for common idiom
-\ clone [
-    in-d>> first value-info literal>> {
-        { V{ } [ [ drop { } 0 vector boa ] ] }
-        { H{ } [ [ drop 0 <hashtable> ] ] }
-        [ drop f ]
-    } case
-] "custom-inlining" set-word-prop
-
 \ slot [
     dup literal?>>
     [ literal>> swap value-info-slot ] [ 2drop object-info ] if
@@ -345,17 +305,3 @@ generic-comparison-ops [
         bi
     ] [ 2drop object-info ] if
 ] "outputs" set-word-prop
-
-\ instance? [
-    in-d>> second value-info literal>> dup class?
-    [ "predicate" word-prop '[ drop @ ] ] [ drop f ] if
-] "custom-inlining" set-word-prop
-
-\ equal? [
-    ! If first input has a known type and second input is an
-    ! object, we convert this to [ swap equal? ].
-    in-d>> first2 value-info class>> object class= [
-        value-info class>> \ equal? specific-method
-        [ swap equal? ] f ?
-    ] [ drop f ] if
-] "custom-inlining" set-word-prop

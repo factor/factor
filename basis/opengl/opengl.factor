@@ -2,9 +2,10 @@
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types continuations kernel libc math macros
-namespaces math.vectors math.parser opengl.gl combinators
-combinators.smart arrays sequences splitting words byte-arrays assocs
+USING: alien alien.c-types ascii calendar combinators.short-circuit
+continuations kernel libc math macros namespaces math.vectors
+math.parser opengl.gl combinators combinators.smart arrays
+sequences splitting words byte-arrays assocs vocabs
 colors colors.constants accessors generalizations locals fry
 specialized-arrays.float specialized-arrays.uint ;
 IN: opengl
@@ -28,12 +29,19 @@ IN: opengl
         { HEX: 0506 "Invalid framebuffer operation" }
     } at "Unknown error" or ;
 
-TUPLE: gl-error code string ;
+TUPLE: gl-error function code string ;
+
+: <gl-error> ( function code -- gl-error )
+    dup error>string \ gl-error boa ; inline
+
+: gl-error-code ( -- code/f )
+    glGetError dup 0 = [ drop f ] when ; inline
+
+: (gl-error) ( function -- )
+    gl-error-code [ <gl-error> throw ] [ drop ] if* ;
 
 : gl-error ( -- )
-    glGetError dup 0 = [ drop ] [
-        dup error>string \ gl-error boa throw
-    ] if ;
+    f (gl-error) ; inline
 
 : do-enabled ( what quot -- )
     over glEnable dip glDisable ; inline
@@ -128,11 +136,11 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : (gen-gl-object) ( quot -- id )
     [ 1 0 <uint> ] dip keep *uint ; inline
 
-: gen-gl-buffer ( -- id )
-    [ glGenBuffers ] (gen-gl-object) ;
-
 : (delete-gl-object) ( id quot -- )
     [ 1 swap <uint> ] dip call ; inline
+
+: gen-gl-buffer ( -- id )
+    [ glGenBuffers ] (gen-gl-object) ;
 
 : delete-gl-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
@@ -145,6 +153,16 @@ MACRO: all-enabled-client-state ( seq quot -- )
     [ GL_ELEMENT_ARRAY_BUFFER ] 2dip '[
         GL_ARRAY_BUFFER swap _ with-gl-buffer
     ] with-gl-buffer ; inline
+
+: gen-vertex-array ( -- id )
+    [ glGenVertexArrays ] (gen-gl-object) ;
+
+: delete-vertex-array ( id -- )
+    [ glDeleteVertexArrays ] (delete-gl-object) ;
+
+:: with-vertex-array ( id quot -- )
+    id glBindVertexArray
+    quot [ 0 glBindVertexArray ] [ ] cleanup ; inline
 
 : <gl-buffer> ( target data hint -- id )
     pick gen-gl-buffer [

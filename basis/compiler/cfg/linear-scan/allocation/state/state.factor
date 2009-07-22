@@ -1,9 +1,23 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators cpu.architecture fry heaps
-kernel math namespaces sequences vectors
+kernel math math.order namespaces sequences vectors
 compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation.state
+
+! Start index of current live interval. We ensure that all
+! live intervals added to the unhandled set have a start index
+! strictly greater than this one. This ensures that we can catch
+! infinite loop situations. We also ensure that all live
+! intervals added to the handled set have an end index strictly
+! smaller than this one. This helps catch bugs.
+SYMBOL: progress
+
+: check-unhandled ( live-interval -- )
+    start>> progress get <= [ "check-unhandled" throw ] when ; inline
+
+: check-handled ( live-interval -- )
+    end>> progress get > [ "check-handled" throw ] when ; inline
 
 ! Mapping from register classes to sequences of machine registers
 SYMBOL: registers
@@ -32,11 +46,14 @@ SYMBOL: inactive-intervals
 : add-inactive ( live-interval -- )
     dup vreg>> inactive-intervals-for push ;
 
+: delete-inactive ( live-interval -- )
+    dup vreg>> inactive-intervals-for delq ;
+
 ! Vector of handled live intervals
 SYMBOL: handled-intervals
 
 : add-handled ( live-interval -- )
-    handled-intervals get push ;
+    [ check-handled ] [ handled-intervals get push ] bi ;
 
 : finished? ( n live-interval -- ? ) end>> swap < ;
 
@@ -90,17 +107,8 @@ ERROR: register-already-used live-interval ;
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
 
-! Start index of current live interval. We ensure that all
-! live intervals added to the unhandled set have a start index
-! strictly greater than ths one. This ensures that we can catch
-! infinite loop situations.
-SYMBOL: progress
-
-: check-progress ( live-interval -- )
-    start>> progress get <= [ "No progress" throw ] when ; inline
-
 : add-unhandled ( live-interval -- )
-    [ check-progress ]
+    [ check-unhandled ]
     [ dup start>> unhandled-intervals get heap-push ]
     bi ;
 
@@ -109,20 +117,40 @@ CONSTANT: reg-classes { int-regs double-float-regs }
 : reg-class-assoc ( quot -- assoc )
     [ reg-classes ] dip { } map>assoc ; inline
 
+! Mapping from register classes to spill counts
 SYMBOL: spill-counts
 
-: next-spill-location ( reg-class -- n )
+: next-spill-slot ( reg-class -- n )
     spill-counts get [ dup 1 + ] change-at ;
+
+! Mapping from vregs to spill slots
+SYMBOL: spill-slots
+
+: assign-spill-slot ( vreg -- n )
+    spill-slots get [ reg-class>> next-spill-slot ] cache ;
 
 : init-allocator ( registers -- )
     registers set
-    [ 0 ] reg-class-assoc spill-counts set
     <min-heap> unhandled-intervals set
     [ V{ } clone ] reg-class-assoc active-intervals set
     [ V{ } clone ] reg-class-assoc inactive-intervals set
     V{ } clone handled-intervals set
+    [ 0 ] reg-class-assoc spill-counts set
+    H{ } clone spill-slots set
     -1 progress set ;
 
 : init-unhandled ( live-intervals -- )
     [ [ start>> ] keep ] { } map>assoc
     unhandled-intervals get heap-push-all ;
+
+! A utility used by register-status and spill-status words
+: free-positions ( new -- assoc )
+    vreg>> reg-class>> registers get at [ 1/0. ] H{ } map>assoc ;
+
+: add-use-position ( n reg assoc -- ) [ [ min ] when* ] change-at ;
+
+: register-available? ( new result -- ? )
+    [ end>> ] [ second ] bi* < ; inline
+
+: register-available ( new result -- )
+    first >>reg add-active ;

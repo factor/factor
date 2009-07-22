@@ -67,7 +67,7 @@ static inline fixnum branchless_abs(fixnum x)
 
 PRIMITIVE(fixnum_shift)
 {
-	fixnum y = untag_fixnum(dpop()); \
+	fixnum y = untag_fixnum(dpop());
 	fixnum x = untag_fixnum(dpeek());
 
 	if(x == 0)

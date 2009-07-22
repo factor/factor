@@ -1,7 +1,7 @@
 USING: help.markup help.syntax math sequences ;
 IN: math.primes.factors
 
-{ factors group-factors unique-factors } related-words
+{ divisors factors group-factors unique-factors } related-words
 
 HELP: factors
 { $values { "n" "a positive integer" } { "seq" sequence } }
@@ -21,3 +21,7 @@ HELP: unique-factors
 HELP: totient
 { $values { "n" "a positive integer" } { "t" integer } }
 { $description { "Return the number of integers between 1 and " { $snippet "n-1" } " that are relatively prime to " { $snippet "n" } "." } } ;
+
+HELP: divisors
+{ $values { "n" "a positive integer" } { "seq" sequence } }
+{ $description { "Return the ordered list of divisors of " { $snippet "n" } ", including 1 and " { $snippet "n" } "." } } ;

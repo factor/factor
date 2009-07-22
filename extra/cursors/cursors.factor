@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generalizations kernel math sequences
-sequences.private ;
+sequences.private fry ;
 IN: cursors
 
 GENERIC: cursor-done? ( cursor -- ? )
@@ -127,12 +127,13 @@ M: to-sequence cursor-write
 : 2map ( seq1 seq2 quot -- ) [ cursor-map2 ] transform2 ; inline
 
 : find-done3? ( cursor1 cursor2 cursor3 quot -- ? )
-    3 nover 3array [ cursor-done? ] any?
-    [ 4 ndrop t ] [ [ [ cursor-get-unsafe ] tri@ ] dip call ] if ; inline
+    [ 3 ndrop t ] swap '[ [ cursor-get-unsafe ] tri@ @ ]
+    [ 3 ndup 3 narray [ cursor-done? ] any? ] 2dip if ; inline
 
 : cursor-until3 ( cursor cursor quot -- )
     [ find-done3? not ]
-    [ drop [ cursor-advance ] tri@ ] bi-curry bi-curry bi-curry bi-curry while ; inline
+    [ drop [ cursor-advance ] tri@ ]
+    bi-curry bi-curry bi-curry bi-curry while ; inline
 
 : cursor-each3 ( cursor cursor quot -- )
     [ f ] compose cursor-until3 ; inline

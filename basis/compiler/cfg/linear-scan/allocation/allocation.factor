@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs heaps kernel namespaces sequences fry math
-combinators arrays sorting compiler.utilities
+math.order combinators arrays sorting compiler.utilities
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation.coalescing
 compiler.cfg.linear-scan.allocation.spilling
@@ -9,40 +9,49 @@ compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.state ;
 IN: compiler.cfg.linear-scan.allocation
 
-: free-positions ( new -- assoc )
-    vreg>> reg-class>> registers get at [ 1/0. ] H{ } map>assoc ;
+: active-positions ( new assoc -- )
+    [ vreg>> active-intervals-for ] dip
+    '[ [ 0 ] dip reg>> _ add-use-position ] each ;
 
-: active-positions ( new -- assoc )
-    vreg>> active-intervals-for [ reg>> 0 ] H{ } map>assoc ;
+: inactive-positions ( new assoc -- )
+    [ [ vreg>> inactive-intervals-for ] keep ] dip
+    '[
+        [ _ relevant-ranges intersect-live-ranges 1/0. or ] [ reg>> ] bi
+        _ add-use-position
+    ] each ;
 
-: inactive-positions ( new -- assoc )
-    dup vreg>> inactive-intervals-for
-    [ [ reg>> swap ] keep relevant-ranges intersect-live-ranges ]
-    with H{ } map>assoc ;
-
-: compute-free-pos ( new -- free-pos )
-    [ free-positions ] [ inactive-positions ] [ active-positions ] tri
-    3array assoc-combine >alist alist-max ;
+: register-status ( new -- free-pos )
+    dup free-positions
+    [ inactive-positions ] [ active-positions ] [ nip ] 2tri
+    >alist alist-max ;
 
 : no-free-registers? ( result -- ? )
     second 0 = ; inline
 
-: register-available? ( new result -- ? )
-    [ end>> ] [ second ] bi* < ; inline
-
-: register-available ( new result -- )
-    first >>reg add-active ;
+: split-to-fit ( new n -- before after )
+    split-interval
+    [ [ compute-start/end ] bi@ ]
+    [ >>split-next drop ]
+    [ ]
+    2tri ;
 
 : register-partially-available ( new result -- )
-    [ second split-before-use ] keep
-    '[ _ register-available ] [ add-unhandled ] bi* ;
+    {
+        { [ 2dup second 1 - spill-live-out? ] [ drop spill-live-out ] }
+        { [ 2dup second 1 - spill-live-in? ] [ drop spill-live-in ] }
+        [
+            [ second 1 - split-to-fit ] keep
+            '[ _ register-available ] [ add-unhandled ] bi*
+        ]
+    } cond ;
 
 : assign-register ( new -- )
     dup coalesce? [ coalesce ] [
-        dup compute-free-pos {
+        dup register-status {
             { [ dup no-free-registers? ] [ drop assign-blocked-register ] }
             { [ 2dup register-available? ] [ register-available ] }
-            [ register-partially-available ]
+            ! [ register-partially-available ]
+            [ drop assign-blocked-register ]
         } cond
     ] if ;
 
