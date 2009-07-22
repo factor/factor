@@ -4,8 +4,6 @@ USING: assocs kernel combinators compiler.cfg.dataflow-analysis
 compiler.cfg.dcn.local ;
 IN: compiler.cfg.dcn.global
 
-<PRIVATE
-
 ! Peek analysis. Peek-in is the set of all locations anticipated at
 ! the start of a basic block.
 BACKWARD-ANALYSIS: peek
@@ -29,8 +27,6 @@ M: avail-analysis transfer-set drop [ peek ] [ replace ] bi assoc-union assoc-un
 BACKWARD-ANALYSIS: kill
 
 M: kill-analysis transfer-set drop replace assoc-union ;
-
-PRIVATE>
 
 ! Main word
 : compute-global-sets ( cfg -- )
