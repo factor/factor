@@ -67,9 +67,6 @@ IN: accessors
 M: frp-button text>> children>> first text>> ;
 
 IN: ui.frp.gadgets
-M: gadget null-val drop f ;
-M: table null-val multiple-selection?>> [ V{ } clone ] [ f ] if ;
-M: frp-field null-val drop "" ;
 
 SINGLETON: gadget-monad
 INSTANCE: gadget-monad monad

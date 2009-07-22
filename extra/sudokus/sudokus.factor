@@ -3,7 +3,7 @@ lists.lazy locals math math.functions math.parser math.ranges
 models.product monads random sequences sets ui ui.frp.gadgets
 ui.frp.layout ui.frp.signals ui.gadgets.alerts vectors fry
 ui.gadgets.labels memoize ;
-IN: gui-sudoku
+IN: sudokus
 
 : row ( index -- row ) 1 + 9 / ceiling ;
 : col ( index -- col ) 9 mod 1 + ;
