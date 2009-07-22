@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel splitting grouping math sequences namespaces make
-io.binary math.bitwise checksums checksums.common
-sbufs strings combinators.smart math.ranges fry combinators
-accessors locals checksums.stream multiline literals
-generalizations ;
+USING: accessors checksums checksums.common checksums.stream
+combinators combinators.smart fry generalizations grouping
+io.binary kernel literals locals make math math.bitwise
+math.ranges multiline namespaces sbufs sequences
+sequences.private splitting strings ;
 IN: checksums.sha
 
 SINGLETON: sha1
@@ -230,21 +230,21 @@ M: sha-256 initialize-checksum-state drop <sha-256-state> ;
 
 : prepare-M-256 ( n seq -- )
     {
-        [ [ 16 - ] dip nth ]
-        [ [ 15 - ] dip nth s0-256 ]
-        [ [ 7 - ] dip nth ]
-        [ [ 2 - ] dip nth s1-256 w+ w+ w+ ]
+        [ [ 16 - ] dip nth-unsafe ]
+        [ [ 15 - ] dip nth-unsafe s0-256 ]
+        [ [ 7 - ] dip nth-unsafe ]
+        [ [ 2 - ] dip nth-unsafe s1-256 w+ w+ w+ ]
         [ ]
-    } 2cleave set-nth ; inline
+    } 2cleave set-nth-unsafe ; inline
 
 : prepare-M-512 ( n seq -- )
     {
-        [ [ 16 - ] dip nth ]
-        [ [ 15 - ] dip nth s0-512 ]
-        [ [ 7 - ] dip nth ]
-        [ [ 2 - ] dip nth s1-512 w+ w+ w+ ]
+        [ [ 16 - ] dip nth-unsafe ]
+        [ [ 15 - ] dip nth-unsafe s0-512 ]
+        [ [ 7 - ] dip nth-unsafe ]
+        [ [ 2 - ] dip nth-unsafe s1-512 w+ w+ w+ ]
         [ ]
-    } 2cleave set-nth ; inline
+    } 2cleave set-nth-unsafe ; inline
 
 : ch ( x y z -- x' )
     [ bitxor bitand ] keep bitxor ; inline
@@ -258,36 +258,36 @@ M: sha-256 initialize-checksum-state drop <sha-256-state> ;
 GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
 
 :: T1-256 ( n M H sha2 -- T1 )
-    n M nth
-    n sha2 K>> nth +
+    n M nth-unsafe
+    n sha2 K>> nth-unsafe +
     e H slice3 ch w+
-    e H nth S1-256 w+
-    h H nth w+ ; inline
+    e H nth-unsafe S1-256 w+
+    h H nth-unsafe w+ ; inline
 
 : T2-256 ( H -- T2 )
-    [ a swap nth S0-256 ]
+    [ a swap nth-unsafe S0-256 ]
     [ a swap slice3 maj w+ ] bi ; inline
 
 :: T1-512 ( n M H sha2 -- T1 )
-    n M nth
-    n sha2 K>> nth +
+    n M nth-unsafe
+    n sha2 K>> nth-unsafe +
     e H slice3 ch w+
-    e H nth S1-512 w+
-    h H nth w+ ; inline
+    e H nth-unsafe S1-512 w+
+    h H nth-unsafe w+ ; inline
 
 : T2-512 ( H -- T2 )
-    [ a swap nth S0-512 ]
+    [ a swap nth-unsafe S0-512 ]
     [ a swap slice3 maj w+ ] bi ; inline
 
 : update-H ( T1 T2 H -- )
-    h g pick exchange
-    g f pick exchange
-    f e pick exchange
-    pick d pick nth w+ e pick set-nth
-    d c pick exchange
-    c b pick exchange
-    b a pick exchange
-    [ w+ a ] dip set-nth ; inline
+    h g pick exchange-unsafe
+    g f pick exchange-unsafe
+    f e pick exchange-unsafe
+    pick d pick nth-unsafe w+ e pick set-nth-unsafe
+    d c pick exchange-unsafe
+    c b pick exchange-unsafe
+    b a pick exchange-unsafe
+    [ w+ a ] dip set-nth-unsafe ; inline
 
 : prepare-message-schedule ( seq sha2 -- w-seq )
     [ word-size>> <sliced-groups> [ be> ] map ]
@@ -309,7 +309,7 @@ M: sha2-short checksum-block
     [ [ block-size>> ] [ H>> clone ] [ ] tri process-chunk ] bi ;
 
 : seq>byte-array ( seq n -- string )
-    '[ _ >be ] map B{ } join ;
+    '[ _ >be ] map B{ } concat-as ;
 
 : sha1>checksum ( sha2 -- bytes )
     H>> 4 seq>byte-array ;
@@ -342,16 +342,14 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
     drop
     [ <sha-256-state> ] dip add-checksum-stream get-checksum ;
 
-
-
 : sha1-W ( t seq -- )
     {
-        [ [ 3 - ] dip nth ]
-        [ [ 8 - ] dip nth bitxor ]
-        [ [ 14 - ] dip nth bitxor ]
-        [ [ 16 - ] dip nth bitxor 1 bitroll-32 ]
+        [ [ 3 - ] dip nth-unsafe ]
+        [ [ 8 - ] dip nth-unsafe bitxor ]
+        [ [ 14 - ] dip nth-unsafe bitxor ]
+        [ [ 16 - ] dip nth-unsafe bitxor 1 bitroll-32 ]
         [ ]
-    } 2cleave set-nth ;
+    } 2cleave set-nth-unsafe ;
 
 : prepare-sha1-message-schedule ( seq -- w-seq )
     4 <sliced-groups> [ be> ] map
@@ -368,11 +366,11 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
     } case ;
 
 :: inner-loop ( n H W K -- temp )
-    a H nth :> A
-    b H nth :> B
-    c H nth :> C
-    d H nth :> D
-    e H nth :> E
+    a H nth-unsafe :> A
+    b H nth-unsafe :> B
+    c H nth-unsafe :> C
+    d H nth-unsafe :> D
+    e H nth-unsafe :> E
     [
         A 5 bitroll-32
 
@@ -380,19 +378,19 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
 
         E
 
-        n K nth
+        n K nth-unsafe
 
-        n W nth
+        n W nth-unsafe
     ] sum-outputs 32 bits ;
 
 :: process-sha1-chunk ( bytes H W K state -- )
     80 [
         H W K inner-loop
-        d H nth e H set-nth
-        c H nth d H set-nth
-        b H nth 30 bitroll-32 c H set-nth
-        a H nth b H set-nth
-        a H set-nth
+        d H nth-unsafe e H set-nth-unsafe
+        c H nth-unsafe d H set-nth-unsafe
+        b H nth-unsafe 30 bitroll-32 c H set-nth-unsafe
+        a H nth-unsafe b H set-nth-unsafe
+        a H set-nth-unsafe
     ] each
     state [ H [ w+ ] 2map ] change-H drop ; inline
 

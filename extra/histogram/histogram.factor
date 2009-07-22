@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences assocs ;
+USING: kernel sequences assocs fry ;
 IN: histogram
 
 <PRIVATE
@@ -24,3 +24,6 @@ PRIVATE>
 
 : histogram ( seq -- hashtable )
     [ inc-at ] sequence>hashtable ;
+
+: collect-values ( seq quot: ( obj hashtable -- ) -- hash )
+    '[ [ dup @ ] dip push-at ] sequence>hashtable ; inline

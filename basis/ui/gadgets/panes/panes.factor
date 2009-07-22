@@ -397,8 +397,8 @@ M: f sloppy-pick-up*
     ] [ drop ] if ;
 
 : end-selection ( pane -- )
-    f >>selecting?
-    hand-moved?
+    dup selecting?>> hand-moved? or
+    [ f >>selecting? ] dip
     [ [ com-copy-selection ] [ request-focus ] bi ]
     [ [ relayout-1 ] [ focus-input ] bi ]
     if ;

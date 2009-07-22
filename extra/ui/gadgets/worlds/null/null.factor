@@ -22,6 +22,6 @@ M: null-world pref-dim* drop { 512 512 } ;
     f swap open-window* ;
 
 : into-window ( world quot -- world )
-    [ dup handle>> ] dip with-gl-context ; inline
+    [ dup ] dip with-gl-context ; inline
 
 

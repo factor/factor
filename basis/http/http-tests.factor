@@ -33,6 +33,7 @@ blah
         { header H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } } }
         { post-data T{ post-data { data "blah" } { content-type "application/octet-stream" } } }
         { cookies V{ } }
+        { redirects 10 }
     }
 ] [
     read-request-test-1 lf>crlf [
@@ -70,6 +71,7 @@ Host: www.sex.com
         { version "1.1" }
         { header H{ { "host" "www.sex.com" } } }
         { cookies V{ } }
+        { redirects 10 }
     }
 ] [
     read-request-test-2 lf>crlf [

@@ -354,13 +354,14 @@ PRIVATE>
     if ;
 
 : row-action? ( table -- ? )
-    [ [ mouse-row ] keep valid-line? ]
-    [ single-click?>> hand-click# get 2 = or ] bi and ;
+    single-click?>> hand-click# get 2 = or ;
 
 <PRIVATE
 
 : table-button-up ( table -- )
-    dup row-action? [ row-action ] [ update-selected-values ] if ;
+    dup [ mouse-row ] keep valid-line? [
+        dup row-action? [ row-action ] [ update-selected-values ] if
+    ] [ drop ] if ;
 
 PRIVATE>
 

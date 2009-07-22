@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences sets arrays math strings fry
 namespaces prettyprint compiler.cfg.linear-scan.live-intervals
-compiler.cfg.linear-scan.allocation compiler.cfg ;
+compiler.cfg.linear-scan.allocation compiler.cfg assocs ;
 IN: compiler.cfg.linear-scan.debugger
 
 : check-assigned ( live-intervals -- )
@@ -19,7 +19,10 @@ IN: compiler.cfg.linear-scan.debugger
     ] [ 1array ] if ;
 
 : check-linear-scan ( live-intervals machine-registers -- )
-    [ [ clone ] map ] dip allocate-registers
+    [
+        [ clone ] map dup [ [ vreg>> ] keep ] H{ } map>assoc
+        live-intervals set
+    ] dip allocate-registers
     [ split-children ] map concat check-assigned ;
 
 : picture ( uses -- str )
@@ -34,6 +37,3 @@ IN: compiler.cfg.linear-scan.debugger
 
 : live-intervals. ( seq -- )
     [ interval-picture ] map simple-table. ;
-
-: test-bb ( insns n -- )
-    [ <basic-block> swap >>number swap >>instructions ] keep set ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors words assocs sequences arrays namespaces
-fry locals definitions classes.algebra
+fry locals definitions classes classes.algebra generic
 stack-checker.state
 stack-checker.backend
 compiler.tree
@@ -9,8 +9,13 @@ compiler.tree.propagation.info
 compiler.tree.dead-code.liveness ;
 IN: compiler.tree.dead-code.simple
 
-: flushable? ( word -- ? )
-    [ "flushable" word-prop ] [ "predicating" word-prop ] bi or ;
+GENERIC: flushable? ( word -- ? )
+
+M: predicate flushable? drop t ;
+
+M: word flushable? "flushable" word-prop ;
+
+M: method-body flushable? "method-generic" word-prop flushable? ;
 
 : flushable-call? ( #call -- ? )
     dup word>> dup flushable? [

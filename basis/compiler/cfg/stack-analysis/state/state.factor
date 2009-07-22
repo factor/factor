@@ -1,11 +1,14 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors namespaces assocs sets math ;
+USING: kernel accessors namespaces assocs sets math deques
+compiler.cfg.registers ;
 IN: compiler.cfg.stack-analysis.state
 
 TUPLE: state
 locs>vregs actual-locs>vregs changed-locs
-ds-height rs-height poisoned? ;
+{ ds-height integer }
+{ rs-height integer }
+poisoned? ;
 
 : <state> ( -- state )
     state new
@@ -33,11 +36,18 @@ M: state clone
     dup changed-loc state get locs>vregs>> set-at ;
 
 : clear-state ( state -- )
-    [ locs>vregs>> clear-assoc ]
-    [ actual-locs>vregs>> clear-assoc ]
-    [ changed-locs>> clear-assoc ]
-    tri ;
+    0 >>ds-height 0 >>rs-height
+    [ locs>vregs>> ] [ actual-locs>vregs>> ] [ changed-locs>> ] tri
+    [ clear-assoc ] tri@ ;
 
-: adjust-ds ( n -- ) state get [ + ] change-ds-height drop ;
+GENERIC# translate-loc 1 ( loc state -- loc' )
+M: ds-loc translate-loc [ n>> ] [ ds-height>> ] bi* - <ds-loc> ;
+M: rs-loc translate-loc [ n>> ] [ rs-height>> ] bi* - <rs-loc> ;
 
-: adjust-rs ( n -- ) state get [ + ] change-rs-height drop ;
+GENERIC# untranslate-loc 1 ( loc state -- loc' )
+M: ds-loc untranslate-loc [ n>> ] [ ds-height>> ] bi* + <ds-loc> ;
+M: rs-loc untranslate-loc [ n>> ] [ rs-height>> ] bi* + <rs-loc> ;
+
+SYMBOL: work-list
+
+: add-to-work-list ( bb -- ) work-list get push-front ;

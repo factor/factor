@@ -176,3 +176,6 @@ H{ } "x" set
 [ 1 ] [ "h" get assoc-size ] unit-test
 
 [ 1 ] [ 2 "h" get at ] unit-test
+
+! Random test case
+[ "A" ] [ 100 [ dup ] H{ } map>assoc 32 over delete-at "A" 32 pick set-at 32 swap at ] unit-test

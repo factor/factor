@@ -2,7 +2,7 @@
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences arrays assocs sequences.private
-growable accessors math.order summary ;
+growable accessors math.order summary vectors ;
 IN: heaps
 
 GENERIC: heap-push* ( value key heap -- entry )
@@ -15,14 +15,14 @@ GENERIC: heap-size ( heap -- n )
 
 <PRIVATE
 
-TUPLE: heap data ;
+TUPLE: heap { data vector } ;
 
 : <heap> ( class -- heap )
     [ V{ } clone ] dip boa ; inline
 
 TUPLE: entry value key heap index ;
 
-: <entry> ( value key heap -- entry ) f entry boa ;
+: <entry> ( value key heap -- entry ) f entry boa ; inline
 
 PRIVATE>
 
@@ -109,10 +109,10 @@ DEFER: up-heap
         [ data-exchange ] 2keep up-heap
     ] [
         3drop
-    ] if ;
+    ] if ; inline recursive
 
 : up-heap ( n heap -- )
-    over 0 > [ (up-heap) ] [ 2drop ] if ;
+    over 0 > [ (up-heap) ] [ 2drop ] if ; inline recursive
 
 : (child) ( m heap -- n )
     2dup right-value
@@ -132,10 +132,10 @@ DEFER: down-heap
         3drop
     ] [
         [ data-exchange ] 2keep down-heap
-    ] if ;
+    ] if ; inline recursive
 
 : down-heap ( m heap -- )
-    2dup left-bounds-check? [ 2drop ] [ (down-heap) ] if ;
+    2dup left-bounds-check? [ 2drop ] [ (down-heap) ] if ; inline recursive
 
 PRIVATE>
 
@@ -148,7 +148,7 @@ M: heap heap-push* ( value key heap -- entry )
     [ swapd heap-push ] curry assoc-each ;
 
 : >entry< ( entry -- key value )
-    [ value>> ] [ key>> ] bi ;
+    [ value>> ] [ key>> ] bi ; inline
 
 M: heap heap-peek ( heap -- value key )
     data-first >entry< ;

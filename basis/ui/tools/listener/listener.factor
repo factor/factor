@@ -304,7 +304,8 @@ M: listener-operation invoke-command ( target command -- )
 : use-if-necessary ( word manifest -- )
     2dup [ vocabulary>> ] dip and [
         manifest [
-            vocabulary>> use-vocab
+            [ vocabulary>> use-vocab ]
+            [ dup name>> associate use-words ] bi
         ] with-variable
     ] [ 2drop ] if ;
 

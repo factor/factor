@@ -26,7 +26,6 @@ tool "tool-switching" f {
 } define-command-map
 
 tool "common" f {
-    { T{ key-down f { A+ } "s" } save }
     { T{ key-down f { A+ } "w" } close-window }
     { T{ key-down f { A+ } "q" } com-exit }
     { T{ key-down f f "F2" } refresh-all }

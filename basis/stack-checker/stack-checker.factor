@@ -15,5 +15,3 @@ M: callable infer ( quot -- effect )
 : infer. ( quot -- )
     #! Safe to call from inference transforms.
     infer effect>string print ;
-
-"stack-checker.call-effect" require

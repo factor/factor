@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.mixin classes.parser
-classes.tuple classes.tuple.parser combinators effects
-effects.parser fry generic generic.parser generic.standard
-interpolate io.streams.string kernel lexer locals.parser
-locals.rewrite.closures locals.types make macros namespaces
-parser quotations sequences vocabs.parser words words.symbol ;
+classes.singleton classes.tuple classes.tuple.parser
+combinators effects.parser fry generic generic.parser
+generic.standard interpolate io.streams.string kernel lexer
+locals.parser locals.types macros make namespaces parser
+quotations sequences vocabs.parser words words.symbol ;
 IN: functors
 
 ! This is a hack
@@ -71,6 +71,14 @@ SYNTAX: `TUPLE:
     } case
     \ define-tuple-class parsed ;
 
+SYNTAX: `SINGLETON:
+    scan-param parsed
+    \ define-singleton-class parsed ;
+
+SYNTAX: `MIXIN:
+    scan-param parsed
+    \ define-mixin-class parsed ;
+
 SYNTAX: `M:
     scan-param parsed
     scan-param parsed
@@ -126,6 +134,8 @@ PRIVATE>
 
 SYNTAX: IS [ dup search [ ] [ no-word ] ?if ] (INTERPOLATE) ;
 
+SYNTAX: DEFERS [ current-vocab create ] (INTERPOLATE) ;
+
 SYNTAX: DEFINES [ create-in ] (INTERPOLATE) ;
 
 SYNTAX: DEFINES-CLASS [ create-class-in ] (INTERPOLATE) ;
@@ -137,6 +147,8 @@ DEFER: ;FUNCTOR delimiter
 : functor-words ( -- assoc )
     H{
         { "TUPLE:" POSTPONE: `TUPLE: }
+        { "SINGLETON:" POSTPONE: `SINGLETON: }
+        { "MIXIN:" POSTPONE: `MIXIN: }
         { "M:" POSTPONE: `M: }
         { "C:" POSTPONE: `C: }
         { ":" POSTPONE: `: }

@@ -143,7 +143,7 @@ SYMBOL: vocab-articles
     swap '[
         _ elements [
             rest { { } { "" } } member?
-            [ "Empty description" throw ] when
+            [ "Empty $description" simple-lint-error ] when
         ] each
     ] each ;
 
