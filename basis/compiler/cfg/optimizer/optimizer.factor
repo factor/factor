@@ -5,7 +5,6 @@ compiler.cfg.tco
 compiler.cfg.predecessors
 compiler.cfg.useless-conditionals
 compiler.cfg.dcn
-compiler.cfg.dominance
 compiler.cfg.ssa
 compiler.cfg.branch-splitting
 compiler.cfg.block-joining
@@ -36,7 +35,6 @@ SYMBOL: check-optimizer?
         join-blocks
         compute-predecessors
         deconcatenatize
-        compute-dominance
         construct-ssa
         alias-analysis
         value-numbering
