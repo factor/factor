@@ -42,7 +42,7 @@ M: model -> dup , ;
 : <box> ( gadgets type -- track )
    [ t make-layout ] dip <track>
    swap [ add-layout ] each
-   swap [ <|> >>model ] unless-empty ; inline
+   swap [ <collection> >>model ] unless-empty ; inline
 : <hbox> ( gadgets -- track ) horizontal <box> ; inline
 : <vbox> ( gadgets -- track ) vertical <box> ; inline
 
@@ -63,7 +63,7 @@ M: gadget (insert-item) dup parent>> track? [ [ f <layout> ] dip (insert-item) ]
     [ insertion-point [ add-gadget ] keep insert-gadget ] if ;
 M: layout (insert-item) insertion-point [ add-layout ] keep [ gadget>> insert-gadget ] [ size>> insert-size ] 3bi ;
 M: model (insert-item) parent>> dup book? [ "No models in books" throw ]
-   [ dup model>> dup |? [ nip swap add-connection ] [ drop [ 1array <|> ] dip (>>model) ] if ] if ;
+   [ dup model>> dup collection? [ nip swap add-connection ] [ drop [ 1array <collection> ] dip (>>model) ] if ] if ;
 : insert-item ( item location -- ) [ dup get [ drop ] [ remove-members ] if ] [ on ] [ ] tri
     [ add-member ] 2keep (insert-item) ;
 
@@ -72,4 +72,3 @@ M: model (insert-item) parent>> dup book? [ "No models in books" throw ]
 : with-interface ( quot -- ) make* [ insert-items ] with-scope ; inline
 
 M: model >>= [ swap insertion-quot <action> ] curry ;
-! Temporary places should be cleared at insertion, not on mention
