@@ -6,8 +6,7 @@ compiler.cfg.predecessors ;
 : test-dominance ( -- )
     cfg new 0 get >>entry
     compute-predecessors
-    compute-dominance
-    drop ;
+    compute-dominance ;
 
 ! Example with no back edges
 V{ } 0 test-bb
