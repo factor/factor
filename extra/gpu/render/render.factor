@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien alien.c-types alien.structs arrays
 assocs classes.mixin classes.parser classes.singleton
-classes.tuple classes.tuple.private combinators destructors fry
+classes.tuple classes.tuple.private combinators combinators.tuple destructors fry
 generic generic.parser gpu gpu.buffers gpu.framebuffers
 gpu.framebuffers.private gpu.shaders gpu.state gpu.textures
 gpu.textures.private half-floats images kernel lexer locals
@@ -474,13 +474,22 @@ M: vertex-array dispose
 PRIVATE>
 
 TUPLE: render-set
-    { primitive-mode primitive-mode }
-    { vertex-array vertex-array }
-    { uniforms uniform-tuple }
-    { indexes vertex-indexes initial: T{ index-range } } 
-    { instances ?integer initial: f }
-    { framebuffer any-framebuffer initial: system-framebuffer }
-    { output-attachments sequence initial: { default-attachment } } ;
+    { primitive-mode primitive-mode read-only }
+    { vertex-array vertex-array read-only }
+    { uniforms uniform-tuple read-only }
+    { indexes vertex-indexes initial: T{ index-range } read-only } 
+    { instances ?integer initial: f read-only }
+    { framebuffer any-framebuffer initial: system-framebuffer read-only }
+    { output-attachments sequence initial: { default-attachment } read-only } ;
+
+: <render-set> ( x quot-assoc -- render-set )
+    render-set swap make-tuple ; inline
+
+: 2<render-set> ( x y quot-assoc -- render-set )
+    render-set swap 2make-tuple ; inline
+
+: 3<render-set> ( x y z quot-assoc -- render-set )
+    render-set swap 3make-tuple ; inline
 
 : render ( render-set -- )
     {
