@@ -13,7 +13,6 @@ compiler.cfg.dcn.height
 compiler.cfg.dcn.local
 compiler.cfg.dcn.local.private
 compiler.cfg.dcn.global
-compiler.cfg.dcn.global.private
 compiler.cfg.dcn.rewrite ;
 
 : test-local-dcn ( insns -- insns' )
