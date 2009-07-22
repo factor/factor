@@ -1,6 +1,6 @@
-USING: accessors assocs bson.constants byte-arrays byte-vectors fry io
-io.binary io.encodings.string io.encodings.utf8 kernel math namespaces
-sequences serialize arrays calendar io.encodings ;
+USING: accessors assocs bson.constants calendar fry io io.binary
+io.encodings io.encodings.utf8 kernel math math.bitwise namespaces
+sequences serialize ;
 
 FROM: kernel.private => declare ;
 FROM: io.encodings.private => (read-until) ;
@@ -44,20 +44,17 @@ GENERIC: element-read ( type -- cont? )
 GENERIC: element-data-read ( type -- object )
 GENERIC: element-binary-read ( length type -- object )
 
-: byte-array>number ( seq -- number )
-    byte-array>bignum >integer ; inline
-
 : get-state ( -- state )
     state get ; inline
 
 : read-int32 ( -- int32 )
-    4 read byte-array>number ; inline
+    4 read signed-le> ; inline
 
 : read-longlong ( -- longlong )
-    8 read byte-array>number ; inline
+    8 read signed-le> ; inline
 
 : read-double ( -- double )
-    8 read byte-array>number bits>double ; inline
+    8 read le> bits>double ; inline
 
 : read-byte-raw ( -- byte-raw )
     1 read ; inline

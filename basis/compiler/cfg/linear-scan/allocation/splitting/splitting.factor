@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry hints kernel locals
-math sequences sets sorting splitting
+math sequences sets sorting splitting namespaces
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation.splitting
@@ -32,12 +32,17 @@ IN: compiler.cfg.linear-scan.allocation.splitting
 
 ERROR: splitting-too-early ;
 
+ERROR: splitting-too-late ;
+
 ERROR: splitting-atomic-interval ;
 
 : check-split ( live-interval n -- )
-    [ [ start>> ] dip > [ splitting-too-early ] when ]
-    [ drop [ end>> ] [ start>> ] bi - 0 = [ splitting-atomic-interval ] when ]
-    2bi ; inline
+    check-allocation? get [
+        [ [ start>> ] dip > [ splitting-too-early ] when ]
+        [ [ end>> ] dip <= [ splitting-too-late ] when ]
+        [ drop [ end>> ] [ start>> ] bi = [ splitting-atomic-interval ] when ]
+        2tri
+    ] [ 2drop ] if ; inline
 
 : split-before ( before -- before' )
     f >>spill-to ; inline
@@ -56,22 +61,3 @@ ERROR: splitting-atomic-interval ;
     after split-after ;
 
 HINTS: split-interval live-interval object ;
-
-: split-between-blocks ( new n -- before after )
-    split-interval
-    2dup [ compute-start/end ] bi@ ;
-
-: insert-use-for-copy ( seq n -- seq' )
-    dup 1 + [ nip 1array split1 ] 2keep 2array glue ;
-
-: split-before-use ( new n -- before after )
-    ! Find optimal split position
-    ! Insert move instruction
-    1 -
-    2dup swap covers? [
-        [ '[ _ insert-use-for-copy ] change-uses ] keep
-        split-between-blocks
-        2dup >>split-next drop
-    ] [
-        split-between-blocks
-    ] if ;

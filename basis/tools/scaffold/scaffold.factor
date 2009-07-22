@@ -266,6 +266,14 @@ PRIVATE>
         [ nip require ]
     } 2cleave ;
 
+: scaffold-core ( string -- ) "resource:core" swap scaffold-vocab ;
+
+: scaffold-basis ( string -- ) "resource:basis" swap scaffold-vocab ;
+
+: scaffold-extra ( string -- ) "resource:extra" swap scaffold-vocab ;
+
+: scaffold-work ( string -- ) "resource:work" swap scaffold-vocab ;
+
 <PRIVATE
 
 : tests-file-string ( vocab -- string )

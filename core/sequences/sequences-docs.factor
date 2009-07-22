@@ -1107,7 +1107,7 @@ HELP: replicate
      { "newseq" sequence } }
 { $description "Calls the quotation for every element of the sequence in order. However, the element is not passed to the quotation -- it is dropped, and the quotation produces an element of its own that is collected into a sequence of the same class as the input sequence." }
 { $examples 
-    { $unchecked-example "USING: prettyprint kernel sequences ;"
+    { $unchecked-example "USING: kernel prettyprint random sequences ;"
         "5 [ 100 random ] replicate ."
         "{ 52 10 45 81 30 }"
     }

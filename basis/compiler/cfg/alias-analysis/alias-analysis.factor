@@ -3,8 +3,7 @@
 USING: kernel math namespaces assocs hashtables sequences arrays
 accessors vectors combinators sets classes compiler.cfg
 compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.copy-prop compiler.cfg.rpo
-compiler.cfg.liveness compiler.cfg.local ;
+compiler.cfg.copy-prop compiler.cfg.rpo compiler.cfg.liveness ;
 IN: compiler.cfg.alias-analysis
 
 ! We try to eliminate redundant slot operations using some simple heuristics.
@@ -197,7 +196,7 @@ M: ##set-slot insn-object obj>> resolve ;
 M: ##set-slot-imm insn-object obj>> resolve ;
 M: ##alien-global insn-object drop \ ##alien-global ;
 
-: init-alias-analysis ( live-in -- )
+: init-alias-analysis ( insns -- insns' )
     H{ } clone histories set
     H{ } clone vregs>acs set
     H{ } clone acs>vregs set
@@ -208,7 +207,7 @@ M: ##alien-global insn-object drop \ ##alien-global ;
     0 ac-counter set
     next-ac heap-ac set
 
-    [ set-heap-ac ] each ;
+    dup local-live-in [ set-heap-ac ] each ;
 
 GENERIC: analyze-aliases* ( insn -- insn' )
 
@@ -280,9 +279,10 @@ M: insn eliminate-dead-stores* ;
     [ insn# set eliminate-dead-stores* ] map-index sift ;
 
 : alias-analysis-step ( insns -- insns' )
+    init-alias-analysis
     analyze-aliases
     compute-live-stores
     eliminate-dead-stores ;
 
 : alias-analysis ( cfg -- cfg' )
-    [ init-alias-analysis ] [ alias-analysis-step ] local-optimization ;
+    [ alias-analysis-step ] local-optimization ;

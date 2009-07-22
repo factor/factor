@@ -16,9 +16,15 @@ TUPLE: history document elements index ;
 
 <PRIVATE
 
+: (save-history) ( input index elements -- )
+    2dup length > [
+        [ [ T{ input f "" } ] dip push ] keep
+        (save-history)
+    ] [ set-nth ] if ;
+
 : save-history ( history -- )
     [ document>> doc-string ] keep
-    '[ <input> _ [ index>> ] [ elements>> ] bi set-nth ]
+    '[ <input> _ [ index>> ] [ elements>> ] bi (save-history) ]
     unless-empty ;
 
 : update-document ( history -- )

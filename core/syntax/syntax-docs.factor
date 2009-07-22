@@ -447,7 +447,7 @@ HELP: USING:
 HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
 { $description "Adds the vocabulary's words, prefixed with the vocabulary name, to the search path." }
-{ $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "finishing" } ". Then, the following will call the latter word:"
+{ $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "fishing" } ". Then, the following will call the latter word:"
   { $code
   "USE: fish"
   "QUALIFIED: go"

@@ -247,3 +247,12 @@ PRIVATE>
             word-break-next nip
         ]
     } 2|| ;
+
+: first-word-from ( start str -- i )
+    over tail-slice first-word + ;
+
+: last-word ( str -- i )
+    [ length ] keep '[ _ word-break-at? ] find-last drop 0 or ;
+
+: last-word-from ( end str -- i )
+    swap head-slice last-word ;

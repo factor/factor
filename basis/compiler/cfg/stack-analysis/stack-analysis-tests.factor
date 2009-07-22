@@ -2,38 +2,20 @@ USING: prettyprint compiler.cfg.debugger compiler.cfg.linearization
 compiler.cfg.predecessors compiler.cfg.stack-analysis
 compiler.cfg.instructions sequences kernel tools.test accessors
 sequences.private alien math combinators.private compiler.cfg
-compiler.cfg.checker compiler.cfg.height compiler.cfg.rpo
-compiler.cfg.dce compiler.cfg.registers compiler.cfg.useless-blocks
-sets namespaces ;
+compiler.cfg.checker compiler.cfg.rpo
+compiler.cfg.dce compiler.cfg.registers
+sets namespaces arrays cpu.architecture ;
 IN: compiler.cfg.stack-analysis.tests
 
 ! Fundamental invariant: a basic block should not load or store a value more than once
-: check-for-redundant-ops ( cfg -- )
-    [
-        instructions>>
-        [
-            [ ##peek? ] filter [ loc>> ] map duplicates empty?
-            [ "Redundant peeks" throw ] unless
-        ] [
-            [ ##replace? ] filter [ loc>> ] map duplicates empty?
-            [ "Redundant replaces" throw ] unless
-        ] bi
-    ] each-basic-block ;
-
 : test-stack-analysis ( quot -- cfg )
     dup cfg? [ test-cfg first ] unless
     compute-predecessors
-    delete-useless-blocks
-    delete-useless-conditionals
-    normalize-height
     stack-analysis
-    dup check-cfg
-    dup check-for-redundant-ops ;
+    dup check-cfg ;
 
 : linearize ( cfg -- mr )
     flatten-cfg instructions>> ;
-
-local-only? off
 
 [ ] [ [ ] test-stack-analysis drop ] unit-test
 
@@ -109,7 +91,114 @@ local-only? off
 ! Sync before a back-edge, not after
 ! ##peeks should be inserted before a ##loop-entry
 ! Don't optimize out the constants
-[ 1 t ] [
+[ t ] [
     [ 1000 [ ] times ] test-stack-analysis eliminate-dead-code linearize
-    [ [ ##add-imm? ] count ] [ [ ##load-immediate? ] any? ] bi
+    [ ##load-immediate? ] any?
+] unit-test
+
+! Correct height tracking
+[ t ] [
+    [ pick [ <array> ] [ drop ] if swap ] test-stack-analysis eliminate-dead-code
+    reverse-post-order 4 swap nth
+    instructions>> [ ##peek? ] filter first2 [ loc>> ] [ loc>> ] bi*
+    2array { D 1 D 0 } set=
+] unit-test
+
+[ D 1 ] [
+    V{ T{ ##branch } } 0 test-bb
+
+    V{ T{ ##peek f V int-regs 0 D 2 } T{ ##branch } } 1 test-bb
+
+    V{
+        T{ ##peek f V int-regs 1 D 2 }
+        T{ ##inc-d f -1 }
+        T{ ##branch }
+    } 2 test-bb
+
+    V{ T{ ##call f \ + -1 } T{ ##branch } } 3 test-bb
+
+    V{ T{ ##return } } 4 test-bb
+
+    test-diamond
+
+    cfg new 0 get >>entry
+    compute-predecessors
+    stack-analysis
+    drop
+
+    3 get successors>> first instructions>> first loc>>
+] unit-test
+
+! Do inserted ##peeks reference the correct stack location if
+! an ##inc-d/r was also inserted?
+[ D 0 ] [
+    V{ T{ ##branch } } 0 test-bb
+
+    V{ T{ ##branch } } 1 test-bb
+
+    V{
+        T{ ##peek f V int-regs 1 D 0 }
+        T{ ##branch }
+    } 2 test-bb
+
+    V{
+        T{ ##call f \ + -1 }
+        T{ ##inc-d f 1 }
+        T{ ##branch }
+    } 3 test-bb
+
+    V{ T{ ##return } } 4 test-bb
+
+    test-diamond
+
+    cfg new 0 get >>entry
+    compute-predecessors
+    stack-analysis
+    drop
+
+    3 get successors>> first instructions>> [ ##peek? ] find nip loc>>
+] unit-test
+
+! Missing ##replace
+[ t ] [
+    [ [ "B" ] 2dip dup [ [ /mod ] dip ] when ] test-stack-analysis
+    reverse-post-order last
+    instructions>> [ ##replace? ] filter [ loc>> ] map
+    { D 0 D 1 D 2 } set=
+] unit-test
+
+! Inserted ##peeks reference the wrong stack location
+[ t ] [
+    [ [ "B" ] 2dip dup [ [ /mod ] dip ] when ] test-stack-analysis
+    eliminate-dead-code reverse-post-order 4 swap nth
+    instructions>> [ ##peek? ] filter [ loc>> ] map
+    { D 0 D 1 } set=
+] unit-test
+
+[ D 0 ] [
+    V{ T{ ##branch } } 0 test-bb
+
+    V{ T{ ##branch } } 1 test-bb
+
+    V{
+        T{ ##peek f V int-regs 1 D 0 }
+        T{ ##inc-d f 1 }
+        T{ ##branch }
+    } 2 test-bb
+
+    V{
+        T{ ##inc-d f 1 }
+        T{ ##branch }
+    } 3 test-bb
+
+    V{ T{ ##return } } 4 test-bb
+
+    test-diamond
+
+    cfg new 0 get >>entry
+    compute-predecessors
+    stack-analysis
+    drop
+
+    3 get successors>> first instructions>> [ ##peek? ] find nip loc>>
 ] unit-test

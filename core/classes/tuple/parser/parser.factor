@@ -33,7 +33,7 @@ ERROR: invalid-slot-name name ;
 : parse-long-slot-name ( -- spec )
     [ scan , \ } parse-until % ] { } make ;
 
-: parse-slot-name ( string/f -- ? )
+: parse-slot-name-delim ( end-delim string/f -- ? )
     #! This isn't meant to enforce any kind of policy, just
     #! to check for mistakes of this form:
     #!
@@ -43,12 +43,18 @@ ERROR: invalid-slot-name name ;
     {
         { [ dup not ] [ unexpected-eof ] }
         { [ dup { ":" "(" "<" "\"" "!" } member? ] [ invalid-slot-name ] }
-        { [ dup ";" = ] [ drop f ] }
+        { [ 2dup = ] [ drop f ] }
         [ dup "{" = [ drop parse-long-slot-name ] when , t ]
-    } cond ;
+    } cond nip ;
+
+: parse-tuple-slots-delim ( end-delim -- )
+    dup scan parse-slot-name-delim [ parse-tuple-slots-delim ] [ drop ] if ;
+
+: parse-slot-name ( string/f -- ? )
+    ";" swap parse-slot-name-delim ;
 
 : parse-tuple-slots ( -- )
-    scan parse-slot-name [ parse-tuple-slots ] when ;
+    ";" parse-tuple-slots-delim ;
 
 : parse-tuple-definition ( -- class superclass slots )
     CREATE-CLASS

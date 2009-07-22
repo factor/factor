@@ -291,3 +291,6 @@ USE: make
 
 [ { "a" 1 "b" 1 "c" } ]
 [ 1 { "a" "b" "c" } [ [ dup , ] [ , ] interleave drop ] { } make ] unit-test
+
+[ t ] [ 0 array-capacity? ] unit-test
+[ f ] [ -1 array-capacity? ] unit-test

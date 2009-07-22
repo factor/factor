@@ -4,9 +4,14 @@ USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
 kernel kernel.private math memory namespaces make sequences
 words system layouts combinators math.order fry locals
-compiler.constants compiler.cfg.registers
-compiler.cfg.instructions compiler.cfg.intrinsics
-compiler.cfg.stack-frame compiler.codegen compiler.codegen.fixup ;
+compiler.constants
+compiler.cfg.registers
+compiler.cfg.instructions
+compiler.cfg.intrinsics
+compiler.cfg.comparisons
+compiler.cfg.stack-frame
+compiler.codegen
+compiler.codegen.fixup ;
 IN: cpu.x86
 
 << enable-fixnum-log2 >>
@@ -124,83 +129,18 @@ M: x86 %log2    BSR ;
 : ?MOV ( dst src -- )
     2dup = [ 2drop ] [ MOV ] if ; inline
 
-:: move>args ( src1 src2 -- )
-    {
-        { [ src1 param-reg-2 = ] [ param-reg-1 src2 ?MOV param-reg-1 param-reg-2 XCHG ] }
-        { [ src1 param-reg-1 = ] [ param-reg-2 src2 ?MOV ] }
-        { [ src2 param-reg-1 = ] [ param-reg-2 src1 ?MOV param-reg-1 param-reg-2 XCHG ] }
-        { [ src2 param-reg-2 = ] [ param-reg-1 src1 ?MOV ] }
-        [
-            param-reg-1 src1 MOV
-            param-reg-2 src2 MOV
-        ]
-    } cond ;
-
-HOOK: %alien-invoke-tail cpu ( func dll -- )
-
-:: overflow-template ( src1 src2 insn inverse func -- )
-    <label> "no-overflow" set
+:: overflow-template ( label dst src1 src2 insn -- )
     src1 src2 insn call
-    ds-reg [] src1 MOV
-    "no-overflow" get JNO
-    src1 src2 inverse call
-    src1 src2 move>args
-    %prepare-alien-invoke
-    func f %alien-invoke
-    "no-overflow" resolve-label ; inline
+    label JO ; inline
 
-:: overflow-template-tail ( src1 src2 insn inverse func -- )
-    <label> "no-overflow" set
-    src1 src2 insn call
-    "no-overflow" get JNO
-    src1 src2 inverse call
-    src1 src2 move>args
-    %prepare-alien-invoke
-    func f %alien-invoke-tail
-    "no-overflow" resolve-label
-    ds-reg [] src1 MOV
-    0 RET ; inline
+M: x86 %fixnum-add ( label dst src1 src2 -- )
+    [ ADD ] overflow-template ;
 
-M: x86 %fixnum-add ( src1 src2 -- )
-    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template ;
+M: x86 %fixnum-sub ( label dst src1 src2 -- )
+    [ SUB ] overflow-template ;
 
-M: x86 %fixnum-add-tail ( src1 src2 -- )
-    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template-tail ;
-
-M: x86 %fixnum-sub ( src1 src2 -- )
-    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template ;
-
-M: x86 %fixnum-sub-tail ( src1 src2 -- )
-    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template-tail ;
-
-M:: x86 %fixnum-mul ( src1 src2 temp1 temp2 -- )
-    "no-overflow" define-label
-    temp1 src1 MOV
-    temp1 tag-bits get SAR
-    src2 temp1 IMUL2
-    ds-reg [] temp1 MOV
-    "no-overflow" get JNO
-    src1 src2 move>args
-    param-reg-1 tag-bits get SAR
-    param-reg-2 tag-bits get SAR
-    %prepare-alien-invoke
-    "overflow_fixnum_multiply" f %alien-invoke
-    "no-overflow" resolve-label ;
-
-M:: x86 %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
-    "overflow" define-label
-    temp1 src1 MOV
-    temp1 tag-bits get SAR
-    src2 temp1 IMUL2
-    "overflow" get JO
-    ds-reg [] temp1 MOV
-    0 RET
-    "overflow" resolve-label
-    src1 src2 move>args
-    param-reg-1 tag-bits get SAR
-    param-reg-2 tag-bits get SAR
-    %prepare-alien-invoke
-    "overflow_fixnum_multiply" f %alien-invoke-tail ;
+M: x86 %fixnum-mul ( label dst src1 src2 -- )
+    [ swap IMUL2 ] overflow-template ;
 
 : bignum@ ( reg n -- op )
     cells bignum tag-number - [+] ; inline
@@ -410,6 +350,28 @@ M: x86.64 small-reg-native small-reg-8 ;
         exclude small-reg-that-isn't
         [ quot call ] with-save/restore
     ] if ; inline
+
+: shift-count? ( reg -- ? ) { ECX RCX } memq? ;
+
+:: emit-shift ( dst src1 src2 quot -- )
+    src2 shift-count? [
+        dst CL quot call
+    ] [
+        dst shift-count? [
+            dst src2 XCHG
+            src2 CL quot call
+            dst src2 XCHG
+        ] [
+            ECX small-reg-native [
+                CL src2 MOV
+                drop dst CL quot call
+            ] with-save/restore
+        ] if
+    ] if ; inline
+
+M: x86 %shl [ SHL ] emit-shift ;
+M: x86 %shr [ SHR ] emit-shift ;
+M: x86 %sar [ SAR ] emit-shift ;
 
 M:: x86 %string-nth ( dst src index temp -- )
     "end" define-label
