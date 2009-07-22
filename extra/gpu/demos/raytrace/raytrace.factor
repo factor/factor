@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays game-loop game-worlds generalizations
-gpu gpu.render gpu.shaders gpu.util gpu.util.wasd kernel
-literals math math.matrices math.order math.vectors
+USING: accessors arrays combinators.tuple game-loop game-worlds
+generalizations gpu gpu.render gpu.shaders gpu.util gpu.util.wasd
+kernel literals math math.matrices math.order math.vectors
 method-chains sequences ui ui.gadgets ui.gadgets.worlds
 ui.pixel-formats ;
 IN: gpu.demos.raytrace
@@ -97,13 +97,12 @@ AFTER: raytrace-world tick*
     spheres>> [ tick-sphere ] each ;
 
 M: raytrace-world draw-world*
-    render-set new
-        triangle-strip-mode >>primitive-mode
-        T{ index-range f 0 4 } >>indexes
-        swap
-        [ <sphere-uniforms> >>uniforms ]
-        [ vertex-array>> >>vertex-array ] bi
-    render ;
+    {
+        { "primitive-mode" [ drop triangle-strip-mode    ] }
+        { "indexes"        [ drop T{ index-range f 0 4 } ] }
+        { "uniforms"       [ <sphere-uniforms>           ] }
+        { "vertex-array"   [ vertex-array>>              ] }
+    } <render-set> render ;
 
 M: raytrace-world pref-dim* drop { 1024 768 } ;
 M: raytrace-world tick-length drop 1000 30 /i ;
