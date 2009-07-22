@@ -49,12 +49,3 @@ M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: _dispatch uses-vregs src>> 1array ;
 M: insn uses-vregs drop f ;
-
-: map-unique ( seq quot -- assoc )
-    map concat unique ; inline
-
-: gen-set ( instructions -- seq )
-    [ uses-vregs ] map-unique ;
-
-: kill-set ( instructions -- seq )
-    [ defs-vregs ] map-unique ;
