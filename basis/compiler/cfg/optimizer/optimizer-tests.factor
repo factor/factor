@@ -1,8 +1,8 @@
-USING: accessors arrays compiler.cfg.checker
-compiler.cfg.debugger compiler.cfg.def-use
-compiler.cfg.instructions fry kernel kernel.private math
-math.partial-dispatch math.private sbufs sequences sequences.private sets
-slots.private strings strings.private tools.test vectors layouts ;
+USING: accessors arrays compiler.cfg.checker compiler.cfg.debugger
+compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.optimizer
+fry kernel kernel.private math math.partial-dispatch math.private
+sbufs sequences sequences.private sets slots.private strings
+strings.private tools.test vectors layouts ;
 IN: compiler.cfg.optimizer.tests
 
 ! Miscellaneous tests
@@ -45,7 +45,7 @@ IN: compiler.cfg.optimizer.tests
         set-string-nth-fast
     ]
 } [
-    [ [ ] ] dip '[ _ test-mr first check-mr ] unit-test
+    [ [ ] ] dip '[ _ test-cfg first optimize-cfg check-cfg ] unit-test
 ] each
 
 cell 8 = [

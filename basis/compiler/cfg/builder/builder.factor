@@ -86,7 +86,6 @@ GENERIC: emit-node ( node -- )
     basic-block get swap loops get set-at ;
 
 : emit-loop ( node -- )
-    ##loop-entry
     ##branch
     begin-basic-block
     [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi ;

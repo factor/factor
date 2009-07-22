@@ -245,7 +245,7 @@ M: _gc generate-insn
         [ gc-root-count>> ]
     } cleave %gc ;
 
-M: ##loop-entry generate-insn drop %loop-entry ;
+M: _loop-entry generate-insn drop %loop-entry ;
 
 M: ##alien-global generate-insn
     [ dst>> register ] [ symbol>> ] [ library>> ] tri
