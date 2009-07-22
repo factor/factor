@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math math.order fry
 combinators binary-search compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.def-use compiler.cfg.linear-scan.liveness compiler.cfg.rpo
+compiler.cfg.def-use compiler.cfg.liveness compiler.cfg.rpo
 compiler.cfg ;
 IN: compiler.cfg.linear-scan.live-intervals
 
