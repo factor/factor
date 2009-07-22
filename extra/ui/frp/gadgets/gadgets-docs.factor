@@ -58,9 +58,13 @@ HELP: <frp-action-field>
 { $values { "field" action-field } }
 { $description "Field that updates its model with its contents when the user hits the return key" } ;
 
-HELP: IMAGE-BUTTON:
+HELP: IMG-FRP-BTN:
 { $syntax "IMAGE-BUTTON: filename" }
 { $description "Creates a button using a tiff image named as specified found in the icons subdirectory of the vocabulary path" } ;
+
+HELP: IMG-BTN:
+{ $syntax "[ do-something ] IMAGE-BUTTON: filename" }
+{ $description "Creates a button using a tiff image named as specified found in the icons subdirectory of the vocabulary path, calling the specified quotation on click" } ;
 
 HELP: output-model
 { $values { "gadget" gadget } { "model" model } }

@@ -38,16 +38,16 @@ HELP: with-interface
 { $values { "quot" "quotation that builds a template and inserts into it" } }
 { $description "Create templates, used with " { $link POSTPONE: $ } } ;
 
-ARTICLE: { "ui.frp.layout" "about" } "GUI Layout"
+ARTICLE: "ui.frp.layout" "GUI Layout"
 "Laying out GUIs works the same way as building lists with " { $vocab-link "make" }
 ". Gadgets are layed out using " { $vocab-link "ui.gadgets.tracks" } " through " { $link <hbox> } " and " { $link <vbox> } ", which allow both fixed and percentage widths. "
 { $link , } " and " { $link -> }  " add a signal or gadget to the gadget you're building. "
 "Also, books can be made with " { $link <frp-book> } ". "
 { $link <spacer> } "s add flexable space between items. " $nl
 "Using " { $link with-interface } ", one can pre-build templates to add items to later: "
-"Like in Java's StringTemplate, placeholders are defined using $ PLACERHOLDER-NAME $ "
+"Like in the StringTemplate framework for java, placeholders are defined using $ PLACERHOLDER-NAME $ "
 "Using PLACEHOLDER-NAME again sets it as the current insertion point. "
-"For examples using normal layout, see the " { $vocab-link "gui-sudoku" } " demo. "
+"For examples using normal layout, see the " { $vocab-link "sudokus" } " demo. "
 "For examples of templating, see " { $vocab-link "recipes" } " demo. " ;
 
-ABOUT: { "ui.frp.layout" "about" }
+ABOUT: "ui.frp.layout"

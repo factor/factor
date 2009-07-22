@@ -41,10 +41,9 @@ HELP: #1
 { $values { "model" model } { "model'" model } }
 { $description "Moves a signal to the top of its dependencies' connections, thus being notified before the others" } ;
 
-ARTICLE: { "signals" "about" } "FRP Signals"
+ARTICLE: "signals" "FRP Signals"
 "Unlike models, which always have a value, signals have discrete start and end times. "
 "They are the core of the frp library: program flow using frp is controlled entirely through manipulating and combining signals. "
-"The output signals of some gadgets (see " { $vocab-link "ui.frp.gadgets" } " ) can be manipulated and used as the input signals of others. "
-"To combine signals see " { $vocab-link "ui.frp.functors" } ;
+"The output signals of some gadgets (see " { $vocab-link "ui.frp.gadgets" } " ) can be manipulated and used as the input signals of others. " ;
 
-ABOUT: { "signals" "about" }
+ABOUT: "signals"

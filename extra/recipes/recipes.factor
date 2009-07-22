@@ -31,11 +31,11 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
     interface
       <frp-table*> :> tbl
       "okay" <frp-border-button> BUTTON -> :> ok
-      IMAGE-BUTTON: submit [ store-tuple ] >>value TOOLBAR -> :> submit
-      IMAGE-BUTTON: love 1 >>value TOOLBAR ->
-      IMAGE-BUTTON: hate -1 >>value -> 2array <merge> :> votes
-      IMAGE-BUTTON: back -> [ -30 ] <$
-      IMAGE-BUTTON: more -> [ 30 ] <$ 2array <merge> :> viewed
+      IMG-FRP-BTN: submit [ store-tuple ] >>value TOOLBAR -> :> submit
+      IMG-FRP-BTN: love 1 >>value TOOLBAR ->
+      IMG-FRP-BTN: hate -1 >>value -> 2array <merge> :> votes
+      IMG-FRP-BTN: back -> [ -30 ] <$
+      IMG-FRP-BTN: more -> [ 30 ] <$ 2array <merge> :> viewed
       <spacer> <frp-field*> ->% 1 :> search
       submit ok [ [ drop ] ] <$ 2array <merge> [ drop ] >>value :> quot
       viewed 0 [ + ] <fold> search ok t <basic> "all" <frp-button> ALL ->
