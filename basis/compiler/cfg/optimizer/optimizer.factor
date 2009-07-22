@@ -5,6 +5,9 @@ compiler.cfg.tco
 compiler.cfg.predecessors
 compiler.cfg.useless-conditionals
 compiler.cfg.stack-analysis
+compiler.cfg.dcn
+compiler.cfg.dominance
+compiler.cfg.ssa
 compiler.cfg.branch-splitting
 compiler.cfg.block-joining
 compiler.cfg.alias-analysis
@@ -24,17 +27,24 @@ SYMBOL: check-optimizer?
         dup check-cfg
     ] when ;
 
+SYMBOL: new-optimizer?
+
 : optimize-cfg ( cfg -- cfg' )
     ! Note that compute-predecessors has to be called several times.
     ! The passes that need this document it.
     [
         optimize-tail-calls
-        delete-useless-conditionals
+        new-optimizer? get [ delete-useless-conditionals ] unless
         compute-predecessors
-        split-branches
+        new-optimizer? get [ split-branches ] unless
+        new-optimizer? get [
+            deconcatenatize
+            compute-dominance
+            construct-ssa
+        ] when
         join-blocks
         compute-predecessors
-        stack-analysis
+        new-optimizer? get [ stack-analysis ] unless
         compute-liveness
         alias-analysis
         value-numbering
