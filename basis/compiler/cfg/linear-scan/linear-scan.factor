@@ -6,6 +6,7 @@ compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.instructions
 compiler.cfg.linear-scan.numbering
+compiler.cfg.linear-scan.liveness
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
@@ -28,17 +29,18 @@ IN: compiler.cfg.linear-scan
 ! by Omri Traub, Glenn Holloway, Michael D. Smith
 ! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.34.8435
 
-:: (linear-scan) ( rpo machine-registers -- )
-    rpo number-instructions
-    rpo compute-live-intervals machine-registers allocate-registers
-    rpo assign-registers
-    rpo resolve-data-flow
-    rpo check-numbering ;
+:: (linear-scan) ( cfg machine-registers -- )
+    cfg compute-live-sets
+    cfg number-instructions
+    cfg compute-live-intervals machine-registers allocate-registers
+    cfg assign-registers
+    cfg resolve-data-flow
+    cfg check-numbering ;
 
 : linear-scan ( cfg -- cfg' )
     [
         init-mapping
-        dup reverse-post-order machine-registers (linear-scan)
+        dup machine-registers (linear-scan)
         spill-counts get >>spill-counts
         cfg-changed
     ] with-scope ;

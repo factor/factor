@@ -13,7 +13,6 @@ compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.dce
 compiler.cfg.write-barrier
-compiler.cfg.liveness
 compiler.cfg.rpo
 compiler.cfg.phi-elimination
 compiler.cfg.checker ;
@@ -39,7 +38,6 @@ SYMBOL: check-optimizer?
         deconcatenatize
         compute-dominance
         construct-ssa
-        compute-liveness
         alias-analysis
         value-numbering
         compute-predecessors

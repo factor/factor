@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences make compiler.cfg.instructions
-compiler.cfg.local cpu.architecture ;
+compiler.cfg.rpo cpu.architecture ;
 IN: compiler.cfg.two-operand
 
 ! On x86, instructions take the form x = x op y
@@ -54,7 +54,6 @@ M: insn convert-two-operand* , ;
 
 : convert-two-operand ( cfg -- cfg' )
     two-operand? [
-        [ drop ]
         [ [ [ convert-two-operand* ] each ] V{ } make ]
         local-optimization
     ] when ;
