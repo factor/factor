@@ -1218,17 +1218,6 @@ test-diamond
 
 [ t ] [ 1 get successors>> first 3 get eq? ] unit-test
 
-[let | n! [ f ] |
-
-[ ] [ 2 get successors>> first instructions>> first src>> n>> n! ] unit-test
-
-[ t ] [
-    T{ ##copy f V int-regs n V int-regs 2 }
-    3 get successors>> first instructions>> first =
-] unit-test
-
-]
-
 [ 3 ] [ 4 get instructions>> length ] unit-test
 
 V{
