@@ -4,7 +4,6 @@ USING: kernel sequences accessors combinators namespaces
 compiler.cfg.tco
 compiler.cfg.predecessors
 compiler.cfg.useless-conditionals
-compiler.cfg.stack-analysis
 compiler.cfg.dcn
 compiler.cfg.dominance
 compiler.cfg.ssa
@@ -27,24 +26,19 @@ SYMBOL: check-optimizer?
         dup check-cfg
     ] when ;
 
-SYMBOL: new-optimizer?
-
 : optimize-cfg ( cfg -- cfg' )
     ! Note that compute-predecessors has to be called several times.
     ! The passes that need this document it.
     [
         optimize-tail-calls
-        new-optimizer? get [ delete-useless-conditionals ] unless
+        delete-useless-conditionals
         compute-predecessors
-        new-optimizer? get [ split-branches ] unless
-        new-optimizer? get [
-            deconcatenatize
-            compute-dominance
-            construct-ssa
-        ] when
+        split-branches
         join-blocks
         compute-predecessors
-        new-optimizer? get [ stack-analysis ] unless
+        deconcatenatize
+        compute-dominance
+        construct-ssa
         compute-liveness
         alias-analysis
         value-numbering
