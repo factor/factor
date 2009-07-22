@@ -36,8 +36,8 @@ V{ } 5 test-bb
 
 [ { 4 } ] [ 1 get dom-frontier [ number>> ] map ] unit-test
 [ { 4 } ] [ 2 get dom-frontier [ number>> ] map ] unit-test
-[ f ] [ 0 get dom-frontier ] unit-test
-[ f ] [ 4 get dom-frontier ] unit-test
+[ { } ] [ 0 get dom-frontier ] unit-test
+[ { } ] [ 4 get dom-frontier ] unit-test
 
 ! Example from the paper
 V{ } 0 test-bb
