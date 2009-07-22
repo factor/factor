@@ -61,20 +61,24 @@ M: ##copy visit
     ds-height get dup 0 = [ drop ] [ ##inc-d ] if
     rs-height get dup 0 = [ drop ] [ ##inc-r ] if ;
 
+: init-local-analysis ( -- )
+    0 ds-height set
+    0 rs-height set
+    H{ } clone copies set
+    H{ } clone reads-locations set
+    H{ } clone writes-locations set ;
+
 : local-analysis ( bb -- )
     ! Removes all ##peek and ##replace from the basic block.
     ! Conceptually, moves all ##peeks to the start
     ! (reads-locations assoc) and all ##replaces to the end
     ! (writes-locations assoc).
-    0 ds-height set
-    0 rs-height set
-    H{ } clone copies set
-    H{ } clone reads-locations set
-    H{ } clone writes-locations set
+    init-local-analysis
     [
         [
-            [ visit ] each
+            unclip-last-slice [ [ visit ] each ] dip
             insert-height-changes
+            ,
         ] V{ } make
     ] change-instructions drop ;
 
