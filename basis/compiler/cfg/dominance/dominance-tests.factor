@@ -34,11 +34,10 @@ V{ } 5 test-bb
 
 [ t ] [ 0 get dom-children 1 get 2 get 4 get 3array set= ] unit-test
 
-[ t ] [ 4 get 1 get dom-frontier key? ] unit-test
-[ f ] [ 3 get 1 get dom-frontier key? ] unit-test
-[ t ] [ 4 get 2 get dom-frontier key? ] unit-test
-[ t ] [ 0 get dom-frontier assoc-empty? ] unit-test
-[ t ] [ 4 get dom-frontier assoc-empty? ] unit-test
+[ { 4 } ] [ 1 get dom-frontier [ number>> ] map ] unit-test
+[ { 4 } ] [ 2 get dom-frontier [ number>> ] map ] unit-test
+[ { } ] [ 0 get dom-frontier ] unit-test
+[ { } ] [ 4 get dom-frontier ] unit-test
 
 ! Example from the paper
 V{ } 0 test-bb
