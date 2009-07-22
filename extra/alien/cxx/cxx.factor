@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.cxx.parser alien.marshall
 alien.inline.types classes.mixin classes.tuple kernel namespaces
-assocs sequences parser classes.parser ;
+assocs sequences parser classes.parser alien.marshall.syntax
+interpolate locals effects io strings ;
 IN: alien.cxx
 
 <PRIVATE
@@ -17,6 +18,13 @@ IN: alien.cxx
     [ add-mixin-instance ] 2bi ;
 PRIVATE>
 
-: define-c++-class ( str superclass-mixin -- )
+: define-c++-class ( name superclass-mixin -- )
     [ [ class-tuple-word ] [ class-mixin ] bi dup ] dip
     add-mixin-instance define-class-tuple ;
+
+:: define-c++-method ( class-name name types effect -- )
+    effect [ in>> "self" suffix ] [ out>> ] bi <effect> :> effect'
+    types class-name "*" append suffix :> types'
+    effect in>> "," join :> args
+    SBUF" " dup [ I[ return self->${name}(${args});]I ] with-output-stream >string :> body
+    name types' effect' body define-c-marshalled ;
