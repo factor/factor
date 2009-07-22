@@ -14,6 +14,14 @@ M: ##flushable rename-insn-defs
     [ rename-value ] change-dst
     drop ;
 
+M: ##fixnum-overflow rename-insn-defs
+    [ rename-value ] change-dst
+    drop ;
+
+M: _fixnum-overflow rename-insn-defs
+    [ rename-value ] change-dst
+    drop ;
+
 M: insn rename-insn-defs drop ;
 
 GENERIC: rename-insn-uses ( insn -- )
