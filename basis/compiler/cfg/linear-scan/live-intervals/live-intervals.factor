@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math math.order fry
-combinators compiler.cfg.instructions compiler.cfg.registers
+combinators binary-search compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.def-use compiler.cfg.liveness compiler.cfg ;
 IN: compiler.cfg.linear-scan.live-intervals
 
@@ -16,16 +16,21 @@ split-before split-after split-next
 start end ranges uses
 copy-from ;
 
-: covers? ( insn# live-interval -- ? )
-    ranges>> [ [ from>> ] [ to>> ] bi between? ] with any? ;
+GENERIC: covers? ( insn# obj -- ? )
 
-: child-interval-at ( insn# interval -- interval' )
-    dup split-after>> [
-        2dup split-after>> start>> <
-        [ split-before>> ] [ split-after>> ] if
-        child-interval-at
-    ] [ nip ] if ;
+M: f covers? 2drop f ;
 
+M: live-range covers? [ from>> ] [ to>> ] bi between? ;
+
+M: live-interval covers? ( insn# live-interval -- ? )
+    ranges>>
+    dup length 4 <= [
+        [ covers? ] with any?
+    ] [
+        [ drop ] [ [ from>> <=> ] with search nip ] 2bi
+        covers?
+    ] if ;
+        
 ERROR: dead-value-error vreg ;
 
 : shorten-range ( n live-interval -- )
@@ -122,10 +127,10 @@ M: ##copy-float compute-live-intervals*
     dup ranges>> [ first from>> ] [ last to>> ] bi
     [ >>start ] [ >>end ] bi* drop ;
 
-: check-start/end ( live-interval -- )
-    [ [ start>> ] [ uses>> first ] bi assert= ]
-    [ [ end>> ] [ uses>> last ] bi assert= ]
-    bi ;
+ERROR: bad-live-interval live-interval ;
+
+: check-start ( live-interval -- )
+    dup start>> -1 = [ bad-live-interval ] [ drop ] if ;
 
 : finish-live-intervals ( live-intervals -- )
     ! Since live intervals are computed in a backward order, we have
@@ -135,7 +140,7 @@ M: ##copy-float compute-live-intervals*
             [ ranges>> reverse-here ]
             [ uses>> reverse-here ]
             [ compute-start/end ]
-            [ check-start/end ]
+            [ check-start ]
         } cleave
     ] each ;
 

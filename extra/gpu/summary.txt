@@ -1,0 +1,1 @@
+High-level OpenGL-based GPU resource management and rendering library

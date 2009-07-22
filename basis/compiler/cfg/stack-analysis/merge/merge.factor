@@ -1,11 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs sequences accessors fry combinators grouping
-sets locals compiler.cfg compiler.cfg.hats compiler.cfg.instructions
-compiler.cfg.stack-analysis.state ;
+USING: kernel assocs sequences accessors fry combinators grouping sets
+arrays vectors locals namespaces make compiler.cfg compiler.cfg.hats
+compiler.cfg.instructions compiler.cfg.stack-analysis.state
+compiler.cfg.registers compiler.cfg.utilities cpu.architecture ;
 IN: compiler.cfg.stack-analysis.merge
-
-! XXX critical edges
 
 : initial-state ( bb states -- state ) 2drop <state> ;
 
@@ -27,14 +26,14 @@ IN: compiler.cfg.stack-analysis.merge
     [ nip first >>rs-height ]
     [ [ '[ _ save-rs-height ] add-instructions ] 2each ] if ;
 
-: assoc-map-values ( assoc quot -- assoc' )
+: assoc-map-keys ( assoc quot -- assoc' )
     '[ _ dip ] assoc-map ; inline
 
 : translate-locs ( assoc state -- assoc' )
-    '[ _ translate-loc ] assoc-map-values ;
+    '[ _ translate-loc ] assoc-map-keys ;
 
 : untranslate-locs ( assoc state -- assoc' )
-    '[ _ untranslate-loc ] assoc-map-values ;
+    '[ _ untranslate-loc ] assoc-map-keys ;
 
 : collect-locs ( loc-maps states -- assoc )
     ! assoc maps locs to sequences
@@ -45,12 +44,16 @@ IN: compiler.cfg.stack-analysis.merge
 : insert-peek ( predecessor loc state -- vreg )
     '[ _ _ translate-loc ^^peek ] add-instructions ;
 
+SYMBOL: added-phis
+
+: add-phi-later ( inputs -- vreg )
+    [ int-regs next-vreg dup ] dip 2array added-phis get push ;
+
 : merge-loc ( predecessors vregs loc state -- vreg )
     ! Insert a ##phi in the current block where the input
     ! is the vreg storing loc from each predecessor block
-    [ dup ] 3dip
     '[ [ ] [ _ _ insert-peek ] ?if ] 2map
-    dup all-equal? [ nip first ] [ zip ^^phi ] if ;
+    dup all-equal? [ first ] [ add-phi-later ] if ;
 
 :: merge-locs ( state predecessors states -- state )
     states [ locs>vregs>> ] map states collect-locs
@@ -77,30 +80,36 @@ IN: compiler.cfg.stack-analysis.merge
     over translate-locs
     >>changed-locs ;
 
-ERROR: cannot-merge-poisoned states ;
+:: insert-phis ( bb -- )
+    bb predecessors>> :> predecessors
+    [
+        added-phis get [| dst inputs |
+            dst predecessors inputs zip ##phi
+        ] assoc-each
+    ] V{ } make bb instructions>> over push-all
+    bb (>>instructions) ;
 
-: multiple-predecessors ( bb states -- state )
-    dup [ not ] any? [
-        2drop <state>
+:: multiple-predecessors ( bb states -- state )
+    states [ not ] any? [
+        <state>
+        bb add-to-work-list
     ] [
-        dup [ poisoned?>> ] any? [
-            cannot-merge-poisoned
-        ] [
-            [ state new ] 2dip
-            [ predecessors>> ] dip
-            {
-                [ merge-ds-heights ]
-                [ merge-rs-heights ]
-                [ merge-locs ]
-                [ nip merge-actual-locs ]
-                [ nip merge-changed-locs ]
-            } 2cleave
-        ] if
+        [
+            H{ } clone added-instructions set
+            V{ } clone added-phis set
+            bb predecessors>> :> predecessors
+            state new
+            predecessors states merge-ds-heights
+            predecessors states merge-rs-heights
+            predecessors states merge-locs
+            states merge-actual-locs
+            states merge-changed-locs
+            bb insert-basic-blocks
+            bb insert-phis
+        ] with-scope
     ] if ;
 
 : merge-states ( bb states -- state )
-    ! If any states are poisoned, save all registers
-    ! to the stack in each branch
     dup length {
         { 0 [ initial-state ] }
         { 1 [ single-predecessor ] }

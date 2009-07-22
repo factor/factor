@@ -9,7 +9,7 @@ compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
 specialized-arrays.double system sorting math.libm
-math.intervals quotations ;
+math.intervals quotations effects ;
 IN: compiler.tree.propagation.tests
 
 [ V{ } ] [ [ ] final-classes ] unit-test
@@ -84,9 +84,9 @@ IN: compiler.tree.propagation.tests
 
 [ float ] [ [ { float float } declare mod ] final-math-class ] unit-test
 
-[ V{ integer } ] [ [ 255 bitand ] final-classes ] unit-test
+[ V{ fixnum } ] [ [ 255 bitand ] final-classes ] unit-test
 
-[ V{ integer } ] [
+[ V{ fixnum } ] [
     [ [ 255 bitand ] [ 65535 bitand ] bi + ] final-classes
 ] unit-test
 
@@ -640,6 +640,10 @@ MIXIN: empty-mixin
     [ { bignum integer } declare [ shift ] keep ] final-classes
 ] unit-test
 
+[ V{ fixnum } ] [ [ >fixnum 15 bitand 1 swap shift ] final-classes ] unit-test
+
+[ V{ fixnum } ] [ [ 15 bitand 1 swap shift ] final-classes ] unit-test
+
 [ V{ fixnum } ] [
     [ { fixnum } declare log2 ] final-classes
 ] unit-test
@@ -704,3 +708,39 @@ TUPLE: circle me ;
 
 ! Joe found an oversight
 [ V{ integer } ] [ [ >integer ] final-classes ] unit-test
+
+TUPLE: foo bar ;
+
+[ t ] [ [ foo new ] { new } inlined? ] unit-test
+
+GENERIC: whatever ( x -- y )
+M: number whatever drop foo ;
+
+[ t ] [ [ 1 whatever new ] { new } inlined? ] unit-test
+
+: that-thing ( -- class ) foo ;
+
+[ f ] [ [ that-thing new ] { new } inlined? ] unit-test
+
+GENERIC: whatever2 ( x -- y )
+M: number whatever2 drop H{ { 1 1 } { 2 2 } { 3 3 } { 4 4 } { 5 6 } } ;
+M: f whatever2 ;
+
+[ t ] [ [ 1 whatever2 at ] { at* hashcode* } inlined? ] unit-test
+[ f ] [ [ whatever2 at ] { at* hashcode* } inlined? ] unit-test
+
+[ t ] [ [ { 1 2 3 } member? ] { member? } inlined? ] unit-test
+[ f ] [ [ { 1 2 3 } swap member? ] { member? } inlined? ] unit-test
+
+[ t ] [ [ { 1 2 3 } memq? ] { memq? } inlined? ] unit-test
+[ f ] [ [ { 1 2 3 } swap memq? ] { memq? } inlined? ] unit-test
+
+[ t ] [ [ V{ } clone ] { clone (clone) } inlined? ] unit-test
+[ f ] [ [ { } clone ] { clone (clone) } inlined? ] unit-test
+
+[ f ] [ [ instance? ] { instance? } inlined? ] unit-test
+[ f ] [ [ 5 instance? ] { instance? } inlined? ] unit-test
+[ t ] [ [ array instance? ] { instance? } inlined? ] unit-test
+
+[ t ] [ [ (( a b c -- c b a )) shuffle ] { shuffle } inlined? ] unit-test
+[ f ] [ [ { 1 2 3 } swap shuffle ] { shuffle } inlined? ] unit-test

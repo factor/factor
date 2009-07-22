@@ -26,7 +26,7 @@ M: word test-cfg
     ] map ;
 
 : insn. ( insn -- )
-    tuple>array [ pprint bl ] each nl ;
+    tuple>array but-last [ pprint bl ] each nl ;
 
 : mr. ( mrs -- )
     [

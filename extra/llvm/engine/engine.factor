@@ -5,29 +5,18 @@ IN: llvm.engine
 
 <<
 
-"LLVMExecutionEngine" "/usr/local/lib/libLLVMExecutionEngine.dylib" "cdecl" add-library
-
-"LLVMTarget" "/usr/local/lib/libLLVMTarget.dylib" "cdecl" add-library
-
-"LLVMAnalysis" "/usr/local/lib/libLLVMAnalysis.dylib" "cdecl" add-library
-
-"LLVMipa" "/usr/local/lib/libLLVMipa.dylib" "cdecl" add-library
-
-"LLVMTransformUtils" "/usr/local/lib/libLLVMTransformUtils.dylib" "cdecl" add-library
-
-"LLVMScalarOpts" "/usr/local/lib/libLLVMScalarOpts.dylib" "cdecl" add-library
-
-"LLVMCodeGen" "/usr/local/lib/libLLVMCodeGen.dylib" "cdecl" add-library
-
-"LLVMAsmPrinter" "/usr/local/lib/libLLVMAsmPrinter.dylib" "cdecl" add-library
-
-"LLVMSelectionDAG" "/usr/local/lib/libLLVMSelectionDAG.dylib" "cdecl" add-library
-
-"LLVMX86CodeGen" "/usr/local/lib/libLLVMX86CodeGen.dylib" "cdecl" add-library
-
-"LLVMJIT" "/usr/local/lib/libLLVMJIT.dylib" "cdecl" add-library
-
-"LLVMInterpreter.dylib" "/usr/local/lib/libLLVMInterpreter.dylib" "cdecl" add-library
+"LLVMExecutionEngine" add-llvm-library
+"LLVMTarget" add-llvm-library
+"LLVMAnalysis" add-llvm-library
+"LLVMipa" add-llvm-library
+"LLVMTransformUtils" add-llvm-library
+"LLVMScalarOpts" add-llvm-library
+"LLVMCodeGen" add-llvm-library
+"LLVMAsmPrinter" add-llvm-library
+"LLVMSelectionDAG" add-llvm-library
+"LLVMX86CodeGen" add-llvm-library
+"LLVMJIT" add-llvm-library
+"LLVMInterpreter" add-llvm-library
 
 >>
 

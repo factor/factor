@@ -134,3 +134,19 @@ unit-test
 [ f ] [ 1 2 H{ { 2 1 } } maybe-set-at ] unit-test
 [ t ] [ 1 3 H{ { 2 1 } } clone maybe-set-at ] unit-test
 [ t ] [ 3 2 H{ { 2 1 } } clone maybe-set-at ] unit-test
+
+[ H{ { 1 2 } { 2 3 } } ] [
+    {
+        H{ { 1 3 } }
+        H{ { 2 3 } }
+        H{ { 1 2 } }
+    } assoc-combine
+] unit-test
+
+[ H{ { 1 7 } } ] [
+    {
+        H{ { 1 2 } { 2 4 } { 5 6 } }
+        H{ { 1 3 } { 2 5 } }
+        H{ { 1 7 } { 5 6 } }
+    } assoc-refine
+] unit-test
