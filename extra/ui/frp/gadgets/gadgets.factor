@@ -52,8 +52,10 @@ M: frp-field model-changed 2dup frp-model>> =
 : <frp-action-field> ( -- field ) f <action-field> dup [ set-control-value ] curry >>quot
     f <model> >>model ;
 
-SYNTAX: IMAGE-BUTTON: scan current-vocab name>> "vocab:" "/icons/" surround ".tiff" surround
-    <image-name> [ <frp-button> ] curry over push-all ;
+: image-prep ( -- image ) scan current-vocab name>> "vocab:" "/icons/" surround ".tiff" surround <image-name> ;
+SYNTAX: IMG-FRP-BTN: image-prep [ <frp-button> ] curry over push-all ;
+
+SYNTAX: IMG-BTN: image-prep [ swap <button> ] curry over push-all ;
 
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
