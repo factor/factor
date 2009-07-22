@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types assocs combinators.short-circuit
 continuations effects fry kernel math memoize sequences
-splitting ;
+splitting strings peg.ebnf make alien.c-types ;
 IN: alien.inline.types
 
 : cify-type ( str -- str' )
@@ -20,6 +20,9 @@ IN: alien.inline.types
 
 : pointer-to-const? ( str -- ? )
     cify-type "const " head? ;
+
+: template-class? ( str -- ? )
+    [ CHAR: < = ] any? ;
 
 MEMO: resolved-primitives ( -- seq )
     primitive-types [ resolve-typedef ] map ;
@@ -57,3 +60,42 @@ MEMO: resolved-primitives ( -- seq )
         [ over pointer-to-primitive? [ ">" prepend ] when ]
         assoc-map unzip
     ] dip <effect> ;
+
+TUPLE: c++-type name params ptr ;
+C: <c++-type> c++-type
+
+EBNF: (parse-c++-type)
+dig  = [0-9]
+alpha = [a-zA-Z]
+alphanum = [1-9a-zA-Z]
+name = [_a-zA-Z] [_a-zA-Z1-9]* => [[ first2 swap prefix >string ]]
+ptr = [*&] => [[ empty? not ]]
+
+param = "," " "* type " "* => [[ third ]]
+
+params = "<" " "* type " "* param* ">" => [[ [ 4 swap nth ] [ third ] bi prefix ]]
+
+type = name " "* params? " "* ptr? => [[ { 0 2 4 } [ swap nth ] with map first3 <c++-type> ]]
+;EBNF
+
+: parse-c++-type ( str -- c++-type )
+    factorize-type parse-c++-type ;
+
+DEFER: c++-type>string
+
+: params>string ( params -- str )
+    [ "<" % [ c++-type>string ] map "," join % ">" % ] "" make ;
+
+: c++-type>string ( c++-type -- str )
+    [
+        [ name>> % ]
+        [ params>> [ params>string % ] when* ]
+        [ ptr>> [ "*" % ] when ]
+        tri
+    ] "" make ;
+
+GENERIC: c++-type ( obj -- c++-type/f )
+
+M: object c++-type drop f ;
+
+M: c++-type c-type ;
