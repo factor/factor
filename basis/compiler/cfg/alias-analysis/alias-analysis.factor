@@ -3,7 +3,7 @@
 USING: kernel math namespaces assocs hashtables sequences arrays
 accessors vectors combinators sets classes compiler.cfg
 compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.copy-prop compiler.cfg.rpo compiler.cfg.def-use ;
+compiler.cfg.copy-prop compiler.cfg.rpo compiler.cfg.liveness ;
 IN: compiler.cfg.alias-analysis
 
 ! We try to eliminate redundant slot operations using some simple heuristics.
@@ -196,9 +196,6 @@ M: ##set-slot insn-object obj>> resolve ;
 M: ##set-slot-imm insn-object obj>> resolve ;
 M: ##alien-global insn-object drop \ ##alien-global ;
 
-: inputs ( insns -- seq )
-    [ [ ##phi? not ] filter gen-set ] [ kill-set ] bi assoc-diff keys ;
-
 : init-alias-analysis ( insns -- insns' )
     H{ } clone histories set
     H{ } clone vregs>acs set
@@ -210,7 +207,7 @@ M: ##alien-global insn-object drop \ ##alien-global ;
     0 ac-counter set
     next-ac heap-ac set
 
-    dup inputs [ set-heap-ac ] each ;
+    dup local-live-in [ set-heap-ac ] each ;
 
 GENERIC: analyze-aliases* ( insn -- insn' )
 

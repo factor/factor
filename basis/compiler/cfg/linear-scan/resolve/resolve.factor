@@ -4,11 +4,11 @@ USING: accessors arrays assocs combinators
 combinators.short-circuit fry kernel locals
 make math sequences
 compiler.cfg.rpo
+compiler.cfg.liveness
 compiler.cfg.utilities
 compiler.cfg.instructions
 compiler.cfg.linear-scan.assignment
-compiler.cfg.linear-scan.mapping
-compiler.cfg.linear-scan.liveness ;
+compiler.cfg.linear-scan.mapping ;
 IN: compiler.cfg.linear-scan.resolve
 
 : add-mapping ( from to reg-class -- )

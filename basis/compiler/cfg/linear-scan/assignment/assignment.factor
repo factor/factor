@@ -6,13 +6,13 @@ cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
+compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.mapping
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals
-compiler.cfg.linear-scan.liveness ;
+compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.assignment
 
 ! This contains both active and inactive intervals; any interval
