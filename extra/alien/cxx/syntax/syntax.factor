@@ -7,4 +7,7 @@ SYNTAX: C++-CLASS:
     parse-c++-class-definition define-c++-class ;
 
 SYNTAX: C++-METHOD:
-    parse-c++-method-definition define-c++-method ;
+    parse-c++-method-definition f define-c++-method ;
+
+SYNTAX: C++-VIRTUAL:
+    parse-c++-method-definition t define-c++-method ;

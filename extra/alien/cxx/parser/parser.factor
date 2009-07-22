@@ -6,5 +6,5 @@ IN: alien.cxx.parser
 : parse-c++-class-definition ( -- class superclass-mixin )
     scan scan-word ;
 
-: parse-c++-method-definition ( -- class-name name types effect )
-    scan function-types-effect ;
+: parse-c++-method-definition ( -- class-name generic name types effect )
+    scan scan-word function-types-effect ;
