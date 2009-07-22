@@ -6,7 +6,7 @@ IN: compiler.cfg.renaming
 
 SYMBOL: renamings
 
-: rename-value ( vreg -- vreg' ) renamings get at ;
+: rename-value ( vreg -- vreg' ) renamings get ?at drop ;
 
 GENERIC: rename-insn-defs ( insn -- )
 

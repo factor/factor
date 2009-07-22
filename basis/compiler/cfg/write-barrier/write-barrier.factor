@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces assocs sets sequences locals
 compiler.cfg compiler.cfg.instructions compiler.cfg.copy-prop
-compiler.cfg.liveness compiler.cfg.local ;
+compiler.cfg.rpo ;
 IN: compiler.cfg.write-barrier
 
 ! Eliminate redundant write barrier hits.
@@ -43,4 +43,4 @@ M: insn eliminate-write-barrier ;
     [ eliminate-write-barrier ] map sift ;
 
 : eliminate-write-barriers ( cfg -- cfg' )
-    [ drop ] [ write-barriers-step ] local-optimization ;
+    [ write-barriers-step ] local-optimization ;

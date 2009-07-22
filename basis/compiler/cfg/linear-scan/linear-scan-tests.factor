@@ -7,7 +7,6 @@ compiler.cfg
 compiler.cfg.optimizer
 compiler.cfg.instructions
 compiler.cfg.registers
-compiler.cfg.liveness
 compiler.cfg.predecessors
 compiler.cfg.rpo
 compiler.cfg.linearization
@@ -1507,9 +1506,7 @@ SYMBOL: linear-scan-result
     [
         cfg new 0 get >>entry
         compute-predecessors
-        compute-liveness
-        dup reverse-post-order
-        { { int-regs regs } } (linear-scan)
+        dup { { int-regs regs } } (linear-scan)
         cfg-changed
         flatten-cfg 1array mr.
     ] with-scope ;
@@ -2331,9 +2328,6 @@ test-diamond
 ! early in bootstrap on x86-32
 [ t ] [
     [
-        H{ } clone live-ins set
-        H{ } clone live-outs set
-        H{ } clone phi-live-ins set
         T{ basic-block
            { id 12345 }
            { instructions
@@ -2353,7 +2347,8 @@ test-diamond
                  T{ ##replace f V int-regs 5 D 0 }
              }
            }
-        } dup 1array { { int-regs V{ 0 1 2 3 } } } (linear-scan)
+        } cfg new over >>entry
+        { { int-regs V{ 0 1 2 3 } } } (linear-scan)
         instructions>> first
         live-values>> assoc-empty?
     ] with-scope

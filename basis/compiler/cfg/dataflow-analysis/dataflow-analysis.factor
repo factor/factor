@@ -20,7 +20,7 @@ MIXIN: dataflow-analysis
 
 GENERIC# compute-in-set 2 ( bb out-sets dfa -- set )
 
-M: kill-block compute-in-set 3drop f ;
+! M: kill-block compute-in-set 3drop f ;
 
 M:: basic-block compute-in-set ( bb out-sets dfa -- set )
     bb dfa predecessors [ out-sets at ] map dfa join-sets ;
@@ -31,7 +31,7 @@ M:: basic-block compute-in-set ( bb out-sets dfa -- set )
 
 GENERIC# compute-out-set 2 ( bb out-sets dfa -- set )
 
-M: kill-block compute-out-set 3drop f ;
+! M: kill-block compute-out-set 3drop f ;
 
 M:: basic-block compute-out-set ( bb in-sets dfa -- set )
     bb in-sets at bb dfa transfer-set ;

@@ -3,10 +3,12 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry kernel locals
 make math sequences
+compiler.cfg.rpo
 compiler.cfg.utilities
 compiler.cfg.instructions
 compiler.cfg.linear-scan.assignment
-compiler.cfg.linear-scan.mapping compiler.cfg.liveness ;
+compiler.cfg.linear-scan.mapping
+compiler.cfg.linear-scan.liveness ;
 IN: compiler.cfg.linear-scan.resolve
 
 : add-mapping ( from to reg-class -- )
@@ -43,5 +45,5 @@ IN: compiler.cfg.linear-scan.resolve
 : resolve-block-data-flow ( bb -- )
     dup successors>> [ resolve-edge-data-flow ] with each ;
 
-: resolve-data-flow ( rpo -- )
-    [ resolve-block-data-flow ] each ;
+: resolve-data-flow ( cfg -- )
+    [ resolve-block-data-flow ] each-basic-block ;
