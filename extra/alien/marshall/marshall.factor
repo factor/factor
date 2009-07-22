@@ -275,21 +275,21 @@ ALIAS: marshall-void* marshall-pointer
 : ?malloc-byte-array ( c-type -- alien )
     dup alien? [ malloc-byte-array ] unless ;
 
-:: x-unmarshaller ( type type-quot wrapper-test def clean -- quot/f )
+:: x-unmarshaller ( type type-quot superclass def clean -- quot/f )
     type type-quot call current-vocab lookup [
-        dup superclasses wrapper-test any?
+        dup superclasses superclass swap member?
         [ def call ] [ drop clean call f ] if
     ] [ clean call f ] if* ; inline
 
 : struct-unmarshaller ( type -- quot/f )
-    [ ] [ \ struct-wrapper = ]
+    [ ] \ struct-wrapper
     [ '[ ?malloc-byte-array _ new swap >>underlying ] ]
     [ ]
     x-unmarshaller ;
 
 : class-unmarshaller ( type -- quot/f )
-    [ type-sans-pointer ] [ \ alien-wrapper = ]
-    [ '[ ?malloc-byte-array _ new swap >>underlying ] ]
+    [ type-sans-pointer "#" append ] \ class-wrapper
+    [ '[ _ new swap >>underlying ] ]
     [ ]
     x-unmarshaller ;
 
