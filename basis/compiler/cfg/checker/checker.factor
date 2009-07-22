@@ -2,14 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.def-use compiler.cfg.linearization compiler.cfg.utilities
-combinators.short-circuit accessors math sequences sets assocs ;
+compiler.cfg.mr combinators.short-circuit accessors math sequences
+sets assocs ;
 IN: compiler.cfg.checker
 
 ERROR: bad-kill-block bb ;
 
 : check-kill-block ( bb -- )
     dup instructions>> first2
-    swap ##epilogue? [ [ ##return? ] [ ##callback-return? ] bi or ] [ ##branch? ] if
+    swap ##epilogue? [
+        { [ ##return? ] [ ##callback-return? ] [ ##jump? ] } 1||
+    ] [ ##branch? ] if
     [ drop ] [ bad-kill-block ] if ;
 
 ERROR: last-insn-not-a-jump bb ;
@@ -26,14 +29,6 @@ ERROR: last-insn-not-a-jump bb ;
         [ ##no-tco? ]
     } 1|| [ drop ] [ last-insn-not-a-jump ] if ;
 
-ERROR: bad-loop-entry bb ;
-
-: check-loop-entry ( bb -- )
-    dup instructions>> dup length 2 >= [
-        2 head* [ ##loop-entry? ] any?
-        [ bad-loop-entry ] [ drop ] if
-    ] [ 2drop ] if ;
-
 ERROR: bad-kill-insn bb ;
 
 : check-kill-instructions ( bb -- )
@@ -41,10 +36,9 @@ ERROR: bad-kill-insn bb ;
     [ bad-kill-insn ] [ drop ] if ;
 
 : check-normal-block ( bb -- )
-    [ check-loop-entry ]
     [ check-last-instruction ]
     [ check-kill-instructions ]
-    tri ;
+    bi ;
 
 ERROR: bad-successors ;
 
@@ -70,5 +64,5 @@ ERROR: undefined-values uses defs ;
 
 : check-cfg ( cfg -- )
     [ [ check-basic-block ] each-basic-block ]
-    [ flatten-cfg check-mr ]
+    [ build-mr check-mr ]
     bi ;
