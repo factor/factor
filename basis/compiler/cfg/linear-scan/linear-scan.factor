@@ -4,9 +4,9 @@ USING: kernel accessors namespaces make locals
 cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
+compiler.cfg.liveness
 compiler.cfg.instructions
 compiler.cfg.linear-scan.numbering
-compiler.cfg.linear-scan.liveness
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
