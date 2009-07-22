@@ -11,7 +11,6 @@ compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.dce
 compiler.cfg.write-barrier
-compiler.cfg.liveness
 compiler.cfg.rpo
 compiler.cfg.phi-elimination
 compiler.cfg.checker ;
@@ -35,7 +34,6 @@ SYMBOL: check-optimizer?
         join-blocks
         compute-predecessors
         stack-analysis
-        compute-liveness
         alias-analysis
         value-numbering
         compute-predecessors

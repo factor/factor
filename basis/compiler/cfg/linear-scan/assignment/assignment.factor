@@ -4,14 +4,15 @@ USING: accessors kernel math assocs namespaces sequences heaps
 fry make combinators sets locals
 cpu.architecture
 compiler.cfg
+compiler.cfg.rpo
 compiler.cfg.def-use
-compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.mapping
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals ;
+compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linear-scan.liveness ;
 IN: compiler.cfg.linear-scan.assignment
 
 ! This contains both active and inactive intervals; any interval
@@ -185,6 +186,6 @@ ERROR: bad-vreg vreg ;
         ] V{ } make
     ] change-instructions drop ;
 
-: assign-registers ( live-intervals rpo -- )
+: assign-registers ( live-intervals cfg -- )
     [ init-assignment ] dip
-    [ assign-registers-in-block ] each ;
+    [ assign-registers-in-block ] each-basic-block ;

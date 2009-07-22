@@ -10,13 +10,24 @@ SYMBOL: vn-counter
 ! biassoc mapping expressions to value numbers
 SYMBOL: exprs>vns
 
+TUPLE: expr op ;
+
 : expr>vn ( expr -- vn ) exprs>vns get [ drop next-vn ] cache ;
 
 : vn>expr ( vn -- expr ) exprs>vns get value-at ;
 
+! Expressions whose values are inputs to the basic block.
+TUPLE: input-expr < expr n ;
+
+SYMBOL: input-expr-counter
+
+: next-input-expr ( -- expr )
+    f input-expr-counter counter input-expr boa ;
+
 SYMBOL: vregs>vns
 
-: vreg>vn ( vreg -- vn ) vregs>vns get at ;
+: vreg>vn ( vreg -- vn )
+    vregs>vns get [ drop next-input-expr expr>vn ] cache ;
 
 : vn>vreg ( vn -- vreg ) vregs>vns get value-at ;
 
