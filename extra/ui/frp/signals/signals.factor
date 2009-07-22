@@ -1,10 +1,7 @@
 USING: accessors arrays kernel models models.product monads
 sequences sequences.extras ;
-FROM: models.product => product ;
+FROM: syntax => >> ;
 IN: ui.frp.signals
-
-GENERIC: null-val ( gadget -- model )
-M: model null-val drop f ;
 
 TUPLE: multi-model < model important? ;
 GENERIC: (model-changed) ( model observer -- )
@@ -47,9 +44,9 @@ M: fold-model model-activated drop ;
     dip [ >>base ] [ value>> >>value ] bi ;
 
 TUPLE: updater-model < multi-model values updates ;
-M: updater-model (model-changed) tuck updates>> =
+M: updater-model (model-changed) [ tuck updates>> =
    [ [ values>> value>> ] keep set-model ]
-   [ drop ] if ;
+   [ drop ] if ] keep f swap (>>value) ;
 : <updates> ( values updates -- signal ) [ 2array updater-model <multi-model> ] 2keep
    [ >>values ] [ >>updates ] bi* ;
 
@@ -61,7 +58,7 @@ M: switch-model (model-changed) 2dup switcher>> =
 : <switch> ( signal1 signal2 -- signal' ) swap [ 2array switch-model <multi-model> ] 2keep
    [ [ value>> >>value ] [ >>original ] bi ] [ >>switcher ] bi* ;
 M: switch-model model-activated [ original>> ] keep model-changed ;
-: >behavior ( event -- behavior ) t <model> <switch> ;
+: >behavior ( event -- behavior ) t >>value ;
 
 TUPLE: mapped-model < multi-model model quot ;
 : new-mapped-model ( model quot class -- mapped-model ) [ over 1array ] dip
@@ -89,20 +86,14 @@ M: action (model-changed) [ [ value>> ] [ quot>> ] bi* call( a -- b ) ] keep val
    [ swap add-connection ] 2keep model-changed ;
 : <action> ( model quot -- action-signal ) [ 1array action <multi-model> ] dip >>quot dup f <action-value> >>value value>> ;
 
-TUPLE: | < multi-model ;
-: <|> ( models -- product ) | <multi-model> ;
-GENERIC: models-changed ( product -- )
-M: | models-changed drop ;
-M: | model-changed
+TUPLE: collection < multi-model ;
+: <collection> ( models -- product ) collection <multi-model> ;
+M: collection (model-changed)
     nip
     dup dependencies>> [ value>> ] all?
-    [ [ dup [ value>> ] product-value swap set-model ] keep models-changed ]
+    [ dup [ value>> ] product-value swap set-model ]
     [ drop ] if ;
-M: | model-activated dup model-changed ;
-
-TUPLE: & < | ;
-: <&> ( models -- product ) & <multi-model> ;
-M: & models-changed dependencies>> [ [ null-val ] keep (>>value) ] each ;
+M: collection model-activated dup (model-changed) ;
 
 ! for side effects
 TUPLE: (frp-when) < multi-model quot cond ;
@@ -110,9 +101,9 @@ TUPLE: (frp-when) < multi-model quot cond ;
 M: (frp-when) (model-changed) [ quot>> ] 2keep
     [ value>> ] [ cond>> ] bi* call( a -- ? ) [ call( model -- ) ] [ 2drop ] if ;
 
-M: model fmap <mapped> ;
-USE: ui.frp.functors
-FMAPS: $> <$ fmap FOR & | product ;
-
 ! only used in construction
 : with-self ( quot: ( model -- model ) -- model ) [ f <basic> dup ] dip call swap [ add-dependency ] keep ; inline
+
+USE: ui.frp.signals.templates
+M: model fmap <mapped> ;
+<< { "$>" "<$" "fmap" } [ fmaps ] each >>

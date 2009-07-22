@@ -39,9 +39,9 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
       <spacer> <frp-field*> ->% 1 :> search
       submit ok [ [ drop ] ] <$ 2array <merge> [ drop ] >>value :> quot
       viewed 0 [ + ] <fold> search ok t <basic> "all" <frp-button> ALL ->
-      tbl selected-value>> votes [ [ + ] curry change-votes modify-tuple ] 2$>-|
+      tbl selected-value>> votes [ [ + ] curry change-votes modify-tuple ] 2$>
         4array <merge>
-        [ drop [ f ] [ "%" dup surround <pattern> ] if-empty top-recipes ] 3fmap-| :> updates
+        [ drop [ f ] [ "%" dup surround <pattern> ] if-empty top-recipes ] 3fmap :> updates
       updates [ top-genres [ <frp-button> GENRES -> ] map <merge> ] bind*
         [ text>> T{ recipe } swap >>genre get-tuples ] fmap
       tbl swap updates 2array <merge> >>model
@@ -52,9 +52,9 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
           [ [ genre>> ] fmap <frp-field> GENRE ->% .5 ]
           [ [ txt>> ] fmap <frp-editor> BODY ->% 1 ]
         } cleave
-        [ <recipe> ] 3fmap-|
+        [ <recipe> ] 3fmap
       [ [ 1 ] <$ ]
-      [ quot ok <updates> #1 [ call( recipe -- ) 0 ] 2fmap-& ] bi
+      [ quot ok <updates> #1 [ call( recipe -- ) 0 ] 2fmap ] bi
       2array <merge> 0 <basic> <switch> >>model
    ] with-interface "recipes" open-window ] with-ui ;
 
