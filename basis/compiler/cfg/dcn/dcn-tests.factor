@@ -24,7 +24,7 @@ compiler.cfg.dcn.rewrite ;
     [ inserting-peeks ] keep untranslate-locs keys ;
 
 : inserting-replaces' ( from to -- assoc )
-    [ inserting-replaces ] keep untranslate-locs remove-dead-stores keys ;
+    [ inserting-replaces ] keep untranslate-locs [ drop n>> 0 >= ] assoc-filter keys ;
 
 [
     V{
@@ -78,7 +78,7 @@ compiler.cfg.dcn.rewrite ;
     cfg new 0 get >>entry
     compute-predecessors
     deconcatenatize
-    check-cfg ;
+    drop ;
 
 V{ T{ ##epilogue } T{ ##return } } 0 test-bb
 
