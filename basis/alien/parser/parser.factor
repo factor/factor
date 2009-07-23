@@ -15,7 +15,7 @@ IN: alien.parser
 : parse-arglist ( parameters return -- types effect )
     [
         2 group [ first2 normalize-c-arg 2array ] map
-        unzip [ "," ?tail drop check-c-name ] map
+        unzip [ "," ?tail drop ] map
     ]
     [ [ { } ] [ 1array ] if-void ]
     bi* <effect> ;
@@ -25,7 +25,7 @@ IN: alien.parser
 
 :: make-function ( return! library function! parameters -- word quot effect )
     return function normalize-c-arg function! return!
-    function check-c-name create-in dup reset-generic
+    function create-in dup reset-generic
     return library function
     parameters return parse-arglist [ function-quot ] dip ;
 
