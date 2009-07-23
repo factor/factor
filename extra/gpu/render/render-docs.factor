@@ -72,7 +72,7 @@ $nl
 "Rectangular matrix type names are column x row."
 }
 { "Uniform slots can also be defined as other " { $snippet "uniform-tuple" } " types to bind uniform structures. The uniform structure will take its value from the slots of a tuple of the given type." }
-{ "Array uniforms are passed as Factor sequences of the corresponding value types above." }
+{ "Array uniforms are passed as Factor sequences of the corresponding value type above." }
 }
 $nl
 "A value of a uniform tuple type is a standard Factor tuple. Uniform tuples are constructed with " { $link new } " or " { $link boa } ", and values are placed inside them using standard slot accessors."
@@ -130,7 +130,7 @@ HELP: define-vertex-struct
 { $description "Defines a new struct C type from a " { $link vertex-format } ". The runtime equivalent of " { $link POSTPONE: VERTEX-STRUCT: } ". This word must be called inside a compilation unit." } ;
 
 HELP: float-uniform
-{ $class-description "This " { $link uniform-type } " value indicates a uniform parameter whose components are " { $snippet "float" } "s." } ;
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a float uniform parameter." } ;
 
 { index-elements index-range multi-index-elements multi-index-range } related-words
 
