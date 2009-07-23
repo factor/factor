@@ -207,8 +207,8 @@ M: multi-index-elements render-vertex-indexes
     bi*
     GL_ELEMENT_ARRAY_BUFFER swap [ handle>> ] [ 0 ] if* glBindBuffer glMultiDrawElements ;
 
-: (bind-texture-unit) ( texture-unit texture -- )
-    [ GL_TEXTURE0 + glActiveTexture ] [ bind-texture drop ] bi* ; inline
+: (bind-texture-unit) ( texture texture-unit -- )
+    swap [ GL_TEXTURE0 + glActiveTexture ] [ bind-texture drop ] bi* ; inline
 
 :: [bind-vertex-attribute] ( stride offset vertex-attribute -- stride offset' quot )
     vertex-attribute name>>                 :> name
@@ -286,22 +286,46 @@ M: uniform-tuple bind-uniforms
 : uniform-type-texture-units ( uniform-type -- units )
     dup texture-uniform = [ drop 1 ] [ "uniform-tuple-texture-units" word-prop 0 or ] if ;
 
-:: [bind-uniform-texture] ( uniform index -- quot )
-    uniform name>> reader-word :> value>>-word
-    { index swap value>>-word (bind-texture-unit) } >quotation ;
+: all-uniform-tuple-slots ( class -- slots )
+    dup "uniform-tuple-slots" word-prop 
+    [ swap superclass all-uniform-tuple-slots prepend ] [ drop { } ] if* ;
 
-:: [bind-uniform-textures] ( superclass uniforms -- quot )
-    superclass "uniform-tuple-texture-units" word-prop 0 or :> first-texture-unit
-    superclass \ bind-uniform-textures method :> next-method
-    uniforms
-        [ uniform-type>> texture-uniform = ] filter
-        [ first-texture-unit + [bind-uniform-texture] ] map-index
-        :> texture-uniforms-cleave
+DEFER: uniform-texture-accessors
 
-    {
-        2dup next-method
-        nip texture-uniforms-cleave cleave
-    } >quotation ;
+: uniform-type-texture-accessors ( uniform-type -- accessors )
+    texture-uniform = [ { [ ] } ] [ { } ] if ;
+
+: uniform-slot-texture-accessor ( uniform -- accessor )
+    [ name>> reader-word ] [ [ uniform-type>> ] [ dim>> ] bi uniform-texture-accessors ] bi
+    dup length 1 = [ first swap prefix ] [ [ ] 2sequence ] if ;
+
+: uniform-tuple-texture-accessors ( uniform-type -- accessors )
+    all-uniform-tuple-slots [ uniform-type>> uniform-type-texture-units zero? not ] filter
+    [ uniform-slot-texture-accessor ] map ;
+
+: uniform-texture-accessors ( uniform-type dim -- accessors )
+    [
+        dup uniform-type?
+        [ uniform-type-texture-accessors ]
+        [ uniform-tuple-texture-accessors ] if
+    ] [
+        2dup swap empty? not and [
+            iota [
+                [ swap nth ] swap prefix
+                over length 1 = [ swap first append ] [ swap suffix ] if
+            ] with map
+        ] [ drop ] if
+    ] bi* ;
+
+: texture-accessor>cleave ( unit accessors -- unit' cleaves )
+    dup last sequence?
+    [ [ last [ texture-accessor>cleave ] map ] [ but-last ] bi swap suffix \ cleave suffix ]
+    [ over suffix \ (bind-texture-unit) suffix [ 1 + ] dip ] if ;
+
+: [bind-uniform-textures] ( class -- quot )
+    f uniform-texture-accessors
+    0 swap [ texture-accessor>cleave ] map nip
+    \ nip swap \ cleave [ ] 3sequence ;
 
 DEFER: [bind-uniform-tuple]
 
@@ -342,7 +366,7 @@ DEFER: [bind-uniform-tuple]
         { mat4x3-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix4x3fv } }
         { mat4-uniform   { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix4fv   } }
 
-        { texture-uniform { drop dim iota [ texture-unit + ] int-array{ } map-as glUniform1iv } }
+        { texture-uniform { drop dim dup iota [ texture-unit + ] int-array{ } map-as glUniform1iv } }
     } at [ uniform invalid-uniform-type ] unless* >quotation :> value-quot
 
     type uniform-type-texture-units dim * texture-unit +
@@ -390,10 +414,6 @@ DEFER: [bind-uniform-tuple]
 
     type uniform-type-texture-units texture-unit +
     pre-quot value-quot append ;
-
-: all-uniform-tuple-slots ( class -- slots )
-    dup "uniform-tuple-slots" word-prop 
-    [ swap superclass all-uniform-tuple-slots append ] [ drop { } ] if* ;
 
 :: [bind-uniform-struct] ( value>>-quot type texture-unit name dim -- texture-unit' quot )
     dim
@@ -444,8 +464,9 @@ TR: hyphens>underscores "-" "_" ;
 
 : define-uniform-tuple-methods ( class superclass uniforms -- )
     [
-        [ \ bind-uniform-textures create-method-in ] 2dip
-        [bind-uniform-textures] define
+        2drop
+        [ \ bind-uniform-textures create-method-in ]
+        [ [bind-uniform-textures] ] bi define
     ] [
         [ \ bind-uniforms create-method-in ] 2dip
         [bind-uniforms] define
@@ -498,21 +519,20 @@ padding-no [ 0 ] initialize
 : (define-uniform-tuple) ( class superclass uniforms -- )
     {
         [ [ uniform>slot ] map define-tuple-class ]
-        [ define-uniform-tuple-methods ]
         [
             [ uniform-type-texture-units ]
-            [ [ uniform-type>> uniform-type-texture-units ] [ + ] map-reduce ] bi* +
+            [
+                [ [ uniform-type>> uniform-type-texture-units ] [ dim>> 1 or ] bi * ]
+                [ + ] map-reduce
+            ] bi* +
             "uniform-tuple-texture-units" set-word-prop
         ]
         [ nip "uniform-tuple-slots" set-word-prop ]
+        [ define-uniform-tuple-methods ]
     } 3cleave ;
 
 : true-subclasses ( class -- seq )
     [ subclasses ] keep [ = not ] curry filter ;
-
-: redefine-uniform-tuple-subclass-methods ( class -- )
-    [ true-subclasses ] keep
-    [ over "uniform-tuple-slots" word-prop (define-uniform-tuple) ] curry each ;
 
 PRIVATE>
 
@@ -540,8 +560,7 @@ SYNTAX: VERTEX-STRUCT:
     scan scan-word define-vertex-struct ;
 
 : define-uniform-tuple ( class superclass uniforms -- )
-    [ (define-uniform-tuple) ]
-    [ 2drop redefine-uniform-tuple-subclass-methods ] 3bi ;
+    (define-uniform-tuple) ; inline
 
 SYNTAX: UNIFORM-TUPLE:
     parse-uniform-tuple-definition define-uniform-tuple ;
