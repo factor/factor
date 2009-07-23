@@ -160,12 +160,13 @@ M: #shuffle emit-node
     [ [ [ out-r>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map rs-store ] 2bi ;
 
 ! #return
-M: #return emit-node
-    drop ##branch begin-basic-block ##epilogue ##return ;
+: emit-return ( -- )
+    ##branch begin-basic-block ##epilogue ##return ;
+
+M: #return emit-node drop emit-return ;
 
 M: #return-recursive emit-node
-    label>> id>> loops get key?
-    [ ##epilogue ##return ] unless ;
+    label>> id>> loops get key? [ emit-return ] unless ;
 
 ! #terminate
 M: #terminate emit-node drop ##no-tco basic-block off ;
