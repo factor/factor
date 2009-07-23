@@ -47,7 +47,7 @@ HELP: UNIFORM-TUPLE:
     { "slot" uniform-type dimension }
     ...
     { "slot" uniform-type dimension } ; "> }
-{ $description "Defines a new " { $link uniform-tuple } " class. Tuples of the new class can be used as the " { $snippet "uniforms" } " slot of a " { $link render-set } " in order to set the uniform parameters of the active shader program. The " { $link uniform-type } " of each slot defines the component type, and the " { $snippet "dimension" } " defines the vector or matrix dimensions; for example, a slot " { $snippet "{ \"foo\" float-uniform { 2 2 } }" } " will define a slot " { $snippet "foo" } " as a 2x2 matrix of floats."
+{ $description "Defines a new " { $link uniform-tuple } " class. Tuples of the new class can be used as the " { $snippet "uniforms" } " slot of a " { $link render-set } " in order to set the uniform parameters of the active shader program. The " { $link uniform-type } " of each slot defines the component type, and the " { $snippet "dimension" } " specifies an array length if not " { $link f } "."
 $nl
 "Uniform parameters are passed from Factor to the shader program through the uniform tuple as follows:"
 { $list
@@ -55,8 +55,26 @@ $nl
 { { $link float-uniform } "s take their values from Factor " { $link float } "s." }
 { { $link bool-uniform } "s take their values from Factor " { $link boolean } "s." }
 { { $link texture-uniform } "s take their values from " { $link texture } " objects." }
-{ "Vector uniforms are passed as Factor " { $link sequence } "s of the corresponding component type." }
-{ "Matrix uniforms are passed as row-major Factor " { $link sequence } "s of sequences of the corresponding component type." } }
+{ "Vector uniforms take their values from Factor " { $link sequence } "s of the corresponding component type."
+    { $list
+    { "Float vector types: " { $link vec2-uniform } ", " { $link vec3-uniform } ", " { $link vec4-uniform } }
+    { "Integer vector types: " { $link ivec2-uniform } ", " { $link ivec3-uniform } ", " { $link ivec4-uniform } }
+    { "Unsigned integer vector types: " { $link uvec2-uniform } ", " { $link uvec3-uniform } ", " { $link uvec4-uniform } }
+    { "Boolean vector types: " { $link bvec2-uniform } ", " { $link bvec3-uniform } ", " { $link bvec4-uniform } }
+    }
+}
+{ "Matrix uniforms take their values from row-major Factor " { $link sequence } "s of sequences of floats. Matrix types are:" 
+    { $list
+    { { $link mat2-uniform } ", " { $link mat2x3-uniform } ", " { $link mat2x4-uniform } }
+    { { $link mat3x2-uniform } ", " { $link mat3-uniform } ", " { $link mat3x4-uniform } }
+    { { $link mat4x2-uniform } ", " { $link mat4x3-uniform } ", " { $link mat4-uniform } }
+    }
+"Rectangular matrix type names are column x row."
+}
+{ "Uniform slots can also be defined as other " { $snippet "uniform-tuple" } " types to bind uniform structures. The uniform structure will take its value from the slots of a tuple of the given type." }
+{ "Array uniforms are passed as Factor sequences of the corresponding value types above." }
+}
+$nl
 "A value of a uniform tuple type is a standard Factor tuple. Uniform tuples are constructed with " { $link new } " or " { $link boa } ", and values are placed inside them using standard slot accessors."
 } ;
 
@@ -73,7 +91,7 @@ HELP: VERTEX-STRUCT:
 { $description "Defines a struct C type (like " { $link POSTPONE: C-STRUCT: } ") with the same binary format and component types as the given " { $link vertex-format } "." } ;
 
 HELP: bool-uniform
-{ $class-description "This " { $link uniform-type } " value indicates a uniform parameter whose components are " { $snippet "bool" } "s." } ;
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a boolean uniform parameter." } ;
 
 HELP: buffer>vertex-array
 { $values
@@ -83,6 +101,15 @@ HELP: buffer>vertex-array
 { $description "Creates a new " { $link vertex-array } " from the entire contents of a single " { $link buffer } " in a single " { $link vertex-format } " for use with " { $snippet "program-instance" } "." } ;
 
 { vertex-array <vertex-array> buffer>vertex-array } related-words
+
+HELP: bvec2-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a two-component boolean vector uniform parameter." } ;
+
+HELP: bvec3-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a three-component boolean vector uniform parameter." } ;
+
+HELP: bvec4-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a four-component boolean vector uniform parameter." } ;
 
 HELP: define-uniform-tuple
 { $values
@@ -104,8 +131,6 @@ HELP: define-vertex-struct
 
 HELP: float-uniform
 { $class-description "This " { $link uniform-type } " value indicates a uniform parameter whose components are " { $snippet "float" } "s." } ;
-
-{ bool-uniform int-uniform float-uniform texture-uniform } related-words
 
 { index-elements index-range multi-index-elements multi-index-range } related-words
 
@@ -130,13 +155,22 @@ HELP: index-type
 { index-type ubyte-indexes ushort-indexes uint-indexes } related-words
 
 HELP: int-uniform
-{ $class-description "This " { $link uniform-type } " value indicates a uniform parameter whose components are " { $snippet "int" } "s." } ;
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a signed integer uniform parameter." } ;
 
 HELP: invalid-uniform-type
 { $values
     { "uniform" uniform }
 }
 { $description "Throws an error indicating that a slot of a " { $link uniform-tuple } " has been declared to have an invalid type." } ;
+
+HELP: ivec2-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a two-component integer vector uniform parameter." } ;
+
+HELP: ivec3-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a three-component integer vector uniform parameter." } ;
+
+HELP: ivec4-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a four-component integer vector uniform parameter." } ;
 
 HELP: lines-mode
 { $class-description "This " { $link primitive-mode } " value instructs " { $link render } " to assemble a line from each pair of indexed vertex array elements." } ;
@@ -146,6 +180,33 @@ HELP: line-loop-mode
 
 HELP: line-strip-mode
 { $class-description "This " { $link primitive-mode } " value instructs " { $link render } " to assemble a connected strip of lines from each consecutive pair of indexed vertex array elements." } ;
+
+HELP: mat2-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a 2x2 square float matrix uniform parameter." } ;
+
+HELP: mat2x3-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a 2-column, 3-row float matrix uniform parameter." } ;
+
+HELP: mat2x4-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a 2-column, 4-row float matrix uniform parameter." } ;
+
+HELP: mat3x2-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a 3-column, 2-row float matrix uniform parameter." } ;
+
+HELP: mat3-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a 3x3 square float matrix uniform parameter." } ;
+
+HELP: mat3x4-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a 3-column, 4-row float matrix uniform parameter." } ;
+
+HELP: mat4x2-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a 4-column, 2-row float matrix uniform parameter." } ;
+
+HELP: mat4x3-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a 4-column, 3-row float matrix uniform parameter." } ;
+
+HELP: mat4-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a 4x4 square float matrix uniform parameter." } ;
 
 HELP: multi-index-elements
 { $class-description "Objects of this tuple class can be passed as the " { $snippet "indexes" } " slot of a non-instanced " { $link render-set } " to instruct " { $link render } " to assemble primitives from the active " { $link vertex-array } " by using multiple arrays of indexes in CPU or GPU memory."
@@ -200,7 +261,7 @@ HELP: render-set
 { render render-set } related-words
 
 HELP: texture-uniform
-{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " is a texture. The dimension of the corresponding " { $link uniform } " slot must be " { $snippet "1" } "." } ;
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a texture uniform parameter." } ;
 
 HELP: triangle-fan-mode
 { $class-description "This " { $link primitive-mode } " value instructs " { $link render } " to generate a fan of triangles using the first indexed vertex array element and every subsequent consecutive pair of elements." } ;
@@ -218,7 +279,7 @@ HELP: uint-indexes
 { $class-description "This " { $link index-type } " indicates that an " { $link index-elements } " or " { $link multi-index-elements } " buffer consists of four-byte unsigned int indexes." } ;
 
 HELP: uint-uniform
-{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " is a scalar or vector of unsigned integers." } ;
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to an unsigned integer uniform parameter." } ;
 
 HELP: uniform
 { $class-description "Values of this tuple type are passed to " { $link define-uniform-tuple } " to define a new " { $link uniform-tuple } " type." } ;
@@ -229,12 +290,28 @@ HELP: uniform-tuple
 HELP: uniform-type
 { $class-description { $snippet "uniform-type" } " values are used as part of a " { $link POSTPONE: UNIFORM-TUPLE: } " definition to define the types of uniform slots." } ;
 
-{ uniform-type bool-uniform int-uniform float-uniform texture-uniform uint-uniform } related-words
-
 HELP: ushort-indexes
 { $class-description "This " { $link index-type } " indicates that an " { $link index-elements } " or " { $link multi-index-elements } " buffer consists of two-byte unsigned short indexes." } ;
 
 { index-type ubyte-indexes ushort-indexes uint-indexes } related-words
+
+HELP: uvec2-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a two-component unsigned integer vector uniform parameter." } ;
+
+HELP: uvec3-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a three-component unsigned integer vector uniform parameter." } ;
+
+HELP: uvec4-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a four-component unsigned integer vector uniform parameter." } ;
+
+HELP: vec2-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a two-component float vector uniform parameter." } ;
+
+HELP: vec3-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a three-component float vector uniform parameter." } ;
+
+HELP: vec4-uniform
+{ $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a four-component float vector uniform parameter." } ;
 
 HELP: vertex-array
 { $class-description "A " { $snippet "vertex-array" } " object associates a shader " { $link program-instance } " with vertex attribute data from one or more " { $link buffer } "s. The format of the binary data inside these buffers is described using " { $link vertex-format } "s. " { $snippet "vertex-array" } "s are constructed using the " { $link <vertex-array> } " or " { $link buffer>vertex-array } " words." } ;
