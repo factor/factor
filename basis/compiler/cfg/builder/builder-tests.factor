@@ -9,6 +9,15 @@ byte-arrays kernel.private math slots.private ;
 : unit-test-cfg ( quot -- )
     '[ _ test-cfg [ compute-predecessors check-cfg ] each ] [ ] swap unit-test ;
 
+: blahblah ( nodes -- ? )
+    { fixnum } declare [
+        dup 3 bitand 1 = [ drop t ] [
+            dup 3 bitand 2 = [
+                blahblah
+            ] [ drop f ] if
+        ] if
+    ] any? ; inline recursive
+
 {
     [ ]
     [ dup ]
@@ -52,6 +61,7 @@ byte-arrays kernel.private math slots.private ;
     [ "int" { "int" } "cdecl" [ ] alien-callback ]
     [ swap - + * ]
     [ swap slot ]
+    [ blahblah ]
 } [
     unit-test-cfg
 ] each
