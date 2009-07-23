@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel compiler.cfg.instructions compiler.cfg.rpo
-compiler.cfg.def-use compiler.cfg.linearization compiler.cfg.liveness
+compiler.cfg.def-use compiler.cfg.linearization
 combinators.short-circuit accessors math sequences sets assocs ;
 IN: compiler.cfg.checker
 
@@ -54,8 +54,6 @@ ERROR: undefined-values uses defs ;
     2dup subset? [ 2drop ] [ undefined-values ] if ;
 
 : check-cfg ( cfg -- )
-    compute-liveness
-    [ entry>> live-in assoc-empty? [ bad-live-in ] unless ]
     [ [ check-basic-block ] each-basic-block ]
     [ flatten-cfg check-mr ]
-    tri ;
+    bi ;

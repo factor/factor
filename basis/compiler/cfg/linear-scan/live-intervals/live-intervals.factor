@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math math.order fry
 combinators binary-search compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.def-use compiler.cfg.liveness compiler.cfg ;
+compiler.cfg.def-use compiler.cfg.liveness compiler.cfg.rpo
+compiler.cfg ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 TUPLE: live-range from to ;
@@ -144,10 +145,10 @@ ERROR: bad-live-interval live-interval ;
         } cleave
     ] each ;
 
-: compute-live-intervals ( rpo -- live-intervals )
+: compute-live-intervals ( cfg -- live-intervals )
     H{ } clone [
         live-intervals set
-        <reversed> [ compute-live-intervals-step ] each
+        post-order [ compute-live-intervals-step ] each
     ] keep values dup finish-live-intervals ;
 
 : relevant-ranges ( interval1 interval2 -- ranges1 ranges2 )

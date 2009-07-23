@@ -36,27 +36,20 @@ V{
 
 test-diamond
 
+3 vreg-counter set-global
+
 [ ] [ cfg new 0 get >>entry eliminate-phis drop ] unit-test
 
-[let | n! [ f ] |
-
-[ ] [ 2 get successors>> first instructions>> first dst>> n>> n! ] unit-test
-
-[ t ] [
-    T{ ##copy f V int-regs n V int-regs 1 }
-    2 get successors>> first instructions>> first =
+[ T{ ##copy f V int-regs 4 V int-regs 1 } ] [
+    2 get successors>> first instructions>> first
 ] unit-test
 
-[ t ] [
-    T{ ##copy f V int-regs n V int-regs 2 }
-    3 get successors>> first instructions>> first =
+[ T{ ##copy f V int-regs 4 V int-regs 2 } ] [
+    3 get successors>> first instructions>> first
 ] unit-test
 
-[ t ] [
-    T{ ##copy f V int-regs 3 V int-regs n }
-    4 get instructions>> first =
+[ T{ ##copy f V int-regs 3 V int-regs 4 } ] [
+    4 get instructions>> first
 ] unit-test
-
-]
 
 [ 3 ] [ 4 get instructions>> length ] unit-test

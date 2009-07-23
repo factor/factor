@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.syntax alien.c-types ;
 IN: unix.types
 
 TYPEDEF: ulonglong __uquad_type
@@ -31,3 +31,5 @@ TYPEDEF: ulonglong __fsblkcnt64_t
 TYPEDEF: ulonglong __fsfilcnt64_t
 TYPEDEF: ulonglong ino64_t
 TYPEDEF: ulonglong off64_t
+
+ALIAS: <time_t> <long>
