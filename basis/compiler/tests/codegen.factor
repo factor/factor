@@ -322,3 +322,15 @@ cell 4 = [
 
 ! Regression from Slava's value numbering changes
 [ 1 ] [ 31337 [ dup fixnum<= [ 1 ] [ 2 ] if ] compile-call ] unit-test
+
+! Bug with ##return node construction
+: return-recursive-bug ( nodes -- ? )
+    { fixnum } declare [
+        dup 3 bitand 1 = [ drop t ] [
+            dup 3 bitand 2 = [
+                return-recursive-bug
+            ] [ drop f ] if
+        ] if
+    ] any? ; inline recursive
+
+[ t ] [ 3 [ return-recursive-bug ] compile-call ] unit-test
