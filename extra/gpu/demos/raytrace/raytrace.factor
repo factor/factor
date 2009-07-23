@@ -11,31 +11,21 @@ GLSL-SHADER-FILE: raytrace-fragment-shader fragment-shader "raytrace.f.glsl"
 GLSL-PROGRAM: raytrace-program
     raytrace-vertex-shader raytrace-fragment-shader ;
 
+UNIFORM-TUPLE: sphere-uniforms
+    { "center" vec3-uniform  f }
+    { "radius" float-uniform f }
+    { "color"  vec4-uniform  f } ;
+
 UNIFORM-TUPLE: raytrace-uniforms
-    { "mv_inv_matrix" float-uniform { 4 4 } }
-    { "fov" float-uniform 2 }
-
-    { "spheres[0].center" float-uniform 3 }
-    { "spheres[0].radius" float-uniform 1 }
-    { "spheres[0].color"  float-uniform 4 }
-
-    { "spheres[1].center" float-uniform 3 }
-    { "spheres[1].radius" float-uniform 1 }
-    { "spheres[1].color"  float-uniform 4 }
-
-    { "spheres[2].center" float-uniform 3 }
-    { "spheres[2].radius" float-uniform 1 }
-    { "spheres[2].color"  float-uniform 4 }
-
-    { "spheres[3].center" float-uniform 3 }
-    { "spheres[3].radius" float-uniform 1 }
-    { "spheres[3].color"  float-uniform 4 }
+    { "mv-inv-matrix"    mat4-uniform f }
+    { "fov"              vec2-uniform f }
     
-    { "floor_height"   float-uniform 1 }
-    { "floor_color[0]" float-uniform 4 }
-    { "floor_color[1]" float-uniform 4 }
-    { "background_color" float-uniform 4 }
-    { "light_direction" float-uniform 3 } ;
+    { "spheres"          sphere-uniforms 4 }
+
+    { "floor-height"     float-uniform f }
+    { "floor-color"      vec4-uniform 2 }
+    { "background-color" vec4-uniform f }
+    { "light-direction"  vec3-uniform f } ;
 
 CONSTANT: reflection-color { 1.0 0.0 1.0 0.0 }
 
@@ -64,12 +54,10 @@ TUPLE: raytrace-world < wasd-world
     [ fov>> ]
     [
         spheres>>
-        [ [ sphere-center ] [ radius>> ] [ color>> ] tri 3array ] map
-        first4 [ first3 ] 4 napply
+        [ [ sphere-center ] [ radius>> ] [ color>> ] tri sphere-uniforms boa ] map
     ] tri
     -30.0 ! floor_height
-    { 1.0 0.0 0.0 1.0 } ! floor_color[0]
-    { 1.0 1.0 1.0 1.0 } ! floor_color[1]
+    { { 1.0 0.0 0.0 1.0 } { 1.0 1.0 1.0 1.0 } } ! floor_color
     { 0.15 0.15 1.0 1.0 } ! background_color
     { 0.0 -1.0 -0.1 } ! light_direction
     raytrace-uniforms boa ;

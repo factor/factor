@@ -53,22 +53,22 @@ VERTEX-FORMAT: bunny-vertex
 VERTEX-STRUCT: bunny-vertex-struct bunny-vertex
 
 UNIFORM-TUPLE: bunny-uniforms < mvp-uniforms
-    { "light_position" float-uniform 3 }
-    { "color"          float-uniform 4 }
-    { "ambient"        float-uniform 4 }
-    { "diffuse"        float-uniform 4 }
-    { "shininess"      float-uniform 1 } ;
+    { "light-position" vec3-uniform  f }
+    { "color"          vec4-uniform  f }
+    { "ambient"        vec4-uniform  f }
+    { "diffuse"        vec4-uniform  f }
+    { "shininess"      float-uniform f } ;
 
 UNIFORM-TUPLE: sobel-uniforms
-    { "texcoord_scale" float-uniform   2 }
-    { "color_texture"  texture-uniform 1 }
-    { "normal_texture" texture-uniform 1 }
-    { "depth_texture"  texture-uniform 1 }
-    { "line_color"     float-uniform   4 } ; 
+    { "texcoord-scale" vec2-uniform    f }
+    { "color-texture"  texture-uniform f }
+    { "normal-texture" texture-uniform f }
+    { "depth-texture"  texture-uniform f }
+    { "line-color"     vec4-uniform    f } ; 
 
 UNIFORM-TUPLE: loading-uniforms
-    { "texcoord_scale"  float-uniform   2 }
-    { "loading_texture" texture-uniform 1 } ;
+    { "texcoord-scale"  vec2-uniform    f }
+    { "loading-texture" texture-uniform f } ;
 
 : numbers ( str -- seq )
     " " split [ string>number ] map sift ;
