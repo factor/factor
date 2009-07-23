@@ -14,6 +14,7 @@ compiler.cfg.dce
 compiler.cfg.write-barrier
 compiler.cfg.rpo
 compiler.cfg.phi-elimination
+compiler.cfg.empty-blocks
 compiler.cfg.checker ;
 IN: compiler.cfg.optimizer
 
@@ -42,5 +43,6 @@ SYMBOL: check-optimizer?
         eliminate-dead-code
         eliminate-write-barriers
         eliminate-phis
+        delete-empty-blocks
         ?check
     ] with-scope ;
