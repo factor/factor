@@ -4,6 +4,7 @@ USING: accessors kernel math assocs namespaces sequences heaps
 fry make combinators sets locals
 cpu.architecture
 compiler.cfg
+compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.liveness
 compiler.cfg.registers
@@ -185,6 +186,6 @@ ERROR: bad-vreg vreg ;
         ] V{ } make
     ] change-instructions drop ;
 
-: assign-registers ( live-intervals rpo -- )
+: assign-registers ( live-intervals cfg -- )
     [ init-assignment ] dip
-    [ assign-registers-in-block ] each ;
+    [ assign-registers-in-block ] each-basic-block ;

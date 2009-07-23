@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.syntax alien.c-types ;
 IN: unix.types
 
 ! OpenBSD 4.2
@@ -17,3 +17,5 @@ TYPEDEF: __uint32_t     fflags_t
 TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
 TYPEDEF: int            time_t
+
+ALIAS: <time_t> <int>

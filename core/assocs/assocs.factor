@@ -129,6 +129,9 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : assoc-combine ( seq -- union )
     H{ } clone [ dupd update ] reduce ;
 
+: assoc-refine ( seq -- assoc )
+    [ f ] [ [ ] [ assoc-intersect ] map-reduce ] if-empty ;
+
 : assoc-diff ( assoc1 assoc2 -- diff )
     [ nip key? not ] curry assoc-filter ;
 
