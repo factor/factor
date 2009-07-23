@@ -6,11 +6,19 @@ IN: compiler.cfg.renaming
 
 SYMBOL: renamings
 
-: rename-value ( vreg -- vreg' ) renamings get at ;
+: rename-value ( vreg -- vreg' ) renamings get ?at drop ;
 
 GENERIC: rename-insn-defs ( insn -- )
 
 M: ##flushable rename-insn-defs
+    [ rename-value ] change-dst
+    drop ;
+
+M: ##fixnum-overflow rename-insn-defs
+    [ rename-value ] change-dst
+    drop ;
+
+M: _fixnum-overflow rename-insn-defs
     [ rename-value ] change-dst
     drop ;
 
