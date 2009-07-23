@@ -14,9 +14,6 @@ IN: compiler.cfg.dcn.rewrite
     peek-in swap [ peek-out ] [ avail-out ] bi
     assoc-union assoc-diff ;
 
-: remove-dead-stores ( assoc -- assoc' )
-    [ drop n>> 0 >= ] assoc-filter ;
-
 : inserting-replaces ( from to -- assoc )
     [ replace-out ] [ [ kill-in ] [ replace-in ] bi ] bi*
     assoc-union assoc-diff ;
