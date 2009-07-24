@@ -12,8 +12,9 @@ compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering
 
 ! Local value numbering. Predecessors must be recomputed after this
-: >copy ( insn -- ##copy )
-    dst>> dup vreg>vn vn>vreg \ ##copy new-insn ;
+: >copy ( insn -- insn/##copy )
+    dup dst>> dup vreg>vn vn>vreg
+    2dup eq? [ 2drop ] [ \ ##copy new-insn nip ] if ;
 
 : rewrite-loop ( insn -- insn' )
     dup rewrite [ rewrite-loop ] [ ] ?if ;
@@ -23,7 +24,7 @@ GENERIC: process-instruction ( insn -- insn' )
 M: ##flushable process-instruction
     dup rewrite
     [ process-instruction ]
-    [ dup number-values [ >copy ] when ] ?if ;
+    [ dup number-values >copy ] ?if ;
 
 M: insn process-instruction
     dup rewrite

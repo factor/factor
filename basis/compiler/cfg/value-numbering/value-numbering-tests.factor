@@ -35,9 +35,9 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
 [
     {
         T{ ##load-reference f V int-regs 0 0.0 }
-        T{ ##load-reference f V int-regs 1 0.0 }
+        T{ ##copy f V int-regs 1 V int-regs 0 }
         T{ ##replace f V int-regs 0 D 0 }
-        T{ ##replace f V int-regs 0 D 1 }
+        T{ ##replace f V int-regs 1 D 1 }
     }
 ] [
     {
@@ -51,9 +51,9 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
 [
     {
         T{ ##load-reference f V int-regs 0 t }
-        T{ ##load-reference f V int-regs 1 t }
+        T{ ##copy f V int-regs 1 V int-regs 0 }
         T{ ##replace f V int-regs 0 D 0 }
-        T{ ##replace f V int-regs 0 D 1 }
+        T{ ##replace f V int-regs 1 D 1 }
     }
 ] [
     {
@@ -64,29 +64,14 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
     } value-numbering-step
 ] unit-test
 
-! Copy propagation
-[
-    {
-        T{ ##peek f V int-regs 45 D 1 }
-        T{ ##copy f V int-regs 48 V int-regs 45 }
-        T{ ##compare-imm-branch f V int-regs 45 7 cc/= }
-    }
-] [
-    {
-        T{ ##peek f V int-regs 45 D 1 }
-        T{ ##copy f V int-regs 48 V int-regs 45 }
-        T{ ##compare-imm-branch f V int-regs 48 7 cc/= }
-    } value-numbering-step
-] unit-test
-
 ! Compare propagation
 [
     {
         T{ ##load-reference f V int-regs 1 + }
         T{ ##peek f V int-regs 2 D 0 }
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc> }
-        T{ ##compare f V int-regs 6 V int-regs 2 V int-regs 1 cc> }
-        T{ ##replace f V int-regs 4 D 0 }
+        T{ ##copy f V int-regs 6 V int-regs 4 }
+        T{ ##replace f V int-regs 6 D 0 }
     }
 ] [
     {
@@ -612,8 +597,8 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##peek f V int-regs 1 D 1 }
         T{ ##load-immediate f V int-regs 2 0 }
-        T{ ##add-imm f V int-regs 3 V int-regs 0 0 }
-        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##copy f V int-regs 3 V int-regs 0 }
+        T{ ##replace f V int-regs 3 D 0 }
     }
 ] [
     {
@@ -630,8 +615,8 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##peek f V int-regs 1 D 1 }
         T{ ##load-immediate f V int-regs 2 0 }
-        T{ ##add-imm f V int-regs 3 V int-regs 0 0 }
-        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##copy f V int-regs 3 V int-regs 0 }
+        T{ ##replace f V int-regs 3 D 0 }
     }
 ] [
     {
@@ -648,8 +633,8 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##peek f V int-regs 1 D 1 }
         T{ ##load-immediate f V int-regs 2 0 }
-        T{ ##or-imm f V int-regs 3 V int-regs 0 0 }
-        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##copy f V int-regs 3 V int-regs 0 }
+        T{ ##replace f V int-regs 3 D 0 }
     }
 ] [
     {
@@ -666,8 +651,8 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##peek f V int-regs 1 D 1 }
         T{ ##load-immediate f V int-regs 2 0 }
-        T{ ##xor-imm f V int-regs 3 V int-regs 0 0 }
-        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##copy f V int-regs 3 V int-regs 0 }
+        T{ ##replace f V int-regs 3 D 0 }
     }
 ] [
     {
@@ -683,8 +668,8 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
     {
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 1 }
-        T{ ##shl-imm f V int-regs 2 V int-regs 0 0 }
-        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##copy f V int-regs 2 V int-regs 0 }
+        T{ ##replace f V int-regs 2 D 0 }
     }
 ] [
     {
