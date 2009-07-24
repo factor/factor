@@ -7,6 +7,7 @@ compiler.cfg.hats
 compiler.cfg.stacks
 compiler.cfg.instructions
 compiler.cfg.utilities
+compiler.cfg.builder.blocks
 compiler.cfg.registers
 compiler.cfg.comparisons ;
 IN: compiler.cfg.intrinsics.fixnum
@@ -31,7 +32,7 @@ IN: compiler.cfg.intrinsics.fixnum
     [ ^^untag-fixnum ^^neg ^^sar dup tag-mask get ^^and-imm ^^xor ] emit-fixnum-op ;
 
 : emit-fixnum-shift-general ( -- )
-    D 0 ^^peek 0 cc> ##compare-imm-branch
+    ds-peek 0 cc> ##compare-imm-branch
     [ emit-fixnum-left-shift ] with-branch
     [ emit-fixnum-right-shift ] with-branch
     2array emit-conditional ;
@@ -62,13 +63,15 @@ IN: compiler.cfg.intrinsics.fixnum
     ds-pop ^^untag-fixnum ^^integer>bignum ds-push ;
 
 : emit-no-overflow-case ( dst -- final-bb )
-    [ -2 ##inc-d ds-push ] with-branch ;
+    [ ds-drop ds-drop ds-push ] with-branch ;
 
 : emit-overflow-case ( word -- final-bb )
-    [ -1 ##call ] with-branch ;
+    [ ##call -1 adjust-d ] with-branch ;
 
 : emit-fixnum-overflow-op ( quot word -- )
-    [ [ D 1 ^^peek D 0 ^^peek ] dip call ] dip
+    ! Inputs to the final instruction need to be copied because
+    ! of loc>vreg sync
+    [ [ (2inputs) [ ^^copy ] bi@ ] dip call ] dip
     [ emit-no-overflow-case ] [ emit-overflow-case ] bi* 2array
     emit-conditional ; inline
 

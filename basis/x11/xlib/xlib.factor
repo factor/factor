@@ -477,7 +477,7 @@ C-STRUCT: XImage
     { "XImage-funcs" "f" } ;
 
 X-FUNCTION: XImage* XGetImage ( Display* display, Drawable d, int x, int y, uint width, uint height, ulong plane_mask, int format ) ;
-X-FUNCTION: int XDestroyImage ( XImage *ximage ) ;
+X-FUNCTION: int XDestroyImage ( XImage* ximage ) ;
 
 : XImage-size ( ximage -- size )
     [ XImage-height ] [ XImage-bytes_per_line ] bi * ;

@@ -286,7 +286,7 @@ M: cucumber equal? "The cucumber has no equal" throw ;
 [ 4294967295 B{ 255 255 255 255 } -1 ]
 [
     -1 <int> -1 <int>
-    [ [ 0 alien-unsigned-cell swap ] [ 0 alien-signed-2 ] bi ]
+    [ [ 0 alien-unsigned-4 swap ] [ 0 alien-signed-2 ] bi ]
     compile-call
 ] unit-test
 
@@ -322,3 +322,15 @@ cell 4 = [
 
 ! Regression from Slava's value numbering changes
 [ 1 ] [ 31337 [ dup fixnum<= [ 1 ] [ 2 ] if ] compile-call ] unit-test
+
+! Bug with ##return node construction
+: return-recursive-bug ( nodes -- ? )
+    { fixnum } declare [
+        dup 3 bitand 1 = [ drop t ] [
+            dup 3 bitand 2 = [
+                return-recursive-bug
+            ] [ drop f ] if
+        ] if
+    ] any? ; inline recursive
+
+[ t ] [ 3 [ return-recursive-bug ] compile-call ] unit-test
