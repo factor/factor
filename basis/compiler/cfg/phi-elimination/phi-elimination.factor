@@ -6,6 +6,20 @@ compiler.cfg.utilities compiler.cfg.hats make
 locals ;
 IN: compiler.cfg.phi-elimination
 
+! assoc mapping predecessors to sequences
+SYMBOL: added-instructions
+
+: add-instructions ( predecessor quot -- )
+    [
+        added-instructions get
+        [ drop V{ } clone ] cache
+        building
+    ] dip with-variable ; inline
+
+: insert-basic-blocks ( bb -- )
+    [ added-instructions get ] dip
+    '[ [ _ ] dip <simple-block> insert-basic-block ] assoc-each ;
+
 : insert-copy ( predecessor input output -- )
     '[ _ _ swap ##copy ] add-instructions ;
 
