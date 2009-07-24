@@ -1,19 +1,19 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien alien.c-types alien.structs arrays
-assocs classes.mixin classes.parser classes.singleton
-classes.tuple classes.tuple.private combinators destructors fry
+assocs classes classes.mixin classes.parser classes.singleton
+classes.tuple classes.tuple.private combinators combinators.tuple destructors fry
 generic generic.parser gpu gpu.buffers gpu.framebuffers
 gpu.framebuffers.private gpu.shaders gpu.state gpu.textures
 gpu.textures.private half-floats images kernel lexer locals
 math math.order math.parser namespaces opengl opengl.gl parser
 quotations sequences slots sorting specialized-arrays.alien
 specialized-arrays.float specialized-arrays.int
-specialized-arrays.uint strings ui.gadgets.worlds variants
+specialized-arrays.uint strings tr ui.gadgets.worlds variants
 vocabs.parser words ;
 IN: gpu.render
 
 UNION: ?string string POSTPONE: f ;
-UNION: uniform-dim integer sequence ;
+UNION: ?integer integer POSTPONE: f ;
 
 TUPLE: vertex-attribute
     { name            ?string        read-only initial: f }
@@ -23,15 +23,44 @@ TUPLE: vertex-attribute
 
 VARIANT: uniform-type
     bool-uniform
+    bvec2-uniform
+    bvec3-uniform
+    bvec4-uniform
     uint-uniform
+    uvec2-uniform
+    uvec3-uniform
+    uvec4-uniform
     int-uniform
+    ivec2-uniform
+    ivec3-uniform
+    ivec4-uniform
     float-uniform
+    vec2-uniform
+    vec3-uniform
+    vec4-uniform
+
+    mat2-uniform
+    mat2x3-uniform
+    mat2x4-uniform
+
+    mat3x2-uniform
+    mat3-uniform
+    mat3x4-uniform
+
+    mat4x2-uniform
+    mat4x3-uniform
+    mat4-uniform
+
     texture-uniform ;
 
+ALIAS: mat2x2-uniform mat2-uniform
+ALIAS: mat3x3-uniform mat3-uniform
+ALIAS: mat4x4-uniform mat4-uniform
+
 TUPLE: uniform
-    { name         string       read-only initial: "" }
-    { uniform-type uniform-type read-only initial: float-uniform }
-    { dim          uniform-dim  read-only initial: 4 } ;
+    { name         string   read-only initial: "" }
+    { uniform-type class    read-only initial: float-uniform }
+    { dim          ?integer read-only initial: f } ;
 
 VARIANT: index-type
     ubyte-indexes
@@ -49,8 +78,6 @@ TUPLE: multi-index-range
     { counts uint-array read-only } ;
 
 C: <multi-index-range> multi-index-range
-
-UNION: ?integer integer POSTPONE: f ;
 
 TUPLE: index-elements
     { ptr gpu-data-ptr read-only }
@@ -180,8 +207,8 @@ M: multi-index-elements render-vertex-indexes
     bi*
     GL_ELEMENT_ARRAY_BUFFER swap [ handle>> ] [ 0 ] if* glBindBuffer glMultiDrawElements ;
 
-: (bind-texture-unit) ( texture-unit texture -- )
-    [ GL_TEXTURE0 + glActiveTexture ] [ bind-texture drop ] bi* ; inline
+: (bind-texture-unit) ( texture texture-unit -- )
+    swap [ GL_TEXTURE0 + glActiveTexture ] [ bind-texture drop ] bi* ; inline
 
 :: [bind-vertex-attribute] ( stride offset vertex-attribute -- stride offset' quot )
     vertex-attribute name>>                 :> name
@@ -242,96 +269,204 @@ M: uniform-tuple bind-uniforms
     2drop ;
 
 : uniform-slot-type ( uniform -- type )
-    dup dim>> 1 = [
+    dup dim>> [ drop sequence ] [
         uniform-type>> {
             { bool-uniform    [ boolean ] }
             { uint-uniform    [ integer ] }
             { int-uniform     [ integer ] }
             { float-uniform   [ float   ] }
             { texture-uniform [ texture ] }
+            [ drop sequence ]
         } case
-    ] [ drop sequence ] if ;
+    ] if ;
 
 : uniform>slot ( uniform -- slot )
     [ name>> ] [ uniform-slot-type ] bi 2array ;
 
-:: [bind-uniform-texture] ( uniform index -- quot )
-    uniform name>> reader-word :> value>>-word
-    { index swap value>>-word (bind-texture-unit) } >quotation ;
+: uniform-type-texture-units ( uniform-type -- units )
+    dup texture-uniform = [ drop 1 ] [ "uniform-tuple-texture-units" word-prop 0 or ] if ;
 
-:: [bind-uniform-textures] ( superclass uniforms -- quot )
-    superclass "uniform-tuple-texture-units" word-prop 0 or :> first-texture-unit
-    superclass \ bind-uniform-textures method :> next-method
-    uniforms
-        [ uniform-type>> texture-uniform = ] filter
-        [ first-texture-unit + [bind-uniform-texture] ] map-index
-        :> texture-uniforms-cleave
+: all-uniform-tuple-slots ( class -- slots )
+    dup "uniform-tuple-slots" word-prop 
+    [ swap superclass all-uniform-tuple-slots prepend ] [ drop { } ] if* ;
 
-    {
-        2dup next-method
-        nip texture-uniforms-cleave cleave
-    } >quotation ;
+DEFER: uniform-texture-accessors
 
-:: [bind-uniform] ( texture-unit uniform -- texture-unit' quot )
-    uniform name>> :> name
+: uniform-type-texture-accessors ( uniform-type -- accessors )
+    texture-uniform = [ { [ ] } ] [ { } ] if ;
+
+: uniform-slot-texture-accessor ( uniform -- accessor )
+    [ name>> reader-word ] [ [ uniform-type>> ] [ dim>> ] bi uniform-texture-accessors ] bi
+    dup length 1 = [ first swap prefix ] [ [ ] 2sequence ] if ;
+
+: uniform-tuple-texture-accessors ( uniform-type -- accessors )
+    all-uniform-tuple-slots [ uniform-type>> uniform-type-texture-units zero? not ] filter
+    [ uniform-slot-texture-accessor ] map ;
+
+: uniform-texture-accessors ( uniform-type dim -- accessors )
+    [
+        dup uniform-type?
+        [ uniform-type-texture-accessors ]
+        [ uniform-tuple-texture-accessors ] if
+    ] [
+        2dup swap empty? not and [
+            iota [
+                [ swap nth ] swap prefix
+                over length 1 = [ swap first append ] [ swap suffix ] if
+            ] with map
+        ] [ drop ] if
+    ] bi* ;
+
+: texture-accessor>cleave ( unit accessors -- unit' cleaves )
+    dup last sequence?
+    [ [ last [ texture-accessor>cleave ] map ] [ but-last ] bi swap suffix \ cleave suffix ]
+    [ over suffix \ (bind-texture-unit) suffix [ 1 + ] dip ] if ;
+
+: [bind-uniform-textures] ( class -- quot )
+    f uniform-texture-accessors
+    0 swap [ texture-accessor>cleave ] map nip
+    \ nip swap \ cleave [ ] 3sequence ;
+
+DEFER: [bind-uniform-tuple]
+
+:: [bind-uniform-array] ( value>>-quot type texture-unit name dim -- texture-unit' quot )
     { name uniform-index } >quotation :> index-quot
-    uniform name>> reader-word 1quotation :> value>>-quot
     { index-quot value>>-quot bi* } >quotation :> pre-quot
 
-    uniform [ uniform-type>> ] [ dim>> ] bi 2array H{
-        { { bool-uniform  1 } [ >c-bool glUniform1i  ] }
-        { { int-uniform   1 } [ glUniform1i  ] }
-        { { uint-uniform  1 } [ glUniform1ui ] }
-        { { float-uniform 1 } [ glUniform1f  ] }
+    type H{
+        { bool-uniform  { dim swap [ >c-bool ] int-array{ } map-as glUniform1iv  } }
+        { int-uniform   { dim swap >int-array   glUniform1iv  } }
+        { uint-uniform  { dim swap >uint-array  glUniform1uiv } }
+        { float-uniform { dim swap >float-array glUniform1fv  } }
 
-        { { bool-uniform  2 } [ [ >c-bool ] map first2 glUniform2i  ] }
-        { { int-uniform   2 } [ first2 glUniform2i  ] }
-        { { uint-uniform  2 } [ first2 glUniform2ui ] }
-        { { float-uniform 2 } [ first2 glUniform2f  ] }
+        { bvec2-uniform { dim swap [ [ >c-bool ] map ] map int-array{ } concat-as glUniform2iv  } }
+        { ivec2-uniform { dim swap int-array{ }   concat-as glUniform2i  } }
+        { uvec2-uniform { dim swap uint-array{ }  concat-as glUniform2ui } }
+        { vec2-uniform  { dim swap float-array{ } concat-as glUniform2f  } }
 
-        { { bool-uniform  3 } [ [ >c-bool ] map first3 glUniform3i  ] }
-        { { int-uniform   3 } [ first3 glUniform3i  ] }
-        { { uint-uniform  3 } [ first3 glUniform3ui ] }
-        { { float-uniform 3 } [ first3 glUniform3f  ] }
+        { bvec3-uniform { dim swap [ [ >c-bool ] map ] map int-array{ } concat-as glUniform3iv  } }
+        { ivec3-uniform { dim swap int-array{ }   concat-as glUniform3i  } }
+        { uvec3-uniform { dim swap uint-array{ }  concat-as glUniform3ui } }
+        { vec3-uniform  { dim swap float-array{ } concat-as glUniform3f  } }
 
-        { { bool-uniform  4 } [ [ >c-bool ] map first4 glUniform4i  ] }
-        { { int-uniform   4 } [ first4 glUniform4i  ] }
-        { { uint-uniform  4 } [ first4 glUniform4ui ] }
-        { { float-uniform 4 } [ first4 glUniform4f  ] }
+        { bvec4-uniform { dim swap [ [ >c-bool ] map ] map int-array{ } concat-as glUniform4iv  } }
+        { ivec4-uniform { dim swap int-array{ }   concat-as glUniform4iv  } }
+        { uvec4-uniform { dim swap uint-array{ }  concat-as glUniform4uiv } }
+        { vec4-uniform  { dim swap float-array{ } concat-as glUniform4fv  } }
 
-        { { float-uniform { 2 2 } } [ [ 1 1 ] dip concat >float-array glUniformMatrix2fv   ] }
-        { { float-uniform { 3 2 } } [ [ 1 1 ] dip concat >float-array glUniformMatrix2x3fv ] }
-        { { float-uniform { 4 2 } } [ [ 1 1 ] dip concat >float-array glUniformMatrix2x4fv ] }
+        { mat2-uniform   { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix2fv   } }
+        { mat2x3-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix2x3fv } }
+        { mat2x4-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix2x4fv } }
+                                                                 
+        { mat3x2-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix3x2fv } }
+        { mat3-uniform   { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix3fv   } }
+        { mat3x4-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix3x4fv } }
+                                                                  
+        { mat4x2-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix4x2fv } }
+        { mat4x3-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix4x3fv } }
+        { mat4-uniform   { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix4fv   } }
 
-        { { float-uniform { 2 3 } } [ [ 1 1 ] dip concat >float-array glUniformMatrix3x2fv ] }
-        { { float-uniform { 3 3 } } [ [ 1 1 ] dip concat >float-array glUniformMatrix3fv   ] }
-        { { float-uniform { 4 3 } } [ [ 1 1 ] dip concat >float-array glUniformMatrix3x4fv ] }
-
-        { { float-uniform { 2 4 } } [ [ 1 1 ] dip concat >float-array glUniformMatrix4x2fv ] }
-        { { float-uniform { 3 4 } } [ [ 1 1 ] dip concat >float-array glUniformMatrix4x3fv ] }
-        { { float-uniform { 4 4 } } [ [ 1 1 ] dip concat >float-array glUniformMatrix4fv   ] }
-
-        { { texture-uniform 1 } { drop texture-unit glUniform1i } }
+        { texture-uniform { drop dim dup iota [ texture-unit + ] int-array{ } map-as glUniform1iv } }
     } at [ uniform invalid-uniform-type ] unless* >quotation :> value-quot
 
-    uniform uniform-type>> texture-uniform =
-    [ texture-unit 1 + ] [ texture-unit ] if
+    type uniform-type-texture-units dim * texture-unit +
     pre-quot value-quot append ;
+
+:: [bind-uniform-value] ( value>>-quot type texture-unit name -- texture-unit' quot )
+    { name uniform-index } >quotation :> index-quot
+    { index-quot value>>-quot bi* } >quotation :> pre-quot
+
+    type H{
+        { bool-uniform  [ >c-bool glUniform1i  ] }
+        { int-uniform   [ glUniform1i  ] }
+        { uint-uniform  [ glUniform1ui ] }
+        { float-uniform [ glUniform1f  ] }
+
+        { bvec2-uniform [ [ >c-bool ] map first2 glUniform2i  ] }
+        { ivec2-uniform [ first2 glUniform2i  ] }
+        { uvec2-uniform [ first2 glUniform2ui ] }
+        { vec2-uniform  [ first2 glUniform2f  ] }
+
+        { bvec3-uniform [ [ >c-bool ] map first3 glUniform3i  ] }
+        { ivec3-uniform [ first3 glUniform3i  ] }
+        { uvec3-uniform [ first3 glUniform3ui ] }
+        { vec3-uniform  [ first3 glUniform3f  ] }
+
+        { bvec4-uniform [ [ >c-bool ] map first4 glUniform4i  ] }
+        { ivec4-uniform [ first4 glUniform4i  ] }
+        { uvec4-uniform [ first4 glUniform4ui ] }
+        { vec4-uniform  [ first4 glUniform4f  ] }
+
+        { mat2-uniform   [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix2fv   ] }
+        { mat2x3-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix2x3fv ] }
+        { mat2x4-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix2x4fv ] }
+
+        { mat3x2-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix3x2fv ] }
+        { mat3-uniform   [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix3fv   ] }
+        { mat3x4-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix3x4fv ] }
+
+        { mat4x2-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix4x2fv ] }
+        { mat4x3-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix4x3fv ] }
+        { mat4-uniform   [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix4fv   ] }
+
+        { texture-uniform { drop texture-unit glUniform1i } }
+    } at [ uniform invalid-uniform-type ] unless* >quotation :> value-quot
+
+    type uniform-type-texture-units texture-unit +
+    pre-quot value-quot append ;
+
+:: [bind-uniform-struct] ( value>>-quot type texture-unit name dim -- texture-unit' quot )
+    dim
+    [
+        iota
+        [ [ [ swap nth ] swap prefix ] map ]
+        [ [ number>string name "[" append "]." surround ] map ] bi
+    ] [
+        { [ ] }
+        name "." append 1array
+    ] if* :> name-prefixes :> quot-prefixes
+    type all-uniform-tuple-slots :> uniforms
+
+    texture-unit quot-prefixes name-prefixes [| quot-prefix name-prefix |
+        uniforms name-prefix [bind-uniform-tuple]
+        quot-prefix prepend
+    ] 2map :> value-cleave :> texture-unit'
+
+    texture-unit' 
+    value>>-quot { value-cleave 2cleave } append ;
+
+TR: hyphens>underscores "-" "_" ;
+
+:: [bind-uniform] ( texture-unit uniform prefix -- texture-unit' quot )
+    prefix uniform name>> append hyphens>underscores :> name
+    uniform uniform-type>> :> type
+    uniform dim>> :> dim
+    uniform name>> reader-word 1quotation :> value>>-quot
+
+    value>>-quot type texture-unit name {
+        { [ type uniform-type? dim     and ] [ dim [bind-uniform-array] ] }
+        { [ type uniform-type? dim not and ] [ [bind-uniform-value] ] }
+        [ dim [bind-uniform-struct] ]
+    } cond ;
+
+:: [bind-uniform-tuple] ( texture-unit uniforms prefix -- texture-unit' quot )
+    texture-unit uniforms [ prefix [bind-uniform] ] map :> uniforms-cleave :> texture-unit'
+
+    texture-unit'
+    { uniforms-cleave 2cleave } >quotation ;
 
 :: [bind-uniforms] ( superclass uniforms -- quot )
     superclass "uniform-tuple-texture-units" word-prop 0 or :> first-texture-unit
     superclass \ bind-uniforms method :> next-method
-    first-texture-unit uniforms [ [bind-uniform] ] map nip :> uniforms-cleave
-    
-    {
-        2dup next-method
-        uniforms-cleave 2cleave
-    } >quotation ;
+    first-texture-unit uniforms "" [bind-uniform-tuple] nip :> bind-quot
+
+    { 2dup next-method } bind-quot [ ] append-as ;
 
 : define-uniform-tuple-methods ( class superclass uniforms -- )
     [
-        [ \ bind-uniform-textures create-method-in ] 2dip
-        [bind-uniform-textures] define
+        2drop
+        [ \ bind-uniform-textures create-method-in ]
+        [ [bind-uniform-textures] ] bi define
     ] [
         [ \ bind-uniforms create-method-in ] 2dip
         [bind-uniforms] define
@@ -384,21 +519,20 @@ padding-no [ 0 ] initialize
 : (define-uniform-tuple) ( class superclass uniforms -- )
     {
         [ [ uniform>slot ] map define-tuple-class ]
-        [ define-uniform-tuple-methods ]
         [
-            [ "uniform-tuple-texture-units" word-prop 0 or ]
-            [ [ uniform-type>> texture-uniform = ] filter length ] bi* +
+            [ uniform-type-texture-units ]
+            [
+                [ [ uniform-type>> uniform-type-texture-units ] [ dim>> 1 or ] bi * ]
+                [ + ] map-reduce
+            ] bi* +
             "uniform-tuple-texture-units" set-word-prop
         ]
         [ nip "uniform-tuple-slots" set-word-prop ]
+        [ define-uniform-tuple-methods ]
     } 3cleave ;
 
 : true-subclasses ( class -- seq )
     [ subclasses ] keep [ = not ] curry filter ;
-
-: redefine-uniform-tuple-subclass-methods ( class -- )
-    [ true-subclasses ] keep
-    [ over "uniform-tuple-slots" word-prop (define-uniform-tuple) ] curry each ;
 
 PRIVATE>
 
@@ -426,8 +560,7 @@ SYNTAX: VERTEX-STRUCT:
     scan scan-word define-vertex-struct ;
 
 : define-uniform-tuple ( class superclass uniforms -- )
-    [ (define-uniform-tuple) ]
-    [ 2drop redefine-uniform-tuple-subclass-methods ] 3bi ;
+    (define-uniform-tuple) ; inline
 
 SYNTAX: UNIFORM-TUPLE:
     parse-uniform-tuple-definition define-uniform-tuple ;
@@ -474,13 +607,22 @@ M: vertex-array dispose
 PRIVATE>
 
 TUPLE: render-set
-    { primitive-mode primitive-mode }
-    { vertex-array vertex-array }
-    { uniforms uniform-tuple }
-    { indexes vertex-indexes initial: T{ index-range } } 
-    { instances ?integer initial: f }
-    { framebuffer any-framebuffer initial: system-framebuffer }
-    { output-attachments sequence initial: { default-attachment } } ;
+    { primitive-mode primitive-mode read-only }
+    { vertex-array vertex-array read-only }
+    { uniforms uniform-tuple read-only }
+    { indexes vertex-indexes initial: T{ index-range } read-only } 
+    { instances ?integer initial: f read-only }
+    { framebuffer any-framebuffer initial: system-framebuffer read-only }
+    { output-attachments sequence initial: { default-attachment } read-only } ;
+
+: <render-set> ( x quot-assoc -- render-set )
+    render-set swap make-tuple ; inline
+
+: 2<render-set> ( x y quot-assoc -- render-set )
+    render-set swap 2make-tuple ; inline
+
+: 3<render-set> ( x y z quot-assoc -- render-set )
+    render-set swap 3make-tuple ; inline
 
 : render ( render-set -- )
     {

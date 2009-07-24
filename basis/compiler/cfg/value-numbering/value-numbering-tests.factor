@@ -3,7 +3,7 @@ USING: compiler.cfg.value-numbering compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
 cpu.architecture tools.test kernel math combinators.short-circuit
 accessors sequences compiler.cfg.predecessors locals
-compiler.cfg.phi-elimination compiler.cfg.dce compiler.cfg.liveness
+compiler.cfg.phi-elimination compiler.cfg.dce
 compiler.cfg assocs vectors arrays layouts namespaces ;
 
 : trim-temps ( insns -- insns )
@@ -14,10 +14,6 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
             [ ##compare-float? ]
         } 1|| [ f >>temp ] when
     ] map ;
-
-: test-value-numbering ( insns -- insns )
-    { } init-value-numbering
-    value-numbering-step ;
 
 ! Folding constants together
 [
@@ -33,15 +29,15 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-reference f V int-regs 1 -0.0 }
         T{ ##replace f V int-regs 0 D 0 }
         T{ ##replace f V int-regs 1 D 1 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
     {
         T{ ##load-reference f V int-regs 0 0.0 }
-        T{ ##load-reference f V int-regs 1 0.0 }
+        T{ ##copy f V int-regs 1 V int-regs 0 }
         T{ ##replace f V int-regs 0 D 0 }
-        T{ ##replace f V int-regs 0 D 1 }
+        T{ ##replace f V int-regs 1 D 1 }
     }
 ] [
     {
@@ -49,15 +45,15 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-reference f V int-regs 1 0.0 }
         T{ ##replace f V int-regs 0 D 0 }
         T{ ##replace f V int-regs 1 D 1 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
     {
         T{ ##load-reference f V int-regs 0 t }
-        T{ ##load-reference f V int-regs 1 t }
+        T{ ##copy f V int-regs 1 V int-regs 0 }
         T{ ##replace f V int-regs 0 D 0 }
-        T{ ##replace f V int-regs 0 D 1 }
+        T{ ##replace f V int-regs 1 D 1 }
     }
 ] [
     {
@@ -65,22 +61,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-reference f V int-regs 1 t }
         T{ ##replace f V int-regs 0 D 0 }
         T{ ##replace f V int-regs 1 D 1 }
-    } test-value-numbering
-] unit-test
-
-! Copy propagation
-[
-    {
-        T{ ##peek f V int-regs 45 D 1 }
-        T{ ##copy f V int-regs 48 V int-regs 45 }
-        T{ ##compare-imm-branch f V int-regs 45 7 cc/= }
-    }
-] [
-    {
-        T{ ##peek f V int-regs 45 D 1 }
-        T{ ##copy f V int-regs 48 V int-regs 45 }
-        T{ ##compare-imm-branch f V int-regs 48 7 cc/= }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 ! Compare propagation
@@ -89,8 +70,8 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-reference f V int-regs 1 + }
         T{ ##peek f V int-regs 2 D 0 }
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc> }
-        T{ ##compare f V int-regs 6 V int-regs 2 V int-regs 1 cc> }
-        T{ ##replace f V int-regs 4 D 0 }
+        T{ ##copy f V int-regs 6 V int-regs 4 }
+        T{ ##replace f V int-regs 6 D 0 }
     }
 ] [
     {
@@ -99,7 +80,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc> }
         T{ ##compare-imm f V int-regs 6 V int-regs 4 5 cc/= }
         T{ ##replace f V int-regs 6 D 0 }
-    } test-value-numbering trim-temps
+    } value-numbering-step trim-temps
 ] unit-test
 
 [
@@ -117,7 +98,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc<= }
         T{ ##compare-imm f V int-regs 6 V int-regs 4 5 cc= }
         T{ ##replace f V int-regs 6 D 0 }
-    } test-value-numbering trim-temps
+    } value-numbering-step trim-temps
 ] unit-test
 
 [
@@ -139,7 +120,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##compare-float f V int-regs 12 V double-float-regs 10 V double-float-regs 11 cc< }
         T{ ##compare-imm f V int-regs 14 V int-regs 12 5 cc= }
         T{ ##replace f V int-regs 14 D 0 }
-    } test-value-numbering trim-temps
+    } value-numbering-step trim-temps
 ] unit-test
 
 [
@@ -155,7 +136,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 30 D -2 }
         T{ ##compare f V int-regs 33 V int-regs 29 V int-regs 30 cc<= }
         T{ ##compare-imm-branch f V int-regs 33 5 cc/= }
-    } test-value-numbering trim-temps
+    } value-numbering-step trim-temps
 ] unit-test
 
 ! Immediate operand conversion
@@ -170,7 +151,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##add f V int-regs 2 V int-regs 0 V int-regs 1 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -184,7 +165,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##add f V int-regs 2 V int-regs 1 V int-regs 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -198,7 +179,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##sub f V int-regs 2 V int-regs 0 V int-regs 1 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -210,7 +191,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
     {
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##sub f V int-regs 1 V int-regs 0 V int-regs 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -224,7 +205,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##mul f V int-regs 2 V int-regs 0 V int-regs 1 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -238,7 +219,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##mul f V int-regs 2 V int-regs 1 V int-regs 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -250,7 +231,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
     {
         T{ ##peek f V int-regs 1 D 0 }
         T{ ##mul-imm f V int-regs 2 V int-regs 1 8 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -264,7 +245,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##and f V int-regs 2 V int-regs 0 V int-regs 1 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -278,7 +259,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##and f V int-regs 2 V int-regs 1 V int-regs 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -292,7 +273,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##or f V int-regs 2 V int-regs 0 V int-regs 1 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -306,7 +287,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##or f V int-regs 2 V int-regs 1 V int-regs 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -320,7 +301,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##xor f V int-regs 2 V int-regs 0 V int-regs 1 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -334,7 +315,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##xor f V int-regs 2 V int-regs 1 V int-regs 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -348,7 +329,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##compare f V int-regs 2 V int-regs 0 V int-regs 1 cc<= }
-    } test-value-numbering trim-temps
+    } value-numbering-step trim-temps
 ] unit-test
 
 [
@@ -362,7 +343,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##compare f V int-regs 2 V int-regs 1 V int-regs 0 cc<= }
-    } test-value-numbering trim-temps
+    } value-numbering-step trim-temps
 ] unit-test
 
 [
@@ -376,7 +357,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##compare-branch f V int-regs 0 V int-regs 1 cc<= }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -390,7 +371,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 100 }
         T{ ##compare-branch f V int-regs 1 V int-regs 0 cc<= }
-    } test-value-numbering trim-temps
+    } value-numbering-step trim-temps
 ] unit-test
 
 ! Reassociation
@@ -409,7 +390,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##add f V int-regs 2 V int-regs 0 V int-regs 1 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##add f V int-regs 4 V int-regs 2 V int-regs 3 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -427,7 +408,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##add f V int-regs 2 V int-regs 1 V int-regs 0 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##add f V int-regs 4 V int-regs 3 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -445,7 +426,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##add f V int-regs 2 V int-regs 0 V int-regs 1 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##sub f V int-regs 4 V int-regs 2 V int-regs 3 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -463,7 +444,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##sub f V int-regs 2 V int-regs 0 V int-regs 1 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##sub f V int-regs 4 V int-regs 2 V int-regs 3 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -481,7 +462,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##mul f V int-regs 2 V int-regs 0 V int-regs 1 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##mul f V int-regs 4 V int-regs 2 V int-regs 3 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -499,7 +480,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##mul f V int-regs 2 V int-regs 1 V int-regs 0 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##mul f V int-regs 4 V int-regs 3 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -517,7 +498,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##and f V int-regs 2 V int-regs 0 V int-regs 1 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##and f V int-regs 4 V int-regs 2 V int-regs 3 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -535,7 +516,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##and f V int-regs 2 V int-regs 1 V int-regs 0 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##and f V int-regs 4 V int-regs 3 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -553,7 +534,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##or f V int-regs 2 V int-regs 0 V int-regs 1 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##or f V int-regs 4 V int-regs 2 V int-regs 3 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -571,7 +552,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##or f V int-regs 2 V int-regs 1 V int-regs 0 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##or f V int-regs 4 V int-regs 3 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -589,7 +570,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##xor f V int-regs 2 V int-regs 0 V int-regs 1 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##xor f V int-regs 4 V int-regs 2 V int-regs 3 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -607,7 +588,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##xor f V int-regs 2 V int-regs 1 V int-regs 0 }
         T{ ##load-immediate f V int-regs 3 50 }
         T{ ##xor f V int-regs 4 V int-regs 3 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 ! Simplification
@@ -616,8 +597,8 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##peek f V int-regs 1 D 1 }
         T{ ##load-immediate f V int-regs 2 0 }
-        T{ ##add-imm f V int-regs 3 V int-regs 0 0 }
-        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##copy f V int-regs 3 V int-regs 0 }
+        T{ ##replace f V int-regs 3 D 0 }
     }
 ] [
     {
@@ -626,7 +607,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
         T{ ##add f V int-regs 3 V int-regs 0 V int-regs 2 }
         T{ ##replace f V int-regs 3 D 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -634,8 +615,8 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##peek f V int-regs 1 D 1 }
         T{ ##load-immediate f V int-regs 2 0 }
-        T{ ##add-imm f V int-regs 3 V int-regs 0 0 }
-        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##copy f V int-regs 3 V int-regs 0 }
+        T{ ##replace f V int-regs 3 D 0 }
     }
 ] [
     {
@@ -644,7 +625,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
         T{ ##sub f V int-regs 3 V int-regs 0 V int-regs 2 }
         T{ ##replace f V int-regs 3 D 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -652,8 +633,8 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##peek f V int-regs 1 D 1 }
         T{ ##load-immediate f V int-regs 2 0 }
-        T{ ##or-imm f V int-regs 3 V int-regs 0 0 }
-        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##copy f V int-regs 3 V int-regs 0 }
+        T{ ##replace f V int-regs 3 D 0 }
     }
 ] [
     {
@@ -662,7 +643,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
         T{ ##or f V int-regs 3 V int-regs 0 V int-regs 2 }
         T{ ##replace f V int-regs 3 D 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -670,8 +651,8 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##peek f V int-regs 1 D 1 }
         T{ ##load-immediate f V int-regs 2 0 }
-        T{ ##xor-imm f V int-regs 3 V int-regs 0 0 }
-        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##copy f V int-regs 3 V int-regs 0 }
+        T{ ##replace f V int-regs 3 D 0 }
     }
 ] [
     {
@@ -680,15 +661,15 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##sub f V int-regs 2 V int-regs 1 V int-regs 1 }
         T{ ##xor f V int-regs 3 V int-regs 0 V int-regs 2 }
         T{ ##replace f V int-regs 3 D 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
     {
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 1 }
-        T{ ##shl-imm f V int-regs 2 V int-regs 0 0 }
-        T{ ##replace f V int-regs 0 D 0 }
+        T{ ##copy f V int-regs 2 V int-regs 0 }
+        T{ ##replace f V int-regs 2 D 0 }
     }
 ] [
     {
@@ -696,7 +677,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-immediate f V int-regs 1 1 }
         T{ ##mul f V int-regs 2 V int-regs 0 V int-regs 1 }
         T{ ##replace f V int-regs 2 D 0 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 ! Constant folding
@@ -713,7 +694,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-immediate f V int-regs 1 1 }
         T{ ##load-immediate f V int-regs 2 3 }
         T{ ##add f V int-regs 3 V int-regs 1 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -729,7 +710,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-immediate f V int-regs 1 1 }
         T{ ##load-immediate f V int-regs 2 3 }
         T{ ##sub f V int-regs 3 V int-regs 1 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -745,7 +726,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-immediate f V int-regs 1 2 }
         T{ ##load-immediate f V int-regs 2 3 }
         T{ ##mul f V int-regs 3 V int-regs 1 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -761,7 +742,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-immediate f V int-regs 1 2 }
         T{ ##load-immediate f V int-regs 2 1 }
         T{ ##and f V int-regs 3 V int-regs 1 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -777,7 +758,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-immediate f V int-regs 1 2 }
         T{ ##load-immediate f V int-regs 2 1 }
         T{ ##or f V int-regs 3 V int-regs 1 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -793,7 +774,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##load-immediate f V int-regs 1 2 }
         T{ ##load-immediate f V int-regs 2 3 }
         T{ ##xor f V int-regs 3 V int-regs 1 V int-regs 2 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -807,7 +788,7 @@ compiler.cfg assocs vectors arrays layouts namespaces ;
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 1 }
         T{ ##shl-imm f V int-regs 3 V int-regs 1 3 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 cell 8 = [
@@ -822,7 +803,7 @@ cell 8 = [
             T{ ##peek f V int-regs 0 D 0 }
             T{ ##load-immediate f V int-regs 1 -1 }
             T{ ##shr-imm f V int-regs 3 V int-regs 1 16 }
-        } test-value-numbering
+        } value-numbering-step
     ] unit-test
 ] when
 
@@ -837,7 +818,7 @@ cell 8 = [
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##load-immediate f V int-regs 1 -8 }
         T{ ##sar-imm f V int-regs 3 V int-regs 1 1 }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 cell 8 = [
@@ -854,7 +835,7 @@ cell 8 = [
             T{ ##load-immediate f V int-regs 1 65536 }
             T{ ##shl-imm f V int-regs 2 V int-regs 1 31 }
             T{ ##add f V int-regs 3 V int-regs 0 V int-regs 2 }
-        } test-value-numbering
+        } value-numbering-step
     ] unit-test
 
     [
@@ -868,7 +849,7 @@ cell 8 = [
             T{ ##peek f V int-regs 0 D 0 }
             T{ ##load-immediate f V int-regs 2 140737488355328 }
             T{ ##add f V int-regs 3 V int-regs 0 V int-regs 2 }
-        } test-value-numbering
+        } value-numbering-step
     ] unit-test
 
     [
@@ -884,7 +865,7 @@ cell 8 = [
             T{ ##load-immediate f V int-regs 2 2147483647 }
             T{ ##add f V int-regs 3 V int-regs 0 V int-regs 2 }
             T{ ##add f V int-regs 4 V int-regs 3 V int-regs 2 }
-        } test-value-numbering
+        } value-numbering-step
     ] unit-test
 ] when
 
@@ -900,7 +881,7 @@ cell 8 = [
         T{ ##load-immediate f V int-regs 1 1 }
         T{ ##load-immediate f V int-regs 2 2 }
         T{ ##compare f V int-regs 3 V int-regs 1 V int-regs 2 cc= }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -914,7 +895,7 @@ cell 8 = [
         T{ ##load-immediate f V int-regs 1 1 }
         T{ ##load-immediate f V int-regs 2 2 }
         T{ ##compare f V int-regs 3 V int-regs 1 V int-regs 2 cc/= }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -928,7 +909,7 @@ cell 8 = [
         T{ ##load-immediate f V int-regs 1 1 }
         T{ ##load-immediate f V int-regs 2 2 }
         T{ ##compare f V int-regs 3 V int-regs 1 V int-regs 2 cc< }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -942,7 +923,7 @@ cell 8 = [
         T{ ##load-immediate f V int-regs 1 1 }
         T{ ##load-immediate f V int-regs 2 2 }
         T{ ##compare f V int-regs 3 V int-regs 2 V int-regs 1 cc< }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -954,7 +935,7 @@ cell 8 = [
     {
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc< }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -966,7 +947,7 @@ cell 8 = [
     {
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc<= }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -978,7 +959,7 @@ cell 8 = [
     {
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc> }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -990,7 +971,7 @@ cell 8 = [
     {
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc>= }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -1002,7 +983,7 @@ cell 8 = [
     {
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc/= }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 [
@@ -1014,12 +995,12 @@ cell 8 = [
     {
         T{ ##peek f V int-regs 0 D 0 }
         T{ ##compare f V int-regs 1 V int-regs 0 V int-regs 0 cc= }
-    } test-value-numbering
+    } value-numbering-step
 ] unit-test
 
 : test-branch-folding ( insns -- insns' n )
     <basic-block>
-    [ V{ 0 1 } clone >>successors basic-block set test-value-numbering ] keep
+    [ V{ 0 1 } clone >>successors basic-block set value-numbering-step ] keep
     successors>> first ;
 
 [
@@ -1208,7 +1189,6 @@ test-diamond
 
 [ ] [
     cfg new 0 get >>entry
-    compute-liveness
     value-numbering
     compute-predecessors
     eliminate-phis drop
@@ -1253,7 +1233,6 @@ test-diamond
 [ ] [
     cfg new 0 get >>entry
     compute-predecessors
-    compute-liveness
     value-numbering
     compute-predecessors
     eliminate-dead-code
@@ -1324,7 +1303,7 @@ V{
 
 [ ] [
     cfg new 0 get >>entry
-    compute-liveness value-numbering eliminate-dead-code drop
+    value-numbering eliminate-dead-code drop
 ] unit-test
 
 [ f ] [ 1 get instructions>> [ ##peek? ] any? ] unit-test

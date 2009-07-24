@@ -44,17 +44,11 @@ M: register->register >insn
 SYMBOL: froms
 SYMBOL: tos
 
-SINGLETONS: memory register ;
-
-: from-loc ( operation -- obj ) from>> spill-slot? memory register ? ;
-
-: to-loc ( operation -- obj ) to>> spill-slot? memory register ? ;
-
 : from-reg ( operation -- seq )
-    [ from-loc ] [ from>> ] [ reg-class>> ] tri 3array ;
+    [ from>> ] [ reg-class>> ] bi 2array ;
 
 : to-reg ( operation -- seq )
-    [ to-loc ] [ to>> ] [ reg-class>> ] tri 3array ;
+    [ to>> ] [ reg-class>> ] bi 2array ;
 
 : start? ( operations -- pair )
     from-reg tos get key? not ;

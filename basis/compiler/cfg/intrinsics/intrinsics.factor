@@ -48,11 +48,11 @@ IN: compiler.cfg.intrinsics
     slots.private:set-slot
     strings.private:string-nth
     strings.private:set-string-nth-fast
-    classes.tuple.private:<tuple-boa>
-    arrays:<array>
-    byte-arrays:<byte-array>
-    byte-arrays:(byte-array)
-    kernel:<wrapper>
+    ! classes.tuple.private:<tuple-boa>
+    ! arrays:<array>
+    ! byte-arrays:<byte-array>
+    ! byte-arrays:(byte-array)
+    ! kernel:<wrapper>
     alien.accessors:alien-unsigned-1
     alien.accessors:set-alien-unsigned-1
     alien.accessors:alien-signed-1
@@ -61,7 +61,7 @@ IN: compiler.cfg.intrinsics
     alien.accessors:set-alien-unsigned-2
     alien.accessors:alien-signed-2
     alien.accessors:set-alien-signed-2
-    alien.accessors:alien-cell
+    ! alien.accessors:alien-cell
     alien.accessors:set-alien-cell
 } [ t "intrinsic" set-word-prop ] each
 
@@ -90,7 +90,7 @@ IN: compiler.cfg.intrinsics
         alien.accessors:set-alien-float
         alien.accessors:alien-double
         alien.accessors:set-alien-double
-    } [ t "intrinsic" set-word-prop ] each ;
+    } drop f [ t "intrinsic" set-word-prop ] each ;
 
 : enable-fixnum-log2 ( -- )
     \ math.integers.private:fixnum-log2 t "intrinsic" set-word-prop ;

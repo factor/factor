@@ -6,7 +6,7 @@ IN: compiler.cfg.renaming
 
 SYMBOL: renamings
 
-: rename-value ( vreg -- vreg' ) renamings get at ;
+: rename-value ( vreg -- vreg' ) renamings get ?at drop ;
 
 GENERIC: rename-insn-defs ( insn -- )
 
@@ -100,6 +100,10 @@ M: ##dispatch rename-insn-uses
 M: ##fixnum-overflow rename-insn-uses
     [ rename-value ] change-src1
     [ rename-value ] change-src2
+    drop ;
+
+M: ##phi rename-insn-uses
+    [ [ rename-value ] assoc-map ] change-inputs
     drop ;
 
 M: insn rename-insn-uses drop ;

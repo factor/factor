@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types arrays combinators combinators.short-circuit
 game-worlds gpu gpu.buffers gpu.util.wasd gpu.framebuffers gpu.render
 gpu.shaders gpu.state gpu.textures gpu.util grouping http.client images
@@ -52,22 +53,22 @@ VERTEX-FORMAT: bunny-vertex
 VERTEX-STRUCT: bunny-vertex-struct bunny-vertex
 
 UNIFORM-TUPLE: bunny-uniforms < mvp-uniforms
-    { "light_position" float-uniform 3 }
-    { "color"          float-uniform 4 }
-    { "ambient"        float-uniform 4 }
-    { "diffuse"        float-uniform 4 }
-    { "shininess"      float-uniform 1 } ;
+    { "light-position" vec3-uniform  f }
+    { "color"          vec4-uniform  f }
+    { "ambient"        vec4-uniform  f }
+    { "diffuse"        vec4-uniform  f }
+    { "shininess"      float-uniform f } ;
 
 UNIFORM-TUPLE: sobel-uniforms
-    { "texcoord_scale" float-uniform   2 }
-    { "color_texture"  texture-uniform 1 }
-    { "normal_texture" texture-uniform 1 }
-    { "depth_texture"  texture-uniform 1 }
-    { "line_color"     float-uniform   4 } ; 
+    { "texcoord-scale" vec2-uniform    f }
+    { "color-texture"  texture-uniform f }
+    { "normal-texture" texture-uniform f }
+    { "depth-texture"  texture-uniform f }
+    { "line-color"     vec4-uniform    f } ; 
 
 UNIFORM-TUPLE: loading-uniforms
-    { "texcoord_scale"  float-uniform   2 }
-    { "loading_texture" texture-uniform 1 } ;
+    { "texcoord-scale"  vec2-uniform    f }
+    { "loading-texture" texture-uniform f } ;
 
 : numbers ( str -- seq )
     " " split [ string>number ] map sift ;
@@ -229,16 +230,14 @@ BEFORE: bunny-world begin-world
             { depth-attachment 1.0 }
         } clear-framebuffer
     ] [
-        render-set new
-            triangles-mode >>primitive-mode
-            { T{ color-attachment f 0 } T{ color-attachment f 1 } } >>output-attachments
-            swap {
-                [ <bunny-uniforms> >>uniforms ]
-                [ bunny>> vertex-array>> >>vertex-array ]
-                [ bunny>> index-elements>> >>indexes ]
-                [ sobel>> framebuffer>> >>framebuffer ]
-            } cleave
-        render
+        {
+            { "primitive-mode"     [ drop triangles-mode ] }
+            { "output-attachments" [ drop { T{ color-attachment f 0 } T{ color-attachment f 1 } } ] }
+            { "uniforms"           [ <bunny-uniforms> ] }
+            { "vertex-array"       [ bunny>> vertex-array>> ] }
+            { "indexes"            [ bunny>> index-elements>> ] }
+            { "framebuffer"        [ sobel>> framebuffer>> ] }
+        } <render-set> render
     ] bi ;
 
 : <sobel-uniforms> ( sobel -- uniforms )
@@ -250,13 +249,12 @@ BEFORE: bunny-world begin-world
 : draw-sobel ( world -- )
     T{ depth-state { comparison f } } set-gpu-state*
 
-    render-set new
-        triangle-strip-mode >>primitive-mode
-        T{ index-range f 0 4 } >>indexes
-        swap sobel>>
-        [ <sobel-uniforms> >>uniforms ]
-        [ vertex-array>> >>vertex-array ] bi
-    render ;
+    sobel>> {
+        { "primitive-mode" [ drop triangle-strip-mode ] }
+        { "indexes"        [ drop T{ index-range f 0 4 } ] }
+        { "uniforms"       [ <sobel-uniforms> ] }
+        { "vertex-array"   [ vertex-array>> ] }
+    } <render-set> render ;
 
 : draw-sobeled-bunny ( world -- )
     [ draw-bunny ] [ draw-sobel ] bi ;
@@ -264,13 +262,12 @@ BEFORE: bunny-world begin-world
 : draw-loading ( world -- )
     T{ depth-state { comparison f } } set-gpu-state*
 
-    render-set new
-        triangle-strip-mode >>primitive-mode
-        T{ index-range f 0 4 } >>indexes
-        swap loading>>
-        [ { 1.0 -1.0 } swap texture>> loading-uniforms boa >>uniforms ]
-        [ vertex-array>> >>vertex-array ] bi
-    render ;
+    loading>> {
+        { "primitive-mode" [ drop triangle-strip-mode ] }
+        { "indexes"        [ drop T{ index-range f 0 4 } ] }
+        { "uniforms"       [ { 1.0 -1.0 } swap texture>> loading-uniforms boa ] }
+        { "vertex-array"   [ vertex-array>> ] }
+    } <render-set> render ;
 
 M: bunny-world draw-world*
     dup bunny>>
