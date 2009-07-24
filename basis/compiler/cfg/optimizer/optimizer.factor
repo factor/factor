@@ -4,7 +4,6 @@ USING: kernel sequences accessors combinators namespaces
 compiler.cfg.tco
 compiler.cfg.predecessors
 compiler.cfg.useless-conditionals
-compiler.cfg.dcn
 compiler.cfg.ssa
 compiler.cfg.branch-splitting
 compiler.cfg.block-joining
@@ -35,7 +34,6 @@ SYMBOL: check-optimizer?
         split-branches
         join-blocks
         compute-predecessors
-        deconcatenatize
         construct-ssa
         alias-analysis
         value-numbering

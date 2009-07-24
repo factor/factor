@@ -20,42 +20,6 @@ IN: compiler.cfg.utilities
         } cond
     ] [ drop f ] if ;
 
-: set-basic-block ( basic-block -- )
-    [ basic-block set ] [ instructions>> building set ] bi ;
-
-: begin-basic-block ( -- )
-    <basic-block> basic-block get [
-        dupd successors>> push
-    ] when*
-    set-basic-block ;
-
-: end-basic-block ( -- )
-    building off
-    basic-block off ;
-
-: emit-trivial-block ( quot -- )
-    basic-block get instructions>> empty? [ ##branch begin-basic-block ] unless
-    call
-    ##branch begin-basic-block ; inline
-
-: call-height ( #call -- n )
-    [ out-d>> length ] [ in-d>> length ] bi - ;
-
-: emit-primitive ( node -- )
-    [ [ word>> ] [ call-height ] bi ##call ] emit-trivial-block ;
-
-: with-branch ( quot -- final-bb )
-    [
-        begin-basic-block
-        call
-        basic-block get dup [ ##branch ] when
-    ] with-scope ; inline
-
-: emit-conditional ( branches -- )
-    end-basic-block
-    begin-basic-block
-    basic-block get '[ [ _ swap successors>> push ] when* ] each ;
-
 PREDICATE: kill-block < basic-block
     instructions>> {
         [ length 2 = ]
