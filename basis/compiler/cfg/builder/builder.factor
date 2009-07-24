@@ -72,11 +72,6 @@ GENERIC: emit-node ( node -- )
     basic-block get successors>> push
     end-basic-block ;
 
-: emit-trivial-block ( quot -- )
-    basic-block get instructions>> empty? [ ##branch begin-basic-block ] unless
-    call
-    ##branch begin-basic-block ; inline
-
 : emit-call ( word height -- )
     over loops get key?
     [ drop loops get at emit-loop-call ]
@@ -109,9 +104,6 @@ M: #recursive emit-node
 : emit-if ( node -- )
     children>> [ emit-branch ] map emit-conditional ;
 
-: ##branch-t ( vreg -- )
-    \ f tag-number cc/= ##compare-imm-branch ;
-
 : trivial-branch? ( nodes -- value ? )
     dup length 1 = [
         first dup #push? [ literal>> t ] [ drop f f ] if
@@ -135,15 +127,23 @@ M: #recursive emit-node
 : emit-trivial-not-if ( -- )
     ds-pop \ f tag-number cc= ^^compare-imm ds-push ;
 
+: emit-actual-if ( #if -- )
+    ! Inputs to the final instruction need to be copied because of
+    ! loc>vreg sync
+    ds-pop ^^copy \ f tag-number cc/= ##compare-imm-branch emit-if ;
+
 M: #if emit-node
     {
         { [ dup trivial-if? ] [ drop emit-trivial-if ] }
         { [ dup trivial-not-if? ] [ drop emit-trivial-not-if ] }
-        [ ds-pop ##branch-t emit-if ]
+        [ emit-actual-if ]
     } cond ;
 
 ! #dispatch
 M: #dispatch emit-node
+    ! Inputs to the final instruction need to be copied because of
+    ! loc>vreg sync. ^^offset>slot always returns a fresh vreg,
+    ! though.
     ds-pop ^^offset>slot i ##dispatch emit-if ;
 
 ! #call
