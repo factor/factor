@@ -102,6 +102,10 @@ M: ##fixnum-overflow rename-insn-uses
     [ rename-value ] change-src2
     drop ;
 
+M: ##phi rename-insn-uses
+    [ [ rename-value ] assoc-map ] change-inputs
+    drop ;
+
 M: insn rename-insn-uses drop ;
 
 : fresh-vreg ( vreg -- vreg' )
