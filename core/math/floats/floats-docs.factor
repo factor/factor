@@ -1,26 +1,6 @@
 USING: help.markup help.syntax math math.private ;
 IN: math.floats
 
-ARTICLE: "floats" "Floats"
-{ $subsection float }
-"Rational numbers represent " { $emphasis "exact" } " quantities. On the other hand, a floating point number is an " { $emphasis "approximation" } ". While rationals can grow to any required precision, floating point numbers are fixed-width, and manipulating them is usually faster than manipulating ratios or bignums (but slower than manipulating fixnums). Floating point numbers are often used to represent irrational numbers, which have no exact representation as a ratio of two integers."
-$nl
-"Introducing a floating point number in a computation forces the result to be expressed in floating point."
-{ $example "5/4 1/2 + ." "1+3/4" }
-{ $example "5/4 0.5 + ." "1.75" }
-"Integers and rationals can be converted to floats:"
-{ $subsection >float }
-"Two real numbers can be divided yielding a float result:"
-{ $subsection /f }
-"Floating point numbers are represented internally in IEEE 754 double-precision format. This internal representation can be accessed for advanced operations and input/output purposes."
-{ $subsection float>bits }
-{ $subsection double>bits }
-{ $subsection bits>float }
-{ $subsection bits>double }
-{ $see-also "syntax-floats" } ;
-
-ABOUT: "floats"
-
 HELP: float
 { $class-description "The class of double-precision floating point numbers." } ;
 
@@ -91,3 +71,37 @@ HELP: float>= ( x y -- ? )
 { $values { "x" float } { "y" float } { "?" "a boolean" } }
 { $description "Primitive version of " { $link >= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link >= } " instead." } ;
+
+ARTICLE: "floats" "Floats"
+{ $subsection float }
+"Rational numbers represent " { $emphasis "exact" } " quantities. On the other hand, a floating point number is an " { $emphasis "approximation" } ". While rationals can grow to any required precision, floating point numbers are fixed-width, and manipulating them is usually faster than manipulating ratios or bignums (but slower than manipulating fixnums). Floating point numbers are often used to represent irrational numbers, which have no exact representation as a ratio of two integers."
+$nl
+"Introducing a floating point number in a computation forces the result to be expressed in floating point."
+{ $example "5/4 1/2 + ." "1+3/4" }
+{ $example "5/4 0.5 + ." "1.75" }
+"Integers and rationals can be converted to floats:"
+{ $subsection >float }
+"Two real numbers can be divided yielding a float result:"
+{ $subsection /f }
+"Floating point numbers are represented internally in IEEE 754 double-precision format. This internal representation can be accessed for advanced operations and input/output purposes."
+{ $subsection float>bits }
+{ $subsection double>bits }
+{ $subsection bits>float }
+{ $subsection bits>double }
+"Constructing floating point NaNs:"
+{ $subsection <fp-nan> }
+"Floating point numbers are discrete:"
+{ $subsection prev-float }
+{ $subsection next-float }
+"Introspection on floating point numbers:"
+{ $subsection fp-special? }
+{ $subsection fp-nan? }
+{ $subsection fp-qnan? }
+{ $subsection fp-snan? }
+{ $subsection fp-infinity? }
+{ $subsection fp-nan-payload }
+"Comparing two floating point numbers:"
+{ $subsection fp-bitwise= }
+{ $see-also "syntax-floats" } ;
+
+ABOUT: "floats"
