@@ -69,7 +69,9 @@ IN: compiler.cfg.intrinsics.fixnum
     [ ##call -1 adjust-d ] with-branch ;
 
 : emit-fixnum-overflow-op ( quot word -- )
-    [ [ (2inputs) ] dip call ] dip
+    ! Inputs to the final instruction need to be copied because
+    ! of loc>vreg sync
+    [ [ (2inputs) [ ^^copy ] bi@ ] dip call ] dip
     [ emit-no-overflow-case ] [ emit-overflow-case ] bi* 2array
     emit-conditional ; inline
 

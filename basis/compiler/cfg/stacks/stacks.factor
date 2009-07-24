@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math sequences kernel namespaces accessors compiler.cfg
+USING: math sequences kernel namespaces accessors biassocs compiler.cfg
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.hats
 compiler.cfg.predecessors compiler.cfg.stacks.local
 compiler.cfg.stacks.height compiler.cfg.stacks.global
@@ -8,7 +8,7 @@ compiler.cfg.stacks.finalize ;
 IN: compiler.cfg.stacks
 
 : begin-stack-analysis ( -- )
-    H{ } clone locs>vregs set
+    <bihash> locs>vregs set
     H{ } clone ds-heights set
     H{ } clone rs-heights set
     H{ } clone peek-sets set
