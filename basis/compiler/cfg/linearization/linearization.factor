@@ -4,10 +4,10 @@ USING: kernel math accessors sequences namespaces make
 combinators assocs arrays locals cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
-compiler.cfg.liveness
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
-compiler.cfg.instructions ;
+compiler.cfg.instructions
+compiler.cfg.utilities ;
 IN: compiler.cfg.linearization
 
 ! Convert CFG IR to machine IR.
@@ -25,7 +25,12 @@ M: insn linearize-insn , drop ;
     #! don't need to branch.
     [ number>> ] bi@ 1 - = ; inline
 
-: emit-branch ( basic-block successor -- )
+: emit-loop-entry? ( bb successor -- ? )
+    [ back-edge? not ]
+    [ nip dup predecessors>> [ swap back-edge? ] with any? ] 2bi and ;
+
+: emit-branch ( bb successor -- )
+    2dup emit-loop-entry? [ _loop-entry ] when
     2dup useless-branch? [ 2drop ] [ nip number>> _branch ] if ;
 
 M: ##branch linearize-insn
@@ -33,11 +38,11 @@ M: ##branch linearize-insn
 
 : successors ( bb -- first second ) successors>> first2 ; inline
 
-: (binary-conditional) ( basic-block insn -- basic-block successor1 successor2 src1 src2 cc )
+: (binary-conditional) ( bb insn -- bb successor1 successor2 src1 src2 cc )
     [ dup successors ]
     [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] bi* ; inline
 
-: binary-conditional ( basic-block insn -- basic-block successor label2 src1 src2 cc )
+: binary-conditional ( bb insn -- bb successor label2 src1 src2 cc )
     [ (binary-conditional) ]
     [ drop dup successors>> second useless-branch? ] 2bi
     [ [ swap number>> ] 3dip ] [ [ number>> ] 3dip negate-cc ] if ;
@@ -54,7 +59,7 @@ M: ##compare-imm-branch linearize-insn
 M: ##compare-float-branch linearize-insn
     [ binary-conditional _compare-float-branch ] with-regs emit-branch ;
 
-: overflow-conditional ( basic-block insn -- basic-block successor label2 dst src1 src2 )
+: overflow-conditional ( bb insn -- bb successor label2 dst src1 src2 )
     [ dup successors number>> ]
     [ [ dst>> ] [ src1>> ] [ src2>> ] tri ] bi* ; inline
 

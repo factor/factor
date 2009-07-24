@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators sets math fry kernel math.order
-namespaces sequences sorting compiler.cfg.rpo ;
+dlists deques namespaces sequences sorting compiler.cfg.rpo ;
 IN: compiler.cfg.dominance
 
 ! Reference:
@@ -85,8 +85,31 @@ PRIVATE>
 
 PRIVATE>
 
-: compute-dominance ( cfg -- cfg' )
+: compute-dominance ( cfg -- )
     [ compute-dom-parents compute-dom-children ]
     [ compute-dom-frontiers ]
-    [ ]
-    tri ;
+    bi ;
+
+<PRIVATE
+
+SYMBOLS: work-list visited ;
+
+: add-to-work-list ( bb -- )
+    dom-frontier work-list get push-all-front ;
+
+: iterated-dom-frontier-step ( bb -- )
+    dup visited get key? [ drop ] [
+        [ visited get conjoin ]
+        [ add-to-work-list ] bi
+    ] if ;
+
+PRIVATE>
+
+: iterated-dom-frontier ( bbs -- bbs' )
+    [
+        <dlist> work-list set
+        H{ } clone visited set
+        [ add-to-work-list ] each
+        work-list get [ iterated-dom-frontier-step ] slurp-deque
+        visited get keys
+    ] with-scope ;

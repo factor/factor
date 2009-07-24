@@ -52,7 +52,7 @@ INSN: ##inc-d { n integer } ;
 INSN: ##inc-r { n integer } ;
 
 ! Subroutine calls
-INSN: ##call word { height integer } ;
+INSN: ##call word ;
 INSN: ##jump word ;
 INSN: ##return ;
 
@@ -170,8 +170,6 @@ INSN: ##epilogue ;
 
 INSN: ##branch ;
 
-INSN: ##loop-entry ;
-
 INSN: ##phi < ##pure inputs ;
 
 ! Conditionals
@@ -201,6 +199,7 @@ INSN: _epilogue stack-frame ;
 INSN: _label id ;
 
 INSN: _branch label ;
+INSN: _loop-entry ;
 
 INSN: _dispatch src temp ;
 INSN: _dispatch-label label ;

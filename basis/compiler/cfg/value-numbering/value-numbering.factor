@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs biassocs classes kernel math accessors
-sorting sets sequences fry
+USING: namespaces assocs kernel accessors
+sorting sets sequences
 compiler.cfg
-compiler.cfg.local
-compiler.cfg.liveness
-compiler.cfg.renaming
+compiler.cfg.rpo
+compiler.cfg.instructions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.simplify
@@ -13,27 +12,28 @@ compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering
 
 ! Local value numbering. Predecessors must be recomputed after this
+: >copy ( insn -- insn/##copy )
+    dup dst>> dup vreg>vn vn>vreg
+    2dup eq? [ 2drop ] [ \ ##copy new-insn nip ] if ;
 
-: number-input-values ( live-in -- )
-    [ [ f next-input-expr simplify ] dip set-vn ] each ;
+: rewrite-loop ( insn -- insn' )
+    dup rewrite [ rewrite-loop ] [ ] ?if ;
 
-: init-value-numbering ( live-in -- )
-    init-value-graph
-    init-expressions
-    number-input-values ;
+GENERIC: process-instruction ( insn -- insn' )
 
-: vreg>vreg-mapping ( -- assoc )
-    vregs>vns get [ keys ] keep
-    '[ dup _ [ at ] [ value-at ] bi ] H{ } map>assoc ;
+M: ##flushable process-instruction
+    dup rewrite
+    [ process-instruction ]
+    [ dup number-values >copy ] ?if ;
 
-: rename-uses ( insns -- )
-    vreg>vreg-mapping renamings [
-        [ rename-insn-uses ] each
-    ] with-variable ;
+M: insn process-instruction
+    dup rewrite
+    [ process-instruction ] [ ] ?if ;
 
 : value-numbering-step ( insns -- insns' )
-    [ rewrite ] map dup rename-uses ;
+    init-value-graph
+    init-expressions
+    [ process-instruction ] map ;
 
 : value-numbering ( cfg -- cfg' )
-    [ init-value-numbering ] [ value-numbering-step ] local-optimization
-    cfg-changed ;
+    [ value-numbering-step ] local-optimization cfg-changed ;

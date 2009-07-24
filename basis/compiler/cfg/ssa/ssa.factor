@@ -1,19 +1,21 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces kernel accessors sequences fry dlists
-deques assocs sets math combinators sorting
+USING: namespaces kernel accessors sequences fry assocs
+sets math combinators
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.renaming
+compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.dominance
 compiler.cfg.instructions ;
 IN: compiler.cfg.ssa
 
-! SSA construction. Predecessors and dominance must be computed first.
+! SSA construction. Predecessors must be computed first.
 
-! This is the classical algorithm based on dominance frontiers:
+! This is the classical algorithm based on dominance frontiers, except
+! we consult liveness information to build pruned SSA:
 ! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.25.8240
 
 ! Eventually might be worth trying something fancier:
@@ -32,45 +34,22 @@ SYMBOL: inserting-phi-nodes
     '[
         dup instructions>> [
             defs-vregs [
-                _ push-at
+                _ conjoin-at
             ] with each
         ] with each
     ] each-basic-block ;
 
-SYMBOLS: has-already ever-on-work-list work-list ;
-
-: init-insert-phi-nodes ( bbs -- )
-    H{ } clone has-already set
-    [ unique ever-on-work-list set ]
-    [ <hashed-dlist> [ push-all-front ] keep work-list set ] bi ;
-
-: add-to-work-list ( bb -- )
-    dup ever-on-work-list get key? [ drop ] [
-        [ ever-on-work-list get conjoin ]
-        [ work-list get push-front ]
-        bi
-    ] if ;
-
 : insert-phi-node-later ( vreg bb -- )
-    [ predecessors>> over '[ _ ] H{ } map>assoc \ ##phi new-insn ] keep
-    inserting-phi-nodes get push-at ;
-
-: compute-phi-node-in ( vreg bb -- )
-    dup has-already get key? [ 2drop ] [
-        [ insert-phi-node-later ]
-        [ has-already get conjoin ]
-        [ add-to-work-list ]
-        tri
-    ] if ;
+    2dup live-in key? [
+        [ predecessors>> over '[ _ ] H{ } map>assoc \ ##phi new-insn ] keep
+        inserting-phi-nodes get push-at
+    ] [ 2drop ] if ;
 
 : compute-phi-nodes-for ( vreg bbs -- )
-    dup length 2 >= [
-        init-insert-phi-nodes
-        work-list get [
-            dom-frontier [
-                compute-phi-node-in
-            ] with each
-        ] with slurp-deque
+    keys dup length 2 >= [
+        iterated-dom-frontier [
+            insert-phi-node-later
+        ] with each
     ] [ 2drop ] if ;
 
 : compute-phi-nodes ( -- )
@@ -143,4 +122,10 @@ M: ##phi rename-insn
 PRIVATE>
 
 : construct-ssa ( cfg -- cfg' )
-    dup [ compute-defs compute-phi-nodes insert-phi-nodes ] [ rename ] bi ;
+    {
+        [ ]
+        [ compute-live-sets ]
+        [ compute-dominance ]
+        [ compute-defs compute-phi-nodes insert-phi-nodes ]
+        [ rename ]
+    } cleave ;
