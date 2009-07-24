@@ -1311,6 +1311,20 @@ HELP: iota
   }
 } ;
 
+HELP: assert-sequence=
+{ $values
+    { "a" sequence } { "b" sequence }
+}
+{ $description "Throws an error if all the elements of two sequences, taken pairwise, are not equal." }
+{ $notes "The sequences need not be of the same type." }
+{ $examples
+  { $example
+    "USING: prettyprint sequences ;"
+    "{ 1 2 3 } V{ 1 2 3 } assert-sequence="
+    ""
+  }
+} ;
+
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
 $nl
@@ -1591,6 +1605,7 @@ ARTICLE: "sequences-comparing" "Comparing sequences"
 { $subsection sequence= }
 { $subsection mismatch }
 { $subsection drop-prefix }
+{ $subsection assert-sequence= }
 "The " { $link <=> } " generic word performs lexicographic comparison when applied to sequences." ;
 
 ARTICLE: "sequences-f" "The f object as a sequence"
