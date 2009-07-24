@@ -195,7 +195,7 @@ M: #terminate emit-node drop ##no-tco end-basic-block ;
         [ return>> return-size >>return ]
         [ alien-parameters parameter-sizes drop >>params ] bi ;
 
-: alien-node-height ( params -- n )
+: alien-node-height ( params -- )
     [ out-d>> length ] [ in-d>> length ] bi - adjust-d ;
 
 : emit-alien-node ( node quot -- )
