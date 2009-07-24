@@ -627,7 +627,7 @@ HELP: slice-error
 } ;
 
 HELP: slice
-{ $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence. New instances can be created by calling " { $link <slice> } "."
+{ $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence. New instances can be created by calling " { $link <slice> } ". Convenience words are also provided for creating slices where one endpoint is the start or end of the sequence; see " { $link "sequences-slices" } " for a list."
 $nl
 "Slices are mutable if the underlying sequence is mutable, and mutating a slice changes the underlying sequence. However, slices cannot be resized after creation." } ;
 
@@ -1357,7 +1357,15 @@ ARTICLE: "virtual-sequences-protocol" "Virtual sequence protocol"
 { $subsection virtual@ } ;
 
 ARTICLE: "virtual-sequences" "Virtual sequences"
-"Virtual sequences allow different ways of accessing a sequence without having to create a new sequence or a new data structure altogether. To do this, they translate the virtual index into a normal index into an underlying sequence using the " { $link "virtual-sequences-protocol" } "."
+"A virtual sequence is an implementation of the " { $link "sequence-protocol" } " which does not store its own elements, and instead computes them, either from scratch or by retrieving them from another sequence."
+$nl
+"Implementations include the following:"
+{ $list
+  { $link reversed }
+  { $link slice }
+  { $link iota }
+}
+"Virtual sequences can be implemented with the " { $link "virtual-sequences-protocol" } ", by translating an index in the virtual sequence into an index in another sequence:"
 { $subsection "virtual-sequences-protocol" } ;
 
 ARTICLE: "sequences-integers" "Counted loops"
@@ -1422,6 +1430,16 @@ ARTICLE: "sequences-appending" "Appending sequences"
 { $subsection pad-tail } ;
 
 ARTICLE: "sequences-slices" "Subsequences and slices"
+"There are two ways to extract a subrange of elements from a sequence. The first approach creates a new sequence of the same type as the input, which does not share storage with the underlying sequence. This takes time proportional to the number of elements being extracted. The second approach creates a " { $emphasis "slice" } ", which is a virtual sequence (see " { $link "virtual-sequences" } ") sharing storage with the original sequence. Slices are constructed in constant time."
+$nl
+"Some general guidelines for choosing between the two approaches:"
+{ $list
+  "If you are using mutable state, the choice has to be made one way or another because of semantics; mutating a slice will change the underlying sequence."
+  { "Using a slice can improve algorithmic complexity. For example, if each iteration of a loop decomposes a sequence using " { $link first } " and " { $link rest } ", then the loop will run in quadratic time, relative to the length of the sequence. Using " { $link rest-slice } " changes the loop to run in linear time, since " { $link rest-slice } " does not copy any elements. Taking a slice of a slice will “collapse” the slice so to avoid the double indirection, so it is safe to use slices in recursive code." }
+  "Accessing elements from a concrete sequence (such as a string or an array) is often faster than accessing elements from a slice, because slice access entails additional indirection. However, in some cases, if the slice is immediately consumed by an iteration combinator, the compiler can eliminate the slice allocation and indirect altogether."
+  "If the slice outlives the original sequence, the original sequence will still remain in memory, since the slice will reference it. This can increase memory consumption unnecessarily."
+}
+{ $heading "Subsequence operations" }
 "Extracting a subsequence:"
 { $subsection subseq }
 { $subsection head }
@@ -1436,7 +1454,8 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection unclip-last }
 { $subsection cut }
 { $subsection cut* }
-"A " { $emphasis "slice" } " is a virtual sequence which presents as view of a subsequence of an underlying sequence:"
+{ $heading "Slice operations" }
+"The slice data type:"
 { $subsection slice }
 { $subsection slice? }
 "Extracting a slice:"
