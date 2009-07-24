@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs biassocs classes kernel math accessors
-sorting sets sequences fry
+USING: namespaces assocs kernel accessors
+sorting sets sequences
 compiler.cfg
 compiler.cfg.rpo
-compiler.cfg.renaming
+compiler.cfg.instructions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.simplify
@@ -12,20 +12,27 @@ compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering
 
 ! Local value numbering. Predecessors must be recomputed after this
-: vreg>vreg-mapping ( -- assoc )
-    vregs>vns get [ keys ] keep
-    '[ dup _ [ at ] [ value-at ] bi ] H{ } map>assoc ;
+: >copy ( insn -- ##copy )
+    dst>> dup vreg>vn vn>vreg \ ##copy new-insn ;
 
-: rename-uses ( insns -- )
-    vreg>vreg-mapping renamings [
-        [ rename-insn-uses ] each
-    ] with-variable ;
+: rewrite-loop ( insn -- insn' )
+    dup rewrite [ rewrite-loop ] [ ] ?if ;
+
+GENERIC: process-instruction ( insn -- insn' )
+
+M: ##flushable process-instruction
+    dup rewrite
+    [ process-instruction ]
+    [ dup number-values [ >copy ] when ] ?if ;
+
+M: insn process-instruction
+    dup rewrite
+    [ process-instruction ] [ ] ?if ;
 
 : value-numbering-step ( insns -- insns' )
     init-value-graph
     init-expressions
-    [ rewrite ] map
-    dup rename-uses ;
+    [ process-instruction ] map ;
 
 : value-numbering ( cfg -- cfg' )
     [ value-numbering-step ] local-optimization cfg-changed ;

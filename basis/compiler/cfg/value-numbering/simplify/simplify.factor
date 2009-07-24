@@ -120,14 +120,12 @@ M: binary-expr simplify*
 
 M: expr simplify* drop f ;
 
-: simplify ( expr -- vn )
+: simplify ( expr -- simplified? vn )
     dup simplify* {
-        { [ dup not ] [ drop expr>vn ] }
-        { [ dup expr? ] [ expr>vn nip ] }
-        { [ dup integer? ] [ nip ] }
-    } cond ;
+        { [ dup not ] [ drop expr>vn f ] }
+        { [ dup expr? ] [ expr>vn nip t ] }
+        { [ dup integer? ] [ nip t ] }
+    } cond swap ;
 
-GENERIC: number-values ( insn -- )
-
-M: ##flushable number-values [ >expr simplify ] [ dst>> ] bi set-vn ;
-M: insn number-values drop ;
+: number-values ( insn -- simplified? )
+    [ >expr simplify ] [ dst>> set-vn ] bi ;
