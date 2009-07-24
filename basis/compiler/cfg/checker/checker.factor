@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.def-use compiler.cfg.linearization compiler.cfg.utilities
-compiler.cfg.dce compiler.cfg.mr combinators.short-circuit accessors
-math sequences sets assocs ;
+compiler.cfg.mr combinators.short-circuit accessors math
+sequences sets assocs ;
 IN: compiler.cfg.checker
 
 ERROR: bad-kill-block bb ;
@@ -64,5 +64,5 @@ ERROR: undefined-values uses defs ;
 
 : check-cfg ( cfg -- )
     [ [ check-basic-block ] each-basic-block ]
-    [ eliminate-dead-code build-mr check-mr ]
+    [ build-mr check-mr ]
     bi ;

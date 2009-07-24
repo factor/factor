@@ -10,30 +10,39 @@ compiler.tree.combinators
 compiler.tree.propagation.info
 compiler.cfg
 compiler.cfg.hats
-compiler.cfg.stacks
 compiler.cfg.utilities
 compiler.cfg.registers
 compiler.cfg.intrinsics
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.cfg.instructions
+compiler.cfg.predecessors
+compiler.cfg.builder.blocks
+compiler.cfg.stacks
 compiler.alien ;
 IN: compiler.cfg.builder
 
-! Convert tree SSA IR to CFG SSA IR.
+! Convert tree SSA IR to CFG IR. The result is not in SSA form; this is
+! constructed later by calling compiler.cfg.ssa:construct-ssa.
 
 SYMBOL: procedures
 SYMBOL: loops
 
-: begin-procedure ( word label -- )
-    end-basic-block
-    begin-basic-block
+: begin-cfg ( word label -- cfg )
+    initial-basic-block
     H{ } clone loops set
-    [ basic-block get ] 2dip
-    <cfg> procedures get push ;
+    [ basic-block get ] 2dip <cfg> dup cfg set ;
+
+: begin-procedure ( word label -- )
+    begin-cfg procedures get push ;
 
 : with-cfg-builder ( nodes word label quot -- )
-    '[ begin-procedure @ ] with-scope ; inline
+    '[
+        begin-stack-analysis
+        begin-procedure
+        @
+        end-stack-analysis
+    ] with-scope ; inline
 
 GENERIC: emit-node ( node -- )
 
@@ -61,7 +70,7 @@ GENERIC: emit-node ( node -- )
 : emit-loop-call ( basic-block -- )
     ##branch
     basic-block get successors>> push
-    basic-block off ;
+    end-basic-block ;
 
 : emit-trivial-block ( quot -- )
     basic-block get instructions>> empty? [ ##branch begin-basic-block ] unless
@@ -71,7 +80,7 @@ GENERIC: emit-node ( node -- )
 : emit-call ( word height -- )
     over loops get key?
     [ drop loops get at emit-loop-call ]
-    [ [ ##call ] emit-trivial-block ]
+    [ [ [ ##call ] [ adjust-d ] bi* ] emit-trivial-block ]
     if ;
 
 ! #recursive
@@ -169,7 +178,7 @@ M: #return-recursive emit-node
     label>> id>> loops get key? [ emit-return ] unless ;
 
 ! #terminate
-M: #terminate emit-node drop ##no-tco basic-block off ;
+M: #terminate emit-node drop ##no-tco end-basic-block ;
 
 ! FFI
 : return-size ( ctype -- n )
@@ -186,9 +195,13 @@ M: #terminate emit-node drop ##no-tco basic-block off ;
         [ return>> return-size >>return ]
         [ alien-parameters parameter-sizes drop >>params ] bi ;
 
+: alien-node-height ( params -- n )
+    [ out-d>> length ] [ in-d>> length ] bi - adjust-d ;
+
 : emit-alien-node ( node quot -- )
     [
-        [ params>> dup <alien-stack-frame> ] dip call
+        [ params>> dup dup <alien-stack-frame> ] dip call
+        alien-node-height
     ] emit-trivial-block ; inline
 
 M: #alien-invoke emit-node

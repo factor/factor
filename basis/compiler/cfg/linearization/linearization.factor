@@ -25,11 +25,12 @@ M: insn linearize-insn , drop ;
     #! don't need to branch.
     [ number>> ] bi@ 1 - = ; inline
 
-: emit-loop-entry? ( bb -- ? )
-    dup predecessors>> [ swap back-edge? ] with any? ;
+: emit-loop-entry? ( bb successor -- ? )
+    [ back-edge? not ]
+    [ nip dup predecessors>> [ swap back-edge? ] with any? ] 2bi and ;
 
 : emit-branch ( bb successor -- )
-    dup emit-loop-entry? [ _loop-entry ] when
+    2dup emit-loop-entry? [ _loop-entry ] when
     2dup useless-branch? [ 2drop ] [ nip number>> _branch ] if ;
 
 M: ##branch linearize-insn
