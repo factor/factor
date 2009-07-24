@@ -11,7 +11,8 @@ specialized-arrays.long specialized-arrays.longlong
 specialized-arrays.short specialized-arrays.uchar
 specialized-arrays.uint specialized-arrays.ulong
 specialized-arrays.ulonglong specialized-arrays.ushort strings
-unix.utilities vocabs.parser words libc.private struct-arrays ;
+unix.utilities vocabs.parser words libc.private struct-arrays
+locals generalizations math ;
 IN: alien.marshall
 
 << primitive-types [ [ "void*" = ] [ "bool" = ] bi or not ]
@@ -19,6 +20,9 @@ filter [ define-primitive-marshallers ] each >>
 
 TUPLE: alien-wrapper { underlying alien } ;
 TUPLE: struct-wrapper < alien-wrapper disposed ;
+TUPLE: class-wrapper < alien-wrapper disposed ;
+
+MIXIN: c++-root
 
 GENERIC: unmarshall-cast ( alien-wrapper -- alien-wrapper' )
 
@@ -26,6 +30,8 @@ M: alien-wrapper unmarshall-cast ;
 M: struct-wrapper unmarshall-cast ;
 
 M: struct-wrapper dispose* underlying>> free ;
+
+M: class-wrapper c++-type class name>> parse-c++-type ;
 
 : marshall-pointer ( obj -- alien )
     {
@@ -269,33 +275,43 @@ ALIAS: marshall-void* marshall-pointer
 : ?malloc-byte-array ( c-type -- alien )
     dup alien? [ malloc-byte-array ] unless ;
 
-: struct-unmarshaller ( type -- quot )
-    current-vocab lookup [
-        dup superclasses [ \ struct-wrapper = ] any? [
-            '[ ?malloc-byte-array _ new swap >>underlying ]
-        ] [ drop [ ] ] if
-    ] [ [ ] ] if* ;
+:: x-unmarshaller ( type type-quot superclass def clean -- quot/f )
+    type type-quot call current-vocab lookup [
+        dup superclasses superclass swap member?
+        [ def call ] [ drop clean call f ] if
+    ] [ clean call f ] if* ; inline
 
-: pointer-unmarshaller ( type -- quot )
-    type-sans-pointer current-vocab lookup [
-        dup superclasses [ \ alien-wrapper = ] any? [
-            '[ _ new swap >>underlying unmarshall-cast ]
-        ] [ drop [ ] ] if
-    ] [ [ ] ] if* ;
+: struct-unmarshaller ( type -- quot/f )
+    [ ] \ struct-wrapper
+    [ '[ ?malloc-byte-array _ new swap >>underlying ] ]
+    [ ]
+    x-unmarshaller ;
+
+: class-unmarshaller ( type -- quot/f )
+    [ type-sans-pointer "#" append ] \ class-wrapper
+    [ '[ _ new swap >>underlying ] ]
+    [ ]
+    x-unmarshaller ;
+
+: non-primitive-unmarshaller ( type -- quot/f )
+    {
+        { [ dup pointer? ] [ class-unmarshaller ] }
+        [ struct-unmarshaller ]
+    } cond ;
 
 : unmarshaller ( type -- quot )
-    factorize-type dup primitive-unmarshaller [ nip ] [
-        dup pointer?
-        [ pointer-unmarshaller ]
-        [ struct-unmarshaller ] if
-    ] if* ;
+    factorize-type {
+        [ primitive-unmarshaller ]
+        [ non-primitive-unmarshaller ]
+        [ drop [ ] ]
+    } 1|| ;
 
 : struct-field-unmarshaller ( type -- quot )
-    factorize-type dup struct-primitive-unmarshaller [ nip ] [
-        dup pointer?
-        [ pointer-unmarshaller ]
-        [ struct-unmarshaller ] if
-    ] if* ;
+    factorize-type {
+        [ struct-primitive-unmarshaller ]
+        [ non-primitive-unmarshaller ]
+        [ drop [ ] ]
+    } 1|| ;
 
 : out-arg-unmarshaller ( type -- quot )
     dup pointer-to-non-const-primitive?
