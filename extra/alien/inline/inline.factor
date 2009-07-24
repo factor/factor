@@ -65,7 +65,7 @@ PRIVATE>
     concat make-function ;
 
 : define-c-library ( name -- )
-    c-library-name c-library set
+    c-library-name [ c-library set ] [ "c-library" set ] bi
     V{ } clone c-strings set
     V{ } clone linker-args set ;
 
