@@ -95,6 +95,6 @@ HELP: DELETE-C-LIBRARY:
 }
 { $see-also POSTPONE: delete-inline-library } ;
 
-HELP: RAW-C:
-{ $syntax "RAW-C:" "body" ";" }
-{ $description "Insert a string into the generated source file. Useful for macros and other details not implemented in " { $snippet "alien.inline" } "." } ;
+HELP: <RAW-C
+{ $syntax "<RAW-C code RAW-C>" }
+{ $description "Insert a (multiline) string into the generated source file. Useful for macros and other details not implemented in " { $snippet "alien.inline" } "." } ;
