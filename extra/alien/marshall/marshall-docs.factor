@@ -330,7 +330,7 @@ HELP: out-arg-unmarshaller
 HELP: class-unmarshaller
 { $values
     { "type" " a C type string" }
-    { "quot" quotation }
+    { "quot/f" quotation }
 }
 { $description "If in the vocab in which this word is called, there is a subclass of " { $link alien-wrapper }
     " named after the type argument, " { $snippet "pointer-unmarshaller" } " will return a quotation which "
@@ -376,7 +376,7 @@ HELP: struct-primitive-unmarshaller
 HELP: struct-unmarshaller
 { $values
     { "type" "a C type string" }
-    { "quot" quotation }
+    { "quot/f" quotation }
 }
 { $description "Returns a quotation which wraps its argument in the subclass of "
     { $link struct-wrapper } " which matches the " { $snippet "type" } " arg."
