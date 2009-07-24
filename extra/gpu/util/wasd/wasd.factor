@@ -8,8 +8,8 @@ specialized-arrays.float ui ui.gadgets.worlds ;
 IN: gpu.util.wasd
 
 UNIFORM-TUPLE: mvp-uniforms
-    { "mv_matrix"  float-uniform   { 4 4 } }
-    { "p_matrix"   float-uniform   { 4 4 } } ;
+    { "mv_matrix"  mat4-uniform f }
+    { "p_matrix"   mat4-uniform f } ;
 
 CONSTANT: -pi/2 $[ pi -2.0 / ]
 CONSTANT:  pi/2 $[ pi  2.0 / ]
