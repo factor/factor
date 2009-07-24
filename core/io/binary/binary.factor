@@ -24,3 +24,10 @@ IN: io.binary
 : h>b/b ( h -- b1 b2 )
     [ mask-byte ]
     [ -8 shift mask-byte ] bi ;
+
+: signed-le> ( bytes -- x )
+    [ le> ] [ length 8 * 1 - 2^ 1 - ] bi
+    2dup > [ bitnot bitor ] [ drop ] if ;
+
+: signed-be> ( bytes -- x )
+    <reversed> signed-le> ;

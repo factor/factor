@@ -327,7 +327,7 @@ HELP: out-arg-unmarshaller
     "for all types except pointers to non-const primitives."
 } ;
 
-HELP: pointer-unmarshaller
+HELP: class-unmarshaller
 { $values
     { "type" " a C type string" }
     { "quot" quotation }
