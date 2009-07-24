@@ -18,7 +18,7 @@ IN: compiler.cfg.hats
 : ^^d3 ( obj obj obj -- vreg vreg obj obj obj ) [ ^^d ] 3dip ; inline
 
 : ^^load-literal ( obj -- dst ) ^^i1 ##load-literal ; inline
-: ^^peek ( loc -- dst ) ^^i1 ##peek ; inline
+: ^^copy ( src -- dst ) ^^i1 ##copy ; inline
 : ^^slot ( obj slot tag -- dst ) ^^i3 i ##slot ; inline
 : ^^slot-imm ( obj slot tag -- dst ) ^^i3 ##slot-imm ; inline
 : ^^set-slot ( src obj slot tag -- ) i ##set-slot ; inline
@@ -74,7 +74,7 @@ IN: compiler.cfg.hats
 : ^^compare ( src1 src2 cc -- dst ) ^^i3 i ##compare ; inline
 : ^^compare-imm ( src1 src2 cc -- dst ) ^^i3 i ##compare-imm ; inline
 : ^^compare-float ( src1 src2 cc -- dst ) ^^i3 i ##compare-float ; inline
-: ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] when ; inline
+: ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] [ ^^copy ] if ; inline
 : ^^tag-fixnum ( src -- dst ) ^^i1 ##tag-fixnum ; inline
 : ^^untag-fixnum ( src -- dst ) ^^i1 ##untag-fixnum ; inline
 : ^^fixnum-add ( src1 src2 -- dst ) ^^i2 ##fixnum-add ; inline

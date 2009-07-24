@@ -27,7 +27,7 @@ IN: compiler.cfg.builder.blocks
     (begin-basic-block) ;
 
 : emit-trivial-block ( quot -- )
-    building get empty? [ ##branch begin-basic-block ] unless
+    ##branch begin-basic-block
     call
     ##branch begin-basic-block ; inline
 
