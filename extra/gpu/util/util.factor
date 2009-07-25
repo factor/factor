@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: gpu.buffers gpu.render gpu.textures images kernel
+USING: gpu.buffers gpu.render gpu.shaders gpu.textures images kernel
 specialized-arrays.float ;
 IN: gpu.util
 
