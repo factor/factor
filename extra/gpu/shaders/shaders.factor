@@ -1,16 +1,28 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays assocs combinators
-combinators.short-circuit definitions destructors gpu
-io.encodings.ascii io.files io.pathnames kernel lexer
-locals math math.parser memoize multiline namespaces
-opengl.gl opengl.shaders parser sequences
+USING: accessors alien alien.c-types alien.structs arrays
+assocs classes.mixin classes.parser classes.singleton
+combinators combinators.short-circuit definitions destructors
+generic.parser gpu gpu.buffers hashtables
+images io.encodings.ascii io.files io.pathnames kernel lexer
+locals math math.parser memoize multiline namespaces opengl
+opengl.gl opengl.shaders parser quotations sequences
 specialized-arrays.int splitting strings ui.gadgets.worlds
-variants hashtables vectors vocabs vocabs.loader words
+variants vectors vocabs vocabs.loader vocabs.parser words
 words.constant ;
 IN: gpu.shaders
 
 VARIANT: shader-kind
     vertex-shader fragment-shader ;
+
+UNION: ?string string POSTPONE: f ;
+
+TUPLE: vertex-attribute
+    { name            ?string        read-only initial: f }
+    { component-type  component-type read-only initial: float-components }
+    { dim             integer        read-only initial: 4 }
+    { normalize?      boolean        read-only initial: f } ;
+
+MIXIN: vertex-format
 
 TUPLE: shader
     { name word read-only initial: t }
@@ -25,6 +37,7 @@ TUPLE: program
     { filename read-only }
     { line integer read-only }
     { shaders array read-only }
+    { feedback-format vertex-format read-only }
     { instances hashtable read-only } ;
 
 TUPLE: shader-instance < gpu-object
@@ -35,7 +48,135 @@ TUPLE: program-instance < gpu-object
     { program program }
     { world world } ;
 
+GENERIC: vertex-format-size ( format -- size )
+
+MEMO: uniform-index ( program-instance uniform-name -- index )
+    [ handle>> ] dip glGetUniformLocation ;
+MEMO: attribute-index ( program-instance attribute-name -- index )
+    [ handle>> ] dip glGetAttribLocation ;
+MEMO: output-index ( program-instance output-name -- index )
+    [ handle>> ] dip glGetFragDataLocation ;
+
 <PRIVATE
+
+: gl-vertex-type ( component-type -- gl-type )
+    {
+        { ubyte-components          [ GL_UNSIGNED_BYTE  ] }
+        { ushort-components         [ GL_UNSIGNED_SHORT ] }
+        { uint-components           [ GL_UNSIGNED_INT   ] }
+        { half-components           [ GL_HALF_FLOAT     ] }
+        { float-components          [ GL_FLOAT          ] }
+        { byte-integer-components   [ GL_BYTE           ] }
+        { short-integer-components  [ GL_SHORT          ] }
+        { int-integer-components    [ GL_INT            ] }
+        { ubyte-integer-components  [ GL_UNSIGNED_BYTE  ] }
+        { ushort-integer-components [ GL_UNSIGNED_SHORT ] }
+        { uint-integer-components   [ GL_UNSIGNED_INT   ] }
+    } case ;
+
+: vertex-type-size ( component-type -- size ) 
+    {
+        { ubyte-components          [ 1 ] }
+        { ushort-components         [ 2 ] }
+        { uint-components           [ 4 ] }
+        { half-components           [ 2 ] }
+        { float-components          [ 4 ] }
+        { byte-integer-components   [ 1 ] }
+        { short-integer-components  [ 2 ] }
+        { int-integer-components    [ 4 ] }
+        { ubyte-integer-components  [ 1 ] }
+        { ushort-integer-components [ 2 ] }
+        { uint-integer-components   [ 4 ] }
+    } case ;
+
+: vertex-attribute-size ( vertex-attribute -- size )
+    [ component-type>> vertex-type-size ] [ dim>> ] bi * ;
+
+: vertex-attributes-size ( vertex-attributes -- size )
+    [ vertex-attribute-size ] [ + ] map-reduce ;
+
+:: [bind-vertex-attribute] ( stride offset vertex-attribute -- stride offset' quot )
+    vertex-attribute name>>                 :> name
+    vertex-attribute component-type>>       :> type
+    type gl-vertex-type                     :> gl-type
+    vertex-attribute dim>>                  :> dim
+    vertex-attribute normalize?>> >c-bool   :> normalize?
+    vertex-attribute vertex-attribute-size  :> size
+
+    stride offset size +
+    {
+        { [ name not ] [ [ 2drop ] ] }
+        {
+            [ type unnormalized-integer-components? ]
+            [
+                {
+                    name attribute-index [ glEnableVertexAttribArray ] keep
+                    dim gl-type stride offset
+                } >quotation :> dip-block
+                
+                { dip-block dip <displaced-alien> glVertexAttribIPointer } >quotation
+            ]
+        }
+        [
+            {
+                name attribute-index [ glEnableVertexAttribArray ] keep
+                dim gl-type normalize? stride offset
+            } >quotation :> dip-block
+
+            { dip-block dip <displaced-alien> glVertexAttribPointer } >quotation
+        ]
+    } cond ;
+
+:: [bind-vertex-format] ( vertex-attributes -- quot )
+    vertex-attributes vertex-attributes-size :> stride
+    stride 0 vertex-attributes [ [bind-vertex-attribute] ] { } map-as 2nip :> attributes-cleave
+    { attributes-cleave 2cleave } >quotation :> with-block
+
+    { drop vertex-buffer with-block with-buffer-ptr } >quotation ; 
+
+GENERIC: bind-vertex-format ( program-instance buffer-ptr format -- )
+
+: define-vertex-format-methods ( class vertex-attributes -- )
+    [
+        [ \ bind-vertex-format create-method-in ] dip
+        [bind-vertex-format] define
+    ] [
+        [ \ vertex-format-size create-method-in ] dip
+        [ \ drop ] dip vertex-attributes-size [ ] 2sequence define
+    ] 2bi ;
+
+: component-type>c-type ( component-type -- c-type )
+    {
+        { ubyte-components [ "uchar" ] }
+        { ushort-components [ "ushort" ] }
+        { uint-components [ "uint" ] }
+        { half-components [ "half" ] }
+        { float-components [ "float" ] }
+        { byte-integer-components [ "char" ] }
+        { ubyte-integer-components [ "uchar" ] }
+        { short-integer-components [ "short" ] }
+        { ushort-integer-components [ "ushort" ] }
+        { int-integer-components [ "int" ] }
+        { uint-integer-components [ "uint" ] }
+    } case ;
+
+: c-array-dim ( dim -- string )
+    dup 1 = [ drop "" ] [ number>string "[" "]" surround ] if ;
+
+SYMBOL: padding-no
+padding-no [ 0 ] initialize
+
+: padding-name ( -- name )
+    "padding-"
+    padding-no get number>string append
+    "(" ")" surround
+    padding-no inc ;
+
+: vertex-attribute>c-type ( vertex-attribute -- {type,name} )
+    [
+        [ component-type>> component-type>c-type ]
+        [ dim>> c-array-dim ] bi append
+    ] [ name>> [ padding-name ] unless* ] bi 2array ;
 
 : shader-filename ( shader/program -- filename )
     dup filename>> [ nip ] [ name>> where first ] if* file-name ;
@@ -69,6 +210,49 @@ TUPLE: program-instance < gpu-object
 
 PRIVATE>
 
+: define-vertex-format ( class vertex-attributes -- )
+    [
+        [
+            [ define-singleton-class ]
+            [ vertex-format add-mixin-instance ]
+            [ ] tri
+        ] [ define-vertex-format-methods ] bi*
+    ]
+    [ "vertex-format-attributes" set-word-prop ] 2bi ;
+
+SYNTAX: VERTEX-FORMAT:
+    CREATE-CLASS parse-definition
+    [ first4 vertex-attribute boa ] map
+    define-vertex-format ;
+
+: define-vertex-struct ( struct-name vertex-format -- )
+    [ current-vocab ] dip
+    "vertex-format-attributes" word-prop [ vertex-attribute>c-type ] map
+    define-struct ;
+
+SYNTAX: VERTEX-STRUCT:
+    scan scan-word define-vertex-struct ;
+
+TUPLE: vertex-array < gpu-object
+    { program-instance program-instance read-only }
+    { vertex-buffers sequence read-only } ;
+
+M: vertex-array dispose
+    [ [ delete-vertex-array ] when* f ] change-handle drop ;
+
+: <vertex-array> ( program-instance vertex-formats -- vertex-array )
+    gen-vertex-array
+    [ glBindVertexArray [ first2 bind-vertex-format ] with each ]
+    [ -rot [ first buffer>> ] map vertex-array boa ] 3bi
+    window-resource ;
+
+: buffer>vertex-array ( vertex-buffer program-instance format -- vertex-array )
+    [ swap ] dip
+    [ 0 <buffer-ptr> ] dip 2array 1array <vertex-array> ; inline
+
+: vertex-array-buffer ( vertex-array -- vertex-buffer )
+    vertex-buffers>> first ;
+
 TUPLE: compile-shader-error shader log ;
 TUPLE: link-program-error program log ;
 
@@ -81,13 +265,6 @@ TUPLE: link-program-error program log ;
     \ link-program-error boa throw ;
 
 DEFER: <shader-instance>
-
-MEMO: uniform-index ( program-instance uniform-name -- index )
-    [ handle>> ] dip glGetUniformLocation ;
-MEMO: attribute-index ( program-instance attribute-name -- index )
-    [ handle>> ] dip glGetAttribLocation ;
-MEMO: output-index ( program-instance output-name -- index )
-    [ handle>> ] dip glGetFragDataLocation ;
 
 <PRIVATE
 
