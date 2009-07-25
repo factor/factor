@@ -54,6 +54,12 @@ TUPLE: buffer < gpu-object
         { pixel-pack-buffer [ GL_PIXEL_PACK_BUFFER ] }
     } case ; inline
 
+: get-buffer-int ( target enum -- value )
+    0 <int> [ glGetBufferParameteriv ] keep *int ;
+
+: bind-buffer ( buffer -- target )
+    [ kind>> gl-target dup ] [ handle>> glBindBuffer ] bi ;
+
 PRIVATE>
 
 M: buffer dispose
@@ -64,11 +70,17 @@ TUPLE: buffer-ptr
     { offset integer read-only } ;
 C: <buffer-ptr> buffer-ptr
 
+TUPLE: buffer-range < buffer-ptr
+    { size integer read-only } ;
+C: <buffer-range> buffer-range
+
 UNION: gpu-data-ptr buffer-ptr c-ptr ;
 
+: buffer-size ( buffer -- size )
+    bind-buffer GL_BUFFER_SIZE get-buffer-int ;
+
 :: allocate-buffer ( buffer size initial-data -- )
-    buffer kind>> gl-target :> target
-    target buffer handle>> glBindBuffer
+    buffer bind-buffer :> target
     target size initial-data buffer gl-buffer-usage glBufferData ;
 
 : <buffer> ( upload usage kind size initial-data -- buffer )
@@ -81,15 +93,13 @@ UNION: gpu-data-ptr buffer-ptr c-ptr ;
 
 :: update-buffer ( buffer-ptr size data -- )
     buffer-ptr buffer>> :> buffer
-    buffer kind>> gl-target :> target
-    target buffer handle>> glBindBuffer
+    buffer bind-buffer :> target
     target buffer-ptr offset>> size data glBufferSubData ;
 
 :: read-buffer ( buffer-ptr size -- data )
     buffer-ptr buffer>> :> buffer
-    buffer kind>> gl-target :> target
+    buffer bind-buffer :> target
     size <byte-array> :> data
-    target buffer handle>> glBindBuffer
     target buffer-ptr offset>> size data glGetBufferSubData
     data ;
 
@@ -102,9 +112,7 @@ UNION: gpu-data-ptr buffer-ptr c-ptr ;
     size glCopyBufferSubData ;
 
 :: with-mapped-buffer ( buffer access quot: ( alien -- ) -- )
-    buffer kind>> gl-target :> target
-
-    target buffer handle>> glBindBuffer
+    buffer bind-buffer :> target
     target access gl-access glMapBuffer
 
     quot call
