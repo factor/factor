@@ -386,33 +386,6 @@ TR: hyphens>underscores "-" "_" ;
         ] }
     } case ;
 
-: component-type>c-type ( component-type -- c-type )
-    {
-        { ubyte-components [ "uchar" ] }
-        { ushort-components [ "ushort" ] }
-        { uint-components [ "uint" ] }
-        { half-components [ "half" ] }
-        { float-components [ "float" ] }
-        { byte-integer-components [ "char" ] }
-        { ubyte-integer-components [ "uchar" ] }
-        { short-integer-components [ "short" ] }
-        { ushort-integer-components [ "ushort" ] }
-        { int-integer-components [ "int" ] }
-        { uint-integer-components [ "uint" ] }
-    } case ;
-
-: c-array-dim ( dim -- string )
-    dup 1 = [ drop "" ] [ number>string "[" "]" surround ] if ;
-
-SYMBOL: padding-no
-padding-no [ 0 ] initialize
-
-: padding-name ( -- name )
-    "padding-"
-    padding-no get number>string append
-    "(" ")" surround
-    padding-no inc ;
-
 : (define-uniform-tuple) ( class superclass uniforms -- )
     {
         [ [ uniform>slot ] map define-tuple-class ]
@@ -490,7 +463,7 @@ TUPLE: render-set
         [
             framebuffer>> 
             [ GL_DRAW_FRAMEBUFFER swap framebuffer-handle glBindFramebuffer ]
-            [ GL_RASTERIZER_DISCARD glEnable ] if*
+            [ GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer GL_RASTERIZER_DISCARD glEnable ] if*
         ]
         [
             [ vertex-array>> program-instance>> ]

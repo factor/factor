@@ -16,6 +16,8 @@ VARIANT: shader-kind
 
 UNION: ?string string POSTPONE: f ;
 
+ERROR: too-many-feedback-formats-error formats ;
+
 TUPLE: vertex-attribute
     { name            ?string        read-only initial: f }
     { component-type  component-type read-only initial: float-components }
@@ -23,6 +25,7 @@ TUPLE: vertex-attribute
     { normalize?      boolean        read-only initial: f } ;
 
 MIXIN: vertex-format
+UNION: ?vertex-format vertex-format POSTPONE: f ;
 
 TUPLE: shader
     { name word read-only initial: t }
@@ -37,7 +40,7 @@ TUPLE: program
     { filename read-only }
     { line integer read-only }
     { shaders array read-only }
-    { feedback-format vertex-format read-only }
+    { feedback-format ?vertex-format read-only }
     { instances hashtable read-only } ;
 
 TUPLE: shader-instance < gpu-object
@@ -316,6 +319,14 @@ DEFER: <shader-instance>
     world get over instances>> at*
     [ nip ] [ drop link-program ] if ;
 
+: shaders-and-feedback-format ( words -- shaders feedback-format )
+    [ vertex-format? ] partition swap
+    [ [ def>> first ] map ] [
+        dup length 1 <=
+        [ [ f ] [ first ] if-empty ]
+        [ too-many-feedback-formats-error ] if
+    ] bi* ;
+
 PRIVATE>
 
 :: refresh-program ( program -- )
@@ -368,7 +379,7 @@ SYNTAX: GLSL-PROGRAM:
     CREATE-WORD dup
     f
     lexer get line>>
-    \ ; parse-until >array [ def>> first ] map
+    \ ; parse-until >array shaders-and-feedback-format
     H{ } clone
     program boa
     define-constant ;
