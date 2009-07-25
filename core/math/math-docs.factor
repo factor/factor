@@ -12,19 +12,19 @@ HELP: number=
 } ;
 
 HELP: <
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is less than " { $snippet "y" } "." } ;
 
 HELP: <=
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is less than or equal to " { $snippet "y" } "." } ;
 
 HELP: >
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is greater than " { $snippet "y" } "." } ;
 
 HELP: >=
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." } ;
 
 
@@ -244,6 +244,13 @@ HELP: times
 { $examples
     { $example "USING: io math ;" "3 [ \"Hi\" print ] times" "Hi\nHi\nHi" }
 } ;
+
+HELP: fp-bitwise=
+{ $values
+    { "x" float } { "y" float }
+    { "?" boolean }
+}
+{ $description "Compares two floating point numbers for bit equality." } ;
 
 HELP: fp-special?
 { $values { "x" real } { "?" "a boolean" } }
