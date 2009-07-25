@@ -40,7 +40,7 @@ COMPILE-AS-C++
 
 C-INCLUDE: <cstring>
 
-RAW-C:
+<RAW-C
 class alpha {
     public:
     alpha(const char* s) {
@@ -68,7 +68,7 @@ class beta : alpha {
         return str + 2;
     };
 };
-;
+RAW-C>
 
 C++-CLASS: alpha c++-root
 C++-CLASS: beta alpha
