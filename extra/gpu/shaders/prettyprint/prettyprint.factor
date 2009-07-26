@@ -14,3 +14,7 @@ M: link-program-error error.
 M: too-many-feedback-formats-error error.
     drop
     "Only one transform feedback format can be specified for a program." print ;
+
+M: invalid-link-feedback-format-error error.
+    drop
+    "Vertex formats used for transform feedback can't contain padding fields." print ;
