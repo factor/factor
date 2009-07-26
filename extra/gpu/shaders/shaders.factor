@@ -6,9 +6,9 @@ generic.parser gpu gpu.buffers hashtables
 images io.encodings.ascii io.files io.pathnames kernel lexer
 locals math math.parser memoize multiline namespaces opengl
 opengl.gl opengl.shaders parser quotations sequences
-specialized-arrays.int splitting strings ui.gadgets.worlds
-variants vectors vocabs vocabs.loader vocabs.parser words
-words.constant ;
+specialized-arrays.alien specialized-arrays.int splitting
+strings ui.gadgets.worlds variants vectors vocabs
+vocabs.loader vocabs.parser words words.constant ;
 IN: gpu.shaders
 
 VARIANT: shader-kind
@@ -17,6 +17,7 @@ VARIANT: shader-kind
 UNION: ?string string POSTPONE: f ;
 
 ERROR: too-many-feedback-formats-error formats ;
+ERROR: invalid-link-feedback-format-error format ;
 
 TUPLE: vertex-attribute
     { name            ?string        read-only initial: f }
@@ -137,16 +138,35 @@ MEMO: output-index ( program-instance output-name -- index )
 
     { drop vertex-buffer with-block with-buffer-ptr } >quotation ; 
 
+:: [link-feedback-format] ( vertex-attributes -- quot )
+    vertex-attributes [ name>> not ] any?
+    [ [ nip invalid-link-feedback-format-error ] ] [
+        vertex-attributes
+        [ name>> ascii malloc-string ]
+        void*-array{ } map-as :> varying-names
+        vertex-attributes length :> varying-count
+        { drop varying-count varying-names GL_INTERLEAVED_ATTRIBS glTransformFeedbackVaryings }
+        >quotation
+    ] if ;
+
 GENERIC: bind-vertex-format ( program-instance buffer-ptr format -- )
+
+GENERIC: link-feedback-format ( program-handle format -- )
+
+M: f link-feedback-format
+    2drop ;
 
 : define-vertex-format-methods ( class vertex-attributes -- )
     [
         [ \ bind-vertex-format create-method-in ] dip
         [bind-vertex-format] define
     ] [
+        [ \ link-feedback-format create-method-in ] dip
+        [link-feedback-format] define
+    ] [
         [ \ vertex-format-size create-method-in ] dip
         [ \ drop ] dip vertex-attributes-size [ ] 2sequence define
-    ] 2bi ;
+    ] 2tri ;
 
 : component-type>c-type ( component-type -- c-type )
     {
@@ -281,7 +301,7 @@ DEFER: <shader-instance>
     [ compile-shader-error ] if ;
 
 : (link-program) ( program shader-instances -- program-instance )
-    [ handle>> ] map <gl-program>
+    [ [ handle>> ] map ] [ feedback-format>> [ link-feedback-format ] curry ] bi (gl-program)
     dup gl-program-ok?
     [ swap world get \ program-instance boa window-resource ]
     [ link-program-error ] if ;

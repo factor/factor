@@ -79,6 +79,11 @@ UNION: gpu-data-ptr buffer-ptr c-ptr ;
 : buffer-size ( buffer -- size )
     bind-buffer GL_BUFFER_SIZE get-buffer-int ;
 
+: buffer-ptr>range ( buffer-ptr -- buffer-range )
+    [ buffer>> ] [ offset>> ] bi
+    2dup [ buffer-size ] dip -
+    buffer-range boa ;
+
 :: allocate-buffer ( buffer size initial-data -- )
     buffer bind-buffer :> target
     target size initial-data buffer gl-buffer-usage glBufferData ;
