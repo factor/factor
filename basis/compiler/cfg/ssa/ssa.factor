@@ -113,6 +113,7 @@ PRIVATE>
         [ ]
         [ compute-live-sets ]
         [ compute-dominance ]
+        [ compute-dom-frontiers ]
         [ compute-defs compute-phi-nodes insert-phi-nodes ]
         [ rename ]
     } cleave ;
