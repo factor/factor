@@ -11,9 +11,9 @@ SYMBOL: temp
 
 [
     {
-        T{ ##copy f V int-regs 3 V int-regs 2 }
+        T{ ##copy f V int-regs 4 V int-regs 2 }
         T{ ##copy f V int-regs 2 V int-regs 1 }
-        T{ ##copy f V int-regs 1 V int-regs 3 }
+        T{ ##copy f V int-regs 1 V int-regs 4 }
     }
 ] [
     H{
