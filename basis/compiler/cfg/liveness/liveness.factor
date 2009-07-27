@@ -10,14 +10,16 @@ IN: compiler.cfg.liveness
 
 BACKWARD-ANALYSIS: live
 
+GENERIC: insn-liveness ( live-set insn -- )
+
 : transfer-liveness ( live-set instructions -- live-set' )
     [ clone ] [ <reversed> ] bi* [
-        [ uses-vregs [ over conjoin ] each ]
+        [ dup ##phi? [ drop ] [ uses-vregs [ over conjoin ] each ] if ]
         [ defs-vregs [ over delete-at ] each ] bi
     ] each ;
 
 : local-live-in ( instructions -- live-set )
-    [ ##phi? not ] filter [ H{ } ] dip transfer-liveness keys ;
+    [ H{ } ] dip transfer-liveness keys ;
 
 M: live-analysis transfer-set
     drop instructions>> transfer-liveness ;
