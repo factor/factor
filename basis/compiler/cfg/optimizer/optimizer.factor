@@ -11,7 +11,7 @@ compiler.cfg.value-numbering
 compiler.cfg.copy-prop
 compiler.cfg.dce
 compiler.cfg.write-barrier
-compiler.cfg.phi-elimination
+compiler.cfg.coalescing
 compiler.cfg.empty-blocks
 compiler.cfg.predecessors
 compiler.cfg.rpo
@@ -32,7 +32,7 @@ SYMBOL: check-optimizer?
         optimize-tail-calls
         delete-useless-conditionals
         compute-predecessors
-        split-branches
+        ! split-branches
         join-blocks
         compute-predecessors
         construct-ssa
@@ -42,7 +42,7 @@ SYMBOL: check-optimizer?
         copy-propagation
         eliminate-dead-code
         eliminate-write-barriers
-        eliminate-phis
+        coalesce
         delete-empty-blocks
         ?check
     ] with-scope ;
