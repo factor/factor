@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel assocs sequences
-sets compiler.cfg.instructions ;
+USING: accessors arrays kernel assocs sequences namespaces fry
+sets compiler.cfg.rpo compiler.cfg.instructions ;
 IN: compiler.cfg.def-use
 
 GENERIC: defs-vregs ( insn -- seq )
@@ -49,3 +49,56 @@ M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: _dispatch uses-vregs src>> 1array ;
 M: insn uses-vregs drop f ;
+
+! Computing def-use chains. We don't assume a program is in SSA form,
+! since SSA construction itself needs def-use information. defs-1
+! is only useful if the program is SSA.
+SYMBOLS: defs defs-1 insns uses ;
+
+: def-of ( vreg -- node ) defs-1 get at ;
+: defs-of ( vreg -- nodes ) defs get at ;
+: uses-of ( vreg -- nodes ) uses get at ;
+: insn-of ( vreg -- insn ) insns get at ;
+
+<PRIVATE
+
+: finish-defs ( -- )
+    defs [ [ keys ] assoc-map ] change ;
+
+: finish-uses ( -- )
+    uses [ [ keys ] assoc-map ] change ;
+
+: (compute-def-use) ( cfg quot -- assoc )
+    H{ } clone [
+        '[
+            dup instructions>> [
+                @ [
+                    _ conjoin-at
+                ] with each
+            ] with each
+        ] each-basic-block
+    ] keep
+    [ keys ] assoc-map ; inline
+
+PRIVATE>
+
+: compute-defs ( cfg -- )
+    [ defs-vregs ] (compute-def-use)
+    [ defs set ] [ [ first ] assoc-map defs-1 set ] bi ;
+
+: compute-uses ( cfg -- )
+    [ uses-vregs ] (compute-def-use) uses set ;
+
+: compute-insns ( cfg -- )
+    H{ } clone [
+        '[
+            instructions>> [
+                dup defs-vregs [
+                    _ set-at
+                ] with each
+            ] each
+        ] each-basic-block
+    ] keep insns set ;
+
+: compute-def-use ( cfg -- )
+    [ compute-defs ] [ compute-uses ] [ compute-insns ] tri ;
