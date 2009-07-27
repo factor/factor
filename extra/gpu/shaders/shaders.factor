@@ -301,7 +301,8 @@ DEFER: <shader-instance>
     [ compile-shader-error ] if ;
 
 : (link-program) ( program shader-instances -- program-instance )
-    [ [ handle>> ] map ] [ feedback-format>> [ link-feedback-format ] curry ] bi (gl-program)
+    [ [ handle>> ] map ] curry
+    [ feedback-format>> [ link-feedback-format ] curry ] bi (gl-program)
     dup gl-program-ok?
     [ swap world get \ program-instance boa window-resource ]
     [ link-program-error ] if ;

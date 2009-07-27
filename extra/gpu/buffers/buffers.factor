@@ -15,7 +15,8 @@ VARIANT: buffer-access-mode
 
 VARIANT: buffer-kind
     vertex-buffer index-buffer
-    pixel-unpack-buffer pixel-pack-buffer ;
+    pixel-unpack-buffer pixel-pack-buffer
+    transform-feedback-buffer ;
 
 TUPLE: buffer < gpu-object 
     { upload-pattern buffer-upload-pattern }
@@ -52,6 +53,7 @@ TUPLE: buffer < gpu-object
         { index-buffer [ GL_ELEMENT_ARRAY_BUFFER ] }
         { pixel-unpack-buffer [ GL_PIXEL_UNPACK_BUFFER ] }
         { pixel-pack-buffer [ GL_PIXEL_PACK_BUFFER ] }
+        { transform-feedback-buffer [ GL_TRANSFORM_FEEDBACK_BUFFER ] }
     } case ; inline
 
 : get-buffer-int ( target enum -- value )
@@ -82,7 +84,7 @@ UNION: gpu-data-ptr buffer-ptr c-ptr ;
 : buffer-ptr>range ( buffer-ptr -- buffer-range )
     [ buffer>> ] [ offset>> ] bi
     2dup [ buffer-size ] dip -
-    buffer-range boa ;
+    buffer-range boa ; inline
 
 :: allocate-buffer ( buffer size initial-data -- )
     buffer bind-buffer :> target
