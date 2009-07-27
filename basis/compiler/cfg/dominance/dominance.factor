@@ -118,9 +118,13 @@ PRIVATE>
 
 SYMBOLS: preorder maxpreorder ;
 
+PRIVATE>
+
 : pre-of ( bb -- n ) [ preorder get at ] [ -1/0. ] if* ;
 
 : maxpre-of ( bb -- n ) [ maxpreorder get at ] [ 1/0. ] if* ;
+
+<PRIVATE
 
 : (compute-dfs) ( n bb -- n )
     [ 1 + ] dip

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel math math.order
 namespaces sequences sorting vectors compiler.cfg.def-use
-compiler.cfg.dominance ;
+compiler.cfg.dominance compiler.cfg.registers ;
 IN: compiler.cfg.coalescing.forest
 
 TUPLE: dom-forest-node vreg bb children ;

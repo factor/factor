@@ -6,6 +6,7 @@ IN: compiler.cfg.coalescing.state
 SYMBOLS: processed-names waiting used-by-another renaming-sets ;
 
 : init-coalescing ( -- )
+    H{ } clone renaming-sets set
     H{ } clone processed-names set
     H{ } clone waiting set
     V{ } clone used-by-another set ;

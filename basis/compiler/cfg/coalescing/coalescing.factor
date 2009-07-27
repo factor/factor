@@ -3,10 +3,13 @@
 USING: accessors assocs fry kernel locals math math.order
 sequences
 compiler.cfg.rpo
-compiler.cfg.instructions
+compiler.cfg.utilities
 compiler.cfg.dominance
+compiler.cfg.instructions
 compiler.cfg.coalescing.state
 compiler.cfg.coalescing.forest
+compiler.cfg.coalescing.copies
+compiler.cfg.coalescing.renaming
 compiler.cfg.coalescing.process-blocks ;
 IN: compiler.cfg.coalescing
 
@@ -18,13 +21,7 @@ IN: compiler.cfg.coalescing
 : process-blocks ( cfg -- )
     [ [ process-block ] if-has-phis ] each-basic-block ;
 
-: schedule-copies ( bb -- ) drop ;
-
 : break-interferences ( -- ) ;
-
-: insert-copies ( cfg -- ) drop ;
-
-: perform-renaming ( cfg -- ) drop ;
 
 : remove-phis-from-block ( bb -- )
     instructions>> [ ##phi? not ] filter-here ;
@@ -38,5 +35,5 @@ IN: compiler.cfg.coalescing
     dup process-blocks
     break-interferences
     dup insert-copies
-    dup perform-renaming
+    perform-renaming
     dup remove-phis ;
