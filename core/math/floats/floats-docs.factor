@@ -9,21 +9,21 @@ HELP: >float
 { $description "Converts a real to a float. This is the identity on floats, and performs a floating point division on rationals." } ;
 
 HELP: bits>double ( n -- x )
-{ $values { "n" "a 64-bit integer representing an 754 double-precision float" } { "x" float } }
+{ $values { "n" "a 64-bit integer representing an IEEE 754 double-precision float" } { "x" float } }
 { $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
 
 { bits>double bits>float double>bits float>bits } related-words
 
 HELP: bits>float ( n -- x )
-{ $values { "n" "a 32-bit integer representing an 754 single-precision float" } { "x" float } }
+{ $values { "n" "a 32-bit integer representing an IEEE 754 single-precision float" } { "x" float } }
 { $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
 
 HELP: double>bits ( x -- n )
-{ $values { "x" float } { "n" "a 64-bit integer representing an 754 double-precision float" } }
+{ $values { "x" float } { "n" "a 64-bit integer representing an IEEE 754 double-precision float" } }
 { $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
 
 HELP: float>bits ( x -- n )
-{ $values { "x" float } { "n" "a 32-bit integer representing an 754 single-precision float" } }
+{ $values { "x" float } { "n" "a 32-bit integer representing an IEEE 754 single-precision float" } }
 { $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
 
 ! Unsafe primitives
@@ -74,7 +74,7 @@ HELP: float>= ( x y -- ? )
 
 ARTICLE: "floats" "Floats"
 { $subsection float }
-"Rational numbers represent " { $emphasis "exact" } " quantities. On the other hand, a floating point number is an " { $emphasis "approximation" } ". While rationals can grow to any required precision, floating point numbers are fixed-width, and manipulating them is usually faster than manipulating ratios or bignums (but slower than manipulating fixnums). Floating point numbers are often used to represent irrational numbers, which have no exact representation as a ratio of two integers."
+"Rational numbers represent " { $emphasis "exact" } " quantities. On the other hand, a floating point number is an " { $emphasis "approximate" } " value. While rationals can grow to any required precision, floating point numbers have limited precision, and manipulating them is usually faster than manipulating ratios or bignums."
 $nl
 "Introducing a floating point number in a computation forces the result to be expressed in floating point."
 { $example "5/4 1/2 + ." "1+3/4" }
