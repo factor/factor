@@ -3,7 +3,7 @@
 USING: assocs classes classes.algebra classes.tuple
 classes.tuple.private kernel accessors math math.intervals
 namespaces sequences words combinators byte-arrays strings
-arrays compiler.tree.propagation.copy ;
+arrays layouts cpu.architecture compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;
