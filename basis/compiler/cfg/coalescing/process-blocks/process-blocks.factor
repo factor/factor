@@ -12,6 +12,11 @@ compiler.cfg.coalescing.forest
 compiler.cfg.coalescing.interference ;
 IN: compiler.cfg.coalescing.process-blocks
 
+! phi-union maps a vreg to the predecessor block
+! that carries it to the phi node's block
+
+! unioned-blocks is a set of bb's which defined
+! the source vregs above
 SYMBOLS: phi-union unioned-blocks ;
 
 :: operand-live-into-phi-node's-block? ( bb src dst -- ? )
@@ -46,7 +51,7 @@ SYMBOLS: phi-union unioned-blocks ;
     src used-by-another get push ;
 
 :: add-to-renaming-set ( bb src dst -- )
-    src phi-union get conjoin
+    bb src phi-union get set-at
     src def-of unioned-blocks get conjoin ;
 
 : process-phi-operand ( bb src dst -- )
@@ -101,12 +106,22 @@ SYMBOLS: visited work-list ;
     dup children>> [ process-df-child ] with with map
     [ ] any? [ work-list get pop-back* ] unless ;
 
+: process-df-nodes ( ##phi work-list -- )
+    dup deque-empty? [ 2drop ] [
+        [ peek-back process-df-node ]
+        [ process-df-nodes ]
+        2bi
+    ] if ;
+
 : process-phi-union ( ##phi dom-forest -- )
     H{ } clone visited set
     <dlist> [ push-all-front ] keep
-    [ work-list set ] [ [ process-df-node ] with slurp-deque ] bi ;
+    [ work-list set ] [ process-df-nodes ] bi ;
 
 :: add-local-interferences ( bb ##phi -- )
+    ! bb contains the phi node. If the input is defined in the same
+    ! block as the phi node, we have to check for interference.
+    ! This can only happen if the value is carried by a back edge.
     phi-union get [
         drop dup def-of bb eq?
         [ ##phi dst>> 2array , ] [ drop ] if
@@ -114,7 +129,7 @@ SYMBOLS: visited work-list ;
 
 : compute-local-interferences ( bb ##phi -- pairs )
     [
-        [ phi-union get compute-dom-forest process-phi-union drop ]
+        [ phi-union get keys compute-dom-forest process-phi-union drop ]
         [ add-local-interferences ]
         2bi
     ] { } make ;
@@ -124,25 +139,10 @@ SYMBOLS: visited work-list ;
         src src' eq? [ bb src ##phi dst>> insert-copy ] when
     ] assoc-each ;
 
-:: same-block ( ##phi vreg1 vreg2 bb1 bb2 -- )
-    vreg1 vreg2 bb1 +same-block+ interferes?
-    [ ##phi vreg1 insert-copies-for-interference ] when ;
-
-:: first-dominates ( ##phi vreg1 vreg2 bb1 bb2 -- )
-    vreg1 vreg2 bb2 +first-dominates+ interferes?
-    [ ##phi vreg1 insert-copies-for-interference ] when ;
-
-:: second-dominates ( ##phi vreg1 vreg2 bb1 bb2 -- )
-    vreg1 vreg2 bb1 +second-dominates+ interferes?
-    [ ##phi vreg1 insert-copies-for-interference ] when ;
-
 : process-local-interferences ( ##phi pairs -- )
     [
-        first2 2dup [ def-of ] bi@ {
-            { [ 2dup eq? ] [ same-block ] }
-            { [ 2dup dominates? ] [ first-dominates ] }
-            [ second-dominates ]
-        } cond
+        first2 2dup interferes?
+        [ drop insert-copies-for-interference ] [ 3drop ] if
     ] with each ;
 
 : add-renaming-set ( ##phi -- )
@@ -150,11 +150,12 @@ SYMBOLS: visited work-list ;
     phi-union get [ drop processed-name ] assoc-each ;
 
 :: process-phi ( bb ##phi -- )
-    H{ } phi-union set
-    H{ } unioned-blocks set
+    H{ } clone phi-union set
+    H{ } clone unioned-blocks set
     ##phi inputs>> ##phi dst>> '[ _ process-phi-operand ] assoc-each
     ##phi bb ##phi compute-local-interferences process-local-interferences
     ##phi add-renaming-set ;
 
 : process-block ( bb -- )
-    dup [ dup ##phi? [ process-phi t ] [ 2drop f ] if ] with all? drop ;
+    dup instructions>>
+    [ dup ##phi? [ process-phi t ] [ 2drop f ] if ] with all? drop ;
