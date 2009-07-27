@@ -23,21 +23,8 @@ IN: compiler.cfg.ssa
 
 <PRIVATE
 
-! Maps vreg to sequence of basic blocks
-SYMBOL: defs
-
 ! Maps basic blocks to sequences of vregs
 SYMBOL: inserting-phi-nodes
-
-: compute-defs ( cfg -- )
-    H{ } clone dup defs set
-    '[
-        dup instructions>> [
-            defs-vregs [
-                _ conjoin-at
-            ] with each
-        ] with each
-    ] each-basic-block ;
 
 : insert-phi-node-later ( vreg bb -- )
     2dup live-in key? [
@@ -46,7 +33,7 @@ SYMBOL: inserting-phi-nodes
     ] [ 2drop ] if ;
 
 : compute-phi-nodes-for ( vreg bbs -- )
-    keys dup length 2 >= [
+    dup length 2 >= [
         iterated-dom-frontier [
             insert-phi-node-later
         ] with each
