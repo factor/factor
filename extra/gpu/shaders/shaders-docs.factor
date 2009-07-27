@@ -25,8 +25,9 @@ HELP: <vertex-array>
 { $description "Creates a new " { $link vertex-array } " to feed data to " { $snippet "program-instance" } " from the set of " { $link buffer } "s specified in " { $snippet "vertex-formats" } "." } ;
 
 HELP: GLSL-PROGRAM:
-{ $syntax "GLSL-PROGRAM: program-name shader shader ... shader ;" }
-{ $description "Defines a new " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance." } ;
+{ $syntax "GLSL-PROGRAM: program-name shader shader ... shader [vertex-format] ;" }
+{ $description "Defines a new " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance. A single " { $link vertex-array } " may optionally be specified; if the program is used to collect transform feedback, this format will be used for the output." }
+{ $notes "Transform feedback requires OpenGL 3.0 or one of the " { $snippet "GL_EXT_transform_feedback" } " or " { $snippet "GL_ARB_transform_feedback" } " extensions." } ;
 
 HELP: GLSL-SHADER-FILE:
 { $syntax "GLSL-SHADER-FILE: shader-name shader-kind \"filename\"" }
@@ -133,6 +134,12 @@ HELP: shader-kind
 { { $link vertex-shader } "s run during primitive assembly and map input vertex data to positions in screen space for rasterization." }
 { { $link fragment-shader } "s run as part of rasterization and decide the final rendered output of a primitive as the outputs of the vertex shader are interpolated across its surface." }
 } } ;
+
+HELP: too-many-feedback-formats-error
+{ $class-description "This error is thrown when a " { $link POSTPONE: GLSL-PROGRAM: } " definition attempts to include more than one " { $link vertex-format } " for transform feedback formatting." } ;
+
+HELP: invalid-link-feedback-format-error
+{ $class-description "This error is thrown when the " { $link vertex-format } " specified as the transform feedback output format of a " { $link program } " is not suitable for the purpose. Transform feedback formats do not support padding (fields with a name of " { $link f } ")." } ;
 
 HELP: uniform-index
 { $values
