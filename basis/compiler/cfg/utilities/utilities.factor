@@ -5,21 +5,6 @@ compiler.cfg compiler.cfg.instructions cpu.architecture kernel
 layouts locals make math namespaces sequences sets vectors fry ;
 IN: compiler.cfg.utilities
 
-: value-info-small-fixnum? ( value-info -- ? )
-    literal>> {
-        { [ dup fixnum? ] [ tag-fixnum small-enough? ] }
-        [ drop f ]
-    } cond ;
-
-: value-info-small-tagged? ( value-info -- ? )
-    dup literal?>> [
-        literal>> {
-            { [ dup fixnum? ] [ tag-fixnum small-enough? ] }
-            { [ dup not ] [ drop t ] }
-            [ drop f ]
-        } cond
-    ] [ drop f ] if ;
-
 PREDICATE: kill-block < basic-block
     instructions>> {
         [ length 2 = ]
@@ -59,3 +44,9 @@ SYMBOL: visited
     swap >vector
     \ ##branch new-insn over push
     >>instructions ;
+
+: has-phis? ( bb -- ? )
+    instructions>> first ##phi? ;
+
+: if-has-phis ( bb quot: ( bb -- ) -- )
+    [ dup has-phis? ] dip [ drop ] if ; inline
