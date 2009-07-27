@@ -141,6 +141,9 @@ HELP: too-many-feedback-formats-error
 HELP: invalid-link-feedback-format-error
 { $class-description "This error is thrown when the " { $link vertex-format } " specified as the transform feedback output format of a " { $link program } " is not suitable for the purpose. Transform feedback formats do not support padding (fields with a name of " { $link f } ")." } ;
 
+HELP: inaccurate-feedback-attribute-error
+{ $class-description "This error is thrown when the " { $link vertex-format } " specified as the transform feedback output format of a " { $link program } " does not match the format of the output attributes linked into a " { $link program-instance } "." } ;
+
 HELP: uniform-index
 { $values
     { "program-instance" program-instance } { "uniform-name" string }

@@ -1,14 +1,15 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien alien.c-types alien.structs arrays
-assocs classes.mixin classes.parser classes.singleton
-combinators combinators.short-circuit definitions destructors
-generic.parser gpu gpu.buffers hashtables
-images io.encodings.ascii io.files io.pathnames kernel lexer
+USING: accessors alien alien.c-types alien.strings
+alien.structs arrays assocs byte-arrays classes.mixin
+classes.parser classes.singleton combinators
+combinators.short-circuit definitions destructors
+generic.parser gpu gpu.buffers hashtables images
+io.encodings.ascii io.files io.pathnames kernel lexer literals
 locals math math.parser memoize multiline namespaces opengl
 opengl.gl opengl.shaders parser quotations sequences
 specialized-arrays.alien specialized-arrays.int splitting
-strings ui.gadgets.worlds variants vectors vocabs
-vocabs.loader vocabs.parser words words.constant ;
+strings ui.gadgets.worlds variants vectors vocabs vocabs.loader
+vocabs.parser words words.constant ;
 IN: gpu.shaders
 
 VARIANT: shader-kind
@@ -18,6 +19,7 @@ UNION: ?string string POSTPONE: f ;
 
 ERROR: too-many-feedback-formats-error formats ;
 ERROR: invalid-link-feedback-format-error format ;
+ERROR: inaccurate-feedback-attribute-error attribute ;
 
 TUPLE: vertex-attribute
     { name            ?string        read-only initial: f }
@@ -99,6 +101,29 @@ MEMO: output-index ( program-instance output-name -- index )
 : vertex-attributes-size ( vertex-attributes -- size )
     [ vertex-attribute-size ] [ + ] map-reduce ;
 
+: feedback-type= ( component-type dim gl-type -- ? )
+    [ 2array ] dip {
+        { $ GL_FLOAT             [ { float-components 1 } ] }
+        { $ GL_FLOAT_VEC2        [ { float-components 2 } ] }
+        { $ GL_FLOAT_VEC3        [ { float-components 3 } ] }
+        { $ GL_FLOAT_VEC4        [ { float-components 4 } ] }
+        { $ GL_INT               [ { int-integer-components 1 } ] }
+        { $ GL_INT_VEC2          [ { int-integer-components 2 } ] }
+        { $ GL_INT_VEC3          [ { int-integer-components 3 } ] }
+        { $ GL_INT_VEC4          [ { int-integer-components 4 } ] }
+        { $ GL_UNSIGNED_INT      [ { uint-integer-components 1 } ] }
+        { $ GL_UNSIGNED_INT_VEC2 [ { uint-integer-components 2 } ] }
+        { $ GL_UNSIGNED_INT_VEC3 [ { uint-integer-components 3 } ] }
+        { $ GL_UNSIGNED_INT_VEC4 [ { uint-integer-components 4 } ] }
+    } case = ;
+
+:: assert-feedback-attribute ( size gl-type name vertex-attribute -- )
+    {
+        [ vertex-attribute name>> name = ] 
+        [ size 1 = ]
+        [ gl-type vertex-attribute [ component-type>> ] [ dim>> ] bi feedback-type= ]
+    } 0&& [ vertex-attribute inaccurate-feedback-attribute-error ] unless ;
+
 :: [bind-vertex-attribute] ( stride offset vertex-attribute -- stride offset' quot )
     vertex-attribute name>>                 :> name
     vertex-attribute component-type>>       :> type
@@ -149,6 +174,21 @@ MEMO: output-index ( program-instance output-name -- index )
         >quotation
     ] if ;
 
+:: [verify-feedback-attribute] ( vertex-attribute index -- quot )
+    vertex-attribute name>> :> name
+    name length 1 + :> name-buffer-length
+    {
+        index name-buffer-length dup
+        [ f 0 <int> 0 <int> ] dip <byte-array>
+        [ glGetTransformFeedbackVarying ] 3keep
+        ascii alien>string
+        vertex-attribute assert-feedback-attribute    
+    } >quotation ;
+
+:: [verify-feedback-format] ( vertex-attributes -- quot )
+    vertex-attributes [ [verify-feedback-attribute] ] map-index :> verify-cleave
+    { drop verify-cleave cleave } >quotation ;
+
 GENERIC: bind-vertex-format ( program-instance buffer-ptr format -- )
 
 GENERIC: link-feedback-format ( program-handle format -- )
@@ -156,17 +196,30 @@ GENERIC: link-feedback-format ( program-handle format -- )
 M: f link-feedback-format
     2drop ;
 
+GENERIC: (verify-feedback-format) ( program-instance format -- )
+
+M: f (verify-feedback-format)
+    2drop ;
+
+: verify-feedback-format ( program-instance -- )
+    dup program>> feedback-format>> (verify-feedback-format) ;
+
 : define-vertex-format-methods ( class vertex-attributes -- )
-    [
-        [ \ bind-vertex-format create-method-in ] dip
-        [bind-vertex-format] define
-    ] [
-        [ \ link-feedback-format create-method-in ] dip
-        [link-feedback-format] define
-    ] [
-        [ \ vertex-format-size create-method-in ] dip
-        [ \ drop ] dip vertex-attributes-size [ ] 2sequence define
-    ] 2tri ;
+    {
+        [
+            [ \ bind-vertex-format create-method-in ] dip
+            [bind-vertex-format] define
+        ] [
+            [ \ link-feedback-format create-method-in ] dip
+            [link-feedback-format] define
+        ] [
+            [ \ (verify-feedback-format) create-method-in ] dip
+            [verify-feedback-format] define
+        ] [
+            [ \ vertex-format-size create-method-in ] dip
+            [ \ drop ] dip vertex-attributes-size [ ] 2sequence define
+        ]
+    } 2cleave ;
 
 : component-type>c-type ( component-type -- c-type )
     {
@@ -303,9 +356,10 @@ DEFER: <shader-instance>
 : (link-program) ( program shader-instances -- program-instance )
     [ [ handle>> ] map ] curry
     [ feedback-format>> [ link-feedback-format ] curry ] bi (gl-program)
-    dup gl-program-ok?
-    [ swap world get \ program-instance boa window-resource ]
-    [ link-program-error ] if ;
+    dup gl-program-ok?  [
+        [ swap world get \ program-instance boa |dispose dup verify-feedback-format ]
+        with-destructors window-resource
+    ] [ link-program-error ] if ;
 
 : link-program ( program -- program-instance )
     dup shaders>> [ <shader-instance> ] map (link-program) ;

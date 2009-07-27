@@ -18,3 +18,7 @@ M: too-many-feedback-formats-error error.
 M: invalid-link-feedback-format-error error.
     drop
     "Vertex formats used for transform feedback can't contain padding fields." print ;
+
+M: inaccurate-feedback-attribute-error error.
+    drop
+    "The types of the transform feedback attributes don't match those specified by the program's vertex format." print ;
