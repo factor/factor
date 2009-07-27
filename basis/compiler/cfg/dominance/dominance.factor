@@ -60,20 +60,25 @@ PRIVATE>
     [ '[ 2dup eq? [ 2drop ] [ _ push-at ] if ] assoc-each ] keep
     dom-childrens set ;
 
-! Maps bb -> DF(bb)
-SYMBOL: dom-frontiers
-
 PRIVATE>
 
-: dom-frontier ( bb -- set ) dom-frontiers get at keys ;
+: compute-dominance ( cfg -- )
+    compute-dom-parents compute-dom-children ;
 
 <PRIVATE
+
+! Maps bb -> DF(bb)
+SYMBOL: dom-frontiers
 
 : compute-dom-frontier ( bb pred -- )
     2dup [ dom-parent ] dip eq? [ 2drop ] [
         [ dom-frontiers get conjoin-at ]
         [ dom-parent compute-dom-frontier ] 2bi
     ] if ;
+
+PRIVATE>
+
+: dom-frontier ( bb -- set ) dom-frontiers get at keys ;
 
 : compute-dom-frontiers ( cfg -- )
     H{ } clone dom-frontiers set
@@ -82,13 +87,6 @@ PRIVATE>
             [ compute-dom-frontier ] with each
         ] [ 2drop ] if
     ] each-basic-block ;
-
-PRIVATE>
-
-: compute-dominance ( cfg -- )
-    [ compute-dom-parents compute-dom-children ]
-    [ compute-dom-frontiers ]
-    bi ;
 
 <PRIVATE
 

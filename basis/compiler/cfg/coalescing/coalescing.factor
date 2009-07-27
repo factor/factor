@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel locals math math.order
-sequences
+sequences namespaces sets
 compiler.cfg.rpo
+compiler.cfg.def-use
 compiler.cfg.utilities
 compiler.cfg.dominance
 compiler.cfg.instructions
@@ -21,7 +22,24 @@ IN: compiler.cfg.coalescing
 : process-blocks ( cfg -- )
     [ [ process-block ] if-has-phis ] each-basic-block ;
 
-: break-interferences ( -- ) ;
+SYMBOL: seen
+
+:: visit-renaming ( dst assoc src bb -- )
+    src seen get key? [
+        src dst bb waiting-for push-at
+        src assoc delete-at
+    ] [ src seen get conjoin ] if ;
+
+:: break-interferences ( -- )
+    V{ } clone seen set
+    renaming-sets get [| dst assoc |
+        assoc [| src bb |
+            src seen get key?
+            [ dst assoc src bb visit-renaming ]
+            [ src seen get conjoin ]
+            if
+        ] assoc-each
+    ] assoc-each ;
 
 : remove-phis-from-block ( bb -- )
     instructions>> [ ##phi? not ] filter-here ;
@@ -31,9 +49,11 @@ IN: compiler.cfg.coalescing
 
 : coalesce ( cfg -- cfg' )
     init-coalescing
+    dup compute-def-use
+    dup compute-dominance
     dup compute-dfs
     dup process-blocks
     break-interferences
     dup insert-copies
-    perform-renaming
+    dup perform-renaming
     dup remove-phis ;
