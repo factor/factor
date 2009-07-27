@@ -289,11 +289,11 @@ HELP: <fp-nan>
 
 HELP: next-float
 { $values { "m" float } { "n" float } }
-{ $description "Returns the least representable " { $link float } " value greater than " { $snippet "m" } "." } ;
+{ $description "Returns the least representable " { $link float } " value greater than " { $snippet "m" } ", or in the case of " { $snippet "-0.0" } ", returns " { $snippet "+0.0" } "." } ;
 
 HELP: prev-float
 { $values { "m" float } { "n" float } }
-{ $description "Returns the greatest representable " { $link float } " value less than " { $snippet "m" } "." } ;
+{ $description "Returns the greatest representable " { $link float } " value less than " { $snippet "m" } ", or in the case of " { $snippet "+0.0" } ", returns " { $snippet "-0.0" } "." } ;
 
 { next-float prev-float } related-words
 
