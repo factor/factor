@@ -604,7 +604,7 @@ ARTICLE: "alien.marshall" "C marshalling"
 "Wrap an alien:" { $subsection alien-wrapper }
 "Wrap a struct:" { $subsection struct-wrapper }
 "Get the marshaller for a C type:" { $subsection marshaller }
-"Get the unmarshaller for a C type:" { $subsection marshaller }
+"Get the unmarshaller for a C type:" { $subsection unmarshaller }
 "Get the unmarshaller for an output parameter:" { $subsection out-arg-unmarshaller }
 "Get the unmarshaller for a struct field:" { $subsection struct-field-unmarshaller }
 $nl
