@@ -431,9 +431,33 @@ SYNTAX: UNIFORM-TUPLE:
     dup first sequence?
     [ bind-named-output-attachments ] [ [ drop ] 2dip bind-unnamed-output-attachments ] if ;
 
+GENERIC: bind-transform-feedback-output ( output -- )
+
+M: buffer bind-transform-feedback-output
+    [ GL_TRANSFORM_FEEDBACK_BUFFER 0 ] dip handle>> glBindBufferBase ; inline
+
+M: buffer-range bind-transform-feedback-output
+    [ GL_TRANSFORM_FEEDBACK_BUFFER 0 ] dip
+    [ handle>> ] [ offset>> ] [ size>> ] tri glBindBufferRange ; inline
+
+M: buffer-ptr bind-transform-feedback-output
+    buffer-ptr>range bind-transform-feedback-output ; inline
+
+: gl-feedback-primitive-mode ( primitive-mode -- gl-mode )
+    {
+        { points-mode         [ GL_POINTS    ] }
+        { lines-mode          [ GL_LINES     ] }
+        { line-strip-mode     [ GL_LINES     ] }
+        { line-loop-mode      [ GL_LINES     ] }
+        { triangles-mode      [ GL_TRIANGLES ] }
+        { triangle-strip-mode [ GL_TRIANGLES ] }
+        { triangle-fan-mode   [ GL_TRIANGLES ] }
+    } case ;
+
 PRIVATE>
 
 UNION: ?any-framebuffer any-framebuffer POSTPONE: f ;
+UNION: transform-feedback-output buffer buffer-range POSTPONE: f ;
 
 TUPLE: render-set
     { primitive-mode primitive-mode read-only }
@@ -442,7 +466,8 @@ TUPLE: render-set
     { indexes vertex-indexes initial: T{ index-range } read-only } 
     { instances ?integer initial: f read-only }
     { framebuffer ?any-framebuffer initial: system-framebuffer read-only }
-    { output-attachments sequence initial: { default-attachment } read-only } ;
+    { output-attachments sequence initial: { default-attachment } read-only }
+    { transform-feedback-output transform-feedback-output initial: f read-only } ;
 
 : <render-set> ( x quot-assoc -- render-set )
     render-set swap make-tuple ; inline
@@ -473,10 +498,19 @@ TUPLE: render-set
         ]
         [ vertex-array>> bind-vertex-array ]
         [
+            dup transform-feedback-output>> [
+                [ primitive-mode>> gl-feedback-primitive-mode glBeginTransformFeedback ]
+                [ bind-transform-feedback-output ] bi*
+            ] [ drop ] if*
+        ]
+
+        [
             [ primitive-mode>> ] [ indexes>> ] [ instances>> ] tri
             [ render-vertex-indexes-instanced ]
             [ render-vertex-indexes ] if*
         ]
+
+        [ transform-feedback-output>> [ glEndTransformFeedback ] when ]
         [ framebuffer>> [ GL_RASTERIZER_DISCARD glDisable ] unless ]
     } cleave ; inline
 
