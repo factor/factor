@@ -113,3 +113,29 @@ PRIVATE>
         work-list get [ iterated-dom-frontier-step ] slurp-deque
         visited get keys
     ] with-scope ;
+
+<PRIVATE
+
+SYMBOLS: preorder maxpreorder ;
+
+: pre-of ( bb -- n ) [ preorder get at ] [ -1/0. ] if* ;
+
+: maxpre-of ( bb -- n ) [ maxpreorder get at ] [ 1/0. ] if* ;
+
+: (compute-dfs) ( n bb -- n )
+    [ 1 + ] dip
+    [ dupd preorder get set-at ]
+    [ dom-children [ (compute-dfs) ] each ]
+    [ dupd maxpreorder get set-at ]
+    tri ;
+
+PRIVATE>
+
+: compute-dfs ( cfg -- )
+    H{ } clone preorder set
+    H{ } clone maxpreorder set
+    [ 0 ] dip entry>> (compute-dfs) drop ;
+
+: dominates? ( bb1 bb2 -- ? )
+    ! Requires DFS to be computed
+    swap [ pre-of ] [ [ pre-of ] [ maxpre-of ] bi ] bi* between? ;

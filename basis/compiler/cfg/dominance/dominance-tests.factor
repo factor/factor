@@ -6,7 +6,8 @@ compiler.cfg.predecessors ;
 : test-dominance ( -- )
     cfg new 0 get >>entry
     compute-predecessors
-    compute-dominance ;
+    dup compute-dominance
+    compute-dfs ;
 
 ! Example with no back edges
 V{ } 0 test-bb
@@ -37,6 +38,12 @@ V{ } 5 test-bb
 [ { 4 } ] [ 2 get dom-frontier [ number>> ] map ] unit-test
 [ { } ] [ 0 get dom-frontier ] unit-test
 [ { } ] [ 4 get dom-frontier ] unit-test
+
+[ t ] [ 0 get 3 get dominates? ] unit-test
+[ f ] [ 3 get 4 get dominates? ] unit-test
+[ f ] [ 1 get 4 get dominates? ] unit-test
+[ t ] [ 4 get 5 get dominates? ] unit-test
+[ f ] [ 1 get 5 get dominates? ] unit-test
 
 ! Example from the paper
 V{ } 0 test-bb
