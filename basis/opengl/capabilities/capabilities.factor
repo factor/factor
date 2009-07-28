@@ -1,16 +1,19 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces make sequences splitting opengl.gl
-continuations math.parser math arrays sets math.order fry ;
+continuations math.parser math arrays sets strings math.order fry ;
 IN: opengl.capabilities
 
 : (require-gl) ( thing require-quot make-error-quot -- )
     [ dupd call [ drop ] ] dip '[ _ " " make throw ] if ; inline
 
+: (has-extension?) ( query-extension(s) available-extensions -- ? )
+    over string?  [ member? ] [ [ member? ] curry any? ] if ;
+
 : gl-extensions ( -- seq )
     GL_EXTENSIONS glGetString " " split ;
 : has-gl-extensions? ( extensions -- ? )
-    gl-extensions swap [ over member? ] all? nip ;
+    gl-extensions [ (has-extension?) ] curry all? ;
 : (make-gl-extensions-error) ( required-extensions -- )
     gl-extensions diff
     "Required OpenGL extensions not supported:\n" %
