@@ -7,11 +7,11 @@ IN: compiler.cfg.coalescing.copies
 : compute-copies ( assoc -- assoc' )
     dup assoc-size <hashtable> [
         '[
-            [ _ set-at ] with each
+            [ _ 2dup key? [ "OOPS" throw ] [ set-at ] if ] with each
         ] assoc-each
     ] keep ;
 
-: insert-copies ( cfg -- )
+: insert-copies ( -- )
     waiting get [
         [ instructions>> building ] dip '[
             building get pop
