@@ -34,13 +34,6 @@ HELP: <multi-index-range>
 }
 { $description "Constructs a " { $link multi-index-range } " tuple." } ;
 
-HELP: <vertex-array>
-{ $values
-    { "program-instance" program-instance } { "vertex-formats" "a list of " { $link buffer-ptr } "/" { $link vertex-format } " pairs" }
-    { "vertex-array" vertex-array }
-}
-{ $description "Creates a new " { $link vertex-array } " to feed data to " { $snippet "program-instance" } " from the set of " { $link buffer } "s specified in " { $snippet "vertex-formats" } "." } ;
-
 HELP: UNIFORM-TUPLE:
 { $syntax <" UNIFORM-TUPLE: class-name
     { "slot" uniform-type dimension }
@@ -78,29 +71,8 @@ $nl
 "A value of a uniform tuple type is a standard Factor tuple. Uniform tuples are constructed with " { $link new } " or " { $link boa } ", and values are placed inside them using standard slot accessors."
 } ;
 
-HELP: VERTEX-FORMAT:
-{ $syntax <" VERTEX-FORMAT: format-name
-    { "attribute"/f component-type dimension normalize? }
-    { "attribute"/f component-type dimension normalize? }
-    ...
-    { "attribute"/f component-type dimension normalize? } ; "> }
-{ $description "Defines a new binary " { $link vertex-format } " for structuring vertex data stored in " { $link buffer } "s. Each " { $snippet "attribute" } " name either corresponds to an input parameter of a vertex shader, or is " { $link f } " to include padding in the vertex format. The " { $link component-type } " determines the format of the components, and the " { $snippet "dimension" } " determines the number of components. If the " { $snippet "component-type" } " is an integer type and " { $snippet "normalize?" } " is true, the component values will be scaled to the range 0.0 to 1.0 when fed to the vertex shader; otherwise, they will be cast to floats retaining their integral values." } ;
-
-HELP: VERTEX-STRUCT:
-{ $syntax <" VERTEX-STRUCT: struct-name format-name "> }
-{ $description "Defines a struct C type (like " { $link POSTPONE: C-STRUCT: } ") with the same binary format and component types as the given " { $link vertex-format } "." } ;
-
 HELP: bool-uniform
 { $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a boolean uniform parameter." } ;
-
-HELP: buffer>vertex-array
-{ $values
-    { "vertex-buffer" buffer } { "program-instance" program-instance } { "format" vertex-format }
-    { "vertex-array" vertex-array }
-}
-{ $description "Creates a new " { $link vertex-array } " from the entire contents of a single " { $link buffer } " in a single " { $link vertex-format } " for use with " { $snippet "program-instance" } "." } ;
-
-{ vertex-array <vertex-array> buffer>vertex-array } related-words
 
 HELP: bvec2-uniform
 { $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a two-component boolean vector uniform parameter." } ;
@@ -116,18 +88,6 @@ HELP: define-uniform-tuple
     { "class" class } { "superclass" class } { "uniforms" sequence }
 }
 { $description "Defines a new " { $link uniform-tuple } " as a subclass of " { $snippet "superclass" } " with the slots specified by the " { $link uniform } " tuple values in " { $snippet "uniforms" } ". The runtime equivalent of " { $link POSTPONE: UNIFORM-TUPLE: } ". This word must be called inside a compilation unit." } ;
-
-HELP: define-vertex-format
-{ $values
-    { "class" class } { "vertex-attributes" sequence }
-}
-{ $description "Defines a new " { $link vertex-format } " with the binary format specified by the " { $link vertex-attribute } " tuple values in " { $snippet "vertex-attributes" } ". The runtime equivalent of " { $link POSTPONE: VERTEX-FORMAT: } ". This word must be called inside a compilation unit." } ;
-
-HELP: define-vertex-struct
-{ $values
-    { "struct-name" string } { "vertex-format" vertex-format }
-}
-{ $description "Defines a new struct C type from a " { $link vertex-format } ". The runtime equivalent of " { $link POSTPONE: VERTEX-STRUCT: } ". This word must be called inside a compilation unit." } ;
 
 HELP: float-uniform
 { $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a float uniform parameter." } ;
@@ -254,9 +214,11 @@ HELP: render-set
 { "The " { $snippet "uniforms" } " slot contains a " { $link uniform-tuple } " with values for the shader program's uniform parameters." }
 { "The " { $snippet "indexes" } " slot contains one of the " { $link vertex-indexes } " types and selects elements from the vertex array to be rendered." }
 { "The " { $snippet "instances" } " slot, if not " { $link f } ", instructs the GPU to render several instances of the same set of vertexes. Instancing requires OpenGL 3.1 or one of the " { $snippet "GL_EXT_draw_instanced" } " or " { $snippet "GL_ARB_draw_instanced" } " extensions." }
-{ "The " { $snippet "framebuffer" } " slot determines the target for the rendering output. Either the " { $link system-framebuffer } " or a user-created " { $link framebuffer } " object can be specified. User-created framebuffers require OpenGL 3.0 or one of the " { $snippet "GL_EXT_framebuffer_object" } " or " { $snippet "GL_ARB_framebuffer_object" } " extensions." }
-{ "The " { $snippet "output-attachments" } " slot specifies which of the framebuffer's " { $link color-attachment-ref } "s to write the fragment shader's color output to. If the shader uses " { $snippet "gl_FragColor" } " or " { $snippet "gl_FragData[n]" } " to write its output, then " { $snippet "output-attachments" } " should be an array of " { $link color-attachment-ref } "s, and the output to color attachment binding is determined positionally. If the shader uses named output values, then " { $snippet "output-attachments" } " should be a list of string/" { $link color-attachment-ref } " pairs, mapping output names to color attachments. Named output values are available in GLSL 1.30 or later, and GLSL 1.20 and earlier using the " { $snippet "GL_EXT_gpu_shader4" } " extension." }
-} } ;
+{ "The " { $snippet "framebuffer" } " slot determines the target for the rendering output. Either the " { $link system-framebuffer } " or a user-created " { $link framebuffer } " object can be specified. " { $link f } " can also be specified to disable rasterization and only run the vertex transformation rendering stage." }
+{ "The " { $snippet "output-attachments" } " slot specifies which of the framebuffer's " { $link color-attachment-ref } "s to write the fragment shader's color output to. If the shader uses " { $snippet "gl_FragColor" } " or " { $snippet "gl_FragData[n]" } " to write its output, then " { $snippet "output-attachments" } " should be an array of " { $link color-attachment-ref } "s, and the output to color attachment binding is determined positionally. If the shader uses named output values, then " { $snippet "output-attachments" } " should be a list of string/" { $link color-attachment-ref } " pairs, mapping output names to color attachments." }
+{ "The " { $snippet "transform-feedback-output" } " slot specifies a target for transform feedback output from the vertex shader: either an entire " { $link buffer } ", a " { $link buffer-range } " subset, or a " { $link buffer-ptr } " offset into the buffer. If " { $link f } ", no transform feedback output is collected. The shader program associated with " { $snippet "vertex-array" } " must have a transform feedback output format specified." }
+} }
+{ $notes "User-created framebuffers require OpenGL 3.0 or one of the " { $snippet "GL_EXT_framebuffer_object" } " or " { $snippet "GL_ARB_framebuffer_object" } " extensions. Disabling rasterization requires OpenGL 3.0 or the " { $snippet "GL_EXT_transform_feedback" } " extension. Named output-attachment values are available in GLSL 1.30 or later, and GLSL 1.20 and earlier using the " { $snippet "GL_EXT_gpu_shader4" } " extension. Transform feedback requires OpenGL 3.0 or one of the " { $snippet "GL_EXT_transform_feedback" } " or " { $snippet "GL_ARB_transform_feedback" } " extensions." } ;
 
 { render render-set } related-words
 
@@ -313,29 +275,6 @@ HELP: vec3-uniform
 HELP: vec4-uniform
 { $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a four-component float vector uniform parameter." } ;
 
-HELP: vertex-array
-{ $class-description "A " { $snippet "vertex-array" } " object associates a shader " { $link program-instance } " with vertex attribute data from one or more " { $link buffer } "s. The format of the binary data inside these buffers is described using " { $link vertex-format } "s. " { $snippet "vertex-array" } "s are constructed using the " { $link <vertex-array> } " or " { $link buffer>vertex-array } " words." } ;
-
-HELP: vertex-array-buffer
-{ $values
-    { "vertex-array" vertex-array }
-    { "vertex-buffer" buffer }
-}
-{ $description "Returns the first " { $link buffer } " object comprised in " { $snippet "vertex-array" } "." } ;
-
-HELP: vertex-attribute
-{ $class-description "This tuple type is passed to " { $link define-vertex-format } " to define a new " { $link vertex-format } " type." } ;
-
-HELP: vertex-format
-{ $class-description "This class encompasses all vertex formats defined by " { $link POSTPONE: VERTEX-FORMAT: } ". A vertex format defines the binary layout of vertex attribute data in a " { $link buffer } " for use as part of a " { $link vertex-array } ". See the " { $link POSTPONE: VERTEX-FORMAT: } " documentation for details on how vertex formats are defined." } ;
-
-HELP: vertex-format-size
-{ $values
-    { "format" vertex-format }
-    { "size" integer }
-}
-{ $description "Returns the size in bytes of a set of vertex attributes in " { $snippet "format" } "." } ;
-
 HELP: vertex-indexes
 { $class-description "This class is a union of the following tuple types, any of which can be used as the " { $snippet "indexes" } " slot of a " { $link render-set } " to select elements from a " { $link vertex-array } " for rendering."
 { $list
@@ -349,11 +288,6 @@ ARTICLE: "gpu.render" "Rendering"
 "The " { $vocab-link "gpu.render" } " vocabulary contains words for organizing and submitting data to the GPU for rendering."
 { $subsection render }
 { $subsection render-set }
-"Render data inside GPU " { $link buffer } "s is organized into " { $link vertex-array } "s for consumption by shader code:"
-{ $subsection vertex-array }
-{ $subsection <vertex-array> }
-{ $subsection buffer>vertex-array }
-{ $subsection POSTPONE: VERTEX-FORMAT: }
 { $link uniform-tuple } "s provide Factor types for containing and submitting shader uniform parameters:"
 { $subsection POSTPONE: UNIFORM-TUPLE: }
 ;
