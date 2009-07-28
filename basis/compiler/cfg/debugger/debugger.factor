@@ -14,9 +14,11 @@ IN: compiler.cfg.debugger
 GENERIC: test-cfg ( quot -- cfgs )
 
 M: callable test-cfg
+    0 vreg-counter set-global
     build-tree optimize-tree gensym build-cfg ;
 
 M: word test-cfg
+    0 vreg-counter set-global
     [ build-tree optimize-tree ] keep build-cfg ;
 
 : test-mr ( quot -- mrs )
