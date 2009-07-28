@@ -54,7 +54,6 @@ SYMBOL: seen
         dup split-critical-edges
         dup compute-def-use
         dup compute-dominance
-        dup compute-dfs
         dup compute-live-ranges
         dup process-blocks
         break-interferences

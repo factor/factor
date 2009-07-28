@@ -9,7 +9,8 @@ compiler.cfg.renaming
 compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.dominance
-compiler.cfg.instructions ;
+compiler.cfg.instructions
+compiler.cfg.ssa.construction.tdmsc ;
 IN: compiler.cfg.ssa.construction
 
 ! SSA construction. Predecessors must be computed first.
@@ -34,9 +35,9 @@ SYMBOL: inserting-phi-nodes
 
 : compute-phi-nodes-for ( vreg bbs -- )
     dup length 2 >= [
-        iterated-dom-frontier [
+        [
             insert-phi-node-later
-        ] with each
+        ] with merge-set-each
     ] [ 2drop ] if ;
 
 : compute-phi-nodes ( -- )
@@ -113,7 +114,7 @@ PRIVATE>
         [ ]
         [ compute-live-sets ]
         [ compute-dominance ]
-        [ compute-dom-frontiers ]
+        [ compute-merge-sets ]
         [ compute-defs compute-phi-nodes insert-phi-nodes ]
         [ rename ]
     } cleave ;

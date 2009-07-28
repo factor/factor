@@ -3,7 +3,7 @@
 USING: accessors assocs fry kernel math math.order
 namespaces sequences sorting vectors compiler.cfg.def-use
 compiler.cfg.dominance compiler.cfg.registers ;
-IN: compiler.cfg.coalescing.forest
+IN: compiler.cfg.ssa.destruction.forest
 
 TUPLE: dom-forest-node vreg bb children ;
 
@@ -31,7 +31,6 @@ TUPLE: dom-forest-node vreg bb children ;
 PRIVATE>
 
 : compute-dom-forest ( vregs -- forest )
-    ! compute-dfs must be called on the CFG first
     <virtual-root> [
         1vector
         [ sort-vregs-by-bb ] dip
