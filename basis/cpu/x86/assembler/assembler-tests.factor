@@ -25,6 +25,7 @@ IN: cpu.x86.assembler.tests
 [ { HEX: 66 HEX: 0f HEX: 2e HEX: c1 } ] [ [ XMM0 XMM1 UCOMISD ] { } make ] unit-test
 [ { HEX: 66 HEX: 0f HEX: 2e HEX: 01 } ] [ [ XMM0 ECX [] UCOMISD ] { } make ] unit-test
 [ [ EAX [] XMM1 UCOMISD ] { } make ] must-fail
+[ { HEX: 66 HEX: 0f HEX: 38 HEX: 2a HEX: 01 } ] [ [ XMM0 ECX [] MOVNTDQA ] { } make ] unit-test
 
 ! rm-r only sse instructions
 [ { HEX: 0f HEX: 2b HEX: 08 } ] [ [ EAX [] XMM1 MOVNTPS ] { } make ] unit-test
@@ -54,8 +55,16 @@ IN: cpu.x86.assembler.tests
 ! 3-operand r-rm-imm sse instructions
 [ { HEX: 66 HEX: 0f HEX: 70 HEX: c1 HEX: 02 } ] [ [ XMM0 XMM1 2 PSHUFD ] { } make ] unit-test
 [ { HEX: 0f HEX: c6 HEX: c1 HEX: 02 } ] [ [ XMM0 XMM1 2 SHUFPS ] { } make ] unit-test
+
+! scalar register insert/extract sse instructions
 [ { HEX: 66 HEX: 0f HEX: c4 HEX: c1 HEX: 02 } ] [ [ XMM0 ECX 2 PINSRW ] { } make ] unit-test
+[ { HEX: 66 HEX: 0f HEX: c4 HEX: 04 HEX: 11 HEX: 03 } ] [ [ XMM0 ECX EDX [+] 3 PINSRW ] { } make ] unit-test
+
 [ { HEX: 66 HEX: 0f HEX: c5 HEX: c1 HEX: 02 } ] [ [ EAX XMM1 2 PEXTRW ] { } make ] unit-test
+[ { HEX: 66 HEX: 0f HEX: 3a HEX: 15 HEX: 08 HEX: 02 } ] [ [ EAX [] XMM1 2 PEXTRW ] { } make ] unit-test
+[ { HEX: 66 HEX: 0f HEX: 3a HEX: 15 HEX: 14 HEX: 08 HEX: 03 } ] [ [ EAX ECX [+] XMM2 3 PEXTRW ] { } make ] unit-test
+[ { HEX: 66 HEX: 0f HEX: 3a HEX: 14 HEX: c8 HEX: 02 } ] [ [ EAX XMM1 2 PEXTRB ] { } make ] unit-test
+[ { HEX: 66 HEX: 0f HEX: 3a HEX: 14 HEX: 08 HEX: 02 } ] [ [ EAX [] XMM1 2 PEXTRB ] { } make ] unit-test
 
 ! sse shift instructions
 [ { HEX: 66 HEX: 0f HEX: 71 HEX: d0 HEX: 05 } ] [ [ XMM0 5 PSRLW ] { } make ] unit-test
@@ -75,6 +84,16 @@ IN: cpu.x86.assembler.tests
 
 [ { HEX: 0f HEX: 50 HEX: c1 } ] [ [ EAX XMM1 MOVMSKPS ] { } make ] unit-test
 [ { HEX: 66 HEX: 0f HEX: 50 HEX: c1 } ] [ [ EAX XMM1 MOVMSKPD ] { } make ] unit-test
+
+[ { HEX: f3 HEX: 0f HEX: b8 HEX: c1 } ] [ [ EAX ECX POPCNT ] { } make ] unit-test
+[ { HEX: f3 HEX: 48 HEX: 0f HEX: b8 HEX: c1 } ] [ [ RAX RCX POPCNT ] { } make ] unit-test
+[ { HEX: f3 HEX: 0f HEX: b8 HEX: 01 } ] [ [ EAX ECX [] POPCNT ] { } make ] unit-test
+[ { HEX: f3 HEX: 0f HEX: b8 HEX: 04 HEX: 11 } ] [ [ EAX ECX EDX [+] POPCNT ] { } make ] unit-test
+
+[ { HEX: f2 HEX: 0f HEX: 38 HEX: f0 HEX: c1 } ] [ [ EAX CL CRC32B ] { } make ] unit-test
+[ { HEX: f2 HEX: 0f HEX: 38 HEX: f0 HEX: 01 } ] [ [ EAX ECX [] CRC32B ] { } make ] unit-test
+[ { HEX: f2 HEX: 0f HEX: 38 HEX: f1 HEX: c1 } ] [ [ EAX ECX CRC32 ] { } make ] unit-test
+[ { HEX: f2 HEX: 0f HEX: 38 HEX: f1 HEX: 01 } ] [ [ EAX ECX [] CRC32 ] { } make ] unit-test
 
 ! memory address modes
 [ { HEX: 8a HEX: 18         } ] [ [ BL RAX [] MOV ] { } make ] unit-test
