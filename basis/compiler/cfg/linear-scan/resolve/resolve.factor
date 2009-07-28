@@ -23,7 +23,7 @@ SYMBOL: spill-temps
 :: resolve-value-data-flow ( bb to vreg -- )
     vreg bb vreg-at-end
     vreg to vreg-at-start
-    2dup eq? [ 2drop ] [ vreg reg-class>> add-mapping ] if ;
+    2dup = [ 2drop ] [ vreg reg-class>> add-mapping ] if ;
 
 : compute-mappings ( bb to -- mappings )
     [
@@ -58,7 +58,7 @@ SYMBOL: temp
     } cond ;
 
 : mapping-instructions ( alist -- insns )
-    >hashtable
+    [ swap ] H{ } assoc-map-as
     [ temp [ swap >insn ] parallel-mapping ] { } make ;
 
 : perform-mappings ( bb to mappings -- )

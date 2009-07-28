@@ -23,7 +23,7 @@ SYMBOLS: temp locs preds to-do ready ;
     temp set
     <dlist> to-do set
     <dlist> ready set
-    [ [ eq? not ] assoc-filter preds set ]
+    [ preds set ]
     [ [ nip dup ] H{ } assoc-map-as locs set ]
     [ keys [ init-to-do ] [ init-ready ] bi ] tri ;
 
