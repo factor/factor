@@ -7,7 +7,7 @@ IN: compiler.cfg.coalescing.copies
 : compute-copies ( assoc -- assoc' )
     dup assoc-size <hashtable> [
         '[
-            [ _ 2dup key? [ "OOPS" throw ] [ set-at ] if ] with each
+            [ 2dup eq? [ 2drop ] [ _ 2dup key? [ "OOPS" throw ] [ set-at ] if ] if ] with each
         ] assoc-each
     ] keep ;
 

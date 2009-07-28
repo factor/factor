@@ -251,3 +251,10 @@ UNION: kill-vreg-insn
     ##alien-invoke
     ##alien-indirect
     ##alien-callback ;
+
+! Instructions that have complex expansions and require that the
+! output registers are not equal to any of the input registers
+UNION: def-is-use-insn
+    ##integer>bignum
+    ##bignum>integer
+    ##unbox-any-c-ptr ;
