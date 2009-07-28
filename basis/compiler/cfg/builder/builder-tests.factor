@@ -1,12 +1,30 @@
 IN: compiler.cfg.builder.tests
-USING: tools.test kernel sequences
-words sequences.private fry prettyprint alien alien.accessors
-math.private compiler.tree.builder compiler.tree.optimizer
-compiler.cfg.builder compiler.cfg.debugger arrays locals byte-arrays
-kernel.private math ;
+USING: tools.test kernel sequences words sequences.private fry
+prettyprint alien alien.accessors math.private compiler.tree.builder
+compiler.tree.optimizer compiler.cfg.builder compiler.cfg.debugger
+compiler.cfg.optimizer compiler.cfg.predecessors compiler.cfg.checker
+arrays locals byte-arrays kernel.private math slots.private vectors sbufs
+strings math.partial-dispatch strings.private ;
 
 ! Just ensure that various CFGs build correctly.
-: unit-test-cfg ( quot -- ) '[ _ test-cfg drop ] [ ] swap unit-test ;
+: unit-test-cfg ( quot -- )
+    '[ _ test-cfg [ optimize-cfg check-cfg ] each ] [ ] swap unit-test ;
+
+: blahblah ( nodes -- ? )
+    { fixnum } declare [
+        dup 3 bitand 1 = [ drop t ] [
+            dup 3 bitand 2 = [
+                blahblah
+            ] [ drop f ] if
+        ] if
+    ] any? ; inline recursive
+
+: more? ( x -- ? ) ;
+
+: test-case-1 ( -- ? ) f ;
+
+: test-case-2 ( -- )
+    test-case-1 [ test-case-2 ] [ ] if ; inline recursive
 
 {
     [ ]
@@ -49,6 +67,39 @@ kernel.private math ;
     [ "int" f "malloc" { "int" } alien-invoke ]
     [ "int" { "int" } "cdecl" alien-indirect ]
     [ "int" { "int" } "cdecl" [ ] alien-callback ]
+    [ swap - + * ]
+    [ swap slot ]
+    [ blahblah ]
+    [ 1000 [ dup [ reverse ] when ] times ]
+    [ 1array ]
+    [ 1 2 ? ]
+    [ { array } declare [ ] map ]
+    [ { array } declare dup 1 slot [ 1 slot ] when ]
+    [ [ dup more? ] [ dup ] produce ]
+    [ vector new over test-case-1 [ test-case-2 ] [ ] if ]
+    [ [ [ nth-unsafe ".." = 0 ] dip set-nth-unsafe ] 2curry (each-integer) ]
+    [
+        { fixnum sbuf } declare 2dup 3 slot fixnum> [
+            over 3 fixnum* over dup [ 2 slot resize-string ] dip 2 set-slot
+        ] [ ] if
+    ]
+    [ [ 2 fixnum* ] when 3 ]
+    [ [ 2 fixnum+ ] when 3 ]
+    [ [ 2 fixnum- ] when 3 ]
+    [ 10000 [ ] times ]
+    [
+        over integer? [
+            over dup 16 <-integer-fixnum
+            [ 0 >=-integer-fixnum ] [ drop f ] if [
+                nip dup
+                [ ] [ ] if
+            ] [ 2drop f ] if
+        ] [ 2drop f ] if
+    ]
+    [
+        pick 10 fixnum>= [ [ 123 fixnum-bitand ] 2dip ] [ ] if
+        set-string-nth-fast
+    ]
 } [
     unit-test-cfg
 ] each
