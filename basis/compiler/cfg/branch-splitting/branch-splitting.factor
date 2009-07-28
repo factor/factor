@@ -54,12 +54,30 @@ UNION: irrelevant ##peek ##replace ##inc-d ##inc-r ;
 
 : split-instructions? ( insns -- ? ) [ irrelevant? not ] count 5 <= ;
 
-: split-branch? ( bb -- ? )
+: short-tail-block? ( bb -- ? )
+    [ successors>> empty? ] [ instructions>> length 2 = ] bi and ;
+
+: short-block? ( bb -- ? )
+    ! If block is empty, always split
+    [ predecessors>> length ] [ instructions>> length 1 - ] bi * 10 <= ;
+
+: cond-cond-block? ( bb -- ? )
     {
-        [ dup successors>> [ back-edge? ] with any? not ]
-        [ predecessors>> length 2 4 between? ]
-        [ instructions>> split-instructions? ]
+        [ predecessors>> length 2 = ]
+        [ successors>> length 2 = ]
+        [ instructions>> length 20 <= ]
     } 1&& ;
+
+: split-branch? ( bb -- ? )
+    dup loop-entry? [ drop f ] [
+        dup predecessors>> length 1 <= [ drop f ] [
+            {
+                [ short-block? ]
+                [ short-tail-block? ]
+                [ cond-cond-block? ]
+            } 1||
+        ] if
+    ] if ;
 
 : split-branches ( cfg -- cfg' )
     dup [

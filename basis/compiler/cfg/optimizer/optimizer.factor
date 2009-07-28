@@ -32,7 +32,7 @@ SYMBOL: check-optimizer?
         optimize-tail-calls
         delete-useless-conditionals
         compute-predecessors
-        ! split-branches
+        split-branches
         join-blocks
         compute-predecessors
         construct-ssa
