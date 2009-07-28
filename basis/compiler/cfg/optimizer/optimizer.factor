@@ -42,7 +42,7 @@ SYMBOL: check-optimizer?
         copy-propagation
         eliminate-dead-code
         eliminate-write-barriers
-        coalesce
+        destruct-ssa
         delete-empty-blocks
         ?check
     ] with-scope ;

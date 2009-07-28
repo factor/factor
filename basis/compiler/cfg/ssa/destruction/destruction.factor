@@ -47,7 +47,7 @@ SYMBOL: seen
 : remove-phis ( cfg -- )
     [ [ remove-phis-from-block ] if-has-phis ] each-basic-block ;
 
-: coalesce ( cfg -- cfg' )
+: destruct-ssa ( cfg -- cfg' )
     dup cfg-has-phis? [
         init-coalescing
         compute-ssa-live-sets
