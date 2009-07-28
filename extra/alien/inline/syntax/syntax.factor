@@ -28,4 +28,4 @@ SYNTAX: ;C-LIBRARY compile-c-library ;
 
 SYNTAX: DELETE-C-LIBRARY: scan delete-inline-library ;
 
-SYNTAX: RAW-C: parse-here raw-c ;
+SYNTAX: <RAW-C "RAW-C>" parse-multiline-string raw-c ;

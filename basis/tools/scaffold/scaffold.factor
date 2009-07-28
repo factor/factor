@@ -124,7 +124,7 @@ M: bad-developer-name summary
         { "str" string }
         { "hash" hashtable }
         { "hashtable" hashtable }
-        { "?" "a boolean" }
+        { "?" boolean }
         { "ch" "a character" }
         { "word" word }
         { "array" array }

@@ -327,10 +327,10 @@ HELP: out-arg-unmarshaller
     "for all types except pointers to non-const primitives."
 } ;
 
-HELP: pointer-unmarshaller
+HELP: class-unmarshaller
 { $values
     { "type" " a C type string" }
-    { "quot" quotation }
+    { "quot/f" quotation }
 }
 { $description "If in the vocab in which this word is called, there is a subclass of " { $link alien-wrapper }
     " named after the type argument, " { $snippet "pointer-unmarshaller" } " will return a quotation which "
@@ -376,7 +376,7 @@ HELP: struct-primitive-unmarshaller
 HELP: struct-unmarshaller
 { $values
     { "type" "a C type string" }
-    { "quot" quotation }
+    { "quot/f" quotation }
 }
 { $description "Returns a quotation which wraps its argument in the subclass of "
     { $link struct-wrapper } " which matches the " { $snippet "type" } " arg."
@@ -604,7 +604,7 @@ ARTICLE: "alien.marshall" "C marshalling"
 "Wrap an alien:" { $subsection alien-wrapper }
 "Wrap a struct:" { $subsection struct-wrapper }
 "Get the marshaller for a C type:" { $subsection marshaller }
-"Get the unmarshaller for a C type:" { $subsection marshaller }
+"Get the unmarshaller for a C type:" { $subsection unmarshaller }
 "Get the unmarshaller for an output parameter:" { $subsection out-arg-unmarshaller }
 "Get the unmarshaller for a struct field:" { $subsection struct-field-unmarshaller }
 $nl

@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math sequences accessors
-math.bits sequences.private words namespaces macros
-hints combinators fry io.binary combinators.smart ;
+USING: arrays assocs combinators combinators.smart fry kernel
+macros math math.bits sequences sequences.private words ;
 IN: math.bitwise
 
 ! utilities
@@ -103,14 +102,6 @@ PRIVATE>
 
 : bit-count ( x -- n )
     dup 0 < [ bitnot ] when (bit-count) ; inline
-
-! Signed byte array to integer conversion
-: signed-le> ( bytes -- x )
-    [ le> ] [ length 8 * 1 - on-bits ] bi
-    2dup > [ bitnot bitor ] [ drop ] if ;
-
-: signed-be> ( bytes -- x )
-    <reversed> signed-le> ;
 
 : >signed ( x n -- y )
     2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
