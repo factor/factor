@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-compiler.cfg compiler.cfg.instructions cpu.architecture kernel
-layouts locals make math namespaces sequences sets vectors fry ;
+cpu.architecture kernel layouts locals make math namespaces sequences
+sets vectors fry compiler.cfg compiler.cfg.instructions
+compiler.cfg.rpo ;
 IN: compiler.cfg.utilities
 
 PREDICATE: kill-block < basic-block
