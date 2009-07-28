@@ -4,7 +4,7 @@ compiler.cfg.registers compiler.codegen compiler.units
 cpu.architecture hashtables kernel namespaces sequences
 tools.test vectors words layouts literals math arrays
 alien.syntax ;
-IN: compiler.tests
+IN: compiler.tests.low-level-ir
 
 : compile-cfg ( cfg -- word )
     gensym
