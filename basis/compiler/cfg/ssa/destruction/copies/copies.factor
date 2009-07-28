@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables fry kernel make namespaces
-sequences compiler.cfg.coalescing.state compiler.cfg.parallel-copy ;
-IN: compiler.cfg.coalescing.copies
+sequences compiler.cfg.ssa.destruction.state compiler.cfg.parallel-copy ;
+IN: compiler.cfg.ssa.destruction.copies
 
 ERROR: bad-copy ;
 

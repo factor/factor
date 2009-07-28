@@ -3,7 +3,7 @@
 USING: accessors assocs fry kernel namespaces sequences math
 compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.liveness compiler.cfg.rpo ;
-IN: compiler.cfg.coalescing.live-ranges
+IN: compiler.cfg.ssa.destruction.live-ranges
 
 ! Live ranges for interference testing
 

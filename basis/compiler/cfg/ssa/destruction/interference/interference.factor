@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 kernel math namespaces sequences locals compiler.cfg.def-use
-compiler.cfg.dominance compiler.cfg.coalescing.live-ranges ;
-IN: compiler.cfg.coalescing.interference
+compiler.cfg.dominance compiler.cfg.ssa.destruction.live-ranges ;
+IN: compiler.cfg.ssa.destruction.interference
 
 <PRIVATE
 

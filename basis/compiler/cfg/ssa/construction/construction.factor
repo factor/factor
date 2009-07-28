@@ -10,7 +10,7 @@ compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.dominance
 compiler.cfg.instructions ;
-IN: compiler.cfg.ssa
+IN: compiler.cfg.ssa.construction
 
 ! SSA construction. Predecessors must be computed first.
 

@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel namespaces sequences
-compiler.cfg.coalescing.state compiler.cfg.renaming compiler.cfg.rpo
+compiler.cfg.ssa.destruction.state compiler.cfg.renaming compiler.cfg.rpo
 disjoint-sets ;
-IN: compiler.cfg.coalescing.renaming
+IN: compiler.cfg.ssa.destruction.renaming
 
 : build-disjoint-set ( assoc -- disjoint-set )
     <disjoint-set> dup [

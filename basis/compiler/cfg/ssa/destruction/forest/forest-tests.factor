@@ -1,9 +1,9 @@
-USING: accessors compiler.cfg compiler.cfg.coalescing.forest
+USING: accessors compiler.cfg compiler.cfg.ssa.destruction.forest
 compiler.cfg.debugger compiler.cfg.dominance compiler.cfg.instructions
 compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.def-use
 cpu.architecture kernel namespaces sequences tools.test vectors sorting
 math.order ;
-IN: compiler.cfg.coalescing.forest.tests
+IN: compiler.cfg.ssa.destruction.forest.tests
 
 V{ T{ ##peek f V int-regs 0 D 0 } } clone 0 test-bb
 V{ T{ ##peek f V int-regs 1 D 0 } } clone 1 test-bb
