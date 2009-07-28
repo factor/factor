@@ -9,15 +9,15 @@ compiler.cfg.dominance
 compiler.cfg.instructions
 compiler.cfg.liveness.ssa
 compiler.cfg.critical-edges
-compiler.cfg.coalescing.state
-compiler.cfg.coalescing.forest
-compiler.cfg.coalescing.copies
-compiler.cfg.coalescing.renaming
-compiler.cfg.coalescing.live-ranges
-compiler.cfg.coalescing.process-blocks ;
-IN: compiler.cfg.coalescing
+compiler.cfg.ssa.destruction.state
+compiler.cfg.ssa.destruction.forest
+compiler.cfg.ssa.destruction.copies
+compiler.cfg.ssa.destruction.renaming
+compiler.cfg.ssa.destruction.live-ranges
+compiler.cfg.ssa.destruction.process-blocks ;
+IN: compiler.cfg.ssa.destruction
 
-! Fast Copy Coalescing and Live-Range Identification
+! Based on "Fast Copy Coalescing and Live-Range Identification"
 ! http://www.cs.ucsd.edu/classes/sp02/cse231/kenpldi.pdf
 
 ! Dominance, liveness and def-use need to be computed

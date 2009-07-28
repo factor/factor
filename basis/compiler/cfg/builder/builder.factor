@@ -23,7 +23,7 @@ compiler.alien ;
 IN: compiler.cfg.builder
 
 ! Convert tree SSA IR to CFG IR. The result is not in SSA form; this is
-! constructed later by calling compiler.cfg.ssa:construct-ssa.
+! constructed later by calling compiler.cfg.ssa.construction:construct-ssa.
 
 SYMBOL: procedures
 SYMBOL: loops
