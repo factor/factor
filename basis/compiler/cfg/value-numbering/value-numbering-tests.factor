@@ -3,7 +3,7 @@ USING: compiler.cfg.value-numbering compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
 cpu.architecture tools.test kernel math combinators.short-circuit
 accessors sequences compiler.cfg.predecessors locals
-compiler.cfg.phi-elimination compiler.cfg.dce
+compiler.cfg.dce compiler.cfg.coalescing
 compiler.cfg assocs vectors arrays layouts namespaces ;
 
 : trim-temps ( insns -- insns )
@@ -1191,14 +1191,14 @@ test-diamond
     cfg new 0 get >>entry
     value-numbering
     compute-predecessors
-    eliminate-phis drop
+    coalesce drop
 ] unit-test
 
 [ 1 ] [ 1 get successors>> length ] unit-test
 
 [ t ] [ 1 get successors>> first 3 get eq? ] unit-test
 
-[ 3 ] [ 4 get instructions>> length ] unit-test
+[ 2 ] [ 4 get instructions>> length ] unit-test
 
 V{
     T{ ##peek f V int-regs 0 D 0 }
