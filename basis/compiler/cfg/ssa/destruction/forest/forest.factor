@@ -10,7 +10,7 @@ TUPLE: dom-forest-node vreg bb children ;
 <PRIVATE
 
 : sort-vregs-by-bb ( vregs -- alist )
-    defs-1 get
+    defs get
     '[ dup _ at ] { } map>assoc
     [ [ second pre-of ] compare ] sort ;
 

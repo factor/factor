@@ -13,7 +13,7 @@ BACKWARD-ANALYSIS: live
 GENERIC: insn-liveness ( live-set insn -- )
 
 : kill-defs ( live-set insn -- live-set )
-    defs-vregs [ over delete-at ] each ;
+    defs-vreg [ over delete-at ] when* ;
 
 : gen-uses ( live-set insn -- live-set )
     dup ##phi? [ drop ] [ uses-vregs [ over conjoin ] each ] if ;

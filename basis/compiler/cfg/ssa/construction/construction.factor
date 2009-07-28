@@ -26,6 +26,27 @@ IN: compiler.cfg.ssa.construction
 
 <PRIVATE
 
+! Maps vregs to sets of basic blocks
+SYMBOL: defs
+
+! Set of vregs defined in more than one basic block
+SYMBOL: defs-multi
+
+: compute-insn-defs ( bb insn -- )
+    defs-vreg dup [
+        defs get [ conjoin-at ] [ drop ] [ at assoc-size 1 > ] 2tri
+        [ defs-multi get conjoin ] [ drop ] if
+    ] [ 2drop ] if ;
+
+: compute-defs ( cfg -- )
+    H{ } clone defs set
+    H{ } clone defs-multi set
+    [
+        dup instructions>> [
+            compute-insn-defs
+        ] with each
+    ] each-basic-block ;
+
 ! Maps basic blocks to sequences of vregs
 SYMBOL: inserting-phi-nodes
 
@@ -36,15 +57,11 @@ SYMBOL: inserting-phi-nodes
     ] [ 2drop ] if ;
 
 : compute-phi-nodes-for ( vreg bbs -- )
-    dup length 2 >= [
-        [
-            insert-phi-node-later
-        ] with merge-set-each
-    ] [ 2drop ] if ;
+    keys [ insert-phi-node-later ] with merge-set-each ;
 
 : compute-phi-nodes ( -- )
     H{ } clone inserting-phi-nodes set
-    defs get [ compute-phi-nodes-for ] assoc-each ;
+    defs-multi get defs get '[ _ at compute-phi-nodes-for ] assoc-each ;
 
 : insert-phi-nodes-in ( phis bb -- )
     [ append ] change-instructions drop ;
