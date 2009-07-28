@@ -98,7 +98,7 @@ M: insn compute-live-intervals* drop ;
 M: vreg-insn compute-live-intervals*
     dup insn#>>
     live-intervals get
-    [ [ defs-vregs ] 2dip '[ [ _ ] dip _ handle-output ] each ]
+    [ [ defs-vreg ] 2dip '[ [ _ ] dip _ handle-output ] when* ]
     [ [ uses-vregs ] 2dip '[ [ _ ] dip _ handle-input ] each ]
     [ [ temp-vregs ] 2dip '[ [ _ ] dip _ handle-temp ] each ]
     3tri ;

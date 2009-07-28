@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators sets math fry kernel math.order
-dlists deques namespaces sequences sorting compiler.cfg.rpo ;
+dlists deques vectors namespaces sequences sorting locals
+compiler.cfg.rpo ;
 IN: compiler.cfg.dominance
 
 ! Reference:
@@ -60,56 +61,42 @@ PRIVATE>
     [ '[ 2dup eq? [ 2drop ] [ _ push-at ] if ] assoc-each ] keep
     dom-childrens set ;
 
-! Maps bb -> DF(bb)
-SYMBOL: dom-frontiers
+SYMBOLS: preorder maxpreorder ;
 
 PRIVATE>
 
-: dom-frontier ( bb -- set ) dom-frontiers get at keys ;
+: pre-of ( bb -- n ) [ preorder get at ] [ -1/0. ] if* ;
+
+: maxpre-of ( bb -- n ) [ maxpreorder get at ] [ 1/0. ] if* ;
 
 <PRIVATE
 
-: compute-dom-frontier ( bb pred -- )
-    2dup [ dom-parent ] dip eq? [ 2drop ] [
-        [ dom-frontiers get conjoin-at ]
-        [ dom-parent compute-dom-frontier ] 2bi
-    ] if ;
+: (compute-dfs) ( n bb -- n )
+    [ 1 + ] dip
+    [ dupd preorder get set-at ]
+    [ dom-children [ (compute-dfs) ] each ]
+    [ dupd maxpreorder get set-at ]
+    tri ;
 
-: compute-dom-frontiers ( cfg -- )
-    H{ } clone dom-frontiers set
-    [
-        dup predecessors>> dup length 2 >= [
-            [ compute-dom-frontier ] with each
-        ] [ 2drop ] if
-    ] each-basic-block ;
+: compute-dfs ( cfg -- )
+    H{ } clone preorder set
+    H{ } clone maxpreorder set
+    [ 0 ] dip entry>> (compute-dfs) drop ;
 
 PRIVATE>
 
 : compute-dominance ( cfg -- )
-    [ compute-dom-parents compute-dom-children ]
-    [ compute-dom-frontiers ]
-    bi ;
+    [ compute-dom-parents compute-dom-children ] [ compute-dfs ] bi ;
 
-<PRIVATE
+: dominates? ( bb1 bb2 -- ? )
+    swap [ pre-of ] [ [ pre-of ] [ maxpre-of ] bi ] bi* between? ;
 
-SYMBOLS: work-list visited ;
-
-: add-to-work-list ( bb -- )
-    dom-frontier work-list get push-all-front ;
-
-: iterated-dom-frontier-step ( bb -- )
-    dup visited get key? [ drop ] [
-        [ visited get conjoin ]
-        [ add-to-work-list ] bi
-    ] if ;
-
-PRIVATE>
-
-: iterated-dom-frontier ( bbs -- bbs' )
-    [
-        <dlist> work-list set
-        H{ } clone visited set
-        [ add-to-work-list ] each
-        work-list get [ iterated-dom-frontier-step ] slurp-deque
-        visited get keys
-    ] with-scope ;
+:: breadth-first-order ( cfg -- bfo )
+    <dlist> :> work-list
+    cfg post-order length <vector> :> accum
+    cfg entry>> work-list push-front
+    work-list [
+        [ accum push ]
+        [ dom-children work-list push-all-front ] bi
+    ] slurp-deque
+    accum ;

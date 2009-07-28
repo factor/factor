@@ -61,7 +61,7 @@ M: bit-array like drop dup bit-array? [ >bit-array ] unless ;
 M: bit-array new-sequence drop <bit-array> ;
 
 M: bit-array equal?
-    over bit-array? [ sequence= ] [ 2drop f ] if ;
+    over bit-array? [ [ underlying>> ] bi@ sequence= ] [ 2drop f ] if ;
 
 M: bit-array resize
     [ drop ] [
