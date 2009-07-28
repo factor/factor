@@ -15,6 +15,9 @@ PREDICATE: kill-block < basic-block
 : back-edge? ( from to -- ? )
     [ number>> ] bi@ >= ;
 
+: loop-entry? ( bb -- ? )
+    dup predecessors>> [ swap back-edge? ] with any? ;
+
 : empty-block? ( bb -- ? )
     instructions>> {
         [ length 1 = ]
