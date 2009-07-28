@@ -27,3 +27,5 @@ HINTS: bit-set-intersect bit-array bit-array ;
 : bit-set-diff ( seq1 seq2 -- seq ) [ bitnot bitand ] bit-set-map ;
 
 HINTS: bit-set-diff bit-array bit-array ;
+
+: bit-set-subset? ( seq1 seq2 -- ? ) dupd bit-set-intersect = ;
