@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel namespaces sequences math
-compiler.cfg.def-use compiler.cfg.instructions
+arrays compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.liveness compiler.cfg.rpo ;
 IN: compiler.cfg.ssa.destruction.live-ranges
 
@@ -11,8 +11,8 @@ IN: compiler.cfg.ssa.destruction.live-ranges
 
 SYMBOLS: local-def-indices local-kill-indices ;
 
-: record-defs ( n vregs -- )
-    local-def-indices get '[ _ set-at ] with each ;
+: record-def ( n vregs -- )
+    dup [ local-def-indices get set-at ] [ 2drop ] if ;
 
 : record-uses ( n vregs -- )
     local-kill-indices get '[ _ set-at ] with each ;
@@ -24,9 +24,9 @@ SYMBOLS: local-def-indices local-kill-indices ;
     ! this instruction and before the next one, ensuring that outputs
     ! interfere with inputs.
     2 *
-    [ swap defs-vregs record-defs ]
+    [ swap defs-vreg record-def ]
     [ swap uses-vregs record-uses ]
-    [ over def-is-use-insn? [ 1 + swap defs-vregs record-uses ] [ 2drop ] if ]
+    [ over def-is-use-insn? [ 1 + swap defs-vreg 1array record-uses ] [ 2drop ] if ]
     2tri ;
 
 SYMBOLS: def-indices kill-indices ;
