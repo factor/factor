@@ -1,5 +1,5 @@
 USING: accessors arrays colors.constants combinators db.queries
-db.sqlite db.tuples db.types io.files.temp kernel locals math
+db.info db.tuples db.types kernel locals math
 monads persistency sequences sequences.extras ui ui.frp.gadgets
 ui.frp.layout ui.frp.signals ui.gadgets.labels
 ui.gadgets.scrollers ui.pens.solid ;
@@ -8,7 +8,7 @@ IN: recipes
 
 STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { genre { VARCHAR 100 } } ;
 : <recipe> ( title genre text -- recipe ) recipe new swap >>txt swap >>genre swap >>title 0 >>votes ;
-"recipes.db" temp-file <sqlite-db> recipe define-db
+get-psql-info recipe define-db
 : top-recipes ( offset search -- recipes ) <query> T{ recipe } rot >>title >>tuple
     "votes" >>order 30 >>limit swap >>offset get-tuples ;
 : top-genres ( -- genres ) f f top-recipes [ genre>> ] map prune 4 (head-slice) ;
