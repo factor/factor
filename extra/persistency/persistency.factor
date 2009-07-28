@@ -1,7 +1,6 @@
 USING: accessors arrays byte-arrays calendar classes classes.tuple
 classes.tuple.parser combinators db db.tuples db.types kernel
-math prettyprint sequences strings unicode.case urls words
-tools.continuations ;
+math sequences strings unicode.case urls words ;
 IN: persistency
 
 TUPLE: persistent id ;
@@ -13,7 +12,7 @@ TUPLE: persistent id ;
 : remove-types ( table -- table' ) [ dup array? [ first ] when ] map ;
 
 SYNTAX: STORED-TUPLE: parse-tuple-definition [ drop persistent ] dip [ remove-types define-tuple-class ]
-   [ nip [ dup unparse >upper ] [ add-types ] bi* define-persistent ] 3bi ;
+   [ nip [ dup name>> >upper ] [ add-types ] bi* define-persistent ] 3bi ;
 
 : define-db ( database class -- ) swap [ [ ensure-table ] with-db ] [ "database" set-word-prop ] 2bi ;
 
