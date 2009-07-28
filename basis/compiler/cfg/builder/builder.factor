@@ -10,30 +10,39 @@ compiler.tree.combinators
 compiler.tree.propagation.info
 compiler.cfg
 compiler.cfg.hats
-compiler.cfg.stacks
 compiler.cfg.utilities
 compiler.cfg.registers
 compiler.cfg.intrinsics
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.cfg.instructions
+compiler.cfg.predecessors
+compiler.cfg.builder.blocks
+compiler.cfg.stacks
 compiler.alien ;
 IN: compiler.cfg.builder
 
-! Convert tree SSA IR to CFG SSA IR.
+! Convert tree SSA IR to CFG IR. The result is not in SSA form; this is
+! constructed later by calling compiler.cfg.ssa.construction:construct-ssa.
 
 SYMBOL: procedures
 SYMBOL: loops
 
-: begin-procedure ( word label -- )
-    end-basic-block
-    begin-basic-block
+: begin-cfg ( word label -- cfg )
+    initial-basic-block
     H{ } clone loops set
-    [ basic-block get ] 2dip
-    <cfg> procedures get push ;
+    [ basic-block get ] 2dip <cfg> dup cfg set ;
+
+: begin-procedure ( word label -- )
+    begin-cfg procedures get push ;
 
 : with-cfg-builder ( nodes word label quot -- )
-    '[ begin-procedure @ ] with-scope ; inline
+    '[
+        begin-stack-analysis
+        begin-procedure
+        @
+        end-stack-analysis
+    ] with-scope ; inline
 
 GENERIC: emit-node ( node -- )
 
@@ -61,24 +70,26 @@ GENERIC: emit-node ( node -- )
 : emit-loop-call ( basic-block -- )
     ##branch
     basic-block get successors>> push
-    basic-block off ;
+    end-basic-block ;
 
-: emit-call ( word -- )
-    dup loops get key?
-    [ loops get at emit-loop-call ]
-    [ ##call ##branch begin-basic-block ]
+: emit-call ( word height -- )
+    over loops get key?
+    [ drop loops get at emit-loop-call ]
+    [ [ [ ##call ] [ adjust-d ] bi* ] emit-trivial-block ]
     if ;
 
 ! #recursive
+: recursive-height ( #recursive -- n )
+    [ label>> return>> in-d>> length ] [ in-d>> length ] bi - ;
+
 : emit-recursive ( #recursive -- )
-    [ label>> id>> emit-call ]
+    [ [ label>> id>> ] [ recursive-height ] bi emit-call ]
     [ [ child>> ] [ label>> word>> ] [ label>> id>> ] tri (build-cfg) ] bi ;
 
 : remember-loop ( label -- )
     basic-block get swap loops get set-at ;
 
 : emit-loop ( node -- )
-    ##loop-entry
     ##branch
     begin-basic-block
     [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi ;
@@ -92,9 +103,6 @@ M: #recursive emit-node
 
 : emit-if ( node -- )
     children>> [ emit-branch ] map emit-conditional ;
-
-: ##branch-t ( vreg -- )
-    \ f tag-number cc/= ##compare-imm-branch ;
 
 : trivial-branch? ( nodes -- value ? )
     dup length 1 = [
@@ -119,24 +127,32 @@ M: #recursive emit-node
 : emit-trivial-not-if ( -- )
     ds-pop \ f tag-number cc= ^^compare-imm ds-push ;
 
+: emit-actual-if ( #if -- )
+    ! Inputs to the final instruction need to be copied because of
+    ! loc>vreg sync
+    ds-pop ^^copy \ f tag-number cc/= ##compare-imm-branch emit-if ;
+
 M: #if emit-node
     {
         { [ dup trivial-if? ] [ drop emit-trivial-if ] }
         { [ dup trivial-not-if? ] [ drop emit-trivial-not-if ] }
-        [ ds-pop ##branch-t emit-if ]
+        [ emit-actual-if ]
     } cond ;
 
 ! #dispatch
 M: #dispatch emit-node
+    ! Inputs to the final instruction need to be copied because of
+    ! loc>vreg sync. ^^offset>slot always returns a fresh vreg,
+    ! though.
     ds-pop ^^offset>slot i ##dispatch emit-if ;
 
 ! #call
 M: #call emit-node
     dup word>> dup "intrinsic" word-prop
-    [ emit-intrinsic ] [ nip emit-call ] if ;
+    [ emit-intrinsic ] [ swap call-height emit-call ] if ;
 
 ! #call-recursive
-M: #call-recursive emit-node label>> id>> emit-call ;
+M: #call-recursive emit-node [ label>> id>> ] [ call-height ] bi emit-call ;
 
 ! #push
 M: #push emit-node
@@ -153,15 +169,16 @@ M: #shuffle emit-node
     [ [ [ out-r>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map rs-store ] 2bi ;
 
 ! #return
-M: #return emit-node
-    drop ##epilogue ##return ;
+: emit-return ( -- )
+    ##branch begin-basic-block ##epilogue ##return ;
+
+M: #return emit-node drop emit-return ;
 
 M: #return-recursive emit-node
-    label>> id>> loops get key?
-    [ ##epilogue ##return ] unless ;
+    label>> id>> loops get key? [ emit-return ] unless ;
 
 ! #terminate
-M: #terminate emit-node drop ##no-tco basic-block off ;
+M: #terminate emit-node drop ##no-tco end-basic-block ;
 
 ! FFI
 : return-size ( ctype -- n )
@@ -178,12 +195,14 @@ M: #terminate emit-node drop ##no-tco basic-block off ;
         [ return>> return-size >>return ]
         [ alien-parameters parameter-sizes drop >>params ] bi ;
 
-: alien-stack-frame ( params -- )
-    <alien-stack-frame> ##stack-frame ;
+: alien-node-height ( params -- )
+    [ out-d>> length ] [ in-d>> length ] bi - adjust-d ;
 
 : emit-alien-node ( node quot -- )
-    [ params>> ] dip [ drop alien-stack-frame ] [ call ] 2bi
-    ##branch begin-basic-block ; inline
+    [
+        [ params>> dup dup <alien-stack-frame> ] dip call
+        alien-node-height
+    ] emit-trivial-block ; inline
 
 M: #alien-invoke emit-node
     [ ##alien-invoke ] emit-alien-node ;

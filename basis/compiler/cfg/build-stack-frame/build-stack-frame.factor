@@ -13,10 +13,16 @@ SYMBOL: spill-counts
 GENERIC: compute-stack-frame* ( insn -- )
 
 : request-stack-frame ( stack-frame -- )
+    frame-required? on
     stack-frame [ max-stack-frame ] change ;
 
-M: ##stack-frame compute-stack-frame*
-    frame-required? on
+M: ##alien-invoke compute-stack-frame*
+    stack-frame>> request-stack-frame ;
+
+M: ##alien-indirect compute-stack-frame*
+    stack-frame>> request-stack-frame ;
+
+M: ##alien-callback compute-stack-frame*
     stack-frame>> request-stack-frame ;
 
 M: ##call compute-stack-frame*
@@ -44,8 +50,6 @@ M: insn compute-stack-frame*
     stack-frame get dup stack-frame-size >>total-size drop ;
 
 GENERIC: insert-pro/epilogues* ( insn -- )
-
-M: ##stack-frame insert-pro/epilogues* drop ;
 
 M: ##prologue insert-pro/epilogues*
     drop frame-required? get [ stack-frame get _prologue ] when ;

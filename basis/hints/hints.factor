@@ -83,6 +83,10 @@ SYNTAX: HINTS:
 
 \ push { { vector } { sbuf } } "specializer" set-word-prop
 
+\ last { { vector } } "specializer" set-word-prop
+
+\ set-last { { object vector } } "specializer" set-word-prop
+
 \ push-all
 { { string sbuf } { array vector } { byte-array byte-vector } }
 "specializer" set-word-prop

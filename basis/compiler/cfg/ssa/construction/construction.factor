@@ -5,39 +5,50 @@ sets math combinators
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
-compiler.cfg.renaming
 compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.dominance
-compiler.cfg.instructions ;
-IN: compiler.cfg.ssa
+compiler.cfg.instructions
+compiler.cfg.renaming.functor
+compiler.cfg.ssa.construction.tdmsc ;
+IN: compiler.cfg.ssa.construction
 
 ! SSA construction. Predecessors must be computed first.
 
-! This is the classical algorithm based on dominance frontiers, except
-! we consult liveness information to build pruned SSA:
-! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.25.8240
+! The phi placement algorithm is implemented in
+! compiler.cfg.ssa.construction.tdmsc.
 
-! Eventually might be worth trying something fancier:
-! http://portal.acm.org/citation.cfm?id=1065887.1065890
+! The renaming algorithm is based on "Practical Improvements to
+! the Construction and Destruction of Static Single Assignment Form",
+! however we construct pruned SSA, not semi-pruned SSA.
+
+! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.49.9683
 
 <PRIVATE
 
-! Maps vreg to sequence of basic blocks
+! Maps vregs to sets of basic blocks
 SYMBOL: defs
+
+! Set of vregs defined in more than one basic block
+SYMBOL: defs-multi
+
+: compute-insn-defs ( bb insn -- )
+    defs-vreg dup [
+        defs get [ conjoin-at ] [ drop ] [ at assoc-size 1 > ] 2tri
+        [ defs-multi get conjoin ] [ drop ] if
+    ] [ 2drop ] if ;
+
+: compute-defs ( cfg -- )
+    H{ } clone defs set
+    H{ } clone defs-multi set
+    [
+        dup instructions>> [
+            compute-insn-defs
+        ] with each
+    ] each-basic-block ;
 
 ! Maps basic blocks to sequences of vregs
 SYMBOL: inserting-phi-nodes
-
-: compute-defs ( cfg -- )
-    H{ } clone dup defs set
-    '[
-        dup instructions>> [
-            defs-vregs [
-                _ conjoin-at
-            ] with each
-        ] with each
-    ] each-basic-block ;
 
 : insert-phi-node-later ( vreg bb -- )
     2dup live-in key? [
@@ -46,15 +57,11 @@ SYMBOL: inserting-phi-nodes
     ] [ 2drop ] if ;
 
 : compute-phi-nodes-for ( vreg bbs -- )
-    keys dup length 2 >= [
-        iterated-dom-frontier [
-            insert-phi-node-later
-        ] with each
-    ] [ 2drop ] if ;
+    keys [ insert-phi-node-later ] with merge-set-each ;
 
 : compute-phi-nodes ( -- )
     H{ } clone inserting-phi-nodes set
-    defs get [ compute-phi-nodes-for ] assoc-each ;
+    defs-multi get defs get '[ _ at compute-phi-nodes-for ] assoc-each ;
 
 : insert-phi-nodes-in ( phis bb -- )
     [ append ] change-instructions drop ;
@@ -62,31 +69,32 @@ SYMBOL: inserting-phi-nodes
 : insert-phi-nodes ( -- )
     inserting-phi-nodes get [ swap insert-phi-nodes-in ] assoc-each ;
 
-SYMBOLS: stacks originals ;
+SYMBOLS: stacks pushed ;
 
 : init-renaming ( -- )
-    H{ } clone stacks set
-    H{ } clone originals set ;
+    H{ } clone stacks set ;
 
 : gen-name ( vreg -- vreg' )
-    [ reg-class>> next-vreg ] keep
-    [ stacks get push-at ]
-    [ swap originals get set-at ]
-    [ drop ]
-    2tri ;
+    [ reg-class>> next-vreg dup ] keep
+    dup pushed get 2dup key?
+    [ 2drop stacks get at set-last ]
+    [ conjoin stacks get push-at ]
+    if ;
 
 : top-name ( vreg -- vreg' )
     stacks get at last ;
 
+RENAMING: ssa-rename [ gen-name ] [ top-name ]
+
 GENERIC: rename-insn ( insn -- )
 
 M: insn rename-insn
-    [ dup uses-vregs [ dup top-name ] { } map>assoc renamings set rename-insn-uses ]
-    [ dup defs-vregs [ dup gen-name ] { } map>assoc renamings set rename-insn-defs ]
+    [ ssa-rename-insn-uses ]
+    [ ssa-rename-insn-defs ]
     bi ;
 
 M: ##phi rename-insn
-    dup defs-vregs [ dup gen-name ] { } map>assoc renamings set rename-insn-defs ;
+    ssa-rename-insn-defs ;
 
 : rename-insns ( bb -- )
     instructions>> [ rename-insn ] each ;
@@ -101,19 +109,19 @@ M: ##phi rename-insn
 : rename-successors-phis ( bb -- )
     [ successors>> ] keep '[ _ rename-successor-phis ] each ;
 
-: pop-stacks ( bb -- )
-    instructions>> [
-        defs-vregs originals get stacks get
-        '[ _ at _ at pop* ] each
-    ] each ;
+: pop-stacks ( -- )
+    pushed get stacks get '[ drop _ at pop* ] assoc-each ;
 
 : rename-in-block ( bb -- )
-    {
-        [ rename-insns ]
-        [ rename-successors-phis ]
-        [ dom-children [ rename-in-block ] each ]
-        [ pop-stacks ]
-    } cleave ;
+    H{ } clone pushed set
+    [ rename-insns ]
+    [ rename-successors-phis ]
+    [
+        pushed get
+        [ dom-children [ rename-in-block ] each ] dip
+        pushed set
+    ] tri
+    pop-stacks ;
 
 : rename ( cfg -- )
     init-renaming
@@ -126,6 +134,7 @@ PRIVATE>
         [ ]
         [ compute-live-sets ]
         [ compute-dominance ]
+        [ compute-merge-sets ]
         [ compute-defs compute-phi-nodes insert-phi-nodes ]
         [ rename ]
     } cleave ;
