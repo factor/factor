@@ -8,8 +8,12 @@ IN: compiler.cfg.coalescing.interference
 <PRIVATE
 
 : kill-after-def? ( vreg1 vreg2 bb -- ? )
-    ! If first register is killed after second one is defined, they interfere
-    [ kill-index ] [ def-index ] bi-curry bi* >= ;
+    ! If first register is used after second one is defined, they interfere.
+    ! If they are used in the same instruction, no interference. If the
+    ! instruction is a def-is-use-insn, then there will be a use at +1
+    ! (instructions are 2 apart) and so outputs will interfere with
+    ! inputs.
+    [ kill-index ] [ def-index ] bi-curry bi* > ;
 
 : interferes-same-block? ( vreg1 vreg2 bb1 bb2 -- ? )
     ! If both are defined in the same basic block, they interfere if their
