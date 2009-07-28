@@ -77,5 +77,3 @@ INSTANCE: gadget monad
 M: gadget monad-of drop gadget-monad ;
 M: gadget-monad return drop <gadget> swap >>model ;
 M: gadget >>= output-model [ swap call( x -- y ) ] curry ; 
-
-! Make sure prop removal really destroys normal db code
