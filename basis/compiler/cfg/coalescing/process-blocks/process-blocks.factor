@@ -47,7 +47,7 @@ SYMBOLS: phi-union unioned-blocks ;
     2nip processed-name ;
 
 :: trivial-interference ( bb src dst -- )
-    dst src bb waiting-for push-at
+    src dst bb waiting-for set-at
     src used-by-another get push ;
 
 :: add-to-renaming-set ( bb src dst -- )
@@ -118,20 +118,21 @@ SYMBOLS: visited work-list ;
     <dlist> [ push-all-front ] keep
     [ work-list set ] [ process-df-nodes ] bi ;
 
-:: add-local-interferences ( bb ##phi -- )
+: add-local-interferences ( ##phi -- )
     ! bb contains the phi node. If the input is defined in the same
     ! block as the phi node, we have to check for interference.
     ! This can only happen if the value is carried by a back edge.
-    phi-union get [
-        drop dup def-of bb eq?
-        [ ##phi dst>> 2array , ] [ drop ] if
-    ] assoc-each ;
+    
+    ! XXX: in the LLVM version they only add an interference if
+    ! the operand is defined in the same block as the ##phi, but
+    ! this doesn't work here. Investigate
+    [ phi-union get ] dip dst>> '[ drop _ 2array , ] assoc-each ;
 
-: compute-local-interferences ( bb ##phi -- pairs )
+: compute-local-interferences ( ##phi -- pairs )
     [
-        [ phi-union get keys compute-dom-forest process-phi-union drop ]
+        [ phi-union get keys compute-dom-forest process-phi-union ]
         [ add-local-interferences ]
-        2bi
+        bi
     ] { } make ;
 
 :: insert-copies-for-interference ( ##phi src -- )
@@ -149,13 +150,14 @@ SYMBOLS: visited work-list ;
     dst>> phi-union get swap renaming-sets get set-at
     phi-union get [ drop processed-name ] assoc-each ;
 
-:: process-phi ( bb ##phi -- )
+: process-phi ( ##phi -- )
     H{ } clone phi-union set
     H{ } clone unioned-blocks set
-    ##phi inputs>> ##phi dst>> '[ _ process-phi-operand ] assoc-each
-    ##phi bb ##phi compute-local-interferences process-local-interferences
-    ##phi add-renaming-set ;
+    [ [ inputs>> ] [ dst>> ] bi '[ _ process-phi-operand ] assoc-each ]
+    [ dup compute-local-interferences process-local-interferences ]
+    [ add-renaming-set ]
+    tri ;
 
 : process-block ( bb -- )
-    dup instructions>>
-    [ dup ##phi? [ process-phi t ] [ 2drop f ] if ] with all? drop ;
+    instructions>>
+    [ dup ##phi? [ process-phi t ] [ drop f ] if ] all? drop ;
