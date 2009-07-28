@@ -26,8 +26,7 @@ M: insn linearize-insn , drop ;
     [ number>> ] bi@ 1 - = ; inline
 
 : emit-loop-entry? ( bb successor -- ? )
-    [ back-edge? not ]
-    [ nip dup predecessors>> [ swap back-edge? ] with any? ] 2bi and ;
+    [ back-edge? not ] [ nip loop-entry? ] 2bi and ;
 
 : emit-branch ( bb successor -- )
     2dup emit-loop-entry? [ _loop-entry ] when
