@@ -127,7 +127,5 @@ M: expr simplify* drop f ;
         { [ dup integer? ] [ nip ] }
     } cond ;
 
-GENERIC: number-values ( insn -- )
-
-M: ##flushable number-values [ >expr simplify ] [ dst>> ] bi set-vn ;
-M: insn number-values drop ;
+: number-values ( insn -- )
+    [ >expr simplify ] [ dst>> ] bi set-vn ;

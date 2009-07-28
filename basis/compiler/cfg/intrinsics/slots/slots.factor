@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: layouts namespaces kernel accessors sequences
 classes.algebra compiler.tree.propagation.info
 compiler.cfg.stacks compiler.cfg.hats compiler.cfg.instructions
-compiler.cfg.utilities ;
+compiler.cfg.utilities compiler.cfg.builder.blocks ;
 IN: compiler.cfg.intrinsics.slots
 
 : value-tag ( info -- n ) class>> class-tag ; inline

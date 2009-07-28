@@ -1,16 +1,17 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel assocs sequences
-sets compiler.cfg.instructions ;
+USING: accessors arrays kernel assocs sequences namespaces fry
+sets compiler.cfg.rpo compiler.cfg.instructions ;
 IN: compiler.cfg.def-use
 
-GENERIC: defs-vregs ( insn -- seq )
+GENERIC: defs-vreg ( insn -- vreg/f )
 GENERIC: temp-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
 
-M: ##flushable defs-vregs dst>> 1array ;
-M: ##fixnum-overflow defs-vregs dst>> 1array ;
-M: insn defs-vregs drop f ;
+M: ##flushable defs-vreg dst>> ;
+M: ##fixnum-overflow defs-vreg dst>> ;
+M: _fixnum-overflow defs-vreg dst>> ;
+M: insn defs-vreg drop f ;
 
 M: ##write-barrier temp-vregs [ card#>> ] [ table>> ] bi 2array ;
 M: ##unary/temp temp-vregs temp>> 1array ;
@@ -49,26 +50,48 @@ M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: _dispatch uses-vregs src>> 1array ;
 M: insn uses-vregs drop f ;
 
-! Instructions that use vregs
-UNION: vreg-insn
-##flushable
-##write-barrier
-##dispatch
-##effect
-##fixnum-overflow
-##conditional-branch
-##compare-imm-branch
-##phi
-##gc
-_conditional-branch
-_compare-imm-branch
-_dispatch ;
+! Computing def-use chains.
 
-: map-unique ( seq quot -- assoc )
-    map concat unique ; inline
+SYMBOLS: defs insns uses ;
 
-: gen-set ( instructions -- seq )
-    [ uses-vregs ] map-unique ;
+: def-of ( vreg -- node ) defs get at ;
+: uses-of ( vreg -- nodes ) uses get at ;
+: insn-of ( vreg -- insn ) insns get at ;
 
-: kill-set ( instructions -- seq )
-    [ defs-vregs ] map-unique ;
+: set-def-of ( obj insn assoc -- )
+    swap defs-vreg dup [ swap set-at ] [ 3drop ] if ;
+
+: compute-defs ( cfg -- )
+    H{ } clone [
+        '[
+            dup instructions>> [
+                _ set-def-of
+            ] with each
+        ] each-basic-block
+    ] keep
+    defs set ;
+
+: compute-insns ( cfg -- )
+    H{ } clone [
+        '[
+            instructions>> [
+                dup _ set-def-of
+            ] each
+        ] each-basic-block
+    ] keep insns set ;
+
+: compute-uses ( cfg -- )
+    H{ } clone [
+        '[
+            dup instructions>> [
+                uses-vregs [
+                    _ conjoin-at
+                ] with each
+            ] with each
+        ] each-basic-block
+    ] keep
+    [ keys ] assoc-map
+    uses set ;
+
+: compute-def-use ( cfg -- )
+    [ compute-defs ] [ compute-uses ] [ compute-insns ] tri ;
