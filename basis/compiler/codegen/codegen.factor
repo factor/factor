@@ -4,7 +4,7 @@ USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
 alien.strings alien.arrays alien.complex alien.libraries sets libc
-continuations.private fry cpu.architecture
+continuations.private fry cpu.architecture classes
 source-files.errors
 compiler.errors
 compiler.alien
@@ -17,6 +17,10 @@ compiler.cfg.builder
 compiler.codegen.fixup
 compiler.utilities ;
 IN: compiler.codegen
+
+SYMBOL: insn-counts
+
+H{ } clone insn-counts set-global
 
 GENERIC: generate-insn ( insn -- )
 
@@ -54,7 +58,12 @@ SYMBOL: labels
         [ word>> init-generator ]
         [
             instructions>>
-            [ [ regs>> registers set ] [ generate-insn ] bi ] each
+            [
+                [ class insn-counts get inc-at ]
+                [ regs>> registers set ]
+                [ generate-insn ]
+                tri
+            ] each
         ] bi
     ] with-fixup ;
 
@@ -245,7 +254,7 @@ M: _gc generate-insn
         [ gc-root-count>> ]
     } cleave %gc ;
 
-M: ##loop-entry generate-insn drop %loop-entry ;
+M: _loop-entry generate-insn drop %loop-entry ;
 
 M: ##alien-global generate-insn
     [ dst>> register ] [ symbol>> ] [ library>> ] tri
