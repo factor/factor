@@ -3,23 +3,16 @@ USING: accessors alien alien.c-types alien.structs arrays
 assocs classes classes.mixin classes.parser classes.singleton
 classes.tuple classes.tuple.private combinators combinators.tuple destructors fry
 generic generic.parser gpu gpu.buffers gpu.framebuffers
-gpu.framebuffers.private gpu.shaders gpu.state gpu.textures
-gpu.textures.private half-floats images kernel lexer locals
-math math.order math.parser namespaces opengl opengl.gl parser
-quotations sequences slots sorting specialized-arrays.alien
-specialized-arrays.float specialized-arrays.int
+gpu.framebuffers.private gpu.shaders gpu.shaders.private gpu.state
+gpu.textures gpu.textures.private half-floats images kernel
+lexer locals math math.order math.parser namespaces opengl
+opengl.gl parser quotations sequences slots sorting
+specialized-arrays.alien specialized-arrays.float specialized-arrays.int
 specialized-arrays.uint strings tr ui.gadgets.worlds variants
 vocabs.parser words ;
 IN: gpu.render
 
-UNION: ?string string POSTPONE: f ;
 UNION: ?integer integer POSTPONE: f ;
-
-TUPLE: vertex-attribute
-    { name            ?string        read-only initial: f }
-    { component-type  component-type read-only initial: float-components }
-    { dim             integer        read-only initial: 4 }
-    { normalize?      boolean        read-only initial: f } ;
 
 VARIANT: uniform-type
     bool-uniform
@@ -111,51 +104,11 @@ VARIANT: primitive-mode
     triangle-strip-mode
     triangle-fan-mode ;
 
-MIXIN: vertex-format
-
 TUPLE: uniform-tuple ;
-
-GENERIC: vertex-format-size ( format -- size )
 
 ERROR: invalid-uniform-type uniform ;
 
 <PRIVATE
-
-: gl-vertex-type ( component-type -- gl-type )
-    {
-        { ubyte-components          [ GL_UNSIGNED_BYTE  ] }
-        { ushort-components         [ GL_UNSIGNED_SHORT ] }
-        { uint-components           [ GL_UNSIGNED_INT   ] }
-        { half-components           [ GL_HALF_FLOAT     ] }
-        { float-components          [ GL_FLOAT          ] }
-        { byte-integer-components   [ GL_BYTE           ] }
-        { short-integer-components  [ GL_SHORT          ] }
-        { int-integer-components    [ GL_INT            ] }
-        { ubyte-integer-components  [ GL_UNSIGNED_BYTE  ] }
-        { ushort-integer-components [ GL_UNSIGNED_SHORT ] }
-        { uint-integer-components   [ GL_UNSIGNED_INT   ] }
-    } case ;
-
-: vertex-type-size ( component-type -- size ) 
-    {
-        { ubyte-components          [ 1 ] }
-        { ushort-components         [ 2 ] }
-        { uint-components           [ 4 ] }
-        { half-components           [ 2 ] }
-        { float-components          [ 4 ] }
-        { byte-integer-components   [ 1 ] }
-        { short-integer-components  [ 2 ] }
-        { int-integer-components    [ 4 ] }
-        { ubyte-integer-components  [ 1 ] }
-        { ushort-integer-components [ 2 ] }
-        { uint-integer-components   [ 4 ] }
-    } case ;
-
-: vertex-attribute-size ( vertex-attribute -- size )
-    [ component-type>> vertex-type-size ] [ dim>> ] bi * ;
-
-: vertex-attributes-size ( vertex-attributes -- size )
-    [ vertex-attribute-size ] [ + ] map-reduce ;
 
 : gl-index-type ( index-type -- gl-index-type )
     {
@@ -209,56 +162,6 @@ M: multi-index-elements render-vertex-indexes
 
 : (bind-texture-unit) ( texture texture-unit -- )
     swap [ GL_TEXTURE0 + glActiveTexture ] [ bind-texture drop ] bi* ; inline
-
-:: [bind-vertex-attribute] ( stride offset vertex-attribute -- stride offset' quot )
-    vertex-attribute name>>                 :> name
-    vertex-attribute component-type>>       :> type
-    type gl-vertex-type                     :> gl-type
-    vertex-attribute dim>>                  :> dim
-    vertex-attribute normalize?>> >c-bool   :> normalize?
-    vertex-attribute vertex-attribute-size  :> size
-
-    stride offset size +
-    {
-        { [ name not ] [ [ 2drop ] ] }
-        {
-            [ type unnormalized-integer-components? ]
-            [
-                {
-                    name attribute-index [ glEnableVertexAttribArray ] keep
-                    dim gl-type stride offset
-                } >quotation :> dip-block
-                
-                { dip-block dip <displaced-alien> glVertexAttribIPointer } >quotation
-            ]
-        }
-        [
-            {
-                name attribute-index [ glEnableVertexAttribArray ] keep
-                dim gl-type normalize? stride offset
-            } >quotation :> dip-block
-
-            { dip-block dip <displaced-alien> glVertexAttribPointer } >quotation
-        ]
-    } cond ;
-
-:: [bind-vertex-format] ( vertex-attributes -- quot )
-    vertex-attributes vertex-attributes-size :> stride
-    stride 0 vertex-attributes [ [bind-vertex-attribute] ] { } map-as 2nip :> attributes-cleave
-    { attributes-cleave 2cleave } >quotation :> with-block
-
-    { drop vertex-buffer with-block with-buffer-ptr } >quotation ; 
-
-GENERIC: bind-vertex-format ( program-instance buffer-ptr format -- )
-
-: define-vertex-format-methods ( class vertex-attributes -- )
-    [
-        [ \ bind-vertex-format create-method-in ] dip
-        [bind-vertex-format] define
-    ] [
-        [ \ vertex-format-size create-method-in ] dip
-        [ \ drop ] dip vertex-attributes-size [ ] 2sequence define
-    ] 2bi ;
 
 GENERIC: bind-uniform-textures ( program-instance uniform-tuple -- )
 GENERIC: bind-uniforms ( program-instance uniform-tuple -- )
@@ -483,39 +386,6 @@ TR: hyphens>underscores "-" "_" ;
         ] }
     } case ;
 
-: component-type>c-type ( component-type -- c-type )
-    {
-        { ubyte-components [ "uchar" ] }
-        { ushort-components [ "ushort" ] }
-        { uint-components [ "uint" ] }
-        { half-components [ "half" ] }
-        { float-components [ "float" ] }
-        { byte-integer-components [ "char" ] }
-        { ubyte-integer-components [ "uchar" ] }
-        { short-integer-components [ "short" ] }
-        { ushort-integer-components [ "ushort" ] }
-        { int-integer-components [ "int" ] }
-        { uint-integer-components [ "uint" ] }
-    } case ;
-
-: c-array-dim ( dim -- string )
-    dup 1 = [ drop "" ] [ number>string "[" "]" surround ] if ;
-
-SYMBOL: padding-no
-padding-no [ 0 ] initialize
-
-: padding-name ( -- name )
-    "padding-"
-    padding-no get number>string append
-    "(" ")" surround
-    padding-no inc ;
-
-: vertex-attribute>c-type ( vertex-attribute -- {type,name} )
-    [
-        [ component-type>> component-type>c-type ]
-        [ dim>> c-array-dim ] bi append
-    ] [ name>> [ padding-name ] unless* ] bi 2array ;
-
 : (define-uniform-tuple) ( class superclass uniforms -- )
     {
         [ [ uniform>slot ] map define-tuple-class ]
@@ -536,54 +406,11 @@ padding-no [ 0 ] initialize
 
 PRIVATE>
 
-: define-vertex-format ( class vertex-attributes -- )
-    [
-        [
-            [ define-singleton-class ]
-            [ vertex-format add-mixin-instance ]
-            [ ] tri
-        ] [ define-vertex-format-methods ] bi*
-    ]
-    [ "vertex-format-attributes" set-word-prop ] 2bi ;
-
-SYNTAX: VERTEX-FORMAT:
-    CREATE-CLASS parse-definition
-    [ first4 vertex-attribute boa ] map
-    define-vertex-format ;
-
-: define-vertex-struct ( struct-name vertex-format -- )
-    [ current-vocab ] dip
-    "vertex-format-attributes" word-prop [ vertex-attribute>c-type ] map
-    define-struct ;
-
-SYNTAX: VERTEX-STRUCT:
-    scan scan-word define-vertex-struct ;
-
 : define-uniform-tuple ( class superclass uniforms -- )
     (define-uniform-tuple) ; inline
 
 SYNTAX: UNIFORM-TUPLE:
     parse-uniform-tuple-definition define-uniform-tuple ;
-
-TUPLE: vertex-array < gpu-object
-    { program-instance program-instance read-only }
-    { vertex-buffers sequence read-only } ;
-
-M: vertex-array dispose
-    [ [ delete-vertex-array ] when* f ] change-handle drop ;
-
-: <vertex-array> ( program-instance vertex-formats -- vertex-array )
-    gen-vertex-array
-    [ glBindVertexArray [ first2 bind-vertex-format ] with each ]
-    [ -rot [ first buffer>> ] map vertex-array boa ] 3bi
-    window-resource ;
-
-: buffer>vertex-array ( vertex-buffer program-instance format -- vertex-array )
-    [ swap ] dip
-    [ 0 <buffer-ptr> ] dip 2array 1array <vertex-array> ; inline
-
-: vertex-array-buffer ( vertex-array -- vertex-buffer )
-    vertex-buffers>> first ;
 
 <PRIVATE 
 
@@ -604,7 +431,33 @@ M: vertex-array dispose
     dup first sequence?
     [ bind-named-output-attachments ] [ [ drop ] 2dip bind-unnamed-output-attachments ] if ;
 
+GENERIC: bind-transform-feedback-output ( output -- )
+
+M: buffer bind-transform-feedback-output
+    [ GL_TRANSFORM_FEEDBACK_BUFFER 0 ] dip handle>> glBindBufferBase ; inline
+
+M: buffer-range bind-transform-feedback-output
+    [ GL_TRANSFORM_FEEDBACK_BUFFER 0 ] dip
+    [ handle>> ] [ offset>> ] [ size>> ] tri glBindBufferRange ; inline
+
+M: buffer-ptr bind-transform-feedback-output
+    buffer-ptr>range bind-transform-feedback-output ; inline
+
+: gl-feedback-primitive-mode ( primitive-mode -- gl-mode )
+    {
+        { points-mode         [ GL_POINTS    ] }
+        { lines-mode          [ GL_LINES     ] }
+        { line-strip-mode     [ GL_LINES     ] }
+        { line-loop-mode      [ GL_LINES     ] }
+        { triangles-mode      [ GL_TRIANGLES ] }
+        { triangle-strip-mode [ GL_TRIANGLES ] }
+        { triangle-fan-mode   [ GL_TRIANGLES ] }
+    } case ;
+
 PRIVATE>
+
+UNION: ?any-framebuffer any-framebuffer POSTPONE: f ;
+UNION: transform-feedback-output buffer buffer-range POSTPONE: f ;
 
 TUPLE: render-set
     { primitive-mode primitive-mode read-only }
@@ -612,8 +465,9 @@ TUPLE: render-set
     { uniforms uniform-tuple read-only }
     { indexes vertex-indexes initial: T{ index-range } read-only } 
     { instances ?integer initial: f read-only }
-    { framebuffer any-framebuffer initial: system-framebuffer read-only }
-    { output-attachments sequence initial: { default-attachment } read-only } ;
+    { framebuffer ?any-framebuffer initial: system-framebuffer read-only }
+    { output-attachments sequence initial: { default-attachment } read-only }
+    { transform-feedback-output transform-feedback-output initial: f read-only } ;
 
 : <render-set> ( x quot-assoc -- render-set )
     render-set swap make-tuple ; inline
@@ -631,7 +485,11 @@ TUPLE: render-set
             [ vertex-array>> program-instance>> ] [ uniforms>> ] bi
             [ bind-uniform-textures ] [ bind-uniforms ] 2bi
         ]
-        [ GL_DRAW_FRAMEBUFFER swap framebuffer>> framebuffer-handle glBindFramebuffer ]
+        [
+            framebuffer>> 
+            [ GL_DRAW_FRAMEBUFFER swap framebuffer-handle glBindFramebuffer ]
+            [ GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer GL_RASTERIZER_DISCARD glEnable ] if*
+        ]
         [
             [ vertex-array>> program-instance>> ]
             [ framebuffer>> ]
@@ -640,9 +498,19 @@ TUPLE: render-set
         ]
         [ vertex-array>> bind-vertex-array ]
         [
+            dup transform-feedback-output>> [
+                [ primitive-mode>> gl-feedback-primitive-mode glBeginTransformFeedback ]
+                [ bind-transform-feedback-output ] bi*
+            ] [ drop ] if*
+        ]
+
+        [
             [ primitive-mode>> ] [ indexes>> ] [ instances>> ] tri
             [ render-vertex-indexes-instanced ]
             [ render-vertex-indexes ] if*
         ]
+
+        [ transform-feedback-output>> [ glEndTransformFeedback ] when ]
+        [ framebuffer>> [ GL_RASTERIZER_DISCARD glDisable ] unless ]
     } cleave ; inline
 
