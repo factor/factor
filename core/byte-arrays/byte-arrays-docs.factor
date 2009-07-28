@@ -23,6 +23,10 @@ $nl
 
 ABOUT: "byte-arrays"
 
+HELP: HEX{
+{ $syntax "HEX{ 0123 45 67 89abcdef }" }
+{ $description "Constructs a " { $link byte-array } " from data specified in hexadecimal format. Whitespace between the curly braces is ignored." } ;
+
 HELP: byte-array
 { $description "The class of byte arrays. See " { $link "syntax-byte-arrays" } " for syntax and " { $link "byte-arrays" } " for general information." } ;
 
