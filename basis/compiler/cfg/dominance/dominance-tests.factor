@@ -33,10 +33,11 @@ V{ } 5 test-bb
 
 [ t ] [ 0 get dom-children 1 get 2 get 4 get 3array set= ] unit-test
 
-[ { 4 } ] [ 1 get dom-frontier [ number>> ] map ] unit-test
-[ { 4 } ] [ 2 get dom-frontier [ number>> ] map ] unit-test
-[ { } ] [ 0 get dom-frontier ] unit-test
-[ { } ] [ 4 get dom-frontier ] unit-test
+[ t ] [ 0 get 3 get dominates? ] unit-test
+[ f ] [ 3 get 4 get dominates? ] unit-test
+[ f ] [ 1 get 4 get dominates? ] unit-test
+[ t ] [ 4 get 5 get dominates? ] unit-test
+[ f ] [ 1 get 5 get dominates? ] unit-test
 
 ! Example from the paper
 V{ } 0 test-bb
@@ -73,25 +74,3 @@ V{ } 5 test-bb
 [ ] [ test-dominance ] unit-test
 
 [ t ] [ 0 5 [a,b] [ get dom-parent 0 get eq? ] all? ] unit-test
-
-V{ } 0 test-bb
-V{ } 1 test-bb
-V{ } 2 test-bb
-V{ } 3 test-bb
-V{ } 4 test-bb
-V{ } 5 test-bb
-V{ } 6 test-bb
-
-0 get 1 get 5 get V{ } 2sequence >>successors drop
-1 get 2 get 3 get V{ } 2sequence >>successors drop
-2 get 4 get 1vector >>successors drop
-3 get 4 get 1vector >>successors drop
-4 get 6 get 1vector >>successors drop
-5 get 6 get 1vector >>successors drop
-
-[ ] [ test-dominance ] unit-test
-
-[ t ] [
-    2 get 3 get 2array iterated-dom-frontier
-    4 get 6 get 2array set=
-] unit-test
