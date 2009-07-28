@@ -9,7 +9,6 @@ compiler.cfg.def-use
 compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
-compiler.cfg.linear-scan.mapping
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
@@ -44,44 +43,25 @@ SYMBOL: register-live-outs
     H{ } clone register-live-outs set
     init-unhandled ;
 
+: insert-spill ( live-interval -- )
+    [ reg>> ] [ vreg>> reg-class>> ] [ spill-to>> ] tri _spill ;
+
 : handle-spill ( live-interval -- )
-    dup spill-to>> [
-        [ reg>> ] [ spill-to>> <spill-slot> ] [ vreg>> reg-class>> ] tri
-        register->memory
-    ] [ drop ] if ;
-
-: first-split ( live-interval -- live-interval' )
-    dup split-before>> [ first-split ] [ ] ?if ;
-
-: next-interval ( live-interval -- live-interval' )
-    split-next>> first-split ;
-
-: handle-copy ( live-interval -- )
-    dup split-next>> [
-        [ reg>> ] [ next-interval reg>> ] [ vreg>> reg-class>> ] tri
-        register->register
-    ] [ drop ] if ;
+    dup spill-to>> [ insert-spill ] [ drop ] if ;
 
 : (expire-old-intervals) ( n heap -- )
     dup heap-empty? [ 2drop ] [
         2dup heap-peek nip <= [ 2drop ] [
-            dup heap-pop drop [ handle-spill ] [ handle-copy ] bi
+            dup heap-pop drop handle-spill
             (expire-old-intervals)
         ] if
     ] if ;
 
 : expire-old-intervals ( n -- )
-    [
-        pending-intervals get (expire-old-intervals)
-    ] { } make mapping-instructions % ;
+    pending-intervals get (expire-old-intervals) ;
 
 : insert-reload ( live-interval -- )
-    {
-        [ reg>> ]
-        [ vreg>> reg-class>> ]
-        [ reload-from>> ]
-        [ start>> ]
-    } cleave f swap \ _reload boa , ;
+    [ reg>> ] [ vreg>> reg-class>> ] [ reload-from>> ] tri _reload ;
 
 : handle-reload ( live-interval -- )
     dup reload-from>> [ insert-reload ] [ drop ] if ;
