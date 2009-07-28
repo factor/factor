@@ -20,13 +20,9 @@ IN: compiler.cfg.value-numbering.rewrite
 
 ! Outputs f to mean no change
 
-GENERIC: rewrite* ( insn -- insn/f )
+GENERIC: rewrite ( insn -- insn/f )
 
-: rewrite ( insn -- insn' )
-    dup [ number-values ] [ rewrite* ] bi
-    [ rewrite ] [ ] ?if ;
-
-M: insn rewrite* drop f ;
+M: insn rewrite drop f ;
 
 : ##branch-t? ( insn -- ? )
     dup ##compare-imm-branch? [
@@ -123,7 +119,7 @@ ERROR: bad-comparison ;
 : fold-compare-imm-branch ( insn -- insn/f )
     (fold-compare-imm) fold-branch ;
 
-M: ##compare-imm-branch rewrite*
+M: ##compare-imm-branch rewrite
     {
         { [ dup rewrite-boolean-comparison? ] [ rewrite-boolean-comparison ] }
         { [ dup rewrite-tagged-comparison? ] [ rewrite-tagged-comparison ] }
@@ -154,7 +150,7 @@ M: ##compare-imm-branch rewrite*
 : rewrite-self-compare-branch ( insn -- insn' )
     (rewrite-self-compare) fold-branch ;
 
-M: ##compare-branch rewrite*
+M: ##compare-branch rewrite
     {
         { [ dup src1>> vreg-small-constant? ] [ t >compare-imm-branch ] }
         { [ dup src2>> vreg-small-constant? ] [ f >compare-imm-branch ] }
@@ -185,7 +181,7 @@ M: ##compare-branch rewrite*
 : rewrite-self-compare ( insn -- insn' )
     dup (rewrite-self-compare) >boolean-insn ;
 
-M: ##compare rewrite*
+M: ##compare rewrite
     {
         { [ dup src1>> vreg-small-constant? ] [ t >compare-imm ] }
         { [ dup src2>> vreg-small-constant? ] [ f >compare-imm ] }
@@ -196,7 +192,7 @@ M: ##compare rewrite*
 : fold-compare-imm ( insn -- insn' )
     dup (fold-compare-imm) >boolean-insn ;
 
-M: ##compare-imm rewrite*
+M: ##compare-imm rewrite
     {
         { [ dup rewrite-redundant-comparison? ] [ rewrite-redundant-comparison ] }
         { [ dup rewrite-tagged-comparison? ] [ rewrite-tagged-comparison ] }
@@ -238,7 +234,7 @@ M: ##shl-imm constant-fold* drop shift ;
     ] dip
     over small-enough? [ new-insn ] [ 2drop 2drop f ] if ; inline
 
-M: ##add-imm rewrite*
+M: ##add-imm rewrite
     {
         { [ dup constant-fold? ] [ constant-fold ] }
         { [ dup reassociate? ] [ \ ##add-imm reassociate ] }
@@ -249,7 +245,7 @@ M: ##add-imm rewrite*
     [ dst>> ] [ src1>> ] [ src2>> neg ] tri dup small-enough?
     [ \ ##add-imm new-insn ] [ 3drop f ] if ;
 
-M: ##sub-imm rewrite*
+M: ##sub-imm rewrite
     {
         { [ dup constant-fold? ] [ constant-fold ] }
         [ sub-imm>add-imm ]
@@ -261,7 +257,7 @@ M: ##sub-imm rewrite*
 : strength-reduce-mul? ( insn -- ? )
     src2>> power-of-2? ;
 
-M: ##mul-imm rewrite*
+M: ##mul-imm rewrite
     {
         { [ dup constant-fold? ] [ constant-fold ] }
         { [ dup strength-reduce-mul? ] [ strength-reduce-mul ] }
@@ -269,40 +265,40 @@ M: ##mul-imm rewrite*
         [ drop f ]
     } cond ;
 
-M: ##and-imm rewrite*
+M: ##and-imm rewrite
     {
         { [ dup constant-fold? ] [ constant-fold ] }
         { [ dup reassociate? ] [ \ ##and-imm reassociate ] }
         [ drop f ]
     } cond ;
 
-M: ##or-imm rewrite*
+M: ##or-imm rewrite
     {
         { [ dup constant-fold? ] [ constant-fold ] }
         { [ dup reassociate? ] [ \ ##or-imm reassociate ] }
         [ drop f ]
     } cond ;
 
-M: ##xor-imm rewrite*
+M: ##xor-imm rewrite
     {
         { [ dup constant-fold? ] [ constant-fold ] }
         { [ dup reassociate? ] [ \ ##xor-imm reassociate ] }
         [ drop f ]
     } cond ;
 
-M: ##shl-imm rewrite*
+M: ##shl-imm rewrite
     {
         { [ dup constant-fold? ] [ constant-fold ] }
         [ drop f ]
     } cond ;
 
-M: ##shr-imm rewrite*
+M: ##shr-imm rewrite
     {
         { [ dup constant-fold? ] [ constant-fold ] }
         [ drop f ]
     } cond ;
 
-M: ##sar-imm rewrite*
+M: ##sar-imm rewrite
     {
         { [ dup constant-fold? ] [ constant-fold ] }
         [ drop f ]
@@ -327,7 +323,7 @@ M: ##sar-imm rewrite*
         [ 2drop f ]
     } cond ; inline
 
-M: ##add rewrite* \ ##add-imm rewrite-arithmetic-commutative ;
+M: ##add rewrite \ ##add-imm rewrite-arithmetic-commutative ;
 
 : subtraction-identity? ( insn -- ? )
     [ src1>> ] [ src2>> ] bi [ vreg>vn ] bi@ eq?  ;
@@ -335,22 +331,22 @@ M: ##add rewrite* \ ##add-imm rewrite-arithmetic-commutative ;
 : rewrite-subtraction-identity ( insn -- insn' )
     dst>> 0 \ ##load-immediate new-insn ;
 
-M: ##sub rewrite*
+M: ##sub rewrite
     {
         { [ dup subtraction-identity? ] [ rewrite-subtraction-identity ] }
         [ \ ##sub-imm rewrite-arithmetic ]
     } cond ;
 
-M: ##mul rewrite* \ ##mul-imm rewrite-arithmetic-commutative ;
+M: ##mul rewrite \ ##mul-imm rewrite-arithmetic-commutative ;
 
-M: ##and rewrite* \ ##and-imm rewrite-arithmetic-commutative ;
+M: ##and rewrite \ ##and-imm rewrite-arithmetic-commutative ;
 
-M: ##or rewrite* \ ##or-imm rewrite-arithmetic-commutative ;
+M: ##or rewrite \ ##or-imm rewrite-arithmetic-commutative ;
 
-M: ##xor rewrite* \ ##xor-imm rewrite-arithmetic-commutative ;
+M: ##xor rewrite \ ##xor-imm rewrite-arithmetic-commutative ;
 
-M: ##shl rewrite* \ ##shl-imm rewrite-arithmetic ;
+M: ##shl rewrite \ ##shl-imm rewrite-arithmetic ;
 
-M: ##shr rewrite* \ ##shr-imm rewrite-arithmetic ;
+M: ##shr rewrite \ ##shr-imm rewrite-arithmetic ;
 
-M: ##sar rewrite* \ ##sar-imm rewrite-arithmetic ;
+M: ##sar rewrite \ ##sar-imm rewrite-arithmetic ;

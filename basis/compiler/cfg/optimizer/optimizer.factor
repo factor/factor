@@ -2,17 +2,19 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors combinators namespaces
 compiler.cfg.tco
-compiler.cfg.predecessors
 compiler.cfg.useless-conditionals
-compiler.cfg.stack-analysis
 compiler.cfg.branch-splitting
 compiler.cfg.block-joining
+compiler.cfg.ssa.construction
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
+compiler.cfg.copy-prop
 compiler.cfg.dce
 compiler.cfg.write-barrier
+compiler.cfg.ssa.destruction
+compiler.cfg.empty-blocks
+compiler.cfg.predecessors
 compiler.cfg.rpo
-compiler.cfg.phi-elimination
 compiler.cfg.checker ;
 IN: compiler.cfg.optimizer
 
@@ -33,12 +35,14 @@ SYMBOL: check-optimizer?
         split-branches
         join-blocks
         compute-predecessors
-        stack-analysis
+        construct-ssa
         alias-analysis
         value-numbering
         compute-predecessors
+        copy-propagation
         eliminate-dead-code
         eliminate-write-barriers
-        eliminate-phis
+        destruct-ssa
+        delete-empty-blocks
         ?check
     ] with-scope ;

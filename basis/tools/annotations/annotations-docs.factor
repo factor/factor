@@ -60,3 +60,6 @@ HELP: reset-word-timing
 
 HELP: word-timing.
 { $description "Prints the word timing table." } ;
+
+HELP: cannot-annotate-twice
+{ $error-description "Thrown when attempting to annotate a word that's already been annotated. If a word already has an annotation such as a watch or a breakpoint, you must first " { $link reset } " the word before adding another annotation." } ;
