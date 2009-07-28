@@ -3,7 +3,7 @@ USING: compiler.cfg.value-numbering compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
 cpu.architecture tools.test kernel math combinators.short-circuit
 accessors sequences compiler.cfg.predecessors locals
-compiler.cfg.dce compiler.cfg.coalescing
+compiler.cfg.dce compiler.cfg.ssa.destruction
 compiler.cfg assocs vectors arrays layouts namespaces ;
 
 : trim-temps ( insns -- insns )

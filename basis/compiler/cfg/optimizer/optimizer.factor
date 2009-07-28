@@ -5,13 +5,13 @@ compiler.cfg.tco
 compiler.cfg.useless-conditionals
 compiler.cfg.branch-splitting
 compiler.cfg.block-joining
-compiler.cfg.ssa
+compiler.cfg.ssa.construction
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.copy-prop
 compiler.cfg.dce
 compiler.cfg.write-barrier
-compiler.cfg.coalescing
+compiler.cfg.ssa.destruction
 compiler.cfg.empty-blocks
 compiler.cfg.predecessors
 compiler.cfg.rpo
