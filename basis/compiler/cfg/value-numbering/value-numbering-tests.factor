@@ -1191,7 +1191,7 @@ test-diamond
     cfg new 0 get >>entry
     value-numbering
     compute-predecessors
-    coalesce drop
+    destruct-ssa drop
 ] unit-test
 
 [ 1 ] [ 1 get successors>> length ] unit-test
