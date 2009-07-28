@@ -1,59 +1,104 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences make compiler.cfg.instructions
+USING: accessors kernel sequences make combinators
+compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.rpo cpu.architecture ;
 IN: compiler.cfg.two-operand
 
-! On x86, instructions take the form x = x op y
-! Our SSA IR is x = y op z
+! This pass runs after SSA coalescing and normalizes instructions
+! to fit the x86 two-address scheme. Possibilities are:
+
+! 1) x = x op y
+! 2) x = y op x
+! 3) x = y op z
+
+! In case 1, there is nothing to do.
+
+! In case 2, we convert to
+! z = y
+! z = z op x
+! x = z
+
+! In case 3, we convert to
+! x = y
+! x = x op z
+
+! In case 2 and case 3, linear scan coalescing will eliminate a
+! copy if the value y is never used again.
 
 ! We don't bother with ##add, ##add-imm, ##sub-imm or ##mul-imm
 ! since x86 has LEA and IMUL instructions which are effectively
 ! three-operand addition and multiplication, respectively.
 
-: convert-two-operand/integer ( insn -- )
-    [ [ dst>> ] [ src1>> ] bi ##copy ]
-    [ dup dst>> >>src1 , ]
-    bi ; inline
-
-: convert-two-operand/float ( insn -- )
-    [ [ dst>> ] [ src1>> ] bi ##copy-float ]
-    [ dup dst>> >>src1 , ]
-    bi ; inline
+UNION: two-operand-insn
+    ##sub
+    ##mul
+    ##and
+    ##and-imm
+    ##or
+    ##or-imm
+    ##xor
+    ##xor-imm
+    ##shl
+    ##shl-imm
+    ##shr
+    ##shr-imm
+    ##sar
+    ##sar-imm
+    ##fixnum-overflow
+    ##add-float
+    ##sub-float
+    ##mul-float
+    ##div-float ;
 
 GENERIC: convert-two-operand* ( insn -- )
 
+: emit-copy ( dst src -- )
+    dup reg-class>> {
+        { int-regs [ ##copy ] }
+        { double-float-regs [ ##copy-float ] }
+    } case ; inline
+
+: case-1? ( insn -- ? ) [ dst>> ] [ src1>> ] bi = ; inline
+
+: case-1 ( insn -- ) , ; inline
+
+: case-2? ( insn -- ? ) [ dst>> ] [ src2>> ] bi = ; inline
+
+ERROR: bad-case-2 insn ;
+
+: case-2 ( insn -- )
+    ! This can't work with a ##fixnum-overflow since it branches
+    dup ##fixnum-overflow? [ bad-case-2 ] when
+    dup dst>> reg-class>> next-vreg
+    [ swap src1>> emit-copy ]
+    [ [ >>src1 ] [ >>dst ] bi , ]
+    [ [ src2>> ] dip emit-copy ]
+    2tri ; inline
+
+: case-3 ( insn -- )
+    [ [ dst>> ] [ src1>> ] bi emit-copy ]
+    [ dup dst>> >>src1 , ]
+    bi ; inline
+
+M: two-operand-insn convert-two-operand*
+    {
+        { [ dup case-1? ] [ case-1 ] }
+        { [ dup case-2? ] [ case-2 ] }
+        [ case-3 ]
+    } cond ; inline
+
 M: ##not convert-two-operand*
-    [ [ dst>> ] [ src>> ] bi ##copy ]
-    [ dup dst>> >>src , ]
-    bi ;
-
-M: ##sub convert-two-operand* convert-two-operand/integer ;
-M: ##mul convert-two-operand* convert-two-operand/integer ;
-M: ##and convert-two-operand* convert-two-operand/integer ;
-M: ##and-imm convert-two-operand* convert-two-operand/integer ;
-M: ##or convert-two-operand* convert-two-operand/integer ;
-M: ##or-imm convert-two-operand* convert-two-operand/integer ;
-M: ##xor convert-two-operand* convert-two-operand/integer ;
-M: ##xor-imm convert-two-operand* convert-two-operand/integer ;
-M: ##shl convert-two-operand* convert-two-operand/integer ;
-M: ##shl-imm convert-two-operand* convert-two-operand/integer ;
-M: ##shr convert-two-operand* convert-two-operand/integer ;
-M: ##shr-imm convert-two-operand* convert-two-operand/integer ;
-M: ##sar convert-two-operand* convert-two-operand/integer ;
-M: ##sar-imm convert-two-operand* convert-two-operand/integer ;
-
-M: ##fixnum-overflow convert-two-operand* convert-two-operand/integer ;
-
-M: ##add-float convert-two-operand* convert-two-operand/float ;
-M: ##sub-float convert-two-operand* convert-two-operand/float ;
-M: ##mul-float convert-two-operand* convert-two-operand/float ;
-M: ##div-float convert-two-operand* convert-two-operand/float ;
+    dup [ dst>> ] [ src>> ] bi = [
+        [ [ dst>> ] [ src>> ] bi ##copy ]
+        [ dup dst>> >>src ]
+        bi
+    ] unless , ;
 
 M: insn convert-two-operand* , ;
 
+: (convert-two-operand) ( cfg -- cfg' )
+    [ [ convert-two-operand* ] each ] V{ } make ;
+
 : convert-two-operand ( cfg -- cfg' )
-    two-operand? [
-        [ [ [ convert-two-operand* ] each ] V{ } make ]
-        local-optimization
-    ] when ;
+    two-operand? [ [ (convert-two-operand) ] local-optimization ] when ;
