@@ -1,4 +1,4 @@
-USING: alien.syntax combinators layouts vocabs.loader ;
+USING: alien.syntax alien.c-types combinators layouts vocabs.loader ;
 IN: unix.types
 
 ! NetBSD 4.0
@@ -16,6 +16,8 @@ TYPEDEF: __uint32_t     blksize_t
 TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
 TYPEDEF: int            time_t
+
+ALIAS: <time_t> <int>
 
 cell-bits {
     { 32 [ "unix.types.netbsd.32" require ] }

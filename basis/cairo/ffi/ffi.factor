@@ -896,7 +896,7 @@ FUNCTION: cairo_status_t
 cairo_pattern_get_rgba ( cairo_pattern_t* pattern, double* red, double* green, double* blue, double* alpha ) ;
 
 FUNCTION: cairo_status_t
-cairo_pattern_get_surface ( cairo_pattern_t* pattern, cairo_surface_t* *surface ) ;
+cairo_pattern_get_surface ( cairo_pattern_t* pattern, cairo_surface_t** surface ) ;
 
 FUNCTION: cairo_status_t
 cairo_pattern_get_color_stop_rgba ( cairo_pattern_t* pattern, int index, double* offset, double* red, double* green, double* blue, double* alpha ) ;
