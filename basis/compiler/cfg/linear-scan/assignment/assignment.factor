@@ -86,7 +86,9 @@ GENERIC: assign-registers-in-insn ( insn -- )
     [ [ vreg>> ] [ reg>> ] bi ] H{ } map>assoc ;
 
 : all-vregs ( insn -- vregs )
-    [ defs-vregs ] [ temp-vregs ] [ uses-vregs ] tri 3append ;
+    [ [ temp-vregs ] [ uses-vregs ] bi append ]
+    [ defs-vreg ] bi
+    [ suffix ] when* ;
 
 SYMBOL: check-assignment?
 

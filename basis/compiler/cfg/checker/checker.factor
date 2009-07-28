@@ -59,7 +59,7 @@ ERROR: undefined-values uses defs ;
     ! Check that every used register has a definition
     instructions>>
     [ [ uses-vregs ] map concat ]
-    [ [ [ defs-vregs ] [ temp-vregs ] bi append ] map concat ] bi
+    [ [ [ temp-vregs ] [ defs-vreg ] bi [ suffix ] when* ] map concat ] bi
     2dup subset? [ 2drop ] [ undefined-values ] if ;
 
 : check-cfg ( cfg -- )
