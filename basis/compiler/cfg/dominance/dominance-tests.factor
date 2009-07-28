@@ -7,6 +7,7 @@ compiler.cfg.predecessors ;
     cfg new 0 get >>entry
     compute-predecessors
     dup compute-dominance
+    dup compute-dom-frontiers
     compute-dfs ;
 
 ! Example with no back edges

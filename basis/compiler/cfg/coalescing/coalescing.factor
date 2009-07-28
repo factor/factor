@@ -54,6 +54,6 @@ SYMBOL: seen
     dup compute-dfs
     dup process-blocks
     break-interferences
-    insert-copies
     dup perform-renaming
+    insert-copies
     dup remove-phis ;
