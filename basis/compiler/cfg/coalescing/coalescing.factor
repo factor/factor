@@ -7,10 +7,12 @@ compiler.cfg.def-use
 compiler.cfg.utilities
 compiler.cfg.dominance
 compiler.cfg.instructions
+compiler.cfg.critical-edges
 compiler.cfg.coalescing.state
 compiler.cfg.coalescing.forest
 compiler.cfg.coalescing.copies
 compiler.cfg.coalescing.renaming
+compiler.cfg.coalescing.live-ranges
 compiler.cfg.coalescing.process-blocks ;
 IN: compiler.cfg.coalescing
 
@@ -49,9 +51,11 @@ SYMBOL: seen
 
 : coalesce ( cfg -- cfg' )
     init-coalescing
+    dup split-critical-edges
     dup compute-def-use
     dup compute-dominance
     dup compute-dfs
+    dup compute-live-ranges
     dup process-blocks
     break-interferences
     dup perform-renaming
