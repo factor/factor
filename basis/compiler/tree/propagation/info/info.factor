@@ -3,7 +3,7 @@
 USING: assocs classes classes.algebra classes.tuple
 classes.tuple.private kernel accessors math math.intervals
 namespaces sequences words combinators byte-arrays strings
-arrays compiler.tree.propagation.copy ;
+arrays layouts cpu.architecture compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;
@@ -305,4 +305,19 @@ SYMBOL: value-infos
     dup word>> \ <tuple-boa> eq? [
         dup in-d>> last node-value-info
         literal>> first immutable-tuple-class?
+    ] [ drop f ] if ;
+
+: value-info-small-fixnum? ( value-info -- ? )
+    literal>> {
+        { [ dup fixnum? ] [ tag-fixnum small-enough? ] }
+        [ drop f ]
+    } cond ;
+
+: value-info-small-tagged? ( value-info -- ? )
+    dup literal?>> [
+        literal>> {
+            { [ dup fixnum? ] [ tag-fixnum small-enough? ] }
+            { [ dup not ] [ drop t ] }
+            [ drop f ]
+        } cond
     ] [ drop f ] if ;

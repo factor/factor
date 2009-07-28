@@ -56,7 +56,7 @@ HOOK: param-reg-2 cpu ( -- reg )
 
 HOOK: pic-tail-reg cpu ( -- reg )
 
-M: x86 %load-immediate MOV ;
+M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
 
 M: x86 %load-reference swap 0 MOV rc-absolute-cell rel-immediate ;
 
@@ -108,10 +108,10 @@ M: x86 %slot-imm ( dst obj slot tag -- ) (%slot-imm) MOV ;
 M: x86 %set-slot ( src obj slot tag temp -- ) (%slot) swap MOV ;
 M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
 
-M: x86 %add     [+] LEA ;
-M: x86 %add-imm [+] LEA ;
+M: x86 %add     2over eq? [ nip ADD ] [ [+] LEA ] if ;
+M: x86 %add-imm 2over eq? [ nip ADD ] [ [+] LEA ] if ;
 M: x86 %sub     nip SUB ;
-M: x86 %sub-imm neg [+] LEA ;
+M: x86 %sub-imm 2over eq? [ nip SUB ] [ neg [+] LEA ] if ;
 M: x86 %mul     nip swap IMUL2 ;
 M: x86 %mul-imm IMUL3 ;
 M: x86 %and     nip AND ;
