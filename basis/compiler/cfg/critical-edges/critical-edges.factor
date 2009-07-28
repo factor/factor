@@ -11,9 +11,11 @@ IN: compiler.cfg.critical-edges
     f <simple-block> insert-basic-block ;
 
 : split-critical-edges ( cfg -- )
-    [
+    dup [
         dup successors>> [
             2dup critical-edge?
             [ split-critical-edge ] [ 2drop ] if
         ] with each
-    ] each-basic-block ;
+    ] each-basic-block
+    cfg-changed
+    drop ;
