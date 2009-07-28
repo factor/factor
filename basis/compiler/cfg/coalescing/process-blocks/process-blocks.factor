@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel locals math math.order arrays
-namespaces sequences sorting sets combinators combinators.short-circuit
-dlists deques make
+namespaces sequences sorting sets combinators combinators.short-circuit make
 compiler.cfg.def-use
 compiler.cfg.instructions
 compiler.cfg.liveness
@@ -61,8 +60,6 @@ SYMBOLS: phi-union unioned-blocks ;
         [ add-to-renaming-set ]
     } cond ;
 
-SYMBOLS: visited work-list ;
-
 : node-is-live-in-of-child? ( node child -- ? )
     [ vreg>> ] [ bb>> live-in ] bi* key? ;
 
@@ -86,52 +83,31 @@ SYMBOLS: visited work-list ;
 : add-interference ( ##phi node child -- )
     [ vreg>> ] bi@ 2array , drop ;
 
-: add-to-work-list ( child -- inserted? )
-    dup visited get key? [ drop f ] [ work-list get push-back t ] if ;
-
-: process-df-child ( ##phi node child -- inserted? )
-    [
-        {
-            { [ 2dup node-is-live-out-of-child? ] [ insert-copies-for-parent ] }
-            { [ 2dup node-is-live-in-of-child? ] [ add-interference ] }
-            { [ 2dup defined-in-same-block? ] [ add-interference ] }
-            [ 3drop ]
-        } cond
-    ]
-    [ add-to-work-list ]
-    bi ;
+: process-df-child ( ##phi node child -- )
+    {
+        { [ 2dup node-is-live-out-of-child? ] [ insert-copies-for-parent ] }
+        { [ 2dup node-is-live-in-of-child? ] [ add-interference ] }
+        { [ 2dup defined-in-same-block? ] [ add-interference ] }
+        [ 3drop ]
+    } cond ;
 
 : process-df-node ( ##phi node -- )
-    dup visited get conjoin
-    dup children>> [ process-df-child ] with with map
-    [ ] any? [ work-list get pop-back* ] unless ;
-
-: process-df-nodes ( ##phi work-list -- )
-    dup deque-empty? [ 2drop ] [
-        [ peek-back process-df-node ]
-        [ process-df-nodes ]
-        2bi
-    ] if ;
+    dup children>>
+    [ [ process-df-child ] with with each ]
+    [ nip [ process-df-node ] with each ]
+    3bi ;
 
 : process-phi-union ( ##phi dom-forest -- )
-    H{ } clone visited set
-    <dlist> [ push-all-front ] keep
-    [ work-list set ] [ process-df-nodes ] bi ;
+    [ process-df-node ] with each ;
 
-:: add-local-interferences ( bb ##phi -- )
-    ! bb contains the phi node. If the input is defined in the same
-    ! block as the phi node, we have to check for interference.
-    ! This can only happen if the value is carried by a back edge.
-    phi-union get [
-        drop dup def-of bb eq?
-        [ ##phi dst>> 2array , ] [ drop ] if
-    ] assoc-each ;
+: add-local-interferences ( ##phi -- )
+    [ phi-union get ] dip dst>> '[ drop _ 2array , ] assoc-each ;
 
-: compute-local-interferences ( bb ##phi -- pairs )
+: compute-local-interferences ( ##phi -- pairs )
     [
-        [ phi-union get keys compute-dom-forest process-phi-union drop ]
+        [ phi-union get keys compute-dom-forest process-phi-union ]
         [ add-local-interferences ]
-        2bi
+        bi
     ] { } make ;
 
 :: insert-copies-for-interference ( ##phi src -- )
@@ -146,16 +122,17 @@ SYMBOLS: visited work-list ;
     ] with each ;
 
 : add-renaming-set ( ##phi -- )
-    dst>> phi-union get swap renaming-sets get set-at
+    [ phi-union get ] dip dst>> renaming-sets get set-at
     phi-union get [ drop processed-name ] assoc-each ;
 
-:: process-phi ( bb ##phi -- )
+: process-phi ( ##phi -- )
     H{ } clone phi-union set
     H{ } clone unioned-blocks set
-    ##phi inputs>> ##phi dst>> '[ _ process-phi-operand ] assoc-each
-    ##phi bb ##phi compute-local-interferences process-local-interferences
-    ##phi add-renaming-set ;
+    [ [ inputs>> ] [ dst>> ] bi '[ _ process-phi-operand ] assoc-each ]
+    [ dup compute-local-interferences process-local-interferences ]
+    [ add-renaming-set ]
+    tri ;
 
 : process-block ( bb -- )
-    dup instructions>>
-    [ dup ##phi? [ process-phi t ] [ 2drop f ] if ] with all? drop ;
+    instructions>>
+    [ dup ##phi? [ process-phi t ] [ drop f ] if ] all? drop ;
