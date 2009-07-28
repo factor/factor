@@ -151,7 +151,7 @@ M: cube-map-face     texture-data-gl-target
 
 : get-texture-float ( target level enum -- value )
     0 <float> [ glGetTexLevelParameterfv ] keep *float ;
-: get-texture-int ( texture level enum -- value )
+: get-texture-int ( target level enum -- value )
     0 <int> [ glGetTexLevelParameteriv ] keep *int ;
 
 : ?product ( x -- y )
