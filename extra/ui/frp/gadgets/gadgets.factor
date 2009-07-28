@@ -19,9 +19,10 @@ M: frp-table row-columns quot>> [ call( a -- b ) ] [ drop f ] if* ;
 M: frp-table row-value val-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 M: frp-table row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 
-: <frp-table> ( model -- table ) f frp-table new-table dup >>renderer
+: new-frp-table ( model class -- table ) f swap new-table dup >>renderer
    V{ } clone <basic> >>selected-values V{ } clone <basic> >>selected-indices*
    f <basic> >>actions dup [ actions>> set-model ] curry >>action ;
+: <frp-table> ( model -- table ) frp-table new-frp-table ;
 : <frp-table*> ( -- table ) V{ } clone <model> <frp-table> ;
 : <frp-list> ( column-model -- table ) <frp-table> [ 1array ] >>quot ;
 : <frp-list*> ( -- table ) V{ } clone <model> <frp-list> ;
@@ -52,11 +53,10 @@ M: frp-field model-changed 2dup frp-model>> =
 : <frp-action-field> ( -- field ) f <action-field> dup [ set-control-value ] curry >>quot
     f <model> >>model ;
 
-: image-prep ( -- quot ) scan current-vocab name>> "vocab:" "/icons/" surround ".tiff" surround [ <image-name> ] [ load-image ] [ ] tri
-    [ \ cached-image "memoize" word-prop set-at ] 3curry ;
-SYNTAX: IMG-FRP-BTN: image-prep [ <frp-button> ] append over push-all ;
+: image-prep ( -- image ) scan current-vocab name>> "vocab:" "/icons/" surround ".tiff" surround <image-name> dup cached-image drop ;
+SYNTAX: IMG-FRP-BTN: image-prep [ <frp-button> ] curry over push-all ;
 
-SYNTAX: IMG-BTN: image-prep [ swap <button> ] append over push-all ;
+SYNTAX: IMG-BTN: image-prep [ swap <button> ] curry over push-all ;
 
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
