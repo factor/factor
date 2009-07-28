@@ -334,3 +334,15 @@ cell 4 = [
     ] any? ; inline recursive
 
 [ t ] [ 3 [ return-recursive-bug ] compile-call ] unit-test
+
+! Coalescing reductions
+[ f ] [ V{ } 0 [ [ vector? ] both? ] compile-call ] unit-test
+[ f ] [ 0 V{ } [ [ vector? ] both? ] compile-call ] unit-test
+
+[ f ] [
+    f vector [
+        [ dup [ \ vector eq? ] [ drop f ] if ] dip
+        dup [ \ vector eq? ] [ drop f ] if
+        over rot [ drop ] [ nip ] if
+    ] compile-call
+] unit-test

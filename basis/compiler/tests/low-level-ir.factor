@@ -111,6 +111,13 @@ IN: compiler.tests
     } compile-test-bb
 ] unit-test
 
+[ 1 ] [
+    V{
+        T{ ##load-immediate f V int-regs 0 16 }
+        T{ ##add-imm f V int-regs 0 V int-regs 0 -8 }
+    } compile-test-bb
+] unit-test
+
 ! These are def-is-use-insns
 USE: multiline
 
