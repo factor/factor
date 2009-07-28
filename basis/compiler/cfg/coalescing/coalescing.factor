@@ -7,6 +7,7 @@ compiler.cfg.def-use
 compiler.cfg.utilities
 compiler.cfg.dominance
 compiler.cfg.instructions
+compiler.cfg.liveness.ssa
 compiler.cfg.critical-edges
 compiler.cfg.coalescing.state
 compiler.cfg.coalescing.forest
@@ -36,10 +37,7 @@ SYMBOL: seen
     V{ } clone seen set
     renaming-sets get [| dst assoc |
         assoc [| src bb |
-            src seen get key?
-            [ dst assoc src bb visit-renaming ]
-            [ src seen get conjoin ]
-            if
+            dst assoc src bb visit-renaming
         ] assoc-each
     ] assoc-each ;
 
@@ -50,14 +48,17 @@ SYMBOL: seen
     [ [ remove-phis-from-block ] if-has-phis ] each-basic-block ;
 
 : coalesce ( cfg -- cfg' )
-    init-coalescing
-    dup split-critical-edges
-    dup compute-def-use
-    dup compute-dominance
-    dup compute-dfs
-    dup compute-live-ranges
-    dup process-blocks
-    break-interferences
-    dup perform-renaming
-    insert-copies
-    dup remove-phis ;
+    dup cfg-has-phis? [
+        init-coalescing
+        compute-ssa-live-sets
+        dup split-critical-edges
+        dup compute-def-use
+        dup compute-dominance
+        dup compute-dfs
+        dup compute-live-ranges
+        dup process-blocks
+        break-interferences
+        dup perform-renaming
+        insert-copies
+        dup remove-phis
+    ] when ;
