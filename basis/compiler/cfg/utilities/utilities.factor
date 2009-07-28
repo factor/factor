@@ -49,7 +49,7 @@ SYMBOL: visited
 : has-phis? ( bb -- ? )
     instructions>> first ##phi? ;
 
-: cfg-has-phis? ( cfg -- )
+: cfg-has-phis? ( cfg -- ? )
     post-order [ has-phis? ] any? ;
 
 : if-has-phis ( bb quot: ( bb -- ) -- )
