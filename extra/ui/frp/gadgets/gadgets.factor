@@ -1,6 +1,6 @@
-USING: accessors arrays kernel models monads sequences
+USING: accessors assocs arrays kernel models monads sequences
 ui.frp.signals ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.buttons.private ui.gadgets.editors
+ui.gadgets.buttons.private ui.gadgets.editors words images.loader
 ui.gadgets.scrollers ui.gadgets.tables ui.images vocabs.parser lexer ;
 IN: ui.frp.gadgets
 
@@ -52,10 +52,11 @@ M: frp-field model-changed 2dup frp-model>> =
 : <frp-action-field> ( -- field ) f <action-field> dup [ set-control-value ] curry >>quot
     f <model> >>model ;
 
-: image-prep ( -- image ) scan current-vocab name>> "vocab:" "/icons/" surround ".tiff" surround <image-name> ;
-SYNTAX: IMG-FRP-BTN: image-prep [ <frp-button> ] curry over push-all ;
+: image-prep ( -- quot ) scan current-vocab name>> "vocab:" "/icons/" surround ".tiff" surround [ <image-name> ] [ load-image ] [ ] tri
+    [ \ cached-image "memoize" word-prop set-at ] 3curry ;
+SYNTAX: IMG-FRP-BTN: image-prep [ <frp-button> ] append over push-all ;
 
-SYNTAX: IMG-BTN: image-prep [ swap <button> ] curry over push-all ;
+SYNTAX: IMG-BTN: image-prep [ swap <button> ] append over push-all ;
 
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
@@ -76,3 +77,5 @@ INSTANCE: gadget monad
 M: gadget monad-of drop gadget-monad ;
 M: gadget-monad return drop <gadget> swap >>model ;
 M: gadget >>= output-model [ swap call( x -- y ) ] curry ; 
+
+! Make sure prop removal really destroys normal db code

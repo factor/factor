@@ -21,8 +21,8 @@ TUPLE: placeholder < gadget members ;
 ! Just take the previous mentioned placeholder and use it
 ! If there is no previously mentioned placeholder, we're probably making a box, and will create the placeholder ourselves
 DEFER: with-interface
-: insertion-quot ( quot -- quot' ) make:building get [ placeholder? ] find-last nip [ <placeholder> dup , ] unless*
-    swap '[ [ _ , @ ] with-interface ] ;
+: insertion-quot ( quot -- quot' ) make:building get [ [ placeholder? ] find-last nip [ <placeholder> dup , ] unless*
+    swap '[ [ _ , @ ] with-interface ] ] when* ;
 
 SYNTAX: ,% scan string>number [ <layout> , ] curry over push-all ;
 SYNTAX: ->% scan string>number '[ [ _ <layout> , ] [ output-model ] bi ] over push-all ;
@@ -72,3 +72,6 @@ M: model (insert-item) parent>> dup book? [ "No models in books" throw ]
 : with-interface ( quot -- ) make* [ insert-items ] with-scope ; inline
 
 M: model >>= [ swap insertion-quot <action> ] curry ;
+M: model fmap insertion-quot <mapped> ;
+M: model $> insertion-quot side-effect-model new-mapped-model ;
+M: model <$ insertion-quot quot-model new-mapped-model ;

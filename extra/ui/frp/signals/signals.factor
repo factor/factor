@@ -71,11 +71,8 @@ M: mapped-model (model-changed)
 TUPLE: side-effect-model < mapped-model ;
 M: side-effect-model (model-changed) [ value>> ] dip [ quot>> call( old -- ) ] 2keep set-model ;
 
-: $> ( model quot -- signal ) side-effect-model new-mapped-model ;
-
 TUPLE: quot-model < mapped-model ;
 M: quot-model (model-changed) nip [ quot>> call( -- b ) ] keep set-model ;
-M: model <$ quot-model new-mapped-model ;
 
 TUPLE: action-value < basic-model parent ;
 : <action-value> ( parent value -- model ) action-value new-model swap >>parent ;
@@ -105,5 +102,4 @@ M: (frp-when) (model-changed) [ quot>> ] 2keep
 : with-self ( quot: ( model -- model ) -- model ) [ f <basic> dup ] dip call swap [ add-dependency ] keep ; inline
 
 USE: ui.frp.signals.templates
-M: model fmap <mapped> ;
 << { "$>" "<$" "fmap" } [ fmaps ] each >>

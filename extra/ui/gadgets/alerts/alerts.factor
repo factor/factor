@@ -1,4 +1,4 @@
-USING: accessors models macros generalizations kernel
+USING: accessors models monads macros generalizations kernel
 ui ui.frp.gadgets ui.frp.signals ui.frp.layout ui.gadgets
 ui.gadgets.labels ui.gadgets.editors ui.gadgets.buttons
 ui.gadgets.packs locals sequences fonts io.styles
