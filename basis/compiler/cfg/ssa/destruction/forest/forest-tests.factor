@@ -31,8 +31,7 @@ V{ T{ ##peek f V int-regs 6 D 0 } } clone 6 test-bb
     cfg new 0 get >>entry
     compute-predecessors
     dup compute-dominance
-    dup compute-def-use
-    compute-dfs
+    compute-def-use
     compute-dom-forest
     clean-up-forest ;
 
