@@ -1,8 +1,15 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel kernel.private alien.accessors sequences
-sequences.private math ;
+USING: accessors alien.accessors ascii grouping kernel
+kernel.private lexer math math.parser parser sequences
+sequences.private ;
 IN: byte-arrays
+
+SYNTAX: HEX{
+    "}" parse-tokens "" join
+    [ blank? not ] filter
+    2 group [ hex> ] B{ } map-as
+    parsed ;
 
 M: byte-array clone (clone) ;
 M: byte-array length length>> ;
