@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Maxim Savchenko, Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: byte-arrays.hex
 USING: byte-arrays help.markup help.syntax ;
 
