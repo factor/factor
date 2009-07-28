@@ -1,9 +1,9 @@
 USING: accessors compiler.cfg compiler.cfg.debugger
 compiler.cfg.dominance compiler.cfg.instructions
-compiler.cfg.predecessors compiler.cfg.ssa assocs
+compiler.cfg.predecessors compiler.cfg.ssa.construction assocs
 compiler.cfg.registers cpu.architecture kernel namespaces sequences
 tools.test vectors ;
-IN: compiler.cfg.ssa.tests
+IN: compiler.cfg.ssa.construction.tests
 
 : reset-counters ( -- )
     ! Reset counters so that results are deterministic w.r.t. hash order

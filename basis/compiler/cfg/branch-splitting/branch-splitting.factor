@@ -6,18 +6,8 @@ compiler.cfg.def-use compiler.cfg compiler.cfg.rpo
 compiler.cfg.renaming compiler.cfg.instructions compiler.cfg.utilities ;
 IN: compiler.cfg.branch-splitting
 
-: clone-renamings ( insns -- assoc )
-    [ defs-vregs ] map concat [ dup fresh-vreg ] H{ } map>assoc ;
-
 : clone-instructions ( insns -- insns' )
-    dup clone-renamings renamings [
-        [
-            clone
-            dup rename-insn-defs
-            dup rename-insn-uses
-            dup fresh-insn-temps
-        ] map
-    ] with-variable ;
+    [ clone dup fresh-insn-temps ] map ;
 
 : clone-basic-block ( bb -- bb' )
     ! The new block gets the same RPO number as the old one.
@@ -62,17 +52,32 @@ IN: compiler.cfg.branch-splitting
 
 UNION: irrelevant ##peek ##replace ##inc-d ##inc-r ;
 
-: split-instructions? ( insns -- ? )
-    [ [ irrelevant? not ] count 5 <= ]
-    [ last ##fixnum-overflow? not ]
-    bi and ;
+: split-instructions? ( insns -- ? ) [ irrelevant? not ] count 5 <= ;
+
+: short-tail-block? ( bb -- ? )
+    [ successors>> empty? ] [ instructions>> length 2 = ] bi and ;
+
+: short-block? ( bb -- ? )
+    ! If block is empty, always split
+    [ predecessors>> length ] [ instructions>> length 1 - ] bi * 10 <= ;
+
+: cond-cond-block? ( bb -- ? )
+    {
+        [ predecessors>> length 2 = ]
+        [ successors>> length 2 = ]
+        [ instructions>> length 20 <= ]
+    } 1&& ;
 
 : split-branch? ( bb -- ? )
-    {
-        [ dup successors>> [ back-edge? ] with any? not ]
-        [ predecessors>> length 2 4 between? ]
-        [ instructions>> split-instructions? ]
-    } 1&& ;
+    dup loop-entry? [ drop f ] [
+        dup predecessors>> length 1 <= [ drop f ] [
+            {
+                [ short-block? ]
+                [ short-tail-block? ]
+                [ cond-cond-block? ]
+            } 1||
+        ] if
+    ] if ;
 
 : split-branches ( cfg -- cfg' )
     dup [

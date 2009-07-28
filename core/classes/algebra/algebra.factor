@@ -106,7 +106,7 @@ PREDICATE: empty-union < anonymous-union members>> empty? ;
 
 PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
-: (class<=) ( first second -- -1/0/1 )
+: (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [
         2dup superclass<= [ 2drop t ] [
             [ normalize-class ] bi@ {

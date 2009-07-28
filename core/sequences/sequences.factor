@@ -633,6 +633,8 @@ PRIVATE>
 
 : last ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
 
+: set-last ( elt seq -- ) [ length 1 - ] keep set-nth ;
+
 : pop* ( seq -- ) [ length 1 - ] [ shorten ] bi ;
 
 <PRIVATE
