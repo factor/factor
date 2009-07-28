@@ -1,17 +1,17 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel locals math math.order
-sequences namespaces sets make
+sequences namespaces sets
 compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.utilities
 compiler.cfg.dominance
 compiler.cfg.instructions
 compiler.cfg.liveness.ssa
-compiler.cfg.parallel-copy
 compiler.cfg.critical-edges
 compiler.cfg.coalescing.state
 compiler.cfg.coalescing.forest
+compiler.cfg.coalescing.copies
 compiler.cfg.coalescing.renaming
 compiler.cfg.coalescing.live-ranges
 compiler.cfg.coalescing.process-blocks ;
@@ -29,7 +29,7 @@ SYMBOL: seen
 
 :: visit-renaming ( dst assoc src bb -- )
     src seen get key? [
-        dst src bb waiting-for set-at
+        src dst bb waiting-for push-at
         src assoc delete-at
     ] [ src seen get conjoin ] if ;
 
@@ -39,15 +39,6 @@ SYMBOL: seen
         assoc [| src bb |
             dst assoc src bb visit-renaming
         ] assoc-each
-    ] assoc-each ;
-
-: insert-copies ( -- )
-    waiting get [
-        [ instructions>> building ] dip '[
-            building get pop
-            _ parallel-copy
-            ,
-        ] with-variable
     ] assoc-each ;
 
 : remove-phis-from-block ( bb -- )

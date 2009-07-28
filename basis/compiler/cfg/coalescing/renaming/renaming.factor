@@ -37,7 +37,7 @@ IN: compiler.cfg.coalescing.renaming
 : rename-copies ( -- )
     waiting renamings get '[
         [
-            [ [ _ ?at drop ] bi@ ] assoc-map
+            [ _ [ ?at drop ] [ '[ _ ?at drop ] map ] bi-curry bi* ] assoc-map
         ] assoc-map
     ] change ;
 
