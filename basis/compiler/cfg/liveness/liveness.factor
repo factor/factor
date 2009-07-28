@@ -12,11 +12,14 @@ BACKWARD-ANALYSIS: live
 
 GENERIC: insn-liveness ( live-set insn -- )
 
+: kill-defs ( live-set insn -- live-set )
+    defs-vregs [ over delete-at ] each ;
+
+: gen-uses ( live-set insn -- live-set )
+    dup ##phi? [ drop ] [ uses-vregs [ over conjoin ] each ] if ;
+
 : transfer-liveness ( live-set instructions -- live-set' )
-    [ clone ] [ <reversed> ] bi* [
-        [ dup ##phi? [ drop ] [ uses-vregs [ over conjoin ] each ] if ]
-        [ defs-vregs [ over delete-at ] each ] bi
-    ] each ;
+    [ clone ] [ <reversed> ] bi* [ [ kill-defs ] [ gen-uses ] bi ] each ;
 
 : local-live-in ( instructions -- live-set )
     [ H{ } ] dip transfer-liveness keys ;
