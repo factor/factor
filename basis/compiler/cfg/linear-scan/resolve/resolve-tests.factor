@@ -47,12 +47,19 @@ H{ { int-regs 10 } { float-regs 20 } } clone spill-counts set
 H{ } clone spill-temps set
 
 [
-    {
-        T{ _spill { src 0 } { class int-regs } { n 10 } }
-        T{ _copy { dst 0 } { src 1 } { class int-regs } }
-        T{ _reload { dst 1 } { class int-regs } { n 10 } }
-    }
+    t
 ] [
     { { { 0 int-regs } { 1 int-regs } } { { 1 int-regs } { 0 int-regs } } }
-    mapping-instructions
+    mapping-instructions {
+        {
+            T{ _spill { src 0 } { class int-regs } { n 10 } }
+            T{ _copy { dst 0 } { src 1 } { class int-regs } }
+            T{ _reload { dst 1 } { class int-regs } { n 10 } }
+        }
+        {
+            T{ _spill { src 1 } { class int-regs } { n 10 } }
+            T{ _copy { dst 1 } { src 0 } { class int-regs } }
+            T{ _reload { dst 0 } { class int-regs } { n 10 } }
+        }
+    } member?
 ] unit-test
