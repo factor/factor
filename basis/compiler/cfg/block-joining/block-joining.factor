@@ -8,9 +8,6 @@ IN: compiler.cfg.block-joining
 ! Joining blocks that are not calls and are connected by a single CFG edge.
 ! Predecessors must be recomputed after this. Also this pass does not
 ! update ##phi nodes and should therefore only run before stack analysis.
-: predecessor ( bb -- pred )
-    predecessors>> first ; inline
-
 : join-block? ( bb -- ? )
     {
         [ kill-block? not ]
