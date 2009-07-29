@@ -6,7 +6,7 @@ compiler.constants combinators compiler.cfg.registers
 compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.instructions
 
-: new-insn ( ... class -- insn ) [ f f ] dip boa ; inline
+: new-insn ( ... class -- insn ) f swap boa ; inline
 
 ! Virtual CPU instructions, used by CFG and machine IRs
 TUPLE: insn ;

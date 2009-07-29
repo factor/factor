@@ -42,34 +42,31 @@ M: ##branch linearize-insn
     [ drop dup successors>> second useless-branch? ] 2bi
     [ [ swap block-number ] 3dip ] [ [ block-number ] 3dip negate-cc ] if ;
 
-: with-regs ( insn quot -- )
-    over regs>> [ call ] dip building get last (>>regs) ; inline
-
 M: ##compare-branch linearize-insn
-    [ binary-conditional _compare-branch ] with-regs emit-branch ;
+    binary-conditional _compare-branch emit-branch ;
 
 M: ##compare-imm-branch linearize-insn
-    [ binary-conditional _compare-imm-branch ] with-regs emit-branch ;
+    binary-conditional _compare-imm-branch emit-branch ;
 
 M: ##compare-float-branch linearize-insn
-    [ binary-conditional _compare-float-branch ] with-regs emit-branch ;
+    binary-conditional _compare-float-branch emit-branch ;
 
 : overflow-conditional ( bb insn -- bb successor label2 dst src1 src2 )
     [ dup successors block-number ]
     [ [ dst>> ] [ src1>> ] [ src2>> ] tri ] bi* ; inline
 
 M: ##fixnum-add linearize-insn
-    [ overflow-conditional _fixnum-add ] with-regs emit-branch ;
+    overflow-conditional _fixnum-add emit-branch ;
 
 M: ##fixnum-sub linearize-insn
-    [ overflow-conditional _fixnum-sub ] with-regs emit-branch ;
+    overflow-conditional _fixnum-sub emit-branch ;
 
 M: ##fixnum-mul linearize-insn
-    [ overflow-conditional _fixnum-mul ] with-regs emit-branch ;
+    overflow-conditional _fixnum-mul emit-branch ;
 
 M: ##dispatch linearize-insn
     swap
-    [ [ [ src>> ] [ temp>> ] bi _dispatch ] with-regs ]
+    [ [ src>> ] [ temp>> ] bi _dispatch ]
     [ successors>> [ block-number _dispatch-label ] each ]
     bi* ;
 
@@ -101,18 +98,16 @@ M: ##dispatch linearize-insn
 
 M: ##gc linearize-insn
     nip
+    [ temp1>> ]
+    [ temp2>> ]
     [
-        [ temp1>> ]
-        [ temp2>> ]
-        [
-            live-values>>
-            [ compute-gc-roots ]
-            [ count-gc-roots ]
-            [ gc-roots-size ]
-            tri
-        ] tri
-        _gc
-    ] with-regs ;
+        live-values>>
+        [ compute-gc-roots ]
+        [ count-gc-roots ]
+        [ gc-roots-size ]
+        tri
+    ] tri
+    _gc ;
 
 : linearize-basic-blocks ( cfg -- insns )
     [
