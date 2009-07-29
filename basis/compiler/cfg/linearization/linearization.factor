@@ -3,34 +3,30 @@
 USING: kernel math accessors sequences namespaces make
 combinators assocs arrays locals cpu.architecture
 compiler.cfg
-compiler.cfg.rpo
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.cfg.instructions
-compiler.cfg.utilities ;
+compiler.cfg.utilities
+compiler.cfg.linearization.order ;
 IN: compiler.cfg.linearization
 
 ! Convert CFG IR to machine IR.
 GENERIC: linearize-insn ( basic-block insn -- )
 
 : linearize-basic-block ( bb -- )
-    [ number>> _label ]
+    [ block-number _label ]
     [ dup instructions>> [ linearize-insn ] with each ]
     bi ;
 
 M: insn linearize-insn , drop ;
 
 : useless-branch? ( basic-block successor -- ? )
-    #! If our successor immediately follows us in RPO, then we
-    #! don't need to branch.
-    [ number>> ] bi@ 1 - = ; inline
-
-: emit-loop-entry? ( bb successor -- ? )
-    [ back-edge? not ] [ nip loop-entry? ] 2bi and ;
+    ! If our successor immediately follows us in linearization
+    ! order then we don't need to branch.
+    [ block-number ] bi@ 1 - = ; inline
 
 : emit-branch ( bb successor -- )
-    2dup emit-loop-entry? [ _loop-entry ] when
-    2dup useless-branch? [ 2drop ] [ nip number>> _branch ] if ;
+    2dup useless-branch? [ 2drop ] [ nip block-number _branch ] if ;
 
 M: ##branch linearize-insn
     drop dup successors>> first emit-branch ;
@@ -44,37 +40,34 @@ M: ##branch linearize-insn
 : binary-conditional ( bb insn -- bb successor label2 src1 src2 cc )
     [ (binary-conditional) ]
     [ drop dup successors>> second useless-branch? ] 2bi
-    [ [ swap number>> ] 3dip ] [ [ number>> ] 3dip negate-cc ] if ;
-
-: with-regs ( insn quot -- )
-    over regs>> [ call ] dip building get last (>>regs) ; inline
+    [ [ swap block-number ] 3dip ] [ [ block-number ] 3dip negate-cc ] if ;
 
 M: ##compare-branch linearize-insn
-    [ binary-conditional _compare-branch ] with-regs emit-branch ;
+    binary-conditional _compare-branch emit-branch ;
 
 M: ##compare-imm-branch linearize-insn
-    [ binary-conditional _compare-imm-branch ] with-regs emit-branch ;
+    binary-conditional _compare-imm-branch emit-branch ;
 
 M: ##compare-float-branch linearize-insn
-    [ binary-conditional _compare-float-branch ] with-regs emit-branch ;
+    binary-conditional _compare-float-branch emit-branch ;
 
 : overflow-conditional ( bb insn -- bb successor label2 dst src1 src2 )
-    [ dup successors number>> ]
+    [ dup successors block-number ]
     [ [ dst>> ] [ src1>> ] [ src2>> ] tri ] bi* ; inline
 
 M: ##fixnum-add linearize-insn
-    [ overflow-conditional _fixnum-add ] with-regs emit-branch ;
+    overflow-conditional _fixnum-add emit-branch ;
 
 M: ##fixnum-sub linearize-insn
-    [ overflow-conditional _fixnum-sub ] with-regs emit-branch ;
+    overflow-conditional _fixnum-sub emit-branch ;
 
 M: ##fixnum-mul linearize-insn
-    [ overflow-conditional _fixnum-mul ] with-regs emit-branch ;
+    overflow-conditional _fixnum-mul emit-branch ;
 
 M: ##dispatch linearize-insn
     swap
-    [ [ [ src>> ] [ temp>> ] bi _dispatch ] with-regs ]
-    [ successors>> [ number>> _dispatch-label ] each ]
+    [ [ src>> ] [ temp>> ] bi _dispatch ]
+    [ successors>> [ block-number _dispatch-label ] each ]
     bi* ;
 
 : (compute-gc-roots) ( n live-values -- n )
@@ -105,22 +98,20 @@ M: ##dispatch linearize-insn
 
 M: ##gc linearize-insn
     nip
+    [ temp1>> ]
+    [ temp2>> ]
     [
-        [ temp1>> ]
-        [ temp2>> ]
-        [
-            live-values>>
-            [ compute-gc-roots ]
-            [ count-gc-roots ]
-            [ gc-roots-size ]
-            tri
-        ] tri
-        _gc
-    ] with-regs ;
+        live-values>>
+        [ compute-gc-roots ]
+        [ count-gc-roots ]
+        [ gc-roots-size ]
+        tri
+    ] tri
+    _gc ;
 
 : linearize-basic-blocks ( cfg -- insns )
     [
-        [ [ linearize-basic-block ] each-basic-block ]
+        [ linearization-order [ linearize-basic-block ] each ]
         [ spill-counts>> _spill-counts ]
         bi
     ] { } make ;
