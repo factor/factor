@@ -57,3 +57,7 @@ SYMBOL: visited
 
 : if-has-phis ( bb quot: ( bb -- ) -- )
     [ dup has-phis? ] dip [ drop ] if ; inline
+
+: predecessor ( bb -- pred )
+    predecessors>> first ; inline
+
