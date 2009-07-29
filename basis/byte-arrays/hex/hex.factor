@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Joe Groff.
+! Copyright (C) 2009 Maxim Savchenko, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: grouping lexer ascii parser sequences kernel math.parser ;
 IN: byte-arrays.hex
