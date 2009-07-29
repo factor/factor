@@ -4,10 +4,11 @@ USING: functors assocs kernel accessors compiler.cfg.instructions
 lexer parser ;
 IN: compiler.cfg.renaming.functor
 
-FUNCTOR: define-renaming ( NAME DEF-QUOT USE-QUOT -- )
+FUNCTOR: define-renaming ( NAME DEF-QUOT USE-QUOT TEMP-QUOT -- )
 
 rename-insn-defs DEFINES ${NAME}-insn-defs
 rename-insn-uses DEFINES ${NAME}-insn-uses
+rename-insn-temps DEFINES ${NAME}-insn-temps
 
 WHERE
 
@@ -111,6 +112,53 @@ M: ##phi rename-insn-uses
 
 M: insn rename-insn-uses drop ;
 
+GENERIC: rename-insn-temps ( insn -- )
+
+M: ##write-barrier rename-insn-temps
+    TEMP-QUOT change-card#
+    TEMP-QUOT change-table
+    drop ;
+
+M: ##unary/temp rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: ##allot rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: ##dispatch rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: ##slot rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: ##set-slot rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: ##string-nth rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: ##set-string-nth-fast rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: ##compare rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: ##compare-imm rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: ##compare-float rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: ##gc rename-insn-temps
+    TEMP-QUOT change-temp1
+    TEMP-QUOT change-temp2
+    drop ;
+
+M: _dispatch rename-insn-temps
+    TEMP-QUOT change-temp drop ;
+
+M: insn rename-insn-temps drop ;
+
 ;FUNCTOR
 
-SYNTAX: RENAMING: scan scan-object scan-object define-renaming ;
+SYNTAX: RENAMING: scan scan-object scan-object scan-object define-renaming ;
