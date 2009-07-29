@@ -9,6 +9,7 @@ compiler.cfg.def-use
 compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
+compiler.cfg.renaming.functor
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
@@ -16,10 +17,16 @@ IN: compiler.cfg.linear-scan.assignment
 
 ! This contains both active and inactive intervals; any interval
 ! such that start <= insn# <= end is in this set.
-SYMBOL: pending-intervals
+SYMBOL: pending-interval-heap
+SYMBOL: pending-interval-assoc
 
-: add-active ( live-interval -- )
-    dup end>> pending-intervals get heap-push ;
+: add-pending ( live-interval -- )
+    [ dup end>> pending-interval-heap get heap-push ]
+    [ [ reg>> ] [ vreg>> ] bi pending-interval-assoc get set-at ]
+    bi ;
+
+: remove-pending ( live-interval -- )
+    vreg>> pending-interval-assoc get delete-at ;
 
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
@@ -37,7 +44,8 @@ SYMBOL: register-live-ins
 SYMBOL: register-live-outs
 
 : init-assignment ( live-intervals -- )
-    <min-heap> pending-intervals set
+    <min-heap> pending-interval-heap set
+    H{ } clone pending-interval-assoc set
     <min-heap> unhandled-intervals set
     H{ } clone register-live-ins set
     H{ } clone register-live-outs set
@@ -49,16 +57,19 @@ SYMBOL: register-live-outs
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
 
+: expire-interval ( live-interval -- )
+    [ remove-pending ] [ handle-spill ] bi ;
+
 : (expire-old-intervals) ( n heap -- )
     dup heap-empty? [ 2drop ] [
         2dup heap-peek nip <= [ 2drop ] [
-            dup heap-pop drop handle-spill
+            dup heap-pop drop expire-interval
             (expire-old-intervals)
         ] if
     ] if ;
 
 : expire-old-intervals ( n -- )
-    pending-intervals get (expire-old-intervals) ;
+    pending-interval-heap get (expire-old-intervals) ;
 
 : insert-reload ( live-interval -- )
     [ reg>> ] [ vreg>> reg-class>> ] [ reload-from>> ] tri _reload ;
@@ -66,45 +77,31 @@ SYMBOL: register-live-outs
 : handle-reload ( live-interval -- )
     dup reload-from>> [ insert-reload ] [ drop ] if ;
 
-: activate-new-intervals ( n -- )
-    #! Any live intervals which start on the current instruction
-    #! are added to the active set.
-    unhandled-intervals get dup heap-empty? [ 2drop ] [
-        2dup heap-peek drop start>> = [
-            heap-pop drop
-            [ add-active ] [ handle-reload ] bi
-            activate-new-intervals
+: activate-interval ( live-interval -- )
+    [ add-pending ] [ handle-reload ] bi ;
+
+: (activate-new-intervals) ( n heap -- )
+    dup heap-empty? [ 2drop ] [
+        2dup heap-peek nip = [
+            dup heap-pop drop activate-interval
+            (activate-new-intervals)
         ] [ 2drop ] if
     ] if ;
+
+: activate-new-intervals ( n -- )
+    unhandled-intervals get (activate-new-intervals) ;
 
 : prepare-insn ( n -- )
     [ expire-old-intervals ] [ activate-new-intervals ] bi ;
 
 GENERIC: assign-registers-in-insn ( insn -- )
 
-: register-mapping ( live-intervals -- alist )
-    [ [ vreg>> ] [ reg>> ] bi ] H{ } map>assoc ;
+: vreg>reg ( vreg -- reg ) pending-interval-assoc get at ;
 
-: all-vregs ( insn -- vregs )
-    [ [ temp-vregs ] [ uses-vregs ] bi append ]
-    [ defs-vreg ] bi
-    [ suffix ] when* ;
-
-SYMBOL: check-assignment?
-
-ERROR: overlapping-registers intervals ;
-
-: check-assignment ( intervals -- )
-    dup [ copy-from>> ] map sift '[ vreg>> _ member? not ] filter
-    dup [ reg>> ] map all-unique? [ drop ] [ overlapping-registers ] if ;
-
-: active-intervals ( n -- intervals )
-    pending-intervals get heap-values [ covers? ] with filter
-    check-assignment? get [ dup check-assignment ] when ;
+RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 
 M: vreg-insn assign-registers-in-insn
-    dup [ all-vregs ] [ insn#>> active-intervals register-mapping ] bi
-    extract-keys >>regs drop ;
+    [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
 M: ##gc assign-registers-in-insn
     ! This works because ##gc is always the first instruction
@@ -115,33 +112,22 @@ M: ##gc assign-registers-in-insn
 
 M: insn assign-registers-in-insn drop ;
 
-: compute-live-spill-slots ( vregs -- assoc )
-    spill-slots get '[ _ at dup [ <spill-slot> ] when ] assoc-map ;
-
-: compute-live-registers ( n -- assoc )
-    active-intervals register-mapping ;
-
-ERROR: bad-live-values live-values ;
-
-: check-live-values ( assoc -- assoc )
-    check-assignment? get [
-        dup values [ not ] any? [ bad-live-values ] when
-    ] when ;
-
-: compute-live-values ( vregs n -- assoc )
+: compute-live-values ( vregs -- assoc )
     ! If a live vreg is not in active or inactive, then it must have been
     ! spilled.
-    [ compute-live-spill-slots ] [ compute-live-registers ] bi*
-    assoc-union check-live-values ;
+    dup assoc-empty? [
+        pending-interval-assoc get
+        '[ _ ?at [ ] [ spill-slots get at <spill-slot> ] if ] assoc-map
+    ] unless ;
 
 : begin-block ( bb -- )
     dup basic-block set
     dup block-from activate-new-intervals
-    [ [ live-in ] [ block-from ] bi compute-live-values ] keep
+    [ live-in compute-live-values ] keep
     register-live-ins get set-at ;
 
 : end-block ( bb -- )
-    [ [ live-out ] [ block-to ] bi compute-live-values ] keep
+    [ live-out compute-live-values ] keep
     register-live-outs get set-at ;
 
 ERROR: bad-vreg vreg ;
