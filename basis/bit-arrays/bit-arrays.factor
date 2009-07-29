@@ -27,6 +27,18 @@ TUPLE: bit-array
     [ [ length bits>cells ] keep ] dip swap underlying>>
     '[ 2 shift [ _ _ ] dip set-alien-unsigned-4 ] each ; inline
 
+: clean-up ( bit-array -- )
+    ! Zero bits after the end.
+    dup underlying>> empty? [ drop ] [
+        [
+            [ underlying>> length 8 * ] [ length ] bi -
+            8 swap - -1 swap shift bitnot
+        ]
+        [ underlying>> last bitand ]
+        [ underlying>> set-last ]
+        tri
+    ] if ; inline
+
 PRIVATE>
 
 : <bit-array> ( n -- bit-array )
@@ -68,7 +80,8 @@ M: bit-array resize
         [ bits>bytes ] [ underlying>> ] bi*
         resize-byte-array
     ] 2bi
-    bit-array boa ;
+    bit-array boa
+    dup clean-up ;
 
 M: bit-array byte-length length 7 + -3 shift ;
 

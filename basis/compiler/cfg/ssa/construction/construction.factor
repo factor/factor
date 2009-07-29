@@ -84,7 +84,7 @@ SYMBOLS: stacks pushed ;
 : top-name ( vreg -- vreg' )
     stacks get at last ;
 
-RENAMING: ssa-rename [ gen-name ] [ top-name ]
+RENAMING: ssa-rename [ gen-name ] [ top-name ] [ ]
 
 GENERIC: rename-insn ( insn -- )
 
