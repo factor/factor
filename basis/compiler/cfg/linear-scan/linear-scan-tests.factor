@@ -21,10 +21,7 @@ compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.debugger ;
 
-FROM: compiler.cfg.linear-scan.assignment => check-assignment? ;
-
 check-allocation? on
-check-assignment? on
 check-numbering? on
 
 [
