@@ -9,6 +9,7 @@ compiler.cfg.def-use
 compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
+compiler.cfg.renaming.functor
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
@@ -95,13 +96,12 @@ SYMBOL: register-live-outs
 
 GENERIC: assign-registers-in-insn ( insn -- )
 
-: all-vregs ( insn -- vregs )
-    [ [ temp-vregs ] [ uses-vregs ] bi append ]
-    [ defs-vreg ] bi
-    [ suffix ] when* ;
+: vreg>reg ( vreg -- reg ) pending-interval-assoc get at ;
+
+RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 
 M: vreg-insn assign-registers-in-insn
-    dup all-vregs pending-interval-assoc get extract-keys >>regs drop ;
+    [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
 M: ##gc assign-registers-in-insn
     ! This works because ##gc is always the first instruction
