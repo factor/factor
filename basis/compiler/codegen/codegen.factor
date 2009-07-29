@@ -24,14 +24,6 @@ H{ } clone insn-counts set-global
 
 GENERIC: generate-insn ( insn -- )
 
-SYMBOL: registers
-
-: register ( vreg -- operand )
-    registers get at [ "Bad value" throw ] unless* ;
-
-: ?register ( obj -- operand )
-    dup vreg? [ register ] when ;
-
 TUPLE: asm label code calls ;
 
 SYMBOL: calls
@@ -60,9 +52,8 @@ SYMBOL: labels
             instructions>>
             [
                 [ class insn-counts get inc-at ]
-                [ regs>> registers set ]
                 [ generate-insn ]
-                tri
+                bi
             ] each
         ] bi
     ] with-fixup ;
@@ -79,16 +70,16 @@ SYMBOL: labels
 M: ##no-tco generate-insn drop ;
 
 M: ##load-immediate generate-insn
-    [ dst>> register ] [ val>> ] bi %load-immediate ;
+    [ dst>> ] [ val>> ] bi %load-immediate ;
 
 M: ##load-reference generate-insn
-    [ dst>> register ] [ obj>> ] bi %load-reference ;
+    [ dst>> ] [ obj>> ] bi %load-reference ;
 
 M: ##peek generate-insn
-    [ dst>> register ] [ loc>> ] bi %peek ;
+    [ dst>> ] [ loc>> ] bi %peek ;
 
 M: ##replace generate-insn
-    [ src>> register ] [ loc>> ] bi %replace ;
+    [ src>> ] [ loc>> ] bi %replace ;
 
 M: ##inc-d generate-insn n>> %inc-d ;
 
@@ -103,7 +94,7 @@ M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 M: ##return generate-insn drop %return ;
 
 M: _dispatch generate-insn
-    [ src>> register ] [ temp>> register ] bi %dispatch ;
+    [ src>> ] [ temp>> ] bi %dispatch ;
 
 M: _dispatch-label generate-insn
     label>> lookup-label
@@ -111,56 +102,34 @@ M: _dispatch-label generate-insn
     rc-absolute-cell label-fixup ;
 
 : >slot< ( insn -- dst obj slot tag )
-    {
-        [ dst>> register ]
-        [ obj>> register ]
-        [ slot>> ?register ]
-        [ tag>> ]
-    } cleave ; inline
+    { [ dst>> ] [ obj>> ] [ slot>> ] [ tag>> ] } cleave ; inline
 
 M: ##slot generate-insn
-    [ >slot< ] [ temp>> register ] bi %slot ;
+    [ >slot< ] [ temp>> ] bi %slot ;
 
 M: ##slot-imm generate-insn
     >slot< %slot-imm ;
 
 : >set-slot< ( insn -- src obj slot tag )
-    {
-        [ src>> register ]
-        [ obj>> register ]
-        [ slot>> ?register ]
-        [ tag>> ]
-    } cleave ; inline
+    { [ src>> ] [ obj>> ] [ slot>> ] [ tag>> ] } cleave ; inline
 
 M: ##set-slot generate-insn
-    [ >set-slot< ] [ temp>> register ] bi %set-slot ;
+    [ >set-slot< ] [ temp>> ] bi %set-slot ;
 
 M: ##set-slot-imm generate-insn
     >set-slot< %set-slot-imm ;
 
 M: ##string-nth generate-insn
-    {
-        [ dst>> register ]
-        [ obj>> register ]
-        [ index>> register ]
-        [ temp>> register ]
-    } cleave %string-nth ;
+    { [ dst>> ] [ obj>> ] [ index>> ] [ temp>> ] } cleave %string-nth ;
 
 M: ##set-string-nth-fast generate-insn
-    {
-        [ src>> register ]
-        [ obj>> register ]
-        [ index>> register ]
-        [ temp>> register ]
-    } cleave %set-string-nth-fast ;
+    { [ src>> ] [ obj>> ] [ index>> ] [ temp>> ] } cleave %set-string-nth-fast ;
 
 : dst/src ( insn -- dst src )
-    [ dst>> register ] [ src>> register ] bi ; inline
+    [ dst>> ] [ src>> ] bi ; inline
 
 : dst/src1/src2 ( insn -- dst src1 src2 )
-    [ dst>> register ]
-    [ src1>> register ]
-    [ src2>> ?register ] tri ; inline
+    [ dst>> ] [ src1>> ] [ src2>> ] tri ; inline
 
 M: ##add     generate-insn dst/src1/src2 %add     ;
 M: ##add-imm generate-insn dst/src1/src2 %add-imm ;
@@ -191,7 +160,7 @@ M: _fixnum-sub generate-insn label/dst/src1/src2 %fixnum-sub ;
 M: _fixnum-mul generate-insn label/dst/src1/src2 %fixnum-mul ;
 
 : dst/src/temp ( insn -- dst src temp )
-    [ dst/src ] [ temp>> register ] bi ; inline
+    [ dst/src ] [ temp>> ] bi ; inline
 
 M: ##integer>bignum generate-insn dst/src/temp %integer>bignum ;
 M: ##bignum>integer generate-insn dst/src/temp %bignum>integer ;
@@ -222,7 +191,7 @@ M: ##alien-float      generate-insn dst/src %alien-float      ;
 M: ##alien-double     generate-insn dst/src %alien-double     ;
 
 : >alien-setter< ( insn -- src value )
-    [ src>> register ] [ value>> register ] bi ; inline
+    [ src>> ] [ value>> ] bi ; inline
 
 M: ##set-alien-integer-1 generate-insn >alien-setter< %set-alien-integer-1 ;
 M: ##set-alien-integer-2 generate-insn >alien-setter< %set-alien-integer-2 ;
@@ -233,23 +202,23 @@ M: ##set-alien-double    generate-insn >alien-setter< %set-alien-double    ;
 
 M: ##allot generate-insn
     {
-        [ dst>> register ]
+        [ dst>> ]
         [ size>> ]
         [ class>> ]
-        [ temp>> register ]
+        [ temp>> ]
     } cleave
     %allot ;
 
 M: ##write-barrier generate-insn
-    [ src>> register ]
-    [ card#>> register ]
-    [ table>> register ]
+    [ src>> ]
+    [ card#>> ]
+    [ table>> ]
     tri %write-barrier ;
 
 M: _gc generate-insn
     {
-        [ temp1>> register ]
-        [ temp2>> register ]
+        [ temp1>> ]
+        [ temp2>> ]
         [ gc-roots>> ]
         [ gc-root-count>> ]
     } cleave %gc ;
@@ -257,7 +226,7 @@ M: _gc generate-insn
 M: _loop-entry generate-insn drop %loop-entry ;
 
 M: ##alien-global generate-insn
-    [ dst>> register ] [ symbol>> ] [ library>> ] tri
+    [ dst>> ] [ symbol>> ] [ library>> ] tri
     %alien-global ;
 
 ! ##alien-invoke
@@ -370,7 +339,7 @@ M: long-long-type flatten-value-type ( type -- types )
 
 : objects>registers ( params -- )
     #! Generate code for unboxing a list of C types, then
-    #! generate code for moving these parameters to register on
+    #! generate code for moving these parameters to registers on
     #! architectures where parameters are passed in registers.
     [
         [ prepare-box-struct ] keep
@@ -499,11 +468,11 @@ M: _branch generate-insn
 
 : >compare< ( insn -- dst temp cc src1 src2 )
     {
-        [ dst>> register ]
-        [ temp>> register ]
+        [ dst>> ]
+        [ temp>> ]
         [ cc>> ]
-        [ src1>> register ]
-        [ src2>> ?register ]
+        [ src1>> ]
+        [ src2>> ]
     } cleave ; inline
 
 M: ##compare generate-insn >compare< %compare ;
@@ -514,8 +483,8 @@ M: ##compare-float generate-insn >compare< %compare-float ;
     {
         [ label>> lookup-label ]
         [ cc>> ]
-        [ src1>> register ]
-        [ src2>> ?register ]
+        [ src1>> ]
+        [ src2>> ]
     } cleave ; inline
 
 M: _compare-branch generate-insn
