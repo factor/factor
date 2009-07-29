@@ -7,11 +7,12 @@ compiler.cfg.renaming compiler.cfg.instructions compiler.cfg.utilities ;
 IN: compiler.cfg.branch-splitting
 
 : clone-instructions ( insns -- insns' )
-    [ clone dup fresh-insn-temps ] map ;
+    [ clone dup rename-insn-temps ] map ;
 
 : clone-basic-block ( bb -- bb' )
-    ! The new block gets the same RPO number as the old one.
-    ! This is just to make 'back-edge?' work.
+    ! The new block temporarily gets the same RPO number as the old one,
+    ! until the next time RPO is computed. This is just to make
+    ! 'back-edge?' work.
     <basic-block>
         swap
         [ instructions>> clone-instructions >>instructions ]
