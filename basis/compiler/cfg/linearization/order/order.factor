@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs deques dlists kernel make
 namespaces sequences combinators combinators.short-circuit
-fry math sets compiler.cfg.utilities ;
+fry math sets compiler.cfg.rpo compiler.cfg.utilities ;
 IN: compiler.cfg.linearization.order
 
 ! This is RPO except loops are rotated. Based on SBCL's src/compiler/control.lisp
@@ -60,11 +60,14 @@ SYMBOLS: work-list loop-heads visited numbers next-number ;
 PRIVATE>
 
 : linearization-order ( cfg -- bbs )
+    ! We call 'post-order drop' to ensure blocks receive their
+    ! RPO numbers.
     <dlist> work-list set
     H{ } clone visited set
     H{ } clone numbers set
     0 next-number set
-    entry>> add-to-work-list
+    [ post-order drop ]
+    [ entry>> add-to-work-list ] bi
     [ work-list get [ process-block ] slurp-deque ] { } make ;
 
 : block-number ( bb -- n ) numbers get at ;
