@@ -22,11 +22,11 @@ IN: compiler.tests.low-level-ir
         T{ ##inc-d f 1 }
         T{ ##replace f V int-regs 0 D 0 }
         T{ ##branch }
-    } append 1 test-bb
+    } [ clone ] map append 1 test-bb
     V{
         T{ ##epilogue }
         T{ ##return }
-    } 2 test-bb
+    } [ clone ] map 2 test-bb
     0 get 1 get 1vector >>successors drop
     1 get 2 get 1vector >>successors drop
     compile-test-cfg
