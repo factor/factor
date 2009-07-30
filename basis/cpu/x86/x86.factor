@@ -264,18 +264,13 @@ M:: x86 %box-alien ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
-HOOK: small-regs cpu ( -- regs )
+HOOK: small-reg? cpu ( reg -- regs )
 
-M: x86.32 small-regs { EAX ECX EDX EBX } ;
-M: x86.64 small-regs { RAX RCX RDX RBX } ;
-
-HOOK: small-reg-native cpu ( reg -- reg' )
-
-M: x86.32 small-reg-native small-reg-4 ;
-M: x86.64 small-reg-native small-reg-8 ;
+M: x86.32 small-reg? { EAX ECX EDX EBX } memq? ;
+M: x86.64 small-reg? drop t ;
 
 : small-reg-that-isn't ( exclude -- reg' )
-    small-regs swap [ native-version-of ] map '[ _ memq? not ] find nip ;
+    [ native-version-of ] map [ small-reg? not ] find nip ;
 
 : with-save/restore ( reg quot -- )
     [ drop PUSH ] [ call ] [ drop POP ] 2tri ; inline
@@ -285,7 +280,7 @@ M: x86.64 small-reg-native small-reg-8 ;
     #! call the quot with that. Otherwise, we find a small
     #! register that is not in exclude, and call quot, saving
     #! and restoring the small register.
-    dst small-regs memq? [ dst quot call ] [
+    dst small-reg? [ dst quot call ] [
         exclude small-reg-that-isn't
         [ quot call ] with-save/restore
     ] if ; inline
