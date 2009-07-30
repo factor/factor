@@ -281,7 +281,7 @@ M: x86.32 has-small-reg?
         { 32 [ drop t ] }
     } case ;
 
-M: x86.64 has-small-reg? drop t ;
+M: x86.64 has-small-reg? 2drop t ;
 
 : small-reg-that-isn't ( exclude -- reg' )
     [ have-byte-regs ] dip
