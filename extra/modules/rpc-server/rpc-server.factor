@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Sam Anklesaria.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs concurrency.distributed
 concurrency.messaging continuations effects init kernel
 namespaces sequences sets threads vocabs vocabs.parser ;

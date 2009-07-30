@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Sam Anklesaria.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel modules.rpc peg peg-lexer peg.ebnf sequences
 strings vocabs.parser ;
 IN: modules.using
