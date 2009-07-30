@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Sam Anklesaria.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs concurrency.distributed
 concurrency.messaging fry generalizations io.sockets kernel
 locals namespaces parser sequences vocabs vocabs.parser words ;
