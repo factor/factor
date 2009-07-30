@@ -264,52 +264,48 @@ M:: x86 %box-alien ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
-HOOK: small-reg? cpu ( reg -- regs )
+! The 'small-reg' mess is pretty crappy, but its only used on x86-32.
+! On x86-64, all registers have 8-bit versions. However, a similar
+! problem arises for shifts, where the shift count must be in CL, and
+! so one day I will fix this properly by adding precoloring to the
+! register allocator.
 
-M: x86.32 small-reg? { EAX ECX EDX EBX } memq? ;
-M: x86.64 small-reg? drop t ;
+HOOK: has-small-reg? cpu ( reg size -- ? )
+
+CONSTANT: have-byte-regs { EAX ECX EDX EBX }
+
+M: x86.32 has-small-reg?
+    {
+        { 8 [ have-byte-regs memq? ] }
+        { 16 [ drop t ] }
+        { 32 [ drop t ] }
+    } case ;
+
+M: x86.64 has-small-reg? drop t ;
 
 : small-reg-that-isn't ( exclude -- reg' )
-    [ native-version-of ] map [ small-reg? not ] find nip ;
+    [ have-byte-regs ] dip
+    [ native-version-of ] map
+    '[ _ memq? not ] find nip ;
 
 : with-save/restore ( reg quot -- )
     [ drop PUSH ] [ call ] [ drop POP ] 2tri ; inline
 
-:: with-small-register ( dst exclude quot: ( new-dst -- ) -- )
-    #! If the destination register overlaps a small register, we
-    #! call the quot with that. Otherwise, we find a small
-    #! register that is not in exclude, and call quot, saving
-    #! and restoring the small register.
-    dst small-reg? [ dst quot call ] [
+:: with-small-register ( dst exclude size quot: ( new-dst -- ) -- )
+    ! If the destination register overlaps a small register with
+    ! 'size' bits, we call the quot with that. Otherwise, we find a
+    ! small register that is not in exclude, and call quot, saving and
+    ! restoring the small register.
+    dst size has-small-reg? [ dst quot call ] [
         exclude small-reg-that-isn't
         [ quot call ] with-save/restore
     ] if ; inline
 
-: shift-count? ( reg -- ? ) { ECX RCX } memq? ;
-
-:: emit-shift ( dst src1 src2 quot -- )
-    src2 shift-count? [
-        dst CL quot call
-    ] [
-        dst shift-count? [
-            dst src2 XCHG
-            src2 CL quot call
-            dst src2 XCHG
-        ] [
-            ECX native-version-of [
-                CL src2 MOV
-                drop dst CL quot call
-            ] with-save/restore
-        ] if
-    ] if ; inline
-
-M: x86 %shl [ SHL ] emit-shift ;
-M: x86 %shr [ SHR ] emit-shift ;
-M: x86 %sar [ SAR ] emit-shift ;
-
 M:: x86 %string-nth ( dst src index temp -- )
+    ! We request a small-reg of size 8 since those of size 16 are
+    ! a superset.
     "end" define-label
-    dst { src index temp } [| new-dst |
+    dst { src index temp } 8 [| new-dst |
         ! Load the least significant 7 bits into new-dst.
         ! 8th bit indicates whether we have to load from
         ! the aux vector or not.
@@ -336,15 +332,15 @@ M:: x86 %string-nth ( dst src index temp -- )
     ] with-small-register ;
 
 M:: x86 %set-string-nth-fast ( ch str index temp -- )
-    ch { index str temp } [| new-ch |
+    ch { index str temp } 8 [| new-ch |
         new-ch ch ?MOV
         temp str index [+] LEA
         temp string-offset [+] new-ch 8-bit-version-of MOV
     ] with-small-register ;
 
 :: %alien-integer-getter ( dst src size quot -- )
-    dst { src } [| new-dst |
-        new-dst dup size 8 * n-bit-version-of dup src [] MOV
+    dst { src } size [| new-dst |
+        new-dst dup size n-bit-version-of dup src [] MOV
         quot call
         dst new-dst ?MOV
     ] with-small-register ; inline
@@ -352,34 +348,55 @@ M:: x86 %set-string-nth-fast ( ch str index temp -- )
 : %alien-unsigned-getter ( dst src size -- )
     [ MOVZX ] %alien-integer-getter ; inline
 
-M: x86 %alien-unsigned-1 1 %alien-unsigned-getter ;
-M: x86 %alien-unsigned-2 2 %alien-unsigned-getter ;
+M: x86 %alien-unsigned-1 8 %alien-unsigned-getter ;
+M: x86 %alien-unsigned-2 16 %alien-unsigned-getter ;
+M: x86 %alien-unsigned-4 32 [ 2drop ] %alien-integer-getter ;
 
 : %alien-signed-getter ( dst src size -- )
     [ MOVSX ] %alien-integer-getter ; inline
 
-M: x86 %alien-signed-1 1 %alien-signed-getter ;
-M: x86 %alien-signed-2 2 %alien-signed-getter ;
-M: x86 %alien-signed-4 4 %alien-signed-getter ;
-
-M: x86 %alien-unsigned-4 4 [ 2drop ] %alien-integer-getter ;
+M: x86 %alien-signed-1 8 %alien-signed-getter ;
+M: x86 %alien-signed-2 16 %alien-signed-getter ;
+M: x86 %alien-signed-4 32 %alien-signed-getter ;
 
 M: x86 %alien-cell [] MOV ;
 M: x86 %alien-float dupd [] MOVSS dup CVTSS2SD ;
 M: x86 %alien-double [] MOVSD ;
 
 :: %alien-integer-setter ( ptr value size -- )
-    value { ptr } [| new-value |
+    value { ptr } size [| new-value |
         new-value value ?MOV
-        ptr [] new-value size 8 * n-bit-version-of MOV
+        ptr [] new-value size n-bit-version-of MOV
     ] with-small-register ; inline
 
-M: x86 %set-alien-integer-1 1 %alien-integer-setter ;
-M: x86 %set-alien-integer-2 2 %alien-integer-setter ;
-M: x86 %set-alien-integer-4 4 %alien-integer-setter ;
+M: x86 %set-alien-integer-1 8 %alien-integer-setter ;
+M: x86 %set-alien-integer-2 16 %alien-integer-setter ;
+M: x86 %set-alien-integer-4 32 %alien-integer-setter ;
 M: x86 %set-alien-cell [ [] ] dip MOV ;
 M: x86 %set-alien-float dup dup CVTSD2SS [ [] ] dip MOVSS ;
 M: x86 %set-alien-double [ [] ] dip MOVSD ;
+
+: shift-count? ( reg -- ? ) { ECX RCX } memq? ;
+
+:: emit-shift ( dst src1 src2 quot -- )
+    src2 shift-count? [
+        dst CL quot call
+    ] [
+        dst shift-count? [
+            dst src2 XCHG
+            src2 CL quot call
+            dst src2 XCHG
+        ] [
+            ECX native-version-of [
+                CL src2 MOV
+                drop dst CL quot call
+            ] with-save/restore
+        ] if
+    ] if ; inline
+
+M: x86 %shl [ SHL ] emit-shift ;
+M: x86 %shr [ SHR ] emit-shift ;
+M: x86 %sar [ SAR ] emit-shift ;
 
 : load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
