@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel words math accessors sequences cpu.x86.assembler.syntax ;
+USING: kernel words math accessors sequences namespaces
+assocs layouts cpu.x86.assembler.syntax ;
 IN: cpu.x86.assembler.operands
 
 ! In 32-bit mode, { 1234 } is absolute indirect addressing.
@@ -101,15 +102,11 @@ TUPLE: byte value ;
 
 C: <byte> byte
 
-<PRIVATE
-
 : n-bit-version-of ( register n -- register' )
     ! Certain 8-bit registers don't exist in 32-bit mode...
     [ "register" word-prop ] dip registers get at nth
     dup { SPL BPL SIL DIL } memq? cell 4 = and
     [ drop f ] when ;
-
-PRIVATE>
 
 : 8-bit-version-of ( register -- register' ) 8 n-bit-version-of ;
 : 16-bit-version-of ( register -- register' ) 16 n-bit-version-of ;
