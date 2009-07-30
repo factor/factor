@@ -681,24 +681,57 @@ ALIAS: PINSRQ PINSRD
 : MAXPD      ( dest src -- ) HEX: 5f HEX: 66 2-operand-rm-sse ;
 : MAXSD      ( dest src -- ) HEX: 5f HEX: f2 2-operand-rm-sse ;
 : MAXSS      ( dest src -- ) HEX: 5f HEX: f3 2-operand-rm-sse ;
+: PUNPCKLBW  ( dest src -- ) HEX: 60 HEX: 66 2-operand-rm-sse ;
+: PUNPCKLWD  ( dest src -- ) HEX: 61 HEX: 66 2-operand-rm-sse ;
+: PUNPCKLDQ  ( dest src -- ) HEX: 62 HEX: 66 2-operand-rm-sse ;
+: PACKSSWB   ( dest src -- ) HEX: 63 HEX: 66 2-operand-rm-sse ;
+: PCMPGTB    ( dest src -- ) HEX: 64 HEX: 66 2-operand-rm-sse ;
+: PCMPGTW    ( dest src -- ) HEX: 65 HEX: 66 2-operand-rm-sse ;
+: PCMPGTD    ( dest src -- ) HEX: 66 HEX: 66 2-operand-rm-sse ;
+: PACKUSWB   ( dest src -- ) HEX: 67 HEX: 66 2-operand-rm-sse ;
+: PUNPCKHBW  ( dest src -- ) HEX: 68 HEX: 66 2-operand-rm-sse ;
+: PUNPCKHWD  ( dest src -- ) HEX: 69 HEX: 66 2-operand-rm-sse ;
+: PUNPCKHDQ  ( dest src -- ) HEX: 6a HEX: 66 2-operand-rm-sse ;
+: PACKSSDW   ( dest src -- ) HEX: 6b HEX: 66 2-operand-rm-sse ;
 : PUNPCKLQDQ ( dest src -- ) HEX: 6c HEX: 66 2-operand-rm-sse ;
 : PUNPCKHQDQ ( dest src -- ) HEX: 6d HEX: 66 2-operand-rm-sse ;
 
+: MOVD       ( dest src -- ) { HEX: 6e HEX: 7e } HEX: 66 2-operand-rm-mr-sse ;
 : MOVDQA     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: 66 2-operand-rm-mr-sse ;
 : MOVDQU     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: f3 2-operand-rm-mr-sse ;
 
 : PSHUFD     ( dest src imm -- ) HEX: 70 HEX: 66 3-operand-rm-sse ;
 : PSHUFLW    ( dest src imm -- ) HEX: 70 HEX: f2 3-operand-rm-sse ;
 : PSHUFHW    ( dest src imm -- ) HEX: 70 HEX: f3 3-operand-rm-sse ;
-: PSRLW      ( dest imm -- ) BIN: 010 HEX: 71 HEX: 66 2-operand-sse-shift ;
-: PSRAW      ( dest imm -- ) BIN: 100 HEX: 71 HEX: 66 2-operand-sse-shift ;
-: PSLLW      ( dest imm -- ) BIN: 110 HEX: 71 HEX: 66 2-operand-sse-shift ;
-: PSRLD      ( dest imm -- ) BIN: 010 HEX: 72 HEX: 66 2-operand-sse-shift ;
-: PSRAD      ( dest imm -- ) BIN: 100 HEX: 72 HEX: 66 2-operand-sse-shift ;
-: PSLLD      ( dest imm -- ) BIN: 110 HEX: 72 HEX: 66 2-operand-sse-shift ;
-: PSRLQ      ( dest imm -- ) BIN: 010 HEX: 73 HEX: 66 2-operand-sse-shift ;
+
+: (PSRLW-imm) ( dest imm -- ) BIN: 010 HEX: 71 HEX: 66 2-operand-sse-shift ;
+: (PSRAW-imm) ( dest imm -- ) BIN: 100 HEX: 71 HEX: 66 2-operand-sse-shift ;
+: (PSLLW-imm) ( dest imm -- ) BIN: 110 HEX: 71 HEX: 66 2-operand-sse-shift ;
+: (PSRLD-imm) ( dest imm -- ) BIN: 010 HEX: 72 HEX: 66 2-operand-sse-shift ;
+: (PSRAD-imm) ( dest imm -- ) BIN: 100 HEX: 72 HEX: 66 2-operand-sse-shift ;
+: (PSLLD-imm) ( dest imm -- ) BIN: 110 HEX: 72 HEX: 66 2-operand-sse-shift ;
+: (PSRLQ-imm) ( dest imm -- ) BIN: 010 HEX: 73 HEX: 66 2-operand-sse-shift ;
+: (PSLLQ-imm) ( dest imm -- ) BIN: 110 HEX: 73 HEX: 66 2-operand-sse-shift ;
+
+: (PSRLW-reg) ( dest src -- ) HEX: d1 HEX: 66 2-operand-rm-sse ;
+: (PSRLD-reg) ( dest src -- ) HEX: d2 HEX: 66 2-operand-rm-sse ;
+: (PSRLQ-reg) ( dest src -- ) HEX: d3 HEX: 66 2-operand-rm-sse ;
+: (PSRAW-reg) ( dest src -- ) HEX: e1 HEX: 66 2-operand-rm-sse ;
+: (PSRAD-reg) ( dest src -- ) HEX: e2 HEX: 66 2-operand-rm-sse ;
+: (PSLLW-reg) ( dest src -- ) HEX: f1 HEX: 66 2-operand-rm-sse ;
+: (PSLLD-reg) ( dest src -- ) HEX: f2 HEX: 66 2-operand-rm-sse ;
+: (PSLLQ-reg) ( dest src -- ) HEX: f3 HEX: 66 2-operand-rm-sse ;
+
+: PSRLW ( dest src -- ) dup integer? [ (PSRLW-imm) ] [ (PSRLW-reg) ] if ;
+: PSRAW ( dest src -- ) dup integer? [ (PSRAW-imm) ] [ (PSRAW-reg) ] if ;
+: PSLLW ( dest src -- ) dup integer? [ (PSLLW-imm) ] [ (PSLLW-reg) ] if ;
+: PSRLD ( dest src -- ) dup integer? [ (PSRLD-imm) ] [ (PSRLD-reg) ] if ;
+: PSRAD ( dest src -- ) dup integer? [ (PSRAD-imm) ] [ (PSRAD-reg) ] if ;
+: PSLLD ( dest src -- ) dup integer? [ (PSLLD-imm) ] [ (PSLLD-reg) ] if ;
+: PSRLQ ( dest src -- ) dup integer? [ (PSRLQ-imm) ] [ (PSRLQ-reg) ] if ;
+: PSLLQ ( dest src -- ) dup integer? [ (PSLLQ-imm) ] [ (PSLLQ-reg) ] if ;
+
 : PSRLDQ     ( dest imm -- ) BIN: 011 HEX: 73 HEX: 66 2-operand-sse-shift ;
-: PSLLQ      ( dest imm -- ) BIN: 110 HEX: 73 HEX: 66 2-operand-sse-shift ;
 : PSLLDQ     ( dest imm -- ) BIN: 111 HEX: 73 HEX: 66 2-operand-sse-shift ;
 
 : PCMPEQB    ( dest src -- ) HEX: 74 HEX: 66 2-operand-rm-sse ;
@@ -709,11 +742,14 @@ ALIAS: PINSRQ PINSRD
 : HSUBPD     ( dest src -- ) HEX: 7d HEX: 66 2-operand-rm-sse ;
 : HSUBPS     ( dest src -- ) HEX: 7d HEX: f2 2-operand-rm-sse ;
 
+: FXSAVE     ( dest -- ) { BIN: 000 f { HEX: 0f HEX: ae } } 1-operand ;
+: FXRSTOR    ( src -- )  { BIN: 001 f { HEX: 0f HEX: ae } } 1-operand ;
 : LDMXCSR    ( src -- )  { BIN: 010 f { HEX: 0f HEX: ae } } 1-operand ;
 : STMXCSR    ( dest -- ) { BIN: 011 f { HEX: 0f HEX: ae } } 1-operand ;
 : LFENCE     ( -- ) HEX: 0f , HEX: ae , OCT: 350 , ;
 : MFENCE     ( -- ) HEX: 0f , HEX: ae , OCT: 360 , ;
 : SFENCE     ( -- ) HEX: 0f , HEX: ae , OCT: 370 , ;
+: CLFLUSH    ( dest -- ) { BIN: 111 f { HEX: 0f HEX: ae } } 1-operand ;
 
 : POPCNT     ( dest src -- ) HEX: b8 HEX: f3 2-operand-rm-sse ;
 
@@ -762,26 +798,46 @@ ALIAS: PINSRQ PINSRD
 : ADDSUBPD   ( dest src -- ) HEX: d0 HEX: 66 2-operand-rm-sse ;
 : ADDSUBPS   ( dest src -- ) HEX: d0 HEX: f2 2-operand-rm-sse ;
 : PADDQ      ( dest src -- ) HEX: d4 HEX: 66 2-operand-rm-sse ;
+: PMULLW     ( dest src -- ) HEX: d5 HEX: 66 2-operand-rm-sse ;
+: PMOVMSKB   ( dest src -- ) HEX: d7 HEX: 66 2-operand-rm-sse ;
+: PSUBUSB    ( dest src -- ) HEX: d8 HEX: 66 2-operand-rm-sse ;
+: PSUBUSW    ( dest src -- ) HEX: d9 HEX: 66 2-operand-rm-sse ;
 : PMINUB     ( dest src -- ) HEX: da HEX: 66 2-operand-rm-sse ;
+: PAND       ( dest src -- ) HEX: db HEX: 66 2-operand-rm-sse ;
+: PADDUSB    ( dest src -- ) HEX: dc HEX: 66 2-operand-rm-sse ;
+: PADDUSW    ( dest src -- ) HEX: dd HEX: 66 2-operand-rm-sse ;
 : PMAXUB     ( dest src -- ) HEX: de HEX: 66 2-operand-rm-sse ;
+: PANDN      ( dest src -- ) HEX: df HEX: 66 2-operand-rm-sse ;
 : PAVGB      ( dest src -- ) HEX: e0 HEX: 66 2-operand-rm-sse ;
 : PAVGW      ( dest src -- ) HEX: e3 HEX: 66 2-operand-rm-sse ;
 : PMULHUW    ( dest src -- ) HEX: e4 HEX: 66 2-operand-rm-sse ;
+: PMULHW     ( dest src -- ) HEX: e5 HEX: 66 2-operand-rm-sse ;
 : CVTTPD2DQ  ( dest src -- ) HEX: e6 HEX: 66 2-operand-rm-sse ;
 : CVTPD2DQ   ( dest src -- ) HEX: e6 HEX: f2 2-operand-rm-sse ;
 : CVTDQ2PD   ( dest src -- ) HEX: e6 HEX: f3 2-operand-rm-sse ;
 
 : MOVNTDQ    ( dest src -- ) HEX: e7 HEX: 66 2-operand-mr-sse ;
 
+: PSUBSB     ( dest src -- ) HEX: e8 HEX: 66 2-operand-rm-sse ;
+: PSUBSW     ( dest src -- ) HEX: e9 HEX: 66 2-operand-rm-sse ;
 : PMINSW     ( dest src -- ) HEX: ea HEX: 66 2-operand-rm-sse ;
+: POR        ( dest src -- ) HEX: eb HEX: 66 2-operand-rm-sse ;
+: PADDSB     ( dest src -- ) HEX: ec HEX: 66 2-operand-rm-sse ;
+: PADDSW     ( dest src -- ) HEX: ed HEX: 66 2-operand-rm-sse ;
 : PMAXSW     ( dest src -- ) HEX: ee HEX: 66 2-operand-rm-sse ;
+: PXOR       ( dest src -- ) HEX: ef HEX: 66 2-operand-rm-sse ;
 : LDDQU      ( dest src -- ) HEX: f0 HEX: f2 2-operand-rm-sse ;
 : PMULUDQ    ( dest src -- ) HEX: f4 HEX: 66 2-operand-rm-sse ;
+: PMADDWD    ( dest src -- ) HEX: f5 HEX: 66 2-operand-rm-sse ;
 : PSADBW     ( dest src -- ) HEX: f6 HEX: 66 2-operand-rm-sse ;
-
 : MASKMOVDQU ( dest src -- ) HEX: f7 HEX: 66 2-operand-rm-sse ;
-
+: PSUBB      ( dest src -- ) HEX: f8 HEX: 66 2-operand-rm-sse ;
+: PSUBW      ( dest src -- ) HEX: f9 HEX: 66 2-operand-rm-sse ;
+: PSUBD      ( dest src -- ) HEX: fa HEX: 66 2-operand-rm-sse ;
 : PSUBQ      ( dest src -- ) HEX: fb HEX: 66 2-operand-rm-sse ;
+: PADDB      ( dest src -- ) HEX: fc HEX: 66 2-operand-rm-sse ;
+: PADDW      ( dest src -- ) HEX: fd HEX: 66 2-operand-rm-sse ;
+: PADDD      ( dest src -- ) HEX: fe HEX: 66 2-operand-rm-sse ;
 
 ! x86-64 branch prediction hints
 
