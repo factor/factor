@@ -466,6 +466,10 @@ M:: word load-gc-root ( gc-root register temp -- )
 : load-gc-roots ( gc-roots temp -- )
     '[ _ load-gc-root ] assoc-each ;
 
+: wipe-locs ( locs -- )
+    ! See explanation in compiler.cfg.stacks.uninitialized
+    [ 0 ] dip [ %replace ] with each ;
+
 :: call-gc ( gc-root-count -- )
     ! Pass pointer to start of GC roots as first parameter
     param-reg-1 gc-root-base param@ LEA
@@ -475,11 +479,12 @@ M:: word load-gc-root ( gc-root register temp -- )
     %prepare-alien-invoke
     "inline_gc" f %alien-invoke ;
 
-M:: x86 %gc ( temp1 temp2 gc-roots gc-root-count -- )
+M:: x86 %gc ( temp1 temp2 gc-roots gc-root-count uninitialized-locs -- )
     "end" define-label
     temp1 temp2 check-nursery
     "end" get JLE
     gc-roots temp1 save-gc-roots
+    uninitialized-locs wipe-locs
     gc-root-count call-gc
     gc-roots temp1 load-gc-roots
     "end" resolve-label ;
