@@ -8,7 +8,7 @@ gpu.textures gpu.textures.private half-floats images kernel
 lexer locals math math.order math.parser namespaces opengl
 opengl.gl parser quotations sequences slots sorting
 specialized-arrays.alien specialized-arrays.float specialized-arrays.int
-specialized-arrays.uint strings tr ui.gadgets.worlds variants
+specialized-arrays.uint strings ui.gadgets.worlds variants
 vocabs.parser words ;
 IN: gpu.render
 
@@ -337,8 +337,6 @@ DEFER: [bind-uniform-tuple]
 
     texture-unit' 
     value>>-quot { value-cleave 2cleave } append ;
-
-TR: hyphens>underscores "-" "_" ;
 
 :: [bind-uniform] ( texture-unit uniform prefix -- texture-unit' quot )
     prefix uniform name>> append hyphens>underscores :> name
