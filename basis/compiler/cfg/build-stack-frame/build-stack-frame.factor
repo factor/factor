@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors math.order assocs kernel sequences
 combinators make classes words cpu.architecture
@@ -13,10 +13,16 @@ SYMBOL: spill-counts
 GENERIC: compute-stack-frame* ( insn -- )
 
 : request-stack-frame ( stack-frame -- )
+    frame-required? on
     stack-frame [ max-stack-frame ] change ;
 
-M: ##stack-frame compute-stack-frame*
-    frame-required? on
+M: ##alien-invoke compute-stack-frame*
+    stack-frame>> request-stack-frame ;
+
+M: ##alien-indirect compute-stack-frame*
+    stack-frame>> request-stack-frame ;
+
+M: ##alien-callback compute-stack-frame*
     stack-frame>> request-stack-frame ;
 
 M: ##call compute-stack-frame*
@@ -36,12 +42,6 @@ M: insn compute-stack-frame*
     ] when ;
 
 \ _spill t frame-required? set-word-prop
-\ ##fixnum-add t frame-required? set-word-prop
-\ ##fixnum-sub t frame-required? set-word-prop
-\ ##fixnum-mul t frame-required? set-word-prop
-\ ##fixnum-add-tail f frame-required? set-word-prop
-\ ##fixnum-sub-tail f frame-required? set-word-prop
-\ ##fixnum-mul-tail f frame-required? set-word-prop
 
 : compute-stack-frame ( insns -- )
     frame-required? off
@@ -50,8 +50,6 @@ M: insn compute-stack-frame*
     stack-frame get dup stack-frame-size >>total-size drop ;
 
 GENERIC: insert-pro/epilogues* ( insn -- )
-
-M: ##stack-frame insert-pro/epilogues* drop ;
 
 M: ##prologue insert-pro/epilogues*
     drop frame-required? get [ stack-frame get _prologue ] when ;

@@ -28,23 +28,42 @@ ERROR: bad-live-ranges interval ;
     [ swap first (>>from) ]
     2bi ;
 
-: split-for-spill ( live-interval n -- before after )
-    split-interval
-    {
-        [ [ trim-before-ranges ] [ trim-after-ranges ] bi* ]
-        [ [ compute-start/end ] bi@ ]
-        [ [ check-ranges ] bi@ ]
-        [ ]
-    } 2cleave ;
-
 : assign-spill ( live-interval -- )
-    dup vreg>> assign-spill-slot >>spill-to f >>split-next drop ;
+    dup vreg>> assign-spill-slot >>spill-to drop ;
+
+: spill-before ( before -- before/f )
+    ! If the interval does not have any usages before the spill location,
+    ! then it is the second child of an interval that was split. We reload
+    ! the value and let the resolve pass insert a split later.
+    dup uses>> empty? [ drop f ] [
+        {
+            [ ]
+            [ assign-spill ]
+            [ trim-before-ranges ]
+            [ compute-start/end ]
+            [ check-ranges ]
+        } cleave
+    ] if ;
 
 : assign-reload ( live-interval -- )
     dup vreg>> assign-spill-slot >>reload-from drop ;
 
-: split-and-spill ( live-interval n -- before after )
-    split-for-spill 2dup [ assign-spill ] [ assign-reload ] bi* ;
+: spill-after ( after -- after/f )
+    ! If the interval has no more usages after the spill location,
+    ! then it is the first child of an interval that was split.  We
+    ! spill the value and let the resolve pass insert a reload later.
+    dup uses>> empty? [ drop f ] [
+        {
+            [ ]
+            [ assign-reload ]
+            [ trim-after-ranges ]
+            [ compute-start/end ]
+            [ check-ranges ]
+        } cleave
+    ] if ;
+
+: split-for-spill ( live-interval n -- before after )
+    split-interval [ spill-before ] [ spill-after ] bi* ;
 
 : find-use-position ( live-interval new -- n )
     [ uses>> ] [ start>> '[ _ >= ] ] bi* find nip 1/0. or ;
@@ -72,47 +91,12 @@ ERROR: bad-live-ranges interval ;
     [ uses>> first ] [ second ] bi* > ;
 
 : spill-new ( new pair -- )
-    drop
-    {
-        [ trim-after-ranges ]
-        [ compute-start/end ]
-        [ assign-reload ]
-        [ add-unhandled ]
-    } cleave ;
-
-: spill-live-out? ( live-interval n -- ? ) [ uses>> last ] dip < ;
-
-: spill-live-out ( live-interval -- )
-    ! The interval has no more usages after the spill location.  This
-    !  means it is the first child of an interval that was split.  We
-    ! spill the value and let the resolve pass insert a reload later.
-    {
-        [ trim-before-ranges ]
-        [ compute-start/end ]
-        [ assign-spill ]
-        [ add-handled ]
-    } cleave ;
-
-: spill-live-in? ( live-interval n -- ? ) [ uses>> first ] dip > ;
-
-: spill-live-in ( live-interval -- )
-    ! The interval does not have any usages before the spill location.
-    !  This means it is the second child of an interval that was
-    ! split.  We reload the value and let the resolve pass insert a
-    ! split later.
-    {
-        [ trim-after-ranges ]
-        [ compute-start/end ]
-        [ assign-reload ]
-        [ add-unhandled ]
-    } cleave ;
+    drop spill-after add-unhandled ;
 
 : spill ( live-interval n -- )
-    {
-        { [ 2dup spill-live-out? ] [ drop spill-live-out ] }
-        { [ 2dup spill-live-in? ] [ drop spill-live-in ] }
-        [ split-and-spill [ add-handled ] [ add-unhandled ] bi* ]
-    } cond ;
+    split-for-spill
+    [ [ add-handled ] when* ]
+    [ [ add-unhandled ] when* ] bi* ;
 
 :: spill-intersecting-active ( new reg -- )
     ! If there is an active interval using 'reg' (there should be at
@@ -149,8 +133,8 @@ ERROR: bad-live-ranges interval ;
     ! A register would be available for part of the new
     ! interval's lifetime if all active and inactive intervals
     ! using that register were split and spilled.
-    [ second 1 - split-and-spill add-unhandled ] keep
-    spill-available ;
+    [ second 1 - split-for-spill [ add-unhandled ] when* ] keep
+    '[ _ spill-available ] when* ;
 
 : assign-blocked-register ( new -- )
     dup spill-status {

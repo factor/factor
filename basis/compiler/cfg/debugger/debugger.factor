@@ -7,16 +7,18 @@ parser compiler.tree.builder compiler.tree.optimizer
 compiler.cfg.builder compiler.cfg.linearization
 compiler.cfg.registers compiler.cfg.stack-frame
 compiler.cfg.linear-scan compiler.cfg.two-operand
-compiler.cfg.liveness compiler.cfg.optimizer
+compiler.cfg.optimizer
 compiler.cfg.mr compiler.cfg ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-cfg ( quot -- cfgs )
 
 M: callable test-cfg
+    0 vreg-counter set-global
     build-tree optimize-tree gensym build-cfg ;
 
 M: word test-cfg
+    0 vreg-counter set-global
     [ build-tree optimize-tree ] keep build-cfg ;
 
 : test-mr ( quot -- mrs )

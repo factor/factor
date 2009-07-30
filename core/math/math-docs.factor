@@ -12,19 +12,19 @@ HELP: number=
 } ;
 
 HELP: <
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is less than " { $snippet "y" } "." } ;
 
 HELP: <=
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is less than or equal to " { $snippet "y" } "." } ;
 
 HELP: >
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is greater than " { $snippet "y" } "." } ;
 
 HELP: >=
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." } ;
 
 
@@ -245,6 +245,13 @@ HELP: times
     { $example "USING: io math ;" "3 [ \"Hi\" print ] times" "Hi\nHi\nHi" }
 } ;
 
+HELP: fp-bitwise=
+{ $values
+    { "x" float } { "y" float }
+    { "?" boolean }
+}
+{ $description "Compares two floating point numbers for bit equality." } ;
+
 HELP: fp-special?
 { $values { "x" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is an IEEE special value (Not-a-Number or Infinity). While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
@@ -282,11 +289,11 @@ HELP: <fp-nan>
 
 HELP: next-float
 { $values { "m" float } { "n" float } }
-{ $description "Returns the least representable " { $link float } " value greater than " { $snippet "m" } "." } ;
+{ $description "Returns the least representable " { $link float } " value greater than " { $snippet "m" } ", or in the case of " { $snippet "-0.0" } ", returns " { $snippet "+0.0" } "." } ;
 
 HELP: prev-float
 { $values { "m" float } { "n" float } }
-{ $description "Returns the greatest representable " { $link float } " value less than " { $snippet "m" } "." } ;
+{ $description "Returns the greatest representable " { $link float } " value less than " { $snippet "m" } ", or in the case of " { $snippet "+0.0" } ", returns " { $snippet "-0.0" } "." } ;
 
 { next-float prev-float } related-words
 
@@ -324,7 +331,7 @@ HELP: each-integer
 
 HELP: all-integers?
 { $values { "n" integer } { "quot" { $quotation "( i -- ? )" } } { "?" "a boolean" } }
-{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iterationi stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
+{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
 { $notes "This word is used to implement " { $link all? } "." } ;
 
 HELP: find-integer

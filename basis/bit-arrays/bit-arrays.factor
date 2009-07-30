@@ -27,6 +27,18 @@ TUPLE: bit-array
     [ [ length bits>cells ] keep ] dip swap underlying>>
     '[ 2 shift [ _ _ ] dip set-alien-unsigned-4 ] each ; inline
 
+: clean-up ( bit-array -- )
+    ! Zero bits after the end.
+    dup underlying>> empty? [ drop ] [
+        [
+            [ underlying>> length 8 * ] [ length ] bi -
+            8 swap - -1 swap shift bitnot
+        ]
+        [ underlying>> last bitand ]
+        [ underlying>> set-last ]
+        tri
+    ] if ; inline
+
 PRIVATE>
 
 : <bit-array> ( n -- bit-array )
@@ -42,9 +54,13 @@ M: bit-array set-nth-unsafe
     [ byte/bit set-bit ] 2keep
     swap n>byte set-alien-unsigned-1 ;
 
-: clear-bits ( bit-array -- ) 0 (set-bits) ;
+GENERIC: clear-bits ( bit-array -- )
 
-: set-bits ( bit-array -- ) -1 (set-bits) ;
+M: bit-array clear-bits 0 (set-bits) ;
+
+GENERIC: set-bits ( bit-array -- )
+
+M: bit-array set-bits -1 (set-bits) ;
 
 M: bit-array clone
     [ length>> ] [ underlying>> clone ] bi bit-array boa ;
@@ -57,14 +73,15 @@ M: bit-array like drop dup bit-array? [ >bit-array ] unless ;
 M: bit-array new-sequence drop <bit-array> ;
 
 M: bit-array equal?
-    over bit-array? [ sequence= ] [ 2drop f ] if ;
+    over bit-array? [ [ underlying>> ] bi@ sequence= ] [ 2drop f ] if ;
 
 M: bit-array resize
     [ drop ] [
         [ bits>bytes ] [ underlying>> ] bi*
         resize-byte-array
     ] 2bi
-    bit-array boa ;
+    bit-array boa
+    dup clean-up ;
 
 M: bit-array byte-length length 7 + -3 shift ;
 

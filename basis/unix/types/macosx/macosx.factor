@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.syntax alien.c-types ;
 IN: unix.types
 
 ! Darwin 9.1.0
@@ -21,3 +21,5 @@ TYPEDEF: __int32_t  blksize_t
 TYPEDEF: long       ssize_t
 TYPEDEF: __int32_t  pid_t
 TYPEDEF: long       time_t
+
+ALIAS: <time_t> <long>

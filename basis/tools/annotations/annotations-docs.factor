@@ -21,7 +21,7 @@ $nl
 ABOUT: "tools.annotations"
 
 HELP: annotate
-{ $values { "word" "a word" } { "quot" { $quotation "( word def -- def )" } } }
+{ $values { "word" "a word" } { "quot" { $quotation "( old-def -- new-def )" } } }
 { $description "Changes a word definition to the result of applying a quotation to the old definition." }
 { $notes "This word is used to implement " { $link watch } "." } ;
 
@@ -60,3 +60,6 @@ HELP: reset-word-timing
 
 HELP: word-timing.
 { $description "Prints the word timing table." } ;
+
+HELP: cannot-annotate-twice
+{ $error-description "Thrown when attempting to annotate a word that's already been annotated. If a word already has an annotation such as a watch or a breakpoint, you must first " { $link reset } " the word before adding another annotation." } ;

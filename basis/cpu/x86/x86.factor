@@ -1,12 +1,17 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs alien alien.c-types arrays strings
-cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
-kernel kernel.private math memory namespaces make sequences
-words system layouts combinators math.order fry locals
-compiler.constants compiler.cfg.registers
-compiler.cfg.instructions compiler.cfg.intrinsics
-compiler.cfg.stack-frame compiler.codegen compiler.codegen.fixup ;
+cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
+cpu.architecture kernel kernel.private math memory namespaces make
+sequences words system layouts combinators math.order fry locals
+compiler.constants
+compiler.cfg.registers
+compiler.cfg.instructions
+compiler.cfg.intrinsics
+compiler.cfg.comparisons
+compiler.cfg.stack-frame
+compiler.codegen
+compiler.codegen.fixup ;
 IN: cpu.x86
 
 << enable-fixnum-log2 >>
@@ -51,7 +56,7 @@ HOOK: param-reg-2 cpu ( -- reg )
 
 HOOK: pic-tail-reg cpu ( -- reg )
 
-M: x86 %load-immediate MOV ;
+M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
 
 M: x86 %load-reference swap 0 MOV rc-absolute-cell rel-immediate ;
 
@@ -103,10 +108,10 @@ M: x86 %slot-imm ( dst obj slot tag -- ) (%slot-imm) MOV ;
 M: x86 %set-slot ( src obj slot tag temp -- ) (%slot) swap MOV ;
 M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
 
-M: x86 %add     [+] LEA ;
-M: x86 %add-imm [+] LEA ;
+M: x86 %add     2over eq? [ nip ADD ] [ [+] LEA ] if ;
+M: x86 %add-imm 2over eq? [ nip ADD ] [ [+] LEA ] if ;
 M: x86 %sub     nip SUB ;
-M: x86 %sub-imm neg [+] LEA ;
+M: x86 %sub-imm 2over eq? [ nip SUB ] [ neg [+] LEA ] if ;
 M: x86 %mul     nip swap IMUL2 ;
 M: x86 %mul-imm IMUL3 ;
 M: x86 %and     nip AND ;
@@ -124,83 +129,18 @@ M: x86 %log2    BSR ;
 : ?MOV ( dst src -- )
     2dup = [ 2drop ] [ MOV ] if ; inline
 
-:: move>args ( src1 src2 -- )
-    {
-        { [ src1 param-reg-2 = ] [ param-reg-1 src2 ?MOV param-reg-1 param-reg-2 XCHG ] }
-        { [ src1 param-reg-1 = ] [ param-reg-2 src2 ?MOV ] }
-        { [ src2 param-reg-1 = ] [ param-reg-2 src1 ?MOV param-reg-1 param-reg-2 XCHG ] }
-        { [ src2 param-reg-2 = ] [ param-reg-1 src1 ?MOV ] }
-        [
-            param-reg-1 src1 MOV
-            param-reg-2 src2 MOV
-        ]
-    } cond ;
-
-HOOK: %alien-invoke-tail cpu ( func dll -- )
-
-:: overflow-template ( src1 src2 insn inverse func -- )
-    <label> "no-overflow" set
+:: overflow-template ( label dst src1 src2 insn -- )
     src1 src2 insn call
-    ds-reg [] src1 MOV
-    "no-overflow" get JNO
-    src1 src2 inverse call
-    src1 src2 move>args
-    %prepare-alien-invoke
-    func f %alien-invoke
-    "no-overflow" resolve-label ; inline
+    label JO ; inline
 
-:: overflow-template-tail ( src1 src2 insn inverse func -- )
-    <label> "no-overflow" set
-    src1 src2 insn call
-    "no-overflow" get JNO
-    src1 src2 inverse call
-    src1 src2 move>args
-    %prepare-alien-invoke
-    func f %alien-invoke-tail
-    "no-overflow" resolve-label
-    ds-reg [] src1 MOV
-    0 RET ; inline
+M: x86 %fixnum-add ( label dst src1 src2 -- )
+    [ ADD ] overflow-template ;
 
-M: x86 %fixnum-add ( src1 src2 -- )
-    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template ;
+M: x86 %fixnum-sub ( label dst src1 src2 -- )
+    [ SUB ] overflow-template ;
 
-M: x86 %fixnum-add-tail ( src1 src2 -- )
-    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template-tail ;
-
-M: x86 %fixnum-sub ( src1 src2 -- )
-    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template ;
-
-M: x86 %fixnum-sub-tail ( src1 src2 -- )
-    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template-tail ;
-
-M:: x86 %fixnum-mul ( src1 src2 temp1 temp2 -- )
-    "no-overflow" define-label
-    temp1 src1 MOV
-    temp1 tag-bits get SAR
-    src2 temp1 IMUL2
-    ds-reg [] temp1 MOV
-    "no-overflow" get JNO
-    src1 src2 move>args
-    param-reg-1 tag-bits get SAR
-    param-reg-2 tag-bits get SAR
-    %prepare-alien-invoke
-    "overflow_fixnum_multiply" f %alien-invoke
-    "no-overflow" resolve-label ;
-
-M:: x86 %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
-    "overflow" define-label
-    temp1 src1 MOV
-    temp1 tag-bits get SAR
-    src2 temp1 IMUL2
-    "overflow" get JO
-    ds-reg [] temp1 MOV
-    0 RET
-    "overflow" resolve-label
-    src1 src2 move>args
-    param-reg-1 tag-bits get SAR
-    param-reg-2 tag-bits get SAR
-    %prepare-alien-invoke
-    "overflow_fixnum_multiply" f %alien-invoke-tail ;
+M: x86 %fixnum-mul ( label dst src1 src2 -- )
+    [ swap IMUL2 ] overflow-template ;
 
 : bignum@ ( reg n -- op )
     cells bignum tag-number - [+] ; inline
@@ -324,102 +264,54 @@ M:: x86 %box-alien ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
-: small-reg-8 ( reg -- reg' )
-    H{
-        { EAX RAX }
-        { ECX RCX }
-        { EDX RDX }
-        { EBX RBX }
-        { ESP RSP }
-        { EBP RBP }
-        { ESI RSP }
-        { EDI RDI }
+! The 'small-reg' mess is pretty crappy, but its only used on x86-32.
+! On x86-64, all registers have 8-bit versions. However, a similar
+! problem arises for shifts, where the shift count must be in CL, and
+! so one day I will fix this properly by adding precoloring to the
+! register allocator.
 
-        { RAX RAX }
-        { RCX RCX }
-        { RDX RDX }
-        { RBX RBX }
-        { RSP RSP }
-        { RBP RBP }
-        { RSI RSP }
-        { RDI RDI }
-    } at ; inline
+HOOK: has-small-reg? cpu ( reg size -- ? )
 
-: small-reg-4 ( reg -- reg' )
-    small-reg-8 H{
-        { RAX EAX }
-        { RCX ECX }
-        { RDX EDX }
-        { RBX EBX }
-        { RSP ESP }
-        { RBP EBP }
-        { RSI ESP }
-        { RDI EDI }
-    } at ; inline
+CONSTANT: have-byte-regs { EAX ECX EDX EBX }
 
-: small-reg-2 ( reg -- reg' )
-    small-reg-4 H{
-        { EAX AX }
-        { ECX CX }
-        { EDX DX }
-        { EBX BX }
-        { ESP SP }
-        { EBP BP }
-        { ESI SI }
-        { EDI DI }
-    } at ; inline
-
-: small-reg-1 ( reg -- reg' )
-    small-reg-4 {
-        { EAX AL }
-        { ECX CL }
-        { EDX DL }
-        { EBX BL }
-    } at ; inline
-
-: small-reg ( reg size -- reg' )
+M: x86.32 has-small-reg?
     {
-        { 1 [ small-reg-1 ] }
-        { 2 [ small-reg-2 ] }
-        { 4 [ small-reg-4 ] }
-        { 8 [ small-reg-8 ] }
+        { 8 [ have-byte-regs memq? ] }
+        { 16 [ drop t ] }
+        { 32 [ drop t ] }
     } case ;
 
-HOOK: small-regs cpu ( -- regs )
-
-M: x86.32 small-regs { EAX ECX EDX EBX } ;
-M: x86.64 small-regs { RAX RCX RDX RBX } ;
-
-HOOK: small-reg-native cpu ( reg -- reg' )
-
-M: x86.32 small-reg-native small-reg-4 ;
-M: x86.64 small-reg-native small-reg-8 ;
+M: x86.64 has-small-reg? drop t ;
 
 : small-reg-that-isn't ( exclude -- reg' )
-    small-regs swap [ small-reg-native ] map '[ _ memq? not ] find nip ;
+    [ have-byte-regs ] dip
+    [ native-version-of ] map
+    '[ _ memq? not ] find nip ;
 
 : with-save/restore ( reg quot -- )
     [ drop PUSH ] [ call ] [ drop POP ] 2tri ; inline
 
-:: with-small-register ( dst exclude quot: ( new-dst -- ) -- )
-    #! If the destination register overlaps a small register, we
-    #! call the quot with that. Otherwise, we find a small
-    #! register that is not in exclude, and call quot, saving
-    #! and restoring the small register.
-    dst small-reg-native small-regs memq? [ dst quot call ] [
+:: with-small-register ( dst exclude size quot: ( new-dst -- ) -- )
+    ! If the destination register overlaps a small register with
+    ! 'size' bits, we call the quot with that. Otherwise, we find a
+    ! small register that is not in exclude, and call quot, saving and
+    ! restoring the small register.
+    dst size has-small-reg? [ dst quot call ] [
         exclude small-reg-that-isn't
         [ quot call ] with-save/restore
     ] if ; inline
 
 M:: x86 %string-nth ( dst src index temp -- )
+    ! We request a small-reg of size 8 since those of size 16 are
+    ! a superset.
     "end" define-label
-    dst { src index temp } [| new-dst |
+    dst { src index temp } 8 [| new-dst |
         ! Load the least significant 7 bits into new-dst.
         ! 8th bit indicates whether we have to load from
         ! the aux vector or not.
         temp src index [+] LEA
-        new-dst 1 small-reg temp string-offset [+] MOV
-        new-dst new-dst 1 small-reg MOVZX
+        new-dst 8-bit-version-of temp string-offset [+] MOV
+        new-dst new-dst 8-bit-version-of MOVZX
         ! Do we have to look at the aux vector?
         new-dst HEX: 80 CMP
         "end" get JL
@@ -430,8 +322,8 @@ M:: x86 %string-nth ( dst src index temp -- )
         new-dst index ADD
         new-dst index ADD
         ! Load high 16 bits
-        new-dst 2 small-reg new-dst byte-array-offset [+] MOV
-        new-dst new-dst 2 small-reg MOVZX
+        new-dst 16-bit-version-of new-dst byte-array-offset [+] MOV
+        new-dst new-dst 16-bit-version-of MOVZX
         new-dst 7 SHL
         ! Compute code point
         new-dst temp XOR
@@ -440,15 +332,15 @@ M:: x86 %string-nth ( dst src index temp -- )
     ] with-small-register ;
 
 M:: x86 %set-string-nth-fast ( ch str index temp -- )
-    ch { index str temp } [| new-ch |
+    ch { index str temp } 8 [| new-ch |
         new-ch ch ?MOV
         temp str index [+] LEA
-        temp string-offset [+] new-ch 1 small-reg MOV
+        temp string-offset [+] new-ch 8-bit-version-of MOV
     ] with-small-register ;
 
 :: %alien-integer-getter ( dst src size quot -- )
-    dst { src } [| new-dst |
-        new-dst dup size small-reg dup src [] MOV
+    dst { src } size [| new-dst |
+        new-dst dup size n-bit-version-of dup src [] MOV
         quot call
         dst new-dst ?MOV
     ] with-small-register ; inline
@@ -456,34 +348,55 @@ M:: x86 %set-string-nth-fast ( ch str index temp -- )
 : %alien-unsigned-getter ( dst src size -- )
     [ MOVZX ] %alien-integer-getter ; inline
 
-M: x86 %alien-unsigned-1 1 %alien-unsigned-getter ;
-M: x86 %alien-unsigned-2 2 %alien-unsigned-getter ;
+M: x86 %alien-unsigned-1 8 %alien-unsigned-getter ;
+M: x86 %alien-unsigned-2 16 %alien-unsigned-getter ;
+M: x86 %alien-unsigned-4 32 [ 2drop ] %alien-integer-getter ;
 
 : %alien-signed-getter ( dst src size -- )
     [ MOVSX ] %alien-integer-getter ; inline
 
-M: x86 %alien-signed-1 1 %alien-signed-getter ;
-M: x86 %alien-signed-2 2 %alien-signed-getter ;
-M: x86 %alien-signed-4 4 %alien-signed-getter ;
-
-M: x86 %alien-unsigned-4 4 [ 2drop ] %alien-integer-getter ;
+M: x86 %alien-signed-1 8 %alien-signed-getter ;
+M: x86 %alien-signed-2 16 %alien-signed-getter ;
+M: x86 %alien-signed-4 32 %alien-signed-getter ;
 
 M: x86 %alien-cell [] MOV ;
 M: x86 %alien-float dupd [] MOVSS dup CVTSS2SD ;
 M: x86 %alien-double [] MOVSD ;
 
 :: %alien-integer-setter ( ptr value size -- )
-    value { ptr } [| new-value |
+    value { ptr } size [| new-value |
         new-value value ?MOV
-        ptr [] new-value size small-reg MOV
+        ptr [] new-value size n-bit-version-of MOV
     ] with-small-register ; inline
 
-M: x86 %set-alien-integer-1 1 %alien-integer-setter ;
-M: x86 %set-alien-integer-2 2 %alien-integer-setter ;
-M: x86 %set-alien-integer-4 4 %alien-integer-setter ;
+M: x86 %set-alien-integer-1 8 %alien-integer-setter ;
+M: x86 %set-alien-integer-2 16 %alien-integer-setter ;
+M: x86 %set-alien-integer-4 32 %alien-integer-setter ;
 M: x86 %set-alien-cell [ [] ] dip MOV ;
 M: x86 %set-alien-float dup dup CVTSD2SS [ [] ] dip MOVSS ;
 M: x86 %set-alien-double [ [] ] dip MOVSD ;
+
+: shift-count? ( reg -- ? ) { ECX RCX } memq? ;
+
+:: emit-shift ( dst src1 src2 quot -- )
+    src2 shift-count? [
+        dst CL quot call
+    ] [
+        dst shift-count? [
+            dst src2 XCHG
+            src2 CL quot call
+            dst src2 XCHG
+        ] [
+            ECX native-version-of [
+                CL src2 MOV
+                drop dst CL quot call
+            ] with-save/restore
+        ] if
+    ] if ; inline
+
+M: x86 %shl [ SHL ] emit-shift ;
+M: x86 %shr [ SHR ] emit-shift ;
+M: x86 %sar [ SAR ] emit-shift ;
 
 : load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
