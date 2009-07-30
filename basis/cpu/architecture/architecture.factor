@@ -128,7 +128,7 @@ HOOK: %alien-global cpu ( dst symbol library -- )
 
 HOOK: %allot cpu ( dst size class temp -- )
 HOOK: %write-barrier cpu ( src card# table -- )
-HOOK: %gc cpu ( temp1 temp2 live-registers live-spill-slots -- )
+HOOK: %gc cpu ( temp1 temp2 live-registers live-spill-slots uninitialized-locs -- )
 
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
