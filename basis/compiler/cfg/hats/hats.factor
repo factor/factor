@@ -18,7 +18,7 @@ IN: compiler.cfg.hats
 : ^^d3 ( obj obj obj -- vreg vreg obj obj obj ) [ ^^d ] 3dip ; inline
 
 : ^^load-literal ( obj -- dst ) ^^i1 ##load-literal ; inline
-: ^^peek ( loc -- dst ) ^^i1 ##peek ; inline
+: ^^copy ( src -- dst ) ^^i1 ##copy ; inline
 : ^^slot ( obj slot tag -- dst ) ^^i3 i ##slot ; inline
 : ^^slot-imm ( obj slot tag -- dst ) ^^i3 ##slot-imm ; inline
 : ^^set-slot ( src obj slot tag -- ) i ##set-slot ; inline
@@ -27,6 +27,7 @@ IN: compiler.cfg.hats
 : ^^add-imm ( src1 src2 -- dst ) ^^i2 ##add-imm ; inline
 : ^^sub ( src1 src2 -- dst ) ^^i2 ##sub ; inline
 : ^^sub-imm ( src1 src2 -- dst ) ^^i2 ##sub-imm ; inline
+: ^^neg ( src -- dst ) [ 0 ^^load-literal ] dip ^^sub ; inline
 : ^^mul ( src1 src2 -- dst ) ^^i2 ##mul ; inline
 : ^^mul-imm ( src1 src2 -- dst ) ^^i2 ##mul-imm ; inline
 : ^^and ( input mask -- output ) ^^i2 ##and ; inline
@@ -35,8 +36,11 @@ IN: compiler.cfg.hats
 : ^^or-imm ( src1 src2 -- dst ) ^^i2 ##or-imm ; inline
 : ^^xor ( src1 src2 -- dst ) ^^i2 ##xor ; inline
 : ^^xor-imm ( src1 src2 -- dst ) ^^i2 ##xor-imm ; inline
+: ^^shl ( src1 src2 -- dst ) ^^i2 ##shl ; inline
 : ^^shl-imm ( src1 src2 -- dst ) ^^i2 ##shl-imm ; inline
+: ^^shr ( src1 src2 -- dst ) ^^i2 ##shr ; inline
 : ^^shr-imm ( src1 src2 -- dst ) ^^i2 ##shr-imm ; inline
+: ^^sar ( src1 src2 -- dst ) ^^i2 ##sar ; inline
 : ^^sar-imm ( src1 src2 -- dst ) ^^i2 ##sar-imm ; inline
 : ^^not ( src -- dst ) ^^i1 ##not ; inline
 : ^^log2 ( src -- dst ) ^^i1 ##log2 ; inline
@@ -70,8 +74,10 @@ IN: compiler.cfg.hats
 : ^^compare ( src1 src2 cc -- dst ) ^^i3 i ##compare ; inline
 : ^^compare-imm ( src1 src2 cc -- dst ) ^^i3 i ##compare-imm ; inline
 : ^^compare-float ( src1 src2 cc -- dst ) ^^i3 i ##compare-float ; inline
-: ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] when ; inline
+: ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] [ ^^copy ] if ; inline
 : ^^tag-fixnum ( src -- dst ) ^^i1 ##tag-fixnum ; inline
 : ^^untag-fixnum ( src -- dst ) ^^i1 ##untag-fixnum ; inline
-
+: ^^fixnum-add ( src1 src2 -- dst ) ^^i2 ##fixnum-add ; inline
+: ^^fixnum-sub ( src1 src2 -- dst ) ^^i2 ##fixnum-sub ; inline
+: ^^fixnum-mul ( src1 src2 -- dst ) ^^i2 ##fixnum-mul ; inline
 : ^^phi ( inputs -- dst ) ^^i1 ##phi ; inline

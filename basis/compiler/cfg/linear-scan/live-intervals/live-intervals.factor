@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math math.order fry
-combinators compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.def-use compiler.cfg.liveness compiler.cfg ;
+combinators binary-search compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.def-use compiler.cfg.liveness compiler.cfg.rpo
+compiler.cfg ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 TUPLE: live-range from to ;
@@ -12,20 +13,24 @@ C: <live-range> live-range
 TUPLE: live-interval
 vreg
 reg spill-to reload-from
-split-before split-after split-next
 start end ranges uses
 copy-from ;
 
-: covers? ( insn# live-interval -- ? )
-    ranges>> [ [ from>> ] [ to>> ] bi between? ] with any? ;
+GENERIC: covers? ( insn# obj -- ? )
 
-: child-interval-at ( insn# interval -- interval' )
-    dup split-after>> [
-        2dup split-after>> start>> <
-        [ split-before>> ] [ split-after>> ] if
-        child-interval-at
-    ] [ nip ] if ;
+M: f covers? 2drop f ;
 
+M: live-range covers? [ from>> ] [ to>> ] bi between? ;
+
+M: live-interval covers? ( insn# live-interval -- ? )
+    ranges>>
+    dup length 4 <= [
+        [ covers? ] with any?
+    ] [
+        [ drop ] [ [ from>> <=> ] with search nip ] 2bi
+        covers?
+    ] if ;
+        
 ERROR: dead-value-error vreg ;
 
 : shorten-range ( n live-interval -- )
@@ -92,7 +97,7 @@ M: insn compute-live-intervals* drop ;
 M: vreg-insn compute-live-intervals*
     dup insn#>>
     live-intervals get
-    [ [ defs-vregs ] 2dip '[ [ _ ] dip _ handle-output ] each ]
+    [ [ defs-vreg ] 2dip '[ [ _ ] dip _ handle-output ] when* ]
     [ [ uses-vregs ] 2dip '[ [ _ ] dip _ handle-input ] each ]
     [ [ temp-vregs ] 2dip '[ [ _ ] dip _ handle-temp ] each ]
     3tri ;
@@ -122,10 +127,10 @@ M: ##copy-float compute-live-intervals*
     dup ranges>> [ first from>> ] [ last to>> ] bi
     [ >>start ] [ >>end ] bi* drop ;
 
-: check-start/end ( live-interval -- )
-    [ [ start>> ] [ uses>> first ] bi assert= ]
-    [ [ end>> ] [ uses>> last ] bi assert= ]
-    bi ;
+ERROR: bad-live-interval live-interval ;
+
+: check-start ( live-interval -- )
+    dup start>> -1 = [ bad-live-interval ] [ drop ] if ;
 
 : finish-live-intervals ( live-intervals -- )
     ! Since live intervals are computed in a backward order, we have
@@ -135,14 +140,14 @@ M: ##copy-float compute-live-intervals*
             [ ranges>> reverse-here ]
             [ uses>> reverse-here ]
             [ compute-start/end ]
-            [ check-start/end ]
+            [ check-start ]
         } cleave
     ] each ;
 
-: compute-live-intervals ( rpo -- live-intervals )
+: compute-live-intervals ( cfg -- live-intervals )
     H{ } clone [
         live-intervals set
-        <reversed> [ compute-live-intervals-step ] each
+        post-order [ compute-live-intervals-step ] each
     ] keep values dup finish-live-intervals ;
 
 : relevant-ranges ( interval1 interval2 -- ranges1 ranges2 )

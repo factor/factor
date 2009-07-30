@@ -35,12 +35,16 @@ TUPLE: disjoint-set
 : representative? ( a disjoint-set -- ? )
     dupd parent = ; inline
 
+PRIVATE>
+
 GENERIC: representative ( a disjoint-set -- p )
 
 M: disjoint-set representative
     2dup representative? [ drop ] [
         [ [ parent ] keep representative dup ] 2keep set-parent
     ] if ;
+
+<PRIVATE
 
 : representatives ( a b disjoint-set -- r r )
     [ representative ] curry bi@ ; inline

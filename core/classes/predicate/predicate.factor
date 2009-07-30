@@ -7,7 +7,9 @@ IN: classes.predicate
 PREDICATE: predicate-class < class
     "metaclass" word-prop predicate-class eq? ;
 
-: predicate-quot ( class -- quot )
+GENERIC: predicate-quot ( class -- quot )
+
+M: predicate-class predicate-quot
     [
         \ dup ,
         [ superclass "predicate" word-prop % ]

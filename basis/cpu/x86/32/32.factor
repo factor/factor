@@ -1,13 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals alien.c-types alien.syntax arrays kernel fry
-math namespaces sequences system layouts io vocabs.loader
-accessors init combinators command-line cpu.x86.assembler
-cpu.x86 cpu.architecture make compiler compiler.units
+USING: locals alien.c-types alien.syntax arrays kernel fry math
+namespaces sequences system layouts io vocabs.loader accessors init
+combinators command-line make compiler compiler.units
 compiler.constants compiler.alien compiler.codegen
-compiler.codegen.fixup compiler.cfg.instructions
-compiler.cfg.builder compiler.cfg.intrinsics
-compiler.cfg.stack-frame ;
+compiler.codegen.fixup compiler.cfg.instructions compiler.cfg.builder
+compiler.cfg.intrinsics compiler.cfg.stack-frame cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86 cpu.architecture ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -50,8 +49,6 @@ M: x86.32 pic-tail-reg EBX ;
 M: x86.32 reserved-area-size 0 ;
 
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
-
-M: x86.32 %alien-invoke-tail 0 JMP rc-relative rel-dlsym ;
 
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
     c-type

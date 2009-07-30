@@ -6,9 +6,8 @@ classes.private arrays hashtables vectors classes.tuple sbufs
 hashtables.private sequences.private math classes.tuple.private
 growable namespaces.private assocs words command-line vocabs io
 io.encodings.string libc splitting math.parser memory compiler.units
-math.order compiler.tree.builder compiler.tree.optimizer
-compiler.cfg.optimizer ;
-FROM: compiler => enable-optimizer compile-word ;
+math.order quotations quotations.private assocs.private ;
+FROM: compiler => enable-optimizer ;
 IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a
@@ -42,16 +41,24 @@ nl
 ! which are also quick to compile are replaced by
 ! compiled definitions as soon as possible.
 {
-    not
+    not ?
+
+    2over roll -roll
 
     array? hashtable? vector?
     tuple? sbuf? tombstone?
+    curry? compose? callable?
+    quotation?
 
-    array-nth set-array-nth
+    curry compose uncurry
+
+    array-nth set-array-nth length>>
 
     wrap probe
 
     namestack*
+
+    layout-of
 } compile-unoptimized
 
 "." write flush
@@ -75,7 +82,7 @@ nl
 "." write flush
 
 {
-    hashcode* = get set
+    hashcode* = equal? assoc-stack (assoc-stack) get set
 } compile-unoptimized
 
 "." write flush
@@ -97,22 +104,6 @@ nl
 {
     malloc calloc free memcpy
 } compile-unoptimized
-
-"." write flush
-
-{ build-tree } compile-unoptimized
-
-"." write flush
-
-{ optimize-tree } compile-unoptimized
-
-"." write flush
-
-{ optimize-cfg } compile-unoptimized
-
-"." write flush
-
-{ compile-word } compile-unoptimized
 
 "." write flush
 

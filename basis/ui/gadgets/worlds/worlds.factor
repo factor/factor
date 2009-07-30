@@ -78,13 +78,11 @@ TUPLE: world-attributes
         '[ f _ [ (>>status-owner) ] [ status>> set-model ] 2bi ] when
     ] [ 2drop ] if ;
 
-SYMBOL: context-world
-
 : window-resource ( resource -- resource )
-    dup context-world get-global window-resources>> push ;
+    dup world get-global window-resources>> push ;
 
 : set-gl-context ( world -- )
-    [ context-world set-global ]
+    [ world set-global ]
     [ handle>> select-gl-context ] bi ;
 
 : with-gl-context ( world quot -- )
@@ -163,9 +161,11 @@ M: world resize-world
 M: world (>>dim)
     [ call-next-method ]
     [
-        dup handle>>
-        [ [ set-gl-context ] [ resize-world ] bi ]
-        [ drop ] if
+        dup active?>> [
+            dup handle>>
+            [ [ set-gl-context ] [ resize-world ] bi ]
+            [ drop ] if
+        ] [ drop ] if
     ] bi ;
 
 GENERIC: draw-world* ( world -- )
