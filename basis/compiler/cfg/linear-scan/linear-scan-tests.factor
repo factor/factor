@@ -75,6 +75,9 @@ check-numbering? on
     { T{ live-range f 0 5 } } 0 split-ranges
 ] unit-test
 
+H{ { int-regs 10 } { float-regs 20 } } clone spill-counts set
+H{ } spill-slots set
+
 [
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
@@ -82,6 +85,7 @@ check-numbering? on
        { end 2 }
        { uses V{ 0 1 } }
        { ranges V{ T{ live-range f 0 2 } } }
+       { spill-to 10 }
     }
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
@@ -89,6 +93,7 @@ check-numbering? on
        { end 5 }
        { uses V{ 5 } }
        { ranges V{ T{ live-range f 5 5 } } }
+       { reload-from 10 }
     }
 ] [
     T{ live-interval
@@ -97,82 +102,61 @@ check-numbering? on
        { end 5 }
        { uses V{ 0 1 5 } }
        { ranges V{ T{ live-range f 0 5 } } }
-    } 2 split-for-spill [ f >>split-next ] bi@
+    } 2 split-for-spill
 ] unit-test
 
 [
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 2 } } }
        { start 0 }
        { end 1 }
        { uses V{ 0 } }
        { ranges V{ T{ live-range f 0 1 } } }
+       { spill-to 11 }
     }
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 2 } } }
        { start 1 }
        { end 5 }
        { uses V{ 1 5 } }
        { ranges V{ T{ live-range f 1 5 } } }
+       { reload-from 11 }
     }
 ] [
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 2 } } }
        { start 0 }
        { end 5 }
        { uses V{ 0 1 5 } }
        { ranges V{ T{ live-range f 0 5 } } }
-    } 0 split-for-spill [ f >>split-next ] bi@
+    } 0 split-for-spill
 ] unit-test
 
 [
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 3 } } }
        { start 0 }
        { end 1 }
        { uses V{ 0 } }
        { ranges V{ T{ live-range f 0 1 } } }
+       { spill-to 12 }
     }
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 3 } } }
        { start 20 }
        { end 30 }
        { uses V{ 20 30 } }
        { ranges V{ T{ live-range f 20 30 } } }
+       { reload-from 12 }
     }
 ] [
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 3 } } }
        { start 0 }
        { end 30 }
        { uses V{ 0 20 30 } }
        { ranges V{ T{ live-range f 0 8 } T{ live-range f 10 18 } T{ live-range f 20 30 } } }
-    } 10 split-for-spill [ f >>split-next ] bi@
-] unit-test
-
-[
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 0 }
-        { end 4 }
-        { uses V{ 0 1 4 } }
-        { ranges V{ T{ live-range f 0 4 } } }
-    }
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 5 }
-        { end 10 }
-        { uses V{ 5 10 } }
-        { ranges V{ T{ live-range f 5 10 } } }
-    }
-] [
-    T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-       { start 0 }
-       { end 10 }
-       { uses V{ 0 1 4 5 10 } }
-       { ranges V{ T{ live-range f 0 10 } } }
-    } 4 split-to-fit [ f >>split-next ] bi@
+    } 10 split-for-spill
 ] unit-test
 
 [
@@ -351,6 +335,78 @@ check-numbering? on
     H{ { int-regs { "A" } } }
     check-linear-scan
 ] must-fail
+
+! Problem with spilling intervals with no more usages after the spill location
+
+[ ] [
+    {
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 20 }
+           { uses V{ 0 10 20 } }
+           { ranges V{ T{ live-range f 0 2 } T{ live-range f 10 20 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 2 } { reg-class int-regs } } }
+           { start 0 }
+           { end 20 }
+           { uses V{ 0 10 20 } }
+           { ranges V{ T{ live-range f 0 2 } T{ live-range f 10 20 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 3 } { reg-class int-regs } } }
+           { start 4 }
+           { end 8 }
+           { uses V{ 6 } }
+           { ranges V{ T{ live-range f 4 8 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 4 } { reg-class int-regs } } }
+           { start 4 }
+           { end 8 }
+           { uses V{ 8 } }
+           { ranges V{ T{ live-range f 4 8 } } }
+        }
+
+        ! This guy will invoke the 'spill partially available' code path
+        T{ live-interval
+           { vreg T{ vreg { n 5 } { reg-class int-regs } } }
+           { start 4 }
+           { end 8 }
+           { uses V{ 8 } }
+           { ranges V{ T{ live-range f 4 8 } } }
+        }
+    }
+    H{ { int-regs { "A" "B" } } }
+    check-linear-scan
+] unit-test
+
+
+! Test spill-new code path
+
+[ ] [
+    {
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 10 }
+           { uses V{ 0 6 10 } }
+           { ranges V{ T{ live-range f 0 10 } } }
+        }
+
+        ! This guy will invoke the 'spill new' code path
+        T{ live-interval
+           { vreg T{ vreg { n 5 } { reg-class int-regs } } }
+           { start 2 }
+           { end 8 }
+           { uses V{ 8 } }
+           { ranges V{ T{ live-range f 2 8 } } }
+        }
+    }
+    H{ { int-regs { "A" } } }
+    check-linear-scan
+] unit-test
 
 SYMBOL: available
 
