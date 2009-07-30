@@ -110,6 +110,7 @@ PRIVATE>
 TUPLE: pull-xml scope ;
 : <pull-xml> ( -- pull-xml )
     [
+        init-parser
         input-stream [ ] change ! bring var in this scope
         init-xml text-now? on
     ] H{ } make-assoc
