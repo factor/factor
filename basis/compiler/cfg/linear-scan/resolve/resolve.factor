@@ -1,28 +1,29 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit fry kernel locals
-make math sequences
+combinators.short-circuit fry kernel locals namespaces
+make math sequences hashtables
+compiler.cfg.rpo
+compiler.cfg.liveness
+compiler.cfg.utilities
 compiler.cfg.instructions
+compiler.cfg.parallel-copy
 compiler.cfg.linear-scan.assignment
-compiler.cfg.linear-scan.mapping compiler.cfg.liveness ;
+compiler.cfg.linear-scan.allocation.state ;
 IN: compiler.cfg.linear-scan.resolve
 
+SYMBOL: spill-temps
+
+: spill-temp ( reg-class -- n )
+    spill-temps get [ next-spill-slot ] cache ;
+
 : add-mapping ( from to reg-class -- )
-    over spill-slot? [
-        pick spill-slot?
-        [ memory->memory ]
-        [ register->memory ] if
-    ] [
-        pick spill-slot?
-        [ memory->register ]
-        [ register->register ] if
-    ] if ;
+    '[ _ 2array ] bi@ 2array , ;
 
 :: resolve-value-data-flow ( bb to vreg -- )
     vreg bb vreg-at-end
     vreg to vreg-at-start
-    2dup eq? [ 2drop ] [ vreg reg-class>> add-mapping ] if ;
+    2dup = [ 2drop ] [ vreg reg-class>> add-mapping ] if ;
 
 : compute-mappings ( bb to -- mappings )
     [
@@ -30,45 +31,48 @@ IN: compiler.cfg.linear-scan.resolve
         [ resolve-value-data-flow ] with with each
     ] { } make ;
 
-: fork? ( from to -- ? )
+: memory->register ( from to -- )
+    swap [ first2 ] [ first n>> ] bi* _reload ;
+
+: register->memory ( from to -- )
+    [ first2 ] [ first n>> ] bi* _spill ;
+
+: temp->register ( from to -- )
+    nip [ first ] [ second ] [ second spill-temp ] tri _reload ;
+
+: register->temp ( from to -- )
+    drop [ first2 ] [ second spill-temp ] bi _spill ;
+
+: register->register ( from to -- )
+    swap [ first ] [ first2 ] bi* _copy ;
+
+SYMBOL: temp
+
+: >insn ( from to -- )
     {
-        [ drop successors>> length 1 >= ]
-        [ nip predecessors>> length 1 = ]
-    } 2&& ; inline
-
-: insert-position/fork ( from to -- before after )
-    nip instructions>> [ >array ] [ dup delete-all ] bi swap ;
-
-: join? ( from to -- ? )
-    {
-        [ drop successors>> length 1 = ]
-        [ nip predecessors>> length 1 >= ]
-    } 2&& ; inline
-
-: insert-position/join ( from to -- before after )
-    drop instructions>> dup pop 1array ;
-
-: insert-position ( bb to -- before after )
-    {
-        { [ 2dup fork? ] [ insert-position/fork ] }
-        { [ 2dup join? ] [ insert-position/join ] }
+        { [ over temp eq? ] [ temp->register ] }
+        { [ dup temp eq? ] [ register->temp ] }
+        { [ over first spill-slot? ] [ memory->register ] }
+        { [ dup first spill-slot? ] [ register->memory ] }
+        [ register->register ]
     } cond ;
 
-: 3append-here ( seq2 seq1 seq3 -- )
-    #! Mutate seq1
-    swap '[ _ push-all ] bi@ ;
+: mapping-instructions ( alist -- insns )
+    [ swap ] H{ } assoc-map-as
+    [ temp [ swap >insn ] parallel-mapping ] { } make ;
 
-: perform-mappings ( mappings bb to -- )
-    pick empty? [ 3drop ] [
-        [ mapping-instructions ] 2dip
-        insert-position 3append-here
+: perform-mappings ( bb to mappings -- )
+    dup empty? [ 3drop ] [
+        mapping-instructions <simple-block>
+        insert-basic-block
     ] if ;
 
 : resolve-edge-data-flow ( bb to -- )
-    [ compute-mappings ] [ perform-mappings ] 2bi ;
+    2dup compute-mappings perform-mappings ;
 
 : resolve-block-data-flow ( bb -- )
     dup successors>> [ resolve-edge-data-flow ] with each ;
 
-: resolve-data-flow ( rpo -- )
-    [ resolve-block-data-flow ] each ;
+: resolve-data-flow ( cfg -- )
+    H{ } clone spill-temps set
+    [ resolve-block-data-flow ] each-basic-block ;

@@ -213,12 +213,25 @@ IN: compiler.tests.intrinsics
 [ -1 ] [ [ -123 -64 fixnum-shift ] compile-call ] unit-test
 [ -1 ] [ -123 -64 [ fixnum-shift ] compile-call ] unit-test
 
-[ HEX: 10000000 ] [ HEX: 1000000 HEX: 10 [ fixnum* ] compile-call ] unit-test
-[ HEX: 10000000 ] [ HEX: -10000000 >fixnum [ 0 swap fixnum- ] compile-call ] unit-test
-[ HEX: 10000000 ] [ HEX: -fffffff >fixnum [ 1 swap fixnum- ] compile-call ] unit-test
+[ 4294967296 ] [ 1 32 [ fixnum-shift ] compile-call ] unit-test
+[ 4294967296 ] [ 1 [ 32 fixnum-shift ] compile-call ] unit-test
+[ 4294967296 ] [ 1 [ 16 fixnum-shift 16 fixnum-shift ] compile-call ] unit-test
+[ -4294967296 ] [ -1 32 [ fixnum-shift ] compile-call ] unit-test
+[ -4294967296 ] [ -1 [ 32 fixnum-shift ] compile-call ] unit-test
+[ -4294967296 ] [ -1 [ 16 fixnum-shift 16 fixnum-shift ] compile-call ] unit-test
 
-[ t ] [ 1 27 fixnum-shift dup [ fixnum+ ] compile-call 1 28 fixnum-shift = ] unit-test
-[ -268435457 ] [ 1 28 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
+[ 8 ] [ 1 3 [ fixnum-shift-fast ] compile-call ] unit-test
+[ 8 ] [ 1 3 [ 15 bitand fixnum-shift-fast ] compile-call ] unit-test
+[ 8 ] [ 1 [ 3 fixnum-shift-fast ] compile-call ] unit-test
+[ 8 ] [ [ 1 3 fixnum-shift-fast ] compile-call ] unit-test
+[ -8 ] [ -1 3 [ fixnum-shift-fast ] compile-call ] unit-test
+[ -8 ] [ -1 3 [ 15 bitand fixnum-shift-fast ] compile-call ] unit-test
+[ -8 ] [ -1 [ 3 fixnum-shift-fast ] compile-call ] unit-test
+[ -8 ] [ [ -1 3 fixnum-shift-fast ] compile-call ] unit-test
+
+[ 2 ] [ 8 -2 [ fixnum-shift-fast ] compile-call ] unit-test
+[ 2 ] [ 8 2 [ 15 bitand neg fixnum-shift-fast ] compile-call ] unit-test
+[ 2 ] [ 8 [ -2 fixnum-shift-fast ] compile-call ] unit-test
 
 [ 4294967296 ] [ 1 32 [ fixnum-shift ] compile-call ] unit-test
 [ 4294967296 ] [ 1 [ 32 fixnum-shift ] compile-call ] unit-test
@@ -226,6 +239,13 @@ IN: compiler.tests.intrinsics
 [ -4294967296 ] [ -1 32 [ fixnum-shift ] compile-call ] unit-test
 [ -4294967296 ] [ -1 [ 32 fixnum-shift ] compile-call ] unit-test
 [ -4294967296 ] [ -1 [ 16 fixnum-shift 16 fixnum-shift ] compile-call ] unit-test
+
+[ HEX: 10000000 ] [ HEX: 1000000 HEX: 10 [ fixnum* ] compile-call ] unit-test
+[ HEX: 10000000 ] [ HEX: -10000000 >fixnum [ 0 swap fixnum- ] compile-call ] unit-test
+[ HEX: 10000000 ] [ HEX: -fffffff >fixnum [ 1 swap fixnum- ] compile-call ] unit-test
+
+[ t ] [ 1 27 fixnum-shift dup [ fixnum+ ] compile-call 1 28 fixnum-shift = ] unit-test
+[ -268435457 ] [ 1 28 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
 
 [ t ] [ 1 20 shift 1 20 shift [ fixnum* ] compile-call 1 40 shift = ] unit-test
 [ t ] [ 1 20 shift neg 1 20 shift [ fixnum* ] compile-call 1 40 shift neg = ] unit-test

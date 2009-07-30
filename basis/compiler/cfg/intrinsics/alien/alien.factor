@@ -1,10 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences alien math classes.algebra
-fry locals combinators cpu.architecture
-compiler.tree.propagation.info
+USING: accessors kernel sequences alien math classes.algebra fry
+locals combinators cpu.architecture compiler.tree.propagation.info
 compiler.cfg.hats compiler.cfg.stacks compiler.cfg.instructions
-compiler.cfg.utilities ;
+compiler.cfg.utilities compiler.cfg.builder.blocks ;
 IN: compiler.cfg.intrinsics.alien
 
 : (prepare-alien-accessor-imm) ( class offset -- offset-vreg )
