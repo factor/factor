@@ -1,10 +1,11 @@
-USING: accessors arrays fry kernel lexer make math.parser
+USING: accessors assocs arrays fry kernel lexer make math.parser
 models monads namespaces parser sequences
 sequences.extras ui.frp.gadgets ui.frp.signals ui.gadgets
 ui.gadgets.books ui.gadgets.tracks words ;
 QUALIFIED: make
 IN: ui.frp.layout
 
+SYMBOL: templates
 TUPLE: layout gadget size ; C: <layout> layout
 TUPLE: placeholder < gadget members ;
 : <placeholder> ( -- placeholder ) placeholder new V{ } clone >>members ;
@@ -22,7 +23,7 @@ TUPLE: placeholder < gadget members ;
 ! If there is no previously mentioned placeholder, we're probably making a box, and will create the placeholder ourselves
 DEFER: with-interface
 : insertion-quot ( quot -- quot' ) make:building get [ [ placeholder? ] find-last nip [ <placeholder> dup , ] unless*
-    swap '[ [ _ , @ ] with-interface ] ] when* ;
+    templates get spin '[ [ _ templates set _ , @ ] with-interface ] ] when* ;
 
 SYNTAX: ,% scan string>number [ <layout> , ] curry over push-all ;
 SYNTAX: ->% scan string>number '[ [ _ <layout> , ] [ output-model ] bi ] over push-all ;
@@ -50,9 +51,10 @@ M: model -> dup , ;
 : <frp-book> ( quot: ( -- model ) -- book ) f make-layout rot 0 >>value make-book ; inline
 : <frp-book*> ( quot -- book ) f make-layout f make-book ; inline
 
-SYNTAX: $ CREATE-WORD <placeholder>
-    [ [ , ] curry (( -- )) define-declared "$" expect ]
-    [ [ , ] curry ] bi over push-all ;
+ERROR: not-in-template word ;
+SYNTAX: $ CREATE-WORD dup
+    [ [ dup templates get at [ nip , ] [ not-in-template ] if* ] curry (( -- )) define-declared "$" expect ]
+    [ [ <placeholder> [ swap templates get set-at ] keep , ] curry ] bi over push-all ;
 
 : insert-gadget ( number parent gadget -- ) -rot [ but-last insert-nth ] change-children drop ;
 : insert-size ( number parent size -- ) -rot [ but-last insert-nth ] change-sizes drop ;
@@ -69,7 +71,7 @@ M: model (insert-item) parent>> dup book? [ "No models in books" throw ]
 
 : insert-items ( makelist -- ) t swap [ dup placeholder? [ nip ] [ over insert-item ] if ] each drop ;
 
-: with-interface ( quot -- ) make* [ insert-items ] with-scope ; inline
+: with-interface ( quot -- ) [ make* ] curry H{ } clone templates rot with-variable [ insert-items ] with-scope ; inline
 
 M: model >>= [ swap insertion-quot <action> ] curry ;
 M: model fmap insertion-quot <mapped> ;
