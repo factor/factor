@@ -221,6 +221,7 @@ M: _gc generate-insn
         [ temp2>> ]
         [ gc-roots>> ]
         [ gc-root-count>> ]
+        [ uninitialized-locs>> ]
     } cleave %gc ;
 
 M: _loop-entry generate-insn drop %loop-entry ;
