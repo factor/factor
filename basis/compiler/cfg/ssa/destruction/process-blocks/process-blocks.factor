@@ -61,10 +61,10 @@ SYMBOLS: phi-union unioned-blocks ;
     } cond ;
 
 : node-is-live-in-of-child? ( node child -- ? )
-    [ vreg>> ] [ bb>> live-in ] bi* key? ;
+    [ vreg>> ] [ bb>> ] bi* live-in? ;
 
 : node-is-live-out-of-child? ( node child -- ? )
-    [ vreg>> ] [ bb>> live-out ] bi* key? ;
+    [ vreg>> ] [ bb>> ] bi* live-out? ;
 
 :: insert-copy ( bb src dst -- )
     bb src dst trivial-interference
