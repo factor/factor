@@ -1,89 +1,14 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.binary kernel combinators kernel.private math
+USING: arrays io.binary kernel combinators kernel.private math locals
 namespaces make sequences words system layouts math.order accessors
-cpu.x86.assembler.syntax ;
+cpu.x86.assembler.operands cpu.x86.assembler.operands.private ;
 QUALIFIED: sequences
 IN: cpu.x86.assembler
 
 ! A postfix assembler for x86-32 and x86-64.
 
-! In 32-bit mode, { 1234 } is absolute indirect addressing.
-! In 64-bit mode, { 1234 } is RIP-relative.
-! Beware!
-
-! Register operands -- eg, ECX
-REGISTERS: 8 AL CL DL BL SPL BPL SIL DIL R8B R9B R10B R11B R12B R13B R14B R15B ;
-
-ALIAS: AH SPL
-ALIAS: CH BPL
-ALIAS: DH SIL
-ALIAS: BH DIL
-
-REGISTERS: 16 AX CX DX BX SP BP SI DI R8W R9W R10W R11W R12W R13W R14W R15W ;
-
-REGISTERS: 32 EAX ECX EDX EBX ESP EBP ESI EDI R8D R9D R10D R11D R12D R13D R14D R15D ;
-
-REGISTERS: 64
-RAX RCX RDX RBX RSP RBP RSI RDI R8 R9 R10 R11 R12 R13 R14 R15 ;
-
-REGISTERS: 128
-XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
-XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15 ;
-
-TUPLE: byte value ;
-
-C: <byte> byte
-
 <PRIVATE
-
-#! Extended AMD64 registers (R8-R15) return true.
-GENERIC: extended? ( op -- ? )
-
-M: object extended? drop f ;
-
-PREDICATE: register < word
-    "register" word-prop ;
-
-PREDICATE: register-8 < register
-    "register-size" word-prop 8 = ;
-
-PREDICATE: register-16 < register
-    "register-size" word-prop 16 = ;
-
-PREDICATE: register-32 < register
-    "register-size" word-prop 32 = ;
-
-PREDICATE: register-64 < register
-    "register-size" word-prop 64 = ;
-
-PREDICATE: register-128 < register
-    "register-size" word-prop 128 = ;
-
-M: register extended? "register" word-prop 7 > ;
-
-! Addressing modes
-TUPLE: indirect base index scale displacement ;
-
-M: indirect extended? base>> extended? ;
-
-: canonicalize-EBP ( indirect -- indirect )
-    #! { EBP } ==> { EBP 0 }
-    dup [ base>> { EBP RBP R13 } member? ] [ displacement>> not ] bi and
-    [ 0 >>displacement ] when ;
-
-ERROR: bad-index indirect ;
-
-: check-ESP ( indirect -- indirect )
-    dup index>> { ESP RSP } memq? [ bad-index ] when ;
-
-: canonicalize ( indirect -- indirect )
-    #! Modify the indirect to work around certain addressing mode
-    #! quirks.
-    canonicalize-EBP check-ESP ;
-
-: <indirect> ( base index scale displacement -- indirect )
-    indirect boa canonicalize ;
 
 : reg-code ( reg -- n ) "register" word-prop 7 bitand ;
 
@@ -159,26 +84,12 @@ M: indirect displacement,
     dup displacement>> dup [
         swap base>>
         [ dup fits-in-byte? [ , ] [ 4, ] if ] [ 4, ] if
-    ] [
-        2drop
-    ] if ;
+    ] [ 2drop ] if ;
 
 M: register displacement, drop ;
 
 : addressing ( reg# indirect -- )
     [ mod-r/m, ] [ sib, ] [ displacement, ] tri ;
-
-! Utilities
-UNION: operand register indirect ;
-
-GENERIC: operand-64? ( operand -- ? )
-
-M: indirect operand-64?
-    [ base>> ] [ index>> ] bi [ operand-64? ] either? ;
-
-M: register-64 operand-64? drop t ;
-
-M: object operand-64? drop f ;
 
 : rex.w? ( rex.w reg r/m -- ? )
     {
@@ -192,22 +103,25 @@ M: object operand-64? drop f ;
 
 : rex.b ( m op -- n )
     [ extended? [ BIN: 00000001 bitor ] when ] keep
-    dup indirect? [
-        index>> extended? [ BIN: 00000010 bitor ] when
-    ] [
-        drop
-    ] if ;
+    dup indirect? [ index>> extended? [ BIN: 00000010 bitor ] when ] [ drop ] if ;
 
-: rex-prefix ( reg r/m rex.w -- )
+: no-prefix? ( prefix reg r/m -- ? )
+    [ BIN: 01000000 = ]
+    [ extended-8-bit-register? not ]
+    [ extended-8-bit-register? not ] tri*
+    and and ;
+
+:: rex-prefix ( reg r/m rex.w -- )
     #! Compile an AMD64 REX prefix.
-    2over rex.w? BIN: 01001000 BIN: 01000000 ?
-    swap rex.r swap rex.b
-    dup BIN: 01000000 = [ drop ] [ , ] if ;
+    rex.w reg r/m rex.w? BIN: 01001000 BIN: 01000000 ?
+    r/m rex.r
+    reg rex.b
+    dup reg r/m no-prefix? [ drop ] [ , ] if ;
 
 : 16-prefix ( reg r/m -- )
     [ register-16? ] either? [ HEX: 66 , ] when ;
 
-: prefix ( reg r/m rex.w -- ) 2over 16-prefix rex-prefix ;
+: prefix ( reg r/m rex.w -- ) [ drop 16-prefix ] [ rex-prefix ] 3bi ;
 
 : prefix-1 ( reg rex.w -- ) f swap prefix ;
 
@@ -269,21 +183,9 @@ M: object operand-64? drop f ;
 : 2-operand ( dst src op -- )
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
-    2over 16-prefix
-    direction-bit
-    operand-size-bit
-    (2-operand) ;
+    [ drop 16-prefix ] [ direction-bit operand-size-bit (2-operand) ] 3bi ;
 
 PRIVATE>
-
-: [] ( reg/displacement -- indirect )
-    dup integer? [ [ f f f ] dip ] [ f f f ] if <indirect> ;
-
-: [+] ( reg displacement -- indirect )
-    dup integer?
-    [ dup zero? [ drop f ] when [ f f ] dip ]
-    [ f f ] if
-    <indirect> ;
 
 ! Moving stuff
 GENERIC: PUSH ( op -- )
