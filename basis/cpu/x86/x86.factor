@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs alien alien.c-types arrays strings
-cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
-kernel kernel.private math memory namespaces make sequences
-words system layouts combinators math.order fry locals
+cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
+cpu.architecture kernel kernel.private math memory namespaces make
+sequences words system layouts combinators math.order fry locals
 compiler.constants
 compiler.cfg.registers
 compiler.cfg.instructions
@@ -264,67 +264,6 @@ M:: x86 %box-alien ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
-: small-reg-8 ( reg -- reg' )
-    H{
-        { EAX RAX }
-        { ECX RCX }
-        { EDX RDX }
-        { EBX RBX }
-        { ESP RSP }
-        { EBP RBP }
-        { ESI RSP }
-        { EDI RDI }
-
-        { RAX RAX }
-        { RCX RCX }
-        { RDX RDX }
-        { RBX RBX }
-        { RSP RSP }
-        { RBP RBP }
-        { RSI RSP }
-        { RDI RDI }
-    } at ; inline
-
-: small-reg-4 ( reg -- reg' )
-    small-reg-8 H{
-        { RAX EAX }
-        { RCX ECX }
-        { RDX EDX }
-        { RBX EBX }
-        { RSP ESP }
-        { RBP EBP }
-        { RSI ESP }
-        { RDI EDI }
-    } at ; inline
-
-: small-reg-2 ( reg -- reg' )
-    small-reg-4 H{
-        { EAX AX }
-        { ECX CX }
-        { EDX DX }
-        { EBX BX }
-        { ESP SP }
-        { EBP BP }
-        { ESI SI }
-        { EDI DI }
-    } at ; inline
-
-: small-reg-1 ( reg -- reg' )
-    small-reg-4 {
-        { EAX AL }
-        { ECX CL }
-        { EDX DL }
-        { EBX BL }
-    } at ; inline
-
-: small-reg ( reg size -- reg' )
-    {
-        { 1 [ small-reg-1 ] }
-        { 2 [ small-reg-2 ] }
-        { 4 [ small-reg-4 ] }
-        { 8 [ small-reg-8 ] }
-    } case ;
-
 HOOK: small-regs cpu ( -- regs )
 
 M: x86.32 small-regs { EAX ECX EDX EBX } ;
@@ -336,7 +275,7 @@ M: x86.32 small-reg-native small-reg-4 ;
 M: x86.64 small-reg-native small-reg-8 ;
 
 : small-reg-that-isn't ( exclude -- reg' )
-    small-regs swap [ small-reg-native ] map '[ _ memq? not ] find nip ;
+    small-regs swap [ native-version-of ] map '[ _ memq? not ] find nip ;
 
 : with-save/restore ( reg quot -- )
     [ drop PUSH ] [ call ] [ drop POP ] 2tri ; inline
@@ -346,7 +285,7 @@ M: x86.64 small-reg-native small-reg-8 ;
     #! call the quot with that. Otherwise, we find a small
     #! register that is not in exclude, and call quot, saving
     #! and restoring the small register.
-    dst small-reg-native small-regs memq? [ dst quot call ] [
+    dst small-regs memq? [ dst quot call ] [
         exclude small-reg-that-isn't
         [ quot call ] with-save/restore
     ] if ; inline
@@ -362,7 +301,7 @@ M: x86.64 small-reg-native small-reg-8 ;
             src2 CL quot call
             dst src2 XCHG
         ] [
-            ECX small-reg-native [
+            ECX native-version-of [
                 CL src2 MOV
                 drop dst CL quot call
             ] with-save/restore
@@ -380,8 +319,8 @@ M:: x86 %string-nth ( dst src index temp -- )
         ! 8th bit indicates whether we have to load from
         ! the aux vector or not.
         temp src index [+] LEA
-        new-dst 1 small-reg temp string-offset [+] MOV
-        new-dst new-dst 1 small-reg MOVZX
+        new-dst 8-bit-version-of temp string-offset [+] MOV
+        new-dst new-dst 8-bit-version-of MOVZX
         ! Do we have to look at the aux vector?
         new-dst HEX: 80 CMP
         "end" get JL
@@ -392,8 +331,8 @@ M:: x86 %string-nth ( dst src index temp -- )
         new-dst index ADD
         new-dst index ADD
         ! Load high 16 bits
-        new-dst 2 small-reg new-dst byte-array-offset [+] MOV
-        new-dst new-dst 2 small-reg MOVZX
+        new-dst 16-bit-version-of new-dst byte-array-offset [+] MOV
+        new-dst new-dst 16-bit-version-of MOVZX
         new-dst 7 SHL
         ! Compute code point
         new-dst temp XOR
@@ -405,12 +344,12 @@ M:: x86 %set-string-nth-fast ( ch str index temp -- )
     ch { index str temp } [| new-ch |
         new-ch ch ?MOV
         temp str index [+] LEA
-        temp string-offset [+] new-ch 1 small-reg MOV
+        temp string-offset [+] new-ch 8-bit-version-of MOV
     ] with-small-register ;
 
 :: %alien-integer-getter ( dst src size quot -- )
     dst { src } [| new-dst |
-        new-dst dup size small-reg dup src [] MOV
+        new-dst dup size 8 * n-bit-version-of dup src [] MOV
         quot call
         dst new-dst ?MOV
     ] with-small-register ; inline
@@ -437,7 +376,7 @@ M: x86 %alien-double [] MOVSD ;
 :: %alien-integer-setter ( ptr value size -- )
     value { ptr } [| new-value |
         new-value value ?MOV
-        ptr [] new-value size small-reg MOV
+        ptr [] new-value size 8 * n-bit-version-of MOV
     ] with-small-register ; inline
 
 M: x86 %set-alien-integer-1 1 %alien-integer-setter ;
