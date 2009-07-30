@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.binary kernel combinators kernel.private math
+USING: arrays io.binary kernel combinators kernel.private math locals
 namespaces make sequences words system layouts math.order accessors
 cpu.x86.assembler.operands cpu.x86.assembler.operands.private ;
 QUALIFIED: sequences
@@ -9,8 +9,6 @@ IN: cpu.x86.assembler
 ! A postfix assembler for x86-32 and x86-64.
 
 <PRIVATE
-
-#! Extended AMD64 registers (R8-R15) return true.
 
 : reg-code ( reg -- n ) "register" word-prop 7 bitand ;
 
@@ -86,9 +84,7 @@ M: indirect displacement,
     dup displacement>> dup [
         swap base>>
         [ dup fits-in-byte? [ , ] [ 4, ] if ] [ 4, ] if
-    ] [
-        2drop
-    ] if ;
+    ] [ 2drop ] if ;
 
 M: register displacement, drop ;
 
@@ -107,22 +103,25 @@ M: register displacement, drop ;
 
 : rex.b ( m op -- n )
     [ extended? [ BIN: 00000001 bitor ] when ] keep
-    dup indirect? [
-        index>> extended? [ BIN: 00000010 bitor ] when
-    ] [
-        drop
-    ] if ;
+    dup indirect? [ index>> extended? [ BIN: 00000010 bitor ] when ] [ drop ] if ;
 
-: rex-prefix ( reg r/m rex.w -- )
+: no-prefix? ( prefix reg r/m -- ? )
+    [ BIN: 01000000 = ]
+    [ extended-8-bit-register? not ]
+    [ extended-8-bit-register? not ] tri*
+    and and ;
+
+:: rex-prefix ( reg r/m rex.w -- )
     #! Compile an AMD64 REX prefix.
-    2over rex.w? BIN: 01001000 BIN: 01000000 ?
-    swap rex.r swap rex.b
-    dup BIN: 01000000 = [ drop ] [ , ] if ;
+    rex.w reg r/m rex.w? BIN: 01001000 BIN: 01000000 ?
+    r/m rex.r
+    reg rex.b
+    dup reg r/m no-prefix? [ drop ] [ , ] if ;
 
 : 16-prefix ( reg r/m -- )
     [ register-16? ] either? [ HEX: 66 , ] when ;
 
-: prefix ( reg r/m rex.w -- ) 2over 16-prefix rex-prefix ;
+: prefix ( reg r/m rex.w -- ) [ drop 16-prefix ] [ rex-prefix ] 3bi ;
 
 : prefix-1 ( reg rex.w -- ) f swap prefix ;
 
@@ -184,10 +183,7 @@ M: register displacement, drop ;
 : 2-operand ( dst src op -- )
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
-    2over 16-prefix
-    direction-bit
-    operand-size-bit
-    (2-operand) ;
+    [ drop 16-prefix ] [ direction-bit operand-size-bit (2-operand) ] 3bi ;
 
 PRIVATE>
 

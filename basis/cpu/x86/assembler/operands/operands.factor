@@ -102,10 +102,13 @@ TUPLE: byte value ;
 
 C: <byte> byte
 
+: extended-8-bit-register? ( register -- ? )
+    { SPL BPL SIL DIL } memq? ;
+
 : n-bit-version-of ( register n -- register' )
     ! Certain 8-bit registers don't exist in 32-bit mode...
     [ "register" word-prop ] dip registers get at nth
-    dup { SPL BPL SIL DIL } memq? cell 4 = and
+    dup extended-8-bit-register? cell 4 = and
     [ drop f ] when ;
 
 : 8-bit-version-of ( register -- register' ) 8 n-bit-version-of ;
