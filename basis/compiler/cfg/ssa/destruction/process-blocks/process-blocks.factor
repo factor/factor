@@ -4,7 +4,7 @@ USING: accessors assocs fry kernel locals math math.order arrays
 namespaces sequences sorting sets combinators combinators.short-circuit make
 compiler.cfg.def-use
 compiler.cfg.instructions
-compiler.cfg.liveness
+compiler.cfg.liveness.ssa
 compiler.cfg.dominance
 compiler.cfg.ssa.destruction.state
 compiler.cfg.ssa.destruction.forest
@@ -19,13 +19,13 @@ IN: compiler.cfg.ssa.destruction.process-blocks
 SYMBOLS: phi-union unioned-blocks ;
 
 :: operand-live-into-phi-node's-block? ( bb src dst -- ? )
-    src bb live-in key? ;
+    src bb live-in? ;
 
 :: phi-node-is-live-out-of-operand's-block? ( bb src dst -- ? )
-    dst src def-of live-out key? ;
+    dst src def-of live-out? ;
 
 :: operand-is-phi-node-and-live-into-operand's-block? ( bb src dst -- ? )
-    { [ src insn-of ##phi? ] [ src src def-of live-in key? ] } 0&& ;
+    { [ src insn-of ##phi? ] [ src src def-of live-in? ] } 0&& ;
 
 :: operand-being-renamed? ( bb src dst -- ? )
     src processed-names get key? ;
@@ -61,10 +61,10 @@ SYMBOLS: phi-union unioned-blocks ;
     } cond ;
 
 : node-is-live-in-of-child? ( node child -- ? )
-    [ vreg>> ] [ bb>> live-in ] bi* key? ;
+    [ vreg>> ] [ bb>> ] bi* live-in? ;
 
 : node-is-live-out-of-child? ( node child -- ? )
-    [ vreg>> ] [ bb>> live-out ] bi* key? ;
+    [ vreg>> ] [ bb>> ] bi* live-out? ;
 
 :: insert-copy ( bb src dst -- )
     bb src dst trivial-interference
