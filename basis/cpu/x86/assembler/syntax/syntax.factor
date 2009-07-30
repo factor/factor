@@ -1,14 +1,23 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel words words.symbol sequences lexer parser fry ;
+USING: kernel words words.symbol sequences lexer parser fry
+namespaces combinators assocs ;
 IN: cpu.x86.assembler.syntax
 
-: define-register ( name num size -- )
-    [ "cpu.x86.assembler" create dup define-symbol ] 2dip
-    [ dupd "register" set-word-prop ] dip
-    "register-size" set-word-prop ;
+SYMBOL: registers
 
-: define-registers ( names size -- )
-    '[ _ define-register ] each-index ;
+registers [ H{ } clone ] initialize
 
-SYNTAX: REGISTERS: scan-word ";" parse-tokens swap define-registers ;
+: define-register ( name num size -- word )
+    [ "cpu.x86.assembler.operands" create ] 2dip {
+        [ 2drop ]
+        [ 2drop define-symbol ]
+        [ drop "register" set-word-prop ]
+        [ nip "register-size" set-word-prop ]
+    } 3cleave ;
+
+: define-registers ( size names -- )
+    [ swap '[ _ define-register ] map-index ] [ drop ] 2bi
+    registers get set-at ;
+
+SYNTAX: REGISTERS: scan-word ";" parse-tokens define-registers ;
