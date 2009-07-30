@@ -1,7 +1,8 @@
 USING: accessors assocs arrays kernel models monads sequences
 ui.frp.signals ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.buttons.private ui.gadgets.editors words images.loader
-ui.gadgets.scrollers ui.gadgets.tables ui.images vocabs.parser lexer ;
+ui.gadgets.scrollers ui.gadgets.tables ui.images vocabs.parser lexer
+models.range ui.gadgets.sliders ;
 IN: ui.frp.gadgets
 
 TUPLE: frp-button < button hook value ;
@@ -53,6 +54,8 @@ M: frp-field model-changed 2dup frp-model>> =
 : <frp-action-field> ( -- field ) f <action-field> dup [ set-control-value ] curry >>quot
     f <model> >>model ;
 
+: <frp-slider> ( init page min max step -- slider ) <range> horizontal <slider> ;
+
 : image-prep ( -- image ) scan current-vocab name>> "vocab:" "/icons/" surround ".tiff" surround <image-name> dup cached-image drop ;
 SYNTAX: IMG-FRP-BTN: image-prep [ <frp-button> ] curry over push-all ;
 
@@ -65,6 +68,7 @@ M: table output-model dup multiple-selection?>>
    [ dup val-quot>> [ selected-value>> ] [ selected-index*>> ] if ] if ;
 M: frp-field output-model frp-model>> ;
 M: scroller output-model viewport>> children>> first output-model ;
+M: slider output-model model>> range-model ;
 
 IN: accessors
 M: frp-button text>> children>> first text>> ;
