@@ -1,5 +1,5 @@
 USING: help.syntax help.markup strings modules.using ;
-IN: modules
+IN: modules.using
 ARTICLE: { "modules.using" "use" } "Using the modules.using vocab"
 "This vocabulary defines " { $link POSTPONE: USING*: } " as an alternative to " { $link POSTPONE: USING: } " which makes qualified imports easier. "
 "Secondly, it allows loading vocabularies from remote servers, as long as the remote vocabulary can be accessed at compile time. "
