@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
-cpu.x86.assembler layouts vocabs parser compiler.constants ;
+cpu.x86.assembler cpu.x86.assembler.operands layouts
+vocabs parser compiler.constants ;
 IN: bootstrap.x86
 
 4 \ cell set

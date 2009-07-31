@@ -5,25 +5,12 @@ namespaces prettyprint compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation compiler.cfg assocs ;
 IN: compiler.cfg.linear-scan.debugger
 
-: check-assigned ( live-intervals -- )
-    [
-        reg>>
-        [ "Not all intervals have registers" throw ] unless
-    ] each ;
-
-: split-children ( live-interval -- seq )
-    dup split-before>> [
-        [ split-before>> ] [ split-after>> ] bi
-        [ split-children ] bi@
-        append
-    ] [ 1array ] if ;
-
 : check-linear-scan ( live-intervals machine-registers -- )
     [
         [ clone ] map dup [ [ vreg>> ] keep ] H{ } map>assoc
         live-intervals set
-    ] dip allocate-registers
-    [ split-children ] map concat check-assigned ;
+    ] dip
+    allocate-registers drop ;
 
 : picture ( uses -- str )
     dup last 1 + CHAR: space <string>

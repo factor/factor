@@ -173,9 +173,14 @@ void print_stack_frame(stack_frame *frame)
 	print_string("\n");
 	print_obj(frame_scan(frame));
 	print_string("\n");
+	print_string("word/quot addr: ");
 	print_cell_hex((cell)frame_executing(frame));
-	print_string(" ");
+	print_string("\n");
+	print_string("word/quot xt: ");
 	print_cell_hex((cell)frame->xt);
+	print_string("\n");
+	print_string("return address: ");
+	print_cell_hex((cell)FRAME_RETURN_ADDRESS(frame));
 	print_string("\n");
 }
 

@@ -190,7 +190,7 @@ INSN: ##fixnum-add < ##fixnum-overflow ;
 INSN: ##fixnum-sub < ##fixnum-overflow ;
 INSN: ##fixnum-mul < ##fixnum-overflow ;
 
-INSN: ##gc temp1 temp2 live-values ;
+INSN: ##gc temp1 temp2 live-values uninitialized-locs ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;
@@ -219,7 +219,7 @@ INSN: _fixnum-mul < _fixnum-overflow ;
 
 TUPLE: spill-slot n ; C: <spill-slot> spill-slot
 
-INSN: _gc temp1 temp2 gc-roots gc-root-count gc-root-size ;
+INSN: _gc temp1 temp2 gc-roots gc-root-count gc-root-size uninitialized-locs ;
 
 ! These instructions operate on machine registers and not
 ! virtual registers
