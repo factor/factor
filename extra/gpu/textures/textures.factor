@@ -26,14 +26,14 @@ TUPLE: cube-map-face
     { axis cube-map-axis read-only } ;
 C: <cube-map-face> cube-map-face
 
-UNION: texture-data-target
-    texture-1d texture-2d texture-3d cube-map-face ;
 UNION: texture-1d-data-target
     texture-1d ;
 UNION: texture-2d-data-target
     texture-2d texture-rectangle texture-1d-array cube-map-face ;
 UNION: texture-3d-data-target
     texture-3d texture-2d-array ;
+UNION: texture-data-target
+    texture-1d-data-target texture-2d-data-target texture-3d-data-target ;
 
 M: texture dispose
     [ [ delete-texture ] when* f ] change-handle drop ;
