@@ -55,10 +55,13 @@ For X11 support, you need recent development libraries for libc,
 Pango, X11, and OpenGL. On a Debian-derived Linux distribution
 (like Ubuntu), you can use the following line to grab everything:
 
-    sudo apt-get install libc6-dev libpango-1.0-dev libx11-dev
+    sudo apt-get install libc6-dev libpango1.0-dev libx11-dev libgl1-mesa-dev
+
+Note that if you are using a proprietary OpenGL driver, you should
+probably leave out the last package in the list.
 
 If your DISPLAY environment variable is set, the UI will start
-automatically:
+automatically when you run Factor:
 
   ./factor
 
