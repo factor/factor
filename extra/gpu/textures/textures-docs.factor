@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: byte-arrays classes gpu.buffers help.markup help.syntax
+USING: alien byte-arrays classes gpu.buffers help.markup help.syntax
 images kernel math ;
 IN: gpu.textures
 
@@ -228,7 +228,11 @@ HELP: texture-cube-map
 { texture-cube-map <texture-cube-map> } related-words
 
 HELP: texture-data
-{ $class-description { $snippet "texture-data" } " tuples are used to feed image data to " { $link allocate-texture } " and " { $link update-texture } ". In addition to providing a " { $snippet "ptr" } " to CPU memory or a GPU " { $link buffer-ptr } ", the " { $link texture-data } " object also specifies the " { $link component-order } " and " { $link component-type } " of the referenced data." }
+{ $class-description { $snippet "texture-data" } " tuples are used to feed image data to " { $link allocate-texture } " and " { $link update-texture } "."
+{ $list
+{ "The " { $snippet "ptr" } " slot references either CPU memory (as a " { $link byte-array } " or " { $link alien } ") or a GPU " { $link buffer-ptr } " that contains the image data." }
+{ "The " { $snippet "component-order" } " and " { $snippet "component-type" } " slots determine the " { $link component-order } " and " { $link component-type } " of the referenced data." }
+} }
 { $notes "Using a " { $link buffer-ptr } " as the " { $snippet "ptr" } " of a " { $snippet "texture-data" } " object requires OpenGL 2.1 or later or the " { $snippet "GL_ARB_pixel_buffer_object" } " extension." } ;
 
 { texture-data <texture-data> } related-words
@@ -254,15 +258,15 @@ HELP: texture-filter
 { $class-description { $snippet "texture-filter" } " values are used in a " { $link texture-parameters } " tuple to determine how a texture should be sampled between pixels or between levels of detail. " { $link filter-linear } " selects linear filtering, while " { $link filter-nearest } " selects nearest-neighbor sampling." } ;
 
 HELP: texture-parameters
-{ $class-description "When a " { $link texture } " is created, the following " { $snippet "texture-parameter" } "s are set to control how the texture is sampled:"
+{ $class-description "A " { $snippet "texture-parameters" } " tuple is supplied when constructing a " { $link texture } " to control the wrapping, filtering, and level-of-detail handling of the texture. These tuples have the following slots:"
 { $list
 { "The " { $snippet "wrap" } " slot determines how texture coordinates outside the 0.0 to 1.0 range are mapped to the texture image. The slot either contains a single " { $link texture-wrap } " value, which will apply to all three axes, or a sequence of up to three values, which will apply to the S, T, and R axes, respectively." }
-{ "The " { $snippet "min-filter" } " and " { $snippet "min-mipmap-filter" } " determine how the texture image is filtered when sampled below its highest level of detail, the former controlling filtering between pixels within a level of detail and the latter filtering between levels of detail. A setting of " { $link filter-linear } " uses linear, bilinear, or trilinear filtering among sampled pixels, while a setting of " { $link filter-nearest } " uses nearest-neighbor sampling. The " { $snippet "min-mipmap-filter" } " slot may additionally be set to " { $link f } " to disable mipmapping and only sample the highest level of detail." }
+{ "The " { $snippet "min-filter" } " and " { $snippet "min-mipmap-filter" } " determine how the texture image is filtered when sampled below its highest level of detail, the former filtering between pixels within a level of detail and the latter filtering between levels of detail. A setting of " { $link filter-linear } " uses linear, bilinear, or trilinear filtering among the sampled pixels, while a setting of " { $link filter-nearest } " uses nearest-neighbor sampling. The " { $snippet "min-mipmap-filter" } " slot may additionally be set to " { $link f } " to disable mipmapping and only sample the highest level of detail." }
 { "The " { $snippet "mag-filter" } " analogously determines how the texture image is filtered when sampled above its highest level of detail." }
 { "The " { $snippet "min-lod" } " and " { $snippet "max-lod" } " slots contain integer values that will clamp the range of levels of detail that will be sampled from the texture." }
 { "The " { $snippet "lod-bias" } " slot contains an integer value that will offset the levels of detail that would normally be sampled from the texture." }
 { "The " { $snippet "base-level" } " slot contains an integer value that identifies the highest level of detail for the image, typically zero." }
-{ "The " { $snippet "max-level" } " slot contains an integer value that identifies the lowest level of detail for the image. This value will automatically be clamped to the maximum of the base-2 logarithm of the dimensions of the highest level of detail image." }
+{ "The " { $snippet "max-level" } " slot contains an integer value that identifies the lowest level of detail for the image. This value will automatically be clamped to the maximum of the base-2 logarithms of the dimensions of the highest level of detail image." }
 } } ;
 
 { texture-parameters set-texture-parameters } related-words
