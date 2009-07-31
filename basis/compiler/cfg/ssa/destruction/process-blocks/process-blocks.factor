@@ -46,7 +46,7 @@ SYMBOLS: phi-union unioned-blocks ;
     2nip processed-name ;
 
 :: trivial-interference ( bb src dst -- )
-    dst src bb waiting-for push-at
+    dst src bb add-waiting
     src used-by-another get push ;
 
 :: add-to-renaming-set ( bb src dst -- )
