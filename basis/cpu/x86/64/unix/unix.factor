@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays sequences math splitting make assocs
-kernel layouts system alien.c-types alien.structs
-cpu.architecture cpu.x86.assembler cpu.x86
-compiler.codegen compiler.cfg.registers ;
+USING: accessors arrays sequences math splitting make assocs kernel
+layouts system alien.c-types alien.structs cpu.architecture
+cpu.x86.assembler cpu.x86.assembler.operands cpu.x86 compiler.codegen
+compiler.cfg.registers ;
 IN: cpu.x86.64.unix
 
 M: int-regs param-regs drop { RDI RSI RDX RCX R8 R9 } ;
