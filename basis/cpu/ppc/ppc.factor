@@ -4,10 +4,10 @@ USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
 alien alien.accessors alien.c-types literals cpu.architecture
 cpu.ppc.assembler cpu.ppc.assembler.backend compiler.cfg.registers
-compiler.cfg.instructions compiler.constants compiler.codegen
+compiler.cfg.instructions compiler.cfg.comparisons
 compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.cfg.build-stack-frame
-compiler.units ;
+compiler.units compiler.constants compiler.codegen ;
 FROM: cpu.ppc.assembler => B ;
 IN: cpu.ppc
 
@@ -180,7 +180,7 @@ M: ppc %xor     XOR ;
 M: ppc %xor-imm XORI ;
 M: ppc %shl     SLW ;
 M: ppc %shl-imm swapd SLWI ;
-M: ppc %shr-imm SRW ;
+M: ppc %shr     SRW ;
 M: ppc %shr-imm swapd SRWI ;
 M: ppc %sar     SRAW ;
 M: ppc %sar-imm SRAWI ;
@@ -190,7 +190,7 @@ M: ppc %not     NOT ;
     0 0 LI
     0 MTXER
     dst src2 src1 insn call
-    label BNO ; inline
+    label BO ; inline
 
 M: ppc %fixnum-add ( label dst src1 src2 -- )
     [ ADDO. ] overflow-template ;
@@ -198,7 +198,7 @@ M: ppc %fixnum-add ( label dst src1 src2 -- )
 M: ppc %fixnum-sub ( label dst src1 src2 -- )
     [ SUBFO. ] overflow-template ;
 
-M:: ppc %fixnum-mul ( label dst src1 src2 -- )
+M: ppc %fixnum-mul ( label dst src1 src2 -- )
     [ MULLWO. ] overflow-template ;
 
 : bignum@ ( n -- offset ) cells bignum tag-number - ; inline
@@ -417,8 +417,7 @@ M:: ppc %call-gc ( gc-root-count -- )
     %prepare-alien-invoke
     3 1 gc-root-base param@ ADDI
     gc-root-count 4 LI
-    "inline_gc" f %alien-invoke
-    "end" resolve-label ;
+    "inline_gc" f %alien-invoke ;
 
 M: ppc %prologue ( n -- )
     0 11 LOAD32 rc-absolute-ppc-2/2 rel-this
