@@ -71,6 +71,7 @@ IN: cpu.x86.assembler.tests
 
 ! sse shift instructions
 [ { HEX: 66 HEX: 0f HEX: 71 HEX: d0 HEX: 05 } ] [ [ XMM0 5 PSRLW ] { } make ] unit-test
+[ { HEX: 66 HEX: 0f HEX: d1 HEX: c1 } ] [ [ XMM0 XMM1 PSRLW ] { } make ] unit-test
 
 ! sse comparison instructions 
 [ { HEX: 66 HEX: 0f HEX: c2 HEX: c1 HEX: 02 } ] [ [ XMM0 XMM1 CMPLEPD ] { } make ] unit-test
