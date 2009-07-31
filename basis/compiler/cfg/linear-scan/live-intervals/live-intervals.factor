@@ -13,7 +13,6 @@ C: <live-range> live-range
 TUPLE: live-interval
 vreg
 reg spill-to reload-from
-split-before split-after split-next
 start end ranges uses
 copy-from ;
 

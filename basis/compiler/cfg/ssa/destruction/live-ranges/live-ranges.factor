@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel namespaces sequences math
 arrays compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.liveness compiler.cfg.rpo ;
+compiler.cfg.liveness.ssa compiler.cfg.rpo ;
 IN: compiler.cfg.ssa.destruction.live-ranges
 
 ! Live ranges for interference testing
@@ -52,9 +52,9 @@ PRIVATE>
 ERROR: bad-kill-index vreg bb ;
 
 : kill-index ( vreg bb -- n )
-    2dup live-out key? [ 2drop 1/0. ] [
+    2dup live-out? [ 2drop 1/0. ] [
         2dup kill-indices get at at* [ 2nip ] [
-            drop 2dup live-in key?
+            drop 2dup live-in?
             [ bad-kill-index ] [ 2drop -1/0. ] if
         ] if
     ] if ;
