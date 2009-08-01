@@ -18,6 +18,7 @@ HELP: CM-FUNCTION:
     "C-LIBRARY: exlib"
     ""
     "C-INCLUDE: <stdio.h>"
+    "C-INCLUDE: <stdlib.h>"
     "CM-FUNCTION: char* sum_diff ( const-int a, const-int b, int* x, int* y )"
     "    *x = a + b;"
     "    *y = a - b;"
