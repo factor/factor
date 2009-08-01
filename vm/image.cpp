@@ -53,10 +53,8 @@ cell code_relocation_base;
 
 static void load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 {
-	cell good_size = h->code_size + (1 << 19);
-
-	if(good_size > p->code_size)
-		p->code_size = good_size;
+	if(h->code_size > p->code_size)
+		fatal_error("Code heap too small to fit image",h->code_size);
 
 	init_code_heap(p->code_size);
 

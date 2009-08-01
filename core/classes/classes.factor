@@ -59,6 +59,9 @@ M: predicate reset-word
 : superclasses ( class -- supers )
     [ superclass ] follow reverse ;
 
+: subclass-of? ( class superclass -- ? )
+    swap superclasses member? ;
+
 : members ( class -- seq )
     #! Output f for non-classes to work with algebra code
     dup class? [ "members" word-prop ] [ drop f ] if ;

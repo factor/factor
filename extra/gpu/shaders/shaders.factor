@@ -8,7 +8,7 @@ io.encodings.ascii io.files io.pathnames kernel lexer literals
 locals math math.parser memoize multiline namespaces opengl
 opengl.gl opengl.shaders parser quotations sequences
 specialized-arrays.alien specialized-arrays.int splitting
-strings ui.gadgets.worlds variants vectors vocabs vocabs.loader
+strings tr ui.gadgets.worlds variants vectors vocabs vocabs.loader
 vocabs.parser words words.constant ;
 IN: gpu.shaders
 
@@ -64,6 +64,8 @@ MEMO: output-index ( program-instance output-name -- index )
     [ handle>> ] dip glGetFragDataLocation ;
 
 <PRIVATE
+
+TR: hyphens>underscores "-" "_" ;
 
 : gl-vertex-type ( component-type -- gl-type )
     {
@@ -125,12 +127,12 @@ MEMO: output-index ( program-instance output-name -- index )
     } 0&& [ vertex-attribute inaccurate-feedback-attribute-error ] unless ;
 
 :: [bind-vertex-attribute] ( stride offset vertex-attribute -- stride offset' quot )
-    vertex-attribute name>>                 :> name
-    vertex-attribute component-type>>       :> type
-    type gl-vertex-type                     :> gl-type
-    vertex-attribute dim>>                  :> dim
-    vertex-attribute normalize?>> >c-bool   :> normalize?
-    vertex-attribute vertex-attribute-size  :> size
+    vertex-attribute name>> hyphens>underscores :> name
+    vertex-attribute component-type>>           :> type
+    type gl-vertex-type                         :> gl-type
+    vertex-attribute dim>>                      :> dim
+    vertex-attribute normalize?>> >c-bool       :> normalize?
+    vertex-attribute vertex-attribute-size      :> size
 
     stride offset size +
     {
