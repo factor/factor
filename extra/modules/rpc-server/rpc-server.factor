@@ -25,12 +25,11 @@ SYMBOL: serving-vocabs serving-vocabs [ V{ } clone ] initialize
 : register-loads-thread ( -- )
     [ [ receive vocab ] keep reply-synchronous t ] "load-words" spawn-server "loads-thread" swap register-process ;
 
-: add-vocabs-hook ( -- )
-    [ 9012 start-node
-        register-gets-thread
-        register-does-thread
-        register-loads-thread
-    ] "start-serving-vocabs" add-init-hook ;
 PRIVATE>
-SYNTAX: service add-vocabs-hook
-    current-vocab name>> serving-vocabs get-global adjoin ;
+SYNTAX: service current-vocab name>> serving-vocabs get-global adjoin ;
+
+[ 9012 start-node
+    register-gets-thread
+    register-does-thread
+    register-loads-thread
+] "start-serving-vocabs" add-init-hook

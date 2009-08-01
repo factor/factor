@@ -1,5 +1,5 @@
-USING: help.markup help.syntax models ui.gadgets.tracks ui.frp.layout ;
-IN: ui.frp.layout
+USING: help.markup help.syntax models ui.gadgets.tracks ;
+IN: ui.gadgets.layout
 
 HELP: ,
 { $values { "item" "a gadget or model" } }
@@ -38,16 +38,16 @@ HELP: with-interface
 { $values { "quot" "quotation that builds a template and inserts into it" } }
 { $description "Create templates, used with " { $link POSTPONE: $ } } ;
 
-ARTICLE: "ui.frp.layout" "GUI Layout"
+ARTICLE: "ui.gadgets.layout" "GUI Layout"
 "Laying out GUIs works the same way as building lists with " { $vocab-link "make" }
 ". Gadgets are layed out using " { $vocab-link "ui.gadgets.tracks" } " through " { $link <hbox> } " and " { $link <vbox> } ", which allow both fixed and percentage widths. "
-{ $link , } " and " { $link -> }  " add a signal or gadget to the gadget you're building. "
-"Also, books can be made with " { $link <frp-book> } ". "
+{ $link , } " and " { $link -> }  " add a model or gadget to the gadget you're building. "
+"Also, books can be made with " { $link <book> } ". "
 { $link <spacer> } "s add flexable space between items. " $nl
 "Using " { $link with-interface } ", one can pre-build templates to add items to later: "
 "Like in the StringTemplate framework for java, placeholders are defined using $ PLACERHOLDER-NAME $ "
 "Using PLACEHOLDER-NAME again sets it as the current insertion point. "
 "For examples using normal layout, see the " { $vocab-link "sudokus" } " demo. "
-"For examples of templating, see " { $vocab-link "recipes" } " demo. " ;
+"For examples of templating, see the " { $vocab-link "recipes" } " demo. " ;
 
-ABOUT: "ui.frp.layout"
+ABOUT: "ui.gadgets.layout"

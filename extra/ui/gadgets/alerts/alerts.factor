@@ -1,5 +1,5 @@
 USING: accessors models monads macros generalizations kernel
-ui ui.frp.gadgets ui.frp.signals ui.frp.layout ui.gadgets
+ui ui.gadgets.controls models.combinators ui.gadgets.layout ui.gadgets
 ui.gadgets.labels ui.gadgets.editors ui.gadgets.buttons
 ui.gadgets.packs locals sequences fonts io.styles
 wrap.strings ;
@@ -13,16 +13,16 @@ IN: ui.gadgets.alerts
 
 :: ask-user ( string -- model' )
    [ [let | lbl  [ string <label>  T{ font { name "sans-serif" } { size 14 } } >>font dup , ]
-            fldm [ <frp-field*> ->% 1 ]
-            btn  [ "okay" <frp-border-button> ] |
-         btn -> [ fldm swap <updates> ]
+            fldm [ <model-field*> ->% 1 ]
+            btn  [ "okay" <model-border-btn> ] |
+         btn -> [ fldm swap updates ]
                 [ [ drop lbl close-window ] $> , ] bi
    ] ] <vbox> { 161 86 } >>pref-dim "" open-window ;
 
 MACRO: ask-buttons ( buttons -- quot ) dup length [
       [ swap
          [ 22 wrap-lines <label> T{ font { name "sans-serif" } { size 18 } } >>font ,
-         [ [ <frp-border-button> [ close-window ] >>hook -> ] map ] <hbox> , ] <vbox>
+         [ [ <model-border-btn> [ close-window ] >>hook -> ] map ] <hbox> , ] <vbox>
          "" open-window
       ] dip firstn
    ] 2curry ;

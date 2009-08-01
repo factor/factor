@@ -1,6 +1,6 @@
 USING: accessors arrays delegate delegate.protocols
 io.pathnames kernel locals sequences
-vectors make strings ui.frp.signals ui.frp.gadgets
+vectors make strings models.combinators ui.gadgets.controls
 sequences.extras ;
 IN: file-trees
 
@@ -44,6 +44,6 @@ DEFER: (tree-insert)
    go-to-path ;
 
 : <dir-table> ( tree-model -- table )
-   <frp-list*> [ node>> 1array ] >>quot
-   [ selected-value>> [ file? not ] <filter> swap <switch> ]
+   <list*> [ node>> 1array ] >>quot
+   [ selected-value>> [ file? not ] filter-model swap switch-models ]
    [ swap >>model ] bi ;
