@@ -1,4 +1,4 @@
-USING: classes.tuple.change-tracking tools.test ;
+USING: classes.tuple.change-tracking tools.test strings accessors kernel continuations ;
 IN: classes.tuple.change-tracking.tests
 
 TUPLE: resource < change-tracking-tuple
