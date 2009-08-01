@@ -98,15 +98,18 @@ M: ##dispatch linearize-insn
 
 M: ##gc linearize-insn
     nip
-    [ temp1>> ]
-    [ temp2>> ]
-    [
-        live-values>>
-        [ compute-gc-roots ]
-        [ count-gc-roots ]
-        [ gc-roots-size ]
-        tri
-    ] tri
+    {
+        [ temp1>> ]
+        [ temp2>> ]
+        [
+            live-values>>
+            [ compute-gc-roots ]
+            [ count-gc-roots ]
+            [ gc-roots-size ]
+            tri
+        ]
+        [ uninitialized-locs>> ]
+    } cleave
     _gc ;
 
 : linearize-basic-blocks ( cfg -- insns )

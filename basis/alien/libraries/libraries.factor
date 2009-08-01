@@ -29,5 +29,6 @@ M: library dispose dll>> [ dispose ] when* ;
 : remove-library ( name -- )
     libraries get delete-at* [ dispose ] [ drop ] if ;
 
-: add-library ( name path abi -- )    
-    <library> swap libraries get [ delete-at ] [ set-at ] 2bi ;
+: add-library ( name path abi -- )
+    [ 2drop remove-library ]
+    [ <library> swap libraries get set-at ] 3bi ;

@@ -54,6 +54,6 @@ IN: benchmark.pidigits
     [ 1 { { 1 0 } { 0 1 } } ] dip 0 0 (pidigits) ;
 
 : pidigits-main ( -- )
-    10000 pidigits ;
+    2000 pidigits ;
 
 MAIN: pidigits-main

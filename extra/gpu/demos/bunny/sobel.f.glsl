@@ -37,7 +37,7 @@ border_factor(vec2 texcoord)
 void
 main()
 {
-    gl_FragColor = /*vec4(border_factor(texcoord));*/ mix(
+    gl_FragColor = mix(
         texture2D(color_texture, texcoord),
         line_color,
         border_factor(texcoord)
