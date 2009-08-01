@@ -14,3 +14,5 @@ SYMBOLS: processed-names waiting used-by-another renaming-sets ;
 : processed-name ( vreg -- ) processed-names get conjoin ;
 
 : waiting-for ( bb -- assoc ) waiting get [ drop H{ } clone ] cache ;
+
+: add-waiting ( dst src bb -- ) waiting-for push-at ;
