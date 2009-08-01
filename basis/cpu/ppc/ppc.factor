@@ -90,14 +90,14 @@ HOOK: reserved-area-size os ( -- n )
     reserved-area-size param-save-size + + ; inline
 
 : spill-integer@ ( n -- offset )
-    spill-integer-offset param@ ;
+    spill-integer-offset local@ ;
 
 : spill-float@ ( n -- offset )
-    spill-float-offset param@ ;
+    spill-float-offset local@ ;
 
 ! Some FP intrinsics need a temporary scratch area in the stack
 ! frame, 8 bytes in size. This is in the param-save area so it
-! should not overlap with spill slots.
+! does not overlap with spill slots.
 : scratch@ ( n -- offset )
     stack-frame get total-size>>
     factor-area-size -
@@ -106,7 +106,7 @@ HOOK: reserved-area-size os ( -- n )
 
 ! GC root area
 : gc-root@ ( n -- offset )
-    gc-root-offset param@ ;
+    gc-root-offset local@ ;
 
 ! Finally we have the linkage area
 HOOK: lr-save os ( -- n )
@@ -415,7 +415,7 @@ M:: ppc %load-gc-root ( gc-root register -- )
 
 M:: ppc %call-gc ( gc-root-count -- )
     %prepare-alien-invoke
-    3 1 gc-root-base param@ ADDI
+    3 1 gc-root-base local@ ADDI
     gc-root-count 4 LI
     "inline_gc" f %alien-invoke ;
 
