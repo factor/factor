@@ -6,7 +6,7 @@ IN: benchmark.beust2
 ! http://crazybob.org/BeustSequence.java.html
 
 :: (count-numbers) ( remaining first value used max listener: ( -- ) -- ? )
-    10 first - [| i |
+    10 first - iota [| i |
         [let* | digit [ i first + ]
                 mask [ digit 2^ ]
                 value' [ i value + ] |
@@ -29,7 +29,7 @@ IN: benchmark.beust2
     ] any? ; inline recursive
 
 :: count-numbers ( max listener -- )
-    10 [ 1+ 1 1 0 max listener (count-numbers) ] any? drop ;
+    10 iota [ 1+ 1 1 0 max listener (count-numbers) ] any? drop ;
     inline
 
 :: beust ( -- )
