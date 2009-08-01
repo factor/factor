@@ -10,6 +10,10 @@ math.order quotations quotations.private assocs.private ;
 FROM: compiler => enable-optimizer ;
 IN: bootstrap.compiler
 
+"profile-compiler" get [
+    "bootstrap.compiler.timing" require
+] when
+
 ! Don't bring this in when deploying, since it will store a
 ! reference to 'eval' in a global variable
 "deploy-vocab" get "staging" get or [
