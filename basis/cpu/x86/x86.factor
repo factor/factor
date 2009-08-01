@@ -435,38 +435,19 @@ M:: x86 %write-barrier ( src card# table -- )
     table table [] MOV
     table card# [+] card-mark <byte> MOV ;
 
-:: check-nursery ( temp1 temp2 -- )
+M:: x86 %check-nursery ( label temp1 temp2 -- )
     temp1 load-zone-ptr
     temp2 temp1 cell [+] MOV
     temp2 1024 ADD
     temp1 temp1 3 cells [+] MOV
-    temp2 temp1 CMP ;
+    temp2 temp1 CMP
+    label JLE ;
 
-GENERIC# save-gc-root 1 ( gc-root operand temp -- )
+M: x86 %save-gc-root ( gc-root register -- ) [ gc-root@ ] dip MOV ;
 
-M:: spill-slot save-gc-root ( gc-root spill-slot temp -- )
-    temp spill-slot n>> spill-integer@ MOV
-    gc-root gc-root@ temp MOV ;
+M: x86 %load-gc-root ( gc-root register -- ) swap gc-root@ MOV ;
 
-M:: word save-gc-root ( gc-root register temp -- )
-    gc-root gc-root@ register MOV ;
-
-: save-gc-roots ( gc-roots temp -- )
-    '[ _ save-gc-root ] assoc-each ;
-
-GENERIC# load-gc-root 1 ( gc-root operand temp -- )
-
-M:: spill-slot load-gc-root ( gc-root spill-slot temp -- )
-    temp gc-root gc-root@ MOV
-    spill-slot n>> spill-integer@ temp MOV ;
-
-M:: word load-gc-root ( gc-root register temp -- )
-    register gc-root gc-root@ MOV ;
-
-: load-gc-roots ( gc-roots temp -- )
-    '[ _ load-gc-root ] assoc-each ;
-
-:: call-gc ( gc-root-count -- )
+M:: x86 %call-gc ( gc-root-count -- )
     ! Pass pointer to start of GC roots as first parameter
     param-reg-1 gc-root-base param@ LEA
     ! Pass number of roots as second parameter
@@ -474,15 +455,6 @@ M:: word load-gc-root ( gc-root register temp -- )
     ! Call GC
     %prepare-alien-invoke
     "inline_gc" f %alien-invoke ;
-
-M:: x86 %gc ( temp1 temp2 gc-roots gc-root-count -- )
-    "end" define-label
-    temp1 temp2 check-nursery
-    "end" get JLE
-    gc-roots temp1 save-gc-roots
-    gc-root-count call-gc
-    gc-roots temp1 load-gc-roots
-    "end" resolve-label ;
 
 M: x86 %alien-global
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
