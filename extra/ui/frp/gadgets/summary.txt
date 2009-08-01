@@ -1,1 +1,0 @@
-Gadgets using signals as their models
