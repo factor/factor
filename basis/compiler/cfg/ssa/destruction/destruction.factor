@@ -29,7 +29,7 @@ SYMBOL: seen
 
 :: visit-renaming ( dst assoc src bb -- )
     src seen get key? [
-        src dst bb waiting-for push-at
+        src dst bb add-waiting
         src assoc delete-at
     ] [ src seen get conjoin ] if ;
 
