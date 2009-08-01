@@ -26,8 +26,10 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
     [ drop define ]
     3bi ;
 
-: reader-quot ( slot-spec -- quot )
-    [
+GENERIC# reader-quot 1 ( class slot-spec -- quot )
+
+M: object reader-quot 
+    nip [
         dup offset>> ,
         \ slot ,
         dup class>> object bootstrap-word eq?
@@ -51,8 +53,12 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
 : define-reader ( class slot-spec -- )
     [ nip name>> define-reader-generic ]
     [
-        [ name>> reader-word ] [ reader-quot ] [ reader-props ] tri
-        define-typecheck
+        {
+            [ drop ]
+            [ nip name>> reader-word ]
+            [ reader-quot ]
+            [ nip reader-props ]
+        } 2cleave define-typecheck
     ] 2bi ;
 
 : writer-word ( name -- word )
@@ -83,8 +89,10 @@ ERROR: bad-slot-value value class ;
 : writer-quot/fixnum ( slot-spec -- )
     [ [ >fixnum ] dip ] % writer-quot/check ;
 
-: writer-quot ( slot-spec -- quot )
-    [
+GENERIC# writer-quot 1 ( class slot-spec -- quot )
+
+M: object writer-quot
+    nip [
         {
             { [ dup class>> object bootstrap-word eq? ] [ writer-quot/object ] }
             { [ dup class>> "coercer" word-prop ] [ writer-quot/coerce ] }
@@ -101,8 +109,12 @@ ERROR: bad-slot-value value class ;
 
 : define-writer ( class slot-spec -- )
     [ nip name>> define-writer-generic ] [
-        [ name>> writer-word ] [ writer-quot ] [ writer-props ] tri
-        define-typecheck
+        {
+            [ drop ]
+            [ nip name>> writer-word ]
+            [ writer-quot ]
+            [ nip writer-props ]
+        } 2cleave define-typecheck
     ] 2bi ;
 
 : setter-word ( name -- word )
