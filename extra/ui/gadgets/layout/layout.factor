@@ -1,9 +1,10 @@
 USING: accessors assocs arrays fry kernel lexer make math.parser
 models monads namespaces parser sequences
-sequences.extras ui.frp.gadgets ui.frp.signals ui.gadgets
-ui.gadgets.books ui.gadgets.tracks words ;
+sequences.extras models.combinators ui.gadgets
+ui.gadgets.tracks words ui.gadgets.controls ;
 QUALIFIED: make
-IN: ui.frp.layout
+QUALIFIED-WITH: ui.gadgets.books book
+IN: ui.gadgets.layout
 
 SYMBOL: templates
 TUPLE: layout gadget size ; C: <layout> layout
@@ -47,9 +48,9 @@ M: model -> dup , ;
 : <hbox> ( gadgets -- track ) horizontal <box> ; inline
 : <vbox> ( gadgets -- track ) vertical <box> ; inline
 
-: make-book ( models gadgets model -- book ) <book> swap [ "No models in books" throw ] unless-empty ;
-: <frp-book> ( quot: ( -- model ) -- book ) f make-layout rot 0 >>value make-book ; inline
-: <frp-book*> ( quot -- book ) f make-layout f make-book ; inline
+: make-book ( models gadgets model -- book ) book:<book> swap [ "No models in books" throw ] unless-empty ;
+: <book> ( quot: ( -- model ) -- book ) f make-layout rot 0 >>value make-book ; inline
+: <book*> ( quot -- book ) f make-layout f make-book ; inline
 
 ERROR: not-in-template word ;
 SYNTAX: $ CREATE-WORD dup
@@ -58,16 +59,17 @@ SYNTAX: $ CREATE-WORD dup
 
 : insert-gadget ( number parent gadget -- ) -rot [ but-last insert-nth ] change-children drop ;
 : insert-size ( number parent size -- ) -rot [ but-last insert-nth ] change-sizes drop ;
-: insertion-point ( gadget placeholder -- number parent gadget ) dup parent>> [ children>> index ] keep rot ;
+: insertion-point ( placeholder -- number parent ) dup parent>> [ children>> index ] keep ;
 
-GENERIC# (insert-item) 1 ( item location -- )
-M: gadget (insert-item) dup parent>> track? [ [ f <layout> ] dip (insert-item) ]
-    [ insertion-point [ add-gadget ] keep insert-gadget ] if ;
-M: layout (insert-item) insertion-point [ add-layout ] keep [ gadget>> insert-gadget ] [ size>> insert-size ] 3bi ;
-M: model (insert-item) parent>> dup book? [ "No models in books" throw ]
+GENERIC# add-gadget-at 1 ( item location -- )
+M: gadget add-gadget-at dup parent>> track? [ [ f <layout> ] dip add-gadget-at ]
+    [ insertion-point rot [ add-gadget ] keep insert-gadget ] if ;
+M: layout add-gadget-at insertion-point rot [ add-layout ] keep [ gadget>> insert-gadget ] [ size>> insert-size ] 3bi ;
+M: model add-gadget-at parent>> dup book:book? [ "No models in books" throw ]
    [ dup model>> dup collection? [ nip swap add-connection ] [ drop [ 1array <collection> ] dip (>>model) ] if ] if ;
+: track-add-at ( item location size -- ) swap [ <layout> ] dip add-gadget-at ;
 : insert-item ( item location -- ) [ dup get [ drop ] [ remove-members ] if ] [ on ] [ ] tri
-    [ add-member ] 2keep (insert-item) ;
+    [ add-member ] 2keep add-gadget-at ;
 
 : insert-items ( makelist -- ) t swap [ dup placeholder? [ nip ] [ over insert-item ] if ] each drop ;
 

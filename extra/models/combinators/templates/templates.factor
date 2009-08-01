@@ -1,6 +1,6 @@
 USING: kernel sequences functors fry macros generalizations ;
-IN: ui.frp.signals.templates
-FROM: ui.frp.signals => <collection> #1 ;
+IN: models.combinators.templates
+FROM: models.combinators => <collection> #1 ;
 FUNCTOR: fmaps ( W -- )
 W        IS ${W}
 w-n      DEFINES ${W}-n

@@ -1,40 +1,40 @@
 USING: accessors help.markup help.syntax ui.gadgets.buttons
-ui.gadgets.editors ui.frp.gadgets models ui.gadgets ;
-IN: ui.frp.gadgets
+ui.gadgets.editors models ui.gadgets ;
+IN: ui.gadgets.controls
 
-HELP: <frp-button>
+HELP: <model-btn>
 { $values { "gadget" "the button's label" } { "button" button } }
 { $description "Creates an button whose signal updates on clicks.  " } ;
 
-HELP: <frp-border-button>
+HELP: <model-border-btn>
 { $values { "text" "the button's label" } { "button" button } }
 { $description "Creates an button whose signal updates on clicks.  " } ;
 
-HELP: <frp-table>
-{ $values { "model" "values the table is to display" } { "table" frp-table } }
-{ $description "Creates an " { $link frp-table } } ;
+HELP: <table>
+{ $values { "model" "values the table is to display" } { "table" table } }
+{ $description "Creates an " { $link table } } ;
 
-HELP: <frp-table*>
-{ $values { "table" frp-table } }
-{ $description "Creates an " { $link frp-table } " with no initial values to display" } ;
+HELP: <table*>
+{ $values { "table" table } }
+{ $description "Creates an " { $link table } " with no initial values to display" } ;
 
-HELP: <frp-list>
-{ $values { "column-model" "values the table is to display" } { "table" frp-table } }
-{ $description "Creates an " { $link frp-table } " with a val-quot that renders each element as its own row" } ;
+HELP: <list>
+{ $values { "column-model" "values the table is to display" } { "table" table } }
+{ $description "Creates an " { $link table } " with a val-quot that renders each element as its own row" } ;
 
-HELP: <frp-list*>
-{ $values { "table" frp-table } }
-{ $description "Creates an frp-list with no initial values to display" } ;
+HELP: <list*>
+{ $values { "table" table } }
+{ $description "Creates an model-list with no initial values to display" } ;
 
 HELP: indexed
-{ $values { "table" frp-table } }
-{ $description "Sets the output model of an frp-table to the selected-index, rather than the selected-value" } ;
+{ $values { "table" table } }
+{ $description "Sets the output model of an table to the selected-index, rather than the selected-value" } ;
 
-HELP: <frp-field>
+HELP: <model-field>
 { $values { "model" model } { "gadget" model-field } }
 { $description "Creates a field with an initial value" } ;
 
-HELP: <frp-field*>
+HELP: <model-field*>
 { $values { "field" model-field } }
 { $description "Creates a field with an empty initial value" } ;
 
@@ -42,11 +42,11 @@ HELP: <empty-field>
 { $values { "model" model } { "field" model-field } }
 { $description "Creates a field with an empty initial value that switches to another signal on its update" } ;
 
-HELP: <frp-editor>
+HELP: <model-editor>
 { $values { "model" model } { "gadget" model-field } }
 { $description "Creates an editor with an initial value" } ;
 
-HELP: <frp-editor*>
+HELP: <model-editor*>
 { $values { "editor" "an editor" } }
 { $description "Creates a editor with an empty initial value" } ;
 
@@ -54,16 +54,16 @@ HELP: <empty-editor>
 { $values { "model" model } { "editor" "an editor" } }
 { $description "Creates a field with an empty initial value that switches to another signal on its update" } ;
 
-HELP: <frp-action-field>
+HELP: <model-action-field>
 { $values { "field" action-field } }
 { $description "Field that updates its model with its contents when the user hits the return key" } ;
 
-HELP: IMG-FRP-BTN:
-{ $syntax "IMAGE-BUTTON: filename" }
+HELP: IMG-MODEL-BTN:
+{ $syntax "IMAGE-MODEL-BTN: filename" }
 { $description "Creates a button using a tiff image named as specified found in the icons subdirectory of the vocabulary path" } ;
 
 HELP: IMG-BTN:
-{ $syntax "[ do-something ] IMAGE-BUTTON: filename" }
+{ $syntax "[ do-something ] IMAGE-BTN: filename" }
 { $description "Creates a button using a tiff image named as specified found in the icons subdirectory of the vocabulary path, calling the specified quotation on click" } ;
 
 HELP: output-model

@@ -1,14 +1,14 @@
 USING: accessors arrays colors.constants combinators db.queries
-db.info db.tuples db.types kernel locals math
-monads persistency sequences sequences.extras ui ui.frp.gadgets
-ui.frp.layout ui.frp.signals ui.gadgets.labels
-ui.gadgets.scrollers ui.pens.solid ;
+db.sqlite db.tuples db.types kernel locals math
+monads persistency sequences sequences.extras ui ui.gadgets.controls
+ui.gadgets.layout models.combinators ui.gadgets.labels
+ui.gadgets.scrollers ui.pens.solid io.files.temp ;
 FROM: sets => prune ;
 IN: recipes
 
 STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { genre { VARCHAR 100 } } ;
 : <recipe> ( title genre text -- recipe ) recipe new swap >>txt swap >>genre swap >>title 0 >>votes ;
-get-psql-info recipe define-db
+"recipes.db" temp-file <sqlite-db> recipe define-db
 : top-recipes ( offset search -- recipes ) <query> T{ recipe } rot >>title >>tuple
     "votes" >>order 30 >>limit swap >>offset get-tuples ;
 : top-genres ( -- genres ) f f top-recipes [ genre>> ] map prune 4 (head-slice) ;
@@ -25,37 +25,37 @@ get-psql-info recipe define-db
         $ BODY $
         $ BUTTON $
      ] <vbox> ,
-  ] <frp-book*> { 350 245 } >>pref-dim ;
+  ] <book*> { 350 245 } >>pref-dim ;
   
 :: recipe-browser ( -- ) [ [
     interface
-      <frp-table*> :> tbl
-      "okay" <frp-border-button> BUTTON -> :> ok
-      IMG-FRP-BTN: submit [ store-tuple ] >>value TOOLBAR -> :> submit
-      IMG-FRP-BTN: love 1 >>value TOOLBAR ->
-      IMG-FRP-BTN: hate -1 >>value -> 2array <merge> :> votes
-      IMG-FRP-BTN: back -> [ -30 ] <$
-      IMG-FRP-BTN: more -> [ 30 ] <$ 2array <merge> :> viewed
-      <spacer> <frp-field*> ->% 1 :> search
-      submit ok [ [ drop ] ] <$ 2array <merge> [ drop ] >>value :> quot
-      viewed 0 [ + ] <fold> search ok t <basic> "all" <frp-button> ALL ->
+      <table*> :> tbl
+      "okay" <model-border-btn> BUTTON -> :> ok
+      IMG-MODEL-BTN: submit [ store-tuple ] >>value TOOLBAR -> :> submit
+      IMG-MODEL-BTN: love 1 >>value TOOLBAR ->
+      IMG-MODEL-BTN: hate -1 >>value -> 2array merge :> votes
+      IMG-MODEL-BTN: back -> [ -30 ] <$
+      IMG-MODEL-BTN: more -> [ 30 ] <$ 2array merge :> viewed
+      <spacer> <model-field*> ->% 1 :> search
+      submit ok [ [ drop ] ] <$ 2array merge [ drop ] >>value :> quot
+      viewed 0 [ + ] fold search ok t <basic> "all" <model-btn> ALL ->
       tbl selected-value>> votes [ [ + ] curry change-votes modify-tuple ] 2$>
-        4array <merge>
-        [ drop [ f ] [ "%" dup surround <pattern> ] if-empty top-recipes ] 3fmap :> updates
-      updates [ top-genres [ <frp-button> GENRES -> ] map <merge> ] bind*
+        4array merge
+        [ drop [ f ] [ "%" dup surround <pattern> ] if-empty top-recipes ] 3fmap :> ups
+      ups [ top-genres [ <model-btn> GENRES -> ] map merge ] bind*
         [ text>> T{ recipe } swap >>genre get-tuples ] fmap
-      tbl swap updates 2array <merge> >>model
+      tbl swap ups 2merge >>model
         [ [ title>> ] [ genre>> ] bi 2array ] >>quot
         { "Title" "Genre" } >>column-titles dup <scroller> RECIPES ,% 1 actions>>
-      submit [ "" dup dup <recipe> ] <$ 2array <merge>
-        { [ [ title>> ] fmap <frp-field> TITLE ->% .5 ]
-          [ [ genre>> ] fmap <frp-field> GENRE ->% .5 ]
-          [ [ txt>> ] fmap <frp-editor> BODY ->% 1 ]
+      submit [ "" dup dup <recipe> ] <$ 2array merge
+        { [ [ title>> ] fmap <model-field> TITLE ->% .5 ]
+          [ [ genre>> ] fmap <model-field> GENRE ->% .5 ]
+          [ [ txt>> ] fmap <model-editor> BODY ->% 1 ]
         } cleave
         [ <recipe> ] 3fmap
       [ [ 1 ] <$ ]
-      [ quot ok <updates> #1 [ call( recipe -- ) 0 ] 2fmap ] bi
-      2array <merge> 0 <basic> <switch> >>model
+      [ quot ok updates #1 [ call( recipe -- ) 0 ] 2fmap ] bi
+      2merge 0 <basic> switch-models >>model
    ] with-interface "recipes" open-window ] with-ui ;
 
 MAIN: recipe-browser
