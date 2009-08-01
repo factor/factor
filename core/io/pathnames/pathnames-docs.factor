@@ -23,6 +23,24 @@ HELP: file-name
     { $example "USING: io.pathnames prettyprint ;" "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
 } ;
 
+HELP: file-extension
+{ $values { "path" "a pathname string" } { "extension" string } }
+{ $description "Outputs the extension of " { $snippet "path" } ", or " { $link f } " if the filename has no extension." }
+{ $examples
+    { $example "USING: io.pathnames prettyprint ;" "\"/usr/bin/gcc\" file-extension ." "f" }
+    { $example "USING: io.pathnames prettyprint ;" "\"/home/csi/gui.vbs\" file-extension ." "\"vbs\"" }
+} ;
+
+HELP: file-stem
+{ $values { "path" "a pathname string" } { "stem" string } }
+{ $description "Outputs the " { $link file-name } " of " { $snippet "filename" } " with the file extension removed, if any." }
+{ $examples
+    { $example "USING: io.pathnames prettyprint ;" "\"/usr/bin/gcc\" file-stem ." "\"gcc\"" }
+    { $example "USING: io.pathnames prettyprint ;" "\"/home/csi/gui.vbs\" file-stem ." "\"gui\"" }
+} ;
+
+{ file-name file-stem file-extension } related-words
+
 HELP: path-components
 { $values { "path" "a pathnames string" } { "seq" sequence } }
 { $description "Splits a pathname on the " { $link path-separator } " into its its component strings." } ;
@@ -86,6 +104,8 @@ ARTICLE: "io.pathnames" "Pathname manipulation"
 "Pathname manipulation:"
 { $subsection parent-directory }
 { $subsection file-name }
+{ $subsection file-stem }
+{ $subsection file-extension }
 { $subsection last-path-separator }
 { $subsection path-components }
 { $subsection prepend-path }
