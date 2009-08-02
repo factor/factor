@@ -21,10 +21,6 @@ SYMBOL: R_q-sets
 ! Targets of back edges
 SYMBOL: back-edge-targets
 
-! hashtable of nodes => sets of vregs, where the vregs are inputs
-! to phi nodes in a successor node
-SYMBOL: phi-outs
-
 : T_q ( q -- T_q )
     T_q-sets get at ;
 
@@ -33,9 +29,6 @@ SYMBOL: phi-outs
 
 : back-edge-target? ( block -- ? )
     back-edge-targets get key? ;
-
-: phi-out? ( vreg node -- ? )
-    phi-outs get at key? ;
 
 : next-R_q ( q -- R_q )
     [ ] [ successors>> ] [ number>> ] tri
@@ -52,27 +45,14 @@ SYMBOL: phi-outs
         [ back-edge-targets get conjoin ] [ drop ] if
     ] each ;
 
-: set-phi-out ( block vreg -- )
-    swap phi-outs get [ drop H{ } clone ] cache conjoin ;
-
-: set-phi-outs ( q -- )
-    instructions>> [
-        dup ##phi? [
-            inputs>> [ set-phi-out ] assoc-each
-        ] [ drop ] if
-    ] each ;
-
 : init-R_q ( -- )
     H{ } clone R_q-sets set
-    H{ } clone back-edge-targets set
-    H{ } clone phi-outs set ;
+    H{ } clone back-edge-targets set ;
 
 : compute-R_q ( cfg -- )
     init-R_q
     post-order [
-        [ set-R_q ]
-        [ set-back-edges ]
-        [ set-phi-outs ] tri
+        [ set-R_q ] [ set-back-edges ] bi
     ] each ;
 
 ! This algorithm for computing T_q uses equation (1)
@@ -150,7 +130,6 @@ PRIVATE>
     [let | def [ vreg def-of ] |
         {
             { [ node def eq? ] [ vreg uses-of def only? not ] }
-            { [ vreg node phi-out? ] [ t ] }
             { [ def node strictly-dominates? ] [ vreg node (live-out?) ] }
             [ f ]
         } cond
