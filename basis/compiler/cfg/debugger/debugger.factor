@@ -53,9 +53,9 @@ M: ds-loc pprint* \ D pprint-loc ;
 M: rs-loc pprint* \ R pprint-loc ;
 
 : resolve-phis ( bb -- )
-    instructions>> [ ##phi? ] filter [
+    [
         [ [ [ get ] dip ] assoc-map ] change-inputs drop
-    ] each ;
+    ] each-phi ;
 
 : test-bb ( insns n -- )
     [ <basic-block> swap >>number swap >>instructions dup ] keep set
