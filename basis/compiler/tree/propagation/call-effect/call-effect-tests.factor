@@ -49,3 +49,7 @@ IN: compiler.tree.propagation.call-effect.tests
 [ f ] [ [ [ [ ] [ 1 ] if ] ] final-info first infer-value ] unit-test
 [ f ] [ [ [ 1 ] '[ @ ] ] final-info first infer-value ] unit-test
 [ f ] [ [ dup drop ] final-info first infer-value ] unit-test
+
+! This should not hang
+[ ] [ [ [ dup call( quot -- ) ] dup call( quot -- ) ] final-info drop ] unit-test
+[ ] [ [ [ dup curry call( quot -- ) ] dup curry call( quot -- ) ] final-info drop ] unit-test
