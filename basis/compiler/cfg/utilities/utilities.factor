@@ -43,6 +43,13 @@ SYMBOL: visited
     to predecessors>> [ dup from eq? [ drop bb ] when ] change-each
     from successors>> [ dup to eq? [ drop bb ] when ] change-each ;
 
+: add-instructions ( bb quot -- )
+    [ instructions>> building ] dip '[
+        building get pop
+        @
+        ,
+    ] with-variable ; inline
+
 : <simple-block> ( insns -- bb )
     <basic-block>
     swap >vector
