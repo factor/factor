@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces deques accessors sets sequences assocs fry
 hashtables dlists compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.rpo compiler.cfg.liveness ;
+compiler.cfg.rpo compiler.cfg.liveness compiler.cfg.utilities ;
 IN: compiler.cfg.liveness.ssa
 
 ! TODO: merge with compiler.cfg.liveness
@@ -22,11 +22,9 @@ SYMBOL: work-list
     [ live-out ] keep instructions>> transfer-liveness ;
 
 : compute-phi-live-in ( basic-block -- phi-live-in )
-    instructions>> [ ##phi? ] filter [ f ] [
-        H{ } clone [
-            '[ inputs>> [ swap _ conjoin-at ] assoc-each ] each
-        ] keep
-    ] if-empty ;
+    H{ } clone [
+        '[ inputs>> [ swap _ conjoin-at ] assoc-each ] each-phi
+    ] keep ;
 
 : update-live-in ( basic-block -- changed? )
     [ [ compute-live-in ] keep live-ins get maybe-set-at ]
