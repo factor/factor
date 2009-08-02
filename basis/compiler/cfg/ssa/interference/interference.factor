@@ -39,7 +39,7 @@ IN: compiler.cfg.ssa.interference
 
 PRIVATE>
 
-: interferes? ( vreg1 vreg2 -- ? )
+: vregs-interfere? ( vreg1 vreg2 -- ? )
     2dup [ def-of ] bi@ {
         { [ 2dup eq? ] [ interferes-same-block? ] }
         { [ 2dup dominates? ] [ interferes-first-dominates? ] }
@@ -48,11 +48,12 @@ PRIVATE>
     } cond ;
 
 ! Debug this stuff later
+<PRIVATE
 
 : quadratic-test? ( seq1 seq2 -- ? ) [ length ] bi@ + 10 < ;
 
 : quadratic-test ( seq1 seq2 -- ? )
-    '[ _ [ interferes? ] with any? ] any? ;
+    '[ _ [ vregs-interfere? ] with any? ] any? ;
 
 : sort-vregs-by-bb ( vregs -- alist )
     defs get
@@ -64,15 +65,22 @@ PRIVATE>
 : find-parent ( dom current -- parent )
     over empty? [ 2drop f ] [
         over last over dominates? [ drop last ] [
-            [ pop* ] dip find-parent
+            over pop* find-parent
         ] if
     ] if ;
 
 :: linear-test ( seq1 seq2 -- ? )
+    ! Instead of sorting, SSA destruction should keep equivalence
+    ! classes sorted by merging them on append
     V{ } clone :> dom
     seq1 seq2 append sort-vregs-by-bb [| pair |
         pair first :> current
         dom current find-parent
-        dup [ current interferes? ] when
+        dup [ current vregs-interfere? ] when
         [ t ] [ current dom push f ] if
     ] any? ;
+
+PRIVATE>
+
+: sets-interfere? ( seq1 seq2 -- ? )
+    quadratic-test ;

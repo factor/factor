@@ -35,12 +35,7 @@ SYMBOL: copies
 
 : classes-interfere? ( vreg1 vreg2 -- ? )
     [ leader ] bi@ 2dup eq? [ 2drop f ] [
-        [ class-elements flatten ] bi@
-        '[
-            _ [
-                interferes?
-            ] with any?
-        ] any?
+        [ class-elements flatten ] bi@ sets-interfere?
     ] if ;
 
 : update-leaders ( vreg1 vreg2 -- )
