@@ -97,31 +97,15 @@ SYMBOL: phi-outs
     H{ } T_q-sets set
     [ next-T_q drop ] each-basic-block ;
 
-:: compute-phi-uses ( cfg -- )
-    ! Here, a phi node uses its argument in the block that it comes from.
-    H{ } clone :> use
-    cfg [| block |
-        block instructions>> [
-            dup ##phi?
-            [ inputs>> [ use conjoin-at ] assoc-each ]
-            [ uses-vregs [ block swap use conjoin-at ] each ]
-            if
-        ] each
-    ] each-basic-block
-    use [ keys ] assoc-map uses set ;
-
 PRIVATE>
 
 : precompute-liveness ( cfg -- )
-    ! The first three of these depend only on the graph
-    ! structure of the CFG, and don't need to be recomputed
-    ! if that doesn't change
+    ! Maybe dominance and def-use should be called before this, separately
     {
+        [ compute-dominance ]
+        [ compute-def-use ]
         [ compute-R_q ]
         [ compute-T_q ]
-        [ compute-dominance ]
-        [ compute-defs ]
-        [ compute-phi-uses ]
     } cleave ;
 
 <PRIVATE
