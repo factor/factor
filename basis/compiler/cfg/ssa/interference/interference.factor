@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit
-kernel math namespaces sequences locals compiler.cfg.def-use
-compiler.cfg.dominance compiler.cfg.ssa.interference.live-ranges ;
+USING: accessors assocs combinators combinators.short-circuit fry
+kernel math math.order sorting namespaces sequences locals
+compiler.cfg.def-use compiler.cfg.dominance
+compiler.cfg.ssa.interference.live-ranges ;
 IN: compiler.cfg.ssa.interference
 
 <PRIVATE
@@ -45,3 +46,33 @@ PRIVATE>
         { [ 2dup swap dominates? ] [ interferes-second-dominates? ] }
         [ 2drop 2drop f ]
     } cond ;
+
+! Debug this stuff later
+
+: quadratic-test? ( seq1 seq2 -- ? ) [ length ] bi@ + 10 < ;
+
+: quadratic-test ( seq1 seq2 -- ? )
+    '[ _ [ interferes? ] with any? ] any? ;
+
+: sort-vregs-by-bb ( vregs -- alist )
+    defs get
+    '[ dup _ at ] { } map>assoc
+    [ [ second pre-of ] compare ] sort ;
+
+: ?last ( seq -- elt/f ) [ f ] [ last ] if-empty ; inline
+
+: find-parent ( dom current -- parent )
+    over empty? [ 2drop f ] [
+        over last over dominates? [ drop last ] [
+            [ pop* ] dip find-parent
+        ] if
+    ] if ;
+
+:: linear-test ( seq1 seq2 -- ? )
+    V{ } clone :> dom
+    seq1 seq2 append sort-vregs-by-bb [| pair |
+        pair first :> current
+        dom current find-parent
+        dup [ current interferes? ] when
+        [ t ] [ current dom push f ] if
+    ] any? ;

@@ -11,7 +11,7 @@ IN: compiler.cfg.ssa.interference.tests
     cfg new 0 get >>entry
     compute-ssa-live-sets
     compute-predecessors
-    dup compute-def-use
+    dup compute-defs
     dup compute-dominance
     compute-live-ranges ;
 
