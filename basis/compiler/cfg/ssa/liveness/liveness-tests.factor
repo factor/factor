@@ -84,11 +84,9 @@ V{ } 0 test-bb
 V{ } 1 test-bb
 V{ } 2 test-bb
 V{ } 3 test-bb
-V int-regs 2
-    2 V int-regs 0 2array
-    3 V int-regs 1 2array
-2array \ ##phi new-insn 1vector
-4 test-bb
+V{
+    T{ ##phi f V int-regs 2 H{ { 2 V int-regs 0 } { 3 V int-regs 1 } } }
+} 4 test-bb
 test-diamond
 
 cfg new 1 get >>entry 5 set
