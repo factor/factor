@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private arrays vectors fry
-math math.order namespaces assocs ;
+math math.order namespaces assocs locals ;
 IN: compiler.utilities
 
 : flattener ( seq quot -- seq vector quot' )
@@ -30,3 +30,15 @@ yield-hook [ [ ] ] initialize
     [ ] [ [ [ second ] bi@ > ] most ] map-reduce ;
 
 : penultimate ( seq -- elt ) [ length 2 - ] keep nth ;
+
+:: compress-path ( source assoc -- destination )
+    [let | destination [ source assoc at ] |
+        source destination = [ source ] [
+            [let | destination' [ destination assoc compress-path ] |
+                destination' destination = [
+                    destination' source assoc set-at
+                ] unless
+                destination'
+            ]
+        ] if
+    ] ;
