@@ -65,15 +65,11 @@ GENERIC: convert-two-operand* ( insn -- )
 
 : case-2? ( insn -- ? ) [ dst>> ] [ src2>> ] bi = ; inline
 
-ERROR: bad-case-2 insn ;
-
 : case-2 ( insn -- )
-    ! This can't work with a ##fixnum-overflow since it branches
-    dup ##fixnum-overflow? [ bad-case-2 ] when
     dup dst>> reg-class>> next-vreg
-    [ swap src1>> emit-copy ]
-    [ [ >>src1 ] [ >>dst ] bi , ]
-    [ [ src2>> ] dip emit-copy ]
+    [ swap src2>> emit-copy ]
+    [ drop [ src2>> ] [ src1>> ] bi emit-copy ]
+    [ >>src2 dup dst>> >>src1 , ]
     2tri ; inline
 
 : case-3 ( insn -- )
