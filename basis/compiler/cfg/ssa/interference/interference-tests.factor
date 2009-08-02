@@ -36,17 +36,17 @@ V{
 
 [ ] [ test-interference ] unit-test
 
-[ f ] [ V int-regs 0 V int-regs 1 interferes? ] unit-test
-[ f ] [ V int-regs 1 V int-regs 0 interferes? ] unit-test
-[ f ] [ V int-regs 2 V int-regs 3 interferes? ] unit-test
-[ f ] [ V int-regs 3 V int-regs 2 interferes? ] unit-test
-[ t ] [ V int-regs 0 V int-regs 2 interferes? ] unit-test
-[ t ] [ V int-regs 2 V int-regs 0 interferes? ] unit-test
-[ f ] [ V int-regs 1 V int-regs 3 interferes? ] unit-test
-[ f ] [ V int-regs 3 V int-regs 1 interferes? ] unit-test
-[ t ] [ V int-regs 3 V int-regs 4 interferes? ] unit-test
-[ t ] [ V int-regs 4 V int-regs 3 interferes? ] unit-test
-[ t ] [ V int-regs 3 V int-regs 5 interferes? ] unit-test
-[ t ] [ V int-regs 5 V int-regs 3 interferes? ] unit-test
-[ f ] [ V int-regs 3 V int-regs 6 interferes? ] unit-test
-[ f ] [ V int-regs 6 V int-regs 3 interferes? ] unit-test
+[ f ] [ V int-regs 0 V int-regs 1 vregs-interfere? ] unit-test
+[ f ] [ V int-regs 1 V int-regs 0 vregs-interfere? ] unit-test
+[ f ] [ V int-regs 2 V int-regs 3 vregs-interfere? ] unit-test
+[ f ] [ V int-regs 3 V int-regs 2 vregs-interfere? ] unit-test
+[ t ] [ V int-regs 0 V int-regs 2 vregs-interfere? ] unit-test
+[ t ] [ V int-regs 2 V int-regs 0 vregs-interfere? ] unit-test
+[ f ] [ V int-regs 1 V int-regs 3 vregs-interfere? ] unit-test
+[ f ] [ V int-regs 3 V int-regs 1 vregs-interfere? ] unit-test
+[ t ] [ V int-regs 3 V int-regs 4 vregs-interfere? ] unit-test
+[ t ] [ V int-regs 4 V int-regs 3 vregs-interfere? ] unit-test
+[ t ] [ V int-regs 3 V int-regs 5 vregs-interfere? ] unit-test
+[ t ] [ V int-regs 5 V int-regs 3 vregs-interfere? ] unit-test
+[ f ] [ V int-regs 3 V int-regs 6 vregs-interfere? ] unit-test
+[ f ] [ V int-regs 6 V int-regs 3 vregs-interfere? ] unit-test
