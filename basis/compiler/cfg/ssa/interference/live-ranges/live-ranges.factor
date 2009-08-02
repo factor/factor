@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel namespaces sequences math
 arrays compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.ssa.liveness compiler.cfg.rpo ;
+compiler.cfg.liveness.ssa compiler.cfg.rpo ;
 IN: compiler.cfg.ssa.interference.live-ranges
 
 ! Live ranges for interference testing

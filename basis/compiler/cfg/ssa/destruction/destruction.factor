@@ -8,7 +8,7 @@ compiler.cfg.def-use
 compiler.cfg.renaming
 compiler.cfg.dominance
 compiler.cfg.instructions
-compiler.cfg.ssa.liveness
+compiler.cfg.liveness.ssa
 compiler.cfg.ssa.cssa
 compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges
@@ -97,7 +97,7 @@ M: insn prepare-insn drop ;
 : destruct-ssa ( cfg -- cfg' )
     dup cfg-has-phis? [
         dup construct-cssa
-        dup precompute-liveness
+        compute-ssa-live-sets
         dup compute-defs
         dup compute-dominance
         dup compute-live-ranges
