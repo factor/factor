@@ -4,7 +4,7 @@ USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
 alien.strings alien.arrays alien.complex alien.libraries sets libc
-continuations.private fry cpu.architecture classes
+continuations.private fry cpu.architecture classes locals
 source-files.errors
 compiler.errors
 compiler.alien
@@ -215,13 +215,44 @@ M: ##write-barrier generate-insn
     [ table>> ]
     tri %write-barrier ;
 
+! GC checks
+: wipe-locs ( locs temp -- )
+    '[
+        _
+        [ 0 %load-immediate ]
+        [ swap [ %replace ] with each ] bi
+    ] unless-empty ;
+
+GENERIC# save-gc-root 1 ( gc-root operand temp -- )
+
+M:: spill-slot save-gc-root ( gc-root operand temp -- )
+    temp operand n>> %reload-integer
+    gc-root temp %save-gc-root ;
+
+M: object save-gc-root drop %save-gc-root ;
+
+: save-gc-roots ( gc-roots temp -- ) '[ _ save-gc-root ] assoc-each ;
+
+GENERIC# load-gc-root 1 ( gc-root operand temp -- )
+
+M:: spill-slot load-gc-root ( gc-root operand temp -- )
+    gc-root temp %load-gc-root
+    temp operand n>> %spill-integer ;
+
+M: object load-gc-root drop %load-gc-root ;
+
+: load-gc-roots ( gc-roots temp -- ) '[ _ load-gc-root ] assoc-each ;
+
 M: _gc generate-insn
+    "no-gc" define-label
     {
-        [ temp1>> ]
-        [ temp2>> ]
-        [ gc-roots>> ]
-        [ gc-root-count>> ]
-    } cleave %gc ;
+        [ [ "no-gc" get ] dip [ temp1>> ] [ temp2>> ] bi %check-nursery ]
+        [ [ uninitialized-locs>> ] [ temp1>> ] bi wipe-locs ]
+        [ [ gc-roots>> ] [ temp1>> ] bi save-gc-roots ]
+        [ gc-root-count>> %call-gc ]
+        [ [ gc-roots>> ] [ temp1>> ] bi load-gc-roots ]
+    } cleave
+    "no-gc" resolve-label ;
 
 M: _loop-entry generate-insn drop %loop-entry ;
 

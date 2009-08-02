@@ -2,7 +2,7 @@ USING: generalizations accessors arrays compiler kernel kernel.private
 math hashtables.private math.private namespaces sequences tools.test
 namespaces.private slots.private sequences.private byte-arrays alien
 alien.accessors layouts words definitions compiler.units io
-combinators vectors grouping make alien.c-types ;
+combinators vectors grouping make alien.c-types combinators.short-circuit ;
 QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
 
@@ -346,3 +346,16 @@ cell 4 = [
         over rot [ drop ] [ nip ] if
     ] compile-call
 ] unit-test
+
+! Coalesing bug reduced from sequence-parser:take-sequence
+: coalescing-bug-1 ( a b c d -- a b c d )
+    3dup {
+        [ 2drop 0 < ]
+        [ [ drop ] 2dip length > ]
+        [ drop > ]
+    } 3|| [ 3drop f ] [ slice boa ] if swap [ [ length ] bi@ ] 2keep ;
+
+[ 0 3 f { 1 2 3 } ] [ { 1 2 3 } -10 3 "hello" coalescing-bug-1 ] unit-test
+[ 0 3 f { 1 2 3 } ] [ { 1 2 3 } 0 7 "hello" coalescing-bug-1 ] unit-test
+[ 0 3 f { 1 2 3 } ] [ { 1 2 3 } 3 2 "hello" coalescing-bug-1 ] unit-test
+[ 2 3 T{ slice f 1 3 "hello" } { 1 2 3 } ] [ { 1 2 3 } 1 3 "hello" coalescing-bug-1 ] unit-test

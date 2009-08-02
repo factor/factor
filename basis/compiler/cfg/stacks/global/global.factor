@@ -26,7 +26,7 @@ M: avail-analysis transfer-set drop [ peek-set ] [ replace-set ] bi assoc-union 
 ! which are going to be overwritten.
 BACKWARD-ANALYSIS: kill
 
-M: kill-analysis transfer-set drop replace-set assoc-union ;
+M: kill-analysis transfer-set drop kill-set assoc-union ;
 
 ! Main word
 : compute-global-sets ( cfg -- cfg' )
