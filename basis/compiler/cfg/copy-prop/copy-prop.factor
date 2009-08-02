@@ -1,11 +1,16 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces assocs accessors sequences grouping
-compiler.cfg.rpo compiler.cfg.renaming compiler.cfg.instructions ;
+combinators compiler.cfg.rpo compiler.cfg.renaming
+compiler.cfg.instructions ;
 IN: compiler.cfg.copy-prop
 
 ! The first three definitions are also used in compiler.cfg.alias-analysis.
 SYMBOL: copies
+
+! Initialized per-basic-block; a mapping from inputs to dst for eliminating
+! redundant phi instructions
+SYMBOL: phis
 
 : resolve ( vreg -- vreg )
     copies get ?at drop ;
@@ -22,17 +27,27 @@ GENERIC: visit-insn ( insn -- )
 
 M: ##copy visit-insn record-copy ;
 
+: useless-phi ( dst inputs -- ) first (record-copy) ;
+
+: redundant-phi ( dst inputs -- ) phis get at (record-copy) ;
+
+: record-phi ( dst inputs -- ) phis get set-at ;
+
 M: ##phi visit-insn
     [ dst>> ] [ inputs>> values [ resolve ] map ] bi
-    dup all-equal? [ first (record-copy) ] [ 2drop ] if ;
+    {
+        { [ dup all-equal? ] [ useless-phi ] }
+        { [ dup phis get key? ] [ redundant-phi ] }
+        [ record-phi ]
+    } cond ;
 
 M: insn visit-insn drop ;
 
 : collect-copies ( cfg -- )
     H{ } clone copies set
     [
-        instructions>>
-        [ visit-insn ] each
+        H{ } clone phis set
+        instructions>> [ visit-insn ] each
     ] each-basic-block ;
 
 GENERIC: update-insn ( insn -- keep? )
@@ -48,8 +63,7 @@ M: insn update-insn rename-insn-uses t ;
     copies get dup assoc-empty? [ 2drop ] [
         renamings set
         [
-            instructions>>
-            [ update-insn ] filter-here
+            instructions>> [ update-insn ] filter-here
         ] each-basic-block
     ] if ;
 
