@@ -4,10 +4,10 @@ USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
 alien alien.accessors alien.c-types literals cpu.architecture
 cpu.ppc.assembler cpu.ppc.assembler.backend compiler.cfg.registers
-compiler.cfg.instructions compiler.constants compiler.codegen
+compiler.cfg.instructions compiler.cfg.comparisons
 compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.cfg.build-stack-frame
-compiler.units ;
+compiler.units compiler.constants compiler.codegen ;
 FROM: cpu.ppc.assembler => B ;
 IN: cpu.ppc
 
@@ -76,8 +76,12 @@ HOOK: reserved-area-size os ( -- n )
 : xt-save ( n -- i ) 2 cells - ;
 
 ! Next, we have the spill area as well as the FFI parameter area.
-! They overlap, since basic blocks with FFI calls will never
-! spill.
+! It is safe for them to overlap, since basic blocks with FFI calls
+! will never spill -- indeed, basic blocks with FFI calls do not
+! use vregs at all, and the FFI call is a stack analysis sync point.
+! In the future this will change and the stack frame logic will
+! need to be untangled somewhat.
+
 : param@ ( n -- x ) reserved-area-size + ; inline
 
 : param-save-size ( -- n ) 8 cells ; foldable
@@ -85,32 +89,30 @@ HOOK: reserved-area-size os ( -- n )
 : local@ ( n -- x )
     reserved-area-size param-save-size + + ; inline
 
-: spill-integer-base ( -- n )
-    stack-frame get spill-counts>> double-float-regs swap at
-    double-float-regs reg-size * ;
-
 : spill-integer@ ( n -- offset )
-    cells spill-integer-base + param@ ;
+    spill-integer-offset local@ ;
 
 : spill-float@ ( n -- offset )
-    double-float-regs reg-size * param@ ;
+    spill-float-offset local@ ;
 
 ! Some FP intrinsics need a temporary scratch area in the stack
-! frame, 8 bytes in size
+! frame, 8 bytes in size. This is in the param-save area so it
+! does not overlap with spill slots.
 : scratch@ ( n -- offset )
     stack-frame get total-size>>
     factor-area-size -
     param-save-size -
     + ;
 
+! GC root area
+: gc-root@ ( n -- offset )
+    gc-root-offset local@ ;
+
 ! Finally we have the linkage area
 HOOK: lr-save os ( -- n )
 
 M: ppc stack-frame-size ( stack-frame -- i )
-    [ spill-counts>> [ swap reg-size * ] { } assoc>map sum ]
-    [ params>> ]
-    [ return>> ]
-    tri + +
+    (stack-frame-size)
     param-save-size +
     reserved-area-size +
     factor-area-size +
@@ -176,95 +178,28 @@ M: ppc %or      OR ;
 M: ppc %or-imm  ORI ;
 M: ppc %xor     XOR ;
 M: ppc %xor-imm XORI ;
+M: ppc %shl     SLW ;
 M: ppc %shl-imm swapd SLWI ;
+M: ppc %shr     SRW ;
 M: ppc %shr-imm swapd SRWI ;
+M: ppc %sar     SRAW ;
 M: ppc %sar-imm SRAWI ;
 M: ppc %not     NOT ;
 
-: %alien-invoke-tail ( func dll -- )
-    [ scratch-reg ] 2dip %alien-global scratch-reg MTCTR BCTR ;
-
-:: exchange-regs ( r1 r2 -- )
-    scratch-reg r1 MR
-    r1 r2 MR
-    r2 scratch-reg MR ;
-
-: ?MR ( r1 r2 -- ) 2dup = [ 2drop ] [ MR ] if ;
-
-:: move>args ( src1 src2 -- )
-    {
-        { [ src1 4 = ] [ 3 src2 ?MR 3 4 exchange-regs ] }
-        { [ src1 3 = ] [ 4 src2 ?MR ] }
-        { [ src2 3 = ] [ 4 src1 ?MR 3 4 exchange-regs ] }
-        { [ src2 4 = ] [ 3 src1 ?MR ] }
-        [ 3 src1 MR 4 src2 MR ]
-    } cond ;
-
-: clear-xer ( -- )
+:: overflow-template ( label dst src1 src2 insn -- )
     0 0 LI
-    0 MTXER ; inline
+    0 MTXER
+    dst src2 src1 insn call
+    label BO ; inline
 
-:: overflow-template ( src1 src2 insn func -- )
-    "no-overflow" define-label
-    clear-xer
-    scratch-reg src2 src1 insn call
-    scratch-reg ds-reg 0 STW
-    "no-overflow" get BNO
-    src1 src2 move>args
-    %prepare-alien-invoke
-    func f %alien-invoke
-    "no-overflow" resolve-label ; inline
+M: ppc %fixnum-add ( label dst src1 src2 -- )
+    [ ADDO. ] overflow-template ;
 
-:: overflow-template-tail ( src1 src2 insn func -- )
-    "overflow" define-label
-    clear-xer
-    scratch-reg src2 src1 insn call
-    "overflow" get BO
-    scratch-reg ds-reg 0 STW
-    BLR
-    "overflow" resolve-label
-    src1 src2 move>args
-    %prepare-alien-invoke
-    func f %alien-invoke-tail ; inline
+M: ppc %fixnum-sub ( label dst src1 src2 -- )
+    [ SUBFO. ] overflow-template ;
 
-M: ppc %fixnum-add ( src1 src2 -- )
-    [ ADDO. ] "overflow_fixnum_add" overflow-template ;
-
-M: ppc %fixnum-add-tail ( src1 src2 -- )
-    [ ADDO. ] "overflow_fixnum_add" overflow-template-tail ;
-
-M: ppc %fixnum-sub ( src1 src2 -- )
-    [ SUBFO. ] "overflow_fixnum_subtract" overflow-template ;
-
-M: ppc %fixnum-sub-tail ( src1 src2 -- )
-    [ SUBFO. ] "overflow_fixnum_subtract" overflow-template-tail ;
-
-M:: ppc %fixnum-mul ( src1 src2 temp1 temp2 -- )
-    "no-overflow" define-label
-    clear-xer
-    temp1 src1 tag-bits get SRAWI
-    temp2 temp1 src2 MULLWO.
-    temp2 ds-reg 0 STW
-    "no-overflow" get BNO
-    src2 src2 tag-bits get SRAWI
-    temp1 src2 move>args
-    %prepare-alien-invoke
-    "overflow_fixnum_multiply" f %alien-invoke
-    "no-overflow" resolve-label ;
-
-M:: ppc %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
-    "overflow" define-label
-    clear-xer
-    temp1 src1 tag-bits get SRAWI
-    temp2 temp1 src2 MULLWO.
-    "overflow" get BO
-    temp2 ds-reg 0 STW
-    BLR
-    "overflow" resolve-label
-    src2 src2 tag-bits get SRAWI
-    temp1 src2 move>args
-    %prepare-alien-invoke
-    "overflow_fixnum_multiply" f %alien-invoke-tail ;
+M: ppc %fixnum-mul ( label dst src1 src2 -- )
+    [ MULLWO. ] overflow-template ;
 
 : bignum@ ( n -- offset ) cells bignum tag-number - ; inline
 
@@ -462,19 +397,27 @@ M:: ppc %write-barrier ( src card# table -- )
     src card# deck-bits SRWI
     table scratch-reg card# STBX ;
 
-M:: ppc %gc ( temp1 temp2 gc-roots gc-root-count -- )
-    "end" define-label
+M:: ppc %check-nursery ( label temp1 temp2 -- )
     temp2 load-zone-ptr
     temp1 temp2 cell LWZ
     temp2 temp2 3 cells LWZ
-    temp1 temp1 1024 ADDI ! add ALLOT_BUFFER_ZONE to here
-    temp1 0 temp2 CMP ! is here >= end?
-    "end" get BLE
+    ! add ALLOT_BUFFER_ZONE to here
+    temp1 temp1 1024 ADDI
+    ! is here >= end?
+    temp1 0 temp2 CMP
+    label BLE ;
+
+M:: ppc %save-gc-root ( gc-root register -- )
+    register 1 gc-root gc-root@ STW ;
+
+M:: ppc %load-gc-root ( gc-root register -- )
+    register 1 gc-root gc-root@ LWZ ;
+
+M:: ppc %call-gc ( gc-root-count -- )
     %prepare-alien-invoke
-    0 3 LI
-    0 4 LI
-    "inline_gc" f %alien-invoke
-    "end" resolve-label ;
+    3 1 gc-root-base local@ ADDI
+    gc-root-count 4 LI
+    "inline_gc" f %alien-invoke ;
 
 M: ppc %prologue ( n -- )
     0 11 LOAD32 rc-absolute-ppc-2/2 rel-this

@@ -8,7 +8,7 @@ IN: compiler.cfg.liveness.ssa
 ! TODO: merge with compiler.cfg.liveness
 
 ! Assoc mapping basic blocks to sequences of sets of vregs; each sequence
-! is in conrrespondence with a predecessor
+! is in correspondence with a predecessor
 SYMBOL: phi-live-ins
 
 : phi-live-in ( predecessor basic-block -- set ) phi-live-ins get at at ;
@@ -31,7 +31,7 @@ SYMBOL: work-list
 : update-live-in ( basic-block -- changed? )
     [ [ compute-live-in ] keep live-ins get maybe-set-at ]
     [ [ compute-phi-live-in ] keep phi-live-ins get maybe-set-at ]
-    bi and ; 
+    bi or ;
 
 : compute-live-out ( basic-block -- live-out )
     [ successors>> [ live-in ] map ]
