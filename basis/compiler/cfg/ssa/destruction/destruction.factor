@@ -34,7 +34,7 @@ SYMBOL: seen
     ] [ src seen get conjoin ] if ;
 
 :: break-interferences ( -- )
-    V{ } clone seen set
+    H{ } clone seen set
     renaming-sets get [| dst assoc |
         assoc [| src bb |
             dst assoc src bb visit-renaming
@@ -49,9 +49,9 @@ SYMBOL: seen
 
 : destruct-ssa ( cfg -- cfg' )
     dup cfg-has-phis? [
-        init-coalescing
-        compute-ssa-live-sets
         dup split-critical-edges
+        compute-ssa-live-sets
+        init-coalescing
         dup compute-def-use
         dup compute-dominance
         dup compute-live-ranges
