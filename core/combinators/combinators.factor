@@ -113,7 +113,7 @@ ERROR: no-case object ;
     ] if ;
 
 : <buckets> ( initial length -- array )
-    next-power-of-2 swap [ nip clone ] curry map ;
+    next-power-of-2 iota swap [ nip clone ] curry map ;
 
 : distribute-buckets ( alist initial quot -- buckets )
     swapd [ [ dup first ] dip call 2array ] curry map
