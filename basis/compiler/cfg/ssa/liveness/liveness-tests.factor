@@ -39,7 +39,6 @@ cfg new 1 get >>entry 4 set
 [ ] [ 4 get precompute-liveness ] unit-test
 
 [ H{ } ] [ back-edge-targets get ] unit-test
-[ H{ } ] [ phi-outs get ] unit-test
 [ t ] [ 1 get R_q { 1 2 3 } [ get ] map unique = ] unit-test
 [ t ] [ 2 get R_q { 2 } [ get ] map unique = ] unit-test
 [ t ] [ 3 get R_q { 3 } [ get ] map unique = ] unit-test
@@ -107,7 +106,7 @@ cfg new 1 get >>entry 5 set
 [ f ] [ V int-regs 1 2 get live-in? ] unit-test
 [ f ] [ V int-regs 2 2 get live-in? ] unit-test
 
-[ t ] [ V int-regs 0 2 get live-out? ] unit-test
+[ f ] [ V int-regs 0 2 get live-out? ] unit-test
 [ f ] [ V int-regs 1 2 get live-out? ] unit-test
 [ f ] [ V int-regs 2 2 get live-out? ] unit-test
 
@@ -116,7 +115,7 @@ cfg new 1 get >>entry 5 set
 [ f ] [ V int-regs 2 3 get live-in? ] unit-test
 
 [ f ] [ V int-regs 0 3 get live-out? ] unit-test
-[ t ] [ V int-regs 1 3 get live-out? ] unit-test
+[ f ] [ V int-regs 1 3 get live-out? ] unit-test
 [ f ] [ V int-regs 2 3 get live-out? ] unit-test
 
 [ f ] [ V int-regs 0 4 get live-in? ] unit-test
@@ -199,8 +198,6 @@ cfg new 1 get >>entry 0 set
 [ f ] [ 9 get back-edge-target? ] unit-test
 [ f ] [ 10 get back-edge-target? ] unit-test
 [ f ] [ 11 get back-edge-target? ] unit-test
-
-[ f ] [ 1 11 [a,b] [ get phi-outs get at ] any? ] unit-test
 
 [ f ] [ V int-regs 0 1 get live-in? ] unit-test
 [ f ] [ V int-regs 1 1 get live-in? ] unit-test
