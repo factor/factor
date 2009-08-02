@@ -354,6 +354,22 @@ HELP: spread
 
 { bi* tri* spread } related-words
 
+HELP: to-fixed-point
+{ $values { "object" object } { "quot" { $quotation "( object(n) -- object(n+1) )" } } { "object(n)" object } }
+{ $description "Applies the quotation repeatedly with " { $snippet "object" } " as the initial input until the output of the quotation equals the input." }
+{ $examples
+    { $example
+        "USING: combinators kernel math prettyprint sequences ;"
+        "IN: scratchpad"
+        ": flatten ( sequence -- sequence' )"
+        "    \"flatten\" over index"
+        "    [ [ 1 + swap nth ] [ nip dup 2 + ] [ drop ] 2tri replace-slice ] when* ;"
+        ""
+        "{ \"flatten\" { 1 { 2 3 } \"flatten\" { 4 5 } { 6 } } } [ flatten ] to-fixed-point ."
+        "{ 1 { 2 3 } 4 5 { 6 } }"
+    }
+} ;
+
 HELP: alist>quot
 { $values { "default" "a quotation" } { "assoc" "a sequence of quotation pairs" } { "quot" "a new quotation" } }
 { $description "Constructs a quotation which calls the first quotation in each pair of " { $snippet "assoc" } " until one of them outputs a true value, and then calls the second quotation in the corresponding pair. Quotations are called in reverse order, and if no quotation outputs a true value then " { $snippet "default" } " is called." }
