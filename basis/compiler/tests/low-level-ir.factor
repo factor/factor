@@ -27,8 +27,8 @@ IN: compiler.tests.low-level-ir
         T{ ##epilogue }
         T{ ##return }
     } [ clone ] map 2 test-bb
-    0 get 1 get 1vector >>successors drop
-    1 get 2 get 1vector >>successors drop
+    0 1 edge
+    1 2 edge
     compile-test-cfg
     execute( -- result ) ;
 
