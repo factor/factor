@@ -18,29 +18,29 @@ IN: compiler.cfg.ssa.destruction.process-blocks
 ! the source vregs above
 SYMBOLS: phi-union unioned-blocks ;
 
-:: operand-live-into-phi-node's-block? ( bb src dst -- ? )
-    src bb live-in? ;
+: operand-live-into-phi-node's-block? ( src dst -- ? )
+    def-of live-in? ;
 
-:: phi-node-is-live-out-of-operand's-block? ( bb src dst -- ? )
-    dst src def-of live-out? ;
+: phi-node-is-live-out-of-operand's-block? ( src dst -- ? )
+    swap def-of live-out? ;
 
-:: operand-is-phi-node-and-live-into-operand's-block? ( bb src dst -- ? )
-    { [ src insn-of ##phi? ] [ src src def-of live-in? ] } 0&& ;
+: operand-is-phi-node-and-live-into-operand's-block? ( src dst -- ? )
+    drop { [ insn-of ##phi? ] [ dup def-of live-in? ] } 1&& ;
 
-:: operand-being-renamed? ( bb src dst -- ? )
-    src processed-names get key? ;
+: operand-being-renamed? ( src dst -- ? )
+    drop processed-names get key? ;
 
-:: two-operands-in-same-block? ( bb src dst -- ? )
-    src def-of unioned-blocks get key? ;
+: two-operands-in-same-block? ( src dst -- ? )
+    drop def-of unioned-blocks get key? ;
 
-: trivial-interference? ( bb src dst -- ? )
+: trivial-interference? ( src dst -- ? )
     {
         [ operand-live-into-phi-node's-block? ]
         [ phi-node-is-live-out-of-operand's-block? ]
         [ operand-is-phi-node-and-live-into-operand's-block? ]
         [ operand-being-renamed? ]
         [ two-operands-in-same-block? ]
-    } 3|| ;
+    } 2|| ;
 
 : don't-coalesce ( bb src dst -- )
     2nip processed-name ;
@@ -56,7 +56,7 @@ SYMBOLS: phi-union unioned-blocks ;
 : process-phi-operand ( bb src dst -- )
     {
         { [ 2dup eq? ] [ don't-coalesce ] }
-        { [ 3dup trivial-interference? ] [ trivial-interference ] }
+        { [ 2dup trivial-interference? ] [ trivial-interference ] }
         [ add-to-renaming-set ]
     } cond ;
 
@@ -70,7 +70,7 @@ SYMBOLS: phi-union unioned-blocks ;
     bb src dst trivial-interference
     src phi-union get delete-at ;
 
-:: insert-copy-for-parent ( bb src node dst -- )
+:: insert-copy-for-parent ( bb src dst node -- )
     src node vreg>> eq? [ bb src dst insert-copy ] when ;
 
 : insert-copies-for-parent ( ##phi node child -- )

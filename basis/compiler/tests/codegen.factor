@@ -359,3 +359,11 @@ cell 4 = [
 [ 0 3 f { 1 2 3 } ] [ { 1 2 3 } 0 7 "hello" coalescing-bug-1 ] unit-test
 [ 0 3 f { 1 2 3 } ] [ { 1 2 3 } 3 2 "hello" coalescing-bug-1 ] unit-test
 [ 2 3 T{ slice f 1 3 "hello" } { 1 2 3 } ] [ { 1 2 3 } 1 3 "hello" coalescing-bug-1 ] unit-test
+
+! Another one, found by Dan
+: coalescing-bug-2 ( a -- b )
+    dup dup 10 fixnum< [ 1 fixnum+fast ] when
+    fixnum+fast 2 fixnum*fast 2 fixnum-fast 2 fixnum*fast 2 fixnum+fast ;
+
+[ 10 ] [ 1 coalescing-bug-2 ] unit-test
+[ 86 ] [ 11 coalescing-bug-2 ] unit-test
