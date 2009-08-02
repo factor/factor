@@ -30,8 +30,12 @@ ERROR: bad-peek dst loc ;
     [ dup n>> 0 < [ 2drop ] [ ##replace ] if ] each-insertion ;
 
 : visit-edge ( from to -- )
-    2dup [ [ insert-peeks ] [ insert-replaces ] 2bi ] V{ } make
-    [ 2drop ] [ <simple-block> insert-basic-block ] if-empty ;
+    ! If both blocks are subroutine calls, don't bother
+    ! computing anything.
+    2dup [ kill-block? ] both? [ 2drop ] [
+        2dup [ [ insert-peeks ] [ insert-replaces ] 2bi ] V{ } make
+        [ 2drop ] [ <simple-block> insert-basic-block ] if-empty
+    ] if ;
 
 : visit-block ( bb -- )
     [ predecessors>> ] keep '[ _ visit-edge ] each ;

@@ -31,7 +31,7 @@ V{
     T{ ##replace f V int-regs 3 D 0 }
 } 3 test-bb
 
-1 get 2 get 3 get V{ } 2sequence >>successors drop
+1 { 2 3 } edges
 
 cfg new 1 get >>entry 4 set
 
@@ -132,35 +132,35 @@ cfg new 1 get >>entry 5 set
 ! This is the CFG in Figure 3 from the paper
 V{ } 1 test-bb
 V{ } 2 test-bb
-1 get 2 get 1vector >>successors drop
+1 2 edge
 V{
     T{ ##peek f V int-regs 0 D 0 }
     T{ ##peek f V int-regs 1 D 0 }
     T{ ##peek f V int-regs 2 D 0 }
 } 3 test-bb
 V{ } 11 test-bb
-2 get 3 get 11 get V{ } 2sequence >>successors drop
+2 { 3 11 } edges
 V{
     T{ ##replace f V int-regs 0 D 0 }
 } 4 test-bb
 V{ } 8 test-bb
-3 get 8 get 4 get V{ } 2sequence >>successors drop
+3 { 8 4 } edges
 V{
     T{ ##replace f V int-regs 1 D 0 }
 } 9 test-bb
-8 get 9 get 1vector >>successors drop
+8 9 edge
 V{
     T{ ##replace f V int-regs 2 D 0 }
 } 5 test-bb
-4 get 5 get 1vector >>successors drop
+4 5 edge
 V{ } 10 test-bb
 V{ } 6 test-bb
-5 get 6 get 1vector >>successors drop
-9 get 6 get 10 get V{ } 2sequence >>successors drop
+5 6 edge
+9 { 6 10 } edges
 V{ } 7 test-bb
-6 get 5 get 7 get V{ } 2sequence >>successors drop
-10 get 8 get 1vector >>successors drop
-7 get 2 get 1vector >>successors drop
+6 { 5 7 } edges
+10 8 edge
+7 2 edge
 
 cfg new 1 get >>entry 0 set
 [ ] [ 0 get compute-predecessors drop ] unit-test

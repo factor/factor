@@ -26,10 +26,9 @@ SYMBOL: spill-temps
     2dup = [ 2drop ] [ vreg reg-class>> add-mapping ] if ;
 
 : compute-mappings ( bb to -- mappings )
-    [
-        dup live-in keys
-        [ resolve-value-data-flow ] with with each
-    ] { } make ;
+    dup live-in dup assoc-empty? [ 3drop f ] [
+        [ keys [ resolve-value-data-flow ] with with each ] { } make
+    ] if ;
 
 : memory->register ( from to -- )
     swap [ first2 ] [ first n>> ] bi* _reload ;

@@ -19,7 +19,7 @@ V{
     T{ ##box-float f V int-regs 0 V int-regs 1 }
 } 1 test-bb
 
-0 get 1 get 1vector >>successors drop
+0 1 edge
 
 [ ] [ test-gc-checks ] unit-test
 
