@@ -1549,9 +1549,9 @@ V{
     T{ ##return }
 } 3 test-bb
 
-1 get 1vector 0 get (>>successors)
-2 get 3 get V{ } 2sequence 1 get (>>successors)
-3 get 1vector 2 get (>>successors)
+0 1 edge
+1 { 2 3 } edges
+2 3 edge
 
 SYMBOL: linear-scan-result
 
@@ -1564,9 +1564,7 @@ SYMBOL: linear-scan-result
         flatten-cfg 1array mr.
     ] with-scope ;
 
-! This test has a critical edge -- do we care about these?
-
-! [ { 1 2 } test-linear-scan-on-cfg ] unit-test
+[ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
 ! Bug in inactive interval handling
 ! [ rot dup [ -rot ] when ]
@@ -1896,11 +1894,11 @@ V{
     T{ ##return }
 } 6 test-bb
 
-0 get 1 get V{ } 1sequence >>successors drop
-1 get 2 get 3 get V{ } 2sequence >>successors drop
-2 get 4 get V{ } 1sequence >>successors drop
-3 get 4 get V{ } 1sequence >>successors drop
-4 get 5 get 6 get V{ } 2sequence >>successors drop
+0 1 edge
+1 { 2 3 } edges
+2 4 edge
+3 4 edge
+4 { 5 6 } edges
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
@@ -1956,14 +1954,14 @@ V{
     T{ ##return }
 } 9 test-bb
 
-0 get 1 get 1vector >>successors drop
-1 get 2 get 7 get V{ } 2sequence >>successors drop
-7 get 8 get 1vector >>successors drop
-8 get 9 get 1vector >>successors drop
-2 get 3 get 5 get V{ } 2sequence >>successors drop
-3 get 4 get 1vector >>successors drop
-4 get 9 get 1vector >>successors drop
-5 get 6 get 1vector >>successors drop
+0 1 edge
+1 { 2 7 } edges
+7 8 edge
+8 9 edge
+2 { 3 5 } edges
+3 4 edge
+4 9 edge
+5 6 edge
 
 [ ] [ { 1 2 3 4 } test-linear-scan-on-cfg ] unit-test
 
@@ -2139,11 +2137,11 @@ V{
     T{ ##return }
 } 5 test-bb
 
-0 get 1 get 1vector >>successors drop
-1 get 2 get 4 get V{ } 2sequence >>successors drop
-2 get 3 get 1vector >>successors drop
-3 get 5 get 1vector >>successors drop
-4 get 5 get 1vector >>successors drop
+0 1 edge
+1 { 2 4 } edges
+2 3 edge
+3 5 edge
+4 5 edge
 
 [ ] [ { 1 2 3 4 5 } test-linear-scan-on-cfg ] unit-test
 
@@ -2286,12 +2284,12 @@ V{
     T{ ##return }
 } 6 test-bb
 
-0 get 1 get 1vector >>successors drop
-1 get 2 get 5 get V{ } 2sequence >>successors drop
-2 get 3 get 1vector >>successors drop
-3 get 4 get 1vector >>successors drop
-4 get 6 get 1vector >>successors drop
-5 get 6 get 1vector >>successors drop
+0 1 edge
+1 { 2 5 } edges
+2 3 edge
+3 4 edge
+4 6 edge
+5 6 edge
 
 [ ] [ { 1 2 3 4 5 } test-linear-scan-on-cfg ] unit-test
 
@@ -2419,8 +2417,8 @@ V{
     T{ ##return }
 } 2 test-bb
 
-0 get 1 get 1vector >>successors drop
-1 get 2 get 1vector >>successors drop
+0 1 edge
+1 2 edge
 
 [ ] [ { 1 2 3 } test-linear-scan-on-cfg ] unit-test
 
@@ -2444,7 +2442,7 @@ V{
     T{ ##return }
 } 2 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
+0 { 1 2 } edges
 
 [ ] [ { 1 2 3 } test-linear-scan-on-cfg ] unit-test
 
