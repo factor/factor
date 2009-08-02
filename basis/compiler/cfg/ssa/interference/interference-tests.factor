@@ -1,6 +1,6 @@
 USING: accessors compiler.cfg compiler.cfg.debugger
 compiler.cfg.def-use compiler.cfg.dominance
-compiler.cfg.instructions compiler.cfg.liveness.ssa
+compiler.cfg.instructions compiler.cfg.ssa.liveness
 compiler.cfg.registers compiler.cfg.predecessors
 compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges cpu.architecture
@@ -9,8 +9,8 @@ IN: compiler.cfg.ssa.interference.tests
 
 : test-interference ( -- )
     cfg new 0 get >>entry
-    compute-ssa-live-sets
     compute-predecessors
+    dup precompute-liveness
     dup compute-defs
     dup compute-dominance
     compute-live-ranges ;
