@@ -7,19 +7,22 @@ IN: compiler.cfg.ssa.destruction.interference
 
 <PRIVATE
 
-: kill-after-def? ( vreg1 vreg2 bb -- ? )
+:: kill-after-def? ( vreg1 vreg2 bb -- ? )
     ! If first register is used after second one is defined, they interfere.
     ! If they are used in the same instruction, no interference. If the
     ! instruction is a def-is-use-insn, then there will be a use at +1
     ! (instructions are 2 apart) and so outputs will interfere with
     ! inputs.
-    [ kill-index ] [ def-index ] bi-curry bi* > ;
+    vreg1 bb kill-index
+    vreg2 bb def-index > ;
 
-: interferes-same-block? ( vreg1 vreg2 bb1 bb2 -- ? )
+:: interferes-same-block? ( vreg1 vreg2 bb1 bb2 -- ? )
     ! If both are defined in the same basic block, they interfere if their
     ! local live ranges intersect.
-    drop
-    { [ kill-after-def? ] [ swapd kill-after-def? ] } 3|| ;
+    vreg1 bb1 def-index
+    vreg2 bb1 def-index <
+    [ vreg1 vreg2 ] [ vreg2 vreg1 ] if
+    bb1 kill-after-def? ;
 
 : interferes-first-dominates? ( vreg1 vreg2 bb1 bb2 -- ? )
     ! If vreg1 dominates vreg2, then they interfere if vreg2's definition
