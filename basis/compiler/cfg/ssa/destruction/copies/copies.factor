@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs hashtables fry kernel make namespaces sets
-sequences compiler.cfg.ssa.destruction.state compiler.cfg.parallel-copy ;
+USING: accessors assocs hashtables fry kernel make namespaces
+sets sequences compiler.cfg.ssa.destruction.state
+compiler.cfg.parallel-copy compiler.cfg.utilities ;
 IN: compiler.cfg.ssa.destruction.copies
 
 ERROR: bad-copy ;
@@ -20,9 +21,5 @@ ERROR: bad-copy ;
 
 : insert-copies ( -- )
     waiting get [
-        [ instructions>> building ] dip '[
-            building get pop
-            _ compute-copies parallel-copy
-            ,
-        ] with-variable
+        '[ _ compute-copies parallel-copy ] add-instructions
     ] assoc-each ;
