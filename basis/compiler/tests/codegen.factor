@@ -2,7 +2,8 @@ USING: generalizations accessors arrays compiler kernel kernel.private
 math hashtables.private math.private namespaces sequences tools.test
 namespaces.private slots.private sequences.private byte-arrays alien
 alien.accessors layouts words definitions compiler.units io
-combinators vectors grouping make alien.c-types combinators.short-circuit ;
+combinators vectors grouping make alien.c-types combinators.short-circuit
+math.order ;
 QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
 
@@ -367,3 +368,28 @@ cell 4 = [
 
 [ 10 ] [ 1 coalescing-bug-2 ] unit-test
 [ 86 ] [ 11 coalescing-bug-2 ] unit-test
+
+! Regression in suffix-arrays code
+: coalescing-bug-3 ( from/f to/f seq -- slice )
+    [
+        [ drop 0 or ] [ length or ] bi-curry bi*
+        [ min ] keep
+    ] keep <slice> ;
+
+[ T{ slice f 0 5 "hello" } ] [ f f "hello" coalescing-bug-3 ] unit-test
+[ T{ slice f 1 5 "hello" } ] [ 1 f "hello" coalescing-bug-3 ] unit-test
+[ T{ slice f 0 3 "hello" } ] [ f 3 "hello" coalescing-bug-3 ] unit-test
+[ T{ slice f 1 3 "hello" } ] [ 1 3 "hello" coalescing-bug-3 ] unit-test
+[ T{ slice f 3 3 "hello" } ] [ 4 3 "hello" coalescing-bug-3 ] unit-test
+[ T{ slice f 5 5 "hello" } ] [ 6 f "hello" coalescing-bug-3 ] unit-test
+
+! Reduction
+: coalescing-bug-4 ( a b c -- a b c )
+     [ [ min ] keep ] dip vector? [ 1 ] [ 2 ] if ;
+
+ [ 2 3 2 ] [ 2 3 "" coalescing-bug-4 ] unit-test
+ [ 3 3 2 ] [ 4 3 "" coalescing-bug-4 ] unit-test
+ [ 3 3 2 ] [ 4 3 "" coalescing-bug-4 ] unit-test
+ [ 2 3 1 ] [ 2 3 V{ } coalescing-bug-4 ] unit-test
+ [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
+ [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
