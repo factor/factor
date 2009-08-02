@@ -2,10 +2,10 @@ USING: accessors compiler.cfg compiler.cfg.debugger
 compiler.cfg.def-use compiler.cfg.dominance
 compiler.cfg.instructions compiler.cfg.liveness.ssa
 compiler.cfg.registers compiler.cfg.predecessors
-compiler.cfg.ssa.destruction.interference
-compiler.cfg.ssa.destruction.live-ranges cpu.architecture
+compiler.cfg.ssa.interference
+compiler.cfg.ssa.interference.live-ranges cpu.architecture
 kernel namespaces tools.test ;
-IN: compiler.cfg.ssa.destruction.interference.tests
+IN: compiler.cfg.ssa.interference.tests
 
 : test-interference ( -- )
     cfg new 0 get >>entry
