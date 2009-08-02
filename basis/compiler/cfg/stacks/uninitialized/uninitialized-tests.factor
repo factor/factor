@@ -25,8 +25,8 @@ V{
     T{ ##inc-d f 1 }
 } 2 test-bb
 
-0 get 1 get 1vector >>successors drop
-1 get 2 get 1vector >>successors drop
+0 1 edge
+1 2 edge
 
 [ ] [ test-uninitialized ] unit-test
 
@@ -52,9 +52,9 @@ V{
     T{ ##return }
 } 3 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
-1 get 3 get 1vector >>successors drop
-2 get 3 get 1vector >>successors drop
+0 { 1 2 } edges
+1 3 edge
+2 3 edge
 
 [ ] [ test-uninitialized ] unit-test
 

@@ -13,12 +13,12 @@ V{ T{ ##peek f V int-regs 4 D 0 } } clone 4 test-bb
 V{ T{ ##peek f V int-regs 5 D 0 } } clone 5 test-bb
 V{ T{ ##peek f V int-regs 6 D 0 } } clone 6 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
-2 get 3 get 4 get V{ } 2sequence >>successors drop
-3 get 5 get 1vector >>successors drop
-4 get 5 get 1vector >>successors drop
-1 get 6 get 1vector >>successors drop
-5 get 6 get 1vector >>successors drop
+0 { 1 2 } edges
+2 { 3 4 } edges
+3 5 edge
+4 5 edge
+1 6 edge
+5 6 edge
 
 : clean-up-forest ( forest -- forest' )
     [ [ vreg>> n>> ] compare ] sort

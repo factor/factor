@@ -16,11 +16,11 @@ V{ } 3 test-bb
 V{ } 4 test-bb
 V{ } 5 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
-1 get 3 get 1vector >>successors drop
-2 get 4 get 1vector >>successors drop
-3 get 4 get 1vector >>successors drop
-4 get 5 get 1vector >>successors drop
+0 { 1 2 } edges
+1 3 edge
+2 4 edge
+3 4 edge
+4 5 edge
 
 [ ] [ test-dominance ] unit-test
 
@@ -46,11 +46,11 @@ V{ } 2 test-bb
 V{ } 3 test-bb
 V{ } 4 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
-1 get 3 get 1vector >>successors drop
-2 get 4 get 1vector >>successors drop
-3 get 4 get 1vector >>successors drop
-4 get 3 get 1vector >>successors drop
+0 { 1 2 } edges
+1 3 edge
+2 4 edge
+3 4 edge
+4 3 edge
 
 [ ] [ test-dominance ] unit-test
 
@@ -64,12 +64,12 @@ V{ } 3 test-bb
 V{ } 4 test-bb
 V{ } 5 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
-1 get 5 get 1vector >>successors drop
-2 get 4 get 3 get V{ } 2sequence >>successors drop
-5 get 4 get 1vector >>successors drop
-4 get 5 get 3 get V{ } 2sequence >>successors drop
-3 get 4 get 1vector >>successors drop
+0 { 1 2 } edges
+1 5 edge
+2 { 4 3 } edges
+5 4 edge
+4 { 5 3 } edges
+3 4 edge
 
 [ ] [ test-dominance ] unit-test
 

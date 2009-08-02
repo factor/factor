@@ -1175,15 +1175,10 @@ V{
 } 3 test-bb
 
 V{
-    T{ ##phi f V int-regs 3 { } }
+    T{ ##phi f V int-regs 3 H{ { 2 V int-regs 1 } { 3 V int-regs 2 } } }
     T{ ##replace f V int-regs 3 D 0 }
     T{ ##return }
 } 4 test-bb
-
-4 get instructions>> first
-2 get V int-regs 1 2array
-3 get V int-regs 2 2array 2array
->>inputs drop
 
 test-diamond
 
@@ -1296,10 +1291,10 @@ V{
     T{ ##return }
 } 5 test-bb
 
-0 get 1 get 1vector >>successors drop
-1 get 2 get 4 get V{ } 2sequence >>successors drop
-2 get 3 get 1vector >>successors drop
-4 get 5 get 1vector >>successors drop
+0 1 edge
+1 { 2 4 } edges
+2 3 edge
+4 5 edge
 
 [ ] [
     cfg new 0 get >>entry
