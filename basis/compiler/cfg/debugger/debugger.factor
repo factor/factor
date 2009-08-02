@@ -8,7 +8,7 @@ compiler.cfg.builder compiler.cfg.linearization
 compiler.cfg.registers compiler.cfg.stack-frame
 compiler.cfg.linear-scan compiler.cfg.two-operand
 compiler.cfg.optimizer compiler.cfg.instructions
-compiler.cfg.mr compiler.cfg ;
+compiler.cfg.utilities compiler.cfg.mr compiler.cfg ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-cfg ( quot -- cfgs )
