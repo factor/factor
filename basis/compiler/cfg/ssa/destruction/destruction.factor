@@ -13,7 +13,7 @@ compiler.cfg.ssa.destruction.state
 compiler.cfg.ssa.destruction.forest
 compiler.cfg.ssa.destruction.copies
 compiler.cfg.ssa.destruction.renaming
-compiler.cfg.ssa.destruction.live-ranges
+compiler.cfg.ssa.interference.live-ranges
 compiler.cfg.ssa.destruction.process-blocks ;
 IN: compiler.cfg.ssa.destruction
 

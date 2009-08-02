@@ -6,9 +6,9 @@ compiler.cfg.def-use
 compiler.cfg.instructions
 compiler.cfg.liveness.ssa
 compiler.cfg.dominance
+compiler.cfg.ssa.interference
 compiler.cfg.ssa.destruction.state
-compiler.cfg.ssa.destruction.forest
-compiler.cfg.ssa.destruction.interference ;
+compiler.cfg.ssa.destruction.forest ;
 IN: compiler.cfg.ssa.destruction.process-blocks
 
 ! phi-union maps a vreg to the predecessor block
