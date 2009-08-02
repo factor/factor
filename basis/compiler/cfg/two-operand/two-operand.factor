@@ -93,8 +93,10 @@ M: ##not convert-two-operand*
 
 M: insn convert-two-operand* , ;
 
-: (convert-two-operand) ( cfg -- cfg' )
-    [ [ convert-two-operand* ] each ] V{ } make ;
+: (convert-two-operand) ( insns -- insns' )
+    dup first kill-vreg-insn? [
+        [ [ convert-two-operand* ] each ] V{ } make
+    ] unless ;
 
 : convert-two-operand ( cfg -- cfg' )
     two-operand? [ [ (convert-two-operand) ] local-optimization ] when ;
