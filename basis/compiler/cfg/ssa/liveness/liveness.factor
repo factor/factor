@@ -80,13 +80,7 @@ SYMBOL: back-edge-targets
 PRIVATE>
 
 : precompute-liveness ( cfg -- )
-    ! Maybe dominance and def-use should be called before this, separately
-    {
-        [ compute-dominance ]
-        [ compute-def-use ]
-        [ compute-R_q ]
-        [ compute-T_q ]
-    } cleave ;
+    [ compute-R_q ] [ compute-T_q ] bi ;
 
 <PRIVATE
 
