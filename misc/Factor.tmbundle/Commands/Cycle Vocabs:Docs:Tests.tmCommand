@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>bundleUUID</key>
+	<string>8061D2F3-B603-411D-AFFE-61784A07906D</string>
+	<key>command</key>
+	<string>#! /Applications/factor/factor
+
+"TM_FILEPATH" os-env [ parent-directory ] [ file-name dup ] bi {
+{ [ dup "docs.factor" tail? ] [ drop 11 tail* "tests.factor" append append ] }
+{ [ "-tests.factor" tail? ] [ 13 tail* ".factor" append append ] }
+[ 7 tail* [ "-docs.factor" append append ] keep over exists? [ drop ] [ scaffold-help ] if ]
+} cond 0 textmate</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^@	</string>
+	<key>name</key>
+	<string>Cycle Vocabs/Docs/Tests</string>
+	<key>output</key>
+	<string>discard</string>
+	<key>scope</key>
+	<string>source.factor</string>
+	<key>uuid</key>
+	<string>D348BE40-6F51-4471-B300-DDDA70ED8C8C</string>
+</dict>
+</plist>

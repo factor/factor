@@ -4,27 +4,26 @@
 <dict>
 	<key>beforeRunningCommand</key>
 	<string>nop</string>
+	<key>bundleUUID</key>
+	<string>8061D2F3-B603-411D-AFFE-61784A07906D</string>
 	<key>command</key>
 	<string>#!/usr/bin/env ruby
 
 require "#{ENV["TM_BUNDLE_SUPPORT"]}/lib/tm_factor"
 
 doc = STDIN.read
-word = line_current_word(ENV["TM_CURRENT_LINE"], ENV["TM_LINE_INDEX"].to_i)
-factor_run(%Q(#{doc_using_statements(doc)} USE: help\n \\ #{word} help))</string>
+puts factor_eval(%Q(#{doc_using_statements(doc)} USE: ui.tools.operations\n [ #{ENV["TM_SELECTED_TEXT"} ] com-expand-macros))</string>
 	<key>fallbackInput</key>
 	<string>word</string>
 	<key>input</key>
 	<string>document</string>
-	<key>keyEquivalent</key>
-	<string>^H</string>
 	<key>name</key>
-	<string>Help for Word</string>
+	<string>Expand Selection</string>
 	<key>output</key>
 	<string>showAsTooltip</string>
 	<key>scope</key>
 	<string>source.factor</string>
 	<key>uuid</key>
-	<string>BC5BE120-734B-40DF-8B6B-5D3243614B27</string>
+	<string>8465B33D-7CA0-4337-945C-4078346D64BC</string>
 </dict>
 </plist>

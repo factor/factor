@@ -32,4 +32,4 @@ SYNTAX: service current-vocab name>> serving-vocabs get-global adjoin ;
     register-gets-thread
     register-does-thread
     register-loads-thread
-] "start-serving-vocabs" add-init-hook
+] "modules.rpc-server" add-init-hook
