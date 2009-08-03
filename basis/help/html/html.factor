@@ -115,7 +115,7 @@ TUPLE: result title href ;
     load-index swap >lower
     '[ [ drop _ ] dip >lower subseq? ] assoc-filter
     [ swap result boa ] { } assoc>map
-    [ [ title>> ] compare ] sort ;
+    [ title>> ] sort-with ;
 
 : article-apropos ( string -- results )
     "articles.idx" offline-apropos ;
