@@ -5,26 +5,23 @@
 	<key>beforeRunningCommand</key>
 	<string>nop</string>
 	<key>command</key>
-	<string>#!/usr/bin/env ruby
-
-require "#{ENV["TM_BUNDLE_SUPPORT"]}/lib/tm_factor"
-
-doc = STDIN.read
-word = line_current_word(ENV["TM_CURRENT_LINE"], ENV["TM_LINE_INDEX"].to_i)
-factor_run(%Q(#{doc_using_statements(doc)} USE: help\n \\ #{word} help))</string>
+	<string>#! /Applications/factor/factor
+USE: modules.using
+USING*: environment localhost::get-using io ;
+"TM_FILEPATH" os-env get-using write</string>
 	<key>fallbackInput</key>
 	<string>word</string>
 	<key>input</key>
-	<string>document</string>
+	<string>none</string>
 	<key>keyEquivalent</key>
-	<string>^H</string>
+	<string>^u</string>
 	<key>name</key>
-	<string>Help for Word</string>
+	<string>Show Using</string>
 	<key>output</key>
 	<string>showAsTooltip</string>
 	<key>scope</key>
 	<string>source.factor</string>
 	<key>uuid</key>
-	<string>BC5BE120-734B-40DF-8B6B-5D3243614B27</string>
+	<string>86DD4385-4029-4EFE-B546-1EC8EB5EB932</string>
 </dict>
 </plist>
