@@ -19,6 +19,7 @@ compiler.cfg.instructions
 compiler.cfg.predecessors
 compiler.cfg.builder.blocks
 compiler.cfg.stacks
+compiler.cfg.stacks.local
 compiler.alien ;
 IN: compiler.cfg.builder
 
@@ -159,14 +160,32 @@ M: #push emit-node
     literal>> ^^load-literal ds-push ;
 
 ! #shuffle
+
+! Even though low level IR has its own dead code elimination pass,
+! we try not to introduce useless ##peeks here, since this reduces
+! the accuracy of global stack analysis.
+
+: make-input-map ( #shuffle -- assoc )
+    ! Assoc maps high-level IR values to stack locations.
+    [
+        [ in-d>> <reversed> [ <ds-loc> swap set ] each-index ]
+        [ in-r>> <reversed> [ <rs-loc> swap set ] each-index ] bi
+    ] H{ } make-assoc ;
+
+: make-output-seq ( values mapping input-map -- vregs )
+    '[ _ at _ at peek-loc ] map ;
+
+: load-shuffle ( #shuffle mapping input-map -- ds-vregs rs-vregs )
+    [ [ out-d>> ] 2dip make-output-seq ]
+    [ [ out-r>> ] 2dip make-output-seq ] 3bi ;
+
+: store-shuffle ( #shuffle ds-vregs rs-vregs -- )
+    [ [ in-d>> length neg inc-d ] dip ds-store ]
+    [ [ in-r>> length neg inc-r ] dip rs-store ]
+    bi-curry* bi ;
+
 M: #shuffle emit-node
-    dup
-    H{ } clone
-    [ [ in-d>> [ length ds-load ] keep ] dip '[ _ set-at ] 2each ]
-    [ [ in-r>> [ length rs-load ] keep ] dip '[ _ set-at ] 2each ]
-    [ nip ] 2tri
-    [ [ [ out-d>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map ds-store ]
-    [ [ [ out-r>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map rs-store ] 2bi ;
+    dup dup [ mapping>> ] [ make-input-map ] bi load-shuffle store-shuffle ;
 
 ! #return
 : emit-return ( -- )

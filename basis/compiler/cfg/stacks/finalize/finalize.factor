@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs kernel fry accessors sequences make math
+USING: namespaces assocs kernel fry accessors sequences make math locals
 combinators compiler.cfg compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.utilities compiler.cfg.rpo compiler.cfg.stacks.local
 compiler.cfg.stacks.global compiler.cfg.stacks.height ;
@@ -8,13 +8,23 @@ IN: compiler.cfg.stacks.finalize
 
 ! This pass inserts peeks and replaces.
 
-: inserting-peeks ( from to -- assoc )
-    peek-in swap [ peek-out ] [ avail-out ] bi
-    assoc-union assoc-diff ;
+:: inserting-peeks ( from to -- assoc )
+    ! A peek is inserted on an edge if the destination anticipates
+    ! the stack location, the source does not anticipate it and
+    ! it is not available from the source in a register.
+    to anticip-in
+    from anticip-out from avail-out assoc-union
+    assoc-diff ;
 
-: inserting-replaces ( from to -- assoc )
-    [ replace-out ] [ [ kill-in ] [ replace-in ] bi ] bi*
-    assoc-union assoc-diff ;
+:: inserting-replaces ( from to -- assoc )
+    ! A replace is inserted on an edge if two conditions hold:
+    ! - the location is not dead at the destination, OR
+    !   the location is live at the destination but not available
+    !   at the destination
+    ! - the location is pending in the source but not the destination
+    from pending-out to pending-in assoc-diff
+    to dead-in to live-in to anticip-in assoc-diff assoc-diff
+    assoc-diff ;
 
 : each-insertion ( assoc bb quot: ( vreg loc -- ) -- )
     '[ drop [ loc>vreg ] [ _ untranslate-loc ] bi @ ] assoc-each ; inline
@@ -33,7 +43,7 @@ ERROR: bad-peek dst loc ;
     ! If both blocks are subroutine calls, don't bother
     ! computing anything.
     2dup [ kill-block? ] both? [ 2drop ] [
-        2dup [ [ insert-peeks ] [ insert-replaces ] 2bi ] V{ } make
+        2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ] V{ } make
         [ 2drop ] [ <simple-block> insert-basic-block ] if-empty
     ] if ;
 
