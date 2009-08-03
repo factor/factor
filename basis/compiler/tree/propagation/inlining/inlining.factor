@@ -163,13 +163,17 @@ DEFER: (flat-length)
 
 SYMBOL: history
 
+: already-inlined? ( obj -- ? ) history get memq? ;
+
+: add-to-history ( obj -- ) history [ swap suffix ] change ;
+
 : remember-inlining ( word -- )
     [ inlining-count get inc-at ]
-    [ history [ swap suffix ] change ]
+    [ add-to-history ]
     bi ;
 
 :: inline-word ( #call word -- ? )
-    word history get memq? [ f ] [
+    word already-inlined? [ f ] [
         #call word splicing-body [
             [
                 word remember-inlining

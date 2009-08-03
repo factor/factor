@@ -64,6 +64,6 @@ TUPLE: upward-slice < slice ;
             drop
             [ downward-slices ]
             [ stable-slices ]
-            [ upward-slices ] tri 3append [ [ from>> ] compare ] sort
+            [ upward-slices ] tri 3append [ from>> ] sort-with
         ]
     } case ;

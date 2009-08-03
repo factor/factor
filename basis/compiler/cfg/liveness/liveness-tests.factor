@@ -29,7 +29,7 @@ V{
     T{ ##return }
 } 3 test-bb
 
-1 get 2 get 3 get V{ } 2sequence >>successors drop
+1 { 2 3 } edges
 
 test-liveness
 
@@ -55,7 +55,7 @@ V{
     T{ ##return }
 } 2 test-bb
 
-1 get 2 get 1vector >>successors drop
+1 2 edge
 
 test-liveness
 
