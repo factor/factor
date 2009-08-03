@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#! /Applications/factor/factor
+USE: modules.using
+USING*: environment localhost::get-using io ;
+"TM_FILEPATH" os-env get-using write</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^u</string>
+	<key>name</key>
+	<string>Update Using</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>scope</key>
+	<string>source.factor</string>
+	<key>uuid</key>
+	<string>86DD4385-4029-4EFE-B546-1EC8EB5EB932</string>
+</dict>
+</plist>

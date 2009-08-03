@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>bundleUUID</key>
+	<string>8061D2F3-B603-411D-AFFE-61784A07906D</string>
+	<key>command</key>
+	<string>res=$(CocoaDialog inputbox --title "Scaffold Setup" \
+    --informative-text "Vocab Name:" \
+    --button1 "Okay" --button2 "Cancel")
+
+[[ $(head -n1 &lt;&lt;&lt;"$res") == "2" ]] &amp;&amp; exit_discard
+res=$(tail -n1 &lt;&lt;&lt;"$res")
+"$TM_BUNDLE_SUPPORT/lib/do_scaffolding.rb" res</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>@N</string>
+	<key>name</key>
+	<string>Create New Vocabulary</string>
+	<key>output</key>
+	<string>discard</string>
+	<key>scope</key>
+	<string>source.factor</string>
+	<key>uuid</key>
+	<string>0CDA009F-8518-4C45-AB0E-D11B281131BF</string>
+</dict>
+</plist>

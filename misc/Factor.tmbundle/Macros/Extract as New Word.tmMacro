@@ -231,8 +231,12 @@ puts factor_eval(%Q(#{doc_using_statements(doc)} USE: stack-checker\n [ #{ENV["T
 			<string>insertText:</string>
 		</dict>
 	</array>
+	<key>keyEquivalent</key>
+	<string>@E</string>
 	<key>name</key>
 	<string>Extract as New Word</string>
+	<key>scope</key>
+	<string>source.factor</string>
 	<key>uuid</key>
 	<string>82E740D1-8D20-48AF-8470-C85C251D4870</string>
 </dict>
