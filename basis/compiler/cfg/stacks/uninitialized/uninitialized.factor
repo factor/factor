@@ -52,7 +52,7 @@ M: insn visit-insn drop ;
 : finish ( -- pair ) ds-loc get rs-loc get 2array ;
 
 : (join-sets) ( seq1 seq2 -- seq )
-    2dup [ length ] bi@ max '[ _ 1 pad-tail ] bi@ [ min ] 2map ;
+    2dup [ length ] bi@ max '[ _ 1 pad-tail ] bi@ [ bitand ] 2map ;
 
 : (uninitialized-locs) ( seq quot -- seq' )
     [ dup length [ drop 0 = ] pusher [ 2each ] dip ] dip map ; inline
