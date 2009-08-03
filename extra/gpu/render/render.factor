@@ -73,7 +73,7 @@ TUPLE: multi-index-range
 C: <multi-index-range> multi-index-range
 
 TUPLE: index-elements
-    { ptr gpu-data-ptr read-only }
+    { ptr read-only }
     { count integer read-only }
     { index-type index-type read-only } ;
 
