@@ -155,6 +155,11 @@ PRIVATE>
 
 : natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 
+: sort-with ( seq quot -- sortedseq )
+    [ compare ] curry sort ; inline
+: inv-sort-with ( seq quot -- sortedseq )
+    [ compare invert-comparison ] curry sort ; inline
+
 : sort-keys ( seq -- sortedseq ) [ [ first ] compare ] sort ;
 
 : sort-values ( seq -- sortedseq ) [ [ second ] compare ] sort ;
