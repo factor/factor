@@ -92,6 +92,3 @@ SYMBOLS: defs insns uses ;
         ] each
     ] each-basic-block
     use [ keys ] assoc-map uses set ;
-
-: compute-def-use ( cfg -- )
-    [ compute-defs ] [ compute-uses ] [ compute-insns ] tri ;
