@@ -43,6 +43,13 @@ SYMBOL: visited
     to predecessors>> [ dup from eq? [ drop bb ] when ] change-each
     from successors>> [ dup to eq? [ drop bb ] when ] change-each ;
 
+: add-instructions ( bb quot -- )
+    [ instructions>> building ] dip '[
+        building get pop
+        @
+        ,
+    ] with-variable ; inline
+
 : <simple-block> ( insns -- bb )
     <basic-block>
     swap >vector
@@ -57,6 +64,10 @@ SYMBOL: visited
 
 : if-has-phis ( bb quot: ( bb -- ) -- )
     [ dup has-phis? ] dip [ drop ] if ; inline
+
+: each-phi ( bb quot: ( ##phi -- ) -- )
+    [ instructions>> ] dip
+    '[ dup ##phi? [ @ t ] [ drop f ] if ] all? drop ; inline
 
 : predecessor ( bb -- pred )
     predecessors>> first ; inline

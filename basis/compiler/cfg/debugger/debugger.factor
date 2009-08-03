@@ -1,14 +1,14 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words sequences quotations namespaces io vectors
-classes.tuple accessors prettyprint prettyprint.config
+classes.tuple accessors prettyprint prettyprint.config assocs
 prettyprint.backend prettyprint.custom prettyprint.sections
 parser compiler.tree.builder compiler.tree.optimizer
 compiler.cfg.builder compiler.cfg.linearization
 compiler.cfg.registers compiler.cfg.stack-frame
 compiler.cfg.linear-scan compiler.cfg.two-operand
-compiler.cfg.optimizer
-compiler.cfg.mr compiler.cfg ;
+compiler.cfg.optimizer compiler.cfg.instructions
+compiler.cfg.utilities compiler.cfg.mr compiler.cfg ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-cfg ( quot -- cfgs )
@@ -52,11 +52,23 @@ M: ds-loc pprint* \ D pprint-loc ;
 
 M: rs-loc pprint* \ R pprint-loc ;
 
+: resolve-phis ( bb -- )
+    [
+        [ [ [ get ] dip ] assoc-map ] change-inputs drop
+    ] each-phi ;
+
 : test-bb ( insns n -- )
-    [ <basic-block> swap >>number swap >>instructions ] keep set ;
+    [ <basic-block> swap >>number swap >>instructions dup ] keep set
+    resolve-phis ;
+
+: edge ( from to -- )
+    [ get ] bi@ 1vector >>successors drop ;
+
+: edges ( from tos -- )
+    [ get ] [ [ get ] V{ } map-as ] bi* >>successors drop ;
 
 : test-diamond ( -- )
-    1 get 1vector 0 get (>>successors)
-    2 get 3 get V{ } 2sequence 1 get (>>successors)
-    4 get 1vector 2 get (>>successors)
-    4 get 1vector 3 get (>>successors) ;
+    0 1 edge
+    1 { 2 3 } edges
+    2 4 edge
+    3 4 edge ;

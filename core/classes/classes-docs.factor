@@ -35,6 +35,7 @@ $nl
 "You can ask a class for its superclass:"
 { $subsection superclass }
 { $subsection superclasses }
+{ $subsection subclass-of? }
 "Class predicates can be used to test instances directly:"
 { $subsection "class-predicates" }
 "There is a universal class which all objects are an instance of, and an empty class with no instances:"
@@ -102,7 +103,21 @@ HELP: superclasses
     }
 } ;
 
-{ superclass superclasses } related-words
+HELP: subclass-of?
+{ $values
+    { "class" class }
+    { "superclass" class }
+    { "?" boolean }
+}
+{ $description "Outputs a boolean value indicating whether " { $snippet "class" } " is at any level a subclass of " { $snippet "superclass" } "." }
+{ $examples 
+    { $example "USING: classes classes.tuple prettyprint words ;"
+               "tuple-class \\ class subclass-of? ."
+               "t"
+    }
+} ;
+
+{ superclass superclasses subclass-of? } related-words
 
 HELP: members
 { $values { "class" class } { "seq" "a sequence of union members, or " { $link f } } }

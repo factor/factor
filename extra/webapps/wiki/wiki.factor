@@ -66,7 +66,7 @@ M: revision feed-entry-date date>> ;
 M: revision feed-entry-url id>> revision-url ;
 
 : reverse-chronological-order ( seq -- sorted )
-    [ [ date>> ] compare invert-comparison ] sort ;
+    [ date>> ] inv-sort-with ;
 
 : <revision> ( id -- revision )
     revision new swap >>id ;
@@ -307,7 +307,7 @@ M: revision feed-entry-url id>> revision-url ;
 
         [
             f <article> select-tuples
-            [ [ title>> ] compare ] sort
+            [ title>> ] sort-with
             "articles" set-value
         ] >>init
 

@@ -1,89 +1,14 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.binary kernel combinators kernel.private math
+USING: arrays io.binary kernel combinators kernel.private math locals
 namespaces make sequences words system layouts math.order accessors
-cpu.x86.assembler.syntax ;
+cpu.x86.assembler.operands cpu.x86.assembler.operands.private ;
 QUALIFIED: sequences
 IN: cpu.x86.assembler
 
 ! A postfix assembler for x86-32 and x86-64.
 
-! In 32-bit mode, { 1234 } is absolute indirect addressing.
-! In 64-bit mode, { 1234 } is RIP-relative.
-! Beware!
-
-! Register operands -- eg, ECX
-REGISTERS: 8 AL CL DL BL SPL BPL SIL DIL R8B R9B R10B R11B R12B R13B R14B R15B ;
-
-ALIAS: AH SPL
-ALIAS: CH BPL
-ALIAS: DH SIL
-ALIAS: BH DIL
-
-REGISTERS: 16 AX CX DX BX SP BP SI DI R8W R9W R10W R11W R12W R13W R14W R15W ;
-
-REGISTERS: 32 EAX ECX EDX EBX ESP EBP ESI EDI R8D R9D R10D R11D R12D R13D R14D R15D ;
-
-REGISTERS: 64
-RAX RCX RDX RBX RSP RBP RSI RDI R8 R9 R10 R11 R12 R13 R14 R15 ;
-
-REGISTERS: 128
-XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
-XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15 ;
-
-TUPLE: byte value ;
-
-C: <byte> byte
-
 <PRIVATE
-
-#! Extended AMD64 registers (R8-R15) return true.
-GENERIC: extended? ( op -- ? )
-
-M: object extended? drop f ;
-
-PREDICATE: register < word
-    "register" word-prop ;
-
-PREDICATE: register-8 < register
-    "register-size" word-prop 8 = ;
-
-PREDICATE: register-16 < register
-    "register-size" word-prop 16 = ;
-
-PREDICATE: register-32 < register
-    "register-size" word-prop 32 = ;
-
-PREDICATE: register-64 < register
-    "register-size" word-prop 64 = ;
-
-PREDICATE: register-128 < register
-    "register-size" word-prop 128 = ;
-
-M: register extended? "register" word-prop 7 > ;
-
-! Addressing modes
-TUPLE: indirect base index scale displacement ;
-
-M: indirect extended? base>> extended? ;
-
-: canonicalize-EBP ( indirect -- indirect )
-    #! { EBP } ==> { EBP 0 }
-    dup [ base>> { EBP RBP R13 } member? ] [ displacement>> not ] bi and
-    [ 0 >>displacement ] when ;
-
-ERROR: bad-index indirect ;
-
-: check-ESP ( indirect -- indirect )
-    dup index>> { ESP RSP } memq? [ bad-index ] when ;
-
-: canonicalize ( indirect -- indirect )
-    #! Modify the indirect to work around certain addressing mode
-    #! quirks.
-    canonicalize-EBP check-ESP ;
-
-: <indirect> ( base index scale displacement -- indirect )
-    indirect boa canonicalize ;
 
 : reg-code ( reg -- n ) "register" word-prop 7 bitand ;
 
@@ -159,26 +84,12 @@ M: indirect displacement,
     dup displacement>> dup [
         swap base>>
         [ dup fits-in-byte? [ , ] [ 4, ] if ] [ 4, ] if
-    ] [
-        2drop
-    ] if ;
+    ] [ 2drop ] if ;
 
 M: register displacement, drop ;
 
 : addressing ( reg# indirect -- )
     [ mod-r/m, ] [ sib, ] [ displacement, ] tri ;
-
-! Utilities
-UNION: operand register indirect ;
-
-GENERIC: operand-64? ( operand -- ? )
-
-M: indirect operand-64?
-    [ base>> ] [ index>> ] bi [ operand-64? ] either? ;
-
-M: register-64 operand-64? drop t ;
-
-M: object operand-64? drop f ;
 
 : rex.w? ( rex.w reg r/m -- ? )
     {
@@ -192,22 +103,25 @@ M: object operand-64? drop f ;
 
 : rex.b ( m op -- n )
     [ extended? [ BIN: 00000001 bitor ] when ] keep
-    dup indirect? [
-        index>> extended? [ BIN: 00000010 bitor ] when
-    ] [
-        drop
-    ] if ;
+    dup indirect? [ index>> extended? [ BIN: 00000010 bitor ] when ] [ drop ] if ;
 
-: rex-prefix ( reg r/m rex.w -- )
+: no-prefix? ( prefix reg r/m -- ? )
+    [ BIN: 01000000 = ]
+    [ extended-8-bit-register? not ]
+    [ extended-8-bit-register? not ] tri*
+    and and ;
+
+:: rex-prefix ( reg r/m rex.w -- )
     #! Compile an AMD64 REX prefix.
-    2over rex.w? BIN: 01001000 BIN: 01000000 ?
-    swap rex.r swap rex.b
-    dup BIN: 01000000 = [ drop ] [ , ] if ;
+    rex.w reg r/m rex.w? BIN: 01001000 BIN: 01000000 ?
+    r/m rex.r
+    reg rex.b
+    dup reg r/m no-prefix? [ drop ] [ , ] if ;
 
 : 16-prefix ( reg r/m -- )
     [ register-16? ] either? [ HEX: 66 , ] when ;
 
-: prefix ( reg r/m rex.w -- ) 2over 16-prefix rex-prefix ;
+: prefix ( reg r/m rex.w -- ) [ drop 16-prefix ] [ rex-prefix ] 3bi ;
 
 : prefix-1 ( reg rex.w -- ) f swap prefix ;
 
@@ -269,21 +183,9 @@ M: object operand-64? drop f ;
 : 2-operand ( dst src op -- )
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
-    2over 16-prefix
-    direction-bit
-    operand-size-bit
-    (2-operand) ;
+    [ drop 16-prefix ] [ direction-bit operand-size-bit (2-operand) ] 3bi ;
 
 PRIVATE>
-
-: [] ( reg/displacement -- indirect )
-    dup integer? [ [ f f f ] dip ] [ f f f ] if <indirect> ;
-
-: [+] ( reg displacement -- indirect )
-    dup integer?
-    [ dup zero? [ drop f ] when [ f f ] dip ]
-    [ f f ] if
-    <indirect> ;
 
 ! Moving stuff
 GENERIC: PUSH ( op -- )
@@ -681,24 +583,57 @@ ALIAS: PINSRQ PINSRD
 : MAXPD      ( dest src -- ) HEX: 5f HEX: 66 2-operand-rm-sse ;
 : MAXSD      ( dest src -- ) HEX: 5f HEX: f2 2-operand-rm-sse ;
 : MAXSS      ( dest src -- ) HEX: 5f HEX: f3 2-operand-rm-sse ;
+: PUNPCKLBW  ( dest src -- ) HEX: 60 HEX: 66 2-operand-rm-sse ;
+: PUNPCKLWD  ( dest src -- ) HEX: 61 HEX: 66 2-operand-rm-sse ;
+: PUNPCKLDQ  ( dest src -- ) HEX: 62 HEX: 66 2-operand-rm-sse ;
+: PACKSSWB   ( dest src -- ) HEX: 63 HEX: 66 2-operand-rm-sse ;
+: PCMPGTB    ( dest src -- ) HEX: 64 HEX: 66 2-operand-rm-sse ;
+: PCMPGTW    ( dest src -- ) HEX: 65 HEX: 66 2-operand-rm-sse ;
+: PCMPGTD    ( dest src -- ) HEX: 66 HEX: 66 2-operand-rm-sse ;
+: PACKUSWB   ( dest src -- ) HEX: 67 HEX: 66 2-operand-rm-sse ;
+: PUNPCKHBW  ( dest src -- ) HEX: 68 HEX: 66 2-operand-rm-sse ;
+: PUNPCKHWD  ( dest src -- ) HEX: 69 HEX: 66 2-operand-rm-sse ;
+: PUNPCKHDQ  ( dest src -- ) HEX: 6a HEX: 66 2-operand-rm-sse ;
+: PACKSSDW   ( dest src -- ) HEX: 6b HEX: 66 2-operand-rm-sse ;
 : PUNPCKLQDQ ( dest src -- ) HEX: 6c HEX: 66 2-operand-rm-sse ;
 : PUNPCKHQDQ ( dest src -- ) HEX: 6d HEX: 66 2-operand-rm-sse ;
 
+: MOVD       ( dest src -- ) { HEX: 6e HEX: 7e } HEX: 66 2-operand-rm-mr-sse ;
 : MOVDQA     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: 66 2-operand-rm-mr-sse ;
 : MOVDQU     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: f3 2-operand-rm-mr-sse ;
 
 : PSHUFD     ( dest src imm -- ) HEX: 70 HEX: 66 3-operand-rm-sse ;
 : PSHUFLW    ( dest src imm -- ) HEX: 70 HEX: f2 3-operand-rm-sse ;
 : PSHUFHW    ( dest src imm -- ) HEX: 70 HEX: f3 3-operand-rm-sse ;
-: PSRLW      ( dest imm -- ) BIN: 010 HEX: 71 HEX: 66 2-operand-sse-shift ;
-: PSRAW      ( dest imm -- ) BIN: 100 HEX: 71 HEX: 66 2-operand-sse-shift ;
-: PSLLW      ( dest imm -- ) BIN: 110 HEX: 71 HEX: 66 2-operand-sse-shift ;
-: PSRLD      ( dest imm -- ) BIN: 010 HEX: 72 HEX: 66 2-operand-sse-shift ;
-: PSRAD      ( dest imm -- ) BIN: 100 HEX: 72 HEX: 66 2-operand-sse-shift ;
-: PSLLD      ( dest imm -- ) BIN: 110 HEX: 72 HEX: 66 2-operand-sse-shift ;
-: PSRLQ      ( dest imm -- ) BIN: 010 HEX: 73 HEX: 66 2-operand-sse-shift ;
+
+: (PSRLW-imm) ( dest imm -- ) BIN: 010 HEX: 71 HEX: 66 2-operand-sse-shift ;
+: (PSRAW-imm) ( dest imm -- ) BIN: 100 HEX: 71 HEX: 66 2-operand-sse-shift ;
+: (PSLLW-imm) ( dest imm -- ) BIN: 110 HEX: 71 HEX: 66 2-operand-sse-shift ;
+: (PSRLD-imm) ( dest imm -- ) BIN: 010 HEX: 72 HEX: 66 2-operand-sse-shift ;
+: (PSRAD-imm) ( dest imm -- ) BIN: 100 HEX: 72 HEX: 66 2-operand-sse-shift ;
+: (PSLLD-imm) ( dest imm -- ) BIN: 110 HEX: 72 HEX: 66 2-operand-sse-shift ;
+: (PSRLQ-imm) ( dest imm -- ) BIN: 010 HEX: 73 HEX: 66 2-operand-sse-shift ;
+: (PSLLQ-imm) ( dest imm -- ) BIN: 110 HEX: 73 HEX: 66 2-operand-sse-shift ;
+
+: (PSRLW-reg) ( dest src -- ) HEX: d1 HEX: 66 2-operand-rm-sse ;
+: (PSRLD-reg) ( dest src -- ) HEX: d2 HEX: 66 2-operand-rm-sse ;
+: (PSRLQ-reg) ( dest src -- ) HEX: d3 HEX: 66 2-operand-rm-sse ;
+: (PSRAW-reg) ( dest src -- ) HEX: e1 HEX: 66 2-operand-rm-sse ;
+: (PSRAD-reg) ( dest src -- ) HEX: e2 HEX: 66 2-operand-rm-sse ;
+: (PSLLW-reg) ( dest src -- ) HEX: f1 HEX: 66 2-operand-rm-sse ;
+: (PSLLD-reg) ( dest src -- ) HEX: f2 HEX: 66 2-operand-rm-sse ;
+: (PSLLQ-reg) ( dest src -- ) HEX: f3 HEX: 66 2-operand-rm-sse ;
+
+: PSRLW ( dest src -- ) dup integer? [ (PSRLW-imm) ] [ (PSRLW-reg) ] if ;
+: PSRAW ( dest src -- ) dup integer? [ (PSRAW-imm) ] [ (PSRAW-reg) ] if ;
+: PSLLW ( dest src -- ) dup integer? [ (PSLLW-imm) ] [ (PSLLW-reg) ] if ;
+: PSRLD ( dest src -- ) dup integer? [ (PSRLD-imm) ] [ (PSRLD-reg) ] if ;
+: PSRAD ( dest src -- ) dup integer? [ (PSRAD-imm) ] [ (PSRAD-reg) ] if ;
+: PSLLD ( dest src -- ) dup integer? [ (PSLLD-imm) ] [ (PSLLD-reg) ] if ;
+: PSRLQ ( dest src -- ) dup integer? [ (PSRLQ-imm) ] [ (PSRLQ-reg) ] if ;
+: PSLLQ ( dest src -- ) dup integer? [ (PSLLQ-imm) ] [ (PSLLQ-reg) ] if ;
+
 : PSRLDQ     ( dest imm -- ) BIN: 011 HEX: 73 HEX: 66 2-operand-sse-shift ;
-: PSLLQ      ( dest imm -- ) BIN: 110 HEX: 73 HEX: 66 2-operand-sse-shift ;
 : PSLLDQ     ( dest imm -- ) BIN: 111 HEX: 73 HEX: 66 2-operand-sse-shift ;
 
 : PCMPEQB    ( dest src -- ) HEX: 74 HEX: 66 2-operand-rm-sse ;
@@ -709,11 +644,14 @@ ALIAS: PINSRQ PINSRD
 : HSUBPD     ( dest src -- ) HEX: 7d HEX: 66 2-operand-rm-sse ;
 : HSUBPS     ( dest src -- ) HEX: 7d HEX: f2 2-operand-rm-sse ;
 
+: FXSAVE     ( dest -- ) { BIN: 000 f { HEX: 0f HEX: ae } } 1-operand ;
+: FXRSTOR    ( src -- )  { BIN: 001 f { HEX: 0f HEX: ae } } 1-operand ;
 : LDMXCSR    ( src -- )  { BIN: 010 f { HEX: 0f HEX: ae } } 1-operand ;
 : STMXCSR    ( dest -- ) { BIN: 011 f { HEX: 0f HEX: ae } } 1-operand ;
 : LFENCE     ( -- ) HEX: 0f , HEX: ae , OCT: 350 , ;
 : MFENCE     ( -- ) HEX: 0f , HEX: ae , OCT: 360 , ;
 : SFENCE     ( -- ) HEX: 0f , HEX: ae , OCT: 370 , ;
+: CLFLUSH    ( dest -- ) { BIN: 111 f { HEX: 0f HEX: ae } } 1-operand ;
 
 : POPCNT     ( dest src -- ) HEX: b8 HEX: f3 2-operand-rm-sse ;
 
@@ -762,26 +700,46 @@ ALIAS: PINSRQ PINSRD
 : ADDSUBPD   ( dest src -- ) HEX: d0 HEX: 66 2-operand-rm-sse ;
 : ADDSUBPS   ( dest src -- ) HEX: d0 HEX: f2 2-operand-rm-sse ;
 : PADDQ      ( dest src -- ) HEX: d4 HEX: 66 2-operand-rm-sse ;
+: PMULLW     ( dest src -- ) HEX: d5 HEX: 66 2-operand-rm-sse ;
+: PMOVMSKB   ( dest src -- ) HEX: d7 HEX: 66 2-operand-rm-sse ;
+: PSUBUSB    ( dest src -- ) HEX: d8 HEX: 66 2-operand-rm-sse ;
+: PSUBUSW    ( dest src -- ) HEX: d9 HEX: 66 2-operand-rm-sse ;
 : PMINUB     ( dest src -- ) HEX: da HEX: 66 2-operand-rm-sse ;
+: PAND       ( dest src -- ) HEX: db HEX: 66 2-operand-rm-sse ;
+: PADDUSB    ( dest src -- ) HEX: dc HEX: 66 2-operand-rm-sse ;
+: PADDUSW    ( dest src -- ) HEX: dd HEX: 66 2-operand-rm-sse ;
 : PMAXUB     ( dest src -- ) HEX: de HEX: 66 2-operand-rm-sse ;
+: PANDN      ( dest src -- ) HEX: df HEX: 66 2-operand-rm-sse ;
 : PAVGB      ( dest src -- ) HEX: e0 HEX: 66 2-operand-rm-sse ;
 : PAVGW      ( dest src -- ) HEX: e3 HEX: 66 2-operand-rm-sse ;
 : PMULHUW    ( dest src -- ) HEX: e4 HEX: 66 2-operand-rm-sse ;
+: PMULHW     ( dest src -- ) HEX: e5 HEX: 66 2-operand-rm-sse ;
 : CVTTPD2DQ  ( dest src -- ) HEX: e6 HEX: 66 2-operand-rm-sse ;
 : CVTPD2DQ   ( dest src -- ) HEX: e6 HEX: f2 2-operand-rm-sse ;
 : CVTDQ2PD   ( dest src -- ) HEX: e6 HEX: f3 2-operand-rm-sse ;
 
 : MOVNTDQ    ( dest src -- ) HEX: e7 HEX: 66 2-operand-mr-sse ;
 
+: PSUBSB     ( dest src -- ) HEX: e8 HEX: 66 2-operand-rm-sse ;
+: PSUBSW     ( dest src -- ) HEX: e9 HEX: 66 2-operand-rm-sse ;
 : PMINSW     ( dest src -- ) HEX: ea HEX: 66 2-operand-rm-sse ;
+: POR        ( dest src -- ) HEX: eb HEX: 66 2-operand-rm-sse ;
+: PADDSB     ( dest src -- ) HEX: ec HEX: 66 2-operand-rm-sse ;
+: PADDSW     ( dest src -- ) HEX: ed HEX: 66 2-operand-rm-sse ;
 : PMAXSW     ( dest src -- ) HEX: ee HEX: 66 2-operand-rm-sse ;
+: PXOR       ( dest src -- ) HEX: ef HEX: 66 2-operand-rm-sse ;
 : LDDQU      ( dest src -- ) HEX: f0 HEX: f2 2-operand-rm-sse ;
 : PMULUDQ    ( dest src -- ) HEX: f4 HEX: 66 2-operand-rm-sse ;
+: PMADDWD    ( dest src -- ) HEX: f5 HEX: 66 2-operand-rm-sse ;
 : PSADBW     ( dest src -- ) HEX: f6 HEX: 66 2-operand-rm-sse ;
-
 : MASKMOVDQU ( dest src -- ) HEX: f7 HEX: 66 2-operand-rm-sse ;
-
+: PSUBB      ( dest src -- ) HEX: f8 HEX: 66 2-operand-rm-sse ;
+: PSUBW      ( dest src -- ) HEX: f9 HEX: 66 2-operand-rm-sse ;
+: PSUBD      ( dest src -- ) HEX: fa HEX: 66 2-operand-rm-sse ;
 : PSUBQ      ( dest src -- ) HEX: fb HEX: 66 2-operand-rm-sse ;
+: PADDB      ( dest src -- ) HEX: fc HEX: 66 2-operand-rm-sse ;
+: PADDW      ( dest src -- ) HEX: fd HEX: 66 2-operand-rm-sse ;
+: PADDD      ( dest src -- ) HEX: fe HEX: 66 2-operand-rm-sse ;
 
 ! x86-64 branch prediction hints
 

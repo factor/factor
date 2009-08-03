@@ -8,7 +8,7 @@ gpu.textures gpu.textures.private half-floats images kernel
 lexer locals math math.order math.parser namespaces opengl
 opengl.gl parser quotations sequences slots sorting
 specialized-arrays.alien specialized-arrays.float specialized-arrays.int
-specialized-arrays.uint strings tr ui.gadgets.worlds variants
+specialized-arrays.uint strings ui.gadgets.worlds variants
 vocabs.parser words ;
 IN: gpu.render
 
@@ -73,7 +73,7 @@ TUPLE: multi-index-range
 C: <multi-index-range> multi-index-range
 
 TUPLE: index-elements
-    { ptr gpu-data-ptr read-only }
+    { ptr read-only }
     { count integer read-only }
     { index-type index-type read-only } ;
 
@@ -338,8 +338,6 @@ DEFER: [bind-uniform-tuple]
     texture-unit' 
     value>>-quot { value-cleave 2cleave } append ;
 
-TR: hyphens>underscores "-" "_" ;
-
 :: [bind-uniform] ( texture-unit uniform prefix -- texture-unit' quot )
     prefix uniform name>> append hyphens>underscores :> name
     uniform uniform-type>> :> type
@@ -424,7 +422,7 @@ SYNTAX: UNIFORM-TUPLE:
     [ [ length ] [ >int-array ] bi glDrawBuffers ] if ;
 
 : bind-named-output-attachments ( program-instance framebuffer attachments -- )
-    rot '[ [ first _ swap output-index ] bi@ <=> ] sort [ second ] map
+    rot '[ first _ swap output-index ] sort-with [ second ] map
     bind-unnamed-output-attachments ;
 
 : bind-output-attachments ( program-instance framebuffer attachments -- )

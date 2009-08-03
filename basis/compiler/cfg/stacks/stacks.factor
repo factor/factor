@@ -13,6 +13,7 @@ IN: compiler.cfg.stacks
     H{ } clone rs-heights set
     H{ } clone peek-sets set
     H{ } clone replace-sets set
+    H{ } clone kill-sets set
     current-height new current-height set ;
 
 : end-stack-analysis ( -- )

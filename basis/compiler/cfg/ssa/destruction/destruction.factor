@@ -1,63 +1,107 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry kernel locals math math.order
-sequences namespaces sets
+USING: accessors arrays assocs fry kernel namespaces
+sequences sequences.deep
+sets vectors
 compiler.cfg.rpo
 compiler.cfg.def-use
-compiler.cfg.utilities
+compiler.cfg.renaming
 compiler.cfg.dominance
 compiler.cfg.instructions
 compiler.cfg.liveness.ssa
-compiler.cfg.critical-edges
-compiler.cfg.ssa.destruction.state
-compiler.cfg.ssa.destruction.forest
-compiler.cfg.ssa.destruction.copies
-compiler.cfg.ssa.destruction.renaming
-compiler.cfg.ssa.destruction.live-ranges
-compiler.cfg.ssa.destruction.process-blocks ;
+compiler.cfg.ssa.cssa
+compiler.cfg.ssa.interference
+compiler.cfg.ssa.interference.live-ranges
+compiler.cfg.utilities
+compiler.utilities ;
 IN: compiler.cfg.ssa.destruction
 
-! Based on "Fast Copy Coalescing and Live-Range Identification"
-! http://www.cs.ucsd.edu/classes/sp02/cse231/kenpldi.pdf
+! Maps vregs to leaders.
+SYMBOL: leader-map
 
-! Dominance, liveness and def-use need to be computed
+: leader ( vreg -- vreg' ) leader-map get compress-path ;
 
-: process-blocks ( cfg -- )
-    [ [ process-block ] if-has-phis ] each-basic-block ;
+! Maps leaders to equivalence class elements.
+SYMBOL: class-element-map
 
-SYMBOL: seen
+: class-elements ( vreg -- elts ) class-element-map get at ;
 
-:: visit-renaming ( dst assoc src bb -- )
-    src seen get key? [
-        src dst bb waiting-for push-at
-        src assoc delete-at
-    ] [ src seen get conjoin ] if ;
+! Sequence of vreg pairs
+SYMBOL: copies
 
-:: break-interferences ( -- )
-    V{ } clone seen set
-    renaming-sets get [| dst assoc |
-        assoc [| src bb |
-            dst assoc src bb visit-renaming
-        ] assoc-each
+: init-coalescing ( -- )
+    H{ } clone leader-map set
+    H{ } clone class-element-map set
+    V{ } clone copies set ;
+
+: classes-interfere? ( vreg1 vreg2 -- ? )
+    [ leader ] bi@ 2dup eq? [ 2drop f ] [
+        [ class-elements flatten ] bi@ sets-interfere?
+    ] if ;
+
+: update-leaders ( vreg1 vreg2 -- )
+    swap leader-map get set-at ;
+
+: merge-classes ( vreg1 vreg2 -- )
+    [ [ class-elements ] bi@ push ]
+    [ drop class-element-map get delete-at ] 2bi ;
+
+: eliminate-copy ( vreg1 vreg2 -- )
+    [ leader ] bi@
+    2dup eq? [ 2drop ] [
+        [ update-leaders ] [ merge-classes ] 2bi
+    ] if ;
+
+: introduce-vreg ( vreg -- )
+    [ leader-map get conjoin ]
+    [ [ 1vector ] keep class-element-map get set-at ] bi ;
+
+GENERIC: prepare-insn ( insn -- )
+
+M: ##copy prepare-insn
+    [ dst>> ] [ src>> ] bi 2array copies get push ;
+
+M: ##phi prepare-insn
+    [ dst>> ] [ inputs>> values ] bi
+    [ eliminate-copy ] with each ;
+
+M: insn prepare-insn drop ;
+
+: prepare-block ( bb -- )
+    instructions>> [ prepare-insn ] each ;
+
+: prepare-coalescing ( cfg -- )
+    init-coalescing
+    defs get keys [ introduce-vreg ] each
+    [ prepare-block ] each-basic-block ;
+
+: process-copies ( -- )
+    copies get [
+        2dup classes-interfere?
+        [ 2drop ] [ eliminate-copy ] if
     ] assoc-each ;
 
-: remove-phis-from-block ( bb -- )
-    instructions>> [ ##phi? not ] filter-here ;
+: useless-copy? ( ##copy -- ? )
+    dup ##copy? [ [ dst>> ] [ src>> ] bi eq? ] [ drop f ] if ;
 
-: remove-phis ( cfg -- )
-    [ [ remove-phis-from-block ] if-has-phis ] each-basic-block ;
+: perform-renaming ( cfg -- )
+    leader-map get keys [ dup leader ] H{ } map>assoc renamings set
+    [
+        instructions>> [
+            [ rename-insn-defs ]
+            [ rename-insn-uses ]
+            [ [ useless-copy? ] [ ##phi? ] bi or not ] tri
+        ] filter-here
+    ] each-basic-block ;
 
 : destruct-ssa ( cfg -- cfg' )
     dup cfg-has-phis? [
-        init-coalescing
-        compute-ssa-live-sets
-        dup split-critical-edges
-        dup compute-def-use
+        dup construct-cssa
+        dup compute-defs
         dup compute-dominance
+        compute-ssa-live-sets
         dup compute-live-ranges
-        dup process-blocks
-        break-interferences
+        dup prepare-coalescing
+        process-copies
         dup perform-renaming
-        insert-copies
-        dup remove-phis
     ] when ;

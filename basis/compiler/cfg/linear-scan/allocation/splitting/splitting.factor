@@ -27,9 +27,6 @@ IN: compiler.cfg.linear-scan.allocation.splitting
 : split-uses ( uses n -- before after )
     '[ _ <= ] partition ;
 
-: record-split ( live-interval before after -- )
-    [ >>split-before ] [ >>split-after ] bi* drop ; inline
-
 ERROR: splitting-too-early ;
 
 ERROR: splitting-too-late ;
@@ -56,7 +53,6 @@ ERROR: splitting-atomic-interval ;
     live-interval clone :> after
     live-interval uses>> n split-uses before after [ (>>uses) ] bi-curry@ bi*
     live-interval ranges>> n split-ranges before after [ (>>ranges) ] bi-curry@ bi*
-    live-interval before after record-split
     before split-before
     after split-after ;
 

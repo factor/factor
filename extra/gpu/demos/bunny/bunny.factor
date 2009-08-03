@@ -221,7 +221,7 @@ BEFORE: bunny-world begin-world
     bunny-uniforms boa ;
 
 : draw-bunny ( world -- )
-    T{ depth-state { comparison cmp-less } } set-gpu-state*
+    T{ depth-state { comparison cmp-less } } set-gpu-state
     
     [
         sobel>> framebuffer>> {
@@ -247,7 +247,7 @@ BEFORE: bunny-world begin-world
     sobel-uniforms boa ;
 
 : draw-sobel ( world -- )
-    T{ depth-state { comparison f } } set-gpu-state*
+    T{ depth-state { comparison f } } set-gpu-state
 
     sobel>> {
         { "primitive-mode" [ drop triangle-strip-mode ] }
@@ -260,7 +260,7 @@ BEFORE: bunny-world begin-world
     [ draw-bunny ] [ draw-sobel ] bi ;
 
 : draw-loading ( world -- )
-    T{ depth-state { comparison f } } set-gpu-state*
+    T{ depth-state { comparison f } } set-gpu-state
 
     loading>> {
         { "primitive-mode" [ drop triangle-strip-mode ] }

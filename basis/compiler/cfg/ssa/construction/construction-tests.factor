@@ -34,9 +34,9 @@ V{
     T{ ##return }
 } 3 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
-1 get 3 get 1vector >>successors drop
-2 get 3 get 1vector >>successors drop
+0 { 1 2 } edges
+1 3 edge
+2 3 edge
 
 : test-ssa ( -- )
     cfg new 0 get >>entry
@@ -93,12 +93,12 @@ V{ T{ ##replace f V int-regs 0 D 0 } } 4 test-bb
 V{ } 5 test-bb
 V{ } 6 test-bb
 
-0 get 1 get 5 get V{ } 2sequence >>successors drop
-1 get 2 get 3 get V{ } 2sequence >>successors drop
-2 get 4 get 1vector >>successors drop
-3 get 4 get 1vector >>successors drop
-4 get 6 get 1vector >>successors drop
-5 get 6 get 1vector >>successors drop
+0 { 1 5 } edges
+1 { 2 3 } edges
+2 4 edge
+3 4 edge
+4 6 edge
+5 6 edge
 
 [ ] [ test-ssa ] unit-test
 
