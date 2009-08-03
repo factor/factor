@@ -414,8 +414,11 @@ PRIVATE>
 : reduce ( seq identity quot -- result )
     swapd each ; inline
 
+: map-integers ( len quot exemplar -- newseq )
+    [ over ] dip [ [ collect ] keep ] new-like ; inline
+
 : map-as ( seq quot exemplar -- newseq )
-    [ over length ] dip [ [ map-into ] keep ] new-like ; inline
+    [ (each) ] dip map-integers ; inline
 
 : map ( seq quot -- newseq )
     over map-as ; inline
@@ -442,7 +445,7 @@ PRIVATE>
     [ -rot ] dip 2each ; inline
 
 : 2map-as ( seq1 seq2 quot exemplar -- newseq )
-    [ (2each) ] dip map-as ; inline
+    [ (2each) ] dip map-integers ; inline
 
 : 2map ( seq1 seq2 quot -- newseq )
     pick 2map-as ; inline
@@ -454,7 +457,7 @@ PRIVATE>
     (3each) each ; inline
 
 : 3map-as ( seq1 seq2 seq3 quot exemplar -- newseq )
-    [ (3each) ] dip map-as ; inline
+    [ (3each) ] dip map-integers ; inline
 
 : 3map ( seq1 seq2 seq3 quot -- newseq )
     [ pick ] dip swap 3map-as ; inline
