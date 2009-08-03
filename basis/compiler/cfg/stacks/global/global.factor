@@ -4,36 +4,56 @@ USING: assocs kernel combinators compiler.cfg.dataflow-analysis
 compiler.cfg.stacks.local ;
 IN: compiler.cfg.stacks.global
 
-! Peek analysis. Peek-in is the set of all locations anticipated at
-! the start of a basic block.
-BACKWARD-ANALYSIS: peek
+: transfer-peeked-locs ( assoc bb -- assoc' )
+    [ replace-set assoc-diff ] [ peek-set assoc-union ] bi ;
 
-M: peek-analysis transfer-set drop [ replace-set assoc-diff ] keep peek-set assoc-union ;
+! A stack location is anticipated at a location if every path from
+! the location to an exit block will read the stack location
+! before writing it.
+BACKWARD-ANALYSIS: anticip
 
-! Replace analysis. Replace-in is the set of all locations which
-! will be overwritten at some point after the start of a basic block.
-FORWARD-ANALYSIS: replace
+M: anticip-analysis transfer-set drop transfer-peeked-locs ;
 
-M: replace-analysis transfer-set drop replace-set assoc-union ;
+! A stack location is live at a location if some path from
+! the location to an exit block will read the stack location
+! before writing it.
+BACKWARD-ANALYSIS: live
 
-! Availability analysis. Avail-out is the set of all locations
-! in registers at the end of a basic block.
+M: live-analysis transfer-set drop transfer-peeked-locs ;
+
+M: live-analysis join-sets drop assoc-combine ;
+
+! A stack location is available at a location if all paths from
+! the entry block to the location load the location into a
+! register.
 FORWARD-ANALYSIS: avail
 
-M: avail-analysis transfer-set drop [ peek-set ] [ replace-set ] bi assoc-union assoc-union ;
+M: avail-analysis transfer-set
+    drop [ peek-set assoc-union ] [ replace-set assoc-union ] bi ;
 
-! Kill analysis. Kill-in is the set of all locations
-! which are going to be overwritten.
-BACKWARD-ANALYSIS: kill
+! A stack location is pending at a location if all paths from
+! the entry block to the location write the location.
+FORWARD-ANALYSIS: pending
 
-M: kill-analysis transfer-set drop kill-set assoc-union ;
+M: pending-analysis transfer-set
+    drop replace-set assoc-union ;
+
+! A stack location is dead at a location if no paths from the
+! location to the exit block read the location before writing it.
+BACKWARD-ANALYSIS: dead
+
+M: dead-analysis transfer-set
+    drop
+    [ kill-set assoc-union ]
+    [ replace-set assoc-union ] bi ;
 
 ! Main word
 : compute-global-sets ( cfg -- cfg' )
     {
-        [ compute-peek-sets ]
-        [ compute-replace-sets ]
+        [ compute-anticip-sets ]
+        [ compute-live-sets ]
+        [ compute-pending-sets ]
+        [ compute-dead-sets ]
         [ compute-avail-sets ]
-        [ compute-kill-sets ]
         [ ]
     } cleave ;
