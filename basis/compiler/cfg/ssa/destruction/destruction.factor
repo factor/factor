@@ -97,9 +97,9 @@ M: insn prepare-insn drop ;
 : destruct-ssa ( cfg -- cfg' )
     dup cfg-has-phis? [
         dup construct-cssa
-        compute-ssa-live-sets
         dup compute-defs
         dup compute-dominance
+        compute-ssa-live-sets
         dup compute-live-ranges
         dup prepare-coalescing
         process-copies
