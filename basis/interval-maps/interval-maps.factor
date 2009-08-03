@@ -46,7 +46,7 @@ PRIVATE>
     array>> [ value ] map ;
 
 : <interval-map> ( specification -- map )
-    all-intervals [ [ first second ] compare ] sort
+    all-intervals [ first second ] sort-with
     >intervals ensure-disjoint interval-map boa ;
 
 : <interval-set> ( specification -- map )
