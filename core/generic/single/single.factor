@@ -145,7 +145,7 @@ GENERIC: compile-engine ( engine -- obj )
     default get <array> [ <enum> swap update ] keep ;
 
 : lo-tag-number ( class -- n )
-    "type" word-prop dup num-tags get member?
+    "type" word-prop dup num-tags get iota member?
     [ drop object tag-number ] unless ;
 
 M: tag-dispatch-engine compile-engine

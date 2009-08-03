@@ -23,7 +23,7 @@ IN: fuel.xref
     dup dup >vocab-link where normalize-loc 4array ;
 
 : sort-xrefs ( seq -- seq' )
-    [ [ first ] dip first <=> ] sort ;
+    [ first ] sort-with ;
 
 : format-xrefs ( seq -- seq' )
     [ word? ] filter [ word>xref ] map ;
