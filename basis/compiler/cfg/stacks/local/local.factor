@@ -10,8 +10,13 @@ compiler.cfg.stacks.height
 compiler.cfg.parallel-copy ;
 IN: compiler.cfg.stacks.local
 
-! Local stack analysis. We build local peek and replace sets for every basic
-! block while constructing the CFG.
+! Local stack analysis. We build three sets for every basic block
+! in the CFG:
+! - peek-set: all stack locations that the block reads before writing
+! - replace-set: all stack locations that the block writes
+! - kill-set: all stack locations which become unavailable after the
+!   block ends because of the stack height being decremented
+! This is done while constructing the CFG.
 
 SYMBOLS: peek-sets replace-sets kill-sets ;
 
@@ -80,9 +85,8 @@ M: rs-loc translate-local-loc n>> current-height get r>> - <rs-loc> ;
 : compute-local-kill-set ( -- assoc )
     basic-block get current-height get
     [ [ ds-heights get at dup ] [ d>> ] bi* [-] iota [ swap - <ds-loc> ] with map ]
-    [ [ rs-heights get at dup ] [ r>> ] bi* [-] iota [ swap - <rs-loc> ] with map ]
-    [ drop local-replace-set get at ] 2tri
-    [ append unique dup ] dip update ;
+    [ [ rs-heights get at dup ] [ r>> ] bi* [-] iota [ swap - <rs-loc> ] with map ] 2bi
+    append unique ;
 
 : begin-local-analysis ( -- )
     H{ } clone local-peek-set set
