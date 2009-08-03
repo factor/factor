@@ -12,7 +12,6 @@ remote = tokenpart s tokenpart => [[ first2 remote-load ]]
 module = rpc | remote | tokenpart
 ;EBNF
 
-IN: syntax
 ON-BNF: USING*:
 tokenizer = <foreign factor>
 sym = !(";"|"}"|"=>"|"EXCEPT").

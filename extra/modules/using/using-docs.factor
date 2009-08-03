@@ -6,7 +6,6 @@ ARTICLE: { "modules.using" "use" } "Using the modules.using vocab"
 "Finally, the word can treat words in remote vocabularies as remote procedure calls. Any inputs are passed to the imported words as normal, and the result will appear on the stack- the only difference is that the word isn't called locally." ;
 ABOUT: { "modules.using" "use" }
 
-IN: syntax
 HELP: USING*:
 { $syntax "USING: rpc-server::module fetch-sever:module { module qualified-name } { module => word ... } { qualified-module } { module EXCEPT word ... } { module word => importname } ;" }
 { $description "Adds vocabularies to the search path. Vocabularies can be loaded off a server or called as an rpc if preceded by a valid hostname. Bracketed pairs facilitate all types of qualified imports on both remote and local modules." }
