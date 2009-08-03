@@ -17,21 +17,19 @@ V{
 V{
     T{ ##replace f V int-regs 2 D 0 }
 } 2 test-bb
-1 get 2 get 1vector >>successors drop
+1 2 edge
 V{
     T{ ##replace f V int-regs 0 D 0 }
 } 3 test-bb
-2 get 3 get 1vector >>successors drop
+2 3 edge
 V{ } 4 test-bb
 V{ } 5 test-bb
-3 get 4 get 5 get V{ } 2sequence >>successors drop
-V int-regs 2
-    2 get V int-regs 0 2array
-    3 get V int-regs 1 2array
-2array \ ##phi new-insn 1vector
-6 test-bb
-4 get 6 get 1vector >>successors drop
-5 get 6 get 1vector >>successors drop
+3 { 4 5 } edges
+V{
+    T{ ##phi f V int-regs 2 H{ { 2 V int-regs 0 } { 3 V int-regs 1 } } }
+} 6 test-bb
+4 6 edge
+5 6 edge
 
 cfg new 1 get >>entry 0 set
-[ ] [ 0 get compute-def-use ] unit-test
+[ ] [ 0 get [ compute-defs ] [ compute-uses ] bi ] unit-test
