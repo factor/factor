@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors http.server kernel namespaces sequences
-splitting urls ;
+USING: accessors http.server http.server.dispatchers kernel
+namespaces sequences splitting urls ;
 IN: http.server.rewrite
 
 TUPLE: rewrite param child default ;
