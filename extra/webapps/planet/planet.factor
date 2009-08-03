@@ -56,7 +56,7 @@ posting "POSTINGS"
 
 : blogroll ( -- seq )
     f <blog> select-tuples
-    [ [ name>> ] compare ] sort ;
+    [ name>> ] sort-with ;
 
 : postings ( -- seq )
     posting new select-tuples

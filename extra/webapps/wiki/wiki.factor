@@ -307,7 +307,7 @@ M: revision feed-entry-url id>> revision-url ;
 
         [
             f <article> select-tuples
-            [ [ title>> ] compare ] sort
+            [ title>> ] sort-with
             "articles" set-value
         ] >>init
 

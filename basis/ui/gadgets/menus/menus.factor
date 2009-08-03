@@ -65,7 +65,7 @@ M: ---- <menu-item>
 : <operations-menu> ( target hook -- menu )
     over object-operations
     [ primary-operation? ] partition
-    [ reverse ] [ [ [ command-name ] compare ] sort ] bi*
+    [ reverse ] [ [ command-name ] sort-with ] bi*
     { ---- } glue <commands-menu> ;
 
 : show-operations-menu ( gadget target hook -- )

@@ -52,7 +52,7 @@ IN: heaps.tests
 ] each
 
 : sort-entries ( entries -- entries' )
-    [ [ key>> ] compare ] sort ;
+    [ key>> ] sort-with ;
 
 : delete-test ( n -- obj1 obj2 )
     [
