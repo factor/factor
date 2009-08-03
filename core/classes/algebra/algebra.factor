@@ -207,7 +207,7 @@ M: anonymous-complement (classes-intersect?)
     [ "Topological sort failed" throw ] unless* ;
 
 : sort-classes ( seq -- newseq )
-    [ [ name>> ] compare ] sort >vector
+    [ name>> ] sort-with >vector
     [ dup empty? not ]
     [ dup largest-class [ over delete-nth ] dip ]
     produce nip ;
