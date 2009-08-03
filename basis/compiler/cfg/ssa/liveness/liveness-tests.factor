@@ -9,7 +9,9 @@ compiler.cfg.ssa.liveness
 compiler.cfg.debugger
 compiler.cfg.instructions
 compiler.cfg.predecessors
-compiler.cfg.registers ;
+compiler.cfg.registers
+compiler.cfg.dominance
+compiler.cfg.def-use ;
 IN: compiler.cfg.ssa.liveness
 
 [ t ] [ { 1 } 1 only? ] unit-test
@@ -17,85 +19,84 @@ IN: compiler.cfg.ssa.liveness
 [ f ] [ { 2 1 } 1 only? ] unit-test
 [ f ] [ { 2 } 1 only? ] unit-test
 
+: test-liveness ( -- )
+    cfg new 0 get >>entry
+    compute-predecessors
+    dup compute-defs
+    dup compute-uses
+    dup compute-dominance
+    precompute-liveness ;
+
 V{
     T{ ##peek f V int-regs 0 D 0 }
     T{ ##replace f V int-regs 0 D 0 }
     T{ ##replace f V int-regs 1 D 1 }
-} 1 test-bb
+} 0 test-bb
 
 V{
     T{ ##replace f V int-regs 2 D 0 }
-} 2 test-bb
+} 1 test-bb
 
 V{
     T{ ##replace f V int-regs 3 D 0 }
-} 3 test-bb
+} 2 test-bb
 
-1 { 2 3 } edges
+0 { 1 2 } edges
 
-cfg new 1 get >>entry 4 set
-
-[ ] [ 4 get compute-predecessors drop ] unit-test
-[ ] [ 4 get precompute-liveness ] unit-test
+[ ] [ test-liveness ] unit-test
 
 [ H{ } ] [ back-edge-targets get ] unit-test
-[ H{ } ] [ phi-outs get ] unit-test
-[ t ] [ 1 get R_q { 1 2 3 } [ get ] map unique = ] unit-test
+[ t ] [ 0 get R_q { 0 1 2 } [ get ] map unique = ] unit-test
+[ t ] [ 1 get R_q { 1 } [ get ] map unique = ] unit-test
 [ t ] [ 2 get R_q { 2 } [ get ] map unique = ] unit-test
-[ t ] [ 3 get R_q { 3 } [ get ] map unique = ] unit-test
 
 : self-T_q ( n -- ? )
     get [ T_q ] [ 1array unique ] bi = ;
 
+[ t ] [ 0 self-T_q ] unit-test
 [ t ] [ 1 self-T_q ] unit-test
 [ t ] [ 2 self-T_q ] unit-test
-[ t ] [ 3 self-T_q ] unit-test
+
+[ f ] [ V int-regs 0 0 get live-in? ] unit-test
+[ t ] [ V int-regs 1 0 get live-in? ] unit-test
+[ t ] [ V int-regs 2 0 get live-in? ] unit-test
+[ t ] [ V int-regs 3 0 get live-in? ] unit-test
+
+[ f ] [ V int-regs 0 0 get live-out? ] unit-test
+[ f ] [ V int-regs 1 0 get live-out? ] unit-test
+[ t ] [ V int-regs 2 0 get live-out? ] unit-test
+[ t ] [ V int-regs 3 0 get live-out? ] unit-test
 
 [ f ] [ V int-regs 0 1 get live-in? ] unit-test
-[ t ] [ V int-regs 1 1 get live-in? ] unit-test
+[ f ] [ V int-regs 1 1 get live-in? ] unit-test
 [ t ] [ V int-regs 2 1 get live-in? ] unit-test
-[ t ] [ V int-regs 3 1 get live-in? ] unit-test
+[ f ] [ V int-regs 3 1 get live-in? ] unit-test
 
 [ f ] [ V int-regs 0 1 get live-out? ] unit-test
 [ f ] [ V int-regs 1 1 get live-out? ] unit-test
-[ t ] [ V int-regs 2 1 get live-out? ] unit-test
-[ t ] [ V int-regs 3 1 get live-out? ] unit-test
+[ f ] [ V int-regs 2 1 get live-out? ] unit-test
+[ f ] [ V int-regs 3 1 get live-out? ] unit-test
 
 [ f ] [ V int-regs 0 2 get live-in? ] unit-test
 [ f ] [ V int-regs 1 2 get live-in? ] unit-test
-[ t ] [ V int-regs 2 2 get live-in? ] unit-test
-[ f ] [ V int-regs 3 2 get live-in? ] unit-test
+[ f ] [ V int-regs 2 2 get live-in? ] unit-test
+[ t ] [ V int-regs 3 2 get live-in? ] unit-test
 
 [ f ] [ V int-regs 0 2 get live-out? ] unit-test
 [ f ] [ V int-regs 1 2 get live-out? ] unit-test
 [ f ] [ V int-regs 2 2 get live-out? ] unit-test
 [ f ] [ V int-regs 3 2 get live-out? ] unit-test
 
-[ f ] [ V int-regs 0 3 get live-in? ] unit-test
-[ f ] [ V int-regs 1 3 get live-in? ] unit-test
-[ f ] [ V int-regs 2 3 get live-in? ] unit-test
-[ t ] [ V int-regs 3 3 get live-in? ] unit-test
-
-[ f ] [ V int-regs 0 3 get live-out? ] unit-test
-[ f ] [ V int-regs 1 3 get live-out? ] unit-test
-[ f ] [ V int-regs 2 3 get live-out? ] unit-test
-[ f ] [ V int-regs 3 3 get live-out? ] unit-test
-
 V{ } 0 test-bb
 V{ } 1 test-bb
 V{ } 2 test-bb
 V{ } 3 test-bb
-V int-regs 2
-    2 get V int-regs 0 2array
-    3 get V int-regs 1 2array
-2array \ ##phi new-insn 1vector
-4 test-bb
+V{
+    T{ ##phi f V int-regs 2 H{ { 2 V int-regs 0 } { 3 V int-regs 1 } } }
+} 4 test-bb
 test-diamond
 
-cfg new 1 get >>entry 5 set
-
-[ ] [ 5 get compute-predecessors drop ] unit-test
-[ ] [ 5 get precompute-liveness ] unit-test
+[ ] [ test-liveness ] unit-test
 
 [ t ] [ V int-regs 0 1 get live-in? ] unit-test
 [ t ] [ V int-regs 1 1 get live-in? ] unit-test
@@ -109,7 +110,7 @@ cfg new 1 get >>entry 5 set
 [ f ] [ V int-regs 1 2 get live-in? ] unit-test
 [ f ] [ V int-regs 2 2 get live-in? ] unit-test
 
-[ t ] [ V int-regs 0 2 get live-out? ] unit-test
+[ f ] [ V int-regs 0 2 get live-out? ] unit-test
 [ f ] [ V int-regs 1 2 get live-out? ] unit-test
 [ f ] [ V int-regs 2 2 get live-out? ] unit-test
 
@@ -118,7 +119,7 @@ cfg new 1 get >>entry 5 set
 [ f ] [ V int-regs 2 3 get live-in? ] unit-test
 
 [ f ] [ V int-regs 0 3 get live-out? ] unit-test
-[ t ] [ V int-regs 1 3 get live-out? ] unit-test
+[ f ] [ V int-regs 1 3 get live-out? ] unit-test
 [ f ] [ V int-regs 2 3 get live-out? ] unit-test
 
 [ f ] [ V int-regs 0 4 get live-in? ] unit-test
@@ -130,7 +131,9 @@ cfg new 1 get >>entry 5 set
 [ f ] [ V int-regs 2 4 get live-out? ] unit-test
 
 ! This is the CFG in Figure 3 from the paper
+V{ } 0 test-bb
 V{ } 1 test-bb
+0 1 edge
 V{ } 2 test-bb
 1 2 edge
 V{
@@ -162,9 +165,7 @@ V{ } 7 test-bb
 10 8 edge
 7 2 edge
 
-cfg new 1 get >>entry 0 set
-[ ] [ 0 get compute-predecessors drop ] unit-test
-[ ] [ 0 get precompute-liveness ] unit-test
+[ ] [ test-liveness ] unit-test
 
 [ t ] [ 1 get R_q 1 11 [a,b] [ get ] map unique = ] unit-test
 [ t ] [ 2 get R_q 2 11 [a,b] [ get ] map unique = ] unit-test
@@ -201,8 +202,6 @@ cfg new 1 get >>entry 0 set
 [ f ] [ 9 get back-edge-target? ] unit-test
 [ f ] [ 10 get back-edge-target? ] unit-test
 [ f ] [ 11 get back-edge-target? ] unit-test
-
-[ f ] [ 1 11 [a,b] [ get phi-outs get at ] any? ] unit-test
 
 [ f ] [ V int-regs 0 1 get live-in? ] unit-test
 [ f ] [ V int-regs 1 1 get live-in? ] unit-test

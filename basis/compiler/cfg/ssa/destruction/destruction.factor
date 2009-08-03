@@ -12,6 +12,7 @@ compiler.cfg.liveness.ssa
 compiler.cfg.ssa.cssa
 compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges
+compiler.cfg.utilities
 compiler.utilities ;
 IN: compiler.cfg.ssa.destruction
 
@@ -94,11 +95,13 @@ M: insn prepare-insn drop ;
     ] each-basic-block ;
 
 : destruct-ssa ( cfg -- cfg' )
-    dup construct-cssa
-    compute-ssa-live-sets
-    dup compute-defs
-    dup compute-dominance
-    dup compute-live-ranges
-    dup prepare-coalescing
-    process-copies
-    dup perform-renaming ;
+    dup cfg-has-phis? [
+        dup construct-cssa
+        dup compute-defs
+        dup compute-dominance
+        compute-ssa-live-sets
+        dup compute-live-ranges
+        dup prepare-coalescing
+        process-copies
+        dup perform-renaming
+    ] when ;

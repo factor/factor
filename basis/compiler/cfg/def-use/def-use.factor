@@ -1,7 +1,7 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel assocs sequences namespaces fry
-sets compiler.cfg.rpo compiler.cfg.instructions ;
+sets compiler.cfg.rpo compiler.cfg.instructions locals ;
 IN: compiler.cfg.def-use
 
 GENERIC: defs-vreg ( insn -- vreg/f )
@@ -80,18 +80,15 @@ SYMBOLS: defs insns uses ;
         ] each-basic-block
     ] keep insns set ;
 
-: compute-uses ( cfg -- )
-    H{ } clone [
-        '[
-            dup instructions>> [
-                uses-vregs [
-                    _ conjoin-at
-                ] with each
-            ] with each
-        ] each-basic-block
-    ] keep
-    [ keys ] assoc-map
-    uses set ;
-
-: compute-def-use ( cfg -- )
-    [ compute-defs ] [ compute-uses ] [ compute-insns ] tri ;
+:: compute-uses ( cfg -- )
+    ! Here, a phi node uses its argument in the block that it comes from.
+    H{ } clone :> use
+    cfg [| block |
+        block instructions>> [
+            dup ##phi?
+            [ inputs>> [ use conjoin-at ] assoc-each ]
+            [ uses-vregs [ block swap use conjoin-at ] each ]
+            if
+        ] each
+    ] each-basic-block
+    use [ keys ] assoc-map uses set ;
