@@ -33,18 +33,6 @@ HELP: new-action
 HELP: page-action
 { $class-description "The class of Chloe page actions. These are actions whose " { $slot "display" } " slot is pre-set to serve the Chloe template stored in the " { $slot "page" } " slot." } ;
 
-HELP: param
-{ $values
-     { "name" string }
-     { "value" string }
-}
-{ $description "Outputs the value of a query parameter (if the current request is a GET or HEAD request) or a POST parameter (if the current request is a POST request)." }
-{ $notes "Instead of using this word, it is better to use " { $link validate-params } " and then access parameters via " { $link "html.forms.values" } " words." } ;
-
-HELP: params
-{ $var-description "A variable holding an assoc of query parameters (if the current request is a GET or HEAD request) or POST parameters (if the current request is a POST request)." }
-{ $notes "Instead of using this word, it is better to use " { $link validate-params } " and then access parameters via " { $link "html.forms.values" } " words." } ;
-
 HELP: validate-integer-id
 { $description "A utility word which validates an integer parameter named " { $snippet "id" } "." }
 { $examples
@@ -144,10 +132,8 @@ ARTICLE: "furnace.actions.lifecycle" "Furnace action lifecycle"
 "Any one of the above steps can perform validation; if " { $link validation-failed } " is called during a POST request, the client is sent back to the page containing the form submission, with current form values and validation errors passed in a " { $link "furnace.conversations" } "." ;
 
 ARTICLE: "furnace.actions.impl" "Furnace actions implementation"
-"The following words are used by the action implementation and there is rarely any reason to call them directly:"
-{ $subsection new-action }
-{ $subsection param }
-{ $subsection params } ;
+"The following parametrized constructor should be called from constructors for subclasses of " { $link action } ":"
+{ $subsection new-action } ;
 
 ARTICLE: "furnace.actions" "Furnace actions"
 "The " { $vocab-link "furnace.actions" } " vocabulary implements a type of responder, called an " { $emphasis "action" } ", which handles the form validation lifecycle."

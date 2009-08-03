@@ -3,7 +3,8 @@
 USING: kernel accessors sequences arrays namespaces splitting
 vocabs.loader destructors assocs debugger continuations
 combinators vocabs.refresh tools.time math math.parser present
-io vectors
+vectors hashtables
+io
 io.sockets
 io.sockets.secure
 io.encodings
@@ -212,8 +213,25 @@ LOG: httpd-header NOTICE
 : split-path ( string -- path )
     "/" split harvest ;
 
+: request-params ( request -- assoc )
+    dup method>> {
+        { "GET" [ url>> query>> ] }
+        { "HEAD" [ url>> query>> ] }
+        { "POST" [ post-data>> params>> ] }
+    } case ;
+
+SYMBOL: params
+
+: param ( name -- value )
+    params get at ;
+
+: set-param ( value name -- )
+    params get set-at ;
+
 : init-request ( request -- )
-    [ request set ] [ url>> url set ] bi
+    [ request set ]
+    [ url>> url set ]
+    [ request-params >hashtable params set ] tri
     V{ } clone responder-nesting set ;
 
 : dispatch-request ( request -- response )
