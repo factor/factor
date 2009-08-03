@@ -46,11 +46,11 @@ V{ T{ ##branch } } 4 test-bb
 
 V{ T{ ##branch } } 5 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
+0 { 1 2 } edges
 
-1 get 3 get 4 get V{ } 2sequence >>successors drop
+1 { 3 4 } edges
 
-2 get 3 get 4 get V{ } 2sequence >>successors drop
+2 { 3 4 } edges
 
 [ ] [ test-branch-splitting ] unit-test
 
@@ -64,11 +64,11 @@ V{ T{ ##branch } } 3 test-bb
 
 V{ T{ ##branch } } 4 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
+0 { 1 2 } edges
 
-1 get 3 get 4 get V{ } 2sequence >>successors drop
+1 { 3 4 } edges
 
-2 get 4 get 1vector >>successors drop
+2 4 edge
 
 [ ] [ test-branch-splitting ] unit-test
 
@@ -78,8 +78,8 @@ V{ T{ ##branch } } 1 test-bb
 
 V{ T{ ##branch } } 2 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
+0 { 1 2 } edges
 
-1 get 2 get 1vector >>successors drop
+1 2 edge
 
 [ ] [ test-branch-splitting ] unit-test

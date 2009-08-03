@@ -113,7 +113,7 @@ ERROR: no-case object ;
     ] if ;
 
 : <buckets> ( initial length -- array )
-    next-power-of-2 swap [ nip clone ] curry map ;
+    next-power-of-2 iota swap [ nip clone ] curry map ;
 
 : distribute-buckets ( alist initial quot -- buckets )
     swapd [ [ dup first ] dip call 2array ] curry map
@@ -180,3 +180,6 @@ M: hashtable hashcode*
         dup assoc-size 1 eq?
         [ assoc-hashcode ] [ nip assoc-size ] if
     ] recursive-hashcode ;
+
+: to-fixed-point ( object quot: ( object(n) -- object(n+1) ) -- object(n) )
+    [ keep over = ] keep [ to-fixed-point ] curry unless ; inline recursive

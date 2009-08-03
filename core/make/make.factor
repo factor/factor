@@ -8,7 +8,7 @@ SYMBOL: building
 : make ( quot exemplar -- seq )
     [
         [
-            1024 swap new-resizable [
+            100 swap new-resizable [
                 building set call
             ] keep
         ] keep like

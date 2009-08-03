@@ -1,5 +1,8 @@
-USING: cpu.x86.assembler kernel tools.test namespaces make ;
+USING: cpu.x86.assembler cpu.x86.assembler.operands
+kernel tools.test namespaces make ;
 IN: cpu.x86.assembler.tests
+
+[ { HEX: 40 HEX: 8a HEX: 2a } ] [ [ BPL RDX [] MOV ] { } make ] unit-test
 
 [ { HEX: 49 HEX: 89 HEX: 04 HEX: 24 } ] [ [ R12 [] RAX MOV ] { } make ] unit-test
 [ { HEX: 49 HEX: 8b HEX: 06 } ] [ [ RAX R14 [] MOV ] { } make ] unit-test
@@ -68,6 +71,7 @@ IN: cpu.x86.assembler.tests
 
 ! sse shift instructions
 [ { HEX: 66 HEX: 0f HEX: 71 HEX: d0 HEX: 05 } ] [ [ XMM0 5 PSRLW ] { } make ] unit-test
+[ { HEX: 66 HEX: 0f HEX: d1 HEX: c1 } ] [ [ XMM0 XMM1 PSRLW ] { } make ] unit-test
 
 ! sse comparison instructions 
 [ { HEX: 66 HEX: 0f HEX: c2 HEX: c1 HEX: 02 } ] [ [ XMM0 XMM1 CMPLEPD ] { } make ] unit-test

@@ -75,6 +75,9 @@ check-numbering? on
     { T{ live-range f 0 5 } } 0 split-ranges
 ] unit-test
 
+H{ { int-regs 10 } { float-regs 20 } } clone spill-counts set
+H{ } spill-slots set
+
 [
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
@@ -82,6 +85,7 @@ check-numbering? on
        { end 2 }
        { uses V{ 0 1 } }
        { ranges V{ T{ live-range f 0 2 } } }
+       { spill-to 10 }
     }
     T{ live-interval
        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
@@ -89,6 +93,7 @@ check-numbering? on
        { end 5 }
        { uses V{ 5 } }
        { ranges V{ T{ live-range f 5 5 } } }
+       { reload-from 10 }
     }
 ] [
     T{ live-interval
@@ -97,82 +102,61 @@ check-numbering? on
        { end 5 }
        { uses V{ 0 1 5 } }
        { ranges V{ T{ live-range f 0 5 } } }
-    } 2 split-for-spill [ f >>split-next ] bi@
+    } 2 split-for-spill
 ] unit-test
 
 [
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 2 } } }
        { start 0 }
        { end 1 }
        { uses V{ 0 } }
        { ranges V{ T{ live-range f 0 1 } } }
+       { spill-to 11 }
     }
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 2 } } }
        { start 1 }
        { end 5 }
        { uses V{ 1 5 } }
        { ranges V{ T{ live-range f 1 5 } } }
+       { reload-from 11 }
     }
 ] [
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 2 } } }
        { start 0 }
        { end 5 }
        { uses V{ 0 1 5 } }
        { ranges V{ T{ live-range f 0 5 } } }
-    } 0 split-for-spill [ f >>split-next ] bi@
+    } 0 split-for-spill
 ] unit-test
 
 [
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 3 } } }
        { start 0 }
        { end 1 }
        { uses V{ 0 } }
        { ranges V{ T{ live-range f 0 1 } } }
+       { spill-to 12 }
     }
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 3 } } }
        { start 20 }
        { end 30 }
        { uses V{ 20 30 } }
        { ranges V{ T{ live-range f 20 30 } } }
+       { reload-from 12 }
     }
 ] [
     T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
+       { vreg T{ vreg { reg-class int-regs } { n 3 } } }
        { start 0 }
        { end 30 }
        { uses V{ 0 20 30 } }
        { ranges V{ T{ live-range f 0 8 } T{ live-range f 10 18 } T{ live-range f 20 30 } } }
-    } 10 split-for-spill [ f >>split-next ] bi@
-] unit-test
-
-[
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 0 }
-        { end 4 }
-        { uses V{ 0 1 4 } }
-        { ranges V{ T{ live-range f 0 4 } } }
-    }
-    T{ live-interval
-        { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-        { start 5 }
-        { end 10 }
-        { uses V{ 5 10 } }
-        { ranges V{ T{ live-range f 5 10 } } }
-    }
-] [
-    T{ live-interval
-       { vreg T{ vreg { reg-class int-regs } { n 1 } } }
-       { start 0 }
-       { end 10 }
-       { uses V{ 0 1 4 5 10 } }
-       { ranges V{ T{ live-range f 0 10 } } }
-    } 4 split-to-fit [ f >>split-next ] bi@
+    } 10 split-for-spill
 ] unit-test
 
 [
@@ -351,6 +335,78 @@ check-numbering? on
     H{ { int-regs { "A" } } }
     check-linear-scan
 ] must-fail
+
+! Problem with spilling intervals with no more usages after the spill location
+
+[ ] [
+    {
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 20 }
+           { uses V{ 0 10 20 } }
+           { ranges V{ T{ live-range f 0 2 } T{ live-range f 10 20 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 2 } { reg-class int-regs } } }
+           { start 0 }
+           { end 20 }
+           { uses V{ 0 10 20 } }
+           { ranges V{ T{ live-range f 0 2 } T{ live-range f 10 20 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 3 } { reg-class int-regs } } }
+           { start 4 }
+           { end 8 }
+           { uses V{ 6 } }
+           { ranges V{ T{ live-range f 4 8 } } }
+        }
+        T{ live-interval
+           { vreg T{ vreg { n 4 } { reg-class int-regs } } }
+           { start 4 }
+           { end 8 }
+           { uses V{ 8 } }
+           { ranges V{ T{ live-range f 4 8 } } }
+        }
+
+        ! This guy will invoke the 'spill partially available' code path
+        T{ live-interval
+           { vreg T{ vreg { n 5 } { reg-class int-regs } } }
+           { start 4 }
+           { end 8 }
+           { uses V{ 8 } }
+           { ranges V{ T{ live-range f 4 8 } } }
+        }
+    }
+    H{ { int-regs { "A" "B" } } }
+    check-linear-scan
+] unit-test
+
+
+! Test spill-new code path
+
+[ ] [
+    {
+        T{ live-interval
+           { vreg T{ vreg { n 1 } { reg-class int-regs } } }
+           { start 0 }
+           { end 10 }
+           { uses V{ 0 6 10 } }
+           { ranges V{ T{ live-range f 0 10 } } }
+        }
+
+        ! This guy will invoke the 'spill new' code path
+        T{ live-interval
+           { vreg T{ vreg { n 5 } { reg-class int-regs } } }
+           { start 2 }
+           { end 8 }
+           { uses V{ 8 } }
+           { ranges V{ T{ live-range f 2 8 } } }
+        }
+    }
+    H{ { int-regs { "A" } } }
+    check-linear-scan
+] unit-test
 
 SYMBOL: available
 
@@ -1493,9 +1549,9 @@ V{
     T{ ##return }
 } 3 test-bb
 
-1 get 1vector 0 get (>>successors)
-2 get 3 get V{ } 2sequence 1 get (>>successors)
-3 get 1vector 2 get (>>successors)
+0 1 edge
+1 { 2 3 } edges
+2 3 edge
 
 SYMBOL: linear-scan-result
 
@@ -1508,9 +1564,7 @@ SYMBOL: linear-scan-result
         flatten-cfg 1array mr.
     ] with-scope ;
 
-! This test has a critical edge -- do we care about these?
-
-! [ { 1 2 } test-linear-scan-on-cfg ] unit-test
+[ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
 ! Bug in inactive interval handling
 ! [ rot dup [ -rot ] when ]
@@ -1761,11 +1815,6 @@ test-diamond
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
-[ ] [
-    1 get instructions>> first regs>> V int-regs 0 swap at
-    2 get instructions>> first regs>> V int-regs 1 swap at assert=
-] unit-test
-
 ! Not until splitting is finished
 ! [ _copy ] [ 3 get instructions>> second class ] unit-test
 
@@ -1845,11 +1894,11 @@ V{
     T{ ##return }
 } 6 test-bb
 
-0 get 1 get V{ } 1sequence >>successors drop
-1 get 2 get 3 get V{ } 2sequence >>successors drop
-2 get 4 get V{ } 1sequence >>successors drop
-3 get 4 get V{ } 1sequence >>successors drop
-4 get 5 get 6 get V{ } 2sequence >>successors drop
+0 1 edge
+1 { 2 3 } edges
+2 4 edge
+3 4 edge
+4 { 5 6 } edges
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
@@ -1905,14 +1954,14 @@ V{
     T{ ##return }
 } 9 test-bb
 
-0 get 1 get 1vector >>successors drop
-1 get 2 get 7 get V{ } 2sequence >>successors drop
-7 get 8 get 1vector >>successors drop
-8 get 9 get 1vector >>successors drop
-2 get 3 get 5 get V{ } 2sequence >>successors drop
-3 get 4 get 1vector >>successors drop
-4 get 9 get 1vector >>successors drop
-5 get 6 get 1vector >>successors drop
+0 1 edge
+1 { 2 7 } edges
+7 8 edge
+8 9 edge
+2 { 3 5 } edges
+3 4 edge
+4 9 edge
+5 6 edge
 
 [ ] [ { 1 2 3 4 } test-linear-scan-on-cfg ] unit-test
 
@@ -2088,11 +2137,11 @@ V{
     T{ ##return }
 } 5 test-bb
 
-0 get 1 get 1vector >>successors drop
-1 get 2 get 4 get V{ } 2sequence >>successors drop
-2 get 3 get 1vector >>successors drop
-3 get 5 get 1vector >>successors drop
-4 get 5 get 1vector >>successors drop
+0 1 edge
+1 { 2 4 } edges
+2 3 edge
+3 5 edge
+4 5 edge
 
 [ ] [ { 1 2 3 4 5 } test-linear-scan-on-cfg ] unit-test
 
@@ -2235,12 +2284,12 @@ V{
     T{ ##return }
 } 6 test-bb
 
-0 get 1 get 1vector >>successors drop
-1 get 2 get 5 get V{ } 2sequence >>successors drop
-2 get 3 get 1vector >>successors drop
-3 get 4 get 1vector >>successors drop
-4 get 6 get 1vector >>successors drop
-5 get 6 get 1vector >>successors drop
+0 1 edge
+1 { 2 5 } edges
+2 3 edge
+3 4 edge
+4 6 edge
+5 6 edge
 
 [ ] [ { 1 2 3 4 5 } test-linear-scan-on-cfg ] unit-test
 
@@ -2368,8 +2417,8 @@ V{
     T{ ##return }
 } 2 test-bb
 
-0 get 1 get 1vector >>successors drop
-1 get 2 get 1vector >>successors drop
+0 1 edge
+1 2 edge
 
 [ ] [ { 1 2 3 } test-linear-scan-on-cfg ] unit-test
 
@@ -2393,7 +2442,7 @@ V{
     T{ ##return }
 } 2 test-bb
 
-0 get 1 get 2 get V{ } 2sequence >>successors drop
+0 { 1 2 } edges
 
 [ ] [ { 1 2 3 } test-linear-scan-on-cfg ] unit-test
 

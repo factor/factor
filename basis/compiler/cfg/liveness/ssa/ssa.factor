@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces deques accessors sets sequences assocs fry
 hashtables dlists compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.rpo compiler.cfg.liveness ;
+compiler.cfg.rpo compiler.cfg.liveness compiler.cfg.utilities ;
 IN: compiler.cfg.liveness.ssa
 
 ! TODO: merge with compiler.cfg.liveness
 
 ! Assoc mapping basic blocks to sequences of sets of vregs; each sequence
-! is in conrrespondence with a predecessor
+! is in correspondence with a predecessor
 SYMBOL: phi-live-ins
 
 : phi-live-in ( predecessor basic-block -- set ) phi-live-ins get at at ;
@@ -22,16 +22,14 @@ SYMBOL: work-list
     [ live-out ] keep instructions>> transfer-liveness ;
 
 : compute-phi-live-in ( basic-block -- phi-live-in )
-    instructions>> [ ##phi? ] filter [ f ] [
-        H{ } clone [
-            '[ inputs>> [ swap _ conjoin-at ] assoc-each ] each
-        ] keep
-    ] if-empty ;
+    H{ } clone [
+        '[ inputs>> [ swap _ conjoin-at ] assoc-each ] each-phi
+    ] keep ;
 
 : update-live-in ( basic-block -- changed? )
     [ [ compute-live-in ] keep live-ins get maybe-set-at ]
     [ [ compute-phi-live-in ] keep phi-live-ins get maybe-set-at ]
-    bi and ; 
+    bi or ;
 
 : compute-live-out ( basic-block -- live-out )
     [ successors>> [ live-in ] map ]
@@ -55,3 +53,7 @@ SYMBOL: work-list
     H{ } clone live-outs set
     dup post-order add-to-work-list
     work-list get [ liveness-step ] slurp-deque ;
+
+: live-in? ( vreg bb -- ? ) live-in key? ;
+
+: live-out? ( vreg bb -- ? ) live-out key? ;

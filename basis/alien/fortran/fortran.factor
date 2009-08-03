@@ -365,7 +365,7 @@ M: character-type (<fortran-result>)
     ] bi* ;
 
 : (fortran-in-shuffle) ( ret par -- seq )
-    [ [ second ] bi@ <=> ] sort append ;
+    [ second ] sort-with append ;
 
 : (fortran-out-shuffle) ( ret par -- seq )
     append ;

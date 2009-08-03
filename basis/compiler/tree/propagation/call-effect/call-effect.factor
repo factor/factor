@@ -3,7 +3,8 @@
 USING: accessors combinators combinators.private effects fry
 kernel kernel.private make sequences continuations quotations
 words math stack-checker stack-checker.transforms
-compiler.tree.propagation.info slots.private ;
+compiler.tree.propagation.info
+compiler.tree.propagation.inlining ;
 IN: compiler.tree.propagation.call-effect
 
 ! call( and execute( have complex expansions.
@@ -130,8 +131,9 @@ ERROR: uninferable ;
 : (infer-value) ( value-info -- effect )
     dup class>> {
         { \ quotation [
-            literal>> [ uninferable ] unless* cached-effect
-            dup +unknown+ = [ uninferable ] when
+            literal>> [ uninferable ] unless*
+            dup already-inlined? [ uninferable ] when
+            cached-effect dup +unknown+ = [ uninferable ] when
         ] }
         { \ curry [
             slots>> third (infer-value)
@@ -151,7 +153,7 @@ ERROR: uninferable ;
 
 : (value>quot) ( value-info -- quot )
     dup class>> {
-        { \ quotation [ literal>> '[ drop @ ] ] }
+        { \ quotation [ literal>> dup remember-inlining '[ drop @ ] ] }
         { \ curry [
             slots>> third (value>quot)
             '[ [ obj>> ] [ quot>> @ ] bi ]
