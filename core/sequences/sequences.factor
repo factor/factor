@@ -701,7 +701,7 @@ PRIVATE>
     3tri ;
 
 : reverse-here ( seq -- )
-    [ length 2/ ] [ length ] [ ] tri
+    [ length 2/ iota ] [ length ] [ ] tri
     [ [ over - 1 - ] dip exchange-unsafe ] 2curry each ;
 
 : reverse ( seq -- newseq )
@@ -805,14 +805,14 @@ PRIVATE>
 <PRIVATE
 
 : (start) ( subseq seq n -- subseq seq ? )
-    pick length [
+    pick length iota [
         [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
     ] all? nip ; inline
 
 PRIVATE>
 
 : start* ( subseq seq n -- i )
-    pick length pick length swap - 1 +
+    pick length pick length swap - 1 + iota
     [ (start) ] find-from
     swap [ 3drop ] dip ;
 

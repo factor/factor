@@ -14,7 +14,7 @@ IN: vocabs.prettyprint
 <PRIVATE
 
 : sort-vocabs ( seq -- seq' )
-    [ [ vocab-name ] compare ] sort ;
+    [ vocab-name ] sort-with ;
 
 : pprint-using ( seq -- )
     [ "syntax" vocab = not ] filter
