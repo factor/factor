@@ -58,7 +58,7 @@ PRIVATE>
 : sort-vregs-by-bb ( vregs -- alist )
     defs get
     '[ dup _ at ] { } map>assoc
-    [ [ second pre-of ] compare ] sort ;
+    [ second pre-of ] sort-with ;
 
 : ?last ( seq -- elt/f ) [ f ] [ last ] if-empty ; inline
 
