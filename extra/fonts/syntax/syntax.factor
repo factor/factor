@@ -1,8 +1,8 @@
-USING: accessors arrays classes.algebraic combinators io.styles
+USING: accessors arrays variants combinators io.styles
 kernel math parser sequences fry ;
 IN: fonts.syntax
 
-DATA: fontname serif | monospace ;
+VARIANT: fontname serif monospace ;
 
 : install ( object quot -- quot/? ) over [ curry ] [ 2drop [ ] ] if ;
 

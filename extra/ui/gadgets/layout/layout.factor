@@ -14,7 +14,7 @@ TUPLE: placeholder < gadget members ;
 : (remove-members) ( placeholder members -- ) [ [ model? ] filter swap parent>> model>> [ remove-connection ] curry each ]
     [ nip [ gadget? ] filter [ unparent ] each ] 2bi ;
 
-: remove-members ( placeholder -- ) dup members>> [ drop ] [ [ (remove-members) ] keep empty ] if-empty ;
+: remove-members ( placeholder -- ) dup members>> [ drop ] [ [ (remove-members) ] keep delete-all ] if-empty ;
 : add-member ( obj placeholder -- ) over layout? [ [ gadget>> ] dip ] when members>> push ;
 
 : , ( item -- ) make:, ;
