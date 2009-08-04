@@ -67,13 +67,6 @@ compiler.tree.combinators ;
     \ loop-test-3 label-is-not-loop?
 ] unit-test
 
-: loop-test-4 ( a -- )
-    dup [
-        loop-test-4
-    ] [
-        drop
-    ] if ; inline recursive
-
 [ f ] [
     [ [ [ ] map ] map ] build-tree analyze-recursive
     [
@@ -145,15 +138,30 @@ DEFER: a'
 
 DEFER: a''
 
-: b'' ( -- )
+: b'' ( a -- b )
     a'' ; inline recursive
 
-: a'' ( -- )
-    b'' a'' ; inline recursive
+: a'' ( a -- b )
+    dup [ b'' a'' ] when ; inline recursive
 
 [ t ] [
     [ a'' ] build-tree analyze-recursive
     \ a'' label-is-not-loop?
+] unit-test
+
+[ t ] [
+    [ a'' ] build-tree analyze-recursive
+    \ b'' label-is-loop?
+] unit-test
+
+[ t ] [
+    [ b'' ] build-tree analyze-recursive
+    \ a'' label-is-not-loop?
+] unit-test
+
+[ f ] [
+    [ b'' ] build-tree analyze-recursive
+    \ b'' label-is-not-loop?
 ] unit-test
 
 : loop-in-non-loop ( x quot: ( i -- ) -- )
@@ -165,4 +173,17 @@ DEFER: a''
     [ 10 [ [ drop ] each-integer ] loop-in-non-loop ]
     build-tree analyze-recursive
     \ (each-integer) label-is-loop?
+] unit-test
+
+DEFER: a'''
+
+: b''' ( -- )
+    blah [ b''' ] [ a''' b''' ] if ; inline recursive
+
+: a''' ( -- )
+    blah [ b''' ] [ a''' ] if ; inline recursive
+
+[ t ] [
+    [ b''' ] build-tree analyze-recursive
+    \ a''' label-is-loop?
 ] unit-test
