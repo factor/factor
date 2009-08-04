@@ -1,35 +1,31 @@
 ! Copyright (C) 2009 Sam Anklesaria.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs concurrency.distributed
-concurrency.messaging continuations effects init kernel
-namespaces sequences sets threads vocabs vocabs.parser ;
+USING: accessors assocs combinators continuations effects
+io.encodings.binary io.servers.connection kernel namespaces
+sequences serialize sets threads vocabs vocabs.parser init ;
 IN: modules.rpc-server
+
 <PRIVATE
 TUPLE: rpc-request args vocabspec wordname ;
 SYMBOL: serving-vocabs serving-vocabs [ V{ } clone ] initialize
 
-: register-gets-thread ( -- )
-    [ receive [ data>> dup serving-vocabs get-global index
+: getter ( -- ) deserialize dup serving-vocabs get-global index
         [ vocab-words [ stack-effect ] { } assoc-map-as ]
-        [ \ no-vocab boa ] if
-    ] keep reply-synchronous 
-    t ] "get-words" spawn-server "gets-thread" swap register-process ;
+        [ \ no-vocab boa ] if serialize ;
 
-: register-does-thread ( -- )
-    [ receive [ data>> dup vocabspec>> serving-vocabs get-global index
+: doer ( -- ) deserialize dup vocabspec>> serving-vocabs get-global index
         [ [ args>> ] [ wordname>> ] [ vocabspec>> vocab-words ] tri at [ execute ] curry with-datastack ]
-        [ vocabspec>> \ no-vocab boa ] if
-    ] keep reply-synchronous
-    t ] "do-word" spawn-server "does-thread" swap register-process ;
-
-: register-loads-thread ( -- )
-    [ [ receive vocab ] keep reply-synchronous t ] "load-words" spawn-server "loads-thread" swap register-process ;
+        [ vocabspec>> \ no-vocab boa ] if serialize ;
 
 PRIVATE>
 SYNTAX: service current-vocab name>> serving-vocabs get-global adjoin ;
 
-[ 9012 start-node
-    register-gets-thread
-    register-does-thread
-    register-loads-thread
+[ [ binary <threaded-server>
+    "rpcs" >>name 9012 >>insecure
+    [ break deserialize {
+      { [ "getter" ] [ getter ] }
+      { [  "doer" ] [ doer ] }
+      { [ "loader" ] [ deserialize vocab serialize ] } 
+    } case ] >>handler
+    start-server ] in-thread drop
 ] "modules.rpc-server" add-init-hook
