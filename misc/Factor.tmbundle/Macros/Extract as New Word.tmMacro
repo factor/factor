@@ -232,7 +232,7 @@ puts factor_eval(%Q(#{doc_using_statements(doc)} USE: stack-checker\n [ #{ENV["T
 		</dict>
 	</array>
 	<key>keyEquivalent</key>
-	<string>@E</string>
+	<string>@W</string>
 	<key>name</key>
 	<string>Extract as New Word</string>
 	<key>scope</key>

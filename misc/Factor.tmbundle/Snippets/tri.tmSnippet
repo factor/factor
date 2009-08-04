@@ -6,7 +6,7 @@
 	<string>
    [ $1 ]
    [ $2 ]
-   [ $3 ] tri </string>
+   [ $3 ] tri</string>
 	<key>name</key>
 	<string>tri</string>
 	<key>scope</key>

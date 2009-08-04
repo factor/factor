@@ -6,7 +6,7 @@
 	<string>
    [let | $1 [ $2 ] $3|
       $0
-   ] </string>
+   ]</string>
 	<key>name</key>
 	<string>let</string>
 	<key>scope</key>

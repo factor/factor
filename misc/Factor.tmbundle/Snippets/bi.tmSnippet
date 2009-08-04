@@ -5,7 +5,7 @@
 	<key>content</key>
 	<string>
    [ $1 ]
-   [ $2 ] bi </string>
+   [ $2 ] bi</string>
 	<key>name</key>
 	<string>bi</string>
 	<key>scope</key>
