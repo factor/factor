@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry generalizations io.encodings.binary
 io.sockets kernel locals namespaces parser sequences serialize
-vocabs vocabs.parser words tools.continuations io ;
+vocabs vocabs.parser words io ;
 IN: modules.rpc
 
 TUPLE: rpc-request args vocabspec wordname ;
@@ -13,7 +13,7 @@ TUPLE: rpc-request args vocabspec wordname ;
 :: define-remote ( str effect addrspec vocabspec -- )
     str create-in effect [ in>> length ] [ out>> length ] bi
     '[ _ narray vocabspec str rpc-request boa addrspec 9012 <inet> binary
-    [ "doer" serialize serialize send-with-check ] with-client _ firstn ]
+    [ "doer" serialize send-with-check ] with-client _ firstn ]
     effect define-declared ;
 
 :: remote-vocab ( addrspec vocabspec -- vocab )
