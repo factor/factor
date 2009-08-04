@@ -63,10 +63,6 @@ HELP: referrer
 { $values { "referrer/f" { $maybe string } } }
 { $description "Outputs the current request's referrer URL." } ;
 
-HELP: request-params
-{ $values { "request" request } { "assoc" assoc } }
-{ $description "Outputs the query parameters (if the current request is a GET or HEAD request) or the POST parameters (if the current request is a POST request)." } ;
-
 HELP: resolve-base-path
 { $values { "string" string } { "string'" string } }
 { $description "Resolves a responder-relative URL." } ;
@@ -121,6 +117,5 @@ ARTICLE: "furnace.misc" "Miscellaneous Furnace features"
 { $subsection exit-with }
 "Other useful words:"
 { $subsection hidden-form-field }
-{ $subsection request-params }
 { $subsection client-state }
 { $subsection user-agent } ;
