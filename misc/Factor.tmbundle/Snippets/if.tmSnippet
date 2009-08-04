@@ -5,7 +5,7 @@
 	<key>content</key>
 	<string>
    [ $1 ]
-   [ $2 ] if </string>
+   [ $2 ] if</string>
 	<key>name</key>
 	<string>if</string>
 	<key>scope</key>

@@ -8,7 +8,7 @@
    [ $2 ]
    [ $3 ]
    [ $4 ]
-} spread </string>
+} spread</string>
 	<key>name</key>
 	<string>spread</string>
 	<key>scope</key>
