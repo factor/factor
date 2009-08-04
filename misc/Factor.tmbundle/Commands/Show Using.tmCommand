@@ -5,10 +5,12 @@
 	<key>beforeRunningCommand</key>
 	<string>nop</string>
 	<key>command</key>
-	<string>#! /Applications/factor/factor
-USE: modules.using
-USING*: environment localhost::get-using io ;
-"TM_FILEPATH" os-env get-using write</string>
+	<string>#!/usr/bin/env ruby
+
+require "#{ENV["TM_BUNDLE_SUPPORT"]}/lib/tm_factor"
+
+factor_run(%Q(USING: namespaces parser ;
+auto-use? t set "#{ENV["TM_FILEPATH"]}" run-file auto-use? f set))</string>
 	<key>fallbackInput</key>
 	<string>word</string>
 	<key>input</key>
@@ -18,10 +20,10 @@ USING*: environment localhost::get-using io ;
 	<key>name</key>
 	<string>Show Using</string>
 	<key>output</key>
-	<string>showAsTooltip</string>
+	<string>discard</string>
 	<key>scope</key>
 	<string>source.factor</string>
 	<key>uuid</key>
-	<string>86DD4385-4029-4EFE-B546-1EC8EB5EB932</string>
+	<string>93AF1721-C14D-428A-B5A0-34CEFAA3B3C5</string>
 </dict>
 </plist>

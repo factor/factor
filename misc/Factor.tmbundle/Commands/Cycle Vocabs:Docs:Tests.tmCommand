@@ -7,19 +7,23 @@
 	<key>bundleUUID</key>
 	<string>8061D2F3-B603-411D-AFFE-61784A07906D</string>
 	<key>command</key>
-	<string>#! /Applications/factor/factor
+	<string>#!/usr/bin/env ruby
+require "#{ENV["TM_BUNDLE_SUPPORT"]}/lib/tm_factor"
 
-"TM_FILEPATH" os-env [ parent-directory ] [ file-name dup ] bi {
-{ [ dup "docs.factor" tail? ] [ drop 11 tail* "tests.factor" append append ] }
-{ [ "-tests.factor" tail? ] [ 13 tail* ".factor" append append ] }
-[ 7 tail* [ "-docs.factor" append append ] keep over exists? [ drop ] [ scaffold-help ] if ]
-} cond 0 textmate</string>
+x = ENV["TM_FILEPATH"][/\/([^\/]+\.factor)/,1]
+y = x.sub("-tests","").sub("docs", "tests")
+if x == y then
+  z = x.sub(".factor","")
+  factor_eval(%Q(USING: tools.scaffold #{z} ;\n"#{z}" scaffold-help))
+  y = x.sub(".factor", "-docs.factor")
+end
+exec "mate #{ENV["TM_FILEPATH"][/(.*\/)[^\/]+\.factor/,1] &lt;&lt; y}"</string>
 	<key>fallbackInput</key>
 	<string>word</string>
 	<key>input</key>
 	<string>none</string>
 	<key>keyEquivalent</key>
-	<string>^@	</string>
+	<string>^@`</string>
 	<key>name</key>
 	<string>Cycle Vocabs/Docs/Tests</string>
 	<key>output</key>

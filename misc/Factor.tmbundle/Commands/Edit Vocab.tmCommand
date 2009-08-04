@@ -4,23 +4,29 @@
 <dict>
 	<key>beforeRunningCommand</key>
 	<string>nop</string>
+	<key>bundleUUID</key>
+	<string>8061D2F3-B603-411D-AFFE-61784A07906D</string>
 	<key>command</key>
 	<string>#!/usr/bin/env ruby
 
 require "#{ENV["TM_BUNDLE_SUPPORT"]}/lib/tm_factor"
+
 doc = STDIN.read
-factor_run(%Q(USE: vocabs.loader\n "#{doc[/\bIN:\s(\S+)/, 1]}" reload))</string>
+word = line_current_word(ENV["TM_CURRENT_LINE"], ENV["TM_LINE_INDEX"].to_i)
+puts factor_eval(%Q(#{doc_using_statements(doc)} USE: editors\n "#{word}" edit-vocab))</string>
+	<key>fallbackInput</key>
+	<string>word</string>
 	<key>input</key>
 	<string>document</string>
 	<key>keyEquivalent</key>
-	<string>^r</string>
+	<string>@V</string>
 	<key>name</key>
-	<string>Reload</string>
+	<string>Edit Vocab</string>
 	<key>output</key>
 	<string>discard</string>
 	<key>scope</key>
 	<string>source.factor</string>
 	<key>uuid</key>
-	<string>8088D204-FFD7-4384-8FDD-A01536FFD0E7</string>
+	<string>0034EC1C-DAD1-498F-82FD-BEF7015F84EE</string>
 </dict>
 </plist>
