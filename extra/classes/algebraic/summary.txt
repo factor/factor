@@ -1,1 +1,0 @@
-Haskell-like algebraic data types
