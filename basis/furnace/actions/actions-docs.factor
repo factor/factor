@@ -33,18 +33,6 @@ HELP: new-action
 HELP: page-action
 { $class-description "The class of Chloe page actions. These are actions whose " { $slot "display" } " slot is pre-set to serve the Chloe template stored in the " { $slot "page" } " slot." } ;
 
-HELP: param
-{ $values
-     { "name" string }
-     { "value" string }
-}
-{ $description "Outputs the value of a query parameter (if the current request is a GET or HEAD request) or a POST parameter (if the current request is a POST request)." }
-{ $notes "Instead of using this word, it is better to use " { $link validate-params } " and then access parameters via " { $link "html.forms.values" } " words." } ;
-
-HELP: params
-{ $var-description "A variable holding an assoc of query parameters (if the current request is a GET or HEAD request) or POST parameters (if the current request is a POST request)." }
-{ $notes "Instead of using this word, it is better to use " { $link validate-params } " and then access parameters via " { $link "html.forms.values" } " words." } ;
-
 HELP: validate-integer-id
 { $description "A utility word which validates an integer parameter named " { $snippet "id" } "." }
 { $examples
@@ -103,7 +91,7 @@ $nl
 ARTICLE: "furnace.actions.config" "Furnace action configuration"
 "Actions have the following slots:"
 { $table
-    { { $slot "rest" } { "A parameter name to map the rest of the URL, after the action name, to. If this is not set, then navigating to a URL where the action is not the last path component will return to the client with an error." } }
+  { { $slot "rest" } { "A parameter name to map the rest of the URL, after the action name, to. If this is not set, then navigating to a URL where the action is not the last path component will return to the client with an error. A more general facility can be found in the " { $vocab-link "http.server.rewrite" } " vocabulary." } }
     { { $slot "init" } { "A quotation called at the beginning of a GET or HEAD request. Typically this quotation configures " { $link "html.forms" } " and parses query parameters." } }
     { { $slot "authorize" } { "A quotation called at the beginning of a GET, HEAD or POST request. In GET requests, it is called after the " { $slot "init" } " quotation; in POST requests, it is called after the " { $slot "validate" } " quotation. By convention, this quotation performs custom authorization checks which depend on query parameters or POST parameters." } }
     { { $slot "display" } { "A quotation called after the " { $slot "init" } " quotation in a GET request. This quotation must return an HTTP " { $link response } "." } }
@@ -144,10 +132,8 @@ ARTICLE: "furnace.actions.lifecycle" "Furnace action lifecycle"
 "Any one of the above steps can perform validation; if " { $link validation-failed } " is called during a POST request, the client is sent back to the page containing the form submission, with current form values and validation errors passed in a " { $link "furnace.conversations" } "." ;
 
 ARTICLE: "furnace.actions.impl" "Furnace actions implementation"
-"The following words are used by the action implementation and there is rarely any reason to call them directly:"
-{ $subsection new-action }
-{ $subsection param }
-{ $subsection params } ;
+"The following parametrized constructor should be called from constructors for subclasses of " { $link action } ":"
+{ $subsection new-action } ;
 
 ARTICLE: "furnace.actions" "Furnace actions"
 "The " { $vocab-link "furnace.actions" } " vocabulary implements a type of responder, called an " { $emphasis "action" } ", which handles the form validation lifecycle."
