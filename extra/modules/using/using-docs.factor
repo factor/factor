@@ -8,5 +8,4 @@ ABOUT: { "modules.using" "use" }
 
 HELP: USING*:
 { $syntax "USING: rpc-server::module fetch-sever:module { module qualified-name } { module => word ... } { qualified-module } { module EXCEPT word ... } { module word => importname } ;" }
-{ $description "Adds vocabularies to the search path. Vocabularies can be loaded off a server or called as an rpc if preceded by a valid hostname. Bracketed pairs facilitate all types of qualified imports on both remote and local modules." }
-"To use the 'USING*:' without explicitly importing modules.using first, add '\"modules.using\" require' to your .factor-boot-rc" ;
+{ $description "Adds vocabularies to the search path. Vocabularies can be loaded off a server or called as an rpc if preceded by a valid hostname. Bracketed pairs facilitate all types of qualified imports on both remote and local modules." } ;
