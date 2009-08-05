@@ -606,6 +606,8 @@ ALIAS: PINSRQ PINSRD
 : PSHUFLW    ( dest src imm -- ) HEX: 70 HEX: f2 3-operand-rm-sse ;
 : PSHUFHW    ( dest src imm -- ) HEX: 70 HEX: f3 3-operand-rm-sse ;
 
+<PRIVATE
+
 : (PSRLW-imm) ( dest imm -- ) BIN: 010 HEX: 71 HEX: 66 2-operand-sse-shift ;
 : (PSRAW-imm) ( dest imm -- ) BIN: 100 HEX: 71 HEX: 66 2-operand-sse-shift ;
 : (PSLLW-imm) ( dest imm -- ) BIN: 110 HEX: 71 HEX: 66 2-operand-sse-shift ;
@@ -623,6 +625,8 @@ ALIAS: PINSRQ PINSRD
 : (PSLLW-reg) ( dest src -- ) HEX: f1 HEX: 66 2-operand-rm-sse ;
 : (PSLLD-reg) ( dest src -- ) HEX: f2 HEX: 66 2-operand-rm-sse ;
 : (PSLLQ-reg) ( dest src -- ) HEX: f3 HEX: 66 2-operand-rm-sse ;
+
+PRIVATE>
 
 : PSRLW ( dest src -- ) dup integer? [ (PSRLW-imm) ] [ (PSRLW-reg) ] if ;
 : PSRAW ( dest src -- ) dup integer? [ (PSRAW-imm) ] [ (PSRAW-reg) ] if ;
