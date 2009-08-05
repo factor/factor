@@ -11,7 +11,7 @@ TUPLE: call-site tail? node label ;
 
 <PRIVATE
 
-TUPLE: call-tree-node tail? label children calls ;
+TUPLE: call-graph-node tail? label children calls ;
 
 : (tail-calls) ( tail? seq -- seq' )
     reverse [ swap [ and ] keep ] map nip reverse ;
@@ -27,40 +27,40 @@ TUPLE: call-tree-node tail? label children calls ;
 
 SYMBOLS: children calls ;
 
-GENERIC: node-call-tree ( tail? node -- )
+GENERIC: node-call-graph ( tail? node -- )
 
-: (build-call-tree) ( tail? nodes -- )
+: (build-call-graph) ( tail? nodes -- )
     [ tail-calls ] keep
-    [ node-call-tree ] 2each ;
+    [ node-call-graph ] 2each ;
 
-: build-call-tree ( nodes -- labels calls )
+: build-call-graph ( nodes -- labels calls )
     [
         V{ } clone children set
         V{ } clone calls set
-        [ t ] dip (build-call-tree)
+        [ t ] dip (build-call-graph)
         children get
         calls get
     ] with-scope ;
 
-M: #return-recursive node-call-tree
+M: #return-recursive node-call-graph
     nip dup label>> (>>return) ;
 
-M: #call-recursive node-call-tree
+M: #call-recursive node-call-graph
     [ dup label>> call-site boa ] keep
     [ drop calls get push ]
     [ label>> calls>> push ] 2bi ;
 
-M: #recursive node-call-tree
+M: #recursive node-call-graph
     [ label>> V{ } clone >>calls drop ]
     [
-        [ label>> ] [ child>> build-call-tree ] bi
-        call-tree-node boa children get push
+        [ label>> ] [ child>> build-call-graph ] bi
+        call-graph-node boa children get push
     ] bi ;
 
-M: #branch node-call-tree
-    children>> [ (build-call-tree) ] with each ;
+M: #branch node-call-graph
+    children>> [ (build-call-graph) ] with each ;
 
-M: node node-call-tree 2drop ;
+M: node node-call-graph 2drop ;
 
 SYMBOLS: not-loops recursive-nesting ;
 
@@ -68,10 +68,10 @@ SYMBOLS: not-loops recursive-nesting ;
 
 : not-a-loop? ( label -- ? ) not-loops get key? ;
 
-: non-tail-calls ( call-tree-node -- seq )
+: non-tail-calls ( call-graph-node -- seq )
     calls>> [ tail?>> not ] filter ;
 
-: visit-back-edges ( call-tree -- )
+: visit-back-edges ( call-graph -- )
     [
         [ non-tail-calls [ label>> not-a-loop ] each ]
         [ children>> visit-back-edges ]
@@ -90,7 +90,7 @@ SYMBOL: changed?
         ] with all? drop
     ] if ;
 
-: detect-cross-frame-calls ( call-tree -- )
+: detect-cross-frame-calls ( call-graph -- )
     ! Suppose we have a nesting of recursives A --> B --> C
     ! B tail-calls A, and C non-tail-calls B. Then A cannot be
     ! a loop, it needs its own procedure, since the call from
@@ -107,14 +107,14 @@ SYMBOL: changed?
     [ call ] [ changed? get [ while-changing ] [ drop ] if ] bi ;
     inline recursive
 
-: detect-loops ( call-tree -- )
+: detect-loops ( call-graph -- )
     H{ } clone not-loops set
     V{ } clone recursive-nesting set
     [ visit-back-edges ]
     [ '[ _ detect-cross-frame-calls ] while-changing ]
     bi ;
 
-: mark-loops ( call-tree -- )
+: mark-loops ( call-graph -- )
     [
         [ label>> dup not-a-loop? [ t >>loop? ] unless drop ]
         [ children>> mark-loops ]
@@ -123,6 +123,11 @@ SYMBOL: changed?
 
 PRIVATE>
 
+SYMBOL: call-graph
+
 : analyze-recursive ( nodes -- nodes )
-    dup build-call-tree drop
-    [ detect-loops ] [ mark-loops ] bi ;
+    dup build-call-graph drop
+    [ call-graph set ]
+    [ detect-loops ]
+    [ mark-loops ]
+    tri ;
