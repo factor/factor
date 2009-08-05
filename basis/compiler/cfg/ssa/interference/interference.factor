@@ -6,6 +6,11 @@ compiler.cfg.def-use compiler.cfg.dominance
 compiler.cfg.ssa.interference.live-ranges ;
 IN: compiler.cfg.ssa.interference
 
+! Interference testing using SSA properties. Actually the only SSA property
+! used here is that definitions dominate uses; because of this, the input
+! is allowed to have multiple definitions of each vreg as long as they're
+! all in the same basic block. This is needed because two-operand conversion
+! runs before coalescing, which uses SSA interference testing.
 <PRIVATE
 
 :: kill-after-def? ( vreg1 vreg2 bb -- ? )
@@ -47,8 +52,9 @@ PRIVATE>
         [ 2drop 2drop f ]
     } cond ;
 
-! Debug this stuff later
 <PRIVATE
+
+! Debug this stuff later
 
 : quadratic-test? ( seq1 seq2 -- ? ) [ length ] bi@ + 10 < ;
 

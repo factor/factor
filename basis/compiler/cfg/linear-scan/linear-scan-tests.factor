@@ -470,7 +470,6 @@ USING: math.private ;
         clone dup [ start>> ] [ end>> ] bi <live-range> 1vector >>ranges
     ] map ;
 
-! Coalescing interacted badly with splitting
 [ ] [
     {
         T{ live-interval
@@ -478,7 +477,6 @@ USING: math.private ;
             { start 14 }
             { end 17 }
             { uses V{ 14 15 16 17 } }
-            { copy-from V int-regs 67 }
         }
         T{ live-interval
             { vreg V int-regs 67 }
@@ -503,7 +501,6 @@ USING: math.private ;
             { start 10 }
             { end 18 }
             { uses V{ 10 11 12 18 } }
-            { copy-from V int-regs 56 }
         }
         T{ live-interval
             { vreg V int-regs 60 }
@@ -559,7 +556,6 @@ USING: math.private ;
             { start 44 }
             { end 56 }
             { uses V{ 44 45 45 46 56 } }
-            { copy-from V int-regs 3686445 }
         }
         T{ live-interval
             { vreg V int-regs 3686198 }
@@ -572,7 +568,6 @@ USING: math.private ;
             { start 46 }
             { end 49 }
             { uses V{ 46 47 47 49 } }
-            { copy-from V int-regs 3686449 }
         }
         T{ live-interval
             { vreg V int-regs 3686196 }
@@ -603,7 +598,6 @@ USING: math.private ;
             { start 49 }
             { end 52 }
             { uses V{ 49 50 50 52 } }
-            { copy-from V int-regs 3686454 }
         }
         T{ live-interval
             { vreg V int-regs 3686461 }
@@ -622,42 +616,36 @@ USING: math.private ;
             { start 54 }
             { end 76 }
             { uses V{ 54 55 55 76 } }
-            { copy-from V int-regs 3686464 }
         }
         T{ live-interval
             { vreg V int-regs 3686470 }
             { start 58 }
             { end 60 }
             { uses V{ 58 59 59 60 } }
-            { copy-from V int-regs 3686469 }
         }
         T{ live-interval
             { vreg V int-regs 3686469 }
             { start 56 }
             { end 58 }
             { uses V{ 56 57 57 58 } }
-            { copy-from V int-regs 3686449 }
         }
         T{ live-interval
             { vreg V int-regs 3686473 }
             { start 60 }
             { end 62 }
             { uses V{ 60 61 61 62 } }
-            { copy-from V int-regs 3686470 }
         }
         T{ live-interval
             { vreg V int-regs 3686479 }
             { start 62 }
             { end 64 }
             { uses V{ 62 63 63 64 } }
-            { copy-from V int-regs 3686473 }
         }
         T{ live-interval
             { vreg V int-regs 3686735 }
             { start 78 }
             { end 96 }
             { uses V{ 78 79 79 96 } }
-            { copy-from V int-regs 3686372 }
         }
         T{ live-interval
             { vreg V int-regs 3686482 }
@@ -688,7 +676,6 @@ USING: math.private ;
             { start 66 }
             { end 75 }
             { uses V{ 66 67 67 75 } }
-            { copy-from V int-regs 3686483 }
         }
         T{ live-interval
             { vreg V int-regs 3687509 }
@@ -719,7 +706,6 @@ USING: math.private ;
             { start 69 }
             { end 74 }
             { uses V{ 69 70 70 74 } }
-            { copy-from V int-regs 3686491 }
         }
         T{ live-interval
             { vreg V int-regs 3687778 }
@@ -762,7 +748,6 @@ USING: math.private ;
             { start 72 }
             { end 74 }
             { uses V{ 72 73 73 74 } }
-            { copy-from V int-regs 3686499 }
         }
         T{ live-interval
             { vreg V int-regs 3687780 }
@@ -877,7 +862,6 @@ USING: math.private ;
             { start 27 }
             { end 30 }
             { uses V{ 27 28 28 30 } }
-            { copy-from V int-regs 3686300 }
         }
         T{ live-interval
             { vreg V int-regs 3686306 }
@@ -950,7 +934,6 @@ USING: math.private ;
             { start 243 }
             { end 245 }
             { uses V{ 243 244 244 245 } }
-            { copy-from V int-regs 3687845 }
         }
         T{ live-interval
             { vreg V int-regs 3687850 }
@@ -1119,7 +1102,6 @@ USING: math.private ;
             { start 141 }
             { end 143 }
             { uses V{ 141 142 142 143 } }
-            { copy-from V int-regs 3687377 }
         }
         T{ live-interval
             { vreg V int-regs 3687381 }
@@ -1174,7 +1156,6 @@ USING: math.private ;
             { start 293 }
             { end 295 }
             { uses V{ 293 294 294 295 } }
-            { copy-from V int-regs 3687087 }
         }
         T{ live-interval
             { vreg V int-regs 3687403 }
@@ -1345,7 +1326,6 @@ USING: math.private ;
             { start 78 }
             { end 96 }
             { uses V{ 78 79 96 } }
-            { copy-from V int-regs 6372 }
         }
         T{ live-interval
             { vreg V int-regs 6483 }

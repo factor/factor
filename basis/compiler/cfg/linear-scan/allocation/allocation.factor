@@ -3,7 +3,6 @@
 USING: accessors assocs heaps kernel namespaces sequences fry math
 math.order combinators arrays sorting compiler.utilities
 compiler.cfg.linear-scan.live-intervals
-compiler.cfg.linear-scan.allocation.coalescing
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.state ;
@@ -29,13 +28,11 @@ IN: compiler.cfg.linear-scan.allocation
     second 0 = ; inline
 
 : assign-register ( new -- )
-    dup coalesce? [ coalesce ] [
-        dup register-status {
-            { [ dup no-free-registers? ] [ drop assign-blocked-register ] }
-            { [ 2dup register-available? ] [ register-available ] }
-            [ drop assign-blocked-register ]
-        } cond
-    ] if ;
+    dup register-status {
+        { [ dup no-free-registers? ] [ drop assign-blocked-register ] }
+        { [ 2dup register-available? ] [ register-available ] }
+        [ drop assign-blocked-register ]
+    } cond ;
 
 : handle-interval ( live-interval -- )
     [

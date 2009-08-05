@@ -45,7 +45,7 @@ ERROR: splitting-atomic-interval ;
     f >>spill-to ; inline
 
 : split-after ( after -- after' )
-    f >>copy-from f >>reg f >>reload-from ; inline
+    f >>reg f >>reload-from ; inline
 
 :: split-interval ( live-interval n -- before after )
     live-interval n check-split
