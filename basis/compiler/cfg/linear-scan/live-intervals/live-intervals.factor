@@ -13,8 +13,7 @@ C: <live-range> live-range
 TUPLE: live-interval
 vreg
 reg spill-to reload-from
-start end ranges uses
-copy-from ;
+start end ranges uses ;
 
 GENERIC: covers? ( insn# obj -- ? )
 
@@ -101,15 +100,6 @@ M: vreg-insn compute-live-intervals*
     [ [ uses-vregs ] 2dip '[ [ _ ] dip _ handle-input ] each ]
     [ [ temp-vregs ] 2dip '[ [ _ ] dip _ handle-temp ] each ]
     3tri ;
-
-: record-copy ( insn -- )
-    [ dst>> live-intervals get at ] [ src>> ] bi >>copy-from drop ;
-
-M: ##copy compute-live-intervals*
-    [ call-next-method ] [ record-copy ] bi ;
-
-M: ##copy-float compute-live-intervals*
-    [ call-next-method ] [ record-copy ] bi ;
 
 : handle-live-out ( bb -- )
     live-out keys
