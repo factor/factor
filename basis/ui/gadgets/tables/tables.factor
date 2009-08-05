@@ -7,7 +7,7 @@ ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
 ui.gestures ui.render ui.pens.solid ui.text ui.commands ui.images
 ui.gadgets.menus ui.gadgets.line-support models
 combinators combinators.short-circuit
-fonts locals strings sorting ;
+fonts locals strings sequences.extras sets ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -42,40 +42,33 @@ focus-border-color
 { mouse-color initial: COLOR: black }
 column-line-color
 selection-required?
-selected-indices selected-values
-selected-indices*
+selection
+selection-index
+selected-indices
 mouse-index
 { takes-focus? initial: t }
 focused?
 multiple-selection? ;
 
-: in>out ( array -- val/f ) [ f ] [ first ] if-empty ;
-: out>in ( val/f -- array ) [ 1array ] [ { } ] if* ;
-IN: accessors
-SLOT: selected-value
-SLOT: selected-index
-SLOT: selected-index*
-M: table selected-value>> selected-values>> [ in>out ] <illusion> ;
-M: table (>>selected-value) [ [ out>in ] <activated-illusion> ] dip (>>selected-values) ;
-M: table selected-index>> selected-indices>> in>out ;
-M: table (>>selected-index) [ out>in ] dip (>>selected-indices) ;
-M: table selected-index*>> selected-indices*>> [ in>out ] <illusion> ;
-M: table (>>selected-index*) [ [ out>in ] <activated-illusion> ] dip (>>selected-indices*) ;
+<PRIVATE
 
-IN: ui.gadgets.tables
-: push-selected-index ( table n -- table ) 2dup swap selected-indices>> index
-   [ drop ] [ over selected-indices>> swap suffix natural-sort >>selected-indices ] if ;
+: push-selected-index ( table n -- table ) swap [ insert-sorted prune >array ] change-selected-indices ;
+: multiple>single ( values -- value/f ? ) [ f f ] [ first t ] if-empty ;
+: multiple>single* ( values -- value/f ) multiple>single drop ;
+: selected-index ( table -- n ) selected-indices>> multiple>single* ;
+: set-selected-index ( table n -- table ) 1array >>selected-indices ;
+PRIVATE>
+: selected ( table -- index/indices ) dup multiple-selection?>> [ selected-indices>> ] [ selected-index ] if ;
 
 : new-table ( rows renderer class -- table )
     new-line-gadget
         swap >>renderer
         swap >>model
-        { } >>selected-indices
-        { } <model> >>selected-values
-        { } <model> >>selected-indices*
         sans-serif-font >>font
         focus-border-color >>focus-border-color
-        transparent >>column-line-color ; inline
+        transparent >>column-line-color
+        f <model> >>selection-index
+        f <model> >>selection ;
 
 : <table> ( rows renderer -- table ) table new-table ;
 
@@ -165,9 +158,9 @@ M: table layout*
 : draw-focused-row ( table -- )
     {
         { [ dup focused?>> not ] [ drop ] }
-        { [ dup selected-index>> not ] [ drop ] }
+        { [ dup selected-index not ] [ drop ] }
         [
-            [ ] [ selected-index>> ] [ focus-border-color>> gl-color ] tri
+            [ ] [ selected-index ] [ focus-border-color>> gl-color ] tri
             row-bounds gl-rect
         ]
     } cond ;
@@ -264,16 +257,16 @@ PRIVATE>
 
 : selected-rows ( table -- {value} )
     [ (selected-rows) ] [ renderer>> ] bi [ row-value ] curry map ;
-
-: multiple>single ( values -- value/f ? ) [ f f ] [ first t ] if-empty ;
 : (selected-row) ( table -- value/f ? ) (selected-rows) multiple>single ;
 : selected-row ( table -- value/f ? ) selected-rows multiple>single ;
 
 <PRIVATE
 
-: update-selected-values ( table -- )
-    [ [ selected-rows ] [ selected-values>> ] bi set-model ]
-    [ [ selected-indices>> ] [ selected-indices*>> ] bi set-model ] bi ;
+: set-table-model ( model value multiple? -- ) [ multiple>single* ] unless swap set-model ;
+
+: update-selected ( table -- )
+    [ [ selection>> ] [ selected-rows ] [ multiple-selection?>> ] tri set-table-model ]
+    [ [ selection-index>> ] [ selected-indices>> ] [ multiple-selection?>> ] tri set-table-model ] bi ;
 
 : show-row-summary ( table n -- )
     over nth-row
@@ -295,7 +288,7 @@ PRIVATE>
     } 1&& ;
 
 : (update-selected-indices) ( table -- {n}/f )
-    [ selected-values>> value>> ] keep
+    [ selection>> value>> dup array? [ 1array ] unless ] keep
     [ find-row-index ] curry map [ ] filter [ f ] when-empty ;
 
 : update-selected-indices ( table -- {n}/f )
@@ -308,7 +301,7 @@ M: table model-changed
     nip dup update-selected-indices [ { } ] unless* {
         [ >>selected-indices f >>mouse-index drop ]
         [ [ f ] [ first ] if-empty show-row-summary ]
-        [ drop update-selected-values ]
+        [ drop update-selected ]
         [ drop relayout ]
     } 2cleave ;
 
@@ -324,7 +317,7 @@ M: table model-changed
 
 : (select-row) ( table n -- )
     [ scroll-to-row ]
-    [ >>selected-index relayout-1 ]
+    [ set-selected-index relayout-1 ]
     2bi ;
 
 : mouse-row ( table -- n )
@@ -341,7 +334,7 @@ M: table model-changed
 : table-button-down ( table -- ) [ (select-row) ] swap (table-button-down) ;
 : continued-button-down ( table -- ) dup multiple-selection?>> [ [ add-selected-row ] swap (table-button-down) ] [ table-button-down ] if ;
 : thru-button-down ( table -- ) dup multiple-selection?>> [
-    [ 2dup over selected-index>> (a,b) swap
+    [ 2dup over selected-index (a,b) swap
       [ swap push-selected-index drop ] curry each add-selected-row ]
     swap (table-button-down) ] [ table-button-down ] if ;
 
@@ -360,7 +353,7 @@ PRIVATE>
 
 : table-button-up ( table -- )
     dup [ mouse-row ] keep valid-line? [
-        dup row-action? [ row-action ] [ update-selected-values ] if
+        dup row-action? [ row-action ] [ update-selected ] if
     ] [ drop ] if ;
 
 PRIVATE>
@@ -368,14 +361,14 @@ PRIVATE>
 : select-row ( table n -- )
     over validate-line
     [ (select-row) ]
-    [ drop update-selected-values ]
+    [ drop update-selected ]
     [ show-row-summary ]
     2tri ;
 
 <PRIVATE
 
 : prev/next-row ( table n -- )
-    [ dup selected-index>> ] dip '[ _ + ] [ 0 ] if* select-row ;
+    [ dup selected-index ] dip '[ _ + ] [ 0 ] if* select-row ;
     
 : previous-row ( table -- )
     -1 prev/next-row ;

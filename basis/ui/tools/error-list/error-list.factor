@@ -71,7 +71,7 @@ M: source-file-renderer filled-column drop 1 ;
         60 >>min-cols
         60 >>max-cols
         t >>selection-required?
-        error-list source-file>> >>selected-value ;
+        error-list source-file>> >>selection ;
 
 SINGLETON: error-renderer
 
@@ -120,7 +120,7 @@ M: error-renderer column-alignment drop { 0 1 0 0 } ;
         60 >>min-cols
         60 >>max-cols
         t >>selection-required?
-        error-list error>> >>selected-value ;
+        error-list error>> >>selection ;
 
 TUPLE: error-display < track ;
 
