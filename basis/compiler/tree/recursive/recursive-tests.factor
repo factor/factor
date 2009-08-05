@@ -146,7 +146,7 @@ DEFER: a''
 
 [ t ] [
     [ a'' ] build-tree analyze-recursive
-    \ a'' label-is-not-loop?
+    \ a'' label-is-loop?
 ] unit-test
 
 [ t ] [
@@ -156,10 +156,10 @@ DEFER: a''
 
 [ t ] [
     [ b'' ] build-tree analyze-recursive
-    \ a'' label-is-not-loop?
+    \ a'' label-is-loop?
 ] unit-test
 
-[ f ] [
+[ t ] [
     [ b'' ] build-tree analyze-recursive
     \ b'' label-is-not-loop?
 ] unit-test

@@ -3,6 +3,7 @@
 USING: kernel sequences math combinators accessors namespaces
 fry disjoint-sets
 compiler.tree
+compiler.tree.recursive
 compiler.tree.combinators
 compiler.tree.escape-analysis.nodes
 compiler.tree.escape-analysis.branches
@@ -67,5 +68,5 @@ M: #return-recursive escape-analysis* ( #return-recursive -- )
     [ call-next-method ]
     [
         [ in-d>> ] [ label>> calls>> ] bi
-        [ out-d>> escaping-values get '[ _ equate ] 2each ] with each
+        [ node>> out-d>> escaping-values get '[ _ equate ] 2each ] with each
     ] bi ;
