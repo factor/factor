@@ -21,7 +21,7 @@ IN: compiler.tree.propagation.recursive
     in-d>> [ value-info ] map ;
 
 : recursive-stacks ( #enter-recursive -- stacks initial )
-    [ label>> calls>> [ node-input-infos ] map flip ]
+    [ label>> calls>> [ node>> node-input-infos ] map flip ]
     [ latest-input-infos ] bi ;
 
 : generalize-counter-interval ( interval initial-interval -- interval' )
