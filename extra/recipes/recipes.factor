@@ -11,7 +11,7 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
 "recipes.db" temp-file <sqlite-db> recipe define-db
 : top-recipes ( offset search -- recipes ) <query> T{ recipe } rot >>title >>tuple
     "votes" >>order 30 >>limit swap >>offset get-tuples ;
-: top-genres ( -- genres ) f f top-recipes [ genre>> ] map prune 4 (head-slice) ;
+: top-genres ( -- genres ) f f top-recipes [ genre>> ] map prune 4 short head-slice ;
 
 : interface ( -- book ) [ 
      [

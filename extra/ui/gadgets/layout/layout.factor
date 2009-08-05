@@ -35,7 +35,7 @@ M: model -> dup , ;
 
 : <spacer> ( -- ) <gadget> 1 <layout> , ;
 
-: add-layout ( track layout -- track ) [ gadget>> ] [ size>> ] bi track-add ; inline
+: add-layout ( track layout -- track ) [ gadget>> ] [ size>> ] bi track-add ;
 : layouts ( sized? gadgets -- layouts ) [ [ gadget? ] [ layout? ] bi or ] filter swap
    [ [ dup layout? [ f <layout> ] unless ] map ]
    [ [ dup gadget? [ gadget>> ] unless ] map ] if ;
@@ -61,10 +61,16 @@ SYNTAX: $ CREATE-WORD dup
 : insert-size ( number parent size -- ) -rot [ but-last insert-nth ] change-sizes drop ;
 : insertion-point ( placeholder -- number parent ) dup parent>> [ children>> index ] keep ;
 
+GENERIC: >layout ( gadget -- layout )
+M: gadget >layout f <layout> ;
+M: layout >layout ;
+
+GENERIC# (add-gadget-at) 2 ( parent item n -- )
+M: gadget (add-gadget-at) -rot [ add-gadget ] keep insert-gadget ;
+M: track (add-gadget-at) -rot >layout [ add-layout ] keep [ gadget>> insert-gadget ] [ size>> insert-size ] 3bi ;
+
 GENERIC# add-gadget-at 1 ( item location -- )
-M: gadget add-gadget-at dup parent>> track? [ [ f <layout> ] dip add-gadget-at ]
-    [ insertion-point rot [ add-gadget ] keep insert-gadget ] if ;
-M: layout add-gadget-at insertion-point rot [ add-layout ] keep [ gadget>> insert-gadget ] [ size>> insert-size ] 3bi ;
+M: object add-gadget-at insertion-point -rot (add-gadget-at) ;
 M: model add-gadget-at parent>> dup book:book? [ "No models in books" throw ]
    [ dup model>> dup collection? [ nip swap add-connection ] [ drop [ 1array <collection> ] dip (>>model) ] if ] if ;
 : track-add-at ( item location size -- ) swap [ <layout> ] dip add-gadget-at ;
