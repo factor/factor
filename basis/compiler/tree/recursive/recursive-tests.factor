@@ -1,9 +1,10 @@
 IN: compiler.tree.recursive.tests
-USING: compiler.tree.recursive tools.test
-kernel combinators.short-circuit math sequences accessors
+USING: tools.test kernel combinators.short-circuit math sequences accessors
 compiler.tree
 compiler.tree.builder
-compiler.tree.combinators ;
+compiler.tree.combinators
+compiler.tree.recursive
+compiler.tree.recursive.private ;
 
 [ { f f f f } ] [ f { f t f f } (tail-calls) ] unit-test
 [ { f f f t } ] [ t { f t f f } (tail-calls) ] unit-test
@@ -146,7 +147,7 @@ DEFER: a''
 
 [ t ] [
     [ a'' ] build-tree analyze-recursive
-    \ a'' label-is-loop?
+    \ a'' label-is-not-loop?
 ] unit-test
 
 [ t ] [
@@ -187,3 +188,14 @@ DEFER: a'''
     [ b''' ] build-tree analyze-recursive
     \ a''' label-is-loop?
 ] unit-test
+
+DEFER: b4
+
+: a4 ( a -- b ) dup [ b4 ] when ; inline recursive
+
+: b4 ( a -- b ) dup [ a4 reverse ] when ; inline recursive
+
+[ t ] [ [ b4 ] build-tree analyze-recursive \ a4 label-is-loop? ] unit-test
+[ t ] [ [ b4 ] build-tree analyze-recursive \ b4 label-is-not-loop? ] unit-test
+[ t ] [ [ a4 ] build-tree analyze-recursive \ a4 label-is-not-loop? ] unit-test
+[ t ] [ [ a4 ] build-tree analyze-recursive \ b4 label-is-loop? ] unit-test
