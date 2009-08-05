@@ -79,7 +79,7 @@ debugger "gestures" f {
 
 : com-help ( debugger -- ) error>> error-help-window ;
 
-: com-edit ( debugger -- ) error>> (:edit) ;
+: com-edit ( debugger -- ) error>> edit-error ;
 
 \ com-edit H{ { +listener+ t } } define-command
 
