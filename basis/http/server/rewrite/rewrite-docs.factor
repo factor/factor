@@ -39,7 +39,7 @@ HELP: <vhost-rewrite>
     "    <show-blogs-action> >>default"
     "    <display-blog-action> >>child"
     "    \"blog_id\" >>param"
-    "    \"blogs.vegan.net >>suffix"
+    "    \"blogs.vegan.net\" >>suffix"
   }
 } ;
 
