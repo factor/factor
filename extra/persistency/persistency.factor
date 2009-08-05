@@ -1,6 +1,7 @@
-USING: accessors arrays byte-arrays calendar classes classes.tuple
-classes.tuple.parser combinators db db.tuples db.types kernel
-math sequences strings unicode.case urls words ;
+USING: accessors arrays byte-arrays calendar classes
+classes.tuple classes.tuple.parser combinators db db.queries
+db.tuples db.types kernel math nmake parser sequences strings
+strings.parser unicode.case urls words ;
 IN: persistency
 
 TUPLE: persistent id ;
@@ -23,3 +24,7 @@ SYNTAX: STORED-TUPLE: parse-tuple-definition [ drop persistent ] dip [ remove-ty
 : store-tuple ( tuple -- ) [ insert-tuple ] w/db ;
 : modify-tuple ( tuple -- ) [ update-tuple ] w/db ;
 : remove-tuples ( tuple -- ) [ delete-tuples ] w/db ;
+    
+TUPLE: pattern value ; C: <pattern> pattern
+SYNTAX: %" parse-string <pattern> parsed ;
+M: pattern where value>> over column-name>> 0% " LIKE " 0% bind# ;

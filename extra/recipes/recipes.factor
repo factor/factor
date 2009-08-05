@@ -1,4 +1,4 @@
-USING: accessors arrays colors.constants combinators db.queries
+USING: accessors arrays colors.constants combinators
 db.sqlite db.tuples db.types kernel locals math
 monads persistency sequences sequences.extras ui ui.gadgets.controls
 ui.gadgets.layout models.combinators ui.gadgets.labels
