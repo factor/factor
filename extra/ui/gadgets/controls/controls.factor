@@ -33,7 +33,7 @@ M: table tbl:row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 : indexed ( table -- table ) f >>val-quot ;
 
 TUPLE: model-field < field model* ;
-: init-field ( field -- field' ) [ [ ] [ "" ] if* ] change-value ;
+: init-field ( model -- model' ) [ [ ] [ "" ] if* ] change-value ;
 : <model-field> ( model -- gadget ) model-field new-field swap init-field >>model* ;
 M: model-field graft*
     [ [ model*>> value>> ] [ editor>> ] bi set-editor-string ]
@@ -45,13 +45,12 @@ M: model-field ungraft*
 M: model-field model-changed 2dup model*>> =
     [ [ value>> ] [ editor>> ] bi* set-editor-string ]
     [ nip [ editor>> editor-string ] [ model*>> ] bi set-model ] if ;
-
+ 
+: (new-field) ( editor field -- gadget ) [ new-editor ] dip new-border dup gadget-child >>editor
+    field-theme { 1 0 } >>align ; inline
 : <model-field*> ( -- field ) "" <model> <model-field> ;
 : <empty-field> ( model -- field ) "" <model> switch-models <model-field> ;
-: (model-editor) ( model class -- gadget )
-    model-field [ new-editor ] dip new-border dup gadget-child >>editor
-    field-theme swap init-field >>model* { 1 0 } >>align ;
-: <model-editor> ( model -- gadget ) multiline-editor (model-editor) ;
+: <model-editor> ( model -- gadget ) multiline-editor model-field (new-field) swap init-field >>model* ;
 : <model-editor*> ( -- editor ) "" <model> <model-editor> ;
 : <empty-editor> ( model -- editor ) "" <model> switch-models <model-editor> ;
 
