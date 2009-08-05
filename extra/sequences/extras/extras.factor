@@ -17,3 +17,5 @@ IN: sequences.extras
 :: combos ( list1 list2 -- result ) list2 [ [ 2array ] curry list1 swap map ] map concat ;
 : find-all ( seq quot -- elts ) [ [ length iota ] keep ] dip
     [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry 2map [ ] filter ; inline
+
+: insert-sorted ( elt seq -- seq ) 2dup [ < ] with find drop over length or swap insert-nth ;
