@@ -11,7 +11,7 @@ TUPLE: call-site tail? node label ;
 
 <PRIVATE
 
-TUPLE: call-tree-node label children calls ;
+TUPLE: call-tree-node tail? label children calls ;
 
 : (tail-calls) ( tail? seq -- seq' )
     reverse [ swap [ and ] keep ] map nip reverse ;
@@ -51,7 +51,6 @@ M: #call-recursive node-call-tree
     [ label>> calls>> push ] 2bi ;
 
 M: #recursive node-call-tree
-    nip
     [ label>> V{ } clone >>calls drop ]
     [
         [ label>> ] [ child>> build-call-tree ] bi
@@ -84,8 +83,9 @@ SYMBOL: changed?
 : check-cross-frame-call ( call-site -- )
     label>> dup not-a-loop? [ drop ] [
         recursive-nesting get <reversed> [
-            2dup eq? [ 2drop f ] [
-                not-a-loop? [ not-a-loop changed? on ] [ drop ] if t
+            2dup label>> eq? [ 2drop f ] [
+                [ label>> not-a-loop? ] [ tail?>> not ] bi or
+                [ not-a-loop changed? on ] [ drop ] if t
             ] if
         ] with all? drop
     ] if ;
@@ -96,7 +96,7 @@ SYMBOL: changed?
     ! a loop, it needs its own procedure, since the call from
     ! C to A crosses a call-frame boundary.
     [
-        [ label>> recursive-nesting get push ]
+        [ recursive-nesting get push ]
         [ calls>> [ check-cross-frame-call ] each ]
         [ children>> detect-cross-frame-calls ] tri
         recursive-nesting get pop*
