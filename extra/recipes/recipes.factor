@@ -39,7 +39,7 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
       <spacer> <model-field*> ->% 1 :> search
       submit ok [ [ drop ] ] <$ 2array merge [ drop ] >>value :> quot
       viewed 0 [ + ] fold search ok t <basic> "all" <model-btn> ALL ->
-      tbl selected-value>> votes [ [ + ] curry change-votes modify-tuple ] 2$>
+      tbl selection>> votes [ [ + ] curry change-votes modify-tuple ] 2$>
         4array merge
         [ drop [ f ] [ "%" dup surround <pattern> ] if-empty top-recipes ] 3fmap :> ups
       ups [ top-genres [ <model-btn> GENRES -> ] map merge ] bind*

@@ -24,8 +24,7 @@ M: table tbl:row-value val-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 M: table tbl:row-color color-quot>> [ call( a -- b ) ]  [ drop f ] if* ;
 
 : new-table ( model class -- table ) f swap tbl:new-table dup >>renderer
-   V{ } clone <basic> >>selected-values V{ } clone <basic> >>selected-indices*
-   f <basic> >>actions dup [ actions>> set-model ] curry >>action ;
+   f <basic> >>actions dup actions>> [ set-model ] curry >>action ;
 : <table> ( model -- table ) table new-table ;
 : <table*> ( -- table ) V{ } clone <model> <table> ;
 : <list> ( column-model -- table ) <table> [ 1array ] >>quot ;
@@ -66,9 +65,7 @@ SYNTAX: IMG-BTN: image-prep [ swap <button> ] curry over push-all ;
 
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;
-M: table output-model dup multiple-selection?>>
-   [ dup val-quot>> [ selected-values>> ] [ selected-indices*>> ] if ]
-   [ dup val-quot>> [ selected-value>> ] [ selected-index*>> ] if ] if ;
+M: table output-model dup val-quot>> [ selection>> ] [ selection-index>> ] if ;
 M: model-field output-model model*>> ;
 M: scroller output-model viewport>> children>> first output-model ;
 M: slider output-model model>> range-model ;
