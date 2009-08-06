@@ -99,7 +99,7 @@ M: scroller layout*
     [ call-next-method ] [
         dup follows>>
         [ update-scroller ] [ >>follows drop ] 2bi
-    ] bi ; 
+    ] bi ;
 
 M: scroller focusable-child*
     viewport>> ;
@@ -129,21 +129,28 @@ M: scroller model-changed
     <scroller-model> >>model
     swap >>column-header ; inline
 
-: build-children ( gadget scroller -- scroller )
-    dup model>> dependencies>>
-    [ first horizontal <slider> >>x ]
-    [ second vertical <slider> >>y ] bi
-    [ nip ] [ model>> <viewport> ] 2bi >>viewport ; inline
-
 PRIVATE>
 
-: <scroller> ( gadget -- scroller )
-    dup viewport-column-header
-    dup [ 2 3 ] [ 2 2 ] if scroller new-frame
+GENERIC# (build-children) 2 ( gadget range orientation -- gadget slider )
+M: scroller (build-children) <slider> ;
+
+<PRIVATE
+: build-children ( gadget scroller -- scroller )
+    dup model>> dependencies>>
+    [ first horizontal (build-children) >>x ]
+    [ second vertical (build-children) >>y ] bi
+    [ nip ] [ model>> <viewport> ] 2bi >>viewport ; inline
+PRIVATE>
+
+: new-scroller ( gadget class -- scroller )
+    [ dup viewport-column-header
+    dup [ 2 3 ] [ 2 2 ] if ] dip new-frame
         init-scroller
         build-children
         dup column-header>>
         [ build-header-scroller ] [ build-scroller ] if ;
+
+: <scroller> ( gadget -- scroller ) scroller new-scroller ;
 
 : scroll>rect ( rect gadget -- )
     dup find-scroller* dup [
@@ -165,3 +172,5 @@ PRIVATE>
 
 : scroll>top ( gadget -- )
     <zero-rect> swap scroll>rect ;
+
+M: scroller output-model viewport>> children>> first output-model ;

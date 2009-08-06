@@ -45,7 +45,7 @@ IN: ui.gadgets.editors.tests
 "hello" <model> <model-field> "field" set
 
 "field" get [
-    [ "hello" ] [ "field" get field-model>> value>> ] unit-test
+    [ "hello" ] [ "field" get model>> value>> ] unit-test
 ] with-grafted-gadget
 
 [ "Hello world." ] [ "Hello    \n    world." join-lines ] unit-test

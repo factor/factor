@@ -1,8 +1,8 @@
-USING: accessors arrays combinators.short-circuit grouping kernel lists
-lists.lazy locals math math.functions math.parser math.ranges
-models.product monads random sequences sets ui ui.gadgets.controls
-ui.gadgets.layout models.combinators ui.gadgets.alerts vectors fry
-ui.gadgets.labels ;
+USING: accessors arrays combinators.short-circuit fry grouping
+kernel lists lists.lazy locals math math.functions math.parser
+math.ranges models.combinators models.product monads random
+sequences sets ui ui.gadgets.alerts ui.gadgets.buttons
+ui.gadgets.editors ui.gadgets.labels ui.gadgets.layout vectors ;
 IN: sudokus
 
 : row ( index -- row ) 1 + 9 / ceiling ;
@@ -29,8 +29,8 @@ IN: sudokus
                [ [ [ <spacer> [ [ <model-field> ->% 2 [ string>number ] fmap ]
                     map <spacer> ] map concat ] <hbox> , ] map concat <spacer> ] map concat <product>
                [ "Difficulty:" <label> , "1" <basic> <model-field> -> [ string>number 1 or 1 + 10 * ] fmap
-               "Generate" <model-border-btn> -> updates [ create ] fmap <spacer>
-               "Hint" <model-border-btn> -> "Solve" <model-border-btn> -> ] <hbox> ,
+               "Generate" <border-button*> -> updates [ create ] fmap <spacer>
+               "Hint" <border-button*> -> "Solve" <border-button*> -> ] <hbox> ,
                roll [ swap updates ] curry bi@
                [ [ hint ] fmap ] [ [ f solution ] fmap ] bi* 3array merge [ [ [ number>string ] [ "" ] if* ] map ] fmap
            ] bind
