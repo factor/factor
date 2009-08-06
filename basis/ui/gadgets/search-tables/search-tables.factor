@@ -58,7 +58,7 @@ mouse-color
 column-line-color
 selection-required?
 single-click?
-selected-value
+selection
 min-rows
 min-cols
 max-rows
