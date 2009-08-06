@@ -55,7 +55,7 @@ multiple-selection? ;
     over selected-indices>> conjoin ;
 
 : multiple>single ( values -- value/f ? )
-    dup assoc-empty? [ drop f f ] [ keys first t ] if ;
+    dup assoc-empty? [ drop f f ] [ values first t ] if ;
 
 : selected-index ( table -- n )
     selected-indices>> multiple>single drop ;
@@ -262,12 +262,13 @@ M: table pref-dim*
 
 PRIVATE>
 
-: (selected-rows) ( table -- {row} )
-    [ selected-indices>> keys natural-sort ] keep
-    '[ _ nth-row [ 1array ] [ drop { } ] if ] map concat ;
+: (selected-rows) ( table -- assoc )
+    [ selected-indices>> ] keep
+    '[ _ nth-row drop ] assoc-map ;
 
-: selected-rows ( table -- {value} )
-    [ (selected-rows) ] [ renderer>> ] bi '[ _ row-value ] map ;
+: selected-rows ( table -- assoc )
+    [ selected-indices>> ] [ ] [ renderer>> ] tri
+    '[ _ nth-row drop _ row-value ] assoc-map ;
 
 : (selected-row) ( table -- value/f ? ) (selected-rows) multiple>single ;
 
@@ -306,7 +307,7 @@ PRIVATE>
 
 : (update-selected-indices) ( table -- set )
     [ selection>> value>> dup array? [ 1array ] unless ] keep
-    [ find-row-index ] curry map sift unique f like ;
+    [ find-row-index ] curry map sift unique f assoc-like ;
 
 : initial-selected-indices ( table -- set )
     {
@@ -315,7 +316,7 @@ PRIVATE>
         [ drop { 0 } unique ]
     } 1&& ;
 
-: update-selected-indices ( table -- {n}/f )
+: update-selected-indices ( table -- set )
     {
         [ (update-selected-indices) ]
         [ initial-selected-indices ]
@@ -324,7 +325,7 @@ PRIVATE>
 M: table model-changed
     nip dup update-selected-indices {
         [ >>selected-indices f >>mouse-index drop ]
-        [ [ f ] [ first ] if-empty show-row-summary ]
+        [ multiple>single drop show-row-summary ]
         [ drop update-selected ]
         [ drop relayout ]
     } 2cleave ;
