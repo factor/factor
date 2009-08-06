@@ -1,10 +1,22 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math.order sorting sequences definitions
-namespaces arrays splitting io math.parser math init ;
+namespaces arrays splitting io math.parser math init continuations ;
 IN: source-files.errors
 
+GENERIC: error-file ( error -- file )
+GENERIC: error-line ( error -- line )
+
+M: object error-file drop f ;
+M: object error-line drop f ;
+
+M: condition error-file error>> error-file ;
+M: condition error-line error>> error-line ;
+
 TUPLE: source-file-error error asset file line# ;
+
+M: source-file-error error-file [ error>> error-file ] [ file>> ] bi or ;
+M: source-file-error error-line [ error>> error-line ] [ line#>> ] bi or ;
 
 : sort-errors ( errors -- alist )
     [ [ line#>> ] sort-with ] { } assoc-map-as sort-keys ;

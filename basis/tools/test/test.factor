@@ -130,7 +130,7 @@ TEST: must-fail
 
 M: test-failure error. ( error -- )
     {
-        [ summary print nl ]
+        [ error-location print nl ]
         [ asset>> [ experiment. nl ] when* ]
         [ error>> error. ]
         [ traceback-button. ]
