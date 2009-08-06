@@ -108,8 +108,8 @@ PRIVATE>
 
 : (load) ( prefix -- failures )
     [ child-vocabs-recursive no-roots no-prefixes ]
-    [ dup find-vocab-root [ >vocab-link ] [ drop f ] if ] bi
-    prefix filter-unportable
+    [ dup find-vocab-root [ >vocab-link prefix ] [ drop ] if ] bi
+    filter-unportable
     require-all ;
 
 : load ( prefix -- )
