@@ -52,13 +52,15 @@ multiple-selection? ;
 
 <PRIVATE
 
-: push-selected-index ( table n -- table ) swap [ insert-sorted prune >array ] change-selected-indices ;
+: push-selected-index ( table n -- table ) swap
+    [ insert-sorted prune >array ] change-selected-indices ;
 : multiple>single ( values -- value/f ? ) [ f f ] [ first t ] if-empty ;
 : multiple>single* ( values -- value/f ) multiple>single drop ;
 : selected-index ( table -- n ) selected-indices>> multiple>single* ;
 : set-selected-index ( table n -- table ) 1array >>selected-indices ;
 PRIVATE>
-: selected ( table -- index/indices ) dup multiple-selection?>> [ selected-indices>> ] [ selected-index ] if ;
+: selected ( table -- index/indices ) dup multiple-selection?>>
+    [ selected-indices>> ] [ selected-index ] if ;
 
 : new-table ( rows renderer class -- table )
     new-line-gadget
@@ -262,11 +264,15 @@ PRIVATE>
 
 <PRIVATE
 
-: set-table-model ( model value multiple? -- ) [ multiple>single* ] unless swap set-model ;
+: set-table-model ( model value multiple? -- )
+    [ multiple>single* ] unless swap set-model ;
 
 : update-selected ( table -- )
     [ [ selection>> ] [ selected-rows ] [ multiple-selection?>> ] tri set-table-model ]
-    [ [ selection-index>> ] [ selected-indices>> ] [ multiple-selection?>> ] tri set-table-model ] bi ;
+    [
+        [ selection-index>> ] [ selected-indices>> ] [ multiple-selection?>> ] tri
+        set-table-model
+    ] bi ;
 
 : show-row-summary ( table n -- )
     over nth-row
@@ -332,11 +338,13 @@ M: table model-changed
    '[ swap [ >>mouse-index ] _ bi ] [ drop ] if-mouse-row ; inline
 
 : table-button-down ( table -- ) [ (select-row) ] swap (table-button-down) ;
-: continued-button-down ( table -- ) dup multiple-selection?>> [ [ add-selected-row ] swap (table-button-down) ] [ table-button-down ] if ;
+: continued-button-down ( table -- ) dup multiple-selection?>>
+    [ [ add-selected-row ] swap (table-button-down) ] [ table-button-down ] if ;
 : thru-button-down ( table -- ) dup multiple-selection?>> [
-    [ 2dup over selected-index (a,b) swap
+      [ 2dup over selected-index (a,b) swap
       [ swap push-selected-index drop ] curry each add-selected-row ]
-    swap (table-button-down) ] [ table-button-down ] if ;
+      swap (table-button-down)
+    ] [ table-button-down ] if ;
 
 PRIVATE>
 
