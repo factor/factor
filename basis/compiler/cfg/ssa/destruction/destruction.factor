@@ -58,8 +58,12 @@ SYMBOL: copies
 
 GENERIC: prepare-insn ( insn -- )
 
-M: ##copy prepare-insn
+: prepare-copy ( insn -- )
     [ dst>> ] [ src>> ] bi 2array copies get push ;
+
+M: ##copy prepare-insn prepare-copy ;
+
+M: ##copy-float prepare-insn prepare-copy ;
 
 M: ##phi prepare-insn
     [ dst>> ] [ inputs>> values ] bi
@@ -81,8 +85,10 @@ M: insn prepare-insn drop ;
         [ 2drop ] [ eliminate-copy ] if
     ] assoc-each ;
 
+UNION: copy-insn ##copy ##copy-float ;
+
 : useless-copy? ( ##copy -- ? )
-    dup ##copy? [ [ dst>> ] [ src>> ] bi eq? ] [ drop f ] if ;
+    dup copy-insn? [ [ dst>> ] [ src>> ] bi eq? ] [ drop f ] if ;
 
 : perform-renaming ( cfg -- )
     leader-map get keys [ dup leader ] H{ } map>assoc renamings set
@@ -95,13 +101,11 @@ M: insn prepare-insn drop ;
     ] each-basic-block ;
 
 : destruct-ssa ( cfg -- cfg' )
-    dup cfg-has-phis? [
-        dup construct-cssa
-        dup compute-defs
-        dup compute-dominance
-        compute-ssa-live-sets
-        dup compute-live-ranges
-        dup prepare-coalescing
-        process-copies
-        dup perform-renaming
-    ] when ;
+    dup construct-cssa
+    dup compute-defs
+    dup compute-dominance
+    compute-ssa-live-sets
+    dup compute-live-ranges
+    dup prepare-coalescing
+    process-copies
+    dup perform-renaming ;

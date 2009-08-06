@@ -11,8 +11,13 @@ IN: compiler.cfg.ssa.interference.live-ranges
 
 SYMBOLS: local-def-indices local-kill-indices ;
 
-: record-def ( n vregs -- )
-    dup [ local-def-indices get set-at ] [ 2drop ] if ;
+: record-def ( n vreg -- )
+    ! We allow multiple defs of a vreg as long as they're
+    ! all in the same basic block
+    dup [
+        local-def-indices get 2dup key?
+        [ 3drop ] [ set-at ] if
+    ] [ 2drop ] if ;
 
 : record-uses ( n vregs -- )
     local-kill-indices get '[ _ set-at ] with each ;
