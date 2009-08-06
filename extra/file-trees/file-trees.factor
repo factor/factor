@@ -1,6 +1,7 @@
 USING: accessors arrays delegate delegate.protocols
-io.pathnames kernel locals make models.combinators sequences
-sequences.extras strings ui.gadgets.tables vectors ;
+io.pathnames kernel locals sequences
+vectors make strings models.combinators ui.gadgets.controls
+sequences.extras ;
 IN: file-trees
 
 TUPLE: walkable-vector vector father ;
@@ -44,5 +45,5 @@ DEFER: (tree-insert)
 
 : <dir-table> ( tree-model -- table )
    <list*> [ node>> 1array ] >>quot
-   [ selection>> [ file? not ] filter-model swap switch-models ]
+   [ selected-value>> [ file? not ] filter-model swap switch-models ]
    [ swap >>model ] bi ;

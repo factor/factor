@@ -580,10 +580,10 @@ TUPLE: field < border editor min-cols max-cols ;
         { 1 0 } >>fill
         field-theme ;
 
-: new-field ( class editor-class -- gadget )
-    new-editor swap new-border
+: new-field ( class -- gadget )
+    [ <editor> ] dip new-border
         dup gadget-child >>editor
-        field-theme { 1 0 } >>align ; inline
+        field-theme ; inline
 
 ! For line-gadget-width
 M: field font>> editor>> font>> ;
@@ -594,33 +594,26 @@ M: field pref-dim*
     [ line-gadget-width ] [ drop second ] 2bi 2array
     border-pref-dim ;
 
-TUPLE: model-field < field ;
-
-: init-model ( object -- object ) [ [ ] [ "" ] if* ] change-value ;
+TUPLE: model-field < field field-model ;
 
 : <model-field> ( model -- gadget )
-    model-field editor new-field swap
-    init-model >>model ;
-
-: <model-field*> ( -- gadget ) "" <model> <model-field> ;
+    model-field new-field swap >>field-model ;
 
 M: model-field graft*
-    [ [ model>> value>> ] [ editor>> ] bi set-editor-string ]
+    [ [ field-model>> value>> ] [ editor>> ] bi set-editor-string ]
     [ dup editor>> model>> add-connection ]
-    [ dup model>> add-connection ] tri ;
+    bi ;
 
 M: model-field ungraft*
-    [ dup editor>> model>> remove-connection ]
-    [ dup model>> remove-connection ] bi ;
+    dup editor>> model>> remove-connection ;
 
-M: model-field model-changed 2dup model>> =
-    [ [ value>> ] [ editor>> ] bi* set-editor-string ]
-    [ nip [ editor>> editor-string ] [ model>> ] bi set-model ] if ;
+M: model-field model-changed
+    nip [ editor>> editor-string ] [ field-model>> ] bi set-model ;
 
-TUPLE: action-field < field { quot initial: [ dup set-control-value ] } ;
+TUPLE: action-field < field quot ;
 
 : <action-field> ( quot -- gadget )
-    action-field editor new-field swap >>quot ;
+    action-field new-field swap >>quot ;
 
 : invoke-action-field ( field -- )
     [ editor>> editor-string ]
@@ -631,7 +624,3 @@ TUPLE: action-field < field { quot initial: [ dup set-control-value ] } ;
 action-field H{
     { T{ key-down f f "RET" } [ invoke-action-field ] }
 } set-gestures
-
-: <multiline-field> ( model -- gadget ) model-field multiline-editor new-field swap init-model >>model ;
-
-: <multiline-field*> ( -- editor ) "" <model> <multiline-field> ;
