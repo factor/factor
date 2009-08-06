@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes.mixin classes.parser classes.singleton
-classes.tuple classes.tuple.parser combinators effects effects.parser
-fry generic generic.parser generic.standard interpolate
-io.streams.string kernel lexer locals.parser locals.rewrite.closures
-locals.types make namespaces parser quotations sequences vocabs.parser
-words words.symbol ;
+USING: accessors arrays classes.mixin classes.parser
+classes.singleton classes.tuple classes.tuple.parser
+combinators effects.parser fry generic generic.parser
+generic.standard interpolate io.streams.string kernel lexer
+locals.parser locals.types macros make namespaces parser
+quotations sequences vocabs.parser words words.symbol ;
 IN: functors
 
 ! This is a hack
@@ -117,6 +117,11 @@ SYNTAX: `GENERIC:
     complete-effect parsed
     \ define-simple-generic* parsed ;
 
+SYNTAX: `MACRO:
+    scan-param parsed
+    parse-declared*
+    \ define-macro parsed ;
+
 SYNTAX: `inline [ word make-inline ] over push-all ;
 
 SYNTAX: `call-next-method T{ fake-call-next-method } parsed ;
@@ -152,6 +157,7 @@ DEFER: ;FUNCTOR delimiter
         { "SYNTAX:" POSTPONE: `SYNTAX: }
         { "SYMBOL:" POSTPONE: `SYMBOL: }
         { "inline" POSTPONE: `inline }
+        { "MACRO:" POSTPONE: `MACRO: }
         { "call-next-method" POSTPONE: `call-next-method }
     } ;
 
