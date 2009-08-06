@@ -50,6 +50,8 @@ mouse-index
 focused?
 multiple-selection? ;
 
+M: table output-model selection>> ;
+
 <PRIVATE
 
 : push-selected-index ( table n -- table ) swap
@@ -73,6 +75,8 @@ PRIVATE>
         f <model> >>selection ;
 
 : <table> ( rows renderer -- table ) table new-table ;
+
+: <table*> ( renderer -- table ) { } <model> swap <table> ;
 
 <PRIVATE
 
@@ -479,3 +483,35 @@ M: table viewport-column-header
     [ <column-headers> ] [ drop f ] if ;
 
 PRIVATE>
+
+! Using quots gives functional flavor
+! No reason to force an object oriented style
+TUPLE: quot-table < table
+{ quot initial: [ ] }
+{ val-quot initial: [ ] }
+{ color-quot initial: [ drop f ] }
+column-titles column-alignment actions hooks ;
+
+M: quot-table column-titles column-titles>> ;
+M: quot-table column-alignment column-alignment>> ;
+M: quot-table row-columns quot>> call( a -- b ) ;
+M: quot-table row-value val-quot>> call( a -- b ) ;
+M: quot-table row-color color-quot>> call( a -- b ) ;
+
+M: quot-table output-model dup val-quot>> [ selection>> ] [ selection-index>> ] if ;
+
+: indexed ( table -- table ) f >>val-quot ;
+
+: new-quot-table ( model class -- table )
+    f swap new-table dup >>renderer
+    f <model> >>actions f <model> >>hooks
+    dup actions>> [ set-model ] curry >>action
+    dup hooks>> [ set-model ] curry >>hook ;
+
+: <quot-table> ( model -- table ) quot-table new-quot-table ;
+
+: <quot-table*> ( -- table ) { } <model> <quot-table> ;
+
+: <list> ( model -- table ) <quot-table> [ 1array ] >>quot ;
+
+: <list*> ( -- table ) { } <model> <list> ;

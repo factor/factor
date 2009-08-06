@@ -231,8 +231,8 @@ M: slider pref-dim*
 
 PRIVATE>
 
-: <slider> ( range orientation -- slider )
-    slider new-track
+: new-slider ( range orientation class -- slider )
+    new-track
         swap >>model
         32 >>line
         dup orientation>> {
@@ -245,3 +245,8 @@ PRIVATE>
             [ drop <gadget> { 1 1 } >>dim f track-add ]
         } cleave ;
 
+: <slider> ( range orientation -- slider ) slider new-slider ;
+
+: <slider*> ( init min max step -- slider ) 0 -roll <range> horizontal <slider> ; ! most common case
+
+M: slider output-model model>> range-model ;

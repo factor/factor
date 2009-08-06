@@ -43,6 +43,9 @@ M: gadget model-changed 2drop ;
 : control-value ( control -- value )
     model>> value>> ;
 
+GENERIC: output-model ( gadget -- model )
+M: gadget output-model model>> ;
+
 : set-control-value ( value control -- )
     model>> set-model ;
 
