@@ -3,8 +3,9 @@
 USING: accessors arrays byte-arrays byte-vectors generic hashtables
 assocs kernel math namespaces make sequences strings sbufs vectors
 words prettyprint.config prettyprint.custom prettyprint.sections
-quotations io io.pathnames io.styles math.parser effects classes.tuple
-math.order classes.tuple.private classes combinators colors ;
+prettyprint.backend.callables quotations io io.pathnames io.styles
+math.parser effects classes.tuple math.order classes.tuple.private
+classes combinators colors ;
 IN: prettyprint.backend
 
 M: effect pprint* effect>string "(" ")" surround text ;
@@ -177,8 +178,7 @@ M: callstack pprint-delims drop \ CS{ \ } ;
 M: object >pprint-sequence ;
 M: vector >pprint-sequence ;
 M: byte-vector >pprint-sequence ;
-M: curry >pprint-sequence ;
-M: compose >pprint-sequence ;
+M: callable >pprint-sequence simplify-callable ;
 M: hashtable >pprint-sequence >alist ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
