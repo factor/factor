@@ -303,11 +303,12 @@ PRIVATE>
     f >>mouse-index [ hide-status ] [ relayout-1 ] bi ;
 
 : find-row-index ( value table -- n/f )
-    [ model>> value>> ] [ renderer>> '[ _ row-value ] map index ] bi ;
+    [ model>> value>> ] [ renderer>> ] bi
+    '[ _ row-value eq? ] with find drop ;
 
 : (update-selected-indices) ( table -- set )
-    [ selection>> value>> dup array? [ 1array ] unless ] keep
-    [ find-row-index ] curry map sift unique f assoc-like ;
+    [ selection>> value>> dup [ array? not ] [ ] bi and [ 1array ] when ] keep
+    '[ _ find-row-index ] map sift unique f assoc-like ;
 
 : initial-selected-indices ( table -- set )
     {
