@@ -1,13 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors colors.constants fry kernel math
-math.functions math.ranges math.rectangles math.order math.vectors
-models.illusion namespaces opengl sequences ui.gadgets
+USING: accessors assocs hashtables arrays colors colors.constants fry
+kernel math math.functions math.ranges math.rectangles math.order
+math.vectors namespaces opengl sequences ui.gadgets
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
 ui.gestures ui.render ui.pens.solid ui.text ui.commands ui.images
-ui.gadgets.menus ui.gadgets.line-support models
-combinators combinators.short-circuit
-fonts locals strings sequences.extras sets ;
+ui.gadgets.menus ui.gadgets.line-support models combinators
+combinators.short-circuit fonts locals strings sets sorting ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -54,15 +53,23 @@ M: table output-model selection>> ;
 
 <PRIVATE
 
-: push-selected-index ( table n -- table ) swap
-    [ insert-sorted prune >array ] change-selected-indices ;
-: multiple>single ( values -- value/f ? ) [ f f ] [ first t ] if-empty ;
-: multiple>single* ( values -- value/f ) multiple>single drop ;
-: selected-index ( table -- n ) selected-indices>> multiple>single* ;
-: set-selected-index ( table n -- table ) 1array >>selected-indices ;
+: add-selected-index ( table n -- table )
+    over selected-indices>> conjoin ;
+
+: multiple>single ( values -- value/f ? )
+    dup assoc-empty? [ drop f f ] [ values first t ] if ;
+
+: selected-index ( table -- n )
+    selected-indices>> multiple>single drop ;
+
+: set-selected-index ( table n -- table )
+    dup associate >>selected-indices ;
+
 PRIVATE>
-: selected ( table -- index/indices ) dup multiple-selection?>>
-    [ selected-indices>> ] [ selected-index ] if ;
+
+: selected ( table -- index/indices )
+    [ selected-indices>> ] [ multiple-selection?>> ] bi
+    [ multiple>single drop ] unless ;
 
 : new-table ( rows renderer class -- table )
     new-line-gadget
@@ -72,7 +79,8 @@ PRIVATE>
         focus-border-color >>focus-border-color
         transparent >>column-line-color
         f <model> >>selection-index
-        f <model> >>selection ;
+        f <model> >>selection
+        H{ } clone >>selected-indices ;
 
 : <table> ( rows renderer -- table ) table new-table ;
 
@@ -154,9 +162,9 @@ M: table layout*
 
 : draw-selected-rows ( table -- )
     {
-        { [ dup selected-indices>> empty? ] [ drop ] }
+        { [ dup selected-indices>> assoc-empty? ] [ drop ] }
         [
-            [ selected-indices>> ] [ selection-color>> gl-color ] [ ] tri
+            [ selected-indices>> keys ] [ selection-color>> gl-color ] [ ] tri
             [ swap row-bounds gl-fill-rect ] curry each
         ]
     } cond ;
@@ -213,7 +221,8 @@ M: table layout*
 :: row-font ( row ind table -- font )
     table font>> clone
     row table renderer>> row-color [ >>foreground ] when*
-    ind table selected-indices>> index [ table selection-color>> >>background ] when ;
+    ind table selected-indices>> key?
+    [ table selection-color>> >>background ] when ;
 
 : draw-columns ( columns widths alignment font gap -- )
     '[ [ _ ] 3dip _ draw-column ] 3each ;
@@ -257,24 +266,34 @@ M: table pref-dim*
 
 PRIVATE>
 
-: (selected-rows) ( table -- {row} )
+: (selected-rows) ( table -- assoc )
     [ selected-indices>> ] keep
-    [ nth-row [ 1array ] [ drop { } ] if ] curry map concat ;
+    '[ _ nth-row drop ] assoc-map ;
 
-: selected-rows ( table -- {value} )
-    [ (selected-rows) ] [ renderer>> ] bi [ row-value ] curry map ;
+: selected-rows ( table -- assoc )
+    [ selected-indices>> ] [ ] [ renderer>> ] tri
+    '[ _ nth-row drop _ row-value ] assoc-map ;
+
 : (selected-row) ( table -- value/f ? ) (selected-rows) multiple>single ;
+
 : selected-row ( table -- value/f ? ) selected-rows multiple>single ;
 
 <PRIVATE
 
 : set-table-model ( model value multiple? -- )
-    [ multiple>single* ] unless swap set-model ;
+    [ multiple>single drop ] unless swap set-model ;
 
 : update-selected ( table -- )
-    [ [ selection>> ] [ selected-rows ] [ multiple-selection?>> ] tri set-table-model ]
     [
-        [ selection-index>> ] [ selected-indices>> ] [ multiple-selection?>> ] tri
+        [ selection>> ]
+        [ selected-rows ]
+        [ multiple-selection?>> ] tri
+        set-table-model
+    ]
+    [
+        [ selection-index>> ]
+        [ selected-indices>> ]
+        [ multiple-selection?>> ] tri
         set-table-model
     ] bi ;
 
@@ -288,29 +307,30 @@ PRIVATE>
     f >>mouse-index [ hide-status ] [ relayout-1 ] bi ;
 
 : find-row-index ( value table -- n/f )
-    [ model>> value>> ] [ renderer>> '[ _ row-value ] map index ] bi ;
+    [ model>> value>> ] [ renderer>> ] bi
+    '[ _ row-value eq? ] with find drop ;
 
-: initial-selected-indices ( table -- {n}/f )
+: (update-selected-indices) ( table -- set )
+    [ selection>> value>> dup [ array? not ] [ ] bi and [ 1array ] when ] keep
+    '[ _ find-row-index ] map sift unique f assoc-like ;
+
+: initial-selected-indices ( table -- set )
     {
         [ model>> value>> empty? not ]
         [ selection-required?>> ]
-        [ drop { 0 } ]
+        [ drop { 0 } unique ]
     } 1&& ;
 
-: (update-selected-indices) ( table -- {n}/f )
-    [ selection>> value>> dup array? [ 1array ] unless ] keep
-    [ find-row-index ] curry map [ ] filter [ f ] when-empty ;
-
-: update-selected-indices ( table -- {n}/f )
+: update-selected-indices ( table -- set )
     {
         [ (update-selected-indices) ]
         [ initial-selected-indices ]
     } 1|| ;
 
 M: table model-changed
-    nip dup update-selected-indices [ { } ] unless* {
+    nip dup update-selected-indices {
         [ >>selected-indices f >>mouse-index drop ]
-        [ [ f ] [ first ] if-empty show-row-summary ]
+        [ multiple>single drop show-row-summary ]
         [ drop update-selected ]
         [ drop relayout ]
     } 2cleave ;
@@ -323,7 +343,7 @@ M: table model-changed
 
 : add-selected-row ( table n -- )
     [ scroll-to-row ]
-    [ push-selected-index relayout-1 ] 2bi ;
+    [ add-selected-index relayout-1 ] 2bi ;
 
 : (select-row) ( table n -- )
     [ scroll-to-row ]
@@ -341,12 +361,17 @@ M: table model-changed
     dup takes-focus?>> [ dup request-focus ] when swap
    '[ swap [ >>mouse-index ] _ bi ] [ drop ] if-mouse-row ; inline
 
-: table-button-down ( table -- ) [ (select-row) ] swap (table-button-down) ;
-: continued-button-down ( table -- ) dup multiple-selection?>>
+: table-button-down ( table -- )
+    [ (select-row) ] swap (table-button-down) ;
+
+: continued-button-down ( table -- )
+    dup multiple-selection?>>
     [ [ add-selected-row ] swap (table-button-down) ] [ table-button-down ] if ;
-: thru-button-down ( table -- ) dup multiple-selection?>> [
+
+: thru-button-down ( table -- )
+    dup multiple-selection?>> [
       [ 2dup over selected-index (a,b) swap
-      [ swap push-selected-index drop ] curry each add-selected-row ]
+      [ swap add-selected-index drop ] curry each add-selected-row ]
       swap (table-button-down)
     ] [ table-button-down ] if ;
 

@@ -165,9 +165,6 @@ M: #shuffle inputs/outputs mapping>> unzip swap ;
 M: #copy inputs/outputs [ in-d>> ] [ out-d>> ] bi ;
 M: #return-recursive inputs/outputs [ in-d>> ] [ out-d>> ] bi ;
 
-: recursive-phi-in ( #enter-recursive -- seq )
-    [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix ;
-
 : ends-with-terminate? ( nodes -- ? )
     [ f ] [ last #terminate? ] if-empty ;
 

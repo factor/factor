@@ -1,9 +1,10 @@
 IN: compiler.tree.recursive.tests
-USING: compiler.tree.recursive tools.test
-kernel combinators.short-circuit math sequences accessors
+USING: tools.test kernel combinators.short-circuit math sequences accessors
 compiler.tree
 compiler.tree.builder
-compiler.tree.combinators ;
+compiler.tree.combinators
+compiler.tree.recursive
+compiler.tree.recursive.private ;
 
 [ { f f f f } ] [ f { f t f f } (tail-calls) ] unit-test
 [ { f f f t } ] [ t { f t f f } (tail-calls) ] unit-test
@@ -66,13 +67,6 @@ compiler.tree.combinators ;
     [ loop-test-3 ] build-tree analyze-recursive
     \ loop-test-3 label-is-not-loop?
 ] unit-test
-
-: loop-test-4 ( a -- )
-    dup [
-        loop-test-4
-    ] [
-        drop
-    ] if ; inline recursive
 
 [ f ] [
     [ [ [ ] map ] map ] build-tree analyze-recursive
@@ -145,15 +139,30 @@ DEFER: a'
 
 DEFER: a''
 
-: b'' ( -- )
+: b'' ( a -- b )
     a'' ; inline recursive
 
-: a'' ( -- )
-    b'' a'' ; inline recursive
+: a'' ( a -- b )
+    dup [ b'' a'' ] when ; inline recursive
 
 [ t ] [
     [ a'' ] build-tree analyze-recursive
     \ a'' label-is-not-loop?
+] unit-test
+
+[ t ] [
+    [ a'' ] build-tree analyze-recursive
+    \ b'' label-is-loop?
+] unit-test
+
+[ t ] [
+    [ b'' ] build-tree analyze-recursive
+    \ a'' label-is-loop?
+] unit-test
+
+[ t ] [
+    [ b'' ] build-tree analyze-recursive
+    \ b'' label-is-not-loop?
 ] unit-test
 
 : loop-in-non-loop ( x quot: ( i -- ) -- )
@@ -166,3 +175,27 @@ DEFER: a''
     build-tree analyze-recursive
     \ (each-integer) label-is-loop?
 ] unit-test
+
+DEFER: a'''
+
+: b''' ( -- )
+    blah [ b''' ] [ a''' b''' ] if ; inline recursive
+
+: a''' ( -- )
+    blah [ b''' ] [ a''' ] if ; inline recursive
+
+[ t ] [
+    [ b''' ] build-tree analyze-recursive
+    \ a''' label-is-loop?
+] unit-test
+
+DEFER: b4
+
+: a4 ( a -- b ) dup [ b4 ] when ; inline recursive
+
+: b4 ( a -- b ) dup [ a4 reverse ] when ; inline recursive
+
+[ t ] [ [ b4 ] build-tree analyze-recursive \ a4 label-is-loop? ] unit-test
+[ t ] [ [ b4 ] build-tree analyze-recursive \ b4 label-is-not-loop? ] unit-test
+[ t ] [ [ a4 ] build-tree analyze-recursive \ a4 label-is-not-loop? ] unit-test
+[ t ] [ [ a4 ] build-tree analyze-recursive \ b4 label-is-loop? ] unit-test

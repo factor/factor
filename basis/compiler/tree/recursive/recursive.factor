@@ -1,104 +1,133 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs arrays namespaces accessors sequences deques
-search-deques dlists compiler.tree compiler.tree.combinators ;
+USING: kernel assocs arrays namespaces accessors sequences deques fry
+search-deques dlists combinators.short-circuit make sets compiler.tree ;
 IN: compiler.tree.recursive
 
-! Collect label info
-GENERIC: collect-label-info ( node -- )
+TUPLE: call-site tail? node label ;
 
-M: #return-recursive collect-label-info
-    dup label>> (>>return) ;
+: recursive-phi-in ( #enter-recursive -- seq )
+    [ label>> calls>> [ node>> in-d>> ] map ] [ in-d>> ] bi suffix ;
 
-M: #call-recursive collect-label-info
-    dup label>> calls>> push ;
+<PRIVATE
 
-M: #recursive collect-label-info
-    label>> V{ } clone >>calls drop ;
+TUPLE: call-graph-node tail? label children calls ;
 
-M: node collect-label-info drop ;
-
-! A loop is a #recursive which only tail calls itself, and those
-! calls are nested inside other loops only. We optimistically
-! assume all #recursive nodes are loops, disqualifying them as
-! we see evidence to the contrary.
 : (tail-calls) ( tail? seq -- seq' )
     reverse [ swap [ and ] keep ] map nip reverse ;
 
 : tail-calls ( tail? node -- seq )
     [
-        [ #phi? ]
-        [ #return? ]
-        [ #return-recursive? ]
-        tri or or
+        {
+            [ #phi? ]
+            [ #return? ]
+            [ #return-recursive? ]
+        } 1||
     ] map (tail-calls) ;
 
-SYMBOL: loop-heights
-SYMBOL: loop-calls
-SYMBOL: loop-stack
-SYMBOL: work-list
+SYMBOLS: children calls ;
 
-GENERIC: collect-loop-info* ( tail? node -- )
+GENERIC: node-call-graph ( tail? node -- )
 
-: non-tail-label-info ( nodes -- )
-    [ f swap collect-loop-info* ] each ;
+: (build-call-graph) ( tail? nodes -- )
+    [ tail-calls ] keep
+    [ node-call-graph ] 2each ;
 
-: (collect-loop-info) ( tail? nodes -- )
-    [ tail-calls ] keep [ collect-loop-info* ] 2each ;
-
-: remember-loop-info ( label -- )
-    loop-stack get length swap loop-heights get set-at ;
-
-M: #recursive collect-loop-info*
+: build-call-graph ( nodes -- labels calls )
     [
-        [
-            label>>
-            [ swap 2array loop-stack [ swap suffix ] change ]
-            [ remember-loop-info ]
-            [ t >>loop? drop ]
-            tri
-        ]
-        [ t swap child>> (collect-loop-info) ] bi
+        V{ } clone children set
+        V{ } clone calls set
+        [ t ] dip (build-call-graph)
+        children get
+        calls get
     ] with-scope ;
 
-: current-loop-nesting ( label -- alist )
-    loop-stack get swap loop-heights get at tail ;
+M: #return-recursive node-call-graph
+    nip dup label>> (>>return) ;
 
-: disqualify-loop ( label -- )
-    work-list get push-front ;
+M: #call-recursive node-call-graph
+    [ dup label>> call-site boa ] keep
+    [ drop calls get push ]
+    [ label>> calls>> push ] 2bi ;
 
-M: #call-recursive collect-loop-info*
-    label>>
-    swap [ dup disqualify-loop ] unless
-    dup current-loop-nesting
-    [ keys [ loop-calls get push-at ] with each ]
-    [ [ nip not ] assoc-filter keys [ disqualify-loop ] each ]
+M: #recursive node-call-graph
+    [ label>> V{ } clone >>calls drop ]
+    [
+        [ label>> ] [ child>> build-call-graph ] bi
+        call-graph-node boa children get push
+    ] bi ;
+
+M: #branch node-call-graph
+    children>> [ (build-call-graph) ] with each ;
+
+M: node node-call-graph 2drop ;
+
+SYMBOLS: not-loops recursive-nesting ;
+
+: not-a-loop ( label -- ) not-loops get conjoin ;
+
+: not-a-loop? ( label -- ? ) not-loops get key? ;
+
+: non-tail-calls ( call-graph-node -- seq )
+    calls>> [ tail?>> not ] filter ;
+
+: visit-back-edges ( call-graph -- )
+    [
+        [ non-tail-calls [ label>> not-a-loop ] each ]
+        [ children>> visit-back-edges ]
+        bi
+    ] each ;
+
+SYMBOL: changed?
+
+: check-cross-frame-call ( call-site -- )
+    label>> dup not-a-loop? [ drop ] [
+        recursive-nesting get <reversed> [
+            2dup label>> eq? [ 2drop f ] [
+                [ label>> not-a-loop? ] [ tail?>> not ] bi or
+                [ not-a-loop changed? on ] [ drop ] if t
+            ] if
+        ] with all? drop
+    ] if ;
+
+: detect-cross-frame-calls ( call-graph -- )
+    ! Suppose we have a nesting of recursives A --> B --> C
+    ! B tail-calls A, and C non-tail-calls B. Then A cannot be
+    ! a loop, it needs its own procedure, since the call from
+    ! C to A crosses a call-frame boundary.
+    [
+        [ recursive-nesting get push ]
+        [ calls>> [ check-cross-frame-call ] each ]
+        [ children>> detect-cross-frame-calls ] tri
+        recursive-nesting get pop*
+    ] each ;
+
+: while-changing ( quot: ( -- ) -- )
+    changed? off
+    [ call ] [ changed? get [ while-changing ] [ drop ] if ] bi ;
+    inline recursive
+
+: detect-loops ( call-graph -- )
+    H{ } clone not-loops set
+    V{ } clone recursive-nesting set
+    [ visit-back-edges ]
+    [ '[ _ detect-cross-frame-calls ] while-changing ]
     bi ;
 
-M: #if collect-loop-info*
-    children>> [ (collect-loop-info) ] with each ;
+: mark-loops ( call-graph -- )
+    [
+        [ label>> dup not-a-loop? [ t >>loop? ] unless drop ]
+        [ children>> mark-loops ]
+        bi
+    ] each ;
 
-M: #dispatch collect-loop-info*
-    children>> [ (collect-loop-info) ] with each ;
+PRIVATE>
 
-M: node collect-loop-info* 2drop ;
-
-: collect-loop-info ( node -- )
-    { } loop-stack set
-    H{ } clone loop-calls set
-    H{ } clone loop-heights set
-    <hashed-dlist> work-list set
-    t swap (collect-loop-info) ;
-
-: disqualify-loops ( -- )
-    work-list get [
-        dup loop?>> [
-            [ f >>loop? drop ]
-            [ loop-calls get at [ disqualify-loop ] each ]
-            bi
-        ] [ drop ] if
-    ] slurp-deque ;
+SYMBOL: call-graph
 
 : analyze-recursive ( nodes -- nodes )
-    dup [ collect-label-info ] each-node
-    dup collect-loop-info disqualify-loops ;
+    dup build-call-graph drop
+    [ call-graph set ]
+    [ detect-loops ]
+    [ mark-loops ]
+    tri ;
