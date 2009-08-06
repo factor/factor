@@ -45,5 +45,5 @@ DEFER: (tree-insert)
 
 : <dir-table> ( tree-model -- table )
    <list*> [ node>> 1array ] >>quot
-   [ selected-value>> [ file? not ] filter-model swap switch-models ]
+   [ selected>> [ file? not ] filter-model swap switch-models ]
    [ swap >>model ] bi ;
