@@ -20,12 +20,12 @@ SYMBOL: serving-vocabs serving-vocabs [ V{ } clone ] initialize
 PRIVATE>
 SYNTAX: service current-vocab name>> serving-vocabs get-global adjoin ;
 
-[ [ binary <threaded-server>
+: start-rpc-server ( -- )
+    binary <threaded-server>
     "rpcs" >>name 9012 >>insecure
     [ deserialize {
       { "getter" [ getter ] }
       {  "doer" [ doer ] }
       { "loader" [ deserialize vocab serialize flush ] } 
     } case ] >>handler
-    start-server ] in-thread
-] "modules.rpc-server" add-init-hook
+    start-server ;
