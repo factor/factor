@@ -1,13 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple colors
-colors.constants combinators combinators.smart fry kernel lexer
-locals math math.rectangles math.vectors models namespaces
-opengl opengl.gl quotations sequences strings ui.commands
-ui.gadgets ui.gadgets.borders ui.gadgets.labels
-ui.gadgets.packs ui.gadgets.tracks ui.gadgets.worlds
-ui.gestures ui.images ui.pens ui.pens.image ui.pens.solid
-ui.pens.tile vocabs.parser ;
+USING: accessors arrays kernel math models namespaces sequences
+strings quotations assocs combinators classes colors colors.constants
+classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.labels ui.gadgets.tracks
+ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.pens ui.pens.solid
+ui.pens.image ui.pens.tile math.rectangles locals fry
+combinators.smart ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
 
@@ -49,13 +48,10 @@ button H{
 } set-gestures
 
 : new-button ( label quot class -- button )
-    [ swap >label ] dip new-border swap >>quot
-    f <model> >>model ; inline
+    [ swap >label ] dip new-border swap >>quot ; inline
 
 : <button> ( label quot -- button )
     button new-button ;
-
-: button-text ( button -- string ) children>> first text>> ;
 
 TUPLE: button-pen
 plain rollover
@@ -165,14 +161,6 @@ repeat-button H{
     repeat-button new-button border-button-theme ;
 
 <PRIVATE
-: image-prep ( -- image ) scan current-vocab name>>
-    "vocab:" "/icons/" surround ".tiff" surround
-    <image-name> dup cached-image drop ;
-PRIVATE>
-
-SYNTAX: IMG-BUTTON: image-prep [ swap <button> ] curry over push-all ;
-
-<PRIVATE
 
 : <checkmark-pen> ( -- pen )
     "checkbox" theme-image <image-pen>
@@ -262,12 +250,3 @@ PRIVATE>
 
 : add-toolbar ( track -- track )
     dup <toolbar> { 3 3 } <border> align-left f track-add ;
-
-TUPLE: button* < button value ;
-
-: <button*> ( label -- button )
-    [ [ dup value>> or ] keep set-control-value ] button* new-button ;
-
-: <border-button*> ( label -- button ) <button*> border-button-theme ;
-
-SYNTAX: IMG-BUTTON*: image-prep [ <button*> ] curry over push-all ;
