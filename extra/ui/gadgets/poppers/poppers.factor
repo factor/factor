@@ -3,7 +3,7 @@
 USING: arrays accessors combinators kernel math
 models models.combinators namespaces sequences
 ui.gadgets ui.gadgets.controls ui.gadgets.layout
-ui.gadgets.tracks ui.gestures ui.gadgets.line-support ui ;
+ui.gadgets.tracks ui.gestures ui.gadgets.line-support ;
 EXCLUDE: ui.gadgets.editors => model-field ;
 IN: ui.gadgets.poppers
 
@@ -48,6 +48,3 @@ M: popper model-changed
 
 M: popped pref-dim* editor>> [ pref-dim* first ] [ line-height ] bi 2array ;
 M: popper focusable-child* children>> [ t ] [ first ] if-empty ;
-
-: tester ( -- ) { "ha" "ba" "Ra" } <model> <popper> { 100 100 } >>pref-dim "testing" open-window ;
-MAIN: tester
