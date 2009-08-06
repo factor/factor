@@ -2,14 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors combinators kernel math
 models models.combinators namespaces sequences
-ui.gadgets ui.gadgets.controls ui.gadgets.layout
-ui.gadgets.tracks ui.gestures ui.gadgets.line-support ;
-EXCLUDE: ui.gadgets.editors => model-field ;
+ui.gadgets ui.gadgets.layout ui.gadgets.tracks
+ui.gestures ui.gadgets.line-support
+ui.gadgets.editors ;
 IN: ui.gadgets.poppers
 
 TUPLE: popped < model-field { fatal? initial: t } ;
 TUPLE: popped-editor < multiline-editor ;
-: <popped> ( text -- gadget ) <basic> init-field popped-editor popped (new-field) swap >>model* ;
+: <popped> ( text -- gadget ) <basic> init-model popped popped-editor new-field swap >>model t >>clipped? ;
 
 : set-expansion ( popped size -- ) over dup parent>> [ children>> index ] [ sizes>> ] bi set-nth relayout ;
 : new-popped ( popped -- ) insertion-point "" <popped>
@@ -25,26 +25,27 @@ TUPLE: popper < track { unfocus-hook initial: [ drop ] } ;
 ! list of strings is model (make shown objects implement sequence protocol)
 : <popper> ( model -- popper ) vertical popper new-track swap >>model ;
 
-M: popped handle-gesture swap {
-    { gain-focus [ 1 set-expansion f ] }
+popped H{
+    { gain-focus [ 1 set-expansion ] }
     { lose-focus [ dup parent>>
         [ [ unfocus-hook>> call( a -- ) ] curry [ f set-expansion ] bi ]
-        [ drop ] if* f
+        [ drop ] if*
     ] }
-    { T{ key-up f f "RET" } [ dup editor>> delete-previous-character new-popped f ] }
+    { T{ key-up f f "RET" } [ dup editor>> delete-previous-character new-popped ] }
     { T{ key-up f f "BACKSPACE" } [ dup editor>> editor-string "" =
         [ dup fatal?>> [ [ focus-prev ] [ unparent ] bi ] [ t >>fatal? drop ] if ]
-        [ f >>fatal? drop ] if f
+        [ f >>fatal? drop ] if
     ] }
-    [ swap call-next-method ]
-} case ;
+} set-gestures
 
 M: popper handle-gesture swap T{ button-down f f 1 } =
-    [ hand-click# get 2 = [ initial-popped ] [ drop ] if ] [ drop ] if f ;
+[ hand-click# get 2 = [ initial-popped ] [ drop ] if ] [ drop ] if t ;
 
 M: popper model-changed
     [ children>> [ unparent ] each ]
     [ [ value>> [ <popped> ] map ] dip [ f track-add ] reduce request-focus ] bi ;
 
-M: popped pref-dim* editor>> [ pref-dim* first ] [ line-height ] bi 2array ;
+M: popped pref-dim* editor>>
+    [ pref-dim* first ] [ line-height ] bi 2array ;
+
 M: popper focusable-child* children>> [ t ] [ first ] if-empty ;

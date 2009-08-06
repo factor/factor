@@ -1,7 +1,7 @@
 USING: accessors assocs arrays fry kernel lexer make math.parser
 models monads namespaces parser sequences
 sequences.extras models.combinators ui.gadgets
-ui.gadgets.tracks words ui.gadgets.controls ;
+ui.gadgets.tracks words ;
 QUALIFIED: make
 QUALIFIED-WITH: ui.gadgets.books book
 IN: ui.gadgets.layout
