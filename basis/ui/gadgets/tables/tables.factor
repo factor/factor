@@ -277,7 +277,7 @@ PRIVATE>
 <PRIVATE
 
 : set-table-model ( model value multiple? -- )
-    [ multiple>single drop ] unless swap set-model ;
+    [ values ] [ multiple>single drop ] if swap set-model ;
 
 : update-selected ( table -- )
     [
