@@ -16,19 +16,19 @@ IN: compiler.cfg.ssa.interference.tests
     compute-live-ranges ;
 
 V{
-    T{ ##peek f V int-regs 0 D 0 }
-    T{ ##peek f V int-regs 2 D 0 }
-    T{ ##copy f V int-regs 1 V int-regs 0 }
-    T{ ##copy f V int-regs 3 V int-regs 2 }
+    T{ ##peek f V int-rep 0 D 0 }
+    T{ ##peek f V int-rep 2 D 0 }
+    T{ ##copy f V int-rep 1 V int-rep 0 }
+    T{ ##copy f V int-rep 3 V int-rep 2 }
     T{ ##branch }
 } 0 test-bb
 
 V{
-    T{ ##peek f V int-regs 4 D 0 }
-    T{ ##peek f V int-regs 5 D 0 }
-    T{ ##replace f V int-regs 3 D 0 }
-    T{ ##peek f V int-regs 6 D 0 }
-    T{ ##replace f V int-regs 5 D 0 }
+    T{ ##peek f V int-rep 4 D 0 }
+    T{ ##peek f V int-rep 5 D 0 }
+    T{ ##replace f V int-rep 3 D 0 }
+    T{ ##peek f V int-rep 6 D 0 }
+    T{ ##replace f V int-rep 5 D 0 }
     T{ ##return }
 } 1 test-bb
 
@@ -36,17 +36,17 @@ V{
 
 [ ] [ test-interference ] unit-test
 
-[ f ] [ V int-regs 0 V int-regs 1 vregs-interfere? ] unit-test
-[ f ] [ V int-regs 1 V int-regs 0 vregs-interfere? ] unit-test
-[ f ] [ V int-regs 2 V int-regs 3 vregs-interfere? ] unit-test
-[ f ] [ V int-regs 3 V int-regs 2 vregs-interfere? ] unit-test
-[ t ] [ V int-regs 0 V int-regs 2 vregs-interfere? ] unit-test
-[ t ] [ V int-regs 2 V int-regs 0 vregs-interfere? ] unit-test
-[ f ] [ V int-regs 1 V int-regs 3 vregs-interfere? ] unit-test
-[ f ] [ V int-regs 3 V int-regs 1 vregs-interfere? ] unit-test
-[ t ] [ V int-regs 3 V int-regs 4 vregs-interfere? ] unit-test
-[ t ] [ V int-regs 4 V int-regs 3 vregs-interfere? ] unit-test
-[ t ] [ V int-regs 3 V int-regs 5 vregs-interfere? ] unit-test
-[ t ] [ V int-regs 5 V int-regs 3 vregs-interfere? ] unit-test
-[ f ] [ V int-regs 3 V int-regs 6 vregs-interfere? ] unit-test
-[ f ] [ V int-regs 6 V int-regs 3 vregs-interfere? ] unit-test
+[ f ] [ V int-rep 0 V int-rep 1 vregs-interfere? ] unit-test
+[ f ] [ V int-rep 1 V int-rep 0 vregs-interfere? ] unit-test
+[ f ] [ V int-rep 2 V int-rep 3 vregs-interfere? ] unit-test
+[ f ] [ V int-rep 3 V int-rep 2 vregs-interfere? ] unit-test
+[ t ] [ V int-rep 0 V int-rep 2 vregs-interfere? ] unit-test
+[ t ] [ V int-rep 2 V int-rep 0 vregs-interfere? ] unit-test
+[ f ] [ V int-rep 1 V int-rep 3 vregs-interfere? ] unit-test
+[ f ] [ V int-rep 3 V int-rep 1 vregs-interfere? ] unit-test
+[ t ] [ V int-rep 3 V int-rep 4 vregs-interfere? ] unit-test
+[ t ] [ V int-rep 4 V int-rep 3 vregs-interfere? ] unit-test
+[ t ] [ V int-rep 3 V int-rep 5 vregs-interfere? ] unit-test
+[ t ] [ V int-rep 5 V int-rep 3 vregs-interfere? ] unit-test
+[ f ] [ V int-rep 3 V int-rep 6 vregs-interfere? ] unit-test
+[ f ] [ V int-rep 6 V int-rep 3 vregs-interfere? ] unit-test

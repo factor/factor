@@ -1,24 +1,24 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays kernel layouts math namespaces
+USING: accessors arrays byte-arrays kernel layouts math namespaces
 sequences classes.tuple cpu.architecture compiler.cfg.registers
 compiler.cfg.instructions ;
 IN: compiler.cfg.hats
 
-: i ( -- vreg ) int-regs next-vreg ; inline
+: i ( -- vreg ) int-rep next-vreg ; inline
 : ^^i ( -- vreg vreg ) i dup ; inline
 : ^^i1 ( obj -- vreg vreg obj ) [ ^^i ] dip ; inline
 : ^^i2 ( obj obj -- vreg vreg obj obj ) [ ^^i ] 2dip ; inline
 : ^^i3 ( obj obj obj -- vreg vreg obj obj obj ) [ ^^i ] 3dip ; inline
 
-: d ( -- vreg ) double-float-regs next-vreg ; inline
+: d ( -- vreg ) double-float-rep next-vreg ; inline
 : ^^d  ( -- vreg vreg ) d dup ; inline
 : ^^d1 ( obj -- vreg vreg obj ) [ ^^d ] dip ; inline
 : ^^d2 ( obj obj -- vreg vreg obj obj ) [ ^^d ] 2dip ; inline
 : ^^d3 ( obj obj obj -- vreg vreg obj obj obj ) [ ^^d ] 3dip ; inline
 
 : ^^load-literal ( obj -- dst ) ^^i1 ##load-literal ; inline
-: ^^copy ( src -- dst ) ^^i1 ##copy ; inline
+: ^^copy ( src -- dst ) ^^i1 dup rep>> ##copy ; inline
 : ^^slot ( obj slot tag -- dst ) ^^i3 i ##slot ; inline
 : ^^slot-imm ( obj slot tag -- dst ) ^^i3 ##slot-imm ; inline
 : ^^set-slot ( src obj slot tag -- ) i ##set-slot ; inline

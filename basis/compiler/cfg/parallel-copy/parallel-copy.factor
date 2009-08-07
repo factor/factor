@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs compiler.cfg.hats compiler.cfg.instructions
-deques dlists fry kernel locals namespaces sequences
-hashtables ;
+USING: assocs cpu.architecture compiler.cfg.hats
+compiler.cfg.instructions deques dlists fry kernel locals namespaces
+sequences hashtables ;
 IN: compiler.cfg.parallel-copy
 
 ! Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency
@@ -57,4 +57,4 @@ PRIVATE>
         ] slurp-deque
     ] with-scope ; inline
 
-: parallel-copy ( mapping -- ) i [ ##copy ] parallel-mapping ;
+: parallel-copy ( mapping -- ) i [ int-rep ##copy ] parallel-mapping ;

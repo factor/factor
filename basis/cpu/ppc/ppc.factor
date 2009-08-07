@@ -32,7 +32,7 @@ enable-float-intrinsics
 M: ppc machine-registers
     {
         { int-regs $[ 2 12 [a,b] 15 29 [a,b] append ] }
-        { double-float-regs $[ 0 29 [a,b] ] }
+        { float-regs $[ 0 29 [a,b] ] }
     } ;
 
 CONSTANT: scratch-reg 30
@@ -493,26 +493,18 @@ M: float-regs return-reg drop 1 ;
 M: int-regs %save-param-reg drop 1 rot local@ STW ;
 M: int-regs %load-param-reg drop 1 rot local@ LWZ ;
 
-GENERIC: STF ( src dst off reg-class -- )
+M: single-float-rep %save-param-reg drop 1 rot local@ STFS ;
+M: single-float-rep %load-param-reg 1 rot local@ LFS ;
 
-M: single-float-regs STF drop STFS ;
-M: double-float-regs STF drop STFD ;
+M: double-float-rep %save-param-reg drop 1 rot local@ STFD ;
+M: double-float-rep %load-param-reg 1 rot local@ LFD ;
 
-M: float-regs %save-param-reg [ 1 rot local@ ] dip STF ;
-
-GENERIC: LF ( dst src off reg-class -- )
-
-M: single-float-regs LF drop LFS ;
-M: double-float-regs LF drop LFD ;
-
-M: float-regs %load-param-reg [ 1 rot local@ ] dip LF ;
-
-M: stack-params %load-param-reg ( stack reg reg-class -- )
+M: stack-params %load-param-reg ( stack reg rep -- )
     drop [ 0 1 rot local@ LWZ 0 1 ] dip param@ STW ;
 
 : next-param@ ( n -- x ) param@ stack-frame get total-size>> + ;
 
-M: stack-params %save-param-reg ( stack reg reg-class -- )
+M: stack-params %save-param-reg ( stack reg rep -- )
     #! Funky. Read the parameter from the caller's stack frame.
     #! This word is used in callbacks
     drop
@@ -524,12 +516,12 @@ M: ppc %prepare-unbox ( -- )
     3 ds-reg 0 LWZ
     ds-reg dup cell SUBI ;
 
-M: ppc %unbox ( n reg-class func -- )
+M: ppc %unbox ( n rep func -- )
     ! Value must be in r3
     ! Call the unboxer
     f %alien-invoke
     ! Store the return value on the C stack
-    over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
+    over [ [ reg-class-of return-reg ] keep %save-param-reg ] [ 2drop ] if ;
 
 M: ppc %unbox-long-long ( n func -- )
     ! Value must be in r3:r4
@@ -548,11 +540,11 @@ M: ppc %unbox-large-struct ( n c-type -- )
     ! Call the function
     "to_value_struct" f %alien-invoke ;
 
-M: ppc %box ( n reg-class func -- )
+M: ppc %box ( n rep func -- )
     ! If the source is a stack location, load it into freg #0.
     ! If the source is f, then we assume the value is already in
     ! freg #0.
-    [ over [ 0 over param-reg swap %load-param-reg ] [ 2drop ] if ] dip
+    [ over [ 0 over reg-class-of param-reg swap %load-param-reg ] [ 2drop ] if ] dip
     f %alien-invoke ;
 
 M: ppc %box-long-long ( n func -- )

@@ -6,11 +6,22 @@ compiler.cfg.registers cpu.architecture namespaces tools.test ;
 
 [
     V{
-        T{ ##copy f V int-regs 1 V int-regs 2 }
-        T{ ##sub f V int-regs 1 V int-regs 1 V int-regs 3 }
+        T{ ##copy f V int-rep 1 V int-rep 2 int-rep }
+        T{ ##sub f V int-rep 1 V int-rep 1 V int-rep 3 }
     }
 ] [
     {
-        T{ ##sub f V int-regs 1 V int-regs 2 V int-regs 3 }
+        T{ ##sub f V int-rep 1 V int-rep 2 V int-rep 3 }
+    } (convert-two-operand)
+] unit-test
+
+[
+    V{
+        T{ ##copy f V double-float-rep 1 V double-float-rep 2 double-float-rep }
+        T{ ##sub-float f V double-float-rep 1 V double-float-rep 1 V double-float-rep 3 }
+    }
+] [
+    {
+        T{ ##sub-float f V double-float-rep 1 V double-float-rep 2 V double-float-rep 3 }
     } (convert-two-operand)
 ] unit-test

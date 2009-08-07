@@ -10,21 +10,18 @@ cpu.x86.assembler.operands cpu.x86 cpu.architecture ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
-! OS X requires that the stack be 16-byte aligned, and we do
-! this on all platforms, sacrificing some stack space for
-! code simplicity.
+! OS X requires that the stack be 16-byte aligned.
 
 M: x86.32 machine-registers
     {
         { int-regs { EAX ECX EDX EBP EBX } }
-        { double-float-regs { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } }
+        { float-regs { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } }
     } ;
 
 M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
-M: x86.32 temp-reg-1 ECX ;
-M: x86.32 temp-reg-2 EDX ;
+M: x86.32 temp-reg ECX ;
 
 M:: x86.32 %dispatch ( src temp -- )
     ! Load jump table base.
@@ -63,29 +60,23 @@ M: x86.32 return-struct-in-registers? ( c-type -- ? )
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
 M: int-regs param-regs drop { } ;
-M: int-regs push-return-reg return-reg PUSH ;
-
-M: int-regs load-return-reg
-    return-reg swap next-stack@ MOV ;
-
-M: int-regs store-return-reg
-    [ stack@ ] [ return-reg ] bi* MOV ;
-
 M: float-regs param-regs drop { } ;
 
-: FSTP ( operand size -- ) 4 = [ FSTPS ] [ FSTPL ] if ;
+GENERIC: push-return-reg ( rep -- )
+GENERIC: load-return-reg ( n rep -- )
+GENERIC: store-return-reg ( n rep -- )
 
-M: float-regs push-return-reg
-    stack-reg swap reg-size
-    [ SUB ] [ [ [] ] dip FSTP ] 2bi ;
+M: int-rep push-return-reg drop EAX PUSH ;
+M: int-rep load-return-reg drop EAX swap next-stack@ MOV ;
+M: int-rep store-return-reg drop stack@ EAX MOV ;
 
-: FLD ( operand size -- ) 4 = [ FLDS ] [ FLDL ] if ;
+M: single-float-rep push-return-reg drop ESP 4 SUB ESP [] FSTPS ;
+M: single-float-rep load-return-reg drop next-stack@ FLDS ;
+M: single-float-rep store-return-reg drop stack@ FSTPS ;
 
-M: float-regs load-return-reg
-    [ next-stack@ ] [ reg-size ] bi* FLD ;
-
-M: float-regs store-return-reg
-    [ stack@ ] [ reg-size ] bi* FSTP ;
+M: double-float-rep push-return-reg drop ESP 8 SUB ESP [] FSTPL ;
+M: double-float-rep load-return-reg drop next-stack@ FLDL ;
+M: double-float-rep store-return-reg drop stack@ FSTPL ;
 
 : align-sub ( n -- )
     [ align-stack ] keep - decr-stack-reg ;
@@ -101,21 +92,21 @@ M: x86.32 %prologue ( n -- )
     0 PUSH rc-absolute-cell rel-this
     3 cells - decr-stack-reg ;
 
-M: object %load-param-reg 3drop ;
+M: x86.32 %load-param-reg 3drop ;
 
-M: object %save-param-reg 3drop ;
+M: x86.32 %save-param-reg 3drop ;
 
-: (%box) ( n reg-class -- )
+: (%box) ( n rep -- )
     #! If n is f, push the return register onto the stack; we
     #! are boxing a return value of a C function. If n is an
     #! integer, push [ESP+n] on the stack; we are boxing a
     #! parameter being passed to a callback from C.
     over [ load-return-reg ] [ 2drop ] if ;
 
-M:: x86.32 %box ( n reg-class func -- )
-    n reg-class (%box)
-    reg-class reg-size [
-        reg-class push-return-reg
+M:: x86.32 %box ( n rep func -- )
+    n rep (%box)
+    rep rep-size [
+        rep push-return-reg
         func f %alien-invoke
     ] with-aligned-stack ;
     
@@ -165,7 +156,7 @@ M: x86.32 %prepare-unbox ( -- )
     EAX ESI [] MOV
     ESI 4 SUB ;
 
-: (%unbox) ( func -- )
+: call-unbox-func ( func -- )
     4 [
         ! Push parameter
         EAX PUSH
@@ -173,17 +164,17 @@ M: x86.32 %prepare-unbox ( -- )
         f %alien-invoke
     ] with-aligned-stack ;
 
-M: x86.32 %unbox ( n reg-class func -- )
+M: x86.32 %unbox ( n rep func -- )
     #! The value being unboxed must already be in EAX.
     #! If n is f, we're unboxing a return value about to be
     #! returned by the callback. Otherwise, we're unboxing
     #! a parameter to a C function about to be called.
-    (%unbox)
+    call-unbox-func
     ! Store the return value on the C stack
     over [ store-return-reg ] [ 2drop ] if ;
 
 M: x86.32 %unbox-long-long ( n func -- )
-    (%unbox)
+    call-unbox-func
     ! Store the return value on the C stack
     [
         dup stack@ EAX MOV

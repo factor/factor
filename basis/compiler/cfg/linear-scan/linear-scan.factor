@@ -39,6 +39,5 @@ IN: compiler.cfg.linear-scan
 : linear-scan ( cfg -- cfg' )
     [
         dup machine-registers (linear-scan)
-        spill-counts get >>spill-counts
         cfg-changed
     ] with-scope ;

@@ -9,6 +9,7 @@ compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.dominance
 compiler.cfg.instructions
+compiler.cfg.renaming
 compiler.cfg.renaming.functor
 compiler.cfg.ssa.construction.tdmsc ;
 IN: compiler.cfg.ssa.construction
@@ -75,7 +76,7 @@ SYMBOLS: stacks pushed ;
     H{ } clone stacks set ;
 
 : gen-name ( vreg -- vreg' )
-    [ reg-class>> next-vreg dup ] keep
+    [ fresh-value dup ] keep
     dup pushed get 2dup key?
     [ 2drop stacks get at set-last ]
     [ conjoin stacks get push-at ]

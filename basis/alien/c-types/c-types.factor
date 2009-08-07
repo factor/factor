@@ -21,7 +21,7 @@ unboxer
 { unboxer-quot callable }
 { getter callable }
 { setter callable }
-{ reg-class initial: int-regs }
+{ rep initial: int-rep }
 size
 align
 stack-align? ;
@@ -98,11 +98,11 @@ M: c-type c-type-unboxer-quot unboxer-quot>> ;
 
 M: string c-type-unboxer-quot c-type c-type-unboxer-quot ;
 
-GENERIC: c-type-reg-class ( name -- reg-class )
+GENERIC: c-type-rep ( name -- rep )
 
-M: c-type c-type-reg-class reg-class>> ;
+M: c-type c-type-rep rep>> ;
 
-M: string c-type-reg-class c-type c-type-reg-class ;
+M: string c-type-rep c-type c-type-rep ;
 
 GENERIC: c-type-getter ( name -- quot )
 
@@ -129,13 +129,11 @@ M: c-type c-type-stack-align? stack-align?>> ;
 M: string c-type-stack-align? c-type c-type-stack-align? ;
 
 : c-type-box ( n type -- )
-    dup c-type-reg-class
-    swap c-type-boxer [ "No boxer" throw ] unless*
+    [ c-type-rep ] [ c-type-boxer [ "No boxer" throw ] unless* ] bi
     %box ;
 
 : c-type-unbox ( n ctype -- )
-    dup c-type-reg-class
-    swap c-type-unboxer [ "No unboxer" throw ] unless*
+    [ c-type-rep ] [ c-type-unboxer [ "No unboxer" throw ] unless* ] bi
     %unbox ;
 
 GENERIC: box-parameter ( n ctype -- )
@@ -426,7 +424,7 @@ CONSTANT: primitive-types
         4 >>align
         "box_float" >>boxer
         "to_float" >>unboxer
-        single-float-regs >>reg-class
+        single-float-rep >>rep
         [ >float ] >>unboxer-quot
     "float" define-primitive-type
 
@@ -438,7 +436,7 @@ CONSTANT: primitive-types
         8 >>align
         "box_double" >>boxer
         "to_double" >>unboxer
-        double-float-regs >>reg-class
+        double-float-rep >>rep
         [ >float ] >>unboxer-quot
     "double" define-primitive-type
 

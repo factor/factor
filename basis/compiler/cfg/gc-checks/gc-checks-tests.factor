@@ -12,11 +12,11 @@ namespaces accessors sequences ;
 
 V{
     T{ ##inc-d f 3 }
-    T{ ##replace f V int-regs 0 D 1 }
+    T{ ##replace f V int-rep 0 D 1 }
 } 0 test-bb
 
 V{
-    T{ ##box-float f V int-regs 0 V int-regs 1 }
+    T{ ##box-float f V int-rep 0 V int-rep 1 }
 } 1 test-bb
 
 0 1 edge

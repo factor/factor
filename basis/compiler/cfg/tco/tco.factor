@@ -63,6 +63,5 @@ IN: compiler.cfg.tco
     ] [ drop ] if ;
 
 : optimize-tail-calls ( cfg -- cfg' )
-    dup cfg set
     dup [ optimize-tail-call ] each-basic-block
     cfg-changed ;

@@ -5,7 +5,7 @@ tools.test vectors sets ;
 IN: compiler.cfg.ssa.construction.tdmsc.tests
 
 : test-tdmsc ( -- )
-    cfg new 0 get >>entry
+    cfg new 0 get >>entry dup cfg set
     compute-predecessors
     dup compute-dominance
     compute-merge-sets ;

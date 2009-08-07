@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces assocs hashtables sequences arrays
-accessors vectors combinators sets classes compiler.cfg
+accessors vectors combinators sets classes cpu.architecture compiler.cfg
 compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.copy-prop compiler.cfg.rpo compiler.cfg.liveness ;
 IN: compiler.cfg.alias-analysis
@@ -226,7 +226,7 @@ M: ##read analyze-aliases*
     call-next-method
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri
     2dup live-slot dup [
-        2nip \ ##copy new-insn analyze-aliases* nip
+        2nip int-rep \ ##copy new-insn analyze-aliases* nip
     ] [
         drop remember-slot
     ] if ;

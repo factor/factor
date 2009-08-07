@@ -23,7 +23,6 @@ M: unary-expr simplify*
     #! its source VN.
     [ in>> vn>expr ] [ op>> ] bi {
         { \ ##copy [ ] }
-        { \ ##copy-float [ ] }
         { \ ##unbox-float [ simplify-unbox-float ] }
         { \ ##unbox-alien [ simplify-unbox-alien ] }
         { \ ##unbox-any-c-ptr [ simplify-unbox-alien ] }
