@@ -1,7 +1,8 @@
 ! (c) 2009 Joe Groff bsd license
 USING: combinators combinators.short-circuit generalizations
-kernel macros math math.ranges quotations sequences words ;
-IN: prettyprint.backend.callables
+kernel macros math math.ranges prettyprint.custom quotations
+sequences words ;
+IN: prettyprint.callables
 
 <PRIVATE
 
@@ -70,3 +71,5 @@ PRIVATE>
 
 : simplify-callable ( quot -- quot' )
     [ (simplify-callable) ] to-fixed-point ;
+
+M: callable >pprint-sequence simplify-callable ;
