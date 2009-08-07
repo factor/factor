@@ -11,7 +11,7 @@ IN: cpu.x86.64
 M: x86.64 machine-registers
     {
         { int-regs { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 R13 } }
-        { double-float-regs {
+        { float-regs {
             XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
             XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15
         } }
@@ -46,20 +46,21 @@ M: int-regs return-reg drop RAX ;
 M: float-regs return-reg drop XMM0 ;
 
 M: x86.64 %prologue ( n -- )
-    temp-reg-1 0 MOV rc-absolute-cell rel-this
+    temp-reg 0 MOV rc-absolute-cell rel-this
     dup PUSH
-    temp-reg-1 PUSH
+    temp-reg PUSH
     stack-reg swap 3 cells - SUB ;
 
-M: stack-params %load-param-reg
+M: stack-params copy-register*
     drop
-    [ R11 swap param@ MOV ] dip
-    param@ R11 MOV ;
+    {
+        { [ dup  integer? ] [ R11 swap next-stack@ MOV  R11 MOV ] }
+        { [ over integer? ] [ R11 swap MOV              param@ R11 MOV ] }
+    } cond ;
 
-M: stack-params %save-param-reg
-    drop
-    R11 swap next-stack@ MOV
-    param@ R11 MOV ;
+M: x86 %save-param-reg [ param@ ] 2dip copy-register ;
+
+M: x86 %load-param-reg [ swap param@ ] dip copy-register ;
 
 : with-return-regs ( quot -- )
     [
@@ -73,20 +74,22 @@ M: x86.64 %prepare-unbox ( -- )
     param-reg-1 R14 [] MOV
     R14 cell SUB ;
 
-M: x86.64 %unbox ( n reg-class func -- )
+M:: x86.64 %unbox ( n rep func -- )
     ! Call the unboxer
-    f %alien-invoke
-    ! Store the return value on the C stack
-    over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
+    func f %alien-invoke
+    ! Store the return value on the C stack if this is an
+    ! alien-invoke, otherwise leave it the return register if
+    ! this is the end of alien-callback
+    n [ n rep reg-class-of return-reg rep %save-param-reg ] when ;
 
 M: x86.64 %unbox-long-long ( n func -- )
-    int-regs swap %unbox ;
+    [ int-rep ] dip %unbox ;
 
 : %unbox-struct-field ( c-type i -- )
     ! Alien must be in param-reg-1.
-    R11 swap cells [+] swap reg-class>> {
+    R11 swap cells [+] swap rep>> reg-class-of {
         { int-regs [ int-regs get pop swap MOV ] }
-        { double-float-regs [ float-regs get pop swap MOVSD ] }
+        { float-regs [ float-regs get pop swap MOVSD ] }
     } case ;
 
 M: x86.64 %unbox-small-struct ( c-type -- )
@@ -109,27 +112,31 @@ M: x86.64 %unbox-large-struct ( n c-type -- )
     ! Copy the struct to the C stack
     "to_value_struct" f %alien-invoke ;
 
-: load-return-value ( reg-class -- )
-    0 over param-reg swap return-reg
-    2dup eq? [ 2drop ] [ MOV ] if ;
+: load-return-value ( rep -- )
+    [ [ 0 ] dip reg-class-of param-reg ]
+    [ reg-class-of return-reg ]
+    [ ]
+    tri copy-register ;
 
-M: x86.64 %box ( n reg-class func -- )
-    rot [
-        rot [ 0 swap param-reg ] keep %load-param-reg
+M:: x86.64 %box ( n rep func -- )
+    n [
+        n
+        0 rep reg-class-of param-reg
+        rep %load-param-reg
     ] [
-        swap load-return-value
-    ] if*
-    f %alien-invoke ;
+        rep load-return-value
+    ] if
+    func f %alien-invoke ;
 
 M: x86.64 %box-long-long ( n func -- )
-    int-regs swap %box ;
+    [ int-rep ] dip %box ;
 
 : box-struct-field@ ( i -- operand ) 1+ cells param@ ;
 
 : %box-struct-field ( c-type i -- )
-    box-struct-field@ swap reg-class>> {
+    box-struct-field@ swap c-type-rep reg-class-of {
         { int-regs [ int-regs get pop MOV ] }
-        { double-float-regs [ float-regs get pop MOVSD ] }
+        { float-regs [ float-regs get pop MOVSD ] }
     } case ;
 
 M: x86.64 %box-small-struct ( c-type -- )

@@ -90,18 +90,18 @@ IN: compiler.cfg.intrinsics.alien
 : emit-alien-cell-setter ( node -- )
     [ ##set-alien-cell ] inline-alien-cell-setter ;
 
-: emit-alien-float-getter ( node reg-class -- )
+: emit-alien-float-getter ( node rep -- )
     '[
         _ {
-            { single-float-regs [ ^^alien-float ] }
-            { double-float-regs [ ^^alien-double ] }
+            { single-float-rep [ ^^alien-float ] }
+            { double-float-rep [ ^^alien-double ] }
         } case ^^box-float
     ] inline-alien-getter ;
 
-: emit-alien-float-setter ( node reg-class -- )
+: emit-alien-float-setter ( node rep -- )
     '[
         _ {
-            { single-float-regs [ ##set-alien-float ] }
-            { double-float-regs [ ##set-alien-double ] }
+            { single-float-rep [ ##set-alien-float ] }
+            { double-float-rep [ ##set-alien-double ] }
         } case
     ] inline-alien-float-setter ;

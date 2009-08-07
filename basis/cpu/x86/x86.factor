@@ -30,9 +30,7 @@ HOOK: reserved-area-size cpu ( -- n )
 
 : param@ ( n -- op ) reserved-area-size + stack@ ;
 
-: spill-integer@ ( n -- op ) spill-integer-offset param@ ;
-
-: spill-float@ ( n -- op ) spill-float-offset param@ ;
+: spill@ ( n -- op ) spill-offset param@ ;
 
 : gc-root@ ( n -- op ) gc-root-offset param@ ;
 
@@ -48,9 +46,11 @@ HOOK: reserved-area-size cpu ( -- n )
 M: x86 stack-frame-size ( stack-frame -- i )
     (stack-frame-size) 3 cells reserved-area-size + + align-stack ;
 
-HOOK: temp-reg-1 cpu ( -- reg )
-HOOK: temp-reg-2 cpu ( -- reg )
+! Must be a volatile register not used for parameter passing, for safe
+! use in calls in and out of C
+HOOK: temp-reg cpu ( -- reg )
 
+! Fastcall calling convention
 HOOK: param-reg-1 cpu ( -- reg )
 HOOK: param-reg-2 cpu ( -- reg )
 
@@ -125,9 +125,6 @@ M: x86 %shr-imm nip SHR ;
 M: x86 %sar-imm nip SAR ;
 M: x86 %not     drop NOT ;
 M: x86 %log2    BSR ;
-
-: ?MOV ( dst src -- )
-    2dup = [ 2drop ] [ MOV ] if ; inline
 
 :: overflow-template ( label dst src1 src2 insn -- )
     src1 src2 insn call
@@ -210,10 +207,17 @@ M: x86 %div-float nip DIVSD ;
 M: x86 %integer>float CVTSI2SD ;
 M: x86 %float>integer CVTTSD2SI ;
 
-M: x86 %copy ( dst src -- ) ?MOV ;
+GENERIC: copy-register* ( dst src rep -- )
 
-M: x86 %copy-float ( dst src -- )
-    2dup = [ 2drop ] [ MOVSD ] if ;
+M: int-rep copy-register* drop MOV ;
+M: tagged-rep copy-register* drop MOV ;
+M: single-float-rep copy-register* drop MOVSS ;
+M: double-float-rep copy-register* drop MOVSD ;
+
+: copy-register ( dst src rep -- )
+    2over eq? [ 3drop ] [ copy-register* ] if ;
+
+M: x86 %copy ( dst src rep -- ) copy-register ;
 
 M: x86 %unbox-float ( dst src -- )
     float-offset [+] MOVSD ;
@@ -300,6 +304,9 @@ M: x86.64 has-small-reg? 2drop t ;
         exclude small-reg-that-isn't
         [ quot call ] with-save/restore
     ] if ; inline
+
+: ?MOV ( dst src -- )
+    2dup = [ 2drop ] [ MOV ] if ; inline
 
 M:: x86 %string-nth ( dst src index temp -- )
     ! We request a small-reg of size 8 since those of size 16 are
@@ -512,39 +519,21 @@ M: x86 %compare-float-branch ( label cc src1 src2 -- )
         { cc/= [ JNE ] }
     } case ;
 
-M: x86 %spill-integer ( src n -- ) spill-integer@ swap MOV ;
-M: x86 %reload-integer ( dst n -- ) spill-integer@ MOV ;
-
-M: x86 %spill-float ( src n -- ) spill-float@ swap MOVSD ;
-M: x86 %reload-float ( dst n -- ) spill-float@ MOVSD ;
+M: x86 %spill ( src n rep -- ) [ spill@ swap ] dip copy-register ;
+M: x86 %reload ( dst n rep -- ) [ spill@ ] dip copy-register ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
-
-M: int-regs %save-param-reg drop [ param@ ] dip MOV ;
-M: int-regs %load-param-reg drop swap param@ MOV ;
-
-GENERIC: MOVSS/D ( dst src reg-class -- )
-
-M: single-float-regs MOVSS/D drop MOVSS ;
-M: double-float-regs MOVSS/D drop MOVSD ;
-
-M: float-regs %save-param-reg [ param@ ] 2dip MOVSS/D ;
-M: float-regs %load-param-reg [ swap param@ ] dip MOVSS/D ;
-
-GENERIC: push-return-reg ( reg-class -- )
-GENERIC: load-return-reg ( n reg-class -- )
-GENERIC: store-return-reg ( n reg-class -- )
 
 M: x86 %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp-reg-1 "stack_chain" f %alien-global
-    temp-reg-1 temp-reg-1 [] MOV
-    temp-reg-1 [] stack-reg MOV
-    temp-reg-1 [] cell SUB
-    temp-reg-1 2 cells [+] ds-reg MOV
-    temp-reg-1 3 cells [+] rs-reg MOV ;
+    temp-reg "stack_chain" f %alien-global
+    temp-reg temp-reg [] MOV
+    temp-reg [] stack-reg MOV
+    temp-reg [] cell SUB
+    temp-reg 2 cells [+] ds-reg MOV
+    temp-reg 3 cells [+] rs-reg MOV ;
 
 M: x86 value-struct? drop t ;
 

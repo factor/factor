@@ -4,7 +4,7 @@ USING: accessors namespaces kernel arrays parser math math.order ;
 IN: compiler.cfg.registers
 
 ! Virtual registers, used by CFG and machine IRs
-TUPLE: vreg { reg-class read-only } { n fixnum read-only } ;
+TUPLE: vreg { rep read-only } { n fixnum read-only } ;
 
 M: vreg equal? over vreg? [ [ n>> ] bi@ eq? ] [ 2drop f ] if ;
 
@@ -12,7 +12,7 @@ M: vreg hashcode* nip n>> ;
 
 SYMBOL: vreg-counter
 
-: next-vreg ( reg-class -- vreg ) \ vreg-counter counter vreg boa ;
+: next-vreg ( rep -- vreg ) \ vreg-counter counter vreg boa ;
 
 ! Stack locations -- 'n' is an index starting from the top of the stack
 ! going down. So 0 is the top of the stack, 1 is what would be the top

@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors combinators namespaces
+compiler.cfg
 compiler.cfg.tco
 compiler.cfg.useless-conditionals
 compiler.cfg.branch-splitting
@@ -29,7 +30,7 @@ SYMBOL: check-optimizer?
 : optimize-cfg ( cfg -- cfg' )
     ! Note that compute-predecessors has to be called several times.
     ! The passes that need this document it.
-    [
+    dup cfg [
         optimize-tail-calls
         delete-useless-conditionals
         compute-predecessors
@@ -47,4 +48,4 @@ SYMBOL: check-optimizer?
         destruct-ssa
         delete-empty-blocks
         ?check
-    ] with-scope ;
+    ] with-variable ;

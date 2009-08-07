@@ -16,7 +16,7 @@ IN: compiler.cfg.gc-checks
 
 : insert-gc-check ( bb -- )
     dup '[
-        i i f _ uninitialized-locs \ ##gc new-insn
+        i i f f _ uninitialized-locs \ ##gc new-insn
         prefix
     ] change-instructions drop ;
 

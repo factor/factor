@@ -31,7 +31,7 @@ M: array c-type-boxer-quot drop [ ] ;
 
 M: array c-type-unboxer-quot drop [ >c-ptr ] ;
 
-M: value-type c-type-reg-class drop int-regs ;
+M: value-type c-type-rep drop int-rep ;
 
 M: value-type c-type-getter
     drop [ swap <displaced-alien> ] ;
@@ -72,8 +72,8 @@ M: string-type box-return
 M: string-type stack-size
     drop "void*" stack-size ;
 
-M: string-type c-type-reg-class
-    drop int-regs ;
+M: string-type c-type-rep
+    drop int-rep ;
 
 M: string-type c-type-boxer
     drop "void*" c-type-boxer ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators cpu.architecture fry heaps
 kernel math math.order namespaces sequences vectors
-compiler.cfg.linear-scan.live-intervals ;
+compiler.cfg compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 ! Start index of current live interval. We ensure that all
@@ -26,7 +26,7 @@ SYMBOL: registers
 SYMBOL: active-intervals
 
 : active-intervals-for ( vreg -- seq )
-    reg-class>> active-intervals get at ;
+    rep>> reg-class-of active-intervals get at ;
 
 : add-active ( live-interval -- )
     dup vreg>> active-intervals-for push ;
@@ -41,7 +41,7 @@ SYMBOL: active-intervals
 SYMBOL: inactive-intervals
 
 : inactive-intervals-for ( vreg -- seq )
-    reg-class>> inactive-intervals get at ;
+    rep>> reg-class-of inactive-intervals get at ;
 
 : add-inactive ( live-interval -- )
     dup vreg>> inactive-intervals-for push ;
@@ -112,22 +112,18 @@ SYMBOL: unhandled-intervals
     [ dup start>> unhandled-intervals get heap-push ]
     bi ;
 
-CONSTANT: reg-classes { int-regs double-float-regs }
-
 : reg-class-assoc ( quot -- assoc )
     [ reg-classes ] dip { } map>assoc ; inline
 
-! Mapping from register classes to spill counts
-SYMBOL: spill-counts
-
-: next-spill-slot ( reg-class -- n )
-    spill-counts get [ dup 1 + ] change-at ;
+: next-spill-slot ( rep -- n )
+    rep-size cfg get
+    [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop ;
 
 ! Mapping from vregs to spill slots
 SYMBOL: spill-slots
 
 : assign-spill-slot ( vreg -- n )
-    spill-slots get [ reg-class>> next-spill-slot ] cache ;
+    spill-slots get [ rep>> next-spill-slot ] cache ;
 
 : init-allocator ( registers -- )
     registers set
@@ -135,7 +131,7 @@ SYMBOL: spill-slots
     [ V{ } clone ] reg-class-assoc active-intervals set
     [ V{ } clone ] reg-class-assoc inactive-intervals set
     V{ } clone handled-intervals set
-    [ 0 ] reg-class-assoc spill-counts set
+    cfg get 0 >>spill-area-size drop
     H{ } clone spill-slots set
     -1 progress set ;
 
@@ -145,7 +141,7 @@ SYMBOL: spill-slots
 
 ! A utility used by register-status and spill-status words
 : free-positions ( new -- assoc )
-    vreg>> reg-class>> registers get at [ 1/0. ] H{ } map>assoc ;
+    vreg>> rep>> reg-class-of registers get at [ 1/0. ] H{ } map>assoc ;
 
 : add-use-position ( n reg assoc -- ) [ [ min ] when* ] change-at ;
 
