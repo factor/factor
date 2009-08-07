@@ -11,53 +11,53 @@ SYMBOL: temp
 
 [
     {
-        T{ ##copy f V int-regs 4 V int-regs 2 }
-        T{ ##copy f V int-regs 2 V int-regs 1 }
-        T{ ##copy f V int-regs 1 V int-regs 4 }
+        T{ ##copy f V int-rep 4 V int-rep 2 int-rep }
+        T{ ##copy f V int-rep 2 V int-rep 1 int-rep }
+        T{ ##copy f V int-rep 1 V int-rep 4 int-rep }
     }
 ] [
     H{
-        { V int-regs 1 V int-regs 2 }
-        { V int-regs 2 V int-regs 1 }
+        { V int-rep 1 V int-rep 2 }
+        { V int-rep 2 V int-rep 1 }
     } test-parallel-copy
 ] unit-test
 
 [
     {
-        T{ ##copy f V int-regs 1 V int-regs 2 }
-        T{ ##copy f V int-regs 3 V int-regs 4 }
+        T{ ##copy f V int-rep 1 V int-rep 2 int-rep }
+        T{ ##copy f V int-rep 3 V int-rep 4 int-rep }
     }
 ] [
     H{
-        { V int-regs 1 V int-regs 2 }
-        { V int-regs 3 V int-regs 4 }
+        { V int-rep 1 V int-rep 2 }
+        { V int-rep 3 V int-rep 4 }
     } test-parallel-copy
 ] unit-test
 
 [
     {
-        T{ ##copy f V int-regs 1 V int-regs 3 }
-        T{ ##copy f V int-regs 2 V int-regs 1 }
+        T{ ##copy f V int-rep 1 V int-rep 3 int-rep }
+        T{ ##copy f V int-rep 2 V int-rep 1 int-rep }
     }
 ] [
     H{
-        { V int-regs 1 V int-regs 3 }
-        { V int-regs 2 V int-regs 3 }
+        { V int-rep 1 V int-rep 3 }
+        { V int-rep 2 V int-rep 3 }
     } test-parallel-copy
 ] unit-test
 
 [
     {
-        T{ ##copy f V int-regs 4 V int-regs 3 }
-        T{ ##copy f V int-regs 3 V int-regs 2 }
-        T{ ##copy f V int-regs 2 V int-regs 1 }
-        T{ ##copy f V int-regs 1 V int-regs 4 }
+        T{ ##copy f V int-rep 4 V int-rep 3 int-rep }
+        T{ ##copy f V int-rep 3 V int-rep 2 int-rep }
+        T{ ##copy f V int-rep 2 V int-rep 1 int-rep }
+        T{ ##copy f V int-rep 1 V int-rep 4 int-rep }
     }
 ] [
     {
-        { V int-regs 2 V int-regs 1 }
-        { V int-regs 3 V int-regs 2 }
-        { V int-regs 1 V int-regs 3 }
-        { V int-regs 4 V int-regs 3 }
+        { V int-rep 2 V int-rep 1 }
+        { V int-rep 3 V int-rep 2 }
+        { V int-rep 1 V int-rep 3 }
+        { V int-rep 4 V int-rep 3 }
     } test-parallel-copy
 ] unit-test

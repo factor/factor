@@ -43,7 +43,7 @@ M: word test-cfg
 ! Prettyprinting
 M: vreg pprint*
     <block
-    \ V pprint-word [ reg-class>> pprint* ] [ n>> pprint* ] bi
+    \ V pprint-word [ rep>> pprint* ] [ n>> pprint* ] bi
     block> ;
 
 : pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;

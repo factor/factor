@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel locals
+cpu.architecture
 compiler.cfg.rpo
 compiler.cfg.hats
 compiler.cfg.utilities
@@ -11,7 +12,7 @@ IN: compiler.cfg.ssa.cssa
 
 :: insert-copy ( bb src -- bb dst )
     i :> dst
-    bb [ dst src ##copy ] add-instructions
+    bb [ dst src int-rep ##copy ] add-instructions
     bb dst ;
 
 : convert-phi ( ##phi -- )

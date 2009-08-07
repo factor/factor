@@ -153,8 +153,8 @@ IN: compiler.cfg.intrinsics
         { \ alien.accessors:set-alien-signed-4 [ 4 emit-alien-integer-setter ] }
         { \ alien.accessors:alien-cell [ emit-alien-cell-getter ] }
         { \ alien.accessors:set-alien-cell [ emit-alien-cell-setter ] }
-        { \ alien.accessors:alien-float [ single-float-regs emit-alien-float-getter ] }
-        { \ alien.accessors:set-alien-float [ single-float-regs emit-alien-float-setter ] }
-        { \ alien.accessors:alien-double [ double-float-regs emit-alien-float-getter ] }
-        { \ alien.accessors:set-alien-double [ double-float-regs emit-alien-float-setter ] }
+        { \ alien.accessors:alien-float [ single-float-rep emit-alien-float-getter ] }
+        { \ alien.accessors:set-alien-float [ single-float-rep emit-alien-float-setter ] }
+        { \ alien.accessors:alien-double [ double-float-rep emit-alien-float-getter ] }
+        { \ alien.accessors:set-alien-double [ double-float-rep emit-alien-float-setter ] }
     } case ;

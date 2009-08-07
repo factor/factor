@@ -58,12 +58,8 @@ SYMBOL: copies
 
 GENERIC: prepare-insn ( insn -- )
 
-: prepare-copy ( insn -- )
+M: ##copy prepare-insn
     [ dst>> ] [ src>> ] bi 2array copies get push ;
-
-M: ##copy prepare-insn prepare-copy ;
-
-M: ##copy-float prepare-insn prepare-copy ;
 
 M: ##phi prepare-insn
     [ dst>> ] [ inputs>> values ] bi
@@ -85,10 +81,8 @@ M: insn prepare-insn drop ;
         [ 2drop ] [ eliminate-copy ] if
     ] assoc-each ;
 
-UNION: copy-insn ##copy ##copy-float ;
-
 : useless-copy? ( ##copy -- ? )
-    dup copy-insn? [ [ dst>> ] [ src>> ] bi eq? ] [ drop f ] if ;
+    dup ##copy? [ [ dst>> ] [ src>> ] bi eq? ] [ drop f ] if ;
 
 : perform-renaming ( cfg -- )
     leader-map get keys [ dup leader ] H{ } map>assoc renamings set
