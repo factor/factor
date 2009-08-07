@@ -1,7 +1,7 @@
 ! (c) 2009 Joe Groff bsd license
-USING: kernel math prettyprint prettyprint.backend.callables
+USING: kernel math prettyprint prettyprint.callables
 tools.test ;
-IN: prettyprint.backend.callables
+IN: prettyprint.callables.tests
 
 [ [ dip ] ] [ [ dip ] simplify-callable ] unit-test
 [ [ [ + ] dip ] ] [ [ [ + ] dip ] simplify-callable ] unit-test

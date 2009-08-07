@@ -1,5 +1,5 @@
-USING: help help.markup help.syntax ;
-IN: prettyprint.backend.callables
+USING: help help.markup help.syntax kernel quotations ;
+IN: prettyprint.callables
 
 HELP: simplify-callable
 { $values { "quot" callable } { "quot'" callable } }
