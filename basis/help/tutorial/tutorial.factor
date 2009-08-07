@@ -11,15 +11,13 @@ $nl
 { $code "USE: tools.scaffold" }
 "Then, ask the scaffold tool to create a new vocabulary named " { $snippet "palindrome" } ":"
 { $code "\"resource:work\" \"palindrome\" scaffold-vocab" }
-"If you look at the output, you will see that a few files were created in your “work” directory. The following phrase will print the full path of your work directory:"
+"If you look at the output, you will see that a few files were created in your “work” directory, and that the new source file was loaded."
+$nl
+"The following phrase will print the full path of your work directory:"
 { $code "\"work\" resource-path ." }
 "The work directory is one of several " { $link "vocabs.roots" } " where Factor searches for vocabularies. It is possible to define new vocabulary roots; see " { $link "add-vocab-roots" } ". To keep things simple in this tutorial, we'll just use the work directory, though."
 $nl
-"Open the work directory in your file manager, and open the subdirectory named " { $snippet "palindrome" } ". Inside this subdirectory you will see a file named " { $snippet "palindrome.factor" } ". We will be editing this file."
-$nl
-"Notice that the file ends with an " { $link POSTPONE: IN: } " form telling Factor that all definitions in this source file should go into the " { $snippet "palindrome" } " vocabulary using the " { $link POSTPONE: IN: } " word:"
-{ $code "IN: palindrome" }
-"We will add new definitions after the " { $link POSTPONE: IN: } " form."
+"Open the work directory in your file manager, and open the subdirectory named " { $snippet "palindrome" } ". Inside this subdirectory you will see a file named " { $snippet "palindrome.factor" } ". Open this file in your text editor."
 $nl
 "You are now ready to go on to the next section: " { $link "first-program-logic" } "." ;
 
@@ -30,6 +28,12 @@ ARTICLE: "first-program-logic" "Writing some logic in your first program"
     "! See http://factorcode.org/license.txt for BSD license."
     "IN: palindrome"
 }
+"Notice that the file ends with an " { $link POSTPONE: IN: } " form telling Factor that all definitions in this source file should go into the " { $snippet "palindrome" } " vocabulary using the " { $link POSTPONE: IN: } " word. We will add new definitions after the " { $link POSTPONE: IN: } " form."
+$nl
+"In order to be able to call the words defined in the " { $snippet "palindrome" } " vocabulary, you need to issue the following command in the listener:"
+{ $code "USE: palindrome" }
+"Now, wee will be making some additions to the file. Since the file was loaded by the scaffold tool in the previous step, you need to tell Factor to reload it if it changes. Factor has a handy feature for this; pressing " { $command tool "common" refresh-all } " in the listener window will reload any changed source files. You can also force a single vocabulary to reload:"
+{ $code "\"palindrome\" reload" }
 "We will now write our first word using " { $link POSTPONE: : } ". This word will test if a string is a palindrome; it will take a string as input, and give back a boolean as output. We will call this word " { $snippet "palindrome?" } ", following a naming convention that words returning booleans have names ending with " { $snippet "?" } "."
 $nl
 "Recall that a string is a palindrome if it is spelled the same forwards or backwards; that is, if the string is equal to its reverse. We can express this in Factor as follows:"
