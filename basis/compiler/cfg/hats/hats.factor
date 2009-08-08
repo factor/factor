@@ -56,8 +56,6 @@ IN: compiler.cfg.hats
 : ^^allot-tuple ( n -- dst ) 2 + cells tuple ^^allot ; inline
 : ^^allot-array ( n -- dst ) 2 + cells array ^^allot ; inline
 : ^^allot-byte-array ( n -- dst ) 2 cells + byte-array ^^allot ; inline
-: ^^box-float ( src -- dst ) ^^i1 i ##box-float ; inline
-: ^^unbox-float ( src -- dst ) ^^d1 ##unbox-float ; inline
 : ^^box-alien ( src -- dst ) ^^i1 i ##box-alien ; inline
 : ^^unbox-alien ( src -- dst ) ^^i1 ##unbox-alien ; inline
 : ^^unbox-c-ptr ( src class -- dst ) ^^i2 i ##unbox-c-ptr ;
