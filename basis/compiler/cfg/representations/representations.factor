@@ -17,6 +17,14 @@ IN: compiler.cfg.representations
 ! Virtual register representation selection. Predecessors and loops
 ! must be computed first.
 
+: emit-conversion ( dst src dst-rep src-rep -- )
+    2array {
+        { { int-rep int-rep } [ int-rep ##copy ] }
+        { { double-float-rep double-float-rep } [ double-float-rep ##copy ] }
+        { { double-float-rep int-rep } [ ##unbox-float ] }
+        { { int-rep double-float-rep } [ int-rep next-vreg-rep ##box-float ] }
+    } case ;
+
 <PRIVATE
 
 ! For every vreg, compute possible representations.
@@ -85,14 +93,6 @@ SYMBOL: costs
 
 ! Insert conversions. This introduces new temporaries, so we need
 ! to rename opearands too.
-
-: emit-conversion ( dst src dst-rep src-rep -- )
-    2array {
-        { { int-rep int-rep } [ int-rep ##copy ] }
-        { { double-float-rep double-float-rep } [ double-float-rep ##copy ] }
-        { { double-float-rep int-rep } [ ##unbox-float ] }
-        { { int-rep double-float-rep } [ int-rep next-vreg-rep ##box-float ] }
-    } case ;
 
 :: emit-def-conversion ( dst preferred required -- new-dst' )
     ! If an instruction defines a register with representation 'required',
