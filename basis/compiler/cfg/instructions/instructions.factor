@@ -250,6 +250,34 @@ UNION: kill-vreg-insn
     ##alien-indirect
     ##alien-callback ;
 
+! Instructions that output floats
+UNION: output-float-insn
+    ##add-float
+    ##sub-float
+    ##mul-float
+    ##div-float
+    ##integer>float
+    ##unbox-float
+    ##alien-float
+    ##alien-double ;
+
+! Instructions that take floats as inputs
+UNION: input-float-insn
+    ##add-float
+    ##sub-float
+    ##mul-float
+    ##div-float
+    ##float>integer
+    ##box-float
+    ##set-alien-float
+    ##set-alien-double
+    ##compare-float
+    ##compare-float-branch ;
+
+! Smackdown
+INTERSECTION: ##unary-float ##unary input-float-insn ;
+INTERSECTION: ##binary-float ##binary input-float-insn ;
+
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers
 UNION: def-is-use-insn

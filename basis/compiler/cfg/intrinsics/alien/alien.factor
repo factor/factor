@@ -53,7 +53,7 @@ IN: compiler.cfg.intrinsics.alien
     inline-alien ; inline
 
 : inline-alien-float-setter ( node quot -- )
-    '[ ds-pop ^^unbox-float @ ]
+    '[ ds-pop @ ]
     [ float inline-alien-setter? ]
     inline-alien ; inline
 
@@ -95,7 +95,7 @@ IN: compiler.cfg.intrinsics.alien
         _ {
             { single-float-rep [ ^^alien-float ] }
             { double-float-rep [ ^^alien-double ] }
-        } case ^^box-float
+        } case
     ] inline-alien-getter ;
 
 : emit-alien-float-setter ( node rep -- )
