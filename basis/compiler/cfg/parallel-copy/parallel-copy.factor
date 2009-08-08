@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs cpu.architecture compiler.cfg.hats
+USING: assocs cpu.architecture compiler.cfg.registers
 compiler.cfg.instructions deques dlists fry kernel locals namespaces
 sequences hashtables ;
 IN: compiler.cfg.parallel-copy
@@ -57,4 +57,5 @@ PRIVATE>
         ] slurp-deque
     ] with-scope ; inline
 
-: parallel-copy ( mapping -- ) i [ int-rep ##copy ] parallel-mapping ;
+: parallel-copy ( mapping -- )
+    next-vreg [ any-rep ##copy ] parallel-mapping ;

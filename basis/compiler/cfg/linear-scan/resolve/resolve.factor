@@ -5,6 +5,7 @@ combinators.short-circuit fry kernel locals namespaces
 make math sequences hashtables
 compiler.cfg.rpo
 compiler.cfg.liveness
+compiler.cfg.registers
 compiler.cfg.utilities
 compiler.cfg.instructions
 compiler.cfg.parallel-copy
@@ -23,7 +24,7 @@ SYMBOL: spill-temps
 :: resolve-value-data-flow ( bb to vreg -- )
     vreg bb vreg-at-end
     vreg to vreg-at-start
-    2dup = [ 2drop ] [ vreg rep>> add-mapping ] if ;
+    2dup = [ 2drop ] [ vreg rep-of add-mapping ] if ;
 
 : compute-mappings ( bb to -- mappings )
     dup live-in dup assoc-empty? [ 3drop f ] [

@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs kernel accessors
 sorting sets sequences
+cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.instructions
@@ -14,7 +15,7 @@ IN: compiler.cfg.value-numbering
 ! Local value numbering. Predecessors must be recomputed after this
 : >copy ( insn -- insn/##copy )
     dup dst>> dup vreg>vn vn>vreg
-    2dup eq? [ 2drop ] [ dup rep>> \ ##copy new-insn nip ] if ;
+    2dup eq? [ 2drop ] [ any-rep \ ##copy new-insn nip ] if ;
 
 : rewrite-loop ( insn -- insn' )
     dup rewrite [ rewrite-loop ] [ ] ?if ;
