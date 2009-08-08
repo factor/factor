@@ -28,17 +28,17 @@ IN: compiler.cfg.ssa.liveness
     precompute-liveness ;
 
 V{
-    T{ ##peek f V int-rep 0 D 0 }
-    T{ ##replace f V int-rep 0 D 0 }
-    T{ ##replace f V int-rep 1 D 1 }
+    T{ ##peek f 0 D 0 }
+    T{ ##replace f 0 D 0 }
+    T{ ##replace f 1 D 1 }
 } 0 test-bb
 
 V{
-    T{ ##replace f V int-rep 2 D 0 }
+    T{ ##replace f 2 D 0 }
 } 1 test-bb
 
 V{
-    T{ ##replace f V int-rep 3 D 0 }
+    T{ ##replace f 3 D 0 }
 } 2 test-bb
 
 0 { 1 2 } edges
@@ -57,78 +57,78 @@ V{
 [ t ] [ 1 self-T_q ] unit-test
 [ t ] [ 2 self-T_q ] unit-test
 
-[ f ] [ V int-rep 0 0 get live-in? ] unit-test
-[ t ] [ V int-rep 1 0 get live-in? ] unit-test
-[ t ] [ V int-rep 2 0 get live-in? ] unit-test
-[ t ] [ V int-rep 3 0 get live-in? ] unit-test
+[ f ] [ 0 0 get live-in? ] unit-test
+[ t ] [ 1 0 get live-in? ] unit-test
+[ t ] [ 2 0 get live-in? ] unit-test
+[ t ] [ 3 0 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 0 get live-out? ] unit-test
-[ f ] [ V int-rep 1 0 get live-out? ] unit-test
-[ t ] [ V int-rep 2 0 get live-out? ] unit-test
-[ t ] [ V int-rep 3 0 get live-out? ] unit-test
+[ f ] [ 0 0 get live-out? ] unit-test
+[ f ] [ 1 0 get live-out? ] unit-test
+[ t ] [ 2 0 get live-out? ] unit-test
+[ t ] [ 3 0 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 1 get live-in? ] unit-test
-[ f ] [ V int-rep 1 1 get live-in? ] unit-test
-[ t ] [ V int-rep 2 1 get live-in? ] unit-test
-[ f ] [ V int-rep 3 1 get live-in? ] unit-test
+[ f ] [ 0 1 get live-in? ] unit-test
+[ f ] [ 1 1 get live-in? ] unit-test
+[ t ] [ 2 1 get live-in? ] unit-test
+[ f ] [ 3 1 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 1 get live-out? ] unit-test
-[ f ] [ V int-rep 1 1 get live-out? ] unit-test
-[ f ] [ V int-rep 2 1 get live-out? ] unit-test
-[ f ] [ V int-rep 3 1 get live-out? ] unit-test
+[ f ] [ 0 1 get live-out? ] unit-test
+[ f ] [ 1 1 get live-out? ] unit-test
+[ f ] [ 2 1 get live-out? ] unit-test
+[ f ] [ 3 1 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 2 get live-in? ] unit-test
-[ f ] [ V int-rep 1 2 get live-in? ] unit-test
-[ f ] [ V int-rep 2 2 get live-in? ] unit-test
-[ t ] [ V int-rep 3 2 get live-in? ] unit-test
+[ f ] [ 0 2 get live-in? ] unit-test
+[ f ] [ 1 2 get live-in? ] unit-test
+[ f ] [ 2 2 get live-in? ] unit-test
+[ t ] [ 3 2 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 2 get live-out? ] unit-test
-[ f ] [ V int-rep 1 2 get live-out? ] unit-test
-[ f ] [ V int-rep 2 2 get live-out? ] unit-test
-[ f ] [ V int-rep 3 2 get live-out? ] unit-test
+[ f ] [ 0 2 get live-out? ] unit-test
+[ f ] [ 1 2 get live-out? ] unit-test
+[ f ] [ 2 2 get live-out? ] unit-test
+[ f ] [ 3 2 get live-out? ] unit-test
 
 V{ } 0 test-bb
 V{ } 1 test-bb
 V{ } 2 test-bb
 V{ } 3 test-bb
 V{
-    T{ ##phi f V int-rep 2 H{ { 2 V int-rep 0 } { 3 V int-rep 1 } } }
+    T{ ##phi f 2 H{ { 2 0 } { 3 1 } } }
 } 4 test-bb
 test-diamond
 
 [ ] [ test-liveness ] unit-test
 
-[ t ] [ V int-rep 0 1 get live-in? ] unit-test
-[ t ] [ V int-rep 1 1 get live-in? ] unit-test
-[ f ] [ V int-rep 2 1 get live-in? ] unit-test
+[ t ] [ 0 1 get live-in? ] unit-test
+[ t ] [ 1 1 get live-in? ] unit-test
+[ f ] [ 2 1 get live-in? ] unit-test
 
-[ t ] [ V int-rep 0 1 get live-out? ] unit-test
-[ t ] [ V int-rep 1 1 get live-out? ] unit-test
-[ f ] [ V int-rep 2 1 get live-out? ] unit-test
+[ t ] [ 0 1 get live-out? ] unit-test
+[ t ] [ 1 1 get live-out? ] unit-test
+[ f ] [ 2 1 get live-out? ] unit-test
 
-[ t ] [ V int-rep 0 2 get live-in? ] unit-test
-[ f ] [ V int-rep 1 2 get live-in? ] unit-test
-[ f ] [ V int-rep 2 2 get live-in? ] unit-test
+[ t ] [ 0 2 get live-in? ] unit-test
+[ f ] [ 1 2 get live-in? ] unit-test
+[ f ] [ 2 2 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 2 get live-out? ] unit-test
-[ f ] [ V int-rep 1 2 get live-out? ] unit-test
-[ f ] [ V int-rep 2 2 get live-out? ] unit-test
+[ f ] [ 0 2 get live-out? ] unit-test
+[ f ] [ 1 2 get live-out? ] unit-test
+[ f ] [ 2 2 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 3 get live-in? ] unit-test
-[ t ] [ V int-rep 1 3 get live-in? ] unit-test
-[ f ] [ V int-rep 2 3 get live-in? ] unit-test
+[ f ] [ 0 3 get live-in? ] unit-test
+[ t ] [ 1 3 get live-in? ] unit-test
+[ f ] [ 2 3 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 3 get live-out? ] unit-test
-[ f ] [ V int-rep 1 3 get live-out? ] unit-test
-[ f ] [ V int-rep 2 3 get live-out? ] unit-test
+[ f ] [ 0 3 get live-out? ] unit-test
+[ f ] [ 1 3 get live-out? ] unit-test
+[ f ] [ 2 3 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 4 get live-in? ] unit-test
-[ f ] [ V int-rep 1 4 get live-in? ] unit-test
-[ f ] [ V int-rep 2 4 get live-in? ] unit-test
+[ f ] [ 0 4 get live-in? ] unit-test
+[ f ] [ 1 4 get live-in? ] unit-test
+[ f ] [ 2 4 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 4 get live-out? ] unit-test
-[ f ] [ V int-rep 1 4 get live-out? ] unit-test
-[ f ] [ V int-rep 2 4 get live-out? ] unit-test
+[ f ] [ 0 4 get live-out? ] unit-test
+[ f ] [ 1 4 get live-out? ] unit-test
+[ f ] [ 2 4 get live-out? ] unit-test
 
 ! This is the CFG in Figure 3 from the paper
 V{ } 0 test-bb
@@ -137,23 +137,23 @@ V{ } 1 test-bb
 V{ } 2 test-bb
 1 2 edge
 V{
-    T{ ##peek f V int-rep 0 D 0 }
-    T{ ##peek f V int-rep 1 D 0 }
-    T{ ##peek f V int-rep 2 D 0 }
+    T{ ##peek f 0 D 0 }
+    T{ ##peek f 1 D 0 }
+    T{ ##peek f 2 D 0 }
 } 3 test-bb
 V{ } 11 test-bb
 2 { 3 11 } edges
 V{
-    T{ ##replace f V int-rep 0 D 0 }
+    T{ ##replace f 0 D 0 }
 } 4 test-bb
 V{ } 8 test-bb
 3 { 8 4 } edges
 V{
-    T{ ##replace f V int-rep 1 D 0 }
+    T{ ##replace f 1 D 0 }
 } 9 test-bb
 8 9 edge
 V{
-    T{ ##replace f V int-rep 2 D 0 }
+    T{ ##replace f 2 D 0 }
 } 5 test-bb
 4 5 edge
 V{ } 10 test-bb
@@ -203,90 +203,90 @@ V{ } 7 test-bb
 [ f ] [ 10 get back-edge-target? ] unit-test
 [ f ] [ 11 get back-edge-target? ] unit-test
 
-[ f ] [ V int-rep 0 1 get live-in? ] unit-test
-[ f ] [ V int-rep 1 1 get live-in? ] unit-test
-[ f ] [ V int-rep 2 1 get live-in? ] unit-test
+[ f ] [ 0 1 get live-in? ] unit-test
+[ f ] [ 1 1 get live-in? ] unit-test
+[ f ] [ 2 1 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 1 get live-out? ] unit-test
-[ f ] [ V int-rep 1 1 get live-out? ] unit-test
-[ f ] [ V int-rep 2 1 get live-out? ] unit-test
+[ f ] [ 0 1 get live-out? ] unit-test
+[ f ] [ 1 1 get live-out? ] unit-test
+[ f ] [ 2 1 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 2 get live-in? ] unit-test
-[ f ] [ V int-rep 1 2 get live-in? ] unit-test
-[ f ] [ V int-rep 2 2 get live-in? ] unit-test
+[ f ] [ 0 2 get live-in? ] unit-test
+[ f ] [ 1 2 get live-in? ] unit-test
+[ f ] [ 2 2 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 2 get live-out? ] unit-test
-[ f ] [ V int-rep 1 2 get live-out? ] unit-test
-[ f ] [ V int-rep 2 2 get live-out? ] unit-test
+[ f ] [ 0 2 get live-out? ] unit-test
+[ f ] [ 1 2 get live-out? ] unit-test
+[ f ] [ 2 2 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 3 get live-in? ] unit-test
-[ f ] [ V int-rep 1 3 get live-in? ] unit-test
-[ f ] [ V int-rep 2 3 get live-in? ] unit-test
+[ f ] [ 0 3 get live-in? ] unit-test
+[ f ] [ 1 3 get live-in? ] unit-test
+[ f ] [ 2 3 get live-in? ] unit-test
 
-[ t ] [ V int-rep 0 3 get live-out? ] unit-test
-[ t ] [ V int-rep 1 3 get live-out? ] unit-test
-[ t ] [ V int-rep 2 3 get live-out? ] unit-test
+[ t ] [ 0 3 get live-out? ] unit-test
+[ t ] [ 1 3 get live-out? ] unit-test
+[ t ] [ 2 3 get live-out? ] unit-test
 
-[ t ] [ V int-rep 0 4 get live-in? ] unit-test
-[ f ] [ V int-rep 1 4 get live-in? ] unit-test
-[ t ] [ V int-rep 2 4 get live-in? ] unit-test
+[ t ] [ 0 4 get live-in? ] unit-test
+[ f ] [ 1 4 get live-in? ] unit-test
+[ t ] [ 2 4 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 4 get live-out? ] unit-test
-[ f ] [ V int-rep 1 4 get live-out? ] unit-test
-[ t ] [ V int-rep 2 4 get live-out? ] unit-test
+[ f ] [ 0 4 get live-out? ] unit-test
+[ f ] [ 1 4 get live-out? ] unit-test
+[ t ] [ 2 4 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 5 get live-in? ] unit-test
-[ f ] [ V int-rep 1 5 get live-in? ] unit-test
-[ t ] [ V int-rep 2 5 get live-in? ] unit-test
+[ f ] [ 0 5 get live-in? ] unit-test
+[ f ] [ 1 5 get live-in? ] unit-test
+[ t ] [ 2 5 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 5 get live-out? ] unit-test
-[ f ] [ V int-rep 1 5 get live-out? ] unit-test
-[ t ] [ V int-rep 2 5 get live-out? ] unit-test
+[ f ] [ 0 5 get live-out? ] unit-test
+[ f ] [ 1 5 get live-out? ] unit-test
+[ t ] [ 2 5 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 6 get live-in? ] unit-test
-[ f ] [ V int-rep 1 6 get live-in? ] unit-test
-[ t ] [ V int-rep 2 6 get live-in? ] unit-test
+[ f ] [ 0 6 get live-in? ] unit-test
+[ f ] [ 1 6 get live-in? ] unit-test
+[ t ] [ 2 6 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 6 get live-out? ] unit-test
-[ f ] [ V int-rep 1 6 get live-out? ] unit-test
-[ t ] [ V int-rep 2 6 get live-out? ] unit-test
+[ f ] [ 0 6 get live-out? ] unit-test
+[ f ] [ 1 6 get live-out? ] unit-test
+[ t ] [ 2 6 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 7 get live-in? ] unit-test
-[ f ] [ V int-rep 1 7 get live-in? ] unit-test
-[ f ] [ V int-rep 2 7 get live-in? ] unit-test
+[ f ] [ 0 7 get live-in? ] unit-test
+[ f ] [ 1 7 get live-in? ] unit-test
+[ f ] [ 2 7 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 7 get live-out? ] unit-test
-[ f ] [ V int-rep 1 7 get live-out? ] unit-test
-[ f ] [ V int-rep 2 7 get live-out? ] unit-test
+[ f ] [ 0 7 get live-out? ] unit-test
+[ f ] [ 1 7 get live-out? ] unit-test
+[ f ] [ 2 7 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 8 get live-in? ] unit-test
-[ t ] [ V int-rep 1 8 get live-in? ] unit-test
-[ t ] [ V int-rep 2 8 get live-in? ] unit-test
+[ f ] [ 0 8 get live-in? ] unit-test
+[ t ] [ 1 8 get live-in? ] unit-test
+[ t ] [ 2 8 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 8 get live-out? ] unit-test
-[ t ] [ V int-rep 1 8 get live-out? ] unit-test
-[ t ] [ V int-rep 2 8 get live-out? ] unit-test
+[ f ] [ 0 8 get live-out? ] unit-test
+[ t ] [ 1 8 get live-out? ] unit-test
+[ t ] [ 2 8 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 9 get live-in? ] unit-test
-[ t ] [ V int-rep 1 9 get live-in? ] unit-test
-[ t ] [ V int-rep 2 9 get live-in? ] unit-test
+[ f ] [ 0 9 get live-in? ] unit-test
+[ t ] [ 1 9 get live-in? ] unit-test
+[ t ] [ 2 9 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 9 get live-out? ] unit-test
-[ t ] [ V int-rep 1 9 get live-out? ] unit-test
-[ t ] [ V int-rep 2 9 get live-out? ] unit-test
+[ f ] [ 0 9 get live-out? ] unit-test
+[ t ] [ 1 9 get live-out? ] unit-test
+[ t ] [ 2 9 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 10 get live-in? ] unit-test
-[ t ] [ V int-rep 1 10 get live-in? ] unit-test
-[ t ] [ V int-rep 2 10 get live-in? ] unit-test
+[ f ] [ 0 10 get live-in? ] unit-test
+[ t ] [ 1 10 get live-in? ] unit-test
+[ t ] [ 2 10 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 10 get live-out? ] unit-test
-[ t ] [ V int-rep 1 10 get live-out? ] unit-test
-[ t ] [ V int-rep 2 10 get live-out? ] unit-test
+[ f ] [ 0 10 get live-out? ] unit-test
+[ t ] [ 1 10 get live-out? ] unit-test
+[ t ] [ 2 10 get live-out? ] unit-test
 
-[ f ] [ V int-rep 0 11 get live-in? ] unit-test
-[ f ] [ V int-rep 1 11 get live-in? ] unit-test
-[ f ] [ V int-rep 2 11 get live-in? ] unit-test
+[ f ] [ 0 11 get live-in? ] unit-test
+[ f ] [ 1 11 get live-in? ] unit-test
+[ f ] [ 2 11 get live-in? ] unit-test
 
-[ f ] [ V int-rep 0 11 get live-out? ] unit-test
-[ f ] [ V int-rep 1 11 get live-out? ] unit-test
-[ f ] [ V int-rep 2 11 get live-out? ] unit-test
+[ f ] [ 0 11 get live-out? ] unit-test
+[ f ] [ 1 11 get live-out? ] unit-test
+[ f ] [ 2 11 get live-out? ] unit-test
