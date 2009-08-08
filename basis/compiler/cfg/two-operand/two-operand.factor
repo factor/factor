@@ -44,7 +44,7 @@ UNION: two-operand-insn
 GENERIC: convert-two-operand* ( insn -- )
 
 : emit-copy ( dst src -- )
-    dup rep>> ##copy ; inline
+    dup rep-of ##copy ; inline
 
 M: two-operand-insn convert-two-operand*
     [ [ dst>> ] [ src1>> ] bi emit-copy ]

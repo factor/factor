@@ -14,14 +14,14 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##replace f V int-rep 0 D 0 }
-    T{ ##replace f V int-rep 0 D 1 }
-    T{ ##replace f V int-rep 0 D 2 }
+    T{ ##replace f 0 D 0 }
+    T{ ##replace f 0 D 1 }
+    T{ ##replace f 0 D 2 }
     T{ ##inc-r f 1 }
 } 1 test-bb
 
 V{
-    T{ ##peek f V int-rep 0 D 0 }
+    T{ ##peek f 0 D 0 }
     T{ ##inc-d f 1 }
 } 2 test-bb
 

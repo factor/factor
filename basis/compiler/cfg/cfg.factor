@@ -19,7 +19,7 @@ M: basic-block hashcode* nip id>> ;
         V{ } clone >>predecessors
         \ basic-block counter >>id ;
 
-TUPLE: cfg { entry basic-block } word label spill-area-size post-order ;
+TUPLE: cfg { entry basic-block } word label spill-area-size reps post-order ;
 
 : <cfg> ( entry word label -- cfg )
     cfg new

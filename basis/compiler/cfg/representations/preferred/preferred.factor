@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays fry namespaces
-cpu.architecture compiler.cfg compiler.cfg.rpo
+cpu.architecture compiler.cfg.utilities compiler.cfg compiler.cfg.rpo
 compiler.cfg.instructions compiler.cfg.def-use ;
 IN: compiler.cfg.representations.preferred
 
@@ -73,10 +73,11 @@ M: insn uses-vreg-reps drop f ;
 : with-vreg-reps ( cfg vreg-quot: ( vreg rep -- ) -- )
     '[
         [ basic-block set ] [
-            instructions>> [
-                dup ##phi? [ drop ] [
-                    _ [ each-def-rep ] [ each-use-rep ] [ each-temp-rep ] 2tri
-                ] if
-            ] each
+            [
+                _
+                [ each-def-rep ]
+                [ each-use-rep ]
+                [ each-temp-rep ] 2tri
+            ] each-non-phi
         ] bi
     ] each-basic-block ; inline

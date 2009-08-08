@@ -11,53 +11,53 @@ SYMBOL: temp
 
 [
     {
-        T{ ##copy f V int-rep 4 V int-rep 2 int-rep }
-        T{ ##copy f V int-rep 2 V int-rep 1 int-rep }
-        T{ ##copy f V int-rep 1 V int-rep 4 int-rep }
+        T{ ##copy f 4 2 any-rep }
+        T{ ##copy f 2 1 any-rep }
+        T{ ##copy f 1 4 any-rep }
     }
 ] [
     H{
-        { V int-rep 1 V int-rep 2 }
-        { V int-rep 2 V int-rep 1 }
+        { 1 2 }
+        { 2 1 }
     } test-parallel-copy
 ] unit-test
 
 [
     {
-        T{ ##copy f V int-rep 1 V int-rep 2 int-rep }
-        T{ ##copy f V int-rep 3 V int-rep 4 int-rep }
+        T{ ##copy f 1 2 any-rep }
+        T{ ##copy f 3 4 any-rep }
     }
 ] [
     H{
-        { V int-rep 1 V int-rep 2 }
-        { V int-rep 3 V int-rep 4 }
+        { 1 2 }
+        { 3 4 }
     } test-parallel-copy
 ] unit-test
 
 [
     {
-        T{ ##copy f V int-rep 1 V int-rep 3 int-rep }
-        T{ ##copy f V int-rep 2 V int-rep 1 int-rep }
+        T{ ##copy f 1 3 any-rep }
+        T{ ##copy f 2 1 any-rep }
     }
 ] [
     H{
-        { V int-rep 1 V int-rep 3 }
-        { V int-rep 2 V int-rep 3 }
+        { 1 3 }
+        { 2 3 }
     } test-parallel-copy
 ] unit-test
 
 [
     {
-        T{ ##copy f V int-rep 4 V int-rep 3 int-rep }
-        T{ ##copy f V int-rep 3 V int-rep 2 int-rep }
-        T{ ##copy f V int-rep 2 V int-rep 1 int-rep }
-        T{ ##copy f V int-rep 1 V int-rep 4 int-rep }
+        T{ ##copy f 4 3 any-rep }
+        T{ ##copy f 3 2 any-rep }
+        T{ ##copy f 2 1 any-rep }
+        T{ ##copy f 1 4 any-rep }
     }
 ] [
     {
-        { V int-rep 2 V int-rep 1 }
-        { V int-rep 3 V int-rep 2 }
-        { V int-rep 1 V int-rep 3 }
-        { V int-rep 4 V int-rep 3 }
+        { 2 1 }
+        { 3 2 }
+        { 1 3 }
+        { 4 3 }
     } test-parallel-copy
 ] unit-test
