@@ -22,7 +22,7 @@ SYMBOLS: peek-sets replace-sets kill-sets ;
 
 SYMBOL: locs>vregs
 
-: loc>vreg ( loc -- vreg ) locs>vregs get [ drop i ] cache ;
+: loc>vreg ( loc -- vreg ) locs>vregs get [ drop next-vreg ] cache ;
 : vreg>loc ( vreg -- loc/f ) locs>vregs get value-at ;
 
 TUPLE: current-height

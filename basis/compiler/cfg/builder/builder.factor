@@ -145,7 +145,7 @@ M: #dispatch emit-node
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync. ^^offset>slot always returns a fresh vreg,
     ! though.
-    ds-pop ^^offset>slot i ##dispatch emit-if ;
+    ds-pop ^^offset>slot next-vreg ##dispatch emit-if ;
 
 ! #call
 M: #call emit-node

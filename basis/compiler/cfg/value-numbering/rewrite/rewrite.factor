@@ -4,7 +4,7 @@ USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
 math.bitwise math.order classes vectors
 compiler.cfg
-compiler.cfg.hats
+compiler.cfg.registers
 compiler.cfg.comparisons
 compiler.cfg.instructions
 compiler.cfg.value-numbering.expressions
@@ -77,7 +77,7 @@ M: ##compare-imm-branch rewrite-tagged-comparison
 
 M: ##compare-imm rewrite-tagged-comparison
     [ dst>> ] [ (rewrite-tagged-comparison) ] bi
-    i \ ##compare-imm new-insn ;
+    next-vreg \ ##compare-imm new-insn ;
 
 : rewrite-redundant-comparison? ( insn -- ? )
     {
@@ -88,9 +88,9 @@ M: ##compare-imm rewrite-tagged-comparison
 
 : rewrite-redundant-comparison ( insn -- insn' )
     [ cc>> ] [ dst>> ] [ src1>> vreg>expr dup op>> ] tri {
-        { \ ##compare [ >compare-expr< i \ ##compare new-insn ] }
-        { \ ##compare-imm [ >compare-imm-expr< i \ ##compare-imm new-insn ] }
-        { \ ##compare-float [ >compare-expr< i \ ##compare-float new-insn ] }
+        { \ ##compare [ >compare-expr< next-vreg \ ##compare new-insn ] }
+        { \ ##compare-imm [ >compare-imm-expr< next-vreg \ ##compare-imm new-insn ] }
+        { \ ##compare-float [ >compare-expr< next-vreg \ ##compare-float new-insn ] }
     } case
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 
@@ -169,7 +169,7 @@ M: ##compare-branch rewrite
     ] dip
     swap-compare
     [ vreg>constant ] dip
-    i \ ##compare-imm new-insn ; inline
+    next-vreg \ ##compare-imm new-insn ; inline
 
 : >boolean-insn ( insn ? -- insn' )
     [ dst>> ] dip

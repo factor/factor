@@ -7,14 +7,20 @@ IN: cpu.architecture
 
 ! Representations -- these are like low-level types
 
-! Integer registers can contain data with one of these two representations
+! Unknown representation; this is used for ##copy instructions which
+! get eliminated later
+SINGLETON: any-rep
+
+! Integer registers can contain data with one of these three representations
+! tagged-rep: tagged pointer or fixnum
+! int-rep: untagged fixnum, not a pointer
 SINGLETONS: tagged-rep int-rep ;
 
 ! Floating point registers can contain data with
 ! one of these representations
 SINGLETONS: single-float-rep double-float-rep ;
 
-UNION: representation tagged-rep int-rep single-float-rep double-float-rep ;
+UNION: representation any-rep tagged-rep int-rep single-float-rep double-float-rep ;
 
 ! Register classes
 SINGLETONS: int-regs float-regs ;

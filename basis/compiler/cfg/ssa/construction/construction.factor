@@ -76,7 +76,7 @@ SYMBOLS: stacks pushed ;
     H{ } clone stacks set ;
 
 : gen-name ( vreg -- vreg' )
-    [ fresh-value dup ] keep
+    [ next-vreg dup ] dip
     dup pushed get 2dup key?
     [ 2drop stacks get at set-last ]
     [ conjoin stacks get push-at ]

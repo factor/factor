@@ -9,15 +9,17 @@ compiler.cfg.instructions
 compiler.cfg.representations ;
 IN: compiler.cfg.ssa.cssa
 
-! Convert SSA to conventional SSA.
+! Convert SSA to conventional SSA. This pass runs after representation
+! selection, so it must keep track of representations when introducing
+! new values.
 
 :: insert-copy ( bb src rep -- bb dst )
-    rep next-vreg :> dst
-    bb [ dst src rep src rep>> emit-conversion ] add-instructions
+    rep next-vreg-rep :> dst
+    bb [ dst src rep src rep-of emit-conversion ] add-instructions
     bb dst ;
 
 : convert-phi ( ##phi -- )
-    dup dst>> rep>> '[ [ _ insert-copy ] assoc-map ] change-inputs drop ;
+    dup dst>> rep-of '[ [ _ insert-copy ] assoc-map ] change-inputs drop ;
 
 : construct-cssa ( cfg -- )
     [ [ convert-phi ] each-phi ] each-basic-block ;

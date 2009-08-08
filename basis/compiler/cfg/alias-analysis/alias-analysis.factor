@@ -226,7 +226,7 @@ M: ##read analyze-aliases*
     call-next-method
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri
     2dup live-slot dup [
-        2nip int-rep \ ##copy new-insn analyze-aliases* nip
+        2nip any-rep \ ##copy new-insn analyze-aliases* nip
     ] [
         drop remember-slot
     ] if ;

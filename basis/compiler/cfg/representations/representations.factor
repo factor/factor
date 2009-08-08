@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel fry accessors sequences assocs sets namespaces
-arrays combinators make locals cpu.architecture compiler.utilities
+arrays combinators make locals deques dlists
+cpu.architecture compiler.utilities
 compiler.cfg
 compiler.cfg.rpo
-compiler.cfg.hats
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.def-use
@@ -14,8 +14,10 @@ compiler.cfg.renaming.functor
 compiler.cfg.representations.preferred ;
 IN: compiler.cfg.representations
 
-! Virtual register representation selection.
-! Still needs a loop nesting heuristic
+! Virtual register representation selection. Predecessors and loops
+! must be computed first.
+
+<PRIVATE
 
 ! For every vreg, compute possible representations.
 SYMBOL: possibilities
@@ -25,6 +27,23 @@ SYMBOL: possibilities
 : compute-possibilities ( cfg -- )
     H{ } clone [ '[ swap _ conjoin-at ] with-vreg-reps ] keep
     [ keys ] assoc-map possibilities set ;
+
+! Compute vregs which must remain tagged for their lifetime.
+SYMBOL: always-boxed
+
+:: (compute-always-boxed) ( vreg rep assoc -- )
+    rep int-rep eq? [
+        int-rep vreg assoc set-at
+    ] when ;
+
+: compute-always-boxed ( cfg -- assoc )
+    H{ } clone [
+        '[
+            [
+                [ _ (compute-always-boxed) ] each-def-rep
+            ] each-non-phi
+        ] each-basic-block
+    ] keep ;
 
 ! For every vreg, compute the cost of keeping it in every possible
 ! representation.
@@ -51,16 +70,18 @@ SYMBOL: costs
     [ '[ _ _ maybe-increase-cost ] ]
     2bi each ;
 
+: compute-costs ( cfg -- costs )
+    init-costs [ representation-cost ] with-vreg-reps costs get ;
+
 ! For every vreg, compute preferred representation, that minimizes costs.
-SYMBOL: preferred
+: minimize-costs ( costs -- representations )
+    [ >alist alist-min first ] assoc-map ;
 
-: minimize-costs ( -- )
-    costs get [ >alist alist-min first ] assoc-map preferred set ;
-
-: compute-costs ( cfg -- )
-    init-costs
-    [ representation-cost ] with-vreg-reps
-    minimize-costs ;
+: compute-representations ( cfg -- )
+    [ compute-costs minimize-costs ]
+    [ compute-always-boxed ]
+    bi assoc-union
+    representations set ;
 
 ! Insert conversions. This introduces new temporaries, so we need
 ! to rename opearands too.
@@ -70,7 +91,7 @@ SYMBOL: preferred
         { { int-rep int-rep } [ int-rep ##copy ] }
         { { double-float-rep double-float-rep } [ double-float-rep ##copy ] }
         { { double-float-rep int-rep } [ ##unbox-float ] }
-        { { int-rep double-float-rep } [ i ##box-float ] }
+        { { int-rep double-float-rep } [ int-rep next-vreg-rep ##box-float ] }
     } case ;
 
 :: emit-def-conversion ( dst preferred required -- new-dst' )
@@ -78,14 +99,14 @@ SYMBOL: preferred
     ! but the register has preferred representation 'preferred', then
     ! we rename the instruction's definition to a new register, which
     ! becomes the input of a conversion instruction.
-    dst required next-vreg [ preferred required emit-conversion ] keep ;
+    dst required next-vreg-rep [ preferred required emit-conversion ] keep ;
 
 :: emit-use-conversion ( src preferred required -- new-src' )
     ! If an instruction uses a register with representation 'required',
     ! but the register has preferred representation 'preferred', then
     ! we rename the instruction's input to a new register, which
     ! becomes the output of a conversion instruction.
-    required next-vreg [ src required preferred emit-conversion ] keep ;
+    required next-vreg-rep [ src required preferred emit-conversion ] keep ;
 
 SYMBOLS: renaming-set needs-renaming? ;
 
@@ -100,7 +121,7 @@ SYMBOLS: renaming-set needs-renaming? ;
     2array renaming-set get push needs-renaming? on ;
 
 :: (compute-renaming-set) ( vreg required quot: ( vreg preferred required -- ) -- )
-    vreg preferred get at :> preferred
+    vreg rep-of :> preferred
     preferred required eq?
     [ vreg no-renaming ]
     [ vreg vreg preferred required quot call record-renaming ] if ; inline
@@ -128,8 +149,15 @@ RENAMING: convert [ converted-value ] [ converted-value ] [ ]
 
 GENERIC: conversions-for-insn ( insn -- )
 
-! Inserting conversions for a phi is done in compiler.cfg.cssa
-M: ##phi conversions-for-insn , ;
+SYMBOL: phi-mappings
+
+! compiler.cfg.cssa inserts conversions which convert phi inputs into
+!  the representation of the output. However, we still have to do some
+!  processing here, because if the only node that uses the output of
+!  the phi instruction is another phi instruction then this phi node's
+! output won't have a representation assigned.
+M: ##phi conversions-for-insn
+    [ , ] [ [ inputs>> values ] [ dst>> ] bi phi-mappings get set-at ] bi ;
 
 M: vreg-insn conversions-for-insn
     [ compute-renaming-set ] [ perform-renaming ] bi ;
@@ -145,13 +173,54 @@ M: insn conversions-for-insn , ;
         ] change-instructions drop
     ] if ;
 
+! If the output of a phi instruction is only used as the input to another
+! phi instruction, then we want to use the same representation for both
+! if possible.
+SYMBOL: work-list
+
+: add-to-work-list ( vregs -- )
+    work-list get push-all-front ;
+
+: rep-assigned ( vregs -- vregs' )
+    representations get '[ _ key? ] filter ;
+
+: rep-not-assigned ( vregs -- vregs' )
+    representations get '[ _ key? not ] filter ;
+
+: add-ready-phis ( -- )
+    phi-mappings get keys rep-assigned add-to-work-list ;
+
+: process-phi-mapping ( dst -- )
+    ! If dst = phi(src1,src2,...) and dst's representation has been
+    ! determined, assign that representation to each one of src1,...
+    ! that does not have a representation yet, and process those, too.
+    dup phi-mappings get at* [
+        [ rep-of ] [ rep-not-assigned ] bi*
+        [ [ set-rep-of ] with each ] [ add-to-work-list ] bi
+    ] [ 2drop ] if ;
+
+: remaining-phi-mappings ( -- )
+    phi-mappings get keys rep-not-assigned
+    [ [ int-rep ] dip set-rep-of ] each ;
+
+: process-phi-mappings ( -- )
+    <hashed-dlist> work-list set
+    add-ready-phis
+    work-list get [ process-phi-mapping ] slurp-deque
+    remaining-phi-mappings ;
+
 : insert-conversions ( cfg -- )
-    [ conversions-for-block ] each-basic-block ;
+    H{ } clone phi-mappings set
+    [ conversions-for-block ] each-basic-block
+    process-phi-mappings ;
+
+PRIVATE>
 
 : select-representations ( cfg -- cfg' )
     {
         [ compute-possibilities ]
-        [ compute-costs ]
+        [ compute-representations ]
         [ insert-conversions ]
-        [ preferred get [ >>rep drop ] assoc-each ]
-    } cleave ;
+        [ ]
+    } cleave
+    representations get cfg get (>>reps) ;

@@ -5,6 +5,7 @@ cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.liveness
+compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.live-intervals

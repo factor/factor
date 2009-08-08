@@ -52,7 +52,7 @@ SYMBOL: register-live-outs
     init-unhandled ;
 
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ vreg>> rep>> ] [ spill-to>> ] tri _spill ;
+    [ reg>> ] [ vreg>> rep-of ] [ spill-to>> ] tri _spill ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
@@ -72,7 +72,7 @@ SYMBOL: register-live-outs
     pending-interval-heap get (expire-old-intervals) ;
 
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ vreg>> rep>> ] [ reload-from>> ] tri _reload ;
+    [ reg>> ] [ vreg>> rep-of ] [ reload-from>> ] tri _reload ;
 
 : handle-reload ( live-interval -- )
     dup reload-from>> [ insert-reload ] [ drop ] if ;
@@ -108,10 +108,10 @@ M: vreg-insn assign-registers-in-insn
 : trace-on-gc ( assoc -- assoc' )
     ! When a GC occurs, virtual registers which contain tagged data
     ! are traced by the GC. Outputs a sequence physical registers.
-    [ drop rep>> int-rep eq? ] { } assoc-filter-as values ;
+    [ drop rep-of int-rep eq? ] { } assoc-filter-as values ;
 
 : spill-on-gc? ( vreg reg -- ? )
-    [ rep>> int-rep? not ] [ spill-slot? not ] bi* and ;
+    [ rep-of int-rep? not ] [ spill-slot? not ] bi* and ;
 
 : spill-on-gc ( assoc -- assoc' )
     ! When a GC occurs, virtual registers which contain untagged data,
@@ -123,7 +123,7 @@ M: vreg-insn assign-registers-in-insn
     [
         [
             2dup spill-on-gc?
-            [ swap [ assign-spill-slot ] [ rep>> ] bi 3array , ] [ 2drop ] if
+            [ swap [ assign-spill-slot ] [ rep-of ] bi 3array , ] [ 2drop ] if
         ] assoc-each
     ] { } make ;
 
