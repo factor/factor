@@ -49,7 +49,10 @@ SYMBOL: copies
 : eliminate-copy ( vreg1 vreg2 -- )
     [ leader ] bi@
     2dup eq? [ 2drop ] [
-        [ update-leaders ] [ merge-classes ] 2bi
+        [ [ rep>> ] bi@ assert= ]
+        [ update-leaders ]
+        [ merge-classes ]
+        2tri
     ] if ;
 
 : introduce-vreg ( vreg -- )

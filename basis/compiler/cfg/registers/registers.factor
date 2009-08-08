@@ -4,7 +4,7 @@ USING: accessors namespaces kernel arrays parser math math.order ;
 IN: compiler.cfg.registers
 
 ! Virtual registers, used by CFG and machine IRs
-TUPLE: vreg { rep read-only } { n fixnum read-only } ;
+TUPLE: vreg rep { n fixnum read-only } ;
 
 M: vreg equal? over vreg? [ [ n>> ] bi@ eq? ] [ 2drop f ] if ;
 
