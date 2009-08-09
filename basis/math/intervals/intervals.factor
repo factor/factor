@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
+! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
@@ -14,7 +14,7 @@ TUPLE: interval { from read-only } { to read-only } ;
 : <interval> ( from to -- interval )
     2dup [ first ] bi@ {
         { [ 2dup > ] [ 2drop 2drop empty-interval ] }
-        { [ 2dup = ] [
+        { [ 2dup number= ] [
             2drop 2dup [ second ] both?
             [ interval boa ] [ 2drop empty-interval ] if
         ] }
@@ -56,20 +56,23 @@ TUPLE: interval { from read-only } { to read-only } ;
     [ 2dup [ first ] bi@ ] dip call [
         2drop t
     ] [
-        2dup [ first ] bi@ = [
+        2dup [ first ] bi@ number= [
             [ second ] bi@ not or
         ] [
             2drop f
         ] if
     ] if ; inline
 
+: endpoint= ( p1 p2 -- ? )
+    [ [ first ] bi@ number= ] [ [ second ] bi@ eq? ] 2bi and ;
+
 : endpoint< ( p1 p2 -- ? ) [ < ] compare-endpoints ;
 
-: endpoint<= ( p1 p2 -- ? ) [ endpoint< ] 2keep = or ;
+: endpoint<= ( p1 p2 -- ? ) [ endpoint< ] [ endpoint= ] 2bi or ;
 
 : endpoint> ( p1 p2 -- ? ) [ > ] compare-endpoints ;
 
-: endpoint>= ( p1 p2 -- ? ) [ endpoint> ] 2keep = or ;
+: endpoint>= ( p1 p2 -- ? ) [ endpoint> ] [ endpoint= ] 2bi or ;
 
 : endpoint-min ( p1 p2 -- p3 ) [ endpoint< ] most ;
 
@@ -180,7 +183,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     ] [
         interval>points
         2dup [ second ] both?
-        [ [ first ] bi@ = ]
+        [ [ first ] bi@ number= ]
         [ 2drop f ] if
     ] if ;
 
@@ -278,13 +281,13 @@ SYMBOL: incomparable
 : left-endpoint-< ( i1 i2 -- ? )
     [ swap interval-subset? ]
     [ nip interval-singleton? ]
-    [ [ from>> ] bi@ = ]
+    [ [ from>> ] bi@ endpoint= ]
     2tri and and ;
 
 : right-endpoint-< ( i1 i2 -- ? )
     [ interval-subset? ]
     [ drop interval-singleton? ]
-    [ [ to>> ] bi@ = ]
+    [ [ to>> ] bi@ endpoint= ]
     2tri and and ;
 
 : (interval<) ( i1 i2 -- i1 i2 ? )
@@ -300,10 +303,10 @@ SYMBOL: incomparable
     } cond 2nip ;
 
 : left-endpoint-<= ( i1 i2 -- ? )
-    [ from>> ] dip to>> = ;
+    [ from>> ] [ to>> ] bi* endpoint= ;
 
 : right-endpoint-<= ( i1 i2 -- ? )
-    [ to>> ] dip from>> = ;
+    [ to>> ] [ from>> ] bi* endpoint= ;
 
 : interval<= ( i1 i2 -- ? )
     {
