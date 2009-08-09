@@ -28,7 +28,7 @@ M: ##call compute-stack-frame*
 
 M: _gc compute-stack-frame*
     frame-required? on
-    stack-frame new swap gc-root-size>> cells >>gc-root-size
+    stack-frame new swap tagged-values>> length cells >>gc-root-size
     request-stack-frame ;
 
 M: _spill-area-size compute-stack-frame*

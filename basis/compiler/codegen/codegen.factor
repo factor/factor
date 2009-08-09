@@ -254,7 +254,7 @@ M: _gc generate-insn
         [ [ uninitialized-locs>> ] [ temp1>> ] bi wipe-locs ]
         [ data-values>> save-data-regs ]
         [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
-        [ gc-root-size>> %call-gc ]
+        [ tagged-values>> length %call-gc ]
         [ [ tagged-values>> ] [ temp1>> ] bi load-gc-roots ]
         [ data-values>> load-data-regs ]
     } cleave

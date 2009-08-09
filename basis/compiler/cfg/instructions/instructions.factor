@@ -218,7 +218,7 @@ INSN: _fixnum-mul < _fixnum-overflow ;
 
 TUPLE: spill-slot n ; C: <spill-slot> spill-slot
 
-INSN: _gc temp1 temp2 data-values tagged-values gc-root-size uninitialized-locs ;
+INSN: _gc temp1 temp2 data-values tagged-values uninitialized-locs ;
 
 ! These instructions operate on machine registers and not
 ! virtual registers
