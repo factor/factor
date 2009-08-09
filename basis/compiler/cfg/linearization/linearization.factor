@@ -89,7 +89,7 @@ M: ##gc linearize-insn
         [ temp1>> ]
         [ temp2>> ]
         [ data-values>> ]
-        [ tagged-values>> gc-root-offsets dup length ]
+        [ tagged-values>> gc-root-offsets ]
         [ uninitialized-locs>> ]
     } cleave
     _gc ;
