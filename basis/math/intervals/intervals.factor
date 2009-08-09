@@ -269,22 +269,6 @@ TUPLE: interval { from read-only } { to read-only } ;
         [ (interval-abs) points>interval ]
     } cond ;
 
-: interval-mod ( i1 i2 -- i3 )
-    {
-        { [ over empty-interval eq? ] [ drop ] }
-        { [ dup empty-interval eq? ] [ nip ] }
-        { [ dup full-interval eq? ] [ nip ] }
-        [ nip interval-abs to>> first [ neg ] keep (a,b) ]
-    } cond ;
-
-: interval-rem ( i1 i2 -- i3 )
-    {
-        { [ over empty-interval eq? ] [ drop ] }
-        { [ dup empty-interval eq? ] [ nip ] }
-        { [ dup full-interval eq? ] [ nip ] }
-        [ nip interval-abs to>> first 0 swap [a,b) ]
-    } cond ;
-
 : interval-recip ( i1 -- i2 ) 1 [a,a] swap interval/ ;
 
 : interval-2/ ( i1 -- i2 ) -1 [a,a] interval-shift ;
@@ -334,6 +318,23 @@ SYMBOL: incomparable
 
 : interval>= ( i1 i2 -- ? )
     swap interval<= ;
+
+: interval-mod ( i1 i2 -- i3 )
+    {
+        { [ over empty-interval eq? ] [ swap ] }
+        { [ dup empty-interval eq? ] [ ] }
+        { [ dup full-interval eq? ] [ ] }
+        [ interval-abs to>> first [ neg ] keep (a,b) ]
+    } cond
+    swap 0 [a,a] interval>= t eq? [ [0,inf] interval-intersect ] when ;
+
+: interval-rem ( i1 i2 -- i3 )
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ dup empty-interval eq? ] [ nip ] }
+        { [ dup full-interval eq? ] [ nip ] }
+        [ nip interval-abs to>> first 0 swap [a,b) ]
+    } cond ;
 
 : interval-bitand-pos ( i1 i2 -- ? )
     [ to>> first ] bi@ min 0 swap [a,b] ;

@@ -74,3 +74,13 @@ TUPLE: test-tuple { x read-only } ;
 [ t ] [
     null-info 3 <literal-info> value-info<=
 ] unit-test
+
+[ t t ] [
+    f <literal-info>
+    fixnum 0 40 [a,b] <class/interval-info>
+    value-info-union
+    \ f class-not <class-info>
+    value-info-intersect
+    [ class>> fixnum class= ]
+    [ interval>> 0 40 [a,b] = ] bi
+] unit-test
