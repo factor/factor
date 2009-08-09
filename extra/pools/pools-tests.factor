@@ -3,23 +3,25 @@ USING: kernel pools tools.test ;
 IN: pools.tests
 
 TUPLE: foo x ;
-POOL: foo 2
 
 [ 1 ] [
-    foo class-pool pool-empty 
+    foo 2 foo <pool> set-class-pool
+
     foo new-from-pool drop
-    foo class-pool pool-free-size
+    foo class-pool pool-size
 ] unit-test
 
 [ T{ foo } T{ foo } f ] [
-    foo class-pool pool-empty 
+    foo 2 foo <pool> set-class-pool
+
     foo new-from-pool
     foo new-from-pool
     foo new-from-pool
 ] unit-test
 
 [ f ] [
-    foo class-pool pool-empty 
+    foo 2 foo <pool> set-class-pool
+
     foo new-from-pool
     foo new-from-pool
     eq?

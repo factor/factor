@@ -1,25 +1,20 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays bit-arrays classes
 classes.tuple.private fry kernel locals parser
-sequences sequences.private words ;
+sequences sequences.private vectors words ;
 IN: pools
 
 TUPLE: pool
     prototype
-    { objects array }
-    { free bit-array } ;
+    { objects vector } ;
 
 : <pool> ( size class -- pool )
     [ nip new ]
-    [ [ iota ] dip '[ _ new ] replicate ]
-    [ drop <bit-array> ] 2tri
+    [ [ iota ] dip '[ _ new ] V{ } replicate-as ] 2bi
     pool boa ;
 
 : pool-size ( pool -- size )
     objects>> length ;
-
-: pool-free-size ( pool -- free-size )
-    free>> [ f = ] filter length ;
 
 <PRIVATE
 
@@ -29,11 +24,7 @@ TUPLE: pool
     to ; inline
 
 : (pool-new) ( pool -- object )
-    [ free>> [ f = ] find drop ] [
-        over [
-            [ objects>> nth ] [ [ t ] 2dip free>> set-nth ] 2bi
-        ] [ drop ] if
-    ] bi ;
+    objects>> [ f ] [ pop ] if-empty ;
 
 : (pool-init) ( pool object -- object )
     [ prototype>> ] dip copy-tuple ; inline
@@ -44,11 +35,7 @@ PRIVATE>
     dup (pool-new) [ (pool-init) ] [ drop f ] if* ; inline
 
 : pool-free ( object pool -- )
-    [ objects>> [ eq? ] with find drop ]
-    [ [ f ] 2dip free>> set-nth ] bi ;
-
-: pool-empty ( pool -- )
-    free>> [ length iota ] keep [ [ f ] 2dip set-nth ] curry each ;
+    objects>> push ;
 
 : class-pool ( class -- pool )
     "pool" word-prop ;
@@ -64,3 +51,4 @@ PRIVATE>
 
 SYNTAX: POOL:
     scan-word scan-word '[ _ swap <pool> ] [ swap set-class-pool ] bi ;
+
