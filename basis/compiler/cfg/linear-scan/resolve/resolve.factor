@@ -9,6 +9,7 @@ compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.utilities
 compiler.cfg.instructions
+compiler.cfg.predecessors
 compiler.cfg.parallel-copy
 compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.allocation.state ;
@@ -75,5 +76,7 @@ SYMBOL: temp
     dup successors>> [ resolve-edge-data-flow ] with each ;
 
 : resolve-data-flow ( cfg -- )
+    needs-predecessors
+
     H{ } clone spill-temps set
     [ resolve-block-data-flow ] each-basic-block ;
