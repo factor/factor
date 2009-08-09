@@ -13,6 +13,7 @@ IN: compiler.tests.low-level-ir
 
 : compile-test-cfg ( -- word )
     cfg new 0 get >>entry
+    dup cfg set
     dup fake-representations representations get >>reps
     compile-cfg ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel namespaces sequences math
 arrays compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.liveness.ssa compiler.cfg.rpo ;
+compiler.cfg.liveness.ssa compiler.cfg.rpo compiler.cfg.dominance ;
 IN: compiler.cfg.ssa.interference.live-ranges
 
 ! Live ranges for interference testing
@@ -47,6 +47,8 @@ SYMBOLS: def-indices kill-indices ;
 PRIVATE>
 
 : compute-live-ranges ( cfg -- )
+    needs-dominance
+
     H{ } clone def-indices set
     H{ } clone kill-indices set
     [ compute-local-live-ranges ] each-basic-block ;

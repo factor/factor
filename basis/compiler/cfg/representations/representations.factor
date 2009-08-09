@@ -14,8 +14,7 @@ compiler.cfg.renaming.functor
 compiler.cfg.representations.preferred ;
 IN: compiler.cfg.representations
 
-! Virtual register representation selection. Predecessors and loops
-! must be computed first.
+! Virtual register representation selection.
 
 : emit-conversion ( dst src dst-rep src-rep -- )
     2array {
@@ -217,6 +216,8 @@ SYMBOL: work-list
 PRIVATE>
 
 : select-representations ( cfg -- cfg' )
+    needs-loops
+
     {
         [ compute-possibilities ]
         [ compute-representations ]

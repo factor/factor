@@ -6,7 +6,6 @@ IN: compiler.cfg.liveness.tests
 
 : test-liveness ( -- )
     cfg new 1 get >>entry
-    compute-predecessors
     compute-live-sets ;
 
 ! Sanity check...

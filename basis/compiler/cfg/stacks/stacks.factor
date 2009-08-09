@@ -18,7 +18,6 @@ IN: compiler.cfg.stacks
 
 : end-stack-analysis ( -- )
     cfg get
-    compute-predecessors
     compute-global-sets
     finalize-stack-shuffling
     drop ;

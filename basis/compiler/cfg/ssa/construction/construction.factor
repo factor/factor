@@ -14,8 +14,6 @@ compiler.cfg.renaming.functor
 compiler.cfg.ssa.construction.tdmsc ;
 IN: compiler.cfg.ssa.construction
 
-! SSA construction. Predecessors must be computed first.
-
 ! The phi placement algorithm is implemented in
 ! compiler.cfg.ssa.construction.tdmsc.
 
@@ -132,10 +130,9 @@ PRIVATE>
 
 : construct-ssa ( cfg -- cfg' )
     {
-        [ ]
         [ compute-live-sets ]
-        [ compute-dominance ]
         [ compute-merge-sets ]
         [ compute-defs compute-phi-nodes insert-phi-nodes ]
         [ rename ]
+        [ ]
     } cleave ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs deques dlists kernel locals sequences lexer
 namespaces functors compiler.cfg.rpo compiler.cfg.utilities
-compiler.cfg ;
+compiler.cfg.predecessors compiler.cfg ;
 IN: compiler.cfg.dataflow-analysis
 
 GENERIC: join-sets ( sets dfa -- set )
@@ -48,6 +48,7 @@ M:: basic-block compute-out-set ( bb in-sets dfa -- set )
     ] when ; inline
 
 :: run-dataflow-analysis ( cfg dfa -- in-sets out-sets )
+    cfg needs-predecessors drop
     H{ } clone :> in-sets
     H{ } clone :> out-sets
     cfg dfa <dfa-worklist> :> work-list

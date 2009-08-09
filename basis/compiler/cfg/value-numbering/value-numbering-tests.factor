@@ -1186,8 +1186,6 @@ test-diamond
 [ ] [
     cfg new 0 get >>entry dup cfg set
     value-numbering
-    compute-predecessors
-    detect-loops
     select-representations
     destruct-ssa drop
 ] unit-test
@@ -1230,9 +1228,7 @@ test-diamond
 
 [ ] [
     cfg new 0 get >>entry
-    compute-predecessors
     value-numbering
-    compute-predecessors
     eliminate-dead-code
     drop
 ] unit-test

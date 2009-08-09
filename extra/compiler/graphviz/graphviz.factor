@@ -24,7 +24,7 @@ IN: compiler.graphviz
     dup "Wrote " prepend print
     [ [ concat ] dip ascii set-file-lines ]
     [ { "dot" "-Tpng" "-O" } swap suffix try-process ]
-    [ ".png" append image. ]
+    [ ".png" append "open" swap 2array try-process ]
     tri ; inline
 
 : attrs>string ( seq -- str )
@@ -86,8 +86,7 @@ IN: compiler.graphviz
 : dom-trees ( cfgs -- )
     [
         [
-            compute-predecessors
-            compute-dominance
+            needs-dominance drop
             dom-childrens get [
                 [
                     bb-edge,

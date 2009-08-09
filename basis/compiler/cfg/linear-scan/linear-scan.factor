@@ -38,7 +38,4 @@ IN: compiler.cfg.linear-scan
     cfg check-numbering ;
 
 : linear-scan ( cfg -- cfg' )
-    [
-        dup machine-registers (linear-scan)
-        cfg-changed
-    ] with-scope ;
+    dup machine-registers (linear-scan) ;
