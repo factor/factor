@@ -53,7 +53,7 @@ SYMBOLS: work-list loop-heads visited ;
     ] [ drop ] if ;
 
 : sorted-successors ( bb -- seq )
-    successors>> [ loop-nesting-at ] sort-with ;
+    successors>> <reversed> [ loop-nesting-at ] sort-with ;
 
 : process-block ( bb -- )
     [ , ]
