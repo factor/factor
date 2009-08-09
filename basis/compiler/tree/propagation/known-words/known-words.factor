@@ -173,7 +173,8 @@ generic-comparison-ops [
     [ object-info ] [ f <literal-info> ] if ;
 
 : info-intervals-intersect? ( info1 info2 -- ? )
-    [ interval>> ] bi@ intervals-intersect? ;
+    2dup [ class>> real class<= ] both?
+    [ [ interval>> ] bi@ intervals-intersect? ] [ 2drop t ] if ;
 
 { number= bignum= float= } [
     [
