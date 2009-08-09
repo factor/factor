@@ -80,7 +80,7 @@ MACRO: <experiment> ( word -- )
     '[ _ ndup _ narray _ prefix ] ;
 
 : experiment. ( seq -- )
-    [ first write ": " write ] [ rest . ] bi ;
+    [ first write ": " write ] [ rest . flush ] bi ;
 
 :: experiment ( word: ( -- error ? ) line# -- )
     word <experiment> :> e
