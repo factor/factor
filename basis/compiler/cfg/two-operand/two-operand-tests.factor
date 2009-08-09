@@ -35,3 +35,18 @@ compiler.cfg.registers cpu.architecture namespaces tools.test ;
         T{ ##sub-float f 1 2 3 }
     } (convert-two-operand)
 ] unit-test
+
+[
+    V{
+        T{ ##copy f 1 2 double-float-rep }
+        T{ ##mul-float f 1 1 1 }
+    }
+] [
+    H{
+        { 1 double-float-rep }
+        { 2 double-float-rep }
+    } clone representations set
+    {
+        T{ ##mul-float f 1 2 2 }
+    } (convert-two-operand)
+] unit-test
