@@ -78,6 +78,8 @@ C: <sphere> sphere
 M: sphere intersect-scene ( hit ray sphere -- hit )
     [ [ sphere-n normalize ] keep <hit> nip ] if-ray-sphere ;
 
+HINTS: M\ sphere intersect-scene { hit ray sphere } ;
+
 TUPLE: group < sphere { objs array read-only } ;
 
 : <group> ( objs bound -- group )
@@ -88,6 +90,8 @@ TUPLE: group < sphere { objs array read-only } ;
 
 M: group intersect-scene ( hit ray group -- hit )
     [ drop objs>> [ intersect-scene ] with each ] if-ray-sphere ;
+
+HINTS: M\ group intersect-scene { hit ray group } ;
 
 CONSTANT: initial-hit T{ hit f double-array{ 0.0 0.0 0.0 } 1/0. }
 
