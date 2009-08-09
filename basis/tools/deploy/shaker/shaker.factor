@@ -293,6 +293,8 @@ IN: tools.deploy.shaker
 
             { } { "math.partial-dispatch" } strip-vocab-globals %
 
+            { } { "math.vectors.specialization" } strip-vocab-globals %
+
             { } { "peg" } strip-vocab-globals %
         ] when
 
