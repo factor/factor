@@ -31,8 +31,11 @@ SYMBOL: inlining-count
 : splicing-call ( #call word -- nodes )
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
+: open-code-#call ( #call word/quot -- nodes/f )
+    [ [ in-d>> ] [ out-d>> ] bi ] dip build-sub-tree ;
+
 : splicing-body ( #call quot/word -- nodes/f )
-    build-sub-tree dup [ analyze-recursive normalize ] when ;
+    open-code-#call dup [ analyze-recursive normalize ] when ;
 
 ! Dispatch elimination
 : undo-inlining ( #call -- ? )

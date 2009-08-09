@@ -246,3 +246,5 @@ M: #copy emit-node drop ;
 M: #enter-recursive emit-node drop ;
 
 M: #phi emit-node drop ;
+
+M: #declare emit-node drop ;
