@@ -13,17 +13,19 @@ DEFER: *char
 
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
-TUPLE: c-type
+TUPLE: abstract-c-type
 { class class initial: object }
-boxer
 { boxer-quot callable }
-unboxer
 { unboxer-quot callable }
 { getter callable }
 { setter callable }
-{ rep initial: int-rep }
 size
-align
+align ;
+
+TUPLE: c-type < abstract-c-type
+boxer
+unboxer
+{ rep initial: int-rep }
 stack-align? ;
 
 : <c-type> ( -- type )
@@ -70,7 +72,7 @@ M: string c-type ( name -- type )
 
 GENERIC: c-type-class ( name -- class )
 
-M: c-type c-type-class class>> ;
+M: abstract-c-type c-type-class class>> ;
 
 M: string c-type-class c-type c-type-class ;
 
@@ -82,7 +84,7 @@ M: string c-type-boxer c-type c-type-boxer ;
 
 GENERIC: c-type-boxer-quot ( name -- quot )
 
-M: c-type c-type-boxer-quot boxer-quot>> ;
+M: abstract-c-type c-type-boxer-quot boxer-quot>> ;
 
 M: string c-type-boxer-quot c-type c-type-boxer-quot ;
 
@@ -94,7 +96,7 @@ M: string c-type-unboxer c-type c-type-unboxer ;
 
 GENERIC: c-type-unboxer-quot ( name -- quot )
 
-M: c-type c-type-unboxer-quot unboxer-quot>> ;
+M: abstract-c-type c-type-unboxer-quot unboxer-quot>> ;
 
 M: string c-type-unboxer-quot c-type c-type-unboxer-quot ;
 
@@ -118,7 +120,7 @@ M: string c-type-setter c-type c-type-setter ;
 
 GENERIC: c-type-align ( name -- n )
 
-M: c-type c-type-align align>> ;
+M: abstract-c-type c-type-align align>> ;
 
 M: string c-type-align c-type c-type-align ;
 
@@ -167,7 +169,7 @@ GENERIC: heap-size ( type -- size ) foldable
 
 M: string heap-size c-type heap-size ;
 
-M: c-type heap-size size>> ;
+M: abstract-c-type heap-size size>> ;
 
 GENERIC: stack-size ( type -- size ) foldable
 
