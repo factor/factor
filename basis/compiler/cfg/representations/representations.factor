@@ -47,7 +47,9 @@ SYMBOL: always-boxed
     H{ } clone [
         '[
             [
-                [ _ (compute-always-boxed) ] each-def-rep
+                dup ##load-reference? [ drop ] [
+                    [ _ (compute-always-boxed) ] each-def-rep
+                ] if
             ] each-non-phi
         ] each-basic-block
     ] keep ;
