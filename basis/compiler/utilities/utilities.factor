@@ -9,7 +9,7 @@ IN: compiler.utilities
         dup
         '[
             @ [
-                dup array?
+                dup [ array? ] [ vector? ] bi or
                 [ _ push-all ] [ _ push ] if
             ] when*
         ]
