@@ -21,10 +21,9 @@ IN: compiler.cfg.ssa.liveness
 
 : test-liveness ( -- )
     cfg new 0 get >>entry
-    compute-predecessors
     dup compute-defs
     dup compute-uses
-    dup compute-dominance
+    needs-dominance
     precompute-liveness ;
 
 V{

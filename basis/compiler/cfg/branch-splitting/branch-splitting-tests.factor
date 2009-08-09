@@ -9,11 +9,11 @@ IN: compiler.cfg.branch-splitting.tests
 
 : check-predecessors ( cfg -- )
     [ get-predecessors ]
-    [ compute-predecessors drop ]
+    [ needs-predecessors drop ]
     [ get-predecessors ] tri assert= ;
 
 : check-branch-splitting ( cfg -- )
-    compute-predecessors
+    needs-predecessors
     split-branches
     check-predecessors ;
 

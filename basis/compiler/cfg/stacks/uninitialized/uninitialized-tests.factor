@@ -6,7 +6,6 @@ namespaces accessors sequences ;
 
 : test-uninitialized ( -- )
     cfg new 0 get >>entry
-    compute-predecessors
     compute-uninitialized-sets ;
 
 V{

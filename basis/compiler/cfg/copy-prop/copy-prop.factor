@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces assocs accessors sequences grouping
 combinators compiler.cfg.rpo compiler.cfg.renaming
-compiler.cfg.instructions ;
+compiler.cfg.instructions compiler.cfg.predecessors ;
 IN: compiler.cfg.copy-prop
 
 ! The first three definitions are also used in compiler.cfg.alias-analysis.
@@ -70,6 +70,8 @@ M: insn update-insn rename-insn-uses t ;
 PRIVATE>
 
 : copy-propagation ( cfg -- cfg' )
+    needs-predecessors
+
     [ collect-copies ]
     [ rename-copies ]
     [ ]

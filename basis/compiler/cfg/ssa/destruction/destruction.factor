@@ -97,9 +97,10 @@ M: insn prepare-insn drop ;
     ] each-basic-block ;
 
 : destruct-ssa ( cfg -- cfg' )
+    needs-dominance
+
     dup construct-cssa
     dup compute-defs
-    dup compute-dominance
     compute-ssa-live-sets
     dup compute-live-ranges
     dup prepare-coalescing

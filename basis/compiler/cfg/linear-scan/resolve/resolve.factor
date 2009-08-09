@@ -3,6 +3,7 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry kernel locals namespaces
 make math sequences hashtables
+compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.liveness
 compiler.cfg.registers
@@ -63,8 +64,8 @@ SYMBOL: temp
 
 : perform-mappings ( bb to mappings -- )
     dup empty? [ 3drop ] [
-        mapping-instructions <simple-block>
-        insert-basic-block
+        mapping-instructions <simple-block> insert-basic-block
+        cfg get cfg-changed drop
     ] if ;
 
 : resolve-edge-data-flow ( bb to -- )

@@ -41,7 +41,6 @@ V{
 : test-ssa ( -- )
     cfg new 0 get >>entry
     dup cfg set
-    compute-predecessors
     construct-ssa
     drop ;
 

@@ -4,12 +4,12 @@ USING: accessors kernel math assocs namespaces sequences heaps
 fry make combinators sets locals arrays
 cpu.architecture
 compiler.cfg
-compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.renaming.functor
+compiler.cfg.linearization.order
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
@@ -181,4 +181,4 @@ ERROR: bad-vreg vreg ;
 
 : assign-registers ( live-intervals cfg -- )
     [ init-assignment ] dip
-    [ assign-registers-in-block ] each-basic-block ;
+    linearization-order [ assign-registers-in-block ] each ;

@@ -19,4 +19,5 @@ IN: compiler.cfg.useless-conditionals
     dup [
         dup delete-conditional? [ delete-conditional ] [ drop ] if
     ] each-basic-block
-    cfg-changed ;
+    
+    cfg-changed predecessors-changed ;

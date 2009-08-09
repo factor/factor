@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math accessors sequences namespaces make
-combinators assocs arrays locals layouts cpu.architecture
+combinators assocs arrays locals layouts hashtables
+cpu.architecture
 compiler.cfg
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
@@ -9,6 +10,14 @@ compiler.cfg.instructions
 compiler.cfg.utilities
 compiler.cfg.linearization.order ;
 IN: compiler.cfg.linearization
+
+<PRIVATE
+
+SYMBOL: numbers
+
+: block-number ( bb -- n ) numbers get at ;
+
+: number-blocks ( bbs -- ) [ 2array ] map-index >hashtable numbers set ;
 
 ! Convert CFG IR to machine IR.
 GENERIC: linearize-insn ( basic-block insn -- )
@@ -87,11 +96,15 @@ M: ##gc linearize-insn
 
 : linearize-basic-blocks ( cfg -- insns )
     [
-        [ linearization-order [ linearize-basic-block ] each ]
-        [ spill-area-size>> _spill-area-size ]
-        bi
+        [
+            linearization-order
+            [ number-blocks ]
+            [ [ linearize-basic-block ] each ] bi
+        ] [ spill-area-size>> _spill-area-size ] bi
     ] { } make ;
 
+PRIVATE>
+        
 : flatten-cfg ( cfg -- mr )
     [ linearize-basic-blocks ] [ word>> ] [ label>> ] tri
     <mr> ;

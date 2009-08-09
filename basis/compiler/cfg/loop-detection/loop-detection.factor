@@ -1,10 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators deques dlists fry kernel
-namespaces sequences sets compiler.cfg ;
+namespaces sequences sets compiler.cfg compiler.cfg.predecessors ;
 IN: compiler.cfg.loop-detection
-
-! Loop detection -- predecessors must be computed first
 
 TUPLE: natural-loop header index ends blocks ;
 
@@ -68,13 +66,18 @@ SYMBOL: loop-nesting
         [ values ] dip '[ blocks>> values [ _ inc-at ] each ] each
     ] keep loop-nesting set ;
 
-PRIVATE>
-
-: loop-nesting-at ( bb -- n ) loop-nesting get at 0 or ;
-
 : detect-loops ( cfg -- cfg' )
+    needs-predecessors
     H{ } clone loops set
     H{ } clone visited set
     H{ } clone active set
     H{ } clone loop-nesting set
     dup entry>> find-loop-headers process-loop-headers compute-loop-nesting ;
+
+PRIVATE>
+
+: loop-nesting-at ( bb -- n ) loop-nesting get at 0 or ;
+
+: needs-loops ( cfg -- cfg' )
+    needs-predecessors
+    dup loops-valid?>> [ detect-loops t >>loops-valid? ] unless ;

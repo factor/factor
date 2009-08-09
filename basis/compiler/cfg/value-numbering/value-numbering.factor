@@ -12,7 +12,8 @@ compiler.cfg.value-numbering.simplify
 compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering
 
-! Local value numbering. Predecessors must be recomputed after this
+! Local value numbering.
+
 : >copy ( insn -- insn/##copy )
     dup dst>> dup vreg>vn vn>vreg
     2dup eq? [ 2drop ] [ any-rep \ ##copy new-insn nip ] if ;
@@ -37,4 +38,6 @@ M: insn process-instruction
     [ process-instruction ] map ;
 
 : value-numbering ( cfg -- cfg' )
-    [ value-numbering-step ] local-optimization cfg-changed ;
+    [ value-numbering-step ] local-optimization
+
+    cfg-changed predecessors-changed ;
