@@ -211,6 +211,10 @@ IN: math.intervals.tests
 
 [ t ] [ 1 100 [a,b] -1 1 [a,b] interval/i [-inf,inf] = ] unit-test
 
+! Accuracy of interval-mod
+[ t ] [ full-interval 40 40 [a,b] interval-mod -40 40 (a,b) interval-subset?
+] unit-test
+
 ! Interval random tester
 : random-element ( interval -- n )
     dup full-interval eq? [
