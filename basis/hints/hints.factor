@@ -69,7 +69,7 @@ t specialize-method? set-global
     dup [ array? ] all? [ first ] when length ;
 
 SYNTAX: HINTS:
-    scan-object
+    scan-object dup wrapper? [ wrapped>> ] when
     [ changed-definition ]
     [ parse-definition { } like "specializer" set-word-prop ] bi ;
 

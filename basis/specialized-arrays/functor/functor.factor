@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: functors sequences sequences.private prettyprint.custom
-kernel words classes math parser alien.c-types byte-arrays
-accessors summary ;
+kernel words classes math math.vectors.specialization parser
+alien.c-types byte-arrays accessors summary ;
 IN: specialized-arrays.functor
 
 ERROR: bad-byte-array-length byte-array type ;
@@ -73,5 +73,7 @@ M: A pprint* pprint-object ;
 SYNTAX: A{ \ } [ >A ] parse-literal ;
 
 INSTANCE: A sequence
+
+A T c-type class>> specialize-vector-words
 
 ;FUNCTOR

@@ -5,6 +5,8 @@ IN: math.intervals.tests
 
 [ empty-interval ] [ 2 2 (a,b) ] unit-test
 
+[ empty-interval ] [ 2 2.0 (a,b) ] unit-test
+
 [ empty-interval ] [ 2 2 [a,b) ] unit-test
 
 [ empty-interval ] [ 2 2 (a,b] ] unit-test
@@ -188,6 +190,10 @@ IN: math.intervals.tests
 [ t ] [ -1 1 (a,b] 1 2 (a,b] interval<= ] unit-test
 
 [ f ] [ 0 10 [a,b] 0 [a,a] interval< ] unit-test
+
+[ f ] [ 0 10 [a,b] 0.0 [a,a] interval< ] unit-test
+
+[ f ] [ 0.0 10 [a,b] 0 [a,a] interval< ] unit-test
 
 [ f ] [ 0 10 [a,b] 10 [a,a] interval> ] unit-test
 
