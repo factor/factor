@@ -3,7 +3,8 @@
 USING: namespaces assocs kernel fry accessors sequences make math locals
 combinators compiler.cfg compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.utilities compiler.cfg.rpo compiler.cfg.stacks.local
-compiler.cfg.stacks.global compiler.cfg.stacks.height ;
+compiler.cfg.stacks.global compiler.cfg.stacks.height
+compiler.cfg.predecessors ;
 IN: compiler.cfg.stacks.finalize
 
 ! This pass inserts peeks and replaces.
@@ -51,5 +52,8 @@ ERROR: bad-peek dst loc ;
     [ predecessors>> ] keep '[ _ visit-edge ] each ;
 
 : finalize-stack-shuffling ( cfg -- cfg' )
+    needs-predecessors
+
     dup [ visit-block ] each-basic-block
+
     cfg-changed ;

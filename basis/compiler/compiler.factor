@@ -12,6 +12,7 @@ compiler.errors compiler.units compiler.utilities
 compiler.tree.builder
 compiler.tree.optimizer
 
+compiler.cfg
 compiler.cfg.builder
 compiler.cfg.optimizer
 compiler.cfg.mr
@@ -152,8 +153,7 @@ t compile-dependencies? set-global
 
 : backend ( tree word -- )
     build-cfg [
-        optimize-cfg
-        build-mr
+        [ optimize-cfg build-mr ] with-cfg
         generate
         save-asm
     ] each ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit kernel math math.order
 sequences assocs namespaces vectors fry arrays splitting
-compiler.cfg.def-use compiler.cfg compiler.cfg.rpo
+compiler.cfg.def-use compiler.cfg compiler.cfg.rpo compiler.cfg.predecessors
 compiler.cfg.renaming compiler.cfg.instructions compiler.cfg.utilities ;
 IN: compiler.cfg.branch-splitting
 
@@ -81,7 +81,10 @@ UNION: irrelevant ##peek ##replace ##inc-d ##inc-r ;
     ] if ;
 
 : split-branches ( cfg -- cfg' )
+    needs-predecessors
+    
     dup [
         dup split-branch? [ split-branch ] [ drop ] if
     ] each-basic-block
+
     cfg-changed ;

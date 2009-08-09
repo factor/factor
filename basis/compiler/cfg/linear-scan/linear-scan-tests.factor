@@ -565,10 +565,9 @@ H{
 :: test-linear-scan-on-cfg ( regs -- )
     [
         cfg new 0 get >>entry
-        compute-predecessors
+        dup cfg set
         dup fake-representations
         dup { { int-regs regs } } (linear-scan)
-        cfg-changed
         flatten-cfg 1array mr.
     ] with-scope ;
 

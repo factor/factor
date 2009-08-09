@@ -24,8 +24,10 @@ M: word test-cfg
 
 : test-mr ( quot -- mrs )
     test-cfg [
-        optimize-cfg
-        build-mr
+        [
+            optimize-cfg
+            build-mr
+        ] with-cfg
     ] map ;
 
 : insn. ( insn -- )

@@ -19,7 +19,10 @@ M: basic-block hashcode* nip id>> ;
         V{ } clone >>predecessors
         \ basic-block counter >>id ;
 
-TUPLE: cfg { entry basic-block } word label spill-area-size reps post-order ;
+TUPLE: cfg { entry basic-block } word label
+spill-area-size reps
+post-order linear-order
+predecessors-valid? dominance-valid? loops-valid? ;
 
 : <cfg> ( entry word label -- cfg )
     cfg new
@@ -27,7 +30,17 @@ TUPLE: cfg { entry basic-block } word label spill-area-size reps post-order ;
         swap >>word
         swap >>entry ;
 
-: cfg-changed ( cfg -- cfg ) f >>post-order ; inline
+: cfg-changed ( cfg -- cfg )
+    f >>post-order
+    f >>linear-order
+    f >>dominance-valid?
+    f >>loops-valid? ; inline
+
+: predecessors-changed ( cfg -- cfg )
+    f >>predecessors-valid? ;
+
+: with-cfg ( cfg quot: ( cfg -- ) -- )
+    [ dup cfg ] dip with-variable ; inline
 
 TUPLE: mr { instructions array } word label ;
 

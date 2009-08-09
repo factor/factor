@@ -3,12 +3,13 @@ USING: tools.test kernel sequences words sequences.private fry
 prettyprint alien alien.accessors math.private compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.builder compiler.cfg.debugger
 compiler.cfg.optimizer compiler.cfg.predecessors compiler.cfg.checker
-arrays locals byte-arrays kernel.private math slots.private vectors sbufs
-strings math.partial-dispatch strings.private ;
+compiler.cfg arrays locals byte-arrays kernel.private math
+slots.private vectors sbufs strings math.partial-dispatch
+strings.private ;
 
 ! Just ensure that various CFGs build correctly.
 : unit-test-cfg ( quot -- )
-    '[ _ test-cfg [ optimize-cfg check-cfg ] each ] [ ] swap unit-test ;
+    '[ _ test-cfg [ [ optimize-cfg check-cfg ] with-cfg ] each ] [ ] swap unit-test ;
 
 : blahblah ( nodes -- ? )
     { fixnum } declare [

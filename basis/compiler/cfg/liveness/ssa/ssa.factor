@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces deques accessors sets sequences assocs fry
 hashtables dlists compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.rpo compiler.cfg.liveness compiler.cfg.utilities ;
+compiler.cfg.rpo compiler.cfg.liveness compiler.cfg.utilities
+compiler.cfg.predecessors ;
 IN: compiler.cfg.liveness.ssa
 
 ! TODO: merge with compiler.cfg.liveness
@@ -47,6 +48,8 @@ SYMBOL: work-list
     ] [ drop ] if ;
 
 : compute-ssa-live-sets ( cfg -- cfg' )
+    needs-predecessors
+
     <hashed-dlist> work-list set
     H{ } clone live-ins set
     H{ } clone phi-live-ins set

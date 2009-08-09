@@ -7,7 +7,6 @@ namespaces accessors sequences ;
 : test-gc-checks ( -- )
     H{ } clone representations set
     cfg new 0 get >>entry
-    compute-predecessors
     insert-gc-checks
     drop ;
 
