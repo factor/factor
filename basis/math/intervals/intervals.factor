@@ -270,20 +270,20 @@ TUPLE: interval { from read-only } { to read-only } ;
     } cond ;
 
 : interval-mod ( i1 i2 -- i3 )
-    #! Inaccurate.
-    [
-        [
-            nip interval-abs to>> first [ neg ] keep (a,b)
-        ] interval-division-op
-    ] do-empty-interval ;
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ dup empty-interval eq? ] [ nip ] }
+        { [ dup full-interval eq? ] [ nip ] }
+        [ nip interval-abs to>> first [ neg ] keep (a,b) ]
+    } cond ;
 
 : interval-rem ( i1 i2 -- i3 )
-    #! Inaccurate.
-    [
-        [
-            nip interval-abs to>> first 0 swap [a,b)
-        ] interval-division-op
-    ] do-empty-interval ;
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ dup empty-interval eq? ] [ nip ] }
+        { [ dup full-interval eq? ] [ nip ] }
+        [ nip interval-abs to>> first 0 swap [a,b) ]
+    } cond ;
 
 : interval-recip ( i1 -- i2 ) 1 [a,a] swap interval/ ;
 
