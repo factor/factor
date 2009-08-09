@@ -89,8 +89,6 @@ M: #call cleanup*
         [ ]
     } cond ;
 
-M: #declare cleanup* drop f ;
-
 : delete-unreachable-branches ( #branch -- )
     dup live-branches>> '[
         _

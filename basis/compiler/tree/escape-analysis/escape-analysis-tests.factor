@@ -9,7 +9,7 @@ quotations.private prettyprint classes.tuple.private classes
 classes.tuple namespaces
 compiler.tree.propagation.info stack-checker.errors
 compiler.tree.checker
-kernel.private ;
+kernel.private vectors ;
 
 GENERIC: count-unboxed-allocations* ( m node -- n )
 
@@ -23,6 +23,9 @@ M: #call count-unboxed-allocations*
 M: #push count-unboxed-allocations*
     dup literal>> class immutable-tuple-class?
     [ (count-unboxed-allocations) ] [ drop ] if ;
+
+M: #introduce count-unboxed-allocations*
+    out-d>> [ escaping-allocation? [ 1+ ] unless ] each ;
 
 M: node count-unboxed-allocations* drop ;
 
@@ -328,3 +331,17 @@ C: <ro-box> ro-box
 TUPLE: empty-tuple ;
 
 [ ] [ [ empty-tuple boa layout-of ] count-unboxed-allocations drop ] unit-test
+
+! New feature!
+
+[ 1 ] [ [ { complex } declare real>> ] count-unboxed-allocations ] unit-test
+
+[ 1 ] [
+    [ { complex } declare [ real>> ] [ imaginary>> ] bi ]
+    count-unboxed-allocations
+] unit-test
+
+[ 0 ] [
+    [ { vector } declare length>> ]
+    count-unboxed-allocations
+] unit-test
