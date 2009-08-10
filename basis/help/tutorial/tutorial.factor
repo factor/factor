@@ -24,15 +24,16 @@ $nl
 ARTICLE: "first-program-logic" "Writing some logic in your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
 { $code
-    "! Copyright (C) 2008 <your name here>"
+    "! Copyright (C) 2009 <your name here>"
     "! See http://factorcode.org/license.txt for BSD license."
+    "USING: ;"
     "IN: palindrome"
 }
 "Notice that the file ends with an " { $link POSTPONE: IN: } " form telling Factor that all definitions in this source file should go into the " { $snippet "palindrome" } " vocabulary using the " { $link POSTPONE: IN: } " word. We will add new definitions after the " { $link POSTPONE: IN: } " form."
 $nl
 "In order to be able to call the words defined in the " { $snippet "palindrome" } " vocabulary, you need to issue the following command in the listener:"
 { $code "USE: palindrome" }
-"Now, wee will be making some additions to the file. Since the file was loaded by the scaffold tool in the previous step, you need to tell Factor to reload it if it changes. Factor has a handy feature for this; pressing " { $command tool "common" refresh-all } " in the listener window will reload any changed source files. You can also force a single vocabulary to reload:"
+"Now, we will be making some additions to the file. Since the file was loaded by the scaffold tool in the previous step, you need to tell Factor to reload it if it changes. Factor has a handy feature for this; pressing " { $command tool "common" refresh-all } " in the listener window will reload any changed source files. You can also force a single vocabulary to reload:"
 { $code "\"palindrome\" reload" }
 "We will now write our first word using " { $link POSTPONE: : } ". This word will test if a string is a palindrome; it will take a string as input, and give back a boolean as output. We will call this word " { $snippet "palindrome?" } ", following a naming convention that words returning booleans have names ending with " { $snippet "?" } "."
 $nl
@@ -46,7 +47,7 @@ $nl
 $nl
 "To add the word to the search path, first convince yourself that this word is in the " { $vocab-link "kernel" } " vocabulary. Enter " { $snippet "dup" } " in the listener's input area, and press " { $operation com-browse } ". This will open the documentation browser tool, viewing the help for the " { $link dup } " word. One of the subheadings in the help article will mention the word's vocabulary."
 $nl
-"So now, add the following at the start of the source file:"
+"Go back to the third line in your source file and change it to:"
 { $code "USING: kernel ;" }
 "Next, find out what vocabulary " { $link reverse } " lives in; type the word name " { $snippet "reverse" } " in the listener's input area, and press " { $operation com-browse } "."
 $nl
@@ -59,15 +60,15 @@ $nl
 ARTICLE: "first-program-test" "Testing your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
 { $code
-    "! Copyright (C) 2008 <your name here>"
+    "! Copyright (C) 2009 <your name here>"
     "! See http://factorcode.org/license.txt for BSD license."
-    "IN: palindrome"
     "USING: kernel sequences ;"
+    "IN: palindrome"
     ""
     ": palindrome? ( str -- ? ) dup reverse = ;"
 }
-"We will now test our new word in the listener. First we have add the palindrome vocabulary to the listener's vocabulary search path:"
-{ $code "USE: palindrome"}
+"We will now test our new word in the listener. If you haven't done so already, add the palindrome vocabulary to the listener's vocabulary search path:"
+{ $code "USE: palindrome" }
 "Next, push a string on the stack:"
 { $code "\"hello\"" }
 "Note that the stack display in the listener now shows this string. Having supplied the input, we call our word:"
@@ -86,9 +87,8 @@ $nl
 $nl
 "We will add some unit tests, which are similar to the interactive tests we did above. Unit tests are defined with the " { $link POSTPONE: unit-test } " word, which takes a sequence of expected outputs, and a piece of code. It runs the code, and asserts that it outputs the expected values."
 $nl
-"Add the following three lines to " { $snippet "palindrome-tests.factor" } ":"
+"Add the following two lines to " { $snippet "palindrome-tests.factor" } ":"
 { $code
-    "USING: palindrome tools.test ;"
     "[ f ] [ \"hello\" palindrome? ] unit-test"
     "[ t ] [ \"racecar\" palindrome? ] unit-test"
 }
@@ -109,7 +109,7 @@ $nl
 { $code "\"palindrome\" test" }
 "The next step is to, of course, fix our code so that the unit test can pass."
 $nl
-"We begin by writing a word called " { $snippet "normalize" } " which removes blanks and non-alphabetical characters from a string, and then converts the string to lower case. We call this word " { $snippet "normalize" } ". To figure out how to write this word, we begin with some interactive experimentation in the listener."
+"We begin by writing a word which removes blanks and non-alphabetical characters from a string, and then converts the string to lower case. We call this word " { $snippet "normalize" } ". To figure out how to write this word, we begin with some interactive experimentation in the listener."
 $nl
 "Start by pushing a character on the stack; notice that characters are really just integers:"
 { $code "CHAR: a" }
@@ -136,7 +136,7 @@ $nl
 { $code "[ Letter? ] filter >lower" }
 "This code starts with a string on the stack, removes non-alphabetical characters, and converts the result to lower case, leaving a new string on the stack. We put this code in a new word, and add the new word to " { $snippet "palindrome.factor" } ":"
 { $code ": normalize ( str -- newstr ) [ Letter? ] filter >lower ;" }
-"You will need to add " { $vocab-link "unicode.case" } " and " { $vocab-link "unicode.categories" } " to the vocabulary search path, so that " { $link Letter? } " can be used in the source file."
+"You will need to add " { $vocab-link "unicode.case" } " and " { $vocab-link "unicode.categories" } " to the vocabulary search path, so that " { $link >lower } " and " { $link Letter? } " can be used in the source file."
 $nl
 "We modify " { $snippet "palindrome?" } " to first apply " { $snippet "normalize" } " to its input:"
 { $code ": palindrome? ( str -- ? ) normalize dup reverse = ;" }
