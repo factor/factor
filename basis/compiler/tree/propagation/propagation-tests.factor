@@ -713,6 +713,20 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 
 [ V{ 1 } ] [ [ { } length 1+ f <array> length ] final-literals ] unit-test
 
+! generalize-counter is not tight enough
+[ V{ fixnum } ] [ [ 0 10 [ 1 + >fixnum ] times ] final-classes ] unit-test
+
+[ V{ fixnum } ] [ [ 0 10 [ 1 + >fixnum ] times 0 + ] final-classes ] unit-test
+
+! Coercions need to update intervals
+[ V{ f } ] [ [ 1 2 ? 100 shift >fixnum 1 = ] final-literals ] unit-test
+
+[ V{ t } ] [ [ >fixnum 1 + >fixnum most-positive-fixnum <= ] final-literals ] unit-test
+
+[ V{ t } ] [ [ >fixnum 1 + >fixnum most-negative-fixnum >= ] final-literals ] unit-test
+
+[ V{ f } ] [ [ >fixnum 1 + >fixnum most-negative-fixnum > ] final-literals ] unit-test
+
 ! Mutable tuples with circularity should not cause problems
 TUPLE: circle me ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler.tree.modular-arithmetic.tests
 USING: kernel kernel.private tools.test math math.partial-dispatch
-math.private accessors slots.private sequences strings sbufs
+math.private accessors slots.private sequences sequences.private strings sbufs
 compiler.tree.builder
 compiler.tree.normalization
 compiler.tree.debugger
@@ -171,3 +171,8 @@ cell {
 [ [ [ { fixnum fixnum } declare + ] 2dip set-alien-signed-8 ] test-modular-arithmetic ] unit-test
 
 [ t ] [ [ { fixnum byte-array } declare [ + ] with map ] { + fixnum+ >fixnum } inlined? ] unit-test
+
+[ t ] [
+    [ 0 10 <byte-array> 10 [ 1 pick 0 + >fixnum pick set-nth-unsafe [ 1 + >fixnum ] dip ] times ]
+    { >fixnum } inlined?
+] unit-test
