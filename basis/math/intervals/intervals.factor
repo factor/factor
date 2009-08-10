@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
-combinators generic layouts ;
+combinators generic layouts memoize ;
 IN: math.intervals
 
 SYMBOL: empty-interval
@@ -48,7 +48,10 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : (a,inf] ( a -- interval ) 1/0. (a,b] ; inline
 
-: [0,inf] ( -- interval ) 0 [a,inf] ; foldable
+MEMO: [0,inf] ( -- interval ) 0 [a,inf] ; foldable
+
+MEMO: fixnum-interval ( -- interval )
+    most-negative-fixnum most-positive-fixnum [a,b] ; inline
 
 : [-inf,inf] ( -- interval ) full-interval ; inline
 
@@ -331,12 +334,22 @@ SYMBOL: incomparable
     } cond
     swap 0 [a,a] interval>= t eq? [ [0,inf] interval-intersect ] when ;
 
+: (rem-range) ( i -- i' ) interval-abs to>> first 0 swap [a,b) ;
+
 : interval-rem ( i1 i2 -- i3 )
     {
         { [ over empty-interval eq? ] [ drop ] }
         { [ dup empty-interval eq? ] [ nip ] }
         { [ dup full-interval eq? ] [ nip ] }
-        [ nip interval-abs to>> first 0 swap [a,b) ]
+        [ (rem-range) 2dup interval-subset? [ drop ] [ nip ] if ]
+    } cond ;
+
+: interval->fixnum ( i1 -- i2 )
+    {
+        { [ dup empty-interval eq? ] [ ] }
+        { [ dup full-interval eq? ] [ drop fixnum-interval ] }
+        { [ dup fixnum-interval interval-subset? not ] [ drop fixnum-interval ] }
+        [ ]
     } cond ;
 
 : interval-bitand-pos ( i1 i2 -- ? )

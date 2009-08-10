@@ -18,14 +18,6 @@ compiler.tree.propagation.call-effect
 compiler.tree.propagation.transforms ;
 IN: compiler.tree.propagation.known-words
 
-\ fixnum
-most-negative-fixnum most-positive-fixnum [a,b]
-"interval" set-word-prop
-
-\ array-capacity
-0 max-array-capacity [a,b]
-"interval" set-word-prop
-
 { + - * / }
 [ { number number } "input-classes" set-word-prop ] each
 
@@ -53,8 +45,8 @@ most-negative-fixnum most-positive-fixnum [a,b]
     { fixnum bignum integer rational float real number object }
     [ class<= ] with find nip ;
 
-: fits? ( interval class -- ? )
-    "interval" word-prop interval-subset? ;
+: fits-in-fixnum? ( interval -- ? )
+    fixnum-interval interval-subset? ;
 
 : binary-op-class ( info1 info2 -- newclass )
     [ class>> ] bi@
@@ -66,7 +58,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
     [ [ interval>> ] bi@ ] dip call ; inline
 
 : won't-overflow? ( class interval -- ? )
-    [ fixnum class<= ] [ fixnum fits? ] bi* and ;
+    [ fixnum class<= ] [ fits-in-fixnum? ] bi* and ;
 
 : may-overflow ( class interval -- class' interval' )
     over null-class? [
@@ -219,14 +211,7 @@ generic-comparison-ops [
 
     { >integer integer }
 } [
-    '[
-        _
-        [ nip ] [
-            [ interval>> ] [ class-interval ] bi*
-            interval-intersect
-        ] 2bi
-        <class/interval-info>
-    ] "outputs" set-word-prop
+    '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
 ] assoc-each
 
 { numerator denominator }
@@ -262,7 +247,7 @@ generic-comparison-ops [
             [ string>number 8 * 2^ 1- 0 swap [a,b] ]
         }
     } cond
-    [ fixnum fits? fixnum integer ? ] keep <class/interval-info>
+    [ fits-in-fixnum? fixnum integer ? ] keep <class/interval-info>
     '[ 2drop _ ] "outputs" set-word-prop
 ] each
 

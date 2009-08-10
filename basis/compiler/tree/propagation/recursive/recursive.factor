@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors arrays fry math.intervals
-combinators namespaces
+USING: kernel sequences accessors arrays fry math math.intervals
+layouts combinators namespaces locals
 stack-checker.inlining
 compiler.tree
 compiler.tree.combinators
@@ -24,20 +24,26 @@ IN: compiler.tree.propagation.recursive
     [ label>> calls>> [ node>> node-input-infos ] map flip ]
     [ latest-input-infos ] bi ;
 
-: generalize-counter-interval ( interval initial-interval -- interval' )
+:: generalize-counter-interval ( interval initial-interval class -- interval' )
     {
-        { [ 2dup interval-subset? ] [ empty-interval ] }
-        { [ over empty-interval eq? ] [ empty-interval ] }
-        { [ 2dup interval>= t eq? ] [ 1/0. [a,a] ] }
-        { [ 2dup interval<= t eq? ] [ -1/0. [a,a] ] }
-        [ [-inf,inf] ]
-    } cond interval-union nip ;
+        { [ interval initial-interval interval-subset? ] [ initial-interval ] }
+        { [ interval empty-interval eq? ] [ initial-interval ] }
+        {
+            [ interval initial-interval interval>= t eq? ]
+            [ class max-value [a,a] initial-interval interval-union ]
+        }
+        {
+            [ interval initial-interval interval<= t eq? ]
+            [ class min-value [a,a] initial-interval interval-union ]
+        }
+        [ class class-interval ]
+    } cond ;
 
 : generalize-counter ( info' initial -- info )
     2dup [ not ] either? [ drop ] [
         2dup [ class>> null-class? ] either? [ drop ] [
             [ clone ] dip
-            [ [ drop ] [ [ interval>> ] bi@ generalize-counter-interval ] 2bi >>interval ]
+            [ [ drop ] [ [ [ interval>> ] bi@ ] [ drop class>> ] 2bi generalize-counter-interval ] 2bi >>interval ]
             [ [ drop ] [ [ slots>> ] bi@ [ generalize-counter ] 2map ] 2bi >>slots ]
             [ [ drop ] [ [ length>> ] bi@ generalize-counter ] 2bi >>length ]
             tri
