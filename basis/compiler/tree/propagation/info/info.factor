@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra classes.tuple
 classes.tuple.private kernel accessors math math.intervals namespaces
-sequences words combinators combinators.short-circuit byte-arrays
-strings arrays layouts cpu.architecture compiler.tree.propagation.copy
- ;
+sequences sequences.private words combinators
+combinators.short-circuit byte-arrays strings arrays layouts
+cpu.architecture compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;
@@ -36,10 +36,6 @@ slots ;
 CONSTANT: null-info T{ value-info f null empty-interval }
 
 CONSTANT: object-info T{ value-info f object full-interval }
-
-: class-interval ( class -- interval )
-    dup real class<=
-    [ "interval" word-prop [-inf,inf] or ] [ drop f ] if ;
 
 : interval>literal ( class interval -- literal literal? )
     #! If interval has zero length and the class is sufficiently
@@ -85,6 +81,23 @@ UNION: fixed-length array byte-array string ;
         [ [ class>> real class<= ] [ interval>> empty-interval eq? ] bi and ]
     } 1|| ;
 
+: min-value ( class -- n ) fixnum eq? [ most-negative-fixnum ] [ -1/0. ] if ;
+
+: max-value ( class -- n ) fixnum eq? [ most-positive-fixnum ] [ 1/0. ] if ;
+
+: class-interval ( class -- i ) fixnum eq? [ fixnum-interval ] [ full-interval ] if ;
+
+: wrap-interval ( interval class -- interval' )
+    {
+        { fixnum [ interval->fixnum ] }
+        { array-capacity [ max-array-capacity [a,a] interval-rem ] }
+        [ drop ]
+    } case ;
+
+: init-interval ( info -- info )
+    dup [ interval>> full-interval or ] [ class>> ] bi wrap-interval >>interval
+    dup class>> integer class<= [ [ integral-closure ] change-interval ] when ; inline
+
 : init-value-info ( info -- info )
     dup literal?>> [
         init-literal-info
@@ -93,8 +106,7 @@ UNION: fixed-length array byte-array string ;
             null >>class
             empty-interval >>interval
         ] [
-            [ [-inf,inf] or ] change-interval
-            dup class>> integer class<= [ [ integral-closure ] change-interval ] when
+            init-interval
             dup [ class>> ] [ interval>> ] bi interval>literal
             [ >>literal ] [ >>literal? ] bi*
         ] if
@@ -107,8 +119,7 @@ UNION: fixed-length array byte-array string ;
     init-value-info ; foldable
 
 : <class-info> ( class -- info )
-    dup word? [ dup "interval" word-prop ] [ f ] if [-inf,inf] or
-    <class/interval-info> ; foldable
+    f <class/interval-info> ; foldable
 
 : <interval-info> ( interval -- info )
     <value-info>
