@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: classes help.markup help.syntax kernel math ;
-IN: pools
+IN: memory.pools
 
 HELP: <pool>
 { $values
@@ -66,11 +66,11 @@ HELP: set-class-pool
 }
 { $description "Associates a " { $link pool } " with " { $snippet "class" } "." } ;
 
-ARTICLE: "pools" "Pools"
-"The " { $vocab-link "pools" } " vocabulary provides " { $link pool } " objects which manage preallocated collections of objects."
+ARTICLE: "memory.pools" "Pools"
+"The " { $vocab-link "memory.pools" } " vocabulary provides " { $link pool } " objects which manage preallocated collections of objects."
 { $subsection pool }
 { $subsection POSTPONE: POOL: }
 { $subsection new-from-pool }
 { $subsection free-to-pool } ;
 
-ABOUT: "pools"
+ABOUT: "memory.pools"
