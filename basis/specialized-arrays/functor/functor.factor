@@ -74,6 +74,6 @@ SYNTAX: A{ \ } [ >A ] parse-literal ;
 
 INSTANCE: A sequence
 
-A T c-type class>> specialize-vector-words
+A T c-type-boxed-class specialize-vector-words
 
 ;FUNCTOR

@@ -11,6 +11,8 @@ M: array c-type ;
 
 M: array c-type-class drop object ;
 
+M: array c-type-boxed-class drop object ;
+
 M: array heap-size unclip [ product ] [ heap-size ] bi* * ;
 
 M: array c-type-align first c-type-align ;
@@ -45,8 +47,9 @@ PREDICATE: string-type < pair
 
 M: string-type c-type ;
 
-M: string-type c-type-class
-    drop object ;
+M: string-type c-type-class drop object ;
+
+M: string-type c-type-boxed-class drop object ;
 
 M: string-type heap-size
     drop "void*" heap-size ;
