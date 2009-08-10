@@ -39,6 +39,7 @@ M: struct-type stack-size
     [ [ align ] keep ] dip
     struct-type new
         byte-array >>class
+        byte-array >>boxed-class
         swap >>fields
         swap >>align
         swap >>size

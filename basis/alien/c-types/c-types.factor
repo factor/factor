@@ -15,6 +15,7 @@ DEFER: *char
 
 TUPLE: abstract-c-type
 { class class initial: object }
+{ boxed-class class initial: object }
 { boxer-quot callable }
 { unboxer-quot callable }
 { getter callable }
@@ -75,6 +76,12 @@ GENERIC: c-type-class ( name -- class )
 M: abstract-c-type c-type-class class>> ;
 
 M: string c-type-class c-type c-type-class ;
+
+GENERIC: c-type-boxed-class ( name -- class )
+
+M: abstract-c-type c-type-boxed-class boxed-class>> ;
+
+M: string c-type-boxed-class c-type c-type-boxed-class ;
 
 GENERIC: c-type-boxer ( name -- boxer )
 
@@ -300,6 +307,7 @@ CONSTANT: primitive-types
 [
     <c-type>
         c-ptr >>class
+        c-ptr >>boxed-class
         [ alien-cell ] >>getter
         [ [ >c-ptr ] 2dip set-alien-cell ] >>setter
         bootstrap-cell >>size
@@ -311,6 +319,7 @@ CONSTANT: primitive-types
 
     <long-long-type>
         integer >>class
+        integer >>boxed-class
         [ alien-signed-8 ] >>getter
         [ set-alien-signed-8 ] >>setter
         8 >>size
@@ -321,6 +330,7 @@ CONSTANT: primitive-types
 
     <long-long-type>
         integer >>class
+        integer >>boxed-class
         [ alien-unsigned-8 ] >>getter
         [ set-alien-unsigned-8 ] >>setter
         8 >>size
@@ -331,6 +341,7 @@ CONSTANT: primitive-types
 
     <c-type>
         integer >>class
+        integer >>boxed-class
         [ alien-signed-cell ] >>getter
         [ set-alien-signed-cell ] >>setter
         bootstrap-cell >>size
@@ -341,6 +352,7 @@ CONSTANT: primitive-types
 
     <c-type>
         integer >>class
+        integer >>boxed-class
         [ alien-unsigned-cell ] >>getter
         [ set-alien-unsigned-cell ] >>setter
         bootstrap-cell >>size
@@ -351,6 +363,7 @@ CONSTANT: primitive-types
 
     <c-type>
         integer >>class
+        integer >>boxed-class
         [ alien-signed-4 ] >>getter
         [ set-alien-signed-4 ] >>setter
         4 >>size
@@ -361,6 +374,7 @@ CONSTANT: primitive-types
 
     <c-type>
         integer >>class
+        integer >>boxed-class
         [ alien-unsigned-4 ] >>getter
         [ set-alien-unsigned-4 ] >>setter
         4 >>size
@@ -371,6 +385,7 @@ CONSTANT: primitive-types
 
     <c-type>
         fixnum >>class
+        fixnum >>boxed-class
         [ alien-signed-2 ] >>getter
         [ set-alien-signed-2 ] >>setter
         2 >>size
@@ -381,6 +396,7 @@ CONSTANT: primitive-types
 
     <c-type>
         fixnum >>class
+        fixnum >>boxed-class
         [ alien-unsigned-2 ] >>getter
         [ set-alien-unsigned-2 ] >>setter
         2 >>size
@@ -391,6 +407,7 @@ CONSTANT: primitive-types
 
     <c-type>
         fixnum >>class
+        fixnum >>boxed-class
         [ alien-signed-1 ] >>getter
         [ set-alien-signed-1 ] >>setter
         1 >>size
@@ -401,6 +418,7 @@ CONSTANT: primitive-types
 
     <c-type>
         fixnum >>class
+        fixnum >>boxed-class
         [ alien-unsigned-1 ] >>getter
         [ set-alien-unsigned-1 ] >>setter
         1 >>size
@@ -420,6 +438,7 @@ CONSTANT: primitive-types
 
     <c-type>
         float >>class
+        float >>boxed-class
         [ alien-float ] >>getter
         [ [ >float ] 2dip set-alien-float ] >>setter
         4 >>size
@@ -432,6 +451,7 @@ CONSTANT: primitive-types
 
     <c-type>
         float >>class
+        float >>boxed-class
         [ alien-double ] >>getter
         [ [ >float ] 2dip set-alien-double ] >>setter
         8 >>size
