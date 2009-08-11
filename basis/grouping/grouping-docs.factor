@@ -17,10 +17,16 @@ ARTICLE: "grouping" "Groups and clumps"
 "The difference can be summarized as the following:"
 { $list
     { "With groups, the subsequences form the original sequence when concatenated:"
-        { $unchecked-example "dup n groups concat sequence= ." "t" }
+        { $unchecked-example
+            "USING: grouping ;"
+            "{ 1 2 3 4 } dup" "2 <groups> concat sequence= ." "t"
+        }
     }
     { "With clumps, collecting the first element of each subsequence but the last one, together with the last subseqence, yields the original sequence:"
-        { $unchecked-example "dup n clumps unclip-last [ [ first ] map ] dip append sequence= ." "t" }
+        { $unchecked-example
+            "USING: grouping ;"
+            "{ 1 2 3 4 } dup" "2 <clumps> unclip-last [ [ first ] map ] dip append sequence= ." "t"
+        }
     }
 }
 "A combinator built using clumps:"
