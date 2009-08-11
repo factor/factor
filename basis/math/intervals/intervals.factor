@@ -340,8 +340,8 @@ SYMBOL: incomparable
     {
         { [ over empty-interval eq? ] [ drop ] }
         { [ dup empty-interval eq? ] [ nip ] }
-        { [ dup full-interval eq? ] [ nip ] }
-        [ (rem-range) 2dup interval-subset? [ drop ] [ nip ] if ]
+        { [ dup full-interval eq? ] [ 2drop [0,inf] ] }
+        [ nip (rem-range) ]
     } cond ;
 
 : interval->fixnum ( i1 -- i2 )
