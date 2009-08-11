@@ -276,6 +276,7 @@ HELP: parsing-word?
 HELP: define-declared
 { $values { "word" word } { "def" quotation } { "effect" effect } }
 { $description "Defines a word and declares its stack effect." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 
 HELP: define-temp
@@ -311,4 +312,5 @@ HELP: make-inline
 HELP: define-inline
 { $values { "word" word } { "def" quotation } { "effect" effect } }
 { $description "Defines a word and makes it " { $link POSTPONE: inline } "." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
