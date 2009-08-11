@@ -118,8 +118,6 @@ ERROR: non-trivial-divisor n ;
         -rot (^mod)
     ] if ; foldable
 
-: 10^ ( n -- n' ) 10 swap ^ ; inline
-
 GENERIC: absq ( x -- y ) foldable
 
 M: real absq sq ;
@@ -159,6 +157,10 @@ GENERIC: log ( x -- y )
 M: real log dup 0.0 >= [ flog ] [ 0.0 rect> log ] if ;
 
 M: complex log >polar swap flog swap rect> ;
+
+: 10^ ( x -- y ) 10 swap ^ ; inline
+
+: log10 ( x -- y ) log 10 log / ; inline
 
 GENERIC: cos ( x -- y ) foldable
 
