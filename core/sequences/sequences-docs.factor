@@ -1214,7 +1214,7 @@ HELP: follow
 { $examples "Get random numbers until zero is reached:"
     { $unchecked-example
     "USING: random sequences prettyprint math ;"
-    "100 [ random dup zero? [ drop f ] when ] follow ."
+    "100 [ random [ f ] when-zero ] follow ."
     "{ 100 86 34 32 24 11 7 2 }"
 } } ;
 
