@@ -1,5 +1,6 @@
 USING: accessors calendar continuations destructors kernel math
-math.order namespaces system threads ui ui.gadgets.worlds ;
+math.order namespaces system threads ui ui.gadgets.worlds
+sequences ;
 IN: game-loop
 
 TUPLE: game-loop
@@ -52,11 +53,11 @@ TUPLE: game-loop-error game-loop error ;
     drop ;
 
 : ?tick ( loop count -- )
-    dup zero? [ drop millis >>last-tick drop ] [
+    [ millis >>last-tick drop ] [
         over [ since-last-tick ] [ tick-length>> ] bi >=
         [ [ drop increment-tick ] [ drop tick ] [ 1- ?tick ] 2tri ]
         [ 2drop ] if
-    ] if ;
+    ] if-zero ;
 
 : (run-loop) ( loop -- )
     dup running?>>

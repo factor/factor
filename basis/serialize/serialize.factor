@@ -47,7 +47,7 @@ M: id equal? over id? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
 ! The last case is needed because a very large number would
 ! otherwise be confused with a small number.
 : serialize-cell ( n -- )
-    dup zero? [ drop 0 write1 ] [
+    [ 0 write1 ] [
         dup HEX: 7e <= [
             HEX: 80 bitor write1
         ] [
@@ -60,7 +60,7 @@ M: id equal? over id? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
             ] if
             >be write
         ] if
-    ] if ;
+    ] if-zero ;
 
 : deserialize-cell ( -- n )
     read1 {
@@ -79,12 +79,12 @@ M: f (serialize) ( obj -- )
     drop CHAR: n write1 ;
 
 M: integer (serialize) ( obj -- )
-    dup zero? [
-        drop CHAR: z write1
+    [
+        CHAR: z write1
     ] [
         dup 0 < [ neg CHAR: m ] [ CHAR: p ] if write1
         serialize-cell
-    ] if ;
+    ] if-zero ;
 
 M: float (serialize) ( obj -- )
     CHAR: F write1

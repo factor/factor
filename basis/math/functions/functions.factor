@@ -71,7 +71,7 @@ PRIVATE>
     2dup [ real? ] both? [ drop 0 >= ] [ 2drop f ] if ; inline
 
 : 0^ ( x -- z )
-    dup zero? [ drop 0/0. ] [ 0 < 1/0. 0 ? ] if ; inline
+    [ 0/0. ] [ 0 < 1/0. 0 ? ] if-zero ; inline
 
 : (^mod) ( n x y -- z )
     make-bits 1 [
@@ -263,13 +263,13 @@ M: real atan fatan ;
 : round ( x -- y ) dup sgn 2 / + truncate ; inline
 
 : floor ( x -- y )
-    dup 1 mod dup zero?
-    [ drop ] [ dup 0 < [ - 1 - ] [ - ] if ] if ; foldable
+    dup 1 mod
+    [ ] [ dup 0 < [ - 1 - ] [ - ] if ] if-zero ; foldable
 
 : ceiling ( x -- y ) neg floor neg ; foldable
 
 : floor-to ( x step -- y )
-    dup zero? [ drop ] [ [ / floor ] [ * ] bi ] if ;
+    [ [ / floor ] [ * ] bi ] unless-zero ;
 
 : lerp ( a b t -- a_t ) [ over - ] dip * + ; inline
 
