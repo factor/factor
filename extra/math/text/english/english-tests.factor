@@ -1,15 +1,15 @@
 USING: math.functions math.text.english tools.test ;
 IN: math.text.english.tests
 
-[ "Zero" ] [ 0 number>text ] unit-test
-[ "Twenty-One" ] [ 21 number>text ] unit-test
-[ "One Hundred" ] [ 100 number>text ] unit-test
-[ "One Hundred and One" ] [ 101 number>text ] unit-test
-[ "One Thousand and One" ] [ 1001 number>text ] unit-test
-[ "One Thousand, One Hundred and One" ] [ 1101 number>text ] unit-test
-[ "One Million, One Thousand and One" ] [ 1001001 number>text ] unit-test
-[ "One Million, One Thousand, One Hundred and One" ] [ 1001101 number>text ] unit-test
-[ "One Million, One Hundred and Eleven Thousand, One Hundred and Eleven" ] [ 1111111 number>text ] unit-test
-[ "One Duotrigintillion" ] [ 10 99 ^ number>text ] unit-test
+[ "zero" ] [ 0 number>text ] unit-test
+[ "twenty-one" ] [ 21 number>text ] unit-test
+[ "one hundred" ] [ 100 number>text ] unit-test
+[ "one hundred and one" ] [ 101 number>text ] unit-test
+[ "one thousand and one" ] [ 1001 number>text ] unit-test
+[ "one thousand, one hundred and one" ] [ 1101 number>text ] unit-test
+[ "one million, one thousand and one" ] [ 1001001 number>text ] unit-test
+[ "one million, one thousand, one hundred and one" ] [ 1001101 number>text ] unit-test
+[ "one million, one hundred and eleven thousand, one hundred and eleven" ] [ 1111111 number>text ] unit-test
+[ "one duotrigintillion" ] [ 10 99 ^ number>text ] unit-test
 
-[ "Negative One Hundred and Twenty-Three" ] [ -123 number>text ] unit-test
+[ "negative one hundred and twenty-three" ] [ -123 number>text ] unit-test
