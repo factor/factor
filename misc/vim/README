@@ -20,9 +20,7 @@ Note: The syntax-highlighting file is automatically generated to include the
 names of all the vocabularies Factor knows about. To regenerate it manually,
 run the following code in the listener:
 
-    USE: editors.vim.generate-syntax
-
-    generate-vim-syntax
+    "editors.vim.generate-syntax" run
 
 ...or run it from the command-line:
 

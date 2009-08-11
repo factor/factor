@@ -1,3 +1,4 @@
+
 " Vim syntax file
 " Language: factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
@@ -28,15 +29,15 @@ syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<#! .*/ contains=factorTodo
 syn match factorComment /\<! .*/ contains=factorTodo
 
-syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorArray0,factorQuotation0
+syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
 
-syn region factorDefn matchgroup=factorDefnDelims start=/\<\(MACRO\|MEMO\|:\)\?:\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
-syn region factorMethod matchgroup=factorMethodDelims start=/\<M:\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
+syn region factorDefn matchgroup=factorDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
+syn region factorMethod matchgroup=factorMethodDelims start=/\<M::\?\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
 syn region factorGeneric matchgroup=factorGenericDelims start=/\<GENERIC:\s\+\S\+\>/ end=/$/ contains=factorStackEffect
 syn region factorGenericN matchgroup=factorGenericNDelims start=/\<GENERIC#\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect
 
-syn region factorPrivateDefn matchgroup=factorPrivateDefnDelims start=/\<\(MACRO\|MEMO\|:\)\?:\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
-syn region factorPrivateMethod matchgroup=factorPrivateMethodDelims start=/\<M:\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
+syn region factorPrivateDefn matchgroup=factorPrivateDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
+syn region factorPrivateMethod matchgroup=factorPrivateMethodDelims start=/\<M::\?\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
 syn region factorPGeneric matchgroup=factorPGenericDelims start=/\<GENERIC:\s\+\S\+\>/ end=/$/ contains=factorStackEffect contained
 syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\<GENERIC#\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect
 
@@ -44,13 +45,13 @@ syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/
 
 
 syn keyword factorBoolean boolean f general-t t
-syn keyword factorCompileDirective inline foldable parsing
+syn keyword factorCompileDirective inline foldable recursive
 
 syn keyword factorKeyword or tuck 2bi 2tri while wrapper nip 4dip wrapper? bi* callstack>array both? hashcode die dupd callstack callstack? 3dup tri@ pick curry build ?execute 3bi prepose >boolean ?if clone eq? tri* ? = swapd call-clear 2over 2keep 3keep clear 2dup when not tuple? dup 2bi* 2tri* call tri-curry object bi@ do unless* if* loop bi-curry* drop when* assert= retainstack assert? -rot execute 2bi@ 2tri@ boa with either? 3drop bi curry? datastack until 3dip over 3curry roll tri-curry* swap tri-curry@ 2nip and throw set-retainstack bi-curry (clone) hashcode* compose spin 2dip if 3tri unless compose? tuple keep 2curry equal? set-datastack assert tri 2drop most <wrapper> boolean? identity-tuple? null new set-callstack dip bi-curry@ rot -roll xor identity-tuple boolean
-syn keyword factorKeyword ?at assoc? assoc-clone-like assoc= delete-at* assoc-partition extract-keys new-assoc value? assoc-size map>assoc push-at assoc-like key? assoc-intersect update assoc-union assoc-combine at* assoc-empty? at+ set-at assoc-all? assoc-subset? assoc-hashcode change-at assoc-each assoc-diff zip values value-at rename-at inc-at enum? at cache assoc>map <enum> assoc assoc-map enum value-at* remove-all assoc-map-as >alist assoc-filter-as substitute-here clear-assoc assoc-stack substitute assoc-filter 2cache delete-at assoc-find keys assoc-any? unzip
-syn keyword factorKeyword case execute-effect dispatch-case-quot <buckets> no-cond no-case? 3cleave>quot contiguous-range? 2cleave cond>quot wrong-values? no-cond? cleave>quot no-case hash-dispatch-quot case>quot 3cleave wrong-values alist>quot hash-case-table hash-case-quot case-find (distribute-buckets) cond cleave distribute-buckets call-effect 2cleave>quot recursive-hashcode linear-case-quot spread spread>quot
+syn keyword factorKeyword ?at assoc? assoc-clone-like assoc= delete-at* assoc-partition extract-keys new-assoc value? assoc-size map>assoc push-at assoc-like key? assoc-intersect assoc-refine update assoc-union assoc-combine at* assoc-empty? at+ set-at assoc-all? assoc-subset? assoc-hashcode change-at assoc-each assoc-diff zip values value-at rename-at inc-at enum? at cache assoc>map <enum> assoc assoc-map enum value-at* remove-all assoc-map-as >alist assoc-filter-as substitute-here clear-assoc assoc-stack maybe-set-at substitute assoc-filter 2cache delete-at assoc-find keys assoc-any? unzip
+syn keyword factorKeyword case execute-effect no-cond no-case? 3cleave>quot 2cleave cond>quot wrong-values? no-cond? cleave>quot no-case case>quot 3cleave wrong-values to-fixed-point alist>quot case-find cond cleave call-effect 2cleave>quot recursive-hashcode linear-case-quot spread spread>quot
 syn keyword factorKeyword byte-array>bignum sgn >bignum next-float number= each-integer next-power-of-2 ?1+ fp-special? imaginary-part mod recip float>bits rational >float number? 2^ bignum? integer fixnum? neg fixnum sq bignum fp-snan? fp-infinity? denominator (all-integers?) times find-last-integer (each-integer) bit? * + fp-bitwise= - fp-qnan? / power-of-2? >= bitand find-integer complex <fp-nan> < log2 > integer? real number bits>double double>bits bitor 2/ zero? rem fp-nan-payload all-integers? (find-integer) real-part prev-float align bits>float float? shift float 1+ 1- fp-nan? abs bitxor ratio? even? <= /mod odd? >integer ratio rational? bitnot real? >fixnum complex? /i numerator /f
-syn keyword factorKeyword append assert-sequence= find-last-from trim-head-slice clone-like 3sequence assert-sequence? map-as filter-here last-index-from prepare-index reversed index-from cut* pad-tail (indices) concat-as remq but-last snip trim-tail nths nth 2pusher sequence slice? <slice> partition remove-nth tail-slice empty? tail* if-empty find-from virtual-sequence? member? set-length delq drop-prefix unclip iota unclip-last-slice bounds-error? sequence-hashcode-step map start midpoint@ rest-slice prepend fourth sift delete sigma new-sequence follow like delete-nth first4 1sequence reverse slice unless-empty padding virtual@ repetition? index 4sequence max-length set-second immutable-sequence first2 first3 replicate-as reduce-index unclip-slice supremum insert-nth trim-tail-slice tail 3append short count suffix concat flip filter sum immutable? 2sequence delete-all start* indices snip-slice check-slice sequence? head map-find reduce append-as reverse-here sequence= halves collapse-slice interleave 2map binary-reduce virtual-seq slice-error? product bounds-check? bounds-check harvest immutable find produce remove pad-head replicate set-fourth peek shorten reversed? map-find-last 3map-as 2unclip-slice shorter? 3map find-last head-slice pop* 2map-as tail-slice* but-last-slice 2map-reduce iota? accumulate each pusher cut-slice new-resizable each-index head-slice* 2reverse-each sequence-hashcode memq? pop set-nth ?nth <flat-slice> second change-each join when-empty accumulator immutable-sequence? <reversed> all? 3append-as virtual-sequence subseq? push-either new-like length last-index push-if 2all? lengthen assert-sequence copy map-reduce move third first 3each tail? set-first prefix bounds-error any? <repetition> trim-slice exchange surround 2reduce cut change-nth min-length set-third produce-as push-all head? delete-slice rest sum-lengths 2each head* infimum glue slice-error subseq replace-slice push repetition map-index trim-head unclip-last mismatch trim
+syn keyword factorKeyword append assert-sequence= find-last-from trim-head-slice clone-like 3sequence assert-sequence? map-as filter-here last-index-from reversed index-from cut* pad-tail (indices) concat-as remq but-last snip trim-tail nths nth 2pusher sequence slice? <slice> partition remove-nth tail-slice empty? tail* if-empty find-from virtual-sequence? member? set-length delq drop-prefix unclip iota unclip-last-slice bounds-error? sequence-hashcode-step map start midpoint@ rest-slice prepend fourth sift delete sigma new-sequence follow like delete-nth first4 1sequence reverse slice unless-empty padding virtual@ repetition? set-last index 4sequence max-length set-second immutable-sequence first2 first3 replicate-as reduce-index unclip-slice supremum insert-nth trim-tail-slice tail 3append short count suffix concat flip filter sum immutable? 2sequence map-integers delete-all start* indices snip-slice check-slice sequence? head map-find reduce append-as reverse-here sequence= halves collapse-slice interleave 2map binary-reduce virtual-seq slice-error? product bounds-check? bounds-check harvest immutable find produce remove pad-head last replicate set-fourth shorten reversed? map-find-last 3map-as 2unclip-slice shorter? 3map find-last head-slice pop* 2map-as tail-slice* but-last-slice 2map-reduce iota? accumulate each pusher cut-slice new-resizable each-index head-slice* 2reverse-each sequence-hashcode memq? pop set-nth ?nth <flat-slice> second change-each join when-empty accumulator immutable-sequence? <reversed> all? 3append-as virtual-sequence subseq? push-either new-like length last-index push-if 2all? lengthen assert-sequence copy map-reduce move third first 3each tail? set-first prefix bounds-error any? <repetition> trim-slice exchange surround 2reduce cut change-nth min-length set-third produce-as push-all head? delete-slice rest sum-lengths 2each head* infimum glue slice-error subseq replace-slice push repetition map-index trim-head unclip-last mismatch trim
 syn keyword factorKeyword global +@ change set-namestack change-global init-namespaces on off set-global namespace set with-scope bind with-variable inc dec counter initialize namestack get get-global make-assoc
 syn keyword factorKeyword <array> 2array 3array pair >array 1array 4array pair? array resize-array array?
 syn keyword factorKeyword +character+ bad-seek-type? readln stream-seek read print with-output-stream contents write1 stream-write1 stream-copy stream-element-type with-input-stream stream-print stream-read stream-contents bl seek-output bad-seek-type nl stream-nl write flush stream-lines +byte+ stream-flush read1 seek-absolute? stream-read1 lines stream-readln stream-read-until each-line seek-end with-output-stream* seek-absolute with-streams seek-input seek-relative? input-stream stream-write read-partial seek-end? seek-relative error-stream read-until with-input-stream* with-streams* each-block output-stream stream-read-partial
@@ -136,37 +137,39 @@ syn match factorMultiStringContents /.*/ contained
 
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
-syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
+"syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
+syn match factorStackEffect /\<( .*--.* )\>/ contained
+syn match factorLiteralStackEffect /\<(( .*--.* ))\>/
 
 "adapted from lisp.vim
 if exists("g:factor_norainbow") 
-    syn region factorQuotation matchgroup=factorDelimiter start=/\<\[\>/ matchgroup=factorDelimiter end=/\<\]\>/ contains=ALL
+    syn region factorQuotation matchgroup=factorDelimiter start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ matchgroup=factorDelimiter end=/\<\]\>/ contains=ALL
 else
-    syn region factorQuotation0           matchgroup=hlLevel0 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation1,factorArray1
-    syn region factorQuotation1 contained matchgroup=hlLevel1 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation2,factorArray2
-    syn region factorQuotation2 contained matchgroup=hlLevel2 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation3,factorArray3
-    syn region factorQuotation3 contained matchgroup=hlLevel3 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation4,factorArray4
-    syn region factorQuotation4 contained matchgroup=hlLevel4 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation5,factorArray5
-    syn region factorQuotation5 contained matchgroup=hlLevel5 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation6,factorArray6
-    syn region factorQuotation6 contained matchgroup=hlLevel6 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation7,factorArray7
-    syn region factorQuotation7 contained matchgroup=hlLevel7 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation8,factorArray8
-    syn region factorQuotation8 contained matchgroup=hlLevel8 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation9,factorArray9
-    syn region factorQuotation9 contained matchgroup=hlLevel9 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation0,factorArray0
+    syn region factorQuotation0           matchgroup=hlLevel0 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation1,factorArray1
+    syn region factorQuotation1 contained matchgroup=hlLevel1 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation2,factorArray2
+    syn region factorQuotation2 contained matchgroup=hlLevel2 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation3,factorArray3
+    syn region factorQuotation3 contained matchgroup=hlLevel3 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation4,factorArray4
+    syn region factorQuotation4 contained matchgroup=hlLevel4 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation5,factorArray5
+    syn region factorQuotation5 contained matchgroup=hlLevel5 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation6,factorArray6
+    syn region factorQuotation6 contained matchgroup=hlLevel6 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation7,factorArray7
+    syn region factorQuotation7 contained matchgroup=hlLevel7 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation8,factorArray8
+    syn region factorQuotation8 contained matchgroup=hlLevel8 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation9,factorArray9
+    syn region factorQuotation9 contained matchgroup=hlLevel9 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation0,factorArray0
 endif
 
 if exists("g:factor_norainbow") 
-    syn region factorArray    matchgroup=factorDelimiter start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/  matchgroup=factorDelimiter end=/\<}\>/ contains=ALL
+    syn region factorArray    matchgroup=factorDelimiter start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/  matchgroup=factorDelimiter end=/\<}\>/ contains=ALL
 else
-    syn region factorArray0           matchgroup=hlLevel0 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray1,factorQuotation1
-    syn region factorArray1 contained matchgroup=hlLevel1 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray2,factorQuotation2
-    syn region factorArray2 contained matchgroup=hlLevel2 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray3,factorQuotation3
-    syn region factorArray3 contained matchgroup=hlLevel3 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray4,factorQuotation4
-    syn region factorArray4 contained matchgroup=hlLevel4 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray5,factorQuotation5
-    syn region factorArray5 contained matchgroup=hlLevel5 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray6,factorQuotation6
-    syn region factorArray6 contained matchgroup=hlLevel6 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray7,factorQuotation7
-    syn region factorArray7 contained matchgroup=hlLevel7 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray8,factorQuotation8
-    syn region factorArray8 contained matchgroup=hlLevel8 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray9,factorQuotation9
-    syn region factorArray9 contained matchgroup=hlLevel9 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray0,factorQuotation0
+    syn region factorArray0           matchgroup=hlLevel0 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray1,factorQuotation1
+    syn region factorArray1 contained matchgroup=hlLevel1 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray2,factorQuotation2
+    syn region factorArray2 contained matchgroup=hlLevel2 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray3,factorQuotation3
+    syn region factorArray3 contained matchgroup=hlLevel3 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray4,factorQuotation4
+    syn region factorArray4 contained matchgroup=hlLevel4 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray5,factorQuotation5
+    syn region factorArray5 contained matchgroup=hlLevel5 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray6,factorQuotation6
+    syn region factorArray6 contained matchgroup=hlLevel6 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray7,factorQuotation7
+    syn region factorArray7 contained matchgroup=hlLevel7 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray8,factorQuotation8
+    syn region factorArray8 contained matchgroup=hlLevel8 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray9,factorQuotation9
+    syn region factorArray9 contained matchgroup=hlLevel9 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray0,factorQuotation0
 endif
 
 syn match factorBracketErr /\<\]\>/
@@ -184,6 +187,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
 
     HiLink factorComment                Comment
     HiLink factorStackEffect            Typedef
+    HiLink factorLiteralStackEffect     Typedef
     HiLink factorTodo                   Todo
     HiLink factorInclude                Include
     HiLink factorRepeat                 Repeat
@@ -270,8 +274,9 @@ endif
 let b:current_syntax = "factor"
 
 set sw=4
-set ts=4
+set sts=4
 set expandtab
 set autoindent " annoying?
 
 " vim: syntax=vim
+
