@@ -162,7 +162,7 @@ M: timestamp year. ( timestamp -- )
 
 : read-rfc3339-seconds ( s -- s' ch )
     "+-Z" read-until [
-        [ string>number ] [ length 10 swap ^ ] bi / +
+        [ string>number ] [ length 10^ ] bi / +
     ] dip ;
 
 : (rfc3339>timestamp) ( -- timestamp )

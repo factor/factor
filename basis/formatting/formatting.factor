@@ -32,7 +32,7 @@ IN: formatting
     [ "." split1 ] dip [ CHAR: 0 pad-tail ] [ head-slice ] bi "." glue ;
 
 : max-digits ( n digits -- n' )
-    10 swap ^ [ * round ] keep / ; inline
+    10^ [ * round ] keep / ; inline
 
 : >exp ( x -- exp base )
     [ 
