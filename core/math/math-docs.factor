@@ -213,9 +213,9 @@ HELP: sgn
 { $description
     "Outputs one of the following:"
     { $list
-        "-1 if " { $snippet "x" } " is negative"
-        "0 if " { $snippet "x" } " is equal to 0"
-        "1 if " { $snippet "x" } " is positive"
+        { "-1 if " { $snippet "x" } " is negative" }
+        { "0 if " { $snippet "x" } " is equal to 0" }
+        { "1 if " { $snippet "x" } " is positive" }
     }
 } ;
 
