@@ -1,11 +1,11 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations fry io kernel make math math.functions math.parser
-    math.statistics memory tools.time ;
+USING: continuations fry io kernel make math math.functions
+math.parser math.statistics memory tools.time ;
 IN: project-euler.ave-time
 
 : nth-place ( x n -- y )
-    10 swap ^ [ * round >integer ] keep /f ;
+    10^ [ * round >integer ] keep /f ;
 
 : collect-benchmarks ( quot n -- seq )
     [
