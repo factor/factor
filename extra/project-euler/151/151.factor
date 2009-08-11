@@ -39,11 +39,11 @@ SYMBOL: table
 
 : (pick-sheet) ( seq i -- newseq )
     [
-        <=> sgn
+        <=>
         {
-            { -1 [ ] }
-            {  0 [ 1- ] }
-            {  1 [ 1+ ] }
+            { +lt+ [ ] }
+            { +eq+ [ 1- ] }
+            { +gt+ [ 1+ ] }
         } case
     ] curry map-index ;
 
@@ -70,8 +70,6 @@ DEFER: (euler151)
         H{ } clone table set
         { 1 1 1 1 } (euler151)
     ] with-scope ;
-
-! TODO: doesn't work currently, problem in area of 'with map' in (euler151)
 
 ! [ euler151 ] 100 ave-time
 ! ? ms run time - 100 trials
