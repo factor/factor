@@ -104,10 +104,12 @@ PRIVATE>
 : divisor? ( m n -- ? )
     mod 0 = ;
 
+ERROR: non-trivial-divisor n ;
+
 : mod-inv ( x n -- y )
     [ nip ] [ gcd 1 = ] 2bi
     [ dup 0 < [ + ] [ nip ] if ]
-    [ "Non-trivial divisor found" throw ] if ; foldable
+    [ non-trivial-divisor ] if ; foldable
 
 : ^mod ( x y n -- z )
     over 0 < [
@@ -115,6 +117,8 @@ PRIVATE>
     ] [
         -rot (^mod)
     ] if ; foldable
+
+: 10^ ( n -- n' ) 10 swap ^ ; inline
 
 GENERIC: absq ( x -- y ) foldable
 
