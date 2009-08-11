@@ -46,9 +46,9 @@ PRIVATE>
 : if-zero ( n quot1 quot2 -- )
     [ dup zero? ] (if-empty) ; inline
 
-: when-zero ( seq quot -- ) [ ] if-zero ; inline
+: when-zero ( n quot -- ) [ ] if-zero ; inline
 
-: unless-zero ( seq quot -- ) [ ] swap if-zero ; inline
+: unless-zero ( n quot -- ) [ ] swap if-zero ; inline
 
 : delete-all ( seq -- ) 0 swap set-length ;
 
