@@ -1,6 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel kernel.private math math.functions math.private ;
+USING: accessors kernel kernel.private math math.functions
+math.private sequences summary ;
 IN: math.ratios
 
 : 2>fraction ( a/b c/d -- a c b d )
@@ -19,13 +20,18 @@ IN: math.ratios
 
 PRIVATE>
 
+ERROR: division-by-zero ;
+
+M: division-by-zero summary
+    drop "Division by zero" ;
+
 M: integer /
-    dup zero? [
-        "Division by zero" throw
+    [
+        division-by-zero
     ] [
         dup 0 < [ [ neg ] bi@ ] when
         2dup gcd nip [ /i ] curry bi@ fraction>
-    ] if ;
+    ] if-zero ;
 
 M: ratio hashcode*
     nip >fraction [ hashcode ] bi@ bitxor ;
