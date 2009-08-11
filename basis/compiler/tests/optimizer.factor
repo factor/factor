@@ -391,6 +391,17 @@ DEFER: loop-bbb
 
 [ ] [ [ \ broken-declaration forget ] with-compilation-unit ] unit-test
 
+! Interval inference issue
+[ f ] [
+    10 70
+    [
+        dup 70 >=
+        [ dup 700 <= [ swap 1024 rem rem ] [ 2drop 70 ] if ]
+        [ 2drop 70 ] if
+        70 >=
+    ] compile-call
+] unit-test
+
 ! Modular arithmetic bug
 : modular-arithmetic-bug ( a -- b ) >integer 256 mod ;
 
