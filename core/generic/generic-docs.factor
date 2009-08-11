@@ -9,7 +9,7 @@ ARTICLE: "method-order" "Method precedence"
 $nl
 "Here is an example:"
 { $code
-    "GENERIC: explain"
+    "GENERIC: explain ( object -- )"
     "M: object explain drop \"an object\" print ;"
     "M: number explain drop \"a number\" print ;"
     "M: sequence explain drop \"a sequence\" print ;"
@@ -17,7 +17,7 @@ $nl
 "The linear order is the following, from least-specific to most-specific:"
 { $code "{ object sequence number }" }
 "Neither " { $link number } " nor " { $link sequence } " are subclasses of each other, yet their intersection is the non-empty " { $link integer } " class. Calling " { $snippet "explain" } " with an integer on the stack will print " { $snippet "a number" } " because " { $link number } " precedes " { $link sequence } " in the class linearization order. If this was not the desired outcome, define a method on the intersection:"
-{ $code "M: integer explain drop \"a sequence\" print ;" }
+{ $code "M: integer explain drop \"an integer\" print ;" }
 "Now, the linear order is the following, from least-specific to most-specific:"
 { $code "{ object sequence number integer }" }
 "The " { $link order } " word can be useful to clarify method dispatch order:"
