@@ -55,11 +55,14 @@ M: tuple class layout-of 2 slot { word } declare ;
 
 PRIVATE>
 
-: initial-values ( class -- slots )
+: tuple-initial-values ( class -- slots )
     all-slots [ initial>> ] map ;
 
+: initial-values ( class -- slots )
+    class-slots [ initial>> ] map ;
+
 : pad-slots ( slots class -- slots' class )
-    [ initial-values over length tail append ] keep ; inline
+    [ tuple-initial-values over length tail append ] keep ; inline
 
 : tuple>array ( tuple -- array )
     prepare-tuple>array
@@ -156,7 +159,7 @@ ERROR: bad-superclass class ;
     dup boa-check-quot "boa-check" set-word-prop ;
 
 : tuple-prototype ( class -- prototype )
-    [ initial-values ] keep over [ ] any?
+    [ tuple-initial-values ] keep over [ ] any?
     [ slots>tuple ] [ 2drop f ] if ;
 
 : define-tuple-prototype ( class -- )

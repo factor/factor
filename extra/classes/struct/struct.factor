@@ -47,6 +47,14 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 M: struct-class boa
     <struct-boa> ; inline
 
+: pad-struct-slots ( slots class -- slots' class )
+    [ class-slots [ initial>> ] map over length tail append ] keep ;
+
+M: struct-class boa>object
+    swap pad-struct-slots
+    [ <struct> swap ] [ "struct-slots" word-prop ] bi 
+    [ name>> setter-word execute( struct value -- struct ) ] 2each ;
+
 ! Struct slot accessors
 
 M: struct-class reader-quot
