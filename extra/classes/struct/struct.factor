@@ -132,3 +132,6 @@ M: struct-class heap-size
 SYNTAX: STRUCT:
     parse-struct-definition define-struct-class ;
 
+USING: vocabs vocabs.loader ;
+
+"prettyprint" vocab [ "classes.struct.prettyprint" require ] when
