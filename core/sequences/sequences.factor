@@ -281,9 +281,11 @@ INSTANCE: repetition immutable-sequence
 
 <PRIVATE
 
+ERROR: integer-length-expected obj ;
+
 : check-length ( n -- n )
     #! Ricing.
-    dup integer? [ "length not an integer" throw ] unless ; inline
+    dup integer? [ integer-length-expected ] unless ; inline
 
 : ((copy)) ( dst i src j n -- dst i src j n )
     dup -roll [
