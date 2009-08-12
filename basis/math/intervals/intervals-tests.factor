@@ -113,6 +113,22 @@ IN: math.intervals.tests
     0 1 (a,b) 0 1 [a,b] interval-subset?
 ] unit-test
 
+[ t ] [
+    full-interval -1/0. 1/0. [a,b] interval-subset?
+] unit-test
+
+[ t ] [
+    -1/0. 1/0. [a,b] full-interval interval-subset?
+] unit-test
+
+[ f ] [
+    full-interval 0 1/0. [a,b] interval-subset?
+] unit-test
+
+[ t ] [
+    0 1/0. [a,b] full-interval interval-subset?
+] unit-test
+
 [ f ] [
     0 0 1 (a,b) interval-contains?
 ] unit-test
