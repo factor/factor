@@ -713,11 +713,7 @@ ERROR: error-message-failed id ;
     GetLastError n>win32-error-string ;
 
 : (win32-error) ( n -- )
-    dup zero? [
-        drop
-    ] [
-        win32-error-string throw
-    ] if ;
+    [ win32-error-string throw ] unless-zero ;
 
 : win32-error ( -- )
     GetLastError (win32-error) ;
