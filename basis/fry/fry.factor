@@ -26,7 +26,7 @@ M: >r/r>-in-fry-error summary
 
 : check-fry ( quot -- quot )
     dup { load-local load-locals get-local drop-locals } intersect
-    empty? [ >r/r>-in-fry-error ] unless ;
+    [ >r/r>-in-fry-error ] unless-empty ;
 
 PREDICATE: fry-specifier < word { _ @ } memq? ;
 
