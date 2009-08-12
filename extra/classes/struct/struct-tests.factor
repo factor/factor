@@ -25,3 +25,6 @@ STRUCT: bar
         [ foo>> z>> ]
     } cleave
 ] unit-test
+
+[ 7654 ] [ S{ foo f 98 7654 f } y>> ] unit-test
+[ 7654 ] [ S{ foo { y 7654 } } y>> ] unit-test
