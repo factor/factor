@@ -9,7 +9,7 @@ IN: math.primes.erato
 CONSTANT: masks B{ 0 128 0 0 0 0 0 64 0 0 0 32 0 16 0 0 0 8 0 4 0 0 0 2 0 0 0 0 0 1 }
 
 : bit-pos ( n -- byte/f mask/f )
-    30 /mod masks nth-unsafe dup zero? [ 2drop f f ] when ;
+    30 /mod masks nth-unsafe [ drop f f ] when-zero ;
 
 : marked-unsafe? ( n arr -- ? )
     [ bit-pos ] dip swap [ [ nth-unsafe ] [ bitand zero? not ] bi* ] [ 2drop f ] if* ;

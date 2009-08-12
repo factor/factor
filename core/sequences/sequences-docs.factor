@@ -123,7 +123,48 @@ HELP: unless-empty
     }
 } ;
 
-{ if-empty when-empty unless-empty } related-words
+HELP: if-zero
+{ $values { "n" number } { "quot1" quotation } { "quot2" quotation } }
+{ $description "Makes an implicit check if the number is zero. A zero is dropped and " { $snippet "quot1" } " is called. Otherwise, if the number is not zero, " { $snippet "quot2" } " is called on it." }
+{ $example
+    "USING: kernel math prettyprint sequences ;"
+    "3 [ \"zero\" ] [ sq ] if-zero ."
+    "9"
+} ;
+
+HELP: when-zero
+{ $values
+     { "n" number } { "quot" "the first quotation of an " { $link if-zero } } }
+{ $description "Makes an implicit check if the sequence is empty. A zero is dropped and the " { $snippet "quot" } " is called." }
+{ $examples "This word is equivalent to " { $link if-zero } " with an empty second quotation:"
+    { $example
+    "USING: sequences prettyprint ;"
+    "0 [ 4 ] [ ] if-zero ."
+    "4"
+    }
+    { $example
+    "USING: sequences prettyprint ;"
+    "0 [ 4 ] when-zero ."
+    "4"
+    }
+} ;
+
+HELP: unless-zero
+{ $values
+     { "n" number } { "quot" "the second quotation of an " { $link if-empty } } }
+{ $description "Makes an implicit check if the number is zero. A zero is dropped. Otherwise, the " { $snippet "quot" } " is called on the number." }
+{ $examples "This word is equivalent to " { $link if-zero } " with an empty first quotation:"
+    { $example
+    "USING: sequences math prettyprint ;"
+    "3 [ ] [ sq ] if-empty ."
+    "9"
+    }
+    { $example
+    "USING: sequences math prettyprint ;"
+    "3 [ sq ] unless-zero ."
+    "9"
+    }
+} ;
 
 HELP: delete-all
 { $values { "seq" "a resizable sequence" } }
@@ -1214,7 +1255,7 @@ HELP: follow
 { $examples "Get random numbers until zero is reached:"
     { $unchecked-example
     "USING: random sequences prettyprint math ;"
-    "100 [ random dup zero? [ drop f ] when ] follow ."
+    "100 [ random [ f ] when-zero ] follow ."
     "{ 100 86 34 32 24 11 7 2 }"
 } } ;
 
@@ -1392,6 +1433,18 @@ $nl
 "Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer."
 $nl
 "More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
+
+ARTICLE: "sequences-if" "Control flow with sequences"
+"To reduce the boilerplate of checking if a sequence is empty or a number is zero, several combinators are provided."
+$nl
+"Checking if a sequence is empty:"
+{ $subsection if-empty }
+{ $subsection when-empty }
+{ $subsection unless-empty }
+"Checking if a number is zero:"
+{ $subsection if-zero }
+{ $subsection when-zero }
+{ $subsection unless-zero } ;
 
 ARTICLE: "sequences-access" "Accessing sequence elements"
 { $subsection ?nth }
@@ -1658,6 +1711,8 @@ $nl
 "Using sequences for looping:"
 { $subsection "sequences-integers" }
 { $subsection "math.ranges" }
+"Using sequences for control flow:"
+{ $subsection "sequences-if" }
 "For inner loops:"
 { $subsection "sequences-unsafe" } ;
 
