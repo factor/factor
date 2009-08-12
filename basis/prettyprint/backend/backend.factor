@@ -138,12 +138,12 @@ M: pathname pprint*
     boa-tuples? get [ pprint-object ] [
         [
             <flow
-            \ T{ pprint-word
+            dup pprint-delims drop pprint-word
             dup class pprint-word
             t <inset
-            tuple>assoc [ pprint-slot-value ] assoc-each
+            dup tuple>assoc [ pprint-slot-value ] assoc-each
             block>
-            \ } pprint-word
+            pprint-delims nip pprint-word
             block>
         ] check-recursion
     ] if ;
