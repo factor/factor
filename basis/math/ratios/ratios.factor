@@ -20,7 +20,7 @@ IN: math.ratios
 
 PRIVATE>
 
-ERROR: division-by-zero ;
+ERROR: division-by-zero x ;
 
 M: division-by-zero summary
     drop "Division by zero" ;
