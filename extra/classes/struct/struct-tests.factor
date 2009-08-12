@@ -1,5 +1,5 @@
 USING: accessors alien.c-types classes.c-types classes.struct
-combinators kernel tools.test ;
+combinators inverse kernel tools.test ;
 IN: classes.struct.tests
 
 STRUCT: foo
@@ -28,3 +28,5 @@ STRUCT: bar
 
 [ 7654 ] [ S{ foo f 98 7654 f } y>> ] unit-test
 [ 7654 ] [ S{ foo { y 7654 } } y>> ] unit-test
+
+[ 98 7654 t ] [ S{ foo f 98 7654 t } [ foo boa ] undo ] unit-test
