@@ -160,3 +160,7 @@ SYNTAX: STRUCT:
 USING: vocabs vocabs.loader ;
 
 "prettyprint" vocab [ "classes.struct.prettyprint" require ] when
+
+SYNTAX: S{
+    POSTPONE: T{ ;
+
