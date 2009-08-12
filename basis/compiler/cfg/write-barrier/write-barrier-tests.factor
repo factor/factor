@@ -1,7 +1,9 @@
+! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 USING: compiler.cfg.write-barrier compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger cpu.architecture
 arrays tools.test vectors compiler.cfg kernel accessors
-compiler.cfg.utilities ;
+compiler.cfg.utilities namespaces sequences ;
 IN: compiler.cfg.write-barrier.tests
 
 : test-write-barrier ( insns -- insns )
@@ -70,3 +72,71 @@ IN: compiler.cfg.write-barrier.tests
         T{ ##write-barrier f 19 30 3 }
     } test-write-barrier
 ] unit-test
+
+V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} 1 test-bb
+V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} 2 test-bb
+1 get 2 get 1vector >>successors drop
+cfg new 1 get >>entry 0 set
+
+[ ] [ 0 [ eliminate-write-barriers ] change ] unit-test
+[ V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} ] [ 1 get instructions>> ] unit-test
+[ V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+} ] [ 2 get instructions>> ] unit-test
+
+V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} 1 test-bb
+V{
+    T{ ##allot }
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} 2 test-bb
+1 get 2 get 1vector >>successors drop
+cfg new 1 get >>entry 0 set
+
+[ ] [ 0 [ eliminate-write-barriers ] change ] unit-test
+[ V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} ] [ 1 get instructions>> ] unit-test
+[ V{
+    T{ ##allot }
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} ] [ 2 get instructions>> ] unit-test
+
+V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} 1 test-bb
+V{
+    T{ ##allot }
+} 2 test-bb
+1 get 2 get 1vector >>successors drop
+V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} 3 test-bb
+2 get 3 get 1vector >>successors drop
+cfg new 1 get >>entry 0 set
+[ ] [ 0 [ eliminate-write-barriers ] change ] unit-test
+[ V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} ] [ 1 get instructions>> ] unit-test
+[ V{ T{ ##allot } } ] [ 2 get instructions>> ] unit-test
+[ V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} ] [ 3 get instructions>> ] unit-test
