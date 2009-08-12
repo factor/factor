@@ -8,4 +8,3 @@ M: struct-class see-class*
     <block "struct-slots" word-prop [ pprint-slot ] each
     block> pprint-; block> ;
 
-
