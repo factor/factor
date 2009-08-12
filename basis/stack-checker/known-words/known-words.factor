@@ -134,13 +134,17 @@ M: object infer-call*
 
 \ compose [ infer-compose ] "special" set-word-prop
 
+ERROR: bad-executable obj ;
+
+M: bad-executable summary
+    drop "execute must be given a word" ;
+
 : infer-execute ( -- )
     pop-literal nip
     dup word? [
         apply-object
     ] [
-        drop
-        "execute must be given a word" time-bomb
+        \ bad-executable boa time-bomb
     ] if ;
 
 \ execute [ infer-execute ] "special" set-word-prop
