@@ -1,3 +1,4 @@
+! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types byte-arrays classes
 classes.c-types classes.parser classes.tuple
 classes.tuple.parser classes.tuple.private fry kernel
@@ -30,7 +31,7 @@ M: struct >c-ptr
 
 M: struct-class new
     dup "prototype" word-prop
-    [ >c-ptr clone swap memory>struct ] [ <struct> ] if ; inline
+    [ >c-ptr clone swap memory>struct ] [ <struct> ] if* ; inline
 
 ! Struct slot accessors
 
@@ -39,10 +40,12 @@ M: struct-class reader-quot
     [ class>> c-type-getter-boxer ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
-M: struct-class writer-quot
-    nip
+: (writer-quot) ( slot -- quot )
     [ class>> c-setter ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+
+M: struct-class writer-quot
+    nip (writer-quot) ;
 
 ! Struct as c-type
 
@@ -82,8 +85,14 @@ M: struct-class heap-size
 ! class definition
 
 : struct-prototype ( class -- prototype )
-    [ heap-size <byte-array> ] [ new [ 2 set-slot ] keep ] bi ; ! [ "struct-slots" word-prop ] tri
-    ! [ [ initial>> ] [ name>> setter-word ] bi over [ execute( struct value -- struct ) ] [ 2drop ] if ] each ;
+    [ heap-size <byte-array> ]
+    [ tuple-layout <tuple> [ 2 set-slot ] keep ]
+    [ "struct-slots" word-prop ] tri
+    [
+        [ initial>> ]
+        [ (writer-quot) ] bi
+        over [ swapd [ call( value struct -- ) ] curry keep ] [ 2drop ] if
+    ] each ;
 
 : (define-struct-class) ( class slots size align -- )
     [
