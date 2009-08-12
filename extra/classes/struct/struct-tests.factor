@@ -17,7 +17,7 @@ STRUCT: bar
 [ 123 ] [ bar new foo>> y>> ] unit-test
 
 [ 1 2 3 t ] [
-    1 2 3 t foo boa bar boa
+    1   2 3 t foo boa   bar boa
     {
         [ w>> ] 
         [ foo>> x>> ]
