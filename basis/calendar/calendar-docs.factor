@@ -27,7 +27,7 @@ HELP: <date>
 } ;
 
 HELP: month-names
-{ $values { "array" array } }
+{ $values { "value" object } }
 { $description "Returns an array with the English names of all the months." }
 { $warning "Do not use this array for looking up a month name directly. Use month-name instead." } ;
 

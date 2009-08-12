@@ -45,11 +45,11 @@ M: not-a-month summary
 
 PRIVATE>
 
-: month-names ( -- array )
+CONSTANT: month-names 
     {
         "January" "February" "March" "April" "May" "June"
         "July" "August" "September" "October" "November" "December"
-    } ;
+    }
 
 : month-name ( n -- string )
     check-month 1- month-names nth ;

@@ -62,9 +62,6 @@ PRIVATE>
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
     [ [ 2array ] with map ] curry map concat ;
 
-: log10 ( m -- n )
-    log 10 log / ;
-
 : mediant ( a/c b/d -- (a+b)/(c+d) )
     2>fraction [ + ] 2bi@ / ;
 

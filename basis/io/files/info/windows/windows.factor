@@ -9,11 +9,11 @@ calendar ascii combinators.short-circuit locals ;
 IN: io.files.info.windows
 
 :: round-up-to ( n multiple -- n' )
-    n multiple rem dup 0 = [
-        drop n
+    n multiple rem [
+        n
     ] [
         multiple swap - n +
-    ] if ;
+    ] if-zero ;
 
 TUPLE: windows-file-info < file-info attributes ;
 
