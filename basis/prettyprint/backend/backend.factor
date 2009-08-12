@@ -125,7 +125,7 @@ M: pathname pprint*
     ] if ; inline
 
 : tuple>assoc ( tuple -- assoc )
-    [ class all-slots ] [ tuple-slots ] bi zip
+    [ class class-slots ] [ object-slots ] bi zip
     [ [ initial>> ] dip = not ] assoc-filter
     [ [ name>> ] dip ] assoc-map ;
 
@@ -182,9 +182,11 @@ M: hashtable >pprint-sequence >alist ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
 
-M: tuple >pprint-sequence
-    [ class ] [ tuple-slots ] bi
+: class-slot-sequence ( class slots -- sequence )
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
+
+M: tuple >pprint-sequence
+    [ class ] [ object-slots ] bi class-slot-sequence ;
 
 M: object pprint-narrow? drop f ;
 M: byte-vector pprint-narrow? drop f ;

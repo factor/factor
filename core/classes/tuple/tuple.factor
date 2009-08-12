@@ -18,6 +18,11 @@ ERROR: not-a-tuple object ;
 : all-slots ( class -- slots )
     superclasses [ "slots" word-prop ] map concat ;
 
+GENERIC: class-slots ( class -- slots )
+
+M: tuple-class class-slots
+    all-slots ;
+
 PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
     all-slots [ read-only>> ] all? ;
 
@@ -63,6 +68,10 @@ PRIVATE>
 
 : tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
+
+GENERIC: object-slots ( object -- seq )
+M: tuple object-slots
+    tuple-slots ;
 
 GENERIC: slots>tuple ( seq class -- tuple )
 

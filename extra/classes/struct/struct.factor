@@ -2,9 +2,9 @@
 USING: accessors alien alien.c-types byte-arrays classes
 classes.c-types classes.parser classes.tuple
 classes.tuple.parser classes.tuple.private combinators
-combinators.smart fry generalizations kernel kernel.private
-libc macros make math math.order quotations sequences slots
-slots.private words ;
+combinators.smart fry generalizations generic.parser kernel
+kernel.private libc macros make math math.order quotations
+sequences slots slots.private words ;
 IN: classes.struct
 
 ! struct class
@@ -60,6 +60,19 @@ M: struct-class reader-quot
 
 M: struct-class writer-quot
     nip (writer-quot) ;
+
+M: struct-class class-slots
+    "struct-slots" word-prop ;
+
+: object-slots-quot ( class -- quot )
+    "struct-slots" word-prop
+    [ name>> reader-word 1quotation ] map
+    \ cleave [ ] 2sequence
+    \ output>array [ ] 2sequence ;
+
+: (define-object-slots-method) ( class -- )
+    [ \ object-slots create-method-in ]
+    [ object-slots-quot ] bi define ;
 
 ! Struct as c-type
 
@@ -124,7 +137,11 @@ M: struct-class heap-size
         make-slots dup
         [ check-struct-slots ] [ struct-offsets ] [ struct-align [ align ] keep ] tri
         (define-struct-class)
-    ] [ drop dup struct-prototype "prototype" set-word-prop ] 2tri ;
+    ] [
+        drop
+        [ dup struct-prototype "prototype" set-word-prop ]
+        [ (define-object-slots-method) ] bi
+    ] 2tri ;
 
 : parse-struct-definition ( -- class slots )
     CREATE-CLASS [ parse-tuple-slots ] { } make ;
