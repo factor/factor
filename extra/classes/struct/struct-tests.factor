@@ -1,5 +1,6 @@
-USING: classes.struct tools.test ;
-IN: classes.struct.test
+USING: accessors alien.c-types classes.c-types classes.struct
+combinators kernel tools.test ;
+IN: classes.struct.tests
 
 STRUCT: foo
     { x char }
@@ -14,3 +15,13 @@ STRUCT: bar
 [ 16 ] [ bar heap-size ] unit-test
 [ 123 ] [ foo new y>> ] unit-test
 [ 123 ] [ bar new foo>> y>> ] unit-test
+
+[ 1 2 3 t ] [
+    1 2 3 t foo boa bar boa
+    {
+        [ w>> ] 
+        [ foo>> x>> ]
+        [ foo>> y>> ]
+        [ foo>> z>> ]
+    } cleave
+] unit-test
