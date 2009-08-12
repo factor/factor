@@ -22,7 +22,7 @@ M: struct >c-ptr
 
 : memory>struct ( ptr class -- struct )
     over c-ptr? [ swap \ c-ptr bad-slot-value ] unless
-    tuple-layout <tuple-boa> ; inline
+    tuple-layout <tuple> [ 2 set-slot ] keep ;
 
 : malloc-struct ( class -- struct )
     [ heap-size malloc ] keep memory>struct ; inline
@@ -100,7 +100,7 @@ M: struct-class heap-size
 
 : struct-prototype ( class -- prototype )
     [ heap-size <byte-array> ]
-    [ tuple-layout <tuple> [ 2 set-slot ] keep ]
+    [ memory>struct ]
     [ "struct-slots" word-prop ] tri
     [
         [ initial>> ]
@@ -122,7 +122,7 @@ M: struct-class heap-size
 : define-struct-class ( class slots -- )
     [ drop struct f define-tuple-class ] [
         make-slots dup
-        [ check-struct-slots ] [ struct-offsets ] [ struct-align ] tri
+        [ check-struct-slots ] [ struct-offsets ] [ struct-align [ align ] keep ] tri
         (define-struct-class)
     ] [ drop dup struct-prototype "prototype" set-word-prop ] 2tri ;
 
