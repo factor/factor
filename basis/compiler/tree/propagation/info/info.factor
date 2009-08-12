@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra classes.tuple
 classes.tuple.private kernel accessors math math.intervals namespaces
-sequences sequences.private words combinators
+sequences sequences.private words combinators memoize
 combinators.short-circuit byte-arrays strings arrays layouts
 cpu.architecture compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
@@ -78,21 +78,37 @@ UNION: fixed-length array byte-array string ;
 : empty-set? ( info -- ? )
     {
         [ class>> null-class? ]
-        [ [ class>> real class<= ] [ interval>> empty-interval eq? ] bi and ]
+        [ [ interval>> empty-interval eq? ] [ class>> real class<= ] bi and ]
     } 1|| ;
 
-: min-value ( class -- n ) fixnum eq? [ most-negative-fixnum ] [ -1/0. ] if ;
+: min-value ( class -- n )
+    {
+        { fixnum [ most-negative-fixnum ] }
+        { array-capacity [ 0 ] }
+        [ drop -1/0. ]
+    } case ;
 
-: max-value ( class -- n ) fixnum eq? [ most-positive-fixnum ] [ 1/0. ] if ;
+: max-value ( class -- n )
+    {
+        { fixnum [ most-positive-fixnum ] }
+        { array-capacity [ max-array-capacity ] }
+        [ drop 1/0. ]
+    } case ;
 
-: class-interval ( class -- i ) fixnum eq? [ fixnum-interval ] [ full-interval ] if ;
+: class-interval ( class -- i )
+    {
+        { fixnum [ fixnum-interval ] }
+        { array-capacity [ array-capacity-interval ] }
+        [ drop full-interval ]
+    } case ;
 
 : wrap-interval ( interval class -- interval' )
     {
-        { fixnum [ interval->fixnum ] }
-        { array-capacity [ max-array-capacity [a,a] interval-rem ] }
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ over full-interval eq? ] [ nip class-interval ] }
+        { [ 2dup class-interval interval-subset? not ] [ nip class-interval ] }
         [ drop ]
-    } case ;
+    } cond ;
 
 : init-interval ( info -- info )
     dup [ interval>> full-interval or ] [ class>> ] bi wrap-interval >>interval
