@@ -1,8 +1,9 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types byte-arrays classes
 classes.c-types classes.parser classes.tuple
-classes.tuple.parser classes.tuple.private fry kernel
-kernel.private libc make math math.order sequences slots
+classes.tuple.parser classes.tuple.private combinators
+combinators.smart fry generalizations kernel kernel.private
+libc macros make math math.order quotations sequences slots
 slots.private words ;
 IN: classes.struct
 
@@ -32,6 +33,19 @@ M: struct >c-ptr
 M: struct-class new
     dup "prototype" word-prop
     [ >c-ptr clone swap memory>struct ] [ <struct> ] if* ; inline
+
+MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
+    [
+        [ \ <struct> [ ] 2sequence ]
+        [
+            "struct-slots" word-prop
+            [ length \ ndip ]
+            [ [ name>> setter-word 1quotation ] map \ spread ] bi
+        ] bi
+    ] [ ] output>sequence ;
+
+M: struct-class boa
+    <struct-boa> ; inline
 
 ! Struct slot accessors
 
