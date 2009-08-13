@@ -52,11 +52,11 @@ SYMBOLS: long ulong long-bits ;
     [
         \  long integer [ HEX: -8000,0000,0000,0000 HEX: 7fff,ffff,ffff,ffff between? ] define-predicate-class
         \ ulong integer [ HEX:                    0 HEX: ffff,ffff,ffff,ffff between? ] define-predicate-class
-        64 long-bits set-global
+        64 \ long-bits set-global
     ] [
         \  long integer [ HEX: -8000,0000 HEX: 7fff,ffff between? ] define-predicate-class
         \ ulong integer [ HEX:          0 HEX: ffff,ffff between? ] define-predicate-class
-        32 long-bits set-global
+        32 \ long-bits set-global
     ] if
 >>
 
