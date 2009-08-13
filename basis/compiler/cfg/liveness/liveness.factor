@@ -28,4 +28,4 @@ M: live-analysis transfer-set
     drop instructions>> transfer-liveness ;
 
 M: live-analysis join-sets
-    drop assoc-combine ;
+    2drop assoc-combine ;
