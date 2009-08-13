@@ -93,6 +93,9 @@ M: struct-class class-slots
         [ (>>offset) ] [ class>> heap-size + ] 2bi
     ] reduce ;
 
+: union-struct-offsets ( slots -- size )
+    [ 0 >>offset class>> heap-size ] [ max ] map-reduce ;
+
 : struct-align ( slots -- align )
     [ class>> c-type-align ] [ max ] map-reduce ;
 
@@ -132,33 +135,40 @@ M: struct-class direct-array-of
         over [ swapd [ call( value struct -- ) ] curry keep ] [ 2drop ] if
     ] each ;
 
-: (define-struct-class) ( class slots size align -- )
+: (struct-word-props) ( class slots size align -- )
     [
         [ "struct-slots" set-word-prop ]
         [ define-accessors ] 2bi
     ]
     [ "struct-size" set-word-prop ]
-    [ "struct-align" set-word-prop ] tri-curry* tri ;
+    [ "struct-align" set-word-prop ] tri-curry*
+    [ tri ] 3curry
+    [ dup struct-prototype "prototype" set-word-prop ]
+    [ (define-object-slots-method) ] tri ;
 
 : check-struct-slots ( slots -- )
     [ class>> c-type drop ] each ;
 
-: define-struct-class ( class slots -- )
-    [ drop struct f define-tuple-class ] [
+: (define-struct-class) ( class slots offsets-quot -- )
+    [ drop struct f define-tuple-class ] swap '[
         make-slots dup
-        [ check-struct-slots ] [ struct-offsets ] [ struct-align [ align ] keep ] tri
-        (define-struct-class)
-    ] [
-        drop
-        [ dup struct-prototype "prototype" set-word-prop ]
-        [ (define-object-slots-method) ] bi
-    ] 2tri ;
+        [ check-struct-slots ] _ [ struct-align [ align ] keep ] tri
+        (struct-word-props)
+    ] 2bi ; inline
+
+: define-struct-class ( class slots -- )
+    [ struct-offsets ] (define-struct-class) ;
+
+: define-union-struct-class ( class slots -- )
+    [ union-struct-offsets ] (define-struct-class) ;
 
 : parse-struct-definition ( -- class slots )
     CREATE-CLASS [ parse-tuple-slots ] { } make ;
 
 SYNTAX: STRUCT:
     parse-struct-definition define-struct-class ;
+SYNTAX: UNION-STRUCT:
+    parse-struct-definition define-union-struct-class ;
 
 USING: vocabs vocabs.loader ;
 
