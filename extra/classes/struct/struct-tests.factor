@@ -1,5 +1,5 @@
 USING: accessors alien.c-types classes.c-types classes.struct
-combinators inverse kernel tools.test ;
+combinators inverse kernel math tools.test ;
 IN: classes.struct.tests
 
 STRUCT: foo
@@ -30,3 +30,10 @@ STRUCT: bar
 [ 7654 ] [ S{ foo { y 7654 } } y>> ] unit-test
 
 [ 98 7654 t ] [ S{ foo f 98 7654 t } [ foo boa ] undo ] unit-test
+
+UNION-STRUCT: float-and-bits
+    { f single-float }
+    { bits uint } ;
+
+[ 1.0 ] [ float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
+
