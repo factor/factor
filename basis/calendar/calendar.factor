@@ -34,14 +34,14 @@ C: <timestamp> timestamp
 : <date> ( year month day -- timestamp )
     0 0 0 gmt-offset-duration <timestamp> ;
 
-ERROR: not-a-month n ;
+ERROR: not-a-month ;
 M: not-a-month summary
     drop "Months are indexed starting at 1" ;
 
 <PRIVATE
 
 : check-month ( n -- n )
-    dup zero? [ not-a-month ] when ;
+    [ not-a-month ] when-zero ;
 
 PRIVATE>
 
@@ -186,9 +186,6 @@ GENERIC: +second ( timestamp x -- timestamp )
     { [ day>> 29 = ] [ month>> 2 = ] [ leap-year? not ] } 1&&
     [ 3 >>month 1 >>day ] when ;
 
-: unless-zero ( n quot -- )
-    [ dup zero? [ drop ] ] dip if ; inline
-
 M: integer +year ( timestamp n -- timestamp )
     [ [ + ] curry change-year adjust-leap-year ] unless-zero ;
 
@@ -196,7 +193,7 @@ M: real +year ( timestamp n -- timestamp )
     [ float>whole-part swapd days-per-year * +day swap +year ] unless-zero ;
 
 : months/years ( n -- months years )
-    12 /rem dup zero? [ drop 1- 12 ] when swap ; inline
+    12 /rem [ 1 - 12 ] when-zero swap ; inline
 
 M: integer +month ( timestamp n -- timestamp )
     [ over month>> + months/years [ >>month ] dip +year ] unless-zero ;
