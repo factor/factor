@@ -1,3 +1,4 @@
+! (c)Joe Groff bsd license
 USING: alien alien.c-types classes classes.predicate kernel
 math math.bitwise math.order namespaces sequences words
 specialized-arrays.direct.alien
