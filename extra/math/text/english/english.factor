@@ -7,35 +7,44 @@ IN: math.text.english
 <PRIVATE
 
 : small-numbers ( n -- str )
-    { "Zero" "One" "Two" "Three" "Four" "Five" "Six" "Seven" "Eight" "Nine"
-    "Ten" "Eleven" "Twelve" "Thirteen" "Fourteen" "Fifteen" "Sixteen"
-    "Seventeen" "Eighteen" "Nineteen" } nth ;
+    {
+        "zero" "one" "two" "three" "four" "five" "six"
+        "seven" "eight" "nine" "ten" "eleven" "twelve"
+        "thirteen" "fourteen" "fifteen" "sixteen" "seventeen"
+        "eighteen" "nineteen"
+    } nth ;
 
 : tens ( n -- str )
-    { f f "Twenty" "Thirty" "Forty" "Fifty" "Sixty" "Seventy" "Eighty" "Ninety" } nth ;
-
+    {
+        f f "twenty" "thirty" "forty" "fifty" "sixty"
+        "seventy" "eighty" "ninety"
+    } nth ;
+    
 : scale-numbers ( n -- str )  ! up to 10^99
-    { f "Thousand" "Million" "Billion" "Trillion" "Quadrillion" "Quintillion"
-    "Sextillion" "Septillion" "Octillion" "Nonillion" "Decillion" "Undecillion"
-    "Duodecillion" "Tredecillion" "Quattuordecillion" "Quindecillion"
-    "Sexdecillion" "Septendecillion" "Octodecillion" "Novemdecillion"
-    "Vigintillion" "Unvigintillion" "Duovigintillion" "Trevigintillion"
-    "Quattuorvigintillion" "Quinvigintillion" "Sexvigintillion"
-    "Septvigintillion" "Octovigintillion" "Novemvigintillion" "Trigintillion"
-    "Untrigintillion" "Duotrigintillion" } nth ;
+    {
+        f "thousand" "million" "billion" "trillion" "quadrillion"
+        "quintillion" "sextillion" "septillion" "octillion"
+        "nonillion" "decillion" "undecillion" "duodecillion"
+        "tredecillion" "quattuordecillion" "quindecillion"
+        "sexdecillion" "septendecillion" "octodecillion" "novemdecillion"
+        "vigintillion" "unvigintillion" "duovigintillion" "trevigintillion"
+        "quattuorvigintillion" "quinvigintillion" "sexvigintillion"
+        "septvigintillion" "octovigintillion" "novemvigintillion"
+        "trigintillion" "untrigintillion" "duotrigintillion"
+    } nth ;
 
 SYMBOL: and-needed?
 : set-conjunction ( seq -- )
     first { [ 100 < ] [ 0 > ] } 1&& and-needed? set ;
 
 : negative-text ( n -- str )
-    0 < "Negative " "" ? ;
+    0 < "negative " "" ? ;
 
 : hundreds-place ( n -- str )
     100 /mod over 0 = [
         2drop ""
     ] [
-        [ small-numbers " Hundred" append ] dip
+        [ small-numbers " hundred" append ] dip
         0 = [ " and " append ] unless
     ] if ;
 
@@ -78,7 +87,7 @@ SYMBOL: and-needed?
     ] if ;
 
 : (number>text) ( n -- str )
-    [ negative-text ] [ abs 3digit-groups recombine ] bi append ;
+    [ negative-text ] [ abs 3 digit-groups recombine ] bi append ;
 
 PRIVATE>
 

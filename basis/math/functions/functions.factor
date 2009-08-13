@@ -71,7 +71,7 @@ PRIVATE>
     2dup [ real? ] both? [ drop 0 >= ] [ 2drop f ] if ; inline
 
 : 0^ ( x -- z )
-    dup zero? [ drop 0/0. ] [ 0 < 1/0. 0 ? ] if ; inline
+    [ 0/0. ] [ 0 < 1/0. 0 ? ] if-zero ; inline
 
 : (^mod) ( n x y -- z )
     make-bits 1 [
@@ -104,10 +104,12 @@ PRIVATE>
 : divisor? ( m n -- ? )
     mod 0 = ;
 
+ERROR: non-trivial-divisor n ;
+
 : mod-inv ( x n -- y )
     [ nip ] [ gcd 1 = ] 2bi
     [ dup 0 < [ + ] [ nip ] if ]
-    [ "Non-trivial divisor found" throw ] if ; foldable
+    [ non-trivial-divisor ] if ; foldable
 
 : ^mod ( x y n -- z )
     over 0 < [
@@ -155,6 +157,10 @@ GENERIC: log ( x -- y )
 M: real log dup 0.0 >= [ flog ] [ 0.0 rect> log ] if ;
 
 M: complex log >polar swap flog swap rect> ;
+
+: 10^ ( x -- y ) 10 swap ^ ; inline
+
+: log10 ( x -- y ) log 10 log / ; inline
 
 GENERIC: cos ( x -- y ) foldable
 
@@ -259,13 +265,13 @@ M: real atan fatan ;
 : round ( x -- y ) dup sgn 2 / + truncate ; inline
 
 : floor ( x -- y )
-    dup 1 mod dup zero?
-    [ drop ] [ dup 0 < [ - 1 - ] [ - ] if ] if ; foldable
+    dup 1 mod
+    [ ] [ dup 0 < [ - 1 - ] [ - ] if ] if-zero ; foldable
 
 : ceiling ( x -- y ) neg floor neg ; foldable
 
 : floor-to ( x step -- y )
-    dup zero? [ drop ] [ [ / floor ] [ * ] bi ] if ;
+    [ [ / floor ] [ * ] bi ] unless-zero ;
 
 : lerp ( a b t -- a_t ) [ over - ] dip * + ; inline
 

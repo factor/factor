@@ -24,9 +24,11 @@ ERROR: bad-effect ;
 : parse-effect-tokens ( end -- tokens )
     [ parse-effect-token dup ] curry [ ] produce nip ;
 
+ERROR: stack-effect-omits-dashes effect ;
+
 : parse-effect ( end -- effect )
     parse-effect-tokens { "--" } split1 dup
-    [ <effect> ] [ "Stack effect declaration must contain --" throw ] if ;
+    [ <effect> ] [ drop stack-effect-omits-dashes ] if ;
 
 : complete-effect ( -- effect )
     "(" expect ")" parse-effect ;
