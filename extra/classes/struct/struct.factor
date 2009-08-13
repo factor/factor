@@ -4,7 +4,7 @@ classes.c-types classes.parser classes.tuple
 classes.tuple.parser classes.tuple.private combinators
 combinators.smart fry generalizations generic.parser kernel
 kernel.private libc macros make math math.order quotations
-sequences slots slots.private words ;
+sequences slots slots.private struct-arrays words ;
 IN: classes.struct
 
 ! struct class
@@ -116,6 +116,9 @@ M: struct-class c-type-unboxer-quot
 
 M: struct-class heap-size
     "struct-size" word-prop ;
+
+M: struct-class direct-array-of
+    <direct-struct-array> ;
 
 ! class definition
 
