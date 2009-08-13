@@ -1,3 +1,4 @@
+! (c)Joe Groff bsd license
 USING: accessors alien.c-types classes.c-types classes.struct
 combinators inverse kernel math tools.test ;
 IN: classes.struct.tests
