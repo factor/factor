@@ -36,11 +36,8 @@ FORWARD-ANALYSIS: safe
 : has-allocation? ( bb -- ? )
     instructions>> [ { [ ##allocation? ] [ ##call? ] } 1|| ] any? ;
 
-: (safe-in) ( maybe-safe-in bb -- safe-in )
-    has-allocation? not swap and [ H{ } clone ] unless* ;
-
 M: safe-analysis transfer-set
-    drop [ (safe-in) ] keep
+    drop [ H{ } assoc-clone-like ] dip
     instructions>> over '[
         dup ##write-barrier? [
             src>> _ conjoin
@@ -48,19 +45,13 @@ M: safe-analysis transfer-set
     ] each ;
 
 M: safe-analysis join-sets
-    ! maybe this would be better if we had access to the basic block
-    ! then in this definition, it would check for has-allocation?
-    ! (once rather than twice)
-    drop assoc-refine ;
-
-: safe-start ( bb -- set )
-    [ safe-in ] keep (safe-in) ;
+    drop has-allocation? [ drop H{ } clone ] [ assoc-refine ] if ;
 
 : write-barriers-step ( bb -- )
-    dup safe-start safe set
+    dup safe-in H{ } assoc-clone-like safe set
     H{ } clone mutated set
     instructions>> [ eliminate-write-barrier ] filter-here ;
 
 : eliminate-write-barriers ( cfg -- cfg' )
-    dup compute-safe-sets
+     dup compute-safe-sets
     dup [ write-barriers-step ] each-basic-block ;
