@@ -94,6 +94,24 @@ cfg new 1 get >>entry 0 set
 } ] [ 2 get instructions>> ] unit-test
 
 V{
+    T{ ##allot f 1 }
+} 1 test-bb
+V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} 2 test-bb
+1 get 2 get 1vector >>successors drop
+cfg new 1 get >>entry 0 set
+
+[ ] [ 0 [ eliminate-write-barriers ] change ] unit-test
+[ V{
+    T{ ##allot f 1 }
+} ] [ 1 get instructions>> ] unit-test
+[ V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+} ] [ 2 get instructions>> ] unit-test
+
+V{
     T{ ##set-slot-imm f 2 1 3 4 }
     T{ ##write-barrier f 1 2 3 }
 } 1 test-bb
