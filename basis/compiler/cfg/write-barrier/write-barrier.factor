@@ -36,12 +36,15 @@ FORWARD-ANALYSIS: safe
 : has-allocation? ( bb -- ? )
     instructions>> [ { [ ##allocation? ] [ ##call? ] } 1|| ] any? ;
 
+GENERIC: safe-slot ( insn -- slot ? )
+M: object safe-slot drop f f ;
+M: ##write-barrier safe-slot src>> t ;
+M: ##allot safe-slot dst>> t ;
+
 M: safe-analysis transfer-set
     drop [ H{ } assoc-clone-like ] dip
     instructions>> over '[
-        dup ##write-barrier? [
-            src>> _ conjoin
-        ] [ drop ] if
+        safe-slot [ _ conjoin ] [ drop ] if
     ] each ;
 
 M: safe-analysis join-sets
@@ -53,5 +56,5 @@ M: safe-analysis join-sets
     instructions>> [ eliminate-write-barrier ] filter-here ;
 
 : eliminate-write-barriers ( cfg -- cfg' )
-     dup compute-safe-sets
+    dup compute-safe-sets
     dup [ write-barriers-step ] each-basic-block ;
