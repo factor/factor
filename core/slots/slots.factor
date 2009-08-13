@@ -170,6 +170,7 @@ M: class initial-value* no-initial-value ;
 : initial-value ( class -- object )
     {
         { [ \ f bootstrap-word over class<= ] [ f ] }
+        { [ \ array-capacity bootstrap-word over class<= ] [ 0 ] }
         { [ dup \ integer bootstrap-word class<= ] [ 0 ] }
         { [ float bootstrap-word over class<= ] [ 0.0 ] }
         { [ string bootstrap-word over class<= ] [ "" ] }
