@@ -63,7 +63,7 @@ CONSTANT: homo-sapiens
 :: split-lines ( n quot -- )
     n line-length /mod
     [ [ line-length quot call ] times ] dip
-    dup zero? [ drop ] quot if ; inline
+    quot unless-zero ; inline
 
 : write-random-fasta ( seed n chars floats desc id -- seed )
     write-description

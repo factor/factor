@@ -11,14 +11,21 @@ SYMBOL: full-interval
 
 TUPLE: interval { from read-only } { to read-only } ;
 
+: closed-point? ( from to -- ? )
+    2dup [ first ] bi@ number=
+    [ [ second ] both? ] [ 2drop f ] if ;
+
 : <interval> ( from to -- interval )
-    2dup [ first ] bi@ {
-        { [ 2dup > ] [ 2drop 2drop empty-interval ] }
-        { [ 2dup number= ] [
-            2drop 2dup [ second ] both?
+    {
+        { [ 2dup [ first ] bi@ > ] [ 2drop empty-interval ] }
+        { [ 2dup [ first ] bi@ number= ] [
+            2dup [ second ] both?
             [ interval boa ] [ 2drop empty-interval ] if
         ] }
-        [ 2drop interval boa ]
+        { [ 2dup [ { -1/0. t } = ] [ { 1/0. t } = ] bi* and ] [
+            2drop full-interval
+        ] }
+        [ interval boa ]
     } cond ;
 
 : open-point ( n -- endpoint ) f 2array ;
@@ -52,6 +59,9 @@ MEMO: [0,inf] ( -- interval ) 0 [a,inf] ; foldable
 
 MEMO: fixnum-interval ( -- interval )
     most-negative-fixnum most-positive-fixnum [a,b] ; inline
+
+MEMO: array-capacity-interval ( -- interval )
+    0 max-array-capacity [a,b] ; inline
 
 : [-inf,inf] ( -- interval ) full-interval ; inline
 
@@ -340,16 +350,8 @@ SYMBOL: incomparable
     {
         { [ over empty-interval eq? ] [ drop ] }
         { [ dup empty-interval eq? ] [ nip ] }
-        { [ dup full-interval eq? ] [ nip ] }
-        [ (rem-range) 2dup interval-subset? [ drop ] [ nip ] if ]
-    } cond ;
-
-: interval->fixnum ( i1 -- i2 )
-    {
-        { [ dup empty-interval eq? ] [ ] }
-        { [ dup full-interval eq? ] [ drop fixnum-interval ] }
-        { [ dup fixnum-interval interval-subset? not ] [ drop fixnum-interval ] }
-        [ ]
+        { [ dup full-interval eq? ] [ 2drop [0,inf] ] }
+        [ nip (rem-range) ]
     } cond ;
 
 : interval-bitand-pos ( i1 i2 -- ? )

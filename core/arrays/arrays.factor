@@ -14,7 +14,7 @@ M: array resize resize-array ;
 
 M: object new-sequence drop 0 <array> ;
 
-M: f new-sequence drop dup zero? [ drop f ] [ 0 <array> ] if ;
+M: f new-sequence drop [ f ] [ 0 <array> ] if-zero ;
 
 M: array equal?
     over array? [ sequence= ] [ 2drop f ] if ;

@@ -131,7 +131,7 @@ M: ratio >base
     [
         dup 0 < negative? set
         abs 1 /mod
-        [ dup zero? [ drop "" ] [ (>base) sign append ] if ]
+        [ [ "" ] [ (>base) sign append ] if-zero ]
         [
             [ numerator (>base) ]
             [ denominator (>base) ] bi
