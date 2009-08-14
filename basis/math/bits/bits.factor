@@ -7,7 +7,7 @@ TUPLE: bits { number read-only } { length read-only } ;
 C: <bits> bits
 
 : make-bits ( number -- bits )
-    dup zero? [ drop T{ bits f 0 0 } ] [ dup abs log2 1 + <bits> ] if ; inline
+    [ T{ bits f 0 0 } ] [ dup abs log2 1 + <bits> ] if-zero ; inline
 
 M: bits length length>> ;
 
@@ -16,4 +16,4 @@ M: bits nth-unsafe number>> swap bit? ;
 INSTANCE: bits immutable-sequence
 
 : unbits ( seq -- number )
-    <reversed> 0 [ [ 1 shift ] dip [ 1+ ] when ] reduce ;
+    <reversed> 0 [ [ 1 shift ] dip [ 1 + ] when ] reduce ;

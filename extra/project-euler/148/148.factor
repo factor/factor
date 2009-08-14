@@ -32,13 +32,13 @@ IN: project-euler.148
 <PRIVATE
 
 : sum-1toN ( n -- sum )
-    dup 1+ * 2/ ; inline
+    dup 1 + * 2/ ; inline
 
 : >base7 ( x -- y )
     [ dup 0 > ] [ 7 /mod ] produce nip ;
 
 : (use-digit) ( prev x index -- next )
-    [ [ 1+ * ] [ sum-1toN 7 sum-1toN ] bi ] dip ^ * + ;
+    [ [ 1 + * ] [ sum-1toN 7 sum-1toN ] bi ] dip ^ * + ;
 
 : (euler148) ( x -- y )
     >base7 0 [ (use-digit) ] reduce-index ;

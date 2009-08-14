@@ -1,7 +1,7 @@
-IN: html.forms.tests
 USING: kernel sequences tools.test assocs html.forms validators accessors
 namespaces ;
 FROM: html.forms => values ;
+IN: html.forms.tests
 
 : with-validation ( quot -- messages )
     [

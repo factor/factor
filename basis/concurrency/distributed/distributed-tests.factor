@@ -1,9 +1,9 @@
-IN: concurrency.distributed.tests
 USING: tools.test concurrency.distributed kernel io.files
 io.files.temp io.directories arrays io.sockets system
 combinators threads math sequences concurrency.messaging
 continuations accessors prettyprint ;
 FROM: concurrency.messaging => receive send ;
+IN: concurrency.distributed.tests
 
 : test-node ( -- addrspec )
     {

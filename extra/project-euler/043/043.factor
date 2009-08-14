@@ -36,7 +36,7 @@ IN: project-euler.043
 <PRIVATE
 
 : subseq-divisible? ( n index seq -- ? )
-    [ 1- dup 3 + ] dip subseq 10 digits>integer swap divisor? ;
+    [ 1 - dup 3 + ] dip subseq 10 digits>integer swap divisor? ;
 
 : interesting? ( seq -- ? )
     {

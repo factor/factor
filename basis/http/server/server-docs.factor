@@ -1,4 +1,5 @@
-USING: help.markup help.syntax io.streams.string quotations strings urls http vocabs.refresh math io.servers.connection ;
+USING: help.markup help.syntax io.streams.string quotations strings urls
+http vocabs.refresh math io.servers.connection assocs ;
 IN: http.server
 
 HELP: trivial-responder
@@ -52,12 +53,33 @@ HELP: httpd
 HELP: http-insomniac
 { $description "Starts a thread which rotates the logs and e-mails a summary of HTTP requests every 24 hours. See " { $link "logging.insomniac" } "." } ;
 
+HELP: request-params
+{ $values { "request" request } { "assoc" assoc } }
+{ $description "Outputs the query parameters (if the current request is a GET or HEAD request) or the POST parameters (if the current request is a POST request)." } ;
+
+HELP: param
+{ $values
+     { "name" string }
+     { "value" string }
+}
+{ $description "Outputs the value of a query parameter (if the current request is a GET or HEAD request) or a POST parameter (if the current request is a POST request)." }
+{ $notes "Instead of using this word, it is better to use " { $vocab-link "furnace.actions" } " and the associated validation machinery, which allows you to access values using " { $link "html.forms.values" } " words." } ;
+
+HELP: params
+{ $var-description "A variable holding an assoc of query parameters (if the current request is a GET or HEAD request) or POST parameters (if the current request is a POST request)." }
+{ $notes "Instead of using this word, it is better to use " { $vocab-link "furnace.actions" } " and the associated validation machinery, which allows you to access values using " { $link "html.forms.values" } " words." } ;
+
 ARTICLE: "http.server.requests" "HTTP request variables"
 "The following variables are set by the HTTP server at the beginning of a request."
 { $subsection request }
 { $subsection url }
 { $subsection post-request? }
 { $subsection responder-nesting }
+{ $subsection params }
+"Utility words:"
+{ $subsection param }
+{ $subsection set-param }
+{ $subsection request-params }
 "Additional vocabularies may be set by vocabularies such as " { $vocab-link "html.forms" } " and " { $vocab-link "furnace.sessions" } "." ;
 
 ARTICLE: "http.server.responders" "HTTP server responders"

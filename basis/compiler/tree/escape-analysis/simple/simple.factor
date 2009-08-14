@@ -1,20 +1,36 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences classes.tuple
 classes.tuple.private arrays math math.private slots.private
 combinators deques search-deques namespaces fry classes
-classes.algebra stack-checker.state
+classes.algebra assocs stack-checker.state
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.escape-analysis.nodes
 compiler.tree.escape-analysis.allocations ;
 IN: compiler.tree.escape-analysis.simple
 
+M: #declare escape-analysis* drop ;
+
 M: #terminate escape-analysis* drop ;
 
 M: #renaming escape-analysis* inputs/outputs copy-values ;
 
-M: #introduce escape-analysis* out-d>> unknown-allocations ;
+: declared-class ( value -- class/f )
+    next-node get dup #declare? [ declaration>> at ] [ 2drop f ] if ;
+
+: record-param-allocation ( value class -- )
+    dup immutable-tuple-class? [
+        [ swap set-value-class ] [
+            all-slots [
+                [ <slot-value> dup ] [ class>> ] bi*
+                record-param-allocation
+            ] map swap record-allocation
+        ] 2bi
+    ] [ drop unknown-allocation ] if ;
+
+M: #introduce escape-analysis*
+    out-d>> [ dup declared-class record-param-allocation ] each ;
 
 DEFER: record-literal-allocation
 
@@ -24,7 +40,6 @@ DEFER: record-literal-allocation
 : object-slots ( object -- slots/f )
     {
         { [ dup class immutable-tuple-class? ] [ tuple-slots ] }
-        { [ dup complex? ] [ [ real-part ] [ imaginary-part ] bi 2array ] }
         [ drop f ]
     } cond ;
 

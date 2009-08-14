@@ -1,6 +1,6 @@
 IN: ui.gadgets.tables.tests
 USING: ui.gadgets.tables ui.gadgets.scrollers ui.gadgets.debug accessors
-models namespaces tools.test kernel combinators ;
+models namespaces tools.test kernel combinators prettyprint arrays ;
 
 SINGLETON: test-renderer
 
@@ -43,5 +43,20 @@ M: test-renderer column-titles drop { "First" "Last" } ;
             ]
             [ selected-row drop ]
         } cleave
+    ] with-grafted-gadget
+] unit-test
+
+SINGLETON: silly-renderer
+
+M: silly-renderer row-columns drop unparse 1array ;
+
+M: silly-renderer column-titles drop { "Foo" } ;
+
+: test-table-2 ( -- table )
+    { 1 2 f } <model> silly-renderer <table> ;
+
+[ f f ] [
+    test-table dup [
+        selected-row
     ] with-grafted-gadget
 ] unit-test

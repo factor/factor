@@ -18,9 +18,8 @@ IN: compiler.cfg.linear-scan.debugger
 
 : interval-picture ( interval -- str )
     [ uses>> picture ]
-    [ copy-from>> unparse ]
     [ vreg>> unparse ]
-    tri 3array ;
+    bi 2array ;
 
 : live-intervals. ( seq -- )
     [ interval-picture ] map simple-table. ;

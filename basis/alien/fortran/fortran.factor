@@ -357,15 +357,15 @@ M: character-type (<fortran-result>)
 
 : (shuffle-map) ( return parameters -- ret par )
     [
-        fortran-ret-type>c-type length swap "void" = [ 1+ ] unless
+        fortran-ret-type>c-type length swap "void" = [ 1 + ] unless
         letters swap head [ "ret" swap suffix ] map
     ] [
-        [ fortran-arg-type>c-type nip length 1+ ] map letters swap zip
+        [ fortran-arg-type>c-type nip length 1 + ] map letters swap zip
         [ first2 letters swap head [ "" 2sequence ] with map ] map concat
     ] bi* ;
 
 : (fortran-in-shuffle) ( ret par -- seq )
-    [ [ second ] bi@ <=> ] sort append ;
+    [ second ] sort-with append ;
 
 : (fortran-out-shuffle) ( ret par -- seq )
     append ;

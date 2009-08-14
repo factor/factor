@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: layouts namespaces kernel accessors sequences
-classes.algebra compiler.tree.propagation.info
-compiler.cfg.stacks compiler.cfg.hats compiler.cfg.instructions
+USING: layouts namespaces kernel accessors sequences classes.algebra
+compiler.tree.propagation.info compiler.cfg.stacks compiler.cfg.hats
+compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.utilities compiler.cfg.builder.blocks ;
 IN: compiler.cfg.intrinsics.slots
 
@@ -45,7 +45,7 @@ IN: compiler.cfg.intrinsics.slots
             dup third value-info-small-fixnum?
             [ (emit-set-slot-imm) ] [ (emit-set-slot) ] if
         ] [ first class>> immediate class<= ] bi
-        [ drop ] [ i i ##write-barrier ] if
+        [ drop ] [ next-vreg next-vreg ##write-barrier ] if
     ] [ drop emit-primitive ] if ;
 
 : emit-string-nth ( -- )
@@ -53,4 +53,4 @@ IN: compiler.cfg.intrinsics.slots
 
 : emit-set-string-nth-fast ( -- )
     3inputs [ ^^untag-fixnum ] [ ^^untag-fixnum ] [ ] tri*
-    swap i ##set-string-nth-fast ;
+    swap next-vreg ##set-string-nth-fast ;

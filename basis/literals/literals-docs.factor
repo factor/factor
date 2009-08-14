@@ -38,7 +38,7 @@ USING: kernel literals math prettyprint ;
 IN: scratchpad
 
 << CONSTANT: five 5 >>
-{ $[ five dup 1+ dup 2 + ] } .
+{ $[ five dup 1 + dup 2 + ] } .
     "> "{ 5 6 8 }" }
 
 } ;
@@ -69,7 +69,7 @@ USE: literals
 IN: scratchpad
 
 CONSTANT: five 5
-{ $ five $[ five dup 1+ dup 2 + ] } .
+{ $ five $[ five dup 1 + dup 2 + ] } .
     "> "{ 5 5 6 8 }" }
 { $subsection POSTPONE: $ }
 { $subsection POSTPONE: $[ }

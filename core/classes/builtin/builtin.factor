@@ -50,13 +50,6 @@ M: builtin-class (classes-intersect?)
         [ swap classes-intersect? ]
     } cond ;
 
-M: anonymous-intersection (flatten-class)
-    participants>> [ flatten-builtin-class ] map
-    [
-        builtins get sift [ (flatten-class) ] each
-    ] [
-        [ ] [ assoc-intersect ] map-reduce [ swap set ] assoc-each
-    ] if-empty ;
+: full-cover ( -- ) builtins get sift [ (flatten-class) ] each ;
 
-M: anonymous-complement (flatten-class)
-    drop builtins get sift [ (flatten-class) ] each ;
+M: anonymous-complement (flatten-class) drop full-cover ;

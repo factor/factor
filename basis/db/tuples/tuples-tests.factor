@@ -469,7 +469,7 @@ TUPLE: bignum-test id m n o ;
     } define-persistent
     [ bignum-test drop-table ] ignore-errors
     [ ] [ bignum-test ensure-table ] unit-test
-    [ ] [ 63 2^ 1- dup dup <bignum-test> insert-tuple ] unit-test ;
+    [ ] [ 63 2^ 1 - dup dup <bignum-test> insert-tuple ] unit-test ;
 
     ! sqlite only
     ! [ T{ bignum-test f 1

@@ -1,5 +1,5 @@
-IN: effects.tests
 USING: effects tools.test prettyprint accessors sequences ;
+IN: effects.tests
 
 [ t ] [ 1 1 <effect> 2 2 <effect> effect<= ] unit-test
 [ f ] [ 1 0 <effect> 2 2 <effect> effect<= ] unit-test

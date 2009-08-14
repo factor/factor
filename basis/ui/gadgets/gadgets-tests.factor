@@ -78,10 +78,10 @@ TUPLE: mock-gadget < gadget graft-called ungraft-called ;
     mock-gadget new 0 >>graft-called 0 >>ungraft-called ;
 
 M: mock-gadget graft*
-    [ 1+ ] change-graft-called drop ;
+    [ 1 + ] change-graft-called drop ;
 
 M: mock-gadget ungraft*
-    [ 1+ ] change-ungraft-called drop ;
+    [ 1 + ] change-ungraft-called drop ;
 
 ! We can't print to output-stream here because that might be a pane
 ! stream, and our graft-queue rebinding here would be captured
@@ -122,7 +122,7 @@ M: mock-gadget ungraft*
         3 [
             <mock-gadget> over <model> >>model
             "g" get over add-gadget drop
-            swap 1+ number>string set
+            swap 1 + number>string set
         ] each ;
 
     : status-flags ( -- seq )

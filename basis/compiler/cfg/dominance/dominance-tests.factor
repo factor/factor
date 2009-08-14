@@ -1,12 +1,11 @@
-IN: compiler.cfg.dominance.tests
 USING: tools.test sequences vectors namespaces kernel accessors assocs sets
 math.ranges arrays compiler.cfg compiler.cfg.dominance compiler.cfg.debugger
 compiler.cfg.predecessors ;
+IN: compiler.cfg.dominance.tests
 
 : test-dominance ( -- )
     cfg new 0 get >>entry
-    compute-predecessors
-    compute-dominance ;
+    needs-dominance drop ;
 
 ! Example with no back edges
 V{ } 0 test-bb

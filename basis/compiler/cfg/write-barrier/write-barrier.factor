@@ -1,7 +1,8 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces assocs sets sequences
-compiler.cfg compiler.cfg.instructions compiler.cfg.rpo ;
+compiler.cfg compiler.cfg.instructions compiler.cfg.rpo
+compiler.cfg.dataflow-analysis fry combinators.short-circuit ;
 IN: compiler.cfg.write-barrier
 
 ! Eliminate redundant write barrier hits.
@@ -30,10 +31,27 @@ M: ##set-slot-imm eliminate-write-barrier
 
 M: insn eliminate-write-barrier drop t ;
 
+FORWARD-ANALYSIS: safe
+
+: has-allocation? ( bb -- ? )
+    instructions>> [ { [ ##allocation? ] [ ##call? ] } 1|| ] any? ;
+
+M: safe-analysis transfer-set
+    drop [ H{ } assoc-clone-like ] dip
+    instructions>> over '[
+        dup ##write-barrier? [
+            src>> _ conjoin
+        ] [ drop ] if
+    ] each ;
+
+M: safe-analysis join-sets
+    drop has-allocation? [ drop H{ } clone ] [ assoc-refine ] if ;
+
 : write-barriers-step ( bb -- )
-    H{ } clone safe set
+    dup safe-in H{ } assoc-clone-like safe set
     H{ } clone mutated set
     instructions>> [ eliminate-write-barrier ] filter-here ;
 
 : eliminate-write-barriers ( cfg -- cfg' )
+     dup compute-safe-sets
     dup [ write-barriers-step ] each-basic-block ;

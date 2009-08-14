@@ -35,7 +35,7 @@ M: +unknown+ curry-effect ;
 
 M: effect curry-effect
     [ in>> length ] [ out>> length ] [ terminated?>> ] tri
-    pick 0 = [ [ 1+ ] dip ] [ [ 1- ] 2dip ] if
+    pick 0 = [ [ 1 + ] dip ] [ [ 1 - ] 2dip ] if
     effect boa ;
 
 M: curry cached-effect

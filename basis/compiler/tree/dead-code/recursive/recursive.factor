@@ -3,6 +3,7 @@
 USING: accessors arrays assocs sequences kernel locals fry
 combinators stack-checker.backend
 compiler.tree
+compiler.tree.recursive
 compiler.tree.dead-code.branches
 compiler.tree.dead-code.liveness
 compiler.tree.dead-code.simple ;

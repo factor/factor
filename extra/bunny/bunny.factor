@@ -11,7 +11,7 @@ TUPLE: bunny-world < demo-world model-triangles geom draw-seq draw-n ;
 
 : next-draw ( gadget -- )
     dup [ draw-seq>> ] [ draw-n>> ] bi
-    1+ swap length mod
+    1 + swap length mod
     >>draw-n relayout-1 ;
 
 : make-draws ( gadget -- draw-seq )

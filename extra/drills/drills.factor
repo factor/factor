@@ -1,16 +1,17 @@
-USING: accessors arrays cocoa.dialogs combinators continuations
+USING: arrays cocoa.dialogs combinators continuations
 fry grouping io.encodings.utf8 io.files io.styles kernel math
 math.parser models models.arrow models.history namespaces random
 sequences splitting ui ui.gadgets.alerts ui.gadgets.book-extras
 ui.gadgets.books ui.gadgets.buttons ui.gadgets.frames
 ui.gadgets.grids ui.gadgets.labels ui.gadgets.tracks fonts
 wrap.strings ;
+EXCLUDE: accessors => change-model ;
 
 IN: drills
 SYMBOLS: it startLength ;
 : big ( gadget -- gadget ) T{ font { name "sans-serif" } { size 30 } } >>font ;
 : card ( model quot -- button ) <arrow> <label-control> big [ next ] <book-btn> ;
-: op ( quot str -- gadget ) <label> big swap <book-bevel-btn> ;
+: op ( quot str -- gadget ) <label> big swap <book-border-btn> ;
 
 : show ( model -- gadget ) dup it set-global [ random ] <arrow>
    { [ [ first ] card ]

@@ -28,10 +28,10 @@ M: line-gadget line-height font>> font-metrics height>> ceiling ;
 : line>y ( n gadget -- y ) line-height * >integer ;
 
 : validate-line ( m gadget -- n )
-    control-value [ drop f ] [ length 1- min 0 max ] if-empty ;
+    control-value [ drop f ] [ length 1 - min 0 max ] if-empty ;
 
 : valid-line? ( n gadget -- ? )
-    control-value length 1- 0 swap between? ;
+    control-value length 1 - 0 swap between? ;
 
 : visible-line ( gadget quot -- n )
     '[
@@ -43,7 +43,7 @@ M: line-gadget line-height font>> font-metrics height>> ceiling ;
     [ loc>> ] visible-line ;
 
 : last-visible-line ( gadget -- n )
-    [ [ loc>> ] [ dim>> ] bi v+ ] visible-line 1+ ;
+    [ [ loc>> ] [ dim>> ] bi v+ ] visible-line 1 + ;
 
 : each-slice-index ( from to seq quot -- )
     [ [ <slice> ] [ drop [a,b) ] 3bi ] dip 2each ; inline

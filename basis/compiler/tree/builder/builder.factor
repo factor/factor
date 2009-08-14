@@ -49,19 +49,18 @@ PRIVATE>
 : build-tree ( word/quot -- nodes )
     [ f ] dip build-tree-with ;
 
-:: build-sub-tree ( #call word/quot -- nodes/f )
+:: build-sub-tree ( in-d out-d word/quot -- nodes/f )
     #! We don't want methods on mixins to have a declaration for that mixin.
     #! This slows down compiler.tree.propagation.inlining since then every
     #! inlined usage of a method has an inline-dependency on the mixin, and
     #! not the more specific type at the call site.
     f specialize-method? [
         [
-            #call in-d>> word/quot build-tree-with unclip-last in-d>> :> in-d
+            in-d word/quot build-tree-with unclip-last in-d>> :> in-d'
             {
                 { [ dup not ] [ ] }
-                { [ dup ends-with-terminate? ] [ #call out-d>> [ f swap #push ] map append ] }
-                [ in-d #call out-d>> #copy suffix ]
+                { [ dup ends-with-terminate? ] [ out-d [ f swap #push ] map append ] }
+                [ in-d' out-d [ [ length ] bi@ assert= ] [ #copy suffix ] 2bi ]
             } cond
         ] [ dup inference-error? [ drop f ] [ rethrow ] if ] recover
     ] with-variable ;
-

@@ -9,7 +9,7 @@ IN: compiler.utilities
         dup
         '[
             @ [
-                dup array?
+                dup [ array? ] [ vector? ] bi or
                 [ _ push-all ] [ _ push ] if
             ] when*
         ]
@@ -26,8 +26,12 @@ SYMBOL: yield-hook
 
 yield-hook [ [ ] ] initialize
 
-: alist-max ( alist -- pair )
-    [ ] [ [ [ second ] bi@ > ] most ] map-reduce ;
+: alist-most ( alist quot -- pair )
+    [ [ ] ] dip '[ [ [ second ] bi@ @ ] most ] map-reduce ; inline
+
+: alist-min ( alist -- pair ) [ before? ] alist-most ;
+
+: alist-max ( alist -- pair ) [ after? ] alist-most ;
 
 : penultimate ( seq -- elt ) [ length 2 - ] keep nth ;
 

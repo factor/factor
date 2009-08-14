@@ -9,7 +9,7 @@ CENTRAL: test-central
 TUPLE: test-disp-cent value disposed ;
 
 ! A phony destructor that adds 1 to the value so we can make sure it got called.
-M: test-disp-cent dispose* dup value>> 1+ >>value drop ;
+M: test-disp-cent dispose* dup value>> 1 + >>value drop ;
 
 DISPOSABLE-CENTRAL: t-d-c
 

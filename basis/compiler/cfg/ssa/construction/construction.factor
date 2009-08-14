@@ -9,11 +9,10 @@ compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.dominance
 compiler.cfg.instructions
+compiler.cfg.renaming
 compiler.cfg.renaming.functor
 compiler.cfg.ssa.construction.tdmsc ;
 IN: compiler.cfg.ssa.construction
-
-! SSA construction. Predecessors must be computed first.
 
 ! The phi placement algorithm is implemented in
 ! compiler.cfg.ssa.construction.tdmsc.
@@ -75,7 +74,7 @@ SYMBOLS: stacks pushed ;
     H{ } clone stacks set ;
 
 : gen-name ( vreg -- vreg' )
-    [ reg-class>> next-vreg dup ] keep
+    [ next-vreg dup ] dip
     dup pushed get 2dup key?
     [ 2drop stacks get at set-last ]
     [ conjoin stacks get push-at ]
@@ -131,10 +130,9 @@ PRIVATE>
 
 : construct-ssa ( cfg -- cfg' )
     {
-        [ ]
         [ compute-live-sets ]
-        [ compute-dominance ]
         [ compute-merge-sets ]
         [ compute-defs compute-phi-nodes insert-phi-nodes ]
         [ rename ]
+        [ ]
     } cleave ;

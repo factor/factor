@@ -5,27 +5,17 @@ compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.rpo cpu.architecture ;
 IN: compiler.cfg.two-operand
 
-! This pass runs after SSA coalescing and normalizes instructions
-! to fit the x86 two-address scheme. Possibilities are:
-
-! 1) x = x op y
-! 2) x = y op x
-! 3) x = y op z
-
-! In case 1, there is nothing to do.
-
-! In case 2, we convert to
-! z = y
-! z = z op x
-! x = z
-
-! In case 3, we convert to
+! This pass runs before SSA coalescing and normalizes instructions
+! to fit the x86 two-address scheme. Since the input is in SSA,
+! it suffices to convert
+!
+! x = y op z
+!
+! to
+!
 ! x = y
 ! x = x op z
-
-! In case 2 and case 3, linear scan coalescing will eliminate a
-! copy if the value y is never used again.
-
+!
 ! We don't bother with ##add, ##add-imm, ##sub-imm or ##mul-imm
 ! since x86 has LEA and IMUL instructions which are effectively
 ! three-operand addition and multiplication, respectively.
@@ -54,42 +44,19 @@ UNION: two-operand-insn
 GENERIC: convert-two-operand* ( insn -- )
 
 : emit-copy ( dst src -- )
-    dup reg-class>> {
-        { int-regs [ ##copy ] }
-        { double-float-regs [ ##copy-float ] }
-    } case ; inline
-
-: case-1? ( insn -- ? ) [ dst>> ] [ src1>> ] bi = ; inline
-
-: case-1 ( insn -- ) , ; inline
-
-: case-2? ( insn -- ? ) [ dst>> ] [ src2>> ] bi = ; inline
-
-: case-2 ( insn -- )
-    dup dst>> reg-class>> next-vreg
-    [ swap src2>> emit-copy ]
-    [ drop [ src2>> ] [ src1>> ] bi emit-copy ]
-    [ >>src2 dup dst>> >>src1 , ]
-    2tri ; inline
-
-: case-3 ( insn -- )
-    [ [ dst>> ] [ src1>> ] bi emit-copy ]
-    [ dup dst>> >>src1 , ]
-    bi ; inline
+    dup rep-of ##copy ; inline
 
 M: two-operand-insn convert-two-operand*
-    {
-        { [ dup case-1? ] [ case-1 ] }
-        { [ dup case-2? ] [ case-2 ] }
-        [ case-3 ]
-    } cond ; inline
+    [ [ dst>> ] [ src1>> ] bi emit-copy ]
+    [
+        dup [ src1>> ] [ src2>> ] bi = [ dup dst>> >>src2 ] when
+        dup dst>> >>src1 ,
+    ] bi ;
 
 M: ##not convert-two-operand*
-    dup [ dst>> ] [ src>> ] bi = [
-        [ [ dst>> ] [ src>> ] bi ##copy ]
-        [ dup dst>> >>src ]
-        bi
-    ] unless , ;
+    [ [ dst>> ] [ src>> ] bi emit-copy ]
+    [ dup dst>> >>src , ]
+    bi ;
 
 M: insn convert-two-operand* , ;
 

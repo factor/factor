@@ -36,7 +36,7 @@ M: winnt available-virtual-mem ( -- n )
     memory-status MEMORYSTATUSEX-ullAvailVirtual ;
 
 : computer-name ( -- string )
-    MAX_COMPUTERNAME_LENGTH 1+
+    MAX_COMPUTERNAME_LENGTH 1 +
     [ <byte-array> dup ] keep <uint>
     GetComputerName win32-error=0/f alien>native-string ;
  

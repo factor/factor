@@ -1,9 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences combinators combinators.short-circuit
-classes vectors compiler.cfg compiler.cfg.instructions compiler.cfg.rpo ;
+USING: kernel accessors sequences namespaces combinators
+combinators.short-circuit classes vectors compiler.cfg
+compiler.cfg.instructions compiler.cfg.rpo ;
 IN: compiler.cfg.empty-blocks
- 
+
+<PRIVATE
+
 : update-predecessor ( bb -- )
     ! We have to replace occurrences of bb with bb's successor
     ! in bb's predecessor's list of successors.
@@ -21,9 +24,12 @@ IN: compiler.cfg.empty-blocks
             2dup eq? [ drop predecessors>> first ] [ nip ] if
         ] with map
     ] change-predecessors drop ;
- 
+
+SYMBOL: changed?
+
 : delete-basic-block ( bb -- )
-    [ update-predecessor ] [ update-successor ] bi ;
+    [ update-predecessor ] [ update-successor ] bi
+    changed? on ;
  
 : delete-basic-block? ( bb -- ? )
     {
@@ -32,7 +38,10 @@ IN: compiler.cfg.empty-blocks
         [ successors>> length 1 = ]
         [ instructions>> first ##branch? ]
     } 1&& ;
- 
+
+PRIVATE>
+
 : delete-empty-blocks ( cfg -- cfg' )
+    changed? off
     dup [ dup delete-basic-block? [ delete-basic-block ] [ drop ] if ] each-basic-block
-    cfg-changed ;
+    changed? get [ cfg-changed ] when ;

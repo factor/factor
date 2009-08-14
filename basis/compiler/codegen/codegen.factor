@@ -173,12 +173,12 @@ M: ##div-float generate-insn dst/src1/src2 %div-float ;
 M: ##integer>float generate-insn dst/src %integer>float ;
 M: ##float>integer generate-insn dst/src %float>integer ;
 
-M: ##copy             generate-insn dst/src %copy ;
-M: ##copy-float       generate-insn dst/src %copy-float ;
-M: ##unbox-float      generate-insn dst/src %unbox-float ;
-M: ##unbox-any-c-ptr  generate-insn dst/src/temp %unbox-any-c-ptr ;
-M: ##box-float        generate-insn dst/src/temp %box-float ;
-M: ##box-alien        generate-insn dst/src/temp %box-alien ;
+M: ##copy generate-insn [ dst/src ] [ rep>> ] bi %copy ;
+
+M: ##unbox-float     generate-insn dst/src %unbox-float ;
+M: ##unbox-any-c-ptr generate-insn dst/src/temp %unbox-any-c-ptr ;
+M: ##box-float       generate-insn dst/src/temp %box-float ;
+M: ##box-alien       generate-insn dst/src/temp %box-alien ;
 
 M: ##alien-unsigned-1 generate-insn dst/src %alien-unsigned-1 ;
 M: ##alien-unsigned-2 generate-insn dst/src %alien-unsigned-2 ;
@@ -226,31 +226,37 @@ M: ##write-barrier generate-insn
 GENERIC# save-gc-root 1 ( gc-root operand temp -- )
 
 M:: spill-slot save-gc-root ( gc-root operand temp -- )
-    temp operand n>> %reload-integer
+    temp operand n>> int-rep %reload
     gc-root temp %save-gc-root ;
 
 M: object save-gc-root drop %save-gc-root ;
 
 : save-gc-roots ( gc-roots temp -- ) '[ _ save-gc-root ] assoc-each ;
 
+: save-data-regs ( data-regs -- ) [ first3 %spill ] each ;
+
 GENERIC# load-gc-root 1 ( gc-root operand temp -- )
 
 M:: spill-slot load-gc-root ( gc-root operand temp -- )
     gc-root temp %load-gc-root
-    temp operand n>> %spill-integer ;
+    temp operand n>> int-rep %spill ;
 
 M: object load-gc-root drop %load-gc-root ;
 
 : load-gc-roots ( gc-roots temp -- ) '[ _ load-gc-root ] assoc-each ;
+
+: load-data-regs ( data-regs -- ) [ first3 %reload ] each ;
 
 M: _gc generate-insn
     "no-gc" define-label
     {
         [ [ "no-gc" get ] dip [ temp1>> ] [ temp2>> ] bi %check-nursery ]
         [ [ uninitialized-locs>> ] [ temp1>> ] bi wipe-locs ]
-        [ [ gc-roots>> ] [ temp1>> ] bi save-gc-roots ]
-        [ gc-root-count>> %call-gc ]
-        [ [ gc-roots>> ] [ temp1>> ] bi load-gc-roots ]
+        [ data-values>> save-data-regs ]
+        [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
+        [ tagged-values>> length %call-gc ]
+        [ [ tagged-values>> ] [ temp1>> ] bi load-gc-roots ]
+        [ data-values>> load-data-regs ]
     } cleave
     "no-gc" resolve-label ;
 
@@ -261,54 +267,45 @@ M: ##alien-global generate-insn
     %alien-global ;
 
 ! ##alien-invoke
-GENERIC: reg-class-variable ( register-class -- symbol )
+GENERIC: next-fastcall-param ( reg-class -- )
 
-M: reg-class reg-class-variable ;
+: ?dummy-stack-params ( rep -- )
+    dummy-stack-params? [ rep-size cell align stack-params +@ ] [ drop ] if ;
 
-M: float-regs reg-class-variable drop float-regs ;
+: ?dummy-int-params ( rep -- )
+    dummy-int-params? [ rep-size cell /i 1 max int-regs +@ ] [ drop ] if ;
 
-GENERIC: inc-reg-class ( register-class -- )
-
-: ?dummy-stack-params ( reg-class -- )
-    dummy-stack-params? [ reg-size cell align stack-params +@ ] [ drop ] if ;
-
-: ?dummy-int-params ( reg-class -- )
-    dummy-int-params? [ reg-size cell /i 1 max int-regs +@ ] [ drop ] if ;
-
-: ?dummy-fp-params ( reg-class -- )
+: ?dummy-fp-params ( rep -- )
     drop dummy-fp-params? [ float-regs inc ] when ;
 
-M: int-regs inc-reg-class
-    [ reg-class-variable inc ]
-    [ ?dummy-stack-params ]
-    [ ?dummy-fp-params ]
-    tri ;
+M: int-rep next-fastcall-param
+    int-regs inc [ ?dummy-stack-params ] [ ?dummy-fp-params ] bi ;
 
-M: float-regs inc-reg-class
-    [ reg-class-variable inc ]
-    [ ?dummy-stack-params ]
-    [ ?dummy-int-params ]
-    tri ;
+M: single-float-rep next-fastcall-param
+    float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
 
-GENERIC: reg-class-full? ( class -- ? )
+M: double-float-rep next-fastcall-param
+    float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
+
+GENERIC: reg-class-full? ( reg-class -- ? )
 
 M: stack-params reg-class-full? drop t ;
 
-M: object reg-class-full?
-    [ reg-class-variable get ] [ param-regs length ] bi >= ;
+M: reg-class reg-class-full?
+    [ get ] [ param-regs length ] bi >= ;
 
-: spill-param ( reg-class -- n reg-class )
+: alloc-stack-param ( rep -- n reg-class rep )
     stack-params get
-    [ reg-size cell align stack-params +@ ] dip
-    stack-params ;
+    [ rep-size cell align stack-params +@ ] dip
+    stack-params dup ;
 
-: fastcall-param ( reg-class -- n reg-class )
-    [ reg-class-variable get ] [ inc-reg-class ] [ ] tri ;
+: alloc-fastcall-param ( rep -- n reg-class rep )
+    [ reg-class-of [ get ] [ inc ] [ ] tri ] keep ;
 
-: alloc-parameter ( parameter -- reg reg-class )
-    c-type-reg-class dup reg-class-full?
-    [ spill-param ] [ fastcall-param ] if
-    [ param-reg ] keep ;
+: alloc-parameter ( parameter -- reg rep )
+    c-type-rep dup reg-class-of reg-class-full?
+    [ alloc-stack-param ] [ alloc-fastcall-param ] if
+    [ param-reg ] dip ;
 
 : (flatten-int-type) ( size -- seq )
     cell /i "void*" c-type <repetition> ;
@@ -340,12 +337,12 @@ M: long-long-type flatten-value-type ( type -- types )
 : reverse-each-parameter ( parameters quot -- )
     [ [ parameter-sizes nip ] keep ] dip 2reverse-each ; inline
 
-: reset-freg-counts ( -- )
+: reset-fastcall-counts ( -- )
     { int-regs float-regs stack-params } [ 0 swap set ] each ;
 
 : with-param-regs ( quot -- )
     #! In quot you can call alloc-parameter
-    [ reset-freg-counts call ] with-scope ; inline
+    [ reset-fastcall-counts call ] with-scope ; inline
 
 : move-parameters ( node word -- )
     #! Moves values from C stack to registers (if word is
@@ -431,6 +428,7 @@ M: ##alien-indirect generate-insn
     alien-parameters [ box-parameter ] each-parameter ;
 
 : registers>objects ( node -- )
+    ! Generate code for boxing input parameters in a callback.
     [
         dup \ %save-param-reg move-parameters
         "nest_stacks" f %alien-invoke
@@ -528,21 +526,9 @@ M: _compare-float-branch generate-insn
     >binary-branch< %compare-float-branch ;
 
 M: _spill generate-insn
-    [ src>> ] [ n>> ] [ class>> ] tri {
-        { int-regs [ %spill-integer ] }
-        { double-float-regs [ %spill-float ] }
-    } case ;
+    [ src>> ] [ n>> ] [ rep>> ] tri %spill ;
 
 M: _reload generate-insn
-    [ dst>> ] [ n>> ] [ class>> ] tri {
-        { int-regs [ %reload-integer ] }
-        { double-float-regs [ %reload-float ] }
-    } case ;
+    [ dst>> ] [ n>> ] [ rep>> ] tri %reload ;
 
-M: _copy generate-insn
-    [ dst>> ] [ src>> ] [ class>> ] tri {
-        { int-regs [ %copy ] }
-        { double-float-regs [ %copy-float ] }
-    } case ;
-
-M: _spill-counts generate-insn drop ;
+M: _spill-area-size generate-insn drop ;

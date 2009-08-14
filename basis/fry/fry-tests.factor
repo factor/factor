@@ -1,6 +1,6 @@
-IN: fry.tests
 USING: fry tools.test math prettyprint kernel io arrays
 sequences eval accessors ;
+IN: fry.tests
 
 [ [ 3 + ] ] [ 3 '[ _ + ] ] unit-test
 

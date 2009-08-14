@@ -9,22 +9,14 @@ IN: compiler.cfg.value-numbering.simplify
 ! Return value of f means we didn't simplify.
 GENERIC: simplify* ( expr -- vn/expr/f )
 
-: simplify-unbox ( in boxer -- vn/expr/f )
-    over op>> eq? [ in>> ] [ drop f ] if ; inline
-
-: simplify-unbox-float ( in -- vn/expr/f )
-    \ ##box-float simplify-unbox ; inline
-
 : simplify-unbox-alien ( in -- vn/expr/f )
-    \ ##box-alien simplify-unbox ; inline
+    dup op>> \ ##box-alien eq? [ in>> ] [ drop f ] if ; inline
 
 M: unary-expr simplify*
     #! Note the copy propagation: a copy always simplifies to
     #! its source VN.
     [ in>> vn>expr ] [ op>> ] bi {
         { \ ##copy [ ] }
-        { \ ##copy-float [ ] }
-        { \ ##unbox-float [ simplify-unbox-float ] }
         { \ ##unbox-alien [ simplify-unbox-alien ] }
         { \ ##unbox-any-c-ptr [ simplify-unbox-alien ] }
         [ 2drop f ]

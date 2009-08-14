@@ -8,4 +8,3 @@ SYNTAX: HEX{
     [ blank? not ] filter
     2 group [ hex> ] B{ } map-as
     parsed ;
-

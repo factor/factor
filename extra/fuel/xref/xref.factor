@@ -23,7 +23,7 @@ IN: fuel.xref
     dup dup >vocab-link where normalize-loc 4array ;
 
 : sort-xrefs ( seq -- seq' )
-    [ [ first ] dip first <=> ] sort ;
+    [ first ] sort-with ;
 
 : format-xrefs ( seq -- seq' )
     [ word? ] filter [ word>xref ] map ;
@@ -36,8 +36,8 @@ MEMO: (vocab-words) ( name -- seq )
 
 : current-words ( -- seq )
     manifest get
-    [ search-vocabs>> ] [ qualified-vocabs>> ] bi [ words>> ] bi@
-    assoc-union keys ;
+    [ search-vocabs>> ] [ qualified-vocabs>> ] bi [ [ words>> ] map ] bi@
+    append H{ } [ assoc-union ] reduce keys ;
 
 : vocabs-words ( names -- seq )
     prune [ (vocab-words) ] map concat ;

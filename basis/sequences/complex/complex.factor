@@ -18,8 +18,8 @@ PRIVATE>
 M: complex-sequence length
     seq>> length -1 shift ;
 M: complex-sequence nth-unsafe
-    complex@ [ nth-unsafe ] [ [ 1+ ] dip nth-unsafe ] 2bi rect> ;
+    complex@ [ nth-unsafe ] [ [ 1 + ] dip nth-unsafe ] 2bi rect> ;
 M: complex-sequence set-nth-unsafe
     complex@
     [ [ real-part      ] [    ] [ ] tri* set-nth-unsafe ]
-    [ [ imaginary-part ] [ 1+ ] [ ] tri* set-nth-unsafe ] 3bi ;
+    [ [ imaginary-part ] [ 1 + ] [ ] tri* set-nth-unsafe ] 3bi ;

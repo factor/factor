@@ -140,7 +140,7 @@ MACRO: interpolate-xml ( xml -- quot )
 : number<-> ( doc -- dup )
     0 over [
         dup var>> [
-            over >>var [ 1+ ] dip
+            over >>var [ 1 + ] dip
         ] unless drop
     ] each-interpolated drop ;
 
