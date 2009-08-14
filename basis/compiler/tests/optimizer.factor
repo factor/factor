@@ -67,7 +67,7 @@ TUPLE: pred-test ;
 [ 3 ] [ t bad-kill-2 ] unit-test
 
 ! regression
-: (the-test) ( x -- y ) dup 0 > [ 1- (the-test) ] when ; inline recursive
+: (the-test) ( x -- y ) dup 0 > [ 1 - (the-test) ] when ; inline recursive
 : the-test ( -- x y ) 2 dup (the-test) ;
 
 [ 2 0 ] [ the-test ] unit-test

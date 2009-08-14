@@ -53,7 +53,7 @@ IN: compiler.tree.recursive.tests
 ] unit-test
 
 : loop-test-2 ( a b -- a' )
-    dup [ 1+ loop-test-2 1 - ] [ drop ] if ; inline recursive
+    dup [ 1 + loop-test-2 1 - ] [ drop ] if ; inline recursive
 
 [ t ] [
     [ loop-test-2 ] build-tree analyze-recursive

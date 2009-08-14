@@ -20,9 +20,6 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
 "Computing additive and multiplicative inverses:"
 { $subsection neg }
 { $subsection recip }
-"Incrementing, decrementing:"
-{ $subsection 1+ }
-{ $subsection 1- }
 "Minimum, maximum, clamping:"
 { $subsection min }
 { $subsection max }
@@ -32,6 +29,10 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
 "Tests:"
 { $subsection zero? }
 { $subsection between? }
+"Control flow:"
+{ $subsection if-zero }
+{ $subsection when-zero }
+{ $subsection unless-zero }
 "Sign:"
 { $subsection sgn }
 "Rounding:"

@@ -257,7 +257,7 @@ M: mark-previous-rule handle-rule-start
         drop
 
         seen-whitespace-end? get [
-            position get 1+ whitespace-end set
+            position get 1 + whitespace-end set
         ] unless
 
         (check-word-break)
