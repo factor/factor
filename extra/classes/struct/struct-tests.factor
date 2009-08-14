@@ -14,11 +14,11 @@ STRUCT: bar
 
 [ 12 ] [ foo heap-size ] unit-test
 [ 16 ] [ bar heap-size ] unit-test
-[ 123 ] [ foo new y>> ] unit-test
-[ 123 ] [ bar new foo>> y>> ] unit-test
+[ 123 ] [ foo <struct> y>> ] unit-test
+[ 123 ] [ bar <struct> foo>> y>> ] unit-test
 
 [ 1 2 3 t ] [
-    1   2 3 t foo boa   bar boa
+    1   2 3 t foo <struct-boa>   bar <struct-boa>
     {
         [ w>> ] 
         [ foo>> x>> ]
@@ -30,7 +30,7 @@ STRUCT: bar
 [ 7654 ] [ S{ foo f 98 7654 f } y>> ] unit-test
 [ 7654 ] [ S{ foo { y 7654 } } y>> ] unit-test
 
-[ 98 7654 t ] [ S{ foo f 98 7654 t } [ foo boa ] undo ] unit-test
+[ 98 7654 t ] [ S{ foo f 98 7654 t } [ foo <struct-boa> ] undo ] unit-test
 
 UNION-STRUCT: float-and-bits
     { f single-float }

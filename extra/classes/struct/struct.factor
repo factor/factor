@@ -27,16 +27,16 @@ M: struct >c-ptr
 : malloc-struct ( class -- struct )
     [ heap-size malloc ] keep memory>struct ; inline
 
-: <struct> ( class -- struct )
+: (struct) ( class -- struct )
     [ heap-size <byte-array> ] keep memory>struct ; inline
 
-M: struct-class new
+: <struct> ( class -- struct )
     dup "prototype" word-prop
-    [ >c-ptr clone swap memory>struct ] [ <struct> ] if* ; inline
+    [ >c-ptr clone swap memory>struct ] [ (struct) ] if* ; inline
 
 MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
     [
-        [ \ <struct> [ ] 2sequence ]
+        [ <wrapper> \ (struct) [ ] 2sequence ]
         [
             "struct-slots" word-prop
             [ length \ ndip ]
@@ -44,15 +44,12 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
         ] bi
     ] [ ] output>sequence ;
 
-M: struct-class boa
-    <struct-boa> ; inline
-
 : pad-struct-slots ( slots class -- slots' class )
     [ class-slots [ initial>> ] map over length tail append ] keep ;
 
 M: struct-class boa>object
     swap pad-struct-slots
-    [ <struct> swap ] [ "struct-slots" word-prop ] bi 
+    [ (struct) swap ] [ "struct-slots" word-prop ] bi 
     [ name>> setter-word execute( struct value -- struct ) ] 2each ;
 
 ! Struct slot accessors
