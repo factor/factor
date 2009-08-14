@@ -21,7 +21,7 @@ BACKWARD-ANALYSIS: live
 
 M: live-analysis transfer-set drop transfer-peeked-locs ;
 
-M: live-analysis join-sets drop assoc-combine ;
+M: live-analysis join-sets 2drop assoc-combine ;
 
 ! A stack location is available at a location if all paths from
 ! the entry block to the location load the location into a
