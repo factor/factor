@@ -80,7 +80,7 @@ MACRO: <experiment> ( word -- )
     '[ _ ndup _ narray _ prefix ] ;
 
 : experiment. ( seq -- )
-    [ first write ": " write ] [ rest . ] bi ;
+    [ first write ": " write ] [ rest . flush ] bi ;
 
 :: experiment ( word: ( -- error ? ) line# -- )
     word <experiment> :> e
@@ -130,7 +130,7 @@ TEST: must-fail
 
 M: test-failure error. ( error -- )
     {
-        [ summary print nl ]
+        [ error-location print nl ]
         [ asset>> [ experiment. nl ] when* ]
         [ error>> error. ]
         [ traceback-button. ]

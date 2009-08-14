@@ -1,7 +1,7 @@
-IN: hashtables.tests
 USING: kernel math namespaces make tools.test vectors sequences
 sequences.private hashtables io prettyprint assocs
 continuations ;
+IN: hashtables.tests
 
 [ f ] [ "hi" V{ 1 2 3 } at ] unit-test
 

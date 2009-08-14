@@ -1,6 +1,6 @@
-IN: alien.c-types.tests
 USING: alien alien.syntax alien.c-types kernel tools.test
 sequences system libc alien.strings io.encodings.utf8 ;
+IN: alien.c-types.tests
 
 CONSTANT: xyz 123
 

@@ -9,41 +9,27 @@ TUPLE: stack-frame
 { return integer }
 { total-size integer }
 { gc-root-size integer }
-spill-counts ;
+{ spill-area-size integer } ;
 
 ! Stack frame utilities
 : param-base ( -- n )
     stack-frame get [ params>> ] [ return>> ] bi + ;
 
-: spill-float-offset ( n -- offset )
-    double-float-regs reg-size * ;
-
-: spill-integer-base ( -- n )
-    stack-frame get spill-counts>> double-float-regs [ swap at ] keep reg-size *
+: spill-offset ( n -- offset )
     param-base + ;
-
-: spill-integer-offset ( n -- offset )
-    cells spill-integer-base + ;
-
-: spill-area-size ( stack-frame -- n )
-    spill-counts>> [ swap reg-size * ] { } assoc>map sum ;
 
 : gc-root-base ( -- n )
-    stack-frame get spill-area-size
-    param-base + ;
+    stack-frame get spill-area-size>> param-base + ;
 
 : gc-root-offset ( n -- n' ) gc-root-base + ;
-
-: gc-roots-size ( live-values -- n )
-    keys [ reg-class>> reg-size ] sigma ;
 
 : (stack-frame-size) ( stack-frame -- n )
     [
         {
-            [ spill-area-size ]
-            [ gc-root-size>> ]
             [ params>> ]
             [ return>> ]
+            [ gc-root-size>> ]
+            [ spill-area-size>> ]
         } cleave
     ] sum-outputs ;
 

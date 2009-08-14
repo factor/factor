@@ -32,6 +32,10 @@ def doc_using_statements(document)
     document.scan(/\b(USING:\s[^;]*\s;|USE:\s+\S+|IN:\s\S+)/).join("\n") << "\n"
 end
 
+def doc_vocab(document) 
+  document.sub(/\bIN:\s(\S+)/, %Q("\\1"))
+end
+
 def line_current_word(line, point)
     left = line.rindex(/\s/, point - 1) || 0; right = line.index(/\s/, point) || line.length
     line[left..right]

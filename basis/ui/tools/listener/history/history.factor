@@ -10,7 +10,7 @@ TUPLE: history document elements index ;
     V{ } clone 0 history boa ;
 
 : history-add ( history -- input )
-    dup elements>> length 1+ >>index
+    dup elements>> length 1 + >>index
     [ document>> doc-string [ <input> ] [ empty? ] bi ] keep
     '[ [ _ elements>> push ] keep ] unless ;
 
@@ -32,7 +32,7 @@ TUPLE: history document elements index ;
     [ set-doc-string ] [ clear-undo drop ] 2bi ;
 
 : change-history-index ( history i -- )
-    over elements>> length 1-
+    over elements>> length 1 -
     '[ _ + _ min 0 max ] change-index drop ;
 
 : history-recall ( history i -- )

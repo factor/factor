@@ -8,7 +8,7 @@ compiler.cfg.def-use
 compiler.cfg.renaming
 compiler.cfg.dominance
 compiler.cfg.instructions
-compiler.cfg.ssa.liveness
+compiler.cfg.liveness.ssa
 compiler.cfg.ssa.cssa
 compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges
@@ -49,7 +49,9 @@ SYMBOL: copies
 : eliminate-copy ( vreg1 vreg2 -- )
     [ leader ] bi@
     2dup eq? [ 2drop ] [
-        [ update-leaders ] [ merge-classes ] 2bi
+        [ update-leaders ]
+        [ merge-classes ]
+        2bi
     ] if ;
 
 : introduce-vreg ( vreg -- )
@@ -95,13 +97,12 @@ M: insn prepare-insn drop ;
     ] each-basic-block ;
 
 : destruct-ssa ( cfg -- cfg' )
-    dup cfg-has-phis? [
-        dup construct-cssa
-        dup precompute-liveness
-        dup compute-defs
-        dup compute-dominance
-        dup compute-live-ranges
-        dup prepare-coalescing
-        process-copies
-        dup perform-renaming
-    ] when ;
+    needs-dominance
+
+    dup construct-cssa
+    dup compute-defs
+    compute-ssa-live-sets
+    dup compute-live-ranges
+    dup prepare-coalescing
+    process-copies
+    dup perform-renaming ;

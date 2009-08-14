@@ -4,11 +4,12 @@ USING: kernel words sequences quotations namespaces io vectors
 classes.tuple accessors prettyprint prettyprint.config assocs
 prettyprint.backend prettyprint.custom prettyprint.sections
 parser compiler.tree.builder compiler.tree.optimizer
-compiler.cfg.builder compiler.cfg.linearization
+cpu.architecture compiler.cfg.builder compiler.cfg.linearization
 compiler.cfg.registers compiler.cfg.stack-frame
 compiler.cfg.linear-scan compiler.cfg.two-operand
 compiler.cfg.optimizer compiler.cfg.instructions
-compiler.cfg.utilities compiler.cfg.mr compiler.cfg ;
+compiler.cfg.utilities compiler.cfg.def-use
+compiler.cfg.rpo compiler.cfg.mr compiler.cfg ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-cfg ( quot -- cfgs )
@@ -23,8 +24,10 @@ M: word test-cfg
 
 : test-mr ( quot -- mrs )
     test-cfg [
-        optimize-cfg
-        build-mr
+        [
+            optimize-cfg
+            build-mr
+        ] with-cfg
     ] map ;
 
 : insn. ( insn -- )
@@ -41,11 +44,6 @@ M: word test-cfg
     ] each ;
 
 ! Prettyprinting
-M: vreg pprint*
-    <block
-    \ V pprint-word [ reg-class>> pprint* ] [ n>> pprint* ] bi
-    block> ;
-
 : pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;
 
 M: ds-loc pprint* \ D pprint-loc ;
@@ -72,3 +70,11 @@ M: rs-loc pprint* \ R pprint-loc ;
     1 { 2 3 } edges
     2 4 edge
     3 4 edge ;
+
+: fake-representations ( cfg -- )
+    post-order [
+        instructions>>
+        [ [ temp-vregs ] [ defs-vreg ] bi [ suffix ] when* ]
+        map concat
+    ] map concat
+    [ int-rep ] H{ } map>assoc representations set ;

@@ -93,7 +93,8 @@ HINTS: filter-by { bit-array object } ;
 PRIVATE>
 
 : compute-merge-sets ( cfg -- )
-    dup cfg set
+    needs-dominance
+
     H{ } clone visited set
     [ compute-levels ]
     [ init-merge-sets ]

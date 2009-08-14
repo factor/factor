@@ -13,24 +13,24 @@ IN: compiler.cfg.ssa.construction.tests
 reset-counters
 
 V{
-    T{ ##load-immediate f V int-regs 1 100 }
-    T{ ##add-imm f V int-regs 2 V int-regs 1 50 }
-    T{ ##add-imm f V int-regs 2 V int-regs 2 10 }
+    T{ ##load-immediate f 1 100 }
+    T{ ##add-imm f 2 1 50 }
+    T{ ##add-imm f 2 2 10 }
     T{ ##branch }
 } 0 test-bb
 
 V{
-    T{ ##load-immediate f V int-regs 3 3 }
+    T{ ##load-immediate f 3 3 }
     T{ ##branch }
 } 1 test-bb
 
 V{
-    T{ ##load-immediate f V int-regs 3 4 }
+    T{ ##load-immediate f 3 4 }
     T{ ##branch }
 } 2 test-bb
 
 V{
-    T{ ##replace f V int-regs 3 D 0 }
+    T{ ##replace f 3 D 0 }
     T{ ##return }
 } 3 test-bb
 
@@ -40,7 +40,7 @@ V{
 
 : test-ssa ( -- )
     cfg new 0 get >>entry
-    compute-predecessors
+    dup cfg set
     construct-ssa
     drop ;
 
@@ -48,23 +48,23 @@ V{
 
 [
     V{
-        T{ ##load-immediate f V int-regs 1 100 }
-        T{ ##add-imm f V int-regs 2 V int-regs 1 50 }
-        T{ ##add-imm f V int-regs 3 V int-regs 2 10 }
+        T{ ##load-immediate f 1 100 }
+        T{ ##add-imm f 2 1 50 }
+        T{ ##add-imm f 3 2 10 }
         T{ ##branch }
     }
 ] [ 0 get instructions>> ] unit-test
 
 [
     V{
-        T{ ##load-immediate f V int-regs 4 3 }
+        T{ ##load-immediate f 4 3 }
         T{ ##branch }
     }
 ] [ 1 get instructions>> ] unit-test
 
 [
     V{
-        T{ ##load-immediate f V int-regs 5 4 }
+        T{ ##load-immediate f 5 4 }
         T{ ##branch }
     }
 ] [ 2 get instructions>> ] unit-test
@@ -74,8 +74,8 @@ V{
 
 [
     V{
-        T{ ##phi f V int-regs 6 H{ { 1 V int-regs 4 } { 2 V int-regs 5 } } }
-        T{ ##replace f V int-regs 6 D 0 }
+        T{ ##phi f 6 H{ { 1 4 } { 2 5 } } }
+        T{ ##replace f 6 D 0 }
         T{ ##return }
     }
 ] [
@@ -87,9 +87,9 @@ reset-counters
 
 V{ } 0 test-bb
 V{ } 1 test-bb
-V{ T{ ##peek f V int-regs 0 D 0 } } 2 test-bb
-V{ T{ ##peek f V int-regs 0 D 0 } } 3 test-bb
-V{ T{ ##replace f V int-regs 0 D 0 } } 4 test-bb
+V{ T{ ##peek f 0 D 0 } } 2 test-bb
+V{ T{ ##peek f 0 D 0 } } 3 test-bb
+V{ T{ ##replace f 0 D 0 } } 4 test-bb
 V{ } 5 test-bb
 V{ } 6 test-bb
 
@@ -104,8 +104,8 @@ V{ } 6 test-bb
 
 [
     V{
-        T{ ##phi f V int-regs 3 H{ { 2 V int-regs 1 } { 3 V int-regs 2 } } }
-        T{ ##replace f V int-regs 3 D 0 }
+        T{ ##phi f 3 H{ { 2 1 } { 3 2 } } }
+        T{ ##replace f 3 D 0 }
     }
 ] [
     4 get instructions>>

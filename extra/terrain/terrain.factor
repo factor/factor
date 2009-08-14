@@ -11,7 +11,7 @@ math.affine-transforms noise ui.gestures combinators.short-circuit
 destructors grid-meshes ;
 IN: terrain
 
-CONSTANT: FOV $[ 2.0 sqrt 1+ ]
+CONSTANT: FOV $[ 2.0 sqrt 1 + ]
 CONSTANT: NEAR-PLANE $[ 1.0 1024.0 / ]
 CONSTANT: FAR-PLANE 2.0
 CONSTANT: PLAYER-START-LOCATION { 0.5 0.51 0.5 }

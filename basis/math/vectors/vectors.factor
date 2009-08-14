@@ -41,8 +41,12 @@ IN: math.vectors
 : set-axis ( u v axis -- w )
     [ [ zero? 2over ? ] dip swap nth ] map-index 2nip ;
 
+<PRIVATE
+
 : 2tetra@ ( p q r s t u v w quot -- )
     dup [ [ 2bi@ ] curry 4dip ] dip 2bi@ ; inline
+
+PRIVATE>
 
 : trilerp ( aaa baa aba bba aab bab abb bbb {t,u,v} -- a_tuv )
     [ first lerp ] [ second lerp ] [ third lerp ] tri-curry

@@ -64,7 +64,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
         k swap - dup k! 0 >
     ] 
     [ ] produce swap suffix
-    { } [ dup array? [ dup first 16 = ] [ f ] if [ [ unclip-last ] [ second 1+ swap <repetition> append ] bi* ] [ suffix ] if ] reduce
+    { } [ dup array? [ dup first 16 = ] [ f ] if [ [ unclip-last ] [ second 1 + swap <repetition> append ] bi* ] [ suffix ] if ] reduce
     [ dup array? [ second 0 <repetition> ] [ 1array ] if ] map concat
     nip swap cut 2array [ [ length>> [0,b) ] [ ] bi get-table ] map ;
     
@@ -91,14 +91,14 @@ CONSTANT: dist-table
     }
 
 : nth* ( n seq -- elt )
-    [ length 1- swap - ] [ nth ] bi ;
+    [ length 1 - swap - ] [ nth ] bi ;
 
 :: inflate-lz77 ( seq -- bytes )
     1000 <byte-vector> :> bytes
     seq
     [
         dup array?
-        [ first2 '[ _ 1- bytes nth* bytes push ] times ]
+        [ first2 '[ _ 1 - bytes nth* bytes push ] times ]
         [ bytes push ] if
     ] each 
     bytes ;

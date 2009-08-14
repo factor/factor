@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel namespaces sequences math
 arrays compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.ssa.liveness compiler.cfg.rpo ;
+compiler.cfg.liveness.ssa compiler.cfg.rpo compiler.cfg.dominance ;
 IN: compiler.cfg.ssa.interference.live-ranges
 
 ! Live ranges for interference testing
@@ -11,8 +11,13 @@ IN: compiler.cfg.ssa.interference.live-ranges
 
 SYMBOLS: local-def-indices local-kill-indices ;
 
-: record-def ( n vregs -- )
-    dup [ local-def-indices get set-at ] [ 2drop ] if ;
+: record-def ( n vreg -- )
+    ! We allow multiple defs of a vreg as long as they're
+    ! all in the same basic block
+    dup [
+        local-def-indices get 2dup key?
+        [ 3drop ] [ set-at ] if
+    ] [ 2drop ] if ;
 
 : record-uses ( n vregs -- )
     local-kill-indices get '[ _ set-at ] with each ;
@@ -42,6 +47,8 @@ SYMBOLS: def-indices kill-indices ;
 PRIVATE>
 
 : compute-live-ranges ( cfg -- )
+    needs-dominance
+
     H{ } clone def-indices set
     H{ } clone kill-indices set
     [ compute-local-live-ranges ] each-basic-block ;

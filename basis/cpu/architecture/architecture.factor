@@ -1,42 +1,56 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generic kernel kernel.private math
 memory namespaces make sequences layouts system hashtables
 classes alien byte-arrays combinators words sets fry ;
 IN: cpu.architecture
 
+! Representations -- these are like low-level types
+
+! Unknown representation; this is used for ##copy instructions which
+! get eliminated later
+SINGLETON: any-rep
+
+! Integer registers can contain data with one of these three representations
+! tagged-rep: tagged pointer or fixnum
+! int-rep: untagged fixnum, not a pointer
+SINGLETONS: tagged-rep int-rep ;
+
+! Floating point registers can contain data with
+! one of these representations
+SINGLETONS: single-float-rep double-float-rep ;
+
+UNION: representation any-rep tagged-rep int-rep single-float-rep double-float-rep ;
+
 ! Register classes
-SINGLETON: int-regs
-SINGLETON: single-float-regs
-SINGLETON: double-float-regs
-UNION: float-regs single-float-regs double-float-regs ;
+SINGLETONS: int-regs float-regs ;
+
 UNION: reg-class int-regs float-regs ;
+CONSTANT: reg-classes { int-regs float-regs }
 
 ! A pseudo-register class for parameters spilled on the stack
 SINGLETON: stack-params
 
-GENERIC: reg-size ( register-class -- n )
+: reg-class-of ( rep -- reg-class )
+    {
+        { tagged-rep [ int-regs ] }
+        { int-rep [ int-regs ] }
+        { single-float-rep [ float-regs ] }
+        { double-float-rep [ float-regs ] }
+        { stack-params [ stack-params ] }
+    } case ;
 
-M: int-regs reg-size drop cell ;
-
-M: single-float-regs reg-size drop 4 ;
-
-M: double-float-regs reg-size drop 8 ;
-
-M: stack-params reg-size drop cell ;
+: rep-size ( rep -- n )
+    {
+        { tagged-rep [ cell ] }
+        { int-rep [ cell ] }
+        { single-float-rep [ 4 ] }
+        { double-float-rep [ 8 ] }
+        { stack-params [ cell ] }
+    } case ;
 
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
-
-! Return values of this class go here
-GENERIC: return-reg ( register-class -- reg )
-
-! Sequence of registers used for parameter passing in class
-GENERIC: param-regs ( register-class -- regs )
-
-GENERIC: param-reg ( n register-class -- reg )
-
-M: object param-reg param-regs nth ;
 
 HOOK: two-operand? cpu ( -- ? )
 
@@ -100,8 +114,7 @@ HOOK: %div-float cpu ( dst src1 src2 -- )
 HOOK: %integer>float cpu ( dst src -- )
 HOOK: %float>integer cpu ( dst src -- )
 
-HOOK: %copy cpu ( dst src -- )
-HOOK: %copy-float cpu ( dst src -- )
+HOOK: %copy cpu ( dst src rep -- )
 HOOK: %unbox-float cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
 HOOK: %box-float cpu ( dst src temp -- )
@@ -146,14 +159,26 @@ HOOK: %compare-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-branch cpu ( label cc src1 src2 -- )
 
-HOOK: %spill-integer cpu ( src n -- )
-HOOK: %spill-float cpu ( src n -- )
-HOOK: %reload-integer cpu ( dst n -- )
-HOOK: %reload-float cpu ( dst n -- )
+HOOK: %spill cpu ( src n rep -- )
+HOOK: %reload cpu ( dst n rep -- )
 
 HOOK: %loop-entry cpu ( -- )
 
 ! FFI stuff
+
+! Return values of this class go here
+GENERIC: return-reg ( reg-class -- reg )
+
+! Sequence of registers used for parameter passing in class
+GENERIC: param-regs ( reg-class -- regs )
+
+M: stack-params param-regs drop f ;
+
+GENERIC: param-reg ( n reg-class -- reg )
+
+M: reg-class param-reg param-regs nth ;
+
+M: stack-params param-reg drop ;
 
 ! Is this integer small enough to appear in value template
 ! slots?
@@ -176,7 +201,7 @@ HOOK: dummy-fp-params? cpu ( -- ? )
 
 HOOK: %prepare-unbox cpu ( -- )
 
-HOOK: %unbox cpu ( n reg-class func -- )
+HOOK: %unbox cpu ( n rep func -- )
 
 HOOK: %unbox-long-long cpu ( n func -- )
 
@@ -184,7 +209,7 @@ HOOK: %unbox-small-struct cpu ( c-type -- )
 
 HOOK: %unbox-large-struct cpu ( n c-type -- )
 
-HOOK: %box cpu ( n reg-class func -- )
+HOOK: %box cpu ( n rep func -- )
 
 HOOK: %box-long-long cpu ( n func -- )
 
@@ -194,9 +219,9 @@ HOOK: %box-small-struct cpu ( c-type -- )
 
 HOOK: %box-large-struct cpu ( n c-type -- )
 
-GENERIC: %save-param-reg ( stack reg reg-class -- )
+HOOK: %save-param-reg cpu ( stack reg rep -- )
 
-GENERIC: %load-param-reg ( stack reg reg-class -- )
+HOOK: %load-param-reg cpu ( stack reg rep -- )
 
 HOOK: %prepare-alien-invoke cpu ( -- )
 
@@ -222,7 +247,3 @@ HOOK: %callback-value cpu ( ctype -- )
 HOOK: %callback-return cpu ( params -- )
 
 M: object %callback-return drop %return ;
-
-M: stack-params param-reg drop ;
-
-M: stack-params param-regs drop f ;

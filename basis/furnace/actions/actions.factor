@@ -17,8 +17,6 @@ html.templates.chloe.syntax
 html.templates.chloe.compiler ;
 IN: furnace.actions
 
-SYMBOL: params
-
 SYMBOL: rest
 
 TUPLE: action rest init authorize display validate submit ;
@@ -60,9 +58,6 @@ TUPLE: action rest init authorize display validate submit ;
         ] [ drop <400> ] if
     ] with-exit-continuation ;
 
-: param ( name -- value )
-    params get at ;
-
 CONSTANT: revalidate-url-key "__u"
 
 : revalidate-url ( -- url/f )
@@ -88,13 +83,12 @@ CONSTANT: revalidate-url-key "__u"
         ] [ drop <400> ] if
     ] with-exit-continuation ;
 
-: handle-rest ( path action -- assoc )
-    rest>> dup [ [ "/" join ] dip associate ] [ 2drop f ] if ;
+: handle-rest ( path action -- )
+    rest>> dup [ [ "/" join ] dip set-param ] [ 2drop ] if ;
 
 : init-action ( path action -- )
     begin-form
-    handle-rest
-    request get request-params assoc-union params set ;
+    handle-rest ;
 
 M: action call-responder* ( path action -- response )
     [ init-action ] keep

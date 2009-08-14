@@ -63,5 +63,5 @@ UNION: fixed-length-sequence array byte-array string ;
         { [ over 0 = ] [ 2drop fixnum <class-info> ] }
         { [ 2dup length-accessor? ] [ nip length>> ] }
         { [ dup literal?>> ] [ literal>> literal-info-slot ] }
-        [ [ 1- ] [ slots>> ] bi* ?nth ]
+        [ [ 1 - ] [ slots>> ] bi* ?nth ]
     } cond [ object-info ] unless* ;

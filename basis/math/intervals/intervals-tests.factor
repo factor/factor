@@ -1,9 +1,11 @@
 USING: math.intervals kernel sequences words math math.order
 arrays prettyprint tools.test random vocabs combinators
-accessors math.constants ;
+accessors math.constants fry ;
 IN: math.intervals.tests
 
 [ empty-interval ] [ 2 2 (a,b) ] unit-test
+
+[ empty-interval ] [ 2 2.0 (a,b) ] unit-test
 
 [ empty-interval ] [ 2 2 [a,b) ] unit-test
 
@@ -111,6 +113,22 @@ IN: math.intervals.tests
     0 1 (a,b) 0 1 [a,b] interval-subset?
 ] unit-test
 
+[ t ] [
+    full-interval -1/0. 1/0. [a,b] interval-subset?
+] unit-test
+
+[ t ] [
+    -1/0. 1/0. [a,b] full-interval interval-subset?
+] unit-test
+
+[ f ] [
+    full-interval 0 1/0. [a,b] interval-subset?
+] unit-test
+
+[ t ] [
+    0 1/0. [a,b] full-interval interval-subset?
+] unit-test
+
 [ f ] [
     0 0 1 (a,b) interval-contains?
 ] unit-test
@@ -189,6 +207,10 @@ IN: math.intervals.tests
 
 [ f ] [ 0 10 [a,b] 0 [a,a] interval< ] unit-test
 
+[ f ] [ 0 10 [a,b] 0.0 [a,a] interval< ] unit-test
+
+[ f ] [ 0.0 10 [a,b] 0 [a,a] interval< ] unit-test
+
 [ f ] [ 0 10 [a,b] 10 [a,a] interval> ] unit-test
 
 [ incomparable ] [ 0 [a,a] 0 10 [a,b] interval< ] unit-test
@@ -210,6 +232,10 @@ IN: math.intervals.tests
 ] unit-test
 
 [ t ] [ 1 100 [a,b] -1 1 [a,b] interval/i [-inf,inf] = ] unit-test
+
+! Accuracy of interval-mod
+[ t ] [ full-interval 40 40 [a,b] interval-mod -40 40 (a,b) interval-subset?
+] unit-test
 
 ! Interval random tester
 : random-element ( interval -- n )
@@ -236,7 +262,7 @@ IN: math.intervals.tests
         } case
     ] if ;
 
-: random-unary-op ( -- pair )
+: unary-ops ( -- alist )
     {
         { bitnot interval-bitnot }
         { abs interval-abs }
@@ -247,11 +273,10 @@ IN: math.intervals.tests
     }
     "math.ratios.private" vocab [
         { recip interval-recip } suffix
-    ] when
-    random ;
+    ] when ;
 
-: unary-test ( -- ? )
-    random-interval random-unary-op ! 2dup . .
+: unary-test ( op -- ? )
+    [ random-interval ] dip
     0 pick interval-contains? over first \ recip eq? and [
         2drop t
     ] [
@@ -259,9 +284,11 @@ IN: math.intervals.tests
         second execute( a -- b ) interval-contains?
     ] if ;
 
-[ t ] [ 80000 iota [ drop unary-test ] all? ] unit-test
+unary-ops [
+    [ [ t ] ] dip '[ 8000 iota [ drop _ unary-test ] all? ] unit-test
+] each
 
-: random-binary-op ( -- pair )
+: binary-ops ( -- alist )
     {
         { + interval+ }
         { - interval- }
@@ -272,17 +299,15 @@ IN: math.intervals.tests
         { bitand interval-bitand }
         { bitor interval-bitor }
         { bitxor interval-bitxor }
-        ! { shift interval-shift }
         { min interval-min }
         { max interval-max }
     }
     "math.ratios.private" vocab [
         { / interval/ } suffix
-    ] when
-    random ;
+    ] when ;
 
-: binary-test ( -- ? )
-    random-interval random-interval random-binary-op ! 3dup . . .
+: binary-test ( op -- ? )
+    [ random-interval random-interval ] dip
     0 pick interval-contains? over first { / /i mod rem } member? and [
         3drop t
     ] [
@@ -290,22 +315,26 @@ IN: math.intervals.tests
         second execute( a b -- c ) interval-contains?
     ] if ;
 
-[ t ] [ 80000 iota [ drop binary-test ] all? ] unit-test
+binary-ops [
+    [ [ t ] ] dip '[ 8000 iota [ drop _ binary-test ] all? ] unit-test
+] each
 
-: random-comparison ( -- pair )
+: comparison-ops ( -- alist )
     {
         { < interval< }
         { <= interval<= }
         { > interval> }
         { >= interval>= }
-    } random ;
+    } ;
 
-: comparison-test ( -- ? )
-    random-interval random-interval random-comparison
+: comparison-test ( op -- ? )
+    [ random-interval random-interval ] dip
     [ [ [ random-element ] bi@ ] dip first execute( a b -- ? ) ] 3keep
     second execute( a b -- ? ) dup incomparable eq? [ 2drop t ] [ = ] if ;
 
-[ t ] [ 40000 iota [ drop comparison-test ] all? ] unit-test
+comparison-ops [
+    [ [ t ] ] dip '[ 8000 iota [ drop _ comparison-test ] all? ] unit-test
+] each
 
 [ t ] [ -10 10 [a,b] 0 100 [a,b] assume> 0 10 (a,b] = ] unit-test
 
@@ -325,18 +354,19 @@ IN: math.intervals.tests
 : random-interval-or-empty ( -- obj )
     10 random 0 = [ empty-interval ] [ random-interval ] if ;
 
-: random-commutative-op ( -- op )
+: commutative-ops ( -- seq )
     {
         interval+ interval*
         interval-bitor interval-bitand interval-bitxor
         interval-max interval-min
-    } random ;
+    } ;
 
-[ t ] [
-    80000 iota [
-        drop
-        random-interval-or-empty random-interval-or-empty
-        random-commutative-op
-        [ execute ] [ swapd execute ] 3bi =
-    ] all?
-] unit-test
+commutative-ops [
+    [ [ t ] ] dip '[
+        8000 iota [
+            drop
+            random-interval-or-empty random-interval-or-empty _
+            [ execute ] [ swapd execute ] 3bi =
+        ] all?
+    ] unit-test
+] each

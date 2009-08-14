@@ -4,6 +4,8 @@ USING: kernel accessors combinators fry sequences assocs compiler.cfg.rpo
 compiler.cfg.instructions compiler.cfg.utilities ;
 IN: compiler.cfg.predecessors
 
+<PRIVATE
+
 : update-predecessors ( bb -- )
     dup successors>> [ predecessors>> push ] with each ;
 
@@ -23,3 +25,9 @@ IN: compiler.cfg.predecessors
         [ [ update-phis ] each-basic-block ]
         [ ]
     } cleave ;
+
+PRIVATE>
+
+: needs-predecessors ( cfg -- cfg' )
+    dup predecessors-valid?>>
+    [ compute-predecessors t >>predecessors-valid? ] unless ;

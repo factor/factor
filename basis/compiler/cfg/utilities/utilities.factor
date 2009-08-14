@@ -69,6 +69,10 @@ SYMBOL: visited
     [ instructions>> ] dip
     '[ dup ##phi? [ @ t ] [ drop f ] if ] all? drop ; inline
 
+: each-non-phi ( bb quot: ( insn -- ) -- )
+    [ instructions>> ] dip
+    '[ dup ##phi? [ drop ] _ if ] each ; inline
+
 : predecessor ( bb -- pred )
     predecessors>> first ; inline
 

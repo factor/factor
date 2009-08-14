@@ -6,7 +6,8 @@ cpu.x86.assembler cpu.x86.assembler.operands cpu.x86 compiler.codegen
 compiler.cfg.registers ;
 IN: cpu.x86.64.unix
 
-M: int-regs param-regs drop { RDI RSI RDX RCX R8 R9 } ;
+M: int-regs param-regs
+    drop { RDI RSI RDX RCX R8 R9 } ;
 
 M: float-regs param-regs
     drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
@@ -15,7 +16,7 @@ M: x86.64 reserved-area-size 0 ;
 
 ! The ABI for passing structs by value is pretty messed up
 << "void*" c-type clone "__stack_value" define-primitive-type
-stack-params "__stack_value" c-type (>>reg-class) >>
+stack-params "__stack_value" c-type (>>rep) >>
 
 : struct-types&offset ( struct-type -- pairs )
     fields>> [
@@ -29,7 +30,7 @@ stack-params "__stack_value" c-type (>>reg-class) >>
 
 : flatten-small-struct ( c-type -- seq )
     struct-types&offset split-struct [
-        [ c-type c-type-reg-class ] map
+        [ c-type c-type-rep reg-class-of ] map
         int-regs swap member? "void*" "double" ? c-type
     ] map ;
 
@@ -53,6 +54,4 @@ M: x86.64 dummy-int-params? f ;
 
 M: x86.64 dummy-fp-params? f ;
 
-M: x86.64 temp-reg-1 R8 ;
-
-M: x86.64 temp-reg-2 R9 ;
+M: x86.64 temp-reg R8 ;

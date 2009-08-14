@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces math words strings
-io vectors arrays math.parser combinators continuations ;
+io vectors arrays math.parser combinators continuations
+source-files.errors ;
 IN: lexer
 
 TUPLE: lexer text line line-text line-length column ;
@@ -24,11 +25,8 @@ TUPLE: lexer text line line-text line-length column ;
 
 ERROR: unexpected want got ;
 
-PREDICATE: unexpected-tab < unexpected
-    got>> CHAR: \t = ;
-
 : forbid-tab ( c -- c )
-    [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ;
+    [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
 
 : skip ( i seq ? -- n )
     over length
@@ -95,6 +93,9 @@ PREDICATE: unexpected-eof < unexpected
     100 <vector> swap (parse-tokens) >array ;
 
 TUPLE: lexer-error line column line-text error ;
+
+M: lexer-error error-file error>> error-file ;
+M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
 
 : <lexer-error> ( msg -- error )
     \ lexer-error new

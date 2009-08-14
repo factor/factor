@@ -20,14 +20,14 @@ HELP: <date>
 { $values { "year" integer } { "month" integer } { "day" integer } { "timestamp" timestamp } }
 { $description "Returns a timestamp object representing the start of the specified day in your current timezone." }
 { $examples
-    { $example "USING: calendar prettyprint ;"
-               "2010 12 25 <date> >gmt midnight ."
+    { $example "USING: accessors calendar prettyprint ;"
+               "2010 12 25 <date> instant >>gmt-offset ."
                "T{ timestamp { year 2010 } { month 12 } { day 25 } }"
     }
 } ;
 
 HELP: month-names
-{ $values { "array" array } }
+{ $values { "value" object } }
 { $description "Returns an array with the English names of all the months." }
 { $warning "Do not use this array for looking up a month name directly. Use month-name instead." } ;
 

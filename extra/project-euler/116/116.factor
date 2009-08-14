@@ -38,13 +38,13 @@ IN: project-euler.116
 <PRIVATE
 
 : nth* ( n seq -- elt/0 )
-    [ length swap - 1- ] keep ?nth 0 or ;
+    [ length swap - 1 - ] keep ?nth 0 or ;
 
 : next ( colortile seq -- )
      [ nth* ] [ last + ] [ push ] tri ;
 
 : ways ( length colortile -- permutations )
-    V{ 1 } clone [ [ next ] 2curry times ] keep last 1- ;
+    V{ 1 } clone [ [ next ] 2curry times ] keep last 1 - ;
 
 : (euler116) ( length -- permutations )
     3 [1,b] [ ways ] with sigma ;

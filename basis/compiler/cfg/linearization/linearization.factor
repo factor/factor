@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math accessors sequences namespaces make
-combinators assocs arrays locals cpu.architecture
+combinators assocs arrays locals layouts hashtables
+cpu.architecture
 compiler.cfg
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
@@ -9,6 +10,14 @@ compiler.cfg.instructions
 compiler.cfg.utilities
 compiler.cfg.linearization.order ;
 IN: compiler.cfg.linearization
+
+<PRIVATE
+
+SYMBOL: numbers
+
+: block-number ( bb -- n ) numbers get at ;
+
+: number-blocks ( bbs -- ) [ 2array ] map-index >hashtable numbers set ;
 
 ! Convert CFG IR to machine IR.
 GENERIC: linearize-insn ( basic-block insn -- )
@@ -70,55 +79,32 @@ M: ##dispatch linearize-insn
     [ successors>> [ block-number _dispatch-label ] each ]
     bi* ;
 
-: (compute-gc-roots) ( n live-values -- n )
-    [
-        [ nip 2array , ]
-        [ drop reg-class>> reg-size + ]
-        3bi
-    ] assoc-each ;
-
-: oop-values ( regs -- regs' )
-    [ drop reg-class>> int-regs eq? ] assoc-filter ;
-
-: data-values ( regs -- regs' )
-    [ drop reg-class>> double-float-regs eq? ] assoc-filter ;
-
-: compute-gc-roots ( live-values -- alist )
-    [
-        [ 0 ] dip
-        ! we put float registers last; the GC doesn't actually scan them
-        [ oop-values (compute-gc-roots) ]
-        [ data-values (compute-gc-roots) ] bi
-        drop
-    ] { } make ;
-
-: count-gc-roots ( live-values -- n )
-    ! Size of GC root area, minus the float registers
-    oop-values assoc-size ;
+: gc-root-offsets ( registers -- alist )
+    ! Outputs a sequence of { offset register/spill-slot } pairs
+    [ length iota [ cell * ] map ] keep zip ;
 
 M: ##gc linearize-insn
     nip
     {
         [ temp1>> ]
         [ temp2>> ]
-        [
-            live-values>>
-            [ compute-gc-roots ]
-            [ count-gc-roots ]
-            [ gc-roots-size ]
-            tri
-        ]
+        [ data-values>> ]
+        [ tagged-values>> gc-root-offsets ]
         [ uninitialized-locs>> ]
     } cleave
     _gc ;
 
 : linearize-basic-blocks ( cfg -- insns )
     [
-        [ linearization-order [ linearize-basic-block ] each ]
-        [ spill-counts>> _spill-counts ]
-        bi
+        [
+            linearization-order
+            [ number-blocks ]
+            [ [ linearize-basic-block ] each ] bi
+        ] [ spill-area-size>> _spill-area-size ] bi
     ] { } make ;
 
+PRIVATE>
+        
 : flatten-cfg ( cfg -- mr )
     [ linearize-basic-blocks ] [ word>> ] [ label>> ] tri
     <mr> ;

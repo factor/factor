@@ -5,6 +5,7 @@ arrays combinators continuations columns math vectors
 grouping stack-checker.branches
 compiler.tree
 compiler.tree.def-use
+compiler.tree.recursive
 compiler.tree.combinators ;
 IN: compiler.tree.checker
 

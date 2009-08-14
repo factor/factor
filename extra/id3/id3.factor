@@ -104,7 +104,7 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
     0 [ [ 7 shift ] dip bitor ] reduce ;
 
 : synchsafe>seq ( n -- seq )
-    dup 1+ log2 1+ 7 / ceiling
+    dup 1 + log2 1 + 7 / ceiling
     [ [ -7 shift ] keep HEX: 7f bitand  ] replicate nip reverse ;
 
 : filter-text-data ( data -- filtered )

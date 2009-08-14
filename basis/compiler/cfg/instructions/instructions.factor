@@ -112,8 +112,7 @@ INSN: ##float>integer < ##unary ;
 INSN: ##integer>float < ##unary ;
 
 ! Boxing and unboxing
-INSN: ##copy < ##unary ;
-INSN: ##copy-float < ##unary ;
+INSN: ##copy < ##unary rep ;
 INSN: ##unbox-float < ##unary ;
 INSN: ##unbox-any-c-ptr < ##unary/temp ;
 INSN: ##box-float < ##unary/temp ;
@@ -190,7 +189,7 @@ INSN: ##fixnum-add < ##fixnum-overflow ;
 INSN: ##fixnum-sub < ##fixnum-overflow ;
 INSN: ##fixnum-mul < ##fixnum-overflow ;
 
-INSN: ##gc temp1 temp2 live-values uninitialized-locs ;
+INSN: ##gc temp1 temp2 data-values tagged-values uninitialized-locs ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;
@@ -219,14 +218,13 @@ INSN: _fixnum-mul < _fixnum-overflow ;
 
 TUPLE: spill-slot n ; C: <spill-slot> spill-slot
 
-INSN: _gc temp1 temp2 gc-roots gc-root-count gc-root-size uninitialized-locs ;
+INSN: _gc temp1 temp2 data-values tagged-values uninitialized-locs ;
 
 ! These instructions operate on machine registers and not
 ! virtual registers
-INSN: _spill src class n ;
-INSN: _reload dst class n ;
-INSN: _copy dst src class ;
-INSN: _spill-counts counts ;
+INSN: _spill src rep n ;
+INSN: _reload dst rep n ;
+INSN: _spill-area-size n ;
 
 ! Instructions that use vregs
 UNION: vreg-insn
@@ -251,6 +249,34 @@ UNION: kill-vreg-insn
     ##alien-invoke
     ##alien-indirect
     ##alien-callback ;
+
+! Instructions that output floats
+UNION: output-float-insn
+    ##add-float
+    ##sub-float
+    ##mul-float
+    ##div-float
+    ##integer>float
+    ##unbox-float
+    ##alien-float
+    ##alien-double ;
+
+! Instructions that take floats as inputs
+UNION: input-float-insn
+    ##add-float
+    ##sub-float
+    ##mul-float
+    ##div-float
+    ##float>integer
+    ##box-float
+    ##set-alien-float
+    ##set-alien-double
+    ##compare-float
+    ##compare-float-branch ;
+
+! Smackdown
+INTERSECTION: ##unary-float ##unary input-float-insn ;
+INTERSECTION: ##binary-float ##binary input-float-insn ;
 
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers

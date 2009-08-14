@@ -8,7 +8,7 @@ IN: math.primes.factors
 
 : count-factor ( n d -- n' c )
     [ 1 ] 2dip [ /i ] keep
-    [ dupd /mod zero? ] curry [ nip [ 1+ ] dip ] while drop
+    [ dupd /mod zero? ] curry [ nip [ 1 + ] dip ] while drop
     swap ;
 
 : write-factor ( n d -- n' d' )
@@ -39,7 +39,7 @@ PRIVATE>
 : totient ( n -- t )
     {
         { [ dup 2 < ] [ drop 0 ] }
-        [ dup unique-factors [ 1 [ 1- * ] reduce ] [ product ] bi / * ]
+        [ dup unique-factors [ 1 [ 1 - * ] reduce ] [ product ] bi / * ]
     } cond ; foldable
 
 : divisors ( n -- seq )

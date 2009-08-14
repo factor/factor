@@ -14,14 +14,16 @@ M: source-file-error error-help error>> error-help ;
 
 CONSTANT: +listener-input+ "<Listener input>"
 
-M: source-file-error summary
+: error-location ( error -- string )
     [
-        [ file>> [ % ": " % ] [ +listener-input+ % ] if* ]
-        [ line#>> [ # ] when* ] bi
+        [ file>> [ % ] [ +listener-input+ % ] if* ]
+        [ line#>> [ ": " % # ] when* ] bi
     ] "" make ;
 
+M: source-file-error summary error>> summary ;
+
 M: source-file-error error.
-    [ summary print nl ]
+    [ error-location print nl ]
     [ asset>> [ "Asset: " write short. nl ] when* ]
     [ error>> error. ]
     tri ;

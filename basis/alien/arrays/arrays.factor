@@ -11,6 +11,8 @@ M: array c-type ;
 
 M: array c-type-class drop object ;
 
+M: array c-type-boxed-class drop object ;
+
 M: array heap-size unclip [ product ] [ heap-size ] bi* * ;
 
 M: array c-type-align first c-type-align ;
@@ -31,7 +33,7 @@ M: array c-type-boxer-quot drop [ ] ;
 
 M: array c-type-unboxer-quot drop [ >c-ptr ] ;
 
-M: value-type c-type-reg-class drop int-regs ;
+M: value-type c-type-rep drop int-rep ;
 
 M: value-type c-type-getter
     drop [ swap <displaced-alien> ] ;
@@ -45,8 +47,9 @@ PREDICATE: string-type < pair
 
 M: string-type c-type ;
 
-M: string-type c-type-class
-    drop object ;
+M: string-type c-type-class drop object ;
+
+M: string-type c-type-boxed-class drop object ;
 
 M: string-type heap-size
     drop "void*" heap-size ;
@@ -72,8 +75,8 @@ M: string-type box-return
 M: string-type stack-size
     drop "void*" stack-size ;
 
-M: string-type c-type-reg-class
-    drop int-regs ;
+M: string-type c-type-rep
+    drop int-rep ;
 
 M: string-type c-type-boxer
     drop "void*" c-type-boxer ;

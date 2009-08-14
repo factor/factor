@@ -16,6 +16,7 @@ compiler.tree.builder
 compiler.tree.optimizer
 compiler.tree.combinators
 compiler.tree.checker
+compiler.tree.identities
 compiler.tree.dead-code
 compiler.tree.modular-arithmetic ;
 FROM: fry => _ ;
@@ -153,7 +154,7 @@ SYMBOL: node-count
         H{ } clone intrinsics-called set
 
         0 swap [
-            [ 1+ ] dip
+            [ 1 + ] dip
             dup #call? [
                 word>> {
                     { [ dup "intrinsic" word-prop ] [ intrinsics-called ] }
@@ -208,6 +209,7 @@ SYMBOL: node-count
         normalize
         propagate
         cleanup
+        apply-identities
         compute-def-use
         remove-dead-code
         compute-def-use
