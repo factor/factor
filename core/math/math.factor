@@ -58,8 +58,6 @@ ERROR: log2-expects-positive x ;
     ] if ; inline
 
 : zero? ( x -- ? ) 0 number= ; inline
-: 1+ ( x -- y ) 1 + ; inline
-: 1- ( x -- y ) 1 - ; inline
 : 2/ ( x -- y ) -1 shift ; inline
 : sq ( x -- y ) dup * ; inline
 : neg ( x -- -x ) -1 * ; inline
@@ -70,6 +68,13 @@ ERROR: log2-expects-positive x ;
 : 2^ ( n -- 2^n ) 1 swap shift ; inline
 : even? ( n -- ? ) 1 bitand zero? ;
 : odd? ( n -- ? ) 1 bitand 1 number= ;
+
+: if-zero ( n quot1 quot2 -- )
+    [ dup zero? ] [ [ drop ] prepose ] [ ] tri* if ; inline
+
+: when-zero ( n quot -- ) [ ] if-zero ; inline
+
+: unless-zero ( n quot -- ) [ ] swap if-zero ; inline
 
 UNION: integer fixnum bignum ;
 

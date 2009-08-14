@@ -146,7 +146,7 @@ DEFER: (flat-length)
 
 : body-length-bias ( word -- n )
     [ flat-length ] [ inlining-count get at 0 or ] bi
-    over 2 <= [ drop ] [ 2/ 1+ * ] if 24 swap [-] 4 /i ;
+    over 2 <= [ drop ] [ 2/ 1 + * ] if 24 swap [-] 4 /i ;
 
 : inlining-rank ( #call word -- n )
     [

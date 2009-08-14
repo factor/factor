@@ -267,8 +267,6 @@ IN: math.intervals.tests
         { bitnot interval-bitnot }
         { abs interval-abs }
         { 2/ interval-2/ }
-        { 1+ interval-1+ }
-        { 1- interval-1- }
         { neg interval-neg }
     }
     "math.ratios.private" vocab [
