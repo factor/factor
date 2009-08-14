@@ -1,5 +1,6 @@
 ! (c)Joe Groff bsd license
-USING: alien arrays classes help.markup help.syntax kernel math ;
+USING: alien arrays classes help.markup help.syntax kernel math
+specialized-arrays.direct ;
 IN: classes.c-types
 
 HELP: c-type-class
