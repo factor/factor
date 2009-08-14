@@ -1,5 +1,5 @@
-IN: biassocs.tests
 USING: biassocs assocs namespaces tools.test ;
+IN: biassocs.tests
 
 <bihash> "h" set
 

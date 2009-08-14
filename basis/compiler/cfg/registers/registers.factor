@@ -1,18 +1,32 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors namespaces kernel arrays parser math math.order ;
+USING: accessors namespaces kernel parser assocs ;
 IN: compiler.cfg.registers
 
-! Virtual registers, used by CFG and machine IRs
-TUPLE: vreg { reg-class read-only } { n fixnum read-only } ;
-
-M: vreg equal? over vreg? [ [ n>> ] bi@ eq? ] [ 2drop f ] if ;
-
-M: vreg hashcode* nip n>> ;
-
+! Virtual registers, used by CFG and machine IRs, are just integers
 SYMBOL: vreg-counter
 
-: next-vreg ( reg-class -- vreg ) \ vreg-counter counter vreg boa ;
+: next-vreg ( -- vreg )
+    ! This word cannot be called AFTER representation selection has run;
+    ! use next-vreg-rep in that case
+    \ vreg-counter counter ;
+
+SYMBOL: representations
+
+ERROR: bad-vreg vreg ;
+
+: rep-of ( vreg -- rep )
+    ! This word cannot be called BEFORE representation selection has run;
+    ! use any-rep for ##copy instructions and so on
+    representations get ?at [ bad-vreg ] unless ;
+
+: set-rep-of ( rep vreg -- )
+    representations get set-at ;
+
+: next-vreg-rep ( rep -- vreg )
+    ! This word cannot be called BEFORE representation selection has run;
+    ! use next-vreg in that case
+    next-vreg [ set-rep-of ] keep ;
 
 ! Stack locations -- 'n' is an index starting from the top of the stack
 ! going down. So 0 is the top of the stack, 1 is what would be the top
@@ -28,6 +42,5 @@ C: <ds-loc> ds-loc
 TUPLE: rs-loc < loc ;
 C: <rs-loc> rs-loc
 
-SYNTAX: V scan-word scan-word vreg boa parsed ;
 SYNTAX: D scan-word <ds-loc> parsed ;
 SYNTAX: R scan-word <rs-loc> parsed ;

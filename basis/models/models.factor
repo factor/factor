@@ -32,10 +32,10 @@ GENERIC: model-activated ( model -- )
 M: model model-activated drop ;
 
 : ref-model ( model -- n )
-    [ 1+ ] change-ref ref>> ;
+    [ 1 + ] change-ref ref>> ;
 
 : unref-model ( model -- n )
-    [ 1- ] change-ref ref>> ;
+    [ 1 - ] change-ref ref>> ;
 
 : activate-model ( model -- )
     dup ref-model 1 = [

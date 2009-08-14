@@ -29,12 +29,26 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
 
 : empty? ( seq -- ? ) length 0 = ; inline
 
+<PRIVATE
+
+: (if-empty) ( seq quot1 quot2 quot3 -- )
+    [ [ drop ] prepose ] [ ] tri* if ; inline
+
+PRIVATE>
+
 : if-empty ( seq quot1 quot2 -- )
-    [ dup empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
+    [ dup empty? ] (if-empty) ; inline
 
 : when-empty ( seq quot -- ) [ ] if-empty ; inline
 
 : unless-empty ( seq quot -- ) [ ] swap if-empty ; inline
+
+: if-zero ( n quot1 quot2 -- )
+    [ dup zero? ] (if-empty) ; inline
+
+: when-zero ( n quot -- ) [ ] if-zero ; inline
+
+: unless-zero ( n quot -- ) [ ] swap if-zero ; inline
 
 : delete-all ( seq -- ) 0 swap set-length ;
 
@@ -267,9 +281,11 @@ INSTANCE: repetition immutable-sequence
 
 <PRIVATE
 
+ERROR: integer-length-expected obj ;
+
 : check-length ( n -- n )
     #! Ricing.
-    dup integer? [ "length not an integer" throw ] unless ; inline
+    dup integer? [ integer-length-expected ] unless ; inline
 
 : ((copy)) ( dst i src j n -- dst i src j n )
     dup -roll [
@@ -414,8 +430,11 @@ PRIVATE>
 : reduce ( seq identity quot -- result )
     swapd each ; inline
 
+: map-integers ( len quot exemplar -- newseq )
+    [ over ] dip [ [ collect ] keep ] new-like ; inline
+
 : map-as ( seq quot exemplar -- newseq )
-    [ over length ] dip [ [ map-into ] keep ] new-like ; inline
+    [ (each) ] dip map-integers ; inline
 
 : map ( seq quot -- newseq )
     over map-as ; inline
@@ -442,7 +461,7 @@ PRIVATE>
     [ -rot ] dip 2each ; inline
 
 : 2map-as ( seq1 seq2 quot exemplar -- newseq )
-    [ (2each) ] dip map-as ; inline
+    [ (2each) ] dip map-integers ; inline
 
 : 2map ( seq1 seq2 quot -- newseq )
     pick 2map-as ; inline
@@ -454,7 +473,7 @@ PRIVATE>
     (3each) each ; inline
 
 : 3map-as ( seq1 seq2 seq3 quot exemplar -- newseq )
-    [ (3each) ] dip map-as ; inline
+    [ (3each) ] dip map-integers ; inline
 
 : 3map ( seq1 seq2 seq3 quot -- newseq )
     [ pick ] dip swap 3map-as ; inline
@@ -701,7 +720,7 @@ PRIVATE>
     3tri ;
 
 : reverse-here ( seq -- )
-    [ length 2/ ] [ length ] [ ] tri
+    [ length 2/ iota ] [ length ] [ ] tri
     [ [ over - 1 - ] dip exchange-unsafe ] 2curry each ;
 
 : reverse ( seq -- newseq )
@@ -805,14 +824,14 @@ PRIVATE>
 <PRIVATE
 
 : (start) ( subseq seq n -- subseq seq ? )
-    pick length [
+    pick length iota [
         [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
     ] all? nip ; inline
 
 PRIVATE>
 
 : start* ( subseq seq n -- i )
-    pick length pick length swap - 1 +
+    pick length pick length swap - 1 + iota
     [ (start) ] find-from
     swap [ 3drop ] dip ;
 

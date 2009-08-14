@@ -54,7 +54,7 @@ $nl
 ARTICLE: "parsing-words" "Parsing words"
 "The Factor parser follows a simple recursive-descent design. The parser reads successive tokens from the input; if the token identifies a number or an ordinary word, it is added to an accumulator vector. Otherwise if the token identifies a parsing word, the parsing word is executed immediately."
 $nl
-"Parsing words are defined using the a defining word:"
+"Parsing words are defined using the defining word:"
 { $subsection POSTPONE: SYNTAX: }
 "Parsing words have uppercase names by convention. Here is the simplest possible parsing word; it prints a greeting at parse time:"
 { $code "SYNTAX: HELLO \"Hello world\" print ;" }

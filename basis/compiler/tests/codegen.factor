@@ -393,3 +393,12 @@ cell 4 = [
  [ 2 3 1 ] [ 2 3 V{ } coalescing-bug-4 ] unit-test
  [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
  [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
+ 
+! Global stack analysis dataflow equations are wrong
+: some-word ( a -- b ) 2 + ;
+: global-dcn-bug-1 ( a b -- c d )
+    dup [ [ drop 1 ] dip ] [ [ some-word ] dip ] if
+    dup [ [ 1 fixnum+fast ] dip ] [ [ drop 1 ] dip ] if ;
+
+[ 2 t ] [ 0 t global-dcn-bug-1 ] unit-test
+[ 1 f ] [ 0 f global-dcn-bug-1 ] unit-test

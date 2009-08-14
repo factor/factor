@@ -33,7 +33,7 @@ M: persistent-hash pluck-at
     {
         { [ 2dup root>> eq? ] [ nip ] }
         { [ over not ] [ 2drop T{ persistent-hash } ] }
-        [ count>> 1- persistent-hash boa ]
+        [ count>> 1 - persistent-hash boa ]
     } cond ;
 
 M: persistent-hash >alist [ root>> >alist% ] { } make ;

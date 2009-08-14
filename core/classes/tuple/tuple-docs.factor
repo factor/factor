@@ -291,8 +291,7 @@ $nl
 { $subsection POSTPONE: SLOT: }
 "Protocol slots are used where the implementation of a superclass needs to assume that each subclass defines certain slots, however the slots of each subclass are potentially declared with different class specializers, thus preventing the slots from being defined in the superclass."
 $nl
-"For example, the " { $link growable } " mixin provides an implementation of the sequence protocol which wraps an underlying sequence, resizing it as necessary when elements are added beyond the length of the sequence. It assumes that the concrete mixin instances define two slots, " { $snippet "length" } " and " { $snippet "underlying" } ". These slots are defined as protocol slots:"
-{ $snippet "SLOT: length" "SLOT: underlying" }
+"For example, the " { $link growable } " mixin provides an implementation of the sequence protocol which wraps an underlying sequence, resizing it as necessary when elements are added beyond the length of the sequence. It assumes that the concrete mixin instances define two slots, " { $snippet "length" } " and " { $snippet "underlying" } ". These slots are defined as protocol slots: " { $snippet "SLOT: length" } " and " { $snippet "SLOT: underlying" } ". "
 "An alternate approach would be to define " { $link growable } " as a tuple class with these two slots, and have other classes subclass it as required. However, this rules out subclasses defining these slots with custom type declarations."
 $nl
 "For example, compare the definitions of the " { $link sbuf } " class,"
@@ -348,7 +347,7 @@ $nl
 { $list
     { { $snippet "\"predicate\"" } " - a quotation which tests if the top of the stack is an instance of this tuple class" }
     { { $snippet "\"slots\"" } " - a sequence of " { $link slot-spec } " instances" }
-    { { $snippet "\"tuple-layout\"" } " - an array with the tuple size and superclasses encoded in a format amneable to fast method dispatch" }
+    { { $snippet "\"layout\"" } " - an array with the tuple size and superclasses encoded in a format amneable to fast method dispatch" }
 } } ;
 
 HELP: define-tuple-predicate

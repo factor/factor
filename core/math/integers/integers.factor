@@ -121,14 +121,14 @@ M: bignum (log2) bignum-log2 ;
     over zero? [
         2drop 0.0
     ] [
-        dup zero? [
-            2drop 1/0.
+        [
+            drop 1/0.
         ] [
             pre-scale
             /f-loop over odd?
             [ zero? [ 1 + ] unless ] [ drop ] if
             post-scale
-        ] if
+        ] if-zero
     ] if ; inline
 
 M: bignum /f ( m n -- f )

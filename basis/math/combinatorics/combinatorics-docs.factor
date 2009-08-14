@@ -28,7 +28,7 @@ HELP: nCk
 HELP: permutation
 { $values { "n" "a non-negative integer" } { "seq" sequence } { "seq" sequence } }
 { $description "Outputs the " { $snippet "nth" } " lexicographical permutation of " { $snippet "seq" } "." }
-{ $notes "Permutations are 0-based and a bounds error will be thrown if " { $snippet "n" } " is larger than " { $snippet "seq length factorial 1-" } "." }
+{ $notes "Permutations are 0-based and a bounds error will be thrown if " { $snippet "n" } " is larger than " { $snippet "seq length factorial 1 -" } "." }
 { $examples
     { $example "USING: math.combinatorics prettyprint ;"
         "1 3 permutation ." "{ 0 2 1 }" }

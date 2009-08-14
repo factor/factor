@@ -145,7 +145,7 @@ GENERIC: compile-engine ( engine -- obj )
     default get <array> [ <enum> swap update ] keep ;
 
 : lo-tag-number ( class -- n )
-    "type" word-prop dup num-tags get member?
+    "type" word-prop dup num-tags get iota member?
     [ drop object tag-number ] unless ;
 
 M: tag-dispatch-engine compile-engine
@@ -208,9 +208,11 @@ SYMBOL: predicate-engines
 : keep-going? ( assoc -- ? )
     assumed get swap second first class<= ;
 
+ERROR: unreachable ;
+
 : prune-redundant-predicates ( assoc -- default assoc' )
     {
-        { [ dup empty? ] [ drop [ "Unreachable" throw ] { } ] }
+        { [ dup empty? ] [ drop [ unreachable ] { } ] }
         { [ dup length 1 = ] [ first second { } ] }
         { [ dup keep-going? ] [ rest-slice prune-redundant-predicates ] }
         [ [ first second ] [ rest-slice ] bi ]

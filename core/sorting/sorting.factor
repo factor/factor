@@ -155,8 +155,13 @@ PRIVATE>
 
 : natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 
-: sort-keys ( seq -- sortedseq ) [ [ first ] compare ] sort ;
+: sort-with ( seq quot -- sortedseq )
+    [ compare ] curry sort ; inline
+: inv-sort-with ( seq quot -- sortedseq )
+    [ compare invert-comparison ] curry sort ; inline
 
-: sort-values ( seq -- sortedseq ) [ [ second ] compare ] sort ;
+: sort-keys ( seq -- sortedseq ) [ first ] sort-with ;
+
+: sort-values ( seq -- sortedseq ) [ second ] sort-with ;
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;

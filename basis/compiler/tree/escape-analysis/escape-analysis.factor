@@ -15,5 +15,6 @@ IN: compiler.tree.escape-analysis
     init-escaping-values
     H{ } clone allocations set
     H{ } clone slot-accesses set
+    H{ } clone value-classes set
     dup (escape-analysis)
     compute-escaping-allocations ;

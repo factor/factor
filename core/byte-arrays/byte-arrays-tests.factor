@@ -1,5 +1,5 @@
-IN: byte-arrays.tests
 USING: tools.test byte-arrays sequences kernel ;
+IN: byte-arrays.tests
 
 [ 6 B{ 1 2 3 } ] [
     6 B{ 1 2 3 } resize-byte-array

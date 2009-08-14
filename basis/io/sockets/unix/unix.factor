@@ -19,7 +19,7 @@ IN: io.sockets.unix
     [ handle-fd ] 2dip 1 <int> "int" heap-size setsockopt io-error ;
 
 M: unix addrinfo-error ( n -- )
-    dup zero? [ drop ] [ gai_strerror throw ] if ;
+    [ gai_strerror throw ] unless-zero ;
 
 ! Client sockets - TCP and Unix domain
 M: object (get-local-address) ( handle remote -- sockaddr )

@@ -234,7 +234,7 @@ GENERIC: ' ( obj -- ptr )
 
 : bignum-bits ( -- n ) bootstrap-cell-bits 2 - ;
 
-: bignum-radix ( -- n ) bignum-bits 2^ 1- ;
+: bignum-radix ( -- n ) bignum-bits 2^ 1 - ;
 
 : bignum>seq ( n -- seq )
     #! n is positive or zero.
@@ -244,7 +244,7 @@ GENERIC: ' ( obj -- ptr )
 
 : emit-bignum ( n -- )
     dup dup 0 < [ neg ] when bignum>seq
-    [ nip length 1+ emit-fixnum ]
+    [ nip length 1 + emit-fixnum ]
     [ drop 0 < 1 0 ? emit ]
     [ nip emit-seq ]
     2tri ;

@@ -109,7 +109,6 @@ ARTICLE: "math.order" "Linear order protocol"
 { $subsection "order-specifiers" }
 "Utilities for comparing objects:"
 { $subsection after? }
-{ $subsection after? }
 { $subsection before? }
 { $subsection after=? }
 { $subsection before=? }

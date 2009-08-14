@@ -48,9 +48,11 @@ GENERIC: (log2) ( x -- n ) foldable
 
 PRIVATE>
 
+ERROR: log2-expects-positive x ;
+
 : log2 ( x -- n )
     dup 0 <= [
-        "log2 expects positive inputs" throw
+        log2-expects-positive
     ] [
         (log2)
     ] if ; inline

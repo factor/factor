@@ -16,7 +16,7 @@ TUPLE: link attributes clickable ;
 
 : find-nth ( seq quot n -- i elt )
     [ <enum> >alist ] 2dip -rot
-    '[ _ [ second @ ] find-from rot drop swap 1+ ]
+    '[ _ [ second @ ] find-from rot drop swap 1 + ]
     [ f 0 ] 2dip times drop first2 ; inline
 
 : find-first-name ( vector string -- i/f tag/f )
@@ -29,7 +29,7 @@ TUPLE: link attributes clickable ;
 : find-between* ( vector i/f tag/f -- vector )
     over integer? [
         [ tail-slice ] [ name>> ] bi*
-        dupd find-matching-close drop dup [ 1+ ] when
+        dupd find-matching-close drop dup [ 1 + ] when
         [ head ] [ first ] if*
     ] [
         3drop V{ } clone

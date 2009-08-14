@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math math.order fry
 combinators binary-search compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.def-use compiler.cfg.liveness compiler.cfg.rpo
+compiler.cfg.def-use compiler.cfg.liveness compiler.cfg.linearization.order
 compiler.cfg ;
 IN: compiler.cfg.linear-scan.live-intervals
 
@@ -13,8 +13,7 @@ C: <live-range> live-range
 TUPLE: live-interval
 vreg
 reg spill-to reload-from
-start end ranges uses
-copy-from ;
+start end ranges uses ;
 
 GENERIC: covers? ( insn# obj -- ? )
 
@@ -102,15 +101,6 @@ M: vreg-insn compute-live-intervals*
     [ [ temp-vregs ] 2dip '[ [ _ ] dip _ handle-temp ] each ]
     3tri ;
 
-: record-copy ( insn -- )
-    [ dst>> live-intervals get at ] [ src>> ] bi >>copy-from drop ;
-
-M: ##copy compute-live-intervals*
-    [ call-next-method ] [ record-copy ] bi ;
-
-M: ##copy-float compute-live-intervals*
-    [ call-next-method ] [ record-copy ] bi ;
-
 : handle-live-out ( bb -- )
     live-out keys
     basic-block get [ block-from ] [ block-to ] bi
@@ -147,7 +137,8 @@ ERROR: bad-live-interval live-interval ;
 : compute-live-intervals ( cfg -- live-intervals )
     H{ } clone [
         live-intervals set
-        post-order [ compute-live-intervals-step ] each
+        linearization-order <reversed>
+        [ compute-live-intervals-step ] each
     ] keep values dup finish-live-intervals ;
 
 : relevant-ranges ( interval1 interval2 -- ranges1 ranges2 )

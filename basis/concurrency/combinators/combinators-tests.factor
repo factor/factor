@@ -1,7 +1,7 @@
-IN: concurrency.combinators.tests
 USING: concurrency.combinators tools.test random kernel math 
 concurrency.mailboxes threads sequences accessors arrays
 math.parser ;
+IN: concurrency.combinators.tests
 
 [ [ drop ] parallel-each ] must-infer
 { 2 0 } [ [ 2drop ] 2parallel-each ] must-infer-as
@@ -49,7 +49,7 @@ math.parser ;
 
 [ "1a" "4b" "3c" ] [
     2
-    { [ 1- ] [ sq ] [ 1+ ] } parallel-cleave
+    { [ 1 - ] [ sq ] [ 1 + ] } parallel-cleave
     [ number>string ] 3 parallel-napply
     { [ "a" append ] [ "b" append ] [ "c" append ] } parallel-spread
 ] unit-test

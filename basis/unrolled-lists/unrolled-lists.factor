@@ -45,7 +45,7 @@ M: unrolled-list clear-deque
 : <front-node> ( elt front -- node )
     [
         unroll-factor 0 <array>
-        [ unroll-factor 1- swap set-nth ] keep f
+        [ unroll-factor 1 - swap set-nth ] keep f
     ] dip [ node boa dup ] keep
     dup [ (>>prev) ] [ 2drop ] if ; inline
 
@@ -55,12 +55,12 @@ M: unrolled-list clear-deque
     ] [ dup front>> >>back ] if* drop ; inline
 
 : push-front/new ( elt list -- )
-    unroll-factor 1- >>front-pos
+    unroll-factor 1 - >>front-pos
     [ <front-node> ] change-front
     normalize-back ; inline
 
 : push-front/existing ( elt list front -- )
-    [ [ 1- ] change-front-pos ] dip
+    [ [ 1 - ] change-front-pos ] dip
     [ front-pos>> ] [ data>> ] bi* set-nth-unsafe ; inline
 
 M: unrolled-list push-front*
@@ -81,12 +81,12 @@ M: unrolled-list peek-front
 
 : pop-front/existing ( list front -- )
     [ dup front-pos>> ] [ data>> ] bi* [ 0 ] 2dip set-nth-unsafe
-    [ 1+ ] change-front-pos
+    [ 1 + ] change-front-pos
     drop ; inline
 
 M: unrolled-list pop-front*
     dup front>> [ empty-unrolled-list ] unless*
-    over front-pos>> unroll-factor 1- eq?
+    over front-pos>> unroll-factor 1 - eq?
     [ pop-front/new ] [ pop-front/existing ] if ;
 
 : <back-node> ( elt back -- node )
@@ -106,8 +106,8 @@ M: unrolled-list pop-front*
     normalize-front ; inline
 
 : push-back/existing ( elt list back -- )
-    [ [ 1+ ] change-back-pos ] dip
-    [ back-pos>> 1- ] [ data>> ] bi* set-nth-unsafe ; inline
+    [ [ 1 + ] change-back-pos ] dip
+    [ back-pos>> 1 - ] [ data>> ] bi* set-nth-unsafe ; inline
 
 M: unrolled-list push-back*
     dup [ back>> ] [ back-pos>> unroll-factor eq? not ] bi
@@ -116,7 +116,7 @@ M: unrolled-list push-back*
 
 M: unrolled-list peek-back
     dup back>>
-    [ [ back-pos>> 1- ] dip data>> nth-unsafe ]
+    [ [ back-pos>> 1 - ] dip data>> nth-unsafe ]
     [ empty-unrolled-list ]
     if* ;
 
@@ -126,7 +126,7 @@ M: unrolled-list peek-back
     dup back>> [ normalize-front ] [ f >>front drop ] if ; inline
 
 : pop-back/existing ( list back -- )
-    [ [ 1- ] change-back-pos ] dip
+    [ [ 1 - ] change-back-pos ] dip
     [ dup back-pos>> ] [ data>> ] bi* [ 0 ] 2dip set-nth-unsafe
     drop ; inline
 

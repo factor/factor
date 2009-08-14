@@ -1,14 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors math.order assocs kernel sequences
-combinators make classes words cpu.architecture
+combinators make classes words cpu.architecture layouts
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stack-frame ;
 IN: compiler.cfg.build-stack-frame
 
 SYMBOL: frame-required?
-
-SYMBOL: spill-counts
 
 GENERIC: compute-stack-frame* ( insn -- )
 
@@ -30,11 +28,11 @@ M: ##call compute-stack-frame*
 
 M: _gc compute-stack-frame*
     frame-required? on
-    stack-frame new swap gc-root-size>> >>gc-root-size
+    stack-frame new swap tagged-values>> length cells >>gc-root-size
     request-stack-frame ;
 
-M: _spill-counts compute-stack-frame*
-    counts>> stack-frame get (>>spill-counts) ;
+M: _spill-area-size compute-stack-frame*
+    n>> stack-frame get (>>spill-area-size) ;
 
 M: insn compute-stack-frame*
     class frame-required? word-prop [
@@ -45,7 +43,7 @@ M: insn compute-stack-frame*
 
 : compute-stack-frame ( insns -- )
     frame-required? off
-    T{ stack-frame } clone stack-frame set
+    stack-frame new stack-frame set
     [ compute-stack-frame* ] each
     stack-frame get dup stack-frame-size >>total-size drop ;
 

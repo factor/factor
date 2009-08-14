@@ -5,6 +5,7 @@ cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.liveness
+compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.live-intervals
@@ -37,8 +38,4 @@ IN: compiler.cfg.linear-scan
     cfg check-numbering ;
 
 : linear-scan ( cfg -- cfg' )
-    [
-        dup machine-registers (linear-scan)
-        spill-counts get >>spill-counts
-        cfg-changed
-    ] with-scope ;
+    dup machine-registers (linear-scan) ;

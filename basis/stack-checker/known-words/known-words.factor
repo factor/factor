@@ -134,13 +134,17 @@ M: object infer-call*
 
 \ compose [ infer-compose ] "special" set-word-prop
 
+ERROR: bad-executable obj ;
+
+M: bad-executable summary
+    drop "execute must be given a word" ;
+
 : infer-execute ( -- )
     pop-literal nip
     dup word? [
         apply-object
     ] [
-        drop
-        "execute must be given a word" time-bomb
+        \ bad-executable boa time-bomb
     ] if ;
 
 \ execute [ infer-execute ] "special" set-word-prop
@@ -149,7 +153,7 @@ M: object infer-call*
 
 : infer-<tuple-boa> ( -- )
     \ <tuple-boa>
-    peek-d literal value>> second 1+ { tuple } <effect>
+    peek-d literal value>> second 1 + { tuple } <effect>
     apply-word/effect ;
 
 \ <tuple-boa> [ infer-<tuple-boa> ] "special" set-word-prop

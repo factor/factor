@@ -1,8 +1,8 @@
-! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
+! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
-combinators generic layouts ;
+combinators generic layouts memoize ;
 IN: math.intervals
 
 SYMBOL: empty-interval
@@ -11,14 +11,21 @@ SYMBOL: full-interval
 
 TUPLE: interval { from read-only } { to read-only } ;
 
+: closed-point? ( from to -- ? )
+    2dup [ first ] bi@ number=
+    [ [ second ] both? ] [ 2drop f ] if ;
+
 : <interval> ( from to -- interval )
-    2dup [ first ] bi@ {
-        { [ 2dup > ] [ 2drop 2drop empty-interval ] }
-        { [ 2dup = ] [
-            2drop 2dup [ second ] both?
+    {
+        { [ 2dup [ first ] bi@ > ] [ 2drop empty-interval ] }
+        { [ 2dup [ first ] bi@ number= ] [
+            2dup [ second ] both?
             [ interval boa ] [ 2drop empty-interval ] if
         ] }
-        [ 2drop interval boa ]
+        { [ 2dup [ { -1/0. t } = ] [ { 1/0. t } = ] bi* and ] [
+            2drop full-interval
+        ] }
+        [ interval boa ]
     } cond ;
 
 : open-point ( n -- endpoint ) f 2array ;
@@ -48,7 +55,13 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : (a,inf] ( a -- interval ) 1/0. (a,b] ; inline
 
-: [0,inf] ( -- interval ) 0 [a,inf] ; foldable
+MEMO: [0,inf] ( -- interval ) 0 [a,inf] ; foldable
+
+MEMO: fixnum-interval ( -- interval )
+    most-negative-fixnum most-positive-fixnum [a,b] ; inline
+
+MEMO: array-capacity-interval ( -- interval )
+    0 max-array-capacity [a,b] ; inline
 
 : [-inf,inf] ( -- interval ) full-interval ; inline
 
@@ -56,20 +69,23 @@ TUPLE: interval { from read-only } { to read-only } ;
     [ 2dup [ first ] bi@ ] dip call [
         2drop t
     ] [
-        2dup [ first ] bi@ = [
+        2dup [ first ] bi@ number= [
             [ second ] bi@ not or
         ] [
             2drop f
         ] if
     ] if ; inline
 
+: endpoint= ( p1 p2 -- ? )
+    [ [ first ] bi@ number= ] [ [ second ] bi@ eq? ] 2bi and ;
+
 : endpoint< ( p1 p2 -- ? ) [ < ] compare-endpoints ;
 
-: endpoint<= ( p1 p2 -- ? ) [ endpoint< ] 2keep = or ;
+: endpoint<= ( p1 p2 -- ? ) [ endpoint< ] [ endpoint= ] 2bi or ;
 
 : endpoint> ( p1 p2 -- ? ) [ > ] compare-endpoints ;
 
-: endpoint>= ( p1 p2 -- ? ) [ endpoint> ] 2keep = or ;
+: endpoint>= ( p1 p2 -- ? ) [ endpoint> ] [ endpoint= ] 2bi or ;
 
 : endpoint-min ( p1 p2 -- p3 ) [ endpoint< ] most ;
 
@@ -180,7 +196,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     ] [
         interval>points
         2dup [ second ] both?
-        [ [ first ] bi@ = ]
+        [ [ first ] bi@ number= ]
         [ 2drop f ] if
     ] if ;
 
@@ -269,22 +285,6 @@ TUPLE: interval { from read-only } { to read-only } ;
         [ (interval-abs) points>interval ]
     } cond ;
 
-: interval-mod ( i1 i2 -- i3 )
-    #! Inaccurate.
-    [
-        [
-            nip interval-abs to>> first [ neg ] keep (a,b)
-        ] interval-division-op
-    ] do-empty-interval ;
-
-: interval-rem ( i1 i2 -- i3 )
-    #! Inaccurate.
-    [
-        [
-            nip interval-abs to>> first 0 swap [a,b)
-        ] interval-division-op
-    ] do-empty-interval ;
-
 : interval-recip ( i1 -- i2 ) 1 [a,a] swap interval/ ;
 
 : interval-2/ ( i1 -- i2 ) -1 [a,a] interval-shift ;
@@ -294,13 +294,13 @@ SYMBOL: incomparable
 : left-endpoint-< ( i1 i2 -- ? )
     [ swap interval-subset? ]
     [ nip interval-singleton? ]
-    [ [ from>> ] bi@ = ]
+    [ [ from>> ] bi@ endpoint= ]
     2tri and and ;
 
 : right-endpoint-< ( i1 i2 -- ? )
     [ interval-subset? ]
     [ drop interval-singleton? ]
-    [ [ to>> ] bi@ = ]
+    [ [ to>> ] bi@ endpoint= ]
     2tri and and ;
 
 : (interval<) ( i1 i2 -- i1 i2 ? )
@@ -316,10 +316,10 @@ SYMBOL: incomparable
     } cond 2nip ;
 
 : left-endpoint-<= ( i1 i2 -- ? )
-    [ from>> ] dip to>> = ;
+    [ from>> ] [ to>> ] bi* endpoint= ;
 
 : right-endpoint-<= ( i1 i2 -- ? )
-    [ to>> ] dip from>> = ;
+    [ to>> ] [ from>> ] bi* endpoint= ;
 
 : interval<= ( i1 i2 -- ? )
     {
@@ -334,6 +334,25 @@ SYMBOL: incomparable
 
 : interval>= ( i1 i2 -- ? )
     swap interval<= ;
+
+: interval-mod ( i1 i2 -- i3 )
+    {
+        { [ over empty-interval eq? ] [ swap ] }
+        { [ dup empty-interval eq? ] [ ] }
+        { [ dup full-interval eq? ] [ ] }
+        [ interval-abs to>> first [ neg ] keep (a,b) ]
+    } cond
+    swap 0 [a,a] interval>= t eq? [ [0,inf] interval-intersect ] when ;
+
+: (rem-range) ( i -- i' ) interval-abs to>> first 0 swap [a,b) ;
+
+: interval-rem ( i1 i2 -- i3 )
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ dup empty-interval eq? ] [ nip ] }
+        { [ dup full-interval eq? ] [ 2drop [0,inf] ] }
+        [ nip (rem-range) ]
+    } cond ;
 
 : interval-bitand-pos ( i1 i2 -- ? )
     [ to>> first ] bi@ min 0 swap [a,b] ;
