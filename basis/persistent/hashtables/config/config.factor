@@ -4,5 +4,5 @@ USING: layouts kernel parser math ;
 IN: persistent.hashtables.config
 
 : radix-bits ( -- n ) << cell 4 = 4 5 ? parsed >> ; foldable
-: radix-mask ( -- n ) radix-bits 2^ 1- ; foldable
-: full-bitmap-mask ( -- n ) radix-bits 2^ 2^ 1- ; inline
+: radix-mask ( -- n ) radix-bits 2^ 1 - ; foldable
+: full-bitmap-mask ( -- n ) radix-bits 2^ 2^ 1 - ; inline

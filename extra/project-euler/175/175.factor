@@ -42,7 +42,7 @@ IN: project-euler.175
 
 : compute ( vec ratio -- )
     {
-        { [ dup integer? ] [ 1- 0 add-bits ] }
+        { [ dup integer? ] [ 1 - 0 add-bits ] }
         { [ dup 1 < ] [ 1 over - / dupd compute 1 1 add-bits ] }
         [ [ 1 mod compute ] 2keep >integer 0 add-bits ]
     } cond ;

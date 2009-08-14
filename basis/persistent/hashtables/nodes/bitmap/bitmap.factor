@@ -7,7 +7,7 @@ persistent.hashtables.config
 persistent.hashtables.nodes ;
 IN: persistent.hashtables.nodes.bitmap
 
-: index ( bit bitmap -- n ) [ 1- ] dip bitand bit-count ; inline
+: index ( bit bitmap -- n ) [ 1 - ] dip bitand bit-count ; inline
 
 M:: bitmap-node (entry-at) ( key hashcode bitmap-node -- entry )
     [let* | shift [ bitmap-node shift>> ]

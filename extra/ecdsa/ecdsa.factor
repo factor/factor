@@ -57,7 +57,7 @@ PRIVATE>
     KEY EC_KEY_get0_public_key dup 
     [| PUB |
         KEY EC_KEY_get0_group :> GROUP
-        GROUP EC_GROUP_get_degree bits>bytes 1+ :> LEN
+        GROUP EC_GROUP_get_degree bits>bytes 1 + :> LEN
         LEN <byte-array> :> BIN
         GROUP PUB POINT_CONVERSION_COMPRESSED BIN LEN f
         EC_POINT_point2oct ssl-error

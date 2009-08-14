@@ -35,7 +35,7 @@ TUPLE: node value children ;
         ] [
             [
                 [ traverse-step traverse-from-path ]
-                [ tuck children>> swap first 1+ tail-slice % ] 2bi
+                [ tuck children>> swap first 1 + tail-slice % ] 2bi
             ] make-node
         ] if
     ] if ;
@@ -44,7 +44,7 @@ TUPLE: node value children ;
     traverse-step traverse-from-path ;
 
 : (traverse-middle) ( frompath topath gadget -- )
-    [ first 1+ ] [ first ] [ children>> ] tri* <slice> % ;
+    [ first 1 + ] [ first ] [ children>> ] tri* <slice> % ;
 
 : traverse-post ( topath gadget -- )
     traverse-step traverse-to-path ;

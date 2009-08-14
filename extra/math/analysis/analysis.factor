@@ -117,5 +117,5 @@ PRIVATE>
 : stirling-fact ( n -- fact )
     [ pi 2 * * sqrt ]
     [ [ e / ] keep ^ ]
-    [ 12 * recip 1+ ] tri * * ;
+    [ 12 * recip 1 + ] tri * * ;
 

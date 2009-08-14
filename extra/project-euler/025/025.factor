@@ -44,7 +44,7 @@ MEMO: fib ( m -- n )
 <PRIVATE
 
 : (digit-fib) ( n term -- term )
-    2dup fib number>string length > [ 1+ (digit-fib) ] [ nip ] if ;
+    2dup fib number>string length > [ 1 + (digit-fib) ] [ nip ] if ;
 
 : digit-fib ( n -- term )
     1 (digit-fib) ;
@@ -68,7 +68,7 @@ PRIVATE>
 <PRIVATE
 
 : digit-fib* ( n -- term )
-    1- 5 log10 2 / + phi log10 / ceiling >integer ;
+    1 - 5 log10 2 / + phi log10 / ceiling >integer ;
 
 PRIVATE>
 

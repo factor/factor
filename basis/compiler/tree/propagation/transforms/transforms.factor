@@ -20,7 +20,7 @@ IN: compiler.tree.propagation.transforms
 
 : rem-custom-inlining ( #call -- quot/f )
     second value-info literal>> dup integer?
-    [ power-of-2? [ 1- bitand ] f ? ] [ drop f ] if ;
+    [ power-of-2? [ 1 - bitand ] f ? ] [ drop f ] if ;
 
 {
     mod-integer-integer
@@ -162,7 +162,7 @@ CONSTANT: lookup-table-at-max 256
     } 1&& ;
 
 : lookup-table-seq ( assoc -- table )
-    [ keys supremum 1+ ] keep '[ _ at ] { } map-as ;
+    [ keys supremum 1 + ] keep '[ _ at ] { } map-as ;
 
 : lookup-table-quot ( seq -- newquot )
     lookup-table-seq

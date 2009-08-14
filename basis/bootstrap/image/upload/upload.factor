@@ -9,9 +9,9 @@ IN: bootstrap.image.upload
 SYMBOL: upload-images-destination
 
 : destination ( -- dest )
-  upload-images-destination get
-  "slava@factorcode.org:/var/www/factorcode.org/newsite/images/latest/"
-  or ;
+    upload-images-destination get
+    "slava@factorcode.org:/var/www/factorcode.org/newsite/images/latest/"
+    or ;
 
 : checksums ( -- temp ) "checksums.txt" temp-file ;
 

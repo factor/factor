@@ -46,7 +46,7 @@ M: heap heap-size ( heap -- n )
 
 : right ( n -- m ) 1 shift 2 + ; inline
 
-: up ( n -- m ) 1- 2/ ; inline
+: up ( n -- m ) 1 - 2/ ; inline
 
 : data-nth ( n heap -- entry )
     data>> nth-unsafe ; inline
@@ -164,7 +164,7 @@ M: bad-heap-delete summary
 
 M: heap heap-delete ( entry heap -- )
     [ entry>index ] keep
-    2dup heap-size 1- = [
+    2dup heap-size 1 - = [
         nip data-pop*
     ] [
         [ nip data-pop ] 2keep

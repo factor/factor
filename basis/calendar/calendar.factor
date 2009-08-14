@@ -52,7 +52,7 @@ CONSTANT: month-names
     }
 
 : month-name ( n -- string )
-    check-month 1- month-names nth ;
+    check-month 1 - month-names nth ;
 
 CONSTANT: month-abbreviations
     {
@@ -61,7 +61,7 @@ CONSTANT: month-abbreviations
     }
 
 : month-abbreviation ( n -- string )
-    check-month 1- month-abbreviations nth ;
+    check-month 1 - month-abbreviations nth ;
 
 CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 
@@ -113,7 +113,7 @@ CONSTANT: day-abbreviations3
     100 b * d + 4800 -
     m 10 /i + m 3 +
     12 m 10 /i * -
-    e 153 m * 2 + 5 /i - 1+ ;
+    e 153 m * 2 + 5 /i - 1 + ;
 
 GENERIC: easter ( obj -- obj' )
 
@@ -196,7 +196,7 @@ M: real +year ( timestamp n -- timestamp )
     [ float>whole-part swapd days-per-year * +day swap +year ] unless-zero ;
 
 : months/years ( n -- months years )
-    12 /rem dup zero? [ drop 1- 12 ] when swap ; inline
+    12 /rem dup zero? [ drop 1 - 12 ] when swap ; inline
 
 M: integer +month ( timestamp n -- timestamp )
     [ over month>> + months/years [ >>month ] dip +year ] unless-zero ;
@@ -371,10 +371,10 @@ M: duration time-
     #! http://web.textfiles.com/computers/formulas.txt
     #! good for any date since October 15, 1582
     [
-        dup 2 <= [ [ 1- ] [ 12 + ] bi* ] when
+        dup 2 <= [ [ 1 - ] [ 12 + ] bi* ] when
         [ dup [ 4 /i + ] [ 100 /i - ] [ 400 /i + ] tri ] dip
-        [ 1+ 3 * 5 /i + ] keep 2 * +
-    ] dip 1+ + 7 mod ;
+        [ 1 + 3 * 5 /i + ] keep 2 * +
+    ] dip 1 + + 7 mod ;
 
 GENERIC: days-in-year ( obj -- n )
 
@@ -395,7 +395,7 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
     year leap-year? [
         year month day <date>
         year 3 1 <date>
-        after=? [ 1+ ] when
+        after=? [ 1 + ] when
     ] when ;
 
 : day-of-year ( timestamp -- n )

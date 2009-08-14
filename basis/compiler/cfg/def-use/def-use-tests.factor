@@ -8,6 +8,7 @@ compiler.cfg
 compiler.cfg.debugger
 compiler.cfg.instructions
 compiler.cfg.registers ;
+IN: compiler.cfg.def-use.tests
 
 V{
     T{ ##peek f 0 D 0 }

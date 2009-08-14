@@ -202,7 +202,7 @@ PRIVATE>
     lf>crlf [
         utf16n string>alien
         EmptyClipboard win32-error=0/f
-        GMEM_MOVEABLE over length 1+ GlobalAlloc
+        GMEM_MOVEABLE over length 1 + GlobalAlloc
             dup win32-error=0/f
     
         dup GlobalLock dup win32-error=0/f

@@ -278,11 +278,11 @@ IN: compiler.tree.propagation.tests
 ] unit-test
 
 [ V{ fixnum } ] [
-    [ >fixnum dup 100 < [ 1+ ] [ "Oops" throw ] if ] final-classes
+    [ >fixnum dup 100 < [ 1 + ] [ "Oops" throw ] if ] final-classes
 ] unit-test
 
 [ V{ -1 } ] [
-    [ 0 dup 100 < not [ 1+ ] [ 1- ] if ] final-literals
+    [ 0 dup 100 < not [ 1 + ] [ 1 - ] if ] final-literals
 ] unit-test
 
 [ V{ 2 } ] [
@@ -472,7 +472,7 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 ] unit-test
 
 : recursive-test-4 ( i n -- )
-    2dup < [ [ 1+ ] dip recursive-test-4 ] [ 2drop ] if ; inline recursive
+    2dup < [ [ 1 + ] dip recursive-test-4 ] [ 2drop ] if ; inline recursive
 
 [ ] [ [ recursive-test-4 ] final-info drop ] unit-test
 
@@ -487,7 +487,7 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 [ V{ integer } ] [ [ { fixnum } declare recursive-test-6 ] final-classes ] unit-test
 
 : recursive-test-7 ( a -- b )
-    dup 10 < [ 1+ recursive-test-7 ] when ; inline recursive
+    dup 10 < [ 1 + recursive-test-7 ] when ; inline recursive
 
 [ V{ fixnum } ] [ [ 0 recursive-test-7 ] final-classes ] unit-test
 
@@ -645,7 +645,7 @@ MIXIN: empty-mixin
 ] unit-test
   
 [ V{ bignum } ] [
-    [ { bignum } declare dup 1- bitxor ] final-classes
+    [ { bignum } declare dup 1 - bitxor ] final-classes
 ] unit-test
 
 [ V{ bignum integer } ] [
@@ -685,7 +685,7 @@ MIXIN: empty-mixin
 
 TUPLE: littledan-1 { a read-only } ;
 
-: (littledan-1-test) ( a -- ) a>> 1+ littledan-1 boa (littledan-1-test) ; inline recursive
+: (littledan-1-test) ( a -- ) a>> 1 + littledan-1 boa (littledan-1-test) ; inline recursive
 
 : littledan-1-test ( -- ) 0 littledan-1 boa (littledan-1-test) ; inline
 
@@ -702,7 +702,7 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 [ ] [ [ littledan-2-test ] final-classes drop ] unit-test
 
 : (littledan-3-test) ( x -- )
-    length 1+ f <array> (littledan-3-test) ; inline recursive
+    length 1 + f <array> (littledan-3-test) ; inline recursive
 
 : littledan-3-test ( -- )
     0 f <array> (littledan-3-test) ; inline
@@ -711,7 +711,7 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 
 [ V{ 0 } ] [ [ { } length ] final-literals ] unit-test
 
-[ V{ 1 } ] [ [ { } length 1+ f <array> length ] final-literals ] unit-test
+[ V{ 1 } ] [ [ { } length 1 + f <array> length ] final-literals ] unit-test
 
 ! generalize-counter is not tight enough
 [ V{ fixnum } ] [ [ 0 10 [ 1 + >fixnum ] times ] final-classes ] unit-test

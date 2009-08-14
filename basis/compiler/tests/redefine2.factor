@@ -1,7 +1,7 @@
-IN: compiler.tests.redefine2
 USING: compiler compiler.units tools.test math parser kernel
 sequences sequences.private classes.mixin generic definitions
 arrays words assocs eval words.symbol ;
+IN: compiler.tests.redefine2
 
 DEFER: redefine2-test
 

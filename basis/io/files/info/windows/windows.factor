@@ -109,11 +109,11 @@ M: windows link-info ( path -- info )
     file-info ;
 
 : volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
-    MAX_PATH 1+ [ <byte-array> ] keep
+    MAX_PATH 1 + [ <byte-array> ] keep
     "DWORD" <c-object>
     "DWORD" <c-object>
     "DWORD" <c-object>
-    MAX_PATH 1+ [ <byte-array> ] keep
+    MAX_PATH 1 + [ <byte-array> ] keep
     [ GetVolumeInformation win32-error=0/f ] 7 nkeep
     drop 5 nrot drop
     [ utf16n alien>string ] 4 ndip
@@ -165,13 +165,13 @@ M: winnt file-system-info ( path -- file-system-info )
     ] if ;
 
 : find-first-volume ( -- string handle )
-    MAX_PATH 1+ [ <byte-array> ] keep
+    MAX_PATH 1 + [ <byte-array> ] keep
     dupd
     FindFirstVolume dup win32-error=0/f
     [ utf16n alien>string ] dip ;
 
 : find-next-volume ( handle -- string/f )
-    MAX_PATH 1+ [ <byte-array> tuck ] keep
+    MAX_PATH 1 + [ <byte-array> tuck ] keep
     FindNextVolume 0 = [
         GetLastError ERROR_NO_MORE_FILES =
         [ drop f ] [ win32-error-string throw ] if

@@ -28,7 +28,7 @@ IN: project-euler.045
 <PRIVATE
 
 : nth-hexagonal ( n -- m )
-    dup 2 * 1- * ;
+    dup 2 * 1 - * ;
 
 DEFER: next-solution
 
@@ -36,7 +36,7 @@ DEFER: next-solution
     dup pentagonal? [ nip ] [ drop next-solution ] if ;
 
 : next-solution ( n -- m )
-    1+ dup nth-hexagonal (next-solution) ;
+    1 + dup nth-hexagonal (next-solution) ;
 
 PRIVATE>
 

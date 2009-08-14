@@ -88,7 +88,7 @@ TUPLE: sequence-parser sequence n ;
     ] take-until :> found
     growing sequence sequence= [
         found dup length
-        growing length 1- - head
+        growing length 1 - - head
         sequence-parser [ growing length - 1 + ] change-n drop
         ! sequence-parser advance drop
     ] [
