@@ -1,5 +1,5 @@
-IN: bit-sets.tests
 USING: bit-sets tools.test bit-arrays ;
+IN: bit-sets.tests
 
 [ ?{ t f t f t f } ] [
     ?{ t f f f t f }

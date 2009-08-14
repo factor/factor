@@ -1,11 +1,9 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
 USING: accessors arrays assocs calendar combinators fry kernel
 generalizations io io.streams.string macros math math.functions
 math.parser peg.ebnf quotations sequences splitting strings
 unicode.categories unicode.case vectors combinators.smart ;
-
 IN: formatting
 
 <PRIVATE
@@ -16,10 +14,10 @@ IN: formatting
 : fix-sign ( string -- string )
     dup CHAR: 0 swap index 0 = 
       [ dup 0 swap [ [ CHAR: 0 = not ] keep digit? and ] find-from
-         [ dup 1- rot dup [ nth ] dip swap
+         [ dup 1 - rot dup [ nth ] dip swap
             {
-               { CHAR: - [ [ 1- ] dip remove-nth "-" prepend ] }
-               { CHAR: + [ [ 1- ] dip remove-nth "+" prepend ] }
+               { CHAR: - [ [ 1 - ] dip remove-nth "-" prepend ] }
+               { CHAR: + [ [ 1 - ] dip remove-nth "+" prepend ] }
                [ drop swap drop ] 
             } case 
          ] [ drop ] if
@@ -39,8 +37,8 @@ IN: formatting
         abs 0 swap
         [ dup [ 10.0 >= ] [ 1.0 < ] bi or ]
         [ dup 10.0 >=
-          [ 10.0 / [ 1+ ] dip ]
-          [ 10.0 * [ 1- ] dip ] if
+          [ 10.0 / [ 1 + ] dip ]
+          [ 10.0 * [ 1 - ] dip ] if
         ] while 
      ] keep 0 < [ neg ] when ;
 

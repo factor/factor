@@ -28,13 +28,13 @@ PRIVATE>
 M: vlist ppush
     >vlist<
     2dup length = [ unshare ] unless
-    [ [ 1+ swap ] dip push ] keep vlist boa ;
+    [ [ 1 + swap ] dip push ] keep vlist boa ;
 
 ERROR: empty-vlist-error ;
 
 M: vlist ppop
     [ empty-vlist-error ]
-    [ [ length>> 1- ] [ vector>> ] bi vlist boa ] if-empty ;
+    [ [ length>> 1 - ] [ vector>> ] bi vlist boa ] if-empty ;
 
 M: vlist clone
     [ length>> ] [ vector>> >vector ] bi vlist boa ;
@@ -65,7 +65,7 @@ M: valist assoc-size vlist>> length 2/ ;
 : valist-at ( key i array -- value ? )
     over 0 >= [
         3dup nth-unsafe = [
-            [ 1+ ] dip nth-unsafe nip t
+            [ 1 + ] dip nth-unsafe nip t
         ] [
             [ 2 - ] dip valist-at
         ] if

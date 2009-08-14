@@ -42,7 +42,7 @@ GENERIC: deep-fry ( obj -- )
     check-fry
     [ [ deep-fry ] each ] [ ] make
     [ dup \ @ = [ drop [ _ call ] ] [ 1array ] if ] map concat
-    { _ } split [ spread>quot ] [ length 1- ] bi ;
+    { _ } split [ spread>quot ] [ length 1 - ] bi ;
 
 PRIVATE>
 

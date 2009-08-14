@@ -35,7 +35,7 @@ M: slice-chunking nth-unsafe group@ slice boa ;
 TUPLE: abstract-groups < chunking-seq ;
 
 M: abstract-groups length
-    [ seq>> length ] [ n>> ] bi [ + 1- ] keep /i ;
+    [ seq>> length ] [ n>> ] bi [ + 1 - ] keep /i ;
 
 M: abstract-groups set-length
     [ n>> * ] [ seq>> ] bi set-length ;
@@ -46,10 +46,10 @@ M: abstract-groups group@
 TUPLE: abstract-clumps < chunking-seq ;
 
 M: abstract-clumps length
-    [ seq>> length ] [ n>> ] bi - 1+ ;
+    [ seq>> length ] [ n>> ] bi - 1 + ;
 
 M: abstract-clumps set-length
-    [ n>> + 1- ] [ seq>> ] bi set-length ;
+    [ n>> + 1 - ] [ seq>> ] bi set-length ;
 
 M: abstract-clumps group@
     [ n>> over + ] [ seq>> ] bi ;

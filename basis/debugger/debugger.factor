@@ -36,7 +36,7 @@ M: string error. print ;
     error-continuation get name>> assoc-stack ;
 
 : :res ( n -- * )
-    1- restarts get-global nth f restarts set-global restart ;
+    1 - restarts get-global nth f restarts set-global restart ;
 
 : :1 ( -- * ) 1 :res ;
 : :2 ( -- * ) 2 :res ;
@@ -44,7 +44,7 @@ M: string error. print ;
 
 : restart. ( restart n -- )
     [
-        1+ dup 3 <= [ ":" % # "    " % ] [ # " :res  " % ] if
+        1 + dup 3 <= [ ":" % # "    " % ] [ # " :res  " % ] if
         name>> %
     ] "" make print ;
 
@@ -92,7 +92,7 @@ HOOK: signal-error. os ( obj -- )
 
 : array-size-error. ( obj -- )
     "Invalid array size: " write dup third .
-    "Maximum: " write fourth 1- . ;
+    "Maximum: " write fourth 1 - . ;
 
 : c-string-error. ( obj -- )
     "Cannot convert to C string: " write third . ;

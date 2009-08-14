@@ -39,7 +39,7 @@ IN: project-euler.common
 <PRIVATE
 
 : max-children ( seq -- seq )
-    [ dup length 1- [ nth-pair max , ] with each ] { } make ;
+    [ dup length 1 - [ nth-pair max , ] with each ] { } make ;
 
 ! Propagate one row into the upper one
 : propagate ( bottom top -- newtop )
@@ -57,7 +57,7 @@ IN: project-euler.common
 PRIVATE>
 
 : alpha-value ( str -- n )
-    >lower [ CHAR: a - 1+ ] sigma ;
+    >lower [ CHAR: a - 1 + ] sigma ;
 
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
     [ [ 2array ] with map ] curry map concat ;
@@ -76,13 +76,13 @@ PRIVATE>
     [ dup 0 = not ] [ 10 /mod ] produce reverse nip ;
 
 : number-length ( n -- m )
-    log10 floor 1+ >integer ;
+    log10 floor 1 + >integer ;
 
 : nth-prime ( n -- n )
-    1- lprimes lnth ;
+    1 - lprimes lnth ;
 
 : nth-triangle ( n -- n )
-    dup 1+ * 2 / ;
+    dup 1 + * 2 / ;
 
 : palindrome? ( n -- ? )
     number>string dup reverse = ;
@@ -91,7 +91,7 @@ PRIVATE>
     number>string natural-sort >string "123456789" = ;
 
 : pentagonal? ( n -- ? )
-    dup 0 > [ 24 * 1+ sqrt 1+ 6 / 1 mod zero? ] [ drop f ] if ;
+    dup 0 > [ 24 * 1 + sqrt 1 + 6 / 1 mod zero? ] [ drop f ] if ;
 
 : penultimate ( seq -- elt )
     dup length 2 - swap nth ;
@@ -119,11 +119,11 @@ PRIVATE>
 
 ! The divisor function, counts the number of divisors
 : tau ( m -- n )
-    group-factors flip second 1 [ 1+ * ] reduce ;
+    group-factors flip second 1 [ 1 + * ] reduce ;
 
 ! Optimized brute-force, is often faster than prime factorization
 : tau* ( m -- n )
-    factor-2s dup [ 1+ ]
+    factor-2s dup [ 1 + ]
     [ perfect-square? -1 0 ? ]
     [ dup sqrt >fixnum [1,b] ] tri* [
         dupd divisor? [ [ 2 + ] dip ] when

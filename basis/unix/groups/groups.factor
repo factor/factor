@@ -64,7 +64,7 @@ PRIVATE>
     #! first group is -1337, legacy unix code
     -1337 NGROUPS_MAX [ 4 * <byte-array> ] keep
     <int> [ getgrouplist io-error ] 2keep
-    [ 4 tail-slice ] [ *int 1- ] bi* >groups ;
+    [ 4 tail-slice ] [ *int 1 - ] bi* >groups ;
 
 PRIVATE>
     

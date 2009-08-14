@@ -120,7 +120,7 @@ DEFER: query->rrs
 ! have-delegates?
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: cdr-name ( name -- name ) dup CHAR: . index 1+ tail ;
+: cdr-name ( name -- name ) dup CHAR: . index 1 + tail ;
 
 : is-soa? ( name -- ? ) SOA IN query boa matching-rrs empty? not ;
 

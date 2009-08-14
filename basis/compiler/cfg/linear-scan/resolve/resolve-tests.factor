@@ -1,9 +1,9 @@
-IN: compiler.cfg.linear-scan.resolve.tests
 USING: compiler.cfg.linear-scan.resolve tools.test kernel namespaces
 accessors
 compiler.cfg
 compiler.cfg.instructions cpu.architecture make sequences
 compiler.cfg.linear-scan.allocation.state ;
+IN: compiler.cfg.linear-scan.resolve.tests
 
 [
     {

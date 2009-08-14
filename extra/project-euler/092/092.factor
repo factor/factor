@@ -38,7 +38,7 @@ IN: project-euler.092
     567 [1,b] [ chain-ending ] map ;
 
 : fast-chain-ending ( seq n -- m )
-    dup 567 > [ next-link ] when 1- swap nth ;
+    dup 567 > [ next-link ] when 1 - swap nth ;
 
 PRIVATE>
 

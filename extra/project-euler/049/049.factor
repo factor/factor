@@ -27,7 +27,7 @@ IN: project-euler.049
 
 : count-digits ( n -- byte-array )
     10 <byte-array> [
-        '[ 10 /mod _ [ 1+ ] change-nth dup 0 > ] loop drop
+        '[ 10 /mod _ [ 1 + ] change-nth dup 0 > ] loop drop
     ] keep ;
 
 HINTS: count-digits fixnum ;
