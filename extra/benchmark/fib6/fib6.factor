@@ -4,7 +4,7 @@ IN: benchmark.fib6
 : fib ( x -- y )
     "int" { "int" } "cdecl" [
         dup 1 <= [ drop 1 ] [
-            1 - dup fib swap 1- fib +
+            1 - dup fib swap 1 - fib +
         ] if
     ] alien-callback
     "int" { "int" } "cdecl" alien-indirect ;
