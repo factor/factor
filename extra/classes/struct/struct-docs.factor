@@ -7,16 +7,16 @@ HELP: <struct-boa>
 { $values
     { "class" class }
 }
-{ $description "This macro implements " { $link boa } " for " { $link struct } " classes. User code does not need to call this word directly and should use " { $snippet "boa" } " instead." } ;
+{ $description "This macro implements " { $link boa } " for " { $link struct } " classes. A struct of the given class is constructed, and its slots are initialized using values off the top of the datastack." } ;
 
 HELP: <struct>
 { $values
     { "class" class }
     { "struct" struct }
 }
-{ $description "Allocates garbage-collected heap memory for a new " { $link struct } " of the specified " { $snippet "class" } ". The new struct's slots are left uninitialized; to allocate a struct with the slots initialized, call " { $link new } " or " { $link boa } " instead." } ;
+{ $description "Allocates garbage-collected heap memory for a new " { $link struct } " of the specified " { $snippet "class" } ". The new struct's slots are initialized with the initial values specified in the struct definition." } ;
 
-{ <struct> malloc-struct memory>struct } related-words
+{ <struct> <struct-boa> malloc-struct memory>struct } related-words
 
 HELP: STRUCT:
 { $syntax "STRUCT: class { slot type } { slot type } ... ;" }
@@ -75,7 +75,9 @@ HELP: struct-class
 ARTICLE: "classes.struct" "Struct classes"
 { $link struct } " classes are similar to " { $link tuple } "s, but their slots exhibit value semantics, and they are backed by a contiguous structured block of memory. Structs can be used for structured access to C memory or Factor byte arrays and for passing struct values in and out of the FFI. Struct types are defined using a syntax similar to tuple syntax:"
 { $subsection POSTPONE: STRUCT: }
-"Structs can be allocated with " { $link new } " and " { $link boa } " like tuples. Additional words are provided for building structs from C memory and from existing buffers:"
+"Structs can be allocated with " { $link new } "- and " { $link boa } "-like constructor words. Additional words are provided for building structs from C memory and from existing buffers:"
+{ $subsection <struct> }
+{ $subsection <struct-boa> }
 { $subsection malloc-struct }
 { $subsection memory>struct }
 "Structs have literal syntax like tuples:"
