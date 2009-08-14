@@ -138,7 +138,7 @@ MACRO: printf ( format-string -- )
 
 : (week-of-year) ( timestamp day -- n )
     [ dup clone 1 >>month 1 >>day day-of-week dup ] dip > [ 7 swap - ] when
-    [ day-of-year ] dip 2dup < [ 0 2nip ] [ - 7 / 1+ >fixnum ] if ;
+    [ day-of-year ] dip 2dup < [ 0 2nip ] [ - 7 / 1 + >fixnum ] if ;
 
 : week-of-year-sunday ( timestamp -- n ) 0 (week-of-year) ; inline
 

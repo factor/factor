@@ -38,7 +38,7 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
 
 GENERIC: end/start ( string regexp -- end start )
 M: regexp end/start drop length 0 ;
-M: reverse-regexp end/start drop length 1- -1 swap ;
+M: reverse-regexp end/start drop length 1 - -1 swap ;
 
 PRIVATE>
 
