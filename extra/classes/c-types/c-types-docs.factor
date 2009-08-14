@@ -13,13 +13,13 @@ HELP: direct-array-of
     { "alien" c-ptr } { "len" integer } { "class" c-type-class }
     { "array" "a direct array" }
 }
-{ $description "Constructs a direct array over " { $snippet "len" } " elements of type " { $snippet "class" } " located at the referenced location in memory." } ;
+{ $description "Constructs one of the " { $link "specialized-arrays.direct" } " over " { $snippet "len" } " elements of type " { $snippet "class" } " located at the referenced location in raw memory." } ;
 
 HELP: int
 { $class-description "A signed four-byte integer quantity." } ;
 
 HELP: long
-{ $class-description "A signed integer quantity. On 64-bit Unix platforms, this is an eight-byte quantity; on Windows and on 32-bit Unix platforms, it is four bytes." } ;
+{ $class-description "A signed integer quantity. On 64-bit Unix platforms, this is an eight-byte type; on Windows and on 32-bit Unix platforms, it is four bytes." } ;
 
 HELP: longlong
 { $class-description "A signed eight-byte integer quantity." } ;
@@ -40,7 +40,7 @@ HELP: uint
 { $class-description "An unsigned four-byte integer quantity." } ;
 
 HELP: ulong
-{ $class-description "An unsigned integer quantity. On 64-bit Unix platforms, this is an eight-byte quantity; on Windows and on 32-bit Unix platforms, it is four bytes." } ;
+{ $class-description "An unsigned integer quantity. On 64-bit Unix platforms, this is an eight-byte type; on Windows and on 32-bit Unix platforms, it is four bytes." } ;
 
 HELP: ulonglong
 { $class-description "An unsigned eight-byte integer quantity." } ;
@@ -64,6 +64,8 @@ ARTICLE: "classes.c-types" "C type classes"
 { $subsection float }
 { $subsection single-complex }
 { $subsection complex }
-{ $subsection pinned-c-ptr } ;
+{ $subsection pinned-c-ptr }
+"The vocabulary also provides a word for constructing " { $link "specialized-arrays.direct" } " of C types over raw memory:"
+{ $subsection direct-array-of } ;
 
 ABOUT: "classes.c-types"
