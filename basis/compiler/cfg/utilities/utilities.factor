@@ -46,7 +46,7 @@ SYMBOL: visited
 : add-instructions ( bb quot -- )
     [ instructions>> building ] dip '[
         building get pop
-        @
+        [ @ ] dip
         ,
     ] with-variable ; inline
 
