@@ -357,10 +357,10 @@ M: character-type (<fortran-result>)
 
 : (shuffle-map) ( return parameters -- ret par )
     [
-        fortran-ret-type>c-type length swap "void" = [ 1+ ] unless
+        fortran-ret-type>c-type length swap "void" = [ 1 + ] unless
         letters swap head [ "ret" swap suffix ] map
     ] [
-        [ fortran-arg-type>c-type nip length 1+ ] map letters swap zip
+        [ fortran-arg-type>c-type nip length 1 + ] map letters swap zip
         [ first2 letters swap head [ "" 2sequence ] with map ] map concat
     ] bi* ;
 

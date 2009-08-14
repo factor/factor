@@ -11,7 +11,7 @@ DEFER: word-1
 
 : word-3 ( a -- b ) 1 + ;
 
-: word-4 ( a -- b c ) 0 swap word-3 swap 1+ ;
+: word-4 ( a -- b c ) 0 swap word-3 swap 1 + ;
 
 [ 1 1 ] [ 0 word-4 ] unit-test
 

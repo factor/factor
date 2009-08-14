@@ -11,7 +11,7 @@ IN: crypto.passwd-md5
     "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" nth ; inline
 
 : to64 ( v n -- string )
-    [ [ -6 shift ] [ 6 2^ 1- bitand lookup-table ] bi ]
+    [ [ -6 shift ] [ 6 2^ 1 - bitand lookup-table ] bi ]
     replicate nip ; inline
 
 PRIVATE>

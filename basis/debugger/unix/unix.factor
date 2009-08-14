@@ -13,7 +13,7 @@ CONSTANT: signal-names
     "SIGUSR1" "SIGUSR2"
 }
 
-: signal-name ( n -- str/f ) 1- signal-names ?nth ;
+: signal-name ( n -- str/f ) 1 - signal-names ?nth ;
 
 : signal-name. ( n -- )
     signal-name [ " (" ")" surround write ] when* ;

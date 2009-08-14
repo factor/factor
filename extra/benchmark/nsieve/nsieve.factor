@@ -1,6 +1,6 @@
-IN: benchmark.nsieve
 USING: math math.parser sequences sequences.private kernel
 arrays make io ;
+IN: benchmark.nsieve
 
 : clear-flags ( step i seq -- )
     2dup length >= [
@@ -13,14 +13,14 @@ arrays make io ;
     2dup length < [
         2dup nth-unsafe [
             over dup 2 * pick clear-flags
-            rot 1+ -rot ! increment count
-        ] when [ 1+ ] dip (nsieve)
+            rot 1 + -rot ! increment count
+        ] when [ 1 + ] dip (nsieve)
     ] [
         2drop
     ] if ; inline recursive
 
 : nsieve ( m -- count )
-    0 2 rot 1+ t <array> (nsieve) ;
+    0 2 rot 1 + t <array> (nsieve) ;
 
 : nsieve. ( m -- )
     [ "Primes up to " % dup # " " % nsieve # ] "" make print ;

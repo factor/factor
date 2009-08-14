@@ -24,20 +24,20 @@ MACRO: narray ( n -- )
     '[ _ { } nsequence ] ;
 
 MACRO: nsum ( n -- )
-    1- [ + ] n*quot ;
+    1 - [ + ] n*quot ;
 
 MACRO: firstn-unsafe ( n -- )
     [ '[ [ _ ] dip nth-unsafe ] ] map '[ _ cleave ] ;
 
 MACRO: firstn ( n -- )
     dup zero? [ drop [ drop ] ] [
-        [ 1- swap bounds-check 2drop ]
+        [ 1 - swap bounds-check 2drop ]
         [ firstn-unsafe ]
         bi-curry '[ _ _ bi ]
     ] if ;
 
 MACRO: npick ( n -- )
-    1- [ dup ] [ '[ _ dip swap ] ] repeat ;
+    1 - [ dup ] [ '[ _ dip swap ] ] repeat ;
 
 MACRO: nover ( n -- )
     dup 1 + '[ _ npick ] n*quot ;
@@ -46,10 +46,10 @@ MACRO: ndup ( n -- )
     dup '[ _ npick ] n*quot ;
 
 MACRO: nrot ( n -- )
-    1- [ ] [ '[ _ dip swap ] ] repeat ;
+    1 - [ ] [ '[ _ dip swap ] ] repeat ;
 
 MACRO: -nrot ( n -- )
-    1- [ ] [ '[ swap _ dip ] ] repeat ;
+    1 - [ ] [ '[ swap _ dip ] ] repeat ;
 
 MACRO: ndrop ( n -- )
     [ drop ] n*quot ;
@@ -91,7 +91,7 @@ MACRO: napply ( quot n -- )
     swap <repetition> spread>quot ;
 
 MACRO: mnswap ( m n -- )
-    1+ '[ _ -nrot ] swap '[ _ _ napply ] ;
+    1 + '[ _ -nrot ] swap '[ _ _ napply ] ;
 
 MACRO: nweave ( n -- )
     [ dup <reversed> [ '[ _ _ mnswap ] ] with map ] keep

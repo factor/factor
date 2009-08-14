@@ -93,7 +93,7 @@ PRIVATE>
 : first-grapheme ( str -- i )
     unclip-slice grapheme-class over
     [ grapheme-class [ nip ] [ grapheme-break? ] 2bi ] find drop
-    nip swap length or 1+ ;
+    nip swap length or 1 + ;
 
 : first-grapheme-from ( start str -- i )
     over tail-slice first-grapheme + ;
@@ -192,13 +192,13 @@ to: word-table
     swap [ format/extended? not ] find-from drop ;
 
 : walk-up ( str i -- j )
-    dupd 1+ (walk-up) [ 1+ (walk-up) ] [ drop f ] if* ;
+    dupd 1 + (walk-up) [ 1 + (walk-up) ] [ drop f ] if* ;
 
 : (walk-down) ( str i -- j )
     swap [ format/extended? not ] find-last-from drop ;
 
 : walk-down ( str i -- j )
-    dupd (walk-down) [ 1- (walk-down) ] [ drop f ] if* ;
+    dupd (walk-down) [ 1 - (walk-down) ] [ drop f ] if* ;
 
 : word-break? ( str i table-entry -- ? )
     {
@@ -226,7 +226,7 @@ PRIVATE>
 : first-word ( str -- i )
     [ unclip-slice word-break-prop over <enum> ] keep
     '[ swap _ word-break-next ] assoc-find 2drop
-    nip swap length or 1+ ;
+    nip swap length or 1 + ;
 
 : >words ( str -- words )
     [ first-word ] >pieces ;
@@ -234,7 +234,7 @@ PRIVATE>
 <PRIVATE
 
 : nth-next ( i str -- str[i-1] str[i] )
-    [ [ 1- ] keep ] dip '[ _ nth ] bi@ ;
+    [ [ 1 - ] keep ] dip '[ _ nth ] bi@ ;
 
 PRIVATE>
 

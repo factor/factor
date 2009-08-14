@@ -1,4 +1,3 @@
-IN: compiler.cfg.builder.tests
 USING: tools.test kernel sequences words sequences.private fry
 prettyprint alien alien.accessors math.private compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.builder compiler.cfg.debugger
@@ -6,6 +5,7 @@ compiler.cfg.optimizer compiler.cfg.predecessors compiler.cfg.checker
 compiler.cfg arrays locals byte-arrays kernel.private math
 slots.private vectors sbufs strings math.partial-dispatch
 strings.private ;
+IN: compiler.cfg.builder.tests
 
 ! Just ensure that various CFGs build correctly.
 : unit-test-cfg ( quot -- )

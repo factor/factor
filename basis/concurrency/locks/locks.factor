@@ -57,7 +57,7 @@ TUPLE: rw-lock readers writers reader# writer ;
 <PRIVATE
 
 : add-reader ( lock -- )
-    [ 1+ ] change-reader# drop ;
+    [ 1 + ] change-reader# drop ;
 
 : acquire-read-lock ( lock timeout -- )
     over writer>>
@@ -68,7 +68,7 @@ TUPLE: rw-lock readers writers reader# writer ;
     writers>> notify-1 ;
 
 : remove-reader ( lock -- )
-    [ 1- ] change-reader# drop ;
+    [ 1 - ] change-reader# drop ;
 
 : release-read-lock ( lock -- )
     dup remove-reader

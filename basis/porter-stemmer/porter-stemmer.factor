@@ -7,7 +7,7 @@ IN: porter-stemmer
     ] [
         CHAR: y = [
             over zero?
-            [ 2drop t ] [ [ 1- ] dip consonant? not ] if
+            [ 2drop t ] [ [ 1 - ] dip consonant? not ] if
         ] [
             2drop t
         ] if
@@ -15,18 +15,18 @@ IN: porter-stemmer
 
 : skip-vowels ( i str -- i str )
     2dup bounds-check? [
-        2dup consonant? [ [ 1+ ] dip skip-vowels ] unless
+        2dup consonant? [ [ 1 + ] dip skip-vowels ] unless
     ] when ;
 
 : skip-consonants ( i str -- i str )
     2dup bounds-check? [
-        2dup consonant? [ [ 1+ ] dip skip-consonants ] when
+        2dup consonant? [ [ 1 + ] dip skip-consonants ] when
     ] when ;
 
 : (consonant-seq) ( n i str -- n )
     skip-vowels
     2dup bounds-check? [
-        [ 1+ ] [ 1+ ] [ ] tri* skip-consonants [ 1+ ] dip
+        [ 1 + ] [ 1 + ] [ ] tri* skip-consonants [ 1 + ] dip
         (consonant-seq)
     ] [
         2drop
@@ -42,7 +42,7 @@ IN: porter-stemmer
     over 1 < [
         2drop f
     ] [
-        2dup nth [ over 1- over nth ] dip = [
+        2dup nth [ over 1 - over nth ] dip = [
             consonant?
         ] [
             2drop f
@@ -92,7 +92,7 @@ IN: porter-stemmer
         { [ "bl" ?tail ] [ "ble" append ] }
         { [ "iz" ?tail ] [ "ize" append ] }
         {
-            [ dup length 1- over double-consonant? ]
+            [ dup length 1 - over double-consonant? ]
             [ dup "lsz" last-is? [ but-last-slice ] unless ]
         }
         {
@@ -206,7 +206,7 @@ IN: porter-stemmer
 : ll->l ( str -- newstr )
     {
         { [ dup last CHAR: l = not ] [ ] }
-        { [ dup length 1- over double-consonant? not ] [ ] }
+        { [ dup length 1 - over double-consonant? not ] [ ] }
         { [ dup consonant-seq 1 > ] [ but-last-slice ] }
         [ ]
     } cond ;

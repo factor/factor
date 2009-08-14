@@ -41,21 +41,21 @@ TUPLE: game-loop-error game-loop error ;
 <PRIVATE
 
 : redraw ( loop -- )
-    [ 1+ ] change-frame-number
+    [ 1 + ] change-frame-number
     [ tick-slice ] [ delegate>> ] bi draw* ;
 
 : tick ( loop -- )
     delegate>> tick* ;
 
 : increment-tick ( loop -- )
-    [ 1+ ] change-tick-number
+    [ 1 + ] change-tick-number
     dup tick-length>> [ + ] curry change-last-tick
     drop ;
 
 : ?tick ( loop count -- )
     [ millis >>last-tick drop ] [
         over [ since-last-tick ] [ tick-length>> ] bi >=
-        [ [ drop increment-tick ] [ drop tick ] [ 1- ?tick ] 2tri ]
+        [ [ drop increment-tick ] [ drop tick ] [ 1 - ?tick ] 2tri ]
         [ 2drop ] if
     ] if-zero ;
 

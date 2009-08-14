@@ -28,7 +28,7 @@ HELP: output>array
     { $example
         <" USING: combinators combinators.smart math prettyprint ;
 9 [
-    { [ 1- ] [ 1+ ] [ sq ] } cleave
+    { [ 1 - ] [ 1 + ] [ sq ] } cleave
 ] output>array .">
     "{ 8 10 81 }"
     }
@@ -71,7 +71,7 @@ HELP: sum-outputs
 { $examples
     { $example
         "USING: combinators.smart kernel math prettyprint ;"
-        "10 [ [ 1- ] [ 1+ ] bi ] sum-outputs ."
+        "10 [ [ 1 - ] [ 1 + ] bi ] sum-outputs ."
         "20"
     }
 } ;

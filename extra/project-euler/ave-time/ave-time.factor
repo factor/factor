@@ -14,7 +14,7 @@ IN: project-euler.ave-time
             '[ _ gc benchmark 1000 / , ] tuck
             '[ _ _ with-datastack drop ]
         ]
-        [ 1- ] tri* swap times call
+        [ 1 - ] tri* swap times call
     ] { } make ; inline
 
 : ave-time ( quot n -- )

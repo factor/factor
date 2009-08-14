@@ -7,7 +7,7 @@ IN: windows.dragdrop-listener
 : filenames-from-hdrop ( hdrop -- filenames )
     dup HEX: FFFFFFFF f 0 DragQueryFile ! get count of files
     [
-        2dup f 0 DragQueryFile 1+ ! get size of filename buffer
+        2dup f 0 DragQueryFile 1 + ! get size of filename buffer
         dup "WCHAR" <c-array>
         [ swap DragQueryFile drop ] keep
         alien>u16-string

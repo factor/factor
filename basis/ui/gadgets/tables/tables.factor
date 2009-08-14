@@ -413,10 +413,10 @@ PRIVATE>
     0 select-row ;
 
 : last-row ( table -- )
-    dup control-value length 1- select-row ;
+    dup control-value length 1 - select-row ;
 
 : prev/next-page ( table n -- )
-    over visible-lines 1- * prev/next-row ;
+    over visible-lines 1 - * prev/next-row ;
 
 : previous-page ( table -- )
     -1 prev/next-page ;

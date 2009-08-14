@@ -1,6 +1,6 @@
-IN: compiler.tests.redefine16
 USING: eval tools.test definitions words compiler.units
 quotations stack-checker ;
+IN: compiler.tests.redefine16
 
 [ ] [ [ "blah" "compiler.tests.redefine16" lookup forget ] with-compilation-unit ] unit-test
 

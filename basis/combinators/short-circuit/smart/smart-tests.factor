@@ -1,32 +1,18 @@
-
 USING: kernel math tools.test combinators.short-circuit.smart ;
-
 IN: combinators.short-circuit.smart.tests
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+[ t ] [       { [ 1 ] [ 2 ] [ 3 ] }          &&  3 = ] unit-test
+[ t ] [ 3     { [ 0 > ] [ odd? ] [ 2 + ] }    &&  5 = ] unit-test
+[ t ] [ 10 20 { [ + 0 > ] [ - even? ] [ + ] } && 30 = ] unit-test
 
-: must-be-t ( in -- ) [ t ] swap unit-test ;
-: must-be-f ( in -- ) [ f ] swap unit-test ;
+[ f ] [       { [ 1 ] [ f ] [ 3 ] } &&  3 = ]          unit-test
+[ f ] [ 3     { [ 0 > ] [ even? ] [ 2 + ] } && ]       unit-test
+[ f ] [ 10 20 { [ + 0 > ] [ - odd? ] [ + ] } && 30 = ] unit-test
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+[ t ] [ { [ 10 0 < ] [ f ] [ "factor" ] } || "factor" = ] unit-test
 
-[       { [ 1 ] [ 2 ] [ 3 ] }          &&  3 = ] must-be-t
-[ 3     { [ 0 > ] [ odd? ] [ 2 + ] }    &&  5 = ] must-be-t
-[ 10 20 { [ + 0 > ] [ - even? ] [ + ] } && 30 = ] must-be-t
+[ t ] [ 10 { [ odd? ] [ 100 > ] [ 1 + ] } || 11 = ]       unit-test
 
-[       { [ 1 ] [ f ] [ 3 ] } &&  3 = ]          must-be-f
-[ 3     { [ 0 > ] [ even? ] [ 2 + ] } && ]       must-be-f
-[ 10 20 { [ + 0 > ] [ - odd? ] [ + ] } && 30 = ] must-be-f
+[ t ] [ 10 20 { [ + odd? ] [ + 100 > ] [ + ] } || 30 = ]  unit-test
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-[ { [ 10 0 < ] [ f ] [ "factor" ] } || "factor" = ] must-be-t
-
-[ 10 { [ odd? ] [ 100 > ] [ 1 + ] } || 11 = ]       must-be-t
-
-[ 10 20 { [ + odd? ] [ + 100 > ] [ + ] } || 30 = ]  must-be-t
-
-[ { [ 10 0 < ] [ f ] [ 0 1 = ] } || ] must-be-f
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+[ f ] [ { [ 10 0 < ] [ f ] [ 0 1 = ] } || ] unit-test

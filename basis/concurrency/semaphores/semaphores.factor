@@ -21,13 +21,13 @@ M: negative-count-semaphore summary
 : acquire-timeout ( semaphore timeout -- )
     over count>> zero?
     [ dupd wait-to-acquire ] [ drop ] if
-    [ 1- ] change-count drop ;
+    [ 1 - ] change-count drop ;
 
 : acquire ( semaphore -- )
     f acquire-timeout ;
 
 : release ( semaphore -- )
-    [ 1+ ] change-count
+    [ 1 + ] change-count
     threads>> notify-1 ;
 
 :: with-semaphore-timeout ( semaphore timeout quot -- )

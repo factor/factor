@@ -1,7 +1,7 @@
-IN: concurrency.locks.tests
 USING: tools.test concurrency.locks concurrency.count-downs
 concurrency.messaging concurrency.mailboxes locals kernel
 threads sequences calendar accessors ;
+IN: concurrency.locks.tests
 
 :: lock-test-0 ( -- v )
     [let | v [ V{ } clone ]

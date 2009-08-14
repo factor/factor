@@ -1,4 +1,3 @@
-IN: compiler.tree.cleanup.tests
 USING: tools.test kernel.private kernel arrays sequences
 math.private math generic words quotations alien alien.c-types
 strings sbufs sequences.private slots.private combinators
@@ -17,6 +16,7 @@ compiler.tree.propagation
 compiler.tree.propagation.info
 compiler.tree.checker
 compiler.tree.debugger ;
+IN: compiler.tree.cleanup.tests
 
 [ t ] [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 
@@ -88,7 +88,7 @@ M: object xyz ;
     2over dup xyz drop >= [
         3drop
     ] [
-        [ swap [ call 1+ ] dip ] keep (i-repeat)
+        [ swap [ call 1 + ] dip ] keep (i-repeat)
     ] if ; inline recursive
 
 : i-repeat ( n quot -- ) [ { integer } declare ] dip 0 -rot (i-repeat) ; inline

@@ -19,7 +19,7 @@ IN: compiler.tree.propagation.inlining
 SYMBOL: node-count
 
 : count-nodes ( nodes -- n )
-    0 swap [ drop 1+ ] each-node ;
+    0 swap [ drop 1 + ] each-node ;
 
 : compute-node-count ( nodes -- ) count-nodes node-count set ;
 

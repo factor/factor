@@ -75,7 +75,7 @@ SYMBOL: terms
 
 : inversions ( seq -- n )
     0 swap [ length ] keep [
-        [ nth ] 2keep swap 1+ tail-slice (inversions) +
+        [ nth ] 2keep swap 1 + tail-slice (inversions) +
     ] curry each ;
 
 : duplicates? ( seq -- ? )
@@ -141,7 +141,7 @@ DEFER: (d)
 
 ! Computing a basis
 : graded ( seq -- seq )
-    dup 0 [ length max ] reduce 1+ [ V{ } clone ] replicate
+    dup 0 [ length max ] reduce 1 + [ V{ } clone ] replicate
     [ dup length pick nth push ] reduce ;
 
 : nth-basis-elt ( generators n -- elt )
@@ -176,7 +176,7 @@ DEFER: (d)
 ! Graded by degree
 : (graded-ker/im-d) ( n seq -- null/rank )
     #! d: C(n) ---> C(n+1)
-    [ ?nth ] [ [ 1+ ] dip ?nth ] 2bi
+    [ ?nth ] [ [ 1 + ] dip ?nth ] 2bi
     dim-im/ker-d ;
 
 : graded-ker/im-d ( graded-basis -- seq )
@@ -240,7 +240,7 @@ DEFER: (d)
     ] if ;
 
 : graded-triple ( seq n -- triple )
-    3 [ 1- + ] with map swap [ ?nth ] curry map ;
+    3 [ 1 - + ] with map swap [ ?nth ] curry map ;
 
 : graded-triples ( seq -- triples )
     dup length [ graded-triple ] with map ;

@@ -52,10 +52,10 @@ fetched-in parsed-html links processed-in fetched-at ;
     [ host>> = ] with partition ;
 
 : add-spidered ( spider spider-result -- )
-    [ [ 1+ ] change-count ] dip
+    [ [ 1 + ] change-count ] dip
     2dup [ spidered>> ] [ dup url>> ] bi* rot set-at
     [ filter-base-links ] 2keep
-    depth>> 1+ swap
+    depth>> 1 + swap
     [ add-nonmatching ]
     [ tuck [ apply-filters ] 2dip add-todo ] 2bi ;
 

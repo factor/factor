@@ -1,6 +1,6 @@
-IN: compiler.tests.float
 USING: compiler.units compiler kernel kernel.private memory math
 math.private tools.test math.floats.private ;
+IN: compiler.tests.float
 
 [ 5.0 ] [ [ 5.0 ] compile-call gc gc gc ] unit-test
 [ 2.0 3.0 ] [ 3.0 [ 2.0 swap ] compile-call ] unit-test
