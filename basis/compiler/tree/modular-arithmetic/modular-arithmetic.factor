@@ -1,10 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.partial-dispatch namespaces sequences sets
-accessors assocs words kernel memoize fry combinators
+USING: math math.private math.partial-dispatch namespaces sequences
+sets accessors assocs words kernel memoize fry combinators
 combinators.short-circuit layouts alien.accessors
 compiler.tree
 compiler.tree.combinators
+compiler.tree.propagation.info
 compiler.tree.def-use
 compiler.tree.def-use.simplified
 compiler.tree.late-optimizations ;
@@ -19,17 +20,24 @@ IN: compiler.tree.modular-arithmetic
 !    ==>
 !        [ >fixnum ] bi@ fixnum+fast
 
+! Words where the low-order bits of the output only depends on the
+! low-order bits of the input. If the output is only used for its
+! low-order bits, then the word can be converted into a form that is
+! cheaper to compute.
 { + - * bitand bitor bitxor } [
     [
         t "modular-arithmetic" set-word-prop
     ] each-integer-derived-op
 ] each
 
-{ bitand bitor bitxor bitnot }
+{ bitand bitor bitxor bitnot >integer }
 [ t "modular-arithmetic" set-word-prop ] each
 
+! Words that only use the low-order bits of their input. If the input
+! is a modular arithmetic word, then the input can be converted into
+! a form that is cheaper to compute.
 {
-    >fixnum
+    >fixnum bignum>fixnum float>fixnum
     set-alien-unsigned-1 set-alien-signed-1
     set-alien-unsigned-2 set-alien-signed-2
 }
@@ -38,80 +46,148 @@ cell 8 = [
 ] when
 [ t "low-order" set-word-prop ] each
 
-SYMBOL: modularize-values
+! Values which only have their low-order bits used. This set starts out
+! big and is gradually refined.
+SYMBOL: modular-values
 
 : modular-value? ( value -- ? )
-    modularize-values get key? ;
+    modular-values get key? ;
 
-: modularize-value ( value -- ) modularize-values get conjoin ;
+: modular-value ( value -- )
+    modular-values get conjoin ;
 
-GENERIC: maybe-modularize* ( value node -- )
+! Values which are known to be fixnums.
+SYMBOL: fixnum-values
 
-: maybe-modularize ( value -- )
-    actually-defined-by [ value>> ] [ node>> ] bi
-    over actually-used-by length 1 = [
-        maybe-modularize*
-    ] [ 2drop ] if ;
+: fixnum-value? ( value -- ? )
+    fixnum-values get key? ;
 
-M: #call maybe-modularize*
-    dup word>> "modular-arithmetic" word-prop [
-        [ modularize-value ]
-        [ in-d>> [ maybe-modularize ] each ] bi*
-    ] [ 2drop ] if ;
+: fixnum-value ( value -- )
+    fixnum-values get conjoin ;
 
-M: node maybe-modularize* 2drop ;
+GENERIC: compute-modular-candidates* ( node -- )
 
-GENERIC: compute-modularized-values* ( node -- )
+M: #push compute-modular-candidates*
+    [ out-d>> first ] [ literal>> ] bi
+    real? [ [ modular-value ] [ fixnum-value ] bi ] [ drop ] if ;
 
-M: #call compute-modularized-values*
-    dup word>> "low-order" word-prop
-    [ in-d>> first maybe-modularize ] [ drop ] if ;
+M: #call compute-modular-candidates*
+    {
+        {
+            [ dup word>> "modular-arithmetic" word-prop ]
+            [ out-d>> first [ modular-value ] [ fixnum-value ] bi ]
+        }
+        {
+            [ dup word>> "low-order" word-prop ]
+            [ in-d>> first modular-value ]
+        }
+        [ drop ]
+    } cond ;
 
-M: node compute-modularized-values* drop ;
+M: node compute-modular-candidates*
+    drop ;
 
-: compute-modularized-values ( nodes -- )
-    [ compute-modularized-values* ] each-node ;
+: compute-modular-candidates ( nodes -- )
+    H{ } clone modular-values set
+    H{ } clone fixnum-values set
+    [ compute-modular-candidates* ] each-node ;
+
+GENERIC: only-reads-low-order? ( node -- ? )
+
+M: #call only-reads-low-order?
+    {
+        [ word>> "low-order" word-prop ]
+        [
+            {
+                [ word>> "modular-arithmetic" word-prop ]
+                [ out-d>> first modular-values get key? ]
+            } 1&&
+        ]
+    } 1|| ;
+
+M: node only-reads-low-order? drop f ;
+
+SYMBOL: changed?
+
+: only-used-as-low-order? ( value -- ? )
+    actually-used-by [ node>> only-reads-low-order? ] all? ;
+
+: (compute-modular-values) ( -- )
+    modular-values get keys [
+        dup only-used-as-low-order?
+        [ drop ] [ modular-values get delete-at changed? on ] if
+    ] each ;
+
+: compute-modular-values ( -- )
+    [ changed? off (compute-modular-values) changed? get ] loop ;
 
 GENERIC: optimize-modular-arithmetic* ( node -- nodes )
 
+M: #push optimize-modular-arithmetic*
+    dup out-d>> first modular-value? [
+        [ >fixnum ] change-literal
+    ] when ;
+
+: input-will-be-fixnum? ( #call -- ? )
+    in-d>> first actually-defined-by
+    [ value>> { [ modular-value? ] [ fixnum-value? ] } 1&& ] all? ;
+
+: output-will-be-coerced? ( #call -- ? )
+    out-d>> first modular-value? ;
+
 : redundant->fixnum? ( #call -- ? )
-    in-d>> first actually-defined-by value>> modular-value? ;
+    {
+        [ input-will-be-fixnum? ]
+        [ output-will-be-coerced? ]
+    } 1|| ;
 
 : optimize->fixnum ( #call -- nodes )
     dup redundant->fixnum? [ drop f ] when ;
 
+: should-be->fixnum? ( #call -- ? )
+    out-d>> first modular-value? ;
+
 : optimize->integer ( #call -- nodes )
-    dup out-d>> first actually-used-by dup length 1 = [
-        first node>> { [ #call? ] [ word>> \ >fixnum eq? ] } 1&&
-        [ drop { } ] when
-    ] [ drop ] if ;
+    dup should-be->fixnum? [ \ >fixnum >>word ] when ;
 
 MEMO: fixnum-coercion ( flags -- nodes )
+    ! flags indicate which input parameters are already known to be fixnums,
+    ! and don't need a coercion as a result.
     [ [ ] [ >fixnum ] ? ] map '[ _ spread ] splice-quot ;
+
+: modular-value-info ( #call -- alist )
+    [ in-d>> ] [ out-d>> ] bi append
+    fixnum <class-info> '[ _ ] { } map>assoc ;
 
 : optimize-modular-op ( #call -- nodes )
     dup out-d>> first modular-value? [
         [ in-d>> ] [ word>> integer-op-input-classes ] [ ] tri
         [
             [
-                [ actually-defined-by value>> modular-value? ]
+                [ actually-defined-by [ value>> modular-value? ] all? ]
                 [ fixnum eq? ]
                 bi* or
             ] 2map fixnum-coercion
         ] [ [ modular-variant ] change-word ] bi* suffix
     ] when ;
 
+: optimize-low-order-op ( #call -- nodes )
+    dup in-d>> first modular-value? [
+        [ ] [ in-d>> first ] [ info>> ] tri
+        [ drop fixnum <class-info> ] change-at
+    ] when ;
+
 M: #call optimize-modular-arithmetic*
     dup word>> {
-        { [ dup \ >fixnum eq? ] [ drop optimize->fixnum ] }
+        { [ dup { >fixnum bignum>fixnum float>fixnum } memq? ] [ drop optimize->fixnum ] }
         { [ dup \ >integer eq? ] [ drop optimize->integer ] }
         { [ dup "modular-arithmetic" word-prop ] [ drop optimize-modular-op ] }
+        { [ dup "low-order" word-prop ] [ drop optimize-low-order-op ] }
         [ drop ]
     } cond ;
 
 M: node optimize-modular-arithmetic* ;
 
 : optimize-modular-arithmetic ( nodes -- nodes' )
-    H{ } clone modularize-values set
-    dup compute-modularized-values
+    dup compute-modular-candidates compute-modular-values
     [ optimize-modular-arithmetic* ] map-nodes ;
