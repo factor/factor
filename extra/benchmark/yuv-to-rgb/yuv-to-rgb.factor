@@ -36,8 +36,7 @@ C-STRUCT: yuv_buffer
     255 min 0 max ; inline
 
 : stride ( line yuv  -- uvy yy )
-    [ yuv_buffer-uv_stride swap 2/ * >fixnum ]
-    [ yuv_buffer-y_stride * >fixnum ] 2bi ; inline
+    [ yuv_buffer-uv_stride swap 2/ * ] [ yuv_buffer-y_stride * ] 2bi ; inline
 
 : compute-y ( yuv uvy yy x -- y )
     + >fixnum nip swap yuv_buffer-y swap alien-unsigned-1 16 - ; inline
@@ -74,16 +73,16 @@ C-STRUCT: yuv_buffer
     drop ; inline
 
 : yuv>rgb-pixel ( index rgb yuv uvy yy x -- index )
-    compute-yuv compute-rgb store-rgb 3 + >fixnum ; inline
+    compute-yuv compute-rgb store-rgb 3 + ; inline
 
 : yuv>rgb-row ( index rgb yuv y -- index )
     over stride
-    pick yuv_buffer-y_width >fixnum
+    pick yuv_buffer-y_width
     [ yuv>rgb-pixel ] with with with with each ; inline
 
 : yuv>rgb ( rgb yuv -- )
     [ 0 ] 2dip
-    dup yuv_buffer-y_height >fixnum
+    dup yuv_buffer-y_height
     [ yuv>rgb-row ] with with each
     drop ;
 
