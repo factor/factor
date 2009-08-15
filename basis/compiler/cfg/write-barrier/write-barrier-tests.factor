@@ -1,9 +1,16 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.cfg.write-barrier compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.debugger cpu.architecture
-arrays tools.test vectors compiler.cfg kernel accessors
-compiler.cfg.utilities namespaces sequences ;
+USING: accessors arrays assocs compiler.cfg
+compiler.cfg.alias-analysis compiler.cfg.block-joining
+compiler.cfg.branch-splitting compiler.cfg.copy-prop
+compiler.cfg.dce compiler.cfg.debugger
+compiler.cfg.instructions compiler.cfg.loop-detection
+compiler.cfg.registers compiler.cfg.ssa.construction
+compiler.cfg.tco compiler.cfg.useless-conditionals
+compiler.cfg.utilities compiler.cfg.value-numbering
+compiler.cfg.write-barrier cpu.architecture kernel
+kernel.private math namespaces sequences sequences.private
+tools.test vectors ;
 IN: compiler.cfg.write-barrier.tests
 
 : test-write-barrier ( insns -- insns )
@@ -94,6 +101,24 @@ cfg new 1 get >>entry 0 set
 } ] [ 2 get instructions>> ] unit-test
 
 V{
+    T{ ##allot f 1 }
+} 1 test-bb
+V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+    T{ ##write-barrier f 1 2 3 }
+} 2 test-bb
+1 get 2 get 1vector >>successors drop
+cfg new 1 get >>entry 0 set
+
+[ ] [ 0 [ eliminate-write-barriers ] change ] unit-test
+[ V{
+    T{ ##allot f 1 }
+} ] [ 1 get instructions>> ] unit-test
+[ V{
+    T{ ##set-slot-imm f 2 1 3 4 }
+} ] [ 2 get instructions>> ] unit-test
+
+V{
     T{ ##set-slot-imm f 2 1 3 4 }
     T{ ##write-barrier f 1 2 3 }
 } 1 test-bb
@@ -140,3 +165,26 @@ cfg new 1 get >>entry 0 set
     T{ ##set-slot-imm f 2 1 3 4 }
     T{ ##write-barrier f 1 2 3 }
 } ] [ 3 get instructions>> ] unit-test
+
+: reverse-here' ( seq -- )
+    { array } declare
+    [ length 2/ iota ] [ length ] [ ] tri
+    [ [ over - 1 - ] dip exchange-unsafe ] 2curry each ;
+
+: write-barrier-stats ( word -- cfg )
+    test-cfg first [
+        optimize-tail-calls
+        delete-useless-conditionals
+        split-branches
+        join-blocks
+        construct-ssa
+        alias-analysis
+        value-numbering
+        copy-propagation
+        eliminate-dead-code
+        eliminate-write-barriers
+    ] with-cfg
+    post-order>> write-barriers
+    [ [ loop-nesting-at ] [ length ] bi* ] assoc-map ;
+
+[ { { 0 1 } } ] [ \ reverse-here' write-barrier-stats ] unit-test

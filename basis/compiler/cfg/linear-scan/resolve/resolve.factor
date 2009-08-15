@@ -65,7 +65,7 @@ SYMBOL: temp
 
 : perform-mappings ( bb to mappings -- )
     dup empty? [ 3drop ] [
-        mapping-instructions <simple-block> insert-basic-block
+        mapping-instructions insert-simple-basic-block
         cfg get cfg-changed drop
     ] if ;
 
