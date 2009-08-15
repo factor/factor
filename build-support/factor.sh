@@ -487,12 +487,12 @@ update_bootstrap() {
 }
 
 refresh_image() {
-    ./$FACTOR_BINARY -script -e="USE: vocabs.loader USE: system refresh-all USE: memory save 0 exit"
+    ./$FACTOR_BINARY -script -e="USING: vocabs.loader system memory ; refresh-all USE: memory save 0 exit"
     check_ret factor
 }
 
 make_boot_image() {
-    ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USE: system USE: bootstrap.image make-image save 0 exit"
+    ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
     check_ret factor
 
 }
