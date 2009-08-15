@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces assocs sets sequences
-fry combinators.short-circuit locals
+fry combinators.short-circuit locals make arrays
 compiler.cfg
 compiler.cfg.dominance
 compiler.cfg.predecessors
@@ -75,10 +75,12 @@ M: insn remove-dead-barrier drop t ;
 ! Anticipation of this and set-slot would help too, maybe later
 FORWARD-ANALYSIS: slot
 
+UNION: access ##read ##write ;
+
 M: slot-analysis transfer-set
     drop [ H{ } assoc-clone-like ] dip
     instructions>> over '[
-        dup ##read? [
+        dup access? [
             obj>> _ conjoin
         ] [ drop ] if
     ] each ;
@@ -86,11 +88,15 @@ M: slot-analysis transfer-set
 : slot-available? ( vreg bb -- ? )
     slot-in key? ;
 
-: make-barriers ( vregs bb -- )
-    [ [ next-vreg next-vreg ##write-barrier ] each ] add-instructions ;
+: make-barriers ( vregs -- bb )
+    [ [ next-vreg next-vreg ##write-barrier ] each ] V{ } make <simple-block> ;
 
-: emit-barriers ( vregs bb -- )
-    predecessors>> [ make-barriers ] with each ;
+: emit-barriers ( vregs loop -- )
+    swap [
+        [ [ header>> predecessors>> ] [ ends>> keys ] bi diff ]
+        [ header>> ] bi
+    ] [ make-barriers ] bi*
+    insert-basic-block ;
 
 : write-barriers ( bbs -- bb=>barriers )
     [
@@ -107,11 +113,16 @@ M: slot-analysis transfer-set
 : dominant-write-barriers ( loop -- vregs )
     [ blocks>> values write-barriers ] [ ends>> keys ] bi filter-dominant ;
 
-: insert-extra-barriers ( -- )
-    loops get values [| loop |
+: safe-loops ( -- loops )
+    loops get values
+    [ blocks>> keys [ has-allocation? not ] all? ] filter ;
+
+:: insert-extra-barriers ( cfg -- )
+    safe-loops [| loop |
+        cfg needs-dominance needs-predecessors drop
         loop dominant-write-barriers
         loop header>> '[ _ slot-available? ] filter
-        [ loop header>> emit-barriers ] unless-empty
+        [ loop emit-barriers cfg cfg-changed drop ] unless-empty
     ] each ;
 
 : contains-write-barrier? ( cfg -- ? )
@@ -119,10 +130,10 @@ M: slot-analysis transfer-set
 
 : eliminate-write-barriers ( cfg -- cfg' )
     dup contains-write-barrier? [
-        needs-loops needs-dominance needs-predecessors
+        needs-loops
         dup [ remove-dead-barriers ] each-basic-block
         dup compute-slot-sets
-        insert-extra-barriers
+        dup insert-extra-barriers
         dup compute-safe-sets
         dup [ write-barriers-step ] each-basic-block
     ] when ;
