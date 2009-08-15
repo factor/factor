@@ -8,11 +8,11 @@ compiler.cfg.utilities compiler.cfg.builder.blocks ;
 IN: compiler.cfg.intrinsics.allot
 
 : ##set-slots ( regs obj class -- )
-    '[ _ swap 1+ _ tag-number ##set-slot-imm ] each-index ;
+    '[ _ swap 1 + _ tag-number ##set-slot-imm ] each-index ;
 
 : emit-simple-allot ( node -- )
     [ in-d>> length ] [ node-output-infos first class>> ] bi
-    [ drop ds-load ] [ [ 1+ cells ] dip ^^allot ] [ nip ] 2tri
+    [ drop ds-load ] [ [ 1 + cells ] dip ^^allot ] [ nip ] 2tri
     [ ##set-slots ] [ [ drop ] [ ds-push ] [ drop ] tri* ] 3bi ;
 
 : tuple-slot-regs ( layout -- vregs )

@@ -47,7 +47,7 @@ TUPLE: CreateProcess-args
 
 : count-trailing-backslashes ( str n -- str n )
     [ "\\" ?tail ] dip swap [
-        1+ count-trailing-backslashes
+        1 + count-trailing-backslashes
     ] when ;
 
 : fix-trailing-backslashes ( str -- str' )

@@ -37,8 +37,8 @@ SYMBOL: p-count
     p-count get length ;
 
 : adjust-p-count ( n -- )
-    max-p 1- over <range> p-count get
-    [ [ 1+ ] change-nth ] curry each ;
+    max-p 1 - over <range> p-count get
+    [ [ 1 + ] change-nth ] curry each ;
 
 : (count-perimeters) ( seq -- )
     dup sum max-p < [

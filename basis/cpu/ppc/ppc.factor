@@ -217,7 +217,7 @@ M:: ppc %integer>bignum ( dst src temp -- )
         temp dst 1 bignum@ STW
         ! Compute sign
         temp src MR
-        temp temp cell-bits 1- SRAWI
+        temp temp cell-bits 1 - SRAWI
         temp temp 1 ANDI
         ! Store sign
         temp dst 2 bignum@ STW

@@ -40,7 +40,7 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
     dup assoc-empty? [ drop 0 ] [ keys supremum ] if ;
 
 : num-fds ( mx -- n )
-    [ reads>> max-fd ] [ writes>> max-fd ] bi max 1+ ;
+    [ reads>> max-fd ] [ writes>> max-fd ] bi max 1 + ;
 
 : init-fdsets ( mx -- nfds read write except )
     [ num-fds ]

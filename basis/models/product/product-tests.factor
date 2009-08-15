@@ -24,7 +24,7 @@ IN: models.product.tests
 
 TUPLE: an-observer { i integer } ;
 
-M: an-observer model-changed nip [ 1+ ] change-i drop ;
+M: an-observer model-changed nip [ 1 + ] change-i drop ;
 
 [ 1 0 ] [
     [let* | m1 [ 1 <model> ]

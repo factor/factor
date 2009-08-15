@@ -14,13 +14,13 @@ SYMBOL: dummy-monitor-disposed
 TUPLE: dummy-monitor < monitor ;
 
 M: dummy-monitor dispose
-    drop dummy-monitor-disposed get [ 1+ ] change-i drop ;
+    drop dummy-monitor-disposed get [ 1 + ] change-i drop ;
 
 M: mock-io-backend (monitor)
     nip
     over exists? [
         dummy-monitor new-monitor
-        dummy-monitor-created get [ 1+ ] change-i drop
+        dummy-monitor-created get [ 1 + ] change-i drop
     ] [
         "Does not exist" throw
     ] if ;

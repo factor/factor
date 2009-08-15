@@ -55,8 +55,8 @@ PROTOCOL: beta three ;
 
 TUPLE: hey value ;
 C: <hey> hey
-CONSULT: alpha hey value>> 1+ ;
-CONSULT: beta hey value>> 1- ;
+CONSULT: alpha hey value>> 1 + ;
+CONSULT: beta hey value>> 1 - ;
 
 [ 2 ] [ 1 <hey> one ] unit-test
 [ 2 ] [ 1 <hey> two ] unit-test

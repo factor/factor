@@ -58,7 +58,7 @@ PRIVATE>
     [
         alist sort-keys unclip swap [ [ first dup ] [ second ] bi ] dip
         [| oldkey oldval key val | ! Underneath is start
-            oldkey 1+ key =
+            oldkey 1 + key =
             oldval val = and
             [ oldkey 2array oldval 2array , key ] unless
             key val

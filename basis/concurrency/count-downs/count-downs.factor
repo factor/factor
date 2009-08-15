@@ -23,7 +23,7 @@ ERROR: count-down-already-done ;
 : count-down ( count-down -- )
     dup n>> dup zero?
     [ count-down-already-done ]
-    [ 1- >>n count-down-check ] if ;
+    [ 1 - >>n count-down-check ] if ;
 
 : await-timeout ( count-down timeout -- )
     [ promise>> ] dip ?promise-timeout ?linked t assert= ;

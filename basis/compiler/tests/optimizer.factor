@@ -67,7 +67,7 @@ TUPLE: pred-test ;
 [ 3 ] [ t bad-kill-2 ] unit-test
 
 ! regression
-: (the-test) ( x -- y ) dup 0 > [ 1- (the-test) ] when ; inline recursive
+: (the-test) ( x -- y ) dup 0 > [ 1 - (the-test) ] when ; inline recursive
 : the-test ( -- x y ) 2 dup (the-test) ;
 
 [ 2 0 ] [ the-test ] unit-test
@@ -100,7 +100,7 @@ GENERIC: void-generic ( obj -- * )
 
 ! regression
 : branch-fold-regression-0 ( m -- n )
-    t [ ] [ 1+ branch-fold-regression-0 ] if ; inline recursive
+    t [ ] [ 1 + branch-fold-regression-0 ] if ; inline recursive
 
 : branch-fold-regression-1 ( -- m )
     10 branch-fold-regression-0 ;
@@ -348,12 +348,12 @@ TUPLE: some-tuple x ;
 
 [ T{ some-tuple f [ 3 ] } ] [ 3 allot-regression ] unit-test
 
-[ 1 ] [ B{ 0 0 0 0 } [ 0 alien-signed-4 1+ ] compile-call ] unit-test
-[ 1 ] [ B{ 0 0 0 0 } [ 0 alien-unsigned-4 1+ ] compile-call ] unit-test
-[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-signed-8 1+ ] compile-call ] unit-test
-[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-unsigned-8 1+ ] compile-call ] unit-test
-[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-signed-cell 1+ ] compile-call ] unit-test
-[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-unsigned-cell 1+ ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 } [ 0 alien-signed-4 1 + ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 } [ 0 alien-unsigned-4 1 + ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-signed-8 1 + ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-unsigned-8 1 + ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-signed-cell 1 + ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-unsigned-cell 1 + ] compile-call ] unit-test
 
 : deep-find-test ( seq -- ? ) [ 5 = ] deep-find ;
 
@@ -382,7 +382,7 @@ DEFER: loop-bbb
 ! Type inference issue
 [ 4 3 ] [
     1 >bignum 2 >bignum
-    [ { bignum integer } declare [ shift ] keep 1+ ] compile-call
+    [ { bignum integer } declare [ shift ] keep 1 + ] compile-call
 ] unit-test
 
 : broken-declaration ( -- ) \ + declare ;

@@ -50,7 +50,7 @@ IN: project-euler.055
 : (lychrel?) ( n iteration -- ? )
     dup 50 < [
         [ add-reverse ] dip over palindrome?
-        [ 2drop f ] [ 1+ (lychrel?) ] if
+        [ 2drop f ] [ 1 + (lychrel?) ] if
     ] [
         2drop t
     ] if ;

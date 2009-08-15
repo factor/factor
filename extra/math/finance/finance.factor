@@ -7,10 +7,10 @@ IN: math.finance
 <PRIVATE
 
 : weighted ( x y a -- z )
-    tuck [ * ] [ 1- neg * ] 2bi* + ;
+    tuck [ * ] [ 1 - neg * ] 2bi* + ;
 
 : a ( n -- a )
-    1+ 2 swap / ;
+    1 + 2 swap / ;
 
 PRIVATE>
 

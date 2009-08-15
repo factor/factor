@@ -1,4 +1,3 @@
-IN: compiler.tree.escape-analysis.tests
 USING: compiler.tree.escape-analysis
 compiler.tree.escape-analysis.allocations compiler.tree.builder
 compiler.tree.recursive compiler.tree.normalization
@@ -10,11 +9,12 @@ classes.tuple namespaces
 compiler.tree.propagation.info stack-checker.errors
 compiler.tree.checker
 kernel.private vectors ;
+IN: compiler.tree.escape-analysis.tests
 
 GENERIC: count-unboxed-allocations* ( m node -- n )
 
 : (count-unboxed-allocations) ( m node -- n )
-    out-d>> first escaping-allocation? [ 1+ ] unless ;
+    out-d>> first escaping-allocation? [ 1 + ] unless ;
 
 M: #call count-unboxed-allocations*
     dup immutable-tuple-boa?
@@ -25,7 +25,7 @@ M: #push count-unboxed-allocations*
     [ (count-unboxed-allocations) ] [ drop ] if ;
 
 M: #introduce count-unboxed-allocations*
-    out-d>> [ escaping-allocation? [ 1+ ] unless ] each ;
+    out-d>> [ escaping-allocation? [ 1 + ] unless ] each ;
 
 M: node count-unboxed-allocations* drop ;
 
@@ -212,10 +212,10 @@ C: <ro-box> ro-box
     dup i>> 1 <= [
         drop 1 <ro-box>
     ] [
-        i>> 1- <ro-box>
+        i>> 1 - <ro-box>
         dup tuple-fib
         swap
-        i>> 1- <ro-box>
+        i>> 1 - <ro-box>
         tuple-fib
         swap i>> swap i>> + <ro-box>
     ] if ; inline recursive
@@ -225,7 +225,7 @@ C: <ro-box> ro-box
 [ 3 ] [ [ <ro-box> tuple-fib ] count-unboxed-allocations ] unit-test
 
 : tuple-fib' ( m -- n )
-    dup 1 <= [ 1- tuple-fib' i>> ] when <ro-box> ; inline recursive
+    dup 1 <= [ 1 - tuple-fib' i>> ] when <ro-box> ; inline recursive
 
 [ 0 ] [ [ tuple-fib' ] count-unboxed-allocations ] unit-test
 
@@ -233,10 +233,10 @@ C: <ro-box> ro-box
     dup i>> 1 <= [
         drop 1 <ro-box>
     ] [
-        i>> 1- <ro-box>
+        i>> 1 - <ro-box>
         dup bad-tuple-fib-1
         swap
-        i>> 1- <ro-box>
+        i>> 1 - <ro-box>
         bad-tuple-fib-1 dup .
         swap i>> swap i>> + <ro-box>
     ] if ; inline recursive
@@ -248,10 +248,10 @@ C: <ro-box> ro-box
     dup i>> 1 <= [
         drop 1 <ro-box>
     ] [
-        i>> 1- <ro-box>
+        i>> 1 - <ro-box>
         dup bad-tuple-fib-2
         swap
-        i>> 1- <ro-box>
+        i>> 1 - <ro-box>
         bad-tuple-fib-2
         swap i>> swap i>> + <ro-box>
     ] if ; inline recursive
@@ -262,9 +262,9 @@ C: <ro-box> ro-box
     dup 1 <= [
         drop 1 <ro-box>
     ] [
-        1- dup tuple-fib-2
+        1 - dup tuple-fib-2
         swap
-        1- tuple-fib-2
+        1 - tuple-fib-2
         swap i>> swap i>> + <ro-box>
     ] if ; inline recursive
 
@@ -274,9 +274,9 @@ C: <ro-box> ro-box
     dup 1 <= [
         drop 1 <ro-box>
     ] [
-        1- dup tuple-fib-3
+        1 - dup tuple-fib-3
         swap
-        1- tuple-fib-3 dup .
+        1 - tuple-fib-3 dup .
         swap i>> swap i>> + <ro-box>
     ] if ; inline recursive
 
@@ -286,9 +286,9 @@ C: <ro-box> ro-box
     dup 1 <= [
         drop 1 <ro-box>
     ] [
-        1- dup bad-tuple-fib-3
+        1 - dup bad-tuple-fib-3
         swap
-        1- bad-tuple-fib-3
+        1 - bad-tuple-fib-3
         2drop f
     ] if ; inline recursive
 

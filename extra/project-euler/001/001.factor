@@ -23,7 +23,7 @@ IN: project-euler.001
 <PRIVATE
 
 : sum-divisible-by ( target n -- m )
-    [ /i dup 1+ * ] keep * 2 /i ;
+    [ /i dup 1 + * ] keep * 2 /i ;
 
 PRIVATE>
 

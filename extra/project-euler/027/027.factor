@@ -53,7 +53,7 @@ IN: project-euler.027
     dup sq -rot * + + ;
 
 : (consecutive-primes) ( b a n -- m )
-    3dup quadratic prime? [ 1+ (consecutive-primes) ] [ 2nip ] if ;
+    3dup quadratic prime? [ 1 + (consecutive-primes) ] [ 2nip ] if ;
 
 : consecutive-primes ( a b -- m )
     swap 0 (consecutive-primes) ;

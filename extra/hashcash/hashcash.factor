@@ -69,7 +69,7 @@ M: hashcash string>>
 
 : (mint) ( tuple counter -- tuple ) 
     2dup set-suffix checksummed-bits pick 
-    valid-guess? [ drop ] [ 1+ (mint) ] if ;
+    valid-guess? [ drop ] [ 1 + (mint) ] if ;
 
 PRIVATE>
 

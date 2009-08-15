@@ -38,6 +38,6 @@ PRIVATE>
 
 : purge-cache ( cache -- )
     dup max-age>> '[
-        [ nip [ 1+ ] change-age age>> _ >= ] assoc-partition
+        [ nip [ 1 + ] change-age age>> _ >= ] assoc-partition
         [ values dispose-each ] dip
     ] change-assoc drop ;

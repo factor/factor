@@ -13,14 +13,14 @@ byte-arrays make io ;
     2dup length < [
         2dup nth-unsafe 0 > [
             over dup 2 * pick clear-flags
-            rot 1+ -rot ! increment count
-        ] when [ 1+ ] dip (nsieve)
+            rot 1 + -rot ! increment count
+        ] when [ 1 + ] dip (nsieve)
     ] [
         2drop
     ] if ; inline recursive
 
 : nsieve ( m -- count )
-    0 2 rot 1+ <byte-array> dup [ drop 1 ] change-each (nsieve) ;
+    0 2 rot 1 + <byte-array> dup [ drop 1 ] change-each (nsieve) ;
 
 : nsieve. ( m -- )
     [ "Primes up to " % dup # " " % nsieve # ] "" make print ;

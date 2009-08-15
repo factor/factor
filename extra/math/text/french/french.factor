@@ -73,7 +73,7 @@ MEMO: units ( -- seq ) ! up to 10^99
     } cond ;
 
 : over-1000000 ( n -- str )
-    3 digit-groups [ 1+ units nth n-units ] map-index sift
+    3 digit-groups [ 1 + units nth n-units ] map-index sift
     reverse " " join ;
 
 : decompose ( n -- str ) 1000000 /mod [ over-1000000 ] dip complete ;

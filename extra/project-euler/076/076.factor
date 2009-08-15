@@ -35,7 +35,7 @@ IN: project-euler.076
     over zero? [
         3drop
     ] [
-        [ [ 1-  2array ] dip at     ]
+        [ [ 1 -  2array ] dip at     ]
         [ [ use 2array ] dip at +   ]
         [ [     2array ] dip set-at ] 3tri
     ] if ;
@@ -46,7 +46,7 @@ IN: project-euler.076
 : (euler076) ( n -- m )
     dup init
     [ [ ways ] curry each-subproblem ]
-    [ [ dup 2array ] dip at 1- ] 2bi ;
+    [ [ dup 2array ] dip at 1 - ] 2bi ;
 
 PRIVATE>
 
