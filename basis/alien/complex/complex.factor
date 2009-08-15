@@ -10,4 +10,4 @@ IN: alien.complex
 ! This overrides the fact that small structures are never returned
 ! in registers on NetBSD, Linux and Solaris running on 32-bit x86.
 "complex-float" c-type t >>return-in-registers? drop
- >>
+>>

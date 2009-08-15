@@ -41,9 +41,9 @@ CONSTANT: right 1
 
 : go-left? ( -- ? ) current-side get left eq? ;
 
-: inc-count ( tree -- ) [ 1+ ] change-count drop ;
+: inc-count ( tree -- ) [ 1 + ] change-count drop ;
 
-: dec-count ( tree -- ) [ 1- ] change-count drop ;
+: dec-count ( tree -- ) [ 1 - ] change-count drop ;
 
 : node-link@ ( node ? -- node )
     go-left? xor [ left>> ] [ right>> ] if ;

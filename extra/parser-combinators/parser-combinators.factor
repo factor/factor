@@ -339,7 +339,7 @@ LAZY: surrounded-by ( parser start end -- parser' )
         2drop epsilon
     ] [
         2dup exactly-n
-        -rot 1- at-most-n <|>
+        -rot 1 - at-most-n <|>
     ] if ;
 
 : at-least-n ( parser n -- parser' )

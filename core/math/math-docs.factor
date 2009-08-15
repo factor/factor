@@ -151,7 +151,7 @@ HELP: bitnot
 { $description "Computes the bitwise complement of the input; that is, each bit in the input number is flipped." }
 { $notes "This word implements bitwise not, so applying it to booleans will throw an error. Boolean not is the " { $link not } " word."
 $nl
-"Due to the two's complement representation of signed integers, the following two lines are equivalent:" { $code "bitnot" "neg 1-" } } ;
+"Due to the two's complement representation of signed integers, the following two lines are equivalent:" { $code "bitnot" "neg 1 -" } } ;
 
 HELP: bit?
 { $values { "x" integer } { "n" integer } { "?" "a boolean" } }
@@ -162,22 +162,6 @@ HELP: log2
 { $values { "x" "a positive integer" } { "n" integer } }
 { $description "Outputs the largest integer " { $snippet "n" } " such that " { $snippet "2^n" } " is less than or equal to " { $snippet "x" } "." }
 { $errors "Throws an error if " { $snippet "x" } " is zero or negative." } ;
-
-HELP: 1+
-{ $values { "x" number } { "y" number } }
-{ $description
-    "Increments a number by 1. The following two lines are equivalent:"
-    { $code "1+" "1 +" }
-    "There is no difference in behavior or efficiency."
-} ;
-
-HELP: 1-
-{ $values { "x" number } { "y" number } }
-{ $description
-    "Decrements a number by 1. The following two lines are equivalent:"
-    { $code "1-" "1 -" }
-    "There is no difference in behavior or efficiency."
-} ;
 
 HELP: ?1+
 { $values { "x" { $maybe number } } { "y" number } }
@@ -236,6 +220,49 @@ HELP: 2^
 HELP: zero?
 { $values { "x" number } { "?" "a boolean" } }
 { $description "Tests if the number is equal to zero." } ;
+
+HELP: if-zero
+{ $values { "n" number } { "quot1" quotation } { "quot2" quotation } }
+{ $description "Makes an implicit check if the number is zero. A zero is dropped and " { $snippet "quot1" } " is called. Otherwise, if the number is not zero, " { $snippet "quot2" } " is called on it." }
+{ $example
+    "USING: kernel math prettyprint sequences ;"
+    "3 [ \"zero\" ] [ sq ] if-zero ."
+    "9"
+} ;
+
+HELP: when-zero
+{ $values
+     { "n" number } { "quot" "the first quotation of an " { $link if-zero } } }
+{ $description "Makes an implicit check if the sequence is empty. A zero is dropped and the " { $snippet "quot" } " is called." }
+{ $examples "This word is equivalent to " { $link if-zero } " with an empty second quotation:"
+    { $example
+    "USING: math prettyprint ;"
+    "0 [ 4 ] [ ] if-zero ."
+    "4"
+    }
+    { $example
+    "USING: math prettyprint ;"
+    "0 [ 4 ] when-zero ."
+    "4"
+    }
+} ;
+
+HELP: unless-zero
+{ $values
+     { "n" number } { "quot" "the second quotation of an " { $link if-empty } } }
+{ $description "Makes an implicit check if the number is zero. A zero is dropped. Otherwise, the " { $snippet "quot" } " is called on the number." }
+{ $examples "This word is equivalent to " { $link if-zero } " with an empty first quotation:"
+    { $example
+    "USING: sequences math prettyprint ;"
+    "3 [ ] [ sq ] if-empty ."
+    "9"
+    }
+    { $example
+    "USING: sequences math prettyprint ;"
+    "3 [ sq ] unless-zero ."
+    "9"
+    }
+} ;
 
 HELP: times
 { $values { "n" integer } { "quot" quotation } }

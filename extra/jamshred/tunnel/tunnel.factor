@@ -13,7 +13,7 @@ TUPLE: segment < oint number color radius ;
 C: <segment> segment
 
 : segment-number++ ( segment -- )
-    [ number>> 1+ ] keep (>>number) ;
+    [ number>> 1 + ] keep (>>number) ;
 
 : clamp-length ( n seq -- n' )
     0 swap length clamp ;
@@ -31,7 +31,7 @@ CONSTANT: random-rotation-angle $[ pi 20 / ]
 
 : (random-segments) ( segments n -- segments )
     dup 0 > [
-        [ dup last random-segment over push ] dip 1- (random-segments)
+        [ dup last random-segment over push ] dip 1 - (random-segments)
     ] [ drop ] if ;
 
 CONSTANT: default-segment-radius 1
@@ -78,7 +78,7 @@ CONSTANT: default-segment-radius 1
     rot dup length swap <slice> find-nearest-segment ;
 
 : nearest-segment-backward ( segments oint start -- segment )
-    swapd 1+ 0 spin <slice> <reversed> find-nearest-segment ;
+    swapd 1 + 0 spin <slice> <reversed> find-nearest-segment ;
 
 : nearest-segment ( segments oint start-segment -- segment )
     #! find the segment nearest to 'oint', and return it.
@@ -91,10 +91,10 @@ CONSTANT: default-segment-radius 1
     over clamp-length swap nth ;
 
 : next-segment ( segments current-segment -- segment )
-    number>> 1+ get-segment ;
+    number>> 1 + get-segment ;
 
 : previous-segment ( segments current-segment -- segment )
-    number>> 1- get-segment ;
+    number>> 1 - get-segment ;
 
 : heading-segment ( segments current-segment heading -- segment )
     #! the next segment on the given heading

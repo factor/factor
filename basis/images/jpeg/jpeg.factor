@@ -229,8 +229,8 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
     ] with each^2 ;
 
 : sign-extend ( bits v -- v' )
-    swap [ ] [ 1- 2^ < ] 2bi
-    [ -1 swap shift 1+ + ] [ drop ] if ;
+    swap [ ] [ 1 - 2^ < ] 2bi
+    [ -1 swap shift 1 + + ] [ drop ] if ;
 
 : read1-jpeg-dc ( decoder -- dc )
     [ read1-huff dup ] [ bs>> bs:read ] bi sign-extend ;
@@ -245,7 +245,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
     0 :> k!
     [
         color ac-huff-table>> read1-jpeg-ac
-        [ first 1+ k + k! ] [ second k coefs set-nth ] [ ] tri
+        [ first 1 + k + k! ] [ second k coefs set-nth ] [ ] tri
         { 0 0 } = not
         k 63 < and
     ] loop

@@ -44,7 +44,7 @@ PRIVATE>
 : parse-multiline-string ( end-text -- str )
     [
         lexer get
-        [ 1+ swap (parse-multiline-string) ]
+        [ 1 + swap (parse-multiline-string) ]
         change-column drop
     ] "" make ;
 

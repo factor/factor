@@ -66,7 +66,7 @@ SYMBOL: matrix
 : do-row ( exchange-with row# -- )
     [ exchange-rows ] keep
     [ first-col ] keep
-    dup 1+ rows-from clear-col ;
+    dup 1 + rows-from clear-col ;
 
 : find-row ( row# quot -- i elt )
     [ rows-from ] dip find ; inline
@@ -76,8 +76,8 @@ SYMBOL: matrix
 
 : (echelon) ( col# row# -- )
     over cols < over rows < and [
-        2dup pivot-row [ over do-row 1+ ] when*
-        [ 1+ ] dip (echelon)
+        2dup pivot-row [ over do-row 1 + ] when*
+        [ 1 + ] dip (echelon)
     ] [
         2drop
     ] if ;

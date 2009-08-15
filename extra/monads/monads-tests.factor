@@ -78,7 +78,7 @@ IN: monads.tests
 ] unit-test
 
 LAZY: nats-from ( n -- list )
-    dup 1+ nats-from cons ;
+    dup 1 + nats-from cons ;
 
 : nats ( -- list ) 0 nats-from ;
 

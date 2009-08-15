@@ -51,7 +51,7 @@ M: id equal? over id? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
         dup HEX: 7e <= [
             HEX: 80 bitor write1
         ] [
-            dup log2 8 /i 1+ 
+            dup log2 8 /i 1 + 
             dup HEX: 7f >= [
                 HEX: ff write1
                 dup serialize-cell

@@ -19,7 +19,7 @@ IN: compiler.tree.propagation.inlining
 SYMBOL: node-count
 
 : count-nodes ( nodes -- n )
-    0 swap [ drop 1+ ] each-node ;
+    0 swap [ drop 1 + ] each-node ;
 
 : compute-node-count ( nodes -- ) count-nodes node-count set ;
 
@@ -146,7 +146,7 @@ DEFER: (flat-length)
 
 : body-length-bias ( word -- n )
     [ flat-length ] [ inlining-count get at 0 or ] bi
-    over 2 <= [ drop ] [ 2/ 1+ * ] if 24 swap [-] 4 /i ;
+    over 2 <= [ drop ] [ 2/ 1 + * ] if 24 swap [-] 4 /i ;
 
 : inlining-rank ( #call word -- n )
     [

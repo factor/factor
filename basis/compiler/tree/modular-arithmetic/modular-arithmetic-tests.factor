@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler.tree.modular-arithmetic.tests
 USING: kernel kernel.private tools.test math math.partial-dispatch
 math.private accessors slots.private sequences sequences.private strings sbufs
 compiler.tree.builder
 compiler.tree.normalization
 compiler.tree.debugger
 alien.accessors layouts combinators byte-arrays ;
+IN: compiler.tree.modular-arithmetic.tests
 
 : test-modular-arithmetic ( quot -- quot' )
     cleaned-up-tree nodes>quot ;

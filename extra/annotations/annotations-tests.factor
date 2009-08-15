@@ -10,7 +10,7 @@ IN: annotations.tests
 
 : four ( -- x )
     !BROKEN this code is broken
-    2 2 + 1+ ;
+    2 2 + 1 + ;
 
 : five ( -- x )
     !TODO return 5

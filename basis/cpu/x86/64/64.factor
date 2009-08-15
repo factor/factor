@@ -131,7 +131,7 @@ M:: x86.64 %box ( n rep func -- )
 M: x86.64 %box-long-long ( n func -- )
     [ int-rep ] dip %box ;
 
-: box-struct-field@ ( i -- operand ) 1+ cells param@ ;
+: box-struct-field@ ( i -- operand ) 1 + cells param@ ;
 
 : %box-struct-field ( c-type i -- )
     box-struct-field@ swap c-type-rep reg-class-of {

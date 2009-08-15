@@ -154,7 +154,7 @@ SYMBOL: node-count
         H{ } clone intrinsics-called set
 
         0 swap [
-            [ 1+ ] dip
+            [ 1 + ] dip
             dup #call? [
                 word>> {
                     { [ dup "intrinsic" word-prop ] [ intrinsics-called ] }

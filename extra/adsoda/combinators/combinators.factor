@@ -13,7 +13,7 @@ IN: adsoda.combinators
 !        { [ dup 0 = ] [ 2drop { { } } ] }
 !        { [ over empty? ] [ 2drop { } ] }
 !        { [ t ] [ 
-!            [ [ 1- (combinations) ] [ drop first ] 2bi prefix-each ]
+!            [ [ 1 - (combinations) ] [ drop first ] 2bi prefix-each ]
 !            [ (combinations) ] 2bi append
 !        ] }
 !    } cond ;
@@ -26,7 +26,7 @@ IN: adsoda.combinators
         { [ over 1 = ] [ 3drop columnize ] }
         { [ over 0 = ] [ 2drop 2drop { } ] }
         { [ 2dup < ] [ 2drop [ 1 cut ] dip  
-                         [ 1- among [ append ] with map  ] 
+                         [ 1 - among [ append ] with map  ] 
                          [ among append ] 2bi
                        ] }
         { [ 2dup = ] [ 3drop 1array ] }
