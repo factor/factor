@@ -68,8 +68,8 @@ M: array month. ( pair -- )
     [ (days-in-month) day-abbreviations2 " " join print ] 2tri
     over "   " <repetition> concat write
     [
-        [ 1+ day. ] keep
-        1+ + 7 mod zero? [ nl ] [ bl ] if
+        [ 1 + day. ] keep
+        1 + + 7 mod zero? [ nl ] [ bl ] if
     ] with each nl ;
 
 M: timestamp month. ( timestamp -- )
@@ -78,7 +78,7 @@ M: timestamp month. ( timestamp -- )
 GENERIC: year. ( obj -- )
 
 M: integer year. ( n -- )
-    12 [ 1+ 2array month. nl ] with each ;
+    12 [ 1 + 2array month. nl ] with each ;
 
 M: timestamp year. ( timestamp -- )
     year>> year. ;
@@ -201,7 +201,7 @@ ERROR: invalid-timestamp-format ;
         "," read-token day-abbreviations3 member? check-timestamp drop
         read1 CHAR: \s assert=
         read-sp checked-number >>day
-        read-sp month-abbreviations index 1+ check-timestamp >>month
+        read-sp month-abbreviations index 1 + check-timestamp >>month
         read-sp checked-number >>year
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
@@ -220,7 +220,7 @@ ERROR: invalid-timestamp-format ;
         "," read-token check-day-name
         read1 CHAR: \s assert=
         "-" read-token checked-number >>day
-        "-" read-token month-abbreviations index 1+ check-timestamp >>month
+        "-" read-token month-abbreviations index 1 + check-timestamp >>month
         read-sp checked-number >>year
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
@@ -233,7 +233,7 @@ ERROR: invalid-timestamp-format ;
 : (cookie-string>timestamp-2) ( -- timestamp )
     timestamp new
         read-sp check-day-name
-        read-sp month-abbreviations index 1+ check-timestamp >>month
+        read-sp month-abbreviations index 1 + check-timestamp >>month
         read-sp checked-number >>day
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute

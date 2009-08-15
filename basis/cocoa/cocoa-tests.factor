@@ -1,7 +1,7 @@
-IN: cocoa.tests
 USING: cocoa cocoa.messages cocoa.subclassing cocoa.types
 compiler kernel namespaces cocoa.classes tools.test memory
 compiler.units math core-graphics.types ;
+IN: cocoa.tests
 
 CLASS: {
     { +superclass+ "NSObject" }

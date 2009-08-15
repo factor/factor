@@ -153,7 +153,7 @@ CONSTANT: pov-values
     IOHIDValueGetIntegerValue pov-values ?nth [ pov-neutral ] unless* ;
 
 : record-button ( state hid-value element -- )
-    [ buttons>> ] [ button-value ] [ IOHIDElementGetUsage 1- ] tri* rot set-nth ;
+    [ buttons>> ] [ button-value ] [ IOHIDElementGetUsage 1 - ] tri* rot set-nth ;
 
 : record-controller ( controller-state value -- )
     dup IOHIDValueGetElement {

@@ -144,7 +144,7 @@ ERROR: vreg-has-no-slots vreg ;
 SYMBOL: ac-counter
 
 : next-ac ( -- n )
-    ac-counter [ dup 1+ ] change ;
+    ac-counter [ dup 1 + ] change ;
 
 ! Alias class for objects which are loaded from the data stack
 ! or other object slots. We pessimistically assume that they

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar combinators generic init
-kernel math namespaces sequences heaps boxes threads
-quotations assocs math.order ;
+USING: accessors assocs boxes calendar
+combinators.short-circuit fry heaps init kernel math.order
+namespaces quotations threads ;
 IN: alarms
 
 TUPLE: alarm
@@ -21,21 +21,21 @@ SYMBOL: alarm-thread
 
 ERROR: bad-alarm-frequency frequency ;
 : check-alarm ( frequency/f -- frequency/f )
-    dup [ duration? ] [ not ] bi or [ bad-alarm-frequency ] unless ;
+    dup { [ duration? ] [ not ] } 1|| [ bad-alarm-frequency ] unless ;
 
 : <alarm> ( quot time frequency -- alarm )
     check-alarm <box> alarm boa ;
 
 : register-alarm ( alarm -- )
-    dup dup time>> alarms get-global heap-push*
-    swap entry>> >box
+    [ dup time>> alarms get-global heap-push* ]
+    [ entry>> >box ] bi
     notify-alarm-thread ;
 
 : alarm-expired? ( alarm now -- ? )
     [ time>> ] dip before=? ;
 
 : reschedule-alarm ( alarm -- )
-    dup [ swap interval>> time+ now max ] change-time register-alarm ;
+    dup '[ _ interval>> time+ now max ] change-time register-alarm ;
 
 : call-alarm ( alarm -- )
     [ entry>> box> drop ]

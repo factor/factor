@@ -1,8 +1,8 @@
-IN: compiler.cfg.stacks.uninitialized.tests
 USING: compiler.cfg.stacks.uninitialized compiler.cfg.debugger
 compiler.cfg.registers compiler.cfg.instructions compiler.cfg
 compiler.cfg.predecessors cpu.architecture tools.test kernel vectors
 namespaces accessors sequences ;
+IN: compiler.cfg.stacks.uninitialized.tests
 
 : test-uninitialized ( -- )
     cfg new 0 get >>entry

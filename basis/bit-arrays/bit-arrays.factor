@@ -91,10 +91,10 @@ SYNTAX: ?{ \ } [ >bit-array ] parse-literal ;
     dup 0 = [
         <bit-array>
     ] [
-        [ log2 1+ <bit-array> 0 ] keep
+        [ log2 1 + <bit-array> 0 ] keep
         [ dup 0 = ] [
             [ pick underlying>> pick set-alien-unsigned-1 ] keep
-            [ 1+ ] [ -8 shift ] bi*
+            [ 1 + ] [ -8 shift ] bi*
         ] until 2drop
     ] if ;
 

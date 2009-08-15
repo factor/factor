@@ -71,7 +71,7 @@ PRIVATE>
     ] if ; inline recursive
 
 : llength ( list -- n )
-    0 [ drop 1+ ] foldl ;
+    0 [ drop 1 + ] foldl ;
 
 : lreverse ( list -- newlist )    
     nil [ swap cons ] foldl ;

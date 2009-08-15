@@ -12,7 +12,7 @@ TUPLE: script-string font string metrics ssa size image disposed ;
 : line-offset>x ( n script-string -- x )
     2dup string>> length = [
         ssa>> ! ssa
-        swap 1- ! icp
+        swap 1 - ! icp
         TRUE ! fTrailing
     ] [
         ssa>>

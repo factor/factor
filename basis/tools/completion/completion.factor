@@ -9,7 +9,7 @@ IN: tools.completion
 :: (fuzzy) ( accum i full ch -- accum i full ? )
     ch i full index-from [
         :> i i accum push
-        accum i 1+ full t
+        accum i 1 + full t
     ] [
         f -1 full f
     ] if* ;
@@ -23,7 +23,7 @@ IN: tools.completion
         [
             2dup number=
             [ drop ] [ nip V{ } clone pick push ] if
-            1+
+            1 +
         ] keep pick last push
     ] each ;
 
@@ -33,9 +33,9 @@ IN: tools.completion
 : score-1 ( i full -- n )
     {
         { [ over zero? ] [ 2drop 10 ] }
-        { [ 2dup length 1- number= ] [ 2drop 4 ] }
-        { [ 2dup [ 1- ] dip nth Letter? not ] [ 2drop 10 ] }
-        { [ 2dup [ 1+ ] dip nth Letter? not ] [ 2drop 4 ] }
+        { [ 2dup length 1 - number= ] [ 2drop 4 ] }
+        { [ 2dup [ 1 - ] dip nth Letter? not ] [ 2drop 10 ] }
+        { [ 2dup [ 1 + ] dip nth Letter? not ] [ 2drop 4 ] }
         [ 2drop 1 ]
     } cond ;
 

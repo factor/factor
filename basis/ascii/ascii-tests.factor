@@ -10,7 +10,7 @@ IN: ascii.tests
 
 [ 4 ] [
     0 "There are Four Upper Case characters"
-    [ LETTER? [ 1+ ] when ] each
+    [ LETTER? [ 1 + ] when ] each
 ] unit-test
 
 [ t f ] [ CHAR: \s ascii? 400 ascii? ] unit-test

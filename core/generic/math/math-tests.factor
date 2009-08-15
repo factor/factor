@@ -1,5 +1,5 @@
-IN: generic.math.tests
 USING: generic.math math tools.test kernel ;
+IN: generic.math.tests
 
 ! Test math-combination
 [ [ [ >float ] dip ] ] [ \ real \ float math-upgrade ] unit-test

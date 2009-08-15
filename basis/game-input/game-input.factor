@@ -45,12 +45,12 @@ ERROR: game-input-not-open ;
     game-input-opened? [
         (open-game-input) 
     ] unless
-    game-input-opened [ 1+ ] change-global
+    game-input-opened [ 1 + ] change-global
     reset-mouse ;
 : close-game-input ( -- )
     game-input-opened [
         dup zero? [ game-input-not-open ] when
-        1-
+        1 -
     ] change-global
     game-input-opened? [
         (close-game-input) 

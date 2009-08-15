@@ -1,8 +1,8 @@
-IN: compiler.cfg.loop-detection.tests
 USING: compiler.cfg compiler.cfg.loop-detection
 compiler.cfg.predecessors
 compiler.cfg.debugger
 tools.test kernel namespaces accessors ;
+IN: compiler.cfg.loop-detection.tests
 
 V{ } 0 test-bb
 V{ } 1 test-bb

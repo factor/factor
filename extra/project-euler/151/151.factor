@@ -42,8 +42,8 @@ SYMBOL: table
         <=>
         {
             { +lt+ [ ] }
-            { +eq+ [ 1- ] }
-            { +gt+ [ 1+ ] }
+            { +eq+ [ 1 - ] }
+            { +gt+ [ 1 + ] }
         } case
     ] curry map-index ;
 
@@ -59,9 +59,9 @@ DEFER: (euler151)
 : (euler151) ( x -- y )
     table get [ {
         { { 0 0 0 1 } [ 0 ] }
-        { { 0 0 1 0 } [ { 0 0 0 1 } (euler151) 1+ ] }
-        { { 0 1 0 0 } [ { 0 0 1 1 } (euler151) 1+ ] }
-        { { 1 0 0 0 } [ { 0 1 1 1 } (euler151) 1+ ] }
+        { { 0 0 1 0 } [ { 0 0 0 1 } (euler151) 1 + ] }
+        { { 0 1 0 0 } [ { 0 0 1 1 } (euler151) 1 + ] }
+        { { 1 0 0 0 } [ { 0 1 1 1 } (euler151) 1 + ] }
         [ [ dup length [ pick-sheet ] with map sum ] [ sum ] bi / ]
      } case ] cache ;
 

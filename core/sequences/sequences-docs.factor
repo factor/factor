@@ -123,49 +123,6 @@ HELP: unless-empty
     }
 } ;
 
-HELP: if-zero
-{ $values { "n" number } { "quot1" quotation } { "quot2" quotation } }
-{ $description "Makes an implicit check if the number is zero. A zero is dropped and " { $snippet "quot1" } " is called. Otherwise, if the number is not zero, " { $snippet "quot2" } " is called on it." }
-{ $example
-    "USING: kernel math prettyprint sequences ;"
-    "3 [ \"zero\" ] [ sq ] if-zero ."
-    "9"
-} ;
-
-HELP: when-zero
-{ $values
-     { "n" number } { "quot" "the first quotation of an " { $link if-zero } } }
-{ $description "Makes an implicit check if the sequence is empty. A zero is dropped and the " { $snippet "quot" } " is called." }
-{ $examples "This word is equivalent to " { $link if-zero } " with an empty second quotation:"
-    { $example
-    "USING: sequences prettyprint ;"
-    "0 [ 4 ] [ ] if-zero ."
-    "4"
-    }
-    { $example
-    "USING: sequences prettyprint ;"
-    "0 [ 4 ] when-zero ."
-    "4"
-    }
-} ;
-
-HELP: unless-zero
-{ $values
-     { "n" number } { "quot" "the second quotation of an " { $link if-empty } } }
-{ $description "Makes an implicit check if the number is zero. A zero is dropped. Otherwise, the " { $snippet "quot" } " is called on the number." }
-{ $examples "This word is equivalent to " { $link if-zero } " with an empty first quotation:"
-    { $example
-    "USING: sequences math prettyprint ;"
-    "3 [ ] [ sq ] if-empty ."
-    "9"
-    }
-    { $example
-    "USING: sequences math prettyprint ;"
-    "3 [ sq ] unless-zero ."
-    "9"
-    }
-} ;
-
 HELP: delete-all
 { $values { "seq" "a resizable sequence" } }
 { $description "Resizes the sequence to zero length, removing all elements. Not all sequences are resizable." }
@@ -1440,11 +1397,7 @@ $nl
 "Checking if a sequence is empty:"
 { $subsection if-empty }
 { $subsection when-empty }
-{ $subsection unless-empty }
-"Checking if a number is zero:"
-{ $subsection if-zero }
-{ $subsection when-zero }
-{ $subsection unless-zero } ;
+{ $subsection unless-empty } ;
 
 ARTICLE: "sequences-access" "Accessing sequence elements"
 { $subsection ?nth }

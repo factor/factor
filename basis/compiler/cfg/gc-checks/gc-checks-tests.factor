@@ -1,8 +1,8 @@
-IN: compiler.cfg.gc-checks.tests
 USING: compiler.cfg.gc-checks compiler.cfg.debugger
 compiler.cfg.registers compiler.cfg.instructions compiler.cfg
 compiler.cfg.predecessors cpu.architecture tools.test kernel vectors
 namespaces accessors sequences ;
+IN: compiler.cfg.gc-checks.tests
 
 : test-gc-checks ( -- )
     H{ } clone representations set

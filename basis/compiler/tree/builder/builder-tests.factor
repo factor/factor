@@ -1,6 +1,6 @@
-IN: compiler.tree.builder.tests
 USING: compiler.tree.builder tools.test sequences kernel
 compiler.tree stack-checker stack-checker.errors ;
+IN: compiler.tree.builder.tests
 
 : inline-recursive ( -- ) inline-recursive ; inline recursive
 

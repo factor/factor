@@ -240,11 +240,11 @@ generic-comparison-ops [
     dup name>> {
         {
             [ "alien-signed-" ?head ]
-            [ string>number 8 * 1- 2^ dup neg swap 1- [a,b] ]
+            [ string>number 8 * 1 - 2^ dup neg swap 1 - [a,b] ]
         }
         {
             [ "alien-unsigned-" ?head ]
-            [ string>number 8 * 2^ 1- 0 swap [a,b] ]
+            [ string>number 8 * 2^ 1 - 0 swap [a,b] ]
         }
     } cond
     [ fits-in-fixnum? fixnum integer ? ] keep <class/interval-info>

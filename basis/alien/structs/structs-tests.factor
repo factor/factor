@@ -1,6 +1,6 @@
-IN: alien.structs.tests
 USING: alien alien.syntax alien.c-types kernel tools.test
 sequences system libc words vocabs namespaces layouts ;
+IN: alien.structs.tests
 
 C-STRUCT: bar
     { "int" "x" }

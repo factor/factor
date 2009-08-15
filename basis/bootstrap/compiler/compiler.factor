@@ -74,7 +74,7 @@ nl
 "." write flush
 
 {
-    + 1+ 1- 2/ < <= > >= shift
+    + 2/ < <= > >= shift
 } compile-unoptimized
 
 "." write flush

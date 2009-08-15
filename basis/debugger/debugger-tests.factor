@@ -1,5 +1,5 @@
-IN: debugger.tests
 USING: debugger kernel continuations tools.test ;
+IN: debugger.tests
 
 [ ] [ [ drop ] [ error. ] recover ] unit-test
 
