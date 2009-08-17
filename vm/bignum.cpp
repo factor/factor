@@ -73,10 +73,6 @@ int factorvm::bignum_equal_p(bignum * x, bignum * y)
         && (bignum_equal_p_unsigned (x, y))));
 }
 
-int bignum_equal_p(bignum * x, bignum * y)
-{
-	return vm->bignum_equal_p(x,y);
-}
 
 enum bignum_comparison factorvm::bignum_compare(bignum * x, bignum * y)
 {
@@ -100,10 +96,6 @@ enum bignum_comparison factorvm::bignum_compare(bignum * x, bignum * y)
         : (bignum_compare_unsigned (x, y))));
 }
 
-enum bignum_comparison bignum_compare(bignum * x, bignum * y)
-{
-	return vm->bignum_compare(x,y);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_add(bignum * x, bignum * y)
@@ -120,11 +112,6 @@ bignum *factorvm::bignum_add(bignum * x, bignum * y)
         : ((BIGNUM_NEGATIVE_P (y))
            ? (bignum_subtract_unsigned (x, y))
            : (bignum_add_unsigned (x, y, 0)))));
-}
-
-bignum *bignum_add(bignum * x, bignum * y)
-{
-	return vm->bignum_add(x,y);
 }
 
 /* allocates memory */
@@ -146,10 +133,6 @@ bignum *factorvm::bignum_subtract(bignum * x, bignum * y)
               : (bignum_subtract_unsigned (x, y))))));
 }
 
-bignum *bignum_subtract(bignum * x, bignum * y)
-{
-	return vm->bignum_subtract(x,y);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_multiply(bignum * x, bignum * y)
@@ -183,10 +166,6 @@ bignum *factorvm::bignum_multiply(bignum * x, bignum * y)
   return (bignum_multiply_unsigned (x, y, negative_p));
 }
 
-bignum *bignum_multiply(bignum * x, bignum * y)
-{
-	return vm->bignum_multiply(x,y);
-}
 
 /* allocates memory */
 void factorvm::bignum_divide(bignum * numerator, bignum * denominator, bignum * * quotient, bignum * * remainder)
@@ -259,10 +238,6 @@ void factorvm::bignum_divide(bignum * numerator, bignum * denominator, bignum * 
     }
 }
 
-void bignum_divide(bignum * numerator, bignum * denominator, bignum * * quotient, bignum * * remainder)
-{
-	return vm->bignum_divide(numerator,denominator,quotient,remainder);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_quotient(bignum * numerator, bignum * denominator)
@@ -316,10 +291,6 @@ bignum *factorvm::bignum_quotient(bignum * numerator, bignum * denominator)
   }
 }
 
-bignum *bignum_quotient(bignum * numerator, bignum * denominator)
-{
-	return vm->bignum_quotient(numerator,denominator);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_remainder(bignum * numerator, bignum * denominator)
@@ -365,10 +336,6 @@ bignum *factorvm::bignum_remainder(bignum * numerator, bignum * denominator)
     }
 }
 
-bignum *bignum_remainder(bignum * numerator, bignum * denominator)
-{
-	return vm->bignum_remainder(numerator, denominator);
-}
 
 #define FOO_TO_BIGNUM(name,type,utype) \
 	bignum * factorvm::name##_to_bignum(type n)						   \
@@ -407,7 +374,7 @@ FOO_TO_BIGNUM(long_long,s64,u64)
 FOO_TO_BIGNUM(ulong_long,u64,u64)
 
 #define BIGNUM_TO_FOO(name,type,utype) \
-  type bignum_to_##name(bignum * bignum) \
+type factorvm::bignum_to_##name(bignum * bignum)	\
   { \
     if (BIGNUM_ZERO_P (bignum)) \
       return (0); \
@@ -441,10 +408,6 @@ double factorvm::bignum_to_double(bignum * bignum)
   }
 }
 
-double bignum_to_double(bignum * bignum)
-{
-	return vm->bignum_to_double(bignum);
-}
 
 #define DTB_WRITE_DIGIT(factor) \
 { \
@@ -488,10 +451,6 @@ bignum *factorvm::double_to_bignum(double x)
   }
 }
 
-bignum *double_to_bignum(double x)
-{
-	return vm->double_to_bignum(x);
-}
 
 #undef DTB_WRITE_DIGIT
 
@@ -514,10 +473,6 @@ int factorvm::bignum_equal_p_unsigned(bignum * x, bignum * y)
     }
 }
 
-int bignum_equal_p_unsigned(bignum * x, bignum * y)
-{
-	return vm->bignum_equal_p_unsigned(x,y);
-}
 
 enum bignum_comparison factorvm::bignum_compare_unsigned(bignum * x, bignum * y)
 {
@@ -544,10 +499,6 @@ enum bignum_comparison factorvm::bignum_compare_unsigned(bignum * x, bignum * y)
   return (bignum_comparison_equal);
 }
 
-enum bignum_comparison bignum_compare_unsigned(bignum * x, bignum * y)
-{
-	return vm->bignum_compare_unsigned(x,y);
-}
 
 /* Addition */
 
@@ -616,10 +567,6 @@ bignum *factorvm::bignum_add_unsigned(bignum * x, bignum * y, int negative_p)
   }
 }
 
-bignum *bignum_add_unsigned(bignum * x, bignum * y, int negative_p)
-{
-	return vm->bignum_add_unsigned(x,y,negative_p);
-}
 
 /* Subtraction */
 
@@ -695,10 +642,6 @@ bignum *factorvm::bignum_subtract_unsigned(bignum * x, bignum * y)
   }
 }
 
-bignum *bignum_subtract_unsigned(bignum * x, bignum * y)
-{
-	return vm->bignum_subtract_unsigned(x,y);
-}
 
 /* Multiplication
    Maximum value for product_low or product_high:
@@ -777,10 +720,6 @@ bignum *factorvm::bignum_multiply_unsigned(bignum * x, bignum * y, int negative_
   }
 }
 
-bignum *bignum_multiply_unsigned(bignum * x, bignum * y, int negative_p)
-{
-	return vm->bignum_multiply_unsigned(x,y,negative_p);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_multiply_unsigned_small_factor(bignum * x, bignum_digit_type y,int negative_p)
@@ -797,10 +736,6 @@ bignum *factorvm::bignum_multiply_unsigned_small_factor(bignum * x, bignum_digit
   return (bignum_trim (p));
 }
 
-bignum *bignum_multiply_unsigned_small_factor(bignum * x, bignum_digit_type y,int negative_p)
-{
-	return vm->bignum_multiply_unsigned_small_factor(x,y,negative_p);
-}
 
 void factorvm::bignum_destructive_add(bignum * bignum, bignum_digit_type n)
 {
@@ -825,10 +760,6 @@ void factorvm::bignum_destructive_add(bignum * bignum, bignum_digit_type n)
     }
 }
 
-void bignum_destructive_add(bignum * bignum, bignum_digit_type n)
-{
-	return vm->bignum_destructive_add(bignum,n);
-}
 
 void factorvm::bignum_destructive_scale_up(bignum * bignum, bignum_digit_type factor)
 {
@@ -859,10 +790,6 @@ void factorvm::bignum_destructive_scale_up(bignum * bignum, bignum_digit_type fa
 #undef product_high
 }
 
-void bignum_destructive_scale_up(bignum * bignum, bignum_digit_type factor)
-{
-	return vm->bignum_destructive_scale_up(bignum,factor);
-}
 
 /* Division */
 
@@ -929,10 +856,6 @@ void factorvm::bignum_divide_unsigned_large_denominator(bignum * numerator, bign
   return;
 }
 
-void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denominator, bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p)
-{
-	return vm->bignum_divide_unsigned_large_denominator(numerator,denominator,quotient,remainder,q_negative_p,r_negative_p);
-}
 
 void factorvm::bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q)
 {
@@ -1008,10 +931,6 @@ void factorvm::bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum 
 #undef qj
 }
 
-void bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q)
-{
-	return vm->bignum_divide_unsigned_normalized(u,v,q);
-}
 
 bignum_digit_type factorvm::bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end, bignum_digit_type guess, bignum_digit_type * u_start)
 {
@@ -1088,10 +1007,6 @@ bignum_digit_type factorvm::bignum_divide_subtract(bignum_digit_type * v_start, 
   return (guess - 1);
 }
 
-bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end, bignum_digit_type guess, bignum_digit_type * u_start)
-{
-	return vm->bignum_divide_subtract(v_start,v_end,guess,u_start);
-}
 
 /* allocates memory */
 void factorvm::bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator, bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p)
@@ -1152,10 +1067,6 @@ void factorvm::bignum_divide_unsigned_medium_denominator(bignum * numerator,bign
   return;
 }
 
-void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator, bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p)
-{
-	vm->bignum_divide_unsigned_medium_denominator(numerator,denominator,quotient,remainder,q_negative_p,r_negative_p);
-}
 
 void factorvm::bignum_destructive_normalization(bignum * source, bignum * target, int shift_left)
 {
@@ -1180,10 +1091,6 @@ void factorvm::bignum_destructive_normalization(bignum * source, bignum * target
   return;
 }
 
-void bignum_destructive_normalization(bignum * source, bignum * target, int shift_left)
-{
-	return vm->bignum_destructive_normalization(source,target,shift_left);
-}
 
 void factorvm::bignum_destructive_unnormalization(bignum * bignum, int shift_right)
 {
@@ -1203,10 +1110,6 @@ void factorvm::bignum_destructive_unnormalization(bignum * bignum, int shift_rig
   return;
 }
 
-void bignum_destructive_unnormalization(bignum * bignum, int shift_right)
-{
-	return vm->bignum_destructive_unnormalization(bignum,shift_right);
-}
 
 /* This is a reduced version of the division algorithm, applied to the
    case of dividing two bignum digits by one bignum digit.  It is
@@ -1272,10 +1175,6 @@ bignum_digit_type factorvm::bignum_digit_divide(bignum_digit_type uh, bignum_dig
   return (HD_CONS ((u[2]), (u[3])));
 }
 
-bignum_digit_type bignum_digit_divide(bignum_digit_type uh, bignum_digit_type ul, bignum_digit_type v, bignum_digit_type * q) /* return value */
-{
-	return vm->bignum_digit_divide(uh,ul,v,q);
-}
 
 #undef BDD_STEP
 
@@ -1340,10 +1239,6 @@ bignum_digit_type factorvm::bignum_digit_divide_subtract(bignum_digit_type v1, b
   return (guess - 1);
 }
 
-bignum_digit_type bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2, bignum_digit_type guess, bignum_digit_type * u)
-{
-	return vm->bignum_digit_divide_subtract(v1,v2,guess,u);
-}
 
 #undef BDDS_MULSUB
 #undef BDDS_ADD
@@ -1368,10 +1263,6 @@ void factorvm::bignum_divide_unsigned_small_denominator(bignum * numerator, bign
   return;
 }
 
-void bignum_divide_unsigned_small_denominator(bignum * numerator, bignum_digit_type denominator, bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p)
-{
-	return vm->bignum_divide_unsigned_small_denominator(numerator,denominator,quotient,remainder,q_negative_p,r_negative_p);
-}
 
 /* Given (denominator > 1), it is fairly easy to show that
    (quotient_high < BIGNUM_RADIX_ROOT), after which it is easy to see
@@ -1399,10 +1290,6 @@ bignum_digit_type factorvm::bignum_destructive_scale_down(bignum * bignum, bignu
 #undef quotient_high
 }
 
-bignum_digit_type bignum_destructive_scale_down(bignum * bignum, bignum_digit_type denominator)
-{
-	return vm->bignum_destructive_scale_down(bignum,denominator);
-}
 
 /* allocates memory */
 bignum * factorvm::bignum_remainder_unsigned_small_denominator(bignum * n, bignum_digit_type d, int negative_p)
@@ -1423,10 +1310,6 @@ bignum * factorvm::bignum_remainder_unsigned_small_denominator(bignum * n, bignu
   return (bignum_digit_to_bignum (r, negative_p));
 }
 
-bignum * bignum_remainder_unsigned_small_denominator(bignum * n, bignum_digit_type d, int negative_p)
-{
-	return vm->bignum_remainder_unsigned_small_denominator(n,d,negative_p);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_digit_to_bignum(bignum_digit_type digit, int negative_p)
@@ -1441,10 +1324,6 @@ bignum *factorvm::bignum_digit_to_bignum(bignum_digit_type digit, int negative_p
     }
 }
 
-bignum *bignum_digit_to_bignum(bignum_digit_type digit, int negative_p)
-{
-	return vm->bignum_digit_to_bignum(digit, negative_p);
-}
 
 /* allocates memory */
 bignum *factorvm::allot_bignum(bignum_length_type length, int negative_p)
@@ -1455,10 +1334,6 @@ bignum *factorvm::allot_bignum(bignum_length_type length, int negative_p)
   return (result);
 }
 
-bignum *allot_bignum(bignum_length_type length, int negative_p)
-{
-	return vm->allot_bignum(length,negative_p);
-}
 
 /* allocates memory */
 bignum * factorvm::allot_bignum_zeroed(bignum_length_type length, int negative_p)
@@ -1471,10 +1346,6 @@ bignum * factorvm::allot_bignum_zeroed(bignum_length_type length, int negative_p
   return (result);
 }
 
-bignum * allot_bignum_zeroed(bignum_length_type length, int negative_p)
-{
-	return vm->allot_bignum_zeroed(length,negative_p);
-}
 
 #define BIGNUM_REDUCE_LENGTH(source, length) \
 	source = reallot_array(source,length + 1)
@@ -1492,10 +1363,6 @@ bignum *factorvm::bignum_shorten_length(bignum * bignum, bignum_length_type leng
   return (bignum);
 }
 
-bignum *bignum_shorten_length(bignum * bignum, bignum_length_type length)
-{
-	return vm->bignum_shorten_length(bignum,length);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_trim(bignum * bignum)
@@ -1515,10 +1382,6 @@ bignum *factorvm::bignum_trim(bignum * bignum)
   return (bignum);
 }
 
-bignum *bignum_trim(bignum * bignum)
-{
-	return vm->bignum_trim(bignum);
-}
 
 /* Copying */
 
@@ -1532,10 +1395,6 @@ bignum *factorvm::bignum_new_sign(bignum * x, int negative_p)
   return (result);
 }
 
-bignum *bignum_new_sign(bignum * x, int negative_p)
-{
-	return vm->bignum_new_sign(x,negative_p);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_maybe_new_sign(bignum * x, int negative_p)
@@ -1551,10 +1410,6 @@ bignum *factorvm::bignum_maybe_new_sign(bignum * x, int negative_p)
     }
 }
 
-bignum *bignum_maybe_new_sign(bignum * x, int negative_p)
-{
-	return vm->bignum_maybe_new_sign(x,negative_p);
-}
 
 void factorvm::bignum_destructive_copy(bignum * source, bignum * target)
 {
@@ -1567,10 +1422,6 @@ void factorvm::bignum_destructive_copy(bignum * source, bignum * target)
   return;
 }
 
-void bignum_destructive_copy(bignum * source, bignum * target)
-{
-	return vm->bignum_destructive_copy(source,target);
-}
 
 /*
  * Added bitwise operations (and oddp).
@@ -1582,10 +1433,6 @@ bignum *factorvm::bignum_bitwise_not(bignum * x)
   return bignum_subtract(BIGNUM_ONE(1), x);
 }
 
-bignum *bignum_bitwise_not(bignum * x)
-{
-	return vm->bignum_bitwise_not(x);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_arithmetic_shift(bignum * arg1, fixnum n)
@@ -1596,10 +1443,6 @@ bignum *factorvm::bignum_arithmetic_shift(bignum * arg1, fixnum n)
     return bignum_magnitude_ash(arg1, n);
 }
 
-bignum *bignum_arithmetic_shift(bignum * arg1, fixnum n)
-{
-	return vm->bignum_arithmetic_shift(arg1,n);
-}
 
 #define AND_OP 0
 #define IOR_OP 1
@@ -1619,10 +1462,6 @@ bignum *factorvm::bignum_bitwise_and(bignum * arg1, bignum * arg2)
          );
 }
 
-bignum *bignum_bitwise_and(bignum * arg1, bignum * arg2)
-{
-	return vm->bignum_bitwise_and(arg1,arg2);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_bitwise_ior(bignum * arg1, bignum * arg2)
@@ -1638,10 +1477,6 @@ bignum *factorvm::bignum_bitwise_ior(bignum * arg1, bignum * arg2)
          );
 }
 
-bignum *bignum_bitwise_ior(bignum * arg1, bignum * arg2)
-{
-	return vm->bignum_bitwise_ior(arg1,arg2);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_bitwise_xor(bignum * arg1, bignum * arg2)
@@ -1657,10 +1492,6 @@ bignum *factorvm::bignum_bitwise_xor(bignum * arg1, bignum * arg2)
          );
 }
 
-bignum *bignum_bitwise_xor(bignum * arg1, bignum * arg2)
-{
-	return vm->bignum_bitwise_xor(arg1,arg2);
-}
 
 /* allocates memory */
 /* ash for the magnitude */
@@ -1725,10 +1556,6 @@ bignum *factorvm::bignum_magnitude_ash(bignum * arg1, fixnum n)
   return (bignum_trim (result));
 }
 
-bignum *bignum_magnitude_ash(bignum * arg1, fixnum n)
-{
-	return vm->bignum_magnitude_ash(arg1,n);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_pospos_bitwise_op(int op, bignum * arg1, bignum * arg2)
@@ -1764,10 +1591,6 @@ bignum *factorvm::bignum_pospos_bitwise_op(int op, bignum * arg1, bignum * arg2)
   return bignum_trim(result);
 }
 
-bignum *bignum_pospos_bitwise_op(int op, bignum * arg1, bignum * arg2)
-{
-	return vm->bignum_pospos_bitwise_op(op,arg1,arg2);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_posneg_bitwise_op(int op, bignum * arg1, bignum * arg2)
@@ -1821,10 +1644,6 @@ bignum *factorvm::bignum_posneg_bitwise_op(int op, bignum * arg1, bignum * arg2)
   return bignum_trim(result);
 }
 
-bignum *bignum_posneg_bitwise_op(int op, bignum * arg1, bignum * arg2)
-{
-	return vm->bignum_posneg_bitwise_op(op,arg1,arg2);
-}
 
 /* allocates memory */
 bignum *factorvm::bignum_negneg_bitwise_op(int op, bignum * arg1, bignum * arg2)
@@ -1886,10 +1705,6 @@ bignum *factorvm::bignum_negneg_bitwise_op(int op, bignum * arg1, bignum * arg2)
   return bignum_trim(result);
 }
 
-bignum *bignum_negneg_bitwise_op(int op, bignum * arg1, bignum * arg2)
-{
-	return vm->bignum_negneg_bitwise_op(op,arg1,arg2);
-}
 
 void factorvm::bignum_negate_magnitude(bignum * arg)
 {
@@ -1918,10 +1733,6 @@ void factorvm::bignum_negate_magnitude(bignum * arg)
   }
 }
 
-void bignum_negate_magnitude(bignum * arg)
-{
-	return vm->bignum_negate_magnitude(arg);
-}
 
 /* Allocates memory */
 bignum *factorvm::bignum_integer_length(bignum * x)
@@ -1944,10 +1755,6 @@ bignum *factorvm::bignum_integer_length(bignum * x)
   return (bignum_trim (result));
 }
 
-bignum *bignum_integer_length(bignum * x)
-{
-	return vm->bignum_integer_length(x);
-}
 
 /* Allocates memory */
 int factorvm::bignum_logbitp(int shift, bignum * arg)
@@ -1957,10 +1764,6 @@ int factorvm::bignum_logbitp(int shift, bignum * arg)
          : bignum_unsigned_logbitp (shift,arg));
 }
 
-int bignum_logbitp(int shift, bignum * arg)
-{
-	return vm->bignum_logbitp(shift,arg);
-}
 
 int factorvm::bignum_unsigned_logbitp(int shift, bignum * bignum)
 {
@@ -1974,10 +1777,6 @@ int factorvm::bignum_unsigned_logbitp(int shift, bignum * bignum)
   return (digit & mask) ? 1 : 0;
 }
 
-int bignum_unsigned_logbitp(int shift, bignum * bignum)
-{
-	return vm->bignum_unsigned_logbitp(shift,bignum);
-}
 
 /* Allocates memory */
 bignum *factorvm::digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factorvm*), unsigned int radix, int negative_p)
@@ -2016,9 +1815,5 @@ bignum *factorvm::digit_stream_to_bignum(unsigned int n_digits, unsigned int (*p
   }
 }
 
-bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factorvm*), unsigned int radix, int negative_p)
-{
-	return vm->digit_stream_to_bignum(n_digits,producer,radix,negative_p);
-}
 
 }
