@@ -249,3 +249,12 @@ cell {
     { fixnum+ >fixnum } inlined?
 ] unit-test
 
+[ f ] [
+    [ f >fixnum ]
+    { >fixnum } inlined?
+] unit-test
+
+[ f ] [
+    [ [ >fixnum ] 2dip set-alien-unsigned-1 ]
+    { >fixnum } inlined?
+] unit-test
