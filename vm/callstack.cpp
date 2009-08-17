@@ -3,7 +3,7 @@
 namespace factor
 {
 
-static void check_frame(stack_frame *frame)
+void factorvm::check_frame(stack_frame *frame)
 {
 #ifdef FACTOR_DEBUG
 	check_code_pointer((cell)frame->xt);
@@ -11,14 +11,24 @@ static void check_frame(stack_frame *frame)
 #endif
 }
 
-callstack *allot_callstack(cell size)
+void check_frame(stack_frame *frame)
+{
+	return vm->check_frame(frame);
+}
+
+callstack *factorvm::allot_callstack(cell size)
 {
 	callstack *stack = allot<callstack>(callstack_size(size));
 	stack->length = tag_fixnum(size);
 	return stack;
 }
 
-stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom)
+callstack *allot_callstack(cell size)
+{
+	return vm->allot_callstack(size);
+}
+
+stack_frame *factorvm::fix_callstack_top(stack_frame *top, stack_frame *bottom)
 {
 	stack_frame *frame = bottom - 1;
 
@@ -28,6 +38,11 @@ stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom)
 	return frame + 1;
 }
 
+stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom)
+{
+	return vm->fix_callstack_top(top,bottom);
+}
+
 /* We ignore the topmost frame, the one calling 'callstack',
 so that set-callstack doesn't get stuck in an infinite loop.
 
@@ -35,7 +50,7 @@ This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-stack_frame *capture_start()
+stack_frame *factorvm::capture_start()
 {
 	stack_frame *frame = stack_chain->callstack_bottom - 1;
 	while(frame >= stack_chain->callstack_top
@@ -46,7 +61,12 @@ stack_frame *capture_start()
 	return frame + 1;
 }
 
-PRIMITIVE(callstack)
+stack_frame *capture_start()
+{
+	return vm->capture_start();
+}
+
+inline void factorvm::vmprim_callstack()
 {
 	stack_frame *top = capture_start();
 	stack_frame *bottom = stack_chain->callstack_bottom;
@@ -60,7 +80,12 @@ PRIMITIVE(callstack)
 	dpush(tag<callstack>(stack));
 }
 
-PRIMITIVE(set_callstack)
+PRIMITIVE(callstack)
+{
+	PRIMITIVE_GETVM()->vmprim_callstack();
+}
+
+inline void factorvm::vmprim_set_callstack()
 {
 	callstack *stack = untag_check<callstack>(dpop());
 
@@ -73,18 +98,33 @@ PRIMITIVE(set_callstack)
 	critical_error("Bug in set_callstack()",0);
 }
 
-code_block *frame_code(stack_frame *frame)
+PRIMITIVE(set_callstack)
+{
+	PRIMITIVE_GETVM()->vmprim_set_callstack();
+}
+
+code_block *factorvm::frame_code(stack_frame *frame)
 {
 	check_frame(frame);
 	return (code_block *)frame->xt - 1;
 }
 
-cell frame_type(stack_frame *frame)
+code_block *frame_code(stack_frame *frame)
+{
+	return vm->frame_code(frame);
+}
+
+cell factorvm::frame_type(stack_frame *frame)
 {
 	return frame_code(frame)->type;
 }
 
-cell frame_executing(stack_frame *frame)
+cell frame_type(stack_frame *frame)
+{
+	return vm->frame_type(frame);
+}
+
+cell factorvm::frame_executing(stack_frame *frame)
 {
 	code_block *compiled = frame_code(frame);
 	if(compiled->literals == F || !stack_traces_p())
@@ -98,14 +138,24 @@ cell frame_executing(stack_frame *frame)
 	}
 }
 
-stack_frame *frame_successor(stack_frame *frame)
+cell frame_executing(stack_frame *frame)
+{
+	return vm->frame_executing(frame);
+}
+
+stack_frame *factorvm::frame_successor(stack_frame *frame)
 {
 	check_frame(frame);
 	return (stack_frame *)((cell)frame - frame->size);
 }
 
+stack_frame *frame_successor(stack_frame *frame)
+{
+	return vm->frame_successor(frame);
+}
+
 /* Allocates memory */
-cell frame_scan(stack_frame *frame)
+cell factorvm::frame_scan(stack_frame *frame)
 {
 	switch(frame_type(frame))
 	{
@@ -131,6 +181,11 @@ cell frame_scan(stack_frame *frame)
 	}
 }
 
+cell frame_scan(stack_frame *frame)
+{
+	return vm->frame_scan(frame);
+}
+
 namespace
 {
 
@@ -149,7 +204,7 @@ struct stack_frame_accumulator {
 
 }
 
-PRIMITIVE(callstack_to_array)
+inline void factorvm::vmprim_callstack_to_array()
 {
 	gc_root<callstack> callstack(dpop());
 
@@ -160,7 +215,12 @@ PRIMITIVE(callstack_to_array)
 	dpush(accum.frames.elements.value());
 }
 
-stack_frame *innermost_stack_frame(callstack *stack)
+PRIMITIVE(callstack_to_array)
+{
+	PRIMITIVE_GETVM()->vmprim_callstack_to_array();
+}
+
+stack_frame *factorvm::innermost_stack_frame(callstack *stack)
 {
 	stack_frame *top = stack->top();
 	stack_frame *bottom = stack->bottom();
@@ -172,26 +232,46 @@ stack_frame *innermost_stack_frame(callstack *stack)
 	return frame;
 }
 
-stack_frame *innermost_stack_frame_quot(callstack *callstack)
+stack_frame *innermost_stack_frame(callstack *stack)
+{
+	return vm->innermost_stack_frame(stack);
+}
+
+stack_frame *factorvm::innermost_stack_frame_quot(callstack *callstack)
 {
 	stack_frame *inner = innermost_stack_frame(callstack);
 	tagged<quotation>(frame_executing(inner)).untag_check();
 	return inner;
 }
 
+stack_frame *innermost_stack_frame_quot(callstack *callstack)
+{
+	return vm->innermost_stack_frame_quot(callstack);
+}
+
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
-PRIMITIVE(innermost_stack_frame_executing)
+inline void factorvm::vmprim_innermost_stack_frame_executing()
 {
 	dpush(frame_executing(innermost_stack_frame(untag_check<callstack>(dpop()))));
 }
 
-PRIMITIVE(innermost_stack_frame_scan)
+PRIMITIVE(innermost_stack_frame_executing)
+{
+	PRIMITIVE_GETVM()->vmprim_innermost_stack_frame_executing();
+}
+
+inline void factorvm::vmprim_innermost_stack_frame_scan()
 {
 	dpush(frame_scan(innermost_stack_frame_quot(untag_check<callstack>(dpop()))));
 }
 
-PRIMITIVE(set_innermost_stack_frame_quot)
+PRIMITIVE(innermost_stack_frame_scan)
+{
+	PRIMITIVE_GETVM()->vmprim_innermost_stack_frame_scan();
+}
+
+inline void factorvm::vmprim_set_innermost_stack_frame_quot()
 {
 	gc_root<callstack> callstack(dpop());
 	gc_root<quotation> quot(dpop());
@@ -207,10 +287,20 @@ PRIMITIVE(set_innermost_stack_frame_quot)
 	FRAME_RETURN_ADDRESS(inner) = (char *)quot->xt + offset;
 }
 
+PRIMITIVE(set_innermost_stack_frame_quot)
+{
+	PRIMITIVE_GETVM()->vmprim_set_innermost_stack_frame_quot();
+}
+
 /* called before entry into Factor code. */
-VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom)
+void factorvm::save_callstack_bottom(stack_frame *callstack_bottom)
 {
 	stack_chain->callstack_bottom = callstack_bottom;
+}
+
+VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom)
+{
+	return vm->save_callstack_bottom(callstack_bottom);
 }
 
 }

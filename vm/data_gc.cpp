@@ -686,7 +686,7 @@ void factorvm::garbage_collection(cell gen,bool growing_data_heap_,cell requeste
 		code_heap_scans++;
 
 		if(collecting_gen == data->tenured())
-			free_unmarked(&code,(heap_iterator)update_literal_and_word_references);
+			free_unmarked(&code,(heap_iterator)factor::update_literal_and_word_references);
 		else
 			copy_code_heap_roots();
 
