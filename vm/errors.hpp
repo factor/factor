@@ -29,12 +29,7 @@ void critical_error(const char* msg, cell tagged);
 
 PRIMITIVE(die);
 
-void throw_error(cell error, stack_frame *native_stack);
 void general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *native_stack);
-void divide_by_zero_error();
-void memory_protection_error(cell addr, stack_frame *native_stack);
-void signal_error(int signal, stack_frame *native_stack);
-void type_error(cell type, cell tagged);
 void not_implemented_error();
 void fp_trap_error(unsigned int fpu_status, stack_frame *signal_callstack_top);
 
