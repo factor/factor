@@ -3,7 +3,7 @@
 namespace factor
 {
 
-factorvm *vm;
+factorvm *vm = new factorvm;
 
 void factorvm::default_parameters(vm_parameters *p)
 {
@@ -117,7 +117,6 @@ void do_stage1_init()
 
 void factorvm::init_factor(vm_parameters *p)
 {
-	vm = new factorvm;
 	/* Kilobytes */
 	p->ds_size = align_page(p->ds_size << 10);
 	p->rs_size = align_page(p->rs_size << 10);
