@@ -6,13 +6,6 @@ inline static cell callstack_size(cell size)
 	return sizeof(callstack) + size;
 }
 
-stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom);
-stack_frame *frame_successor(stack_frame *frame);
-code_block *frame_code(stack_frame *frame);
-cell frame_executing(stack_frame *frame);
-cell frame_scan(stack_frame *frame);
-cell frame_type(stack_frame *frame);
-
 PRIMITIVE(callstack);
 PRIMITIVE(set_callstack);
 PRIMITIVE(callstack_to_array);
