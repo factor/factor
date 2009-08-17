@@ -63,6 +63,20 @@ struct factorvm {
 	bignum *bignum_add(bignum * x, bignum * y);
 	bignum *bignum_subtract(bignum * x, bignum * y);
 	bignum *bignum_multiply(bignum * x, bignum * y);
+	void bignum_divide(bignum * numerator, bignum * denominator, bignum * * quotient, bignum * * remainder);
+	bignum *bignum_quotient(bignum * numerator, bignum * denominator);
+	bignum *bignum_remainder(bignum * numerator, bignum * denominator);
+	double bignum_to_double(bignum * bignum);
+	bignum *double_to_bignum(double x);
+	int bignum_equal_p_unsigned(bignum * x, bignum * y);
+	enum bignum_comparison bignum_compare_unsigned(bignum * x, bignum * y);
+	bignum *bignum_add_unsigned(bignum * x, bignum * y, int negative_p);
+	bignum *bignum_subtract_unsigned(bignum * x, bignum * y);
+	bignum *bignum_multiply_unsigned(bignum * x, bignum * y, int negative_p);
+	bignum *bignum_multiply_unsigned_small_factor(bignum * x, bignum_digit_type y,int negative_p);
+	void bignum_destructive_add(bignum * bignum, bignum_digit_type n);
+	void bignum_destructive_scale_up(bignum * bignum, bignum_digit_type factor);
+	void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denominator, bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
 	// next method here:
 
 };
