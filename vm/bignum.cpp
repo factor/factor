@@ -61,8 +61,7 @@ namespace factor
 
 /* Exports */
 
-int
-bignum_equal_p(bignum * x, bignum * y)
+int factorvm::bignum_equal_p(bignum * x, bignum * y)
 {
   return
     ((BIGNUM_ZERO_P (x))
@@ -74,8 +73,12 @@ bignum_equal_p(bignum * x, bignum * y)
         && (bignum_equal_p_unsigned (x, y))));
 }
 
-enum bignum_comparison
-bignum_compare(bignum * x, bignum * y)
+int bignum_equal_p(bignum * x, bignum * y)
+{
+	return vm->bignum_equal_p(x,y);
+}
+
+enum bignum_comparison factorvm::bignum_compare(bignum * x, bignum * y)
 {
   return
     ((BIGNUM_ZERO_P (x))
@@ -97,9 +100,13 @@ bignum_compare(bignum * x, bignum * y)
         : (bignum_compare_unsigned (x, y))));
 }
 
+enum bignum_comparison bignum_compare(bignum * x, bignum * y)
+{
+	return vm->bignum_compare(x,y);
+}
+
 /* allocates memory */
-bignum *
-bignum_add(bignum * x, bignum * y)
+bignum *factorvm::bignum_add(bignum * x, bignum * y)
 {
   return
     ((BIGNUM_ZERO_P (x))
@@ -115,9 +122,13 @@ bignum_add(bignum * x, bignum * y)
            : (bignum_add_unsigned (x, y, 0)))));
 }
 
+bignum *bignum_add(bignum * x, bignum * y)
+{
+	return vm->bignum_add(x,y);
+}
+
 /* allocates memory */
-bignum *
-bignum_subtract(bignum * x, bignum * y)
+bignum *factorvm::bignum_subtract(bignum * x, bignum * y)
 {
   return
     ((BIGNUM_ZERO_P (x))
@@ -135,9 +146,13 @@ bignum_subtract(bignum * x, bignum * y)
               : (bignum_subtract_unsigned (x, y))))));
 }
 
+bignum *bignum_subtract(bignum * x, bignum * y)
+{
+	return vm->bignum_subtract(x,y);
+}
+
 /* allocates memory */
-bignum *
-bignum_multiply(bignum * x, bignum * y)
+bignum *factorvm::bignum_multiply(bignum * x, bignum * y)
 {
   bignum_length_type x_length = (BIGNUM_LENGTH (x));
   bignum_length_type y_length = (BIGNUM_LENGTH (y));
@@ -166,6 +181,11 @@ bignum_multiply(bignum * x, bignum * y)
         return (bignum_multiply_unsigned_small_factor (x, digit, negative_p));
     }
   return (bignum_multiply_unsigned (x, y, negative_p));
+}
+
+bignum *bignum_multiply(bignum * x, bignum * y)
+{
+	return vm->bignum_multiply(x,y);
 }
 
 /* allocates memory */
