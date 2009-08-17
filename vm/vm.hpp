@@ -236,6 +236,14 @@ struct factorvm {
 	tuple *allot_tuple(cell layout_);
 	inline void vmprim_tuple();
 	inline void vmprim_tuple_boa();
+
+	//words
+	word *allot_word(cell vocab_, cell name_);
+	inline void vmprim_word();
+	inline void vmprim_word_xt();
+	void update_word_xt(cell w_);
+	inline void vmprim_optimized_p();
+	inline void vmprim_wrapper();
 	// next method here:
 
 
