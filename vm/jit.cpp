@@ -102,7 +102,7 @@ code_block *jit::to_code_block()
 	relocation.trim();
 	literals.trim();
 
-	return add_code_block(
+	return myvm->add_code_block(
 		type,
 		code.elements.value(),
 		F, /* no labels */
