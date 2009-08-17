@@ -41,9 +41,6 @@ struct vm_parameters {
 	cell max_pic_size;
 };
 
-void load_image(vm_parameters *p);
-bool save_image(const vm_char *file);
-
 PRIMITIVE(save_image);
 PRIMITIVE(save_image_and_exit);
 
