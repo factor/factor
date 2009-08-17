@@ -14,10 +14,6 @@ void factorvm::init_objects(image_header *h)
 	bignum_neg_one = h->bignum_neg_one;
 }
 
-void init_objects(image_header *h)
-{
-	return vm->init_objects(h);
-}
 
 
 void factorvm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
@@ -53,10 +49,6 @@ void factorvm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 	data_relocation_base = h->data_relocation_base;
 }
 
-void load_data_heap(FILE *file, image_header *h, vm_parameters *p)
-{
-	return vm->load_data_heap(file,h,p);
-}
 
 
 void factorvm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
@@ -84,10 +76,6 @@ void factorvm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 	build_free_list(&code,h->code_size);
 }
 
-void load_code_heap(FILE *file, image_header *h, vm_parameters *p)
-{
-	return vm->load_code_heap(file,h,p);
-}
 
 /* Save the current image to disk */
 bool factorvm::save_image(const vm_char *filename)
@@ -135,10 +123,6 @@ bool factorvm::save_image(const vm_char *filename)
 	return ok;
 }
 
-bool save_image(const vm_char *filename)
-{
-	return vm->save_image(filename);
-}
 
 inline void factorvm::vmprim_save_image()
 {
@@ -207,10 +191,6 @@ template <typename TYPE> void factorvm::code_fixup(TYPE **handle)
 	*handle = new_ptr;
 }
 
-template <typename TYPE> void code_fixup(TYPE **handle)
-{
-	return vm->code_fixup(handle);
-}
 
 void factorvm::fixup_word(word *word)
 {
@@ -221,10 +201,6 @@ void factorvm::fixup_word(word *word)
 	code_fixup(&word->xt);
 }
 
-void fixup_word(word *word)
-{
-	return vm->fixup_word(word);
-}
 
 void factorvm::fixup_quotation(quotation *quot)
 {
@@ -237,20 +213,12 @@ void factorvm::fixup_quotation(quotation *quot)
 		quot->xt = (void *)lazy_jit_compile;
 }
 
-void fixup_quotation(quotation *quot)
-{
-	return vm->fixup_quotation(quot);
-}
 
 void factorvm::fixup_alien(alien *d)
 {
 	d->expired = T;
 }
 
-void fixup_alien(alien *d)
-{
-	return vm->fixup_alien(d);
-}
 
 void factorvm::fixup_stack_frame(stack_frame *frame)
 {
@@ -268,10 +236,6 @@ void factorvm::fixup_callstack_object(callstack *stack)
 	iterate_callstack_object(stack,factor::fixup_stack_frame);
 }
 
-void fixup_callstack_object(callstack *stack)
-{
-	return vm->fixup_callstack_object(stack);
-}
 
 /* Initialize an object in a newly-loaded image */
 void factorvm::relocate_object(object *object)
@@ -317,10 +281,6 @@ void factorvm::relocate_object(object *object)
 	}
 }
 
-void relocate_object(object *object)
-{
-	return vm->relocate_object(object);
-}
 
 /* Since the image might have been saved with a different base address than
 where it is loaded, we need to fix up pointers in the image. */
@@ -349,10 +309,6 @@ void factorvm::relocate_data()
 	}
 }
 
-void relocate_data()
-{
-	return vm->relocate_data();
-}
 
 void factorvm::fixup_code_block(code_block *compiled)
 {
@@ -373,10 +329,6 @@ void factorvm::relocate_code()
 	iterate_code_heap(factor::fixup_code_block);
 }
 
-void relocate_code()
-{
-	return vm->relocate_code();
-}
 
 /* Read an image file from disk, only done once during startup */
 /* This function also initializes the data and code heaps */
@@ -414,9 +366,5 @@ void factorvm::load_image(vm_parameters *p)
 	userenv[IMAGE_ENV] = allot_alien(F,(cell)p->image_path);
 }
 
-void load_image(vm_parameters *p)
-{
-	return vm->load_image(p);
-}
 
 }
