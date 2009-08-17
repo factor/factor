@@ -38,47 +38,7 @@ PRIMITIVE(bignum_bitp);
 PRIMITIVE(bignum_log2);
 PRIMITIVE(byte_array_to_bignum);
 
-
-
-
-
-
-
-
-
 cell unbox_array_size();
-
-inline static double untag_float(cell tagged)
-{
-	return untag<boxed_float>(tagged)->n;
-}
-
-inline static double untag_float_check(cell tagged)
-{
-	return untag_check<boxed_float>(tagged)->n;
-}
-
-
-
-
-
-inline static fixnum float_to_fixnum(cell tagged)
-{
-	return (fixnum)untag_float(tagged);
-}
-
-
-
-
-
-inline double fixnum_to_float(cell tagged)
-{
-	return (double)untag_fixnum(tagged);
-}
-
-
-
-
 
 PRIMITIVE(fixnum_to_float);
 PRIMITIVE(bignum_to_float);
