@@ -10,7 +10,7 @@ bool in_code_heap_p(cell ptr);
 
 void jit_compile_word(cell word, cell def, bool relocate);
 
-typedef void (*code_heap_iterator)(code_block *compiled);
+//typedef void (*code_heap_iterator)(code_block *compiled);
 
 void iterate_code_heap(code_heap_iterator iter);
 

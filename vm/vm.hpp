@@ -1,6 +1,19 @@
 namespace factor
 {
 
+struct heap;
+struct data_heap;
+struct data;
+struct zone;
+struct vm_parameters;
+struct image_header;
+
+typedef u8 card;
+typedef u8 card_deck;
+
+typedef void (*heap_iterator)(heap_block *compiled);
+typedef void (*code_heap_iterator)(code_block *compiled);
+
 struct factorvm {
 
 	// contexts
@@ -173,6 +186,10 @@ struct factorvm {
 	void clear_gc_stats();
 	inline void vmprim_become();
 	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
+
+	// local roots
+	std::vector<cell> gc_locals;
+	std::vector<cell> gc_bignums;
 
 	//debug
 	void print_chars(string* str);
