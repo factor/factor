@@ -489,6 +489,8 @@ struct factorvm {
 	void compact_code_heap();
 
 	//image
+	cell code_relocation_base;
+	cell data_relocation_base;
 	void init_objects(image_header *h);
 	void load_data_heap(FILE *file, image_header *h, vm_parameters *p);
 	void load_code_heap(FILE *file, image_header *h, vm_parameters *p);
@@ -578,6 +580,11 @@ struct factorvm {
 	inline void vmprim_dispatch_stats();
 
 	//inline cache
+	cell max_pic_size;
+	cell cold_call_to_ic_transitions;
+	cell ic_to_pic_transitions;
+	cell pic_to_mega_transitions;
+	cell pic_counts[4];  /* PIC_TAG, PIC_HI_TAG, PIC_TUPLE, PIC_HI_TAG_TUPLE */
 	void init_inline_caching(int max_size);
 	void deallocate_inline_cache(cell return_address);
 	cell determine_inline_cache_type(array *cache_entries);

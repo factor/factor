@@ -19,7 +19,6 @@ void init_objects(image_header *h)
 	return vm->init_objects(h);
 }
 
-cell data_relocation_base;
 
 void factorvm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 {
@@ -59,7 +58,6 @@ void load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 	return vm->load_data_heap(file,h,p);
 }
 
-cell code_relocation_base;
 
 void factorvm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 {
