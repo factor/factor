@@ -5,8 +5,6 @@ factor::context *stack_chain;
 namespace factor
 {
 
-cell ds_size, rs_size;
-context *unused_contexts;
 
 void factorvm::reset_datastack()
 {

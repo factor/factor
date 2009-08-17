@@ -123,22 +123,22 @@ object *resolve_forwarding(object *untagged)
 	return vm->resolve_forwarding(untagged);
 }
 
-template <typename T> T *factorvm::copy_untagged_object(T *untagged)
+template <typename TYPE> TYPE *factorvm::copy_untagged_object(TYPE *untagged)
 {
 	check_data_pointer(untagged);
 
 	if(untagged->h.forwarding_pointer_p())
-		untagged = (T *)resolve_forwarding(untagged->h.forwarding_pointer());
+		untagged = (TYPE *)resolve_forwarding(untagged->h.forwarding_pointer());
 	else
 	{
 		untagged->h.check_header();
-		untagged = (T *)copy_object_impl(untagged);
+		untagged = (TYPE *)copy_object_impl(untagged);
 	}
 
 	return untagged;
 }
 
-template <typename T> T *copy_untagged_object(T *untagged)
+template <typename TYPE> TYPE *copy_untagged_object(TYPE *untagged)
 {
 	return vm->copy_untagged_object(untagged);
 }
