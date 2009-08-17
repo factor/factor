@@ -155,7 +155,6 @@ struct factorvm {
 	template<typename T> void each_object(T &functor);
 	cell find_all_words();
 	cell object_size(cell tagged);
-	// next method here:
 
 	
 	//write barrier
@@ -499,6 +498,8 @@ struct factorvm {
 	void forward_object_xts();
 	void fixup_object_xts();
 	void compact_code_heap();
+	inline void check_code_pointer(cell ptr);
+ 	// next method here:
 
 	//image
 	cell code_relocation_base;

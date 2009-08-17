@@ -9,10 +9,6 @@ void factorvm::init_code_heap(cell size)
 	new_heap(&code,size);
 }
 
-void init_code_heap(cell size)
-{
-	return vm->init_code_heap(size);
-}
 
 bool factorvm::in_code_heap_p(cell ptr)
 {
@@ -38,10 +34,6 @@ void factorvm::jit_compile_word(cell word_, cell def_, bool relocate)
 	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
 }
 
-void jit_compile_word(cell word_, cell def_, bool relocate)
-{
-	return vm->jit_compile_word(word_,def_,relocate);
-}
 
 /* Apply a function to every code block */
 void factorvm::iterate_code_heap(code_heap_iterator iter)
@@ -56,10 +48,6 @@ void factorvm::iterate_code_heap(code_heap_iterator iter)
 	}
 }
 
-void iterate_code_heap(code_heap_iterator iter)
-{
-	return vm->iterate_code_heap(iter);
-}
 
 /* Copy literals referenced from all code blocks to newspace. Only for
 aging and nursery collections */
@@ -68,10 +56,6 @@ void factorvm::copy_code_heap_roots()
 	iterate_code_heap(factor::copy_literal_references);
 }
 
-void copy_code_heap_roots()
-{
-	return vm->copy_code_heap_roots();
-}
 
 /* Update pointers to words referenced from all code blocks. Only after
 defining a new word. */
@@ -80,10 +64,6 @@ void factorvm::update_code_heap_words()
 	iterate_code_heap(factor::update_word_references);
 }
 
-void update_code_heap_words()
-{
-	return vm->update_code_heap_words();
-}
 
 inline void factorvm::vmprim_modify_code_heap()
 {
@@ -163,10 +143,6 @@ code_block *factorvm::forward_xt(code_block *compiled)
 	return (code_block *)forwarding[compiled];
 }
 
-code_block *forward_xt(code_block *compiled)
-{
-	return vm->forward_xt(compiled);
-}
 
 void factorvm::forward_frame_xt(stack_frame *frame)
 {
@@ -223,10 +199,6 @@ void factorvm::forward_object_xts()
 	end_scan();
 }
 
-void forward_object_xts()
-{
-	return vm->forward_object_xts();
-}
 
 /* Set the XT fields now that the heap has been compacted */
 void factorvm::fixup_object_xts()
@@ -257,10 +229,6 @@ void factorvm::fixup_object_xts()
 	end_scan();
 }
 
-void fixup_object_xts()
-{
-	return vm->fixup_object_xts();
-}
 
 /* Move all free space to the end of the code heap. This is not very efficient,
 since it makes several passes over the code and data heaps, but we only ever
@@ -286,11 +254,6 @@ void factorvm::compact_code_heap()
 	/* Now update the free list; there will be a single free block at
 	the end */
 	build_free_list(&code,size);
-}
-
-void compact_code_heap()
-{
-	return vm->compact_code_heap();
 }
 
 }

@@ -541,4 +541,13 @@ inline void do_slots(cell obj, void (* iter)(cell *,factorvm*))
 	return vm->do_slots(obj,iter);
 }
 
+// code_heap.hpp
+
+inline void factorvm::check_code_pointer(cell ptr)
+{
+#ifdef FACTOR_DEBUG
+	assert(in_code_heap_p(ptr));
+#endif
+}
+
 }
