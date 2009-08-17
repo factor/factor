@@ -173,6 +173,30 @@ struct factorvm {
 	void clear_gc_stats();
 	inline void vmprim_become();
 	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
+
+	//debug
+	void print_chars(string* str);
+	void print_word(word* word, cell nesting);
+	void print_factor_string(string* str);
+	void print_array(array* array, cell nesting);
+	void print_tuple(tuple *tuple, cell nesting);
+	void print_nested_obj(cell obj, fixnum nesting);
+	void print_obj(cell obj);
+	void print_objects(cell *start, cell *end);
+	void print_datastack();
+	void print_retainstack();
+	void print_stack_frame(stack_frame *frame);
+	void print_callstack();
+	void dump_cell(cell x);
+	void dump_memory(cell from, cell to);
+	void dump_zone(zone *z);
+	void dump_generations();
+	void dump_objects(cell type);
+	void find_data_references_step(cell *scan);
+	void find_data_references(cell look_for_);
+	void dump_code_heap();
+	void factorbug();
+	inline void vmprim_die();
 	// next method here:
 
 
