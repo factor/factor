@@ -242,7 +242,7 @@ stack_frame *innermost_stack_frame(callstack *stack)
 stack_frame *factorvm::innermost_stack_frame_quot(callstack *callstack)
 {
 	stack_frame *inner = innermost_stack_frame(callstack);
-	tagged<quotation>(frame_executing(inner)).untag_check();
+	tagged<quotation>(frame_executing(inner)).untag_check(this);
 	return inner;
 }
 
@@ -278,8 +278,8 @@ inline void factorvm::vmprim_set_innermost_stack_frame_quot()
 	gc_root<callstack> callstack(dpop(),this);
 	gc_root<quotation> quot(dpop(),this);
 
-	callstack.untag_check();
-	quot.untag_check();
+	callstack.untag_check(this);
+	quot.untag_check(this);
 
 	jit_compile(quot.value(),true);
 

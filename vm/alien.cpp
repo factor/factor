@@ -139,7 +139,7 @@ DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
 inline void factorvm::vmprim_dlopen()
 {
 	gc_root<byte_array> path(dpop(),this);
-	path.untag_check();
+	path.untag_check(this);
 	gc_root<dll> library(allot<dll>(sizeof(dll)),this);
 	library->path = path.value();
 	ffi_dlopen(library.untagged());
@@ -156,7 +156,7 @@ inline void factorvm::vmprim_dlsym()
 {
 	gc_root<object> library(dpop(),this);
 	gc_root<byte_array> name(dpop(),this);
-	name.untag_check();
+	name.untag_check(this);
 
 	symbol_char *sym = name->data<symbol_char>();
 
