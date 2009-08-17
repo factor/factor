@@ -31,11 +31,6 @@ word *factorvm::allot_word(cell vocab_, cell name_)
 	return new_word.untagged();
 }
 
-word *allot_word(cell vocab_, cell name_)
-{
-	return vm->allot_word(vocab_,name_);
-}
-
 /* <word> ( name vocabulary -- word ) */
 inline void factorvm::vmprim_word()
 {
@@ -77,11 +72,6 @@ void factorvm::update_word_xt(cell w_)
 	}
 	else
 		w->xt = w->code->xt();
-}
-
-void update_word_xt(cell w_)
-{
-	return vm->update_word_xt(w_);
 }
 
 inline void factorvm::vmprim_optimized_p()
