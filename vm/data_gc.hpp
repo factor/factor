@@ -22,12 +22,17 @@ void init_data_gc();
 
 void gc();
 
-inline static bool collecting_accumulation_gen_p()
+inline bool factorvm::collecting_accumulation_gen_p()
 {
 	return ((data->have_aging_p()
 		&& collecting_gen == data->aging()
 		&& !collecting_aging_again)
 		|| collecting_gen == data->tenured());
+}
+
+inline bool collecting_accumulation_gen_p()
+{
+	return vm->collecting_accumulation_gen_p();
 }
 
 void copy_handle(cell *handle);
@@ -41,7 +46,7 @@ allocation (which does not call GC because of possible roots in volatile
 registers) does not run out of memory */
 static const cell allot_buffer_zone = 1024;
 
-inline static object *allot_zone(zone *z, cell a)
+inline object *factorvm::allot_zone(zone *z, cell a)
 {
 	cell h = z->here;
 	z->here = h + align8(a);
@@ -50,11 +55,16 @@ inline static object *allot_zone(zone *z, cell a)
 	return obj;
 }
 
+inline object *allot_zone(zone *z, cell a)
+{
+	return vm->allot_zone(z,a);
+}
+
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-inline static object *allot_object(header header, cell size)
+inline object *factorvm::allot_object(header header, cell size)
 {
 #ifdef GC_DEBUG
 	if(!gc_off)
@@ -105,9 +115,19 @@ inline static object *allot_object(header header, cell size)
 	return obj;
 }
 
-template<typename T> T *allot(cell size)
+inline object *allot_object(header header, cell size)
 {
-	return (T *)allot_object(header(T::type_number),size);
+	return vm->allot_object(header,size);
+}
+
+template<typename TYPE> TYPE *factorvm::allot(cell size)
+{
+	return (TYPE *)allot_object(header(TYPE::type_number),size);
+}
+
+template<typename TYPE> TYPE *allot(cell size)
+{
+	return vm->allot<TYPE>(size);
 }
 
 void copy_reachable_objects(cell scan, cell *end);
@@ -120,7 +140,7 @@ PRIMITIVE(become);
 
 extern bool growing_data_heap;
 
-inline static void check_data_pointer(object *pointer)
+inline void factorvm::check_data_pointer(object *pointer)
 {
 #ifdef FACTOR_DEBUG
 	if(!growing_data_heap)
@@ -131,7 +151,12 @@ inline static void check_data_pointer(object *pointer)
 #endif
 }
 
-inline static void check_tagged_pointer(cell tagged)
+inline void check_data_pointer(object *pointer)
+{
+	return vm->check_data_pointer(pointer);
+}
+
+inline void factorvm::check_tagged_pointer(cell tagged)
 {
 #ifdef FACTOR_DEBUG
 	if(!immediate_p(tagged))
@@ -141,6 +166,11 @@ inline static void check_tagged_pointer(cell tagged)
 		obj->h.hi_tag();
 	}
 #endif
+}
+
+inline void check_tagged_pointer(cell tagged)
+{
+	return vm->check_tagged_pointer(tagged);
 }
 
 VM_ASM_API void inline_gc(cell *gc_roots_base, cell gc_roots_size);
