@@ -466,6 +466,7 @@ struct factorvm {
 	void load_image(vm_parameters *p);
 
 	//callstack
+	template<typename T> void iterate_callstack_object(callstack *stack_, T &iterator);
 	void check_frame(stack_frame *frame);
 	callstack *allot_callstack(cell size);
 	stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom);
