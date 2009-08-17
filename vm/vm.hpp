@@ -316,6 +316,20 @@ struct factorvm {
 	void overflow_fixnum_add(fixnum x, fixnum y);
 	void overflow_fixnum_subtract(fixnum x, fixnum y);
 	void overflow_fixnum_multiply(fixnum x, fixnum y);
+	
+	//io
+	void init_c_io();
+	void io_error();
+	inline void vmprim_fopen();
+	inline void vmprim_fgetc();
+	inline void vmprim_fread();
+	inline void vmprim_fputc();
+	inline void vmprim_fwrite();
+	inline void vmprim_fseek();
+	inline void vmprim_fflush();
+	inline void vmprim_fclose();
+	int err_no();
+	void clear_err_no();
 	// next method here:
 
 
