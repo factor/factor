@@ -7,9 +7,9 @@ struct quotation_jit : public jit {
 
 	quotation_jit(cell quot, bool compiling_, bool relocate_, factorvm *vm)
 		: jit(QUOTATION_TYPE,quot,vm),
-		  elements(owner.as<quotation>().untagged()->array),
+		  elements(owner.as<quotation>().untagged()->array,vm),
 		  compiling(compiling_),
-		  relocate(relocate_) {};
+		  relocate(relocate_){};
 
 	void emit_mega_cache_lookup(cell methods, fixnum index, cell cache);
 	bool primitive_call_p(cell i);

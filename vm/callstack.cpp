@@ -192,10 +192,12 @@ namespace
 struct stack_frame_accumulator {
 	growable_array frames;
 
+	stack_frame_accumulator(factorvm *vm) : frames(vm) {} 
+
 	void operator()(stack_frame *frame)
 	{
-		gc_root<object> executing(frame_executing(frame));
-		gc_root<object> scan(frame_scan(frame));
+		gc_root<object> executing(frame_executing(frame),frames.elements.myvm);
+		gc_root<object> scan(frame_scan(frame),frames.elements.myvm);
 
 		frames.add(executing.value());
 		frames.add(scan.value());
@@ -206,9 +208,9 @@ struct stack_frame_accumulator {
 
 inline void factorvm::vmprim_callstack_to_array()
 {
-	gc_root<callstack> callstack(dpop());
+	gc_root<callstack> callstack(dpop(),this);
 
-	stack_frame_accumulator accum;
+	stack_frame_accumulator accum(this);
 	iterate_callstack_object(callstack.untagged(),accum);
 	accum.frames.trim();
 
@@ -273,8 +275,8 @@ PRIMITIVE(innermost_stack_frame_scan)
 
 inline void factorvm::vmprim_set_innermost_stack_frame_quot()
 {
-	gc_root<callstack> callstack(dpop());
-	gc_root<quotation> quot(dpop());
+	gc_root<callstack> callstack(dpop(),this);
+	gc_root<quotation> quot(dpop(),this);
 
 	callstack.untag_check();
 	quot.untag_check();

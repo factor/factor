@@ -244,7 +244,7 @@ PRIMITIVE(reset_dispatch_stats)
 
 inline void factorvm::vmprim_dispatch_stats()
 {
-	growable_array stats;
+	growable_array stats(this);
 	stats.add(allot_cell(megamorphic_cache_hits));
 	stats.add(allot_cell(megamorphic_cache_misses));
 	stats.trim();
@@ -258,8 +258,8 @@ PRIMITIVE(dispatch_stats)
 
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cache_)
 {
-	gc_root<array> methods(methods_);
-	gc_root<array> cache(cache_);
+	gc_root<array> methods(methods_,myvm);
+	gc_root<array> cache(cache_,myvm);
 
 	/* Generate machine code to determine the object's class. */
 	emit_class_lookup(index,PIC_HI_TAG_TUPLE);

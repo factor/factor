@@ -638,10 +638,10 @@ code_block *allot_code_block(cell size)
 /* Might GC */
 code_block *factorvm::add_code_block(cell type,cell code_,cell labels_,cell relocation_,cell literals_)
 {
-	gc_root<byte_array> code(code_);
-	gc_root<object> labels(labels_);
-	gc_root<byte_array> relocation(relocation_);
-	gc_root<array> literals(literals_);
+	gc_root<byte_array> code(code_,this);
+	gc_root<object> labels(labels_,this);
+	gc_root<byte_array> relocation(relocation_,this);
+	gc_root<array> literals(literals_,this);
 
 	cell code_length = align8(array_capacity(code.untagged()));
 	code_block *compiled = allot_code_block(code_length);

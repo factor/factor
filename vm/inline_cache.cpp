@@ -132,9 +132,9 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 					    cell cache_entries_,
 					    bool tail_call_p)
 {
-	gc_root<word> generic_word(generic_word_);
-	gc_root<array> methods(methods_);
-	gc_root<array> cache_entries(cache_entries_);
+	gc_root<word> generic_word(generic_word_,myvm);
+	gc_root<array> methods(methods_,myvm);
+	gc_root<array> cache_entries(cache_entries_,myvm);
 
 	cell inline_cache_type = determine_inline_cache_type(cache_entries.untagged());
 	update_pic_count(inline_cache_type);
@@ -169,9 +169,9 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 
 code_block *factorvm::compile_inline_cache(fixnum index,cell generic_word_,cell methods_,cell cache_entries_,bool tail_call_p)
 {
-	gc_root<word> generic_word(generic_word_);
-	gc_root<array> methods(methods_);
-	gc_root<array> cache_entries(cache_entries_);
+	gc_root<word> generic_word(generic_word_,this);
+	gc_root<array> methods(methods_,this);
+	gc_root<array> cache_entries(cache_entries_,this);
 
 	inline_cache_jit jit(generic_word.value(),this);
 	jit.compile_inline_cache(index,
@@ -213,12 +213,12 @@ cell inline_cache_size(cell cache_entries)
 /* Allocates memory */
 cell factorvm::add_inline_cache_entry(cell cache_entries_, cell klass_, cell method_)
 {
-	gc_root<array> cache_entries(cache_entries_);
-	gc_root<object> klass(klass_);
-	gc_root<word> method(method_);
+	gc_root<array> cache_entries(cache_entries_,this);
+	gc_root<object> klass(klass_,this);
+	gc_root<word> method(method_,this);
 
 	cell pic_size = array_capacity(cache_entries.untagged());
-	gc_root<array> new_cache_entries(reallot_array(cache_entries.untagged(),pic_size + 2));
+	gc_root<array> new_cache_entries(reallot_array(cache_entries.untagged(),pic_size + 2),this);
 	set_array_nth(new_cache_entries.untagged(),pic_size,klass.value());
 	set_array_nth(new_cache_entries.untagged(),pic_size + 1,method.value());
 	return new_cache_entries.value();
@@ -255,11 +255,11 @@ void *factorvm::inline_cache_miss(cell return_address)
 	   instead of leaving dead PICs around until the next GC. */
 	deallocate_inline_cache(return_address);
 
-	gc_root<array> cache_entries(dpop());
+	gc_root<array> cache_entries(dpop(),this);
 	fixnum index = untag_fixnum(dpop());
-	gc_root<array> methods(dpop());
-	gc_root<word> generic_word(dpop());
-	gc_root<object> object(((cell *)ds)[-index]);
+	gc_root<array> methods(dpop(),this);
+	gc_root<word> generic_word(dpop(),this);
+	gc_root<object> object(((cell *)ds)[-index],this);
 
 	void *xt;
 
@@ -277,7 +277,7 @@ void *factorvm::inline_cache_miss(cell return_address)
 		gc_root<array> new_cache_entries(add_inline_cache_entry(
 							   cache_entries.value(),
 							   klass,
-							   method));
+							   method),this);
 		xt = compile_inline_cache(index,
 					  generic_word.value(),
 					  methods.value(),
@@ -317,7 +317,7 @@ PRIMITIVE(reset_inline_cache_stats)
 
 inline void factorvm::vmprim_inline_cache_stats()
 {
-	growable_array stats;
+	growable_array stats(this);
 	stats.add(allot_cell(cold_call_to_ic_transitions));
 	stats.add(allot_cell(ic_to_pic_transitions));
 	stats.add(allot_cell(pic_to_mega_transitions));
