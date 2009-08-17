@@ -38,8 +38,6 @@ PRIMITIVE(bignum_bitp);
 PRIMITIVE(bignum_log2);
 PRIMITIVE(byte_array_to_bignum);
 
-cell unbox_array_size();
-
 PRIMITIVE(fixnum_to_float);
 PRIMITIVE(bignum_to_float);
 PRIMITIVE(str_to_float);

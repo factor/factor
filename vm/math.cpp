@@ -71,30 +71,18 @@ inline fixnum factorvm::sign_mask(fixnum x)
 	return x >> (WORD_SIZE - 1);
 }
 
-inline fixnum sign_mask(fixnum x)
-{
-	return vm->sign_mask(x);
-}
 
 inline fixnum factorvm::branchless_max(fixnum x, fixnum y)
 {
 	return (x - ((x - y) & sign_mask(x - y)));
 }
 
-inline fixnum branchless_max(fixnum x, fixnum y)
-{
-	return vm->branchless_max(x,y);
-}
 
 inline fixnum factorvm::branchless_abs(fixnum x)
 {
 	return (x ^ sign_mask(x)) - sign_mask(x);
 }
 
-inline fixnum branchless_abs(fixnum x)
-{
-	return vm->branchless_abs(x);
-}
 
 inline void factorvm::vmprim_fixnum_shift()
 {
@@ -410,10 +398,6 @@ cell factorvm::unbox_array_size()
 	return 0; /* can't happen */
 }
 
-cell unbox_array_size()
-{
-	return vm->unbox_array_size();
-}
 
 inline void factorvm::vmprim_fixnum_to_float()
 {
