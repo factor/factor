@@ -3,10 +3,6 @@
 namespace factor
 {
 
-cell bignum_zero;
-cell bignum_pos_one;
-cell bignum_neg_one;
-
 inline void factorvm::vmprim_bignum_to_fixnum()
 {
 	drepl(tag_fixnum(bignum_to_fixnum(untag<bignum>(dpeek()))));
