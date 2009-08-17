@@ -8,40 +8,24 @@ relocation_type factorvm::relocation_type_of(relocation_entry r)
 	return (relocation_type)((r & 0xf0000000) >> 28);
 }
 
-relocation_type relocation_type_of(relocation_entry r)
-{
-	return vm->relocation_type_of(r);
-}
 
 relocation_class factorvm::relocation_class_of(relocation_entry r)
 {
 	return (relocation_class)((r & 0x0f000000) >> 24);
 }
 
-relocation_class relocation_class_of(relocation_entry r)
-{
-	return vm->relocation_class_of(r);
-}
 
 cell factorvm::relocation_offset_of(relocation_entry r)
 {
 	return  (r & 0x00ffffff);
 }
 
-cell relocation_offset_of(relocation_entry r)
-{
-	return vm->relocation_offset_of(r);
-}
 
 void factorvm::flush_icache_for(code_block *block)
 {
 	flush_icache((cell)block,block->size);
 }
 
-void flush_icache_for(code_block *block)
-{
-	return vm->flush_icache_for(block);
-}
 
 int factorvm::number_of_parameters(relocation_type type)
 {
@@ -67,10 +51,6 @@ int factorvm::number_of_parameters(relocation_type type)
 	}
 }
 
-int number_of_parameters(relocation_type type)
-{
-	return vm->number_of_parameters(type);
-}
 
 void *factorvm::object_xt(cell obj)
 {
@@ -86,10 +66,6 @@ void *factorvm::object_xt(cell obj)
 	}
 }
 
-void *object_xt(cell obj)
-{
-	return vm->object_xt(obj);
-}
 
 void *factorvm::xt_pic(word *w, cell tagged_quot)
 {
@@ -105,30 +81,18 @@ void *factorvm::xt_pic(word *w, cell tagged_quot)
 	}
 }
 
-void *xt_pic(word *w, cell tagged_quot)
-{
-	return vm->xt_pic(w,tagged_quot);
-}
 
 void *factorvm::word_xt_pic(word *w)
 {
 	return xt_pic(w,w->pic_def);
 }
 
-void *word_xt_pic(word *w)
-{
-	return vm->word_xt_pic(w);
-}
 
 void *factorvm::word_xt_pic_tail(word *w)
 {
 	return xt_pic(w,w->pic_tail_def);
 }
 
-void *word_xt_pic_tail(word *w)
-{
-	return vm->word_xt_pic_tail(w);
-}
 
 /* References to undefined symbols are patched up to call this function on
 image load */
@@ -187,10 +151,6 @@ void *factorvm::get_rel_symbol(array *literals, cell index)
 	}
 }
 
-void *get_rel_symbol(array *literals, cell index)
-{
-	return vm->get_rel_symbol(literals,index);
-}
 
 cell factorvm::compute_relocation(relocation_entry rel, cell index, code_block *compiled)
 {
@@ -234,10 +194,6 @@ cell factorvm::compute_relocation(relocation_entry rel, cell index, code_block *
 #undef ARG
 }
 
-cell compute_relocation(relocation_entry rel, cell index, code_block *compiled)
-{
-	return vm->compute_relocation(rel,index,compiled);
-}
 
 void factorvm::iterate_relocations(code_block *compiled, relocation_iterator iter)
 {
@@ -257,10 +213,6 @@ void factorvm::iterate_relocations(code_block *compiled, relocation_iterator ite
 	}
 }
 
-void iterate_relocations(code_block *compiled, relocation_iterator iter)
-{
-	return vm->iterate_relocations(compiled,iter);
-}
 
 /* Store a 32-bit value into a PowerPC LIS/ORI sequence */
 void factorvm::store_address_2_2(cell *ptr, cell value)
@@ -269,10 +221,6 @@ void factorvm::store_address_2_2(cell *ptr, cell value)
 	ptr[ 0] = ((ptr[ 0] & ~0xffff) | (value & 0xffff));
 }
 
-void store_address_2_2(cell *ptr, cell value)
-{
-	return vm->store_address_2_2(ptr,value);
-}
 
 /* Store a value into a bitfield of a PowerPC instruction */
 void factorvm::store_address_masked(cell *ptr, fixnum value, cell mask, fixnum shift)
@@ -285,10 +233,6 @@ void factorvm::store_address_masked(cell *ptr, fixnum value, cell mask, fixnum s
 	*ptr = ((*ptr & ~mask) | ((value >> shift) & mask));
 }
 
-void store_address_masked(cell *ptr, fixnum value, cell mask, fixnum shift)
-{
-	return vm->store_address_masked(ptr,value,mask,shift);
-}
 
 /* Perform a fixup on a code block */
 void factorvm::store_address_in_code_block(cell klass, cell offset, fixnum absolute_value)
@@ -336,10 +280,6 @@ void factorvm::store_address_in_code_block(cell klass, cell offset, fixnum absol
 	}
 }
 
-void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value)
-{
-	return vm->store_address_in_code_block(klass,offset,absolute_value);
-}
 
 void factorvm::update_literal_references_step(relocation_entry rel, cell index, code_block *compiled)
 {
@@ -367,10 +307,6 @@ void factorvm::update_literal_references(code_block *compiled)
 	}
 }
 
-void update_literal_references(code_block *compiled)
-{
-	return vm->update_literal_references(compiled);
-}
 
 /* Copy all literals referenced from a code block to newspace. Only for
 aging and nursery collections */
@@ -479,10 +415,6 @@ void factorvm::check_code_address(cell address)
 #endif
 }
 
-void check_code_address(cell address)
-{
-	return vm->check_code_address(address);
-}
 
 /* Update references to words. This is done after a new code block
 is added to the heap. */
@@ -499,10 +431,6 @@ void factorvm::mark_code_block(code_block *compiled)
 	copy_handle(&compiled->relocation);
 }
 
-void mark_code_block(code_block *compiled)
-{
-	return vm->mark_code_block(compiled);
-}
 
 void factorvm::mark_stack_frame_step(stack_frame *frame)
 {
@@ -526,10 +454,6 @@ void factorvm::mark_active_blocks(context *stacks)
 	}
 }
 
-void mark_active_blocks(context *stacks)
-{
-	return vm->mark_active_blocks(stacks);
-}
 
 void factorvm::mark_object_code_block(object *object)
 {
@@ -560,10 +484,6 @@ void factorvm::mark_object_code_block(object *object)
 	}
 }
 
-void mark_object_code_block(object *object)
-{
-	return vm->mark_object_code_block(object);
-}
 
 /* Perform all fixups on a code block */
 void factorvm::relocate_code_block(code_block *compiled)
@@ -597,10 +517,6 @@ void factorvm::fixup_labels(array *labels, code_block *compiled)
 	}
 }
 
-void fixup_labels(array *labels, code_block *compiled)
-{
-	return vm->fixup_labels(labels,compiled);
-}
 
 /* Might GC */
 code_block *factorvm::allot_code_block(cell size)
@@ -630,10 +546,6 @@ code_block *factorvm::allot_code_block(cell size)
 	return (code_block *)block;
 }
 
-code_block *allot_code_block(cell size)
-{
-	return vm->allot_code_block(size);
-}
 
 /* Might GC */
 code_block *factorvm::add_code_block(cell type,cell code_,cell labels_,cell relocation_,cell literals_)
@@ -672,9 +584,5 @@ code_block *factorvm::add_code_block(cell type,cell code_,cell labels_,cell relo
 	return compiled;
 }
 
-code_block *add_code_block(cell type,cell code_,cell labels_,cell relocation_,cell literals_)
-{
-	return vm->add_code_block(type,code_,labels_,relocation_,literals_);
-}
 
 }
