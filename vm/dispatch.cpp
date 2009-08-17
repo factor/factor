@@ -18,11 +18,6 @@ cell factorvm::search_lookup_alist(cell table, cell klass)
 	return F;
 }
 
-cell search_lookup_alist(cell table, cell klass)
-{
-	return vm->search_lookup_alist(table,klass);
-}
-
 cell factorvm::search_lookup_hash(cell table, cell klass, cell hashcode)
 {
 	array *buckets = untag<array>(table);
@@ -33,31 +28,16 @@ cell factorvm::search_lookup_hash(cell table, cell klass, cell hashcode)
 		return search_lookup_alist(bucket,klass);
 }
 
-cell search_lookup_hash(cell table, cell klass, cell hashcode)
-{
-	return vm->search_lookup_hash(table,klass,hashcode);
-}
-
 cell factorvm::nth_superclass(tuple_layout *layout, fixnum echelon)
 {
 	cell *ptr = (cell *)(layout + 1);
 	return ptr[echelon * 2];
 }
 
-cell nth_superclass(tuple_layout *layout, fixnum echelon)
-{
-	return vm->nth_superclass(layout,echelon);
-}
-
 cell factorvm::nth_hashcode(tuple_layout *layout, fixnum echelon)
 {
 	cell *ptr = (cell *)(layout + 1);
 	return ptr[echelon * 2 + 1];
-}
-
-cell nth_hashcode(tuple_layout *layout, fixnum echelon)
-{
-	return vm->nth_hashcode(layout,echelon);
 }
 
 cell factorvm::lookup_tuple_method(cell obj, cell methods)
@@ -92,11 +72,6 @@ cell factorvm::lookup_tuple_method(cell obj, cell methods)
 	return F;
 }
 
-cell lookup_tuple_method(cell obj, cell methods)
-{
-	return vm->lookup_tuple_method(obj,methods);
-}
-
 cell factorvm::lookup_hi_tag_method(cell obj, cell methods)
 {
 	array *hi_tag_methods = untag<array>(methods);
@@ -105,11 +80,6 @@ cell factorvm::lookup_hi_tag_method(cell obj, cell methods)
 	assert(tag < TYPE_COUNT - HEADER_TYPE);
 #endif
 	return array_nth(hi_tag_methods,tag);
-}
-
-cell lookup_hi_tag_method(cell obj, cell methods)
-{
-	return vm->lookup_hi_tag_method(obj,methods);
 }
 
 cell factorvm::lookup_hairy_method(cell obj, cell methods)
@@ -134,11 +104,6 @@ cell factorvm::lookup_hairy_method(cell obj, cell methods)
 	}
 }
 
-cell lookup_hairy_method(cell obj, cell methods)
-{
-	return vm->lookup_hairy_method(obj,methods);
-}
-
 cell factorvm::lookup_method(cell obj, cell methods)
 {
 	cell tag = TAG(obj);
@@ -146,11 +111,6 @@ cell factorvm::lookup_method(cell obj, cell methods)
 		return lookup_hairy_method(obj,methods);
 	else
 		return array_nth(untag<array>(methods),TAG(obj));
-}
-
-cell lookup_method(cell obj, cell methods)
-{
-	return vm->lookup_method(obj,methods);
 }
 
 inline void factorvm::vmprim_lookup_method()
@@ -178,20 +138,10 @@ cell factorvm::object_class(cell obj)
 	}
 }
 
-cell object_class(cell obj)
-{
-	return vm->object_class(obj);
-}
-
 cell factorvm::method_cache_hashcode(cell klass, array *array)
 {
 	cell capacity = (array_capacity(array) >> 1) - 1;
 	return ((klass >> TAG_BITS) & capacity) << 1;
-}
-
-cell method_cache_hashcode(cell klass, array *array)
-{
-	return vm->method_cache_hashcode(klass,array);
 }
 
 void factorvm::update_method_cache(cell cache, cell klass, cell method)
@@ -200,11 +150,6 @@ void factorvm::update_method_cache(cell cache, cell klass, cell method)
 	cell hashcode = method_cache_hashcode(klass,cache_elements);
 	set_array_nth(cache_elements,hashcode,klass);
 	set_array_nth(cache_elements,hashcode + 1,method);
-}
-
-void update_method_cache(cell cache, cell klass, cell method)
-{
-	return vm->update_method_cache(cache,klass,method);
 }
 
 inline void factorvm::vmprim_mega_cache_miss()
