@@ -1,8 +1,6 @@
 namespace factor
 {
 
-cell allot_alien(cell delegate, cell displacement);
-
 PRIMITIVE(displaced_alien);
 PRIMITIVE(alien_address);
 
