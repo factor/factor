@@ -42,31 +42,13 @@ PRIMITIVE(bignum_bitp);
 PRIMITIVE(bignum_log2);
 PRIMITIVE(byte_array_to_bignum);
 
-inline cell factorvm::allot_integer(fixnum x)
-{
-	if(x < fixnum_min || x > fixnum_max)
-		return tag<bignum>(fixnum_to_bignum(x));
-	else
-		return tag_fixnum(x);
-}
 
-inline cell allot_integer(fixnum x)
-{
-	return vm->allot_integer(x);
-}
 
-inline cell factorvm::allot_cell(cell x)
-{
-	if(x > (cell)fixnum_max)
-		return tag<bignum>(cell_to_bignum(x));
-	else
-		return tag_fixnum(x);
-}
 
-inline cell allot_cell(cell x)
-{
-	return vm->allot_cell(x);
-}
+
+
+
+
 
 cell unbox_array_size();
 
@@ -80,47 +62,27 @@ inline static double untag_float_check(cell tagged)
 	return untag_check<boxed_float>(tagged)->n;
 }
 
-inline cell factorvm::allot_float(double n)
-{
-	boxed_float *flo = allot<boxed_float>(sizeof(boxed_float));
-	flo->n = n;
-	return tag(flo);
-}
 
-inline cell allot_float(double n)
-{
-	return vm->allot_float(n);
-}
+
+
 
 inline static fixnum float_to_fixnum(cell tagged)
 {
 	return (fixnum)untag_float(tagged);
 }
 
-inline bignum *factorvm::float_to_bignum(cell tagged)
-{
-	return double_to_bignum(untag_float(tagged));
-}
 
-inline bignum *float_to_bignum(cell tagged)
-{
-	return vm->float_to_bignum(tagged);
-}
+
+
 
 inline double fixnum_to_float(cell tagged)
 {
 	return (double)untag_fixnum(tagged);
 }
 
-inline double factorvm::bignum_to_float(cell tagged)
-{
-	return bignum_to_double(untag<bignum>(tagged));
-}
 
-inline double bignum_to_float(cell tagged)
-{
-	return vm->bignum_to_float(tagged);
-}
+
+
 
 PRIMITIVE(fixnum_to_float);
 PRIMITIVE(bignum_to_float);

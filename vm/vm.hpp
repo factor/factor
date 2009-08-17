@@ -942,6 +942,65 @@ struct growable_byte_array {
 	void trim();
 };
 
+//math.hpp
+inline cell factorvm::allot_integer(fixnum x)
+{
+	if(x < fixnum_min || x > fixnum_max)
+		return tag<bignum>(fixnum_to_bignum(x));
+	else
+		return tag_fixnum(x);
+}
+
+inline cell allot_integer(fixnum x)
+{
+	return vm->allot_integer(x);
+}
+
+inline cell factorvm::allot_cell(cell x)
+{
+	if(x > (cell)fixnum_max)
+		return tag<bignum>(cell_to_bignum(x));
+	else
+		return tag_fixnum(x);
+}
+
+inline cell allot_cell(cell x)
+{
+	return vm->allot_cell(x);
+}
+
+inline cell factorvm::allot_float(double n)
+{
+	boxed_float *flo = allot<boxed_float>(sizeof(boxed_float));
+	flo->n = n;
+	return tag(flo);
+}
+
+inline cell allot_float(double n)
+{
+	return vm->allot_float(n);
+}
+
+inline bignum *factorvm::float_to_bignum(cell tagged)
+{
+	return double_to_bignum(untag_float(tagged));
+}
+
+inline bignum *float_to_bignum(cell tagged)
+{
+	return vm->float_to_bignum(tagged);
+}
+
+inline double factorvm::bignum_to_float(cell tagged)
+{
+	return bignum_to_double(untag<bignum>(tagged));
+}
+
+inline double bignum_to_float(cell tagged)
+{
+	return vm->bignum_to_float(tagged);
+}
+
 // next method here:
 
 
