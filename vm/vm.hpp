@@ -276,7 +276,49 @@ struct factorvm {
 	inline void vmprim_bignum_log2();
 	unsigned int bignum_producer(unsigned int digit);
 	inline void vmprim_byte_array_to_bignum();
+	cell unbox_array_size();
+	inline void vmprim_fixnum_to_float();
+	inline void vmprim_bignum_to_float();
+	inline void vmprim_str_to_float();
+	inline void vmprim_float_to_str();
+	inline void vmprim_float_eq();
+	inline void vmprim_float_add();
+	inline void vmprim_float_subtract();
+	inline void vmprim_float_multiply();
+	inline void vmprim_float_divfloat();
+	inline void vmprim_float_mod();
+	inline void vmprim_float_less();
+	inline void vmprim_float_lesseq();
+	inline void vmprim_float_greater();
+	inline void vmprim_float_greatereq();
+	inline void vmprim_float_bits();
+	inline void vmprim_bits_float();
+	inline void vmprim_double_bits();
+	inline void vmprim_bits_double();
+	fixnum to_fixnum(cell tagged);
+	cell to_cell(cell tagged);
+	void box_signed_1(s8 n);
+	void box_unsigned_1(u8 n);
+	void box_signed_2(s16 n);
+	void box_unsigned_2(u16 n);
+	void box_signed_4(s32 n);
+	void box_unsigned_4(u32 n);
+	void box_signed_cell(fixnum integer);
+	void box_unsigned_cell(cell cell);
+	void box_signed_8(s64 n);
+	s64 to_signed_8(cell obj);
+	void box_unsigned_8(u64 n);
+	u64 to_unsigned_8(cell obj);
+	void box_float(float flo);
+	float to_float(cell value);
+	void box_double(double flo);
+	double to_double(cell value);
+	void overflow_fixnum_add(fixnum x, fixnum y);
+	void overflow_fixnum_subtract(fixnum x, fixnum y);
+	void overflow_fixnum_multiply(fixnum x, fixnum y);
 	// next method here:
+
+
 
 
 };
