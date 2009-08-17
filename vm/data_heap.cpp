@@ -5,16 +5,12 @@ factor::zone nursery;
 namespace factor
 {
 
-/* Set by the -securegc command line argument */
-bool secure_gc;
-
 /* new objects are allocated here */
 VM_C_API zone nursery;
 
-/* GC is off during heap walking */
-bool gc_off;
 
-data_heap *data;
+
+
 
 cell factorvm::init_zone(zone *z, cell size, cell start)
 {
@@ -376,10 +372,6 @@ PRIMITIVE(data_room)
 {
 	PRIMITIVE_GETVM()->vmprim_data_room();
 }
-
-/* A heap walk allows useful things to be done, like finding all
-references to an object for debugging purposes. */
-cell heap_scan_ptr;
 
 /* Disables GC and activates next-object ( -- obj ) primitive */
 void factorvm::begin_scan()
