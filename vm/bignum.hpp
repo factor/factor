@@ -55,10 +55,6 @@ bignum_divide(bignum * numerator, bignum * denominator,
 		  bignum * * quotient, bignum * * remainder);
 bignum * bignum_quotient(bignum *, bignum *);
 bignum * bignum_remainder(bignum *, bignum *);
-bignum * fixnum_to_bignum(fixnum);
-bignum * cell_to_bignum(cell);
-bignum * long_long_to_bignum(s64 n);
-bignum * ulong_long_to_bignum(u64 n);
 fixnum bignum_to_fixnum(bignum *);
 cell bignum_to_cell(bignum *);
 s64 bignum_to_long_long(bignum *);

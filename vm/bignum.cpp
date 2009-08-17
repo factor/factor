@@ -371,7 +371,7 @@ bignum *bignum_remainder(bignum * numerator, bignum * denominator)
 }
 
 #define FOO_TO_BIGNUM(name,type,utype) \
-  bignum * name##_to_bignum(type n)                                 \
+	bignum * factorvm::name##_to_bignum(type n)						   \
   {                                                                    \
     int negative_p;                                                    \
     bignum_digit_type result_digits [BIGNUM_DIGITS_FOR(type)];         \

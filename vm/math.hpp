@@ -1,10 +1,6 @@
 namespace factor
 {
 
-extern cell bignum_zero;
-extern cell bignum_pos_one;
-extern cell bignum_neg_one;
-
 static const fixnum fixnum_max = (((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)) - 1);
 static const fixnum fixnum_min = (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)));
 static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));

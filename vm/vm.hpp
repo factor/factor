@@ -243,6 +243,9 @@ struct factorvm {
 	inline void check_tagged_pointer(cell tagged);
 
 	// local roots
+	/* If a runtime function needs to call another function which potentially
+	   allocates memory, it must wrap any local variable references to Factor
+	   objects in gc_root instances */
 	std::vector<cell> gc_locals;
 	std::vector<cell> gc_bignums;
 
@@ -329,10 +332,17 @@ struct factorvm {
 	inline void vmprim_wrapper();
 
 	//math
+	cell bignum_zero;
+	cell bignum_pos_one;
+	cell bignum_neg_one;	
 	inline void vmprim_bignum_to_fixnum();
 	inline void vmprim_float_to_fixnum();
 	inline void vmprim_fixnum_divint();
 	inline void vmprim_fixnum_divmod();
+	bignum *fixnum_to_bignum(fixnum);
+	bignum *cell_to_bignum(cell);
+	bignum *long_long_to_bignum(s64 n);
+	bignum *ulong_long_to_bignum(u64 n);
 	inline fixnum sign_mask(fixnum x);
 	inline fixnum branchless_max(fixnum x, fixnum y);
 	inline fixnum branchless_abs(fixnum x);
