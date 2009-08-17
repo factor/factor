@@ -142,7 +142,39 @@ struct factorvm {
 	inline void vmprim_end_scan();
 	template<typename T> void each_object(T &functor);
 	cell find_all_words();
+
+	//data_gc
+	void init_data_gc();
+	object *copy_untagged_object_impl(object *pointer, cell size);
+	object *copy_object_impl(object *untagged);
+	bool should_copy_p(object *untagged);
+	object *resolve_forwarding(object *untagged);
+	template <typename T> T *copy_untagged_object(T *untagged);
+	cell copy_object(cell pointer);
+	void copy_handle(cell *handle);
+	void copy_card(card *ptr, cell gen, cell here);
+	void copy_card_deck(card_deck *deck, cell gen, card mask, card unmask);
+	void copy_gen_cards(cell gen);
+	void copy_cards();
+	void copy_stack_elements(segment *region, cell top);
+	void copy_registered_locals();
+	void copy_registered_bignums();
+	void copy_roots();
+	cell copy_next_from_nursery(cell scan);
+	cell copy_next_from_aging(cell scan);
+	cell copy_next_from_tenured(cell scan);
+	void copy_reachable_objects(cell scan, cell *end);
+	void begin_gc(cell requested_bytes);
+	void end_gc(cell gc_elapsed);
+	void garbage_collection(cell gen,bool growing_data_heap_,cell requested_bytes);
+	void gc();
+	inline void vmprim_gc();
+	inline void vmprim_gc_stats();
+	void clear_gc_stats();
+	inline void vmprim_become();
+	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
 	// next method here:
+
 
 };
 
