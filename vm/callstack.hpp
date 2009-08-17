@@ -22,16 +22,6 @@ PRIMITIVE(set_innermost_stack_frame_quot);
 
 VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom);
 
-template<typename T> void iterate_callstack(cell top, cell bottom, T &iterator)
-{
-	stack_frame *frame = (stack_frame *)bottom - 1;
-
-	while((cell)frame >= top)
-	{
-		iterator(frame);
-		frame = frame_successor(frame);
-	}
-}
 
 
 }

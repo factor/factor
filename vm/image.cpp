@@ -195,9 +195,9 @@ void factorvm::data_fixup(cell *cell)
 	*cell += (tenured->start - data_relocation_base);
 }
 
-void data_fixup(cell *cell)
+void data_fixup(cell *cell, factorvm *myvm)
 {
-	return vm->data_fixup(cell);
+	return myvm->data_fixup(cell);
 }
 
 template <typename TYPE> void factorvm::code_fixup(TYPE **handle)
@@ -258,9 +258,9 @@ void factorvm::fixup_stack_frame(stack_frame *frame)
 	code_fixup(&FRAME_RETURN_ADDRESS(frame));
 }
 
-void fixup_stack_frame(stack_frame *frame)
+void fixup_stack_frame(stack_frame *frame, factorvm *myvm)
 {
-	return vm->fixup_stack_frame(frame);
+	return myvm->fixup_stack_frame(frame);
 }
 
 void factorvm::fixup_callstack_object(callstack *stack)

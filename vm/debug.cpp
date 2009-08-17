@@ -232,9 +232,9 @@ void factorvm::print_stack_frame(stack_frame *frame)
 	print_string("\n");
 }
 
-void print_stack_frame(stack_frame *frame)
+void print_stack_frame(stack_frame *frame, factorvm *myvm)
 {
-	return vm->print_stack_frame(frame);
+	return myvm->print_stack_frame(frame);
 }
 
 void factorvm::print_callstack()
@@ -356,9 +356,9 @@ void factorvm::find_data_references_step(cell *scan)
 	}
 }
 
-void find_data_references_step(cell *scan)
+void find_data_references_step(cell *scan,factorvm *myvm)
 {
-	return vm->find_data_references_step(scan);
+	return myvm->find_data_references_step(scan);
 }
 
 void factorvm::find_data_references(cell look_for_)
