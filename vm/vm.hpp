@@ -397,6 +397,26 @@ struct factorvm {
 	void forward_object_xts();
 	void fixup_object_xts();
 	void compact_code_heap();
+
+	//image
+	void init_objects(image_header *h);
+	void load_data_heap(FILE *file, image_header *h, vm_parameters *p);
+	void load_code_heap(FILE *file, image_header *h, vm_parameters *p);
+	bool save_image(const vm_char *filename);
+	inline void vmprim_save_image();
+	inline void vmprim_save_image_and_exit();
+	void data_fixup(cell *cell);
+	template <typename T> void code_fixup(T **handle);
+	void fixup_word(word *word);
+	void fixup_quotation(quotation *quot);
+	void fixup_alien(alien *d);
+	void fixup_stack_frame(stack_frame *frame);
+	void fixup_callstack_object(callstack *stack);
+	void relocate_object(object *object);
+	void relocate_data();
+	void fixup_code_block(code_block *compiled);
+	void relocate_code();
+	void load_image(vm_parameters *p);
 	// next method here:
 
 
