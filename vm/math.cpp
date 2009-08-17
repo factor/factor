@@ -367,7 +367,8 @@ unsigned int bignum_producer(unsigned int digit)
 inline void factorvm::vmprim_byte_array_to_bignum()
 {
 	cell n_digits = array_capacity(untag_check<byte_array>(dpeek()));
-	bignum * result = factor::digit_stream_to_bignum(n_digits,factor::bignum_producer,0x100,0);
+	//	bignum * result = factor::digit_stream_to_bignum(n_digits,factor::bignum_producer,0x100,0);
+	bignum * result = digit_stream_to_bignum(n_digits,factor::bignum_producer,0x100,0);
 	drepl(tag<bignum>(result));
 }
 

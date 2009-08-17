@@ -98,23 +98,6 @@ PRIMITIVE(end_scan);
 
 cell find_all_words();
 
-/* Every object has a regular representation in the runtime, which makes GC
-much simpler. Every slot of the object until binary_payload_start is a pointer
-to some other object. */
-inline static void do_slots(cell obj, void (* iter)(cell *))
-{
-	cell scan = obj;
-	cell payload_start = binary_payload_start((object *)obj);
-	cell end = obj + payload_start;
-
-	scan += sizeof(cell);
-
-	while(scan < end)
-	{
-		iter((cell *)scan);
-		scan += sizeof(cell);
-	}
-}
 
 }
 

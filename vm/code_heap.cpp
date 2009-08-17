@@ -176,9 +176,9 @@ void factorvm::forward_frame_xt(stack_frame *frame)
 	FRAME_RETURN_ADDRESS(frame) = (void *)((cell)forwarded + offset);
 }
 
-void forward_frame_xt(stack_frame *frame)
+void forward_frame_xt(stack_frame *frame,factorvm *myvm)
 {
-	return vm->forward_frame_xt(frame);
+	return myvm->forward_frame_xt(frame);
 }
 
 void factorvm::forward_object_xts()

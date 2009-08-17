@@ -137,9 +137,9 @@ void factorvm::undefined_symbol()
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
 }
 
-void undefined_symbol()
+void undefined_symbol(factorvm *myvm)
 {
-	return vm->undefined_symbol();
+	return myvm->undefined_symbol();
 }
 
 /* Look up an external library symbol referenced by a compiled code block */
@@ -509,9 +509,9 @@ void factorvm::mark_stack_frame_step(stack_frame *frame)
 	mark_code_block(frame_code(frame));
 }
 
-void mark_stack_frame_step(stack_frame *frame)
+void mark_stack_frame_step(stack_frame *frame, factorvm *myvm)
 {
-	return vm->mark_stack_frame_step(frame);
+	return myvm->mark_stack_frame_step(frame);
 }
 
 /* Mark code blocks executing in currently active stack frames. */
