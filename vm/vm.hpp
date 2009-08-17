@@ -902,6 +902,33 @@ template <typename TYPE> TYPE *factorvm::reallot_array(TYPE *array_, cell capaci
 	}
 }
 
+//arrays.hpp
+inline void factorvm::set_array_nth(array *array, cell slot, cell value)
+{
+#ifdef FACTOR_DEBUG
+	assert(slot < array_capacity(array));
+	assert(array->h.hi_tag() == ARRAY_TYPE);
+	check_tagged_pointer(value);
+#endif
+	array->data()[slot] = value;
+	write_barrier(array);
+}
+
+inline void set_array_nth(array *array, cell slot, cell value)
+{
+	return vm->set_array_nth(array,slot,value);
+}
+
+struct growable_array {
+	cell count;
+	gc_root<array> elements;
+
+	growable_array(factorvm *myvm, cell capacity = 10) : count(0), elements(allot_array(capacity,F),myvm) {}
+
+	void add(cell elt);
+	void trim();
+};
+
 // next method here:
 
 
