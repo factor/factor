@@ -124,22 +124,12 @@ SYMBOL: changed?
 GENERIC: optimize-modular-arithmetic* ( node -- nodes )
 
 M: #push optimize-modular-arithmetic*
-    dup out-d>> first modular-value? [
-        [ >fixnum ] change-literal
-    ] when ;
-
-: input-will-be-fixnum? ( #call -- ? )
-    in-d>> first actually-defined-by
-    [ value>> { [ modular-value? ] [ fixnum-value? ] } 1&& ] all? ;
-
-: output-will-be-coerced? ( #call -- ? )
-    out-d>> first modular-value? ;
+    dup [ out-d>> first modular-value? ] [ literal>> real? ] bi and
+    [ [ >fixnum ] change-literal ] when ;
 
 : redundant->fixnum? ( #call -- ? )
-    {
-        [ input-will-be-fixnum? ]
-        [ output-will-be-coerced? ]
-    } 1|| ;
+    in-d>> first actually-defined-by
+    [ value>> { [ modular-value? ] [ fixnum-value? ] } 1&& ] all? ;
 
 : optimize->fixnum ( #call -- nodes )
     dup redundant->fixnum? [ drop f ] when ;
@@ -172,7 +162,7 @@ MEMO: fixnum-coercion ( flags -- nodes )
     ] when ;
 
 : optimize-low-order-op ( #call -- nodes )
-    dup in-d>> first modular-value? [
+    dup in-d>> first fixnum-value? [
         [ ] [ in-d>> first ] [ info>> ] tri
         [ drop fixnum <class-info> ] change-at
     ] when ;
