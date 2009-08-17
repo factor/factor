@@ -37,7 +37,7 @@ template<typename T> void iterate_callstack(cell top, cell bottom, T &iterator)
 keep the callstack in a GC root and use relative offsets */
 template<typename T> void iterate_callstack_object(callstack *stack_, T &iterator)
 {
-	gc_root<callstack> stack(stack_);
+	gc_root<callstack> stack(stack_,vm);
 	fixnum frame_offset = untag_fixnum(stack->length) - sizeof(stack_frame);
 
 	while(frame_offset >= 0)

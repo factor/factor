@@ -18,7 +18,7 @@ void init_profiler()
 /* Allocates memory */
 code_block *factorvm::compile_profiling_stub(cell word_)
 {
-	gc_root<word> word(word_);
+	gc_root<word> word(word_,this);
 
 	jit jit(WORD_TYPE,word.value(),this);
 	jit.emit_with(userenv[JIT_PROFILING],word.value());
@@ -43,7 +43,7 @@ void factorvm::set_profiling(bool profiling)
 	and allocate profiling blocks if necessary */
 	gc();
 
-	gc_root<array> words(find_all_words());
+	gc_root<array> words(find_all_words(),this);
 
 	cell i;
 	cell length = array_capacity(words.untagged());

@@ -179,7 +179,7 @@ VM_C_API void init_factor(vm_parameters *p)
 /* May allocate memory */
 void factorvm::pass_args_to_factor(int argc, vm_char **argv)
 {
-	growable_array args;
+	growable_array args(this);
 	int i;
 
 	for(i = 1; i < argc; i++)

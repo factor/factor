@@ -147,7 +147,7 @@ inline void factorvm::vmprim_save_image()
 	/* do a full GC to push everything into tenured space */
 	gc();
 
-	gc_root<byte_array> path(dpop());
+	gc_root<byte_array> path(dpop(),this);
 	path.untag_check();
 	save_image((vm_char *)(path.untagged() + 1));
 }
@@ -162,7 +162,7 @@ inline void factorvm::vmprim_save_image_and_exit()
 	/* We unbox this before doing anything else. This is the only point
 	where we might throw an error, so we have to throw an error here since
 	later steps destroy the current image. */
-	gc_root<byte_array> path(dpop());
+	gc_root<byte_array> path(dpop(),this);
 	path.untag_check();
 
 	/* strip out userenv data which is set on startup anyway */

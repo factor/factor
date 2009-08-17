@@ -358,7 +358,7 @@ inline void factorvm::vmprim_data_room()
 	dpush(tag_fixnum((data->cards_end - data->cards) >> 10));
 	dpush(tag_fixnum((data->decks_end - data->decks) >> 10));
 
-	growable_array a;
+	growable_array a(this);
 
 	cell gen;
 	for(gen = 0; gen < data->gen_count; gen++)
@@ -478,7 +478,7 @@ struct word_counter {
 
 struct word_accumulator {
 	growable_array words;
-	word_accumulator(int count) : words(count) {}
+	word_accumulator(int count,factorvm *vm) : words(vm,count) {}
 	void operator()(tagged<object> obj) { if(obj.type_p(WORD_TYPE)) words.add(obj.value()); }
 };
 
@@ -488,7 +488,7 @@ cell factorvm::find_all_words()
 {
 	word_counter counter;
 	each_object(counter);
-	word_accumulator accum(counter.count);
+	word_accumulator accum(counter.count,this);
 	each_object(accum);
 	accum.words.trim();
 	return accum.words.elements.value();

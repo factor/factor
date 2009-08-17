@@ -90,7 +90,7 @@ PRIMITIVE(load_locals)
 
 cell factorvm::clone_object(cell obj_)
 {
-	gc_root<object> obj(obj_);
+	gc_root<object> obj(obj_,this);
 
 	if(immediate_p(obj.value()))
 		return obj.value();

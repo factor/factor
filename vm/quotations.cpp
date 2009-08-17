@@ -125,7 +125,7 @@ void quotation_jit::iterate_quotation()
 	{
 		set_position(i);
 
-		gc_root<object> obj(array_nth(elements.untagged(),i));
+		gc_root<object> obj(array_nth(elements.untagged(),i),myvm);
 
 		switch(obj.type())
 		{
@@ -282,7 +282,7 @@ void set_quot_xt(quotation *quot, code_block *code)
 /* Allocates memory */
 void factorvm::jit_compile(cell quot_, bool relocating)
 {
-	gc_root<quotation> quot(quot_);
+	gc_root<quotation> quot(quot_,this);
 	if(quot->code) return;
 
 	quotation_jit compiler(quot.value(),true,relocating,this);
@@ -339,13 +339,13 @@ PRIMITIVE(quotation_xt)
 
 void factorvm::compile_all_words()
 {
-	gc_root<array> words(find_all_words());
+	gc_root<array> words(find_all_words(),this);
 
 	cell i;
 	cell length = array_capacity(words.untagged());
 	for(i = 0; i < length; i++)
 	{
-		gc_root<word> word(array_nth(words.untagged(),i));
+		gc_root<word> word(array_nth(words.untagged(),i),this);
 
 		if(!word->code || !word_optimized_p(word.untagged()))
 			jit_compile_word(word.value(),word->def,false);
@@ -365,8 +365,8 @@ void compile_all_words()
 /* Allocates memory */
 fixnum factorvm::quot_code_offset_to_scan(cell quot_, cell offset)
 {
-	gc_root<quotation> quot(quot_);
-	gc_root<array> array(quot->array);
+	gc_root<quotation> quot(quot_,this);
+	gc_root<array> array(quot->array,this);
 
 	quotation_jit compiler(quot.value(),false,false,this);
 	compiler.compute_position(offset);
@@ -382,7 +382,7 @@ fixnum quot_code_offset_to_scan(cell quot_, cell offset)
 
 cell factorvm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 {
-	gc_root<quotation> quot(quot_);
+	gc_root<quotation> quot(quot_,this);
 	stack_chain->callstack_top = stack;
 	jit_compile(quot.value(),true);
 	return quot.value();
