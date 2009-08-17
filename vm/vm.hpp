@@ -417,6 +417,44 @@ struct factorvm {
 	void fixup_code_block(code_block *compiled);
 	void relocate_code();
 	void load_image(vm_parameters *p);
+
+	//callstack
+	void check_frame(stack_frame *frame);
+	callstack *allot_callstack(cell size);
+	stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom);
+	stack_frame *capture_start();
+	inline void vmprim_callstack();
+	inline void vmprim_set_callstack();
+	code_block *frame_code(stack_frame *frame);
+	cell frame_type(stack_frame *frame);
+	cell frame_executing(stack_frame *frame);
+	stack_frame *frame_successor(stack_frame *frame);
+	cell frame_scan(stack_frame *frame);
+	inline void vmprim_callstack_to_array();
+	stack_frame *innermost_stack_frame(callstack *stack);
+	stack_frame *innermost_stack_frame_quot(callstack *callstack);
+	inline void vmprim_innermost_stack_frame_executing();
+	inline void vmprim_innermost_stack_frame_scan();
+	inline void vmprim_set_innermost_stack_frame_quot();
+	void save_callstack_bottom(stack_frame *callstack_bottom);
+
+	//alien
+	char *pinned_alien_offset(cell obj);
+	cell allot_alien(cell delegate_, cell displacement);
+	inline void vmprim_displaced_alien();
+	inline void vmprim_alien_address();
+	void *alien_pointer();
+	inline void vmprim_dlopen();
+	inline void vmprim_dlsym();
+	inline void vmprim_dlclose();
+	inline void vmprim_dll_validp();
+	char *alien_offset(cell obj);
+	char *unbox_alien();
+	void box_alien(void *ptr);
+	void to_value_struct(cell src, void *dest, cell size);
+	void box_value_struct(void *src, cell size);
+	void box_small_struct(cell x, cell y, cell size);
+	void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size);
 	// next method here:
 
 

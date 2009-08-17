@@ -56,7 +56,7 @@ void factorvm::set_profiling(bool profiling)
 	}
 
 	/* Update XTs in code heap */
-	iterate_code_heap(relocate_code_block);
+	iterate_code_heap(factor::relocate_code_block);
 }
 
 void set_profiling(bool profiling)
