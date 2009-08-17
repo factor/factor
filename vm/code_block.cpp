@@ -467,9 +467,9 @@ void factorvm::update_literal_and_word_references(code_block *compiled)
 	update_word_references(compiled);
 }
 
-void update_literal_and_word_references(code_block *compiled)
+void update_literal_and_word_references(code_block *compiled, factorvm *myvm)
 {
-	return vm->update_literal_and_word_references(compiled);
+	return myvm->update_literal_and_word_references(compiled);
 }
 
 void factorvm::check_code_address(cell address)
