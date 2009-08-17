@@ -10,10 +10,6 @@ byte_array *factorvm::allot_byte_array(cell size)
 	return array;
 }
 
-byte_array *allot_byte_array(cell size)
-{
-	return vm->allot_byte_array(size);
-}
 
 inline void factorvm::vmprim_byte_array()
 {
