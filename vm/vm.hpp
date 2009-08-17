@@ -166,7 +166,6 @@ struct factorvm {
 	inline card *addr_to_allot_marker(object *a);
 	inline void write_barrier(object *obj);
 	inline void allot_barrier(object *address);
-	// next method here:
 
 
 	//data_gc
@@ -211,7 +210,10 @@ struct factorvm {
 	std::vector<cell> gc_bignums;
 
 	// generic arrays
+	template <typename T> T *allot_array_internal(cell capacity);
+	template <typename T> bool reallot_array_in_place_p(T *array, cell capacity);
 	template <typename TYPE> TYPE *reallot_array(TYPE *array_, cell capacity);
+	// next method here:
 
 	//debug
 	void print_chars(string* str);
