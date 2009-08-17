@@ -5,8 +5,8 @@ struct quotation_jit : public jit {
 	gc_root<array> elements;
 	bool compiling, relocate;
 
-	quotation_jit(cell quot, bool compiling_, bool relocate_)
-		: jit(QUOTATION_TYPE,quot),
+	quotation_jit(cell quot, bool compiling_, bool relocate_, factorvm *vm)
+		: jit(QUOTATION_TYPE,quot,vm),
 		  elements(owner.as<quotation>().untagged()->array),
 		  compiling(compiling_),
 		  relocate(relocate_) {};

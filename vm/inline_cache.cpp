@@ -103,7 +103,7 @@ void update_pic_count(cell type)
 struct inline_cache_jit : public jit {
 	fixnum index;
 
-	inline_cache_jit(cell generic_word_) : jit(PIC_TYPE,generic_word_) {};
+	inline_cache_jit(cell generic_word_,factorvm *vm) : jit(PIC_TYPE,generic_word_,vm) {};
 
 	void emit_check(cell klass);
 	void compile_inline_cache(fixnum index,
@@ -173,7 +173,7 @@ code_block *factorvm::compile_inline_cache(fixnum index,cell generic_word_,cell 
 	gc_root<array> methods(methods_);
 	gc_root<array> cache_entries(cache_entries_);
 
-	inline_cache_jit jit(generic_word.value());
+	inline_cache_jit jit(generic_word.value(),this);
 	jit.compile_inline_cache(index,
 				 generic_word.value(),
 				 methods.value(),
