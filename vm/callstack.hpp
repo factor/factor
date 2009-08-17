@@ -35,7 +35,7 @@ template<typename T> void iterate_callstack(cell top, cell bottom, T &iterator)
 
 /* This is a little tricky. The iterator may allocate memory, so we
 keep the callstack in a GC root and use relative offsets */
-template<typename T> void iterate_callstack_object(callstack *stack_, T &iterator)
+template<typename T> void factorvm::iterate_callstack_object(callstack *stack_, T &iterator)
 {
 	gc_root<callstack> stack(stack_,vm);
 	fixnum frame_offset = untag_fixnum(stack->length) - sizeof(stack_frame);
@@ -46,6 +46,11 @@ template<typename T> void iterate_callstack_object(callstack *stack_, T &iterato
 		frame_offset -= frame->size;
 		iterator(frame);
 	}
+}
+
+template<typename T> void iterate_callstack_object(callstack *stack_, T &iterator)
+{
+	return vm->iterate_callstack_object(stack_,iterator);
 }
 
 }
