@@ -14,7 +14,7 @@ struct heap {
 	heap_free_list free;
 };
 
-typedef void (*heap_iterator)(heap_block *compiled);
+typedef void (*heap_iterator)(heap_block *compiled,factorvm *vm);
 
 void new_heap(heap *h, cell size);
 void build_free_list(heap *h, cell size);
