@@ -934,8 +934,7 @@ void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denom
 	return vm->bignum_divide_unsigned_large_denominator(numerator,denominator,quotient,remainder,q_negative_p,r_negative_p);
 }
 
-void
-bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q)
+void factorvm::bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q)
 {
   bignum_length_type u_length = (BIGNUM_LENGTH (u));
   bignum_length_type v_length = (BIGNUM_LENGTH (v));
@@ -1009,11 +1008,12 @@ bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q)
 #undef qj
 }
 
-bignum_digit_type
-bignum_divide_subtract(bignum_digit_type * v_start,
-                       bignum_digit_type * v_end,
-                       bignum_digit_type guess,
-                       bignum_digit_type * u_start)
+void bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q)
+{
+	return vm->bignum_divide_unsigned_normalized(u,v,q);
+}
+
+bignum_digit_type factorvm::bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end, bignum_digit_type guess, bignum_digit_type * u_start)
 {
   bignum_digit_type * v_scan = v_start;
   bignum_digit_type * u_scan = u_start;
@@ -1088,14 +1088,13 @@ bignum_divide_subtract(bignum_digit_type * v_start,
   return (guess - 1);
 }
 
+bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end, bignum_digit_type guess, bignum_digit_type * u_start)
+{
+	return vm->bignum_divide_subtract(v_start,v_end,guess,u_start);
+}
+
 /* allocates memory */
-void
-bignum_divide_unsigned_medium_denominator(bignum * numerator,
-                                          bignum_digit_type denominator,
-                                          bignum * * quotient,
-                                          bignum * * remainder,
-                                          int q_negative_p,
-                                          int r_negative_p)
+void factorvm::bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator, bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p)
 {
   GC_BIGNUM(numerator);
   
@@ -1153,9 +1152,12 @@ bignum_divide_unsigned_medium_denominator(bignum * numerator,
   return;
 }
 
-void
-bignum_destructive_normalization(bignum * source, bignum * target,
-                                 int shift_left)
+void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator, bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p)
+{
+	vm->bignum_divide_unsigned_medium_denominator(numerator,denominator,quotient,remainder,q_negative_p,r_negative_p);
+}
+
+void factorvm::bignum_destructive_normalization(bignum * source, bignum * target, int shift_left)
 {
   bignum_digit_type digit;
   bignum_digit_type * scan_source = (BIGNUM_START_PTR (source));
@@ -1176,6 +1178,11 @@ bignum_destructive_normalization(bignum * source, bignum * target,
   else
     BIGNUM_ASSERT (carry == 0);
   return;
+}
+
+void bignum_destructive_normalization(bignum * source, bignum * target, int shift_left)
+{
+	return vm->bignum_destructive_normalization(source,target,shift_left);
 }
 
 void
