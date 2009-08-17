@@ -252,6 +252,10 @@ struct factorvm {
 	template <typename TYPE> TYPE *reallot_array(TYPE *array_, cell capacity);
 
 	//debug
+	bool fep_disabled;
+	bool full_output;
+	cell look_for;
+	cell obj;
 	void print_chars(string* str);
 	void print_word(word* word, cell nesting);
 	void print_factor_string(string* str);
@@ -1072,7 +1076,6 @@ inline cell tag_boolean(cell untagged)
 {
 	return vm->tag_boolean(untagged);
 }
-
 
 // next method here:
 

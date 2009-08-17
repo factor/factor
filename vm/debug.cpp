@@ -3,8 +3,6 @@
 namespace factor
 {
 
-static bool fep_disabled;
-static bool full_output;
 
 void factorvm::print_chars(string* str)
 {
@@ -346,8 +344,6 @@ void dump_objects(cell type)
 	return vm->dump_objects(type);
 }
 
-cell look_for;
-cell obj;
 
 void factorvm::find_data_references_step(cell *scan)
 {
