@@ -21,10 +21,6 @@ void factorvm::init_c_io()
 	userenv[STDERR_ENV] = allot_alien(F,(cell)stderr);
 }
 
-void init_c_io()
-{
-	return vm->init_c_io();
-}
 
 void factorvm::io_error()
 {
@@ -36,10 +32,6 @@ void factorvm::io_error()
 	general_error(ERROR_IO,tag_fixnum(errno),F,NULL);
 }
 
-void io_error()
-{
-	return vm->io_error();
-}
 
 inline void factorvm::vmprim_fopen()
 {
