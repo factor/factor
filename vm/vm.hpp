@@ -186,6 +186,13 @@ struct factorvm {
 	void clear_gc_stats();
 	inline void vmprim_become();
 	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
+	inline bool collecting_accumulation_gen_p();
+	inline object *allot_zone(zone *z, cell a);
+	inline object *allot_object(header header, cell size);
+	template <typename TYPE> TYPE *allot(cell size);
+	inline void check_data_pointer(object *pointer);
+	inline void check_tagged_pointer(cell tagged);
+	// next method here:
 
 	// local roots
 	std::vector<cell> gc_locals;
@@ -544,7 +551,7 @@ struct factorvm {
 	void print_cell_hex_pad(cell x);
 	void print_fixnum(fixnum x);
 	cell read_cell_hex();
-	// next method here:
+
 
 
 
