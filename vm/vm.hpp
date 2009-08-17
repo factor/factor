@@ -37,6 +37,26 @@ struct factorvm {
 	code_block *compile_profiling_stub(cell word_);
 	void set_profiling(bool profiling);
 	inline void vmprim_profiling();
+
+	// errors
+	void out_of_memory();
+	void fatal_error(const char* msg, cell tagged);
+	void critical_error(const char* msg, cell tagged);
+	void throw_error(cell error, stack_frame *callstack_top);
+
+	void not_implemented_error();
+	bool in_page(cell fault, cell area, cell area_size, int offset);
+	void memory_protection_error(cell addr, stack_frame *native_stack);
+	void signal_error(int signal, stack_frame *native_stack);
+	void divide_by_zero_error();
+	void fp_trap_error(stack_frame *signal_callstack_top);
+	inline void vmprim_call_clear();
+	inline void vmprim_unimplemented();
+	void memory_signal_handler_impl();
+	void misc_signal_handler_impl();
+	void fp_signal_handler_impl();
+	void type_error(cell type, cell tagged);
+	void general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *callstack_top);
 	// next method here:
 
 };
