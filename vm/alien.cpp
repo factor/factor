@@ -24,11 +24,6 @@ char *factorvm::pinned_alien_offset(cell obj)
 	}
 }
 
-char *pinned_alien_offset(cell obj)
-{
-	return vm->pinned_alien_offset(obj);
-}
-
 /* make an alien */
 cell factorvm::allot_alien(cell delegate_, cell displacement)
 {
@@ -48,11 +43,6 @@ cell factorvm::allot_alien(cell delegate_, cell displacement)
 	new_alien->expired = F;
 
 	return new_alien.value();
-}
-
-cell allot_alien(cell delegate_, cell displacement)
-{
-	return vm->allot_alien(delegate_,displacement);
 }
 
 /* make an alien pointing at an offset of another alien */
@@ -108,15 +98,16 @@ void *alien_pointer()
 	return vm->alien_pointer();
 }
 
+
 /* define words to read/write values at an alien address */
 #define DEFINE_ALIEN_ACCESSOR(name,type,boxer,to) \
 	PRIMITIVE(alien_##name) \
 	{ \
-		boxer(*(type*)alien_pointer()); \
+		boxer(*(type*)PRIMITIVE_GETVM()->alien_pointer());	\
 	} \
 	PRIMITIVE(set_alien_##name) \
 	{ \
-		type *ptr = (type *)alien_pointer(); \
+		type *ptr = (type *)PRIMITIVE_GETVM()->alien_pointer(); \
 		type value = to(dpop()); \
 		*ptr = value; \
 	}
@@ -133,7 +124,7 @@ DEFINE_ALIEN_ACCESSOR(signed_1,s8,box_signed_1,to_fixnum)
 DEFINE_ALIEN_ACCESSOR(unsigned_1,u8,box_unsigned_1,to_cell)
 DEFINE_ALIEN_ACCESSOR(float,float,box_float,to_float)
 DEFINE_ALIEN_ACCESSOR(double,double,box_double,to_double)
-DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
+DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,PRIMITIVE_GETVM()->pinned_alien_offset)
 
 /* open a native library and push a handle */
 inline void factorvm::vmprim_dlopen()
