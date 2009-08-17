@@ -678,6 +678,181 @@ inline void allot_barrier(object *address)
 	return vm->allot_barrier(address);
 }
 
+
+//data_gc.hpp
+inline bool factorvm::collecting_accumulation_gen_p()
+{
+	return ((data->have_aging_p()
+		&& collecting_gen == data->aging()
+		&& !collecting_aging_again)
+		|| collecting_gen == data->tenured());
+}
+
+inline bool collecting_accumulation_gen_p()
+{
+	return vm->collecting_accumulation_gen_p();
+}
+
+inline object *factorvm::allot_zone(zone *z, cell a)
+{
+	cell h = z->here;
+	z->here = h + align8(a);
+	object *obj = (object *)h;
+	allot_barrier(obj);
+	return obj;
+}
+
+inline object *allot_zone(zone *z, cell a)
+{
+	return vm->allot_zone(z,a);
+}
+
+/*
+ * It is up to the caller to fill in the object's fields in a meaningful
+ * fashion!
+ */
+inline object *factorvm::allot_object(header header, cell size)
+{
+#ifdef GC_DEBUG
+	if(!gc_off)
+		gc();
+#endif
+
+	object *obj;
+
+	if(nursery.size - allot_buffer_zone > size)
+	{
+		/* If there is insufficient room, collect the nursery */
+		if(nursery.here + allot_buffer_zone + size > nursery.end)
+			garbage_collection(data->nursery(),false,0);
+
+		cell h = nursery.here;
+		nursery.here = h + align8(size);
+		obj = (object *)h;
+	}
+	/* If the object is bigger than the nursery, allocate it in
+	tenured space */
+	else
+	{
+		zone *tenured = &data->generations[data->tenured()];
+
+		/* If tenured space does not have enough room, collect */
+		if(tenured->here + size > tenured->end)
+		{
+			gc();
+			tenured = &data->generations[data->tenured()];
+		}
+
+		/* If it still won't fit, grow the heap */
+		if(tenured->here + size > tenured->end)
+		{
+			garbage_collection(data->tenured(),true,size);
+			tenured = &data->generations[data->tenured()];
+		}
+
+		obj = allot_zone(tenured,size);
+
+		/* Allows initialization code to store old->new pointers
+		without hitting the write barrier in the common case of
+		a nursery allocation */
+		write_barrier(obj);
+	}
+
+	obj->h = header;
+	return obj;
+}
+
+inline object *allot_object(header header, cell size)
+{
+	return vm->allot_object(header,size);
+}
+
+template<typename TYPE> TYPE *factorvm::allot(cell size)
+{
+	return (TYPE *)allot_object(header(TYPE::type_number),size);
+}
+
+template<typename TYPE> TYPE *allot(cell size)
+{
+	return vm->allot<TYPE>(size);
+}
+
+inline void factorvm::check_data_pointer(object *pointer)
+{
+#ifdef FACTOR_DEBUG
+	if(!growing_data_heap)
+	{
+		assert((cell)pointer >= data->seg->start
+		       && (cell)pointer < data->seg->end);
+	}
+#endif
+}
+
+inline void check_data_pointer(object *pointer)
+{
+	return vm->check_data_pointer(pointer);
+}
+
+inline void factorvm::check_tagged_pointer(cell tagged)
+{
+#ifdef FACTOR_DEBUG
+	if(!immediate_p(tagged))
+	{
+		object *obj = untag<object>(tagged);
+		check_data_pointer(obj);
+		obj->h.hi_tag();
+	}
+#endif
+}
+
+inline void check_tagged_pointer(cell tagged)
+{
+	return vm->check_tagged_pointer(tagged);
+}
+
+//local_roots.hpp
+template <typename TYPE>
+struct gc_root : public tagged<TYPE>
+{
+	factorvm *myvm;
+
+	void push() { check_tagged_pointer(tagged<TYPE>::value()); myvm->gc_locals.push_back((cell)this); }
+	
+	//explicit gc_root(cell value_, factorvm *vm) : myvm(vm),tagged<TYPE>(value_) { push(); }
+	explicit gc_root(cell value_,factorvm *vm) : tagged<TYPE>(value_),myvm(vm) { push(); }
+	explicit gc_root(TYPE *value_, factorvm *vm) : tagged<TYPE>(value_),myvm(vm) { push(); }
+
+	const gc_root<TYPE>& operator=(const TYPE *x) { tagged<TYPE>::operator=(x); return *this; }
+	const gc_root<TYPE>& operator=(const cell &x) { tagged<TYPE>::operator=(x); return *this; }
+
+	~gc_root() {
+#ifdef FACTOR_DEBUG
+		assert(myvm->gc_locals.back() == (cell)this);
+#endif
+		myvm->gc_locals.pop_back();
+	}
+};
+
+/* A similar hack for the bignum implementation */
+struct gc_bignum
+{
+	bignum **addr;
+	factorvm *myvm;
+	gc_bignum(bignum **addr_, factorvm *vm) : addr(addr_), myvm(vm) {
+		if(*addr_)
+			check_data_pointer(*addr_);
+		myvm->gc_bignums.push_back((cell)addr);
+	}
+
+	~gc_bignum() {
+#ifdef FACTOR_DEBUG
+		assert(myvm->gc_bignums.back() == (cell)addr);
+#endif
+		myvm->gc_bignums.pop_back();
+	}
+};
+
+#define GC_BIGNUM(x,vm) gc_bignum x##__gc_root(&x,vm)
 // next method here:
 
 
