@@ -358,7 +358,7 @@ struct growable_byte_array {
 	cell count;
 	gc_root<byte_array> elements;
 
-	growable_byte_array(factorvm *vm,cell capacity = 40) : count(0), elements(allot_byte_array(capacity),vm) { }
+	growable_byte_array(factorvm *myvm,cell capacity = 40) : count(0), elements(myvm->allot_byte_array(capacity),myvm) { }
 
 	void append_bytes(void *elts, cell len);
 	void append_byte_array(cell elts);

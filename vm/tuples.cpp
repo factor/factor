@@ -12,11 +12,6 @@ tuple *factorvm::allot_tuple(cell layout_)
 	return t.untagged();
 }
 
-tuple *allot_tuple(cell layout_)
-{
-	return vm->allot_tuple(layout_);
-}
-
 inline void factorvm::vmprim_tuple()
 {
 	gc_root<tuple_layout> layout(dpop(),this);
