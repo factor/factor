@@ -236,6 +236,7 @@ struct factorvm {
 	template <typename TYPE> TYPE *allot(cell size);
 	inline void check_data_pointer(object *pointer);
 	inline void check_tagged_pointer(cell tagged);
+	inline void vmprim_clear_gc_stats();
 
 	// local roots
 	/* If a runtime function needs to call another function which potentially
