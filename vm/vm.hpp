@@ -213,7 +213,6 @@ struct factorvm {
 	template <typename T> T *allot_array_internal(cell capacity);
 	template <typename T> bool reallot_array_in_place_p(T *array, cell capacity);
 	template <typename TYPE> TYPE *reallot_array(TYPE *array_, cell capacity);
-	// next method here:
 
 	//debug
 	void print_chars(string* str);
@@ -246,6 +245,8 @@ struct factorvm {
 	cell allot_array_2(cell v1_, cell v2_);
 	cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_);
 	inline void vmprim_resize_array();
+	inline void set_array_nth(array *array, cell slot, cell value);
+	// next method here:
 
 	//strings
 	cell string_nth(string* str, cell index);

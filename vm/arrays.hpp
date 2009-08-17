@@ -1,6 +1,7 @@
 namespace factor
 {
-inline static cell array_nth(array *array, cell slot)
+
+inline cell array_nth(array *array, cell slot)
 {
 #ifdef FACTOR_DEBUG
 	assert(slot < array_capacity(array));
@@ -9,7 +10,7 @@ inline static cell array_nth(array *array, cell slot)
 	return array->data()[slot];
 }
 
-inline static void set_array_nth(array *array, cell slot, cell value)
+inline void factorvm::set_array_nth(array *array, cell slot, cell value)
 {
 #ifdef FACTOR_DEBUG
 	assert(slot < array_capacity(array));
@@ -18,6 +19,11 @@ inline static void set_array_nth(array *array, cell slot, cell value)
 #endif
 	array->data()[slot] = value;
 	write_barrier(array);
+}
+
+inline void set_array_nth(array *array, cell slot, cell value)
+{
+	return vm->set_array_nth(array,slot,value);
 }
 
 array *allot_array(cell capacity, cell fill);
