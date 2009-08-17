@@ -119,8 +119,9 @@ void        bignum_negate_magnitude(bignum *);
 bignum * bignum_integer_length(bignum * arg1);
 int bignum_unsigned_logbitp(int shift, bignum * bignum);
 int bignum_logbitp(int shift, bignum * arg);
+struct factorvm;
 bignum * digit_stream_to_bignum(unsigned int n_digits,
-                                   unsigned int (*producer)(unsigned int),
+								unsigned int (*producer)(unsigned int,factorvm*),
                                    unsigned int radix,
                                    int negative_p);
 

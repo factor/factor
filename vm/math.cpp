@@ -359,9 +359,9 @@ unsigned int factorvm::bignum_producer(unsigned int digit)
 	return *(ptr + digit);
 }
 
-unsigned int bignum_producer(unsigned int digit)
+unsigned int bignum_producer(unsigned int digit, factorvm *myvm)
 {
-	return vm->bignum_producer(digit);
+	return myvm->bignum_producer(digit);
 }
 
 inline void factorvm::vmprim_byte_array_to_bignum()
