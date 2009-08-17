@@ -11,8 +11,6 @@ struct image_header;
 typedef u8 card;
 typedef u8 card_deck;
 
-typedef void (*heap_iterator)(heap_block *compiled);
-typedef void (*code_heap_iterator)(code_block *compiled);
 
 struct factorvm {
 
@@ -999,6 +997,27 @@ inline double factorvm::bignum_to_float(cell tagged)
 inline double bignum_to_float(cell tagged)
 {
 	return vm->bignum_to_float(tagged);
+}
+
+//callstack.hpp
+/* This is a little tricky. The iterator may allocate memory, so we
+keep the callstack in a GC root and use relative offsets */
+template<typename T> void factorvm::iterate_callstack_object(callstack *stack_, T &iterator)
+{
+	gc_root<callstack> stack(stack_,vm);
+	fixnum frame_offset = untag_fixnum(stack->length) - sizeof(stack_frame);
+
+	while(frame_offset >= 0)
+	{
+		stack_frame *frame = stack->frame_at(frame_offset);
+		frame_offset -= frame->size;
+		iterator(frame);
+	}
+}
+
+template<typename T> void iterate_callstack_object(callstack *stack_, T &iterator)
+{
+	return vm->iterate_callstack_object(stack_,iterator);
 }
 
 // next method here:
