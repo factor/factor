@@ -23,10 +23,6 @@ array *factorvm::allot_array(cell capacity, cell fill_)
 	return new_array.untagged();
 }
 
-array *allot_array(cell capacity, cell fill_)
-{
-	return vm->allot_array(capacity,fill_);
-}
 
 /* push a new array on the stack */
 inline void factorvm::vmprim_array()
@@ -49,10 +45,6 @@ cell factorvm::allot_array_1(cell obj_)
 	return a.value();
 }
 
-cell allot_array_1(cell obj_)
-{
-	return vm->allot_array_1(obj_);
-}
 
 cell factorvm::allot_array_2(cell v1_, cell v2_)
 {
@@ -64,10 +56,6 @@ cell factorvm::allot_array_2(cell v1_, cell v2_)
 	return a.value();
 }
 
-cell allot_array_2(cell v1_, cell v2_)
-{
-	return vm->allot_array_2(v1_,v2_);
-}
 
 cell factorvm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 {
@@ -83,10 +71,6 @@ cell factorvm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 	return a.value();
 }
 
-cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
-{
-	return vm->allot_array_4(v1_,v2_,v3_,v4_);
-}
 
 inline void factorvm::vmprim_resize_array()
 {
