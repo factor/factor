@@ -180,7 +180,7 @@ struct factorvm {
 	bool performing_compaction;
 	cell collecting_gen;
 
-	/* if true, we collecting aging space for the second time, so if it is still
+	/* if true, we are collecting aging space for the second time, so if it is still
 	   full, we go on to collect tenured */
 	bool collecting_aging_again;
 
