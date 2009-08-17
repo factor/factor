@@ -853,6 +853,55 @@ struct gc_bignum
 };
 
 #define GC_BIGNUM(x,vm) gc_bignum x##__gc_root(&x,vm)
+
+//generic_arrays.hpp
+template <typename T> T *factorvm::allot_array_internal(cell capacity)
+{
+	T *array = allot<T>(array_size<T>(capacity));
+	array->capacity = tag_fixnum(capacity);
+	return array;
+}
+
+template <typename T> T *allot_array_internal(cell capacity)
+{
+	return vm->allot_array_internal<T>(capacity);
+}
+
+template <typename T> bool factorvm::reallot_array_in_place_p(T *array, cell capacity)
+{
+	return in_zone(&nursery,array) && capacity <= array_capacity(array);
+}
+
+template <typename T> bool reallot_array_in_place_p(T *array, cell capacity)
+{
+	return vm->reallot_array_in_place_p<T>(array,capacity);
+}
+
+template <typename TYPE> TYPE *factorvm::reallot_array(TYPE *array_, cell capacity)
+{
+	gc_root<TYPE> array(array_,this);
+
+	if(reallot_array_in_place_p(array.untagged(),capacity))
+	{
+		array->capacity = tag_fixnum(capacity);
+		return array.untagged();
+	}
+	else
+	{
+		cell to_copy = array_capacity(array.untagged());
+		if(capacity < to_copy)
+			to_copy = capacity;
+
+		TYPE *new_array = allot_array_internal<TYPE>(capacity);
+	
+		memcpy(new_array + 1,array.untagged() + 1,to_copy * TYPE::element_size);
+		memset((char *)(new_array + 1) + to_copy * TYPE::element_size,
+			0,(capacity - to_copy) * TYPE::element_size);
+
+		return new_array;
+	}
+}
+
 // next method here:
 
 
