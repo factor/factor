@@ -237,12 +237,17 @@ void init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,
 }
 
 /* Size of the object pointed to by a tagged pointer */
-cell object_size(cell tagged)
+cell factorvm::object_size(cell tagged)
 {
 	if(immediate_p(tagged))
 		return 0;
 	else
 		return untagged_object_size(untag<object>(tagged));
+}
+
+cell object_size(cell tagged)
+{
+	return vm->object_size(tagged);
 }
 
 /* Size of the object pointed to by an untagged pointer */

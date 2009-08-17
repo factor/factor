@@ -154,6 +154,9 @@ struct factorvm {
 	inline void vmprim_end_scan();
 	template<typename T> void each_object(T &functor);
 	cell find_all_words();
+	cell object_size(cell tagged);
+	// next method here:
+
 	
 	//write barrier
 	inline card *addr_to_card(cell a);
@@ -412,7 +415,6 @@ struct factorvm {
 	inline double fixnum_to_float(cell tagged);
 	template <typename T> T *untag_check(cell value);
 	template <typename T> T *untag(cell value);
-	// next method here:
 	
 	//io
 	void init_c_io();
