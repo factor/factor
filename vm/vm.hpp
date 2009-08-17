@@ -43,7 +43,6 @@ struct factorvm {
 	void fatal_error(const char* msg, cell tagged);
 	void critical_error(const char* msg, cell tagged);
 	void throw_error(cell error, stack_frame *callstack_top);
-
 	void not_implemented_error();
 	bool in_page(cell fault, cell area, cell area_size, int offset);
 	void memory_protection_error(cell addr, stack_frame *native_stack);
@@ -57,6 +56,13 @@ struct factorvm {
 	void fp_signal_handler_impl();
 	void type_error(cell type, cell tagged);
 	void general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *callstack_top);
+
+	// bignum
+	int bignum_equal_p(bignum * x, bignum * y);
+	enum bignum_comparison bignum_compare(bignum * x, bignum * y);
+	bignum *bignum_add(bignum * x, bignum * y);
+	bignum *bignum_subtract(bignum * x, bignum * y);
+	bignum *bignum_multiply(bignum * x, bignum * y);
 	// next method here:
 
 };
