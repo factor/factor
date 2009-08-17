@@ -11,21 +11,11 @@ void factorvm::check_frame(stack_frame *frame)
 #endif
 }
 
-void check_frame(stack_frame *frame)
-{
-	return vm->check_frame(frame);
-}
-
 callstack *factorvm::allot_callstack(cell size)
 {
 	callstack *stack = allot<callstack>(callstack_size(size));
 	stack->length = tag_fixnum(size);
 	return stack;
-}
-
-callstack *allot_callstack(cell size)
-{
-	return vm->allot_callstack(size);
 }
 
 stack_frame *factorvm::fix_callstack_top(stack_frame *top, stack_frame *bottom)
@@ -36,11 +26,6 @@ stack_frame *factorvm::fix_callstack_top(stack_frame *top, stack_frame *bottom)
 		frame = frame_successor(frame);
 
 	return frame + 1;
-}
-
-stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom)
-{
-	return vm->fix_callstack_top(top,bottom);
 }
 
 /* We ignore the topmost frame, the one calling 'callstack',
@@ -59,11 +44,6 @@ stack_frame *factorvm::capture_start()
 		frame = frame_successor(frame);
 	}
 	return frame + 1;
-}
-
-stack_frame *capture_start()
-{
-	return vm->capture_start();
 }
 
 inline void factorvm::vmprim_callstack()
@@ -109,19 +89,10 @@ code_block *factorvm::frame_code(stack_frame *frame)
 	return (code_block *)frame->xt - 1;
 }
 
-code_block *frame_code(stack_frame *frame)
-{
-	return vm->frame_code(frame);
-}
 
 cell factorvm::frame_type(stack_frame *frame)
 {
 	return frame_code(frame)->type;
-}
-
-cell frame_type(stack_frame *frame)
-{
-	return vm->frame_type(frame);
 }
 
 cell factorvm::frame_executing(stack_frame *frame)
@@ -138,20 +109,10 @@ cell factorvm::frame_executing(stack_frame *frame)
 	}
 }
 
-cell frame_executing(stack_frame *frame)
-{
-	return vm->frame_executing(frame);
-}
-
 stack_frame *factorvm::frame_successor(stack_frame *frame)
 {
 	check_frame(frame);
 	return (stack_frame *)((cell)frame - frame->size);
-}
-
-stack_frame *frame_successor(stack_frame *frame)
-{
-	return vm->frame_successor(frame);
 }
 
 /* Allocates memory */
@@ -181,11 +142,6 @@ cell factorvm::frame_scan(stack_frame *frame)
 	}
 }
 
-cell frame_scan(stack_frame *frame)
-{
-	return vm->frame_scan(frame);
-}
-
 namespace
 {
 
@@ -196,8 +152,8 @@ struct stack_frame_accumulator {
 
 	void operator()(stack_frame *frame, factorvm *myvm)
 	{
-		gc_root<object> executing(frame_executing(frame),myvm);
-		gc_root<object> scan(frame_scan(frame),myvm);
+		gc_root<object> executing(myvm->frame_executing(frame),myvm);
+		gc_root<object> scan(myvm->frame_scan(frame),myvm);
 
 		frames.add(executing.value());
 		frames.add(scan.value());
@@ -234,21 +190,11 @@ stack_frame *factorvm::innermost_stack_frame(callstack *stack)
 	return frame;
 }
 
-stack_frame *innermost_stack_frame(callstack *stack)
-{
-	return vm->innermost_stack_frame(stack);
-}
-
 stack_frame *factorvm::innermost_stack_frame_quot(callstack *callstack)
 {
 	stack_frame *inner = innermost_stack_frame(callstack);
 	tagged<quotation>(frame_executing(inner)).untag_check(this);
 	return inner;
-}
-
-stack_frame *innermost_stack_frame_quot(callstack *callstack)
-{
-	return vm->innermost_stack_frame_quot(callstack);
 }
 
 /* Some primitives implementing a limited form of callstack mutation.
