@@ -155,6 +155,19 @@ struct factorvm {
 	inline void vmprim_end_scan();
 	template<typename T> void each_object(T &functor);
 	cell find_all_words();
+	
+	//write barrier
+	inline card *addr_to_card(cell a);
+	inline cell card_to_addr(card *c);
+	inline cell card_offset(card *c);
+	inline card_deck *addr_to_deck(cell a);
+	inline cell deck_to_addr(card_deck *c);
+	inline card *deck_to_card(card_deck *d);
+	inline card *addr_to_allot_marker(object *a);
+	inline void write_barrier(object *obj);
+	inline void allot_barrier(object *address);
+	// next method here:
+
 
 	//data_gc
 	void init_data_gc();
@@ -192,14 +205,12 @@ struct factorvm {
 	template <typename TYPE> TYPE *allot(cell size);
 	inline void check_data_pointer(object *pointer);
 	inline void check_tagged_pointer(cell tagged);
-	// next method here:
 
 	// local roots
 	std::vector<cell> gc_locals;
 	std::vector<cell> gc_bignums;
 
 	// generic arrays
-
 	template <typename TYPE> TYPE *reallot_array(TYPE *array_, cell capacity);
 
 	//debug
