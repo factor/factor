@@ -221,6 +221,10 @@ struct factorvm {
 	inline void vmprim_string_nth();
 	inline void vmprim_set_string_nth_fast();
 	inline void vmprim_set_string_nth_slow();
+
+	//booleans
+	void box_boolean(bool value);
+	bool to_boolean(cell value);
 	// next method here:
 
 
