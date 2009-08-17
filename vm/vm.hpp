@@ -191,6 +191,10 @@ struct factorvm {
 	std::vector<cell> gc_locals;
 	std::vector<cell> gc_bignums;
 
+	// generic arrays
+
+	template <typename TYPE> TYPE *reallot_array(TYPE *array_, cell capacity);
+
 	//debug
 	void print_chars(string* str);
 	void print_word(word* word, cell nesting);
