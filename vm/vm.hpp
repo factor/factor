@@ -231,6 +231,11 @@ struct factorvm {
 	inline void vmprim_byte_array();
 	inline void vmprim_uninitialized_byte_array();
 	inline void vmprim_resize_byte_array();
+
+	//tuples
+	tuple *allot_tuple(cell layout_);
+	inline void vmprim_tuple();
+	inline void vmprim_tuple_boa();
 	// next method here:
 
 
