@@ -11,19 +11,9 @@ void factorvm::reset_datastack()
 	ds = ds_bot - sizeof(cell);
 }
 
-void reset_datastack()
-{
-	return vm->reset_datastack();
-}
-
 void factorvm::reset_retainstack()
 {
 	rs = rs_bot - sizeof(cell);
-}
-
-void reset_retainstack()
-{
-	return vm->reset_retainstack();
 }
 
 static const cell stack_reserved = (64 * sizeof(cell));
@@ -32,11 +22,6 @@ void factorvm::fix_stacks()
 {
 	if(ds + sizeof(cell) < ds_bot || ds + stack_reserved >= ds_top) reset_datastack();
 	if(rs + sizeof(cell) < rs_bot || rs + stack_reserved >= rs_top) reset_retainstack();
-}
-
-void fix_stacks()
-{
-	return vm->fix_stacks();
 }
 
 /* called before entry into foreign C code. Note that ds and rs might
@@ -74,20 +59,10 @@ context *factorvm::alloc_context()
 	return new_context;
 }
 
-context *alloc_context()
-{
-	return vm->alloc_context();
-}
-
 void factorvm::dealloc_context(context *old_context)
 {
 	old_context->next = unused_contexts;
 	unused_contexts = old_context;
-}
-
-void dealloc_context(context *old_context)
-{
-	return vm->dealloc_context(old_context);
 }
 
 /* called on entry into a compiled callback */
@@ -156,11 +131,6 @@ void factorvm::init_stacks(cell ds_size_, cell rs_size_)
 	unused_contexts = NULL;
 }
 
-void init_stacks(cell ds_size_, cell rs_size_)
-{
-	return vm->init_stacks(ds_size_,rs_size_);
-}
-
 bool factorvm::stack_to_array(cell bottom, cell top)
 {
 	fixnum depth = (fixnum)(top - bottom + sizeof(cell));
@@ -174,11 +144,6 @@ bool factorvm::stack_to_array(cell bottom, cell top)
 		dpush(tag<array>(a));
 		return true;
 	}
-}
-
-bool stack_to_array(cell bottom, cell top)
-{
-	return vm->stack_to_array(bottom,top);
 }
 
 inline void factorvm::vmprim_datastack()
@@ -209,11 +174,6 @@ cell factorvm::array_to_stack(array *array, cell bottom)
 	cell depth = array_capacity(array) * sizeof(cell);
 	memcpy((void*)bottom,array + 1,depth);
 	return bottom + depth - sizeof(cell);
-}
-
-cell array_to_stack(array *array, cell bottom)
-{
-	return vm->array_to_stack(array,bottom);
 }
 
 inline void factorvm::vmprim_set_datastack()
