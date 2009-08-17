@@ -497,6 +497,21 @@ struct factorvm {
 	void *inline_cache_miss(cell return_address);
 	inline void vmprim_reset_inline_cache_stats();
 	inline void vmprim_inline_cache_stats();
+
+	//factor
+	void default_parameters(vm_parameters *p);
+	bool factor_arg(const vm_char* str, const vm_char* arg, cell* value);
+	void init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv);
+	void do_stage1_init();
+	void init_factor(vm_parameters *p);
+	void pass_args_to_factor(int argc, vm_char **argv);
+	void start_factor(vm_parameters *p);
+	void start_embedded_factor(vm_parameters *p);
+	void start_standalone_factor(int argc, vm_char **argv);
+	char *factor_eval_string(char *string);
+	void factor_eval_free(char *result);
+	void factor_yield();
+	void factor_sleep(long us);
 	// next method here:
 
 
