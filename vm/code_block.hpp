@@ -78,7 +78,7 @@ void copy_literal_references(code_block *compiled, factorvm *myvm);
 
 void update_word_references(code_block *compiled, factorvm *myvm);
 
-void update_literal_and_word_references(code_block *compiled);
+void update_literal_and_word_references(code_block *compiled, factorvm *myvm);
 
 void mark_code_block(code_block *compiled);
 
