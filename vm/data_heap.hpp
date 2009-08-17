@@ -1,8 +1,6 @@
 namespace factor
 {
 
-/* Set by the -securegc command line argument */
-extern bool secure_gc;
 
 /* generational copying GC divides memory into zones */
 struct zone {
@@ -47,7 +45,6 @@ struct data_heap {
 	bool have_aging_p() { return gen_count > 2; }
 };
 
-extern data_heap *data;
 
 static const cell max_gen_count = 3;
 
@@ -98,9 +95,6 @@ PRIMITIVE(size);
 PRIMITIVE(begin_scan);
 PRIMITIVE(next_object);
 PRIMITIVE(end_scan);
-
-/* GC is off during heap walking */
-extern bool gc_off;
 
 cell find_all_words();
 
