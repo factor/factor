@@ -8,10 +8,6 @@ namespace factor
 /* new objects are allocated here */
 VM_C_API zone nursery;
 
-
-
-
-
 cell factorvm::init_zone(zone *z, cell size, cell start)
 {
 	z->size = size;
@@ -20,10 +16,6 @@ cell factorvm::init_zone(zone *z, cell size, cell start)
 	return z->end;
 }
 
-cell init_zone(zone *z, cell size, cell start)
-{
-	return vm->init_zone(z,size,start);
-}
 
 void factorvm::init_card_decks()
 {
@@ -31,11 +23,6 @@ void factorvm::init_card_decks()
 	allot_markers_offset = (cell)data->allot_markers - (start >> card_bits);
 	cards_offset = (cell)data->cards - (start >> card_bits);
 	decks_offset = (cell)data->decks - (start >> deck_bits);
-}
-
-void init_card_decks()
-{
-	return vm->init_card_decks();
 }
 
 data_heap *factorvm::alloc_data_heap(cell gens, cell young_size,cell aging_size,cell tenured_size)
@@ -102,10 +89,6 @@ data_heap *factorvm::alloc_data_heap(cell gens, cell young_size,cell aging_size,
 	return data;
 }
 
-data_heap *alloc_data_heap(cell gens, cell young_size,cell aging_size,cell tenured_size)
-{
-	return vm->alloc_data_heap(gens,young_size,aging_size,tenured_size);
-}
 
 data_heap *factorvm::grow_data_heap(data_heap *data, cell requested_bytes)
 {
@@ -117,10 +100,6 @@ data_heap *factorvm::grow_data_heap(data_heap *data, cell requested_bytes)
 		new_tenured_size);
 }
 
-data_heap *grow_data_heap(data_heap *data, cell requested_bytes)
-{
-	return vm->grow_data_heap(data,requested_bytes);
-}
 
 void factorvm::dealloc_data_heap(data_heap *data)
 {
@@ -133,10 +112,6 @@ void factorvm::dealloc_data_heap(data_heap *data)
 	free(data);
 }
 
-void dealloc_data_heap(data_heap *data)
-{
-	return vm->dealloc_data_heap(data);
-}
 
 void factorvm::clear_cards(cell from, cell to)
 {
@@ -146,10 +121,6 @@ void factorvm::clear_cards(cell from, cell to)
 	memset(first_card,0,last_card - first_card);
 }
 
-void clear_cards(cell from, cell to)
-{
-	return vm->clear_cards(from,to);
-}
 
 void factorvm::clear_decks(cell from, cell to)
 {
@@ -159,10 +130,6 @@ void factorvm::clear_decks(cell from, cell to)
 	memset(first_deck,0,last_deck - first_deck);
 }
 
-void clear_decks(cell from, cell to)
-{
-	return vm->clear_decks(from,to);
-}
 
 void factorvm::clear_allot_markers(cell from, cell to)
 {
@@ -172,10 +139,6 @@ void factorvm::clear_allot_markers(cell from, cell to)
 	memset(first_card,invalid_allot_marker,last_card - first_card);
 }
 
-void clear_allot_markers(cell from, cell to)
-{
-	return vm->clear_allot_markers(from,to);
-}
 
 void factorvm::reset_generation(cell i)
 {
@@ -186,10 +149,6 @@ void factorvm::reset_generation(cell i)
 		memset((void*)z->start,69,z->size);
 }
 
-void reset_generation(cell i)
-{
-	return vm->reset_generation(i);
-}
 
 /* After garbage collection, any generations which are now empty need to have
 their allocation pointers and cards reset. */
@@ -204,10 +163,6 @@ void factorvm::reset_generations(cell from, cell to)
 	clear_allot_markers(from,to);
 }
 
-void reset_generations(cell from, cell to)
-{
-	return vm->reset_generations(from,to);
-}
 
 void factorvm::set_data_heap(data_heap *data_)
 {
@@ -219,10 +174,6 @@ void factorvm::set_data_heap(data_heap *data_)
 	clear_allot_markers(data->nursery(),data->tenured());
 }
 
-void set_data_heap(data_heap *data_)
-{
-	return vm->set_data_heap(data_);
-}
 
 void factorvm::init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,bool secure_gc_)
 {
@@ -231,10 +182,6 @@ void factorvm::init_data_heap(cell gens,cell young_size,cell aging_size,cell ten
 	init_data_gc();
 }
 
-void init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,bool secure_gc_)
-{
-	return vm->init_data_heap(gens,young_size,aging_size,tenured_size,secure_gc_);
-}
 
 /* Size of the object pointed to by a tagged pointer */
 cell factorvm::object_size(cell tagged)
@@ -245,10 +192,6 @@ cell factorvm::object_size(cell tagged)
 		return untagged_object_size(untag<object>(tagged));
 }
 
-cell object_size(cell tagged)
-{
-	return vm->object_size(tagged);
-}
 
 /* Size of the object pointed to by an untagged pointer */
 cell factorvm::untagged_object_size(object *pointer)
@@ -256,10 +199,6 @@ cell factorvm::untagged_object_size(object *pointer)
 	return align8(unaligned_object_size(pointer));
 }
 
-cell untagged_object_size(object *pointer)
-{
-	return vm->untagged_object_size(pointer);
-}
 
 /* Size of the data area of an object pointed to by an untagged pointer */
 cell factorvm::unaligned_object_size(object *pointer)
@@ -296,10 +235,6 @@ cell factorvm::unaligned_object_size(object *pointer)
 	}
 }
 
-cell unaligned_object_size(object *pointer)
-{
-	return vm->unaligned_object_size(pointer);
-}
 
 inline void factorvm::vmprim_size()
 {
@@ -348,10 +283,6 @@ cell factorvm::binary_payload_start(object *pointer)
 	}
 }
 
-cell binary_payload_start(object *pointer)
-{
-	return vm->binary_payload_start(pointer);
-}
 
 /* Push memory usage statistics in data heap */
 inline void factorvm::vmprim_data_room()
@@ -385,20 +316,12 @@ void factorvm::begin_scan()
 	gc_off = true;
 }
 
-void begin_scan()
-{
-	return vm->begin_scan();
-}
 
 void factorvm::end_scan()
 {
 	gc_off = false;
 }
 
-void end_scan()
-{
-	return vm->end_scan();
-}
 
 inline void factorvm::vmprim_begin_scan()
 {
@@ -423,10 +346,6 @@ cell factorvm::next_object()
 	return tag_dynamic(obj);
 }
 
-cell next_object()
-{
-	return vm->next_object();
-}
 
 /* Push object at heap scan cursor and advance; pushes f when done */
 inline void factorvm::vmprim_next_object()
@@ -459,10 +378,6 @@ template<typename TYPE> void factorvm::each_object(TYPE &functor)
 	end_scan();
 }
 
-template<typename TYPE> void each_object(TYPE &functor)
-{
-	return vm->each_object(functor);
-}
 
 namespace
 {
@@ -491,9 +406,5 @@ cell factorvm::find_all_words()
 	return accum.words.elements.value();
 }
 
-cell find_all_words()
-{
-	return vm->find_all_words();
-}
 
 }
