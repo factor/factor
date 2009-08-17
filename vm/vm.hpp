@@ -559,6 +559,8 @@ struct factorvm {
 	inline void vmprim_quot_compiled_p();
 
 	//dispatch
+	cell megamorphic_cache_hits;
+	cell megamorphic_cache_misses;
 	cell search_lookup_alist(cell table, cell klass);
 	cell search_lookup_hash(cell table, cell klass, cell hashcode);
 	cell nth_superclass(tuple_layout *layout, fixnum echelon);

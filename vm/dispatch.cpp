@@ -3,9 +3,6 @@
 namespace factor
 {
 
-cell megamorphic_cache_hits;
-cell megamorphic_cache_misses;
-
 cell factorvm::search_lookup_alist(cell table, cell klass)
 {
 	array *elements = untag<array>(table);
