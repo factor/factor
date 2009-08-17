@@ -11,10 +11,6 @@ void factorvm::print_chars(string* str)
 		putchar(string_nth(str,i));
 }
 
-void print_chars(string* str)
-{
-	return vm->print_chars(str);
-}
 
 void factorvm::print_word(word* word, cell nesting)
 {
@@ -34,10 +30,6 @@ void factorvm::print_word(word* word, cell nesting)
 	}
 }
 
-void print_word(word* word, cell nesting)
-{
-	return vm->print_word(word,nesting);
-}
 
 void factorvm::print_factor_string(string* str)
 {
@@ -46,10 +38,6 @@ void factorvm::print_factor_string(string* str)
 	putchar('"');
 }
 
-void print_factor_string(string* str)
-{
-	return vm->print_factor_string(str);
-}
 
 void factorvm::print_array(array* array, cell nesting)
 {
@@ -75,10 +63,6 @@ void factorvm::print_array(array* array, cell nesting)
 		print_string("...");
 }
 
-void print_array(array* array, cell nesting)
-{
-	return vm->print_array(array,nesting);
-}
 
 void factorvm::print_tuple(tuple *tuple, cell nesting)
 {
@@ -109,10 +93,6 @@ void factorvm::print_tuple(tuple *tuple, cell nesting)
 		print_string("...");
 }
 
-void print_tuple(tuple *tuple, cell nesting)
-{
-	return vm->print_tuple(tuple,nesting);
-}
 
 void factorvm::print_nested_obj(cell obj, fixnum nesting)
 {
@@ -164,20 +144,12 @@ void factorvm::print_nested_obj(cell obj, fixnum nesting)
 	}
 }
 
-void print_nested_obj(cell obj, fixnum nesting)
-{
-	return vm->print_nested_obj(obj,nesting);
-}
 
 void factorvm::print_obj(cell obj)
 {
 	print_nested_obj(obj,10);
 }
 
-void print_obj(cell obj)
-{
-	return vm->print_obj(obj);
-}
 
 void factorvm::print_objects(cell *start, cell *end)
 {
@@ -188,10 +160,6 @@ void factorvm::print_objects(cell *start, cell *end)
 	}
 }
 
-void print_objects(cell *start, cell *end)
-{
-	return vm->print_objects(start,end);
-}
 
 void factorvm::print_datastack()
 {
@@ -199,10 +167,6 @@ void factorvm::print_datastack()
 	print_objects((cell *)ds_bot,(cell *)ds);
 }
 
-void print_datastack()
-{
-	return vm->print_datastack();
-}
 
 void factorvm::print_retainstack()
 {
@@ -210,10 +174,6 @@ void factorvm::print_retainstack()
 	print_objects((cell *)rs_bot,(cell *)rs);
 }
 
-void print_retainstack()
-{
-	return vm->print_retainstack();
-}
 
 void factorvm::print_stack_frame(stack_frame *frame)
 {
@@ -245,10 +205,6 @@ void factorvm::print_callstack()
 	iterate_callstack(top,bottom,factor::print_stack_frame);
 }
 
-void print_callstack()
-{
-	return vm->print_callstack();
-}
 
 void factorvm::dump_cell(cell x)
 {
@@ -258,10 +214,6 @@ void factorvm::dump_cell(cell x)
 	nl();
 }
 
-void dump_cell(cell x)
-{
-	return vm->dump_cell(x);
-}
 
 void factorvm::dump_memory(cell from, cell to)
 {
@@ -271,10 +223,6 @@ void factorvm::dump_memory(cell from, cell to)
 		dump_cell(from);
 }
 
-void dump_memory(cell from, cell to)
-{
-	return vm->dump_memory(from,to);
-}
 
 void factorvm::dump_zone(zone *z)
 {
@@ -283,10 +231,6 @@ void factorvm::dump_zone(zone *z)
 	print_string(", here="); print_cell(z->here - z->start); nl();
 }
 
-void dump_zone(zone *z)
-{
-	return vm->dump_zone(z);
-}
 
 void factorvm::dump_generations()
 {
@@ -314,10 +258,6 @@ void factorvm::dump_generations()
 	nl();
 }
 
-void dump_generations()
-{
-	return vm->dump_generations();
-}
 
 void factorvm::dump_objects(cell type)
 {
@@ -339,10 +279,6 @@ void factorvm::dump_objects(cell type)
 	end_scan();
 }
 
-void dump_objects(cell type)
-{
-	return vm->dump_objects(type);
-}
 
 
 void factorvm::find_data_references_step(cell *scan)
@@ -373,10 +309,6 @@ void factorvm::find_data_references(cell look_for_)
 	end_scan();
 }
 
-void find_data_references(cell look_for_)
-{
-	return vm->find_data_references(look_for_);
-}
 
 /* Dump all code blocks for debugging */
 void factorvm::dump_code_heap()
@@ -419,10 +351,6 @@ void factorvm::dump_code_heap()
 	print_cell(literal_size); print_string(" bytes of literal data\n");
 }
 
-void dump_code_heap()
-{
-	return vm->dump_code_heap();
-}
 
 void factorvm::factorbug()
 {
@@ -568,10 +496,6 @@ void factorvm::factorbug()
 	}
 }
 
-void factorbug()
-{
-	return vm->factorbug();
-}
 
 inline void factorvm::vmprim_die()
 {
