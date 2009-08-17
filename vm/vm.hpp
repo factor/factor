@@ -468,6 +468,8 @@ struct factorvm {
 	code_block *add_code_block(cell type,cell code_,cell labels_,cell relocation_,cell literals_);
 
 	//code_heap
+	heap code;
+	unordered_map<heap_block *,char *> forwarding;
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
 	void jit_compile_word(cell word_, cell def_, bool relocate);

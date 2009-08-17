@@ -3,8 +3,6 @@
 namespace factor
 {
 
-heap code;
-
 /* Allocate a code heap during startup */
 void factorvm::init_code_heap(cell size)
 {
@@ -159,7 +157,6 @@ PRIMITIVE(code_room)
 	PRIMITIVE_GETVM()->vmprim_code_room();
 }
 
-static unordered_map<heap_block *,char *> forwarding;
 
 code_block *factorvm::forward_xt(code_block *compiled)
 {
