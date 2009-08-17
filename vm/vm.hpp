@@ -382,6 +382,21 @@ struct factorvm {
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size);
 	code_block *add_code_block(cell type,cell code_,cell labels_,cell relocation_,cell literals_);
+
+	//code_heap
+	void init_code_heap(cell size);
+	bool in_code_heap_p(cell ptr);
+	void jit_compile_word(cell word_, cell def_, bool relocate);
+	void iterate_code_heap(code_heap_iterator iter);
+	void copy_code_heap_roots();
+	void update_code_heap_words();
+	inline void vmprim_modify_code_heap();
+	inline void vmprim_code_room();
+	code_block *forward_xt(code_block *compiled);
+	void forward_frame_xt(stack_frame *frame);
+	void forward_object_xts();
+	void fixup_object_xts();
+	void compact_code_heap();
 	// next method here:
 
 
