@@ -466,6 +466,23 @@ struct factorvm {
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
 	cell lazy_jit_compile_impl(cell quot_, stack_frame *stack);
 	inline void vmprim_quot_compiled_p();
+
+	//dispatch
+	cell search_lookup_alist(cell table, cell klass);
+	cell search_lookup_hash(cell table, cell klass, cell hashcode);
+	cell nth_superclass(tuple_layout *layout, fixnum echelon);
+	cell nth_hashcode(tuple_layout *layout, fixnum echelon);
+	cell lookup_tuple_method(cell obj, cell methods);
+	cell lookup_hi_tag_method(cell obj, cell methods);
+	cell lookup_hairy_method(cell obj, cell methods);
+	cell lookup_method(cell obj, cell methods);
+	inline void vmprim_lookup_method();
+	cell object_class(cell obj);
+	cell method_cache_hashcode(cell klass, array *array);
+	void update_method_cache(cell cache, cell klass, cell method);
+	inline void vmprim_mega_cache_miss();
+	inline void vmprim_reset_dispatch_stats();
+	inline void vmprim_dispatch_stats();
 	// next method here:
 
 
