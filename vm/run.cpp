@@ -102,11 +102,6 @@ cell factorvm::clone_object(cell obj_)
 	}
 }
 
-cell clone_object(cell obj_)
-{
-	return vm->clone_object(obj_);
-}
-
 inline void factorvm::vmprim_clone()
 {
 	drepl(clone_object(dpeek()));
