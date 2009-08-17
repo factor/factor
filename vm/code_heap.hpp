@@ -1,8 +1,6 @@
 namespace factor
 {
 
-/* compiled code */
-extern heap code;
 
 void init_code_heap(cell size);
 
