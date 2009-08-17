@@ -455,6 +455,17 @@ struct factorvm {
 	void box_value_struct(void *src, cell size);
 	void box_small_struct(cell x, cell y, cell size);
 	void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size);
+
+	//quotations
+	inline void vmprim_jit_compile();
+	inline void vmprim_array_to_quotation();
+	inline void vmprim_quotation_xt();
+	void set_quot_xt(quotation *quot, code_block *code);
+	void jit_compile(cell quot_, bool relocating);
+	void compile_all_words();
+	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
+	cell lazy_jit_compile_impl(cell quot_, stack_frame *stack);
+	inline void vmprim_quot_compiled_p();
 	// next method here:
 
 
