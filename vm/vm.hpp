@@ -115,6 +115,33 @@ struct factorvm {
 	int bignum_logbitp(int shift, bignum * arg);
 	int bignum_unsigned_logbitp(int shift, bignum * bignum);
 	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int), unsigned int radix, int negative_p);
+
+	//data_heap
+	cell init_zone(zone *z, cell size, cell start);
+	void init_card_decks();
+	data_heap *alloc_data_heap(cell gens, cell young_size,cell aging_size,cell tenured_size);
+	data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
+	void dealloc_data_heap(data_heap *data);
+	void clear_cards(cell from, cell to);
+	void clear_decks(cell from, cell to);
+	void clear_allot_markers(cell from, cell to);
+	void reset_generation(cell i);
+	void reset_generations(cell from, cell to);
+	void set_data_heap(data_heap *data_);
+	void init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,bool secure_gc_);
+	cell untagged_object_size(object *pointer);
+	cell unaligned_object_size(object *pointer);
+	inline void vmprim_size();
+	cell binary_payload_start(object *pointer);
+	inline void vmprim_data_room();
+	void begin_scan();
+	void end_scan();
+	inline void vmprim_begin_scan();
+	cell next_object();
+	inline void vmprim_next_object();
+	inline void vmprim_end_scan();
+	template<typename T> void each_object(T &functor);
+	cell find_all_words();
 	// next method here:
 
 };
