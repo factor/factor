@@ -3,6 +3,8 @@
 namespace factor
 {
 
+factorvm *vm;
+
 VM_C_API void default_parameters(vm_parameters *p)
 {
 	p->image_path = NULL;
@@ -95,6 +97,7 @@ static void do_stage1_init()
 
 VM_C_API void init_factor(vm_parameters *p)
 {
+	vm = new factorvm;
 	/* Kilobytes */
 	p->ds_size = align_page(p->ds_size << 10);
 	p->rs_size = align_page(p->rs_size << 10);
