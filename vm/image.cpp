@@ -363,9 +363,9 @@ void factorvm::fixup_code_block(code_block *compiled)
 	relocate_code_block(compiled);
 }
 
-void fixup_code_block(code_block *compiled)
+void fixup_code_block(code_block *compiled,factorvm *myvm)
 {
-	return vm->fixup_code_block(compiled);
+	return myvm->fixup_code_block(compiled);
 }
 
 void factorvm::relocate_code()

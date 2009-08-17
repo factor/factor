@@ -1,17 +1,6 @@
 namespace factor
 {
 
-struct heap;
-struct data_heap;
-struct data;
-struct zone;
-struct vm_parameters;
-struct image_header;
-
-typedef u8 card;
-typedef u8 card_deck;
-
-
 struct factorvm {
 
 	// contexts
@@ -47,6 +36,7 @@ struct factorvm {
 	inline void vmprim_clone();
 
 	// profiler
+	bool profiling_p;
 	void init_profiler();
 	code_block *compile_profiling_stub(cell word_);
 	void set_profiling(bool profiling);

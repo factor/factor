@@ -36,8 +36,6 @@ struct context {
 	context *next;
 };
 
-//extern cell ds_size, rs_size;
-
 #define ds_bot (stack_chain->datastack_region->start)
 #define ds_top (stack_chain->datastack_region->end)
 #define rs_bot (stack_chain->retainstack_region->start)

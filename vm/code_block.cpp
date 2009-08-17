@@ -397,9 +397,9 @@ void factorvm::copy_literal_references(code_block *compiled)
 	}
 }
 
-void copy_literal_references(code_block *compiled)
+void copy_literal_references(code_block *compiled, factorvm *myvm)
 {
-	return vm->copy_literal_references(compiled);
+	return myvm->copy_literal_references(compiled);
 }
 
 /* Compute an address to store at a relocation */
@@ -456,9 +456,9 @@ void factorvm::update_word_references(code_block *compiled)
 	}
 }
 
-void update_word_references(code_block *compiled)
+void update_word_references(code_block *compiled, factorvm *myvm)
 {
-	return vm->update_word_references(compiled);
+	return myvm->update_word_references(compiled);
 }
 
 void factorvm::update_literal_and_word_references(code_block *compiled)
@@ -574,9 +574,9 @@ void factorvm::relocate_code_block(code_block *compiled)
 	flush_icache_for(compiled);
 }
 
-void relocate_code_block(code_block *compiled)
+void relocate_code_block(code_block *compiled, factorvm *myvm)
 {
-	return vm->relocate_code_block(compiled);
+	return myvm->relocate_code_block(compiled);
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
