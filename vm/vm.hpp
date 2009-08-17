@@ -61,6 +61,8 @@ struct factorvm {
 	void type_error(cell type, cell tagged);
 	void general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *callstack_top);
 
+	//callstack
+
 	// bignum
 	int bignum_equal_p(bignum * x, bignum * y);
 	enum bignum_comparison bignum_compare(bignum * x, bignum * y);
@@ -530,6 +532,10 @@ struct factorvm {
 	inline void vmprim_innermost_stack_frame_scan();
 	inline void vmprim_set_innermost_stack_frame_quot();
 	void save_callstack_bottom(stack_frame *callstack_bottom);
+	template<typename T> void iterate_callstack(cell top, cell bottom, T &iterator);
+	inline void do_slots(cell obj, void (* iter)(cell *,factorvm*));
+	// next method here:
+
 
 	//alien
 	char *pinned_alien_offset(cell obj);
@@ -1066,7 +1072,7 @@ template<typename TYPE> void factorvm::iterate_callstack_object(callstack *stack
 	{
 		stack_frame *frame = stack->frame_at(frame_offset);
 		frame_offset -= frame->size;
-		iterator(frame);
+		iterator(frame,this);
 	}
 }
 
@@ -1086,7 +1092,48 @@ inline cell tag_boolean(cell untagged)
 	return vm->tag_boolean(untagged);
 }
 
-// next method here:
+// callstack.hpp
+template<typename TYPE> void factorvm::iterate_callstack(cell top, cell bottom, TYPE &iterator)
+{
+	stack_frame *frame = (stack_frame *)bottom - 1;
+
+	while((cell)frame >= top)
+	{
+		iterator(frame,this);
+		frame = frame_successor(frame);
+	}
+}
+
+template<typename TYPE> void iterate_callstack(cell top, cell bottom, TYPE &iterator)
+{
+	return vm->iterate_callstack(top,bottom,iterator);
+}
+
+
+// data_heap.hpp
+/* Every object has a regular representation in the runtime, which makes GC
+much simpler. Every slot of the object until binary_payload_start is a pointer
+to some other object. */
+struct factorvm;
+inline void factorvm::do_slots(cell obj, void (* iter)(cell *,factorvm*))
+{
+	cell scan = obj;
+	cell payload_start = binary_payload_start((object *)obj);
+	cell end = obj + payload_start;
+
+	scan += sizeof(cell);
+
+	while(scan < end)
+	{
+		iter((cell *)scan,this);
+		scan += sizeof(cell);
+	}
+}
+
+inline void do_slots(cell obj, void (* iter)(cell *,factorvm*))
+{
+	return vm->do_slots(obj,iter);
+}
 
 
 }
