@@ -396,7 +396,7 @@ VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 inline void factorvm::vmprim_quot_compiled_p()
 {
 	tagged<quotation> quot(dpop());
-	quot.untag_check();
+	quot.untag_check(this);
 	dpush(tag_boolean(quot->code != NULL));
 }
 

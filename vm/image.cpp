@@ -146,7 +146,7 @@ inline void factorvm::vmprim_save_image()
 	gc();
 
 	gc_root<byte_array> path(dpop(),this);
-	path.untag_check();
+	path.untag_check(this);
 	save_image((vm_char *)(path.untagged() + 1));
 }
 
@@ -161,7 +161,7 @@ inline void factorvm::vmprim_save_image_and_exit()
 	where we might throw an error, so we have to throw an error here since
 	later steps destroy the current image. */
 	gc_root<byte_array> path(dpop(),this);
-	path.untag_check();
+	path.untag_check(this);
 
 	/* strip out userenv data which is set on startup anyway */
 	for(cell i = 0; i < USER_ENV; i++)

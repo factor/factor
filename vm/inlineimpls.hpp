@@ -1,10 +1,8 @@
 namespace factor
 {
 
-// I've had to copy inline implementations here to make dependencies work. Hopefully this can be better factored
+// I've had to copy inline implementations here to make dependencies work. Am hoping to move this code back into include files
 // once the rest of the reentrant changes are done. -PD
-
-//tagged.hpp
 
 // write_barrier.hpp
 

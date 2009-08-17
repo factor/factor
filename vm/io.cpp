@@ -45,8 +45,8 @@ inline void factorvm::vmprim_fopen()
 {
 	gc_root<byte_array> mode(dpop(),this);
 	gc_root<byte_array> path(dpop(),this);
-	mode.untag_check();
-	path.untag_check();
+	mode.untag_check(this);
+	path.untag_check(this);
 
 	for(;;)
 	{
