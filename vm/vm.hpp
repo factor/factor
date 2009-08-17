@@ -225,6 +225,12 @@ struct factorvm {
 	//booleans
 	void box_boolean(bool value);
 	bool to_boolean(cell value);
+
+	//byte arrays
+	byte_array *allot_byte_array(cell size);
+	inline void vmprim_byte_array();
+	inline void vmprim_uninitialized_byte_array();
+	inline void vmprim_resize_byte_array();
 	// next method here:
 
 

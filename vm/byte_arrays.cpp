@@ -3,30 +3,50 @@
 namespace factor
 {
 
-byte_array *allot_byte_array(cell size)
+byte_array *factorvm::allot_byte_array(cell size)
 {
 	byte_array *array = allot_array_internal<byte_array>(size);
 	memset(array + 1,0,size);
 	return array;
 }
 
-PRIMITIVE(byte_array)
+byte_array *allot_byte_array(cell size)
+{
+	return vm->allot_byte_array(size);
+}
+
+inline void factorvm::vmprim_byte_array()
 {
 	cell size = unbox_array_size();
 	dpush(tag<byte_array>(allot_byte_array(size)));
 }
 
-PRIMITIVE(uninitialized_byte_array)
+PRIMITIVE(byte_array)
+{
+	PRIMITIVE_GETVM()->vmprim_byte_array();
+}
+
+inline void factorvm::vmprim_uninitialized_byte_array()
 {
 	cell size = unbox_array_size();
 	dpush(tag<byte_array>(allot_array_internal<byte_array>(size)));
 }
 
-PRIMITIVE(resize_byte_array)
+PRIMITIVE(uninitialized_byte_array)
+{
+	PRIMITIVE_GETVM()->vmprim_uninitialized_byte_array();
+}
+
+inline void factorvm::vmprim_resize_byte_array()
 {
 	byte_array *array = untag_check<byte_array>(dpop());
 	cell capacity = unbox_array_size();
 	dpush(tag<byte_array>(reallot_array(array,capacity)));
+}
+
+PRIMITIVE(resize_byte_array)
+{
+	PRIMITIVE_GETVM()->vmprim_resize_byte_array();
 }
 
 void growable_byte_array::append_bytes(void *elts, cell len)
