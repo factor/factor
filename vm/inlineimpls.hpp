@@ -347,7 +347,7 @@ struct growable_array {
 	cell count;
 	gc_root<array> elements;
 
-	growable_array(factorvm *myvm, cell capacity = 10) : count(0), elements(allot_array(capacity,F),myvm) {}
+	growable_array(factorvm *myvm, cell capacity = 10) : count(0), elements(myvm->allot_array(capacity,F),myvm) {}
 
 	void add(cell elt);
 	void trim();
