@@ -76,11 +76,45 @@ struct factorvm {
 	bignum *bignum_multiply_unsigned_small_factor(bignum * x, bignum_digit_type y,int negative_p);
 	void bignum_destructive_add(bignum * bignum, bignum_digit_type n);
 	void bignum_destructive_scale_up(bignum * bignum, bignum_digit_type factor);
-	void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denominator, bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
+	void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denominator, 
+												  bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
 	void bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q);
-	bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end, bignum_digit_type guess, bignum_digit_type * u_start);
-	void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator, bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
+	bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end, 
+											 bignum_digit_type guess, bignum_digit_type * u_start);
+	void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator, 
+												   bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
 	void bignum_destructive_normalization(bignum * source, bignum * target, int shift_left);
+	void bignum_destructive_unnormalization(bignum * bignum, int shift_right);
+	bignum_digit_type bignum_digit_divide(bignum_digit_type uh, bignum_digit_type ul, 
+										  bignum_digit_type v, bignum_digit_type * q) /* return value */;
+	bignum_digit_type bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2, 
+												   bignum_digit_type guess, bignum_digit_type * u);
+	void bignum_divide_unsigned_small_denominator(bignum * numerator, bignum_digit_type denominator, 
+												  bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
+	bignum_digit_type bignum_destructive_scale_down(bignum * bignum, bignum_digit_type denominator);
+	bignum * bignum_remainder_unsigned_small_denominator(bignum * n, bignum_digit_type d, int negative_p);
+	bignum *bignum_digit_to_bignum(bignum_digit_type digit, int negative_p);
+	bignum *allot_bignum(bignum_length_type length, int negative_p);
+	bignum * allot_bignum_zeroed(bignum_length_type length, int negative_p);
+	bignum *bignum_shorten_length(bignum * bignum, bignum_length_type length);
+	bignum *bignum_trim(bignum * bignum);
+	bignum *bignum_new_sign(bignum * x, int negative_p);
+	bignum *bignum_maybe_new_sign(bignum * x, int negative_p);
+	void bignum_destructive_copy(bignum * source, bignum * target);
+	bignum *bignum_bitwise_not(bignum * x);
+	bignum *bignum_arithmetic_shift(bignum * arg1, fixnum n);
+	bignum *bignum_bitwise_and(bignum * arg1, bignum * arg2);
+	bignum *bignum_bitwise_ior(bignum * arg1, bignum * arg2);
+	bignum *bignum_bitwise_xor(bignum * arg1, bignum * arg2);
+	bignum *bignum_magnitude_ash(bignum * arg1, fixnum n);
+	bignum *bignum_pospos_bitwise_op(int op, bignum * arg1, bignum * arg2);
+	bignum *bignum_posneg_bitwise_op(int op, bignum * arg1, bignum * arg2);
+	bignum *bignum_negneg_bitwise_op(int op, bignum * arg1, bignum * arg2);
+	void bignum_negate_magnitude(bignum * arg);
+	bignum *bignum_integer_length(bignum * x);
+	int bignum_logbitp(int shift, bignum * arg);
+	int bignum_unsigned_logbitp(int shift, bignum * bignum);
+	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int), unsigned int radix, int negative_p);
 	// next method here:
 
 };
