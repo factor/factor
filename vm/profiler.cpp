@@ -20,7 +20,7 @@ code_block *factorvm::compile_profiling_stub(cell word_)
 {
 	gc_root<word> word(word_);
 
-	jit jit(WORD_TYPE,word.value());
+	jit jit(WORD_TYPE,word.value(),this);
 	jit.emit_with(userenv[JIT_PROFILING],word.value());
 
 	return jit.to_code_block();

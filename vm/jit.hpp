@@ -10,9 +10,9 @@ struct jit {
 	bool computing_offset_p;
 	fixnum position;
 	cell offset;
-	//factorvm *vm;
+	factorvm *myvm;
 
-	jit(cell jit_type, cell owner);
+	jit(cell jit_type, cell owner, factorvm *vm);
 	void compute_position(cell offset);
 
 	void emit_relocation(cell code_template);
