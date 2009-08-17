@@ -31,6 +31,12 @@ struct factorvm {
 	inline void vmprim_load_locals();
 	cell clone_object(cell obj_);
 	inline void vmprim_clone();
+
+	// profiler
+	void init_profiler();
+	code_block *compile_profiling_stub(cell word_);
+	void set_profiling(bool profiling);
+	inline void vmprim_profiling();
 	// next method here:
 
 };
