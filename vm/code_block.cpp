@@ -251,7 +251,7 @@ void factorvm::iterate_relocations(code_block *compiled, relocation_iterator ite
 		for(cell i = 0; i < length; i++)
 		{
 			relocation_entry rel = relocation->data<relocation_entry>()[i];
-			iter(rel,index,compiled);
+			iter(rel,index,compiled,this);
 			index += number_of_parameters(relocation_type_of(rel));			
 		}
 	}
@@ -352,9 +352,9 @@ void factorvm::update_literal_references_step(relocation_entry rel, cell index, 
 	}
 }
 
-void update_literal_references_step(relocation_entry rel, cell index, code_block *compiled)
+void update_literal_references_step(relocation_entry rel, cell index, code_block *compiled, factorvm *myvm)
 {
-	return vm->update_literal_references_step(rel,index,compiled);
+	return myvm->update_literal_references_step(rel,index,compiled);
 }
 
 /* Update pointers to literals from compiled code. */
@@ -415,9 +415,9 @@ void factorvm::relocate_code_block_step(relocation_entry rel, cell index, code_b
 				    compute_relocation(rel,index,compiled));
 }
 
-void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled)
+void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled, factorvm *myvm)
 {
-	return vm->relocate_code_block_step(rel,index,compiled);
+	return myvm->relocate_code_block_step(rel,index,compiled);
 }
 
 void factorvm::update_word_references_step(relocation_entry rel, cell index, code_block *compiled)
@@ -427,9 +427,9 @@ void factorvm::update_word_references_step(relocation_entry rel, cell index, cod
 		relocate_code_block_step(rel,index,compiled);
 }
 
-void update_word_references_step(relocation_entry rel, cell index, code_block *compiled)
+void update_word_references_step(relocation_entry rel, cell index, code_block *compiled, factorvm *myvm)
 {
-	return vm->update_word_references_step(rel,index,compiled);
+	return myvm->update_word_references_step(rel,index,compiled);
 }
 
 /* Relocate new code blocks completely; updating references to literals,

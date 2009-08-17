@@ -64,7 +64,7 @@ void flush_icache_for(code_block *compiled);
 
 struct factorvm;
 
-typedef void (*relocation_iterator)(relocation_entry rel, cell index, code_block *compiled);
+typedef void (*relocation_iterator)(relocation_entry rel, cell index, code_block *compiled, factorvm *vm);
 
 void iterate_relocations(code_block *compiled, relocation_iterator iter);
 
