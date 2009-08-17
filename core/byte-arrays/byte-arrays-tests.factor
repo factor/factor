@@ -1,4 +1,4 @@
-USING: tools.test byte-arrays sequences kernel ;
+USING: tools.test byte-arrays sequences kernel math ;
 IN: byte-arrays.tests
 
 [ 6 B{ 1 2 3 } ] [
@@ -11,3 +11,7 @@ IN: byte-arrays.tests
 [ -10 B{ } resize-byte-array ] must-fail
 
 [ B{ 123 } ] [ 123 1byte-array ] unit-test
+
+[ B{ 123 } ] [ 123 0 B{ 0 } [ set-nth ] keep ] unit-test
+
+[ B{ 123 } ] [ 123 >bignum 0 B{ 0 } [ set-nth ] keep ] unit-test
