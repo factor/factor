@@ -406,6 +406,11 @@ struct factorvm {
 	inline cell allot_float(double n);
 	inline bignum *float_to_bignum(cell tagged);
 	inline double bignum_to_float(cell tagged);
+	inline double untag_float(cell tagged);
+	inline double untag_float_check(cell tagged);
+	inline fixnum float_to_fixnum(cell tagged);
+	inline double fixnum_to_float(cell tagged);
+	// next method here:
 	
 	//io
 	void init_c_io();
@@ -534,7 +539,6 @@ struct factorvm {
 	void save_callstack_bottom(stack_frame *callstack_bottom);
 	template<typename T> void iterate_callstack(cell top, cell bottom, T &iterator);
 	inline void do_slots(cell obj, void (* iter)(cell *,factorvm*));
-	// next method here:
 
 
 	//alien
@@ -1059,6 +1063,47 @@ inline double bignum_to_float(cell tagged)
 {
 	return vm->bignum_to_float(tagged);
 }
+
+inline double factorvm::untag_float(cell tagged)
+{
+	return untag<boxed_float>(tagged)->n;
+}
+
+inline double untag_float(cell tagged)
+{
+	return vm->untag_float(tagged);
+}
+
+inline double factorvm::untag_float_check(cell tagged)
+{
+	return untag_check<boxed_float>(tagged)->n;
+}
+
+inline double untag_float_check(cell tagged)
+{
+	return vm->untag_float_check(tagged);
+}
+
+inline fixnum factorvm::float_to_fixnum(cell tagged)
+{
+	return (fixnum)untag_float(tagged);
+}
+
+inline static fixnum float_to_fixnum(cell tagged)
+{
+	return vm->float_to_fixnum(tagged);
+}
+
+inline double factorvm::fixnum_to_float(cell tagged)
+{
+	return (double)untag_fixnum(tagged);
+}
+
+inline double fixnum_to_float(cell tagged)
+{
+	return vm->fixnum_to_float(tagged);
+}
+
 
 //callstack.hpp
 /* This is a little tricky. The iterator may allocate memory, so we
