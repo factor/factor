@@ -72,6 +72,10 @@ struct factorvm {
 	void bignum_divide(bignum * numerator, bignum * denominator, bignum * * quotient, bignum * * remainder);
 	bignum *bignum_quotient(bignum * numerator, bignum * denominator);
 	bignum *bignum_remainder(bignum * numerator, bignum * denominator);
+	cell bignum_to_cell(bignum * bignum);
+	fixnum bignum_to_fixnum(bignum * bignum);
+	s64 bignum_to_long_long(bignum * bignum);
+	u64 bignum_to_ulong_long(bignum * bignum);
 	double bignum_to_double(bignum * bignum);
 	bignum *double_to_bignum(double x);
 	int bignum_equal_p_unsigned(bignum * x, bignum * y);
