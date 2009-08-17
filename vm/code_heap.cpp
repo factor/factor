@@ -51,7 +51,7 @@ void factorvm::iterate_code_heap(code_heap_iterator iter)
 	while(scan)
 	{
 		if(scan->status != B_FREE)
-			iter((code_block *)scan);
+			iter((code_block *)scan,this);
 		scan = next_block(&code,scan);
 	}
 }
