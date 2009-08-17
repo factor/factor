@@ -21,7 +21,7 @@ SYMBOL: total
 : canonicalize-specializer-1 ( specializer -- specializer' )
     [
         [ class? ] filter
-        [ length <reversed> [ 1+ neg ] map ] keep zip
+        [ length <reversed> [ 1 + neg ] map ] keep zip
         [ length args [ max ] change ] keep
     ]
     [
@@ -104,7 +104,7 @@ SYMBOL: total
         { 0 [ [ dup ] ] }
         { 1 [ [ over ] ] }
         { 2 [ [ pick ] ] }
-        [ 1- picker [ dip swap ] curry ]
+        [ 1 - picker [ dip swap ] curry ]
     } case ;
 
 : (multi-predicate) ( class picker -- quot )
