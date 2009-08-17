@@ -6,8 +6,8 @@ namespace factor
 /* make a new array with an initial element */
 array *factorvm::allot_array(cell capacity, cell fill_)
 {
-	gc_root<object> fill(fill_);
-	gc_root<array> new_array(allot_array_internal<array>(capacity));
+	gc_root<object> fill(fill_,this);
+	gc_root<array> new_array(allot_array_internal<array>(capacity),this);
 
 	if(fill.value() == tag_fixnum(0))
 		memset(new_array->data(),'\0',capacity * sizeof(cell));
@@ -43,8 +43,8 @@ PRIMITIVE(array)
 
 cell factorvm::allot_array_1(cell obj_)
 {
-	gc_root<object> obj(obj_);
-	gc_root<array> a(allot_array_internal<array>(1));
+	gc_root<object> obj(obj_,this);
+	gc_root<array> a(allot_array_internal<array>(1),this);
 	set_array_nth(a.untagged(),0,obj.value());
 	return a.value();
 }
@@ -56,9 +56,9 @@ cell allot_array_1(cell obj_)
 
 cell factorvm::allot_array_2(cell v1_, cell v2_)
 {
-	gc_root<object> v1(v1_);
-	gc_root<object> v2(v2_);
-	gc_root<array> a(allot_array_internal<array>(2));
+	gc_root<object> v1(v1_,this);
+	gc_root<object> v2(v2_,this);
+	gc_root<array> a(allot_array_internal<array>(2),this);
 	set_array_nth(a.untagged(),0,v1.value());
 	set_array_nth(a.untagged(),1,v2.value());
 	return a.value();
@@ -71,11 +71,11 @@ cell allot_array_2(cell v1_, cell v2_)
 
 cell factorvm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 {
-	gc_root<object> v1(v1_);
-	gc_root<object> v2(v2_);
-	gc_root<object> v3(v3_);
-	gc_root<object> v4(v4_);
-	gc_root<array> a(allot_array_internal<array>(4));
+	gc_root<object> v1(v1_,this);
+	gc_root<object> v2(v2_,this);
+	gc_root<object> v3(v3_,this);
+	gc_root<object> v4(v4_,this);
+	gc_root<array> a(allot_array_internal<array>(4),this);
 	set_array_nth(a.untagged(),0,v1.value());
 	set_array_nth(a.untagged(),1,v2.value());
 	set_array_nth(a.untagged(),2,v3.value());
@@ -102,7 +102,7 @@ PRIMITIVE(resize_array)
 
 void growable_array::add(cell elt_)
 {
-	gc_root<object> elt(elt_);
+	gc_root<object> elt(elt_,elements.myvm);
 	if(count == array_capacity(elements.untagged()))
 		elements = reallot_array(elements.untagged(),count * 2);
 

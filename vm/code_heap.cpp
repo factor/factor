@@ -29,8 +29,8 @@ bool in_code_heap_p(cell ptr)
 /* Compile a word definition with the non-optimizing compiler. Allocates memory */
 void factorvm::jit_compile_word(cell word_, cell def_, bool relocate)
 {
-	gc_root<word> word(word_);
-	gc_root<quotation> def(def_);
+	gc_root<word> word(word_,this);
+	gc_root<quotation> def(def_,this);
 
 	jit_compile(def.value(),relocate);
 
@@ -89,7 +89,7 @@ void update_code_heap_words()
 
 inline void factorvm::vmprim_modify_code_heap()
 {
-	gc_root<array> alist(dpop());
+	gc_root<array> alist(dpop(),this);
 
 	cell count = array_capacity(alist.untagged());
 
@@ -99,10 +99,10 @@ inline void factorvm::vmprim_modify_code_heap()
 	cell i;
 	for(i = 0; i < count; i++)
 	{
-		gc_root<array> pair(array_nth(alist.untagged(),i));
+		gc_root<array> pair(array_nth(alist.untagged(),i),this);
 
-		gc_root<word> word(array_nth(pair.untagged(),0));
-		gc_root<object> data(array_nth(pair.untagged(),1));
+		gc_root<word> word(array_nth(pair.untagged(),0),this);
+		gc_root<object> data(array_nth(pair.untagged(),1),this);
 
 		switch(data.type())
 		{

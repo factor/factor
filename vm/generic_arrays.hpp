@@ -33,7 +33,7 @@ template <typename T> bool reallot_array_in_place_p(T *array, cell capacity)
 
 template <typename T> T *reallot_array(T *array_, cell capacity)
 {
-	gc_root<T> array(array_);
+	gc_root<T> array(array_,vm);
 
 	if(reallot_array_in_place_p(array.untagged(),capacity))
 	{

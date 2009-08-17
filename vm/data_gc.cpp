@@ -730,7 +730,7 @@ PRIMITIVE(gc)
 
 inline void factorvm::vmprim_gc_stats()
 {
-	growable_array result;
+	growable_array result(this);
 
 	cell i;
 	u64 total_gc_time = 0;

@@ -43,8 +43,8 @@ void io_error()
 
 inline void factorvm::vmprim_fopen()
 {
-	gc_root<byte_array> mode(dpop());
-	gc_root<byte_array> path(dpop());
+	gc_root<byte_array> mode(dpop(),this);
+	gc_root<byte_array> path(dpop(),this);
 	mode.untag_check();
 	path.untag_check();
 
@@ -108,7 +108,7 @@ inline void factorvm::vmprim_fread()
 		return;
 	}
 
-	gc_root<byte_array> buf(allot_array_internal<byte_array>(size));
+	gc_root<byte_array> buf(allot_array_internal<byte_array>(size),this);
 
 	for(;;)
 	{

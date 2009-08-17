@@ -1,6 +1,5 @@
 namespace factor
 {
-
 inline static cell array_nth(array *array, cell slot)
 {
 #ifdef FACTOR_DEBUG
@@ -34,7 +33,7 @@ struct growable_array {
 	cell count;
 	gc_root<array> elements;
 
-	growable_array(cell capacity = 10) : count(0), elements(allot_array(capacity,F)) {}
+	growable_array(factorvm *myvm, cell capacity = 10) : count(0), elements(allot_array(capacity,F),myvm) {}
 
 	void add(cell elt);
 	void trim();
