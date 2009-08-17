@@ -22,13 +22,7 @@ struct quotation_jit : public jit {
 	void iterate_quotation();
 };
 
-void set_quot_xt(quotation *quot, code_block *code);
-void jit_compile(cell quot, bool relocate);
-fixnum quot_code_offset_to_scan(cell quot, cell offset);
-
 PRIMITIVE(jit_compile);
-
-void compile_all_words();
 
 PRIMITIVE(array_to_quotation);
 PRIMITIVE(quotation_xt);

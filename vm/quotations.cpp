@@ -198,8 +198,8 @@ void quotation_jit::iterate_quotation()
 
 				if(compiling)
 				{
-					jit_compile(array_nth(elements.untagged(),i),relocate);
-					jit_compile(array_nth(elements.untagged(),i + 1),relocate);
+					myvm->jit_compile(array_nth(elements.untagged(),i),relocate);
+					myvm->jit_compile(array_nth(elements.untagged(),i + 1),relocate);
 				}
 
 				literal(array_nth(elements.untagged(),i));
@@ -214,7 +214,7 @@ void quotation_jit::iterate_quotation()
 			else if(fast_dip_p(i))
 			{
 				if(compiling)
-					jit_compile(obj.value(),relocate);
+					myvm->jit_compile(obj.value(),relocate);
 				emit_with(userenv[JIT_DIP],obj.value());
 				i++;
 				break;
@@ -223,7 +223,7 @@ void quotation_jit::iterate_quotation()
 			else if(fast_2dip_p(i))
 			{
 				if(compiling)
-					jit_compile(obj.value(),relocate);
+					myvm->jit_compile(obj.value(),relocate);
 				emit_with(userenv[JIT_2DIP],obj.value());
 				i++;
 				break;
@@ -232,7 +232,7 @@ void quotation_jit::iterate_quotation()
 			else if(fast_3dip_p(i))
 			{
 				if(compiling)
-					jit_compile(obj.value(),relocate);
+					myvm->jit_compile(obj.value(),relocate);
 				emit_with(userenv[JIT_3DIP],obj.value());
 				i++;
 				break;
@@ -274,11 +274,6 @@ void factorvm::set_quot_xt(quotation *quot, code_block *code)
 	quot->xt = code->xt();
 }
 
-void set_quot_xt(quotation *quot, code_block *code)
-{
-	return vm->set_quot_xt(quot,code);
-}
-
 /* Allocates memory */
 void factorvm::jit_compile(cell quot_, bool relocating)
 {
@@ -292,11 +287,6 @@ void factorvm::jit_compile(cell quot_, bool relocating)
 	set_quot_xt(quot.untagged(),compiled);
 
 	if(relocating) relocate_code_block(compiled);
-}
-
-void jit_compile(cell quot_, bool relocating)
-{
-	return vm->jit_compile(quot_,relocating);
 }
 
 inline void factorvm::vmprim_jit_compile()
@@ -357,11 +347,6 @@ void factorvm::compile_all_words()
 	iterate_code_heap(factor::relocate_code_block);
 }
 
-void compile_all_words()
-{
-	return vm->compile_all_words();
-}
-
 /* Allocates memory */
 fixnum factorvm::quot_code_offset_to_scan(cell quot_, cell offset)
 {
@@ -373,11 +358,6 @@ fixnum factorvm::quot_code_offset_to_scan(cell quot_, cell offset)
 	compiler.iterate_quotation();
 
 	return compiler.get_position();
-}
-
-fixnum quot_code_offset_to_scan(cell quot_, cell offset)
-{
-	return vm->quot_code_offset_to_scan(quot_,offset);
 }
 
 cell factorvm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
