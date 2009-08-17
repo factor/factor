@@ -19,9 +19,9 @@ struct gc_root : public tagged<TYPE>
 
 	~gc_root() {
 #ifdef FACTOR_DEBUG
-		assert(vm->gc_locals.back() == (cell)this);
+		assert(myvm->gc_locals.back() == (cell)this);
 #endif
-		vm->gc_locals.pop_back();
+		myvm->gc_locals.pop_back();
 	}
 };
 
@@ -30,21 +30,20 @@ struct gc_bignum
 {
 	bignum **addr;
 	factorvm *myvm;
-	//gc_bignum(bignum **addr_, factorvm *vm) : addr(addr_), myvm(vm) {
-	gc_bignum(bignum **addr_) : addr(addr_), myvm(vm) {
+	gc_bignum(bignum **addr_, factorvm *vm) : addr(addr_), myvm(vm) {
 		if(*addr_)
 			check_data_pointer(*addr_);
-		vm->gc_bignums.push_back((cell)addr);
+		myvm->gc_bignums.push_back((cell)addr);
 	}
 
 	~gc_bignum() {
 #ifdef FACTOR_DEBUG
-		assert(vm->gc_bignums.back() == (cell)addr);
+		assert(myvm->gc_bignums.back() == (cell)addr);
 #endif
-		vm->gc_bignums.pop_back();
+		myvm->gc_bignums.pop_back();
 	}
 };
 
-#define GC_BIGNUM(x) gc_bignum x##__gc_root(&x)
+#define GC_BIGNUM(x,vm) gc_bignum x##__gc_root(&x,vm)
 
 }
