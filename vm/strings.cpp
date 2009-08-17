@@ -3,7 +3,7 @@
 namespace factor
 {
 
-cell string_nth(string* str, cell index)
+cell factorvm::string_nth(string* str, cell index)
 {
 	/* If high bit is set, the most significant 16 bits of the char
 	come from the aux vector. The least significant bit of the
@@ -22,12 +22,22 @@ cell string_nth(string* str, cell index)
 	}
 }
 
-void set_string_nth_fast(string *str, cell index, cell ch)
+cell string_nth(string* str, cell index)
+{
+	return vm->string_nth(str,index);
+}
+
+void factorvm::set_string_nth_fast(string *str, cell index, cell ch)
 {
 	str->data()[index] = ch;
 }
 
-void set_string_nth_slow(string *str_, cell index, cell ch)
+void set_string_nth_fast(string *str, cell index, cell ch)
+{
+	return vm->set_string_nth_fast(str,index,ch);
+}
+
+void factorvm::set_string_nth_slow(string *str_, cell index, cell ch)
 {
 	gc_root<string> str(str_);
 
@@ -54,8 +64,13 @@ void set_string_nth_slow(string *str_, cell index, cell ch)
 	aux->data<u16>()[index] = ((ch >> 7) ^ 1);
 }
 
+void set_string_nth_slow(string *str_, cell index, cell ch)
+{
+	return vm->set_string_nth_slow(str_,index,ch);
+}
+
 /* allocates memory */
-void set_string_nth(string *str, cell index, cell ch)
+void factorvm::set_string_nth(string *str, cell index, cell ch)
 {
 	if(ch <= 0x7f)
 		set_string_nth_fast(str,index,ch);
@@ -63,8 +78,13 @@ void set_string_nth(string *str, cell index, cell ch)
 		set_string_nth_slow(str,index,ch);
 }
 
+void set_string_nth(string *str, cell index, cell ch)
+{
+	return vm->set_string_nth(str,index,ch);
+}
+
 /* Allocates memory */
-string *allot_string_internal(cell capacity)
+string *factorvm::allot_string_internal(cell capacity)
 {
 	string *str = allot<string>(string_size(capacity));
 
@@ -75,8 +95,13 @@ string *allot_string_internal(cell capacity)
 	return str;
 }
 
+string *allot_string_internal(cell capacity)
+{
+	return vm->allot_string_internal(capacity);
+}
+
 /* Allocates memory */
-void fill_string(string *str_, cell start, cell capacity, cell fill)
+void factorvm::fill_string(string *str_, cell start, cell capacity, cell fill)
 {
 	gc_root<string> str(str_);
 
@@ -91,29 +116,49 @@ void fill_string(string *str_, cell start, cell capacity, cell fill)
 	}
 }
 
+void fill_string(string *str_, cell start, cell capacity, cell fill)
+{
+	return vm->fill_string(str_,start,capacity,fill);
+}
+
 /* Allocates memory */
-string *allot_string(cell capacity, cell fill)
+string *factorvm::allot_string(cell capacity, cell fill)
 {
 	gc_root<string> str(allot_string_internal(capacity));
 	fill_string(str.untagged(),0,capacity,fill);
 	return str.untagged();
 }
 
-PRIMITIVE(string)
+string *allot_string(cell capacity, cell fill)
+{
+	return vm->allot_string(capacity,fill);
+}
+
+inline void factorvm::vmprim_string()
 {
 	cell initial = to_cell(dpop());
 	cell length = unbox_array_size();
 	dpush(tag<string>(allot_string(length,initial)));
 }
 
-static bool reallot_string_in_place_p(string *str, cell capacity)
+PRIMITIVE(string)
+{
+	PRIMITIVE_GETVM()->vmprim_string();
+}
+
+bool factorvm::reallot_string_in_place_p(string *str, cell capacity)
 {
 	return in_zone(&nursery,str)
 		&& (str->aux == F || in_zone(&nursery,untag<byte_array>(str->aux)))
 		&& capacity <= string_capacity(str);
 }
 
-string* reallot_string(string *str_, cell capacity)
+bool reallot_string_in_place_p(string *str, cell capacity)
+{
+	return vm->reallot_string_in_place_p(str,capacity);
+}
+
+string* factorvm::reallot_string(string *str_, cell capacity)
 {
 	gc_root<string> str(str_);
 
@@ -155,21 +200,36 @@ string* reallot_string(string *str_, cell capacity)
 	}
 }
 
-PRIMITIVE(resize_string)
+string* reallot_string(string *str_, cell capacity)
+{
+	return vm->reallot_string(str_,capacity);
+}
+
+inline void factorvm::vmprim_resize_string()
 {
 	string* str = untag_check<string>(dpop());
 	cell capacity = unbox_array_size();
 	dpush(tag<string>(reallot_string(str,capacity)));
 }
 
-PRIMITIVE(string_nth)
+PRIMITIVE(resize_string)
+{
+	PRIMITIVE_GETVM()->vmprim_resize_string();
+}
+
+inline void factorvm::vmprim_string_nth()
 {
 	string *str = untag<string>(dpop());
 	cell index = untag_fixnum(dpop());
 	dpush(tag_fixnum(string_nth(str,index)));
 }
 
-PRIMITIVE(set_string_nth_fast)
+PRIMITIVE(string_nth)
+{
+	PRIMITIVE_GETVM()->vmprim_string_nth();
+}
+
+inline void factorvm::vmprim_set_string_nth_fast()
 {
 	string *str = untag<string>(dpop());
 	cell index = untag_fixnum(dpop());
@@ -177,12 +237,22 @@ PRIMITIVE(set_string_nth_fast)
 	set_string_nth_fast(str,index,value);
 }
 
-PRIMITIVE(set_string_nth_slow)
+PRIMITIVE(set_string_nth_fast)
+{
+	PRIMITIVE_GETVM()->vmprim_set_string_nth_fast();
+}
+
+inline void factorvm::vmprim_set_string_nth_slow()
 {
 	string *str = untag<string>(dpop());
 	cell index = untag_fixnum(dpop());
 	cell value = untag_fixnum(dpop());
 	set_string_nth_slow(str,index,value);
+}
+
+PRIMITIVE(set_string_nth_slow)
+{
+	PRIMITIVE_GETVM()->vmprim_set_string_nth_slow();
 }
 
 }

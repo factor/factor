@@ -205,6 +205,22 @@ struct factorvm {
 	cell allot_array_2(cell v1_, cell v2_);
 	cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_);
 	inline void vmprim_resize_array();
+
+	//strings
+	cell string_nth(string* str, cell index);
+	void set_string_nth_fast(string *str, cell index, cell ch);
+	void set_string_nth_slow(string *str_, cell index, cell ch);
+	void set_string_nth(string *str, cell index, cell ch);
+	string *allot_string_internal(cell capacity);
+	void fill_string(string *str_, cell start, cell capacity, cell fill);
+	string *allot_string(cell capacity, cell fill);
+	inline void vmprim_string();
+	bool reallot_string_in_place_p(string *str, cell capacity);
+	string* reallot_string(string *str_, cell capacity);
+	inline void vmprim_resize_string();
+	inline void vmprim_string_nth();
+	inline void vmprim_set_string_nth_fast();
+	inline void vmprim_set_string_nth_slow();
 	// next method here:
 
 
