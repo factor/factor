@@ -77,6 +77,10 @@ struct factorvm {
 	void bignum_destructive_add(bignum * bignum, bignum_digit_type n);
 	void bignum_destructive_scale_up(bignum * bignum, bignum_digit_type factor);
 	void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denominator, bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
+	void bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q);
+	bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end, bignum_digit_type guess, bignum_digit_type * u_start);
+	void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator, bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
+	void bignum_destructive_normalization(bignum * source, bignum * target, int shift_left);
 	// next method here:
 
 };
