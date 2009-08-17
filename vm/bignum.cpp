@@ -1980,14 +1980,14 @@ int bignum_unsigned_logbitp(int shift, bignum * bignum)
 }
 
 /* Allocates memory */
-bignum *factorvm::digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int), unsigned int radix, int negative_p)
+bignum *factorvm::digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factorvm*), unsigned int radix, int negative_p)
 {
   BIGNUM_ASSERT ((radix > 1) && (radix <= BIGNUM_RADIX_ROOT));
   if (n_digits == 0)
     return (BIGNUM_ZERO ());
   if (n_digits == 1)
     {
-      fixnum digit = ((fixnum) ((*producer) (0)));
+		fixnum digit = ((fixnum) ((*producer) (0,this)));
       return (fixnum_to_bignum (negative_p ? (- digit) : digit));
     }
   {
@@ -2009,14 +2009,14 @@ bignum *factorvm::digit_stream_to_bignum(unsigned int n_digits, unsigned int (*p
         {
           bignum_destructive_scale_up (result, ((bignum_digit_type) radix));
           bignum_destructive_add
-            (result, ((bignum_digit_type) ((*producer) (n_digits))));
+			  (result, ((bignum_digit_type) ((*producer) (n_digits,this))));
         }
       return (bignum_trim (result));
     }
   }
 }
 
-bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int), unsigned int radix, int negative_p)
+bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factorvm*), unsigned int radix, int negative_p)
 {
 	return vm->digit_stream_to_bignum(n_digits,producer,radix,negative_p);
 }
