@@ -5,7 +5,6 @@ factor::cell userenv[USER_ENV];
 namespace factor
 {
 
-cell T;
 
 inline void factorvm::vmprim_getenv()
 {
