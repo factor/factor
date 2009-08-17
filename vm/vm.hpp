@@ -348,6 +348,40 @@ struct factorvm {
 	cell heap_size(heap *heap);
 	cell compute_heap_forwarding(heap *heap, unordered_map<heap_block *,char *> &forwarding);
 	void compact_heap(heap *heap, unordered_map<heap_block *,char *> &forwarding);
+
+	//code_block
+	relocation_type relocation_type_of(relocation_entry r);
+	relocation_class relocation_class_of(relocation_entry r);
+	cell relocation_offset_of(relocation_entry r);
+	void flush_icache_for(code_block *block);
+	int number_of_parameters(relocation_type type);
+	void *object_xt(cell obj);
+	void *xt_pic(word *w, cell tagged_quot);
+	void *word_xt_pic(word *w);
+	void *word_xt_pic_tail(word *w);
+	void undefined_symbol();
+	void *get_rel_symbol(array *literals, cell index);
+	cell compute_relocation(relocation_entry rel, cell index, code_block *compiled);
+	void iterate_relocations(code_block *compiled, relocation_iterator iter);
+	void store_address_2_2(cell *ptr, cell value);
+	void store_address_masked(cell *ptr, fixnum value, cell mask, fixnum shift);
+	void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value);
+	void update_literal_references_step(relocation_entry rel, cell index, code_block *compiled);
+	void update_literal_references(code_block *compiled);
+	void copy_literal_references(code_block *compiled);
+	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
+	void update_word_references_step(relocation_entry rel, cell index, code_block *compiled);
+	void update_word_references(code_block *compiled);
+	void update_literal_and_word_references(code_block *compiled);
+	void check_code_address(cell address);
+	void mark_code_block(code_block *compiled);
+	void mark_stack_frame_step(stack_frame *frame);
+	void mark_active_blocks(context *stacks);
+	void mark_object_code_block(object *object);
+	void relocate_code_block(code_block *compiled);
+	void fixup_labels(array *labels, code_block *compiled);
+	code_block *allot_code_block(cell size);
+	code_block *add_code_block(cell type,cell code_,cell labels_,cell relocation_,cell literals_);
 	// next method here:
 
 
