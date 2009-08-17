@@ -246,7 +246,6 @@ struct factorvm {
 	cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_);
 	inline void vmprim_resize_array();
 	inline void set_array_nth(array *array, cell slot, cell value);
-	// next method here:
 
 	//strings
 	cell string_nth(string* str, cell index);
@@ -358,6 +357,12 @@ struct factorvm {
 	void overflow_fixnum_add(fixnum x, fixnum y);
 	void overflow_fixnum_subtract(fixnum x, fixnum y);
 	void overflow_fixnum_multiply(fixnum x, fixnum y);
+	inline cell allot_integer(fixnum x);
+	inline cell allot_cell(cell x);
+	inline cell allot_float(double n);
+	inline bignum *float_to_bignum(cell tagged);
+	inline double bignum_to_float(cell tagged);
+	// next method here:
 	
 	//io
 	void init_c_io();
