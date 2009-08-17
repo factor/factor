@@ -5,13 +5,18 @@ namespace factor
 
 bool profiling_p;
 
-void init_profiler()
+void factorvm::init_profiler()
 {
 	profiling_p = false;
 }
 
+void init_profiler()
+{
+	return vm->init_profiler();
+}
+
 /* Allocates memory */
-code_block *compile_profiling_stub(cell word_)
+code_block *factorvm::compile_profiling_stub(cell word_)
 {
 	gc_root<word> word(word_);
 
@@ -21,8 +26,13 @@ code_block *compile_profiling_stub(cell word_)
 	return jit.to_code_block();
 }
 
+code_block *compile_profiling_stub(cell word_)
+{
+	return vm->compile_profiling_stub(word_);
+}
+
 /* Allocates memory */
-static void set_profiling(bool profiling)
+void factorvm::set_profiling(bool profiling)
 {
 	if(profiling == profiling_p)
 		return;
@@ -49,9 +59,19 @@ static void set_profiling(bool profiling)
 	iterate_code_heap(relocate_code_block);
 }
 
-PRIMITIVE(profiling)
+void set_profiling(bool profiling)
+{
+	return vm->set_profiling(profiling);
+}
+
+inline void factorvm::vmprim_profiling()
 {
 	set_profiling(to_boolean(dpop()));
+}
+
+PRIMITIVE(profiling)
+{
+	PRIMITIVE_GETVM()->vmprim_profiling();
 }
 
 }
