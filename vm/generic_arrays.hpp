@@ -19,16 +19,26 @@ template <typename T> cell array_size(T *array)
 	return array_size<T>(array_capacity(array));
 }
 
-template <typename T> T *allot_array_internal(cell capacity)
+template <typename T> T *factorvm::allot_array_internal(cell capacity)
 {
 	T *array = allot<T>(array_size<T>(capacity));
 	array->capacity = tag_fixnum(capacity);
 	return array;
 }
 
-template <typename T> bool reallot_array_in_place_p(T *array, cell capacity)
+template <typename T> T *allot_array_internal(cell capacity)
+{
+	return vm->allot_array_internal<T>(capacity);
+}
+
+template <typename T> bool factorvm::reallot_array_in_place_p(T *array, cell capacity)
 {
 	return in_zone(&nursery,array) && capacity <= array_capacity(array);
+}
+
+template <typename T> bool reallot_array_in_place_p(T *array, cell capacity)
+{
+	return vm->reallot_array_in_place_p<T>(array,capacity);
 }
 
 template <typename TYPE> TYPE *factorvm::reallot_array(TYPE *array_, cell capacity)
