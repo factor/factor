@@ -164,17 +164,17 @@ macosx.app: factor
 		Factor.app/Contents/MacOS/factor
 
 $(EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
-	$(LINKER) $(ENGINE) $(DLL_OBJS)
-	$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
 $(CONSOLE_EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
-	$(LINKER) $(ENGINE) $(DLL_OBJS)
-	$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION) $(EXE_OBJS)
 
 $(TEST_LIBRARY): vm/ffi_test.o
-	$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(SHARED_DLL_EXTENSION) $(TEST_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(SHARED_DLL_EXTENSION) $(TEST_OBJS)
 
 clean:
 	rm -f vm/*.o
@@ -187,22 +187,22 @@ tags:
 	etags vm/*.{cpp,hpp,mm,S,c}
 
 vm/resources.o:
-	$(WINDRES) vm/factor.rs vm/resources.o
+	$(TOOLCHAIN_PREFIX)$(WINDRES) vm/factor.rs vm/resources.o
 
 vm/ffi_test.o: vm/ffi_test.c
-	$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
 
 .c.o:
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) -o $@ $<
 
 .cpp.o:
-	$(CPP) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
 .S.o:
-	$(CC) -x assembler-with-cpp -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -x assembler-with-cpp -c $(CFLAGS) -o $@ $<
 
 .mm.o:
-	$(CPP) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
 .PHONY: factor tags clean
 
