@@ -3,7 +3,6 @@
 namespace factor
 {
 
-bool profiling_p;
 
 void factorvm::init_profiler()
 {

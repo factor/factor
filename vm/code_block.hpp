@@ -62,19 +62,21 @@ typedef u32 relocation_entry;
 
 void flush_icache_for(code_block *compiled);
 
+struct factorvm;
+
 typedef void (*relocation_iterator)(relocation_entry rel, cell index, code_block *compiled);
 
 void iterate_relocations(code_block *compiled, relocation_iterator iter);
 
 void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value);
 
-void relocate_code_block(code_block *compiled);
+void relocate_code_block(code_block *compiled, factorvm *myvm);
 
 void update_literal_references(code_block *compiled);
 
-void copy_literal_references(code_block *compiled);
+void copy_literal_references(code_block *compiled, factorvm *myvm);
 
-void update_word_references(code_block *compiled);
+void update_word_references(code_block *compiled, factorvm *myvm);
 
 void update_literal_and_word_references(code_block *compiled);
 
