@@ -20,6 +20,17 @@ struct factorvm {
 	inline void vmprim_set_datastack();
 	inline void vmprim_set_retainstack();
 	inline void vmprim_check_datastack();
+
+	// run
+	inline void vmprim_getenv();
+	inline void vmprim_setenv();
+	inline void vmprim_exit();
+	inline void vmprim_micros();
+	inline void vmprim_sleep();
+	inline void vmprim_set_slot();
+	inline void vmprim_load_locals();
+	cell clone_object(cell obj_);
+	inline void vmprim_clone();
 	// next method here:
 
 };
