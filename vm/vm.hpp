@@ -131,6 +131,12 @@ struct factorvm {
 	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int), unsigned int radix, int negative_p);
 
 	//data_heap
+	bool secure_gc;  /* Set by the -securegc command line argument */
+	bool gc_off; /* GC is off during heap walking */
+	data_heap *data;
+	/* A heap walk allows useful things to be done, like finding all
+	   references to an object for debugging purposes. */
+	cell heap_scan_ptr;
 	cell init_zone(zone *z, cell size, cell start);
 	void init_card_decks();
 	data_heap *alloc_data_heap(cell gens, cell young_size,cell aging_size,cell tenured_size);
