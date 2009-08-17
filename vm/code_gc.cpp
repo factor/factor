@@ -3,15 +3,20 @@
 namespace factor
 {
 
-static void clear_free_list(heap *heap)
+void factorvm::clear_free_list(heap *heap)
 {
 	memset(&heap->free,0,sizeof(heap_free_list));
+}
+
+void clear_free_list(heap *heap)
+{
+	return vm->clear_free_list(heap);
 }
 
 /* This malloc-style heap code is reasonably generic. Maybe in the future, it
 will be used for the data heap too, if we ever get incremental
 mark/sweep/compact GC. */
-void new_heap(heap *heap, cell size)
+void factorvm::new_heap(heap *heap, cell size)
 {
 	heap->seg = alloc_segment(align_page(size));
 	if(!heap->seg)
@@ -20,7 +25,12 @@ void new_heap(heap *heap, cell size)
 	clear_free_list(heap);
 }
 
-static void add_to_free_list(heap *heap, free_heap_block *block)
+void new_heap(heap *heap, cell size)
+{
+	return vm->new_heap(heap,size);
+}
+
+void factorvm::add_to_free_list(heap *heap, free_heap_block *block)
 {
 	if(block->size < free_list_count * block_size_increment)
 	{
@@ -35,11 +45,16 @@ static void add_to_free_list(heap *heap, free_heap_block *block)
 	}
 }
 
+void add_to_free_list(heap *heap, free_heap_block *block)
+{
+	return vm->add_to_free_list(heap,block);
+}
+
 /* Called after reading the code heap from the image file, and after code GC.
 
 In the former case, we must add a large free block from compiling.base + size to
 compiling.limit. */
-void build_free_list(heap *heap, cell size)
+void factorvm::build_free_list(heap *heap, cell size)
 {
 	heap_block *prev = NULL;
 
@@ -91,13 +106,23 @@ void build_free_list(heap *heap, cell size)
 
 }
 
-static void assert_free_block(free_heap_block *block)
+void build_free_list(heap *heap, cell size)
+{
+	return vm->build_free_list(heap,size);
+}
+
+void factorvm::assert_free_block(free_heap_block *block)
 {
 	if(block->status != B_FREE)
 		critical_error("Invalid block in free list",(cell)block);
 }
+
+void assert_free_block(free_heap_block *block)
+{
+	return vm->assert_free_block(block);
+}
 		
-static free_heap_block *find_free_block(heap *heap, cell size)
+free_heap_block *factorvm::find_free_block(heap *heap, cell size)
 {
 	cell attempt = size;
 
@@ -137,7 +162,12 @@ static free_heap_block *find_free_block(heap *heap, cell size)
 	return NULL;
 }
 
-static free_heap_block *split_free_block(heap *heap, free_heap_block *block, cell size)
+free_heap_block *find_free_block(heap *heap, cell size)
+{
+	return vm->find_free_block(heap,size);
+}
+
+free_heap_block *factorvm::split_free_block(heap *heap, free_heap_block *block, cell size)
 {
 	if(block->size != size )
 	{
@@ -153,8 +183,13 @@ static free_heap_block *split_free_block(heap *heap, free_heap_block *block, cel
 	return block;
 }
 
+free_heap_block *split_free_block(heap *heap, free_heap_block *block, cell size)
+{
+	return vm->split_free_block(heap,block,size);
+}
+
 /* Allocate a block of memory from the mark and sweep GC heap */
-heap_block *heap_allot(heap *heap, cell size)
+heap_block *factorvm::heap_allot(heap *heap, cell size)
 {
 	size = (size + block_size_increment - 1) & ~(block_size_increment - 1);
 
@@ -170,14 +205,24 @@ heap_block *heap_allot(heap *heap, cell size)
 		return NULL;
 }
 
+heap_block *heap_allot(heap *heap, cell size)
+{
+	return vm->heap_allot(heap,size);
+}
+
 /* Deallocates a block manually */
-void heap_free(heap *heap, heap_block *block)
+void factorvm::heap_free(heap *heap, heap_block *block)
 {
 	block->status = B_FREE;
 	add_to_free_list(heap,(free_heap_block *)block);
 }
 
-void mark_block(heap_block *block)
+void heap_free(heap *heap, heap_block *block)
+{
+	return vm->heap_free(heap,block);
+}
+
+void factorvm::mark_block(heap_block *block)
 {
 	/* If already marked, do nothing */
 	switch(block->status)
@@ -193,9 +238,14 @@ void mark_block(heap_block *block)
 	}
 }
 
+void mark_block(heap_block *block)
+{
+	return vm->mark_block(block);
+}
+
 /* If in the middle of code GC, we have to grow the heap, data GC restarts from
 scratch, so we have to unmark any marked blocks. */
-void unmark_marked(heap *heap)
+void factorvm::unmark_marked(heap *heap)
 {
 	heap_block *scan = first_block(heap);
 
@@ -208,9 +258,14 @@ void unmark_marked(heap *heap)
 	}
 }
 
+void unmark_marked(heap *heap)
+{
+	return vm->unmark_marked(heap);
+}
+
 /* After code GC, all referenced code blocks have status set to B_MARKED, so any
 which are allocated and not marked can be reclaimed. */
-void free_unmarked(heap *heap, heap_iterator iter)
+void factorvm::free_unmarked(heap *heap, heap_iterator iter)
 {
 	clear_free_list(heap);
 
@@ -257,8 +312,13 @@ void free_unmarked(heap *heap, heap_iterator iter)
 		add_to_free_list(heap,(free_heap_block *)prev);
 }
 
+void free_unmarked(heap *heap, heap_iterator iter)
+{
+	return vm->free_unmarked(heap,iter);
+}
+
 /* Compute total sum of sizes of free blocks, and size of largest free block */
-void heap_usage(heap *heap, cell *used, cell *total_free, cell *max_free)
+void factorvm::heap_usage(heap *heap, cell *used, cell *total_free, cell *max_free)
 {
 	*used = 0;
 	*total_free = 0;
@@ -286,8 +346,13 @@ void heap_usage(heap *heap, cell *used, cell *total_free, cell *max_free)
 	}
 }
 
+void heap_usage(heap *heap, cell *used, cell *total_free, cell *max_free)
+{
+	return vm->heap_usage(heap,used,total_free,max_free);
+}
+
 /* The size of the heap, not including the last block if it's free */
-cell heap_size(heap *heap)
+cell factorvm::heap_size(heap *heap)
 {
 	heap_block *scan = first_block(heap);
 
@@ -302,8 +367,13 @@ cell heap_size(heap *heap)
 		return heap->seg->size;
 }
 
+cell heap_size(heap *heap)
+{
+	return vm->heap_size(heap);
+}
+
 /* Compute where each block is going to go, after compaction */
-cell compute_heap_forwarding(heap *heap, unordered_map<heap_block *,char *> &forwarding)
+cell factorvm::compute_heap_forwarding(heap *heap, unordered_map<heap_block *,char *> &forwarding)
 {
 	heap_block *scan = first_block(heap);
 	char *address = (char *)first_block(heap);
@@ -324,7 +394,12 @@ cell compute_heap_forwarding(heap *heap, unordered_map<heap_block *,char *> &for
 	return (cell)address - heap->seg->start;
 }
 
-void compact_heap(heap *heap, unordered_map<heap_block *,char *> &forwarding)
+cell compute_heap_forwarding(heap *heap, unordered_map<heap_block *,char *> &forwarding)
+{
+	return vm->compute_heap_forwarding(heap,forwarding);
+}
+
+void factorvm::compact_heap(heap *heap, unordered_map<heap_block *,char *> &forwarding)
 {
 	heap_block *scan = first_block(heap);
 
@@ -336,6 +411,11 @@ void compact_heap(heap *heap, unordered_map<heap_block *,char *> &forwarding)
 			memmove(forwarding[scan],scan,scan->size);
 		scan = next;
 	}
+}
+
+void compact_heap(heap *heap, unordered_map<heap_block *,char *> &forwarding)
+{
+	return vm->compact_heap(heap,forwarding);
 }
 
 }
