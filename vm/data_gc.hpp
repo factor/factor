@@ -10,14 +10,6 @@ struct gc_stats {
 	u64 bytes_copied;
 };
 
-extern zone *newspace;
-
-extern bool performing_compaction;
-extern cell collecting_gen;
-extern bool collecting_aging_again;
-
-extern cell last_code_heap_scan;
-
 void init_data_gc();
 
 void gc();
@@ -40,8 +32,6 @@ PRIMITIVE(gc_stats);
 void clear_gc_stats();
 PRIMITIVE(clear_gc_stats);
 PRIMITIVE(become);
-
-extern bool growing_data_heap;
 
 
 VM_ASM_API void inline_gc(cell *gc_roots_base, cell gc_roots_size);

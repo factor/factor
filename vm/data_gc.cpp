@@ -3,36 +3,6 @@
 namespace factor
 {
 
-/* used during garbage collection only */
-zone *newspace;
-bool performing_gc;
-bool performing_compaction;
-cell collecting_gen;
-
-/* if true, we are collecting aging space for the second time, so if it is still
-full, we go on to collect tenured */
-bool collecting_aging_again;
-
-/* in case a generation fills up in the middle of a gc, we jump back
-up to try collecting the next generation. */
-jmp_buf gc_jmp;
-
-gc_stats stats[max_gen_count];
-u64 cards_scanned;
-u64 decks_scanned;
-u64 card_scan_time;
-cell code_heap_scans;
-
-/* What generation was being collected when copy_code_heap_roots() was last
-called? Until the next call to add_code_block(), future
-collections of younger generations don't have to touch the code
-heap. */
-cell last_code_heap_scan;
-
-/* sometimes we grow the heap */
-bool growing_data_heap;
-data_heap *old_data_heap;
-
 void factorvm::init_data_gc()
 {
 	performing_gc = false;
