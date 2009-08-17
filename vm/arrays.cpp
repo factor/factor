@@ -4,7 +4,7 @@ namespace factor
 {
 
 /* make a new array with an initial element */
-array *allot_array(cell capacity, cell fill_)
+array *factorvm::allot_array(cell capacity, cell fill_)
 {
 	gc_root<object> fill(fill_);
 	gc_root<array> new_array(allot_array_internal<array>(capacity));
@@ -23,15 +23,25 @@ array *allot_array(cell capacity, cell fill_)
 	return new_array.untagged();
 }
 
+array *allot_array(cell capacity, cell fill_)
+{
+	return vm->allot_array(capacity,fill_);
+}
+
 /* push a new array on the stack */
-PRIMITIVE(array)
+inline void factorvm::vmprim_array()
 {
 	cell initial = dpop();
 	cell size = unbox_array_size();
 	dpush(tag<array>(allot_array(size,initial)));
 }
 
-cell allot_array_1(cell obj_)
+PRIMITIVE(array)
+{
+	PRIMITIVE_GETVM()->vmprim_array();
+}
+
+cell factorvm::allot_array_1(cell obj_)
 {
 	gc_root<object> obj(obj_);
 	gc_root<array> a(allot_array_internal<array>(1));
@@ -39,7 +49,12 @@ cell allot_array_1(cell obj_)
 	return a.value();
 }
 
-cell allot_array_2(cell v1_, cell v2_)
+cell allot_array_1(cell obj_)
+{
+	return vm->allot_array_1(obj_);
+}
+
+cell factorvm::allot_array_2(cell v1_, cell v2_)
 {
 	gc_root<object> v1(v1_);
 	gc_root<object> v2(v2_);
@@ -49,7 +64,12 @@ cell allot_array_2(cell v1_, cell v2_)
 	return a.value();
 }
 
-cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
+cell allot_array_2(cell v1_, cell v2_)
+{
+	return vm->allot_array_2(v1_,v2_);
+}
+
+cell factorvm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 {
 	gc_root<object> v1(v1_);
 	gc_root<object> v2(v2_);
@@ -63,11 +83,21 @@ cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 	return a.value();
 }
 
-PRIMITIVE(resize_array)
+cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
+{
+	return vm->allot_array_4(v1_,v2_,v3_,v4_);
+}
+
+inline void factorvm::vmprim_resize_array()
 {
 	array* a = untag_check<array>(dpop());
 	cell capacity = unbox_array_size();
 	dpush(tag<array>(reallot_array(a,capacity)));
+}
+
+PRIMITIVE(resize_array)
+{
+	PRIMITIVE_GETVM()->vmprim_resize_array();
 }
 
 void growable_array::add(cell elt_)

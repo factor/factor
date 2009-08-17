@@ -197,6 +197,14 @@ struct factorvm {
 	void dump_code_heap();
 	void factorbug();
 	inline void vmprim_die();
+
+	//arrays
+	array *allot_array(cell capacity, cell fill_);
+	inline void vmprim_array();
+	cell allot_array_1(cell obj_);
+	cell allot_array_2(cell v1_, cell v2_);
+	cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_);
+	inline void vmprim_resize_array();
 	// next method here:
 
 
