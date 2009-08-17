@@ -202,14 +202,14 @@ void data_fixup(cell *cell)
 	return vm->data_fixup(cell);
 }
 
-template <typename T> void factorvm::code_fixup(T **handle)
+template <typename TYPE> void factorvm::code_fixup(TYPE **handle)
 {
-	T *ptr = *handle;
-	T *new_ptr = (T *)(((cell)ptr) + (code.seg->start - code_relocation_base));
+	TYPE *ptr = *handle;
+	TYPE *new_ptr = (TYPE *)(((cell)ptr) + (code.seg->start - code_relocation_base));
 	*handle = new_ptr;
 }
 
-template <typename T> void code_fixup(T **handle)
+template <typename TYPE> void code_fixup(TYPE **handle)
 {
 	return vm->code_fixup(handle);
 }

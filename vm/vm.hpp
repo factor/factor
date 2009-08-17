@@ -15,6 +15,8 @@ typedef u8 card_deck;
 struct factorvm {
 
 	// contexts
+	cell ds_size, rs_size;
+	context *unused_contexts;
 	void reset_datastack();
 	void reset_retainstack();
 	void fix_stacks();
@@ -33,6 +35,7 @@ struct factorvm {
 	inline void vmprim_check_datastack();
 
 	// run
+	cell T;  /* Canonical T object. It's just a word */
 	inline void vmprim_getenv();
 	inline void vmprim_setenv();
 	inline void vmprim_exit();
@@ -264,6 +267,7 @@ struct factorvm {
 	//booleans
 	void box_boolean(bool value);
 	bool to_boolean(cell value);
+	inline cell tag_boolean(cell untagged);
 
 	//byte arrays
 	byte_array *allot_byte_array(cell size);
@@ -853,26 +857,26 @@ struct gc_bignum
 #define GC_BIGNUM(x,vm) gc_bignum x##__gc_root(&x,vm)
 
 //generic_arrays.hpp
-template <typename T> T *factorvm::allot_array_internal(cell capacity)
+template <typename TYPE> TYPE *factorvm::allot_array_internal(cell capacity)
 {
-	T *array = allot<T>(array_size<T>(capacity));
+	TYPE *array = allot<TYPE>(array_size<TYPE>(capacity));
 	array->capacity = tag_fixnum(capacity);
 	return array;
 }
 
-template <typename T> T *allot_array_internal(cell capacity)
+template <typename TYPE> TYPE *allot_array_internal(cell capacity)
 {
-	return vm->allot_array_internal<T>(capacity);
+	return vm->allot_array_internal<TYPE>(capacity);
 }
 
-template <typename T> bool factorvm::reallot_array_in_place_p(T *array, cell capacity)
+template <typename TYPE> bool factorvm::reallot_array_in_place_p(TYPE *array, cell capacity)
 {
 	return in_zone(&nursery,array) && capacity <= array_capacity(array);
 }
 
-template <typename T> bool reallot_array_in_place_p(T *array, cell capacity)
+template <typename TYPE> bool reallot_array_in_place_p(TYPE *array, cell capacity)
 {
-	return vm->reallot_array_in_place_p<T>(array,capacity);
+	return vm->reallot_array_in_place_p<TYPE>(array,capacity);
 }
 
 template <typename TYPE> TYPE *factorvm::reallot_array(TYPE *array_, cell capacity)
@@ -1002,7 +1006,7 @@ inline double bignum_to_float(cell tagged)
 //callstack.hpp
 /* This is a little tricky. The iterator may allocate memory, so we
 keep the callstack in a GC root and use relative offsets */
-template<typename T> void factorvm::iterate_callstack_object(callstack *stack_, T &iterator)
+template<typename TYPE> void factorvm::iterate_callstack_object(callstack *stack_, TYPE &iterator)
 {
 	gc_root<callstack> stack(stack_,vm);
 	fixnum frame_offset = untag_fixnum(stack->length) - sizeof(stack_frame);
@@ -1015,10 +1019,22 @@ template<typename T> void factorvm::iterate_callstack_object(callstack *stack_, 
 	}
 }
 
-template<typename T> void iterate_callstack_object(callstack *stack_, T &iterator)
+template<typename TYPE> void iterate_callstack_object(callstack *stack_, TYPE &iterator)
 {
 	return vm->iterate_callstack_object(stack_,iterator);
 }
+
+//booleans.hpp
+inline cell factorvm::tag_boolean(cell untagged)
+{
+	return (untagged ? T : F);
+}
+
+inline cell tag_boolean(cell untagged)
+{
+	return vm->tag_boolean(untagged);
+}
+
 
 // next method here:
 

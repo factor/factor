@@ -453,7 +453,7 @@ PRIMITIVE(end_scan)
 	PRIMITIVE_GETVM()->vmprim_end_scan();
 }
 
-template<typename T> void factorvm::each_object(T &functor)
+template<typename TYPE> void factorvm::each_object(TYPE &functor)
 {
 	begin_scan();
 	cell obj;
@@ -462,7 +462,7 @@ template<typename T> void factorvm::each_object(T &functor)
 	end_scan();
 }
 
-template<typename T> void each_object(T &functor)
+template<typename TYPE> void each_object(TYPE &functor)
 {
 	return vm->each_object(functor);
 }
