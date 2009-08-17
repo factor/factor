@@ -35,11 +35,6 @@ void factorvm::nl()
 	fputs("\n",stdout);
 }
 
-void nl()
-{
-	return vm->nl();
-}
-
 void factorvm::print_string(const char *str)
 {
 	fputs(str,stdout);
@@ -55,19 +50,9 @@ void factorvm::print_cell(cell x)
 	printf(CELL_FORMAT,x);
 }
 
-void print_cell(cell x)
-{
-	return vm->print_cell(x);
-}
-
 void factorvm::print_cell_hex(cell x)
 {
 	printf(CELL_HEX_FORMAT,x);
-}
-
-void print_cell_hex(cell x)
-{
-	return vm->print_cell_hex(x);
 }
 
 void factorvm::print_cell_hex_pad(cell x)
@@ -75,19 +60,9 @@ void factorvm::print_cell_hex_pad(cell x)
 	printf(CELL_HEX_PAD_FORMAT,x);
 }
 
-void print_cell_hex_pad(cell x)
-{
-	return vm->print_cell_hex_pad(x);
-}
-
 void factorvm::print_fixnum(fixnum x)
 {
 	printf(FIXNUM_FORMAT,x);
-}
-
-void print_fixnum(fixnum x)
-{
-	return vm->print_fixnum(x);
 }
 
 cell factorvm::read_cell_hex()
@@ -96,10 +71,5 @@ cell factorvm::read_cell_hex()
 	if(scanf(CELL_HEX_FORMAT,&cell) < 0) exit(1);
 	return cell;
 }
-
-cell read_cell_hex()
-{
-	return vm->read_cell_hex();
-};
 
 }
