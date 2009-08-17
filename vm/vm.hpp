@@ -244,6 +244,38 @@ struct factorvm {
 	void update_word_xt(cell w_);
 	inline void vmprim_optimized_p();
 	inline void vmprim_wrapper();
+
+	//math
+	inline void vmprim_bignum_to_fixnum();
+	inline void vmprim_float_to_fixnum();
+	inline void vmprim_fixnum_divint();
+	inline void vmprim_fixnum_divmod();
+	inline fixnum sign_mask(fixnum x);
+	inline fixnum branchless_max(fixnum x, fixnum y);
+	inline fixnum branchless_abs(fixnum x);
+	inline void vmprim_fixnum_shift();
+	inline void vmprim_fixnum_to_bignum();
+	inline void vmprim_float_to_bignum();
+	inline void vmprim_bignum_eq();
+	inline void vmprim_bignum_add();
+	inline void vmprim_bignum_subtract();
+	inline void vmprim_bignum_multiply();
+	inline void vmprim_bignum_divint();
+	inline void vmprim_bignum_divmod();
+	inline void vmprim_bignum_mod();
+	inline void vmprim_bignum_and();
+	inline void vmprim_bignum_or();
+	inline void vmprim_bignum_xor();
+	inline void vmprim_bignum_shift();
+	inline void vmprim_bignum_less();
+	inline void vmprim_bignum_lesseq();
+	inline void vmprim_bignum_greater();
+	inline void vmprim_bignum_greatereq();
+	inline void vmprim_bignum_not();
+	inline void vmprim_bignum_bitp();
+	inline void vmprim_bignum_log2();
+	unsigned int bignum_producer(unsigned int digit);
+	inline void vmprim_byte_array_to_bignum();
 	// next method here:
 
 
