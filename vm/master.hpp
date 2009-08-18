@@ -35,8 +35,8 @@
 
 /* Factor headers */
 #include "layouts.hpp"
-#include "primitives.hpp"
 #include "platform.hpp"
+#include "primitives.hpp"
 #include "stacks.hpp"
 #include "segments.hpp"
 #include "contexts.hpp"

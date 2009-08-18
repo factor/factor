@@ -27,6 +27,8 @@ IN: bootstrap.x86
     temp0 0 [] MOV rc-absolute-cell rt-stack-chain jit-rel
     ! save stack pointer
     temp0 [] stack-reg MOV
+    ! pass vm ptr to primitive
+    EAX 0 MOV rc-absolute-cell rt-vm jit-rel
     ! call the primitive
     0 JMP rc-relative rt-primitive jit-rel
 ] jit-primitive jit-define
