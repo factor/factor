@@ -20,9 +20,9 @@ PREDICATE: hi-tag-class < builtin-class class>type 7 > ;
 
 : bootstrap-type>class ( n -- class ) builtins get nth ;
 
-M: hi-tag class hi-tag type>class ;
+M: hi-tag class hi-tag type>class ; inline
 
-M: object class tag type>class ;
+M: object class tag type>class ; inline
 
 M: builtin-class rank-class drop 0 ;
 

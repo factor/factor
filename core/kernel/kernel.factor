@@ -192,19 +192,19 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 ! Object protocol
 GENERIC: hashcode* ( depth obj -- code )
 
-M: object hashcode* 2drop 0 ;
+M: object hashcode* 2drop 0 ; inline
 
-M: f hashcode* 2drop 31337 ;
+M: f hashcode* 2drop 31337 ; inline
 
 : hashcode ( obj -- code ) 3 swap hashcode* ; inline
 
 GENERIC: equal? ( obj1 obj2 -- ? )
 
-M: object equal? 2drop f ;
+M: object equal? 2drop f ; inline
 
 TUPLE: identity-tuple ;
 
-M: identity-tuple equal? 2drop f ;
+M: identity-tuple equal? 2drop f ; inline
 
 : = ( obj1 obj2 -- ? )
     2dup eq? [ 2drop t ] [
@@ -213,9 +213,9 @@ M: identity-tuple equal? 2drop f ;
 
 GENERIC: clone ( obj -- cloned )
 
-M: object clone ;
+M: object clone ; inline
 
-M: callstack clone (clone) ;
+M: callstack clone (clone) ; inline
 
 ! Tuple construction
 GENERIC: new ( class -- tuple )

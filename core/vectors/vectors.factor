@@ -15,10 +15,10 @@ TUPLE: vector
 M: vector like
     drop dup vector? [
         dup array? [ dup length vector boa ] [ >vector ] if
-    ] unless ;
+    ] unless ; inline
 
 M: vector new-sequence
-    drop [ f <array> ] [ >fixnum ] bi vector boa ;
+    drop [ f <array> ] [ >fixnum ] bi vector boa ; inline
 
 M: vector equal?
     over vector? [ sequence= ] [ 2drop f ] if ;
@@ -34,9 +34,9 @@ M: array like
             2dup length eq?
             [ nip ] [ resize-array ] if
         ] [ >array ] if
-    ] unless ;
+    ] unless ; inline
 
-M: sequence new-resizable drop <vector> ;
+M: sequence new-resizable drop <vector> ; inline
 
 INSTANCE: vector growable
 

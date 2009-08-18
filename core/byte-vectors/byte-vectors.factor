@@ -18,15 +18,15 @@ M: byte-vector like
     drop dup byte-vector? [
         dup byte-array?
         [ dup length byte-vector boa ] [ >byte-vector ] if
-    ] unless ;
+    ] unless ; inline
 
 M: byte-vector new-sequence
-    drop [ (byte-array) ] [ >fixnum ] bi byte-vector boa ;
+    drop [ (byte-array) ] [ >fixnum ] bi byte-vector boa ; inline
 
 M: byte-vector equal?
     over byte-vector? [ sequence= ] [ 2drop f ] if ;
 
-M: byte-vector contract 2drop ;
+M: byte-vector contract 2drop ; inline
 
 M: byte-array like
     #! If we have an byte-array, we're done.
@@ -39,8 +39,8 @@ M: byte-array like
             2dup length eq?
             [ nip ] [ resize-byte-array ] if
         ] [ >byte-array ] if
-    ] unless ;
+    ] unless ; inline
 
-M: byte-array new-resizable drop <byte-vector> ;
+M: byte-array new-resizable drop <byte-vector> ; inline
 
 INSTANCE: byte-vector growable
