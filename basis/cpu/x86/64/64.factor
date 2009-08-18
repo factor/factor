@@ -172,6 +172,8 @@ M: x86.64 %alien-invoke
     rc-absolute-cell rel-dlsym
     R11 CALL ;
 
+M: x86.64 %vm-invoke %alien-invoke ;
+
 M: x86.64 %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
     RBP RAX MOV ;

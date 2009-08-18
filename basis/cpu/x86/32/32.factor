@@ -47,6 +47,12 @@ M: x86.32 reserved-area-size 0 ;
 
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
+M: x86.32 %vm-invoke
+    temp-reg 0 MOV rc-absolute-cell rt-vm rel-fixup ! push the vm ptr as the 3rd argument
+    temp-reg PUSH
+    %alien-invoke
+    temp-reg POP ;
+
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
     c-type
     [ return-in-registers?>> ]

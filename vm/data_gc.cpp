@@ -694,7 +694,7 @@ PRIMITIVE(become)
 	PRIMITIVE_GETVM()->vmprim_become();
 }
 
-VM_ASM_API void factorvm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
+void factorvm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 {
 	for(cell i = 0; i < gc_roots_size; i++)
 		gc_locals.push_back((cell)&gc_roots_base[i]);
@@ -705,9 +705,9 @@ VM_ASM_API void factorvm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 		gc_locals.pop_back();
 }
 
-VM_ASM_API void inline_gc(cell *gc_roots_base, cell gc_roots_size)
+VM_ASM_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factorvm *myvm)
 {
-       return vm->inline_gc(gc_roots_base,gc_roots_size);
+	return VM_PTR->inline_gc(gc_roots_base,gc_roots_size);
 }
 
 }
