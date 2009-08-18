@@ -20,11 +20,11 @@ UNION: pinned-c-ptr
 
 GENERIC: >c-ptr ( obj -- c-ptr )
 
-M: c-ptr >c-ptr ;
+M: c-ptr >c-ptr ; inline
 
 SLOT: underlying
 
-M: object >c-ptr underlying>> ;
+M: object >c-ptr underlying>> ; inline
 
 GENERIC: expired? ( c-ptr -- ? ) flushable
 

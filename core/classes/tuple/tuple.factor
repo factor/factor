@@ -29,7 +29,7 @@ PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
 : layout-of ( tuple -- layout )
     1 slot { array } declare ; inline
 
-M: tuple class layout-of 2 slot { word } declare ;
+M: tuple class layout-of 2 slot { word } declare ; inline
 
 : tuple-size ( tuple -- size )
     layout-of 3 slot { fixnum } declare ; inline
@@ -323,7 +323,7 @@ M: tuple-class (classes-intersect?)
         [ swap classes-intersect? ]
     } cond ;
 
-M: tuple clone (clone) ;
+M: tuple clone (clone) ; inline
 
 M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 

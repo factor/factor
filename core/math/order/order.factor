@@ -15,24 +15,24 @@ GENERIC: <=> ( obj1 obj2 -- <=> )
 
 : >=< ( obj1 obj2 -- >=< ) <=> invert-comparison ; inline
 
-M: real <=> 2dup < [ 2drop +lt+ ] [ number= +eq+ +gt+ ? ] if ;
+M: real <=> 2dup < [ 2drop +lt+ ] [ number= +eq+ +gt+ ? ] if ; inline
 
 GENERIC: before? ( obj1 obj2 -- ? )
 GENERIC: after? ( obj1 obj2 -- ? )
 GENERIC: before=? ( obj1 obj2 -- ? )
 GENERIC: after=? ( obj1 obj2 -- ? )
 
-M: object before? ( obj1 obj2 -- ? ) <=> +lt+ eq? ;
-M: object after? ( obj1 obj2 -- ? ) <=> +gt+ eq? ;
-M: object before=? ( obj1 obj2 -- ? ) <=> +gt+ eq? not ;
-M: object after=? ( obj1 obj2 -- ? ) <=> +lt+ eq? not ;
+M: object before? ( obj1 obj2 -- ? ) <=> +lt+ eq? ; inline
+M: object after? ( obj1 obj2 -- ? ) <=> +gt+ eq? ; inline
+M: object before=? ( obj1 obj2 -- ? ) <=> +gt+ eq? not ; inline
+M: object after=? ( obj1 obj2 -- ? ) <=> +lt+ eq? not ; inline
 
-M: real before? ( obj1 obj2 -- ? ) < ;
-M: real after? ( obj1 obj2 -- ? ) > ;
-M: real before=? ( obj1 obj2 -- ? ) <= ;
-M: real after=? ( obj1 obj2 -- ? ) >= ;
+M: real before? ( obj1 obj2 -- ? ) < ; inline
+M: real after? ( obj1 obj2 -- ? ) > ; inline
+M: real before=? ( obj1 obj2 -- ? ) <= ; inline
+M: real after=? ( obj1 obj2 -- ? ) >= ; inline
 
-: min ( x y -- z ) [ before? ] most ; inline 
+: min ( x y -- z ) [ before? ] most ; inline
 : max ( x y -- z ) [ after? ] most ; inline
 : clamp ( x min max -- y ) [ max ] dip min ; inline
 

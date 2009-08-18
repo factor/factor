@@ -78,6 +78,6 @@ M: bignum >integer
 
 M: real >integer
     dup most-negative-fixnum most-positive-fixnum between?
-    [ >fixnum ] [ >bignum ] if ;
+    [ >fixnum ] [ >bignum ] if ; inline
 
 UNION: immediate fixnum POSTPONE: f ;
