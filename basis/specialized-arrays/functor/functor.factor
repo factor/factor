@@ -39,19 +39,19 @@ TUPLE: A
     dup length T heap-size /mod 0 = [ drop T bad-byte-array-length ] unless
     swap A boa ; inline
 
-M: A clone [ length>> ] [ underlying>> clone ] bi A boa ;
+M: A clone [ length>> ] [ underlying>> clone ] bi A boa ; inline
 
-M: A length length>> ;
+M: A length length>> ; inline
 
-M: A nth-unsafe underlying>> NTH call ;
+M: A nth-unsafe underlying>> NTH call ; inline
 
-M: A set-nth-unsafe underlying>> SET-NTH call ;
+M: A set-nth-unsafe underlying>> SET-NTH call ; inline
 
-: >A ( seq -- specialized-array ) A new clone-like ; inline
+: >A ( seq -- specialized-array ) A new clone-like ;
 
-M: A like drop dup A instance? [ >A ] unless ;
+M: A like drop dup A instance? [ >A ] unless ; inline
 
-M: A new-sequence drop (A) ;
+M: A new-sequence drop (A) ; inline
 
 M: A equal? over A instance? [ sequence= ] [ 2drop f ] if ;
 
@@ -60,9 +60,9 @@ M: A resize
         [ T heap-size * ] [ underlying>> ] bi*
         resize-byte-array
     ] 2bi
-    A boa ;
+    A boa ; inline
 
-M: A byte-length underlying>> length ;
+M: A byte-length underlying>> length ; inline
 
 M: A pprint-delims drop \ A{ \ } ;
 
