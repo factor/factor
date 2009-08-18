@@ -660,6 +660,9 @@ struct factorvm {
 	segment *alloc_segment(cell size);
 	const vm_char *vm_executable_path();
 	inline void vmprim_existsp();
+	const vm_char *default_image_path();
+	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
+	bool windows_stat(vm_char *path);
  	// next method here:	
 #endif
 
