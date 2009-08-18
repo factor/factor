@@ -1,4 +1,4 @@
-USING: biassocs assocs namespaces tools.test ;
+USING: biassocs assocs namespaces tools.test hashtables kernel ;
 IN: biassocs.tests
 
 <bihash> "h" set
@@ -30,3 +30,13 @@ H{ { "a" "A" } { "b" "B" } } "a" set
 [ "A" ] [ "a" "b" get at ] unit-test
 
 [ "a" ] [ "A" "b" get value-at ] unit-test
+
+[ ] [ H{ { 1 2 } } >biassoc "h" set ] unit-test
+
+[ ] [ "h" get clone "g" set ] unit-test
+
+[ ] [ 3 4 "g" get set-at ] unit-test
+
+[ H{ { 1 2 } } ] [ "h" get >hashtable ] unit-test
+
+[ H{ { 1 2 } { 4 3 } } ] [ "g" get >hashtable ] unit-test
