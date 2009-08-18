@@ -13,7 +13,7 @@ IN: compiler.tests.stack-trace
 [ baz ] [ 3 = ] must-fail-with
 [ t ] [
     symbolic-stack-trace
-    [ word? ] filter
+    2 head*
     { baz bar foo } tail?
 ] unit-test
 
@@ -24,7 +24,7 @@ IN: compiler.tests.stack-trace
 [ t ] [
     [ { 1 "hi" } bleh ] ignore-errors \ + stack-trace-any?
 ] unit-test
-    
+
 [ t f ] [
     [ { "hi" } bleh ] ignore-errors
     \ + stack-trace-any?
