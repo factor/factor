@@ -5,27 +5,47 @@ namespace factor
 
 HMODULE hFactorDll;
 
-void init_ffi()
+void factorvm::init_ffi()
 {
 	hFactorDll = GetModuleHandle(FACTOR_DLL);
 	if(!hFactorDll)
 		fatal_error("GetModuleHandle(\"" FACTOR_DLL_NAME "\") failed", 0);
 }
 
-void ffi_dlopen(dll *dll)
+void init_ffi()
+{
+	return vm->init_ffi();
+}
+
+void factorvm::ffi_dlopen(dll *dll)
 {
 	dll->dll = LoadLibraryEx((WCHAR *)alien_offset(dll->path), NULL, 0);
 }
 
-void *ffi_dlsym(dll *dll, symbol_char *symbol)
+void ffi_dlopen(dll *dll)
+{
+	return vm->ffi_dlopen(dll);
+}
+
+void *factorvm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
 	return (void *)GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
 }
 
-void ffi_dlclose(dll *dll)
+void *ffi_dlsym(dll *dll, symbol_char *symbol)
+{
+	return vm->ffi_dlsym(dll,symbol);
+}
+
+void factorvm::ffi_dlclose(dll *dll)
 {
 	FreeLibrary((HMODULE)dll->dll);
 	dll->dll = NULL;
+}
+
+void ffi_dlclose(dll *dll)
+{
+	return vm->ffi_dlclose(dll);
 }
 
 bool windows_stat(vm_char *path)
@@ -82,7 +102,7 @@ const vm_char *default_image_path()
 }
 
 /* You must free() this yourself. */
-const vm_char *vm_executable_path()
+const vm_char *factorvm::vm_executable_path()
 {
 	vm_char full_path[MAX_UNICODE_PATH];
 	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
@@ -90,14 +110,24 @@ const vm_char *vm_executable_path()
 	return safe_strdup(full_path);
 }
 
+const vm_char *vm_executable_path()
+{
+	return vm->vm_executable_path();
+}
 
-PRIMITIVE(existsp)
+
+inline void factorvm::vmprim_existsp()
 {
 	vm_char *path = untag_check<byte_array>(dpop())->data<vm_char>();
 	box_boolean(windows_stat(path));
 }
 
-segment *alloc_segment(cell size)
+PRIMITIVE(existsp)
+{
+	PRIMITIVE_GETVM()->vmprim_existsp();
+}
+
+segment *factorvm::alloc_segment(cell size)
 {
 	char *mem;
 	DWORD ignore;
@@ -122,7 +152,12 @@ segment *alloc_segment(cell size)
 	return block;
 }
 
-void dealloc_segment(segment *block)
+segment *alloc_segment(cell size)
+{
+	return vm->alloc_segment(size);
+}
+
+void factorvm::dealloc_segment(segment *block)
 {
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
@@ -131,7 +166,12 @@ void dealloc_segment(segment *block)
 	free(block);
 }
 
-long getpagesize()
+void dealloc_segment(segment *block)
+{
+	return vm->dealloc_segment(block);
+}
+
+long factorvm::getpagesize()
 {
 	static long g_pagesize = 0;
 	if (! g_pagesize)
@@ -143,9 +183,19 @@ long getpagesize()
 	return g_pagesize;
 }
 
-void sleep_micros(u64 usec)
+long getpagesize()
+{
+	return vm->getpagesize();
+}
+
+void factorvm::sleep_micros(u64 usec)
 {
 	Sleep((DWORD)(usec / 1000));
+}
+
+void sleep_micros(u64 usec)
+{
+	return vm->sleep_micros(usec);
 }
 
 }
