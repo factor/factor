@@ -23,9 +23,18 @@ HELP: HEREDOC:
 { $values { "marker" "a word (token)" } { "text" "arbitrary text" } { "" "a string" } }
 { $description "A multiline string syntax with a user-specified terminating delimiter.  HEREDOC: reads the next word, and uses it as the 'close quote'.  All input from the beginning of the HEREDOC:'s next line, until the first appearance of the word's name, becomes a string.  The terminating word does not need to be at the beginning of a line.\n\nThe HEREDOC: line should not have anything after the delimiting word.  The delimiting word should be an alphanumeric token.  It should not be, as in some other languages, a \"quoted string\"." }
 { $examples
-    { $example "USING: heredoc ;" "HEREDOC: END\nx\nEND" "! \"x\\n\"" }
-    { $example "HEREDOC: END\nxEND" "! \"x\"" }
-    { $example "2 5 HEREDOC: zap\nfoo\nbarzap subseq" "! \"o\\nb\"" }
+    { $example "USING: multiline prettyprint ;"
+               "HEREDOC: END\nx\nEND ."
+               "\"x\\n\""
+    }
+    { $example "USING: multiline prettyprint ;"
+               "HEREDOC: END\nxEND ."
+               "\"x\""
+    }
+    { $example "USING: multiline prettyprint sequences ;"
+               "2 5 HEREDOC: zap\nfoo\nbarzap subseq ."
+               "\"o\\nb\""
+    }
 } ;
 
 { POSTPONE: <" POSTPONE: STRING: } related-words
