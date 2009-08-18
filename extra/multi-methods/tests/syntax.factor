@@ -1,9 +1,10 @@
-IN: multi-methods.tests
 USING: multi-methods tools.test math sequences namespaces system
 kernel strings definitions prettyprint debugger arrays
 hashtables continuations classes assocs accessors see ;
+RENAME: GENERIC: multi-methods => multi-methods:GENERIC:
+IN: multi-methods.tests
 
-GENERIC: first-test ( -- )
+multi-methods:GENERIC: first-test ( -- )
 
 [ t ] [ \ first-test generic? ] unit-test
 
@@ -13,14 +14,14 @@ SINGLETON: paper    INSTANCE: paper thing
 SINGLETON: scissors INSTANCE: scissors thing
 SINGLETON: rock     INSTANCE: rock thing
 
-GENERIC: beats? ( obj1 obj2 -- ? )
+multi-methods:GENERIC: beats? ( obj1 obj2 -- ? )
 
-METHOD: beats? { paper scissors } t ;
-METHOD: beats? { scissors rock } t ;
-METHOD: beats? { rock paper } t ;
-METHOD: beats? { thing thing } f ;
+METHOD: beats? { paper scissors } 2drop t ;
+METHOD: beats? { scissors rock } 2drop t ;
+METHOD: beats? { rock paper } 2drop t ;
+METHOD: beats? { thing thing } 2drop f ;
 
-: play ( obj1 obj2 -- ? ) beats? 2nip ;
+: play ( obj1 obj2 -- ? ) beats? ;
 
 [ { } 3 play ] must-fail
 [ t ] [ error get no-method? ] unit-test
@@ -34,7 +35,7 @@ METHOD: beats? { thing thing } f ;
 
 SYMBOL: some-var
 
-GENERIC: hook-test ( -- obj )
+multi-methods:GENERIC: hook-test ( obj -- obj )
 
 METHOD: hook-test { array { some-var array } } reverse ;
 METHOD: hook-test { { some-var array } } class ;
@@ -57,7 +58,7 @@ TUPLE: busted-1 ;
 TUPLE: busted-2 ; INSTANCE: busted-2 busted
 TUPLE: busted-3 ;
 
-GENERIC: busted-sort ( obj1 obj2 -- obj1 obj2 )
+multi-methods:GENERIC: busted-sort ( obj1 obj2 -- obj1 obj2 )
 
 METHOD: busted-sort { busted-1 busted-2 } ;
 METHOD: busted-sort { busted-2 busted-3 } ;
