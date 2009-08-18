@@ -11,11 +11,6 @@ s64 factorvm::current_micros()
 		- EPOCH_OFFSET) / 10;
 }
 
-s64 current_micros()
-{
-	return vm->current_micros();
-}
-
 FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 {
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
@@ -71,16 +66,7 @@ void factorvm::c_to_factor_toplevel(cell quot)
 	RemoveVectoredExceptionHandler((void *)exception_handler);
 }
 
-void c_to_factor_toplevel(cell quot)
-{
-	return vm->c_to_factor_toplevel(quot);
-}
-
 void factorvm::open_console()
-{
-}
-
-void open_console()
 {
 }
 

@@ -19,9 +19,7 @@ typedef char symbol_char;
 
 #define FACTOR_STDCALL __attribute__((stdcall))
 
-void c_to_factor_toplevel(cell quot);
 FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe);
-void open_console();
 
 // SSE traps raise these exception codes, which are defined in internal NT headers
 // but not winbase.h
