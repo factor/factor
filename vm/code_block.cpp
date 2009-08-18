@@ -44,6 +44,7 @@ int factorvm::number_of_parameters(relocation_type type)
 	case RT_THIS:
 	case RT_STACK_CHAIN:
 	case RT_MEGAMORPHIC_CACHE_HITS:
+	case RT_VM:
 		return 0;
 	default:
 		critical_error("Bad rel type",type);
@@ -186,6 +187,8 @@ cell factorvm::compute_relocation(relocation_entry rel, cell index, code_block *
 		return untag_fixnum(ARG);
 	case RT_MEGAMORPHIC_CACHE_HITS:
 		return (cell)&megamorphic_cache_hits;
+	case RT_VM:
+		return (cell)this;
 	default:
 		critical_error("Bad rel type",rel);
 		return 0; /* Can't happen */
