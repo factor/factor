@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien.c-types classes.c-types classes.struct
-combinators inverse kernel math tools.test ;
+combinators kernel math tools.test ;
 IN: classes.struct.tests
 
 STRUCT: foo
@@ -29,8 +29,6 @@ STRUCT: bar
 
 [ 7654 ] [ S{ foo f 98 7654 f } y>> ] unit-test
 [ 7654 ] [ S{ foo { y 7654 } } y>> ] unit-test
-
-[ 98 7654 t ] [ S{ foo f 98 7654 t } [ foo <struct-boa> ] undo ] unit-test
 
 UNION-STRUCT: float-and-bits
     { f single-float }
