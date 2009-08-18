@@ -26,6 +26,8 @@ enum relocation_type {
 	RT_UNTAGGED,
 	/* address of megamorphic_cache_hits var */
 	RT_MEGAMORPHIC_CACHE_HITS,
+	/* address of vm object*/
+	RT_VM,
 };
 
 enum relocation_class {
