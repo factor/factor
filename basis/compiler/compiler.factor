@@ -120,7 +120,7 @@ M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
     } cond ;
 
 : optimize? ( word -- ? )
-    { [ predicate-engine-word? ] [ single-generic? ] } 1|| not ;
+    single-generic? not ;
 
 : contains-breakpoints? ( -- ? )
     dependencies get keys [ "break?" word-prop ] any? ;

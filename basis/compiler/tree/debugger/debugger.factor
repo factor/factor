@@ -11,6 +11,8 @@ compiler.tree.normalization
 compiler.tree.cleanup
 compiler.tree.propagation
 compiler.tree.propagation.info
+compiler.tree.escape-analysis
+compiler.tree.tuple-unboxing
 compiler.tree.def-use
 compiler.tree.builder
 compiler.tree.optimizer
@@ -209,6 +211,8 @@ SYMBOL: node-count
         normalize
         propagate
         cleanup
+        escape-analysis
+        unbox-tuples
         apply-identities
         compute-def-use
         remove-dead-code

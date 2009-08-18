@@ -41,13 +41,13 @@ IN: compiler.tree.cleanup.tests
 
 GENERIC: mynot ( x -- y )
 
-M: f mynot drop t ;
+M: f mynot drop t ; inline
 
-M: object mynot drop f ;
+M: object mynot drop f ; inline
 
 GENERIC: detect-f ( x -- y )
 
-M: f detect-f ;
+M: f detect-f ; inline
 
 [ t ] [
     [ dup [ mynot ] [ ] if detect-f ] \ detect-f inlined?
@@ -55,9 +55,9 @@ M: f detect-f ;
 
 GENERIC: xyz ( n -- n )
 
-M: integer xyz ;
+M: integer xyz ; inline
 
-M: object xyz ;
+M: object xyz ; inline
 
 [ t ] [
     [ { integer } declare xyz ] \ xyz inlined?

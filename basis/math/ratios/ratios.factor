@@ -48,8 +48,8 @@ M: ratio >fixnum >fraction /i >fixnum ;
 M: ratio >bignum >fraction /i >bignum ;
 M: ratio >float >fraction /f ;
 
-M: ratio numerator numerator>> ;
-M: ratio denominator denominator>> ;
+M: ratio numerator numerator>> ; inline
+M: ratio denominator denominator>> ; inline
 
 M: ratio < scale < ;
 M: ratio <= scale <= ;

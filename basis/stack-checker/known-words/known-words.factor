@@ -158,6 +158,8 @@ M: bad-executable summary
 
 \ <tuple-boa> [ infer-<tuple-boa> ] "special" set-word-prop
 
+\ <tuple-boa> t "flushable" set-word-prop
+
 : infer-effect-unsafe ( word -- )
     pop-literal nip
     add-effect-input

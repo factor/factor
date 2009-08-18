@@ -112,7 +112,7 @@ M: hashtable delete-at ( key hash -- )
     ] if ;
 
 M: hashtable assoc-size ( hash -- n )
-    [ count>> ] [ deleted>> ] bi - ;
+    [ count>> ] [ deleted>> ] bi - ; inline
 
 : rehash ( hash -- )
     dup >alist [
@@ -150,7 +150,7 @@ M: hashtable >alist
     ] keep { } like ;
 
 M: hashtable clone
-    (clone) [ clone ] change-array ;
+    (clone) [ clone ] change-array ; inline
 
 M: hashtable equal?
     over hashtable? [
@@ -159,15 +159,15 @@ M: hashtable equal?
     ] [ 2drop f ] if ;
 
 ! Default method
-M: assoc new-assoc drop <hashtable> ;
+M: assoc new-assoc drop <hashtable> ; inline
 
-M: f new-assoc drop <hashtable> ;
+M: f new-assoc drop <hashtable> ; inline
 
 : >hashtable ( assoc -- hashtable )
     H{ } assoc-clone-like ;
 
 M: hashtable assoc-like
-    drop dup hashtable? [ >hashtable ] unless ;
+    drop dup hashtable? [ >hashtable ] unless ; inline
 
 : ?set-at ( value key assoc/f -- assoc )
     [ [ set-at ] keep ] [ associate ] if* ;

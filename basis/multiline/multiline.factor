@@ -27,7 +27,7 @@ SYNTAX: STRING:
 
 <PRIVATE
 
-:: (parse-multiline-string) ( i end -- j )
+:: (scan-multiline-string) ( i end -- j )
     lexer get line-text>> :> text
     text [
         end text i start* [| j |
@@ -35,18 +35,21 @@ SYNTAX: STRING:
         ] [
             text i short tail % CHAR: \n ,
             lexer get next-line
-            0 end (parse-multiline-string)
+            0 end (scan-multiline-string)
         ] if*
     ] [ end unexpected-eof ] if ;
         
+:: (parse-multiline-string) ( end-text skip-n-chars -- str )
+    [
+        lexer get
+        [ skip-n-chars + end-text (scan-multiline-string) ]
+        change-column drop
+    ] "" make ;
+
 PRIVATE>
 
 : parse-multiline-string ( end-text -- str )
-    [
-        lexer get
-        [ 1 + swap (parse-multiline-string) ]
-        change-column drop
-    ] "" make ;
+    1 (parse-multiline-string) ;
 
 SYNTAX: <"
     "\">" parse-multiline-string parsed ;
@@ -61,3 +64,9 @@ SYNTAX: {"
     "\"}" parse-multiline-string parsed ;
 
 SYNTAX: /* "*/" parse-multiline-string drop ;
+
+SYNTAX: HEREDOC:
+    scan
+    lexer get next-line
+    0 (parse-multiline-string)
+    parsed ;

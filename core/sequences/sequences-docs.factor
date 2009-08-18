@@ -1392,7 +1392,7 @@ $nl
 "More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
 
 ARTICLE: "sequences-if" "Control flow with sequences"
-"To reduce the boilerplate of checking if a sequence is empty or a number is zero, several combinators are provided."
+"To reduce the boilerplate of checking if a sequence is empty, several combinators are provided."
 $nl
 "Checking if a sequence is empty:"
 { $subsection if-empty }

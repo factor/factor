@@ -21,7 +21,7 @@ TUPLE: definition value node uses ;
 ERROR: no-def-error value ;
 
 : def-of ( value -- definition )
-    dup def-use get at* [ nip ] [ no-def-error ] if ;
+    def-use get ?at [ no-def-error ] unless ;
 
 ERROR: multiple-defs-error ;
 
