@@ -171,6 +171,7 @@ M: class initial-value* no-initial-value ;
     {
         { [ \ f bootstrap-word over class<= ] [ f ] }
         { [ \ array-capacity bootstrap-word over class<= ] [ 0 ] }
+        { [ dup \ integer bootstrap-word class<= ] [ 0 ] }
         { [ float bootstrap-word over class<= ] [ 0.0 ] }
         { [ string bootstrap-word over class<= ] [ "" ] }
         { [ array bootstrap-word over class<= ] [ { } ] }
@@ -236,5 +237,8 @@ M: slot-spec make-slot
 : finalize-slots ( specs base -- specs )
     over length iota [ + ] with map [ >>offset ] 2map ;
 
+: slot-named* ( name specs -- offset spec/f )
+    [ name>> = ] with find ;
+
 : slot-named ( name specs -- spec/f )
-    [ name>> = ] with find nip ;
+    slot-named* nip ;
