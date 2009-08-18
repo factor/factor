@@ -503,7 +503,7 @@ struct factorvm {
 	void fixup_object_xts();
 	void compact_code_heap();
 	inline void check_code_pointer(cell ptr);
- 	// next method here:
+
 
 	//image
 	cell code_relocation_base;
@@ -645,8 +645,20 @@ struct factorvm {
 	cell read_cell_hex();
 
 
-
-
+	// os-windows
+#if defined(WINDOWS)
+	void init_ffi();
+	void ffi_dlopen(dll *dll);
+	void *ffi_dlsym(dll *dll, symbol_char *symbol);
+	void ffi_dlclose(dll *dll);
+	void sleep_micros(u64 usec);
+	long getpagesize();
+	void dealloc_segment(segment *block);
+	segment *alloc_segment(cell size);
+	const vm_char *vm_executable_path();
+	inline void vmprim_existsp();
+ 	// next method here:	
+#endif
 
 };
 
