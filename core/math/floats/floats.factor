@@ -3,28 +3,28 @@
 USING: kernel math math.private ;
 IN: math.floats.private
 
-M: fixnum >float fixnum>float ;
-M: bignum >float bignum>float ;
+M: fixnum >float fixnum>float ; inline
+M: bignum >float bignum>float ; inline
 
-M: float >fixnum float>fixnum ;
-M: float >bignum float>bignum ;
-M: float >float ;
+M: float >fixnum float>fixnum ; inline
+M: float >bignum float>bignum ; inline
+M: float >float ; inline
 
-M: float hashcode* nip float>bits ;
-M: float equal? over float? [ float= ] [ 2drop f ] if ;
-M: float number= float= ;
+M: float hashcode* nip float>bits ; inline
+M: float equal? over float? [ float= ] [ 2drop f ] if ; inline
+M: float number= float= ; inline
 
-M: float < float< ;
-M: float <= float<= ;
-M: float > float> ;
-M: float >= float>= ;
+M: float < float< ; inline
+M: float <= float<= ; inline
+M: float > float> ; inline
+M: float >= float>= ; inline
 
-M: float + float+ ;
-M: float - float- ;
-M: float * float* ;
-M: float / float/f ;
-M: float /f float/f ;
-M: float /i float/f >integer ;
-M: float mod float-mod ;
+M: float + float+ ; inline
+M: float - float- ; inline
+M: float * float* ; inline
+M: float / float/f ; inline
+M: float /f float/f ; inline
+M: float /i float/f >integer ; inline
+M: float mod float-mod ; inline
 
-M: real abs dup 0 < [ neg ] when ;
+M: real abs dup 0 < [ neg ] when ; inline
