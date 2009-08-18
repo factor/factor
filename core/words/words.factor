@@ -12,7 +12,7 @@ IN: words
 
 M: word execute (execute) ;
 
-M: word ?execute execute( -- value ) ;
+M: word ?execute execute( -- value ) ; inline
 
 M: word <=>
     [ [ name>> ] [ vocabulary>> ] bi 2array ] compare ;
@@ -213,7 +213,7 @@ M: word forget*
     ] if ;
 
 M: word hashcode*
-    nip 1 slot { fixnum } declare ; foldable
+    nip 1 slot { fixnum } declare ; inline foldable
 
 M: word literalize <wrapper> ;
 

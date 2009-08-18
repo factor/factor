@@ -1,5 +1,5 @@
-IN: multi-methods.tests
 USING: math strings sequences tools.test ;
+IN: multi-methods.tests
 
 GENERIC: legacy-test ( a -- b )
 

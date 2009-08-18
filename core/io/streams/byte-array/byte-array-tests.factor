@@ -1,5 +1,5 @@
 USING: tools.test io.streams.byte-array io.encodings.binary
-io.encodings.utf8 io kernel arrays strings namespaces ;
+io.encodings.utf8 io kernel arrays strings namespaces math ;
 
 [ B{ } ] [ B{ } binary [ contents ] with-byte-reader ] unit-test
 [ B{ 1 2 3 } ] [ binary [ B{ 1 2 3 } write ] with-byte-writer ] unit-test
@@ -27,4 +27,9 @@ io.encodings.utf8 io kernel arrays strings namespaces ;
         0 seek-end input-stream get stream-seek
         read1
     ] with-byte-reader
+] unit-test
+
+! Overly aggressive compiler optimizations
+[ B{ 123 } ] [
+    binary [ 123 >bignum write1 ] with-byte-writer
 ] unit-test

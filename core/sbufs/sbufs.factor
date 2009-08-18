@@ -11,24 +11,24 @@ TUPLE: sbuf
 : <sbuf> ( n -- sbuf ) 0 <string> 0 sbuf boa ; inline
 
 M: sbuf set-nth-unsafe
-    [ >fixnum ] [ >fixnum ] [ underlying>> ] tri* set-string-nth ;
+    [ >fixnum ] [ >fixnum ] [ underlying>> ] tri* set-string-nth ; inline
 
 M: sbuf new-sequence
-    drop [ 0 <string> ] [ >fixnum ] bi sbuf boa ;
+    drop [ 0 <string> ] [ >fixnum ] bi sbuf boa ; inline
 
 : >sbuf ( seq -- sbuf ) SBUF" " clone-like ; inline
 
 M: sbuf like
     drop dup sbuf? [
         dup string? [ dup length sbuf boa ] [ >sbuf ] if
-    ] unless ;
+    ] unless ; inline
 
-M: sbuf new-resizable drop <sbuf> ;
+M: sbuf new-resizable drop <sbuf> ; inline
 
 M: sbuf equal?
     over sbuf? [ sequence= ] [ 2drop f ] if ;
 
-M: string new-resizable drop <sbuf> ;
+M: string new-resizable drop <sbuf> ; inline
 
 M: string like
     #! If we have a string, we're done.
@@ -41,6 +41,6 @@ M: string like
             2dup length eq?
             [ nip dup reset-string-hashcode ] [ resize-string ] if
         ] [ >string ] if
-    ] unless ;
+    ] unless ; inline
 
 INSTANCE: sbuf growable
