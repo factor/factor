@@ -3,12 +3,17 @@
 namespace factor
 {
 
-s64 current_micros()
+s64 factorvm::current_micros()
 {
 	FILETIME t;
 	GetSystemTimeAsFileTime(&t);
 	return (((s64)t.dwLowDateTime | (s64)t.dwHighDateTime<<32)
 		- EPOCH_OFFSET) / 10;
+}
+
+s64 current_micros()
+{
+	return vm->current_micros();
 }
 
 FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
@@ -58,12 +63,21 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
-void c_to_factor_toplevel(cell quot)
+void factorvm::c_to_factor_toplevel(cell quot)
 {
 	if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)exception_handler))
 		fatal_error("AddVectoredExceptionHandler failed", 0);
 	c_to_factor(quot);
 	RemoveVectoredExceptionHandler((void *)exception_handler);
+}
+
+void c_to_factor_toplevel(cell quot)
+{
+	return vm->c_to_factor_toplevel(quot);
+}
+
+void factorvm::open_console()
+{
 }
 
 void open_console()

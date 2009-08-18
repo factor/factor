@@ -649,7 +649,7 @@ struct factorvm {
 
 
 	// os-windows
-#if defined(WINDOWS)
+  #if defined(WINDOWS)
 	void init_ffi();
 	void ffi_dlopen(dll *dll);
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);
@@ -663,8 +663,20 @@ struct factorvm {
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
 	bool windows_stat(vm_char *path);
- 	// next method here:	
-#endif
+
+    #if defined(WINCE)
+    #else   /* WINNT */
+	s64 current_micros();
+	void c_to_factor_toplevel(cell quot);
+	void open_console();
+ 	// next method here:
+    #endif
+
+	
+    #ifdef FACTOR_X86	
+    #endif
+
+  #endif
 
 };
 
