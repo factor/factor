@@ -49,7 +49,7 @@ M: lexer skip-word ( lexer -- )
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
-    [ line>> ] [ text>> ] bi length <= ;
+    [ line>> ] [ text>> length ] bi <= ;
 
 : still-parsing-line? ( lexer -- ? )
     [ column>> ] [ line-length>> ] bi < ;

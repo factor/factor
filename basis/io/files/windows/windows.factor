@@ -47,10 +47,8 @@ IN: io.files.windows
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
-    [ dupd d>w/w <uint> ] dip SetFilePointer
-    INVALID_SET_FILE_POINTER = [
-        CloseHandle "SetFilePointer failed" throw
-    ] when drop ;
+    [ [ handle>> ] dip d>w/w <uint> ] dip SetFilePointer
+    INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
 
 HOOK: open-append os ( path -- win32-file )
 
