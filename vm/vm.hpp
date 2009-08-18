@@ -3,6 +3,9 @@ namespace factor
 
 struct factorvm {
 
+	// segments
+	inline cell align_page(cell a);
+
 	// contexts
 	cell ds_size, rs_size;
 	context *unused_contexts;
