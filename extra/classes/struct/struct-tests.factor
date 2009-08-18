@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien.c-types classes.c-types classes.struct
-combinators kernel math tools.test ;
+combinators kernel libc math tools.test ;
 IN: classes.struct.tests
 
 STRUCT: foo
@@ -35,4 +35,6 @@ UNION-STRUCT: float-and-bits
     { bits uint } ;
 
 [ 1.0 ] [ float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
+[ 4 ] [ float-and-bits heap-size ] unit-test
 
+[ ] [ foo malloc-struct free ] unit-test
