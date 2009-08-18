@@ -1,9 +1,15 @@
 namespace factor
 {
 
-extern "C" typedef void (*primitive_type)();
-extern const primitive_type primitives[];
+#if defined(FACTOR_X86)
+  extern "C" __attribute__ ((regparm (1))) typedef void (*primitive_type)(void *myvm);
+  #define PRIMITIVE(name) extern "C" __attribute__ ((regparm (1)))  void primitive_##name(void *myvm)
+  #define PRIMITIVE_GETVM() ((factorvm*)myvm)
+#else
+  extern "C" typedef void (*primitive_type)(void *myvm);
+  #define PRIMITIVE(name) extern "C" void primitive_##name(void *myvm)
+  #define PRIMITIVE_GETVM() vm
+#endif
 
-#define PRIMITIVE(name) extern "C" void primitive_##name()
-#define PRIMITIVE_GETVM() vm
+extern const primitive_type primitives[];
 }
