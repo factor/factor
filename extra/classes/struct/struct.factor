@@ -44,23 +44,23 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
         ] bi
     ] [ ] output>sequence ;
 
-: pad-struct-slots ( slots class -- slots' class )
+: pad-struct-slots ( values class -- values' class )
     [ class-slots [ initial>> ] map over length tail append ] keep ;
+
+: (writer-quot) ( slot -- quot )
+    [ class>> c-setter ]
+    [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
 M: struct-class boa>object
     swap pad-struct-slots
-    [ (struct) swap ] [ "struct-slots" word-prop ] bi 
-    [ name>> setter-word execute( struct value -- struct ) ] 2each ;
+    [ (struct) ] [ "struct-slots" word-prop ] bi 
+    [ [ (writer-quot) call( value struct -- ) ] with 2each ] curry keep ;
 
 ! Struct slot accessors
 
 M: struct-class reader-quot
     nip
     [ class>> c-type-getter-boxer ]
-    [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
-
-: (writer-quot) ( slot -- quot )
-    [ class>> c-setter ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
 M: struct-class writer-quot
