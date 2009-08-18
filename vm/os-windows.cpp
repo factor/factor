@@ -12,29 +12,14 @@ void factorvm::init_ffi()
 		fatal_error("GetModuleHandle(\"" FACTOR_DLL_NAME "\") failed", 0);
 }
 
-void init_ffi()
-{
-	return vm->init_ffi();
-}
-
 void factorvm::ffi_dlopen(dll *dll)
 {
 	dll->dll = LoadLibraryEx((WCHAR *)alien_offset(dll->path), NULL, 0);
 }
 
-void ffi_dlopen(dll *dll)
-{
-	return vm->ffi_dlopen(dll);
-}
-
 void *factorvm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
 	return (void *)GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
-}
-
-void *ffi_dlsym(dll *dll, symbol_char *symbol)
-{
-	return vm->ffi_dlsym(dll,symbol);
 }
 
 void factorvm::ffi_dlclose(dll *dll)
@@ -43,12 +28,7 @@ void factorvm::ffi_dlclose(dll *dll)
 	dll->dll = NULL;
 }
 
-void ffi_dlclose(dll *dll)
-{
-	return vm->ffi_dlclose(dll);
-}
-
-bool windows_stat(vm_char *path)
+bool factorvm::windows_stat(vm_char *path)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
 	HANDLE h = CreateFileW(path,
@@ -76,14 +56,15 @@ bool windows_stat(vm_char *path)
 	return ret;
 }
 
-void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
+
+void factorvm::windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
 {
 	snwprintf(temp_path, length-1, L"%s.image", full_path); 
 	temp_path[sizeof(temp_path) - 1] = 0;
 }
 
 /* You must free() this yourself. */
-const vm_char *default_image_path()
+const vm_char *factorvm::default_image_path()
 {
 	vm_char full_path[MAX_UNICODE_PATH];
 	vm_char *ptr;
@@ -108,11 +89,6 @@ const vm_char *factorvm::vm_executable_path()
 	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
 		fatal_error("GetModuleFileName() failed", 0);
 	return safe_strdup(full_path);
-}
-
-const vm_char *vm_executable_path()
-{
-	return vm->vm_executable_path();
 }
 
 
@@ -152,11 +128,6 @@ segment *factorvm::alloc_segment(cell size)
 	return block;
 }
 
-segment *alloc_segment(cell size)
-{
-	return vm->alloc_segment(size);
-}
-
 void factorvm::dealloc_segment(segment *block)
 {
 	SYSTEM_INFO si;
@@ -164,11 +135,6 @@ void factorvm::dealloc_segment(segment *block)
 	if(!VirtualFree((void*)(block->start - si.dwPageSize), 0, MEM_RELEASE))
 		fatal_error("dealloc_segment failed",0);
 	free(block);
-}
-
-void dealloc_segment(segment *block)
-{
-	return vm->dealloc_segment(block);
 }
 
 long factorvm::getpagesize()
@@ -183,19 +149,9 @@ long factorvm::getpagesize()
 	return g_pagesize;
 }
 
-long getpagesize()
-{
-	return vm->getpagesize();
-}
-
 void factorvm::sleep_micros(u64 usec)
 {
 	Sleep((DWORD)(usec / 1000));
-}
-
-void sleep_micros(u64 usec)
-{
-	return vm->sleep_micros(usec);
 }
 
 }
