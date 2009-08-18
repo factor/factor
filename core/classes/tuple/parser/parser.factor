@@ -87,19 +87,21 @@ ERROR: bad-literal-tuple ;
 : parse-slot-values ( -- values )
     [ (parse-slot-values) ] { } make ;
 
-: boa>tuple ( class slots -- tuple )
+GENERIC# boa>object 1 ( class slots -- tuple )
+
+M: tuple-class boa>object
     swap prefix >tuple ;
 
-: assoc>tuple ( class slots -- tuple )
-    [ [ ] [ initial-values ] [ all-slots ] tri ] dip
-    swap [ [ slot-named offset>> 2 - ] curry dip ] curry assoc-map
-    [ dup <enum> ] dip update boa>tuple ;
+: assoc>object ( class slots -- tuple )
+    [ [ ] [ initial-values ] [ class-slots ] tri ] dip
+    swap [ [ slot-named* drop ] curry dip ] curry assoc-map
+    [ dup <enum> ] dip update boa>object ;
 
 : parse-tuple-literal-slots ( class -- tuple )
     scan {
         { f [ unexpected-eof ] }
-        { "f" [ \ } parse-until boa>tuple ] }
-        { "{" [ parse-slot-values assoc>tuple ] }
+        { "f" [ \ } parse-until boa>object ] }
+        { "{" [ parse-slot-values assoc>object ] }
         { "}" [ new ] }
         [ bad-literal-tuple ]
     } case ;
