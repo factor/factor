@@ -664,18 +664,12 @@ struct factorvm {
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
 	bool windows_stat(vm_char *path);
 
-    #if defined(WINCE)
-    #else   /* WINNT */
+   #if defined(WINNT)
 	s64 current_micros();
 	void c_to_factor_toplevel(cell quot);
 	void open_console();
  	// next method here:
-    #endif
-
-	
-    #ifdef FACTOR_X86	
-    #endif
-
+   #endif
   #endif
 
 };
