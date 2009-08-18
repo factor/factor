@@ -40,7 +40,7 @@ SINGLETON: utf8
     dup stream-read1 dup [ begin-utf8 ] when nip ; inline
 
 M: utf8 decode-char
-    drop decode-utf8 ;
+    drop decode-utf8 ; inline
 
 ! Encoding UTF-8
 

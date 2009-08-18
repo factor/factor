@@ -16,7 +16,7 @@ PRIVATE>
 SINGLETON: ascii
 
 M: ascii encode-char
-    128 encode-if< ;
+    128 encode-if< ; inline
 
 M: ascii decode-char
-    128 decode-if< ;
+    128 decode-if< ; inline

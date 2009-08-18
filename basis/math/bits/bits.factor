@@ -9,9 +9,9 @@ C: <bits> bits
 : make-bits ( number -- bits )
     [ T{ bits f 0 0 } ] [ dup abs log2 1 + <bits> ] if-zero ; inline
 
-M: bits length length>> ;
+M: bits length length>> ; inline
 
-M: bits nth-unsafe number>> swap bit? ;
+M: bits nth-unsafe number>> swap bit? ; inline
 
 INSTANCE: bits immutable-sequence
 
