@@ -50,6 +50,7 @@ CONSTANT: rt-immediate 8
 CONSTANT: rt-stack-chain 9
 CONSTANT: rt-untagged 10
 CONSTANT: rt-megamorphic-cache-hits 11
+CONSTANT: rt-vm 12
 
 : rc-absolute? ( n -- ? )
     ${ rc-absolute-ppc-2/2 rc-absolute-cell rc-absolute } member? ;
