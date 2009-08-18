@@ -9,9 +9,9 @@ MIXIN: growable
 SLOT: length
 SLOT: underlying
 
-M: growable length length>> ;
-M: growable nth-unsafe underlying>> nth-unsafe ;
-M: growable set-nth-unsafe underlying>> set-nth-unsafe ;
+M: growable length length>> ; inline
+M: growable nth-unsafe underlying>> nth-unsafe ; inline
+M: growable set-nth-unsafe underlying>> set-nth-unsafe ; inline
 
 : capacity ( seq -- n ) underlying>> length ; inline
 
@@ -49,21 +49,21 @@ M: growable set-length ( n seq -- )
         [ >fixnum ] dip
     ] if ; inline
 
-M: growable set-nth ensure set-nth-unsafe ;
+M: growable set-nth ensure set-nth-unsafe ; inline
 
-M: growable clone (clone) [ clone ] change-underlying ;
+M: growable clone (clone) [ clone ] change-underlying ; inline
 
 M: growable lengthen ( n seq -- )
     2dup length > [
         2dup capacity > [ over new-size over expand ] when
         2dup (>>length)
-    ] when 2drop ;
+    ] when 2drop ; inline
 
 M: growable shorten ( n seq -- )
     growable-check
     2dup length < [
         2dup contract
         2dup (>>length)
-    ] when 2drop ;
+    ] when 2drop ; inline
 
 INSTANCE: growable sequence
