@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax strings ;
 IN: multiline
 
 HELP: STRING:
@@ -19,21 +19,30 @@ HELP: /*
 } ;
 
 HELP: HEREDOC:
-{ $syntax "HEREDOC: marker\n...text...marker" }
-{ $values { "marker" "a word (token)" } { "text" "arbitrary text" } { "" "a string" } }
-{ $description "A multiline string syntax with a user-specified terminating delimiter.  HEREDOC: reads the next word, and uses it as the 'close quote'.  All input from the beginning of the HEREDOC:'s next line, until the first appearance of the word's name, becomes a string.  The terminating word does not need to be at the beginning of a line.\n\nThe HEREDOC: line should not have anything after the delimiting word.  The delimiting word should be an alphanumeric token.  It should not be, as in some other languages, a \"quoted string\"." }
+{ $syntax "HEREDOC: marker\n...text...\nmarker" }
+{ $values { "marker" "a word (token)" } { "text" "arbitrary text" } { "value" string } }
+{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after the " { $link POSTPONE: HEREDOC: } " until the end of the line containing the " { $link POSTPONE: HEREDOC: } ". Text is captured until a line is found conatining exactly this delimter string." }
+{ $warning "Whitespace is significant." }
 { $examples
     { $example "USING: multiline prettyprint ;"
-               "HEREDOC: END\nx\nEND ."
+               "HEREDOC: END\nx\nEND\n."
                "\"x\\n\""
     }
-    { $example "USING: multiline prettyprint ;"
-               "HEREDOC: END\nxEND ."
-               "\"x\""
-    }
     { $example "USING: multiline prettyprint sequences ;"
-               "2 5 HEREDOC: zap\nfoo\nbarzap subseq ."
+               "2 5 HEREDOC: zap\nfoo\nbar\nzap\nsubseq ."
                "\"o\\nb\""
+    }
+} ;
+
+HELP: DELIMITED:
+{ $syntax "DELIMITED: marker\n...text...\nmarker" }
+{ $values { "marker" "a word (token)" } { "text" "arbitrary text" } { "value" string } }
+{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after the " { $link POSTPONE: DELIMITED: } " until the end of the line containing the " { $link POSTPONE: DELIMITED: } ". Text is captured until the exact delimiter string is found, regardless of where." }
+{ $examples
+    { $example "USING: multiline prettyprint ;"
+               "DELIMITED: factor blows my mind"
+"whoafactor blows my mind ."
+                "\"whoa\""
     }
 } ;
 
@@ -49,6 +58,7 @@ ARTICLE: "multiline" "Multiline"
 { $subsection POSTPONE: STRING: }
 { $subsection POSTPONE: <" }
 { $subsection POSTPONE: HEREDOC: }
+{ $subsection POSTPONE: DELIMITED: }
 "Multiline comments:"
 { $subsection POSTPONE: /* }
 "Writing new multiline parsing words:"
