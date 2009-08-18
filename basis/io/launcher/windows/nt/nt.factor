@@ -10,21 +10,21 @@ IN: io.launcher.windows.nt
 
 : duplicate-handle ( handle -- handle' )
     GetCurrentProcess ! source process
-    swap ! handle
+    swap handle>> ! handle
     GetCurrentProcess ! target process
     f <void*> [ ! target handle
         DUPLICATE_SAME_ACCESS ! desired access
         TRUE ! inherit handle
-        DUPLICATE_CLOSE_SOURCE ! options
+        0 ! options
         DuplicateHandle win32-error=0/f
-    ] keep *void* ;
+    ] keep *void* <win32-handle> &dispose ;
 
 ! /dev/null simulation
 : null-input ( -- pipe )
-    (pipe) [ in>> handle>> ] [ out>> dispose ] bi ;
+    (pipe) [ in>> &dispose ] [ out>> dispose ] bi ;
 
 : null-output ( -- pipe )
-    (pipe) [ in>> dispose ] [ out>> handle>> ] bi ;
+    (pipe) [ in>> dispose ] [ out>> &dispose ] bi ;
 
 : null-pipe ( mode -- pipe )
     {
@@ -49,7 +49,7 @@ IN: io.launcher.windows.nt
     create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
-    CreateFile dup invalid-handle? <win32-file> &dispose handle>> ;
+    CreateFile dup invalid-handle? <win32-file> &dispose ;
 
 : redirect-append ( path access-mode create-mode -- handle )
     [ path>> ] 2dip
@@ -58,10 +58,10 @@ IN: io.launcher.windows.nt
     dup 0 FILE_END set-file-pointer ;
 
 : redirect-handle ( handle access-mode create-mode -- handle )
-    2drop handle>> duplicate-handle ;
+    2drop ;
 
 : redirect-stream ( stream access-mode create-mode -- handle )
-    [ underlying-handle handle>> ] 2dip redirect-handle ;
+    [ underlying-handle ] 2dip redirect-handle ;
 
 : redirect ( obj access-mode create-mode -- handle )
     {
@@ -72,7 +72,7 @@ IN: io.launcher.windows.nt
         { [ pick win32-file? ] [ redirect-handle ] }
         [ redirect-stream ]
     } cond
-    dup [ dup t set-inherit ] when ;
+    dup [ dup t set-inherit handle>> ] when ;
 
 : redirect-stdout ( process args -- handle )
     drop
