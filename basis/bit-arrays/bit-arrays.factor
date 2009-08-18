@@ -44,33 +44,33 @@ PRIVATE>
 : <bit-array> ( n -- bit-array )
     dup bits>bytes <byte-array> bit-array boa ; inline
 
-M: bit-array length length>> ;
+M: bit-array length length>> ; inline
 
 M: bit-array nth-unsafe
-    [ >fixnum ] [ underlying>> ] bi* byte/bit bit? ;
+    [ >fixnum ] [ underlying>> ] bi* byte/bit bit? ; inline
 
 M: bit-array set-nth-unsafe
     [ >fixnum ] [ underlying>> ] bi*
     [ byte/bit set-bit ] 2keep
-    swap n>byte set-alien-unsigned-1 ;
+    swap n>byte set-alien-unsigned-1 ; inline
 
 GENERIC: clear-bits ( bit-array -- )
 
-M: bit-array clear-bits 0 (set-bits) ;
+M: bit-array clear-bits 0 (set-bits) ; inline
 
 GENERIC: set-bits ( bit-array -- )
 
-M: bit-array set-bits -1 (set-bits) ;
+M: bit-array set-bits -1 (set-bits) ; inline
 
 M: bit-array clone
-    [ length>> ] [ underlying>> clone ] bi bit-array boa ;
+    [ length>> ] [ underlying>> clone ] bi bit-array boa ; inline
 
 : >bit-array ( seq -- bit-array )
     T{ bit-array f 0 B{ } } clone-like ; inline
 
-M: bit-array like drop dup bit-array? [ >bit-array ] unless ;
+M: bit-array like drop dup bit-array? [ >bit-array ] unless ; inline
 
-M: bit-array new-sequence drop <bit-array> ;
+M: bit-array new-sequence drop <bit-array> ; inline
 
 M: bit-array equal?
     over bit-array? [ [ underlying>> ] bi@ sequence= ] [ 2drop f ] if ;
@@ -81,7 +81,7 @@ M: bit-array resize
         resize-byte-array
     ] 2bi
     bit-array boa
-    dup clean-up ;
+    dup clean-up ; inline
 
 M: bit-array byte-length length 7 + -3 shift ;
 
