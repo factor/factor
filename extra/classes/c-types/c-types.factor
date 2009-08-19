@@ -62,7 +62,7 @@ SYMBOLS: long ulong long-bits ;
 >>
 
 : set-class-c-type ( class c-type <direct-array> -- )
-    [ "class-c-type" set-word-prop ]
+    [ c-type "class-c-type" set-word-prop ]
     [ "class-direct-array" set-word-prop ] bi-curry* bi ;
 
 : class-c-type ( class -- c-type )
@@ -103,12 +103,12 @@ ulonglong [ 64 bits            ] "coercer" set-word-prop
 PREDICATE: c-type-class < class
     "class-c-type" word-prop ;
 
-GENERIC: direct-array-of ( alien len class -- array )
+GENERIC: direct-array-of ( alien len class -- array ) inline
 
 M: c-type-class direct-array-of
     class-direct-array execute( alien len -- array ) ; inline
 
-M: c-type-class c-type class-c-type c-type ;
+M: c-type-class c-type class-c-type ;
 M: c-type-class c-type-align class-c-type c-type-align ;
 M: c-type-class c-type-getter class-c-type c-type-getter ;
 M: c-type-class c-type-setter class-c-type c-type-setter ;
