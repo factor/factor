@@ -79,6 +79,19 @@ DEF(void,set_x87_env,(const void*)):
 	fldcw 2(%eax)
 	ret
 
+DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
+	mov CELL_SIZE(STACK_REG),NV_TEMP_REG  /* stash vm ptr  */
+	/* clear x87 stack, but preserve rounding mode and exception flags */
+	sub $2,STACK_REG
+	fnstcw (STACK_REG)
+	fninit
+	fldcw (STACK_REG)
+	/* rewind_to */
+	mov ARG1,STACK_REG
+	mov NV_TEMP_REG,ARG1
+	jmp *QUOT_XT_OFFSET(ARG0)
+
+	
 #include "cpu-x86.S"
 
 #ifdef WINDOWS

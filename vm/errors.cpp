@@ -78,7 +78,7 @@ void factorvm::throw_error(cell error, stack_frame *callstack_top)
 		else
 			callstack_top = stack_chain->callstack_top;
 
-		throw_impl(userenv[BREAK_ENV],callstack_top);
+		throw_impl(userenv[BREAK_ENV],callstack_top,this);
 	}
 	/* Error was thrown in early startup before error handler is set, just
 	crash. */
@@ -167,7 +167,7 @@ void factorvm::fp_trap_error(unsigned int fpu_status, stack_frame *signal_callst
 
 inline void factorvm::vmprim_call_clear()
 {
-	throw_impl(dpop(),stack_chain->callstack_bottom);
+	throw_impl(dpop(),stack_chain->callstack_bottom,this);
 }
 
 PRIMITIVE(call_clear)
