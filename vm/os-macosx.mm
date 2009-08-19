@@ -10,7 +10,7 @@ void c_to_factor_toplevel(cell quot)
 	for(;;)
 	{
 NS_DURING
-		c_to_factor(quot);
+		c_to_factor(quot,vm);
 		NS_VOIDRETURN;
 NS_HANDLER
 		dpush(vm->allot_alien(F,(cell)localException));

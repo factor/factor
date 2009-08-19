@@ -34,17 +34,19 @@ multiply_overflow:
 	mov ARITH_TEMP_2,ARG1
 	jmp MANGLE(overflow_fixnum_multiply)
 
-DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
+DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	PUSH_NONVOLATILE
 	mov ARG0,NV_TEMP_REG
-
+	//mov $35,ARG1
 	/* Create register shadow area for Win64 */
 	sub $32,STACK_REG
 
 	/* Save stack pointer */
 	lea -CELL_SIZE(STACK_REG),ARG0
+	push ARG1  /* save vm ptr */
 	call MANGLE(save_callstack_bottom)
-
+	pop ARG1
+	
 	/* Call quot-xt */
 	mov NV_TEMP_REG,ARG0
 	call *QUOT_XT_OFFSET(ARG0)
@@ -65,10 +67,13 @@ DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
 	mov ARG1,STACK_REG                    
 	jmp *QUOT_XT_OFFSET(ARG0)
 
-DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot)):
+DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
+	mov ARG1,NV_TEMP_REG         /* stash vm ptr */
 	mov STACK_REG,ARG1           /* Save stack pointer */
 	sub $STACK_PADDING,STACK_REG
+	push NV_TEMP_REG             /* push vm ptr as arg3 */
 	call MANGLE(lazy_jit_compile_impl)
+	pop NV_TEMP_REG
 	mov RETURN_REG,ARG0          /* No-op on 32-bit */
 	add $STACK_PADDING,STACK_REG
         jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */

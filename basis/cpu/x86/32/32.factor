@@ -240,6 +240,7 @@ M: x86.32 %alien-callback ( quot -- )
     4 [
         EAX swap %load-reference
         EAX PUSH
+        param-reg-2 0 MOV rc-absolute-cell rt-vm rel-fixup 
         "c_to_factor" f %alien-invoke
     ] with-aligned-stack ;
 

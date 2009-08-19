@@ -27,7 +27,7 @@ PRIMITIVE(jit_compile);
 PRIMITIVE(array_to_quotation);
 PRIMITIVE(quotation_xt);
 
-VM_ASM_API cell lazy_jit_compile_impl(cell quot, stack_frame *stack);
+VM_ASM_API cell lazy_jit_compile_impl(cell quot, stack_frame *stack, factorvm *myvm);
 
 PRIMITIVE(quot_compiled_p);
 
