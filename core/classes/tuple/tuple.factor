@@ -69,7 +69,7 @@ GENERIC: slots>tuple ( seq class -- tuple )
 M: tuple-class slots>tuple ( seq class -- tuple )
     check-slots pad-slots
     tuple-layout <tuple> [
-        [ tuple-size ]
+        [ tuple-size iota ]
         [ [ set-array-nth ] curry ]
         bi 2each
     ] keep ;
