@@ -35,7 +35,7 @@ M: tuple class layout-of 2 slot { word } declare ; inline
     layout-of 3 slot { fixnum } declare ; inline
 
 : prepare-tuple>array ( tuple -- n tuple layout )
-    check-tuple [ tuple-size ] [ ] [ layout-of ] tri ;
+    check-tuple [ tuple-size iota ] [ ] [ layout-of ] tri ;
 
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
