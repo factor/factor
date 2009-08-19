@@ -56,9 +56,9 @@ IN: compiler.tree.propagation.tests
 
 [ float ] [ [ { float real } declare + ] final-math-class ] unit-test
 
-! [ rational ] [ [ { ratio ratio } declare + ] final-math-class ] unit-test
+[ rational ] [ [ { ratio ratio } declare + ] final-math-class ] unit-test
 
-! [ rational ] [ [ { rational ratio } declare + ] final-math-class ] unit-test
+[ rational ] [ [ { rational ratio } declare + ] final-math-class ] unit-test
 
 [ number ] [ [ { complex complex } declare + ] final-math-class ] unit-test
 
@@ -156,6 +156,18 @@ IN: compiler.tree.propagation.tests
 [ V{ t } ] [ [ 40 rem 0 >= ] final-literals ] unit-test
 
 [ V{ t } ] [ [ abs 40 mod 0 >= ] final-literals ] unit-test
+
+[ t ] [ [ abs ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ absq ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { float } declare abs ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { float } declare absq ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { double-array double-array } declare [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
 
 [ V{ string } ] [
     [ dup string? not [ "Oops" throw ] [ ] if ] final-classes
