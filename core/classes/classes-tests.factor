@@ -110,6 +110,12 @@ USE: multiline
     "class-intersect-no-method-c" parse-stream drop
 ] unit-test
 
+! Forget the above crap
+[
+    { "classes.test.a" "classes.test.b" "classes.test.c" "classes.test.d" }
+    [ forget-vocab ] each
+] with-compilation-unit
+
 TUPLE: forgotten-predicate-test ;
 
 [ ] [ [ \ forgotten-predicate-test forget ] with-compilation-unit ] unit-test

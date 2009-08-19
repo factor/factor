@@ -4,17 +4,17 @@ USING: accessors kernel kernel.private math math.private
 sequences sequences.private ;
 IN: arrays
 
-M: array clone (clone) ;
-M: array length length>> ;
-M: array nth-unsafe [ >fixnum ] dip array-nth ;
-M: array set-nth-unsafe [ >fixnum ] dip set-array-nth ;
-M: array resize resize-array ;
+M: array clone (clone) ; inline
+M: array length length>> ; inline
+M: array nth-unsafe [ >fixnum ] dip array-nth ; inline
+M: array set-nth-unsafe [ >fixnum ] dip set-array-nth ; inline
+M: array resize resize-array ; inline
 
 : >array ( seq -- array ) { } clone-like ;
 
-M: object new-sequence drop 0 <array> ;
+M: object new-sequence drop 0 <array> ; inline
 
-M: f new-sequence drop [ f ] [ 0 <array> ] if-zero ;
+M: f new-sequence drop [ f ] [ 0 <array> ] if-zero ; inline
 
 M: array equal?
     over array? [ sequence= ] [ 2drop f ] if ;

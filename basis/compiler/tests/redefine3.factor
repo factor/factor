@@ -5,11 +5,11 @@ IN: compiler.tests.redefine3
 
 GENERIC: sheeple ( obj -- x )
 
-M: object sheeple drop "sheeple" ;
+M: object sheeple drop "sheeple" ; inline
 
 MIXIN: empty-mixin
 
-M: empty-mixin sheeple drop "wake up" ;
+M: empty-mixin sheeple drop "wake up" ; inline
 
 : sheeple-test ( -- string ) { } sheeple ;
 

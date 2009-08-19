@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences words memoize combinators
-classes classes.builtin classes.tuple math.partial-dispatch
-fry assocs combinators.short-circuit
+classes classes.builtin classes.tuple classes.singleton
+math.partial-dispatch fry assocs combinators.short-circuit
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -45,6 +45,7 @@ M: predicate finalize-word
     "predicating" word-prop {
         { [ dup builtin-class? ] [ drop word>> cached-expansion ] }
         { [ dup tuple-class? ] [ drop word>> def>> splice-final ] }
+        { [ dup singleton-class? ] [ drop word>> def>> splice-final ] }
         [ drop ]
     } cond ;
 

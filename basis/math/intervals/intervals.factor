@@ -94,21 +94,25 @@ MEMO: array-capacity-interval ( -- interval )
 : interval>points ( int -- from to )
     [ from>> ] [ to>> ] bi ;
 
-: points>interval ( seq -- interval )
-    dup [ first fp-nan? ] any?
-    [ drop [-inf,inf] ] [
-        dup first
-        [ [ endpoint-min ] reduce ]
-        [ [ endpoint-max ] reduce ]
-        2bi <interval>
-    ] if ;
+: points>interval ( seq -- interval nan? )
+    [ first fp-nan? not ] partition
+    [
+        [ [ ] [ endpoint-min ] map-reduce ]
+        [ [ ] [ endpoint-max ] map-reduce ] bi
+        <interval>
+    ]
+    [ empty? not ]
+    bi* ;
+
+: nan-ok ( interval nan? -- interval ) drop ; inline
+: nan-not-ok ( interval nan? -- interval ) [ drop full-interval ] when ; inline
 
 : (interval-op) ( p1 p2 quot -- p3 )
     [ [ first ] [ first ] [ call ] tri* ]
     [ drop [ second ] both? ]
     3bi 2array ; inline
 
-: interval-op ( i1 i2 quot -- i3 )
+: interval-op ( i1 i2 quot -- i3 nan? )
     {
         [ [ from>> ] [ from>> ] [ ] tri* (interval-op) ]
         [ [ to>>   ] [ from>> ] [ ] tri* (interval-op) ]
@@ -126,10 +130,10 @@ MEMO: array-capacity-interval ( -- interval )
     } cond ; inline
 
 : interval+ ( i1 i2 -- i3 )
-    [ [ + ] interval-op ] do-empty-interval ;
+    [ [ + ] interval-op nan-ok ] do-empty-interval ;
 
 : interval- ( i1 i2 -- i3 )
-    [ [ - ] interval-op ] do-empty-interval ;
+    [ [ - ] interval-op nan-ok ] do-empty-interval ;
 
 : interval-intersect ( i1 i2 -- i3 )
     {
@@ -154,7 +158,7 @@ MEMO: array-capacity-interval ( -- interval )
         { [ dup empty-interval eq? ] [ drop ] }
         { [ over full-interval eq? ] [ drop ] }
         { [ dup full-interval eq? ] [ nip ] }
-        [ [ interval>points 2array ] bi@ append points>interval ]
+        [ [ interval>points 2array ] bi@ append points>interval nan-not-ok ]
     } cond ;
 
 : interval-subset? ( i1 i2 -- ? )
@@ -173,7 +177,7 @@ MEMO: array-capacity-interval ( -- interval )
     0 swap interval-contains? ;
 
 : interval* ( i1 i2 -- i3 )
-    [ [ [ * ] interval-op ] do-empty-interval ]
+    [ [ [ * ] interval-op nan-ok ] do-empty-interval ]
     [ [ interval-zero? ] either? ]
     2bi [ 0 [a,a] interval-union ] when ;
 
@@ -220,7 +224,7 @@ MEMO: array-capacity-interval ( -- interval )
     [
         [
             [ interval-closure ] bi@
-            [ shift ] interval-op
+            [ shift ] interval-op nan-not-ok
         ] interval-integer-op
     ] do-empty-interval ;
 
@@ -235,11 +239,11 @@ MEMO: array-capacity-interval ( -- interval )
 
 : interval-max ( i1 i2 -- i3 )
     #! Inaccurate; could be tighter
-    [ [ interval-closure ] bi@ [ max ] interval-op ] do-empty-interval ;
+    [ [ interval-closure ] bi@ [ max ] interval-op nan-not-ok ] do-empty-interval ;
 
 : interval-min ( i1 i2 -- i3 )
     #! Inaccurate; could be tighter
-    [ [ interval-closure ] bi@ [ min ] interval-op ] do-empty-interval ;
+    [ [ interval-closure ] bi@ [ min ] interval-op nan-not-ok ] do-empty-interval ;
 
 : interval-interior ( i1 -- i2 )
     dup special-interval? [
@@ -254,7 +258,7 @@ MEMO: array-capacity-interval ( -- interval )
     } cond ; inline
 
 : interval/ ( i1 i2 -- i3 )
-    [ [ [ / ] interval-op ] interval-division-op ] do-empty-interval ;
+    [ [ [ / ] interval-op nan-not-ok ] interval-division-op ] do-empty-interval ;
 
 : interval/-safe ( i1 i2 -- i3 )
     #! Just a hack to make the compiler work if bootstrap.math
@@ -266,13 +270,13 @@ MEMO: array-capacity-interval ( -- interval )
         [
             [
                 [ interval-closure ] bi@
-                [ /i ] interval-op
+                [ /i ] interval-op nan-not-ok
             ] interval-integer-op
         ] interval-division-op
     ] do-empty-interval ;
 
 : interval/f ( i1 i2 -- i3 )
-    [ [ [ /f ] interval-op ] interval-division-op ] do-empty-interval ;
+    [ [ [ /f ] interval-op nan-not-ok ] interval-division-op ] do-empty-interval ;
 
 : (interval-abs) ( i1 -- i2 )
     interval>points [ first2 [ abs ] dip 2array ] bi@ 2array ;
@@ -281,9 +285,12 @@ MEMO: array-capacity-interval ( -- interval )
     {
         { [ dup empty-interval eq? ] [ ] }
         { [ dup full-interval eq? ] [ drop [0,inf] ] }
-        { [ 0 over interval-contains? ] [ (interval-abs) { 0 t } suffix points>interval ] }
-        [ (interval-abs) points>interval ]
+        { [ 0 over interval-contains? ] [ (interval-abs) { 0 t } suffix points>interval nan-not-ok ] }
+        [ (interval-abs) points>interval nan-not-ok ]
     } cond ;
+
+: interval-absq ( i1 -- i2 )
+    interval-abs interval-sq ;
 
 : interval-recip ( i1 -- i2 ) 1 [a,a] swap interval/ ;
 

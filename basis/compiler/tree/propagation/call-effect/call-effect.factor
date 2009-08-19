@@ -153,7 +153,7 @@ ERROR: uninferable ;
 
 : (value>quot) ( value-info -- quot )
     dup class>> {
-        { \ quotation [ literal>> dup remember-inlining '[ drop @ ] ] }
+        { \ quotation [ literal>> dup add-to-history '[ drop @ ] ] }
         { \ curry [
             slots>> third (value>quot)
             '[ [ obj>> ] [ quot>> @ ] bi ]
