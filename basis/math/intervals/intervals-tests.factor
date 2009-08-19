@@ -348,6 +348,10 @@ comparison-ops [
 
 [ t ] [ -10 10 [a,b] interval-abs 0 10 [a,b] = ] unit-test
 
+[ t ] [ full-interval interval-abs [0,inf] = ] unit-test
+
+[ t ] [ [0,inf] interval-sq [0,inf] = ] unit-test
+
 ! Test that commutative interval ops really are
 : random-interval-or-empty ( -- obj )
     10 random 0 = [ empty-interval ] [ random-interval ] if ;
