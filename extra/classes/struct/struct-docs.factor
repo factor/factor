@@ -31,7 +31,7 @@ HELP: STRUCT:
 HELP: S{
 { $syntax "S{ class slots... }" }
 { $values { "class" "a " { $link struct } " class word" } { "slots" "slot values" } }
-{ $description "Marks the beginning of a literal struct. The syntax is identical to tuple literal syntax with " { $link POSTPONE: T{ } { $snippet " }" } "; in fact, " { $snippet "T{" } " and " { $snippet "S{" } " can be used interchangeably. Structs will always be printed with " { $snippet "S{" } "." } ;
+{ $description "Marks the beginning of a literal struct. The syntax is identical to tuple literal syntax with " { $link POSTPONE: T{ } { $snippet " }" } "; either the assoc syntax (that is, " { $snippet "S{ class { slot value } { slot value } ... }" } ") or the simple syntax (" { $snippet "S{ class f value value ... }" } ") can be used." } ;
 
 HELP: UNION-STRUCT:
 { $syntax "UNION-STRUCT: class { slot type } { slot type } ... ;" }

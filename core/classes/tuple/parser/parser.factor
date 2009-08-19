@@ -92,19 +92,19 @@ GENERIC# boa>object 1 ( class slots -- tuple )
 M: tuple-class boa>object
     swap prefix >tuple ;
 
-: assoc>object ( class slots -- tuple )
-    [ [ ] [ initial-values ] [ class-slots ] tri ] dip
+: assoc>object ( class slots values -- tuple )
+    [ [ [ initial>> ] map ] keep ] dip
     swap [ [ slot-named* drop ] curry dip ] curry assoc-map
     [ dup <enum> ] dip update boa>object ;
 
-: parse-tuple-literal-slots ( class -- tuple )
+: parse-tuple-literal-slots ( class slots -- tuple )
     scan {
         { f [ unexpected-eof ] }
-        { "f" [ \ } parse-until boa>object ] }
+        { "f" [ drop \ } parse-until boa>object ] }
         { "{" [ parse-slot-values assoc>object ] }
-        { "}" [ new ] }
+        { "}" [ drop new ] }
         [ bad-literal-tuple ]
     } case ;
 
 : parse-tuple-literal ( -- tuple )
-    scan-word parse-tuple-literal-slots ;
+    scan-word dup all-slots parse-tuple-literal-slots ;
