@@ -24,7 +24,8 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
     [ create-method ] 2dip
     [ [ props>> ] [ drop ] [ ] tri* update ]
     [ drop define ]
-    3bi ;
+    [ 2drop make-inline ]
+    3tri ;
 
 GENERIC# reader-quot 1 ( class slot-spec -- quot )
 
@@ -41,11 +42,7 @@ M: object reader-quot
     dup t "reader" set-word-prop ;
 
 : reader-props ( slot-spec -- assoc )
-    [
-        [ "reading" set ]
-        [ read-only>> [ t "foldable" set ] when ] bi
-        t "flushable" set
-    ] H{ } make-assoc ;
+    "reading" associate ;
 
 : define-reader-generic ( name -- )
     reader-word (( object -- value )) define-simple-generic ;

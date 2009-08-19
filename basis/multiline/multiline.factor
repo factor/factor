@@ -4,6 +4,8 @@ USING: namespaces make parser lexer kernel sequences words
 quotations math accessors locals ;
 IN: multiline
 
+ERROR: bad-heredoc identifier ;
+
 <PRIVATE
 : next-line-text ( -- str )
     lexer get dup next-line line-text>> ;
@@ -46,6 +48,28 @@ SYNTAX: STRING:
         change-column drop
     ] "" make ;
 
+: rest-of-line ( -- seq )
+    lexer get [ line-text>> ] [ column>> ] bi tail ;
+
+:: advance-same-line ( text -- )
+    lexer get [ text length + ] change-column drop ;
+
+:: (parse-til-line-begins) ( begin-text -- )
+    lexer get still-parsing? [
+        lexer get line-text>> begin-text sequence= [
+            begin-text advance-same-line
+        ] [
+            lexer get line-text>> % "\n" %
+            lexer get next-line
+            begin-text (parse-til-line-begins)
+        ] if
+    ] [
+        begin-text bad-heredoc
+    ] if ;
+
+: parse-til-line-begins ( begin-text -- seq )
+    [ (parse-til-line-begins) ] "" make ;
+
 PRIVATE>
 
 : parse-multiline-string ( end-text -- str )
@@ -66,7 +90,13 @@ SYNTAX: {"
 SYNTAX: /* "*/" parse-multiline-string drop ;
 
 SYNTAX: HEREDOC:
-    scan
+    lexer get skip-blank
+    rest-of-line
     lexer get next-line
-    0 (parse-multiline-string)
-    parsed ;
+    parse-til-line-begins parsed ;
+
+SYNTAX: DELIMITED:
+    lexer get skip-blank
+    rest-of-line
+    lexer get next-line
+    0 (parse-multiline-string) parsed ;

@@ -4,18 +4,18 @@ USING: accessors kernel kernel.private alien.accessors sequences
 sequences.private math ;
 IN: byte-arrays
 
-M: byte-array clone (clone) ;
-M: byte-array length length>> ;
-M: byte-array nth-unsafe swap >fixnum alien-unsigned-1 ;
-M: byte-array set-nth-unsafe swap >fixnum set-alien-unsigned-1 ;
+M: byte-array clone (clone) ; inline
+M: byte-array length length>> ; inline
+M: byte-array nth-unsafe swap >fixnum alien-unsigned-1 ; inline
+M: byte-array set-nth-unsafe swap >fixnum set-alien-unsigned-1 ; inline
 : >byte-array ( seq -- byte-array ) B{ } clone-like ; inline
-M: byte-array new-sequence drop (byte-array) ;
+M: byte-array new-sequence drop (byte-array) ; inline
 
 M: byte-array equal?
     over byte-array? [ sequence= ] [ 2drop f ] if ;
 
 M: byte-array resize
-    resize-byte-array ;
+    resize-byte-array ; inline
 
 INSTANCE: byte-array sequence
 

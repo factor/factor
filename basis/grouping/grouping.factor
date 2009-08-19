@@ -18,41 +18,41 @@ GENERIC: group@ ( n groups -- from to seq )
 
 M: chunking-seq set-nth group@ <slice> 0 swap copy ;
 
-M: chunking-seq like drop { } like ;
+M: chunking-seq like drop { } like ; inline
 
 INSTANCE: chunking-seq sequence
 
 MIXIN: subseq-chunking
 
-M: subseq-chunking nth group@ subseq ;
+M: subseq-chunking nth group@ subseq ; inline
 
 MIXIN: slice-chunking
 
-M: slice-chunking nth group@ <slice> ;
+M: slice-chunking nth group@ <slice> ; inline
 
-M: slice-chunking nth-unsafe group@ slice boa ;
+M: slice-chunking nth-unsafe group@ slice boa ; inline
 
 TUPLE: abstract-groups < chunking-seq ;
 
 M: abstract-groups length
-    [ seq>> length ] [ n>> ] bi [ + 1 - ] keep /i ;
+    [ seq>> length ] [ n>> ] bi [ + 1 - ] keep /i ; inline
 
 M: abstract-groups set-length
-    [ n>> * ] [ seq>> ] bi set-length ;
+    [ n>> * ] [ seq>> ] bi set-length ; inline
 
 M: abstract-groups group@
-    [ n>> [ * dup ] keep + ] [ seq>> ] bi [ length min ] keep ;
+    [ n>> [ * dup ] keep + ] [ seq>> ] bi [ length min ] keep ; inline
 
 TUPLE: abstract-clumps < chunking-seq ;
 
 M: abstract-clumps length
-    [ seq>> length ] [ n>> ] bi - 1 + ;
+    [ seq>> length ] [ n>> ] bi - 1 + ; inline
 
 M: abstract-clumps set-length
-    [ n>> + 1 - ] [ seq>> ] bi set-length ;
+    [ n>> + 1 - ] [ seq>> ] bi set-length ; inline
 
 M: abstract-clumps group@
-    [ n>> over + ] [ seq>> ] bi ;
+    [ n>> over + ] [ seq>> ] bi ; inline
 
 PRIVATE>
 
