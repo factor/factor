@@ -124,29 +124,31 @@ M: pathname pprint*
         ] if
     ] if ; inline
 
-: tuple>assoc ( tuple -- assoc )
-    [ class class-slots ] [ object-slots ] bi zip
+: filter-tuple-assoc ( slot,value -- name,value )
     [ [ initial>> ] dip = not ] assoc-filter
     [ [ name>> ] dip ] assoc-map ;
+
+: tuple>assoc ( tuple -- assoc )
+    [ class all-slots ] [ tuple-slots ] bi zip filter-tuple-assoc ;
 
 : pprint-slot-value ( name value -- )
     <flow \ { pprint-word
     [ text ] [ f <inset pprint* block> ] bi*
     \ } pprint-word block> ;
 
+: (pprint-tuple) ( opener class slots closer -- )
+    <flow {
+        [ pprint-word ]
+        [ pprint-word ]
+        [ t <inset [ pprint-slot-value ] assoc-each block> ]
+        [ pprint-word ]
+    } spread block> ;
+
+: ?pprint-tuple ( tuple quot -- )
+    [ boa-tuples? get [ pprint-object ] ] dip [ check-recursion ] curry if ; inline
+
 : pprint-tuple ( tuple -- )
-    boa-tuples? get [ pprint-object ] [
-        [
-            <flow
-            dup pprint-delims drop pprint-word
-            dup class pprint-word
-            t <inset
-            dup tuple>assoc [ pprint-slot-value ] assoc-each
-            block>
-            pprint-delims nip pprint-word
-            block>
-        ] check-recursion
-    ] if ;
+    [ [ \ T{ ] dip [ class ] [ tuple>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
 
 M: tuple pprint*
     pprint-tuple ;
@@ -186,7 +188,7 @@ M: callstack >pprint-sequence callstack>array ;
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
 
 M: tuple >pprint-sequence
-    [ class ] [ object-slots ] bi class-slot-sequence ;
+    [ class ] [ tuple-slots ] bi class-slot-sequence ;
 
 M: object pprint-narrow? drop f ;
 M: byte-vector pprint-narrow? drop f ;

@@ -15,6 +15,9 @@ TUPLE: struct
 PREDICATE: struct-class < tuple-class
     \ struct subclass-of? ;
 
+M: struct-class struct-slots
+    "struct-slots" word-prop ;
+
 ! struct allocation
 
 M: struct >c-ptr
@@ -38,7 +41,7 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
     [
         [ <wrapper> \ (struct) [ ] 2sequence ]
         [
-            "struct-slots" word-prop
+            struct-slots
             [ length \ ndip ]
             [ [ name>> setter-word 1quotation ] map \ spread ] bi
         ] bi
@@ -53,10 +56,12 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 
 M: struct-class boa>object
     swap pad-struct-slots
-    [ (struct) ] [ "struct-slots" word-prop ] bi 
+    [ (struct) ] [ struct-slots ] bi 
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] curry keep ;
 
 ! Struct slot accessors
+
+GENERIC: struct-slot-values ( struct -- sequence )
 
 M: struct-class reader-quot
     nip
@@ -66,18 +71,15 @@ M: struct-class reader-quot
 M: struct-class writer-quot
     nip (writer-quot) ;
 
-M: struct-class class-slots
-    "struct-slots" word-prop ;
-
-: object-slots-quot ( class -- quot )
-    "struct-slots" word-prop
+: struct-slot-values-quot ( class -- quot )
+    struct-slots
     [ name>> reader-word 1quotation ] map
     \ cleave [ ] 2sequence
     \ output>array [ ] 2sequence ;
 
-: (define-object-slots-method) ( class -- )
-    [ \ object-slots create-method-in ]
-    [ object-slots-quot ] bi define ;
+: (define-struct-slot-values-method) ( class -- )
+    [ \ struct-slot-values create-method-in ]
+    [ struct-slot-values-quot ] bi define ;
 
 ! Struct as c-type
 
@@ -125,7 +127,7 @@ M: struct-class direct-array-of
 : struct-prototype ( class -- prototype )
     [ heap-size <byte-array> ]
     [ memory>struct ]
-    [ "struct-slots" word-prop ] tri
+    [ struct-slots ] tri
     [
         [ initial>> ]
         [ (writer-quot) ] bi
@@ -134,14 +136,14 @@ M: struct-class direct-array-of
 
 : (struct-word-props) ( class slots size align -- )
     [
-        [ "struct-slots" set-word-prop ]
+        [ struct-slots ]
         [ define-accessors ] 2bi
     ]
     [ "struct-size" set-word-prop ]
     [ "struct-align" set-word-prop ] tri-curry*
     [ tri ] 3curry
     [ dup struct-prototype "prototype" set-word-prop ]
-    [ (define-object-slots-method) ] tri ;
+    [ (define-struct-slot-values-method) ] tri ;
 
 : check-struct-slots ( slots -- )
     [ class>> c-type drop ] each ;
@@ -172,5 +174,4 @@ USING: vocabs vocabs.loader ;
 "prettyprint" vocab [ "classes.struct.prettyprint" require ] when
 
 SYNTAX: S{
-    POSTPONE: T{ ;
-
+    scan-word dup struct-slots parse-tuple-literal-slots ;
