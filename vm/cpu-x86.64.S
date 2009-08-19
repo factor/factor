@@ -88,6 +88,7 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
 	add $STACK_PADDING,%rsp
 	jmp *%rax
 
+<<<<<<< HEAD
 DEF(void,get_sse_env,(void*)):
 	stmxcsr (%rdi)
 	ret
@@ -106,4 +107,14 @@ DEF(void,set_x87_env,(const void*)):
 	fldcw 2(%rdi)
 	ret
 
+DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
+	/* clear x87 stack, but preserve rounding mode and exception flags */
+	sub $2,STACK_REG
+	fnstcw (STACK_REG)
+	fninit
+	fldcw (STACK_REG)
+	/* rewind_to */
+	mov ARG1,STACK_REG
+	jmp *QUOT_XT_OFFSET(ARG0)
+	
 #include "cpu-x86.S"

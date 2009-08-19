@@ -370,7 +370,7 @@ cell factorvm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 
 VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factorvm *myvm)
 {
-	return vm->lazy_jit_compile_impl(quot_,stack);
+	return VM_PTR->lazy_jit_compile_impl(quot_,stack);
 }
 
 inline void factorvm::vmprim_quot_compiled_p()

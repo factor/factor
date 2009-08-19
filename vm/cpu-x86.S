@@ -37,7 +37,6 @@ multiply_overflow:
 DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	PUSH_NONVOLATILE
 	mov ARG0,NV_TEMP_REG
-	//mov $35,ARG1
 	/* Create register shadow area for Win64 */
 	sub $32,STACK_REG
 
@@ -56,16 +55,6 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 
 	POP_NONVOLATILE
 	ret
-
-DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
-	/* clear x87 stack, but preserve rounding mode and exception flags */
-	sub $2,STACK_REG
-	fnstcw (STACK_REG)
-	fninit
-	fldcw (STACK_REG)
-	/* rewind_to */
-	mov ARG1,STACK_REG                    
-	jmp *QUOT_XT_OFFSET(ARG0)
 
 DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
 	mov ARG1,NV_TEMP_REG         /* stash vm ptr */
