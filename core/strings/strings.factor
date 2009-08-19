@@ -37,24 +37,24 @@ M: string hashcode*
     [ ] [ dup rehash-string string-hashcode ] ?if ;
 
 M: string length
-    length>> ;
+    length>> ; inline
 
 M: string nth-unsafe
-    [ >fixnum ] dip string-nth ;
+    [ >fixnum ] dip string-nth ; inline
 
 M: string set-nth-unsafe
     dup reset-string-hashcode
-    [ >fixnum ] [ >fixnum ] [ ] tri* set-string-nth ;
+    [ >fixnum ] [ >fixnum ] [ ] tri* set-string-nth ; inline
 
 M: string clone
-    (clone) [ clone ] change-aux ;
+    (clone) [ clone ] change-aux ; inline
 
-M: string resize resize-string ;
+M: string resize resize-string ; inline
 
 : 1string ( ch -- str ) 1 swap <string> ;
 
 : >string ( seq -- str ) "" clone-like ;
 
-M: string new-sequence drop 0 <string> ;
+M: string new-sequence drop 0 <string> ; inline
 
 INSTANCE: string sequence

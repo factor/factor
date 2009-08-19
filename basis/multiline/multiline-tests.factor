@@ -1,4 +1,4 @@
-USING: multiline tools.test ;
+USING: accessors eval multiline tools.test ;
 IN: multiline.tests
 
 STRING: test-it
@@ -26,36 +26,66 @@ hi"> ] unit-test
 [ "foo\nbar\n" ] [ HEREDOC: END
 foo
 bar
-END ] unit-test
-
-[ "foo\nbar" ] [ HEREDOC: END
-foo
-barEND ] unit-test
+END
+] unit-test
 
 [ "" ] [ HEREDOC: END
-END ] unit-test
+END
+] unit-test
 
-[ " " ] [ HEREDOC: END
- END ] unit-test
+[ " END\n" ] [ HEREDOC: END
+ END
+END
+] unit-test
 
 [ "\n" ] [ HEREDOC: END
 
-END ] unit-test
+END
+] unit-test
 
-[ "x" ] [ HEREDOC: END
-xEND ] unit-test
+[ "x\n" ] [ HEREDOC: END
+x
+END
+] unit-test
 
-[ "xyz " ] [ HEREDOC: END
-xyz END ] unit-test
+[ "x\n" ] [ HEREDOC:       END
+x
+END
+] unit-test
+
+[ "xyz \n" ] [ HEREDOC: END
+xyz 
+END
+] unit-test
 
 [ "} ! * # \" «\n" ] [ HEREDOC: END
 } ! * # " «
-END ] unit-test
+END
+] unit-test
 
-[ 21 "foo\nbar" " HEREDOC: FOO\n FOO\n" 22 ] [ 21 HEREDOC: X
+[ 21 "foo\nbar\n" " HEREDOC: FOO\n FOO\n" 22 ] [ 21 HEREDOC: X
 foo
-barX HEREDOC: END ! mumble
+bar
+X
+HEREDOC: END
  HEREDOC: FOO
  FOO
-END 22 ] unit-test
+END
+22 ] unit-test
 
+[ "lol\n xyz\n" ]
+[
+HEREDOC: xyz
+lol
+ xyz
+xyz
+] unit-test
+
+
+[ "lol" ]
+[ DELIMITED: aol
+lolaol ] unit-test
+
+[ "whoa" ]
+[ DELIMITED: factor blows my mind
+whoafactor blows my mind ] unit-test

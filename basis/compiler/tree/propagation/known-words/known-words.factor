@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel effects accessors math math.private
 math.integers.private math.partial-dispatch math.intervals
-math.parser math.order layouts words sequences sequences.private
+math.parser math.order math.functions layouts words sequences sequences.private
 arrays assocs classes classes.algebra combinators generic.math
 splitting fry locals classes.tuple alien.accessors
 classes.tuple.private slots.private definitions strings.private
@@ -40,6 +40,8 @@ IN: compiler.tree.propagation.known-words
 ] each
 
 \ abs [ [ interval-abs ] ?change-interval ] "outputs" set-word-prop
+
+\ absq [ [ interval-absq ] ?change-interval ] "outputs" set-word-prop
 
 : math-closure ( class -- newclass )
     { fixnum bignum integer rational float real number object }

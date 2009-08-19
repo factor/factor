@@ -18,11 +18,11 @@ TUPLE: V { underlying A } { length array-capacity } ;
 M: V like
     drop dup V instance? [
         dup A instance? [ dup length V boa ] [ >V ] if
-    ] unless ;
+    ] unless ; inline
 
-M: V new-sequence drop [ <A> ] [ >fixnum ] bi V boa ;
+M: V new-sequence drop [ <A> ] [ >fixnum ] bi V boa ; inline
 
-M: A new-resizable drop <V> ;
+M: A new-resizable drop <V> ; inline
 
 M: V equal? over V instance? [ sequence= ] [ 2drop f ] if ;
 

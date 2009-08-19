@@ -98,38 +98,38 @@ GENERIC: fp-infinity? ( x -- ? )
 GENERIC: fp-nan-payload ( x -- bits )
 
 M: object fp-special?
-    drop f ;
+    drop f ; inline
 M: object fp-nan?
-    drop f ;
+    drop f ; inline
 M: object fp-qnan?
-    drop f ;
+    drop f ; inline
 M: object fp-snan?
-    drop f ;
+    drop f ; inline
 M: object fp-infinity?
-    drop f ;
+    drop f ; inline
 M: object fp-nan-payload
-    drop f ;
+    drop f ; inline
 
 M: float fp-special?
-    double>bits -52 shift HEX: 7ff [ bitand ] keep = ;
+    double>bits -52 shift HEX: 7ff [ bitand ] keep = ; inline
 
 M: float fp-nan-payload
-    double>bits HEX: fffffffffffff bitand ; foldable flushable
+    double>bits HEX: fffffffffffff bitand ; inline
 
 M: float fp-nan?
-    dup fp-special? [ fp-nan-payload zero? not ] [ drop f ] if ;
+    dup fp-special? [ fp-nan-payload zero? not ] [ drop f ] if ; inline
 
 M: float fp-qnan?
-    dup fp-nan? [ fp-nan-payload HEX: 8000000000000 bitand zero? not ] [ drop f ] if ;
+    dup fp-nan? [ fp-nan-payload HEX: 8000000000000 bitand zero? not ] [ drop f ] if ; inline
 
 M: float fp-snan?
-    dup fp-nan? [ fp-nan-payload HEX: 8000000000000 bitand zero? ] [ drop f ] if ;
+    dup fp-nan? [ fp-nan-payload HEX: 8000000000000 bitand zero? ] [ drop f ] if ; inline
 
 M: float fp-infinity?
-    dup fp-special? [ fp-nan-payload zero? ] [ drop f ] if ;
+    dup fp-special? [ fp-nan-payload zero? ] [ drop f ] if ; inline
 
 : <fp-nan> ( payload -- nan )
-    HEX: 7ff0000000000000 bitor bits>double ; foldable flushable
+    HEX: 7ff0000000000000 bitor bits>double ; inline
 
 : next-float ( m -- n )
     double>bits
@@ -137,7 +137,7 @@ M: float fp-infinity?
         dup -0.0 double>bits = [ drop 0.0 ] [ ! negative zero
             1 + bits>double ! positive
         ] if
-    ] if ; foldable flushable
+    ] if ; inline
 
 : prev-float ( m -- n )
     double>bits
@@ -145,7 +145,7 @@ M: float fp-infinity?
         dup 0.0 double>bits = [ drop -0.0 ] [ ! positive zero
             1 - bits>double ! positive non-zero
         ] if
-    ] if ; foldable flushable
+    ] if ; inline
 
 : next-power-of-2 ( m -- n )
     dup 2 <= [ drop 2 ] [ 1 - log2 1 + 2^ ] if ; inline
