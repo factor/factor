@@ -248,7 +248,7 @@ DEFER: __
     "predicate" word-prop [ dupd call assure ] curry ;
 
 : slot-readers ( class -- quot )
-    class-slots [ name>> reader-word 1quotation ] map [ cleave ] curry ;
+    all-slots [ name>> reader-word 1quotation ] map [ cleave ] curry ;
 
 : ?wrapped ( object -- wrapped )
     dup wrapper? [ wrapped>> ] when ;

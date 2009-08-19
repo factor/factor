@@ -18,11 +18,6 @@ ERROR: not-a-tuple object ;
 : all-slots ( class -- slots )
     superclasses [ "slots" word-prop ] map concat ;
 
-GENERIC: class-slots ( class -- slots )
-
-M: tuple-class class-slots
-    all-slots ;
-
 PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
     all-slots [ read-only>> ] all? ;
 
@@ -55,14 +50,11 @@ M: tuple class layout-of 2 slot { word } declare ; inline
 
 PRIVATE>
 
-: tuple-initial-values ( class -- slots )
+: initial-values ( class -- slots )
     all-slots [ initial>> ] map ;
 
-: initial-values ( class -- slots )
-    class-slots [ initial>> ] map ;
-
 : pad-slots ( slots class -- slots' class )
-    [ tuple-initial-values over length tail append ] keep ; inline
+    [ initial-values over length tail append ] keep ; inline
 
 : tuple>array ( tuple -- array )
     prepare-tuple>array
@@ -71,10 +63,6 @@ PRIVATE>
 
 : tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
-
-GENERIC: object-slots ( object -- seq )
-M: tuple object-slots
-    tuple-slots ;
 
 GENERIC: slots>tuple ( seq class -- tuple )
 
@@ -159,7 +147,7 @@ ERROR: bad-superclass class ;
     dup boa-check-quot "boa-check" set-word-prop ;
 
 : tuple-prototype ( class -- prototype )
-    [ tuple-initial-values ] keep over [ ] any?
+    [ initial-values ] keep over [ ] any?
     [ slots>tuple ] [ 2drop f ] if ;
 
 : define-tuple-prototype ( class -- )
