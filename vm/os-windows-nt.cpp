@@ -62,7 +62,7 @@ void factorvm::c_to_factor_toplevel(cell quot)
 {
 	if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)exception_handler))
 		fatal_error("AddVectoredExceptionHandler failed", 0);
-	c_to_factor(quot);
+	c_to_factor(quot,this);
 	RemoveVectoredExceptionHandler((void *)exception_handler);
 }
 
