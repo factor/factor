@@ -12,6 +12,7 @@ IN: bootstrap.x86
 : div-arg ( -- reg ) EAX ;
 : mod-arg ( -- reg ) EDX ;
 : arg ( -- reg ) EAX ;
+: arg2 ( -- reg ) EDX ;
 : temp0 ( -- reg ) EAX ;
 : temp1 ( -- reg ) EDX ;
 : temp2 ( -- reg ) ECX ;
