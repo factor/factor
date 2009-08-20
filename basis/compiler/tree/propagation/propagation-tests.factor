@@ -82,6 +82,8 @@ IN: compiler.tree.propagation.tests
 
 [ bignum ] [ [ { bignum bignum } declare bitxor ] final-math-class ] unit-test
 
+[ bignum ] [ [ { integer } declare 123 >bignum bitand ] final-math-class ] unit-test
+
 [ float ] [ [ { float float } declare mod ] final-math-class ] unit-test
 
 [ V{ fixnum } ] [ [ 255 bitand ] final-classes ] unit-test
