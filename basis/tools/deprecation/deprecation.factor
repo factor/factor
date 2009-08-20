@@ -1,9 +1,9 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays assocs compiler.units
 debugger io kernel namespaces prettyprint sequences
-source-files.errors summary tools.crossref.private
-tools.errors words ;
-IN: deprecation
+source-files.errors summary tools.crossref
+tools.crossref.private tools.errors words ;
+IN: tools.deprecation
 
 SYMBOL: +deprecation-note+
 SYMBOL: deprecation-notes
@@ -42,7 +42,7 @@ T{ error-type
 : check-deprecations ( word -- )
     dup "forgotten" word-prop
     [ clear-deprecation-note ] [
-        dup def>> [ deprecated? ] filter
+        dup def>> uses [ deprecated? ] filter
         [ clear-deprecation-note ] [ >array deprecation-note ] if-empty
     ] if ;
 
