@@ -6,9 +6,6 @@ card has a slot written to.
 
 the offset of the first object is set by the allocator. */
 
-VM_C_API factor::cell cards_offset;
-VM_C_API factor::cell decks_offset;
-
 namespace factor
 {
 

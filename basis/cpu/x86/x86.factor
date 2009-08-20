@@ -587,18 +587,22 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
     dst class store-tagged
     nursery-ptr size inc-allot-ptr ;
 
+: %vm-field-ptr ( reg field -- )
+    [ drop 0 MOV rc-absolute-cell rt-vm rel-fixup ]
+    [ vm-field-offset ADD ] 2bi ;
+
 M:: x86 %write-barrier ( src card# table -- )
     #! Mark the card pointed to by vreg.
     ! Mark the card
     card# src MOV
     card# card-bits SHR
-    table "cards_offset" f %alien-global
+    table "cards_offset" %vm-field-ptr
     table table [] MOV
     table card# [+] card-mark <byte> MOV
 
     ! Mark the card deck
     card# deck-bits card-bits - SHR
-    table "decks_offset" f %alien-global
+    table "decks_offset" %vm-field-ptr
     table table [] MOV
     table card# [+] card-mark <byte> MOV ;
 
