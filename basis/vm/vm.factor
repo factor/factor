@@ -15,6 +15,8 @@ C-STRUCT: zone
 C-STRUCT: vm
     { "context*" "stack_chain" }
     { "zone" "nursery" }
+    { "cell" "cards_offset" }
+    { "cell" "decks_offset" }
     ;
 
 : vm-field-offset ( field -- offset ) "vm" offset-of ;
