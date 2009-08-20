@@ -32,3 +32,10 @@ M: protocol-slot-test-tuple (>>my-protocol-slot-test) [ sqrt ] dip (>>x) ;
     T{ protocol-slot-test-tuple { x 3 } } clone
     [ 7 + ] change-my-protocol-slot-test x>>
 ] unit-test
+
+UNION: comme-ci integer float ;
+UNION: comme-ca integer float ;
+comme-ca 25.5 "initial-value" set-word-prop
+
+[ 0 ]    [ comme-ci initial-value ] unit-test
+[ 25.5 ] [ comme-ca initial-value ] unit-test
