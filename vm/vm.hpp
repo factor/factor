@@ -3,6 +3,9 @@ namespace factor
 
 struct factorvm {
 
+	factor::context *stack_chain; 
+
+
 	// segments
 	inline cell align_page(cell a);
 

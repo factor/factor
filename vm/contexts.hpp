@@ -55,4 +55,3 @@ VM_C_API void unnest_stacks();
 
 }
 
-VM_C_API factor::context *stack_chain;

@@ -1,7 +1,5 @@
 #include "master.hpp"
 
-factor::context *stack_chain;
-
 namespace factor
 {
 
