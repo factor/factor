@@ -449,10 +449,10 @@ M:: ppc %allot ( dst size class nursery-ptr -- )
     dst class store-tagged ;
 
 : load-cards-offset ( dst -- )
-    [ "cards_offset" f %alien-global ] [ dup 0 LWZ ] bi ;
+    [ "cards_offset" %load-vm-field-addr ] [ dup 0 LWZ ] bi ;
 
 : load-decks-offset ( dst -- )
-    [ "decks_offset" f %alien-global ] [ dup 0 LWZ ] bi  ;
+    [ "decks_offset" %load-vm-field-addr ] [ dup 0 LWZ ] bi  ;
 
 M:: ppc %write-barrier ( src card# table -- )
     card-mark scratch-reg LI
