@@ -69,18 +69,11 @@ M: rs-loc translate-local-loc n>> current-height get r>> - <rs-loc> ;
 
 : peek-loc ( loc -- vreg )
     translate-local-loc
-    dup local-replace-set get key? [ dup local-peek-set get conjoin ] unless
-    dup replace-mapping get at [ ] [ loc>vreg ] ?if ;
+    dup replace-mapping get at
+    [ ] [ dup local-peek-set get conjoin loc>vreg ] ?if ;
 
 : replace-loc ( vreg loc -- )
-    translate-local-loc
-    2dup loc>vreg =
-    [ nip replace-mapping get delete-at ]
-    [
-        [ local-replace-set get conjoin ]
-        [ replace-mapping get set-at ]
-        bi
-    ] if ;
+    translate-local-loc replace-mapping get set-at ;
 
 : compute-local-kill-set ( -- assoc )
     basic-block get current-height get
@@ -90,13 +83,17 @@ M: rs-loc translate-local-loc n>> current-height get r>> - <rs-loc> ;
 
 : begin-local-analysis ( -- )
     H{ } clone local-peek-set set
-    H{ } clone local-replace-set set
     H{ } clone replace-mapping set
     current-height get
     [ 0 >>emit-d 0 >>emit-r drop ]
     [ [ d>> ] [ r>> ] bi basic-block get record-stack-heights ] bi ;
 
+: remove-redundant-replaces ( -- )
+    replace-mapping get [ [ loc>vreg ] dip = not ] assoc-filter
+    [ replace-mapping set ] [ keys unique local-replace-set set ] bi ;
+
 : end-local-analysis ( -- )
+    remove-redundant-replaces
     emit-changes
     basic-block get {
         [ [ local-peek-set get ] dip peek-sets get set-at ]
