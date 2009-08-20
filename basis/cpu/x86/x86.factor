@@ -1,5 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+<<<<<<< HEAD
 USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
 cpu.architecture kernel kernel.private math memory namespaces make
@@ -12,6 +13,14 @@ compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.codegen
 compiler.codegen.fixup ;
+=======
+USING: accessors alien combinators compiler.cfg.comparisons
+compiler.cfg.intrinsics compiler.cfg.registers
+compiler.cfg.stack-frame compiler.codegen.fixup compiler.constants
+cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands fry
+kernel layouts locals make math math.order namespaces sequences system
+vm ;
+>>>>>>> Added a vm C-STRUCT, using it for struct offsets in x86 asm
 IN: cpu.x86
 
 << enable-fixnum-log2 >>
@@ -742,8 +751,8 @@ M:: x86 %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp1 0 MOV rc-absolute-cell rt-vm rel-fixup ! stack-chain is first item in vm struct. TODO: make vm C-STRUCT
-    temp1 temp1 [] MOV
+    temp1 0 MOV rc-absolute-cell rt-vm rel-fixup
+    temp1 temp1 "stack_chain" vm-offset [+] MOV
     temp2 stack-reg cell neg [+] LEA
     temp1 [] temp2 MOV
     callback-allowed? [
