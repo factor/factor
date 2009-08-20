@@ -29,6 +29,5 @@ static const cell deck_bits = (card_bits + 10);
 static const cell deck_size = (1<<deck_bits);
 static const cell addr_deck_mask = (deck_size-1);
 static const cell invalid_allot_marker = 0xff;
-extern cell allot_markers_offset;
 
 }

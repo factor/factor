@@ -7,6 +7,7 @@ struct factorvm {
 	/* new objects are allocated here */
 	zone nursery;
 
+
 	// segments
 	inline cell align_page(cell a);
 
@@ -169,6 +170,7 @@ struct factorvm {
 
 	
 	//write barrier
+	cell allot_markers_offset;
 	inline card *addr_to_card(cell a);
 	inline cell card_to_addr(card *c);
 	inline cell card_offset(card *c);
