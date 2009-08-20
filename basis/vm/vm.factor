@@ -5,4 +5,4 @@ IN: vm
 
 C-STRUCT: vm { "context*" "stack_chain" } ;
 
-: vm-offset ( field -- offset ) "vm" offset-of ;
+: vm-field-offset ( field -- offset ) "vm" offset-of ;

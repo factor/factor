@@ -752,7 +752,7 @@ M:: x86 %save-context ( temp1 temp2 callback-allowed? -- )
     #! callback which does a GC, which must reliably trace
     #! all roots.
     temp1 0 MOV rc-absolute-cell rt-vm rel-fixup
-    temp1 temp1 "stack_chain" vm-offset [+] MOV
+    temp1 temp1 "stack_chain" vm-field-offset [+] MOV
     temp2 stack-reg cell neg [+] LEA
     temp1 [] temp2 MOV
     callback-allowed? [

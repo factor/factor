@@ -683,7 +683,7 @@ M: ppc %box-large-struct ( n c-type -- )
 
 : %load-vm-field-addr ( reg symbol -- )
     [ drop %load-vm-addr ]
-    [ [ dup ] dip vm-offset ADDI ] 2bi ;
+    [ [ dup ] dip vm-field-offset ADDI ] 2bi ;
 
 M:: ppc %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
