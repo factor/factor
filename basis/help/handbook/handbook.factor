@@ -288,6 +288,7 @@ ARTICLE: "handbook-tools-reference" "Developer tools"
 { $subsection "prettyprint" }
 { $subsection "inspector" }
 { $subsection "tools.annotations" }
+{ $subsection "tools.deprecation" }
 { $subsection "tools.inference" }
 { $heading "Browsing" }
 { $subsection "see" }
