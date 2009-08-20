@@ -101,6 +101,7 @@ M: object declarations. drop ;
 M: word declarations.
     {
         POSTPONE: delimiter
+        POSTPONE: deprecated
         POSTPONE: inline
         POSTPONE: recursive
         POSTPONE: foldable
