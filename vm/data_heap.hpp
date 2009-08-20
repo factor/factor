@@ -66,6 +66,3 @@ PRIMITIVE(next_object);
 PRIMITIVE(end_scan);
 
 }
-
-/* new objects are allocated here */
-VM_C_API factor::zone nursery;

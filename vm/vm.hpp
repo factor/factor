@@ -2,9 +2,10 @@ namespace factor
 {
 
 struct factorvm {
-
-	factor::context *stack_chain; 
-
+	// if you change this struct, also change vm.factor
+	context *stack_chain; 
+	/* new objects are allocated here */
+	zone nursery;
 
 	// segments
 	inline cell align_page(cell a);
