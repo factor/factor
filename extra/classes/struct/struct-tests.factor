@@ -1,7 +1,7 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien.c-types classes.c-types classes.struct
-combinators io.streams.string kernel libc math namespaces
-prettyprint prettyprint.config tools.test ;
+combinators io.streams.string kernel libc math multiline namespaces
+prettyprint prettyprint.config see tools.test ;
 IN: classes.struct.tests
 
 STRUCT: foo
@@ -46,3 +46,17 @@ UNION-STRUCT: float-and-bits
 [ "S{ foo f 0 7654 f }" ]
 [ t boa-tuples? [ foo <struct> 7654 >>y [ pprint ] with-string-writer ] with-variable ] unit-test
 
+[ <" USING: classes.c-types classes.struct kernel ;
+IN: classes.struct.tests
+STRUCT: foo
+    { x char initial: 0 } { y int initial: 123 }
+    { z boolean initial: f } ;
+"> ]
+[ [ foo see ] with-string-writer ] unit-test
+
+[ <" USING: classes.c-types classes.struct ;
+IN: classes.struct.tests
+UNION-STRUCT: float-and-bits
+    { f single-float initial: 0.0 } { bits uint initial: 0 } ;
+"> ]
+[ [ float-and-bits see ] with-string-writer ] unit-test
