@@ -612,7 +612,7 @@ M:: x86 %call-gc ( gc-root-count -- )
     ! Call GC
     "inline_gc" f %vm-invoke ;
 
-M: x86 %alien-global
+M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
@@ -742,7 +742,7 @@ M:: x86 %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp1 "stack_chain" f %alien-global
+    temp1 0 MOV rc-absolute-cell rt-vm rel-fixup ! stack-chain is first item in vm struct. TODO: make vm C-STRUCT
     temp1 temp1 [] MOV
     temp2 stack-reg cell neg [+] LEA
     temp1 [] temp2 MOV
