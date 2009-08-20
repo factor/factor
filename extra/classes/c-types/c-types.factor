@@ -61,33 +61,33 @@ SYMBOLS: long ulong long-bits ;
     ] if
 >>
 
-: set-class-c-type ( class c-type <direct-array> -- )
+: set-class-c-type ( class initial c-type <direct-array> -- )
+    [ "initial-value" set-word-prop ]
     [ c-type "class-c-type" set-word-prop ]
-    [ "class-direct-array" set-word-prop ] bi-curry* bi ;
+    [ "class-direct-array" set-word-prop ] tri-curry* tri ;
 
 : class-c-type ( class -- c-type )
     "class-c-type" word-prop ;
 : class-direct-array ( class -- <direct-array> )
     "class-direct-array" word-prop ;
 
-alien          "void*"          \ <direct-void*-array>          set-class-c-type
-\ f            "void*"          \ <direct-void*-array>          set-class-c-type
-pinned-c-ptr   "void*"          \ <direct-void*-array>          set-class-c-type
-boolean        "bool"           \ <direct-bool-array>           set-class-c-type
-char           "char"           \ <direct-char-array>           set-class-c-type
-uchar          "uchar"          \ <direct-uchar-array>          set-class-c-type
-short          "short"          \ <direct-short-array>          set-class-c-type
-ushort         "ushort"         \ <direct-ushort-array>         set-class-c-type
-int            "int"            \ <direct-int-array>            set-class-c-type
-uint           "uint"           \ <direct-uint-array>           set-class-c-type
-long           "long"           \ <direct-long-array>           set-class-c-type
-ulong          "ulong"          \ <direct-ulong-array>          set-class-c-type
-longlong       "longlong"       \ <direct-longlong-array>       set-class-c-type
-ulonglong      "ulonglong"      \ <direct-ulonglong-array>      set-class-c-type
-float          "double"         \ <direct-double-array>         set-class-c-type
-single-float   "float"          \ <direct-float-array>          set-class-c-type
-complex        "complex-double" \ <direct-complex-double-array> set-class-c-type
-single-complex "complex-float"  \ <direct-complex-float-array>  set-class-c-type
+\ f            f            "void*"          \ <direct-void*-array>          set-class-c-type
+pinned-c-ptr   f            "void*"          \ <direct-void*-array>          set-class-c-type
+boolean        f            "bool"           \ <direct-bool-array>           set-class-c-type
+char           0            "char"           \ <direct-char-array>           set-class-c-type
+uchar          0            "uchar"          \ <direct-uchar-array>          set-class-c-type
+short          0            "short"          \ <direct-short-array>          set-class-c-type
+ushort         0            "ushort"         \ <direct-ushort-array>         set-class-c-type
+int            0            "int"            \ <direct-int-array>            set-class-c-type
+uint           0            "uint"           \ <direct-uint-array>           set-class-c-type
+long           0            "long"           \ <direct-long-array>           set-class-c-type
+ulong          0            "ulong"          \ <direct-ulong-array>          set-class-c-type
+longlong       0            "longlong"       \ <direct-longlong-array>       set-class-c-type
+ulonglong      0            "ulonglong"      \ <direct-ulonglong-array>      set-class-c-type
+float          0.0          "double"         \ <direct-double-array>         set-class-c-type
+single-float   0.0          "float"          \ <direct-float-array>          set-class-c-type
+complex        C{ 0.0 0.0 } "complex-double" \ <direct-complex-double-array> set-class-c-type
+single-complex C{ 0.0 0.0 } "complex-float"  \ <direct-complex-float-array>  set-class-c-type
 
 char      [  8 bits  8 >signed ] "coercer" set-word-prop
 uchar     [  8 bits            ] "coercer" set-word-prop
