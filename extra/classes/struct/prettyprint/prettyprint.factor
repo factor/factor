@@ -1,6 +1,7 @@
 ! (c)Joe Groff bsd license
-USING: classes.struct kernel prettyprint.backend prettyprint.custom
-prettyprint.sections see.private sequences words ;
+USING: accessors assocs classes classes.struct kernel math
+prettyprint.backend prettyprint.custom prettyprint.sections
+see.private sequences words ;
 IN: classes.struct.prettyprint
 
 <PRIVATE

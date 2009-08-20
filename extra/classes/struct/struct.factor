@@ -3,8 +3,8 @@ USING: accessors alien alien.c-types byte-arrays classes
 classes.c-types classes.parser classes.tuple
 classes.tuple.parser classes.tuple.private combinators
 combinators.smart fry generalizations generic.parser kernel
-kernel.private libc macros make math math.order quotations
-sequences slots slots.private struct-arrays words ;
+kernel.private libc macros make math math.order parser
+quotations sequences slots slots.private struct-arrays words ;
 IN: classes.struct
 
 ! struct class
@@ -15,7 +15,7 @@ TUPLE: struct
 PREDICATE: struct-class < tuple-class
     \ struct subclass-of? ;
 
-M: struct-class struct-slots
+: struct-slots ( struct -- slots )
     "struct-slots" word-prop ;
 
 ! struct allocation
@@ -48,7 +48,7 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
     ] [ ] output>sequence ;
 
 : pad-struct-slots ( values class -- values' class )
-    [ class-slots [ initial>> ] map over length tail append ] keep ;
+    [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
 : (writer-quot) ( slot -- quot )
     [ class>> c-setter ]
@@ -136,7 +136,7 @@ M: struct-class direct-array-of
 
 : (struct-word-props) ( class slots size align -- )
     [
-        [ struct-slots ]
+        [ "struct-slots" set-word-prop ]
         [ define-accessors ] 2bi
     ]
     [ "struct-size" set-word-prop ]
@@ -174,4 +174,4 @@ USING: vocabs vocabs.loader ;
 "prettyprint" vocab [ "classes.struct.prettyprint" require ] when
 
 SYNTAX: S{
-    scan-word dup struct-slots parse-tuple-literal-slots ;
+    scan-word dup struct-slots parse-tuple-literal-slots parsed ;
