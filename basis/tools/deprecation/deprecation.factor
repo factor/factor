@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays assocs compiler.units
-debugger io kernel namespaces prettyprint sequences
+debugger init io kernel namespaces prettyprint sequences
 source-files.errors summary tools.crossref
 tools.crossref.private tools.errors words ;
 IN: tools.deprecation
@@ -67,6 +67,7 @@ M: deprecation-observer definitions-changed
     [ [ check-deprecations ] each ]
     [ drop initialize-deprecation-notes ] if ;
 
-\ deprecation-observer add-definition-observer
+[ \ deprecation-observer add-definition-observer ] 
+"tools.deprecation" add-init-hook
 
 initialize-deprecation-notes
