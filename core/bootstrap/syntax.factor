@@ -67,6 +67,7 @@ IN: bootstrap.syntax
     "M\\"
     "]"
     "delimiter"
+    "deprecated"
     "f"
     "flushable"
     "foldable"
