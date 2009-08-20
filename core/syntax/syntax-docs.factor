@@ -193,7 +193,7 @@ HELP: delimiter
 
 HELP: deprecated
 { $syntax ": foo ... ; deprecated" }
-{ $description "Declares the most recently defined word as deprecated. If the " { $vocab-link "deprecation" } " vocabulary is loaded, usages of deprecated words will be noted as they are made." } ;
+{ $description "Declares the most recently defined word as deprecated. If the " { $vocab-link "tools.deprecation" } " vocabulary is loaded, usages of deprecated words will be noted as they are made." } ;
 
 HELP: SYNTAX:
 { $syntax "SYNTAX: foo ... ;" }
