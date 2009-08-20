@@ -23,7 +23,11 @@ GENERIC# compute-in-set 2 ( bb out-sets dfa -- set )
 M: kill-block compute-in-set 3drop f ;
 
 M:: basic-block compute-in-set ( bb out-sets dfa -- set )
-    bb dfa predecessors [ out-sets at ] map bb dfa join-sets ;
+    ! Only consider initialized sets.
+    bb dfa predecessors
+    [ out-sets key? ] filter
+    [ out-sets at ] map
+    bb dfa join-sets ;
 
 :: update-in-set ( bb in-sets out-sets dfa -- ? )
     bb out-sets dfa compute-in-set
