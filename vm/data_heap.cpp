@@ -1,12 +1,7 @@
 #include "master.hpp"
 
-factor::zone nursery;
-
 namespace factor
 {
-
-/* new objects are allocated here */
-VM_C_API zone nursery;
 
 cell factorvm::init_zone(zone *z, cell size, cell start)
 {
