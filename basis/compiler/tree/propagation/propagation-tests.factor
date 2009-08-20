@@ -165,6 +165,10 @@ IN: compiler.tree.propagation.tests
 
 [ t ] [ [ { float } declare absq ] final-info first interval>> [0,inf] = ] unit-test
 
+[ t ] [ [ { complex } declare abs ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { complex } declare absq ] final-info first interval>> [0,inf] = ] unit-test
+
 [ t ] [ [ [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
 
 [ t ] [ [ { double-array double-array } declare [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
