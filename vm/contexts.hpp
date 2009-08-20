@@ -50,7 +50,6 @@ PRIMITIVE(set_datastack);
 PRIMITIVE(set_retainstack);
 PRIMITIVE(check_datastack);
 
-VM_C_API void save_stacks();
 VM_C_API void nest_stacks();
 VM_C_API void unnest_stacks();
 
