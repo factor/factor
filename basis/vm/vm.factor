@@ -3,6 +3,18 @@
 USING: alien.structs alien.syntax ;
 IN: vm
 
-C-STRUCT: vm { "context*" "stack_chain" } ;
+TYPEDEF: void* cell
+
+C-STRUCT: zone
+    { "cell" "start" }
+    { "cell" "here" }
+    { "cell" "size" }
+    { "cell" "end" }
+    ;
+
+C-STRUCT: vm
+    { "context*" "stack_chain" }
+    { "zone" "nursery" }
+    ;
 
 : vm-field-offset ( field -- offset ) "vm" offset-of ;

@@ -566,7 +566,8 @@ M: x86 %sar [ SAR ] emit-shift ;
 
 : load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
-    0 MOV "nursery" f rc-absolute-cell rel-dlsym ;
+    [ 0 MOV rc-absolute-cell rt-vm rel-fixup ]
+    [ "nursery" vm-field-offset ADD ] bi ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap cell [+] MOV ] 2bi ;

@@ -29,6 +29,14 @@ enable-float-intrinsics
 \ ##float>integer t frame-required? set-word-prop
 >>
 
+: %load-vm-addr ( reg -- )
+    0 swap LOAD32 rc-absolute-ppc-2/2 rt-vm rel-fixup ;
+
+: %load-vm-field-addr ( reg symbol -- )
+    [ drop %load-vm-addr ]
+    [ [ dup ] dip vm-field-offset ADDI ] 2bi ;
+
+
 M: ppc machine-registers
     {
         { int-regs $[ 2 12 [a,b] 15 29 [a,b] append ] }
@@ -418,7 +426,7 @@ M: ppc %set-alien-float swap 0 STFS ;
 M: ppc %set-alien-double swap 0 STFD ;
 
 : load-zone-ptr ( reg -- )
-    "nursery" f %alien-global ;
+    "nursery" %load-vm-field-addr ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap 4 LWZ ] 2bi ;
@@ -677,13 +685,6 @@ M: ppc %box-large-struct ( n c-type -- )
     [ [ 3 1 ] dip struct-return@ ADDI ] [ heap-size 4 LI ] bi*
     ! Call the function
     "box_value_struct" f %alien-invoke ;
-
-: %load-vm-addr ( reg -- )
-    0 swap LOAD32 rc-absolute-ppc-2/2 rt-vm rel-fixup ;
-
-: %load-vm-field-addr ( reg symbol -- )
-    [ drop %load-vm-addr ]
-    [ [ dup ] dip vm-field-offset ADDI ] 2bi ;
 
 M:: ppc %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
