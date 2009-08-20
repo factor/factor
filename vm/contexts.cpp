@@ -35,11 +35,6 @@ void factorvm::save_stacks()
 	}
 }
 
-void save_stacks()
-{
-	return vm->save_stacks();
-}
-
 context *factorvm::alloc_context()
 {
 	context *new_context;
