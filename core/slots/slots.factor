@@ -166,6 +166,7 @@ M: class initial-value* no-initial-value ;
 
 : initial-value ( class -- object )
     {
+        { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop ] }
         { [ \ f bootstrap-word over class<= ] [ f ] }
         { [ \ array-capacity bootstrap-word over class<= ] [ 0 ] }
         { [ float bootstrap-word over class<= ] [ 0.0 ] }
@@ -233,5 +234,8 @@ M: slot-spec make-slot
 : finalize-slots ( specs base -- specs )
     over length iota [ + ] with map [ >>offset ] 2map ;
 
+: slot-named* ( name specs -- offset spec/f )
+    [ name>> = ] with find ;
+
 : slot-named ( name specs -- spec/f )
-    [ name>> = ] with find nip ;
+    slot-named* nip ;
