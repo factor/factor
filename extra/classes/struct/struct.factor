@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types byte-arrays classes
-classes.c-types classes.parser classes.tuple
+USING: accessors alien alien.c-types alien.structs arrays
+byte-arrays classes classes.c-types classes.parser classes.tuple
 classes.tuple.parser classes.tuple.private combinators
 combinators.smart fry generalizations generic.parser kernel
 kernel.private libc macros make math math.order parser
@@ -50,9 +50,19 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 : pad-struct-slots ( values class -- values' class )
     [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
+: (reader-quot) ( slot -- quot )
+    [ class>> c-type-getter-boxer ]
+    [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+
 : (writer-quot) ( slot -- quot )
     [ class>> c-setter ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+
+: (boxer-quot) ( class -- quot )
+    '[ _ memory>struct ] ;
+
+: (unboxer-quot) ( class -- quot )
+    drop [ >c-ptr ] ;
 
 M: struct-class boa>object
     swap pad-struct-slots
@@ -64,9 +74,7 @@ M: struct-class boa>object
 GENERIC: struct-slot-values ( struct -- sequence )
 
 M: struct-class reader-quot
-    nip
-    [ class>> c-type-getter-boxer ]
-    [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+    nip (reader-quot) ;
 
 M: struct-class writer-quot
     nip (writer-quot) ;
@@ -83,6 +91,19 @@ M: struct-class writer-quot
 
 ! Struct as c-type
 
+: slot>field ( slot -- field )
+    [ class>> c-type ] [ name>> ] bi 2array ;
+
+: define-struct-for-class ( class -- )
+    [
+        [ name>> ] [ vocabulary>> ] [ struct-slots [ slot>field ] map ] tri
+        define-struct
+    ] [
+        [ name>> c-type ]
+        [ (unboxer-quot) >>unboxer-quot ]
+        [ (boxer-quot) >>boxer-quot ] tri drop
+    ] bi ;
+
 : align-offset ( offset class -- offset' )
     c-type-align align ;
 
@@ -98,7 +119,8 @@ M: struct-class writer-quot
 : struct-align ( slots -- align )
     [ class>> c-type-align ] [ max ] map-reduce ;
 
-M: struct-class c-type ;
+M: struct-class c-type
+    name>> c-type ;
 
 M: struct-class c-type-align
     "struct-align" word-prop ;
@@ -111,10 +133,10 @@ M: struct-class c-type-setter
     '[ @ swap @ _ memcpy ] ;
 
 M: struct-class c-type-boxer-quot
-    '[ _ memory>struct ] ;
+    (boxer-quot) ;
 
 M: struct-class c-type-unboxer-quot
-    drop [ >c-ptr ] ;
+    (unboxer-quot) ;
 
 M: struct-class heap-size
     "struct-size" word-prop ;
@@ -149,11 +171,13 @@ M: struct-class direct-array-of
     [ class>> c-type drop ] each ;
 
 : (define-struct-class) ( class slots offsets-quot -- )
-    [ drop struct f define-tuple-class ] swap '[
+    [ drop struct f define-tuple-class ] swap
+    '[
         make-slots dup
         [ check-struct-slots ] _ [ struct-align [ align ] keep ] tri
         (struct-word-props)
-    ] 2bi ; inline
+    ]
+    [ drop define-struct-for-class ] 2tri ; inline
 
 : define-struct-class ( class slots -- )
     [ struct-offsets ] (define-struct-class) ;
