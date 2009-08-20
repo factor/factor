@@ -4,7 +4,7 @@ USING: kernel kernel.private tools.test math math.partial-dispatch
 prettyprint math.private accessors slots.private sequences
 sequences.private strings sbufs compiler.tree.builder
 compiler.tree.normalization compiler.tree.debugger alien.accessors
-layouts combinators byte-arrays ;
+layouts combinators byte-arrays arrays ;
 IN: compiler.tree.modular-arithmetic.tests
 
 : test-modular-arithmetic ( quot -- quot' )
@@ -134,7 +134,7 @@ TUPLE: declared-fixnum { x fixnum } ;
     ] { mod fixnum-mod rem } inlined?
 ] unit-test
 
-[ [ >fixnum 255 fixnum-bitand ] ]
+[ [ >fixnum 255 >R R> fixnum-bitand ] ]
 [ [ >integer 256 rem ] test-modular-arithmetic ] unit-test
 
 [ t ] [
@@ -201,6 +201,21 @@ cell {
     { >fixnum } inlined?
 ] unit-test
 
+[ t ] [
+    [ >integer [ >fixnum ] [ >fixnum ] bi ]
+    { >integer } inlined?
+] unit-test
+
+[ f ] [
+    [ >bignum [ >fixnum ] [ >fixnum ] bi ]
+    { >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ >bignum [ >fixnum ] [ >fixnum ] bi ]
+    { >bignum } inlined?
+] unit-test
+
 [ f ] [
     [ [ { fixnum } declare 2 fixnum+ ] dip [ >fixnum 2 - ] [ ] if ]
     { fixnum+ } inlined?
@@ -257,4 +272,21 @@ cell {
 [ f ] [
     [ [ >fixnum ] 2dip set-alien-unsigned-1 ]
     { >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum } declare 123 >bignum bitand >fixnum ]
+    { >bignum fixnum>bignum bignum-bitand } inlined?
+] unit-test
+
+! Shifts
+[ t ] [
+    [
+        [ 0 ] 2dip { array } declare [
+            hashcode* >fixnum swap [
+                [ -2 shift ] [ 5 shift ] bi
+                + +
+            ] keep bitxor >fixnum
+        ] with each
+    ] { + bignum+ fixnum-shift bitxor bignum-bitxor } inlined?
 ] unit-test
