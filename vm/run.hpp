@@ -109,5 +109,4 @@ PRIMITIVE(clone);
 
 }
 
-/* TAGGED user environment data; see getenv/setenv prims */
-VM_C_API factor::cell userenv[USER_ENV];
+ 

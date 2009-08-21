@@ -81,8 +81,8 @@ void jit::emit_with(cell code_template_, cell argument_) {
 
 void jit::emit_class_lookup(fixnum index, cell type)
 {
-	emit_with(userenv[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
-	emit(userenv[type]);
+	emit_with(myvm->userenv[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
+	emit(myvm->userenv[type]);
 }
 
 /* Facility to convert compiled code offsets to quotation offsets.
