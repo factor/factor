@@ -15,7 +15,7 @@ IN: benchmark.beust2
                     remaining 1 <= [
                         listener call f
                     ] [
-                        remaining 1-
+                        remaining 1 -
                         0
                         value' 10 *
                         used mask bitor
@@ -29,12 +29,12 @@ IN: benchmark.beust2
     ] any? ; inline recursive
 
 :: count-numbers ( max listener -- )
-    10 iota [ 1+ 1 1 0 max listener (count-numbers) ] any? drop ;
+    10 iota [ 1 + 1 1 0 max listener (count-numbers) ] any? drop ;
     inline
 
 :: beust ( -- )
     [let | i! [ 0 ] |
-        5000000000 [ i 1+ i! ] count-numbers
+        5000000000 [ i 1 + i! ] count-numbers
         i number>string " unique numbers." append print
     ] ;
 

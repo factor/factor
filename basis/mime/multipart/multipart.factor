@@ -46,7 +46,7 @@ ERROR: end-of-stream multipart ;
     dup bytes>> length 256 < [ fill-bytes ] when ;
 
 : split-bytes ( bytes separator -- leftover-bytes safe-to-dump )
-    dupd [ length ] bi@ 1- - short cut-slice swap ;
+    dupd [ length ] bi@ 1 - - short cut-slice swap ;
 
 : dump-until-separator ( multipart -- multipart )
     dup

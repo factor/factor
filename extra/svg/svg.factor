@@ -11,7 +11,7 @@ XML-NS: inkscape-name http://www.inkscape.org/namespaces/inkscape
 
 : svg-string>number ( string -- number )
     { { CHAR: E CHAR: e } } substitute "e" split1
-    [ string>number ] [ [ string>number 10 swap ^ ] [ 1 ] if* ] bi* *
+    [ string>number ] [ [ string>number 10^ ] [ 1 ] if* ] bi* *
     >float ;
 
 : degrees ( deg -- rad ) pi * 180.0 / ;

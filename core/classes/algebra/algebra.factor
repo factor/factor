@@ -202,9 +202,11 @@ M: anonymous-complement (classes-intersect?)
 : class= ( first second -- ? )
     [ class<= ] [ swap class<= ] 2bi and ;
 
+ERROR: topological-sort-failed ;
+
 : largest-class ( seq -- n elt )
     dup [ [ class< ] with any? not ] curry find-last
-    [ "Topological sort failed" throw ] unless* ;
+    [ topological-sort-failed ] unless* ;
 
 : sort-classes ( seq -- newseq )
     [ name>> ] sort-with >vector

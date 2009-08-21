@@ -87,7 +87,7 @@ SYMBOL: and-needed?
     ] if ;
 
 : (number>text) ( n -- str )
-    [ negative-text ] [ abs 3digit-groups recombine ] bi append ;
+    [ negative-text ] [ abs 3 digit-groups recombine ] bi append ;
 
 PRIVATE>
 

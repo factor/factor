@@ -1,6 +1,6 @@
-IN: bootstrap.image.tests
 USING: bootstrap.image bootstrap.image.private tools.test
 kernel math ;
+IN: bootstrap.image.tests
 
 [ f ] [ { 1 2 3 } [ 1 2 3 ] eql? ] unit-test
 

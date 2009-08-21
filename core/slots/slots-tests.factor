@@ -1,6 +1,6 @@
-IN: slots.tests
 USING: math accessors slots strings generic.single kernel
 tools.test generic words parser eval math.functions ;
+IN: slots.tests
 
 TUPLE: r/w-test foo ;
 
@@ -18,23 +18,6 @@ TUPLE: hello length ;
 
 [ "xyz" 4 >>length ] [ no-method? ] must-fail-with
 
-[ t ] [ r/o-test \ foo>> method "foldable" word-prop ] unit-test
-[ t ] [ r/o-test \ foo>> method "flushable" word-prop ] unit-test
-
-[ f ] [ r/w-test \ foo>> method "foldable" word-prop ] unit-test
-[ t ] [ r/w-test \ foo>> method "flushable" word-prop ] unit-test
-
-! See if declarations are cleared on redefinition
-[ ] [ "IN: slots.tests TUPLE: r/w-test { foo read-only } ;" eval( -- ) ] unit-test
-
-[ t ] [ r/w-test \ foo>> method "foldable" word-prop ] unit-test
-[ t ] [ r/w-test \ foo>> method "flushable" word-prop ] unit-test
-
-[ ] [ "IN: slots.tests TUPLE: r/w-test foo ;" eval( -- ) ] unit-test
-
-[ f ] [ r/w-test \ foo>> method "foldable" word-prop ] unit-test
-[ t ] [ r/w-test \ foo>> method "flushable" word-prop ] unit-test
-
 ! Test protocol slots
 SLOT: my-protocol-slot-test
 
@@ -49,3 +32,10 @@ M: protocol-slot-test-tuple (>>my-protocol-slot-test) [ sqrt ] dip (>>x) ;
     T{ protocol-slot-test-tuple { x 3 } } clone
     [ 7 + ] change-my-protocol-slot-test x>>
 ] unit-test
+
+UNION: comme-ci integer float ;
+UNION: comme-ca integer float ;
+comme-ca 25.5 "initial-value" set-word-prop
+
+[ 0 ]    [ comme-ci initial-value ] unit-test
+[ 25.5 ] [ comme-ca initial-value ] unit-test

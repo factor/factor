@@ -23,14 +23,14 @@ SINGLETON: char-elt
 : prev ( loc document quot: ( loc document -- loc ) -- loc )
     {
         { [ pick { 0 0 } = ] [ 2drop ] }
-        { [ pick second zero? ] [ drop [ first 1- ] dip line-end ] }
+        { [ pick second zero? ] [ drop [ first 1 - ] dip line-end ] }
         [ call ]
     } cond ; inline
 
 : next ( loc document quot: ( loc document -- loc ) -- loc )
     {
         { [ 2over doc-end = ] [ 2drop ] }
-        { [ 2over line-end? ] [ 2drop first 1+ 0 2array ] }
+        { [ 2over line-end? ] [ 2drop first 1 + 0 2array ] }
         [ call ]
     } cond ; inline
 
@@ -73,7 +73,7 @@ SINGLETON: one-word-elt
 
 M: one-word-elt prev-elt
     drop
-    [ [ 1- ] dip f prev-word ] modify-col ;
+    [ [ 1 - ] dip f prev-word ] modify-col ;
 
 M: one-word-elt next-elt
     drop
@@ -90,7 +90,7 @@ SINGLETON: word-elt
 
 M: word-elt prev-elt
     drop
-    [ [ [ 1- ] dip blank-at? prev-word ] modify-col ]
+    [ [ [ 1 - ] dip blank-at? prev-word ] modify-col ]
     prev ;
 
 M: word-elt next-elt

@@ -1,6 +1,6 @@
-IN: compiler.cfg.two-operand.tests
 USING: kernel compiler.cfg.two-operand compiler.cfg.instructions
 compiler.cfg.registers cpu.architecture namespaces tools.test ;
+IN: compiler.cfg.two-operand.tests
 
 3 vreg-counter set-global
 

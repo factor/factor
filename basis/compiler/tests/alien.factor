@@ -395,7 +395,7 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 
 : callback-9 ( -- callback )
     "int" { "int" "int" "int" } "cdecl" [
-        + + 1+
+        + + 1 +
     ] alien-callback ;
 
 FUNCTION: void ffi_test_36_point_5 ( ) ;

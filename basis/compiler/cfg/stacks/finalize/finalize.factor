@@ -45,7 +45,7 @@ ERROR: bad-peek dst loc ;
     ! computing anything.
     2dup [ kill-block? ] both? [ 2drop ] [
         2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ] V{ } make
-        [ 2drop ] [ <simple-block> insert-basic-block ] if-empty
+        [ 2drop ] [ insert-simple-basic-block ] if-empty
     ] if ;
 
 : visit-block ( bb -- )

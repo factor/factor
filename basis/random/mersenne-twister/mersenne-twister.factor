@@ -17,7 +17,7 @@ CONSTANT: a uint-array{ 0 HEX: 9908b0df }
 
 : y ( n seq -- y )
     [ nth-unsafe 31 mask-bit ]
-    [ [ 1+ ] [ nth-unsafe ] bi* 31 bits ] 2bi bitor ; inline
+    [ [ 1 + ] [ nth-unsafe ] bi* 31 bits ] 2bi bitor ; inline
 
 : mt[k] ( offset n seq -- )
     [
@@ -30,16 +30,16 @@ CONSTANT: a uint-array{ 0 HEX: 9908b0df }
     [
         seq>>
         [ [ n m - ] dip '[ [ m ] dip _ mt[k] ] each ]
-        [ [ m 1- ] dip '[ [ m n - ] [ n m - + ] bi* _ mt[k] ] each ]
+        [ [ m 1 - ] dip '[ [ m n - ] [ n m - + ] bi* _ mt[k] ] each ]
         bi
     ] [ 0 >>i drop ] bi ; inline
 
 : init-mt-formula ( i seq -- f(seq[i]) )
-    dupd nth dup -30 shift bitxor 1812433253 * + 1+ 32 bits ; inline
+    dupd nth dup -30 shift bitxor 1812433253 * + 1 + 32 bits ; inline
 
 : init-mt-rest ( seq -- )
-    n 1- swap '[
-        _ [ init-mt-formula ] [ [ 1+ ] dip set-nth ] 2bi
+    n 1 - swap '[
+        _ [ init-mt-formula ] [ [ 1 + ] dip set-nth ] 2bi
     ] each ; inline
 
 : init-mt-seq ( seed -- seq )
@@ -67,7 +67,7 @@ M: mersenne-twister seed-random ( mt seed -- )
 M: mersenne-twister random-32* ( mt -- r )
     [ next-index ]
     [ seq>> nth-unsafe mt-temper ]
-    [ [ 1+ ] change-i drop ] tri ;
+    [ [ 1 + ] change-i drop ] tri ;
 
 [
     [ 32 random-bits ] with-system-random

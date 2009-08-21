@@ -23,7 +23,7 @@ TUPLE: list < pack index presenter color hook ;
         list-theme ;
 
 : calc-bounded-index ( n list -- m )
-    control-value length 1- min 0 max ;
+    control-value length 1 - min 0 max ;
 
 : bound-index ( list -- )
     dup index>> over calc-bounded-index >>index drop ;
@@ -83,10 +83,10 @@ M: list focusable-child* drop t ;
     ] if ;
 
 : select-previous ( list -- )
-    [ index>> 1- ] keep select-index ;
+    [ index>> 1 - ] keep select-index ;
 
 : select-next ( list -- )
-    [ index>> 1+ ] keep select-index ;
+    [ index>> 1 + ] keep select-index ;
 
 : invoke-value-action ( list -- )
     dup list-empty? [

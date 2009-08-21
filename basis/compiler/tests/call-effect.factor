@@ -1,5 +1,5 @@
-IN: compiler.tests.call-effect
 USING: tools.test combinators generic.single sequences kernel ;
+IN: compiler.tests.call-effect
 
 : execute-ic-test ( a b -- c ) execute( a -- c ) ;
 
