@@ -1,7 +1,5 @@
 #include "master.hpp"
 
-factor::cell userenv[USER_ENV];
-
 namespace factor
 {
 

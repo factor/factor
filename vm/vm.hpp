@@ -8,8 +8,7 @@ struct factorvm {
 	zone nursery; /* new objects are allocated here */
 	cell cards_offset;
 	cell decks_offset;
-	//	cell userenv[USER_ENV];  // prob best to put this last 
-
+	cell userenv[USER_ENV]; /* TAGGED user environment data; see getenv/setenv prims */
 
 
 	// segments
