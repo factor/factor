@@ -1,6 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-<<<<<<< HEAD
 USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
 cpu.architecture kernel kernel.private math memory namespaces make
@@ -12,15 +11,7 @@ compiler.cfg.intrinsics
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.codegen
-compiler.codegen.fixup ;
-=======
-USING: accessors alien combinators compiler.cfg.comparisons
-compiler.cfg.intrinsics compiler.cfg.registers
-compiler.cfg.stack-frame compiler.codegen.fixup compiler.constants
-cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands fry
-kernel layouts locals make math math.order namespaces sequences system
-vm ;
->>>>>>> Added a vm C-STRUCT, using it for struct offsets in x86 asm
+compiler.codegen.fixup vm ;
 IN: cpu.x86
 
 << enable-fixnum-log2 >>
@@ -564,10 +555,13 @@ M: x86 %shl [ SHL ] emit-shift ;
 M: x86 %shr [ SHR ] emit-shift ;
 M: x86 %sar [ SAR ] emit-shift ;
 
+M: x86 %vm-field-ptr ( dst field -- )
+    [ drop 0 MOV rc-absolute-cell rt-vm rel-fixup ]
+    [ vm-field-offset ADD ] 2bi ;
+
 : load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
-    [ 0 MOV rc-absolute-cell rt-vm rel-fixup ]
-    [ "nursery" vm-field-offset ADD ] bi ;
+    "nursery" %vm-field-ptr ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap cell [+] MOV ] 2bi ;
@@ -587,9 +581,6 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
     dst class store-tagged
     nursery-ptr size inc-allot-ptr ;
 
-: %vm-field-ptr ( reg field -- )
-    [ drop 0 MOV rc-absolute-cell rt-vm rel-fixup ]
-    [ vm-field-offset ADD ] 2bi ;
 
 M:: x86 %write-barrier ( src card# table -- )
     #! Mark the card pointed to by vreg.
@@ -627,7 +618,7 @@ M:: x86 %call-gc ( gc-root-count -- )
     "inline_gc" f %vm-invoke ;
 
 M: x86 %alien-global ( dst symbol library -- )
-    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
+    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
