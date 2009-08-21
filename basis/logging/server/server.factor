@@ -74,7 +74,7 @@ CONSTANT: keep-logs 10
     over exists? [ move-file ] [ 2drop ] if ;
 
 : advance-log ( path n -- )
-    [ 1- log# ] 2keep log# ?move-file ;
+    [ 1 - log# ] 2keep log# ?move-file ;
 
 : rotate-log ( service -- )
     dup close-log

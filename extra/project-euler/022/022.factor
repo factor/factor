@@ -32,7 +32,7 @@ IN: project-euler.022
     ascii file-contents [ quotable? ] filter "," split ;
 
 : name-scores ( seq -- seq )
-    [ 1+ swap alpha-value * ] map-index ;
+    [ 1 + swap alpha-value * ] map-index ;
 
 PRIVATE>
 

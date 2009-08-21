@@ -1,6 +1,6 @@
-IN: byte-vectors.tests
 USING: tools.test byte-vectors vectors sequences kernel
 prettyprint ;
+IN: byte-vectors.tests
 
 [ 0 ] [ 123 <byte-vector> length ] unit-test
 

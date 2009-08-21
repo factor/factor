@@ -47,7 +47,7 @@ M: callable run-pipeline-element
 PRIVATE>
 
 : run-pipeline ( seq -- results )
-    [ length dup zero? [ drop { } ] [ 1- <pipes> ] if ] keep
+    [ length dup zero? [ drop { } ] [ 1 - <pipes> ] if ] keep
     [
         [ [ first in>> ] [ second out>> ] bi ] dip
         run-pipeline-element

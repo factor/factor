@@ -9,10 +9,10 @@ C: <box> box
     dup i>> 1 <= [
         drop 1 <box>
     ] [
-        i>> 1- <box>
+        i>> 1 - <box>
         dup tuple-fib
         swap
-        i>> 1- <box>
+        i>> 1 - <box>
         tuple-fib
         swap i>> swap i>> + <box>
     ] if ; inline recursive

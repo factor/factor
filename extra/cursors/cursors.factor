@@ -68,7 +68,7 @@ M: from-sequence cursor-get-unsafe
     >from-sequence< nth-unsafe ;
 
 M: from-sequence cursor-advance
-    [ 1+ ] change-n drop ;
+    [ 1 + ] change-n drop ;
 
 : >input ( seq -- cursor )
     0 from-sequence boa ; inline

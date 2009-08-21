@@ -57,7 +57,7 @@ PRIVATE>
     2dup length 2 - >= [
         2drop
     ] [
-        [ 1+ dup 2 + ] dip subseq  hex> [ , ] when*
+        [ 1 + dup 2 + ] dip subseq  hex> [ , ] when*
     ] if ;
 
 : url-decode-% ( index str -- index str )
@@ -70,7 +70,7 @@ PRIVATE>
         2dup nth dup CHAR: % = [
             drop url-decode-% [ 3 + ] dip
         ] [
-            , [ 1+ ] dip
+            , [ 1 + ] dip
         ] if url-decode-iter
     ] if ;
 

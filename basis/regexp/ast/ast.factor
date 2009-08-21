@@ -56,7 +56,7 @@ M: at-least <times>
 : to-times ( term n -- ast )
     dup zero?
     [ 2drop epsilon ]
-    [ dupd 1- to-times 2array <concatenation> <maybe> ]
+    [ dupd 1 - to-times 2array <concatenation> <maybe> ]
     if ;
 
 M: from-to <times>

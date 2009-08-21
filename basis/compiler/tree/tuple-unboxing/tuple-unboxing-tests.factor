@@ -1,4 +1,3 @@
-IN: compiler.tree.tuple-unboxing.tests
 USING: tools.test compiler.tree
 compiler.tree.builder compiler.tree.recursive
 compiler.tree.normalization compiler.tree.propagation
@@ -7,6 +6,7 @@ compiler.tree.tuple-unboxing compiler.tree.checker
 compiler.tree.def-use kernel accessors sequences math
 math.private sorting math.order binary-search sequences.private
 slots.private ;
+IN: compiler.tree.tuple-unboxing.tests
 
 : test-unboxing ( quot -- )
     build-tree

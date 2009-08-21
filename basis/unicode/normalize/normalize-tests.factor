@@ -27,7 +27,7 @@ IN: unicode.normalize.tests
 :: assert= ( test spec quot -- )
     spec [
         [
-            [ 1- test nth ] bi@
+            [ 1 - test nth ] bi@
             [ 1quotation ] [ quot curry ] bi* unit-test
         ] with each
     ] assoc-each ;

@@ -54,17 +54,17 @@ TUPLE: CLASS-array
     [ \ CLASS [ tuple-prototype <repetition> concat ] [ tuple-arity ] bi ] keep
     \ CLASS-array boa ; inline
 
-M: CLASS-array length length>> ;
+M: CLASS-array length length>> ; inline
 
-M: CLASS-array nth-unsafe tuple-slice \ CLASS read-tuple ;
+M: CLASS-array nth-unsafe tuple-slice \ CLASS read-tuple ; inline
 
-M: CLASS-array set-nth-unsafe tuple-slice \ CLASS write-tuple ;
+M: CLASS-array set-nth-unsafe tuple-slice \ CLASS write-tuple ; inline
 
-M: CLASS-array new-sequence drop <CLASS-array> ;
+M: CLASS-array new-sequence drop <CLASS-array> ; inline
 
 : >CLASS-array ( seq -- tuple-array ) 0 <CLASS-array> clone-like ;
 
-M: CLASS-array like drop dup CLASS-array? [ >CLASS-array ] unless ;
+M: CLASS-array like drop dup CLASS-array? [ >CLASS-array ] unless ; inline
 
 INSTANCE: CLASS-array sequence
 

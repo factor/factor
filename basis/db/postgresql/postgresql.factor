@@ -88,7 +88,7 @@ M: postgresql-statement query-results ( query -- result-set )
     dup init-result-set ;
 
 M: postgresql-result-set advance-row ( result-set -- )
-    [ 1+ ] change-n drop ;
+    [ 1 + ] change-n drop ;
 
 M: postgresql-result-set more-rows? ( result-set -- ? )
     [ n>> ] [ max>> ] bi < ;

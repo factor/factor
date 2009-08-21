@@ -29,7 +29,7 @@ IN: quoted-printable
 
 : take-some ( seqs -- seqs seq )
     0 over [ length + dup 76 >= ] find drop nip
-    [ 1- cut-slice swap ] [ f swap ] if* concat ;
+    [ 1 - cut-slice swap ] [ f swap ] if* concat ;
 
 : divide-lines ( strings -- strings )
     [ dup ] [ take-some ] produce nip ;

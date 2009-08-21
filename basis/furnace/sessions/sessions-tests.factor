@@ -1,10 +1,10 @@
-IN: furnace.sessions.tests
 USING: tools.test http furnace.sessions furnace.actions
 http.server http.server.responses math namespaces make kernel
 accessors io.sockets io.servers.connection prettyprint
 io.streams.string io.files io.files.temp io.directories
 splitting destructors sequences db db.tuples db.sqlite
 continuations urls math.parser furnace furnace.utilities ;
+IN: furnace.sessions.tests
 
 : with-session ( session quot -- )
     [
@@ -19,7 +19,7 @@ M: foo init-session* drop 0 "x" sset ;
 
 M: foo call-responder*
     2drop
-    "x" [ 1+ ] schange
+    "x" [ 1 + ] schange
     "x" sget number>string "text/html" <content> ;
 
 : url-responder-mock-test ( -- string )
@@ -73,7 +73,7 @@ M: foo call-responder*
 
         [ 9 ] [ "x" sget sq ] unit-test
 
-        [ ] [ "x" [ 1- ] schange ] unit-test
+        [ ] [ "x" [ 1 - ] schange ] unit-test
 
         [ 4 ] [ "x" sget sq ] unit-test
 

@@ -7,7 +7,7 @@ IN: benchmark.fannkuch
 : count ( quot: ( -- ? ) -- n )
     #! Call quot until it returns false, return number of times
     #! it was true
-    [ 0 ] dip '[ _ dip swap [ [ 1+ ] when ] keep ] loop ; inline
+    [ 0 ] dip '[ _ dip swap [ [ 1 + ] when ] keep ] loop ; inline
 
 : count-flips ( perm -- flip# )
     '[
@@ -19,12 +19,12 @@ IN: benchmark.fannkuch
     [ CHAR: 0 + write1 ] each nl ; inline
 
 : fannkuch-step ( counter max-flips perm -- counter max-flips )
-    pick 30 < [ [ 1+ ] [ ] [ dup write-permutation ] tri* ] when
+    pick 30 < [ [ 1 + ] [ ] [ dup write-permutation ] tri* ] when
     count-flips max ; inline
 
 : fannkuch ( n -- )
     [
-        [ 0 0 ] dip [ 1+ ] B{ } map-as
+        [ 0 0 ] dip [ 1 + ] B{ } map-as
         [ fannkuch-step ] each-permutation nip
     ] keep
     "Pfannkuchen(" write pprint ") = " write . ;

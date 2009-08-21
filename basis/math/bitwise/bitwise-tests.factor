@@ -17,7 +17,8 @@ IN: math.bitwise.tests
 [ 256 ] [ 1 { 8 } bitfield ] unit-test
 [ 268 ] [ 3 1 { 8 2 } bitfield ] unit-test
 [ 268 ] [ 1 { 8 { 3 2 } } bitfield ] unit-test
-[ 512 ] [ 1 { { 1+ 8 } } bitfield ] unit-test
+: test-1+ ( x -- y ) 1 + ;
+[ 512 ] [ 1 { { test-1+ 8 } } bitfield ] unit-test
 
 CONSTANT: a 1
 CONSTANT: b 2

@@ -1,6 +1,6 @@
-IN: compiler.tree.propagation.recursive.tests
 USING: tools.test compiler.tree.propagation.recursive
 math.intervals kernel math literals layouts ;
+IN: compiler.tree.propagation.recursive.tests
 
 [ T{ interval f { 0 t } { 1/0. t } } ] [
     T{ interval f { 1 t } { 1 t } }

@@ -103,7 +103,7 @@ TUPLE: run-loop fds sources timers ;
 : (reset-timer) ( timer counter -- )
     yield {
         { [ dup 0 = ] [ now ((reset-timer)) ] }
-        { [ run-queue deque-empty? not ] [ 1- (reset-timer) ] }
+        { [ run-queue deque-empty? not ] [ 1 - (reset-timer) ] }
         { [ sleep-queue heap-empty? ] [ 5 minutes hence ((reset-timer)) ] }
         [ sleep-queue heap-peek nip micros>timestamp ((reset-timer)) ]
     } cond ;

@@ -37,7 +37,7 @@ IN: project-euler.046
     dup perfect-squares [ 2 * - ] with map [ prime? ] any? ;
 
 : next-odd-composite ( n -- m )
-    dup odd? [ 2 + ] [ 1+ ] if dup prime? [ next-odd-composite ] when ;
+    dup odd? [ 2 + ] [ 1 + ] if dup prime? [ next-odd-composite ] when ;
 
 : disprove-conjecture ( n -- m )
     dup fits-conjecture? [ next-odd-composite disprove-conjecture ] when ;

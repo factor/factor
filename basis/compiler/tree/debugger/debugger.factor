@@ -11,6 +11,8 @@ compiler.tree.normalization
 compiler.tree.cleanup
 compiler.tree.propagation
 compiler.tree.propagation.info
+compiler.tree.escape-analysis
+compiler.tree.tuple-unboxing
 compiler.tree.def-use
 compiler.tree.builder
 compiler.tree.optimizer
@@ -154,7 +156,7 @@ SYMBOL: node-count
         H{ } clone intrinsics-called set
 
         0 swap [
-            [ 1+ ] dip
+            [ 1 + ] dip
             dup #call? [
                 word>> {
                     { [ dup "intrinsic" word-prop ] [ intrinsics-called ] }
@@ -209,6 +211,8 @@ SYMBOL: node-count
         normalize
         propagate
         cleanup
+        escape-analysis
+        unbox-tuples
         apply-identities
         compute-def-use
         remove-dead-code

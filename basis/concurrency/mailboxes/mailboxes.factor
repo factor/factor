@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: concurrency.mailboxes
 USING: dlists deques threads sequences continuations
 destructors namespaces math quotations words kernel
 arrays assocs init system concurrency.conditions accessors
 debugger debugger.threads locals fry ;
+IN: concurrency.mailboxes
 
 TUPLE: mailbox threads data disposed ;
 

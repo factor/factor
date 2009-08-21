@@ -58,7 +58,7 @@ IN: project-euler.186
         pick [ next ] [ next ] bi
         [ = ] [
             pick equate
-            [ 1+ ] dip
+            [ 1 + ] dip
         ] 2unless? (p186)
     ] [
         drop nip

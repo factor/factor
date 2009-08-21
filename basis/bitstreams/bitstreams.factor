@@ -70,7 +70,7 @@ GENERIC: poke ( value n bitstream -- )
     [ get-abp + ] [ set-abp ] bi ; inline
     
 : (align) ( n m -- n' )
-    [ /mod 0 > [ 1+ ] when ] [ * ] bi ; inline
+    [ /mod 0 > [ 1 + ] when ] [ * ] bi ; inline
     
 : align ( n bitstream -- )
     [ get-abp swap (align) ] [ set-abp ] bi ; inline

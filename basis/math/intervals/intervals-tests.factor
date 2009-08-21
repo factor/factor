@@ -113,6 +113,22 @@ IN: math.intervals.tests
     0 1 (a,b) 0 1 [a,b] interval-subset?
 ] unit-test
 
+[ t ] [
+    full-interval -1/0. 1/0. [a,b] interval-subset?
+] unit-test
+
+[ t ] [
+    -1/0. 1/0. [a,b] full-interval interval-subset?
+] unit-test
+
+[ f ] [
+    full-interval 0 1/0. [a,b] interval-subset?
+] unit-test
+
+[ t ] [
+    0 1/0. [a,b] full-interval interval-subset?
+] unit-test
+
 [ f ] [
     0 0 1 (a,b) interval-contains?
 ] unit-test
@@ -251,8 +267,6 @@ IN: math.intervals.tests
         { bitnot interval-bitnot }
         { abs interval-abs }
         { 2/ interval-2/ }
-        { 1+ interval-1+ }
-        { 1- interval-1- }
         { neg interval-neg }
     }
     "math.ratios.private" vocab [
@@ -333,6 +347,10 @@ comparison-ops [
 [ t ] [ -10 10 [a,b] 0 100 [a,b] assume<= -10 10 [a,b] = ] unit-test
 
 [ t ] [ -10 10 [a,b] interval-abs 0 10 [a,b] = ] unit-test
+
+[ t ] [ full-interval interval-abs [0,inf] = ] unit-test
+
+[ t ] [ [0,inf] interval-sq [0,inf] = ] unit-test
 
 ! Test that commutative interval ops really are
 : random-interval-or-empty ( -- obj )

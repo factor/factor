@@ -1,7 +1,7 @@
-IN: cocoa.plists.tests
 USING: tools.test cocoa.plists colors kernel hashtables
 core-foundation.utilities core-foundation destructors
 assocs cocoa.enumeration ;
+IN: cocoa.plists.tests
 
 [
     [ V{ } ] [ H{ } >cf &CFRelease [ ] NSFastEnumeration-map ] unit-test

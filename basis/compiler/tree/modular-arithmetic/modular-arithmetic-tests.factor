@@ -1,12 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler.tree.modular-arithmetic.tests
 USING: kernel kernel.private tools.test math math.partial-dispatch
-math.private accessors slots.private sequences sequences.private strings sbufs
-compiler.tree.builder
-compiler.tree.normalization
-compiler.tree.debugger
-alien.accessors layouts combinators byte-arrays ;
+prettyprint math.private accessors slots.private sequences
+sequences.private strings sbufs compiler.tree.builder
+compiler.tree.normalization compiler.tree.debugger alien.accessors
+layouts combinators byte-arrays arrays ;
+IN: compiler.tree.modular-arithmetic.tests
 
 : test-modular-arithmetic ( quot -- quot' )
     cleaned-up-tree nodes>quot ;
@@ -93,8 +92,6 @@ TUPLE: declared-fixnum { x fixnum } ;
     [ { string sbuf } declare ] \ push-all def>> append \ >fixnum inlined?
 ] unit-test
 
-
-
 [ t ] [
     [
         { integer } declare [ 256 mod ] map
@@ -137,8 +134,13 @@ TUPLE: declared-fixnum { x fixnum } ;
     ] { mod fixnum-mod rem } inlined?
 ] unit-test
 
-[ [ >fixnum 255 fixnum-bitand ] ]
+[ [ >fixnum 255 >R R> fixnum-bitand ] ]
 [ [ >integer 256 rem ] test-modular-arithmetic ] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare + [ 1 + >fixnum ] [ 2 + >fixnum ] bi ]
+    { >fixnum } inlined?
+] unit-test
 
 [ [ "COMPLEX SHUFFLE" fixnum+fast "COMPLEX SHUFFLE" set-alien-unsigned-1 ] ]
 [ [ [ { fixnum fixnum } declare + ] 2dip set-alien-unsigned-1 ] test-modular-arithmetic ] unit-test
@@ -175,4 +177,116 @@ cell {
 [ t ] [
     [ 0 10 <byte-array> 10 [ 1 pick 0 + >fixnum pick set-nth-unsafe [ 1 + >fixnum ] dip ] times ]
     { >fixnum } inlined?
+] unit-test
+
+[ f ] [ [ + >fixnum ] { >fixnum } inlined? ] unit-test
+
+[ t ] [
+    [ >integer [ >fixnum ] [ >fixnum ] bi ]
+    { >integer } inlined?
+] unit-test
+
+[ f ] [
+    [ >integer [ >fixnum ] [ >fixnum ] bi ]
+    { >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ >integer [ 2 + >fixnum ] [ 3 + >fixnum ] bi ]
+    { >integer } inlined?
+] unit-test
+
+[ f ] [
+    [ >integer [ 2 + >fixnum ] [ 3 + >fixnum ] bi ]
+    { >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ >integer [ >fixnum ] [ >fixnum ] bi ]
+    { >integer } inlined?
+] unit-test
+
+[ f ] [
+    [ >bignum [ >fixnum ] [ >fixnum ] bi ]
+    { >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ >bignum [ >fixnum ] [ >fixnum ] bi ]
+    { >bignum } inlined?
+] unit-test
+
+[ f ] [
+    [ [ { fixnum } declare 2 fixnum+ ] dip [ >fixnum 2 - ] [ ] if ]
+    { fixnum+ } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum boolean } declare [ 1 + ] [ "HI" throw ] if >fixnum ]
+    { fixnum+ >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum boolean } declare [ 1 + ] [ drop 5 ] if >fixnum ]
+    { fixnum+ >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum boolean } declare [ 1 + ] [ 2 + ] if >fixnum ]
+    { fixnum+ >fixnum } inlined?
+] unit-test
+
+[ [ [ 1 ] [ 4 ] if ] ] [
+    [ [ 1.5 ] [ 4 ] if >fixnum ] test-modular-arithmetic
+] unit-test
+
+[ [ [ 1 ] [ 2 ] if ] ] [
+    [ [ 1.5 ] [ 2.3 ] if >fixnum ] test-modular-arithmetic
+] unit-test
+
+[ f ] [
+    [ { fixnum fixnum boolean } declare [ [ 3 * ] [ 1 + ] dip ] [ [ 4 - ] [ 2 + ] dip ] if >fixnum ]
+    { fixnum+ >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ 0 1000 [ 1 + dup >fixnum . ] times drop ]
+    { fixnum+ >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum } declare 3 + [ 1000 ] dip [ >fixnum . ] curry times ]
+    { fixnum+ >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ 0 1000 [ 1 + ] times >fixnum ]
+    { fixnum+ >fixnum } inlined?
+] unit-test
+
+[ f ] [
+    [ f >fixnum ]
+    { >fixnum } inlined?
+] unit-test
+
+[ f ] [
+    [ [ >fixnum ] 2dip set-alien-unsigned-1 ]
+    { >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum } declare 123 >bignum bitand >fixnum ]
+    { >bignum fixnum>bignum bignum-bitand } inlined?
+] unit-test
+
+! Shifts
+[ t ] [
+    [
+        [ 0 ] 2dip { array } declare [
+            hashcode* >fixnum swap [
+                [ -2 shift ] [ 5 shift ] bi
+                + +
+            ] keep bitxor >fixnum
+        ] with each
+    ] { + bignum+ fixnum-shift bitxor bignum-bitxor } inlined?
 ] unit-test

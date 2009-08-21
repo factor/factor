@@ -29,7 +29,7 @@ IN: project-euler.044
 <PRIVATE
 
 : nth-pentagonal ( n -- seq )
-    dup 3 * 1- * 2 / ;
+    dup 3 * 1 - * 2 / ;
 
 : sum-and-diff? ( m n -- ? )
     [ + ] [ - ] 2bi [ pentagonal? ] bi@ and ;

@@ -162,7 +162,7 @@ M:: x86 %integer>bignum ( dst src temp -- )
         dst 3 bignum@ src MOV
         ! Compute sign
         temp src MOV
-        temp cell-bits 1- SAR
+        temp cell-bits 1 - SAR
         temp 1 AND
         ! Store sign
         dst 2 bignum@ temp MOV

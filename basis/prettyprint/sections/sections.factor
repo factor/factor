@@ -44,7 +44,7 @@ TUPLE: pprinter last-newline line-count indent ;
         line-limit? [
             "..." write pprinter get return
         ] when
-        pprinter get [ 1+ ] change-line-count drop
+        pprinter get [ 1 + ] change-line-count drop
         nl do-indent
     ] if ;
 
@@ -209,7 +209,7 @@ M: block short-section ( block -- )
 TUPLE: text < section string ;
 
 : <text> ( string style -- text )
-    over length 1+ \ text new-section
+    over length 1 + \ text new-section
         swap >>style
         swap >>string ;
 
@@ -310,8 +310,8 @@ SYMBOL: next
 : group-flow ( seq -- newseq )
     [
         dup length [
-            2dup 1- swap ?nth prev set
-            2dup 1+ swap ?nth next set
+            2dup 1 - swap ?nth prev set
+            2dup 1 + swap ?nth next set
             swap nth dup split-before dup , split-after
         ] with each
     ] { } make { t } split harvest ;

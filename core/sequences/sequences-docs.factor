@@ -123,8 +123,6 @@ HELP: unless-empty
     }
 } ;
 
-{ if-empty when-empty unless-empty } related-words
-
 HELP: delete-all
 { $values { "seq" "a resizable sequence" } }
 { $description "Resizes the sequence to zero length, removing all elements. Not all sequences are resizable." }
@@ -1214,7 +1212,7 @@ HELP: follow
 { $examples "Get random numbers until zero is reached:"
     { $unchecked-example
     "USING: random sequences prettyprint math ;"
-    "100 [ random dup zero? [ drop f ] when ] follow ."
+    "100 [ random [ f ] when-zero ] follow ."
     "{ 100 86 34 32 24 11 7 2 }"
 } } ;
 
@@ -1392,6 +1390,14 @@ $nl
 "Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer."
 $nl
 "More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
+
+ARTICLE: "sequences-if" "Control flow with sequences"
+"To reduce the boilerplate of checking if a sequence is empty, several combinators are provided."
+$nl
+"Checking if a sequence is empty:"
+{ $subsection if-empty }
+{ $subsection when-empty }
+{ $subsection unless-empty } ;
 
 ARTICLE: "sequences-access" "Accessing sequence elements"
 { $subsection ?nth }
@@ -1658,6 +1664,8 @@ $nl
 "Using sequences for looping:"
 { $subsection "sequences-integers" }
 { $subsection "math.ranges" }
+"Using sequences for control flow:"
+{ $subsection "sequences-if" }
 "For inner loops:"
 { $subsection "sequences-unsafe" } ;
 

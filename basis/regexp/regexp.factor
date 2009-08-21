@@ -25,7 +25,7 @@ M: lookahead question>quot ! Returns ( index string -- ? )
 M: lookbehind question>quot ! Returns ( index string -- ? )
     term>> <reversed-option>
     ast>dfa dfa>reverse-shortest-word
-    '[ [ 1- ] dip f _ execute ] ;
+    '[ [ 1 - ] dip f _ execute ] ;
 
 : check-string ( string -- string )
     ! Make this configurable
@@ -38,7 +38,7 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
 
 GENERIC: end/start ( string regexp -- end start )
 M: regexp end/start drop length 0 ;
-M: reverse-regexp end/start drop length 1- -1 swap ;
+M: reverse-regexp end/start drop length 1 - -1 swap ;
 
 PRIVATE>
 
@@ -53,12 +53,12 @@ PRIVATE>
 :: (next-match) ( i string regexp quot: ( i string regexp -- j ) reverse? -- i start end ? )
     i string regexp quot call dup [| j |
         j i j
-        reverse? [ swap [ 1+ ] bi@ ] when
+        reverse? [ swap [ 1 + ] bi@ ] when
         string
     ] [ drop f f f f ] if ; inline
 
 : search-range ( i string reverse? -- seq )
-    [ drop dup 1+ -1 ] [ length 1 ] if range boa ; inline
+    [ drop dup 1 + -1 ] [ length 1 ] if range boa ; inline
 
 :: next-match ( i string regexp quot: ( i string regexp -- j ) reverse? -- i start end ? )
     f f f f
@@ -93,7 +93,7 @@ PRIVATE>
     [ subseq ] map-matches ;
 
 : count-matches ( string regexp -- n )
-    [ 0 ] 2dip [ 3drop 1+ ] each-match ;
+    [ 0 ] 2dip [ 3drop 1 + ] each-match ;
 
 <PRIVATE
 
@@ -192,7 +192,7 @@ PRIVATE>
     dup skip-blank [
         [ index-from ] 2keep
         [ swapd subseq ]
-        [ 2drop 1+ ] 3bi
+        [ 2drop 1 + ] 3bi
     ] change-lexer-column ;
 
 : parse-noblank-token ( lexer -- str/f )

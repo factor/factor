@@ -164,4 +164,19 @@ IN: io.launcher.windows.nt.tests
     "append-test" temp-file ascii file-contents
 ] unit-test
 
+[ "( scratchpad ) " ] [
+    console-vm "-run=listener" 2array
+    ascii [ "USE: system 0 exit" print flush readln ] with-process-stream
+] unit-test
 
+[ ] [
+    console-vm "-run=listener" 2array
+    ascii [ "USE: system 0 exit" print ] with-process-writer
+] unit-test
+
+[ ] [
+    <process>
+    console-vm "-run=listener" 2array >>command
+    "vocab:io/launcher/windows/nt/test/input.txt" >>stdin
+    try-process
+] unit-test

@@ -20,7 +20,7 @@ IN: compiler.tree.propagation.transforms
 
 : rem-custom-inlining ( #call -- quot/f )
     second value-info literal>> dup integer?
-    [ power-of-2? [ 1- bitand ] f ? ] [ drop f ] if ;
+    [ power-of-2? [ 1 - bitand ] f ? ] [ drop f ] if ;
 
 {
     mod-integer-integer
@@ -38,6 +38,12 @@ IN: compiler.tree.propagation.transforms
     in-d>> rem-custom-inlining
 ] "custom-inlining" set-word-prop
 
+: positive-fixnum? ( obj -- ? )
+    { [ fixnum? ] [ 0 >= ] } 1&& ;
+
+: simplify-bitand? ( value -- ? )
+    value-info literal>> positive-fixnum? ;
+
 {
     bitand-integer-integer
     bitand-integer-fixnum
@@ -45,10 +51,17 @@ IN: compiler.tree.propagation.transforms
     bitand
 } [
     [
-        in-d>> second value-info >literal< [
-            0 most-positive-fixnum between?
-            [ [ >fixnum ] bi@ fixnum-bitand ] f ?
-        ] when
+        {
+            {
+                [ dup in-d>> first simplify-bitand? ]
+                [ drop [ >fixnum fixnum-bitand ] ]
+            }
+            {
+                [ dup in-d>> second simplify-bitand? ]
+                [ drop [ [ >fixnum ] dip fixnum-bitand ] ]
+            }
+            [ drop f ]
+        } cond
     ] "custom-inlining" set-word-prop
 ] each
 
@@ -162,7 +175,7 @@ CONSTANT: lookup-table-at-max 256
     } 1&& ;
 
 : lookup-table-seq ( assoc -- table )
-    [ keys supremum 1+ ] keep '[ _ at ] { } map-as ;
+    [ keys supremum 1 + ] keep '[ _ at ] { } map-as ;
 
 : lookup-table-quot ( seq -- newquot )
     lookup-table-seq
