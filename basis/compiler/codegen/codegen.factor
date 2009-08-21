@@ -270,6 +270,9 @@ M: ##alien-global generate-insn
     [ dst>> ] [ symbol>> ] [ library>> ] tri
     %alien-global ;
 
+M: ##vm-field-ptr generate-insn
+    [ dst>> ] [ fieldname>> ] bi %vm-field-ptr ;
+
 ! ##alien-invoke
 GENERIC: next-fastcall-param ( rep -- )
 
