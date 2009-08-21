@@ -1,5 +1,5 @@
-IN: globs.tests
 USING: tools.test globs ;
+IN: globs.tests
 
 [ f ] [ "abd" "fdf" glob-matches? ] unit-test
 [ f ] [ "fdsafas" "?" glob-matches? ] unit-test

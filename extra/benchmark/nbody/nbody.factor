@@ -59,7 +59,7 @@ TUPLE: nbody-system { bodies array read-only } ;
 :: each-pair ( bodies pair-quot: ( other-body body -- ) each-quot: ( body -- ) -- )
     bodies [| body i |
         body each-quot call
-        bodies i 1+ tail-slice [
+        bodies i 1 + tail-slice [
             body pair-quot call
         ] each
     ] each-index ; inline

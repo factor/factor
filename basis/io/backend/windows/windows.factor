@@ -4,23 +4,36 @@ USING: alien alien.c-types arrays destructors io io.backend
 io.buffers io.files io.ports io.binary io.timeouts system
 strings kernel math namespaces sequences windows.errors
 windows.kernel32 windows.shell32 windows.types windows.winsock
-splitting continuations math.bitwise accessors ;
+splitting continuations math.bitwise accessors init sets assocs ;
 IN: io.backend.windows
 
+: win32-handles ( -- assoc )
+    \ win32-handles [ H{ } clone ] initialize-alien ;
+
+TUPLE: win32-handle < identity-tuple handle disposed ;
+
+M: win32-handle hashcode* handle>> hashcode* ;
+
 : set-inherit ( handle ? -- )
-    [ HANDLE_FLAG_INHERIT ] dip
+    [ handle>> HANDLE_FLAG_INHERIT ] dip
     >BOOLEAN SetHandleInformation win32-error=0/f ;
 
-TUPLE: win32-handle handle disposed ;
-
 : new-win32-handle ( handle class -- win32-handle )
-    new swap [ >>handle ] [ f set-inherit ] bi ;
+    new swap >>handle
+    dup f set-inherit
+    dup win32-handles conjoin ;
 
 : <win32-handle> ( handle -- win32-handle )
     win32-handle new-win32-handle ;
 
+ERROR: disposing-twice ;
+
+: unregister-handle ( handle -- )
+    win32-handles delete-at*
+    [ t >>disposed drop ] [ disposing-twice ] if ;
+
 M: win32-handle dispose* ( handle -- )
-    handle>> CloseHandle drop ;
+    [ unregister-handle ] [ handle>> CloseHandle win32-error=0/f ] bi ;
 
 TUPLE: win32-file < win32-handle ptr ;
 

@@ -17,7 +17,7 @@ GENERIC: assoc-like ( assoc exemplar -- newassoc )
 GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
 GENERIC: >alist ( assoc -- newassoc )
 
-M: assoc assoc-like drop ;
+M: assoc assoc-like drop ; inline
 
 : ?at ( key assoc -- value/key ? )
     2dup at* [ 2nip t ] [ 2drop f ] if ; inline
@@ -87,7 +87,7 @@ PRIVATE>
 
 M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ dup assoc-size ] dip new-assoc
-    [ [ set-at ] with-assoc assoc-each ] keep ;
+    [ [ set-at ] with-assoc assoc-each ] keep ; inline
 
 : keys ( assoc -- keys )
     [ drop ] { } assoc>map ;
@@ -189,48 +189,48 @@ M: sequence set-at
     [ 2nip set-second ]
     [ drop [ swap 2array ] dip push ] if ;
 
-M: sequence new-assoc drop <vector> ;
+M: sequence new-assoc drop <vector> ; inline
 
-M: sequence clear-assoc delete-all ;
+M: sequence clear-assoc delete-all ; inline
 
 M: sequence delete-at
     [ nip ] [ search-alist nip ] 2bi
     [ swap delete-nth ] [ drop ] if* ;
 
-M: sequence assoc-size length ;
+M: sequence assoc-size length ; inline
 
 M: sequence assoc-clone-like
-    [ >alist ] dip clone-like ;
+    [ >alist ] dip clone-like ; inline
 
 M: sequence assoc-like
-    [ >alist ] dip like ;
+    [ >alist ] dip like ; inline
 
-M: sequence >alist ;
+M: sequence >alist ; inline
 
 ! Override sequence => assoc instance for f
-M: f clear-assoc drop ;
+M: f clear-assoc drop ; inline
 
-M: f assoc-like drop dup assoc-empty? [ drop f ] when ;
+M: f assoc-like drop dup assoc-empty? [ drop f ] when ; inline
 
 INSTANCE: sequence assoc
 
-TUPLE: enum seq ;
+TUPLE: enum { seq read-only } ;
 
 C: <enum> enum
 
 M: enum at*
     seq>> 2dup bounds-check?
-    [ nth t ] [ 2drop f f ] if ;
+    [ nth t ] [ 2drop f f ] if ; inline
 
-M: enum set-at seq>> set-nth ;
+M: enum set-at seq>> set-nth ; inline
 
-M: enum delete-at seq>> delete-nth ;
+M: enum delete-at seq>> delete-nth ; inline
 
 M: enum >alist ( enum -- alist )
-    seq>> [ length ] keep zip ;
+    seq>> [ length ] keep zip ; inline
 
-M: enum assoc-size seq>> length ;
+M: enum assoc-size seq>> length ; inline
 
-M: enum clear-assoc seq>> delete-all ;
+M: enum clear-assoc seq>> delete-all ; inline
 
 INSTANCE: enum assoc

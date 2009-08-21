@@ -11,8 +11,8 @@ CONSULT: assoc-protocol lex-hash hash>> ;
 
 :: prepare-pos ( v i -- c l )
     [let | n [ i v head-slice ] |
-           v CHAR: \n n last-index -1 or 1+ -
-           n [ CHAR: \n = ] count 1+
+           v CHAR: \n n last-index -1 or 1 + -
+           n [ CHAR: \n = ] count 1 +
     ] ;
       
 : store-pos ( v a -- )
@@ -25,12 +25,12 @@ M: lex-hash set-at
         [ swap hash>> set-at ]
     } case ;
 
-:: at-pos ( t l c -- p ) t l head-slice [ length ] map sum l 1- + c + ;
+:: at-pos ( t l c -- p ) t l head-slice [ length ] map sum l 1 - + c + ;
 
 M: lex-hash at*
     swap {
       { input [ drop lexer get text>> "\n" join t ] }
-      { pos [ drop lexer get [ text>> ] [ line>> 1- ] [ column>> 1+ ] tri at-pos t ] }
+      { pos [ drop lexer get [ text>> ] [ line>> 1 - ] [ column>> 1 + ] tri at-pos t ] }
       [ swap hash>> at* ]
     } case ;
 

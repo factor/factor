@@ -26,7 +26,7 @@ SYMBOL: windows
     #! etc.
     swap 2array windows get-global push
     windows get-global dup length 1 >
-    [ [ length 1- dup 1- ] keep exchange ] [ drop ] if ;
+    [ [ length 1 - dup 1 - ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
     windows [ [ first = not ] with filter ] change-global ;

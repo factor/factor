@@ -1,15 +1,15 @@
-IN: compiler.tests.redefine3
 USING: accessors compiler compiler.units tools.test math parser
 kernel sequences sequences.private classes.mixin generic
 definitions arrays words assocs eval ;
+IN: compiler.tests.redefine3
 
 GENERIC: sheeple ( obj -- x )
 
-M: object sheeple drop "sheeple" ;
+M: object sheeple drop "sheeple" ; inline
 
 MIXIN: empty-mixin
 
-M: empty-mixin sheeple drop "wake up" ;
+M: empty-mixin sheeple drop "wake up" ; inline
 
 : sheeple-test ( -- string ) { } sheeple ;
 

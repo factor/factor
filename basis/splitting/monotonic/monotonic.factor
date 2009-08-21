@@ -29,10 +29,10 @@ PRIVATE>
             [ length ] [ ] [ <circular> 1 over change-circular-start ] tri
             [ @ not [ , ] [ drop ] if ] 3each
         ] { } make
-        dup empty? [ over length 1- prefix ] when -1 prefix 2 clump
+        dup empty? [ over length 1 - prefix ] when -1 prefix 2 clump
         swap
     ] dip
-    '[ first2 [ 1+ ] bi@ _ _ boa ] map ; inline
+    '[ first2 [ 1 + ] bi@ _ _ boa ] map ; inline
 
 PRIVATE>
 

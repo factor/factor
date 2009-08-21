@@ -50,8 +50,8 @@ IN: linked-assocs.test
 
 { 9 } [
     <linked-hash>
-    { [ 3 * ] [ 1- ] }          "first"   pick set-at
-    { [ [ 1- ] bi@ ] [ 2 / ] }  "second"  pick set-at
+    { [ 3 * ] [ 1 - ] }          "first"   pick set-at
+    { [ [ 1 - ] bi@ ] [ 2 / ] }  "second"  pick set-at
     4 6 pick values [ first call ] each
     + swap values <reversed> [ second call ] each
 ] unit-test

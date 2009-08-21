@@ -48,16 +48,16 @@ GENERIC: (log2) ( x -- n ) foldable
 
 PRIVATE>
 
+ERROR: log2-expects-positive x ;
+
 : log2 ( x -- n )
     dup 0 <= [
-        "log2 expects positive inputs" throw
+        log2-expects-positive
     ] [
         (log2)
     ] if ; inline
 
 : zero? ( x -- ? ) 0 number= ; inline
-: 1+ ( x -- y ) 1 + ; inline
-: 1- ( x -- y ) 1 - ; inline
 : 2/ ( x -- y ) -1 shift ; inline
 : sq ( x -- y ) dup * ; inline
 : neg ( x -- -x ) -1 * ; inline
@@ -68,6 +68,13 @@ PRIVATE>
 : 2^ ( n -- 2^n ) 1 swap shift ; inline
 : even? ( n -- ? ) 1 bitand zero? ;
 : odd? ( n -- ? ) 1 bitand 1 number= ;
+
+: if-zero ( n quot1 quot2 -- )
+    [ dup zero? ] [ [ drop ] prepose ] [ ] tri* if ; inline
+
+: when-zero ( n quot -- ) [ ] if-zero ; inline
+
+: unless-zero ( n quot -- ) [ ] swap if-zero ; inline
 
 UNION: integer fixnum bignum ;
 
@@ -90,55 +97,18 @@ GENERIC: fp-snan? ( x -- ? )
 GENERIC: fp-infinity? ( x -- ? )
 GENERIC: fp-nan-payload ( x -- bits )
 
-M: object fp-special?
-    drop f ;
-M: object fp-nan?
-    drop f ;
-M: object fp-qnan?
-    drop f ;
-M: object fp-snan?
-    drop f ;
-M: object fp-infinity?
-    drop f ;
-M: object fp-nan-payload
-    drop f ;
-
-M: float fp-special?
-    double>bits -52 shift HEX: 7ff [ bitand ] keep = ;
-
-M: float fp-nan-payload
-    double>bits HEX: fffffffffffff bitand ; foldable flushable
-
-M: float fp-nan?
-    dup fp-special? [ fp-nan-payload zero? not ] [ drop f ] if ;
-
-M: float fp-qnan?
-    dup fp-nan? [ fp-nan-payload HEX: 8000000000000 bitand zero? not ] [ drop f ] if ;
-
-M: float fp-snan?
-    dup fp-nan? [ fp-nan-payload HEX: 8000000000000 bitand zero? ] [ drop f ] if ;
-
-M: float fp-infinity?
-    dup fp-special? [ fp-nan-payload zero? ] [ drop f ] if ;
+M: object fp-special? drop f ; inline
+M: object fp-nan? drop f ; inline
+M: object fp-qnan? drop f ; inline
+M: object fp-snan? drop f ; inline
+M: object fp-infinity? drop f ; inline
+M: object fp-nan-payload drop f ; inline
 
 : <fp-nan> ( payload -- nan )
-    HEX: 7ff0000000000000 bitor bits>double ; foldable flushable
+    HEX: 7ff0000000000000 bitor bits>double ; inline
 
-: next-float ( m -- n )
-    double>bits
-    dup -0.0 double>bits > [ 1 - bits>double ] [ ! negative non-zero
-        dup -0.0 double>bits = [ drop 0.0 ] [ ! negative zero
-            1 + bits>double ! positive
-        ] if
-    ] if ; foldable flushable
-
-: prev-float ( m -- n )
-    double>bits
-    dup -0.0 double>bits >= [ 1 + bits>double ] [ ! negative
-        dup 0.0 double>bits = [ drop -0.0 ] [ ! positive zero
-            1 - bits>double ! positive non-zero
-        ] if
-    ] if ; foldable flushable
+GENERIC: next-float ( m -- n )
+GENERIC: prev-float ( m -- n )
 
 : next-power-of-2 ( m -- n )
     dup 2 <= [ drop 2 ] [ 1 - log2 1 + 2^ ] if ; inline

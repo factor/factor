@@ -80,7 +80,7 @@ CONSTANT: WNOWAIT    HEX: 1000000
     HEX: ff00 bitand -8 shift ; inline
 
 : WIFSIGNALED ( status -- ? )
-    HEX: 7f bitand 1+ -1 shift 0 > ; inline
+    HEX: 7f bitand 1 + -1 shift 0 > ; inline
 
 : WCOREFLAG ( -- value )
     HEX: 80 ; inline

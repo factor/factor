@@ -6,9 +6,9 @@ IN: compiler.cfg.loop-detection
 
 TUPLE: natural-loop header index ends blocks ;
 
-<PRIVATE
-
 SYMBOL: loops
+
+<PRIVATE
 
 : <natural-loop> ( header index -- loop )
     H{ } clone H{ } clone natural-loop boa ;

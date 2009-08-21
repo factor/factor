@@ -9,7 +9,7 @@ MEMO: fib ( m -- n )
 
 [ 89 ] [ 10 fib ] unit-test
 
-[ "USING: kernel math memoize generalizations ; IN: memoize.tests MEMO: x ( a b c d e -- f g h i j ) [ 1+ ] 4 ndip ;" eval( -- ) ] must-fail
+[ "USING: kernel math memoize generalizations ; IN: memoize.tests MEMO: x ( a b c d e -- f g h i j ) [ 1 + ] 4 ndip ;" eval( -- ) ] must-fail
 
 MEMO: see-test ( a -- b ) reverse ;
 

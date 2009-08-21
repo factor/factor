@@ -165,8 +165,8 @@ error-display "toolbar" f {
         { 5 5 } >>gap
         error-list <error-list-toolbar> f track-add
         error-list source-file-table>> <scroller> "Source files" <labeled-gadget> 1/4 track-add
-        error-list error-table>> <scroller> "Errors" <labeled-gadget> 1/2 track-add
-        error-list error-display>> "Details" <labeled-gadget> 1/4 track-add
+        error-list error-table>> <scroller> "Errors" <labeled-gadget> 1/4 track-add
+        error-list error-display>> "Details" <labeled-gadget> 1/2 track-add
     { 5 5 } <filled-border> 1 track-add ;
 
 M: error-list-gadget focusable-child*

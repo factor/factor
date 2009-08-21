@@ -1,10 +1,10 @@
-IN: compiler.tree.recursive.tests
 USING: tools.test kernel combinators.short-circuit math sequences accessors
 compiler.tree
 compiler.tree.builder
 compiler.tree.combinators
 compiler.tree.recursive
 compiler.tree.recursive.private ;
+IN: compiler.tree.recursive.tests
 
 [ { f f f f } ] [ f { f t f f } (tail-calls) ] unit-test
 [ { f f f t } ] [ t { f t f f } (tail-calls) ] unit-test
@@ -30,7 +30,7 @@ compiler.tree.recursive.private ;
     ] curry contains-node? ;
 
 : loop-test-1 ( a -- )
-    dup [ 1+ loop-test-1 ] [ drop ] if ; inline recursive
+    dup [ 1 + loop-test-1 ] [ drop ] if ; inline recursive
                           
 [ t ] [
     [ loop-test-1 ] build-tree analyze-recursive
@@ -53,7 +53,7 @@ compiler.tree.recursive.private ;
 ] unit-test
 
 : loop-test-2 ( a b -- a' )
-    dup [ 1+ loop-test-2 1- ] [ drop ] if ; inline recursive
+    dup [ 1 + loop-test-2 1 - ] [ drop ] if ; inline recursive
 
 [ t ] [
     [ loop-test-2 ] build-tree analyze-recursive

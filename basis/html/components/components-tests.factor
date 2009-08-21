@@ -1,9 +1,9 @@
-IN: html.components.tests
 USING: tools.test kernel io.streams.string
 io.streams.null accessors inspector html.streams
 html.components html.forms namespaces
 xml.writer ;
 FROM: html.components => inspector ;
+IN: html.components.tests
 
 [ ] [ begin-form ] unit-test
 

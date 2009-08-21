@@ -5,7 +5,7 @@ parser sequences strings vectors words quotations effects classes
 continuations assocs combinators compiler.errors accessors math.order
 definitions sets hints macros stack-checker.state
 stack-checker.visitor stack-checker.errors stack-checker.values
-stack-checker.recursive-state ;
+stack-checker.recursive-state summary ;
 IN: stack-checker.backend
 
 : push-d ( obj -- ) meta-d push ;
@@ -98,8 +98,10 @@ M: object apply-object push-literal ;
 : time-bomb ( error -- )
     '[ _ throw ] infer-quot-here ;
 
-: bad-call ( -- )
-    "call must be given a callable" time-bomb ;
+ERROR: bad-call obj ;
+
+M: bad-call summary
+    drop "call must be given a callable" ;
 
 : infer-literal-quot ( literal -- )
     dup recursive-quotation? [
@@ -110,7 +112,7 @@ M: object apply-object push-literal ;
             [ [ recursion>> ] keep add-local-quotation ]
             bi infer-quot
         ] [
-            drop bad-call
+            value>> \ bad-call boa time-bomb
         ] if
     ] if ;
 

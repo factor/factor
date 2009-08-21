@@ -495,7 +495,7 @@ TUPLE: multiline-editor < editor ;
 
 <PRIVATE
 
-: page-elt ( editor -- editor element ) dup visible-lines 1- <page-elt> ;
+: page-elt ( editor -- editor element ) dup visible-lines 1 - <page-elt> ;
 
 PRIVATE>
 
@@ -526,7 +526,7 @@ PRIVATE>
 
 : this-line-and-next ( document line -- start end )
     [ nip 0 swap 2array ]
-    [ [ nip 1+ ] [ 1+ swap doc-line length ] 2bi 2array ]
+    [ [ nip 1 + ] [ 1 + swap doc-line length ] 2bi 2array ]
     2bi ;
 
 : last-line? ( document line -- ? )
