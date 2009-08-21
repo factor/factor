@@ -345,8 +345,8 @@ void copy_literal_references(code_block *compiled, factorvm *myvm)
 void factorvm::relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled)
 {
 #ifdef FACTOR_DEBUG
-	tagged<array>(compiled->literals).untag_check();
-	tagged<byte_array>(compiled->relocation).untag_check();
+	tagged<array>(compiled->literals).untag_check(vm);
+	tagged<byte_array>(compiled->relocation).untag_check(vm);
 #endif
 
 	store_address_in_code_block(relocation_class_of(rel),
