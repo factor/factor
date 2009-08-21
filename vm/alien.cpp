@@ -108,7 +108,7 @@ void *alien_pointer()
 	PRIMITIVE(set_alien_##name) \
 	{ \
 		type *ptr = (type *)PRIMITIVE_GETVM()->alien_pointer(); \
-		type value = to(dpop()); \
+		type value = PRIMITIVE_GETVM()->to(dpop()); \
 		*ptr = value; \
 	}
 
@@ -124,7 +124,7 @@ DEFINE_ALIEN_ACCESSOR(signed_1,s8,box_signed_1,to_fixnum)
 DEFINE_ALIEN_ACCESSOR(unsigned_1,u8,box_unsigned_1,to_cell)
 DEFINE_ALIEN_ACCESSOR(float,float,box_float,to_float)
 DEFINE_ALIEN_ACCESSOR(double,double,box_double,to_double)
-DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,PRIMITIVE_GETVM()->pinned_alien_offset)
+DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
 
 /* open a native library and push a handle */
 inline void factorvm::vmprim_dlopen()

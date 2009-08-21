@@ -298,7 +298,7 @@ M: object %prepare-var-args ;
 
 HOOK: %alien-invoke cpu ( function library -- )
 
-HOOK: %vm-invoke cpu ( function library -- )
+HOOK: %vm-invoke cpu ( function -- )
 
 HOOK: %cleanup cpu ( params -- )
 

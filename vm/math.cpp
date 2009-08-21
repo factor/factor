@@ -618,9 +618,9 @@ fixnum factorvm::to_fixnum(cell tagged)
 	}
 }
 
-VM_C_API fixnum to_fixnum(cell tagged)
+VM_C_API fixnum to_fixnum(cell tagged,factorvm *myvm)
 {
-	return vm->to_fixnum(tagged);
+	return VM_PTR->to_fixnum(tagged);
 }
 
 cell factorvm::to_cell(cell tagged)
@@ -628,9 +628,9 @@ cell factorvm::to_cell(cell tagged)
 	return (cell)to_fixnum(tagged);
 }
 
-VM_C_API cell to_cell(cell tagged)
+VM_C_API cell to_cell(cell tagged, factorvm *myvm)
 {
-	return vm->to_cell(tagged);
+	return VM_PTR->to_cell(tagged);
 }
 
 void factorvm::box_signed_1(s8 n)
@@ -740,9 +740,10 @@ s64 factorvm::to_signed_8(cell obj)
 	}
 }
 
-VM_C_API s64 to_signed_8(cell obj)
+VM_C_API s64 to_signed_8(cell obj,factorvm *myvm)
 {
-	return vm->to_signed_8(obj);
+	ASSERTVM();
+	return VM_PTR->to_signed_8(obj);
 }
 
 void factorvm::box_unsigned_8(u64 n)
@@ -772,9 +773,10 @@ u64 factorvm::to_unsigned_8(cell obj)
 	}
 }
 
-VM_C_API u64 to_unsigned_8(cell obj)
+VM_C_API u64 to_unsigned_8(cell obj,factorvm *myvm)
 {
-	return vm->to_unsigned_8(obj);
+	ASSERTVM();
+	return VM_PTR->to_unsigned_8(obj);
 }
 
 void factorvm::box_float(float flo)
@@ -792,9 +794,9 @@ float factorvm::to_float(cell value)
 	return untag_float_check(value);
 }
 
-VM_C_API float to_float(cell value)
+VM_C_API float to_float(cell value,factorvm *myvm)
 {
-	return vm->to_float(value);
+	return VM_PTR->to_float(value);
 }
 
 void factorvm::box_double(double flo)
@@ -812,9 +814,9 @@ double factorvm::to_double(cell value)
 	return untag_float_check(value);
 }
 
-VM_C_API double to_double(cell value)
+VM_C_API double to_double(cell value,factorvm *myvm)
 {
-	return vm->to_double(value);
+	return VM_PTR->to_double(value);
 }
 
 /* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
