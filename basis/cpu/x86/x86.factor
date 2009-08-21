@@ -615,7 +615,7 @@ M:: x86 %call-gc ( gc-root-count -- )
     ! Pass number of roots as second parameter
     param-reg-2 gc-root-count MOV
     ! Call GC
-    "inline_gc" f %vm-invoke ;
+    "inline_gc" %vm-invoke ;
 
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    
