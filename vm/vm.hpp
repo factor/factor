@@ -8,9 +8,13 @@ struct factorvm {
 	zone nursery; /* new objects are allocated here */
 	cell cards_offset;
 	cell decks_offset;
-	cell __padding__ ;   // align to 8byte boundary (for 32bit platforms)
+#ifndef FACTOR_64
+	cell __padding__ ;   // align to 8 byte boundary
+#endif
 	cell userenv[USER_ENV]; /* TAGGED user environment data; see getenv/setenv prims */
-
+#ifndef FACTOR_64
+	cell __padding2__;   // not sure why we need this, bootstrap doesn't work without it
+#endif
 
 	// segments
 	inline cell align_page(cell a);

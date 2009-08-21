@@ -36,6 +36,7 @@ enable-float-intrinsics
     [ drop %load-vm-addr ]
     [ [ dup ] dip vm-field-offset ADDI ] 2bi ;
 
+M: ppc %vm-field-ptr ( dst field -- ) %load-vm-field-addr ;
 
 M: ppc machine-registers
     {
