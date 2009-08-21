@@ -22,21 +22,21 @@ struct jit {
 	void emit_with(cell code_template_, cell literal_);
 
 	void push(cell literal) {
-		emit_with(userenv[JIT_PUSH_IMMEDIATE],literal);
+		emit_with(myvm->userenv[JIT_PUSH_IMMEDIATE],literal);
 	}
 
 	void word_jump(cell word) {
 		literal(tag_fixnum(xt_tail_pic_offset));
 		literal(word);
-		emit(userenv[JIT_WORD_JUMP]);
+		emit(myvm->userenv[JIT_WORD_JUMP]);
 	}
 
 	void word_call(cell word) {
-		emit_with(userenv[JIT_WORD_CALL],word);
+		emit_with(myvm->userenv[JIT_WORD_CALL],word);
 	}
 
 	void word_special(cell word) {
-		emit_with(userenv[JIT_WORD_SPECIAL],word);
+		emit_with(myvm->userenv[JIT_WORD_SPECIAL],word);
 	}
 
 	void emit_subprimitive(cell word_) {
