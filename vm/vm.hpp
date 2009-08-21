@@ -8,6 +8,7 @@ struct factorvm {
 	zone nursery; /* new objects are allocated here */
 	cell cards_offset;
 	cell decks_offset;
+	cell __padding__ ;   // align to 8byte boundary (for 32bit platforms)
 	cell userenv[USER_ENV]; /* TAGGED user environment data; see getenv/setenv prims */
 
 
