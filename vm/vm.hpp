@@ -2,11 +2,15 @@ namespace factor
 {
 
 struct factorvm {
-	// if you change this struct, also change vm.factor
+
+	// if you change this struct, also change vm.factor k--------
 	context *stack_chain; 
 	zone nursery; /* new objects are allocated here */
 	cell cards_offset;
 	cell decks_offset;
+	//	cell userenv[USER_ENV];  // prob best to put this last 
+
+
 
 	// segments
 	inline cell align_page(cell a);
@@ -494,6 +498,10 @@ struct factorvm {
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size);
 	code_block *add_code_block(cell type,cell code_,cell labels_,cell relocation_,cell literals_);
+	inline bool stack_traces_p()
+	{
+		return userenv[STACK_TRACES_ENV] != F;
+	}
 
 	//code_heap
 	heap code;
