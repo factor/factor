@@ -21,7 +21,7 @@ jit::jit(cell type_, cell owner_, factorvm *vm)
 	  offset(0),
 	  myvm(vm)
 {
-	if(stack_traces_p()) literal(owner.value());
+	if(myvm->stack_traces_p()) literal(owner.value());
 }
 
 void jit::emit_relocation(cell code_template_)

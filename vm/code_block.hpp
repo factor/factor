@@ -72,9 +72,4 @@ void copy_literal_references(code_block *compiled, factorvm *myvm);
 void update_word_references(code_block *compiled, factorvm *myvm);
 void update_literal_and_word_references(code_block *compiled, factorvm *myvm);
 
-inline bool stack_traces_p()
-{
-	return userenv[STACK_TRACES_ENV] != F;
-}
-
 }
