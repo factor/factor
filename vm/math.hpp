@@ -61,9 +61,9 @@ PRIMITIVE(double_bits);
 PRIMITIVE(bits_double);
 
 VM_C_API void box_float(float flo);
-VM_C_API float to_float(cell value);
+VM_C_API float to_float(cell value, factorvm *vm);
 VM_C_API void box_double(double flo);
-VM_C_API double to_double(cell value);
+VM_C_API double to_double(cell value, factorvm *vm);
 
 VM_C_API void box_signed_1(s8 n);
 VM_C_API void box_unsigned_1(u8 n);
@@ -76,11 +76,11 @@ VM_C_API void box_unsigned_cell(cell cell);
 VM_C_API void box_signed_8(s64 n);
 VM_C_API void box_unsigned_8(u64 n);
 
-VM_C_API s64 to_signed_8(cell obj);
-VM_C_API u64 to_unsigned_8(cell obj);
+VM_C_API s64 to_signed_8(cell obj, factorvm *vm);
+VM_C_API u64 to_unsigned_8(cell obj, factorvm *vm);
 
-VM_C_API fixnum to_fixnum(cell tagged);
-VM_C_API cell to_cell(cell tagged);
+VM_C_API fixnum to_fixnum(cell tagged, factorvm *vm);
+VM_C_API cell to_cell(cell tagged, factorvm *vm);
 
 VM_ASM_API void overflow_fixnum_add(fixnum x, fixnum y);
 VM_ASM_API void overflow_fixnum_subtract(fixnum x, fixnum y);

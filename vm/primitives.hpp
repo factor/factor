@@ -12,4 +12,6 @@ namespace factor
 #endif
 
 extern const primitive_type primitives[];
+#define VM_PTR vm
+#define ASSERTVM() 
 }
