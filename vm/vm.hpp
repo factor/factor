@@ -448,8 +448,6 @@ struct factorvm {
 	inline void vmprim_fseek();
 	inline void vmprim_fflush();
 	inline void vmprim_fclose();
-	int err_no();
-	void clear_err_no();
 
 	//code_gc
 	void clear_free_list(heap *heap);
