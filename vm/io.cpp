@@ -258,24 +258,13 @@ PRIMITIVE(fclose)
 /* This function is used by FFI I/O. Accessing the errno global directly is
 not portable, since on some libc's errno is not a global but a funky macro that
 reads thread-local storage. */
-int factorvm::err_no()
+VM_C_API int err_no()
 {
 	return errno;
 }
 
-VM_C_API int err_no()
-{
-	return vm->err_no();
-}
-
-void factorvm::clear_err_no()
+VM_C_API void clear_err_no()
 {
 	errno = 0;
 }
-
-VM_C_API void clear_err_no()
-{
-	return vm->clear_err_no();
-}
-
 }
