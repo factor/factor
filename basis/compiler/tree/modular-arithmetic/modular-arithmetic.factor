@@ -172,7 +172,7 @@ MEMO: fixnum-coercion ( flags -- nodes )
     ] when ;
 
 : optimize-low-order-op ( #call -- nodes )
-    dup in-d>> first fixnum-value? [
+    dup in-d>> first actually-defined-by [ value>> fixnum-value? ] all? [
         [ ] [ in-d>> first ] [ info>> ] tri
         [ drop fixnum <class-info> ] change-at
     ] when ;

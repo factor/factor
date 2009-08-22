@@ -1,10 +1,11 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.structs arrays
+USING: accessors alien alien.c-types alien.structs alien.structs.fields arrays
 byte-arrays classes classes.c-types classes.parser classes.tuple
 classes.tuple.parser classes.tuple.private combinators
 combinators.smart fry generalizations generic.parser kernel
 kernel.private libc macros make math math.order parser
 quotations sequences slots slots.private struct-arrays words ;
+FROM: slots => reader-word writer-word ;
 IN: classes.struct
 
 ! struct class
@@ -92,12 +93,23 @@ M: struct-class writer-quot
 ! Struct as c-type
 
 : slot>field ( slot -- field )
-    [ class>> c-type ] [ name>> ] bi 2array ;
+    field-spec new swap {
+        [ name>> >>name ]
+        [ offset>> >>offset ]
+        [ class>> c-type >>type ]
+        [ name>> reader-word >>reader ]
+        [ name>> writer-word >>writer ]
+    } cleave ;
 
 : define-struct-for-class ( class -- )
     [
-        [ name>> ] [ vocabulary>> ] [ struct-slots [ slot>field ] map ] tri
-        define-struct
+        {
+            [ name>> ]
+            [ "struct-size" word-prop ]
+            [ "struct-align" word-prop ]
+            [ struct-slots [ slot>field ] map ]
+        } cleave
+        (define-struct)
     ] [
         [ name>> c-type ]
         [ (unboxer-quot) >>unboxer-quot ]
@@ -171,8 +183,8 @@ M: struct-class direct-array-of
     [ class>> c-type drop ] each ;
 
 : (define-struct-class) ( class slots offsets-quot -- )
-    [ drop struct f define-tuple-class ] swap
-    '[
+    [ drop struct f define-tuple-class ]
+    swap '[
         make-slots dup
         [ check-struct-slots ] _ [ struct-align [ align ] keep ] tri
         (struct-word-props)
