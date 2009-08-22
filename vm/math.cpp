@@ -788,15 +788,16 @@ VM_C_API u64 to_unsigned_8(cell obj,factorvm *myvm)
 	ASSERTVM();
 	return VM_PTR->to_unsigned_8(obj);
 }
-
+ 
 void factorvm::box_float(float flo)
 {
         dpush(allot_float(flo));
 }
 
-VM_C_API void box_float(float flo)
+VM_C_API void box_float(float flo,factorvm *myvm)      // not sure if this is ever called
 {
-	return vm->box_float(flo);
+	ASSERTVM();
+	return VM_PTR->box_float(flo);
 }
 
 float factorvm::to_float(cell value)
@@ -814,9 +815,10 @@ void factorvm::box_double(double flo)
         dpush(allot_float(flo));
 }
 
-VM_C_API void box_double(double flo)
+VM_C_API void box_double(double flo,factorvm *myvm)   // not sure if this is ever called
 {
-	return vm->box_double(flo);
+	ASSERTVM();
+	return VM_PTR->box_double(flo);
 }
 
 double factorvm::to_double(cell value)

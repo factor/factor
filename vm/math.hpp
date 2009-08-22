@@ -60,9 +60,9 @@ PRIMITIVE(bits_float);
 PRIMITIVE(double_bits);
 PRIMITIVE(bits_double);
 
-VM_C_API void box_float(float flo);
+VM_C_API void box_float(float flo, factorvm *vm);
 VM_C_API float to_float(cell value, factorvm *vm);
-VM_C_API void box_double(double flo);
+VM_C_API void box_double(double flo, factorvm *vm);
 VM_C_API double to_double(cell value, factorvm *vm);
 
 VM_C_API void box_signed_1(s8 n, factorvm *vm);
