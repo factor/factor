@@ -841,7 +841,7 @@ void factorvm::overflow_fixnum_add(fixnum x, fixnum y)
 
 VM_ASM_API void overflow_fixnum_add(fixnum x, fixnum y)
 {
-	return vm->overflow_fixnum_add(x,y);
+	return PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_add(x,y);
 }
 
 void factorvm::overflow_fixnum_subtract(fixnum x, fixnum y)
@@ -852,7 +852,7 @@ void factorvm::overflow_fixnum_subtract(fixnum x, fixnum y)
 
 VM_ASM_API void overflow_fixnum_subtract(fixnum x, fixnum y)
 {
-	return vm->overflow_fixnum_subtract(x,y);
+	return PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_subtract(x,y);
 }
 
 void factorvm::overflow_fixnum_multiply(fixnum x, fixnum y)
@@ -866,7 +866,7 @@ void factorvm::overflow_fixnum_multiply(fixnum x, fixnum y)
 
 VM_ASM_API void overflow_fixnum_multiply(fixnum x, fixnum y)
 {
-	return vm->overflow_fixnum_multiply(x,y);
+	return PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_multiply(x,y);
 }
 
 }

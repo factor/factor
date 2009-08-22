@@ -91,7 +91,7 @@ void growable_array::add(cell elt_)
 	if(count == array_capacity(elements.untagged()))
 		elements = myvm->reallot_array(elements.untagged(),count * 2);
 
-	set_array_nth(elements.untagged(),count++,elt.value());
+	myvm->set_array_nth(elements.untagged(),count++,elt.value());
 }
 
 void growable_array::trim()
