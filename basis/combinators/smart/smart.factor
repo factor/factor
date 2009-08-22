@@ -7,6 +7,9 @@ IN: combinators.smart
 MACRO: drop-outputs ( quot -- quot' )
     dup infer out>> '[ @ _ ndrop ] ;
 
+MACRO: keep-inputs ( quot -- quot' )
+    dup infer in>> '[ _ _ nkeep ] ;
+
 MACRO: output>sequence ( quot exemplar -- newquot )
     [ dup infer out>> ] dip
     '[ @ _ _ nsequence ] ;
