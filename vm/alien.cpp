@@ -218,9 +218,10 @@ char *factorvm::alien_offset(cell obj)
 	}
 }
 
-VM_C_API char *alien_offset(cell obj)
+VM_C_API char *alien_offset(cell obj, factorvm *myvm)
 {
-	return vm->alien_offset(obj);
+	ASSERTVM();
+	return VM_PTR->alien_offset(obj);
 }
 
 /* pop an object representing a C pointer */
@@ -231,6 +232,7 @@ char *factorvm::unbox_alien()
 
 VM_C_API char *unbox_alien()
 {
+	printf("*PHIL unbox_alien\n");
 	return vm->unbox_alien();
 }
 
@@ -243,9 +245,10 @@ void factorvm::box_alien(void *ptr)
 		dpush(allot_alien(F,(cell)ptr));
 }
 
-VM_C_API void box_alien(void *ptr)
+VM_C_API void box_alien(void *ptr, factorvm *myvm)
 {
-	return vm->box_alien(ptr);
+	ASSERTVM();
+	return VM_PTR->box_alien(ptr);
 }
 
 /* for FFI calls passing structs by value */
@@ -256,6 +259,7 @@ void factorvm::to_value_struct(cell src, void *dest, cell size)
 
 VM_C_API void to_value_struct(cell src, void *dest, cell size)
 {
+	printf("PHIL to_value_struct\n");
 	return vm->to_value_struct(src,dest,size);
 }
 
@@ -269,6 +273,7 @@ void factorvm::box_value_struct(void *src, cell size)
 
 VM_C_API void box_value_struct(void *src, cell size)
 {
+	printf("PHIL box_value_struct\n");
 	return vm->box_value_struct(src,size);
 }
 
@@ -283,6 +288,7 @@ void factorvm::box_small_struct(cell x, cell y, cell size)
 
 VM_C_API void box_small_struct(cell x, cell y, cell size)
 {
+	printf("PHIL box_small_struct\n");
 	return vm->box_small_struct(x,y,size);
 }
 
@@ -299,6 +305,7 @@ void factorvm::box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size)
 
 VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size)
 {
+	printf("PHIL box_medium_struct\n");
 	return vm->box_medium_struct(x1, x2, x3, x4, size);
 }
 
