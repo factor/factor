@@ -47,9 +47,12 @@ M: x86.32 reserved-area-size 0 ;
 
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
-M: x86.32 %vm-invoke ( function -- )
+: push-vm-ptr ( -- )
     temp-reg 0 MOV rc-absolute-cell rt-vm rel-fixup ! push the vm ptr as an argument
-    temp-reg PUSH
+    temp-reg PUSH ;
+
+M: x86.32 %vm-invoke ( function -- )
+    push-vm-ptr
     f %alien-invoke
     temp-reg POP ;
 
@@ -109,9 +112,12 @@ M: x86.32 %save-param-reg 3drop ;
     #! parameter being passed to a callback from C.
     over [ load-return-reg ] [ 2drop ] if ;
 
+CONSTANT: vm-ptr-size 4
+
 M:: x86.32 %box ( n rep func -- )
     n rep (%box)
-    rep rep-size [
+    rep rep-size vm-ptr-size + [
+        push-vm-ptr
         rep push-return-reg
         func f %alien-invoke
     ] with-aligned-stack ;
@@ -164,9 +170,8 @@ M: x86.32 %prepare-unbox ( -- )
 
 : call-unbox-func ( func -- )
     8 [
-        ! push vm ptr
-        temp-reg 0 MOV rc-absolute-cell rt-vm rel-fixup ! push the vm ptr as an argument
-        temp-reg PUSH
+        ! push the vm ptr as an argument
+        push-vm-ptr
         ! Push parameter
         EAX PUSH
         ! Call the unboxer
