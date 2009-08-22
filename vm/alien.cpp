@@ -103,12 +103,14 @@ void *alien_pointer()
 #define DEFINE_ALIEN_ACCESSOR(name,type,boxer,to) \
 	PRIMITIVE(alien_##name) \
 	{ \
-		boxer(*(type*)PRIMITIVE_GETVM()->alien_pointer());	\
+		factorvm *myvm = PRIMITIVE_GETVM(); \
+		myvm->boxer(*(type*)myvm->alien_pointer());	\
 	} \
 	PRIMITIVE(set_alien_##name) \
 	{ \
-		type *ptr = (type *)PRIMITIVE_GETVM()->alien_pointer(); \
-		type value = PRIMITIVE_GETVM()->to(dpop()); \
+		factorvm *myvm = PRIMITIVE_GETVM(); \
+		type *ptr = (type *)myvm->alien_pointer(); \
+		type value = myvm->to(dpop()); \
 		*ptr = value; \
 	}
 
