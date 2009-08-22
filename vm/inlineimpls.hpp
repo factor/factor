@@ -11,11 +11,6 @@ inline cell factorvm::align_page(cell a)
 	return align(a,getpagesize());
 }
 
-inline static cell align_page(cell a)
-{
-	return vm->align_page(a);
-}
-
 // write_barrier.hpp
 
 inline card *factorvm::addr_to_card(cell a)
@@ -23,29 +18,16 @@ inline card *factorvm::addr_to_card(cell a)
 	return (card*)(((cell)(a) >> card_bits) + cards_offset);
 }
 
-inline card *addr_to_card(cell a)
-{
-	return vm->addr_to_card(a);
-}
 
 inline cell factorvm::card_to_addr(card *c)
 {
 	return ((cell)c - cards_offset) << card_bits;
 }
 
-inline cell card_to_addr(card *c)
-{
-	return vm->card_to_addr(c);
-}
 
 inline cell factorvm::card_offset(card *c)
 {
 	return *(c - (cell)data->cards + (cell)data->allot_markers);
-}
-
-inline cell card_offset(card *c)
-{
-	return vm->card_offset(c);
 }
 
 inline card_deck *factorvm::addr_to_deck(cell a)
@@ -53,19 +35,9 @@ inline card_deck *factorvm::addr_to_deck(cell a)
 	return (card_deck *)(((cell)a >> deck_bits) + decks_offset);
 }
 
-inline card_deck *addr_to_deck(cell a)
-{
-	return vm->addr_to_deck(a);
-}
-
 inline cell factorvm::deck_to_addr(card_deck *c)
 {
 	return ((cell)c - decks_offset) << deck_bits;
-}
-
-inline cell deck_to_addr(card_deck *c)
-{
-	return vm->deck_to_addr(c);
 }
 
 inline card *factorvm::deck_to_card(card_deck *d)
@@ -73,19 +45,9 @@ inline card *factorvm::deck_to_card(card_deck *d)
 	return (card *)((((cell)d - decks_offset) << (deck_bits - card_bits)) + cards_offset);
 }
 
-inline card *deck_to_card(card_deck *d)
-{
-	return vm->deck_to_card(d);
-}
-
 inline card *factorvm::addr_to_allot_marker(object *a)
 {
 	return (card *)(((cell)a >> card_bits) + allot_markers_offset);
-}
-
-inline card *addr_to_allot_marker(object *a)
-{
-	return vm->addr_to_allot_marker(a);
 }
 
 /* the write barrier must be called any time we are potentially storing a
@@ -96,22 +58,12 @@ inline void factorvm::write_barrier(object *obj)
 	*addr_to_deck((cell)obj) = card_mark_mask;
 }
 
-inline void write_barrier(object *obj)
-{
-	return vm->write_barrier(obj);
-}
-
 /* we need to remember the first object allocated in the card */
 inline void factorvm::allot_barrier(object *address)
 {
 	card *ptr = addr_to_allot_marker(address);
 	if(*ptr == invalid_allot_marker)
 		*ptr = ((cell)address & addr_card_mask);
-}
-
-inline void allot_barrier(object *address)
-{
-	return vm->allot_barrier(address);
 }
 
 
@@ -124,11 +76,6 @@ inline bool factorvm::collecting_accumulation_gen_p()
 		|| collecting_gen == data->tenured());
 }
 
-inline bool collecting_accumulation_gen_p()
-{
-	return vm->collecting_accumulation_gen_p();
-}
-
 inline object *factorvm::allot_zone(zone *z, cell a)
 {
 	cell h = z->here;
@@ -136,11 +83,6 @@ inline object *factorvm::allot_zone(zone *z, cell a)
 	object *obj = (object *)h;
 	allot_barrier(obj);
 	return obj;
-}
-
-inline object *allot_zone(zone *z, cell a)
-{
-	return vm->allot_zone(z,a);
 }
 
 /*
@@ -198,19 +140,9 @@ inline object *factorvm::allot_object(header header, cell size)
 	return obj;
 }
 
-inline object *allot_object(header header, cell size)
-{
-	return vm->allot_object(header,size);
-}
-
 template<typename TYPE> TYPE *factorvm::allot(cell size)
 {
 	return (TYPE *)allot_object(header(TYPE::type_number),size);
-}
-
-template<typename TYPE> TYPE *allot(cell size)
-{
-	return vm->allot<TYPE>(size);
 }
 
 inline void factorvm::check_data_pointer(object *pointer)
@@ -222,11 +154,6 @@ inline void factorvm::check_data_pointer(object *pointer)
 		       && (cell)pointer < data->seg->end);
 	}
 #endif
-}
-
-inline void check_data_pointer(object *pointer)
-{
-	return vm->check_data_pointer(pointer);
 }
 
 inline void factorvm::check_tagged_pointer(cell tagged)
@@ -241,18 +168,13 @@ inline void factorvm::check_tagged_pointer(cell tagged)
 #endif
 }
 
-inline void check_tagged_pointer(cell tagged)
-{
-	return vm->check_tagged_pointer(tagged);
-}
-
 //local_roots.hpp
 template <typename TYPE>
 struct gc_root : public tagged<TYPE>
 {
 	factorvm *myvm;
 
-	void push() { check_tagged_pointer(tagged<TYPE>::value()); myvm->gc_locals.push_back((cell)this); }
+	void push() { myvm->check_tagged_pointer(tagged<TYPE>::value()); myvm->gc_locals.push_back((cell)this); }
 	
 	//explicit gc_root(cell value_, factorvm *vm) : myvm(vm),tagged<TYPE>(value_) { push(); }
 	explicit gc_root(cell value_,factorvm *vm) : tagged<TYPE>(value_),myvm(vm) { push(); }
@@ -276,7 +198,7 @@ struct gc_bignum
 	factorvm *myvm;
 	gc_bignum(bignum **addr_, factorvm *vm) : addr(addr_), myvm(vm) {
 		if(*addr_)
-			check_data_pointer(*addr_);
+			myvm->check_data_pointer(*addr_);
 		myvm->gc_bignums.push_back((cell)addr);
 	}
 
@@ -298,19 +220,9 @@ template <typename TYPE> TYPE *factorvm::allot_array_internal(cell capacity)
 	return array;
 }
 
-template <typename TYPE> TYPE *allot_array_internal(cell capacity)
-{
-	return vm->allot_array_internal<TYPE>(capacity);
-}
-
 template <typename TYPE> bool factorvm::reallot_array_in_place_p(TYPE *array, cell capacity)
 {
 	return in_zone(&nursery,array) && capacity <= array_capacity(array);
-}
-
-template <typename TYPE> bool reallot_array_in_place_p(TYPE *array, cell capacity)
-{
-	return vm->reallot_array_in_place_p<TYPE>(array,capacity);
 }
 
 template <typename TYPE> TYPE *factorvm::reallot_array(TYPE *array_, cell capacity)
@@ -350,11 +262,6 @@ inline void factorvm::set_array_nth(array *array, cell slot, cell value)
 	write_barrier(array);
 }
 
-inline void set_array_nth(array *array, cell slot, cell value)
-{
-	return vm->set_array_nth(array,slot,value);
-}
-
 struct growable_array {
 	cell count;
 	gc_root<array> elements;
@@ -387,22 +294,12 @@ inline cell factorvm::allot_integer(fixnum x)
 		return tag_fixnum(x);
 }
 
-inline cell allot_integer(fixnum x)
-{
-	return vm->allot_integer(x);
-}
-
 inline cell factorvm::allot_cell(cell x)
 {
 	if(x > (cell)fixnum_max)
 		return tag<bignum>(cell_to_bignum(x));
 	else
 		return tag_fixnum(x);
-}
-
-inline cell allot_cell(cell x)
-{
-	return vm->allot_cell(x);
 }
 
 inline cell factorvm::allot_float(double n)
@@ -412,19 +309,9 @@ inline cell factorvm::allot_float(double n)
 	return tag(flo);
 }
 
-inline cell allot_float(double n)
-{
-	return vm->allot_float(n);
-}
-
 inline bignum *factorvm::float_to_bignum(cell tagged)
 {
 	return double_to_bignum(untag_float(tagged));
-}
-
-inline bignum *float_to_bignum(cell tagged)
-{
-	return vm->float_to_bignum(tagged);
 }
 
 inline double factorvm::bignum_to_float(cell tagged)
@@ -432,19 +319,9 @@ inline double factorvm::bignum_to_float(cell tagged)
 	return bignum_to_double(untag<bignum>(tagged));
 }
 
-inline double bignum_to_float(cell tagged)
-{
-	return vm->bignum_to_float(tagged);
-}
-
 inline double factorvm::untag_float(cell tagged)
 {
 	return untag<boxed_float>(tagged)->n;
-}
-
-inline double untag_float(cell tagged)
-{
-	return vm->untag_float(tagged);
 }
 
 inline double factorvm::untag_float_check(cell tagged)
@@ -452,31 +329,15 @@ inline double factorvm::untag_float_check(cell tagged)
 	return untag_check<boxed_float>(tagged)->n;
 }
 
-inline double untag_float_check(cell tagged)
-{
-	return vm->untag_float_check(tagged);
-}
-
 inline fixnum factorvm::float_to_fixnum(cell tagged)
 {
 	return (fixnum)untag_float(tagged);
-}
-
-inline static fixnum float_to_fixnum(cell tagged)
-{
-	return vm->float_to_fixnum(tagged);
 }
 
 inline double factorvm::fixnum_to_float(cell tagged)
 {
 	return (double)untag_fixnum(tagged);
 }
-
-inline double fixnum_to_float(cell tagged)
-{
-	return vm->fixnum_to_float(tagged);
-}
-
 
 //callstack.hpp
 /* This is a little tricky. The iterator may allocate memory, so we
@@ -494,20 +355,10 @@ template<typename TYPE> void factorvm::iterate_callstack_object(callstack *stack
 	}
 }
 
-template<typename TYPE> void iterate_callstack_object(callstack *stack_, TYPE &iterator)
-{
-	return vm->iterate_callstack_object(stack_,iterator);
-}
-
 //booleans.hpp
 inline cell factorvm::tag_boolean(cell untagged)
 {
 	return (untagged ? T : F);
-}
-
-inline cell tag_boolean(cell untagged)
-{
-	return vm->tag_boolean(untagged);
 }
 
 // callstack.hpp
@@ -520,11 +371,6 @@ template<typename TYPE> void factorvm::iterate_callstack(cell top, cell bottom, 
 		iterator(frame,this);
 		frame = frame_successor(frame);
 	}
-}
-
-template<typename TYPE> void iterate_callstack(cell top, cell bottom, TYPE &iterator)
-{
-	return vm->iterate_callstack(top,bottom,iterator);
 }
 
 
@@ -546,11 +392,6 @@ inline void factorvm::do_slots(cell obj, void (* iter)(cell *,factorvm*))
 		iter((cell *)scan,this);
 		scan += sizeof(cell);
 	}
-}
-
-inline void do_slots(cell obj, void (* iter)(cell *,factorvm*))
-{
-	return vm->do_slots(obj,iter);
 }
 
 // code_heap.hpp

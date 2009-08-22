@@ -221,9 +221,6 @@ struct factorvm {
 	bool growing_data_heap;
 	data_heap *old_data_heap;
 
-	DEFPUSHPOP(gc_local_,gc_locals)
-
-
 	void init_data_gc();
 	object *copy_untagged_object_impl(object *pointer, cell size);
 	object *copy_object_impl(object *untagged);
