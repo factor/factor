@@ -65,16 +65,16 @@ VM_C_API float to_float(cell value, factorvm *vm);
 VM_C_API void box_double(double flo);
 VM_C_API double to_double(cell value, factorvm *vm);
 
-VM_C_API void box_signed_1(s8 n);
-VM_C_API void box_unsigned_1(u8 n);
-VM_C_API void box_signed_2(s16 n);
-VM_C_API void box_unsigned_2(u16 n);
-VM_C_API void box_signed_4(s32 n);
-VM_C_API void box_unsigned_4(u32 n);
-VM_C_API void box_signed_cell(fixnum integer);
-VM_C_API void box_unsigned_cell(cell cell);
-VM_C_API void box_signed_8(s64 n);
-VM_C_API void box_unsigned_8(u64 n);
+VM_C_API void box_signed_1(s8 n, factorvm *vm);
+VM_C_API void box_unsigned_1(u8 n, factorvm *vm);
+VM_C_API void box_signed_2(s16 n, factorvm *vm);
+VM_C_API void box_unsigned_2(u16 n, factorvm *vm);
+VM_C_API void box_signed_4(s32 n, factorvm *vm);
+VM_C_API void box_unsigned_4(u32 n, factorvm *vm);
+VM_C_API void box_signed_cell(fixnum integer, factorvm *vm);
+VM_C_API void box_unsigned_cell(cell cell, factorvm *vm);
+VM_C_API void box_signed_8(s64 n, factorvm *vm);
+VM_C_API void box_unsigned_8(u64 n, factorvm *vm);
 
 VM_C_API s64 to_signed_8(cell obj, factorvm *vm);
 VM_C_API u64 to_unsigned_8(cell obj, factorvm *vm);

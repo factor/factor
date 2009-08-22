@@ -638,9 +638,10 @@ void factorvm::box_signed_1(s8 n)
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_signed_1(s8 n)
+VM_C_API void box_signed_1(s8 n,factorvm *myvm)
 {
-	return vm->box_signed_1(n);
+	ASSERTVM();
+	return VM_PTR->box_signed_1(n);
 }
 
 void factorvm::box_unsigned_1(u8 n)
@@ -648,9 +649,10 @@ void factorvm::box_unsigned_1(u8 n)
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_unsigned_1(u8 n)
+VM_C_API void box_unsigned_1(u8 n,factorvm *myvm)
 {
-	return vm->box_unsigned_1(n);
+	ASSERTVM();
+	return VM_PTR->box_unsigned_1(n);
 }
 
 void factorvm::box_signed_2(s16 n)
@@ -658,9 +660,10 @@ void factorvm::box_signed_2(s16 n)
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_signed_2(s16 n)
+VM_C_API void box_signed_2(s16 n,factorvm *myvm)
 {
-	return vm->box_signed_2(n);
+	ASSERTVM();
+	return VM_PTR->box_signed_2(n);
 }
 
 void factorvm::box_unsigned_2(u16 n)
@@ -668,9 +671,10 @@ void factorvm::box_unsigned_2(u16 n)
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_unsigned_2(u16 n)
+VM_C_API void box_unsigned_2(u16 n,factorvm *myvm)
 {
-	return vm->box_unsigned_2(n);
+	ASSERTVM();
+	return VM_PTR->box_unsigned_2(n);
 }
 
 void factorvm::box_signed_4(s32 n)
@@ -678,9 +682,10 @@ void factorvm::box_signed_4(s32 n)
 	dpush(allot_integer(n));
 }
 
-VM_C_API void box_signed_4(s32 n)
+VM_C_API void box_signed_4(s32 n,factorvm *myvm)
 {
-	return vm->box_signed_4(n);
+	ASSERTVM();
+	return VM_PTR->box_signed_4(n);
 }
 
 void factorvm::box_unsigned_4(u32 n)
@@ -688,9 +693,10 @@ void factorvm::box_unsigned_4(u32 n)
 	dpush(allot_cell(n));
 }
 
-VM_C_API void box_unsigned_4(u32 n)
+VM_C_API void box_unsigned_4(u32 n,factorvm *myvm)
 {
-	return vm->box_unsigned_4(n);
+	ASSERTVM();
+	return VM_PTR->box_unsigned_4(n);
 }
 
 void factorvm::box_signed_cell(fixnum integer)
@@ -698,9 +704,10 @@ void factorvm::box_signed_cell(fixnum integer)
 	dpush(allot_integer(integer));
 }
 
-VM_C_API void box_signed_cell(fixnum integer)
+VM_C_API void box_signed_cell(fixnum integer,factorvm *myvm)
 {
-	return vm->box_signed_cell(integer);
+	ASSERTVM();
+	return VM_PTR->box_signed_cell(integer);
 }
 
 void factorvm::box_unsigned_cell(cell cell)
@@ -708,9 +715,10 @@ void factorvm::box_unsigned_cell(cell cell)
 	dpush(allot_cell(cell));
 }
 
-VM_C_API void box_unsigned_cell(cell cell)
+VM_C_API void box_unsigned_cell(cell cell,factorvm *myvm)
 {
-	return vm->box_unsigned_cell(cell);
+	ASSERTVM();
+	return VM_PTR->box_unsigned_cell(cell);
 }
 
 void factorvm::box_signed_8(s64 n)
@@ -721,9 +729,10 @@ void factorvm::box_signed_8(s64 n)
 		dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_signed_8(s64 n)
+VM_C_API void box_signed_8(s64 n,factorvm *myvm)
 {
-	return vm->box_signed_8(n);
+	ASSERTVM();
+	return VM_PTR->box_signed_8(n);
 }
 
 s64 factorvm::to_signed_8(cell obj)
@@ -754,9 +763,10 @@ void factorvm::box_unsigned_8(u64 n)
 		dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_unsigned_8(u64 n)
+VM_C_API void box_unsigned_8(u64 n,factorvm *myvm)
 {
-	return vm->box_unsigned_8(n);
+	ASSERTVM();
+	return VM_PTR->box_unsigned_8(n);
 }
 
 u64 factorvm::to_unsigned_8(cell obj)
