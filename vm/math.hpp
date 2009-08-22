@@ -5,6 +5,7 @@ static const fixnum fixnum_max = (((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
 static const fixnum fixnum_min = (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)));
 static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));
 
+// defined in assembler
 PRIMITIVE(fixnum_add);
 PRIMITIVE(fixnum_subtract);
 PRIMITIVE(fixnum_multiply);
