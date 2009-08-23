@@ -424,9 +424,11 @@ PRIVATE>
     over map-as ; inline
 
 : replicate ( seq quot -- newseq )
+    [ iota ] dip
     [ drop ] prepose map ; inline
 
 : replicate-as ( seq quot exemplar -- newseq )
+    [ iota ] 2dip
     [ [ drop ] prepose ] dip map-as ; inline
 
 : change-each ( seq quot -- )
