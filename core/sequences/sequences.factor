@@ -99,10 +99,10 @@ M: f like drop [ f ] when-empty ; inline
 INSTANCE: f immutable-sequence
 
 ! Integers support the sequence protocol
-! M: integer length ; inline
-! M: integer nth-unsafe drop ; inline
+M: integer length ; inline
+M: integer nth-unsafe drop ; inline
 
-! INSTANCE: integer immutable-sequence
+INSTANCE: integer immutable-sequence
 
 PRIVATE>
 
@@ -424,10 +424,9 @@ PRIVATE>
     over map-as ; inline
 
 : replicate ( seq quot -- newseq )
-    [ iota ] dip [ drop ] prepose map ; inline
+    [ drop ] prepose map ; inline
 
 : replicate-as ( seq quot exemplar -- newseq )
-    [ iota ] 2dip
     [ [ drop ] prepose ] dip map-as ; inline
 
 : change-each ( seq quot -- )
