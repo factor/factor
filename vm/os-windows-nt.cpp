@@ -21,7 +21,7 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
 
-	if(in_code_heap_p(c->EIP))
+	if(vm->in_code_heap_p(c->EIP))
 		signal_callstack_top = (stack_frame *)c->ESP;
 	else
 		signal_callstack_top = NULL;

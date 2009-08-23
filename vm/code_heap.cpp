@@ -9,15 +9,9 @@ void factorvm::init_code_heap(cell size)
 	new_heap(&code,size);
 }
 
-
 bool factorvm::in_code_heap_p(cell ptr)
 {
 	return (ptr >= code.seg->start && ptr <= code.seg->end);
-}
-
-bool in_code_heap_p(cell ptr)
-{
-	return vm->in_code_heap_p(ptr); // used by os specific signal handlers
 }
 
 /* Compile a word definition with the non-optimizing compiler. Allocates memory */
