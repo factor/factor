@@ -23,16 +23,7 @@ enum vm_error_type
 	ERROR_FP_TRAP,
 };
 
-void out_of_memory();
-void fatal_error(const char* msg, cell tagged);
-void critical_error(const char* msg, cell tagged);
-
 PRIMITIVE(die);
-
-void general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *native_stack);
-void not_implemented_error();
-void fp_trap_error(unsigned int fpu_status, stack_frame *signal_callstack_top);
-
 PRIMITIVE(call_clear);
 PRIMITIVE(unimplemented);
 

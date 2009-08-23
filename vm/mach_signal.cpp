@@ -203,13 +203,13 @@ void mach_initialize ()
 	/* Allocate a port on which the thread shall listen for exceptions.  */
 	if (mach_port_allocate (self, MACH_PORT_RIGHT_RECEIVE, &our_exception_port)
 		!= KERN_SUCCESS)
-		fatal_error("mach_port_allocate() failed",0);
+		vm->fatal_error("mach_port_allocate() failed",0);
 
 	/* See http://web.mit.edu/darwin/src/modules/xnu/osfmk/man/mach_port_insert_right.html.  */
 	if (mach_port_insert_right (self, our_exception_port, our_exception_port,
 		MACH_MSG_TYPE_MAKE_SEND)
 		!= KERN_SUCCESS)
-		fatal_error("mach_port_insert_right() failed",0);
+		vm->fatal_error("mach_port_insert_right() failed",0);
 
 	/* The exceptions we want to catch. */
 	mask = EXC_MASK_BAD_ACCESS | EXC_MASK_ARITHMETIC;
@@ -226,7 +226,7 @@ void mach_initialize ()
 	if (task_set_exception_ports (self, mask, our_exception_port,
 		EXCEPTION_DEFAULT, MACHINE_THREAD_STATE)
 		!= KERN_SUCCESS)
-		fatal_error("task_set_exception_ports() failed",0);
+		vm->fatal_error("task_set_exception_ports() failed",0);
 }
 
 }
