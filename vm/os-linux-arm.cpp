@@ -25,7 +25,7 @@ void flush_icache(cell start, cell len)
 		: "r0","r1","r2");
 
 	if(result < 0)
-		critical_error("flush_icache() failed",result);
+		vm->critical_error("flush_icache() failed",result);
 }
 
 }
