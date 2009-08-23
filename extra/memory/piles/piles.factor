@@ -28,6 +28,12 @@ M: pile dispose
         [ + ] curry change-offset drop
     ] 2tri ;
 
+: <pile-c-object> ( pile c-type -- alien )
+    heap-size pile-alloc ; inline
+
+: <pile-c-array> ( pile n c-type -- alien )
+    heap-size * pile-alloc ; inline
+
 : pile-align ( pile align -- pile )
     [ align ] curry change-offset ;
     
