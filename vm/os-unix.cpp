@@ -107,7 +107,7 @@ static stack_frame *uap_stack_pointer(void *uap)
 	delivered during stack frame setup/teardown or while transitioning
 	from Factor to C is a sign of things seriously gone wrong, not just
 	a divide by zero or stack underflow in the listener */
-	if(in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
+	if(vm->in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
 	{
 		stack_frame *ptr = (stack_frame *)ucontext_stack_pointer(uap);
 		if(!ptr)

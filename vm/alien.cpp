@@ -93,12 +93,6 @@ void *factorvm::alien_pointer()
 	return unbox_alien() + offset;
 }
 
-void *alien_pointer()
-{
-	return vm->alien_pointer();
-}
-
-
 /* define words to read/write values at an alien address */
 #define DEFINE_ALIEN_ACCESSOR(name,type,boxer,to) \
 	PRIMITIVE(alien_##name) \
@@ -232,7 +226,7 @@ char *factorvm::unbox_alien()
 
 VM_C_API char *unbox_alien()
 {
-	printf("*PHIL unbox_alien\n");fflush(stdout);
+	printf("PHIL unbox_alien\n");fflush(stdout);
 	return vm->unbox_alien();
 }
 
