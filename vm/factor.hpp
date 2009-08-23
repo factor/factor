@@ -7,6 +7,7 @@ VM_C_API void init_factor(vm_parameters *p);
 VM_C_API void pass_args_to_factor(int argc, vm_char **argv);
 VM_C_API void start_embedded_factor(vm_parameters *p);
 VM_C_API void start_standalone_factor(int argc, vm_char **argv);
+VM_C_API void start_standalone_factor_in_new_thread(int argc, vm_char **argv);
 
 VM_C_API char *factor_eval_string(char *string);
 VM_C_API void factor_eval_free(char *result);

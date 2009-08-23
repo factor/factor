@@ -3,6 +3,11 @@
 namespace factor
 {
 
+void start_thread(void *(*start_routine)(void *),void *args){
+    CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0); 
+}
+
+
 s64 factorvm::current_micros()
 {
 	FILETIME t;
