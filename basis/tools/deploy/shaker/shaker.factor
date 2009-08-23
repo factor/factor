@@ -202,17 +202,37 @@ IN: tools.deploy.shaker
         [ dup implementors [ "methods" word-prop delete-at ] with each ] each
     ] when ;
 
+: recursive-subst ( seq old new -- )
+    '[
+        _ _
+        {
+            ! old becomes new
+            { [ 3dup drop eq? ] [ 2nip ] }
+            ! recurse into arrays
+            { [ pick array? ] [ [ dup ] 2dip recursive-subst ] }
+            ! otherwise do nothing
+            [ 2drop ]
+        } cond
+    ] change-each ;
+
+: strip-default-method ( generic new-default -- )
+    [
+        [ "decision-tree" word-prop ]
+        [ "default-method" word-prop ] bi
+    ] dip
+    recursive-subst ;
+
+: new-default-method ( -- gensym )
+    [ [ "No method" throw ] (( -- * )) define-temp ] with-compilation-unit ;
+
 : strip-default-methods ( -- )
+    ! In a development image, each generic has its own default method.
+    ! This gives better error messages for runtime type errors, but
+    ! takes up space. For deployment we merge them all together.
     strip-debugger? [
         "Stripping default methods" show
-        [
-            [ generic? ] instances
-            [ "No method" throw ] (( -- * )) define-temp
-            dup t "default" set-word-prop
-            '[
-                [ _ "default-method" set-word-prop ] [ make-generic ] bi
-            ] each
-        ] with-compilation-unit
+        [ single-generic? ] instances
+        new-default-method '[ _ strip-default-method ] each
     ] when ;
 
 : strip-vocab-globals ( except names -- words )
@@ -361,8 +381,8 @@ IN: tools.deploy.shaker
     [ compress-object? ] [ ] "objects" compress ;
 
 : remain-compiled ( old new -- old new )
-    #! Quotations which were formerly compiled must remain
-    #! compiled.
+    ! Quotations which were formerly compiled must remain
+    ! compiled.
     2dup [
         2dup [ quot-compiled? ] [ quot-compiled? not ] bi* and
         [ nip jit-compile ] [ 2drop ] if
@@ -383,7 +403,9 @@ SYMBOL: deploy-vocab
         [ boot ] %
         init-hooks get values concat %
         strip-debugger? [ , ] [
-            ! Don't reference try directly
+            ! Don't reference 'try' directly since we don't want
+            ! to pull in the debugger and prettyprinter into every
+            ! deployed app
             [:c]
             [print-error]
             '[
