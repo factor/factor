@@ -6,7 +6,7 @@ vocabs sequences sequences.private words memory kernel.private
 continuations io vocabs.loader system strings sets vectors quotations
 byte-arrays sorting compiler.units definitions generic
 generic.standard generic.single tools.deploy.config combinators
-classes slots.private ;
+classes classes.builtin slots.private grouping ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: command-line
 QUALIFIED: compiler.errors
@@ -194,12 +194,31 @@ IN: tools.deploy.shaker
     strip-word-names? [ dup strip-word-names ] when
     2drop ;
 
+: compiler-classes ( -- seq )
+    { "compiler" "stack-checker" }
+    [ child-vocabs [ words ] map concat [ class? ] filter ]
+    map concat unique ;
+
+: prune-decision-tree ( tree classes -- )
+    [ tuple class>type ] 2dip '[
+        dup array? [
+            [
+                dup array? [
+                    [
+                        2 group
+                        [ drop _ key? not ] assoc-filter
+                        concat
+                    ] map
+                ] when
+            ] map
+        ] when
+    ] change-nth ;
+
 : strip-compiler-classes ( -- )
     strip-dictionary? [
         "Stripping compiler classes" show
-        { "compiler" "stack-checker" }
-        [ child-vocabs [ words ] map concat [ class? ] filter ] map concat
-        [ dup implementors [ "methods" word-prop delete-at ] with each ] each
+        [ single-generic? ] instances
+        compiler-classes '[ "decision-tree" word-prop _ prune-decision-tree ] each
     ] when ;
 
 : recursive-subst ( seq old new -- )
@@ -440,6 +459,8 @@ SYMBOL: deploy-vocab
     "vocab:tools/deploy/shaker/next-methods.factor" run-file ;
 
 : (clear-megamorphic-cache) ( i array -- )
+    ! Can't do any dispatch while clearing caches since that
+    ! might leave them in an inconsistent state.
     2dup 1 slot < [
         2dup [ f ] 2dip set-array-nth
         [ 1 + ] dip (clear-megamorphic-cache)
@@ -465,8 +486,8 @@ SYMBOL: deploy-vocab
     compute-next-methods
     strip-init-hooks
     strip-c-io
-    strip-compiler-classes
     strip-default-methods
+    strip-compiler-classes
     f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
     deploy-vocab get vocab-main deploy-boot-quot
     find-megamorphic-caches
