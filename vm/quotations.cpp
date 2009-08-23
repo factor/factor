@@ -92,7 +92,7 @@ bool quotation_jit::stack_frame_p()
 		switch(tagged<object>(obj).type())
 		{
 		case WORD_TYPE:
-			if(untag<word>(obj)->subprimitive == F)
+			if(myvm->untag<word>(obj)->subprimitive == F)
 				return true;
 			break;
 		case QUOTATION_TYPE:

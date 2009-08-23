@@ -6,7 +6,7 @@ namespace factor
 /* Snarfed from SBCL linux-so.c. You must free() this yourself. */
 const char *vm_executable_path()
 {
-	char *path = (char *)safe_malloc(PATH_MAX + 1);
+	char *path = (char *)vm->safe_malloc(PATH_MAX + 1);
 
 	int size = readlink("/proc/self/exe", path, PATH_MAX);
 	if (size < 0)
@@ -17,7 +17,7 @@ const char *vm_executable_path()
 	else
 	{
 		path[size] = '\0';
-		return safe_strdup(path);
+		return vm->safe_strdup(path);
 	}
 }
 
