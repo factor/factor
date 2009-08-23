@@ -1,6 +1,6 @@
 USING: alien.syntax alien.c-types core-foundation
 core-foundation.bundles core-foundation.dictionaries system
-combinators kernel sequences debugger io accessors ;
+combinators kernel sequences io accessors ;
 IN: iokit
 
 <<
@@ -136,11 +136,9 @@ FUNCTION: IOReturn IORegistryEntryCreateCFProperties ( io_registry_entry_t entry
 
 FUNCTION: char* mach_error_string ( IOReturn error ) ;
 
-TUPLE: mach-error error-code ;
-C: <mach-error> mach-error
-
-M: mach-error error.
-    "IOKit call failed: " print error-code>> mach_error_string print ;
+TUPLE: mach-error error-code error-string ;
+: <mach-error> ( code -- error )
+    dup mach_error_string \ mach-error boa ;
 
 : mach-error ( return -- )
     dup KERN_SUCCESS = [ drop ] [ <mach-error> throw ] if ;
