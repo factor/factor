@@ -82,6 +82,8 @@ IN: compiler.tree.propagation.tests
 
 [ bignum ] [ [ { bignum bignum } declare bitxor ] final-math-class ] unit-test
 
+[ bignum ] [ [ { integer } declare 123 >bignum bitand ] final-math-class ] unit-test
+
 [ float ] [ [ { float float } declare mod ] final-math-class ] unit-test
 
 [ V{ fixnum } ] [ [ 255 bitand ] final-classes ] unit-test
@@ -164,6 +166,10 @@ IN: compiler.tree.propagation.tests
 [ t ] [ [ { float } declare abs ] final-info first interval>> [0,inf] = ] unit-test
 
 [ t ] [ [ { float } declare absq ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { complex } declare abs ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { complex } declare absq ] final-info first interval>> [0,inf] = ] unit-test
 
 [ t ] [ [ [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
 

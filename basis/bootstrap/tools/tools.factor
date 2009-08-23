@@ -14,6 +14,7 @@ IN: bootstrap.tools
     "tools.test"
     "tools.time"
     "tools.threads"
+    "tools.deprecation"
     "vocabs.hierarchy"
     "vocabs.refresh"
     "vocabs.refresh.monitor"

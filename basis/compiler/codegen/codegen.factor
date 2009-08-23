@@ -267,7 +267,7 @@ M: ##alien-global generate-insn
     %alien-global ;
 
 ! ##alien-invoke
-GENERIC: next-fastcall-param ( reg-class -- )
+GENERIC: next-fastcall-param ( rep -- )
 
 : ?dummy-stack-params ( rep -- )
     dummy-stack-params? [ rep-size cell align stack-params +@ ] [ drop ] if ;
@@ -300,7 +300,7 @@ M: reg-class reg-class-full?
     stack-params dup ;
 
 : alloc-fastcall-param ( rep -- n reg-class rep )
-    [ reg-class-of [ get ] [ inc ] [ ] tri ] keep ;
+    [ [ reg-class-of get ] [ reg-class-of ] [ next-fastcall-param ] tri ] keep ;
 
 : alloc-parameter ( parameter -- reg rep )
     c-type-rep dup reg-class-of reg-class-full?
