@@ -123,6 +123,9 @@ M: word subwords drop f ;
 : define-declared ( word def effect -- )
     [ nip swap set-stack-effect ] [ drop define ] 3bi ;
 
+: make-deprecated ( word -- )
+    t "deprecated" set-word-prop ;
+
 : make-inline ( word -- )
     dup inline? [ drop ] [
         [ t "inline" set-word-prop ]
@@ -148,7 +151,7 @@ M: word reset-word
     {
         "unannotated-def" "parsing" "inline" "recursive"
         "foldable" "flushable" "reading" "writing" "reader"
-        "writer" "delimiter"
+        "writer" "delimiter" "deprecated"
     } reset-props ;
 
 : reset-generic ( word -- )
@@ -199,6 +202,9 @@ M: parsing-word definer drop \ SYNTAX: \ ; ;
 
 : delimiter? ( obj -- ? )
     dup word? [ "delimiter" word-prop ] [ drop f ] if ;
+
+: deprecated? ( obj -- ? )
+    dup word? [ "deprecated" word-prop ] [ drop f ] if ;
 
 ! Definition protocol
 M: word where "loc" word-prop ;

@@ -4,7 +4,7 @@ sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
-compiler definitions ;
+compiler definitions generic.single ;
 IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
@@ -423,3 +423,6 @@ M: object bad-dispatch-position-test* ;
         \ bad-dispatch-position-test* forget
     ] with-compilation-unit
 ] unit-test
+
+! Not sure if I want to fix this...
+! [ t [ [ f ] [ 3 ] if >fixnum ] compile-call ] [ no-method? ] must-fail-with

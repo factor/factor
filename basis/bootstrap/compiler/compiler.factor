@@ -35,83 +35,87 @@ gc
 : compile-unoptimized ( words -- )
     [ optimized? not ] filter compile ;
 
-nl
-"Compiling..." write flush
+"debug-compiler" get [
+    
+    nl
+    "Compiling..." write flush
 
-! Compile a set of words ahead of the full compile.
-! This set of words was determined semi-empirically
-! using the profiler. It improves bootstrap time
-! significantly, because frequenly called words
-! which are also quick to compile are replaced by
-! compiled definitions as soon as possible.
-{
-    not ?
+    ! Compile a set of words ahead of the full compile.
+    ! This set of words was determined semi-empirically
+    ! using the profiler. It improves bootstrap time
+    ! significantly, because frequenly called words
+    ! which are also quick to compile are replaced by
+    ! compiled definitions as soon as possible.
+    {
+        not ?
 
-    2over roll -roll
+        2over roll -roll
 
-    array? hashtable? vector?
-    tuple? sbuf? tombstone?
-    curry? compose? callable?
-    quotation?
+        array? hashtable? vector?
+        tuple? sbuf? tombstone?
+        curry? compose? callable?
+        quotation?
 
-    curry compose uncurry
+        curry compose uncurry
 
-    array-nth set-array-nth length>>
+        array-nth set-array-nth length>>
 
-    wrap probe
+        wrap probe
 
-    namestack*
+        namestack*
 
-    layout-of
-} compile-unoptimized
+        layout-of
+    } compile-unoptimized
 
-"." write flush
+    "." write flush
 
-{
-    bitand bitor bitxor bitnot
-} compile-unoptimized
+    {
+        bitand bitor bitxor bitnot
+    } compile-unoptimized
 
-"." write flush
+    "." write flush
 
-{
-    + 2/ < <= > >= shift
-} compile-unoptimized
+    {
+        + 2/ < <= > >= shift
+    } compile-unoptimized
 
-"." write flush
+    "." write flush
 
-{
-    new-sequence nth push pop last flip
-} compile-unoptimized
+    {
+        new-sequence nth push pop last flip
+    } compile-unoptimized
 
-"." write flush
+    "." write flush
 
-{
-    hashcode* = equal? assoc-stack (assoc-stack) get set
-} compile-unoptimized
+    {
+        hashcode* = equal? assoc-stack (assoc-stack) get set
+    } compile-unoptimized
 
-"." write flush
+    "." write flush
 
-{
-    memq? split harvest sift cut cut-slice start index clone
-    set-at reverse push-all class number>string string>number
-    like clone-like
-} compile-unoptimized
+    {
+        memq? split harvest sift cut cut-slice start index clone
+        set-at reverse push-all class number>string string>number
+        like clone-like
+    } compile-unoptimized
 
-"." write flush
+    "." write flush
 
-{
-    lines prefix suffix unclip new-assoc update
-    word-prop set-word-prop 1array 2array 3array ?nth
-} compile-unoptimized
+    {
+        lines prefix suffix unclip new-assoc update
+        word-prop set-word-prop 1array 2array 3array ?nth
+    } compile-unoptimized
 
-"." write flush
+    "." write flush
 
-{
-    malloc calloc free memcpy
-} compile-unoptimized
+    {
+        malloc calloc free memcpy
+    } compile-unoptimized
 
-"." write flush
+    "." write flush
 
-vocabs [ words compile-unoptimized "." write flush ] each
+    vocabs [ words compile-unoptimized "." write flush ] each
 
-" done" print flush
+    " done" print flush
+
+] unless
