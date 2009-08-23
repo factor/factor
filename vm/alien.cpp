@@ -232,7 +232,7 @@ char *factorvm::unbox_alien()
 
 VM_C_API char *unbox_alien()
 {
-	printf("*PHIL unbox_alien\n");
+	printf("*PHIL unbox_alien\n");fflush(stdout);
 	return vm->unbox_alien();
 }
 
