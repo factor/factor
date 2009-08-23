@@ -64,20 +64,9 @@ template <typename TYPE> TYPE *factorvm::untag_check(cell value)
 	return tagged<TYPE>(value).untag_check(this);
 }
 
-template <typename TYPE> TYPE *untag_check(cell value)
-{
-	return vm->untag_check<TYPE>(value);
-}
-
 template <typename TYPE> TYPE *factorvm::untag(cell value)
 {
 	return tagged<TYPE>(value).untagged();
 }
-
-template <typename TYPE> TYPE *untag(cell value)
-{
-	return vm->untag<TYPE>(value);
-}
-
 
 }

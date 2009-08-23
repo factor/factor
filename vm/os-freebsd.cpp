@@ -33,7 +33,7 @@ const char *vm_executable_path()
 	if(strcmp(path, "unknown") == 0)
 		return NULL;
 
-	return safe_strdup(path);
+	return vm->safe_strdup(path);
 }
 
 }

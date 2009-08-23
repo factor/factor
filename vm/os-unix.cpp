@@ -58,7 +58,7 @@ void ffi_dlclose(dll *dll)
 PRIMITIVE(existsp)
 {
 	struct stat sb;
-	char *path = (char *)(untag_check<byte_array>(dpop()) + 1);
+	char *path = (char *)(vm->untag_check<byte_array>(dpop()) + 1);
 	box_boolean(stat(path,&sb) >= 0);
 }
 
@@ -79,7 +79,7 @@ segment *alloc_segment(cell size)
 	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect high guard page",(cell)array);
 
-	segment *retval = (segment *)safe_malloc(sizeof(segment));
+	segment *retval = (segment *)vm->safe_malloc(sizeof(segment));
 
 	retval->start = (cell)(array + pagesize);
 	retval->size = size;

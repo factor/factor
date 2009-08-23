@@ -11,11 +11,6 @@ void *factorvm::safe_malloc(size_t size)
 	return ptr;
 }
 
-void *safe_malloc(size_t size)
-{
-	return vm->safe_malloc(size);
-}
-
 vm_char *factorvm::safe_strdup(const vm_char *str)
 {
 	vm_char *ptr = STRDUP(str);
@@ -23,10 +18,6 @@ vm_char *factorvm::safe_strdup(const vm_char *str)
 	return ptr;
 }
 
-vm_char *safe_strdup(const vm_char *str)
-{
-	return vm->safe_strdup(str);
-}
 
 /* We don't use printf directly, because format directives are not portable.
 Instead we define the common cases here. */
@@ -40,10 +31,6 @@ void factorvm::print_string(const char *str)
 	fputs(str,stdout);
 }
 
-void print_string(const char *str)
-{
-	return vm->print_string(str);
-}
 
 void factorvm::print_cell(cell x)
 {
