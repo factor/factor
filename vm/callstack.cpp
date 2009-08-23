@@ -246,9 +246,10 @@ void factorvm::save_callstack_bottom(stack_frame *callstack_bottom)
 	stack_chain->callstack_bottom = callstack_bottom;
 }
 
-VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom)
+VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom, factorvm *myvm)
 {
-	return vm->save_callstack_bottom(callstack_bottom);
+	ASSERTVM();
+	return VM_PTR->save_callstack_bottom(callstack_bottom);
 }
 
 }
