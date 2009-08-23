@@ -8,9 +8,10 @@ void factorvm::box_boolean(bool value)
 	dpush(value ? T : F);
 }
 
-VM_C_API void box_boolean(bool value)
+VM_C_API void box_boolean(bool value, factorvm *myvm)
 {
-	return vm->box_boolean(value);
+	ASSERTVM();
+	return VM_PTR->box_boolean(value);
 }
 
 bool factorvm::to_boolean(cell value)
@@ -18,9 +19,10 @@ bool factorvm::to_boolean(cell value)
 	return value != F;
 }
 
-VM_C_API bool to_boolean(cell value)
+VM_C_API bool to_boolean(cell value, factorvm *myvm)
 {
-	return vm->to_boolean(value);
+	ASSERTVM();
+	return VM_PTR->to_boolean(value);
 }
 
 }
