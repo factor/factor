@@ -41,7 +41,7 @@ static void call_fault_handler(
 	a divide by zero or stack underflow in the listener */
 
 	/* Are we in compiled Factor code? Then use the current stack pointer */
-	if(in_code_heap_p(MACH_PROGRAM_COUNTER(thread_state)))
+	if(vm->in_code_heap_p(MACH_PROGRAM_COUNTER(thread_state)))
 		signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
 	/* Are we in C? Then use the saved callstack top */
 	else
