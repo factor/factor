@@ -90,8 +90,9 @@ void factorvm::nest_stacks()
 	reset_retainstack();
 }
 
-void nest_stacks()
+void nest_stacks(factorvm *myvm)
 {
+	printf("PHIL nest_stacks %d %d\n",vm,myvm);fflush(stdout);
 	return vm->nest_stacks();
 }
 
@@ -110,8 +111,9 @@ void factorvm::unnest_stacks()
 	dealloc_context(old_stacks);
 }
 
-void unnest_stacks()
+void unnest_stacks(factorvm *myvm)
 {
+	printf("PHIL unnest_stacks %d %d\n",vm,myvm);fflush(stdout);
 	return vm->unnest_stacks();
 }
 
