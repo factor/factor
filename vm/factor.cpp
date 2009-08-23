@@ -277,4 +277,30 @@ VM_C_API void factor_sleep(long us)
 	return vm->factor_sleep(us);
 }
 
+struct startargs {
+	int argc;
+	vm_char **argv;
+};
+
+void* start_standalone_factor_thread(void *arg) 
+{
+	factorvm *newvm = new factorvm;
+	startargs *args = (startargs*) arg;
+	vm_parameters p;
+	newvm->default_parameters(&p);
+	newvm->init_parameters_from_args(&p,args->argc, args->argv);
+	newvm->init_factor(&p);
+	newvm->pass_args_to_factor(args->argc,args->argv);
+	newvm->start_factor(&p);
+	return 0;
+}
+
+
+VM_C_API void start_standalone_factor_in_new_thread(int argc, vm_char **argv)
+{
+	startargs *args = new startargs;   // leaks startargs structure
+	args->argc = argc; args->argv = argv;
+	start_thread(start_standalone_factor_thread,args);
+}
+
 }
