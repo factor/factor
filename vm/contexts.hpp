@@ -50,8 +50,9 @@ PRIMITIVE(set_datastack);
 PRIMITIVE(set_retainstack);
 PRIMITIVE(check_datastack);
 
-VM_C_API void nest_stacks();
-VM_C_API void unnest_stacks();
+struct factorvm;
+VM_C_API void nest_stacks(factorvm *vm);
+VM_C_API void unnest_stacks(factorvm *vm);
 
 }
 

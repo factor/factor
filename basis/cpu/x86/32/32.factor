@@ -257,11 +257,13 @@ M: x86.32 %callback-value ( ctype -- )
     ESP 12 SUB
     ! Save top of data stack in non-volatile register
     %prepare-unbox
+    push-vm-ptr
     EAX PUSH
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Place top of data stack in EAX
     EAX POP
+    temp-reg POP
     ! Restore C stack
     ESP 12 ADD
     ! Unbox EAX
