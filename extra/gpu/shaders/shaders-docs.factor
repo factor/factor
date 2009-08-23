@@ -111,7 +111,7 @@ HELP: output-index
 { $notes "Named fragment shader outputs require OpenGL 3.0 or later and GLSL 1.30 or later, or OpenGL 2.0 or later and GLSL 1.20 or earlier with the " { $snippet "GL_EXT_gpu_shader4" } " extension." } ;
 
 HELP: program
-{ $class-description "A " { $snippet "program" } " provides a specification for linking a " { $link program-instance } " in a graphics context. Programs are defined with " { $link POSTPONE: GLSL-PROGRAM: } " and instantiated in a context with " { $link <program-instance> } "." } ;
+{ $class-description "A " { $snippet "program" } " provides a specification for linking a " { $link program-instance } " in a graphics context. Programs are defined with " { $link POSTPONE: GLSL-PROGRAM: } " and instantiated for a context with " { $link <program-instance> } "." } ;
 
 HELP: program-instance
 { $class-description "A " { $snippet "program-instance" } " is a shader " { $link program } " that has been compiled and linked for a graphics context using " { $link <program-instance> } "." } ;
@@ -120,10 +120,10 @@ HELP: refresh-program
 { $values
     { "program" program }
 }
-{ $description "Rereads the source code for every " { $link shader } " in " { $link program } " and attempts to refresh all the existing " { $link shader-instance } "s and " { $link program-instance } "s for those programs. If the new source code fails to compile or link, the existing instances are untouched; otherwise, they are updated on the fly to reference the newly compiled code." } ;
+{ $description "Rereads the source code for every " { $link shader } " in " { $link program } " and attempts to refresh all the existing " { $link shader-instance } "s and " { $link program-instance } "s for those shaders. If any of the new source code fails to compile or link, the existing valid shader and program instances will remain untouched. However, subsequent attempts to compile new shader or program instances will still attempt to use the new source code. If the compilation and linking succeed, the existing shader and program instances will be updated on the fly to reference the newly compiled code." } ;
 
 HELP: shader
-{ $class-description "A " { $snippet "shader" } " provides a block of GLSL source code that can be compiled into a " { $link shader-instance } " in a graphics context. Shaders are defined with " { $link POSTPONE: GLSL-SHADER: } " or " { $link POSTPONE: GLSL-SHADER-FILE: } " and instantiated in a context with " { $link <shader-instance> } "." } ;
+{ $class-description "A " { $snippet "shader" } " provides a block of GLSL source code that can be compiled into a " { $link shader-instance } " in a graphics context. Shaders are defined with " { $link POSTPONE: GLSL-SHADER: } " or " { $link POSTPONE: GLSL-SHADER-FILE: } " and instantiated for a context with " { $link <shader-instance> } "." } ;
 
 HELP: shader-instance
 { $class-description "A " { $snippet "shader-instance" } " is a " { $link shader } " that has been compiled for a graphics context using " { $link <shader-instance> } "." } ;
