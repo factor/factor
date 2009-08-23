@@ -17,7 +17,7 @@ bool factorvm::in_code_heap_p(cell ptr)
 
 bool in_code_heap_p(cell ptr)
 {
-	return vm->in_code_heap_p(ptr);
+	return vm->in_code_heap_p(ptr); // used by os specific signal handlers
 }
 
 /* Compile a word definition with the non-optimizing compiler. Allocates memory */
