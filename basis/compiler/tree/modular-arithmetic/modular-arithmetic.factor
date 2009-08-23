@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.private math.partial-dispatch namespaces sequences
-sets accessors assocs words kernel memoize fry combinators
-combinators.short-circuit layouts alien.accessors
+USING: math math.intervals math.private math.partial-dispatch
+namespaces sequences sets accessors assocs words kernel memoize fry
+combinators combinators.short-circuit layouts alien.accessors
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -30,7 +30,7 @@ IN: compiler.tree.modular-arithmetic
     ] each-integer-derived-op
 ] each
 
-{ bitand bitor bitxor bitnot >integer }
+{ bitand bitor bitxor bitnot >integer >bignum fixnum>bignum }
 [ t "modular-arithmetic" set-word-prop ] each
 
 ! Words that only use the low-order bits of their input. If the input
@@ -71,16 +71,28 @@ M: #push compute-modular-candidates*
     [ out-d>> first ] [ literal>> ] bi
     real? [ [ modular-value ] [ fixnum-value ] bi ] [ drop ] if ;
 
+: small-shift? ( interval -- ? )
+    0 cell-bits tag-bits get - 1 - [a,b] interval-subset? ;
+
+: modular-word? ( #call -- ? )
+    dup word>> { shift fixnum-shift bignum-shift } memq?
+    [ node-input-infos second interval>> small-shift? ]
+    [ word>> "modular-arithmetic" word-prop ]
+    if ;
+
+: output-candidate ( #call -- )
+    out-d>> first [ modular-value ] [ fixnum-value ] bi ;
+
+: low-order-word? ( #call -- ? )
+    word>> "low-order" word-prop ;
+
+: input-candidiate ( #call -- )
+    in-d>> first modular-value ;
+
 M: #call compute-modular-candidates*
     {
-        {
-            [ dup word>> "modular-arithmetic" word-prop ]
-            [ out-d>> first [ modular-value ] [ fixnum-value ] bi ]
-        }
-        {
-            [ dup word>> "low-order" word-prop ]
-            [ in-d>> first modular-value ]
-        }
+        { [ dup modular-word? ] [ output-candidate ] }
+        { [ dup low-order-word? ] [ input-candidiate ] }
         [ drop ]
     } cond ;
 
@@ -94,15 +106,13 @@ M: node compute-modular-candidates*
 
 GENERIC: only-reads-low-order? ( node -- ? )
 
+: output-modular? ( #call -- ? )
+    out-d>> first modular-values get key? ;
+
 M: #call only-reads-low-order?
     {
-        [ word>> "low-order" word-prop ]
-        [
-            {
-                [ word>> "modular-arithmetic" word-prop ]
-                [ out-d>> first modular-values get key? ]
-            } 1&&
-        ]
+        [ low-order-word? ]
+        [ { [ modular-word? ] [ output-modular? ] } 1&& ]
     } 1|| ;
 
 M: node only-reads-low-order? drop f ;
@@ -162,22 +172,30 @@ MEMO: fixnum-coercion ( flags -- nodes )
     ] when ;
 
 : optimize-low-order-op ( #call -- nodes )
-    dup in-d>> first fixnum-value? [
+    dup in-d>> first actually-defined-by [ value>> fixnum-value? ] all? [
         [ ] [ in-d>> first ] [ info>> ] tri
         [ drop fixnum <class-info> ] change-at
     ] when ;
 
+: like->fixnum? ( #call -- ? )
+    word>> { >fixnum bignum>fixnum float>fixnum } memq? ;
+
+: like->integer? ( #call -- ? )
+    word>> { >integer >bignum fixnum>bignum } memq? ;
+
 M: #call optimize-modular-arithmetic*
-    dup word>> {
-        { [ dup { >fixnum bignum>fixnum float>fixnum } memq? ] [ drop optimize->fixnum ] }
-        { [ dup \ >integer eq? ] [ drop optimize->integer ] }
-        { [ dup "modular-arithmetic" word-prop ] [ drop optimize-modular-op ] }
-        { [ dup "low-order" word-prop ] [ drop optimize-low-order-op ] }
-        [ drop ]
+    {
+        { [ dup like->fixnum? ] [ optimize->fixnum ] }
+        { [ dup like->integer? ] [ optimize->integer ] }
+        { [ dup modular-word? ] [ optimize-modular-op ] }
+        { [ dup low-order-word? ] [ optimize-low-order-op ] }
+        [ ]
     } cond ;
 
 M: node optimize-modular-arithmetic* ;
 
 : optimize-modular-arithmetic ( nodes -- nodes' )
     dup compute-modular-candidates compute-modular-values
-    [ optimize-modular-arithmetic* ] map-nodes ;
+    modular-values get assoc-empty? [
+        [ optimize-modular-arithmetic* ] map-nodes
+    ] unless ;

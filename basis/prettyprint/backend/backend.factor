@@ -124,29 +124,31 @@ M: pathname pprint*
         ] if
     ] if ; inline
 
-: tuple>assoc ( tuple -- assoc )
-    [ class all-slots ] [ tuple-slots ] bi zip
+: filter-tuple-assoc ( slot,value -- name,value )
     [ [ initial>> ] dip = not ] assoc-filter
     [ [ name>> ] dip ] assoc-map ;
+
+: tuple>assoc ( tuple -- assoc )
+    [ class all-slots ] [ tuple-slots ] bi zip filter-tuple-assoc ;
 
 : pprint-slot-value ( name value -- )
     <flow \ { pprint-word
     [ text ] [ f <inset pprint* block> ] bi*
     \ } pprint-word block> ;
 
+: (pprint-tuple) ( opener class slots closer -- )
+    <flow {
+        [ pprint-word ]
+        [ pprint-word ]
+        [ t <inset [ pprint-slot-value ] assoc-each block> ]
+        [ pprint-word ]
+    } spread block> ;
+
+: ?pprint-tuple ( tuple quot -- )
+    [ boa-tuples? get [ pprint-object ] ] dip [ check-recursion ] curry if ; inline
+
 : pprint-tuple ( tuple -- )
-    boa-tuples? get [ pprint-object ] [
-        [
-            <flow
-            \ T{ pprint-word
-            dup class pprint-word
-            t <inset
-            tuple>assoc [ pprint-slot-value ] assoc-each
-            block>
-            \ } pprint-word
-            block>
-        ] check-recursion
-    ] if ;
+    [ [ \ T{ ] dip [ class ] [ tuple>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
 
 M: tuple pprint*
     pprint-tuple ;
@@ -177,15 +179,16 @@ M: callstack pprint-delims drop \ CS{ \ } ;
 M: object >pprint-sequence ;
 M: vector >pprint-sequence ;
 M: byte-vector >pprint-sequence ;
-M: curry >pprint-sequence ;
-M: compose >pprint-sequence ;
+M: callable >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
 
-M: tuple >pprint-sequence
-    [ class ] [ tuple-slots ] bi
+: class-slot-sequence ( class slots -- sequence )
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
+
+M: tuple >pprint-sequence
+    [ class ] [ tuple-slots ] bi class-slot-sequence ;
 
 M: object pprint-narrow? drop f ;
 M: byte-vector pprint-narrow? drop f ;

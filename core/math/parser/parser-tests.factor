@@ -25,6 +25,14 @@ unit-test
 [ "e" string>number ]
 unit-test
 
+[ 100000 ]
+[ "100,000" string>number ]
+unit-test
+
+[ 100000.0 ]
+[ "100,000.0" string>number ]
+unit-test
+
 [ "100.0" ]
 [ "1.0e2" string>number number>string ]
 unit-test

@@ -294,6 +294,16 @@ HELP: delimiter?
 { $description "Tests if an object is a delimiter word declared by " { $link POSTPONE: delimiter } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
+HELP: deprecated?
+{ $values { "obj" object } { "?" "a boolean" } }
+{ $description "Tests if an object is " { $link POSTPONE: deprecated } "." }
+{ $notes "Outputs " { $link f } " if the object is not a word." } ;
+
+HELP: make-deprecated
+{ $values { "word" word } }
+{ $description "Declares a word as " { $link POSTPONE: deprecated } "." }
+{ $side-effects "word" } ;
+
 HELP: make-flushable
 { $values { "word" word } }
 { $description "Declares a word as " { $link POSTPONE: flushable } "." }
