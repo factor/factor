@@ -92,8 +92,8 @@ void factorvm::nest_stacks()
 
 void nest_stacks(factorvm *myvm)
 {
-	printf("PHIL nest_stacks %d %d\n",vm,myvm);fflush(stdout);
-	return vm->nest_stacks();
+	ASSERTVM();
+	return VM_PTR->nest_stacks();
 }
 
 /* called when leaving a compiled callback */
@@ -113,8 +113,8 @@ void factorvm::unnest_stacks()
 
 void unnest_stacks(factorvm *myvm)
 {
-	printf("PHIL unnest_stacks %d %d\n",vm,myvm);fflush(stdout);
-	return vm->unnest_stacks();
+	ASSERTVM();
+	return VM_PTR->unnest_stacks();
 }
 
 /* called on startup */
