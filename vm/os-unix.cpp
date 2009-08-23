@@ -9,11 +9,11 @@ void start_thread(void *(*start_routine)(void *))
 	pthread_t thread;
 
 	if (pthread_attr_init (&attr) != 0)
-		fatal_error("pthread_attr_init() failed",0);
+		vm->fatal_error("pthread_attr_init() failed",0);
 	if (pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED) != 0)
-		fatal_error("pthread_attr_setdetachstate() failed",0);
+		vm->fatal_error("pthread_attr_setdetachstate() failed",0);
 	if (pthread_create (&thread, &attr, start_routine, NULL) != 0)
-		fatal_error("pthread_create() failed",0);
+		vm->fatal_error("pthread_create() failed",0);
 	pthread_attr_destroy (&attr);
 }
 
@@ -51,7 +51,7 @@ void *ffi_dlsym(dll *dll, symbol_char *symbol)
 void ffi_dlclose(dll *dll)
 {
 	if(dlclose(dll->dll))
-		general_error(ERROR_FFI,F,F,NULL);
+		vm->general_error(ERROR_FFI,F,F,NULL);
 	dll->dll = NULL;
 }
 
@@ -71,13 +71,13 @@ segment *alloc_segment(cell size)
 		MAP_ANON | MAP_PRIVATE,-1,0);
 
 	if(array == (char*)-1)
-		out_of_memory();
+		vm->out_of_memory();
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
-		fatal_error("Cannot protect low guard page",(cell)array);
+		vm->fatal_error("Cannot protect low guard page",(cell)array);
 
 	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
-		fatal_error("Cannot protect high guard page",(cell)array);
+		vm->fatal_error("Cannot protect high guard page",(cell)array);
 
 	segment *retval = (segment *)vm->safe_malloc(sizeof(segment));
 
@@ -96,7 +96,7 @@ void dealloc_segment(segment *block)
 		pagesize + block->size + pagesize);
 	
 	if(retval)
-		fatal_error("dealloc_segment failed",0);
+		vm->fatal_error("dealloc_segment failed",0);
 
 	free(block);
 }
@@ -111,7 +111,7 @@ static stack_frame *uap_stack_pointer(void *uap)
 	{
 		stack_frame *ptr = (stack_frame *)ucontext_stack_pointer(uap);
 		if(!ptr)
-			critical_error("Invalid uap",(cell)uap);
+			vm->critical_error("Invalid uap",(cell)uap);
 		return ptr;
 	}
 	else
@@ -154,7 +154,7 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 	while(ret == -1 && errno == EINTR);
 
 	if(ret == -1)
-		fatal_error("sigaction failed", 0);
+		vm->fatal_error("sigaction failed", 0);
 }
 
 void unix_init_signals()
@@ -216,7 +216,7 @@ extern "C" {
 void safe_close(int fd)
 {
 	if(close(fd) < 0)
-		fatal_error("error closing fd",errno);
+		vm->fatal_error("error closing fd",errno);
 }
 
 bool check_write(int fd, void *data, ssize_t size)
@@ -235,7 +235,7 @@ bool check_write(int fd, void *data, ssize_t size)
 void safe_write(int fd, void *data, ssize_t size)
 {
 	if(!check_write(fd,data,size))
-		fatal_error("error writing fd",errno);
+		vm->fatal_error("error writing fd",errno);
 }
 
 bool safe_read(int fd, void *data, ssize_t size)
@@ -247,7 +247,7 @@ bool safe_read(int fd, void *data, ssize_t size)
 			return safe_read(fd,data,size);
 		else
 		{
-			fatal_error("error reading fd",errno);
+			vm->fatal_error("error reading fd",errno);
 			return false;
 		}
 	}
@@ -266,7 +266,7 @@ void *stdin_loop(void *arg)
 			break;
 
 		if(buf[0] != 'X')
-			fatal_error("stdin_loop: bad data on control fd",buf[0]);
+			vm->fatal_error("stdin_loop: bad data on control fd",buf[0]);
 
 		for(;;)
 		{
@@ -303,19 +303,19 @@ void open_console()
 	int filedes[2];
 
 	if(pipe(filedes) < 0)
-		fatal_error("Error opening control pipe",errno);
+		vm->fatal_error("Error opening control pipe",errno);
 
 	control_read = filedes[0];
 	control_write = filedes[1];
 
 	if(pipe(filedes) < 0)
-		fatal_error("Error opening size pipe",errno);
+		vm->fatal_error("Error opening size pipe",errno);
 
 	size_read = filedes[0];
 	size_write = filedes[1];
 
 	if(pipe(filedes) < 0)
-		fatal_error("Error opening stdin pipe",errno);
+		vm->fatal_error("Error opening stdin pipe",errno);
 
 	stdin_read = filedes[0];
 	stdin_write = filedes[1];
@@ -330,7 +330,7 @@ VM_C_API void wait_for_stdin()
 		if(errno == EINTR)
 			wait_for_stdin();
 		else
-			fatal_error("Error writing control fd",errno);
+			vm->fatal_error("Error writing control fd",errno);
 	}
 }
 
