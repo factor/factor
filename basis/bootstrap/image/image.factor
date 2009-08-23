@@ -38,11 +38,11 @@ IN: bootstrap.image
 
 ! Object cache; we only consider numbers equal if they have the
 ! same type
-TUPLE: id obj ;
+TUPLE: eql-wrapper obj ;
 
-C: <id> id
+C: <eql-wrapper> eql-wrapper
 
-M: id hashcode* obj>> hashcode* ;
+M: eql-wrapper hashcode* obj>> hashcode* ;
 
 GENERIC: (eql?) ( obj1 obj2 -- ? )
 
@@ -62,19 +62,27 @@ M: sequence (eql?)
 
 M: object (eql?) = ;
 
-M: id equal?
-    over id? [ [ obj>> ] bi@ eql? ] [ 2drop f ] if ;
+M: eql-wrapper equal?
+    over eql-wrapper? [ [ obj>> ] bi@ eql? ] [ 2drop f ] if ;
+
+TUPLE: eq-wrapper obj ;
+
+C: <eq-wrapper> eq-wrapper
+
+M: eq-wrapper equal?
+    over eq-wrapper? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
 
 SYMBOL: objects
 
-: (objects) ( obj -- id assoc ) <id> objects get ; inline
+: cache-eql-object ( obj quot -- value )
+    [ <eql-wrapper> objects get ] dip '[ obj>> @ ] cache ; inline
 
-: lookup-object ( obj -- n/f ) (objects) at ;
+: cache-eq-object ( obj quot -- value )
+    [ <eq-wrapper> objects get ] dip '[ obj>> @ ] cache ; inline
 
-: put-object ( n obj -- ) (objects) set-at ;
+: lookup-object ( obj -- n/f ) <eq-wrapper> objects get at ;
 
-: cache-object ( obj quot -- value )
-    [ (objects) ] dip '[ obj>> @ ] cache ; inline
+: put-object ( n obj -- ) <eq-wrapper> objects get set-at ;
 
 ! Constants
 
@@ -252,7 +260,7 @@ GENERIC: ' ( obj -- ptr )
 M: bignum '
     [
         bignum [ emit-bignum ] emit-object
-    ] cache-object ;
+    ] cache-eql-object ;
 
 ! Fixnums
 
@@ -277,7 +285,7 @@ M: float '
         float [
             align-here double>bits emit-64
         ] emit-object
-    ] cache-object ;
+    ] cache-eql-object ;
 
 ! Special objects
 
@@ -340,7 +348,7 @@ M: word ' ;
 ! Wrappers
 
 M: wrapper '
-    wrapped>> ' wrapper [ emit ] emit-object ;
+    [ wrapped>> ' wrapper [ emit ] emit-object ] cache-eql-object ;
 
 ! Strings
 : native> ( object -- object )
@@ -379,7 +387,7 @@ M: wrapper '
 M: string '
     #! We pool strings so that each string is only written once
     #! to the image
-    [ emit-string ] cache-object ;
+    [ emit-string ] cache-eql-object ;
 
 : assert-empty ( seq -- )
     length 0 assert= ;
@@ -390,10 +398,12 @@ M: string '
     ] bi* ;
 
 M: byte-array '
-    byte-array [
-        dup length emit-fixnum
-        pad-bytes emit-bytes
-    ] emit-object ;
+    [
+        byte-array [
+            dup length emit-fixnum
+            pad-bytes emit-bytes
+        ] emit-object
+    ] cache-eq-object ;
 
 ! Tuples
 ERROR: tuple-removed class ;
@@ -408,20 +418,22 @@ ERROR: tuple-removed class ;
 
 : emit-tuple ( tuple -- pointer )
     dup class name>> "tombstone" =
-    [ [ (emit-tuple) ] cache-object ] [ (emit-tuple) ] if ;
+    [ [ (emit-tuple) ] cache-eql-object ]
+    [ [ (emit-tuple) ] cache-eq-object ]
+    if ;
 
 M: tuple ' emit-tuple ;
 
 M: tombstone '
     state>> "((tombstone))" "((empty))" ?
     "hashtables.private" lookup def>> first
-    [ emit-tuple ] cache-object ;
+    [ emit-tuple ] cache-eql-object ;
 
 ! Arrays
 : emit-array ( array -- offset )
     [ ' ] map array [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
 
-M: array ' emit-array ;
+M: array ' [ emit-array ] cache-eq-object ;
 
 ! This is a hack. We need to detect arrays which are tuple
 ! layout arrays so that they can be internalized, but making
@@ -438,7 +450,7 @@ M: tuple-layout-array '
     [
         [ dup integer? [ <fake-bignum> ] when ] map
         emit-array
-    ] cache-object ;
+    ] cache-eql-object ;
 
 ! Quotations
 
@@ -452,7 +464,7 @@ M: quotation '
             0 emit ! xt
             0 emit ! code
         ] emit-object
-    ] cache-object ;
+    ] cache-eql-object ;
 
 ! End of the image
 
