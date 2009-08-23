@@ -23,6 +23,10 @@ IN: math.intervals.tests
 
 [ T{ interval f { 1 t } { 1 t } } ] [ 1 [a,a] ] unit-test
 
+! Not sure how to handle NaNs yet...
+! [ 1 0/0. [a,b] ] must-fail
+! [ 0/0. 1 [a,b] ] must-fail
+
 [ t ] [ { 3 t } { 3 f } endpoint< ] unit-test
 [ t ] [ { 2 f } { 3 f } endpoint< ] unit-test
 [ f ] [ { 3 f } { 3 t } endpoint< ] unit-test
@@ -349,6 +353,10 @@ comparison-ops [
 [ t ] [ -10 10 [a,b] interval-abs 0 10 [a,b] = ] unit-test
 
 [ t ] [ full-interval interval-abs [0,inf] = ] unit-test
+
+[ t ] [ [0,inf] interval-abs [0,inf] = ] unit-test
+
+[ t ] [ empty-interval interval-abs empty-interval = ] unit-test
 
 [ t ] [ [0,inf] interval-sq [0,inf] = ] unit-test
 
