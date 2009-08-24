@@ -443,17 +443,15 @@ SYMBOL: deploy-vocab
     t "quiet" set-global
     f output-stream set-global ;
 
-: unsafe-next-method-quot ( method -- quot )
+: next-method* ( method -- quot )
     [ "method-class" word-prop ]
     [ "method-generic" word-prop ] bi
-    next-method 1quotation ;
+    next-method ;
 
 : compute-next-methods ( -- )
     [ standard-generic? ] instances [
         "methods" word-prop [
-            nip dup
-            unsafe-next-method-quot
-            "next-method-quot" set-word-prop
+            nip dup next-method* "next-method" set-word-prop
         ] assoc-each
     ] each
     "vocab:tools/deploy/shaker/next-methods.factor" run-file ;
