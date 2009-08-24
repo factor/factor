@@ -27,13 +27,6 @@ PRIMITIVE(die);
 PRIMITIVE(call_clear);
 PRIMITIVE(unimplemented);
 
-/* Global variables used to pass fault handler state from signal handler to
-user-space */
-extern cell signal_number;
-extern cell signal_fault_addr;
-extern unsigned int signal_fpu_status;
-extern stack_frame *signal_callstack_top;
-
 void memory_signal_handler_impl();
 void fp_signal_handler_impl();
 void misc_signal_handler_impl();

@@ -59,6 +59,12 @@ struct factorvm {
 	inline void vmprim_profiling();
 
 	// errors
+	/* Global variables used to pass fault handler state from signal handler to
+	   user-space */
+	cell signal_number;
+	cell signal_fault_addr;
+	unsigned int signal_fpu_status;
+	stack_frame *signal_callstack_top;
 	void out_of_memory();
 	void fatal_error(const char* msg, cell tagged);
 	void critical_error(const char* msg, cell tagged);
@@ -692,4 +698,6 @@ struct factorvm {
 
 extern factorvm *vm;
 
+extern factorvm *lookup_vm(long threadid);
+extern void register_vm(long threadid,factorvm *vm);
 }

@@ -3,8 +3,8 @@
 namespace factor
 {
 
-void start_thread(void *(*start_routine)(void *),void *args){
-    CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0); 
+void *start_thread(void *(*start_routine)(void *),void *args){
+    return CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0); 
 }
 
 
@@ -18,18 +18,19 @@ s64 factorvm::current_micros()
 
 FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 {
+	printf("exception handler %d\n",GetCurrentThreadId());
+	factorvm *myvm = lookup_vm(GetCurrentThreadId());
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
 
-	if(vm->in_code_heap_p(c->EIP))
-		signal_callstack_top = (stack_frame *)c->ESP;
+	if(myvm->in_code_heap_p(c->EIP))
+		myvm->signal_callstack_top = (stack_frame *)c->ESP;
 	else
-		signal_callstack_top = NULL;
+		myvm->signal_callstack_top = NULL;
 
-	switch (e->ExceptionCode)
-	{
-	case EXCEPTION_ACCESS_VIOLATION:
-		signal_fault_addr = e->ExceptionInformation[1];
+    switch (e->ExceptionCode) {
+    case EXCEPTION_ACCESS_VIOLATION:
+		myvm->signal_fault_addr = e->ExceptionInformation[1];
 		c->EIP = (cell)memory_signal_handler_impl;
 	break;
 
@@ -42,7 +43,7 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 	case STATUS_FLOAT_UNDERFLOW:
 	case STATUS_FLOAT_MULTIPLE_FAULTS:
 	case STATUS_FLOAT_MULTIPLE_TRAPS:
-		signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));
+		myvm->signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));
 		X87SW(c) = 0;
 		MXCSR(c) &= 0xffffffc0;
 		c->EIP = (cell)fp_signal_handler_impl;
@@ -56,7 +57,7 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 		enabled. Don't really have any idea what this exception means. */
 		break;
 	default:
-		signal_number = e->ExceptionCode;
+		myvm->signal_number = e->ExceptionCode;
 		c->EIP = (cell)misc_signal_handler_impl;
 		break;
 	}
