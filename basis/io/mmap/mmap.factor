@@ -6,30 +6,29 @@ accessors vocabs.loader combinators alien.c-types
 math ;
 IN: io.mmap
 
-TUPLE: mapped-file address handle length disposed ;
+TUPLE: mapped-file < disposable address handle length ;
 
 HOOK: (mapped-file-reader) os ( path length -- address handle )
 HOOK: (mapped-file-r/w) os ( path length -- address handle )
 
-ERROR: bad-mmap-size path size ;
+ERROR: bad-mmap-size n ;
 
 <PRIVATE
 
-: prepare-mapped-file ( path -- path' n )
-    [ normalize-path ] [ file-info size>> ] bi
-    dup 0 <= [ bad-mmap-size ] when ;
+: prepare-mapped-file ( path quot -- mapped-file path' length )
+    [
+        [ normalize-path ] [ file-info size>> ] bi
+        [ dup 0 <= [ bad-mmap-size ] [ 2drop ] if ]
+        [ nip mapped-file new-disposable swap >>length ]
+    ] dip 2tri [ >>address ] [ >>handle ] bi* ; inline
 
 PRIVATE>
 
 : <mapped-file-reader> ( path -- mmap )
-    prepare-mapped-file
-    [ (mapped-file-reader) ] keep
-    f mapped-file boa ;
+    [ (mapped-file-reader) ] prepare-mapped-file ;
 
 : <mapped-file> ( path -- mmap )
-    prepare-mapped-file
-    [ (mapped-file-r/w) ] keep
-    f mapped-file boa ;
+    [ (mapped-file-r/w) ] prepare-mapped-file ;
 
 HOOK: close-mapped-file io-backend ( mmap -- )
 
