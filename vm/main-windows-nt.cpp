@@ -17,6 +17,8 @@ int WINAPI WinMain(
 	}
 
 	factor::start_standalone_factor(nArgs,szArglist);
+	//HANDLE thread = factor::start_standalone_factor_in_new_thread(nArgs,szArglist);
+	//WaitForSingleObject(thread, INFINITE);
 
 	LocalFree(szArglist);
 

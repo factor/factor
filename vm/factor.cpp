@@ -212,7 +212,7 @@ void factorvm::factor_sleep(long us)
 
 void factorvm::start_standalone_factor(int argc, vm_char **argv)
 {
-	printf("thread id is %d\n",GetCurrentThreadId());fflush(stdout);
+	//printf("thread id is %d\n",GetCurrentThreadId());fflush(stdout);
 	register_vm(GetCurrentThreadId(),this);
 	vm_parameters p;
 	default_parameters(&p);
@@ -243,11 +243,12 @@ VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 	return newvm->start_standalone_factor(argc,argv);
 }
 
-VM_C_API void start_standalone_factor_in_new_thread(int argc, vm_char **argv)
+VM_C_API void *start_standalone_factor_in_new_thread(int argc, vm_char **argv)
 {
 	startargs *args = new startargs;   // leaks startargs structure
 	args->argc = argc; args->argv = argv;
-	start_thread(start_standalone_factor_thread,args);
+	void *handle = start_thread(start_standalone_factor_thread,args);
+	return handle;
 }
 
 }
