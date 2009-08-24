@@ -40,7 +40,7 @@ typedef char symbol_char;
 #define OPEN_READ(path) fopen(path,"rb")
 #define OPEN_WRITE(path) fopen(path,"wb")
 
-#define print_native_string(string) vm->print_string(string)
+#define print_native_string(string) print_string(string)
 
 void start_thread(void *(*start_routine)(void *));
 
