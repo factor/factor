@@ -181,15 +181,15 @@ SYMBOL: event-stream-callbacks
     }
     "cdecl" [ (master-event-source-callback) ] alien-callback ;
 
-TUPLE: event-stream info handle disposed ;
+TUPLE: event-stream < disposable info handle ;
 
 : <event-stream> ( quot paths latency flags -- event-stream )
     [
-        add-event-source-callback dup
-        [ master-event-source-callback ] dip
+        add-event-source-callback
+        [ master-event-source-callback ] keep
     ] 3dip <FSEventStream>
     dup enable-event-stream
-    f event-stream boa ;
+    event-stream new-disposable swap >>handle swap >>info ;
 
 M: event-stream dispose*
     {
