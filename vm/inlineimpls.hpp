@@ -176,7 +176,6 @@ struct gc_root : public tagged<TYPE>
 
 	void push() { myvm->check_tagged_pointer(tagged<TYPE>::value()); myvm->gc_locals.push_back((cell)this); }
 	
-	//explicit gc_root(cell value_, factorvm *vm) : myvm(vm),tagged<TYPE>(value_) { push(); }
 	explicit gc_root(cell value_,factorvm *vm) : tagged<TYPE>(value_),myvm(vm) { push(); }
 	explicit gc_root(TYPE *value_, factorvm *vm) : tagged<TYPE>(value_),myvm(vm) { push(); }
 
@@ -344,7 +343,7 @@ inline double factorvm::fixnum_to_float(cell tagged)
 keep the callstack in a GC root and use relative offsets */
 template<typename TYPE> void factorvm::iterate_callstack_object(callstack *stack_, TYPE &iterator)
 {
-	gc_root<callstack> stack(stack_,vm);
+	gc_root<callstack> stack(stack_,this);
 	fixnum frame_offset = untag_fixnum(stack->length) - sizeof(stack_frame);
 
 	while(frame_offset >= 0)
