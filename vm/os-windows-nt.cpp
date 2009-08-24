@@ -18,7 +18,6 @@ s64 factorvm::current_micros()
 
 FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 {
-	//printf("exception handler %d\n",GetCurrentThreadId());fflush(stdout);
 	factorvm *myvm = lookup_vm(GetCurrentThreadId());
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
@@ -64,12 +63,17 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
+bool handler_added = 0;
+
 void factorvm::c_to_factor_toplevel(cell quot)
 {
-	if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)exception_handler))
-		fatal_error("AddVectoredExceptionHandler failed", 0);
+	if(!handler_added){
+		if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)exception_handler))
+			fatal_error("AddVectoredExceptionHandler failed", 0);
+		handler_added = 1;
+	}
 	c_to_factor(quot,this);
-	RemoveVectoredExceptionHandler((void *)exception_handler);
+ 	RemoveVectoredExceptionHandler((void *)exception_handler);
 }
 
 void factorvm::open_console()

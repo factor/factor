@@ -170,8 +170,9 @@ void factorvm::pass_args_to_factor(int argc, vm_char **argv)
 	growable_array args(this);
 	int i;
 
-	for(i = 1; i < argc; i++)
+	for(i = 1; i < argc; i++){
 		args.add(allot_alien(F,(cell)argv[i]));
+	}
 
 	args.trim();
 	userenv[ARGS_ENV] = args.elements.value();
@@ -212,7 +213,6 @@ void factorvm::factor_sleep(long us)
 
 void factorvm::start_standalone_factor(int argc, vm_char **argv)
 {
-	//printf("thread id is %d\n",GetCurrentThreadId());fflush(stdout);
 	register_vm(GetCurrentThreadId(),this);
 	vm_parameters p;
 	default_parameters(&p);
