@@ -1,4 +1,5 @@
-USING: words ;
+USING: kernel words ;
 IN: generic
 
-: next-method-quot ( method -- quot ) "next-method-quot" word-prop ;
+: (call-next-method) ( method -- )
+    dup "next-method" word-prop execute ;

@@ -12,7 +12,7 @@ SYMBOL: watches
 
 SYMBOL: inotify
 
-TUPLE: linux-monitor < monitor wd inotify watches disposed ;
+TUPLE: linux-monitor < monitor wd inotify watches ;
 
 : <linux-monitor> ( wd path mailbox -- monitor )
     linux-monitor new-monitor
