@@ -24,11 +24,12 @@ IN: tools.deploy.shaker
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
     {
+        "alien.strings"
         "command-line"
         "cpu.x86"
+        "destructors"
         "environment"
         "libc"
-        "alien.strings"
     }
     [ init-hooks get delete-at ] each
     deploy-threads? get [
@@ -62,6 +63,13 @@ IN: tools.deploy.shaker
     "libc" vocab [
         "Stripping manual memory management debug code" show
         "vocab:tools/deploy/shaker/strip-libc.factor"
+        run-file
+    ] when ;
+
+: strip-destructors ( -- )
+    "libc" vocab [
+        "Stripping destructor debug code" show
+        "vocab:tools/deploy/shaker/strip-destructors.factor"
         run-file
     ] when ;
 
@@ -278,6 +286,8 @@ IN: tools.deploy.shaker
 
         "mallocs" "libc.private" lookup ,
 
+        "disposables" "destructors" lookup ,
+
         deploy-threads? [
             "initial-thread" "threads" lookup ,
         ] unless
@@ -478,6 +488,7 @@ SYMBOL: deploy-vocab
 : strip ( -- )
     init-stripper
     strip-libc
+    strip-destructors
     strip-call
     strip-cocoa
     strip-debugger

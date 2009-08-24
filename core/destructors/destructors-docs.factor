@@ -8,8 +8,8 @@ HELP: dispose
 $nl
 "No further operations can be performed on a disposable object after this call."
 $nl
-"Disposing an object which has already been disposed should have no effect, and in particular it should not fail with an error. To help implement this pattern, add a " { $slot "disposed" } " slot to your object and implement the " { $link dispose* } " method instead." }
-{ $notes "You must close disposable objects after you are finished working with them, to avoid leaking operating system resources. A convenient way to automate this is by using the " { $link with-disposal } " word."
+"Disposing an object which has already been disposed should have no effect, and in particular it should not fail with an error. To help implement this pattern, inherit from the " { $link disposable } " class and implement the " { $link dispose* } " method instead." }
+{ $notes "You must dispose of disposable objects after you are finished working with them, to avoid leaking operating system resources. A convenient way to automate this is by using the " { $link with-disposal } " word."
 $nl
 "The default implementation assumes the object has a " { $snippet "disposed" } " slot. If the slot is set to " { $link f } ", it calls " { $link dispose* } " and sets the slot to " { $link t } "." } ;
 
@@ -51,6 +51,9 @@ HELP: dispose-each
      { "seq" sequence } }
 { $description "Attempts to dispose of each element of a sequence and collects all of the errors into a sequence. If any errors are thrown during disposal, the last error is rethrown after all objects have been disposed." } ;
 
+HELP: disposables
+{ $var-description "Global variable holding all disposable objects which have not been disposed of yet. The " { $link new-disposable } " word adds objects here, and the " { $link dispose } " method on disposables removes them. The " { $link "tools.destructors" } " vocabulary provides some words for working with this data." } ;
+
 ARTICLE: "destructors-anti-patterns" "Resource disposal anti-patterns"
 "Words which create objects corresponding to external resources should always be used with " { $link with-disposal } ". The following code is wrong:"
 { $code
@@ -58,12 +61,9 @@ ARTICLE: "destructors-anti-patterns" "Resource disposal anti-patterns"
 }
 "The reason being that if " { $snippet "do stuff" } " throws an error, the resource will not be disposed of. The most important case where this can occur is with I/O streams, and the correct solution is to always use " { $link with-input-stream } " and " { $link with-output-stream } "; see " { $link "stdio" } " for details." ;
 
-ARTICLE: "destructors" "Deterministic resource disposal"
-"Operating system resources such as streams, memory mapped files, and so on are not managed by Factor's garbage collector and must be released when you are done with them. Failing to release a resource can lead to reduced performance and instability."
-$nl
-"Disposable object protocol:"
+ARTICLE: "destructors-using" "Using destructors"
+"Disposing of an object:"
 { $subsection dispose }
-{ $subsection dispose* }
 "Utility word for scoped disposal:"
 { $subsection with-disposal }
 "Utility word for disposing multiple objects:"
@@ -71,7 +71,23 @@ $nl
 "Utility words for more complex disposal patterns:"
 { $subsection with-destructors }
 { $subsection &dispose }
-{ $subsection |dispose }
-{ $subsection "destructors-anti-patterns" } ;
+{ $subsection |dispose } ;
+
+ARTICLE: "destructors-extending" "Writing new destructors"
+"Superclass for disposable objects:"
+{ $subsection disposable }
+"Parametrized constructor for disposable objects:"
+{ $subsection new-disposable }
+"Generic disposal word:"
+{ $subsection dispose* }
+"Global set of disposable objects:"
+{ $subsection disposables } ;
+
+ARTICLE: "destructors" "Deterministic resource disposal"
+"Operating system resources such as streams, memory mapped files, and so on are not managed by Factor's garbage collector and must be released when you are done with them. Failing to release a resource can lead to reduced performance and instability."
+{ $subsection "destructors-using" }
+{ $subsection "destructors-extending" }
+{ $subsection "destructors-anti-patterns" }
+{ $see-also "tools.destructors" } ;
 
 ABOUT: "destructors"

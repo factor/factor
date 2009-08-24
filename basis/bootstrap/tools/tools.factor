@@ -8,6 +8,7 @@ IN: bootstrap.tools
     "tools.crossref"
     "tools.errors"
     "tools.deploy"
+    "tools.destructors"
     "tools.disassembler"
     "tools.memory"
     "tools.profiler"
