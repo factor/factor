@@ -78,9 +78,9 @@ TUPLE: openssl-context < secure-context aliens sessions ;
         SSL_CTX_set_verify_depth
     ] [ drop ] if ;
 
-TUPLE: bio handle disposed ;
+TUPLE: bio < disposable handle ;
 
-: <bio> ( handle -- bio ) f bio boa ;
+: <bio> ( handle -- bio ) bio new-disposable swap >>handle ;
 
 M: bio dispose* handle>> BIO_free ssl-error ;
 
@@ -94,9 +94,9 @@ M: bio dispose* handle>> BIO_free ssl-error ;
         SSL_CTX_set_tmp_dh ssl-error
     ] [ drop ] if ;
 
-TUPLE: rsa handle disposed ;
+TUPLE: rsa < disposable handle ;
 
-: <rsa> ( handle -- rsa ) f rsa boa ;
+: <rsa> ( handle -- rsa ) rsa new-disposable swap >>handle ;
 
 M: rsa dispose* handle>> RSA_free ;
 
@@ -109,7 +109,7 @@ M: rsa dispose* handle>> RSA_free ;
     SSL_CTX_set_tmp_rsa ssl-error ;
 
 : <openssl-context> ( config ctx -- context )
-    openssl-context new
+    openssl-context new-disposable
         swap >>handle
         swap >>config
         V{ } clone >>aliens
@@ -139,7 +139,7 @@ M: openssl-context dispose*
     [ handle>> SSL_CTX_free ]
     tri ;
 
-TUPLE: ssl-handle file handle connected disposed ;
+TUPLE: ssl-handle < disposable file handle connected ;
 
 SYMBOL: default-secure-context
 
@@ -151,8 +151,10 @@ SYMBOL: default-secure-context
     ] unless* ;
 
 : <ssl-handle> ( fd -- ssl )
-    current-secure-context handle>> SSL_new dup ssl-error
-    f f ssl-handle boa ;
+    ssl-handle new-disposable
+    current-secure-context handle>> SSL_new
+    dup ssl-error >>handle
+    swap >>file ;
 
 M: ssl-handle dispose*
     [ handle>> SSL_free ] [ file>> dispose ] bi ;

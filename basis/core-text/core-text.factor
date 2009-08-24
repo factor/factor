@@ -46,7 +46,7 @@ ERROR: not-a-string object ;
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line line metrics image loc dim disposed ;
+TUPLE: line < disposable line metrics image loc dim ;
 
 : typographic-bounds ( line -- width ascent descent leading )
     0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
@@ -109,6 +109,8 @@ TUPLE: line line metrics image loc dim disposed ;
 
 :: <line> ( font string -- line )
     [
+        line new-disposable
+
         [let* | open-font [ font cache-font ]
                 line [ string open-font font foreground>> <CTLine> |CFRelease ]
 
@@ -120,7 +122,11 @@ TUPLE: line line metrics image loc dim disposed ;
                 ext [ (loc) (dim) [ + ceiling ] 2map ]
                 dim [ ext loc [ - >integer ] 2map ]
                 metrics [ open-font line compute-line-metrics ] |
-            line metrics
+
+            line >>line
+
+            metrics >>metrics
+
             dim [
                 {
                     [ font dim fill-background ]
@@ -128,11 +134,12 @@ TUPLE: line line metrics image loc dim disposed ;
                     [ loc set-text-position ]
                     [ [ line ] dip CTLineDraw ]
                 } cleave
-            ] make-bitmap-image
-            metrics loc dim line-loc
-            metrics metrics>dim
+            ] make-bitmap-image >>image
+
+            metrics loc dim line-loc >>loc
+
+            metrics metrics>dim >>dim
         ]
-        f line boa
     ] with-destructors ;
 
 M: line dispose* line>> CFRelease ;

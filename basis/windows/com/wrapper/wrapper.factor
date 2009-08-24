@@ -6,7 +6,7 @@ destructors fry math.parser generalizations sets
 specialized-arrays.alien specialized-arrays.direct.alien ;
 IN: windows.com.wrapper
 
-TUPLE: com-wrapper callbacks vtbls disposed ;
+TUPLE: com-wrapper < disposable callbacks vtbls ;
 
 <PRIVATE
 
@@ -153,7 +153,7 @@ PRIVATE>
     [ +live-wrappers+ get adjoin ] bi ;
 
 : <com-wrapper> ( implementations -- wrapper )
-    (make-callbacks) f f com-wrapper boa
+    com-wrapper new-disposable swap (make-callbacks) >>vtbls
     dup allocate-wrapper ;
 
 M: com-wrapper dispose*
