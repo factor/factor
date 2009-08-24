@@ -5,6 +5,19 @@ namespace factor
 
 factorvm *vm;
 
+unordered_map<long,factorvm*> thread_vms;
+
+factorvm *lookup_vm(long threadid)
+{
+	return thread_vms[threadid];
+}
+
+void register_vm(long threadid, factorvm *vm)
+{
+	thread_vms[threadid] = vm;
+}
+
+
 void factorvm::default_parameters(vm_parameters *p)
 {
 	p->image_path = NULL;
@@ -199,6 +212,8 @@ void factorvm::factor_sleep(long us)
 
 void factorvm::start_standalone_factor(int argc, vm_char **argv)
 {
+	printf("thread id is %d\n",GetCurrentThreadId());fflush(stdout);
+	register_vm(GetCurrentThreadId(),this);
 	vm_parameters p;
 	default_parameters(&p);
 	init_parameters_from_args(&p,argc,argv);

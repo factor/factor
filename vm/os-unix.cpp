@@ -120,15 +120,15 @@ static stack_frame *uap_stack_pointer(void *uap)
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	signal_fault_addr = (cell)siginfo->si_addr;
-	signal_callstack_top = uap_stack_pointer(uap);
+	vm->signal_fault_addr = (cell)siginfo->si_addr;
+	vm->signal_callstack_top = uap_stack_pointer(uap);
 	UAP_PROGRAM_COUNTER(uap) = (cell)memory_signal_handler_impl;
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	signal_number = signal;
-	signal_callstack_top = uap_stack_pointer(uap);
+	vm->signal_number = signal;
+	vm->signal_callstack_top = uap_stack_pointer(uap);
 	UAP_PROGRAM_COUNTER(uap) = (cell)misc_signal_handler_impl;
 }
 
