@@ -6,7 +6,10 @@ io.encodings.utf8 alien.strings continuations destructors byte-arrays
 accessors combinators ;
 IN: io.streams.c
 
-TUPLE: c-stream handle disposed ;
+TUPLE: c-stream < disposable handle ;
+
+: new-c-stream ( handle class -- c-stream )
+    new-disposable swap >>handle ; inline
 
 M: c-stream dispose* handle>> fclose ;
 
@@ -20,7 +23,7 @@ M: c-stream stream-seek
 
 TUPLE: c-writer < c-stream ;
 
-: <c-writer> ( handle -- stream ) f c-writer boa ;
+: <c-writer> ( handle -- stream ) c-writer new-c-stream ;
 
 M: c-writer stream-element-type drop +byte+ ;
 
@@ -32,7 +35,7 @@ M: c-writer stream-flush dup check-disposed handle>> fflush ;
 
 TUPLE: c-reader < c-stream ;
 
-: <c-reader> ( handle -- stream ) f c-reader boa ;
+: <c-reader> ( handle -- stream ) c-reader new-c-stream ;
 
 M: c-reader stream-element-type drop +byte+ ;
 
