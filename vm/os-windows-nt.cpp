@@ -18,7 +18,7 @@ s64 factorvm::current_micros()
 
 FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 {
-	printf("exception handler %d\n",GetCurrentThreadId());
+	//printf("exception handler %d\n",GetCurrentThreadId());fflush(stdout);
 	factorvm *myvm = lookup_vm(GetCurrentThreadId());
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
