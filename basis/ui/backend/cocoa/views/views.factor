@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.strings arrays assocs
 cocoa kernel math cocoa.messages cocoa.subclassing cocoa.classes
 cocoa.views cocoa.application cocoa.pasteboard cocoa.types
-cocoa.windows sequences io.encodings.ascii ui ui.private ui.gadgets
+cocoa.windows sequences io.encodings.utf8 ui ui.private ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures
 core-foundation.strings core-graphics core-graphics.types threads
 combinators math.rectangles ;
@@ -220,7 +220,7 @@ CLASS: {
 { "validateUserInterfaceItem:" "char" { "id" "SEL" "id" }
     [
         nip -> action
-        2dup [ window ] [ ascii alien>string ] bi* validate-action
+        2dup [ window ] [ utf8 alien>string ] bi* validate-action
         [ [ 2drop ] dip >c-bool ] [ SUPER-> validateUserInterfaceItem: ] if
     ]
 }
