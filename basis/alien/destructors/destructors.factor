@@ -16,9 +16,10 @@ N [ F stack-effect out>> length ]
 
 WHERE
 
-TUPLE: F-destructor alien disposed ;
+TUPLE: F-destructor < disposable alien ;
 
-: <F-destructor> ( alien -- destructor ) f F-destructor boa ; inline
+: <F-destructor> ( alien -- destructor )
+    F-destructor new-disposable swap >>alien ; inline
 
 M: F-destructor dispose* alien>> F N ndrop ;
 

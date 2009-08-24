@@ -6,12 +6,12 @@ arrays assocs init system concurrency.conditions accessors
 debugger debugger.threads locals fry ;
 IN: concurrency.mailboxes
 
-TUPLE: mailbox threads data disposed ;
+TUPLE: mailbox < disposable threads data ;
 
 M: mailbox dispose* threads>> notify-all ;
 
 : <mailbox> ( -- mailbox )
-    <dlist> <dlist> f mailbox boa ;
+    mailbox new-disposable <dlist> >>threads <dlist> >>data ;
 
 : mailbox-empty? ( mailbox -- bool )
     data>> deque-empty? ;
