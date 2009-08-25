@@ -7,12 +7,12 @@ factorvm *vm;
 
 unordered_map<long,factorvm*> thread_vms;
 
-factorvm *lookup_vm(long threadid)
+factorvm *lookup_vm(unsigned long threadid)
 {
 	return thread_vms[threadid];
 }
 
-void register_vm(long threadid, factorvm *vm)
+void register_vm(unsigned long threadid, factorvm *vm)
 {
 	thread_vms[threadid] = vm;
 }
@@ -243,7 +243,7 @@ VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 	return newvm->start_standalone_factor(argc,argv);
 }
 
-VM_C_API void *start_standalone_factor_in_new_thread(int argc, vm_char **argv)
+VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc, vm_char **argv)
 {
 	startargs *args = new startargs;   // leaks startargs structure
 	args->argc = argc; args->argv = argv;
