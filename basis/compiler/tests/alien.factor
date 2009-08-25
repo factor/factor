@@ -6,7 +6,6 @@ namespaces.private parser quotations sequences
 specialized-arrays.float stack-checker stack-checker.errors
 system threads tools.test words ;
 IN: compiler.tests.alien
-FROM: classes.c-types => short float ;
 
 <<
 : libfactor-ffi-tests-path ( -- string )
@@ -575,8 +574,8 @@ FUNCTION: complex-float ffi_test_47 ( complex-float x, complex-double y ) ;
 
 ! Reported by jedahu
 STRUCT: bool-field-test
-    { name pinned-c-ptr }
-    { on boolean }
+    { name char* }
+    { on bool }
     { parents short } ;
 
 FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
