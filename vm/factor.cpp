@@ -12,9 +12,9 @@ factorvm *lookup_vm(unsigned long threadid)
 	return thread_vms[threadid];
 }
 
-void register_vm(unsigned long threadid, factorvm *vm)
+void register_vm(unsigned long threadid, factorvm *thevm)
 {
-	thread_vms[threadid] = vm;
+	thread_vms[threadid] = thevm;
 }
 
 

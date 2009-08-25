@@ -16,9 +16,12 @@ int WINAPI WinMain(
 		return 1;
 	}
 
+  #ifdef FACTOR_MULTITHREADED
+	factor::THREADHANDLE thread = factor::start_standalone_factor_in_new_thread(nArgs,szArglist);
+	WaitForSingleObject(thread, INFINITE);
+  #else
 	factor::start_standalone_factor(nArgs,szArglist);
-	//HANDLE thread = factor::start_standalone_factor_in_new_thread(nArgs,szArglist);
-	//WaitForSingleObject(thread, INFINITE);
+  #endif
 
 	LocalFree(szArglist);
 

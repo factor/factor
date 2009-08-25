@@ -677,17 +677,47 @@ struct factorvm {
 	bool windows_stat(vm_char *path);
 	
    #if defined(WINNT)
-	void c_to_factor_toplevel(cell quot);
 	void open_console();
  	// next method here:	
    #endif
+  #else  // UNIX
+
+	stack_frame *uap_stack_pointer(void *uap);
 
   #endif
 
 };
 
-extern factorvm *vm;
 
 extern factorvm *lookup_vm(unsigned long threadid);
 extern void register_vm(unsigned long threadid,factorvm *vm);
+
+#define FACTOR_SINGLE_THREADED
+
+#ifdef FACTOR_SINGLE_THREADED
+  extern factorvm *vm;
+  #define PRIMITIVE_GETVM() vm
+  #define PRIMITIVE_OVERFLOW_GETVM() vm
+  #define VM_PTR vm
+  #define ASSERTVM() 
+  #define SIGNAL_VM_PTR vm
+#endif
+
+#ifdef FACTOR_TESTING_MULTITHREADED
+  extern factorvm *vm;
+  #define PRIMITIVE_GETVM() ((factorvm*)myvm)
+  #define PRIMITIVE_OVERFLOW_GETVM() vm
+  #define VM_PTR myvm
+  #define ASSERTVM() assert(vm==myvm)
+  #define SIGNAL_VM_PTR lookup_vm(thread_id())
+#endif
+
+#ifdef FACTOR_MULTITHREADED
+  #define PRIMITIVE_GETVM() ((factorvm*)myvm)
+  #define PRIMITIVE_OVERFLOW_GETVM() ((factorvm*)myvm)
+  #define VM_PTR myvm
+  #define ASSERTVM() 
+  #define SIGNAL_VM_PTR lookup_vm(thread_id())
+#endif
+
 }
