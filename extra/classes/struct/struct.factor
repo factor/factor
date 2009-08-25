@@ -96,7 +96,7 @@ M: struct-class writer-quot
     field-spec new swap {
         [ name>> >>name ]
         [ offset>> >>offset ]
-        [ class>> c-type >>type ]
+        [ class>> >>type ]
         [ name>> reader-word >>reader ]
         [ name>> writer-word >>writer ]
     } cleave ;
