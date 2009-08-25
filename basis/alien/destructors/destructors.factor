@@ -4,7 +4,7 @@ USING: functors destructors accessors kernel parser words
 effects generalizations sequences ;
 IN: alien.destructors
 
-SLOT: alien
+TUPLE: alien-destructor alien ;
 
 FUNCTOR: define-destructor ( F -- )
 
@@ -16,12 +16,12 @@ N [ F stack-effect out>> length ]
 
 WHERE
 
-TUPLE: F-destructor < disposable alien ;
+TUPLE: F-destructor < alien-destructor ;
 
 : <F-destructor> ( alien -- destructor )
-    F-destructor new-disposable swap >>alien ; inline
+    F-destructor boa ; inline
 
-M: F-destructor dispose* alien>> F N ndrop ;
+M: F-destructor dispose alien>> F N ndrop ;
 
 : &F ( alien -- alien ) dup <F-destructor> &dispose drop ; inline
 
