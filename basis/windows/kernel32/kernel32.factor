@@ -216,15 +216,15 @@ C-STRUCT: OVERLAPPED
     { "DWORD" "offset-high" }
     { "HANDLE" "event" } ;
 
-C-STRUCT: SYSTEMTIME
-    { "WORD" "wYear" }
-    { "WORD" "wMonth" }
-    { "WORD" "wDayOfWeek" }
-    { "WORD" "wDay" }
-    { "WORD" "wHour" }
-    { "WORD" "wMinute" }
-    { "WORD" "wSecond" }
-    { "WORD" "wMilliseconds" } ;
+STRUCT: SYSTEMTIME
+    { wYear WORD }
+    { wMonth WORD }
+    { wDayOfWeek WORD }
+    { wDay WORD }
+    { wHour WORD }
+    { wMinute WORD }
+    { wSecond WORD }
+    { wMilliseconds WORD } ;
 
 C-STRUCT: TIME_ZONE_INFORMATION
     { "LONG" "Bias" }
@@ -235,9 +235,9 @@ C-STRUCT: TIME_ZONE_INFORMATION
     { "SYSTEMTIME" "DaylightDate" }
     { "LONG" "DaylightBias" } ;
 
-C-STRUCT: FILETIME
-    { "DWORD" "dwLowDateTime" }
-    { "DWORD" "dwHighDateTime" } ;
+STRUCT: FILETIME
+    { dwLowDateTime DWORD }
+    { dwHighDateTime DWORD } ;
 
 C-STRUCT: STARTUPINFO
     { "DWORD" "cb" }
