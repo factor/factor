@@ -267,42 +267,42 @@ STRUCT: PROCESS_INFORMATION
     { dwProcessId DWORD }
     { dwThreadId DWORD } ;
 
-C-STRUCT: SYSTEM_INFO
-    { "DWORD" "dwOemId" }
-    { "DWORD" "dwPageSize" }
-    { "LPVOID" "lpMinimumApplicationAddress" }
-    { "LPVOID" "lpMaximumApplicationAddress" }
-    { "DWORD_PTR" "dwActiveProcessorMask" }
-    { "DWORD" "dwNumberOfProcessors" }
-    { "DWORD" "dwProcessorType" }
-    { "DWORD" "dwAllocationGranularity" }
-    { "WORD" "wProcessorLevel" }
-    { "WORD" "wProcessorRevision" } ;
+STRUCT: SYSTEM_INFO
+    { dwOemId DWORD }
+    { dwPageSize DWORD }
+    { lpMinimumApplicationAddress LPVOID }
+    { lpMaximumApplicationAddress LPVOID }
+    { dwActiveProcessorMask DWORD_PTR }
+    { dwNumberOfProcessors DWORD }
+    { dwProcessorType DWORD }
+    { dwAllocationGranularity DWORD }
+    { wProcessorLevel WORD }
+    { wProcessorRevision WORD } ;
 
 TYPEDEF: void* LPSYSTEM_INFO
 
-C-STRUCT: MEMORYSTATUS
-    { "DWORD" "dwLength" }
-    { "DWORD" "dwMemoryLoad" }
-    { "SIZE_T" "dwTotalPhys" }
-    { "SIZE_T" "dwAvailPhys" }
-    { "SIZE_T" "dwTotalPageFile" }
-    { "SIZE_T" "dwAvailPageFile" }
-    { "SIZE_T" "dwTotalVirtual" }
-    { "SIZE_T" "dwAvailVirtual" } ;
+STRUCT: MEMORYSTATUS
+    { dwLength DWORD }
+    { dwMemoryLoad DWORD }
+    { dwTotalPhys SIZE_T }
+    { dwAvailPhys SIZE_T }
+    { dwTotalPageFile SIZE_T }
+    { dwAvailPageFile SIZE_T }
+    { dwTotalVirtual SIZE_T }
+    { dwAvailVirtual SIZE_T } ;
 
 TYPEDEF: void* LPMEMORYSTATUS
 
-C-STRUCT: MEMORYSTATUSEX
-    { "DWORD" "dwLength" }
-    { "DWORD" "dwMemoryLoad" }
-    { "DWORDLONG" "ullTotalPhys" }
-    { "DWORDLONG" "ullAvailPhys" }
-    { "DWORDLONG" "ullTotalPageFile" }
-    { "DWORDLONG" "ullAvailPageFile" }
-    { "DWORDLONG" "ullTotalVirtual" }
-    { "DWORDLONG" "ullAvailVirtual" }
-    { "DWORDLONG" "ullAvailExtendedVirtual" } ;
+STRUCT: MEMORYSTATUSEX
+    { dwLength DWORD }
+    { dwMemoryLoad DWORD }
+    { ullTotalPhys DWORDLONG }
+    { ullAvailPhys DWORDLONG }
+    { ullTotalPageFile DWORDLONG }
+    { ullAvailPageFile DWORDLONG }
+    { ullTotalVirtual DWORDLONG }
+    { ullAvailVirtual DWORDLONG }
+    { ullAvailExtendedVirtual DWORDLONG } ;
 
 TYPEDEF: void* LPMEMORYSTATUSEX
 
