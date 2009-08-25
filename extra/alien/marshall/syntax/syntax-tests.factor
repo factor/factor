@@ -9,9 +9,7 @@ C-LIBRARY: test
 
 C-INCLUDE: <stdlib.h>
 C-INCLUDE: <string.h>
-
-! This used to typedef 'bool' but that's bad for PowerPC where its really an int
-C-TYPEDEF: char mybool
+C-INCLUDE: <stdbool.h>
 
 CM-FUNCTION: void outarg1 ( int* a )
     *a += 2;
@@ -39,7 +37,7 @@ CM-FUNCTION: void change_time ( double hours, sundial* d )
     d->wedge.degrees = hours * 30;
 ;
 
-CM-FUNCTION: mybool c_not ( mybool p )
+CM-FUNCTION: bool c_not ( bool p )
     return !p;
 ;
 
