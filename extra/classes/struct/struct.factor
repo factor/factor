@@ -204,7 +204,7 @@ M: struct-class heap-size
 ERROR: invalid-struct-slot token ;
 
 : struct-slot-class ( c-type -- class' )
-    c-type boxed-class>>
+    c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
 
 : parse-struct-slot ( -- slot )
