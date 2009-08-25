@@ -115,6 +115,17 @@ DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
 	fldcw (STACK_REG)
 	/* rewind_to */
 	mov ARG1,STACK_REG
+	mov ARG2,ARG1  /* make vm ptr 2nd arg in case quot_xt = lazy_jit_compile */
 	jmp *QUOT_XT_OFFSET(ARG0)
+
+DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
+	mov ARG1,ARG2                /* vm is 3rd arg */
+	mov STACK_REG,ARG1           /* Save stack pointer */
+	sub $STACK_PADDING,STACK_REG
+	call MANGLE(lazy_jit_compile_impl)
+	mov RETURN_REG,ARG0          /* No-op on 32-bit */
+	add $STACK_PADDING,STACK_REG
+        jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
+
 	
 #include "cpu-x86.S"
