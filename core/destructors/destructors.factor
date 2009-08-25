@@ -21,7 +21,7 @@ SLOT: continuation
     disposables get conjoin ;
 
 : unregister-disposable ( obj -- )
-    disposables get 2dup key? [ already-unregistered ] unless delete-at ;
+    disposables get 2dup key? [ delete-at ] [ drop already-unregistered ] if ;
 
 PRIVATE>
 
@@ -49,7 +49,11 @@ M: object dispose
     dup disposed>> [ drop ] [ t >>disposed dispose* ] if ;
 
 M: disposable dispose
-    [ unregister-disposable ] [ call-next-method ] bi ;
+    dup disposed>> [ drop ] [
+        [ unregister-disposable ]
+        [ call-next-method ]
+        bi
+    ] if ;
 
 : dispose-each ( seq -- )
     [
