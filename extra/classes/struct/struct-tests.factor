@@ -1,13 +1,15 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien.c-types alien.structs.fields classes.c-types
-classes.struct combinators io.streams.string kernel libc literals math
-multiline namespaces prettyprint prettyprint.config see tools.test ;
+USING: accessors alien.c-types alien.structs.fields alien.syntax
+classes.c-types classes.struct combinators io.streams.string kernel
+libc literals math multiline namespaces prettyprint prettyprint.config
+see tools.test ;
+FROM: classes.c-types => float ;
 IN: classes.struct.tests
 
 STRUCT: struct-test-foo
     { x char }
     { y int initial: 123 }
-    { z boolean } ;
+    { z bool } ;
 
 STRUCT: struct-test-bar
     { w ushort initial: HEX: ffff }
@@ -32,7 +34,7 @@ STRUCT: struct-test-bar
 [ 7654 ] [ S{ struct-test-foo { y 7654 } } y>> ] unit-test
 
 UNION-STRUCT: struct-test-float-and-bits
-    { f single-float }
+    { f float }
     { bits uint } ;
 
 [ 1.0 ] [ struct-test-float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
@@ -65,7 +67,7 @@ STRUCT: struct-test-foo
 [ <" USING: classes.c-types classes.struct ;
 IN: classes.struct.tests
 UNION-STRUCT: struct-test-float-and-bits
-    { f single-float initial: 0.0 } { bits uint initial: 0 } ;
+    { f float initial: 0.0 } { bits uint initial: 0 } ;
 "> ]
 [ [ struct-test-float-and-bits see ] with-string-writer ] unit-test
 
@@ -73,21 +75,21 @@ UNION-STRUCT: struct-test-float-and-bits
     T{ field-spec
         { name "x" }
         { offset 0 }
-        { type $[ char c-type ] }
+        { type char }
         { reader x>> }
         { writer (>>x) }
     }
     T{ field-spec
         { name "y" }
         { offset 4 }
-        { type $[ int c-type ] }
+        { type int }
         { reader y>> }
         { writer (>>y) }
     }
     T{ field-spec
         { name "z" }
         { offset 8 }
-        { type $[ boolean c-type ] }
+        { type bool }
         { reader z>> }
         { writer (>>z) }
     }
@@ -97,16 +99,24 @@ UNION-STRUCT: struct-test-float-and-bits
     T{ field-spec
         { name "f" }
         { offset 0 }
-        { type $[ single-float c-type ] }
+        { type float }
         { reader f>> }
         { writer (>>f) }
     }
     T{ field-spec
         { name "bits" }
         { offset 0 }
-        { type $[ uint c-type ] }
+        { type uint }
         { reader bits>> }
         { writer (>>bits) }
     }
 } ] [ "struct-test-float-and-bits" c-type fields>> ] unit-test
 
+STRUCT: struct-test-ffi-foo
+    { x int }
+    { y int } ;
+
+LIBRARY: f-cdecl
+FUNCTION: int ffi_test_11 ( int a, struct-test-ffi-foo b, int c ) ;
+
+[ 14 ] [ 1 2 3 struct-test-ffi-foo <struct-boa> 4 ffi_test_11 ] unit-test

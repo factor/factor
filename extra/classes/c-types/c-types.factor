@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
 USING: alien alien.c-types classes classes.predicate kernel
-math math.bitwise math.order namespaces sequences words
+math.bitwise math.order namespaces sequences words
 specialized-arrays.direct.alien
 specialized-arrays.direct.bool
 specialized-arrays.direct.char
@@ -17,46 +17,53 @@ specialized-arrays.direct.uint
 specialized-arrays.direct.ulong
 specialized-arrays.direct.ulonglong
 specialized-arrays.direct.ushort ;
+QUALIFIED: math
 IN: classes.c-types
 
-PREDICATE: char < fixnum
+PREDICATE: char < math:fixnum
     HEX: -80 HEX: 7f between? ;
 
-PREDICATE: uchar < fixnum
+PREDICATE: uchar < math:fixnum
     HEX: 0 HEX: ff between? ;
 
-PREDICATE: short < fixnum
+PREDICATE: short < math:fixnum
     HEX: -8000 HEX: 7fff between? ;
 
-PREDICATE: ushort < fixnum
+PREDICATE: ushort < math:fixnum
     HEX: 0 HEX: ffff between? ;
 
-PREDICATE: int < integer
+PREDICATE: int < math:integer
     HEX: -8000,0000 HEX: 7fff,ffff between? ;
 
-PREDICATE: uint < integer
+PREDICATE: uint < math:integer
     HEX: 0 HEX: ffff,ffff between? ;
 
-PREDICATE: longlong < integer
+PREDICATE: longlong < math:integer
     HEX: -8000,0000,0000,0000 HEX: 7fff,ffff,ffff,ffff between? ;
 
-PREDICATE: ulonglong < integer
+PREDICATE: ulonglong < math:integer
     HEX: 0 HEX: ffff,ffff,ffff,ffff between? ;
 
-UNION: single-float float ;
-UNION: single-complex complex ;
+UNION: double math:float ;
+UNION: complex-double math:complex ;
+
+UNION: bool boolean ;
+UNION: void* pinned-c-ptr ;
+
+UNION: float math:float ;
+UNION: complex-float math:complex ;
 
 SYMBOLS: long ulong long-bits ;
 
 <<
     "long" heap-size 8 =
     [
-        \  long integer [ HEX: -8000,0000,0000,0000 HEX: 7fff,ffff,ffff,ffff between? ] define-predicate-class
-        \ ulong integer [ HEX:                    0 HEX: ffff,ffff,ffff,ffff between? ] define-predicate-class
+        \  long math:integer [ HEX: -8000,0000,0000,0000 HEX: 7fff,ffff,ffff,ffff between? ] define-predicate-class
+        \ ulong math:integer [ HEX:                    0 HEX: ffff,ffff,ffff,ffff between? ] define-predicate-class
         64 \ long-bits set-global
     ] [
-        \  long integer [ HEX: -8000,0000 HEX: 7fff,ffff between? ] define-predicate-class
-        \ ulong integer [ HEX:          0 HEX: ffff,ffff between? ] define-predicate-class
+        \  long math:integer [ HEX: -8000,0000 HEX: 7fff,ffff between? ] define-predicate-class
+        \ ulong math:integer [ HEX:          0 HEX: ffff,ffff between? ] define-predicate-class
         32 \ long-bits set-global
     ] if
 >>
@@ -72,7 +79,9 @@ SYMBOLS: long ulong long-bits ;
     "class-direct-array" word-prop ;
 
 \ f            f            "void*"          \ <direct-void*-array>          set-class-c-type
+void*          f            "void*"          \ <direct-void*-array>          set-class-c-type
 pinned-c-ptr   f            "void*"          \ <direct-void*-array>          set-class-c-type
+bool           f            "bool"           \ <direct-bool-array>           set-class-c-type
 boolean        f            "bool"           \ <direct-bool-array>           set-class-c-type
 char           0            "char"           \ <direct-char-array>           set-class-c-type
 uchar          0            "uchar"          \ <direct-uchar-array>          set-class-c-type
@@ -84,10 +93,10 @@ long           0            "long"           \ <direct-long-array>           set
 ulong          0            "ulong"          \ <direct-ulong-array>          set-class-c-type
 longlong       0            "longlong"       \ <direct-longlong-array>       set-class-c-type
 ulonglong      0            "ulonglong"      \ <direct-ulonglong-array>      set-class-c-type
-float          0.0          "double"         \ <direct-double-array>         set-class-c-type
-single-float   0.0          "float"          \ <direct-float-array>          set-class-c-type
-complex        C{ 0.0 0.0 } "complex-double" \ <direct-complex-double-array> set-class-c-type
-single-complex C{ 0.0 0.0 } "complex-float"  \ <direct-complex-float-array>  set-class-c-type
+float          0.0          "float"          \ <direct-float-array>          set-class-c-type
+double         0.0          "double"         \ <direct-double-array>         set-class-c-type
+complex-float  C{ 0.0 0.0 } "complex-float"  \ <direct-complex-float-array>  set-class-c-type
+complex-double C{ 0.0 0.0 } "complex-double" \ <direct-complex-double-array> set-class-c-type
 
 char      [  8 bits  8 >signed ] "coercer" set-word-prop
 uchar     [  8 bits            ] "coercer" set-word-prop
