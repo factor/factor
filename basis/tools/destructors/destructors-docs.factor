@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax quotations ;
+USING: help.markup help.syntax help.tips quotations destructors ;
 IN: tools.destructors
 
 HELP: disposables.
@@ -10,10 +10,13 @@ HELP: leaks
 { $values
     { "quot" quotation }
 }
-{ $description "Runs a quotation, printing any increases in the number of disposable objects after the quotation returns." } ;
+{ $description "Runs a quotation, printing any increases in the number of disposable objects after the quotation returns. The " { $link debug-leaks? } " variable is also switched on while the quotation runs, recording the current continuation in every newly-created disposable object." } ;
+
+TIP: "Use the " { $link leaks } " combinator to track down resource leaks." ;
 
 ARTICLE: "tools.destructors" "Destructor tools"
 "The " { $vocab-link "tools.destructors" } " vocabulary provides words for tracking down resource leaks."
+{ $subsection debug-leaks? }
 { $subsection disposables. }
 { $subsection leaks }
 { $see-also "destructors" } ;

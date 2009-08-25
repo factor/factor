@@ -1,6 +1,23 @@
 USING: help.markup help.syntax libc kernel continuations io
-sequences ;
+sequences classes ;
 IN: destructors
+
+HELP: debug-leaks?
+{ $var-description "When this variable is on, " { $link new-disposable } " stores the current continuation in the " { $link disposable } "'s " { $slot "continuation" } " slot." }
+{ $see-also "tools.destructors" } ;
+
+HELP: disposable
+{ $class-description "Parent class for disposable resources. This class has three slots:"
+    { $list
+        { { $slot "disposed" } " - boolean. Set to true by " { $link dispose } ". Assert that it is false with " { $link check-disposed } "." }
+        { { $slot "id" } " - unique identifier. Set by " { $link new-disposable } "." }
+        { { $slot "continuation" } " - current continuation at construction time, for debugging. Set by " { $link new-disposable } " if " { $link debug-leaks? } " is on." }
+    }
+"New instances must be constructed with " { $link new-disposable } " and subclasses must implement " { $link dispose* } "." } ;
+
+HELP: new-disposable
+{ $values { "class" class } { "disposable" disposable } }
+{ $description "Constructs a new instance of a subclass of " { $link disposable } ". This sets the " { $slot "id" } " slot, registers the new object with the global " { $link disposables } " set, and if " { $link debug-leaks? } " is on, stores the current continuation in the " { $slot "continuation" } " slot." } ;
 
 HELP: dispose
 { $values { "disposable" "a disposable object" } }
@@ -52,7 +69,8 @@ HELP: dispose-each
 { $description "Attempts to dispose of each element of a sequence and collects all of the errors into a sequence. If any errors are thrown during disposal, the last error is rethrown after all objects have been disposed." } ;
 
 HELP: disposables
-{ $var-description "Global variable holding all disposable objects which have not been disposed of yet. The " { $link new-disposable } " word adds objects here, and the " { $link dispose } " method on disposables removes them. The " { $link "tools.destructors" } " vocabulary provides some words for working with this data." } ;
+{ $var-description "Global variable holding all disposable objects which have not been disposed of yet. The " { $link new-disposable } " word adds objects here, and the " { $link dispose } " method on disposables removes them. The " { $link "tools.destructors" } " vocabulary provides some words for working with this data." }
+{ $see-also "tools.destructors" } ;
 
 ARTICLE: "destructors-anti-patterns" "Resource disposal anti-patterns"
 "Words which create objects corresponding to external resources should always be used with " { $link with-disposal } ". The following code is wrong:"
