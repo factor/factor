@@ -659,18 +659,18 @@ struct factorvm {
 
 	// os-*
 	inline void vmprim_existsp();
-	long thread_id();
-
-	// os-windows
-  #if defined(WINDOWS)
+	cell thread_id();
 	void init_ffi();
 	void ffi_dlopen(dll *dll);
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);
 	void ffi_dlclose(dll *dll);
+	segment *alloc_segment(cell size);
+
+	// os-windows
+  #if defined(WINDOWS)
 	void sleep_micros(u64 usec);
 	long getpagesize();
 	void dealloc_segment(segment *block);
-	segment *alloc_segment(cell size);
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
