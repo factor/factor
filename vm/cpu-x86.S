@@ -56,17 +56,6 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	POP_NONVOLATILE
 	ret
 
-DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
-	mov ARG1,NV_TEMP_REG         /* stash vm ptr */
-	mov STACK_REG,ARG1           /* Save stack pointer */
-	sub $STACK_PADDING,STACK_REG
-	push NV_TEMP_REG             /* push vm ptr as arg3 */
-	call MANGLE(lazy_jit_compile_impl)
-	pop NV_TEMP_REG
-	mov RETURN_REG,ARG0          /* No-op on 32-bit */
-	add $STACK_PADDING,STACK_REG
-        jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
-
 /* cpu.x86.features calls this */
 DEF(bool,sse_version,(void)):
 	mov $0x1,RETURN_REG
@@ -103,6 +92,7 @@ sse_2:
 sse_1:
 	mov $10,RETURN_REG
 	ret
+
 #ifdef WINDOWS
 	.section .drectve
 	.ascii " -export:sse_version"
