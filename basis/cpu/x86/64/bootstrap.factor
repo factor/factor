@@ -21,6 +21,9 @@ IN: bootstrap.x86
 : rex-length ( -- n ) 1 ;
 
 [
+    ! HACK: stash vm pointer above the ds stack
+    temp0 0 MOV rc-absolute-cell rt-vm jit-rel
+    ds-reg bootstrap-cell [+] temp0 MOV 
     ! load stack_chain
     temp0 0 MOV rc-absolute-cell rt-stack-chain jit-rel
     temp0 temp0 [] MOV
