@@ -95,7 +95,11 @@ ERROR: unimplemented-color-type image ;
     unimplemented-color-type ;
 
 : decode-truecolor-alpha ( loading-png -- loading-png )
-    unimplemented-color-type ;
+    [ <image> ] dip {
+        [ png-image-bytes >>bitmap ]
+        [ [ width>> ] [ height>> ] bi 2array >>dim ]
+        [ drop RGBA >>component-order ubyte-components >>component-type ]
+    } cleave ;
 
 : decode-png ( loading-png -- loading-png ) 
     dup color-type>> {
