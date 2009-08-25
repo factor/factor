@@ -1,6 +1,7 @@
 ! (c)Joe Groff bsd license
-USING: alien arrays classes help.markup help.syntax kernel math
+USING: alien arrays classes help.markup help.syntax kernel
 specialized-arrays.direct ;
+QUALIFIED: math
 IN: classes.c-types
 
 HELP: c-type-class
@@ -11,7 +12,7 @@ HELP: char
 
 HELP: direct-array-of
 { $values
-    { "alien" c-ptr } { "len" integer } { "class" c-type-class }
+    { "alien" c-ptr } { "len" math:integer } { "class" c-type-class }
     { "array" "a direct array" }
 }
 { $description "Constructs one of the " { $link "specialized-arrays.direct" } " over " { $snippet "len" } " elements of type " { $snippet "class" } " located at the referenced location in raw memory." } ;
@@ -28,11 +29,17 @@ HELP: longlong
 HELP: short
 { $class-description "A signed two-byte integer quantity." } ;
 
-HELP: single-complex
+HELP: complex-float
 { $class-description "A single-precision complex floating point quantity." } ;
 
-HELP: single-float
+HELP: complex-double
+{ $class-description "A double-precision complex floating point quantity. This is an alias for the Factor " { $link math:complex } " type." } ;
+
+HELP: float
 { $class-description "A single-precision floating point quantity." } ;
+
+HELP: double
+{ $class-description "A double-precision floating point quantity. This is an alias for the Factor " { $link math:float } " type." } ;
 
 HELP: uchar
 { $class-description "An unsigned one-byte integer quantity." } ;
@@ -49,6 +56,12 @@ HELP: ulonglong
 HELP: ushort
 { $class-description "An unsigned two-byte integer quantity." } ;
 
+HELP: bool
+{ $class-description "A boolean value. This is an alias to the Factor " { $link boolean } " class." } ;
+
+HELP: void*
+{ $class-description "A pointer to raw C memory. This is an alias to the Factor " { $link pinned-c-ptr } " class." } ;
+
 ARTICLE: "classes.c-types" "C type classes"
 "The " { $vocab-link "classes.c-types" } " vocabulary defines Factor classes that correspond to C types in the FFI."
 { $subsection char }
@@ -61,11 +74,12 @@ ARTICLE: "classes.c-types" "C type classes"
 { $subsection ulong }
 { $subsection longlong }
 { $subsection ulonglong }
-{ $subsection single-float }
 { $subsection float }
-{ $subsection single-complex }
-{ $subsection complex }
-{ $subsection pinned-c-ptr }
+{ $subsection double }
+{ $subsection complex-float }
+{ $subsection complex-double }
+{ $subsection bool }
+{ $subsection void* }
 "The vocabulary also provides a word for constructing " { $link "specialized-arrays.direct" } " of C types over raw memory:"
 { $subsection direct-array-of } ;
 
