@@ -85,7 +85,7 @@ IN: io.launcher.windows.nt
 : redirect-stderr ( process args -- handle )
     over stderr>> +stdout+ eq? [
         nip
-        lpStartupInfo>> STARTUPINFO-hStdOutput
+        lpStartupInfo>> hStdOutput>>
     ] [
         drop
         stderr>>
@@ -104,7 +104,7 @@ IN: io.launcher.windows.nt
     STD_INPUT_HANDLE GetStdHandle or ;
 
 M: winnt fill-redirection ( process args -- )
-    [ 2dup redirect-stdout ] keep lpStartupInfo>> set-STARTUPINFO-hStdOutput
-    [ 2dup redirect-stderr ] keep lpStartupInfo>> set-STARTUPINFO-hStdError
-    [ 2dup redirect-stdin  ] keep lpStartupInfo>> set-STARTUPINFO-hStdInput
-    2drop ;
+    dup lpStartupInfo>>
+    [ [ redirect-stdout ] dip (>>hStdOutput) ]
+    [ [ redirect-stderr ] dip (>>hStdError) ]
+    [ [ redirect-stdin ] dip (>>hStdInput) ] 3tri ;
