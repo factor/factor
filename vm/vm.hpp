@@ -66,7 +66,6 @@ struct factorvm {
 	unsigned int signal_fpu_status;
 	stack_frame *signal_callstack_top;
 	void out_of_memory();
-	void fatal_error(const char* msg, cell tagged);
 	void critical_error(const char* msg, cell tagged);
 	void throw_error(cell error, stack_frame *callstack_top);
 	void not_implemented_error();
@@ -657,20 +656,6 @@ struct factorvm {
 	void factor_eval_free(char *result);
 	void factor_yield();
 	void factor_sleep(long us);
-
-	//utilities
-	void *safe_malloc(size_t size);
-	vm_char *safe_strdup(const vm_char *str);
-	void nl();
-	void print_string(const char *str);
-	void print_cell(cell x);
-	void print_cell_hex(cell x);
-	void print_cell_hex_pad(cell x);
-	void print_fixnum(fixnum x);
-	cell read_cell_hex();
-
-	
-
 
 	// os-*
 	inline void vmprim_existsp();
