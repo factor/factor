@@ -188,10 +188,10 @@ M: winnt file-systems ( -- array )
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
-        normalize-path open-existing &dispose handle>>
-        "FILETIME" <c-object>
-        "FILETIME" <c-object>
-        "FILETIME" <c-object>
+        normalize-path open-read &dispose handle>>
+        FILETIME <struct>
+        FILETIME <struct>
+        FILETIME <struct>
         [ GetFileTime win32-error=0/f ] 3keep
         [ FILETIME>timestamp >local-time ] tri@
     ] with-destructors ;
