@@ -32,6 +32,8 @@ M: A set-nth-unsafe underlying>> SET-NTH call ;
 M: A like drop dup A instance? [ >A' ] unless ;
 M: A new-sequence drop <A'> ;
 
+M: A byte-length length>> T heap-size * ;
+
 M: A pprint-delims drop \ A'{ \ } ;
 
 M: A >pprint-sequence ;
