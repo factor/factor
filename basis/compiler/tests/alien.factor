@@ -6,7 +6,7 @@ namespaces.private parser quotations sequences
 specialized-arrays.float stack-checker stack-checker.errors
 system threads tools.test words ;
 IN: compiler.tests.alien
-FROM: classes.c-types => short ;
+FROM: classes.c-types => short float ;
 
 <<
 : libfactor-ffi-tests-path ( -- string )
@@ -183,8 +183,8 @@ FUNCTION: long ffi_test_22 long x longlong y longlong z ;
 [ 1111 f 123456789 ffi_test_22 ] must-fail
 
 STRUCT: RECT
-    { x single-float } { y single-float }
-    { w single-float } { h single-float } ;
+    { x float } { y float }
+    { w float } { h float } ;
 
 : <RECT> ( x y w h -- rect )
     RECT <struct>
@@ -250,7 +250,7 @@ FUNCTION: test-struct-7 ffi_test_30 ;
 
 [ B{ 1 2 3 4 5 6 7 } ] [ ffi_test_30 ] unit-test
 
-STRUCT: test-struct-8 { x float } { y float } ;
+STRUCT: test-struct-8 { x double } { y double } ;
 
 FUNCTION: double ffi_test_32 test-struct-8 x int y ;
 
@@ -261,7 +261,7 @@ FUNCTION: double ffi_test_32 test-struct-8 x int y ;
     3 ffi_test_32
 ] unit-test
 
-STRUCT: test-struct-9 { x single-float } { y single-float } ;
+STRUCT: test-struct-9 { x float } { y float } ;
 
 FUNCTION: double ffi_test_33 test-struct-9 x int y ;
 
@@ -272,7 +272,7 @@ FUNCTION: double ffi_test_33 test-struct-9 x int y ;
     3 ffi_test_33
 ] unit-test
 
-STRUCT: test-struct-10 { x single-float } { y int } ;
+STRUCT: test-struct-10 { x float } { y int } ;
 
 FUNCTION: double ffi_test_34 test-struct-10 x int y ;
 
@@ -294,7 +294,7 @@ FUNCTION: double ffi_test_35 test-struct-11 x int y ;
     3 ffi_test_35
 ] unit-test
 
-STRUCT: test-struct-12 { a int } { x float } ;
+STRUCT: test-struct-12 { a int } { x double } ;
 
 : make-struct-12 ( x -- alien )
     test-struct-12 <struct>
@@ -399,12 +399,12 @@ FUNCTION: int ffi_test_37 ( void* func ) ;
 [ 7 ] [ callback-9 ffi_test_37 ] unit-test
 
 STRUCT: test_struct_13
-{ x1 single-float }
-{ x2 single-float }
-{ x3 single-float }
-{ x4 single-float }
-{ x5 single-float }
-{ x6 single-float } ;
+{ x1 float }
+{ x2 float }
+{ x3 float }
+{ x4 float }
+{ x5 float }
+{ x6 float } ;
 
 : make-test-struct-13 ( -- alien )
     test_struct_13 <struct>
@@ -421,10 +421,10 @@ FUNCTION: int ffi_test_39 ( long a, long b, test_struct_13 s ) ;
 
 ! Joe Groff found this problem
 STRUCT: double-rect
-{ a float }
-{ b float }
-{ c float }
-{ d float } ;
+{ a double }
+{ b double }
+{ c double }
+{ d double } ;
 
 : <double-rect> ( a b c d -- foo )
     double-rect <struct>
@@ -455,8 +455,8 @@ STRUCT: double-rect
 [ 1.0 2.0 3.0 4.0 <double-rect> double-rect-test >double-rect< ] unit-test
 
 STRUCT: test_struct_14
-    { x1 float }
-    { x2 float } ;
+    { x1 double }
+    { x2 double } ;
 
 FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 ) ;
 
@@ -504,8 +504,8 @@ FUNCTION: test-struct-12 ffi_test_41 ( int a, double x ) ;
 ] unit-test
 
 STRUCT: test_struct_15
-    { x single-float }
-    { y single-float } ;
+    { x float }
+    { y float } ;
 
 FUNCTION: test_struct_15 ffi_test_42 ( float x, float y ) ;
 
@@ -527,7 +527,7 @@ FUNCTION: test_struct_15 ffi_test_42 ( float x, float y ) ;
 ] unit-test
 
 STRUCT: test_struct_16
-    { x single-float }
+    { x float }
     { a int } ;
 
 FUNCTION: test_struct_16 ffi_test_43 ( float x, int a ) ;
