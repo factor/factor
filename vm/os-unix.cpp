@@ -31,40 +31,40 @@ void sleep_micros(cell usec)
 	usleep(usec);
 }
 
-void init_ffi()
+void factorvm::init_ffi()
 {
 	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic unix */
 	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
 }
 
-void ffi_dlopen(dll *dll)
+void factorvm::ffi_dlopen(dll *dll)
 {
-	dll->dll = dlopen(alien_offset(dll->path,vm), RTLD_LAZY);
+	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY);
 }
 
-void *ffi_dlsym(dll *dll, symbol_char *symbol)
+void *factorvm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
 	return dlsym(handle,symbol);
 }
 
-void ffi_dlclose(dll *dll)
+void factorvm::ffi_dlclose(dll *dll)
 {
 	if(dlclose(dll->dll))
-		vm->general_error(ERROR_FFI,F,F,NULL);
+		general_error(ERROR_FFI,F,F,NULL);
 	dll->dll = NULL;
 }
 
 
-long factorvm::thread_id(){
-	return 0;  // TODO fix me
+cell factorvm::thread_id(){
+	return pthread_self();
 }
 
 
 inline void factorvm::vmprim_existsp()
 {
 	struct stat sb;
-	char *path = (char *)(vm->untag_check<byte_array>(dpop()) + 1);
+	char *path = (char *)(untag_check<byte_array>(dpop()) + 1);
 	box_boolean(stat(path,&sb) >= 0);
 }
 
@@ -73,7 +73,7 @@ PRIMITIVE(existsp)
 	PRIMITIVE_GETVM()->vmprim_existsp();
 }
 
-segment *alloc_segment(cell size)
+segment *factorvm::alloc_segment(cell size)
 {
 	int pagesize = getpagesize();
 
@@ -82,7 +82,7 @@ segment *alloc_segment(cell size)
 		MAP_ANON | MAP_PRIVATE,-1,0);
 
 	if(array == (char*)-1)
-		vm->out_of_memory();
+		out_of_memory();
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect low guard page",(cell)array);
