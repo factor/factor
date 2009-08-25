@@ -96,10 +96,7 @@ HOOK: reserved-area-size os ( -- n )
 ! frame, 8 bytes in size. This is in the param-save area so it
 ! does not overlap with spill slots.
 : scratch@ ( n -- offset )
-    stack-frame get total-size>>
-    factor-area-size -
-    param-save-size -
-    + ;
+    factor-area-size + ;
 
 ! GC root area
 : gc-root@ ( n -- offset )

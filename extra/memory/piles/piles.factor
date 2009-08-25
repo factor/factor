@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien destructors kernel libc math ;
+USING: accessors alien alien.c-types destructors kernel libc math ;
 IN: memory.piles
 
 TUPLE: pile
@@ -27,6 +27,12 @@ M: pile dispose
     ] [
         [ + ] curry change-offset drop
     ] 2tri ;
+
+: <pile-c-object> ( pile c-type -- alien )
+    heap-size pile-alloc ; inline
+
+: <pile-c-array> ( pile n c-type -- alien )
+    heap-size * pile-alloc ; inline
 
 : pile-align ( pile align -- pile )
     [ align ] curry change-offset ;

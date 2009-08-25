@@ -180,3 +180,8 @@ IN: compiler.cfg.builder.tests
     [ { byte-array fixnum } declare set-alien-unsigned-1 ]
     [ ##set-alien-integer-1? ] contains-insn?
 ] unit-test
+
+[ f ] [
+    [ 1000 [ ] times ]
+    [ [ ##peek? ] [ ##replace? ] bi or ] contains-insn?
+] unit-test
