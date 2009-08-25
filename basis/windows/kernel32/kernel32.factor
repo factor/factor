@@ -239,33 +239,33 @@ STRUCT: FILETIME
     { dwLowDateTime DWORD }
     { dwHighDateTime DWORD } ;
 
-C-STRUCT: STARTUPINFO
-    { "DWORD" "cb" }
-    { "LPTSTR" "lpReserved" }
-    { "LPTSTR" "lpDesktop" }
-    { "LPTSTR" "lpTitle" }
-    { "DWORD" "dwX" }
-    { "DWORD" "dwY" }
-    { "DWORD" "dwXSize" }
-    { "DWORD" "dwYSize" }
-    { "DWORD" "dwXCountChars" }
-    { "DWORD" "dwYCountChars" }
-    { "DWORD" "dwFillAttribute" }
-    { "DWORD" "dwFlags" }
-    { "WORD" "wShowWindow" }
-    { "WORD" "cbReserved2" }
-    { "LPBYTE" "lpReserved2" }
-    { "HANDLE" "hStdInput" }
-    { "HANDLE" "hStdOutput" }
-    { "HANDLE" "hStdError" } ;
+STRUCT: STARTUPINFO
+    { cb DWORD }
+    { lpReserved LPTSTR }
+    { lpDesktop LPTSTR }
+    { lpTitle LPTSTR }
+    { dwX DWORD }
+    { dwY DWORD }
+    { dwXSize DWORD }
+    { dwYSize DWORD }
+    { dwXCountChars DWORD }
+    { dwYCountChars DWORD }
+    { dwFillAttribute DWORD }
+    { dwFlags DWORD }
+    { wShowWindow WORD }
+    { cbReserved2 WORD }
+    { lpReserved2 LPBYTE }
+    { hStdInput HANDLE }
+    { hStdOutput HANDLE }
+    { hStdError HANDLE } ;
 
 TYPEDEF: void* LPSTARTUPINFO
 
-C-STRUCT: PROCESS_INFORMATION
-    { "HANDLE" "hProcess" }
-    { "HANDLE" "hThread" }
-    { "DWORD" "dwProcessId" }
-    { "DWORD" "dwThreadId" } ;
+STRUCT: PROCESS_INFORMATION
+    { hProcess HANDLE }
+    { hThread HANDLE }
+    { dwProcessId DWORD }
+    { dwThreadId DWORD } ;
 
 C-STRUCT: SYSTEM_INFO
     { "DWORD" "dwOemId" }
