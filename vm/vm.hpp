@@ -669,6 +669,12 @@ struct factorvm {
 	void print_fixnum(fixnum x);
 	cell read_cell_hex();
 
+	
+
+
+	// os-*
+	inline void vmprim_existsp();
+	long thread_id();
 
 	// os-windows
   #if defined(WINDOWS)
@@ -681,17 +687,17 @@ struct factorvm {
 	void dealloc_segment(segment *block);
 	segment *alloc_segment(cell size);
 	const vm_char *vm_executable_path();
-	inline void vmprim_existsp();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
 	bool windows_stat(vm_char *path);
-
+	
    #if defined(WINNT)
 	s64 current_micros();
 	void c_to_factor_toplevel(cell quot);
 	void open_console();
- 	// next method here:
+ 	// next method here:	
    #endif
+
   #endif
 
 };
