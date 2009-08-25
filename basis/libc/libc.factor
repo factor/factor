@@ -3,7 +3,7 @@
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien assocs continuations alien.destructors kernel
-namespaces accessors sets summary ;
+namespaces accessors sets summary destructors destructors.private ;
 IN: libc
 
 : errno ( -- int )
@@ -26,8 +26,16 @@ IN: libc
 : (realloc) ( alien size -- newalien )
     "void*" "libc" "realloc" { "void*" "ulong" } alien-invoke ;
 
-: mallocs ( -- assoc )
-    \ mallocs [ H{ } clone ] initialize-alien ;
+! We stick malloc-ptr instances in the global disposables set
+TUPLE: malloc-ptr value continuation ;
+
+M: malloc-ptr hashcode* value>> hashcode* ;
+
+M: malloc-ptr equal?
+    over malloc-ptr? [ [ value>> ] bi@ = ] [ 2drop f ] if ;
+
+: <malloc-ptr> ( value -- malloc-ptr )
+    malloc-ptr new swap >>value ;
 
 PRIVATE>
 
@@ -39,11 +47,6 @@ M: bad-ptr summary
 : check-ptr ( c-ptr -- c-ptr )
     [ bad-ptr ] unless* ;
 
-ERROR: double-free ;
-
-M: double-free summary
-    drop "Free failed since memory is not allocated" ;
-
 ERROR: realloc-error ptr size ;
 
 M: realloc-error summary
@@ -52,16 +55,13 @@ M: realloc-error summary
 <PRIVATE
 
 : add-malloc ( alien -- alien )
-    dup mallocs conjoin ;
+    dup <malloc-ptr> register-disposable ;
 
 : delete-malloc ( alien -- )
-    [
-        mallocs delete-at*
-        [ drop ] [ double-free ] if
-    ] when* ;
+    [ <malloc-ptr> unregister-disposable ] when* ;
 
 : malloc-exists? ( alien -- ? )
-    mallocs key? ;
+    <malloc-ptr> disposables get key? ;
 
 PRIVATE>
 

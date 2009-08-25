@@ -284,8 +284,6 @@ IN: tools.deploy.shaker
 
         "io-thread" "io.thread" lookup ,
 
-        "mallocs" "libc.private" lookup ,
-
         "disposables" "destructors" lookup ,
 
         deploy-threads? [

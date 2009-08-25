@@ -93,7 +93,7 @@ ALIAS: marshall-void* marshall-pointer
 
 : primitive-marshaller ( type -- quot/f )
     {
-        { "bool"        [ [ marshall-bool ] ] }
+        { "bool"        [ [ ] ] }
         { "boolean"     [ [ marshall-bool ] ] }
         { "char"        [ [ marshall-primitive ] ] }
         { "uchar"       [ [ marshall-primitive ] ] }
@@ -179,7 +179,7 @@ ALIAS: marshall-void* marshall-pointer
 
 : primitive-unmarshaller ( type -- quot/f )
     {
-        { "bool"       [ [ unmarshall-bool ] ] }
+        { "bool"       [ [ ] ] }
         { "boolean"    [ [ unmarshall-bool ] ] }
         { "char"       [ [ ] ] }
         { "uchar"      [ [ ] ] }

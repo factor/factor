@@ -17,7 +17,6 @@ M:: macosx (monitor) ( path recursive? mailbox -- monitor )
         path 1array 0 0 <event-stream> >>handle
     ] ;
 
-M: macosx-monitor dispose
-    handle>> dispose ;
+M: macosx-monitor dispose* handle>> dispose ;
 
 macosx set-io-backend
