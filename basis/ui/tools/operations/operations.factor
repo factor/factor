@@ -1,15 +1,16 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations definitions generic help.topics threads
-stack-checker summary io.pathnames io.styles kernel namespaces parser
-prettyprint quotations tools.crossref tools.annotations editors
-tools.profiler tools.test tools.time tools.walker vocabs vocabs.loader
-words sequences classes compiler.errors compiler.units
-accessors vocabs.parser macros.expander ui ui.tools.browser
-ui.tools.listener ui.tools.listener.completion ui.tools.profiler
-ui.tools.inspector ui.tools.traceback ui.commands ui.gadgets.editors
-ui.gestures ui.operations ui.tools.deploy models help.tips
-source-files.errors ;
+stack-checker summary io.pathnames io.styles kernel namespaces
+parser prettyprint quotations tools.crossref tools.annotations
+editors tools.profiler tools.test tools.time tools.walker vocabs
+vocabs.loader words sequences classes compiler.errors
+compiler.units accessors vocabs.parser macros.expander ui
+ui.tools.browser ui.tools.listener ui.tools.listener.completion
+ui.tools.profiler ui.tools.inspector ui.tools.traceback
+ui.commands ui.gadgets.editors ui.gestures ui.operations
+ui.tools.deploy models help.tips source-files.errors destructors
+libc libc.private ;
 IN: ui.tools.operations
 
 ! Objects
@@ -181,6 +182,22 @@ M: word com-stack-effect 1quotation com-stack-effect ;
     { +keyboard+ T{ key-down f { C+ } "m" } }
     { +listener+ t }
 } define-operation
+
+! Disposables
+[ disposable? ] \ dispose H{ } define-operation
+
+! Disposables with a continuation
+PREDICATE: tracked-disposable < disposable
+    continuation>> >boolean ;
+
+PREDICATE: tracked-malloc-ptr < malloc-ptr
+    continuation>> >boolean ;
+
+: com-creation-traceback ( disposable -- )
+    continuation>> traceback-window ;
+
+[ tracked-disposable? ] \ com-creation-traceback H{ { +primary+ t } } define-operation
+[ tracked-malloc-ptr? ] \ com-creation-traceback H{ { +primary+ t } } define-operation
 
 ! Operations -> commands
 interactor
