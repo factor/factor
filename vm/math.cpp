@@ -818,7 +818,7 @@ void factorvm::box_double(double flo)
         dpush(allot_float(flo));
 }
 
-VM_C_API void box_double(double flo,factorvm *myvm)   // not sure if this is ever called
+VM_C_API void box_double(double flo,factorvm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_double(flo);
