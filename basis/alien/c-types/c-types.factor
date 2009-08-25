@@ -95,6 +95,8 @@ M: string require-c-type-arrays
 M: array require-c-type-arrays
     first c-type require-c-type-arrays ;
 
+ERROR: specialized-array-vocab-not-loaded vocab word ;
+
 GENERIC: c-type-array-constructor ( c-type -- word ) foldable
 
 M: string c-type-array-constructor 
@@ -102,21 +104,26 @@ M: string c-type-array-constructor
 M: array c-type-array-constructor
     first c-type c-type-array-constructor ;
 M: c-type c-type-array-constructor
-    array-constructor>> ;
+    array-constructor>> dup word?
+    [ first2 specialized-array-vocab-not-loaded ] unless ;
 
 GENERIC: c-type-direct-array-constructor ( c-type -- word ) foldable
 
 M: string c-type-direct-array-constructor 
-    c-type c-type-array-constructor ;
+    c-type c-type-direct-array-constructor ;
 M: array c-type-direct-array-constructor
     first c-type c-type-direct-array-constructor ;
 M: c-type c-type-direct-array-constructor
-    direct-array-constructor>> ;
+    direct-array-constructor>> dup word?
+    [ first2 specialized-array-vocab-not-loaded ] unless ;
 
-: <c-type-array> ( len c-type -- array )
+GENERIC: <c-type-array> ( len c-type -- array )
+M: object <c-type-array>
     c-type-array-constructor execute( len -- array ) ; inline
-: <c-type-direct-array> ( len c-type -- array )
-    c-type-direct-array-constructor execute( len -- array ) ; inline
+
+GENERIC: <c-type-direct-array> ( alien len c-type -- array )
+M: object <c-type-direct-array>
+    c-type-direct-array-constructor execute( alien len -- array ) ; inline
 
 GENERIC: c-type-class ( name -- class )
 
