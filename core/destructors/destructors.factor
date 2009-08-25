@@ -17,7 +17,7 @@ SYMBOL: debug-leaks?
 SLOT: continuation
 
 : register-disposable ( obj -- )
-    debug-leaks? get [ continuation >>continuation ] when
+    debug-leaks? get-global [ continuation >>continuation ] when
     disposables get conjoin ;
 
 : unregister-disposable ( obj -- )
