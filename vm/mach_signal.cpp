@@ -215,7 +215,7 @@ void mach_initialize ()
 	mask = EXC_MASK_BAD_ACCESS | EXC_MASK_ARITHMETIC;
 
 	/* Create the thread listening on the exception port.  */
-	start_thread(mach_exception_thread);
+	start_thread(mach_exception_thread,NULL);
 
 	/* Replace the exception port info for these exceptions with our own.
 	Note that we replace the exception port for the entire task, not only

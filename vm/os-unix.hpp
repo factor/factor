@@ -42,7 +42,7 @@ typedef char symbol_char;
 
 #define print_native_string(string) print_string(string)
 
-void start_thread(void *(*start_routine)(void *));
+void *start_thread(void *(*start_routine)(void *),void *args);
 
 void init_ffi();
 void ffi_dlopen(dll *dll);
