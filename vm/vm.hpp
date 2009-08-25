@@ -664,6 +664,7 @@ struct factorvm {
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);
 	void ffi_dlclose(dll *dll);
 	segment *alloc_segment(cell size);
+	void c_to_factor_toplevel(cell quot);
 
 	// os-windows
   #if defined(WINDOWS)

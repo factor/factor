@@ -3,9 +3,9 @@
 namespace factor
 {
 
-void c_to_factor_toplevel(cell quot)
+void factorvm::c_to_factor_toplevel(cell quot)
 {
-	c_to_factor(quot,vm);
+	c_to_factor(quot,this);
 }
 
 void init_signals()

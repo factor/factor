@@ -9,7 +9,7 @@ THREADHANDLE start_thread(void *(*start_routine)(void *),void *args)
 	pthread_t thread;
 	if (pthread_attr_init (&attr) != 0)
 		fatal_error("pthread_attr_init() failed",0);
-	if (pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED) != 0)
+	if (pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_JOINABLE) != 0)
 		fatal_error("pthread_attr_setdetachstate() failed",0);
 	if (pthread_create (&thread, &attr, start_routine, args) != 0)
 		fatal_error("pthread_create() failed",0);
@@ -114,17 +114,17 @@ void dealloc_segment(segment *block)
 	free(block);
 }
   
-static stack_frame *uap_stack_pointer(void *uap)
+stack_frame *factorvm::uap_stack_pointer(void *uap)
 {
 	/* There is a race condition here, but in practice a signal
 	delivered during stack frame setup/teardown or while transitioning
 	from Factor to C is a sign of things seriously gone wrong, not just
 	a divide by zero or stack underflow in the listener */
-	if(vm->in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
+	if(in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
 	{
 		stack_frame *ptr = (stack_frame *)ucontext_stack_pointer(uap);
 		if(!ptr)
-			vm->critical_error("Invalid uap",(cell)uap);
+			critical_error("Invalid uap",(cell)uap);
 		return ptr;
 	}
 	else
@@ -133,15 +133,17 @@ static stack_frame *uap_stack_pointer(void *uap)
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	vm->signal_fault_addr = (cell)siginfo->si_addr;
-	vm->signal_callstack_top = uap_stack_pointer(uap);
+	factorvm *myvm = lookup_vm(thread_id());
+	myvm->signal_fault_addr = (cell)siginfo->si_addr;
+	myvm->signal_callstack_top = myvm->uap_stack_pointer(uap);
 	UAP_PROGRAM_COUNTER(uap) = (cell)memory_signal_handler_impl;
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	vm->signal_number = signal;
-	vm->signal_callstack_top = uap_stack_pointer(uap);
+	factorvm *myvm = lookup_vm(thread_id());
+	myvm->signal_number = signal;
+	myvm->signal_callstack_top = myvm->uap_stack_pointer(uap);
 	UAP_PROGRAM_COUNTER(uap) = (cell)misc_signal_handler_impl;
 }
 
