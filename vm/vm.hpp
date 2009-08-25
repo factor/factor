@@ -659,7 +659,6 @@ struct factorvm {
 
 	// os-*
 	inline void vmprim_existsp();
-	cell thread_id();
 	void init_ffi();
 	void ffi_dlopen(dll *dll);
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);
@@ -677,7 +676,6 @@ struct factorvm {
 	bool windows_stat(vm_char *path);
 	
    #if defined(WINNT)
-	s64 current_micros();
 	void c_to_factor_toplevel(cell quot);
 	void open_console();
  	// next method here:	
@@ -689,6 +687,6 @@ struct factorvm {
 
 extern factorvm *vm;
 
-extern factorvm *lookup_vm(long threadid);
-extern void register_vm(long threadid,factorvm *vm);
+extern factorvm *lookup_vm(unsigned long threadid);
+extern void register_vm(unsigned long threadid,factorvm *vm);
 }

@@ -42,12 +42,10 @@ typedef char symbol_char;
 
 #define print_native_string(string) print_string(string)
 
-void *start_thread(void *(*start_routine)(void *),void *args);
+typedef pthread_t THREADHANDLE;
 
-void init_ffi();
-void ffi_dlopen(dll *dll);
-void *ffi_dlsym(dll *dll, symbol_char *symbol);
-void ffi_dlclose(dll *dll);
+THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
+unsigned long thread_id();
 
 void unix_init_signals();
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);

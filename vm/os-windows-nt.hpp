@@ -26,7 +26,10 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe);
 #define STATUS_FLOAT_MULTIPLE_FAULTS 0xC00002B4
 #define STATUS_FLOAT_MULTIPLE_TRAPS  0xC00002B5
 
-void *start_thread(void *(*start_routine)(void *),void *args);
+typedef HANDLE THREADHANDLE;
+
+THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
+unsigned long thread_id();
 
 #define SIGNAL_VM_PTR lookup_vm(GetCurrentThreadId())
 

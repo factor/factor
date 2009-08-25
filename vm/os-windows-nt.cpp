@@ -3,16 +3,16 @@
 namespace factor
 {
 
-void *start_thread(void *(*start_routine)(void *),void *args){
-    return CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0); 
+THREADHANDLE start_thread(void *(*start_routine)(void *),void *args){
+    return (void*) CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0); 
 }
 
-cell factorvm::thread_id(){
+unsigned long thread_id(){
 	return GetCurrentThreadId();
 }
 
 
-s64 factorvm::current_micros()
+s64 current_micros()
 {
 	FILETIME t;
 	GetSystemTimeAsFileTime(&t);
