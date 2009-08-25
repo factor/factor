@@ -133,7 +133,7 @@ stack_frame *factorvm::uap_stack_pointer(void *uap)
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	factorvm *myvm = lookup_vm(thread_id());
+	factorvm *myvm = SIGNAL_VM_PTR();
 	myvm->signal_fault_addr = (cell)siginfo->si_addr;
 	myvm->signal_callstack_top = myvm->uap_stack_pointer(uap);
 	UAP_PROGRAM_COUNTER(uap) = (cell)memory_signal_handler_impl;
@@ -141,7 +141,7 @@ void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	factorvm *myvm = lookup_vm(thread_id());
+	factorvm *myvm = SIGNAL_VM_PTR();
 	myvm->signal_number = signal;
 	myvm->signal_callstack_top = myvm->uap_stack_pointer(uap);
 	UAP_PROGRAM_COUNTER(uap) = (cell)misc_signal_handler_impl;

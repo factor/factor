@@ -123,6 +123,8 @@ M:: x86.64 %unbox-large-struct ( n c-type -- )
     [ ]
     tri copy-register ;
 
+
+
 M:: x86.64 %box ( n rep func -- )
     n [
         n
@@ -131,7 +133,7 @@ M:: x86.64 %box ( n rep func -- )
     ] [
         rep load-return-value
     ] if
-    func %vm-invoke-2nd-arg ;
+    rep int-rep? [ func %vm-invoke-2nd-arg ] [ func %vm-invoke-1st-arg ] if ;
 
 M: x86.64 %box-long-long ( n func -- )
     [ int-rep ] dip %box ;
