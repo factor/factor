@@ -31,6 +31,4 @@ typedef HANDLE THREADHANDLE;
 THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
 unsigned long thread_id();
 
-#define SIGNAL_VM_PTR lookup_vm(GetCurrentThreadId())
-
 }

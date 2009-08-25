@@ -55,6 +55,4 @@ s64 current_micros();
 void sleep_micros(cell usec);
 
 void open_console();
-
-#define SIGNAL_VM_PTR vm
 }
