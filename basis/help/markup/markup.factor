@@ -137,6 +137,14 @@ ALIAS: $slot $snippet
         ] with-nesting
     ] ($heading) ;
 
+: $deprecated ( element -- )
+    [
+        deprecated-style get [
+            last-element off
+            "This word is deprecated" $heading print-element
+        ] with-nesting
+    ] ($heading) ;
+
 ! Images
 : $image ( element -- )
     [ first write-image ] ($span) ;

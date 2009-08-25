@@ -32,6 +32,20 @@ HELP: pile-alloc
 }
 { $description "Requests " { $snippet "size" } " bytes from a " { $link pile } ". If the pile does not have enough space to satisfy the request, a " { $link not-enough-pile-space } " error is thrown." } ;
 
+HELP: <pile-c-array>
+{ $values
+    { "pile" pile } { "n" integer } { "c-type" "a C type" }
+    { "alien" alien }
+}
+{ $description "Requests enough space from a " { $link pile } " to hold " { $snippet "n" } " values of " { $snippet "c-type" } ". If the pile does not have enough space to satisfy the request, a " { $link not-enough-pile-space } " error is thrown." } ;
+
+HELP: <pile-c-object>
+{ $values
+    { "pile" pile } { "c-type" "a C type" }
+    { "alien" alien }
+}
+{ $description "Requests enough space from a " { $link pile } " to hold a value of " { $snippet "c-type" } ". If the pile does not have enough space to satisfy the request, a " { $link not-enough-pile-space } " error is thrown." } ;
+
 HELP: pile-empty
 { $values
     { "pile" pile }
@@ -42,6 +56,8 @@ ARTICLE: "memory.piles" "Piles"
 "A " { $link pile } " is a block of raw memory. Portions of its memory can be allocated from the beginning of the pile in constant time, and the pile can be emptied and its pointer reset to the beginning."
 { $subsection <pile> }
 { $subsection pile-alloc }
+{ $subsection <pile-c-array> }
+{ $subsection <pile-c-object> }
 { $subsection pile-align }
 { $subsection pile-empty }
 "An example of the utility of piles is in video games. For example, the game Abuse was scripted with a Lisp dialect. In order to avoid stalls from traditional GC or heap-based allocators, the Abuse Lisp VM would allocate values from a preallocated pile over the course of a frame, and release the entire pile at the end of the frame." ;
