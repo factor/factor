@@ -3,7 +3,7 @@
 namespace factor
 {
 
-void *start_thread(void *(*start_routine)(void *),void *args)
+THREADHANDLE start_thread(void *(*start_routine)(void *),void *args)
 {
 	pthread_attr_t attr;
 	pthread_t thread;
@@ -14,8 +14,13 @@ void *start_thread(void *(*start_routine)(void *),void *args)
 	if (pthread_create (&thread, &attr, start_routine, args) != 0)
 		fatal_error("pthread_create() failed",0);
 	pthread_attr_destroy (&attr);
-	return (void*)thread;
+	return thread;
 }
+
+unsigned long thread_id(){
+	return pthread_self();
+}
+
 
 static void *null_dll;
 
@@ -56,9 +61,6 @@ void factorvm::ffi_dlclose(dll *dll)
 }
 
 
-cell factorvm::thread_id(){
-	return pthread_self();
-}
 
 
 inline void factorvm::vmprim_existsp()
