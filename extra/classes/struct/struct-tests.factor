@@ -1,9 +1,9 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien.c-types alien.libraries
 alien.structs.fields alien.syntax classes.struct combinators
-destructors io.pathnames io.streams.string kernel libc literals math
-multiline namespaces prettyprint prettyprint.config see system
-tools.test ;
+destructors io.encodings.utf8 io.pathnames io.streams.string
+kernel libc literals math multiline namespaces prettyprint
+prettyprint.config see system tools.test ;
 IN: classes.struct.tests
 
 <<
