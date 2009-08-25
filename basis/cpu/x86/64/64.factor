@@ -172,7 +172,9 @@ M: x86.64 %alien-invoke
     rc-absolute-cell rel-dlsym
     R11 CALL ;
 
-M: x86.64 %vm-invoke ( function -- ) f %alien-invoke ;
+M: x86.64 %vm-invoke-1st-arg ( function -- ) f %alien-invoke ;
+
+M: x86.64 %vm-invoke-3rd-arg ( function -- ) f %alien-invoke ;
 
 M: x86.64 %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
