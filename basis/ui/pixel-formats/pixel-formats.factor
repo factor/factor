@@ -46,13 +46,15 @@ HOOK: (pixel-format-attribute) ui-backend ( pixel-format attribute-name -- value
 
 ERROR: invalid-pixel-format-attributes world attributes ;
 
-TUPLE: pixel-format world handle ;
+TUPLE: pixel-format < disposable world handle ;
 
 : <pixel-format> ( world attributes -- pixel-format )
     2dup (make-pixel-format)
-    [ nip pixel-format boa ] [ invalid-pixel-format-attributes ] if* ;
+    [ pixel-format new-disposable swap >>handle swap >>world ]
+    [ invalid-pixel-format-attributes ]
+    ?if ;
 
-M: pixel-format dispose
+M: pixel-format dispose*
     [ (free-pixel-format) ] [ f >>handle drop ] bi ;
 
 : pixel-format-attribute ( pixel-format attribute-name -- value )

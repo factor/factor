@@ -22,8 +22,6 @@ M: object dispose-monitors ;
 
 TUPLE: monitor < disposable path queue timeout ;
 
-M: monitor hashcode* path>> hashcode* ;
-
 M: monitor timeout timeout>> ;
 
 M: monitor set-timeout (>>timeout) ;
