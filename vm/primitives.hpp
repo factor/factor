@@ -13,6 +13,7 @@ namespace factor
 
 extern const primitive_type primitives[];
 #define PRIMITIVE_OVERFLOW_GETVM() vm
+
 #define VM_PTR vm
 #define ASSERTVM() 
 }
