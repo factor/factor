@@ -620,6 +620,7 @@ fixnum factorvm::to_fixnum(cell tagged)
 
 VM_C_API fixnum to_fixnum(cell tagged,factorvm *myvm)
 {
+	ASSERTVM();
 	return VM_PTR->to_fixnum(tagged);
 }
 
@@ -630,6 +631,7 @@ cell factorvm::to_cell(cell tagged)
 
 VM_C_API cell to_cell(cell tagged, factorvm *myvm)
 {
+	ASSERTVM();
 	return VM_PTR->to_cell(tagged);
 }
 
@@ -807,6 +809,7 @@ float factorvm::to_float(cell value)
 
 VM_C_API float to_float(cell value,factorvm *myvm)
 {
+	ASSERTVM();
 	return VM_PTR->to_float(value);
 }
 

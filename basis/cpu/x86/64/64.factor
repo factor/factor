@@ -74,9 +74,14 @@ M: x86.64 %prepare-unbox ( -- )
     param-reg-1 R14 [] MOV
     R14 cell SUB ;
 
+: %vm-invoke-2nd-arg ( function -- )
+    param-reg-2 0 MOV rc-absolute-cell rt-vm rel-fixup
+    f %alien-invoke ;
+
+
 M:: x86.64 %unbox ( n rep func -- )
     ! Call the unboxer
-    func f %alien-invoke
+    func %vm-invoke-2nd-arg
     ! Store the return value on the C stack if this is an
     ! alien-invoke, otherwise leave it the return register if
     ! this is the end of alien-callback
@@ -92,9 +97,10 @@ M: x86.64 %unbox-long-long ( n func -- )
         { float-regs [ float-regs get pop swap MOVSD ] }
     } case ;
 
+
 M: x86.64 %unbox-small-struct ( c-type -- )
     ! Alien must be in param-reg-1.
-    "alien_offset" f %alien-invoke
+    "alien_offset" %vm-invoke-2nd-arg
     ! Move alien_offset() return value to R11 so that we don't
     ! clobber it.
     R11 RAX MOV
@@ -125,7 +131,7 @@ M:: x86.64 %box ( n rep func -- )
     ] [
         rep load-return-value
     ] if
-    func f %alien-invoke ;
+    func %vm-invoke-2nd-arg ;
 
 M: x86.64 %box-long-long ( n func -- )
     [ int-rep ] dip %box ;
@@ -175,6 +181,7 @@ M: x86.64 %alien-invoke
 M: x86.64 %vm-invoke-1st-arg ( function -- )
     param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
     f %alien-invoke ;
+
 
 M: x86.64 %vm-invoke-3rd-arg ( function -- )
     param-reg-3 0 MOV rc-absolute-cell rt-vm rel-fixup
