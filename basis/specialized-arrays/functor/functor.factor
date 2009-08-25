@@ -16,6 +16,7 @@ M: bad-byte-array-length summary
 FUNCTOR: define-array ( T -- )
 
 A            DEFINES-CLASS ${T}-array
+S            DEFINES-CLASS ${T}-sequence
 <A>          DEFINES <${A}>
 (A)          DEFINES (${A})
 >A           DEFINES >${A}
@@ -27,9 +28,13 @@ SET-NTH      [ T dup c-setter array-accessor ]
 
 WHERE
 
+MIXIN: S
+
 TUPLE: A
 { length array-capacity read-only }
 { underlying byte-array read-only } ;
+
+INSTANCE: A S
 
 : <A> ( n -- specialized-array ) dup T <c-array> A boa ; inline
 

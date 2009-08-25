@@ -8,6 +8,7 @@ IN: specialized-arrays.direct.functor
 FUNCTOR: define-direct-array ( T -- )
 
 A'      IS ${T}-array
+S       IS ${T}-sequence
 >A'     IS >${T}-array
 <A'>    IS <${A'}>
 A'{     IS ${A'}{
@@ -23,6 +24,8 @@ WHERE
 TUPLE: A
 { underlying c-ptr read-only }
 { length fixnum read-only } ;
+
+INSTANCE: A S
 
 : <A> ( alien len -- direct-array ) A boa ; inline
 M: A length length>> ;
