@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel windows.types multiline ;
+USING: alien alien.syntax kernel windows.types multiline
+classes.struct ;
 IN: windows.kernel32
 
 CONSTANT: MAX_PATH 260
@@ -707,17 +708,17 @@ C-STRUCT: WIN32_FIND_DATA
     { { "TCHAR" 260 } "cFileName" }
     { { "TCHAR" 14 } "cAlternateFileName" } ;
 
-C-STRUCT: BY_HANDLE_FILE_INFORMATION
-    { "DWORD" "dwFileAttributes" }
-    { "FILETIME" "ftCreationTime" }
-    { "FILETIME" "ftLastAccessTime" }
-    { "FILETIME" "ftLastWriteTime" }
-    { "DWORD" "dwVolumeSerialNumber" }
-    { "DWORD" "nFileSizeHigh" }
-    { "DWORD" "nFileSizeLow" }
-    { "DWORD" "nNumberOfLinks" }
-    { "DWORD" "nFileIndexHigh" }
-    { "DWORD" "nFileIndexLow" } ;
+STRUCT: BY_HANDLE_FILE_INFORMATION
+    { dwFileAttributes DWORD }
+    { ftCreationTime FILETIME }
+    { ftLastAccessTime FILETIME }
+    { ftLastWriteTime FILETIME }
+    { dwVolumeSerialNumber DWORD }
+    { nFileSizeHigh DWORD }
+    { nFileSizeLow DWORD }
+    { nNumberOfLinks DWORD }
+    { nFileIndexHigh DWORD }
+    { nFileIndexLow DWORD } ;
 
 TYPEDEF: WIN32_FIND_DATA* PWIN32_FIND_DATA
 TYPEDEF: WIN32_FIND_DATA* LPWIN32_FIND_DATA
@@ -737,10 +738,10 @@ TYPEDEF: PFILETIME LPFILETIME
 
 TYPEDEF: int GET_FILEEX_INFO_LEVELS
 
-C-STRUCT: SECURITY_ATTRIBUTES
-    { "DWORD" "nLength" }
-    { "LPVOID" "lpSecurityDescriptor" }
-    { "BOOL" "bInheritHandle" } ;
+STRUCT: SECURITY_ATTRIBUTES
+    { nLength DWORD }
+    { lpSecurityDescriptor LPVOID }
+    { bInheritHandle BOOL } ;
 
 CONSTANT: HANDLE_FLAG_INHERIT 1
 CONSTANT: HANDLE_FLAG_PROTECT_FROM_CLOSE 2
