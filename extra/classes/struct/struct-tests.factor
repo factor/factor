@@ -1,7 +1,7 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien.c-types alien.libraries
 alien.structs.fields alien.syntax classes.struct combinators
-io.pathnames io.streams.string kernel libc literals math
+destructors io.pathnames io.streams.string kernel libc literals math
 multiline namespaces prettyprint prettyprint.config see system
 tools.test ;
 IN: classes.struct.tests
@@ -54,7 +54,18 @@ UNION-STRUCT: struct-test-float-and-bits
 [ 1.0 ] [ struct-test-float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
 [ 4 ] [ struct-test-float-and-bits heap-size ] unit-test
 
-[ ] [ struct-test-foo malloc-struct free ] unit-test
+[ ] [ [ struct-test-foo malloc-struct &free drop ] with-destructors ] unit-test
+
+STRUCT: struct-test-string-ptr
+    { x char* } ;
+
+[ "hello world" ] [
+    [
+        struct-test-string-ptr <struct>
+        "hello world" utf8 malloc-string &free >>x
+        x>>
+    ] with-destructors
+] unit-test
 
 [ "S{ struct-test-foo { y 7654 } }" ]
 [
