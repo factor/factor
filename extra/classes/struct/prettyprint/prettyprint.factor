@@ -1,7 +1,7 @@
 ! (c)Joe Groff bsd license
-USING: accessors assocs classes classes.struct kernel math
-prettyprint.backend prettyprint.custom prettyprint.sections
-see.private sequences words ;
+USING: accessors assocs classes classes.struct combinators
+kernel math prettyprint.backend prettyprint.custom
+prettyprint.sections see.private sequences words ;
 IN: classes.struct.prettyprint
 
 <PRIVATE
@@ -14,11 +14,21 @@ IN: classes.struct.prettyprint
 : struct>assoc ( struct -- assoc )
     [ class struct-slots ] [ struct-slot-values ] bi zip filter-tuple-assoc ;
 
+: pprint-struct-slot ( slot -- )
+    <flow \ { pprint-word
+    {
+        [ name>> text ]
+        [ c-type>> text ]
+        [ read-only>> [ \ read-only pprint-word ] when ]
+        [ initial>> [ \ initial: pprint-word pprint* ] when* ]
+    } cleave
+    \ } pprint-word block> ;
+
 PRIVATE>
 
 M: struct-class see-class*
     <colon dup struct-definer-word pprint-word dup pprint-word
-    <block struct-slots [ pprint-slot ] each
+    <block struct-slots [ pprint-struct-slot ] each
     block> pprint-; block> ;
 
 M: struct pprint-delims
