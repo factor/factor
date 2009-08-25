@@ -17,7 +17,7 @@ void factorvm::out_of_memory()
 	exit(1);
 }
 
-void factorvm::fatal_error(const char* msg, cell tagged)
+void fatal_error(const char* msg, cell tagged)
 {
 	print_string("fatal_error: "); print_string(msg);
 	print_string(": "); print_cell_hex(tagged); nl();
