@@ -34,8 +34,6 @@ TUPLE: A
 { length array-capacity read-only }
 { underlying byte-array read-only } ;
 
-INSTANCE: A S
-
 : <A> ( n -- specialized-array ) dup T <c-array> A boa ; inline
 
 : (A) ( n -- specialized-array ) dup T (c-array) A boa ; inline
@@ -78,7 +76,14 @@ M: A pprint* pprint-object ;
 SYNTAX: A{ \ } [ >A ] parse-literal ;
 
 INSTANCE: A sequence
+INSTANCE: A S
 
 A T c-type-boxed-class specialize-vector-words
+
+T c-type
+    \ A >>array-class
+    \ <A> >>array-constructor
+    \ S >>sequence-mixin-class
+    drop
 
 ;FUNCTOR

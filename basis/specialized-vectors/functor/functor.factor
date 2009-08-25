@@ -20,8 +20,6 @@ WHERE
 
 V A <A> vectors.functor:define-vector
 
-INSTANCE: V S
-
 M: V contract 2drop ;
 
 M: V byte-length underlying>> byte-length ;
@@ -35,5 +33,6 @@ M: V pprint* pprint-object ;
 SYNTAX: V{ \ } [ >V ] parse-literal ;
 
 INSTANCE: V growable
+INSTANCE: V S
 
 ;FUNCTOR
