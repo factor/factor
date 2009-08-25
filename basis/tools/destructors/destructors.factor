@@ -44,8 +44,8 @@ PRIVATE>
 
 : leaks ( quot -- )
     disposables get clone
-    debug-leaks? on
+    t debug-leaks? set-global
     [
         [ call disposables get clone ] dip
-    ] [ ] [ debug-leaks? off ] cleanup
+    ] [ ] [ f debug-leaks? set-global ] cleanup
      assoc-diff (disposables.) ; inline
