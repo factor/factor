@@ -3,18 +3,18 @@
 namespace factor
 {
 
-void start_thread(void *(*start_routine)(void *))
+void *start_thread(void *(*start_routine)(void *),void *args)
 {
 	pthread_attr_t attr;
 	pthread_t thread;
-
 	if (pthread_attr_init (&attr) != 0)
 		vm->fatal_error("pthread_attr_init() failed",0);
 	if (pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED) != 0)
 		vm->fatal_error("pthread_attr_setdetachstate() failed",0);
-	if (pthread_create (&thread, &attr, start_routine, NULL) != 0)
+	if (pthread_create (&thread, &attr, start_routine, args) != 0)
 		vm->fatal_error("pthread_create() failed",0);
 	pthread_attr_destroy (&attr);
+	return (void*)thread;
 }
 
 static void *null_dll;
@@ -55,11 +55,22 @@ void ffi_dlclose(dll *dll)
 	dll->dll = NULL;
 }
 
-PRIMITIVE(existsp)
+
+long factorvm::thread_id(){
+	return 0;  // TODO fix me
+}
+
+
+inline void factorvm::vmprim_existsp()
 {
 	struct stat sb;
 	char *path = (char *)(vm->untag_check<byte_array>(dpop()) + 1);
 	box_boolean(stat(path,&sb) >= 0);
+}
+
+PRIMITIVE(existsp)
+{
+	PRIMITIVE_GETVM()->vmprim_existsp();
 }
 
 segment *alloc_segment(cell size)
@@ -320,7 +331,7 @@ void open_console()
 	stdin_read = filedes[0];
 	stdin_write = filedes[1];
 
-	start_thread(stdin_loop);
+	start_thread(stdin_loop,NULL);
 }
 
 VM_C_API void wait_for_stdin()
