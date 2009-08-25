@@ -25,8 +25,6 @@ TUPLE: A
 { underlying c-ptr read-only }
 { length fixnum read-only } ;
 
-INSTANCE: A S
-
 : <A> ( alien len -- direct-array ) A boa ; inline
 M: A length length>> ;
 M: A nth-unsafe underlying>> NTH call ;
@@ -41,5 +39,11 @@ M: A >pprint-sequence ;
 M: A pprint* pprint-object ;
 
 INSTANCE: A sequence
+INSTANCE: A S
+
+T c-type
+    \ A >>direct-array-class
+    \ <A> >>direct-array-constructor
+    drop
 
 ;FUNCTOR
