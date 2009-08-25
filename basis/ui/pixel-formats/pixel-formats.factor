@@ -50,7 +50,7 @@ TUPLE: pixel-format < disposable world handle ;
 
 : <pixel-format> ( world attributes -- pixel-format )
     2dup (make-pixel-format)
-    [ pixel-format new swap >>handle swap >>world ]
+    [ pixel-format new-disposable swap >>handle swap >>world ]
     [ invalid-pixel-format-attributes ]
     ?if ;
 
