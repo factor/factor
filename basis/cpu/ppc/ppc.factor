@@ -38,6 +38,9 @@ enable-float-intrinsics
 
 M: ppc %vm-field-ptr ( dst field -- ) %load-vm-field-addr ;
 
+M: ppc %vm-invoke-1st-arg ( function -- ) f %alien-invoke ;
+M: ppc %vm-invoke-3rd-arg ( function -- ) f %alien-invoke ;
+
 M: ppc machine-registers
     {
         { int-regs $[ 2 12 [a,b] 15 29 [a,b] append ] }

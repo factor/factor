@@ -437,7 +437,7 @@ M: ##alien-indirect generate-insn
     ! Generate code for boxing input parameters in a callback.
     [
         dup \ %save-param-reg move-parameters
-        "nest_stacks" %vm-invoke
+        "nest_stacks" %vm-invoke-1st-arg
         box-parameters
     ] with-param-regs ;
 
@@ -475,7 +475,7 @@ TUPLE: callback-context ;
         [ callback-context new do-callback ] %
     ] [ ] make ;
 
-: %unnest-stacks ( -- ) "unnest_stacks" %vm-invoke ;
+: %unnest-stacks ( -- ) "unnest_stacks" %vm-invoke-1st-arg ;
 
 M: ##callback-return generate-insn
     #! All the extra book-keeping for %unwind is only for x86.
