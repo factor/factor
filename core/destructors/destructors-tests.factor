@@ -1,5 +1,5 @@
 USING: destructors kernel tools.test continuations accessors
-namespaces sequences ;
+namespaces sequences destructors.private ;
 IN: destructors.tests
 
 TUPLE: dispose-error ;
@@ -66,3 +66,12 @@ M: dummy-destructor dispose ( obj -- )
     ] ignore-errors destroyed?>>
 ] unit-test
 
+TUPLE: silly-disposable < disposable ;
+
+M: silly-disposable dispose* drop ;
+
+silly-disposable new-disposable "s" set
+"s" get dispose
+[ "s" get unregister-disposable ]
+[ disposable>> silly-disposable? ]
+must-fail-with

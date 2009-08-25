@@ -153,3 +153,9 @@ USE: debugger.threads
         "" write
     ] with-file-writer
 ] [ no-method? ] must-fail-with
+
+! What happens if we close a file twice?
+[ ] [
+    "closing-twice" unique-file ascii <file-writer>
+    [ dispose ] [ dispose ] bi
+] unit-test

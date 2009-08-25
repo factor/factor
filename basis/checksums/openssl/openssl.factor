@@ -19,13 +19,13 @@ C: <openssl-checksum> openssl-checksum
 
 <PRIVATE
 
-TUPLE: evp-md-context handle ;
+TUPLE: evp-md-context < disposable handle ;
 
 : <evp-md-context> ( -- ctx )
-    "EVP_MD_CTX" <c-object>
-    dup EVP_MD_CTX_init evp-md-context boa ;
+    evp-md-context new-disposable
+    "EVP_MD_CTX" <c-object> dup EVP_MD_CTX_init >>handle ;
 
-M: evp-md-context dispose
+M: evp-md-context dispose*
     handle>> EVP_MD_CTX_cleanup drop ;
 
 : with-evp-md-context ( quot -- )
