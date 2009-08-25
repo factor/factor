@@ -1,10 +1,24 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien.c-types alien.structs.fields alien.syntax
-classes.c-types classes.struct combinators io.streams.string kernel
-libc literals math multiline namespaces prettyprint prettyprint.config
-see tools.test ;
-FROM: classes.c-types => float ;
+USING: accessors alien.c-types alien.libraries
+alien.structs.fields alien.syntax classes.struct combinators
+io.pathnames io.streams.string kernel libc literals math
+multiline namespaces prettyprint prettyprint.config see system
+tools.test ;
 IN: classes.struct.tests
+
+<<
+: libfactor-ffi-tests-path ( -- string )
+    "resource:" (normalize-path)
+    {
+        { [ os winnt? ]  [ "libfactor-ffi-test.dll" ] }
+        { [ os macosx? ] [ "libfactor-ffi-test.dylib" ] }
+        { [ os unix?  ]  [ "libfactor-ffi-test.so" ] }
+    } cond append-path ;
+
+"f-cdecl" libfactor-ffi-tests-path "cdecl" add-library
+
+"f-stdcall" libfactor-ffi-tests-path "stdcall" add-library
+>>
 
 STRUCT: struct-test-foo
     { x char }
@@ -56,15 +70,14 @@ UNION-STRUCT: struct-test-float-and-bits
     with-variable
 ] unit-test
 
-[ <" USING: classes.c-types classes.struct kernel ;
+[ <" USING: classes.struct ;
 IN: classes.struct.tests
 STRUCT: struct-test-foo
-    { x char initial: 0 } { y int initial: 123 }
-    { z boolean initial: f } ;
+    { x char initial: 0 } { y int initial: 123 } { z bool } ;
 "> ]
 [ [ struct-test-foo see ] with-string-writer ] unit-test
 
-[ <" USING: classes.c-types classes.struct ;
+[ <" USING: classes.struct ;
 IN: classes.struct.tests
 UNION-STRUCT: struct-test-float-and-bits
     { f float initial: 0.0 } { bits uint initial: 0 } ;
@@ -75,21 +88,21 @@ UNION-STRUCT: struct-test-float-and-bits
     T{ field-spec
         { name "x" }
         { offset 0 }
-        { type char }
+        { type "char" }
         { reader x>> }
         { writer (>>x) }
     }
     T{ field-spec
         { name "y" }
         { offset 4 }
-        { type int }
+        { type "int" }
         { reader y>> }
         { writer (>>y) }
     }
     T{ field-spec
         { name "z" }
         { offset 8 }
-        { type bool }
+        { type "bool" }
         { reader z>> }
         { writer (>>z) }
     }
@@ -99,14 +112,14 @@ UNION-STRUCT: struct-test-float-and-bits
     T{ field-spec
         { name "f" }
         { offset 0 }
-        { type float }
+        { type "float" }
         { reader f>> }
         { writer (>>f) }
     }
     T{ field-spec
         { name "bits" }
         { offset 0 }
-        { type uint }
+        { type "uint" }
         { reader bits>> }
         { writer (>>bits) }
     }
