@@ -60,7 +60,7 @@ pango_layout_iter_free ( PangoLayoutIter* iter ) ;
 
 DESTRUCTOR: pango_layout_iter_free
 
-TUPLE: layout font string selection layout metrics ink-rect logical-rect image disposed ;
+TUPLE: layout < disposable font string selection layout metrics ink-rect logical-rect image ;
 
 SYMBOL: dpi
 
@@ -186,7 +186,7 @@ MEMO: missing-font-metrics ( font -- metrics )
 
 : <layout> ( font string -- line )
     [
-        layout new
+        layout new-disposable
             swap unpack-selection
             swap >>font
             dup [ string>> ] [ font>> ] bi <PangoLayout> >>layout
