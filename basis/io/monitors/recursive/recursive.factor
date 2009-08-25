@@ -8,7 +8,7 @@ IN: io.monitors.recursive
 
 ! Simulate recursive monitors on platforms that don't have them
 
-TUPLE: recursive-monitor < monitor children thread ready disposed ;
+TUPLE: recursive-monitor < monitor children thread ready ;
 
 : notify? ( -- ? ) monitor tget ready>> promise-fulfilled? ;
 

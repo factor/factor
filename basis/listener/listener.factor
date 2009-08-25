@@ -163,6 +163,7 @@ SYMBOL: interactive-vocabs
     "syntax"
     "tools.annotations"
     "tools.crossref"
+    "tools.destructors"
     "tools.disassembler"
     "tools.errors"
     "tools.memory"

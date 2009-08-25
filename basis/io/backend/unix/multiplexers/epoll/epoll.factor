@@ -18,7 +18,7 @@ TUPLE: epoll-mx < mx events ;
         max-events epoll_create dup io-error >>fd
         max-events "epoll-event" <struct-array> >>events ;
 
-M: epoll-mx dispose fd>> close-file ;
+M: epoll-mx dispose* fd>> close-file ;
 
 : make-event ( fd events -- event )
     "epoll-event" <c-object>

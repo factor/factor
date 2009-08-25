@@ -193,7 +193,8 @@ HELP: delimiter
 
 HELP: deprecated
 { $syntax ": foo ... ; deprecated" }
-{ $description "Declares the most recently defined word as deprecated. If the " { $vocab-link "tools.deprecation" } " vocabulary is loaded, usages of deprecated words will be noted as they are made." } ;
+{ $description "Declares the most recently defined word as deprecated. If the " { $vocab-link "tools.deprecation" } " vocabulary is loaded, usages of deprecated words will be noted by the " { $link "tools.errors" } " system." }
+{ $notes "Code that uses deprecated words continues to function normally; the errors are purely informational. However, code that uses deprecated words should be updated, for the deprecated words are intended to be removed soon." } ;
 
 HELP: SYNTAX:
 { $syntax "SYNTAX: foo ... ;" }
