@@ -10,6 +10,7 @@ FUNCTOR: define-vector ( T -- )
 V   DEFINES-CLASS ${T}-vector
 
 A   IS      ${T}-array
+S   IS      ${T}-sequence
 <A> IS      <${A}>
 
 >V  DEFERS >${V}
@@ -18,6 +19,8 @@ V{  DEFINES ${V}{
 WHERE
 
 V A <A> vectors.functor:define-vector
+
+INSTANCE: V S
 
 M: V contract 2drop ;
 
