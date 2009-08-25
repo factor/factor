@@ -1,24 +1,34 @@
 ! Copyright (C) 2007, 2009 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations kernel namespaces make
-sequences vectors sets assocs init ;
+sequences vectors sets assocs init math ;
 IN: destructors
 
 SYMBOL: disposables
 
 [ H{ } clone disposables set-global ] "destructors" add-init-hook
 
+ERROR: already-unregistered disposable ;
+
+SYMBOL: debug-leaks?
+
 <PRIVATE
 
+SLOT: continuation
+
 : register-disposable ( obj -- )
+    debug-leaks? get-global [ continuation >>continuation ] when
     disposables get conjoin ;
 
 : unregister-disposable ( obj -- )
-    disposables get delete-at ;
+    disposables get 2dup key? [ delete-at ] [ drop already-unregistered ] if ;
 
 PRIVATE>
 
-TUPLE: disposable < identity-tuple disposed id ;
+TUPLE: disposable < identity-tuple
+{ id integer }
+{ disposed boolean }
+continuation ;
 
 M: disposable hashcode* nip id>> ;
 
@@ -39,7 +49,11 @@ M: object dispose
     dup disposed>> [ drop ] [ t >>disposed dispose* ] if ;
 
 M: disposable dispose
-    [ unregister-disposable ] [ call-next-method ] bi ;
+    dup disposed>> [ drop ] [
+        [ unregister-disposable ]
+        [ call-next-method ]
+        bi
+    ] if ;
 
 : dispose-each ( seq -- )
     [

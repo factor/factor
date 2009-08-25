@@ -85,6 +85,14 @@ H{
     { wrap-margin 500 }
 } warning-style set-global
 
+SYMBOL: deprecated-style
+H{
+    { page-color COLOR: gray90 }
+    { border-color COLOR: red }
+    { border-width 5 }
+    { wrap-margin 500 }
+} deprecated-style set-global
+
 SYMBOL: table-content-style
 H{
     { wrap-margin 350 }
