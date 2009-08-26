@@ -62,7 +62,7 @@ M: rs-loc loc-reg drop rs-reg ;
 M: ppc %peek loc>operand LWZ ;
 M: ppc %replace loc>operand STW ;
 
-: (%inc) ( n reg -- ) dup rot cells ADDI ; inline
+:: (%inc) ( n reg -- ) reg reg n cells ADDI ; inline
 
 M: ppc %inc-d ( n -- ) ds-reg (%inc) ;
 M: ppc %inc-r ( n -- ) rs-reg (%inc) ;
