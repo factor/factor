@@ -1,10 +1,11 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types alien.structs alien.structs.fields arrays
-byte-arrays classes classes.c-types classes.parser classes.tuple
+byte-arrays classes classes.parser classes.tuple
 classes.tuple.parser classes.tuple.private combinators
 combinators.smart fry generalizations generic.parser kernel
-kernel.private libc macros make math math.order parser
-quotations sequences slots slots.private struct-arrays words ;
+kernel.private lexer libc macros make math math.order parser
+quotations sequences slots slots.private struct-arrays
+vectors words ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
 
@@ -12,6 +13,9 @@ IN: classes.struct
 
 TUPLE: struct
     { (underlying) c-ptr read-only } ;
+
+TUPLE: struct-slot-spec < slot-spec
+    c-type ;
 
 PREDICATE: struct-class < tuple-class
     \ struct subclass-of? ;
@@ -52,11 +56,11 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
     [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
 : (reader-quot) ( slot -- quot )
-    [ class>> c-type-getter-boxer ]
+    [ c-type>> c-type-getter-boxer ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
 : (writer-quot) ( slot -- quot )
-    [ class>> c-setter ]
+    [ c-type>> c-setter ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
 : (boxer-quot) ( class -- quot )
@@ -90,13 +94,17 @@ M: struct-class writer-quot
     [ \ struct-slot-values create-method-in ]
     [ struct-slot-values-quot ] bi define ;
 
+: (define-byte-length-method) ( class -- )
+    [ \ byte-length create-method-in ]
+    [ heap-size \ drop swap [ ] 2sequence ] bi define ;
+
 ! Struct as c-type
 
 : slot>field ( slot -- field )
     field-spec new swap {
         [ name>> >>name ]
         [ offset>> >>offset ]
-        [ class>> c-type >>type ]
+        [ c-type>> >>type ]
         [ name>> reader-word >>reader ]
         [ name>> writer-word >>writer ]
     } cleave ;
@@ -111,9 +119,12 @@ M: struct-class writer-quot
         } cleave
         (define-struct)
     ] [
-        [ name>> c-type ]
-        [ (unboxer-quot) >>unboxer-quot ]
-        [ (boxer-quot) >>boxer-quot ] tri drop
+        {
+            [ name>> c-type ]
+            [ (unboxer-quot) >>unboxer-quot ]
+            [ (boxer-quot) >>boxer-quot ]
+            [ >>boxed-class ]
+        } cleave drop
     ] bi ;
 
 : align-offset ( offset class -- offset' )
@@ -121,15 +132,15 @@ M: struct-class writer-quot
 
 : struct-offsets ( slots -- size )
     0 [
-        [ class>> align-offset ] keep
-        [ (>>offset) ] [ class>> heap-size + ] 2bi
+        [ c-type>> align-offset ] keep
+        [ (>>offset) ] [ c-type>> heap-size + ] 2bi
     ] reduce ;
 
 : union-struct-offsets ( slots -- size )
-    [ 0 >>offset class>> heap-size ] [ max ] map-reduce ;
+    [ 0 >>offset c-type>> heap-size ] [ max ] map-reduce ;
 
 : struct-align ( slots -- align )
-    [ class>> c-type-align ] [ max ] map-reduce ;
+    [ c-type>> c-type-align ] [ max ] map-reduce ;
 
 M: struct-class c-type
     name>> c-type ;
@@ -153,9 +164,6 @@ M: struct-class c-type-unboxer-quot
 M: struct-class heap-size
     "struct-size" word-prop ;
 
-M: struct-class direct-array-of
-    <direct-struct-array> ;
-
 ! class definition
 
 : struct-prototype ( class -- prototype )
@@ -168,6 +176,10 @@ M: struct-class direct-array-of
         over [ swapd [ call( value struct -- ) ] curry keep ] [ 2drop ] if
     ] each ;
 
+: (struct-methods) ( class -- )
+    [ (define-struct-slot-values-method) ]
+    [ (define-byte-length-method) ] bi ;
+
 : (struct-word-props) ( class slots size align -- )
     [
         [ "struct-slots" set-word-prop ]
@@ -177,10 +189,10 @@ M: struct-class direct-array-of
     [ "struct-align" set-word-prop ] tri-curry*
     [ tri ] 3curry
     [ dup struct-prototype "prototype" set-word-prop ]
-    [ (define-struct-slot-values-method) ] tri ;
+    [ (struct-methods) ] tri ;
 
 : check-struct-slots ( slots -- )
-    [ class>> c-type drop ] each ;
+    [ c-type>> c-type drop ] each ;
 
 : (define-struct-class) ( class slots offsets-quot -- )
     [ drop struct f define-tuple-class ]
@@ -197,8 +209,27 @@ M: struct-class direct-array-of
 : define-union-struct-class ( class slots -- )
     [ union-struct-offsets ] (define-struct-class) ;
 
+ERROR: invalid-struct-slot token ;
+
+: struct-slot-class ( c-type -- class' )
+    c-type c-type-boxed-class
+    dup \ byte-array = [ drop \ c-ptr ] when ;
+
+: parse-struct-slot ( -- slot )
+    struct-slot-spec new
+    scan >>name
+    scan [ >>c-type ] [ struct-slot-class >>class ] bi
+    \ } parse-until [ dup empty? ] [ peel-off-attributes ] until drop ;
+    
+: parse-struct-slots ( slots -- slots' more? )
+    scan {
+        { ";" [ f ] }
+        { "{" [ parse-struct-slot over push t ] }
+        [ invalid-struct-slot ]
+    } case ;
+
 : parse-struct-definition ( -- class slots )
-    CREATE-CLASS [ parse-tuple-slots ] { } make ;
+    CREATE-CLASS 8 <vector> [ parse-struct-slots ] [ ] while >array ;
 
 SYNTAX: STRUCT:
     parse-struct-definition define-struct-class ;
