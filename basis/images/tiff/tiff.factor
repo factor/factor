@@ -517,14 +517,14 @@ ERROR: unknown-component-order ifd ;
 : with-tiff-endianness ( loading-tiff quot -- )
     [ dup endianness>> ] dip with-endianness ; inline
 
-: load-tiff-ifds ( path -- loading-tiff )
-    binary [
+: load-tiff-ifds ( stream -- loading-tiff )
+    [
         <loading-tiff>
         read-header [
             dup ifd-offset>> read-ifds
             process-ifds
         ] with-tiff-endianness
-    ] with-file-reader ;
+    ] with-input-stream* ;
 
 : process-chunky-ifd ( ifd -- )
     read-strips
@@ -555,13 +555,18 @@ ERROR: unknown-component-order ifd ;
     ifds>> [ process-ifd ] each ;
 
 : load-tiff ( path -- loading-tiff )
-    [ load-tiff-ifds dup ] keep
-    binary [
-        [ process-tif-ifds ] with-tiff-endianness
-    ] with-file-reader ;
+    [ load-tiff-ifds dup ]
+    [
+        [ [ 0 seek-absolute ] dip stream-seek ]
+        [
+            [
+                [ process-tif-ifds ] with-tiff-endianness
+            ] with-input-stream
+        ] bi
+    ] bi ;
 
 ! tiff files can store several images -- we just take the first for now
-M: tiff-image load-image* ( path tiff-image -- image )
+M: tiff-image stream>image ( stream tiff-image -- image )
     drop load-tiff tiff>image ;
 
 { "tif" "tiff" } [ tiff-image register-image-class ] each
