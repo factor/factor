@@ -919,7 +919,7 @@ PRIVATE>
 <PRIVATE
 
 : generic-flip ( matrix -- newmatrix )
-    [ dup first length [ length min ] reduce ] keep
+    [ dup first length [ length min ] reduce iota ] keep
     [ [ nth-unsafe ] with { } map-as ] curry { } map-as ; inline
 
 USE: arrays
@@ -929,7 +929,7 @@ USE: arrays
 
 : array-flip ( matrix -- newmatrix )
     { array } declare
-    [ dup first array-length [ array-length min ] reduce ] keep
+    [ dup first array-length [ array-length min ] reduce iota ] keep
     [ [ { array } declare array-nth ] with { } map-as ] curry { } map-as ;
 
 PRIVATE>
