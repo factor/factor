@@ -94,6 +94,10 @@ M: struct-class writer-quot
     [ \ struct-slot-values create-method-in ]
     [ struct-slot-values-quot ] bi define ;
 
+: (define-byte-length-method) ( class -- )
+    [ \ byte-length create-method-in ]
+    [ heap-size \ drop swap [ ] 2sequence ] bi define ;
+
 ! Struct as c-type
 
 : slot>field ( slot -- field )
@@ -172,6 +176,10 @@ M: struct-class heap-size
         over [ swapd [ call( value struct -- ) ] curry keep ] [ 2drop ] if
     ] each ;
 
+: (struct-methods) ( class -- )
+    [ (define-struct-slot-values-method) ]
+    [ (define-byte-length-method) ] bi ;
+
 : (struct-word-props) ( class slots size align -- )
     [
         [ "struct-slots" set-word-prop ]
@@ -181,7 +189,7 @@ M: struct-class heap-size
     [ "struct-align" set-word-prop ] tri-curry*
     [ tri ] 3curry
     [ dup struct-prototype "prototype" set-word-prop ]
-    [ (define-struct-slot-values-method) ] tri ;
+    [ (struct-methods) ] tri ;
 
 : check-struct-slots ( slots -- )
     [ c-type>> c-type drop ] each ;
