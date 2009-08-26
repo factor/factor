@@ -37,4 +37,10 @@ STRUCT: test-struct-array
 
 [ 15 ] [ 15 10 test-struct-array <struct-array> resize length ] unit-test
 
-
+[ S{ test-struct-array f 12 20 } ] [
+    struct-array{ test-struct-array
+        S{ test-struct-array f  4 20 } 
+        S{ test-struct-array f 12 20 }
+        S{ test-struct-array f 20 20 }
+    } second
+] unit-test
