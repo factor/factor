@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien alien.c-types alien.syntax kernel destructors
 accessors fry words hashtables strings sequences memoize assocs math
-math.vectors math.rectangles math.functions locals init namespaces
-combinators fonts colors cache core-foundation core-foundation.strings
-core-foundation.attributed-strings core-foundation.utilities
-core-graphics core-graphics.types core-text.fonts core-text.utilities ;
+math.order math.vectors math.rectangles math.functions locals init
+namespaces combinators fonts colors cache core-foundation
+core-foundation.strings core-foundation.attributed-strings
+core-foundation.utilities core-graphics core-graphics.types
+core-text.fonts core-text.utilities ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
@@ -120,7 +121,7 @@ TUPLE: line < disposable line metrics image loc dim ;
                 (ext) [ (loc) (dim) v+ ]
                 loc [ (loc) [ floor ] map ]
                 ext [ (loc) (dim) [ + ceiling ] 2map ]
-                dim [ ext loc [ - >integer ] 2map ]
+                dim [ ext loc [ - >integer 1 max ] 2map ]
                 metrics [ open-font line compute-line-metrics ] |
 
             line >>line
