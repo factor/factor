@@ -1,19 +1,36 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien.c-types alien.structs.fields classes.c-types
-classes.struct combinators io.streams.string kernel libc literals math
-multiline namespaces prettyprint prettyprint.config see tools.test ;
+USING: accessors alien.c-types alien.libraries
+alien.structs.fields alien.syntax classes.struct combinators
+destructors io.encodings.utf8 io.pathnames io.streams.string
+kernel libc literals math multiline namespaces prettyprint
+prettyprint.config see system tools.test ;
 IN: classes.struct.tests
+
+<<
+: libfactor-ffi-tests-path ( -- string )
+    "resource:" (normalize-path)
+    {
+        { [ os winnt? ]  [ "libfactor-ffi-test.dll" ] }
+        { [ os macosx? ] [ "libfactor-ffi-test.dylib" ] }
+        { [ os unix?  ]  [ "libfactor-ffi-test.so" ] }
+    } cond append-path ;
+
+"f-cdecl" libfactor-ffi-tests-path "cdecl" add-library
+
+"f-stdcall" libfactor-ffi-tests-path "stdcall" add-library
+>>
 
 STRUCT: struct-test-foo
     { x char }
     { y int initial: 123 }
-    { z boolean } ;
+    { z bool } ;
 
 STRUCT: struct-test-bar
     { w ushort initial: HEX: ffff }
     { foo struct-test-foo } ;
 
 [ 12 ] [ struct-test-foo heap-size ] unit-test
+[ 12 ] [ struct-test-foo <struct> byte-length ] unit-test
 [ 16 ] [ struct-test-bar heap-size ] unit-test
 [ 123 ] [ struct-test-foo <struct> y>> ] unit-test
 [ 123 ] [ struct-test-bar <struct> foo>> y>> ] unit-test
@@ -32,13 +49,24 @@ STRUCT: struct-test-bar
 [ 7654 ] [ S{ struct-test-foo { y 7654 } } y>> ] unit-test
 
 UNION-STRUCT: struct-test-float-and-bits
-    { f single-float }
+    { f float }
     { bits uint } ;
 
 [ 1.0 ] [ struct-test-float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
 [ 4 ] [ struct-test-float-and-bits heap-size ] unit-test
 
-[ ] [ struct-test-foo malloc-struct free ] unit-test
+[ ] [ [ struct-test-foo malloc-struct &free drop ] with-destructors ] unit-test
+
+STRUCT: struct-test-string-ptr
+    { x char* } ;
+
+[ "hello world" ] [
+    [
+        struct-test-string-ptr <struct>
+        "hello world" utf8 malloc-string &free >>x
+        x>>
+    ] with-destructors
+] unit-test
 
 [ "S{ struct-test-foo { y 7654 } }" ]
 [
@@ -54,18 +82,17 @@ UNION-STRUCT: struct-test-float-and-bits
     with-variable
 ] unit-test
 
-[ <" USING: classes.c-types classes.struct kernel ;
+[ <" USING: classes.struct ;
 IN: classes.struct.tests
 STRUCT: struct-test-foo
-    { x char initial: 0 } { y int initial: 123 }
-    { z boolean initial: f } ;
+    { x char initial: 0 } { y int initial: 123 } { z bool } ;
 "> ]
 [ [ struct-test-foo see ] with-string-writer ] unit-test
 
-[ <" USING: classes.c-types classes.struct ;
+[ <" USING: classes.struct ;
 IN: classes.struct.tests
 UNION-STRUCT: struct-test-float-and-bits
-    { f single-float initial: 0.0 } { bits uint initial: 0 } ;
+    { f float initial: 0.0 } { bits uint initial: 0 } ;
 "> ]
 [ [ struct-test-float-and-bits see ] with-string-writer ] unit-test
 
@@ -73,21 +100,21 @@ UNION-STRUCT: struct-test-float-and-bits
     T{ field-spec
         { name "x" }
         { offset 0 }
-        { type $[ char c-type ] }
+        { type "char" }
         { reader x>> }
         { writer (>>x) }
     }
     T{ field-spec
         { name "y" }
         { offset 4 }
-        { type $[ int c-type ] }
+        { type "int" }
         { reader y>> }
         { writer (>>y) }
     }
     T{ field-spec
         { name "z" }
         { offset 8 }
-        { type $[ boolean c-type ] }
+        { type "bool" }
         { reader z>> }
         { writer (>>z) }
     }
@@ -97,16 +124,24 @@ UNION-STRUCT: struct-test-float-and-bits
     T{ field-spec
         { name "f" }
         { offset 0 }
-        { type $[ single-float c-type ] }
+        { type "float" }
         { reader f>> }
         { writer (>>f) }
     }
     T{ field-spec
         { name "bits" }
         { offset 0 }
-        { type $[ uint c-type ] }
+        { type "uint" }
         { reader bits>> }
         { writer (>>bits) }
     }
 } ] [ "struct-test-float-and-bits" c-type fields>> ] unit-test
 
+STRUCT: struct-test-ffi-foo
+    { x int }
+    { y int } ;
+
+LIBRARY: f-cdecl
+FUNCTION: int ffi_test_11 ( int a, struct-test-ffi-foo b, int c ) ;
+
+[ 14 ] [ 1 2 3 struct-test-ffi-foo <struct-boa> 4 ffi_test_11 ] unit-test
