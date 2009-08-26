@@ -205,7 +205,7 @@ MTSPR: CTR 9
 : SRWI ( d a b -- ) (SRWI) RLWINM ;
 : SRWI. ( d a b -- ) (SRWI) RLWINM. ;
 :: LOAD32 ( n r -- )
-    n -16 shift HEX: 7fff bitand r LIS
-    r r n HEX: 7fff bitand ORI ;
+    n -16 shift HEX: ffff bitand r LIS
+    r r n HEX: ffff bitand ORI ;
 : immediate? ( n -- ? ) HEX: -8000 HEX: 7fff between? ;
 : LOAD ( n r -- ) over immediate? [ LI ] [ LOAD32 ] if ;

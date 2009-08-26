@@ -304,6 +304,7 @@ USING: cpu.x86.features cpu.x86.features.private ;
     sse2? [
         " - yes" print
         enable-float-intrinsics
+        enable-fsqrt
         [
             sse2? [
                 "This image was built to use SSE2, which your CPU does not support." print
