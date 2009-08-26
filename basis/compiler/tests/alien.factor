@@ -1,10 +1,10 @@
 USING: accessors alien alien.c-types alien.libraries
-alien.syntax arrays classes.c-types classes.struct combinators
+alien.syntax arrays classes.struct combinators
 compiler continuations effects io io.backend io.pathnames
 io.streams.string kernel math memory namespaces
 namespaces.private parser quotations sequences
 specialized-arrays.float stack-checker stack-checker.errors
-system threads tools.test words ;
+system threads tools.test words specialized-arrays.char ;
 IN: compiler.tests.alien
 
 <<
@@ -207,47 +207,47 @@ FUNCTION: float ffi_test_23 ( float[3] x, float[3] y ) ;
 ] unit-test
 
 ! Test odd-size structs
-C-STRUCT: test-struct-1 { { "char" 1 } "x" } ;
+STRUCT: test-struct-1 { x char[1] } ;
 
 FUNCTION: test-struct-1 ffi_test_24 ;
 
-[ B{ 1 } ] [ ffi_test_24 ] unit-test
+[ S{ test-struct-1 { x char-array{ 1 } } } ] [ ffi_test_24 ] unit-test
 
-C-STRUCT: test-struct-2 { { "char" 2 } "x" } ;
+STRUCT: test-struct-2 { x char[2] } ;
 
 FUNCTION: test-struct-2 ffi_test_25 ;
 
-[ B{ 1 2 } ] [ ffi_test_25 ] unit-test
+[ S{ test-struct-2 { x char-array{ 1 2 } } } ] [ ffi_test_25 ] unit-test
 
-C-STRUCT: test-struct-3 { { "char" 3 } "x" } ;
+STRUCT: test-struct-3 { x char[3] } ;
 
 FUNCTION: test-struct-3 ffi_test_26 ;
 
-[ B{ 1 2 3 } ] [ ffi_test_26 ] unit-test
+[ S{ test-struct-3 { x char-array{ 1 2 3 } } } ] [ ffi_test_26 ] unit-test
 
-C-STRUCT: test-struct-4 { { "char" 4 } "x" } ;
+STRUCT: test-struct-4 { x char[4] } ;
 
 FUNCTION: test-struct-4 ffi_test_27 ;
 
-[ B{ 1 2 3 4 } ] [ ffi_test_27 ] unit-test
+[ S{ test-struct-4 { x char-array{ 1 2 3 4 } } } ] [ ffi_test_27 ] unit-test
 
-C-STRUCT: test-struct-5 { { "char" 5 } "x" } ;
+STRUCT: test-struct-5 { x char[5] } ;
 
 FUNCTION: test-struct-5 ffi_test_28 ;
 
-[ B{ 1 2 3 4 5 } ] [ ffi_test_28 ] unit-test
+[ S{ test-struct-5 { x char-array{ 1 2 3 4 5 } } } ] [ ffi_test_28 ] unit-test
 
-C-STRUCT: test-struct-6 { { "char" 6 } "x" } ;
+STRUCT: test-struct-6 { x char[6] } ;
 
 FUNCTION: test-struct-6 ffi_test_29 ;
 
-[ B{ 1 2 3 4 5 6 } ] [ ffi_test_29 ] unit-test
+[ S{ test-struct-6 { x char-array{ 1 2 3 4 5 6 } } } ] [ ffi_test_29 ] unit-test
 
-C-STRUCT: test-struct-7 { { "char" 7 } "x" } ;
+STRUCT: test-struct-7 { x char[7] } ;
 
 FUNCTION: test-struct-7 ffi_test_30 ;
 
-[ B{ 1 2 3 4 5 6 7 } ] [ ffi_test_30 ] unit-test
+[ S{ test-struct-7 { x char-array{ 1 2 3 4 5 6 7 } } } ] [ ffi_test_30 ] unit-test
 
 STRUCT: test-struct-8 { x double } { y double } ;
 
