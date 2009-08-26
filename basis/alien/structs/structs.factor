@@ -3,7 +3,7 @@
 USING: accessors arrays assocs generic hashtables kernel kernel.private
 math namespaces parser sequences strings words libc fry
 alien.c-types alien.structs.fields cpu.architecture math.order
-quotations byte-arrays ;
+quotations byte-arrays struct-arrays ;
 IN: alien.structs
 
 TUPLE: struct-type < abstract-c-type fields return-in-registers? ;
@@ -11,6 +11,16 @@ TUPLE: struct-type < abstract-c-type fields return-in-registers? ;
 M: struct-type c-type ;
 
 M: struct-type c-type-stack-align? drop f ;
+
+M: struct-type <c-type-array> ( len c-type -- array )
+    dup c-type-array-constructor
+    [ execute( len -- array ) ]
+    [ <struct-array> ] ?if ; inline
+
+M: struct-type <c-type-direct-array> ( alien len c-type -- array )
+    dup c-type-direct-array-constructor
+    [ execute( alien len -- array ) ]
+    [ <direct-struct-array> ] ?if ; inline
 
 : if-value-struct ( ctype true false -- )
     [ dup value-struct? ] 2dip '[ drop "void*" @ ] if ; inline
@@ -35,9 +45,8 @@ M: struct-type stack-size
 
 : c-struct? ( type -- ? ) (c-type) struct-type? ;
 
-: (define-struct) ( name size align fields -- )
-    [ [ align ] keep ] dip
-    struct-type new
+: (define-struct) ( name size align fields class -- )
+    [ [ align ] keep ] 2dip new
         byte-array >>class
         byte-array >>boxed-class
         swap >>fields
@@ -55,13 +64,13 @@ M: struct-type stack-size
     [ 2drop ] [ make-fields ] 3bi
     [ struct-offsets ] keep
     [ [ type>> ] map compute-struct-align ] keep
-    [ (define-struct) ] keep
+    [ struct-type (define-struct) ] keep
     [ define-field ] each ;
 
 : define-union ( name members -- )
     [ expand-constants ] map
     [ [ heap-size ] [ max ] map-reduce ] keep
-    compute-struct-align f (define-struct) ;
+    compute-struct-align f struct-type (define-struct) ;
 
 : offset-of ( field struct -- offset )
     c-types get at fields>> 

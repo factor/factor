@@ -117,7 +117,7 @@ M: struct-class writer-quot
             [ "struct-align" word-prop ]
             [ struct-slots [ slot>field ] map ]
         } cleave
-        (define-struct)
+        struct-type (define-struct)
     ] [
         {
             [ name>> c-type ]
