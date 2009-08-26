@@ -1,5 +1,5 @@
 include vm/Config.unix
-CFLAGS += -fPIC
+CFLAGS += -fPIC -D_XOPEN_SOURCE
 
 PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o
 
