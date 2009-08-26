@@ -21,7 +21,7 @@ HELP: /*
 HELP: HEREDOC:
 { $syntax "HEREDOC: marker\n...text...\nmarker" }
 { $values { "marker" "a word (token)" } { "text" "arbitrary text" } { "value" string } }
-{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after the " { $link POSTPONE: HEREDOC: } " until the end of the line containing the " { $link POSTPONE: HEREDOC: } ". Text is captured until a line is found conatining exactly this delimter string." }
+{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after " { $link POSTPONE: HEREDOC: } " until the end of the line containing " { $link POSTPONE: HEREDOC: } ". Text is captured until a line is found conatining exactly this delimter string." }
 { $warning "Whitespace is significant." }
 { $examples
     { $example "USING: multiline prettyprint ;"
@@ -37,7 +37,8 @@ HELP: HEREDOC:
 HELP: DELIMITED:
 { $syntax "DELIMITED: marker\n...text...\nmarker" }
 { $values { "marker" "a word (token)" } { "text" "arbitrary text" } { "value" string } }
-{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after the " { $link POSTPONE: DELIMITED: } " until the end of the line containing the " { $link POSTPONE: DELIMITED: } ". Text is captured until the exact delimiter string is found, regardless of where." }
+{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after " { $link POSTPONE: DELIMITED: } " until the end of the line containing " { $link POSTPONE: DELIMITED: } ". Text is captured until the exact delimiter string is found, regardless of where." }
+{ $warning "Whitespace is significant on the " { $link POSTPONE: DELIMITED: } " line." }
 { $examples
     { $example "USING: multiline prettyprint ;"
                "DELIMITED: factor blows my mind"

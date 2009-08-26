@@ -15,7 +15,7 @@ IN: generalizations
 
 MACRO: nsequence ( n seq -- )
     [
-        [ drop <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
+        [ drop iota <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
         [ '[ @ [ _ swap set-nth-unsafe ] keep ] ] reduce
     ] keep
     '[ @ _ like ] ;
@@ -27,7 +27,7 @@ MACRO: nsum ( n -- )
     1 - [ + ] n*quot ;
 
 MACRO: firstn-unsafe ( n -- )
-    [ '[ [ _ ] dip nth-unsafe ] ] map '[ _ cleave ] ;
+    iota [ '[ [ _ ] dip nth-unsafe ] ] map '[ _ cleave ] ;
 
 MACRO: firstn ( n -- )
     dup zero? [ drop [ drop ] ] [
@@ -94,7 +94,7 @@ MACRO: mnswap ( m n -- )
     1 + '[ _ -nrot ] swap '[ _ _ napply ] ;
 
 MACRO: nweave ( n -- )
-    [ dup <reversed> [ '[ _ _ mnswap ] ] with map ] keep
+    [ dup iota <reversed> [ '[ _ _ mnswap ] ] with map ] keep
     '[ _ _ ncleave ] ;
 
 MACRO: nbi-curry ( n -- )
