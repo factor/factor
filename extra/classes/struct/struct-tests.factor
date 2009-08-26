@@ -1,9 +1,10 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien.c-types alien.libraries
-alien.structs.fields alien.syntax classes.struct combinators
+alien.structs.fields alien.syntax ascii classes.struct combinators
 destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math multiline namespaces prettyprint
-prettyprint.config see system tools.test ;
+prettyprint.config see sequences specialized-arrays.ushort
+system tools.test ;
 IN: classes.struct.tests
 
 <<
@@ -145,3 +146,16 @@ LIBRARY: f-cdecl
 FUNCTION: int ffi_test_11 ( int a, struct-test-ffi-foo b, int c ) ;
 
 [ 14 ] [ 1 2 3 struct-test-ffi-foo <struct-boa> 4 ffi_test_11 ] unit-test
+
+STRUCT: struct-test-array-slots
+    { x int }
+    { y ushort[6] initial: ushort-array{ 2 3 5 7 11 13 } }
+    { z int } ;
+
+[ 11 ] [ struct-test-array-slots <struct> y>> 4 swap nth ] unit-test
+
+[ t ] [
+    struct-test-array-slots <struct>
+    [ y>> [ 8 3 ] dip set-nth ]
+    [ y>> ushort-array{ 2 3 5 8 11 13 } sequence= ] bi
+] unit-test
