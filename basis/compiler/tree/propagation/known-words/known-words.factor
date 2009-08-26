@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel effects accessors math math.private
 math.integers.private math.partial-dispatch math.intervals
-math.parser math.order math.functions layouts words sequences sequences.private
-arrays assocs classes classes.algebra combinators generic.math
-splitting fry locals classes.tuple alien.accessors
-classes.tuple.private slots.private definitions strings.private
-vectors hashtables generic quotations
+math.parser math.order math.functions math.libm layouts words
+sequences sequences.private arrays assocs classes
+classes.algebra combinators generic.math splitting fry locals
+classes.tuple alien.accessors classes.tuple.private
+slots.private definitions strings.private vectors hashtables
+generic quotations
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -297,3 +298,8 @@ generic-comparison-ops [
         bi
     ] [ 2drop object-info ] if
 ] "outputs" set-word-prop
+
+{ facos fasin fatan fatan2 fcos fsin ftan fcosh fsinh ftanh fexp
+flog fpow fsqrt facosh fasinh fatanh } [
+    { float } "default-output-classes" set-word-prop
+] each

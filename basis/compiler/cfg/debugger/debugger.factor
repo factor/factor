@@ -1,15 +1,16 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words sequences quotations namespaces io vectors
-classes.tuple accessors prettyprint prettyprint.config assocs
-prettyprint.backend prettyprint.custom prettyprint.sections
-parser compiler.tree.builder compiler.tree.optimizer
-cpu.architecture compiler.cfg.builder compiler.cfg.linearization
-compiler.cfg.registers compiler.cfg.stack-frame
-compiler.cfg.linear-scan compiler.cfg.two-operand
-compiler.cfg.optimizer compiler.cfg.instructions
-compiler.cfg.utilities compiler.cfg.def-use
-compiler.cfg.rpo compiler.cfg.mr compiler.cfg ;
+arrays hashtables classes.tuple accessors prettyprint
+prettyprint.config assocs prettyprint.backend prettyprint.custom
+prettyprint.sections parser compiler.tree.builder
+compiler.tree.optimizer cpu.architecture compiler.cfg.builder
+compiler.cfg.linearization compiler.cfg.registers
+compiler.cfg.stack-frame compiler.cfg.linear-scan
+compiler.cfg.two-operand compiler.cfg.optimizer
+compiler.cfg.instructions compiler.cfg.utilities
+compiler.cfg.def-use compiler.cfg.rpo compiler.cfg.mr
+compiler.cfg.representations.preferred compiler.cfg ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-cfg ( quot -- cfgs )
@@ -73,8 +74,9 @@ M: rs-loc pprint* \ R pprint-loc ;
 
 : fake-representations ( cfg -- )
     post-order [
-        instructions>>
-        [ [ temp-vregs ] [ defs-vreg ] bi [ suffix ] when* ]
-        map concat
-    ] map concat
-    [ int-rep ] H{ } map>assoc representations set ;
+        instructions>> [
+            [ [ temp-vregs ] [ temp-vreg-reps ] bi zip ]
+            [ [ defs-vreg ] [ defs-vreg-rep ] bi 2dup and [ 2array ] [ 2drop f ] if ]
+            bi [ suffix ] when*
+        ] map concat
+    ] map concat >hashtable representations set ;

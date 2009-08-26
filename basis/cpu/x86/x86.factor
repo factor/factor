@@ -203,6 +203,7 @@ M: x86 %add-float nip ADDSD ;
 M: x86 %sub-float nip SUBSD ;
 M: x86 %mul-float nip MULSD ;
 M: x86 %div-float nip DIVSD ;
+M: x86 %sqrt SQRTSD ;
 
 M: x86 %integer>float CVTSI2SD ;
 M: x86 %float>integer CVTTSD2SI ;
