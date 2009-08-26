@@ -106,6 +106,7 @@ INSN: ##add-float < ##commutative ;
 INSN: ##sub-float < ##binary ;
 INSN: ##mul-float < ##commutative ;
 INSN: ##div-float < ##binary ;
+INSN: ##sqrt < ##unary ;
 
 ! Float/integer conversion
 INSN: ##float>integer < ##unary ;
@@ -256,6 +257,7 @@ UNION: output-float-insn
     ##sub-float
     ##mul-float
     ##div-float
+    ##sqrt
     ##integer>float
     ##unbox-float
     ##alien-float
@@ -267,6 +269,7 @@ UNION: input-float-insn
     ##sub-float
     ##mul-float
     ##div-float
+    ##sqrt
     ##float>integer
     ##box-float
     ##set-alien-float
