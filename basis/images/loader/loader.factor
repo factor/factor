@@ -30,7 +30,7 @@ GENERIC: stream>image ( stream class -- image )
     swap types get set-at ;
 
 : load-image ( path -- image )
-    [ open-image-file ] [ image-class new ] bi load-image* ;
+    [ open-image-file ] [ image-class ] bi load-image* ;
 
 M: byte-array load-image*
     [ binary <byte-reader> ] dip stream>image ;
