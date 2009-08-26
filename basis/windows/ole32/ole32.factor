@@ -148,7 +148,7 @@ TUPLE: ole32-error code message ;
             [ ]
         } 2cleave
 
-        GUID-Data4 8 <direct-uchar-array> {
+        GUID-Data4 {
             [ 20 22 0 (guid-byte>guid) ]
             [ 22 24 1 (guid-byte>guid) ]
 
@@ -175,7 +175,7 @@ TUPLE: ole32-error code message ;
             [ [ GUID-Data3 ] 4 (guid-section%) "-" % ]
             [ ]
         } cleave
-        GUID-Data4 8 <direct-uchar-array> {
+        GUID-Data4 {
             [ 0 (guid-byte%) ]
             [ 1 (guid-byte%) "-" % ]
             [ 2 (guid-byte%) ]
