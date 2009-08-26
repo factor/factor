@@ -16,6 +16,7 @@ M: bad-byte-array-length summary
 FUNCTOR: define-array ( T -- )
 
 A            DEFINES-CLASS ${T}-array
+S            DEFINES-CLASS ${T}-sequence
 <A>          DEFINES <${A}>
 (A)          DEFINES (${A})
 >A           DEFINES >${A}
@@ -26,6 +27,8 @@ NTH          [ T dup c-type-getter-boxer array-accessor ]
 SET-NTH      [ T dup c-setter array-accessor ]
 
 WHERE
+
+MIXIN: S
 
 TUPLE: A
 { length array-capacity read-only }
@@ -73,7 +76,14 @@ M: A pprint* pprint-object ;
 SYNTAX: A{ \ } [ >A ] parse-literal ;
 
 INSTANCE: A sequence
+INSTANCE: A S
 
 A T c-type-boxed-class specialize-vector-words
+
+T c-type
+    \ A >>array-class
+    \ <A> >>array-constructor
+    \ S >>sequence-mixin-class
+    drop
 
 ;FUNCTOR

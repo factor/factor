@@ -153,7 +153,7 @@ PRIVATE>
     [ +live-wrappers+ get adjoin ] bi ;
 
 : <com-wrapper> ( implementations -- wrapper )
-    com-wrapper new-disposable swap (make-callbacks) >>vtbls
+    com-wrapper new-disposable swap (make-callbacks) >>callbacks
     dup allocate-wrapper ;
 
 M: com-wrapper dispose*
