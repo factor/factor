@@ -1,6 +1,6 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces words io.binary math math.order
+USING: kernel namespaces words math math.order locals
 cpu.ppc.assembler.backend ;
 IN: cpu.ppc.assembler
 
@@ -97,8 +97,8 @@ X: XOR 0 316 31
 X: XOR. 1 316 31
 X1: EXTSB 0 954 31
 X1: EXTSB. 1 954 31
-: FMR ( a s -- ) [ 0 ] 2dip 72 0 63 x-insn ;
-: FMR. ( a s -- ) [ 0 ] 2dip 72 1 63 x-insn ;
+: FMR ( a s -- ) [ 0 ] 2dip 0 72 63 x-insn ;
+: FMR. ( a s -- ) [ 0 ] 2dip 1 72 63 x-insn ;
 : FCTIWZ ( a s -- ) [ 0 ] 2dip 0 15 63 x-insn ;
 : FCTIWZ. ( a s -- ) [ 0 ] 2dip 1 15 63 x-insn ;
 
@@ -189,9 +189,9 @@ MTSPR: LR 8
 MTSPR: CTR 9
 
 ! Pseudo-instructions
-: LI ( value dst -- ) 0 rot ADDI ; inline
+: LI ( value dst -- ) swap [ 0 ] dip ADDI ; inline
 : SUBI ( dst src1 src2 -- ) neg ADDI ; inline
-: LIS ( value dst -- ) 0 rot ADDIS ; inline
+: LIS ( value dst -- ) swap [ 0 ] dip ADDIS ; inline
 : SUBIC ( dst src1 src2 -- ) neg ADDIC ; inline
 : SUBIC. ( dst src1 src2 -- ) neg ADDIC. ; inline
 : NOT ( dst src -- ) dup NOR ; inline
@@ -204,6 +204,8 @@ MTSPR: CTR 9
 : (SRWI) ( d a b -- d a b x y ) 32 over - swap 31 ; inline
 : SRWI ( d a b -- ) (SRWI) RLWINM ;
 : SRWI. ( d a b -- ) (SRWI) RLWINM. ;
-: LOAD32 ( n r -- ) [ w>h/h ] dip tuck LIS dup rot ORI ;
+:: LOAD32 ( n r -- )
+    n -16 shift HEX: 7fff bitand r LIS
+    r r n HEX: 7fff bitand ORI ;
 : immediate? ( n -- ? ) HEX: -8000 HEX: 7fff between? ;
 : LOAD ( n r -- ) over immediate? [ LI ] [ LOAD32 ] if ;
