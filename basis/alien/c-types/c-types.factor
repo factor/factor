@@ -98,12 +98,12 @@ M: array require-c-type-arrays
 ERROR: specialized-array-vocab-not-loaded vocab word ;
 
 : c-type-array-constructor ( c-type -- word )
-    array-constructor>> dup word?
-    [ first2 specialized-array-vocab-not-loaded ] unless ; foldable
+    array-constructor>> dup array?
+    [ first2 specialized-array-vocab-not-loaded ] when ; foldable
 
 : c-type-direct-array-constructor ( c-type -- word )
-    direct-array-constructor>> dup word?
-    [ first2 specialized-array-vocab-not-loaded ] unless ; foldable
+    direct-array-constructor>> dup array?
+    [ first2 specialized-array-vocab-not-loaded ] when ; foldable
 
 GENERIC: <c-type-array> ( len c-type -- array )
 M: object <c-type-array>
