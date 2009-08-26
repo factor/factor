@@ -102,13 +102,12 @@ M: x86.64 %unbox-small-struct ( c-type -- )
         flatten-value-type [ %unbox-struct-field ] each-index
     ] with-return-regs ;
 
-M: x86.64 %unbox-large-struct ( n c-type -- )
+M:: x86.64 %unbox-large-struct ( n c-type -- )
     ! Source is in param-reg-1
-    heap-size
-    ! Load destination address
-    param-reg-2 rot param@ LEA
-    ! Load structure size
-    param-reg-3 swap MOV
+    ! Load destination address into param-reg-2
+    param-reg-2 n param@ LEA
+    ! Load structure size into param-reg-3
+    param-reg-3 c-type heap-size MOV
     ! Copy the struct to the C stack
     "to_value_struct" f %alien-invoke ;
 
