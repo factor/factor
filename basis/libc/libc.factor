@@ -83,6 +83,12 @@ PRIVATE>
 : memcpy ( dst src size -- )
     "void" "libc" "memcpy" { "void*" "void*" "ulong" } alien-invoke ;
 
+: memcmp ( a b size -- cmp )
+    "int" "libc" "memcmp" { "void*" "void*" "ulong" } alien-invoke ;
+
+: memory= ( a b size -- ? )
+    memcmp 0 = ;
+
 : strlen ( alien -- len )
     "size_t" "libc" "strlen" { "char*" } alien-invoke ;
 
