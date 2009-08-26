@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types byte-arrays kernel libc
-math sequences sequences.private ;
+USING: accessors alien alien.c-types alien.structs byte-arrays
+classes.struct kernel libc math sequences sequences.private ;
 IN: struct-arrays
 
 : c-type-struct-class ( c-type -- class )
@@ -16,11 +16,14 @@ TUPLE: struct-array
 M: struct-array length length>> ;
 M: struct-array byte-length [ length>> ] [ element-size>> ] bi * ;
 
+: (nth-ptr) ( i struct-array -- alien )
+    [ element-size>> * ] [ underlying>> ] bi <displaced-alien> ; inline
+
 M: struct-array nth-unsafe
-    [ element-size>> * ] [ underlying>> ] bi <displaced-alien> ;
+    [ (nth-ptr) ] [ class>> ] bi [ memory>struct ] when* ; inline
 
 M: struct-array set-nth-unsafe
-    [ nth-unsafe swap ] [ element-size>> ] bi memcpy ;
+    [ (nth-ptr) swap ] [ element-size>> ] bi memcpy ;
 
 M: struct-array new-sequence
     [ element-size>> [ * <byte-array> ] 2keep ]
@@ -50,3 +53,14 @@ ERROR: bad-byte-array-length byte-array ;
     [ heap-size calloc ] 2keep <direct-struct-array> ; inline
 
 INSTANCE: struct-array sequence
+
+M: struct-type <c-type-array> ( len c-type -- array )
+    dup c-type-array-constructor
+    [ execute( len -- array ) ]
+    [ <struct-array> ] ?if ; inline
+
+M: struct-type <c-type-direct-array> ( alien len c-type -- array )
+    dup c-type-direct-array-constructor
+    [ execute( alien len -- array ) ]
+    [ <direct-struct-array> ] ?if ; inline
+

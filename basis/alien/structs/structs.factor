@@ -3,7 +3,7 @@
 USING: accessors arrays assocs generic hashtables kernel kernel.private
 math namespaces parser sequences strings words libc fry
 alien.c-types alien.structs.fields cpu.architecture math.order
-quotations byte-arrays struct-arrays ;
+quotations byte-arrays ;
 IN: alien.structs
 
 TUPLE: struct-type < abstract-c-type fields return-in-registers? ;
@@ -11,16 +11,6 @@ TUPLE: struct-type < abstract-c-type fields return-in-registers? ;
 M: struct-type c-type ;
 
 M: struct-type c-type-stack-align? drop f ;
-
-M: struct-type <c-type-array> ( len c-type -- array )
-    dup c-type-array-constructor
-    [ execute( len -- array ) ]
-    [ <struct-array> ] ?if ; inline
-
-M: struct-type <c-type-direct-array> ( alien len c-type -- array )
-    dup c-type-direct-array-constructor
-    [ execute( alien len -- array ) ]
-    [ <direct-struct-array> ] ?if ; inline
 
 : if-value-struct ( ctype true false -- )
     [ dup value-struct? ] 2dip '[ drop "void*" @ ] if ; inline
