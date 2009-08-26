@@ -4,8 +4,7 @@ game-worlds gpu gpu.buffers gpu.util.wasd gpu.framebuffers gpu.render
 gpu.shaders gpu.state gpu.textures gpu.util grouping http.client images
 images.loader io io.encodings.ascii io.files io.files.temp
 kernel math math.matrices math.parser math.vectors
-method-chains sequences specialized-arrays.direct.float
-specialized-arrays.float specialized-vectors.uint splitting
+method-chains sequences specialized-arrays.float specialized-vectors.uint splitting
 struct-vectors threads ui ui.gadgets ui.gadgets.worlds
 ui.pixel-formats ;
 IN: gpu.demos.bunny
@@ -99,10 +98,10 @@ UNIFORM-TUPLE: loading-uniforms
 
 : calc-bunny-normal ( vertexes indexes -- )
     swap
-    [ [ nth bunny-vertex-struct-vertex 3 <direct-float-array> ] curry { } map-as normal ]
+    [ [ nth bunny-vertex-struct-vertex ] curry { } map-as normal ]
     [
         [
-            nth [ bunny-vertex-struct-normal 3 <direct-float-array> v+ ] keep
+            nth [ bunny-vertex-struct-normal v+ ] keep
             set-bunny-vertex-struct-normal
         ] curry with each
     ] 2bi ;
@@ -113,7 +112,7 @@ UNIFORM-TUPLE: loading-uniforms
 
 : normalize-bunny-normals ( vertexes -- )
     [
-        [ bunny-vertex-struct-normal 3 <direct-float-array> normalize ] keep
+        [ bunny-vertex-struct-normal normalize ] keep
         set-bunny-vertex-struct-normal
     ] each ;
 
