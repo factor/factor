@@ -203,6 +203,7 @@ enable-alien-4-intrinsics
 
 ! SSE2 is always available on x86-64.
 enable-float-intrinsics
+enable-fsqrt
 
 USE: vocabs.loader
 
