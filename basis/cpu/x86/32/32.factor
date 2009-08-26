@@ -208,13 +208,13 @@ M: x86 %unbox-small-struct ( size -- )
         { 2 [ %unbox-struct-2 ] }
     } case ;
 
-M: x86.32 %unbox-large-struct ( n c-type -- )
+M:: x86.32 %unbox-large-struct ( n c-type -- )
     ! Alien must be in EAX.
     ! Compute destination address
-    ECX rot stack@ LEA
+    ECX n stack@ LEA
     12 [
         ! Push struct size
-        heap-size PUSH
+        c-type heap-size PUSH
         ! Push destination address
         ECX PUSH
         ! Push source address
