@@ -111,14 +111,11 @@ ERROR: unimplemented-color-type image ;
         [ unknown-color-type ]
     } case ;
 
-: load-png ( path -- image )
-    binary stream-throws <limited-file-reader> [
+M: png-image stream>image
+    drop [
         <loading-png>
         read-png-header
         read-png-chunks
         parse-ihdr-chunk
         decode-png
     ] with-input-stream ;
-
-M: png-image load-image*
-    drop load-png ;
