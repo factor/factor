@@ -30,6 +30,7 @@ STRUCT: struct-test-bar
     { foo struct-test-foo } ;
 
 [ 12 ] [ struct-test-foo heap-size ] unit-test
+[ 12 ] [ struct-test-foo <struct> byte-length ] unit-test
 [ 16 ] [ struct-test-bar heap-size ] unit-test
 [ 123 ] [ struct-test-foo <struct> y>> ] unit-test
 [ 123 ] [ struct-test-bar <struct> foo>> y>> ] unit-test
