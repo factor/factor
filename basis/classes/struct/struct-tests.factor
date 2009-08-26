@@ -4,7 +4,7 @@ alien.structs.fields alien.syntax ascii classes.struct combinators
 destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays.ushort
-system tools.test ;
+system tools.test combinators.short-circuit ;
 IN: classes.struct.tests
 
 <<
@@ -137,6 +137,25 @@ UNION-STRUCT: struct-test-float-and-bits
         { writer (>>bits) }
     }
 } ] [ "struct-test-float-and-bits" c-type fields>> ] unit-test
+
+STRUCT: struct-test-equality-1
+    { x int } ;
+STRUCT: struct-test-equality-2
+    { y int } ;
+
+[ t ] [
+    [
+        struct-test-equality-1 <struct> 5 >>x
+        struct-test-equality-1 malloc-struct &free 5 >>x =
+    ] with-destructors
+] unit-test
+
+[ f ] [
+    [
+        struct-test-equality-1 <struct> 5 >>x
+        struct-test-equality-2 malloc-struct &free 5 >>y =
+    ] with-destructors
+] unit-test
 
 STRUCT: struct-test-ffi-foo
     { x int }

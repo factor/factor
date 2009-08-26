@@ -2,10 +2,10 @@
 USING: accessors alien alien.c-types alien.structs
 alien.structs.fields arrays byte-arrays classes classes.parser
 classes.tuple classes.tuple.parser classes.tuple.private
-combinators combinators.smart fry generalizations generic.parser
-kernel kernel.private lexer libc macros make math math.order
-parser quotations sequences slots slots.private struct-arrays
-vectors words ;
+combinators combinators.short-circuit combinators.smart fry
+generalizations generic.parser kernel kernel.private lexer
+libc macros make math math.order parser quotations sequences
+slots slots.private struct-arrays vectors words ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
 
@@ -27,6 +27,12 @@ PREDICATE: struct-class < tuple-class
 
 M: struct >c-ptr
     2 slot { c-ptr } declare ; inline
+
+M: struct equal?
+    {
+        [ [ class ] bi@ = ]
+        [ [ >c-ptr ] [ [ >c-ptr ] [ byte-length ] bi ] bi* memory= ]
+    } 2&& ;
 
 : memory>struct ( ptr class -- struct )
     over c-ptr? [ swap \ c-ptr bad-slot-value ] unless
