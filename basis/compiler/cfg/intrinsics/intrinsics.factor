@@ -19,6 +19,7 @@ QUALIFIED: strings.private
 QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
 QUALIFIED: math.integers.private
+QUALIFIED: math.libm
 QUALIFIED: alien.accessors
 IN: compiler.cfg.intrinsics
 
@@ -92,6 +93,9 @@ IN: compiler.cfg.intrinsics
         alien.accessors:set-alien-double
     } [ t "intrinsic" set-word-prop ] each ;
 
+: enable-fsqrt ( -- )
+    \ math.libm:fsqrt t "intrinsic" set-word-prop ;
+
 : enable-fixnum-log2 ( -- )
     \ math.integers.private:fixnum-log2 t "intrinsic" set-word-prop ;
 
@@ -130,6 +134,7 @@ IN: compiler.cfg.intrinsics
         { \ math.private:float= [ drop cc= emit-float-comparison ] }
         { \ math.private:float>fixnum [ drop emit-float>fixnum ] }
         { \ math.private:fixnum>float [ drop emit-fixnum>float ] }
+        { \ math.libm:fsqrt [ drop emit-fsqrt ] }
         { \ slots.private:slot [ emit-slot ] }
         { \ slots.private:set-slot [ emit-set-slot ] }
         { \ strings.private:string-nth [ drop emit-string-nth ] }
