@@ -170,6 +170,8 @@ M: ##sub-float generate-insn dst/src1/src2 %sub-float ;
 M: ##mul-float generate-insn dst/src1/src2 %mul-float ;
 M: ##div-float generate-insn dst/src1/src2 %div-float ;
 
+M: ##sqrt generate-insn dst/src %sqrt ;
+
 M: ##integer>float generate-insn dst/src %integer>float ;
 M: ##float>integer generate-insn dst/src %float>integer ;
 

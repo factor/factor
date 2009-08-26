@@ -15,3 +15,6 @@ IN: compiler.cfg.intrinsics.float
 
 : emit-fixnum>float ( -- )
     ds-pop ^^untag-fixnum ^^integer>float ds-push ;
+
+: emit-fsqrt ( -- )
+    ds-pop ^^sqrt ds-push ;
