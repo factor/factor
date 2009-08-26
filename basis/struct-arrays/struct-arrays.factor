@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.structs byte-arrays
-classes.struct kernel libc math sequences sequences.private ;
+classes.struct kernel libc math parser sequences sequences.private ;
 IN: struct-arrays
 
 : c-type-struct-class ( c-type -- class )
@@ -64,3 +64,13 @@ M: struct-type <c-type-direct-array> ( alien len c-type -- array )
     [ execute( alien len -- array ) ]
     [ <direct-struct-array> ] ?if ; inline
 
+: >struct-array ( sequence class -- struct-array )
+    [ dup length ] dip <struct-array>
+    [ 0 swap copy ] keep ; inline
+
+SYNTAX: struct-array{
+    \ } scan-word [ >struct-array ] curry parse-literal ;
+
+USING: vocabs vocabs.loader ;
+
+"prettyprint" vocab [ "struct-arrays.prettyprint" require ] when
