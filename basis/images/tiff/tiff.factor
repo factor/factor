@@ -449,7 +449,6 @@ ERROR: unhandled-compression compression ;
     dup strips>> concat >>bitmap ;
 
 : (strips-predictor) ( ifd -- ifd )
-B
     [ ]
     [ image-width find-tag ]
     [ samples-per-pixel find-tag ] tri
