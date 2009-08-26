@@ -656,14 +656,17 @@ V{
     T{ ##copy
        { dst 689481 }
        { src 689475 }
+       { rep int-rep }
     }
     T{ ##copy
        { dst 689482 }
        { src 689474 }
+       { rep int-rep }
     }
     T{ ##copy
        { dst 689483 }
        { src 689473 }
+       { rep int-rep }
     }
     T{ ##branch }
 } 2 test-bb
@@ -672,14 +675,17 @@ V{
     T{ ##copy
        { dst 689481 }
        { src 689473 }
+       { rep int-rep }
     }
     T{ ##copy
        { dst 689482 }
        { src 689475 }
+       { rep int-rep }
     }
     T{ ##copy
        { dst 689483 }
        { src 689474 }
+       { rep int-rep }
     }
     T{ ##branch }
 } 3 test-bb
@@ -742,10 +748,12 @@ V{
     T{ ##copy
        { dst 689608 }
        { src 689600 }
+       { rep int-rep }
     }
     T{ ##copy
        { dst 689610 }
        { src 689601 }
+       { rep int-rep }
     }
     T{ ##branch }
 } 2 test-bb
@@ -758,14 +766,17 @@ V{
     T{ ##copy
        { dst 689607 }
        { src 689600 }
+       { rep int-rep }
     }
     T{ ##copy
        { dst 689608 }
        { src 689601 }
+       { rep int-rep }
     }
     T{ ##copy
        { dst 689610 }
        { src 689609 }
+       { rep int-rep }
     }
     T{ ##branch }
 } 3 test-bb
@@ -816,6 +827,7 @@ V{
     T{ ##copy
        { dst 2 }
        { src 1 }
+       { rep int-rep }
     }
     T{ ##branch }
 } 2 test-bb
@@ -828,6 +840,7 @@ V{
     T{ ##copy
        { dst 2 }
        { src 3 }
+       { rep int-rep }
     }
     T{ ##branch }
 } 3 test-bb
@@ -1121,7 +1134,7 @@ V{
         { slot 1 }
         { tag 2 }
     }
-    T{ ##copy { dst 79 } { src 69 } }
+    T{ ##copy { dst 79 } { src 69 } { rep int-rep } }
     T{ ##slot-imm
         { dst 85 }
         { obj 62 }
@@ -1169,22 +1182,22 @@ V{
     T{ ##peek { dst 114 } { loc D 1 } }
     T{ ##peek { dst 116 } { loc D 4 } }
     T{ ##peek { dst 119 } { loc R 0 } }
-    T{ ##copy { dst 109 } { src 108 } }
-    T{ ##copy { dst 111 } { src 110 } }
-    T{ ##copy { dst 113 } { src 112 } }
-    T{ ##copy { dst 115 } { src 114 } }
-    T{ ##copy { dst 117 } { src 116 } }
-    T{ ##copy { dst 120 } { src 119 } }
+    T{ ##copy { dst 109 } { src 108 } { rep int-rep } }
+    T{ ##copy { dst 111 } { src 110 } { rep int-rep } }
+    T{ ##copy { dst 113 } { src 112 } { rep int-rep } }
+    T{ ##copy { dst 115 } { src 114 } { rep int-rep } }
+    T{ ##copy { dst 117 } { src 116 } { rep int-rep } }
+    T{ ##copy { dst 120 } { src 119 } { rep int-rep } }
     T{ ##branch }
 } 3 test-bb
 
 V{
-    T{ ##copy { dst 109 } { src 62 } }
-    T{ ##copy { dst 111 } { src 61 } }
-    T{ ##copy { dst 113 } { src 62 } }
-    T{ ##copy { dst 115 } { src 79 } }
-    T{ ##copy { dst 117 } { src 64 } }
-    T{ ##copy { dst 120 } { src 69 } }
+    T{ ##copy { dst 109 } { src 62 } { rep int-rep } }
+    T{ ##copy { dst 111 } { src 61 } { rep int-rep } }
+    T{ ##copy { dst 113 } { src 62 } { rep int-rep } }
+    T{ ##copy { dst 115 } { src 79 } { rep int-rep } }
+    T{ ##copy { dst 117 } { src 64 } { rep int-rep } }
+    T{ ##copy { dst 120 } { src 69 } { rep int-rep } }
     T{ ##branch }
 } 4 test-bb
 
@@ -1306,12 +1319,12 @@ V{
     T{ ##peek { dst 162 } { loc D 1 } }
     T{ ##peek { dst 164 } { loc D 4 } }
     T{ ##peek { dst 167 } { loc R 0 } }
-    T{ ##copy { dst 157 } { src 156 } }
-    T{ ##copy { dst 159 } { src 158 } }
-    T{ ##copy { dst 161 } { src 160 } }
-    T{ ##copy { dst 163 } { src 162 } }
-    T{ ##copy { dst 165 } { src 164 } }
-    T{ ##copy { dst 168 } { src 167 } }
+    T{ ##copy { dst 157 } { src 156 } { rep int-rep } }
+    T{ ##copy { dst 159 } { src 158 } { rep int-rep } }
+    T{ ##copy { dst 161 } { src 160 } { rep int-rep } }
+    T{ ##copy { dst 163 } { src 162 } { rep int-rep } }
+    T{ ##copy { dst 165 } { src 164 } { rep int-rep } }
+    T{ ##copy { dst 168 } { src 167 } { rep int-rep } }
     T{ ##branch }
 } 4 test-bb
 
