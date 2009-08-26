@@ -3,7 +3,7 @@ compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.mr
 compiler.cfg.registers compiler.codegen compiler.units
 cpu.architecture hashtables kernel namespaces sequences
 tools.test vectors words layouts literals math arrays
-alien.syntax ;
+alien.syntax math.private ;
 IN: compiler.tests.low-level-ir
 
 : compile-cfg ( cfg -- word )
@@ -46,16 +46,19 @@ IN: compiler.tests.low-level-ir
     } compile-test-bb
 ] unit-test
 
-! ##copy on floats
-[ 1.5 ] [
-    V{
-        T{ ##load-reference f 4 1.5 }
-        T{ ##unbox-float f 1 4 }
-        T{ ##copy f 2 1 double-float-rep }
-        T{ ##box-float f 3 2 }
-        T{ ##copy f 0 3 int-rep }
-    } compile-test-bb
-] unit-test
+! ##copy on floats. We can only run this test if float intrinsics
+! are enabled.
+\ float+ "intrinsic" word-prop [
+    [ 1.5 ] [
+        V{
+            T{ ##load-reference f 4 1.5 }
+            T{ ##unbox-float f 1 4 }
+            T{ ##copy f 2 1 double-float-rep }
+            T{ ##box-float f 3 2 }
+            T{ ##copy f 0 3 int-rep }
+        } compile-test-bb
+    ] unit-test
+] when
 
 ! make sure slot access works when the destination is
 ! one of the sources
