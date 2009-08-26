@@ -79,12 +79,15 @@ M: string c-type ( name -- type )
 : ?require-word ( word/pair -- )
     dup word? [ drop ] [ first require ] ?if ;
 
+MIXIN: array-c-type
+INSTANCE: c-type array-c-type
+
 GENERIC: require-c-type-arrays ( c-type -- )
 
 M: object require-c-type-arrays
     drop ;
 
-M: c-type require-c-type-arrays
+M: array-c-type require-c-type-arrays
     [ array-class>> ?require-word ]
     [ sequence-mixin-class>> ?require-word ]
     [ direct-array-class>> ?require-word ] tri ;
@@ -103,7 +106,7 @@ M: string c-type-array-constructor
     c-type c-type-array-constructor ;
 M: array c-type-array-constructor
     first c-type c-type-array-constructor ;
-M: c-type c-type-array-constructor
+M: array-c-type c-type-array-constructor
     array-constructor>> dup word?
     [ first2 specialized-array-vocab-not-loaded ] unless ;
 
@@ -113,7 +116,7 @@ M: string c-type-direct-array-constructor
     c-type c-type-direct-array-constructor ;
 M: array c-type-direct-array-constructor
     first c-type c-type-direct-array-constructor ;
-M: c-type c-type-direct-array-constructor
+M: array-c-type c-type-direct-array-constructor
     direct-array-constructor>> dup word?
     [ first2 specialized-array-vocab-not-loaded ] unless ;
 
