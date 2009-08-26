@@ -1,10 +1,10 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.structs alien.structs.fields arrays
-byte-arrays classes classes.parser classes.tuple
-classes.tuple.parser classes.tuple.private combinators
-combinators.smart fry generalizations generic.parser kernel
-kernel.private lexer libc macros make math math.order parser
-quotations sequences slots slots.private struct-arrays
+USING: accessors alien alien.c-types alien.structs
+alien.structs.fields arrays byte-arrays classes classes.parser
+classes.tuple classes.tuple.parser classes.tuple.private
+combinators combinators.smart fry generalizations generic.parser
+kernel kernel.private lexer libc macros make math math.order
+parser quotations sequences slots slots.private struct-arrays
 vectors words ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
@@ -236,9 +236,9 @@ SYNTAX: STRUCT:
 SYNTAX: UNION-STRUCT:
     parse-struct-definition define-union-struct-class ;
 
+SYNTAX: S{
+    scan-word dup struct-slots parse-tuple-literal-slots parsed ;
+
 USING: vocabs vocabs.loader ;
 
 "prettyprint" vocab [ "classes.struct.prettyprint" require ] when
-
-SYNTAX: S{
-    scan-word dup struct-slots parse-tuple-literal-slots parsed ;
