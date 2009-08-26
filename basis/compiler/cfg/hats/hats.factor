@@ -43,6 +43,7 @@ IN: compiler.cfg.hats
 : ^^sub-float ( src1 src2 -- dst ) ^^r2 ##sub-float ; inline
 : ^^mul-float ( src1 src2 -- dst ) ^^r2 ##mul-float ; inline
 : ^^div-float ( src1 src2 -- dst ) ^^r2 ##div-float ; inline
+: ^^sqrt ( src -- dst ) ^^r1 ##sqrt ; inline
 : ^^float>integer ( src -- dst ) ^^r1 ##float>integer ; inline
 : ^^integer>float ( src -- dst ) ^^r1 ##integer>float ; inline
 : ^^allot ( size class -- dst ) ^^r2 next-vreg ##allot ; inline
