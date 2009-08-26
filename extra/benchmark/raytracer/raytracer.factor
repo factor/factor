@@ -155,7 +155,7 @@ DEFER: create ( level c r -- scene )
     ] with map ;
 
 : ray-pixel ( scene point -- n )
-    ss-grid ray-grid 0.0 -rot
+    ss-grid ray-grid [ 0.0 ] 2dip
     [ [ swap cast-ray + ] with each ] with each ;
 
 : pixel-grid ( -- grid )
