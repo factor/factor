@@ -165,7 +165,7 @@ M: x86.64 %box-large-struct ( n c-type -- )
     ! Compute destination address
     param-reg-1 swap struct-return@ LEA
     ! Copy the struct from the C stack
-    "box_value_struct" f %alien-invoke ;
+    "box_value_struct" %vm-invoke-3rd-arg ;
 
 M: x86.64 %prepare-box-struct ( -- )
     ! Compute target address for value struct return
