@@ -6,7 +6,7 @@ images.processing io io.binary io.encodings.binary io.files
 io.streams.byte-array kernel locals math math.bitwise
 math.constants math.functions math.matrices math.order
 math.ranges math.vectors memoize multiline namespaces
-sequences sequences.deep ;
+sequences sequences.deep images.loader ;
 IN: images.jpeg
 
 QUALIFIED-WITH: bitstreams bs
@@ -18,6 +18,9 @@ TUPLE: jpeg-image < image
     { quant-tables initial: { f f } }
     { huff-tables initial: { f f f f } }
     { components } ;
+
+"jpg" jpeg-image register-image-class
+"jpeg" jpeg-image register-image-class
 
 <PRIVATE
 
@@ -353,17 +356,13 @@ ERROR: not-a-jpeg-image ;
 
 PRIVATE>
 
-: load-jpeg ( path -- image )
-    binary [
+M: jpeg-image stream>image ( stream jpeg-image -- bitmap )
+    drop [
         parse-marker { SOI } = [ not-a-jpeg-image ] unless
         parse-headers
         contents <jpeg-image>
-    ] with-file-reader
+    ] with-input-stream
     dup jpeg-image [
         baseline-parse
         baseline-decompress
     ] with-variable ;
-
-M: jpeg-image load-image* ( path jpeg-image -- bitmap )
-    drop load-jpeg ;
-

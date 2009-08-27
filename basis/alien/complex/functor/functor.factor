@@ -31,6 +31,7 @@ T c-type
 <T> 1quotation >>unboxer-quot
 *T 1quotation >>boxer-quot
 number >>boxed-class
+T set-array-class
 drop
 
 ;FUNCTOR

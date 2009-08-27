@@ -1,9 +1,10 @@
-USING: alien alien.c-types alien.syntax compiler kernel namespaces
-sequences stack-checker stack-checker.errors words arrays parser
-quotations continuations effects namespaces.private io
-io.streams.string memory system threads tools.test math accessors
-combinators specialized-arrays.float alien.libraries io.pathnames
-io.backend ;
+USING: accessors alien alien.c-types alien.libraries
+alien.syntax arrays classes.struct combinators
+compiler continuations effects io io.backend io.pathnames
+io.streams.string kernel math memory namespaces
+namespaces.private parser quotations sequences
+specialized-arrays.float stack-checker stack-checker.errors
+system threads tools.test words specialized-arrays.char ;
 IN: compiler.tests.alien
 
 <<
@@ -46,25 +47,22 @@ FUNCTION: int ffi_test_9 int a int b int c int d int e int f int g ;
 [ "a" 2 3 4 5 6 7 ffi_test_9 ] must-fail
 [ 1 2 3 4 5 6 "a" ffi_test_9 ] must-fail
 
-C-STRUCT: foo
-    { "int" "x" }
-    { "int" "y" }
-;
+STRUCT: FOO { x int } { y int } ;
 
-: make-foo ( x y -- foo )
-    "foo" <c-object> [ set-foo-y ] keep [ set-foo-x ] keep ;
+: make-FOO ( x y -- FOO )
+    FOO <struct> swap >>y swap >>x ;
 
-FUNCTION: int ffi_test_11 int a foo b int c ;
+FUNCTION: int ffi_test_11 int a FOO b int c ;
 
-[ 14 ] [ 1 2 3 make-foo 4 ffi_test_11 ] unit-test
+[ 14 ] [ 1 2 3 make-FOO 4 ffi_test_11 ] unit-test
 
 FUNCTION: int ffi_test_13 int a int b int c int d int e int f int g int h int i int j int k ;
 
 [ 66 ] [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
 
-FUNCTION: foo ffi_test_14 int x int y ;
+FUNCTION: FOO ffi_test_14 int x int y ;
 
-[ 11 6 ] [ 11 6 ffi_test_14 dup foo-x swap foo-y ] unit-test
+[ 11 6 ] [ 11 6 ffi_test_14 [ x>> ] [ y>> ] bi ] unit-test
 
 FUNCTION: char* ffi_test_15 char* x char* y ;
 
@@ -72,25 +70,19 @@ FUNCTION: char* ffi_test_15 char* x char* y ;
 [ "bar" ] [ "xy" "xy" ffi_test_15 ] unit-test
 [ 1 2 ffi_test_15 ] must-fail
 
-C-STRUCT: bar
-    { "long" "x" }
-    { "long" "y" }
-    { "long" "z" }
-;
+STRUCT: BAR { x long } { y long } { z long } ;
 
-FUNCTION: bar ffi_test_16 long x long y long z ;
+FUNCTION: BAR ffi_test_16 long x long y long z ;
 
 [ 11 6 -7 ] [
-    11 6 -7 ffi_test_16 dup bar-x over bar-y rot bar-z
+    11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
 ] unit-test
 
-C-STRUCT: tiny
-    { "int" "x" }
-;
+STRUCT: TINY { x int } ;
 
-FUNCTION: tiny ffi_test_17 int x ;
+FUNCTION: TINY ffi_test_17 int x ;
 
-[ 11 ] [ 11 ffi_test_17 tiny-x ] unit-test
+[ 11 ] [ 11 ffi_test_17 x>> ] unit-test
 
 [ [ alien-indirect ] infer ] [ inference-error? ] must-fail-with
 
@@ -132,12 +124,12 @@ unit-test
 
 [ 25 ] [ 2 3 4 5 ffi_test_18 ] unit-test
 
-: ffi_test_19 ( x y z -- bar )
-    "bar" "f-stdcall" "ffi_test_19" { "long" "long" "long" }
+: ffi_test_19 ( x y z -- BAR )
+    "BAR" "f-stdcall" "ffi_test_19" { "long" "long" "long" }
     alien-invoke gc ;
 
 [ 11 6 -7 ] [
-    11 6 -7 ffi_test_19 dup bar-x over bar-y rot bar-z
+    11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
 ] unit-test
 
 FUNCTION: double ffi_test_6 float x float y ;
@@ -189,23 +181,20 @@ FUNCTION: long ffi_test_22 long x longlong y longlong z ;
 
 [ 1111 f 123456789 ffi_test_22 ] must-fail
 
-C-STRUCT: rect
-    { "float" "x" }
-    { "float" "y" }
-    { "float" "w" }
-    { "float" "h" }
-;
+STRUCT: RECT
+    { x float } { y float }
+    { w float } { h float } ;
 
-: <rect> ( x y w h -- rect )
-    "rect" <c-object>
-    [ set-rect-h ] keep
-    [ set-rect-w ] keep
-    [ set-rect-y ] keep
-    [ set-rect-x ] keep ;
+: <RECT> ( x y w h -- rect )
+    RECT <struct>
+        swap >>h
+        swap >>w
+        swap >>y
+        swap >>x ;
 
-FUNCTION: int ffi_test_12 int a int b rect c int d int e int f ;
+FUNCTION: int ffi_test_12 int a int b RECT c int d int e int f ;
 
-[ 45 ] [ 1 2 3.0 4.0 5.0 6.0 <rect> 7 8 9 ffi_test_12 ] unit-test
+[ 45 ] [ 1 2 3.0 4.0 5.0 6.0 <RECT> 7 8 9 ffi_test_12 ] unit-test
 
 [ 1 2 { 1 2 3 } 7 8 9 ffi_test_12 ] must-fail
 
@@ -218,97 +207,97 @@ FUNCTION: float ffi_test_23 ( float[3] x, float[3] y ) ;
 ] unit-test
 
 ! Test odd-size structs
-C-STRUCT: test-struct-1 { { "char" 1 } "x" } ;
+STRUCT: test-struct-1 { x char[1] } ;
 
 FUNCTION: test-struct-1 ffi_test_24 ;
 
-[ B{ 1 } ] [ ffi_test_24 ] unit-test
+[ S{ test-struct-1 { x char-array{ 1 } } } ] [ ffi_test_24 ] unit-test
 
-C-STRUCT: test-struct-2 { { "char" 2 } "x" } ;
+STRUCT: test-struct-2 { x char[2] } ;
 
 FUNCTION: test-struct-2 ffi_test_25 ;
 
-[ B{ 1 2 } ] [ ffi_test_25 ] unit-test
+[ S{ test-struct-2 { x char-array{ 1 2 } } } ] [ ffi_test_25 ] unit-test
 
-C-STRUCT: test-struct-3 { { "char" 3 } "x" } ;
+STRUCT: test-struct-3 { x char[3] } ;
 
 FUNCTION: test-struct-3 ffi_test_26 ;
 
-[ B{ 1 2 3 } ] [ ffi_test_26 ] unit-test
+[ S{ test-struct-3 { x char-array{ 1 2 3 } } } ] [ ffi_test_26 ] unit-test
 
-C-STRUCT: test-struct-4 { { "char" 4 } "x" } ;
+STRUCT: test-struct-4 { x char[4] } ;
 
 FUNCTION: test-struct-4 ffi_test_27 ;
 
-[ B{ 1 2 3 4 } ] [ ffi_test_27 ] unit-test
+[ S{ test-struct-4 { x char-array{ 1 2 3 4 } } } ] [ ffi_test_27 ] unit-test
 
-C-STRUCT: test-struct-5 { { "char" 5 } "x" } ;
+STRUCT: test-struct-5 { x char[5] } ;
 
 FUNCTION: test-struct-5 ffi_test_28 ;
 
-[ B{ 1 2 3 4 5 } ] [ ffi_test_28 ] unit-test
+[ S{ test-struct-5 { x char-array{ 1 2 3 4 5 } } } ] [ ffi_test_28 ] unit-test
 
-C-STRUCT: test-struct-6 { { "char" 6 } "x" } ;
+STRUCT: test-struct-6 { x char[6] } ;
 
 FUNCTION: test-struct-6 ffi_test_29 ;
 
-[ B{ 1 2 3 4 5 6 } ] [ ffi_test_29 ] unit-test
+[ S{ test-struct-6 { x char-array{ 1 2 3 4 5 6 } } } ] [ ffi_test_29 ] unit-test
 
-C-STRUCT: test-struct-7 { { "char" 7 } "x" } ;
+STRUCT: test-struct-7 { x char[7] } ;
 
 FUNCTION: test-struct-7 ffi_test_30 ;
 
-[ B{ 1 2 3 4 5 6 7 } ] [ ffi_test_30 ] unit-test
+[ S{ test-struct-7 { x char-array{ 1 2 3 4 5 6 7 } } } ] [ ffi_test_30 ] unit-test
 
-C-STRUCT: test-struct-8 { "double" "x" } { "double" "y" } ;
+STRUCT: test-struct-8 { x double } { y double } ;
 
 FUNCTION: double ffi_test_32 test-struct-8 x int y ;
 
 [ 9.0 ] [
-    "test-struct-8" <c-object>
-    1.0 over set-test-struct-8-x
-    2.0 over set-test-struct-8-y
+    test-struct-8 <struct>
+    1.0 >>x
+    2.0 >>y
     3 ffi_test_32
 ] unit-test
 
-C-STRUCT: test-struct-9 { "float" "x" } { "float" "y" } ;
+STRUCT: test-struct-9 { x float } { y float } ;
 
 FUNCTION: double ffi_test_33 test-struct-9 x int y ;
 
 [ 9.0 ] [
-    "test-struct-9" <c-object>
-    1.0 over set-test-struct-9-x
-    2.0 over set-test-struct-9-y
+    test-struct-9 <struct>
+    1.0 >>x
+    2.0 >>y
     3 ffi_test_33
 ] unit-test
 
-C-STRUCT: test-struct-10 { "float" "x" } { "int" "y" } ;
+STRUCT: test-struct-10 { x float } { y int } ;
 
 FUNCTION: double ffi_test_34 test-struct-10 x int y ;
 
 [ 9.0 ] [
-    "test-struct-10" <c-object>
-    1.0 over set-test-struct-10-x
-    2 over set-test-struct-10-y
+    test-struct-10 <struct>
+    1.0 >>x
+    2 >>y
     3 ffi_test_34
 ] unit-test
 
-C-STRUCT: test-struct-11 { "int" "x" } { "int" "y" } ;
+STRUCT: test-struct-11 { x int } { y int } ;
 
 FUNCTION: double ffi_test_35 test-struct-11 x int y ;
 
 [ 9.0 ] [
-    "test-struct-11" <c-object>
-    1 over set-test-struct-11-x
-    2 over set-test-struct-11-y
+    test-struct-11 <struct>
+    1 >>x
+    2 >>y
     3 ffi_test_35
 ] unit-test
 
-C-STRUCT: test-struct-12 { "int" "a" } { "double" "x" } ;
+STRUCT: test-struct-12 { a int } { x double } ;
 
 : make-struct-12 ( x -- alien )
-    "test-struct-12" <c-object>
-    [ set-test-struct-12-x ] keep ;
+    test-struct-12 <struct>
+        swap >>x ;
 
 FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
 
@@ -408,50 +397,47 @@ FUNCTION: int ffi_test_37 ( void* func ) ;
 
 [ 7 ] [ callback-9 ffi_test_37 ] unit-test
 
-C-STRUCT: test_struct_13
-{ "float" "x1" }
-{ "float" "x2" }
-{ "float" "x3" }
-{ "float" "x4" }
-{ "float" "x5" }
-{ "float" "x6" } ;
+STRUCT: test_struct_13
+{ x1 float }
+{ x2 float }
+{ x3 float }
+{ x4 float }
+{ x5 float }
+{ x6 float } ;
 
 : make-test-struct-13 ( -- alien )
-    "test_struct_13" <c-object>
-        1.0 over set-test_struct_13-x1
-        2.0 over set-test_struct_13-x2
-        3.0 over set-test_struct_13-x3
-        4.0 over set-test_struct_13-x4
-        5.0 over set-test_struct_13-x5
-        6.0 over set-test_struct_13-x6 ;
+    test_struct_13 <struct>
+        1.0 >>x1
+        2.0 >>x2
+        3.0 >>x3
+        4.0 >>x4
+        5.0 >>x5
+        6.0 >>x6 ;
 
 FUNCTION: int ffi_test_39 ( long a, long b, test_struct_13 s ) ;
 
 [ 21 ] [ 12347 12347 make-test-struct-13 ffi_test_39 ] unit-test
 
 ! Joe Groff found this problem
-C-STRUCT: double-rect
-{ "double" "a" }
-{ "double" "b" }
-{ "double" "c" }
-{ "double" "d" } ;
+STRUCT: double-rect
+{ a double }
+{ b double }
+{ c double }
+{ d double } ;
 
 : <double-rect> ( a b c d -- foo )
-    "double-rect" <c-object>
-    {
-        [ set-double-rect-d ]
-        [ set-double-rect-c ]
-        [ set-double-rect-b ]
-        [ set-double-rect-a ]
-        [ ]
-    } cleave ;
+    double-rect <struct>
+        swap >>d
+        swap >>c
+        swap >>b
+        swap >>a ;
 
 : >double-rect< ( foo -- a b c d )
     {
-        [ double-rect-a ]
-        [ double-rect-b ]
-        [ double-rect-c ]
-        [ double-rect-d ]
+        [ a>> ]
+        [ b>> ]
+        [ c>> ]
+        [ d>> ]
     } cleave ;
 
 : double-rect-callback ( -- alien )
@@ -467,23 +453,22 @@ C-STRUCT: double-rect
 [ 1.0 2.0 3.0 4.0 ]
 [ 1.0 2.0 3.0 4.0 <double-rect> double-rect-test >double-rect< ] unit-test
 
-C-STRUCT: test_struct_14
-{ "double" "x1" }
-{ "double" "x2" } ;
+STRUCT: test_struct_14
+    { x1 double }
+    { x2 double } ;
 
 FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 ) ;
 
 [ 1.0 2.0 ] [
-    1.0 2.0 ffi_test_40
-    [ test_struct_14-x1 ] [ test_struct_14-x2 ] bi
+    1.0 2.0 ffi_test_40 [ x1>> ] [ x2>> ] bi
 ] unit-test
 
 : callback-10 ( -- callback )
     "test_struct_14" { "double" "double" } "cdecl"
     [
-        "test_struct_14" <c-object>
-        [ set-test_struct_14-x2 ] keep
-        [ set-test_struct_14-x1 ] keep
+        test_struct_14 <struct>
+            swap >>x2
+            swap >>x1
     ] alien-callback ;
 
 : callback-10-test ( x1 x2 callback -- result )
@@ -491,22 +476,22 @@ FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 ) ;
 
 [ 1.0 2.0 ] [
     1.0 2.0 callback-10 callback-10-test
-    [ test_struct_14-x1 ] [ test_struct_14-x2 ] bi
+    [ x1>> ] [ x2>> ] bi
 ] unit-test
 
 FUNCTION: test-struct-12 ffi_test_41 ( int a, double x ) ;
 
 [ 1 2.0 ] [
     1 2.0 ffi_test_41
-    [ test-struct-12-a ] [ test-struct-12-x ] bi
+    [ a>> ] [ x>> ] bi
 ] unit-test
 
 : callback-11 ( -- callback )
     "test-struct-12" { "int" "double" } "cdecl"
     [
-        "test-struct-12" <c-object>
-        [ set-test-struct-12-x ] keep
-        [ set-test-struct-12-a ] keep
+        test-struct-12 <struct>
+            swap >>x
+            swap >>a
     ] alien-callback ;
 
 : callback-11-test ( x1 x2 callback -- result )
@@ -514,47 +499,46 @@ FUNCTION: test-struct-12 ffi_test_41 ( int a, double x ) ;
 
 [ 1 2.0 ] [
     1 2.0 callback-11 callback-11-test
-    [ test-struct-12-a ] [ test-struct-12-x ] bi
+    [ a>> ] [ x>> ] bi
 ] unit-test
 
-C-STRUCT: test_struct_15
-{ "float" "x" }
-{ "float" "y" } ;
+STRUCT: test_struct_15
+    { x float }
+    { y float } ;
 
 FUNCTION: test_struct_15 ffi_test_42 ( float x, float y ) ;
 
-[ 1.0 2.0 ] [ 1.0 2.0 ffi_test_42 [ test_struct_15-x ] [ test_struct_15-y ] bi ] unit-test
+[ 1.0 2.0 ] [ 1.0 2.0 ffi_test_42 [ x>> ] [ y>> ] bi ] unit-test
 
 : callback-12 ( -- callback )
     "test_struct_15" { "float" "float" } "cdecl"
     [
-        "test_struct_15" <c-object>
-        [ set-test_struct_15-y ] keep
-        [ set-test_struct_15-x ] keep
+        test_struct_15 <struct>
+            swap >>y
+            swap >>x
     ] alien-callback ;
 
 : callback-12-test ( x1 x2 callback -- result )
     "test_struct_15" { "float" "float" } "cdecl" alien-indirect ;
 
 [ 1.0 2.0 ] [
-    1.0 2.0 callback-12 callback-12-test
-    [ test_struct_15-x ] [ test_struct_15-y ] bi
+    1.0 2.0 callback-12 callback-12-test [ x>> ] [ y>> ] bi
 ] unit-test
 
-C-STRUCT: test_struct_16
-{ "float" "x" }
-{ "int" "a" } ;
+STRUCT: test_struct_16
+    { x float }
+    { a int } ;
 
 FUNCTION: test_struct_16 ffi_test_43 ( float x, int a ) ;
 
-[ 1.0 2 ] [ 1.0 2 ffi_test_43 [ test_struct_16-x ] [ test_struct_16-a ] bi ] unit-test
+[ 1.0 2 ] [ 1.0 2 ffi_test_43 [ x>> ] [ a>> ] bi ] unit-test
 
 : callback-13 ( -- callback )
     "test_struct_16" { "float" "int" } "cdecl"
     [
-        "test_struct_16" <c-object>
-        [ set-test_struct_16-a ] keep
-        [ set-test_struct_16-x ] keep
+        test_struct_16 <struct>
+            swap >>a
+            swap >>x
     ] alien-callback ;
 
 : callback-13-test ( x1 x2 callback -- result )
@@ -562,12 +546,12 @@ FUNCTION: test_struct_16 ffi_test_43 ( float x, int a ) ;
 
 [ 1.0 2 ] [
     1.0 2 callback-13 callback-13-test
-    [ test_struct_16-x ] [ test_struct_16-a ] bi
+    [ x>> ] [ a>> ] bi
 ] unit-test
 
 FUNCTION: test_struct_14 ffi_test_44 ( ) ; inline
 
-[ 1.0 2.0 ] [ ffi_test_44 [ test_struct_14-x1 ] [ test_struct_14-x2 ] bi ] unit-test
+[ 1.0 2.0 ] [ ffi_test_44 [ x1>> ] [ x2>> ] bi ] unit-test
 
 : stack-frame-bustage ( -- a b ) ffi_test_44 gc 3 ;
 
@@ -589,14 +573,15 @@ FUNCTION: complex-float ffi_test_47 ( complex-float x, complex-double y ) ;
 ] unit-test
 
 ! Reported by jedahu
-C-STRUCT: bool-field-test
-   { "char*" "name" }
-   { "bool"  "on" }
-   { "short" "parents" } ;
+STRUCT: bool-field-test
+    { name char* }
+    { on bool }
+    { parents short } ;
 
 FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
 
 [ 123 ] [
-    "bool-field-test" <c-object> 123 over set-bool-field-test-parents
+    bool-field-test <struct>
+        123 >>parents
     ffi_test_48
 ] unit-test

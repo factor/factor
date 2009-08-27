@@ -106,6 +106,7 @@ INSN: ##add-float < ##commutative ;
 INSN: ##sub-float < ##binary ;
 INSN: ##mul-float < ##commutative ;
 INSN: ##div-float < ##binary ;
+INSN: ##sqrt < ##unary ;
 
 ! Float/integer conversion
 INSN: ##float>integer < ##unary ;
@@ -117,6 +118,7 @@ INSN: ##unbox-float < ##unary ;
 INSN: ##unbox-any-c-ptr < ##unary/temp ;
 INSN: ##box-float < ##unary/temp ;
 INSN: ##box-alien < ##unary/temp ;
+INSN: ##box-displaced-alien < ##binary temp ;
 
 : ##unbox-f ( dst src -- ) drop 0 ##load-immediate ;
 : ##unbox-byte-array ( dst src -- ) byte-array-offset ##add-imm ;
@@ -151,7 +153,12 @@ INSN: ##set-alien-double < ##alien-setter ;
 ! Memory allocation
 INSN: ##allot < ##flushable size class temp ;
 
-UNION: ##allocation ##allot ##box-float ##box-alien ##integer>bignum ;
+UNION: ##allocation
+##allot
+##box-float
+##box-alien
+##box-displaced-alien
+##integer>bignum ;
 
 INSN: ##write-barrier < ##effect card# table ;
 
@@ -256,6 +263,7 @@ UNION: output-float-insn
     ##sub-float
     ##mul-float
     ##div-float
+    ##sqrt
     ##integer>float
     ##unbox-float
     ##alien-float
@@ -267,6 +275,7 @@ UNION: input-float-insn
     ##sub-float
     ##mul-float
     ##div-float
+    ##sqrt
     ##float>integer
     ##box-float
     ##set-alien-float

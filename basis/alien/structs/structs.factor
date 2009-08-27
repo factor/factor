@@ -35,9 +35,8 @@ M: struct-type stack-size
 
 : c-struct? ( type -- ? ) (c-type) struct-type? ;
 
-: (define-struct) ( name size align fields -- )
-    [ [ align ] keep ] dip
-    struct-type new
+: (define-struct) ( name size align fields class -- )
+    [ [ align ] keep ] 2dip new
         byte-array >>class
         byte-array >>boxed-class
         swap >>fields
@@ -55,14 +54,17 @@ M: struct-type stack-size
     [ 2drop ] [ make-fields ] 3bi
     [ struct-offsets ] keep
     [ [ type>> ] map compute-struct-align ] keep
-    [ (define-struct) ] keep
+    [ struct-type (define-struct) ] keep
     [ define-field ] each ;
 
 : define-union ( name members -- )
     [ expand-constants ] map
     [ [ heap-size ] [ max ] map-reduce ] keep
-    compute-struct-align f (define-struct) ;
+    compute-struct-align f struct-type (define-struct) ;
 
 : offset-of ( field struct -- offset )
     c-types get at fields>> 
     [ name>> = ] with find nip offset>> ;
+
+USE: vocabs.loader
+"struct-arrays" require
