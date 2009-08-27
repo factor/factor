@@ -74,8 +74,20 @@ M: x86.64 %prepare-unbox ( -- )
     param-reg-1 R14 [] MOV
     R14 cell SUB ;
 
+M: x86.64 %vm-invoke-1st-arg ( function -- )
+    param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
+    f %alien-invoke ;
+
 : %vm-invoke-2nd-arg ( function -- )
     param-reg-2 0 MOV rc-absolute-cell rt-vm rel-fixup
+    f %alien-invoke ;
+
+M: x86.64 %vm-invoke-3rd-arg ( function -- )
+    param-reg-3 0 MOV rc-absolute-cell rt-vm rel-fixup
+    f %alien-invoke ;
+
+: %vm-invoke-4th-arg ( function -- )
+    int-regs param-regs fourth 0 MOV rc-absolute-cell rt-vm rel-fixup
     f %alien-invoke ;
 
 
@@ -153,7 +165,7 @@ M: x86.64 %box-small-struct ( c-type -- )
         [ param-reg-3 swap heap-size MOV ] bi
         param-reg-1 0 box-struct-field@ MOV
         param-reg-2 1 box-struct-field@ MOV
-        "box_small_struct" f %alien-invoke
+        "box_small_struct" %vm-invoke-4th-arg
     ] with-return-regs ;
 
 : struct-return@ ( n -- operand )
@@ -180,14 +192,6 @@ M: x86.64 %alien-invoke
     rc-absolute-cell rel-dlsym
     R11 CALL ;
 
-M: x86.64 %vm-invoke-1st-arg ( function -- )
-    param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
-    f %alien-invoke ;
-
-
-M: x86.64 %vm-invoke-3rd-arg ( function -- )
-    param-reg-3 0 MOV rc-absolute-cell rt-vm rel-fixup
-    f %alien-invoke ;
 
 M: x86.64 %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
