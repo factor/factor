@@ -5,7 +5,8 @@ destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays.ushort
 system tools.test compiler.tree.debugger struct-arrays
-classes.tuple.private specialized-arrays.direct.int ;
+classes.tuple.private specialized-arrays.direct.int
+compiler.units ;
 IN: classes.struct.tests
 
 <<
@@ -21,6 +22,11 @@ IN: classes.struct.tests
 
 "f-stdcall" libfactor-ffi-tests-path "stdcall" add-library
 >>
+
+SYMBOL: struct-test-empty
+
+[ [ struct-test-empty { } define-struct-class ] with-compilation-unit ]
+[ struct-must-have-slots? ] must-fail-with
 
 STRUCT: struct-test-foo
     { x char }
