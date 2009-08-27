@@ -359,8 +359,6 @@ update_script_name() {
 }
 
 update_script() {
-    echo "Updating and restarting the factor.sh script..."
-
     update_script=`update_script_name`
     
     echo "#!/bin/sh" >"$update_script"
@@ -384,8 +382,10 @@ git_fetch_factorcode() {
     invoke_git fetch "$GIT_URL" master
 
     if update_script_changed; then
+        echo "Updating and restarting the factor.sh script..."
         update_script
     else
+        echo "Updating the working tree..."
         invoke_git pull "$GIT_URL" master
     fi
 }
