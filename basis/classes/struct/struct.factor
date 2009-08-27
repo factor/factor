@@ -36,7 +36,7 @@ M: struct equal?
 
 : memory>struct ( ptr class -- struct )
     over c-ptr? [ swap \ c-ptr bad-slot-value ] unless
-    tuple-layout <tuple> [ 2 set-slot ] keep ;
+    tuple-layout <tuple> [ 2 set-slot ] keep ; inline
 
 : malloc-struct ( class -- struct )
     [ heap-size malloc ] keep memory>struct ; inline

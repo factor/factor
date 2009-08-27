@@ -20,7 +20,7 @@ M: struct-array byte-length [ length>> ] [ element-size>> ] bi * ;
     [ element-size>> * ] [ underlying>> ] bi <displaced-alien> ; inline
 
 M: struct-array nth-unsafe
-    [ (nth-ptr) ] [ class>> struct-class? ] bi [ memory>struct ] when* ; inline
+    [ (nth-ptr) ] [ class>> dup struct-class? ] bi [ memory>struct ] [ drop ] if ; inline
 
 M: struct-array set-nth-unsafe
     [ (nth-ptr) swap ] [ element-size>> ] bi memcpy ;
