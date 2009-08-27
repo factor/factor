@@ -12,6 +12,8 @@ IN: classes.struct
 
 ! struct class
 
+ERROR: struct-must-have-slots ;
+
 TUPLE: struct
     { (underlying) c-ptr read-only } ;
 
@@ -207,7 +209,10 @@ M: struct-class heap-size
     [ c-type>> c-type drop ] each ;
 
 : (define-struct-class) ( class slots offsets-quot -- )
-    [ drop struct f define-tuple-class ]
+    [ 
+        [ struct-must-have-slots ]
+        [ drop struct f define-tuple-class ] if-empty
+    ]
     swap '[
         make-slots dup
         [ check-struct-slots ] _ [ struct-align [ align ] keep ] tri
