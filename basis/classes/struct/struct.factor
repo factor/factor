@@ -5,7 +5,8 @@ classes.tuple classes.tuple.parser classes.tuple.private
 combinators combinators.short-circuit combinators.smart fry
 generalizations generic.parser kernel kernel.private lexer
 libc macros make math math.order parser quotations sequences
-slots slots.private struct-arrays vectors words ;
+slots slots.private struct-arrays vectors words
+compiler.tree.propagation.transforms ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
 
@@ -18,7 +19,7 @@ TUPLE: struct-slot-spec < slot-spec
     c-type ;
 
 PREDICATE: struct-class < tuple-class
-    \ struct subclass-of? ;
+    { [ \ struct subclass-of? ] [ all-slots length 1 = ] } 1&& ;
 
 : struct-slots ( struct -- slots )
     "struct-slots" word-prop ;
@@ -35,8 +36,11 @@ M: struct equal?
     } 2&& ;
 
 : memory>struct ( ptr class -- struct )
-    over c-ptr? [ swap \ c-ptr bad-slot-value ] unless
-    tuple-layout <tuple> [ 2 set-slot ] keep ; inline
+    [ 1array ] dip slots>tuple ;
+
+\ memory>struct [
+    dup struct-class? [ '[ _ boa ] ] [ drop f ] if
+] 1 define-partial-eval
 
 : malloc-struct ( class -- struct )
     [ heap-size malloc ] keep memory>struct ; inline
