@@ -14,6 +14,7 @@ WORD=
 NO_UI=
 GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
+SCRIPT_ARGS="$*"
 
 test_program_installed() {
     if ! [[ -n `type -p $1` ]] ; then
@@ -353,9 +354,40 @@ git_clone() {
     invoke_git clone $GIT_URL
 }
 
-git_pull_factorcode() {
-    echo "Updating the git repository from factorcode.org..."
-    invoke_git pull $GIT_URL master
+update_script_name() {
+    echo `dirname $0`/_update.sh
+}
+
+update_script() {
+    update_script=`update_script_name`
+    
+    echo "#!/bin/sh" >"$update_script"
+    echo "git pull \"$GIT_URL\" master" >>"$update_script"
+    echo "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
+        >>"$update_script"
+    echo "exit 0" >>"$update_script"
+
+    chmod 755 "$update_script"
+    exec "$update_script"
+}
+
+update_script_changed() {
+    invoke_git diff --stat `invoke_git merge-base HEAD FETCH_HEAD` FETCH_HEAD | grep 'build-support.factor\.sh' >/dev/null 
+}
+
+git_fetch_factorcode() {
+    echo "Fetching the git repository from factorcode.org..."
+
+    rm -f `update_script_name`
+    invoke_git fetch "$GIT_URL" master
+
+    if update_script_changed; then
+        echo "Updating and restarting the factor.sh script..."
+        update_script
+    else
+        echo "Updating the working tree..."
+        invoke_git pull "$GIT_URL" master
+    fi
 }
 
 cd_factor() {
@@ -475,7 +507,7 @@ install() {
 
 update() {
     get_config_info
-    git_pull_factorcode
+    git_fetch_factorcode
     backup_factor
     make_clean
     make_factor
