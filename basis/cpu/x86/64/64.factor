@@ -127,7 +127,7 @@ M:: x86.64 %unbox-large-struct ( n c-type -- )
     ! Load structure size into param-reg-3
     param-reg-3 c-type heap-size MOV
     ! Copy the struct to the C stack
-    "to_value_struct" f %alien-invoke ;
+    "to_value_struct" %vm-invoke-4th-arg ;
 
 : load-return-value ( rep -- )
     [ [ 0 ] dip reg-class-of param-reg ]
@@ -194,7 +194,7 @@ M: x86.64 %alien-invoke
 
 
 M: x86.64 %prepare-alien-indirect ( -- )
-    "unbox_alien" f %alien-invoke
+    "unbox_alien" %vm-invoke-1st-arg
     RBP RAX MOV ;
 
 M: x86.64 %alien-indirect ( -- )
