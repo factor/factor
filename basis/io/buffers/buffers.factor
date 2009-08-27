@@ -42,7 +42,7 @@ M: buffer dispose* ptr>> free ;
     [ fill>> ] [ pos>> ] bi - ; inline
 
 : buffer@ ( buffer -- alien )
-    [ pos>> ] [ ptr>> ] bi <displaced-alien> ;
+    [ pos>> ] [ ptr>> ] bi <displaced-alien> ; inline
 
 : buffer-read ( n buffer -- byte-array )
     [ buffer-length min ] keep

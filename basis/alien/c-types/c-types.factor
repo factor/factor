@@ -236,9 +236,9 @@ M: c-type stack-size size>> cell align ;
 
 GENERIC: byte-length ( seq -- n ) flushable
 
-M: byte-array byte-length length ;
+M: byte-array byte-length length ; inline
 
-M: f byte-length drop 0 ;
+M: f byte-length drop 0 ; inline
 
 : c-getter ( name -- quot )
     c-type-getter [
@@ -281,7 +281,7 @@ M: memory-stream stream-read
     ] [ [ + ] change-index drop ] 2bi ;
 
 : byte-array>memory ( byte-array base -- )
-    swap dup byte-length memcpy ;
+    swap dup byte-length memcpy ; inline
 
 : array-accessor ( type quot -- def )
     [

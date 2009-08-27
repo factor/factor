@@ -402,3 +402,9 @@ cell 4 = [
 
 [ 2 t ] [ 0 t global-dcn-bug-1 ] unit-test
 [ 1 f ] [ 0 f global-dcn-bug-1 ] unit-test
+
+! Forgot a GC check
+: missing-gc-check-1 ( a -- b ) { fixnum } declare <alien> ;
+: missing-gc-check-2 ( -- ) 10000000 [ missing-gc-check-1 drop ] each-integer ;
+
+[ ] [ missing-gc-check-2 ] unit-test
