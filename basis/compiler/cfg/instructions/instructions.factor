@@ -153,7 +153,12 @@ INSN: ##set-alien-double < ##alien-setter ;
 ! Memory allocation
 INSN: ##allot < ##flushable size class temp ;
 
-UNION: ##allocation ##allot ##box-float ##box-alien ##integer>bignum ;
+UNION: ##allocation
+##allot
+##box-float
+##box-alien
+##box-displaced-alien
+##integer>bignum ;
 
 INSN: ##write-barrier < ##effect card# table ;
 
