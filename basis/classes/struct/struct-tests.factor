@@ -5,7 +5,7 @@ destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays.ushort
 system tools.test compiler.tree.debugger struct-arrays
-classes.tuple.private ;
+classes.tuple.private specialized-arrays.direct.int ;
 IN: classes.struct.tests
 
 <<
@@ -181,12 +181,19 @@ STRUCT: struct-test-array-slots
 ] unit-test
 
 STRUCT: struct-test-optimization
-    { x int } { y int } ;
+    { x int[3] } { y int } ;
 
 [ t ] [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 [ t ] [
     [ 3 struct-test-optimization <direct-struct-array> third y>> ]
     { <tuple> <tuple-boa> memory>struct y>> } inlined?
+] unit-test
+
+[ t ] [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
+
+[ t ] [
+    [ struct-test-optimization memory>struct x>> second ]
+    { memory>struct x>> <direct-int-array> <tuple> <tuple-boa> } inlined?
 ] unit-test
 
 [ f ] [ [ memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
