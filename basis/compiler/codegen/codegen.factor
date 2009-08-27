@@ -170,15 +170,20 @@ M: ##sub-float generate-insn dst/src1/src2 %sub-float ;
 M: ##mul-float generate-insn dst/src1/src2 %mul-float ;
 M: ##div-float generate-insn dst/src1/src2 %div-float ;
 
+M: ##sqrt generate-insn dst/src %sqrt ;
+
 M: ##integer>float generate-insn dst/src %integer>float ;
 M: ##float>integer generate-insn dst/src %float>integer ;
 
 M: ##copy generate-insn [ dst/src ] [ rep>> ] bi %copy ;
 
-M: ##unbox-float     generate-insn dst/src %unbox-float ;
+M: ##unbox-float generate-insn dst/src %unbox-float ;
 M: ##unbox-any-c-ptr generate-insn dst/src/temp %unbox-any-c-ptr ;
-M: ##box-float       generate-insn dst/src/temp %box-float ;
-M: ##box-alien       generate-insn dst/src/temp %box-alien ;
+M: ##box-float generate-insn dst/src/temp %box-float ;
+M: ##box-alien generate-insn dst/src/temp %box-alien ;
+
+M: ##box-displaced-alien generate-insn
+    [ dst/src1/src2 ] [ temp>> ] bi %box-displaced-alien ;
 
 M: ##alien-unsigned-1 generate-insn dst/src %alien-unsigned-1 ;
 M: ##alien-unsigned-2 generate-insn dst/src %alien-unsigned-2 ;

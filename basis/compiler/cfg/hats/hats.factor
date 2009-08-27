@@ -43,6 +43,7 @@ IN: compiler.cfg.hats
 : ^^sub-float ( src1 src2 -- dst ) ^^r2 ##sub-float ; inline
 : ^^mul-float ( src1 src2 -- dst ) ^^r2 ##mul-float ; inline
 : ^^div-float ( src1 src2 -- dst ) ^^r2 ##div-float ; inline
+: ^^sqrt ( src -- dst ) ^^r1 ##sqrt ; inline
 : ^^float>integer ( src -- dst ) ^^r1 ##float>integer ; inline
 : ^^integer>float ( src -- dst ) ^^r1 ##integer>float ; inline
 : ^^allot ( size class -- dst ) ^^r2 next-vreg ##allot ; inline
@@ -50,6 +51,7 @@ IN: compiler.cfg.hats
 : ^^allot-array ( n -- dst ) 2 + cells array ^^allot ; inline
 : ^^allot-byte-array ( n -- dst ) 2 cells + byte-array ^^allot ; inline
 : ^^box-alien ( src -- dst ) ^^r1 next-vreg ##box-alien ; inline
+: ^^box-displaced-alien ( base displacement -- dst ) ^^r2 next-vreg ##box-displaced-alien ; inline
 : ^^unbox-alien ( src -- dst ) ^^r1 ##unbox-alien ; inline
 : ^^unbox-c-ptr ( src class -- dst ) ^^r2 next-vreg ##unbox-c-ptr ;
 : ^^alien-unsigned-1 ( src -- dst ) ^^r1 ##alien-unsigned-1 ; inline
