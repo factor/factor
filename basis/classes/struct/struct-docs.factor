@@ -24,7 +24,7 @@ HELP: STRUCT:
 { $description "Defines a new " { $link struct } " type. The syntax is nearly identical to " { $link POSTPONE: TUPLE: } "; however, there are some additional restrictions on struct types:"
 { $list
 { "Struct classes cannot have a superclass defined." }
-{ "The slots of a struct must all have a type declared. The type must be either another struct class, or one of the " { $link "classes.c-types" } "." } 
+{ "The slots of a struct must all have a type declared. The type must be a C type." } 
 { { $link read-only } " slots on structs are not enforced, though they may be declared." }
 } } ;
 

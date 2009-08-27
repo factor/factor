@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs kernel accessors
-sorting sets sequences
+sorting sets sequences arrays
 cpu.architecture
+sequences.deep
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.instructions
@@ -32,10 +33,13 @@ M: insn process-instruction
     dup rewrite
     [ process-instruction ] [ ] ?if ;
 
+M: array process-instruction
+    [ process-instruction ] map ;
+
 : value-numbering-step ( insns -- insns' )
     init-value-graph
     init-expressions
-    [ process-instruction ] map ;
+    [ process-instruction ] map flatten ;
 
 : value-numbering ( cfg -- cfg' )
     [ value-numbering-step ] local-optimization

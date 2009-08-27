@@ -10,6 +10,8 @@ compiler.cfg.intrinsics.float
 compiler.cfg.intrinsics.slots
 compiler.cfg.intrinsics.misc
 compiler.cfg.comparisons ;
+QUALIFIED: alien
+QUALIFIED: alien.accessors
 QUALIFIED: kernel
 QUALIFIED: arrays
 QUALIFIED: byte-arrays
@@ -19,7 +21,7 @@ QUALIFIED: strings.private
 QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
 QUALIFIED: math.integers.private
-QUALIFIED: alien.accessors
+QUALIFIED: math.libm
 IN: compiler.cfg.intrinsics
 
 {
@@ -53,6 +55,7 @@ IN: compiler.cfg.intrinsics
     byte-arrays:<byte-array>
     byte-arrays:(byte-array)
     kernel:<wrapper>
+    alien:<displaced-alien>
     alien.accessors:alien-unsigned-1
     alien.accessors:set-alien-unsigned-1
     alien.accessors:alien-signed-1
@@ -92,6 +95,9 @@ IN: compiler.cfg.intrinsics
         alien.accessors:set-alien-double
     } [ t "intrinsic" set-word-prop ] each ;
 
+: enable-fsqrt ( -- )
+    \ math.libm:fsqrt t "intrinsic" set-word-prop ;
+
 : enable-fixnum-log2 ( -- )
     \ math.integers.private:fixnum-log2 t "intrinsic" set-word-prop ;
 
@@ -130,6 +136,7 @@ IN: compiler.cfg.intrinsics
         { \ math.private:float= [ drop cc= emit-float-comparison ] }
         { \ math.private:float>fixnum [ drop emit-float>fixnum ] }
         { \ math.private:fixnum>float [ drop emit-fixnum>float ] }
+        { \ math.libm:fsqrt [ drop emit-fsqrt ] }
         { \ slots.private:slot [ emit-slot ] }
         { \ slots.private:set-slot [ emit-set-slot ] }
         { \ strings.private:string-nth [ drop emit-string-nth ] }
@@ -139,6 +146,7 @@ IN: compiler.cfg.intrinsics
         { \ byte-arrays:<byte-array> [ emit-<byte-array> ] }
         { \ byte-arrays:(byte-array) [ emit-(byte-array) ] }
         { \ kernel:<wrapper> [ emit-simple-allot ] }
+        { \ alien:<displaced-alien> [ emit-<displaced-alien> ] }
         { \ alien.accessors:alien-unsigned-1 [ 1 emit-alien-unsigned-getter ] }
         { \ alien.accessors:set-alien-unsigned-1 [ 1 emit-alien-integer-setter ] }
         { \ alien.accessors:alien-signed-1 [ 1 emit-alien-signed-getter ] }

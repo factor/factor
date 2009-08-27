@@ -9,8 +9,7 @@ C-LIBRARY: test
 
 C-INCLUDE: <stdlib.h>
 C-INCLUDE: <string.h>
-
-C-TYPEDEF: char bool
+C-INCLUDE: <stdbool.h>
 
 CM-FUNCTION: void outarg1 ( int* a )
     *a += 2;

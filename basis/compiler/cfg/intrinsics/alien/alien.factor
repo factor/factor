@@ -1,10 +1,23 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences alien math classes.algebra fry
-locals combinators cpu.architecture compiler.tree.propagation.info
-compiler.cfg.hats compiler.cfg.stacks compiler.cfg.instructions
+locals combinators combinators.short-circuit cpu.architecture
+compiler.tree.propagation.info compiler.cfg.hats
+compiler.cfg.stacks compiler.cfg.instructions
 compiler.cfg.utilities compiler.cfg.builder.blocks ;
 IN: compiler.cfg.intrinsics.alien
+
+: emit-<displaced-alien>? ( node -- ? )
+    node-input-infos {
+        [ first class>> fixnum class<= ]
+        [ second class>> c-ptr class<= ]
+    } 1&& ;
+
+: emit-<displaced-alien> ( node -- )
+    dup emit-<displaced-alien>?
+    [ drop 2inputs [ ^^untag-fixnum ] dip ^^box-displaced-alien ds-push ]
+    [ emit-primitive ]
+    if ;
 
 : (prepare-alien-accessor-imm) ( class offset -- offset-vreg )
     ds-drop [ ds-pop swap ^^unbox-c-ptr ] dip ^^add-imm ;
