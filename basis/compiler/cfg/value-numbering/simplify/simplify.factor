@@ -87,6 +87,12 @@ M: unary-expr simplify*
         [ 2drop f ]
     } cond ; inline
 
+: simplify-box-displaced-alien ( expr -- vn/expr/f )
+    >binary-expr< {
+        { [ over expr-zero? ] [ nip ] }
+        [ 2drop f ]
+    } cond ;
+
 M: binary-expr simplify*
     dup op>> {
         { \ ##add [ simplify-add ] }
@@ -107,6 +113,7 @@ M: binary-expr simplify*
         { \ ##sar-imm [ simplify-shr ] }
         { \ ##shl [ simplify-shl ] }
         { \ ##shl-imm [ simplify-shl ] }
+        { \ ##box-displaced-alien [ simplify-box-displaced-alien ] }
         [ 2drop f ]
     } case ;
 

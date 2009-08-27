@@ -463,6 +463,54 @@ cell 8 = [
     ] compile-call
 ] unit-test
 
+[ ALIEN: 123 ] [
+    123 [ <alien> ] compile-call
+] unit-test
+
+[ ALIEN: 123 ] [
+    123 [ { fixnum } declare <alien> ] compile-call
+] unit-test
+
+[ ALIEN: 123 ] [
+    [ 123 <alien> ] compile-call
+] unit-test
+
+[ f ] [
+    0 [ <alien> ] compile-call
+] unit-test
+
+[ f ] [
+    0 [ { fixnum } declare <alien> ] compile-call
+] unit-test
+
+[ f ] [
+    [ 0 <alien> ] compile-call
+] unit-test
+
+[ ALIEN: 321 ] [
+    0 ALIEN: 321 [ <displaced-alien> ] compile-call
+] unit-test
+
+[ ALIEN: 321 ] [
+    0 ALIEN: 321 [ { fixnum c-ptr } declare <displaced-alien> ] compile-call
+] unit-test
+
+[ ALIEN: 321 ] [
+    ALIEN: 321 [ 0 swap <displaced-alien> ] compile-call
+] unit-test
+
+[ B{ 0 1 2 3 4 } ] [
+   2  B{ 0 1 2 3 4 } <displaced-alien>
+    [ 1 swap <displaced-alien> ] compile-call
+    underlying>>
+] unit-test
+
+[ B{ 0 1 2 3 4 } ] [
+    2 B{ 0 1 2 3 4 } <displaced-alien>
+    [ 1 swap { c-ptr } declare <displaced-alien> ] compile-call
+    underlying>>
+] unit-test
+
 [
     B{ 0 0 0 0 } [ { byte-array } declare <void*> ] compile-call
 ] must-fail
