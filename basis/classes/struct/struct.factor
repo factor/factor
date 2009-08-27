@@ -48,8 +48,10 @@ M: struct equal?
 : (struct) ( class -- struct )
     [ heap-size <byte-array> ] keep memory>struct ; inline
 
+: struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
+
 : <struct> ( class -- struct )
-    dup "prototype" word-prop
+    dup struct-prototype
     [ >c-ptr clone swap memory>struct ] [ (struct) ] if* ; inline
 
 MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
@@ -176,7 +178,7 @@ M: struct-class heap-size
 
 ! class definition
 
-: struct-prototype ( class -- prototype )
+: make-struct-prototype ( class -- prototype )
     [ heap-size <byte-array> ]
     [ memory>struct ]
     [ struct-slots ] tri
@@ -198,7 +200,7 @@ M: struct-class heap-size
     [ "struct-size" set-word-prop ]
     [ "struct-align" set-word-prop ] tri-curry*
     [ tri ] 3curry
-    [ dup struct-prototype "prototype" set-word-prop ]
+    [ dup make-struct-prototype "prototype" set-word-prop ]
     [ (struct-methods) ] tri ;
 
 : check-struct-slots ( slots -- )
