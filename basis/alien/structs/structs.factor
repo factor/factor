@@ -65,3 +65,6 @@ M: struct-type stack-size
 : offset-of ( field struct -- offset )
     c-types get at fields>> 
     [ name>> = ] with find nip offset>> ;
+
+USE: vocabs.loader
+"struct-arrays" require
