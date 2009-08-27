@@ -255,7 +255,7 @@ M:: x86 %box-float ( dst src temp -- )
 
 : alien@ ( reg n -- op ) cells alien tag-number - [+] ;
 
-:: %allot-alien ( dst base displacement temp -- )
+:: %allot-alien ( dst displacement base temp -- )
     dst 4 cells alien temp %allot
     dst 1 alien@ base MOV ! alien
     dst 2 alien@ \ f tag-number MOV ! expired
@@ -268,7 +268,7 @@ M:: x86 %box-alien ( dst src temp -- )
         dst \ f tag-number MOV
         src 0 CMP
         "end" get JE
-        dst \ f tag-number src temp %allot-alien
+        dst src \ f tag-number temp %allot-alien
         "end" resolve-label
     ] with-scope ;
 
@@ -290,7 +290,7 @@ M:: x86 %box-displaced-alien ( dst displacement base temp -- )
         ! base = base.base
         base base 1 alien@ MOV
         "ok" resolve-label
-        dst base displacement temp %allot-alien
+        dst displacement base temp %allot-alien
         "end" resolve-label
     ] with-scope ;
 
