@@ -315,21 +315,48 @@ M:: ppc %unbox-any-c-ptr ( dst src temp -- )
 
 : alien@ ( n -- n' ) cells object tag-number - ;
 
+:: %allot-alien ( dst displacement base temp -- )
+    dst 4 cells alien temp %allot
+    temp \ f tag-number %load-immediate
+    ! Store underlying-alien slot
+    base dst 1 alien@ STW
+    ! Store expired slot
+    temp dst 2 alien@ STW
+    ! Store offset
+    displacement dst 3 alien@ STW ;
+
 M:: ppc %box-alien ( dst src temp -- )
     [
         "f" define-label
         dst \ f tag-number %load-immediate
         0 src 0 CMPI
         "f" get BEQ
-        dst 4 cells alien temp %allot
-        ! Store offset
-        src dst 3 alien@ STW
-        ! Store expired slot
-        temp \ f tag-number %load-immediate
-        temp dst 1 alien@ STW
-        ! Store underlying-alien slot
-        temp dst 2 alien@ STW
+        dst src temp temp %allot-alien
         "f" resolve-label
+    ] with-scope ;
+
+M:: ppc %box-displaced-alien ( dst displacement base temp -- )
+    [
+        "end" define-label
+        "ok" define-label
+        ! If displacement is zero, return the base
+        dst base MR
+        0 displacement 0 CMPI
+        "end" get BEQ
+        ! If base is already a displaced alien, unpack it
+        0 base \ f tag-number CMPI
+        "ok" get BEQ
+        temp base header-offset LWZ
+        0 temp alien type-number tag-fixnum CMPI
+        "ok" get BNE
+        ! displacement += base.displacement
+        temp base 3 alien@ LWZ
+        displacement displacement temp ADD
+        ! base = base.base
+        base base 1 alien@ LWZ
+        "ok" resolve-label
+        dst displacement base temp %allot-alien
+        "end" resolve-label
     ] with-scope ;
 
 M: ppc %alien-unsigned-1 0 LBZ ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
-math.bitwise math.order classes vectors
+math.bitwise math.order classes vectors locals make
 compiler.cfg
 compiler.cfg.registers
 compiler.cfg.comparisons
@@ -350,3 +350,24 @@ M: ##shl rewrite \ ##shl-imm rewrite-arithmetic ;
 M: ##shr rewrite \ ##shr-imm rewrite-arithmetic ;
 
 M: ##sar rewrite \ ##sar-imm rewrite-arithmetic ;
+
+: box-displaced-alien? ( expr -- ? )
+    op>> \ ##box-displaced-alien eq? ;
+
+! ##box-displaced-alien f 1 2 3
+! ##unbox-any-c-ptr 4 1
+! =>
+! ##box-displaced-alien f 1 2 3
+! ##unbox-any-c-ptr 5 3
+! ##add 4 5 2
+
+:: rewrite-unbox-displaced-alien ( insn expr -- insns )
+    [
+        next-vreg :> temp
+        temp expr in2>> vn>vreg insn temp>> ##unbox-any-c-ptr
+        insn dst>> temp expr in1>> vn>vreg ##add
+    ] { } make ;
+
+M: ##unbox-any-c-ptr rewrite
+    dup src>> vreg>expr dup box-displaced-alien?
+    [ rewrite-unbox-displaced-alien ] [ 2drop f ] if ;

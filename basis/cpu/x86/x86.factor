@@ -255,17 +255,42 @@ M:: x86 %box-float ( dst src temp -- )
 
 : alien@ ( reg n -- op ) cells alien tag-number - [+] ;
 
+:: %allot-alien ( dst displacement base temp -- )
+    dst 4 cells alien temp %allot
+    dst 1 alien@ base MOV ! alien
+    dst 2 alien@ \ f tag-number MOV ! expired
+    dst 3 alien@ displacement MOV ! displacement
+    ;
+
 M:: x86 %box-alien ( dst src temp -- )
     [
         "end" define-label
         dst \ f tag-number MOV
         src 0 CMP
         "end" get JE
-        dst 4 cells alien temp %allot
-        dst 1 alien@ \ f tag-number MOV
-        dst 2 alien@ \ f tag-number MOV
-        ! Store src in alien-offset slot
-        dst 3 alien@ src MOV
+        dst src \ f tag-number temp %allot-alien
+        "end" resolve-label
+    ] with-scope ;
+
+M:: x86 %box-displaced-alien ( dst displacement base temp -- )
+    [
+        "end" define-label
+        "ok" define-label
+        ! If displacement is zero, return the base
+        dst base MOV
+        displacement 0 CMP
+        "end" get JE
+        ! If base is already a displaced alien, unpack it
+        base \ f tag-number CMP
+        "ok" get JE
+        base header-offset [+] alien type-number tag-fixnum CMP
+        "ok" get JNE
+        ! displacement += base.displacement
+        displacement base 3 alien@ ADD
+        ! base = base.base
+        base base 1 alien@ MOV
+        "ok" resolve-label
+        dst displacement base temp %allot-alien
         "end" resolve-label
     ] with-scope ;
 
