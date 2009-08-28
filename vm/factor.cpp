@@ -52,7 +52,11 @@ void factorvm::default_parameters(vm_parameters *p)
 #ifdef WINDOWS
 	p->console = false;
 #else
-	p->console = true;
+	if (this == vm)
+		p->console = true;
+	else 		
+		p->console = false;
+	
 #endif
 
 	p->stack_traces = true;
