@@ -7,10 +7,10 @@ IN: alien.structs.fields
 TUPLE: field-spec name offset type reader writer ;
 
 : reader-word ( class name vocab -- word )
-    [ "-" glue ] dip create ;
+    [ "-" glue ] dip create dup make-deprecated ;
 
 : writer-word ( class name vocab -- word )
-    [ [ swap "set-" % % "-" % % ] "" make ] dip create ;
+    [ [ swap "set-" % % "-" % % ] "" make ] dip create dup make-deprecated ;
 
 : <field-spec> ( struct-name vocab type field-name -- spec )
     field-spec new
