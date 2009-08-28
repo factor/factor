@@ -39,12 +39,14 @@ T{ error-type
 : clear-deprecation-note ( word -- )
     deprecation-notes get-global delete-at ;
 
-: check-deprecations ( word -- )
-    dup "forgotten" word-prop
-    [ clear-deprecation-note ] [
-        dup def>> uses [ deprecated? ] filter
-        [ clear-deprecation-note ] [ >array deprecation-note ] if-empty
-    ] if ;
+: check-deprecations ( usage -- )
+    dup word? [
+        dup "forgotten" word-prop
+        [ clear-deprecation-note ] [
+            dup def>> uses [ deprecated? ] filter
+            [ clear-deprecation-note ] [ >array deprecation-note ] if-empty
+        ] if
+    ] [ drop ] if ;
 
 M: deprecated-usages summary
     drop "Deprecated words used" ;
