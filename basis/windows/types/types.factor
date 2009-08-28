@@ -216,17 +216,17 @@ CONSTANT: TRUE 1
 
 ! typedef LRESULT (CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 
-C-STRUCT: WNDCLASS
-    { "UINT" "style" }
-    { "WNDPROC" "lpfnWndProc" }
-    { "int" "cbClsExtra" }
-    { "int" "cbWndExtra" }
-    { "HINSTANCE" "hInstance" }
-    { "HICON" "hIcon" }
-    { "HCURSOR" "hCursor" }
-    { "HBRUSH" "hbrBackground" }
-    { "LPCTSTR" "lpszMenuName" }
-    { "LPCTSTR" "lpszClassName" } ;
+STRUCT: WNDCLASS
+    { style UINT }
+    { lpfnWndProc WNDPROC }
+    { cbClsExtra int }
+    { cbWndExtra int }
+    { hInstance HINSTANCE }
+    { hIcon HICON }
+    { hCursor HCURSOR }
+    { hbrBackground HBRUSH }
+    { lpszMenuName LPCTSTR }
+    { lpszClassName LPCTSTR } ;
 
 STRUCT: WNDCLASSEX
     { cbSize UINT }
@@ -328,12 +328,6 @@ STRUCT: PIXELFORMATDESCRIPTOR
     { dwLayerMask DWORD }
     { dwVisibleMask DWORD }
     { dwDamageMask DWORD } ;
-
-C-STRUCT: RECT
-    { "LONG" "left" }
-    { "LONG" "top" }
-    { "LONG" "right" }
-    { "LONG" "bottom" } ;
 
 : <RECT> ( loc dim -- RECT )
     [ RECT <struct> ] 2dip

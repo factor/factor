@@ -751,17 +751,18 @@ M: windows-ui-backend beep ( -- )
 
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow
-    "MONITORINFOEX" <c-object> dup length over set-MONITORINFOEX-cbSize
-    [ GetMonitorInfo win32-error=0/f ] keep MONITORINFOEX-rcMonitor ;
+    MONITORINFOEX <struct>
+        MONITORINFOEX heap-size >>cbSize
+    [ GetMonitorInfo win32-error=0/f ] keep rcMonitor>> ;
 
 : client-area>RECT ( hwnd -- RECT )
-    "RECT" <c-object>
+    RECT <struct>
     [ GetClientRect win32-error=0/f ]
     [ "POINT" byte-array>struct-array [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )
-    "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep ;
+    RECT <struct> [ GetWindowRect win32-error=0/f ] keep ;
 
 M: windows-ui-backend (grab-input) ( handle -- )
     0 ShowCursor drop

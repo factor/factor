@@ -6,7 +6,7 @@ math.rectangles namespaces parser sequences shuffle
 struct-arrays ui.backend.windows vectors windows.com
 windows.dinput windows.dinput.constants windows.errors
 windows.kernel32 windows.messages windows.ole32
-windows.user32 ;
+windows.user32 classes.struct ;
 IN: game-input.dinput
 CONSTANT: MOUSE-BUFFER-SIZE 16
 
@@ -162,7 +162,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     [ remove-controller ] each ;
 
 : device-interface? ( dbt-broadcast-hdr -- ? )
-    DEV_BROADCAST_HDR-dbch_devicetype DBT_DEVTYP_DEVICEINTERFACE = ;
+    dbch_devicetype>> DBT_DEVTYP_DEVICEINTERFACE = ;
 
 : device-arrived ( dbt-broadcast-hdr -- )
     device-interface? [ find-controllers ] when ;
@@ -185,9 +185,9 @@ TUPLE: window-rect < rect window-loc ;
     { 0 0 } >>dim ;
 
 : (device-notification-filter) ( -- DEV_BROADCAST_DEVICEW )
-    "DEV_BROADCAST_DEVICEW" <c-object>
-    "DEV_BROADCAST_DEVICEW" heap-size over set-DEV_BROADCAST_DEVICEW-dbcc_size
-    DBT_DEVTYP_DEVICEINTERFACE over set-DEV_BROADCAST_DEVICEW-dbcc_devicetype ;
+    DEV_BROADCAST_DEVICEW <struct>
+        DEV_BROADCAST_DEVICEW heap-size >>dbcc_size
+        DBT_DEVTYP_DEVICEINTERFACE >>dbcc_devicetype ;
 
 : create-device-change-window ( -- )
     <zero-window-rect> WS_OVERLAPPEDWINDOW 0 create-window
@@ -239,11 +239,13 @@ M: dinput-game-input-backend (close-game-input)
     delete-dinput ;
 
 M: dinput-game-input-backend (reset-game-input)
-    {
-        +dinput+ +keyboard-device+ +keyboard-state+
-        +controller-devices+ +controller-guids+
-        +device-change-window+ +device-change-handle+
-    } [ f swap set-global ] each ;
+    global [
+        {
+            +dinput+ +keyboard-device+ +keyboard-state+
+            +controller-devices+ +controller-guids+
+            +device-change-window+ +device-change-handle+
+        } [ off ] each
+    ] bind ;
 
 M: dinput-game-input-backend get-controllers
     +controller-devices+ get
