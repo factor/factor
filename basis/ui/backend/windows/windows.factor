@@ -260,12 +260,14 @@ CONSTANT: window-control>ex-style
     window-controls>> window-control>ex-style symbols>flags ;
 
 : get-RECT-top-left ( RECT -- x y )
-    [ RECT-left ] keep RECT-top ;
+    [ left>> ] [ top>> ] bi ;
+
+: get-RECT-width/height ( RECT -- width height )
+    [ [ right>> ] [ left>> ] bi - ]
+    [ [ bottom>> ] [ top>> ] bi - ] bi ;
 
 : get-RECT-dimensions ( RECT -- x y width height )
-    [ get-RECT-top-left ] keep
-    [ RECT-right ] keep [ RECT-left - ] keep
-    [ RECT-bottom ] keep RECT-top - ;
+    [ get-RECT-top-left ] [ get-RECT-width/height ] bi ;
 
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
@@ -610,12 +612,12 @@ M: windows-ui-backend do-events
 : make-RECT ( world -- RECT )
     [ window-loc>> ] [ dim>> ] bi <RECT> ;
 
-: default-position-RECT ( RECT -- )
-    dup get-RECT-dimensions [ 2drop ] 2dip
-    CW_USEDEFAULT + pick set-RECT-bottom
-    CW_USEDEFAULT + over set-RECT-right
-    CW_USEDEFAULT over set-RECT-left
-    CW_USEDEFAULT swap set-RECT-top ;
+: default-position-RECT ( RECT -- RECT' )
+    dup get-RECT-width/height
+        [ CW_USEDEFAULT + >>bottom ] dip
+        CW_USEDEFAULT + >>right
+        CW_USEDEFAULT >>left
+        CW_USEDEFAULT >>top ;
 
 : make-adjusted-RECT ( rect style ex-style -- RECT )
     [
@@ -623,7 +625,7 @@ M: windows-ui-backend do-events
         dup get-RECT-top-left [ zero? ] both? swap
         dup
     ] 2dip adjust-RECT
-    swap [ dup default-position-RECT ] when ;
+    swap [ default-position-RECT ] when ;
 
 : get-window-class ( -- class-name )
     class-name-ptr [
