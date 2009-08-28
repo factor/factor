@@ -1,6 +1,9 @@
 #ifndef __FACTOR_MASTER_H__
 #define __FACTOR_MASTER_H__
 
+#define _THREAD_SAFE
+#define _REENTRANT
+
 #ifndef WINCE
 #include <errno.h>
 #endif
