@@ -8,3 +8,7 @@ IN: libc
 : calloc ( size count -- newalien ) (calloc) check-ptr ;
 
 : free ( alien -- ) (free) ;
+
+FORGET: malloc-ptr
+
+FORGET: <malloc-ptr>
