@@ -326,17 +326,6 @@ M: long-long-type box-return ( type -- )
     [ define-out ]
     tri ;
 
-: expand-constants ( c-type -- c-type' )
-    dup array? [
-        unclip [
-            [
-                dup word? [
-                    def>> call( -- object )
-                ] when
-            ] map
-        ] dip prefix
-    ] when ;
-
 : malloc-file-contents ( path -- alien len )
     binary file-contents [ malloc-byte-array ] [ length ] bi ;
 
