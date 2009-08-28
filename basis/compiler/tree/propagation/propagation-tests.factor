@@ -780,6 +780,10 @@ M: f whatever2 ; inline
 [ t ] [ [ 1 whatever2 at ] { at* hashcode* } inlined? ] unit-test
 [ f ] [ [ whatever2 at ] { at* hashcode* } inlined? ] unit-test
 
+SYMBOL: not-an-assoc
+
+[ f ] [ [ not-an-assoc at ] { at* } inlined? ] unit-test
+
 [ t ] [ [ { 1 2 3 } member? ] { member? } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap member? ] { member? } inlined? ] unit-test
 
