@@ -3,7 +3,7 @@ destructors io io.backend io.ports io.timeouts io.backend.windows
 io.files.windows io.files.windows.nt io.files io.pathnames io.buffers
 io.streams.c io.streams.null libc kernel math namespaces sequences
 threads windows windows.errors windows.kernel32 strings splitting
-ascii system accessors locals ;
+ascii system accessors locals classes.struct ;
 QUALIFIED: windows.winsock
 IN: io.backend.windows.nt
 
