@@ -589,19 +589,18 @@ M: windows-ui-backend do-events
     ] if ;
 
 :: register-window-class ( class-name-ptr -- )
-    "WNDCLASSEX" <c-object> f GetModuleHandle
+    WNDCLASSEX <struct> f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
-        "WNDCLASSEX" heap-size over set-WNDCLASSEX-cbSize
-        { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags over set-WNDCLASSEX-style
-        ui-wndproc over set-WNDCLASSEX-lpfnWndProc
-        0 over set-WNDCLASSEX-cbClsExtra
-        0 over set-WNDCLASSEX-cbWndExtra
-        f GetModuleHandle over set-WNDCLASSEX-hInstance
-        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon
-        over set-WNDCLASSEX-hIcon
-        f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
+        WNDCLASSEX heap-size >>cbSize
+        { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags >>style
+        ui-wndproc >>lpfnWndProc
+        0 >>cbClsExtra
+        0 >>cbWndExtra
+        f GetModuleHandle >>hInstance
+        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon >>hIcon
+        f IDC_ARROW LoadCursor >>hCursor
 
-        class-name-ptr over set-WNDCLASSEX-lpszClassName
+        class-name-ptr >>lpszClassName
         RegisterClassEx win32-error=0/f
     ] [ drop ] if ;
 

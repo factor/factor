@@ -228,19 +228,19 @@ C-STRUCT: WNDCLASS
     { "LPCTSTR" "lpszMenuName" }
     { "LPCTSTR" "lpszClassName" } ;
 
-C-STRUCT: WNDCLASSEX
-    { "UINT" "cbSize" }
-    { "UINT" "style" }
-    { "WNDPROC" "lpfnWndProc" }
-    { "int" "cbClsExtra" }
-    { "int" "cbWndExtra" }
-    { "HINSTANCE" "hInstance" }
-    { "HICON" "hIcon" }
-    { "HCURSOR" "hCursor" }
-    { "HBRUSH" "hbrBackground" }
-    { "LPCTSTR" "lpszMenuName" }
-    { "LPCTSTR" "lpszClassName" }
-    { "HICON" "hIconSm" } ;
+STRUCT: WNDCLASSEX
+    { cbSize UINT }
+    { style UINT }
+    { lpfnWndProc WNDPROC }
+    { cbClsExtra int }
+    { cbWndExtra int }
+    { hInstance HINSTANCE }
+    { hIcon HICON }
+    { hCursor HCURSOR }
+    { hbrBackground HBRUSH }
+    { lpszMenuName LPCTSTR }
+    { lpszClassName LPCTSTR }
+    { hIconSm HICON } ;
 
 C-STRUCT: RECT
     { "LONG" "left" }
