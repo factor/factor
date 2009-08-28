@@ -1,6 +1,6 @@
 IN: alien.syntax
 USING: alien alien.c-types alien.parser alien.structs
-help.markup help.syntax ;
+classes.struct help.markup help.syntax ;
 
 HELP: DLL"
 { $syntax "DLL\" path\"" }
@@ -55,12 +55,14 @@ HELP: TYPEDEF:
 { $notes "This word differs from " { $link typedef } " in that it runs at parse time, to ensure correct ordering of operations when loading source files. Words defined in source files are compiled before top-level forms are run, so if a source file defines C binding words and uses " { $link typedef } ", the type alias won't be available at compile time." } ;
 
 HELP: C-STRUCT:
+{ $deprecated "New code should use " { $link "classes.struct" } ". See the " { $link POSTPONE: STRUCT: } " word." }
 { $syntax "C-STRUCT: name pairs... ;" }
 { $values { "name" "a new C type name" } { "pairs" "C type / field name string pairs" } }
 { $description "Defines a C struct layout and accessor words." }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." } ;
 
 HELP: C-UNION:
+{ $deprecated "New code should use " { $link "classes.struct" } ". See the " { $link POSTPONE: UNION-STRUCT: } " word." }
 { $syntax "C-UNION: name members... ;" }
 { $values { "name" "a new C type name" } { "members" "a sequence of C types" } }
 { $description "Defines a new C type sized to fit its largest member." }
