@@ -55,11 +55,11 @@ M: struct-type stack-size
     [ struct-offsets ] keep
     [ [ type>> ] map compute-struct-align ] keep
     [ struct-type (define-struct) ] keep
-    [ define-field ] each ;
+    [ define-field ] each ; deprecated
 
 : define-union ( name members -- )
     [ [ heap-size ] [ max ] map-reduce ] keep
-    compute-struct-align f struct-type (define-struct) ;
+    compute-struct-align f struct-type (define-struct) ; deprecated
 
 : offset-of ( field struct -- offset )
     c-types get at fields>> 
