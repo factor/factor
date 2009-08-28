@@ -26,13 +26,13 @@ TUPLE: A
 { length fixnum read-only } ;
 
 : <A> ( alien len -- direct-array ) A boa ; inline
-M: A length length>> ;
-M: A nth-unsafe underlying>> NTH call ;
-M: A set-nth-unsafe underlying>> SET-NTH call ;
-M: A like drop dup A instance? [ >A' ] unless ;
-M: A new-sequence drop <A'> ;
+M: A length length>> ; inline
+M: A nth-unsafe underlying>> NTH call ; inline
+M: A set-nth-unsafe underlying>> SET-NTH call ; inline
+M: A like drop dup A instance? [ >A' ] unless ; inline
+M: A new-sequence drop <A'> ; inline
 
-M: A byte-length length>> T heap-size * ;
+M: A byte-length length>> T heap-size * ; inline
 
 M: A pprint-delims drop \ A'{ \ } ;
 

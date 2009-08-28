@@ -1,15 +1,18 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.structs alien.structs.fields arrays
-byte-arrays classes classes.parser classes.tuple
-classes.tuple.parser classes.tuple.private combinators
-combinators.smart fry generalizations generic.parser kernel
-kernel.private lexer libc macros make math math.order parser
-quotations sequences slots slots.private struct-arrays
-vectors words ;
+USING: accessors alien alien.c-types alien.structs
+alien.structs.fields arrays byte-arrays classes classes.parser
+classes.tuple classes.tuple.parser classes.tuple.private
+combinators combinators.short-circuit combinators.smart fry
+generalizations generic.parser kernel kernel.private lexer
+libc macros make math math.order parser quotations sequences
+slots slots.private struct-arrays vectors words
+compiler.tree.propagation.transforms ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
 
 ! struct class
+
+ERROR: struct-must-have-slots ;
 
 TUPLE: struct
     { (underlying) c-ptr read-only } ;
@@ -18,7 +21,7 @@ TUPLE: struct-slot-spec < slot-spec
     c-type ;
 
 PREDICATE: struct-class < tuple-class
-    \ struct subclass-of? ;
+    { [ \ struct subclass-of? ] [ all-slots length 1 = ] } 1&& ;
 
 : struct-slots ( struct -- slots )
     "struct-slots" word-prop ;
@@ -28,9 +31,18 @@ PREDICATE: struct-class < tuple-class
 M: struct >c-ptr
     2 slot { c-ptr } declare ; inline
 
+M: struct equal?
+    {
+        [ [ class ] bi@ = ]
+        [ [ >c-ptr ] [ [ >c-ptr ] [ byte-length ] bi ] bi* memory= ]
+    } 2&& ;
+
 : memory>struct ( ptr class -- struct )
-    over c-ptr? [ swap \ c-ptr bad-slot-value ] unless
-    tuple-layout <tuple> [ 2 set-slot ] keep ;
+    [ 1array ] dip slots>tuple ;
+
+\ memory>struct [
+    dup struct-class? [ '[ _ boa ] ] [ drop f ] if
+] 1 define-partial-eval
 
 : malloc-struct ( class -- struct )
     [ heap-size malloc ] keep memory>struct ; inline
@@ -38,8 +50,10 @@ M: struct >c-ptr
 : (struct) ( class -- struct )
     [ heap-size <byte-array> ] keep memory>struct ; inline
 
+: struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
+
 : <struct> ( class -- struct )
-    dup "prototype" word-prop
+    dup struct-prototype
     [ >c-ptr clone swap memory>struct ] [ (struct) ] if* ; inline
 
 MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
@@ -166,7 +180,7 @@ M: struct-class heap-size
 
 ! class definition
 
-: struct-prototype ( class -- prototype )
+: make-struct-prototype ( class -- prototype )
     [ heap-size <byte-array> ]
     [ memory>struct ]
     [ struct-slots ] tri
@@ -188,14 +202,17 @@ M: struct-class heap-size
     [ "struct-size" set-word-prop ]
     [ "struct-align" set-word-prop ] tri-curry*
     [ tri ] 3curry
-    [ dup struct-prototype "prototype" set-word-prop ]
+    [ dup make-struct-prototype "prototype" set-word-prop ]
     [ (struct-methods) ] tri ;
 
 : check-struct-slots ( slots -- )
     [ c-type>> c-type drop ] each ;
 
 : (define-struct-class) ( class slots offsets-quot -- )
-    [ drop struct f define-tuple-class ]
+    [ 
+        [ struct-must-have-slots ]
+        [ drop struct f define-tuple-class ] if-empty
+    ]
     swap '[
         make-slots dup
         [ check-struct-slots ] _ [ struct-align [ align ] keep ] tri
@@ -236,9 +253,9 @@ SYNTAX: STRUCT:
 SYNTAX: UNION-STRUCT:
     parse-struct-definition define-union-struct-class ;
 
+SYNTAX: S{
+    scan-word dup struct-slots parse-tuple-literal-slots parsed ;
+
 USING: vocabs vocabs.loader ;
 
 "prettyprint" vocab [ "classes.struct.prettyprint" require ] when
-
-SYNTAX: S{
-    scan-word dup struct-slots parse-tuple-literal-slots parsed ;

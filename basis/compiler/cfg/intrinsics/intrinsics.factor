@@ -10,6 +10,8 @@ compiler.cfg.intrinsics.float
 compiler.cfg.intrinsics.slots
 compiler.cfg.intrinsics.misc
 compiler.cfg.comparisons ;
+QUALIFIED: alien
+QUALIFIED: alien.accessors
 QUALIFIED: kernel
 QUALIFIED: arrays
 QUALIFIED: byte-arrays
@@ -20,7 +22,6 @@ QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
 QUALIFIED: math.integers.private
 QUALIFIED: math.libm
-QUALIFIED: alien.accessors
 IN: compiler.cfg.intrinsics
 
 {
@@ -54,6 +55,7 @@ IN: compiler.cfg.intrinsics
     byte-arrays:<byte-array>
     byte-arrays:(byte-array)
     kernel:<wrapper>
+    alien:<displaced-alien>
     alien.accessors:alien-unsigned-1
     alien.accessors:set-alien-unsigned-1
     alien.accessors:alien-signed-1
@@ -144,6 +146,7 @@ IN: compiler.cfg.intrinsics
         { \ byte-arrays:<byte-array> [ emit-<byte-array> ] }
         { \ byte-arrays:(byte-array) [ emit-(byte-array) ] }
         { \ kernel:<wrapper> [ emit-simple-allot ] }
+        { \ alien:<displaced-alien> [ emit-<displaced-alien> ] }
         { \ alien.accessors:alien-unsigned-1 [ 1 emit-alien-unsigned-getter ] }
         { \ alien.accessors:set-alien-unsigned-1 [ 1 emit-alien-integer-setter ] }
         { \ alien.accessors:alien-signed-1 [ 1 emit-alien-signed-getter ] }

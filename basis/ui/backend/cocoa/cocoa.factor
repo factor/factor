@@ -211,7 +211,7 @@ CLASS: {
     { +name+ "FactorApplicationDelegate" }
 }
 
-{  "applicationDidUpdate:" "void" { "id" "SEL" "id" }
+{ "applicationDidUpdate:" "void" { "id" "SEL" "id" }
     [ 3drop reset-run-loop ]
 } ;
 

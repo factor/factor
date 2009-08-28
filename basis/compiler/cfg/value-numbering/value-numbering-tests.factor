@@ -870,6 +870,63 @@ cell 8 = [
     ] unit-test
 ] when
 
+! Displaced alien optimizations
+3 vreg-counter set-global
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 2 16 }
+        T{ ##box-displaced-alien f 1 2 0 }
+        T{ ##unbox-any-c-ptr f 4 0 }
+        T{ ##add-imm f 3 4 16 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 2 16 }
+        T{ ##box-displaced-alien f 1 2 0 }
+        T{ ##unbox-any-c-ptr f 3 1 }
+    } value-numbering-step
+] unit-test
+
+4 vreg-counter set-global
+
+[
+    {
+        T{ ##box-alien f 0 1 }
+        T{ ##load-immediate f 2 16 }
+        T{ ##box-displaced-alien f 3 2 0 }
+        T{ ##copy f 5 1 any-rep }
+        T{ ##add-imm f 4 5 16 }
+    }
+] [
+    {
+        T{ ##box-alien f 0 1 }
+        T{ ##load-immediate f 2 16 }
+        T{ ##box-displaced-alien f 3 2 0 }
+        T{ ##unbox-any-c-ptr f 4 3 }
+    } value-numbering-step
+] unit-test
+
+3 vreg-counter set-global
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 2 0 }
+        T{ ##copy f 3 0 any-rep }
+        T{ ##replace f 3 D 1 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 2 0 }
+        T{ ##box-displaced-alien f 3 2 0 }
+        T{ ##replace f 3 D 1 }
+    } value-numbering-step
+] unit-test
+
 ! Branch folding
 [
     {
@@ -1301,3 +1358,4 @@ V{
 ] unit-test
 
 [ f ] [ 1 get instructions>> [ ##peek? ] any? ] unit-test
+

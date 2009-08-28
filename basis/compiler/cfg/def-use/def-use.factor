@@ -21,6 +21,7 @@ M: ##slot temp-vregs temp>> 1array ;
 M: ##set-slot temp-vregs temp>> 1array ;
 M: ##string-nth temp-vregs temp>> 1array ;
 M: ##set-string-nth-fast temp-vregs temp>> 1array ;
+M: ##box-displaced-alien temp-vregs temp>> 1array ;
 M: ##compare temp-vregs temp>> 1array ;
 M: ##compare-imm temp-vregs temp>> 1array ;
 M: ##compare-float temp-vregs temp>> 1array ;
