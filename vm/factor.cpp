@@ -5,18 +5,10 @@ namespace factor
 
 factorvm *vm;
 
-unordered_map<long,factorvm*> thread_vms;
-
-factorvm *lookup_vm(unsigned long threadid)
+void init_globals()
 {
-	return thread_vms[threadid];
+	init_platform_globals();
 }
-
-void register_vm(unsigned long threadid, factorvm *thevm)
-{
-	thread_vms[threadid] = thevm;
-}
-
 
 void factorvm::default_parameters(vm_parameters *p)
 {
@@ -217,7 +209,6 @@ void factorvm::factor_sleep(long us)
 
 void factorvm::start_standalone_factor(int argc, vm_char **argv)
 {
-	register_vm(thread_id(),this);
 	vm_parameters p;
 	default_parameters(&p);
 	init_parameters_from_args(&p,argc,argv);
@@ -234,6 +225,7 @@ struct startargs {
 void* start_standalone_factor_thread(void *arg) 
 {
 	factorvm *newvm = new factorvm;
+	register_vm_with_thread(newvm);
 	startargs *args = (startargs*) arg;
 	newvm->start_standalone_factor(args->argc, args->argv);
 	return 0;
@@ -244,6 +236,7 @@ VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {
 	factorvm *newvm = new factorvm;
 	vm = newvm;
+	register_vm_with_thread(newvm);
 	return newvm->start_standalone_factor(argc,argv);
 }
 

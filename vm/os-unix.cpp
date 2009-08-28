@@ -17,10 +17,26 @@ THREADHANDLE start_thread(void *(*start_routine)(void *),void *args)
 	return thread;
 }
 
-unsigned long thread_id(){
-	return pthread_self();
+
+pthread_key_t tlsKey = 0;
+
+void init_platform_globals()
+{
+	if (pthread_key_create(&tlsKey, NULL) != 0){
+		fatal_error("pthread_key_create() failed",0);
+	}
+
 }
 
+void register_vm_with_thread(factorvm *vm)
+{
+	pthread_setspecific(tlsKey,vm);
+}
+
+factorvm *tls_vm()
+{
+	return (factorvm*)pthread_getspecific(tlsKey);
+}
 
 static void *null_dll;
 
