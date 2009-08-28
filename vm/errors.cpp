@@ -165,7 +165,7 @@ void factorvm::memory_signal_handler_impl()
 
 void memory_signal_handler_impl()
 {
-	SIGNAL_VM_PTR()->misc_signal_handler_impl();
+	SIGNAL_VM_PTR()->memory_signal_handler_impl();
 }
 
 void factorvm::misc_signal_handler_impl()
