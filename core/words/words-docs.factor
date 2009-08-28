@@ -219,7 +219,11 @@ HELP: <word> ( name vocab -- word )
 HELP: gensym
 { $values { "word" word } }
 { $description "Creates an uninterned word that is not equal to any other word in the system." }
-{ $examples { $unchecked-example "gensym ." "G:260561" } }
+{ $examples { $example "USING: prettyprint words ;"
+    "gensym ."
+    "( gensym )"
+    }
+}
 { $notes "Gensyms are often used as placeholder values that have no meaning of their own but must be unique. For example, the compiler uses gensyms to label sections of code." } ;
 
 HELP: bootstrapping?
