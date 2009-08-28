@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors images images.loader io.pathnames kernel namespaces
-opengl opengl.gl opengl.textures sequences strings ui ui.gadgets
-ui.gadgets.panes ui.render ui.images ;
+USING: accessors images images.loader io.pathnames kernel
+models namespaces opengl opengl.gl opengl.textures sequences
+strings ui ui.gadgets ui.gadgets.panes ui.images ui.render
+constructors ;
 IN: images.viewer
 
 TUPLE: image-gadget < gadget image texture ;
@@ -13,7 +14,20 @@ M: image-gadget pref-dim* image>> dim>> ;
     dup texture>> [ ] [ dup image>> { 0 0 } <texture> >>texture texture>> ] ?if ;
 
 M: image-gadget draw-gadget* ( gadget -- )
-    [ dim>> ] [ image-gadget-texture ] bi draw-scaled-texture ;
+    dup image>> [
+        [ dim>> ] [ image-gadget-texture ] bi draw-scaled-texture
+    ] [
+        drop
+    ] if ;
+
+TUPLE: image-control < image-gadget ;
+
+CONSTRUCTOR: image-control ( model -- image-control ) ;
+
+M: image-control pref-dim* image>> [ dim>> ] [ { 640 480 } ] if* ;
+
+M: image-control model-changed
+    swap value>> >>image relayout ;
 
 ! Todo: delete texture on ungraft
 
