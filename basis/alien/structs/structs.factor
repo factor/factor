@@ -58,7 +58,6 @@ M: struct-type stack-size
     [ define-field ] each ; deprecated
 
 : define-union ( name members -- )
-    [ expand-constants ] map
     [ [ heap-size ] [ max ] map-reduce ] keep
     compute-struct-align f struct-type (define-struct) ; deprecated
 
