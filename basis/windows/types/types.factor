@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax namespaces kernel words
 sequences math math.bitwise math.vectors colors
-io.encodings.utf16n classes.struct ;
+io.encodings.utf16n classes.struct accessors ;
 IN: windows.types
 
 TYPEDEF: char                CHAR
@@ -242,11 +242,11 @@ STRUCT: WNDCLASSEX
     { lpszClassName LPCTSTR }
     { hIconSm HICON } ;
 
-C-STRUCT: RECT
-    { "LONG" "left" }
-    { "LONG" "top" }
-    { "LONG" "right" }
-    { "LONG" "bottom" } ;
+STRUCT: RECT
+    { left LONG }
+    { top LONG }
+    { right LONG }
+    { bottom LONG } ;
 
 C-STRUCT: PAINTSTRUCT
     { "HDC" " hdc" }
@@ -336,12 +336,9 @@ C-STRUCT: RECT
     { "LONG" "bottom" } ;
 
 : <RECT> ( loc dim -- RECT )
-    over v+
-    "RECT" <c-object>
-    over first over set-RECT-right
-    swap second over set-RECT-bottom
-    over first over set-RECT-left
-    swap second over set-RECT-top ;
+    [ RECT <struct> ] 2dip
+    [ drop [ first >>left ] [ second >>top ] bi ]
+    [ v+ [ first >>right ] [ second >>bottom ] bi ] 2bi ;
 
 TYPEDEF: RECT* PRECT
 TYPEDEF: RECT* LPRECT
