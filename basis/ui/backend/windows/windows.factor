@@ -503,14 +503,15 @@ SYMBOL: nc-buttons
     ] if ;
 
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
-    "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
-    "TRACKMOUSEEVENT" heap-size over set-TRACKMOUSEEVENT-cbSize ;
+    TRACKMOUSEEVENT <struct>
+        swap >>hwndTrack
+        TRACKMOUSEEVENT heap-size >>cbSize ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
     2nip
     over make-TRACKMOUSEEVENT
-    TME_LEAVE over set-TRACKMOUSEEVENT-dwFlags
-    0 over set-TRACKMOUSEEVENT-dwHoverTime
+        TME_LEAVE >>dwFlags
+        0 >>dwHoverTime
     TrackMouseEvent drop
     >lo-hi swap window move-hand fire-motion ;
 
