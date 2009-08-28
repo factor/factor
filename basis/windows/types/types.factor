@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax namespaces kernel words
 sequences math math.bitwise math.vectors colors
-io.encodings.utf16n ;
+io.encodings.utf16n classes.struct ;
 IN: windows.types
 
 TYPEDEF: char                CHAR
@@ -301,33 +301,33 @@ C-STRUCT: MSG
 
 TYPEDEF: MSG*                LPMSG
 
-C-STRUCT: PIXELFORMATDESCRIPTOR
-    { "WORD" "nSize" }
-    { "WORD" "nVersion" }
-    { "DWORD" "dwFlags" }
-    { "BYTE" "iPixelType" }
-    { "BYTE" "cColorBits" }
-    { "BYTE" "cRedBits" }
-    { "BYTE" "cRedShift" }
-    { "BYTE" "cGreenBits" }
-    { "BYTE" "cGreenShift" }
-    { "BYTE" "cBlueBits" }
-    { "BYTE" "cBlueShift" }
-    { "BYTE" "cAlphaBits" }
-    { "BYTE" "cAlphaShift" }
-    { "BYTE" "cAccumBits" }
-    { "BYTE" "cAccumRedBits" }
-    { "BYTE" "cAccumGreenBits" }
-    { "BYTE" "cAccumBlueBits" }
-    { "BYTE" "cAccumAlphaBits" }
-    { "BYTE" "cDepthBits" }
-    { "BYTE" "cStencilBits" }
-    { "BYTE" "cAuxBuffers" }
-    { "BYTE" "iLayerType" }
-    { "BYTE" "bReserved" }
-    { "DWORD" "dwLayerMask" }
-    { "DWORD" "dwVisibleMask" }
-    { "DWORD" "dwDamageMask" } ;
+STRUCT: PIXELFORMATDESCRIPTOR
+    { nSize WORD }
+    { nVersion WORD }
+    { dwFlags DWORD }
+    { iPixelType BYTE }
+    { cColorBits BYTE }
+    { cRedBits BYTE }
+    { cRedShift BYTE }
+    { cGreenBits BYTE }
+    { cGreenShift BYTE }
+    { cBlueBits BYTE }
+    { cBlueShift BYTE }
+    { cAlphaBits BYTE }
+    { cAlphaShift BYTE }
+    { cAccumBits BYTE }
+    { cAccumRedBits BYTE }
+    { cAccumGreenBits BYTE }
+    { cAccumBlueBits BYTE }
+    { cAccumAlphaBits BYTE }
+    { cDepthBits BYTE }
+    { cStencilBits BYTE }
+    { cAuxBuffers BYTE }
+    { iLayerType BYTE }
+    { bReserved BYTE }
+    { dwLayerMask DWORD }
+    { dwVisibleMask DWORD }
+    { dwDamageMask DWORD } ;
 
 C-STRUCT: RECT
     { "LONG" "left" }

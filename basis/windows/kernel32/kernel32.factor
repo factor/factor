@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel windows.types multiline ;
+USING: alien alien.syntax kernel windows.types multiline
+classes.struct ;
 IN: windows.kernel32
 
 CONSTANT: MAX_PATH 260
@@ -215,15 +216,15 @@ C-STRUCT: OVERLAPPED
     { "DWORD" "offset-high" }
     { "HANDLE" "event" } ;
 
-C-STRUCT: SYSTEMTIME
-    { "WORD" "wYear" }
-    { "WORD" "wMonth" }
-    { "WORD" "wDayOfWeek" }
-    { "WORD" "wDay" }
-    { "WORD" "wHour" }
-    { "WORD" "wMinute" }
-    { "WORD" "wSecond" }
-    { "WORD" "wMilliseconds" } ;
+STRUCT: SYSTEMTIME
+    { wYear WORD }
+    { wMonth WORD }
+    { wDayOfWeek WORD }
+    { wDay WORD }
+    { wHour WORD }
+    { wMinute WORD }
+    { wSecond WORD }
+    { wMilliseconds WORD } ;
 
 C-STRUCT: TIME_ZONE_INFORMATION
     { "LONG" "Bias" }
@@ -234,74 +235,74 @@ C-STRUCT: TIME_ZONE_INFORMATION
     { "SYSTEMTIME" "DaylightDate" }
     { "LONG" "DaylightBias" } ;
 
-C-STRUCT: FILETIME
-    { "DWORD" "dwLowDateTime" }
-    { "DWORD" "dwHighDateTime" } ;
+STRUCT: FILETIME
+    { dwLowDateTime DWORD }
+    { dwHighDateTime DWORD } ;
 
-C-STRUCT: STARTUPINFO
-    { "DWORD" "cb" }
-    { "LPTSTR" "lpReserved" }
-    { "LPTSTR" "lpDesktop" }
-    { "LPTSTR" "lpTitle" }
-    { "DWORD" "dwX" }
-    { "DWORD" "dwY" }
-    { "DWORD" "dwXSize" }
-    { "DWORD" "dwYSize" }
-    { "DWORD" "dwXCountChars" }
-    { "DWORD" "dwYCountChars" }
-    { "DWORD" "dwFillAttribute" }
-    { "DWORD" "dwFlags" }
-    { "WORD" "wShowWindow" }
-    { "WORD" "cbReserved2" }
-    { "LPBYTE" "lpReserved2" }
-    { "HANDLE" "hStdInput" }
-    { "HANDLE" "hStdOutput" }
-    { "HANDLE" "hStdError" } ;
+STRUCT: STARTUPINFO
+    { cb DWORD }
+    { lpReserved LPTSTR }
+    { lpDesktop LPTSTR }
+    { lpTitle LPTSTR }
+    { dwX DWORD }
+    { dwY DWORD }
+    { dwXSize DWORD }
+    { dwYSize DWORD }
+    { dwXCountChars DWORD }
+    { dwYCountChars DWORD }
+    { dwFillAttribute DWORD }
+    { dwFlags DWORD }
+    { wShowWindow WORD }
+    { cbReserved2 WORD }
+    { lpReserved2 LPBYTE }
+    { hStdInput HANDLE }
+    { hStdOutput HANDLE }
+    { hStdError HANDLE } ;
 
 TYPEDEF: void* LPSTARTUPINFO
 
-C-STRUCT: PROCESS_INFORMATION
-    { "HANDLE" "hProcess" }
-    { "HANDLE" "hThread" }
-    { "DWORD" "dwProcessId" }
-    { "DWORD" "dwThreadId" } ;
+STRUCT: PROCESS_INFORMATION
+    { hProcess HANDLE }
+    { hThread HANDLE }
+    { dwProcessId DWORD }
+    { dwThreadId DWORD } ;
 
-C-STRUCT: SYSTEM_INFO
-    { "DWORD" "dwOemId" }
-    { "DWORD" "dwPageSize" }
-    { "LPVOID" "lpMinimumApplicationAddress" }
-    { "LPVOID" "lpMaximumApplicationAddress" }
-    { "DWORD_PTR" "dwActiveProcessorMask" }
-    { "DWORD" "dwNumberOfProcessors" }
-    { "DWORD" "dwProcessorType" }
-    { "DWORD" "dwAllocationGranularity" }
-    { "WORD" "wProcessorLevel" }
-    { "WORD" "wProcessorRevision" } ;
+STRUCT: SYSTEM_INFO
+    { dwOemId DWORD }
+    { dwPageSize DWORD }
+    { lpMinimumApplicationAddress LPVOID }
+    { lpMaximumApplicationAddress LPVOID }
+    { dwActiveProcessorMask DWORD_PTR }
+    { dwNumberOfProcessors DWORD }
+    { dwProcessorType DWORD }
+    { dwAllocationGranularity DWORD }
+    { wProcessorLevel WORD }
+    { wProcessorRevision WORD } ;
 
 TYPEDEF: void* LPSYSTEM_INFO
 
-C-STRUCT: MEMORYSTATUS
-    { "DWORD" "dwLength" }
-    { "DWORD" "dwMemoryLoad" }
-    { "SIZE_T" "dwTotalPhys" }
-    { "SIZE_T" "dwAvailPhys" }
-    { "SIZE_T" "dwTotalPageFile" }
-    { "SIZE_T" "dwAvailPageFile" }
-    { "SIZE_T" "dwTotalVirtual" }
-    { "SIZE_T" "dwAvailVirtual" } ;
+STRUCT: MEMORYSTATUS
+    { dwLength DWORD }
+    { dwMemoryLoad DWORD }
+    { dwTotalPhys SIZE_T }
+    { dwAvailPhys SIZE_T }
+    { dwTotalPageFile SIZE_T }
+    { dwAvailPageFile SIZE_T }
+    { dwTotalVirtual SIZE_T }
+    { dwAvailVirtual SIZE_T } ;
 
 TYPEDEF: void* LPMEMORYSTATUS
 
-C-STRUCT: MEMORYSTATUSEX
-    { "DWORD" "dwLength" }
-    { "DWORD" "dwMemoryLoad" }
-    { "DWORDLONG" "ullTotalPhys" }
-    { "DWORDLONG" "ullAvailPhys" }
-    { "DWORDLONG" "ullTotalPageFile" }
-    { "DWORDLONG" "ullAvailPageFile" }
-    { "DWORDLONG" "ullTotalVirtual" }
-    { "DWORDLONG" "ullAvailVirtual" }
-    { "DWORDLONG" "ullAvailExtendedVirtual" } ;
+STRUCT: MEMORYSTATUSEX
+    { dwLength DWORD }
+    { dwMemoryLoad DWORD }
+    { ullTotalPhys DWORDLONG }
+    { ullAvailPhys DWORDLONG }
+    { ullTotalPageFile DWORDLONG }
+    { ullAvailPageFile DWORDLONG }
+    { ullTotalVirtual DWORDLONG }
+    { ullAvailVirtual DWORDLONG }
+    { ullAvailExtendedVirtual DWORDLONG } ;
 
 TYPEDEF: void* LPMEMORYSTATUSEX
 
@@ -707,17 +708,17 @@ C-STRUCT: WIN32_FIND_DATA
     { { "TCHAR" 260 } "cFileName" }
     { { "TCHAR" 14 } "cAlternateFileName" } ;
 
-C-STRUCT: BY_HANDLE_FILE_INFORMATION
-    { "DWORD" "dwFileAttributes" }
-    { "FILETIME" "ftCreationTime" }
-    { "FILETIME" "ftLastAccessTime" }
-    { "FILETIME" "ftLastWriteTime" }
-    { "DWORD" "dwVolumeSerialNumber" }
-    { "DWORD" "nFileSizeHigh" }
-    { "DWORD" "nFileSizeLow" }
-    { "DWORD" "nNumberOfLinks" }
-    { "DWORD" "nFileIndexHigh" }
-    { "DWORD" "nFileIndexLow" } ;
+STRUCT: BY_HANDLE_FILE_INFORMATION
+    { dwFileAttributes DWORD }
+    { ftCreationTime FILETIME }
+    { ftLastAccessTime FILETIME }
+    { ftLastWriteTime FILETIME }
+    { dwVolumeSerialNumber DWORD }
+    { nFileSizeHigh DWORD }
+    { nFileSizeLow DWORD }
+    { nNumberOfLinks DWORD }
+    { nFileIndexHigh DWORD }
+    { nFileIndexLow DWORD } ;
 
 TYPEDEF: WIN32_FIND_DATA* PWIN32_FIND_DATA
 TYPEDEF: WIN32_FIND_DATA* LPWIN32_FIND_DATA
@@ -737,10 +738,10 @@ TYPEDEF: PFILETIME LPFILETIME
 
 TYPEDEF: int GET_FILEEX_INFO_LEVELS
 
-C-STRUCT: SECURITY_ATTRIBUTES
-    { "DWORD" "nLength" }
-    { "LPVOID" "lpSecurityDescriptor" }
-    { "BOOL" "bInheritHandle" } ;
+STRUCT: SECURITY_ATTRIBUTES
+    { nLength DWORD }
+    { lpSecurityDescriptor LPVOID }
+    { bInheritHandle BOOL } ;
 
 CONSTANT: HANDLE_FLAG_INHERIT 1
 CONSTANT: HANDLE_FLAG_PROTECT_FROM_CLOSE 2
