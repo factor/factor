@@ -354,18 +354,18 @@ M: ##sar rewrite \ ##sar-imm rewrite-arithmetic ;
 : box-displaced-alien? ( expr -- ? )
     op>> \ ##box-displaced-alien eq? ;
 
-! ##box-displaced-alien f 1 2 3
-! ##unbox-any-c-ptr 4 1
+! ##box-displaced-alien f 1 2 3 <class>
+! ##unbox-c-ptr 4 1 <class>
 ! =>
-! ##box-displaced-alien f 1 2 3
-! ##unbox-any-c-ptr 5 3
+! ##box-displaced-alien f 1 2 3 <class>
+! ##unbox-c-ptr 5 3 <class>
 ! ##add 4 5 2
 
 :: rewrite-unbox-displaced-alien ( insn expr -- insns )
     [
         next-vreg :> temp
-        temp expr in2>> vn>vreg insn temp>> ##unbox-any-c-ptr
-        insn dst>> temp expr in1>> vn>vreg ##add
+        temp expr base>> vn>vreg expr base-class>> insn temp>> ##unbox-c-ptr
+        insn dst>> temp expr displacement>> vn>vreg ##add
     ] { } make ;
 
 M: ##unbox-any-c-ptr rewrite
