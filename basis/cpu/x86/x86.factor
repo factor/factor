@@ -203,6 +203,8 @@ M: x86 %add-float nip ADDSD ;
 M: x86 %sub-float nip SUBSD ;
 M: x86 %mul-float nip MULSD ;
 M: x86 %div-float nip DIVSD ;
+M: x86 %min-float nip MINSD ;
+M: x86 %max-float nip MAXSD ;
 M: x86 %sqrt SQRTSD ;
 
 M: x86 %integer>float CVTSI2SD ;
@@ -572,3 +574,8 @@ M: x86 small-enough? ( n -- ? )
     #! stack frame set up, and we want to read the frame
     #! set up by the caller.
     stack-frame get total-size>> + stack@ ;
+
+: enable-sse2 ( -- )
+    enable-float-intrinsics
+    enable-fsqrt
+    enable-float-min/max ;

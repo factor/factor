@@ -3,7 +3,7 @@
 USING: kernel sequences words fry generic accessors classes.tuple
 classes classes.algebra definitions stack-checker.state quotations
 classes.tuple.private math math.partial-dispatch math.private
-math.intervals layouts math.order vectors hashtables
+math.intervals math.floats.private layouts math.order vectors hashtables
 combinators effects generalizations assocs sets
 combinators.short-circuit sequences.private locals
 stack-checker namespaces compiler.tree.propagation.info ;
@@ -78,6 +78,16 @@ IN: compiler.tree.propagation.transforms
         ]
     ] [ f ] if
 ] "custom-inlining" set-word-prop
+
+{
+    { min [ float-min ] }
+    { max [ float-max ] }
+} [
+    '[
+        in-d>> first2 [ value-info class>> float class<= ] both?
+        [ _ ] [ f ] if
+    ] "custom-inlining" set-word-prop
+] assoc-each
 
 ! Generate more efficient code for common idiom
 \ clone [
