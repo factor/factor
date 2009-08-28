@@ -5,7 +5,7 @@ io.files.windows io.files.windows.nt kernel windows.kernel32
 windows.time windows accessors alien.c-types combinators
 generalizations system alien.strings io.encodings.utf16n
 sequences splitting windows.errors fry continuations destructors
-calendar ascii combinators.short-circuit locals ;
+calendar ascii combinators.short-circuit locals classes.struct ;
 IN: io.files.info.windows
 
 :: round-up-to ( n multiple -- n' )
@@ -57,35 +57,26 @@ TUPLE: windows-file-info < file-info attributes ;
 : BY_HANDLE_FILE_INFORMATION>file-info ( HANDLE_FILE_INFORMATION -- file-info )
     [ \ windows-file-info new ] dip
     {
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type >>type ]
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-attributes >>attributes ]
+        [ dwFileAttributes>> win32-file-type >>type ]
+        [ dwFileAttributes>> win32-file-attributes >>attributes ]
         [
-            [ BY_HANDLE_FILE_INFORMATION-nFileSizeLow ]
-            [ BY_HANDLE_FILE_INFORMATION-nFileSizeHigh ] bi >64bit >>size
+            [ nFileSizeLow>> ]
+            [ nFileSizeHigh>> ] bi >64bit >>size
         ]
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes >>permissions ]
-        [
-            BY_HANDLE_FILE_INFORMATION-ftCreationTime
-            FILETIME>timestamp >>created
-        ]
-        [
-            BY_HANDLE_FILE_INFORMATION-ftLastWriteTime
-            FILETIME>timestamp >>modified
-        ]
-        [
-            BY_HANDLE_FILE_INFORMATION-ftLastAccessTime
-            FILETIME>timestamp >>accessed
-        ]
-        ! [ BY_HANDLE_FILE_INFORMATION-nNumberOfLinks ]
+        [ dwFileAttributes>> >>permissions ]
+        [ ftCreationTime>> FILETIME>timestamp >>created ]
+        [ ftLastWriteTime>> FILETIME>timestamp >>modified ]
+        [ ftLastAccessTime>> FILETIME>timestamp >>accessed ]
+        ! [ nNumberOfLinks>> ]
         ! [
-          ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexLow ]
-          ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexHigh ] bi >64bit
+          ! [ nFileIndexLow>> ]
+          ! [ nFileIndexHigh>> ] bi >64bit
         ! ]
     } cleave ;
 
 : get-file-information ( handle -- BY_HANDLE_FILE_INFORMATION )
     [
-        "BY_HANDLE_FILE_INFORMATION" <c-object>
+        BY_HANDLE_FILE_INFORMATION <struct>
         [ GetFileInformationByHandle win32-error=0/f ] keep
     ] keep CloseHandle win32-error=0/f ;
 
@@ -197,10 +188,10 @@ M: winnt file-systems ( -- array )
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
-        normalize-path open-existing &dispose handle>>
-        "FILETIME" <c-object>
-        "FILETIME" <c-object>
-        "FILETIME" <c-object>
+        normalize-path open-read &dispose handle>>
+        FILETIME <struct>
+        FILETIME <struct>
+        FILETIME <struct>
         [ GetFileTime win32-error=0/f ] 3keep
         [ FILETIME>timestamp >local-time ] tri@
     ] with-destructors ;

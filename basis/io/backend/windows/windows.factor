@@ -4,7 +4,8 @@ USING: alien alien.c-types arrays destructors io io.backend
 io.buffers io.files io.ports io.binary io.timeouts system
 strings kernel math namespaces sequences windows.errors
 windows.kernel32 windows.shell32 windows.types windows.winsock
-splitting continuations math.bitwise accessors init sets assocs ;
+splitting continuations math.bitwise accessors init sets assocs
+classes.struct classes ;
 IN: io.backend.windows
 
 TUPLE: win32-handle < disposable handle ;
@@ -50,6 +51,5 @@ HOOK: add-completion io-backend ( port -- )
     } flags ; foldable
 
 : default-security-attributes ( -- obj )
-    "SECURITY_ATTRIBUTES" <c-object>
-    "SECURITY_ATTRIBUTES" heap-size
-    over set-SECURITY_ATTRIBUTES-nLength ;
+    SECURITY_ATTRIBUTES <struct>
+    dup class heap-size >>nLength ;
