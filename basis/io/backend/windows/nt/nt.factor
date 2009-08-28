@@ -3,7 +3,7 @@ destructors io io.backend io.ports io.timeouts io.backend.windows
 io.files.windows io.files.windows.nt io.files io.pathnames io.buffers
 io.streams.c io.streams.null libc kernel math namespaces sequences
 threads windows windows.errors windows.kernel32 strings splitting
-ascii system accessors locals ;
+ascii system accessors locals classes.struct combinators.short-circuit ;
 QUALIFIED: windows.winsock
 IN: io.backend.windows.nt
 
@@ -36,7 +36,7 @@ M: winnt add-completion ( win32-handle -- )
     handle>> master-completion-port get-global <completion-port> drop ;
 
 : eof? ( error -- ? )
-    [ ERROR_HANDLE_EOF = ] [ ERROR_BROKEN_PIPE = ] bi or ;
+    { [ ERROR_HANDLE_EOF = ] [ ERROR_BROKEN_PIPE = ] } 1|| ;
 
 : twiddle-thumbs ( overlapped port -- bytes-transferred )
     [
@@ -66,9 +66,9 @@ M: winnt add-completion ( win32-handle -- )
 
 : handle-overlapped ( us -- ? )
     wait-for-overlapped [
-        dup [
+        [
             [ drop GetLastError 1array ] dip resume-callback t
-        ] [ 2drop f ] if
+        ] [ drop f ] if*
     ] [ resume-callback t ] if ;
 
 M: win32-handle cancel-operation

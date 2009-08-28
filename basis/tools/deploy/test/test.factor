@@ -11,7 +11,9 @@ IN: tools.deploy.test
     ] with-directory ;
 
 : small-enough? ( n -- ? )
-    [ "test.image" temp-file file-info size>> ] [ cell 4 / * ] bi* <= ;
+    [ "test.image" temp-file file-info size>> ]
+    [ cell 4 / * cpu ppc? [ 100000 + ] when ] bi*
+    <= ;
 
 : run-temp-image ( -- )
     os macosx?
