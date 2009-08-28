@@ -232,10 +232,13 @@ ERROR: invalid-struct-slot token ;
     c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
 
+: scan-c-type ( -- c-type )
+    scan dup "{" = [ drop \ } parse-until >array ] when ;
+
 : parse-struct-slot ( -- slot )
     struct-slot-spec new
     scan >>name
-    scan [ >>c-type ] [ struct-slot-class >>class ] bi
+    scan-c-type [ >>c-type ] [ struct-slot-class >>class ] bi
     \ } parse-until [ dup empty? ] [ peel-off-attributes ] until drop ;
     
 : parse-struct-slots ( slots -- slots' more? )
