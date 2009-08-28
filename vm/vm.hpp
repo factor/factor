@@ -690,12 +690,11 @@ struct factorvm {
 };
 
 
-extern factorvm *lookup_vm(unsigned long threadid);
-extern void register_vm(unsigned long threadid,factorvm *vm);
+// #define FACTOR_SINGLE_THREADED_SINGLETON
+#define FACTOR_SINGLE_THREADED_TESTING
 
-#define FACTOR_SINGLE_THREADED
-
-#ifdef FACTOR_SINGLE_THREADED
+#ifdef FACTOR_SINGLE_THREADED_SINGLETON
+/* calls are dispatched using the singleton */
   extern factorvm *vm;
   #define PRIMITIVE_GETVM() vm
   #define PRIMITIVE_OVERFLOW_GETVM() vm
@@ -704,13 +703,14 @@ extern void register_vm(unsigned long threadid,factorvm *vm);
   #define SIGNAL_VM_PTR() vm
 #endif
 
-#ifdef FACTOR_TESTING_MULTITHREADED
+#ifdef FACTOR_SINGLE_THREADED_TESTING
+/* calls are dispatched as per multithreaded, but checked against singleton */
   extern factorvm *vm;
   #define PRIMITIVE_GETVM() ((factorvm*)myvm)
   #define PRIMITIVE_OVERFLOW_GETVM() vm
   #define VM_PTR myvm
   #define ASSERTVM() assert(vm==myvm)
-  #define SIGNAL_VM_PTR() lookup_vm(thread_id())
+  #define SIGNAL_VM_PTR() tls_vm()
 #endif
 
 #ifdef FACTOR_MULTITHREADED
@@ -718,7 +718,7 @@ extern void register_vm(unsigned long threadid,factorvm *vm);
   #define PRIMITIVE_OVERFLOW_GETVM() ((factorvm*)myvm)
   #define VM_PTR myvm
   #define ASSERTVM() 
-  #define SIGNAL_VM_PTR() lookup_vm(thread_id())
+  #define SIGNAL_VM_PTR() tls_vm()
 #endif
 
 }

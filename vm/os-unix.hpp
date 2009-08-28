@@ -45,7 +45,7 @@ typedef char symbol_char;
 typedef pthread_t THREADHANDLE;
 
 THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
-unsigned long thread_id();
+pthread_t thread_id();
 
 void unix_init_signals();
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);
@@ -54,5 +54,9 @@ void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 s64 current_micros();
 void sleep_micros(cell usec);
 
+void init_platform_globals();
+struct factorvm;
+void register_vm_with_thread(factorvm *vm);
+factorvm *tls_vm();
 void open_console();
 }
