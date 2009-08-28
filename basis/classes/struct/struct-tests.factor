@@ -187,7 +187,7 @@ STRUCT: struct-test-array-slots
 ] unit-test
 
 STRUCT: struct-test-optimization
-    { x int[3] } { y int } ;
+    { x { "int" 3 } } { y int } ;
 
 [ t ] [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 [ t ] [
