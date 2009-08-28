@@ -39,7 +39,9 @@ UNION: two-operand-insn
     ##add-float
     ##sub-float
     ##mul-float
-    ##div-float ;
+    ##div-float
+    ##min-float
+    ##max-float ;
 
 GENERIC: convert-two-operand* ( insn -- )
 
