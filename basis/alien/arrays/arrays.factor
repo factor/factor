@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.strings alien.c-types alien.accessors alien.structs
 arrays words sequences math kernel namespaces fry libc cpu.architecture
-io.encodings.utf8 ;
+io.encodings.utf8 accessors ;
 IN: alien.arrays
 
 UNION: value-type array struct-type ;
@@ -13,7 +13,10 @@ M: array c-type-class drop object ;
 
 M: array c-type-boxed-class drop object ;
 
-M: array heap-size unclip [ product ] [ heap-size ] bi* * ;
+: array-length ( seq -- n )
+    [ dup word? [ def>> call( -- object ) ] when ] [ * ] map-reduce ;
+
+M: array heap-size unclip [ array-length ] [ heap-size ] bi* * ;
 
 M: array c-type-align first c-type-align ;
 
@@ -31,7 +34,7 @@ M: array stack-size drop "void*" stack-size ;
 
 M: array c-type-boxer-quot
     unclip
-    [ product ]
+    [ array-length ]
     [ [ require-c-type-arrays ] keep ] bi*
     [ <c-type-direct-array> ] 2curry ;
 
