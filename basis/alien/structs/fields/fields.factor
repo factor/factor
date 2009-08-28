@@ -16,7 +16,7 @@ TUPLE: field-spec name offset type reader writer ;
     field-spec new
         0 >>offset
         swap >>name
-        swap expand-constants >>type
+        swap >>type
         3dup name>> swap reader-word >>reader
         3dup name>> swap writer-word >>writer
     2nip ;

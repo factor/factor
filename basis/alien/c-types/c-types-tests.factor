@@ -4,7 +4,7 @@ IN: alien.c-types.tests
 
 CONSTANT: xyz 123
 
-[ { "blah" 123 } ] [ { "blah" xyz } expand-constants ] unit-test
+[ 492 ] [ { "int" xyz } heap-size ] unit-test
 
 [ -1 ] [ -1 <char> *char ] unit-test
 [ -1 ] [ -1 <short> *short ] unit-test
