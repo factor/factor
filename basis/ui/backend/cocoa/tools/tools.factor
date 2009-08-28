@@ -30,7 +30,7 @@ CLASS: {
 }
 
 { "applicationShouldHandleReopen:hasVisibleWindows:" "int" { "id" "SEL" "id" "int" }
-    [ [ 3drop ] dip 0 = [ show-listener ] when 0 ]
+    [ [ 3drop ] dip 0 = [ show-listener ] when 1 ]
 }
 
 { "factorListener:" "id" { "id" "SEL" "id" }
