@@ -25,6 +25,7 @@ M: ##slot temp-vreg-reps drop { int-rep } ;
 M: ##set-slot temp-vreg-reps drop { int-rep } ;
 M: ##string-nth temp-vreg-reps drop { int-rep } ;
 M: ##set-string-nth-fast temp-vreg-reps drop { int-rep } ;
+M: ##box-displaced-alien temp-vreg-reps drop { int-rep } ;
 M: ##compare temp-vreg-reps drop { int-rep } ;
 M: ##compare-imm temp-vreg-reps drop { int-rep } ;
 M: ##compare-float temp-vreg-reps drop { int-rep } ;
