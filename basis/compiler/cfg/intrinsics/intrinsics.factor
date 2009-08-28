@@ -21,6 +21,7 @@ QUALIFIED: strings.private
 QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
 QUALIFIED: math.integers.private
+QUALIFIED: math.floats.private
 QUALIFIED: math.libm
 IN: compiler.cfg.intrinsics
 
@@ -98,6 +99,12 @@ IN: compiler.cfg.intrinsics
 : enable-fsqrt ( -- )
     \ math.libm:fsqrt t "intrinsic" set-word-prop ;
 
+: enable-float-min/max ( -- )
+    {
+        math.floats.private:float-min
+        math.floats.private:float-max
+    } [ t "intrinsic" set-word-prop ] each ;
+
 : enable-fixnum-log2 ( -- )
     \ math.integers.private:fixnum-log2 t "intrinsic" set-word-prop ;
 
@@ -136,6 +143,8 @@ IN: compiler.cfg.intrinsics
         { \ math.private:float= [ drop cc= emit-float-comparison ] }
         { \ math.private:float>fixnum [ drop emit-float>fixnum ] }
         { \ math.private:fixnum>float [ drop emit-fixnum>float ] }
+        { \ math.floats.private:float-min [ drop [ ^^min-float ] emit-float-op ] }
+        { \ math.floats.private:float-max [ drop [ ^^max-float ] emit-float-op ] }
         { \ math.libm:fsqrt [ drop emit-fsqrt ] }
         { \ slots.private:slot [ emit-slot ] }
         { \ slots.private:set-slot [ emit-set-slot ] }

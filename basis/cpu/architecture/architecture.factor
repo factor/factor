@@ -110,6 +110,8 @@ HOOK: %add-float cpu ( dst src1 src2 -- )
 HOOK: %sub-float cpu ( dst src1 src2 -- )
 HOOK: %mul-float cpu ( dst src1 src2 -- )
 HOOK: %div-float cpu ( dst src1 src2 -- )
+HOOK: %min-float cpu ( dst src1 src2 -- )
+HOOK: %max-float cpu ( dst src1 src2 -- )
 HOOK: %sqrt cpu ( dst src -- )
 
 HOOK: %integer>float cpu ( dst src -- )
