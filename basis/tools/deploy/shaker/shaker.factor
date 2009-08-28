@@ -1,12 +1,13 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors io.backend io.streams.c init fry namespaces
-math make assocs kernel parser parser.notes lexer strings.parser
-vocabs sequences sequences.private words memory kernel.private
-continuations io vocabs.loader system strings sets vectors quotations
-byte-arrays sorting compiler.units definitions generic
-generic.standard generic.single tools.deploy.config combinators
-classes classes.builtin slots.private grouping ;
+USING: arrays accessors io.backend io.streams.c init fry
+namespaces math make assocs kernel parser parser.notes lexer
+strings.parser vocabs sequences sequences.deep sequences.private
+words memory kernel.private continuations io vocabs.loader
+system strings sets vectors quotations byte-arrays sorting
+compiler.units definitions generic generic.standard
+generic.single tools.deploy.config combinators classes
+classes.builtin slots.private grouping ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: command-line
 QUALIFIED: compiler.errors
@@ -120,6 +121,7 @@ IN: tools.deploy.shaker
                 "combination"
                 "compiled-generic-uses"
                 "compiled-uses"
+                "constant"
                 "constraints"
                 "custom-inlining"
                 "decision-tree"
@@ -145,6 +147,7 @@ IN: tools.deploy.shaker
                 "local-writer"
                 "local-writer?"
                 "local?"
+                "low-order"
                 "macro"
                 "members"
                 "memo-quot"
@@ -456,11 +459,13 @@ SYMBOL: deploy-vocab
     [ "method-generic" word-prop ] bi
     next-method ;
 
+: calls-next-method? ( method -- ? )
+    def>> flatten \ (call-next-method) swap memq? ;
+
 : compute-next-methods ( -- )
     [ standard-generic? ] instances [
-        "methods" word-prop [
-            nip dup next-method* "next-method" set-word-prop
-        ] assoc-each
+        "methods" word-prop values [ calls-next-method? ] filter
+        [ dup next-method* "next-method" set-word-prop ] each
     ] each
     "vocab:tools/deploy/shaker/next-methods.factor" run-file ;
 
