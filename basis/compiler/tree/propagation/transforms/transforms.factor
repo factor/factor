@@ -207,12 +207,14 @@ CONSTANT: lookup-table-at-max 256
     ] ;
 
 : at-quot ( assoc -- quot )
-    dup lookup-table-at? [
-        dup fast-lookup-table-at? [
-            fast-lookup-table-quot
-        ] [
-            lookup-table-quot
-        ] if
+    dup assoc? [
+        dup lookup-table-at? [
+            dup fast-lookup-table-at? [
+                fast-lookup-table-quot
+            ] [
+                lookup-table-quot
+            ] if
+        ] [ drop f ] if
     ] [ drop f ] if ;
 
 \ at* [ at-quot ] 1 define-partial-eval
