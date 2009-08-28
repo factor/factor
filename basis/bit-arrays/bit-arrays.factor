@@ -83,7 +83,7 @@ M: bit-array resize
     bit-array boa
     dup clean-up ; inline
 
-M: bit-array byte-length length 7 + -3 shift ;
+M: bit-array byte-length length 7 + -3 shift ; inline
 
 SYNTAX: ?{ \ } [ >bit-array ] parse-literal ;
 

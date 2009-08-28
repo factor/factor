@@ -68,8 +68,6 @@ TUPLE: image dim component-order component-type upside-down? bitmap ;
 
 : has-alpha? ( image -- ? ) component-order>> alpha-channel? ;
 
-GENERIC: load-image* ( path class -- image )
-
 : bytes-per-component ( component-type -- n )
     {
         { ubyte-components [ 1 ] }
