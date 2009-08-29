@@ -47,43 +47,12 @@ M: cannot-find-source error.
 : edit-vocab ( name -- )
     >vocab-link edit ;
 
-GENERIC: error-file ( error -- file )
-
-GENERIC: error-line ( error -- line )
-
-M: lexer-error error-file
-    error>> error-file ;
-
-M: lexer-error error-line
-    [ error>> error-line ] [ line>> ] bi or ;
-
-M: source-file-error error-file
-    [ error>> error-file ] [ file>> ] bi or ;
-
-M: source-file-error error-line
-    error>> error-line ;
-
-M: condition error-file
-    error>> error-file ;
-
-M: condition error-line
-    error>> error-line ;
-
-M: object error-file
-    drop f ;
-
-M: object error-line
-    drop f ;
-
-: (:edit) ( error -- )
+: edit-error ( error -- )
     [ error-file ] [ error-line ] bi
     2dup and [ edit-location ] [ 2drop ] if ;
 
 : :edit ( -- )
-    error get (:edit) ;
-
-: edit-error ( error -- )
-    [ file>> ] [ line#>> ] bi 2dup and [ edit-location ] [ 2drop ] if ;
+    error get edit-error ;
 
 : edit-each ( seq -- )
     [

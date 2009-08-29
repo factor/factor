@@ -57,7 +57,7 @@ M: object make-slot-descriptions
     make-mirror [ <slot-description> ] { } assoc>map ;
 
 M: hashtable make-slot-descriptions
-    call-next-method [ [ key-string>> ] compare ] sort ;
+    call-next-method [ key-string>> ] sort-with ;
 
 : <inspector-table> ( model -- table )
     [ make-slot-descriptions ] <arrow> inspector-renderer <table>

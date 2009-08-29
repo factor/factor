@@ -39,15 +39,15 @@ syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<#! .*/ contains=factorTodo
 syn match factorComment /\<! .*/ contains=factorTodo
 
-syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorArray0,factorQuotation0
+syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
 
-syn region factorDefn matchgroup=factorDefnDelims start=/\<\(MACRO\|MACRO::\|MEMO:\|MEMO::\|:\|::\)\?:\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
-syn region factorMethod matchgroup=factorMethodDelims start=/\<M:\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
+syn region factorDefn matchgroup=factorDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
+syn region factorMethod matchgroup=factorMethodDelims start=/\<M::\?\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
 syn region factorGeneric matchgroup=factorGenericDelims start=/\<GENERIC:\s\+\S\+\>/ end=/$/ contains=factorStackEffect
 syn region factorGenericN matchgroup=factorGenericNDelims start=/\<GENERIC#\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect
 
-syn region factorPrivateDefn matchgroup=factorPrivateDefnDelims start=/\<\(MACRO\|MACRO::\|MEMO:\|MEMO::\|:\|::\)\?:\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
-syn region factorPrivateMethod matchgroup=factorPrivateMethodDelims start=/\<M:\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
+syn region factorPrivateDefn matchgroup=factorPrivateDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
+syn region factorPrivateMethod matchgroup=factorPrivateMethodDelims start=/\<M::\?\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
 syn region factorPGeneric matchgroup=factorPGenericDelims start=/\<GENERIC:\s\+\S\+\>/ end=/$/ contains=factorStackEffect contained
 syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\<GENERIC#\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect
 
@@ -55,7 +55,7 @@ syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/
 
 
 syn keyword factorBoolean boolean f general-t t
-syn keyword factorCompileDirective inline foldable parsing
+syn keyword factorCompileDirective inline foldable recursive
 
 <%
 
@@ -149,37 +149,39 @@ syn match factorMultiStringContents /.*/ contained
 
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
-syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
+"syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
+syn match factorStackEffect /\<( .*--.* )\>/ contained
+syn match factorLiteralStackEffect /\<(( .*--.* ))\>/
 
 "adapted from lisp.vim
 if exists("g:factor_norainbow") 
-    syn region factorQuotation matchgroup=factorDelimiter start=/\<\[\>/ matchgroup=factorDelimiter end=/\<\]\>/ contains=ALL
+    syn region factorQuotation matchgroup=factorDelimiter start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ matchgroup=factorDelimiter end=/\<\]\>/ contains=ALL
 else
-    syn region factorQuotation0           matchgroup=hlLevel0 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation1,factorArray1
-    syn region factorQuotation1 contained matchgroup=hlLevel1 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation2,factorArray2
-    syn region factorQuotation2 contained matchgroup=hlLevel2 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation3,factorArray3
-    syn region factorQuotation3 contained matchgroup=hlLevel3 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation4,factorArray4
-    syn region factorQuotation4 contained matchgroup=hlLevel4 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation5,factorArray5
-    syn region factorQuotation5 contained matchgroup=hlLevel5 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation6,factorArray6
-    syn region factorQuotation6 contained matchgroup=hlLevel6 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation7,factorArray7
-    syn region factorQuotation7 contained matchgroup=hlLevel7 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation8,factorArray8
-    syn region factorQuotation8 contained matchgroup=hlLevel8 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation9,factorArray9
-    syn region factorQuotation9 contained matchgroup=hlLevel9 start=/\<\[\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation0,factorArray0
+    syn region factorQuotation0           matchgroup=hlLevel0 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation1,factorArray1
+    syn region factorQuotation1 contained matchgroup=hlLevel1 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation2,factorArray2
+    syn region factorQuotation2 contained matchgroup=hlLevel2 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation3,factorArray3
+    syn region factorQuotation3 contained matchgroup=hlLevel3 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation4,factorArray4
+    syn region factorQuotation4 contained matchgroup=hlLevel4 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation5,factorArray5
+    syn region factorQuotation5 contained matchgroup=hlLevel5 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation6,factorArray6
+    syn region factorQuotation6 contained matchgroup=hlLevel6 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation7,factorArray7
+    syn region factorQuotation7 contained matchgroup=hlLevel7 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation8,factorArray8
+    syn region factorQuotation8 contained matchgroup=hlLevel8 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation9,factorArray9
+    syn region factorQuotation9 contained matchgroup=hlLevel9 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation0,factorArray0
 endif
 
 if exists("g:factor_norainbow") 
-    syn region factorArray    matchgroup=factorDelimiter start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/  matchgroup=factorDelimiter end=/\<}\>/ contains=ALL
+    syn region factorArray    matchgroup=factorDelimiter start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/  matchgroup=factorDelimiter end=/\<}\>/ contains=ALL
 else
-    syn region factorArray0           matchgroup=hlLevel0 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray1,factorQuotation1
-    syn region factorArray1 contained matchgroup=hlLevel1 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray2,factorQuotation2
-    syn region factorArray2 contained matchgroup=hlLevel2 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray3,factorQuotation3
-    syn region factorArray3 contained matchgroup=hlLevel3 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray4,factorQuotation4
-    syn region factorArray4 contained matchgroup=hlLevel4 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray5,factorQuotation5
-    syn region factorArray5 contained matchgroup=hlLevel5 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray6,factorQuotation6
-    syn region factorArray6 contained matchgroup=hlLevel6 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray7,factorQuotation7
-    syn region factorArray7 contained matchgroup=hlLevel7 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray8,factorQuotation8
-    syn region factorArray8 contained matchgroup=hlLevel8 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray9,factorQuotation9
-    syn region factorArray9 contained matchgroup=hlLevel9 start=/\<\(V\|H\|T\|W\|F\|B\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray0,factorQuotation0
+    syn region factorArray0           matchgroup=hlLevel0 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray1,factorQuotation1
+    syn region factorArray1 contained matchgroup=hlLevel1 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray2,factorQuotation2
+    syn region factorArray2 contained matchgroup=hlLevel2 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray3,factorQuotation3
+    syn region factorArray3 contained matchgroup=hlLevel3 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray4,factorQuotation4
+    syn region factorArray4 contained matchgroup=hlLevel4 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray5,factorQuotation5
+    syn region factorArray5 contained matchgroup=hlLevel5 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray6,factorQuotation6
+    syn region factorArray6 contained matchgroup=hlLevel6 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray7,factorQuotation7
+    syn region factorArray7 contained matchgroup=hlLevel7 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray8,factorQuotation8
+    syn region factorArray8 contained matchgroup=hlLevel8 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray9,factorQuotation9
+    syn region factorArray9 contained matchgroup=hlLevel9 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray0,factorQuotation0
 endif
 
 syn match factorBracketErr /\<\]\>/
@@ -197,6 +199,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
 
     HiLink factorComment                Comment
     HiLink factorStackEffect            Typedef
+    HiLink factorLiteralStackEffect     Typedef
     HiLink factorTodo                   Todo
     HiLink factorInclude                Include
     HiLink factorRepeat                 Repeat
@@ -283,7 +286,7 @@ endif
 let b:current_syntax = "factor"
 
 set sw=4
-set ts=4
+set sts=4
 set expandtab
 set autoindent " annoying?
 

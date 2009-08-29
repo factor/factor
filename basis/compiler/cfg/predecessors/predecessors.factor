@@ -1,8 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors combinators fry sequences assocs compiler.cfg.rpo
-compiler.cfg.instructions ;
+compiler.cfg.instructions compiler.cfg.utilities ;
 IN: compiler.cfg.predecessors
+
+<PRIVATE
 
 : update-predecessors ( bb -- )
     dup successors>> [ predecessors>> push ] with each ;
@@ -14,9 +16,7 @@ IN: compiler.cfg.predecessors
     ] change-inputs drop ;
 
 : update-phis ( bb -- )
-    dup instructions>> [
-        dup ##phi? [ update-phi ] [ 2drop ] if
-    ] with each ;
+    dup [ update-phi ] with each-phi ;
 
 : compute-predecessors ( cfg -- cfg' )
     {
@@ -25,3 +25,9 @@ IN: compiler.cfg.predecessors
         [ [ update-phis ] each-basic-block ]
         [ ]
     } cleave ;
+
+PRIVATE>
+
+: needs-predecessors ( cfg -- cfg' )
+    dup predecessors-valid?>>
+    [ compute-predecessors t >>predecessors-valid? ] unless ;

@@ -1,4 +1,3 @@
-IN: furnace.auth.providers.db.tests
 USING: furnace.actions
 furnace.auth
 furnace.auth.login
@@ -6,6 +5,7 @@ furnace.auth.providers
 furnace.auth.providers.db tools.test
 namespaces db db.sqlite db.tuples continuations
 io.files io.files.temp io.directories accessors kernel ;
+IN: furnace.auth.providers.db.tests
 
 <action> "test" <login-realm> realm set
 

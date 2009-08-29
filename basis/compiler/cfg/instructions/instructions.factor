@@ -91,6 +91,8 @@ INSN: ##shr < ##binary ;
 INSN: ##shr-imm < ##binary-imm ;
 INSN: ##sar < ##binary ;
 INSN: ##sar-imm < ##binary-imm ;
+INSN: ##min < ##binary ;
+INSN: ##max < ##binary ;
 INSN: ##not < ##unary ;
 INSN: ##log2 < ##unary ;
 
@@ -106,18 +108,21 @@ INSN: ##add-float < ##commutative ;
 INSN: ##sub-float < ##binary ;
 INSN: ##mul-float < ##commutative ;
 INSN: ##div-float < ##binary ;
+INSN: ##min-float < ##binary ;
+INSN: ##max-float < ##binary ;
+INSN: ##sqrt < ##unary ;
 
 ! Float/integer conversion
 INSN: ##float>integer < ##unary ;
 INSN: ##integer>float < ##unary ;
 
 ! Boxing and unboxing
-INSN: ##copy < ##unary ;
-INSN: ##copy-float < ##unary ;
+INSN: ##copy < ##unary rep ;
 INSN: ##unbox-float < ##unary ;
 INSN: ##unbox-any-c-ptr < ##unary/temp ;
 INSN: ##box-float < ##unary/temp ;
 INSN: ##box-alien < ##unary/temp ;
+INSN: ##box-displaced-alien < ##binary temp base-class ;
 
 : ##unbox-f ( dst src -- ) drop 0 ##load-immediate ;
 : ##unbox-byte-array ( dst src -- ) byte-array-offset ##add-imm ;
@@ -152,7 +157,12 @@ INSN: ##set-alien-double < ##alien-setter ;
 ! Memory allocation
 INSN: ##allot < ##flushable size class temp ;
 
-UNION: ##allocation ##allot ##box-float ##box-alien ##integer>bignum ;
+UNION: ##allocation
+##allot
+##box-float
+##box-alien
+##box-displaced-alien
+##integer>bignum ;
 
 INSN: ##write-barrier < ##effect card# table ;
 
@@ -190,7 +200,7 @@ INSN: ##fixnum-add < ##fixnum-overflow ;
 INSN: ##fixnum-sub < ##fixnum-overflow ;
 INSN: ##fixnum-mul < ##fixnum-overflow ;
 
-INSN: ##gc temp1 temp2 live-values uninitialized-locs ;
+INSN: ##gc temp1 temp2 data-values tagged-values uninitialized-locs ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;
@@ -219,14 +229,13 @@ INSN: _fixnum-mul < _fixnum-overflow ;
 
 TUPLE: spill-slot n ; C: <spill-slot> spill-slot
 
-INSN: _gc temp1 temp2 gc-roots gc-root-count gc-root-size uninitialized-locs ;
+INSN: _gc temp1 temp2 data-values tagged-values uninitialized-locs ;
 
 ! These instructions operate on machine registers and not
 ! virtual registers
-INSN: _spill src class n ;
-INSN: _reload dst class n ;
-INSN: _copy dst src class ;
-INSN: _spill-counts counts ;
+INSN: _spill src rep n ;
+INSN: _reload dst rep n ;
+INSN: _spill-area-size n ;
 
 ! Instructions that use vregs
 UNION: vreg-insn
@@ -251,6 +260,40 @@ UNION: kill-vreg-insn
     ##alien-invoke
     ##alien-indirect
     ##alien-callback ;
+
+! Instructions that output floats
+UNION: output-float-insn
+    ##add-float
+    ##sub-float
+    ##mul-float
+    ##div-float
+    ##min-float
+    ##max-float
+    ##sqrt
+    ##integer>float
+    ##unbox-float
+    ##alien-float
+    ##alien-double ;
+
+! Instructions that take floats as inputs
+UNION: input-float-insn
+    ##add-float
+    ##sub-float
+    ##mul-float
+    ##div-float
+    ##min-float
+    ##max-float
+    ##sqrt
+    ##float>integer
+    ##box-float
+    ##set-alien-float
+    ##set-alien-double
+    ##compare-float
+    ##compare-float-branch ;
+
+! Smackdown
+INTERSECTION: ##unary-float ##unary input-float-insn ;
+INTERSECTION: ##binary-float ##binary input-float-insn ;
 
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers

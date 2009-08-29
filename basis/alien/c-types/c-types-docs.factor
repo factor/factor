@@ -1,7 +1,7 @@
 IN: alien.c-types
 USING: alien help.syntax help.markup libc kernel.private
 byte-arrays math strings hashtables alien.syntax alien.strings sequences
-io.encodings.string debugger destructors ;
+io.encodings.string debugger destructors vocabs.loader ;
 
 HELP: <c-type>
 { $values { "type" hashtable } }
@@ -127,6 +127,21 @@ HELP: malloc-string
         "memory allocation fails"
     }
 } ;
+
+HELP: require-c-type-arrays
+{ $values { "c-type" "a C type" } }
+{ $description { $link require } "s any unloaded vocabularies needed to construct a specialized array or direct array of " { $snippet "c-type" } " using the " { $link <c-type-array> } " or " { $link <c-type-direct-array> } " vocabularies." }
+{ $notes "This word must be called inside a compilation unit. See the " { $vocab-link "specialized-arrays" } " and " { $vocab-link "specialized-arrays.direct" } " vocabulary sets for details on the underlying sequence types loaded." } ;
+
+HELP: <c-type-array>
+{ $values { "len" integer } { "c-type" "a C type" } { "array" "a specialized array" } }
+{ $description "Constructs a new specialized array of length " { $snippet "len" } " and element type " { $snippet "c-type" } "." }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-type-arrays } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary set for details on the underlying sequence type constructed." } ;
+
+HELP: <c-type-direct-array>
+{ $values { "alien" c-ptr } { "len" integer } { "c-type" "a C type" } { "array" "a specialized direct array" } }
+{ $description "Constructs a new specialized array of length " { $snippet "len" } " and element type " { $snippet "c-type" } " over the range of memory referenced by " { $snippet "alien" } "." }
+{ $notes "The appropriate direct specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-type-arrays } " word. See the " { $vocab-link "specialized-arrays.direct" } " vocabulary set for details on the underlying sequence type constructed." } ;
 
 ARTICLE: "c-strings" "C strings"
 "C string types are arrays with shape " { $snippet "{ \"char*\" encoding }" } ", where " { $snippet "encoding" } " is an encoding descriptor. The type " { $snippet "\"char*\"" } " is an alias for " { $snippet "{ \"char*\" utf8 }" } ". See " { $link "encodings-descriptors" } " for information about encoding descriptors."

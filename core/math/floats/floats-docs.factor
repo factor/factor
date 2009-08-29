@@ -10,21 +10,21 @@ HELP: >float
 
 HELP: bits>double ( n -- x )
 { $values { "n" "a 64-bit integer representing an IEEE 754 double-precision float" } { "x" float } }
-{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
+{ $description "Creates a " { $link float } " object from a 64-bit binary representation. This word is usually used to reconstruct floats read from streams." } ;
 
 { bits>double bits>float double>bits float>bits } related-words
 
 HELP: bits>float ( n -- x )
 { $values { "n" "a 32-bit integer representing an IEEE 754 single-precision float" } { "x" float } }
-{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
+{ $description "Creates a " { $link float } " object from a 32-bit binary representation. This word is usually used to reconstruct floats read from streams." } ;
 
 HELP: double>bits ( x -- n )
 { $values { "x" float } { "n" "a 64-bit integer representing an IEEE 754 double-precision float" } }
-{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
+{ $description "Creates a 64-bit binary representation of a " { $link float } " object. This can be used in the process of writing a float to a stream." } ;
 
 HELP: float>bits ( x -- n )
 { $values { "x" float } { "n" "a 32-bit integer representing an IEEE 754 single-precision float" } }
-{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
+{ $description "Creates a 32-bit binary representation of a " { $link float } " object. This can be used in the process of writing a float to a stream." } ;
 
 ! Unsafe primitives
 HELP: float+ ( x y -- z )

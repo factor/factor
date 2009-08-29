@@ -1,12 +1,15 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences assocs fry
+cpu.architecture
 compiler.cfg.rpo
-compiler.cfg.hats
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.stacks.uninitialized ;
 IN: compiler.cfg.gc-checks
+
+! Garbage collection check insertion. This pass runs after representation
+! selection, so it must keep track of representations.
 
 : insert-gc-check? ( bb -- ? )
     instructions>> [ ##allocation? ] any? ;
@@ -16,7 +19,9 @@ IN: compiler.cfg.gc-checks
 
 : insert-gc-check ( bb -- )
     dup '[
-        i i f _ uninitialized-locs \ ##gc new-insn
+        int-rep next-vreg-rep
+        int-rep next-vreg-rep
+        f f _ uninitialized-locs \ ##gc new-insn
         prefix
     ] change-instructions drop ;
 

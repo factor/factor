@@ -44,3 +44,6 @@ INSTANCE: biassoc assoc
 
 : >biassoc ( assoc -- biassoc )
     T{ biassoc } assoc-clone-like ;
+
+M: biassoc clone
+    [ from>> ] [ to>> ] bi [ clone ] bi@ biassoc boa ;

@@ -51,7 +51,7 @@ PRIVATE>
 
 : push-growing-circular ( elt circular -- )
     dup full? [ push-circular ]
-    [ [ 1+ ] change-length set-last ] if ;
+    [ [ 1 + ] change-length set-last ] if ;
 
 : <growing-circular> ( capacity -- growing-circular )
     { } new-sequence 0 0 growing-circular boa ;

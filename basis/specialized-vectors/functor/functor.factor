@@ -10,6 +10,7 @@ FUNCTOR: define-vector ( T -- )
 V   DEFINES-CLASS ${T}-vector
 
 A   IS      ${T}-array
+S   IS      ${T}-sequence
 <A> IS      <${A}>
 
 >V  DEFERS >${V}
@@ -32,5 +33,6 @@ M: V pprint* pprint-object ;
 SYNTAX: V{ \ } [ >V ] parse-literal ;
 
 INSTANCE: V growable
+INSTANCE: V S
 
 ;FUNCTOR

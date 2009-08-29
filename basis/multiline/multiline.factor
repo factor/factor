@@ -4,6 +4,8 @@ USING: namespaces make parser lexer kernel sequences words
 quotations math accessors locals ;
 IN: multiline
 
+ERROR: bad-heredoc identifier ;
+
 <PRIVATE
 : next-line-text ( -- str )
     lexer get dup next-line line-text>> ;
@@ -27,7 +29,7 @@ SYNTAX: STRING:
 
 <PRIVATE
 
-:: (parse-multiline-string) ( i end -- j )
+:: (scan-multiline-string) ( i end -- j )
     lexer get line-text>> :> text
     text [
         end text i start* [| j |
@@ -35,18 +37,43 @@ SYNTAX: STRING:
         ] [
             text i short tail % CHAR: \n ,
             lexer get next-line
-            0 end (parse-multiline-string)
+            0 end (scan-multiline-string)
         ] if*
     ] [ end unexpected-eof ] if ;
         
+:: (parse-multiline-string) ( end-text skip-n-chars -- str )
+    [
+        lexer get
+        [ skip-n-chars + end-text (scan-multiline-string) ]
+        change-column drop
+    ] "" make ;
+
+: rest-of-line ( -- seq )
+    lexer get [ line-text>> ] [ column>> ] bi tail ;
+
+:: advance-same-line ( text -- )
+    lexer get [ text length + ] change-column drop ;
+
+:: (parse-til-line-begins) ( begin-text -- )
+    lexer get still-parsing? [
+        lexer get line-text>> begin-text sequence= [
+            begin-text advance-same-line
+        ] [
+            lexer get line-text>> % "\n" %
+            lexer get next-line
+            begin-text (parse-til-line-begins)
+        ] if
+    ] [
+        begin-text bad-heredoc
+    ] if ;
+
+: parse-til-line-begins ( begin-text -- seq )
+    [ (parse-til-line-begins) ] "" make ;
+
 PRIVATE>
 
 : parse-multiline-string ( end-text -- str )
-    [
-        lexer get
-        [ 1+ swap (parse-multiline-string) ]
-        change-column drop
-    ] "" make ;
+    1 (parse-multiline-string) ;
 
 SYNTAX: <"
     "\">" parse-multiline-string parsed ;
@@ -61,3 +88,15 @@ SYNTAX: {"
     "\"}" parse-multiline-string parsed ;
 
 SYNTAX: /* "*/" parse-multiline-string drop ;
+
+SYNTAX: HEREDOC:
+    lexer get skip-blank
+    rest-of-line
+    lexer get next-line
+    parse-til-line-begins parsed ;
+
+SYNTAX: DELIMITED:
+    lexer get skip-blank
+    rest-of-line
+    lexer get next-line
+    0 (parse-multiline-string) parsed ;

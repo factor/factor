@@ -39,7 +39,7 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 <PRIVATE
 
 : random-integer ( n -- n' )
-    dup log2 7 + 8 /i 1+
+    dup log2 7 + 8 /i 1 +
     [ random-bytes >byte-array byte-array>bignum ]
     [ 3 shift 2^ ] bi / * >integer ;
 
@@ -57,7 +57,7 @@ PRIVATE>
 
 : randomize ( seq -- seq )
     dup length [ dup 1 > ]
-    [ [ iota random ] [ 1- ] bi [ pick exchange ] keep ]
+    [ [ iota random ] [ 1 - ] bi [ pick exchange ] keep ]
     while drop ;
 
 : delete-random ( seq -- elt )

@@ -29,13 +29,13 @@ PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
 : layout-of ( tuple -- layout )
     1 slot { array } declare ; inline
 
-M: tuple class layout-of 2 slot { word } declare ;
+M: tuple class layout-of 2 slot { word } declare ; inline
 
 : tuple-size ( tuple -- size )
     layout-of 3 slot { fixnum } declare ; inline
 
 : prepare-tuple>array ( tuple -- n tuple layout )
-    check-tuple [ tuple-size ] [ ] [ layout-of ] tri ;
+    check-tuple [ tuple-size iota ] [ ] [ layout-of ] tri ;
 
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
@@ -69,7 +69,7 @@ GENERIC: slots>tuple ( seq class -- tuple )
 M: tuple-class slots>tuple ( seq class -- tuple )
     check-slots pad-slots
     tuple-layout <tuple> [
-        [ tuple-size ]
+        [ tuple-size iota ]
         [ [ set-array-nth ] curry ]
         bi 2each
     ] keep ;
@@ -323,7 +323,7 @@ M: tuple-class (classes-intersect?)
         [ swap classes-intersect? ]
     } cond ;
 
-M: tuple clone (clone) ;
+M: tuple clone (clone) ; inline
 
 M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 

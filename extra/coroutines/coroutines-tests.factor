@@ -7,7 +7,7 @@ USING: coroutines kernel sequences prettyprint tools.test math ;
   [ drop 1 coyield* 2 coyield* 3 coterminate ] cocreate ;
 
 : test2 ( -- co )
-  [ 1+ coyield* ] cocreate ;
+  [ 1 + coyield* ] cocreate ;
 
 test1 dup *coresume . dup *coresume . dup *coresume . dup *coresume 2drop
 [ test2 42 over coresume . dup *coresume . drop ] must-fail
@@ -18,4 +18,4 @@ test1 dup *coresume . dup *coresume . dup *coresume . dup *coresume 2drop
 
 { "c" "b" "a" } [ test3 { "a" "b" "c" } over coresume [ dup *coresume [ *coresume ] dip ] dip ] unit-test
 
-{ 4+2/3 } [ [ 1+ coyield 2 * coyield 3 / coreset ] cocreate 1 5 [ over coresume ] times nip ] unit-test
+{ 4+2/3 } [ [ 1 + coyield 2 * coyield 3 / coreset ] cocreate 1 5 [ over coresume ] times nip ] unit-test

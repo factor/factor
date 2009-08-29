@@ -12,7 +12,6 @@ ARTICLE: "class-operations" "Class operations"
 { $subsection classes-intersect? }
 { $subsection min-class }
 "Low-level implementation detail:"
-{ $subsection class-types }
 { $subsection flatten-class }
 { $subsection flatten-builtin-class }
 { $subsection class-types }

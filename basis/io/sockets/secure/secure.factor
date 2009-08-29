@@ -29,7 +29,7 @@ ephemeral-key-bits ;
         "vocab:openssl/cacert.pem" >>ca-file
         t >>verify ;
 
-TUPLE: secure-context config handle disposed ;
+TUPLE: secure-context < disposable config handle ;
 
 HOOK: <secure-context> secure-socket-backend ( config -- context )
 

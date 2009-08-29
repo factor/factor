@@ -91,13 +91,6 @@ M: object modify-form drop f ;
 
 CONSTANT: nested-forms-key "__n"
 
-: request-params ( request -- assoc )
-    dup method>> {
-        { "GET" [ url>> query>> ] }
-        { "HEAD" [ url>> query>> ] }
-        { "POST" [ post-data>> params>> ] }
-    } case ;
-
 : referrer ( -- referrer/f )
     #! Typo is intentional, it's in the HTTP spec!
     "referer" request get header>> at

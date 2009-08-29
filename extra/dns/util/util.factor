@@ -10,7 +10,7 @@ MACRO: 1if ( test then else -- ) '[ dup @ _ _ if ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: sort-largest-first ( seq -- seq ) [ [ length ] compare ] sort reverse ;
+: sort-largest-first ( seq -- seq ) [ length ] sort-with reverse ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

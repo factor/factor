@@ -28,6 +28,6 @@ ERROR: not-an-integer x ;
     [
         [ dup string>number [ nip ] [ not-an-integer ] if* ] bi@
     ] keep length
-    10 swap ^ / + swap [ neg ] when ;
+    10^ / + swap [ neg ] when ;
 
 SYNTAX: DECIMAL: scan parse-decimal parsed ;

@@ -1,5 +1,5 @@
-IN: boxes.tests
 USING: boxes namespaces tools.test accessors ;
+IN: boxes.tests
 
 [ ] [ <box> "b" set ] unit-test
 

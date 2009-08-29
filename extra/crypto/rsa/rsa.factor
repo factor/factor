@@ -26,7 +26,7 @@ CONSTANT: public-key 65537
 : modulus-phi ( numbits -- n phi ) 
     #! Loop until phi is not divisible by the public key.
     dup rsa-primes [ * ] 2keep
-    [ 1- ] bi@ *
+    [ 1 - ] bi@ *
     dup public-key gcd nip 1 = [
         rot drop
     ] [

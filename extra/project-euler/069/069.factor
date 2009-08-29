@@ -70,7 +70,7 @@ PRIVATE>
     } cond product ;
 
 : primorial-upto ( limit -- m )
-    1 swap '[ dup primorial _ <= ] [ 1+ dup primorial ] produce
+    1 swap '[ dup primorial _ <= ] [ 1 + dup primorial ] produce
     nip penultimate ;
 
 PRIVATE>

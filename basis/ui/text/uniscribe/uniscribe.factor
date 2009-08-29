@@ -25,7 +25,7 @@ M: uniscribe-renderer draw-string ( font string -- )
 
 M: uniscribe-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [
-        cached-script-string x>line-offset 0 = [ 1+ ] unless
+        cached-script-string x>line-offset 0 = [ 1 + ] unless
     ] if-empty ;
 
 M: uniscribe-renderer offset>x ( n font string -- x )

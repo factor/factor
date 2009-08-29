@@ -1,7 +1,7 @@
-IN: concurrency.mailboxes.tests
 USING: concurrency.mailboxes concurrency.count-downs concurrency.conditions
 vectors sequences threads tools.test math kernel strings namespaces
 continuations calendar destructors ;
+IN: concurrency.mailboxes.tests
 
 { 1 1 } [ [ integer? ] mailbox-get? ] must-infer-as
 

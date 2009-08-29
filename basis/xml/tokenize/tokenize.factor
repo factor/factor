@@ -13,7 +13,7 @@ IN: xml.tokenize
         swap
         [ version-1.0?>> over text? not ]
         [ check>> ] bi and [
-            spot get [ 1+ ] change-column drop
+            spot get [ 1 + ] change-column drop
             disallowed-char
         ] [ drop ] if
     ] [ drop ] if* ;
@@ -23,7 +23,7 @@ HINTS: assure-good-char { spot fixnum } ;
 : record ( spot char -- spot )
     over char>> [
         CHAR: \n =
-        [ [ 1+ ] change-line -1 ] [ dup column>> 1+ ] if
+        [ [ 1 + ] change-line -1 ] [ dup column>> 1 + ] if
         >>column
     ] [ drop ] if ;
 
@@ -91,7 +91,7 @@ HINTS: next* { spot } ;
 : take-string ( match -- string )
     dup length <circular-string>
     spot get '[ 2dup _ string-matches? ] take-until nip
-    dup length rot length 1- - head
+    dup length rot length 1 - - head
     get-char [ missing-close ] unless next ;
 
 : expect ( string -- )

@@ -1,6 +1,6 @@
-IN: functors.tests
 USING: functors tools.test math words kernel multiline parser
 io.streams.string generic ;
+IN: functors.tests
 
 <<
 

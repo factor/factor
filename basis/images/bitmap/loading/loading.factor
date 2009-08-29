@@ -342,8 +342,8 @@ M: v-header uncompress-bitmap* ( loading-bitmap header -- loading-bitmap' )
 
 ERROR: unsupported-bitmap-file magic ;
 
-: load-bitmap ( path -- loading-bitmap )
-    binary stream-throws <limited-file-reader> [
+: load-bitmap ( stream -- loading-bitmap )
+    [
         \ loading-bitmap new
         parse-file-header [ >>file-header ] [ ] bi magic>> {
             { "BM" [
@@ -363,7 +363,7 @@ ERROR: unsupported-bitmap-file magic ;
 : loading-bitmap>bytes ( loading-bitmap -- byte-array )
     uncompress-bitmap bitmap>bytes ;
 
-M: bitmap-image load-image* ( path bitmap-image -- bitmap )
+M: bitmap-image stream>image ( stream bitmap-image -- bitmap )
     drop load-bitmap
     [ image new ] dip
     {

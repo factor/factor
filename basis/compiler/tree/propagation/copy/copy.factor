@@ -5,7 +5,8 @@ combinators sets locals columns grouping
 stack-checker.branches
 compiler.tree
 compiler.tree.def-use
-compiler.tree.combinators ;
+compiler.tree.combinators
+compiler.utilities ;
 IN: compiler.tree.propagation.copy
 
 ! Two values are copy-equivalent if they are always identical
@@ -14,18 +15,6 @@ IN: compiler.tree.propagation.copy
 
 ! Mapping from values to their canonical leader
 SYMBOL: copies
-
-:: compress-path ( source assoc -- destination )
-    [let | destination [ source assoc at ] |
-        source destination = [ source ] [
-            [let | destination' [ destination assoc compress-path ] |
-                destination' destination = [
-                    destination' source assoc set-at
-                ] unless
-                destination'
-            ]
-        ] if
-    ] ;
 
 : resolve-copy ( copy -- val ) copies get compress-path ;
 

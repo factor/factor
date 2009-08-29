@@ -1,6 +1,6 @@
-IN: compiler.codegen.tests
 USING: compiler.codegen.fixup tools.test cpu.architecture math kernel make
 compiler.constants ;
+IN: compiler.codegen.tests
 
 [ ] [ [ ] with-fixup drop ] unit-test
 [ ] [ [ \ + %call ] with-fixup drop ] unit-test

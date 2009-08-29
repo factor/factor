@@ -35,7 +35,7 @@ IN: project-euler.042
 
 : (triangle-upto) ( limit n -- )
     2dup nth-triangle > [
-        dup nth-triangle , 1+ (triangle-upto)
+        dup nth-triangle , 1 + (triangle-upto)
     ] [
         2drop
     ] if ;
@@ -61,7 +61,7 @@ PRIVATE>
 <PRIVATE
 
 : triangle? ( n -- ? )
-    8 * 1+ sqrt 1- 2 / 1 mod zero? ;
+    8 * 1 + sqrt 1 - 2 / 1 mod zero? ;
 
 PRIVATE>
 

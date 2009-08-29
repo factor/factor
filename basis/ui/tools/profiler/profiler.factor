@@ -147,7 +147,7 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
     horizontal <track>
         { 3 3 } >>gap
         profiler vocabs>> vocab-renderer <profiler-table>
-            profiler vocab>> >>selected-value
+            profiler vocab>> >>selection
             10 >>min-rows
             10 >>max-rows
         "Vocabularies" <labeled-gadget>
@@ -164,11 +164,11 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
         horizontal <track>
             { 3 3 } >>gap
             profiler <generic-model> word-renderer <profiler-table>
-                profiler generic>> >>selected-value
+                profiler generic>> >>selection
             "Generic words" <labeled-gadget>
         1/2 track-add
             profiler <class-model> word-renderer <profiler-table>
-                profiler class>> >>selected-value
+                profiler class>> >>selection
             "Classes" <labeled-gadget>
         1/2 track-add
     1/2 track-add

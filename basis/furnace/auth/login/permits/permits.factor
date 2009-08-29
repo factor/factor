@@ -1,6 +1,5 @@
 USING: accessors namespaces kernel combinators.short-circuit
 db.tuples db.types furnace.auth furnace.sessions furnace.cache ;
-
 IN: furnace.auth.login.permits
 
 TUPLE: permit < server-state session uid ;
