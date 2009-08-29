@@ -28,7 +28,7 @@ IN: project-euler.040
 
 : (concat-upto) ( n limit str -- str )
     2dup length > [
-        pick number>string over push-all rot 1+ -rot (concat-upto)
+        pick number>string over push-all rot 1 + -rot (concat-upto)
     ] [
         2nip
     ] if ;
@@ -37,7 +37,7 @@ IN: project-euler.040
     SBUF" " clone 1 -rot (concat-upto) ;
 
 : nth-integer ( n str -- m )
-    [ 1- ] dip nth 1string string>number ;
+    [ 1 - ] dip nth 1string string>number ;
 
 PRIVATE>
 

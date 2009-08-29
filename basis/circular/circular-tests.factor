@@ -2,6 +2,7 @@
 ! See http;//factorcode.org/license.txt for BSD license
 USING: arrays kernel tools.test sequences sequences.private
 circular strings ;
+IN: circular.tests
 
 [ 0 ] [ { 0 1 2 3 4 } <circular> 0 swap virtual@ drop ] unit-test
 [ 2 ] [ { 0 1 2 3 4 } <circular> 2 swap virtual@ drop ] unit-test

@@ -26,14 +26,10 @@ REGISTERS: 128
 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
 XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15 ;
 
-<PRIVATE
-
-GENERIC: extended? ( op -- ? )
-
-M: object extended? drop f ;
-
 PREDICATE: register < word
     "register" word-prop ;
+
+<PRIVATE
 
 PREDICATE: register-8 < register
     "register-size" word-prop 8 = ;
@@ -49,6 +45,10 @@ PREDICATE: register-64 < register
 
 PREDICATE: register-128 < register
     "register-size" word-prop 128 = ;
+
+GENERIC: extended? ( op -- ? )
+
+M: object extended? drop f ;
 
 M: register extended? "register" word-prop 7 > ;
 

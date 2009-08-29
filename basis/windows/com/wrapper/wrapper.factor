@@ -6,7 +6,7 @@ destructors fry math.parser generalizations sets
 specialized-arrays.alien specialized-arrays.direct.alien ;
 IN: windows.com.wrapper
 
-TUPLE: com-wrapper callbacks vtbls disposed ;
+TUPLE: com-wrapper < disposable callbacks vtbls ;
 
 <PRIVATE
 
@@ -28,7 +28,7 @@ unless
 "windows.com.wrapper.callbacks" create-vocab drop
 
 : (next-vtbl-counter) ( -- n )
-    +vtbl-counter+ [ 1+ dup ] change ;
+    +vtbl-counter+ [ 1 + dup ] change ;
 
 : com-unwrap ( wrapped -- object )
     +wrapped-objects+ get-global at*
@@ -59,7 +59,7 @@ unless
 : (make-add-ref) ( interfaces -- quot )
     length "void*" heap-size * '[
         _
-        [ alien-unsigned-4 1+ dup ]
+        [ alien-unsigned-4 1 + dup ]
         [ set-alien-unsigned-4 ]
         2bi
     ] ;
@@ -68,7 +68,7 @@ unless
     length "void*" heap-size * '[
         _
         [ drop ]
-        [ alien-unsigned-4 1- dup ]
+        [ alien-unsigned-4 1 - dup ]
         [ set-alien-unsigned-4 ]
         2tri
         dup 0 = [ swap (free-wrapped-object) ] [ nip ] if
@@ -101,7 +101,7 @@ unless
     "windows.com.wrapper.callbacks" create ;
 
 : (finish-thunk) ( param-count thunk quot -- thunked-quot )
-    [ [ drop [ ] ] [ swap 1- '[ _ _ ndip ] ] if-empty ]
+    [ [ drop [ ] ] [ swap 1 - '[ _ _ ndip ] ] if-empty ]
     dip compose ;
 
 : (make-interface-callbacks) ( interface-name quots iunknown-methods n -- words )
@@ -153,7 +153,7 @@ PRIVATE>
     [ +live-wrappers+ get adjoin ] bi ;
 
 : <com-wrapper> ( implementations -- wrapper )
-    (make-callbacks) f f com-wrapper boa
+    com-wrapper new-disposable swap (make-callbacks) >>callbacks
     dup allocate-wrapper ;
 
 M: com-wrapper dispose*

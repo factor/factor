@@ -287,8 +287,9 @@ ARTICLE: "handbook-tools-reference" "Developer tools"
 { $heading "Debugging" }
 { $subsection "prettyprint" }
 { $subsection "inspector" }
-{ $subsection "tools.annotations" }
 { $subsection "tools.inference" }
+{ $subsection "tools.annotations" }
+{ $subsection "tools.deprecation" }
 { $heading "Browsing" }
 { $subsection "see" }
 { $subsection "tools.crossref" }
@@ -298,6 +299,7 @@ ARTICLE: "handbook-tools-reference" "Developer tools"
 { $subsection "profiling" }
 { $subsection "tools.memory" }
 { $subsection "tools.threads" }
+{ $subsection "tools.destructors" }
 { $subsection "tools.disassembler" }
 { $heading "Deployment" }
 { $subsection "tools.deploy" } ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.strings alien.c-types alien.accessors alien.structs
 arrays words sequences math kernel namespaces fry libc cpu.architecture
-io.encodings.utf8 ;
+io.encodings.utf8 accessors ;
 IN: alien.arrays
 
 UNION: value-type array struct-type ;
@@ -11,7 +11,12 @@ M: array c-type ;
 
 M: array c-type-class drop object ;
 
-M: array heap-size unclip [ product ] [ heap-size ] bi* * ;
+M: array c-type-boxed-class drop object ;
+
+: array-length ( seq -- n )
+    [ dup word? [ def>> call( -- object ) ] when ] [ * ] map-reduce ;
+
+M: array heap-size unclip [ array-length ] [ heap-size ] bi* * ;
 
 M: array c-type-align first c-type-align ;
 
@@ -27,11 +32,15 @@ M: array box-return drop "void*" box-return ;
 
 M: array stack-size drop "void*" stack-size ;
 
-M: array c-type-boxer-quot drop [ ] ;
+M: array c-type-boxer-quot
+    unclip
+    [ array-length ]
+    [ [ require-c-type-arrays ] keep ] bi*
+    [ <c-type-direct-array> ] 2curry ;
 
 M: array c-type-unboxer-quot drop [ >c-ptr ] ;
 
-M: value-type c-type-reg-class drop int-regs ;
+M: value-type c-type-rep drop int-rep ;
 
 M: value-type c-type-getter
     drop [ swap <displaced-alien> ] ;
@@ -45,8 +54,9 @@ PREDICATE: string-type < pair
 
 M: string-type c-type ;
 
-M: string-type c-type-class
-    drop object ;
+M: string-type c-type-class drop object ;
+
+M: string-type c-type-boxed-class drop object ;
 
 M: string-type heap-size
     drop "void*" heap-size ;
@@ -72,8 +82,8 @@ M: string-type box-return
 M: string-type stack-size
     drop "void*" stack-size ;
 
-M: string-type c-type-reg-class
-    drop int-regs ;
+M: string-type c-type-rep
+    drop int-rep ;
 
 M: string-type c-type-boxer
     drop "void*" c-type-boxer ;

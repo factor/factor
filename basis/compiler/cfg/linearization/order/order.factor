@@ -1,15 +1,16 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs deques dlists kernel make
+USING: accessors assocs deques dlists kernel make sorting
 namespaces sequences combinators combinators.short-circuit
-fry math sets compiler.cfg.rpo compiler.cfg.utilities ;
+fry math sets compiler.cfg.rpo compiler.cfg.utilities
+compiler.cfg.loop-detection ;
 IN: compiler.cfg.linearization.order
 
 ! This is RPO except loops are rotated. Based on SBCL's src/compiler/control.lisp
 
 <PRIVATE
 
-SYMBOLS: work-list loop-heads visited numbers next-number ;
+SYMBOLS: work-list loop-heads visited ;
 
 : visited? ( bb -- ? ) visited get key? ;
 
@@ -17,6 +18,11 @@ SYMBOLS: work-list loop-heads visited numbers next-number ;
     dup visited get key? [ drop ] [
         work-list get push-back
     ] if ;
+
+: init-linearization-order ( cfg -- )
+    <dlist> work-list set
+    H{ } clone visited set
+    entry>> add-to-work-list ;
 
 : (find-alternate-loop-head) ( bb -- bb' )
     dup {
@@ -46,28 +52,26 @@ SYMBOLS: work-list loop-heads visited numbers next-number ;
         add-to-work-list
     ] [ drop ] if ;
 
-: assign-number ( bb -- )
-    next-number [ get ] [ inc ] bi swap numbers get set-at ;
+: sorted-successors ( bb -- seq )
+    successors>> <reversed> [ loop-nesting-at ] sort-with ;
 
 : process-block ( bb -- )
-    {
-        [ , ]
-        [ assign-number ]
-        [ visited get conjoin ]
-        [ successors>> <reversed> [ process-successor ] each ]
-    } cleave ;
+    [ , ]
+    [ visited get conjoin ]
+    [ sorted-successors [ process-successor ] each ]
+    tri ;
+
+: (linearization-order) ( cfg -- bbs )
+    init-linearization-order
+
+    [ work-list get [ process-block ] slurp-deque ] { } make ;
 
 PRIVATE>
 
 : linearization-order ( cfg -- bbs )
-    ! We call 'post-order drop' to ensure blocks receive their
-    ! RPO numbers.
-    <dlist> work-list set
-    H{ } clone visited set
-    H{ } clone numbers set
-    0 next-number set
-    [ post-order drop ]
-    [ entry>> add-to-work-list ] bi
-    [ work-list get [ process-block ] slurp-deque ] { } make ;
+    needs-post-order needs-loops
 
-: block-number ( bb -- n ) numbers get at ;
+    dup linear-order>> [ ] [
+        dup (linearization-order)
+        >>linear-order linear-order>>
+    ] ?if ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words sequences kernel assocs combinators classes
+USING: words accessors sequences kernel assocs combinators classes
 classes.algebra classes.builtin namespaces arrays math quotations ;
 IN: classes.intersection
 
@@ -34,3 +34,15 @@ M: intersection-class instance?
 
 M: intersection-class (flatten-class)
     participants <anonymous-intersection> (flatten-class) ;
+
+! Horribly inefficient and inaccurate
+: intersect-flattened-classes ( seq1 seq2 -- seq3 )
+    ! Only keep those in seq1 that intersect something in seq2.
+    [ [ classes-intersect? ] with any? ] curry filter ;
+
+M: anonymous-intersection (flatten-class)
+    participants>> [ full-cover ] [
+        [ flatten-class keys ]
+        [ intersect-flattened-classes ] map-reduce
+        [ dup set ] each
+    ] if-empty ;

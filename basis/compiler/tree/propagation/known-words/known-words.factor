@@ -1,12 +1,13 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel effects accessors math math.private
-math.integers.private math.partial-dispatch math.intervals
-math.parser math.order layouts words sequences sequences.private
-arrays assocs classes classes.algebra combinators generic.math
-splitting fry locals classes.tuple alien.accessors
-classes.tuple.private slots.private definitions strings.private
-vectors hashtables generic quotations
+math.integers.private math.floats.private math.partial-dispatch
+math.intervals math.parser math.order math.functions math.libm
+layouts words sequences sequences.private arrays assocs classes
+classes.algebra combinators generic.math splitting fry locals
+classes.tuple alien.accessors classes.tuple.private
+slots.private definitions strings.private vectors hashtables
+generic quotations
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -17,14 +18,6 @@ compiler.tree.propagation.constraints
 compiler.tree.propagation.call-effect
 compiler.tree.propagation.transforms ;
 IN: compiler.tree.propagation.known-words
-
-\ fixnum
-most-negative-fixnum most-positive-fixnum [a,b]
-"interval" set-word-prop
-
-\ array-capacity
-0 max-array-capacity [a,b]
-"interval" set-word-prop
 
 { + - * / }
 [ { number number } "input-classes" set-word-prop ] each
@@ -40,21 +33,27 @@ most-negative-fixnum most-positive-fixnum [a,b]
 
 \ bitnot { integer } "input-classes" set-word-prop
 
-: ?change-interval ( info quot -- quot' )
-    over interval>> [ [ clone ] dip change-interval ] [ 2drop ] if ; inline
+: real-op ( info quot -- quot' )
+    [
+        dup class>> real classes-intersect?
+        [ clone ] [ drop real <class-info> ] if
+    ] dip
+    change-interval ; inline
 
 { bitnot fixnum-bitnot bignum-bitnot } [
-    [ [ interval-bitnot ] ?change-interval ] "outputs" set-word-prop
+    [ [ interval-bitnot ] real-op ] "outputs" set-word-prop
 ] each
 
-\ abs [ [ interval-abs ] ?change-interval ] "outputs" set-word-prop
+\ abs [ [ interval-abs ] real-op ] "outputs" set-word-prop
+
+\ absq [ [ interval-absq ] real-op ] "outputs" set-word-prop
 
 : math-closure ( class -- newclass )
     { fixnum bignum integer rational float real number object }
     [ class<= ] with find nip ;
 
-: fits? ( interval class -- ? )
-    "interval" word-prop interval-subset? ;
+: fits-in-fixnum? ( interval -- ? )
+    fixnum-interval interval-subset? ;
 
 : binary-op-class ( info1 info2 -- newclass )
     [ class>> ] bi@
@@ -66,7 +65,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
     [ [ interval>> ] bi@ ] dip call ; inline
 
 : won't-overflow? ( class interval -- ? )
-    [ fixnum class<= ] [ fixnum fits? ] bi* and ;
+    [ fixnum class<= ] [ fits-in-fixnum? ] bi* and ;
 
 : may-overflow ( class interval -- class' interval' )
     over null-class? [
@@ -80,10 +79,15 @@ most-negative-fixnum most-positive-fixnum [a,b]
     ] unless ;
 
 : ensure-math-class ( class must-be -- class' )
-    [ class<= ] 2keep ? ;
+    [ class<= ] most ;
 
 : number-valued ( class interval -- class' interval' )
     [ number ensure-math-class ] dip ;
+
+: fixnum-valued ( class interval -- class' interval' )
+    over null-class? [
+        [ drop fixnum ] dip
+    ] unless ;
 
 : integer-valued ( class interval -- class' interval' )
     [ integer ensure-math-class ] dip ;
@@ -173,7 +177,8 @@ generic-comparison-ops [
     [ object-info ] [ f <literal-info> ] if ;
 
 : info-intervals-intersect? ( info1 info2 -- ? )
-    [ interval>> ] bi@ intervals-intersect? ;
+    2dup [ class>> real class<= ] both?
+    [ [ interval>> ] bi@ intervals-intersect? ] [ 2drop t ] if ;
 
 { number= bignum= float= } [
     [
@@ -218,14 +223,7 @@ generic-comparison-ops [
 
     { >integer integer }
 } [
-    '[
-        _
-        [ nip ] [
-            [ interval>> ] [ class-interval ] bi*
-            interval-intersect
-        ] 2bi
-        <class/interval-info>
-    ] "outputs" set-word-prop
+    '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
 ] assoc-each
 
 { numerator denominator }
@@ -254,14 +252,14 @@ generic-comparison-ops [
     dup name>> {
         {
             [ "alien-signed-" ?head ]
-            [ string>number 8 * 1- 2^ dup neg swap 1- [a,b] ]
+            [ string>number 8 * 1 - 2^ dup neg swap 1 - [a,b] ]
         }
         {
             [ "alien-unsigned-" ?head ]
-            [ string>number 8 * 2^ 1- 0 swap [a,b] ]
+            [ string>number 8 * 2^ 1 - 0 swap [a,b] ]
         }
     } cond
-    [ fixnum fits? fixnum integer ? ] keep <class/interval-info>
+    [ fits-in-fixnum? fixnum integer ? ] keep <class/interval-info>
     '[ 2drop _ ] "outputs" set-word-prop
 ] each
 
@@ -305,3 +303,21 @@ generic-comparison-ops [
         bi
     ] [ 2drop object-info ] if
 ] "outputs" set-word-prop
+
+{ facos fasin fatan fatan2 fcos fsin ftan fcosh fsinh ftanh fexp
+flog fpow fsqrt facosh fasinh fatanh } [
+    { float } "default-output-classes" set-word-prop
+] each
+
+! Find a less repetitive way of doing this
+\ float-min { float float } "input-classes" set-word-prop
+\ float-min [ interval-min ] [ float-valued ] binary-op
+
+\ float-max { float float } "input-classes" set-word-prop
+\ float-max [ interval-max ] [ float-valued ] binary-op
+
+\ fixnum-min { fixnum fixnum } "input-classes" set-word-prop
+\ fixnum-min [ interval-min ] [ fixnum-valued ] binary-op
+
+\ fixnum-max { fixnum fixnum } "input-classes" set-word-prop
+\ fixnum-max [ interval-max ] [ fixnum-valued ] binary-op

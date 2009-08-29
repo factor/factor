@@ -1,11 +1,10 @@
-USING: accessors arrays compiler.units kernel kernel.private math
-math.constants math.private sequences strings tools.test words
-continuations sequences.private hashtables.private byte-arrays
-system random layouts vectors
+USING: accessors arrays compiler.units kernel kernel.private
+math math.constants math.private math.integers.private sequences
+strings tools.test words continuations sequences.private
+hashtables.private byte-arrays system random layouts vectors
 sbufs strings.private slots.private alien math.order
 alien.accessors alien.c-types alien.syntax alien.strings
-namespaces libc io.encodings.ascii
-classes compiler ;
+namespaces libc io.encodings.ascii classes compiler ;
 IN: compiler.tests.intrinsics
 
 ! Make sure that intrinsic ops compile to correct code.
@@ -271,6 +270,15 @@ cell 8 = [
     [ 100000 swap array-nth ] compile-call
 ] unit-test
 
+[ 2 ] [ 2 4 [ fixnum-min ] compile-call ] unit-test
+[ 2 ] [ 4 2 [ fixnum-min ] compile-call ] unit-test
+[ 4 ] [ 2 4 [ fixnum-max ] compile-call ] unit-test
+[ 4 ] [ 4 2 [ fixnum-max ] compile-call ] unit-test
+[ -2 ] [ -2 -4 [ fixnum-max ] compile-call ] unit-test
+[ -2 ] [ -4 -2 [ fixnum-max ] compile-call ] unit-test
+[ -4 ] [ -2 -4 [ fixnum-min ] compile-call ] unit-test
+[ -4 ] [ -4 -2 [ fixnum-min ] compile-call ] unit-test
+
 ! 64-bit overflow
 cell 8 = [
     [ t ] [ 1 59 fixnum-shift dup [ fixnum+ ] compile-call 1 60 fixnum-shift = ] unit-test
@@ -461,6 +469,54 @@ cell 8 = [
     2 B{ 1 2 3 4 5 6 } <displaced-alien> [
         { alien } declare 1 alien-unsigned-1
     ] compile-call
+] unit-test
+
+[ ALIEN: 123 ] [
+    123 [ <alien> ] compile-call
+] unit-test
+
+[ ALIEN: 123 ] [
+    123 [ { fixnum } declare <alien> ] compile-call
+] unit-test
+
+[ ALIEN: 123 ] [
+    [ 123 <alien> ] compile-call
+] unit-test
+
+[ f ] [
+    0 [ <alien> ] compile-call
+] unit-test
+
+[ f ] [
+    0 [ { fixnum } declare <alien> ] compile-call
+] unit-test
+
+[ f ] [
+    [ 0 <alien> ] compile-call
+] unit-test
+
+[ ALIEN: 321 ] [
+    0 ALIEN: 321 [ <displaced-alien> ] compile-call
+] unit-test
+
+[ ALIEN: 321 ] [
+    0 ALIEN: 321 [ { fixnum c-ptr } declare <displaced-alien> ] compile-call
+] unit-test
+
+[ ALIEN: 321 ] [
+    ALIEN: 321 [ 0 swap <displaced-alien> ] compile-call
+] unit-test
+
+[ B{ 0 1 2 3 4 } ] [
+   2  B{ 0 1 2 3 4 } <displaced-alien>
+    [ 1 swap <displaced-alien> ] compile-call
+    underlying>>
+] unit-test
+
+[ B{ 0 1 2 3 4 } ] [
+    2 B{ 0 1 2 3 4 } <displaced-alien>
+    [ 1 swap { c-ptr } declare <displaced-alien> ] compile-call
+    underlying>>
 ] unit-test
 
 [

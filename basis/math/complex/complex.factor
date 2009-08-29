@@ -5,29 +5,29 @@ math.libm math.functions arrays math.functions.private sequences
 parser ;
 IN: math.complex.private
 
-M: real real-part ;
-M: real imaginary-part drop 0 ;
-M: complex real-part real>> ;
-M: complex imaginary-part imaginary>> ;
-M: complex absq >rect [ sq ] bi@ + ;
-M: complex hashcode* nip >rect [ hashcode ] bi@ bitxor ;
+M: real real-part ; inline
+M: real imaginary-part drop 0 ; inline
+M: complex real-part real>> ; inline
+M: complex imaginary-part imaginary>> ; inline
+M: complex absq >rect [ sq ] bi@ + ; inline
+M: complex hashcode* nip >rect [ hashcode ] bi@ bitxor ; inline
 : componentwise ( x y quot -- a b ) [ [ >rect ] bi@ ] dip bi-curry@ bi* ; inline
 : complex= ( x y quot -- ? ) componentwise and ; inline
-M: complex equal? over complex? [ [ = ] complex= ] [ 2drop f ] if ;
-M: complex number= [ number= ] complex= ;
+M: complex equal? over complex? [ [ = ] complex= ] [ 2drop f ] if ; inline
+M: complex number= [ number= ] complex= ; inline
 : complex-op ( x y quot -- z ) componentwise rect> ; inline
-M: complex + [ + ] complex-op ;
-M: complex - [ - ] complex-op ;
+M: complex + [ + ] complex-op ; inline
+M: complex - [ - ] complex-op ; inline
 : *re ( x y -- xr*yr xi*yi ) [ >rect ] bi@ [ * ] bi-curry@ bi* ; inline
 : *im ( x y -- xi*yr xr*yi ) swap [ >rect ] bi@ swap [ * ] bi-curry@ bi* ; inline
-M: complex * [ *re - ] [ *im + ] 2bi rect> ;
+M: complex * [ *re - ] [ *im + ] 2bi rect> ; inline
 : (complex/) ( x y -- r i m ) [ [ *re + ] [ *im - ] 2bi ] keep absq ; inline
 : complex/ ( x y quot -- z ) [ (complex/) ] dip curry bi@ rect> ; inline
-M: complex / [ / ] complex/ ;
-M: complex /f [ /f ] complex/ ;
-M: complex /i [ /i ] complex/ ;
-M: complex abs absq >float fsqrt ;
-M: complex sqrt >polar [ fsqrt ] [ 2.0 / ] bi* polar> ;
+M: complex / [ / ] complex/ ; inline
+M: complex /f [ /f ] complex/ ; inline
+M: complex /i [ /i ] complex/ ; inline
+M: complex abs absq >float fsqrt ; inline
+M: complex sqrt >polar [ fsqrt ] [ 2.0 / ] bi* polar> ; inline
 
 IN: syntax
 

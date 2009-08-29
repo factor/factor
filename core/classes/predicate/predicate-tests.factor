@@ -27,8 +27,18 @@ TUPLE: tuple-b < tuple-a ;
 
 PREDICATE: tuple-c < tuple-b slot>> ;
 
-GENERIC: ptest ( tuple -- )
-M: tuple-a ptest drop ;
-M: tuple-c ptest drop ;
+GENERIC: ptest ( tuple -- x )
+M: tuple-a ptest drop tuple-a ;
+M: tuple-c ptest drop tuple-c ;
 
-[ ] [ tuple-b new ptest ] unit-test
+[ tuple-a ] [ tuple-b new ptest ] unit-test
+[ tuple-c ] [ tuple-b new t >>slot ptest ] unit-test
+
+PREDICATE: tuple-d < tuple-a slot>> ;
+
+GENERIC: ptest' ( tuple -- x )
+M: tuple-a ptest' drop tuple-a ;
+M: tuple-d ptest' drop tuple-d ;
+
+[ tuple-a ] [ tuple-b new ptest' ] unit-test
+[ tuple-d ] [ tuple-b new t >>slot ptest' ] unit-test

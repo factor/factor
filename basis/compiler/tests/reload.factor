@@ -1,5 +1,5 @@
-IN: compiler.tests.reload
 USE: vocabs.loader
+IN: compiler.tests.reload
 
 ! "parser" reload
 ! "sequences" reload

@@ -1,5 +1,5 @@
 USING: alien alien.syntax alien.c-types alien.strings math
-kernel sequences windows.errors windows.types debugger io
+kernel sequences windows.errors windows.types io
 accessors math.order namespaces make math.parser windows.kernel32
 combinators locals specialized-arrays.direct.uchar ;
 IN: windows.ole32
@@ -116,11 +116,10 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
 : succeeded? ( hresult -- ? )
     0 HEX: 7FFFFFFF between? ;
 
-TUPLE: ole32-error error-code ;
-C: <ole32-error> ole32-error
+TUPLE: ole32-error code message ;
 
-M: ole32-error error.
-    "COM method failed: " print error-code>> n>win32-error-string print ;
+: <ole32-error> ( code -- error )
+    dup n>win32-error-string \ ole32-error boa ;
 
 : ole32-error ( hresult -- )
     dup succeeded? [ drop ] [ <ole32-error> throw ] if ;
@@ -149,7 +148,7 @@ M: ole32-error error.
             [ ]
         } 2cleave
 
-        GUID-Data4 8 <direct-uchar-array> {
+        GUID-Data4 {
             [ 20 22 0 (guid-byte>guid) ]
             [ 22 24 1 (guid-byte>guid) ]
 
@@ -176,7 +175,7 @@ M: ole32-error error.
             [ [ GUID-Data3 ] 4 (guid-section%) "-" % ]
             [ ]
         } cleave
-        GUID-Data4 8 <direct-uchar-array> {
+        GUID-Data4 {
             [ 0 (guid-byte%) ]
             [ 1 (guid-byte%) "-" % ]
             [ 2 (guid-byte%) ]

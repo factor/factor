@@ -10,7 +10,7 @@ IN: irc.client.internals
 : do-connect ( server port quot: ( host port -- stream ) attempts -- stream/f )
     dup 0 > [
         [ drop call( host port -- stream ) ]
-        [ drop 15 sleep 1- do-connect ]
+        [ drop 15 sleep 1 - do-connect ]
         recover
     ] [ 2drop 2drop f ] if ;
 

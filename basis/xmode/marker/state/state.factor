@@ -28,7 +28,7 @@ SYMBOLS: line last-offset position context
 
 : next-token, ( len id -- )
     [ position get 2dup + ] dip token,
-    position get + dup 1- position set last-offset set ;
+    position get + dup 1 - position set last-offset set ;
 
 : push-context ( rules -- )
     context [ <line-context> ] change ;

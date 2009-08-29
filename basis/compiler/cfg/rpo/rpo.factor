@@ -40,3 +40,6 @@ SYMBOL: visited
 
 : local-optimization ( cfg quot: ( insns -- insns' ) -- cfg' )
     dupd '[ _ optimize-basic-block ] each-basic-block ; inline
+
+: needs-post-order ( cfg -- cfg' )
+    dup post-order drop ;

@@ -3,7 +3,7 @@
 USING: accessors assocs combinators combinators.short-circuit
 cpu.architecture kernel layouts locals make math namespaces sequences
 sets vectors fry compiler.cfg compiler.cfg.instructions
-compiler.cfg.rpo ;
+compiler.cfg.rpo arrays ;
 IN: compiler.cfg.utilities
 
 PREDICATE: kill-block < basic-block
@@ -37,17 +37,27 @@ SYMBOL: visited
 : skip-empty-blocks ( bb -- bb' )
     H{ } clone visited [ (skip-empty-blocks) ] with-variable ;
 
-:: insert-basic-block ( from to bb -- )
-    bb from 1vector >>predecessors drop
+:: insert-basic-block ( froms to bb -- )
+    bb froms V{ } like >>predecessors drop
     bb to 1vector >>successors drop
-    to predecessors>> [ dup from eq? [ drop bb ] when ] change-each
-    from successors>> [ dup to eq? [ drop bb ] when ] change-each ;
+    to predecessors>> [ dup froms memq? [ drop bb ] when ] change-each
+    froms [ successors>> [ dup to eq? [ drop bb ] when ] change-each ] each ;
+
+: add-instructions ( bb quot -- )
+    [ instructions>> building ] dip '[
+        building get pop
+        [ @ ] dip
+        ,
+    ] with-variable ; inline
 
 : <simple-block> ( insns -- bb )
     <basic-block>
     swap >vector
     \ ##branch new-insn over push
     >>instructions ;
+
+: insert-simple-basic-block ( from to insns -- )
+    [ 1vector ] 2dip <simple-block> insert-basic-block ;
 
 : has-phis? ( bb -- ? )
     instructions>> first ##phi? ;
@@ -57,6 +67,14 @@ SYMBOL: visited
 
 : if-has-phis ( bb quot: ( bb -- ) -- )
     [ dup has-phis? ] dip [ drop ] if ; inline
+
+: each-phi ( bb quot: ( ##phi -- ) -- )
+    [ instructions>> ] dip
+    '[ dup ##phi? [ @ t ] [ drop f ] if ] all? drop ; inline
+
+: each-non-phi ( bb quot: ( insn -- ) -- )
+    [ instructions>> ] dip
+    '[ dup ##phi? [ drop ] _ if ] each ; inline
 
 : predecessor ( bb -- pred )
     predecessors>> first ; inline

@@ -57,7 +57,7 @@ t to: remove-hidden-solids?
 
 : with-pv ( i quot -- ) [ swap >pv call ] with-scope  ; inline
 
-: dimension ( array -- x )      length 1- ; inline 
+: dimension ( array -- x )      length 1 - ; inline 
 : change-last ( seq quot -- ) 
     [ [ dimension ] keep ] dip change-nth  ; inline
 
@@ -99,7 +99,7 @@ TUPLE: light name { direction array } color ;
 : point-inside-or-on-halfspace? ( halfspace v -- ? ) 
     position-point VERY-SMALL-NUM neg > ;
 : project-vector (  seq -- seq )     
-    pv> [ head ] [ 1+  tail ] 2bi append ; 
+    pv> [ head ] [ 1 +  tail ] 2bi append ; 
 : get-intersection ( matrice -- seq )     
     [ 1 tail* ] map     flip first ;
 
@@ -336,7 +336,7 @@ TUPLE: solid dimension silhouettes
 : compute-adjacencies ( solid -- solid )
     dup dimension>> [ >= ] curry 
     [ keep swap ] curry MAX-FACE-PER-CORNER swap
-    [ [ test-faces-combinaisons ] 2keep 1- ] while drop ;
+    [ [ test-faces-combinaisons ] 2keep 1 - ] while drop ;
 
 : find-adjacencies ( solid -- solid ) 
     erase-old-adjacencies   
@@ -435,7 +435,7 @@ TUPLE: space name dimension solids ambient-color lights ;
     [ [ non-empty-solid? ] filter ] change-solids ;
 
 : projected-space ( space solids -- space ) 
-   swap dimension>> 1-  <space>    
+   swap dimension>> 1 -  <space>    
    swap >>dimension    swap  >>solids ;
 
 : get-silhouette ( solid -- silhouette )    

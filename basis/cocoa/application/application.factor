@@ -18,7 +18,7 @@ NSApplicationDelegateReplyFailure ;
 
 : NSApp ( -- app ) NSApplication -> sharedApplication ;
 
-: NSAnyEventMask ( -- mask ) HEX: ffffffff ; inline
+CONSTANT: NSAnyEventMask HEX: ffffffff
 
 FUNCTION: void NSBeep ( ) ;
 

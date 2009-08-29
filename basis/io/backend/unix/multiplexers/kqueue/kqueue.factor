@@ -17,7 +17,7 @@ TUPLE: kqueue-mx < mx events ;
         kqueue dup io-error >>fd
         max-events "kevent" <struct-array> >>events ;
 
-M: kqueue-mx dispose fd>> close-file ;
+M: kqueue-mx dispose* fd>> close-file ;
 
 : make-kevent ( fd filter flags -- event )
     "kevent" <c-object>

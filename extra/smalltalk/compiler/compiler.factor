@@ -123,7 +123,7 @@ M: ast-block compile-ast
     [ lexenv self>> suffix ] dip <lambda> ;
 
 : compile-method-body ( lexenv block -- quot )
-    [ [ (compile-method-body) ] [ arguments>> length 1+ ] bi ] 2keep
+    [ [ (compile-method-body) ] [ arguments>> length 1 + ] bi ] 2keep
     make-return ;
 
 : compile-method ( lexenv ast-method -- )

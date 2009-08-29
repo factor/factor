@@ -20,16 +20,14 @@ M: object dispose-monitors ;
         [ dispose-monitors ] [ ] cleanup
     ] with-scope ; inline
 
-TUPLE: monitor < identity-tuple path queue timeout ;
-
-M: monitor hashcode* path>> hashcode* ;
+TUPLE: monitor < disposable path queue timeout ;
 
 M: monitor timeout timeout>> ;
 
 M: monitor set-timeout (>>timeout) ;
 
 : new-monitor ( path mailbox class -- monitor )
-    new
+    new-disposable
         swap >>queue
         swap >>path ; inline
 

@@ -1,24 +1,31 @@
-! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
+! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
-combinators generic layouts ;
+combinators generic layouts memoize ;
 IN: math.intervals
 
 SYMBOL: empty-interval
 
-SYMBOL: full-interval
+SINGLETON: full-interval
 
 TUPLE: interval { from read-only } { to read-only } ;
 
+: closed-point? ( from to -- ? )
+    2dup [ first ] bi@ number=
+    [ [ second ] both? ] [ 2drop f ] if ;
+
 : <interval> ( from to -- interval )
-    2dup [ first ] bi@ {
-        { [ 2dup > ] [ 2drop 2drop empty-interval ] }
-        { [ 2dup = ] [
-            2drop 2dup [ second ] both?
+    {
+        { [ 2dup [ first ] bi@ > ] [ 2drop empty-interval ] }
+        { [ 2dup [ first ] bi@ number= ] [
+            2dup [ second ] both?
             [ interval boa ] [ 2drop empty-interval ] if
         ] }
-        [ 2drop interval boa ]
+        { [ 2dup [ { -1/0. t } = ] [ { 1/0. t } = ] bi* and ] [
+            2drop full-interval
+        ] }
+        [ interval boa ]
     } cond ;
 
 : open-point ( n -- endpoint ) f 2array ;
@@ -48,7 +55,13 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : (a,inf] ( a -- interval ) 1/0. (a,b] ; inline
 
-: [0,inf] ( -- interval ) 0 [a,inf] ; foldable
+MEMO: [0,inf] ( -- interval ) 0 [a,inf] ; foldable
+
+MEMO: fixnum-interval ( -- interval )
+    most-negative-fixnum most-positive-fixnum [a,b] ; inline
+
+MEMO: array-capacity-interval ( -- interval )
+    0 max-array-capacity [a,b] ; inline
 
 : [-inf,inf] ( -- interval ) full-interval ; inline
 
@@ -56,20 +69,23 @@ TUPLE: interval { from read-only } { to read-only } ;
     [ 2dup [ first ] bi@ ] dip call [
         2drop t
     ] [
-        2dup [ first ] bi@ = [
+        2dup [ first ] bi@ number= [
             [ second ] bi@ not or
         ] [
             2drop f
         ] if
     ] if ; inline
 
+: endpoint= ( p1 p2 -- ? )
+    [ [ first ] bi@ number= ] [ [ second ] bi@ eq? ] 2bi and ;
+
 : endpoint< ( p1 p2 -- ? ) [ < ] compare-endpoints ;
 
-: endpoint<= ( p1 p2 -- ? ) [ endpoint< ] 2keep = or ;
+: endpoint<= ( p1 p2 -- ? ) [ endpoint< ] [ endpoint= ] 2bi or ;
 
 : endpoint> ( p1 p2 -- ? ) [ > ] compare-endpoints ;
 
-: endpoint>= ( p1 p2 -- ? ) [ endpoint> ] 2keep = or ;
+: endpoint>= ( p1 p2 -- ? ) [ endpoint> ] [ endpoint= ] 2bi or ;
 
 : endpoint-min ( p1 p2 -- p3 ) [ endpoint< ] most ;
 
@@ -78,21 +94,25 @@ TUPLE: interval { from read-only } { to read-only } ;
 : interval>points ( int -- from to )
     [ from>> ] [ to>> ] bi ;
 
-: points>interval ( seq -- interval )
-    dup [ first fp-nan? ] any?
-    [ drop [-inf,inf] ] [
-        dup first
-        [ [ endpoint-min ] reduce ]
-        [ [ endpoint-max ] reduce ]
-        2bi <interval>
-    ] if ;
+: points>interval ( seq -- interval nan? )
+    [ first fp-nan? not ] partition
+    [
+        [ [ ] [ endpoint-min ] map-reduce ]
+        [ [ ] [ endpoint-max ] map-reduce ] bi
+        <interval>
+    ]
+    [ empty? not ]
+    bi* ;
+
+: nan-ok ( interval nan? -- interval ) drop ; inline
+: nan-not-ok ( interval nan? -- interval ) [ drop full-interval ] when ; inline
 
 : (interval-op) ( p1 p2 quot -- p3 )
     [ [ first ] [ first ] [ call ] tri* ]
     [ drop [ second ] both? ]
     3bi 2array ; inline
 
-: interval-op ( i1 i2 quot -- i3 )
+: interval-op ( i1 i2 quot -- i3 nan? )
     {
         [ [ from>> ] [ from>> ] [ ] tri* (interval-op) ]
         [ [ to>>   ] [ from>> ] [ ] tri* (interval-op) ]
@@ -110,10 +130,10 @@ TUPLE: interval { from read-only } { to read-only } ;
     } cond ; inline
 
 : interval+ ( i1 i2 -- i3 )
-    [ [ + ] interval-op ] do-empty-interval ;
+    [ [ + ] interval-op nan-ok ] do-empty-interval ;
 
 : interval- ( i1 i2 -- i3 )
-    [ [ - ] interval-op ] do-empty-interval ;
+    [ [ - ] interval-op nan-ok ] do-empty-interval ;
 
 : interval-intersect ( i1 i2 -- i3 )
     {
@@ -138,7 +158,7 @@ TUPLE: interval { from read-only } { to read-only } ;
         { [ dup empty-interval eq? ] [ drop ] }
         { [ over full-interval eq? ] [ drop ] }
         { [ dup full-interval eq? ] [ nip ] }
-        [ [ interval>points 2array ] bi@ append points>interval ]
+        [ [ interval>points 2array ] bi@ append points>interval nan-not-ok ]
     } cond ;
 
 : interval-subset? ( i1 i2 -- ? )
@@ -157,7 +177,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     0 swap interval-contains? ;
 
 : interval* ( i1 i2 -- i3 )
-    [ [ [ * ] interval-op ] do-empty-interval ]
+    [ [ [ * ] interval-op nan-ok ] do-empty-interval ]
     [ [ interval-zero? ] either? ]
     2bi [ 0 [a,a] interval-union ] when ;
 
@@ -180,7 +200,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     ] [
         interval>points
         2dup [ second ] both?
-        [ [ first ] bi@ = ]
+        [ [ first ] bi@ number= ]
         [ 2drop f ] if
     ] if ;
 
@@ -204,7 +224,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     [
         [
             [ interval-closure ] bi@
-            [ shift ] interval-op
+            [ shift ] interval-op nan-not-ok
         ] interval-integer-op
     ] do-empty-interval ;
 
@@ -218,12 +238,24 @@ TUPLE: interval { from read-only } { to read-only } ;
     ] do-empty-interval ;
 
 : interval-max ( i1 i2 -- i3 )
-    #! Inaccurate; could be tighter
-    [ [ interval-closure ] bi@ [ max ] interval-op ] do-empty-interval ;
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ dup empty-interval eq? ] [ nip ] }
+        { [ 2dup [ full-interval eq? ] both? ] [ drop ] }
+        { [ over full-interval eq? ] [ nip from>> first [a,inf] ] }
+        { [ dup full-interval eq? ] [ drop from>> first [a,inf] ] }
+        [ [ interval-closure ] bi@ [ max ] interval-op nan-not-ok ]
+    } cond ;
 
 : interval-min ( i1 i2 -- i3 )
-    #! Inaccurate; could be tighter
-    [ [ interval-closure ] bi@ [ min ] interval-op ] do-empty-interval ;
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ dup empty-interval eq? ] [ nip ] }
+        { [ 2dup [ full-interval eq? ] both? ] [ drop ] }
+        { [ over full-interval eq? ] [ nip to>> first [-inf,a] ] }
+        { [ dup full-interval eq? ] [ drop to>> first [-inf,a] ] }
+        [ [ interval-closure ] bi@ [ min ] interval-op nan-not-ok ]
+    } cond ;
 
 : interval-interior ( i1 -- i2 )
     dup special-interval? [
@@ -238,7 +270,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     } cond ; inline
 
 : interval/ ( i1 i2 -- i3 )
-    [ [ [ / ] interval-op ] interval-division-op ] do-empty-interval ;
+    [ [ [ / ] interval-op nan-not-ok ] interval-division-op ] do-empty-interval ;
 
 : interval/-safe ( i1 i2 -- i3 )
     #! Just a hack to make the compiler work if bootstrap.math
@@ -250,13 +282,13 @@ TUPLE: interval { from read-only } { to read-only } ;
         [
             [
                 [ interval-closure ] bi@
-                [ /i ] interval-op
+                [ /i ] interval-op nan-not-ok
             ] interval-integer-op
         ] interval-division-op
     ] do-empty-interval ;
 
 : interval/f ( i1 i2 -- i3 )
-    [ [ [ /f ] interval-op ] interval-division-op ] do-empty-interval ;
+    [ [ [ /f ] interval-op nan-not-ok ] interval-division-op ] do-empty-interval ;
 
 : (interval-abs) ( i1 -- i2 )
     interval>points [ first2 [ abs ] dip 2array ] bi@ 2array ;
@@ -265,25 +297,12 @@ TUPLE: interval { from read-only } { to read-only } ;
     {
         { [ dup empty-interval eq? ] [ ] }
         { [ dup full-interval eq? ] [ drop [0,inf] ] }
-        { [ 0 over interval-contains? ] [ (interval-abs) { 0 t } suffix points>interval ] }
-        [ (interval-abs) points>interval ]
+        { [ 0 over interval-contains? ] [ (interval-abs) { 0 t } suffix points>interval nan-not-ok ] }
+        [ (interval-abs) points>interval nan-not-ok ]
     } cond ;
 
-: interval-mod ( i1 i2 -- i3 )
-    #! Inaccurate.
-    [
-        [
-            nip interval-abs to>> first [ neg ] keep (a,b)
-        ] interval-division-op
-    ] do-empty-interval ;
-
-: interval-rem ( i1 i2 -- i3 )
-    #! Inaccurate.
-    [
-        [
-            nip interval-abs to>> first 0 swap [a,b)
-        ] interval-division-op
-    ] do-empty-interval ;
+: interval-absq ( i1 -- i2 )
+    interval-abs interval-sq ;
 
 : interval-recip ( i1 -- i2 ) 1 [a,a] swap interval/ ;
 
@@ -294,13 +313,13 @@ SYMBOL: incomparable
 : left-endpoint-< ( i1 i2 -- ? )
     [ swap interval-subset? ]
     [ nip interval-singleton? ]
-    [ [ from>> ] bi@ = ]
+    [ [ from>> ] bi@ endpoint= ]
     2tri and and ;
 
 : right-endpoint-< ( i1 i2 -- ? )
     [ interval-subset? ]
     [ drop interval-singleton? ]
-    [ [ to>> ] bi@ = ]
+    [ [ to>> ] bi@ endpoint= ]
     2tri and and ;
 
 : (interval<) ( i1 i2 -- i1 i2 ? )
@@ -316,10 +335,10 @@ SYMBOL: incomparable
     } cond 2nip ;
 
 : left-endpoint-<= ( i1 i2 -- ? )
-    [ from>> ] dip to>> = ;
+    [ from>> ] [ to>> ] bi* endpoint= ;
 
 : right-endpoint-<= ( i1 i2 -- ? )
-    [ to>> ] dip from>> = ;
+    [ to>> ] [ from>> ] bi* endpoint= ;
 
 : interval<= ( i1 i2 -- ? )
     {
@@ -334,6 +353,25 @@ SYMBOL: incomparable
 
 : interval>= ( i1 i2 -- ? )
     swap interval<= ;
+
+: interval-mod ( i1 i2 -- i3 )
+    {
+        { [ over empty-interval eq? ] [ swap ] }
+        { [ dup empty-interval eq? ] [ ] }
+        { [ dup full-interval eq? ] [ ] }
+        [ interval-abs to>> first [ neg ] keep (a,b) ]
+    } cond
+    swap 0 [a,a] interval>= t eq? [ [0,inf] interval-intersect ] when ;
+
+: (rem-range) ( i -- i' ) interval-abs to>> first 0 swap [a,b) ;
+
+: interval-rem ( i1 i2 -- i3 )
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ dup empty-interval eq? ] [ nip ] }
+        { [ dup full-interval eq? ] [ 2drop [0,inf] ] }
+        [ nip (rem-range) ]
+    } cond ;
 
 : interval-bitand-pos ( i1 i2 -- ? )
     [ to>> first ] bi@ min 0 swap [a,b] ;

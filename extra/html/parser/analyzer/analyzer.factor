@@ -3,7 +3,7 @@
 USING: assocs html.parser kernel math sequences strings ascii
 arrays generalizations shuffle namespaces make
 splitting http accessors io combinators http.client urls
-urls.encoding fry prettyprint sets ;
+urls.encoding fry prettyprint sets combinators.short-circuit ;
 IN: html.parser.analyzer
 
 TUPLE: link attributes clickable ;
@@ -16,7 +16,7 @@ TUPLE: link attributes clickable ;
 
 : find-nth ( seq quot n -- i elt )
     [ <enum> >alist ] 2dip -rot
-    '[ _ [ second @ ] find-from rot drop swap 1+ ]
+    '[ _ [ second @ ] find-from rot drop swap 1 + ]
     [ f 0 ] 2dip times drop first2 ; inline
 
 : find-first-name ( vector string -- i/f tag/f )
@@ -29,7 +29,7 @@ TUPLE: link attributes clickable ;
 : find-between* ( vector i/f tag/f -- vector )
     over integer? [
         [ tail-slice ] [ name>> ] bi*
-        dupd find-matching-close drop dup [ 1+ ] when
+        dupd find-matching-close drop dup [ 1 + ] when
         [ head ] [ first ] if*
     ] [
         3drop V{ } clone
@@ -102,6 +102,15 @@ TUPLE: link attributes clickable ;
 : find-links ( vector -- vector' )
     [ [ name>> "a" = ] [ attributes>> "href" swap at ] bi and ]
     find-between-all ;
+
+: find-images ( vector -- vector' )
+    [
+        {
+            [ name>> "img" = ]
+            [ attributes>> "src" swap at ]
+        } 1&&
+    ] find-all
+    values [ attributes>> "src" swap at ] map ;
 
 : <link> ( vector -- link )
     [ first attributes>> ]

@@ -1,38 +1,42 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors compiler.cfg.builder compiler.cfg.linear-scan
-compiler.cfg.liveness compiler.cfg.mr compiler.cfg.optimizer
-compiler.cfg.stacks.finalize compiler.cfg.stacks.global
-compiler.codegen compiler.tree.builder compiler.tree.optimizer
-kernel make sequences tools.annotations tools.crossref ;
+USING: accessors kernel make sequences tools.annotations tools.crossref ;
+QUALIFIED: compiler.cfg.builder
+QUALIFIED: compiler.cfg.linear-scan
+QUALIFIED: compiler.cfg.mr
+QUALIFIED: compiler.cfg.optimizer
+QUALIFIED: compiler.cfg.stacks.finalize
+QUALIFIED: compiler.cfg.stacks.global
+QUALIFIED: compiler.codegen
+QUALIFIED: compiler.tree.builder
+QUALIFIED: compiler.tree.optimizer
 IN: bootstrap.compiler.timing
 
 : passes ( word -- seq )
     def>> uses [ vocabulary>> "compiler." head? ] filter ;
 
-: high-level-passes ( -- seq ) \ optimize-tree passes ;
+: high-level-passes ( -- seq ) \ compiler.tree.optimizer:optimize-tree passes ;
 
-: low-level-passes ( -- seq ) \ optimize-cfg passes ;
+: low-level-passes ( -- seq ) \ compiler.cfg.optimizer:optimize-cfg passes ;
 
-: machine-passes ( -- seq ) \ build-mr passes ;
+: machine-passes ( -- seq ) \ compiler.cfg.mr:build-mr passes ;
 
-: linear-scan-passes ( -- seq ) \ (linear-scan) passes ;
+: linear-scan-passes ( -- seq ) \ compiler.cfg.linear-scan:(linear-scan) passes ;
 
 : all-passes ( -- seq )
     [
-        \ build-tree ,
-        \ optimize-tree ,
+        \ compiler.tree.builder:build-tree ,
+        \ compiler.tree.optimizer:optimize-tree ,
         high-level-passes %
-        \ build-cfg ,
-        \ compute-global-sets ,
-        \ finalize-stack-shuffling ,
-        \ optimize-cfg ,
+        \ compiler.cfg.builder:build-cfg ,
+        \ compiler.cfg.stacks.global:compute-global-sets ,
+        \ compiler.cfg.stacks.finalize:finalize-stack-shuffling ,
+        \ compiler.cfg.optimizer:optimize-cfg ,
         low-level-passes %
-        \ compute-live-sets ,
-        \ build-mr ,
+        \ compiler.cfg.mr:build-mr ,
         machine-passes %
         linear-scan-passes %
-        \ generate ,
+        \ compiler.codegen:generate ,
     ] { } make ;
 
 all-passes [ [ reset ] [ add-timing ] bi ] each

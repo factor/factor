@@ -23,7 +23,7 @@ M: glue pref-dim* drop { 0 0 } ;
     [ '[ [ dim>> ] [ gap>> ] [ filled-cell>> ] tri _ tri@ ] dip ] dip call ; inline
 
 : available-space ( pref-dim gap dims -- avail )
-    length 1+ * [-] ; inline
+    length 1 + * [-] ; inline
 
 : -center) ( pref-dim gap filled-cell dims -- )
     [ nip available-space ] 2keep [ remove-nth sum [-] ] 2keep set-nth ; inline

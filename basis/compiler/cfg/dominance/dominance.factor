@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators sets math fry kernel math.order
 dlists deques vectors namespaces sequences sorting locals
-compiler.cfg.rpo ;
+compiler.cfg.rpo compiler.cfg.predecessors ;
 IN: compiler.cfg.dominance
 
 ! Reference:
@@ -83,10 +83,14 @@ PRIVATE>
     H{ } clone maxpreorder set
     [ 0 ] dip entry>> (compute-dfs) drop ;
 
+: compute-dominance ( cfg -- cfg' )
+    [ compute-dom-parents compute-dom-children ] [ compute-dfs ] [ ] tri ;
+
 PRIVATE>
 
-: compute-dominance ( cfg -- )
-    [ compute-dom-parents compute-dom-children ] [ compute-dfs ] bi ;
+: needs-dominance ( cfg -- cfg' )
+    needs-predecessors
+    dup dominance-valid?>> [ compute-dominance t >>dominance-valid? ] unless ;
 
 : dominates? ( bb1 bb2 -- ? )
     swap [ pre-of ] [ [ pre-of ] [ maxpre-of ] bi ] bi* between? ;

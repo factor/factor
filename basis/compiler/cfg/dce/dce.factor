@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sets kernel namespaces sequences
 compiler.cfg.instructions compiler.cfg.def-use
-compiler.cfg.rpo ;
+compiler.cfg.rpo compiler.cfg.predecessors ;
 IN: compiler.cfg.dce
 
 ! Maps vregs to sequences of vregs
@@ -95,6 +95,8 @@ M: ##write-barrier live-insn? src>> live-vreg? ;
 M: insn live-insn? drop t ;
 
 : eliminate-dead-code ( cfg -- cfg' )
+    needs-predecessors
+
     init-dead-code
     dup
     [ [ instructions>> [ build-liveness-graph ] each ] each-basic-block ]

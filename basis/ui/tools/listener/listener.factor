@@ -170,7 +170,7 @@ M: interactor stream-read1
 M: interactor dispose drop ;
 
 : go-to-error ( interactor error -- )
-    [ line>> 1- ] [ column>> ] bi 2array
+    [ line>> 1 - ] [ column>> ] bi 2array
     over set-caret
     mark>caret ;
 

@@ -219,7 +219,11 @@ HELP: <word> ( name vocab -- word )
 HELP: gensym
 { $values { "word" word } }
 { $description "Creates an uninterned word that is not equal to any other word in the system." }
-{ $examples { $unchecked-example "gensym ." "G:260561" } }
+{ $examples { $example "USING: prettyprint words ;"
+    "gensym ."
+    "( gensym )"
+    }
+}
 { $notes "Gensyms are often used as placeholder values that have no meaning of their own but must be unique. For example, the compiler uses gensyms to label sections of code." } ;
 
 HELP: bootstrapping?
@@ -276,6 +280,7 @@ HELP: parsing-word?
 HELP: define-declared
 { $values { "word" word } { "def" quotation } { "effect" effect } }
 { $description "Defines a word and declares its stack effect." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 
 HELP: define-temp
@@ -292,6 +297,16 @@ HELP: delimiter?
 { $values { "obj" object } { "?" "a boolean" } }
 { $description "Tests if an object is a delimiter word declared by " { $link POSTPONE: delimiter } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
+
+HELP: deprecated?
+{ $values { "obj" object } { "?" "a boolean" } }
+{ $description "Tests if an object is " { $link POSTPONE: deprecated } "." }
+{ $notes "Outputs " { $link f } " if the object is not a word." } ;
+
+HELP: make-deprecated
+{ $values { "word" word } }
+{ $description "Declares a word as " { $link POSTPONE: deprecated } "." }
+{ $side-effects "word" } ;
 
 HELP: make-flushable
 { $values { "word" word } }
@@ -311,4 +326,5 @@ HELP: make-inline
 HELP: define-inline
 { $values { "word" word } { "def" quotation } { "effect" effect } }
 { $description "Defines a word and makes it " { $link POSTPONE: inline } "." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;

@@ -10,7 +10,4 @@ SYMBOL: renamings
 : rename-value ( vreg -- vreg' )
     renamings get ?at drop ;
 
-: fresh-value ( vreg -- vreg' )
-    reg-class>> next-vreg ;
-
-RENAMING: rename [ rename-value ] [ rename-value ] [ fresh-value ]
+RENAMING: rename [ rename-value ] [ rename-value ] [ drop next-vreg ]

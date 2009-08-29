@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs math math.parser memoize
-io.encodings.ascii io.files lexer parser
-colors sequences splitting combinators.smart ascii ;
+USING: kernel assocs math math.parser memoize io.encodings.utf8
+io.files lexer parser colors sequences splitting
+combinators.smart ascii ;
 IN: colors.constants
 
 <PRIVATE
@@ -19,7 +19,7 @@ IN: colors.constants
     [ parse-color ] H{ } map>assoc ;
 
 MEMO: rgb.txt ( -- assoc )
-    "resource:basis/colors/constants/rgb.txt" ascii file-lines parse-rgb.txt ;
+    "resource:basis/colors/constants/rgb.txt" utf8 file-lines parse-rgb.txt ;
 
 PRIVATE>
 

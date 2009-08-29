@@ -1,15 +1,15 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math assocs namespaces sequences heaps
-fry make combinators sets locals
+fry make combinators sets locals arrays
 cpu.architecture
 compiler.cfg
-compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.renaming.functor
+compiler.cfg.linearization.order
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
@@ -52,7 +52,7 @@ SYMBOL: register-live-outs
     init-unhandled ;
 
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ vreg>> reg-class>> ] [ spill-to>> ] tri _spill ;
+    [ reg>> ] [ vreg>> rep-of ] [ spill-to>> ] tri _spill ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
@@ -72,7 +72,7 @@ SYMBOL: register-live-outs
     pending-interval-heap get (expire-old-intervals) ;
 
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ vreg>> reg-class>> ] [ reload-from>> ] tri _reload ;
+    [ reg>> ] [ vreg>> rep-of ] [ reload-from>> ] tri _reload ;
 
 : handle-reload ( live-interval -- )
     dup reload-from>> [ insert-reload ] [ drop ] if ;
@@ -103,11 +103,36 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 M: vreg-insn assign-registers-in-insn
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
+! TODO: needs tagged-rep
+
+: trace-on-gc ( assoc -- assoc' )
+    ! When a GC occurs, virtual registers which contain tagged data
+    ! are traced by the GC. Outputs a sequence physical registers.
+    [ drop rep-of int-rep eq? ] { } assoc-filter-as values ;
+
+: spill-on-gc? ( vreg reg -- ? )
+    [ rep-of int-rep? not ] [ spill-slot? not ] bi* and ;
+
+: spill-on-gc ( assoc -- assoc' )
+    ! When a GC occurs, virtual registers which contain untagged data,
+    ! and are stored in physical registers, are saved to their spill
+    ! slots. Outputs sequence of triples:
+    ! - physical register
+    ! - spill slot
+    ! - representation
+    [
+        [
+            2dup spill-on-gc?
+            [ swap [ assign-spill-slot ] [ rep-of ] bi 3array , ] [ 2drop ] if
+        ] assoc-each
+    ] { } make ;
+
 M: ##gc assign-registers-in-insn
-    ! This works because ##gc is always the first instruction
-    ! in a block.
+    ! Since ##gc is always the first instruction in a block, the set of
+    ! values live at the ##gc is just live-in.
     dup call-next-method
-    basic-block get register-live-ins get at >>live-values
+    basic-block get register-live-ins get at
+    [ trace-on-gc >>tagged-values ] [ spill-on-gc >>data-values ] bi
     drop ;
 
 M: insn assign-registers-in-insn drop ;
@@ -156,4 +181,4 @@ ERROR: bad-vreg vreg ;
 
 : assign-registers ( live-intervals cfg -- )
     [ init-assignment ] dip
-    [ assign-registers-in-block ] each-basic-block ;
+    linearization-order [ assign-registers-in-block ] each ;

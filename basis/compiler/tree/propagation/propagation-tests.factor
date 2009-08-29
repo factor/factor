@@ -82,6 +82,8 @@ IN: compiler.tree.propagation.tests
 
 [ bignum ] [ [ { bignum bignum } declare bitxor ] final-math-class ] unit-test
 
+[ bignum ] [ [ { integer } declare 123 >bignum bitand ] final-math-class ] unit-test
+
 [ float ] [ [ { float float } declare mod ] final-math-class ] unit-test
 
 [ V{ fixnum } ] [ [ 255 bitand ] final-classes ] unit-test
@@ -148,6 +150,30 @@ IN: compiler.tree.propagation.tests
         dup 10 < [ dup 8 > [ drop 9 ] unless ] [ drop 9 ] if
     ] final-literals
 ] unit-test
+
+[ V{ t } ] [ [ 40 mod 40 < ] final-literals ] unit-test
+
+[ V{ f } ] [ [ 40 mod 0 >= ] final-literals ] unit-test
+
+[ V{ t } ] [ [ 40 rem 0 >= ] final-literals ] unit-test
+
+[ V{ t } ] [ [ abs 40 mod 0 >= ] final-literals ] unit-test
+
+[ t ] [ [ abs ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ absq ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { float } declare abs ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { float } declare absq ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { complex } declare abs ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { complex } declare absq ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { double-array double-array } declare [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
 
 [ V{ string } ] [
     [ dup string? not [ "Oops" throw ] [ ] if ] final-classes
@@ -270,11 +296,11 @@ IN: compiler.tree.propagation.tests
 ] unit-test
 
 [ V{ fixnum } ] [
-    [ >fixnum dup 100 < [ 1+ ] [ "Oops" throw ] if ] final-classes
+    [ >fixnum dup 100 < [ 1 + ] [ "Oops" throw ] if ] final-classes
 ] unit-test
 
 [ V{ -1 } ] [
-    [ 0 dup 100 < not [ 1+ ] [ 1- ] if ] final-literals
+    [ 0 dup 100 < not [ 1 + ] [ 1 - ] if ] final-literals
 ] unit-test
 
 [ V{ 2 } ] [
@@ -436,6 +462,13 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
     ] final-classes
 ] unit-test
 
+[ V{ f { } } ] [
+    [
+        T{ mixed-mutable-immutable f 3 { } }
+        [ x>> ] [ y>> ] bi
+    ] final-literals
+] unit-test
+
 ! Recursive propagation
 : recursive-test-1 ( a -- b ) recursive-test-1 ; inline recursive
 
@@ -464,7 +497,7 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 ] unit-test
 
 : recursive-test-4 ( i n -- )
-    2dup < [ [ 1+ ] dip recursive-test-4 ] [ 2drop ] if ; inline recursive
+    2dup < [ [ 1 + ] dip recursive-test-4 ] [ 2drop ] if ; inline recursive
 
 [ ] [ [ recursive-test-4 ] final-info drop ] unit-test
 
@@ -479,7 +512,7 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 [ V{ integer } ] [ [ { fixnum } declare recursive-test-6 ] final-classes ] unit-test
 
 : recursive-test-7 ( a -- b )
-    dup 10 < [ 1+ recursive-test-7 ] when ; inline recursive
+    dup 10 < [ 1 + recursive-test-7 ] when ; inline recursive
 
 [ V{ fixnum } ] [ [ 0 recursive-test-7 ] final-classes ] unit-test
 
@@ -494,8 +527,8 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 ] unit-test
 
 GENERIC: iterate ( obj -- next-obj ? )
-M: fixnum iterate f ;
-M: array iterate first t ;
+M: fixnum iterate f ; inline
+M: array iterate first t ; inline
 
 : dead-loop ( obj -- final-obj )
     iterate [ dead-loop ] when ; inline recursive
@@ -559,7 +592,7 @@ M: array iterate first t ;
 ] unit-test
 
 GENERIC: bad-generic ( a -- b )
-M: fixnum bad-generic 1 fixnum+fast ;
+M: fixnum bad-generic 1 fixnum+fast ; inline
 : bad-behavior ( -- b ) 4 bad-generic ; inline recursive
 
 [ V{ fixnum } ] [ [ bad-behavior ] final-classes ] unit-test
@@ -632,8 +665,12 @@ MIXIN: empty-mixin
     [ { integer } declare 127 bitand ] final-info first interval>>
 ] unit-test
 
+[ V{ t } ] [
+    [ [ 123 bitand ] [ drop f ] if dup [ 0 >= ] [ not ] if ] final-literals
+] unit-test
+  
 [ V{ bignum } ] [
-    [ { bignum } declare dup 1- bitxor ] final-classes
+    [ { bignum } declare dup 1 - bitxor ] final-classes
 ] unit-test
 
 [ V{ bignum integer } ] [
@@ -673,7 +710,7 @@ MIXIN: empty-mixin
 
 TUPLE: littledan-1 { a read-only } ;
 
-: (littledan-1-test) ( a -- ) a>> 1+ littledan-1 boa (littledan-1-test) ; inline recursive
+: (littledan-1-test) ( a -- ) a>> 1 + littledan-1 boa (littledan-1-test) ; inline recursive
 
 : littledan-1-test ( -- ) 0 littledan-1 boa (littledan-1-test) ; inline
 
@@ -690,7 +727,7 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 [ ] [ [ littledan-2-test ] final-classes drop ] unit-test
 
 : (littledan-3-test) ( x -- )
-    length 1+ f <array> (littledan-3-test) ; inline recursive
+    length 1 + f <array> (littledan-3-test) ; inline recursive
 
 : littledan-3-test ( -- )
     0 f <array> (littledan-3-test) ; inline
@@ -699,7 +736,21 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 
 [ V{ 0 } ] [ [ { } length ] final-literals ] unit-test
 
-[ V{ 1 } ] [ [ { } length 1+ f <array> length ] final-literals ] unit-test
+[ V{ 1 } ] [ [ { } length 1 + f <array> length ] final-literals ] unit-test
+
+! generalize-counter is not tight enough
+[ V{ fixnum } ] [ [ 0 10 [ 1 + >fixnum ] times ] final-classes ] unit-test
+
+[ V{ fixnum } ] [ [ 0 10 [ 1 + >fixnum ] times 0 + ] final-classes ] unit-test
+
+! Coercions need to update intervals
+[ V{ f } ] [ [ 1 2 ? 100 shift >fixnum 1 = ] final-literals ] unit-test
+
+[ V{ t } ] [ [ >fixnum 1 + >fixnum most-positive-fixnum <= ] final-literals ] unit-test
+
+[ V{ t } ] [ [ >fixnum 1 + >fixnum most-negative-fixnum >= ] final-literals ] unit-test
+
+[ V{ f } ] [ [ >fixnum 1 + >fixnum most-negative-fixnum > ] final-literals ] unit-test
 
 ! Mutable tuples with circularity should not cause problems
 TUPLE: circle me ;
@@ -714,7 +765,7 @@ TUPLE: foo bar ;
 [ t ] [ [ foo new ] { new } inlined? ] unit-test
 
 GENERIC: whatever ( x -- y )
-M: number whatever drop foo ;
+M: number whatever drop foo ; inline
 
 [ t ] [ [ 1 whatever new ] { new } inlined? ] unit-test
 
@@ -723,11 +774,15 @@ M: number whatever drop foo ;
 [ f ] [ [ that-thing new ] { new } inlined? ] unit-test
 
 GENERIC: whatever2 ( x -- y )
-M: number whatever2 drop H{ { 1 1 } { 2 2 } { 3 3 } { 4 4 } { 5 6 } } ;
-M: f whatever2 ;
+M: number whatever2 drop H{ { 1 1 } { 2 2 } { 3 3 } { 4 4 } { 5 6 } } ; inline
+M: f whatever2 ; inline
 
 [ t ] [ [ 1 whatever2 at ] { at* hashcode* } inlined? ] unit-test
 [ f ] [ [ whatever2 at ] { at* hashcode* } inlined? ] unit-test
+
+SYMBOL: not-an-assoc
+
+[ f ] [ [ not-an-assoc at ] { at* } inlined? ] unit-test
 
 [ t ] [ [ { 1 2 3 } member? ] { member? } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap member? ] { member? } inlined? ] unit-test

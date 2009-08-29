@@ -119,7 +119,9 @@ M: #declare propagate-before
 M: #call propagate-before
     dup word>> {
         { [ 2dup foldable-call? ] [ fold-call ] }
-        { [ 2dup do-inlining ] [ 2drop ] }
+        { [ 2dup do-inlining ] [
+            [ output-value-infos ] [ drop out-d>> ] 2bi refine-value-infos 
+        ] }
         [
             [ [ output-value-infos ] [ drop out-d>> ] 2bi set-value-infos ]
             [ compute-constraints ]

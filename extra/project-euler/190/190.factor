@@ -43,7 +43,7 @@ IN: project-euler.190
 PRIVATE>
 
 :: P_m ( m -- P_m )
-    m [1,b] [| i | 2 i * m 1+ / i ^ ] PI ;
+    m [1,b] [| i | 2 i * m 1 + / i ^ ] PI ;
 
 : euler190 ( -- answer )
     2 15 [a,b] [ P_m truncate ] sigma ;

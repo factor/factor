@@ -30,7 +30,7 @@ TUPLE: disjoint-set
     ranks>> at ; inline
 
 : inc-rank ( a disjoint-set -- )
-    ranks>> [ 1+ ] change-at ; inline
+    ranks>> [ 1 + ] change-at ; inline
 
 : representative? ( a disjoint-set -- ? )
     dupd parent = ; inline

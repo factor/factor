@@ -329,7 +329,7 @@ SYMBOL: id
 : next-id ( -- n )
   #! Return the next unique id for a parser
   id get-global [
-    dup 1+ id set-global
+    dup 1 + id set-global
   ] [
     1 id set-global 0
   ] if* ;

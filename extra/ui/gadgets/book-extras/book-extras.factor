@@ -5,8 +5,13 @@ IN: ui.gadgets.book-extras
 : |<< ( book -- ) 0 swap set-control-value ;
 : next ( book -- ) model>> [ 1 + ] change-model ;
 : prev ( book -- ) model>> [ 1 - ] change-model ;
-: (book-t) ( quot -- quot ) '[ : owner ( gadget -- book ) parent>> dup book? [ owner ] unless ; owner @ ] ;
+: owner ( gadget -- book ) parent>> dup book? [ owner ] unless ;
+: (book-t) ( quot -- quot ) '[ owner @ ] ;
 : <book-btn> ( label quot -- button ) (book-t) <button> ;
-: <book-bevel-btn> ( label quot -- button ) (book-t) <border-button> ;
-: >>> ( label -- button ) [ next ] <book-btn> ;
-: <<< ( label -- button ) [ prev ] <book-btn> ;
+: <book-border-btn> ( label quot -- button ) (book-t) <border-button> ;
+: >>> ( gadget -- ) owner next ;
+: <<< ( gadget -- ) owner prev ;
+: go-to ( gadget number -- ) swap owner model>> set-model ;
+
+: <forward-btn> ( label -- button ) [ >>> ] <button> ;
+: <backward-btn> ( label -- button ) [ <<< ] <button> ;

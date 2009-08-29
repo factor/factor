@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs deques dlists kernel locals sequences lexer
 namespaces functors compiler.cfg.rpo compiler.cfg.utilities
-compiler.cfg ;
+compiler.cfg.predecessors compiler.cfg ;
 IN: compiler.cfg.dataflow-analysis
 
-GENERIC: join-sets ( sets dfa -- set )
+GENERIC: join-sets ( sets bb dfa -- set )
 GENERIC: transfer-set ( in-set bb dfa -- out-set )
 GENERIC: block-order ( cfg dfa -- bbs )
 GENERIC: successors ( bb dfa -- seq )
@@ -23,7 +23,11 @@ GENERIC# compute-in-set 2 ( bb out-sets dfa -- set )
 M: kill-block compute-in-set 3drop f ;
 
 M:: basic-block compute-in-set ( bb out-sets dfa -- set )
-    bb dfa predecessors [ out-sets at ] map dfa join-sets ;
+    ! Only consider initialized sets.
+    bb dfa predecessors
+    [ out-sets key? ] filter
+    [ out-sets at ] map
+    bb dfa join-sets ;
 
 :: update-in-set ( bb in-sets out-sets dfa -- ? )
     bb out-sets dfa compute-in-set
@@ -48,6 +52,7 @@ M:: basic-block compute-out-set ( bb in-sets dfa -- set )
     ] when ; inline
 
 :: run-dataflow-analysis ( cfg dfa -- in-sets out-sets )
+    cfg needs-predecessors drop
     H{ } clone :> in-sets
     H{ } clone :> out-sets
     cfg dfa <dfa-worklist> :> work-list
@@ -55,7 +60,7 @@ M:: basic-block compute-out-set ( bb in-sets dfa -- set )
     in-sets
     out-sets ; inline
 
-M: dataflow-analysis join-sets drop assoc-refine ;
+M: dataflow-analysis join-sets 2drop assoc-refine ;
 
 FUNCTOR: define-analysis ( name -- )
 
