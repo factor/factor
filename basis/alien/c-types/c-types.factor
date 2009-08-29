@@ -254,16 +254,19 @@ M: f byte-length drop 0 ; inline
     ] unless* ;
 
 : <c-array> ( n type -- array )
-    heap-size * <byte-array> ; inline
+    heap-size * <byte-array> ; inline deprecated
 
 : <c-object> ( type -- array )
-    1 swap <c-array> ; inline
+    heap-size <byte-array> ; inline
+
+: (c-object) ( type -- array )
+    heap-size (byte-array) ; inline
 
 : malloc-array ( n type -- alien )
-    heap-size calloc ; inline
+    [ heap-size calloc ] [ <c-type-direct-array> ] 2bi ; inline
 
 : malloc-object ( type -- alien )
-    1 swap malloc-array ; inline
+   heap-size malloc ; inline
 
 : malloc-byte-array ( byte-array -- alien )
     dup byte-length [ nip malloc dup ] 2keep memcpy ;
