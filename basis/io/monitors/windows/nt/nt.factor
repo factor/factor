@@ -7,7 +7,7 @@ system accessors threads splitting io.backend io.backend.windows
 io.backend.windows.nt io.files.windows.nt io.monitors io.ports
 io.buffers io.files io.timeouts io.encodings.string
 io.encodings.utf16n io windows.errors windows.kernel32 windows.types
-io.pathnames ;
+io.pathnames classes.struct ;
 IN: io.monitors.windows.nt
 
 : open-directory ( path -- handle )
@@ -59,9 +59,10 @@ TUPLE: win32-monitor < monitor port ;
     [ Action>> parse-action ] bi ;
 
 : (file-notify-records) ( buffer -- buffer )
+    FILE_NOTIFY_INFORMATION memory>struct
     dup ,
     dup NextEntryOffset>> zero? [
-        [ NextEntryOffset>> ] [ <displaced-alien> ] bi
+        [ NextEntryOffset>> ] [ >c-ptr <displaced-alien> ] bi
         (file-notify-records)
     ] unless ;
 
