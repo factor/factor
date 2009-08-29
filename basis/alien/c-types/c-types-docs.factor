@@ -73,7 +73,7 @@ HELP: byte-array>memory
 HELP: malloc-array
 { $values { "n" "a non-negative integer" } { "type" "a C type" } { "alien" alien } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type, then wraps the memory in a sequence object using " { $link <c-type-direct-array> } "." }
-{ $notes "The appropriate direct specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-type-arrays } " word. See the " { $vocab-link "specialized-arrays.direct" } " vocabulary set for details on the underlying sequence type constructed." } ;
+{ $notes "The appropriate direct specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-type-arrays } " word. See the " { $vocab-link "specialized-arrays.direct" } " vocabulary set for details on the underlying sequence type constructed." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if the type does not exist, if the requested size is negative, if a direct specialized array class appropriate to the type is not loaded, or if memory allocation fails." } ;
 
