@@ -380,26 +380,26 @@ TYPEDEF: DWORD* LPCOLORREF
 : color>RGB ( color -- COLORREF )
     >rgba-components drop [ 255 * >integer ] tri@ RGB ;
 
-C-STRUCT: TEXTMETRICW
-    { "LONG" "tmHeight" }
-    { "LONG" "tmAscent" }
-    { "LONG" "tmDescent" }
-    { "LONG" "tmInternalLeading" }
-    { "LONG" "tmExternalLeading" }
-    { "LONG" "tmAveCharWidth" }
-    { "LONG" "tmMaxCharWidth" }
-    { "LONG" "tmWeight" }
-    { "LONG" "tmOverhang" }
-    { "LONG" "tmDigitizedAspectX" }
-    { "LONG" "tmDigitizedAspectY" }
-    { "WCHAR" "tmFirstChar" }
-    { "WCHAR" "tmLastChar" }
-    { "WCHAR" "tmDefaultChar" }
-    { "WCHAR" "tmBreakChar" }
-    { "BYTE" "tmItalic" }
-    { "BYTE" "tmUnderlined" }
-    { "BYTE" "tmStruckOut" }
-    { "BYTE" "tmPitchAndFamily" }
-    { "BYTE" "tmCharSet" } ;
+STRUCT: TEXTMETRICW
+    { tmHeight LONG }
+    { tmAscent LONG }
+    { tmDescent LONG }
+    { tmInternalLeading LONG }
+    { tmExternalLeading LONG }
+    { tmAveCharWidth LONG }
+    { tmMaxCharWidth LONG }
+    { tmWeight LONG }
+    { tmOverhang LONG }
+    { tmDigitizedAspectX LONG }
+    { tmDigitizedAspectY LONG }
+    { tmFirstChar WCHAR }
+    { tmLastChar WCHAR }
+    { tmDefaultChar WCHAR }
+    { tmBreakChar WCHAR }
+    { tmItalic BYTE }
+    { tmUnderlined BYTE }
+    { tmStruckOut BYTE }
+    { tmPitchAndFamily BYTE }
+    { tmCharSet BYTE } ;
 
 TYPEDEF: TEXTMETRICW* LPTEXTMETRIC
