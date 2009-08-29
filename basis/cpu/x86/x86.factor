@@ -123,6 +123,10 @@ M: x86 %xor-imm nip XOR ;
 M: x86 %shl-imm nip SHL ;
 M: x86 %shr-imm nip SHR ;
 M: x86 %sar-imm nip SAR ;
+
+M: x86 %min     nip [ CMP ] [ CMOVG ] 2bi ;
+M: x86 %max     nip [ CMP ] [ CMOVL ] 2bi ;
+
 M: x86 %not     drop NOT ;
 M: x86 %log2    BSR ;
 
@@ -579,3 +583,5 @@ M: x86 small-enough? ( n -- ? )
     enable-float-intrinsics
     enable-fsqrt
     enable-float-min/max ;
+
+enable-min/max

@@ -25,6 +25,9 @@ QUALIFIED: math.floats.private
 QUALIFIED: math.libm
 IN: compiler.cfg.intrinsics
 
+: enable-intrinsics ( words -- )
+    [ t "intrinsic" set-word-prop ] each ;
+
 {
     kernel.private:tag
     kernel.private:getenv
@@ -67,7 +70,7 @@ IN: compiler.cfg.intrinsics
     alien.accessors:set-alien-signed-2
     alien.accessors:alien-cell
     alien.accessors:set-alien-cell
-} [ t "intrinsic" set-word-prop ] each
+} enable-intrinsics
 
 : enable-alien-4-intrinsics ( -- )
     {
@@ -75,7 +78,7 @@ IN: compiler.cfg.intrinsics
         alien.accessors:set-alien-unsigned-4
         alien.accessors:alien-signed-4
         alien.accessors:set-alien-signed-4
-    } [ t "intrinsic" set-word-prop ] each ;
+    } enable-intrinsics ;
 
 : enable-float-intrinsics ( -- )
     {
@@ -94,7 +97,7 @@ IN: compiler.cfg.intrinsics
         alien.accessors:set-alien-float
         alien.accessors:alien-double
         alien.accessors:set-alien-double
-    } [ t "intrinsic" set-word-prop ] each ;
+    } enable-intrinsics ;
 
 : enable-fsqrt ( -- )
     \ math.libm:fsqrt t "intrinsic" set-word-prop ;
@@ -103,10 +106,16 @@ IN: compiler.cfg.intrinsics
     {
         math.floats.private:float-min
         math.floats.private:float-max
-    } [ t "intrinsic" set-word-prop ] each ;
+    } enable-intrinsics ;
+
+: enable-min/max ( -- )
+    {
+        math.integers.private:fixnum-min
+        math.integers.private:fixnum-max
+    } enable-intrinsics ;
 
 : enable-fixnum-log2 ( -- )
-    \ math.integers.private:fixnum-log2 t "intrinsic" set-word-prop ;
+    { math.integers.private:fixnum-log2 } enable-intrinsics ;
 
 : emit-intrinsic ( node word -- )
     {
@@ -130,6 +139,8 @@ IN: compiler.cfg.intrinsics
         { \ math.private:fixnum>= [ drop cc>= emit-fixnum-comparison ] }
         { \ math.private:fixnum> [ drop cc> emit-fixnum-comparison ] }
         { \ kernel:eq? [ drop cc= emit-fixnum-comparison ] }
+        { \ math.integers.private:fixnum-min [ drop [ ^^min ] emit-fixnum-op ] }
+        { \ math.integers.private:fixnum-max [ drop [ ^^max ] emit-fixnum-op ] }
         { \ math.private:bignum>fixnum [ drop emit-bignum>fixnum ] }
         { \ math.private:fixnum>bignum [ drop emit-fixnum>bignum ] }
         { \ math.private:float+ [ drop [ ^^add-float ] emit-float-op ] }

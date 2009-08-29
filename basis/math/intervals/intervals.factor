@@ -7,7 +7,7 @@ IN: math.intervals
 
 SYMBOL: empty-interval
 
-SYMBOL: full-interval
+SINGLETON: full-interval
 
 TUPLE: interval { from read-only } { to read-only } ;
 
@@ -238,12 +238,24 @@ MEMO: array-capacity-interval ( -- interval )
     ] do-empty-interval ;
 
 : interval-max ( i1 i2 -- i3 )
-    #! Inaccurate; could be tighter
-    [ [ interval-closure ] bi@ [ max ] interval-op nan-not-ok ] do-empty-interval ;
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ dup empty-interval eq? ] [ nip ] }
+        { [ 2dup [ full-interval eq? ] both? ] [ drop ] }
+        { [ over full-interval eq? ] [ nip from>> first [a,inf] ] }
+        { [ dup full-interval eq? ] [ drop from>> first [a,inf] ] }
+        [ [ interval-closure ] bi@ [ max ] interval-op nan-not-ok ]
+    } cond ;
 
 : interval-min ( i1 i2 -- i3 )
-    #! Inaccurate; could be tighter
-    [ [ interval-closure ] bi@ [ min ] interval-op nan-not-ok ] do-empty-interval ;
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ dup empty-interval eq? ] [ nip ] }
+        { [ 2dup [ full-interval eq? ] both? ] [ drop ] }
+        { [ over full-interval eq? ] [ nip to>> first [-inf,a] ] }
+        { [ dup full-interval eq? ] [ drop to>> first [-inf,a] ] }
+        [ [ interval-closure ] bi@ [ min ] interval-op nan-not-ok ]
+    } cond ;
 
 : interval-interior ( i1 -- i2 )
     dup special-interval? [

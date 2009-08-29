@@ -3,8 +3,8 @@
 USING: kernel math math.private ;
 IN: math.floats.private
 
-: float-min ( x y -- z ) [ float< ] 2keep ? ;
-: float-max ( x y -- z ) [ float> ] 2keep ? ;
+: float-min ( x y -- z ) [ float< ] most ; foldable
+: float-max ( x y -- z ) [ float> ] most ; foldable
 
 M: fixnum >float fixnum>float ; inline
 M: bignum >float bignum>float ; inline

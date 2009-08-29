@@ -35,6 +35,8 @@ UNION: two-operand-insn
     ##shr-imm
     ##sar
     ##sar-imm
+    ##min
+    ##max
     ##fixnum-overflow
     ##add-float
     ##sub-float
