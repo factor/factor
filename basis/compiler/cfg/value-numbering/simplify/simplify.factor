@@ -112,7 +112,7 @@ M: binary-expr simplify*
 
 M: box-displaced-alien-expr simplify*
     [ base>> ] [ displacement>> ] bi {
-        { [ dup expr-zero? ] [ drop ] }
+        { [ dup vn>expr expr-zero? ] [ drop ] }
         [ 2drop f ]
     } cond ;
 
