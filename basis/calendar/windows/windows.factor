@@ -1,6 +1,6 @@
 USING: calendar namespaces alien.c-types system
 windows.kernel32 kernel math combinators windows.errors
-classes.struct accessors ;
+accessors classes.struct ;
 IN: calendar.windows
 
 M: windows gmt-offset ( -- hours minutes seconds )

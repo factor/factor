@@ -307,13 +307,13 @@ STRUCT: MEMORYSTATUSEX
 
 TYPEDEF: void* LPMEMORYSTATUSEX
 
-C-STRUCT: OSVERSIONINFO
-    { "DWORD" "dwOSVersionInfoSize" }
-    { "DWORD" "dwMajorVersion" }
-    { "DWORD" "dwMinorVersion" }
-    { "DWORD" "dwBuildNumber" }
-    { "DWORD" "dwPlatformId" }
-    { { "WCHAR" 128 } "szCSDVersion" } ;
+STRUCT: OSVERSIONINFO
+    { dwOSVersionInfoSize DWORD }
+    { dwMajorVersion DWORD }
+    { dwMinorVersion DWORD }
+    { dwBuildNumber DWORD }
+    { dwPlatformId DWORD }
+    { szCSDVersion WCHAR[128] } ;
 
 TYPEDEF: void* LPOSVERSIONINFO
 
@@ -326,11 +326,11 @@ C-STRUCT: MEMORY_BASIC_INFORMATION
   { "DWORD" "protect" }
   { "DWORD" "type" } ;
 
-C-STRUCT: GUID
-    { "ULONG" "Data1" }
-    { "WORD"  "Data2" }
-    { "WORD"  "Data3" }
-    { { "UCHAR" 8 } "Data4" } ;
+STRUCT: GUID
+    { Data1 ULONG }
+    { Data2 WORD }
+    { Data3 WORD }
+    { Data4 UCHAR[8] } ;
 
 /*
     fBinary  :1;
