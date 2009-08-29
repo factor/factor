@@ -266,7 +266,7 @@ M: f byte-length drop 0 ; inline
     [ heap-size calloc ] [ <c-type-direct-array> ] 2bi ; inline
 
 : malloc-object ( type -- alien )
-   heap-size malloc ; inline
+    1 swap heap-size calloc ; inline
 
 : malloc-byte-array ( byte-array -- alien )
     dup byte-length [ nip malloc dup ] 2keep memcpy ;
