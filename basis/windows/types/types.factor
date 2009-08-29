@@ -257,28 +257,28 @@ C-STRUCT: PAINTSTRUCT
     { "BYTE[32]" "rgbReserved" }
 ;
 
-C-STRUCT: BITMAPINFOHEADER
-    { "DWORD"  "biSize" }
-    { "LONG"   "biWidth" }
-    { "LONG"   "biHeight" }
-    { "WORD"   "biPlanes" }
-    { "WORD"   "biBitCount" }
-    { "DWORD"  "biCompression" }
-    { "DWORD"  "biSizeImage" }
-    { "LONG"   "biXPelsPerMeter" }
-    { "LONG"   "biYPelsPerMeter" }
-    { "DWORD"  "biClrUsed" }
-    { "DWORD"  "biClrImportant" } ;
+STRUCT: BITMAPINFOHEADER
+    { biSize DWORD }
+    { biWidth LONG }
+    { biHeight LONG }
+    { biPlanes WORD }
+    { biBitCount WORD }
+    { biCompression DWORD }
+    { biSizeImage DWORD }
+    { biXPelsPerMeter LONG }
+    { biYPelsPerMeter LONG }
+    { biClrUsed DWORD }
+    { biClrImportant DWORD } ;
 
-C-STRUCT: RGBQUAD
-    { "BYTE" "rgbBlue" }
-    { "BYTE" "rgbGreen" }
-    { "BYTE" "rgbRed" }
-    { "BYTE" "rgbReserved" } ;
+STRUCT: RGBQUAD
+    { rgbBlue BYTE }
+    { rgbGreen BYTE }
+    { rgbRed BYTE }
+    { rgbReserved BYTE } ;
 
-C-STRUCT: BITMAPINFO
-    { "BITMAPINFOHEADER" "bmiHeader" }
-    { "RGBQUAD[1]" "bmiColors" } ;
+STRUCT: BITMAPINFO
+    { bmiHeader BITMAPINFOHEADER }
+    { bimColors RGBQUAD[1] } ;
 
 TYPEDEF: void* LPPAINTSTRUCT
 TYPEDEF: void* PAINTSTRUCT
