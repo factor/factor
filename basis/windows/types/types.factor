@@ -287,9 +287,9 @@ C-STRUCT: POINT
     { "LONG" "x" }
     { "LONG" "y" } ; 
 
-C-STRUCT: SIZE
-    { "LONG" "cx" }
-    { "LONG" "cy" } ; 
+STRUCT: SIZE
+    { cx LONG }
+    { cy LONG } ;
 
 C-STRUCT: MSG
     { "HWND" "hWnd" }
