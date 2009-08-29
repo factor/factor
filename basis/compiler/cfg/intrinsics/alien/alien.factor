@@ -14,10 +14,11 @@ IN: compiler.cfg.intrinsics.alien
     } 1&& ;
 
 : emit-<displaced-alien> ( node -- )
-    dup emit-<displaced-alien>?
-    [ drop 2inputs [ ^^untag-fixnum ] dip ^^box-displaced-alien ds-push ]
-    [ emit-primitive ]
-    if ;
+    dup emit-<displaced-alien>? [
+        [ 2inputs [ ^^untag-fixnum ] dip ] dip
+        node-input-infos second class>>
+        ^^box-displaced-alien ds-push
+    ] [ emit-primitive ] if ;
 
 : (prepare-alien-accessor-imm) ( class offset -- offset-vreg )
     ds-drop [ ds-pop swap ^^unbox-c-ptr ] dip ^^add-imm ;

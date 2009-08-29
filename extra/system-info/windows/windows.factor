@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types kernel libc math namespaces
-windows windows.kernel32 windows.advapi32
-words combinators vocabs.loader system-info.backend
-system alien.strings windows.errors ;
+USING: alien alien.c-types classes.struct accessors kernel
+math namespaces windows windows.kernel32 windows.advapi32 words
+combinators vocabs.loader system-info.backend system
+alien.strings windows.errors ;
 IN: system-info.windows
 
 : system-info ( -- SYSTEM_INFO )

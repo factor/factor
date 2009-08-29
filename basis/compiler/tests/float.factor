@@ -83,3 +83,8 @@ IN: compiler.tests.float
 [ f ] [ 3.0 [ dup 0.0 float= swap -0.0 float= or ] compile-call ] unit-test
 
 [ 315 315.0 ] [ 313 [ 2 fixnum+fast dup fixnum>float ] compile-call ] unit-test
+
+[ 17.5 ] [ -11.3 17.5 [ float-max ] compile-call ] unit-test
+[ 17.5 ] [ 17.5 -11.3 [ float-max ] compile-call ] unit-test
+[ -11.3 ] [ -11.3 17.5 [ float-min ] compile-call ] unit-test
+[ -11.3 ] [ 17.5 -11.3 [ float-min ] compile-call ] unit-test
