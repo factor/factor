@@ -79,10 +79,15 @@ IN: compiler.tree.propagation.known-words
     ] unless ;
 
 : ensure-math-class ( class must-be -- class' )
-    [ class<= ] 2keep ? ;
+    [ class<= ] most ;
 
 : number-valued ( class interval -- class' interval' )
     [ number ensure-math-class ] dip ;
+
+: fixnum-valued ( class interval -- class' interval' )
+    over null-class? [
+        [ drop fixnum ] dip
+    ] unless ;
 
 : integer-valued ( class interval -- class' interval' )
     [ integer ensure-math-class ] dip ;
@@ -304,7 +309,15 @@ flog fpow fsqrt facosh fasinh fatanh } [
     { float } "default-output-classes" set-word-prop
 ] each
 
-{ float-min float-max } [
-    [ { float float } "input-classes" set-word-prop ]
-    [ { float } "default-output-classes" set-word-prop ] bi
-] each
+! Find a less repetitive way of doing this
+\ float-min { float float } "input-classes" set-word-prop
+\ float-min [ interval-min ] [ float-valued ] binary-op
+
+\ float-max { float float } "input-classes" set-word-prop
+\ float-max [ interval-max ] [ float-valued ] binary-op
+
+\ fixnum-min { fixnum fixnum } "input-classes" set-word-prop
+\ fixnum-min [ interval-min ] [ fixnum-valued ] binary-op
+
+\ fixnum-max { fixnum fixnum } "input-classes" set-word-prop
+\ fixnum-max [ interval-max ] [ fixnum-valued ] binary-op

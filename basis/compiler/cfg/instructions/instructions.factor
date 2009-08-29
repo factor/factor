@@ -91,6 +91,8 @@ INSN: ##shr < ##binary ;
 INSN: ##shr-imm < ##binary-imm ;
 INSN: ##sar < ##binary ;
 INSN: ##sar-imm < ##binary-imm ;
+INSN: ##min < ##binary ;
+INSN: ##max < ##binary ;
 INSN: ##not < ##unary ;
 INSN: ##log2 < ##unary ;
 
