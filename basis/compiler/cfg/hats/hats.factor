@@ -35,6 +35,8 @@ IN: compiler.cfg.hats
 : ^^shr-imm ( src1 src2 -- dst ) ^^r2 ##shr-imm ; inline
 : ^^sar ( src1 src2 -- dst ) ^^r2 ##sar ; inline
 : ^^sar-imm ( src1 src2 -- dst ) ^^r2 ##sar-imm ; inline
+: ^^min ( src1 src2 -- dst ) ^^r2 ##min ; inline
+: ^^max ( src1 src2 -- dst ) ^^r2 ##max ; inline
 : ^^not ( src -- dst ) ^^r1 ##not ; inline
 : ^^log2 ( src -- dst ) ^^r1 ##log2 ; inline
 : ^^bignum>integer ( src -- dst ) ^^r1 next-vreg ##bignum>integer ; inline

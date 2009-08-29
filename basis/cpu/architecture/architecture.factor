@@ -96,6 +96,8 @@ HOOK: %shr     cpu ( dst src1 src2 -- )
 HOOK: %shr-imm cpu ( dst src1 src2 -- )
 HOOK: %sar     cpu ( dst src1 src2 -- )
 HOOK: %sar-imm cpu ( dst src1 src2 -- )
+HOOK: %min     cpu ( dst src1 src2 -- )
+HOOK: %max     cpu ( dst src1 src2 -- )
 HOOK: %not     cpu ( dst src -- )
 HOOK: %log2    cpu ( dst src -- )
 
