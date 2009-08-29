@@ -377,8 +377,6 @@ FUNCTION: DWORD WSAWaitForMultipleEvents ( DWORD cEvents,
                                            BOOL fAlertable ) ;
 
 
-
-
 LIBRARY: mswsock
 
 ! Not in Windows CE
@@ -388,14 +386,13 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
 CONSTANT: SIO_GET_EXTENSION_FUNCTION_POINTER -939524090
 
 : WSAID_CONNECTEX ( -- GUID )
-    "GUID" <c-object>
-    HEX: 25a207b9 over set-GUID-Data1
-    HEX: ddf3 over set-GUID-Data2
-    HEX: 4660 over set-GUID-Data3
+    HEX: 25a207b9
+    HEX: ddf3
+    HEX: 4660
     B{
         HEX: 8e HEX: e9 HEX: 76 HEX: e5
         HEX: 8c HEX: 74 HEX: 06 HEX: 3e
-    } over set-GUID-Data4 ;
+    } GUID <struct-boa> ;
 
 : winsock-expected-error? ( n -- ? )
     ERROR_IO_PENDING ERROR_SUCCESS WSA_IO_PENDING 3array member? ;
