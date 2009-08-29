@@ -1,5 +1,6 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays assocs compiler.units debugger init io
+USING: accessors arrays assocs combinators.short-circuit
+compiler.units debugger init io
 io.streams.null kernel namespaces prettyprint sequences
 source-files.errors summary tools.crossref
 tools.crossref.private tools.errors words ;
@@ -41,7 +42,7 @@ T{ error-type
 
 : check-deprecations ( usage -- )
     dup word? [
-        dup "forgotten" word-prop
+        dup { [ "forgotten" word-prop ] [ deprecated? ] } 1||
         [ clear-deprecation-note ] [
             dup def>> uses [ deprecated? ] filter
             [ clear-deprecation-note ] [ >array deprecation-note ] if-empty
