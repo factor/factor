@@ -5,15 +5,15 @@ io.files.windows io.files.windows.nt kernel windows.kernel32
 windows.time windows accessors alien.c-types combinators
 generalizations system alien.strings io.encodings.utf16n
 sequences splitting windows.errors fry continuations destructors
-calendar ascii combinators.short-circuit locals ;
+calendar ascii combinators.short-circuit locals classes.struct ;
 IN: io.files.info.windows
 
 :: round-up-to ( n multiple -- n' )
-    n multiple rem dup 0 = [
-        drop n
+    n multiple rem [
+        n
     ] [
         multiple swap - n +
-    ] if ;
+    ] if-zero ;
 
 TUPLE: windows-file-info < file-info attributes ;
 
@@ -57,35 +57,26 @@ TUPLE: windows-file-info < file-info attributes ;
 : BY_HANDLE_FILE_INFORMATION>file-info ( HANDLE_FILE_INFORMATION -- file-info )
     [ \ windows-file-info new ] dip
     {
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type >>type ]
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-attributes >>attributes ]
+        [ dwFileAttributes>> win32-file-type >>type ]
+        [ dwFileAttributes>> win32-file-attributes >>attributes ]
         [
-            [ BY_HANDLE_FILE_INFORMATION-nFileSizeLow ]
-            [ BY_HANDLE_FILE_INFORMATION-nFileSizeHigh ] bi >64bit >>size
+            [ nFileSizeLow>> ]
+            [ nFileSizeHigh>> ] bi >64bit >>size
         ]
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes >>permissions ]
-        [
-            BY_HANDLE_FILE_INFORMATION-ftCreationTime
-            FILETIME>timestamp >>created
-        ]
-        [
-            BY_HANDLE_FILE_INFORMATION-ftLastWriteTime
-            FILETIME>timestamp >>modified
-        ]
-        [
-            BY_HANDLE_FILE_INFORMATION-ftLastAccessTime
-            FILETIME>timestamp >>accessed
-        ]
-        ! [ BY_HANDLE_FILE_INFORMATION-nNumberOfLinks ]
+        [ dwFileAttributes>> >>permissions ]
+        [ ftCreationTime>> FILETIME>timestamp >>created ]
+        [ ftLastWriteTime>> FILETIME>timestamp >>modified ]
+        [ ftLastAccessTime>> FILETIME>timestamp >>accessed ]
+        ! [ nNumberOfLinks>> ]
         ! [
-          ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexLow ]
-          ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexHigh ] bi >64bit
+          ! [ nFileIndexLow>> ]
+          ! [ nFileIndexHigh>> ] bi >64bit
         ! ]
     } cleave ;
 
 : get-file-information ( handle -- BY_HANDLE_FILE_INFORMATION )
     [
-        "BY_HANDLE_FILE_INFORMATION" <c-object>
+        BY_HANDLE_FILE_INFORMATION <struct>
         [ GetFileInformationByHandle win32-error=0/f ] keep
     ] keep CloseHandle win32-error=0/f ;
 
@@ -109,11 +100,11 @@ M: windows link-info ( path -- info )
     file-info ;
 
 : volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
-    MAX_PATH 1+ [ <byte-array> ] keep
+    MAX_PATH 1 + [ <byte-array> ] keep
     "DWORD" <c-object>
     "DWORD" <c-object>
     "DWORD" <c-object>
-    MAX_PATH 1+ [ <byte-array> ] keep
+    MAX_PATH 1 + [ <byte-array> ] keep
     [ GetVolumeInformation win32-error=0/f ] 7 nkeep
     drop 5 nrot drop
     [ utf16n alien>string ] 4 ndip
@@ -165,13 +156,13 @@ M: winnt file-system-info ( path -- file-system-info )
     ] if ;
 
 : find-first-volume ( -- string handle )
-    MAX_PATH 1+ [ <byte-array> ] keep
+    MAX_PATH 1 + [ <byte-array> ] keep
     dupd
     FindFirstVolume dup win32-error=0/f
     [ utf16n alien>string ] dip ;
 
 : find-next-volume ( handle -- string/f )
-    MAX_PATH 1+ [ <byte-array> tuck ] keep
+    MAX_PATH 1 + [ <byte-array> tuck ] keep
     FindNextVolume 0 = [
         GetLastError ERROR_NO_MORE_FILES =
         [ drop f ] [ win32-error-string throw ] if
@@ -197,10 +188,10 @@ M: winnt file-systems ( -- array )
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
-        normalize-path open-existing &dispose handle>>
-        "FILETIME" <c-object>
-        "FILETIME" <c-object>
-        "FILETIME" <c-object>
+        normalize-path open-read &dispose handle>>
+        FILETIME <struct>
+        FILETIME <struct>
+        FILETIME <struct>
         [ GetFileTime win32-error=0/f ] 3keep
         [ FILETIME>timestamp >local-time ] tri@
     ] with-destructors ;

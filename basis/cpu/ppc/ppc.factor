@@ -32,7 +32,7 @@ enable-float-intrinsics
 M: ppc machine-registers
     {
         { int-regs $[ 2 12 [a,b] 15 29 [a,b] append ] }
-        { double-float-regs $[ 0 29 [a,b] ] }
+        { float-regs $[ 0 29 [a,b] ] }
     } ;
 
 CONSTANT: scratch-reg 30
@@ -62,7 +62,7 @@ M: rs-loc loc-reg drop rs-reg ;
 M: ppc %peek loc>operand LWZ ;
 M: ppc %replace loc>operand STW ;
 
-: (%inc) ( n reg -- ) dup rot cells ADDI ; inline
+:: (%inc) ( n reg -- ) reg reg n cells ADDI ; inline
 
 M: ppc %inc-d ( n -- ) ds-reg (%inc) ;
 M: ppc %inc-r ( n -- ) rs-reg (%inc) ;
@@ -89,20 +89,14 @@ HOOK: reserved-area-size os ( -- n )
 : local@ ( n -- x )
     reserved-area-size param-save-size + + ; inline
 
-: spill-integer@ ( n -- offset )
-    spill-integer-offset local@ ;
-
-: spill-float@ ( n -- offset )
-    spill-float-offset local@ ;
+: spill@ ( n -- offset )
+    spill-offset local@ ;
 
 ! Some FP intrinsics need a temporary scratch area in the stack
 ! frame, 8 bytes in size. This is in the param-save area so it
 ! does not overlap with spill slots.
 : scratch@ ( n -- offset )
-    stack-frame get total-size>>
-    factor-area-size -
-    param-save-size -
-    + ;
+    factor-area-size + ;
 
 ! GC root area
 : gc-root@ ( n -- offset )
@@ -217,7 +211,7 @@ M:: ppc %integer>bignum ( dst src temp -- )
         temp dst 1 bignum@ STW
         ! Compute sign
         temp src MR
-        temp temp cell-bits 1- SRAWI
+        temp temp cell-bits 1 - SRAWI
         temp temp 1 ANDI
         ! Store sign
         temp dst 2 bignum@ STW
@@ -275,9 +269,11 @@ M:: ppc %float>integer ( dst src -- )
     fp-scratch-reg 1 0 scratch@ STFD
     dst 1 4 scratch@ LWZ ;
 
-M: ppc %copy ( dst src -- ) MR ;
-
-M: ppc %copy-float ( dst src -- ) FMR ;
+M: ppc %copy ( dst src rep -- )
+    {
+        { int-rep [ MR ] }
+        { double-float-rep [ FMR ] }
+    } case ;
 
 M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
 
@@ -319,21 +315,48 @@ M:: ppc %unbox-any-c-ptr ( dst src temp -- )
 
 : alien@ ( n -- n' ) cells object tag-number - ;
 
+:: %allot-alien ( dst displacement base temp -- )
+    dst 4 cells alien temp %allot
+    temp \ f tag-number %load-immediate
+    ! Store underlying-alien slot
+    base dst 1 alien@ STW
+    ! Store expired slot
+    temp dst 2 alien@ STW
+    ! Store offset
+    displacement dst 3 alien@ STW ;
+
 M:: ppc %box-alien ( dst src temp -- )
     [
         "f" define-label
         dst \ f tag-number %load-immediate
         0 src 0 CMPI
         "f" get BEQ
-        dst 4 cells alien temp %allot
-        ! Store offset
-        src dst 3 alien@ STW
-        ! Store expired slot
-        temp \ f tag-number %load-immediate
-        temp dst 1 alien@ STW
-        ! Store underlying-alien slot
-        temp dst 2 alien@ STW
+        dst src temp temp %allot-alien
         "f" resolve-label
+    ] with-scope ;
+
+M:: ppc %box-displaced-alien ( dst displacement base temp -- )
+    [
+        "end" define-label
+        "ok" define-label
+        ! If displacement is zero, return the base
+        dst base MR
+        0 displacement 0 CMPI
+        "end" get BEQ
+        ! If base is already a displaced alien, unpack it
+        0 base \ f tag-number CMPI
+        "ok" get BEQ
+        temp base header-offset LWZ
+        0 temp alien type-number tag-fixnum CMPI
+        "ok" get BNE
+        ! displacement += base.displacement
+        temp base 3 alien@ LWZ
+        displacement displacement temp ADD
+        ! base = base.base
+        base base 1 alien@ LWZ
+        "ok" resolve-label
+        dst displacement base temp %allot-alien
+        "end" resolve-label
     ] with-scope ;
 
 M: ppc %alien-unsigned-1 0 LBZ ;
@@ -478,11 +501,29 @@ M: ppc %compare-branch (%compare) %branch ;
 M: ppc %compare-imm-branch (%compare-imm) %branch ;
 M: ppc %compare-float-branch (%compare-float) %branch ;
 
-M: ppc %spill-integer ( src n -- ) spill-integer@ 1 swap STW ;
-M: ppc %reload-integer ( dst n -- ) spill-integer@ 1 swap LWZ ;
+: load-from-frame ( dst n rep -- )
+    {
+        { int-rep [ [ 1 ] dip LWZ ] }
+        { single-float-rep [ [ 1 ] dip LFS ] }
+        { double-float-rep [ [ 1 ] dip LFD ] }
+        { stack-params [ [ 0 1 ] dip LWZ [ 0 1 ] dip param@ STW ] }
+    } case ;
 
-M: ppc %spill-float ( src n -- ) spill-float@ 1 swap STFD ;
-M: ppc %reload-float ( dst n -- ) spill-float@ 1 swap LFD ;
+: next-param@ ( n -- x ) param@ stack-frame get total-size>> + ;
+
+: store-to-frame ( src n rep -- )
+    {
+        { int-rep [ [ 1 ] dip STW ] }
+        { single-float-rep [ [ 1 ] dip STFS ] }
+        { double-float-rep [ [ 1 ] dip STFD ] }
+        { stack-params [ [ [ 0 1 ] dip next-param@ LWZ 0 1 ] dip STW ] }
+    } case ;
+
+M: ppc %spill ( src n rep -- )
+    [ spill@ ] dip store-to-frame ;
+
+M: ppc %reload ( dst n rep -- )
+    [ spill@ ] dip load-from-frame ;
 
 M: ppc %loop-entry ;
 
@@ -490,46 +531,23 @@ M: int-regs return-reg drop 3 ;
 M: int-regs param-regs drop { 3 4 5 6 7 8 9 10 } ;
 M: float-regs return-reg drop 1 ;
 
-M: int-regs %save-param-reg drop 1 rot local@ STW ;
-M: int-regs %load-param-reg drop 1 rot local@ LWZ ;
+M:: ppc %save-param-reg ( stack reg rep -- )
+    reg stack local@ rep store-to-frame ;
 
-GENERIC: STF ( src dst off reg-class -- )
-
-M: single-float-regs STF drop STFS ;
-M: double-float-regs STF drop STFD ;
-
-M: float-regs %save-param-reg [ 1 rot local@ ] dip STF ;
-
-GENERIC: LF ( dst src off reg-class -- )
-
-M: single-float-regs LF drop LFS ;
-M: double-float-regs LF drop LFD ;
-
-M: float-regs %load-param-reg [ 1 rot local@ ] dip LF ;
-
-M: stack-params %load-param-reg ( stack reg reg-class -- )
-    drop [ 0 1 rot local@ LWZ 0 1 ] dip param@ STW ;
-
-: next-param@ ( n -- x ) param@ stack-frame get total-size>> + ;
-
-M: stack-params %save-param-reg ( stack reg reg-class -- )
-    #! Funky. Read the parameter from the caller's stack frame.
-    #! This word is used in callbacks
-    drop
-    [ 0 1 ] dip next-param@ LWZ
-    [ 0 1 ] dip local@ STW ;
+M:: ppc %load-param-reg ( stack reg rep -- )
+    reg stack local@ rep load-from-frame ;
 
 M: ppc %prepare-unbox ( -- )
     ! First parameter is top of stack
     3 ds-reg 0 LWZ
     ds-reg dup cell SUBI ;
 
-M: ppc %unbox ( n reg-class func -- )
+M: ppc %unbox ( n rep func -- )
     ! Value must be in r3
     ! Call the unboxer
     f %alien-invoke
     ! Store the return value on the C stack
-    over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
+    over [ [ reg-class-of return-reg ] keep %save-param-reg ] [ 2drop ] if ;
 
 M: ppc %unbox-long-long ( n func -- )
     ! Value must be in r3:r4
@@ -548,11 +566,11 @@ M: ppc %unbox-large-struct ( n c-type -- )
     ! Call the function
     "to_value_struct" f %alien-invoke ;
 
-M: ppc %box ( n reg-class func -- )
+M: ppc %box ( n rep func -- )
     ! If the source is a stack location, load it into freg #0.
     ! If the source is f, then we assume the value is already in
     ! freg #0.
-    [ over [ 0 over param-reg swap %load-param-reg ] [ 2drop ] if ] dip
+    [ over [ 0 over reg-class-of param-reg swap %load-param-reg ] [ 2drop ] if ] dip
     f %alien-invoke ;
 
 M: ppc %box-long-long ( n func -- )

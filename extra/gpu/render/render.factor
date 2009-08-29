@@ -73,7 +73,7 @@ TUPLE: multi-index-range
 C: <multi-index-range> multi-index-range
 
 TUPLE: index-elements
-    { ptr gpu-data-ptr read-only }
+    { ptr read-only }
     { count integer read-only }
     { index-type index-type read-only } ;
 
@@ -422,7 +422,7 @@ SYNTAX: UNIFORM-TUPLE:
     [ [ length ] [ >int-array ] bi glDrawBuffers ] if ;
 
 : bind-named-output-attachments ( program-instance framebuffer attachments -- )
-    rot '[ [ first _ swap output-index ] bi@ <=> ] sort [ second ] map
+    rot '[ first _ swap output-index ] sort-with [ second ] map
     bind-unnamed-output-attachments ;
 
 : bind-output-attachments ( program-instance framebuffer attachments -- )

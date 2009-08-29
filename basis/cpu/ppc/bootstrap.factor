@@ -226,7 +226,7 @@ CONSTANT: rs-reg 14
     ! key = class
     5 4 MR
     ! key &= cache.length - 1
-    5 5 mega-cache-size get 1- bootstrap-cell * ANDI
+    5 5 mega-cache-size get 1 - bootstrap-cell * ANDI
     ! cache += array-start-offset
     3 3 array-start-offset ADDI
     ! cache += key

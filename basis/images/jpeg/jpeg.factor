@@ -6,7 +6,7 @@ images.processing io io.binary io.encodings.binary io.files
 io.streams.byte-array kernel locals math math.bitwise
 math.constants math.functions math.matrices math.order
 math.ranges math.vectors memoize multiline namespaces
-sequences sequences.deep ;
+sequences sequences.deep images.loader ;
 IN: images.jpeg
 
 QUALIFIED-WITH: bitstreams bs
@@ -18,6 +18,9 @@ TUPLE: jpeg-image < image
     { quant-tables initial: { f f } }
     { huff-tables initial: { f f f f } }
     { components } ;
+
+"jpg" jpeg-image register-image-class
+"jpeg" jpeg-image register-image-class
 
 <PRIVATE
 
@@ -229,8 +232,8 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
     ] with each^2 ;
 
 : sign-extend ( bits v -- v' )
-    swap [ ] [ 1- 2^ < ] 2bi
-    [ -1 swap shift 1+ + ] [ drop ] if ;
+    swap [ ] [ 1 - 2^ < ] 2bi
+    [ -1 swap shift 1 + + ] [ drop ] if ;
 
 : read1-jpeg-dc ( decoder -- dc )
     [ read1-huff dup ] [ bs>> bs:read ] bi sign-extend ;
@@ -245,7 +248,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
     0 :> k!
     [
         color ac-huff-table>> read1-jpeg-ac
-        [ first 1+ k + k! ] [ second k coefs set-nth ] [ ] tri
+        [ first 1 + k + k! ] [ second k coefs set-nth ] [ ] tri
         { 0 0 } = not
         k 63 < and
     ] loop
@@ -353,17 +356,13 @@ ERROR: not-a-jpeg-image ;
 
 PRIVATE>
 
-: load-jpeg ( path -- image )
-    binary [
+M: jpeg-image stream>image ( stream jpeg-image -- bitmap )
+    drop [
         parse-marker { SOI } = [ not-a-jpeg-image ] unless
         parse-headers
         contents <jpeg-image>
-    ] with-file-reader
+    ] with-input-stream
     dup jpeg-image [
         baseline-parse
         baseline-decompress
     ] with-variable ;
-
-M: jpeg-image load-image* ( path jpeg-image -- bitmap )
-    drop load-jpeg ;
-

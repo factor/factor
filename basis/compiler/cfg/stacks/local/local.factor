@@ -10,14 +10,19 @@ compiler.cfg.stacks.height
 compiler.cfg.parallel-copy ;
 IN: compiler.cfg.stacks.local
 
-! Local stack analysis. We build local peek and replace sets for every basic
-! block while constructing the CFG.
+! Local stack analysis. We build three sets for every basic block
+! in the CFG:
+! - peek-set: all stack locations that the block reads before writing
+! - replace-set: all stack locations that the block writes
+! - kill-set: all stack locations which become unavailable after the
+!   block ends because of the stack height being decremented
+! This is done while constructing the CFG.
 
 SYMBOLS: peek-sets replace-sets kill-sets ;
 
 SYMBOL: locs>vregs
 
-: loc>vreg ( loc -- vreg ) locs>vregs get [ drop i ] cache ;
+: loc>vreg ( loc -- vreg ) locs>vregs get [ drop next-vreg ] cache ;
 : vreg>loc ( vreg -- loc/f ) locs>vregs get value-at ;
 
 TUPLE: current-height
@@ -64,35 +69,31 @@ M: rs-loc translate-local-loc n>> current-height get r>> - <rs-loc> ;
 
 : peek-loc ( loc -- vreg )
     translate-local-loc
-    dup local-replace-set get key? [ dup local-peek-set get conjoin ] unless
-    dup replace-mapping get at [ ] [ loc>vreg ] ?if ;
+    dup replace-mapping get at
+    [ ] [ dup local-peek-set get conjoin loc>vreg ] ?if ;
 
 : replace-loc ( vreg loc -- )
-    translate-local-loc
-    2dup loc>vreg =
-    [ nip replace-mapping get delete-at ]
-    [
-        [ local-replace-set get conjoin ]
-        [ replace-mapping get set-at ]
-        bi
-    ] if ;
+    translate-local-loc replace-mapping get set-at ;
 
 : compute-local-kill-set ( -- assoc )
     basic-block get current-height get
     [ [ ds-heights get at dup ] [ d>> ] bi* [-] iota [ swap - <ds-loc> ] with map ]
-    [ [ rs-heights get at dup ] [ r>> ] bi* [-] iota [ swap - <rs-loc> ] with map ]
-    [ drop local-replace-set get at ] 2tri
-    [ append unique dup ] dip update ;
+    [ [ rs-heights get at dup ] [ r>> ] bi* [-] iota [ swap - <rs-loc> ] with map ] 2bi
+    append unique ;
 
 : begin-local-analysis ( -- )
     H{ } clone local-peek-set set
-    H{ } clone local-replace-set set
     H{ } clone replace-mapping set
     current-height get
     [ 0 >>emit-d 0 >>emit-r drop ]
     [ [ d>> ] [ r>> ] bi basic-block get record-stack-heights ] bi ;
 
+: remove-redundant-replaces ( -- )
+    replace-mapping get [ [ loc>vreg ] dip = not ] assoc-filter
+    [ replace-mapping set ] [ keys unique local-replace-set set ] bi ;
+
 : end-local-analysis ( -- )
+    remove-redundant-replaces
     emit-changes
     basic-block get {
         [ [ local-peek-set get ] dip peek-sets get set-at ]

@@ -803,7 +803,7 @@ ARTICLE: "looping-combinators" "Looping combinators"
 { $subsection until }
 "To execute one iteration of a loop, use the following word:"
 { $subsection do }
-"This word is intended as a modifier. The normal " { $link while } " loop never executes the body if the predicate returns first on the first iteration. To ensure the body executes at least once, use " { $link do } ":"
+"This word is intended as a modifier. The normal " { $link while } " loop never executes the body if the predicate returns false on the first iteration. To ensure the body executes at least once, use " { $link do } ":"
 { $code
     "[ P ] [ Q ] do while"
 }

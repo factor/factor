@@ -44,7 +44,7 @@ M: form clone
     [ value ] dip '[
         [
             form [ clone ] change
-            1+ "index" set-value
+            1 + "index" set-value
             "value" set-value
             @
         ] with-scope
@@ -54,7 +54,7 @@ M: form clone
     [ value ] dip '[
         [
             begin-form
-            1+ "index" set-value
+            1 + "index" set-value
             from-object
             @
         ] with-scope

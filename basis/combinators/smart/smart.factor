@@ -1,11 +1,14 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry generalizations kernel macros math.order
-stack-checker math ;
+stack-checker math sequences ;
 IN: combinators.smart
 
 MACRO: drop-outputs ( quot -- quot' )
     dup infer out>> '[ @ _ ndrop ] ;
+
+MACRO: keep-inputs ( quot -- quot' )
+    dup infer in>> '[ _ _ nkeep ] ;
 
 MACRO: output>sequence ( quot exemplar -- newquot )
     [ dup infer out>> ] dip
@@ -39,3 +42,9 @@ MACRO: append-outputs-as ( quot exemplar -- newquot )
 
 MACRO: append-outputs ( quot -- seq )
     '[ _ { } append-outputs-as ] ;
+
+MACRO: preserving ( quot -- )
+    [ infer in>> length ] keep '[ _ ndup @ ] ;
+
+MACRO: smart-if ( pred true false -- )
+    '[ _ preserving _ _ if ] ; inline

@@ -1,5 +1,5 @@
-IN: cairo.tests
 USING: cairo tools.test math.rectangles accessors ;
+IN: cairo.tests
 
 [ { 10 20 } ] [
     { 10 20 } [

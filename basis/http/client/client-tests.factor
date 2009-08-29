@@ -1,5 +1,6 @@
 USING: http.client http.client.private http tools.test
 namespaces urls ;
+IN: http.client.tests
 
 [ "localhost" f ] [ "localhost" parse-host ] unit-test
 [ "localhost" 8888 ] [ "localhost:8888" parse-host ] unit-test

@@ -79,6 +79,8 @@ concurrency.promises threads io.streams.string ;
 ! See what happens if other end is closed
 [ ] [ <promise> "port" set ] unit-test
 
+[ ] [ "datagram3" get dispose ] unit-test
+
 [ ] [
     [
         "127.0.0.1" 0 <inet4> utf8 <server>
@@ -93,6 +95,8 @@ concurrency.promises threads io.streams.string ;
 
 [ "hello" f ] [
     "port" get ?promise utf8 [
+        1 seconds input-stream get set-timeout
+        1 seconds output-stream get set-timeout
         "hi\n" write flush readln readln
     ] with-client
 ] unit-test

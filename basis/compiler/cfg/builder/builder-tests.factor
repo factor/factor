@@ -1,14 +1,15 @@
-IN: compiler.cfg.builder.tests
 USING: tools.test kernel sequences words sequences.private fry
 prettyprint alien alien.accessors math.private compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.builder compiler.cfg.debugger
 compiler.cfg.optimizer compiler.cfg.predecessors compiler.cfg.checker
-arrays locals byte-arrays kernel.private math slots.private vectors sbufs
-strings math.partial-dispatch strings.private ;
+compiler.cfg arrays locals byte-arrays kernel.private math
+slots.private vectors sbufs strings math.partial-dispatch
+strings.private accessors compiler.cfg.instructions ;
+IN: compiler.cfg.builder.tests
 
 ! Just ensure that various CFGs build correctly.
 : unit-test-cfg ( quot -- )
-    '[ _ test-cfg [ optimize-cfg check-cfg ] each ] [ ] swap unit-test ;
+    '[ _ test-cfg [ [ optimize-cfg check-cfg ] with-cfg ] each ] [ ] swap unit-test ;
 
 : blahblah ( nodes -- ? )
     { fixnum } declare [
@@ -156,3 +157,37 @@ strings math.partial-dispatch strings.private ;
     { pinned-c-ptr class } \ set-alien-cell '[ _ declare 10 _ execute ] unit-test-cfg
     { pinned-c-ptr class fixnum } \ set-alien-cell '[ _ declare _ execute ] unit-test-cfg
 ] each
+
+: contains-insn? ( quot insn-check -- ? )
+    [ test-mr [ instructions>> ] map ] dip
+    '[ _ any? ] any? ; inline
+
+[ t ] [ [ swap ] [ ##replace? ] contains-insn? ] unit-test
+
+[ f ] [ [ swap swap ] [ ##replace? ] contains-insn? ] unit-test
+
+[ t ] [
+    [ { fixnum byte-array fixnum } declare set-alien-unsigned-1 ]
+    [ ##set-alien-integer-1? ] contains-insn?
+] unit-test
+
+[ t ] [
+    [ { fixnum byte-array fixnum } declare [ dup * dup * ] 2dip set-alien-unsigned-1 ]
+    [ ##set-alien-integer-1? ] contains-insn?
+] unit-test
+
+[ f ] [
+    [ { byte-array fixnum } declare set-alien-unsigned-1 ]
+    [ ##set-alien-integer-1? ] contains-insn?
+] unit-test
+
+[ f ] [
+    [ 1000 [ ] times ]
+    [ [ ##peek? ] [ ##replace? ] bi or ] contains-insn?
+] unit-test
+
+[ f t ] [
+    [ { fixnum simple-alien } declare <displaced-alien> 0 alien-cell ]
+    [ [ ##unbox-any-c-ptr? ] contains-insn? ]
+    [ [ ##slot-imm? ] contains-insn? ] bi
+] unit-test

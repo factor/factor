@@ -7,7 +7,7 @@ locals sequences ;
 IN: channels.examples
 
 : (counter) ( channel n -- )
-    [ swap to ] 2keep 1+ (counter) ;
+    [ swap to ] 2keep 1 + (counter) ;
     
 : counter ( channel -- )
     2 (counter) ;    

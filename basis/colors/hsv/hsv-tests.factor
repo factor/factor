@@ -1,5 +1,5 @@
-IN: colors.hsv.tests
 USING: accessors kernel colors colors.hsv tools.test math ;
+IN: colors.hsv.tests
 
 : hsv>rgb ( h s v -- r g b )
     [ 360 * ] 2dip

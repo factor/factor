@@ -10,7 +10,7 @@ compiler.cfg.instructions
 compiler.cfg.utilities ;
 IN: compiler.cfg.tco
 
-! Tail call optimization. You must run compute-predecessors after this
+! Tail call optimization.
 
 : return? ( bb -- ? )
     skip-empty-blocks
@@ -63,6 +63,6 @@ IN: compiler.cfg.tco
     ] [ drop ] if ;
 
 : optimize-tail-calls ( cfg -- cfg' )
-    dup cfg set
     dup [ optimize-tail-call ] each-basic-block
-    cfg-changed ;
+
+    cfg-changed predecessors-changed ;

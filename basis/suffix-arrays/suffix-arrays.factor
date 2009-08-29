@@ -17,7 +17,7 @@ IN: suffix-arrays
 
 : from-to ( index begin suffix-array -- from/f to/f )
     swap '[ _ head? not ]
-    [ find-last-from drop dup [ 1+ ] when ]
+    [ find-last-from drop dup [ 1 + ] when ]
     [ find-from drop ] 3bi ;
 
 : <funky-slice> ( from/f to/f seq -- slice )

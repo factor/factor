@@ -1,6 +1,6 @@
-IN: alarms.tests
 USING: alarms alarms.private kernel calendar sequences
 tools.test threads concurrency.count-downs ;
+IN: alarms.tests
 
 [ ] [
     1 <count-down>

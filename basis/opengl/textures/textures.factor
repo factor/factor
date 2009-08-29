@@ -268,7 +268,7 @@ DEFER: make-texture
 
 <PRIVATE
 
-TUPLE: single-texture image dim loc texture-coords texture display-list disposed ;
+TUPLE: single-texture < disposable image dim loc texture-coords texture display-list ;
 
 : adjust-texture-dim ( dim -- dim' )
     non-power-of-2-textures? get [
@@ -331,7 +331,7 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
     GL_COMPILE [ [ dim>> ] keep draw-textured-rect ] make-dlist ;
 
 : <single-texture> ( image loc -- texture )
-    single-texture new swap >>loc swap [ >>image ] [ dim>> >>dim ] bi
+    single-texture new-disposable swap >>loc swap [ >>image ] [ dim>> >>dim ] bi
     dup image>> dim>> product 0 = [
         dup texture-coords >>texture-coords
         dup image>> make-texture >>texture
@@ -347,7 +347,7 @@ M: single-texture draw-scaled-texture
         dup texture>> [ draw-textured-rect ] [ 2drop ] if
     ] if ;
 
-TUPLE: multi-texture grid display-list loc disposed ;
+TUPLE: multi-texture < disposable grid display-list loc ;
 
 : image-locs ( image-grid -- loc-grid )
     [ first [ dim>> first ] map ] [ [ first dim>> second ] map ] bi
@@ -373,11 +373,9 @@ TUPLE: multi-texture grid display-list loc disposed ;
 
 : <multi-texture> ( image-grid loc -- multi-texture )
     [
-        [
-            <texture-grid> dup
-            make-textured-grid-display-list
-        ] keep
-        f multi-texture boa
+        [ multi-texture new-disposable ] 2dip
+        [ nip >>loc ] [ <texture-grid> >>grid ] 2bi
+        dup grid>> make-textured-grid-display-list >>display-list
     ] with-destructors ;
 
 M: multi-texture draw-scaled-texture nip draw-texture ;

@@ -5,7 +5,7 @@ IN: io.streams.duplex.tests
 ! Test duplex stream close behavior
 TUPLE: closing-stream < disposable ;
 
-: <closing-stream> ( -- stream ) closing-stream new ;
+: <closing-stream> ( -- stream ) closing-stream new-disposable ;
 
 M: closing-stream dispose* drop ;
 

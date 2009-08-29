@@ -73,7 +73,7 @@ M: topic url-of topic>filename ;
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )
-    all-vocabs >hashtable f over delete-at no-roots remove-redundant-prefixes ;
+    all-vocabs-recursive >hashtable f over delete-at no-roots remove-redundant-prefixes ;
 
 : all-topics ( -- topics )
     [
@@ -115,7 +115,7 @@ TUPLE: result title href ;
     load-index swap >lower
     '[ [ drop _ ] dip >lower subseq? ] assoc-filter
     [ swap result boa ] { } assoc>map
-    [ [ title>> ] compare ] sort ;
+    [ title>> ] sort-with ;
 
 : article-apropos ( string -- results )
     "articles.idx" offline-apropos ;

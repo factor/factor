@@ -7,12 +7,12 @@ windows.offscreen windows.gdi32 windows.ole32 windows.types
 windows.fonts opengl.textures locals windows.errors ;
 IN: windows.uniscribe
 
-TUPLE: script-string font string metrics ssa size image disposed ;
+TUPLE: script-string < disposable font string metrics ssa size image ;
 
 : line-offset>x ( n script-string -- x )
     2dup string>> length = [
         ssa>> ! ssa
-        swap 1- ! icp
+        swap 1 - ! icp
         TRUE ! fTrailing
     ] [
         ssa>>
@@ -89,7 +89,7 @@ TUPLE: script-string font string metrics ssa size image disposed ;
     TEXTMETRIC>metrics ;
 
 : <script-string> ( font string -- script-string )
-    [ script-string new ] 2dip
+    [ script-string new-disposable ] 2dip
         [ >>font ] [ >>string ] bi*
     [
         {

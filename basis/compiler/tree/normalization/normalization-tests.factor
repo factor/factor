@@ -1,10 +1,10 @@
-IN: compiler.tree.normalization.tests
 USING: compiler.tree.builder compiler.tree.recursive
 compiler.tree.normalization
 compiler.tree.normalization.introductions
 compiler.tree.normalization.renaming
 compiler.tree compiler.tree.checker
 sequences accessors tools.test kernel math ;
+IN: compiler.tree.normalization.tests
 
 [ 3 ] [ [ 3drop 1 2 3 ] build-tree count-introductions ] unit-test
 

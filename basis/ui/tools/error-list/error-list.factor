@@ -71,7 +71,7 @@ M: source-file-renderer filled-column drop 1 ;
         60 >>min-cols
         60 >>max-cols
         t >>selection-required?
-        error-list source-file>> >>selected-value ;
+        error-list source-file>> >>selection ;
 
 SINGLETON: error-renderer
 
@@ -120,7 +120,7 @@ M: error-renderer column-alignment drop { 0 1 0 0 } ;
         60 >>min-cols
         60 >>max-cols
         t >>selection-required?
-        error-list error>> >>selected-value ;
+        error-list error>> >>selection ;
 
 TUPLE: error-display < track ;
 
@@ -165,8 +165,8 @@ error-display "toolbar" f {
         { 5 5 } >>gap
         error-list <error-list-toolbar> f track-add
         error-list source-file-table>> <scroller> "Source files" <labeled-gadget> 1/4 track-add
-        error-list error-table>> <scroller> "Errors" <labeled-gadget> 1/2 track-add
-        error-list error-display>> "Details" <labeled-gadget> 1/4 track-add
+        error-list error-table>> <scroller> "Errors" <labeled-gadget> 1/4 track-add
+        error-list error-display>> "Details" <labeled-gadget> 1/2 track-add
     { 5 5 } <filled-border> 1 track-add ;
 
 M: error-list-gadget focusable-child*

@@ -2,7 +2,7 @@ USING: alien arrays generic assocs hashtables io
 io.streams.string kernel math namespaces parser prettyprint
 sequences strings tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
-classes.algebra vectors definitions source-files compiler.units
+classes.algebra definitions source-files compiler.units
 kernel.private sorting vocabs memory eval accessors sets ;
 IN: classes.tests
 
@@ -109,6 +109,12 @@ USE: multiline
     M: j g ;"> <string-reader>
     "class-intersect-no-method-c" parse-stream drop
 ] unit-test
+
+! Forget the above crap
+[
+    { "classes.test.a" "classes.test.b" "classes.test.c" "classes.test.d" }
+    [ forget-vocab ] each
+] with-compilation-unit
 
 TUPLE: forgotten-predicate-test ;
 

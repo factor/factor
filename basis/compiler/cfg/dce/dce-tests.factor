@@ -11,62 +11,62 @@ IN: compiler.cfg.dce.tests
     entry>> instructions>> ; 
 
 [ V{
-    T{ ##load-immediate { dst V int-regs 1 } { val 8 } }
-    T{ ##load-immediate { dst V int-regs 2 } { val 16 } }
-    T{ ##add { dst V int-regs 3 } { src1 V int-regs 1 } { src2 V int-regs 2 } }
-    T{ ##replace { src V int-regs 3 } { loc D 0 } }
+    T{ ##load-immediate { dst 1 } { val 8 } }
+    T{ ##load-immediate { dst 2 } { val 16 } }
+    T{ ##add { dst 3 } { src1 1 } { src2 2 } }
+    T{ ##replace { src 3 } { loc D 0 } }
 } ] [ V{
-    T{ ##load-immediate { dst V int-regs 1 } { val 8 } }
-    T{ ##load-immediate { dst V int-regs 2 } { val 16 } }
-    T{ ##add { dst V int-regs 3 } { src1 V int-regs 1 } { src2 V int-regs 2 } }
-    T{ ##replace { src V int-regs 3 } { loc D 0 } }
+    T{ ##load-immediate { dst 1 } { val 8 } }
+    T{ ##load-immediate { dst 2 } { val 16 } }
+    T{ ##add { dst 3 } { src1 1 } { src2 2 } }
+    T{ ##replace { src 3 } { loc D 0 } }
 } test-dce ] unit-test
 
 [ V{ } ] [ V{
-    T{ ##load-immediate { dst V int-regs 1 } { val 8 } }
-    T{ ##load-immediate { dst V int-regs 2 } { val 16 } }
-    T{ ##add { dst V int-regs 3 } { src1 V int-regs 1 } { src2 V int-regs 2 } }
+    T{ ##load-immediate { dst 1 } { val 8 } }
+    T{ ##load-immediate { dst 2 } { val 16 } }
+    T{ ##add { dst 3 } { src1 1 } { src2 2 } }
 } test-dce ] unit-test
 
 [ V{ } ] [ V{
-    T{ ##load-immediate { dst V int-regs 3 } { val 8 } }
-    T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
+    T{ ##load-immediate { dst 3 } { val 8 } }
+    T{ ##allot { dst 1 } { temp 2 } }
 } test-dce ] unit-test
 
 [ V{ } ] [ V{
-    T{ ##load-immediate { dst V int-regs 3 } { val 8 } }
-    T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
-    T{ ##set-slot-imm { obj V int-regs 1 } { src V int-regs 3 } }
+    T{ ##load-immediate { dst 3 } { val 8 } }
+    T{ ##allot { dst 1 } { temp 2 } }
+    T{ ##set-slot-imm { obj 1 } { src 3 } }
 } test-dce ] unit-test
 
 [ V{
-    T{ ##load-immediate { dst V int-regs 3 } { val 8 } }
-    T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
-    T{ ##set-slot-imm { obj V int-regs 1 } { src V int-regs 3 } }
-    T{ ##replace { src V int-regs 1 } { loc D 0 } }
+    T{ ##load-immediate { dst 3 } { val 8 } }
+    T{ ##allot { dst 1 } { temp 2 } }
+    T{ ##set-slot-imm { obj 1 } { src 3 } }
+    T{ ##replace { src 1 } { loc D 0 } }
 } ] [ V{
-    T{ ##load-immediate { dst V int-regs 3 } { val 8 } }
-    T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
-    T{ ##set-slot-imm { obj V int-regs 1 } { src V int-regs 3 } }
-    T{ ##replace { src V int-regs 1 } { loc D 0 } }
+    T{ ##load-immediate { dst 3 } { val 8 } }
+    T{ ##allot { dst 1 } { temp 2 } }
+    T{ ##set-slot-imm { obj 1 } { src 3 } }
+    T{ ##replace { src 1 } { loc D 0 } }
 } test-dce ] unit-test
 
 [ V{
-    T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
-    T{ ##replace { src V int-regs 1 } { loc D 0 } }
+    T{ ##allot { dst 1 } { temp 2 } }
+    T{ ##replace { src 1 } { loc D 0 } }
 } ] [ V{
-    T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
-    T{ ##replace { src V int-regs 1 } { loc D 0 } }
+    T{ ##allot { dst 1 } { temp 2 } }
+    T{ ##replace { src 1 } { loc D 0 } }
 } test-dce ] unit-test
 
 [ V{
-    T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
-    T{ ##replace { src V int-regs 1 } { loc D 0 } }
-    T{ ##load-immediate { dst V int-regs 3 } { val 8 } }
-    T{ ##set-slot-imm { obj V int-regs 1 } { src V int-regs 3 } }
+    T{ ##allot { dst 1 } { temp 2 } }
+    T{ ##replace { src 1 } { loc D 0 } }
+    T{ ##load-immediate { dst 3 } { val 8 } }
+    T{ ##set-slot-imm { obj 1 } { src 3 } }
 } ] [ V{
-    T{ ##allot { dst V int-regs 1 } { temp V int-regs 2 } }
-    T{ ##replace { src V int-regs 1 } { loc D 0 } }
-    T{ ##load-immediate { dst V int-regs 3 } { val 8 } }
-    T{ ##set-slot-imm { obj V int-regs 1 } { src V int-regs 3 } }
+    T{ ##allot { dst 1 } { temp 2 } }
+    T{ ##replace { src 1 } { loc D 0 } }
+    T{ ##load-immediate { dst 3 } { val 8 } }
+    T{ ##set-slot-imm { obj 1 } { src 3 } }
 } test-dce ] unit-test

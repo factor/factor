@@ -39,7 +39,7 @@ IN: project-euler.099
     flip first2 swap [ log ] map v* ;
 
 : solve ( seq -- index )
-    simplify [ supremum ] keep index 1+ ;
+    simplify [ supremum ] keep index 1 + ;
 
 PRIVATE>
 

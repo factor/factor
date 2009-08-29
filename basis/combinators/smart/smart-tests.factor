@@ -4,7 +4,7 @@ USING: tools.test combinators.smart math kernel accessors ;
 IN: combinators.smart.tests
 
 : test-bi ( -- 9 11 )
-    10 [ 1- ] [ 1+ ] bi ;
+    10 [ 1 - ] [ 1 + ] bi ;
 
 [ [ test-bi ] output>array ] must-infer
 [ { 9 11 } ] [ [ test-bi ] output>array ] unit-test

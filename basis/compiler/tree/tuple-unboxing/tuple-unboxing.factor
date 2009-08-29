@@ -1,12 +1,15 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs accessors kernel combinators
+USING: namespaces assocs accessors kernel kernel.private combinators
 classes.algebra sequences slots.private fry vectors
 classes.tuple.private math math.private arrays
-stack-checker.branches
+stack-checker.branches stack-checker.values
 compiler.utilities
 compiler.tree
+compiler.tree.builder
+compiler.tree.cleanup
 compiler.tree.combinators
+compiler.tree.propagation
 compiler.tree.propagation.info
 compiler.tree.escape-analysis.simple
 compiler.tree.escape-analysis.allocations ;
@@ -72,8 +75,8 @@ M: #call unbox-tuples*
     } case ;
 
 M: #declare unbox-tuples*
-    #! We don't look at declarations after propagation anyway.
-    f >>declaration ;
+    #! We don't look at declarations after escape analysis anyway.
+    drop f ;
 
 M: #copy unbox-tuples*
     [ flatten-values ] change-in-d
@@ -113,6 +116,44 @@ M: #return-recursive unbox-tuples*
     [ flatten-values ] change-in-d
     [ flatten-values ] change-out-d ;
 
+: value-declaration ( value -- quot )
+    value-class [ 1array '[ _ declare ] ] [ [ ] ] if* ;
+
+: unbox-parameter-quot ( allocation -- quot )
+    dup unboxed-allocation {
+        { [ dup not ] [ 2drop [ ] ] }
+        { [ dup array? ] [
+            [ value-declaration ] [
+                [
+                    [ unbox-parameter-quot ] [ 2 + '[ _ slot ] ] bi*
+                    prepose
+                ] map-index
+            ] bi* '[ @ _ cleave ]
+        ] }
+    } cond ;
+
+: unbox-parameters-quot ( values -- quot )
+    [ unbox-parameter-quot ] map
+    dup [ [ ] = ] all? [ drop [ ] ] [ '[ _ spread ] ] if ;
+
+: unbox-parameters-nodes ( new-values old-values -- nodes )
+    [ flatten-values ] [ unbox-parameters-quot ] bi build-sub-tree ;
+
+: new-and-old-values ( values -- new-values old-values )
+    [ length [ <value> ] replicate ] keep ;
+
+: unbox-hairy-introduce ( #introduce -- nodes )
+    dup out-d>> new-and-old-values
+    [ drop >>out-d ] [ unbox-parameters-nodes ] 2bi
+    swap prefix propagate ;
+
+M: #introduce unbox-tuples*
+    ! For every output that is unboxed, insert slot accessors
+    ! to convert the stack value into its unboxed form
+    dup out-d>> [ unboxed-allocation ] any? [
+        unbox-hairy-introduce
+    ] when ;
+
 ! These nodes never participate in unboxing
 : assert-not-unboxed ( values -- )
     dup array?
@@ -122,8 +163,6 @@ M: #return-recursive unbox-tuples*
 M: #branch unbox-tuples* dup in-d>> assert-not-unboxed ;
 
 M: #return unbox-tuples* dup in-d>> assert-not-unboxed ;
-
-M: #introduce unbox-tuples* dup out-d>> assert-not-unboxed ;
 
 M: #alien-invoke unbox-tuples* dup in-d>> assert-not-unboxed ;
 

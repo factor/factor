@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra classes.tuple
-classes.tuple.private kernel accessors math math.intervals
-namespaces sequences words combinators byte-arrays strings
-arrays layouts cpu.architecture compiler.tree.propagation.copy ;
+classes.tuple.private kernel accessors math math.intervals namespaces
+sequences sequences.private words combinators memoize
+combinators.short-circuit byte-arrays strings arrays layouts
+cpu.architecture compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;
@@ -36,10 +37,6 @@ CONSTANT: null-info T{ value-info f null empty-interval }
 
 CONSTANT: object-info T{ value-info f object full-interval }
 
-: class-interval ( class -- interval )
-    dup real class<=
-    [ "interval" word-prop [-inf,inf] or ] [ drop f ] if ;
-
 : interval>literal ( class interval -- literal literal? )
     #! If interval has zero length and the class is sufficiently
     #! precise, we can turn it into a literal
@@ -69,7 +66,7 @@ DEFER: <literal-info>
 UNION: fixed-length array byte-array string ;
 
 : init-literal-info ( info -- info )
-    [-inf,inf] >>interval
+    empty-interval >>interval
     dup literal>> class >>class
     dup literal>> {
         { [ dup real? ] [ [a,a] >>interval ] }
@@ -78,16 +75,54 @@ UNION: fixed-length array byte-array string ;
         [ drop ]
     } cond ; inline
 
+: empty-set? ( info -- ? )
+    {
+        [ class>> null-class? ]
+        [ [ interval>> empty-interval eq? ] [ class>> real class<= ] bi and ]
+    } 1|| ;
+
+: min-value ( class -- n )
+    {
+        { fixnum [ most-negative-fixnum ] }
+        { array-capacity [ 0 ] }
+        [ drop -1/0. ]
+    } case ;
+
+: max-value ( class -- n )
+    {
+        { fixnum [ most-positive-fixnum ] }
+        { array-capacity [ max-array-capacity ] }
+        [ drop 1/0. ]
+    } case ;
+
+: class-interval ( class -- i )
+    {
+        { fixnum [ fixnum-interval ] }
+        { array-capacity [ array-capacity-interval ] }
+        [ drop full-interval ]
+    } case ;
+
+: wrap-interval ( interval class -- interval' )
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ over full-interval eq? ] [ nip class-interval ] }
+        { [ 2dup class-interval interval-subset? not ] [ nip class-interval ] }
+        [ drop ]
+    } cond ;
+
+: init-interval ( info -- info )
+    dup [ interval>> full-interval or ] [ class>> ] bi wrap-interval >>interval
+    dup class>> integer class<= [ [ integral-closure ] change-interval ] when ; inline
+
 : init-value-info ( info -- info )
     dup literal?>> [
         init-literal-info
     ] [
-        dup [ class>> null-class? ] [ interval>> empty-interval eq? ] bi or [
+        dup empty-set? [
             null >>class
             empty-interval >>interval
         ] [
-            [ [-inf,inf] or ] change-interval
-            dup class>> integer class<= [ [ integral-closure ] change-interval ] when
+            init-interval
             dup [ class>> ] [ interval>> ] bi interval>literal
             [ >>literal ] [ >>literal? ] bi*
         ] if
@@ -100,8 +135,7 @@ UNION: fixed-length array byte-array string ;
     init-value-info ; foldable
 
 : <class-info> ( class -- info )
-    dup word? [ dup "interval" word-prop ] [ f ] if [-inf,inf] or
-    <class/interval-info> ; foldable
+    f <class/interval-info> ; foldable
 
 : <interval-info> ( interval -- info )
     <value-info>

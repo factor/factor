@@ -37,7 +37,7 @@ IN: project-euler.026
     1 1000 (a,b) [ prime? ] filter [ 1 swap / ] map ;
 
 : (mult-order) ( n a m -- k )
-    3dup ^ swap mod 1 = [ 2nip ] [ 1+ (mult-order) ] if ;
+    3dup ^ swap mod 1 = [ 2nip ] [ 1 + (mult-order) ] if ;
 
 PRIVATE>
 

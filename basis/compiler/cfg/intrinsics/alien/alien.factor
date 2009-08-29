@@ -1,10 +1,24 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences alien math classes.algebra fry
-locals combinators cpu.architecture compiler.tree.propagation.info
-compiler.cfg.hats compiler.cfg.stacks compiler.cfg.instructions
+locals combinators combinators.short-circuit cpu.architecture
+compiler.tree.propagation.info compiler.cfg.hats
+compiler.cfg.stacks compiler.cfg.instructions
 compiler.cfg.utilities compiler.cfg.builder.blocks ;
 IN: compiler.cfg.intrinsics.alien
+
+: emit-<displaced-alien>? ( node -- ? )
+    node-input-infos {
+        [ first class>> fixnum class<= ]
+        [ second class>> c-ptr class<= ]
+    } 1&& ;
+
+: emit-<displaced-alien> ( node -- )
+    dup emit-<displaced-alien>? [
+        [ 2inputs [ ^^untag-fixnum ] dip ] dip
+        node-input-infos second class>>
+        ^^box-displaced-alien ds-push
+    ] [ emit-primitive ] if ;
 
 : (prepare-alien-accessor-imm) ( class offset -- offset-vreg )
     ds-drop [ ds-pop swap ^^unbox-c-ptr ] dip ^^add-imm ;
@@ -53,7 +67,7 @@ IN: compiler.cfg.intrinsics.alien
     inline-alien ; inline
 
 : inline-alien-float-setter ( node quot -- )
-    '[ ds-pop ^^unbox-float @ ]
+    '[ ds-pop @ ]
     [ float inline-alien-setter? ]
     inline-alien ; inline
 
@@ -90,18 +104,18 @@ IN: compiler.cfg.intrinsics.alien
 : emit-alien-cell-setter ( node -- )
     [ ##set-alien-cell ] inline-alien-cell-setter ;
 
-: emit-alien-float-getter ( node reg-class -- )
+: emit-alien-float-getter ( node rep -- )
     '[
         _ {
-            { single-float-regs [ ^^alien-float ] }
-            { double-float-regs [ ^^alien-double ] }
-        } case ^^box-float
+            { single-float-rep [ ^^alien-float ] }
+            { double-float-rep [ ^^alien-double ] }
+        } case
     ] inline-alien-getter ;
 
-: emit-alien-float-setter ( node reg-class -- )
+: emit-alien-float-setter ( node rep -- )
     '[
         _ {
-            { single-float-regs [ ##set-alien-float ] }
-            { double-float-regs [ ##set-alien-double ] }
+            { single-float-rep [ ##set-alien-float ] }
+            { double-float-rep [ ##set-alien-double ] }
         } case
     ] inline-alien-float-setter ;

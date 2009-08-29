@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
-math.bitwise math.order classes vectors
+math.bitwise math.order classes vectors locals make
 compiler.cfg
-compiler.cfg.hats
+compiler.cfg.registers
 compiler.cfg.comparisons
 compiler.cfg.instructions
 compiler.cfg.value-numbering.expressions
@@ -77,7 +77,7 @@ M: ##compare-imm-branch rewrite-tagged-comparison
 
 M: ##compare-imm rewrite-tagged-comparison
     [ dst>> ] [ (rewrite-tagged-comparison) ] bi
-    i \ ##compare-imm new-insn ;
+    next-vreg \ ##compare-imm new-insn ;
 
 : rewrite-redundant-comparison? ( insn -- ? )
     {
@@ -88,9 +88,9 @@ M: ##compare-imm rewrite-tagged-comparison
 
 : rewrite-redundant-comparison ( insn -- insn' )
     [ cc>> ] [ dst>> ] [ src1>> vreg>expr dup op>> ] tri {
-        { \ ##compare [ >compare-expr< i \ ##compare new-insn ] }
-        { \ ##compare-imm [ >compare-imm-expr< i \ ##compare-imm new-insn ] }
-        { \ ##compare-float [ >compare-expr< i \ ##compare-float new-insn ] }
+        { \ ##compare [ >compare-expr< next-vreg \ ##compare new-insn ] }
+        { \ ##compare-imm [ >compare-imm-expr< next-vreg \ ##compare-imm new-insn ] }
+        { \ ##compare-float [ >compare-expr< next-vreg \ ##compare-float new-insn ] }
     } case
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 
@@ -169,7 +169,7 @@ M: ##compare-branch rewrite
     ] dip
     swap-compare
     [ vreg>constant ] dip
-    i \ ##compare-imm new-insn ; inline
+    next-vreg \ ##compare-imm new-insn ; inline
 
 : >boolean-insn ( insn ? -- insn' )
     [ dst>> ] dip
@@ -350,3 +350,24 @@ M: ##shl rewrite \ ##shl-imm rewrite-arithmetic ;
 M: ##shr rewrite \ ##shr-imm rewrite-arithmetic ;
 
 M: ##sar rewrite \ ##sar-imm rewrite-arithmetic ;
+
+: box-displaced-alien? ( expr -- ? )
+    op>> \ ##box-displaced-alien eq? ;
+
+! ##box-displaced-alien f 1 2 3 <class>
+! ##unbox-c-ptr 4 1 <class>
+! =>
+! ##box-displaced-alien f 1 2 3 <class>
+! ##unbox-c-ptr 5 3 <class>
+! ##add 4 5 2
+
+:: rewrite-unbox-displaced-alien ( insn expr -- insns )
+    [
+        next-vreg :> temp
+        temp expr base>> vn>vreg expr base-class>> insn temp>> ##unbox-c-ptr
+        insn dst>> temp expr displacement>> vn>vreg ##add
+    ] { } make ;
+
+M: ##unbox-any-c-ptr rewrite
+    dup src>> vreg>expr dup box-displaced-alien?
+    [ rewrite-unbox-displaced-alien ] [ 2drop f ] if ;

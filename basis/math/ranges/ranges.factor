@@ -12,11 +12,9 @@ TUPLE: range
 : <range> ( a b step -- range )
     [ over - ] dip [ /i 1 + 0 max ] keep range boa ; inline
 
-M: range length ( seq -- n )
-    length>> ;
+M: range length ( seq -- n ) length>> ; inline
 
-M: range nth-unsafe ( n range -- obj )
-    [ step>> * ] keep from>> + ;
+M: range nth-unsafe ( n range -- obj ) [ step>> * ] keep from>> + ; inline
 
 ! For ranges with many elements, the default element-wise methods
 ! sequences define are unsuitable because they're O(n)
