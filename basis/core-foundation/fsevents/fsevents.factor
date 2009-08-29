@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces make assocs init accessors
 continuations combinators io.encodings.utf8 destructors locals
-arrays specialized-arrays.direct.alien
+arrays specialized-arrays.direct.alien classes.struct
 specialized-arrays.direct.int specialized-arrays.direct.longlong
 core-foundation core-foundation.run-loop core-foundation.strings
 core-foundation.time ;
@@ -26,12 +26,12 @@ TYPEDEF: int FSEventStreamEventFlags
 TYPEDEF: longlong FSEventStreamEventId
 TYPEDEF: void* FSEventStreamRef
 
-C-STRUCT: FSEventStreamContext
-    { "CFIndex" "version" }
-    { "void*" "info" }
-    { "void*" "retain" }
-    { "void*" "release" }
-    { "void*" "copyDescription" } ;
+STRUCT: FSEventStreamContext
+    { version CFIndex }
+    { info void* }
+    { retain void* }
+    { release void* }
+    { copyDescription void* } ;
 
 ! callback(FSEventStreamRef streamRef, void *clientCallBackInfo, size_t numEvents, void *eventPaths, const FSEventStreamEventFlags eventFlags[], const FSEventStreamEventId eventIds[]);
 TYPEDEF: void* FSEventStreamCallback
@@ -104,8 +104,8 @@ FUNCTION: void FSEventStreamShow ( FSEventStreamRef streamRef ) ;
 FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef ) ;
 
 : make-FSEventStreamContext ( info -- alien )
-    "FSEventStreamContext" <c-object>
-    [ set-FSEventStreamContext-info ] keep ;
+    FSEventStreamContext <struct>
+        swap >>info ;
 
 :: <FSEventStream> ( callback info paths latency flags -- event-stream )
     f ! allocator

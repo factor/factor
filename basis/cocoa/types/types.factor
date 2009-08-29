@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax combinators kernel layouts
-core-graphics.types ;
+classes.struct core-graphics.types ;
 IN: cocoa.types
 
 TYPEDEF: long NSInteger
@@ -16,9 +16,9 @@ TYPEDEF: NSSize _NSSize
 TYPEDEF: CGRect NSRect
 TYPEDEF: NSRect _NSRect
 
-C-STRUCT: NSRange
-    { "NSUInteger" "location" }
-    { "NSUInteger" "length" } ;
+STRUCT: NSRange
+    { location NSUInteger }
+    { length NSUInteger } ;
 
 TYPEDEF: NSRange _NSRange
 
@@ -27,13 +27,11 @@ TYPEDEF: int long32
 TYPEDEF: uint ulong32
 TYPEDEF: void* unknown_type
 
-: <NSRange> ( length location -- size )
-    "NSRange" <c-object>
-    [ set-NSRange-length ] keep
-    [ set-NSRange-location ] keep ;
+: <NSRange> ( location length -- size )
+    NSRange <struct-boa> ;
 
-C-STRUCT: NSFastEnumerationState
-    { "ulong" "state" }
-    { "id*" "itemsPtr" }
-    { "ulong*" "mutationsPtr" }
-    { "ulong[5]" "extra" } ;
+STRUCT: NSFastEnumerationState
+    { state ulong }
+    { itemsPtr id* }
+    { mutationsPtr ulong* }
+    { extra ulong[5] } ;
