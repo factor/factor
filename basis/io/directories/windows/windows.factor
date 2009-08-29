@@ -48,10 +48,11 @@ M: windows delete-directory ( path -- )
 TUPLE: windows-directory-entry < directory-entry attributes ;
 
 M: windows >directory-entry ( byte-array -- directory-entry )
-    [ WIN32_FIND_DATA-cFileName utf16n alien>string ]
-    [ WIN32_FIND_DATA-dwFileAttributes win32-file-type ]
-    [ WIN32_FIND_DATA-dwFileAttributes win32-file-attributes ]
-    tri
+    [ cFileName>> utf16n alien>string ]
+    [
+        dwFileAttributes>>
+        [ win32-file-type ] [ win32-file-attributes ] bi
+    ] bi
     dupd remove windows-directory-entry boa ;
 
 M: windows (directory-entries) ( path -- seq )
