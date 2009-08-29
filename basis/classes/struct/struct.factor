@@ -45,7 +45,7 @@ M: struct equal?
 ] 1 define-partial-eval
 
 : malloc-struct ( class -- struct )
-    [ heap-size malloc ] keep memory>struct ; inline
+    [ 1 swap heap-size calloc ] keep memory>struct ; inline
 
 : (struct) ( class -- struct )
     [ heap-size <byte-array> ] keep memory>struct ; inline
