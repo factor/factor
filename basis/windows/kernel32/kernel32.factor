@@ -90,11 +90,12 @@ CONSTANT: FILE_ACTION_MODIFIED 3
 CONSTANT: FILE_ACTION_RENAMED_OLD_NAME 4
 CONSTANT: FILE_ACTION_RENAMED_NEW_NAME 5
 
-C-STRUCT: FILE_NOTIFY_INFORMATION
-    { "DWORD" "NextEntryOffset" }
-    { "DWORD" "Action" }
-    { "DWORD" "FileNameLength" }
-    { "WCHAR[1]" "FileName" } ;
+STRUCT: FILE_NOTIFY_INFORMATION
+    { NextEntryOffset DWORD }
+    { Action DWORD }
+    { FileNameLength DWORD }
+    { FileName WCHAR[1] } ;
+
 TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 
 CONSTANT: STD_INPUT_HANDLE  -10
@@ -694,19 +695,17 @@ C-STRUCT: OFSTRUCT
 
 TYPEDEF: OFSTRUCT* LPOFSTRUCT
 
-! MAX_PATH = 260
-C-STRUCT: WIN32_FIND_DATA
-    { "DWORD" "dwFileAttributes" }
-    { "FILETIME" "ftCreationTime" }
-    { "FILETIME" "ftLastAccessTime" }
-    { "FILETIME" "ftLastWriteTime" }
-    { "DWORD" "nFileSizeHigh" }
-    { "DWORD" "nFileSizeLow" }
-    { "DWORD" "dwReserved0" }
-    { "DWORD" "dwReserved1" }
-    ! { { "TCHAR" MAX_PATH } "cFileName" }
-    { { "TCHAR" 260 } "cFileName" }
-    { { "TCHAR" 14 } "cAlternateFileName" } ;
+STRUCT: WIN32_FIND_DATA
+    { dwFileAttributes DWORD }
+    { ftCreationTime FILETIME }
+    { ftLastAccessTime FILETIME }
+    { ftLastWriteTime FILETIME }
+    { nFileSizeHigh DWORD }
+    { nFileSizeLow DWORD }
+    { dwReserved0 DWORD }
+    { dwReserved1 DWORD }
+    { cFileName { "TCHAR" MAX_PATH } }
+    { cAlternateFileName TCHAR[14] } ;
 
 STRUCT: BY_HANDLE_FILE_INFORMATION
     { dwFileAttributes DWORD }

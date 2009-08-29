@@ -55,17 +55,13 @@ TUPLE: win32-monitor < monitor port ;
     memory>byte-array utf16n decode ;
 
 : parse-notify-record ( buffer -- path changed )
-    [
-        [ FILE_NOTIFY_INFORMATION-FileName ]
-        [ FILE_NOTIFY_INFORMATION-FileNameLength ]
-        bi memory>u16-string
-    ]
-    [ FILE_NOTIFY_INFORMATION-Action parse-action ] bi ;
+    [ [ FileName>> ] [ FileNameLength>> ] bi memory>u16-string ]
+    [ Action>> parse-action ] bi ;
 
 : (file-notify-records) ( buffer -- buffer )
     dup ,
-    dup FILE_NOTIFY_INFORMATION-NextEntryOffset zero? [
-        [ FILE_NOTIFY_INFORMATION-NextEntryOffset ] keep <displaced-alien>
+    dup NextEntryOffset>> zero? [
+        [ NextEntryOffset>> ] [ <displaced-alien> ] bi
         (file-notify-records)
     ] unless ;
 
