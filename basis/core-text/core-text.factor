@@ -116,8 +116,8 @@ TUPLE: line < disposable line metrics image loc dim ;
                 line [ string open-font font foreground>> <CTLine> |CFRelease ]
 
                 rect [ line line-rect ]
-                (loc) [ rect CGRect-origin CGPoint>loc ]
-                (dim) [ rect CGRect-size CGSize>dim ]
+                (loc) [ rect origin>> CGPoint>loc ]
+                (dim) [ rect size>> CGSize>dim ]
                 (ext) [ (loc) (dim) v+ ]
                 loc [ (loc) [ floor ] map ]
                 ext [ (loc) (dim) [ + ceiling ] 2map ]

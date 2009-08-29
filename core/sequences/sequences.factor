@@ -98,9 +98,9 @@ M: f like drop [ f ] when-empty ; inline
 
 INSTANCE: f immutable-sequence
 
-! Integers support the sequence protocol
-M: integer length ; inline
-M: integer nth-unsafe drop ; inline
+! Integers used to support the sequence protocol
+M: integer length ; inline deprecated
+M: integer nth-unsafe drop ; inline deprecated
 
 INSTANCE: integer immutable-sequence
 
