@@ -17,7 +17,7 @@ M: struct-array length length>> ; inline
 M: struct-array byte-length [ length>> ] [ element-size>> ] bi * ; inline
 
 : (nth-ptr) ( i struct-array -- alien )
-    [ element-size>> * ] [ underlying>> ] bi <displaced-alien> ; inline
+    [ element-size>> * >fixnum ] [ underlying>> ] bi <displaced-alien> ; inline
 
 M: struct-array nth-unsafe
     [ (nth-ptr) ] [ class>> dup struct-class? ] bi [ memory>struct ] [ drop ] if ; inline
@@ -26,7 +26,7 @@ M: struct-array set-nth-unsafe
     [ (nth-ptr) swap ] [ element-size>> ] bi memcpy ; inline
 
 M: struct-array new-sequence
-    [ element-size>> [ * <byte-array> ] 2keep ]
+    [ element-size>> [ * (byte-array) ] 2keep ]
     [ class>> ] bi struct-array boa ; inline
 
 M: struct-array resize ( n seq -- newseq )
