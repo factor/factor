@@ -235,6 +235,10 @@ IN: math.intervals.tests
     interval-contains?
 ] unit-test
 
+[ t ] [ full-interval 10 10 [a,b] interval-max 10 1/0. [a,b] = ] unit-test
+
+[ t ] [ full-interval 10 10 [a,b] interval-min -1/0. 10 [a,b] = ] unit-test
+
 [ t ] [ 1 100 [a,b] -1 1 [a,b] interval/i [-inf,inf] = ] unit-test
 
 ! Accuracy of interval-mod

@@ -1,9 +1,12 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! Copyright (C) 2008, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private sequences
 sequences.private math math.private combinators ;
 IN: math.integers.private
+
+: fixnum-min ( x y -- z ) [ fixnum< ] most ; foldable
+: fixnum-max ( x y -- z ) [ fixnum> ] most ; foldable
 
 M: integer numerator ; inline
 M: integer denominator drop 1 ; inline

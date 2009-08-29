@@ -1,11 +1,10 @@
-USING: accessors arrays compiler.units kernel kernel.private math
-math.constants math.private sequences strings tools.test words
-continuations sequences.private hashtables.private byte-arrays
-system random layouts vectors
+USING: accessors arrays compiler.units kernel kernel.private
+math math.constants math.private math.integers.private sequences
+strings tools.test words continuations sequences.private
+hashtables.private byte-arrays system random layouts vectors
 sbufs strings.private slots.private alien math.order
 alien.accessors alien.c-types alien.syntax alien.strings
-namespaces libc io.encodings.ascii
-classes compiler ;
+namespaces libc io.encodings.ascii classes compiler ;
 IN: compiler.tests.intrinsics
 
 ! Make sure that intrinsic ops compile to correct code.
@@ -270,6 +269,15 @@ cell 8 = [
     100001 f <array> 3 100000 pick set-nth
     [ 100000 swap array-nth ] compile-call
 ] unit-test
+
+[ 2 ] [ 2 4 [ fixnum-min ] compile-call ] unit-test
+[ 2 ] [ 4 2 [ fixnum-min ] compile-call ] unit-test
+[ 4 ] [ 2 4 [ fixnum-max ] compile-call ] unit-test
+[ 4 ] [ 4 2 [ fixnum-max ] compile-call ] unit-test
+[ -2 ] [ -2 -4 [ fixnum-max ] compile-call ] unit-test
+[ -2 ] [ -4 -2 [ fixnum-max ] compile-call ] unit-test
+[ -4 ] [ -2 -4 [ fixnum-min ] compile-call ] unit-test
+[ -4 ] [ -4 -2 [ fixnum-min ] compile-call ] unit-test
 
 ! 64-bit overflow
 cell 8 = [

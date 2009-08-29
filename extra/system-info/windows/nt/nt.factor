@@ -4,11 +4,11 @@ USING: alien alien.c-types alien.strings
 kernel libc math namespaces system-info.backend
 system-info.windows windows windows.advapi32
 windows.kernel32 system byte-arrays windows.errors
-classes classes.struct ;
+classes classes.struct accessors ;
 IN: system-info.windows.nt
 
 M: winnt cpus ( -- n )
-    system-info SYSTEM_INFO-dwNumberOfProcessors ;
+    system-info dwNumberOfProcessors>> ;
 
 : memory-status ( -- MEMORYSTATUSEX )
     "MEMORYSTATUSEX" <struct>
