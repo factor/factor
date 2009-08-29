@@ -185,3 +185,9 @@ IN: compiler.cfg.builder.tests
     [ 1000 [ ] times ]
     [ [ ##peek? ] [ ##replace? ] bi or ] contains-insn?
 ] unit-test
+
+[ f t ] [
+    [ { fixnum simple-alien } declare <displaced-alien> 0 alien-cell ]
+    [ [ ##unbox-any-c-ptr? ] contains-insn? ]
+    [ [ ##slot-imm? ] contains-insn? ] bi
+] unit-test

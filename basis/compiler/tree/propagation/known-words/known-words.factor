@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel effects accessors math math.private
-math.integers.private math.partial-dispatch math.intervals
-math.parser math.order math.functions math.libm layouts words
-sequences sequences.private arrays assocs classes
+math.integers.private math.floats.private math.partial-dispatch
+math.intervals math.parser math.order math.functions math.libm
+layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private
 slots.private definitions strings.private vectors hashtables
@@ -79,10 +79,15 @@ IN: compiler.tree.propagation.known-words
     ] unless ;
 
 : ensure-math-class ( class must-be -- class' )
-    [ class<= ] 2keep ? ;
+    [ class<= ] most ;
 
 : number-valued ( class interval -- class' interval' )
     [ number ensure-math-class ] dip ;
+
+: fixnum-valued ( class interval -- class' interval' )
+    over null-class? [
+        [ drop fixnum ] dip
+    ] unless ;
 
 : integer-valued ( class interval -- class' interval' )
     [ integer ensure-math-class ] dip ;
@@ -303,3 +308,16 @@ generic-comparison-ops [
 flog fpow fsqrt facosh fasinh fatanh } [
     { float } "default-output-classes" set-word-prop
 ] each
+
+! Find a less repetitive way of doing this
+\ float-min { float float } "input-classes" set-word-prop
+\ float-min [ interval-min ] [ float-valued ] binary-op
+
+\ float-max { float float } "input-classes" set-word-prop
+\ float-max [ interval-max ] [ float-valued ] binary-op
+
+\ fixnum-min { fixnum fixnum } "input-classes" set-word-prop
+\ fixnum-min [ interval-min ] [ fixnum-valued ] binary-op
+
+\ fixnum-max { fixnum fixnum } "input-classes" set-word-prop
+\ fixnum-max [ interval-max ] [ fixnum-valued ] binary-op

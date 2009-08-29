@@ -123,6 +123,10 @@ M: x86 %xor-imm nip XOR ;
 M: x86 %shl-imm nip SHL ;
 M: x86 %shr-imm nip SHR ;
 M: x86 %sar-imm nip SAR ;
+
+M: x86 %min     nip [ CMP ] [ CMOVG ] 2bi ;
+M: x86 %max     nip [ CMP ] [ CMOVL ] 2bi ;
+
 M: x86 %not     drop NOT ;
 M: x86 %log2    BSR ;
 
@@ -203,6 +207,8 @@ M: x86 %add-float nip ADDSD ;
 M: x86 %sub-float nip SUBSD ;
 M: x86 %mul-float nip MULSD ;
 M: x86 %div-float nip DIVSD ;
+M: x86 %min-float nip MINSD ;
+M: x86 %max-float nip MAXSD ;
 M: x86 %sqrt SQRTSD ;
 
 M: x86 %integer>float CVTSI2SD ;
@@ -572,3 +578,10 @@ M: x86 small-enough? ( n -- ? )
     #! stack frame set up, and we want to read the frame
     #! set up by the caller.
     stack-frame get total-size>> + stack@ ;
+
+: enable-sse2 ( -- )
+    enable-float-intrinsics
+    enable-fsqrt
+    enable-float-min/max ;
+
+enable-min/max
