@@ -226,14 +226,14 @@ STRUCT: SYSTEMTIME
     { wSecond WORD }
     { wMilliseconds WORD } ;
 
-C-STRUCT: TIME_ZONE_INFORMATION
-    { "LONG" "Bias" }
-    { { "WCHAR" 32 } "StandardName" }
-    { "SYSTEMTIME" "StandardDate" }
-    { "LONG" "StandardBias" }
-    { { "WCHAR" 32 } "DaylightName" }
-    { "SYSTEMTIME" "DaylightDate" }
-    { "LONG" "DaylightBias" } ;
+STRUCT: TIME_ZONE_INFORMATION
+    { Bias LONG }
+    { StandardName WCHAR[32] }
+    { StandardDate SYSTEMTIME }
+    { StandardBias LONG }
+    { DaylightName WCHAR[32] }
+    { DaylightDate SYSTEMTIME }
+    { DaylightBias LONG } ;
 
 STRUCT: FILETIME
     { dwLowDateTime DWORD }
