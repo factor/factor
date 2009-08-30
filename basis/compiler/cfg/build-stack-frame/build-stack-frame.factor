@@ -14,13 +14,12 @@ GENERIC: compute-stack-frame* ( insn -- )
     frame-required? on
     stack-frame [ max-stack-frame ] change ;
 
-M: ##alien-invoke compute-stack-frame*
-    stack-frame>> request-stack-frame ;
+UNION: stack-frame-insn
+    ##alien-invoke
+    ##alien-indirect
+    ##alien-callback ;
 
-M: ##alien-indirect compute-stack-frame*
-    stack-frame>> request-stack-frame ;
-
-M: ##alien-callback compute-stack-frame*
+M: stack-frame-insn compute-stack-frame*
     stack-frame>> request-stack-frame ;
 
 M: ##call compute-stack-frame*
@@ -40,6 +39,8 @@ M: insn compute-stack-frame*
     ] when ;
 
 \ _spill t frame-required? set-word-prop
+\ ##unary-float-function t frame-required? set-word-prop
+\ ##binary-float-function t frame-required? set-word-prop
 
 : compute-stack-frame ( insns -- )
     frame-required? off
