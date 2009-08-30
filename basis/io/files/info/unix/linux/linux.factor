@@ -4,8 +4,8 @@ USING: accessors alien.c-types alien.syntax combinators csv
 io.backend io.encodings.utf8 io.files io.files.info io.streams.string
 io.files.unix kernel math.order namespaces sequences sorting
 system unix unix.statfs.linux unix.statvfs.linux io.files.links
-specialized-arrays.direct.uint arrays io.files.info.unix assocs
-io.pathnames unix.types classes.struct ;
+arrays io.files.info.unix assocs io.pathnames unix.types
+classes.struct ;
 FROM: csv => delimiter ;
 IN: io.files.info.unix.linux
 
@@ -26,7 +26,7 @@ M: linux statfs>file-system-info ( struct -- statfs )
         [ f_bavail>> >>blocks-available ]
         [ f_files>> >>files ]
         [ f_ffree>> >>files-free ]
-        [ f_fsid>> 2 <direct-uint-array> >array >>id ]
+        [ f_fsid>> >>id ]
         [ f_namelen>> >>namelen ]
         [ f_frsize>> >>preferred-block-size ]
         ! [ statfs64-f_spare >>spare ]
