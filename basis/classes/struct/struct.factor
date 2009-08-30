@@ -37,6 +37,8 @@ M: struct equal?
         [ [ >c-ptr ] [ [ >c-ptr ] [ byte-length ] bi ] bi* memory= ]
     } 2&& ;
 
+: struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
+
 : memory>struct ( ptr class -- struct )
     [ 1array ] dip slots>tuple ;
 
@@ -44,17 +46,20 @@ M: struct equal?
     dup struct-class? [ '[ _ boa ] ] [ drop f ] if
 ] 1 define-partial-eval
 
+: (init-struct) ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
+    '[ dup struct-prototype _ _ ?if ] keep memory>struct ; inline
+
+: (malloc-struct) ( class -- struct )
+    [ heap-size malloc ] keep memory>struct ; inline
+
 : malloc-struct ( class -- struct )
-    [ 1 swap heap-size calloc ] keep memory>struct ; inline
+    [ >c-ptr malloc-byte-array ] [ 1 swap heap-size calloc ] (init-struct) ;
 
 : (struct) ( class -- struct )
-    [ heap-size <byte-array> ] keep memory>struct ; inline
-
-: struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
+    [ heap-size (byte-array) ] keep memory>struct ; inline
 
 : <struct> ( class -- struct )
-    dup struct-prototype
-    [ >c-ptr clone swap memory>struct ] [ (struct) ] if* ; inline
+    [ >c-ptr clone ] [ heap-size <byte-array> ] (init-struct) ;
 
 MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
     [
