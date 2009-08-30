@@ -2,11 +2,11 @@
 USING: accessors alien alien.c-types alien.structs
 alien.structs.fields arrays byte-arrays classes classes.parser
 classes.tuple classes.tuple.parser classes.tuple.private
-combinators combinators.short-circuit combinators.smart fry
-generalizations generic.parser kernel kernel.private lexer
-libc macros make math math.order parser quotations sequences
-slots slots.private struct-arrays vectors words
-compiler.tree.propagation.transforms ;
+combinators combinators.short-circuit combinators.smart
+functors.backend fry generalizations generic.parser kernel
+kernel.private lexer libc locals macros make math math.order parser
+quotations sequences slots slots.private struct-arrays vectors
+words compiler.tree.propagation.transforms ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
 
@@ -258,6 +258,34 @@ SYNTAX: UNION-STRUCT:
 
 SYNTAX: S{
     scan-word dup struct-slots parse-tuple-literal-slots parsed ;
+
+: scan-c-type` ( -- c-type/param )
+    scan dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;
+
+:: parse-struct-slot` ( accum -- accum )
+    scan-string-param :> name
+    scan-c-type` :> c-type
+    \ } parse-until :> attributes
+    accum {
+        \ struct-slot-spec new 
+            name >>name
+            c-type [ >>c-type ] [ struct-slot-class >>class ] bi
+            attributes [ dup empty? ] [ peel-off-attributes ] until drop
+        over push
+    } over push-all ;
+
+: parse-struct-slots` ( accum -- accum more? )
+    scan {
+        { ";" [ f ] }
+        { "{" [ parse-struct-slot` t ] }
+        [ invalid-struct-slot ]
+    } case ;
+
+FUNCTOR-SYNTAX: STRUCT:
+    scan-param parsed
+    [ 8 <vector> ] over push-all
+    [ parse-struct-slots` ] [ ] while
+    [ >array define-struct-class ] over push-all ;
 
 USING: vocabs vocabs.loader ;
 
