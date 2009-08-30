@@ -193,7 +193,7 @@ M: ##box-float generate-insn dst/src/temp %box-float ;
 M: ##box-alien generate-insn dst/src/temp %box-alien ;
 
 M: ##box-displaced-alien generate-insn
-    [ dst/src1/src2 ] [ temp>> ] bi %box-displaced-alien ;
+    [ dst/src1/src2 ] [ temp1>> ] [ temp2>> ] tri %box-displaced-alien ;
 
 M: ##alien-unsigned-1 generate-insn dst/src %alien-unsigned-1 ;
 M: ##alien-unsigned-2 generate-insn dst/src %alien-unsigned-2 ;
