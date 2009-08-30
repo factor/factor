@@ -46,6 +46,9 @@ M: struct equal?
     dup struct-class? [ '[ _ boa ] ] [ drop f ] if
 ] 1 define-partial-eval
 
+M: struct clone
+    [ >c-ptr ] [ byte-length memory>byte-array ] [ class memory>struct ] tri ;
+
 : (init-struct) ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
     '[ dup struct-prototype _ _ ?if ] keep memory>struct ; inline
 
