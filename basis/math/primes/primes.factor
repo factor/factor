@@ -56,7 +56,8 @@ PRIVATE>
 : coprime? ( a b -- ? ) gcd nip 1 = ; foldable
 
 : random-prime ( numbits -- p )
-    random-bits* next-prime ;
+    [ ] [ 2^ ] [ random-bits* next-prime ] tri
+    2dup < [ 2drop random-prime ] [ 2nip ] if ;
 
 : estimated-primes ( m -- n )
     dup log / ; foldable
