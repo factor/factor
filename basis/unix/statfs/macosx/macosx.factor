@@ -3,7 +3,7 @@
 USING: alien.c-types io.encodings.utf8 io.encodings.string
 kernel sequences unix.stat accessors unix combinators math
 grouping system alien.strings math.bitwise alien.syntax
-unix.types ;
+unix.types classes.struct ;
 IN: unix.statfs.macosx
 
 CONSTANT: MNT_RDONLY  HEX: 00000001
@@ -65,9 +65,9 @@ CONSTANT: VFS_CTL_NEWADDR HEX: 00010004
 CONSTANT: VFS_CTL_TIMEO   HEX: 00010005
 CONSTANT: VFS_CTL_NOLOCKS HEX: 00010006
 
-C-STRUCT: vfsquery
-    { "uint32_t" "vq_flags" }
-    { { "uint32_t" 31 } "vq_spare" } ;
+STRUCT: vfsquery
+    { vq_flags uint32_t }
+    { vq_spare uint32_t[31] } ;
 
 CONSTANT: VQ_NOTRESP  HEX: 0001
 CONSTANT: VQ_NEEDAUTH HEX: 0002
@@ -95,26 +95,26 @@ CONSTANT: MFSNAMELEN 15
 CONSTANT: MNAMELEN 90
 CONSTANT: MFSTYPENAMELEN 16
 
-C-STRUCT: fsid_t
-    { { "int32_t" 2 } "val" } ;
+STRUCT: fsid_t
+    { val int32_t[2] } ;
 
-C-STRUCT: statfs64
-    { "uint32_t"        "f_bsize" }
-    { "int32_t"         "f_iosize" }
-    { "uint64_t"        "f_blocks" }
-    { "uint64_t"        "f_bfree" }
-    { "uint64_t"        "f_bavail" }
-    { "uint64_t"        "f_files" }
-    { "uint64_t"        "f_ffree" }
-    { "fsid_t"          "f_fsid" }
-    { "uid_t"           "f_owner" }
-    { "uint32_t"        "f_type" }
-    { "uint32_t"        "f_flags" }
-    { "uint32_t"        "f_fssubtype" }
-    { { "char" MFSTYPENAMELEN } "f_fstypename" }
-    { { "char" MAXPATHLEN } "f_mntonname" }
-    { { "char" MAXPATHLEN } "f_mntfromname" }
-    { { "uint32_t" 8 } "f_reserved" } ;
+STRUCT: statfs64
+    { f_bsize uint32_t }
+    { f_iosize int32_t }
+    { f_blocks uint64_t }
+    { f_bfree uint64_t }
+    { f_bavail uint64_t }
+    { f_files uint64_t }
+    { f_ffree uint64_t }
+    { f_fsid fsid_t }
+    { f_owner uid_t }
+    { f_type uint32_t }
+    { f_flags uint32_t }
+    { f_fssubtype uint32_t }
+    { f_fstypename { "char" MFSTYPENAMELEN } }
+    { f_mntonname { "char" MAXPATHLEN } }
+    { f_mntfromname { "char" MAXPATHLEN } }
+    { f_reserved uint32_t[8] } ;
 
 FUNCTION: int statfs64 ( char* path, statfs64* buf ) ;
 FUNCTION: int getmntinfo64 ( statfs64** mntbufp, int flags ) ;
