@@ -40,13 +40,13 @@ HELP: UNION-STRUCT:
 
 HELP: define-struct-class
 { $values
-    { "class" class } { "slots" "a sequence of " { $link slot-spec } "s" }
+    { "class" class } { "slots" "a sequence of " { $link struct-slot-spec } "s" }
 }
 { $description "Defines a new " { $link struct } " class. This is the runtime equivalent of the " { $link POSTPONE: STRUCT: } " syntax." } ;
 
 HELP: define-union-struct-class
 { $values
-    { "class" class } { "slots" "a sequence of " { $link slot-spec } "s" }
+    { "class" class } { "slots" "a sequence of " { $link struct-slot-spec } "s" }
 }
 { $description "Defines a new " { $link struct } " class where all of the slots share the same storage. This is the runtime equivalent of the " { $link POSTPONE: UNION-STRUCT: } " syntax." } ;
 
@@ -55,7 +55,7 @@ HELP: malloc-struct
     { "class" class }
     { "struct" struct }
 }
-{ $description "Allocates unmanaged C heap memory for a new " { $link struct } " of the specified " { $snippet "class" } ". The new struct's slots are left uninitialized. The struct should be " { $link free } "d when it is no longer needed." } ;
+{ $description "Allocates unmanaged C heap memory for a new " { $link struct } " of the specified " { $snippet "class" } ". The new struct's slots are zeroed out. The struct should be " { $link free } "d when it is no longer needed." } ;
 
 HELP: memory>struct
 { $values
