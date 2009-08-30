@@ -5,7 +5,7 @@ combinators system io.backend accessors alien.c-types
 io.encodings.utf8 alien.strings unix.types io.files.unix
 io.files io.files.info unix.statvfs.netbsd unix.getfsstat.netbsd arrays
 grouping sequences io.encodings.utf8 classes.struct
-specialized-arrays.direct.uint io.files.info.unix ;
+io.files.info.unix ;
 IN: io.files.info.unix.netbsd
 
 TUPLE: netbsd-file-system-info < unix-file-system-info
@@ -36,7 +36,7 @@ M: netbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-inf
         [ f_syncwrites>> >>sync-writes ]
         [ f_asyncreads>> >>async-reads ]
         [ f_asyncwrites>> >>async-writes ]
-        [ f_fsidx>> 2 <direct-uint-array> >array >>idx ]
+        [ f_fsidx>> >>idx ]
         [ f_fsid>> >>id ]
         [ f_namemax>> >>name-max ]
         [ f_owner>> >>owner ]
