@@ -420,6 +420,7 @@ ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 { $subsection 2/ }
 { $subsection 2^ }
 { $subsection bit? }
+"Advanced topics:"
 { $subsection "math.bitwise" }
 { $subsection "math.bits" }
 { $see-also "booleans" } ;

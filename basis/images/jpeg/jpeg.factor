@@ -6,7 +6,7 @@ images.processing io io.binary io.encodings.binary io.files
 io.streams.byte-array kernel locals math math.bitwise
 math.constants math.functions math.matrices math.order
 math.ranges math.vectors memoize multiline namespaces
-sequences sequences.deep images.loader ;
+sequences sequences.deep images.loader io.streams.limited ;
 IN: images.jpeg
 
 QUALIFIED-WITH: bitstreams bs
@@ -118,18 +118,18 @@ TUPLE: jpeg-color-info
     ] with-byte-reader ;
 
 : decode-huff-table ( chunk -- )
-    data>>
-    binary
-    [
-        1 ! %fixme: Should handle multiple tables at once
+    data>> [ binary <byte-reader> ] [ length ] bi
+    stream-throws limit
+    [   
+        [ input-stream get [ count>> ] [ limit>> ] bi < ]
         [
             read4/4 swap 2 * +
             16 read
             dup [ ] [ + ] map-reduce read
             binary [ [ read [ B{ } ] unless* ] { } map-as ] with-byte-reader
             swap jpeg> huff-tables>> set-nth
-        ] times
-    ] with-byte-reader ;
+        ] while
+    ] with-input-stream* ;
 
 : decode-scan ( chunk -- )
     data>>
@@ -148,7 +148,10 @@ TUPLE: jpeg-color-info
 : singleton-first ( seq -- elt )
     [ length 1 assert= ] [ first ] bi ;
 
+ERROR: not-a-baseline-jpeg-image ;
+
 : baseline-parse ( -- )
+    jpeg> headers>> [ type>> { SOF 0 } = ] any? [ not-a-baseline-jpeg-image ] unless
     jpeg> headers>>
     {
         [ [ type>> { SOF 0 } = ] filter singleton-first decode-frame ]
@@ -221,7 +224,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
 : V.M ( x A -- x.A ) Mtranspose swap M.V ;
 : idct-blas ( b -- b' ) >float-blas-vector dct-matrix-blas V.M ;
 
-: idct ( b -- b' ) idct-blas ;
+: idct ( b -- b' ) idct-factor ;
 
 :: draw-block ( block x,y color-id jpeg-image -- )
     block dup length>> sqrt >fixnum group flip

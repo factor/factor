@@ -29,7 +29,7 @@ ERROR: bad-live-ranges interval ;
     2bi ;
 
 : assign-spill ( live-interval -- )
-    dup vreg>> assign-spill-slot >>spill-to drop ;
+    dup vreg>> vreg-spill-slot >>spill-to drop ;
 
 : spill-before ( before -- before/f )
     ! If the interval does not have any usages before the spill location,
@@ -46,7 +46,7 @@ ERROR: bad-live-ranges interval ;
     ] if ;
 
 : assign-reload ( live-interval -- )
-    dup vreg>> assign-spill-slot >>reload-from drop ;
+    dup vreg>> vreg-spill-slot >>reload-from drop ;
 
 : spill-after ( after -- after/f )
     ! If the interval has no more usages after the spill location,

@@ -112,6 +112,10 @@ INSN: ##min-float < ##binary ;
 INSN: ##max-float < ##binary ;
 INSN: ##sqrt < ##unary ;
 
+! libc intrinsics
+INSN: ##unary-float-function < ##unary func ;
+INSN: ##binary-float-function < ##binary func ;
+
 ! Float/integer conversion
 INSN: ##float>integer < ##unary ;
 INSN: ##integer>float < ##unary ;
@@ -122,7 +126,7 @@ INSN: ##unbox-float < ##unary ;
 INSN: ##unbox-any-c-ptr < ##unary/temp ;
 INSN: ##box-float < ##unary/temp ;
 INSN: ##box-alien < ##unary/temp ;
-INSN: ##box-displaced-alien < ##binary temp base-class ;
+INSN: ##box-displaced-alien < ##binary temp1 temp2 base-class ;
 
 : ##unbox-f ( dst src -- ) drop 0 ##load-immediate ;
 : ##unbox-byte-array ( dst src -- ) byte-array-offset ##add-imm ;
@@ -252,6 +256,11 @@ UNION: vreg-insn
     _compare-imm-branch
     _dispatch ;
 
+! Instructions that kill all live vregs but cannot trigger GC
+UNION: partial-sync-insn
+    ##unary-float-function
+    ##binary-float-function ;
+
 ! Instructions that kill all live vregs
 UNION: kill-vreg-insn
     ##call
@@ -270,6 +279,8 @@ UNION: output-float-insn
     ##min-float
     ##max-float
     ##sqrt
+    ##unary-float-function
+    ##binary-float-function
     ##integer>float
     ##unbox-float
     ##alien-float
@@ -284,6 +295,8 @@ UNION: input-float-insn
     ##min-float
     ##max-float
     ##sqrt
+    ##unary-float-function
+    ##binary-float-function
     ##float>integer
     ##box-float
     ##set-alien-float

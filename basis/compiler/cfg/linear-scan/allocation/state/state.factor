@@ -120,15 +120,19 @@ SYMBOL: unhandled-intervals
     rep-size cfg get
     [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop ;
 
+! Minheap of sync points which still need to be processed
+SYMBOL: unhandled-sync-points
+
 ! Mapping from vregs to spill slots
 SYMBOL: spill-slots
 
-: assign-spill-slot ( vreg -- n )
+: vreg-spill-slot ( vreg -- n )
     spill-slots get [ rep-of next-spill-slot ] cache ;
 
 : init-allocator ( registers -- )
     registers set
     <min-heap> unhandled-intervals set
+    <min-heap> unhandled-sync-points set
     [ V{ } clone ] reg-class-assoc active-intervals set
     [ V{ } clone ] reg-class-assoc inactive-intervals set
     V{ } clone handled-intervals set
@@ -136,9 +140,10 @@ SYMBOL: spill-slots
     H{ } clone spill-slots set
     -1 progress set ;
 
-: init-unhandled ( live-intervals -- )
-    [ [ start>> ] keep ] { } map>assoc
-    unhandled-intervals get heap-push-all ;
+: init-unhandled ( live-intervals sync-points -- )
+    [ [ [ start>> ] keep ] { } map>assoc unhandled-intervals get heap-push-all ]
+    [ [ [ n>> ] keep ] { } map>assoc unhandled-sync-points get heap-push-all ]
+    bi* ;
 
 ! A utility used by register-status and spill-status words
 : free-positions ( new -- assoc )

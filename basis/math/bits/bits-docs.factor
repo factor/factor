@@ -6,6 +6,7 @@ IN: math.bits
 ABOUT: "math.bits"
 
 ARTICLE: "math.bits" "Number bits virtual sequence"
+"The " { $vocab-link "math.bits" } " vocabulary implements a virtual sequence which presents an integer as a sequence of bits, with the first element of the sequence being the least significant bit of the integer."
 { $subsection bits }
 { $subsection <bits> }
 { $subsection make-bits } ;
