@@ -7,7 +7,7 @@ cpu.ppc.assembler cpu.ppc.assembler.backend compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.comparisons
 compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.cfg.build-stack-frame
-compiler.units compiler.constants compiler.codegen ;
+compiler.units compiler.constants compiler.codegen vm ;
 FROM: cpu.ppc.assembler => B ;
 IN: cpu.ppc
 
@@ -678,11 +678,18 @@ M: ppc %box-large-struct ( n c-type -- )
     ! Call the function
     "box_value_struct" f %alien-invoke ;
 
+: %load-vm-addr ( reg -- )
+    0 swap LOAD32 rc-absolute-ppc-2/2 rt-vm rel-fixup ;
+
+: %load-vm-field-addr ( reg symbol -- )
+    [ drop %load-vm-addr ]
+    [ [ dup ] dip vm-offset ADDI ] 2bi ;
+
 M:: ppc %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp1 "stack_chain" f %alien-global
+    temp1 "stack_chain" %load-vm-field-addr
     temp1 temp1 0 LWZ
     1 temp1 0 STW
     callback-allowed? [
