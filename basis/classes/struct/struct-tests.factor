@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien.c-types alien.libraries
+USING: accessors alien alien.c-types alien.libraries
 alien.structs.fields alien.syntax ascii classes.struct combinators
 destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math multiline namespaces prettyprint
@@ -203,3 +203,5 @@ STRUCT: struct-test-optimization
 ] unit-test
 
 [ f ] [ [ memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
+
+[ f ] [ struct-test-foo <struct> dup clone [ >c-ptr ] bi@ eq? ] unit-test
