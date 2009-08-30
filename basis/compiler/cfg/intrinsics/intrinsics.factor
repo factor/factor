@@ -108,6 +108,27 @@ IN: compiler.cfg.intrinsics
         math.floats.private:float-max
     } enable-intrinsics ;
 
+: enable-float-functions ( -- )
+    ! Everything except for fsqrt
+    {
+        math.libm:facos
+        math.libm:fasin
+        math.libm:fatan
+        math.libm:fatan2
+        math.libm:fcos
+        math.libm:fsin
+        math.libm:ftan
+        math.libm:fcosh
+        math.libm:fsinh
+        math.libm:ftanh
+        math.libm:fexp
+        math.libm:flog
+        math.libm:fpow
+        math.libm:facosh
+        math.libm:fasinh
+        math.libm:fatanh
+    } enable-intrinsics ;
+
 : enable-min/max ( -- )
     {
         math.integers.private:fixnum-min
@@ -157,6 +178,22 @@ IN: compiler.cfg.intrinsics
         { \ math.floats.private:float-min [ drop [ ^^min-float ] emit-float-op ] }
         { \ math.floats.private:float-max [ drop [ ^^max-float ] emit-float-op ] }
         { \ math.libm:fsqrt [ drop emit-fsqrt ] }
+        { \ math.libm:facos [ drop "acos" emit-unary-float-function ] }
+        { \ math.libm:fasin [ drop "asin" emit-unary-float-function ] }
+        { \ math.libm:fatan [ drop "atan" emit-unary-float-function ] }
+        { \ math.libm:fatan2 [ drop "atan2" emit-binary-float-function ] }
+        { \ math.libm:fcos [ drop "cos" emit-unary-float-function ] }
+        { \ math.libm:fsin [ drop "sin" emit-unary-float-function ] }
+        { \ math.libm:ftan [ drop "tan" emit-unary-float-function ] }
+        { \ math.libm:fcosh [ drop "cosh" emit-unary-float-function ] }
+        { \ math.libm:fsinh [ drop "sinh" emit-unary-float-function ] }
+        { \ math.libm:ftanh [ drop "tanh" emit-unary-float-function ] }
+        { \ math.libm:fexp [ drop "exp" emit-unary-float-function ] }
+        { \ math.libm:flog [ drop "log" emit-unary-float-function ] }
+        { \ math.libm:fpow [ drop "pow" emit-binary-float-function ] }
+        { \ math.libm:facosh [ drop "acosh" emit-unary-float-function ] }
+        { \ math.libm:fasinh [ drop "asinh" emit-unary-float-function ] }
+        { \ math.libm:fatanh [ drop "atanh" emit-unary-float-function ] }
         { \ slots.private:slot [ emit-slot ] }
         { \ slots.private:set-slot [ emit-set-slot ] }
         { \ strings.private:string-nth [ drop emit-string-nth ] }

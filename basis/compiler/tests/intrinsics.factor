@@ -519,6 +519,14 @@ cell 8 = [
     underlying>>
 ] unit-test
 
+[ ALIEN: 1234 ALIEN: 2234 ] [
+    ALIEN: 234 [
+        { c-ptr } declare
+        [ 1000 swap <displaced-alien> ]
+        [ 2000 swap <displaced-alien> ] bi
+    ] compile-call
+] unit-test
+
 [
     B{ 0 0 0 0 } [ { byte-array } declare <void*> ] compile-call
 ] must-fail
