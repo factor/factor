@@ -4,8 +4,7 @@ USING: accessors alien.c-types alien.syntax combinators
 io.backend io.files io.files.info io.files.unix kernel math system unix
 unix.statfs.freebsd unix.statvfs.freebsd unix.getfsstat.freebsd
 sequences grouping alien.strings io.encodings.utf8 unix.types
-specialized-arrays.direct.uint arrays io.files.info.unix
-classes.struct ;
+arrays io.files.info.unix classes.struct ;
 IN: io.files.info.unix.freebsd
 
 TUPLE: freebsd-file-system-info < unix-file-system-info
@@ -34,7 +33,7 @@ M: freebsd statfs>file-system-info ( file-system-info statvfs -- file-system-inf
         [ f_asyncreads>> >>asyncreads ]
         [ f_namemax>> >>name-max ]
         [ f_owner>> >>owner ]
-        [ f_fsid>> 2 <direct-uint-array> >array >>id ]
+        [ f_fsid>> >>id ]
         [ f_fstypename>> utf8 alien>string >>type ]
         [ f_mntfromname>> utf8 alien>string >>device-name ]
         [ f_mntonname>> utf8 alien>string >>mount-point ]
