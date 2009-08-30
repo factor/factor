@@ -61,15 +61,6 @@ M: cannot-send-synchronous-to-self summary
         data>>
     ] if ;
 
-: send-synchronous-timeout ( timeout message thread -- reply ) 
-    dup self eq? [
-        cannot-send-synchronous-to-self
-    ] [
-        [ <synchronous> dup ] dip send
-        '[ _ synchronous-reply? ] receive-if-timeout
-        data>>
-    ] if ;   
-    
 : reply-synchronous ( message synchronous -- )
     [ <reply> ] keep sender>> send ;
 
