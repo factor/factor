@@ -1,7 +1,8 @@
 USING: alien alien.c-types alien.accessors effects kernel
 windows.ole32 parser lexer splitting grouping sequences
 namespaces assocs quotations generalizations accessors words
-macros alien.syntax fry arrays layouts math ;
+macros alien.syntax fry arrays layouts math classes.struct
+windows.kernel32 prettyprint.custom prettyprint.sections ;
 IN: windows.com.syntax
 
 <PRIVATE
@@ -100,3 +101,5 @@ SYNTAX: COM-INTERFACE:
     define-words-for-com-interface ;
 
 SYNTAX: GUID: scan string>guid parsed ;
+
+M: GUID pprint* guid>string "GUID: " prepend text ;
