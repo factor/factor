@@ -197,12 +197,32 @@ M: x86.64 %callback-value ( ctype -- )
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
+: float-function-param ( i spill-slot -- )
+    [ float-regs param-regs nth ] [ n>> spill@ ] bi* MOVSD ;
+
+: float-function-return ( reg -- )
+    float-regs return-reg double-float-rep copy-register ;
+
+M:: x86.64 %unary-float-function ( dst src func -- )
+    0 src float-function-param
+    func f %alien-invoke
+    dst float-function-return ;
+
+M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
+    0 src1 float-function-param
+    1 src2 float-function-param
+    func f %alien-invoke
+    dst float-function-return ;
+
 ! The result of reading 4 bytes from memory is a fixnum on
 ! x86-64.
 enable-alien-4-intrinsics
 
 ! SSE2 is always available on x86-64.
 enable-sse2
+
+! Enable fast calling of libc math functions
+enable-float-functions
 
 USE: vocabs.loader
 

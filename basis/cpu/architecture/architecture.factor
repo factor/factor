@@ -115,6 +115,8 @@ HOOK: %div-float cpu ( dst src1 src2 -- )
 HOOK: %min-float cpu ( dst src1 src2 -- )
 HOOK: %max-float cpu ( dst src1 src2 -- )
 HOOK: %sqrt cpu ( dst src -- )
+HOOK: %unary-float-function cpu ( dst src func -- )
+HOOK: %binary-float-function cpu ( dst src1 src2 func -- )
 
 HOOK: %integer>float cpu ( dst src -- )
 HOOK: %float>integer cpu ( dst src -- )

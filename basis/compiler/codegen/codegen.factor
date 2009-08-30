@@ -176,6 +176,12 @@ M: ##max-float generate-insn dst/src1/src2 %max-float ;
 
 M: ##sqrt generate-insn dst/src %sqrt ;
 
+M: ##unary-float-function generate-insn
+    [ dst/src ] [ func>> ] bi %unary-float-function ;
+
+M: ##binary-float-function generate-insn
+    [ dst/src1/src2 ] [ func>> ] bi %binary-float-function ;
+
 M: ##integer>float generate-insn dst/src %integer>float ;
 M: ##float>integer generate-insn dst/src %float>integer ;
 
