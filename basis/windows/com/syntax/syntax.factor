@@ -7,13 +7,10 @@ IN: windows.com.syntax
 
 <PRIVATE
 
-C-STRUCT: com-interface
-    { "void*" "vtbl" } ;
-
 MACRO: com-invoke ( n return parameters -- )
     [ 2nip length ] 3keep
     '[
-        _ npick com-interface-vtbl _ cell * alien-cell _ _
+        _ npick *void* _ cell * alien-cell _ _
         "stdcall" alien-indirect
     ] ;
 
@@ -32,7 +29,7 @@ unless
     dup "f" = [ drop f ] [
         dup +com-interface-definitions+ get-global at*
         [ nip ]
-        [ swap " COM interface hasn't been defined" append throw ]
+        [ " COM interface hasn't been defined" prepend throw ]
         if
     ] if ;
 
