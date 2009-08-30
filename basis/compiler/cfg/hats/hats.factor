@@ -47,6 +47,8 @@ IN: compiler.cfg.hats
 : ^^div-float ( src1 src2 -- dst ) ^^r2 ##div-float ; inline
 : ^^max-float ( src1 src2 -- dst ) ^^r2 ##max-float ; inline
 : ^^min-float ( src1 src2 -- dst ) ^^r2 ##min-float ; inline
+: ^^unary-float-function ( src func -- dst ) ^^r2 ##unary-float-function ; inline
+: ^^binary-float-function ( src1 src2 func -- dst ) ^^r3 ##binary-float-function ; inline
 : ^^sqrt ( src -- dst ) ^^r1 ##sqrt ; inline
 : ^^float>integer ( src -- dst ) ^^r1 ##float>integer ; inline
 : ^^integer>float ( src -- dst ) ^^r1 ##integer>float ; inline
