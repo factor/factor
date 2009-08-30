@@ -110,6 +110,8 @@ M: struct-class reader-quot
 M: struct-class writer-quot
     nip (writer-quot) ;
 
+! c-types
+
 <PRIVATE
 : struct-slot-values-quot ( class -- quot )
     struct-slots
