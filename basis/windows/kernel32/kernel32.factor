@@ -660,13 +660,13 @@ C-STRUCT: TOKEN_PRIVILEGES
     { "LUID_AND_ATTRIBUTES*" "Privileges" } ;
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 
-C-STRUCT: WIN32_FILE_ATTRIBUTE_DATA
-    { "DWORD" "dwFileAttributes" }
-    { "FILETIME" "ftCreationTime" }
-    { "FILETIME" "ftLastAccessTime" }
-    { "FILETIME" "ftLastWriteTime" }
-    { "DWORD" "nFileSizeHigh" }
-    { "DWORD" "nFileSizeLow" } ;
+STRUCT: WIN32_FILE_ATTRIBUTE_DATA
+    { dwFileAttributes DWORD }
+    { ftCreationTime FILETIME }
+    { ftLastAccessTime FILETIME }
+    { ftLastWriteTime FILETIME }
+    { nFileSizeHigh DWORD }
+    { nFileSizeLow DWORD } ;
 TYPEDEF: WIN32_FILE_ATTRIBUTE_DATA* LPWIN32_FILE_ATTRIBUTE_DATA
 
 C-STRUCT: BY_HANDLE_FILE_INFORMATION
