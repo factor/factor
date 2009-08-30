@@ -126,7 +126,7 @@ INSN: ##unbox-float < ##unary ;
 INSN: ##unbox-any-c-ptr < ##unary/temp ;
 INSN: ##box-float < ##unary/temp ;
 INSN: ##box-alien < ##unary/temp ;
-INSN: ##box-displaced-alien < ##binary temp base-class ;
+INSN: ##box-displaced-alien < ##binary temp1 temp2 base-class ;
 
 : ##unbox-f ( dst src -- ) drop 0 ##load-immediate ;
 : ##unbox-byte-array ( dst src -- ) byte-array-offset ##add-imm ;

@@ -58,7 +58,7 @@ IN: compiler.cfg.hats
 : ^^allot-byte-array ( n -- dst ) 2 cells + byte-array ^^allot ; inline
 : ^^box-alien ( src -- dst ) ^^r1 next-vreg ##box-alien ; inline
 : ^^box-displaced-alien ( base displacement base-class -- dst )
-    ^^r3 [ next-vreg ] dip ##box-displaced-alien ; inline
+    ^^r3 [ next-vreg next-vreg ] dip ##box-displaced-alien ; inline
 : ^^unbox-alien ( src -- dst ) ^^r1 ##unbox-alien ; inline
 : ^^unbox-c-ptr ( src class -- dst ) ^^r2 next-vreg ##unbox-c-ptr ;
 : ^^alien-unsigned-1 ( src -- dst ) ^^r1 ##alien-unsigned-1 ; inline

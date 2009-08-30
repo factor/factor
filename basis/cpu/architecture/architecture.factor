@@ -126,7 +126,7 @@ HOOK: %unbox-float cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
 HOOK: %box-float cpu ( dst src temp -- )
 HOOK: %box-alien cpu ( dst src temp -- )
-HOOK: %box-displaced-alien cpu ( dst displacement base temp -- )
+HOOK: %box-displaced-alien cpu ( dst displacement base temp1 temp2 -- )
 
 HOOK: %alien-unsigned-1 cpu ( dst src -- )
 HOOK: %alien-unsigned-2 cpu ( dst src -- )
