@@ -1,7 +1,8 @@
 USING: accessors arrays assocs bson.constants combinators
 combinators.smart constructors destructors formatting fry hashtables
 io io.pools io.sockets kernel linked-assocs math mongodb.connection
-mongodb.msg parser prettyprint sequences sets splitting strings
+mongodb.msg parser prettyprint prettyprint.custom prettyprint.sections
+sequences sets splitting strings
 tools.continuations uuid memoize locals ;
 
 IN: mongodb.driver
@@ -31,6 +32,9 @@ M: mdb-pool make-connection
 CONSTANT: PARTIAL? "partial?"
 
 ERROR: mdb-error msg ;
+
+M: mdb-error pprint* ( obj -- )
+    msg>> text ;
 
 : >pwd-digest ( user password -- digest )
     "mongo" swap 3array ":" join md5-checksum ; 
