@@ -9,6 +9,15 @@ HELP: <struct-boa>
 }
 { $description "This macro implements " { $link boa } " for " { $link struct } " classes. A struct of the given class is constructed, and its slots are initialized using values off the top of the datastack." } ;
 
+HELP: (struct)
+{ $values
+    { "class" class }
+    { "struct" struct }
+}
+{ $description "Allocates garbage-collected heap memory for a new " { $link struct } " of the specified " { $snippet "class" } ". The new struct's slots are left uninitialized; in most cases, the " { $link <struct> } " word, which initializes the struct's slots with their initial values, should be used instead." } ;
+
+{ (struct) (malloc-struct) } related-words
+
 HELP: <struct>
 { $values
     { "class" class }
@@ -55,7 +64,14 @@ HELP: malloc-struct
     { "class" class }
     { "struct" struct }
 }
-{ $description "Allocates unmanaged C heap memory for a new " { $link struct } " of the specified " { $snippet "class" } ". The new struct's slots are zeroed out. The struct should be " { $link free } "d when it is no longer needed." } ;
+{ $description "Allocates unmanaged C heap memory for a new " { $link struct } " of the specified " { $snippet "class" } ". The new struct's slots are initialized to their initial values. The struct should be " { $link free } "d when it is no longer needed." } ;
+
+HELP: (malloc-struct)
+{ $values
+    { "class" class }
+    { "struct" struct }
+}
+{ $description "Allocates unmanaged C heap memory for a new " { $link struct } " of the specified " { $snippet "class" } ". The new struct's slots are left uninitialized; to initialize the allocated memory with the slots' initial values, use " { $link malloc-struct } ". The struct should be " { $link free } "d when it is no longer needed." } ;
 
 HELP: memory>struct
 { $values
@@ -80,6 +96,9 @@ ARTICLE: "classes.struct" "Struct classes"
 { $subsection <struct-boa> }
 { $subsection malloc-struct }
 { $subsection memory>struct }
+"When the contents of a struct will be immediately reset, faster primitive words are available that will create a struct without initializing its contents:"
+{ $subsection (struct) }
+{ $subsection (malloc-struct) }
 "Structs have literal syntax like tuples:"
 { $subsection POSTPONE: S{ }
 "Union structs are also supported, which behave like structs but share the same memory for all the type's slots."

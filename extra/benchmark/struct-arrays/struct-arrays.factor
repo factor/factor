@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.struct combinators.smart fry kernel
 math math.functions math.order math.parser sequences
-struct-arrays hints io ;
+struct-arrays io ;
 IN: benchmark.struct-arrays
 
 STRUCT: point { x float } { y float } { z float } ;
@@ -44,8 +44,6 @@ STRUCT: point { x float } { y float } { z float } ;
 
 : struct-array-benchmark ( len -- )
     make-points [ normalize-points ] [ max-points ] bi print-point ;
-
-HINTS: struct-array-benchmark fixnum ;
 
 : main ( -- ) 5000000 struct-array-benchmark ;
 
