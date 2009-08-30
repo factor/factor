@@ -1,21 +1,20 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test alien.complex kernel alien.c-types alien.syntax
-namespaces math ;
+USING: accessors tools.test alien.complex classes.struct kernel
+alien.c-types alien.syntax namespaces math ;
 IN: alien.complex.tests
 
-C-STRUCT: complex-holder
-    { "complex-float" "z" } ;
+STRUCT: complex-holder
+    { z complex-float } ;
 
 : <complex-holder> ( z -- alien )
-    "complex-holder" <c-object>
-    [ set-complex-holder-z ] keep ;
+    complex-holder <struct-boa> ;
 
 [ ] [
     C{ 1.0 2.0 } <complex-holder> "h" set
 ] unit-test
 
-[ C{ 1.0 2.0 } ] [ "h" get complex-holder-z ] unit-test
+[ C{ 1.0 2.0 } ] [ "h" get z>> ] unit-test
 
 [ number ] [ "complex-float" c-type-boxed-class ] unit-test
 
