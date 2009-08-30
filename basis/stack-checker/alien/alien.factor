@@ -14,9 +14,6 @@ TUPLE: alien-indirect-params < alien-node-params ;
 
 TUPLE: alien-callback-params < alien-node-params quot xt ;
 
-: pop-parameters ( -- seq )
-    pop-literal nip [ expand-constants ] map ;
-
 : param-prep-quot ( node -- quot )
     parameters>> [ c-type c-type-unboxer-quot ] map spread>quot ;
 
@@ -31,7 +28,7 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
 : infer-alien-invoke ( -- )
     alien-invoke-params new
     ! Compile-time parameters
-    pop-parameters >>parameters
+    pop-literal nip >>parameters
     pop-literal nip >>function
     pop-literal nip >>library
     pop-literal nip >>return
@@ -50,7 +47,7 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     alien-indirect-params new
     ! Compile-time parameters
     pop-literal nip >>abi
-    pop-parameters >>parameters
+    pop-literal nip >>parameters
     pop-literal nip >>return
     ! Quotation which coerces parameters to required types
     dup param-prep-quot [ dip ] curry infer-quot-here
@@ -71,7 +68,7 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     alien-callback-params new
     pop-literal nip >>quot
     pop-literal nip >>abi
-    pop-parameters >>parameters
+    pop-literal nip >>parameters
     pop-literal nip >>return
     gensym >>xt
     dup callback-bottom

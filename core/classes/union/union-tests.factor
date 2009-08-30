@@ -2,9 +2,8 @@ USING: alien arrays definitions generic assocs hashtables io
 kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
-classes.algebra vectors definitions source-files
-compiler.units kernel.private sorting vocabs io.streams.string
-eval see ;
+classes.algebra source-files compiler.units kernel.private
+sorting vocabs io.streams.string eval see ;
 IN: classes.union.tests
 
 ! DEFER: bah

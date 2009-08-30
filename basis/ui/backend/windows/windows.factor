@@ -11,7 +11,7 @@ threads libc combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render math.bitwise locals
 accessors math.rectangles math.order calendar ascii sets
 io.encodings.utf16n windows.errors literals ui.pixel-formats 
-ui.pixel-formats.private memoize classes struct-arrays ;
+ui.pixel-formats.private memoize classes struct-arrays classes.struct ;
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
@@ -89,26 +89,27 @@ CONSTANT: pfd-flag-map H{
     [ value>> ] [ 0 ] if* ;
 
 : >pfd ( attributes -- pfd )
-    "PIXELFORMATDESCRIPTOR" <c-object>
-    "PIXELFORMATDESCRIPTOR" heap-size over set-PIXELFORMATDESCRIPTOR-nSize
-    1 over set-PIXELFORMATDESCRIPTOR-nVersion
-    over >pfd-flags over set-PIXELFORMATDESCRIPTOR-dwFlags
-    PFD_TYPE_RGBA over set-PIXELFORMATDESCRIPTOR-iPixelType
-    over color-bits attr-value over set-PIXELFORMATDESCRIPTOR-cColorBits
-    over red-bits attr-value over set-PIXELFORMATDESCRIPTOR-cRedBits
-    over green-bits attr-value over set-PIXELFORMATDESCRIPTOR-cGreenBits
-    over blue-bits attr-value over set-PIXELFORMATDESCRIPTOR-cBlueBits
-    over alpha-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAlphaBits
-    over accum-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumBits
-    over accum-red-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumRedBits
-    over accum-green-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumGreenBits
-    over accum-blue-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumBlueBits
-    over accum-alpha-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumAlphaBits
-    over depth-bits attr-value over set-PIXELFORMATDESCRIPTOR-cDepthBits
-    over stencil-bits attr-value over set-PIXELFORMATDESCRIPTOR-cStencilBits
-    over aux-buffers attr-value over set-PIXELFORMATDESCRIPTOR-cAuxBuffers
-    PFD_MAIN_PLANE over set-PIXELFORMATDESCRIPTOR-dwLayerMask
-    nip ;
+    [ PIXELFORMATDESCRIPTOR <struct> ] dip
+    {
+        [ drop PIXELFORMATDESCRIPTOR heap-size >>nSize ]
+        [ drop 1 >>nVersion ]
+        [ >pfd-flags >>dwFlags ]
+        [ drop PFD_TYPE_RGBA >>iPixelType ]
+        [ color-bits attr-value >>cColorBits ]
+        [ red-bits attr-value >>cRedBits ]
+        [ green-bits attr-value >>cGreenBits ]
+        [ blue-bits attr-value >>cBlueBits ]
+        [ alpha-bits attr-value >>cAlphaBits ]
+        [ accum-bits attr-value >>cAccumBits ]
+        [ accum-red-bits attr-value >>cAccumRedBits ]
+        [ accum-green-bits attr-value >>cAccumGreenBits ]
+        [ accum-blue-bits attr-value >>cAccumBlueBits ]
+        [ accum-alpha-bits attr-value >>cAccumAlphaBits ]
+        [ depth-bits attr-value >>cDepthBits ]
+        [ stencil-bits attr-value >>cStencilBits ]
+        [ aux-buffers attr-value >>cAuxBuffers ]
+        [ drop PFD_MAIN_PLANE >>dwLayerMask ]
+    } cleave ;
 
 : pfd-make-pixel-format ( world attributes -- pf )
     [ handle>> hDC>> ] [ >pfd ] bi*
@@ -116,12 +117,12 @@ CONSTANT: pfd-flag-map H{
 
 : get-pfd ( pixel-format -- pfd )
     [ world>> handle>> hDC>> ] [ handle>> ] bi
-    "PIXELFORMATDESCRIPTOR" heap-size
-    "PIXELFORMATDESCRIPTOR" <c-object>
+    PIXELFORMATDESCRIPTOR heap-size
+    PIXELFORMATDESCRIPTOR <struct>
     [ DescribePixelFormat win32-error=0/f ] keep ;
 
 : pfd-flag? ( pfd flag -- ? )
-    [ PIXELFORMATDESCRIPTOR-dwFlags ] dip bitand c-bool> ;
+    [ dwFlags>> ] dip bitand c-bool> ;
 
 : (pfd-pixel-format-attribute) ( pfd attribute -- value )
     {
@@ -131,19 +132,19 @@ CONSTANT: pfd-flag-map H{
         { fullscreen [ PFD_DRAW_TO_WINDOW pfd-flag? ] }
         { windowed [ PFD_DRAW_TO_WINDOW pfd-flag? ] }
         { software-rendered [ PFD_GENERIC_FORMAT pfd-flag? ] }
-        { color-bits [ PIXELFORMATDESCRIPTOR-cColorBits ] }
-        { red-bits [ PIXELFORMATDESCRIPTOR-cRedBits ] }
-        { green-bits [ PIXELFORMATDESCRIPTOR-cGreenBits ] }
-        { blue-bits [ PIXELFORMATDESCRIPTOR-cBlueBits ] }
-        { alpha-bits [ PIXELFORMATDESCRIPTOR-cAlphaBits ] }
-        { accum-bits [ PIXELFORMATDESCRIPTOR-cAccumBits ] }
-        { accum-red-bits [ PIXELFORMATDESCRIPTOR-cAccumRedBits ] }
-        { accum-green-bits [ PIXELFORMATDESCRIPTOR-cAccumGreenBits ] }
-        { accum-blue-bits [ PIXELFORMATDESCRIPTOR-cAccumBlueBits ] }
-        { accum-alpha-bits [ PIXELFORMATDESCRIPTOR-cAccumAlphaBits ] }
-        { depth-bits [ PIXELFORMATDESCRIPTOR-cDepthBits ] }
-        { stencil-bits [ PIXELFORMATDESCRIPTOR-cStencilBits ] }
-        { aux-buffers [ PIXELFORMATDESCRIPTOR-cAuxBuffers ] }
+        { color-bits [ cColorBits>> ] }
+        { red-bits [ cRedBits>> ] }
+        { green-bits [ cGreenBits>> ] }
+        { blue-bits [ cBlueBits>> ] }
+        { alpha-bits [ cAlphaBits>> ] }
+        { accum-bits [ cAccumBits>> ] }
+        { accum-red-bits [ cAccumRedBits>> ] }
+        { accum-green-bits [ cAccumGreenBits>> ] }
+        { accum-blue-bits [ cAccumBlueBits>> ] }
+        { accum-alpha-bits [ cAccumAlphaBits>> ] }
+        { depth-bits [ cDepthBits>> ] }
+        { stencil-bits [ cStencilBits>> ] }
+        { aux-buffers [ cAuxBuffers>> ] }
         [ 2drop f ]
     } case ;
 
@@ -663,7 +664,7 @@ M: windows-ui-backend do-events
 
 : set-pixel-format ( pixel-format hdc -- )
     swap handle>>
-    "PIXELFORMATDESCRIPTOR" <c-object> SetPixelFormat win32-error=0/f ;
+    PIXELFORMATDESCRIPTOR <struct> SetPixelFormat win32-error=0/f ;
 
 : setup-gl ( world -- )
     [ get-dc ] keep
