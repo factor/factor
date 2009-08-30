@@ -18,3 +18,9 @@ IN: compiler.cfg.intrinsics.float
 
 : emit-fsqrt ( -- )
     ds-pop ^^sqrt ds-push ;
+
+: emit-unary-float-function ( func -- )
+    [ ds-pop ] dip ^^unary-float-function ds-push ;
+
+: emit-binary-float-function ( func -- )
+    [ 2inputs ] dip ^^binary-float-function ds-push ;
