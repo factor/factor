@@ -161,10 +161,10 @@ WHERE
 
 STRUCT: T-class
     { NAME int }
-    { "x" { TYPE 4 } }
-    { "y" { "short" N } }
-    { "z" TYPE initial: 5 }
-    { "w" { "int" 2 } } ;
+    { x { TYPE 4 } }
+    { y { "short" N } }
+    { z TYPE initial: 5 }
+    { float { "float" 2 } } ;
 
 ;FUNCTOR
 
@@ -203,11 +203,11 @@ STRUCT: T-class
             { c-type "char" }
         }
         T{ struct-slot-spec
-            { name "w" }
+            { name "float" }
             { offset 16 }
             { class object }
             { initial f } 
-            { c-type { "int" 2 } }
+            { c-type { "float" 2 } }
         }
     }
 ] [ a-struct struct-slots ] unit-test

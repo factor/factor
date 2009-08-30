@@ -58,15 +58,17 @@ M: object (fake-quotations>) , ;
     [ parse-definition* ] dip
     parsed ;
 
+: >string-param ( string -- string/param )
+    dup search dup lexical? [ nip ] [ drop ] if ;
+
 : scan-c-type* ( -- c-type/param )
-    scan {
-        { [ dup "{" =  ] [ drop \ } parse-until >array ] }
-        { [ dup search ] [ search ] }
-        [ ]
-    } cond ;
+    scan dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;
+
+: scan-string-param ( -- name/param )
+    scan >string-param ;
 
 :: parse-struct-slot* ( accum -- accum )
-    scan-param :> name
+    scan-string-param :> name
     scan-c-type* :> c-type
     \ } parse-until :> attributes
     accum {
