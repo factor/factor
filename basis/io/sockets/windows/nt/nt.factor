@@ -3,7 +3,7 @@ continuations destructors io.ports io.timeouts io.sockets
 io namespaces io.streams.duplex io.backend.windows
 io.sockets.windows io.backend.windows.nt windows.winsock kernel
 libc math sequences threads system combinators accessors
-classes.struct ;
+classes.struct windows.kernel32 ;
 IN: io.sockets.windows.nt
 
 : malloc-int ( object -- object )
@@ -15,7 +15,7 @@ M: winnt WSASocket-flags ( -- DWORD )
 : get-ConnectEx-ptr ( socket -- void* )
     SIO_GET_EXTENSION_FUNCTION_POINTER
     WSAID_CONNECTEX
-    "GUID" heap-size
+    GUID heap-size
     "void*" <c-object>
     [
         "void*" heap-size

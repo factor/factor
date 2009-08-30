@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.strings alien.syntax
 combinators io.encodings.utf16n io.files io.pathnames kernel
 windows.errors windows.com windows.com.syntax windows.user32
-windows.ole32 windows ;
+windows.ole32 windows specialized-arrays.ushort ;
 IN: windows.shell32
 
 CONSTANT: CSIDL_DESKTOP HEX: 00
@@ -90,7 +90,7 @@ ALIAS: ShellExecute ShellExecuteW
 
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
-    MAX_UNICODE_PATH "ushort" <c-array>
+    MAX_UNICODE_PATH <ushort-array>
     [ SHGetFolderPath drop ] keep utf16n alien>string ;
 
 : desktop ( -- str )
