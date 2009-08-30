@@ -3,17 +3,33 @@
 USING: kernel threads vectors arrays sequences namespaces make
 tools.test continuations deques strings math words match
 quotations concurrency.messaging concurrency.mailboxes
-concurrency.count-downs accessors ;
+concurrency.count-downs concurrency.conditions accessors calendar ;
 IN: concurrency.messaging.tests
 
 [ ] [ my-mailbox data>> clear-deque ] unit-test
 
 [ "received" ] [ 
     [
-        receive "received" swap reply-synchronous
+        [ drop "received" ] handle-synchronous
     ] "Synchronous test" spawn
     "sent" swap send-synchronous
 ] unit-test
+
+[ "received" ] [ 
+    [
+        [ drop "received" ] handle-synchronous
+    ] "Synchronous test" spawn
+    [ 100 milliseconds "sent" ] dip send-synchronous-timeout
+] unit-test
+
+[
+    [
+        100 milliseconds sleep
+        [ drop "received" ] handle-synchronous
+    ] "Synchronous test" spawn
+    [ 5 milliseconds "sent" ] dip send-synchronous-timeout
+] [ wait-timeout? ] must-fail-with
+
 
 [ 1 3 2 ] [
     1 self send
@@ -64,3 +80,4 @@ SYMBOL: exit
 ! ] "Bad synchronous send" spawn "t" set
 
 ! [ 3 "t" get send-synchronous ] must-fail
+
