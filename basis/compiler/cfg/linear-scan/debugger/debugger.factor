@@ -9,6 +9,7 @@ IN: compiler.cfg.linear-scan.debugger
     [
         [ clone ] map dup [ [ vreg>> ] keep ] H{ } map>assoc
         live-intervals set
+        f
     ] dip
     allocate-registers drop ;
 
