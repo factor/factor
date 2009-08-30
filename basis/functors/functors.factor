@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.mixin classes.parser
-classes.singleton classes.tuple classes.tuple.parser
+classes.singleton classes.struct classes.tuple classes.tuple.parser
 combinators effects.parser fry generic generic.parser
 generic.standard interpolate io.streams.string kernel lexer
-locals.parser locals.types macros make namespaces parser
-quotations sequences vocabs.parser words words.symbol ;
+locals locals.parser locals.types macros make namespaces parser
+quotations sequences slots vectors vocabs.parser words words.symbol ;
 IN: functors
 
 ! This is a hack
@@ -58,6 +58,32 @@ M: object (fake-quotations>) , ;
     [ parse-definition* ] dip
     parsed ;
 
+: scan-c-type* ( -- c-type/param )
+    scan {
+        { [ dup "{" =  ] [ drop \ } parse-until >array ] }
+        { [ dup search ] [ search ] }
+        [ ]
+    } cond ;
+
+:: parse-struct-slot* ( accum -- accum )
+    scan-param :> name
+    scan-c-type* :> c-type
+    \ } parse-until :> attributes
+    accum {
+        \ struct-slot-spec new 
+            name >>name
+            c-type [ >>c-type ] [ struct-slot-class >>class ] bi
+            attributes [ dup empty? ] [ peel-off-attributes ] until drop
+        over push
+    } over push-all ;
+
+: parse-struct-slots* ( accum -- accum more? )
+    scan {
+        { ";" [ f ] }
+        { "{" [ parse-struct-slot* t ] }
+        [ invalid-struct-slot ]
+    } case ;
+
 SYNTAX: `TUPLE:
     scan-param parsed
     scan {
@@ -70,6 +96,12 @@ SYNTAX: `TUPLE:
         ]
     } case
     \ define-tuple-class parsed ;
+
+SYNTAX: `STRUCT:
+    scan-param parsed
+    [ 8 <vector> ] over push-all
+    [ parse-struct-slots* ] [ ] while
+    [ >array define-struct-class ] over push-all ;
 
 SYNTAX: `SINGLETON:
     scan-param parsed
@@ -147,6 +179,7 @@ DEFER: ;FUNCTOR delimiter
 : functor-words ( -- assoc )
     H{
         { "TUPLE:" POSTPONE: `TUPLE: }
+        { "STRUCT:" POSTPONE: `STRUCT: }
         { "SINGLETON:" POSTPONE: `SINGLETON: }
         { "MIXIN:" POSTPONE: `MIXIN: }
         { "M:" POSTPONE: `M: }
