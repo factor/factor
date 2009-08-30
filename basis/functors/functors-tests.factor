@@ -1,5 +1,5 @@
-USING: functors tools.test math words kernel multiline parser
-io.streams.string generic ;
+USING: classes.struct functors tools.test math words kernel
+multiline parser io.streams.string generic ;
 IN: functors.tests
 
 <<
@@ -150,4 +150,65 @@ SYMBOL: W-symbol
 ] unit-test
 
 test-redefinition
+
+<<
+
+FUNCTOR: define-a-struct ( T NAME TYPE N -- )
+
+T-class DEFINES-CLASS ${T}
+
+WHERE
+
+STRUCT: T-class
+    { NAME int }
+    { x { TYPE 4 } }
+    { y { "short" N } }
+    { z TYPE initial: 5 }
+    { float { "float" 2 } } ;
+
+;FUNCTOR
+
+"a-struct" "nemo" "char" 2 define-a-struct
+
+>>
+
+[
+    {
+        T{ struct-slot-spec
+            { name "nemo" }
+            { offset 0 }
+            { class integer }
+            { initial 0 } 
+            { c-type "int" }
+        }
+        T{ struct-slot-spec
+            { name "x" }
+            { offset 4 }
+            { class object }
+            { initial f } 
+            { c-type { "char" 4 } }
+        }
+        T{ struct-slot-spec
+            { name "y" }
+            { offset 8 }
+            { class object }
+            { initial f } 
+            { c-type { "short" 2 } }
+        }
+        T{ struct-slot-spec
+            { name "z" }
+            { offset 12 }
+            { class fixnum }
+            { initial 5 } 
+            { c-type "char" }
+        }
+        T{ struct-slot-spec
+            { name "float" }
+            { offset 16 }
+            { class object }
+            { initial f } 
+            { c-type { "float" 2 } }
+        }
+    }
+] [ a-struct struct-slots ] unit-test
 
