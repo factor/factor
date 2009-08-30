@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.private
-math.libm math.functions arrays math.functions.private sequences
-parser ;
+math.functions arrays math.functions.private sequences parser ;
 IN: math.complex.private
 
 M: real real-part ; inline
@@ -26,8 +25,8 @@ M: complex * [ *re - ] [ *im + ] 2bi rect> ; inline
 M: complex / [ / ] complex/ ; inline
 M: complex /f [ /f ] complex/ ; inline
 M: complex /i [ /i ] complex/ ; inline
-M: complex abs absq >float fsqrt ; inline
-M: complex sqrt >polar [ fsqrt ] [ 2.0 / ] bi* polar> ; inline
+M: complex abs absq sqrt ; inline
+M: complex sqrt >polar [ sqrt ] [ 2.0 / ] bi* polar> ; inline
 
 IN: syntax
 

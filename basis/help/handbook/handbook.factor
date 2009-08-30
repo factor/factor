@@ -106,10 +106,7 @@ ARTICLE: "numbers" "Numbers"
 { $subsection "complex-numbers" }
 "Advanced features:"
 { $subsection "math-vectors" }
-{ $subsection "math-intervals" }
-{ $subsection "math-bitfields" }
-"Implementation:"
-{ $subsection "math.libm" } ;
+{ $subsection "math-intervals" } ;
 
 USE: io.buffers
 
