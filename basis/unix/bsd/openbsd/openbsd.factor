@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.syntax classes.struct ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 1024
@@ -13,12 +13,12 @@ C-STRUCT: addrinfo
     { "char*" "canonname" }
     { "addrinfo*" "next" } ;
 
-C-STRUCT: dirent
-    { "__uint32_t" "d_fileno" }
-    { "__uint16_t" "d_reclen" }
-    { "__uint8_t"  "d_type" }
-    { "__uint8_t"  "d_namlen" }
-    { { "char" 256 } "d_name" } ;
+STRUCT: dirent
+    { d_fileno __uint32_t }
+    { d_reclen __uint16_t }
+    { d_type __uint8_t }
+    { d_namlen __uint8_t }
+    { d_name char[256] } ;
 
 CONSTANT: EPERM 1
 CONSTANT: ENOENT 2

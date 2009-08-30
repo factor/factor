@@ -28,6 +28,20 @@ SYMBOL: pending-interval-assoc
 : remove-pending ( live-interval -- )
     vreg>> pending-interval-assoc get delete-at ;
 
+: (vreg>reg) ( vreg pending -- reg )
+    ! If a live vreg is not in the pending set, then it must
+    ! have been spilled.
+    ?at [ spill-slots get at <spill-slot> ] unless ;
+
+: vreg>reg ( vreg -- reg )
+    pending-interval-assoc get (vreg>reg) ;
+
+: vregs>regs ( vregs -- assoc )
+    dup assoc-empty? [
+        pending-interval-assoc get
+        '[ _ (vreg>reg) ] assoc-map
+    ] unless ;
+
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
 
@@ -96,8 +110,6 @@ SYMBOL: register-live-outs
 
 GENERIC: assign-registers-in-insn ( insn -- )
 
-: vreg>reg ( vreg -- reg ) pending-interval-assoc get at ;
-
 RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 
 M: vreg-insn assign-registers-in-insn
@@ -123,7 +135,7 @@ M: vreg-insn assign-registers-in-insn
     [
         [
             2dup spill-on-gc?
-            [ swap [ assign-spill-slot ] [ rep-of ] bi 3array , ] [ 2drop ] if
+            [ swap [ vreg-spill-slot ] [ rep-of ] bi 3array , ] [ 2drop ] if
         ] assoc-each
     ] { } make ;
 
@@ -137,23 +149,13 @@ M: ##gc assign-registers-in-insn
 
 M: insn assign-registers-in-insn drop ;
 
-: compute-live-values ( vregs -- assoc )
-    ! If a live vreg is not in active or inactive, then it must have been
-    ! spilled.
-    dup assoc-empty? [
-        pending-interval-assoc get
-        '[ _ ?at [ ] [ spill-slots get at <spill-slot> ] if ] assoc-map
-    ] unless ;
-
 : begin-block ( bb -- )
     dup basic-block set
     dup block-from activate-new-intervals
-    [ live-in compute-live-values ] keep
-    register-live-ins get set-at ;
+    [ live-in vregs>regs ] keep register-live-ins get set-at ;
 
 : end-block ( bb -- )
-    [ live-out compute-live-values ] keep
-    register-live-outs get set-at ;
+    [ live-out vregs>regs ] keep register-live-outs get set-at ;
 
 ERROR: bad-vreg vreg ;
 

@@ -30,20 +30,18 @@ M: live-interval covers? ( insn# live-interval -- ? )
         covers?
     ] if ;
         
-ERROR: dead-value-error vreg ;
+: add-new-range ( from to live-interval -- )
+    [ <live-range> ] dip ranges>> push ;
 
 : shorten-range ( n live-interval -- )
     dup ranges>> empty?
-    [ vreg>> dead-value-error ] [ ranges>> last (>>from) ] if ;
+    [ dupd add-new-range ] [ ranges>> last (>>from) ] if ;
 
 : extend-range ( from to live-range -- )
     ranges>> last
     [ max ] change-to
     [ min ] change-from
     drop ;
-
-: add-new-range ( from to live-interval -- )
-    [ <live-range> ] dip ranges>> push ;
 
 : extend-range? ( to live-interval -- ? )
     ranges>> [ drop f ] [ last from>> >= ] if-empty ;
@@ -52,8 +50,18 @@ ERROR: dead-value-error vreg ;
     2dup extend-range?
     [ extend-range ] [ add-new-range ] if ;
 
-: add-use ( n live-interval -- )
-    uses>> push ;
+GENERIC: operands-in-registers? ( insn -- ? )
+
+M: vreg-insn operands-in-registers? drop t ;
+
+M: partial-sync-insn operands-in-registers? drop f ;
+
+: add-def ( insn live-interval -- )
+    [ insn#>> ] [ uses>> ] bi* push ;
+
+: add-use ( insn live-interval -- )
+    ! Every use is a potential def, no SSA here baby!
+    over operands-in-registers? [ add-def ] [ 2drop ] if ;
 
 : <live-interval> ( vreg -- live-interval )
     \ live-interval new
@@ -68,51 +76,68 @@ ERROR: dead-value-error vreg ;
 M: live-interval hashcode*
     nip [ start>> ] [ end>> 1000 * ] bi + ;
 
-M: live-interval clone
-    call-next-method [ clone ] change-uses ;
-
 ! Mapping from vreg to live-interval
 SYMBOL: live-intervals
 
-: live-interval ( vreg live-intervals -- live-interval )
-    [ <live-interval> ] cache ;
+: live-interval ( vreg -- live-interval )
+    live-intervals get [ <live-interval> ] cache ;
 
 GENERIC: compute-live-intervals* ( insn -- )
 
 M: insn compute-live-intervals* drop ;
 
-: handle-output ( n vreg live-intervals -- )
+: handle-output ( insn vreg -- )
     live-interval
-    [ add-use ] [ shorten-range ] 2bi ;
+    [ [ insn#>> ] dip shorten-range ] [ add-def ] 2bi ;
 
-: handle-input ( n vreg live-intervals -- )
+: handle-input ( insn vreg -- )
     live-interval
-    [ [ basic-block get block-from ] 2dip add-range ] [ add-use ] 2bi ;
+    [ [ [ basic-block get block-from ] dip insn#>> ] dip add-range ] [ add-use ] 2bi ;
 
-: handle-temp ( n vreg live-intervals -- )
+: handle-temp ( insn vreg -- )
     live-interval
-    [ dupd add-range ] [ add-use ] 2bi ;
+    [ [ insn#>> dup ] dip add-range ] [ add-use ] 2bi ;
 
 M: vreg-insn compute-live-intervals*
-    dup insn#>>
-    live-intervals get
-    [ [ defs-vreg ] 2dip '[ [ _ ] dip _ handle-output ] when* ]
-    [ [ uses-vregs ] 2dip '[ [ _ ] dip _ handle-input ] each ]
-    [ [ temp-vregs ] 2dip '[ [ _ ] dip _ handle-temp ] each ]
-    3tri ;
+    [ dup defs-vreg [ handle-output ] with when* ]
+    [ dup uses-vregs [ handle-input ] with each ]
+    [ dup temp-vregs [ handle-temp ] with each ]
+    tri ;
 
 : handle-live-out ( bb -- )
-    live-out keys
-    basic-block get [ block-from ] [ block-to ] bi
-    live-intervals get '[
-        [ _ _ ] dip _ live-interval add-range
-    ] each ;
+    [ block-from ] [ block-to ] [ live-out keys ] tri
+    [ live-interval add-range ] with with each ;
+
+! A location where all registers have to be spilled
+TUPLE: sync-point n ;
+
+C: <sync-point> sync-point
+
+! Sequence of sync points
+SYMBOL: sync-points
+
+GENERIC: compute-sync-points* ( insn -- )
+
+M: partial-sync-insn compute-sync-points*
+    insn#>> <sync-point> sync-points get push ;
+
+M: insn compute-sync-points* drop ;
 
 : compute-live-intervals-step ( bb -- )
     [ basic-block set ]
     [ handle-live-out ]
-    [ instructions>> <reversed> [ compute-live-intervals* ] each ] tri ;
+    [
+        instructions>> <reversed> [
+            [ compute-live-intervals* ]
+            [ compute-sync-points* ]
+            bi
+        ] each
+    ] tri ;
 
+: init-live-intervals ( -- )
+    H{ } clone live-intervals set
+    V{ } clone sync-points set ;
+    
 : compute-start/end ( live-interval -- )
     dup ranges>> [ first from>> ] [ last to>> ] bi
     [ >>start ] [ >>end ] bi* drop ;
@@ -122,10 +147,10 @@ ERROR: bad-live-interval live-interval ;
 : check-start ( live-interval -- )
     dup start>> -1 = [ bad-live-interval ] [ drop ] if ;
 
-: finish-live-intervals ( live-intervals -- )
+: finish-live-intervals ( live-intervals -- seq )
     ! Since live intervals are computed in a backward order, we have
     ! to reverse some sequences, and compute the start and end.
-    [
+    values dup [
         {
             [ ranges>> reverse-here ]
             [ uses>> reverse-here ]
@@ -134,12 +159,11 @@ ERROR: bad-live-interval live-interval ;
         } cleave
     ] each ;
 
-: compute-live-intervals ( cfg -- live-intervals )
-    H{ } clone [
-        live-intervals set
-        linearization-order <reversed>
-        [ compute-live-intervals-step ] each
-    ] keep values dup finish-live-intervals ;
+: compute-live-intervals ( cfg -- live-intervals sync-points )
+    init-live-intervals
+    linearization-order <reversed> [ compute-live-intervals-step ] each
+    live-intervals get finish-live-intervals
+    sync-points get ;
 
 : relevant-ranges ( interval1 interval2 -- ranges1 ranges2 )
     [ [ ranges>> ] bi@ ] [ nip start>> ] 2bi '[ to>> _ >= ] filter ;

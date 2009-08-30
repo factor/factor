@@ -1,12 +1,12 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien.c-types alien.libraries
+USING: accessors alien alien.c-types alien.libraries
 alien.structs.fields alien.syntax ascii classes.struct combinators
 destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays.ushort
 system tools.test compiler.tree.debugger struct-arrays
 classes.tuple.private specialized-arrays.direct.int
-compiler.units ;
+compiler.units byte-arrays specialized-arrays.char ;
 IN: classes.struct.tests
 
 <<
@@ -63,7 +63,7 @@ UNION-STRUCT: struct-test-float-and-bits
 [ 1.0 ] [ struct-test-float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
 [ 4 ] [ struct-test-float-and-bits heap-size ] unit-test
 
-[ ] [ [ struct-test-foo malloc-struct &free drop ] with-destructors ] unit-test
+[ 123 ] [ [ struct-test-foo malloc-struct &free y>> ] with-destructors ] unit-test
 
 STRUCT: struct-test-string-ptr
     { x char* } ;
@@ -203,3 +203,28 @@ STRUCT: struct-test-optimization
 ] unit-test
 
 [ f ] [ [ memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
+
+! Test cloning structs
+STRUCT: clone-test-struct { x int } { y char[3] } ;
+
+[ 1 char-array{ 9 1 1 } ] [
+    clone-test-struct <struct>
+    1 >>x char-array{ 9 1 1 } >>y
+    clone
+    [ x>> ] [ y>> >char-array ] bi
+] unit-test
+
+[ t 1 char-array{ 9 1 1 } ] [
+    [
+        clone-test-struct malloc-struct &free
+        1 >>x char-array{ 9 1 1 } >>y
+        clone
+        [ >c-ptr byte-array? ] [ x>> ] [ y>> >char-array ] tri
+    ] with-destructors
+] unit-test
+
+STRUCT: struct-that's-a-word { x int } ;
+
+: struct-that's-a-word ( -- ) "OOPS" throw ;
+
+[ -77 ] [ S{ struct-that's-a-word { x -77 } } clone x>> ] unit-test
