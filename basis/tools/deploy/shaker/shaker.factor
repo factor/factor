@@ -289,6 +289,8 @@ IN: tools.deploy.shaker
 
         "disposables" "destructors" lookup ,
 
+        "functor-words" "functors.backend" lookup ,
+        
         deploy-threads? [
             "initial-thread" "threads" lookup ,
         ] unless

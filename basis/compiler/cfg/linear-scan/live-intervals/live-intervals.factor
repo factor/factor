@@ -30,8 +30,6 @@ M: live-interval covers? ( insn# live-interval -- ? )
         covers?
     ] if ;
         
-ERROR: dead-value-error vreg ;
-
 : add-new-range ( from to live-interval -- )
     [ <live-range> ] dip ranges>> push ;
 

@@ -1,26 +1,26 @@
-USING: kernel alien.syntax math ;
+USING: kernel alien.syntax math classes.struct ;
 IN: unix.stat
 
 ! NetBSD 4.0
 
-C-STRUCT: stat
-    { "dev_t" "st_dev" }
-    { "ino_t" "st_ino" }
-    { "mode_t" "st_mode" }
-    { "nlink_t" "st_nlink" }
-    { "uid_t" "st_uid" }
-    { "gid_t" "st_gid" }
-    { "dev_t" "st_rdev" }
-    { "timespec" "st_atimespec" }
-    { "timespec" "st_mtimespec" }
-    { "timespec" "st_ctimespec" }
-    { "off_t" "st_size" }
-    { "blkcnt_t" "st_blocks" }
-    { "blksize_t" "st_blksize" }
-    { "uint32_t" "st_flags" }
-    { "uint32_t" "st_gen" }
-    { "uint32_t" "st_spare0" }
-    { "timespec" "st_birthtimespec" } ;
+STRUCT: stat
+    { st_dev dev_t }
+    { st_ino ino_t }
+    { st_mode mode_t }
+    { st_nlink nlink_t }
+    { st_uid uid_t }
+    { st_gid gid_t }
+    { st_rdev dev_t }
+    { st_atimespec timespec }
+    { st_mtimespec timespec }
+    { st_ctimespec timespec }
+    { st_size off_t }
+    { st_blocks blkcnt_t }
+    { st_blksize blksize_t }
+    { st_flags uint32_t }
+    { st_gen uint32_t }
+    { st_spare0 uint32_t }
+    { st_birthtimespec timespec } ;
 
 FUNCTION: int __stat13 ( char* pathname, stat* buf ) ;
 FUNCTION: int __lstat13 ( char* pathname, stat* buf ) ;

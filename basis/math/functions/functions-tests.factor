@@ -30,21 +30,40 @@ IN: math.functions.tests
 [ 0 ] [ 0 3 ^ ] unit-test
 
 [ 0.0 ] [ 1 log ] unit-test
+[ 0.0 ] [ 1.0 log ] unit-test
+[ 1.0 ] [ e log ] unit-test
+
+[ t ] [ 1 exp e = ] unit-test
+[ t ] [ 1.0 exp e = ] unit-test
+[ 1.0 ] [ -1 exp e * ] unit-test
 
 [ 1.0 ] [ 0 cosh ] unit-test
+[ 1.0 ] [ 0.0 cosh ] unit-test
 [ 0.0 ] [ 1 acosh ] unit-test
+[ 0.0 ] [ 1.0 acosh ] unit-test
 
 [ 1.0 ] [ 0 cos ] unit-test
+[ 1.0 ] [ 0.0 cos ] unit-test
 [ 0.0 ] [ 1 acos ] unit-test
+[ 0.0 ] [ 1.0 acos ] unit-test
 
 [ 0.0 ] [ 0 sinh ] unit-test
+[ 0.0 ] [ 0.0 sinh ] unit-test
 [ 0.0 ] [ 0 asinh ] unit-test
+[ 0.0 ] [ 0.0 asinh ] unit-test
 
 [ 0.0 ] [ 0 sin ] unit-test
+[ 0.0 ] [ 0.0 sin ] unit-test
 [ 0.0 ] [ 0 asin ] unit-test
+[ 0.0 ] [ 0.0 asin ] unit-test
+
+[ 0.0 ] [ 0 tan ] unit-test
+[ t ] [ pi 2 / tan 1.e10 > ] unit-test
 
 [ t ] [ 10 atan real? ] unit-test
+[ t ] [ 10.0 atan real? ] unit-test
 [ f ] [ 10 atanh real? ] unit-test
+[ f ] [ 10.0 atanh real? ] unit-test
 
 [ t ] [ 10 asin sin 10 1.e-10 ~ ] unit-test
 [ t ] [ -1 sqrt neg dup acos cos 1.e-10 ~ ] unit-test
