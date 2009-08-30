@@ -1,25 +1,24 @@
-USING: kernel alien.syntax math sequences unix
-alien.c-types arrays accessors combinators ;
+USING: kernel alien.syntax math classes.struct ;
 IN: unix.stat
 
 ! stat64
-C-STRUCT: stat
-    { "dev_t"      "st_dev" }
-    { "ushort"     "__pad1" }
-    { "__ino_t"     "__st_ino" }
-    { "mode_t"     "st_mode" }
-    { "nlink_t"    "st_nlink" }
-    { "uid_t"      "st_uid" }
-    { "gid_t"      "st_gid" }
-    { "dev_t"      "st_rdev" }
-    { { "ushort" 2 } "__pad2" }
-    { "off64_t"    "st_size" }
-    { "blksize_t"  "st_blksize" }
-    { "blkcnt64_t" "st_blocks" }
-    { "timespec"   "st_atimespec" }
-    { "timespec"   "st_mtimespec" }
-    { "timespec"   "st_ctimespec" }
-    { "ulonglong"  "st_ino" } ;
+STRUCT: stat
+    { st_dev dev_t }
+    { __pad1 ushort }
+    { __st_ino __ino_t }
+    { st_mode mode_t }
+    { st_nlink nlink_t }
+    { st_uid uid_t }
+    { st_gid gid_t }
+    { st_rdev dev_t }
+    { __pad2 ushort[2] }
+    { st_size off64_t }
+    { st_blksize blksize_t }
+    { st_blocks blkcnt64_t }
+    { st_atimespec timespec }
+    { st_mtimespec timespec }
+    { st_ctimespec timespec }
+    { st_ino ulonglong } ;
 
 FUNCTION: int __xstat64  ( int ver, char* pathname, stat* buf ) ;
 FUNCTION: int __lxstat64 ( int ver, char* pathname, stat* buf ) ;
