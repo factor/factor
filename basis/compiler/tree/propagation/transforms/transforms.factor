@@ -1,11 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences words fry generic accessors classes.tuple
-classes classes.algebra definitions stack-checker.state quotations
-classes.tuple.private math math.partial-dispatch math.private
-math.intervals layouts math.order vectors hashtables
-combinators effects generalizations assocs sets
-combinators.short-circuit sequences.private locals
+USING: kernel sequences words fry generic accessors
+classes.tuple classes classes.algebra definitions
+stack-checker.state quotations classes.tuple.private math
+math.partial-dispatch math.private math.intervals
+math.floats.private math.integers.private layouts math.order
+vectors hashtables combinators effects generalizations assocs
+sets combinators.short-circuit sequences.private locals
 stack-checker namespaces compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.transforms
 
@@ -77,6 +78,26 @@ IN: compiler.tree.propagation.transforms
             ] if
         ]
     ] [ f ] if
+] "custom-inlining" set-word-prop
+
+! Integrate this with generic arithmetic optimization instead?
+: both-inputs? ( #call class -- ? )
+    [ in-d>> first2 ] dip '[ value-info class>> _ class<= ] both? ;
+
+\ min [
+    {
+        { [ dup fixnum both-inputs? ] [ [ fixnum-min ] ] }
+        { [ dup float both-inputs? ] [ [ float-min ] ] }
+        [ f ]
+    } cond nip
+] "custom-inlining" set-word-prop
+
+\ max [
+    {
+        { [ dup fixnum both-inputs? ] [ [ fixnum-max ] ] }
+        { [ dup float both-inputs? ] [ [ float-max ] ] }
+        [ f ]
+    } cond nip
 ] "custom-inlining" set-word-prop
 
 ! Generate more efficient code for common idiom
@@ -207,12 +228,14 @@ CONSTANT: lookup-table-at-max 256
     ] ;
 
 : at-quot ( assoc -- quot )
-    dup lookup-table-at? [
-        dup fast-lookup-table-at? [
-            fast-lookup-table-quot
-        ] [
-            lookup-table-quot
-        ] if
+    dup assoc? [
+        dup lookup-table-at? [
+            dup fast-lookup-table-at? [
+                fast-lookup-table-quot
+            ] [
+                lookup-table-quot
+            ] if
+        ] [ drop f ] if
     ] [ drop f ] if ;
 
 \ at* [ at-quot ] 1 define-partial-eval

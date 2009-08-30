@@ -149,6 +149,8 @@ M: ##shr     generate-insn dst/src1/src2 %shr     ;
 M: ##shr-imm generate-insn dst/src1/src2 %shr-imm ;
 M: ##sar     generate-insn dst/src1/src2 %sar     ;
 M: ##sar-imm generate-insn dst/src1/src2 %sar-imm ;
+M: ##min     generate-insn dst/src1/src2 %min     ;
+M: ##max     generate-insn dst/src1/src2 %max     ;
 M: ##not     generate-insn dst/src       %not     ;
 M: ##log2    generate-insn dst/src       %log2    ;
 
@@ -169,6 +171,8 @@ M: ##add-float generate-insn dst/src1/src2 %add-float ;
 M: ##sub-float generate-insn dst/src1/src2 %sub-float ;
 M: ##mul-float generate-insn dst/src1/src2 %mul-float ;
 M: ##div-float generate-insn dst/src1/src2 %div-float ;
+M: ##min-float generate-insn dst/src1/src2 %min-float ;
+M: ##max-float generate-insn dst/src1/src2 %max-float ;
 
 M: ##sqrt generate-insn dst/src %sqrt ;
 

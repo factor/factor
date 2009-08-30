@@ -236,9 +236,9 @@ M: c-type stack-size size>> cell align ;
 
 GENERIC: byte-length ( seq -- n ) flushable
 
-M: byte-array byte-length length ;
+M: byte-array byte-length length ; inline
 
-M: f byte-length drop 0 ;
+M: f byte-length drop 0 ; inline
 
 : c-getter ( name -- quot )
     c-type-getter [
@@ -254,16 +254,25 @@ M: f byte-length drop 0 ;
     ] unless* ;
 
 : <c-array> ( n type -- array )
-    heap-size * <byte-array> ; inline
+    heap-size * <byte-array> ; inline deprecated
 
 : <c-object> ( type -- array )
-    1 swap <c-array> ; inline
+    heap-size <byte-array> ; inline
+
+: (c-object) ( type -- array )
+    heap-size (byte-array) ; inline
 
 : malloc-array ( n type -- alien )
-    heap-size calloc ; inline
+    [ heap-size calloc ] [ <c-type-direct-array> ] 2bi ; inline
+
+: (malloc-array) ( n type -- alien )
+    [ heap-size * malloc ] [ <c-type-direct-array> ] 2bi ; inline
 
 : malloc-object ( type -- alien )
-    1 swap malloc-array ; inline
+    1 swap heap-size calloc ; inline
+
+: (malloc-object) ( type -- alien )
+    heap-size malloc ; inline
 
 : malloc-byte-array ( byte-array -- alien )
     dup byte-length [ nip malloc dup ] 2keep memcpy ;
@@ -281,7 +290,7 @@ M: memory-stream stream-read
     ] [ [ + ] change-index drop ] 2bi ;
 
 : byte-array>memory ( byte-array base -- )
-    swap dup byte-length memcpy ;
+    swap dup byte-length memcpy ; inline
 
 : array-accessor ( type quot -- def )
     [
@@ -325,17 +334,6 @@ M: long-long-type box-return ( type -- )
     [ define-deref ]
     [ define-out ]
     tri ;
-
-: expand-constants ( c-type -- c-type' )
-    dup array? [
-        unclip [
-            [
-                dup word? [
-                    def>> call( -- object )
-                ] when
-            ] map
-        ] dip prefix
-    ] when ;
 
 : malloc-file-contents ( path -- alien len )
     binary file-contents [ malloc-byte-array ] [ length ] bi ;
