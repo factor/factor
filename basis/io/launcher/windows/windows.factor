@@ -7,7 +7,7 @@ namespaces make io.launcher kernel sequences windows.errors
 splitting system threads init strings combinators
 io.backend accessors concurrency.flags io.files assocs
 io.files.private windows destructors specialized-arrays.ushort
-specialized-arrays.alien ;
+specialized-arrays.alien classes classes.struct ;
 IN: io.launcher.windows
 
 TUPLE: CreateProcess-args
@@ -24,9 +24,10 @@ TUPLE: CreateProcess-args
 
 : default-CreateProcess-args ( -- obj )
     CreateProcess-args new
-    "STARTUPINFO" <c-object>
-    "STARTUPINFO" heap-size over set-STARTUPINFO-cb >>lpStartupInfo
-    "PROCESS_INFORMATION" <c-object> >>lpProcessInformation
+        STARTUPINFO <struct>
+        dup class heap-size >>cb
+    >>lpStartupInfo
+    PROCESS_INFORMATION <struct> >>lpProcessInformation
     TRUE >>bInheritHandles
     0 >>dwCreateFlags ;
 
@@ -108,7 +109,7 @@ TUPLE: CreateProcess-args
     ] when ;
 
 : fill-startup-info ( process args -- process args )
-    STARTF_USESTDHANDLES over lpStartupInfo>> set-STARTUPINFO-dwFlags ;
+    dup lpStartupInfo>> STARTF_USESTDHANDLES >>dwFlags drop ;
 
 HOOK: fill-redirection io-backend ( process args -- )
 
@@ -136,17 +137,16 @@ M: windows run-process* ( process -- handle )
     ] with-destructors ;
 
 M: windows kill-process* ( handle -- )
-    PROCESS_INFORMATION-hProcess
-    255 TerminateProcess win32-error=0/f ;
+    hProcess>> 255 TerminateProcess win32-error=0/f ;
 
 : dispose-process ( process-information -- )
     #! From MSDN: "Handles in PROCESS_INFORMATION must be closed
     #! with CloseHandle when they are no longer needed."
-    dup PROCESS_INFORMATION-hProcess [ CloseHandle drop ] when*
-    PROCESS_INFORMATION-hThread [ CloseHandle drop ] when* ;
+    [ hProcess>> [ CloseHandle drop ] when* ]
+    [ hThread>> [ CloseHandle drop ] when* ] bi ;
 
 : exit-code ( process -- n )
-    PROCESS_INFORMATION-hProcess
+    hProcess>>
     0 <ulong> [ GetExitCodeProcess ] keep *ulong
     swap win32-error=0/f ;
 
@@ -157,7 +157,7 @@ M: windows kill-process* ( handle -- )
 
 M: windows wait-for-processes ( -- ? )
     processes get keys dup
-    [ handle>> PROCESS_INFORMATION-hProcess ] void*-array{ } map-as
+    [ handle>> hProcess>> ] void*-array{ } map-as
     [ length ] keep 0 0
     WaitForMultipleObjects
     dup HEX: ffffffff = [ win32-error ] when

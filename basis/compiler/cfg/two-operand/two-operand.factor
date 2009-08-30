@@ -35,11 +35,15 @@ UNION: two-operand-insn
     ##shr-imm
     ##sar
     ##sar-imm
+    ##min
+    ##max
     ##fixnum-overflow
     ##add-float
     ##sub-float
     ##mul-float
-    ##div-float ;
+    ##div-float
+    ##min-float
+    ##max-float ;
 
 GENERIC: convert-two-operand* ( insn -- )
 

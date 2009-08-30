@@ -1,6 +1,7 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays assocs compiler.units
-debugger init io kernel namespaces prettyprint sequences
+USING: accessors arrays assocs combinators.short-circuit
+compiler.units debugger init io
+io.streams.null kernel namespaces prettyprint sequences
 source-files.errors summary tools.crossref
 tools.crossref.private tools.errors words ;
 IN: tools.deprecation
@@ -39,12 +40,14 @@ T{ error-type
 : clear-deprecation-note ( word -- )
     deprecation-notes get-global delete-at ;
 
-: check-deprecations ( word -- )
-    dup "forgotten" word-prop
-    [ clear-deprecation-note ] [
-        dup def>> uses [ deprecated? ] filter
-        [ clear-deprecation-note ] [ >array deprecation-note ] if-empty
-    ] if ;
+: check-deprecations ( usage -- )
+    dup word? [
+        dup { [ "forgotten" word-prop ] [ deprecated? ] } 1||
+        [ clear-deprecation-note ] [
+            dup def>> uses [ deprecated? ] filter
+            [ clear-deprecation-note ] [ >array deprecation-note ] if-empty
+        ] if
+    ] [ drop ] if ;
 
 M: deprecated-usages summary
     drop "Deprecated words used" ;
@@ -58,8 +61,10 @@ M: deprecated-usages error.
 SINGLETON: deprecation-observer
 
 : initialize-deprecation-notes ( -- )
-    get-crossref [ drop deprecated? ] assoc-filter
-    values [ keys [ check-deprecations ] each ] each ;
+    [
+        get-crossref [ drop deprecated? ] assoc-filter
+        values [ keys [ check-deprecations ] each ] each
+    ] with-null-writer ;
 
 M: deprecation-observer definitions-changed
     drop keys [ word? ] filter

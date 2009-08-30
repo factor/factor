@@ -202,8 +202,7 @@ M: x86.64 %callback-value ( ctype -- )
 enable-alien-4-intrinsics
 
 ! SSE2 is always available on x86-64.
-enable-float-intrinsics
-enable-fsqrt
+enable-sse2
 
 USE: vocabs.loader
 

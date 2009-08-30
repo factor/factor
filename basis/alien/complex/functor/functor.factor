@@ -1,33 +1,28 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.structs alien.c-types math math.functions sequences
-arrays kernel functors vocabs.parser namespaces accessors
-quotations ;
+USING: accessors alien alien.structs alien.c-types classes.struct math
+math.functions sequences arrays kernel functors vocabs.parser
+namespaces quotations ;
 IN: alien.complex.functor
 
 FUNCTOR: define-complex-type ( N T -- )
 
-T-real DEFINES ${T}-real
-T-imaginary DEFINES ${T}-imaginary
-set-T-real DEFINES set-${T}-real
-set-T-imaginary DEFINES set-${T}-imaginary
+T-class DEFINES-CLASS ${T}
 
 <T> DEFINES <${T}>
 *T DEFINES *${T}
 
 WHERE
 
+STRUCT: T-class { real N } { imaginary N } ;
+
 : <T> ( z -- alien )
-    >rect T <c-object> [ set-T-imaginary ] [ set-T-real ] [ ] tri ; inline
+    >rect T-class <struct-boa> >c-ptr ;
 
 : *T ( alien -- z )
-    [ T-real ] [ T-imaginary ] bi rect> ; inline
+    T-class memory>struct [ real>> ] [ imaginary>> ] bi rect> ; inline
 
-T current-vocab
-{ { N "real" } { N "imaginary" } }
-define-struct
-
-T c-type
+T-class c-type
 <T> 1quotation >>unboxer-quot
 *T 1quotation >>boxer-quot
 number >>boxed-class

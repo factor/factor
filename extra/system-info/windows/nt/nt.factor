@@ -3,37 +3,38 @@
 USING: alien alien.c-types alien.strings
 kernel libc math namespaces system-info.backend
 system-info.windows windows windows.advapi32
-windows.kernel32 system byte-arrays windows.errors ;
+windows.kernel32 system byte-arrays windows.errors
+classes classes.struct accessors ;
 IN: system-info.windows.nt
 
 M: winnt cpus ( -- n )
-    system-info SYSTEM_INFO-dwNumberOfProcessors ;
+    system-info dwNumberOfProcessors>> ;
 
 : memory-status ( -- MEMORYSTATUSEX )
-    "MEMORYSTATUSEX" <c-object>
-    "MEMORYSTATUSEX" heap-size over set-MEMORYSTATUSEX-dwLength
+    "MEMORYSTATUSEX" <struct>
+    dup class heap-size >>dwLength
     dup GlobalMemoryStatusEx win32-error=0/f ;
 
 M: winnt memory-load ( -- n )
-    memory-status MEMORYSTATUSEX-dwMemoryLoad ;
+    memory-status dwMemoryLoad>> ;
 
 M: winnt physical-mem ( -- n )
-    memory-status MEMORYSTATUSEX-ullTotalPhys ;
+    memory-status ullTotalPhys>> ;
 
 M: winnt available-mem ( -- n )
-    memory-status MEMORYSTATUSEX-ullAvailPhys ;
+    memory-status ullAvailPhys>> ;
 
 M: winnt total-page-file ( -- n )
-    memory-status MEMORYSTATUSEX-ullTotalPageFile ;
+    memory-status ullTotalPageFile>> ;
 
 M: winnt available-page-file ( -- n )
-    memory-status MEMORYSTATUSEX-ullAvailPageFile ;
+    memory-status ullAvailPageFile>> ;
 
 M: winnt total-virtual-mem ( -- n )
-    memory-status MEMORYSTATUSEX-ullTotalVirtual ;
+    memory-status ullTotalVirtual>> ;
 
 M: winnt available-virtual-mem ( -- n )
-    memory-status MEMORYSTATUSEX-ullAvailVirtual ;
+    memory-status ullAvailVirtual>> ;
 
 : computer-name ( -- string )
     MAX_COMPUTERNAME_LENGTH 1 +

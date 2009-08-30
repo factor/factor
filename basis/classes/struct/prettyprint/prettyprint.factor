@@ -1,7 +1,7 @@
 ! (c)Joe Groff bsd license
 USING: accessors assocs classes classes.struct combinators
 kernel math prettyprint.backend prettyprint.custom
-prettyprint.sections see.private sequences words ;
+prettyprint.sections see.private sequences strings words ;
 IN: classes.struct.prettyprint
 
 <PRIVATE
@@ -18,7 +18,7 @@ IN: classes.struct.prettyprint
     <flow \ { pprint-word
     {
         [ name>> text ]
-        [ c-type>> text ]
+        [ c-type>> dup string? [ text ] [ pprint* ] if ]
         [ read-only>> [ \ read-only pprint-word ] when ]
         [ initial>> [ \ initial: pprint-word pprint* ] when* ]
     } cleave

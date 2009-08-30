@@ -4,7 +4,7 @@ cpu.architecture tools.test kernel math combinators.short-circuit
 accessors sequences compiler.cfg.predecessors locals compiler.cfg.dce
 compiler.cfg.ssa.destruction compiler.cfg.loop-detection
 compiler.cfg.representations compiler.cfg assocs vectors arrays
-layouts namespaces ;
+layouts namespaces alien ;
 IN: compiler.cfg.value-numbering.tests
 
 : trim-temps ( insns -- insns )
@@ -877,7 +877,7 @@ cell 8 = [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-immediate f 2 16 }
-        T{ ##box-displaced-alien f 1 2 0 }
+        T{ ##box-displaced-alien f 1 2 0 c-ptr }
         T{ ##unbox-any-c-ptr f 4 0 }
         T{ ##add-imm f 3 4 16 }
     }
@@ -885,7 +885,7 @@ cell 8 = [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-immediate f 2 16 }
-        T{ ##box-displaced-alien f 1 2 0 }
+        T{ ##box-displaced-alien f 1 2 0 c-ptr }
         T{ ##unbox-any-c-ptr f 3 1 }
     } value-numbering-step
 ] unit-test
@@ -896,7 +896,7 @@ cell 8 = [
     {
         T{ ##box-alien f 0 1 }
         T{ ##load-immediate f 2 16 }
-        T{ ##box-displaced-alien f 3 2 0 }
+        T{ ##box-displaced-alien f 3 2 0 c-ptr }
         T{ ##copy f 5 1 any-rep }
         T{ ##add-imm f 4 5 16 }
     }
@@ -904,7 +904,7 @@ cell 8 = [
     {
         T{ ##box-alien f 0 1 }
         T{ ##load-immediate f 2 16 }
-        T{ ##box-displaced-alien f 3 2 0 }
+        T{ ##box-displaced-alien f 3 2 0 c-ptr }
         T{ ##unbox-any-c-ptr f 4 3 }
     } value-numbering-step
 ] unit-test
@@ -922,7 +922,7 @@ cell 8 = [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-immediate f 2 0 }
-        T{ ##box-displaced-alien f 3 2 0 }
+        T{ ##box-displaced-alien f 3 2 0 c-ptr }
         T{ ##replace f 3 D 1 }
     } value-numbering-step
 ] unit-test
