@@ -143,9 +143,9 @@ CONSTANT: GUID-STRING-LENGTH
 : guid>string ( guid -- string )
     [
         [ "{" ] dip {
-            [ Data1>> >hex "-" ]
-            [ Data2>> >hex "-" ]
-            [ Data3>> >hex "-" ]
+            [ Data1>> >hex 8 CHAR: 0 pad-head "-" ]
+            [ Data2>> >hex 4 CHAR: 0 pad-head "-" ]
+            [ Data3>> >hex 4 CHAR: 0 pad-head "-" ]
             [
                 Data4>> [
                     {
