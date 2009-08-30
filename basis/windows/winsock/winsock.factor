@@ -195,9 +195,9 @@ C-STRUCT: FLOWSPEC
 TYPEDEF: FLOWSPEC* PFLOWSPEC
 TYPEDEF: FLOWSPEC* LPFLOWSPEC
 
-C-STRUCT: WSABUF
-    { "ulong" "len" }
-    { "void*" "buf" } ;
+STRUCT: WSABUF
+    { len ulong }
+    { buf void* } ;
 TYPEDEF: WSABUF* LPWSABUF
 
 C-STRUCT: QOS
