@@ -1,24 +1,16 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.mixin classes.parser
-classes.singleton classes.struct classes.tuple classes.tuple.parser
-combinators effects.parser fry generic generic.parser
-generic.standard interpolate io.streams.string kernel lexer
-locals locals.parser locals.types macros make namespaces parser
-quotations sequences slots vectors vocabs.parser words words.symbol ;
+classes.singleton classes.tuple classes.tuple.parser
+combinators effects.parser fry functors.backend generic
+generic.parser interpolate io.streams.string kernel lexer
+locals.parser locals.types macros make namespaces parser
+quotations sequences vocabs.parser words words.symbol ;
 IN: functors
 
 ! This is a hack
 
 <PRIVATE
-
-: scan-param ( -- obj ) scan-object literalize ;
-
-: define* ( word def -- ) over set-word define ;
-
-: define-declared* ( word def effect -- ) pick set-word define-declared ;
-
-: define-simple-generic* ( word effect -- ) over set-word define-simple-generic ;
 
 TUPLE: fake-call-next-method ;
 
@@ -58,35 +50,7 @@ M: object (fake-quotations>) , ;
     [ parse-definition* ] dip
     parsed ;
 
-: >string-param ( string -- string/param )
-    dup search dup lexical? [ nip ] [ drop ] if ;
-
-: scan-c-type* ( -- c-type/param )
-    scan dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;
-
-: scan-string-param ( -- name/param )
-    scan >string-param ;
-
-:: parse-struct-slot* ( accum -- accum )
-    scan-string-param :> name
-    scan-c-type* :> c-type
-    \ } parse-until :> attributes
-    accum {
-        \ struct-slot-spec new 
-            name >>name
-            c-type [ >>c-type ] [ struct-slot-class >>class ] bi
-            attributes [ dup empty? ] [ peel-off-attributes ] until drop
-        over push
-    } over push-all ;
-
-: parse-struct-slots* ( accum -- accum more? )
-    scan {
-        { ";" [ f ] }
-        { "{" [ parse-struct-slot* t ] }
-        [ invalid-struct-slot ]
-    } case ;
-
-SYNTAX: `TUPLE:
+FUNCTOR-SYNTAX: TUPLE:
     scan-param parsed
     scan {
         { ";" [ tuple parsed f parsed ] }
@@ -99,66 +63,60 @@ SYNTAX: `TUPLE:
     } case
     \ define-tuple-class parsed ;
 
-SYNTAX: `STRUCT:
-    scan-param parsed
-    [ 8 <vector> ] over push-all
-    [ parse-struct-slots* ] [ ] while
-    [ >array define-struct-class ] over push-all ;
-
-SYNTAX: `SINGLETON:
+FUNCTOR-SYNTAX: SINGLETON:
     scan-param parsed
     \ define-singleton-class parsed ;
 
-SYNTAX: `MIXIN:
+FUNCTOR-SYNTAX: MIXIN:
     scan-param parsed
     \ define-mixin-class parsed ;
 
-SYNTAX: `M:
+FUNCTOR-SYNTAX: M:
     scan-param parsed
     scan-param parsed
     [ create-method-in dup method-body set ] over push-all
     parse-definition*
     \ define* parsed ;
 
-SYNTAX: `C:
+FUNCTOR-SYNTAX: C:
     scan-param parsed
     scan-param parsed
     complete-effect
     [ [ [ boa ] curry ] over push-all ] dip parsed
     \ define-declared* parsed ;
 
-SYNTAX: `:
+FUNCTOR-SYNTAX: :
     scan-param parsed
     parse-declared*
     \ define-declared* parsed ;
 
-SYNTAX: `SYMBOL:
+FUNCTOR-SYNTAX: SYMBOL:
     scan-param parsed
     \ define-symbol parsed ;
 
-SYNTAX: `SYNTAX:
+FUNCTOR-SYNTAX: SYNTAX:
     scan-param parsed
     parse-definition*
     \ define-syntax parsed ;
 
-SYNTAX: `INSTANCE:
+FUNCTOR-SYNTAX: INSTANCE:
     scan-param parsed
     scan-param parsed
     \ add-mixin-instance parsed ;
 
-SYNTAX: `GENERIC:
+FUNCTOR-SYNTAX: GENERIC:
     scan-param parsed
     complete-effect parsed
     \ define-simple-generic* parsed ;
 
-SYNTAX: `MACRO:
+FUNCTOR-SYNTAX: MACRO:
     scan-param parsed
     parse-declared*
     \ define-macro parsed ;
 
-SYNTAX: `inline [ word make-inline ] over push-all ;
+FUNCTOR-SYNTAX: inline [ word make-inline ] over push-all ;
 
-SYNTAX: `call-next-method T{ fake-call-next-method } parsed ;
+FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } parsed ;
 
 : (INTERPOLATE) ( accum quot -- accum )
     [ scan interpolate-locals ] dip
@@ -177,24 +135,6 @@ SYNTAX: DEFINES-CLASS [ create-class-in ] (INTERPOLATE) ;
 DEFER: ;FUNCTOR delimiter
 
 <PRIVATE
-
-: functor-words ( -- assoc )
-    H{
-        { "TUPLE:" POSTPONE: `TUPLE: }
-        { "STRUCT:" POSTPONE: `STRUCT: }
-        { "SINGLETON:" POSTPONE: `SINGLETON: }
-        { "MIXIN:" POSTPONE: `MIXIN: }
-        { "M:" POSTPONE: `M: }
-        { "C:" POSTPONE: `C: }
-        { ":" POSTPONE: `: }
-        { "GENERIC:" POSTPONE: `GENERIC: }
-        { "INSTANCE:" POSTPONE: `INSTANCE: }
-        { "SYNTAX:" POSTPONE: `SYNTAX: }
-        { "SYMBOL:" POSTPONE: `SYMBOL: }
-        { "inline" POSTPONE: `inline }
-        { "MACRO:" POSTPONE: `MACRO: }
-        { "call-next-method" POSTPONE: `call-next-method }
-    } ;
 
 : push-functor-words ( -- )
     functor-words use-words ;
