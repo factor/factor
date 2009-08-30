@@ -44,3 +44,10 @@ STRUCT: test-struct-array
         S{ test-struct-array f 20 20 }
     } second
 ] unit-test
+
+! Regression
+STRUCT: fixed-string { text char[100] } ;
+
+[ { ALIEN: 123 ALIEN: 223 ALIEN: 323 ALIEN: 423 } ] [
+    ALIEN: 123 4 fixed-string <direct-struct-array> [ (underlying)>> ] { } map-as
+] unit-test

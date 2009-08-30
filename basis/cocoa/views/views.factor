@@ -58,6 +58,6 @@ CONSTANT: NSOpenGLCPSwapInterval 222
 : mouse-location ( view event -- loc )
     [
         -> locationInWindow f -> convertPoint:fromView:
-        [ CGPoint-x ] [ CGPoint-y ] bi
+        [ x>> ] [ y>> ] bi
     ] [ drop -> frame CGRect-h ] 2bi
     swap - [ >integer ] bi@ 2array ;

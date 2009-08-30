@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs heaps kernel namespaces sequences fry math
-math.order combinators arrays sorting compiler.utilities
+math.order combinators arrays sorting compiler.utilities locals
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.splitting
@@ -34,22 +34,48 @@ IN: compiler.cfg.linear-scan.allocation
         [ drop assign-blocked-register ]
     } cond ;
 
-: handle-interval ( live-interval -- )
-    [
-        start>>
+: handle-sync-point ( n -- )
+    [ active-intervals get values ] dip
+    [ '[ [ _ spill ] each ] each ]
+    [ drop [ delete-all ] each ]
+    2bi ;
+
+:: handle-progress ( n sync? -- )
+    n {
         [ progress set ]
         [ deactivate-intervals ]
-        [ activate-intervals ] tri
-    ] [ assign-register ] bi ;
+        [ sync? [ handle-sync-point ] [ drop ] if ]
+        [ activate-intervals ]
+    } cleave ;
+
+GENERIC: handle ( obj -- )
+
+M: live-interval handle ( live-interval -- )
+    [ start>> f handle-progress ] [ assign-register ] bi ;
+
+M: sync-point handle ( sync-point -- )
+    n>> t handle-progress ;
+
+: smallest-heap ( heap1 heap2 -- heap )
+    ! If heap1 and heap2 have the same key, favors heap1.
+    [ [ heap-peek nip ] bi@ <= ] most ;
 
 : (allocate-registers) ( -- )
-    unhandled-intervals get [ handle-interval ] slurp-heap ;
+    {
+        { [ unhandled-intervals get heap-empty? ] [ unhandled-sync-points get ] }
+        { [ unhandled-sync-points get heap-empty? ] [ unhandled-intervals get ] }
+        ! If a live interval begins at the same location as a sync point,
+        ! process the sync point before the live interval. This ensures that the
+        ! return value of C function calls doesn't get spilled and reloaded
+        ! unnecessarily.
+        [ unhandled-sync-points get unhandled-intervals get smallest-heap ]
+    } cond dup heap-empty? [ drop ] [ heap-pop drop handle (allocate-registers) ] if ;
 
 : finish-allocation ( -- )
     active-intervals inactive-intervals
     [ get values [ handled-intervals get push-all ] each ] bi@ ;
 
-: allocate-registers ( live-intervals machine-registers -- live-intervals )
+: allocate-registers ( live-intervals sync-point machine-registers -- live-intervals )
     init-allocator
     init-unhandled
     (allocate-registers)

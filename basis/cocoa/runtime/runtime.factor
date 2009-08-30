@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.syntax classes.struct ;
 IN: cocoa.runtime
 
 TYPEDEF: void* SEL
@@ -17,9 +17,9 @@ TYPEDEF: void* Class
 TYPEDEF: void* Method
 TYPEDEF: void* Protocol
 
-C-STRUCT: objc-super
-    { "id" "receiver" }
-    { "Class" "class" } ;
+STRUCT: objc-super
+    { receiver id }
+    { class Class } ;
 
 CONSTANT: CLS_CLASS        HEX: 1
 CONSTANT: CLS_META         HEX: 2

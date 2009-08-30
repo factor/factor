@@ -141,7 +141,9 @@ M: ##set-string-nth-fast rename-insn-temps
     TEMP-QUOT change-temp drop ;
 
 M: ##box-displaced-alien rename-insn-temps
-    TEMP-QUOT change-temp drop ;
+    TEMP-QUOT change-temp1
+    TEMP-QUOT change-temp2
+    drop ;
 
 M: ##compare rename-insn-temps
     TEMP-QUOT change-temp drop ;

@@ -1,27 +1,28 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel cocoa cocoa.types alien.c-types locals math
-sequences vectors fry libc destructors
-specialized-arrays.direct.alien ;
+USING: accessors kernel classes.struct cocoa cocoa.types alien.c-types
+locals math sequences vectors fry libc destructors ;
 IN: cocoa.enumeration
+
+<< "id" require-c-type-arrays >>
 
 CONSTANT: NS-EACH-BUFFER-SIZE 16
 
 : with-enumeration-buffers ( quot -- )
     '[
-        "NSFastEnumerationState" malloc-object &free
+        NSFastEnumerationState malloc-struct &free
         NS-EACH-BUFFER-SIZE "id" malloc-array &free
         NS-EACH-BUFFER-SIZE
         @
     ] with-destructors ; inline
 
 :: (NSFastEnumeration-each) ( object quot: ( elt -- ) state stackbuf count -- )
-    object state stackbuf count -> countByEnumeratingWithState:objects:count:
-    dup 0 = [ drop ] [
-        state NSFastEnumerationState-itemsPtr [ stackbuf ] unless*
-        swap <direct-void*-array> quot each
+    object state stackbuf count -> countByEnumeratingWithState:objects:count: :> items-count
+    items-count 0 = [
+        state itemsPtr>> [ items-count "id" <c-type-direct-array> ] [ stackbuf ] if* :> items
+        items-count iota [ items nth quot call ] each
         object quot state stackbuf count (NSFastEnumeration-each)
-    ] if ; inline recursive
+    ] unless ; inline recursive
 
 : NSFastEnumeration-each ( object quot -- )
     [ (NSFastEnumeration-each) ] with-enumeration-buffers ; inline
