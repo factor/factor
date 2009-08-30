@@ -10,21 +10,24 @@ IN: concurrency.messaging.tests
 
 [ "received" ] [ 
     [
-        receive "received" swap reply-synchronous
+        [ drop "received" ] handle-synchronous
     ] "Synchronous test" spawn
     "sent" swap send-synchronous
 ] unit-test
 
 [ "received" ] [ 
     [
-        receive "received" swap reply-synchronous
+        [ drop "received" ] handle-synchronous
     ] "Synchronous test" spawn
     [ 100 milliseconds "sent" ] dip send-synchronous-timeout
 ] unit-test
 
-[ [ 100 milliseconds sleep
-    receive "received" swap reply-synchronous ] "Synchronous test" spawn
-  [ 50 milliseconds "sent" ] dip send-synchronous-timeout
+[
+    [
+        100 milliseconds sleep
+        [ drop "received" ] handle-synchronous
+    ] "Synchronous test" spawn
+    [ 5 milliseconds "sent" ] dip send-synchronous-timeout
 ] [ wait-timeout? ] must-fail-with
 
 
@@ -77,3 +80,4 @@ SYMBOL: exit
 ! ] "Bad synchronous send" spawn "t" set
 
 ! [ 3 "t" get send-synchronous ] must-fail
+
