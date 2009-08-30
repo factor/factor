@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax kernel layouts
+USING: accessors alien.c-types alien.syntax classes.struct kernel layouts
 math math.rectangles arrays ;
 IN: core-graphics.types
 
@@ -12,63 +12,56 @@ IN: core-graphics.types
 : *CGFloat ( alien -- x )
     cell 4 = [ *float ] [ *double ] if ; inline
 
-C-STRUCT: CGPoint
-    { "CGFloat" "x" }
-    { "CGFloat" "y" } ;
+STRUCT: CGPoint
+    { x CGFloat }
+    { y CGFloat } ;
 
 : <CGPoint> ( x y -- point )
-    "CGPoint" <c-object>
-    [ set-CGPoint-y ] keep
-    [ set-CGPoint-x ] keep ;
+    CGPoint <struct-boa> ;
 
-C-STRUCT: CGSize
-    { "CGFloat" "w" }
-    { "CGFloat" "h" } ;
+STRUCT: CGSize
+    { w CGFloat }
+    { h CGFloat } ;
 
 : <CGSize> ( w h -- size )
-    "CGSize" <c-object>
-    [ set-CGSize-h ] keep
-    [ set-CGSize-w ] keep ;
+    CGSize <struct-boa> ;
 
-C-STRUCT: CGRect
-    { "CGPoint" "origin" }
-    { "CGSize"  "size"   } ;
+STRUCT: CGRect
+    { origin CGPoint }
+    { size   CGSize  } ;
 
 : CGPoint>loc ( CGPoint -- loc )
-    [ CGPoint-x ] [ CGPoint-y ] bi 2array ;
+    [ x>> ] [ y>> ] bi 2array ;
 
 : CGSize>dim ( CGSize -- dim )
-    [ CGSize-w ] [ CGSize-h ] bi 2array ;
+    [ w>> ] [ h>> ] bi 2array ;
 
 : CGRect>rect ( CGRect -- rect )
-    [ CGRect-origin CGPoint>loc ]
-    [ CGRect-size CGSize>dim ]
+    [ origin>> CGPoint>loc ]
+    [ size>>   CGSize>dim ]
     bi <rect> ; inline
 
 : CGRect-x ( CGRect -- x )
-    CGRect-origin CGPoint-x ; inline
+    origin>> x>> ; inline
 : CGRect-y ( CGRect -- y )
-    CGRect-origin CGPoint-y ; inline
+    origin>> y>> ; inline
 : CGRect-w ( CGRect -- w )
-    CGRect-size CGSize-w ; inline
+    size>> w>> ; inline
 : CGRect-h ( CGRect -- h )
-    CGRect-size CGSize-h ; inline
+    size>> h>> ; inline
 
 : set-CGRect-x ( x CGRect -- )
-    CGRect-origin set-CGPoint-x ; inline
+    origin>> (>>x) ; inline
 : set-CGRect-y ( y CGRect -- )
-    CGRect-origin set-CGPoint-y ; inline
+    origin>> (>>y) ; inline
 : set-CGRect-w ( w CGRect -- )
-    CGRect-size set-CGSize-w ; inline
+    size>> (>>w) ; inline
 : set-CGRect-h ( h CGRect -- )
-    CGRect-size set-CGSize-h ; inline
+    size>> (>>h) ; inline
 
 : <CGRect> ( x y w h -- rect )
-    "CGRect" <c-object>
-    [ set-CGRect-h ] keep
-    [ set-CGRect-w ] keep
-    [ set-CGRect-y ] keep
-    [ set-CGRect-x ] keep ;
+    [ CGPoint <struct-boa> ] [ CGSize <struct-boa> ] 2bi*
+    CGRect <struct-boa> ;
 
 : CGRect-x-y ( alien -- origin-x origin-y )
     [ CGRect-x ] [ CGRect-y ] bi ;
@@ -76,13 +69,13 @@ C-STRUCT: CGRect
 : CGRect-top-left ( alien -- x y )
     [ CGRect-x ] [ [ CGRect-y ] [ CGRect-h ] bi + ] bi ;
 
-C-STRUCT: CGAffineTransform
-    { "CGFloat" "a" }
-    { "CGFloat" "b" }
-    { "CGFloat" "c" }
-    { "CGFloat" "d" }
-    { "CGFloat" "tx" }
-    { "CGFloat" "ty" } ;
+STRUCT: CGAffineTransform
+    { a CGFloat }
+    { b CGFloat }
+    { c CGFloat }
+    { d CGFloat }
+    { tx CGFloat }
+    { ty CGFloat } ;
 
 TYPEDEF: void* CGColorRef
 TYPEDEF: void* CGColorSpaceRef

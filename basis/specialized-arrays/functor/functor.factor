@@ -13,6 +13,9 @@ M: bad-byte-array-length summary
 : (c-array) ( n c-type -- array )
     heap-size * (byte-array) ; inline
 
+: <c-array> ( n type -- array )
+    heap-size * <byte-array> ; inline
+
 FUNCTOR: define-array ( T -- )
 
 A            DEFINES-CLASS ${T}-array

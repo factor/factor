@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings arrays assocs
-continuations combinators compiler compiler.alien stack-checker kernel
-math namespaces make quotations sequences strings words
-cocoa.runtime io macros memoize io.encodings.utf8 effects libc
-libc.private lexer init core-foundation fry generalizations
-specialized-arrays.direct.alien ;
+classes.struct continuations combinators compiler compiler.alien
+stack-checker kernel math namespaces make quotations sequences
+strings words cocoa.runtime io macros memoize io.encodings.utf8
+effects libc libc.private lexer init core-foundation fry
+generalizations specialized-arrays.direct.alien ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -31,11 +31,8 @@ super-message-senders [ H{ } clone ] initialize
     bi ;
 
 : <super> ( receiver -- super )
-    "objc-super" <c-object> [
-        [ dup object_getClass class_getSuperclass ] dip
-        set-objc-super-class
-    ] keep
-    [ set-objc-super-receiver ] keep ;
+    [ ] [ object_getClass class_getSuperclass ] bi
+    objc-super <struct-boa> ;
 
 TUPLE: selector name object ;
 
