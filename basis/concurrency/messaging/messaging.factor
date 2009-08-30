@@ -120,14 +120,10 @@ M: cannot-send-synchronous-to-self summary
         '[ _ synchronous-reply? ] (receive-if-timeout) data>>
     ] if ;   
 
-<PRIVATE
-
 : reply-synchronous ( message synchronous -- )
     dup expired?
     [ 2drop ] 
     [ [ <reply> ] keep sender>> send ] if ;
-
-PRIVATE>
 
 : handle-synchronous ( quot -- )
     (receive) [
