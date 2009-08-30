@@ -49,8 +49,10 @@ M: struct equal?
 M: struct clone
     [ >c-ptr ] [ byte-length memory>byte-array ] [ class memory>struct ] tri ;
 
+<PRIVATE
 : (init-struct) ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
     '[ dup struct-prototype _ _ ?if ] keep memory>struct ; inline
+PRIVATE>
 
 : (malloc-struct) ( class -- struct )
     [ heap-size malloc ] keep memory>struct ; inline
@@ -74,6 +76,7 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
         ] bi
     ] [ ] output>sequence ;
 
+<PRIVATE
 : pad-struct-slots ( values class -- values' class )
     [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
@@ -90,6 +93,7 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 
 : (unboxer-quot) ( class -- quot )
     drop [ >c-ptr ] ;
+PRIVATE>
 
 M: struct-class boa>object
     swap pad-struct-slots
@@ -106,6 +110,7 @@ M: struct-class reader-quot
 M: struct-class writer-quot
     nip (writer-quot) ;
 
+<PRIVATE
 : struct-slot-values-quot ( class -- quot )
     struct-slots
     [ name>> reader-word 1quotation ] map
@@ -119,8 +124,6 @@ M: struct-class writer-quot
 : (define-byte-length-method) ( class -- )
     [ \ byte-length create-method-in ]
     [ heap-size \ drop swap [ ] 2sequence ] bi define ;
-
-! Struct as c-type
 
 : slot>field ( slot -- field )
     field-spec new swap {
@@ -163,6 +166,7 @@ M: struct-class writer-quot
 
 : struct-align ( slots -- align )
     [ c-type>> c-type-align ] [ max ] map-reduce ;
+PRIVATE>
 
 M: struct-class c-type
     name>> c-type ;
@@ -188,6 +192,7 @@ M: struct-class heap-size
 
 ! class definition
 
+<PRIVATE
 : make-struct-prototype ( class -- prototype )
     [ heap-size <byte-array> ]
     [ memory>struct ]
@@ -227,6 +232,7 @@ M: struct-class heap-size
         (struct-word-props)
     ]
     [ drop define-struct-for-class ] 2tri ; inline
+PRIVATE>
 
 : define-struct-class ( class slots -- )
     [ struct-offsets ] (define-struct-class) ;
@@ -236,6 +242,7 @@ M: struct-class heap-size
 
 ERROR: invalid-struct-slot token ;
 
+<PRIVATE
 : struct-slot-class ( c-type -- class' )
     c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
@@ -258,6 +265,7 @@ ERROR: invalid-struct-slot token ;
 
 : parse-struct-definition ( -- class slots )
     CREATE-CLASS 8 <vector> [ parse-struct-slots ] [ ] while >array ;
+PRIVATE>
 
 SYNTAX: STRUCT:
     parse-struct-definition define-struct-class ;
@@ -267,6 +275,9 @@ SYNTAX: UNION-STRUCT:
 SYNTAX: S{
     scan-word dup struct-slots parse-tuple-literal-slots parsed ;
 
+! functor support
+
+<PRIVATE
 : scan-c-type` ( -- c-type/param )
     scan dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;
 
@@ -288,6 +299,7 @@ SYNTAX: S{
         { "{" [ parse-struct-slot` t ] }
         [ invalid-struct-slot ]
     } case ;
+PRIVATE>
 
 FUNCTOR-SYNTAX: STRUCT:
     scan-param parsed
