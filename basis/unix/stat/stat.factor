@@ -1,5 +1,5 @@
 USING: kernel system combinators alien.syntax alien.c-types
-math io.backend.unix vocabs.loader unix ;
+math io.backend.unix vocabs.loader unix classes.struct ;
 IN: unix.stat
 
 ! File Types
@@ -15,8 +15,8 @@ CONSTANT: S_IFLNK  OCT: 120000   ! Symbolic link.
 CONSTANT: S_IFSOCK OCT: 140000   ! Socket.
 CONSTANT: S_IFWHT  OCT: 160000   ! Whiteout.
 
-C-STRUCT: fsid
-    { { "int" 2 } "__val" } ;
+STRUCT: fsid
+    { __val int[2] } ;
 
 TYPEDEF: fsid __fsid_t
 TYPEDEF: fsid fsid_t
@@ -30,7 +30,7 @@ TYPEDEF: fsid fsid_t
 } case >>
 
 : file-status ( pathname -- stat )
-    "stat" <c-object> [ [ stat ] unix-system-call drop ] keep ;
+    \ stat <struct> [ [ stat ] unix-system-call drop ] keep ;
 
 : link-status ( pathname -- stat )
-    "stat" <c-object> [ [ lstat ] unix-system-call drop ] keep ;
+    \ stat <struct> [ [ lstat ] unix-system-call drop ] keep ;

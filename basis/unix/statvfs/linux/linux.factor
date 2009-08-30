@@ -1,21 +1,21 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.syntax classes.struct ;
 IN: unix.statvfs.linux
 
-C-STRUCT: statvfs64
-    { "ulong" "f_bsize" }
-    { "ulong" "f_frsize" }
-    { "__fsblkcnt64_t" "f_blocks" }
-    { "__fsblkcnt64_t" "f_bfree" }
-    { "__fsblkcnt64_t" "f_bavail" }
-    { "__fsfilcnt64_t" "f_files" }
-    { "__fsfilcnt64_t" "f_ffree" }
-    { "__fsfilcnt64_t" "f_favail" }
-    { "ulong" "f_fsid" }
-    { "ulong" "f_flag" }
-    { "ulong" "f_namemax" }
-    { { "int" 6 } "__f_spare" } ;
+STRUCT: statvfs64
+    { f_bsize ulong }
+    { f_frsize ulong }
+    { f_blocks __fsblkcnt64_t }
+    { f_bfree __fsblkcnt64_t }
+    { f_bavail __fsblkcnt64_t }
+    { f_files __fsfilcnt64_t }
+    { f_ffree __fsfilcnt64_t }
+    { f_favail __fsfilcnt64_t }
+    { f_fsid ulong }
+    { f_flag ulong }
+    { f_namemax ulong }
+    { __f_spare int[6] } ;
 
 FUNCTION: int statvfs64 ( char* path, statvfs64* buf ) ;
 
