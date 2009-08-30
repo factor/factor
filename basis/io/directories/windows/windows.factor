@@ -4,7 +4,7 @@ USING: system io.directories io.encodings.utf16n alien.strings
 io.pathnames io.backend io.files.windows destructors
 kernel accessors calendar windows windows.errors
 windows.kernel32 alien.c-types sequences splitting
-fry continuations ;
+fry continuations classes.struct ;
 IN: io.directories.windows
 
 M: windows touch-file ( path -- )
@@ -33,12 +33,12 @@ M: windows delete-directory ( path -- )
     RemoveDirectory win32-error=0/f ;
 
 : find-first-file ( path -- WIN32_FIND_DATA handle )
-    "WIN32_FIND_DATA" <c-object>
+    WIN32_FIND_DATA <struct>
     [ nip ] [ FindFirstFile ] 2bi
     [ INVALID_HANDLE_VALUE = [ win32-error-string throw ] when ] keep ;
 
 : find-next-file ( path -- WIN32_FIND_DATA/f )
-    "WIN32_FIND_DATA" <c-object>
+    WIN32_FIND_DATA <struct>
     [ nip ] [ FindNextFile ] 2bi 0 = [
         GetLastError ERROR_NO_MORE_FILES = [
             win32-error
