@@ -10,7 +10,7 @@ STRUCT: stat
     { st_nlink nlink_t }
     { st_uid uid_t }
     { st_gid gid_t }
-    { st_rdev dev_ti }
+    { st_rdev dev_t }
     { st_lspare0 int32_t }
     { st_atimespec timespec }
     { st_mtimespec timespec }
