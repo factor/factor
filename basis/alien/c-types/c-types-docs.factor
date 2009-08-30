@@ -49,10 +49,10 @@ HELP: c-setter
 { $errors "Throws an error if the type does not exist." } ;
 
 HELP: <c-array>
-{ $deprecated "New code should use " { $link <c-type-array> } " or the " { $vocab-link "specialized-arrays" } " vocabularies." }
 { $values { "n" "a non-negative integer" } { "type" "a C type" } { "array" byte-array } }
 { $description "Creates a byte array large enough to hold " { $snippet "n" } " values of a C type." }
-{ $errors "Throws an error if the type does not exist or the requested size is negative." } ;
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-arrays } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary set for details on the underlying sequence type constructed." }
+{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
 
 HELP: <c-object>
 { $values { "type" "a C type" } { "array" byte-array } }
@@ -72,8 +72,8 @@ HELP: byte-array>memory
 
 HELP: malloc-array
 { $values { "n" "a non-negative integer" } { "type" "a C type" } { "alien" alien } }
-{ $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type, then wraps the memory in a sequence object using " { $link <c-type-direct-array> } "." }
-{ $notes "The appropriate direct specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-type-arrays } " word. See the " { $vocab-link "specialized-arrays.direct" } " vocabulary set for details on the underlying sequence type constructed." }
+{ $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type, then wraps the memory in a sequence object using " { $link <c-direct-array> } "." }
+{ $notes "The appropriate direct specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-arrays } " word. See the " { $vocab-link "specialized-arrays.direct" } " vocabulary set for details on the underlying sequence type constructed." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if the type does not exist, if the requested size is negative, if a direct specialized array class appropriate to the type is not loaded, or if memory allocation fails." } ;
 
@@ -89,7 +89,7 @@ HELP: malloc-byte-array
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if memory allocation fails." } ;
 
-{ <c-type-array> <c-type-direct-array> malloc-array } related-words
+{ <c-array> <c-direct-array> malloc-array } related-words
 
 HELP: box-parameter
 { $values { "n" integer } { "ctype" string } }
@@ -130,20 +130,15 @@ HELP: malloc-string
     }
 } ;
 
-HELP: require-c-type-arrays
+HELP: require-c-arrays
 { $values { "c-type" "a C type" } }
-{ $description { $link require } "s any unloaded vocabularies needed to construct a specialized array or direct array of " { $snippet "c-type" } " using the " { $link <c-type-array> } " or " { $link <c-type-direct-array> } " vocabularies." }
+{ $description { $link require } "s any unloaded vocabularies needed to construct a specialized array or direct array of " { $snippet "c-type" } " using the " { $link <c-array> } " or " { $link <c-direct-array> } " vocabularies." }
 { $notes "This word must be called inside a compilation unit. See the " { $vocab-link "specialized-arrays" } " and " { $vocab-link "specialized-arrays.direct" } " vocabulary sets for details on the underlying sequence types loaded." } ;
 
-HELP: <c-type-array>
-{ $values { "len" integer } { "c-type" "a C type" } { "array" "a specialized array" } }
-{ $description "Constructs a new specialized array of length " { $snippet "len" } " and element type " { $snippet "c-type" } "." }
-{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-type-arrays } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary set for details on the underlying sequence type constructed." } ;
-
-HELP: <c-type-direct-array>
+HELP: <c-direct-array>
 { $values { "alien" c-ptr } { "len" integer } { "c-type" "a C type" } { "array" "a specialized direct array" } }
 { $description "Constructs a new specialized array of length " { $snippet "len" } " and element type " { $snippet "c-type" } " over the range of memory referenced by " { $snippet "alien" } "." }
-{ $notes "The appropriate direct specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-type-arrays } " word. See the " { $vocab-link "specialized-arrays.direct" } " vocabulary set for details on the underlying sequence type constructed." } ;
+{ $notes "The appropriate direct specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-arrays } " word. See the " { $vocab-link "specialized-arrays.direct" } " vocabulary set for details on the underlying sequence type constructed." } ;
 
 ARTICLE: "c-strings" "C strings"
 "C string types are arrays with shape " { $snippet "{ \"char*\" encoding }" } ", where " { $snippet "encoding" } " is an encoding descriptor. The type " { $snippet "\"char*\"" } " is an alias for " { $snippet "{ \"char*\" utf8 }" } ". See " { $link "encodings-descriptors" } " for information about encoding descriptors."
