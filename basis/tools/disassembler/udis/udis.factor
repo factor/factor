@@ -3,7 +3,8 @@
 USING: tools.disassembler namespaces combinators
 alien alien.syntax alien.c-types lexer parser kernel
 sequences layouts math math.order alien.libraries
-math.parser system make fry arrays libc destructors ;
+math.parser system make fry arrays libc destructors
+tools.disassembler.utils splitting ;
 IN: tools.disassembler.udis
 
 <<
@@ -103,11 +104,13 @@ FUNCTION: char* ud_lookup_mnemonic ( int c ) ;
     dup UD_SYN_INTEL ud_set_syntax ;
 
 : with-ud ( quot: ( ud -- ) -- )
-    [ [ <ud> ] dip call ] with-destructors ; inline
+    [ [ [ <ud> ] dip call ] with-destructors ] with-words-xt ; inline
 
 SINGLETON: udis-disassembler
 
 : buf/len ( from to -- buf len ) [ drop <alien> ] [ swap - ] 2bi ;
+
+: resolve-call ( str -- str' ) "0x" split1-last [ resolve-xt append ] when* ;
 
 : format-disassembly ( lines -- lines' )
     dup [ second length ] [ max ] map-reduce
@@ -115,7 +118,7 @@ SINGLETON: udis-disassembler
         [
             [ first >hex cell 2 * CHAR: 0 pad-head % ": " % ]
             [ second _ CHAR: \s pad-tail % "  " % ]
-            [ third % ]
+            [ third resolve-call % ]
             tri
         ] "" make
     ] map ;
