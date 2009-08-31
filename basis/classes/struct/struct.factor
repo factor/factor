@@ -6,7 +6,7 @@ combinators combinators.short-circuit combinators.smart
 functors.backend fry generalizations generic.parser kernel
 kernel.private lexer libc locals macros make math math.order parser
 quotations sequences slots slots.private struct-arrays vectors
-words compiler.tree.propagation.transforms ;
+words compiler.tree.propagation.transforms specialized-arrays.direct.uchar ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
 
@@ -35,7 +35,10 @@ M: struct equal?
     {
         [ [ class ] bi@ = ]
         [ [ >c-ptr ] [ [ >c-ptr ] [ byte-length ] bi ] bi* memory= ]
-    } 2&& ;
+    } 2&& ; inline
+
+M: struct hashcode*
+    [ >c-ptr ] [ byte-length ] bi <direct-uchar-array> hashcode* ; inline    
 
 : struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
 
