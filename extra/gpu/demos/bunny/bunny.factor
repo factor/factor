@@ -1,11 +1,11 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien.c-types arrays combinators combinators.short-circuit
-game-worlds gpu gpu.buffers gpu.util.wasd gpu.framebuffers gpu.render
-gpu.shaders gpu.state gpu.textures gpu.util grouping http.client images
-images.loader io io.encodings.ascii io.files io.files.temp
-kernel math math.matrices math.parser math.vectors
-method-chains sequences specialized-arrays.float specialized-vectors.uint splitting
-struct-vectors threads ui ui.gadgets ui.gadgets.worlds
+USING: accessors alien.c-types arrays classes.struct combinators
+combinators.short-circuit game-worlds gpu gpu.buffers gpu.util.wasd
+gpu.framebuffers gpu.render gpu.shaders gpu.state gpu.textures gpu.util
+grouping http.client images images.loader io io.encodings.ascii io.files
+io.files.temp kernel math math.matrices math.parser math.vectors
+method-chains sequences specialized-arrays.float specialized-vectors.uint
+splitting struct-vectors threads ui ui.gadgets ui.gadgets.worlds
 ui.pixel-formats ;
 IN: gpu.demos.bunny
 
@@ -73,9 +73,8 @@ UNIFORM-TUPLE: loading-uniforms
     " " split [ string>number ] map sift ;
 
 : <bunny-vertex> ( vertex -- struct )
-    >float-array
-    "bunny-vertex-struct" <c-object>
-    [ set-bunny-vertex-struct-vertex ] keep ;
+    bunny-vertex-struct <struct>
+        swap >float-array >>vertex ; inline
 
 : (parse-bunny-model) ( vs is -- vs is )
     readln [
@@ -87,7 +86,7 @@ UNIFORM-TUPLE: loading-uniforms
     ] when* ;
 
 : parse-bunny-model ( -- vertexes indexes )
-    100000 "bunny-vertex-struct" <struct-vector>
+    100000 bunny-vertex-struct <struct-vector>
     100000 <uint-vector>
     (parse-bunny-model) ;
 
@@ -98,23 +97,15 @@ UNIFORM-TUPLE: loading-uniforms
 
 : calc-bunny-normal ( vertexes indexes -- )
     swap
-    [ [ nth bunny-vertex-struct-vertex ] curry { } map-as normal ]
-    [
-        [
-            nth [ bunny-vertex-struct-normal v+ ] keep
-            set-bunny-vertex-struct-normal
-        ] curry with each
-    ] 2bi ;
+    [ [ nth vertex>> ] curry { } map-as normal ]
+    [ [ nth [ v+ ] change-normal drop ] curry with each ] 2bi ;
 
 : calc-bunny-normals ( vertexes indexes -- )
     3 <groups>
     [ calc-bunny-normal ] with each ;
 
 : normalize-bunny-normals ( vertexes -- )
-    [
-        [ bunny-vertex-struct-normal normalize ] keep
-        set-bunny-vertex-struct-normal
-    ] each ;
+    [ [ normalize ] change-normal drop ] each ;
 
 : bunny-data ( filename -- vertexes indexes )
     ascii [ parse-bunny-model ] with-file-reader

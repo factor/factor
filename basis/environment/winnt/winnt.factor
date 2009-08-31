@@ -6,10 +6,10 @@ alien.c-types sequences windows.errors io.streams.memory
 io.encodings io ;
 IN: environment.winnt
 
-<< "TCHAR" require-c-type-arrays >>
+<< "TCHAR" require-c-arrays >>
 
 M: winnt os-env ( key -- value )
-    MAX_UNICODE_PATH "TCHAR" <c-type-array>
+    MAX_UNICODE_PATH "TCHAR" <c-array>
     [ dup length GetEnvironmentVariable ] keep over 0 = [
         2drop f
     ] [

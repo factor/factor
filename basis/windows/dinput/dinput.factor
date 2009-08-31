@@ -1,5 +1,6 @@
 USING: windows.kernel32 windows.ole32 windows.com windows.com.syntax
-alien alien.c-types alien.syntax kernel system namespaces math ;
+alien alien.c-types alien.syntax kernel system namespaces math
+classes.struct ;
 IN: windows.dinput
 
 LIBRARY: dinput
@@ -35,291 +36,293 @@ TYPEDEF: void* LPDIENUMDEVICEOBJECTSCALLBACKW
 
 TYPEDEF: DWORD D3DCOLOR
 
-C-STRUCT: DIDEVICEINSTANCEW
-    { "DWORD"      "dwSize" }
-    { "GUID"       "guidInstance" }
-    { "GUID"       "guidProduct" }
-    { "DWORD"      "dwDevType" }
-    { "WCHAR[260]" "tszInstanceName" }
-    { "WCHAR[260]" "tszProductName" }
-    { "GUID"       "guidFFDriver" }
-    { "WORD"       "wUsagePage" }
-    { "WORD"       "wUsage" } ;
+STRUCT: DIDEVICEINSTANCEW
+    { dwSize          DWORD      }
+    { guidInstance    GUID       }
+    { guidProduct     GUID       }
+    { dwDevType       DWORD      }
+    { tszInstanceName WCHAR[260] }
+    { tszProductName  WCHAR[260] }
+    { guidFFDriver    GUID       }
+    { wUsagePage      WORD       }
+    { wUsage          WORD       } ;
 TYPEDEF: DIDEVICEINSTANCEW* LPDIDEVICEINSTANCEW
 TYPEDEF: DIDEVICEINSTANCEW* LPCDIDEVICEINSTANCEW
-C-UNION: DIACTION-union "LPCWSTR" "UINT" ;
-C-STRUCT: DIACTIONW
-    { "UINT_PTR"       "uAppData" }
-    { "DWORD"          "dwSemantic" }
-    { "DWORD"          "dwFlags" }
-    { "DIACTION-union" "lptszActionName-or-uResIdString" }
-    { "GUID"           "guidInstance" }
-    { "DWORD"          "dwObjID" }
-    { "DWORD"          "dwHow" } ;
+UNION-STRUCT: DIACTION-union
+    { lptszActionName LPCWSTR }
+    { uResIdString    UINT    } ;
+STRUCT: DIACTIONW
+    { uAppData     UINT_PTR       }
+    { dwSemantic   DWORD          }
+    { dwFlags      DWORD          }
+    { union        DIACTION-union }
+    { guidInstance GUID           }
+    { dwObjID      DWORD          }
+    { dwHow        DWORD          } ;
 TYPEDEF: DIACTIONW* LPDIACTIONW
 TYPEDEF: DIACTIONW* LPCDIACTIONW
-C-STRUCT: DIACTIONFORMATW
-    { "DWORD"       "dwSize" }
-    { "DWORD"       "dwActionSize" }
-    { "DWORD"       "dwDataSize" }
-    { "DWORD"       "dwNumActions" }
-    { "LPDIACTIONW" "rgoAction" }
-    { "GUID"        "guidActionMap" }
-    { "DWORD"       "dwGenre" }
-    { "DWORD"       "dwBufferSize" }
-    { "LONG"        "lAxisMin" }
-    { "LONG"        "lAxisMax" }
-    { "HINSTANCE"   "hInstString" }
-    { "FILETIME"    "ftTimeStamp" }
-    { "DWORD"       "dwCRC" }
-    { "WCHAR[260]"  "tszActionMap" } ;
+STRUCT: DIACTIONFORMATW
+    { dwSize        DWORD       }
+    { dwActionSize  DWORD       }
+    { dwDataSize    DWORD       }
+    { dwNumActions  DWORD       }
+    { rgoAction     LPDIACTIONW }
+    { guidActionMap GUID        }
+    { dwGenre       DWORD       }
+    { dwBufferSize  DWORD       }
+    { lAxisMin      LONG        }
+    { lAxisMax      LONG        }
+    { hInstString   HINSTANCE   }
+    { ftTimeStamp   FILETIME    }
+    { dwCRC         DWORD       }
+    { tszActionMap  WCHAR[260]  } ;
 TYPEDEF: DIACTIONFORMATW* LPDIACTIONFORMATW
 TYPEDEF: DIACTIONFORMATW* LPCDIACTIONFORMATW
-C-STRUCT: DICOLORSET
-    { "DWORD"    "dwSize" }
-    { "D3DCOLOR" "cTextFore" }
-    { "D3DCOLOR" "cTextHighlight" }
-    { "D3DCOLOR" "cCalloutLine" }
-    { "D3DCOLOR" "cCalloutHighlight" }
-    { "D3DCOLOR" "cBorder" }
-    { "D3DCOLOR" "cControlFill" }
-    { "D3DCOLOR" "cHighlightFill" }
-    { "D3DCOLOR" "cAreaFill" } ;
+STRUCT: DICOLORSET
+    { dwSize            DWORD    }
+    { cTextFore         D3DCOLOR }
+    { cTextHighlight    D3DCOLOR }
+    { cCalloutLine      D3DCOLOR }
+    { cCalloutHighlight D3DCOLOR }
+    { cBorder           D3DCOLOR }
+    { cControlFill      D3DCOLOR }
+    { cHighlightFill    D3DCOLOR }
+    { cAreaFill         D3DCOLOR } ;
 TYPEDEF: DICOLORSET* LPDICOLORSET
 TYPEDEF: DICOLORSET* LPCDICOLORSET
 
-C-STRUCT: DICONFIGUREDEVICESPARAMSW
-    { "DWORD"             "dwSize" }
-    { "DWORD"             "dwcUsers" }
-    { "LPWSTR"            "lptszUserNames" }
-    { "DWORD"             "dwcFormats" }
-    { "LPDIACTIONFORMATW" "lprgFormats" }
-    { "HWND"              "hwnd" }
-    { "DICOLORSET"        "dics" }
-    { "IUnknown*"         "lpUnkDDSTarget" } ;
+STRUCT: DICONFIGUREDEVICESPARAMSW
+    { dwSize         DWORD             }
+    { dwcUsers       DWORD             }
+    { lptszUserNames LPWSTR            }
+    { dwcFormats     DWORD             }
+    { lprgFormats    LPDIACTIONFORMATW }
+    { hwnd           HWND              }
+    { dics           DICOLORSET        }
+    { lpUnkDDSTarget IUnknown*         } ;
 TYPEDEF: DICONFIGUREDEVICESPARAMSW* LPDICONFIGUREDEVICESPARAMSW
 TYPEDEF: DICONFIGUREDEVICESPARAMSW* LPDICONFIGUREDEVICESPARAMSW
 
-C-STRUCT: DIDEVCAPS
-    { "DWORD" "dwSize" }
-    { "DWORD" "dwFlags" }
-    { "DWORD" "dwDevType" }
-    { "DWORD" "dwAxes" }
-    { "DWORD" "dwButtons" }
-    { "DWORD" "dwPOVs" }
-    { "DWORD" "dwFFSamplePeriod" }
-    { "DWORD" "dwFFMinTimeResolution" }
-    { "DWORD" "dwFirmwareRevision" }
-    { "DWORD" "dwHardwareRevision" }
-    { "DWORD" "dwFFDriverVersion" } ;
+STRUCT: DIDEVCAPS
+    { dwSize DWORD }
+    { dwFlags DWORD }
+    { dwDevType DWORD }
+    { dwAxes DWORD }
+    { dwButtons DWORD }
+    { dwPOVs DWORD }
+    { dwFFSamplePeriod DWORD }
+    { dwFFMinTimeResolution DWORD }
+    { dwFirmwareRevision DWORD }
+    { dwHardwareRevision DWORD }
+    { dwFFDriverVersion DWORD } ;
 TYPEDEF: DIDEVCAPS* LPDIDEVCAPS
 TYPEDEF: DIDEVCAPS* LPCDIDEVCAPS
-C-STRUCT: DIDEVICEOBJECTINSTANCEW
-    { "DWORD" "dwSize" }
-    { "GUID" "guidType" }
-    { "DWORD" "dwOfs" }
-    { "DWORD" "dwType" }
-    { "DWORD" "dwFlags" }
-    { "WCHAR[260]" "tszName" }
-    { "DWORD" "dwFFMaxForce" }
-    { "DWORD" "dwFFForceResolution" }
-    { "WORD" "wCollectionNumber" }
-    { "WORD" "wDesignatorIndex" }
-    { "WORD" "wUsagePage" }
-    { "WORD" "wUsage" }
-    { "DWORD" "dwDimension" }
-    { "WORD" "wExponent" }
-    { "WORD" "wReportId" } ;
+STRUCT: DIDEVICEOBJECTINSTANCEW
+    { dwSize DWORD }
+    { guidType GUID }
+    { dwOfs DWORD }
+    { dwType DWORD }
+    { dwFlags DWORD }
+    { tszName WCHAR[260] }
+    { dwFFMaxForce DWORD }
+    { dwFFForceResolution DWORD }
+    { wCollectionNumber WORD }
+    { wDesignatorIndex WORD }
+    { wUsagePage WORD }
+    { wUsage WORD }
+    { dwDimension DWORD }
+    { wExponent WORD }
+    { wReportId WORD } ;
 TYPEDEF: DIDEVICEOBJECTINSTANCEW* LPDIDEVICEOBJECTINSTANCEW
 TYPEDEF: DIDEVICEOBJECTINSTANCEW* LPCDIDEVICEOBJECTINSTANCEW
-C-STRUCT: DIDEVICEOBJECTDATA
-    { "DWORD"    "dwOfs" }
-    { "DWORD"    "dwData" }
-    { "DWORD"    "dwTimeStamp" }
-    { "DWORD"    "dwSequence" }
-    { "UINT_PTR" "uAppData" } ;
+STRUCT: DIDEVICEOBJECTDATA
+    { dwOfs DWORD    }
+    { dwData DWORD    }
+    { dwTimeStamp DWORD    }
+    { dwSequence DWORD    }
+    { uAppData UINT_PTR } ;
 TYPEDEF: DIDEVICEOBJECTDATA* LPDIDEVICEOBJECTDATA
 TYPEDEF: DIDEVICEOBJECTDATA* LPCDIDEVICEOBJECTDATA
-C-STRUCT: DIOBJECTDATAFORMAT
-    { "GUID*" "pguid" }
-    { "DWORD" "dwOfs" }
-    { "DWORD" "dwType" }
-    { "DWORD" "dwFlags" } ;
+STRUCT: DIOBJECTDATAFORMAT
+    { pguid GUID* }
+    { dwOfs DWORD }
+    { dwType DWORD }
+    { dwFlags DWORD } ;
 TYPEDEF: DIOBJECTDATAFORMAT* LPDIOBJECTDATAFORMAT
 TYPEDEF: DIOBJECTDATAFORMAT* LPCDIOBJECTDATAFORMAT
-C-STRUCT: DIDATAFORMAT
-    { "DWORD" "dwSize" }
-    { "DWORD" "dwObjSize" }
-    { "DWORD" "dwFlags" }
-    { "DWORD" "dwDataSize" }
-    { "DWORD" "dwNumObjs" }
-    { "LPDIOBJECTDATAFORMAT" "rgodf" } ;
+STRUCT: DIDATAFORMAT
+    { dwSize DWORD }
+    { dwObjSize DWORD }
+    { dwFlags DWORD }
+    { dwDataSize DWORD }
+    { dwNumObjs DWORD }
+    { rgodf LPDIOBJECTDATAFORMAT } ;
 TYPEDEF: DIDATAFORMAT* LPDIDATAFORMAT
 TYPEDEF: DIDATAFORMAT* LPCDIDATAFORMAT
-C-STRUCT: DIPROPHEADER
-    { "DWORD" "dwSize" }
-    { "DWORD" "dwHeaderSize" }
-    { "DWORD" "dwObj" }
-    { "DWORD" "dwHow" } ;
+STRUCT: DIPROPHEADER
+    { dwSize DWORD }
+    { dwHeaderSize DWORD }
+    { dwObj DWORD }
+    { dwHow DWORD } ;
 TYPEDEF: DIPROPHEADER* LPDIPROPHEADER
 TYPEDEF: DIPROPHEADER* LPCDIPROPHEADER
-C-STRUCT: DIPROPDWORD
-    { "DIPROPHEADER" "diph" }
-    { "DWORD"        "dwData" } ;
+STRUCT: DIPROPDWORD
+    { diph DIPROPHEADER }
+    { dwData DWORD        } ;
 TYPEDEF: DIPROPDWORD* LPDIPROPDWORD
 TYPEDEF: DIPROPDWORD* LPCDIPROPDWORD
-C-STRUCT: DIPROPPOINTER
-    { "DIPROPHEADER" "diph" }
-    { "UINT_PTR" "uData" } ;
+STRUCT: DIPROPPOINTER
+    { diph DIPROPHEADER }
+    { uData UINT_PTR } ;
 TYPEDEF: DIPROPPOINTER* LPDIPROPPOINTER
 TYPEDEF: DIPROPPOINTER* LPCDIPROPPOINTER
-C-STRUCT: DIPROPRANGE
-    { "DIPROPHEADER" "diph" }
-    { "LONG" "lMin" }
-    { "LONG" "lMax" } ;
+STRUCT: DIPROPRANGE
+    { diph DIPROPHEADER }
+    { lMin LONG }
+    { lMax LONG } ;
 TYPEDEF: DIPROPRANGE* LPDIPROPRANGE
 TYPEDEF: DIPROPRANGE* LPCDIPROPRANGE
-C-STRUCT: DIPROPCAL
-    { "DIPROPHEADER" "diph" }
-    { "LONG" "lMin" }
-    { "LONG" "lCenter" }
-    { "LONG" "lMax" } ;
+STRUCT: DIPROPCAL
+    { diph DIPROPHEADER }
+    { lMin LONG }
+    { lCenter LONG }
+    { lMax LONG } ;
 TYPEDEF: DIPROPCAL* LPDIPROPCAL
 TYPEDEF: DIPROPCAL* LPCDIPROPCAL
-C-STRUCT: DIPROPGUIDANDPATH
-    { "DIPROPHEADER" "diph" }
-    { "GUID" "guidClass" }
-    { "WCHAR[260]"   "wszPath" } ;
+STRUCT: DIPROPGUIDANDPATH
+    { diph DIPROPHEADER }
+    { guidClass GUID }
+    { wszPath WCHAR[260]   } ;
 TYPEDEF: DIPROPGUIDANDPATH* LPDIPROPGUIDANDPATH
 TYPEDEF: DIPROPGUIDANDPATH* LPCDIPROPGUIDANDPATH
-C-STRUCT: DIPROPSTRING
-    { "DIPROPHEADER" "diph" }
-    { "WCHAR[260]"   "wsz" } ;
+STRUCT: DIPROPSTRING
+    { diph DIPROPHEADER }
+    { wsz WCHAR[260]   } ;
 TYPEDEF: DIPROPSTRING* LPDIPROPSTRING
 TYPEDEF: DIPROPSTRING* LPCDIPROPSTRING
-C-STRUCT: CPOINT
-    { "LONG" "lP" }
-    { "DWORD" "dwLog" } ;
-C-STRUCT: DIPROPCPOINTS
-    { "DIPROPHEADER" "diph" }
-    { "DWORD" "dwCPointsNum" }
-    { "CPOINT[8]" "cp" } ;
+STRUCT: CPOINT
+    { lP LONG }
+    { dwLog DWORD } ;
+STRUCT: DIPROPCPOINTS
+    { diph DIPROPHEADER }
+    { dwCPointsNum DWORD }
+    { cp CPOINT[8] } ;
 TYPEDEF: DIPROPCPOINTS* LPDIPROPCPOINTS
 TYPEDEF: DIPROPCPOINTS* LPCDIPROPCPOINTS
-C-STRUCT: DIENVELOPE
-    { "DWORD" "dwSize" }
-    { "DWORD" "dwAttackLevel" }
-    { "DWORD" "dwAttackTime" }
-    { "DWORD" "dwFadeLevel" }
-    { "DWORD" "dwFadeTime" } ;
+STRUCT: DIENVELOPE
+    { dwSize DWORD }
+    { dwAttackLevel DWORD }
+    { dwAttackTime DWORD }
+    { dwFadeLevel DWORD }
+    { dwFadeTime DWORD } ;
 TYPEDEF: DIENVELOPE* LPDIENVELOPE
 TYPEDEF: DIENVELOPE* LPCDIENVELOPE
-C-STRUCT: DIEFFECT
-    { "DWORD" "dwSize" }
-    { "DWORD" "dwFlags" }
-    { "DWORD" "dwDuration" }
-    { "DWORD" "dwSamplePeriod" }
-    { "DWORD" "dwGain" }
-    { "DWORD" "dwTriggerButton" }
-    { "DWORD" "dwTriggerRepeatInterval" }
-    { "DWORD" "cAxes" }
-    { "LPDWORD" "rgdwAxes" }
-    { "LPLONG" "rglDirection" }
-    { "LPDIENVELOPE" "lpEnvelope" }
-    { "DWORD" "cbTypeSpecificParams" }
-    { "LPVOID" "lpvTypeSpecificParams" }
-    { "DWORD" "dwStartDelay" } ;
+STRUCT: DIEFFECT
+    { dwSize DWORD }
+    { dwFlags DWORD }
+    { dwDuration DWORD }
+    { dwSamplePeriod DWORD }
+    { dwGain DWORD }
+    { dwTriggerButton DWORD }
+    { dwTriggerRepeatInterval DWORD }
+    { cAxes DWORD }
+    { rgdwAxes LPDWORD }
+    { rglDirection LPLONG }
+    { lpEnvelope LPDIENVELOPE }
+    { cbTypeSpecificParams DWORD }
+    { lpvTypeSpecificParams LPVOID }
+    { dwStartDelay DWORD } ;
 TYPEDEF: DIEFFECT* LPDIEFFECT
 TYPEDEF: DIEFFECT* LPCDIEFFECT
-C-STRUCT: DIEFFECTINFOW
-    { "DWORD"      "dwSize" }
-    { "GUID"       "guid" }
-    { "DWORD"      "dwEffType" }
-    { "DWORD"      "dwStaticParams" }
-    { "DWORD"      "dwDynamicParams" }
-    { "WCHAR[260]" "tszName" } ;
+STRUCT: DIEFFECTINFOW
+    { dwSize          DWORD      }
+    { guid            GUID       }
+    { dwEffType       DWORD      }
+    { dwStaticParams  DWORD      }
+    { dwDynamicParams DWORD      }
+    { tszName         WCHAR[260] } ;
 TYPEDEF: DIEFFECTINFOW* LPDIEFFECTINFOW
 TYPEDEF: DIEFFECTINFOW* LPCDIEFFECTINFOW
-C-STRUCT: DIEFFESCAPE
-    { "DWORD"  "dwSize" }
-    { "DWORD"  "dwCommand" }
-    { "LPVOID" "lpvInBuffer" }
-    { "DWORD"  "cbInBuffer" }
-    { "LPVOID" "lpvOutBuffer" }
-    { "DWORD"  "cbOutBuffer" } ;
+STRUCT: DIEFFESCAPE
+    { dwSize       DWORD  }
+    { dwCommand    DWORD  }
+    { lpvInBuffer  LPVOID }
+    { cbInBuffer   DWORD  }
+    { lpvOutBuffer LPVOID }
+    { cbOutBuffer  DWORD  } ;
 TYPEDEF: DIEFFESCAPE* LPDIEFFESCAPE
 TYPEDEF: DIEFFESCAPE* LPCDIEFFESCAPE
-C-STRUCT: DIFILEEFFECT
-    { "DWORD"       "dwSize" }
-    { "GUID"        "GuidEffect" }
-    { "LPCDIEFFECT" "lpDiEffect" }
-    { "CHAR[260]"   "szFriendlyName" } ;
+STRUCT: DIFILEEFFECT
+    { dwSize         DWORD       }
+    { GuidEffect     GUID        }
+    { lpDiEffect     LPCDIEFFECT }
+    { szFriendlyName CHAR[260]   } ;
 TYPEDEF: DIFILEEFFECT* LPDIFILEEFFECT
 TYPEDEF: DIFILEEFFECT* LPCDIFILEEFFECT
-C-STRUCT: DIDEVICEIMAGEINFOW
-    { "WCHAR[260]" "tszImagePath" }
-    { "DWORD"      "dwFlags" }
-    { "DWORD"      "dwViewID" }
-    { "RECT"       "rcOverlay" }
-    { "DWORD"      "dwObjID" }
-    { "DWORD"      "dwcValidPts" }
-    { "POINT[5]"   "rgptCalloutLine" }
-    { "RECT"       "rcCalloutRect" }
-    { "DWORD"      "dwTextAlign" } ;
+STRUCT: DIDEVICEIMAGEINFOW
+    { tszImagePath    WCHAR[260] }
+    { dwFlags         DWORD      }
+    { dwViewID        DWORD      }
+    { rcOverlay       RECT       }
+    { dwObjID         DWORD      }
+    { dwcValidPts     DWORD      }
+    { rgptCalloutLine POINT[5]   }
+    { rcCalloutRect   RECT       }
+    { dwTextAlign     DWORD      } ;
 TYPEDEF: DIDEVICEIMAGEINFOW* LPDIDEVICEIMAGEINFOW
 TYPEDEF: DIDEVICEIMAGEINFOW* LPCDIDEVICEIMAGEINFOW
-C-STRUCT: DIDEVICEIMAGEINFOHEADERW
-    { "DWORD" "dwSize" }
-    { "DWORD" "dwSizeImageInfo" }
-    { "DWORD" "dwcViews" }
-    { "DWORD" "dwcButtons" }
-    { "DWORD" "dwcAxes" }
-    { "DWORD" "dwcPOVs" }
-    { "DWORD" "dwBufferSize" }
-    { "DWORD" "dwBufferUsed" }
-    { "DIDEVICEIMAGEINFOW*" "lprgImageInfoArray" } ;
+STRUCT: DIDEVICEIMAGEINFOHEADERW
+    { dwSize          DWORD }
+    { dwSizeImageInfo DWORD }
+    { dwcViews        DWORD }
+    { dwcButtons      DWORD }
+    { dwcAxes         DWORD }
+    { dwcPOVs         DWORD }
+    { dwBufferSize    DWORD }
+    { dwBufferUsed    DWORD }
+    { lprgImageInfoArray DIDEVICEIMAGEINFOW* } ;
 TYPEDEF: DIDEVICEIMAGEINFOHEADERW* LPDIDEVICEIMAGEINFOHEADERW
 TYPEDEF: DIDEVICEIMAGEINFOHEADERW* LPCDIDEVICEIMAGEINFOHEADERW
 
-C-STRUCT: DIMOUSESTATE2
-    { "LONG"    "lX" }
-    { "LONG"    "lY" }
-    { "LONG"    "lZ" }
-    { "BYTE[8]" "rgbButtons" } ;
+STRUCT: DIMOUSESTATE2
+    { lX         LONG    }
+    { lY         LONG    }
+    { lZ         LONG    }
+    { rgbButtons BYTE[8] } ;
 TYPEDEF: DIMOUSESTATE2* LPDIMOUSESTATE2
 TYPEDEF: DIMOUSESTATE2* LPCDIMOUSESTATE2
 
-C-STRUCT: DIJOYSTATE2
-    { "LONG"      "lX" }
-    { "LONG"      "lY" }
-    { "LONG"      "lZ" }
-    { "LONG"      "lRx" }
-    { "LONG"      "lRy" }
-    { "LONG"      "lRz" }
-    { "LONG[2]"   "rglSlider" }
-    { "DWORD[4]"  "rgdwPOV" }
-    { "BYTE[128]" "rgbButtons" }
-    { "LONG"      "lVX" }
-    { "LONG"      "lVY" }
-    { "LONG"      "lVZ" }
-    { "LONG"      "lVRx" }
-    { "LONG"      "lVRy" }
-    { "LONG"      "lVRz" }
-    { "LONG[2]"   "rglVSlider" }
-    { "LONG"      "lAX" }
-    { "LONG"      "lAY" }
-    { "LONG"      "lAZ" }
-    { "LONG"      "lARx" }
-    { "LONG"      "lARy" }
-    { "LONG"      "lARz" }
-    { "LONG[2]"   "rglASlider" }
-    { "LONG"      "lFX" }
-    { "LONG"      "lFY" }
-    { "LONG"      "lFZ" }
-    { "LONG"      "lFRx" }
-    { "LONG"      "lFRy" }
-    { "LONG"      "lFRz" }
-    { "LONG[2]"   "rglFSlider" } ;
+STRUCT: DIJOYSTATE2
+    { lX         LONG      }
+    { lY         LONG      }
+    { lZ         LONG      }
+    { lRx        LONG      }
+    { lRy        LONG      }
+    { lRz        LONG      }
+    { rglSlider  LONG[2]   }
+    { rgdwPOV    DWORD[4]  }
+    { rgbButtons BYTE[128] }
+    { lVX        LONG      }
+    { lVY        LONG      }
+    { lVZ        LONG      }
+    { lVRx       LONG      }
+    { lVRy       LONG      }
+    { lVRz       LONG      }
+    { rglVSlider LONG[2]   }
+    { lAX        LONG      }
+    { lAY        LONG      }
+    { lAZ        LONG      }
+    { lARx       LONG      }
+    { lARy       LONG      }
+    { lARz       LONG      }
+    { rglASlider LONG[2]   }
+    { lFX        LONG      }
+    { lFY        LONG      }
+    { lFZ        LONG      }
+    { lFRx       LONG      }
+    { lFRy       LONG      }
+    { lFRz       LONG      }
+    { rglFSlider LONG[2]   } ;
 TYPEDEF: DIJOYSTATE2* LPDIJOYSTATE2
 TYPEDEF: DIJOYSTATE2* LPCDIJOYSTATE2
 
