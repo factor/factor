@@ -5,7 +5,7 @@ USING: arrays sequences alien alien.c-types alien.destructors
 alien.syntax math math.functions math.vectors destructors combinators
 colors fonts accessors assocs namespaces kernel pango pango.fonts
 pango.cairo cairo cairo.ffi glib unicode.data images cache init
-math.rectangles fry memoize io.encodings.utf8 ;
+math.rectangles fry memoize io.encodings.utf8 classes.struct ;
 IN: pango.layouts
 
 LIBRARY: pango
@@ -84,8 +84,8 @@ SYMBOL: dpi
     [ set-layout-text ] keep ;
 
 : layout-extents ( layout -- ink-rect logical-rect )
-    "PangoRectangle" <c-object>
-    "PangoRectangle" <c-object>
+    PangoRectangle <struct>
+    PangoRectangle <struct>
     [ pango_layout_get_extents ] 2keep
     [ PangoRectangle>rect ] bi@ ;
 
