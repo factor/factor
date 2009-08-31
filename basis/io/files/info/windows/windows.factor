@@ -36,20 +36,17 @@ TUPLE: windows-file-info < file-info attributes ;
 : WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
     [ \ windows-file-info new ] dip
     {
-        [ WIN32_FIND_DATA-dwFileAttributes win32-file-type >>type ]
-        [ WIN32_FIND_DATA-dwFileAttributes win32-file-attributes >>attributes ]
-        [
-            [ WIN32_FIND_DATA-nFileSizeLow ]
-            [ WIN32_FIND_DATA-nFileSizeHigh ] bi >64bit >>size
-        ]
-        [ WIN32_FIND_DATA-dwFileAttributes >>permissions ]
-        [ WIN32_FIND_DATA-ftCreationTime FILETIME>timestamp >>created ]
-        [ WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp >>modified ]
-        [ WIN32_FIND_DATA-ftLastAccessTime FILETIME>timestamp >>accessed ]
+        [ dwFileAttributes>> win32-file-type >>type ]
+        [ dwFileAttributes>> win32-file-attributes >>attributes ]
+        [ [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit >>size ]
+        [ dwFileAttributes>> >>permissions ]
+        [ ftCreationTime>> FILETIME>timestamp >>created ]
+        [ ftLastWriteTime>> FILETIME>timestamp >>modified ]
+        [ ftLastAccessTime>> FILETIME>timestamp >>accessed ]
     } cleave ;
 
 : find-first-file-stat ( path -- WIN32_FIND_DATA )
-    "WIN32_FIND_DATA" <c-object> [
+    WIN32_FIND_DATA <struct> [
         FindFirstFile
         [ INVALID_HANDLE_VALUE = [ win32-error ] when ] keep
         FindClose win32-error=0/f

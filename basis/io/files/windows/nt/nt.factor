@@ -5,7 +5,7 @@ windows.kernel32 kernel libc math threads system environment
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.short-circuit ascii splitting alien strings assocs
 namespaces make accessors tr windows.time windows.shell32
-windows.errors specialized-arrays.ushort ;
+windows.errors specialized-arrays.ushort classes.struct ;
 IN: io.files.windows.nt
 
 M: winnt cwd
@@ -16,8 +16,7 @@ M: winnt cwd
 M: winnt cd
     SetCurrentDirectory win32-error=0/f ;
 
-: unicode-prefix ( -- seq )
-    "\\\\?\\" ; inline
+CONSTANT: unicode-prefix "\\\\?\\"
 
 M: winnt root-directory? ( path -- ? )
     {
@@ -48,10 +47,9 @@ M: winnt CreateFile-flags ( DWORD -- DWORD )
 <PRIVATE
 
 : windows-file-size ( path -- size )
-    normalize-path 0 "WIN32_FILE_ATTRIBUTE_DATA" <c-object>
+    normalize-path 0 WIN32_FILE_ATTRIBUTE_DATA <struct>
     [ GetFileAttributesEx win32-error=0/f ] keep
-    [ WIN32_FILE_ATTRIBUTE_DATA-nFileSizeLow ]
-    [ WIN32_FILE_ATTRIBUTE_DATA-nFileSizeHigh ] bi >64bit ;
+    [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit ;
 
 PRIVATE>
 

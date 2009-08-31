@@ -21,24 +21,24 @@ IN: system-info.windows
     system-info dwOemId>> HEX: ffff0000 bitand ;
 
 : os-version ( -- os-version )
-    "OSVERSIONINFO" <c-object>
-    "OSVERSIONINFO" heap-size over set-OSVERSIONINFO-dwOSVersionInfoSize
+    OSVERSIONINFO <struct>
+        OSVERSIONINFO heap-size >>dwOSVersionInfoSize
     dup GetVersionEx win32-error=0/f ;
 
 : windows-major ( -- n )
-    os-version OSVERSIONINFO-dwMajorVersion ;
+    os-version dwMajorVersion>> ;
 
 : windows-minor ( -- n )
-    os-version OSVERSIONINFO-dwMinorVersion ;
+    os-version dwMinorVersion>> ;
 
 : windows-build# ( -- n )
-    os-version OSVERSIONINFO-dwBuildNumber ;
+    os-version dwBuildNumber>> ;
 
 : windows-platform-id ( -- n )
-    os-version OSVERSIONINFO-dwPlatformId ;
+    os-version dwPlatformId>> ;
 
 : windows-service-pack ( -- string )
-    os-version OSVERSIONINFO-szCSDVersion alien>native-string ;
+    os-version szCSDVersion>> alien>native-string ;
 
 : feature-present? ( n -- ? )
     IsProcessorFeaturePresent zero? not ;
