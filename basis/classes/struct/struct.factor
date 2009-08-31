@@ -46,9 +46,6 @@ M: struct equal?
     dup struct-class? [ '[ _ boa ] ] [ drop f ] if
 ] 1 define-partial-eval
 
-M: struct clone
-    [ >c-ptr ] [ byte-length memory>byte-array ] [ class memory>struct ] tri ;
-
 <PRIVATE
 : (init-struct) ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
     '[ dup struct-prototype _ _ ?if ] keep memory>struct ; inline
@@ -58,13 +55,13 @@ PRIVATE>
     [ heap-size malloc ] keep memory>struct ; inline
 
 : malloc-struct ( class -- struct )
-    [ >c-ptr malloc-byte-array ] [ 1 swap heap-size calloc ] (init-struct) ;
+    [ >c-ptr malloc-byte-array ] [ 1 swap heap-size calloc ] (init-struct) ; inline
 
 : (struct) ( class -- struct )
     [ heap-size (byte-array) ] keep memory>struct ; inline
 
 : <struct> ( class -- struct )
-    [ >c-ptr clone ] [ heap-size <byte-array> ] (init-struct) ;
+    [ >c-ptr clone ] [ heap-size <byte-array> ] (init-struct) ; inline
 
 MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
     [
@@ -119,13 +116,24 @@ M: struct-class writer-quot
     \ cleave [ ] 2sequence
     \ output>array [ ] 2sequence ;
 
+: define-inline-method ( class generic quot -- )
+    [ create-method-in ] dip [ define ] [ drop make-inline ] 2bi ;
+
 : (define-struct-slot-values-method) ( class -- )
-    [ \ struct-slot-values create-method-in ]
-    [ struct-slot-values-quot ] bi define ;
+    [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
+    define-inline-method ;
 
 : (define-byte-length-method) ( class -- )
-    [ \ byte-length create-method-in ]
-    [ heap-size \ drop swap [ ] 2sequence ] bi define ;
+    [ \ byte-length ] [ heap-size \ drop swap [ ] 2sequence ] bi
+    define-inline-method ;
+
+: clone-underlying ( struct -- byte-array )
+    [ >c-ptr ] [ byte-length ] bi memory>byte-array ; inline
+
+: (define-clone-method) ( class -- )
+    [ \ clone ]
+    [ \ clone-underlying swap literalize \ memory>struct [ ] 3sequence ] bi
+    define-inline-method ;
 
 : slot>field ( slot -- field )
     field-spec new swap {
@@ -207,7 +215,9 @@ M: struct-class heap-size
 
 : (struct-methods) ( class -- )
     [ (define-struct-slot-values-method) ]
-    [ (define-byte-length-method) ] bi ;
+    [ (define-byte-length-method) ]
+    [ (define-clone-method) ]
+    tri ;
 
 : (struct-word-props) ( class slots size align -- )
     [
