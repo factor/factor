@@ -42,6 +42,11 @@ HELP: S{
 { $values { "class" "a " { $link struct } " class word" } { "slots" "slot values" } }
 { $description "Marks the beginning of a literal struct. The syntax is identical to tuple literal syntax with " { $link POSTPONE: T{ } { $snippet " }" } "; either the assoc syntax (that is, " { $snippet "S{ class { slot value } { slot value } ... }" } ") or the simple syntax (" { $snippet "S{ class f value value ... }" } ") can be used." } ;
 
+HELP: S@
+{ $syntax "S@ class alien" }
+{ $values { "class" "a " { $link struct } " class word" } { "alien" "a literal alien" } }
+{ $description "Marks the beginning of a literal struct at a specific C address. The prettyprinter uses this syntax when the memory backing a struct object is invalid. This syntax should not generally be used in source code." } ;
+
 HELP: UNION-STRUCT:
 { $syntax "UNION-STRUCT: class { slot type } { slot type } ... ;" }
 { $values { "class" "a new " { $link struct } " class to define" } { "slots" "a list of slot specifiers" } }
