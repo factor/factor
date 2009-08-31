@@ -184,6 +184,14 @@ STRUCT: struct-test-equality-2
     ] with-destructors
 ] unit-test
 
+[ t ] [
+    [
+        struct-test-equality-1 <struct> 5 >>x
+        struct-test-equality-1 malloc-struct &free 5 >>x
+        [ hashcode ] bi@ =
+    ] with-destructors
+] unit-test
+
 STRUCT: struct-test-ffi-foo
     { x int }
     { y int } ;
