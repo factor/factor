@@ -155,12 +155,16 @@ objc>alien-types get [ swap ] assoc-map
 } case
 assoc-union alien>objc-types set-global
 
+: internal-cocoa-type? ( c-type -- ? )
+    [ "?" = ] [ first CHAR: _ = ] bi or ;
+
+: warn-c-type ( c-type -- )
+    dup internal-cocoa-type?
+    [ drop ] [ "Warning: no such C type: " write print ] if ;
+
 : objc-struct-type ( i string -- ctype )
     [ CHAR: = ] 2keep index-from swap subseq
-    dup c-types get key? [
-        "Warning: no such C type: " write dup print
-        drop "void*"
-    ] unless ;
+    dup c-types get key? [ warn-c-type "void*" ] unless ;
 
 ERROR: no-objc-type name ;
 
