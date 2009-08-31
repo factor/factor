@@ -55,4 +55,4 @@ M: array make-mirror <enum> ;
 M: vector make-mirror <enum> ;
 M: quotation make-mirror <enum> ;
 M: object make-mirror <mirror> ;
-M: struct make-mirror struct>assoc [ [ class>> ] dip ] assoc-map ;
+M: struct make-mirror struct>assoc [ [ [ name>> ] [ class>> ] bi 2array ] dip ] assoc-map ;
