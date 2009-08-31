@@ -6,7 +6,7 @@ kernel libc literals math multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays.ushort
 system tools.test compiler.tree.debugger struct-arrays
 classes.tuple.private specialized-arrays.direct.int
-compiler.units ;
+compiler.units byte-arrays specialized-arrays.char ;
 IN: classes.struct.tests
 
 <<
@@ -224,4 +224,27 @@ STRUCT: struct-test-optimization
 
 [ f ] [ [ memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 
-[ f ] [ struct-test-foo <struct> dup clone [ >c-ptr ] bi@ eq? ] unit-test
+! Test cloning structs
+STRUCT: clone-test-struct { x int } { y char[3] } ;
+
+[ 1 char-array{ 9 1 1 } ] [
+    clone-test-struct <struct>
+    1 >>x char-array{ 9 1 1 } >>y
+    clone
+    [ x>> ] [ y>> >char-array ] bi
+] unit-test
+
+[ t 1 char-array{ 9 1 1 } ] [
+    [
+        clone-test-struct malloc-struct &free
+        1 >>x char-array{ 9 1 1 } >>y
+        clone
+        [ >c-ptr byte-array? ] [ x>> ] [ y>> >char-array ] tri
+    ] with-destructors
+] unit-test
+
+STRUCT: struct-that's-a-word { x int } ;
+
+: struct-that's-a-word ( -- ) "OOPS" throw ;
+
+[ -77 ] [ S{ struct-that's-a-word { x -77 } } clone x>> ] unit-test
