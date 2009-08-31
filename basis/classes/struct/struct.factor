@@ -301,7 +301,7 @@ SYNTAX: S@
 
 : parse-struct-slot` ( accum -- accum )
     scan-string-param scan-c-type` \ } parse-until
-    [ <struct-slot-spec> ] 3curry over push-all ;
+    [ <struct-slot-spec> over push ] 3curry over push-all ;
 
 : parse-struct-slots` ( accum -- accum more? )
     scan {
