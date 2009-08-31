@@ -834,6 +834,14 @@ HELP: call(
 
 HELP: execute(
 { $syntax "execute( stack -- effect )" }
-{ $description "Calls the word on the top of the stack, asserting that it has the given stack effect. The word does not need to be known at compile time." } ;
+{ $description "Calls the word on the top of the stack, asserting that it has the given stack effect. The word does not need to be known at compile time." }
+{ $examples
+  { $code
+    "IN: scratchpad"
+    ""
+    ": eat ( -- ) ; : sleep ( -- ) ; : hack ( -- ) ;"
+    "{ eat sleep hack } [ execute( -- ) ] each"
+  }
+} ;
 
 { POSTPONE: call( POSTPONE: execute( } related-words
