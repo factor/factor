@@ -4,6 +4,8 @@ io.encodings.string io.encodings.utf16n alien.strings
 arrays literals ;
 IN: windows.errors
 
+<< "TCHAR" require-c-arrays >>
+
 CONSTANT: ERROR_SUCCESS                               0
 CONSTANT: ERROR_INVALID_FUNCTION                      1
 CONSTANT: ERROR_FILE_NOT_FOUND                        2
