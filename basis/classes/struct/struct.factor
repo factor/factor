@@ -23,7 +23,7 @@ TUPLE: struct-slot-spec < slot-spec
 PREDICATE: struct-class < tuple-class
     { [ \ struct subclass-of? ] [ all-slots length 1 = ] } 1&& ;
 
-: struct-slots ( struct -- slots )
+: struct-slots ( struct-class -- slots )
     "struct-slots" word-prop ;
 
 ! struct allocation
