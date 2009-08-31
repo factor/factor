@@ -35,8 +35,8 @@ M: array stack-size drop "void*" stack-size ;
 M: array c-type-boxer-quot
     unclip
     [ array-length ]
-    [ [ require-c-type-arrays ] keep ] bi*
-    [ <c-type-direct-array> ] 2curry ;
+    [ [ require-c-arrays ] keep ] bi*
+    [ <c-direct-array> ] 2curry ;
 
 M: array c-type-unboxer-quot drop [ >c-ptr ] ;
 
