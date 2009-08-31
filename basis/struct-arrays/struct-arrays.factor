@@ -71,6 +71,9 @@ M: struct-type <c-direct-array> ( alien len c-type -- array )
 SYNTAX: struct-array{
     \ } scan-word [ >struct-array ] curry parse-literal ;
 
+SYNTAX: struct-array@
+    scan-word [ scan-object scan-object ] dip <direct-struct-array> parsed ;
+
 USING: vocabs vocabs.loader ;
 
 "prettyprint" vocab [ "struct-arrays.prettyprint" require ] when
