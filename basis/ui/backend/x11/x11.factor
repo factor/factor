@@ -49,7 +49,8 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: glx-visual { $ GLX_USE_GL $ GLX_RGBA } H{
 
 M: x11-ui-backend (make-pixel-format)
     [ drop dpy get scr get ] dip
-    >glx-visual-int-array glXChooseVisual ;
+    >glx-visual-int-array glXChooseVisual
+    XVisualInfo memory>struct ;
 
 M: x11-ui-backend (free-pixel-format)
     handle>> XFree ;
@@ -223,7 +224,7 @@ M: world client-event
     ] [ wait-for-display wait-event ] if ;
 
 M: x11-ui-backend do-events
-    wait-event dup window>> window dup
+    wait-event dup XAnyEvent>> window>> window dup
     [ handle-event ] [ 2drop ] if ;
 
 : x-clipboard@ ( gadget clipboard -- prop win )
