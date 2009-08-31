@@ -1,14 +1,15 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unix alien alien.c-types kernel math sequences strings
-io.backend.unix splitting io.encodings.utf8 io.encodings.string ;
+io.backend.unix splitting io.encodings.utf8 io.encodings.string
+specialized-arrays.char ;
 IN: system-info.linux
 
 : (uname) ( buf -- int )
     "int" f "uname" { "char*" } alien-invoke ;
 
 : uname ( -- seq )
-    65536 "char" <c-array> [ (uname) io-error ] keep
+    65536 <char-array> [ (uname) io-error ] keep
     "\0" split harvest [ utf8 decode ] map
     6 "" pad-tail ;
 
