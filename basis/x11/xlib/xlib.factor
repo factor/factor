@@ -10,10 +10,9 @@
 ! add to this library and are wondering what part of the file to
 ! modify, just find the function or data structure in the manual
 ! and note the section.
-
-USING: kernel arrays alien alien.c-types alien.strings
-alien.syntax math math.bitwise words sequences namespaces
-continuations io io.encodings.ascii x11.syntax ;
+USING: accessors kernel arrays alien alien.c-types alien.strings
+alien.syntax classes.struct math math.bitwise words sequences
+namespaces continuations io io.encodings.ascii x11.syntax ;
 IN: x11.xlib
 
 LIBRARY: xlib
@@ -66,10 +65,10 @@ ALIAS: *Atom *ulong
 !
 
 ! This struct is incomplete
-C-STRUCT: Display
-{ "void*" "ext_data" }
-{ "void*" "free_funcs" }
-{ "int" "fd" } ;
+STRUCT: Display
+{ ext_data void* }
+{ free_funcs void* }
+{ fd int } ;
 
 X-FUNCTION: Display* XOpenDisplay ( void* display_name ) ;
 
@@ -114,22 +113,22 @@ X-FUNCTION: int XCloseDisplay ( Display* display ) ;
 : CWColormap         ( -- n ) 13 2^ ; inline
 : CWCursor           ( -- n ) 14 2^ ; inline
 
-C-STRUCT: XSetWindowAttributes
-        { "Pixmap" "background_pixmap" }
-        { "ulong" "background_pixel" }
-        { "Pixmap" "border_pixmap" }
-        { "ulong" "border_pixel" }
-        { "int" "bit_gravity" }
-        { "int" "win_gravity" }
-        { "int" "backing_store" }
-        { "ulong" "backing_planes" }
-        { "ulong" "backing_pixel" }
-        { "Bool" "save_under" }
-        { "long" "event_mask" }
-        { "long" "do_not_propagate_mask" }
-        { "Bool" "override_redirect" }
-        { "Colormap" "colormap" }
-        { "Cursor" "cursor" } ;
+STRUCT: XSetWindowAttributes
+{ background_pixmap Pixmap }
+{ background_pixel ulong }
+{ border_pixmap Pixmap }
+{ border_pixel ulong }
+{ bit_gravity int }
+{ win_gravity int }
+{ backing_store int }
+{ backing_planes ulong }
+{ backing_pixel ulong }
+{ save_under Bool }
+{ event_mask long }
+{ do_not_propagate_mask long }
+{ override_redirect Bool }
+{ colormap Colormap }
+{ cursor Cursor } ;
 
 CONSTANT: UnmapGravity          0
 
@@ -169,14 +168,14 @@ X-FUNCTION: int XMapRaised ( Display* display, Window w ) ;
 : CWSibling     ( -- n ) 5 2^ ; inline
 : CWStackMode   ( -- n ) 6 2^ ; inline
 
-C-STRUCT: XWindowChanges
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "width" }
-        { "int" "height" }
-        { "int" "border_width" }
-        { "Window" "sibling" }
-        { "int" "stack_mode" } ;
+STRUCT: XWindowChanges
+{ x int }
+{ y int }
+{ width int }
+{ height int }
+{ border_width int }
+{ sibling Window }
+{ stack_mode int } ;
 
 X-FUNCTION: Status XConfigureWindow ( Display* display, Window w, uint value_mask, XWindowChanges* values ) ;
 X-FUNCTION: Status XMoveWindow ( Display* display, Window w, int x, int y ) ;
@@ -211,30 +210,30 @@ X-FUNCTION: Status XQueryTree (
   Window* parent_return,
   Window** children_return, uint* nchildren_return ) ;
 
-C-STRUCT: XWindowAttributes
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "width" }
-        { "int" " height" }
-        { "int" "border_width" }
-        { "int" "depth" }
-        { "Visual*" "visual" }
-        { "Window" "root" }
-        { "int" "class" }
-        { "int" "bit_gravity" }
-        { "int" "win_gravity" }
-        { "int" "backing_store" }
-        { "ulong" "backing_planes" }
-        { "ulong" "backing_pixel" }
-        { "Bool" "save_under" }
-        { "Colormap" "colormap" }
-        { "Bool" "map_installed" }
-        { "int" "map_state" }
-        { "long" "all_event_masks" }
-        { "long" "your_event_mask" }
-        { "long" "do_not_propagate_mask" }
-        { "Bool" "override_redirect" }
-        { "Screen*" "screen" } ;
+STRUCT: XWindowAttributes
+{ x int }
+{ y int }
+{ width int }
+{  height int }
+{ border_width int }
+{ depth int }
+{ visual Visual* }
+{ root Window }
+{ class int }
+{ bit_gravity int }
+{ win_gravity int }
+{ backing_store int }
+{ backing_planes ulong }
+{ backing_pixel ulong }
+{ save_under Bool }
+{ colormap Colormap }
+{ map_installed Bool }
+{ map_state int }
+{ all_event_masks long }
+{ your_event_mask long }
+{ do_not_propagate_mask long }
+{ override_redirect Bool }
+{ screen Screen* } ;
 
 X-FUNCTION: Status XGetWindowAttributes ( Display* display, Window w, XWindowAttributes* attr ) ;
 
@@ -292,13 +291,13 @@ X-FUNCTION: int XFreePixmap ( Display* display, Pixmap pixmap ) ;
 ! 6 - Color Management Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XColor
-        { "ulong" "pixel" }
-        { "ushort" "red" }
-        { "ushort" "green" }
-        { "ushort" "blue" }
-        { "char" "flags" }
-        { "char" "pad" } ;
+STRUCT: XColor
+{ pixel ulong }
+{ red ushort }
+{ green ushort }
+{ blue ushort }
+{ flags char }
+{ pad char } ;
 
 X-FUNCTION: Status XLookupColor ( Display* display, Colormap colormap, char* color_name, XColor* exact_def_return, XColor* screen_def_return ) ;
 X-FUNCTION: Status XAllocColor ( Display* display, Colormap colormap, XColor* screen_in_out ) ;
@@ -353,30 +352,30 @@ CONSTANT: GXorInverted          HEX: d
 CONSTANT: GXnand                HEX: e
 CONSTANT: GXset                 HEX: f
 
-C-STRUCT: XGCValues
-        { "int" "function" }
-        { "ulong" "plane_mask" }
-        { "ulong" "foreground" }
-        { "ulong" "background" }
-        { "int" "line_width" }
-        { "int" "line_style" }
-        { "int" "cap_style" }
-        { "int" "join_style" }
-        { "int" "fill_style" }
-        { "int" "fill_rule" }
-        { "int" "arc_mode" }
-        { "Pixmap" "tile" }
-        { "Pixmap" "stipple" }
-        { "int" "ts_x_origin" }
-        { "int" "ts_y_origin" }
-        { "Font" "font" }
-        { "int" "subwindow_mode" }
-        { "Bool" "graphics_exposures" }
-        { "int" "clip_x_origin" }
-        { "int" "clip_y_origin" }
-        { "Pixmap" "clip_mask" }
-        { "int" "dash_offset" }
-        { "char" "dashes" } ;
+STRUCT: XGCValues
+{ function int }
+{ plane_mask ulong }
+{ foreground ulong }
+{ background ulong }
+{ line_width int }
+{ line_style int }
+{ cap_style int }
+{ join_style int }
+{ fill_style int }
+{ fill_rule int }
+{ arc_mode int }
+{ tile Pixmap }
+{ stipple Pixmap }
+{ ts_x_origin int }
+{ ts_y_origin int }
+{ font Font }
+{ subwindow_mode int }
+{ graphics_exposures Bool }
+{ clip_x_origin int }
+{ clip_y_origin int }
+{ clip_mask Pixmap }
+{ dash_offset int }
+{ dashes char } ;
 
 X-FUNCTION: GC XCreateGC ( Display* display, Window d, ulong valuemask, XGCValues* values ) ;
 X-FUNCTION: int XChangeGC ( Display* display, GC gc, ulong valuemask, XGCValues* values ) ;
@@ -402,35 +401,35 @@ X-FUNCTION: Status XFillArc ( Display* display, Drawable d, GC gc, int x, int y,
 
 ! 8.5 - Font Metrics
 
-C-STRUCT: XCharStruct
-        { "short" "lbearing" }
-        { "short" "rbearing" }
-        { "short" "width" }
-        { "short" "ascent" }
-        { "short" "descent" }
-        { "ushort" "attributes" } ;
+STRUCT: XCharStruct
+{ lbearing short }
+{ rbearing short }
+{ width short }
+{ ascent short }
+{ descent short }
+{ attributes ushort } ;
 
 X-FUNCTION: Font XLoadFont ( Display* display, char* name ) ;
 X-FUNCTION: XFontStruct* XQueryFont ( Display* display, XID font_ID ) ;
 X-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, char* name ) ;
 
-C-STRUCT: XFontStruct
-        { "XExtData*" "ext_data" }
-        { "Font" "fid" }
-        { "uint" "direction" }
-        { "uint" "min_char_or_byte2" }
-        { "uint" "max_char_or_byte2" }
-        { "uint" "min_byte1" }
-        { "uint" "max_byte1" }
-        { "Bool" "all_chars_exist" }
-        { "uint" "default_char" }
-        { "int" "n_properties" }
-        { "XFontProp*" "properties" }
-        { "XCharStruct" "min_bounds" }
-        { "XCharStruct" "max_bounds" }
-        { "XCharStruct*" "per_char" }
-        { "int" "ascent" }
-        { "int" "descent" } ;
+STRUCT: XFontStruct
+{ ext_data XExtData* }
+{ fid Font }
+{ direction uint }
+{ min_char_or_byte2 uint }
+{ max_char_or_byte2 uint }
+{ min_byte1 uint }
+{ max_byte1 uint }
+{ all_chars_exist Bool }
+{ default_char uint }
+{ n_properties int }
+{ properties XFontProp* }
+{ min_bounds XCharStruct }
+{ max_bounds XCharStruct }
+{ per_char XCharStruct* }
+{ ascent int }
+{ descent int } ;
 
 X-FUNCTION: int XTextWidth ( XFontStruct* font_struct, char* string, int count ) ;
 
@@ -449,41 +448,41 @@ X-FUNCTION: Status XDrawString (
 
 CONSTANT: AllPlanes -1
 
-C-STRUCT: XImage-funcs
-    { "void*" "create_image" }
-    { "void*" "destroy_image" }
-    { "void*" "get_pixel" }
-    { "void*" "put_pixel" }
-    { "void*" "sub_image" }
-    { "void*" "add_pixel" } ;
+STRUCT: XImage-funcs
+{ create_image void* }
+{ destroy_image void* }
+{ get_pixel void* }
+{ put_pixel void* }
+{ sub_image void* }
+{ add_pixel void* } ;
 
-C-STRUCT: XImage
-    { "int"          "width" }
-    { "int"          "height" }
-    { "int"          "xoffset" }
-    { "int"          "format" }
-    { "char*"        "data" }
-    { "int"          "byte_order" }
-    { "int"          "bitmap_unit" }
-    { "int"          "bitmap_bit_order" }
-    { "int"          "bitmap_pad" }
-    { "int"          "depth" }
-    { "int"          "bytes_per_line" }
-    { "int"          "bits_per_pixel" }
-    { "ulong"        "red_mask" }
-    { "ulong"        "green_mask" }
-    { "ulong"        "blue_mask" }
-    { "XPointer"     "obdata" }
-    { "XImage-funcs" "f" } ;
+STRUCT: XImage
+{ width int }
+{ height int }
+{ xoffset int }
+{ format int }
+{ data char* }
+{ byte_order int }
+{ bitmap_unit int }
+{ bitmap_bit_order int }
+{ bitmap_pad int }
+{ depth int }
+{ bytes_per_line int }
+{ bits_per_pixel int }
+{ red_mask ulong }
+{ green_mask ulong }
+{ blue_mask ulong }
+{ obdata XPointer }
+{ f XImage-funcs } ;
 
 X-FUNCTION: XImage* XGetImage ( Display* display, Drawable d, int x, int y, uint width, uint height, ulong plane_mask, int format ) ;
 X-FUNCTION: int XDestroyImage ( XImage* ximage ) ;
 
 : XImage-size ( ximage -- size )
-    [ XImage-height ] [ XImage-bytes_per_line ] bi * ;
+    [ height>> ] [ bytes_per_line>> ] bi * ;
 
 : XImage-pixels ( ximage -- byte-array )
-    [ XImage-data ] [ XImage-size ] bi memory>byte-array ;
+    [ data>> ] [ XImage-size ] bi memory>byte-array ;
 
 !
 ! 9 - Window and Session Manager Functions
@@ -536,11 +535,11 @@ CONSTANT: ButtonRelease         5
 CONSTANT: MotionNotify          6
 CONSTANT: EnterNotify           7
 CONSTANT: LeaveNotify           8
-CONSTANT: FocusIn                       9
+CONSTANT: FocusIn               9
 CONSTANT: FocusOut              10
 CONSTANT: KeymapNotify          11
-CONSTANT: Expose                        12
-CONSTANT: GraphicsExpose                13
+CONSTANT: Expose                12
+CONSTANT: GraphicsExpose        13
 CONSTANT: NoExpose              14
 CONSTANT: VisibilityNotify      15
 CONSTANT: CreateNotify          16
@@ -548,28 +547,28 @@ CONSTANT: DestroyNotify         17
 CONSTANT: UnmapNotify           18
 CONSTANT: MapNotify             19
 CONSTANT: MapRequest            20
-CONSTANT: ReparentNotify                21
-CONSTANT: ConfigureNotify               22
+CONSTANT: ReparentNotify        21
+CONSTANT: ConfigureNotify       22
 CONSTANT: ConfigureRequest      23
 CONSTANT: GravityNotify         24
 CONSTANT: ResizeRequest         25
-CONSTANT: CirculateNotify               26
+CONSTANT: CirculateNotify       26
 CONSTANT: CirculateRequest      27
-CONSTANT: PropertyNotify                28
-CONSTANT: SelectionClear                29
+CONSTANT: PropertyNotify        28
+CONSTANT: SelectionClear        29
 CONSTANT: SelectionRequest      30
-CONSTANT: SelectionNotify               31
-CONSTANT: ColormapNotify                32
+CONSTANT: SelectionNotify       31
+CONSTANT: ColormapNotify        32
 CONSTANT: ClientMessage         33
 CONSTANT: MappingNotify         34
 CONSTANT: LASTEvent             35
 
-C-STRUCT: XAnyEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" } ;
+STRUCT: XAnyEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -596,22 +595,22 @@ CONSTANT: Button5 5
 : Mod4Mask    ( -- n ) 1 6 shift ; inline
 : Mod5Mask    ( -- n ) 1 7 shift ; inline
 
-C-STRUCT: XButtonEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "Window" "root" }
-        { "Window" "subwindow" }
-        { "Time" "time" }
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "x_root" }
-        { "int" "y_root" }
-        { "uint" "state" }
-        { "uint" "button" }
-        { "Bool" "same_screen" } ;
+STRUCT: XButtonEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ root Window }
+{ subwindow Window }
+{ time Time }
+{ x int }
+{ y int }
+{ x_root int }
+{ y_root int }
+{ state uint }
+{ button uint }
+{ same_screen Bool } ;
 
 TYPEDEF: XButtonEvent XButtonPressedEvent
 TYPEDEF: XButtonEvent XButtonReleasedEvent
@@ -619,445 +618,438 @@ TYPEDEF: XButtonEvent XButtonReleasedEvent
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XKeyEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "Window" "root" }
-        { "Window" "subwindow" }
-        { "Time" "time" }
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "x_root" }
-        { "int" "y_root" }
-        { "uint" "state" }
-        { "uint" "keycode" }
-        { "Bool" "same_screen" } ;
+STRUCT: XKeyEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ root Window }
+{ subwindow Window }
+{ time Time }
+{ x int }
+{ y int }
+{ x_root int }
+{ y_root int }
+{ state uint }
+{ keycode uint }
+{ same_screen Bool } ;
 
 TYPEDEF: XKeyEvent XKeyPressedEvent
 TYPEDEF: XKeyEvent XKeyReleasedEvent
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XMotionEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "Window" "root" }
-        { "Window" "subwindow" }
-        { "Time" "time" }
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "x_root" }
-        { "int" "y_root" }
-        { "uint" "state" }
-        { "char" "is_hint" }
-        { "Bool" "same_screen" } ;
+STRUCT: XMotionEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ root Window }
+{ subwindow Window }
+{ time Time }
+{ x int }
+{ y int }
+{ x_root int }
+{ y_root int }
+{ state uint }
+{ is_hint char }
+{ same_screen Bool } ;
 
 TYPEDEF: XMotionEvent XPointerMovedEvent
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XCrossingEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "Window" "root" }
-        { "Window" "subwindow" }
-        { "Time" "time" }
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "x_root" }
-        { "int" "y_root" }
-        { "int" "mode" }
-        { "int" "detail" }
-        { "Bool" "same_screen" }
-        { "Bool" "focus" }
-        { "uint" "state" } ;
+STRUCT: XCrossingEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ root Window }
+{ subwindow Window }
+{ time Time }
+{ x int }
+{ y int }
+{ x_root int }
+{ y_root int }
+{ mode int }
+{ detail int }
+{ same_screen Bool }
+{ focus Bool }
+{ state uint } ;
 
 TYPEDEF: XCrossingEvent XEnterWindowEvent
 TYPEDEF: XCrossingEvent XLeaveWindowEvent
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XFocusChangeEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "int" "mode" }
-        { "int" "detail" } ;
+STRUCT: XFocusChangeEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ mode int }
+{ detail int } ;
 
 TYPEDEF: XFocusChangeEvent XFocusInEvent
 TYPEDEF: XFocusChangeEvent XFocusOutEvent
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XExposeEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "width" }
-        { "int" "height" }
-        { "int" "count" } ;
+STRUCT: XExposeEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ x int }
+{ y int }
+{ width int }
+{ height int }
+{ count int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XGraphicsExposeEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Drawable" "drawable" }
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "width" }
-        { "int" "height" }
-        { "int" "count" }
-        { "int" "major_code" }
-        { "int" "minor_code" } ;
+STRUCT: XGraphicsExposeEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ drawable Drawable }
+{ x int }
+{ y int }
+{ width int }
+{ height int }
+{ count int }
+{ major_code int }
+{ minor_code int } ;
 
-C-STRUCT: XNoExposeEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Drawable" "drawable" }
-        { "int" "major_code" }
-        { "int" "minor_code" } ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-C-STRUCT: XVisibilityEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "int" "state" } ;
+STRUCT: XNoExposeEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ drawable Drawable }
+{ major_code int }
+{ minor_code int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XCreateWindowEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "parent" }
-        { "Window" "window" }
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "width" }
-        { "int" "height" }
-        { "int" "border_width" }
-        { "Bool" "override_redirect" } ;
+STRUCT: XVisibilityEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ state int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XDestroyWindowEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "event" }
-        { "Window" "window" } ;
+STRUCT: XCreateWindowEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ parent Window }
+{ window Window }
+{ x int }
+{ y int }
+{ width int }
+{ height int }
+{ border_width int }
+{ override_redirect Bool } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XUnmapEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "event" }
-        { "Window" "window" }
-        { "Bool" "from_configure" } ;
+STRUCT: XDestroyWindowEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ event Window }
+{ window Window } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XMapEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "event" }
-        { "Window" "window" }
-        { "Bool" "override_redirect" } ;
+STRUCT: XUnmapEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ event Window }
+{ window Window }
+{ from_configure Bool } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XMapRequestEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "parent" }
-        { "Window" "window" } ;
+STRUCT: XMapEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ event Window }
+{ window Window }
+{ override_redirect Bool } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XReparentEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "event" }
-        { "Window" "window" }
-        { "Window" "parent" }
-        { "int" "x" }
-        { "int" "y" }
-        { "Bool" "override_redirect" } ;
+STRUCT: XMapRequestEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ parent Window }
+{ window Window } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XConfigureEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "event" }
-        { "Window" "window" }
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "width" }
-        { "int" "height" }
-        { "int" "border_width" }
-        { "Window" "above" }
-        { "Bool" "override_redirect" } ;
+STRUCT: XReparentEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ event Window }
+{ window Window }
+{ parent Window }
+{ x int }
+{ y int }
+{ override_redirect Bool } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XGravityEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "event" }
-        { "Window" "window" }
-        { "int" "x" }
-        { "int" "y" } ;
+STRUCT: XConfigureEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ event Window }
+{ window Window }
+{ x int }
+{ y int }
+{ width int }
+{ height int }
+{ border_width int }
+{ above Window }
+{ override_redirect Bool } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XResizeRequestEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "int" "width" }
-        { "int" "height" } ;
+STRUCT: XGravityEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ event Window }
+{ window Window }
+{ x int }
+{ y int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XConfigureRequestEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "parent" }
-        { "Window" "window" }
-        { "int" "x" }
-        { "int" "y" }
-        { "int" "width" }
-        { "int" "height" }
-        { "int" "border_width" }
-        { "Window" "above" }
-        { "int" "detail" }
-        { "ulong" "value_mask" } ;
+STRUCT: XResizeRequestEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ width int }
+{ height int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XCirculateEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "event" }
-        { "Window" "window" }
-        { "int" "place" } ;
+STRUCT: XConfigureRequestEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ parent Window }
+{ window Window }
+{ x int }
+{ y int }
+{ width int }
+{ height int }
+{ border_width int }
+{ above Window }
+{ detail int }
+{ value_mask ulong } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XCirculateRequestEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "parent" }
-        { "Window" "window" }
-        { "int" "place" } ;
+STRUCT: XCirculateEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ event Window }
+{ window Window }
+{ place int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XPropertyEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "Atom" "atom" }
-        { "Time" "time" }
-        { "int" "state" } ;
+STRUCT: XCirculateRequestEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ parent Window }
+{ window Window }
+{ place int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XSelectionClearEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "Atom" "selection" }
-        { "Time" "time" } ;
+STRUCT: XPropertyEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ atom Atom }
+{ time Time }
+{ state int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XSelectionRequestEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "owner" }
-        { "Window" "requestor" }
-        { "Atom" "selection" }
-        { "Atom" "target" }
-        { "Atom" "property" }
-        { "Time" "time" } ;
+STRUCT: XSelectionClearEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ selection Atom }
+{ time Time } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XSelectionEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "requestor" }
-        { "Atom" "selection" }
-        { "Atom" "target" }
-        { "Atom" "property" }
-        { "Time" "time" } ;
+STRUCT: XSelectionRequestEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ owner Window }
+{ requestor Window }
+{ selection Atom }
+{ target Atom }
+{ property Atom }
+{ time Time } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XColormapEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "Colormap" "colormap" }
-        { "Bool" "new" }
-        { "int" "state" } ;
+STRUCT: XSelectionEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ requestor Window }
+{ selection Atom }
+{ target Atom }
+{ property Atom }
+{ time Time } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XClientMessageEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "Atom" "message_type" }
-        { "int" "format" }
-        { "long" "data0" }
-        { "long" "data1" }
-        { "long" "data2" }
-        { "long" "data3" }
-        { "long" "data4" }
-!       union {
-!               char  b[20];
-!               short s[10];
-!               long  l[5];
-!       } data;
-;
+STRUCT: XColormapEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ colormap Colormap }
+{ new Bool }
+{ state int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XMappingEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        { "int" "request" }
-        { "int" "first_keycode" }
-        { "int" "count" } ;
+STRUCT: XClientMessageEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ message_type Atom }
+{ format int }
+{ data0 long }
+{ data1 long }
+{ data2 long }
+{ data3 long }
+{ data4 long } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XErrorEvent
-        { "int" "type" }
-        { "Display*" "display" }
-        { "XID" "resourceid" }
-        { "ulong" "serial" }
-        { "uchar" "error_code" }
-        { "uchar" "request_code" }
-        { "uchar" "minor_code" } ;
+STRUCT: XMappingEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ request int }
+{ first_keycode int }
+{ count int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-C-STRUCT: XKeymapEvent
-        { "int" "type" }
-        { "ulong" "serial" }
-        { "Bool" "send_event" }
-        { "Display*" "display" }
-        { "Window" "window" }
-        ! char key_vector[32];
-        { "int" "pad" }
-        { "int" "pad" }
-        { "int" "pad" }
-        { "int" "pad" }
-        { "int" "pad" }
-        { "int" "pad" }
-        { "int" "pad" }
-        { "int" "pad" } ;
+STRUCT: XErrorEvent
+{ type int }
+{ display Display* }
+{ resourceid XID }
+{ serial ulong }
+{ error_code uchar }
+{ request_code uchar }
+{ minor_code uchar } ;
 
-C-UNION: XEvent
-        "int"
-        "XAnyEvent"
-        "XKeyEvent"
-        "XButtonEvent"
-        "XMotionEvent"
-        "XCrossingEvent"
-        "XFocusChangeEvent"
-        "XExposeEvent"
-        "XGraphicsExposeEvent"
-        "XNoExposeEvent"
-        "XVisibilityEvent"
-        "XCreateWindowEvent"
-        "XDestroyWindowEvent"
-        "XUnmapEvent"
-        "XMapEvent"
-        "XMapRequestEvent"
-        "XReparentEvent"
-        "XConfigureEvent"
-        "XGravityEvent"
-        "XResizeRequestEvent"
-        "XConfigureRequestEvent"
-        "XCirculateEvent"
-        "XCirculateRequestEvent"
-        "XPropertyEvent"
-        "XSelectionClearEvent"
-        "XSelectionRequestEvent"
-        "XSelectionEvent"
-        "XColormapEvent"
-        "XClientMessageEvent"
-        "XMappingEvent"
-        "XErrorEvent"
-        "XKeymapEvent"
-        { "long" 24 } ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+STRUCT: XKeymapEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ window Window }
+{ pad int }
+{ pad int }
+{ pad int }
+{ pad int }
+{ pad int }
+{ pad int }
+{ pad int }
+{ pad int } ;
+
+UNION-STRUCT: XEvent
+{ int int }
+{ XAnyEvent XAnyEvent }
+{ XKeyEvent XKeyEvent }
+{ XButtonEvent XButtonEvent }
+{ XMotionEvent XMotionEvent }
+{ XCrossingEvent XCrossingEvent }
+{ XFocusChangeEvent XFocusChangeEvent }
+{ XExposeEvent XExposeEvent }
+{ XGraphicsExposeEvent XGraphicsExposeEvent }
+{ XNoExposeEvent XNoExposeEvent }
+{ XVisibilityEvent XVisibilityEvent }
+{ XCreateWindowEvent XCreateWindowEvent }
+{ XDestroyWindowEvent XDestroyWindowEvent }
+{ XUnmapEvent XUnmapEvent }
+{ XMapEvent XMapEvent }
+{ XMapRequestEvent XMapRequestEvent }
+{ XReparentEvent XReparentEvent }
+{ XConfigureEvent XConfigureEvent }
+{ XGravityEvent XGravityEvent }
+{ XResizeRequestEvent XResizeRequestEvent }
+{ XConfigureRequestEvent XConfigureRequestEvent }
+{ XCirculateEvent XCirculateEvent }
+{ XCirculateRequestEvent XCirculateRequestEvent }
+{ XPropertyEvent XPropertyEvent }
+{ XSelectionClearEvent XSelectionClearEvent }
+{ XSelectionRequestEvent XSelectionRequestEvent }
+{ XSelectionEvent XSelectionEvent }
+{ XColormapEvent XColormapEvent }
+{ XClientMessageEvent XClientMessageEvent }
+{ XMappingEvent XMappingEvent }
+{ XErrorEvent XErrorEvent }
+{ XKeymapEvent XKeymapEvent }
+{ padding long[24] } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 11 - Event Handling Functions
@@ -1148,25 +1140,25 @@ X-FUNCTION: Status XWithdrawWindow (
 : PAllHints    ( -- n )
     { PPosition PSize PMinSize PMaxSize PResizeInc PAspect } flags ; foldable
 
-C-STRUCT: XSizeHints
-    { "long" "flags" }
-    { "int" "x" }
-    { "int" "y" }
-    { "int" "width" }
-    { "int" "height" }
-    { "int" "min_width" }
-    { "int" "min_height" }
-    { "int" "max_width" }
-    { "int" "max_height" }
-    { "int" "width_inc" }
-    { "int" "height_inc" }
-    { "int" "min_aspect_x" }
-    { "int" "min_aspect_y" }
-    { "int" "max_aspect_x" }
-    { "int" "max_aspect_y" }
-    { "int" "base_width" }
-    { "int" "base_height" }
-    { "int" "win_gravity" } ;
+STRUCT: XSizeHints
+    { flags long }
+    { x int }
+    { y int }
+    { width int }
+    { height int }
+    { min_width int }
+    { min_height int }
+    { max_width int }
+    { max_height int }
+    { width_inc int }
+    { height_inc int }
+    { min_aspect_x int }
+    { min_aspect_y int }
+    { max_aspect_x int }
+    { max_aspect_y int }
+    { base_width int }
+    { base_height int }
+    { win_gravity int } ;
 
 ! 14.1.10.  Setting and Reading the WM_PROTOCOLS Property
 
@@ -1208,17 +1200,17 @@ CONSTANT: VisualColormapSizeMask        HEX: 80
 CONSTANT: VisualBitsPerRGBMask          HEX: 100
 CONSTANT: VisualAllMask                 HEX: 1FF
 
-C-STRUCT: XVisualInfo
-        { "Visual*" "visual" }
-        { "VisualID" "visualid" }
-        { "int" "screen" }
-        { "uint" "depth" }
-        { "int" "class" }
-        { "ulong" "red_mask" }
-        { "ulong" "green_mask" }
-        { "ulong" "blue_mask" }
-        { "int" "colormap_size" }
-        { "int" "bits_per_rgb" } ;
+STRUCT: XVisualInfo
+        { visual Visual* }
+        { visualid VisualID }
+        { screen int }
+        { depth uint }
+        { class int }
+        { red_mask ulong }
+        { green_mask ulong }
+        { blue_mask ulong }
+        { colormap_size int }
+        { bits_per_rgb int } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Appendix D - Compatibility Functions
