@@ -9,5 +9,11 @@ M: struct-array pprint-delims
 M: struct-array >pprint-sequence
     [ >array ] [ class>> ] bi prefix ;
 
-M: struct-array pprint* pprint-object ;
+: pprint-struct-array-pointer ( struct-array -- )
+    \ struct-array@ pprint-word 
+    [ class>> ] [ underlying>> ] [ length>> ] tri [ pprint* ] tri@ ;
+
+M: struct-array pprint*
+    [ pprint-object ]
+    [ pprint-struct-array-pointer ] pprint-c-object ;
 
