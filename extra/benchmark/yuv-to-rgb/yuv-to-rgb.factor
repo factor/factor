@@ -86,7 +86,7 @@ STRUCT: yuv_buffer
     [ yuv>rgb-row ] with with each
     drop ;
 
-HINTS: yuv>rgb byte-array byte-array ;
+HINTS: yuv>rgb byte-array yuv_buffer ;
 
 : yuv>rgb-benchmark ( -- )
     [ fake-data yuv>rgb ] with-destructors ;
