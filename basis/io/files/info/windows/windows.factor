@@ -5,7 +5,8 @@ io.files.windows io.files.windows.nt kernel windows.kernel32
 windows.time windows accessors alien.c-types combinators
 generalizations system alien.strings io.encodings.utf16n
 sequences splitting windows.errors fry continuations destructors
-calendar ascii combinators.short-circuit locals classes.struct ;
+calendar ascii combinators.short-circuit locals classes.struct
+specialized-arrays.ushort ;
 IN: io.files.info.windows
 
 :: round-up-to ( n multiple -- n' )
@@ -100,11 +101,11 @@ M: windows link-info ( path -- info )
     file-info ;
 
 : volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
-    MAX_PATH 1 + [ <byte-array> ] keep
+    MAX_PATH 1 + [ <ushort-array> ] keep
     "DWORD" <c-object>
     "DWORD" <c-object>
     "DWORD" <c-object>
-    MAX_PATH 1 + [ <byte-array> ] keep
+    MAX_PATH 1 + [ <ushort-array> ] keep
     [ GetVolumeInformation win32-error=0/f ] 7 nkeep
     drop 5 nrot drop
     [ utf16n alien>string ] 4 ndip
@@ -147,7 +148,7 @@ M: winnt file-system-info ( path -- file-system-info )
     calculate-file-system-info ;
 
 : volume>paths ( string -- array )
-    16384 "ushort" <c-array> tuck dup length
+    16384 <ushort-array> tuck dup length
     0 <uint> dup [ GetVolumePathNamesForVolumeName 0 = ] dip swap [
         win32-error-string throw
     ] [
@@ -156,13 +157,13 @@ M: winnt file-system-info ( path -- file-system-info )
     ] if ;
 
 : find-first-volume ( -- string handle )
-    MAX_PATH 1 + [ <byte-array> ] keep
+    MAX_PATH 1 + [ <ushort-array> ] keep
     dupd
     FindFirstVolume dup win32-error=0/f
     [ utf16n alien>string ] dip ;
 
 : find-next-volume ( handle -- string/f )
-    MAX_PATH 1 + [ <byte-array> tuck ] keep
+    MAX_PATH 1 + [ <ushort-array> tuck ] keep
     FindNextVolume 0 = [
         GetLastError ERROR_NO_MORE_FILES =
         [ drop f ] [ win32-error-string throw ] if
