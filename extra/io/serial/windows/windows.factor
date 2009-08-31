@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files.windows io.streams.duplex kernel math
 math.bitwise windows.kernel32 accessors alien.c-types
-windows io.files.windows fry locals continuations ;
+windows io.files.windows fry locals continuations
+classes.struct ;
 IN: io.serial.windows
 
 : <serial-stream> ( path encoding -- duplex )
@@ -10,7 +11,7 @@ IN: io.serial.windows
 
 : get-comm-state ( duplex -- dcb )
     in>> handle>>
-    "DCB" <c-object> tuck
+    DCB <struct> tuck
     GetCommState win32-error=0/f ;
 
 : set-comm-state ( duplex dcb -- )
