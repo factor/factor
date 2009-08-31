@@ -9,7 +9,7 @@ STRUCT: stat
     { st_mode mode_t }
     { st_nlink nlink_t }
     { st_uid uid_t }
-    { st_gid git_t }
+    { st_gid gid_t }
     { st_rdev __dev_t }
     { st_atimespec timespec }
     { st_mtimespec timespec }
