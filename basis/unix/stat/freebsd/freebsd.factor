@@ -9,7 +9,7 @@ STRUCT: stat
     { st_mode mode_t }
     { st_nlink nlink_t }
     { st_uid uid_t }
-    { st_gid git_t }
+    { st_gid gid_t }
     { st_rdev __dev_t }
     { st_atimespec timespec }
     { st_mtimespec timespec }
@@ -18,10 +18,10 @@ STRUCT: stat
     { st_blocks blkcnt_t }
     { st_blksize blksize_t }
     { st_flags fflags_t }
-    { st_gen _uint32_t }
+    { st_gen __uint32_t }
     { st_lspare __int32_t }
     { st_birthtimespec timespec }
-    { pad0 __int32_t[2] }
+    { pad0 __int32_t[2] } ;
 
 FUNCTION: int stat  ( char* pathname, stat* buf ) ;
 FUNCTION: int lstat ( char* pathname, stat* buf ) ;

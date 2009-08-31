@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.strings combinators
 continuations destructors fry io io.backend io.backend.unix
 io.directories io.encodings.binary io.encodings.utf8 io.files
 io.pathnames io.files.types kernel math.bitwise sequences system
-unix unix.stat vocabs.loader ;
+unix unix.stat vocabs.loader classes.struct ;
 IN: io.directories.unix
 
 : touch-mode ( -- n )
@@ -37,7 +37,7 @@ M: unix copy-file ( from to -- )
 HOOK: find-next-file os ( DIR* -- byte-array )
 
 M: unix find-next-file ( DIR* -- byte-array )
-    "dirent" <c-object>
+    dirent <struct>
     f <void*>
     [ readdir_r 0 = [ (io-error) ] unless ] 2keep
     *void* [ drop f ] unless ;
@@ -57,8 +57,8 @@ M: unix find-next-file ( DIR* -- byte-array )
 
 M: unix >directory-entry ( byte-array -- directory-entry )
     {
-        [ dirent-d_name underlying>> utf8 alien>string ]
-        [ dirent-d_type dirent-type>file-type ]
+        [ d_name>> underlying>> utf8 alien>string ]
+        [ d_type>> dirent-type>file-type ]
     } cleave directory-entry boa ;
 
 M: unix (directory-entries) ( path -- seq )

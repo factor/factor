@@ -8,7 +8,7 @@ IN: windows.fonts
         { "serif" "Times New Roman" }
         { "monospace" "Courier New" }
     } ?at drop ;
-    
+
 MEMO:: (cache-font) ( font -- HFONT )
     font size>> neg ! nHeight
     0 0 0 ! nWidth, nEscapement, nOrientation
@@ -31,7 +31,7 @@ MEMO:: (cache-font) ( font -- HFONT )
 
 : TEXTMETRIC>metrics ( TEXTMETRIC -- metrics )
     [ metrics new 0 >>width ] dip {
-        [ TEXTMETRICW-tmHeight >>height ]
-        [ TEXTMETRICW-tmAscent >>ascent ]
-        [ TEXTMETRICW-tmDescent >>descent ]
+        [ tmHeight>> >>height ]
+        [ tmAscent>> >>ascent ]
+        [ tmDescent>> >>descent ]
     } cleave ;

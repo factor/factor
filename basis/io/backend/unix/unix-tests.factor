@@ -74,8 +74,7 @@ yield
 
 [ datagram-client delete-file ] ignore-errors
 
-datagram-client <local> <datagram>
-"d" set
+[ ] [ datagram-client <local> <datagram> "d" set ] unit-test
 
 [ ] [
     "hello" >byte-array

@@ -1,4 +1,4 @@
-USING: alien.syntax unix.time ;
+USING: alien.syntax unix.time classes.struct ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 1024
@@ -32,12 +32,12 @@ CONSTANT: __DARWIN_MAXPATHLEN 1024
 CONSTANT: __DARWIN_MAXNAMELEN 255
 CONSTANT: __DARWIN_MAXNAMELEN+1 255
 
-C-STRUCT: dirent
-    { "ino_t" "d_ino" }
-    { "__uint16_t" "d_reclen" }
-    { "__uint8_t"  "d_type" }
-    { "__uint8_t"  "d_namlen" }
-    { { "char" __DARWIN_MAXNAMELEN+1 } "d_name" } ;
+STRUCT: dirent
+    { d_ino ino_t }
+    { d_reclen __uint16_t }
+    { d_type __uint8_t }
+    { d_namlen __uint8_t }
+    { d_name { "char" __DARWIN_MAXNAMELEN+1 } } ;
 
 CONSTANT: EPERM 1
 CONSTANT: ENOENT 2
