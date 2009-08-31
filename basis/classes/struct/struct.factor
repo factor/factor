@@ -277,6 +277,9 @@ SYNTAX: UNION-STRUCT:
 SYNTAX: S{
     scan-word dup struct-slots parse-tuple-literal-slots parsed ;
 
+SYNTAX: S@
+    scan-word scan-object swap memory>struct parsed ;
+
 ! functor support
 
 <PRIVATE

@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
-USING: accessors assocs classes classes.struct combinators
-kernel math prettyprint.backend prettyprint.custom
+USING: accessors alien assocs classes classes.struct
+combinators kernel math prettyprint.backend prettyprint.custom
 prettyprint.sections see.private sequences strings words ;
 IN: classes.struct.prettyprint
 
@@ -24,6 +24,14 @@ IN: classes.struct.prettyprint
     } cleave
     \ } pprint-word block> ;
 
+: pprint-struct ( struct -- )
+    [ [ \ S{ ] dip [ class ] [ struct>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
+
+: pprint-struct-pointer ( struct -- )
+    \ S@ pprint-word
+    [ class pprint-word ]
+    [ >c-ptr pprint* ] bi ;
+
 PRIVATE>
 
 M: struct-class see-class*
@@ -38,4 +46,5 @@ M: struct >pprint-sequence
     [ class ] [ struct-slot-values ] bi class-slot-sequence ;
 
 M: struct pprint*
-    [ [ \ S{ ] dip [ class ] [ struct>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
+    [ pprint-struct ]
+    [ pprint-struct-pointer ] pprint-c-object ;

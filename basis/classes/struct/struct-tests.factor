@@ -1,7 +1,7 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types alien.libraries
-alien.structs.fields alien.syntax ascii classes.struct combinators
-destructors io.encodings.utf8 io.pathnames io.streams.string
+alien.structs.fields alien.syntax ascii byte-arrays classes.struct
+combinators destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays.ushort
 system tools.test compiler.tree.debugger struct-arrays
@@ -78,16 +78,36 @@ STRUCT: struct-test-string-ptr
 
 [ "S{ struct-test-foo { y 7654 } }" ]
 [
-    f boa-tuples?
-    [ struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer ]
-    with-variable
+    [
+        boa-tuples? off
+        c-object-pointers? off
+        struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer
+    ] with-scope
+] unit-test
+
+[ "S@ struct-test-foo B{ 0 0 0 0 0 0 0 0 0 0 0 0 }" ]
+[
+    [
+        c-object-pointers? on
+        12 <byte-array> struct-test-foo memory>struct [ pprint ] with-string-writer
+    ] with-scope
 ] unit-test
 
 [ "S{ struct-test-foo f 0 7654 f }" ]
 [
-    t boa-tuples?
-    [ struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer ]
-    with-variable
+    [
+        boa-tuples? on
+        c-object-pointers? off
+        struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer
+    ] with-scope
+] unit-test
+
+[ "S@ struct-test-foo f" ]
+[
+    [
+        c-object-pointers? off
+        f struct-test-foo memory>struct [ pprint ] with-string-writer
+    ] with-scope
 ] unit-test
 
 [ <" USING: classes.struct ;
