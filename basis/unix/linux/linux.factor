@@ -84,14 +84,14 @@ CONSTANT: SEEK_SET 0
 CONSTANT: SEEK_CUR 1
 CONSTANT: SEEK_END 2
 
-C-STRUCT: passwd
-    { "char*"  "pw_name" }
-    { "char*"  "pw_passwd" }
-    { "uid_t"  "pw_uid" }
-    { "gid_t"  "pw_gid" }
-    { "char*"  "pw_gecos" }
-    { "char*"  "pw_dir" }
-    { "char*"  "pw_shell" } ;
+STRUCT: passwd
+    { pw_name char* }
+    { pw_passwd char* }
+    { pw_uid uid_t }
+    { pw_gid gid_t }
+    { pw_gecos char* }
+    { pw_dir char* }
+    { pw_shell char* } ;
 
 ! dirent64
 STRUCT: dirent

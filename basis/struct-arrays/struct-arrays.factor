@@ -71,13 +71,13 @@ ERROR: bad-byte-array-length byte-array ;
 
 INSTANCE: struct-array sequence
 
-M: struct-type <c-type-array> ( len c-type -- array )
-    dup c-type-array-constructor
+M: struct-type <c-array> ( len c-type -- array )
+    dup c-array-constructor
     [ execute( len -- array ) ]
     [ <struct-array> ] ?if ; inline
 
-M: struct-type <c-type-direct-array> ( alien len c-type -- array )
-    dup c-type-direct-array-constructor
+M: struct-type <c-direct-array> ( alien len c-type -- array )
+    dup c-direct-array-constructor
     [ execute( alien len -- array ) ]
     [ <direct-struct-array> ] ?if ; inline
 
@@ -87,6 +87,9 @@ M: struct-type <c-type-direct-array> ( alien len c-type -- array )
 
 SYNTAX: struct-array{
     \ } scan-word [ >struct-array ] curry parse-literal ;
+
+SYNTAX: struct-array@
+    scan-word [ scan-object scan-object ] dip <direct-struct-array> parsed ;
 
 USING: vocabs vocabs.loader ;
 

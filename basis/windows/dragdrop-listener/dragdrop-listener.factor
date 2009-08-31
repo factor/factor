@@ -1,8 +1,11 @@
-USING: windows.com windows.com.wrapper combinators
-windows.kernel32 windows.ole32 windows.shell32 kernel accessors
+USING: alien.strings io.encodings.utf16n windows.com
+windows.com.wrapper combinators windows.kernel32 windows.ole32
+windows.shell32 kernel accessors
 prettyprint namespaces ui.tools.listener ui.tools.workspace
 alien.c-types alien sequences math ;
 IN: windows.dragdrop-listener
+
+<< "WCHAR" require-c-arrays >>
 
 : filenames-from-hdrop ( hdrop -- filenames )
     dup HEX: FFFFFFFF f 0 DragQueryFile ! get count of files
@@ -10,7 +13,7 @@ IN: windows.dragdrop-listener
         2dup f 0 DragQueryFile 1 + ! get size of filename buffer
         dup "WCHAR" <c-array>
         [ swap DragQueryFile drop ] keep
-        alien>u16-string
+        utf16n alien>string
     ] with map ;
 
 : filenames-from-data-object ( data-object -- filenames )

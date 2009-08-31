@@ -99,12 +99,12 @@ PRIVATE>
     length v inc>> v (blas-vector-like) ;
 
 : <zero-vector> ( exemplar -- zero )
-    [ element-type <c-object> ]
+    [ element-type heap-size <byte-array> ]
     [ length>> 0 ]
     [ (blas-vector-like) ] tri ;
 
 : <empty-vector> ( length exemplar -- vector )
-    [ element-type <c-array> ]
+    [ element-type heap-size * <byte-array> ]
     [ 1 swap ] 2bi
     (blas-vector-like) ;
 

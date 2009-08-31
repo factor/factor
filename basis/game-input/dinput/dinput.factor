@@ -39,12 +39,14 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     get IDirectInputDevice8W::SetDataFormat ole32-error ;
 
 : <buffer-size-diprop> ( size -- DIPROPDWORD )
-    "DIPROPDWORD" <c-object>
-        "DIPROPDWORD" heap-size over set-DIPROPHEADER-dwSize
-        "DIPROPHEADER" heap-size over set-DIPROPHEADER-dwHeaderSize
-        0 over set-DIPROPHEADER-dwObj
-        DIPH_DEVICE over set-DIPROPHEADER-dwHow
-        swap over set-DIPROPDWORD-dwData ;
+    DIPROPDWORD <struct> [
+        diph>>
+        DIPROPDWORD heap-size  >>dwSize
+        DIPROPHEADER heap-size >>dwHeaderSize
+        0           >>dwObj
+        DIPH_DEVICE >>dwHow
+        drop
+    ] keep swap >>dwData ;
 
 : set-buffer-size ( device size -- )
     DIPROP_BUFFERSIZE swap <buffer-size-diprop>
@@ -63,7 +65,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     GUID_SysKeyboard device-for-guid
     [ configure-keyboard ]
     [ +keyboard-device+ set-global ] bi
-    256 <byte-array> <keys-array> keyboard-state boa
+    256 <byte-array> 256 <keys-array> keyboard-state boa
     +keyboard-state+ set-global ;
 
 : find-mouse ( -- )
@@ -72,23 +74,20 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     [ +mouse-device+ set-global ] bi
     0 0 0 0 8 f <array> mouse-state boa
     +mouse-state+ set-global
-    MOUSE-BUFFER-SIZE "DIDEVICEOBJECTDATA" <c-array>
+    MOUSE-BUFFER-SIZE DIDEVICEOBJECTDATA <struct-array>
     +mouse-buffer+ set-global ;
 
 : device-info ( device -- DIDEVICEIMAGEINFOW )
-    "DIDEVICEINSTANCEW" <c-object>
-    "DIDEVICEINSTANCEW" heap-size over set-DIDEVICEINSTANCEW-dwSize
-    [ IDirectInputDevice8W::GetDeviceInfo ole32-error ] keep ;
+    DIDEVICEINSTANCEW <struct>
+        DIDEVICEINSTANCEW heap-size >>dwSize
+    [ IDirectInputDevice8W::GetDeviceInfo ole32-error ] keep ; inline
 : device-caps ( device -- DIDEVCAPS )
-    "DIDEVCAPS" <c-object>
-    "DIDEVCAPS" heap-size over set-DIDEVCAPS-dwSize
-    [ IDirectInputDevice8W::GetCapabilities ole32-error ] keep ;
-
-: <guid> ( memory -- byte-array )
-    "GUID" heap-size memory>byte-array ;
+    DIDEVCAPS <struct>
+        DIDEVCAPS heap-size >>dwSize
+    [ IDirectInputDevice8W::GetCapabilities ole32-error ] keep ; inline
 
 : device-guid ( device -- guid )
-    device-info DIDEVICEINSTANCEW-guidInstance <guid> ;
+    device-info guidInstance>> ; inline
 
 : device-attached? ( device -- ? )
     +dinput+ get swap device-guid
@@ -96,8 +95,9 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-device-axes-callback ( -- alien )
     [ ! ( lpddoi pvRef -- BOOL )
+        [ DIDEVICEOBJECTINSTANCEW memory>struct ] dip
         +controller-devices+ get at
-        swap DIDEVICEOBJECTINSTANCEW-guidType <guid> {
+        swap guidType>> {
             { [ dup GUID_XAxis = ] [ drop 0.0 >>x ] }
             { [ dup GUID_YAxis = ] [ drop 0.0 >>y ] }
             { [ dup GUID_ZAxis = ] [ drop 0.0 >>z ] }
@@ -118,8 +118,8 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 : controller-state-template ( device -- controller-state )
     controller-state new
     over device-caps
-    [ DIDEVCAPS-dwButtons f <array> >>buttons ]
-    [ DIDEVCAPS-dwPOVs zero? f pov-neutral ? >>pov ] bi
+    [ dwButtons>> f <array> >>buttons ]
+    [ dwPOVs>> zero? f pov-neutral ? >>pov ] bi
     find-device-axes ;
 
 : device-known? ( guid -- ? )
@@ -129,12 +129,12 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     device-for-guid {
         [ configure-controller ]
         [ controller-state-template ]
-        [ dup device-guid +controller-guids+ get set-at ]
+        [ dup device-guid clone +controller-guids+ get set-at ]
         [ +controller-devices+ get set-at ]
     } cleave ;
 
 : add-controller ( guid -- )
-    dup <guid> device-known? [ drop ] [ (add-controller) ] if ;
+    dup device-known? [ drop ] [ (add-controller) ] if ;
 
 : remove-controller ( device -- )
     [ +controller-devices+ get delete-at ]
@@ -143,9 +143,9 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-controller-callback ( -- alien )
     [ ! ( lpddi pvRef -- BOOL )
-        drop DIDEVICEINSTANCEW-guidInstance add-controller
+        drop DIDEVICEINSTANCEW memory>struct guidInstance>> add-controller
         DIENUM_CONTINUE
-    ] LPDIENUMDEVICESCALLBACKW ;
+    ] LPDIENUMDEVICESCALLBACKW ; inline
 
 : find-controllers ( -- )
     +dinput+ get DI8DEVCLASS_GAMECTRL find-controller-callback
@@ -252,11 +252,11 @@ M: dinput-game-input-backend get-controllers
     [ drop controller boa ] { } assoc>map ;
 
 M: dinput-game-input-backend product-string
-    handle>> device-info DIDEVICEINSTANCEW-tszProductName
+    handle>> device-info tszProductName>>
     utf16n alien>string ;
 
 M: dinput-game-input-backend product-id
-    handle>> device-info DIDEVICEINSTANCEW-guidProduct <guid> ;
+    handle>> device-info guidProduct>> ;
 M: dinput-game-input-backend instance-id
     handle>> device-guid ;
 
@@ -273,38 +273,36 @@ CONSTANT: pov-values
     }
 
 : >axis ( long -- float )
-    32767 - 32767.0 /f ;
+    32767 - 32767.0 /f ; inline
 : >slider ( long -- float )
-    65535.0 /f ;
+    65535.0 /f ; inline
 : >pov ( long -- symbol )
     dup HEX: FFFF bitand HEX: FFFF =
     [ drop pov-neutral ]
-    [ 2750 + 4500 /i pov-values nth ] if ;
-: >buttons ( alien length -- array )
-    memory>byte-array <keys-array> ;
+    [ 2750 + 4500 /i pov-values nth ] if ; inline
 
 : (fill-if) ( controller-state DIJOYSTATE2 ? quot -- )
     [ drop ] compose [ 2drop ] if ; inline
 
 : fill-controller-state ( controller-state DIJOYSTATE2 -- controller-state )
     {
-        [ over x>> [ DIJOYSTATE2-lX >axis >>x ] (fill-if) ]
-        [ over y>> [ DIJOYSTATE2-lY >axis >>y ] (fill-if) ]
-        [ over z>> [ DIJOYSTATE2-lZ >axis >>z ] (fill-if) ]
-        [ over rx>> [ DIJOYSTATE2-lRx >axis >>rx ] (fill-if) ]
-        [ over ry>> [ DIJOYSTATE2-lRy >axis >>ry ] (fill-if) ]
-        [ over rz>> [ DIJOYSTATE2-lRz >axis >>rz ] (fill-if) ]
-        [ over slider>> [ DIJOYSTATE2-rglSlider *long >slider >>slider ] (fill-if) ]
-        [ over pov>> [ DIJOYSTATE2-rgdwPOV *uint >pov >>pov ] (fill-if) ]
-        [ DIJOYSTATE2-rgbButtons over buttons>> length >buttons >>buttons ]
+        [ over x>> [ lX>> >axis >>x ] (fill-if) ]
+        [ over y>> [ lY>> >axis >>y ] (fill-if) ]
+        [ over z>> [ lZ>> >axis >>z ] (fill-if) ]
+        [ over rx>> [ lRx>> >axis >>rx ] (fill-if) ]
+        [ over ry>> [ lRy>> >axis >>ry ] (fill-if) ]
+        [ over rz>> [ lRz>> >axis >>rz ] (fill-if) ]
+        [ over slider>> [ rglSlider>> first >slider >>slider ] (fill-if) ]
+        [ over pov>> [ rgdwPOV>> first >pov >>pov ] (fill-if) ]
+        [ rgbButtons>> over buttons>> length <keys-array> >>buttons ]
     } 2cleave ;
 
 : read-device-buffer ( device buffer count -- buffer count' )
-    [ "DIDEVICEOBJECTDATA" heap-size ] 2dip <uint>
+    [ DIDEVICEOBJECTDATA heap-size ] 2dip <uint>
     [ 0 IDirectInputDevice8W::GetDeviceData ole32-error ] 2keep *uint ;
 
 : (fill-mouse-state) ( state DIDEVICEOBJECTDATA -- state )
-    [ DIDEVICEOBJECTDATA-dwData 32 >signed ] [ DIDEVICEOBJECTDATA-dwOfs ] bi {
+    [ dwData>> 32 >signed ] [ dwOfs>> ] bi {
         { DIMOFS_X [ [ + ] curry change-dx ] }
         { DIMOFS_Y [ [ + ] curry change-dy ] }
         { DIMOFS_Z [ [ + ] curry change-scroll-dy ] }
@@ -312,16 +310,15 @@ CONSTANT: pov-values
     } case ;
 
 : fill-mouse-state ( buffer count -- state )
-    [ +mouse-state+ get ] 2dip swap
-    [ "DIDEVICEOBJECTDATA" byte-array>struct-array nth (fill-mouse-state) ] curry each ;
+    [ +mouse-state+ get ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
 
-: get-device-state ( device byte-array -- )
+: get-device-state ( device DIJOYSTATE2 -- )
     [ dup IDirectInputDevice8W::Poll ole32-error ] dip
-    [ length ] keep
+    [ byte-length ] keep
     IDirectInputDevice8W::GetDeviceState ole32-error ;
 
 : (read-controller) ( handle template -- state )
-    swap [ "DIJOYSTATE2" heap-size <byte-array> [ get-device-state ] keep ]
+    swap [ DIJOYSTATE2 <struct> [ get-device-state ] keep ]
     [ fill-controller-state ] [ drop f ] with-acquisition ;
 
 M: dinput-game-input-backend read-controller
