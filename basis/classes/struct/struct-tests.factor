@@ -6,7 +6,7 @@ kernel libc literals math multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays.ushort
 system tools.test compiler.tree.debugger struct-arrays
 classes.tuple.private specialized-arrays.direct.int
-compiler.units byte-arrays specialized-arrays.char ;
+compiler.units specialized-arrays.char ;
 IN: classes.struct.tests
 
 <<

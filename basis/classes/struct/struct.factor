@@ -254,19 +254,22 @@ PRIVATE>
 
 ERROR: invalid-struct-slot token ;
 
-<PRIVATE
 : struct-slot-class ( c-type -- class' )
     c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
 
+: <struct-slot-spec> ( name c-type attributes -- slot-spec )
+    [ struct-slot-spec new ] 3dip
+    [ >>name ]
+    [ [ >>c-type ] [ struct-slot-class >>class ] bi ]
+    [ [ dup empty? ] [ peel-off-attributes ] until drop ] tri* ;
+
+<PRIVATE
 : scan-c-type ( -- c-type )
     scan dup "{" = [ drop \ } parse-until >array ] when ;
 
 : parse-struct-slot ( -- slot )
-    struct-slot-spec new
-    scan >>name
-    scan-c-type [ >>c-type ] [ struct-slot-class >>class ] bi
-    \ } parse-until [ dup empty? ] [ peel-off-attributes ] until drop ;
+    scan scan-c-type \ } parse-until <struct-slot-spec> ;
     
 : parse-struct-slots ( slots -- slots' more? )
     scan {
@@ -296,17 +299,9 @@ SYNTAX: S@
 : scan-c-type` ( -- c-type/param )
     scan dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;
 
-:: parse-struct-slot` ( accum -- accum )
-    scan-string-param :> name
-    scan-c-type` :> c-type
-    \ } parse-until :> attributes
-    accum {
-        \ struct-slot-spec new 
-            name >>name
-            c-type [ >>c-type ] [ struct-slot-class >>class ] bi
-            attributes [ dup empty? ] [ peel-off-attributes ] until drop
-        over push
-    } over push-all ;
+: parse-struct-slot` ( accum -- accum )
+    scan-string-param scan-c-type` \ } parse-until
+    [ <struct-slot-spec> ] 3curry over push-all ;
 
 : parse-struct-slots` ( accum -- accum more? )
     scan {
