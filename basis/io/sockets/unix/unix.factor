@@ -61,8 +61,8 @@ M: object ((client)) ( addrspec -- fd )
 
 : server-socket-fd ( addrspec type -- fd )
     [ dup protocol-family ] dip socket-fd
-    dup init-server-socket
-    dup handle-fd rot make-sockaddr/size bind io-error ;
+    [ init-server-socket ] keep
+    [ handle-fd swap make-sockaddr/size bind io-error ] keep ;
 
 M: object (server) ( addrspec -- handle )
     [
@@ -148,7 +148,7 @@ M: local make-sockaddr
     dup length 1 + max-un-path > [ "Path too long" throw ] when
     "sockaddr-un" <c-object>
     AF_UNIX over set-sockaddr-un-family
-    dup sockaddr-un-path rot utf8 string>alien dup length memcpy ;
+    [ [ utf8 string>alien ] dip set-sockaddr-un-path ] keep ;
 
 M: local parse-sockaddr
     drop
