@@ -18,7 +18,7 @@ STRUCT: stat
     { st_blocks blkcnt_t }
     { st_blksize blksize_t }
     { st_flags fflags_t }
-    { st_gen _uint32_t }
+    { st_gen __uint32_t }
     { st_lspare __int32_t }
     { st_birthtimespec timespec }
     { pad0 __int32_t[2] }
