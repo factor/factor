@@ -1,9 +1,8 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings alien.syntax arrays
-kernel math namespaces sequences io.encodings.string
-io.encodings.utf8 io.encodings.ascii x11 x11.xlib x11.constants
-specialized-arrays.int accessors ;
+USING: accessors alien.c-types alien.strings classes.struct
+io.encodings.utf8 kernel namespaces sequences
+specialized-arrays.int x11 x11.constants x11.xlib ;
 IN: x11.clipboard
 
 ! This code was based on by McCLIM's Backends/CLX/port.lisp
@@ -34,20 +33,15 @@ TUPLE: x-clipboard atom contents ;
     [ XGetWindowProperty drop ] keep snarf-property ;
 
 : selection-from-event ( event window -- string )
-    swap XSelectionEvent-property zero? [
-        drop f
-    ] [
-        selection-property 1 window-property
-    ] if ;
+    swap property>> 0 =
+    [ drop f ] [ selection-property 1 window-property ] if ;
 
 : own-selection ( prop win -- )
     [ dpy get ] 2dip CurrentTime XSetSelectionOwner drop
     flush-dpy ;
 
 : set-targets-prop ( evt -- )
-    dpy get swap
-    [ XSelectionRequestEvent-requestor ] keep
-    XSelectionRequestEvent-property
+    [ dpy get ] dip [ requestor>> ] [ property>> ] bi
     "TARGETS" x-atom 32 PropModeReplace
     {
         "UTF8_STRING" "STRING" "TARGETS" "TIMESTAMP"
@@ -55,28 +49,27 @@ TUPLE: x-clipboard atom contents ;
     4 XChangeProperty drop ;
 
 : set-timestamp-prop ( evt -- )
-    dpy get swap
-    [ XSelectionRequestEvent-requestor ] keep
-    [ XSelectionRequestEvent-property ] keep
-    [ "TIMESTAMP" x-atom 32 PropModeReplace ] dip
-    XSelectionRequestEvent-time <int>
+    [ dpy get ] dip
+    [ requestor>> ]
+    [ property>> "TIMESTAMP" x-atom 32 PropModeReplace ]
+    [ time>> <int> ] tri
     1 XChangeProperty drop ;
 
 : send-notify ( evt prop -- )
-    "XSelectionEvent" <c-object>
-    SelectionNotify over set-XSelectionEvent-type
-    [ set-XSelectionEvent-property ] keep
-    over XSelectionRequestEvent-display   over set-XSelectionEvent-display
-    over XSelectionRequestEvent-requestor over set-XSelectionEvent-requestor
-    over XSelectionRequestEvent-selection over set-XSelectionEvent-selection
-    over XSelectionRequestEvent-target    over set-XSelectionEvent-target
-    over XSelectionRequestEvent-time      over set-XSelectionEvent-time
-    [ dpy get swap XSelectionRequestEvent-requestor 0 0 ] dip
+    XSelectionEvent <struct>
+    SelectionNotify >>type
+    swap >>property
+    over display>>   >>display
+    over requestor>> >>requestor
+    over selection>> >>selection
+    over target>>    >>target
+    over time>>      >>time
+    [ [ dpy get ] dip requestor>> 0 0 ] dip
     XSendEvent drop
     flush-dpy ;
 
 : send-notify-success ( evt -- )
-    dup XSelectionRequestEvent-property send-notify ;
+    dup property>> send-notify ;
 
 : send-notify-failure ( evt -- )
     0 send-notify ;

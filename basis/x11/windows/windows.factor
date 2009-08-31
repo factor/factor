@@ -1,15 +1,15 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types hashtables kernel math math.vectors
-math.bitwise namespaces sequences x11 x11.xlib x11.constants x11.glx
-arrays fry ;
+USING: accessors kernel math math.bitwise math.vectors
+namespaces sequences x11 x11.xlib x11.constants x11.glx arrays
+fry classes.struct ;
 IN: x11.windows
 
 : create-window-mask ( -- n )
     { CWBackPixel CWBorderPixel CWColormap CWEventMask } flags ;
 
 : create-colormap ( visinfo -- colormap )
-    [ dpy get root get ] dip XVisualInfo-visual AllocNone
+    [ dpy get root get ] dip visual>> AllocNone
     XCreateColormap ;
 
 : event-mask ( -- n )
@@ -28,15 +28,15 @@ IN: x11.windows
     } flags ;
 
 : window-attributes ( visinfo -- attributes )
-    "XSetWindowAttributes" <c-object>
-    0 over set-XSetWindowAttributes-background_pixel
-    0 over set-XSetWindowAttributes-border_pixel
-    [ [ create-colormap ] dip set-XSetWindowAttributes-colormap ] keep
-    event-mask over set-XSetWindowAttributes-event_mask ;
+    XSetWindowAttributes <struct>
+    0 >>background_pixel
+    0 >>border_pixel
+    event-mask >>event_mask
+    swap create-colormap >>colormap ;
 
 : set-size-hints ( window -- )
-    "XSizeHints" <c-object>
-    USPosition over set-XSizeHints-flags
+    XSizeHints <struct>
+    USPosition >>flags
     [ dpy get ] 2dip XSetWMNormalHints ;
 
 : auto-position ( window loc -- )
@@ -47,8 +47,8 @@ IN: x11.windows
 : create-window ( loc dim visinfo -- window )
     pick [
         [ [ [ dpy get root get ] dip >xy ] dip { 1 1 } vmax >xy 0 ] dip
-        [ XVisualInfo-depth InputOutput ] keep
-        [ XVisualInfo-visual create-window-mask ] keep
+        [ depth>> InputOutput ] keep
+        [ visual>> create-window-mask ] keep
         window-attributes XCreateWindow
         dup
     ] dip auto-position ;
