@@ -50,6 +50,6 @@ M: freebsd statvfs>file-system-info ( file-system-info statvfs -- file-system-in
 
 M: freebsd file-systems ( -- array )
     f 0 0 getfsstat dup io-error
-    \ statfs <struct> dup dup length 0 getfsstat io-error
-    \ statfs heap-size group
-    [ f_mntonname>> alien>native-string file-system-info ] map ;
+    \ statfs <c-type-array>
+    [ dup length 0 getfsstat io-error ]
+    [ [ f_mntonname>> utf8 alien>string file-system-info ] map ] bi ;
