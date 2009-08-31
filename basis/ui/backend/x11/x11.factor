@@ -1,14 +1,13 @@
 ! Copyright (C) 2005, 2009 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays ui ui.private ui.gadgets
-ui.gadgets.private ui.gestures ui.backend ui.clipboards
-ui.gadgets.worlds ui.render ui.event-loop assocs kernel math
-namespaces opengl sequences strings x11 x11.xlib x11.events x11.xim
-x11.glx x11.clipboard x11.constants x11.windows x11.io
-io.encodings.string io.encodings.ascii io.encodings.utf8 combinators
-command-line math.vectors classes.tuple opengl.gl threads
-math.rectangles environment ascii literals
-ui.pixel-formats ui.pixel-formats.private ;
+USING: accessors alien.c-types arrays ascii assocs
+classes.struct combinators io.encodings.ascii
+io.encodings.string io.encodings.utf8 kernel literals math
+namespaces sequences strings ui ui.backend ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.pixel-formats.private
+ui.private x11 x11.clipboard x11.constants x11.events x11.glx
+x11.io x11.windows x11.xim x11.xlib environment command-line ;
 IN: ui.backend.x11
 
 SINGLETON: x11-ui-backend
@@ -25,8 +24,7 @@ C: <x11-pixmap-handle> x11-pixmap-handle
 M: world expose-event nip relayout ;
 
 M: world configure-event
-    over configured-loc >>window-loc
-    swap configured-dim >>dim
+    swap [ event-loc >>window-loc ] [ event-dim >>dim ] bi
     ! In case dimensions didn't change
     relayout-1 ;
 
@@ -51,7 +49,8 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: glx-visual { $ GLX_USE_GL $ GLX_RGBA } H{
 
 M: x11-ui-backend (make-pixel-format)
     [ drop dpy get scr get ] dip
-    >glx-visual-int-array glXChooseVisual ;
+    >glx-visual-int-array glXChooseVisual
+    XVisualInfo memory>struct ;
 
 M: x11-ui-backend (free-pixel-format)
     handle>> XFree ;
@@ -103,7 +102,7 @@ CONSTANT: key-codes
     dup key-codes at [ t ] [ 1string f ] ?if ;
 
 : event-modifiers ( event -- seq )
-    XKeyEvent-state modifiers modifier ;
+    state>> modifiers modifier ;
 
 : valid-input? ( string gesture -- ? )
     over empty? [ 2drop f ] [
@@ -132,10 +131,7 @@ M: world key-up-event
     [ key-up-event>gesture ] dip propagate-key-gesture ;
 
 : mouse-event>gesture ( event -- modifiers button loc )
-    [ event-modifiers ]
-    [ XButtonEvent-button ]
-    [ mouse-event-loc ]
-    tri ;
+    [ event-modifiers ] [ button>> ] [ event-loc ] tri ;
 
 M: world button-down-event
     [ mouse-event>gesture [ <button-down> ] dip ] dip
@@ -146,7 +142,7 @@ M: world button-up-event
     send-button-up ;
 
 : mouse-event>scroll-direction ( event -- pair )
-    XButtonEvent-button {
+    button>> {
         { 4 { 0 -1 } }
         { 5 { 0 1 } }
         { 6 { -1 0 } }
@@ -154,7 +150,7 @@ M: world button-up-event
     } at ;
 
 M: world wheel-event
-    [ [ mouse-event>scroll-direction ] [ mouse-event-loc ] bi ] dip
+    [ [ mouse-event>scroll-direction ] [ event-loc ] bi ] dip
     send-wheel ;
 
 M: world enter-event motion-event ;
@@ -162,16 +158,13 @@ M: world enter-event motion-event ;
 M: world leave-event 2drop forget-rollover ;
 
 M: world motion-event
-    [ [ XMotionEvent-x ] [ XMotionEvent-y ] bi 2array ] dip
-    move-hand fire-motion ;
+    [ event-loc ] dip move-hand fire-motion ;
 
 M: world focus-in-event
-    nip
-    [ handle>> xic>> XSetICFocus ] [ focus-world ] bi ;
+    nip [ handle>> xic>> XSetICFocus ] [ focus-world ] bi ;
 
 M: world focus-out-event
-    nip
-    [ handle>> xic>> XUnsetICFocus ] [ unfocus-world ] bi ;
+    nip [ handle>> xic>> XUnsetICFocus ] [ unfocus-world ] bi ;
 
 M: world selection-notify-event
     [ handle>> window>> selection-from-event ] keep
@@ -189,22 +182,18 @@ M: world selection-notify-event
     } case ;
 
 : encode-clipboard ( string type -- bytes )
-    XSelectionRequestEvent-target
-    XA_UTF8_STRING = utf8 ascii ? encode ;
+    target>> XA_UTF8_STRING = utf8 ascii ? encode ;
 
 : set-selection-prop ( evt -- )
     dpy get swap
-    [ XSelectionRequestEvent-requestor ] keep
-    [ XSelectionRequestEvent-property ] keep
-    [ XSelectionRequestEvent-target ] keep
-    [ 8 PropModeReplace ] dip
-    [
-        XSelectionRequestEvent-selection
-        clipboard-for-atom contents>>
-    ] keep encode-clipboard dup length XChangeProperty drop ;
+    [ requestor>> ] keep
+    [ property>> ] keep
+    [ target>> 8 PropModeReplace ] keep
+    [ selection>> clipboard-for-atom contents>> ] keep
+    encode-clipboard dup length XChangeProperty drop ;
 
 M: world selection-request-event
-    drop dup XSelectionRequestEvent-target {
+    drop dup target>> {
         { [ dup supported-type? ] [ drop dup set-selection-prop send-notify-success ] }
         { [ dup "TARGETS" x-atom = ] [ drop dup set-targets-prop send-notify-success ] }
         { [ dup "TIMESTAMP" x-atom = ] [ drop dup set-timestamp-prop send-notify-success ] }
@@ -235,7 +224,7 @@ M: world client-event
     ] [ wait-for-display wait-event ] if ;
 
 M: x11-ui-backend do-events
-    wait-event dup XAnyEvent-window window dup
+    wait-event dup XAnyEvent>> window>> window dup
     [ handle-event ] [ 2drop ] if ;
 
 : x-clipboard@ ( gadget clipboard -- prop win )
@@ -269,17 +258,13 @@ M: x11-ui-backend set-title ( string world -- )
     [ dpy get ] 2dip [ set-title-old ] [ set-title-new ] 3bi ;
 
 M: x11-ui-backend (set-fullscreen) ( world ? -- )
-    [
-        handle>> window>> "XClientMessageEvent" <c-object>
-        [ set-XClientMessageEvent-window ] keep
-    ] dip
-    _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ?
-    over set-XClientMessageEvent-data0
-    ClientMessage over set-XClientMessageEvent-type
-    dpy get over set-XClientMessageEvent-display
-    "_NET_WM_STATE" x-atom over set-XClientMessageEvent-message_type
-    32 over set-XClientMessageEvent-format
-    "_NET_WM_STATE_FULLSCREEN" x-atom over set-XClientMessageEvent-data1
+    XClientMessageEvent <struct>
+    swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ? >>data0
+    swap handle>> window>> >>window
+    dpy get >>display
+    "_NET_WM_STATE" x-atom >>message_type
+    32 >>format
+    "_NET_WM_STATE_FULLSCREEN" x-atom >>data1
     [ dpy get root get 0 SubstructureNotifyMask ] dip XSendEvent drop ;
 
 M: x11-ui-backend (open-window) ( world -- )
@@ -312,9 +297,9 @@ M: x11-pixmap-handle flush-gl-context ( handle -- )
     drop ;
 
 M: x11-ui-backend (open-offscreen-buffer) ( world -- )
-    dup [ [ dim>> ] [ handle>> ] bi* glx-pixmap ]
-    with-world-pixel-format
+    dup [ [ dim>> ] [ handle>> ] bi* glx-pixmap ] with-world-pixel-format
     <x11-pixmap-handle> >>handle drop ;
+
 M: x11-ui-backend (close-offscreen-buffer) ( handle -- )
     dpy get swap
     [ glx-pixmap>> glXDestroyGLXPixmap ]
