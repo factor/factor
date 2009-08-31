@@ -696,6 +696,8 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   HEX: 000000FF
 : make-lang-id ( lang1 lang2 -- n )
     10 shift bitor ; inline
 
+<< "TCHAR" require-c-type-arrays >>
+
 ERROR: error-message-failed id ;
 :: n>win32-error-string ( id -- string )
     {
@@ -705,7 +707,7 @@ ERROR: error-message-failed id ;
     f
     id
     LANG_NEUTRAL SUBLANG_DEFAULT make-lang-id
-    32768 [ "TCHAR" <c-array> ] keep 
+    32768 [ "TCHAR" <c-type-array> ] [ ] bi
     f pick [ FormatMessage 0 = [ id error-message-failed ] when ] dip
     utf16n alien>string [ blank? ] trim ;
 

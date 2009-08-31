@@ -35,6 +35,8 @@ M: string string>alien
     [ stream>> >byte-array ]
     tri ;
 
+M: tuple string>alien drop underlying>> ;
+
 HOOK: alien>native-string os ( alien -- string )
 
 M: windows alien>native-string utf16n alien>string ;
