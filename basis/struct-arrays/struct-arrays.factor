@@ -49,6 +49,9 @@ ERROR: bad-byte-array-length byte-array ;
 : <direct-struct-array> ( alien length c-type -- struct-array )
     [ heap-size ] [ c-type-struct-class ] bi struct-array boa ; inline
 
+: struct-array-on ( struct length -- struct-array )
+    [ [ >c-ptr ] [ class ] bi ] dip swap <direct-struct-array> ; inline    
+
 : malloc-struct-array ( length c-type -- struct-array )
     [ heap-size calloc ] 2keep <direct-struct-array> ; inline
 
