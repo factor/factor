@@ -27,9 +27,7 @@ M: struct-array nth-unsafe
 M: struct-array set-nth-unsafe
     [ (nth-ptr) swap ] [ element-size>> ] bi memcpy ; inline
 
-! Foldable memo word. This is an optimization; by precompiling a
-! constructor for array elements, we avoid memory>struct's slow path.
-MEMO: struct-element-constructor ( c-type -- word )
+: (struct-element-constructor) ( c-type -- word )
     [
         "struct-array-ctor" f <word>
         [
@@ -37,7 +35,12 @@ MEMO: struct-element-constructor ( c-type -- word )
             [ '[ _ memory>struct ] [ ] like ] [ drop [ ] ] if
             (( alien -- object )) define-inline
         ] keep
-    ] with-compilation-unit ; foldable
+    ] with-compilation-unit ;
+
+! Foldable memo word. This is an optimization; by precompiling a
+! constructor for array elements, we avoid memory>struct's slow path.
+MEMO: struct-element-constructor ( c-type -- word )
+    (struct-element-constructor) ; foldable
 
 : <direct-struct-array> ( alien length c-type -- struct-array )
     [ heap-size ] [ c-type-struct-class ] [ struct-element-constructor ]
