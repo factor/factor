@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.structs byte-arrays
-classes.struct kernel libc math parser sequences
+classes classes.struct kernel libc math parser sequences
 sequences.private words fry memoize compiler.units ;
 IN: struct-arrays
 
