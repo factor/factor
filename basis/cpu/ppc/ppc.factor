@@ -335,7 +335,7 @@ M:: ppc %box-alien ( dst src temp -- )
         "f" resolve-label
     ] with-scope ;
 
-M:: ppc %box-displaced-alien ( dst displacement base temp -- )
+M:: ppc %box-displaced-alien ( dst displacement base displacement' base' -- )
     [
         "end" define-label
         "ok" define-label
@@ -343,7 +343,12 @@ M:: ppc %box-displaced-alien ( dst displacement base temp -- )
         dst base MR
         0 displacement 0 CMPI
         "end" get BEQ
+        ! Quickly use displacement' before its needed for real, as allot temporary
+        displacement' :> temp
+        dst 4 cells alien temp %allot
         ! If base is already a displaced alien, unpack it
+        base' base MR
+        displacement' displacement MR
         0 base \ f tag-number CMPI
         "ok" get BEQ
         temp base header-offset LWZ
@@ -351,11 +356,17 @@ M:: ppc %box-displaced-alien ( dst displacement base temp -- )
         "ok" get BNE
         ! displacement += base.displacement
         temp base 3 alien@ LWZ
-        displacement displacement temp ADD
+        displacement' displacement temp ADD
         ! base = base.base
-        base base 1 alien@ LWZ
+        base' base 1 alien@ LWZ
         "ok" resolve-label
-        dst displacement base temp %allot-alien
+        ! Store underlying-alien slot
+        base' dst 1 alien@ STW
+        ! Store offset
+        displacement' dst 3 alien@ STW
+        ! Store expired slot (its ok to clobber displacement')
+        temp \ f tag-number %load-immediate
+        temp dst 2 alien@ STW
         "end" resolve-label
     ] with-scope ;
 

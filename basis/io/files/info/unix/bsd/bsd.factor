@@ -12,10 +12,7 @@ M: bsd new-file-info ( -- class ) bsd-file-info new ;
 M: bsd stat>file-info ( stat -- file-info )
     [ call-next-method ] keep
     {
-        [ stat-st_flags >>flags ]
-        [ stat-st_gen >>gen ]
-        [
-            stat-st_birthtimespec timespec>unix-time
-            >>birth-time
-        ]
+        [ st_flags>> >>flags ]
+        [ st_gen>> >>gen ]
+        [ st_birthtimespec>> timespec>unix-time >>birth-time ]
     } cleave ;
