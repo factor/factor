@@ -95,6 +95,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-device-axes-callback ( -- alien )
     [ ! ( lpddoi pvRef -- BOOL )
+        [ DIDEVICEOBJECTINSTANCEW memory>struct ] dip
         +controller-devices+ get at
         swap guidType>> {
             { [ dup GUID_XAxis = ] [ drop 0.0 >>x ] }
@@ -142,7 +143,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-controller-callback ( -- alien )
     [ ! ( lpddi pvRef -- BOOL )
-        drop guidInstance>> add-controller
+        drop DIDEVICEINSTANCEW memory>struct guidInstance>> add-controller
         DIENUM_CONTINUE
     ] LPDIENUMDEVICESCALLBACKW ; inline
 
@@ -255,7 +256,7 @@ M: dinput-game-input-backend product-string
     utf16n alien>string ;
 
 M: dinput-game-input-backend product-id
-    handle>> device-info guidProduct>> <guid> ;
+    handle>> device-info guidProduct>> ;
 M: dinput-game-input-backend instance-id
     handle>> device-guid ;
 
@@ -311,9 +312,9 @@ CONSTANT: pov-values
 : fill-mouse-state ( buffer count -- state )
     [ +mouse-state+ get ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
 
-: get-device-state ( device byte-array -- )
+: get-device-state ( device DIJOYSTATE2 -- )
     [ dup IDirectInputDevice8W::Poll ole32-error ] dip
-    [ length ] keep
+    [ byte-length ] keep
     IDirectInputDevice8W::GetDeviceState ole32-error ;
 
 : (read-controller) ( handle template -- state )

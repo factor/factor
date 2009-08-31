@@ -2,7 +2,7 @@ USING: windows.dinput windows.kernel32 windows.ole32 windows.com
 windows.com.syntax alien alien.c-types alien.syntax kernel system namespaces
 combinators sequences fry math accessors macros words quotations
 libc continuations generalizations splitting locals assocs init
-struct-arrays memoize ;
+struct-arrays memoize classes.struct ;
 IN: windows.dinput.constants
 
 ! Some global variables aren't provided by the DirectInput DLL (they're in the
@@ -38,14 +38,6 @@ MEMO: heap-size* ( c-type -- n ) heap-size ;
 : (flags) ( array -- n )
     0 [ (flag) bitor ] reduce ;
 
-: (DIOBJECTDATAFORMAT) ( pguid dwOfs dwType dwFlags alien -- alien )
-    [ {
-        [ set-DIOBJECTDATAFORMAT-dwFlags ]
-        [ set-DIOBJECTDATAFORMAT-dwType ]
-        [ set-DIOBJECTDATAFORMAT-dwOfs ]
-        [ set-DIOBJECTDATAFORMAT-pguid ]
-    } cleave ] keep ;
-
 : <DIOBJECTDATAFORMAT> ( struct {pguid-var,field,index,dwType-flags,dwFlags} -- alien )
     {
         [ first dup word? [ get ] when ]
@@ -54,10 +46,10 @@ MEMO: heap-size* ( c-type -- n ) heap-size ;
         [ fourth (flags) ]
         [ 4 swap nth (flag) ]
     } cleave
-    "DIOBJECTDATAFORMAT" <c-object> (DIOBJECTDATAFORMAT) ;
+    DIOBJECTDATAFORMAT <struct-boa> ;
 
 :: malloc-DIOBJECTDATAFORMAT-array ( struct array -- alien )
-    [let | alien [ array length "DIOBJECTDATAFORMAT" malloc-struct-array ] |
+    [let | alien [ array length DIOBJECTDATAFORMAT malloc-struct-array ] |
         array [| args i |
             struct args <DIOBJECTDATAFORMAT>
             i alien set-nth
@@ -65,22 +57,10 @@ MEMO: heap-size* ( c-type -- n ) heap-size ;
         alien
     ] ;
 
-: (DIDATAFORMAT) ( dwSize dwObjSize dwFlags dwDataSize dwNumObjs rgodf alien -- alien )
-    [
-        {
-            [ set-DIDATAFORMAT-rgodf ]
-            [ set-DIDATAFORMAT-dwNumObjs ]
-            [ set-DIDATAFORMAT-dwDataSize ]
-            [ set-DIDATAFORMAT-dwFlags ]
-            [ set-DIDATAFORMAT-dwObjSize ]
-            [ set-DIDATAFORMAT-dwSize ]
-        } cleave
-    ] keep ;
-
 : <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
-    [ "DIDATAFORMAT" heap-size "DIOBJECTDATAFORMAT" heap-size ] 4 ndip
+    [ DIDATAFORMAT heap-size DIOBJECTDATAFORMAT heap-size ] 4 ndip
     [ nip length ] [ malloc-DIOBJECTDATAFORMAT-array ] 2bi
-    "DIDATAFORMAT" <c-object> (DIDATAFORMAT) ;
+    DIDATAFORMAT <struct-boa> ;
 
 : initialize ( symbol quot -- )
     call swap set-global ; inline
@@ -861,7 +841,7 @@ MEMO: heap-size* ( c-type -- n ) heap-size ;
 
     {
         c_dfDIKeyboard c_dfDIKeyboard_HID c_dfDIMouse2 c_dfDIJoystick2
-    } [ [ DIDATAFORMAT-rgodf free ] uninitialize ] each ;
+    } [ [ rgodf>> free ] uninitialize ] each ;
 
 PRIVATE>
 
