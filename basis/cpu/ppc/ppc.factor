@@ -338,7 +338,8 @@ M:: ppc %box-alien ( dst src temp -- )
 M:: ppc %box-displaced-alien ( dst displacement base displacement' base' -- )
     [
         "end" define-label
-        "ok" define-label
+        "alloc" define-label
+        "simple-case" define-label
         ! If displacement is zero, return the base
         dst base MR
         0 displacement 0 CMPI
@@ -347,19 +348,21 @@ M:: ppc %box-displaced-alien ( dst displacement base displacement' base' -- )
         displacement' :> temp
         dst 4 cells alien temp %allot
         ! If base is already a displaced alien, unpack it
-        base' base MR
-        displacement' displacement MR
         0 base \ f tag-number CMPI
-        "ok" get BEQ
+        "simple-case" get BEQ
         temp base header-offset LWZ
         0 temp alien type-number tag-fixnum CMPI
-        "ok" get BNE
+        "simple-case" get BNE
         ! displacement += base.displacement
         temp base 3 alien@ LWZ
         displacement' displacement temp ADD
         ! base = base.base
         base' base 1 alien@ LWZ
-        "ok" resolve-label
+        "alloc" get B
+        "simple-case" resolve-label
+        displacement' displacement MR
+        base' base MR
+        "alloc" resolve-label
         ! Store underlying-alien slot
         base' dst 1 alien@ STW
         ! Store offset
