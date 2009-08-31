@@ -90,11 +90,12 @@ CONSTANT: FILE_ACTION_MODIFIED 3
 CONSTANT: FILE_ACTION_RENAMED_OLD_NAME 4
 CONSTANT: FILE_ACTION_RENAMED_NEW_NAME 5
 
-C-STRUCT: FILE_NOTIFY_INFORMATION
-    { "DWORD" "NextEntryOffset" }
-    { "DWORD" "Action" }
-    { "DWORD" "FileNameLength" }
-    { "WCHAR[1]" "FileName" } ;
+STRUCT: FILE_NOTIFY_INFORMATION
+    { NextEntryOffset DWORD }
+    { Action DWORD }
+    { FileNameLength DWORD }
+    { FileName WCHAR[1] } ;
+
 TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 
 CONSTANT: STD_INPUT_HANDLE  -10
@@ -226,14 +227,14 @@ STRUCT: SYSTEMTIME
     { wSecond WORD }
     { wMilliseconds WORD } ;
 
-C-STRUCT: TIME_ZONE_INFORMATION
-    { "LONG" "Bias" }
-    { { "WCHAR" 32 } "StandardName" }
-    { "SYSTEMTIME" "StandardDate" }
-    { "LONG" "StandardBias" }
-    { { "WCHAR" 32 } "DaylightName" }
-    { "SYSTEMTIME" "DaylightDate" }
-    { "LONG" "DaylightBias" } ;
+STRUCT: TIME_ZONE_INFORMATION
+    { Bias LONG }
+    { StandardName WCHAR[32] }
+    { StandardDate SYSTEMTIME }
+    { StandardBias LONG }
+    { DaylightName WCHAR[32] }
+    { DaylightDate SYSTEMTIME }
+    { DaylightBias LONG } ;
 
 STRUCT: FILETIME
     { dwLowDateTime DWORD }
@@ -306,13 +307,13 @@ STRUCT: MEMORYSTATUSEX
 
 TYPEDEF: void* LPMEMORYSTATUSEX
 
-C-STRUCT: OSVERSIONINFO
-    { "DWORD" "dwOSVersionInfoSize" }
-    { "DWORD" "dwMajorVersion" }
-    { "DWORD" "dwMinorVersion" }
-    { "DWORD" "dwBuildNumber" }
-    { "DWORD" "dwPlatformId" }
-    { { "WCHAR" 128 } "szCSDVersion" } ;
+STRUCT: OSVERSIONINFO
+    { dwOSVersionInfoSize DWORD }
+    { dwMajorVersion DWORD }
+    { dwMinorVersion DWORD }
+    { dwBuildNumber DWORD }
+    { dwPlatformId DWORD }
+    { szCSDVersion WCHAR[128] } ;
 
 TYPEDEF: void* LPOSVERSIONINFO
 
@@ -325,11 +326,11 @@ C-STRUCT: MEMORY_BASIC_INFORMATION
   { "DWORD" "protect" }
   { "DWORD" "type" } ;
 
-C-STRUCT: GUID
-    { "ULONG" "Data1" }
-    { "WORD"  "Data2" }
-    { "WORD"  "Data3" }
-    { { "UCHAR" 8 } "Data4" } ;
+STRUCT: GUID
+    { Data1 ULONG }
+    { Data2 WORD }
+    { Data3 WORD }
+    { Data4 UCHAR[8] } ;
 
 /*
     fBinary  :1;
@@ -659,13 +660,13 @@ C-STRUCT: TOKEN_PRIVILEGES
     { "LUID_AND_ATTRIBUTES*" "Privileges" } ;
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 
-C-STRUCT: WIN32_FILE_ATTRIBUTE_DATA
-    { "DWORD" "dwFileAttributes" }
-    { "FILETIME" "ftCreationTime" }
-    { "FILETIME" "ftLastAccessTime" }
-    { "FILETIME" "ftLastWriteTime" }
-    { "DWORD" "nFileSizeHigh" }
-    { "DWORD" "nFileSizeLow" } ;
+STRUCT: WIN32_FILE_ATTRIBUTE_DATA
+    { dwFileAttributes DWORD }
+    { ftCreationTime FILETIME }
+    { ftLastAccessTime FILETIME }
+    { ftLastWriteTime FILETIME }
+    { nFileSizeHigh DWORD }
+    { nFileSizeLow DWORD } ;
 TYPEDEF: WIN32_FILE_ATTRIBUTE_DATA* LPWIN32_FILE_ATTRIBUTE_DATA
 
 C-STRUCT: BY_HANDLE_FILE_INFORMATION
@@ -694,19 +695,17 @@ C-STRUCT: OFSTRUCT
 
 TYPEDEF: OFSTRUCT* LPOFSTRUCT
 
-! MAX_PATH = 260
-C-STRUCT: WIN32_FIND_DATA
-    { "DWORD" "dwFileAttributes" }
-    { "FILETIME" "ftCreationTime" }
-    { "FILETIME" "ftLastAccessTime" }
-    { "FILETIME" "ftLastWriteTime" }
-    { "DWORD" "nFileSizeHigh" }
-    { "DWORD" "nFileSizeLow" }
-    { "DWORD" "dwReserved0" }
-    { "DWORD" "dwReserved1" }
-    ! { { "TCHAR" MAX_PATH } "cFileName" }
-    { { "TCHAR" 260 } "cFileName" }
-    { { "TCHAR" 14 } "cAlternateFileName" } ;
+STRUCT: WIN32_FIND_DATA
+    { dwFileAttributes DWORD }
+    { ftCreationTime FILETIME }
+    { ftLastAccessTime FILETIME }
+    { ftLastWriteTime FILETIME }
+    { nFileSizeHigh DWORD }
+    { nFileSizeLow DWORD }
+    { dwReserved0 DWORD }
+    { dwReserved1 DWORD }
+    { cFileName { "TCHAR" MAX_PATH } }
+    { cAlternateFileName TCHAR[14] } ;
 
 STRUCT: BY_HANDLE_FILE_INFORMATION
     { dwFileAttributes DWORD }

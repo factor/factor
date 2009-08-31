@@ -5,7 +5,8 @@ io.files.windows io.files.windows.nt kernel windows.kernel32
 windows.time windows accessors alien.c-types combinators
 generalizations system alien.strings io.encodings.utf16n
 sequences splitting windows.errors fry continuations destructors
-calendar ascii combinators.short-circuit locals classes.struct ;
+calendar ascii combinators.short-circuit locals classes.struct
+specialized-arrays.ushort ;
 IN: io.files.info.windows
 
 :: round-up-to ( n multiple -- n' )
@@ -35,20 +36,17 @@ TUPLE: windows-file-info < file-info attributes ;
 : WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
     [ \ windows-file-info new ] dip
     {
-        [ WIN32_FIND_DATA-dwFileAttributes win32-file-type >>type ]
-        [ WIN32_FIND_DATA-dwFileAttributes win32-file-attributes >>attributes ]
-        [
-            [ WIN32_FIND_DATA-nFileSizeLow ]
-            [ WIN32_FIND_DATA-nFileSizeHigh ] bi >64bit >>size
-        ]
-        [ WIN32_FIND_DATA-dwFileAttributes >>permissions ]
-        [ WIN32_FIND_DATA-ftCreationTime FILETIME>timestamp >>created ]
-        [ WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp >>modified ]
-        [ WIN32_FIND_DATA-ftLastAccessTime FILETIME>timestamp >>accessed ]
+        [ dwFileAttributes>> win32-file-type >>type ]
+        [ dwFileAttributes>> win32-file-attributes >>attributes ]
+        [ [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit >>size ]
+        [ dwFileAttributes>> >>permissions ]
+        [ ftCreationTime>> FILETIME>timestamp >>created ]
+        [ ftLastWriteTime>> FILETIME>timestamp >>modified ]
+        [ ftLastAccessTime>> FILETIME>timestamp >>accessed ]
     } cleave ;
 
 : find-first-file-stat ( path -- WIN32_FIND_DATA )
-    "WIN32_FIND_DATA" <c-object> [
+    WIN32_FIND_DATA <struct> [
         FindFirstFile
         [ INVALID_HANDLE_VALUE = [ win32-error ] when ] keep
         FindClose win32-error=0/f
@@ -147,7 +145,7 @@ M: winnt file-system-info ( path -- file-system-info )
     calculate-file-system-info ;
 
 : volume>paths ( string -- array )
-    16384 "ushort" <c-array> tuck dup length
+    16384 <ushort-array> tuck dup length
     0 <uint> dup [ GetVolumePathNamesForVolumeName 0 = ] dip swap [
         win32-error-string throw
     ] [
