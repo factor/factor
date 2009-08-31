@@ -5,11 +5,11 @@ windows.kernel32 kernel libc math threads system environment
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.short-circuit ascii splitting alien strings assocs
 namespaces make accessors tr windows.time windows.shell32
-windows.errors ;
+windows.errors specialized-arrays.ushort ;
 IN: io.files.windows.nt
 
 M: winnt cwd
-    MAX_UNICODE_PATH dup "ushort" <c-array>
+    MAX_UNICODE_PATH dup <ushort-array>
     [ GetCurrentDirectory win32-error=0/f ] keep
     utf16n alien>string ;
 
