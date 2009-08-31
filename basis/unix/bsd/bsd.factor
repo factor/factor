@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax combinators system vocabs.loader ;
+USING: alien.syntax classes.struct combinators system
+vocabs.loader ;
 IN: unix
 
 CONSTANT: MAXPATHLEN 1024
@@ -46,18 +47,18 @@ C-STRUCT: sockaddr-un
     { "uchar" "family" }
     { { "char" 104 } "path" } ;
 
-C-STRUCT: passwd
-    { "char*"  "pw_name" }
-    { "char*"  "pw_passwd" }
-    { "uid_t"  "pw_uid" }
-    { "gid_t"  "pw_gid" }
-    { "time_t" "pw_change" }
-    { "char*"  "pw_class" }
-    { "char*"  "pw_gecos" }
-    { "char*"  "pw_dir" }
-    { "char*"  "pw_shell" }
-    { "time_t" "pw_expire" }
-    { "int"    "pw_fields" } ;
+STRUCT: passwd
+    { pw_name char* }
+    { pw_passwd char* }
+    { pw_uid uid_t }
+    { pw_gid gid_t }
+    { pw_change time_t }
+    { pw_class char* }
+    { pw_gecos char* }
+    { pw_dir char* }
+    { pw_shell char* }
+    { pw_expire time_t }
+    { pw_fields int } ;
 
 CONSTANT: max-un-path 104
 
