@@ -80,6 +80,15 @@ M: string c-type ( name -- type )
 : ?require-word ( word/pair -- )
     dup word? [ drop ] [ first require ] ?if ;
 
+! These words being foldable means that words need to be
+! recompiled if a C type is redefined. Even so, folding the
+! size facilitates some optimizations.
+GENERIC: heap-size ( type -- size ) foldable
+
+M: string heap-size c-type heap-size ;
+
+M: abstract-c-type heap-size size>> ;
+
 GENERIC: require-c-arrays ( c-type -- )
 
 M: object require-c-arrays
@@ -237,15 +246,6 @@ GENERIC: unbox-return ( ctype -- )
 M: c-type unbox-return f swap c-type-unbox ;
 
 M: string unbox-return c-type unbox-return ;
-
-! These words being foldable means that words need to be
-! recompiled if a C type is redefined. Even so, folding the
-! size facilitates some optimizations.
-GENERIC: heap-size ( type -- size ) foldable
-
-M: string heap-size c-type heap-size ;
-
-M: abstract-c-type heap-size size>> ;
 
 GENERIC: stack-size ( type -- size ) foldable
 
