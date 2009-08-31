@@ -1,4 +1,5 @@
-USING: alien.syntax alien.c-types math vocabs.loader ;
+USING: alien.syntax alien.c-types math vocabs.loader
+classes.struct ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 256
@@ -13,12 +14,12 @@ C-STRUCT: addrinfo
     { "void*" "addr" }
     { "addrinfo*" "next" } ;
 
-C-STRUCT: dirent
-    { "__uint32_t" "d_fileno" }
-    { "__uint16_t" "d_reclen" }
-    { "__uint8_t"  "d_type" }
-    { "__uint8_t"  "d_namlen" }
-    { { "char" 256 } "d_name" } ;
+STRUCT: dirent
+    { d_fileno __uint32_t }
+    { d_reclen __uint16_t }
+    { d_type __uint8_t }
+    { d_namlen __uint8_t }
+    { d_name char[256] } ;
 
 CONSTANT: EPERM 1
 CONSTANT: ENOENT 2
@@ -126,8 +127,7 @@ CONSTANT: _UTX_LINESIZE   32
 CONSTANT: _UTX_IDSIZE     4
 CONSTANT: _UTX_HOSTSIZE   256
 
-: _SS_MAXSIZE ( -- n )
-    128 ; inline
+CONSTANT: _SS_MAXSIZE 128
 
 : _SS_ALIGNSIZE ( -- n )
     "__int64_t" heap-size ; inline
