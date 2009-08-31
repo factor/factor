@@ -1,14 +1,13 @@
-USING: alien.syntax ;
+USING: alien.syntax classes.struct ;
 IN: unix.kqueue
 
-C-STRUCT: kevent
-    { "ulong"  "ident"  } ! identifier for this event
-    { "short"  "filter" } ! filter for event
-    { "ushort" "flags"  } ! action flags for kqueue
-    { "uint"   "fflags" } ! filter flag value
-    { "long"   "data"   } ! filter data value
-    { "void*"  "udata"  } ! opaque user data identifier
-;
+STRUCT: kevent
+    { ident  ulong }
+    { filter short }
+    { flags  ushort }
+    { fflags uint }
+    { data   long }
+    { udata  void* } ;
 
 FUNCTION: int kevent ( int kq, kevent* changelist, int nchanges, kevent* eventlist, int nevents, timespec* timeout ) ;
 

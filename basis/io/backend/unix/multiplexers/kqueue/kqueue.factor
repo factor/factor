@@ -2,28 +2,28 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types combinators destructors
 io.backend.unix kernel math.bitwise sequences struct-arrays unix
-unix.kqueue unix.time assocs io.backend.unix.multiplexers ;
+unix.kqueue unix.time assocs io.backend.unix.multiplexers
+classes.struct ;
 IN: io.backend.unix.multiplexers.kqueue
 
 TUPLE: kqueue-mx < mx events ;
 
-: max-events ( -- n )
-    #! We read up to 256 events at a time. This is an arbitrary
-    #! constant...
-    256 ; inline
+! We read up to 256 events at a time. This is an arbitrary
+! constant...
+CONSTANT: max-events 256
 
 : <kqueue-mx> ( -- mx )
     kqueue-mx new-mx
         kqueue dup io-error >>fd
-        max-events "kevent" <struct-array> >>events ;
+        max-events \ kevent <struct-array> >>events ;
 
 M: kqueue-mx dispose* fd>> close-file ;
 
 : make-kevent ( fd filter flags -- event )
-    "kevent" <c-object>
-    [ set-kevent-flags ] keep
-    [ set-kevent-filter ] keep
-    [ set-kevent-ident ] keep ;
+    \ kevent <struct>
+        swap >>flags
+        swap >>filter
+        swap >>ident ;
 
 : register-kevent ( kevent mx -- )
     fd>> swap 1 f 0 f kevent io-error ;
@@ -63,13 +63,14 @@ M: kqueue-mx remove-output-callbacks ( fd mx -- seq )
     ] dip kevent multiplexer-error ;
 
 : handle-kevent ( mx kevent -- )
-    [ kevent-ident swap ] [ kevent-filter ] bi {
+    [ ident>> swap ] [ filter>> ] bi {
         { EVFILT_READ [ input-available ] }
         { EVFILT_WRITE [ output-available ] }
     } case ;
 
 : handle-kevents ( mx n -- )
-    [ dup events>> ] dip head-slice [ handle-kevent ] with each ;
+    [ dup events>> ] dip head-slice
+    [ \ kevent memory>struct handle-kevent ] with each ;
 
 M: kqueue-mx wait-for-events ( us mx -- )
     swap dup [ make-timespec ] when
