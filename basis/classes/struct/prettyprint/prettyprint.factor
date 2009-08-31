@@ -28,9 +28,11 @@ IN: classes.struct.prettyprint
     [ [ \ S{ ] dip [ class ] [ struct>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
 
 : pprint-struct-pointer ( struct -- )
+    <block
     \ S@ pprint-word
     [ class pprint-word ]
-    [ >c-ptr pprint* ] bi ;
+    [ >c-ptr pprint* ] bi
+    block> ;
 
 PRIVATE>
 

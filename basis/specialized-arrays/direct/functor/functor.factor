@@ -2,14 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: functors sequences sequences.private kernel words classes
 math alien alien.c-types byte-arrays accessors
-specialized-arrays parser prettyprint.backend prettyprint.custom ;
+specialized-arrays parser
+prettyprint.backend prettyprint.custom prettyprint.sections ;
 IN: specialized-arrays.direct.functor
 
 <PRIVATE
 
 : pprint-direct-array ( direct-array tag -- )
+    <block
     pprint-word
-    [ underlying>> ] [ length>> ] bi [ pprint* ] bi@ ;
+    [ underlying>> ] [ length>> ] bi [ pprint* ] bi@
+    block> ;
 
 PRIVATE>
 
