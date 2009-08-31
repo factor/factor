@@ -47,6 +47,6 @@ M: openbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-in
 
 M: openbsd file-systems ( -- seq )
     f 0 0 getfsstat dup io-error
-    \ statfs <c-type-array> dup dup length 0 getfsstat io-error 
-    \ statfs heap-size group 
-    [ f_mntonname>> alien>native-string file-system-info ] map ;
+    \ statfs <c-type-array>
+    [ dup length 0 getvfsstat io-error ]
+    [ [ f_mntonname>> utf8 alien>string file-system-info ] map ] bi ;
