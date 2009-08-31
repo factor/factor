@@ -51,21 +51,21 @@ GENERIC: client-event ( event window -- )
     over wheel? [ 2drop ] [ button-up-event ] if ;
 
 : handle-event ( event window -- )
-    over type>> {
-        { Expose [ XExposeEvent>> expose-event ] }
-        { ConfigureNotify [ XConfigureEvent>> configure-event ] }
-        { ButtonPress [ XButtonEvent>> button-down-event$ ] }
-        { ButtonRelease [ XButtonEvent>> button-up-event$ ] }
-        { EnterNotify [ XCrossingEvent>> enter-event ] }
-        { LeaveNotify [ XCrossingEvent>> leave-event ] }
-        { MotionNotify [ XMotionEvent>> motion-event ] }
-        { KeyPress [ XKeyEvent>> key-down-event ] }
-        { KeyRelease [ XKeyEvent>> key-up-event ] }
-        { FocusIn [ XFocusChangeEvent>> focus-in-event ] }
-        { FocusOut [ XFocusChangeEvent>> focus-out-event ] }
-        { SelectionNotify [ XSelectionEvent>> selection-notify-event ] }
-        { SelectionRequest [ XSelectionRequestEvent>> selection-request-event ] }
-        { ClientMessage [ XClientMessageEvent>> client-event ] }
+    swap dup XAnyEvent>> type>> {
+        { Expose [ XExposeEvent>> swap expose-event ] }
+        { ConfigureNotify [ XConfigureEvent>> swap configure-event ] }
+        { ButtonPress [ XButtonEvent>> swap button-down-event$ ] }
+        { ButtonRelease [ XButtonEvent>> swap button-up-event$ ] }
+        { EnterNotify [ XCrossingEvent>> swap enter-event ] }
+        { LeaveNotify [ XCrossingEvent>> swap leave-event ] }
+        { MotionNotify [ XMotionEvent>> swap motion-event ] }
+        { KeyPress [ XKeyEvent>> swap key-down-event ] }
+        { KeyRelease [ XKeyEvent>> swap key-up-event ] }
+        { FocusIn [ XFocusChangeEvent>> swap focus-in-event ] }
+        { FocusOut [ XFocusChangeEvent>> swap focus-out-event ] }
+        { SelectionNotify [ XSelectionEvent>> swap selection-notify-event ] }
+        { SelectionRequest [ XSelectionRequestEvent>> swap selection-request-event ] }
+        { ClientMessage [ XClientMessageEvent>> swap client-event ] }
         [ 3drop ]
     } case ;
 
