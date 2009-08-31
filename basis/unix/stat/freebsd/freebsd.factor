@@ -21,7 +21,7 @@ STRUCT: stat
     { st_gen __uint32_t }
     { st_lspare __int32_t }
     { st_birthtimespec timespec }
-    { pad0 __int32_t[2] }
+    { pad0 __int32_t[2] } ;
 
 FUNCTION: int stat  ( char* pathname, stat* buf ) ;
 FUNCTION: int lstat ( char* pathname, stat* buf ) ;
