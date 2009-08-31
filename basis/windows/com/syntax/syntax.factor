@@ -1,18 +1,16 @@
 USING: alien alien.c-types alien.accessors effects kernel
 windows.ole32 parser lexer splitting grouping sequences
 namespaces assocs quotations generalizations accessors words
-macros alien.syntax fry arrays layouts math ;
+macros alien.syntax fry arrays layouts math classes.struct
+windows.kernel32 prettyprint.custom prettyprint.sections ;
 IN: windows.com.syntax
 
 <PRIVATE
 
-C-STRUCT: com-interface
-    { "void*" "vtbl" } ;
-
 MACRO: com-invoke ( n return parameters -- )
     [ 2nip length ] 3keep
     '[
-        _ npick com-interface-vtbl _ cell * alien-cell _ _
+        _ npick *void* _ cell * alien-cell _ _
         "stdcall" alien-indirect
     ] ;
 
@@ -31,7 +29,7 @@ unless
     dup "f" = [ drop f ] [
         dup +com-interface-definitions+ get-global at*
         [ nip ]
-        [ swap " COM interface hasn't been defined" append throw ]
+        [ " COM interface hasn't been defined" prepend throw ]
         if
     ] if ;
 
@@ -100,3 +98,5 @@ SYNTAX: COM-INTERFACE:
     define-words-for-com-interface ;
 
 SYNTAX: GUID: scan string>guid parsed ;
+
+M: GUID pprint* guid>string "GUID: " prepend text ;

@@ -2,25 +2,26 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel combinators sequences
 math windows.gdi32 windows.types images destructors
-accessors fry locals ;
+accessors fry locals classes.struct ;
 IN: windows.offscreen
 
 : (bitmap-info) ( dim -- BITMAPINFO )
-    "BITMAPINFO" <c-object> [
-        BITMAPINFO-bmiHeader {
-            [ nip "BITMAPINFOHEADER" heap-size swap set-BITMAPINFOHEADER-biSize ]
-            [ [ first ] dip set-BITMAPINFOHEADER-biWidth ]
-            [ [ second ] dip set-BITMAPINFOHEADER-biHeight ]
-            [ nip 1 swap set-BITMAPINFOHEADER-biPlanes ]
-            [ nip 32 swap set-BITMAPINFOHEADER-biBitCount ]
-            [ nip BI_RGB swap set-BITMAPINFOHEADER-biCompression ]
-            [ [ first2 * 4 * ] dip set-BITMAPINFOHEADER-biSizeImage ]
-            [ nip 72 swap set-BITMAPINFOHEADER-biXPelsPerMeter ]
-            [ nip 72 swap set-BITMAPINFOHEADER-biYPelsPerMeter ]
-            [ nip 0 swap set-BITMAPINFOHEADER-biClrUsed ]
-            [ nip 0 swap set-BITMAPINFOHEADER-biClrImportant ]
-        } 2cleave
-    ] keep ;
+    [
+        BITMAPINFO <struct>
+        dup bmiHeader>>
+        BITMAPINFOHEADER heap-size >>biSize
+    ] dip
+        [ first >>biWidth ]
+        [ second >>biHeight ]
+        [ first2 * 4 * >>biSizeImage ] tri
+        1 >>biPlanes
+        32 >>biBitCount
+        BI_RGB >>biCompression
+        72 >>biXPelsPerMeter
+        72 >>biYPelsPerMeter
+        0 >>biClrUsed
+        0 >>biClrImportant
+        drop ;
 
 : make-bitmap ( dim dc -- hBitmap bits )
     [ nip ]
