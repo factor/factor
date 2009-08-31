@@ -47,6 +47,8 @@ HELP: S@
 { $values { "class" "a " { $link struct } " class word" } { "alien" "a literal alien" } }
 { $description "Marks the beginning of a literal struct at a specific C address. The prettyprinter uses this syntax when the memory backing a struct object is invalid. This syntax should not generally be used in source code." } ;
 
+{ POSTPONE: S{ POSTPONE: S@ } related-words
+
 HELP: UNION-STRUCT:
 { $syntax "UNION-STRUCT: class { slot type } { slot type } ... ;" }
 { $values { "class" "a new " { $link struct } " class to define" } { "slots" "a list of slot specifiers" } }
