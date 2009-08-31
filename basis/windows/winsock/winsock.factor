@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax arrays
 byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors math.bitwise io.encodings.utf16n ;
+windows.errors math.bitwise io.encodings.utf16n classes.struct
+literals windows.com.syntax ;
 IN: windows.winsock
 
 USE: libc
@@ -121,12 +122,12 @@ C-STRUCT: sockaddr-in6
     { { "uchar" 16 } "addr" }
     { "uint" "scopeid" } ;
 
-C-STRUCT: hostent
-    { "char*" "name" }
-    { "void*" "aliases" }
-    { "short" "addrtype" }
-    { "short" "length" }
-    { "void*" "addr-list" } ;
+STRUCT: hostent
+    { name char* }
+    { aliases void* }
+    { addrtype short }
+    { length short }
+    { addr-list void* } ;
 
 C-STRUCT: addrinfo
     { "int" "flags" }
@@ -142,10 +143,7 @@ C-STRUCT: timeval
     { "long" "sec" }
     { "long" "usec" } ;
 
-: hostent-addr ( hostent -- addr ) hostent-addr-list *void* ; ! *uint ;
-
 LIBRARY: winsock
-
 
 FUNCTION: int setsockopt ( SOCKET s, int level, int optname, char* optval, int optlen ) ;
 
@@ -195,9 +193,9 @@ C-STRUCT: FLOWSPEC
 TYPEDEF: FLOWSPEC* PFLOWSPEC
 TYPEDEF: FLOWSPEC* LPFLOWSPEC
 
-C-STRUCT: WSABUF
-    { "ulong" "len" }
-    { "void*" "buf" } ;
+STRUCT: WSABUF
+    { len ulong }
+    { buf void* } ;
 TYPEDEF: WSABUF* LPWSABUF
 
 C-STRUCT: QOS
@@ -377,8 +375,6 @@ FUNCTION: DWORD WSAWaitForMultipleEvents ( DWORD cEvents,
                                            BOOL fAlertable ) ;
 
 
-
-
 LIBRARY: mswsock
 
 ! Not in Windows CE
@@ -387,18 +383,10 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
 
 CONSTANT: SIO_GET_EXTENSION_FUNCTION_POINTER -939524090
 
-: WSAID_CONNECTEX ( -- GUID )
-    "GUID" <c-object>
-    HEX: 25a207b9 over set-GUID-Data1
-    HEX: ddf3 over set-GUID-Data2
-    HEX: 4660 over set-GUID-Data3
-    B{
-        HEX: 8e HEX: e9 HEX: 76 HEX: e5
-        HEX: 8c HEX: 74 HEX: 06 HEX: 3e
-    } over set-GUID-Data4 ;
+CONSTANT: WSAID_CONNECTEX GUID: {25a207b9-ddf3-4660-8ee9-76e58c74063e}
 
 : winsock-expected-error? ( n -- ? )
-    ERROR_IO_PENDING ERROR_SUCCESS WSA_IO_PENDING 3array member? ;
+    ${ ERROR_IO_PENDING ERROR_SUCCESS WSA_IO_PENDING } member? ;
 
 : (winsock-error-string) ( n -- str )
     ! #! WSAStartup returns the error code 'n' directly

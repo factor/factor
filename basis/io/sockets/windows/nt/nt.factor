@@ -2,7 +2,8 @@ USING: alien alien.accessors alien.c-types byte-arrays
 continuations destructors io.ports io.timeouts io.sockets
 io namespaces io.streams.duplex io.backend.windows
 io.sockets.windows io.backend.windows.nt windows.winsock kernel
-libc math sequences threads system combinators accessors ;
+libc math sequences threads system combinators accessors
+classes.struct windows.kernel32 ;
 IN: io.sockets.windows.nt
 
 : malloc-int ( object -- object )
@@ -14,7 +15,7 @@ M: winnt WSASocket-flags ( -- DWORD )
 : get-ConnectEx-ptr ( socket -- void* )
     SIO_GET_EXTENSION_FUNCTION_POINTER
     WSAID_CONNECTEX
-    "GUID" heap-size
+    GUID heap-size
     "void*" <c-object>
     [
         "void*" heap-size
@@ -127,9 +128,9 @@ TUPLE: WSARecvFrom-args port
        lpFlags lpFrom lpFromLen lpOverlapped lpCompletionRoutine ;
 
 : make-receive-buffer ( -- WSABUF )
-    "WSABUF" malloc-object &free
-    default-buffer-size get over set-WSABUF-len
-    default-buffer-size get malloc &free over set-WSABUF-buf ; inline
+    WSABUF malloc-struct &free
+        default-buffer-size get
+        [ >>len ] [ malloc &free >>buf ] bi ; inline
 
 : <WSARecvFrom-args> ( datagram -- WSARecvFrom )
     WSARecvFrom-args new
@@ -158,7 +159,7 @@ TUPLE: WSARecvFrom-args port
     } cleave WSARecvFrom socket-error* ; inline
 
 : parse-WSARecvFrom ( n WSARecvFrom -- packet sockaddr )
-    [ lpBuffers>> WSABUF-buf swap memory>byte-array ]
+    [ lpBuffers>> buf>> swap memory>byte-array ]
     [ [ lpFrom>> ] [ lpFromLen>> *int ] bi memory>byte-array ] bi ; inline
 
 M: winnt (receive) ( datagram -- packet addrspec )
@@ -175,11 +176,9 @@ TUPLE: WSASendTo-args port
        dwFlags lpTo iToLen lpOverlapped lpCompletionRoutine ;
 
 : make-send-buffer ( packet -- WSABUF )
-    "WSABUF" malloc-object &free
-    [ [ malloc-byte-array &free ] dip set-WSABUF-buf ]
-    [ [ length ] dip set-WSABUF-len ]
-    [ nip ]
-    2tri ; inline
+    [ WSABUF malloc-struct &free ] dip
+        [ malloc-byte-array &free >>buf ]
+        [ length >>len ] bi ; inline
 
 : <WSASendTo-args> ( packet addrspec datagram -- WSASendTo )
     WSASendTo-args new
