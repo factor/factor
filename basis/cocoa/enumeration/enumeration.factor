@@ -4,7 +4,7 @@ USING: accessors kernel classes.struct cocoa cocoa.types alien.c-types
 locals math sequences vectors fry libc destructors ;
 IN: cocoa.enumeration
 
-<< "id" require-c-type-arrays >>
+<< "id" require-c-arrays >>
 
 CONSTANT: NS-EACH-BUFFER-SIZE 16
 
@@ -19,7 +19,7 @@ CONSTANT: NS-EACH-BUFFER-SIZE 16
 :: (NSFastEnumeration-each) ( object quot: ( elt -- ) state stackbuf count -- )
     object state stackbuf count -> countByEnumeratingWithState:objects:count: :> items-count
     items-count 0 = [
-        state itemsPtr>> [ items-count "id" <c-type-direct-array> ] [ stackbuf ] if* :> items
+        state itemsPtr>> [ items-count "id" <c-direct-array> ] [ stackbuf ] if* :> items
         items-count iota [ items nth quot call ] each
         object quot state stackbuf count (NSFastEnumeration-each)
     ] unless ; inline recursive

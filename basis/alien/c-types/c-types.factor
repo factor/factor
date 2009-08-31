@@ -24,6 +24,7 @@ size
 align
 array-class
 array-constructor
+(array)-constructor
 direct-array-class
 direct-array-constructor
 sequence-mixin-class ;
@@ -79,47 +80,74 @@ M: string c-type ( name -- type )
 : ?require-word ( word/pair -- )
     dup word? [ drop ] [ first require ] ?if ;
 
-GENERIC: require-c-type-arrays ( c-type -- )
+! These words being foldable means that words need to be
+! recompiled if a C type is redefined. Even so, folding the
+! size facilitates some optimizations.
+GENERIC: heap-size ( type -- size ) foldable
 
-M: object require-c-type-arrays
+M: string heap-size c-type heap-size ;
+
+M: abstract-c-type heap-size size>> ;
+
+GENERIC: require-c-arrays ( c-type -- )
+
+M: object require-c-arrays
     drop ;
 
-M: c-type require-c-type-arrays
+M: c-type require-c-arrays
     [ array-class>> ?require-word ]
     [ sequence-mixin-class>> ?require-word ]
     [ direct-array-class>> ?require-word ] tri ;
 
-M: string require-c-type-arrays
-    c-type require-c-type-arrays ;
+M: string require-c-arrays
+    c-type require-c-arrays ;
 
-M: array require-c-type-arrays
-    first c-type require-c-type-arrays ;
+M: array require-c-arrays
+    first c-type require-c-arrays ;
 
 ERROR: specialized-array-vocab-not-loaded vocab word ;
 
-: c-type-array-constructor ( c-type -- word )
+: c-array-constructor ( c-type -- word )
     array-constructor>> dup array?
     [ first2 specialized-array-vocab-not-loaded ] when ; foldable
 
-: c-type-direct-array-constructor ( c-type -- word )
+: c-(array)-constructor ( c-type -- word )
+    (array)-constructor>> dup array?
+    [ first2 specialized-array-vocab-not-loaded ] when ; foldable
+
+: c-direct-array-constructor ( c-type -- word )
     direct-array-constructor>> dup array?
     [ first2 specialized-array-vocab-not-loaded ] when ; foldable
 
-GENERIC: <c-type-array> ( len c-type -- array )
-M: object <c-type-array>
-    c-type-array-constructor execute( len -- array ) ; inline
-M: string <c-type-array>
-    c-type <c-type-array> ; inline
-M: array <c-type-array>
-    first c-type <c-type-array> ; inline
+GENERIC: <c-array> ( len c-type -- array )
+M: object <c-array>
+    c-array-constructor execute( len -- array ) ; inline
+M: string <c-array>
+    c-type <c-array> ; inline
+M: array <c-array>
+    first c-type <c-array> ; inline
 
-GENERIC: <c-type-direct-array> ( alien len c-type -- array )
-M: object <c-type-direct-array>
-    c-type-direct-array-constructor execute( alien len -- array ) ; inline
-M: string <c-type-direct-array>
-    c-type <c-type-direct-array> ; inline
-M: array <c-type-direct-array>
-    first c-type <c-type-direct-array> ; inline
+GENERIC: (c-array) ( len c-type -- array )
+M: object (c-array)
+    c-(array)-constructor execute( len -- array ) ; inline
+M: string (c-array)
+    c-type (c-array) ; inline
+M: array (c-array)
+    first c-type (c-array) ; inline
+
+GENERIC: <c-direct-array> ( alien len c-type -- array )
+M: object <c-direct-array>
+    c-direct-array-constructor execute( alien len -- array ) ; inline
+M: string <c-direct-array>
+    c-type <c-direct-array> ; inline
+M: array <c-direct-array>
+    first c-type <c-direct-array> ; inline
+
+: malloc-array ( n type -- alien )
+    [ heap-size calloc ] [ <c-direct-array> ] 2bi ; inline
+
+: (malloc-array) ( n type -- alien )
+    [ heap-size * malloc ] [ <c-direct-array> ] 2bi ; inline
 
 GENERIC: c-type-class ( name -- class )
 
@@ -219,15 +247,6 @@ M: c-type unbox-return f swap c-type-unbox ;
 
 M: string unbox-return c-type unbox-return ;
 
-! These words being foldable means that words need to be
-! recompiled if a C type is redefined. Even so, folding the
-! size facilitates some optimizations.
-GENERIC: heap-size ( type -- size ) foldable
-
-M: string heap-size c-type heap-size ;
-
-M: abstract-c-type heap-size size>> ;
-
 GENERIC: stack-size ( type -- size ) foldable
 
 M: string stack-size c-type stack-size ;
@@ -253,20 +272,11 @@ M: f byte-length drop 0 ; inline
         [ "Cannot write struct fields with this type" throw ]
     ] unless* ;
 
-: <c-array> ( n type -- array )
-    heap-size * <byte-array> ; inline deprecated
-
 : <c-object> ( type -- array )
     heap-size <byte-array> ; inline
 
 : (c-object) ( type -- array )
     heap-size (byte-array) ; inline
-
-: malloc-array ( n type -- alien )
-    [ heap-size calloc ] [ <c-type-direct-array> ] 2bi ; inline
-
-: (malloc-array) ( n type -- alien )
-    [ heap-size * malloc ] [ <c-type-direct-array> ] 2bi ; inline
 
 : malloc-object ( type -- alien )
     1 swap heap-size calloc ; inline
@@ -353,6 +363,10 @@ M: long-long-type box-return ( type -- )
         [
             [ "specialized-arrays." prepend ]
             [ "<" "-array>" surround ] bi* ?lookup >>array-constructor
+        ]
+        [
+            [ "specialized-arrays." prepend ]
+            [ "(" "-array)" surround ] bi* ?lookup >>(array)-constructor
         ]
         [
             [ "specialized-arrays." prepend ]
