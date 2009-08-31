@@ -70,7 +70,7 @@ M: kqueue-mx remove-output-callbacks ( fd mx -- seq )
 
 : handle-kevents ( mx n -- )
     [ dup events>> ] dip head-slice
-    [ \ kevent memory>struct handle-kevent ] with each ;
+    [ handle-kevent ] with each ;
 
 M: kqueue-mx wait-for-events ( us mx -- )
     swap dup [ make-timespec ] when
