@@ -131,7 +131,8 @@ M: struct-class writer-quot
     [ >c-ptr ] [ byte-length ] bi memory>byte-array ; inline
 
 : (define-clone-method) ( class -- )
-    [ \ clone ] [ \ clone-underlying swap \ memory>struct [ ] 3sequence ] bi
+    [ \ clone ]
+    [ \ clone-underlying swap literalize \ memory>struct [ ] 3sequence ] bi
     define-inline-method ;
 
 : slot>field ( slot -- field )
