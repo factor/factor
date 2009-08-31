@@ -260,12 +260,14 @@ CONSTANT: window-control>ex-style
     window-controls>> window-control>ex-style symbols>flags ;
 
 : get-RECT-top-left ( RECT -- x y )
-    [ RECT-left ] keep RECT-top ;
+    [ left>> ] [ top>> ] bi ;
+
+: get-RECT-width/height ( RECT -- width height )
+    [ [ right>> ] [ left>> ] bi - ]
+    [ [ bottom>> ] [ top>> ] bi - ] bi ;
 
 : get-RECT-dimensions ( RECT -- x y width height )
-    [ get-RECT-top-left ] keep
-    [ RECT-right ] keep [ RECT-left - ] keep
-    [ RECT-bottom ] keep RECT-top - ;
+    [ get-RECT-top-left ] [ get-RECT-width/height ] bi ;
 
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
@@ -503,14 +505,15 @@ SYMBOL: nc-buttons
     ] if ;
 
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
-    "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
-    "TRACKMOUSEEVENT" heap-size over set-TRACKMOUSEEVENT-cbSize ;
+    TRACKMOUSEEVENT <struct>
+        swap >>hwndTrack
+        TRACKMOUSEEVENT heap-size >>cbSize ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
     2nip
     over make-TRACKMOUSEEVENT
-    TME_LEAVE over set-TRACKMOUSEEVENT-dwFlags
-    0 over set-TRACKMOUSEEVENT-dwHoverTime
+        TME_LEAVE >>dwFlags
+        0 >>dwHoverTime
     TrackMouseEvent drop
     >lo-hi swap window move-hand fire-motion ;
 
@@ -588,19 +591,18 @@ M: windows-ui-backend do-events
     ] if ;
 
 :: register-window-class ( class-name-ptr -- )
-    "WNDCLASSEX" <c-object> f GetModuleHandle
+    WNDCLASSEX <struct> f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
-        "WNDCLASSEX" heap-size over set-WNDCLASSEX-cbSize
-        { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags over set-WNDCLASSEX-style
-        ui-wndproc over set-WNDCLASSEX-lpfnWndProc
-        0 over set-WNDCLASSEX-cbClsExtra
-        0 over set-WNDCLASSEX-cbWndExtra
-        f GetModuleHandle over set-WNDCLASSEX-hInstance
-        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon
-        over set-WNDCLASSEX-hIcon
-        f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
+        WNDCLASSEX heap-size >>cbSize
+        { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags >>style
+        ui-wndproc >>lpfnWndProc
+        0 >>cbClsExtra
+        0 >>cbWndExtra
+        f GetModuleHandle >>hInstance
+        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon >>hIcon
+        f IDC_ARROW LoadCursor >>hCursor
 
-        class-name-ptr over set-WNDCLASSEX-lpszClassName
+        class-name-ptr >>lpszClassName
         RegisterClassEx win32-error=0/f
     ] [ drop ] if ;
 
@@ -610,12 +612,12 @@ M: windows-ui-backend do-events
 : make-RECT ( world -- RECT )
     [ window-loc>> ] [ dim>> ] bi <RECT> ;
 
-: default-position-RECT ( RECT -- )
-    dup get-RECT-dimensions [ 2drop ] 2dip
-    CW_USEDEFAULT + pick set-RECT-bottom
-    CW_USEDEFAULT + over set-RECT-right
-    CW_USEDEFAULT over set-RECT-left
-    CW_USEDEFAULT swap set-RECT-top ;
+: default-position-RECT ( RECT -- RECT' )
+    dup get-RECT-width/height
+        [ CW_USEDEFAULT + >>bottom ] dip
+        CW_USEDEFAULT + >>right
+        CW_USEDEFAULT >>left
+        CW_USEDEFAULT >>top ;
 
 : make-adjusted-RECT ( rect style ex-style -- RECT )
     [
@@ -623,7 +625,7 @@ M: windows-ui-backend do-events
         dup get-RECT-top-left [ zero? ] both? swap
         dup
     ] 2dip adjust-RECT
-    swap [ dup default-position-RECT ] when ;
+    swap [ default-position-RECT ] when ;
 
 : get-window-class ( -- class-name )
     class-name-ptr [
@@ -749,17 +751,18 @@ M: windows-ui-backend beep ( -- )
 
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow
-    "MONITORINFOEX" <c-object> dup length over set-MONITORINFOEX-cbSize
-    [ GetMonitorInfo win32-error=0/f ] keep MONITORINFOEX-rcMonitor ;
+    MONITORINFOEX <struct>
+        MONITORINFOEX heap-size >>cbSize
+    [ GetMonitorInfo win32-error=0/f ] keep rcMonitor>> ;
 
 : client-area>RECT ( hwnd -- RECT )
-    "RECT" <c-object>
+    RECT <struct>
     [ GetClientRect win32-error=0/f ]
     [ "POINT" byte-array>struct-array [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )
-    "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep ;
+    RECT <struct> [ GetWindowRect win32-error=0/f ] keep ;
 
 M: windows-ui-backend (grab-input) ( handle -- )
     0 ShowCursor drop
