@@ -4,8 +4,8 @@ USING: alien.syntax kernel unix.stat math unix
 combinators system io.backend accessors alien.c-types
 io.encodings.utf8 alien.strings unix.types io.files.unix
 io.files io.files.info unix.statvfs.netbsd unix.getfsstat.netbsd arrays
-grouping sequences io.encodings.utf8
-specialized-arrays.direct.uint io.files.info.unix ;
+grouping sequences io.encodings.utf8 classes.struct
+io.files.info.unix ;
 IN: io.files.info.unix.netbsd
 
 TUPLE: netbsd-file-system-info < unix-file-system-info
@@ -16,38 +16,37 @@ idx mount-from ;
 M: netbsd new-file-system-info netbsd-file-system-info new ;
 
 M: netbsd file-system-statvfs
-    "statvfs" <c-object> [ statvfs io-error ] keep ;
+    \ statvfs <struct> [ statvfs io-error ] keep ;
 
 M: netbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-info' )
     {
-        [ statvfs-f_flag >>flags ]
-        [ statvfs-f_bsize >>block-size ]
-        [ statvfs-f_frsize >>preferred-block-size ]
-        [ statvfs-f_iosize >>io-size ]
-        [ statvfs-f_blocks >>blocks ]
-        [ statvfs-f_bfree >>blocks-free ]
-        [ statvfs-f_bavail >>blocks-available ]
-        [ statvfs-f_bresvd >>blocks-reserved ]
-        [ statvfs-f_files >>files ]
-        [ statvfs-f_ffree >>files-free ]
-        [ statvfs-f_favail >>files-available ]
-        [ statvfs-f_fresvd >>files-reserved ]
-        [ statvfs-f_syncreads >>sync-reads ]
-        [ statvfs-f_syncwrites >>sync-writes ]
-        [ statvfs-f_asyncreads >>async-reads ]
-        [ statvfs-f_asyncwrites >>async-writes ]
-        [ statvfs-f_fsidx 2 <direct-uint-array> >array >>idx ]
-        [ statvfs-f_fsid >>id ]
-        [ statvfs-f_namemax >>name-max ]
-        [ statvfs-f_owner >>owner ]
-        ! [ statvfs-f_spare >>spare ]
-        [ statvfs-f_fstypename utf8 alien>string >>type ]
-        [ statvfs-f_mntonname utf8 alien>string >>mount-point ]
-        [ statvfs-f_mntfromname utf8 alien>string >>device-name ]
+        [ f_flag>> >>flags ]
+        [ f_bsize>> >>block-size ]
+        [ f_frsize>> >>preferred-block-size ]
+        [ f_iosize>> >>io-size ]
+        [ f_blocks>> >>blocks ]
+        [ f_bfree>> >>blocks-free ]
+        [ f_bavail>> >>blocks-available ]
+        [ f_bresvd>> >>blocks-reserved ]
+        [ f_files>> >>files ]
+        [ f_ffree>> >>files-free ]
+        [ f_favail>> >>files-available ]
+        [ f_fresvd>> >>files-reserved ]
+        [ f_syncreads>> >>sync-reads ]
+        [ f_syncwrites>> >>sync-writes ]
+        [ f_asyncreads>> >>async-reads ]
+        [ f_asyncwrites>> >>async-writes ]
+        [ f_fsidx>> >>idx ]
+        [ f_fsid>> >>id ]
+        [ f_namemax>> >>name-max ]
+        [ f_owner>> >>owner ]
+        [ f_fstypename>> utf8 alien>string >>type ]
+        [ f_mntonname>> utf8 alien>string >>mount-point ]
+        [ f_mntfromname>> utf8 alien>string >>device-name ]
     } cleave ;
 
 M: netbsd file-systems ( -- array )
     f 0 0 getvfsstat dup io-error
-    "statvfs" <c-array> dup dup length 0 getvfsstat io-error
-    "statvfs" heap-size group
-    [ statvfs-f_mntonname utf8 alien>string file-system-info ] map ;
+    \ statvfs <c-type-array> dup dup length 0 getvfsstat io-error
+    \ statvfs heap-size group
+    [ f_mntonname>> utf8 alien>string file-system-info ] map ;
