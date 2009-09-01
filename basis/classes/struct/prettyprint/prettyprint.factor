@@ -27,7 +27,12 @@ IN: classes.struct.prettyprint
     \ } pprint-word block> ;
 
 : pprint-struct ( struct -- )
-    [ [ \ S{ ] dip [ class ] [ struct>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
+    [
+        [ \ S{ ] dip
+        [ class ]
+        [ struct>assoc [ [ name>> ] dip ] assoc-map ] bi
+        \ } (pprint-tuple)
+    ] ?pprint-tuple ;
 
 : pprint-struct-pointer ( struct -- )
     \ S@ [ [ class pprint-word ] [ >c-ptr pprint* ] bi ] pprint-prefix ;
