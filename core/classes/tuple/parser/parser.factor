@@ -56,11 +56,18 @@ ERROR: invalid-slot-name name ;
 : parse-tuple-slots ( -- )
     ";" parse-tuple-slots-delim ;
 
+ERROR: bad-inheritance class superclass ;
+
+: check-self-inheritance ( class1 class2 -- class1 class2 )
+    2dup = [ bad-inheritance ] when ;
+
 : parse-tuple-definition ( -- class superclass slots )
     CREATE-CLASS
-    scan {
+    scan 2dup = [ ] when {
         { ";" [ tuple f ] }
-        { "<" [ scan-word [ parse-tuple-slots ] { } make ] }
+        { "<" [
+            scan-word check-self-inheritance [ parse-tuple-slots ] { } make
+        ] }
         [ tuple swap [ parse-slot-name [ parse-tuple-slots ] when ] { } make ]
     } case
     dup check-duplicate-slots
