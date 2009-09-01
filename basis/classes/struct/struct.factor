@@ -97,7 +97,7 @@ PRIVATE>
 
 M: struct-class boa>object
     swap pad-struct-slots
-    [ (struct) ] [ struct-slots ] bi 
+    [ <struct> ] [ struct-slots ] bi 
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] curry keep ;
 
 ! Struct slot accessors

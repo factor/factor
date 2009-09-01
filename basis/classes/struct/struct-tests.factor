@@ -1,12 +1,13 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types alien.libraries
-alien.structs.fields alien.syntax ascii byte-arrays classes.struct
-combinators destructors io.encodings.utf8 io.pathnames io.streams.string
-kernel libc literals math multiline namespaces prettyprint
-prettyprint.config see sequences specialized-arrays.ushort
-system tools.test compiler.tree.debugger struct-arrays
-classes.tuple.private specialized-arrays.direct.int
-compiler.units specialized-arrays.char ;
+alien.structs.fields alien.syntax ascii assocs byte-arrays
+classes.struct classes.tuple.private combinators
+compiler.tree.debugger compiler.units destructors
+io.encodings.utf8 io.pathnames io.streams.string kernel libc
+literals math mirrors multiline namespaces prettyprint
+prettyprint.config see sequences specialized-arrays.char
+specialized-arrays.direct.int specialized-arrays.ushort
+struct-arrays system tools.test ;
 IN: classes.struct.tests
 
 <<
@@ -55,6 +56,89 @@ STRUCT: struct-test-bar
 
 [ 7654 ] [ S{ struct-test-foo f 98 7654 f } y>> ] unit-test
 [ 7654 ] [ S{ struct-test-foo { y 7654 } } y>> ] unit-test
+
+[ {
+    { "underlying" B{ 98 0 0 98 127 0 0 127 0 0 0 0 } }
+    { { "x" "char" } 98            }
+    { { "y" "int"  } HEX: 7F00007F }
+    { { "z" "bool" } f             }
+} ] [
+    B{ 98 0 0 98 127 0 0 127 0 0 0 0 } struct-test-foo memory>struct
+    make-mirror >alist
+] unit-test
+
+[ { { "underlying" f } } ] [
+    f struct-test-foo memory>struct
+    make-mirror >alist
+] unit-test
+
+[ 55 t ] [ S{ struct-test-foo { x 55 } } make-mirror { "x" "char" } swap at* ] unit-test
+[ 55 t ] [ S{ struct-test-foo { y 55 } } make-mirror { "y" "int"  } swap at* ] unit-test
+[ t  t ] [ S{ struct-test-foo { z t  } } make-mirror { "z" "bool" } swap at* ] unit-test
+[ f  t ] [ S{ struct-test-foo { z f  } } make-mirror { "z" "bool" } swap at* ] unit-test
+[ f  f ] [ S{ struct-test-foo } make-mirror { "nonexist" "bool" } swap at* ] unit-test
+[ f  f ] [ S{ struct-test-foo } make-mirror "nonexist" swap at* ] unit-test
+[ f  t ] [ f struct-test-foo memory>struct make-mirror "underlying" swap at* ] unit-test
+
+[ S{ struct-test-foo { x 3 } { y 2 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror [ 3 { "x" "char" } ] dip set-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 1 } { y 5 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror [ 5 { "y" "int" } ] dip set-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 1 } { y 2 } { z t } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror [ t { "z" "bool" } ] dip set-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror [ "nonsense" "underlying" ] dip set-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror [ "nonsense" "nonexist" ] dip set-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror [ "nonsense" { "nonexist" "int" } ] dip set-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 1 } { y 123 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror { "y" "int" } swap delete-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 0 } { y 2 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror { "x" "char" } swap delete-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror { "nonexist" "char" } swap delete-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror "underlying" swap delete-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z f } }
+    [ make-mirror "nonsense" swap delete-at ] keep
+] unit-test
+
+[ S{ struct-test-foo { x 0 } { y 123 } { z f } } ] [
+    S{ struct-test-foo { x 1 } { y 2 } { z t } }
+    [ make-mirror clear-assoc ] keep
+] unit-test
 
 UNION-STRUCT: struct-test-float-and-bits
     { f float }
