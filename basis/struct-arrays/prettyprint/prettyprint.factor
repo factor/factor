@@ -10,10 +10,9 @@ M: struct-array >pprint-sequence
     [ >array ] [ class>> ] bi prefix ;
 
 : pprint-struct-array-pointer ( struct-array -- )
-    <block
-    \ struct-array@ pprint-word 
-    [ class>> ] [ underlying>> ] [ length>> ] tri [ pprint* ] tri@
-    block> ;
+    \ struct-array@ 
+    [ [ class>> pprint-word ] [ underlying>> pprint* ] [ length>> pprint* ] tri ]
+    pprint-prefix ;
 
 M: struct-array pprint*
     [ pprint-object ]

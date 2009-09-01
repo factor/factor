@@ -9,10 +9,7 @@ IN: specialized-arrays.direct.functor
 <PRIVATE
 
 : pprint-direct-array ( direct-array tag -- )
-    <block
-    pprint-word
-    [ underlying>> ] [ length>> ] bi [ pprint* ] bi@
-    block> ;
+    [ [ underlying>> ] [ length>> ] bi [ pprint* ] bi@ ] pprint-prefix ;
 
 PRIVATE>
 
