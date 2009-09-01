@@ -23,5 +23,8 @@ HELP: string-limit?
 { $var-description "Toggles whether printed strings are truncated to the margin." } ;
 
 HELP: boa-tuples?
-{ $var-description "Toggles whether tuples print in BOA-form or assoc-form." }
+{ $var-description "Toggles whether tuples and structs print in BOA-form or assoc-form." }
 { $notes "See " { $link POSTPONE: T{ } " for a description of both literal tuple forms." } ;
+
+HELP: c-object-pointers?
+{ $var-description "Toggles whether C objects such as structs and direct arrays only print their underlying address. If this flag isn't set, C objects will attempt to print their contents. If a C object points to invalid memory, it will display only its address regardless." } ;

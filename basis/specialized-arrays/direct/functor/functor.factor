@@ -2,8 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: functors sequences sequences.private kernel words classes
 math alien alien.c-types byte-arrays accessors
-specialized-arrays prettyprint.custom ;
+specialized-arrays parser
+prettyprint.backend prettyprint.custom prettyprint.sections ;
 IN: specialized-arrays.direct.functor
+
+<PRIVATE
+
+: pprint-direct-array ( direct-array tag -- )
+    [ [ underlying>> ] [ length>> ] bi [ pprint* ] bi@ ] pprint-prefix ;
+
+PRIVATE>
 
 FUNCTOR: define-direct-array ( T -- )
 
@@ -15,6 +23,7 @@ A'{     IS ${A'}{
 
 A       DEFINES-CLASS direct-${T}-array
 <A>     DEFINES <${A}>
+A'@      DEFINES ${A'}@
 
 NTH     [ T dup c-type-getter-boxer array-accessor ]
 SET-NTH [ T dup c-setter array-accessor ]
@@ -34,11 +43,17 @@ M: A new-sequence drop <A'> ; inline
 
 M: A byte-length length>> T heap-size * ; inline
 
+SYNTAX: A'@ 
+    scan-object scan-object <A> parsed ;
+
 M: A pprint-delims drop \ A'{ \ } ;
 
 M: A >pprint-sequence ;
 
-M: A pprint* pprint-object ;
+M: A pprint*
+    [ pprint-object ]
+    [ \ A'@ pprint-direct-array ]
+    pprint-c-object ;
 
 INSTANCE: A sequence
 INSTANCE: A S

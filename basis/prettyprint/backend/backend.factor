@@ -1,10 +1,11 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays byte-vectors generic hashtables
-assocs kernel math namespaces make sequences strings sbufs vectors
-words prettyprint.config prettyprint.custom prettyprint.sections
-quotations io io.pathnames io.styles math.parser effects classes.tuple
-math.order classes.tuple.private classes combinators colors ;
+USING: accessors arrays byte-arrays byte-vectors continuations
+generic hashtables assocs kernel math namespaces make sequences
+strings sbufs vectors words prettyprint.config prettyprint.custom
+prettyprint.sections quotations io io.pathnames io.styles math.parser
+effects classes.tuple math.order classes.tuple.private classes
+combinators colors ;
 IN: prettyprint.backend
 
 M: effect pprint* effect>string "(" ")" surround text ;
@@ -152,6 +153,15 @@ M: pathname pprint*
 
 M: tuple pprint*
     pprint-tuple ;
+
+: recover-pprint ( try recovery -- )
+    pprinter-stack get clone
+    [ pprinter-stack set ] curry prepose recover ; inline
+
+: pprint-c-object ( object content-quot pointer-quot -- )
+    [ c-object-pointers? get ] 2dip
+    [ nip ]
+    [ [ drop ] prepose [ recover-pprint ] 2curry ] 2bi if ; inline
 
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [

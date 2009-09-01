@@ -6,7 +6,7 @@ combinators combinators.short-circuit combinators.smart
 functors.backend fry generalizations generic.parser kernel
 kernel.private lexer libc locals macros make math math.order parser
 quotations sequences slots slots.private struct-arrays vectors
-words compiler.tree.propagation.transforms ;
+words compiler.tree.propagation.transforms specialized-arrays.direct.uchar ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
 
@@ -23,7 +23,7 @@ TUPLE: struct-slot-spec < slot-spec
 PREDICATE: struct-class < tuple-class
     { [ \ struct subclass-of? ] [ all-slots length 1 = ] } 1&& ;
 
-: struct-slots ( struct -- slots )
+: struct-slots ( struct-class -- slots )
     "struct-slots" word-prop ;
 
 ! struct allocation
@@ -35,7 +35,10 @@ M: struct equal?
     {
         [ [ class ] bi@ = ]
         [ [ >c-ptr ] [ [ >c-ptr ] [ byte-length ] bi ] bi* memory= ]
-    } 2&& ;
+    } 2&& ; inline
+
+M: struct hashcode*
+    [ >c-ptr ] [ byte-length ] bi <direct-uchar-array> hashcode* ; inline    
 
 : struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
 
@@ -254,19 +257,22 @@ PRIVATE>
 
 ERROR: invalid-struct-slot token ;
 
-<PRIVATE
 : struct-slot-class ( c-type -- class' )
     c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
 
+: <struct-slot-spec> ( name c-type attributes -- slot-spec )
+    [ struct-slot-spec new ] 3dip
+    [ >>name ]
+    [ [ >>c-type ] [ struct-slot-class >>class ] bi ]
+    [ [ dup empty? ] [ peel-off-attributes ] until drop ] tri* ;
+
+<PRIVATE
 : scan-c-type ( -- c-type )
     scan dup "{" = [ drop \ } parse-until >array ] when ;
 
 : parse-struct-slot ( -- slot )
-    struct-slot-spec new
-    scan >>name
-    scan-c-type [ >>c-type ] [ struct-slot-class >>class ] bi
-    \ } parse-until [ dup empty? ] [ peel-off-attributes ] until drop ;
+    scan scan-c-type \ } parse-until <struct-slot-spec> ;
     
 : parse-struct-slots ( slots -- slots' more? )
     scan {
@@ -287,23 +293,18 @@ SYNTAX: UNION-STRUCT:
 SYNTAX: S{
     scan-word dup struct-slots parse-tuple-literal-slots parsed ;
 
+SYNTAX: S@
+    scan-word scan-object swap memory>struct parsed ;
+
 ! functor support
 
 <PRIVATE
 : scan-c-type` ( -- c-type/param )
     scan dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;
 
-:: parse-struct-slot` ( accum -- accum )
-    scan-string-param :> name
-    scan-c-type` :> c-type
-    \ } parse-until :> attributes
-    accum {
-        \ struct-slot-spec new 
-            name >>name
-            c-type [ >>c-type ] [ struct-slot-class >>class ] bi
-            attributes [ dup empty? ] [ peel-off-attributes ] until drop
-        over push
-    } over push-all ;
+: parse-struct-slot` ( accum -- accum )
+    scan-string-param scan-c-type` \ } parse-until
+    [ <struct-slot-spec> over push ] 3curry over push-all ;
 
 : parse-struct-slots` ( accum -- accum more? )
     scan {

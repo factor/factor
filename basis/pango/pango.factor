@@ -2,7 +2,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license
 USING: arrays system alien.destructors alien.c-types alien.syntax alien
-combinators math.rectangles kernel math alien.libraries ;
+combinators math.rectangles kernel math alien.libraries classes.struct
+accessors ;
 IN: pango
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -25,13 +26,13 @@ CONSTANT: PANGO_SCALE 1024
 FUNCTION: PangoContext*
 pango_context_new ( ) ;
 
-C-STRUCT: PangoRectangle
-    { "int" "x" }
-    { "int" "y" }
-    { "int" "width" }
-    { "int" "height" } ;
+STRUCT: PangoRectangle
+    { x int }
+    { y int }
+    { width int }
+    { height int } ;
 
 : PangoRectangle>rect ( PangoRectangle -- rect )
-    [ [ PangoRectangle-x pango>float ] [ PangoRectangle-y pango>float ] bi 2array ]
-    [ [ PangoRectangle-width pango>float ] [ PangoRectangle-height pango>float ] bi 2array ] bi
+    [ [ x>> pango>float ] [ y>> pango>float ] bi 2array ]
+    [ [ width>> pango>float ] [ height>> pango>float ] bi 2array ] bi
     <rect> ;
