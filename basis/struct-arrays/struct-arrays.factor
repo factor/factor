@@ -40,7 +40,10 @@ M: struct-array nth-unsafe
 M: struct-array set-nth-unsafe
     [ (nth-ptr) swap ] [ element-size>> ] bi memcpy ; inline
 
+ERROR: not-a-struct-class struct-class ;
+
 : <direct-struct-array> ( alien length struct-class -- struct-array )
+    dup struct-class? [ not-a-struct-class ] unless
     [ heap-size ] [ ] [ struct-element-constructor ]
     tri struct-array boa ; inline
 
@@ -52,7 +55,7 @@ M: struct-array resize ( n seq -- newseq )
     [ [ element-size>> * ] [ underlying>> ] bi resize ] [ class>> ] 2bi
     <direct-struct-array> ; inline
 
-: <struct-array> ( length c-type -- struct-array )
+: <struct-array> ( length struct-class -- struct-array )
     [ heap-size * <byte-array> ] 2keep <direct-struct-array> ; inline
 
 ERROR: bad-byte-array-length byte-array ;
