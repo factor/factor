@@ -15,7 +15,7 @@ HELP: <direct-struct-array>
 { $description "Creates a new array for holding values of the specified C type, backed by the memory at " { $snippet "alien" } "." } ;
 
 HELP: struct-array-on
-{ $value { "struct" struct } { "length" integer } }
+{ $values { "struct" struct } { "length" integer } { "struct-array" struct-array } }
 { $description "Create a new array for holding values of " { $snippet "struct" } "'s C type, backed by the memory starting at " { $snippet "struct" } "'s address." }
 { $examples
 "This word is useful with the FFI. When a C function has a pointer to a struct as its return type (or a C callback has a struct pointer as an argument type), Factor automatically wraps the pointer in a " { $link struct } " object. If the pointer actually references an array of objects, this word will convert the struct object to a struct array object:"
