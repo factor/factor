@@ -10,11 +10,11 @@ void factorvm::c_to_factor_toplevel(cell quot)
 	for(;;)
 	{
 NS_DURING
-		c_to_factor(quot,vm);
+		c_to_factor(quot,this);
 		NS_VOIDRETURN;
 NS_HANDLER
-		dpush(vm->allot_alien(F,(cell)localException));
-		quot = vm->userenv[COCOA_EXCEPTION_ENV];
+		dpush(allot_alien(F,(cell)localException));
+		quot = userenv[COCOA_EXCEPTION_ENV];
 		if(!tagged<object>(quot).type_p(QUOTATION_TYPE))
 		{
 			/* No Cocoa exception handler was registered, so
