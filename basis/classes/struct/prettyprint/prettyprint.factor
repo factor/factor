@@ -1,7 +1,9 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien assocs classes classes.struct
-combinators kernel math prettyprint.backend prettyprint.custom
-prettyprint.sections see.private sequences strings words ;
+USING: accessors alien alien.c-types arrays assocs classes
+classes.struct combinators continuations fry kernel make math
+math.parser mirrors prettyprint.backend prettyprint.custom
+prettyprint.sections see.private sequences strings
+summary words ;
 IN: classes.struct.prettyprint
 
 <PRIVATE
@@ -46,3 +48,21 @@ M: struct >pprint-sequence
 M: struct pprint*
     [ pprint-struct ]
     [ pprint-struct-pointer ] pprint-c-object ;
+
+M: struct summary
+    [
+        dup class name>> %
+        " struct of " %
+        byte-length #
+        " bytes " %
+    ] "" make ;
+
+M: struct make-mirror
+    [
+        [ drop "underlying" ] [ (underlying)>> ] bi 2array 1array
+    ] [
+        '[
+            _ struct>assoc
+            [ [ [ name>> ] [ c-type>> ] bi 2array ] dip ] assoc-map
+        ] [ drop { } ] recover
+    ] bi append ;
