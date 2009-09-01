@@ -147,3 +147,9 @@ TUPLE: bad-inheritance-tuple ;
 [
     "IN: classes.tuple.parser.tests TUPLE: bad-inheritance-tuple < bad-inheritance-tuple ;" eval( -- )
 ] [ error>> bad-inheritance? ] must-fail-with
+
+TUPLE: bad-inheritance-tuple2 ;
+TUPLE: bad-inheritance-tuple3 < bad-inheritance-tuple2 ;
+[
+    "IN: classes.tuple.parser.tests TUPLE: bad-inheritance-tuple2 < bad-inheritance-tuple3 ;" eval( -- )
+] [ error>> bad-inheritance? ] must-fail-with
