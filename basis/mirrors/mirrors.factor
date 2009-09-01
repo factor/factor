@@ -56,3 +56,13 @@ M: array make-mirror <enum> ;
 M: vector make-mirror <enum> ;
 M: quotation make-mirror <enum> ;
 M: object make-mirror <mirror> ;
+
+M: struct make-mirror
+    [
+        [ drop "underlying" ] [ (underlying)>> ] bi 2array 1array
+    ] [
+        '[
+            _ struct>assoc
+            [ [ [ name>> ] [ c-type>> ] bi 2array ] dip ] assoc-map
+        ] [ drop { } ] recover
+    ] bi append ;
