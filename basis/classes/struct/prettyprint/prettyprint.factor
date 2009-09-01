@@ -1,9 +1,9 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types arrays assocs classes
-classes.struct combinators continuations fry kernel make math
-math.parser mirrors prettyprint.backend prettyprint.custom
-prettyprint.sections see.private sequences strings
-summary words ;
+classes.struct combinators combinators.short-circuit continuations
+fry kernel libc make math math.parser mirrors prettyprint.backend
+prettyprint.custom prettyprint.sections see.private sequences
+slots strings summary words ;
 IN: classes.struct.prettyprint
 
 <PRIVATE
@@ -62,12 +62,57 @@ M: struct summary
         " bytes " %
     ] "" make ;
 
-M: struct make-mirror
-    [
-        [ drop "underlying" ] [ (underlying)>> ] bi 2array 1array
+TUPLE: struct-mirror { object read-only } ;
+C: <struct-mirror> struct-mirror
+
+: get-struct-slot ( struct slot -- value present? )
+    over class struct-slots slot-named
+    [ name>> reader-word execute( struct -- value ) t ]
+    [ drop f f ] if* ;
+: set-struct-slot ( value struct slot -- )
+    over class struct-slots slot-named
+    [ name>> writer-word execute( value struct -- ) ]
+    [ 2drop ] if* ;
+: reset-struct-slot ( struct slot -- )
+    over class struct-slots slot-named
+    [ [ initial>> swap ] [ name>> writer-word ] bi execute( value struct -- ) ]
+    [ drop ] if* ;
+: reset-struct-slots ( struct -- )
+    dup class struct-prototype
+    dup byte-length memcpy ;
+
+M: struct-mirror at*
+    object>> {
+        { [ over "underlying" = ] [ nip >c-ptr t ] }
+        { [ over { [ array? ] [ length 1 >= ] } 1&& ] [ swap first get-struct-slot ] }
+        [ 2drop f f ]
+    } cond ;
+
+M: struct-mirror set-at
+    object>> {
+        { [ over "underlying" = ] [ 3drop ] }
+        { [ over array? ] [ swap first set-struct-slot ] }
+        [ 3drop ]
+    } cond ;
+
+M: struct-mirror delete-at
+    object>> {
+        { [ over "underlying" = ] [ 2drop ] }
+        { [ over array? ] [ swap first reset-struct-slot ] }
+        [ 2drop ]
+    } cond ;
+
+M: struct-mirror clear-assoc
+    object>> reset-struct-slots ;
+
+M: struct-mirror >alist ( mirror -- alist )
+    object>> [
+        [ drop "underlying" ] [ >c-ptr ] bi 2array 1array
     ] [
         '[
             _ struct>assoc
             [ [ [ name>> ] [ c-type>> ] bi 2array ] dip ] assoc-map
         ] [ drop { } ] recover
     ] bi append ;
+
+M: struct make-mirror <struct-mirror> ;

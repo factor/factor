@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: classes classes.struct gpu.buffers help.markup help.syntax
-images kernel math multiline quotations sequences strings ;
+images kernel math multiline quotations sequences strings words ;
 IN: gpu.shaders
 
 HELP: <program-instance>
@@ -86,7 +86,7 @@ HELP: define-vertex-format
 
 HELP: define-vertex-struct
 { $values
-    { "struct-name" string } { "vertex-format" vertex-format }
+    { "class" word } { "vertex-format" vertex-format }
 }
 { $description "Defines a new struct C type from a " { $link vertex-format } ". The runtime equivalent of " { $link POSTPONE: VERTEX-STRUCT: } ". This word must be called inside a compilation unit." } ;
 
