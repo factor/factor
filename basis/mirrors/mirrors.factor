@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables kernel sequences generic words
-arrays classes slots slots.private classes.tuple
-classes.tuple.private math vectors quotations accessors
-combinators ;
+USING: accessors arrays assocs classes classes.struct
+classes.struct.prettyprint.private classes.tuple
+classes.tuple.private combinators generic hashtables kernel
+math quotations sequences slots slots.private vectors words
+continuations fry ;
 IN: mirrors
 
 TUPLE: mirror { object read-only } ;
@@ -55,3 +56,13 @@ M: array make-mirror <enum> ;
 M: vector make-mirror <enum> ;
 M: quotation make-mirror <enum> ;
 M: object make-mirror <mirror> ;
+
+M: struct make-mirror
+    [
+        [ drop "underlying" ] [ (underlying)>> ] bi 2array 1array
+    ] [
+        '[
+            _ struct>assoc
+            [ [ [ name>> ] [ c-type>> ] bi 2array ] dip ] assoc-map
+        ] [ drop { } ] recover
+    ] bi append ;
