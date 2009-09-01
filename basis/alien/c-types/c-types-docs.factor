@@ -49,7 +49,7 @@ HELP: c-setter
 { $errors "Throws an error if the type does not exist." } ;
 
 HELP: <c-array>
-{ $values { "n" "a non-negative integer" } { "type" "a C type" } { "array" byte-array } }
+{ $values { "len" "a non-negative integer" } { "c-type" "a C type" } { "array" byte-array } }
 { $description "Creates a byte array large enough to hold " { $snippet "n" } " values of a C type." }
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, a " { $link specialized-array-vocab-not-loaded } " error will be thrown. The vocabulary can be loaded with a " { $link POSTPONE: USING: } " form as usual, or with the " { $link require-c-arrays } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary set for details on the underlying sequence type constructed." }
 { $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
