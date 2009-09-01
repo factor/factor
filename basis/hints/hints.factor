@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
-combinators definitions fry generic generic.single
+combinators definitions effects fry generic generic.single
 generic.standard hashtables io.binary io.streams.string kernel
 kernel.private math math.parser namespaces parser sbufs
 sequences splitting splitting.private strings vectors words ;
@@ -18,6 +18,14 @@ GENERIC: specializer-declaration ( spec -- class )
 M: class specializer-declaration ;
 
 M: object specializer-declaration class ;
+
+: specialized? ( types -- ? )
+    [ object = ] all? not ;
+
+: specializer ( word -- specializer )
+    [ "specializer" word-prop ]
+    [ stack-effect effect-in-types ] bi
+    dup specialized? [ suffix ] [ drop ] if ;
 
 : make-specializer ( specs -- quot )
     dup length <reversed>
@@ -49,7 +57,7 @@ t specialize-method? set-global
 
 : specialize-method ( quot method -- quot' )
     [ specialize-method? get [ method-declaration prepend ] [ drop ] if ]
-    [ "method-generic" word-prop "specializer" word-prop ] bi
+    [ "method-generic" word-prop specializer ] bi
     [ specialize-quot ] when* ;
 
 : standard-method? ( method -- ? )
@@ -61,7 +69,7 @@ t specialize-method? set-global
     [ def>> ] keep
     dup generic? [ drop ] [
         [ dup standard-method? [ specialize-method ] [ drop ] if ]
-        [ "specializer" word-prop [ specialize-quot ] when* ]
+        [ specializer [ specialize-quot ] when* ]
         bi
     ] if ;
 
