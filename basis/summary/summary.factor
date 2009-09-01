@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes sequences kernel namespaces
-make words math math.parser assocs classes.struct
-alien.c-types ;
+make words math math.parser assocs ;
 IN: summary
 
 GENERIC: summary ( object -- string )
@@ -32,11 +31,3 @@ M: assoc summary
 M: f summary object-summary ;
 
 M: integer summary object-summary ;
-
-M: struct summary
-    [
-        dup class name>> %
-        " struct of " %
-        byte-length #
-        " bytes " %
-    ] "" make ;
