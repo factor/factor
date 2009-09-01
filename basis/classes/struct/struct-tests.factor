@@ -76,7 +76,7 @@ STRUCT: struct-test-string-ptr
     ] with-destructors
 ] unit-test
 
-[ "S{ struct-test-foo { y 7654 } }" ]
+[ "S{ struct-test-foo { x 0 } { y 7654 } { z f } }" ]
 [
     [
         boa-tuples? off
