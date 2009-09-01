@@ -109,7 +109,6 @@ IN: compiler.cfg.intrinsics
     } enable-intrinsics ;
 
 : enable-float-functions ( -- )
-    ! Everything except for fsqrt
     {
         { math.libm:facos [ drop "acos" emit-unary-float-function ] }
         { math.libm:fasin [ drop "asin" emit-unary-float-function ] }
@@ -127,6 +126,9 @@ IN: compiler.cfg.intrinsics
         { math.libm:facosh [ drop "acosh" emit-unary-float-function ] }
         { math.libm:fasinh [ drop "asinh" emit-unary-float-function ] }
         { math.libm:fatanh [ drop "atanh" emit-unary-float-function ] }
+        { math.libm:fsqrt [ drop "sqrt" emit-unary-float-function ] }
+        { math.floats.private:float-min [ drop "fmin" emit-binary-float-function ] }
+        { math.floats.private:float-max [ drop "fmax" emit-binary-float-function ] }
     } enable-intrinsics ;
 
 : enable-min/max ( -- )

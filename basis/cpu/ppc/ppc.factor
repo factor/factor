@@ -281,6 +281,23 @@ M:: ppc %box-float ( dst src temp -- )
     dst 16 float temp %allot
     src dst float-offset STFD ;
 
+: float-function-param ( i spill-slot -- )
+    [ float-regs param-regs nth 1 ] [ n>> spill@ ] bi* LFD ;
+
+: float-function-return ( reg -- )
+    float-regs return-reg 2dup = [ 2drop ] [ FMR ] if ;
+
+M:: ppc %unary-float-function ( dst src func -- )
+    0 src float-function-param
+    func f %alien-invoke
+    dst float-function-return ;
+
+M:: ppc %binary-float-function ( dst src1 src2 func -- )
+    0 src1 float-function-param
+    1 src2 float-function-param
+    func f %alien-invoke
+    dst float-function-return ;
+
 M:: ppc %unbox-any-c-ptr ( dst src temp -- )
     [
         { "is-byte-array" "end" "start" } [ define-label ] each
@@ -680,6 +697,8 @@ M: ppc %unbox-small-struct ( size -- )
         { 2 [ %unbox-struct-2 ] }
         { 4 [ %unbox-struct-4 ] }
     } case ;
+
+enable-float-functions
 
 USE: vocabs.loader
 
