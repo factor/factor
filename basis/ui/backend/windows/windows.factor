@@ -614,8 +614,8 @@ M: windows-ui-backend do-events
 
 : default-position-RECT ( RECT -- RECT' )
     dup get-RECT-width/height
-        [ CW_USEDEFAULT + >>bottom ] dip
-        CW_USEDEFAULT + >>right
+        [ CW_USEDEFAULT + >>right ] dip
+        CW_USEDEFAULT + >>bottom
         CW_USEDEFAULT >>left
         CW_USEDEFAULT >>top ;
 
@@ -758,7 +758,7 @@ M: windows-ui-backend beep ( -- )
 : client-area>RECT ( hwnd -- RECT )
     RECT <struct>
     [ GetClientRect win32-error=0/f ]
-    [ "POINT" byte-array>struct-array [ ClientToScreen drop ] with each ]
+    [ >c-ptr "POINT" byte-array>struct-array [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )

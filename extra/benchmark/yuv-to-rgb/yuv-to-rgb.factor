@@ -2,50 +2,50 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.accessors alien.c-types alien.syntax byte-arrays
 destructors generalizations hints kernel libc locals math math.order
-sequences sequences.private ;
+sequences sequences.private classes.struct accessors ;
 IN: benchmark.yuv-to-rgb
 
-C-STRUCT: yuv_buffer
-    { "int" "y_width" }
-    { "int" "y_height" }
-    { "int" "y_stride" }
-    { "int" "uv_width" }
-    { "int" "uv_height" }
-    { "int" "uv_stride" }
-    { "void*" "y" }
-    { "void*" "u" }
-    { "void*" "v" } ;
+STRUCT: yuv_buffer
+    { y_width int }
+    { y_height int }
+    { y_stride int }
+    { uv_width int }
+    { uv_height int }
+    { uv_stride int }
+    { y void* }
+    { u void* }
+    { v void* } ;
 
 :: fake-data ( -- rgb yuv )
     [let* | w [ 1600 ]
             h [ 1200 ]
-            buffer [ "yuv_buffer" <c-object> ]
+            buffer [ yuv_buffer <struct> ]
             rgb [ w h * 3 * <byte-array> ] |
-        w buffer set-yuv_buffer-y_width
-        h buffer set-yuv_buffer-y_height
-        h buffer set-yuv_buffer-uv_height
-        w buffer set-yuv_buffer-y_stride
-        w buffer set-yuv_buffer-uv_stride
-        w h * [ dup * ] B{ } map-as malloc-byte-array &free buffer set-yuv_buffer-y
-        w h * 2/ [ dup dup * * ] B{ } map-as malloc-byte-array &free buffer set-yuv_buffer-u
-        w h * 2/ [ dup * dup * ] B{ } map-as malloc-byte-array &free buffer set-yuv_buffer-v
         rgb buffer
+            w >>y_width
+            h >>y_height
+            h >>uv_height
+            w >>y_stride
+            w >>uv_stride
+            w h * [ dup * ] B{ } map-as malloc-byte-array &free >>y
+            w h * 2/ [ dup dup * * ] B{ } map-as malloc-byte-array &free >>u
+            w h * 2/ [ dup * dup * ] B{ } map-as malloc-byte-array &free >>v
     ] ;
 
 : clamp ( n -- n )
     255 min 0 max ; inline
 
 : stride ( line yuv  -- uvy yy )
-    [ yuv_buffer-uv_stride swap 2/ * ] [ yuv_buffer-y_stride * ] 2bi ; inline
+    [ uv_stride>> swap 2/ * ] [ y_stride>> * ] 2bi ; inline
 
 : compute-y ( yuv uvy yy x -- y )
-    + >fixnum nip swap yuv_buffer-y swap alien-unsigned-1 16 - ; inline
+    + >fixnum nip swap y>> swap alien-unsigned-1 16 - ; inline
 
 : compute-v ( yuv uvy yy x -- v )
-    nip 2/ + >fixnum swap yuv_buffer-u swap alien-unsigned-1 128 - ; inline
+    nip 2/ + >fixnum swap u>> swap alien-unsigned-1 128 - ; inline
 
 : compute-u ( yuv uvy yy x -- v )
-    nip 2/ + >fixnum swap yuv_buffer-v swap alien-unsigned-1 128 - ; inline
+    nip 2/ + >fixnum swap v>> swap alien-unsigned-1 128 - ; inline
 
 :: compute-yuv ( yuv uvy yy x -- y u v )
     yuv uvy yy x compute-y
@@ -77,16 +77,16 @@ C-STRUCT: yuv_buffer
 
 : yuv>rgb-row ( index rgb yuv y -- index )
     over stride
-    pick yuv_buffer-y_width
+    pick y_width>>
     [ yuv>rgb-pixel ] with with with with each ; inline
 
 : yuv>rgb ( rgb yuv -- )
     [ 0 ] 2dip
-    dup yuv_buffer-y_height
+    dup y_height>>
     [ yuv>rgb-row ] with with each
     drop ;
 
-HINTS: yuv>rgb byte-array byte-array ;
+HINTS: yuv>rgb byte-array yuv_buffer ;
 
 : yuv>rgb-benchmark ( -- )
     [ fake-data yuv>rgb ] with-destructors ;

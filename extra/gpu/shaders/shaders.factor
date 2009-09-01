@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien alien.c-types alien.strings
-alien.structs arrays assocs byte-arrays classes.mixin
-classes.parser classes.singleton combinators
+arrays assocs byte-arrays classes.mixin classes.parser
+classes.singleton classes.struct combinators
 combinators.short-circuit definitions destructors
 generic.parser gpu gpu.buffers hashtables images
 io.encodings.ascii io.files io.pathnames kernel lexer literals
@@ -238,8 +238,8 @@ M: f (verify-feedback-format)
         { uint-integer-components [ "uint" ] }
     } case ;
 
-: c-array-dim ( dim -- string )
-    dup 1 = [ drop "" ] [ number>string "[" "]" surround ] if ;
+: c-array-dim ( type dim -- type' )
+    dup 1 = [ drop ] [ 2array ] if ;
 
 SYMBOL: padding-no
 padding-no [ 0 ] initialize
@@ -250,11 +250,10 @@ padding-no [ 0 ] initialize
     "(" ")" surround
     padding-no inc ;
 
-: vertex-attribute>c-type ( vertex-attribute -- {type,name} )
-    [
-        [ component-type>> component-type>c-type ]
-        [ dim>> c-array-dim ] bi append
-    ] [ name>> [ padding-name ] unless* ] bi 2array ;
+: vertex-attribute>struct-slot ( vertex-attribute -- struct-slot-spec )
+    [ name>> [ padding-name ] unless* ]
+    [ [ component-type>> component-type>c-type ] [ dim>> c-array-dim ] bi ] bi
+    { } <struct-slot-spec> ;
 
 : shader-filename ( shader/program -- filename )
     dup filename>> [ nip ] [ name>> where first ] if* file-name ;
@@ -303,13 +302,12 @@ SYNTAX: VERTEX-FORMAT:
     [ first4 vertex-attribute boa ] map
     define-vertex-format ;
 
-: define-vertex-struct ( struct-name vertex-format -- )
-    [ current-vocab ] dip
-    "vertex-format-attributes" word-prop [ vertex-attribute>c-type ] map
-    define-struct ;
+: define-vertex-struct ( class vertex-format -- )
+    "vertex-format-attributes" word-prop [ vertex-attribute>struct-slot ] map
+    define-struct-class ;
 
 SYNTAX: VERTEX-STRUCT:
-    scan scan-word define-vertex-struct ;
+    CREATE-CLASS scan-word define-vertex-struct ;
 
 TUPLE: vertex-array < gpu-object
     { program-instance program-instance read-only }

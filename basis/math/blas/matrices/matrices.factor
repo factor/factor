@@ -132,7 +132,7 @@ M: blas-matrix-base clone
 
 ! XXX try rounding stride to next 128 bit bound for better vectorizin'
 : <empty-matrix> ( rows cols exemplar -- matrix )
-    [ element-type [ * ] dip <c-array> ]
+    [ element-type heap-size * * <byte-array> ]
     [ 2drop ]
     [ f swap (blas-matrix-like) ] 3tri ;
 
