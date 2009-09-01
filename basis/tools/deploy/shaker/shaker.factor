@@ -68,9 +68,14 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-destructors ( -- )
-    "libc" vocab [
-        "Stripping destructor debug code" show
-        "vocab:tools/deploy/shaker/strip-destructors.factor"
+    "Stripping destructor debug code" show
+    "vocab:tools/deploy/shaker/strip-destructors.factor"
+    run-file ;
+
+: strip-struct-arrays ( -- )
+    "struct-arrays" vocab [
+        "Stripping dynamic struct array code" show
+        "vocab:tools/deploy/shaker/strip-struct-arrays.factor"
         run-file
     ] when ;
 
@@ -493,6 +498,7 @@ SYMBOL: deploy-vocab
 : strip ( -- )
     init-stripper
     strip-libc
+    strip-struct-arrays
     strip-destructors
     strip-call
     strip-cocoa

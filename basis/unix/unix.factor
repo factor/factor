@@ -5,7 +5,7 @@ USING: alien alien.c-types alien.syntax kernel libc
 sequences continuations byte-arrays strings math namespaces
 system combinators vocabs.loader accessors
 stack-checker macros locals generalizations unix.types
-io vocabs ;
+io vocabs classes.struct ;
 IN: unix
 
 CONSTANT: PROT_NONE   0
@@ -35,11 +35,11 @@ CONSTANT: DT_LNK      10
 CONSTANT: DT_SOCK     12
 CONSTANT: DT_WHT      14
 
-C-STRUCT: group
-    { "char*" "gr_name" }
-    { "char*" "gr_passwd" }
-    { "int" "gr_gid" }
-    { "char**" "gr_mem" } ;
+STRUCT: group
+    { gr_name char* }
+    { gr_passwd char* }
+    { gr_gid int }
+    { gr_mem char** } ;
 
 LIBRARY: libc
 
@@ -147,19 +147,19 @@ M: unix open-file [ open ] unix-system-call ;
 
 FUNCTION: DIR* opendir ( char* path ) ;
 
-C-STRUCT: utimbuf
-    { "time_t" "actime"  }
-    { "time_t" "modtime" } ;
+STRUCT: utimbuf
+    { actime time_t }
+    { modtime time_t } ;
 
-FUNCTION: int utime ( char* path, utimebuf* buf ) ;
+FUNCTION: int utime ( char* path, utimbuf* buf ) ;
 
 : touch ( filename -- ) f [ utime ] unix-system-call drop ;
 
 : change-file-times ( filename access modification -- )
-    "utimebuf" <c-object>
-    [ set-utimbuf-modtime ] keep
-    [ set-utimbuf-actime ] keep
-    [ utime ] unix-system-call drop ;
+    utimbuf <struct>
+        swap >>modtime
+        swap >>actime
+        [ utime ] unix-system-call drop ;
 
 FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;

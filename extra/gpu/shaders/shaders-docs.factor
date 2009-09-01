@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: alien.syntax classes gpu.buffers help.markup help.syntax
+USING: classes classes.struct gpu.buffers help.markup help.syntax
 images kernel math multiline quotations sequences strings ;
 IN: gpu.shaders
 
@@ -51,7 +51,7 @@ HELP: VERTEX-FORMAT:
 
 HELP: VERTEX-STRUCT:
 { $syntax <" VERTEX-STRUCT: struct-name format-name "> }
-{ $description "Defines a struct C type (like " { $link POSTPONE: C-STRUCT: } ") with the same binary format and component types as the given " { $link vertex-format } "." } ;
+{ $description "Defines a struct class (like " { $link POSTPONE: STRUCT: } ") with the same binary format and component types as the given " { $link vertex-format } "." } ;
 
 { POSTPONE: GLSL-PROGRAM: POSTPONE: GLSL-SHADER-FILE: POSTPONE: GLSL-SHADER: } related-words
 
