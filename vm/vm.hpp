@@ -690,11 +690,10 @@ struct factorvm {
 };
 
 
-// #define FACTOR_SINGLE_THREADED_SINGLETON
-#define FACTOR_SINGLE_THREADED_TESTING
+#define FACTOR_MULTITHREADED_TLS
 
 #ifdef FACTOR_SINGLE_THREADED_SINGLETON
-/* calls are dispatched using the singleton */
+/* calls are dispatched using the singleton vm ptr */
   extern factorvm *vm;
   #define PRIMITIVE_GETVM() vm
   #define PRIMITIVE_OVERFLOW_GETVM() vm
@@ -710,6 +709,15 @@ struct factorvm {
   #define PRIMITIVE_OVERFLOW_GETVM() vm
   #define VM_PTR myvm
   #define ASSERTVM() assert(vm==myvm)
+  #define SIGNAL_VM_PTR() tls_vm()
+#endif
+
+#ifdef FACTOR_MULTITHREADED_TLS
+/* uses thread local storage to obtain vm ptr */
+  #define PRIMITIVE_GETVM() tls_vm()
+  #define PRIMITIVE_OVERFLOW_GETVM() tls_vm()
+  #define VM_PTR tls_vm()
+  #define ASSERTVM() 
   #define SIGNAL_VM_PTR() tls_vm()
 #endif
 
