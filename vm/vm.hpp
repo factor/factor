@@ -690,7 +690,7 @@ struct factorvm {
 };
 
 
-#define FACTOR_MULTITHREADED_TLS
+#define FACTOR_SINGLE_THREADED_SINGLETON
 
 #ifdef FACTOR_SINGLE_THREADED_SINGLETON
 /* calls are dispatched using the singleton vm ptr */
