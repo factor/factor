@@ -65,7 +65,7 @@ t specialize-method? set-global
 : specialize-method ( quot method -- quot' )
     [ specialize-method? get [ method-declaration prepend ] [ drop ] if ]
     [ dup "method-generic" word-prop specializer ] bi
-    [ specialize-quot ] [ nip ] if* ;
+    [ specialize-quot ] [ drop ] if* ;
 
 : standard-method? ( method -- ? )
     dup method-body? [
