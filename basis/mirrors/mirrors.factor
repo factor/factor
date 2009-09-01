@@ -3,7 +3,8 @@
 USING: accessors arrays assocs classes classes.struct
 classes.struct.prettyprint.private classes.tuple
 classes.tuple.private combinators generic hashtables kernel
-math quotations sequences slots slots.private vectors words ;
+math quotations sequences slots slots.private vectors words
+continuations fry ;
 IN: mirrors
 
 TUPLE: mirror { object read-only } ;
@@ -55,6 +56,3 @@ M: array make-mirror <enum> ;
 M: vector make-mirror <enum> ;
 M: quotation make-mirror <enum> ;
 M: object make-mirror <mirror> ;
-
-M: struct make-mirror struct>assoc
-    [ [ [ name>> ] [ c-type>> ] bi 2array ] dip ] assoc-map ;
