@@ -142,3 +142,8 @@ TUPLE: parsing-corner-case x ;
         "    x 3 }"
     } "\n" join eval( -- tuple )
 ] [ error>> unexpected-eof? ] must-fail-with
+
+TUPLE: bad-inheritance-tuple ;
+[
+    "IN: classes.tuple.parser.tests TUPLE: bad-inheritance-tuple < bad-inheritance-tuple ;" eval( -- )
+] [ error>> bad-inheritance? ] must-fail-with
