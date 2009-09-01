@@ -154,10 +154,14 @@ M: pathname pprint*
 M: tuple pprint*
     pprint-tuple ;
 
+: recover-pprint ( try recovery -- )
+    pprinter-stack get clone
+    [ pprinter-stack set ] curry prepose recover ; inline
+
 : pprint-c-object ( object content-quot pointer-quot -- )
     [ c-object-pointers? get ] 2dip
     [ nip ]
-    [ [ drop ] prepose [ recover ] 2curry ] 2bi if ; inline
+    [ [ drop ] prepose [ recover-pprint ] 2curry ] 2bi if ; inline
 
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [
