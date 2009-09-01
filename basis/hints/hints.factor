@@ -36,14 +36,21 @@ M: object specializer-declaration class ;
         [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce
     ] if-empty ;
 
-: specializer-cases ( quot word -- default alist )
-    dup [ array? ] all? [ 1array ] unless [
-        [ make-specializer ] keep
-        [ specializer-declaration ] map '[ _ declare ] pick append
-    ] { } map>assoc ;
+ERROR: type-mismatch-error word expected-types ;
 
-: specialize-quot ( quot specializer -- quot' )
-    specializer-cases alist>quot ;
+: fallback-def ( word -- quot )
+    dup stack-effect effect-in-types dup specialized?
+    [ [ type-mismatch-error ] 2curry ]
+    [ drop def>> ] if ;
+
+: specializer-cases ( quot specializer -- alist )
+    dup [ array? ] all? [ 1array ] unless [
+        [ nip make-specializer ]
+        [ [ specializer-declaration ] map swap '[ _ declare @ ] ] 2bi
+    ] with { } map>assoc ;
+
+: specialize-quot ( quot word specializer -- quot' )
+    [ drop nip fallback-def ] [ nip specializer-cases ] 3bi alist>quot ;
 
 ! compiler.tree.propagation.inlining sets this to f
 SYMBOL: specialize-method?
@@ -57,8 +64,8 @@ t specialize-method? set-global
 
 : specialize-method ( quot method -- quot' )
     [ specialize-method? get [ method-declaration prepend ] [ drop ] if ]
-    [ "method-generic" word-prop specializer ] bi
-    [ specialize-quot ] when* ;
+    [ dup "method-generic" word-prop specializer ] bi
+    [ specialize-quot ] [ nip ] if* ;
 
 : standard-method? ( method -- ? )
     dup method-body? [
@@ -69,7 +76,7 @@ t specialize-method? set-global
     [ def>> ] keep
     dup generic? [ drop ] [
         [ dup standard-method? [ specialize-method ] [ drop ] if ]
-        [ specializer [ specialize-quot ] when* ]
+        [ dup specializer [ specialize-quot ] [ drop ] if* ]
         bi
     ] if ;
 
