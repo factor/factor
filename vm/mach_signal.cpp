@@ -41,18 +41,18 @@ static void call_fault_handler(
 	a divide by zero or stack underflow in the listener */
 
 	/* Are we in compiled Factor code? Then use the current stack pointer */
-	if(vm->in_code_heap_p(MACH_PROGRAM_COUNTER(thread_state)))
-		vm->signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
+	if(SIGNAL_VM_PTR()->in_code_heap_p(MACH_PROGRAM_COUNTER(thread_state)))
+		SIGNAL_VM_PTR()->signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
 	/* Are we in C? Then use the saved callstack top */
 	else
-		vm->signal_callstack_top = NULL;
+		SIGNAL_VM_PTR()->signal_callstack_top = NULL;
 
 	MACH_STACK_POINTER(thread_state) = fix_stack_pointer(MACH_STACK_POINTER(thread_state));
 
 	/* Now we point the program counter at the right handler function. */
 	if(exception == EXC_BAD_ACCESS)
 	{
-		vm->signal_fault_addr = MACH_EXC_STATE_FAULT(exc_state);
+		SIGNAL_VM_PTR()->signal_fault_addr = MACH_EXC_STATE_FAULT(exc_state);
 		MACH_PROGRAM_COUNTER(thread_state) = (cell)memory_signal_handler_impl;
 	}
 	else if(exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV)
@@ -63,7 +63,7 @@ static void call_fault_handler(
 	}
 	else
 	{
-		vm->signal_number = (exception == EXC_ARITHMETIC ? SIGFPE : SIGABRT);
+		SIGNAL_VM_PTR()->signal_number = (exception == EXC_ARITHMETIC ? SIGFPE : SIGABRT);
 		MACH_PROGRAM_COUNTER(thread_state) = (cell)misc_signal_handler_impl;
 	}
 }
