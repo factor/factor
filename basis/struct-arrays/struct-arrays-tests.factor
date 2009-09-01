@@ -51,3 +51,5 @@ STRUCT: fixed-string { text char[100] } ;
 [ { ALIEN: 123 ALIEN: 223 ALIEN: 323 ALIEN: 423 } ] [
     ALIEN: 123 4 fixed-string <direct-struct-array> [ (underlying)>> ] { } map-as
 ] unit-test
+
+[ 10 "int" <struct-array> ] must-fail
