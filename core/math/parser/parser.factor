@@ -87,7 +87,7 @@ SYMBOL: negative?
     >byte-array 0 suffix (string>float) ;
 
 : number-char? ( char -- ? )
-    "0123456789." member? ;
+    "0123456789ABCDEFabcdef." member? ;
 
 : numeric-looking? ( str -- ? )
     "-" ?head drop
