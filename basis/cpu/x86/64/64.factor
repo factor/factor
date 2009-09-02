@@ -202,7 +202,7 @@ M: x86.64 %alien-indirect ( -- )
 
 M: x86.64 %alien-callback ( quot -- )
     param-reg-1 swap %load-reference
-    "c_to_factor" f %alien-invoke ;
+    "c_to_factor" %vm-invoke-2nd-arg ;
 
 M: x86.64 %callback-value ( ctype -- )
     ! Save top of data stack
@@ -211,7 +211,7 @@ M: x86.64 %callback-value ( ctype -- )
     RSP 8 SUB
     param-reg-1 PUSH
     ! Restore data/call/retain stacks
-    "unnest_stacks" f %alien-invoke
+    "unnest_stacks" %vm-invoke-1st-arg
     ! Put former top of data stack in param-reg-1
     param-reg-1 POP
     RSP 8 ADD
