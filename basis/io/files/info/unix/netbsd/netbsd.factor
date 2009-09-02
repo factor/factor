@@ -48,5 +48,5 @@ M: netbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-inf
 M: netbsd file-systems ( -- array )
     f 0 0 getvfsstat dup io-error
     \ statvfs <struct-array>
-    [ dup length 0 getvfsstat io-error ]
-    [ [ f_mntonname>> utf8 alien>string file-system-info ] map ] bi ;
+    [ dup byte-length 0 getvfsstat io-error ]
+    [ [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ] bi ;

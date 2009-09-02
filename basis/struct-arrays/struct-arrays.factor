@@ -5,9 +5,6 @@ classes classes.struct kernel libc math parser sequences
 sequences.private words fry memoize compiler.units ;
 IN: struct-arrays
 
-: c-type-struct-class ( c-type -- class )
-    c-type boxed-class>> ; foldable
-
 TUPLE: struct-array
 { underlying c-ptr read-only }
 { length array-capacity read-only }
@@ -15,11 +12,27 @@ TUPLE: struct-array
 { class read-only }
 { ctor read-only } ;
 
-M: struct-array length length>> ; inline
-M: struct-array byte-length [ length>> ] [ element-size>> ] bi * ; inline
+<PRIVATE
 
 : (nth-ptr) ( i struct-array -- alien )
     [ element-size>> * >fixnum ] [ underlying>> ] bi <displaced-alien> ; inline
+
+: (struct-element-constructor) ( struct-class -- word )
+    [
+        "struct-array-ctor" f <word>
+        [ swap '[ _ memory>struct ] (( alien -- object )) define-inline ] keep
+    ] with-compilation-unit ;
+
+! Foldable memo word. This is an optimization; by precompiling a
+! constructor for array elements, we avoid memory>struct's slow path.
+MEMO: struct-element-constructor ( struct-class -- word )
+    (struct-element-constructor) ; foldable
+
+PRIVATE>
+
+M: struct-array length length>> ; inline
+
+M: struct-array byte-length [ length>> ] [ element-size>> ] bi * ; inline
 
 M: struct-array nth-unsafe
     [ (nth-ptr) ] [ ctor>> ] bi execute( alien -- object ) ; inline
@@ -27,23 +40,11 @@ M: struct-array nth-unsafe
 M: struct-array set-nth-unsafe
     [ (nth-ptr) swap ] [ element-size>> ] bi memcpy ; inline
 
-: (struct-element-constructor) ( c-type -- word )
-    [
-        "struct-array-ctor" f <word>
-        [
-            swap dup struct-class?
-            [ '[ _ memory>struct ] [ ] like ] [ drop [ ] ] if
-            (( alien -- object )) define-inline
-        ] keep
-    ] with-compilation-unit ;
+ERROR: not-a-struct-class struct-class ;
 
-! Foldable memo word. This is an optimization; by precompiling a
-! constructor for array elements, we avoid memory>struct's slow path.
-MEMO: struct-element-constructor ( c-type -- word )
-    (struct-element-constructor) ; foldable
-
-: <direct-struct-array> ( alien length c-type -- struct-array )
-    [ heap-size ] [ c-type-struct-class ] [ struct-element-constructor ]
+: <direct-struct-array> ( alien length struct-class -- struct-array )
+    dup struct-class? [ not-a-struct-class ] unless
+    [ heap-size ] [ ] [ struct-element-constructor ]
     tri struct-array boa ; inline
 
 M: struct-array new-sequence
@@ -54,7 +55,7 @@ M: struct-array resize ( n seq -- newseq )
     [ [ element-size>> * ] [ underlying>> ] bi resize ] [ class>> ] 2bi
     <direct-struct-array> ; inline
 
-: <struct-array> ( length c-type -- struct-array )
+: <struct-array> ( length struct-class -- struct-array )
     [ heap-size * <byte-array> ] 2keep <direct-struct-array> ; inline
 
 ERROR: bad-byte-array-length byte-array ;

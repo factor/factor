@@ -1,9 +1,8 @@
 USING: accessors arrays byte-arrays combinators
 combinators.short-circuit fry hints images kernel locals math
-math.affine-transforms math.functions math.order
-math.polynomials math.private math.vectors random
-random.mersenne-twister sequences sequences.private
-sequences.product ;
+math.affine-transforms math.functions math.order math.polynomials
+math.vectors random random.mersenne-twister sequences
+sequences.private sequences.product ;
 IN: noise
 
 : <perlin-noise-table> ( -- table )
@@ -35,25 +34,25 @@ HINTS: (fade) { float float float } ;
 HINTS: grad { fixnum float float float } ;
 
 : unit-cube ( point -- cube )
-    [ floor >fixnum 256 rem ] map ;
+    [ floor 256 rem ] map ;
 
 :: hashes ( table x y z -- aaa baa aba bba aab bab abb bbb )
-    x               table nth-unsafe y fixnum+fast :> a
-    x 1 fixnum+fast table nth-unsafe y fixnum+fast :> b
+    x      table nth-unsafe y + :> a
+    x  1 + table nth-unsafe y + :> b
 
-    a               table nth-unsafe z fixnum+fast :> aa
-    b               table nth-unsafe z fixnum+fast :> ba
-    a 1 fixnum+fast table nth-unsafe z fixnum+fast :> ab
-    b 1 fixnum+fast table nth-unsafe z fixnum+fast :> bb
+    a      table nth-unsafe z + :> aa
+    b      table nth-unsafe z + :> ba
+    a  1 + table nth-unsafe z + :> ab
+    b  1 + table nth-unsafe z + :> bb
 
-    aa               table nth-unsafe 
-    ba               table nth-unsafe 
-    ab               table nth-unsafe 
-    bb               table nth-unsafe 
-    aa 1 fixnum+fast table nth-unsafe 
-    ba 1 fixnum+fast table nth-unsafe 
-    ab 1 fixnum+fast table nth-unsafe 
-    bb 1 fixnum+fast table nth-unsafe ; inline
+    aa     table nth-unsafe
+    ba     table nth-unsafe
+    ab     table nth-unsafe
+    bb     table nth-unsafe
+    aa 1 + table nth-unsafe
+    ba 1 + table nth-unsafe
+    ab 1 + table nth-unsafe
+    bb 1 + table nth-unsafe ; inline
 
 HINTS: hashes { byte-array fixnum fixnum fixnum } ;
 
