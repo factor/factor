@@ -1,5 +1,5 @@
 USING: kernel stack-checker.transforms ;
-IN: struct-arrays
+IN: struct-arrays.private
 
 : struct-element-constructor ( c-type -- word )
     "Struct array usages must be compiled" throw ;
