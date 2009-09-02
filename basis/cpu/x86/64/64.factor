@@ -218,11 +218,11 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
 ! x86-64.
 enable-alien-4-intrinsics
 
-! SSE2 is always available on x86-64.
-enable-sse2
-
 ! Enable fast calling of libc math functions
 enable-float-functions
+
+! SSE2 is always available on x86-64.
+enable-sse2
 
 USE: vocabs.loader
 
