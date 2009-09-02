@@ -1,4 +1,4 @@
-USING: kernel stack-checker.transforms ;
+USING: kernel stack-checker.transforms struct-arrays.private ;
 IN: struct-arrays
 
 : struct-element-constructor ( c-type -- word )

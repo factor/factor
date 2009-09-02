@@ -25,13 +25,20 @@ unit-test
 [ "e" string>number ]
 unit-test
 
-[ 100000 ]
-[ "100,000" string>number ]
-unit-test
+[ 100000 ] [ "100,000" string>number ] unit-test
 
-[ 100000.0 ]
-[ "100,000.0" string>number ]
-unit-test
+[ 100000.0 ] [ "100,000.0" string>number ] unit-test
+
+[ f ] [ "," string>number ] unit-test
+[ f ] [ "-," string>number ] unit-test
+[ f ] [ "1," string>number ] unit-test
+[ f ] [ "-1," string>number ] unit-test
+[ f ] [ ",2" string>number ] unit-test
+[ f ] [ "-,2" string>number ] unit-test
+
+[ 2.0 ] [ "2." string>number ] unit-test
+
+[ 255 ] [ "ff" hex> ] unit-test
 
 [ "100.0" ]
 [ "1.0e2" string>number number>string ]

@@ -8,11 +8,11 @@ arrays io.files.info.unix classes.struct struct-arrays
 io.encodings.utf8 ;
 IN: io.files.unix.openbsd
 
-TUPLE: freebsd-file-system-info < unix-file-system-info
+TUPLE: openbsd-file-system-info < unix-file-system-info
 io-size sync-writes sync-reads async-writes async-reads 
 owner ;
 
-M: openbsd new-file-system-info freebsd-file-system-info new ;
+M: openbsd new-file-system-info openbsd-file-system-info new ;
 
 M: openbsd file-system-statfs
     \ statfs <struct> [ statfs io-error ] keep ;
@@ -49,5 +49,5 @@ M: openbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-in
 M: openbsd file-systems ( -- seq )
     f 0 0 getfsstat dup io-error
     \ statfs <struct-array>
-    [ dup length 0 getfsstat io-error ]
-    [ [ f_mntonname>> utf8 alien>string file-system-info ] map ] bi ;
+    [ dup byte-length 0 getfsstat io-error ]
+    [ [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ] bi ;

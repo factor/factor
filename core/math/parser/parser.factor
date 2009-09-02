@@ -86,16 +86,27 @@ SYMBOL: negative?
     [ CHAR: , eq? not ] filter
     >byte-array 0 suffix (string>float) ;
 
+: number-char? ( char -- ? )
+    "0123456789ABCDEFabcdef." member? ;
+
+: numeric-looking? ( str -- ? )
+    "-" ?head drop
+    dup empty? [ drop f ] [
+        dup first number-char? [
+            last number-char?
+        ] [ drop f ] if
+    ] if ;
+
 PRIVATE>
 
 : base> ( str radix -- n/f )
-    over empty? [ 2drop f ] [
+    over numeric-looking? [
         over [ "/." member? ] find nip {
             { CHAR: / [ string>ratio ] }
             { CHAR: . [ drop string>float ] }
             [ drop string>integer ]
         } case
-    ] if ;
+    ] [ 2drop f ] if ;
 
 : string>number ( str -- n/f ) 10 base> ;
 : bin> ( str -- n/f ) 2 base> ;
