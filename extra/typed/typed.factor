@@ -33,7 +33,12 @@ ERROR: output-mismatch-error < type-mismatch-error ;
     [ output-mismatch-error ] 2curry ;
 
 : typed-outputs ( quot word types -- quot' )
-    2drop ;
+    {
+        [ 2drop ]
+        [ 2nip make-coercer ]
+        [ 2nip make-specializer ]
+        [ [ drop ] 2dip output-mismatch-quot ]
+    } 3cleave '[ @ @ @ _ unless ] ;
 
 ! defining typed words
 
@@ -45,8 +50,12 @@ PREDICATE: typed < word "typed" word-prop ;
     [ effect-out-types dup typed-stack-effect? [ typed-outputs ] [ 2drop ] if ] 2bi ;
 
 : define-typed ( word def effect -- )
-    [ [ 2drop ] [ typed-def ] [ 2nip ] 3tri define-declared ]
-    [ drop "typed" set-word-prop ] 3bi ;
+    {
+        [ [ 2drop ] [ typed-def ] [ 2nip ] 3tri define-declared ]
+        [ nip effect-in-types "input-classes" set-word-prop ]
+        [ nip effect-out-types "default-output-classes" set-word-prop ]
+        [ drop "typed" set-word-prop ]
+    } 3cleave ;
 
 SYNTAX: TYPED:
     (:) define-typed ;
