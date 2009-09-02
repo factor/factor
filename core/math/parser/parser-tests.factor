@@ -38,6 +38,8 @@ unit-test
 
 [ 2.0 ] [ "2." string>number ] unit-test
 
+[ 255 ] [ "ff" hex> ] unit-test
+
 [ "100.0" ]
 [ "1.0e2" string>number number>string ]
 unit-test
