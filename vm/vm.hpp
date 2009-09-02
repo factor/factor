@@ -585,6 +585,7 @@ struct factorvm {
 	inline void vmprim_dlsym();
 	inline void vmprim_dlclose();
 	inline void vmprim_dll_validp();
+	inline void vmprim_vm_ptr();
 	char *alien_offset(cell obj);
 	char *unbox_alien();
 	void box_alien(void *ptr);
