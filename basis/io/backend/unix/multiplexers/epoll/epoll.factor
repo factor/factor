@@ -1,6 +1,6 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types kernel destructors bit-arrays
+USING: accessors classes.struct kernel destructors bit-arrays
 sequences assocs struct-arrays math namespaces locals fry unix
 unix.linux.epoll unix.time io.ports io.backend.unix
 io.backend.unix.multiplexers ;
@@ -16,14 +16,14 @@ TUPLE: epoll-mx < mx events ;
 : <epoll-mx> ( -- mx )
     epoll-mx new-mx
         max-events epoll_create dup io-error >>fd
-        max-events "epoll-event" <struct-array> >>events ;
+        max-events epoll-event <struct-array> >>events ;
 
 M: epoll-mx dispose* fd>> close-file ;
 
 : make-event ( fd events -- event )
-    "epoll-event" <c-object>
-    [ set-epoll-event-events ] keep
-    [ set-epoll-event-fd ] keep ;
+    epoll-event <struct>
+        swap >>events
+        swap >>fd ;
 
 :: do-epoll-ctl ( fd mx what events -- )
     mx fd>> what fd fd events make-event epoll_ctl io-error ;
@@ -55,7 +55,7 @@ M: epoll-mx remove-output-callbacks ( fd mx -- seq )
     epoll_wait multiplexer-error ;
 
 : handle-event ( event mx -- )
-    [ epoll-event-fd ] dip
+    [ fd>> ] dip
     [ EPOLLIN EPOLLOUT bitor do-epoll-del ]
     [ input-available ] [ output-available ] 2tri ;
 

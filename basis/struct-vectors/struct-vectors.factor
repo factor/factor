@@ -9,10 +9,11 @@ TUPLE: struct-vector
 { length array-capacity }
 { c-type read-only } ;
 
-: <struct-vector> ( capacity c-type -- struct-vector )
+: <struct-vector> ( capacity struct-class -- struct-vector )
     [ <struct-array> 0 ] keep struct-vector boa ; inline
 
 M: struct-vector byte-length underlying>> byte-length ;
+
 M: struct-vector new-sequence
     [ c-type>> <struct-array> ] [ [ >fixnum ] [ c-type>> ] bi* ] 2bi
     struct-vector boa ;

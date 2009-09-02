@@ -1,16 +1,16 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix.linux.epoll
-USING: alien.syntax math ;
+USING: alien.syntax classes.struct math ;
 
 FUNCTION: int epoll_create ( int size ) ;
 
 FUNCTION: int epoll_ctl ( int epfd, int op, int fd, epoll_event* event ) ;
 
-C-STRUCT: epoll-event
-    { "uint" "events" }
-    { "uint" "fd" }
-    { "uint" "padding" } ;
+STRUCT: epoll-event
+{ events uint }
+{ fd uint }
+{ padding uint } ;
 
 FUNCTION: int epoll_wait ( int epfd, epoll_event* events, int maxevents, int timeout ) ;
 
