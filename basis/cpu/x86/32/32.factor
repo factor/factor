@@ -133,7 +133,8 @@ M:: x86.32 %box ( n rep func -- )
 
 M: x86.32 %box-long-long ( n func -- )
     [ (%box-long-long) ] dip
-    8 [
+    8 vm-ptr-size + [
+        push-vm-ptr
         EDX PUSH
         EAX PUSH
         f %alien-invoke
@@ -141,12 +142,13 @@ M: x86.32 %box-long-long ( n func -- )
 
 M:: x86.32 %box-large-struct ( n c-type -- )
     ! Compute destination address
-    ECX n struct-return@ LEA
-    8 [
+    EDX n struct-return@ LEA
+    8 vm-ptr-size + [
+        push-vm-ptr
         ! Push struct size
         c-type heap-size PUSH
         ! Push destination address
-        ECX PUSH
+        EDX PUSH
         ! Copy the struct from the C stack
         "box_value_struct" f %alien-invoke
     ] with-aligned-stack ;
@@ -159,7 +161,8 @@ M: x86.32 %prepare-box-struct ( -- )
 
 M: x86.32 %box-small-struct ( c-type -- )
     #! Box a <= 8-byte struct returned in EAX:EDX. OS X only.
-    12 [
+    12 vm-ptr-size + [
+        push-vm-ptr
         heap-size PUSH
         EDX PUSH
         EAX PUSH
@@ -200,7 +203,8 @@ M: x86.32 %unbox-long-long ( n func -- )
 
 : %unbox-struct-1 ( -- )
     #! Alien must be in EAX.
-    4 [
+    4 vm-ptr-size + [
+        push-vm-ptr
         EAX PUSH
         "alien_offset" f %alien-invoke
         ! Load first cell
@@ -209,7 +213,8 @@ M: x86.32 %unbox-long-long ( n func -- )
 
 : %unbox-struct-2 ( -- )
     #! Alien must be in EAX.
-    4 [
+    4 vm-ptr-size + [
+        push-vm-ptr
         EAX PUSH
         "alien_offset" f %alien-invoke
         ! Load second cell
@@ -228,12 +233,13 @@ M: x86 %unbox-small-struct ( size -- )
 M:: x86.32 %unbox-large-struct ( n c-type -- )
     ! Alien must be in EAX.
     ! Compute destination address
-    ECX n stack@ LEA
-    12 [
+    EDX n stack@ LEA
+    12 vm-ptr-size + [
+        push-vm-ptr
         ! Push struct size
         c-type heap-size PUSH
         ! Push destination address
-        ECX PUSH
+        EDX PUSH
         ! Push source address
         EAX PUSH
         ! Copy the struct to the stack
@@ -241,7 +247,8 @@ M:: x86.32 %unbox-large-struct ( n c-type -- )
     ] with-aligned-stack ;
 
 M: x86.32 %prepare-alien-indirect ( -- )
-    "unbox_alien" f %alien-invoke
+    push-vm-ptr "unbox_alien" f %alien-invoke
+    temp-reg POP
     EBP EAX MOV ;
 
 M: x86.32 %alien-indirect ( -- )
