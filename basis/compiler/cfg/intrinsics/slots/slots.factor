@@ -29,7 +29,7 @@ IN: compiler.cfg.intrinsics.slots
 
 : (emit-set-slot) ( infos -- obj-reg )
     [ 3inputs ^^offset>slot ] [ second value-tag ] bi*
-    pick [ ^^set-slot ] dip ;
+    pick [ next-vreg ##set-slot ] dip ;
 
 : (emit-set-slot-imm) ( infos -- obj-reg )
     ds-drop

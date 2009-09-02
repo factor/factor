@@ -126,7 +126,7 @@ HOOK: %unbox-float cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
 HOOK: %box-float cpu ( dst src temp -- )
 HOOK: %box-alien cpu ( dst src temp -- )
-HOOK: %box-displaced-alien cpu ( dst displacement base temp1 temp2 -- )
+HOOK: %box-displaced-alien cpu ( dst displacement base temp1 temp2 base-class -- )
 
 HOOK: %alien-unsigned-1 cpu ( dst src -- )
 HOOK: %alien-unsigned-2 cpu ( dst src -- )
@@ -167,8 +167,8 @@ HOOK: %compare-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-branch cpu ( label cc src1 src2 -- )
 
-HOOK: %spill cpu ( src n rep -- )
-HOOK: %reload cpu ( dst n rep -- )
+HOOK: %spill cpu ( src rep n -- )
+HOOK: %reload cpu ( dst rep n -- )
 
 HOOK: %loop-entry cpu ( -- )
 
