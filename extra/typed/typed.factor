@@ -1,6 +1,7 @@
 ! (c)Joe Groff bsd license
-USING: accessors combinators definitions effects fry hints
-kernel kernel.private parser sequences words ;
+USING: accessors combinators combinators.short-circuit
+definitions effects fry hints kernel kernel.private namespaces
+parser quotations see.private sequences words ;
 IN: typed
 
 ERROR: type-mismatch-error word expected-types ;
@@ -43,24 +44,41 @@ ERROR: output-mismatch-error < type-mismatch-error ;
 
 ! defining typed words
 
-PREDICATE: typed < word "typed" word-prop ;
-
-: typed-def ( word def effect -- quot )
-    [ swap ] dip
-    [ effect-in-types dup typed-stack-effect? [ typed-inputs ] [ 2drop ] if ] 
+: typed-gensym-quot ( def word effect -- quot )
+    [ nip effect-in-types swap '[ _ declare @ ] ]
     [ effect-out-types dup typed-stack-effect? [ typed-outputs ] [ 2drop ] if ] 2bi ;
 
+: define-typed-gensym ( word def effect -- gensym )
+    [ 3drop gensym dup ]
+    [ [ swap ] dip typed-gensym-quot ]
+    [ 2nip ] 3tri define-declared ;
+
+PREDICATE: typed < word "typed-word" word-prop ;
+
+: typed-quot ( quot word effect -- quot' )
+    [ effect-in-types dup typed-stack-effect? [ typed-inputs ] [ 2drop ] if ] 
+    [ nip effect-out-types dup typed-stack-effect? [ '[ @ _ declare ] ] [ drop ] if ] 2bi ;
+
+: (typed-def) ( word def effect -- quot )
+    [ define-typed-gensym ] 3keep
+    [ drop [ swap "typed-word" set-word-prop ] [ [ 1quotation ] dip ] 2bi ] dip
+    typed-quot ;
+
+: typed-def ( word def effect -- quot )
+    dup {
+        [ effect-in-types typed-stack-effect? ]
+        [ effect-out-types typed-stack-effect? ]
+    } 1|| [ (typed-def) ] [ drop nip ] if ;
+
 : define-typed ( word def effect -- )
-    {
-        [ [ 2drop ] [ typed-def ] [ 2nip ] 3tri define-declared ]
-        [ nip effect-in-types "input-classes" set-word-prop ]
-        [ nip effect-out-types "default-output-classes" set-word-prop ]
-        [ drop "typed" set-word-prop ]
-    } 3cleave ;
+    [ [ 2drop ] [ typed-def ] [ 2nip ] 3tri define-inline ] 
+    [ drop "typed-def" set-word-prop ]
+    [ 2drop "typed-word" word-prop \ word set-global ] 3tri ;
 
 SYNTAX: TYPED:
     (:) define-typed ;
 
 M: typed definer drop \ TYPED: \ ; ;
-M: typed definition "typed" word-prop ;
+M: typed definition "typed-def" word-prop ;
+M: typed declarations. "typed-word" word-prop declarations. ;
 
