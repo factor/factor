@@ -352,7 +352,7 @@ M:: ppc %box-alien ( dst src temp -- )
         "f" resolve-label
     ] with-scope ;
 
-M:: ppc %box-displaced-alien ( dst displacement base displacement' base' -- )
+M:: ppc %box-displaced-alien ( dst displacement base displacement' base' base-class -- )
     [
         "end" define-label
         "alloc" define-label
@@ -500,8 +500,8 @@ M: ppc %epilogue ( n -- )
     dst \ t %load-reference
     "end" get resolve-label ; inline
 
-: %boolean ( dst temp cc -- )
-    negate-cc {
+: %boolean ( dst cc temp -- )
+    swap negate-cc {
         { cc< [ \ BLT (%boolean) ] }
         { cc<= [ \ BLE (%boolean) ] }
         { cc> [ \ BGT (%boolean) ] }
@@ -514,9 +514,9 @@ M: ppc %epilogue ( n -- )
 : (%compare-imm) ( src1 src2 -- ) [ 0 ] 2dip CMPI ; inline
 : (%compare-float) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
 
-M: ppc %compare (%compare) %boolean ;
-M: ppc %compare-imm (%compare-imm) %boolean ;
-M: ppc %compare-float (%compare-float) %boolean ;
+M: ppc %compare [ (%compare) ] 2dip %boolean ;
+M: ppc %compare-imm [ (%compare-imm) ] 2dip %boolean ;
+M: ppc %compare-float [ (%compare-float) ] 2dip %boolean ;
 
 : %branch ( label cc -- )
     {
@@ -528,9 +528,9 @@ M: ppc %compare-float (%compare-float) %boolean ;
         { cc/= [ BNE ] }
     } case ;
 
-M: ppc %compare-branch (%compare) %branch ;
-M: ppc %compare-imm-branch (%compare-imm) %branch ;
-M: ppc %compare-float-branch (%compare-float) %branch ;
+M: ppc %compare-branch [ (%compare) ] 2dip %branch ;
+M: ppc %compare-imm-branch [ (%compare-imm) ] 2dip %branch ;
+M: ppc %compare-float-branch [ (%compare-float) ] 2dip %branch ;
 
 : load-from-frame ( dst n rep -- )
     {
@@ -550,11 +550,11 @@ M: ppc %compare-float-branch (%compare-float) %branch ;
         { stack-params [ [ [ 0 1 ] dip next-param@ LWZ 0 1 ] dip STW ] }
     } case ;
 
-M: ppc %spill ( src n rep -- )
-    [ spill@ ] dip store-to-frame ;
+M: ppc %spill ( src rep n -- )
+    swap [ spill@ ] dip store-to-frame ;
 
-M: ppc %reload ( dst n rep -- )
-    [ spill@ ] dip load-from-frame ;
+M: ppc %reload ( dst rep n -- )
+    swap [ spill@ ] dip load-from-frame ;
 
 M: ppc %loop-entry ;
 

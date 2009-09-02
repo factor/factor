@@ -278,7 +278,7 @@ M:: x86 %box-alien ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
-M:: x86 %box-displaced-alien ( dst displacement base displacement' base' -- )
+M:: x86 %box-displaced-alien ( dst displacement base displacement' base' base-class -- )
     [
         "end" define-label
         "ok" define-label
@@ -511,8 +511,8 @@ M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
     temp 0 MOV \ t rc-absolute-cell rel-immediate
     dst temp word execute ; inline
 
-M: x86 %compare ( dst temp cc src1 src2 -- )
-    CMP {
+M: x86 %compare ( dst src1 src2 cc temp -- )
+    [ CMP ] 2dip swap {
         { cc< [ \ CMOVL %boolean ] }
         { cc<= [ \ CMOVLE %boolean ] }
         { cc> [ \ CMOVG %boolean ] }
@@ -521,11 +521,11 @@ M: x86 %compare ( dst temp cc src1 src2 -- )
         { cc/= [ \ CMOVNE %boolean ] }
     } case ;
 
-M: x86 %compare-imm ( dst temp cc src1 src2 -- )
+M: x86 %compare-imm ( dst src1 src2 cc temp -- )
     %compare ;
 
-M: x86 %compare-float ( dst temp cc src1 src2 -- )
-    UCOMISD {
+M: x86 %compare-float ( dst src1 src2 cc temp -- )
+    [ UCOMISD ] 2dip swap {
         { cc< [ \ CMOVB %boolean ] }
         { cc<= [ \ CMOVBE %boolean ] }
         { cc> [ \ CMOVA %boolean ] }
@@ -534,8 +534,8 @@ M: x86 %compare-float ( dst temp cc src1 src2 -- )
         { cc/= [ \ CMOVNE %boolean ] }
     } case ;
 
-M: x86 %compare-branch ( label cc src1 src2 -- )
-    CMP {
+M: x86 %compare-branch ( label src1 src2 cc -- )
+    [ CMP ] dip {
         { cc< [ JL ] }
         { cc<= [ JLE ] }
         { cc> [ JG ] }
@@ -547,8 +547,8 @@ M: x86 %compare-branch ( label cc src1 src2 -- )
 M: x86 %compare-imm-branch ( label src1 src2 cc -- )
     %compare-branch ;
 
-M: x86 %compare-float-branch ( label cc src1 src2 -- )
-    UCOMISD {
+M: x86 %compare-float-branch ( label src1 src2 cc -- )
+    [ UCOMISD ] dip {
         { cc< [ JB ] }
         { cc<= [ JBE ] }
         { cc> [ JA ] }
@@ -557,8 +557,11 @@ M: x86 %compare-float-branch ( label cc src1 src2 -- )
         { cc/= [ JNE ] }
     } case ;
 
-M: x86 %spill ( src n rep -- ) [ spill@ swap ] dip copy-register ;
-M: x86 %reload ( dst n rep -- ) [ spill@ ] dip copy-register ;
+M:: x86 %spill ( src rep n -- )
+    n spill@ src rep copy-register ;
+
+M:: x86 %reload ( dst rep n -- )
+    dst n spill@ rep copy-register ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
