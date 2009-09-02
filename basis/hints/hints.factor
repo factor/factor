@@ -19,13 +19,8 @@ M: class specializer-declaration ;
 
 M: object specializer-declaration class ;
 
-: specialized? ( types -- ? )
-    [ object = ] all? not ;
-
 : specializer ( word -- specializer )
-    [ "specializer" word-prop ]
-    [ stack-effect effect-in-types ] bi
-    dup specialized? [ suffix ] [ drop ] if ;
+    "specializer" word-prop ;
 
 : make-specializer ( specs -- quot )
     dup length <reversed>
@@ -36,13 +31,6 @@ M: object specializer-declaration class ;
         [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce
     ] if-empty ;
 
-ERROR: type-mismatch-error word expected-types ;
-
-: fallback-def ( word -- quot )
-    dup stack-effect effect-in-types dup specialized?
-    [ [ type-mismatch-error ] 2curry ]
-    [ drop def>> ] if ;
-
 : specializer-cases ( quot specializer -- alist )
     dup [ array? ] all? [ 1array ] unless [
         [ nip make-specializer ]
@@ -50,7 +38,7 @@ ERROR: type-mismatch-error word expected-types ;
     ] with { } map>assoc ;
 
 : specialize-quot ( quot word specializer -- quot' )
-    [ drop nip fallback-def ] [ nip specializer-cases ] 3bi alist>quot ;
+    [ drop nip def>> ] [ nip specializer-cases ] 3bi alist>quot ;
 
 ! compiler.tree.propagation.inlining sets this to f
 SYMBOL: specialize-method?
@@ -72,13 +60,39 @@ t specialize-method? set-global
         "method-generic" word-prop standard-generic?
     ] [ drop f ] if ;
 
-: specialized-def ( word -- quot )
+: (specialized-def) ( word -- quot )
     [ def>> ] keep
     dup generic? [ drop ] [
         [ dup standard-method? [ specialize-method ] [ drop ] if ]
         [ dup specializer [ specialize-quot ] [ drop ] if* ]
         bi
     ] if ;
+
+ERROR: type-mismatch-error word expected-types ;
+
+: typed-stack-effect? ( effect -- ? )
+    [ object = ] all? not ;
+
+: type-mismatch-quot ( word types -- quot )
+    [ type-mismatch-error ] 2curry ;
+
+: make-coercer ( types -- quot )
+    [ "coercer" word-prop [ ] or ]
+    [ swap \ dip [ ] 2sequence prepend ]
+    map-reduce ;
+
+: typed-inputs ( quot word -- quot' )
+    dup stack-effect effect-in-types {
+        [ 2nip make-coercer ]
+        [ 2nip make-specializer ]
+        [ nip swap '[ _ declare @ ] ]
+        [ [ drop ] 2dip type-mismatch-quot ]
+    } 3cleave '[ @ @ _ _ if ] ;
+
+: specialized-def ( word -- quot )
+    [ (specialized-def) ] keep
+    dup stack-effect effect-in-types typed-stack-effect?
+    [ typed-inputs ] [ drop ] if ;
 
 : specialized-length ( specializer -- n )
     dup [ array? ] all? [ first ] when length ;
