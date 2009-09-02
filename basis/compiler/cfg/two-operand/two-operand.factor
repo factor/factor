@@ -37,7 +37,9 @@ UNION: two-operand-insn
     ##sar-imm
     ##min
     ##max
-    ##fixnum-overflow
+    ##fixnum-add
+    ##fixnum-sub
+    ##fixnum-mul
     ##add-float
     ##sub-float
     ##mul-float
