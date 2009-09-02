@@ -1,3 +1,4 @@
+! (c)Joe Groff bsd license
 USING: accessors combinators definitions effects fry hints
 kernel kernel.private parser sequences words ;
 IN: typed
