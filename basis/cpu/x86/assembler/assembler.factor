@@ -420,15 +420,20 @@ PRIVATE>
 : MOVUPD     ( dest src -- ) HEX: 10 HEX: 66 2-operand-sse ;
 : MOVSD      ( dest src -- ) HEX: 10 HEX: f2 2-operand-sse ;
 : MOVSS      ( dest src -- ) HEX: 10 HEX: f3 2-operand-sse ;
-: MOVHLPS    ( dest src -- ) HEX: 12 f       2-operand-sse ;
+: MOVLPS     ( dest src -- ) HEX: 12 f       2-operand-sse ;
+: MOVLPD     ( dest src -- ) HEX: 12 HEX: 66 2-operand-sse ;
 : MOVDDUP    ( dest src -- ) HEX: 12 HEX: f2 2-operand-rm-sse ;
 : MOVSLDUP   ( dest src -- ) HEX: 12 HEX: f3 2-operand-rm-sse ;
 : UNPCKLPS   ( dest src -- ) HEX: 14 f       2-operand-rm-sse ;
 : UNPCKLPD   ( dest src -- ) HEX: 14 HEX: 66 2-operand-rm-sse ;
 : UNPCKHPS   ( dest src -- ) HEX: 15 f       2-operand-rm-sse ;
 : UNPCKHPD   ( dest src -- ) HEX: 15 HEX: 66 2-operand-rm-sse ;
-: MOVLHPS    ( dest src -- ) HEX: 16 f       2-operand-sse ;
+: MOVHPS     ( dest src -- ) HEX: 16 f       2-operand-sse ;
+: MOVHPD     ( dest src -- ) HEX: 16 HEX: 66 2-operand-sse ;
 : MOVSHDUP   ( dest src -- ) HEX: 16 HEX: f3 2-operand-rm-sse ;
+
+ALIAS: MOVHLPS MOVLPS
+ALIAS: MOVLHPS MOVHPS
 
 : PREFETCHNTA ( mem -- )  { BIN: 000 f { HEX: 0f HEX: 18 } } 1-operand ;
 : PREFETCHT0  ( mem -- )  { BIN: 001 f { HEX: 0f HEX: 18 } } 1-operand ;
