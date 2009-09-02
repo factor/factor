@@ -303,4 +303,14 @@ VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, f
 	return VM_PTR->box_medium_struct(x1, x2, x3, x4, size);
 }
 
+inline void factorvm::vmprim_vm_ptr()
+{
+	box_alien(this);
+}
+
+PRIMITIVE(vm_ptr)
+{
+	PRIMITIVE_GETVM()->vmprim_vm_ptr();
+}
+
 }

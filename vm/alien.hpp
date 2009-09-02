@@ -36,6 +36,8 @@ PRIMITIVE(dlsym);
 PRIMITIVE(dlclose);
 PRIMITIVE(dll_validp);
 
+PRIMITIVE(vm_ptr);
+
 VM_C_API char *alien_offset(cell object, factorvm *vm);
 VM_C_API char *unbox_alien(factorvm *vm);
 VM_C_API void box_alien(void *ptr, factorvm *vm);
