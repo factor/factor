@@ -432,6 +432,9 @@ PRIVATE>
 : MOVHPD     ( dest src -- ) HEX: 16 HEX: 66 2-operand-sse ;
 : MOVSHDUP   ( dest src -- ) HEX: 16 HEX: f3 2-operand-rm-sse ;
 
+ALIAS: MOVHLPS MOVLPS
+ALIAS: MOVLHPS MOVHPS
+
 : PREFETCHNTA ( mem -- )  { BIN: 000 f { HEX: 0f HEX: 18 } } 1-operand ;
 : PREFETCHT0  ( mem -- )  { BIN: 001 f { HEX: 0f HEX: 18 } } 1-operand ;
 : PREFETCHT1  ( mem -- )  { BIN: 010 f { HEX: 0f HEX: 18 } } 1-operand ;
