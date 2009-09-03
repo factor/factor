@@ -1,10 +1,19 @@
 IN: struct-arrays.tests
 USING: classes.struct struct-arrays tools.test kernel math sequences
-alien.syntax alien.c-types destructors libc accessors sequences.private ;
+alien.syntax alien.c-types destructors libc accessors sequences.private
+compiler.tree.debugger combinators.smart ;
 
 STRUCT: test-struct-array
     { x int }
     { y int } ;
+
+[ 1 ] [
+    1 struct-array{ test-struct-array } new-sequence length
+] unit-test
+
+[ V{ test-struct-array } ] [
+    [ [ test-struct-array <struct> ] struct-array{ test-struct-array } output>sequence first ] final-classes
+] unit-test
 
 : make-point ( x y -- struct )
     test-struct-array <struct-boa> ;
