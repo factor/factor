@@ -17,7 +17,6 @@ C-STRUCT: vm
     { "zone" "nursery" }
     { "cell" "cards_offset" }
     { "cell" "decks_offset" }
-    { "cell" "__padding__" }
     { "cell[70]" "userenv" }
     ;
 

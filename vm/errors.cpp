@@ -185,7 +185,7 @@ void factorvm::fp_signal_handler_impl()
 
 void fp_signal_handler_impl()
 {
-	SIGNAL_VM_PTR->fp_signal_handler_impl();
+	SIGNAL_VM_PTR()->fp_signal_handler_impl();
 }
 
 }
