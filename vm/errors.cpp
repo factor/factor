@@ -3,13 +3,6 @@
 namespace factor
 {
 
-/* Global variables used to pass fault handler state from signal handler to
-user-space */
-cell signal_number;
-cell signal_fault_addr;
-unsigned int signal_fpu_status;
-stack_frame *signal_callstack_top;
-
 void factorvm::out_of_memory()
 {
 	print_string("Out of memory\n\n");
