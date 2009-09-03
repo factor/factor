@@ -91,6 +91,11 @@ INSN: ##set-string-nth-fast
 use: src/int-rep obj/int-rep index/int-rep
 temp: temp/int-rep ;
 
+PURE-INSN: ##copy
+def: dst
+use: src
+literal: rep ;
+
 ! Integer arithmetic
 PURE-INSN: ##add
 def: dst/int-rep
@@ -201,6 +206,15 @@ use: src/int-rep
 temp: temp/int-rep ;
 
 ! Float arithmetic
+PURE-INSN: ##unbox-float
+def: dst/double-float-rep
+use: src/int-rep ;
+
+PURE-INSN: ##box-float
+def: dst/int-rep
+use: src/double-float-rep
+temp: temp/int-rep ;
+
 PURE-INSN: ##add-float
 def: dst/double-float-rep
 use: src1/double-float-rep src2/double-float-rep ;
@@ -240,6 +254,15 @@ def: dst/double-float-rep
 use: src1/double-float-rep src2/double-float-rep
 literal: func ;
 
+! Single/double float conversion
+PURE-INSN: ##single>double-float
+def: dst/double-float-rep
+use: src/single-float-rep ;
+
+PURE-INSN: ##double>single-float
+def: dst/single-float-rep
+use: src/double-float-rep ;
+
 ! Float/integer conversion
 PURE-INSN: ##float>integer
 def: dst/int-rep
@@ -249,24 +272,78 @@ PURE-INSN: ##integer>float
 def: dst/double-float-rep
 use: src/int-rep ;
 
-! Boxing and unboxing
-PURE-INSN: ##copy
+! SIMD operations
+
+INSN: ##box-vector
+def: dst/int-rep
+use: src
+literal: rep
+temp: temp/int-rep ;
+
+INSN: ##unbox-vector
+def: dst
+use: src/int-rep
+literal: rep ;
+
+INSN: ##broadcast-vector
+def: dst
+use: src/scalar-rep
+literal: rep ;
+
+INSN: ##gather-vector-2
+def: dst
+use: src1/scalar-rep src2/scalar-rep
+literal: rep ;
+
+INSN: ##gather-vector-4
+def: dst
+use: src1/scalar-rep src2/scalar-rep src3/scalar-rep src4/scalar-rep
+literal: rep ;
+
+INSN: ##add-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+INSN: ##sub-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+INSN: ##mul-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+INSN: ##div-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+INSN: ##min-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+INSN: ##max-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+INSN: ##sqrt-vector
 def: dst
 use: src
 literal: rep ;
 
-PURE-INSN: ##unbox-float
-def: dst/double-float-rep
-use: src/int-rep ;
+INSN: ##horizontal-add-vector
+def: dst/scalar-rep
+use: src
+literal: rep ;
 
+! Boxing and unboxing aliens
 PURE-INSN: ##unbox-any-c-ptr
 def: dst/int-rep
 use: src/int-rep
-temp: temp/int-rep ;
-
-PURE-INSN: ##box-float
-def: dst/int-rep
-use: src/double-float-rep
 temp: temp/int-rep ;
 
 PURE-INSN: ##box-alien
@@ -322,12 +399,17 @@ def: dst/int-rep
 use: src/int-rep ;
 
 INSN: ##alien-float
-def: dst/double-float-rep
+def: dst/single-float-rep
 use: src/int-rep ;
 
 INSN: ##alien-double
 def: dst/double-float-rep
 use: src/int-rep ;
+
+INSN: ##alien-vector
+def: dst
+use: src/int-rep
+literal: rep ;
 
 INSN: ##set-alien-integer-1
 use: src/int-rep value/int-rep ;
@@ -342,10 +424,14 @@ INSN: ##set-alien-cell
 use: src/int-rep value/int-rep ;
 
 INSN: ##set-alien-float
-use: src/int-rep value/double-float-rep ;
+use: src/int-rep value/single-float-rep ;
 
 INSN: ##set-alien-double
 use: src/int-rep value/double-float-rep ;
+
+INSN: ##set-alien-vector
+use: src/int-rep value
+literal: rep ;
 
 ! Memory allocation
 INSN: ##allot
@@ -510,6 +596,7 @@ literal: n ;
 UNION: ##allocation
 ##allot
 ##box-float
+##box-vector
 ##box-alien
 ##box-displaced-alien
 ##integer>bignum ;

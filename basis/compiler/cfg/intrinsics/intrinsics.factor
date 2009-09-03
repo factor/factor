@@ -7,6 +7,7 @@ compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.allot
 compiler.cfg.intrinsics.fixnum
 compiler.cfg.intrinsics.float
+compiler.cfg.intrinsics.simd
 compiler.cfg.intrinsics.slots
 compiler.cfg.intrinsics.misc
 compiler.cfg.comparisons ;
@@ -22,6 +23,9 @@ QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
 QUALIFIED: math.integers.private
 QUALIFIED: math.floats.private
+QUALIFIED: math.vectors.simd
+QUALIFIED: math.vectors.simd.private
+QUALIFIED: math.vectors.simd.alien
 QUALIFIED: math.libm
 IN: compiler.cfg.intrinsics
 
@@ -140,6 +144,28 @@ IN: compiler.cfg.intrinsics
 : enable-fixnum-log2 ( -- )
     {
         { math.integers.private:fixnum-log2 [ drop emit-fixnum-log2 ] }
+    } enable-intrinsics ;
+
+: enable-sse2-simd ( -- )
+    {
+        { math.vectors.simd.private:assert-positive [ drop ] }
+        { math.vectors.simd.private:(simd-v+) [ [ ^^add-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.private:(simd-v-) [ [ ^^sub-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.private:(simd-v*) [ [ ^^mul-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.private:(simd-v/) [ [ ^^div-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.private:(simd-vmin) [ [ ^^min-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.private:(simd-vmax) [ [ ^^max-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.private:(simd-vsqrt) [ [ ^^sqrt-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.private:(simd-broadcast) [ [ ^^broadcast-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd.private:(simd-gather-2) [ emit-gather-vector-2 ] }
+        { math.vectors.simd.private:(simd-gather-4) [ emit-gather-vector-4 ] }
+        { math.vectors.simd.alien:alien-vector [ emit-alien-vector ] }
+        { math.vectors.simd.alien:set-alien-vector [ emit-set-alien-vector ] }
+    } enable-intrinsics ;
+
+: enable-sse3-simd ( -- )
+    {
+        { math.vectors.simd.private:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
     } enable-intrinsics ;
 
 : emit-intrinsic ( node word -- )
