@@ -3,9 +3,9 @@ USING: accessors alien alien.c-types alien.structs
 alien.structs.fields arrays byte-arrays classes classes.parser
 classes.tuple classes.tuple.parser classes.tuple.private
 combinators combinators.short-circuit combinators.smart
-functors.backend fry generalizations generic.parser kernel
-kernel.private lexer libc locals macros make math math.order parser
-quotations sequences slots slots.private struct-arrays vectors
+definitions functors.backend fry generalizations generic.parser
+kernel kernel.private lexer libc locals macros make math math.order
+parser quotations sequences slots slots.private struct-arrays vectors
 words compiler.tree.propagation.transforms specialized-arrays.direct.uchar ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
@@ -236,10 +236,13 @@ M: struct-class heap-size
 : check-struct-slots ( slots -- )
     [ c-type>> c-type drop ] each ;
 
+: redefine-struct-tuple-class ( class -- )
+    [ dup class? [ forget-class ] [ drop ] if ] [ struct f define-tuple-class ] bi ;
+
 : (define-struct-class) ( class slots offsets-quot -- )
     [ 
         [ struct-must-have-slots ]
-        [ drop struct f define-tuple-class ] if-empty
+        [ drop redefine-struct-tuple-class ] if-empty
     ]
     swap '[
         make-slots dup
