@@ -700,6 +700,11 @@ M: x86 small-enough? ( n -- ? )
 : enable-sse2 ( -- )
     enable-float-intrinsics
     enable-fsqrt
-    enable-float-min/max ;
+    enable-float-min/max
+    enable-sse2-simd ;
+
+: enable-sse3 ( -- )
+    enable-sse2
+    enable-sse3-simd ;
 
 enable-min/max

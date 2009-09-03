@@ -4,7 +4,7 @@ USING: accessors alien.c-types byte-arrays cpu.architecture
 generalizations kernel math math.functions math.vectors
 math.vectors.simd.functor math.vectors.specialization parser
 prettyprint.custom sequences sequences.private
-specialized-arrays.double locals assocs literals ;
+specialized-arrays.double locals assocs literals words fry ;
 IN: math.vectors.simd
 
 <PRIVATE
@@ -69,8 +69,20 @@ PRIVATE>
 
 <PRIVATE
 
-:: simd-vector-words ( class ctor elt-type assoc -- )
-    class elt-type assoc {
+: supported-simd-ops ( assoc -- assoc' )
+    {
+        { v+ (simd-v+) }
+        { v- (simd-v-) }
+        { v* (simd-v*) }
+        { v/ (simd-v/) }
+        { vmin (simd-vmin) }
+        { vmax (simd-vmax) }
+        { sum (simd-sum) }
+    } [ nip "intrinsic" word-prop ] assoc-filter
+    '[ drop _ key? ] assoc-filter ;
+
+:: high-level-ops ( ctor -- assoc )
+    {
         { vneg [ [ dup v- ] keep v- ] }
         { v. [ v* sum ] }
         { n+v [ [ ctor execute ] dip v+ ] }
@@ -85,7 +97,10 @@ PRIVATE>
         { norm [ norm-sq sqrt ] }
         { normalize [ dup norm v/n ] }
         { distance [ v- norm ] }
-    } assoc-union
+    } ;
+
+:: simd-vector-words ( class ctor elt-type assoc -- )
+    class elt-type assoc supported-simd-ops ctor high-level-ops assoc-union
     specialize-vector-words ;
 
 PRIVATE>
