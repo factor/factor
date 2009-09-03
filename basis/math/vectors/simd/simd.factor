@@ -2,29 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types byte-arrays cpu.architecture
 generalizations kernel math math.functions math.vectors
-math.vectors.simd.functor math.vectors.specialization parser
-prettyprint.custom sequences sequences.private
-specialized-arrays.double locals assocs literals words fry ;
+math.vectors.simd.functor math.vectors.simd.intrinsics
+math.vectors.specialization parser prettyprint.custom sequences
+sequences.private specialized-arrays.double locals assocs
+literals words fry ;
 IN: math.vectors.simd
-
-<PRIVATE
-
-ERROR: bad-simd-call ;
-
-: (simd-v+) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-v-) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-v*) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-v/) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-vmin) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-vmax) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-vsqrt) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-sum) ( v1 rep -- v2 ) bad-simd-call ;
-: (simd-broadcast) ( x rep -- v ) bad-simd-call ;
-: (simd-gather-2) ( a b rep -- v ) bad-simd-call ;
-: (simd-gather-4) ( a b c d rep -- v ) bad-simd-call ;
-: assert-positive ( x -- y ) ;
-
-PRIVATE>
 
 <<
 
