@@ -4,15 +4,15 @@ IN: unix
 
 CONSTANT: FD_SETSIZE 256
 
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" } 
-    { "int" "socktype" }
-    { "int" "protocol" }
-    { "socklen_t" "addrlen" }
-    { "char*" "canonname" }
-    { "void*" "addr" }
-    { "addrinfo*" "next" } ;
+STRUCT: addrinfo
+    { flags int }
+    { family int }
+    { socktype int }
+    { protocol int }
+    { addrlen socklen_t }
+    { canonname char* }
+    { addr void* }
+    { next addrinfo* } ;
 
 STRUCT: dirent
     { d_fileno __uint32_t }

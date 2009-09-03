@@ -30,7 +30,7 @@ CONSTANT: SO_BROADCAST   HEX:  20
 CONSTANT: SO_USELOOPBACK HEX:  40
 CONSTANT: SO_LINGER      HEX:  80
 CONSTANT: SO_OOBINLINE   HEX: 100
-: SO_DONTLINGER ( -- n ) SO_LINGER bitnot ; inline
+CONSTANT: SO_DONTLINGER $[ SO_LINGER bitnot ]
 
 CONSTANT: SO_SNDBUF     HEX: 1001
 CONSTANT: SO_RCVBUF     HEX: 1002
@@ -75,7 +75,7 @@ CONSTANT: PF_INET6      23
 CONSTANT: AI_PASSIVE     1
 CONSTANT: AI_CANONNAME   2
 CONSTANT: AI_NUMERICHOST 4
-: AI_MASK ( -- n ) { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ;
+CONSTANT: AI_MASK $[ { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ]
 
 CONSTANT: NI_NUMERICHOST 1
 CONSTANT: NI_NUMERICSERV 2
@@ -96,7 +96,7 @@ ALIAS: WSA_IO_PENDING ERROR_IO_PENDING
 
 CONSTANT: INADDR_ANY 0
 
-: INVALID_SOCKET ( -- alien ) -1 <alien> ; inline
+CONSTANT: INVALID_SOCKET $[ -1 <alien> ]
 CONSTANT: SOCKET_ERROR -1
 
 CONSTANT: SD_RECV 0
@@ -109,18 +109,18 @@ CONSTANT: SOL_SOCKET HEX: ffff
 ! C-STRUCT: in_addr
     ! { "in_addr_t" "s_addr" } ;
 
-C-STRUCT: sockaddr-in
-    { "short" "family" }
-    { "ushort" "port" }
-    { "uint" "addr" }
-    { { "char" 8 } "pad" } ;
+STRUCT: sockaddr-in
+    { family short }
+    { port ushort }
+    { addr uint }
+    { pad char[8] } ;
 
-C-STRUCT: sockaddr-in6
-    { "uchar" "family" }
-    { "ushort" "port" }
-    { "uint" "flowinfo" }
-    { { "uchar" 16 } "addr" }
-    { "uint" "scopeid" } ;
+STRUCT: sockaddr-in6
+    { family uchar }
+    { port ushort }
+    { flowinfo uint }
+    { addr uchar[16] }
+    { scopeid uint } ;
 
 STRUCT: hostent
     { name char* }
@@ -129,15 +129,15 @@ STRUCT: hostent
     { length short }
     { addr-list void* } ;
 
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" }
-    { "int" "socktype" }
-    { "int" "protocol" }
-    { "size_t" "addrlen" }
-    { "char*" "canonname" }
-    { "sockaddr*" "addr" }
-    { "addrinfo*" "next" } ;
+STRUCT: addrinfo
+    { flags int }
+    { family int }
+    { socktype int }
+    { protocol int }
+    { addrlen size_t }
+    { canonname char* }
+    { addr sockaddr* }
+    { next addrinfo* } ;
 
 C-STRUCT: timeval
     { "long" "sec" }
