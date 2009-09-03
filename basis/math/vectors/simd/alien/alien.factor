@@ -1,17 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien accessors alien.c-types byte-arrays compiler.units
-cpu.architecture libc locals kernel math math.vectors.simd
-math.vectors.simd.private ;
+cpu.architecture locals kernel math math.vectors.simd
+math.vectors.simd.intrinsics ;
 IN: math.vectors.simd.alien
-
-: alien-vector ( c-ptr n rep -- value )
-    ! Inefficient version for when intrinsics are missing
-    [ swap <displaced-alien> ] dip rep-size memory>byte-array ;
-
-: set-alien-vector ( value c-ptr n rep -- )
-    ! Inefficient version for when intrinsics are missing
-    [ swap <displaced-alien> swap ] dip rep-size memcpy ;
 
 :: define-simd-type ( class rep -- )
     <c-type>
