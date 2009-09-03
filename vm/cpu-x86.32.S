@@ -44,17 +44,6 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	add $12,%esp                       /* pop args from the stack */
 	ret                                /* return _with new stack_ */
 
-/* cpu.x86.32 calls this */
-DEF(bool,check_sse2,(void)):
-	push %ebx
-	mov $1,%eax
-	cpuid
-	shr $26,%edx
-	and $1,%edx
-	pop %ebx
-	mov %edx,%eax
-	ret
-
 DEF(long long,read_timestamp_counter,(void)):
 	rdtsc
 	ret
@@ -72,6 +61,5 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
 
 #ifdef WINDOWS
 	.section .drectve
-	.ascii " -export:check_sse2"
 	.ascii " -export:read_timestamp_counter"
 #endif

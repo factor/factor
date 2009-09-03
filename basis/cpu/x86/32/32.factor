@@ -295,22 +295,6 @@ os windows? [
     4 "double" c-type (>>align)
 ] unless
 
-USING: cpu.x86.features cpu.x86.features.private ;
+USE: vocabs.loader
 
-"-no-sse2" (command-line) member? [
-    [ { check_sse2 } compile ] with-optimizer
-
-    "Checking if your CPU supports SSE2..." print flush
-    sse2? [
-        " - yes" print
-        enable-sse2
-        [
-            sse2? [
-                "This image was built to use SSE2, which your CPU does not support." print
-                "You will need to bootstrap Factor again." print
-                flush
-                1 exit
-            ] unless
-        ] "cpu.x86" add-init-hook
-    ] [ " - no" print ] if
-] unless
+"cpu.x86.features" require
