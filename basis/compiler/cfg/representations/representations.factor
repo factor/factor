@@ -5,6 +5,7 @@ arrays combinators make locals deques dlists
 cpu.architecture compiler.utilities
 compiler.cfg
 compiler.cfg.rpo
+compiler.cfg.hats
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.def-use
@@ -16,13 +17,47 @@ IN: compiler.cfg.representations
 
 ! Virtual register representation selection.
 
+ERROR: bad-conversion dst src dst-rep src-rep ;
+
+GENERIC: emit-box ( dst src rep -- )
+GENERIC: emit-unbox ( dst src rep -- )
+
+M: single-float-rep emit-box
+    drop
+    [ double-float-rep next-vreg-rep dup ] dip ##single>double-float
+    int-rep next-vreg-rep ##box-float ;
+
+M: single-float-rep emit-unbox
+    drop
+    [ double-float-rep next-vreg-rep dup ] dip ##unbox-float
+    ##double>single-float ;
+
+M: double-float-rep emit-box
+    drop
+    int-rep next-vreg-rep ##box-float ;
+
+M: double-float-rep emit-unbox
+    drop ##unbox-float ;
+
+M: vector-rep emit-box
+    int-rep next-vreg-rep ##box-vector ;
+
+M: vector-rep emit-unbox
+    ##unbox-vector ;
+
 : emit-conversion ( dst src dst-rep src-rep -- )
-    2array {
-        { { int-rep int-rep } [ int-rep ##copy ] }
-        { { double-float-rep double-float-rep } [ double-float-rep ##copy ] }
-        { { double-float-rep int-rep } [ ##unbox-float ] }
-        { { int-rep double-float-rep } [ int-rep next-vreg-rep ##box-float ] }
-    } case ;
+    {
+        { [ 2dup eq? ] [ drop ##copy ] }
+        { [ dup int-rep eq? ] [ drop emit-unbox ] }
+        { [ over int-rep eq? ] [ nip emit-box ] }
+        [
+            2array {
+                { { double-float-rep single-float-rep } [ ##single>double-float ] }
+                { { single-float-rep double-float-rep } [ ##double>single-float ] }
+                [ first2 bad-conversion ]
+            } case
+        ]
+    } cond ;
 
 <PRIVATE
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays fry namespaces generic
-words sets cpu.architecture compiler.units
+words sets combinators generalizations cpu.architecture compiler.units
 compiler.cfg.utilities compiler.cfg compiler.cfg.rpo
 compiler.cfg.instructions compiler.cfg.instructions.syntax
 compiler.cfg.def-use ;
@@ -13,34 +13,40 @@ GENERIC: uses-vreg-reps ( insn -- reps )
 
 <PRIVATE
 
+: rep-getter-quot ( rep -- quot )
+    {
+        { f [ [ rep>> ] ] }
+        { scalar-rep [ [ rep>> scalar-rep-of ] ] }
+        [ '[ _ nip ] ]
+    } case ;
+
 : define-defs-vreg-rep-method ( insn -- )
     [ \ defs-vreg-rep create-method ]
-    [ insn-def-slot dup [ rep>> ] when '[ drop _ ] ] bi
-    define ;
+    [ insn-def-slot [ rep>> rep-getter-quot ] [ [ drop f ] ] if* ]
+    bi define ;
+
+: reps-getter-quot ( reps -- quot )
+    [ rep>> rep-getter-quot ] map dup length '[ _ cleave _ narray ] ;
 
 : define-uses-vreg-reps-method ( insn -- )
     [ \ uses-vreg-reps create-method ]
-    [ insn-use-slots [ rep>> ] map '[ drop _ ] ] bi
-    define ;
+    [ insn-use-slots reps-getter-quot ]
+    bi define ;
 
 : define-temp-vreg-reps-method ( insn -- )
     [ \ temp-vreg-reps create-method ]
-    [ insn-temp-slots [ rep>> ] map '[ drop _ ] ] bi
-    define ;
+    [ insn-temp-slots reps-getter-quot ]
+    bi define ;
 
 PRIVATE>
 
 [
     insn-classes get
-    [ { ##copy } diff [ define-defs-vreg-rep-method ] each ]
-    [ { ##copy ##phi } diff [ define-uses-vreg-reps-method ] each ]
+    [ [ define-defs-vreg-rep-method ] each ]
+    [ { ##phi } diff [ define-uses-vreg-reps-method ] each ]
     [ [ define-temp-vreg-reps-method ] each ]
     tri
 ] with-compilation-unit
-
-M: ##copy defs-vreg-rep rep>> ;
-
-M: ##copy uses-vreg-reps rep>> 1array ;
 
 : each-def-rep ( insn vreg-quot: ( vreg rep -- ) -- )
     [ [ defs-vreg ] [ defs-vreg-rep ] bi ] dip with when* ; inline

@@ -7,11 +7,20 @@ IN: compiler.cfg.instructions.syntax
 
 SYMBOLS: def use temp literal constant ;
 
+SYMBOL: scalar-rep
+
 TUPLE: insn-slot-spec type name rep ;
+
+: parse-rep ( str/f -- rep )
+    {
+        { [ dup not ] [ ] }
+        { [ dup "scalar-rep" = ] [ drop scalar-rep ] }
+        [ "cpu.architecture" lookup ]
+    } cond ;
 
 : parse-insn-slot-spec ( type string -- spec )
     over [ "Missing type" throw ] unless
-    "/" split1 dup [ "cpu.architecture" lookup ] when
+    "/" split1 parse-rep
     insn-slot-spec boa ;
 
 : parse-insn-slot-specs ( seq -- specs )
