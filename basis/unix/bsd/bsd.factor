@@ -27,25 +27,25 @@ CONSTANT: F_SETFD 2
 CONSTANT: F_SETFL 4
 CONSTANT: FD_CLOEXEC 1
 
-C-STRUCT: sockaddr-in
-    { "uchar" "len" }
-    { "uchar" "family" }
-    { "ushort" "port" }
-    { "in_addr_t" "addr" }
-    { "longlong" "unused" } ;
+STRUCT: sockaddr-in
+    { len uchar }
+    { family uchar }
+    { port ushort }
+    { addr in_addr_t }
+    { unused longlong } ;
 
-C-STRUCT: sockaddr-in6
-    { "uchar" "len" }
-    { "uchar" "family" }
-    { "ushort" "port" }
-    { "uint" "flowinfo" }
-    { { "uchar" 16 } "addr" }
-    { "uint" "scopeid" } ;
+STRUCT: sockaddr-in6
+    { len uchar }
+    { family uchar }
+    { port ushort }
+    { flowinfo uint }
+    { addr uchar[16] }
+    { scopeid uint } ;
 
-C-STRUCT: sockaddr-un
-    { "uchar" "len" }
-    { "uchar" "family" }
-    { { "char" 104 } "path" } ;
+STRUCT: sockaddr-un
+    { len uchar }
+    { family uchar }
+    { path char[104] } ;
 
 STRUCT: passwd
     { pw_name char* }
