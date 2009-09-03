@@ -81,7 +81,7 @@ SYNTAX: A{ \ } [ >A ] parse-literal ;
 INSTANCE: A sequence
 INSTANCE: A S
 
-A T c-type-boxed-class specialize-vector-words
+A T c-type-boxed-class f specialize-vector-words
 
 T c-type
     \ A >>array-class

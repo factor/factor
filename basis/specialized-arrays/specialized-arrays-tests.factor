@@ -3,7 +3,8 @@ USING: tools.test specialized-arrays sequences
 specialized-arrays.int specialized-arrays.bool
 specialized-arrays.ushort alien.c-types accessors kernel
 specialized-arrays.direct.int specialized-arrays.char
-specialized-arrays.uint arrays combinators ;
+specialized-arrays.uint specialized-arrays.float
+arrays combinators compiler ;
 
 [ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
 
@@ -28,3 +29,7 @@ specialized-arrays.uint arrays combinators ;
 [ { 3 1 3 3 7 } ] [
     int-array{ 3 1 3 3 7 } malloc-byte-array 5 <direct-int-array> >array
 ] unit-test
+
+[ f ] [ float-array{ 4 3 2 1 } dup clone [ underlying>> ] bi@ eq? ] unit-test
+
+[ f ] [ [ float-array{ 4 3 2 1 } dup clone [ underlying>> ] bi@ eq? ] compile-call ] unit-test
