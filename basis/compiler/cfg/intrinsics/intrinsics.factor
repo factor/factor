@@ -23,9 +23,7 @@ QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
 QUALIFIED: math.integers.private
 QUALIFIED: math.floats.private
-QUALIFIED: math.vectors.simd
-QUALIFIED: math.vectors.simd.private
-QUALIFIED: math.vectors.simd.alien
+QUALIFIED: math.vectors.simd.intrinsics
 QUALIFIED: math.libm
 IN: compiler.cfg.intrinsics
 
@@ -148,24 +146,24 @@ IN: compiler.cfg.intrinsics
 
 : enable-sse2-simd ( -- )
     {
-        { math.vectors.simd.private:assert-positive [ drop ] }
-        { math.vectors.simd.private:(simd-v+) [ [ ^^add-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.private:(simd-v-) [ [ ^^sub-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.private:(simd-v*) [ [ ^^mul-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.private:(simd-v/) [ [ ^^div-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.private:(simd-vmin) [ [ ^^min-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.private:(simd-vmax) [ [ ^^max-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.private:(simd-vsqrt) [ [ ^^sqrt-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.private:(simd-broadcast) [ [ ^^broadcast-vector ] emit-unary-vector-op ] }
-        { math.vectors.simd.private:(simd-gather-2) [ emit-gather-vector-2 ] }
-        { math.vectors.simd.private:(simd-gather-4) [ emit-gather-vector-4 ] }
-        { math.vectors.simd.alien:alien-vector [ emit-alien-vector ] }
-        { math.vectors.simd.alien:set-alien-vector [ emit-set-alien-vector ] }
+        { math.vectors.simd.intrinsics:assert-positive [ drop ] }
+        { math.vectors.simd.intrinsics:(simd-v+) [ [ ^^add-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v-) [ [ ^^sub-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v*) [ [ ^^mul-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v/) [ [ ^^div-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vmin) [ [ ^^min-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vmax) [ [ ^^max-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vsqrt) [ [ ^^sqrt-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-broadcast) [ [ ^^broadcast-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-gather-2) [ emit-gather-vector-2 ] }
+        { math.vectors.simd.intrinsics:(simd-gather-4) [ emit-gather-vector-4 ] }
+        { math.vectors.simd.intrinsics:alien-vector [ emit-alien-vector ] }
+        { math.vectors.simd.intrinsics:set-alien-vector [ emit-set-alien-vector ] }
     } enable-intrinsics ;
 
 : enable-sse3-simd ( -- )
     {
-        { math.vectors.simd.private:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
     } enable-intrinsics ;
 
 : emit-intrinsic ( node word -- )
