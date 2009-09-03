@@ -1,27 +1,112 @@
 namespace factor
 {
 
-struct factorvm {
-
+struct factorvmdata {
 	// if you change this struct, also change vm.factor k--------
 	context *stack_chain; 
 	zone nursery; /* new objects are allocated here */
 	cell cards_offset;
 	cell decks_offset;
-#ifndef FACTOR_64
-	cell __padding__ ;   // align to 8 byte boundary
-#endif
 	cell userenv[USER_ENV]; /* TAGGED user environment data; see getenv/setenv prims */
-#ifndef FACTOR_64
-	cell __padding2__;   // not sure why we need this, bootstrap doesn't work without it
-#endif
+
+	// -------------------------------
+
+	// contexts
+	cell ds_size, rs_size;
+	context *unused_contexts;
+
+	// run
+	cell T;  /* Canonical T object. It's just a word */
+
+	// profiler
+	bool profiling_p;
+
+	// errors
+	/* Global variables used to pass fault handler state from signal handler to
+	   user-space */
+	cell signal_number;
+	cell signal_fault_addr;
+	unsigned int signal_fpu_status;
+	stack_frame *signal_callstack_top;
+	//data_heap
+	bool secure_gc;  /* Set by the -securegc command line argument */
+	bool gc_off; /* GC is off during heap walking */
+	data_heap *data;
+	/* A heap walk allows useful things to be done, like finding all
+	   references to an object for debugging purposes. */
+	cell heap_scan_ptr;
+	//write barrier
+	cell allot_markers_offset;
+	//data_gc
+	/* used during garbage collection only */
+	zone *newspace;
+	bool performing_gc;
+	bool performing_compaction;
+	cell collecting_gen;
+	/* if true, we are collecting aging space for the second time, so if it is still
+	   full, we go on to collect tenured */
+	bool collecting_aging_again;
+	/* in case a generation fills up in the middle of a gc, we jump back
+	   up to try collecting the next generation. */
+	jmp_buf gc_jmp;
+	gc_stats stats[max_gen_count];
+	u64 cards_scanned;
+	u64 decks_scanned;
+	u64 card_scan_time;
+	cell code_heap_scans;
+	/* What generation was being collected when copy_code_heap_roots() was last
+	   called? Until the next call to add_code_block(), future
+	   collections of younger generations don't have to touch the code
+	   heap. */
+	cell last_code_heap_scan;
+	/* sometimes we grow the heap */
+	bool growing_data_heap;
+	data_heap *old_data_heap;
+
+	// local roots
+	/* If a runtime function needs to call another function which potentially
+	   allocates memory, it must wrap any local variable references to Factor
+	   objects in gc_root instances */
+	std::vector<cell> gc_locals;
+	std::vector<cell> gc_bignums;
+
+	//debug
+	bool fep_disabled;
+	bool full_output;
+	cell look_for;
+	cell obj;
+
+	//math
+	cell bignum_zero;
+	cell bignum_pos_one;
+	cell bignum_neg_one;	
+
+	//code_heap
+	heap code;
+	unordered_map<heap_block *,char *> forwarding;
+
+	//image
+	cell code_relocation_base;
+	cell data_relocation_base;
+
+	//dispatch
+	cell megamorphic_cache_hits;
+	cell megamorphic_cache_misses;
+
+	//inline cache
+	cell max_pic_size;
+	cell cold_call_to_ic_transitions;
+	cell ic_to_pic_transitions;
+	cell pic_to_mega_transitions;
+	cell pic_counts[4];  /* PIC_TAG, PIC_HI_TAG, PIC_TUPLE, PIC_HI_TAG_TUPLE */
+};
+
+struct factorvm : factorvmdata {
 
 	// segments
 	inline cell align_page(cell a);
 
 	// contexts
-	cell ds_size, rs_size;
-	context *unused_contexts;
 	void reset_datastack();
 	void reset_retainstack();
 	void fix_stacks();
@@ -40,7 +125,6 @@ struct factorvm {
 	inline void vmprim_check_datastack();
 
 	// run
-	cell T;  /* Canonical T object. It's just a word */
 	inline void vmprim_getenv();
 	inline void vmprim_setenv();
 	inline void vmprim_exit();
@@ -52,19 +136,12 @@ struct factorvm {
 	inline void vmprim_clone();
 
 	// profiler
-	bool profiling_p;
 	void init_profiler();
 	code_block *compile_profiling_stub(cell word_);
 	void set_profiling(bool profiling);
 	inline void vmprim_profiling();
 
 	// errors
-	/* Global variables used to pass fault handler state from signal handler to
-	   user-space */
-	cell signal_number;
-	cell signal_fault_addr;
-	unsigned int signal_fpu_status;
-	stack_frame *signal_callstack_top;
 	void out_of_memory();
 	void critical_error(const char* msg, cell tagged);
 	void throw_error(cell error, stack_frame *callstack_top);
@@ -148,12 +225,6 @@ struct factorvm {
 	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factorvm *), unsigned int radix, int negative_p);
 
 	//data_heap
-	bool secure_gc;  /* Set by the -securegc command line argument */
-	bool gc_off; /* GC is off during heap walking */
-	data_heap *data;
-	/* A heap walk allows useful things to be done, like finding all
-	   references to an object for debugging purposes. */
-	cell heap_scan_ptr;
 	cell init_zone(zone *z, cell size, cell start);
 	void init_card_decks();
 	data_heap *alloc_data_heap(cell gens, cell young_size,cell aging_size,cell tenured_size);
@@ -183,7 +254,6 @@ struct factorvm {
 
 	
 	//write barrier
-	cell allot_markers_offset;
 	inline card *addr_to_card(cell a);
 	inline cell card_to_addr(card *c);
 	inline cell card_offset(card *c);
@@ -196,36 +266,6 @@ struct factorvm {
 
 
 	//data_gc
-	/* used during garbage collection only */
-	zone *newspace;
-	bool performing_gc;
-	bool performing_compaction;
-	cell collecting_gen;
-
-	/* if true, we are collecting aging space for the second time, so if it is still
-	   full, we go on to collect tenured */
-	bool collecting_aging_again;
-
-	/* in case a generation fills up in the middle of a gc, we jump back
-	   up to try collecting the next generation. */
-	jmp_buf gc_jmp;
-
-	gc_stats stats[max_gen_count];
-	u64 cards_scanned;
-	u64 decks_scanned;
-	u64 card_scan_time;
-	cell code_heap_scans;
-
-	/* What generation was being collected when copy_code_heap_roots() was last
-	   called? Until the next call to add_code_block(), future
-	   collections of younger generations don't have to touch the code
-	   heap. */
-	cell last_code_heap_scan;
-
-	/* sometimes we grow the heap */
-	bool growing_data_heap;
-	data_heap *old_data_heap;
-
 	void init_data_gc();
 	object *copy_untagged_object_impl(object *pointer, cell size);
 	object *copy_object_impl(object *untagged);
@@ -263,23 +303,12 @@ struct factorvm {
 	inline void check_tagged_pointer(cell tagged);
 	inline void vmprim_clear_gc_stats();
 
-	// local roots
-	/* If a runtime function needs to call another function which potentially
-	   allocates memory, it must wrap any local variable references to Factor
-	   objects in gc_root instances */
-	std::vector<cell> gc_locals;
-	std::vector<cell> gc_bignums;
-
 	// generic arrays
 	template <typename T> T *allot_array_internal(cell capacity);
 	template <typename T> bool reallot_array_in_place_p(T *array, cell capacity);
 	template <typename TYPE> TYPE *reallot_array(TYPE *array_, cell capacity);
 
 	//debug
-	bool fep_disabled;
-	bool full_output;
-	cell look_for;
-	cell obj;
 	void print_chars(string* str);
 	void print_word(word* word, cell nesting);
 	void print_factor_string(string* str);
@@ -353,9 +382,6 @@ struct factorvm {
 	inline void vmprim_wrapper();
 
 	//math
-	cell bignum_zero;
-	cell bignum_pos_one;
-	cell bignum_neg_one;	
 	inline void vmprim_bignum_to_fixnum();
 	inline void vmprim_float_to_fixnum();
 	inline void vmprim_fixnum_divint();
@@ -511,8 +537,6 @@ struct factorvm {
 	}
 
 	//code_heap
-	heap code;
-	unordered_map<heap_block *,char *> forwarding;
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
 	void jit_compile_word(cell word_, cell def_, bool relocate);
@@ -530,8 +554,6 @@ struct factorvm {
 
 
 	//image
-	cell code_relocation_base;
-	cell data_relocation_base;
 	void init_objects(image_header *h);
 	void load_data_heap(FILE *file, image_header *h, vm_parameters *p);
 	void load_code_heap(FILE *file, image_header *h, vm_parameters *p);
@@ -606,8 +628,6 @@ struct factorvm {
 	inline void vmprim_quot_compiled_p();
 
 	//dispatch
-	cell megamorphic_cache_hits;
-	cell megamorphic_cache_misses;
 	cell search_lookup_alist(cell table, cell klass);
 	cell search_lookup_hash(cell table, cell klass, cell hashcode);
 	cell nth_superclass(tuple_layout *layout, fixnum echelon);
@@ -625,11 +645,6 @@ struct factorvm {
 	inline void vmprim_dispatch_stats();
 
 	//inline cache
-	cell max_pic_size;
-	cell cold_call_to_ic_transitions;
-	cell ic_to_pic_transitions;
-	cell pic_to_mega_transitions;
-	cell pic_counts[4];  /* PIC_TAG, PIC_HI_TAG, PIC_TUPLE, PIC_HI_TAG_TUPLE */
 	void init_inline_caching(int max_size);
 	void deallocate_inline_cache(cell return_address);
 	cell determine_inline_cache_type(array *cache_entries);
