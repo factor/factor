@@ -7,7 +7,8 @@ ARTICLE: "math-constants" "Constants"
 { $subsection euler }
 { $subsection phi }
 { $subsection pi }
-{ $subsection epsilon } ;
+{ $subsection epsilon }
+{ $subsection single-epsilon } ;
 
 ABOUT: "math-constants"
 
@@ -25,4 +26,7 @@ HELP: pi
 { $values { "pi" "circumference of circle with diameter 1" } } ;
 
 HELP: epsilon
-{ $values { "epsilon" "smallest floating point value you can add to 1 without underflow" } } ;
+{ $values { "epsilon" "smallest double-precision floating point value you can add to 1 without underflow" } } ;
+
+HELP: single-epsilon
+{ $values { "epsilon" "smallest single-precision floating point value you can add to 1 without underflow" } } ;
