@@ -20,22 +20,14 @@ IN: compiler.cfg.intrinsics.alien
         ^^box-displaced-alien ds-push
     ] [ emit-primitive ] if ;
 
-: (prepare-alien-accessor-imm) ( class offset -- offset-vreg )
-    ds-drop [ ds-pop swap ^^unbox-c-ptr ] dip ^^add-imm ;
-
-: (prepare-alien-accessor) ( class -- offset-vreg )
-    [ 2inputs ^^untag-fixnum swap ] dip ^^unbox-c-ptr ^^add ;
-
 : prepare-alien-accessor ( infos -- offset-vreg )
-    <reversed> [ second class>> ] [ first ] bi
-    dup value-info-small-fixnum? [
-        literal>> (prepare-alien-accessor-imm)
-    ] [ drop (prepare-alien-accessor) ] if ;
+    <reversed> second class>>
+    [ 2inputs ^^untag-fixnum swap ] dip ^^unbox-c-ptr ^^add ;
 
 :: inline-alien ( node quot test -- )
     [let | infos [ node node-input-infos ] |
         infos test call
-        [ infos prepare-alien-accessor quot call ]
+        [ infos quot call ]
         [ node emit-primitive ]
         if
     ] ; inline
@@ -46,7 +38,7 @@ IN: compiler.cfg.intrinsics.alien
     bi and ;
 
 : inline-alien-getter ( node quot -- )
-    '[ @ ds-push ]
+    '[ prepare-alien-accessor @ ds-push ]
     [ inline-alien-getter? ] inline-alien ; inline
 
 : inline-alien-setter? ( infos class -- ? )
@@ -56,18 +48,17 @@ IN: compiler.cfg.intrinsics.alien
     tri and and ;
 
 : inline-alien-integer-setter ( node quot -- )
-    '[ ds-pop ^^untag-fixnum @ ]
+    '[ prepare-alien-accessor ds-pop ^^untag-fixnum @ ]
     [ fixnum inline-alien-setter? ]
     inline-alien ; inline
 
 : inline-alien-cell-setter ( node quot -- )
-    [ dup node-input-infos first class>> ] dip
-    '[ ds-pop _ ^^unbox-c-ptr @ ]
+    '[ [ prepare-alien-accessor ds-pop ] [ first class>> ] bi ^^unbox-c-ptr @ ]
     [ pinned-c-ptr inline-alien-setter? ]
     inline-alien ; inline
 
 : inline-alien-float-setter ( node quot -- )
-    '[ ds-pop @ ]
+    '[ prepare-alien-accessor ds-pop @ ]
     [ float inline-alien-setter? ]
     inline-alien ; inline
 

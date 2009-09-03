@@ -4,7 +4,7 @@ USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
 cpu.architecture kernel kernel.private math memory namespaces make
 sequences words system layouts combinators math.order fry locals
-compiler.constants
+compiler.constants byte-arrays
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.intrinsics
@@ -130,6 +130,21 @@ M: x86 %max     nip [ CMP ] [ CMOVL ] 2bi ;
 M: x86 %not     drop NOT ;
 M: x86 %log2    BSR ;
 
+GENERIC: copy-register* ( dst src rep -- )
+
+M: int-rep copy-register* drop MOV ;
+M: tagged-rep copy-register* drop MOV ;
+M: single-float-rep copy-register* drop MOVSS ;
+M: double-float-rep copy-register* drop MOVSD ;
+M: 4float-array-rep copy-register* drop MOVUPS ;
+M: 2double-array-rep copy-register* drop MOVUPD ;
+M: vector-rep copy-register* drop MOVDQU ;
+
+: copy-register ( dst src rep -- )
+    2over eq? [ 3drop ] [ copy-register* ] if ;
+
+M: x86 %copy ( dst src rep -- ) copy-register ;
+
 :: overflow-template ( label dst src1 src2 insn -- )
     src1 src2 insn call
     label JO ; inline
@@ -211,23 +226,119 @@ M: x86 %min-float nip MINSD ;
 M: x86 %max-float nip MAXSD ;
 M: x86 %sqrt SQRTSD ;
 
+M: x86 %single>double-float CVTSS2SD ;
+M: x86 %double>single-float CVTSD2SS ;
+
 M: x86 %integer>float CVTSI2SD ;
 M: x86 %float>integer CVTTSD2SI ;
 
-GENERIC: copy-register* ( dst src rep -- )
-
-M: int-rep copy-register* drop MOV ;
-M: tagged-rep copy-register* drop MOV ;
-M: single-float-rep copy-register* drop MOVSS ;
-M: double-float-rep copy-register* drop MOVSD ;
-
-: copy-register ( dst src rep -- )
-    2over eq? [ 3drop ] [ copy-register* ] if ;
-
-M: x86 %copy ( dst src rep -- ) copy-register ;
-
 M: x86 %unbox-float ( dst src -- )
     float-offset [+] MOVSD ;
+
+M:: x86 %box-float ( dst src temp -- )
+    dst 16 float temp %allot
+    dst float-offset [+] src MOVSD ;
+
+M:: x86 %box-vector ( dst src rep temp -- )
+    dst rep rep-size 2 cells + byte-array temp %allot
+    16 tag-fixnum dst 1 byte-array tag-number %set-slot-imm
+    dst byte-array-offset [+]
+    src rep copy-register ;
+
+M:: x86 %unbox-vector ( dst src rep -- )
+    dst src byte-array-offset [+]
+    rep copy-register ;
+
+M: x86 %broadcast-vector ( dst src rep -- )
+    {
+        { 4float-array-rep [ [ MOVAPS ] [ drop dup 0 SHUFPS ] 2bi ] }
+        { 2double-array-rep [ [ MOVAPD ] [ drop dup 0 SHUFPD ] 2bi ] }
+    } case ;
+
+M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
+    rep {
+        {
+            4float-array-rep
+            [
+                dst src1 MOVSS
+                dst src2 UNPCKLPS
+                src3 src4 UNPCKLPS
+                dst src3 HEX: 44 SHUFPS
+            ]
+        }
+    } case ;
+
+M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
+    rep {
+        {
+            2double-array-rep
+            [
+                dst src1 MOVAPD
+                dst src2 0 SHUFPD
+            ]
+        }
+    } case ;
+
+M: x86 %add-vector ( dst src1 src2 rep -- )
+    {
+        { 4float-array-rep [ ADDPS ] }
+        { 2double-array-rep [ ADDPD ] }
+        { 16char-array-rep [ PADDB ] }
+        { 16uchar-array-rep [ PADDB ] }
+        { 8short-array-rep [ PADDW ] }
+        { 8ushort-array-rep [ PADDW ] }
+        { 4int-array-rep [ PADDD ] }
+        { 4uint-array-rep [ PADDD ] }
+    } case drop ;
+
+M: x86 %sub-vector ( dst src1 src2 rep -- )
+    {
+        { 4float-array-rep [ SUBPS ] }
+        { 2double-array-rep [ SUBPD ] }
+        { 16char-array-rep [ PSUBB ] }
+        { 16uchar-array-rep [ PSUBB ] }
+        { 8short-array-rep [ PSUBW ] }
+        { 8ushort-array-rep [ PSUBW ] }
+        { 4int-array-rep [ PSUBD ] }
+        { 4uint-array-rep [ PSUBD ] }
+    } case drop ;
+
+M: x86 %mul-vector ( dst src1 src2 rep -- )
+    {
+        { 4float-array-rep [ MULPS ] }
+        { 2double-array-rep [ MULPD ] }
+        { 4int-array-rep [ PMULLW ] }
+    } case drop ;
+
+M: x86 %div-vector ( dst src1 src2 rep -- )
+    {
+        { 4float-array-rep [ DIVPS ] }
+        { 2double-array-rep [ DIVPD ] }
+    } case drop ;
+
+M: x86 %min-vector ( dst src1 src2 rep -- )
+    {
+        { 4float-array-rep [ MINPS ] }
+        { 2double-array-rep [ MINPD ] }
+    } case drop ;
+
+M: x86 %max-vector ( dst src1 src2 rep -- )
+    {
+        { 4float-array-rep [ MAXPS ] }
+        { 2double-array-rep [ MAXPD ] }
+    } case drop ;
+
+M: x86 %sqrt-vector ( dst src rep -- )
+    {
+        { 4float-array-rep [ SQRTPS ] }
+        { 2double-array-rep [ SQRTPD ] }
+    } case ;
+
+M: x86 %horizontal-add-vector ( dst src rep -- )
+    {
+        { 4float-array-rep [ [ MOVAPS ] [ HADDPS ] [ HADDPS ] 2tri ] }
+        { 2double-array-rep [ [ MOVAPD ] [ HADDPD ] 2bi ] }
+    } case ;
 
 M:: x86 %unbox-any-c-ptr ( dst src temp -- )
     [
@@ -254,10 +365,6 @@ M:: x86 %unbox-any-c-ptr ( dst src temp -- )
         dst byte-array-offset ADD
         "end" resolve-label
     ] with-scope ;
-
-M:: x86 %box-float ( dst src temp -- )
-    dst 16 float temp %allot
-    dst float-offset [+] src MOVSD ;
 
 : alien@ ( reg n -- op ) cells alien tag-number - [+] ;
 
@@ -405,8 +512,9 @@ M: x86 %alien-signed-2 16 %alien-signed-getter ;
 M: x86 %alien-signed-4 32 %alien-signed-getter ;
 
 M: x86 %alien-cell [] MOV ;
-M: x86 %alien-float dupd [] MOVSS dup CVTSS2SD ;
+M: x86 %alien-float [] MOVSS ;
 M: x86 %alien-double [] MOVSD ;
+M: x86 %alien-vector [ [] ] dip copy-register ;
 
 :: %alien-integer-setter ( ptr value size -- )
     value { ptr } size [| new-value |
@@ -418,8 +526,9 @@ M: x86 %set-alien-integer-1 8 %alien-integer-setter ;
 M: x86 %set-alien-integer-2 16 %alien-integer-setter ;
 M: x86 %set-alien-integer-4 32 %alien-integer-setter ;
 M: x86 %set-alien-cell [ [] ] dip MOV ;
-M: x86 %set-alien-float dup dup CVTSD2SS [ [] ] dip MOVSS ;
+M: x86 %set-alien-float [ [] ] dip MOVSS ;
 M: x86 %set-alien-double [ [] ] dip MOVSD ;
+M: x86 %set-alien-vector [ [] ] 2dip copy-register ;
 
 : shift-count? ( reg -- ? ) { ECX RCX } memq? ;
 
