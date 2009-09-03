@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Patrick Mauritz.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: unix
 USING: alien.syntax system kernel layouts ;
+IN: unix
 
 ! Solaris.
 
@@ -26,37 +26,37 @@ CONSTANT: SO_RCVTIMEO HEX: 1006
 CONSTANT: F_SETFL 4    ! set file status flags
 CONSTANT: O_NONBLOCK HEX: 80 ! no delay
 
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" }
-    { "int" "socktype" }
-    { "int" "protocol" }
+STRUCT: addrinfo
+    { flags int }
+    { family int }
+    { socktype int }
+    { protocol int }
 ! #ifdef __sparcv9
 !         int _ai_pad;            
 ! #endif
-    { "int" "addrlen" }
-    { "char*" "canonname" }
-    { "void*" "addr" }
-    { "void*" "next" } ;
+    { addrlen int }
+    { canonname char* }
+    { addr void* }
+    { next void* } ;
 
-C-STRUCT: sockaddr-in
-    { "ushort" "family" }
-    { "ushort" "port" }
-    { "in_addr_t" "addr" }
-    { "longlong" "unused" } ;
+STRUCT: sockaddr-in
+    { family ushort }
+    { port ushort }
+    { addr in_addr_t }
+    { unused longlong } ;
 
-C-STRUCT: sockaddr-in6
-    { "ushort" "family" }
-    { "ushort" "port" }
-    { "uint" "flowinfo" }
-    { { "uchar" 16 } "addr" }
-    { "uint" "scopeid" } ;
+STRUCT: sockaddr-in6
+    { family ushort }
+    { port ushort }
+    { flowinfo uint }
+    { addr uchar[16] }
+    { scopeid uint } ;
 
 : max-un-path 108 ;
 
-C-STRUCT: sockaddr-un
-    { "ushort" "family" }
-    { { "char" max-un-path } "path" } ;
+STRUCT: sockaddr-un
+    { family ushort }
+    { path { "char" max-un-path } } ;
 
 CONSTANT: EINTR 4
 CONSTANT: EAGAIN 11
