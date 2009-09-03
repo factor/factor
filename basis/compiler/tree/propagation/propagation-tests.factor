@@ -799,3 +799,13 @@ SYMBOL: not-an-assoc
 
 [ t ] [ [ (( a b c -- c b a )) shuffle ] { shuffle } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap shuffle ] { shuffle } inlined? ] unit-test
+
+! Type function for 'clone' had a subtle issue
+TUPLE: tuple-with-read-only-slot { x read-only } ;
+
+M: tuple-with-read-only-slot clone
+    x>> clone tuple-with-read-only-slot boa ; inline
+
+[ V{ object } ] [
+    [ { 1 2 3 } dup tuple-with-read-only-slot boa clone x>> eq? ] final-classes
+] unit-test
