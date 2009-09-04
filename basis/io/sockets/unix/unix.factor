@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.strings generic kernel math threads
 sequences byte-arrays io.binary io.backend.unix io.streams.duplex
 io.backend io.pathnames io.files.private io.encodings.utf8 math.parser
 continuations libc combinators system accessors destructors unix
-locals init ;
+locals init classes.struct ;
 
 EXCLUDE: namespaces => bind ;
 EXCLUDE: io => read write ;
@@ -139,17 +139,17 @@ M: unix (send) ( packet addrspec datagram -- )
 ! Unix domain sockets
 M: local protocol-family drop PF_UNIX ;
 
-M: local sockaddr-size drop "sockaddr-un" heap-size ;
+M: local sockaddr-size drop sockaddr-un heap-size ;
 
-M: local empty-sockaddr drop "sockaddr-un" <c-object> ;
+M: local empty-sockaddr drop sockaddr-un <struct> ;
 
 M: local make-sockaddr
     path>> (normalize-path)
     dup length 1 + max-un-path > [ "Path too long" throw ] when
-    "sockaddr-un" <c-object>
-    AF_UNIX over set-sockaddr-un-family
-    [ [ utf8 string>alien ] dip set-sockaddr-un-path ] keep ;
+    sockaddr-un <struct>
+        AF_UNIX >>family
+        swap utf8 string>alien >>path ;
 
 M: local parse-sockaddr
     drop
-    sockaddr-un-path utf8 alien>string <local> ;
+    path>> utf8 alien>string <local> ;
