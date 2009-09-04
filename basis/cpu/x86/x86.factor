@@ -340,6 +340,9 @@ M: x86 %horizontal-add-vector ( dst src rep -- )
         { double-2-rep [ [ MOVAPD ] [ HADDPD ] 2bi ] }
     } case ;
 
+M: x86 %unbox-alien ( dst src -- )
+    alien-offset [+] MOV ;
+
 M:: x86 %unbox-any-c-ptr ( dst src temp -- )
     [
         { "is-byte-array" "end" "start" } [ define-label ] each
