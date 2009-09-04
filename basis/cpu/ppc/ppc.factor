@@ -516,7 +516,7 @@ M: ppc %epilogue ( n -- )
 : (%compare-float-unordered) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
 : (%compare-float-ordered) ( src1 src2 -- ) [ 0 ] dip FCMPO ; inline
 
-: (%compare-float) ( cc src1 src2 -- branch1 branch2 )
+:: (%compare-float) ( cc src1 src2 -- branch1 branch2 )
     cc {
         { cc<    [ src1 src2 (%compare-float-ordered)   \ BLT f     ] }
         { cc<=   [ src1 src2 (%compare-float-ordered)   \ BLT \ BEQ ] }
@@ -536,7 +536,7 @@ M: ppc %epilogue ( n -- )
 
 M: ppc %compare (%compare) %boolean ;
 M: ppc %compare-imm (%compare-imm) %boolean ;
-M:: ppc %compare-float ( dst temp cc src1 src2 )
+M:: ppc %compare-float ( dst temp cc src1 src2 -- )
     cc negate-cc src1 src2 (%compare-float) :> branch2 :> branch1
     dst temp branch1 branch2 (%boolean) ;
 
