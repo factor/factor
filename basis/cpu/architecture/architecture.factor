@@ -177,6 +177,7 @@ HOOK: %max-vector cpu ( dst src1 src2 rep -- )
 HOOK: %sqrt-vector cpu ( dst src rep -- )
 HOOK: %horizontal-add-vector cpu ( dst src rep -- )
 
+HOOK: %unbox-alien cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
 HOOK: %box-alien cpu ( dst src temp -- )
 HOOK: %box-displaced-alien cpu ( dst displacement base temp1 temp2 base-class -- )

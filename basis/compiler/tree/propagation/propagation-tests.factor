@@ -9,7 +9,7 @@ compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
 specialized-arrays.double system sorting math.libm
-math.intervals quotations effects ;
+math.intervals quotations effects alien ;
 IN: compiler.tree.propagation.tests
 
 [ V{ } ] [ [ ] final-classes ] unit-test
@@ -808,4 +808,10 @@ M: tuple-with-read-only-slot clone
 
 [ V{ object } ] [
     [ { 1 2 3 } dup tuple-with-read-only-slot boa clone x>> eq? ] final-classes
+] unit-test
+
+! alien-cell outputs a simple-alien or f
+[ t ] [
+    [ { byte-array fixnum } declare alien-cell dup [ "OOPS" throw ] unless ] final-classes
+    first simple-alien class=
 ] unit-test

@@ -341,11 +341,6 @@ use: src
 literal: rep ;
 
 ! Boxing and unboxing aliens
-PURE-INSN: ##unbox-any-c-ptr
-def: dst/int-rep
-use: src/int-rep
-temp: temp/int-rep ;
-
 PURE-INSN: ##box-alien
 def: dst/int-rep
 use: src/int-rep
@@ -357,9 +352,17 @@ use: displacement/int-rep base/int-rep
 temp: temp1/int-rep temp2/int-rep
 literal: base-class ;
 
+PURE-INSN: ##unbox-any-c-ptr
+def: dst/int-rep
+use: src/int-rep
+temp: temp/int-rep ;
+
 : ##unbox-f ( dst src -- ) drop 0 ##load-immediate ;
 : ##unbox-byte-array ( dst src -- ) byte-array-offset ##add-imm ;
-: ##unbox-alien ( dst src -- ) 3 object tag-number ##slot-imm ;
+
+PURE-INSN: ##unbox-alien
+def: dst/int-rep
+use: src/int-rep ;
 
 : ##unbox-c-ptr ( dst src class temp -- )
     {

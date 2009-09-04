@@ -175,9 +175,10 @@ CODEGEN: ##min-vector %min-vector
 CODEGEN: ##max-vector %max-vector
 CODEGEN: ##sqrt-vector %sqrt-vector
 CODEGEN: ##horizontal-add-vector %horizontal-add-vector
-CODEGEN: ##unbox-any-c-ptr %unbox-any-c-ptr
 CODEGEN: ##box-alien %box-alien
 CODEGEN: ##box-displaced-alien %box-displaced-alien
+CODEGEN: ##unbox-alien %unbox-alien
+CODEGEN: ##unbox-any-c-ptr %unbox-any-c-ptr
 CODEGEN: ##alien-unsigned-1 %alien-unsigned-1
 CODEGEN: ##alien-unsigned-2 %alien-unsigned-2
 CODEGEN: ##alien-unsigned-4 %alien-unsigned-4
