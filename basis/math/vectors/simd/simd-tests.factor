@@ -3,299 +3,348 @@ USING: math math.vectors.simd math.vectors.simd.private
 math.vectors math.functions kernel.private compiler sequences
 tools.test compiler.tree.debugger accessors kernel ;
 
-[ 4float-array{ 0 0 0 0 } ] [ 4float-array new ] unit-test
+[ float-4{ 0 0 0 0 } ] [ float-4 new ] unit-test
 
-[ V{ float } ] [ [ { 4float-array } declare norm-sq ] final-classes ] unit-test
+[ float-4{ 0 0 0 0 } ] [ [ float-4 new ] compile-call ] unit-test
 
-[ V{ float } ] [ [ { 4float-array } declare norm ] final-classes ] unit-test
+[ V{ float } ] [ [ { float-4 } declare norm-sq ] final-classes ] unit-test
 
-[ 4float-array{ 12 12 12 12 } ] [
-    12 [ 4float-array-with ] compile-call
+[ V{ float } ] [ [ { float-4 } declare norm ] final-classes ] unit-test
+
+[ float-4{ 12 12 12 12 } ] [
+    12 [ float-4-with ] compile-call
 ] unit-test
 
-[ 4float-array{ 1 2 3 4 } ] [
-    1 2 3 4 [ 4float-array-boa ] compile-call
+[ float-4{ 1 2 3 4 } ] [
+    1 2 3 4 [ float-4-boa ] compile-call
 ] unit-test
 
-[ 4float-array{ 11 22 33 44 } ] [
-    4float-array{ 1 2 3 4 } 4float-array{ 10 20 30 40 }
-    [ { 4float-array 4float-array } declare v+ ] compile-call
+[ float-4{ 11 22 33 44 } ] [
+    float-4{ 1 2 3 4 } float-4{ 10 20 30 40 }
+    [ { float-4 float-4 } declare v+ ] compile-call
 ] unit-test
 
-[ 4float-array{ -9 -18 -27 -36 } ] [
-    4float-array{ 1 2 3 4 } 4float-array{ 10 20 30 40 }
-    [ { 4float-array 4float-array } declare v- ] compile-call
+[ float-4{ -9 -18 -27 -36 } ] [
+    float-4{ 1 2 3 4 } float-4{ 10 20 30 40 }
+    [ { float-4 float-4 } declare v- ] compile-call
 ] unit-test
 
-[ 4float-array{ 10 40 90 160 } ] [
-    4float-array{ 1 2 3 4 } 4float-array{ 10 20 30 40 }
-    [ { 4float-array 4float-array } declare v* ] compile-call
+[ float-4{ 10 40 90 160 } ] [
+    float-4{ 1 2 3 4 } float-4{ 10 20 30 40 }
+    [ { float-4 float-4 } declare v* ] compile-call
 ] unit-test
 
-[ 4float-array{ 10 100 1000 10000 } ] [
-    4float-array{ 100 2000 30000 400000 } 4float-array{ 10 20 30 40 }
-    [ { 4float-array 4float-array } declare v/ ] compile-call
+[ float-4{ 10 100 1000 10000 } ] [
+    float-4{ 100 2000 30000 400000 } float-4{ 10 20 30 40 }
+    [ { float-4 float-4 } declare v/ ] compile-call
 ] unit-test
 
-[ 4float-array{ -10 -20 -30 -40 } ] [
-    4float-array{ -10 20 -30 40 } 4float-array{ 10 -20 30 -40 }
-    [ { 4float-array 4float-array } declare vmin ] compile-call
+[ float-4{ -10 -20 -30 -40 } ] [
+    float-4{ -10 20 -30 40 } float-4{ 10 -20 30 -40 }
+    [ { float-4 float-4 } declare vmin ] compile-call
 ] unit-test
 
-[ 4float-array{ 10 20 30 40 } ] [
-    4float-array{ -10 20 -30 40 } 4float-array{ 10 -20 30 -40 }
-    [ { 4float-array 4float-array } declare vmax ] compile-call
+[ float-4{ 10 20 30 40 } ] [
+    float-4{ -10 20 -30 40 } float-4{ 10 -20 30 -40 }
+    [ { float-4 float-4 } declare vmax ] compile-call
 ] unit-test
 
 [ 10.0 ] [
-    4float-array{ 1 2 3 4 }
-    [ { 4float-array } declare sum ] compile-call
+    float-4{ 1 2 3 4 }
+    [ { float-4 } declare sum ] compile-call
 ] unit-test
 
 [ 13.0 ] [
-    4float-array{ 1 2 3 4 }
-    [ { 4float-array } declare sum 3.0 + ] compile-call
+    float-4{ 1 2 3 4 }
+    [ { float-4 } declare sum 3.0 + ] compile-call
 ] unit-test
 
 [ 8.0 ] [
-    4float-array{ 1 2 3 4 } 4float-array{ 2 0 2 0 }
-    [ { 4float-array 4float-array } declare v. ] compile-call
+    float-4{ 1 2 3 4 } float-4{ 2 0 2 0 }
+    [ { float-4 float-4 } declare v. ] compile-call
 ] unit-test
 
-[ 4float-array{ 5 10 15 20 } ] [
-    5.0 4float-array{ 1 2 3 4 }
-    [ { float 4float-array } declare n*v ] compile-call
+[ float-4{ 5 10 15 20 } ] [
+    5.0 float-4{ 1 2 3 4 }
+    [ { float float-4 } declare n*v ] compile-call
 ] unit-test
 
-[ 4float-array{ 5 10 15 20 } ] [
-    4float-array{ 1 2 3 4 } 5.0
-    [ { float 4float-array } declare v*n ] compile-call
+[ float-4{ 5 10 15 20 } ] [
+    float-4{ 1 2 3 4 } 5.0
+    [ { float float-4 } declare v*n ] compile-call
 ] unit-test
 
-[ 4float-array{ 10 5 2 5 } ] [
-    10.0 4float-array{ 1 2 5 2 }
-    [ { float 4float-array } declare n/v ] compile-call
+[ float-4{ 10 5 2 5 } ] [
+    10.0 float-4{ 1 2 5 2 }
+    [ { float float-4 } declare n/v ] compile-call
 ] unit-test
 
-[ 4float-array{ 0.5 1 1.5 2 } ] [
-    4float-array{ 1 2 3 4 } 2
-    [ { float 4float-array } declare v/n ] compile-call
+[ float-4{ 0.5 1 1.5 2 } ] [
+    float-4{ 1 2 3 4 } 2
+    [ { float float-4 } declare v/n ] compile-call
 ] unit-test
 
-[ 4float-array{ 1 0 0 0 } ] [
-    4float-array{ 10 0 0 0 }
-    [ { 4float-array } declare normalize ] compile-call
+[ float-4{ 1 0 0 0 } ] [
+    float-4{ 10 0 0 0 }
+    [ { float-4 } declare normalize ] compile-call
 ] unit-test
 
 [ 30.0 ] [
-    4float-array{ 1 2 3 4 }
-    [ { 4float-array } declare norm-sq ] compile-call
+    float-4{ 1 2 3 4 }
+    [ { float-4 } declare norm-sq ] compile-call
 ] unit-test
 
 [ t ] [
-    4float-array{ 1 0 0 0 }
-    4float-array{ 0 1 0 0 }
-    [ { 4float-array 4float-array } declare distance ] compile-call
+    float-4{ 1 0 0 0 }
+    float-4{ 0 1 0 0 }
+    [ { float-4 float-4 } declare distance ] compile-call
     2 sqrt 1.0e-6 ~
 ] unit-test
 
-[ 2double-array{ 12 12 } ] [
-    12 [ 2double-array-with ] compile-call
+[ double-2{ 12 12 } ] [
+    12 [ double-2-with ] compile-call
 ] unit-test
 
-[ 2double-array{ 1 2 } ] [
-    1 2 [ 2double-array-boa ] compile-call
+[ double-2{ 1 2 } ] [
+    1 2 [ double-2-boa ] compile-call
 ] unit-test
 
-[ 2double-array{ 11 22 } ] [
-    2double-array{ 1 2 } 2double-array{ 10 20 }
-    [ { 2double-array 2double-array } declare v+ ] compile-call
+[ double-2{ 11 22 } ] [
+    double-2{ 1 2 } double-2{ 10 20 }
+    [ { double-2 double-2 } declare v+ ] compile-call
 ] unit-test
 
-[ 2double-array{ -9 -18 } ] [
-    2double-array{ 1 2 } 2double-array{ 10 20 }
-    [ { 2double-array 2double-array } declare v- ] compile-call
+[ double-2{ -9 -18 } ] [
+    double-2{ 1 2 } double-2{ 10 20 }
+    [ { double-2 double-2 } declare v- ] compile-call
 ] unit-test
 
-[ 2double-array{ 10 40 } ] [
-    2double-array{ 1 2 } 2double-array{ 10 20 }
-    [ { 2double-array 2double-array } declare v* ] compile-call
+[ double-2{ 10 40 } ] [
+    double-2{ 1 2 } double-2{ 10 20 }
+    [ { double-2 double-2 } declare v* ] compile-call
 ] unit-test
 
-[ 2double-array{ 10 100 } ] [
-    2double-array{ 100 2000 } 2double-array{ 10 20 }
-    [ { 2double-array 2double-array } declare v/ ] compile-call
+[ double-2{ 10 100 } ] [
+    double-2{ 100 2000 } double-2{ 10 20 }
+    [ { double-2 double-2 } declare v/ ] compile-call
 ] unit-test
 
-[ 2double-array{ -10 -20 } ] [
-    2double-array{ -10 20 } 2double-array{ 10 -20 }
-    [ { 2double-array 2double-array } declare vmin ] compile-call
+[ double-2{ -10 -20 } ] [
+    double-2{ -10 20 } double-2{ 10 -20 }
+    [ { double-2 double-2 } declare vmin ] compile-call
 ] unit-test
 
-[ 2double-array{ 10 20 } ] [
-    2double-array{ -10 20 } 2double-array{ 10 -20 }
-    [ { 2double-array 2double-array } declare vmax ] compile-call
+[ double-2{ 10 20 } ] [
+    double-2{ -10 20 } double-2{ 10 -20 }
+    [ { double-2 double-2 } declare vmax ] compile-call
 ] unit-test
 
 [ 3.0 ] [
-    2double-array{ 1 2 }
-    [ { 2double-array } declare sum ] compile-call
+    double-2{ 1 2 }
+    [ { double-2 } declare sum ] compile-call
 ] unit-test
 
 [ 7.0 ] [
-    2double-array{ 1 2 }
-    [ { 2double-array } declare sum 4.0 + ] compile-call
+    double-2{ 1 2 }
+    [ { double-2 } declare sum 4.0 + ] compile-call
 ] unit-test
 
 [ 16.0 ] [
-    2double-array{ 1 2 } 2double-array{ 2 7 }
-    [ { 2double-array 2double-array } declare v. ] compile-call
+    double-2{ 1 2 } double-2{ 2 7 }
+    [ { double-2 double-2 } declare v. ] compile-call
 ] unit-test
 
-[ 2double-array{ 5 10 } ] [
-    5.0 2double-array{ 1 2 }
-    [ { float 2double-array } declare n*v ] compile-call
+[ double-2{ 5 10 } ] [
+    5.0 double-2{ 1 2 }
+    [ { float double-2 } declare n*v ] compile-call
 ] unit-test
 
-[ 2double-array{ 5 10 } ] [
-    2double-array{ 1 2 } 5.0
-    [ { float 2double-array } declare v*n ] compile-call
+[ double-2{ 5 10 } ] [
+    double-2{ 1 2 } 5.0
+    [ { float double-2 } declare v*n ] compile-call
 ] unit-test
 
-[ 2double-array{ 10 5 } ] [
-    10.0 2double-array{ 1 2 }
-    [ { float 2double-array } declare n/v ] compile-call
+[ double-2{ 10 5 } ] [
+    10.0 double-2{ 1 2 }
+    [ { float double-2 } declare n/v ] compile-call
 ] unit-test
 
-[ 2double-array{ 0.5 1 } ] [
-    2double-array{ 1 2 } 2
-    [ { float 2double-array } declare v/n ] compile-call
+[ double-2{ 0.5 1 } ] [
+    double-2{ 1 2 } 2
+    [ { float double-2 } declare v/n ] compile-call
 ] unit-test
 
-[ 2double-array{ 0 0 } ] [ 2double-array new ] unit-test
+[ double-2{ 0 0 } ] [ double-2 new ] unit-test
 
-[ 2double-array{ 1 0 } ] [
-    2double-array{ 10 0 }
-    [ { 2double-array } declare normalize ] compile-call
+[ double-2{ 1 0 } ] [
+    double-2{ 10 0 }
+    [ { double-2 } declare normalize ] compile-call
 ] unit-test
 
 [ 5.0 ] [
-    2double-array{ 1 2 }
-    [ { 2double-array } declare norm-sq ] compile-call
+    double-2{ 1 2 }
+    [ { double-2 } declare norm-sq ] compile-call
 ] unit-test
 
 [ t ] [
-    2double-array{ 1 0 }
-    2double-array{ 0 1 }
-    [ { 2double-array 2double-array } declare distance ] compile-call
+    double-2{ 1 0 }
+    double-2{ 0 1 }
+    [ { double-2 double-2 } declare distance ] compile-call
     2 sqrt 1.0e-6 ~
 ] unit-test
 
-[ 4double-array{ 0 0 0 0 } ] [ 4double-array new ] unit-test
+[ double-4{ 0 0 0 0 } ] [ double-4 new ] unit-test
 
-[ 4double-array{ 1 2 3 4 } ] [
-    1 2 3 4 4double-array-boa
+[ double-4{ 1 2 3 4 } ] [
+    1 2 3 4 double-4-boa
 ] unit-test
 
-[ 4double-array{ 1 1 1 1 } ] [
-    1 4double-array-with
+[ double-4{ 1 1 1 1 } ] [
+    1 double-4-with
 ] unit-test
 
-[ 4double-array{ 0 1 2 3 } ] [
-    1 4double-array-with [ * ] map-index
+[ double-4{ 0 1 2 3 } ] [
+    1 double-4-with [ * ] map-index
 ] unit-test
 
-[ V{ float } ] [ [ { 4double-array } declare norm-sq ] final-classes ] unit-test
+[ V{ float } ] [ [ { double-4 } declare norm-sq ] final-classes ] unit-test
 
-[ V{ float } ] [ [ { 4double-array } declare norm ] final-classes ] unit-test
+[ V{ float } ] [ [ { double-4 } declare norm ] final-classes ] unit-test
 
-[ 4double-array{ 12 12 12 12 } ] [
-    12 [ 4double-array-with ] compile-call
+[ double-4{ 12 12 12 12 } ] [
+    12 [ double-4-with ] compile-call
 ] unit-test
 
-[ 4double-array{ 1 2 3 4 } ] [
-    1 2 3 4 [ 4double-array-boa ] compile-call
+[ double-4{ 1 2 3 4 } ] [
+    1 2 3 4 [ double-4-boa ] compile-call
 ] unit-test
 
-[ 4double-array{ 11 22 33 44 } ] [
-    4double-array{ 1 2 3 4 } 4double-array{ 10 20 30 40 }
-    [ { 4double-array 4double-array } declare v+ ] compile-call
+[ double-4{ 11 22 33 44 } ] [
+    double-4{ 1 2 3 4 } double-4{ 10 20 30 40 }
+    [ { double-4 double-4 } declare v+ ] compile-call
 ] unit-test
 
-[ 4double-array{ -9 -18 -27 -36 } ] [
-    4double-array{ 1 2 3 4 } 4double-array{ 10 20 30 40 }
-    [ { 4double-array 4double-array } declare v- ] compile-call
+[ double-4{ -9 -18 -27 -36 } ] [
+    double-4{ 1 2 3 4 } double-4{ 10 20 30 40 }
+    [ { double-4 double-4 } declare v- ] compile-call
 ] unit-test
 
-[ 4double-array{ 10 40 90 160 } ] [
-    4double-array{ 1 2 3 4 } 4double-array{ 10 20 30 40 }
-    [ { 4double-array 4double-array } declare v* ] compile-call
+[ double-4{ 10 40 90 160 } ] [
+    double-4{ 1 2 3 4 } double-4{ 10 20 30 40 }
+    [ { double-4 double-4 } declare v* ] compile-call
 ] unit-test
 
-[ 4double-array{ 10 100 1000 10000 } ] [
-    4double-array{ 100 2000 30000 400000 } 4double-array{ 10 20 30 40 }
-    [ { 4double-array 4double-array } declare v/ ] compile-call
+[ double-4{ 10 100 1000 10000 } ] [
+    double-4{ 100 2000 30000 400000 } double-4{ 10 20 30 40 }
+    [ { double-4 double-4 } declare v/ ] compile-call
 ] unit-test
 
-[ 4double-array{ -10 -20 -30 -40 } ] [
-    4double-array{ -10 20 -30 40 } 4double-array{ 10 -20 30 -40 }
-    [ { 4double-array 4double-array } declare vmin ] compile-call
+[ double-4{ -10 -20 -30 -40 } ] [
+    double-4{ -10 20 -30 40 } double-4{ 10 -20 30 -40 }
+    [ { double-4 double-4 } declare vmin ] compile-call
 ] unit-test
 
-[ 4double-array{ 10 20 30 40 } ] [
-    4double-array{ -10 20 -30 40 } 4double-array{ 10 -20 30 -40 }
-    [ { 4double-array 4double-array } declare vmax ] compile-call
+[ double-4{ 10 20 30 40 } ] [
+    double-4{ -10 20 -30 40 } double-4{ 10 -20 30 -40 }
+    [ { double-4 double-4 } declare vmax ] compile-call
 ] unit-test
 
 [ 10.0 ] [
-    4double-array{ 1 2 3 4 }
-    [ { 4double-array } declare sum ] compile-call
+    double-4{ 1 2 3 4 }
+    [ { double-4 } declare sum ] compile-call
 ] unit-test
 
 [ 13.0 ] [
-    4double-array{ 1 2 3 4 }
-    [ { 4double-array } declare sum 3.0 + ] compile-call
+    double-4{ 1 2 3 4 }
+    [ { double-4 } declare sum 3.0 + ] compile-call
 ] unit-test
 
 [ 8.0 ] [
-    4double-array{ 1 2 3 4 } 4double-array{ 2 0 2 0 }
-    [ { 4double-array 4double-array } declare v. ] compile-call
+    double-4{ 1 2 3 4 } double-4{ 2 0 2 0 }
+    [ { double-4 double-4 } declare v. ] compile-call
 ] unit-test
 
-[ 4double-array{ 5 10 15 20 } ] [
-    5.0 4double-array{ 1 2 3 4 }
-    [ { float 4double-array } declare n*v ] compile-call
+[ double-4{ 5 10 15 20 } ] [
+    5.0 double-4{ 1 2 3 4 }
+    [ { float double-4 } declare n*v ] compile-call
 ] unit-test
 
-[ 4double-array{ 5 10 15 20 } ] [
-    4double-array{ 1 2 3 4 } 5.0
-    [ { float 4double-array } declare v*n ] compile-call
+[ double-4{ 5 10 15 20 } ] [
+    double-4{ 1 2 3 4 } 5.0
+    [ { float double-4 } declare v*n ] compile-call
 ] unit-test
 
-[ 4double-array{ 10 5 2 5 } ] [
-    10.0 4double-array{ 1 2 5 2 }
-    [ { float 4double-array } declare n/v ] compile-call
+[ double-4{ 10 5 2 5 } ] [
+    10.0 double-4{ 1 2 5 2 }
+    [ { float double-4 } declare n/v ] compile-call
 ] unit-test
 
-[ 4double-array{ 0.5 1 1.5 2 } ] [
-    4double-array{ 1 2 3 4 } 2
-    [ { float 4double-array } declare v/n ] compile-call
+[ double-4{ 0.5 1 1.5 2 } ] [
+    double-4{ 1 2 3 4 } 2
+    [ { float double-4 } declare v/n ] compile-call
 ] unit-test
 
-[ 4double-array{ 1 0 0 0 } ] [
-    4double-array{ 10 0 0 0 }
-    [ { 4double-array } declare normalize ] compile-call
+[ double-4{ 1 0 0 0 } ] [
+    double-4{ 10 0 0 0 }
+    [ { double-4 } declare normalize ] compile-call
 ] unit-test
 
 [ 30.0 ] [
-    4double-array{ 1 2 3 4 }
-    [ { 4double-array } declare norm-sq ] compile-call
+    double-4{ 1 2 3 4 }
+    [ { double-4 } declare norm-sq ] compile-call
 ] unit-test
 
 [ t ] [
-    4double-array{ 1 0 0 0 }
-    4double-array{ 0 1 0 0 }
-    [ { 4double-array 4double-array } declare distance ] compile-call
+    double-4{ 1 0 0 0 }
+    double-4{ 0 1 0 0 }
+    [ { double-4 double-4 } declare distance ] compile-call
     2 sqrt 1.0e-6 ~
 ] unit-test
 
+[ float-8{ 0 0 0 0 0 0 0 0 } ] [ float-8 new ] unit-test
+
+[ float-8{ 0 0 0 0 0 0 0 0 } ] [ [ float-8 new ] compile-call ] unit-test
+
+[ float-8{ 1 1 1 1 1 1 1 1 } ] [ 1 float-8-with ] unit-test
+
+[ float-8{ 1 1 1 1 1 1 1 1 } ] [ [ 1 float-8-with ] compile-call ] unit-test
+
+[ float-8{ 1 2 3 4 5 6 7 8 } ] [ 1 2 3 4 5 6 7 8 float-8-boa ] unit-test
+
+[ float-8{ 1 2 3 4 5 6 7 8 } ] [ [ 1 2 3 4 5 6 7 8 float-8-boa ] compile-call ] unit-test
+
+[ float-8{ 3 6 9 12 15 18 21 24 } ] [
+    float-8{ 1 2 3 4 5 6 7 8 }
+    float-8{ 2 4 6 8 10 12 14 16 }
+    [ { float-8 float-8 } declare v+ ] compile-call
+] unit-test
+
+[ float-8{ -1 -2 -3 -4 -5 -6 -7 -8 } ] [
+    float-8{ 1 2 3 4 5 6 7 8 }
+    float-8{ 2 4 6 8 10 12 14 16 }
+    [ { float-8 float-8 } declare v- ] compile-call
+] unit-test
+
+[ float-8{ -1 -2 -3 -4 -5 -6 -7 -8 } ] [
+    -0.5
+    float-8{ 2 4 6 8 10 12 14 16 }
+    [ { float float-8 } declare n*v ] compile-call
+] unit-test
+
+[ float-8{ -1 -2 -3 -4 -5 -6 -7 -8 } ] [
+    float-8{ 2 4 6 8 10 12 14 16 }
+    -0.5
+    [ { float-8 float } declare v*n ] compile-call
+] unit-test
+
+[ float-8{ 256 128 64 32 16 8 4 2 } ] [
+    256.0
+    float-8{ 1 2 4 8 16 32 64 128 }
+    [ { float float-8 } declare n/v ] compile-call
+] unit-test
+
+[ float-8{ -1 -2 -3 -4 -5 -6 -7 -8 } ] [
+    float-8{ 2 4 6 8 10 12 14 16 }
+    -2.0
+    [ { float-8 float } declare v/n ] compile-call
+] unit-test

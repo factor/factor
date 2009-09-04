@@ -201,7 +201,7 @@ M: x86.64 %callback-value ( ctype -- )
     [ float-regs param-regs nth ] [ n>> spill@ ] bi* MOVSD ;
 
 : float-function-return ( reg -- )
-    float-regs return-reg double-float-rep copy-register ;
+    float-regs return-reg double-rep copy-register ;
 
 M:: x86.64 %unary-float-function ( dst src func -- )
     0 src float-function-param

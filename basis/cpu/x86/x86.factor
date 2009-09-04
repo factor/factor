@@ -134,10 +134,10 @@ GENERIC: copy-register* ( dst src rep -- )
 
 M: int-rep copy-register* drop MOV ;
 M: tagged-rep copy-register* drop MOV ;
-M: single-float-rep copy-register* drop MOVSS ;
-M: double-float-rep copy-register* drop MOVSD ;
-M: 4float-array-rep copy-register* drop MOVUPS ;
-M: 2double-array-rep copy-register* drop MOVUPD ;
+M: float-rep copy-register* drop MOVSS ;
+M: double-rep copy-register* drop MOVSD ;
+M: float-4-rep copy-register* drop MOVUPS ;
+M: double-2-rep copy-register* drop MOVUPD ;
 M: vector-rep copy-register* drop MOVDQU ;
 
 : copy-register ( dst src rep -- )
@@ -251,14 +251,14 @@ M:: x86 %unbox-vector ( dst src rep -- )
 
 M: x86 %broadcast-vector ( dst src rep -- )
     {
-        { 4float-array-rep [ [ MOVAPS ] [ drop dup 0 SHUFPS ] 2bi ] }
-        { 2double-array-rep [ [ MOVAPD ] [ drop dup 0 SHUFPD ] 2bi ] }
+        { float-4-rep [ [ MOVAPS ] [ drop dup 0 SHUFPS ] 2bi ] }
+        { double-2-rep [ [ MOVAPD ] [ drop dup 0 SHUFPD ] 2bi ] }
     } case ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
     rep {
         {
-            4float-array-rep
+            float-4-rep
             [
                 dst src1 MOVSS
                 dst src2 UNPCKLPS
@@ -271,7 +271,7 @@ M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
 M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
     rep {
         {
-            2double-array-rep
+            double-2-rep
             [
                 dst src1 MOVAPD
                 dst src2 0 SHUFPD
@@ -281,63 +281,63 @@ M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
 
 M: x86 %add-vector ( dst src1 src2 rep -- )
     {
-        { 4float-array-rep [ ADDPS ] }
-        { 2double-array-rep [ ADDPD ] }
-        { 16char-array-rep [ PADDB ] }
-        { 16uchar-array-rep [ PADDB ] }
-        { 8short-array-rep [ PADDW ] }
-        { 8ushort-array-rep [ PADDW ] }
-        { 4int-array-rep [ PADDD ] }
-        { 4uint-array-rep [ PADDD ] }
+        { float-4-rep [ ADDPS ] }
+        { double-2-rep [ ADDPD ] }
+        { char-16-rep [ PADDB ] }
+        { uchar-16-rep [ PADDB ] }
+        { short-8-rep [ PADDW ] }
+        { ushort-8-rep [ PADDW ] }
+        { int-4-rep [ PADDD ] }
+        { uint-4-rep [ PADDD ] }
     } case drop ;
 
 M: x86 %sub-vector ( dst src1 src2 rep -- )
     {
-        { 4float-array-rep [ SUBPS ] }
-        { 2double-array-rep [ SUBPD ] }
-        { 16char-array-rep [ PSUBB ] }
-        { 16uchar-array-rep [ PSUBB ] }
-        { 8short-array-rep [ PSUBW ] }
-        { 8ushort-array-rep [ PSUBW ] }
-        { 4int-array-rep [ PSUBD ] }
-        { 4uint-array-rep [ PSUBD ] }
+        { float-4-rep [ SUBPS ] }
+        { double-2-rep [ SUBPD ] }
+        { char-16-rep [ PSUBB ] }
+        { uchar-16-rep [ PSUBB ] }
+        { short-8-rep [ PSUBW ] }
+        { ushort-8-rep [ PSUBW ] }
+        { int-4-rep [ PSUBD ] }
+        { uint-4-rep [ PSUBD ] }
     } case drop ;
 
 M: x86 %mul-vector ( dst src1 src2 rep -- )
     {
-        { 4float-array-rep [ MULPS ] }
-        { 2double-array-rep [ MULPD ] }
-        { 4int-array-rep [ PMULLW ] }
+        { float-4-rep [ MULPS ] }
+        { double-2-rep [ MULPD ] }
+        { int-4-rep [ PMULLW ] }
     } case drop ;
 
 M: x86 %div-vector ( dst src1 src2 rep -- )
     {
-        { 4float-array-rep [ DIVPS ] }
-        { 2double-array-rep [ DIVPD ] }
+        { float-4-rep [ DIVPS ] }
+        { double-2-rep [ DIVPD ] }
     } case drop ;
 
 M: x86 %min-vector ( dst src1 src2 rep -- )
     {
-        { 4float-array-rep [ MINPS ] }
-        { 2double-array-rep [ MINPD ] }
+        { float-4-rep [ MINPS ] }
+        { double-2-rep [ MINPD ] }
     } case drop ;
 
 M: x86 %max-vector ( dst src1 src2 rep -- )
     {
-        { 4float-array-rep [ MAXPS ] }
-        { 2double-array-rep [ MAXPD ] }
+        { float-4-rep [ MAXPS ] }
+        { double-2-rep [ MAXPD ] }
     } case drop ;
 
 M: x86 %sqrt-vector ( dst src rep -- )
     {
-        { 4float-array-rep [ SQRTPS ] }
-        { 2double-array-rep [ SQRTPD ] }
+        { float-4-rep [ SQRTPS ] }
+        { double-2-rep [ SQRTPD ] }
     } case ;
 
 M: x86 %horizontal-add-vector ( dst src rep -- )
     {
-        { 4float-array-rep [ [ MOVAPS ] [ HADDPS ] [ HADDPS ] 2tri ] }
-        { 2double-array-rep [ [ MOVAPD ] [ HADDPD ] 2bi ] }
+        { float-4-rep [ [ MOVAPS ] [ HADDPS ] [ HADDPS ] 2tri ] }
+        { double-2-rep [ [ MOVAPD ] [ HADDPD ] 2bi ] }
     } case ;
 
 M:: x86 %unbox-any-c-ptr ( dst src temp -- )

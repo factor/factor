@@ -272,7 +272,7 @@ M:: ppc %float>integer ( dst src -- )
 M: ppc %copy ( dst src rep -- )
     {
         { int-rep [ MR ] }
-        { double-float-rep [ FMR ] }
+        { double-rep [ FMR ] }
     } case ;
 
 M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
@@ -535,8 +535,8 @@ M: ppc %compare-float-branch [ (%compare-float) ] 2dip %branch ;
 : load-from-frame ( dst n rep -- )
     {
         { int-rep [ [ 1 ] dip LWZ ] }
-        { single-float-rep [ [ 1 ] dip LFS ] }
-        { double-float-rep [ [ 1 ] dip LFD ] }
+        { float-rep [ [ 1 ] dip LFS ] }
+        { double-rep [ [ 1 ] dip LFD ] }
         { stack-params [ [ 0 1 ] dip LWZ [ 0 1 ] dip param@ STW ] }
     } case ;
 
@@ -545,8 +545,8 @@ M: ppc %compare-float-branch [ (%compare-float) ] 2dip %branch ;
 : store-to-frame ( src n rep -- )
     {
         { int-rep [ [ 1 ] dip STW ] }
-        { single-float-rep [ [ 1 ] dip STFS ] }
-        { double-float-rep [ [ 1 ] dip STFD ] }
+        { float-rep [ [ 1 ] dip STFS ] }
+        { double-rep [ [ 1 ] dip STFD ] }
         { stack-params [ [ [ 0 1 ] dip next-param@ LWZ 0 1 ] dip STW ] }
     } case ;
 

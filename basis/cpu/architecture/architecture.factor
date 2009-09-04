@@ -18,34 +18,35 @@ SINGLETONS: tagged-rep int-rep ;
 
 ! Floating point registers can contain data with
 ! one of these representations
-SINGLETONS: single-float-rep double-float-rep ;
+SINGLETONS: float-rep double-rep ;
 
+! On x86, floating point registers are really vector registers
 SINGLETONS:
-4float-array-rep
-2double-array-rep
-16char-array-rep
-16uchar-array-rep
-8short-array-rep
-8ushort-array-rep
-4int-array-rep
-4uint-array-rep ;
+float-4-rep
+double-2-rep
+char-16-rep
+uchar-16-rep
+short-8-rep
+ushort-8-rep
+int-4-rep
+uint-4-rep ;
 
 UNION: vector-rep
-4float-array-rep
-2double-array-rep
-16char-array-rep
-16uchar-array-rep
-8short-array-rep
-8ushort-array-rep
-4int-array-rep
-4uint-array-rep ;
+float-4-rep
+double-2-rep
+char-16-rep
+uchar-16-rep
+short-8-rep
+ushort-8-rep
+int-4-rep
+uint-4-rep ;
 
 UNION: representation
 any-rep
 tagged-rep
 int-rep
-single-float-rep
-double-float-rep
+float-rep
+double-rep
 vector-rep ;
 
 ! Register classes
@@ -61,8 +62,8 @@ GENERIC: reg-class-of ( rep -- reg-class )
 
 M: tagged-rep reg-class-of drop int-regs ;
 M: int-rep reg-class-of drop int-regs ;
-M: single-float-rep reg-class-of drop float-regs ;
-M: double-float-rep reg-class-of drop float-regs ;
+M: float-rep reg-class-of drop float-regs ;
+M: double-rep reg-class-of drop float-regs ;
 M: vector-rep reg-class-of drop float-regs ;
 M: stack-params reg-class-of drop stack-params ;
 
@@ -70,15 +71,15 @@ GENERIC: rep-size ( rep -- n )
 
 M: tagged-rep rep-size drop cell ;
 M: int-rep rep-size drop cell ;
-M: single-float-rep rep-size drop 4 ;
-M: double-float-rep rep-size drop 8 ;
+M: float-rep rep-size drop 4 ;
+M: double-rep rep-size drop 8 ;
 M: stack-params rep-size drop cell ;
 M: vector-rep rep-size drop 16 ;
 
 GENERIC: scalar-rep-of ( rep -- rep' )
 
-M: 4float-array-rep scalar-rep-of drop single-float-rep ;
-M: 2double-array-rep scalar-rep-of drop double-float-rep ;
+M: float-4-rep scalar-rep-of drop float-rep ;
+M: double-2-rep scalar-rep-of drop double-rep ;
 
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
