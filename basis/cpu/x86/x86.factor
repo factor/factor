@@ -511,50 +511,100 @@ M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
     temp 0 MOV \ t rc-absolute-cell rel-immediate
     dst temp word execute ; inline
 
-M: x86 %compare ( dst temp cc src1 src2 -- )
-    CMP {
-        { cc< [ \ CMOVL %boolean ] }
-        { cc<= [ \ CMOVLE %boolean ] }
-        { cc> [ \ CMOVG %boolean ] }
-        { cc>= [ \ CMOVGE %boolean ] }
-        { cc= [ \ CMOVE %boolean ] }
-        { cc/= [ \ CMOVNE %boolean ] }
+M:: x86 %compare ( dst temp cc src1 src2 -- )
+    src1 src2 CMP
+    cc order-cc {
+        { cc<  [ dst temp \ CMOVL %boolean ] }
+        { cc<= [ dst temp \ CMOVLE %boolean ] }
+        { cc>  [ dst temp \ CMOVG %boolean ] }
+        { cc>= [ dst temp \ CMOVGE %boolean ] }
+        { cc=  [ dst temp \ CMOVE %boolean ] }
+        { cc/= [ dst temp \ CMOVNE %boolean ] }
     } case ;
 
 M: x86 %compare-imm ( dst temp cc src1 src2 -- )
     %compare ;
 
-M: x86 %compare-float ( dst temp cc src1 src2 -- )
-    UCOMISD {
-        { cc< [ \ CMOVB %boolean ] }
-        { cc<= [ \ CMOVBE %boolean ] }
-        { cc> [ \ CMOVA %boolean ] }
-        { cc>= [ \ CMOVAE %boolean ] }
-        { cc= [ \ CMOVE %boolean ] }
-        { cc/= [ \ CMOVNE %boolean ] }
+: %cmov-float= ( dst src -- )
+    [
+        "no-move" define-label
+
+        "no-move" get [ JNE ] [ JP ] bi
+        MOV
+        "no-move" resolve-label
+    ] with-scope ;
+
+: %cmov-float/= ( dst src -- )
+    [
+        "no-move" define-label
+        "move" define-label
+
+        "move" get JP
+        "no-move" get JE
+        "move" resolve-label
+        MOV
+        "no-move" resolve-label
+    ] with-scope ;
+
+M:: x86 %compare-float ( dst temp cc src1 src2 -- )
+    cc {
+        { cc<    [ src2 src1 UCOMISD dst temp \ CMOVA  %boolean ] }
+        { cc<=   [ src2 src1 UCOMISD dst temp \ CMOVAE %boolean ] }
+        { cc>    [ src1 src2 UCOMISD dst temp \ CMOVA  %boolean ] }
+        { cc>=   [ src1 src2 UCOMISD dst temp \ CMOVAE %boolean ] }
+        { cc=    [ src1 src2  COMISD dst temp \ %cmov-float= %boolean ] }
+        { cc<>   [ src1 src2 UCOMISD dst temp \ CMOVNE %boolean ] }
+        { cc<>=  [ src1 src2 UCOMISD dst temp \ CMOVNP %boolean ] }
+        { cc/<   [ src2 src1  COMISD dst temp \ CMOVBE %boolean ] }
+        { cc/<=  [ src2 src1  COMISD dst temp \ CMOVB  %boolean ] }
+        { cc/>   [ src1 src2  COMISD dst temp \ CMOVBE %boolean ] }
+        { cc/>=  [ src1 src2  COMISD dst temp \ CMOVB  %boolean ] }
+        { cc/=   [ src1 src2  COMISD dst temp \ %cmov-float/= %boolean ] }
+        { cc/<>  [ src1 src2  COMISD dst temp \ CMOVE  %boolean ] }
+        { cc/<>= [ src1 src2  COMISD dst temp \ CMOVP  %boolean ] }
     } case ;
 
-M: x86 %compare-branch ( label cc src1 src2 -- )
-    CMP {
-        { cc< [ JL ] }
-        { cc<= [ JLE ] }
-        { cc> [ JG ] }
-        { cc>= [ JGE ] }
-        { cc= [ JE ] }
-        { cc/= [ JNE ] }
+M:: x86 %compare-branch ( label cc src1 src2 -- )
+    src1 src2 CMP
+    cc order-cc {
+        { cc<  [ label JL ] }
+        { cc<= [ label JLE ] }
+        { cc>  [ label JG ] }
+        { cc>= [ label JGE ] }
+        { cc=  [ label JE ] }
+        { cc/= [ label JNE ] }
     } case ;
 
 M: x86 %compare-imm-branch ( label src1 src2 cc -- )
     %compare-branch ;
 
-M: x86 %compare-float-branch ( label cc src1 src2 -- )
-    UCOMISD {
-        { cc< [ JB ] }
-        { cc<= [ JBE ] }
-        { cc> [ JA ] }
-        { cc>= [ JAE ] }
-        { cc= [ JE ] }
-        { cc/= [ JNE ] }
+: %jump-float= ( label -- )
+    [
+        "no-jump" define-label
+        "no-jump" get JP
+        JE
+        "no-jump" resolve-label
+    ] with-scope ;
+
+: %jump-float/= ( label -- )
+    [ JNE ] [ JP ] bi ;
+
+M:: x86 %compare-float-branch ( label cc src1 src2 -- )
+    cc {
+        { cc<    [ src2 src1 UCOMISD label JA  ] }
+        { cc<=   [ src2 src1 UCOMISD label JAE ] }
+        { cc>    [ src1 src2 UCOMISD label JA  ] }
+        { cc>=   [ src1 src2 UCOMISD label JAE ] }
+        { cc=    [ src1 src2  COMISD label %jump-float= ] }
+        { cc<>   [ src1 src2 UCOMISD label JNE ] }
+        { cc<>=  [ src1 src2 UCOMISD label JNP ] }
+        { cc/<   [ src2 src1  COMISD label JBE ] }
+        { cc/<=  [ src2 src1  COMISD label JB  ] }
+        { cc/>   [ src1 src2  COMISD label JBE ] }
+        { cc/>=  [ src1 src2  COMISD label JB  ] }
+        { cc/=   [ src1 src2  COMISD label %jump-float/= ] }
+        { cc/<>  [ src1 src2  COMISD label JE  ] }
+        { cc/<>= [ src1 src2  COMISD label JP  ] }
     } case ;
 
 M: x86 %spill ( src n rep -- ) [ spill@ swap ] dip copy-register ;
