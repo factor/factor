@@ -1,4 +1,4 @@
-#include "vm-data-dummy.hpp"
+#include "vm-data.hpp"
 
 namespace factor
 {

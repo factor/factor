@@ -100,6 +100,19 @@ struct factorvmdata {
 	cell ic_to_pic_transitions;
 	cell pic_to_mega_transitions;
 	cell pic_counts[4];  /* PIC_TAG, PIC_HI_TAG, PIC_TUPLE, PIC_HI_TAG_TUPLE */
+
+	factorvmdata() 
+		: profiling_p(false),
+		  secure_gc(false),
+		  gc_off(false),
+		  performing_gc(false),
+		  performing_compaction(false),
+		  collecting_aging_again(false),
+		  growing_data_heap(false),
+		  fep_disabled(false),
+		  full_output(false)
+	{}
+
 };
 
 }
