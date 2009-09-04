@@ -1,6 +1,24 @@
-USING: kernel accessors io.sockets io.backend.windows io.backend
-windows.winsock system destructors alien.c-types ;
+USING: kernel accessors io.sockets io.sockets.private
+io.backend.windows io.backend windows.winsock system destructors
+alien.c-types classes.struct combinators ;
 IN: io.sockets.windows
+
+M: windows addrinfo-error ( n -- )
+    winsock-return-check ;
+
+M: windows sockaddr-of-family ( alien af -- addrspec )
+    {
+        { AF_INET [ sockaddr-in memory>struct ] }
+        { AF_INET6 [ sockaddr-in6 memory>struct ] }
+        [ 2drop f ]
+    } case ;
+
+M: windows addrspec-of-family ( af -- addrspec )
+    {
+        { AF_INET [ T{ inet4 } ] }
+        { AF_INET6 [ T{ inet6 } ] }
+        [ drop f ]
+    } case ;
 
 HOOK: WSASocket-flags io-backend ( -- DWORD )
 
@@ -13,8 +31,7 @@ M: win32-socket dispose ( stream -- )
     handle>> closesocket drop ;
 
 : unspecific-sockaddr/size ( addrspec -- sockaddr len )
-    [ empty-sockaddr/size ] [ protocol-family ] bi
-    pick set-sockaddr-in-family ;
+    [ empty-sockaddr/size ] [ protocol-family ] bi pick (>>family) ;
 
 : opened-socket ( handle -- win32-socket )
     <win32-socket> |dispose dup add-completion ;
@@ -56,6 +73,3 @@ M: object (server) ( addrspec -- handle )
 
 M: windows (datagram) ( addrspec -- handle )
     [ SOCK_DGRAM server-socket ] with-destructors ;
-
-M: windows addrinfo-error ( n -- )
-    winsock-return-check ;

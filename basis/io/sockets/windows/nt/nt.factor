@@ -1,13 +1,13 @@
 USING: alien alien.accessors alien.c-types byte-arrays
 continuations destructors io.ports io.timeouts io.sockets
-io namespaces io.streams.duplex io.backend.windows
-io.sockets.windows io.backend.windows.nt windows.winsock kernel
-libc math sequences threads system combinators accessors
-classes.struct windows.kernel32 ;
+io.sockets.private io namespaces io.streams.duplex
+io.backend.windows io.sockets.windows io.backend.windows.nt
+windows.winsock kernel libc math sequences threads system
+combinators accessors classes.struct windows.kernel32 ;
 IN: io.sockets.windows.nt
 
-: malloc-int ( object -- object )
-    "int" heap-size malloc [ nip ] [ 0 set-alien-signed-4 ] 2bi ; inline
+: malloc-int ( n -- alien )
+    <int> malloc-byte-array ; inline
 
 M: winnt WSASocket-flags ( -- DWORD )
     WSA_FLAG_OVERLAPPED ;
@@ -100,17 +100,20 @@ TUPLE: AcceptEx-args port
     } cleave AcceptEx drop
     winsock-error-string [ throw ] when* ; inline
 
+: (extract-remote-address) ( lpOutputBuffer dwReceiveDataLength dwLocalAddressLength dwRemoteAddressLength -- sockaddr )
+    f <void*> 0 <int> f <void*> [ 0 <int> GetAcceptExSockaddrs ] keep *void* ;
+
 : extract-remote-address ( AcceptEx -- sockaddr )
-    {
-        [ lpOutputBuffer>> ]
-        [ dwReceiveDataLength>> ]
-        [ dwLocalAddressLength>> ]
-        [ dwRemoteAddressLength>> ]
-    } cleave
-    f <void*>
-    0 <int>
-    f <void*>
-    [ 0 <int> GetAcceptExSockaddrs ] keep *void* ; inline
+    [
+        {
+            [ lpOutputBuffer>> ]
+            [ dwReceiveDataLength>> ]
+            [ dwLocalAddressLength>> ]
+            [ dwRemoteAddressLength>> ]
+        } cleave
+        (extract-remote-address)
+    ] [ port>> addr>> protocol-family ] bi
+    sockaddr-of-family ; inline
 
 M: object (accept) ( server addr -- handle sockaddr )
     [
@@ -160,7 +163,12 @@ TUPLE: WSARecvFrom-args port
 
 : parse-WSARecvFrom ( n WSARecvFrom -- packet sockaddr )
     [ lpBuffers>> buf>> swap memory>byte-array ]
-    [ [ lpFrom>> ] [ lpFromLen>> *int ] bi memory>byte-array ] bi ; inline
+    [
+        [ port>> addr>> empty-sockaddr dup ]
+        [ lpFrom>> ]
+        [ lpFromLen>> *int ]
+        tri memcpy
+    ] bi ; inline
 
 M: winnt (receive) ( datagram -- packet addrspec )
     [
