@@ -51,10 +51,15 @@ M: vector-rep emit-unbox
         { [ dup int-rep eq? ] [ drop emit-unbox ] }
         { [ over int-rep eq? ] [ nip emit-box ] }
         [
-            2array {
-                { { double-rep float-rep } [ ##single>double-float ] }
-                { { float-rep double-rep } [ ##double>single-float ] }
-                [ first2 bad-conversion ]
+            2dup 2array {
+                { { double-rep float-rep } [ 2drop ##single>double-float ] }
+                { { float-rep double-rep } [ 2drop ##double>single-float ] }
+                ! Punning SIMD vector types? Naughty naughty! But
+                ! it is allowed... otherwise bail out.
+                [
+                    drop 2dup [ reg-class-of ] bi@ eq?
+                    [ drop ##copy ] [ bad-conversion ] if
+                ]
             } case
         ]
     } cond ;
