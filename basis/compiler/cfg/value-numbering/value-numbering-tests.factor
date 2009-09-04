@@ -89,7 +89,7 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##load-reference f 1 + }
         T{ ##peek f 2 D 0 }
         T{ ##compare f 4 2 1 cc<= }
-        T{ ##compare f 6 2 1 cc> }
+        T{ ##compare f 6 2 1 cc/<= }
         T{ ##replace f 6 D 0 }
     }
 ] [
@@ -109,7 +109,7 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##unbox-float f 10 8 }
         T{ ##unbox-float f 11 9 }
         T{ ##compare-float f 12 10 11 cc< }
-        T{ ##compare-float f 14 10 11 cc>= }
+        T{ ##compare-float f 14 10 11 cc/< }
         T{ ##replace f 14 D 0 }
     }
 ] [

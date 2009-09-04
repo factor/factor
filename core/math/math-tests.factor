@@ -36,3 +36,35 @@ IN: math.tests
 [ -0.0 ] [ 0.0 prev-float ] unit-test
 [ t ] [ 1.0 dup prev-float > ] unit-test
 [ t ] [ -1.0 dup prev-float > ] unit-test
+
+[ f ] [ 0/0.  0/0. = ] unit-test
+[ f ] [ 0/0.  1.0  = ] unit-test
+[ f ] [ 0/0.  1/0. = ] unit-test
+[ f ] [ 0/0. -1/0. = ] unit-test
+
+[ f ] [  0/0. 0/0. = ] unit-test
+[ f ] [  1.0  0/0. = ] unit-test
+[ f ] [ -1/0. 0/0. = ] unit-test
+[ f ] [  1/0. 0/0. = ] unit-test
+
+[ f ] [ 0/0.  0/0. < ] unit-test
+[ f ] [ 0/0.  1.0  < ] unit-test
+[ f ] [ 0/0.  1/0. < ] unit-test
+[ f ] [ 0/0. -1/0. < ] unit-test
+
+[ f ] [ 0/0.  0/0. <= ] unit-test
+[ f ] [ 0/0.  1.0  <= ] unit-test
+[ f ] [ 0/0.  1/0. <= ] unit-test
+[ f ] [ 0/0. -1/0. <= ] unit-test
+
+[ f ] [  0/0. 0/0. > ] unit-test
+[ f ] [  1.0  0/0. > ] unit-test
+[ f ] [ -1/0. 0/0. > ] unit-test
+[ f ] [  1/0. 0/0. > ] unit-test
+
+[ f ] [  0/0. 0/0. >= ] unit-test
+[ f ] [  1.0  0/0. >= ] unit-test
+[ f ] [ -1/0. 0/0. >= ] unit-test
+[ f ] [  1/0. 0/0. >= ] unit-test
+
+

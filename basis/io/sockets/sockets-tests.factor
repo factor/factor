@@ -1,7 +1,8 @@
 IN: io.sockets.tests
-USING: io.sockets sequences math tools.test namespaces accessors 
-kernel destructors calendar io.timeouts io.encodings.utf8 io
-concurrency.promises threads io.streams.string ;
+USING: io.sockets io.sockets.private sequences math tools.test
+namespaces accessors kernel destructors calendar io.timeouts
+io.encodings.utf8 io concurrency.promises threads
+io.streams.string ;
 
 [ B{ 1 2 3 4 } ]
 [ "1.2.3.4" T{ inet4 } inet-pton ] unit-test
