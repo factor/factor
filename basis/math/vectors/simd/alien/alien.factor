@@ -5,39 +5,38 @@ cpu.architecture locals kernel math math.vectors.simd
 math.vectors.simd.intrinsics ;
 IN: math.vectors.simd.alien
 
-:: define-simd-type ( class rep -- )
+:: define-simd-128-type ( class rep -- )
     <c-type>
         byte-array >>class
         class >>boxed-class
-        [ rep alien-vector ] >>getter
+        [ rep alien-vector class boa ] >>getter
         [ [ underlying>> ] 2dip rep set-alien-vector ] >>setter
         16 >>size
         8 >>align
         rep >>rep
-        [ class boa ] >>boxer-quot
-        [ underlying>> ] >>unboxer-quot
     class name>> typedef ;
 
-: define-4double-array-type ( -- )
+:: define-simd-256-type ( class rep -- )
     <c-type>
-        4double-array >>class
-        4double-array >>boxed-class
+        class >>class
+        class >>boxed-class
         [
-            [ 2double-array-rep alien-vector ]
-            [ 16 + >fixnum 2double-array-rep alien-vector ] 2bi
-            4double-array boa
+            [ rep alien-vector ]
+            [ 16 + >fixnum rep alien-vector ] 2bi
+            class boa
         ] >>getter
         [
-            [ [ underlying1>> ] 2dip 2double-array-rep set-alien-vector ]
-            [ [ underlying2>> ] 2dip 16 + >fixnum 2double-array-rep set-alien-vector ]
+            [ [ underlying1>> ] 2dip rep set-alien-vector ]
+            [ [ underlying2>> ] 2dip 16 + >fixnum rep set-alien-vector ]
             3bi
         ] >>setter
         32 >>size
         8 >>align
-        2double-array-rep >>rep
-    "4double-array" typedef ;
+        rep >>rep
+    class name>> typedef ;
 [
-    4float-array 4float-array-rep define-simd-type
-    2double-array 2double-array-rep define-simd-type
-    define-4double-array-type
+    float-4 float-4-rep define-simd-128-type
+    double-2 double-2-rep define-simd-128-type
+    float-8 float-4-rep define-simd-256-type
+    double-4 double-2-rep define-simd-256-type
 ] with-compilation-unit

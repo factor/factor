@@ -549,7 +549,7 @@ CONSTANT: primitive-types
         4 >>align
         "box_float" >>boxer
         "to_float" >>unboxer
-        single-float-rep >>rep
+        float-rep >>rep
         [ >float ] >>unboxer-quot
         "float" set-array-class
     "float" define-primitive-type
@@ -563,7 +563,7 @@ CONSTANT: primitive-types
         8 >>align
         "box_double" >>boxer
         "to_double" >>unboxer
-        double-float-rep >>rep
+        double-rep >>rep
         [ >float ] >>unboxer-quot
         "double" set-array-class
     "double" define-primitive-type

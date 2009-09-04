@@ -207,135 +207,135 @@ temp: temp/int-rep ;
 
 ! Float arithmetic
 PURE-INSN: ##unbox-float
-def: dst/double-float-rep
+def: dst/double-rep
 use: src/int-rep ;
 
 PURE-INSN: ##box-float
 def: dst/int-rep
-use: src/double-float-rep
+use: src/double-rep
 temp: temp/int-rep ;
 
 PURE-INSN: ##add-float
-def: dst/double-float-rep
-use: src1/double-float-rep src2/double-float-rep ;
+def: dst/double-rep
+use: src1/double-rep src2/double-rep ;
 
 PURE-INSN: ##sub-float
-def: dst/double-float-rep
-use: src1/double-float-rep src2/double-float-rep ;
+def: dst/double-rep
+use: src1/double-rep src2/double-rep ;
 
 PURE-INSN: ##mul-float
-def: dst/double-float-rep
-use: src1/double-float-rep src2/double-float-rep ;
+def: dst/double-rep
+use: src1/double-rep src2/double-rep ;
 
 PURE-INSN: ##div-float
-def: dst/double-float-rep
-use: src1/double-float-rep src2/double-float-rep ;
+def: dst/double-rep
+use: src1/double-rep src2/double-rep ;
 
 PURE-INSN: ##min-float
-def: dst/double-float-rep
-use: src1/double-float-rep src2/double-float-rep ;
+def: dst/double-rep
+use: src1/double-rep src2/double-rep ;
 
 PURE-INSN: ##max-float
-def: dst/double-float-rep
-use: src1/double-float-rep src2/double-float-rep ;
+def: dst/double-rep
+use: src1/double-rep src2/double-rep ;
 
 PURE-INSN: ##sqrt
-def: dst/double-float-rep
-use: src/double-float-rep ;
+def: dst/double-rep
+use: src/double-rep ;
 
 ! libc intrinsics
 PURE-INSN: ##unary-float-function
-def: dst/double-float-rep
-use: src/double-float-rep
+def: dst/double-rep
+use: src/double-rep
 literal: func ;
 
 PURE-INSN: ##binary-float-function
-def: dst/double-float-rep
-use: src1/double-float-rep src2/double-float-rep
+def: dst/double-rep
+use: src1/double-rep src2/double-rep
 literal: func ;
 
 ! Single/double float conversion
 PURE-INSN: ##single>double-float
-def: dst/double-float-rep
-use: src/single-float-rep ;
+def: dst/double-rep
+use: src/float-rep ;
 
 PURE-INSN: ##double>single-float
-def: dst/single-float-rep
-use: src/double-float-rep ;
+def: dst/float-rep
+use: src/double-rep ;
 
 ! Float/integer conversion
 PURE-INSN: ##float>integer
 def: dst/int-rep
-use: src/double-float-rep ;
+use: src/double-rep ;
 
 PURE-INSN: ##integer>float
-def: dst/double-float-rep
+def: dst/double-rep
 use: src/int-rep ;
 
 ! SIMD operations
 
-INSN: ##box-vector
+PURE-INSN: ##box-vector
 def: dst/int-rep
 use: src
 literal: rep
 temp: temp/int-rep ;
 
-INSN: ##unbox-vector
+PURE-INSN: ##unbox-vector
 def: dst
 use: src/int-rep
 literal: rep ;
 
-INSN: ##broadcast-vector
+PURE-INSN: ##broadcast-vector
 def: dst
 use: src/scalar-rep
 literal: rep ;
 
-INSN: ##gather-vector-2
+PURE-INSN: ##gather-vector-2
 def: dst
 use: src1/scalar-rep src2/scalar-rep
 literal: rep ;
 
-INSN: ##gather-vector-4
+PURE-INSN: ##gather-vector-4
 def: dst
 use: src1/scalar-rep src2/scalar-rep src3/scalar-rep src4/scalar-rep
 literal: rep ;
 
-INSN: ##add-vector
+PURE-INSN: ##add-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-INSN: ##sub-vector
+PURE-INSN: ##sub-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-INSN: ##mul-vector
+PURE-INSN: ##mul-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-INSN: ##div-vector
+PURE-INSN: ##div-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-INSN: ##min-vector
+PURE-INSN: ##min-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-INSN: ##max-vector
+PURE-INSN: ##max-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-INSN: ##sqrt-vector
+PURE-INSN: ##sqrt-vector
 def: dst
 use: src
 literal: rep ;
 
-INSN: ##horizontal-add-vector
+PURE-INSN: ##horizontal-add-vector
 def: dst/scalar-rep
 use: src
 literal: rep ;
@@ -399,11 +399,11 @@ def: dst/int-rep
 use: src/int-rep ;
 
 INSN: ##alien-float
-def: dst/single-float-rep
+def: dst/float-rep
 use: src/int-rep ;
 
 INSN: ##alien-double
-def: dst/double-float-rep
+def: dst/double-rep
 use: src/int-rep ;
 
 INSN: ##alien-vector
@@ -424,10 +424,10 @@ INSN: ##set-alien-cell
 use: src/int-rep value/int-rep ;
 
 INSN: ##set-alien-float
-use: src/int-rep value/single-float-rep ;
+use: src/int-rep value/float-rep ;
 
 INSN: ##set-alien-double
-use: src/int-rep value/double-float-rep ;
+use: src/int-rep value/double-rep ;
 
 INSN: ##set-alien-vector
 use: src/int-rep value
@@ -494,12 +494,12 @@ literal: cc
 temp: temp/int-rep ;
 
 INSN: ##compare-float-branch
-use: src1/double-float-rep src2/double-float-rep
+use: src1/double-rep src2/double-rep
 literal: cc ;
 
 PURE-INSN: ##compare-float
 def: dst/int-rep
-use: src1/double-float-rep src2/double-float-rep
+use: src1/double-rep src2/double-rep
 literal: cc
 temp: temp/int-rep ;
 

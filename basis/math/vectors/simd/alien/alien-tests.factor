@@ -2,14 +2,14 @@ IN: math.vectors.simd.alien.tests
 USING: cpu.architecture math.vectors.simd
 math.vectors.simd.intrinsics accessors math.vectors.simd.alien
 kernel classes.struct tools.test compiler sequences byte-arrays
-alien math kernel.private specialized-arrays.float ;
+alien math kernel.private specialized-arrays.float combinators ;
 
 ! Vector alien intrinsics
-[ 4float-array{ 1 2 3 4 } ] [
+[ float-4{ 1 2 3 4 } ] [
     [
-        4float-array{ 1 2 3 4 }
-        underlying>> 0 4float-array-rep alien-vector
-    ] compile-call 4float-array boa
+        float-4{ 1 2 3 4 }
+        underlying>> 0 float-4-rep alien-vector
+    ] compile-call float-4 boa
 ] unit-test
 
 [ B{ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 } ] [
@@ -17,7 +17,7 @@ alien math kernel.private specialized-arrays.float ;
     [
         0 [
             { byte-array c-ptr fixnum } declare
-            4float-array-rep set-alien-vector
+            float-4-rep set-alien-vector
         ] compile-call
     ] keep
 ] unit-test
@@ -26,31 +26,44 @@ alien math kernel.private specialized-arrays.float ;
     [
         float-array{ 1 2 3 4 } underlying>>
         float-array{ 4 3 2 1 } clone
-        [ underlying>> 0 4float-array-rep set-alien-vector ] keep
+        [ underlying>> 0 float-4-rep set-alien-vector ] keep
     ] compile-call
 ] unit-test
 
 STRUCT: simd-struct
-{ x 4float-array }
-{ y 2double-array }
-{ z 4double-array } ;
+{ x float-4 }
+{ y double-2 }
+{ z double-4 }
+{ w float-8 } ;
 
 [ t ] [ [ simd-struct <struct> ] compile-call >c-ptr [ 0 = ] all? ] unit-test
 
-[ 4float-array{ 1 2 3 4 } 2double-array{ 2 1 } 4double-array{ 4 3 2 1 } ] [
+[
+    float-4{ 1 2 3 4 }
+    double-2{ 2 1 }
+    double-4{ 4 3 2 1 }
+    float-8{ 1 2 3 4 5 6 7 8 }
+] [
     simd-struct <struct>
-    4float-array{ 1 2 3 4 } >>x
-    2double-array{ 2 1 } >>y
-    4double-array{ 4 3 2 1 } >>z
-    [ x>> ] [ y>> ] [ z>> ] tri
+    float-4{ 1 2 3 4 } >>x
+    double-2{ 2 1 } >>y
+    double-4{ 4 3 2 1 } >>z
+    float-8{ 1 2 3 4 5 6 7 8 } >>w
+    { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
 ] unit-test
 
-[ 4float-array{ 1 2 3 4 } 2double-array{ 2 1 } 4double-array{ 4 3 2 1 } ] [
+[
+    float-4{ 1 2 3 4 }
+    double-2{ 2 1 }
+    double-4{ 4 3 2 1 }
+    float-8{ 1 2 3 4 5 6 7 8 }
+] [
     [
         simd-struct <struct>
-        4float-array{ 1 2 3 4 } >>x
-        2double-array{ 2 1 } >>y
-        4double-array{ 4 3 2 1 } >>z
-        [ x>> ] [ y>> ] [ z>> ] tri
+        float-4{ 1 2 3 4 } >>x
+        double-2{ 2 1 } >>y
+        double-4{ 4 3 2 1 } >>z
+        float-8{ 1 2 3 4 5 6 7 8 } >>w
+        { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
     ] compile-call
 ] unit-test

@@ -1,51 +1,59 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types byte-arrays cpu.architecture
-generalizations kernel math math.functions math.vectors
+kernel math math.functions math.vectors
 math.vectors.simd.functor math.vectors.simd.intrinsics
 math.vectors.specialization parser prettyprint.custom sequences
 sequences.private specialized-arrays.double locals assocs
-literals words fry ;
+words fry ;
 IN: math.vectors.simd
 
 <<
 
-DEFER: 4float-array
-DEFER: 2double-array
+DEFER: float-4
+DEFER: double-2
+DEFER: float-8
+DEFER: double-4
 
-"double" 2 define-simd-type
-"float" 4 define-simd-type
+"double" define-simd-128
+"float" define-simd-128
+"double" define-simd-256
+"float" define-simd-256
 
 >>
 
-! Constructors
-: 4float-array-with ( x -- simd-array )
-    >float 4float-array-rep (simd-broadcast) 4float-array boa ; inline
+: float-4-with ( x -- simd-array )
+    >float float-4-rep (simd-broadcast) float-4 boa ; inline
 
-: 4float-array-boa ( a b c d -- simd-array )
-    [ >float ] 4 napply 4float-array-rep (simd-gather-4) 4float-array boa ; inline
+:: float-4-boa ( a b c d -- simd-array )
+    a >float b >float c >float d >float
+    float-4-rep (simd-gather-4) float-4 boa ; inline
 
-: 2double-array-with ( x -- simd-array )
-    >float 2double-array-rep (simd-broadcast) 2double-array boa ; inline
+: double-2-with ( x -- simd-array )
+    >float double-2-rep (simd-broadcast) double-2 boa ; inline
 
-: 2double-array-boa ( a b -- simd-array )
-    [ >float ] bi@ 2double-array-rep (simd-gather-2) 2double-array boa ; inline
+: double-2-boa ( a b -- simd-array )
+    [ >float ] bi@ double-2-rep (simd-gather-2) double-2 boa ; inline
 
-<PRIVATE
+: float-8-with ( x -- simd-array )
+    [ float-4-with ] [ float-4-with ] bi [ underlying>> ] bi@
+    float-8 boa ; inline
 
-: 4float-array-vv->v-op ( v1 v2 quot -- v3 )
-    [ [ underlying>> ] bi@ 4float-array-rep ] dip call 4float-array boa ; inline
+:: float-8-boa ( a b c d e f g h -- simd-array )
+    a b c d float-4-boa
+    e f g h float-4-boa
+    [ underlying>> ] bi@
+    float-8 boa ; inline
 
-: 4float-array-v->n-op ( v1 quot -- v2 )
-    [ underlying>> 4float-array-rep ] dip call ; inline
+: double-4-with ( x -- simd-array )
+    [ double-2-with ] [ double-2-with ] bi [ underlying>> ] bi@
+    double-4 boa ; inline
 
-: 2double-array-vv->v-op ( v1 v2 quot -- v3 )
-    [ [ underlying>> ] bi@ 2double-array-rep ] dip call 2double-array boa ; inline
-
-: 2double-array-v->n-op ( v1 quot -- v2 )
-    [ underlying>> 2double-array-rep ] dip call ; inline
-
-PRIVATE>
+:: double-4-boa ( a b c d -- simd-array )
+    a b double-2-boa
+    c d double-2-boa
+    [ underlying>> ] bi@
+    double-4 boa ; inline
 
 <<
 
@@ -64,6 +72,7 @@ PRIVATE>
     '[ drop _ key? ] assoc-filter ;
 
 :: high-level-ops ( ctor -- assoc )
+    ! Some SIMD operations are defined in terms of others.
     {
         { vneg [ [ dup v- ] keep v- ] }
         { v. [ v* sum ] }
@@ -87,121 +96,44 @@ PRIVATE>
 
 PRIVATE>
 
-\ 4float-array \ 4float-array-with float H{
-    { v+ [ [ (simd-v+) ] 4float-array-vv->v-op ] }
-    { v- [ [ (simd-v-) ] 4float-array-vv->v-op ] }
-    { v* [ [ (simd-v*) ] 4float-array-vv->v-op ] }
-    { v/ [ [ (simd-v/) ] 4float-array-vv->v-op ] }
-    { vmin [ [ (simd-vmin) ] 4float-array-vv->v-op ] }
-    { vmax [ [ (simd-vmax) ] 4float-array-vv->v-op ] }
-    { sum [ [ (simd-sum) ] 4float-array-v->n-op ] }
+\ float-4 \ float-4-with float H{
+    { v+ [ [ (simd-v+) ] float-4-vv->v-op ] }
+    { v- [ [ (simd-v-) ] float-4-vv->v-op ] }
+    { v* [ [ (simd-v*) ] float-4-vv->v-op ] }
+    { v/ [ [ (simd-v/) ] float-4-vv->v-op ] }
+    { vmin [ [ (simd-vmin) ] float-4-vv->v-op ] }
+    { vmax [ [ (simd-vmax) ] float-4-vv->v-op ] }
+    { sum [ [ (simd-sum) ] float-4-v->n-op ] }
 } simd-vector-words
 
-\ 2double-array \ 2double-array-with float H{
-    { v+ [ [ (simd-v+) ] 2double-array-vv->v-op ] }
-    { v- [ [ (simd-v-) ] 2double-array-vv->v-op ] }
-    { v* [ [ (simd-v*) ] 2double-array-vv->v-op ] }
-    { v/ [ [ (simd-v/) ] 2double-array-vv->v-op ] }
-    { vmin [ [ (simd-vmin) ] 2double-array-vv->v-op ] }
-    { vmax [ [ (simd-vmax) ] 2double-array-vv->v-op ] }
-    { sum [ [ (simd-sum) ] 2double-array-v->n-op ] }
+\ double-2 \ double-2-with float H{
+    { v+ [ [ (simd-v+) ] double-2-vv->v-op ] }
+    { v- [ [ (simd-v-) ] double-2-vv->v-op ] }
+    { v* [ [ (simd-v*) ] double-2-vv->v-op ] }
+    { v/ [ [ (simd-v/) ] double-2-vv->v-op ] }
+    { vmin [ [ (simd-vmin) ] double-2-vv->v-op ] }
+    { vmax [ [ (simd-vmax) ] double-2-vv->v-op ] }
+    { sum [ [ (simd-sum) ] double-2-v->n-op ] }
 } simd-vector-words
 
->>
+\ float-8 \ float-8-with float H{
+    { v+ [ [ (simd-v+) ] float-8-vv->v-op ] }
+    { v- [ [ (simd-v-) ] float-8-vv->v-op ] }
+    { v* [ [ (simd-v*) ] float-8-vv->v-op ] }
+    { v/ [ [ (simd-v/) ] float-8-vv->v-op ] }
+    { vmin [ [ (simd-vmin) ] float-8-vv->v-op ] }
+    { vmax [ [ (simd-vmax) ] float-8-vv->v-op ] }
+    { sum [ [ (simd-sum) ] [ + ] float-8-v->n-op ] }
+} simd-vector-words
 
-! Synthesize 256-bit vectors from a pair of 128-bit vectors
-! Functorize this later so that we can do it for integers, etc
-TUPLE: 4double-array
-{ underlying1 byte-array initial: $[ 16 <byte-array> ] read-only }
-{ underlying2 byte-array initial: $[ 16 <byte-array> ] read-only } ;
-
-: <4double-array> ( -- simd-array )
-    16 <byte-array> 16 <byte-array> 4double-array boa ; inline
-
-: (4double-array) ( -- simd-array )
-    16 (byte-array) 16 (byte-array) 4double-array boa ; inline
-
-M: 4double-array clone
-    [ underlying1>> clone ] [ underlying2>> clone ] bi
-    4double-array boa ; inline
-
-M: 4double-array length drop 4 ; inline
-
-<PRIVATE
-
-: 4double-array-deref ( n seq -- n' seq' )
-    over 2 < [ underlying1>> ] [ [ 2 - ] dip underlying2>> ] if
-    2 swap double-array boa ; inline
-
-PRIVATE>
-
-M: 4double-array nth-unsafe
-    4double-array-deref nth-unsafe ; inline
-
-M: 4double-array set-nth-unsafe
-    4double-array-deref set-nth-unsafe ; inline
-
-: >4double-array ( seq -- simd-array )
-    4double-array new clone-like ;
-
-M: 4double-array like
-    drop dup 4double-array? [ >4double-array ] unless ; inline
-
-M: 4double-array new-sequence
-    drop dup 4 = [ drop (4double-array) ] [ 4 bad-length ] if ; inline
-
-M: 4double-array equal?
-    over 4double-array? [ sequence= ] [ 2drop f ] if ;
-
-M: 4double-array byte-length drop 32 ; inline
-
-SYNTAX: 4double-array{
-    \ } [ >4double-array ] parse-literal ;
-
-M: 4double-array pprint-delims
-    drop \ 4double-array{ \ } ;
-
-M: 4double-array >pprint-sequence ;
-
-M: 4double-array pprint* pprint-object ;
-
-INSTANCE: 4double-array sequence
-
-: 4double-array-with ( x -- simd-array )
-    dup [ >float 2double-array-rep (simd-broadcast) ] bi@
-    4double-array boa ; inline
-
-: 4double-array-boa ( a b c d -- simd-array )
-    [ >float ] 4 napply [ 2double-array-rep (simd-gather-2) ] 2bi@
-    4double-array boa ; inline
-
-! SIMD operations on 4double-arrays
-
-<PRIVATE
-
-: 4double-array-vv->v-op ( v1 v2 quot -- v3 )
-    [ [ [ underlying1>> ] bi@ 2double-array-rep ] dip call ]
-    [ [ [ underlying2>> ] bi@ 2double-array-rep ] dip call ] 3bi
-    4double-array boa ; inline
-
-: 4double-array-v->n-op ( v1 quot scalar-quot -- v2 )
-    [
-        [ [ underlying1>> 2double-array-rep ] dip call ]
-        [ [ underlying2>> 2double-array-rep ] dip call ] 2bi
-    ] dip call ; inline
-
-PRIVATE>
-
-<<
-
-\ 4double-array \ 4double-array-with float H{
-    { v+ [ [ (simd-v+) ] 4double-array-vv->v-op ] }
-    { v- [ [ (simd-v-) ] 4double-array-vv->v-op ] }
-    { v* [ [ (simd-v*) ] 4double-array-vv->v-op ] }
-    { v/ [ [ (simd-v/) ] 4double-array-vv->v-op ] }
-    { vmin [ [ (simd-vmin) ] 4double-array-vv->v-op ] }
-    { vmax [ [ (simd-vmax) ] 4double-array-vv->v-op ] }
-    { sum [ [ (simd-sum) ] [ + ] 4double-array-v->n-op ] }
+\ double-4 \ double-4-with float H{
+    { v+ [ [ (simd-v+) ] double-4-vv->v-op ] }
+    { v- [ [ (simd-v-) ] double-4-vv->v-op ] }
+    { v* [ [ (simd-v*) ] double-4-vv->v-op ] }
+    { v/ [ [ (simd-v/) ] double-4-vv->v-op ] }
+    { vmin [ [ (simd-vmin) ] double-4-vv->v-op ] }
+    { vmax [ [ (simd-vmax) ] double-4-vv->v-op ] }
+    { sum [ [ (simd-sum) ] [ + ] double-4-v->n-op ] }
 } simd-vector-words
 
 >>

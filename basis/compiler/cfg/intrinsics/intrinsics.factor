@@ -93,10 +93,10 @@ IN: compiler.cfg.intrinsics
         { math.private:float= [ drop cc= emit-float-comparison ] }
         { math.private:float>fixnum [ drop emit-float>fixnum ] }
         { math.private:fixnum>float [ drop emit-fixnum>float ] }
-        { alien.accessors:alien-float [ single-float-rep emit-alien-float-getter ] }
-        { alien.accessors:set-alien-float [ single-float-rep emit-alien-float-setter ] }
-        { alien.accessors:alien-double [ double-float-rep emit-alien-float-getter ] }
-        { alien.accessors:set-alien-double [ double-float-rep emit-alien-float-setter ] }
+        { alien.accessors:alien-float [ float-rep emit-alien-float-getter ] }
+        { alien.accessors:set-alien-float [ float-rep emit-alien-float-setter ] }
+        { alien.accessors:alien-double [ double-rep emit-alien-float-getter ] }
+        { alien.accessors:set-alien-double [ double-rep emit-alien-float-setter ] }
     } enable-intrinsics ;
 
 : enable-fsqrt ( -- )

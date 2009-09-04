@@ -279,10 +279,10 @@ GENERIC: next-fastcall-param ( rep -- )
 M: int-rep next-fastcall-param
     int-regs inc [ ?dummy-stack-params ] [ ?dummy-fp-params ] bi ;
 
-M: single-float-rep next-fastcall-param
+M: float-rep next-fastcall-param
     float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
 
-M: double-float-rep next-fastcall-param
+M: double-rep next-fastcall-param
     float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
 
 GENERIC: reg-class-full? ( reg-class -- ? )
