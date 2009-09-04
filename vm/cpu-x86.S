@@ -1,4 +1,5 @@
-DEF(void,primitive_fixnum_add,(void)):
+DEF(void,primitive_fixnum_add,(void *myvm)):
+	mov ARG0, ARG2  /* save vm ptr for overflow */
 	mov (DS_REG),ARG0
 	mov -CELL_SIZE(DS_REG),ARG1
 	sub $CELL_SIZE,DS_REG
@@ -8,7 +9,8 @@ DEF(void,primitive_fixnum_add,(void)):
 	mov ARITH_TEMP_1,(DS_REG)
 	ret
 
-DEF(void,primitive_fixnum_subtract,(void)):
+DEF(void,primitive_fixnum_subtract,(void *myvm)):
+	mov ARG0, ARG2  /* save vm ptr for overflow */
 	mov (DS_REG),ARG1
 	mov -CELL_SIZE(DS_REG),ARG0
 	sub $CELL_SIZE,DS_REG
@@ -18,7 +20,8 @@ DEF(void,primitive_fixnum_subtract,(void)):
 	mov ARITH_TEMP_1,(DS_REG)
 	ret
 
-DEF(void,primitive_fixnum_multiply,(void)):
+DEF(void,primitive_fixnum_multiply,(void *myvm)):
+	mov ARG0, ARG2  /* save vm ptr for overflow */	
 	mov (DS_REG),ARITH_TEMP_1
 	mov ARITH_TEMP_1,DIV_RESULT
 	mov -CELL_SIZE(DS_REG),ARITH_TEMP_2
@@ -28,6 +31,7 @@ DEF(void,primitive_fixnum_multiply,(void)):
 	jo multiply_overflow
 	mov DIV_RESULT,(DS_REG)
 	ret
+
 multiply_overflow:
 	sar $3,ARITH_TEMP_1
 	mov ARITH_TEMP_1,ARG0
