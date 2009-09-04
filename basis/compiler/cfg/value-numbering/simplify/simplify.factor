@@ -14,7 +14,7 @@ M: copy-expr simplify* src>> ;
 : simplify-unbox-alien ( expr -- vn/expr/f )
     src>> vn>expr dup box-alien-expr? [ src>> ] [ drop f ] if ;
 
-! M: unbox-alien-expr simplify* simplify-unbox-alien ;
+M: unbox-alien-expr simplify* simplify-unbox-alien ;
 
 M: unbox-any-c-ptr-expr simplify* simplify-unbox-alien ;
 

@@ -7,7 +7,7 @@ layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private
 slots.private definitions strings.private vectors hashtables
-generic quotations
+generic quotations alien
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -263,6 +263,10 @@ generic-comparison-ops [
     [ fits-in-fixnum? fixnum integer ? ] keep <class/interval-info>
     '[ 2drop _ ] "outputs" set-word-prop
 ] each
+
+\ alien-cell [
+    2drop simple-alien \ f class-or <class-info>
+] "outputs" set-word-prop
 
 { <tuple> <tuple-boa> } [
     [
