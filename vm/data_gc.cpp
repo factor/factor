@@ -708,7 +708,7 @@ void factorvm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 VM_ASM_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factorvm *myvm)
 {
 	ASSERTVM();
-	return VM_PTR->inline_gc(gc_roots_base,gc_roots_size);
+	VM_PTR->inline_gc(gc_roots_base,gc_roots_size);
 }
 
 }

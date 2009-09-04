@@ -831,6 +831,7 @@ double factorvm::to_double(cell value)
 
 VM_C_API double to_double(cell value,factorvm *myvm)
 {
+	ASSERTVM();
 	return VM_PTR->to_double(value);
 }
 
@@ -844,7 +845,7 @@ inline void factorvm::overflow_fixnum_add(fixnum x, fixnum y)
 
 VM_ASM_API_OVERFLOW void overflow_fixnum_add(fixnum x, fixnum y, factorvm *myvm)
 {
-	return PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_add(x,y);
+	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_add(x,y);
 }
 
 inline void factorvm::overflow_fixnum_subtract(fixnum x, fixnum y)
@@ -855,7 +856,7 @@ inline void factorvm::overflow_fixnum_subtract(fixnum x, fixnum y)
 
 VM_ASM_API_OVERFLOW void overflow_fixnum_subtract(fixnum x, fixnum y, factorvm *myvm)
 {
-	return PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_subtract(x,y);
+	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_subtract(x,y);
 }
 
 inline void factorvm::overflow_fixnum_multiply(fixnum x, fixnum y)
@@ -869,7 +870,7 @@ inline void factorvm::overflow_fixnum_multiply(fixnum x, fixnum y)
 
 VM_ASM_API_OVERFLOW void overflow_fixnum_multiply(fixnum x, fixnum y, factorvm *myvm)
 {
-	return PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_multiply(x,y);
+	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_multiply(x,y);
 }
 
 }
