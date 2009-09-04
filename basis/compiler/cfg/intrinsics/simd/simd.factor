@@ -35,15 +35,10 @@ IN: compiler.cfg.intrinsics.simd
         ds-push
     ] emit-vector-op ;
 
-: inline-alien-vector-setter ( node quot -- )
-    '[ ds-drop prepare-alien-accessor ds-pop @ ]
-    [ byte-array inline-alien-setter? ]
-    inline-alien ; inline
-
 : emit-alien-vector ( node -- )
     dup [
         '[
-            ds-drop prepare-alien-accessor
+            ds-drop prepare-alien-getter
             _ ^^alien-vector ds-push
         ]
         [ inline-alien-getter? ] inline-alien
@@ -52,6 +47,9 @@ IN: compiler.cfg.intrinsics.simd
 : emit-set-alien-vector ( node -- )
     dup [
         '[
+            ds-drop prepare-alien-setter ds-pop
             _ ##set-alien-vector
-        ] inline-alien-vector-setter
+        ]
+        [ byte-array inline-alien-setter? ]
+        inline-alien
     ] with emit-vector-op ;
