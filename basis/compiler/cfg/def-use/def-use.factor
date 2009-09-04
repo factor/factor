@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes combinators compiler.units fry
-generalizations generic kernel locals namespaces quotations
-sequences sets slots words compiler.cfg.instructions
-compiler.cfg.instructions.syntax compiler.cfg.rpo ;
+USING: accessors assocs arrays classes combinators
+compiler.units fry generalizations generic kernel locals
+namespaces quotations sequences sets slots words
+compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.cfg.rpo ;
 IN: compiler.cfg.def-use
 
 GENERIC: defs-vreg ( insn -- vreg/f )
@@ -15,10 +16,12 @@ M: ##phi uses-vregs inputs>> values ;
 <PRIVATE
 
 : slot-array-quot ( slots -- quot )
-    [ [ drop f ] ] [
-        [ reader-word 1quotation ] map
-        dup length '[ _ cleave _ narray ]
-    ] if-empty ;
+    [ reader-word 1quotation ] map dup length {
+        { 0 [ drop [ drop f ] ] }
+        { 1 [ first [ 1array ] compose ] }
+        { 2 [ first2 '[ _ _ bi 2array ] ] }
+        [ '[ _ cleave _ narray ] ]
+    } case ;
 
 : define-defs-vreg-method ( insn -- )
     [ \ defs-vreg create-method ]
