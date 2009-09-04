@@ -626,10 +626,10 @@ struct factorvm : factorvmdata {
 #ifdef FACTOR_SINGLE_THREADED_TESTING
 /* calls are dispatched as per multithreaded, but checked against singleton */
   extern factorvm *vm;
-  #define PRIMITIVE_GETVM() ((factorvm*)myvm)
-  #define PRIMITIVE_OVERFLOW_GETVM() vm
-  #define VM_PTR myvm
   #define ASSERTVM() assert(vm==myvm)
+  #define PRIMITIVE_GETVM() ((factorvm*)myvm)
+  #define PRIMITIVE_OVERFLOW_GETVM() ASSERTVM(); myvm
+  #define VM_PTR myvm
   #define SIGNAL_VM_PTR() tls_vm()
 #endif
 

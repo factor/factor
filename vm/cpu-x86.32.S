@@ -2,6 +2,7 @@
 
 #define ARG0 %eax
 #define ARG1 %edx
+#define ARG2 %ecx
 #define STACK_REG %esp
 #define DS_REG %esi
 #define RETURN_REG %eax
