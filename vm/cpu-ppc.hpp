@@ -3,6 +3,7 @@ namespace factor
 
 #define FACTOR_CPU_STRING "ppc"
 #define VM_ASM_API VM_C_API
+#define VM_ASM_API_OVERFLOW VM_C_API
 
 register cell ds asm("r13");
 register cell rs asm("r14");
