@@ -4,7 +4,6 @@ io.files.windows io.files.windows.nt io.files io.pathnames io.buffers
 io.streams.c io.streams.null libc kernel math namespaces sequences
 threads windows windows.errors windows.kernel32 strings splitting
 ascii system accessors locals classes.struct combinators.short-circuit ;
-QUALIFIED: windows.winsock
 IN: io.backend.windows.nt
 
 ! Global variable with assoc mapping overlapped to threads
@@ -79,8 +78,7 @@ M: winnt io-multiplex ( us -- )
 
 M: winnt init-io ( -- )
     <master-completion-port> master-completion-port set-global
-    H{ } clone pending-overlapped set-global
-    windows.winsock:init-winsock ;
+    H{ } clone pending-overlapped set-global ;
 
 ERROR: invalid-file-size n ;
 

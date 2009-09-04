@@ -39,13 +39,9 @@ GENERIC: inet-pton ( str addrspec -- data )
 
 GENERIC: parse-sockaddr ( sockaddr addrspec -- newaddrspec )
 
-: sockaddr-of-family ( alien af -- addrspec )
-    {
-        { AF_INET [ sockaddr-in memory>struct ] }
-        { AF_INET6 [ sockaddr-in6 memory>struct ] }
-        { AF_UNIX [ sockaddr-un memory>struct ] }
-        [ 2drop f ]
-    } case ;
+HOOK: sockaddr-of-family os ( alien af -- sockaddr )
+
+HOOK: addrspec-of-family os ( af -- addrspec )
 
 PRIVATE>
 
@@ -222,14 +218,6 @@ HOOK: (receive) io-backend ( datagram -- packet addrspec )
     pick class byte-array assert= ;
 
 HOOK: (send) io-backend ( packet addrspec datagram -- )
-
-: addrspec-of-family ( af -- addrspec )
-    {
-        { AF_INET [ T{ inet4 } ] }
-        { AF_INET6 [ T{ inet6 } ] }
-        { AF_UNIX [ T{ local } ] }
-        [ drop f ]
-    } case ;
 
 : addrinfo>addrspec ( addrinfo -- addrspec )
     [ [ addr>> ] [ family>> ] bi sockaddr-of-family ]
