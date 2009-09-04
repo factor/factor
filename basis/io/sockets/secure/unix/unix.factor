@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors unix byte-arrays kernel sequences
-namespaces math math.order combinators init alien alien.c-types
+USING: accessors unix byte-arrays kernel sequences namespaces
+math math.order combinators init alien alien.c-types
 alien.strings libc continuations destructors openssl
 openssl.libcrypto openssl.libssl io io.files io.ports
 io.backend.unix io.sockets.unix io.encodings.ascii io.buffers
-io.sockets io.sockets.secure io.sockets.secure.openssl
-io.timeouts system summary fry ;
+io.sockets io.sockets.private io.sockets.secure
+io.sockets.secure.openssl io.timeouts system summary fry ;
 FROM: io.ports => shutdown ;
 IN: io.sockets.secure.unix
 
