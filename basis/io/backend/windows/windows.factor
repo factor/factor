@@ -52,4 +52,4 @@ HOOK: add-completion io-backend ( port -- )
 
 : default-security-attributes ( -- obj )
     SECURITY_ATTRIBUTES <struct>
-    dup class heap-size >>nLength ;
+    SECURITY_ATTRIBUTES heap-size >>nLength ;
