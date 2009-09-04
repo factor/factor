@@ -49,7 +49,7 @@ STRUCT: body
 TUPLE: nbody-system { bodies struct-array read-only } ;
 
 : init-bodies ( bodies -- )
-    [ first ] [ double-4{ 0 0 0 0 } [ [ velocity>> ] [ mass>> ] bi v*n v+ ] reduce ] bi
+    [ first ] [ [ [ velocity>> ] [ mass>> ] bi v*n ] [ v+ ] map-reduce ] bi
     offset-momentum drop ; inline
 
 : <nbody-system> ( -- system )
