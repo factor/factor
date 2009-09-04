@@ -117,7 +117,7 @@ M: A length drop N ; inline
 <PRIVATE
 
 : A-deref ( n seq -- n' seq' )
-    over N/2 < [ underlying1>> ] [ [ N/2 - ] dip underlying2>> ] if A/2 boa ; inline
+    over N/2 < [ underlying1>> ] [ [ N/2 - ] dip underlying2>> ] if \ A/2 boa ; inline
 
 PRIVATE>
 
