@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes.tuple classes.tuple.parser kernel words
 make fry sequences parser accessors effects namespaces
-combinators splitting classes.parser lexer ;
+combinators splitting classes.parser lexer quotations ;
 IN: compiler.cfg.instructions.syntax
 
 SYMBOLS: def use temp literal constant ;
@@ -67,7 +67,8 @@ TUPLE: insn-slot-spec type name rep ;
     [ name>> ] map "insn#" suffix define-tuple-class ;
 
 : define-insn-ctor ( class specs -- )
-    [ dup '[ f _ boa , ] ] dip [ name>> ] map f <effect> define-declared ;
+    [ dup '[ _ ] [ f ] [ boa , ] surround ] dip
+    [ name>> ] map f <effect> define-declared ;
 
 : define-insn ( class superclass specs -- )
     parse-insn-slot-specs {

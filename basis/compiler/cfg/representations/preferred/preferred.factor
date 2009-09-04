@@ -17,7 +17,7 @@ GENERIC: uses-vreg-reps ( insn -- reps )
     {
         { f [ [ rep>> ] ] }
         { scalar-rep [ [ rep>> scalar-rep-of ] ] }
-        [ '[ _ nip ] ]
+        [ [ drop ] swap suffix ]
     } case ;
 
 : define-defs-vreg-rep-method ( insn -- )
@@ -26,7 +26,16 @@ GENERIC: uses-vreg-reps ( insn -- reps )
     bi define ;
 
 : reps-getter-quot ( reps -- quot )
-    [ rep>> rep-getter-quot ] map dup length '[ _ cleave _ narray ] ;
+    dup [ rep>> { f scalar-rep } memq? not ] all? [
+        [ rep>> ] map [ drop ] swap suffix
+    ] [
+        [ rep>> rep-getter-quot ] map dup length {
+            { 0 [ drop [ drop f ] ] }
+            { 1 [ first [ 1array ] compose ] }
+            { 2 [ first2 '[ _ _ bi 2array ] ] }
+            [ '[ _ cleave _ narray ] ]
+        } case
+    ] if ;
 
 : define-uses-vreg-reps-method ( insn -- )
     [ \ uses-vreg-reps create-method ]

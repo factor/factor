@@ -100,9 +100,8 @@ M: _spill-area-size generate-insn drop ;
 : codegen-method-body ( class word -- quot )
     [
         "insn-slots" word-prop
-        [ insn-slot-quot ] map
-    ] dip
-    '[ _ cleave _ execute ] ;
+        [ insn-slot-quot ] map cleave>quot
+    ] dip suffix ;
 
 SYNTAX: CODEGEN:
     scan-word [ \ generate-insn create-method-in ] keep scan-word

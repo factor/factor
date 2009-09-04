@@ -64,7 +64,7 @@ M: ##load-reference >expr obj>> <reference> ;
                 { constant [ [ constant>vn ] ] }
             } case
         ] bi append
-    ] map swap '[ _ cleave _ boa ] ;
+    ] map cleave>quot swap suffix \ boa suffix ;
 
 : define->expr-method ( insn expr slot-specs -- )
     [ 2drop \ >expr create-method-in ] [ >expr-quot nip ] 3bi define ;
