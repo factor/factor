@@ -235,8 +235,6 @@ void* start_standalone_factor_thread(void *arg)
 VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {
 	factorvm *newvm = new factorvm;
-	newvm->print_vm_data();
-	printf("PHIL YEAH: %d %d %d %d\n",(void*)(newvm),(void*)(newvm+1),sizeof(newvm), sizeof(factorvm));
 	vm = newvm;
 	register_vm_with_thread(newvm);
 	return newvm->start_standalone_factor(argc,argv);
@@ -247,62 +245,6 @@ VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc, vm_char **
 	startargs *args = new startargs;   // leaks startargs structure
 	args->argc = argc; args->argv = argv;
 	return start_thread(start_standalone_factor_thread,args);
-}
-
-
-void factorvm::print_vm_data() {
-	printf("PHIL: stack_chain %d\n",&stack_chain);
-	printf("PHIL: nursery %d\n",&nursery);
-	printf("PHIL: cards_offset %d\n",&cards_offset);
-	printf("PHIL: decks_offset %d\n",&decks_offset);
-	printf("PHIL: userenv %d\n",&userenv);
-	printf("PHIL: ds_size %d\n",&ds_size);
-	printf("PHIL: rs_size %d\n",&rs_size);
-	printf("PHIL: unused_contexts %d\n",&unused_contexts);
-	printf("PHIL: T %d\n",&T);
-	printf("PHIL: profiling_p %d\n",&profiling_p);
-	printf("PHIL: signal_number %d\n",&signal_number);
-	printf("PHIL: signal_fault_addr %d\n",&signal_fault_addr);
-	printf("PHIL: signal_callstack_top %d\n",&signal_callstack_top);
-	printf("PHIL: secure_gc %d\n",&secure_gc);
-	printf("PHIL: gc_off %d\n",&gc_off);
-	printf("PHIL: data %d\n",&data);
-	printf("PHIL: heap_scan_ptr %d\n",&heap_scan_ptr);
-	printf("PHIL: allot_markers_offset %d\n",&allot_markers_offset);
-	printf("PHIL: newspace %d\n",&newspace);
-	printf("PHIL: performing_gc %d\n",&performing_gc);
-	printf("PHIL: performing_compaction %d\n",&performing_compaction);
-	printf("PHIL: collecting_gen %d\n",&collecting_gen);
-	printf("PHIL: collecting_aging_again %d\n",&collecting_aging_again);
-	printf("PHIL: gc_jmp %d\n",&gc_jmp);
-	printf("PHIL: stats %d\n",&stats);
-	printf("PHIL: cards_scanned %d\n",&cards_scanned);
-	printf("PHIL: decks_scanned %d\n",&decks_scanned);
-	printf("PHIL: card_scan_time %d\n",&card_scan_time);
-	printf("PHIL: code_heap_scans %d\n",&code_heap_scans);
-	printf("PHIL: last_code_heap_scan %d\n",&last_code_heap_scan);
-	printf("PHIL: growing_data_heap %d\n",&growing_data_heap);
-	printf("PHIL: old_data_heap %d\n",&old_data_heap);
-	printf("PHIL: gc_locals %d\n",&gc_locals);
-	printf("PHIL: gc_bignums %d\n",&gc_bignums);
-	printf("PHIL: fep_disabled %d\n",&fep_disabled);
-	printf("PHIL: full_output %d\n",&full_output);
-	printf("PHIL: look_for %d\n",&look_for);
-	printf("PHIL: obj %d\n",&obj);
-	printf("PHIL: bignum_zero %d\n",&bignum_zero);
-	printf("PHIL: bignum_pos_one %d\n",&bignum_pos_one);
-	printf("PHIL: bignum_neg_one %d\n",&bignum_neg_one);
-	printf("PHIL: code %d\n",&code);
-	printf("PHIL: forwarding %d\n",&forwarding);
-	printf("PHIL: code_relocation_base %d\n",&code_relocation_base);
-	printf("PHIL: data_relocation_base %d\n",&data_relocation_base);
-	printf("PHIL: megamorphic_cache_hits %d\n",&megamorphic_cache_hits);
-	printf("PHIL: megamorphic_cache_misses %d\n",&megamorphic_cache_misses);
-	printf("PHIL: max_pic_size %d\n",&max_pic_size);
-	printf("PHIL: cold_call_to_ic_transitions %d\n",&cold_call_to_ic_transitions);
-	printf("PHIL: ic_to_pic_transitions %d\n",&ic_to_pic_transitions);
-	printf("PHIL: pic_to_mega_transitions %d\n",&pic_to_mega_transitions);
-	printf("PHIL: pic_counts %d\n",&pic_counts);
 }
 
 	// if you change this struct, also change vm.factor k--------
