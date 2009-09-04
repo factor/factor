@@ -1,14 +1,10 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax arrays
-byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors math.bitwise io.encodings.utf16n classes.struct
-literals windows.com.syntax ;
+byte-arrays kernel literals math sequences windows.types
+windows.kernel32 windows.errors math.bitwise io.encodings.utf16n
+classes.struct windows.com.syntax init ;
 IN: windows.winsock
-
-USE: libc
-: alien>byte-array ( alien str -- byte-array )
-    heap-size dup <byte-array> [ -rot memcpy ] keep ;
 
 TYPEDEF: void* SOCKET
 
@@ -30,7 +26,7 @@ CONSTANT: SO_BROADCAST   HEX:  20
 CONSTANT: SO_USELOOPBACK HEX:  40
 CONSTANT: SO_LINGER      HEX:  80
 CONSTANT: SO_OOBINLINE   HEX: 100
-CONSTANT: SO_DONTLINGER $[ SO_LINGER bitnot ]
+: SO_DONTLINGER ( -- n ) SO_LINGER bitnot ; inline
 
 CONSTANT: SO_SNDBUF     HEX: 1001
 CONSTANT: SO_RCVBUF     HEX: 1002
@@ -75,7 +71,9 @@ CONSTANT: PF_INET6      23
 CONSTANT: AI_PASSIVE     1
 CONSTANT: AI_CANONNAME   2
 CONSTANT: AI_NUMERICHOST 4
-CONSTANT: AI_MASK $[ { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ]
+
+: AI_MASK ( -- n )
+    { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ; inline
 
 CONSTANT: NI_NUMERICHOST 1
 CONSTANT: NI_NUMERICSERV 2
@@ -96,7 +94,8 @@ ALIAS: WSA_IO_PENDING ERROR_IO_PENDING
 
 CONSTANT: INADDR_ANY 0
 
-CONSTANT: INVALID_SOCKET $[ -1 <alien> ]
+: INVALID_SOCKET ( -- n ) -1 <alien> ; inline
+
 CONSTANT: SOCKET_ERROR -1
 
 CONSTANT: SD_RECV 0
@@ -104,10 +103,6 @@ CONSTANT: SD_SEND 1
 CONSTANT: SD_BOTH 2
 
 CONSTANT: SOL_SOCKET HEX: ffff
-
-! TYPEDEF: uint in_addr_t
-! C-STRUCT: in_addr
-    ! { "in_addr_t" "s_addr" } ;
 
 STRUCT: sockaddr-in
     { family short }
@@ -379,7 +374,17 @@ LIBRARY: mswsock
 
 ! Not in Windows CE
 FUNCTION: int AcceptEx ( void* listen, void* accept, void* out-buf, int recv-len, int addr-len, int remote-len, void* out-len, void* overlapped ) ;
-FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, void* f, void* g, void* h ) ;
+
+FUNCTION: void GetAcceptExSockaddrs (
+  PVOID lpOutputBuffer,
+  DWORD dwReceiveDataLength,
+  DWORD dwLocalAddressLength,
+  DWORD dwRemoteAddressLength,
+  LPSOCKADDR* LocalSockaddr,
+  LPINT LocalSockaddrLength,
+  LPSOCKADDR* RemoteSockaddr,
+  LPINT RemoteSockaddrLength
+) ;
 
 CONSTANT: SIO_GET_EXTENSION_FUNCTION_POINTER -939524090
 
@@ -431,3 +436,5 @@ CONSTANT: WSAID_CONNECTEX GUID: {25a207b9-ddf3-4660-8ee9-76e58c74063e}
 
 : init-winsock ( -- )
     HEX: 0202 <wsadata> WSAStartup winsock-return-check ;
+
+[ init-winsock ] "windows.winsock" add-init-hook
