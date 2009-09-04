@@ -22,6 +22,22 @@ IN: io.sockets.unix
 M: unix addrinfo-error ( n -- )
     [ gai_strerror throw ] unless-zero ;
 
+M: unix sockaddr-of-family ( alien af -- addrspec )
+    {
+        { AF_INET [ sockaddr-in memory>struct ] }
+        { AF_INET6 [ sockaddr-in6 memory>struct ] }
+        { AF_UNIX [ sockaddr-un memory>struct ] }
+        [ 2drop f ]
+    } case ;
+
+M: unix addrspec-of-family ( af -- addrspec )
+    {
+        { AF_INET [ T{ inet4 } ] }
+        { AF_INET6 [ T{ inet6 } ] }
+        { AF_UNIX [ T{ local } ] }
+        [ drop f ]
+    } case ;
+
 ! Client sockets - TCP and Unix domain
 M: object (get-local-address) ( handle remote -- sockaddr )
     [ handle-fd ] dip empty-sockaddr/size <int>
@@ -100,19 +116,17 @@ CONSTANT: packet-size 65536
 [ packet-size malloc receive-buffer set-global ] "io.sockets.unix" add-init-hook
 
 :: do-receive ( port -- packet sockaddr )
-    port addr>> empty-sockaddr/size [| sockaddr len |
-        port handle>> handle-fd ! s
-        receive-buffer get-global ! buf
-        packet-size ! nbytes
-        0 ! flags
-        sockaddr ! from
-        len <int> ! fromlen
-        recvfrom dup 0 >= [
-            receive-buffer get-global swap memory>byte-array sockaddr
-        ] [
-            drop f f
-        ] if
-    ] call ;
+    port addr>> empty-sockaddr/size :> len :> sockaddr
+    port handle>> handle-fd ! s
+    receive-buffer get-global ! buf
+    packet-size ! nbytes
+    0 ! flags
+    sockaddr ! from
+    len <int> ! fromlen
+    recvfrom dup 0 >=
+    [ receive-buffer get-global swap memory>byte-array sockaddr ]
+    [ drop f f ]
+    if ;
 
 M: unix (receive) ( datagram -- packet sockaddr )
     dup do-receive dup [ [ drop ] 2dip ] [
