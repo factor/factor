@@ -130,6 +130,8 @@ SYNTAX: DEFERS [ current-vocab create ] (INTERPOLATE) ;
 
 SYNTAX: DEFINES [ create-in ] (INTERPOLATE) ;
 
+SYNTAX: DEFINES-PRIVATE [ begin-private create-in end-private ] (INTERPOLATE) ;
+
 SYNTAX: DEFINES-CLASS [ create-class-in ] (INTERPOLATE) ;
 
 DEFER: ;FUNCTOR delimiter
