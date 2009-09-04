@@ -23,41 +23,81 @@ DEFER: double-4
 >>
 
 : float-4-with ( x -- simd-array )
-    >float float-4-rep (simd-broadcast) float-4 boa ; inline
+    [ 4 ] dip >float '[ _ ] \ float-4 new replicate-as ;
 
-:: float-4-boa ( a b c d -- simd-array )
-    a >float b >float c >float d >float
-    float-4-rep (simd-gather-4) float-4 boa ; inline
+: float-4-boa ( a b c d -- simd-array )
+    \ float-4 new 4sequence ;
 
 : double-2-with ( x -- simd-array )
-    >float double-2-rep (simd-broadcast) double-2 boa ; inline
+    [ 2 ] dip >float '[ _ ] \ double-2 new replicate-as ;
 
 : double-2-boa ( a b -- simd-array )
-    [ >float ] bi@ double-2-rep (simd-gather-2) double-2 boa ; inline
+    \ double-2 new 2sequence ;
+
+! More efficient expansions for the above, used when SIMD is
+! actually available.
+
+<<
+
+\ float-4-with [
+    drop
+    \ (simd-broadcast) "intrinsic" word-prop [
+        [ >float float-4-rep (simd-broadcast) \ float-4 boa ]
+    ] [ \ float-4-with def>> ] if
+] "custom-inlining" set-word-prop
+
+\ float-4-boa [
+    drop
+    \ (simd-gather-4) "intrinsic" word-prop [
+        [| a b c d |
+            a >float b >float c >float d >float
+            float-4-rep (simd-gather-4) \ float-4 boa
+        ]
+    ] [ \ float-4-boa def>> ] if
+] "custom-inlining" set-word-prop
+
+\ double-2-with [
+    drop
+    \ (simd-broadcast) "intrinsic" word-prop [
+        [ >float double-2-rep (simd-broadcast) \ double-2 boa ]
+    ] [ \ double-2-with def>> ] if
+] "custom-inlining" set-word-prop
+
+\ double-2-boa [
+    drop
+    \ (simd-gather-4) "intrinsic" word-prop [
+        [ [ >float ] bi@ double-2-rep (simd-gather-2) \ double-2 boa ]
+    ] [ \ double-2-boa def>> ] if
+] "custom-inlining" set-word-prop
+
+>>
 
 : float-8-with ( x -- simd-array )
     [ float-4-with ] [ float-4-with ] bi [ underlying>> ] bi@
-    float-8 boa ; inline
+    \ float-8 boa ; inline
 
 :: float-8-boa ( a b c d e f g h -- simd-array )
     a b c d float-4-boa
     e f g h float-4-boa
     [ underlying>> ] bi@
-    float-8 boa ; inline
+    \ float-8 boa ; inline
 
 : double-4-with ( x -- simd-array )
     [ double-2-with ] [ double-2-with ] bi [ underlying>> ] bi@
-    double-4 boa ; inline
+    \ double-4 boa ; inline
 
 :: double-4-boa ( a b c d -- simd-array )
     a b double-2-boa
     c d double-2-boa
     [ underlying>> ] bi@
-    double-4 boa ; inline
+    \ double-4 boa ; inline
 
 <<
 
 <PRIVATE
+
+! Filter out operations that are not available, eg horizontal adds
+! on SSE2. Fallback code in math.vectors is used in that case.
 
 : supported-simd-ops ( assoc -- assoc' )
     {
@@ -71,8 +111,9 @@ DEFER: double-4
     } [ nip "intrinsic" word-prop ] assoc-filter
     '[ drop _ key? ] assoc-filter ;
 
+! Some SIMD operations are defined in terms of others.
+
 :: high-level-ops ( ctor -- assoc )
-    ! Some SIMD operations are defined in terms of others.
     {
         { vneg [ [ dup v- ] keep v- ] }
         { v. [ v* sum ] }
