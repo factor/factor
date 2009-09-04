@@ -147,20 +147,31 @@ stack_frame *factorvm::uap_stack_pointer(void *uap)
 		return NULL;
 }
 
+
+
+void factorvm::memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	signal_fault_addr = (cell)siginfo->si_addr;
+	signal_callstack_top = uap_stack_pointer(uap);
+	UAP_PROGRAM_COUNTER(uap) = (cell)factor::memory_signal_handler_impl;
+}
+
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	factorvm *myvm = SIGNAL_VM_PTR();
-	myvm->signal_fault_addr = (cell)siginfo->si_addr;
-	myvm->signal_callstack_top = myvm->uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) = (cell)memory_signal_handler_impl;
+	SIGNAL_VM_PTR()->memory_signal_handler(signal,siginfo,uap);
+}
+
+
+void factorvm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	signal_number = signal;
+	signal_callstack_top = uap_stack_pointer(uap);
+	UAP_PROGRAM_COUNTER(uap) = (cell)factor::misc_signal_handler_impl;
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	factorvm *myvm = SIGNAL_VM_PTR();
-	myvm->signal_number = signal;
-	myvm->signal_callstack_top = myvm->uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) = (cell)misc_signal_handler_impl;
+	SIGNAL_VM_PTR()->misc_signal_handler(signal,siginfo,uap);
 }
 
 void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)

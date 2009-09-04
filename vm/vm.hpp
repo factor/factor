@@ -355,9 +355,9 @@ struct factorvm : factorvmdata {
 	float to_float(cell value);
 	void box_double(double flo);
 	double to_double(cell value);
-	void overflow_fixnum_add(fixnum x, fixnum y);
-	void overflow_fixnum_subtract(fixnum x, fixnum y);
-	void overflow_fixnum_multiply(fixnum x, fixnum y);
+	inline void overflow_fixnum_add(fixnum x, fixnum y);
+	inline void overflow_fixnum_subtract(fixnum x, fixnum y);
+	inline void overflow_fixnum_multiply(fixnum x, fixnum y);
 	inline cell allot_integer(fixnum x);
 	inline cell allot_cell(cell x);
 	inline cell allot_float(double n);
@@ -600,7 +600,8 @@ struct factorvm : factorvmdata {
  	// next method here:	
    #endif
   #else  // UNIX
-
+	void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap);
+	void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap);
 	stack_frame *uap_stack_pointer(void *uap);
 
   #endif
