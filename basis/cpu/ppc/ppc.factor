@@ -500,14 +500,14 @@ M: ppc %epilogue ( n -- )
     dst \ t %load-reference
     "end" get resolve-label ; inline
 
-: %boolean ( dst temp cc -- )
-    negate-cc {
-        { cc< [ \ BLT (%boolean) ] }
-        { cc<= [ \ BLE (%boolean) ] }
-        { cc> [ \ BGT (%boolean) ] }
-        { cc>= [ \ BGE (%boolean) ] }
-        { cc= [ \ BEQ (%boolean) ] }
-        { cc/= [ \ BNE (%boolean) ] }
+:: %boolean ( dst temp cc -- )
+    cc negate-cc order-cc {
+        { cc<  [ dst temp \ BLT (%boolean) ] }
+        { cc<= [ dst temp \ BLE (%boolean) ] }
+        { cc>  [ dst temp \ BGT (%boolean) ] }
+        { cc>= [ dst temp \ BGE (%boolean) ] }
+        { cc=  [ dst temp \ BEQ (%boolean) ] }
+        { cc/= [ dst temp \ BNE (%boolean) ] }
     } case ;
 
 : (%compare) ( src1 src2 -- ) [ 0 ] dip CMP ; inline
@@ -518,14 +518,14 @@ M: ppc %compare (%compare) %boolean ;
 M: ppc %compare-imm (%compare-imm) %boolean ;
 M: ppc %compare-float (%compare-float) %boolean ;
 
-: %branch ( label cc -- )
-    {
-        { cc< [ BLT ] }
-        { cc<= [ BLE ] }
-        { cc> [ BGT ] }
-        { cc>= [ BGE ] }
-        { cc= [ BEQ ] }
-        { cc/= [ BNE ] }
+:: %branch ( label cc -- )
+    cc order-cc {
+        { cc<  [ label BLT ] }
+        { cc<= [ label BLE ] }
+        { cc>  [ label BGT ] }
+        { cc>= [ label BGE ] }
+        { cc=  [ label BEQ ] }
+        { cc/= [ label BNE ] }
     } case ;
 
 M: ppc %compare-branch (%compare) %branch ;
