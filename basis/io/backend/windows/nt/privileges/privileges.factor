@@ -30,8 +30,8 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 
 : make-token-privileges ( name ? -- obj )
     "TOKEN_PRIVILEGES" <c-object>
-    1 [ over set-TOKEN_PRIVILEGES-PrivilegeCount ] keep
-    "LUID_AND_ATTRIBUTES" malloc-array &free
+    1 over set-TOKEN_PRIVILEGES-PrivilegeCount
+    "LUID_AND_ATTRIBUTES" malloc-object &free
     over set-TOKEN_PRIVILEGES-Privileges
 
     swap [
