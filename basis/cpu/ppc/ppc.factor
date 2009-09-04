@@ -501,7 +501,7 @@ M: ppc %epilogue ( n -- )
     "end" get resolve-label ; inline
 
 : %boolean ( dst temp cc -- )
-    negate-cc {
+    negate-cc order-cc {
         { cc< [ \ BLT (%boolean) ] }
         { cc<= [ \ BLE (%boolean) ] }
         { cc> [ \ BGT (%boolean) ] }
@@ -519,7 +519,7 @@ M: ppc %compare-imm (%compare-imm) %boolean ;
 M: ppc %compare-float (%compare-float) %boolean ;
 
 : %branch ( label cc -- )
-    {
+    order-cc {
         { cc< [ BLT ] }
         { cc<= [ BLE ] }
         { cc> [ BGT ] }

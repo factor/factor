@@ -512,7 +512,7 @@ M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
     dst temp word execute ; inline
 
 M: x86 %compare ( dst temp cc src1 src2 -- )
-    CMP {
+    CMP order-cc {
         { cc< [ \ CMOVL %boolean ] }
         { cc<= [ \ CMOVLE %boolean ] }
         { cc> [ \ CMOVG %boolean ] }
@@ -524,18 +524,47 @@ M: x86 %compare ( dst temp cc src1 src2 -- )
 M: x86 %compare-imm ( dst temp cc src1 src2 -- )
     %compare ;
 
+: %cmov-float= ( dst src -- )
+    [
+        "no-move" define-label
+
+        "no-move" get [ JNE ] [ JP ] bi
+        MOV
+        "no-move" resolve-label
+    ] with-scope ;
+
+: %cmov-float/= ( dst src -- )
+    [
+        "no-move" define-label
+        "move" define-label
+
+        "move" get JP
+        "no-move" get JE
+        "move" resolve-label
+        MOV
+        "no-move" resolve-label
+    ] with-scope ;
+
 M: x86 %compare-float ( dst temp cc src1 src2 -- )
-    UCOMISD {
-        { cc< [ \ CMOVB %boolean ] }
-        { cc<= [ \ CMOVBE %boolean ] }
-        { cc> [ \ CMOVA %boolean ] }
-        { cc>= [ \ CMOVAE %boolean ] }
-        { cc= [ \ CMOVE %boolean ] }
-        { cc/= [ \ CMOVNE %boolean ] }
+    rot {
+        { cc<    [ swap UCOMISD \ CMOVA  %boolean ] }
+        { cc<=   [ swap UCOMISD \ CMOVAE %boolean ] }
+        { cc>    [      UCOMISD \ CMOVA  %boolean ] }
+        { cc>=   [      UCOMISD \ CMOVAE %boolean ] }
+        { cc=    [       COMISD \ %cmov-float= %boolean ] }
+        { cc<>   [      UCOMISD \ CMOVNE %boolean ] }
+        { cc<>=  [      UCOMISD \ CMOVNP %boolean ] }
+        { cc/<   [ swap  COMISD \ CMOVBE %boolean ] }
+        { cc/<=  [ swap  COMISD \ CMOVB  %boolean ] }
+        { cc/>   [       COMISD \ CMOVBE %boolean ] }
+        { cc/>=  [       COMISD \ CMOVB  %boolean ] }
+        { cc/=   [       COMISD \ %cmov-float/= %boolean ] }
+        { cc/<>  [       COMISD \ CMOVE  %boolean ] }
+        { cc/<>= [       COMISD \ CMOVP  %boolean ] }
     } case ;
 
 M: x86 %compare-branch ( label cc src1 src2 -- )
-    CMP {
+    CMP order-cc {
         { cc< [ JL ] }
         { cc<= [ JLE ] }
         { cc> [ JG ] }
@@ -547,14 +576,33 @@ M: x86 %compare-branch ( label cc src1 src2 -- )
 M: x86 %compare-imm-branch ( label src1 src2 cc -- )
     %compare-branch ;
 
+: %jump-float= ( label -- )
+    [
+        "no-jump" define-label
+        "no-jump" get JP
+        JE
+        "no-jump" resolve-label
+    ] with-scope ;
+
+: %jump-float/= ( label -- )
+    [ JNE ] [ JP ] bi ;
+
 M: x86 %compare-float-branch ( label cc src1 src2 -- )
-    UCOMISD {
-        { cc< [ JB ] }
-        { cc<= [ JBE ] }
-        { cc> [ JA ] }
-        { cc>= [ JAE ] }
-        { cc= [ JE ] }
-        { cc/= [ JNE ] }
+    rot {
+        { cc<    [ swap UCOMISD JA  ] }
+        { cc<=   [ swap UCOMISD JAE ] }
+        { cc>    [      UCOMISD JA  ] }
+        { cc>=   [      UCOMISD JAE ] }
+        { cc=    [       COMISD %jump-float= ] }
+        { cc<>   [      UCOMISD JNE ] }
+        { cc<>=  [      UCOMISD JNP ] }
+        { cc/<   [ swap  COMISD JBE ] }
+        { cc/<=  [ swap  COMISD JB  ] }
+        { cc/>   [       COMISD JBE ] }
+        { cc/>=  [       COMISD JB  ] }
+        { cc/=   [       COMISD %jump-float/= ] } ! XXX
+        { cc/<>  [       COMISD JE  ] }
+        { cc/<>= [       COMISD JP  ] }
     } case ;
 
 M: x86 %spill ( src n rep -- ) [ spill@ swap ] dip copy-register ;
