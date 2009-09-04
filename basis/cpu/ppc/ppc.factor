@@ -501,7 +501,7 @@ M: ppc %epilogue ( n -- )
     dst \ t %load-reference
     "end" get resolve-label ; inline
 
-: %boolean ( dst temp cc -- )
+:: %boolean ( dst temp cc -- )
     cc negate-cc order-cc {
         { cc<  [ dst temp \ BLT f (%boolean) ] }
         { cc<= [ dst temp \ BLE f (%boolean) ] }

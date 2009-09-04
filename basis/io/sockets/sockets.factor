@@ -15,6 +15,8 @@ IN: io.sockets
 } cond use-vocab >>
 
 ! Addressing
+<PRIVATE
+
 GENERIC: protocol-family ( addrspec -- af )
 
 GENERIC: sockaddr-size ( addrspec -- n )
@@ -37,17 +39,23 @@ GENERIC: inet-pton ( str addrspec -- data )
 
 GENERIC: parse-sockaddr ( sockaddr addrspec -- newaddrspec )
 
+HOOK: sockaddr-of-family os ( alien af -- sockaddr )
+
+HOOK: addrspec-of-family os ( af -- addrspec )
+
+PRIVATE>
+
+TUPLE: abstract-inet host port ;
+
+M: abstract-inet present
+    [ host>> ":" ] [ port>> number>string ] bi 3append ;
+
 TUPLE: local path ;
 
 : <local> ( path -- addrspec )
     normalize-path local boa ;
 
 M: local present path>> "Unix domain socket: " prepend ;
-
-TUPLE: abstract-inet host port ;
-
-M: abstract-inet present
-    [ host>> ":" ] [ port>> number>string ] bi 3append ;
 
 TUPLE: inet4 < abstract-inet ;
 
@@ -146,23 +154,9 @@ M: inet6 parse-sockaddr
     [ [ addr>> ] dip inet-ntop ]
     [ drop port>> ntohs ] 2bi <inet6> ;
 
-: addrspec-of-family ( af -- addrspec )
-    {
-        { AF_INET [ T{ inet4 } ] }
-        { AF_INET6 [ T{ inet6 } ] }
-        { AF_UNIX [ T{ local } ] }
-        [ drop f ]
-    } case ;
-
-: sockaddr-of-family ( af -- addrspec )
-    {
-        { AF_INET [ sockaddr-in ] }
-        { AF_INET6 [ sockaddr-in6 ] }
-        { AF_UNIX [ sockaddr-un ] }
-        [ drop f ]
-    } case ;
-
 M: f parse-sockaddr nip ;
+
+<PRIVATE
 
 GENERIC: (get-local-address) ( handle remote -- sockaddr )
 
@@ -198,6 +192,58 @@ M: object (client) ( remote -- client-in client-out local )
         2bi
     ] with-destructors ;
 
+TUPLE: server-port < port addr encoding ;
+
+: check-server-port ( port -- port )
+    dup check-disposed
+    dup server-port? [ "Not a server port" throw ] unless ; inline
+
+GENERIC: (server) ( addrspec -- handle )
+
+GENERIC: (accept) ( server addrspec -- handle sockaddr )
+
+TUPLE: datagram-port < port addr ;
+
+HOOK: (datagram) io-backend ( addr -- datagram )
+
+: check-datagram-port ( port -- port )
+    dup check-disposed
+    dup datagram-port? [ "Not a datagram port" throw ] unless ; inline
+
+HOOK: (receive) io-backend ( datagram -- packet addrspec )
+
+: check-datagram-send ( packet addrspec port -- packet addrspec port )
+    check-datagram-port
+    2dup addr>> [ class ] bi@ assert=
+    pick class byte-array assert= ;
+
+HOOK: (send) io-backend ( packet addrspec datagram -- )
+
+: addrinfo>addrspec ( addrinfo -- addrspec )
+    [ [ addr>> ] [ family>> ] bi sockaddr-of-family ]
+    [ family>> addrspec-of-family ] bi
+    parse-sockaddr ;
+
+: parse-addrinfo-list ( addrinfo -- seq )
+    [ next>> dup [ addrinfo memory>struct ] when ] follow
+    [ addrinfo>addrspec ] map
+    sift ;
+
+HOOK: addrinfo-error io-backend ( n -- )
+
+: resolve-passive-host ( -- addrspecs )
+    { T{ inet6 f "::" f } T{ inet4 f "0.0.0.0" f } } [ clone ] map ;
+
+: prepare-addrinfo ( -- addrinfo )
+    addrinfo <struct>
+        PF_UNSPEC >>family
+        IPPROTO_TCP >>protocol ;
+
+: fill-in-ports ( addrspecs port -- addrspecs )
+    '[ _ >>port ] map ;
+
+PRIVATE>
+
 : <client> ( remote encoding -- stream local )
     [ (client) ] dip swap [ <encoder-duplex> ] dip ;
 
@@ -213,22 +259,12 @@ SYMBOL: remote-address
         ] dip with-stream
     ] with-scope ; inline
 
-TUPLE: server-port < port addr encoding ;
-
-: check-server-port ( port -- port )
-    dup check-disposed
-    dup server-port? [ "Not a server port" throw ] unless ; inline
-
-GENERIC: (server) ( addrspec -- handle )
-
 : <server> ( addrspec encoding -- server )
     [
         [ (server) ] keep
         [ drop server-port <port> ] [ get-local-address ] 2bi
         >>addr
     ] dip >>encoding ;
-
-GENERIC: (accept) ( server addrspec -- handle sockaddr )
 
 : accept ( server -- client remote )
     [
@@ -238,10 +274,6 @@ GENERIC: (accept) ( server addrspec -- handle sockaddr )
         <ports>
     ] keep encoding>> <encoder-duplex> swap ;
 
-TUPLE: datagram-port < port addr ;
-
-HOOK: (datagram) io-backend ( addr -- datagram )
-
 : <datagram> ( addrspec -- datagram )
     [
         [ (datagram) |dispose ] keep
@@ -249,54 +281,18 @@ HOOK: (datagram) io-backend ( addr -- datagram )
         >>addr
     ] with-destructors ;
 
-: check-datagram-port ( port -- port )
-    dup check-disposed
-    dup datagram-port? [ "Not a datagram port" throw ] unless ; inline
-
-HOOK: (receive) io-backend ( datagram -- packet addrspec )
-
 : receive ( datagram -- packet addrspec )
     check-datagram-port
     [ (receive) ] [ addr>> ] bi parse-sockaddr ;
 
-: check-datagram-send ( packet addrspec port -- packet addrspec port )
-    check-datagram-port
-    2dup addr>> [ class ] bi@ assert=
-    pick class byte-array assert= ;
-
-HOOK: (send) io-backend ( packet addrspec datagram -- )
-
 : send ( packet addrspec datagram -- )
     check-datagram-send (send) ;
-
-: addrinfo>addrspec ( addrinfo -- addrspec )
-    [ [ addr>> ] [ family>> sockaddr-of-family ] bi memory>struct ]
-    [ family>> addrspec-of-family ] bi
-    parse-sockaddr ;
-
-: parse-addrinfo-list ( addrinfo -- seq )
-    [ next>> dup [ addrinfo memory>struct ] when ] follow
-    [ addrinfo>addrspec ] map
-    sift ;
-
-HOOK: addrinfo-error io-backend ( n -- )
 
 GENERIC: resolve-host ( addrspec -- seq )
 
 TUPLE: inet < abstract-inet ;
 
 C: <inet> inet
-
-: resolve-passive-host ( -- addrspecs )
-    { T{ inet6 f "::" f } T{ inet4 f "0.0.0.0" f } } [ clone ] map ;
-
-: prepare-addrinfo ( -- addrinfo )
-    addrinfo <struct>
-        PF_UNSPEC >>family
-        IPPROTO_TCP >>protocol ;
-
-: fill-in-ports ( addrspecs port -- addrspecs )
-    '[ _ >>port ] map ;
 
 M: inet resolve-host
     [ port>> ] [ host>> ] bi [
