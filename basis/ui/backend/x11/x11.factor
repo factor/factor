@@ -257,15 +257,19 @@ M: x11-ui-backend set-title ( string world -- )
     handle>> window>> swap
     [ dpy get ] 2dip [ set-title-old ] [ set-title-new ] 3bi ;
 
-M: x11-ui-backend (set-fullscreen) ( world ? -- )
+: make-fullscreen-msg ( world ? -- msg )
     XClientMessageEvent <struct>
-    swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ? >>data0
-    swap handle>> window>> >>window
+    ClientMessage >>type
     dpy get >>display
     "_NET_WM_STATE" x-atom >>message_type
+    swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ? >>data0
+    swap handle>> window>> >>window
     32 >>format
-    "_NET_WM_STATE_FULLSCREEN" x-atom >>data1
-    [ dpy get root get 0 SubstructureNotifyMask ] dip XSendEvent drop ;
+    "_NET_WM_STATE_FULLSCREEN" x-atom >>data1 ;
+
+M: x11-ui-backend (set-fullscreen) ( world ? -- )
+    [ dpy get root get 0 SubstructureNotifyMask ] 2dip
+    make-fullscreen-msg XSendEvent drop ;
 
 M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
