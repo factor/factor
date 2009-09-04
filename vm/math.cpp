@@ -836,29 +836,29 @@ VM_C_API double to_double(cell value,factorvm *myvm)
 
 /* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
 overflow, they call these functions. */
-void factorvm::overflow_fixnum_add(fixnum x, fixnum y)
+inline void factorvm::overflow_fixnum_add(fixnum x, fixnum y)
 {
 	drepl(tag<bignum>(fixnum_to_bignum(
 		untag_fixnum(x) + untag_fixnum(y))));
 }
 
-VM_ASM_API void overflow_fixnum_add(fixnum x, fixnum y)
+VM_ASM_API void overflow_fixnum_add(fixnum x, fixnum y, factorvm *myvm)
 {
 	return PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_add(x,y);
 }
 
-void factorvm::overflow_fixnum_subtract(fixnum x, fixnum y)
+inline void factorvm::overflow_fixnum_subtract(fixnum x, fixnum y)
 {
 	drepl(tag<bignum>(fixnum_to_bignum(
 		untag_fixnum(x) - untag_fixnum(y))));
 }
 
-VM_ASM_API void overflow_fixnum_subtract(fixnum x, fixnum y)
+VM_ASM_API void overflow_fixnum_subtract(fixnum x, fixnum y, factorvm *myvm)
 {
 	return PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_subtract(x,y);
 }
 
-void factorvm::overflow_fixnum_multiply(fixnum x, fixnum y)
+inline void factorvm::overflow_fixnum_multiply(fixnum x, fixnum y)
 {
 	bignum *bx = fixnum_to_bignum(x);
 	GC_BIGNUM(bx,this);
@@ -867,7 +867,7 @@ void factorvm::overflow_fixnum_multiply(fixnum x, fixnum y)
 	drepl(tag<bignum>(bignum_multiply(bx,by)));
 }
 
-VM_ASM_API void overflow_fixnum_multiply(fixnum x, fixnum y)
+VM_ASM_API void overflow_fixnum_multiply(fixnum x, fixnum y, factorvm *myvm)
 {
 	return PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_multiply(x,y);
 }
