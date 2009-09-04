@@ -140,10 +140,8 @@ INSTANCE: A sequence
     [ [ [ underlying2>> ] bi@ A-rep ] dip call ] 3bi
     \ A boa ; inline
 
-: A-v->n-op ( v1 quot scalar-quot -- v2 )
-    [
-        [ [ underlying1>> A-rep ] dip call ]
-        [ [ underlying2>> A-rep ] dip call ] 2bi
-    ] dip call ; inline
+: A-v->n-op ( v1 combine-quot reduce-quot -- v2 )
+    [ [ [ underlying1>> ] [ underlying2>> ] bi A-rep ] dip call A-rep ]
+    dip call ; inline
 
 ;FUNCTOR

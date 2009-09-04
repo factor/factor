@@ -174,7 +174,7 @@ PRIVATE>
     { v/ [ [ (simd-v/) ] double-4-vv->v-op ] }
     { vmin [ [ (simd-vmin) ] double-4-vv->v-op ] }
     { vmax [ [ (simd-vmax) ] double-4-vv->v-op ] }
-    { sum [ [ (simd-sum) ] [ + ] double-4-v->n-op ] }
+    { sum [ [ (simd-v+) ] [ (simd-sum) ] double-4-v->n-op ] }
 } simd-vector-words
 
 >>
