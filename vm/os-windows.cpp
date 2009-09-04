@@ -60,7 +60,7 @@ bool factorvm::windows_stat(vm_char *path)
 void factorvm::windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
 {
 	snwprintf(temp_path, length-1, L"%s.image", full_path); 
-	temp_path[sizeof(temp_path) - 1] = 0;
+	temp_path[length - 1] = 0;
 }
 
 /* You must free() this yourself. */
@@ -76,8 +76,8 @@ const vm_char *factorvm::default_image_path()
 	if((ptr = wcsrchr(full_path, '.')))
 		*ptr = 0;
 
-	snwprintf(temp_path, sizeof(temp_path)-1, L"%s.image", full_path); 
-	temp_path[sizeof(temp_path) - 1] = 0;
+	snwprintf(temp_path, MAX_UNICODE_PATH-1, L"%s.image", full_path); 
+	temp_path[MAX_UNICODE_PATH - 1] = 0;
 
 	return safe_strdup(temp_path);
 }
