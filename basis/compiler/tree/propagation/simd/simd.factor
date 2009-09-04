@@ -22,8 +22,8 @@ IN: compiler.tree.propagation.simd
 \ (simd-sum) [
     nip dup literal?>> [
         literal>> scalar-rep-of {
-            { single-float-rep [ float ] }
-            { double-float-rep [ float ] }
+            { float-rep [ float ] }
+            { double-rep [ float ] }
         } case
     ] [ drop real ] if
     <class-info>

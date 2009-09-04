@@ -98,15 +98,15 @@ IN: compiler.cfg.intrinsics.alien
 : emit-alien-float-getter ( node rep -- )
     '[
         _ {
-            { single-float-rep [ ^^alien-float ] }
-            { double-float-rep [ ^^alien-double ] }
+            { float-rep [ ^^alien-float ] }
+            { double-rep [ ^^alien-double ] }
         } case
     ] inline-alien-getter ;
 
 : emit-alien-float-setter ( node rep -- )
     '[
         _ {
-            { single-float-rep [ ##set-alien-float ] }
-            { double-float-rep [ ##set-alien-double ] }
+            { float-rep [ ##set-alien-float ] }
+            { double-rep [ ##set-alien-double ] }
         } case
     ] inline-alien-float-setter ;

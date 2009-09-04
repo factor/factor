@@ -22,21 +22,21 @@ ERROR: bad-conversion dst src dst-rep src-rep ;
 GENERIC: emit-box ( dst src rep -- )
 GENERIC: emit-unbox ( dst src rep -- )
 
-M: single-float-rep emit-box
+M: float-rep emit-box
     drop
-    [ double-float-rep next-vreg-rep dup ] dip ##single>double-float
+    [ double-rep next-vreg-rep dup ] dip ##single>double-float
     int-rep next-vreg-rep ##box-float ;
 
-M: single-float-rep emit-unbox
+M: float-rep emit-unbox
     drop
-    [ double-float-rep next-vreg-rep dup ] dip ##unbox-float
+    [ double-rep next-vreg-rep dup ] dip ##unbox-float
     ##double>single-float ;
 
-M: double-float-rep emit-box
+M: double-rep emit-box
     drop
     int-rep next-vreg-rep ##box-float ;
 
-M: double-float-rep emit-unbox
+M: double-rep emit-unbox
     drop ##unbox-float ;
 
 M: vector-rep emit-box
@@ -52,8 +52,8 @@ M: vector-rep emit-unbox
         { [ over int-rep eq? ] [ nip emit-box ] }
         [
             2array {
-                { { double-float-rep single-float-rep } [ ##single>double-float ] }
-                { { single-float-rep double-float-rep } [ ##double>single-float ] }
+                { { double-rep float-rep } [ ##single>double-float ] }
+                { { float-rep double-rep } [ ##double>single-float ] }
                 [ first2 bad-conversion ]
             } case
         ]

@@ -53,7 +53,7 @@ IN: compiler.tests.low-level-ir
         V{
             T{ ##load-reference f 4 1.5 }
             T{ ##unbox-float f 1 4 }
-            T{ ##copy f 2 1 double-float-rep }
+            T{ ##copy f 2 1 double-rep }
             T{ ##box-float f 3 2 }
             T{ ##copy f 0 3 int-rep }
         } compile-test-bb
