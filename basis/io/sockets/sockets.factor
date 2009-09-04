@@ -5,7 +5,8 @@ USING: generic kernel io.backend namespaces continuations sequences
 arrays io.encodings io.ports io.streams.duplex io.encodings.ascii
 alien.strings io.binary accessors destructors classes byte-arrays
 parser alien.c-types math.parser splitting grouping math assocs
-summary system vocabs.loader combinators present fry vocabs.parser ;
+summary system vocabs.loader combinators present fry vocabs.parser
+classes.struct ;
 IN: io.sockets
 
 << {
@@ -75,21 +76,20 @@ M: inet4 address-size drop 4 ;
 
 M: inet4 protocol-family drop PF_INET ;
 
-M: inet4 sockaddr-size drop "sockaddr-in" heap-size ;
+M: inet4 sockaddr-size drop sockaddr-in heap-size ;
 
-M: inet4 empty-sockaddr drop "sockaddr-in" <c-object> ;
+M: inet4 empty-sockaddr drop sockaddr-in <struct> ;
 
 M: inet4 make-sockaddr ( inet -- sockaddr )
-    "sockaddr-in" <c-object>
-    AF_INET over set-sockaddr-in-family
-    over port>> htons over set-sockaddr-in-port
-    over host>>
-    "0.0.0.0" or
-    rot inet-pton *uint over set-sockaddr-in-addr ;
+    sockaddr-in <struct>
+        AF_INET >>family
+        swap [ port>> htons >>port ]
+            [ host>> "0.0.0.0" or ]
+            [ inet-pton *uint >>addr ] tri ;
 
-M: inet4 parse-sockaddr
-    [ dup sockaddr-in-addr <uint> ] dip inet-ntop
-    swap sockaddr-in-port ntohs <inet4> ;
+M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
+    [ [ addr>> <uint> ] dip inet-ntop ]
+    [ drop port>> ntohs ] 2bi <inet4> ;
 
 TUPLE: inet6 < abstract-inet ;
 
@@ -131,26 +131,34 @@ M: inet6 address-size drop 16 ;
 
 M: inet6 protocol-family drop PF_INET6 ;
 
-M: inet6 sockaddr-size drop "sockaddr-in6" heap-size ;
+M: inet6 sockaddr-size drop sockaddr-in6 heap-size ;
 
-M: inet6 empty-sockaddr drop "sockaddr-in6" <c-object> ;
+M: inet6 empty-sockaddr drop sockaddr-in6 <struct> ;
 
 M: inet6 make-sockaddr ( inet -- sockaddr )
-    "sockaddr-in6" <c-object>
-    AF_INET6 over set-sockaddr-in6-family
-    over port>> htons over set-sockaddr-in6-port
-    over host>> "::" or
-    rot inet-pton over set-sockaddr-in6-addr ;
+    sockaddr-in6 <struct>
+        AF_INET6 >>family
+        swap [ port>> htons >>port ]
+            [ host>> "::" or ]
+            [ inet-pton >>addr ] tri ;
 
 M: inet6 parse-sockaddr
-    [ dup sockaddr-in6-addr ] dip inet-ntop
-    swap sockaddr-in6-port ntohs <inet6> ;
+    [ [ addr>> ] dip inet-ntop ]
+    [ drop port>> ntohs ] 2bi <inet6> ;
 
 : addrspec-of-family ( af -- addrspec )
     {
         { AF_INET [ T{ inet4 } ] }
         { AF_INET6 [ T{ inet6 } ] }
         { AF_UNIX [ T{ local } ] }
+        [ drop f ]
+    } case ;
+
+: sockaddr-of-family ( af -- addrspec )
+    {
+        { AF_INET [ sockaddr-in ] }
+        { AF_INET6 [ sockaddr-in6 ] }
+        { AF_UNIX [ sockaddr-un ] }
         [ drop f ]
     } case ;
 
@@ -262,11 +270,12 @@ HOOK: (send) io-backend ( packet addrspec datagram -- )
     check-datagram-send (send) ;
 
 : addrinfo>addrspec ( addrinfo -- addrspec )
-    [ addrinfo-addr ] [ addrinfo-family addrspec-of-family ] bi
+    [ [ addr>> ] [ family>> sockaddr-of-family ] bi memory>struct ]
+    [ family>> addrspec-of-family ] bi
     parse-sockaddr ;
 
 : parse-addrinfo-list ( addrinfo -- seq )
-    [ addrinfo-next ] follow
+    [ next>> dup [ addrinfo memory>struct ] when ] follow
     [ addrinfo>addrspec ] map
     sift ;
 
@@ -282,9 +291,9 @@ C: <inet> inet
     { T{ inet6 f "::" f } T{ inet4 f "0.0.0.0" f } } [ clone ] map ;
 
 : prepare-addrinfo ( -- addrinfo )
-    "addrinfo" <c-object>
-    PF_UNSPEC over set-addrinfo-family
-    IPPROTO_TCP over set-addrinfo-protocol ;
+    addrinfo <struct>
+        PF_UNSPEC >>family
+        IPPROTO_TCP >>protocol ;
 
 : fill-in-ports ( addrspecs port -- addrspecs )
     '[ _ >>port ] map ;
@@ -292,7 +301,7 @@ C: <inet> inet
 M: inet resolve-host
     [ port>> ] [ host>> ] bi [
         f prepare-addrinfo f <void*>
-        [ getaddrinfo addrinfo-error ] keep *void*
+        [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
         [ parse-addrinfo-list ] keep freeaddrinfo
     ] [ resolve-passive-host ] if*
     swap fill-in-ports ;
