@@ -5,7 +5,7 @@ classes.struct continuations combinators compiler compiler.alien
 stack-checker kernel math namespaces make quotations sequences
 strings words cocoa.runtime io macros memoize io.encodings.utf8
 effects libc libc.private lexer init core-foundation fry
-generalizations specialized-arrays.direct.alien ;
+generalizations specialized-arrays.alien ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
