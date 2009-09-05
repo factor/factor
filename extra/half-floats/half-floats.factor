@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types alien.syntax kernel math math.order
-specialized-arrays.direct.functor specialized-arrays.functor ;
+specialized-arrays.functor ;
 IN: half-floats
 
 : half>bits ( float -- bits )
@@ -37,6 +37,5 @@ C-STRUCT: half { "ushort" "(bits)" } ;
     drop
 
 "half" define-array
-"half" define-direct-array
 
 >>

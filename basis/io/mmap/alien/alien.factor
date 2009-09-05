@@ -1,4 +1,4 @@
-USING: io.mmap.functor specialized-arrays.direct.alien ;
+USING: io.mmap.functor specialized-arrays.alien ;
 IN: io.mmap.alien
 
 << "void*" define-mapped-array >>
