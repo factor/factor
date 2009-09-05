@@ -25,9 +25,7 @@ align
 array-class
 array-constructor
 (array)-constructor
-direct-array-class
-direct-array-constructor
-sequence-mixin-class ;
+direct-array-constructor ;
 
 TUPLE: c-type < abstract-c-type
 boxer
@@ -89,21 +87,19 @@ M: string heap-size c-type heap-size ;
 
 M: abstract-c-type heap-size size>> ;
 
-GENERIC: require-c-arrays ( c-type -- )
+GENERIC: require-c-array ( c-type -- )
 
-M: object require-c-arrays
+M: object require-c-array
     drop ;
 
-M: c-type require-c-arrays
-    [ array-class>> ?require-word ]
-    [ sequence-mixin-class>> ?require-word ]
-    [ direct-array-class>> ?require-word ] tri ;
+M: c-type require-c-array
+    array-class>> ?require-word ;
 
-M: string require-c-arrays
-    c-type require-c-arrays ;
+M: string require-c-array
+    c-type require-c-array ;
 
-M: array require-c-arrays
-    first c-type require-c-arrays ;
+M: array require-c-array
+    first c-type require-c-array ;
 
 ERROR: specialized-array-vocab-not-loaded vocab word ;
 
@@ -370,14 +366,6 @@ M: long-long-type box-return ( type -- )
         ]
         [
             [ "specialized-arrays." prepend ]
-            [ "-sequence" append ] bi* ?lookup >>sequence-mixin-class
-        ]
-        [
-            [ "specialized-arrays.direct." prepend ]
-            [ "direct-" "-array" surround ] bi* ?lookup >>direct-array-class
-        ]
-        [
-            [ "specialized-arrays.direct." prepend ]
             [ "<direct-" "-array>" surround ] bi* ?lookup >>direct-array-constructor
         ]
     } 2cleave ;
