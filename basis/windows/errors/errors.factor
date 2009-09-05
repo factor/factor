@@ -4,7 +4,7 @@ io.encodings.string io.encodings.utf16n alien.strings
 arrays literals ;
 IN: windows.errors
 
-<< "TCHAR" require-c-arrays >>
+<< "TCHAR" require-c-array >>
 
 CONSTANT: ERROR_SUCCESS                               0
 CONSTANT: ERROR_INVALID_FUNCTION                      1
@@ -698,7 +698,7 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   HEX: 000000FF
 : make-lang-id ( lang1 lang2 -- n )
     10 shift bitor ; inline
 
-<< "TCHAR" require-c-arrays >>
+<< "TCHAR" require-c-array >>
 
 ERROR: error-message-failed id ;
 :: n>win32-error-string ( id -- string )

@@ -5,9 +5,8 @@ classes.struct classes.tuple.private combinators
 compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
 literals math mirrors multiline namespaces prettyprint
-prettyprint.config see sequences specialized-arrays.char
-specialized-arrays.direct.int specialized-arrays.ushort
-struct-arrays system tools.test ;
+prettyprint.config see sequences specialized-arrays.char int
+specialized-arrays.ushort struct-arrays system tools.test ;
 IN: classes.struct.tests
 
 <<
