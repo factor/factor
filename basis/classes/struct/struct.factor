@@ -6,7 +6,7 @@ combinators combinators.short-circuit combinators.smart
 definitions functors.backend fry generalizations generic.parser
 kernel kernel.private lexer libc locals macros make math math.order
 parser quotations sequences slots slots.private struct-arrays vectors
-words compiler.tree.propagation.transforms specialized-arrays.direct.uchar ;
+words compiler.tree.propagation.transforms specialized-arrays.uchar ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
 
@@ -20,8 +20,7 @@ TUPLE: struct
 TUPLE: struct-slot-spec < slot-spec
     c-type ;
 
-PREDICATE: struct-class < tuple-class
-    { [ \ struct subclass-of? ] [ all-slots length 1 = ] } 1&& ;
+PREDICATE: struct-class < tuple-class \ struct subclass-of? ;
 
 : struct-slots ( struct-class -- slots )
     "struct-slots" word-prop ;
@@ -126,10 +125,6 @@ M: struct-class writer-quot
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
     define-inline-method ;
 
-: (define-byte-length-method) ( class -- )
-    [ \ byte-length ] [ heap-size \ drop swap [ ] 2sequence ] bi
-    define-inline-method ;
-
 : clone-underlying ( struct -- byte-array )
     [ >c-ptr ] [ byte-length ] bi memory>byte-array ; inline
 
@@ -203,6 +198,9 @@ M: struct-class c-type-unboxer-quot
 M: struct-class heap-size
     "struct-size" word-prop ;
 
+M: struct byte-length
+    class "struct-size" word-prop ; foldable
+
 ! class definition
 
 <PRIVATE
@@ -218,9 +216,8 @@ M: struct-class heap-size
 
 : (struct-methods) ( class -- )
     [ (define-struct-slot-values-method) ]
-    [ (define-byte-length-method) ]
     [ (define-clone-method) ]
-    tri ;
+    bi ;
 
 : (struct-word-props) ( class slots size align -- )
     [
