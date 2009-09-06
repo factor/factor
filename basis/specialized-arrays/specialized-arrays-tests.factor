@@ -1,5 +1,5 @@
 IN: specialized-arrays.tests
-USING: tools.test specialized-arrays sequences
+USING: tools.test alien.syntax specialized-arrays sequences
 specialized-arrays.int specialized-arrays.bool
 specialized-arrays.ushort alien.c-types accessors kernel
 specialized-arrays.char specialized-arrays.uint arrays combinators ;
@@ -30,4 +30,5 @@ specialized-arrays.char specialized-arrays.uint arrays combinators ;
 
 [ ushort-array{ 0 0 0 } ] [
     3 ALIEN: 123 100 <direct-ushort-array> new-sequence
+    dup [ drop 0 ] change-each
 ] unit-test
