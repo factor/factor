@@ -278,7 +278,7 @@ HELP: reduce-index
 
 HELP: accumulate
 { $values { "identity" object } { "seq" sequence } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } { "newseq" "a new sequence" } }
-{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results together with the final result. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence."
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results together with the final result. The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
 $nl
 "When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." }
 { $examples
