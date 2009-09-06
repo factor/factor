@@ -124,11 +124,14 @@ HOOK: signal-error. os ( obj -- )
 : primitive-error. ( error -- ) 
     "Unimplemented primitive" print drop ;
 
+: fp-trap-error. ( error -- )
+    "Floating point trap" print drop ;
+
 PREDICATE: vm-error < array
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
-        [ second 0 15 between? ]
+        [ second 0 16 between? ]
     } cond ;
 
 : vm-errors ( error -- n errors )
@@ -149,6 +152,7 @@ PREDICATE: vm-error < array
         { 13 [ retainstack-underflow.  ] }
         { 14 [ retainstack-overflow.   ] }
         { 15 [ memory-error.           ] }
+        { 16 [ fp-trap-error.          ] }
     } ; inline
 
 M: vm-error summary drop "VM error" ;
