@@ -88,4 +88,14 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
 	add $STACK_PADDING,%rsp
 	jmp *%rax
 
+DEF(unsigned,get_fp_control_register,(void)):
+    stmxcsr -4(%rsp)
+    movl -4(%rsp), %eax
+    ret
+
+DEF(void,set_fp_control_register,(unsigned reg)):
+    movl %edi, -4(%rsp)
+    ldmxcsr -4(%rsp)
+    ret
+
 #include "cpu-x86.S"
