@@ -68,19 +68,31 @@ HELP: collect-fp-exceptions
 { $values { "quot" quotation } { "exceptions" "a sequence of " { $link fp-exception } " symbols" } }
 { $description "Clears the floating-point exception flags and then calls " { $snippet "quot" } ", returning the set of floating-point exceptions raised during its execution and placing them on the datastack on " { $snippet "quot" } "'s completion." } ;
 
-{ fp-exception fp-exception-flags set-fp-exception-flags clear-fp-exception-flags collect-fp-exceptions } related-words
+{ fp-exception-flags set-fp-exception-flags clear-fp-exception-flags collect-fp-exceptions } related-words
+
+HELP: denormal-mode
+{ $values { "mode" fp-denormal-mode } }
+{ $description "Returns the current floating-point denormal mode." } ;
 
 HELP: with-denormal-mode
 { $values { "mode" fp-denormal-mode } { "quot" quotation } }
 { $description "Sets the floating-point denormal mode to " { $snippet "mode" } " for the dynamic extent of " { $snippet "quot" } ", restoring the denormal mode to its original value on " { $snippet "quot" } "'s completion." } ;
 
-{ fp-denormal-mode with-denormal-mode } related-words
+{ denormal-mode with-denormal-mode } related-words
+
+HELP: rounding-mode
+{ $values { "mode" fp-rounding-mode } }
+{ $description "Returns the current floating-point rounding mode." } ;
 
 HELP: with-rounding-mode
 { $values { "mode" fp-rounding-mode } { "quot" quotation } }
 { $description "Sets the floating-point rounding mode to " { $snippet "mode" } " for the dynamic extent of " { $snippet "quot" } ", restoring the rounding mode to its original value on " { $snippet "quot" } "'s completion." } ;
 
-{ fp-rounding-mode with-rounding-mode } related-words
+{ rounding-mode with-rounding-mode } related-words
+
+HELP: fp-traps
+{ $values { "exceptions" "a sequence of " { $link fp-exception } " symbols" } }
+{ $description "Returns the set of floating point exceptions with processor traps currently set." } ;
 
 HELP: with-fp-traps
 { $values { "exceptions" "a sequence of " { $link fp-exception } " symbols" } { "quot" quotation } }
@@ -90,7 +102,7 @@ HELP: without-fp-traps
 { $values { "quot" quotation } }
 { $description "Disables all floating-pointer processor traps for the dynamic extent of " { $snippet "quot" } ", restoring the original exception mask on " { $snippet "quot" } "'s completion." } ;
 
-{ with-fp-traps without-fp-traps } related-words
+{ fp-traps with-fp-traps without-fp-traps } related-words
 
 ARTICLE: "math.floats.env" "Controlling the floating-point environment"
 "The " { $vocab-link "math.floats.env" } " vocabulary contains words for querying and controlling the floating-point environment."
@@ -100,11 +112,14 @@ $nl
 { $subsection set-fp-exception-flags }
 { $subsection clear-fp-exception-flags }
 { $subsection collect-fp-exceptions }
-"Controlling processor traps for floating-point exceptions:"
+"Querying and controlling processor traps for floating-point exceptions:"
+{ $subsection fp-traps }
 { $subsection with-fp-traps }
 { $subsection without-fp-traps }
-"Controlling the rounding mode and treatment of denormals:"
+"Querying and controlling the rounding mode and treatment of denormals:"
+{ $subsection rounding-mode }
 { $subsection with-rounding-mode }
+{ $subsection denormal-mode }
 { $subsection with-denormal-mode }
 { $notes
 "On x86, the above words only modify the SSE unit's state (in particular, the MXCSR register); the x87 unit is ignored by Factor and unaffected by " { $snippet "math.float.env" } ". On PowerPC, the above words only modify the scalar FPU's state (in FPSCR); the AltiVec state is currently not exposed." } ;
