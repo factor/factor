@@ -47,9 +47,9 @@ FUNCTION: void set_fp_control_register ( uint reg ) ;
 
 HOOK: exception-flag-bits    cpu ( -- bits )
 HOOK: exception-flag>bit     cpu ( -- assoc )
-HOOK: exception-enable-bits  cpu ( -- bits )
-HOOK: exception-enable>bit   cpu ( -- assoc )
-HOOK: >exception-enable      cpu ( mask -- enable )
+HOOK: fp-traps-bits  cpu ( -- bits )
+HOOK: fp-traps>bit   cpu ( -- assoc )
+HOOK: >fp-traps      cpu ( mask -- enable )
 HOOK: rounding-mode-bits     cpu ( -- bits )
 HOOK: rounding-mode>bit      cpu ( -- assoc )
 HOOK: denormal-mode-bits     cpu ( -- bits )
@@ -64,8 +64,8 @@ M: x86 exception-flag>bit
         { +fp-inexact+           HEX: 20 }
     } ;
 
-M: x86 exception-enable-bits HEX: 1f80 ;
-M: x86 exception-enable>bit
+M: x86 fp-traps-bits HEX: 1f80 ;
+M: x86 fp-traps>bit
     H{
         { +fp-invalid-operation+ HEX: 0080 }
         { +fp-overflow+          HEX: 0400 }
@@ -74,7 +74,7 @@ M: x86 exception-enable>bit
         { +fp-inexact+           HEX: 1000 }
     } ;
 
-M: x86 >exception-enable bitnot ;
+M: x86 >fp-traps bitnot ;
 
 M: x86 rounding-mode-bits HEX: 6000 ;
 M: x86 rounding-mode>bit
@@ -97,8 +97,8 @@ M: ppc exception-flag>bit
         { +fp-inexact+           HEX: 0200,0000 }
     } ;
 
-M: ppc exception-enable-bits HEX: f80 ;
-M: ppc exception-enable>bit
+M: ppc fp-traps-bits HEX: f80 ;
+M: ppc fp-traps>bit
     H{
         { +fp-invalid-operation+ HEX: 8000 }
         { +fp-overflow+          HEX: 4000 }
@@ -107,7 +107,7 @@ M: ppc exception-enable>bit
         { +fp-inexact+           HEX: 0800 }
     } ;
 
-M: ppc >exception-enable ;
+M: ppc >fp-traps ;
 
 M: ppc rounding-mode-bits HEX: 3 ;
 M: ppc rounding-mode>bit
@@ -135,10 +135,10 @@ M: ppc denormal-mode-bits HEX: 4 ;
 : (set-exception-flags) ( register exceptions -- register' )
     exception-flag>bit >mask exception-flag-bits remask ; inline
 
-: (get-exception-enable) ( register -- exceptions )
-    >exception-enable exception-enable>bit mask> ; inline
-: (set-exception-enable) ( register exceptions -- register' )
-    exception-enable>bit >mask >exception-enable exception-enable-bits remask ; inline
+: (get-fp-traps) ( register -- exceptions )
+    >fp-traps fp-traps>bit mask> ; inline
+: (set-fp-traps) ( register exceptions -- register' )
+    fp-traps>bit >mask >fp-traps fp-traps-bits remask ; inline
 
 : (get-rounding-mode) ( register -- mode )
     rounding-mode-bits mask rounding-mode>bit value-at ; inline
@@ -156,26 +156,23 @@ M: ppc denormal-mode-bits HEX: 4 ;
 : change-control-register ( quot -- )
     get_fp_control_register swap call set_fp_control_register ; inline
 
-: get-exception-enable ( -- exceptions ) get_fp_control_register (get-exception-enable) ;
-: set-exception-enable ( exceptions -- ) [ (set-exception-enable) ] curry change-control-register ;
-: get-rounding-mode ( -- rounding-mode ) get_fp_control_register (get-rounding-mode) ;
+: set-fp-traps ( exceptions -- ) [ (set-fp-traps) ] curry change-control-register ;
 : set-rounding-mode ( exceptions -- ) [ (set-rounding-mode) ] curry change-control-register ;
-: get-denormal-mode ( -- ? ) get_fp_control_register (get-denormal-mode) ;
-: set-denormal-mode ( ? -- ) [ (set-denormal-mode) ] curry change-control-register ;
+: set-denormal-mode ( mode -- ) [ (set-denormal-mode) ] curry change-control-register ;
 
-: get-fp-env ( -- exception-flags exception-enable rounding-mode denormals? )
+: get-fp-env ( -- exception-flags fp-traps rounding-mode denormals? )
     get_fp_control_register {
         [ (get-exception-flags) ]
-        [ (get-exception-enable) ]
+        [ (get-fp-traps) ]
         [ (get-rounding-mode) ]
         [ (get-denormal-mode) ]
     } cleave ;
 
-: set-fp-env ( exception-flags exception-enable rounding-mode denormal-mode -- )
+: set-fp-env ( exception-flags fp-traps rounding-mode denormal-mode -- )
     [
         {
             [ [ (set-exception-flags) ] when* ]
-            [ [ (set-exception-enable) ] when* ]
+            [ [ (set-fp-traps) ] when* ]
             [ [ (set-rounding-mode) ] when* ]
             [ [ (set-denormal-mode) ] when* ]
         } spread
@@ -190,20 +187,26 @@ PRIVATE>
 : collect-fp-exceptions ( quot -- exceptions )
     clear-fp-exception-flags call fp-exception-flags ; inline
 
+: denormal-mode ( -- mode ) get_fp_control_register (get-denormal-mode) ;
+
 :: with-denormal-mode ( mode quot -- )
-    get-denormal-mode :> orig
+    denormal-mode :> orig
     mode set-denormal-mode
     quot [ orig set-denormal-mode ] [ ] cleanup ; inline
 
+: rounding-mode ( -- mode ) get_fp_control_register (get-rounding-mode) ;
+
 :: with-rounding-mode ( mode quot -- )
-    get-rounding-mode :> orig
+    rounding-mode :> orig
     mode set-rounding-mode
     quot [ orig set-rounding-mode ] [ ] cleanup ; inline
 
+: fp-traps ( -- exceptions ) get_fp_control_register (get-fp-traps) ;
+
 :: with-fp-traps ( exceptions quot -- )
-    get-exception-enable :> orig
-    exceptions set-exception-enable
-    quot [ orig set-exception-enable ] [ ] cleanup ; inline
+    fp-traps :> orig
+    exceptions set-fp-traps
+    quot [ orig set-fp-traps ] [ ] cleanup ; inline
 
 : without-fp-traps ( quot -- )
     { } swap with-fp-traps ; inline
