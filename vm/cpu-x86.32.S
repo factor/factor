@@ -68,6 +68,16 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
 	add $12,%esp
 	jmp *%eax
 
+DEF(unsigned,get_fp_control_register,(void)):
+    push %eax
+    stmxcsr (%esp)
+    pop %eax
+    ret
+
+DEF(void,set_fp_control_register,(unsigned reg)):
+    ldmxcsr 4(%esp)
+    ret
+
 #include "cpu-x86.S"
 
 #ifdef WINDOWS
