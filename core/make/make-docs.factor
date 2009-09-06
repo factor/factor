@@ -23,7 +23,7 @@ $nl
 "and"
 { $code "[ [ reverse % ] each ] \"\" make" }
 "is equivalent to"
-{ $code "[ [ reverse ] map concat" }
+{ $code "[ reverse ] map concat" }
 { $heading "Utilities for simple make patterns" }
 "Sometimes, an existing word already implements a specific " { $link make } " usage. For example, " { $link suffix } " is equivalent to the following, with the added caveat that the below example always outputs an array:"
 { $code "[ , % ] { } make" }
