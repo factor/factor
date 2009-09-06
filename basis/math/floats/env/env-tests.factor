@@ -13,12 +13,12 @@ IN: math.floats.env.tests
 ] unit-test
 
 [ t ] [
-    [ 2.0 100000.0 ^ drop ] collect-fp-exceptions
+    [ 2.0 100,000.0 ^ drop ] collect-fp-exceptions
     { +fp-inexact+ +fp-overflow+ } set= 
 ] unit-test
 
 [ t ] [
-    [ 2.0 -100000.0 ^ drop ] collect-fp-exceptions
+    [ 2.0 -100,000.0 ^ drop ] collect-fp-exceptions
     { +fp-inexact+ +fp-underflow+ } set= 
 ] unit-test
 
@@ -121,3 +121,11 @@ IN: math.floats.env.tests
     ] with-denormal-mode
 ] unit-test
 
+[ { +fp-zero-divide+ }       [ 1.0 0.0 /f ] with-fp-traps ] must-fail
+[ { +fp-inexact+ }           [ 1.0 3.0 /f ] with-fp-traps ] must-fail
+[ { +fp-invalid-operation+ } [ -1.0 fsqrt ] with-fp-traps ] must-fail
+[ { +fp-overflow+ }          [ 2.0  100,000.0 ^ ] with-fp-traps ] must-fail
+[ { +fp-underflow+ }         [ 2.0 -100,000.0 ^ ] with-fp-traps ] must-fail
+
+! Ensure traps get cleared
+[ 1/0. ] [ 1.0 0.0 /f ] unit-test
