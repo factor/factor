@@ -110,8 +110,11 @@ struct factorvmdata {
 		  collecting_aging_again(false),
 		  growing_data_heap(false),
 		  fep_disabled(false),
-		  full_output(false)
-	{}
+		  full_output(false),
+		  max_pic_size(0)
+	{
+		memset(this,0,sizeof(this)); // just to make sure
+	}
 
 };
 
