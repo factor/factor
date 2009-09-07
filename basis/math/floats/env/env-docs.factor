@@ -122,6 +122,6 @@ $nl
 { $subsection denormal-mode }
 { $subsection with-denormal-mode }
 { $notes
-"On x86, the above words only modify the SSE unit's state (in particular, the MXCSR register); the x87 unit is ignored by Factor and unaffected by " { $snippet "math.float.env" } ". On PowerPC, the above words only modify the scalar FPU's state (in FPSCR); the AltiVec state is currently not exposed." } ;
+"On x86, the above words only modify the SSE unit's state (in particular, the MXCSR register); the x87 unit is unaffected. On PowerPC, the above words only modify the scalar FPU's state (in FPSCR); the AltiVec unit is unaffected." } ;
 
 ABOUT: "math.floats.env"
