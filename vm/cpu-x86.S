@@ -21,7 +21,7 @@ DEF(void,primitive_fixnum_subtract,(void *myvm)):
 	ret
 
 DEF(void,primitive_fixnum_multiply,(void *myvm)):
-	mov ARG0, ARG2  /* save vm ptr for overflow */	
+	push ARG0  /* save vm ptr for overflow */
 	mov (DS_REG),ARITH_TEMP_1
 	mov ARITH_TEMP_1,DIV_RESULT
 	mov -CELL_SIZE(DS_REG),ARITH_TEMP_2
@@ -30,13 +30,15 @@ DEF(void,primitive_fixnum_multiply,(void *myvm)):
 	imul ARITH_TEMP_2
 	jo multiply_overflow
 	mov DIV_RESULT,(DS_REG)
+	pop ARG2
 	ret
-
 multiply_overflow:
 	sar $3,ARITH_TEMP_1
 	mov ARITH_TEMP_1,ARG0
 	mov ARITH_TEMP_2,ARG1
+	pop ARG2
 	jmp MANGLE(overflow_fixnum_multiply)
+
 
 DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	PUSH_NONVOLATILE
