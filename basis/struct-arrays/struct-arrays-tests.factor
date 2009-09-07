@@ -1,6 +1,7 @@
 IN: struct-arrays.tests
 USING: classes.struct struct-arrays tools.test kernel math sequences
-alien.syntax alien.c-types destructors libc accessors sequences.private ;
+alien.syntax alien.c-types destructors libc accessors sequences.private
+compiler.tree.debugger ;
 
 STRUCT: test-struct-array
     { x int }
@@ -53,3 +54,9 @@ STRUCT: fixed-string { text char[100] } ;
 ] unit-test
 
 [ 10 "int" <struct-array> ] must-fail
+
+STRUCT: wig { x int } ;
+: <bacon> ( -- wig ) 0 wig <struct-boa> ; inline
+: waterfall ( -- a b ) 1 wig <struct-array> <bacon> swap first x>> ; inline
+
+[ t ] [ [ waterfall ] { x>> } inlined? ] unit-test
