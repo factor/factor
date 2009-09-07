@@ -53,7 +53,7 @@ DEF(void,primitive_inline_cache_miss,(void *vm)):
 	mov (%esp),%ebx
 DEF(void,primitive_inline_cache_miss_tail,(void *vm)):
 	sub $8,%esp
-	push %eax   /* push vm ptr */
+	push ARG0   /* push vm ptr */
 	push %ebx
 	call MANGLE(inline_cache_miss)
 	add $16,%esp
