@@ -79,10 +79,11 @@ DEF(long long,read_timestamp_counter,(void)):
 	or %rdx,%rax
 	ret
 
-DEF(void,primitive_inline_cache_miss,(void)):
+DEF(void,primitive_inline_cache_miss,(void *vm)):
 	mov (%rsp),%rbx
-DEF(void,primitive_inline_cache_miss_tail,(void)):
+DEF(void,primitive_inline_cache_miss_tail,(void *vm)):
 	sub $STACK_PADDING,%rsp
+	mov ARG0,ARG1
 	mov %rbx,ARG0
 	call MANGLE(inline_cache_miss)
 	add $STACK_PADDING,%rsp
