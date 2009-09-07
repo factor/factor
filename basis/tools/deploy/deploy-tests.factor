@@ -102,3 +102,7 @@ M: quit-responder call-responder*
 os windows? os macosx? or [
     [ ] [ "tools.deploy.test.8" shake-and-bake run-temp-image ] unit-test
 ] when
+
+os macsx? [
+    [ ] [ "tools.deploy.test.14" shake-and-bake run-temp-image ] unit-test
+] when
