@@ -316,6 +316,11 @@ STRUCT: struct-test-optimization
 
 [ f ] [ [ memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 
+[ t ] [
+    [ struct-test-optimization <struct> struct-test-optimization <struct> [ x>> ] bi@ ]
+    { x>> } inlined?
+] unit-test
+
 ! Test cloning structs
 STRUCT: clone-test-struct { x int } { y char[3] } ;
 
@@ -340,3 +345,4 @@ STRUCT: struct-that's-a-word { x int } ;
 : struct-that's-a-word ( -- ) "OOPS" throw ;
 
 [ -77 ] [ S{ struct-that's-a-word { x -77 } } clone x>> ] unit-test
+

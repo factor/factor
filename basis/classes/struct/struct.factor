@@ -42,11 +42,9 @@ M: struct hashcode*
 : struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
 
 : memory>struct ( ptr class -- struct )
-    [ 1array ] dip slots>tuple ;
-
-\ memory>struct [
-    dup struct-class? [ '[ _ boa ] ] [ drop f ] if
-] 1 define-partial-eval
+    ! This is sub-optimal if the class is not literal, but gets
+    ! optimized down to efficient code if it is.
+    '[ _ boa ] call( ptr -- struct ) ; inline
 
 <PRIVATE
 : (init-struct) ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
