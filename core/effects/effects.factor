@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.parser math.order namespaces make sequences strings
-words assocs combinators accessors arrays ;
+words assocs combinators accessors arrays quotations ;
 IN: effects
 
 TUPLE: effect { in read-only } { out read-only } { terminated? read-only } ;
@@ -53,6 +53,13 @@ M: effect effect>string ( effect -- string )
         ")" %
     ] "" make ;
 
+GENERIC: effect>type ( obj -- type )
+M: object effect>type drop object ;
+M: word effect>type ;
+! attempting to specialize on callable breaks compiling
+! M: effect effect>type drop callable ;
+M: pair effect>type second effect>type ;
+
 GENERIC: stack-effect ( word -- effect/f )
 
 M: word stack-effect "declared-effect" word-prop ;
@@ -87,3 +94,8 @@ M: effect clone
         [ [ [ "obj" ] replicate ] bi@ ] dip
         effect boa
     ] if ; inline
+
+: effect-in-types ( effect -- input-types )
+    in>> [ effect>type ] map ;
+: effect-out-types ( effect -- input-types )
+    out>> [ effect>type ] map ;
