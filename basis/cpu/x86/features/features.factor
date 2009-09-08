@@ -40,7 +40,7 @@ USING: cpu.x86.features cpu.x86.features.private ;
         sse-version version < [
             "This image was built to use " write
             version sse-string write
-            " but your CPU supports " write
+            " but your CPU only supports " write
             sse-version sse-string write "." print
             "You will need to bootstrap Factor again." print
             flush
