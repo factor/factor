@@ -39,7 +39,7 @@ M: word print-stack-effect? drop t ;
 
 : stack-effect. ( word -- )
     [ print-stack-effect? ] [ stack-effect ] bi and
-    [ effect>string comment. ] when* ;
+    [ pprint-effect ] when* ;
 
 <PRIVATE
 
