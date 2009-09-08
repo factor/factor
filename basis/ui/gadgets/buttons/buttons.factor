@@ -119,24 +119,9 @@ PRIVATE>
         [ append theme-image ] tri-curry@ tri
     ] 2dip <tile-pen> ;
 
-CONSTANT: button-background
-    T{ rgba
-         f
-         0.8901960784313725
-         0.8862745098039215
-         0.8588235294117647
-         1.0
-    }
+CONSTANT: button-background COLOR: FactorLightTan
+CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
 
-CONSTANT: button-clicked-background
-    T{ rgba
-         f
-         0.2156862745098039
-         0.2431372549019608
-         0.2823529411764706
-         1.0
-    }
-    
 : <border-button-pen> ( -- pen )
     "button" button-background button-clicked-background
     <border-button-state-pen> dup

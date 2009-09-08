@@ -8,12 +8,12 @@ IN: ui.gadgets.status-bar
 
 : status-bar-font ( -- font )
     sans-serif-font clone
-    T{ rgba f 0.216 0.243 0.282 1.0 } >>background
+    COLOR: FactorDarkSlateBlue >>background
     COLOR: white >>foreground ;
 
 : status-bar-theme ( label -- label )
     status-bar-font >>font
-    T{ rgba f 0.216 0.243 0.282 1.0 } <solid> >>interior ;
+    COLOR: FactorDarkSlateBlue <solid> >>interior ;
 
 : <status-bar> ( model -- gadget )
     1/10 seconds <delay> [ "" like ] <arrow> <label-control>

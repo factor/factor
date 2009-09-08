@@ -33,8 +33,8 @@ H{
     { font-size 18 }
     { font-style bold }
     { wrap-margin 500 }
-    { foreground T{ rgba f 0.216 0.243 0.282 1.0 } }
-    { page-color T{ rgba f 0.94 0.94 0.91 1.0 } }
+    { foreground COLOR: FactorDarkSlateBlue }
+    { page-color COLOR: FactorLightTan }
     { border-width 5 }
 } title-style set-global
 
@@ -70,7 +70,7 @@ H{
 
 SYMBOL: code-style
 H{
-    { page-color T{ rgba f 0.94 0.94 0.91 1.0 } }
+    { page-color COLOR: FactorLightTan }
     { border-width 5 }
     { wrap-margin f }
 } code-style set-global
@@ -81,7 +81,7 @@ H{ { font-style bold } } input-style set-global
 SYMBOL: url-style
 H{
     { font-name "monospace" }
-    { foreground COLOR: blue }
+    { foreground COLOR: DodgerBlue4 }
 } url-style set-global
 
 SYMBOL: warning-style
@@ -108,7 +108,7 @@ H{
 SYMBOL: table-style
 H{
     { table-gap { 5 5 } }
-    { table-border T{ rgba f 0.94 0.94 0.91 1.0 } }
+    { table-border COLOR: FactorLightTan }
 } table-style set-global
 
 SYMBOL: list-style
