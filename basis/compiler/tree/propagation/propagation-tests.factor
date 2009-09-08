@@ -799,3 +799,6 @@ SYMBOL: not-an-assoc
 
 [ t ] [ [ (( a b c -- c b a )) shuffle ] { shuffle } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap shuffle ] { shuffle } inlined? ] unit-test
+
+! Don't crash if bad literal inputs are passed to unsafe words
+[ f ] [ [ { } 1 fixnum+fast ] final-info first literal?>> ] unit-test
