@@ -11,7 +11,7 @@ ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
 ui.gadgets.icons ui.gadgets.grid-lines ui.baseline-alignment
 colors io.styles ;
-FROM: io.styles => foreground background shadow ;
+FROM: io.styles => foreground background ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < track
@@ -199,12 +199,11 @@ MEMO: specified-font ( assoc -- font )
         [ font-size swap at >>size ]
         [ foreground swap at >>foreground ]
         [ background swap at >>background ]
-        [ shadow swap at >>shadow ]
     } cleave
     derive-font ;
 
 : apply-font-style ( style gadget -- style gadget )
-    { font-name font-style font-size foreground background shadow }
+    { font-name font-style font-size foreground background }
     pick extract-keys specified-font >>font ;
 
 : apply-style ( style gadget key quot -- style gadget )
