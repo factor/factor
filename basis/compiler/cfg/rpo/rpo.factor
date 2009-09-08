@@ -33,3 +33,13 @@ SYMBOL: visited
 
 : each-basic-block ( cfg quot -- )
     [ reverse-post-order ] dip each ; inline
+
+: optimize-basic-block ( bb quot -- )
+    [ drop basic-block set ]
+    [ change-instructions drop ] 2bi ; inline
+
+: local-optimization ( cfg quot: ( insns -- insns' ) -- cfg' )
+    dupd '[ _ optimize-basic-block ] each-basic-block ; inline
+
+: needs-post-order ( cfg -- cfg' )
+    dup post-order drop ;

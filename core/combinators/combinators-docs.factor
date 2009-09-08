@@ -275,7 +275,7 @@ $nl
 "The simplest combinators do not take an effect declaration. The compiler checks the stack effect at compile time, rejecting the program if this cannot be done:"
 { $subsection call }
 { $subsection execute }
-"The second set of combinators takes an effect declaration. The stack effect of the quotation or word is checked at runtime:"
+"The second set of combinators takes an effect declaration. Note that the opening parenthesis is actually part of the word name; these are parsing words, and they read a stack effect until the corresponding closing parenthesis. The stack effect of the quotation or word is then checked at runtime:"
 { $subsection POSTPONE: call( }
 { $subsection POSTPONE: execute( }
 "The above are syntax sugar. The underlying words are a bit more verbose but allow non-constant effects to be passed in:"
@@ -303,11 +303,25 @@ ABOUT: "combinators"
 
 HELP: call-effect
 { $values { "quot" quotation } { "effect" effect } }
-{ $description "Given a quotation and a stack effect, calls the quotation, asserting at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary quotation which is not required at compile time." } ;
+{ $description "Given a quotation and a stack effect, calls the quotation, asserting at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary quotation which is not required at compile time." }
+{ $examples
+  "The following two lines are equivalent:"
+  { $code
+    "call( a b -- c )"
+    "(( a b -- c )) call-effect"
+  }
+} ;
 
 HELP: execute-effect
 { $values { "word" word } { "effect" effect } }
-{ $description "Given a word and a stack effect, executes the word, asserting at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary word which is not required at compile time." } ;
+{ $description "Given a word and a stack effect, executes the word, asserting at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary word which is not required at compile time." }
+{ $examples
+  "The following two lines are equivalent:"
+  { $code
+    "execute( a b -- c )"
+    "(( a b -- c )) execute-effect"
+  }
+} ;
 
 HELP: execute-effect-unsafe
 { $values { "word" word } { "effect" effect } }
@@ -353,6 +367,22 @@ HELP: spread
 } ;
 
 { bi* tri* spread } related-words
+
+HELP: to-fixed-point
+{ $values { "object" object } { "quot" { $quotation "( object(n) -- object(n+1) )" } } { "object(n)" object } }
+{ $description "Applies the quotation repeatedly with " { $snippet "object" } " as the initial input until the output of the quotation equals the input." }
+{ $examples
+    { $example
+        "USING: combinators kernel math prettyprint sequences ;"
+        "IN: scratchpad"
+        ": flatten ( sequence -- sequence' )"
+        "    \"flatten\" over index"
+        "    [ [ 1 + swap nth ] [ nip dup 2 + ] [ drop ] 2tri replace-slice ] when* ;"
+        ""
+        "{ \"flatten\" { 1 { 2 3 } \"flatten\" { 4 5 } { 6 } } } [ flatten ] to-fixed-point ."
+        "{ 1 { 2 3 } 4 5 { 6 } }"
+    }
+} ;
 
 HELP: alist>quot
 { $values { "default" "a quotation" } { "assoc" "a sequence of quotation pairs" } { "quot" "a new quotation" } }
@@ -418,7 +448,7 @@ HELP: cond>quot
 { $values { "assoc" "a sequence of pairs of quotations" } { "quot" quotation } }
 { $description  "Creates a quotation that when called, has the same effect as applying " { $link cond } " to " { $snippet "assoc" } "."
 $nl
-"the generated quotation is more efficient than the naive implementation of " { $link cond } ", though, since it expands into a series of conditionals, and no iteration through " { $snippet "assoc" } " has to be performed." }
+"The generated quotation is more efficient than the naive implementation of " { $link cond } ", though, since it expands into a series of conditionals, and no iteration through " { $snippet "assoc" } " has to be performed." }
 { $notes "This word is used behind the scenes to compile " { $link cond } " forms efficiently; it can also be called directly,  which is useful for meta-programming." } ;
 
 HELP: case>quot

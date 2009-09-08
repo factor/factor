@@ -1,7 +1,7 @@
-IN: classes.tuple.parser.tests
 USING: accessors classes.tuple.parser lexer words classes
 sequences math kernel slots tools.test parser compiler.units
-arrays classes.tuple eval ;
+arrays classes.tuple eval multiline ;
+IN: classes.tuple.parser.tests
 
 TUPLE: test-1 ;
 
@@ -142,3 +142,14 @@ TUPLE: parsing-corner-case x ;
         "    x 3 }"
     } "\n" join eval( -- tuple )
 ] [ error>> unexpected-eof? ] must-fail-with
+
+TUPLE: bad-inheritance-tuple ;
+[
+    "IN: classes.tuple.parser.tests TUPLE: bad-inheritance-tuple < bad-inheritance-tuple ;" eval( -- )
+] [ error>> bad-inheritance? ] must-fail-with
+
+TUPLE: bad-inheritance-tuple2 ;
+TUPLE: bad-inheritance-tuple3 < bad-inheritance-tuple2 ;
+[
+    "IN: classes.tuple.parser.tests TUPLE: bad-inheritance-tuple2 < bad-inheritance-tuple3 ;" eval( -- )
+] [ error>> bad-inheritance? ] must-fail-with

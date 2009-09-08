@@ -3,10 +3,7 @@ combinators.short-circuit fry kernel math math.blas.ffi
 math.complex math.functions math.order sequences sequences.private
 functors words locals parser prettyprint.backend prettyprint.custom
 specialized-arrays.float specialized-arrays.double
-specialized-arrays.direct.float specialized-arrays.direct.double
-specialized-arrays.complex-float specialized-arrays.complex-double
-specialized-arrays.direct.complex-float
-specialized-arrays.direct.complex-double ;
+specialized-arrays.complex-float specialized-arrays.complex-double ;
 IN: math.blas.vectors
 
 TUPLE: blas-vector-base underlying length inc ;
@@ -99,12 +96,12 @@ PRIVATE>
     length v inc>> v (blas-vector-like) ;
 
 : <zero-vector> ( exemplar -- zero )
-    [ element-type <c-object> ]
+    [ element-type heap-size <byte-array> ]
     [ length>> 0 ]
     [ (blas-vector-like) ] tri ;
 
 : <empty-vector> ( length exemplar -- vector )
-    [ element-type <c-array> ]
+    [ element-type heap-size * <byte-array> ]
     [ 1 swap ] 2bi
     (blas-vector-like) ;
 

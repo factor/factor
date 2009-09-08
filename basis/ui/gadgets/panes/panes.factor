@@ -96,10 +96,6 @@ M: pane selected-children
         add-incremental
     ] [ next-line ] bi ;
 
-: ?pane-nl ( pane -- )
-    [ dup current>> children>> empty? [ pane-nl ] [ drop ] if ]
-    [ pane-nl ] bi ;
-
 : smash-pane ( pane -- gadget ) [ pane-nl ] [ output>> smash-line ] bi ;
 
 : pane-write ( seq pane -- )
@@ -401,8 +397,8 @@ M: f sloppy-pick-up*
     ] [ drop ] if ;
 
 : end-selection ( pane -- )
-    f >>selecting?
-    hand-moved?
+    dup selecting?>> hand-moved? or
+    [ f >>selecting? ] dip
     [ [ com-copy-selection ] [ request-focus ] bi ]
     [ [ relayout-1 ] [ focus-input ] bi ]
     if ;

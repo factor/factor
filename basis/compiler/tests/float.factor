@@ -1,6 +1,6 @@
-IN: compiler.tests.float
 USING: compiler.units compiler kernel kernel.private memory math
 math.private tools.test math.floats.private ;
+IN: compiler.tests.float
 
 [ 5.0 ] [ [ 5.0 ] compile-call gc gc gc ] unit-test
 [ 2.0 3.0 ] [ 3.0 [ 2.0 swap ] compile-call ] unit-test
@@ -83,3 +83,8 @@ math.private tools.test math.floats.private ;
 [ f ] [ 3.0 [ dup 0.0 float= swap -0.0 float= or ] compile-call ] unit-test
 
 [ 315 315.0 ] [ 313 [ 2 fixnum+fast dup fixnum>float ] compile-call ] unit-test
+
+[ 17.5 ] [ -11.3 17.5 [ float-max ] compile-call ] unit-test
+[ 17.5 ] [ 17.5 -11.3 [ float-max ] compile-call ] unit-test
+[ -11.3 ] [ -11.3 17.5 [ float-min ] compile-call ] unit-test
+[ -11.3 ] [ 17.5 -11.3 [ float-min ] compile-call ] unit-test

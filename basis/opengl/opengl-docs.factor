@@ -1,5 +1,5 @@
 USING: alien help.markup help.syntax io kernel math quotations
-opengl.gl assocs vocabs.loader sequences accessors colors ;
+opengl.gl assocs vocabs.loader sequences accessors colors words ;
 IN: opengl
 
 HELP: gl-color
@@ -8,7 +8,7 @@ HELP: gl-color
 { $notes "See " { $link "colors" } "." } ;
 
 HELP: gl-error
-{ $description "If the most recent OpenGL call resulted in an error, print the error to " { $link output-stream } "." } ;
+{ $description "If the most recent OpenGL call resulted in an error, throw a " { $snippet "gl-error" } " instance reporting the error." } ;
 
 HELP: do-enabled
 { $values { "what" integer } { "quot" quotation } }
@@ -45,7 +45,7 @@ HELP: bind-texture-unit
 { $description "Binds texture " { $snippet "id" } " to texture target " { $snippet "target" } " of texture unit " { $snippet "unit" } ". Equivalent to " { $snippet "unit glActiveTexture target id glBindTexture" } "." } ;
 
 HELP: set-draw-buffers
-{ $values { "buffers" "A sequence of buffer words (e.g. " { $snippet "GL_BACK" } ", " { $snippet "GL_COLOR_ATTACHMENT0_EXT" } ")"} }
+{ $values { "buffers" "A sequence of buffer words (e.g. " { $snippet "GL_BACK" } ", " { $snippet "GL_COLOR_ATTACHMENT0" } ")"} }
 { $description "Wrapper for " { $link glDrawBuffers } ". Sets up the buffers named in the sequence for simultaneous drawing." } ;
 
 HELP: do-attribs
@@ -73,6 +73,8 @@ ARTICLE: "gl-utilities" "OpenGL utility words"
 $nl
 "The " { $vocab-link "opengl.gl" } " and " { $vocab-link "opengl.glu" } " vocabularies have the actual OpenGL bindings."
 { $subsection "opengl-low-level" }
+"Error reporting:"
+{ $subsection gl-error }
 "Wrappers:"
 { $subsection gl-color }
 { $subsection gl-translate }

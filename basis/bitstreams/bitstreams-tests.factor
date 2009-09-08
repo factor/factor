@@ -5,7 +5,6 @@ grouping compression.lzw multiline byte-arrays io.encodings.binary
 io.streams.byte-array ;
 IN: bitstreams.tests
 
-
 [ BIN: 1111111111 ]
 [
     B{ HEX: 0f HEX: ff HEX: ff HEX: ff } <msb0-bit-reader>

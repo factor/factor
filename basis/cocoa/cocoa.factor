@@ -60,6 +60,7 @@ SYNTAX: IMPORT: scan [ ] import-objc-class ;
         "NSOpenGLPixelFormat"
         "NSOpenGLView"
         "NSOpenPanel"
+        "NSPanel"
         "NSPasteboard"
         "NSPropertyListSerialization"
         "NSResponder"

@@ -36,9 +36,6 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
 : max-descent ( seq -- n )
     [ descent>> ] map ?supremum ;
 
-: max-text-height ( seq -- y )
-    [ ascent>> ] filter [ height>> ] map ?supremum ;
-
 : max-graphics-height ( seq -- y )
     [ ascent>> not ] filter [ height>> ] map ?supremum 0 or ;
 

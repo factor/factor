@@ -5,7 +5,7 @@ USING: arrays sequences alien alien.c-types alien.destructors
 alien.syntax math math.functions math.vectors destructors combinators
 colors fonts accessors assocs namespaces kernel pango pango.fonts
 pango.cairo cairo cairo.ffi glib unicode.data images cache init
-math.rectangles fry memoize io.encodings.utf8 ;
+math.rectangles fry memoize io.encodings.utf8 classes.struct ;
 IN: pango.layouts
 
 LIBRARY: pango
@@ -60,7 +60,7 @@ pango_layout_iter_free ( PangoLayoutIter* iter ) ;
 
 DESTRUCTOR: pango_layout_iter_free
 
-TUPLE: layout font string selection layout metrics ink-rect logical-rect image disposed ;
+TUPLE: layout < disposable font string selection layout metrics ink-rect logical-rect image ;
 
 SYMBOL: dpi
 
@@ -84,8 +84,8 @@ SYMBOL: dpi
     [ set-layout-text ] keep ;
 
 : layout-extents ( layout -- ink-rect logical-rect )
-    "PangoRectangle" <c-object>
-    "PangoRectangle" <c-object>
+    PangoRectangle <struct>
+    PangoRectangle <struct>
     [ pango_layout_get_extents ] 2keep
     [ PangoRectangle>rect ] bi@ ;
 
@@ -186,7 +186,7 @@ MEMO: missing-font-metrics ( font -- metrics )
 
 : <layout> ( font string -- line )
     [
-        layout new
+        layout new-disposable
             swap unpack-selection
             swap >>font
             dup [ string>> ] [ font>> ] bi <PangoLayout> >>layout

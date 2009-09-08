@@ -72,9 +72,6 @@ SYMBOL: table
 : connect ( class1 class2 -- ) 1 set-table ;
 : disconnect ( class1 class2 -- ) 0 set-table ;
   
-: break-around ( classes1 classes2 -- )
-    [ disconnect ] [ swap disconnect ] 2bi ;
-
 : make-grapheme-table ( -- )
     { CR } { LF } connect
     { Control CR LF } graphemes disconnect
@@ -91,15 +88,12 @@ VALUE: grapheme-table
 : grapheme-break? ( class1 class2 -- ? )
     grapheme-table nth nth not ;
 
-: chars ( i str n -- str[i] str[i+n] )
-    swap [ dupd + ] dip [ ?nth ] curry bi@ ;
-
 PRIVATE>
 
 : first-grapheme ( str -- i )
     unclip-slice grapheme-class over
     [ grapheme-class [ nip ] [ grapheme-break? ] 2bi ] find drop
-    nip swap length or 1+ ;
+    nip swap length or 1 + ;
 
 : first-grapheme-from ( start str -- i )
     over tail-slice first-grapheme + ;
@@ -198,13 +192,13 @@ to: word-table
     swap [ format/extended? not ] find-from drop ;
 
 : walk-up ( str i -- j )
-    dupd 1+ (walk-up) [ 1+ (walk-up) ] [ drop f ] if* ;
+    dupd 1 + (walk-up) [ 1 + (walk-up) ] [ drop f ] if* ;
 
 : (walk-down) ( str i -- j )
     swap [ format/extended? not ] find-last-from drop ;
 
 : walk-down ( str i -- j )
-    dupd (walk-down) [ 1- (walk-down) ] [ drop f ] if* ;
+    dupd (walk-down) [ 1 - (walk-down) ] [ drop f ] if* ;
 
 : word-break? ( str i table-entry -- ? )
     {
@@ -232,7 +226,7 @@ PRIVATE>
 : first-word ( str -- i )
     [ unclip-slice word-break-prop over <enum> ] keep
     '[ swap _ word-break-next ] assoc-find 2drop
-    nip swap length or 1+ ;
+    nip swap length or 1 + ;
 
 : >words ( str -- words )
     [ first-word ] >pieces ;
@@ -240,7 +234,7 @@ PRIVATE>
 <PRIVATE
 
 : nth-next ( i str -- str[i-1] str[i] )
-    [ [ 1- ] keep ] dip '[ _ nth ] bi@ ;
+    [ [ 1 - ] keep ] dip '[ _ nth ] bi@ ;
 
 PRIVATE>
 
@@ -253,3 +247,12 @@ PRIVATE>
             word-break-next nip
         ]
     } 2|| ;
+
+: first-word-from ( start str -- i )
+    over tail-slice first-word + ;
+
+: last-word ( str -- i )
+    [ length ] keep '[ _ word-break-at? ] find-last drop 0 or ;
+
+: last-word-from ( end str -- i )
+    swap head-slice last-word ;

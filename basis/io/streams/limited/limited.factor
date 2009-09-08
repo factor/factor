@@ -98,5 +98,8 @@ PRIVATE>
 M: limited-stream stream-read-until
     swap BV{ } clone (read-until) [ 2nip B{ } like ] dip ;
 
+M: limited-stream stream-seek
+    stream>> stream-seek ;
+
 M: limited-stream dispose
     stream>> dispose ;

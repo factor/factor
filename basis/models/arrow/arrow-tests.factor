@@ -4,7 +4,7 @@ IN: models.arrow.tests
 
 3 <model> "x" set
 "x" get [ 2 * ] <arrow> dup "z" set
-[ 1+ ] <arrow> "y" set
+[ 1 + ] <arrow> "y" set
 [ ] [ "y" get activate-model ] unit-test
 [ t ] [ "z" get "x" get connections>> memq? ] unit-test
 [ 7 ] [ "y" get value>> ] unit-test

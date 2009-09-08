@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.syntax assocs help.markup
-help.syntax io.backend kernel namespaces ;
+help.syntax io.backend kernel namespaces strings ;
 IN: alien.libraries
 
 HELP: <library>
@@ -15,7 +15,7 @@ HELP: libraries
 { $description "A global hashtable that keeps a list of open libraries. Use the " { $link add-library } " word to construct a library and add it with a single call." } ;
 
 HELP: library
-{ $values { "name" "a string" } { "library" assoc } }
+{ $values { "name" string } { "library" assoc } }
 { $description "Looks up a library by its logical name. The library object is a hashtable with the following keys:"
     { $list
         { { $snippet "name" } " - the full path of the C library binary" }
@@ -40,11 +40,11 @@ HELP: dlclose ( dll -- )
 { $description "Closes a DLL handle created by " { $link dlopen } ". This word might not be implemented on all platforms." } ;
 
 HELP: load-library
-{ $values { "name" "a string" } { "dll" "a DLL handle" } }
+{ $values { "name" string } { "dll" "a DLL handle" } }
 { $description "Loads a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } ". If the library is already loaded, returns the existing handle." } ;
 
 HELP: add-library
-{ $values { "name" "a string" } { "path" "a string" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
+{ $values { "name" string } { "path" string } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
 { $description "Defines a new logical library named " { $snippet "name" } " located in the file system at " { $snippet "path" } "and the specified ABI." }
 { $notes "Because the entire source file is parsed before top-level forms are executed, " { $link add-library } " cannot be used in the same file as " { $link POSTPONE: FUNCTION: } " definitions from that library. The " { $link add-library } " call will happen too late, after compilation, and the alien calls will not work."
 $nl
@@ -59,9 +59,14 @@ $nl
 }
 "Note the parse time evaluation with " { $link POSTPONE: << } "." } ;
 
+HELP: remove-library
+{ $values { "name" string } }
+{ $description "Unloads a library and removes it from the internal list of libraries. The " { $snippet "name" } " parameter should be a name that was previously passed to " { $link add-library } ". If no library with that name exists, this word does nothing." } ;
+
 ARTICLE: "loading-libs" "Loading native libraries"
 "Before calling a C library, you must associate its path name on disk with a logical name which Factor uses to identify the library:"
 { $subsection add-library }
+{ $subsection remove-library }
 "Once a library has been defined, you can try loading it to see if the path name is correct:"
 { $subsection load-library }
 "If the compiler cannot load a library, or cannot resolve a symbol in a library, a linkage error is reported using the compiler error mechanism (see " { $link "compiler-errors" } "). Once you install the right library, reload the source file containing the " { $link add-library } " form to force the compiler to try loading the library again." ;

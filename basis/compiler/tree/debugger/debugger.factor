@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
@@ -11,11 +11,16 @@ compiler.tree.normalization
 compiler.tree.cleanup
 compiler.tree.propagation
 compiler.tree.propagation.info
+compiler.tree.escape-analysis
+compiler.tree.tuple-unboxing
 compiler.tree.def-use
 compiler.tree.builder
 compiler.tree.optimizer
 compiler.tree.combinators
-compiler.tree.checker ;
+compiler.tree.checker
+compiler.tree.identities
+compiler.tree.dead-code
+compiler.tree.modular-arithmetic ;
 FROM: fry => _ ;
 RENAME: _ match => __
 IN: compiler.tree.debugger
@@ -151,7 +156,7 @@ SYMBOL: node-count
         H{ } clone intrinsics-called set
 
         0 swap [
-            [ 1+ ] dip
+            [ 1 + ] dip
             dup #call? [
                 word>> {
                     { [ dup "intrinsic" word-prop ] [ intrinsics-called ] }
@@ -201,8 +206,18 @@ SYMBOL: node-count
 
 : cleaned-up-tree ( quot -- nodes )
     [
-        check-optimizer? on
-        build-tree optimize-tree 
+        build-tree
+        analyze-recursive
+        normalize
+        propagate
+        cleanup
+        escape-analysis
+        unbox-tuples
+        apply-identities
+        compute-def-use
+        remove-dead-code
+        compute-def-use
+        optimize-modular-arithmetic 
     ] with-scope ;
 
 : inlined? ( quot seq/word -- ? )

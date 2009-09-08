@@ -27,46 +27,63 @@ TUPLE: bit-array
     [ [ length bits>cells ] keep ] dip swap underlying>>
     '[ 2 shift [ _ _ ] dip set-alien-unsigned-4 ] each ; inline
 
+: clean-up ( bit-array -- )
+    ! Zero bits after the end.
+    dup underlying>> empty? [ drop ] [
+        [
+            [ underlying>> length 8 * ] [ length ] bi -
+            8 swap - -1 swap shift bitnot
+        ]
+        [ underlying>> last bitand ]
+        [ underlying>> set-last ]
+        tri
+    ] if ; inline
+
 PRIVATE>
 
 : <bit-array> ( n -- bit-array )
     dup bits>bytes <byte-array> bit-array boa ; inline
 
-M: bit-array length length>> ;
+M: bit-array length length>> ; inline
 
 M: bit-array nth-unsafe
-    [ >fixnum ] [ underlying>> ] bi* byte/bit bit? ;
+    [ >fixnum ] [ underlying>> ] bi* byte/bit bit? ; inline
 
 M: bit-array set-nth-unsafe
     [ >fixnum ] [ underlying>> ] bi*
     [ byte/bit set-bit ] 2keep
-    swap n>byte set-alien-unsigned-1 ;
+    swap n>byte set-alien-unsigned-1 ; inline
 
-: clear-bits ( bit-array -- ) 0 (set-bits) ;
+GENERIC: clear-bits ( bit-array -- )
 
-: set-bits ( bit-array -- ) -1 (set-bits) ;
+M: bit-array clear-bits 0 (set-bits) ; inline
+
+GENERIC: set-bits ( bit-array -- )
+
+M: bit-array set-bits -1 (set-bits) ; inline
 
 M: bit-array clone
-    [ length>> ] [ underlying>> clone ] bi bit-array boa ;
+    [ length>> ] [ underlying>> clone ] bi bit-array boa ; inline
 
 : >bit-array ( seq -- bit-array )
     T{ bit-array f 0 B{ } } clone-like ; inline
 
-M: bit-array like drop dup bit-array? [ >bit-array ] unless ;
+M: bit-array like drop dup bit-array? [ >bit-array ] unless ; inline
 
-M: bit-array new-sequence drop <bit-array> ;
+M: bit-array new-sequence drop <bit-array> ; inline
 
 M: bit-array equal?
-    over bit-array? [ sequence= ] [ 2drop f ] if ;
+    over bit-array? [ [ underlying>> ] bi@ sequence= ] [ 2drop f ] if ;
 
 M: bit-array resize
     [ drop ] [
         [ bits>bytes ] [ underlying>> ] bi*
         resize-byte-array
     ] 2bi
-    bit-array boa ;
+    bit-array boa
+    dup clean-up ; inline
 
-M: bit-array byte-length length 7 + -3 shift ;
+M: bit-array byte-length length 7 + -3 shift ; inline
 
 SYNTAX: ?{ \ } [ >bit-array ] parse-literal ;
 
@@ -74,10 +91,10 @@ SYNTAX: ?{ \ } [ >bit-array ] parse-literal ;
     dup 0 = [
         <bit-array>
     ] [
-        [ log2 1+ <bit-array> 0 ] keep
+        [ log2 1 + <bit-array> 0 ] keep
         [ dup 0 = ] [
             [ pick underlying>> pick set-alien-unsigned-1 ] keep
-            [ 1+ ] [ -8 shift ] bi*
+            [ 1 + ] [ -8 shift ] bi*
         ] until 2drop
     ] if ;
 

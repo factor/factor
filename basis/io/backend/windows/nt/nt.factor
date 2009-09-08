@@ -3,8 +3,7 @@ destructors io io.backend io.ports io.timeouts io.backend.windows
 io.files.windows io.files.windows.nt io.files io.pathnames io.buffers
 io.streams.c io.streams.null libc kernel math namespaces sequences
 threads windows windows.errors windows.kernel32 strings splitting
-ascii system accessors locals ;
-QUALIFIED: windows.winsock
+ascii system accessors locals classes.struct combinators.short-circuit ;
 IN: io.backend.windows.nt
 
 ! Global variable with assoc mapping overlapped to threads
@@ -15,11 +14,11 @@ TUPLE: io-callback port thread ;
 C: <io-callback> io-callback
 
 : (make-overlapped) ( -- overlapped-ext )
-    "OVERLAPPED" malloc-object &free ;
+    OVERLAPPED malloc-struct &free ;
 
 : make-overlapped ( port -- overlapped-ext )
     [ (make-overlapped) ] dip
-    handle>> ptr>> [ over set-OVERLAPPED-offset ] when* ;
+    handle>> ptr>> [ >>offset ] when* ;
 
 M: winnt FileArgs-overlapped ( port -- overlapped )
     make-overlapped ;
@@ -36,12 +35,12 @@ M: winnt add-completion ( win32-handle -- )
     handle>> master-completion-port get-global <completion-port> drop ;
 
 : eof? ( error -- ? )
-    [ ERROR_HANDLE_EOF = ] [ ERROR_BROKEN_PIPE = ] bi or ;
+    { [ ERROR_HANDLE_EOF = ] [ ERROR_BROKEN_PIPE = ] } 1|| ;
 
 : twiddle-thumbs ( overlapped port -- bytes-transferred )
     [
         drop
-        [ pending-overlapped get-global set-at ] curry "I/O" suspend
+        [ >c-ptr pending-overlapped get-global set-at ] curry "I/O" suspend
         {
             { [ dup integer? ] [ ] }
             { [ dup array? ] [
@@ -58,17 +57,18 @@ M: winnt add-completion ( win32-handle -- )
         f <void*> [ ! overlapped
             us [ 1000 /i ] [ INFINITE ] if* ! timeout
             GetQueuedCompletionStatus zero?
-        ] keep *void*
+        ] keep
+        *void* dup [ OVERLAPPED memory>struct ] when
     ] keep *int spin ;
 
 : resume-callback ( result overlapped -- )
-    pending-overlapped get-global delete-at* drop resume-with ;
+    >c-ptr pending-overlapped get-global delete-at* drop resume-with ;
 
 : handle-overlapped ( us -- ? )
     wait-for-overlapped [
-        dup [
+        [
             [ drop GetLastError 1array ] dip resume-callback t
-        ] [ 2drop f ] if
+        ] [ drop f ] if*
     ] [ resume-callback t ] if ;
 
 M: win32-handle cancel-operation
@@ -79,8 +79,7 @@ M: winnt io-multiplex ( us -- )
 
 M: winnt init-io ( -- )
     <master-completion-port> master-completion-port set-global
-    H{ } clone pending-overlapped set-global
-    windows.winsock:init-winsock ;
+    H{ } clone pending-overlapped set-global ;
 
 ERROR: invalid-file-size n ;
 

@@ -3,9 +3,7 @@ combinators.short-circuit fry kernel locals macros
 math math.blas.ffi math.blas.vectors math.blas.vectors.private
 math.complex math.functions math.order functors words
 sequences sequences.merged sequences.private shuffle
-specialized-arrays.direct.float specialized-arrays.direct.double
 specialized-arrays.float specialized-arrays.double
-specialized-arrays.direct.complex-float specialized-arrays.direct.complex-double
 specialized-arrays.complex-float specialized-arrays.complex-double
 parser prettyprint.backend prettyprint.custom ascii ;
 IN: math.blas.matrices
@@ -132,7 +130,7 @@ M: blas-matrix-base clone
 
 ! XXX try rounding stride to next 128 bit bound for better vectorizin'
 : <empty-matrix> ( rows cols exemplar -- matrix )
-    [ element-type [ * ] dip <c-array> ]
+    [ element-type heap-size * * <byte-array> ]
     [ 2drop ]
     [ f swap (blas-matrix-like) ] 3tri ;
 

@@ -45,7 +45,7 @@ TUPLE: document < model locs undos redos inside-undo? ;
     [ drop ] [ doc-line length ] 2bi 2array ;
 
 : doc-lines ( from to document -- slice )
-    [ 1+ ] [ value>> ] bi* <slice> ;
+    [ 1 + ] [ value>> ] bi* <slice> ;
 
 : start-on-line ( from line# document -- n1 )
     drop over first =
@@ -67,7 +67,7 @@ TUPLE: document < model locs undos redos inside-undo? ;
     [ start-on-line ] [ end-on-line ] bi-curry bi-curry bi* ;
 
 : last-line# ( document -- line )
-    value>> length 1- ;
+    value>> length 1 - ;
 
 CONSTANT: doc-start { 0 0 }
 
@@ -84,7 +84,7 @@ CONSTANT: doc-start { 0 0 }
         over length 1 = [
             nip first2
         ] [
-            first swap length 1- + 0
+            first swap length 1 - + 0
         ] if
     ] dip last length + 2array ;
 
@@ -92,7 +92,7 @@ CONSTANT: doc-start { 0 0 }
     0 swap [ append ] change-nth ;
 
 : append-last ( str seq -- )
-    [ length 1- ] keep [ prepend ] change-nth ;
+    [ length 1 - ] keep [ prepend ] change-nth ;
 
 : loc-col/str ( loc document -- str col )
     [ first2 swap ] dip nth swap ;
@@ -103,7 +103,7 @@ CONSTANT: doc-start { 0 0 }
 
 : (set-doc-range) ( doc-lines from to lines -- changed-lines )
     [ prepare-insert ] 3keep
-    [ [ first ] bi@ 1+ ] dip
+    [ [ first ] bi@ 1 + ] dip
     replace-slice ;
 
 : entire-doc ( document -- start end document )

@@ -1,24 +1,24 @@
-USING: alien.syntax ;
+USING: alien.syntax classes.struct ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 1024
 
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" } 
-    { "int" "socktype" }
-    { "int" "protocol" }
-    { "socklen_t" "addrlen" }
-    { "char*" "canonname" }
-    { "void*" "addr" }
-    { "addrinfo*" "next" } ;
+STRUCT: addrinfo
+    { flags int }
+    { family int }
+    { socktype int }
+    { protocol int }
+    { addrlen socklen_t }
+    { canonname char* }
+    { addr void* }
+    { next addrinfo* } ;
 
-C-STRUCT: dirent
-    { "u_int32_t" "d_fileno" }
-    { "u_int16_t" "d_reclen" }
-    { "u_int8_t"  "d_type" }
-    { "u_int8_t"  "d_namlen" }
-    { { "char" 256 } "d_name" } ;
+STRUCT: dirent
+    { d_fileno u_int32_t }
+    { d_reclen u_int16_t }
+    { d_type u_int8_t }
+    { d_namlen u_int8_t }
+    { d_name char[256] } ;
 
 CONSTANT: EPERM 1
 CONSTANT: ENOENT 2

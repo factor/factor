@@ -4,10 +4,10 @@ USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
 alien alien.accessors alien.c-types literals cpu.architecture
 cpu.ppc.assembler cpu.ppc.assembler.backend compiler.cfg.registers
-compiler.cfg.instructions compiler.constants compiler.codegen
+compiler.cfg.instructions compiler.cfg.comparisons
 compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.cfg.build-stack-frame
-compiler.units ;
+compiler.units compiler.constants compiler.codegen ;
 FROM: cpu.ppc.assembler => B ;
 IN: cpu.ppc
 
@@ -32,7 +32,7 @@ enable-float-intrinsics
 M: ppc machine-registers
     {
         { int-regs $[ 2 12 [a,b] 15 29 [a,b] append ] }
-        { double-float-regs $[ 0 29 [a,b] ] }
+        { float-regs $[ 0 29 [a,b] ] }
     } ;
 
 CONSTANT: scratch-reg 30
@@ -62,7 +62,7 @@ M: rs-loc loc-reg drop rs-reg ;
 M: ppc %peek loc>operand LWZ ;
 M: ppc %replace loc>operand STW ;
 
-: (%inc) ( n reg -- ) dup rot cells ADDI ; inline
+:: (%inc) ( n reg -- ) reg reg n cells ADDI ; inline
 
 M: ppc %inc-d ( n -- ) ds-reg (%inc) ;
 M: ppc %inc-r ( n -- ) rs-reg (%inc) ;
@@ -76,8 +76,12 @@ HOOK: reserved-area-size os ( -- n )
 : xt-save ( n -- i ) 2 cells - ;
 
 ! Next, we have the spill area as well as the FFI parameter area.
-! They overlap, since basic blocks with FFI calls will never
-! spill.
+! It is safe for them to overlap, since basic blocks with FFI calls
+! will never spill -- indeed, basic blocks with FFI calls do not
+! use vregs at all, and the FFI call is a stack analysis sync point.
+! In the future this will change and the stack frame logic will
+! need to be untangled somewhat.
+
 : param@ ( n -- x ) reserved-area-size + ; inline
 
 : param-save-size ( -- n ) 8 cells ; foldable
@@ -85,32 +89,24 @@ HOOK: reserved-area-size os ( -- n )
 : local@ ( n -- x )
     reserved-area-size param-save-size + + ; inline
 
-: spill-integer-base ( -- n )
-    stack-frame get spill-counts>> double-float-regs swap at
-    double-float-regs reg-size * ;
-
-: spill-integer@ ( n -- offset )
-    cells spill-integer-base + param@ ;
-
-: spill-float@ ( n -- offset )
-    double-float-regs reg-size * param@ ;
+: spill@ ( n -- offset )
+    spill-offset local@ ;
 
 ! Some FP intrinsics need a temporary scratch area in the stack
-! frame, 8 bytes in size
+! frame, 8 bytes in size. This is in the param-save area so it
+! does not overlap with spill slots.
 : scratch@ ( n -- offset )
-    stack-frame get total-size>>
-    factor-area-size -
-    param-save-size -
-    + ;
+    factor-area-size + ;
+
+! GC root area
+: gc-root@ ( n -- offset )
+    gc-root-offset local@ ;
 
 ! Finally we have the linkage area
 HOOK: lr-save os ( -- n )
 
 M: ppc stack-frame-size ( stack-frame -- i )
-    [ spill-counts>> [ swap reg-size * ] { } assoc>map sum ]
-    [ params>> ]
-    [ return>> ]
-    tri + +
+    (stack-frame-size)
     param-save-size +
     reserved-area-size +
     factor-area-size +
@@ -176,95 +172,28 @@ M: ppc %or      OR ;
 M: ppc %or-imm  ORI ;
 M: ppc %xor     XOR ;
 M: ppc %xor-imm XORI ;
+M: ppc %shl     SLW ;
 M: ppc %shl-imm swapd SLWI ;
+M: ppc %shr     SRW ;
 M: ppc %shr-imm swapd SRWI ;
+M: ppc %sar     SRAW ;
 M: ppc %sar-imm SRAWI ;
 M: ppc %not     NOT ;
 
-: %alien-invoke-tail ( func dll -- )
-    [ scratch-reg ] 2dip %alien-global scratch-reg MTCTR BCTR ;
-
-:: exchange-regs ( r1 r2 -- )
-    scratch-reg r1 MR
-    r1 r2 MR
-    r2 scratch-reg MR ;
-
-: ?MR ( r1 r2 -- ) 2dup = [ 2drop ] [ MR ] if ;
-
-:: move>args ( src1 src2 -- )
-    {
-        { [ src1 4 = ] [ 3 src2 ?MR 3 4 exchange-regs ] }
-        { [ src1 3 = ] [ 4 src2 ?MR ] }
-        { [ src2 3 = ] [ 4 src1 ?MR 3 4 exchange-regs ] }
-        { [ src2 4 = ] [ 3 src1 ?MR ] }
-        [ 3 src1 MR 4 src2 MR ]
-    } cond ;
-
-: clear-xer ( -- )
+:: overflow-template ( label dst src1 src2 insn -- )
     0 0 LI
-    0 MTXER ; inline
+    0 MTXER
+    dst src2 src1 insn call
+    label BO ; inline
 
-:: overflow-template ( src1 src2 insn func -- )
-    "no-overflow" define-label
-    clear-xer
-    scratch-reg src2 src1 insn call
-    scratch-reg ds-reg 0 STW
-    "no-overflow" get BNO
-    src1 src2 move>args
-    %prepare-alien-invoke
-    func f %alien-invoke
-    "no-overflow" resolve-label ; inline
+M: ppc %fixnum-add ( label dst src1 src2 -- )
+    [ ADDO. ] overflow-template ;
 
-:: overflow-template-tail ( src1 src2 insn func -- )
-    "overflow" define-label
-    clear-xer
-    scratch-reg src2 src1 insn call
-    "overflow" get BO
-    scratch-reg ds-reg 0 STW
-    BLR
-    "overflow" resolve-label
-    src1 src2 move>args
-    %prepare-alien-invoke
-    func f %alien-invoke-tail ; inline
+M: ppc %fixnum-sub ( label dst src1 src2 -- )
+    [ SUBFO. ] overflow-template ;
 
-M: ppc %fixnum-add ( src1 src2 -- )
-    [ ADDO. ] "overflow_fixnum_add" overflow-template ;
-
-M: ppc %fixnum-add-tail ( src1 src2 -- )
-    [ ADDO. ] "overflow_fixnum_add" overflow-template-tail ;
-
-M: ppc %fixnum-sub ( src1 src2 -- )
-    [ SUBFO. ] "overflow_fixnum_subtract" overflow-template ;
-
-M: ppc %fixnum-sub-tail ( src1 src2 -- )
-    [ SUBFO. ] "overflow_fixnum_subtract" overflow-template-tail ;
-
-M:: ppc %fixnum-mul ( src1 src2 temp1 temp2 -- )
-    "no-overflow" define-label
-    clear-xer
-    temp1 src1 tag-bits get SRAWI
-    temp2 temp1 src2 MULLWO.
-    temp2 ds-reg 0 STW
-    "no-overflow" get BNO
-    src2 src2 tag-bits get SRAWI
-    temp1 src2 move>args
-    %prepare-alien-invoke
-    "overflow_fixnum_multiply" f %alien-invoke
-    "no-overflow" resolve-label ;
-
-M:: ppc %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
-    "overflow" define-label
-    clear-xer
-    temp1 src1 tag-bits get SRAWI
-    temp2 temp1 src2 MULLWO.
-    "overflow" get BO
-    temp2 ds-reg 0 STW
-    BLR
-    "overflow" resolve-label
-    src2 src2 tag-bits get SRAWI
-    temp1 src2 move>args
-    %prepare-alien-invoke
-    "overflow_fixnum_multiply" f %alien-invoke-tail ;
+M: ppc %fixnum-mul ( label dst src1 src2 -- )
+    [ MULLWO. ] overflow-template ;
 
 : bignum@ ( n -- offset ) cells bignum tag-number - ; inline
 
@@ -282,7 +211,7 @@ M:: ppc %integer>bignum ( dst src temp -- )
         temp dst 1 bignum@ STW
         ! Compute sign
         temp src MR
-        temp temp cell-bits 1- SRAWI
+        temp temp cell-bits 1 - SRAWI
         temp temp 1 ANDI
         ! Store sign
         temp dst 2 bignum@ STW
@@ -340,15 +269,34 @@ M:: ppc %float>integer ( dst src -- )
     fp-scratch-reg 1 0 scratch@ STFD
     dst 1 4 scratch@ LWZ ;
 
-M: ppc %copy ( dst src -- ) MR ;
-
-M: ppc %copy-float ( dst src -- ) FMR ;
+M: ppc %copy ( dst src rep -- )
+    {
+        { int-rep [ MR ] }
+        { double-float-rep [ FMR ] }
+    } case ;
 
 M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
 
 M:: ppc %box-float ( dst src temp -- )
     dst 16 float temp %allot
     src dst float-offset STFD ;
+
+: float-function-param ( i spill-slot -- )
+    [ float-regs param-regs nth 1 ] [ n>> spill@ ] bi* LFD ;
+
+: float-function-return ( reg -- )
+    float-regs return-reg 2dup = [ 2drop ] [ FMR ] if ;
+
+M:: ppc %unary-float-function ( dst src func -- )
+    0 src float-function-param
+    func f %alien-invoke
+    dst float-function-return ;
+
+M:: ppc %binary-float-function ( dst src1 src2 func -- )
+    0 src1 float-function-param
+    1 src2 float-function-param
+    func f %alien-invoke
+    dst float-function-return ;
 
 M:: ppc %unbox-any-c-ptr ( dst src temp -- )
     [
@@ -384,21 +332,62 @@ M:: ppc %unbox-any-c-ptr ( dst src temp -- )
 
 : alien@ ( n -- n' ) cells object tag-number - ;
 
+:: %allot-alien ( dst displacement base temp -- )
+    dst 4 cells alien temp %allot
+    temp \ f tag-number %load-immediate
+    ! Store underlying-alien slot
+    base dst 1 alien@ STW
+    ! Store expired slot
+    temp dst 2 alien@ STW
+    ! Store offset
+    displacement dst 3 alien@ STW ;
+
 M:: ppc %box-alien ( dst src temp -- )
     [
         "f" define-label
         dst \ f tag-number %load-immediate
         0 src 0 CMPI
         "f" get BEQ
-        dst 4 cells alien temp %allot
-        ! Store offset
-        src dst 3 alien@ STW
-        ! Store expired slot
-        temp \ f tag-number %load-immediate
-        temp dst 1 alien@ STW
-        ! Store underlying-alien slot
-        temp dst 2 alien@ STW
+        dst src temp temp %allot-alien
         "f" resolve-label
+    ] with-scope ;
+
+M:: ppc %box-displaced-alien ( dst displacement base displacement' base' -- )
+    [
+        "end" define-label
+        "alloc" define-label
+        "simple-case" define-label
+        ! If displacement is zero, return the base
+        dst base MR
+        0 displacement 0 CMPI
+        "end" get BEQ
+        ! Quickly use displacement' before its needed for real, as allot temporary
+        displacement' :> temp
+        dst 4 cells alien temp %allot
+        ! If base is already a displaced alien, unpack it
+        0 base \ f tag-number CMPI
+        "simple-case" get BEQ
+        temp base header-offset LWZ
+        0 temp alien type-number tag-fixnum CMPI
+        "simple-case" get BNE
+        ! displacement += base.displacement
+        temp base 3 alien@ LWZ
+        displacement' displacement temp ADD
+        ! base = base.base
+        base' base 1 alien@ LWZ
+        "alloc" get B
+        "simple-case" resolve-label
+        displacement' displacement MR
+        base' base MR
+        "alloc" resolve-label
+        ! Store underlying-alien slot
+        base' dst 1 alien@ STW
+        ! Store offset
+        displacement' dst 3 alien@ STW
+        ! Store expired slot (its ok to clobber displacement')
+        temp \ f tag-number %load-immediate
+        temp dst 2 alien@ STW
+        "end" resolve-label
     ] with-scope ;
 
 M: ppc %alien-unsigned-1 0 LBZ ;
@@ -462,19 +451,27 @@ M:: ppc %write-barrier ( src card# table -- )
     src card# deck-bits SRWI
     table scratch-reg card# STBX ;
 
-M:: ppc %gc ( temp1 temp2 gc-roots gc-root-count -- )
-    "end" define-label
+M:: ppc %check-nursery ( label temp1 temp2 -- )
     temp2 load-zone-ptr
     temp1 temp2 cell LWZ
     temp2 temp2 3 cells LWZ
-    temp1 temp1 1024 ADDI ! add ALLOT_BUFFER_ZONE to here
-    temp1 0 temp2 CMP ! is here >= end?
-    "end" get BLE
+    ! add ALLOT_BUFFER_ZONE to here
+    temp1 temp1 1024 ADDI
+    ! is here >= end?
+    temp1 0 temp2 CMP
+    label BLE ;
+
+M:: ppc %save-gc-root ( gc-root register -- )
+    register 1 gc-root gc-root@ STW ;
+
+M:: ppc %load-gc-root ( gc-root register -- )
+    register 1 gc-root gc-root@ LWZ ;
+
+M:: ppc %call-gc ( gc-root-count -- )
     %prepare-alien-invoke
-    0 3 LI
-    0 4 LI
-    "inline_gc" f %alien-invoke
-    "end" resolve-label ;
+    3 1 gc-root-base local@ ADDI
+    gc-root-count 4 LI
+    "inline_gc" f %alien-invoke ;
 
 M: ppc %prologue ( n -- )
     0 11 LOAD32 rc-absolute-ppc-2/2 rel-this
@@ -496,50 +493,93 @@ M: ppc %epilogue ( n -- )
     [ [ 1 1 ] dip ADDI ] bi
     0 MTLR ;
 
-:: (%boolean) ( dst temp word -- )
+:: (%boolean) ( dst temp branch1 branch2 -- )
     "end" define-label
     dst \ f tag-number %load-immediate
-    "end" get word execute
+    "end" get branch1 execute( label -- )
+    branch2 [ "end" get branch2 execute( label -- ) ] when
     dst \ t %load-reference
     "end" get resolve-label ; inline
 
-: %boolean ( dst temp cc -- )
-    negate-cc {
-        { cc< [ \ BLT (%boolean) ] }
-        { cc<= [ \ BLE (%boolean) ] }
-        { cc> [ \ BGT (%boolean) ] }
-        { cc>= [ \ BGE (%boolean) ] }
-        { cc= [ \ BEQ (%boolean) ] }
-        { cc/= [ \ BNE (%boolean) ] }
+:: %boolean ( dst temp cc -- )
+    cc negate-cc order-cc {
+        { cc<  [ dst temp \ BLT f (%boolean) ] }
+        { cc<= [ dst temp \ BLE f (%boolean) ] }
+        { cc>  [ dst temp \ BGT f (%boolean) ] }
+        { cc>= [ dst temp \ BGE f (%boolean) ] }
+        { cc=  [ dst temp \ BEQ f (%boolean) ] }
+        { cc/= [ dst temp \ BNE f (%boolean) ] }
     } case ;
 
 : (%compare) ( src1 src2 -- ) [ 0 ] dip CMP ; inline
 : (%compare-imm) ( src1 src2 -- ) [ 0 ] 2dip CMPI ; inline
-: (%compare-float) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
+: (%compare-float-unordered) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
+: (%compare-float-ordered) ( src1 src2 -- ) [ 0 ] dip FCMPO ; inline
+
+:: (%compare-float) ( cc src1 src2 -- branch1 branch2 )
+    cc {
+        { cc<    [ src1 src2 (%compare-float-ordered)   \ BLT f     ] }
+        { cc<=   [ src1 src2 (%compare-float-ordered)   \ BLT \ BEQ ] }
+        { cc>    [ src1 src2 (%compare-float-ordered)   \ BGT f     ] }
+        { cc>=   [ src1 src2 (%compare-float-ordered)   \ BGT \ BEQ ] }
+        { cc=    [ src1 src2 (%compare-float-unordered) \ BEQ f     ] }
+        { cc<>   [ src1 src2 (%compare-float-ordered)   \ BLT \ BGT ] }
+        { cc<>=  [ src1 src2 (%compare-float-ordered)   \ BNO f     ] }
+        { cc/<   [ src1 src2 (%compare-float-unordered) \ BGE f     ] }
+        { cc/<=  [ src1 src2 (%compare-float-unordered) \ BGT \ BO  ] }
+        { cc/>   [ src1 src2 (%compare-float-unordered) \ BLE f     ] }
+        { cc/>=  [ src1 src2 (%compare-float-unordered) \ BLT \ BO  ] }
+        { cc/=   [ src1 src2 (%compare-float-unordered) \ BNE f     ] }
+        { cc/<>  [ src1 src2 (%compare-float-unordered) \ BEQ \ BO  ] }
+        { cc/<>= [ src1 src2 (%compare-float-unordered) \ BO  f     ] }
+    } case ; inline
 
 M: ppc %compare (%compare) %boolean ;
 M: ppc %compare-imm (%compare-imm) %boolean ;
-M: ppc %compare-float (%compare-float) %boolean ;
+M:: ppc %compare-float ( dst temp cc src1 src2 -- )
+    cc negate-cc src1 src2 (%compare-float) :> branch2 :> branch1
+    dst temp branch1 branch2 (%boolean) ;
 
-: %branch ( label cc -- )
-    {
-        { cc< [ BLT ] }
-        { cc<= [ BLE ] }
-        { cc> [ BGT ] }
-        { cc>= [ BGE ] }
-        { cc= [ BEQ ] }
-        { cc/= [ BNE ] }
+:: %branch ( label cc -- )
+    cc order-cc {
+        { cc<  [ label BLT ] }
+        { cc<= [ label BLE ] }
+        { cc>  [ label BGT ] }
+        { cc>= [ label BGE ] }
+        { cc=  [ label BEQ ] }
+        { cc/= [ label BNE ] }
     } case ;
 
 M: ppc %compare-branch (%compare) %branch ;
 M: ppc %compare-imm-branch (%compare-imm) %branch ;
-M: ppc %compare-float-branch (%compare-float) %branch ;
+M:: ppc %compare-float-branch ( label cc src1 src2 -- )
+    cc src1 src2 (%compare-float) :> branch2 :> branch1
+    label branch1 execute( label -- )
+    branch2 [ label branch2 execute( label -- ) ] when ;
 
-M: ppc %spill-integer ( src n -- ) spill-integer@ 1 swap STW ;
-M: ppc %reload-integer ( dst n -- ) spill-integer@ 1 swap LWZ ;
+: load-from-frame ( dst n rep -- )
+    {
+        { int-rep [ [ 1 ] dip LWZ ] }
+        { single-float-rep [ [ 1 ] dip LFS ] }
+        { double-float-rep [ [ 1 ] dip LFD ] }
+        { stack-params [ [ 0 1 ] dip LWZ [ 0 1 ] dip param@ STW ] }
+    } case ;
 
-M: ppc %spill-float ( src n -- ) spill-float@ 1 swap STFD ;
-M: ppc %reload-float ( dst n -- ) spill-float@ 1 swap LFD ;
+: next-param@ ( n -- x ) param@ stack-frame get total-size>> + ;
+
+: store-to-frame ( src n rep -- )
+    {
+        { int-rep [ [ 1 ] dip STW ] }
+        { single-float-rep [ [ 1 ] dip STFS ] }
+        { double-float-rep [ [ 1 ] dip STFD ] }
+        { stack-params [ [ [ 0 1 ] dip next-param@ LWZ 0 1 ] dip STW ] }
+    } case ;
+
+M: ppc %spill ( src n rep -- )
+    [ spill@ ] dip store-to-frame ;
+
+M: ppc %reload ( dst n rep -- )
+    [ spill@ ] dip load-from-frame ;
 
 M: ppc %loop-entry ;
 
@@ -547,46 +587,23 @@ M: int-regs return-reg drop 3 ;
 M: int-regs param-regs drop { 3 4 5 6 7 8 9 10 } ;
 M: float-regs return-reg drop 1 ;
 
-M: int-regs %save-param-reg drop 1 rot local@ STW ;
-M: int-regs %load-param-reg drop 1 rot local@ LWZ ;
+M:: ppc %save-param-reg ( stack reg rep -- )
+    reg stack local@ rep store-to-frame ;
 
-GENERIC: STF ( src dst off reg-class -- )
-
-M: single-float-regs STF drop STFS ;
-M: double-float-regs STF drop STFD ;
-
-M: float-regs %save-param-reg [ 1 rot local@ ] dip STF ;
-
-GENERIC: LF ( dst src off reg-class -- )
-
-M: single-float-regs LF drop LFS ;
-M: double-float-regs LF drop LFD ;
-
-M: float-regs %load-param-reg [ 1 rot local@ ] dip LF ;
-
-M: stack-params %load-param-reg ( stack reg reg-class -- )
-    drop [ 0 1 rot local@ LWZ 0 1 ] dip param@ STW ;
-
-: next-param@ ( n -- x ) param@ stack-frame get total-size>> + ;
-
-M: stack-params %save-param-reg ( stack reg reg-class -- )
-    #! Funky. Read the parameter from the caller's stack frame.
-    #! This word is used in callbacks
-    drop
-    [ 0 1 ] dip next-param@ LWZ
-    [ 0 1 ] dip local@ STW ;
+M:: ppc %load-param-reg ( stack reg rep -- )
+    reg stack local@ rep load-from-frame ;
 
 M: ppc %prepare-unbox ( -- )
     ! First parameter is top of stack
     3 ds-reg 0 LWZ
     ds-reg dup cell SUBI ;
 
-M: ppc %unbox ( n reg-class func -- )
+M: ppc %unbox ( n rep func -- )
     ! Value must be in r3
     ! Call the unboxer
     f %alien-invoke
     ! Store the return value on the C stack
-    over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
+    over [ [ reg-class-of return-reg ] keep %save-param-reg ] [ 2drop ] if ;
 
 M: ppc %unbox-long-long ( n func -- )
     ! Value must be in r3:r4
@@ -605,11 +622,11 @@ M: ppc %unbox-large-struct ( n c-type -- )
     ! Call the function
     "to_value_struct" f %alien-invoke ;
 
-M: ppc %box ( n reg-class func -- )
+M: ppc %box ( n rep func -- )
     ! If the source is a stack location, load it into freg #0.
     ! If the source is f, then we assume the value is already in
     ! freg #0.
-    [ over [ 0 over param-reg swap %load-param-reg ] [ 2drop ] if ] dip
+    [ over [ 0 over reg-class-of param-reg swap %load-param-reg ] [ 2drop ] if ] dip
     f %alien-invoke ;
 
 M: ppc %box-long-long ( n func -- )
@@ -705,6 +722,8 @@ M: ppc %unbox-small-struct ( size -- )
         { 2 [ %unbox-struct-2 ] }
         { 4 [ %unbox-struct-4 ] }
     } case ;
+
+enable-float-functions
 
 USE: vocabs.loader
 

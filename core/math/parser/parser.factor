@@ -28,13 +28,16 @@ IN: math.parser
         { CHAR: d 13 }
         { CHAR: e 14 }
         { CHAR: f 15 }
-    } at 255 or ; inline
+        { CHAR: , f }
+    } at* [ drop 255 ] unless ; inline
 
 : string>digits ( str -- digits )
     [ digit> ] B{ } map-as ; inline
 
 : (digits>integer) ( valid? accum digit radix -- valid? accum )
-    2dup < [ swapd * + ] [ 2drop 2drop f 0 ] if ; inline
+    over [
+        2dup < [ swapd * + ] [ 2drop 2drop f 0 ] if
+    ] [ 2drop ] if ; inline
 
 : each-digit ( seq radix quot -- n/f )
     [ t 0 ] 3dip curry each swap [ drop f ] unless ; inline
@@ -80,18 +83,30 @@ SYMBOL: negative?
     ] if ; inline
 
 : string>float ( str -- n/f )
+    [ CHAR: , eq? not ] filter
     >byte-array 0 suffix (string>float) ;
+
+: number-char? ( char -- ? )
+    "0123456789ABCDEFabcdef." member? ;
+
+: numeric-looking? ( str -- ? )
+    "-" ?head drop
+    dup empty? [ drop f ] [
+        dup first number-char? [
+            last number-char?
+        ] [ drop f ] if
+    ] if ;
 
 PRIVATE>
 
 : base> ( str radix -- n/f )
-    over empty? [ 2drop f ] [
+    over numeric-looking? [
         over [ "/." member? ] find nip {
             { CHAR: / [ string>ratio ] }
             { CHAR: . [ drop string>float ] }
             [ drop string>integer ]
         } case
-    ] if ;
+    ] [ 2drop f ] if ;
 
 : string>number ( str -- n/f ) 10 base> ;
 : bin> ( str -- n/f ) 2 base> ;
@@ -131,7 +146,7 @@ M: ratio >base
     [
         dup 0 < negative? set
         abs 1 /mod
-        [ dup zero? [ drop "" ] [ (>base) sign append ] if ]
+        [ [ "" ] [ (>base) sign append ] if-zero ]
         [
             [ numerator (>base) ]
             [ denominator (>base) ] bi

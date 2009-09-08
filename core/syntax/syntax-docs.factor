@@ -191,6 +191,11 @@ HELP: delimiter
 { $syntax ": foo ... ; delimiter" }
 { $description "Declares the most recently defined word as a delimiter. Delimiters are words which are only ever valid as the end of a nested block to be read by " { $link parse-until } ". An unpaired occurrence of a delimiter is a parse error." } ;
 
+HELP: deprecated
+{ $syntax ": foo ... ; deprecated" }
+{ $description "Declares the most recently defined word as deprecated. If the " { $vocab-link "tools.deprecation" } " vocabulary is loaded, usages of deprecated words will be noted by the " { $link "tools.errors" } " system." }
+{ $notes "Code that uses deprecated words continues to function normally; the errors are purely informational. However, code that uses deprecated words should be updated, for the deprecated words are intended to be removed soon." } ;
+
 HELP: SYNTAX:
 { $syntax "SYNTAX: foo ... ;" }
 { $description "Defines a parsing word." }
@@ -447,7 +452,7 @@ HELP: USING:
 HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
 { $description "Adds the vocabulary's words, prefixed with the vocabulary name, to the search path." }
-{ $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "finishing" } ". Then, the following will call the latter word:"
+{ $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "fishing" } ". Then, the following will call the latter word:"
   { $code
   "USE: fish"
   "QUALIFIED: go"
@@ -829,6 +834,14 @@ HELP: call(
 
 HELP: execute(
 { $syntax "execute( stack -- effect )" }
-{ $description "Calls the word on the top of the stack, asserting that it has the given stack effect. The word does not need to be known at compile time." } ;
+{ $description "Calls the word on the top of the stack, asserting that it has the given stack effect. The word does not need to be known at compile time." }
+{ $examples
+  { $code
+    "IN: scratchpad"
+    ""
+    ": eat ( -- ) ; : sleep ( -- ) ; : hack ( -- ) ;"
+    "{ eat sleep hack } [ execute( -- ) ] each"
+  }
+} ;
 
 { POSTPONE: call( POSTPONE: execute( } related-words

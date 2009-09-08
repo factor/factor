@@ -111,6 +111,7 @@ IN: bootstrap.syntax
     "foldable" [ word make-foldable ] define-core-syntax
     "flushable" [ word make-flushable ] define-core-syntax
     "delimiter" [ word t "delimiter" set-word-prop ] define-core-syntax
+    "deprecated" [ word make-deprecated ] define-core-syntax
 
     "SYNTAX:" [
         CREATE-WORD parse-definition define-syntax
@@ -245,7 +246,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
     
     "initial:" "syntax" lookup define-symbol
-    
+
     "read-only" "syntax" lookup define-symbol
 
     "call(" [ \ call-effect parse-call( ] define-core-syntax

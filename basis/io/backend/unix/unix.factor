@@ -4,14 +4,15 @@ USING: alien alien.c-types alien.syntax generic assocs kernel
 kernel.private math io.ports sequences strings sbufs threads
 unix vectors io.buffers io.backend io.encodings math.parser
 continuations system libc namespaces make io.timeouts
-io.encodings.utf8 destructors accessors summary combinators
-locals unix.time fry io.backend.unix.multiplexers ;
+io.encodings.utf8 destructors destructors.private accessors
+summary combinators locals unix.time fry
+io.backend.unix.multiplexers ;
 QUALIFIED: io
 IN: io.backend.unix
 
 GENERIC: handle-fd ( handle -- fd )
 
-TUPLE: fd fd disposed ;
+TUPLE: fd < disposable fd ;
 
 : init-fd ( fd -- fd )
     [
@@ -25,14 +26,16 @@ TUPLE: fd fd disposed ;
     #! since on OS X 10.3, this operation fails from init-io
     #! when running the Factor.app (presumably because fd 0 and
     #! 1 are closed).
-    f fd boa ;
+    fd new-disposable swap >>fd ;
 
 M: fd dispose
     dup disposed>> [ drop ] [
-        [ cancel-operation ]
-        [ t >>disposed drop ]
-        [ fd>> close-file ]
-        tri
+        {
+            [ cancel-operation ]
+            [ t >>disposed drop ]
+            [ unregister-disposable ]
+            [ fd>> close-file ]
+        } cleave
     ] if ;
 
 M: fd handle-fd dup check-disposed fd>> ;
@@ -133,7 +136,7 @@ M: unix io-multiplex ( ms/f -- )
 ! pipe to non-blocking, and read from it instead of the real
 ! stdin. Very crufty, but it will suffice until we get native
 ! threading support at the language level.
-TUPLE: stdin control size data disposed ;
+TUPLE: stdin < disposable control size data ;
 
 M: stdin dispose*
     [
@@ -168,7 +171,7 @@ M: stdin refill
 : data-read-fd ( -- fd ) &: stdin_read *uint ;
 
 : <stdin> ( -- stdin )
-    stdin new
+    stdin new-disposable
         control-write-fd <fd> <output-port> >>control
         size-read-fd <fd> init-fd <input-port> >>size
         data-read-fd <fd> >>data ;

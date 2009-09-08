@@ -4,8 +4,8 @@ USING: accessors alien.c-types alien.syntax combinators csv
 io.backend io.encodings.utf8 io.files io.files.info io.streams.string
 io.files.unix kernel math.order namespaces sequences sorting
 system unix unix.statfs.linux unix.statvfs.linux io.files.links
-specialized-arrays.direct.uint arrays io.files.info.unix assocs
-io.pathnames unix.types ;
+arrays io.files.info.unix assocs io.pathnames unix.types
+classes.struct ;
 FROM: csv => delimiter ;
 IN: io.files.info.unix.linux
 
@@ -15,30 +15,30 @@ namelen ;
 M: linux new-file-system-info linux-file-system-info new ;
 
 M: linux file-system-statfs ( path -- byte-array )
-    "statfs64" <c-object> [ statfs64 io-error ] keep ;
+    \ statfs64 <struct> [ statfs64 io-error ] keep ;
 
 M: linux statfs>file-system-info ( struct -- statfs )
     {
-        [ statfs64-f_type >>type ]
-        [ statfs64-f_bsize >>block-size ]
-        [ statfs64-f_blocks >>blocks ]
-        [ statfs64-f_bfree >>blocks-free ]
-        [ statfs64-f_bavail >>blocks-available ]
-        [ statfs64-f_files >>files ]
-        [ statfs64-f_ffree >>files-free ]
-        [ statfs64-f_fsid 2 <direct-uint-array> >array >>id ]
-        [ statfs64-f_namelen >>namelen ]
-        [ statfs64-f_frsize >>preferred-block-size ]
+        [ f_type>> >>type ]
+        [ f_bsize>> >>block-size ]
+        [ f_blocks>> >>blocks ]
+        [ f_bfree>> >>blocks-free ]
+        [ f_bavail>> >>blocks-available ]
+        [ f_files>> >>files ]
+        [ f_ffree>> >>files-free ]
+        [ f_fsid>> >>id ]
+        [ f_namelen>> >>namelen ]
+        [ f_frsize>> >>preferred-block-size ]
         ! [ statfs64-f_spare >>spare ]
     } cleave ;
 
 M: linux file-system-statvfs ( path -- byte-array )
-    "statvfs64" <c-object> [ statvfs64 io-error ] keep ;
+    \ statvfs64 <struct> [ statvfs64 io-error ] keep ;
 
 M: linux statvfs>file-system-info ( struct -- statfs )
     {
-        [ statvfs64-f_flag >>flags ]
-        [ statvfs64-f_namemax >>name-max ]
+        [ f_flag>> >>flags ]
+        [ f_namemax>> >>name-max ]
     } cleave ;
 
 TUPLE: mtab-entry file-system-name mount-point type options

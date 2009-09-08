@@ -24,10 +24,13 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
     [ create-method ] 2dip
     [ [ props>> ] [ drop ] [ ] tri* update ]
     [ drop define ]
-    3bi ;
+    [ 2drop make-inline ]
+    3tri ;
 
-: reader-quot ( slot-spec -- quot )
-    [
+GENERIC# reader-quot 1 ( class slot-spec -- quot )
+
+M: object reader-quot 
+    nip [
         dup offset>> ,
         \ slot ,
         dup class>> object bootstrap-word eq?
@@ -39,11 +42,7 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
     dup t "reader" set-word-prop ;
 
 : reader-props ( slot-spec -- assoc )
-    [
-        [ "reading" set ]
-        [ read-only>> [ t "foldable" set ] when ] bi
-        t "flushable" set
-    ] H{ } make-assoc ;
+    "reading" associate ;
 
 : define-reader-generic ( name -- )
     reader-word (( object -- value )) define-simple-generic ;
@@ -51,8 +50,12 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
 : define-reader ( class slot-spec -- )
     [ nip name>> define-reader-generic ]
     [
-        [ name>> reader-word ] [ reader-quot ] [ reader-props ] tri
-        define-typecheck
+        {
+            [ drop ]
+            [ nip name>> reader-word ]
+            [ reader-quot ]
+            [ nip reader-props ]
+        } 2cleave define-typecheck
     ] 2bi ;
 
 : writer-word ( name -- word )
@@ -83,8 +86,10 @@ ERROR: bad-slot-value value class ;
 : writer-quot/fixnum ( slot-spec -- )
     [ [ >fixnum ] dip ] % writer-quot/check ;
 
-: writer-quot ( slot-spec -- quot )
-    [
+GENERIC# writer-quot 1 ( class slot-spec -- quot )
+
+M: object writer-quot
+    nip [
         {
             { [ dup class>> object bootstrap-word eq? ] [ writer-quot/object ] }
             { [ dup class>> "coercer" word-prop ] [ writer-quot/coerce ] }
@@ -101,8 +106,12 @@ ERROR: bad-slot-value value class ;
 
 : define-writer ( class slot-spec -- )
     [ nip name>> define-writer-generic ] [
-        [ name>> writer-word ] [ writer-quot ] [ writer-props ] tri
-        define-typecheck
+        {
+            [ drop ]
+            [ nip name>> writer-word ]
+            [ writer-quot ]
+            [ nip writer-props ]
+        } 2cleave define-typecheck
     ] 2bi ;
 
 : setter-word ( name -- word )
@@ -157,6 +166,7 @@ M: class initial-value* no-initial-value ;
 
 : initial-value ( class -- object )
     {
+        { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop ] }
         { [ \ f bootstrap-word over class<= ] [ f ] }
         { [ \ array-capacity bootstrap-word over class<= ] [ 0 ] }
         { [ float bootstrap-word over class<= ] [ 0.0 ] }
@@ -224,5 +234,8 @@ M: slot-spec make-slot
 : finalize-slots ( specs base -- specs )
     over length iota [ + ] with map [ >>offset ] 2map ;
 
+: slot-named* ( name specs -- offset spec/f )
+    [ name>> = ] with find ;
+
 : slot-named ( name specs -- spec/f )
-    [ name>> = ] with find nip ;
+    slot-named* nip ;

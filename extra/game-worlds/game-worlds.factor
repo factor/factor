@@ -1,5 +1,5 @@
 USING: accessors game-input game-loop kernel math ui.gadgets
-ui.gadgets.worlds ui.gestures ;
+ui.gadgets.worlds ui.gestures threads ;
 IN: game-worlds
 
 TUPLE: game-world < world
@@ -9,7 +9,7 @@ TUPLE: game-world < world
 GENERIC: tick-length ( world -- millis )
 
 M: game-world draw*
-    swap >>tick-slice draw-world ;
+    swap >>tick-slice relayout-1 yield ;
 
 M: game-world begin-world
     open-game-input 

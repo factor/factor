@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces math words strings
-io vectors arrays math.parser combinators continuations ;
+io vectors arrays math.parser combinators continuations
+source-files.errors ;
 IN: lexer
 
 TUPLE: lexer text line line-text line-length column ;
@@ -22,9 +23,14 @@ TUPLE: lexer text line line-text line-length column ;
 : <lexer> ( text -- lexer )
     lexer new-lexer ;
 
+ERROR: unexpected want got ;
+
+: forbid-tab ( c -- c )
+    [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
+
 : skip ( i seq ? -- n )
     over length
-    [ [ swap CHAR: \s eq? xor ] curry find-from drop ] dip or ;
+    [ [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop ] dip or ;
 
 : change-lexer-column ( lexer quot -- )
     [ [ column>> ] [ line-text>> ] bi ] prepose keep
@@ -43,7 +49,7 @@ M: lexer skip-word ( lexer -- )
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
-    [ line>> ] [ text>> ] bi length <= ;
+    [ line>> ] [ text>> length ] bi <= ;
 
 : still-parsing-line? ( lexer -- ? )
     [ column>> ] [ line-length>> ] bi < ;
@@ -64,8 +70,6 @@ M: lexer skip-word ( lexer -- )
     ] [ drop f ] if ;
 
 : scan ( -- str/f ) lexer get parse-token ;
-
-ERROR: unexpected want got ;
 
 PREDICATE: unexpected-eof < unexpected
     got>> not ;
@@ -89,6 +93,9 @@ PREDICATE: unexpected-eof < unexpected
     100 <vector> swap (parse-tokens) >array ;
 
 TUPLE: lexer-error line column line-text error ;
+
+M: lexer-error error-file error>> error-file ;
+M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
 
 : <lexer-error> ( msg -- error )
     \ lexer-error new

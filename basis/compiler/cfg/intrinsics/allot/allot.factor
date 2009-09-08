@@ -1,18 +1,18 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.order sequences accessors arrays
 byte-arrays layouts classes.tuple.private fry locals
 compiler.tree.propagation.info compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.stacks
-compiler.cfg.utilities ;
+compiler.cfg.utilities compiler.cfg.builder.blocks ;
 IN: compiler.cfg.intrinsics.allot
 
 : ##set-slots ( regs obj class -- )
-    '[ _ swap 1+ _ tag-number ##set-slot-imm ] each-index ;
+    '[ _ swap 1 + _ tag-number ##set-slot-imm ] each-index ;
 
 : emit-simple-allot ( node -- )
     [ in-d>> length ] [ node-output-infos first class>> ] bi
-    [ drop ds-load ] [ [ 1+ cells ] dip ^^allot ] [ nip ] 2tri
+    [ drop ds-load ] [ [ 1 + cells ] dip ^^allot ] [ nip ] 2tri
     [ ##set-slots ] [ [ drop ] [ ds-push ] [ drop ] tri* ] 3bi ;
 
 : tuple-slot-regs ( layout -- vregs )

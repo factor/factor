@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.private
 sequences sequences.private ;
@@ -9,19 +9,21 @@ MIXIN: growable
 SLOT: length
 SLOT: underlying
 
-M: growable length length>> ;
-M: growable nth-unsafe underlying>> nth-unsafe ;
-M: growable set-nth-unsafe underlying>> set-nth-unsafe ;
+M: growable length length>> ; inline
+M: growable nth-unsafe underlying>> nth-unsafe ; inline
+M: growable set-nth-unsafe underlying>> set-nth-unsafe ; inline
 
 : capacity ( seq -- n ) underlying>> length ; inline
 
 : expand ( len seq -- )
     [ resize ] change-underlying drop ; inline
 
-: contract ( len seq -- )
+GENERIC: contract ( len seq -- )
+
+M: growable contract ( len seq -- )
     [ length ] keep
     [ [ 0 ] 2dip set-nth-unsafe ] curry
-    (each-integer) ; inline
+    (each-integer) ;
 
 : growable-check ( n seq -- n seq )
     over 0 < [ bounds-error ] when ; inline
@@ -47,21 +49,21 @@ M: growable set-length ( n seq -- )
         [ >fixnum ] dip
     ] if ; inline
 
-M: growable set-nth ensure set-nth-unsafe ;
+M: growable set-nth ensure set-nth-unsafe ; inline
 
-M: growable clone (clone) [ clone ] change-underlying ;
+M: growable clone (clone) [ clone ] change-underlying ; inline
 
 M: growable lengthen ( n seq -- )
     2dup length > [
         2dup capacity > [ over new-size over expand ] when
         2dup (>>length)
-    ] when 2drop ;
+    ] when 2drop ; inline
 
 M: growable shorten ( n seq -- )
     growable-check
     2dup length < [
         2dup contract
         2dup (>>length)
-    ] when 2drop ;
+    ] when 2drop ; inline
 
 INSTANCE: growable sequence

@@ -12,19 +12,19 @@ HELP: number=
 } ;
 
 HELP: <
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is less than " { $snippet "y" } "." } ;
 
 HELP: <=
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is less than or equal to " { $snippet "y" } "." } ;
 
 HELP: >
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is greater than " { $snippet "y" } "." } ;
 
 HELP: >=
-{ $values { "x" real } { "y" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." } ;
 
 
@@ -151,7 +151,7 @@ HELP: bitnot
 { $description "Computes the bitwise complement of the input; that is, each bit in the input number is flipped." }
 { $notes "This word implements bitwise not, so applying it to booleans will throw an error. Boolean not is the " { $link not } " word."
 $nl
-"Due to the two's complement representation of signed integers, the following two lines are equivalent:" { $code "bitnot" "neg 1-" } } ;
+"Due to the two's complement representation of signed integers, the following two lines are equivalent:" { $code "bitnot" "neg 1 -" } } ;
 
 HELP: bit?
 { $values { "x" integer } { "n" integer } { "?" "a boolean" } }
@@ -162,22 +162,6 @@ HELP: log2
 { $values { "x" "a positive integer" } { "n" integer } }
 { $description "Outputs the largest integer " { $snippet "n" } " such that " { $snippet "2^n" } " is less than or equal to " { $snippet "x" } "." }
 { $errors "Throws an error if " { $snippet "x" } " is zero or negative." } ;
-
-HELP: 1+
-{ $values { "x" number } { "y" number } }
-{ $description
-    "Increments a number by 1. The following two lines are equivalent:"
-    { $code "1+" "1 +" }
-    "There is no difference in behavior or efficiency."
-} ;
-
-HELP: 1-
-{ $values { "x" number } { "y" number } }
-{ $description
-    "Decrements a number by 1. The following two lines are equivalent:"
-    { $code "1-" "1 -" }
-    "There is no difference in behavior or efficiency."
-} ;
 
 HELP: ?1+
 { $values { "x" { $maybe number } } { "y" number } }
@@ -213,9 +197,9 @@ HELP: sgn
 { $description
     "Outputs one of the following:"
     { $list
-        "-1 if " { $snippet "x" } " is negative"
-        "0 if " { $snippet "x" } " is equal to 0"
-        "1 if " { $snippet "x" } " is positive"
+        { "-1 if " { $snippet "x" } " is negative" }
+        { "0 if " { $snippet "x" } " is equal to 0" }
+        { "1 if " { $snippet "x" } " is positive" }
     }
 } ;
 
@@ -237,6 +221,49 @@ HELP: zero?
 { $values { "x" number } { "?" "a boolean" } }
 { $description "Tests if the number is equal to zero." } ;
 
+HELP: if-zero
+{ $values { "n" number } { "quot1" quotation } { "quot2" quotation } }
+{ $description "Makes an implicit check if the number is zero. A zero is dropped and " { $snippet "quot1" } " is called. Otherwise, if the number is not zero, " { $snippet "quot2" } " is called on it." }
+{ $example
+    "USING: kernel math prettyprint sequences ;"
+    "3 [ \"zero\" ] [ sq ] if-zero ."
+    "9"
+} ;
+
+HELP: when-zero
+{ $values
+     { "n" number } { "quot" "the first quotation of an " { $link if-zero } } }
+{ $description "Makes an implicit check if the sequence is empty. A zero is dropped and the " { $snippet "quot" } " is called." }
+{ $examples "This word is equivalent to " { $link if-zero } " with an empty second quotation:"
+    { $example
+    "USING: math prettyprint ;"
+    "0 [ 4 ] [ ] if-zero ."
+    "4"
+    }
+    { $example
+    "USING: math prettyprint ;"
+    "0 [ 4 ] when-zero ."
+    "4"
+    }
+} ;
+
+HELP: unless-zero
+{ $values
+     { "n" number } { "quot" "the second quotation of an " { $link if-empty } } }
+{ $description "Makes an implicit check if the number is zero. A zero is dropped. Otherwise, the " { $snippet "quot" } " is called on the number." }
+{ $examples "This word is equivalent to " { $link if-zero } " with an empty first quotation:"
+    { $example
+    "USING: sequences math prettyprint ;"
+    "3 [ ] [ sq ] if-empty ."
+    "9"
+    }
+    { $example
+    "USING: sequences math prettyprint ;"
+    "3 [ sq ] unless-zero ."
+    "9"
+    }
+} ;
+
 HELP: times
 { $values { "n" integer } { "quot" quotation } }
 { $description "Calls the quotation " { $snippet "n" } " times." }
@@ -244,6 +271,13 @@ HELP: times
 { $examples
     { $example "USING: io math ;" "3 [ \"Hi\" print ] times" "Hi\nHi\nHi" }
 } ;
+
+HELP: fp-bitwise=
+{ $values
+    { "x" float } { "y" float }
+    { "?" boolean }
+}
+{ $description "Compares two floating point numbers for bit equality." } ;
 
 HELP: fp-special?
 { $values { "x" real } { "?" "a boolean" } }
@@ -282,11 +316,11 @@ HELP: <fp-nan>
 
 HELP: next-float
 { $values { "m" float } { "n" float } }
-{ $description "Returns the least representable " { $link float } " value greater than " { $snippet "m" } "." } ;
+{ $description "Returns the least representable " { $link float } " value greater than " { $snippet "m" } ", or in the case of " { $snippet "-0.0" } ", returns " { $snippet "+0.0" } "." } ;
 
 HELP: prev-float
 { $values { "m" float } { "n" float } }
-{ $description "Returns the greatest representable " { $link float } " value less than " { $snippet "m" } "." } ;
+{ $description "Returns the greatest representable " { $link float } " value less than " { $snippet "m" } ", or in the case of " { $snippet "+0.0" } ", returns " { $snippet "-0.0" } "." } ;
 
 { next-float prev-float } related-words
 
@@ -324,7 +358,7 @@ HELP: each-integer
 
 HELP: all-integers?
 { $values { "n" integer } { "quot" { $quotation "( i -- ? )" } } { "?" "a boolean" } }
-{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iterationi stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
+{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
 { $notes "This word is used to implement " { $link all? } "." } ;
 
 HELP: find-integer
@@ -386,6 +420,7 @@ ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 { $subsection 2/ }
 { $subsection 2^ }
 { $subsection bit? }
+"Advanced topics:"
 { $subsection "math.bitwise" }
 { $subsection "math.bits" }
 { $see-also "booleans" } ;

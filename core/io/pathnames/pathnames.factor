@@ -118,7 +118,10 @@ PRIVATE>
         ] if
     ] unless ;
 
-: file-extension ( filename -- extension )
+: file-stem ( path -- stem )
+    file-name "." split1-last drop ;
+
+: file-extension ( path -- extension )
     file-name "." split1-last nip ;
 
 : path-components ( path -- seq )

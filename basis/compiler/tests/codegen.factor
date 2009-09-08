@@ -2,7 +2,8 @@ USING: generalizations accessors arrays compiler kernel kernel.private
 math hashtables.private math.private namespaces sequences tools.test
 namespaces.private slots.private sequences.private byte-arrays alien
 alien.accessors layouts words definitions compiler.units io
-combinators vectors grouping make alien.c-types ;
+combinators vectors grouping make alien.c-types combinators.short-circuit
+math.order math.libm math.parser ;
 QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
 
@@ -286,6 +287,129 @@ M: cucumber equal? "The cucumber has no equal" throw ;
 [ 4294967295 B{ 255 255 255 255 } -1 ]
 [
     -1 <int> -1 <int>
-    [ [ 0 alien-unsigned-cell swap ] [ 0 alien-signed-2 ] bi ]
+    [ [ 0 alien-unsigned-4 swap ] [ 0 alien-signed-2 ] bi ]
     compile-call
 ] unit-test
+
+! Regression found while working on global register allocation
+
+: linear-scan-regression-1 ( a b c -- ) 3array , ;
+: linear-scan-regression-2 ( a b -- ) 2array , ;
+
+: linear-scan-regression ( a b c -- )
+    [ linear-scan-regression-2 ]
+    [ linear-scan-regression-1 ]
+    bi-curry bi-curry interleave ;
+
+[
+    {
+        { 1 "x" "y" }
+        { "x" "y" }
+        { 2 "x" "y" }
+        { "x" "y" }
+        { 3 "x" "y" }
+    }
+] [
+    [ { 1 2 3 } "x" "y" linear-scan-regression ] { } make
+] unit-test
+
+! Regression from Doug's value numbering changes
+[ t ] [ 2 [ 1 swap fixnum< ] compile-call ] unit-test
+[ 3 ] [ 2 [ 1 swap fixnum< [ 3 ] [ 4 ] if ] compile-call ] unit-test
+
+cell 4 = [
+    [ 0 ] [ 101 [ dup fixnum-fast 1 fixnum+fast 20 fixnum-shift-fast 20 fixnum-shift-fast ] compile-call ] unit-test
+] when
+
+! Regression from Slava's value numbering changes
+[ 1 ] [ 31337 [ dup fixnum<= [ 1 ] [ 2 ] if ] compile-call ] unit-test
+
+! Bug with ##return node construction
+: return-recursive-bug ( nodes -- ? )
+    { fixnum } declare [
+        dup 3 bitand 1 = [ drop t ] [
+            dup 3 bitand 2 = [
+                return-recursive-bug
+            ] [ drop f ] if
+        ] if
+    ] any? ; inline recursive
+
+[ t ] [ 3 [ return-recursive-bug ] compile-call ] unit-test
+
+! Coalescing reductions
+[ f ] [ V{ } 0 [ [ vector? ] both? ] compile-call ] unit-test
+[ f ] [ 0 V{ } [ [ vector? ] both? ] compile-call ] unit-test
+
+[ f ] [
+    f vector [
+        [ dup [ \ vector eq? ] [ drop f ] if ] dip
+        dup [ \ vector eq? ] [ drop f ] if
+        over rot [ drop ] [ nip ] if
+    ] compile-call
+] unit-test
+
+! Coalesing bug reduced from sequence-parser:take-sequence
+: coalescing-bug-1 ( a b c d -- a b c d )
+    3dup {
+        [ 2drop 0 < ]
+        [ [ drop ] 2dip length > ]
+        [ drop > ]
+    } 3|| [ 3drop f ] [ slice boa ] if swap [ [ length ] bi@ ] 2keep ;
+
+[ 0 3 f { 1 2 3 } ] [ { 1 2 3 } -10 3 "hello" coalescing-bug-1 ] unit-test
+[ 0 3 f { 1 2 3 } ] [ { 1 2 3 } 0 7 "hello" coalescing-bug-1 ] unit-test
+[ 0 3 f { 1 2 3 } ] [ { 1 2 3 } 3 2 "hello" coalescing-bug-1 ] unit-test
+[ 2 3 T{ slice f 1 3 "hello" } { 1 2 3 } ] [ { 1 2 3 } 1 3 "hello" coalescing-bug-1 ] unit-test
+
+! Another one, found by Dan
+: coalescing-bug-2 ( a -- b )
+    dup dup 10 fixnum< [ 1 fixnum+fast ] when
+    fixnum+fast 2 fixnum*fast 2 fixnum-fast 2 fixnum*fast 2 fixnum+fast ;
+
+[ 10 ] [ 1 coalescing-bug-2 ] unit-test
+[ 86 ] [ 11 coalescing-bug-2 ] unit-test
+
+! Regression in suffix-arrays code
+: coalescing-bug-3 ( from/f to/f seq -- slice )
+    [
+        [ drop 0 or ] [ length or ] bi-curry bi*
+        [ min ] keep
+    ] keep <slice> ;
+
+[ T{ slice f 0 5 "hello" } ] [ f f "hello" coalescing-bug-3 ] unit-test
+[ T{ slice f 1 5 "hello" } ] [ 1 f "hello" coalescing-bug-3 ] unit-test
+[ T{ slice f 0 3 "hello" } ] [ f 3 "hello" coalescing-bug-3 ] unit-test
+[ T{ slice f 1 3 "hello" } ] [ 1 3 "hello" coalescing-bug-3 ] unit-test
+[ T{ slice f 3 3 "hello" } ] [ 4 3 "hello" coalescing-bug-3 ] unit-test
+[ T{ slice f 5 5 "hello" } ] [ 6 f "hello" coalescing-bug-3 ] unit-test
+
+! Reduction
+: coalescing-bug-4 ( a b c -- a b c )
+     [ [ min ] keep ] dip vector? [ 1 ] [ 2 ] if ;
+
+ [ 2 3 2 ] [ 2 3 "" coalescing-bug-4 ] unit-test
+ [ 3 3 2 ] [ 4 3 "" coalescing-bug-4 ] unit-test
+ [ 3 3 2 ] [ 4 3 "" coalescing-bug-4 ] unit-test
+ [ 2 3 1 ] [ 2 3 V{ } coalescing-bug-4 ] unit-test
+ [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
+ [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
+ 
+! Global stack analysis dataflow equations are wrong
+: some-word ( a -- b ) 2 + ;
+: global-dcn-bug-1 ( a b -- c d )
+    dup [ [ drop 1 ] dip ] [ [ some-word ] dip ] if
+    dup [ [ 1 fixnum+fast ] dip ] [ [ drop 1 ] dip ] if ;
+
+[ 2 t ] [ 0 t global-dcn-bug-1 ] unit-test
+[ 1 f ] [ 0 f global-dcn-bug-1 ] unit-test
+
+! Forgot a GC check
+: missing-gc-check-1 ( a -- b ) { fixnum } declare <alien> ;
+: missing-gc-check-2 ( -- ) 10000000 [ missing-gc-check-1 drop ] each-integer ;
+
+[ ] [ missing-gc-check-2 ] unit-test
+
+[ 1 "0.169967142900241" ] [ 1.4 [ 1 swap fcos ] compile-call number>string ] unit-test
+[ 1 "0.169967142900241" ] [ 1.4 1 [ swap fcos ] compile-call number>string ] unit-test
+[ "0.169967142900241" "0.9854497299884601" ] [ 1.4 [ [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
+[ 1 "0.169967142900241" "0.9854497299884601" ] [ 1.4 1 [ swap >float [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test

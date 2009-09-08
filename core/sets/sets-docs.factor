@@ -1,4 +1,5 @@
-USING: kernel help.markup help.syntax sequences quotations assocs ;
+USING: assocs hashtables help.markup help.syntax kernel
+quotations sequences ;
 IN: sets
 
 ARTICLE: "sets" "Set-theoretic operations on sequences"
@@ -22,6 +23,7 @@ $nl
 "Adding elements to sets:"
 { $subsection adjoin }
 { $subsection conjoin }
+{ $subsection conjoin-at }
 { $see-also member? memq? any? all? "assocs-sets" } ;
 
 ABOUT: "sets"
@@ -52,6 +54,10 @@ HELP: conjoin
     }
 }
 { $side-effects "assoc" } ;
+
+HELP: conjoin-at
+{ $values { "value" object } { "key" object } { "assoc" assoc } }
+{ $description "Adds " { $snippet "value" } " to the set stored at " { $snippet "key" } " of " { $snippet "assoc" } "." } ;
 
 HELP: unique
 { $values { "seq" "a sequence" } { "assoc" assoc } }
@@ -125,3 +131,4 @@ HELP: gather
      { "seq" sequence } { "quot" quotation }
      { "newseq" sequence } }
 { $description "Maps a quotation onto a sequence, concatenates the results of the mapping, and removes duplicates." } ;
+

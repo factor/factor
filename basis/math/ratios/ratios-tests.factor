@@ -78,8 +78,8 @@ unit-test
 [ 3 ] [ 10/3 truncate ] unit-test
 [ -3 ] [ -10/3 truncate ] unit-test
 
-[ -1/2 ] [ 1/2 1- ] unit-test
-[ 3/2 ] [ 1/2 1+ ] unit-test
+[ -1/2 ] [ 1/2 1 - ] unit-test
+[ 3/2 ] [ 1/2 1 + ] unit-test
 
 [ 1.0 ] [ 0.5 1/2 + ] unit-test
 [ 1.0 ] [ 1/2 0.5 + ] unit-test

@@ -59,16 +59,19 @@ C: <extra-words> extra-words
     [ qualified-vocabs>> delete-all ]
     tri ;
 
+ERROR: no-word-in-vocab word vocab ;
+
 <PRIVATE
 
 : (add-qualified) ( qualified -- )
     manifest get qualified-vocabs>> push ;
 
-: (from) ( vocab words -- vocab words words' assoc )
-    2dup swap load-vocab words>> ;
+: (from) ( vocab words -- vocab words words' vocab )
+    2dup swap load-vocab ;
 
-: extract-words ( seq assoc -- assoc' )
-    extract-keys dup [ [ drop ] [ no-word-error ] if ] assoc-each ;
+: extract-words ( seq vocab -- assoc' )
+    [ words>> extract-keys dup ] [ name>> ] bi
+    [ swap [ 2drop ] [ no-word-in-vocab ] if ] curry assoc-each ;
 
 : (lookup) ( name assoc -- word/f )
     at dup forward-reference? [ drop f ] when ;
@@ -148,7 +151,7 @@ TUPLE: from vocab names words ;
 TUPLE: exclude vocab names words ;
 
 : <exclude> ( vocab words -- from )
-    (from) [ nip ] [ extract-words ] 2bi assoc-diff exclude boa ;
+    (from) [ nip words>> ] [ extract-words ] 2bi assoc-diff exclude boa ;
 
 : add-words-excluding ( vocab words -- )
     <exclude> (add-qualified) ;
@@ -156,7 +159,7 @@ TUPLE: exclude vocab names words ;
 TUPLE: rename word vocab words ;
 
 : <rename> ( word vocab new-name -- rename )
-    [ 2dup load-vocab words>> dupd at [ ] [ no-word-error ] ?if ] dip
+    [ 2dup load-vocab words>> dupd at [ ] [ swap no-word-in-vocab ] ?if ] dip
     associate rename boa ;
 
 : add-renamed-word ( word vocab new-name -- )

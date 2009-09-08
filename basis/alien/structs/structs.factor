@@ -6,29 +6,11 @@ alien.c-types alien.structs.fields cpu.architecture math.order
 quotations byte-arrays ;
 IN: alien.structs
 
-TUPLE: struct-type
-size
-align
-fields
-{ boxer-quot callable }
-{ unboxer-quot callable }
-{ getter callable }
-{ setter callable }
-return-in-registers? ;
+TUPLE: struct-type < abstract-c-type fields return-in-registers? ;
 
 M: struct-type c-type ;
 
-M: struct-type heap-size size>> ;
-
-M: struct-type c-type-class drop byte-array ;
-
-M: struct-type c-type-align align>> ;
-
 M: struct-type c-type-stack-align? drop f ;
-
-M: struct-type c-type-boxer-quot boxer-quot>> ;
-
-M: struct-type c-type-unboxer-quot unboxer-quot>> ;
 
 : if-value-struct ( ctype true false -- )
     [ dup value-struct? ] 2dip '[ drop "void*" @ ] if ; inline
@@ -53,9 +35,10 @@ M: struct-type stack-size
 
 : c-struct? ( type -- ? ) (c-type) struct-type? ;
 
-: (define-struct) ( name size align fields -- )
-    [ [ align ] keep ] dip
-    struct-type new
+: (define-struct) ( name size align fields class -- )
+    [ [ align ] keep ] 2dip new
+        byte-array >>class
+        byte-array >>boxed-class
         swap >>fields
         swap >>align
         swap >>size
@@ -71,14 +54,16 @@ M: struct-type stack-size
     [ 2drop ] [ make-fields ] 3bi
     [ struct-offsets ] keep
     [ [ type>> ] map compute-struct-align ] keep
-    [ (define-struct) ] keep
-    [ define-field ] each ;
+    [ struct-type (define-struct) ] keep
+    [ define-field ] each ; deprecated
 
 : define-union ( name members -- )
-    [ expand-constants ] map
     [ [ heap-size ] [ max ] map-reduce ] keep
-    compute-struct-align f (define-struct) ;
+    compute-struct-align f struct-type (define-struct) ; deprecated
 
 : offset-of ( field struct -- offset )
     c-types get at fields>> 
     [ name>> = ] with find nip offset>> ;
+
+USE: vocabs.loader
+"struct-arrays" require

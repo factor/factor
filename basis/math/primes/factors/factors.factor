@@ -1,14 +1,14 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators kernel make math math.functions
-math.primes sequences ;
+math.primes math.ranges sequences sequences.product sorting ;
 IN: math.primes.factors
 
 <PRIVATE
 
 : count-factor ( n d -- n' c )
     [ 1 ] 2dip [ /i ] keep
-    [ dupd /mod zero? ] curry [ nip [ 1+ ] dip ] while drop
+    [ dupd /mod zero? ] curry [ nip [ 1 + ] dip ] while drop
     swap ;
 
 : write-factor ( n d -- n' d' )
@@ -39,5 +39,13 @@ PRIVATE>
 : totient ( n -- t )
     {
         { [ dup 2 < ] [ drop 0 ] }
-        [ dup unique-factors [ 1 [ 1- * ] reduce ] [ product ] bi / * ]
+        [ dup unique-factors [ 1 [ 1 - * ] reduce ] [ product ] bi / * ]
     } cond ; foldable
+
+: divisors ( n -- seq )
+    dup 1 = [
+        1array
+    ] [
+        group-factors [ first2 [0,b] [ ^ ] with map ] map
+        [ product ] product-map natural-sort
+    ] if ;

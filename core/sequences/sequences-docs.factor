@@ -123,8 +123,6 @@ HELP: unless-empty
     }
 } ;
 
-{ if-empty when-empty unless-empty } related-words
-
 HELP: delete-all
 { $values { "seq" "a resizable sequence" } }
 { $description "Resizes the sequence to zero length, removing all elements. Not all sequences are resizable." }
@@ -280,7 +278,7 @@ HELP: reduce-index
 
 HELP: accumulate
 { $values { "identity" object } { "seq" sequence } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } { "newseq" "a new sequence" } }
-{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results together with the final result. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence."
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results together with the final result. The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
 $nl
 "When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." }
 { $examples
@@ -627,7 +625,7 @@ HELP: slice-error
 } ;
 
 HELP: slice
-{ $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence. New instances can be created by calling " { $link <slice> } "."
+{ $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence. New instances can be created by calling " { $link <slice> } ". Convenience words are also provided for creating slices where one endpoint is the start or end of the sequence; see " { $link "sequences-slices" } " for a list."
 $nl
 "Slices are mutable if the underlying sequence is mutable, and mutating a slice changes the underlying sequence. However, slices cannot be resized after creation." } ;
 
@@ -1107,7 +1105,7 @@ HELP: replicate
      { "newseq" sequence } }
 { $description "Calls the quotation for every element of the sequence in order. However, the element is not passed to the quotation -- it is dropped, and the quotation produces an element of its own that is collected into a sequence of the same class as the input sequence." }
 { $examples 
-    { $unchecked-example "USING: prettyprint kernel sequences ;"
+    { $unchecked-example "USING: kernel prettyprint random sequences ;"
         "5 [ 100 random ] replicate ."
         "{ 52 10 45 81 30 }"
     }
@@ -1214,7 +1212,7 @@ HELP: follow
 { $examples "Get random numbers until zero is reached:"
     { $unchecked-example
     "USING: random sequences prettyprint math ;"
-    "100 [ random dup zero? [ drop f ] when ] follow ."
+    "100 [ random [ f ] when-zero ] follow ."
     "{ 100 86 34 32 24 11 7 2 }"
 } } ;
 
@@ -1311,6 +1309,20 @@ HELP: iota
   }
 } ;
 
+HELP: assert-sequence=
+{ $values
+    { "a" sequence } { "b" sequence }
+}
+{ $description "Throws an error if all the elements of two sequences, taken pairwise, are not equal." }
+{ $notes "The sequences need not be of the same type." }
+{ $examples
+  { $example
+    "USING: prettyprint sequences ;"
+    "{ 1 2 3 } V{ 1 2 3 } assert-sequence="
+    ""
+  }
+} ;
+
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
 $nl
@@ -1357,7 +1369,15 @@ ARTICLE: "virtual-sequences-protocol" "Virtual sequence protocol"
 { $subsection virtual@ } ;
 
 ARTICLE: "virtual-sequences" "Virtual sequences"
-"Virtual sequences allow different ways of accessing a sequence without having to create a new sequence or a new data structure altogether. To do this, they translate the virtual index into a normal index into an underlying sequence using the " { $link "virtual-sequences-protocol" } "."
+"A virtual sequence is an implementation of the " { $link "sequence-protocol" } " which does not store its own elements, and instead computes them, either from scratch or by retrieving them from another sequence."
+$nl
+"Implementations include the following:"
+{ $list
+  { $link reversed }
+  { $link slice }
+  { $link iota }
+}
+"Virtual sequences can be implemented with the " { $link "virtual-sequences-protocol" } ", by translating an index in the virtual sequence into an index in another sequence:"
 { $subsection "virtual-sequences-protocol" } ;
 
 ARTICLE: "sequences-integers" "Counted loops"
@@ -1370,6 +1390,14 @@ $nl
 "Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer."
 $nl
 "More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
+
+ARTICLE: "sequences-if" "Control flow with sequences"
+"To reduce the boilerplate of checking if a sequence is empty, several combinators are provided."
+$nl
+"Checking if a sequence is empty:"
+{ $subsection if-empty }
+{ $subsection when-empty }
+{ $subsection unless-empty } ;
 
 ARTICLE: "sequences-access" "Accessing sequence elements"
 { $subsection ?nth }
@@ -1422,6 +1450,16 @@ ARTICLE: "sequences-appending" "Appending sequences"
 { $subsection pad-tail } ;
 
 ARTICLE: "sequences-slices" "Subsequences and slices"
+"There are two ways to extract a subrange of elements from a sequence. The first approach creates a new sequence of the same type as the input, which does not share storage with the underlying sequence. This takes time proportional to the number of elements being extracted. The second approach creates a " { $emphasis "slice" } ", which is a virtual sequence (see " { $link "virtual-sequences" } ") sharing storage with the original sequence. Slices are constructed in constant time."
+$nl
+"Some general guidelines for choosing between the two approaches:"
+{ $list
+  "If you are using mutable state, the choice has to be made one way or another because of semantics; mutating a slice will change the underlying sequence."
+  { "Using a slice can improve algorithmic complexity. For example, if each iteration of a loop decomposes a sequence using " { $link first } " and " { $link rest } ", then the loop will run in quadratic time, relative to the length of the sequence. Using " { $link rest-slice } " changes the loop to run in linear time, since " { $link rest-slice } " does not copy any elements. Taking a slice of a slice will “collapse” the slice so to avoid the double indirection, so it is safe to use slices in recursive code." }
+  "Accessing elements from a concrete sequence (such as a string or an array) is often faster than accessing elements from a slice, because slice access entails additional indirection. However, in some cases, if the slice is immediately consumed by an iteration combinator, the compiler can eliminate the slice allocation and indirect altogether."
+  "If the slice outlives the original sequence, the original sequence will still remain in memory, since the slice will reference it. This can increase memory consumption unnecessarily."
+}
+{ $heading "Subsequence operations" }
 "Extracting a subsequence:"
 { $subsection subseq }
 { $subsection head }
@@ -1436,7 +1474,8 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection unclip-last }
 { $subsection cut }
 { $subsection cut* }
-"A " { $emphasis "slice" } " is a virtual sequence which presents as view of a subsequence of an underlying sequence:"
+{ $heading "Slice operations" }
+"The slice data type:"
 { $subsection slice }
 { $subsection slice? }
 "Extracting a slice:"
@@ -1591,6 +1630,7 @@ ARTICLE: "sequences-comparing" "Comparing sequences"
 { $subsection sequence= }
 { $subsection mismatch }
 { $subsection drop-prefix }
+{ $subsection assert-sequence= }
 "The " { $link <=> } " generic word performs lexicographic comparison when applied to sequences." ;
 
 ARTICLE: "sequences-f" "The f object as a sequence"
@@ -1624,6 +1664,8 @@ $nl
 "Using sequences for looping:"
 { $subsection "sequences-integers" }
 { $subsection "math.ranges" }
+"Using sequences for control flow:"
+{ $subsection "sequences-if" }
 "For inner loops:"
 { $subsection "sequences-unsafe" } ;
 

@@ -24,3 +24,6 @@ IN: sequences.product.tests
         [ [ % ] each ] product-each
     ] "" make
 ] unit-test
+
+[ { } ] [ { { } { 1 } } [ ] product-map ] unit-test
+[ ] [ { { } { 1 } } [ drop ] product-each ] unit-test

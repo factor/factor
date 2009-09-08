@@ -19,7 +19,7 @@ IN: images.tesselation
     '[ _ tesselate-columns ] map ;
 
 : tile-width ( tile-bitmap original-image -- width )
-    [ first length ] [ component-order>> bytes-per-pixel ] bi* /i ;
+    [ first length ] [ bytes-per-pixel ] bi* /i ;
 
 : <tile-image> ( tile-bitmap original-image -- tile-image )
     clone
@@ -28,7 +28,7 @@ IN: images.tesselation
         [ [ over tile-width ] [ length ] bi 2array >>dim ] bi ;
 
 :: tesselate ( image tess-dim -- image-grid )
-    image component-order>> bytes-per-pixel :> bpp
+    image bytes-per-pixel :> bpp
     image dim>> { bpp 1 } v* :> image-dim'
     tess-dim { bpp 1 } v* :> tess-dim'
     image bitmap>> image-dim' tess-dim' tesselate-bitmap

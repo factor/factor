@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.c-types alien.destructors accessors kernel ;
+USING: alien.syntax alien.c-types alien.destructors accessors classes.struct kernel ;
 IN: core-foundation
 
 TYPEDEF: void* CFTypeRef
@@ -20,14 +20,12 @@ TYPEDEF: void* CFUUIDRef
 ALIAS: <CFIndex> <long>
 ALIAS: *CFIndex *long
 
-C-STRUCT: CFRange
-{ "CFIndex" "location" }
-{ "CFIndex" "length" } ;
+STRUCT: CFRange
+    { location CFIndex }
+    { length CFIndex } ;
 
 : <CFRange> ( location length -- range )
-    "CFRange" <c-object>
-    [ set-CFRange-length ] keep
-    [ set-CFRange-location ] keep ;
+    CFRange <struct-boa> ;
 
 FUNCTION: CFTypeRef CFRetain ( CFTypeRef cf ) ;
 

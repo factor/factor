@@ -296,7 +296,7 @@ ARTICLE: "stdio-motivation" "Motivation for default streams"
     "    16 group"
     "] with-disposal"
 }
-"This code is robust however it is more complex than it needs to be since. This is where the default stream words come in; using them, the above can be rewritten as follows:"
+"This code is robust, however it is more complex than it needs to be. This is where the default stream words come in; using them, the above can be rewritten as follows:"
 { $code
     "USING: continuations kernel io io.files math.parser splitting ;"
     "\"data.txt\" utf8 <file-reader> ["
@@ -338,7 +338,6 @@ $nl
 { $subsection write1 }
 { $subsection write }
 "If the default output stream is a character stream (" { $link stream-element-type } " outputs " { $link +character+ } "), lines of text can be written:"
-{ $subsection readln }
 { $subsection print }
 { $subsection nl }
 { $subsection bl }

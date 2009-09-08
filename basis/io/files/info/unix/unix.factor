@@ -4,7 +4,7 @@ USING: accessors kernel system math math.bitwise strings arrays
 sequences combinators combinators.short-circuit alien.c-types
 vocabs.loader calendar calendar.unix io.files.info
 io.files.types io.backend io.directories unix unix.stat unix.time unix.users
-unix.groups ;
+unix.groups classes.struct struct-arrays ;
 IN: io.files.info.unix
 
 TUPLE: unix-file-system-info < file-system-info
@@ -69,19 +69,19 @@ M: unix stat>file-info ( stat -- file-info )
     [ new-file-info ] dip
     {
         [ stat>type >>type ]
-        [ stat-st_size >>size ]
-        [ stat-st_mode >>permissions ]
-        [ stat-st_ctimespec timespec>unix-time >>created ]
-        [ stat-st_mtimespec timespec>unix-time >>modified ]
-        [ stat-st_atimespec timespec>unix-time >>accessed ]
-        [ stat-st_uid >>uid ]
-        [ stat-st_gid >>gid ]
-        [ stat-st_dev >>dev ]
-        [ stat-st_ino >>ino ]
-        [ stat-st_nlink >>nlink ]
-        [ stat-st_rdev >>rdev ]
-        [ stat-st_blocks >>blocks ]
-        [ stat-st_blksize >>blocksize ]
+        [ st_size>> >>size ]
+        [ st_mode>> >>permissions ]
+        [ st_ctimespec>> timespec>unix-time >>created ]
+        [ st_mtimespec>> timespec>unix-time >>modified ]
+        [ st_atimespec>> timespec>unix-time >>accessed ]
+        [ st_uid>> >>uid ]
+        [ st_gid>> >>gid ]
+        [ st_dev>> >>dev ]
+        [ st_ino>> >>ino ]
+        [ st_nlink>> >>nlink ]
+        [ st_rdev>> >>rdev ]
+        [ st_blocks>> >>blocks ]
+        [ st_blksize>> >>blocksize ]
         [ drop dup blocks>> standard-unix-block-size * >>size-on-disk ]
     } cleave ;
 
@@ -98,12 +98,12 @@ M: unix stat>file-info ( stat -- file-info )
     } case ;
 
 M: unix stat>type ( stat -- type )
-    stat-st_mode n>file-type ;
+    st_mode>> n>file-type ;
 
 <PRIVATE
 
 : stat-mode ( path -- mode )
-    normalize-path file-status stat-st_mode ;
+    normalize-path file-status st_mode>> ;
 
 : chmod-set-bit ( path mask ? -- )
     [ dup stat-mode ] 2dip
@@ -179,14 +179,12 @@ M: unix copy-file-and-info ( from to -- )
 
 <PRIVATE
 
-: make-timeval-array ( array -- byte-array )
-    [ [ "timeval" <c-object> ] unless* ] map concat ;
-
 : timestamp>timeval ( timestamp -- timeval )
     unix-1970 time- duration>microseconds make-timeval ;
 
 : timestamps>byte-array ( timestamps -- byte-array )
-    [ dup [ timestamp>timeval ] when ] map make-timeval-array ;
+    [ [ timestamp>timeval ] [ \ timeval <struct> ] if* ] map
+    \ timeval >struct-array ;
 
 PRIVATE>
 
@@ -202,8 +200,7 @@ PRIVATE>
     f swap 2array set-file-times ;
 
 : set-file-ids ( path uid gid -- )
-    [ normalize-path ] 2dip
-    [ [ -1 ] unless* ] bi@ chown io-error ;
+    [ normalize-path ] 2dip [ -1 or ] bi@ chown io-error ;
 
 GENERIC: set-file-user ( path string/id -- )
 

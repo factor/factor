@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel kernel.private namespaces
-system cpu.x86.assembler layouts compiler.units math
-math.private compiler.constants vocabs slots.private words
-locals.backend make sequences combinators arrays ;
+USING: bootstrap.image.private kernel kernel.private namespaces system
+layouts compiler.units math math.private compiler.constants vocabs
+slots.private words locals.backend make sequences combinators arrays
+ cpu.x86.assembler cpu.x86.assembler.operands ;
 IN: bootstrap.x86
 
 big-endian off
@@ -226,7 +226,7 @@ big-endian off
     temp2 temp1 MOV
     bootstrap-cell 8 = [ temp2 1 SHL ] when
     ! key &= cache.length - 1
-    temp2 mega-cache-size get 1- bootstrap-cell * AND
+    temp2 mega-cache-size get 1 - bootstrap-cell * AND
     ! cache += array-start-offset
     temp0 array-start-offset ADD
     ! cache += key
@@ -496,7 +496,7 @@ big-endian off
     ! make a copy
     mod-arg div-arg MOV
     ! sign-extend
-    mod-arg bootstrap-cell-bits 1- SAR
+    mod-arg bootstrap-cell-bits 1 - SAR
     ! divide
     temp3 IDIV ;
 
