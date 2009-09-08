@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system kernel math alien.syntax combinators locals init io
-cpu.x86 compiler compiler.units accessors ;
+USING: system kernel math math.order math.parser namespaces
+alien.syntax combinators locals init io cpu.x86 compiler
+compiler.units accessors ;
 IN: cpu.x86.features
 
 <PRIVATE
@@ -61,6 +62,7 @@ USING: cpu.x86.features cpu.x86.features.private ;
 [ { sse_version } compile ] with-optimizer
 
 "Checking for multimedia extensions: " write sse-version
+"sse-version" get [ string>number min ] when*
 [ sse-string write " detected" print ]
 [ install-sse-check ]
 [ enable-sse ] tri
