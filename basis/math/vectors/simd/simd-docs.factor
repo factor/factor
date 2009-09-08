@@ -138,8 +138,8 @@ M\ actor advance optimized.">
 { $code
 <" USE: compiler.tree.debugger
 
-M\ actor advance test-mr mr.">
-"An example of a high-performance algorithm that uses SIMD primitives can be found in the " { $vocab-link "benchmark.nbody-simd" } " vocabulary." } ;
+M\ actor advance test-mr mr."> }
+"An example of a high-performance algorithm that uses SIMD primitives can be found in the " { $vocab-link "benchmark.nbody-simd" } " vocabulary." ;
 
 ARTICLE: "math.vectors.simd.intrinsics" "Low-level SIMD primitives"
 "The words in the " { $vocab-link "math.vectors.simd.intrinsics" } " vocabulary are used to implement SIMD support. These words have three disadvantages compared to the higher-level " { $link "math-vectors" } " words:"
