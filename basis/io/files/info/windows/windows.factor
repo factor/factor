@@ -129,8 +129,7 @@ ERROR: not-absolute-path ;
         [ first Letter? ]
     } 1&& [ 2 head "\\" append ] [ not-absolute-path ] if ;
 
-M: winnt file-system-info ( path -- file-system-info )
-    normalize-path root-directory
+: (file-system-info) ( path -- file-system-info )
     dup [ volume-information ] [ file-system-space ] bi
     \ win32-file-system-info new
         swap *ulonglong >>free-space
@@ -143,6 +142,9 @@ M: winnt file-system-info ( path -- file-system-info )
         swap >>device-name
         swap >>mount-point
     calculate-file-system-info ;
+
+M: winnt file-system-info ( path -- file-system-info )
+    normalize-path root-directory (file-system-info) ;
 
 : volume>paths ( string -- array )
     16384 <ushort-array> tuck dup length
@@ -180,7 +182,7 @@ M: winnt file-system-info ( path -- file-system-info )
 M: winnt file-systems ( -- array )
     find-volumes [ volume>paths ] map
     concat [
-        [ file-system-info ]
+        [ (file-system-info) ]
         [ drop \ file-system-info new swap >>mount-point ] recover
     ] map ;
 
