@@ -41,8 +41,8 @@ void throw_error(cell error, stack_frame *callstack_top)
 		gc_off = false;
 
 		/* Reset local roots */
-		gc_locals = gc_locals_region->start - sizeof(cell);
-		gc_bignums = gc_bignums_region->start - sizeof(cell);
+		gc_locals.clear();
+		gc_bignums.clear();
 
 		/* If we had an underflow or overflow, stack pointers might be
 		out of bounds */
@@ -130,6 +130,11 @@ void divide_by_zero_error()
 	general_error(ERROR_DIVIDE_BY_ZERO,F,F,NULL);
 }
 
+void fp_trap_error()
+{
+	general_error(ERROR_FP_TRAP,F,F,NULL);
+}
+
 PRIMITIVE(call_clear)
 {
 	throw_impl(dpop(),stack_chain->callstack_bottom);
@@ -149,6 +154,11 @@ void memory_signal_handler_impl()
 void misc_signal_handler_impl()
 {
 	signal_error(signal_number,signal_callstack_top);
+}
+
+void fp_signal_handler_impl()
+{
+    fp_trap_error();
 }
 
 }

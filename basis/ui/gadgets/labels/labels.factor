@@ -4,7 +4,7 @@ USING: accessors arrays hashtables io kernel math math.functions
 namespaces make opengl sequences strings splitting ui.gadgets
 ui.gadgets.tracks ui.gadgets.packs fonts ui.render ui.pens.solid
 ui.baseline-alignment ui.text colors colors.constants models
-combinators ;
+combinators opengl.gl ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.

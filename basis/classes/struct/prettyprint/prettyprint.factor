@@ -116,3 +116,5 @@ M: struct-mirror >alist ( mirror -- alist )
     ] bi append ;
 
 M: struct make-mirror <struct-mirror> ;
+
+INSTANCE: struct-mirror assoc

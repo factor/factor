@@ -97,11 +97,9 @@ SYMBOL: history
 :: inline-word ( #call word -- ? )
     word already-inlined? [ f ] [
         #call word splicing-body [
-            [
-                word add-to-history
-                dup (propagate)
-            ] with-scope
-            #call (>>body) t
+            word add-to-history
+            #call (>>body)
+            #call propagate-body
         ] [ f ] if*
     ] if ;
 
@@ -141,5 +139,7 @@ SYMBOL: history
     #! Note the logic here: if there's a custom inlining hook,
     #! it is permitted to return f, which means that we try the
     #! normal inlining heuristic.
-    dup custom-inlining? [ 2dup inline-custom ] [ f ] if
-    [ 2drop t ] [ (do-inlining) ] if ;
+    [
+        dup custom-inlining? [ 2dup inline-custom ] [ f ] if
+        [ 2drop t ] [ (do-inlining) ] if
+    ] with-scope ;

@@ -5,7 +5,7 @@ prettyprint namespaces ui.tools.listener ui.tools.workspace
 alien.c-types alien sequences math ;
 IN: windows.dragdrop-listener
 
-<< "WCHAR" require-c-arrays >>
+<< "WCHAR" require-c-array >>
 
 : filenames-from-hdrop ( hdrop -- filenames )
     dup HEX: FFFFFFFF f 0 DragQueryFile ! get count of files

@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces assocs hashtables sequences arrays
-accessors vectors combinators sets classes cpu.architecture compiler.cfg
-compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.copy-prop compiler.cfg.rpo compiler.cfg.liveness ;
+accessors vectors combinators sets classes cpu.architecture
+compiler.cfg compiler.cfg.registers compiler.cfg.instructions
+compiler.cfg.def-use compiler.cfg.copy-prop compiler.cfg.rpo
+compiler.cfg.liveness ;
 IN: compiler.cfg.alias-analysis
 
 ! We try to eliminate redundant slot operations using some simple heuristics.
@@ -211,11 +212,11 @@ M: ##alien-global insn-object drop \ ##alien-global ;
 
 GENERIC: analyze-aliases* ( insn -- insn' )
 
+M: insn analyze-aliases*
+    dup defs-vreg [ set-heap-ac ] when* ;
+
 M: ##load-immediate analyze-aliases*
     dup [ val>> ] [ dst>> ] bi constants get set-at ;
-
-M: ##flushable analyze-aliases*
-    dup dst>> set-heap-ac ;
 
 M: ##allocation analyze-aliases*
     #! A freshly allocated object is distinct from any other
@@ -245,8 +246,6 @@ M: ##copy analyze-aliases*
     #! The output vreg gets the same alias class as the input
     #! vreg, since they both contain the same value.
     dup record-copy ;
-
-M: insn analyze-aliases* ;
 
 : analyze-aliases ( insns -- insns' )
     [ insn# set analyze-aliases* ] map-index sift ;

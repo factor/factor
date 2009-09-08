@@ -33,34 +33,34 @@ CONSTANT: FD_CLOEXEC 1
 
 CONSTANT: F_SETFL 4
 
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" }
-    { "int" "socktype" }
-    { "int" "protocol" }
-    { "socklen_t" "addrlen" }
-    { "void*" "addr" }
-    { "char*" "canonname" }
-    { "addrinfo*" "next" } ;
+STRUCT: addrinfo
+    { flags int }
+    { family int }
+    { socktype int }
+    { protocol int }
+    { addrlen socklen_t }
+    { addr void* }
+    { canonname char* }
+    { next addrinfo* } ;
 
-C-STRUCT: sockaddr-in
-    { "ushort" "family" }
-    { "ushort" "port" }
-    { "in_addr_t" "addr" }
-    { "longlong" "unused" } ;
+STRUCT: sockaddr-in
+    { family ushort }
+    { port ushort }
+    { addr in_addr_t }
+    { unused longlong } ;
 
-C-STRUCT: sockaddr-in6
-    { "ushort" "family" }
-    { "ushort" "port" }
-    { "uint" "flowinfo" }
-    { { "uchar" 16 } "addr" }
-    { "uint" "scopeid" } ;
+STRUCT: sockaddr-in6
+    { family ushort }
+    { port ushort }
+    { flowinfo uint }
+    { addr uchar[16] }
+    { scopeid uint } ;
 
 CONSTANT: max-un-path 108
 
-C-STRUCT: sockaddr-un
-    { "ushort" "family" }
-    { { "char" max-un-path } "path" } ;
+STRUCT: sockaddr-un
+    { family ushort }
+    { path { "char" max-un-path } } ;
 
 CONSTANT: SOCK_STREAM 1
 CONSTANT: SOCK_DGRAM 2
