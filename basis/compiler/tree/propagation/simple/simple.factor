@@ -1,10 +1,10 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors kernel sequences sequences.private assocs words
-namespaces classes.algebra combinators classes classes.tuple
-classes.tuple.private continuations arrays alien.c-types
-math math.private slots generic definitions
-stack-checker.state
+USING: fry accessors kernel sequences sequences.private assocs
+words namespaces classes.algebra combinators
+combinators.short-circuit classes classes.tuple
+classes.tuple.private continuations arrays alien.c-types math
+math.private slots generic definitions stack-checker.state
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -63,9 +63,19 @@ M: #declare propagate-before
     [ in-d>> [ value-info ] map ] [ "outputs" word-prop ] bi*
     with-datastack ;
 
+: literal-inputs? ( #call -- ? )
+    in-d>> [ value-info literal?>> ] all? ;
+
+: input-classes-match? ( #call word -- ? )
+    [ in-d>> ] [ "input-classes" word-prop ] bi*
+    [ [ value-info literal>> ] dip instance? ] 2all? ;
+
 : foldable-call? ( #call word -- ? )
-    "foldable" word-prop
-    [ in-d>> [ value-info literal?>> ] all? ] [ drop f ] if ;
+    {
+        [ nip "foldable" word-prop ]
+        [ drop literal-inputs? ]
+        [ input-classes-match? ]
+    } 2&& ;
 
 : (fold-call) ( #call word -- info )
     [ [ out-d>> ] [ in-d>> [ value-info literal>> ] map ] bi ] [ '[ _ execute ] ] bi*
