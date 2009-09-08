@@ -69,12 +69,16 @@ H{
     { vtruncate { +vector+ -> +vector+ } }
 }
 
-SYMBOL: specializations
+PREDICATE: vector-word < word vector-words key? ;
 
-specializations [ vector-words keys [ V{ } clone ] H{ } map>assoc ] initialize
+: specializations ( word -- assoc )
+    dup "specializations" word-prop
+    [ ] [ V{ } clone [ "specializations" set-word-prop ] keep ] ?if ;
+
+M: vector-word subwords specializations values ;
 
 : add-specialization ( new-word signature word -- )
-    specializations get at set-at ;
+    specializations set-at ;
 
 : word-schema ( word -- schema ) vector-words at ;
 
@@ -98,7 +102,7 @@ specializations [ vector-words keys [ V{ } clone ] H{ } map>assoc ] initialize
     ] each ;
 
 : find-specialization ( classes word -- word/f )
-    specializations get at
+    specializations
     [ first [ class<= ] 2all? ] with find
     swap [ second ] when ;
 
