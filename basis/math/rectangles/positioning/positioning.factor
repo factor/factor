@@ -1,12 +1,17 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel accessors math math.vectors
-math.rectangles math.order arrays locals
+math.rectangles math.order arrays locals fry
 combinators.short-circuit ;
 IN: math.rectangles.positioning
 
 ! Some geometry code for positioning popups and menus
 ! in a semi-intelligent manner
+
+<PRIVATE
+
+: adjust-visible-rect ( visible-rect popup-dim screen-dim -- visible-rect' )
+    [ drop clone ] dip '[ _ vmin ] change-loc ;
 
 : popup-x ( visible-rect popup-dim screen-dim -- x )
     [ loc>> first ] 2dip swap [ first ] bi@ - min 0 max ;
@@ -33,5 +38,8 @@ IN: math.rectangles.positioning
 :: popup-dim ( loc popup-dim screen-dim -- dim )
     screen-dim loc v- popup-dim vmin ;
 
+PRIVATE>
+
 : popup-rect ( visible-rect popup-dim screen-dim -- rect )
+    [ adjust-visible-rect ] 2keep
     [ popup-loc dup ] 2keep popup-dim <rect> ;
