@@ -5,7 +5,7 @@ kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
 alien.strings alien.arrays alien.complex alien.libraries sets libc
 continuations.private fry cpu.architecture classes locals
-source-files.errors
+source-files.errors slots parser generic.parser
 compiler.errors
 compiler.alien
 compiler.constants
@@ -67,23 +67,8 @@ SYMBOL: labels
 : lookup-label ( id -- label )
     labels get [ drop <label> ] cache ;
 
+! Special cases
 M: ##no-tco generate-insn drop ;
-
-M: ##load-immediate generate-insn
-    [ dst>> ] [ val>> ] bi %load-immediate ;
-
-M: ##load-reference generate-insn
-    [ dst>> ] [ obj>> ] bi %load-reference ;
-
-M: ##peek generate-insn
-    [ dst>> ] [ loc>> ] bi %peek ;
-
-M: ##replace generate-insn
-    [ src>> ] [ loc>> ] bi %replace ;
-
-M: ##inc-d generate-insn n>> %inc-d ;
-
-M: ##inc-r generate-insn n>> %inc-r ;
 
 M: ##call generate-insn
     word>> dup sub-primitive>>
@@ -91,146 +76,144 @@ M: ##call generate-insn
 
 M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 
-M: ##return generate-insn drop %return ;
-
-M: _dispatch generate-insn
-    [ src>> ] [ temp>> ] bi %dispatch ;
-
 M: _dispatch-label generate-insn
     label>> lookup-label
     cell 0 <repetition> %
     rc-absolute-cell label-fixup ;
 
-: >slot< ( insn -- dst obj slot tag )
-    { [ dst>> ] [ obj>> ] [ slot>> ] [ tag>> ] } cleave ; inline
+M: _prologue generate-insn
+    stack-frame>> [ stack-frame set ] [ total-size>> %prologue ] bi ;
 
-M: ##slot generate-insn
-    [ >slot< ] [ temp>> ] bi %slot ;
+M: _epilogue generate-insn
+    stack-frame>> total-size>> %epilogue ;
 
-M: ##slot-imm generate-insn
-    >slot< %slot-imm ;
+M: _spill-area-size generate-insn drop ;
 
-: >set-slot< ( insn -- src obj slot tag )
-    { [ src>> ] [ obj>> ] [ slot>> ] [ tag>> ] } cleave ; inline
+! Some meta-programming to generate simple code generators, where
+! the instruction is unpacked and then a %word is called
+<<
 
-M: ##set-slot generate-insn
-    [ >set-slot< ] [ temp>> ] bi %set-slot ;
+: insn-slot-quot ( spec -- quot )
+    name>> [ reader-word ] [ "label" = ] bi
+    [ \ lookup-label [ ] 2sequence ] [ [ ] 1sequence ] if ;
 
-M: ##set-slot-imm generate-insn
-    >set-slot< %set-slot-imm ;
+: codegen-method-body ( class word -- quot )
+    [
+        "insn-slots" word-prop
+        [ insn-slot-quot ] map cleave>quot
+    ] dip suffix ;
 
-M: ##string-nth generate-insn
-    { [ dst>> ] [ obj>> ] [ index>> ] [ temp>> ] } cleave %string-nth ;
+SYNTAX: CODEGEN:
+    scan-word [ \ generate-insn create-method-in ] keep scan-word
+    codegen-method-body define ;
+>>
 
-M: ##set-string-nth-fast generate-insn
-    { [ src>> ] [ obj>> ] [ index>> ] [ temp>> ] } cleave %set-string-nth-fast ;
+CODEGEN: ##load-immediate %load-immediate
+CODEGEN: ##load-reference %load-reference
+CODEGEN: ##peek %peek
+CODEGEN: ##replace %replace
+CODEGEN: ##inc-d %inc-d
+CODEGEN: ##inc-r %inc-r
+CODEGEN: ##return %return
+CODEGEN: ##slot %slot
+CODEGEN: ##slot-imm %slot-imm
+CODEGEN: ##set-slot %set-slot
+CODEGEN: ##set-slot-imm %set-slot-imm
+CODEGEN: ##string-nth %string-nth
+CODEGEN: ##set-string-nth-fast %set-string-nth-fast
+CODEGEN: ##add %add
+CODEGEN: ##add-imm %add-imm
+CODEGEN: ##sub %sub
+CODEGEN: ##sub-imm %sub-imm
+CODEGEN: ##mul %mul
+CODEGEN: ##mul-imm %mul-imm
+CODEGEN: ##and %and
+CODEGEN: ##and-imm %and-imm
+CODEGEN: ##or %or
+CODEGEN: ##or-imm %or-imm
+CODEGEN: ##xor %xor
+CODEGEN: ##xor-imm %xor-imm
+CODEGEN: ##shl %shl
+CODEGEN: ##shl-imm %shl-imm
+CODEGEN: ##shr %shr
+CODEGEN: ##shr-imm %shr-imm
+CODEGEN: ##sar %sar
+CODEGEN: ##sar-imm %sar-imm
+CODEGEN: ##min %min
+CODEGEN: ##max %max
+CODEGEN: ##not %not
+CODEGEN: ##log2 %log2
+CODEGEN: ##copy %copy
+CODEGEN: ##integer>bignum %integer>bignum
+CODEGEN: ##bignum>integer %bignum>integer
+CODEGEN: ##unbox-float %unbox-float
+CODEGEN: ##box-float %box-float
+CODEGEN: ##add-float %add-float
+CODEGEN: ##sub-float %sub-float
+CODEGEN: ##mul-float %mul-float
+CODEGEN: ##div-float %div-float
+CODEGEN: ##min-float %min-float
+CODEGEN: ##max-float %max-float
+CODEGEN: ##sqrt %sqrt
+CODEGEN: ##unary-float-function %unary-float-function
+CODEGEN: ##binary-float-function %binary-float-function
+CODEGEN: ##single>double-float %single>double-float
+CODEGEN: ##double>single-float %double>single-float
+CODEGEN: ##integer>float %integer>float
+CODEGEN: ##float>integer %float>integer
+CODEGEN: ##unbox-vector %unbox-vector
+CODEGEN: ##broadcast-vector %broadcast-vector
+CODEGEN: ##gather-vector-2 %gather-vector-2
+CODEGEN: ##gather-vector-4 %gather-vector-4
+CODEGEN: ##box-vector %box-vector
+CODEGEN: ##add-vector %add-vector
+CODEGEN: ##sub-vector %sub-vector
+CODEGEN: ##mul-vector %mul-vector
+CODEGEN: ##div-vector %div-vector
+CODEGEN: ##min-vector %min-vector
+CODEGEN: ##max-vector %max-vector
+CODEGEN: ##sqrt-vector %sqrt-vector
+CODEGEN: ##horizontal-add-vector %horizontal-add-vector
+CODEGEN: ##box-alien %box-alien
+CODEGEN: ##box-displaced-alien %box-displaced-alien
+CODEGEN: ##unbox-alien %unbox-alien
+CODEGEN: ##unbox-any-c-ptr %unbox-any-c-ptr
+CODEGEN: ##alien-unsigned-1 %alien-unsigned-1
+CODEGEN: ##alien-unsigned-2 %alien-unsigned-2
+CODEGEN: ##alien-unsigned-4 %alien-unsigned-4
+CODEGEN: ##alien-signed-1 %alien-signed-1
+CODEGEN: ##alien-signed-2 %alien-signed-2
+CODEGEN: ##alien-signed-4 %alien-signed-4
+CODEGEN: ##alien-cell %alien-cell
+CODEGEN: ##alien-float %alien-float
+CODEGEN: ##alien-double %alien-double
+CODEGEN: ##alien-vector %alien-vector
+CODEGEN: ##set-alien-integer-1 %set-alien-integer-1
+CODEGEN: ##set-alien-integer-2 %set-alien-integer-2
+CODEGEN: ##set-alien-integer-4 %set-alien-integer-4
+CODEGEN: ##set-alien-cell %set-alien-cell
+CODEGEN: ##set-alien-float %set-alien-float
+CODEGEN: ##set-alien-double %set-alien-double
+CODEGEN: ##set-alien-vector %set-alien-vector
+CODEGEN: ##allot %allot
+CODEGEN: ##write-barrier %write-barrier
+CODEGEN: ##compare %compare
+CODEGEN: ##compare-imm %compare-imm
+CODEGEN: ##compare-float %compare-float
 
-: dst/src ( insn -- dst src )
-    [ dst>> ] [ src>> ] bi ; inline
+CODEGEN: _fixnum-add %fixnum-add
+CODEGEN: _fixnum-sub %fixnum-sub
+CODEGEN: _fixnum-mul %fixnum-mul
+CODEGEN: _label resolve-label
+CODEGEN: _branch %jump-label
+CODEGEN: _compare-branch %compare-branch
+CODEGEN: _compare-imm-branch %compare-imm-branch
+CODEGEN: _compare-float-branch %compare-float-branch
+CODEGEN: _dispatch %dispatch
+CODEGEN: _spill %spill
+CODEGEN: _reload %reload
 
-: dst/src1/src2 ( insn -- dst src1 src2 )
-    [ dst>> ] [ src1>> ] [ src2>> ] tri ; inline
-
-M: ##add     generate-insn dst/src1/src2 %add     ;
-M: ##add-imm generate-insn dst/src1/src2 %add-imm ;
-M: ##sub     generate-insn dst/src1/src2 %sub     ;
-M: ##sub-imm generate-insn dst/src1/src2 %sub-imm ;
-M: ##mul     generate-insn dst/src1/src2 %mul     ;
-M: ##mul-imm generate-insn dst/src1/src2 %mul-imm ;
-M: ##and     generate-insn dst/src1/src2 %and     ;
-M: ##and-imm generate-insn dst/src1/src2 %and-imm ;
-M: ##or      generate-insn dst/src1/src2 %or      ;
-M: ##or-imm  generate-insn dst/src1/src2 %or-imm  ;
-M: ##xor     generate-insn dst/src1/src2 %xor     ;
-M: ##xor-imm generate-insn dst/src1/src2 %xor-imm ;
-M: ##shl     generate-insn dst/src1/src2 %shl     ;
-M: ##shl-imm generate-insn dst/src1/src2 %shl-imm ;
-M: ##shr     generate-insn dst/src1/src2 %shr     ;
-M: ##shr-imm generate-insn dst/src1/src2 %shr-imm ;
-M: ##sar     generate-insn dst/src1/src2 %sar     ;
-M: ##sar-imm generate-insn dst/src1/src2 %sar-imm ;
-M: ##min     generate-insn dst/src1/src2 %min     ;
-M: ##max     generate-insn dst/src1/src2 %max     ;
-M: ##not     generate-insn dst/src       %not     ;
-M: ##log2    generate-insn dst/src       %log2    ;
-
-: label/dst/src1/src2 ( insn -- label dst src1 src2 )
-    [ label>> lookup-label ] [ dst/src1/src2 ] bi ; inline
-
-M: _fixnum-add generate-insn label/dst/src1/src2 %fixnum-add ;
-M: _fixnum-sub generate-insn label/dst/src1/src2 %fixnum-sub ;
-M: _fixnum-mul generate-insn label/dst/src1/src2 %fixnum-mul ;
-
-: dst/src/temp ( insn -- dst src temp )
-    [ dst/src ] [ temp>> ] bi ; inline
-
-M: ##integer>bignum generate-insn dst/src/temp %integer>bignum ;
-M: ##bignum>integer generate-insn dst/src/temp %bignum>integer ;
-
-M: ##add-float generate-insn dst/src1/src2 %add-float ;
-M: ##sub-float generate-insn dst/src1/src2 %sub-float ;
-M: ##mul-float generate-insn dst/src1/src2 %mul-float ;
-M: ##div-float generate-insn dst/src1/src2 %div-float ;
-M: ##min-float generate-insn dst/src1/src2 %min-float ;
-M: ##max-float generate-insn dst/src1/src2 %max-float ;
-
-M: ##sqrt generate-insn dst/src %sqrt ;
-
-M: ##unary-float-function generate-insn
-    [ dst/src ] [ func>> ] bi %unary-float-function ;
-
-M: ##binary-float-function generate-insn
-    [ dst/src1/src2 ] [ func>> ] bi %binary-float-function ;
-
-M: ##integer>float generate-insn dst/src %integer>float ;
-M: ##float>integer generate-insn dst/src %float>integer ;
-
-M: ##copy generate-insn [ dst/src ] [ rep>> ] bi %copy ;
-
-M: ##unbox-float generate-insn dst/src %unbox-float ;
-M: ##unbox-any-c-ptr generate-insn dst/src/temp %unbox-any-c-ptr ;
-M: ##box-float generate-insn dst/src/temp %box-float ;
-M: ##box-alien generate-insn dst/src/temp %box-alien ;
-
-M: ##box-displaced-alien generate-insn
-    [ dst/src1/src2 ] [ temp1>> ] [ temp2>> ] tri %box-displaced-alien ;
-
-M: ##alien-unsigned-1 generate-insn dst/src %alien-unsigned-1 ;
-M: ##alien-unsigned-2 generate-insn dst/src %alien-unsigned-2 ;
-M: ##alien-unsigned-4 generate-insn dst/src %alien-unsigned-4 ;
-M: ##alien-signed-1   generate-insn dst/src %alien-signed-1   ;
-M: ##alien-signed-2   generate-insn dst/src %alien-signed-2   ;
-M: ##alien-signed-4   generate-insn dst/src %alien-signed-4   ;
-M: ##alien-cell       generate-insn dst/src %alien-cell       ;
-M: ##alien-float      generate-insn dst/src %alien-float      ;
-M: ##alien-double     generate-insn dst/src %alien-double     ;
-
-: >alien-setter< ( insn -- src value )
-    [ src>> ] [ value>> ] bi ; inline
-
-M: ##set-alien-integer-1 generate-insn >alien-setter< %set-alien-integer-1 ;
-M: ##set-alien-integer-2 generate-insn >alien-setter< %set-alien-integer-2 ;
-M: ##set-alien-integer-4 generate-insn >alien-setter< %set-alien-integer-4 ;
-M: ##set-alien-cell      generate-insn >alien-setter< %set-alien-cell      ;
-M: ##set-alien-float     generate-insn >alien-setter< %set-alien-float     ;
-M: ##set-alien-double    generate-insn >alien-setter< %set-alien-double    ;
-
-M: ##allot generate-insn
-    {
-        [ dst>> ]
-        [ size>> ]
-        [ class>> ]
-        [ temp>> ]
-    } cleave
-    %allot ;
-
-M: ##write-barrier generate-insn
-    [ src>> ]
-    [ card#>> ]
-    [ table>> ]
-    tri %write-barrier ;
-
-! GC checks
+! ##gc
 : wipe-locs ( locs temp -- )
     '[
         _
@@ -241,7 +224,7 @@ M: ##write-barrier generate-insn
 GENERIC# save-gc-root 1 ( gc-root operand temp -- )
 
 M:: spill-slot save-gc-root ( gc-root operand temp -- )
-    temp operand n>> int-rep %reload
+    temp int-rep operand n>> %reload
     gc-root temp %save-gc-root ;
 
 M: object save-gc-root drop %save-gc-root ;
@@ -254,7 +237,7 @@ GENERIC# load-gc-root 1 ( gc-root operand temp -- )
 
 M:: spill-slot load-gc-root ( gc-root operand temp -- )
     gc-root temp %load-gc-root
-    temp operand n>> int-rep %spill ;
+    temp int-rep operand n>> %spill ;
 
 M: object load-gc-root drop %load-gc-root ;
 
@@ -296,10 +279,10 @@ GENERIC: next-fastcall-param ( rep -- )
 M: int-rep next-fastcall-param
     int-regs inc [ ?dummy-stack-params ] [ ?dummy-fp-params ] bi ;
 
-M: single-float-rep next-fastcall-param
+M: float-rep next-fastcall-param
     float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
 
-M: double-float-rep next-fastcall-param
+M: double-rep next-fastcall-param
     float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
 
 GENERIC: reg-class-full? ( reg-class -- ? )
@@ -497,53 +480,3 @@ M: ##alien-callback generate-insn
     [ wrap-callback-quot %alien-callback ]
     [ alien-return [ %unnest-stacks ] [ %callback-value ] if-void ]
     tri ;
-
-M: _prologue generate-insn
-    stack-frame>> [ stack-frame set ] [ total-size>> %prologue ] bi ;
-
-M: _epilogue generate-insn
-    stack-frame>> total-size>> %epilogue ;
-
-M: _label generate-insn
-    id>> lookup-label resolve-label ;
-
-M: _branch generate-insn
-    label>> lookup-label %jump-label ;
-
-: >compare< ( insn -- dst temp cc src1 src2 )
-    {
-        [ dst>> ]
-        [ temp>> ]
-        [ cc>> ]
-        [ src1>> ]
-        [ src2>> ]
-    } cleave ; inline
-
-M: ##compare generate-insn >compare< %compare ;
-M: ##compare-imm generate-insn >compare< %compare-imm ;
-M: ##compare-float generate-insn >compare< %compare-float ;
-
-: >binary-branch< ( insn -- label cc src1 src2 )
-    {
-        [ label>> lookup-label ]
-        [ cc>> ]
-        [ src1>> ]
-        [ src2>> ]
-    } cleave ; inline
-
-M: _compare-branch generate-insn
-    >binary-branch< %compare-branch ;
-
-M: _compare-imm-branch generate-insn
-    >binary-branch< %compare-imm-branch ;
-
-M: _compare-float-branch generate-insn
-    >binary-branch< %compare-float-branch ;
-
-M: _spill generate-insn
-    [ src>> ] [ n>> ] [ rep>> ] tri %spill ;
-
-M: _reload generate-insn
-    [ dst>> ] [ n>> ] [ rep>> ] tri %reload ;
-
-M: _spill-area-size generate-insn drop ;

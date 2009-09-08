@@ -1,10 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors grouping sequences combinators
-math specialized-arrays.direct.uint byte-arrays fry
-specialized-arrays.direct.ushort specialized-arrays.uint
-specialized-arrays.ushort specialized-arrays.float images
-half-floats ;
+USING: kernel accessors grouping sequences combinators math
+byte-arrays fry specialized-arrays.uint specialized-arrays.ushort
+specialized-arrays.float images half-floats ;
 IN: images.normalization
 
 <PRIVATE

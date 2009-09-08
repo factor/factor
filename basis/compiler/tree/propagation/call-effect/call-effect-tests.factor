@@ -47,9 +47,15 @@ IN: compiler.tree.propagation.call-effect.tests
 [ t ] [ [ 2 '[ _ ] 1 '[ _ + ] compose ] final-info first infer-value (( -- object )) effect= ] unit-test
 [ t ] [ [ 2 '[ _ + ] ] final-info first infer-value (( object -- object )) effect= ] unit-test
 [ f ] [ [ [ [ ] [ 1 ] if ] ] final-info first infer-value ] unit-test
-[ f ] [ [ [ 1 ] '[ @ ] ] final-info first infer-value ] unit-test
+[ t ] [ [ [ 1 ] '[ @ ] ] final-info first infer-value (( -- object )) effect= ] unit-test
 [ f ] [ [ dup drop ] final-info first infer-value ] unit-test
 
 ! This should not hang
 [ ] [ [ [ dup call( quot -- ) ] dup call( quot -- ) ] final-info drop ] unit-test
 [ ] [ [ [ dup curry call( quot -- ) ] dup curry call( quot -- ) ] final-info drop ] unit-test
+
+! This should get inlined, because the parameter to the curry is literal even though
+! [ boa ] by itself doesn't infer
+TUPLE: a-tuple x ;
+
+[ V{ a-tuple } ] [ [ a-tuple '[ _ boa ] call( x -- tuple ) ] final-classes ] unit-test

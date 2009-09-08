@@ -42,14 +42,11 @@ M: ##set-slot-imm build-liveness-graph
 M: ##write-barrier build-liveness-graph
     dup src>> setter-liveness-graph ;
 
-M: ##flushable build-liveness-graph
-    dup dst>> add-edges ;
-
 M: ##allot build-liveness-graph
-    [ dst>> allocations get conjoin ]
-    [ call-next-method ] bi ;
+    [ dst>> allocations get conjoin ] [ call-next-method ] bi ;
 
-M: insn build-liveness-graph drop ;
+M: insn build-liveness-graph
+    dup defs-vreg dup [ add-edges ] [ 2drop ] if ;
 
 GENERIC: compute-live-vregs ( insn -- )
 
@@ -77,14 +74,16 @@ M: ##set-slot-imm compute-live-vregs
 M: ##write-barrier compute-live-vregs
     dup src>> setter-live-vregs ;
 
-M: ##flushable compute-live-vregs drop ;
+M: ##fixnum-add compute-live-vregs record-live ;
+
+M: ##fixnum-sub compute-live-vregs record-live ;
+
+M: ##fixnum-mul compute-live-vregs record-live ;
 
 M: insn compute-live-vregs
-    record-live ;
+    dup defs-vreg [ drop ] [ record-live ] if ;
 
 GENERIC: live-insn? ( insn -- ? )
-
-M: ##flushable live-insn? dst>> live-vreg? ;
 
 M: ##set-slot live-insn? obj>> live-vreg? ;
 
@@ -92,9 +91,18 @@ M: ##set-slot-imm live-insn? obj>> live-vreg? ;
 
 M: ##write-barrier live-insn? src>> live-vreg? ;
 
-M: insn live-insn? drop t ;
+M: ##fixnum-add live-insn? drop t ;
+
+M: ##fixnum-sub live-insn? drop t ;
+
+M: ##fixnum-mul live-insn? drop t ;
+
+M: insn live-insn? defs-vreg [ live-vreg? ] [ t ] if* ;
 
 : eliminate-dead-code ( cfg -- cfg' )
+    ! Even though we don't use predecessors directly, we depend
+    ! on the predecessors pass updating phi nodes to remove dead
+    ! inputs.
     needs-predecessors
 
     init-dead-code

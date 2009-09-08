@@ -189,5 +189,17 @@ IN: compiler.cfg.builder.tests
 [ f t ] [
     [ { fixnum simple-alien } declare <displaced-alien> 0 alien-cell ]
     [ [ ##unbox-any-c-ptr? ] contains-insn? ]
-    [ [ ##slot-imm? ] contains-insn? ] bi
+    [ [ ##unbox-alien? ] contains-insn? ] bi
+] unit-test
+
+[ f t ] [
+    [ { byte-array fixnum } declare alien-cell 4 alien-float ]
+    [ [ ##box-alien? ] contains-insn? ]
+    [ [ ##box-float? ] contains-insn? ] bi
+] unit-test
+
+[ f t ] [
+    [ { byte-array fixnum } declare alien-cell { simple-alien } declare 4 alien-float ]
+    [ [ ##box-alien? ] contains-insn? ]
+    [ [ ##box-float? ] contains-insn? ] bi
 ] unit-test

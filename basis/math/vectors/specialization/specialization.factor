@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words kernel make sequences effects kernel.private accessors
 combinators math math.intervals math.vectors namespaces assocs fry
-splitting classes.algebra generalizations
+splitting classes.algebra generalizations locals
 compiler.tree.propagation.info ;
 IN: math.vectors.specialization
 
@@ -67,14 +67,19 @@ H{
     { vmin { +vector+ +vector+ -> +vector+ } }
     { vneg { +vector+ -> +vector+ } }
     { vtruncate { +vector+ -> +vector+ } }
+    { sum { +vector+ -> +scalar+ } }
 }
 
-SYMBOL: specializations
+PREDICATE: vector-word < word vector-words key? ;
 
-specializations [ vector-words keys [ V{ } clone ] H{ } map>assoc ] initialize
+: specializations ( word -- assoc )
+    dup "specializations" word-prop
+    [ ] [ V{ } clone [ "specializations" set-word-prop ] keep ] ?if ;
+
+M: vector-word subwords specializations values ;
 
 : add-specialization ( new-word signature word -- )
-    specializations get at set-at ;
+    specializations set-at ;
 
 : word-schema ( word -- schema ) vector-words at ;
 
@@ -82,23 +87,27 @@ specializations [ vector-words keys [ V{ } clone ] H{ } map>assoc ] initialize
 
 : outputs ( schema -- seq ) { -> } split second ;
 
-: specialize-vector-word ( word array-type elt-type -- word' )
+: loop-vector-op ( word array-type elt-type -- word' )
     pick word-schema
     [ inputs (specialize-vector-word) ]
     [ outputs record-output-signature ] 3bi ;
 
-: input-signature ( word -- signature ) def>> first ;
+:: specialize-vector-word ( word array-type elt-type simd -- word/quot' )
+    word simd key? [ word simd at ] [ word array-type elt-type loop-vector-op ] if ;
 
-: specialize-vector-words ( array-type elt-type -- )
-    [ vector-words keys ] 2dip
-    '[
-        [ _ _ specialize-vector-word ] keep
-        [ dup input-signature ] dip
-        add-specialization
+:: input-signature ( word array-type elt-type -- signature )
+    array-type elt-type word word-schema inputs signature-for-schema ;
+
+:: specialize-vector-words ( array-type elt-type simd -- )
+    vector-words keys [
+        [ array-type elt-type simd specialize-vector-word ]
+        [ array-type elt-type input-signature ]
+        [ ]
+        tri add-specialization
     ] each ;
 
 : find-specialization ( classes word -- word/f )
-    specializations get at
+    specializations
     [ first [ class<= ] 2all? ] with find
     swap [ second ] when ;
 
