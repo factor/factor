@@ -4,8 +4,7 @@ USING: accessors alien.c-types byte-arrays cpu.architecture
 kernel math math.functions math.vectors
 math.vectors.simd.functor math.vectors.simd.intrinsics
 math.vectors.specialization parser prettyprint.custom sequences
-sequences.private specialized-arrays.double locals assocs
-words fry ;
+sequences.private locals assocs words fry ;
 IN: math.vectors.simd
 
 <<
