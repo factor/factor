@@ -9,7 +9,8 @@ size
 bold?
 italic?
 { foreground initial: COLOR: black }
-{ background initial: COLOR: white } ;
+{ background initial: COLOR: white }
+shadow ;
 
 : <font> ( -- font )
     font new ; inline
@@ -37,6 +38,7 @@ italic?
             [ [ italic?>> ] either? >>italic? ]
             [ [ foreground>> ] either? >>foreground ]
             [ [ background>> ] either? >>background ]
+            [ [ shadow>> ] either? >>shadow ]
         } 2cleave
     ] when* ;
 
@@ -56,7 +58,7 @@ italic?
         12 >>size ;
 
 : strip-font-colors ( font -- font' )
-    clone f >>background f >>foreground ;
+    clone f >>background f >>foreground f >>shadow ;
 
 TUPLE: metrics width ascent descent height leading cap-height x-height ;
 

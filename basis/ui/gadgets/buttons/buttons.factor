@@ -10,7 +10,7 @@ combinators.smart ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
 
-TUPLE: button < border pressed? selected? quot ;
+TUPLE: button < border pressed? selected? quot tooltip ;
 
 <PRIVATE
 
@@ -35,6 +35,12 @@ PRIVATE>
     >>pressed?
     relayout-1 ;
 
+: button-enter ( button -- )
+    dup dup tooltip>> [ swap show-status ] [ drop ] if* button-update ;
+
+: button-leave ( button -- )
+    dup "" swap show-status button-update ;
+
 : button-clicked ( button -- )
     dup button-update
     dup button-rollover?
@@ -43,8 +49,8 @@ PRIVATE>
 button H{
     { T{ button-up } [ button-clicked ] }
     { T{ button-down } [ button-update ] }
-    { mouse-leave [ button-update ] }
-    { mouse-enter [ button-update ] }
+    { mouse-leave [ button-leave ] }
+    { mouse-enter [ button-enter ] }
 } set-gestures
 
 : new-button ( label quot class -- button )
@@ -132,11 +138,14 @@ CONSTANT: button-clicked-background
     }
     
 : <border-button-pen> ( -- pen )
-    "button" button-background COLOR: black <border-button-state-pen> dup
-    "button-clicked" button-clicked-background COLOR: white <border-button-state-pen> dup dup
+    "button" button-background button-clicked-background
+    <border-button-state-pen> dup
+    "button-clicked" button-clicked-background COLOR: white
+    <border-button-state-pen> dup dup
     <button-pen> ;
 
 : border-button-theme ( gadget -- gadget )
+    dup children>> first font>> t >>bold? drop
     horizontal >>orientation
     <border-button-pen> >>interior
     dup dup interior>> pen-pref-dim >>min-dim
@@ -235,9 +244,12 @@ PRIVATE>
 : command-button-quot ( target command -- quot )
     '[ _ _ invoke-command ] ;
 
+: gesture>tooltip ( gesture -- str )
+    [ gesture>string "Shortcut: " prepend ] [ "Shortcut Unassigned" ] if* ;
+
 : <command-button> ( target gesture command -- button )
-    [ command-string swap ] keep command-button-quot
-    '[ drop @ ] <border-button> ;
+    swapd [ command-name swap ] keep command-button-quot
+    '[ drop @ ] <border-button> swap gesture>tooltip >>tooltip ;
 
 : <toolbar> ( target -- toolbar )
     <shelf>
