@@ -67,7 +67,7 @@ M: double-rep reg-class-of drop float-regs ;
 M: vector-rep reg-class-of drop float-regs ;
 M: stack-params reg-class-of drop stack-params ;
 
-GENERIC: rep-size ( rep -- n )
+GENERIC: rep-size ( rep -- n ) foldable
 
 M: tagged-rep rep-size drop cell ;
 M: int-rep rep-size drop cell ;
