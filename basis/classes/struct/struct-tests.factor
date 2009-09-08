@@ -6,7 +6,7 @@ compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
 literals math mirrors multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays.char
-specialized-arrays.direct.int specialized-arrays.ushort
+specialized-arrays.int specialized-arrays.ushort
 struct-arrays system tools.test ;
 IN: classes.struct.tests
 
@@ -316,6 +316,11 @@ STRUCT: struct-test-optimization
 
 [ f ] [ [ memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 
+[ t ] [
+    [ struct-test-optimization <struct> struct-test-optimization <struct> [ x>> ] bi@ ]
+    { x>> } inlined?
+] unit-test
+
 ! Test cloning structs
 STRUCT: clone-test-struct { x int } { y char[3] } ;
 
@@ -340,3 +345,4 @@ STRUCT: struct-that's-a-word { x int } ;
 : struct-that's-a-word ( -- ) "OOPS" throw ;
 
 [ -77 ] [ S{ struct-that's-a-word { x -77 } } clone x>> ] unit-test
+

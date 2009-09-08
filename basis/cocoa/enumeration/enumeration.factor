@@ -4,7 +4,7 @@ USING: accessors kernel classes.struct cocoa cocoa.types alien.c-types
 locals math sequences vectors fry libc destructors ;
 IN: cocoa.enumeration
 
-<< "id" require-c-arrays >>
+<< "id" require-c-array >>
 
 CONSTANT: NS-EACH-BUFFER-SIZE 16
 

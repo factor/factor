@@ -178,6 +178,7 @@ IN: tools.deploy.shaker
                 "slots"
                 "special"
                 "specializer"
+                "struct-slots"
                 ! UI needs this
                 ! "superclass"
                 "transform-n"

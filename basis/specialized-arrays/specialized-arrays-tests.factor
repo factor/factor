@@ -1,10 +1,8 @@
 IN: specialized-arrays.tests
-USING: tools.test specialized-arrays sequences
+USING: tools.test alien.syntax specialized-arrays sequences
 specialized-arrays.int specialized-arrays.bool
 specialized-arrays.ushort alien.c-types accessors kernel
-specialized-arrays.direct.int specialized-arrays.char
-specialized-arrays.uint specialized-arrays.float
-arrays combinators compiler ;
+specialized-arrays.char specialized-arrays.uint arrays combinators ;
 
 [ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
 
@@ -33,3 +31,8 @@ arrays combinators compiler ;
 [ f ] [ float-array{ 4 3 2 1 } dup clone [ underlying>> ] bi@ eq? ] unit-test
 
 [ f ] [ [ float-array{ 4 3 2 1 } dup clone [ underlying>> ] bi@ eq? ] compile-call ] unit-test
+
+[ ushort-array{ 0 0 0 } ] [
+    3 ALIEN: 123 100 <direct-ushort-array> new-sequence
+    dup [ drop 0 ] change-each
+] unit-test

@@ -493,44 +493,73 @@ M: ppc %epilogue ( n -- )
     [ [ 1 1 ] dip ADDI ] bi
     0 MTLR ;
 
-:: (%boolean) ( dst temp word -- )
+:: (%boolean) ( dst temp branch1 branch2 -- )
     "end" define-label
     dst \ f tag-number %load-immediate
-    "end" get word execute
+    "end" get branch1 execute( label -- )
+    branch2 [ "end" get branch2 execute( label -- ) ] when
     dst \ t %load-reference
     "end" get resolve-label ; inline
 
-: %boolean ( dst cc temp -- )
-    swap negate-cc {
-        { cc< [ \ BLT (%boolean) ] }
-        { cc<= [ \ BLE (%boolean) ] }
-        { cc> [ \ BGT (%boolean) ] }
-        { cc>= [ \ BGE (%boolean) ] }
-        { cc= [ \ BEQ (%boolean) ] }
-        { cc/= [ \ BNE (%boolean) ] }
+:: %boolean ( dst cc temp -- )
+    cc negate-cc order-cc {
+        { cc<  [ dst temp \ BLT f (%boolean) ] }
+        { cc<= [ dst temp \ BLE f (%boolean) ] }
+        { cc>  [ dst temp \ BGT f (%boolean) ] }
+        { cc>= [ dst temp \ BGE f (%boolean) ] }
+        { cc=  [ dst temp \ BEQ f (%boolean) ] }
+        { cc/= [ dst temp \ BNE f (%boolean) ] }
     } case ;
 
 : (%compare) ( src1 src2 -- ) [ 0 ] dip CMP ; inline
 : (%compare-imm) ( src1 src2 -- ) [ 0 ] 2dip CMPI ; inline
-: (%compare-float) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
+: (%compare-float-unordered) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
+: (%compare-float-ordered) ( src1 src2 -- ) [ 0 ] dip FCMPO ; inline
+
+:: (%compare-float) ( src1 src2 cc -- branch1 branch2 )
+    cc {
+        { cc<    [ src1 src2 (%compare-float-ordered)   \ BLT f     ] }
+        { cc<=   [ src1 src2 (%compare-float-ordered)   \ BLT \ BEQ ] }
+        { cc>    [ src1 src2 (%compare-float-ordered)   \ BGT f     ] }
+        { cc>=   [ src1 src2 (%compare-float-ordered)   \ BGT \ BEQ ] }
+        { cc=    [ src1 src2 (%compare-float-unordered) \ BEQ f     ] }
+        { cc<>   [ src1 src2 (%compare-float-ordered)   \ BLT \ BGT ] }
+        { cc<>=  [ src1 src2 (%compare-float-ordered)   \ BNO f     ] }
+        { cc/<   [ src1 src2 (%compare-float-unordered) \ BGE f     ] }
+        { cc/<=  [ src1 src2 (%compare-float-unordered) \ BGT \ BO  ] }
+        { cc/>   [ src1 src2 (%compare-float-unordered) \ BLE f     ] }
+        { cc/>=  [ src1 src2 (%compare-float-unordered) \ BLT \ BO  ] }
+        { cc/=   [ src1 src2 (%compare-float-unordered) \ BNE f     ] }
+        { cc/<>  [ src1 src2 (%compare-float-unordered) \ BEQ \ BO  ] }
+        { cc/<>= [ src1 src2 (%compare-float-unordered) \ BO  f     ] }
+    } case ; inline
 
 M: ppc %compare [ (%compare) ] 2dip %boolean ;
-M: ppc %compare-imm [ (%compare-imm) ] 2dip %boolean ;
-M: ppc %compare-float [ (%compare-float) ] 2dip %boolean ;
 
-: %branch ( label cc -- )
-    {
-        { cc< [ BLT ] }
-        { cc<= [ BLE ] }
-        { cc> [ BGT ] }
-        { cc>= [ BGE ] }
-        { cc= [ BEQ ] }
-        { cc/= [ BNE ] }
+M: ppc %compare-imm [ (%compare-imm) ] 2dip %boolean ;
+
+M:: ppc %compare-float ( dst src1 src2 cc temp -- )
+    cc negate-cc src1 src2 (%compare-float) :> branch2 :> branch1
+    dst temp branch1 branch2 (%boolean) ;
+
+:: %branch ( label cc -- )
+    cc order-cc {
+        { cc<  [ label BLT ] }
+        { cc<= [ label BLE ] }
+        { cc>  [ label BGT ] }
+        { cc>= [ label BGE ] }
+        { cc=  [ label BEQ ] }
+        { cc/= [ label BNE ] }
     } case ;
 
 M: ppc %compare-branch [ (%compare) ] 2dip %branch ;
+
 M: ppc %compare-imm-branch [ (%compare-imm) ] 2dip %branch ;
-M: ppc %compare-float-branch [ (%compare-float) ] 2dip %branch ;
+
+M:: ppc %compare-float-branch ( label src1 src2 cc -- )
+    cc src1 src2 (%compare-float) :> branch2 :> branch1
+    label branch1 execute( label -- )
+    branch2 [ label branch2 execute( label -- ) ] when ;
 
 : load-from-frame ( dst n rep -- )
     {
