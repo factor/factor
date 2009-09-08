@@ -83,8 +83,8 @@ M: browser-gadget handle-gesture
     } 2|| ;
 
 M: browser-gadget definitions-changed ( assoc browser -- )
-    model>> [ value>> swap showing-definition? ] keep
-    '[ _ notify-connections ] when ;
+    [ model>> value>> swap showing-definition? ] keep
+    '[ _ [ history-value ] keep set-history-value ] when ;
 
 M: browser-gadget focusable-child* search-field>> ;
 
