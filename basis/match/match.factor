@@ -69,10 +69,9 @@ MACRO: match-cond ( assoc -- )
     dup length zero? not [ rest ] [ drop f ] if ;
 
 : (match-first) ( seq pattern-seq -- bindings leftover/f )
-    2dup [ length ] bi@ < [ 2drop f f ]
-    [
+    2dup shorter? [ 2drop f f ] [
         2dup length head over match
-        [ nip swap ?1-tail ] [ [ rest ] dip (match-first) ] if*
+        [ swap ?1-tail ] [ [ rest ] dip (match-first) ] ?if
     ] if ;
     
 : match-first ( seq pattern-seq -- bindings )
@@ -80,10 +79,7 @@ MACRO: match-cond ( assoc -- )
 
 : (match-all) ( seq pattern-seq -- )
     [ nip ] [ (match-first) swap ] 2bi
-    [ 
-        , [ swap (match-all) ] [ drop ] if* 
-    ] [ 2drop ] if* ;
+    [ , [ swap (match-all) ] [ drop ] if* ] [ 2drop ] if* ;
 
 : match-all ( seq pattern-seq -- bindings-seq )
     [ (match-all) ] { } make ;
-    
