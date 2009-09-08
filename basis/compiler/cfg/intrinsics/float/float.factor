@@ -8,7 +8,7 @@ IN: compiler.cfg.intrinsics.float
     [ 2inputs ] dip call ds-push ; inline
 
 : emit-float-comparison ( cc -- )
-    [ 2inputs ] dip ^^compare-float ds-push ; inline
+    [ 2inputs ] dip ^^compare-float-unordered ds-push ; inline
 
 : emit-float>fixnum ( -- )
     ds-pop ^^float>integer ^^tag-fixnum ds-push ;
