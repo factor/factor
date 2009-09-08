@@ -31,7 +31,7 @@ M: x87-env (set-fp-env-register)
     set_x87_env ;
 
 M: x86 (fp-env-registers)
-    sse2?
+    sse-version 20 >=
     [ <sse-env> <x87-env> 2array ]
     [ <x87-env> 1array ] if ;
 
