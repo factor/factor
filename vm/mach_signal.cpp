@@ -28,7 +28,9 @@ http://www.wodeveloper.com/omniLists/macosx-dev/2000/June/msg00137.html */
 /* Modify a suspended thread's thread_state so that when the thread resumes
 executing, the call frame of the current C primitive (if any) is rewound, and
 the appropriate Factor error is thrown from the top-most Factor frame. */
-static void call_fault_handler(exception_type_t exception,
+static void call_fault_handler(
+    exception_type_t exception,
+    exception_data_type_t code,
 	MACH_EXC_STATE_TYPE *exc_state,
 	MACH_THREAD_STATE_TYPE *thread_state)
 {
@@ -52,12 +54,13 @@ static void call_fault_handler(exception_type_t exception,
 		signal_fault_addr = MACH_EXC_STATE_FAULT(exc_state);
 		MACH_PROGRAM_COUNTER(thread_state) = (cell)memory_signal_handler_impl;
 	}
-	else
-	{
-		if(exception == EXC_ARITHMETIC)
-			signal_number = SIGFPE;
-		else
-			signal_number = SIGABRT;
+	else if(exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV)
+    {
+		MACH_PROGRAM_COUNTER(thread_state) = (cell)fp_signal_handler_impl;
+    }
+    else
+    {
+        signal_number = exception == EXC_ARITHMETIC ? SIGFPE : SIGABRT;
 		MACH_PROGRAM_COUNTER(thread_state) = (cell)misc_signal_handler_impl;
 	}
 }
@@ -102,7 +105,7 @@ catch_exception_raise (mach_port_t exception_port,
 
 	/* Modify registers so to have the thread resume executing the
 	fault handler */
-	call_fault_handler(exception,&exc_state,&thread_state);
+	call_fault_handler(exception,code[0],&exc_state,&thread_state);
 
 	/* Set the faulting thread's register contents..
 	

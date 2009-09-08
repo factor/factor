@@ -3,10 +3,8 @@
 namespace factor
 {
 
-segment *gc_locals_region;
-cell gc_locals;
+std::vector<cell> gc_locals;
 
-segment *gc_bignums_region;
-cell gc_bignums;
+std::vector<cell> gc_bignums;
 
 }

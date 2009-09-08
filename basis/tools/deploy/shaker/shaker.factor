@@ -178,6 +178,8 @@ IN: tools.deploy.shaker
                 "slots"
                 "special"
                 "specializer"
+                "specializations"
+                "struct-slots"
                 ! UI needs this
                 ! "superclass"
                 "transform-n"
@@ -349,8 +351,6 @@ IN: tools.deploy.shaker
             { } { "layouts" } strip-vocab-globals %
 
             { } { "math.partial-dispatch" } strip-vocab-globals %
-
-            { } { "math.vectors.specialization" } strip-vocab-globals %
 
             { } { "peg" } strip-vocab-globals %
         ] when

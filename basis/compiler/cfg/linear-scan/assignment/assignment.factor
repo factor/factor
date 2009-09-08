@@ -135,7 +135,7 @@ M: vreg-insn assign-registers-in-insn
     [
         [
             2dup spill-on-gc?
-            [ swap [ vreg-spill-slot ] [ rep-of ] bi 3array , ] [ 2drop ] if
+            [ swap [ rep-of ] [ vreg-spill-slot ] bi 3array , ] [ 2drop ] if
         ] assoc-each
     ] { } make ;
 

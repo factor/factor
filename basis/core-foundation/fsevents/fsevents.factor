@@ -3,8 +3,8 @@
 USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces make assocs init accessors
 continuations combinators io.encodings.utf8 destructors locals
-arrays specialized-arrays.direct.alien classes.struct
-specialized-arrays.direct.int specialized-arrays.direct.longlong
+arrays specialized-arrays.alien classes.struct
+specialized-arrays.int specialized-arrays.longlong
 core-foundation core-foundation.run-loop core-foundation.strings
 core-foundation.time ;
 IN: core-foundation.fsevents

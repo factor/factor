@@ -20,22 +20,10 @@ IN: compiler.cfg.intrinsics.alien
         ^^box-displaced-alien ds-push
     ] [ emit-primitive ] if ;
 
-: (prepare-alien-accessor-imm) ( class offset -- offset-vreg )
-    ds-drop [ ds-pop swap ^^unbox-c-ptr ] dip ^^add-imm ;
-
-: (prepare-alien-accessor) ( class -- offset-vreg )
-    [ 2inputs ^^untag-fixnum swap ] dip ^^unbox-c-ptr ^^add ;
-
-: prepare-alien-accessor ( infos -- offset-vreg )
-    <reversed> [ second class>> ] [ first ] bi
-    dup value-info-small-fixnum? [
-        literal>> (prepare-alien-accessor-imm)
-    ] [ drop (prepare-alien-accessor) ] if ;
-
 :: inline-alien ( node quot test -- )
     [let | infos [ node node-input-infos ] |
         infos test call
-        [ infos prepare-alien-accessor quot call ]
+        [ infos quot call ]
         [ node emit-primitive ]
         if
     ] ; inline
@@ -45,8 +33,14 @@ IN: compiler.cfg.intrinsics.alien
     [ second class>> fixnum class<= ]
     bi and ;
 
+: prepare-alien-accessor ( info -- offset-vreg )
+    class>> [ 2inputs ^^untag-fixnum swap ] dip ^^unbox-c-ptr ^^add ;
+
+: prepare-alien-getter ( infos -- offset-vreg )
+    first prepare-alien-accessor ;
+
 : inline-alien-getter ( node quot -- )
-    '[ @ ds-push ]
+    '[ prepare-alien-getter @ ds-push ]
     [ inline-alien-getter? ] inline-alien ; inline
 
 : inline-alien-setter? ( infos class -- ? )
@@ -55,19 +49,21 @@ IN: compiler.cfg.intrinsics.alien
     [ third class>> fixnum class<= ]
     tri and and ;
 
+: prepare-alien-setter ( infos -- offset-vreg )
+    second prepare-alien-accessor ;
+
 : inline-alien-integer-setter ( node quot -- )
-    '[ ds-pop ^^untag-fixnum @ ]
+    '[ prepare-alien-setter ds-pop ^^untag-fixnum @ ]
     [ fixnum inline-alien-setter? ]
     inline-alien ; inline
 
 : inline-alien-cell-setter ( node quot -- )
-    [ dup node-input-infos first class>> ] dip
-    '[ ds-pop _ ^^unbox-c-ptr @ ]
+    '[ [ prepare-alien-setter ds-pop ] [ first class>> ] bi ^^unbox-c-ptr @ ]
     [ pinned-c-ptr inline-alien-setter? ]
     inline-alien ; inline
 
 : inline-alien-float-setter ( node quot -- )
-    '[ ds-pop @ ]
+    '[ prepare-alien-setter ds-pop @ ]
     [ float inline-alien-setter? ]
     inline-alien ; inline
 
@@ -107,15 +103,15 @@ IN: compiler.cfg.intrinsics.alien
 : emit-alien-float-getter ( node rep -- )
     '[
         _ {
-            { single-float-rep [ ^^alien-float ] }
-            { double-float-rep [ ^^alien-double ] }
+            { float-rep [ ^^alien-float ] }
+            { double-rep [ ^^alien-double ] }
         } case
     ] inline-alien-getter ;
 
 : emit-alien-float-setter ( node rep -- )
     '[
         _ {
-            { single-float-rep [ ##set-alien-float ] }
-            { double-float-rep [ ##set-alien-double ] }
+            { float-rep [ ##set-alien-float ] }
+            { double-rep [ ##set-alien-double ] }
         } case
     ] inline-alien-float-setter ;

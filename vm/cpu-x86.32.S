@@ -44,17 +44,6 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	add $12,%esp                       /* pop args from the stack */
 	ret                                /* return _with new stack_ */
 
-/* cpu.x86.32 calls this */
-DEF(bool,check_sse2,(void)):
-	push %ebx
-	mov $1,%eax
-	cpuid
-	shr $26,%edx
-	and $1,%edx
-	pop %ebx
-	mov %edx,%eax
-	ret
-
 DEF(long long,read_timestamp_counter,(void)):
 	rdtsc
 	ret
@@ -68,10 +57,39 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
 	add $12,%esp
 	jmp *%eax
 
+DEF(void,get_sse_env,(void*)):
+    movl 4(%esp), %eax
+    stmxcsr (%eax)
+    ret
+
+DEF(void,set_sse_env,(const void*)):
+    movl 4(%esp), %eax
+    ldmxcsr (%eax)
+    ret
+
+DEF(void,get_x87_env,(void*)):
+    movl 4(%esp), %eax
+    fnstsw (%eax)
+    fnstcw 2(%eax)
+    ret
+
+DEF(void,set_x87_env,(const void*)):
+    movl 4(%esp), %eax
+    fldcw 2(%eax)
+    movb 4(%eax), %dl
+    test %dl, %dl
+    jz 1f
+    fnclex
+1:
+    ret
+
 #include "cpu-x86.S"
 
 #ifdef WINDOWS
 	.section .drectve
-	.ascii " -export:check_sse2"
 	.ascii " -export:read_timestamp_counter"
+	.ascii " -export:get_sse_env"
+	.ascii " -export:set_sse_env"
+	.ascii " -export:get_x87_env"
+	.ascii " -export:set_x87_env"
 #endif

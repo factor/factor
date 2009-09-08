@@ -1,22 +1,84 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes.tuple classes.tuple.parser kernel words
-make fry sequences parser accessors effects ;
+make fry sequences parser accessors effects namespaces
+combinators splitting classes.parser lexer quotations ;
 IN: compiler.cfg.instructions.syntax
 
+SYMBOLS: def use temp literal constant ;
+
+SYMBOL: scalar-rep
+
+TUPLE: insn-slot-spec type name rep ;
+
+: parse-rep ( str/f -- rep )
+    {
+        { [ dup not ] [ ] }
+        { [ dup "scalar-rep" = ] [ drop scalar-rep ] }
+        [ "cpu.architecture" lookup ]
+    } cond ;
+
+: parse-insn-slot-spec ( type string -- spec )
+    over [ "Missing type" throw ] unless
+    "/" split1 parse-rep
+    insn-slot-spec boa ;
+
+: parse-insn-slot-specs ( seq -- specs )
+    [
+        f [
+            {
+                { "def:" [ drop def ] }
+                { "use:" [ drop use ] }
+                { "temp:" [ drop temp ] }
+                { "literal:" [ drop literal ] }
+                { "constant:" [ drop constant ] }
+                [ dupd parse-insn-slot-spec , ]
+            } case
+        ] reduce drop
+    ] { } make ;
+
+: insn-def-slot ( class -- slot/f )
+    "insn-slots" word-prop
+    [ type>> def eq? ] find nip ;
+
+: insn-use-slots ( class -- slot/f )
+    "insn-slots" word-prop
+    [ type>> use eq? ] filter ;
+
+: insn-temp-slots ( class -- slot/f )
+    "insn-slots" word-prop
+    [ type>> temp eq? ] filter ;
+
+! We cannot reference words in compiler.cfg.instructions directly
+! since that would create circularity.
+: insn-classes-word ( -- word )
+    "insn-classes" "compiler.cfg.instructions" lookup ;
+
 : insn-word ( -- word )
-    #! We want to put the insn tuple in compiler.cfg.instructions,
-    #! but we cannot have circularity between that vocabulary and
-    #! this one.
     "insn" "compiler.cfg.instructions" lookup ;
+
+: pure-insn-word ( -- word )
+    "pure-insn" "compiler.cfg.instructions" lookup ;
 
 : insn-effect ( word -- effect )
     boa-effect in>> but-last f <effect> ;
 
-SYNTAX: INSN:
-    parse-tuple-definition "insn#" suffix
-    [ dup tuple eq? [ drop insn-word ] when ] dip
-    [ define-tuple-class ]
-    [ 2drop save-location ]
-    [ 2drop [ ] [ '[ f _ boa , ] ] [ insn-effect ] tri define-inline ]
-    3tri ;
+: define-insn-tuple ( class superclass specs -- )
+    [ name>> ] map "insn#" suffix define-tuple-class ;
+
+: define-insn-ctor ( class specs -- )
+    [ dup '[ _ ] [ f ] [ boa , ] surround ] dip
+    [ name>> ] map f <effect> define-declared ;
+
+: define-insn ( class superclass specs -- )
+    parse-insn-slot-specs {
+        [ nip "insn-slots" set-word-prop ]
+        [ 2drop insn-classes-word get push ]
+        [ define-insn-tuple ]
+        [ 2drop save-location ]
+        [ nip define-insn-ctor ]
+    } 3cleave ;
+
+SYNTAX: INSN: CREATE-CLASS insn-word ";" parse-tokens define-insn ;
+
+SYNTAX: PURE-INSN: CREATE-CLASS pure-insn-word ";" parse-tokens define-insn ;
