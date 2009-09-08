@@ -34,13 +34,12 @@ H{
     { font-style bold }
     { wrap-margin 500 }
     { foreground T{ rgba f 0.216 0.243 0.282 1.0 } }
-    { shadow COLOR: white }
     { page-color T{ rgba f 0.94 0.94 0.91 1.0 } }
     { border-width 5 }
 } title-style set-global
 
 SYMBOL: help-path-style
-H{ { font-size 10 } { shadow f } } help-path-style set-global
+H{ { font-size 10 } } help-path-style set-global
 
 SYMBOL: heading-style
 H{

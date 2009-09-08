@@ -65,24 +65,13 @@ M: label baseline
 M: label cap-height
     label-metrics cap-height>> round ;
 
-: draw-text* ( font text fg bg -- )
-    [ rot ] dip
-    [ font-with-background ] when* swap
-    [ font-with-foreground ] when* swap
-    draw-text ;
-
-: draw-shadowed-text ( font text -- )
-    [
-        { 0 1 } [ over shadow>> background get draw-text* ]
-        with-translation
-    ] [ foreground get transparent draw-text* ] 2bi ;
-
-: draw-normal-text ( font text -- )
-    foreground get background get draw-text* ;
-
 M: label draw-gadget*
-    >label< over shadow>>
-    [ draw-shadowed-text ] [ draw-normal-text ] if ;
+    >label<
+    [
+        background get [ font-with-background ] when*
+        foreground get [ font-with-foreground ] when*
+    ] dip
+    draw-text ;
 
 M: label gadget-text* string>> % ;
 
