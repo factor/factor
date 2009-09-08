@@ -425,8 +425,8 @@ tuple
     { "set-retainstack" "kernel" (( rs -- )) }
     { "set-callstack" "kernel" (( cs -- )) }
     { "exit" "system" (( n -- )) }
-    { "data-room" "memory" (( -- cards generations )) }
-    { "code-room" "memory" (( -- code-free code-total )) }
+    { "data-room" "memory" (( -- cards decks generations )) }
+    { "code-room" "memory" (( -- code-total code-used code-free largest-free-block )) }
     { "micros" "system" (( -- us )) }
     { "modify-code-heap" "compiler.units" (( alist -- )) }
     { "(dlopen)" "alien.libraries" (( path -- dll )) }

@@ -30,10 +30,12 @@ TUPLE: disjoint-set
     ranks>> at ; inline
 
 : inc-rank ( a disjoint-set -- )
-    ranks>> [ 1+ ] change-at ; inline
+    ranks>> [ 1 + ] change-at ; inline
 
 : representative? ( a disjoint-set -- ? )
     dupd parent = ; inline
+
+PRIVATE>
 
 GENERIC: representative ( a disjoint-set -- p )
 
@@ -41,6 +43,8 @@ M: disjoint-set representative
     2dup representative? [ drop ] [
         [ [ parent ] keep representative dup ] 2keep set-parent
     ] if ;
+
+<PRIVATE
 
 : representatives ( a b disjoint-set -- r r )
     [ representative ] curry bi@ ; inline

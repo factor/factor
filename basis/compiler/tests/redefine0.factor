@@ -1,6 +1,6 @@
-IN: compiler.tests.redefine0
 USING: tools.test eval compiler compiler.errors compiler.units definitions kernel math
 namespaces macros assocs ;
+IN: compiler.tests.redefine0
 
 ! Test ripple-up behavior
 : test-1 ( -- a ) 3 ;

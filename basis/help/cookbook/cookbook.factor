@@ -45,7 +45,7 @@ ARTICLE: "cookbook-colon-defs" "Shuffle word and definition cookbook"
 { $code ": sq ( x -- y ) dup * ;" }
 "(You could have looked this up yourself by clicking on the " { $link sq } " word itself.)"
 $nl
-"Note the key elements in a word definition: The colon " { $link POSTPONE: : } " denotes the start of a word definition. The name of the new word must immediately follow. The word definition then continues on until the " { $link POSTPONE: ; } " token signifies the end of the definition. This type of word definition is called a " { $emphasis "compound definition." }
+"Note the key elements in a word definition: The colon " { $link POSTPONE: : } " denotes the start of a word definition. The name of the new word and a stack effect declaration must immediately follow. The word definition then continues on until the " { $link POSTPONE: ; } " token signifies the end of the definition. This type of word definition is called a " { $emphasis "compound definition." }
 $nl
 "Factor is all about code reuse through short and logical colon definitions. Breaking up a problem into small pieces which are easy to test is called " { $emphasis "factoring." }
 $nl
@@ -154,11 +154,11 @@ $nl
 }
 "Note that words must be defined before being referenced. The following is generally invalid:"
 { $code
-    ": frob accelerate particles ;"
-    ": accelerate accelerator on ;"
-    ": particles [ (particles) ] each ;"
+    ": frob ( what -- ) accelerate particles ;"
+    ": accelerate ( -- ) accelerator on ;"
+    ": particles ( what -- ) [ (particles) ] each ;"
 }
-"You would have to place the first definition after the two others for the parser to accept the file."
+"You would have to place the first definition after the two others for the parser to accept the file. If you have a set of mutually recursive words, you can use " { $link POSTPONE: DEFER: } "."
 { $references
     { }
     "word-search"
@@ -277,7 +277,7 @@ $nl
     "Don't worry about efficiency unless your program is too slow. Don't prefer complex code to simple code just because you feel it will be more efficient. The Factor compiler is designed to make idiomatic code run fast."
     { "None of the above are hard-and-fast rules: there are exceptions to all of them. But one rule unconditionally holds: " { $emphasis "there is always a simpler way" } "." }
 }
-"Factor tries to implement as much of itself as possible, because this improves simplicity and performance. One consequence is that Factor exposes its internals for extension and study. You even have the option of using low-level features not usually found in high-level languages, such manual memory management, pointer arithmetic, and inline assembly code."
+"Factor tries to implement as much of itself as possible, because this improves simplicity and performance. One consequence is that Factor exposes its internals for extension and study. You even have the option of using low-level features not usually found in high-level languages, such as manual memory management, pointer arithmetic, and inline assembly code."
 $nl
 "Unsafe features are tucked away so that you will not invoke them by accident, or have to use them to solve conventional programming problems. However when the need arises, unsafe features are invaluable, for example you might have to do some pointer arithmetic when interfacing directly with C libraries." ;
 
@@ -287,6 +287,7 @@ ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
     "Factor only makes use of one native thread, and Factor threads are scheduled co-operatively. C library calls block the entire VM."
     "Factor does not hide anything from the programmer, all internals are exposed. It is your responsibility to avoid writing fragile code which depends too much on implementation detail."
     { "If a literal object appears in a word definition, the object itself is pushed on the stack when the word executes, not a copy. If you intend to mutate this object, you must " { $link clone } " it first. See " { $link "syntax-literals" } "." }
+    { "Also, " { $link dup } " and related shuffle words don't copy entire objects or arrays; they only duplicate the reference to them. If you want to guard an object against mutation, use " { $link clone } "." }
     { "For a discussion of potential issues surrounding the " { $link f } " object, see " { $link "booleans" } "." }
     { "Factor's object system is quite flexible. Careless usage of union, mixin and predicate classes can lead to similar problems to those caused by “multiple inheritance” in other languages. In particular, it is possible to have two classes such that they have a non-empty intersection and yet neither is a subclass of the other. If a generic word defines methods on two such classes, various disambiguation rules are applied to ensure method dispatch remains deterministic, however they may not be what you expect. See " { $link "method-order" } " for details." }
     { "Be careful when calling words which access variables from a " { $link make-assoc } " which constructs an assoc with arbitrary keys, since those keys might shadow variables." }

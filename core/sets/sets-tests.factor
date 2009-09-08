@@ -29,3 +29,4 @@ IN: sets.tests
 [ f ] [ { } { 1 } intersects? ] unit-test
 
 [ f ] [ { 1 } { } intersects? ] unit-test
+

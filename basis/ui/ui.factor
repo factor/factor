@@ -26,7 +26,7 @@ SYMBOL: windows
     #! etc.
     swap 2array windows get-global push
     windows get-global dup length 1 >
-    [ [ length 1- dup 1- ] keep exchange ] [ drop ] if ;
+    [ [ length 1 - dup 1 - ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
     windows [ [ first = not ] with filter ] change-global ;
@@ -61,7 +61,7 @@ SYMBOL: windows
 
 : set-up-window ( world -- )
     {
-        [ handle>> select-gl-context ]
+        [ set-gl-context ]
         [ [ title>> ] keep set-title ]
         [ begin-world ]
         [ resize-world ]
@@ -89,12 +89,13 @@ M: world graft*
 
 : (ungraft-world) ( world -- )
     {
-        [ handle>> select-gl-context ]
+        [ set-gl-context ]
         [ text-handle>> [ dispose ] when* ]
         [ images>> [ dispose ] when* ]
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
         [ end-world ]
+        [ [ <reversed> [ [ dispose ] when* ] each V{ } clone ] change-window-resources drop ]
     } cleave ;
 
 M: world ungraft*
@@ -198,7 +199,7 @@ PRIVATE>
     windows get empty? not ;
 
 : ?attributes ( gadget title/attributes -- attributes )
-    dup string? [ world-attributes new swap >>title ] when
+    dup string? [ world-attributes new swap >>title ] [ clone ] if
     swap [ [ [ 1array ] [ f ] if* ] curry unless* ] curry change-gadgets ;
 
 PRIVATE>
@@ -223,6 +224,9 @@ PRIVATE>
 
 : raise-window ( gadget -- )
     find-world raise-window* ;
+
+: topmost-window ( -- world )
+    windows get last second ;
 
 HOOK: close-window ui-backend ( gadget -- )
 

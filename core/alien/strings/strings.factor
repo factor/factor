@@ -12,6 +12,9 @@ M: c-ptr alien>string
     [ <memory-stream> ] [ <decoder> ] bi*
     "\0" swap stream-read-until drop ;
 
+M: object alien>string
+    [ underlying>> ] dip alien>string ;
+
 M: f alien>string
     drop ;
 
@@ -31,6 +34,8 @@ M: string string>alien
     [ 0 swap stream-write1 ]
     [ stream>> >byte-array ]
     tri ;
+
+M: tuple string>alien drop underlying>> ;
 
 HOOK: alien>native-string os ( alien -- string )
 

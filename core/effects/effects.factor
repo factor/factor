@@ -6,25 +6,29 @@ IN: effects
 
 TUPLE: effect { in read-only } { out read-only } { terminated? read-only } ;
 
+GENERIC: effect-length ( obj -- n )
+M: sequence effect-length length ;
+M: integer effect-length ;
+
 : <effect> ( in out -- effect )
     dup { "*" } sequence= [ drop { } t ] [ f ] if
     effect boa ;
 
 : effect-height ( effect -- n )
-    [ out>> length ] [ in>> length ] bi - ; inline
+    [ out>> effect-length ] [ in>> effect-length ] bi - ; inline
 
 : effect<= ( effect1 effect2 -- ? )
     {
         { [ over terminated?>> ] [ t ] }
         { [ dup terminated?>> ] [ f ] }
-        { [ 2dup [ in>> length ] bi@ > ] [ f ] }
+        { [ 2dup [ in>> effect-length ] bi@ > ] [ f ] }
         { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
         [ t ]
     } cond 2nip ; inline
 
 : effect= ( effect1 effect2 -- ? )
-    [ [ in>> length ] bi@ = ]
-    [ [ out>> length ] bi@ = ]
+    [ [ in>> effect-length ] bi@ = ]
+    [ [ out>> effect-length ] bi@ = ]
     [ [ terminated?>> ] bi@ = ]
     2tri and and ;
 
@@ -62,7 +66,7 @@ M: effect clone
     stack-effect effect-height ;
 
 : split-shuffle ( stack shuffle -- stack1 stack2 )
-    in>> length cut* ;
+    in>> effect-length cut* ;
 
 : shuffle-mapping ( effect -- mapping )
     [ out>> ] [ in>> ] bi [ index ] curry map ;
@@ -77,8 +81,9 @@ M: effect clone
     over terminated?>> [
         drop
     ] [
-        [ [ [ in>> length ] [ out>> length ] bi ] [ in>> length ] bi* swap [-] + ]
-        [ [ out>> length ] [ [ in>> length ] [ out>> length ] bi ] bi* [ [-] ] dip + ]
+        [ [ [ in>> effect-length ] [ out>> effect-length ] bi ] [ in>> effect-length ] bi* swap [-] + ]
+        [ [ out>> effect-length ] [ [ in>> effect-length ] [ out>> effect-length ] bi ] bi* [ [-] ] dip + ]
         [ nip terminated?>> ] 2tri
+        [ [ [ "obj" ] replicate ] bi@ ] dip
         effect boa
     ] if ; inline

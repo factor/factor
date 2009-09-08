@@ -28,6 +28,7 @@ ARTICLE: "breakpoints" "Setting breakpoints"
 $nl
 "Breakpoints can be inserted directly into code:"
 { $subsection break }
+{ $subsection POSTPONE: B }
 "Note that because the walker calls various core library and UI words while rendering its own user interface, setting a breakpoint on a word such as " { $link append } " or " { $link draw-gadget } " will hang the UI." ;
 
 ARTICLE: "ui-walker" "UI walker"

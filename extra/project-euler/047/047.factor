@@ -36,8 +36,8 @@ IN: project-euler.047
         swap - nip
     ] [
         dup prime? [ [ drop 0 ] 2dip ] [
-            2dup unique-factors length = [ [ 1+ ] 2dip ] [ [ drop 0 ] 2dip ] if
-        ] if 1+ (consecutive)
+            2dup unique-factors length = [ [ 1 + ] 2dip ] [ [ drop 0 ] 2dip ] if
+        ] if 1 + (consecutive)
     ] if ;
 
 : consecutive ( goal test -- n )
@@ -69,10 +69,10 @@ SYMBOL: sieve
     sieve get nth 0 = ;
 
 : multiples ( n -- seq )
-    sieve get length 1- over <range> ;
+    sieve get length 1 - over <range> ;
 
 : increment-counts ( n -- )
-     multiples [ sieve get [ 1+ ] change-nth ] each ;
+     multiples [ sieve get [ 1 + ] change-nth ] each ;
 
 : prime-tau-upto ( limit -- seq )
     dup initialize-sieve 2 swap [a,b) [

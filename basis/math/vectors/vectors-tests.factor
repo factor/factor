@@ -16,3 +16,5 @@ USING: math.vectors tools.test ;
 [ { 1.75 2.125 } ] [ { 1.0 2.5 } { 2.5 1.0 } { 0.5 0.25 } vlerp ] unit-test 
 
 [ 1.125 ] [ 0.0 1.0 2.0 4.0 { 0.5 0.25 } bilerp ] unit-test
+
+[ 17 ] [ 0 1 2 3 4 5 6 7 { 1 2 3 } trilerp ] unit-test

@@ -17,7 +17,7 @@ IN: images.processing
     <image> over matrix-dim >>dim
     swap flip flatten
     [ 128 * 128 + 0 max 255 min  >fixnum ] map
-    >byte-array >>bitmap L >>component-order ;
+    >byte-array >>bitmap L >>component-order ubyte-components >>component-type ;
 
 :: matrix-zoom ( m f -- m' )
     m matrix-dim f v*n coord-matrix

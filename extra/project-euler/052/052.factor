@@ -24,7 +24,7 @@ IN: project-euler.052
 <PRIVATE
 
 : map-nx ( n x -- seq )
-    [ 1+ * ] with map ; inline
+    [ 1 + * ] with map ; inline
 
 : all-same-digits? ( seq -- ? )
     [ number>digits natural-sort ] map all-equal? ;
@@ -35,9 +35,9 @@ IN: project-euler.052
 : next-all-same ( x n -- n )
     dup candidate? [
         2dup swap map-nx all-same-digits?
-        [ nip ] [ 1+ next-all-same ] if
+        [ nip ] [ 1 + next-all-same ] if
     ] [
-        1+ next-all-same
+        1 + next-all-same
     ] if ;
 
 PRIVATE>

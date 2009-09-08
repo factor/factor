@@ -1,4 +1,6 @@
-USING: kernel tools.test windows.ole32 alien.c-types ;
+USING: kernel tools.test windows.ole32 alien.c-types
+classes.struct specialized-arrays.uchar windows.kernel32
+windows.com.syntax ;
 IN: windows.ole32.tests
 
 [ t ] [
@@ -19,17 +21,9 @@ IN: windows.ole32.tests
     guid=
 ] unit-test
         
-little-endian?
-[ B{
-    HEX: 67 HEX: 45 HEX: 23 HEX: 01 HEX: ab HEX: 89 HEX: ef HEX: cd
-    HEX: 01 HEX: 23 HEX: 45 HEX: 67 HEX: 89 HEX: ab HEX: cd HEX: ef
-} ]
-[ B{
-    HEX: 01 HEX: 23 HEX: 45 HEX: 67 HEX: 89 HEX: ab HEX: cd HEX: ef
-    HEX: 01 HEX: 23 HEX: 45 HEX: 67 HEX: 89 HEX: ab HEX: cd HEX: ef
-} ] ?
-[ "{01234567-89ab-cdef-0123-456789abcdef}" string>guid ]
-unit-test
+[
+    GUID: 01234567-89ab-cdef-0123-456789abcdef}
+] [ "{01234567-89ab-cdef-0123-456789abcdef}" string>guid ] unit-test
 
 [ "{01234567-89ab-cdef-0123-456789abcdef}" ]
 [ "{01234567-89ab-cdef-0123-456789abcdef}" string>guid guid>string ]

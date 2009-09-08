@@ -12,7 +12,6 @@ IN: debugger
 "threads" vocab [
     [
         "error-in-thread" "threads" lookup
-        [ die 2drop ]
-        define
+        [ [ die 2drop ] define ] [ f "combination" set-word-prop ] bi
     ] with-compilation-unit
 ] when

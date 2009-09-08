@@ -7,8 +7,25 @@ ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
 ui.pixel-formats destructors literals strings ;
 IN: ui.gadgets.worlds
 
+SYMBOLS:
+    close-button
+    minimize-button
+    maximize-button
+    resize-handles
+    small-title-bar
+    normal-title-bar ;
+
 CONSTANT: default-world-pixel-format-attributes
     { windowed double-buffered T{ depth-bits { value 16 } } }
+
+CONSTANT: default-world-window-controls
+    {
+        normal-title-bar
+        close-button
+        minimize-button
+        maximize-button
+        resize-handles
+    }
 
 TUPLE: world < track
     active? focused? grab-input?
@@ -16,7 +33,9 @@ TUPLE: world < track
     title status status-owner
     text-handle handle images
     window-loc
-    pixel-format-attributes ;
+    pixel-format-attributes
+    window-controls
+    window-resources ;
 
 TUPLE: world-attributes
     { world-class initial: world }
@@ -24,7 +43,8 @@ TUPLE: world-attributes
     { title string initial: "Factor Window" }
     status
     gadgets
-    { pixel-format-attributes initial: $ default-world-pixel-format-attributes } ;
+    { pixel-format-attributes initial: $ default-world-pixel-format-attributes }
+    { window-controls initial: $ default-world-window-controls } ;
 
 : <world-attributes> ( -- world-attributes )
     world-attributes new ; inline
@@ -58,11 +78,22 @@ TUPLE: world-attributes
         '[ f _ [ (>>status-owner) ] [ status>> set-model ] 2bi ] when
     ] [ 2drop ] if ;
 
+: window-resource ( resource -- resource )
+    dup world get-global window-resources>> push ;
+
+: set-gl-context ( world -- )
+    [ world set-global ]
+    [ handle>> select-gl-context ] bi ;
+
+: with-gl-context ( world quot -- )
+    '[ set-gl-context @ ]
+    [ handle>> flush-gl-context gl-error ] bi ; inline
+
 ERROR: no-world-found ;
 
 : find-gl-context ( gadget -- )
     find-world dup
-    [ handle>> select-gl-context ] [ no-world-found ] if ;
+    [ set-gl-context ] [ no-world-found ] if ;
 
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [
@@ -79,13 +110,15 @@ M: world request-focus-on ( child gadget -- )
         t >>root?
         f >>active?
         { 0 0 } >>window-loc
-        f >>grab-input? ;
+        f >>grab-input?
+        V{ } clone >>window-resources ;
 
 : apply-world-attributes ( world attributes -- world )
     {
         [ title>> >>title ]
         [ status>> >>status ]
         [ pixel-format-attributes>> >>pixel-format-attributes ]
+        [ window-controls>> >>window-controls ]
         [ grab-input?>> >>grab-input? ]
         [ gadgets>> [ 1 track-add ] each ]
     } cleave ;
@@ -128,9 +161,11 @@ M: world resize-world
 M: world (>>dim)
     [ call-next-method ]
     [
-        dup handle>>
-        [ select-gl-context resize-world ]
-        [ drop ] if*
+        dup active?>> [
+            dup handle>>
+            [ [ set-gl-context ] [ resize-world ] bi ]
+            [ drop ] if
+        ] [ drop ] if
     ] bi ;
 
 GENERIC: draw-world* ( world -- )
@@ -164,7 +199,7 @@ ui-error-hook [ [ rethrow ] ] initialize
     dup draw-world? [
         dup world [
             [
-                dup handle>> [ draw-world* ] with-gl-context
+                dup [ draw-world* ] with-gl-context
                 flush-layout-cache-hook get call( -- )
             ] [
                 over <world-error> ui-error

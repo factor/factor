@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit kernel math math.constants math.functions
-    math.vectors sequences ;
+USING: combinators.short-circuit kernel math math.constants
+math.functions math.vectors sequences ;
 IN: math.analysis
 
 <PRIVATE
@@ -117,5 +117,5 @@ PRIVATE>
 : stirling-fact ( n -- fact )
     [ pi 2 * * sqrt ]
     [ [ e / ] keep ^ ]
-    [ 12 * recip 1+ ] tri * * ;
+    [ 12 * recip 1 + ] tri * * ;
 

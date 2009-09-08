@@ -29,7 +29,7 @@ HELP: <lexer-error>
 
 HELP: skip
 { $values { "i" "a starting index" } { "seq" sequence } { "?" "a boolean" } { "n" integer } }
-{ $description "Skips to the first space character (if " { $snippet "boolean" } " is " { $link f } ") or the first non-space character (otherwise)." } ;
+{ $description "Skips to the first space character (if " { $snippet "boolean" } " is " { $link f } ") or the first non-space character (otherwise). Tabulations used as separators instead of spaces will be flagged as an error." } ;
 
 HELP: change-lexer-column
 { $values { "lexer" lexer } { "quot" { $quotation "( col line -- newcol )" } } }

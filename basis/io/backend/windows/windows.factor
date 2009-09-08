@@ -3,24 +3,26 @@
 USING: alien alien.c-types arrays destructors io io.backend
 io.buffers io.files io.ports io.binary io.timeouts system
 strings kernel math namespaces sequences windows.errors
-windows.kernel32 windows.shell32 windows.types windows.winsock
-splitting continuations math.bitwise accessors ;
+windows.kernel32 windows.shell32 windows.types splitting
+continuations math.bitwise accessors init sets assocs
+classes.struct classes ;
 IN: io.backend.windows
 
+TUPLE: win32-handle < disposable handle ;
+
 : set-inherit ( handle ? -- )
-    [ HANDLE_FLAG_INHERIT ] dip
+    [ handle>> HANDLE_FLAG_INHERIT ] dip
     >BOOLEAN SetHandleInformation win32-error=0/f ;
 
-TUPLE: win32-handle handle disposed ;
-
 : new-win32-handle ( handle class -- win32-handle )
-    new swap [ >>handle ] [ f set-inherit ] bi ;
+    new-disposable swap >>handle
+    dup f set-inherit ;
 
 : <win32-handle> ( handle -- win32-handle )
     win32-handle new-win32-handle ;
 
 M: win32-handle dispose* ( handle -- )
-    handle>> CloseHandle drop ;
+    handle>> CloseHandle win32-error=0/f ;
 
 TUPLE: win32-file < win32-handle ptr ;
 
@@ -41,7 +43,7 @@ HOOK: add-completion io-backend ( port -- )
     <win32-file> |dispose
     dup add-completion ;
 
-: share-mode ( -- fixnum )
+: share-mode ( -- n )
     {
         FILE_SHARE_READ
         FILE_SHARE_WRITE
@@ -49,6 +51,5 @@ HOOK: add-completion io-backend ( port -- )
     } flags ; foldable
 
 : default-security-attributes ( -- obj )
-    "SECURITY_ATTRIBUTES" <c-object>
-    "SECURITY_ATTRIBUTES" heap-size
-    over set-SECURITY_ATTRIBUTES-nLength ;
+    SECURITY_ATTRIBUTES <struct>
+    SECURITY_ATTRIBUTES heap-size >>nLength ;

@@ -1,9 +1,8 @@
 IN: specialized-arrays.tests
-USING: tools.test specialized-arrays sequences
+USING: tools.test alien.syntax specialized-arrays sequences
 specialized-arrays.int specialized-arrays.bool
 specialized-arrays.ushort alien.c-types accessors kernel
-specialized-arrays.direct.int specialized-arrays.char
-specialized-arrays.uint arrays combinators ;
+specialized-arrays.char specialized-arrays.uint arrays combinators ;
 
 [ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
 
@@ -27,4 +26,9 @@ specialized-arrays.uint arrays combinators ;
 
 [ { 3 1 3 3 7 } ] [
     int-array{ 3 1 3 3 7 } malloc-byte-array 5 <direct-int-array> >array
+] unit-test
+
+[ ushort-array{ 0 0 0 } ] [
+    3 ALIEN: 123 100 <direct-ushort-array> new-sequence
+    dup [ drop 0 ] change-each
 ] unit-test

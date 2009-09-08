@@ -3,10 +3,10 @@
 USING: kernel assocs math accessors destructors fry sequences ;
 IN: cache
 
-TUPLE: cache-assoc assoc max-age disposed ;
+TUPLE: cache-assoc < disposable assoc max-age ;
 
 : <cache-assoc> ( -- cache )
-    H{ } clone 10 f cache-assoc boa ;
+    cache-assoc new-disposable H{ } clone >>assoc 10 >>max-age ;
 
 <PRIVATE
 
@@ -38,6 +38,6 @@ PRIVATE>
 
 : purge-cache ( cache -- )
     dup max-age>> '[
-        [ nip [ 1+ ] change-age age>> _ >= ] assoc-partition
+        [ nip [ 1 + ] change-age age>> _ >= ] assoc-partition
         [ values dispose-each ] dip
     ] change-assoc drop ;

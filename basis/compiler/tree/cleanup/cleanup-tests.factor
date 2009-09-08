@@ -1,4 +1,3 @@
-IN: compiler.tree.cleanup.tests
 USING: tools.test kernel.private kernel arrays sequences
 math.private math generic words quotations alien alien.c-types
 strings sbufs sequences.private slots.private combinators
@@ -6,6 +5,7 @@ definitions system layouts vectors math.partial-dispatch
 math.order math.functions accessors hashtables classes assocs
 io.encodings.utf8 io.encodings.ascii io.encodings fry slots
 sorting.private combinators.short-circuit grouping prettyprint
+generalizations
 compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
@@ -16,6 +16,7 @@ compiler.tree.propagation
 compiler.tree.propagation.info
 compiler.tree.checker
 compiler.tree.debugger ;
+IN: compiler.tree.cleanup.tests
 
 [ t ] [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 
@@ -40,13 +41,13 @@ compiler.tree.debugger ;
 
 GENERIC: mynot ( x -- y )
 
-M: f mynot drop t ;
+M: f mynot drop t ; inline
 
-M: object mynot drop f ;
+M: object mynot drop f ; inline
 
 GENERIC: detect-f ( x -- y )
 
-M: f detect-f ;
+M: f detect-f ; inline
 
 [ t ] [
     [ dup [ mynot ] [ ] if detect-f ] \ detect-f inlined?
@@ -54,9 +55,9 @@ M: f detect-f ;
 
 GENERIC: xyz ( n -- n )
 
-M: integer xyz ;
+M: integer xyz ; inline
 
-M: object xyz ;
+M: object xyz ; inline
 
 [ t ] [
     [ { integer } declare xyz ] \ xyz inlined?
@@ -87,7 +88,7 @@ M: object xyz ;
     2over dup xyz drop >= [
         3drop
     ] [
-        [ swap [ call 1+ ] dip ] keep (i-repeat)
+        [ swap [ call 1 + ] dip ] keep (i-repeat)
     ] if ; inline recursive
 
 : i-repeat ( n quot -- ) [ { integer } declare ] dip 0 -rot (i-repeat) ; inline
@@ -112,10 +113,6 @@ M: object xyz ;
 
 [ t ] [
     [ { fixnum } declare [ ] times ] \ >= inlined?
-] unit-test
-
-[ t ] [
-    [ { fixnum } declare [ ] times ] \ 1+ inlined?
 ] unit-test
 
 [ t ] [
@@ -171,19 +168,6 @@ M: object xyz ;
     [ { array-capacity } declare 1 fixnum- ] \ fixnum- inlined?
 ] unit-test
 
-[ t ] [
-    [ 5000 [ 5000 [ ] times ] times ] \ 1+ inlined?
-] unit-test
-
-[ t ] [
-    [ 5000 [ [ ] times ] each ] \ 1+ inlined?
-] unit-test
-
-[ t ] [
-    [ 5000 0 [ dup 2 - swap [ 2drop ] curry each ] reduce ]
-    \ 1+ inlined?
-] unit-test
-
 GENERIC: annotate-entry-test-1 ( x -- )
 
 M: fixnum annotate-entry-test-1 drop ;
@@ -192,7 +176,7 @@ M: fixnum annotate-entry-test-1 drop ;
     2dup >= [
         2drop
     ] [
-        [ dup annotate-entry-test-1 1+ ] dip (annotate-entry-test-2)
+        [ dup annotate-entry-test-1 1 + ] dip (annotate-entry-test-2)
     ] if ; inline recursive
 
 : annotate-entry-test-2 ( from to -- obj ) 0 -rot (annotate-entry-test-2) ; inline
@@ -239,6 +223,11 @@ M: float detect-float ;
 [ f ] [
     [ { fixnum fixnum } declare 1 swap 7 bitand shift ]
     { fixnum-shift-fast } inlined?
+] unit-test
+
+[ t ] [
+    [ 1 swap 7 bitand shift ]
+    { shift fixnum-shift } inlined?
 ] unit-test
 
 cell-bits 32 = [
@@ -297,10 +286,6 @@ cell-bits 32 = [
             ] if
         ] when
     ] \ + inlined?
-] unit-test
-
-[ t ] [
-    [ 1000 iota [ 1+ ] map ] { 1+ fixnum+ } inlined?
 ] unit-test
 
 : rec ( a -- b )
@@ -461,7 +446,7 @@ cell-bits 32 = [
 : buffalo-wings ( i seq -- )
     2dup < [
         2dup chicken-fingers
-        [ 1+ ] dip buffalo-wings
+        [ 1 + ] dip buffalo-wings
     ] [
         2drop
     ] if ; inline recursive
@@ -480,7 +465,7 @@ cell-bits 32 = [
 : ribs ( i seq -- )
     2dup < [
         steak
-        [ 1+ ] dip ribs
+        [ 1 + ] dip ribs
     ] [
         2drop
     ] if ; inline recursive
@@ -517,4 +502,24 @@ cell-bits 32 = [
 [ t ] [
     [ { integer integer } declare + drop ]
     { + +-integer-integer } inlined?
+] unit-test
+
+[ [ ] ] [
+    [
+        20 f <array>
+        [ 0 swap nth ] keep
+        [ 1 swap nth ] keep
+        [ 2 swap nth ] keep
+        [ 3 swap nth ] keep
+        [ 4 swap nth ] keep
+        [ 5 swap nth ] keep
+        [ 6 swap nth ] keep
+        [ 7 swap nth ] keep
+        [ 8 swap nth ] keep
+        [ 9 swap nth ] keep
+        [ 10 swap nth ] keep
+        [ 11 swap nth ] keep
+        [ 12 swap nth ] keep
+        14 ndrop
+    ] cleaned-up-tree nodes>quot
 ] unit-test

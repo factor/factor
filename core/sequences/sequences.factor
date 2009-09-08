@@ -18,14 +18,14 @@ GENERIC: clone-like ( seq exemplar -- newseq ) flushable
 : new-like ( len exemplar quot -- seq )
     over [ [ new-sequence ] dip call ] dip like ; inline
 
-M: sequence like drop ;
+M: sequence like drop ; inline
 
 GENERIC: lengthen ( n seq -- )
 GENERIC: shorten ( n seq -- )
 
-M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
+M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ; inline
 
-M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
+M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 
 : empty? ( seq -- ? ) length 0 = ; inline
 
@@ -82,25 +82,25 @@ GENERIC: resize ( n seq -- newseq ) flushable
 GENERIC: nth-unsafe ( n seq -- elt ) flushable
 GENERIC: set-nth-unsafe ( elt n seq -- )
 
-M: sequence nth bounds-check nth-unsafe ;
-M: sequence set-nth bounds-check set-nth-unsafe ;
+M: sequence nth bounds-check nth-unsafe ; inline
+M: sequence set-nth bounds-check set-nth-unsafe ; inline
 
-M: sequence nth-unsafe nth ;
-M: sequence set-nth-unsafe set-nth ;
+M: sequence nth-unsafe nth ; inline
+M: sequence set-nth-unsafe set-nth ; inline
 
 : change-nth-unsafe ( i seq quot -- )
     [ [ nth-unsafe ] dip call ] 3keep drop set-nth-unsafe ; inline
 
 ! The f object supports the sequence protocol trivially
-M: f length drop 0 ;
-M: f nth-unsafe nip ;
-M: f like drop [ f ] when-empty ;
+M: f length drop 0 ; inline
+M: f nth-unsafe nip ; inline
+M: f like drop [ f ] when-empty ; inline
 
 INSTANCE: f immutable-sequence
 
-! Integers support the sequence protocol
-M: integer length ;
-M: integer nth-unsafe drop ;
+! Integers used to support the sequence protocol
+M: integer length ; inline deprecated
+M: integer nth-unsafe drop ; inline deprecated
 
 INSTANCE: integer immutable-sequence
 
@@ -113,8 +113,8 @@ TUPLE: iota { n integer read-only } ;
 
 <PRIVATE
 
-M: iota length n>> ;
-M: iota nth-unsafe drop ;
+M: iota length n>> ; inline
+M: iota nth-unsafe drop ; inline
 
 INSTANCE: iota immutable-sequence
 
@@ -185,12 +185,12 @@ MIXIN: virtual-sequence
 GENERIC: virtual-seq ( seq -- seq' )
 GENERIC: virtual@ ( n seq -- n' seq' )
 
-M: virtual-sequence nth virtual@ nth ;
-M: virtual-sequence set-nth virtual@ set-nth ;
-M: virtual-sequence nth-unsafe virtual@ nth-unsafe ;
-M: virtual-sequence set-nth-unsafe virtual@ set-nth-unsafe ;
-M: virtual-sequence like virtual-seq like ;
-M: virtual-sequence new-sequence virtual-seq new-sequence ;
+M: virtual-sequence nth virtual@ nth ; inline
+M: virtual-sequence set-nth virtual@ set-nth ; inline
+M: virtual-sequence nth-unsafe virtual@ nth-unsafe ; inline
+M: virtual-sequence set-nth-unsafe virtual@ set-nth-unsafe ; inline
+M: virtual-sequence like virtual-seq like ; inline
+M: virtual-sequence new-sequence virtual-seq new-sequence ; inline
 
 INSTANCE: virtual-sequence sequence
 
@@ -199,11 +199,9 @@ TUPLE: reversed { seq read-only } ;
 
 C: <reversed> reversed
 
-M: reversed virtual-seq seq>> ;
-
-M: reversed virtual@ seq>> [ length swap - 1 - ] keep ;
-
-M: reversed length seq>> length ;
+M: reversed virtual-seq seq>> ; inline
+M: reversed virtual@ seq>> [ length swap - 1 - ] keep ; inline
+M: reversed length seq>> length ; inline
 
 INSTANCE: reversed virtual-sequence
 
@@ -233,11 +231,11 @@ TUPLE: slice-error from to seq reason ;
     check-slice
     slice boa ; inline
 
-M: slice virtual-seq seq>> ;
+M: slice virtual-seq seq>> ; inline
 
-M: slice virtual@ [ from>> + ] [ seq>> ] bi ;
+M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 
-M: slice length [ to>> ] [ from>> ] bi - ;
+M: slice length [ to>> ] [ from>> ] bi - ; inline
 
 : short ( seq n -- seq n' ) over length min ; inline
 
@@ -260,16 +258,18 @@ TUPLE: repetition { len read-only } { elt read-only } ;
 
 C: <repetition> repetition
 
-M: repetition length len>> ;
-M: repetition nth-unsafe nip elt>> ;
+M: repetition length len>> ; inline
+M: repetition nth-unsafe nip elt>> ; inline
 
 INSTANCE: repetition immutable-sequence
 
 <PRIVATE
 
+ERROR: integer-length-expected obj ;
+
 : check-length ( n -- n )
     #! Ricing.
-    dup integer? [ "length not an integer" throw ] unless ; inline
+    dup integer? [ integer-length-expected ] unless ; inline
 
 : ((copy)) ( dst i src j n -- dst i src j n )
     dup -roll [
@@ -314,9 +314,9 @@ PRIVATE>
     (copy) drop ; inline
 
 M: sequence clone-like
-    [ dup length ] dip new-sequence [ 0 swap copy ] keep ;
+    [ dup length ] dip new-sequence [ 0 swap copy ] keep ; inline
 
-M: immutable-sequence clone-like like ;
+M: immutable-sequence clone-like like ; inline
 
 : push-all ( src dest -- ) [ length ] [ copy ] bi ;
 
@@ -358,8 +358,14 @@ PRIVATE>
 
 <PRIVATE
 
+: ((each)) ( seq -- n quot )
+    [ length ] keep [ nth-unsafe ] curry ; inline
+
 : (each) ( seq quot -- n quot' )
-    [ [ length ] keep [ nth-unsafe ] curry ] dip compose ; inline
+    [ ((each)) ] dip compose ; inline
+
+: (each-index) ( seq quot -- n quot' )
+    [ ((each)) [ keep ] curry ] dip compose ; inline
 
 : (collect) ( quot into -- quot' )
     [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
@@ -408,8 +414,11 @@ PRIVATE>
 : reduce ( seq identity quot -- result )
     swapd each ; inline
 
+: map-integers ( len quot exemplar -- newseq )
+    [ over ] dip [ [ collect ] keep ] new-like ; inline
+
 : map-as ( seq quot exemplar -- newseq )
-    [ over length ] dip [ [ map-into ] keep ] new-like ; inline
+    [ (each) ] dip map-integers ; inline
 
 : map ( seq quot -- newseq )
     over map-as ; inline
@@ -436,7 +445,7 @@ PRIVATE>
     [ -rot ] dip 2each ; inline
 
 : 2map-as ( seq1 seq2 quot exemplar -- newseq )
-    [ (2each) ] dip map-as ; inline
+    [ (2each) ] dip map-integers ; inline
 
 : 2map ( seq1 seq2 quot -- newseq )
     pick 2map-as ; inline
@@ -448,7 +457,7 @@ PRIVATE>
     (3each) each ; inline
 
 : 3map-as ( seq1 seq2 seq3 quot exemplar -- newseq )
-    [ (3each) ] dip map-as ; inline
+    [ (3each) ] dip map-integers ; inline
 
 : 3map ( seq1 seq2 seq3 quot -- newseq )
     [ pick ] dip swap 3map-as ; inline
@@ -498,19 +507,18 @@ PRIVATE>
 : follow ( obj quot -- seq )
     [ dup ] swap [ keep ] curry produce nip ; inline
 
-: prepare-index ( seq quot -- seq n quot )
-    [ dup length ] dip ; inline
-
 : each-index ( seq quot -- )
-    prepare-index 2each ; inline
+    (each-index) each-integer ; inline
 
 : interleave ( seq between quot -- )
-    swap [ drop ] [ [ 2dip call ] 2curry ] 2bi
-    [ [ 0 = ] 2dip if ] 2curry
-    each-index ; inline
+    pick empty? [ 3drop ] [
+        [ [ drop first-unsafe ] dip call ]
+        [ [ rest-slice ] 2dip [ bi* ] 2curry each ]
+        3bi
+    ] if ; inline
 
 : map-index ( seq quot -- newseq )
-    prepare-index 2map ; inline
+    [ dup length iota ] dip 2map ; inline
 
 : reduce-index ( seq identity quot -- )
     swapd each-index ; inline
@@ -628,6 +636,8 @@ PRIVATE>
 
 : last ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
 
+: set-last ( elt seq -- ) [ length 1 - ] keep set-nth ;
+
 : pop* ( seq -- ) [ length 1 - ] [ shorten ] bi ;
 
 <PRIVATE
@@ -694,7 +704,7 @@ PRIVATE>
     3tri ;
 
 : reverse-here ( seq -- )
-    [ length 2/ ] [ length ] [ ] tri
+    [ length 2/ iota ] [ length ] [ ] tri
     [ [ over - 1 - ] dip exchange-unsafe ] 2curry each ;
 
 : reverse ( seq -- newseq )
@@ -798,14 +808,14 @@ PRIVATE>
 <PRIVATE
 
 : (start) ( subseq seq n -- subseq seq ? )
-    pick length [
+    pick length iota [
         [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
     ] all? nip ; inline
 
 PRIVATE>
 
 : start* ( subseq seq n -- i )
-    pick length pick length swap - 1 +
+    pick length pick length swap - 1 + iota
     [ (start) ] find-from
     swap [ 3drop ] dip ;
 
@@ -909,7 +919,7 @@ PRIVATE>
 <PRIVATE
 
 : generic-flip ( matrix -- newmatrix )
-    [ dup first length [ length min ] reduce ] keep
+    [ dup first length [ length min ] reduce iota ] keep
     [ [ nth-unsafe ] with { } map-as ] curry { } map-as ; inline
 
 USE: arrays
@@ -919,8 +929,8 @@ USE: arrays
 
 : array-flip ( matrix -- newmatrix )
     { array } declare
-    [ dup first array-length [ array-length min ] reduce ] keep
-    [ [ array-nth ] with { } map-as ] curry { } map-as ;
+    [ dup first array-length [ array-length min ] reduce iota ] keep
+    [ [ { array } declare array-nth ] with { } map-as ] curry { } map-as ;
 
 PRIVATE>
 

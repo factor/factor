@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays classes combinators
-compression.lzw constructors endian fry grouping images io
+compression.lzw endian fry grouping images io
 io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
@@ -12,14 +12,27 @@ IN: images.tiff
 SINGLETON: tiff-image
 
 TUPLE: loading-tiff endianness the-answer ifd-offset ifds ;
-CONSTRUCTOR: loading-tiff ( -- tiff ) V{ } clone >>ifds ;
+
+: <loading-tiff> ( -- tiff )
+    loading-tiff new V{ } clone >>ifds ;
 
 TUPLE: ifd count ifd-entries next
 processed-tags strips bitmap ;
-CONSTRUCTOR: ifd ( count ifd-entries next -- ifd ) ;
+
+: <ifd> ( count ifd-entries next -- ifd )
+    ifd new
+        swap >>next
+        swap >>ifd-entries
+        swap >>count ;
 
 TUPLE: ifd-entry tag type count offset/value ;
-CONSTRUCTOR: ifd-entry ( tag type count offset/value -- ifd-entry ) ;
+
+: <ifd-entry> ( tag type count offset/value -- ifd-entry )
+    ifd-entry new
+        swap >>offset/value
+        swap >>count
+        swap >>type
+        swap >>tag ;
 
 SINGLETONS: photometric-interpretation
 photometric-interpretation-white-is-zero
@@ -443,7 +456,7 @@ ERROR: unhandled-compression compression ;
     '[
         _ group
         [ _ group unclip [ v+ ] accumulate swap suffix concat ] map
-        concat >byte-array
+        B{ } concat-as
     ] change-bitmap ;
 
 : strips-predictor ( ifd -- ifd )
@@ -471,15 +484,15 @@ ERROR: unknown-component-order ifd ;
         [ unknown-component-order ]
     } case >>bitmap ;
 
-: ifd-component-order ( ifd -- byte-order )
+: ifd-component-order ( ifd -- component-order component-type )
     bits-per-sample find-tag {
-        { { 32 32 32 32 } [ R32G32B32A32 ] }
-        { { 32 32 32 } [ R32G32B32 ] }
-        { { 16 16 16 16 } [ R16G16B16A16 ] }
-        { { 16 16 16 } [ R16G16B16 ] }
-        { { 8 8 8 8 } [ RGBA ] }
-        { { 8 8 8 } [ RGB ] }
-        { 8 [ LA ] }
+        { { 32 32 32 32 } [ RGBA float-components ] }
+        { { 32 32 32 } [ RGB float-components ] }
+        { { 16 16 16 16 } [ RGBA ushort-components ] }
+        { { 16 16 16 } [ RGB ushort-components ] }
+        { { 8 8 8 8 } [ RGBA ubyte-components ] }
+        { { 8 8 8 } [ RGB ubyte-components ] }
+        { 8 [ LA ubyte-components ] }
         [ unknown-component-order ]
     } case ;
 
@@ -492,11 +505,11 @@ ERROR: unknown-component-order ifd ;
     } case ;
 
 : ifd>image ( ifd -- image )
-    {
-        [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
-        [ ifd-component-order f ]
-        [ bitmap>> ]
-    } cleave image boa ;
+    [ <image> ] dip {
+        [ [ image-width find-tag ] [ image-length find-tag ] bi 2array >>dim ]
+        [ ifd-component-order [ >>component-order ] [ >>component-type ] bi* ]
+        [ bitmap>> >>bitmap ]
+    } cleave ;
 
 : tiff>image ( image -- image )
     ifds>> [ ifd>image ] map first ;
@@ -504,14 +517,14 @@ ERROR: unknown-component-order ifd ;
 : with-tiff-endianness ( loading-tiff quot -- )
     [ dup endianness>> ] dip with-endianness ; inline
 
-: load-tiff-ifds ( path -- loading-tiff )
-    binary [
+: load-tiff-ifds ( stream -- loading-tiff )
+    [
         <loading-tiff>
         read-header [
             dup ifd-offset>> read-ifds
             process-ifds
         ] with-tiff-endianness
-    ] with-file-reader ;
+    ] with-input-stream* ;
 
 : process-chunky-ifd ( ifd -- )
     read-strips
@@ -542,13 +555,18 @@ ERROR: unknown-component-order ifd ;
     ifds>> [ process-ifd ] each ;
 
 : load-tiff ( path -- loading-tiff )
-    [ load-tiff-ifds dup ] keep
-    binary [
-        [ process-tif-ifds ] with-tiff-endianness
-    ] with-file-reader ;
+    [ load-tiff-ifds dup ]
+    [
+        [ [ 0 seek-absolute ] dip stream-seek ]
+        [
+            [
+                [ process-tif-ifds ] with-tiff-endianness
+            ] with-input-stream
+        ] bi
+    ] bi ;
 
 ! tiff files can store several images -- we just take the first for now
-M: tiff-image load-image* ( path tiff-image -- image )
+M: tiff-image stream>image ( stream tiff-image -- image )
     drop load-tiff tiff>image ;
 
 { "tif" "tiff" } [ tiff-image register-image-class ] each

@@ -97,7 +97,7 @@ M: lazy-take car ( lazy-take -- car )
     cons>> car ;
 
 M: lazy-take cdr ( lazy-take -- cdr )
-    [ n>> 1- ] keep
+    [ n>> 1 - ] keep
     cons>> cdr ltake ;
 
 M: lazy-take nil? ( lazy-take -- ? )
@@ -191,7 +191,7 @@ TUPLE: lazy-from-by n quot ;
 C: lfrom-by lazy-from-by
 
 : lfrom ( n -- list )
-    [ 1+ ] lfrom-by ;
+    [ 1 + ] lfrom-by ;
 
 M: lazy-from-by car ( lazy-from-by -- car )
     n>> ;
@@ -235,7 +235,7 @@ M: sequence-cons car ( sequence-cons -- car )
     [ index>> ] [ seq>> nth ] bi ;
 
 M: sequence-cons cdr ( sequence-cons -- cdr )
-    [ index>> 1+ ] [ seq>> sequence-tail>list ] bi ;
+    [ index>> 1 + ] [ seq>> sequence-tail>list ] bi ;
 
 M: sequence-cons nil? ( sequence-cons -- ? )
     drop f ;

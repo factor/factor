@@ -29,13 +29,13 @@ PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
 : layout-of ( tuple -- layout )
     1 slot { array } declare ; inline
 
-M: tuple class layout-of 2 slot { word } declare ;
+M: tuple class layout-of 2 slot { word } declare ; inline
 
 : tuple-size ( tuple -- size )
-    layout-of second ; inline
+    layout-of 3 slot { fixnum } declare ; inline
 
 : prepare-tuple>array ( tuple -- n tuple layout )
-    check-tuple [ tuple-size ] [ ] [ layout-of ] tri ;
+    check-tuple [ tuple-size iota ] [ ] [ layout-of ] tri ;
 
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
@@ -66,10 +66,10 @@ PRIVATE>
 
 GENERIC: slots>tuple ( seq class -- tuple )
 
-M: tuple-class slots>tuple
+M: tuple-class slots>tuple ( seq class -- tuple )
     check-slots pad-slots
     tuple-layout <tuple> [
-        [ tuple-size ]
+        [ tuple-size iota ]
         [ [ set-array-nth ] curry ]
         bi 2each
     ] keep ;
@@ -147,8 +147,8 @@ ERROR: bad-superclass class ;
     dup boa-check-quot "boa-check" set-word-prop ;
 
 : tuple-prototype ( class -- prototype )
-    [ initial-values ] keep
-    over [ ] any? [ slots>tuple ] [ 2drop f ] if ;
+    [ initial-values ] keep over [ ] any?
+    [ slots>tuple ] [ 2drop f ] if ;
 
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;
@@ -323,7 +323,7 @@ M: tuple-class (classes-intersect?)
         [ swap classes-intersect? ]
     } cond ;
 
-M: tuple clone (clone) ;
+M: tuple clone (clone) ; inline
 
 M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 
@@ -340,8 +340,7 @@ M: tuple tuple-hashcode
 M: tuple hashcode* tuple-hashcode ;
 
 M: tuple-class new
-    dup "prototype" word-prop
-    [ (clone) ] [ tuple-layout <tuple> ] ?if ;
+    dup "prototype" word-prop [ (clone) ] [ tuple-layout <tuple> ] ?if ;
 
 M: tuple-class boa
     [ "boa-check" word-prop [ call ] when* ]

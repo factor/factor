@@ -14,7 +14,7 @@ SYMBOL: *calling*
   *wordtimes* get-global [ drop { 0 0 } ] cache first2 ;
 
 : update-times ( utime current-utime current-numinvokes -- utime' invokes' )
-  rot [ + ] curry [ 1+ ] bi* ;
+  rot [ + ] curry [ 1 + ] bi* ;
 
 : register-time ( utime word -- )
   name>>

@@ -5,6 +5,7 @@ help.topics io kernel namespaces parser sequences
 source-files.errors vocabs.hierarchy vocabs words classes
 locals tools.errors listener ;
 FROM: help.lint.checks => all-vocabs ;
+FROM: vocabs => child-vocabs ;
 IN: help.lint
 
 SYMBOL: lint-failures
@@ -55,8 +56,6 @@ PRIVATE>
         ] check-something
     ] [ drop ] if ;
 
-: check-words ( words -- ) [ check-word ] each ;
-
 : check-article ( article -- )
     [ with-interactive-vocabs ] vocabs-quot set
     >link dup '[
@@ -80,7 +79,8 @@ PRIVATE>
 
 : help-lint ( prefix -- )
     [
-        all-vocabs-seq [ vocab-name ] map all-vocabs set
+        auto-use? off
+        all-vocab-names all-vocabs set
         group-articles vocab-articles set
         child-vocabs
         [ check-vocab ] each

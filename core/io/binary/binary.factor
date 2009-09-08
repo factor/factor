@@ -10,7 +10,7 @@ IN: io.binary
 
 : nth-byte ( x n -- b ) -8 * shift mask-byte ; inline
 
-: >le ( x n -- byte-array ) [ nth-byte ] with B{ } map-as ;
+: >le ( x n -- byte-array ) iota [ nth-byte ] with B{ } map-as ;
 : >be ( x n -- byte-array ) >le dup reverse-here ;
 
 : d>w/w ( d -- w1 w2 )
@@ -24,3 +24,10 @@ IN: io.binary
 : h>b/b ( h -- b1 b2 )
     [ mask-byte ]
     [ -8 shift mask-byte ] bi ;
+
+: signed-le> ( bytes -- x )
+    [ le> ] [ length 8 * 1 - 2^ 1 - ] bi
+    2dup > [ bitnot bitor ] [ drop ] if ;
+
+: signed-be> ( bytes -- x )
+    <reversed> signed-le> ;

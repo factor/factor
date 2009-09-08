@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel layouts system math alien.c-types sequences
-compiler.cfg.registers cpu.architecture cpu.x86.assembler cpu.x86 ;
+compiler.cfg.registers cpu.architecture cpu.x86.assembler cpu.x86
+cpu.x86.assembler.operands ;
 IN: cpu.x86.64.winnt
 
 M: int-regs param-regs drop { RCX RDX R8 R9 } ;
@@ -21,9 +22,7 @@ M: x86.64 dummy-int-params? t ;
 
 M: x86.64 dummy-fp-params? t ;
 
-M: x86.64 temp-reg-1 RAX ;
-
-M: x86.64 temp-reg-2 RCX ;
+M: x86.64 temp-reg RAX ;
 
 <<
 "longlong" "ptrdiff_t" typedef

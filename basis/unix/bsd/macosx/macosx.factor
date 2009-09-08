@@ -1,17 +1,17 @@
-USING: alien.syntax unix.time ;
+USING: alien.syntax unix.time classes.struct ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 1024
 
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" } 
-    { "int" "socktype" }
-    { "int" "protocol" }
-    { "socklen_t" "addrlen" }
-    { "char*" "canonname" }
-    { "void*" "addr" }
-    { "addrinfo*" "next" } ;
+STRUCT: addrinfo
+    { flags int }
+    { family int } 
+    { socktype int }
+    { protocol int }
+    { addrlen socklen_t }
+    { canonname char* }
+    { addr void* }
+    { next addrinfo* } ;
 
 CONSTANT: _UTX_USERSIZE 256
 CONSTANT: _UTX_LINESIZE 32
@@ -32,12 +32,12 @@ CONSTANT: __DARWIN_MAXPATHLEN 1024
 CONSTANT: __DARWIN_MAXNAMELEN 255
 CONSTANT: __DARWIN_MAXNAMELEN+1 255
 
-C-STRUCT: dirent
-    { "ino_t" "d_ino" }
-    { "__uint16_t" "d_reclen" }
-    { "__uint8_t"  "d_type" }
-    { "__uint8_t"  "d_namlen" }
-    { { "char" __DARWIN_MAXNAMELEN+1 } "d_name" } ;
+STRUCT: dirent
+    { d_ino ino_t }
+    { d_reclen __uint16_t }
+    { d_type __uint8_t }
+    { d_namlen __uint8_t }
+    { d_name { "char" __DARWIN_MAXNAMELEN+1 } } ;
 
 CONSTANT: EPERM 1
 CONSTANT: ENOENT 2

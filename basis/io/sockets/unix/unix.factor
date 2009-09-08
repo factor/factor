@@ -1,10 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov. 
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings generic kernel math threads
-sequences byte-arrays io.binary io.backend.unix io.streams.duplex
-io.backend io.pathnames io.files.private io.encodings.utf8 math.parser
-continuations libc combinators system accessors destructors unix
-locals init ;
+USING: alien alien.c-types alien.strings generic kernel math
+threads sequences byte-arrays io.binary io.backend.unix
+io.streams.duplex io.backend io.pathnames io.sockets.private
+io.files.private io.encodings.utf8 math.parser continuations
+libc combinators system accessors destructors unix locals init
+classes.struct ;
 
 EXCLUDE: namespaces => bind ;
 EXCLUDE: io => read write ;
@@ -19,7 +20,23 @@ IN: io.sockets.unix
     [ handle-fd ] 2dip 1 <int> "int" heap-size setsockopt io-error ;
 
 M: unix addrinfo-error ( n -- )
-    dup zero? [ drop ] [ gai_strerror throw ] if ;
+    [ gai_strerror throw ] unless-zero ;
+
+M: unix sockaddr-of-family ( alien af -- addrspec )
+    {
+        { AF_INET [ sockaddr-in memory>struct ] }
+        { AF_INET6 [ sockaddr-in6 memory>struct ] }
+        { AF_UNIX [ sockaddr-un memory>struct ] }
+        [ 2drop f ]
+    } case ;
+
+M: unix addrspec-of-family ( af -- addrspec )
+    {
+        { AF_INET [ T{ inet4 } ] }
+        { AF_INET6 [ T{ inet6 } ] }
+        { AF_UNIX [ T{ local } ] }
+        [ drop f ]
+    } case ;
 
 ! Client sockets - TCP and Unix domain
 M: object (get-local-address) ( handle remote -- sockaddr )
@@ -61,8 +78,8 @@ M: object ((client)) ( addrspec -- fd )
 
 : server-socket-fd ( addrspec type -- fd )
     [ dup protocol-family ] dip socket-fd
-    dup init-server-socket
-    dup handle-fd rot make-sockaddr/size bind io-error ;
+    [ init-server-socket ] keep
+    [ handle-fd swap make-sockaddr/size bind io-error ] keep ;
 
 M: object (server) ( addrspec -- handle )
     [
@@ -99,19 +116,17 @@ CONSTANT: packet-size 65536
 [ packet-size malloc receive-buffer set-global ] "io.sockets.unix" add-init-hook
 
 :: do-receive ( port -- packet sockaddr )
-    port addr>> empty-sockaddr/size [| sockaddr len |
-        port handle>> handle-fd ! s
-        receive-buffer get-global ! buf
-        packet-size ! nbytes
-        0 ! flags
-        sockaddr ! from
-        len <int> ! fromlen
-        recvfrom dup 0 >= [
-            receive-buffer get-global swap memory>byte-array sockaddr
-        ] [
-            drop f f
-        ] if
-    ] call ;
+    port addr>> empty-sockaddr/size :> len :> sockaddr
+    port handle>> handle-fd ! s
+    receive-buffer get-global ! buf
+    packet-size ! nbytes
+    0 ! flags
+    sockaddr ! from
+    len <int> ! fromlen
+    recvfrom dup 0 >=
+    [ receive-buffer get-global swap memory>byte-array sockaddr ]
+    [ drop f f ]
+    if ;
 
 M: unix (receive) ( datagram -- packet sockaddr )
     dup do-receive dup [ [ drop ] 2dip ] [
@@ -139,17 +154,17 @@ M: unix (send) ( packet addrspec datagram -- )
 ! Unix domain sockets
 M: local protocol-family drop PF_UNIX ;
 
-M: local sockaddr-size drop "sockaddr-un" heap-size ;
+M: local sockaddr-size drop sockaddr-un heap-size ;
 
-M: local empty-sockaddr drop "sockaddr-un" <c-object> ;
+M: local empty-sockaddr drop sockaddr-un <struct> ;
 
 M: local make-sockaddr
     path>> (normalize-path)
     dup length 1 + max-un-path > [ "Path too long" throw ] when
-    "sockaddr-un" <c-object>
-    AF_UNIX over set-sockaddr-un-family
-    dup sockaddr-un-path rot utf8 string>alien dup length memcpy ;
+    sockaddr-un <struct>
+        AF_UNIX >>family
+        swap utf8 string>alien >>path ;
 
 M: local parse-sockaddr
     drop
-    sockaddr-un-path utf8 alien>string <local> ;
+    path>> utf8 alien>string <local> ;

@@ -530,12 +530,6 @@ EXCLUDE: qualified.tests.bar => x ;
 [ 3 ] [ x ] unit-test
 [ 4 ] [ y ] unit-test
 
-[ "IN: qualified.tests FROM: qualified.tests => doesnotexist ;" eval( -- ) ]
-[ error>> no-word-error? ] must-fail-with
-
-[ "IN: qualified.tests RENAME: doesnotexist qualified.tests => blahx" eval( -- ) ]
-[ error>> no-word-error? ] must-fail-with
-
 ! Two similar bugs
 
 ! Replace : def with something in << >>

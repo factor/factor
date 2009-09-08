@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays
-byte-vectors combinators constructors fry grouping hashtables
+byte-vectors combinators fry grouping hashtables
 compression.huffman images io.binary kernel locals
 math math.bitwise math.order math.ranges multiline sequences
 sorting ;
@@ -64,7 +64,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
         k swap - dup k! 0 >
     ] 
     [ ] produce swap suffix
-    { } [ dup array? [ dup first 16 = ] [ f ] if [ [ unclip-last ] [ second 1+ swap <repetition> append ] bi* ] [ suffix ] if ] reduce
+    { } [ dup array? [ dup first 16 = ] [ f ] if [ [ unclip-last ] [ second 1 + swap <repetition> append ] bi* ] [ suffix ] if ] reduce
     [ dup array? [ second 0 <repetition> ] [ 1array ] if ] map concat
     nip swap cut 2array [ [ length>> [0,b) ] [ ] bi get-table ] map ;
     
@@ -91,14 +91,14 @@ CONSTANT: dist-table
     }
 
 : nth* ( n seq -- elt )
-    [ length 1- swap - ] [ nth ] bi ;
+    [ length 1 - swap - ] [ nth ] bi ;
 
 :: inflate-lz77 ( seq -- bytes )
     1000 <byte-vector> :> bytes
     seq
     [
         dup array?
-        [ first2 '[ _ 1- bytes nth* bytes push ] times ]
+        [ first2 '[ _ 1 - bytes nth* bytes push ] times ]
         [ bytes push ] if
     ] each 
     bytes ;
@@ -151,7 +151,16 @@ CONSTANT: dist-table
         ] when
     ] map ;
     
-: inflate-raw ( bitstream -- bytes ) zlib-unimplemented ;
+:: inflate-raw ( bitstream -- bytes ) 
+    8 bitstream bs:align 
+    16 bitstream bs:read :> len
+    16 bitstream bs:read :> nlen
+    len nlen + 16 >signed -1 assert= ! len + ~len = -1
+    bitstream byte-pos>>
+    bitstream byte-pos>> len +
+    bitstream bytes>> <slice>
+    len 8 * bitstream bs:seek ;
+
 : inflate-static ( bitstream -- bytes ) zlib-unimplemented ;
 
 :: inflate-loop ( bitstream -- bytes )
@@ -194,17 +203,16 @@ CONSTANT: dist-table
 
 PRIVATE>
 
-! for debug -- shows residual values
-: reverse-png-filter' ( lines -- filtered )
+: reverse-png-filter' ( lines -- byte-array )
     [ first ] [ 1 tail ] [ map ] bi-curry@ bi nip
-    concat [ 128 + 256 wrap ] map ;
-    
-: reverse-png-filter ( lines -- filtered )
+    concat [ 128 + ] B{ } map-as ;
+
+: reverse-png-filter ( lines -- byte-array )
     dup first [ 0 ] replicate prefix
     [ { 0 0 } prepend  ] map
     2 clump [
         first2 dup [ third ] [ 0 2 rot set-nth ] bi png-unfilter-line
-    ] map concat ;
+    ] map B{ } concat-as ;
 
 : zlib-inflate ( bytes -- bytes )
     bs:<lsb0-bit-reader>

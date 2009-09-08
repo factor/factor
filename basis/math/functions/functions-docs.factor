@@ -20,9 +20,6 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
 "Computing additive and multiplicative inverses:"
 { $subsection neg }
 { $subsection recip }
-"Incrementing, decrementing:"
-{ $subsection 1+ }
-{ $subsection 1- }
 "Minimum, maximum, clamping:"
 { $subsection min }
 { $subsection max }
@@ -32,6 +29,10 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
 "Tests:"
 { $subsection zero? }
 { $subsection between? }
+"Control flow:"
+{ $subsection if-zero }
+{ $subsection when-zero }
+{ $subsection unless-zero }
 "Sign:"
 { $subsection sgn }
 "Rounding:"
@@ -50,8 +51,10 @@ ARTICLE: "power-functions" "Powers and logarithms"
 { $subsection exp }
 { $subsection cis }
 { $subsection log }
+{ $subsection log10 }
 "Raising a number to a power:"
 { $subsection ^ }
+{ $subsection 10^ }
 "Converting between rectangular and polar form:"
 { $subsection abs }
 { $subsection absq }
@@ -121,6 +124,10 @@ HELP: exp
 HELP: log
 { $values { "x" number } { "y" number } }
 { $description "Natural logarithm function. Outputs negative infinity if " { $snippet "x" } " is 0." } ;
+
+HELP: log10
+{ $values { "x" number } { "y" number } }
+{ $description "Logarithm function base 10. Outputs negative infinity if " { $snippet "x" } " is 0." } ;
 
 HELP: sqrt
 { $values { "x" number } { "y" number } }
@@ -260,6 +267,10 @@ HELP: ^
 { $values { "x" number } { "y" number } { "z" number } }
 { $description "Raises " { $snippet "x" } " to the power of " { $snippet "y" } ". If " { $snippet "y" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." }
 { $errors "Throws an error if " { $snippet "x" } " and " { $snippet "y" } " are both integer 0." } ;
+
+HELP: 10^
+{ $values { "x" number } { "y" number } }
+{ $description "Raises " { $snippet "x" } " to the power of 10. If " { $snippet "x" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." } ;
 
 HELP: gcd
 { $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }

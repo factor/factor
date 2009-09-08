@@ -6,7 +6,7 @@ help.markup help.topics io io.streams.string kernel make namespaces
 parser prettyprint sequences summary help.vocabs
 vocabs vocabs.loader vocabs.hierarchy vocabs.metadata words see
 listener ;
-
+FROM: vocabs.hierarchy => child-vocabs ;
 IN: fuel.help
 
 <PRIVATE
@@ -67,10 +67,10 @@ SYMBOL: describe-words
             [ fuel-vocab-help-table ] bi*
             [ 2array ] [ drop f ] if*
         ] if-empty
-    ] { } assoc>map [  ] filter ;
+    ] { } assoc>map sift ;
 
 : fuel-vocab-children-help ( name -- element )
-    all-child-vocabs fuel-vocab-list ; inline
+    child-vocabs fuel-vocab-list ; inline
 
 : fuel-vocab-describe-words ( name -- element )
     [ words. ] with-string-writer \ describe-words swap 2array ; inline

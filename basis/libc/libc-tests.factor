@@ -4,8 +4,8 @@ destructors kernel ;
 
 100 malloc "block" set
 
-[ t ] [ "block" get mallocs key? ] unit-test
+[ t ] [ "block" get malloc-exists? ] unit-test
 
 [ ] [ [ "block" get &free drop ] with-destructors ] unit-test
 
-[ f ] [ "block" get mallocs key? ] unit-test
+[ f ] [ "block" get malloc-exists? ] unit-test

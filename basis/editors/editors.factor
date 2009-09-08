@@ -3,8 +3,9 @@
 USING: parser lexer kernel namespaces sequences definitions
 io.files io.backend io.pathnames io summary continuations
 tools.crossref vocabs.hierarchy prettyprint source-files
-source-files.errors assocs vocabs vocabs.loader splitting
+source-files.errors assocs vocabs.loader splitting
 accessors debugger help.topics ;
+FROM: vocabs => vocab-name >vocab-link ;
 IN: editors
 
 TUPLE: no-edit-hook ;
@@ -15,7 +16,7 @@ M: no-edit-hook summary
 SYMBOL: edit-hook
 
 : available-editors ( -- seq )
-    "editors" all-child-vocabs-seq [ vocab-name ] map ;
+    "editors" child-vocabs no-roots no-prefixes [ vocab-name ] map ;
 
 : editor-restarts ( -- alist )
     available-editors
@@ -46,43 +47,12 @@ M: cannot-find-source error.
 : edit-vocab ( name -- )
     >vocab-link edit ;
 
-GENERIC: error-file ( error -- file )
-
-GENERIC: error-line ( error -- line )
-
-M: lexer-error error-file
-    error>> error-file ;
-
-M: lexer-error error-line
-    [ error>> error-line ] [ line>> ] bi or ;
-
-M: source-file-error error-file
-    [ error>> error-file ] [ file>> ] bi or ;
-
-M: source-file-error error-line
-    error>> error-line ;
-
-M: condition error-file
-    error>> error-file ;
-
-M: condition error-line
-    error>> error-line ;
-
-M: object error-file
-    drop f ;
-
-M: object error-line
-    drop f ;
-
-: (:edit) ( error -- )
+: edit-error ( error -- )
     [ error-file ] [ error-line ] bi
     2dup and [ edit-location ] [ 2drop ] if ;
 
 : :edit ( -- )
-    error get (:edit) ;
-
-: edit-error ( error -- )
-    [ file>> ] [ line#>> ] bi 2dup and [ edit-location ] [ 2drop ] if ;
+    error get edit-error ;
 
 : edit-each ( seq -- )
     [

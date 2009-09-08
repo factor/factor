@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien system ;
+USING: alien.syntax alien system classes.struct ;
 IN: unix
 
 ! Linux.
@@ -33,34 +33,34 @@ CONSTANT: FD_CLOEXEC 1
 
 CONSTANT: F_SETFL 4
 
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" }
-    { "int" "socktype" }
-    { "int" "protocol" }
-    { "socklen_t" "addrlen" }
-    { "void*" "addr" }
-    { "char*" "canonname" }
-    { "addrinfo*" "next" } ;
+STRUCT: addrinfo
+    { flags int }
+    { family int }
+    { socktype int }
+    { protocol int }
+    { addrlen socklen_t }
+    { addr void* }
+    { canonname char* }
+    { next addrinfo* } ;
 
-C-STRUCT: sockaddr-in
-    { "ushort" "family" }
-    { "ushort" "port" }
-    { "in_addr_t" "addr" }
-    { "longlong" "unused" } ;
+STRUCT: sockaddr-in
+    { family ushort }
+    { port ushort }
+    { addr in_addr_t }
+    { unused longlong } ;
 
-C-STRUCT: sockaddr-in6
-    { "ushort" "family" }
-    { "ushort" "port" }
-    { "uint" "flowinfo" }
-    { { "uchar" 16 } "addr" }
-    { "uint" "scopeid" } ;
+STRUCT: sockaddr-in6
+    { family ushort }
+    { port ushort }
+    { flowinfo uint }
+    { addr uchar[16] }
+    { scopeid uint } ;
 
 CONSTANT: max-un-path 108
 
-C-STRUCT: sockaddr-un
-    { "ushort" "family" }
-    { { "char" max-un-path } "path" } ;
+STRUCT: sockaddr-un
+    { family ushort }
+    { path { "char" max-un-path } } ;
 
 CONSTANT: SOCK_STREAM 1
 CONSTANT: SOCK_DGRAM 2
@@ -84,22 +84,22 @@ CONSTANT: SEEK_SET 0
 CONSTANT: SEEK_CUR 1
 CONSTANT: SEEK_END 2
 
-C-STRUCT: passwd
-    { "char*"  "pw_name" }
-    { "char*"  "pw_passwd" }
-    { "uid_t"  "pw_uid" }
-    { "gid_t"  "pw_gid" }
-    { "char*"  "pw_gecos" }
-    { "char*"  "pw_dir" }
-    { "char*"  "pw_shell" } ;
+STRUCT: passwd
+    { pw_name char* }
+    { pw_passwd char* }
+    { pw_uid uid_t }
+    { pw_gid gid_t }
+    { pw_gecos char* }
+    { pw_dir char* }
+    { pw_shell char* } ;
 
 ! dirent64
-C-STRUCT: dirent
-    { "ulonglong" "d_ino" }
-    { "longlong" "d_off" }
-    { "ushort" "d_reclen" }
-    { "uchar" "d_type" }
-    { { "char" 256 } "d_name" } ;
+STRUCT: dirent
+    { d_ino ulonglong }
+    { d_off longlong }
+    { d_reclen ushort }
+    { d_type uchar }
+    { d_name char[256] } ;
 
 FUNCTION: int open64 ( char* path, int flags, int prot ) ;
 FUNCTION: dirent64* readdir64 ( DIR* dirp ) ;

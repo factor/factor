@@ -56,7 +56,7 @@ M: checksum checksum-lines
     [ B{ CHAR: \n } join ] dip checksum-bytes ;
 
 : checksum-file ( path checksum -- value )
-    #! normalize-path (file-reader) is equivalen to
+    #! normalize-path (file-reader) is equivalent to
     #! binary <file-reader>. We use the lower-level form
     #! so that we can move io.encodings.binary to basis/.
     [ normalize-path (file-reader) ] dip checksum-stream ;

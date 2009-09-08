@@ -11,9 +11,9 @@ TUPLE-ARRAY: point
 : tuple-array-benchmark ( -- )
     100 [
         drop 5000 <point-array> [
-            [ 1+ ] change-x
-            [ 1- ] change-y
-            [ 1+ 2 / ] change-z
+            [ 1 + ] change-x
+            [ 1 - ] change-y
+            [ 1 + 2 / ] change-z
         ] map [ z>> ] sigma
     ] sigma . ;
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs constructors fry
+USING: accessors arrays assocs fry
 hashtables io kernel locals math math.order math.parser
 math.ranges multiline sequences ;
 IN: compression.huffman
@@ -17,8 +17,8 @@ TUPLE: huffman-code
     { code } ;
 
 : <huffman-code> ( -- code ) 0 0 0 huffman-code boa ;
-: next-size ( code -- ) [ 1+ ] change-size [ 2 * ] change-code drop ;
-: next-code ( code -- ) [ 1+ ] change-code drop ;
+: next-size ( code -- ) [ 1 + ] change-size [ 2 * ] change-code drop ;
+: next-code ( code -- ) [ 1 + ] change-code drop ;
 
 :: all-patterns ( huff n -- seq )
     n log2 huff size>> - :> free-bits
@@ -58,7 +58,10 @@ TUPLE: huffman-decoder
     { rtable }
     { bits/level } ;
 
-CONSTRUCTOR: huffman-decoder ( bs tdesc -- decoder )
+: <huffman-decoder> ( bs tdesc -- decoder )
+    huffman-decoder new
+    swap >>tdesc
+    swap >>bs
     16 >>bits/level
     [ ] [ tdesc>> ] [ bits/level>> 2^ ] tri reverse-table >>rtable ;
 

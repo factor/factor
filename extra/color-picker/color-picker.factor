@@ -26,7 +26,7 @@ M: color-preview model-changed
     horizontal <slider> 1 >>line ;
 
 : <color-sliders> ( -- gadget model )
-    3 [ 0 0 0 255 <range> ] replicate
+    3 [ 0 0 0 255 1 <range> ] replicate
     [ <filled-pile> { 5 5 } >>gap [ <color-slider> add-gadget ] reduce ]
     [ [ range-model ] map <product> ]
     bi ;

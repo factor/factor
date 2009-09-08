@@ -24,7 +24,7 @@ IN: lists.tests
 ] unit-test
     
 { T{ cons f 2 T{ cons f 3 T{ cons f 4 T{ cons f 5 +nil+ } } } } } [
-    { 1 2 3 4 } sequence>list [ 1+ ] lmap
+    { 1 2 3 4 } sequence>list [ 1 + ] lmap
 ] unit-test
     
 { 15 } [

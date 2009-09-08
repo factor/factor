@@ -4,7 +4,7 @@ USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
 alien.strings alien.arrays alien.complex alien.libraries sets libc
-continuations.private fry cpu.architecture
+continuations.private fry cpu.architecture classes locals
 source-files.errors
 compiler.errors
 compiler.alien
@@ -18,15 +18,11 @@ compiler.codegen.fixup
 compiler.utilities ;
 IN: compiler.codegen
 
+SYMBOL: insn-counts
+
+H{ } clone insn-counts set-global
+
 GENERIC: generate-insn ( insn -- )
-
-SYMBOL: registers
-
-: register ( vreg -- operand )
-    registers get at [ "Bad value" throw ] unless* ;
-
-: ?register ( obj -- operand )
-    dup vreg? [ register ] when ;
 
 TUPLE: asm label code calls ;
 
@@ -54,7 +50,11 @@ SYMBOL: labels
         [ word>> init-generator ]
         [
             instructions>>
-            [ [ regs>> registers set ] [ generate-insn ] bi ] each
+            [
+                [ class insn-counts get inc-at ]
+                [ generate-insn ]
+                bi
+            ] each
         ] bi
     ] with-fixup ;
 
@@ -67,17 +67,19 @@ SYMBOL: labels
 : lookup-label ( id -- label )
     labels get [ drop <label> ] cache ;
 
+M: ##no-tco generate-insn drop ;
+
 M: ##load-immediate generate-insn
-    [ dst>> register ] [ val>> ] bi %load-immediate ;
+    [ dst>> ] [ val>> ] bi %load-immediate ;
 
 M: ##load-reference generate-insn
-    [ dst>> register ] [ obj>> ] bi %load-reference ;
+    [ dst>> ] [ obj>> ] bi %load-reference ;
 
 M: ##peek generate-insn
-    [ dst>> register ] [ loc>> ] bi %peek ;
+    [ dst>> ] [ loc>> ] bi %peek ;
 
 M: ##replace generate-insn
-    [ src>> register ] [ loc>> ] bi %replace ;
+    [ src>> ] [ loc>> ] bi %replace ;
 
 M: ##inc-d generate-insn n>> %inc-d ;
 
@@ -92,7 +94,7 @@ M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 M: ##return generate-insn drop %return ;
 
 M: _dispatch generate-insn
-    [ src>> register ] [ temp>> register ] bi %dispatch ;
+    [ src>> ] [ temp>> ] bi %dispatch ;
 
 M: _dispatch-label generate-insn
     label>> lookup-label
@@ -100,56 +102,34 @@ M: _dispatch-label generate-insn
     rc-absolute-cell label-fixup ;
 
 : >slot< ( insn -- dst obj slot tag )
-    {
-        [ dst>> register ]
-        [ obj>> register ]
-        [ slot>> ?register ]
-        [ tag>> ]
-    } cleave ; inline
+    { [ dst>> ] [ obj>> ] [ slot>> ] [ tag>> ] } cleave ; inline
 
 M: ##slot generate-insn
-    [ >slot< ] [ temp>> register ] bi %slot ;
+    [ >slot< ] [ temp>> ] bi %slot ;
 
 M: ##slot-imm generate-insn
     >slot< %slot-imm ;
 
 : >set-slot< ( insn -- src obj slot tag )
-    {
-        [ src>> register ]
-        [ obj>> register ]
-        [ slot>> ?register ]
-        [ tag>> ]
-    } cleave ; inline
+    { [ src>> ] [ obj>> ] [ slot>> ] [ tag>> ] } cleave ; inline
 
 M: ##set-slot generate-insn
-    [ >set-slot< ] [ temp>> register ] bi %set-slot ;
+    [ >set-slot< ] [ temp>> ] bi %set-slot ;
 
 M: ##set-slot-imm generate-insn
     >set-slot< %set-slot-imm ;
 
 M: ##string-nth generate-insn
-    {
-        [ dst>> register ]
-        [ obj>> register ]
-        [ index>> register ]
-        [ temp>> register ]
-    } cleave %string-nth ;
+    { [ dst>> ] [ obj>> ] [ index>> ] [ temp>> ] } cleave %string-nth ;
 
 M: ##set-string-nth-fast generate-insn
-    {
-        [ src>> register ]
-        [ obj>> register ]
-        [ index>> register ]
-        [ temp>> register ]
-    } cleave %set-string-nth-fast ;
+    { [ src>> ] [ obj>> ] [ index>> ] [ temp>> ] } cleave %set-string-nth-fast ;
 
 : dst/src ( insn -- dst src )
-    [ dst>> register ] [ src>> register ] bi ; inline
+    [ dst>> ] [ src>> ] bi ; inline
 
 : dst/src1/src2 ( insn -- dst src1 src2 )
-    [ dst>> register ]
-    [ src1>> register ]
-    [ src2>> ?register ] tri ; inline
+    [ dst>> ] [ src1>> ] [ src2>> ] tri ; inline
 
 M: ##add     generate-insn dst/src1/src2 %add     ;
 M: ##add-imm generate-insn dst/src1/src2 %add-imm ;
@@ -163,27 +143,26 @@ M: ##or      generate-insn dst/src1/src2 %or      ;
 M: ##or-imm  generate-insn dst/src1/src2 %or-imm  ;
 M: ##xor     generate-insn dst/src1/src2 %xor     ;
 M: ##xor-imm generate-insn dst/src1/src2 %xor-imm ;
+M: ##shl     generate-insn dst/src1/src2 %shl     ;
 M: ##shl-imm generate-insn dst/src1/src2 %shl-imm ;
+M: ##shr     generate-insn dst/src1/src2 %shr     ;
 M: ##shr-imm generate-insn dst/src1/src2 %shr-imm ;
+M: ##sar     generate-insn dst/src1/src2 %sar     ;
 M: ##sar-imm generate-insn dst/src1/src2 %sar-imm ;
+M: ##min     generate-insn dst/src1/src2 %min     ;
+M: ##max     generate-insn dst/src1/src2 %max     ;
 M: ##not     generate-insn dst/src       %not     ;
 M: ##log2    generate-insn dst/src       %log2    ;
 
-: src1/src2 ( insn -- src1 src2 )
-    [ src1>> register ] [ src2>> register ] bi ; inline
+: label/dst/src1/src2 ( insn -- label dst src1 src2 )
+    [ label>> lookup-label ] [ dst/src1/src2 ] bi ; inline
 
-: src1/src2/temp1/temp2 ( insn -- src1 src2 temp1 temp2 )
-    [ src1/src2 ] [ temp1>> register ] [ temp2>> register ] tri ; inline
-
-M: ##fixnum-add generate-insn src1/src2 %fixnum-add ;
-M: ##fixnum-add-tail generate-insn src1/src2 %fixnum-add-tail ;
-M: ##fixnum-sub generate-insn src1/src2 %fixnum-sub ;
-M: ##fixnum-sub-tail generate-insn src1/src2 %fixnum-sub-tail ;
-M: ##fixnum-mul generate-insn src1/src2/temp1/temp2 %fixnum-mul ;
-M: ##fixnum-mul-tail generate-insn src1/src2/temp1/temp2 %fixnum-mul-tail ;
+M: _fixnum-add generate-insn label/dst/src1/src2 %fixnum-add ;
+M: _fixnum-sub generate-insn label/dst/src1/src2 %fixnum-sub ;
+M: _fixnum-mul generate-insn label/dst/src1/src2 %fixnum-mul ;
 
 : dst/src/temp ( insn -- dst src temp )
-    [ dst/src ] [ temp>> register ] bi ; inline
+    [ dst/src ] [ temp>> ] bi ; inline
 
 M: ##integer>bignum generate-insn dst/src/temp %integer>bignum ;
 M: ##bignum>integer generate-insn dst/src/temp %bignum>integer ;
@@ -192,16 +171,29 @@ M: ##add-float generate-insn dst/src1/src2 %add-float ;
 M: ##sub-float generate-insn dst/src1/src2 %sub-float ;
 M: ##mul-float generate-insn dst/src1/src2 %mul-float ;
 M: ##div-float generate-insn dst/src1/src2 %div-float ;
+M: ##min-float generate-insn dst/src1/src2 %min-float ;
+M: ##max-float generate-insn dst/src1/src2 %max-float ;
+
+M: ##sqrt generate-insn dst/src %sqrt ;
+
+M: ##unary-float-function generate-insn
+    [ dst/src ] [ func>> ] bi %unary-float-function ;
+
+M: ##binary-float-function generate-insn
+    [ dst/src1/src2 ] [ func>> ] bi %binary-float-function ;
 
 M: ##integer>float generate-insn dst/src %integer>float ;
 M: ##float>integer generate-insn dst/src %float>integer ;
 
-M: ##copy             generate-insn dst/src %copy ;
-M: ##copy-float       generate-insn dst/src %copy-float ;
-M: ##unbox-float      generate-insn dst/src %unbox-float ;
-M: ##unbox-any-c-ptr  generate-insn dst/src/temp %unbox-any-c-ptr ;
-M: ##box-float        generate-insn dst/src/temp %box-float ;
-M: ##box-alien        generate-insn dst/src/temp %box-alien ;
+M: ##copy generate-insn [ dst/src ] [ rep>> ] bi %copy ;
+
+M: ##unbox-float generate-insn dst/src %unbox-float ;
+M: ##unbox-any-c-ptr generate-insn dst/src/temp %unbox-any-c-ptr ;
+M: ##box-float generate-insn dst/src/temp %box-float ;
+M: ##box-alien generate-insn dst/src/temp %box-alien ;
+
+M: ##box-displaced-alien generate-insn
+    [ dst/src1/src2 ] [ temp1>> ] [ temp2>> ] tri %box-displaced-alien ;
 
 M: ##alien-unsigned-1 generate-insn dst/src %alien-unsigned-1 ;
 M: ##alien-unsigned-2 generate-insn dst/src %alien-unsigned-2 ;
@@ -214,7 +206,7 @@ M: ##alien-float      generate-insn dst/src %alien-float      ;
 M: ##alien-double     generate-insn dst/src %alien-double     ;
 
 : >alien-setter< ( insn -- src value )
-    [ src>> register ] [ value>> register ] bi ; inline
+    [ src>> ] [ value>> ] bi ; inline
 
 M: ##set-alien-integer-1 generate-insn >alien-setter< %set-alien-integer-1 ;
 M: ##set-alien-integer-2 generate-insn >alien-setter< %set-alien-integer-2 ;
@@ -225,82 +217,110 @@ M: ##set-alien-double    generate-insn >alien-setter< %set-alien-double    ;
 
 M: ##allot generate-insn
     {
-        [ dst>> register ]
+        [ dst>> ]
         [ size>> ]
         [ class>> ]
-        [ temp>> register ]
+        [ temp>> ]
     } cleave
     %allot ;
 
 M: ##write-barrier generate-insn
-    [ src>> register ]
-    [ card#>> register ]
-    [ table>> register ]
+    [ src>> ]
+    [ card#>> ]
+    [ table>> ]
     tri %write-barrier ;
 
-M: _gc generate-insn
-    {
-        [ temp1>> register ]
-        [ temp2>> register ]
-        [ gc-roots>> ]
-        [ gc-root-count>> ]
-    } cleave %gc ;
+! GC checks
+: wipe-locs ( locs temp -- )
+    '[
+        _
+        [ 0 %load-immediate ]
+        [ swap [ %replace ] with each ] bi
+    ] unless-empty ;
 
-M: ##loop-entry generate-insn drop %loop-entry ;
+GENERIC# save-gc-root 1 ( gc-root operand temp -- )
+
+M:: spill-slot save-gc-root ( gc-root operand temp -- )
+    temp operand n>> int-rep %reload
+    gc-root temp %save-gc-root ;
+
+M: object save-gc-root drop %save-gc-root ;
+
+: save-gc-roots ( gc-roots temp -- ) '[ _ save-gc-root ] assoc-each ;
+
+: save-data-regs ( data-regs -- ) [ first3 %spill ] each ;
+
+GENERIC# load-gc-root 1 ( gc-root operand temp -- )
+
+M:: spill-slot load-gc-root ( gc-root operand temp -- )
+    gc-root temp %load-gc-root
+    temp operand n>> int-rep %spill ;
+
+M: object load-gc-root drop %load-gc-root ;
+
+: load-gc-roots ( gc-roots temp -- ) '[ _ load-gc-root ] assoc-each ;
+
+: load-data-regs ( data-regs -- ) [ first3 %reload ] each ;
+
+M: _gc generate-insn
+    "no-gc" define-label
+    {
+        [ [ "no-gc" get ] dip [ temp1>> ] [ temp2>> ] bi %check-nursery ]
+        [ [ uninitialized-locs>> ] [ temp1>> ] bi wipe-locs ]
+        [ data-values>> save-data-regs ]
+        [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
+        [ tagged-values>> length %call-gc ]
+        [ [ tagged-values>> ] [ temp1>> ] bi load-gc-roots ]
+        [ data-values>> load-data-regs ]
+    } cleave
+    "no-gc" resolve-label ;
+
+M: _loop-entry generate-insn drop %loop-entry ;
 
 M: ##alien-global generate-insn
-    [ dst>> register ] [ symbol>> ] [ library>> ] tri
+    [ dst>> ] [ symbol>> ] [ library>> ] tri
     %alien-global ;
 
 ! ##alien-invoke
-GENERIC: reg-class-variable ( register-class -- symbol )
+GENERIC: next-fastcall-param ( rep -- )
 
-M: reg-class reg-class-variable ;
+: ?dummy-stack-params ( rep -- )
+    dummy-stack-params? [ rep-size cell align stack-params +@ ] [ drop ] if ;
 
-M: float-regs reg-class-variable drop float-regs ;
+: ?dummy-int-params ( rep -- )
+    dummy-int-params? [ rep-size cell /i 1 max int-regs +@ ] [ drop ] if ;
 
-GENERIC: inc-reg-class ( register-class -- )
-
-: ?dummy-stack-params ( reg-class -- )
-    dummy-stack-params? [ reg-size cell align stack-params +@ ] [ drop ] if ;
-
-: ?dummy-int-params ( reg-class -- )
-    dummy-int-params? [ reg-size cell /i 1 max int-regs +@ ] [ drop ] if ;
-
-: ?dummy-fp-params ( reg-class -- )
+: ?dummy-fp-params ( rep -- )
     drop dummy-fp-params? [ float-regs inc ] when ;
 
-M: int-regs inc-reg-class
-    [ reg-class-variable inc ]
-    [ ?dummy-stack-params ]
-    [ ?dummy-fp-params ]
-    tri ;
+M: int-rep next-fastcall-param
+    int-regs inc [ ?dummy-stack-params ] [ ?dummy-fp-params ] bi ;
 
-M: float-regs inc-reg-class
-    [ reg-class-variable inc ]
-    [ ?dummy-stack-params ]
-    [ ?dummy-int-params ]
-    tri ;
+M: single-float-rep next-fastcall-param
+    float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
 
-GENERIC: reg-class-full? ( class -- ? )
+M: double-float-rep next-fastcall-param
+    float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
+
+GENERIC: reg-class-full? ( reg-class -- ? )
 
 M: stack-params reg-class-full? drop t ;
 
-M: object reg-class-full?
-    [ reg-class-variable get ] [ param-regs length ] bi >= ;
+M: reg-class reg-class-full?
+    [ get ] [ param-regs length ] bi >= ;
 
-: spill-param ( reg-class -- n reg-class )
+: alloc-stack-param ( rep -- n reg-class rep )
     stack-params get
-    [ reg-size cell align stack-params +@ ] dip
-    stack-params ;
+    [ rep-size cell align stack-params +@ ] dip
+    stack-params dup ;
 
-: fastcall-param ( reg-class -- n reg-class )
-    [ reg-class-variable get ] [ inc-reg-class ] [ ] tri ;
+: alloc-fastcall-param ( rep -- n reg-class rep )
+    [ [ reg-class-of get ] [ reg-class-of ] [ next-fastcall-param ] tri ] keep ;
 
-: alloc-parameter ( parameter -- reg reg-class )
-    c-type-reg-class dup reg-class-full?
-    [ spill-param ] [ fastcall-param ] if
-    [ param-reg ] keep ;
+: alloc-parameter ( parameter -- reg rep )
+    c-type-rep dup reg-class-of reg-class-full?
+    [ alloc-stack-param ] [ alloc-fastcall-param ] if
+    [ param-reg ] dip ;
 
 : (flatten-int-type) ( size -- seq )
     cell /i "void*" c-type <repetition> ;
@@ -332,12 +352,12 @@ M: long-long-type flatten-value-type ( type -- types )
 : reverse-each-parameter ( parameters quot -- )
     [ [ parameter-sizes nip ] keep ] dip 2reverse-each ; inline
 
-: reset-freg-counts ( -- )
+: reset-fastcall-counts ( -- )
     { int-regs float-regs stack-params } [ 0 swap set ] each ;
 
 : with-param-regs ( quot -- )
     #! In quot you can call alloc-parameter
-    [ reset-freg-counts call ] with-scope ; inline
+    [ reset-fastcall-counts call ] with-scope ; inline
 
 : move-parameters ( node word -- )
     #! Moves values from C stack to registers (if word is
@@ -362,7 +382,7 @@ M: long-long-type flatten-value-type ( type -- types )
 
 : objects>registers ( params -- )
     #! Generate code for unboxing a list of C types, then
-    #! generate code for moving these parameters to register on
+    #! generate code for moving these parameters to registers on
     #! architectures where parameters are passed in registers.
     [
         [ prepare-box-struct ] keep
@@ -423,6 +443,7 @@ M: ##alien-indirect generate-insn
     alien-parameters [ box-parameter ] each-parameter ;
 
 : registers>objects ( node -- )
+    ! Generate code for boxing input parameters in a callback.
     [
         dup \ %save-param-reg move-parameters
         "nest_stacks" f %alien-invoke
@@ -491,11 +512,11 @@ M: _branch generate-insn
 
 : >compare< ( insn -- dst temp cc src1 src2 )
     {
-        [ dst>> register ]
-        [ temp>> register ]
+        [ dst>> ]
+        [ temp>> ]
         [ cc>> ]
-        [ src1>> register ]
-        [ src2>> ?register ]
+        [ src1>> ]
+        [ src2>> ]
     } cleave ; inline
 
 M: ##compare generate-insn >compare< %compare ;
@@ -506,8 +527,8 @@ M: ##compare-float generate-insn >compare< %compare-float ;
     {
         [ label>> lookup-label ]
         [ cc>> ]
-        [ src1>> register ]
-        [ src2>> ?register ]
+        [ src1>> ]
+        [ src2>> ]
     } cleave ; inline
 
 M: _compare-branch generate-insn
@@ -520,15 +541,9 @@ M: _compare-float-branch generate-insn
     >binary-branch< %compare-float-branch ;
 
 M: _spill generate-insn
-    [ src>> ] [ n>> ] [ class>> ] tri {
-        { int-regs [ %spill-integer ] }
-        { double-float-regs [ %spill-float ] }
-    } case ;
+    [ src>> ] [ n>> ] [ rep>> ] tri %spill ;
 
 M: _reload generate-insn
-    [ dst>> ] [ n>> ] [ class>> ] tri {
-        { int-regs [ %reload-integer ] }
-        { double-float-regs [ %reload-float ] }
-    } case ;
+    [ dst>> ] [ n>> ] [ rep>> ] tri %reload ;
 
-M: _spill-counts generate-insn drop ;
+M: _spill-area-size generate-insn drop ;

@@ -45,7 +45,7 @@ MACRO: duals>nweave ( n -- )
 MACRO: chain-rule ( word -- e )
     [ input-length '[ _ duals>nweave ] ]
     [ "derivative" word-prop ]
-    [ input-length 1+ '[ _ nspread ] ]
+    [ input-length 1 + '[ _ nspread ] ]
     tri
     '[ [ @ _ @ ] sum-outputs ] ;
 

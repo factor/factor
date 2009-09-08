@@ -43,16 +43,15 @@ TUPLE: growing-circular < circular length ;
 M: growing-circular length length>> ;
 
 <PRIVATE
+
 : full? ( circular -- ? )
     [ length ] [ seq>> length ] bi = ;
 
-: set-last ( elt seq -- )
-    [ length 1- ] keep set-nth ;
 PRIVATE>
 
 : push-growing-circular ( elt circular -- )
     dup full? [ push-circular ]
-    [ [ 1+ ] change-length set-last ] if ;
+    [ [ 1 + ] change-length set-last ] if ;
 
 : <growing-circular> ( capacity -- growing-circular )
     { } new-sequence 0 0 growing-circular boa ;

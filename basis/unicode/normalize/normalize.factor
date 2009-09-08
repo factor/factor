@@ -108,7 +108,7 @@ HINTS: string-append string string ;
 ! Normalization -- Composition
 
 : initial-medial? ( str i -- ? )
-    { [ swap nth initial? ] [ 1+ swap ?nth medial? ] } 2&& ;
+    { [ swap nth initial? ] [ 1 + swap ?nth medial? ] } 2&& ;
 
 : --final? ( str i -- ? )
     2 + swap ?nth final? ;
@@ -124,7 +124,7 @@ HINTS: string-append string string ;
 : compose-jamo ( str i -- str i )
     2dup initial-medial? [
         2dup --final? [ imf, ] [ im, ] if
-    ] [ 2dup swap nth , 1+ ] if ;
+    ] [ 2dup swap nth , 1 + ] if ;
 
 : pass-combining ( str -- str i )
     dup [ non-starter? not ] find drop
@@ -136,7 +136,7 @@ TUPLE: compose-state i str char after last-class ;
 : get-str ( state i -- ch )
     swap [ i>> + ] [ str>> ] bi ?nth ; inline
 : current ( state -- ch ) 0 get-str ; inline
-: to ( state -- state ) [ 1+ ] change-i ; inline
+: to ( state -- state ) [ 1 + ] change-i ; inline
 : push-after ( ch state -- state ) [ ?push ] change-after ; inline
 
 :: try-compose ( state new-char current-class -- state )
@@ -177,8 +177,8 @@ DEFER: compose-iter
 :: (compose) ( str i -- )
     i str ?nth [
         dup jamo? [ drop str i compose-jamo ] [
-            i 1+ str ?nth combining-class
-            [ str i 1+ compose-combining ] [ , str i 1+ ] if
+            i 1 + str ?nth combining-class
+            [ str i 1 + compose-combining ] [ , str i 1 + ] if
         ] if (compose)
     ] when* ; inline recursive
 

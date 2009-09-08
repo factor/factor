@@ -112,8 +112,7 @@ M: gadget gadget-text-separator
     orientation>> vertical = "\n" "" ? ;
 
 : gadget-seq-text ( seq gadget -- )
-    gadget-text-separator swap
-    [ dup % ] [ gadget-text* ] interleave drop ;
+    gadget-text-separator '[ _ % ] [ gadget-text* ] interleave ;
 
 M: gadget gadget-text*
     [ children>> ] keep gadget-seq-text ;

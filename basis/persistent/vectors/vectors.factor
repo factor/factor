@@ -55,13 +55,13 @@ M: persistent-vector nth-unsafe
     [ 1array ] dip node boa ;
 
 : 2node ( first second -- node )
-    [ 2array ] [ drop level>> 1+ ] 2bi node boa ;
+    [ 2array ] [ drop level>> 1 + ] 2bi node boa ;
 
 : new-child ( new-child node -- node' expansion/f )
     dup full? [ tuck level>> 1node ] [ node-add f ] if ;
 
 : new-last ( val seq -- seq' )
-    [ length 1- ] keep new-nth ;
+    [ length 1 - ] keep new-nth ;
 
 : node-set-last ( child node -- node' )
     clone [ new-last ] change-children ;
@@ -86,7 +86,7 @@ M: persistent-vector ppush ( val pvec -- pvec' )
     clone
     dup tail>> full?
     [ ppush-new-tail ] [ ppush-tail ] if
-    [ 1+ ] change-count ;
+    [ 1 + ] change-count ;
 
 : node-set-nth ( val i node -- node' )
     clone [ new-nth ] change-children ;
@@ -166,7 +166,7 @@ M: persistent-vector ppop ( pvec -- pvec' )
                 clone
                 dup tail>> children>> length 1 >
                 [ ppop-tail ] [ ppop-new-tail ] if
-            ] dip 1- >>count
+            ] dip 1 - >>count
         ]
     } case ;
 

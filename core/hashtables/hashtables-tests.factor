@@ -1,7 +1,7 @@
-IN: hashtables.tests
 USING: kernel math namespaces make tools.test vectors sequences
 sequences.private hashtables io prettyprint assocs
 continuations ;
+IN: hashtables.tests
 
 [ f ] [ "hi" V{ 1 2 3 } at ] unit-test
 
@@ -176,3 +176,6 @@ H{ } "x" set
 [ 1 ] [ "h" get assoc-size ] unit-test
 
 [ 1 ] [ 2 "h" get at ] unit-test
+
+! Random test case
+[ "A" ] [ 100 [ dup ] H{ } map>assoc 32 over delete-at "A" 32 pick set-at 32 swap at ] unit-test

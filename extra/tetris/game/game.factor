@@ -32,10 +32,10 @@ CONSTANT: default-height 20
     [ not ] change-paused? drop ;
 
 : level>> ( tetris -- level )
-    rows>> 1+ 10 / ceiling ;
+    rows>> 1 + 10 / ceiling ;
 
 : update-interval ( tetris -- interval )
-    level>> 1- 60 * 1000 swap - ;
+    level>> 1 - 60 * 1000 swap - ;
 
 : add-block ( tetris block -- )
     over board>> spin current-piece tetromino>> colour>> set-block ;
@@ -57,7 +57,7 @@ CONSTANT: default-height 20
         { 2 [ 100 ] }
         { 3 [ 300 ] }
         { 4 [ 1200 ] }
-    } case swap 1+ * ;
+    } case swap 1 + * ;
 
 : add-score ( tetris n-rows -- tetris )
     over level>> swap rows-score swap [ + ] change-score ;

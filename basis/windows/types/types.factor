@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax namespaces kernel words
 sequences math math.bitwise math.vectors colors
-io.encodings.utf16n ;
+io.encodings.utf16n classes.struct accessors ;
 IN: windows.types
 
 TYPEDEF: char                CHAR
@@ -216,37 +216,37 @@ CONSTANT: TRUE 1
 
 ! typedef LRESULT (CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 
-C-STRUCT: WNDCLASS
-    { "UINT" "style" }
-    { "WNDPROC" "lpfnWndProc" }
-    { "int" "cbClsExtra" }
-    { "int" "cbWndExtra" }
-    { "HINSTANCE" "hInstance" }
-    { "HICON" "hIcon" }
-    { "HCURSOR" "hCursor" }
-    { "HBRUSH" "hbrBackground" }
-    { "LPCTSTR" "lpszMenuName" }
-    { "LPCTSTR" "lpszClassName" } ;
+STRUCT: WNDCLASS
+    { style UINT }
+    { lpfnWndProc WNDPROC }
+    { cbClsExtra int }
+    { cbWndExtra int }
+    { hInstance HINSTANCE }
+    { hIcon HICON }
+    { hCursor HCURSOR }
+    { hbrBackground HBRUSH }
+    { lpszMenuName LPCTSTR }
+    { lpszClassName LPCTSTR } ;
 
-C-STRUCT: WNDCLASSEX
-    { "UINT" "cbSize" }
-    { "UINT" "style" }
-    { "WNDPROC" "lpfnWndProc" }
-    { "int" "cbClsExtra" }
-    { "int" "cbWndExtra" }
-    { "HINSTANCE" "hInstance" }
-    { "HICON" "hIcon" }
-    { "HCURSOR" "hCursor" }
-    { "HBRUSH" "hbrBackground" }
-    { "LPCTSTR" "lpszMenuName" }
-    { "LPCTSTR" "lpszClassName" }
-    { "HICON" "hIconSm" } ;
+STRUCT: WNDCLASSEX
+    { cbSize UINT }
+    { style UINT }
+    { lpfnWndProc WNDPROC }
+    { cbClsExtra int }
+    { cbWndExtra int }
+    { hInstance HINSTANCE }
+    { hIcon HICON }
+    { hCursor HCURSOR }
+    { hbrBackground HBRUSH }
+    { lpszMenuName LPCTSTR }
+    { lpszClassName LPCTSTR }
+    { hIconSm HICON } ;
 
-C-STRUCT: RECT
-    { "LONG" "left" }
-    { "LONG" "top" }
-    { "LONG" "right" }
-    { "LONG" "bottom" } ;
+STRUCT: RECT
+    { left LONG }
+    { top LONG }
+    { right LONG }
+    { bottom LONG } ;
 
 C-STRUCT: PAINTSTRUCT
     { "HDC" " hdc" }
@@ -257,28 +257,28 @@ C-STRUCT: PAINTSTRUCT
     { "BYTE[32]" "rgbReserved" }
 ;
 
-C-STRUCT: BITMAPINFOHEADER
-    { "DWORD"  "biSize" }
-    { "LONG"   "biWidth" }
-    { "LONG"   "biHeight" }
-    { "WORD"   "biPlanes" }
-    { "WORD"   "biBitCount" }
-    { "DWORD"  "biCompression" }
-    { "DWORD"  "biSizeImage" }
-    { "LONG"   "biXPelsPerMeter" }
-    { "LONG"   "biYPelsPerMeter" }
-    { "DWORD"  "biClrUsed" }
-    { "DWORD"  "biClrImportant" } ;
+STRUCT: BITMAPINFOHEADER
+    { biSize DWORD }
+    { biWidth LONG }
+    { biHeight LONG }
+    { biPlanes WORD }
+    { biBitCount WORD }
+    { biCompression DWORD }
+    { biSizeImage DWORD }
+    { biXPelsPerMeter LONG }
+    { biYPelsPerMeter LONG }
+    { biClrUsed DWORD }
+    { biClrImportant DWORD } ;
 
-C-STRUCT: RGBQUAD
-    { "BYTE" "rgbBlue" }
-    { "BYTE" "rgbGreen" }
-    { "BYTE" "rgbRed" }
-    { "BYTE" "rgbReserved" } ;
+STRUCT: RGBQUAD
+    { rgbBlue BYTE }
+    { rgbGreen BYTE }
+    { rgbRed BYTE }
+    { rgbReserved BYTE } ;
 
-C-STRUCT: BITMAPINFO
-    { "BITMAPINFOHEADER" "bmiHeader" }
-    { "RGBQUAD[1]" "bmiColors" } ;
+STRUCT: BITMAPINFO
+    { bmiHeader BITMAPINFOHEADER }
+    { bimColors RGBQUAD[1] } ;
 
 TYPEDEF: void* LPPAINTSTRUCT
 TYPEDEF: void* PAINTSTRUCT
@@ -287,9 +287,9 @@ C-STRUCT: POINT
     { "LONG" "x" }
     { "LONG" "y" } ; 
 
-C-STRUCT: SIZE
-    { "LONG" "cx" }
-    { "LONG" "cy" } ; 
+STRUCT: SIZE
+    { cx LONG }
+    { cy LONG } ;
 
 C-STRUCT: MSG
     { "HWND" "hWnd" }
@@ -301,47 +301,36 @@ C-STRUCT: MSG
 
 TYPEDEF: MSG*                LPMSG
 
-C-STRUCT: PIXELFORMATDESCRIPTOR
-    { "WORD" "nSize" }
-    { "WORD" "nVersion" }
-    { "DWORD" "dwFlags" }
-    { "BYTE" "iPixelType" }
-    { "BYTE" "cColorBits" }
-    { "BYTE" "cRedBits" }
-    { "BYTE" "cRedShift" }
-    { "BYTE" "cGreenBits" }
-    { "BYTE" "cGreenShift" }
-    { "BYTE" "cBlueBits" }
-    { "BYTE" "cBlueShift" }
-    { "BYTE" "cAlphaBits" }
-    { "BYTE" "cAlphaShift" }
-    { "BYTE" "cAccumBits" }
-    { "BYTE" "cAccumRedBits" }
-    { "BYTE" "cAccumGreenBits" }
-    { "BYTE" "cAccumBlueBits" }
-    { "BYTE" "cAccumAlphaBits" }
-    { "BYTE" "cDepthBits" }
-    { "BYTE" "cStencilBits" }
-    { "BYTE" "cAuxBuffers" }
-    { "BYTE" "iLayerType" }
-    { "BYTE" "bReserved" }
-    { "DWORD" "dwLayerMask" }
-    { "DWORD" "dwVisibleMask" }
-    { "DWORD" "dwDamageMask" } ;
-
-C-STRUCT: RECT
-    { "LONG" "left" }
-    { "LONG" "top" }
-    { "LONG" "right" }
-    { "LONG" "bottom" } ;
+STRUCT: PIXELFORMATDESCRIPTOR
+    { nSize WORD }
+    { nVersion WORD }
+    { dwFlags DWORD }
+    { iPixelType BYTE }
+    { cColorBits BYTE }
+    { cRedBits BYTE }
+    { cRedShift BYTE }
+    { cGreenBits BYTE }
+    { cGreenShift BYTE }
+    { cBlueBits BYTE }
+    { cBlueShift BYTE }
+    { cAlphaBits BYTE }
+    { cAlphaShift BYTE }
+    { cAccumBits BYTE }
+    { cAccumRedBits BYTE }
+    { cAccumGreenBits BYTE }
+    { cAccumBlueBits BYTE }
+    { cAccumAlphaBits BYTE }
+    { cDepthBits BYTE }
+    { cStencilBits BYTE }
+    { cAuxBuffers BYTE }
+    { iLayerType BYTE }
+    { bReserved BYTE }
+    { dwLayerMask DWORD }
+    { dwVisibleMask DWORD }
+    { dwDamageMask DWORD } ;
 
 : <RECT> ( loc dim -- RECT )
-    over v+
-    "RECT" <c-object>
-    over first over set-RECT-right
-    swap second over set-RECT-bottom
-    over first over set-RECT-left
-    swap second over set-RECT-top ;
+    dupd v+ [ first2 ] bi@ RECT <struct-boa> ;
 
 TYPEDEF: RECT* PRECT
 TYPEDEF: RECT* LPRECT
@@ -389,26 +378,26 @@ TYPEDEF: DWORD* LPCOLORREF
 : color>RGB ( color -- COLORREF )
     >rgba-components drop [ 255 * >integer ] tri@ RGB ;
 
-C-STRUCT: TEXTMETRICW
-    { "LONG" "tmHeight" }
-    { "LONG" "tmAscent" }
-    { "LONG" "tmDescent" }
-    { "LONG" "tmInternalLeading" }
-    { "LONG" "tmExternalLeading" }
-    { "LONG" "tmAveCharWidth" }
-    { "LONG" "tmMaxCharWidth" }
-    { "LONG" "tmWeight" }
-    { "LONG" "tmOverhang" }
-    { "LONG" "tmDigitizedAspectX" }
-    { "LONG" "tmDigitizedAspectY" }
-    { "WCHAR" "tmFirstChar" }
-    { "WCHAR" "tmLastChar" }
-    { "WCHAR" "tmDefaultChar" }
-    { "WCHAR" "tmBreakChar" }
-    { "BYTE" "tmItalic" }
-    { "BYTE" "tmUnderlined" }
-    { "BYTE" "tmStruckOut" }
-    { "BYTE" "tmPitchAndFamily" }
-    { "BYTE" "tmCharSet" } ;
+STRUCT: TEXTMETRICW
+    { tmHeight LONG }
+    { tmAscent LONG }
+    { tmDescent LONG }
+    { tmInternalLeading LONG }
+    { tmExternalLeading LONG }
+    { tmAveCharWidth LONG }
+    { tmMaxCharWidth LONG }
+    { tmWeight LONG }
+    { tmOverhang LONG }
+    { tmDigitizedAspectX LONG }
+    { tmDigitizedAspectY LONG }
+    { tmFirstChar WCHAR }
+    { tmLastChar WCHAR }
+    { tmDefaultChar WCHAR }
+    { tmBreakChar WCHAR }
+    { tmItalic BYTE }
+    { tmUnderlined BYTE }
+    { tmStruckOut BYTE }
+    { tmPitchAndFamily BYTE }
+    { tmCharSet BYTE } ;
 
 TYPEDEF: TEXTMETRICW* LPTEXTMETRIC

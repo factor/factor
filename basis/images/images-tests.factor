@@ -3,7 +3,7 @@
 USING: images tools.test kernel accessors ;
 IN: images.tests
 
-[ B{ 57 57 57 255 } ] [ 1 1 T{ image f { 2 3 } RGBA f B{
+[ B{ 57 57 57 255 } ] [ 1 1 T{ image f { 2 3 } RGBA ubyte-components f B{
     0 0 0 0 
     0 0 0 0 
     0 0 0 0 
@@ -19,7 +19,7 @@ IN: images.tests
     57 57 57 255
     0 0 0 0 
     0 0 0 0 
-} ] [ B{ 57 57 57 255 } 1 1 T{ image f { 2 3 } RGBA f B{
+} ] [ B{ 57 57 57 255 } 1 1 T{ image f { 2 3 } RGBA ubyte-components f B{
     0 0 0 0 
     0 0 0 0 
     0 0 0 0 

@@ -1,9 +1,10 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax
-combinators io.encodings.utf16n io.files io.pathnames kernel
-windows.errors windows.com windows.com.syntax windows.user32
-windows.ole32 windows ;
+classes.struct combinators io.encodings.utf16n io.files
+io.pathnames kernel windows.errors windows.com
+windows.com.syntax windows.user32 windows.ole32 windows
+specialized-arrays.ushort ;
 IN: windows.shell32
 
 CONSTANT: CSIDL_DESKTOP HEX: 00
@@ -90,7 +91,7 @@ ALIAS: ShellExecute ShellExecuteW
 
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
-    MAX_UNICODE_PATH "ushort" <c-array>
+    MAX_UNICODE_PATH <ushort-array>
     [ SHGetFolderPath drop ] keep utf16n alien>string ;
 
 : desktop ( -- str )
@@ -167,23 +168,23 @@ CONSTANT: SFGAO_NEWCONTENT        HEX: 00200000
 
 TYPEDEF: ULONG SFGAOF
 
-C-STRUCT: DROPFILES
-    { "DWORD" "pFiles" }
-    { "POINT" "pt" }
-    { "BOOL" "fNC" }
-    { "BOOL" "fWide" } ;
+STRUCT: DROPFILES
+    { pFiles DWORD }
+    { pt POINT }
+    { fNC BOOL }
+    { fWide BOOL } ;
 TYPEDEF: DROPFILES* LPDROPFILES
 TYPEDEF: DROPFILES* LPCDROPFILES
 TYPEDEF: HANDLE HDROP
 
-C-STRUCT: SHITEMID
-    { "USHORT" "cb" }
-    { "BYTE[1]" "abID" } ;
+STRUCT: SHITEMID
+    { cb USHORT }
+    { abID BYTE[1] } ;
 TYPEDEF: SHITEMID* LPSHITEMID
 TYPEDEF: SHITEMID* LPCSHITEMID
 
-C-STRUCT: ITEMIDLIST
-    { "SHITEMID" "mkid" } ;
+STRUCT: ITEMIDLIST
+    { mkid SHITEMID } ;
 TYPEDEF: ITEMIDLIST* LPITEMIDLIST
 TYPEDEF: ITEMIDLIST* LPCITEMIDLIST
 TYPEDEF: ITEMIDLIST ITEMID_CHILD
@@ -194,10 +195,13 @@ CONSTANT: STRRET_WSTR 0
 CONSTANT: STRRET_OFFSET 1
 CONSTANT: STRRET_CSTR 2
 
-C-UNION: STRRET-union "LPWSTR" "LPSTR" "UINT" "char[260]" ;
-C-STRUCT: STRRET
-    { "int" "uType" }
-    { "STRRET-union" "union" } ;
+UNION-STRUCT: STRRET-union
+    { pOleStr LPWSTR }
+    { uOffset UINT }
+    { cStr char[260] } ;
+STRUCT: STRRET
+    { uType int }
+    { value STRRET-union } ;
 
 COM-INTERFACE: IEnumIDList IUnknown {000214F2-0000-0000-C000-000000000046}
     HRESULT Next ( ULONG celt, LPITEMIDLIST* rgelt, ULONG* pceltFetched )

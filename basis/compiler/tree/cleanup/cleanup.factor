@@ -20,7 +20,7 @@ IN: compiler.tree.cleanup
 GENERIC: delete-node ( node -- )
 
 M: #call-recursive delete-node
-    dup label>> [ [ eq? not ] with filter ] change-calls drop ;
+    dup label>> calls>> [ node>> eq? not ] with filter-here ;
 
 M: #return-recursive delete-node
     label>> f >>return drop ;
@@ -88,8 +88,6 @@ M: #call cleanup*
         { [ dup remove-overflow-check? ] [ remove-overflow-check ] }
         [ ]
     } cond ;
-
-M: #declare cleanup* drop f ;
 
 : delete-unreachable-branches ( #branch -- )
     dup live-branches>> '[
