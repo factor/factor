@@ -87,7 +87,7 @@ ALIAS: $slot $snippet
 
 : ($code) ( presentation quot -- )
     [
-        snippet-style get [
+        code-char-style get [
             last-element off
             [ ($code-style) ] dip with-nesting
         ] with-style
@@ -307,7 +307,7 @@ M: f ($instance)
 
 : ($see) ( word quot -- )
     [
-        snippet-style get [
+        code-char-style get [
             code-style get swap with-nesting
         ] with-style
     ] ($block) ; inline
