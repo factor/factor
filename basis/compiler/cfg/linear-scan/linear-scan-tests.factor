@@ -80,9 +80,9 @@ cfg new 0 >>spill-area-size cfg set
 H{ } spill-slots set
 
 H{
-    { 1 single-float-rep }
-    { 2 single-float-rep }
-    { 3 single-float-rep }
+    { 1 float-rep }
+    { 2 float-rep }
+    { 3 float-rep }
 } representations set
 
 [

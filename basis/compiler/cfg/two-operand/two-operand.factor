@@ -37,13 +37,21 @@ UNION: two-operand-insn
     ##sar-imm
     ##min
     ##max
-    ##fixnum-overflow
+    ##fixnum-add
+    ##fixnum-sub
+    ##fixnum-mul
     ##add-float
     ##sub-float
     ##mul-float
     ##div-float
     ##min-float
-    ##max-float ;
+    ##max-float
+    ##add-vector
+    ##sub-vector
+    ##mul-vector
+    ##div-vector
+    ##min-vector
+    ##max-vector ;
 
 GENERIC: convert-two-operand* ( insn -- )
 

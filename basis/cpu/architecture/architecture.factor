@@ -18,9 +18,36 @@ SINGLETONS: tagged-rep int-rep ;
 
 ! Floating point registers can contain data with
 ! one of these representations
-SINGLETONS: single-float-rep double-float-rep ;
+SINGLETONS: float-rep double-rep ;
 
-UNION: representation any-rep tagged-rep int-rep single-float-rep double-float-rep ;
+! On x86, floating point registers are really vector registers
+SINGLETONS:
+float-4-rep
+double-2-rep
+char-16-rep
+uchar-16-rep
+short-8-rep
+ushort-8-rep
+int-4-rep
+uint-4-rep ;
+
+UNION: vector-rep
+float-4-rep
+double-2-rep
+char-16-rep
+uchar-16-rep
+short-8-rep
+ushort-8-rep
+int-4-rep
+uint-4-rep ;
+
+UNION: representation
+any-rep
+tagged-rep
+int-rep
+float-rep
+double-rep
+vector-rep ;
 
 ! Register classes
 SINGLETONS: int-regs float-regs ;
@@ -31,23 +58,28 @@ CONSTANT: reg-classes { int-regs float-regs }
 ! A pseudo-register class for parameters spilled on the stack
 SINGLETON: stack-params
 
-: reg-class-of ( rep -- reg-class )
-    {
-        { tagged-rep [ int-regs ] }
-        { int-rep [ int-regs ] }
-        { single-float-rep [ float-regs ] }
-        { double-float-rep [ float-regs ] }
-        { stack-params [ stack-params ] }
-    } case ;
+GENERIC: reg-class-of ( rep -- reg-class )
 
-: rep-size ( rep -- n )
-    {
-        { tagged-rep [ cell ] }
-        { int-rep [ cell ] }
-        { single-float-rep [ 4 ] }
-        { double-float-rep [ 8 ] }
-        { stack-params [ cell ] }
-    } case ;
+M: tagged-rep reg-class-of drop int-regs ;
+M: int-rep reg-class-of drop int-regs ;
+M: float-rep reg-class-of drop float-regs ;
+M: double-rep reg-class-of drop float-regs ;
+M: vector-rep reg-class-of drop float-regs ;
+M: stack-params reg-class-of drop stack-params ;
+
+GENERIC: rep-size ( rep -- n ) foldable
+
+M: tagged-rep rep-size drop cell ;
+M: int-rep rep-size drop cell ;
+M: float-rep rep-size drop 4 ;
+M: double-rep rep-size drop 8 ;
+M: stack-params rep-size drop cell ;
+M: vector-rep rep-size drop 16 ;
+
+GENERIC: scalar-rep-of ( rep -- rep' )
+
+M: float-4-rep scalar-rep-of drop float-rep ;
+M: double-2-rep scalar-rep-of drop double-rep ;
 
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
@@ -101,12 +133,17 @@ HOOK: %max     cpu ( dst src1 src2 -- )
 HOOK: %not     cpu ( dst src -- )
 HOOK: %log2    cpu ( dst src -- )
 
+HOOK: %copy cpu ( dst src rep -- )
+
 HOOK: %fixnum-add cpu ( label dst src1 src2 -- )
 HOOK: %fixnum-sub cpu ( label dst src1 src2 -- )
 HOOK: %fixnum-mul cpu ( label dst src1 src2 -- )
 
 HOOK: %integer>bignum cpu ( dst src temp -- )
 HOOK: %bignum>integer cpu ( dst src temp -- )
+
+HOOK: %unbox-float cpu ( dst src -- )
+HOOK: %box-float cpu ( dst src temp -- )
 
 HOOK: %add-float cpu ( dst src1 src2 -- )
 HOOK: %sub-float cpu ( dst src1 src2 -- )
@@ -118,15 +155,32 @@ HOOK: %sqrt cpu ( dst src -- )
 HOOK: %unary-float-function cpu ( dst src func -- )
 HOOK: %binary-float-function cpu ( dst src1 src2 func -- )
 
+HOOK: %single>double-float cpu ( dst src -- )
+HOOK: %double>single-float cpu ( dst src -- )
+
 HOOK: %integer>float cpu ( dst src -- )
 HOOK: %float>integer cpu ( dst src -- )
 
-HOOK: %copy cpu ( dst src rep -- )
-HOOK: %unbox-float cpu ( dst src -- )
+HOOK: %box-vector cpu ( dst src temp rep -- )
+HOOK: %unbox-vector cpu ( dst src rep -- )
+
+HOOK: %broadcast-vector cpu ( dst src rep -- )
+HOOK: %gather-vector-2 cpu ( dst src1 src2 rep -- )
+HOOK: %gather-vector-4 cpu ( dst src1 src2 src3 src4 rep -- )
+
+HOOK: %add-vector cpu ( dst src1 src2 rep -- )
+HOOK: %sub-vector cpu ( dst src1 src2 rep -- )
+HOOK: %mul-vector cpu ( dst src1 src2 rep -- )
+HOOK: %div-vector cpu ( dst src1 src2 rep -- )
+HOOK: %min-vector cpu ( dst src1 src2 rep -- )
+HOOK: %max-vector cpu ( dst src1 src2 rep -- )
+HOOK: %sqrt-vector cpu ( dst src rep -- )
+HOOK: %horizontal-add-vector cpu ( dst src rep -- )
+
+HOOK: %unbox-alien cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
-HOOK: %box-float cpu ( dst src temp -- )
 HOOK: %box-alien cpu ( dst src temp -- )
-HOOK: %box-displaced-alien cpu ( dst displacement base temp1 temp2 -- )
+HOOK: %box-displaced-alien cpu ( dst displacement base temp1 temp2 base-class -- )
 
 HOOK: %alien-unsigned-1 cpu ( dst src -- )
 HOOK: %alien-unsigned-2 cpu ( dst src -- )
@@ -137,6 +191,7 @@ HOOK: %alien-signed-4   cpu ( dst src -- )
 HOOK: %alien-cell       cpu ( dst src -- )
 HOOK: %alien-float      cpu ( dst src -- )
 HOOK: %alien-double     cpu ( dst src -- )
+HOOK: %alien-vector     cpu ( dst src rep -- )
 
 HOOK: %set-alien-integer-1 cpu ( ptr value -- )
 HOOK: %set-alien-integer-2 cpu ( ptr value -- )
@@ -144,6 +199,7 @@ HOOK: %set-alien-integer-4 cpu ( ptr value -- )
 HOOK: %set-alien-cell      cpu ( ptr value -- )
 HOOK: %set-alien-float     cpu ( ptr value -- )
 HOOK: %set-alien-double    cpu ( ptr value -- )
+HOOK: %set-alien-vector    cpu ( ptr value rep -- )
 
 HOOK: %alien-global cpu ( dst symbol library -- )
 
@@ -167,8 +223,8 @@ HOOK: %compare-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-branch cpu ( label cc src1 src2 -- )
 
-HOOK: %spill cpu ( src n rep -- )
-HOOK: %reload cpu ( dst n rep -- )
+HOOK: %spill cpu ( src rep n -- )
+HOOK: %reload cpu ( dst rep n -- )
 
 HOOK: %loop-entry cpu ( -- )
 

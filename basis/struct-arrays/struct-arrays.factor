@@ -48,7 +48,7 @@ ERROR: not-a-struct-class struct-class ;
     tri struct-array boa ; inline
 
 M: struct-array new-sequence
-    [ element-size>> * (byte-array) ] [ length>> ] [ class>> ] tri
+    [ element-size>> * (byte-array) ] [ class>> ] 2bi
     <direct-struct-array> ; inline
 
 M: struct-array resize ( n seq -- newseq )

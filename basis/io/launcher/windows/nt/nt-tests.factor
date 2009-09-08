@@ -42,7 +42,7 @@ IN: io.launcher.windows.nt.tests
         console-vm "-run=listener" 2array >>command
         +closed+ >>stdin
         +stdout+ >>stderr
-    ascii [ contents ] with-process-reader
+    ascii [ lines last ] with-process-reader
 ] unit-test
 
 : launcher-test-path ( -- str )
@@ -166,7 +166,7 @@ IN: io.launcher.windows.nt.tests
 
 [ "( scratchpad ) " ] [
     console-vm "-run=listener" 2array
-    ascii [ "USE: system 0 exit" print flush readln ] with-process-stream
+    ascii [ "USE: system 0 exit" print flush lines last ] with-process-stream
 ] unit-test
 
 [ ] [

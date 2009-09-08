@@ -11,7 +11,7 @@ ui.gadgets.viewports ui.tools.common ui.tools.browser.popups
 ui.tools.browser.history ;
 IN: ui.tools.browser
 
-TUPLE: browser-gadget < tool history pane scroller search-field popup ;
+TUPLE: browser-gadget < tool history scroller search-field popup ;
 
 { 650 400 } browser-gadget set-tool-dim
 
@@ -59,9 +59,8 @@ M: browser-gadget set-history-value
         dup <history> >>history
         dup <search-field> >>search-field
         dup <browser-toolbar> { 3 3 } <border> { 1 0 } >>fill f track-add
-        dup <help-pane> >>pane
-        dup pane>> <scroller> >>scroller
-        dup scroller>> 1 track-add ;
+        dup dup <help-pane> { 10 0 } <border> { 1 1 } >>fill
+        <scroller> >>scroller scroller>> 1 track-add ;
 
 M: browser-gadget graft*
     [ add-definition-observer ] [ call-next-method ] bi ;

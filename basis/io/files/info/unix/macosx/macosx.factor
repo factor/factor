@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings combinators
 grouping io.encodings.utf8 io.files kernel math sequences
-system unix io.files.unix specialized-arrays.direct.uint arrays
+system unix io.files.unix specialized-arrays.uint arrays
 unix.statfs.macosx unix.statvfs.macosx unix.getfsstat.macosx
 io.files.info.unix io.files.info classes.struct struct-arrays ;
 IN: io.files.info.unix.macosx

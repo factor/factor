@@ -3,8 +3,7 @@ init windows.com.syntax.private windows.com continuations kernel
 namespaces windows.ole32 libc vocabs assocs accessors arrays
 sequences quotations combinators math words compiler.units
 destructors fry math.parser generalizations sets
-specialized-arrays.alien specialized-arrays.direct.alien
-windows.kernel32 classes.struct ;
+specialized-arrays.alien windows.kernel32 classes.struct ;
 IN: windows.com.wrapper
 
 TUPLE: com-wrapper < disposable callbacks vtbls ;

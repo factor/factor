@@ -6,7 +6,7 @@ alien.c-types sequences windows.errors io.streams.memory
 io.encodings io ;
 IN: environment.winnt
 
-<< "TCHAR" require-c-arrays >>
+<< "TCHAR" require-c-array >>
 
 M: winnt os-env ( key -- value )
     MAX_UNICODE_PATH "TCHAR" <c-array>

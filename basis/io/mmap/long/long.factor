@@ -1,4 +1,4 @@
-USING: io.mmap.functor specialized-arrays.direct.long ;
+USING: io.mmap.functor specialized-arrays.long ;
 IN: io.mmap.long
 
 << "long" define-mapped-array >>
