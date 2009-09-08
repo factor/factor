@@ -10,3 +10,4 @@ USING: math.primes.factors sequences tools.test ;
 { { 13 4253 15823 32472893749823741 } } [ 28408516453955558205925627 factors ] unit-test
 { { 1 2 3 4 6 8 12 24 } } [ 24 divisors ] unit-test
 { 24 } [ 360 divisors length ] unit-test
+{ { 1 } } [ 1 divisors ] unit-test
