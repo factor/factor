@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators
+USING: accessors byte-arrays combinators fry
 compiler.tree.propagation.info cpu.architecture kernel words math
 math.intervals math.vectors.simd.intrinsics ;
 IN: compiler.tree.propagation.simd
@@ -40,3 +40,13 @@ IN: compiler.tree.propagation.simd
 ] "outputs" set-word-prop
 
 \ alien-vector { byte-array } "default-output-classes" set-word-prop
+
+! If SIMD is not available, inline alien-vector and set-alien-vector
+! to get a speedup
+: inline-unless-intrinsic ( word -- )
+    dup '[ drop _ dup "intrinsic" word-prop [ drop f ] [ def>> ] if ]
+    "custom-inlining" set-word-prop ;
+
+\ alien-vector inline-unless-intrinsic
+
+\ set-alien-vector inline-unless-intrinsic
