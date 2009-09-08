@@ -88,14 +88,22 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
 	add $STACK_PADDING,%rsp
 	jmp *%rax
 
-DEF(unsigned,get_fp_control_register,(void)):
-    stmxcsr -4(%rsp)
-    movl -4(%rsp), %eax
+DEF(void,get_sse_env,(void*)):
+    stmxcsr (%rdi)
     ret
 
-DEF(void,set_fp_control_register,(unsigned reg)):
-    movl %edi, -4(%rsp)
-    ldmxcsr -4(%rsp)
+DEF(void,set_sse_env,(const void*)):
+    ldmxcsr (%rdi)
+    ret
+
+DEF(void,get_x87_env,(void*)):
+    fnstsw (%rdi)
+    fnstcw 2(%rdi)
+    ret
+
+DEF(void,set_x87_env,(const void*)):
+    fnclex
+    fldcw 2(%rdi)
     ret
 
 #include "cpu-x86.S"

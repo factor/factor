@@ -59,7 +59,8 @@ HELP: fp-exception-flags
 
 HELP: set-fp-exception-flags
 { $values { "exceptions" "a sequence of " { $link fp-exception } " symbols" } }
-{ $description "Replaces the set of floating-point exception flags with the set specified in " { $snippet "exceptions" } "." } ;
+{ $description "Replaces the set of floating-point exception flags with the set specified in " { $snippet "exceptions" } "." }
+{ $notes "On Intel platforms, the legacy x87 floating-point unit does not support setting exception flags, so this word only clears the x87 exception flags. However, the SSE unit's flags are set as expected." } ;
 
 HELP: clear-fp-exception-flags
 { $description "Clears all of the floating-point exception flags." } ;
@@ -121,7 +122,6 @@ $nl
 { $subsection with-rounding-mode }
 { $subsection denormal-mode }
 { $subsection with-denormal-mode }
-{ $notes
-"On x86, the above words only modify the SSE unit's state (in particular, the MXCSR register); the x87 unit is unaffected. On PowerPC, the above words only modify the scalar FPU's state (in FPSCR); the AltiVec unit is unaffected." } ;
+{ $notes "On PowerPC, the above words only modify the scalar FPU's state (in FPSCR); the AltiVec unit is currently unaffected." } ;
 
 ABOUT: "math.floats.env"

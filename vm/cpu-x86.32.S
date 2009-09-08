@@ -68,14 +68,30 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
 	add $12,%esp
 	jmp *%eax
 
-DEF(unsigned,get_fp_control_register,(void)):
-    push %eax
-    stmxcsr (%esp)
-    pop %eax
+DEF(void,get_sse_env,(void*)):
+    movl 4(%esp), %eax
+    stmxcsr (%eax)
     ret
 
-DEF(void,set_fp_control_register,(unsigned reg)):
-    ldmxcsr 4(%esp)
+DEF(void,set_sse_env,(const void*)):
+    movl 4(%esp), %eax
+    ldmxcsr (%eax)
+    ret
+
+DEF(void,get_x87_env,(void*)):
+    movl 4(%esp), %eax
+    fnstsw (%eax)
+    fnstcw 2(%eax)
+    ret
+
+DEF(void,set_x87_env,(const void*)):
+    movl 4(%esp), %eax
+    fldcw 2(%eax)
+    movb 4(%eax), %dl
+    test %dl, %dl
+    jz 1f
+    fnclex
+1:
     ret
 
 #include "cpu-x86.S"
@@ -84,4 +100,8 @@ DEF(void,set_fp_control_register,(unsigned reg)):
 	.section .drectve
 	.ascii " -export:check_sse2"
 	.ascii " -export:read_timestamp_counter"
+	.ascii " -export:get_sse_env"
+	.ascii " -export:set_sse_env"
+	.ascii " -export:get_x87_env"
+	.ascii " -export:set_x87_env"
 #endif
