@@ -41,8 +41,8 @@ void throw_error(cell error, stack_frame *callstack_top)
 		gc_off = false;
 
 		/* Reset local roots */
-		gc_locals = gc_locals_region->start - sizeof(cell);
-		gc_bignums = gc_bignums_region->start - sizeof(cell);
+		gc_locals.clear();
+		gc_bignums.clear();
 
 		/* If we had an underflow or overflow, stack pointers might be
 		out of bounds */
