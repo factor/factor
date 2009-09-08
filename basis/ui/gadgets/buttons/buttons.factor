@@ -229,8 +229,8 @@ PRIVATE>
 : command-button-quot ( target command -- quot )
     '[ _ _ invoke-command ] ;
 
-: gesture>tooltip ( gesture -- str )
-    [ gesture>string "Shortcut: " prepend ] [ "Shortcut Unassigned" ] if* ;
+: gesture>tooltip ( gesture -- str/f )
+    dup [ gesture>string "Shortcut: " prepend ] when ;
 
 : <command-button> ( target gesture command -- button )
     swapd [ command-name swap ] keep command-button-quot
