@@ -7,7 +7,9 @@ HELP: button
 $nl
 "A button's appearance can vary depending on the state of the mouse button if the " { $snippet "interior" } " or " { $snippet "boundary" } " slots are set to instances of " { $link button-pen } "."
 $nl
-"A button can be selected, which is distinct from being pressed. This state is held in the " { $snippet "selected?" } " slot, and is used by " { $link checkbox } " instances to render themselves when they're checked." } ;
+"A button can be selected, which is distinct from being pressed. This state is held in the " { $snippet "selected?" } " slot, and is used by " { $link checkbox } " instances to render themselves when they're checked."
+$nl
+"A button can optionally display a message in the window's status bar whenever the mouse cursor hovers over the button. To enable this behavior, just set a string to the button's " { $snippet "tooltip" } " slot." } ;
 
 HELP: <button>
 { $values { "label" gadget } { "quot" { $quotation "( button -- )" } } { "button" "a new " { $link button } } }
