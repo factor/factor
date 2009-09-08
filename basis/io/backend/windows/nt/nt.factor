@@ -14,11 +14,11 @@ TUPLE: io-callback port thread ;
 C: <io-callback> io-callback
 
 : (make-overlapped) ( -- overlapped-ext )
-    "OVERLAPPED" malloc-object &free ;
+    OVERLAPPED malloc-struct &free ;
 
 : make-overlapped ( port -- overlapped-ext )
     [ (make-overlapped) ] dip
-    handle>> ptr>> [ over set-OVERLAPPED-offset ] when* ;
+    handle>> ptr>> [ >>offset ] when* ;
 
 M: winnt FileArgs-overlapped ( port -- overlapped )
     make-overlapped ;
@@ -40,7 +40,7 @@ M: winnt add-completion ( win32-handle -- )
 : twiddle-thumbs ( overlapped port -- bytes-transferred )
     [
         drop
-        [ pending-overlapped get-global set-at ] curry "I/O" suspend
+        [ >c-ptr pending-overlapped get-global set-at ] curry "I/O" suspend
         {
             { [ dup integer? ] [ ] }
             { [ dup array? ] [
@@ -57,11 +57,12 @@ M: winnt add-completion ( win32-handle -- )
         f <void*> [ ! overlapped
             us [ 1000 /i ] [ INFINITE ] if* ! timeout
             GetQueuedCompletionStatus zero?
-        ] keep *void*
+        ] keep
+        *void* dup [ OVERLAPPED memory>struct ] when
     ] keep *int spin ;
 
 : resume-callback ( result overlapped -- )
-    pending-overlapped get-global delete-at* drop resume-with ;
+    >c-ptr pending-overlapped get-global delete-at* drop resume-with ;
 
 : handle-overlapped ( us -- ? )
     wait-for-overlapped [

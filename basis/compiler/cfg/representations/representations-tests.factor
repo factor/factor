@@ -3,7 +3,7 @@ compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.representations.preferred ;
 IN: compiler.cfg.representations
 
-[ { double-float-rep double-float-rep } ] [
+[ { double-rep double-rep } ] [
     T{ ##add-float
        { dst 5 }
        { src1 3 }
@@ -11,7 +11,7 @@ IN: compiler.cfg.representations
     } uses-vreg-reps
 ] unit-test
 
-[ double-float-rep ] [
+[ double-rep ] [
     T{ ##alien-double
        { dst 5 }
        { src 3 }

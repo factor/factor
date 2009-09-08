@@ -1,15 +1,14 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax math math.bitwise ;
+USING: alien.syntax math math.bitwise classes.struct ;
 IN: unix.linux.inotify
 
-C-STRUCT: inotify-event
-    { "int" "wd" }       ! watch descriptor
-    { "uint" "mask" }    ! watch mask
-    { "uint" "cookie" }  ! cookie to synchronize two events
-    { "uint" "len" }     ! length (including nulls) of name
-    { "char[0]" "name" } ! stub for possible name
-    ;
+STRUCT: inotify-event
+    { wd int }
+    { mask uint }
+    { cookie uint }
+    { len uint }
+    { name char[0] } ;
 
 CONSTANT: IN_ACCESS HEX: 1         ! File was accessed
 CONSTANT: IN_MODIFY HEX: 2         ! File was modified
@@ -28,8 +27,8 @@ CONSTANT: IN_UNMOUNT HEX: 2000     ! Backing fs was unmounted
 CONSTANT: IN_Q_OVERFLOW HEX: 4000  ! Event queued overflowed
 CONSTANT: IN_IGNORED HEX: 8000     ! File was ignored
 
-: IN_CLOSE ( -- n ) IN_CLOSE_WRITE IN_CLOSE_NOWRITE bitor ; inline ! close
-: IN_MOVE ( -- n ) IN_MOVED_FROM IN_MOVED_TO bitor        ; inline ! moves
+: IN_CLOSE ( -- n ) { IN_CLOSE_WRITE IN_CLOSE_NOWRITE } flags ; foldable ! close
+: IN_MOVE ( -- n ) { IN_MOVED_FROM IN_MOVED_TO } flags        ; foldable ! moves
 
 CONSTANT: IN_ONLYDIR HEX: 1000000     ! only watch the path if it is a directory
 CONSTANT: IN_DONT_FOLLOW HEX: 2000000 ! don't follow a sym link

@@ -1,7 +1,7 @@
 USING: alien alien.syntax alien.c-types alien.strings math
 kernel sequences windows.errors windows.types io
 accessors math.order namespaces make math.parser windows.kernel32
-combinators locals specialized-arrays.direct.uchar
+combinators locals specialized-arrays.uchar
 literals splitting grouping classes.struct combinators.smart ;
 IN: windows.ole32
 

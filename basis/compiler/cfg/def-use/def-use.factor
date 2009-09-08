@@ -1,55 +1,52 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel assocs sequences namespaces fry
-sets compiler.cfg.rpo compiler.cfg.instructions locals ;
+USING: accessors assocs arrays classes combinators
+compiler.units fry generalizations generic kernel locals
+namespaces quotations sequences sets slots words
+compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.cfg.rpo ;
 IN: compiler.cfg.def-use
 
 GENERIC: defs-vreg ( insn -- vreg/f )
 GENERIC: temp-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
 
-M: ##flushable defs-vreg dst>> ;
-M: ##fixnum-overflow defs-vreg dst>> ;
-M: _fixnum-overflow defs-vreg dst>> ;
-M: insn defs-vreg drop f ;
-
-M: ##write-barrier temp-vregs [ card#>> ] [ table>> ] bi 2array ;
-M: ##unary/temp temp-vregs temp>> 1array ;
-M: ##allot temp-vregs temp>> 1array ;
-M: ##dispatch temp-vregs temp>> 1array ;
-M: ##slot temp-vregs temp>> 1array ;
-M: ##set-slot temp-vregs temp>> 1array ;
-M: ##string-nth temp-vregs temp>> 1array ;
-M: ##set-string-nth-fast temp-vregs temp>> 1array ;
-M: ##box-displaced-alien temp-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
-M: ##compare temp-vregs temp>> 1array ;
-M: ##compare-imm temp-vregs temp>> 1array ;
-M: ##compare-float temp-vregs temp>> 1array ;
-M: ##gc temp-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
-M: _dispatch temp-vregs temp>> 1array ;
-M: insn temp-vregs drop f ;
-
-M: ##unary uses-vregs src>> 1array ;
-M: ##binary uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
-M: ##binary-imm uses-vregs src1>> 1array ;
-M: ##effect uses-vregs src>> 1array ;
-M: ##slot uses-vregs [ obj>> ] [ slot>> ] bi 2array ;
-M: ##slot-imm uses-vregs obj>> 1array ;
-M: ##set-slot uses-vregs [ src>> ] [ obj>> ] [ slot>> ] tri 3array ;
-M: ##set-slot-imm uses-vregs [ src>> ] [ obj>> ] bi 2array ;
-M: ##string-nth uses-vregs [ obj>> ] [ index>> ] bi 2array ;
-M: ##set-string-nth-fast uses-vregs [ src>> ] [ obj>> ] [ index>> ] tri 3array ;
-M: ##conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
-M: ##compare-imm-branch uses-vregs src1>> 1array ;
-M: ##dispatch uses-vregs src>> 1array ;
-M: ##alien-getter uses-vregs src>> 1array ;
-M: ##alien-setter uses-vregs [ src>> ] [ value>> ] bi 2array ;
-M: ##fixnum-overflow uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: ##phi uses-vregs inputs>> values ;
-M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
-M: _compare-imm-branch uses-vregs src1>> 1array ;
-M: _dispatch uses-vregs src>> 1array ;
-M: insn uses-vregs drop f ;
+
+<PRIVATE
+
+: slot-array-quot ( slots -- quot )
+    [ reader-word 1quotation ] map dup length {
+        { 0 [ drop [ drop f ] ] }
+        { 1 [ first [ 1array ] compose ] }
+        { 2 [ first2 '[ _ _ bi 2array ] ] }
+        [ '[ _ cleave _ narray ] ]
+    } case ;
+
+: define-defs-vreg-method ( insn -- )
+    [ \ defs-vreg create-method ]
+    [ insn-def-slot [ name>> reader-word 1quotation ] [ [ drop f ] ] if* ] bi
+    define ;
+
+: define-uses-vregs-method ( insn -- )
+    [ \ uses-vregs create-method ]
+    [ insn-use-slots [ name>> ] map slot-array-quot ] bi
+    define ;
+
+: define-temp-vregs-method ( insn -- )
+    [ \ temp-vregs create-method ]
+    [ insn-temp-slots [ name>> ] map slot-array-quot ] bi
+    define ;
+
+PRIVATE>
+
+[
+    insn-classes get
+    [ [ define-defs-vreg-method ] each ]
+    [ { ##phi } diff [ define-uses-vregs-method ] each ]
+    [ [ define-temp-vregs-method ] each ]
+    tri
+] with-compilation-unit
 
 ! Computing def-use chains.
 
