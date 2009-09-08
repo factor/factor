@@ -210,12 +210,12 @@ C-ENUM:
 
 TYPEDEF: uint COMPUTER_NAME_FORMAT
 
-C-STRUCT: OVERLAPPED
-    { "UINT_PTR" "internal" }
-    { "UINT_PTR" "internal-high" }
-    { "DWORD" "offset" }
-    { "DWORD" "offset-high" }
-    { "HANDLE" "event" } ;
+STRUCT: OVERLAPPED
+    { internal UINT_PTR }
+    { internal-high UINT_PTR }
+    { offset DWORD }
+    { offset-high DWORD }
+    { event HANDLE } ;
 
 STRUCT: SYSTEMTIME
     { wYear WORD }

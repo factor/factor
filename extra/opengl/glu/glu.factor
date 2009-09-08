@@ -4,11 +4,15 @@ USING: alien alien.libraries alien.syntax kernel sequences words system
 combinators ;
 IN: opengl.glu
 
+<<
+
 os {
     { [ dup macosx? ] [ drop ] }
     { [ dup windows? ] [ drop ] }
     { [ dup unix? ] [ drop "glu" "libGLU.so.1" "cdecl" add-library ] }
 } cond
+
+>>
 
 LIBRARY: glu
  

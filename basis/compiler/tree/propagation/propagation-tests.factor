@@ -815,3 +815,6 @@ M: tuple-with-read-only-slot clone
     [ { byte-array fixnum } declare alien-cell dup [ "OOPS" throw ] unless ] final-classes
     first simple-alien class=
 ] unit-test
+
+! Don't crash if bad literal inputs are passed to unsafe words
+[ f ] [ [ { } 1 fixnum+fast ] final-info first literal?>> ] unit-test

@@ -1,14 +1,10 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax arrays
-byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors math.bitwise io.encodings.utf16n classes.struct
-literals windows.com.syntax ;
+byte-arrays kernel literals math sequences windows.types
+windows.kernel32 windows.errors math.bitwise io.encodings.utf16n
+classes.struct windows.com.syntax init ;
 IN: windows.winsock
-
-USE: libc
-: alien>byte-array ( alien str -- byte-array )
-    heap-size dup <byte-array> [ -rot memcpy ] keep ;
 
 TYPEDEF: void* SOCKET
 
@@ -75,7 +71,9 @@ CONSTANT: PF_INET6      23
 CONSTANT: AI_PASSIVE     1
 CONSTANT: AI_CANONNAME   2
 CONSTANT: AI_NUMERICHOST 4
-: AI_MASK ( -- n ) { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ;
+
+: AI_MASK ( -- n )
+    { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ; inline
 
 CONSTANT: NI_NUMERICHOST 1
 CONSTANT: NI_NUMERICSERV 2
@@ -96,7 +94,8 @@ ALIAS: WSA_IO_PENDING ERROR_IO_PENDING
 
 CONSTANT: INADDR_ANY 0
 
-: INVALID_SOCKET ( -- alien ) -1 <alien> ; inline
+: INVALID_SOCKET ( -- n ) -1 <alien> ; inline
+
 CONSTANT: SOCKET_ERROR -1
 
 CONSTANT: SD_RECV 0
@@ -105,22 +104,18 @@ CONSTANT: SD_BOTH 2
 
 CONSTANT: SOL_SOCKET HEX: ffff
 
-! TYPEDEF: uint in_addr_t
-! C-STRUCT: in_addr
-    ! { "in_addr_t" "s_addr" } ;
+STRUCT: sockaddr-in
+    { family short }
+    { port ushort }
+    { addr uint }
+    { pad char[8] } ;
 
-C-STRUCT: sockaddr-in
-    { "short" "family" }
-    { "ushort" "port" }
-    { "uint" "addr" }
-    { { "char" 8 } "pad" } ;
-
-C-STRUCT: sockaddr-in6
-    { "uchar" "family" }
-    { "ushort" "port" }
-    { "uint" "flowinfo" }
-    { { "uchar" 16 } "addr" }
-    { "uint" "scopeid" } ;
+STRUCT: sockaddr-in6
+    { family uchar }
+    { port ushort }
+    { flowinfo uint }
+    { addr uchar[16] }
+    { scopeid uint } ;
 
 STRUCT: hostent
     { name char* }
@@ -129,15 +124,15 @@ STRUCT: hostent
     { length short }
     { addr-list void* } ;
 
-C-STRUCT: addrinfo
-    { "int" "flags" }
-    { "int" "family" }
-    { "int" "socktype" }
-    { "int" "protocol" }
-    { "size_t" "addrlen" }
-    { "char*" "canonname" }
-    { "sockaddr*" "addr" }
-    { "addrinfo*" "next" } ;
+STRUCT: addrinfo
+    { flags int }
+    { family int }
+    { socktype int }
+    { protocol int }
+    { addrlen size_t }
+    { canonname char* }
+    { addr sockaddr* }
+    { next addrinfo* } ;
 
 C-STRUCT: timeval
     { "long" "sec" }
@@ -379,7 +374,17 @@ LIBRARY: mswsock
 
 ! Not in Windows CE
 FUNCTION: int AcceptEx ( void* listen, void* accept, void* out-buf, int recv-len, int addr-len, int remote-len, void* out-len, void* overlapped ) ;
-FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, void* f, void* g, void* h ) ;
+
+FUNCTION: void GetAcceptExSockaddrs (
+  PVOID lpOutputBuffer,
+  DWORD dwReceiveDataLength,
+  DWORD dwLocalAddressLength,
+  DWORD dwRemoteAddressLength,
+  LPSOCKADDR* LocalSockaddr,
+  LPINT LocalSockaddrLength,
+  LPSOCKADDR* RemoteSockaddr,
+  LPINT RemoteSockaddrLength
+) ;
 
 CONSTANT: SIO_GET_EXTENSION_FUNCTION_POINTER -939524090
 
@@ -431,3 +436,5 @@ CONSTANT: WSAID_CONNECTEX GUID: {25a207b9-ddf3-4660-8ee9-76e58c74063e}
 
 : init-winsock ( -- )
     HEX: 0202 <wsadata> WSAStartup winsock-return-check ;
+
+[ init-winsock ] "windows.winsock" add-init-hook

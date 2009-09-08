@@ -3,8 +3,8 @@
 USING: alien alien.c-types arrays destructors io io.backend
 io.buffers io.files io.ports io.binary io.timeouts system
 strings kernel math namespaces sequences windows.errors
-windows.kernel32 windows.shell32 windows.types windows.winsock
-splitting continuations math.bitwise accessors init sets assocs
+windows.kernel32 windows.shell32 windows.types splitting
+continuations math.bitwise accessors init sets assocs
 classes.struct classes ;
 IN: io.backend.windows
 
@@ -52,4 +52,4 @@ HOOK: add-completion io-backend ( port -- )
 
 : default-security-attributes ( -- obj )
     SECURITY_ATTRIBUTES <struct>
-    dup class heap-size >>nLength ;
+    SECURITY_ATTRIBUTES heap-size >>nLength ;
