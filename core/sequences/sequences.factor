@@ -535,8 +535,12 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
+<PRIVATE
+
 : (indices) ( elt i obj accum -- )
     [ swap [ = ] dip ] dip [ push ] 2curry when ; inline
+
+PRIVATE>
 
 : indices ( obj seq -- indices )
     swap V{ } clone
