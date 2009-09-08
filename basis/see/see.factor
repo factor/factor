@@ -7,7 +7,7 @@ generic.single generic.standard generic.hook io io.pathnames
 io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections sequences sets sorting strings summary words
-words.symbol words.constant words.alias vocabs ;
+words.symbol words.constant words.alias vocabs slots ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -212,7 +212,10 @@ M: word see*
     ] tri ;
 
 : seeing-implementors ( class -- seq )
-    dup implementors [ method ] with map natural-sort ;
+    dup implementors
+    [ [ reader? ] [ writer? ] bi or not ] filter
+    [ method ] with map
+    natural-sort ;
 
 : seeing-methods ( generic -- seq )
     "methods" word-prop values natural-sort ;
