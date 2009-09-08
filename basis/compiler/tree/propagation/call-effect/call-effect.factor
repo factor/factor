@@ -50,12 +50,12 @@ M: curry cached-effect
 M: compose cached-effect
     [ first>> ] [ second>> ] bi [ cached-effect ] bi@ compose-effects* ;
 
+: safe-infer ( quot -- effect )
+    [ infer ] [ 2drop +unknown+ ] recover ;
+
 M: quotation cached-effect
     dup cached-effect>>
-    [ ] [
-        [ [ infer ] [ 2drop +unknown+ ] recover dup ] keep
-        (>>cached-effect)
-    ] ?if ;
+    [ ] [ [ safe-infer dup ] keep (>>cached-effect) ] ?if ;
 
 : call-effect-unsafe? ( quot effect -- ? )
     [ cached-effect ] dip
@@ -116,6 +116,29 @@ M: quotation cached-effect
 : execute-effect>quot ( effect -- quot )
     inline-cache new '[ drop _ _ execute-effect-ic ] ;
 
+! Some bookkeeping to make sure that crap like
+! [ dup curry call( quot -- ) ] dup curry call( quot -- ) ]
+! doesn't hang the compiler.
+GENERIC: already-inlined-quot? ( quot -- ? )
+
+M: curry already-inlined-quot? quot>> already-inlined-quot? ;
+
+M: compose already-inlined-quot?
+    [ first>> already-inlined-quot? ]
+    [ second>> already-inlined-quot? ] bi or ;
+
+M: quotation already-inlined-quot? already-inlined? ;
+
+GENERIC: add-quot-to-history ( quot -- )
+
+M: curry add-quot-to-history quot>> add-quot-to-history ;
+
+M: compose add-quot-to-history
+    [ first>> add-quot-to-history ]
+    [ second>> add-quot-to-history ] bi ;
+
+M: quotation add-quot-to-history add-to-history ;
+
 : last2 ( seq -- penultimate ultimate )
     2 tail* first2 ;
 
@@ -129,22 +152,18 @@ ERROR: uninferable ;
     (( -- object )) swap compose-effects ;
 
 : (infer-value) ( value-info -- effect )
-    dup class>> {
-        { \ quotation [
-            literal>> [ uninferable ] unless*
-            dup already-inlined? [ uninferable ] when
-            cached-effect dup +unknown+ = [ uninferable ] when
-        ] }
-        { \ curry [
-            slots>> third (infer-value)
-            remove-effect-input
-        ] }
-        { \ compose [
-            slots>> last2 [ (infer-value) ] bi@
-            compose-effects
-        ] }
-        [ uninferable ]
-    } case ;
+    dup literal?>> [
+        literal>>
+        [ callable? [ uninferable ] unless ]
+        [ already-inlined-quot? [ uninferable ] when ]
+        [ safe-infer dup +unknown+ = [ uninferable ] when ] tri
+    ] [
+        dup class>> {
+            { \ curry [ slots>> third (infer-value) remove-effect-input ] }
+            { \ compose [ slots>> last2 [ (infer-value) ] bi@ compose-effects ] }
+            [ uninferable ]
+        } case
+    ] if ;
 
 : infer-value ( value-info -- effect/f )
     [ (infer-value) ]
@@ -152,17 +171,20 @@ ERROR: uninferable ;
     recover ;
 
 : (value>quot) ( value-info -- quot )
-    dup class>> {
-        { \ quotation [ literal>> dup add-to-history '[ drop @ ] ] }
-        { \ curry [
-            slots>> third (value>quot)
-            '[ [ obj>> ] [ quot>> @ ] bi ]
-        ] }
-        { \ compose [
-            slots>> last2 [ (value>quot) ] bi@
-            '[ [ first>> @ ] [ second>> @ ] bi ]
-        ] }
-    } case ;
+    dup literal?>> [
+        literal>> [ add-quot-to-history ] [ '[ drop @ ] ] bi
+    ] [
+        dup class>> {
+            { \ curry [
+                slots>> third (value>quot)
+                '[ [ obj>> ] [ quot>> @ ] bi ]
+            ] }
+            { \ compose [
+                slots>> last2 [ (value>quot) ] bi@
+                '[ [ first>> @ ] [ second>> @ ] bi ]
+            ] }
+        } case
+    ] if ;
 
 : value>quot ( value-info -- quot: ( code effect -- ) )
     (value>quot) '[ drop @ ] ;
