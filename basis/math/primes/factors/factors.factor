@@ -43,5 +43,9 @@ PRIVATE>
     } cond ; foldable
 
 : divisors ( n -- seq )
-    group-factors [ first2 [0,b] [ ^ ] with map ] map
-    [ product ] product-map natural-sort ;
+    dup 1 = [
+        1array
+    ] [
+        group-factors [ first2 [0,b] [ ^ ] with map ] map
+        [ product ] product-map natural-sort
+    ] if ;
