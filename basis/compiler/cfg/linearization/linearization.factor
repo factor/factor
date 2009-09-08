@@ -57,8 +57,11 @@ M: ##compare-branch linearize-insn
 M: ##compare-imm-branch linearize-insn
     binary-conditional _compare-imm-branch emit-branch ;
 
-M: ##compare-float-branch linearize-insn
-    binary-conditional _compare-float-branch emit-branch ;
+M: ##compare-float-ordered-branch linearize-insn
+    binary-conditional _compare-float-ordered-branch emit-branch ;
+
+M: ##compare-float-unordered-branch linearize-insn
+    binary-conditional _compare-float-unordered-branch emit-branch ;
 
 : overflow-conditional ( bb insn -- bb successor label2 dst src1 src2 )
     [ dup successors block-number ]
