@@ -6,9 +6,9 @@ IN: tools.deploy.test.14
 
 CLASS: {
     { +superclass+ "NSObject" }
-    { +name+ "Foo" }
+    { +name+ "Bar" }
 } {
-    "foo:"
+    "bar:"
     "float"
     { "id" "SEL" "NSRect" }
     [
@@ -19,8 +19,8 @@ CLASS: {
 } ;
 
 : main ( -- )
-    Foo -> alloc -> init
-    S{ CGRect f S{ CGPoint f 1.0 2.0 } S{ CGSize f 3.0 4.0 } } -> foo:
+    Bar -> alloc -> init
+    S{ CGRect f S{ CGPoint f 1.0 2.0 } S{ CGSize f 3.0 4.0 } } -> bar:
     10.0 assert= ;
 
 MAIN: main
