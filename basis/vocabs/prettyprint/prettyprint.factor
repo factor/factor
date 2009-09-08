@@ -1,12 +1,13 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sorting sequences vocabs io io.styles arrays assocs
-namespaces sets parser colors prettyprint.backend prettyprint.sections
-vocabs.parser make fry math.order ;
+USING: accessors arrays assocs colors colors.constants fry io
+io.styles kernel make math.order namespaces parser
+prettyprint.backend prettyprint.sections prettyprint.stylesheet
+sequences sets sorting vocabs vocabs.parser ;
 IN: vocabs.prettyprint
 
 : pprint-vocab ( vocab -- )
-    [ vocab-name ] [ vocab ] bi present-text ;
+    [ vocab-name ] [ vocab vocab-style ] bi styled-text ;
 
 : pprint-in ( vocab -- )
     [ \ IN: pprint-word pprint-vocab ] with-pprint ;
@@ -85,7 +86,7 @@ PRIVATE>
         "To avoid doing this in the future, add the following forms" print
         "at the top of the source file:" print nl
     ] with-style
-    { { page-color T{ rgba f 0.8 0.8 0.8 1.0 } } }
+    { { page-color COLOR: FactorLightTan } }
     [ manifest get pprint-manifest ] with-nesting
     nl nl
 ] print-use-hook set-global
