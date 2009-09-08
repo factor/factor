@@ -623,7 +623,7 @@ M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
     temp 0 MOV \ t rc-absolute-cell rel-immediate
     dst temp word execute ; inline
 
-M: x86 %compare ( dst src1 src2 cc temp -- )
+M:: x86 %compare ( dst src1 src2 cc temp -- )
     src1 src2 CMP
     cc order-cc {
         { cc<  [ dst temp \ CMOVL %boolean ] }
