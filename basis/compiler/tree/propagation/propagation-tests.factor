@@ -9,7 +9,7 @@ compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
 specialized-arrays.double system sorting math.libm
-math.intervals quotations effects ;
+math.intervals quotations effects alien ;
 IN: compiler.tree.propagation.tests
 
 [ V{ } ] [ [ ] final-classes ] unit-test
@@ -799,3 +799,22 @@ SYMBOL: not-an-assoc
 
 [ t ] [ [ (( a b c -- c b a )) shuffle ] { shuffle } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap shuffle ] { shuffle } inlined? ] unit-test
+
+! Type function for 'clone' had a subtle issue
+TUPLE: tuple-with-read-only-slot { x read-only } ;
+
+M: tuple-with-read-only-slot clone
+    x>> clone tuple-with-read-only-slot boa ; inline
+
+[ V{ object } ] [
+    [ { 1 2 3 } dup tuple-with-read-only-slot boa clone x>> eq? ] final-classes
+] unit-test
+
+! alien-cell outputs a simple-alien or f
+[ t ] [
+    [ { byte-array fixnum } declare alien-cell dup [ "OOPS" throw ] unless ] final-classes
+    first simple-alien class=
+] unit-test
+
+! Don't crash if bad literal inputs are passed to unsafe words
+[ f ] [ [ { } 1 fixnum+fast ] final-info first literal?>> ] unit-test

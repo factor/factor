@@ -201,16 +201,14 @@ SYMBOL: outdated-tuples
     slots>tuple ;
 
 : outdated-tuple? ( tuple assoc -- ? )
-    over tuple? [
-        [ [ layout-of ] dip key? ]
-        [ drop class "forgotten" word-prop not ]
-        2bi and
-    ] [ 2drop f ] if ;
+    [ [ layout-of ] dip key? ]
+    [ drop class "forgotten" word-prop not ]
+    2bi and ;
 
 : update-tuples ( -- )
     outdated-tuples get
     dup assoc-empty? [ drop ] [
-        [ outdated-tuple? ] curry instances
+        [ [ tuple? ] instances ] dip [ outdated-tuple? ] curry filter
         dup [ update-tuple ] map become
     ] if ;
 

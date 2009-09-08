@@ -17,7 +17,7 @@ H{
 
 SYMBOL: link-style
 H{
-    { foreground COLOR: dark-blue }
+    { foreground COLOR: DodgerBlue4 }
     { font-style bold }
 } link-style set-global
 
@@ -33,7 +33,8 @@ H{
     { font-size 18 }
     { font-style bold }
     { wrap-margin 500 }
-    { page-color COLOR: light-gray }
+    { foreground COLOR: FactorDarkSlateBlue }
+    { page-color COLOR: FactorLightTan }
     { border-width 5 }
 } title-style set-global
 
@@ -58,12 +59,18 @@ SYMBOL: snippet-style
 H{
     { font-name "monospace" }
     { font-size 12 }
-    { foreground COLOR: navy-blue }
+    { foreground COLOR: DarkOrange4 }
 } snippet-style set-global
+
+SYMBOL: code-char-style
+H{
+    { font-name "monospace" }
+    { font-size 12 }
+} code-char-style set-global
 
 SYMBOL: code-style
 H{
-    { page-color COLOR: gray80 }
+    { page-color COLOR: FactorLightTan }
     { border-width 5 }
     { wrap-margin f }
 } code-style set-global
@@ -74,7 +81,7 @@ H{ { font-style bold } } input-style set-global
 SYMBOL: url-style
 H{
     { font-name "monospace" }
-    { foreground COLOR: blue }
+    { foreground COLOR: DodgerBlue4 }
 } url-style set-global
 
 SYMBOL: warning-style
@@ -101,7 +108,7 @@ H{
 SYMBOL: table-style
 H{
     { table-gap { 5 5 } }
-    { table-border COLOR: light-gray }
+    { table-border COLOR: FactorLightTan }
 } table-style set-global
 
 SYMBOL: list-style

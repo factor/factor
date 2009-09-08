@@ -1,15 +1,15 @@
 USING: kernel combinators quotations arrays sequences assocs
-locals generalizations macros fry ;
+generalizations macros fry ;
 IN: combinators.short-circuit
 
-MACRO:: n&& ( quots n -- quot )
-    [ f ] quots [| q |
-        n
-        [ q '[ drop _ ndup @ dup not ] ]
-        [ '[ drop _ ndrop f ] ]
-        bi 2array
-    ] map
-    n '[ _ nnip ] suffix 1array
+MACRO: n&& ( quots n -- quot )
+    [
+        [ [ f ] ] 2dip swap [
+            [ '[ drop _ ndup @ dup not ] ]
+            [ drop '[ drop _ ndrop f ] ]
+            2bi 2array
+        ] with map
+    ] [ '[ _ nnip ] suffix 1array ] bi
     [ cond ] 3append ;
 
 <PRIVATE
@@ -24,14 +24,14 @@ PRIVATE>
 : 2&& ( obj1 obj2 quots -- ? ) [ with with ] unoptimized-&& ;
 : 3&& ( obj1 obj2 obj3 quots -- ? ) [ with with with ] unoptimized-&& ;
 
-MACRO:: n|| ( quots n -- quot )
-    [ f ] quots [| q |
-        n
-        [ q '[ drop _ ndup @ dup ] ]
-        [ '[ _ nnip ] ]
-        bi 2array
-    ] map
-    n '[ drop _ ndrop t ] [ f ] 2array suffix 1array
+MACRO: n|| ( quots n -- quot )
+    [
+        [ [ f ] ] 2dip swap [
+            [ '[ drop _ ndup @ dup ] ]
+            [ drop '[ _ nnip ] ]
+            2bi 2array
+        ] with map
+    ] [ '[ drop _ ndrop t ] [ f ] 2array suffix 1array ] bi
     [ cond ] 3append ;
 
 <PRIVATE
