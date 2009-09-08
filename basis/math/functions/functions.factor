@@ -13,7 +13,7 @@ IN: math.functions
 GENERIC: sqrt ( x -- y ) foldable
 
 M: real sqrt
-    >float dup 0.0 < [ neg fsqrt 0.0 swap rect> ] [ fsqrt ] if ;
+    >float dup 0.0 < [ neg fsqrt 0.0 swap rect> ] [ fsqrt ] if ; inline
 
 : factor-2s ( n -- r s )
     #! factor an integer into 2^r * s
@@ -52,14 +52,25 @@ PRIVATE>
 : >polar ( z -- abs arg )
     >float-rect [ [ sq ] bi@ + fsqrt ] [ swap fatan2 ] 2bi ; inline
 
-: cis ( arg -- z ) dup fcos swap fsin rect> ; inline
+: cis ( arg -- z ) >float [ fcos ] [ fsin ] bi rect> ; inline
 
 : polar> ( abs arg -- z ) cis * ; inline
+
+GENERIC: exp ( x -- y )
+
+M: float exp fexp ; inline
+
+M: real exp >float exp ; inline
+
+M: complex exp >rect swap fexp swap polar> ; inline
 
 <PRIVATE
 
 : ^mag ( w abs arg -- magnitude )
-    [ >float-rect swap ] [ swap fpow ] [ rot * fexp /f ] tri* ; inline
+    [ >float-rect swap ]
+    [ >float swap >float fpow ]
+    [ rot * exp /f ]
+    tri* ; inline
 
 : ^theta ( w abs arg -- theta )
     [ >float-rect ] [ flog * swap ] [ * + ] tri* ; inline
@@ -71,7 +82,7 @@ PRIVATE>
     2dup [ real? ] both? [ drop 0 >= ] [ 2drop f ] if ; inline
 
 : 0^ ( x -- z )
-    dup zero? [ drop 0/0. ] [ 0 < 1/0. 0 ? ] if ; inline
+    [ 0/0. ] [ 0 < 1/0. 0 ? ] if-zero ; inline
 
 : (^mod) ( n x y -- z )
     make-bits 1 [
@@ -89,9 +100,9 @@ PRIVATE>
 
 : ^ ( x y -- z )
     {
-        { [ over zero? ] [ nip 0^ ] }
+        { [ over 0 = ] [ nip 0^ ] }
         { [ dup integer? ] [ integer^ ] }
-        { [ 2dup real^? ] [ fpow ] }
+        { [ 2dup real^? ] [ [ >float ] bi@ fpow ] }
         [ ^complex ]
     } cond ; inline
 
@@ -104,10 +115,12 @@ PRIVATE>
 : divisor? ( m n -- ? )
     mod 0 = ;
 
+ERROR: non-trivial-divisor n ;
+
 : mod-inv ( x n -- y )
     [ nip ] [ gcd 1 = ] 2bi
     [ dup 0 < [ + ] [ nip ] if ]
-    [ "Non-trivial divisor found" throw ] if ; foldable
+    [ non-trivial-divisor ] if ; foldable
 
 : ^mod ( x y n -- z )
     over 0 < [
@@ -118,7 +131,7 @@ PRIVATE>
 
 GENERIC: absq ( x -- y ) foldable
 
-M: real absq sq ;
+M: real absq sq ; inline
 
 : ~abs ( x y epsilon -- ? )
     [ - abs ] dip < ;
@@ -144,17 +157,17 @@ M: real absq sq ;
 : >=1? ( x -- ? )
     dup complex? [ drop f ] [ 1 >= ] if ; inline
 
-GENERIC: exp ( x -- y )
-
-M: real exp fexp ;
-
-M: complex exp >rect swap fexp swap polar> ;
-
 GENERIC: log ( x -- y )
 
-M: real log dup 0.0 >= [ flog ] [ 0.0 rect> log ] if ;
+M: float log dup 0.0 >= [ flog ] [ 0.0 rect> log ] if ; inline
 
-M: complex log >polar swap flog swap rect> ;
+M: real log >float log ; inline
+
+M: complex log >polar swap flog swap rect> ; inline
+
+: 10^ ( x -- y ) 10 swap ^ ; inline
+
+: log10 ( x -- y ) log 10 log / ; inline
 
 GENERIC: cos ( x -- y ) foldable
 
@@ -163,7 +176,9 @@ M: complex cos
     [ [ fcos ] [ fcosh ] bi* * ]
     [ [ fsin neg ] [ fsinh ] bi* * ] 2bi rect> ;
 
-M: real cos fcos ;
+M: float cos fcos ; inline
+
+M: real cos >float cos ; inline
 
 : sec ( x -- y ) cos recip ; inline
 
@@ -174,7 +189,9 @@ M: complex cosh
     [ [ fcosh ] [ fcos ] bi* * ]
     [ [ fsinh ] [ fsin ] bi* * ] 2bi rect> ;
 
-M: real cosh fcosh ;
+M: float cosh fcosh ; inline
+
+M: real cosh >float cosh ; inline
 
 : sech ( x -- y ) cosh recip ; inline
 
@@ -185,7 +202,9 @@ M: complex sin
     [ [ fsin ] [ fcosh ] bi* * ]
     [ [ fcos ] [ fsinh ] bi* * ] 2bi rect> ;
 
-M: real sin fsin ;
+M: float sin fsin ; inline
+
+M: real sin >float sin ; inline
 
 : cosec ( x -- y ) sin recip ; inline
 
@@ -196,7 +215,9 @@ M: complex sinh
     [ [ fsinh ] [ fcos ] bi* * ]
     [ [ fcosh ] [ fsin ] bi* * ] 2bi rect> ;
 
-M: real sinh fsinh ;
+M: float sinh fsinh ; inline
+
+M: real sinh >float sinh ; inline
 
 : cosech ( x -- y ) sinh recip ; inline
 
@@ -204,13 +225,17 @@ GENERIC: tan ( x -- y ) foldable
 
 M: complex tan [ sin ] [ cos ] bi / ;
 
-M: real tan ftan ;
+M: float tan ftan ; inline
+
+M: real tan >float tan ; inline
 
 GENERIC: tanh ( x -- y ) foldable
 
 M: complex tanh [ sinh ] [ cosh ] bi / ;
 
-M: real tanh ftanh ;
+M: float tanh ftanh ; inline
+
+M: real tanh >float tanh ; inline
 
 : cot ( x -- y ) tan recip ; inline
 
@@ -236,17 +261,19 @@ M: real tanh ftanh ;
 : -i* ( x -- y ) >rect swap neg rect> ;
 
 : asin ( x -- y )
-    dup [-1,1]? [ fasin ] [ i* asinh -i* ] if ; inline
+    dup [-1,1]? [ >float fasin ] [ i* asinh -i* ] if ; inline
 
 : acos ( x -- y )
-    dup [-1,1]? [ facos ] [ asin pi 2 / swap - ] if ;
+    dup [-1,1]? [ >float facos ] [ asin pi 2 / swap - ] if ;
     inline
 
 GENERIC: atan ( x -- y ) foldable
 
-M: complex atan i* atanh i* ;
+M: complex atan i* atanh i* ; inline
 
-M: real atan fatan ;
+M: float atan fatan ; inline
+
+M: real atan >float atan ; inline
 
 : asec ( x -- y ) recip acos ; inline
 
@@ -259,10 +286,13 @@ M: real atan fatan ;
 : round ( x -- y ) dup sgn 2 / + truncate ; inline
 
 : floor ( x -- y )
-    dup 1 mod dup zero?
-    [ drop ] [ dup 0 < [ - 1 - ] [ - ] if ] if ; foldable
+    dup 1 mod
+    [ ] [ dup 0 < [ - 1 - ] [ - ] if ] if-zero ; foldable
 
 : ceiling ( x -- y ) neg floor neg ; foldable
+
+: floor-to ( x step -- y )
+    [ [ / floor ] [ * ] bi ] unless-zero ;
 
 : lerp ( a b t -- a_t ) [ over - ] dip * + ; inline
 

@@ -4,15 +4,16 @@ USING: kernel assocs math sequences fry io.encodings.string
 io.encodings.utf16n accessors arrays combinators destructors
 cache namespaces init fonts alien.c-types windows.usp10
 windows.offscreen windows.gdi32 windows.ole32 windows.types
-windows.fonts opengl.textures locals windows.errors ;
+windows.fonts opengl.textures locals windows.errors
+classes.struct ;
 IN: windows.uniscribe
 
-TUPLE: script-string font string metrics ssa size image disposed ;
+TUPLE: script-string < disposable font string metrics ssa size image ;
 
 : line-offset>x ( n script-string -- x )
     2dup string>> length = [
         ssa>> ! ssa
-        swap 1- ! icp
+        swap 1 - ! icp
         TRUE ! fTrailing
     ] [
         ssa>>
@@ -81,15 +82,16 @@ TUPLE: script-string font string metrics ssa size image disposed ;
 : script-string-size ( script-string -- dim )
     ssa>> ScriptString_pSize
     dup win32-error=0/f
-    [ SIZE-cx ] [ SIZE-cy ] bi 2array ;
+    SIZE memory>struct
+    [ cx>> ] [ cy>> ] bi 2array ;
 
 : dc-metrics ( dc -- metrics )
-    "TEXTMETRICW" <c-object>
+    TEXTMETRICW <struct>
     [ GetTextMetrics drop ] keep
     TEXTMETRIC>metrics ;
 
 : <script-string> ( font string -- script-string )
-    [ script-string new ] 2dip
+    [ script-string new-disposable ] 2dip
         [ >>font ] [ >>string ] bi*
     [
         {

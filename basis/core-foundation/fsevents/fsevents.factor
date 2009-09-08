@@ -3,8 +3,8 @@
 USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces make assocs init accessors
 continuations combinators io.encodings.utf8 destructors locals
-arrays specialized-arrays.direct.alien
-specialized-arrays.direct.int specialized-arrays.direct.longlong
+arrays specialized-arrays.alien classes.struct
+specialized-arrays.int specialized-arrays.longlong
 core-foundation core-foundation.run-loop core-foundation.strings
 core-foundation.time ;
 IN: core-foundation.fsevents
@@ -26,12 +26,12 @@ TYPEDEF: int FSEventStreamEventFlags
 TYPEDEF: longlong FSEventStreamEventId
 TYPEDEF: void* FSEventStreamRef
 
-C-STRUCT: FSEventStreamContext
-    { "CFIndex" "version" }
-    { "void*" "info" }
-    { "void*" "retain" }
-    { "void*" "release" }
-    { "void*" "copyDescription" } ;
+STRUCT: FSEventStreamContext
+    { version CFIndex }
+    { info void* }
+    { retain void* }
+    { release void* }
+    { copyDescription void* } ;
 
 ! callback(FSEventStreamRef streamRef, void *clientCallBackInfo, size_t numEvents, void *eventPaths, const FSEventStreamEventFlags eventFlags[], const FSEventStreamEventId eventIds[]);
 TYPEDEF: void* FSEventStreamCallback
@@ -104,8 +104,8 @@ FUNCTION: void FSEventStreamShow ( FSEventStreamRef streamRef ) ;
 FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef ) ;
 
 : make-FSEventStreamContext ( info -- alien )
-    "FSEventStreamContext" <c-object>
-    [ set-FSEventStreamContext-info ] keep ;
+    FSEventStreamContext <struct>
+        swap >>info ;
 
 :: <FSEventStream> ( callback info paths latency flags -- event-stream )
     f ! allocator
@@ -181,15 +181,15 @@ SYMBOL: event-stream-callbacks
     }
     "cdecl" [ (master-event-source-callback) ] alien-callback ;
 
-TUPLE: event-stream info handle disposed ;
+TUPLE: event-stream < disposable info handle ;
 
 : <event-stream> ( quot paths latency flags -- event-stream )
     [
-        add-event-source-callback dup
-        [ master-event-source-callback ] dip
+        add-event-source-callback
+        [ master-event-source-callback ] keep
     ] 3dip <FSEventStream>
     dup enable-event-stream
-    f event-stream boa ;
+    event-stream new-disposable swap >>handle swap >>info ;
 
 M: event-stream dispose*
     {

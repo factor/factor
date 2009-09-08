@@ -30,6 +30,7 @@ ARTICLE: "prettyprint-variables" "Prettyprint control variables"
 { $subsection line-limit }
 { $subsection string-limit? }
 { $subsection boa-tuples? }
+{ $subsection c-object-pointers? }
 "Note that the " { $link short. } " and " { $link pprint-short } " variables override some of these variables."
 {
     $warning "Treat the global variables as essentially being constants. Only ever rebind them in a nested scope."

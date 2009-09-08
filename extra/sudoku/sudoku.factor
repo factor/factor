@@ -25,7 +25,7 @@ SYMBOL: board
 DEFER: search
 
 : assume ( n x y -- )
-    [ >board ] 2keep [ [ 1+ ] dip search ] 2keep f>board ;
+    [ >board ] 2keep [ [ 1 + ] dip search ] 2keep f>board ;
 
 : attempt ( n x y -- )
     {
@@ -35,7 +35,7 @@ DEFER: search
         [ assume ]
     } cond ;
 
-: solve ( x y -- ) 9 [ 1+ 2over attempt ] each 2drop ;
+: solve ( x y -- ) 9 [ 1 + 2over attempt ] each 2drop ;
 
 : board. ( board -- )
     standard-table-style [
@@ -59,9 +59,9 @@ DEFER: search
 
 : search ( x y -- )
     {
-        { [ over 9 = ] [ [ drop 0 ] dip 1+ search ] }
+        { [ over 9 = ] [ [ drop 0 ] dip 1 + search ] }
         { [ over 0 = over 9 = and ] [ 2drop solution. ] }
-        { [ 2dup board> ] [ [ 1+ ] dip search ] }
+        { [ 2dup board> ] [ [ 1 + ] dip search ] }
         [ solve ]
     } cond ;
 

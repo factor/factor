@@ -21,7 +21,7 @@ C: <foo> foo
 
 : something ( array -- num )
     {
-        { [ dup 1+ 2array ] [ 3 * ] }
+        { [ dup 1 + 2array ] [ 3 * ] }
         { [ 3array ] [ + + ] }
     } switch ;
 
@@ -92,5 +92,5 @@ TUPLE: funny-tuple ;
 
 [ ] [ [ <funny-tuple> ] [undo] drop ] unit-test
 
-[ 0 ] [ { 1 2 } [ [ 1+ 2 ] { } output>sequence ] undo ] unit-test
-[ { 0 1 } ] [ 1 2 [ [ [ 1+ ] bi@ ] input<sequence ] undo ] unit-test
+[ 0 ] [ { 1 2 } [ [ 1 + 2 ] { } output>sequence ] undo ] unit-test
+[ { 0 1 } ] [ 1 2 [ [ [ 1 + ] bi@ ] input<sequence ] undo ] unit-test

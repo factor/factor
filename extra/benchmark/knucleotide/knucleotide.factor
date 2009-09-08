@@ -23,12 +23,12 @@ IN: benchmark.knucleotide
 : tally ( x exemplar -- b )
     clone tuck
     [
-      [ [ 1+ ] [ 1 ] if* ] change-at
+      [ [ 1 + ] [ 1 ] if* ] change-at
     ] curry each ;
 
 : small-groups ( x n -- b )
     swap
-    [ length swap - 1+ ] 2keep
+    [ length swap - 1 + ] 2keep
     [ [ over + ] dip subseq ] 2curry map ;
 
 : handle-table ( inputs n -- )

@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax parser namespaces kernel math
-windows.types generalizations math.bitwise ;
+windows.types generalizations math.bitwise classes.struct
+literals ;
 IN: windows.user32
 
 ! HKL for ActivateKeyboardLayout
@@ -74,8 +75,10 @@ CONSTANT: WS_EX_RIGHTSCROLLBAR    HEX: 00000000
 CONSTANT: WS_EX_CONTROLPARENT     HEX: 00010000
 CONSTANT: WS_EX_STATICEDGE        HEX: 00020000
 CONSTANT: WS_EX_APPWINDOW         HEX: 00040000
+
 : WS_EX_OVERLAPPEDWINDOW ( -- n )
     WS_EX_WINDOWEDGE WS_EX_CLIENTEDGE bitor ; foldable
+
 : WS_EX_PALETTEWINDOW ( -- n )
     { WS_EX_WINDOWEDGE WS_EX_TOOLWINDOW WS_EX_TOPMOST } flags ; foldable
 
@@ -521,11 +524,11 @@ CONSTANT: TME_NONCLIENT 16
 CONSTANT: TME_QUERY HEX: 40000000
 CONSTANT: TME_CANCEL HEX: 80000000
 CONSTANT: HOVER_DEFAULT HEX: ffffffff
-C-STRUCT: TRACKMOUSEEVENT
-    { "DWORD" "cbSize" }
-    { "DWORD" "dwFlags" }
-    { "HWND" "hwndTrack" }
-    { "DWORD" "dwHoverTime" } ;
+STRUCT: TRACKMOUSEEVENT
+    { cbSize DWORD }
+    { dwFlags DWORD }
+    { hwndTrack HWND }
+    { dwHoverTime DWORD } ;
 TYPEDEF: TRACKMOUSEEVENT* LPTRACKMOUSEEVENT
 
 CONSTANT: DBT_DEVICEARRIVAL HEX: 8000
@@ -538,26 +541,26 @@ CONSTANT: DEVICE_NOTIFY_SERVICE_HANDLE 1
 
 CONSTANT: DEVICE_NOTIFY_ALL_INTERFACE_CLASSES 4
 
-C-STRUCT: DEV_BROADCAST_HDR
-    { "DWORD" "dbch_size" }
-    { "DWORD" "dbch_devicetype" }
-    { "DWORD" "dbch_reserved" } ;
+STRUCT: DEV_BROADCAST_HDR
+    { dbch_size DWORD }
+    { dbch_devicetype DWORD }
+    { dbch_reserved DWORD } ;
 
-C-STRUCT: DEV_BROADCAST_DEVICEW
-    { "DWORD" "dbcc_size" }
-    { "DWORD" "dbcc_devicetype" }
-    { "DWORD" "dbcc_reserved" }
-    { "GUID"  "dbcc_classguid" }
-    { { "WCHAR" 1 } "dbcc_name" } ;
+STRUCT: DEV_BROADCAST_DEVICEW
+    { dbcc_size DWORD }
+    { dbcc_devicetype DWORD }
+    { dbcc_reserved DWORD }
+    { dbcc_classguid GUID }
+    { dbcc_name WCHAR[1] } ;
 
 CONSTANT: CCHDEVICENAME 32
 
-C-STRUCT: MONITORINFOEX
-    { "DWORD" "cbSize" }
-    { "RECT"  "rcMonitor" }
-    { "RECT"  "rcWork" }
-    { "DWORD" "dwFlags" }
-    { { "TCHAR" CCHDEVICENAME } "szDevice" } ;
+STRUCT: MONITORINFOEX
+    { cbSize DWORD }
+    { rcMonitor RECT }
+    { rcWork RECT }
+    { dwFlags DWORD }
+    { szDevice { "TCHAR" $ CCHDEVICENAME } } ;
 
 TYPEDEF: MONITORINFOEX* LPMONITORINFOEX
 TYPEDEF: MONITORINFOEX* LPMONITORINFO
@@ -582,6 +585,28 @@ CONSTANT: SWP_NOREPOSITION SWP_NOOWNERZORDER
 CONSTANT: SWP_DEFERERASE 8192
 CONSTANT: SWP_ASYNCWINDOWPOS 16384
 
+CONSTANT: MF_ENABLED         HEX: 0000
+CONSTANT: MF_GRAYED          HEX: 0001
+CONSTANT: MF_DISABLED        HEX: 0002
+CONSTANT: MF_STRING          HEX: 0000
+CONSTANT: MF_BITMAP          HEX: 0004
+CONSTANT: MF_UNCHECKED       HEX: 0000
+CONSTANT: MF_CHECKED         HEX: 0008
+CONSTANT: MF_POPUP           HEX: 0010
+CONSTANT: MF_MENUBARBREAK    HEX: 0020
+CONSTANT: MF_MENUBREAK       HEX: 0040
+CONSTANT: MF_UNHILITE        HEX: 0000
+CONSTANT: MF_HILITE          HEX: 0080
+CONSTANT: MF_OWNERDRAW       HEX: 0100
+CONSTANT: MF_USECHECKBITMAPS HEX: 0200
+CONSTANT: MF_BYCOMMAND       HEX: 0000
+CONSTANT: MF_BYPOSITION      HEX: 0400
+CONSTANT: MF_SEPARATOR       HEX: 0800
+CONSTANT: MF_DEFAULT         HEX: 1000
+CONSTANT: MF_SYSMENU         HEX: 2000
+CONSTANT: MF_HELP            HEX: 4000
+CONSTANT: MF_RIGHTJUSTIFY    HEX: 4000
+CONSTANT: MF_MOUSESELECT     HEX: 8000
 
 LIBRARY: user32
 
@@ -807,7 +832,7 @@ FUNCTION: BOOL DrawIcon ( HDC hDC, int X, int Y, HICON hIcon ) ;
 ! FUNCTION: DrawTextW
 ! FUNCTION: EditWndProc
 FUNCTION: BOOL EmptyClipboard ( ) ;
-! FUNCTION: EnableMenuItem
+FUNCTION: BOOL EnableMenuItem ( HMENU hMenu, UINT uIDEnableItem, UINT uEnable ) ;
 ! FUNCTION: EnableScrollBar
 ! FUNCTION: EnableWindow
 ! FUNCTION: EndDeferWindowPos
@@ -975,7 +1000,7 @@ FUNCTION: int GetPriorityClipboardFormat ( UINT* paFormatPriorityList, int cForm
 ! FUNCTION: GetSubMenu
 ! FUNCTION: GetSysColor
 FUNCTION: HBRUSH GetSysColorBrush ( int nIndex ) ;
-! FUNCTION: GetSystemMenu
+FUNCTION: HMENU GetSystemMenu ( HWND hWnd, BOOL bRevert ) ;
 ! FUNCTION: GetSystemMetrics
 ! FUNCTION: GetTabbedTextExtentA
 ! FUNCTION: GetTabbedTextExtentW

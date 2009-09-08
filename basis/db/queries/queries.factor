@@ -75,7 +75,7 @@ M: db-connection <update-tuple-statement> ( class -- statement )
 M: random-id-generator eval-generator ( singleton -- obj )
     drop
     system-random-generator get [
-        63 [ random-bits ] keep 1- set-bit
+        63 [ random-bits ] keep 1 - set-bit
     ] with-random ;
 
 : interval-comparison ( ? str -- str )

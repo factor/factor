@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sets namespaces make sequences parser
 lexer combinators words classes.parser classes.tuple arrays
-slots math assocs parser.notes ;
+slots math assocs parser.notes classes.algebra ;
 IN: classes.tuple.parser
 
 : slot-names ( slots -- seq )
@@ -33,7 +33,7 @@ ERROR: invalid-slot-name name ;
 : parse-long-slot-name ( -- spec )
     [ scan , \ } parse-until % ] { } make ;
 
-: parse-slot-name ( string/f -- ? )
+: parse-slot-name-delim ( end-delim string/f -- ? )
     #! This isn't meant to enforce any kind of policy, just
     #! to check for mistakes of this form:
     #!
@@ -43,18 +43,31 @@ ERROR: invalid-slot-name name ;
     {
         { [ dup not ] [ unexpected-eof ] }
         { [ dup { ":" "(" "<" "\"" "!" } member? ] [ invalid-slot-name ] }
-        { [ dup ";" = ] [ drop f ] }
+        { [ 2dup = ] [ drop f ] }
         [ dup "{" = [ drop parse-long-slot-name ] when , t ]
-    } cond ;
+    } cond nip ;
+
+: parse-tuple-slots-delim ( end-delim -- )
+    dup scan parse-slot-name-delim [ parse-tuple-slots-delim ] [ drop ] if ;
+
+: parse-slot-name ( string/f -- ? )
+    ";" swap parse-slot-name-delim ;
 
 : parse-tuple-slots ( -- )
-    scan parse-slot-name [ parse-tuple-slots ] when ;
+    ";" parse-tuple-slots-delim ;
+
+ERROR: bad-inheritance class superclass ;
+
+: check-inheritance ( class1 class2 -- class1 class2 )
+    2dup swap class<= [ bad-inheritance ] when ;
 
 : parse-tuple-definition ( -- class superclass slots )
     CREATE-CLASS
-    scan {
+    scan 2dup = [ ] when {
         { ";" [ tuple f ] }
-        { "<" [ scan-word [ parse-tuple-slots ] { } make ] }
+        { "<" [
+            scan-word check-inheritance [ parse-tuple-slots ] { } make
+        ] }
         [ tuple swap [ parse-slot-name [ parse-tuple-slots ] when ] { } make ]
     } case
     dup check-duplicate-slots
@@ -81,22 +94,24 @@ ERROR: bad-literal-tuple ;
 : parse-slot-values ( -- values )
     [ (parse-slot-values) ] { } make ;
 
-: boa>tuple ( class slots -- tuple )
+GENERIC# boa>object 1 ( class slots -- tuple )
+
+M: tuple-class boa>object
     swap prefix >tuple ;
 
-: assoc>tuple ( class slots -- tuple )
-    [ [ ] [ initial-values ] [ all-slots ] tri ] dip
-    swap [ [ slot-named offset>> 2 - ] curry dip ] curry assoc-map
-    [ dup <enum> ] dip update boa>tuple ;
+: assoc>object ( class slots values -- tuple )
+    [ [ [ initial>> ] map ] keep ] dip
+    swap [ [ slot-named* drop ] curry dip ] curry assoc-map
+    [ dup <enum> ] dip update boa>object ;
 
-: parse-tuple-literal-slots ( class -- tuple )
+: parse-tuple-literal-slots ( class slots -- tuple )
     scan {
         { f [ unexpected-eof ] }
-        { "f" [ \ } parse-until boa>tuple ] }
-        { "{" [ parse-slot-values assoc>tuple ] }
-        { "}" [ new ] }
+        { "f" [ drop \ } parse-until boa>object ] }
+        { "{" [ parse-slot-values assoc>object ] }
+        { "}" [ drop new ] }
         [ bad-literal-tuple ]
     } case ;
 
 : parse-tuple-literal ( -- tuple )
-    scan-word parse-tuple-literal-slots ;
+    scan-word dup all-slots parse-tuple-literal-slots ;

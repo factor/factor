@@ -14,6 +14,10 @@ HELP: open-window
 { $values { "gadget" gadget } { "title/attributes" { "a " { $link string } " or a " { $link world-attributes } " tuple" } } }
 { $description "Opens a native window containing " { $snippet "gadget" } " with the specified attributes. If a string is provided, it is used as the window title; otherwise, the window attributes are specified in a " { $link world-attributes } " tuple." } ;
 
+HELP: close-window
+{ $values { "gadget" gadget } }
+{ $description "Close the native window containing " { $snippet "gadget" } "." } ;
+
 HELP: world-attributes
 { $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } }
 { $class-description "Tuples of this class can be passed to " { $link open-window } " to control attributes of the window opened. The following attributes can be set:" }
@@ -23,6 +27,7 @@ HELP: world-attributes
     { { $snippet "status" } ", if specified, is a gadget that will be used as the window's status bar." }
     { { $snippet "gadgets" } " is a sequence of gadgets that will be placed inside the window." }
     { { $snippet "pixel-format-attributes" } " is a sequence of " { $link "ui.pixel-formats-attributes" } " that the window will request for its OpenGL pixel format." }
+    { { $snippet "window-controls" } " is a sequence of " { $link "ui.gadgets.worlds-window-controls" } " that will be placed in the window." }
 } ;
 
 HELP: set-fullscreen
@@ -75,6 +80,10 @@ HELP: with-ui
 
 HELP: beep
 { $description "Plays the system beep sound." } ;
+
+HELP: topmost-window
+{ $values { "world" world } }
+{ $description "Returns the " { $link world } " representing the currently focused window." } ;
 
 ARTICLE: "ui-glossary" "UI glossary"
 { $table
@@ -262,3 +271,31 @@ ARTICLE: "ui" "UI framework"
 { $subsection "ui-backend" } ;
 
 ABOUT: "ui"
+
+HELP: close-button
+{ $description "Asks for a close button to be available for a window. Without a close button, a window cannot be closed by the user and must be closed by the program using " { $link close-window } "." } ;
+
+HELP: minimize-button
+{ $description "Asks for a minimize button to be available for a window." } ;
+
+HELP: maximize-button
+{ $description "Asks for a maximize button to be available for a window." } ;
+
+HELP: resize-handles
+{ $description "Asks for resize controls to be available for a window. Without resize controls, the window size will not be changeable by the user." } ;
+
+HELP: small-title-bar
+{ $description "Asks for a window to have a small title bar. Without a title bar, the " { $link close-button } ", " { $link minimize-button } ", and " { $link maximize-button } " controls will not be available. A small title bar may have other side effects in the window system, such as causing the window to not show up in the system task switcher and to float over other Factor windows." } ;
+
+HELP: normal-title-bar
+{ $description "Asks for a window to have a title bar. Without a title bar, the " { $link close-button } ", " { $link minimize-button } ", and " { $link maximize-button } " controls will not be available." } ;
+
+ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
+"The following window controls can be placed in a " { $link world } " window:"
+{ $subsection close-button }
+{ $subsection minimize-button }
+{ $subsection maximize-button }
+{ $subsection resize-handles }
+{ $subsection small-title-bar }
+{ $subsection normal-title-bar }
+"Provide a sequence of these values in the " { $snippet "window-controls" } " slot of the " { $link world-attributes } " tuple you pass to " { $link open-window } "." ;

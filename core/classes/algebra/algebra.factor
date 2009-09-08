@@ -106,7 +106,7 @@ PREDICATE: empty-union < anonymous-union members>> empty? ;
 
 PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
-: (class<=) ( first second -- -1/0/1 )
+: (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [
         2dup superclass<= [ 2drop t ] [
             [ normalize-class ] bi@ {
@@ -202,12 +202,14 @@ M: anonymous-complement (classes-intersect?)
 : class= ( first second -- ? )
     [ class<= ] [ swap class<= ] 2bi and ;
 
+ERROR: topological-sort-failed ;
+
 : largest-class ( seq -- n elt )
     dup [ [ class< ] with any? not ] curry find-last
-    [ "Topological sort failed" throw ] unless* ;
+    [ topological-sort-failed ] unless* ;
 
 : sort-classes ( seq -- newseq )
-    [ [ name>> ] compare ] sort >vector
+    [ name>> ] sort-with >vector
     [ dup empty? not ]
     [ dup largest-class [ over delete-nth ] dip ]
     produce nip ;

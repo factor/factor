@@ -9,9 +9,9 @@ windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
 windows.messages windows.types windows.offscreen windows.nt
 threads libc combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render math.bitwise locals
-accessors math.rectangles math.order calendar ascii
+accessors math.rectangles math.order calendar ascii sets
 io.encodings.utf16n windows.errors literals ui.pixel-formats 
-ui.pixel-formats.private memoize classes struct-arrays ;
+ui.pixel-formats.private memoize classes struct-arrays classes.struct ;
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
@@ -89,26 +89,27 @@ CONSTANT: pfd-flag-map H{
     [ value>> ] [ 0 ] if* ;
 
 : >pfd ( attributes -- pfd )
-    "PIXELFORMATDESCRIPTOR" <c-object>
-    "PIXELFORMATDESCRIPTOR" heap-size over set-PIXELFORMATDESCRIPTOR-nSize
-    1 over set-PIXELFORMATDESCRIPTOR-nVersion
-    over >pfd-flags over set-PIXELFORMATDESCRIPTOR-dwFlags
-    PFD_TYPE_RGBA over set-PIXELFORMATDESCRIPTOR-iPixelType
-    over color-bits attr-value over set-PIXELFORMATDESCRIPTOR-cColorBits
-    over red-bits attr-value over set-PIXELFORMATDESCRIPTOR-cRedBits
-    over green-bits attr-value over set-PIXELFORMATDESCRIPTOR-cGreenBits
-    over blue-bits attr-value over set-PIXELFORMATDESCRIPTOR-cBlueBits
-    over alpha-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAlphaBits
-    over accum-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumBits
-    over accum-red-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumRedBits
-    over accum-green-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumGreenBits
-    over accum-blue-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumBlueBits
-    over accum-alpha-bits attr-value over set-PIXELFORMATDESCRIPTOR-cAccumAlphaBits
-    over depth-bits attr-value over set-PIXELFORMATDESCRIPTOR-cDepthBits
-    over stencil-bits attr-value over set-PIXELFORMATDESCRIPTOR-cStencilBits
-    over aux-buffers attr-value over set-PIXELFORMATDESCRIPTOR-cAuxBuffers
-    PFD_MAIN_PLANE over set-PIXELFORMATDESCRIPTOR-dwLayerMask
-    nip ;
+    [ PIXELFORMATDESCRIPTOR <struct> ] dip
+    {
+        [ drop PIXELFORMATDESCRIPTOR heap-size >>nSize ]
+        [ drop 1 >>nVersion ]
+        [ >pfd-flags >>dwFlags ]
+        [ drop PFD_TYPE_RGBA >>iPixelType ]
+        [ color-bits attr-value >>cColorBits ]
+        [ red-bits attr-value >>cRedBits ]
+        [ green-bits attr-value >>cGreenBits ]
+        [ blue-bits attr-value >>cBlueBits ]
+        [ alpha-bits attr-value >>cAlphaBits ]
+        [ accum-bits attr-value >>cAccumBits ]
+        [ accum-red-bits attr-value >>cAccumRedBits ]
+        [ accum-green-bits attr-value >>cAccumGreenBits ]
+        [ accum-blue-bits attr-value >>cAccumBlueBits ]
+        [ accum-alpha-bits attr-value >>cAccumAlphaBits ]
+        [ depth-bits attr-value >>cDepthBits ]
+        [ stencil-bits attr-value >>cStencilBits ]
+        [ aux-buffers attr-value >>cAuxBuffers ]
+        [ drop PFD_MAIN_PLANE >>dwLayerMask ]
+    } cleave ;
 
 : pfd-make-pixel-format ( world attributes -- pf )
     [ handle>> hDC>> ] [ >pfd ] bi*
@@ -116,12 +117,12 @@ CONSTANT: pfd-flag-map H{
 
 : get-pfd ( pixel-format -- pfd )
     [ world>> handle>> hDC>> ] [ handle>> ] bi
-    "PIXELFORMATDESCRIPTOR" heap-size
-    "PIXELFORMATDESCRIPTOR" <c-object>
+    PIXELFORMATDESCRIPTOR heap-size
+    PIXELFORMATDESCRIPTOR <struct>
     [ DescribePixelFormat win32-error=0/f ] keep ;
 
 : pfd-flag? ( pfd flag -- ? )
-    [ PIXELFORMATDESCRIPTOR-dwFlags ] dip bitand c-bool> ;
+    [ dwFlags>> ] dip bitand c-bool> ;
 
 : (pfd-pixel-format-attribute) ( pfd attribute -- value )
     {
@@ -131,19 +132,19 @@ CONSTANT: pfd-flag-map H{
         { fullscreen [ PFD_DRAW_TO_WINDOW pfd-flag? ] }
         { windowed [ PFD_DRAW_TO_WINDOW pfd-flag? ] }
         { software-rendered [ PFD_GENERIC_FORMAT pfd-flag? ] }
-        { color-bits [ PIXELFORMATDESCRIPTOR-cColorBits ] }
-        { red-bits [ PIXELFORMATDESCRIPTOR-cRedBits ] }
-        { green-bits [ PIXELFORMATDESCRIPTOR-cGreenBits ] }
-        { blue-bits [ PIXELFORMATDESCRIPTOR-cBlueBits ] }
-        { alpha-bits [ PIXELFORMATDESCRIPTOR-cAlphaBits ] }
-        { accum-bits [ PIXELFORMATDESCRIPTOR-cAccumBits ] }
-        { accum-red-bits [ PIXELFORMATDESCRIPTOR-cAccumRedBits ] }
-        { accum-green-bits [ PIXELFORMATDESCRIPTOR-cAccumGreenBits ] }
-        { accum-blue-bits [ PIXELFORMATDESCRIPTOR-cAccumBlueBits ] }
-        { accum-alpha-bits [ PIXELFORMATDESCRIPTOR-cAccumAlphaBits ] }
-        { depth-bits [ PIXELFORMATDESCRIPTOR-cDepthBits ] }
-        { stencil-bits [ PIXELFORMATDESCRIPTOR-cStencilBits ] }
-        { aux-buffers [ PIXELFORMATDESCRIPTOR-cAuxBuffers ] }
+        { color-bits [ cColorBits>> ] }
+        { red-bits [ cRedBits>> ] }
+        { green-bits [ cGreenBits>> ] }
+        { blue-bits [ cBlueBits>> ] }
+        { alpha-bits [ cAlphaBits>> ] }
+        { accum-bits [ cAccumBits>> ] }
+        { accum-red-bits [ cAccumRedBits>> ] }
+        { accum-green-bits [ cAccumGreenBits>> ] }
+        { accum-blue-bits [ cAccumBlueBits>> ] }
+        { accum-alpha-bits [ cAccumAlphaBits>> ] }
+        { depth-bits [ cDepthBits>> ] }
+        { stencil-bits [ cStencilBits>> ] }
+        { aux-buffers [ cAuxBuffers>> ] }
         [ 2drop f ]
     } case ;
 
@@ -202,7 +203,7 @@ PRIVATE>
     lf>crlf [
         utf16n string>alien
         EmptyClipboard win32-error=0/f
-        GMEM_MOVEABLE over length 1+ GlobalAlloc
+        GMEM_MOVEABLE over length 1 + GlobalAlloc
             dup win32-error=0/f
     
         dup GlobalLock dup win32-error=0/f
@@ -223,16 +224,50 @@ M: pasteboard set-clipboard-contents drop copy ;
 
 SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
-: style ( -- n ) WS_OVERLAPPEDWINDOW ; inline
-: ex-style ( -- n ) WS_EX_APPWINDOW WS_EX_WINDOWEDGE bitor ; inline
+CONSTANT: window-control>style
+    H{
+        { close-button 0 }
+        { minimize-button $ WS_MINIMIZEBOX }
+        { maximize-button $ WS_MAXIMIZEBOX }
+        { resize-handles $ WS_THICKFRAME }
+        { small-title-bar $ WS_CAPTION }
+        { normal-title-bar $ WS_CAPTION }
+    }
+
+CONSTANT: window-control>ex-style
+    H{
+        { close-button 0 }
+        { minimize-button 0 }
+        { maximize-button 0 }
+        { resize-handles $ WS_EX_WINDOWEDGE }
+        { small-title-bar $ WS_EX_TOOLWINDOW }
+        { normal-title-bar $ WS_EX_APPWINDOW }
+    }
+
+: needs-sysmenu? ( controls -- ? )
+    { close-button minimize-button maximize-button } intersects? ;
+
+: has-titlebar? ( controls -- ? )
+    { small-title-bar normal-title-bar } intersects? ;
+
+: world>style ( world -- n )
+    window-controls>>
+    [ window-control>style symbols>flags ]
+    [ needs-sysmenu? [ WS_SYSMENU bitor ] when ]
+    [ has-titlebar? [ WS_POPUP bitor ] unless ] tri ;
+
+: world>ex-style ( world -- n )
+    window-controls>> window-control>ex-style symbols>flags ;
 
 : get-RECT-top-left ( RECT -- x y )
-    [ RECT-left ] keep RECT-top ;
+    [ left>> ] [ top>> ] bi ;
+
+: get-RECT-width/height ( RECT -- width height )
+    [ [ right>> ] [ left>> ] bi - ]
+    [ [ bottom>> ] [ top>> ] bi - ] bi ;
 
 : get-RECT-dimensions ( RECT -- x y width height )
-    [ get-RECT-top-left ] keep
-    [ RECT-right ] keep [ RECT-left - ] keep
-    [ RECT-bottom ] keep RECT-top - ;
+    [ get-RECT-top-left ] [ get-RECT-width/height ] bi ;
 
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
@@ -242,12 +277,12 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    dup { 0 0 } = [ 2drop ] [ swap window (>>dim) ] if ;
+    dup { 0 0 } = [ 2drop ] [ swap window [ (>>dim) ] [ drop ] if* ] if ;
 
 : handle-wm-move ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    swap window (>>window-loc) ;
+    swap window [ (>>window-loc) ] [ drop ] if* ;
 
 CONSTANT: wm-keydown-codes
     H{
@@ -470,14 +505,15 @@ SYMBOL: nc-buttons
     ] if ;
 
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
-    "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
-    "TRACKMOUSEEVENT" heap-size over set-TRACKMOUSEEVENT-cbSize ;
+    TRACKMOUSEEVENT <struct>
+        swap >>hwndTrack
+        TRACKMOUSEEVENT heap-size >>cbSize ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
     2nip
     over make-TRACKMOUSEEVENT
-    TME_LEAVE over set-TRACKMOUSEEVENT-dwFlags
-    0 over set-TRACKMOUSEEVENT-dwHoverTime
+        TME_LEAVE >>dwFlags
+        0 >>dwHoverTime
     TrackMouseEvent drop
     >lo-hi swap window move-hand fire-motion ;
 
@@ -555,40 +591,41 @@ M: windows-ui-backend do-events
     ] if ;
 
 :: register-window-class ( class-name-ptr -- )
-    "WNDCLASSEX" <c-object> f GetModuleHandle
+    WNDCLASSEX <struct> f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
-        "WNDCLASSEX" heap-size over set-WNDCLASSEX-cbSize
-        { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags over set-WNDCLASSEX-style
-        ui-wndproc over set-WNDCLASSEX-lpfnWndProc
-        0 over set-WNDCLASSEX-cbClsExtra
-        0 over set-WNDCLASSEX-cbWndExtra
-        f GetModuleHandle over set-WNDCLASSEX-hInstance
-        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon
-        over set-WNDCLASSEX-hIcon
-        f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
+        WNDCLASSEX heap-size >>cbSize
+        { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags >>style
+        ui-wndproc >>lpfnWndProc
+        0 >>cbClsExtra
+        0 >>cbWndExtra
+        f GetModuleHandle >>hInstance
+        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon >>hIcon
+        f IDC_ARROW LoadCursor >>hCursor
 
-        class-name-ptr over set-WNDCLASSEX-lpszClassName
+        class-name-ptr >>lpszClassName
         RegisterClassEx win32-error=0/f
     ] [ drop ] if ;
 
-: adjust-RECT ( RECT -- )
-    style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
+: adjust-RECT ( RECT style ex-style -- )
+    [ 0 ] dip AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( world -- RECT )
     [ window-loc>> ] [ dim>> ] bi <RECT> ;
 
-: default-position-RECT ( RECT -- )
-    dup get-RECT-dimensions [ 2drop ] 2dip
-    CW_USEDEFAULT + pick set-RECT-bottom
-    CW_USEDEFAULT + over set-RECT-right
-    CW_USEDEFAULT over set-RECT-left
-    CW_USEDEFAULT swap set-RECT-top ;
+: default-position-RECT ( RECT -- RECT' )
+    dup get-RECT-width/height
+        [ CW_USEDEFAULT + >>right ] dip
+        CW_USEDEFAULT + >>bottom
+        CW_USEDEFAULT >>left
+        CW_USEDEFAULT >>top ;
 
-: make-adjusted-RECT ( rect -- RECT )
-    make-RECT
-    dup get-RECT-top-left [ zero? ] both? swap
-    dup adjust-RECT
-    swap [ dup default-position-RECT ] when ;
+: make-adjusted-RECT ( rect style ex-style -- RECT )
+    [
+        make-RECT
+        dup get-RECT-top-left [ zero? ] both? swap
+        dup
+    ] 2dip adjust-RECT
+    swap [ default-position-RECT ] when ;
 
 : get-window-class ( -- class-name )
     class-name-ptr [
@@ -597,12 +634,12 @@ M: windows-ui-backend do-events
         dup
     ] change-global ;
 
-: create-window ( rect -- hwnd )
-    make-adjusted-RECT
+:: create-window ( rect style ex-style -- hwnd )
+    rect style ex-style make-adjusted-RECT
     [ get-window-class f ] dip
     [
         [ ex-style ] 2dip
-        { WS_CLIPSIBLINGS WS_CLIPCHILDREN style } flags
+        WS_CLIPSIBLINGS WS_CLIPCHILDREN bitor style bitor
     ] dip get-RECT-dimensions
     f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;
 
@@ -629,15 +666,28 @@ M: windows-ui-backend do-events
 
 : set-pixel-format ( pixel-format hdc -- )
     swap handle>>
-    "PIXELFORMATDESCRIPTOR" <c-object> SetPixelFormat win32-error=0/f ;
+    PIXELFORMATDESCRIPTOR <struct> SetPixelFormat win32-error=0/f ;
 
 : setup-gl ( world -- )
     [ get-dc ] keep
     [ swap [ handle>> hDC>> set-pixel-format ] [ get-rc ] bi ]
     with-world-pixel-format ;
 
+: disable-close-button ( hwnd -- )
+    0 GetSystemMenu
+    SC_CLOSE MF_BYCOMMAND MF_GRAYED bitor EnableMenuItem drop ;
+
+: ?disable-close-button ( world hwnd -- )
+    swap window-controls>> close-button swap member? not
+    [ disable-close-button ] [ drop ] if ;
+
 M: windows-ui-backend (open-window) ( world -- )
-    [ dup create-window [ f f ] dip f f <win> >>handle setup-gl ]
+    [
+        dup
+        [ ] [ world>style ] [ world>ex-style ] tri create-window
+        [ ?disable-close-button ]
+        [ [ f f ] dip f f <win> >>handle setup-gl ] 2bi
+    ]
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
 
@@ -701,17 +751,18 @@ M: windows-ui-backend beep ( -- )
 
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow
-    "MONITORINFOEX" <c-object> dup length over set-MONITORINFOEX-cbSize
-    [ GetMonitorInfo win32-error=0/f ] keep MONITORINFOEX-rcMonitor ;
+    MONITORINFOEX <struct>
+        MONITORINFOEX heap-size >>cbSize
+    [ GetMonitorInfo win32-error=0/f ] keep rcMonitor>> ;
 
 : client-area>RECT ( hwnd -- RECT )
-    "RECT" <c-object>
+    RECT <struct>
     [ GetClientRect win32-error=0/f ]
-    [ "POINT" byte-array>struct-array [ ClientToScreen drop ] with each ]
+    [ >c-ptr "POINT" byte-array>struct-array [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )
-    "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep ;
+    RECT <struct> [ GetWindowRect win32-error=0/f ] keep ;
 
 M: windows-ui-backend (grab-input) ( handle -- )
     0 ShowCursor drop
@@ -743,13 +794,9 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
     } cleave ;
 
 : exit-fullscreen ( world -- )
-    handle>> hWnd>>
+    dup handle>> hWnd>>
     {
-        [
-            GWL_STYLE GetWindowLong
-            fullscreen-flags bitor
-        ]
-        [ GWL_STYLE rot SetWindowLong win32-error=0/f ]
+        [ GWL_STYLE rot world>style SetWindowLong win32-error=0/f ]
         [
             f
             over hwnd>RECT get-RECT-dimensions

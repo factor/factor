@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: furnace.auth.providers.assoc
 USING: accessors assocs kernel furnace.auth.providers ;
+IN: furnace.auth.providers.assoc
 
 TUPLE: users-in-memory assoc ;
 

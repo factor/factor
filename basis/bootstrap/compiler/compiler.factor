@@ -6,10 +6,13 @@ classes.private arrays hashtables vectors classes.tuple sbufs
 hashtables.private sequences.private math classes.tuple.private
 growable namespaces.private assocs words command-line vocabs io
 io.encodings.string libc splitting math.parser memory compiler.units
-math.order compiler.tree.builder compiler.tree.optimizer
-compiler.cfg.optimizer ;
-FROM: compiler => enable-optimizer compile-word ;
+math.order quotations quotations.private assocs.private ;
+FROM: compiler => enable-optimizer ;
 IN: bootstrap.compiler
+
+"profile-compiler" get [
+    "bootstrap.compiler.timing" require
+] when
 
 ! Don't bring this in when deploying, since it will store a
 ! reference to 'eval' in a global variable
@@ -32,90 +35,87 @@ gc
 : compile-unoptimized ( words -- )
     [ optimized? not ] filter compile ;
 
-nl
-"Compiling..." write flush
+"debug-compiler" get [
+    
+    nl
+    "Compiling..." write flush
 
-! Compile a set of words ahead of the full compile.
-! This set of words was determined semi-empirically
-! using the profiler. It improves bootstrap time
-! significantly, because frequenly called words
-! which are also quick to compile are replaced by
-! compiled definitions as soon as possible.
-{
-    not
+    ! Compile a set of words ahead of the full compile.
+    ! This set of words was determined semi-empirically
+    ! using the profiler. It improves bootstrap time
+    ! significantly, because frequenly called words
+    ! which are also quick to compile are replaced by
+    ! compiled definitions as soon as possible.
+    {
+        not ?
 
-    array? hashtable? vector?
-    tuple? sbuf? tombstone?
+        2over roll -roll
 
-    array-nth set-array-nth
+        array? hashtable? vector?
+        tuple? sbuf? tombstone?
+        curry? compose? callable?
+        quotation?
 
-    wrap probe
+        curry compose uncurry
 
-    namestack*
-} compile-unoptimized
+        array-nth set-array-nth length>>
 
-"." write flush
+        wrap probe
 
-{
-    bitand bitor bitxor bitnot
-} compile-unoptimized
+        namestack*
 
-"." write flush
+        layout-of
+    } compile-unoptimized
 
-{
-    + 1+ 1- 2/ < <= > >= shift
-} compile-unoptimized
+    "." write flush
 
-"." write flush
+    {
+        bitand bitor bitxor bitnot
+    } compile-unoptimized
 
-{
-    new-sequence nth push pop last flip
-} compile-unoptimized
+    "." write flush
 
-"." write flush
+    {
+        + 2/ < <= > >= shift
+    } compile-unoptimized
 
-{
-    hashcode* = get set
-} compile-unoptimized
+    "." write flush
 
-"." write flush
+    {
+        new-sequence nth push pop last flip
+    } compile-unoptimized
 
-{
-    memq? split harvest sift cut cut-slice start index clone
-    set-at reverse push-all class number>string string>number
-} compile-unoptimized
+    "." write flush
 
-"." write flush
+    {
+        hashcode* = equal? assoc-stack (assoc-stack) get set
+    } compile-unoptimized
 
-{
-    lines prefix suffix unclip new-assoc update
-    word-prop set-word-prop 1array 2array 3array ?nth
-} compile-unoptimized
+    "." write flush
 
-"." write flush
+    {
+        memq? split harvest sift cut cut-slice start index clone
+        set-at reverse push-all class number>string string>number
+        like clone-like
+    } compile-unoptimized
 
-{
-    malloc calloc free memcpy
-} compile-unoptimized
+    "." write flush
 
-"." write flush
+    {
+        lines prefix suffix unclip new-assoc update
+        word-prop set-word-prop 1array 2array 3array ?nth
+    } compile-unoptimized
 
-{ build-tree } compile-unoptimized
+    "." write flush
 
-"." write flush
+    {
+        malloc calloc free memcpy
+    } compile-unoptimized
 
-{ optimize-tree } compile-unoptimized
+    "." write flush
 
-"." write flush
+    vocabs [ words compile-unoptimized "." write flush ] each
 
-{ optimize-cfg } compile-unoptimized
+    " done" print flush
 
-"." write flush
-
-{ compile-word } compile-unoptimized
-
-"." write flush
-
-vocabs [ words compile-unoptimized "." write flush ] each
-
-" done" print flush
+] unless

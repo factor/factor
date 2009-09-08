@@ -120,14 +120,13 @@ TUPLE: bunny-outlined
     framebuffer framebuffer-dim ;
 
 : outlining-supported? ( -- ? )
-    "2.0" {
+    "3.0" {
         "GL_ARB_shader_objects"
         "GL_ARB_draw_buffers"
         "GL_ARB_multitexture"
-    } has-gl-version-or-extensions? {
         "GL_EXT_framebuffer_object"
         "GL_ARB_texture_float"
-    } has-gl-extensions? and ;
+    } has-gl-version-or-extensions? ;
 
 : pass1-program ( -- program )
     vertex-shader-source <vertex-shader> check-gl-shader
@@ -154,14 +153,14 @@ TUPLE: bunny-outlined
     GL_TEXTURE_2D 0 iformat dim first2 0 xformat GL_UNSIGNED_BYTE f glTexImage2D ;
 
 :: (attach-framebuffer-texture) ( texture attachment -- )
-    GL_FRAMEBUFFER_EXT attachment GL_TEXTURE_2D texture 0 glFramebufferTexture2DEXT
+    GL_DRAW_FRAMEBUFFER attachment GL_TEXTURE_2D texture 0 glFramebufferTexture2D
     gl-error ;
 
 : (make-framebuffer) ( color-texture normal-texture depth-texture -- framebuffer )
     3array gen-framebuffer dup [
-        swap GL_COLOR_ATTACHMENT0_EXT
-             GL_COLOR_ATTACHMENT1_EXT
-             GL_DEPTH_ATTACHMENT_EXT 3array [ (attach-framebuffer-texture) ] 2each
+        swap GL_COLOR_ATTACHMENT0
+             GL_COLOR_ATTACHMENT1
+             GL_DEPTH_ATTACHMENT 3array [ (attach-framebuffer-texture) ] 2each
         check-framebuffer
     ] with-framebuffer ;
 
@@ -182,8 +181,8 @@ MACRO: (framebuffer-texture>>draw) ( iformat xformat setter -- )
 : (make-framebuffer-textures) ( draw dim -- draw color normal depth )
     {
         [ drop ]
-        [ GL_RGBA16F_ARB GL_RGBA [ >>color-texture  ] (framebuffer-texture>>draw) ]
-        [ GL_RGBA16F_ARB GL_RGBA [ >>normal-texture ] (framebuffer-texture>>draw) ]
+        [ GL_RGBA16F GL_RGBA [ >>color-texture  ] (framebuffer-texture>>draw) ]
+        [ GL_RGBA16F GL_RGBA [ >>normal-texture ] (framebuffer-texture>>draw) ]
         [
             GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT
             [ >>depth-texture ] (framebuffer-texture>>draw)
@@ -202,17 +201,17 @@ MACRO: (framebuffer-texture>>draw) ( iformat xformat setter -- )
     [ drop ] [ remake-framebuffer ] if ;
 
 : clear-framebuffer ( -- )
-    GL_COLOR_ATTACHMENT0_EXT glDrawBuffer
+    GL_COLOR_ATTACHMENT0 glDrawBuffer
     0.15 0.15 0.15 1.0 glClearColor
     GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
-    GL_COLOR_ATTACHMENT1_EXT glDrawBuffer
+    GL_COLOR_ATTACHMENT1 glDrawBuffer
     0.0 0.0 0.0 0.0 glClearColor
     GL_COLOR_BUFFER_BIT glClear ;
 
 : (pass1) ( geom draw -- )
     dup framebuffer>> [
         clear-framebuffer
-        { GL_COLOR_ATTACHMENT0_EXT GL_COLOR_ATTACHMENT1_EXT } set-draw-buffers
+        { GL_COLOR_ATTACHMENT0 GL_COLOR_ATTACHMENT1 } set-draw-buffers
         pass1-program>> (draw-cel-shaded-bunny)
     ] with-framebuffer ;
 

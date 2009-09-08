@@ -10,14 +10,14 @@ IN: io.ports
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
 
-TUPLE: port handle timeout disposed ;
+TUPLE: port < disposable handle timeout ;
 
 M: port timeout timeout>> ;
 
 M: port set-timeout (>>timeout) ;
 
 : <port> ( handle class -- port )
-    new swap >>handle ; inline
+    new-disposable swap >>handle ; inline
 
 TUPLE: buffered-port < port { buffer buffer } ;
 

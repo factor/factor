@@ -19,3 +19,7 @@ PRIVATE>
 SYNTAX: $ scan-word expand-literal >vector ;
 SYNTAX: $[ parse-quotation with-datastack >vector ;
 SYNTAX: ${ \ } [ expand-literals ] parse-literal ;
+
+SYNTAX: $$
+    scan-word execute( accum -- accum ) dup pop [ >quotation ] keep
+    [ output>sequence ] 2curry call( -- object ) parsed ;

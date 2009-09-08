@@ -175,8 +175,8 @@ $nl
 { $code
     ":: counter ( -- )"
     "    [let | value! [ 0 ] |"
-    "        [ value 1+ dup value! ]"
-    "        [ value 1- dup value! ] ] ;"
+    "        [ value 1 + dup value! ]"
+    "        [ value 1 - dup value! ] ] ;"
 }
 "Mutable bindings are implemented in a manner similar to the ML language; each mutable binding is actually an immutable binding of a mutable cell (in Factor's case, a 1-element array); reading the binding automatically dereferences the array, and writing to the binding stores into the array."
 $nl

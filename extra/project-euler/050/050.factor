@@ -66,7 +66,7 @@ IN: project-euler.050
     2dup [ first ] bi@ > [ drop ] [ nip ] if ;
 
 : continue? ( pair seq -- ? )
-    [ first ] [ length 1- ] bi* < ;
+    [ first ] [ length 1 - ] bi* < ;
 
 : (find-longest) ( best seq limit -- best )
     [ longest-prime longest ] 2keep 2over continue? [

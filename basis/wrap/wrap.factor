@@ -77,8 +77,10 @@ SYMBOL: line-ideal
     [
         line-ideal set
         line-max set
-        initialize
-        [ wrap-step ] reduce
-        min-cost
-        post-process
+        [ { } ] [
+            initialize
+            [ wrap-step ] reduce
+            min-cost
+            post-process
+        ] if-empty
     ] with-scope ;

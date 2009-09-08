@@ -14,7 +14,7 @@ $nl
 $nl
 "On the other hand, using " { $link make } " instead of a single call to " { $link surround } " is overkill. The below headings summarize the most important cases where other idioms are more appropriate than " { $link make } "."
 { $heading "Make versus combinators" }
-"Sometimes, usages of " { $link make } " are better expressed with " { $link "sequences-combinators" } ". For example, instead of calling a combinator with a quotation which executes " { $link , } " exactly once on each iteration, oftena combinator encapsulating that specific idiom exists and can be used."
+"Sometimes, usages of " { $link make } " are better expressed with " { $link "sequences-combinators" } ". For example, instead of calling a combinator with a quotation which executes " { $link , } " exactly once on each iteration, often a combinator encapsulating that specific idiom exists and can be used."
 $nl
 "For example,"
 { $code "[ [ 42 * , ] each ] { } make" }
@@ -23,7 +23,7 @@ $nl
 "and"
 { $code "[ [ reverse % ] each ] \"\" make" }
 "is equivalent to"
-{ $code "[ [ reverse ] map concat" }
+{ $code "[ reverse ] map concat" }
 { $heading "Utilities for simple make patterns" }
 "Sometimes, an existing word already implements a specific " { $link make } " usage. For example, " { $link suffix } " is equivalent to the following, with the added caveat that the below example always outputs an array:"
 { $code "[ , % ] { } make" }

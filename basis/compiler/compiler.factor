@@ -12,6 +12,7 @@ compiler.errors compiler.units compiler.utilities
 compiler.tree.builder
 compiler.tree.optimizer
 
+compiler.cfg
 compiler.cfg.builder
 compiler.cfg.optimizer
 compiler.cfg.mr
@@ -119,7 +120,7 @@ M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
     } cond ;
 
 : optimize? ( word -- ? )
-    { [ predicate-engine-word? ] [ single-generic? ] } 1|| not ;
+    single-generic? not ;
 
 : contains-breakpoints? ( -- ? )
     dependencies get keys [ "break?" word-prop ] any? ;
@@ -152,8 +153,7 @@ t compile-dependencies? set-global
 
 : backend ( tree word -- )
     build-cfg [
-        optimize-cfg
-        build-mr
+        [ optimize-cfg build-mr ] with-cfg
         generate
         save-asm
     ] each ;

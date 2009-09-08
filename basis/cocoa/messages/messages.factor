@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings arrays assocs
-continuations combinators compiler compiler.alien stack-checker kernel
-math namespaces make quotations sequences strings words
-cocoa.runtime io macros memoize io.encodings.utf8 effects libc
-libc.private lexer init core-foundation fry generalizations
-specialized-arrays.direct.alien ;
+classes.struct continuations combinators compiler compiler.alien
+stack-checker kernel math namespaces make quotations sequences
+strings words cocoa.runtime io macros memoize io.encodings.utf8
+effects libc libc.private lexer init core-foundation fry
+generalizations specialized-arrays.alien ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -31,11 +31,8 @@ super-message-senders [ H{ } clone ] initialize
     bi ;
 
 : <super> ( receiver -- super )
-    "objc-super" <c-object> [
-        [ dup object_getClass class_getSuperclass ] dip
-        set-objc-super-class
-    ] keep
-    [ set-objc-super-receiver ] keep ;
+    [ ] [ object_getClass class_getSuperclass ] bi
+    objc-super <struct-boa> ;
 
 TUPLE: selector name object ;
 
@@ -158,12 +155,16 @@ objc>alien-types get [ swap ] assoc-map
 } case
 assoc-union alien>objc-types set-global
 
+: internal-cocoa-type? ( c-type -- ? )
+    [ "?" = ] [ first CHAR: _ = ] bi or ;
+
+: warn-c-type ( c-type -- )
+    dup internal-cocoa-type?
+    [ drop ] [ "Warning: no such C type: " write print ] if ;
+
 : objc-struct-type ( i string -- ctype )
     [ CHAR: = ] 2keep index-from swap subseq
-    dup c-types get key? [
-        "Warning: no such C type: " write dup print
-        drop "void*"
-    ] unless ;
+    dup c-types get key? [ warn-c-type "void*" ] unless ;
 
 ERROR: no-objc-type name ;
 
@@ -172,7 +173,7 @@ ERROR: no-objc-type name ;
     [ ] [ no-objc-type ] ?if ;
 
 : (parse-objc-type) ( i string -- ctype )
-    [ [ 1+ ] dip ] [ nth ] 2bi {
+    [ [ 1 + ] dip ] [ nth ] 2bi {
         { [ dup "rnNoORV" member? ] [ drop (parse-objc-type) ] }
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }

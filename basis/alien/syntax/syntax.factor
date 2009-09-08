@@ -22,17 +22,19 @@ SYNTAX: TYPEDEF:
     scan scan typedef ;
 
 SYNTAX: C-STRUCT:
-    scan current-vocab parse-definition define-struct ;
+    scan current-vocab parse-definition define-struct ; deprecated
 
 SYNTAX: C-UNION:
-    scan parse-definition define-union ;
+    scan parse-definition define-union ; deprecated
 
 SYNTAX: C-ENUM:
     ";" parse-tokens
     [ [ create-in ] dip define-constant ] each-index ;
 
+ERROR: no-such-symbol name library ;
+
 : address-of ( name library -- value )
-    load-library dlsym [ "No such symbol" throw ] unless* ;
+    2dup load-library dlsym [ 2nip ] [ no-such-symbol ] if* ;
 
 SYNTAX: &:
     scan "c-library" get '[ _ _ address-of ] over push-all ;

@@ -1,18 +1,18 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax unix.time ;
+USING: alien.syntax unix.time classes.struct ;
 IN: unix
 
-C-STRUCT: sockaddr_storage
-    { "__uint8_t" "ss_len" }
-    { "sa_family_t" "ss_family" }
-    { { "char" _SS_PAD1SIZE } "__ss_pad1" }
-    { "__int64_t" "__ss_align" }
-    { { "char" _SS_PAD2SIZE } "__ss_pad2" } ;
+STRUCT: sockaddr_storage
+    { ss_len __uint8_t }
+    { ss_family sa_family_t }
+    { __ss_pad1 { "char" _SS_PAD1SIZE } }
+    { __ss_align __int64_t }
+    { __ss_pad2 { "char" _SS_PAD2SIZE } } ;
 
-C-STRUCT: exit_struct
-    { "uint16_t" "e_termination" }
-    { "uint16_t" "e_exit" } ;
+STRUCT: exit_struct
+    { e_termination uint16_t }
+    { e_exit uint16_t } ;
 
 C-STRUCT: utmpx
     { { "char" _UTX_USERSIZE } "ut_user" }

@@ -73,3 +73,7 @@ SYMBOL: xml-file
 [ T{ xml-chunk f V{ "hello" } } ] [ "hello" string>xml-chunk ] unit-test
 [ "1.1" ] [ "<?xml version='1.1'?><x/>" string>xml prolog>> version>> ] unit-test
 [ "ß" ] [ "<x>ß</x>" <string-reader> read-xml children>string ] unit-test
+
+! <pull-xml> tests
+! this tests just checks that pull-event doesn't raise an exception
+[ ] [ "vocab:xml/tests/test.xml" binary [ <pull-xml> pull-event drop ] with-file-reader ] unit-test

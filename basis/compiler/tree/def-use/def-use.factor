@@ -21,7 +21,7 @@ TUPLE: definition value node uses ;
 ERROR: no-def-error value ;
 
 : def-of ( value -- definition )
-    dup def-use get at* [ nip ] [ no-def-error ] if ;
+    def-use get ?at [ no-def-error ] unless ;
 
 ERROR: multiple-defs-error ;
 
@@ -43,7 +43,7 @@ GENERIC: node-uses-values ( node -- values )
 M: #introduce node-uses-values drop f ;
 M: #push node-uses-values drop f ;
 M: #phi node-uses-values phi-in-d>> concat remove-bottom prune ;
-M: #declare node-uses-values declaration>> keys ;
+M: #declare node-uses-values drop f ;
 M: #terminate node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
 M: #shuffle node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
 M: #alien-callback node-uses-values drop f ;

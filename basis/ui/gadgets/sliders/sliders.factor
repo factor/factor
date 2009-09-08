@@ -9,10 +9,14 @@ IN: ui.gadgets.sliders
 
 TUPLE: slider < track elevator thumb saved line ;
 
-: slider-value ( gadget -- n ) model>> range-value >fixnum ;
+: slider-value ( gadget -- n ) model>> range-value ;
 : slider-page ( gadget -- n ) model>> range-page-value ;
+: slider-min ( gadget -- n ) model>> range-min-value ;
 : slider-max ( gadget -- n ) model>> range-max-value ;
 : slider-max* ( gadget -- n ) model>> range-max-value* ;
+
+: slider-length ( gadget -- n ) [ slider-max ] [ slider-min ] bi - ;
+: slider-length* ( gadget -- n ) [ slider-max* ] [ slider-min ] bi - ;
 
 : slide-by ( amount slider -- ) model>> move-by ;
 : slide-by-page ( amount slider -- ) model>> move-by-page ;
@@ -22,8 +26,6 @@ TUPLE: slider < track elevator thumb saved line ;
 <PRIVATE
 
 TUPLE: elevator < gadget direction ;
-
-: find-elevator ( gadget -- elevator/f ) [ elevator? ] find-parent ;
 
 : find-slider ( gadget -- slider/f ) [ slider? ] find-parent ;
 
@@ -36,7 +38,9 @@ CONSTANT: elevator-padding 4
 CONSTANT: min-thumb-dim 30
 
 : visible-portion ( slider -- n )
-    [ slider-page ] [ slider-max 1 max ] bi / 1 min ;
+    [ slider-page ]
+    [ slider-length 1 max ]
+    bi / 1 min ;
 
 : thumb-dim ( slider -- h )
     [
@@ -50,7 +54,7 @@ CONSTANT: min-thumb-dim 30
     #! x*n is the screen position of the thumb, and conversely
     #! for x/n. The '1 max' calls avoid division by zero.
     [ [ elevator-length ] [ thumb-dim ] bi - 1 max ]
-    [ slider-max* 1 max ]
+    [ slider-length* 1 max ]
     bi / ;
 
 : slider>screen ( m slider -- n ) slider-scale * ;
@@ -133,7 +137,9 @@ elevator H{
         swap >>orientation ;
 
 : thumb-loc ( slider -- loc )
-    [ slider-value ] keep slider>screen elevator-padding + ;
+    [ slider-value ]
+    [ slider-min - ]
+    [ slider>screen elevator-padding + ] tri ;
 
 : layout-thumb-loc ( thumb slider -- )
     [ thumb-loc ] [ orientation>> ] bi n*v
@@ -238,3 +244,4 @@ PRIVATE>
             [ <down-button> f track-add ]
             [ drop <gadget> { 1 1 } >>dim f track-add ]
         } cleave ;
+

@@ -34,7 +34,7 @@ SYMBOL: column
 : write1-lines ( ch -- )
     write1
     column get [
-        1+ [ 76 = [ crlf ] when ]
+        1 + [ 76 = [ crlf ] when ]
         [ 76 mod column set ] bi
     ] when* ;
 
@@ -48,7 +48,7 @@ SYMBOL: column
 
 : encode-pad ( seq n -- )
     [ 3 0 pad-tail binary [ encode3 ] with-byte-writer ]
-    [ 1+ ] bi* head-slice 4 CHAR: = pad-tail write-lines ; inline
+    [ 1 + ] bi* head-slice 4 CHAR: = pad-tail write-lines ; inline
 
 : decode4 ( seq -- )
     [ 0 [ base64>ch swap 6 shift bitor ] reduce 3 >be ]

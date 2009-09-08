@@ -69,9 +69,10 @@ t specialize-method? set-global
     dup [ array? ] all? [ first ] when length ;
 
 SYNTAX: HINTS:
-    scan-object
+    scan-object dup wrapper? [ wrapped>> ] when
     [ changed-definition ]
-    [ parse-definition { } like "specializer" set-word-prop ] bi ;
+    [ subwords [ changed-definition ] each ]
+    [ parse-definition { } like "specializer" set-word-prop ] tri ;
 
 ! Default specializers
 { first first2 first3 first4 }
@@ -82,6 +83,10 @@ SYNTAX: HINTS:
 ] each
 
 \ push { { vector } { sbuf } } "specializer" set-word-prop
+
+\ last { { vector } } "specializer" set-word-prop
+
+\ set-last { { object vector } } "specializer" set-word-prop
 
 \ push-all
 { { string sbuf } { array vector } { byte-array byte-vector } }

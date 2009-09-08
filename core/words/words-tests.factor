@@ -122,6 +122,6 @@ DEFER: x
 [
     all-words [
         "compiled-uses" word-prop
-        keys [ "forgotten" word-prop ] any?
-    ] filter
+        keys [ "forgotten" word-prop ] filter
+    ] map harvest
 ] unit-test

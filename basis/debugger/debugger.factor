@@ -36,7 +36,7 @@ M: string error. print ;
     error-continuation get name>> assoc-stack ;
 
 : :res ( n -- * )
-    1- restarts get-global nth f restarts set-global restart ;
+    1 - restarts get-global nth f restarts set-global restart ;
 
 : :1 ( -- * ) 1 :res ;
 : :2 ( -- * ) 2 :res ;
@@ -44,7 +44,7 @@ M: string error. print ;
 
 : restart. ( restart n -- )
     [
-        1+ dup 3 <= [ ":" % # "    " % ] [ # " :res  " % ] if
+        1 + dup 3 <= [ ":" % # "    " % ] [ # " :res  " % ] if
         name>> %
     ] "" make print ;
 
@@ -92,7 +92,7 @@ HOOK: signal-error. os ( obj -- )
 
 : array-size-error. ( obj -- )
     "Invalid array size: " write dup third .
-    "Maximum: " write fourth 1- . ;
+    "Maximum: " write fourth 1 - . ;
 
 : c-string-error. ( obj -- )
     "Cannot convert to C string: " write third . ;
@@ -104,8 +104,8 @@ HOOK: signal-error. os ( obj -- )
     "Cannot do next-object outside begin/end-scan" print drop ;
 
 : undefined-symbol-error. ( obj -- )
-    "The image refers to a library or symbol that was not found"
-    " at load time" append print drop ;
+    "The image refers to a library or symbol that was not found at load time"
+    print drop ;
 
 : stack-underflow. ( obj name -- )
     write " stack underflow" print drop ;
@@ -252,12 +252,21 @@ M: no-current-vocab summary
     drop "Not in a vocabulary; IN: form required" ;
 
 M: no-word-error summary
-    name>> "No word named ``" "'' found in current vocabulary search path" surround ;
+    name>>
+    "No word named ``"
+    "'' found in current vocabulary search path" surround ;
 
 M: no-word-error error. summary print ;
 
+M: no-word-in-vocab summary
+    [ vocab>> ] [ word>> ] bi
+    [ "No word named ``" % % "'' found in ``" % % "'' vocabulary" % ] "" make ;
+
+M: no-word-in-vocab error. summary print ;
+
 M: ambiguous-use-error summary
-    words>> first name>> "More than one vocabulary defines a word named ``" "''" surround ;
+    words>> first name>>
+    "More than one vocabulary defines a word named ``" "''" surround ;
 
 M: ambiguous-use-error error. summary print ;
 

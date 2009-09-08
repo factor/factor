@@ -13,7 +13,8 @@ IN: io.servers.connection
 TUPLE: threaded-server
 name
 log-level
-secure insecure
+secure
+insecure
 secure-config
 sockets
 max-connections
@@ -29,14 +30,14 @@ ready ;
 
 : new-threaded-server ( encoding class -- threaded-server )
     new
-        swap >>encoding
         "server" >>name
         DEBUG >>log-level
-        1 minutes >>timeout
-        V{ } clone >>sockets
         <secure-config> >>secure-config
+        V{ } clone >>sockets
+        1 minutes >>timeout
         [ "No handler quotation" throw ] >>handler
-        <flag> >>ready ; inline
+        <flag> >>ready
+        swap >>encoding ;
 
 : <threaded-server> ( encoding -- threaded-server )
     threaded-server new-threaded-server ;

@@ -1,6 +1,6 @@
 USING: definitions io io.launcher kernel math math.parser
 namespaces parser prettyprint sequences editors accessors
-make ;
+make strings ;
 IN: editors.vim
 
 SYMBOL: vim-path
@@ -11,7 +11,7 @@ SINGLETON: vim
 
 M: vim vim-command
     [
-        vim-path get ,
+        vim-path get dup string? [ , ] [ % ] if
         [ , ] [ number>string "+" prepend , ] bi*
     ] { } make ;
 

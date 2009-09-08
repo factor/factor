@@ -1,6 +1,6 @@
 ;;; fuel-log.el -- logging utilities
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -34,6 +34,9 @@
 (defvar fuel-log--inhibit-p nil
   "Set this to t to inhibit all log messages")
 
+(defvar fuel-log--debug-p nil
+  "If t, all messages are logged no matter what")
+
 (define-derived-mode factor-messages-mode fundamental-mode "FUEL Messages"
   "Simple mode to log interactions with the factor listener"
   (kill-all-local-variables)
@@ -55,7 +58,7 @@
         (current-buffer))))
 
 (defun fuel-log--msg (type &rest args)
-  (unless fuel-log--inhibit-p
+  (when (or fuel-log--debug-p (not fuel-log--inhibit-p))
     (with-current-buffer (fuel-log--buffer)
       (let ((inhibit-read-only t))
         (insert

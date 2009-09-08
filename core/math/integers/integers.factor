@@ -1,83 +1,86 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! Copyright (C) 2008, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private sequences
 sequences.private math math.private combinators ;
 IN: math.integers.private
 
-M: integer numerator ;
-M: integer denominator drop 1 ;
+: fixnum-min ( x y -- z ) [ fixnum< ] most ; foldable
+: fixnum-max ( x y -- z ) [ fixnum> ] most ; foldable
 
-M: fixnum >fixnum ;
-M: fixnum >bignum fixnum>bignum ;
-M: fixnum >integer ;
+M: integer numerator ; inline
+M: integer denominator drop 1 ; inline
 
-M: fixnum hashcode* nip ;
-M: fixnum equal? over bignum? [ >bignum bignum= ] [ 2drop f ] if ;
-M: fixnum number= eq? ;
+M: fixnum >fixnum ; inline
+M: fixnum >bignum fixnum>bignum ; inline
+M: fixnum >integer ; inline
 
-M: fixnum < fixnum< ;
-M: fixnum <= fixnum<= ;
-M: fixnum > fixnum> ;
-M: fixnum >= fixnum>= ;
+M: fixnum hashcode* nip ; inline
+M: fixnum equal? over bignum? [ >bignum bignum= ] [ 2drop f ] if ; inline
+M: fixnum number= eq? ; inline
 
-M: fixnum + fixnum+ ;
-M: fixnum - fixnum- ;
-M: fixnum * fixnum* ;
-M: fixnum /i fixnum/i ;
-M: fixnum /f [ >float ] dip >float float/f ;
+M: fixnum < fixnum< ; inline
+M: fixnum <= fixnum<= ; inline
+M: fixnum > fixnum> ; inline
+M: fixnum >= fixnum>= ; inline
 
-M: fixnum mod fixnum-mod ;
+M: fixnum + fixnum+ ; inline
+M: fixnum - fixnum- ; inline
+M: fixnum * fixnum* ; inline
+M: fixnum /i fixnum/i ; inline
+M: fixnum /f [ >float ] dip >float float/f ; inline
 
-M: fixnum /mod fixnum/mod ;
+M: fixnum mod fixnum-mod ; inline
 
-M: fixnum bitand fixnum-bitand ;
-M: fixnum bitor fixnum-bitor ;
-M: fixnum bitxor fixnum-bitxor ;
-M: fixnum shift >fixnum fixnum-shift ;
+M: fixnum /mod fixnum/mod ; inline
 
-M: fixnum bitnot fixnum-bitnot ;
+M: fixnum bitand fixnum-bitand ; inline
+M: fixnum bitor fixnum-bitor ; inline
+M: fixnum bitxor fixnum-bitxor ; inline
+M: fixnum shift >fixnum fixnum-shift ; inline
 
-M: fixnum bit? neg shift 1 bitand 0 > ;
+M: fixnum bitnot fixnum-bitnot ; inline
+
+M: fixnum bit? neg shift 1 bitand 0 > ; inline
 
 : fixnum-log2 ( x -- n )
     0 swap [ dup 1 eq? ] [ [ 1 + ] [ 2/ ] bi* ] until drop ;
 
-M: fixnum (log2) fixnum-log2 ;
+M: fixnum (log2) fixnum-log2 ; inline
 
-M: bignum >fixnum bignum>fixnum ;
-M: bignum >bignum ;
+M: bignum >fixnum bignum>fixnum ; inline
+M: bignum >bignum ; inline
 
 M: bignum hashcode* nip >fixnum ;
 
 M: bignum equal?
     over bignum? [ bignum= ] [
         swap dup fixnum? [ >bignum bignum= ] [ 2drop f ] if
-    ] if ;
+    ] if ; inline
 
-M: bignum number= bignum= ;
+M: bignum number= bignum= ; inline
 
-M: bignum < bignum< ;
-M: bignum <= bignum<= ;
-M: bignum > bignum> ;
-M: bignum >= bignum>= ;
+M: bignum < bignum< ; inline
+M: bignum <= bignum<= ; inline
+M: bignum > bignum> ; inline
+M: bignum >= bignum>= ; inline
 
-M: bignum + bignum+ ;
-M: bignum - bignum- ;
-M: bignum * bignum* ;
-M: bignum /i bignum/i ;
-M: bignum mod bignum-mod ;
+M: bignum + bignum+ ; inline
+M: bignum - bignum- ; inline
+M: bignum * bignum* ; inline
+M: bignum /i bignum/i ; inline
+M: bignum mod bignum-mod ; inline
 
-M: bignum /mod bignum/mod ;
+M: bignum /mod bignum/mod ; inline
 
-M: bignum bitand bignum-bitand ;
-M: bignum bitor bignum-bitor ;
-M: bignum bitxor bignum-bitxor ;
-M: bignum shift >fixnum bignum-shift ;
+M: bignum bitand bignum-bitand ; inline
+M: bignum bitor bignum-bitor ; inline
+M: bignum bitxor bignum-bitxor ; inline
+M: bignum shift >fixnum bignum-shift ; inline
 
-M: bignum bitnot bignum-bitnot ;
-M: bignum bit? bignum-bit? ;
-M: bignum (log2) bignum-log2 ;
+M: bignum bitnot bignum-bitnot ; inline
+M: bignum bit? bignum-bit? ; inline
+M: bignum (log2) bignum-log2 ; inline
 
 ! Converting ratios to floats. Based on FLOAT-RATIO from
 ! sbcl/src/code/float.lisp, which has the following license:
@@ -121,14 +124,14 @@ M: bignum (log2) bignum-log2 ;
     over zero? [
         2drop 0.0
     ] [
-        dup zero? [
-            2drop 1/0.
+        [
+            drop 1/0.
         ] [
             pre-scale
             /f-loop over odd?
             [ zero? [ 1 + ] unless ] [ drop ] if
             post-scale
-        ] if
+        ] if-zero
     ] if ; inline
 
 M: bignum /f ( m n -- f )

@@ -122,26 +122,32 @@ code in the buffer."
     (beginning-of-line)
     (when (fuel-syntax--at-begin-of-def) 0)))
 
+(defsubst factor-mode--previous-non-empty ()
+  (forward-line -1)
+  (while (and (not (bobp))
+              (fuel-syntax--looking-at-emptiness))
+    (forward-line -1)))
+
 (defun factor-mode--indent-setter-line ()
   (when (fuel-syntax--at-setter-line)
-    (save-excursion
-      (let ((indent (and (fuel-syntax--at-constructor-line)
-                         (current-indentation))))
-        (while (not (or indent
-                        (bobp)
-                        (fuel-syntax--at-begin-of-def)
-                        (fuel-syntax--at-end-of-def)))
-          (if (fuel-syntax--at-constructor-line)
-              (setq indent (fuel-syntax--increased-indentation))
-            (forward-line -1)))
-        indent))))
+    (or (save-excursion
+          (let ((indent (and (fuel-syntax--at-constructor-line)
+                             (current-indentation))))
+            (while (not (or indent
+                            (bobp)
+                            (fuel-syntax--at-begin-of-def)
+                            (fuel-syntax--at-end-of-def)))
+              (if (fuel-syntax--at-constructor-line)
+                  (setq indent (fuel-syntax--increased-indentation))
+                (forward-line -1)))
+            indent))
+        (save-excursion
+          (factor-mode--previous-non-empty)
+          (current-indentation)))))
 
 (defun factor-mode--indent-continuation ()
   (save-excursion
-    (forward-line -1)
-    (while (and (not (bobp))
-                (fuel-syntax--looking-at-emptiness))
-      (forward-line -1))
+    (factor-mode--previous-non-empty)
     (cond ((or (fuel-syntax--at-end-of-def)
                (fuel-syntax--at-setter-line))
            (fuel-syntax--decreased-indentation))

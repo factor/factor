@@ -124,7 +124,7 @@ M: bad-developer-name summary
         { "str" string }
         { "hash" hashtable }
         { "hashtable" hashtable }
-        { "?" "a boolean" }
+        { "?" boolean }
         { "ch" "a character" }
         { "word" word }
         { "array" array }
@@ -265,6 +265,14 @@ PRIVATE>
         [ scaffold-authors ]
         [ nip require ]
     } 2cleave ;
+
+: scaffold-core ( string -- ) "resource:core" swap scaffold-vocab ;
+
+: scaffold-basis ( string -- ) "resource:basis" swap scaffold-vocab ;
+
+: scaffold-extra ( string -- ) "resource:extra" swap scaffold-vocab ;
+
+: scaffold-work ( string -- ) "resource:work" swap scaffold-vocab ;
 
 <PRIVATE
 

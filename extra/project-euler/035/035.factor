@@ -39,13 +39,13 @@ IN: project-euler.035
 : (circular?) ( seq n -- ? )
     dup 0 > [
         2dup rotate 10 digits>integer
-        prime? [ 1- (circular?) ] [ 2drop f ] if
+        prime? [ 1 - (circular?) ] [ 2drop f ] if
     ] [
         2drop t
     ] if ;
 
 : circular? ( seq -- ? )
-    dup length 1- (circular?) ;
+    dup length 1 - (circular?) ;
 
 PRIVATE>
 

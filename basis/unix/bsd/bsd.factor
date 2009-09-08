@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax combinators system vocabs.loader ;
+USING: alien.syntax classes.struct combinators system
+vocabs.loader ;
 IN: unix
 
 CONSTANT: MAXPATHLEN 1024
@@ -26,38 +27,38 @@ CONSTANT: F_SETFD 2
 CONSTANT: F_SETFL 4
 CONSTANT: FD_CLOEXEC 1
 
-C-STRUCT: sockaddr-in
-    { "uchar" "len" }
-    { "uchar" "family" }
-    { "ushort" "port" }
-    { "in_addr_t" "addr" }
-    { "longlong" "unused" } ;
+STRUCT: sockaddr-in
+    { len uchar }
+    { family uchar }
+    { port ushort }
+    { addr in_addr_t }
+    { unused longlong } ;
 
-C-STRUCT: sockaddr-in6
-    { "uchar" "len" }
-    { "uchar" "family" }
-    { "ushort" "port" }
-    { "uint" "flowinfo" }
-    { { "uchar" 16 } "addr" }
-    { "uint" "scopeid" } ;
+STRUCT: sockaddr-in6
+    { len uchar }
+    { family uchar }
+    { port ushort }
+    { flowinfo uint }
+    { addr uchar[16] }
+    { scopeid uint } ;
 
-C-STRUCT: sockaddr-un
-    { "uchar" "len" }
-    { "uchar" "family" }
-    { { "char" 104 } "path" } ;
+STRUCT: sockaddr-un
+    { len uchar }
+    { family uchar }
+    { path char[104] } ;
 
-C-STRUCT: passwd
-    { "char*"  "pw_name" }
-    { "char*"  "pw_passwd" }
-    { "uid_t"  "pw_uid" }
-    { "gid_t"  "pw_gid" }
-    { "time_t" "pw_change" }
-    { "char*"  "pw_class" }
-    { "char*"  "pw_gecos" }
-    { "char*"  "pw_dir" }
-    { "char*"  "pw_shell" }
-    { "time_t" "pw_expire" }
-    { "int"    "pw_fields" } ;
+STRUCT: passwd
+    { pw_name char* }
+    { pw_passwd char* }
+    { pw_uid uid_t }
+    { pw_gid gid_t }
+    { pw_change time_t }
+    { pw_class char* }
+    { pw_gecos char* }
+    { pw_dir char* }
+    { pw_shell char* }
+    { pw_expire time_t }
+    { pw_fields int } ;
 
 CONSTANT: max-un-path 104
 

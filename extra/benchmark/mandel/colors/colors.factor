@@ -12,7 +12,7 @@ CONSTANT: val 0.85
 
 : <color-map> ( nb-cols -- map )
     dup [
-        360 * swap 1+ / sat val
+        360 * swap 1 + / sat val
         1 <hsva> >rgba scale-rgb
     ] with map ;
 

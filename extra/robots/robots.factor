@@ -1,14 +1,17 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors http.client kernel unicode.categories
-sequences urls splitting combinators splitting.monotonic
-combinators.short-circuit assocs unicode.case arrays
-math.parser calendar.format make fry present globs
-multiline regexp.combinators regexp ;
+USING: accessors arrays assocs calendar.format combinators
+combinators.short-circuit fry globs http.client kernel make
+math.parser multiline namespaces present regexp
+regexp.combinators sequences sets splitting splitting.monotonic
+unicode.case unicode.categories urls ;
 IN: robots
 
 ! visit-time is GMT, request-rate is pages/second 
 ! crawl-rate is seconds
+
+SYMBOL: robot-identities
+robot-identities [ { "FactorSpider" } ] initialize
 
 TUPLE: robots site sitemap rules rules-quot ;
 
@@ -79,6 +82,13 @@ visit-time request-rate crawl-delay unknowns ;
         [ site>> ] [ rules>> disallows>> ] bi
         derive-urls [ <glob> ] map <and> <not>
     ] bi 2array <or> '[ _ matches? ] ;
+
+: relevant-rules ( robots -- rules )
+    [
+        user-agents>> [
+            robot-identities get [ swap glob-matches? ] with any?
+        ] any?
+    ] filter ;
 
 PRIVATE>
 

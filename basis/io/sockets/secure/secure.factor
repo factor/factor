@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces continuations
-destructors io debugger io.sockets sequences summary calendar
-delegate system vocabs.loader combinators present ;
+USING: accessors kernel namespaces continuations destructors io
+debugger io.sockets io.sockets.private sequences summary
+calendar delegate system vocabs.loader combinators present ;
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout
@@ -29,7 +29,7 @@ ephemeral-key-bits ;
         "vocab:openssl/cacert.pem" >>ca-file
         t >>verify ;
 
-TUPLE: secure-context config handle disposed ;
+TUPLE: secure-context < disposable config handle ;
 
 HOOK: <secure-context> secure-socket-backend ( config -- context )
 

@@ -36,7 +36,7 @@ IN: project-euler.014
 <PRIVATE
 
 : next-collatz ( n -- n )
-    dup even? [ 2 / ] [ 3 * 1+ ] if ;
+    dup even? [ 2 / ] [ 3 * 1 + ] if ;
 
 : longest ( seq seq -- seq )
     2dup [ length ] bi@ > [ drop ] [ nip ] if ;
@@ -59,7 +59,7 @@ PRIVATE>
 <PRIVATE
 
 : worth-calculating? ( n -- ? )
-    1- 3 { [ divisor? ] [ / even? ] } 2&& ;
+    1 - 3 { [ divisor? ] [ / even? ] } 2&& ;
 
 PRIVATE>
 

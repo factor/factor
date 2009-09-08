@@ -15,7 +15,7 @@ IN: generalizations
 
 MACRO: nsequence ( n seq -- )
     [
-        [ drop <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
+        [ drop iota <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
         [ '[ @ [ _ swap set-nth-unsafe ] keep ] ] reduce
     ] keep
     '[ @ _ like ] ;
@@ -24,29 +24,32 @@ MACRO: narray ( n -- )
     '[ _ { } nsequence ] ;
 
 MACRO: nsum ( n -- )
-    1- [ + ] n*quot ;
+    1 - [ + ] n*quot ;
 
 MACRO: firstn-unsafe ( n -- )
-    [ '[ [ _ ] dip nth-unsafe ] ] map '[ _ cleave ] ;
+    iota [ '[ [ _ ] dip nth-unsafe ] ] map '[ _ cleave ] ;
 
 MACRO: firstn ( n -- )
     dup zero? [ drop [ drop ] ] [
-        [ 1- swap bounds-check 2drop ]
+        [ 1 - swap bounds-check 2drop ]
         [ firstn-unsafe ]
         bi-curry '[ _ _ bi ]
     ] if ;
 
 MACRO: npick ( n -- )
-    1- [ dup ] [ '[ _ dip swap ] ] repeat ;
+    1 - [ dup ] [ '[ _ dip swap ] ] repeat ;
+
+MACRO: nover ( n -- )
+    dup 1 + '[ _ npick ] n*quot ;
 
 MACRO: ndup ( n -- )
     dup '[ _ npick ] n*quot ;
 
 MACRO: nrot ( n -- )
-    1- [ ] [ '[ _ dip swap ] ] repeat ;
+    1 - [ ] [ '[ _ dip swap ] ] repeat ;
 
 MACRO: -nrot ( n -- )
-    1- [ ] [ '[ swap _ dip ] ] repeat ;
+    1 - [ ] [ '[ swap _ dip ] ] repeat ;
 
 MACRO: ndrop ( n -- )
     [ drop ] n*quot ;
@@ -69,6 +72,9 @@ MACRO: ncurry ( n -- )
 MACRO: nwith ( n -- )
     [ with ] n*quot ;
 
+MACRO: nbi ( n -- )
+    '[ [ _ nkeep ] dip call ] ;
+
 MACRO: ncleave ( quots n -- )
     [ '[ _ '[ _ _ nkeep ] ] map [ ] join ] [ '[ _ ndrop ] ] bi
     compose ;
@@ -85,11 +91,14 @@ MACRO: napply ( quot n -- )
     swap <repetition> spread>quot ;
 
 MACRO: mnswap ( m n -- )
-    1+ '[ _ -nrot ] swap '[ _ _ napply ] ;
+    1 + '[ _ -nrot ] swap '[ _ _ napply ] ;
 
 MACRO: nweave ( n -- )
-    [ dup <reversed> [ '[ _ _ mnswap ] ] with map ] keep
+    [ dup iota <reversed> [ '[ _ _ mnswap ] ] with map ] keep
     '[ _ _ ncleave ] ;
+
+MACRO: nbi-curry ( n -- )
+    [ bi-curry ] n*quot ;
 
 : nappend-as ( n exemplar -- seq )
     [ narray concat ] dip like ; inline

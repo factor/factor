@@ -1,131 +1,110 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math accessors sequences namespaces make
-combinators assocs arrays locals cpu.architecture
+combinators assocs arrays locals layouts hashtables
+cpu.architecture
 compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.liveness
+compiler.cfg.comparisons
 compiler.cfg.stack-frame
-compiler.cfg.instructions ;
+compiler.cfg.instructions
+compiler.cfg.utilities
+compiler.cfg.linearization.order ;
 IN: compiler.cfg.linearization
+
+<PRIVATE
+
+SYMBOL: numbers
+
+: block-number ( bb -- n ) numbers get at ;
+
+: number-blocks ( bbs -- ) [ 2array ] map-index >hashtable numbers set ;
 
 ! Convert CFG IR to machine IR.
 GENERIC: linearize-insn ( basic-block insn -- )
 
 : linearize-basic-block ( bb -- )
-    [ number>> _label ]
+    [ block-number _label ]
     [ dup instructions>> [ linearize-insn ] with each ]
     bi ;
 
 M: insn linearize-insn , drop ;
 
 : useless-branch? ( basic-block successor -- ? )
-    #! If our successor immediately follows us in RPO, then we
-    #! don't need to branch.
-    [ number>> ] bi@ 1 - = ; inline
+    ! If our successor immediately follows us in linearization
+    ! order then we don't need to branch.
+    [ block-number ] bi@ 1 - = ; inline
 
-: branch-to-branch? ( successor -- ? )
-    #! A branch to a block containing just a jump return is cloned.
-    instructions>> dup length 2 = [
-        [ first ##epilogue? ]
-        [ second [ ##return? ] [ ##jump? ] bi or ] bi and
-    ] [ drop f ] if ;
-
-: emit-branch ( basic-block successor -- )
-    {
-        { [ 2dup useless-branch? ] [ 2drop ] }
-        { [ dup branch-to-branch? ] [ nip linearize-basic-block ] }
-        [ nip number>> _branch ]
-    } cond ;
+: emit-branch ( bb successor -- )
+    2dup useless-branch? [ 2drop ] [ nip block-number _branch ] if ;
 
 M: ##branch linearize-insn
     drop dup successors>> first emit-branch ;
 
-: (binary-conditional) ( basic-block insn -- basic-block successor1 successor2 src1 src2 cc )
-    [ dup successors>> first2 ]
+: successors ( bb -- first second ) successors>> first2 ; inline
+
+: (binary-conditional) ( bb insn -- bb successor1 successor2 src1 src2 cc )
+    [ dup successors ]
     [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] bi* ; inline
 
-: binary-conditional ( basic-block insn -- basic-block successor label2 src1 src2 cc )
+: binary-conditional ( bb insn -- bb successor label2 src1 src2 cc )
     [ (binary-conditional) ]
     [ drop dup successors>> second useless-branch? ] 2bi
-    [ [ swap number>> ] 3dip ] [ [ number>> ] 3dip negate-cc ] if ;
-
-: with-regs ( insn quot -- )
-    over regs>> [ call ] dip building get last (>>regs) ; inline
+    [ [ swap block-number ] 3dip ] [ [ block-number ] 3dip negate-cc ] if ;
 
 M: ##compare-branch linearize-insn
-    [ binary-conditional _compare-branch ] with-regs emit-branch ;
+    binary-conditional _compare-branch emit-branch ;
 
 M: ##compare-imm-branch linearize-insn
-    [ binary-conditional _compare-imm-branch ] with-regs emit-branch ;
+    binary-conditional _compare-imm-branch emit-branch ;
 
 M: ##compare-float-branch linearize-insn
-    [ binary-conditional _compare-float-branch ] with-regs emit-branch ;
+    binary-conditional _compare-float-branch emit-branch ;
+
+: overflow-conditional ( bb insn -- bb successor label2 dst src1 src2 )
+    [ dup successors block-number ]
+    [ [ dst>> ] [ src1>> ] [ src2>> ] tri ] bi* ; inline
+
+M: ##fixnum-add linearize-insn
+    overflow-conditional _fixnum-add emit-branch ;
+
+M: ##fixnum-sub linearize-insn
+    overflow-conditional _fixnum-sub emit-branch ;
+
+M: ##fixnum-mul linearize-insn
+    overflow-conditional _fixnum-mul emit-branch ;
 
 M: ##dispatch linearize-insn
     swap
-    [ [ [ src>> ] [ temp>> ] bi _dispatch ] with-regs ]
-    [ successors>> [ number>> _dispatch-label ] each ]
+    [ [ src>> ] [ temp>> ] bi _dispatch ]
+    [ successors>> [ block-number _dispatch-label ] each ]
     bi* ;
 
-: gc-root-registers ( n live-registers -- n )
-    [
-        [ second 2array , ]
-        [ first reg-class>> reg-size + ]
-        2bi
-    ] each ;
-
-: gc-root-spill-slots ( n live-spill-slots -- n )
-    [
-        dup first reg-class>> int-regs eq? [
-            [ second <spill-slot> 2array , ]
-            [ first reg-class>> reg-size + ]
-            2bi
-        ] [ drop ] if
-    ] each ;
-
-: oop-registers ( regs -- regs' )
-    [ first reg-class>> int-regs eq? ] filter ;
-
-: data-registers ( regs -- regs' )
-    [ first reg-class>> double-float-regs eq? ] filter ;
-
-:: compute-gc-roots ( live-registers live-spill-slots -- alist )
-    [
-        0
-        ! we put float registers last; the GC doesn't actually scan them
-        live-registers oop-registers gc-root-registers
-        live-spill-slots gc-root-spill-slots
-        live-registers data-registers gc-root-registers
-        drop
-    ] { } make ;
-
-: count-gc-roots ( live-registers live-spill-slots -- n )
-    ! Size of GC root area, minus the float registers
-    [ oop-registers length ] bi@ + ;
+: gc-root-offsets ( registers -- alist )
+    ! Outputs a sequence of { offset register/spill-slot } pairs
+    [ length iota [ cell * ] map ] keep zip ;
 
 M: ##gc linearize-insn
     nip
-    [
+    {
         [ temp1>> ]
         [ temp2>> ]
-        [
-            [ live-registers>> ] [ live-spill-slots>> ] bi
-            [ compute-gc-roots ]
-            [ count-gc-roots ]
-            [ gc-roots-size ]
-            2tri
-        ] tri
-        _gc
-    ] with-regs ;
+        [ data-values>> ]
+        [ tagged-values>> gc-root-offsets ]
+        [ uninitialized-locs>> ]
+    } cleave
+    _gc ;
 
 : linearize-basic-blocks ( cfg -- insns )
     [
-        [ [ linearize-basic-block ] each-basic-block ]
-        [ spill-counts>> _spill-counts ]
-        bi
+        [
+            linearization-order
+            [ number-blocks ]
+            [ [ linearize-basic-block ] each ] bi
+        ] [ spill-area-size>> _spill-area-size ] bi
     ] { } make ;
 
+PRIVATE>
+        
 : flatten-cfg ( cfg -- mr )
     [ linearize-basic-blocks ] [ word>> ] [ label>> ] tri
     <mr> ;

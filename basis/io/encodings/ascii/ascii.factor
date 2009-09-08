@@ -5,7 +5,7 @@ IN: io.encodings.ascii
 
 <PRIVATE
 : encode-if< ( char stream encoding max -- )
-    nip 1- pick < [ encode-error ] [ stream-write1 ] if ; inline
+    nip 1 - pick < [ encode-error ] [ stream-write1 ] if ; inline
 
 : decode-if< ( stream encoding max -- character )
     nip swap stream-read1 dup
@@ -16,7 +16,7 @@ PRIVATE>
 SINGLETON: ascii
 
 M: ascii encode-char
-    128 encode-if< ;
+    128 encode-if< ; inline
 
 M: ascii decode-char
-    128 decode-if< ;
+    128 decode-if< ; inline
