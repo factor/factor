@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lexer sets sequences kernel splitting effects
-combinators arrays ;
+combinators arrays vocabs.parser classes ;
 IN: effects.parser
 
 DEFER: parse-effect
@@ -13,10 +13,11 @@ ERROR: bad-effect ;
         dup { f "(" "((" } member? [ bad-effect ] [
             ":" ?tail [
                 scan {
-                    { "(" [ ")" parse-effect ] }
-                    { f [ ")" unexpected-eof ] }
+                    { [ dup "(" = ] [ drop ")" parse-effect ] }
+                    { [ dup search class? ] [ search ] }
+                    { [ dup f = ] [ ")" unexpected-eof ] }
                     [ bad-effect ]
-                } case 2array
+                } cond 2array
             ] when
         ] if
     ] if ;
