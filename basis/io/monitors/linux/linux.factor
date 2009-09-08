@@ -5,7 +5,7 @@ io.files io.pathnames io.buffers io.ports io.timeouts
 io.backend.unix io.encodings.utf8 unix.linux.inotify assocs
 namespaces make threads continuations init math math.bitwise
 sets alien alien.strings alien.c-types vocabs.loader accessors
-system hashtables destructors unix ;
+system hashtables destructors unix classes.struct ;
 IN: io.monitors.linux
 
 SYMBOL: watches
@@ -82,30 +82,30 @@ M: linux-monitor dispose* ( monitor -- )
     ] { } make prune ;
 
 : parse-event-name ( event -- name )
-    dup inotify-event-len zero?
-    [ drop "" ] [ inotify-event-name utf8 alien>string ] if ;
+    dup len>> zero?
+    [ drop "" ] [ name>> utf8 alien>string ] if ;
 
 : parse-file-notify ( buffer -- path changed )
-    dup inotify-event-mask ignore-flags? [
+    dup mask>> ignore-flags? [
         drop f f
     ] [
-        [ parse-event-name ] [ inotify-event-mask parse-action ] bi
+        [ parse-event-name ] [ mask>> parse-action ] bi
     ] if ;
 
 : events-exhausted? ( i buffer -- ? )
     fill>> >= ;
 
-: inotify-event@ ( i buffer -- alien )
-    ptr>> <displaced-alien> ;
+: inotify-event@ ( i buffer -- inotify-event )
+    ptr>> <displaced-alien> inotify-event memory>struct ;
 
 : next-event ( i buffer -- i buffer )
     2dup inotify-event@
-    inotify-event-len "inotify-event" heap-size +
+    len>> inotify-event heap-size +
     swap [ + ] dip ;
 
 : parse-file-notifications ( i buffer -- )
     2dup events-exhausted? [ 2drop ] [
-        2dup inotify-event@ dup inotify-event-wd wd>monitor
+        2dup inotify-event@ dup wd>> wd>monitor
         [ parse-file-notify ] dip queue-change
         next-event parse-file-notifications
     ] if ;
