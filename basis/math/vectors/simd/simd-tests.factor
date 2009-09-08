@@ -1,7 +1,7 @@
 IN: math.vectors.simd.tests
 USING: math math.vectors.simd math.vectors.simd.private
-math.vectors math.functions kernel.private compiler sequences
-tools.test compiler.tree.debugger accessors kernel ;
+math.vectors math.functions math.private kernel.private compiler
+sequences tools.test compiler.tree.debugger accessors kernel ;
 
 [ float-4{ 0 0 0 0 } ] [ float-4 new ] unit-test
 
