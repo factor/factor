@@ -17,7 +17,7 @@ H{
 
 SYMBOL: link-style
 H{
-    { foreground COLOR: dark-blue }
+    { foreground COLOR: DodgerBlue4 }
     { font-style bold }
 } link-style set-global
 
@@ -33,12 +33,14 @@ H{
     { font-size 18 }
     { font-style bold }
     { wrap-margin 500 }
-    { page-color COLOR: light-gray }
+    { foreground T{ rgba f 0.216 0.243 0.282 1.0 } }
+    { shadow COLOR: white }
+    { page-color T{ rgba f 0.94 0.94 0.91 1.0 } }
     { border-width 5 }
 } title-style set-global
 
 SYMBOL: help-path-style
-H{ { font-size 10 } } help-path-style set-global
+H{ { font-size 10 } { shadow f } } help-path-style set-global
 
 SYMBOL: heading-style
 H{
@@ -58,12 +60,18 @@ SYMBOL: snippet-style
 H{
     { font-name "monospace" }
     { font-size 12 }
-    { foreground COLOR: navy-blue }
+    { foreground COLOR: DarkOrange4 }
 } snippet-style set-global
+
+SYMBOL: code-char-style
+H{
+    { font-name "monospace" }
+    { font-size 12 }
+} code-char-style set-global
 
 SYMBOL: code-style
 H{
-    { page-color COLOR: gray80 }
+    { page-color T{ rgba f 0.94 0.94 0.91 1.0 } }
     { border-width 5 }
     { wrap-margin f }
 } code-style set-global
@@ -101,7 +109,7 @@ H{
 SYMBOL: table-style
 H{
     { table-gap { 5 5 } }
-    { table-border COLOR: light-gray }
+    { table-border T{ rgba f 0.94 0.94 0.91 1.0 } }
 } table-style set-global
 
 SYMBOL: list-style

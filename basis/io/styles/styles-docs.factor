@@ -121,6 +121,7 @@ ARTICLE: "character-styles" "Character styles"
 "Character styles for " { $link stream-format } " and " { $link with-style } ":"
 { $subsection foreground }
 { $subsection background }
+{ $subsection shadow }
 { $subsection font-name }
 { $subsection font-size }
 { $subsection font-style }
@@ -202,6 +203,18 @@ HELP: background
             "    swap 10 / 1 1 over - over 1 <rgba>"
             "    background associate format nl"
         "] each"
+    }
+} ;
+
+HELP: shadow
+{ $description "Character style. An instance of " { $link color } ". See " { $link "colors" } "." }
+{ $examples
+    { $code
+        "\"Hello world\\n\""
+        "H{ { background COLOR: gray }"
+        "   { shadow COLOR: white }"
+        "   { font-size 72 }"
+        "} format"
     }
 } ;
 

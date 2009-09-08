@@ -116,6 +116,7 @@ SYMBOL: bold-italic
 ! Character styles
 SYMBOL: foreground
 SYMBOL: background
+SYMBOL: shadow
 SYMBOL: font-name
 SYMBOL: font-size
 SYMBOL: font-style
