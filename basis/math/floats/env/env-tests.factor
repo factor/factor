@@ -1,6 +1,12 @@
-USING: kernel math math.floats.env math.functions math.libm
-sets tools.test ;
+USING: kernel math math.floats.env math.floats.env.private
+math.functions math.libm sets tools.test ;
 IN: math.floats.env.tests
+
+: set-default-fp-env ( -- )
+    { } { } +round-nearest+ +denormal-keep+ set-fp-env ;
+
+! In case the tests screw up the FP env because of bugs in math.floats.env
+set-default-fp-env
 
 [ t ] [
     [ 1.0 0.0 / drop ] collect-fp-exceptions
@@ -129,3 +135,7 @@ IN: math.floats.env.tests
 
 ! Ensure traps get cleared
 [ 1/0. ] [ 1.0 0.0 /f ] unit-test
+
+! In case the tests screw up the FP env because of bugs in math.floats.env
+set-default-fp-env
+

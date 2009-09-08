@@ -245,17 +245,12 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
     mtctr r3
     bctr
 
-DEF(unsigned,get_fp_control_register,(void)):
+DEF(void,get_ppc_fpu_env,(void*)):
     mffs fr0
-    li r2,-4
-    stfiwx fr0,r2,r1
-    lwzx r3,r2,r1
+    stfd fr0,0(r3)
     blr
 
-DEF(void,set_fp_control_register,(unsigned)):
-    li r2,-4
-    stwx r3,r2,r1
-    li r2,-8
-    lfdx fr0,r2,r1
+DEF(void,set_ppc_fpu_env,(const void*)):
+    lfd fr0,0(r3)
     mtfsf 0xff,fr0
     blr
