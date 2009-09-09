@@ -31,7 +31,7 @@ PRIVATE>
         ] bind
     ] keep ;
 
-: string-style ( obj -- style )
+: string-style ( str -- style )
     [
         presented set
         COLOR: LightSalmon4 foreground set
