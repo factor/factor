@@ -2,14 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 cpu.architecture kernel layouts locals make math namespaces sequences
-sets vectors fry compiler.cfg compiler.cfg.instructions
-compiler.cfg.rpo arrays ;
+sets vectors fry arrays compiler.cfg compiler.cfg.instructions
+compiler.cfg.rpo compiler.utilities ;
 IN: compiler.cfg.utilities
 
 PREDICATE: kill-block < basic-block
     instructions>> {
-        [ length 2 = ]
-        [ first kill-vreg-insn? ]
+        [ length 2 >= ]
+        [ penultimate kill-vreg-insn? ]
     } 1&& ;
 
 : back-edge? ( from to -- ? )
