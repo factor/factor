@@ -298,6 +298,14 @@ M:: ppc %binary-float-function ( dst src1 src2 func -- )
     func f %alien-invoke
     dst float-function-return ;
 
+! Internal format is always double-precision on PowerPC
+M: ppc %single>double-float 2drop ;
+
+M: ppc %double>single-float 2drop ;
+
+M: ppc %unbox-alien ( dst src -- )
+    alien-offset LWZ ;
+
 M:: ppc %unbox-any-c-ptr ( dst src temp -- )
     [
         { "is-byte-array" "end" "start" } [ define-label ] each
@@ -540,6 +548,7 @@ M: ppc %compare-imm [ (%compare-imm) ] 2dip %boolean ;
 M:: ppc %compare-float-ordered ( dst src1 src2 cc temp -- )
     src1 src2 cc negate-cc \ (%compare-float-ordered) (%compare-float) :> branch2 :> branch1
     dst temp branch1 branch2 (%boolean) ;
+
 M:: ppc %compare-float-unordered ( dst src1 src2 cc temp -- )
     src1 src2 cc negate-cc \ (%compare-float-unordered) (%compare-float) :> branch2 :> branch1
     dst temp branch1 branch2 (%boolean) ;
@@ -559,7 +568,7 @@ M:: ppc %compare-branch ( label src1 src2 cc -- )
     label cc %branch ;
 
 M:: ppc %compare-imm-branch ( label src1 src2 cc -- )
-    src1 src2 (%compare)
+    src1 src2 (%compare-imm)
     label cc %branch ;
 
 :: (%branch) ( label branch1 branch2 -- )
@@ -571,7 +580,7 @@ M:: ppc %compare-float-ordered-branch ( label src1 src2 cc -- )
     label branch1 branch2 (%branch) ;
 
 M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
-    cc src1 src2 \ (%compare-float-unordered) (%compare-float) :> branch2 :> branch1
+    src1 src2 cc \ (%compare-float-unordered) (%compare-float) :> branch2 :> branch1
     label branch1 branch2 (%branch) ;
 
 : load-from-frame ( dst n rep -- )
