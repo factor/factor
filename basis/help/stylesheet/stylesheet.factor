@@ -30,10 +30,10 @@ H{ { font-style bold } } strong-style set-global
 SYMBOL: title-style
 H{
     { font-name "sans-serif" }
-    { font-size 18 }
+    { font-size 20 }
     { font-style bold }
     { wrap-margin 500 }
-    { foreground COLOR: FactorDarkSlateBlue }
+    { foreground COLOR: gray20 }
     { page-color COLOR: FactorLightTan }
     { border-width 5 }
 } title-style set-global
@@ -46,6 +46,7 @@ H{
     { font-name "sans-serif" }
     { font-size 16 }
     { font-style bold }
+    { foreground COLOR: FactorDarkSlateBlue }
 } heading-style set-global
 
 SYMBOL: subsection-style
