@@ -242,11 +242,11 @@ MEMO: specified-font ( assoc -- font )
 : apply-page-color-style ( style gadget -- style gadget )
     page-color [ <solid> >>interior ] apply-style ;
 
-: apply-border-width-style ( style gadget -- style gadget )
-    border-width [ dup 2array <border> ] apply-style ;
+: apply-inset-style ( style gadget -- style gadget )
+    inset [ <border> ] apply-style ;
 
 : style-pane ( style pane -- pane )
-    apply-border-width-style
+    apply-inset-style
     apply-border-color-style
     apply-page-color-style
     apply-presentation-style
