@@ -295,6 +295,4 @@ os windows? [
     4 "double" c-type (>>align)
 ] unless
 
-USE: vocabs.loader
-
 "cpu.x86.features" require

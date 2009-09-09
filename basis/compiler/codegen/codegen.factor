@@ -199,7 +199,8 @@ CODEGEN: ##allot %allot
 CODEGEN: ##write-barrier %write-barrier
 CODEGEN: ##compare %compare
 CODEGEN: ##compare-imm %compare-imm
-CODEGEN: ##compare-float %compare-float
+CODEGEN: ##compare-float-ordered %compare-float-ordered
+CODEGEN: ##compare-float-unordered %compare-float-unordered
 
 CODEGEN: _fixnum-add %fixnum-add
 CODEGEN: _fixnum-sub %fixnum-sub
@@ -208,7 +209,8 @@ CODEGEN: _label resolve-label
 CODEGEN: _branch %jump-label
 CODEGEN: _compare-branch %compare-branch
 CODEGEN: _compare-imm-branch %compare-imm-branch
-CODEGEN: _compare-float-branch %compare-float-branch
+CODEGEN: _compare-float-ordered-branch %compare-float-ordered-branch
+CODEGEN: _compare-float-unordered-branch %compare-float-unordered-branch
 CODEGEN: _dispatch %dispatch
 CODEGEN: _spill %spill
 CODEGEN: _reload %reload
