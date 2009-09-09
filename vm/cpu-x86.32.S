@@ -75,12 +75,8 @@ DEF(void,get_x87_env,(void*)):
 
 DEF(void,set_x87_env,(const void*)):
     movl 4(%esp), %eax
-    fldcw 2(%eax)
-    movb 4(%eax), %dl
-    test %dl, %dl
-    jz 1f
     fnclex
-1:
+    fldcw 2(%eax)
     ret
 
 #include "cpu-x86.S"
