@@ -76,7 +76,7 @@ PREDICATE: vector-word < word vector-words key? ;
     dup "specializations" word-prop
     [ ] [ V{ } clone [ "specializations" set-word-prop ] keep ] ?if ;
 
-M: vector-word subwords specializations values ;
+M: vector-word subwords specializations values [ word? ] filter ;
 
 : add-specialization ( new-word signature word -- )
     specializations set-at ;

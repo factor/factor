@@ -2,7 +2,8 @@ IN: specialized-arrays.tests
 USING: tools.test alien.syntax specialized-arrays sequences
 specialized-arrays.int specialized-arrays.bool
 specialized-arrays.ushort alien.c-types accessors kernel
-specialized-arrays.char specialized-arrays.uint arrays combinators ;
+specialized-arrays.char specialized-arrays.uint
+specialized-arrays.float arrays combinators compiler ;
 
 [ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
 
