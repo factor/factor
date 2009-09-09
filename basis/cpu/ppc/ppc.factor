@@ -554,9 +554,13 @@ M:: ppc %compare-float-unordered ( dst src1 src2 cc temp -- )
         { cc/= [ label BNE ] }
     } case ;
 
-M: ppc %compare-branch [ (%compare) ] 2dip %branch ;
+M:: ppc %compare-branch ( label src1 src2 cc -- )
+    src1 src2 (%compare)
+    label cc %branch ;
 
-M: ppc %compare-imm-branch [ (%compare-imm) ] 2dip %branch ;
+M:: ppc %compare-imm-branch ( label src1 src2 cc -- )
+    src1 src2 (%compare)
+    label cc %branch ;
 
 :: (%branch) ( label branch1 branch2 -- )
     label branch1 execute( label -- )
