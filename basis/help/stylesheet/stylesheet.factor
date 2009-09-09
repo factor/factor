@@ -35,7 +35,7 @@ H{
     { wrap-margin 500 }
     { foreground COLOR: gray20 }
     { page-color COLOR: FactorLightTan }
-    { border-width 5 }
+    { inset { 5 5 } }
 } title-style set-global
 
 SYMBOL: help-path-style
@@ -72,7 +72,7 @@ H{
 SYMBOL: code-style
 H{
     { page-color COLOR: FactorLightTan }
-    { border-width 5 }
+    { inset { 5 5 } }
     { wrap-margin f }
 } code-style set-global
 
@@ -89,7 +89,7 @@ SYMBOL: warning-style
 H{
     { page-color COLOR: gray90 }
     { border-color COLOR: red }
-    { border-width 5 }
+    { inset { 5 5 } }
     { wrap-margin 500 }
 } warning-style set-global
 
@@ -97,7 +97,7 @@ SYMBOL: deprecated-style
 H{
     { page-color COLOR: gray90 }
     { border-color COLOR: red }
-    { border-width 5 }
+    { inset { 5 5 } }
     { wrap-margin 500 }
 } deprecated-style set-global
 
