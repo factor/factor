@@ -101,19 +101,21 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : $navigation-table ( topic -- )
     [
-        [ help-path [ \ $links "Up:" $navigation-row ] unless-empty ]
         [ prev-article [ 1array \ $long-link "Prev:" $navigation-row ] when* ]
         [ next-article [ 1array \ $long-link "Next:" $navigation-row ] when* ]
-        tri
+        bi
     ] { } make [ $table ] unless-empty ;
+
+: ($navigation) ( topic -- )
+    help-path-style get [
+        [ help-path [ reverse $breadcrumbs ] unless-empty ]
+        [ $navigation-table ] bi
+    ] with-style ;
 
 : $title ( topic -- )
     title-style get [
-        title-style get [
-            [ ($title) ]
-            [ help-path-style get [ $navigation-table ] with-style ] bi
-        ] with-nesting
-    ] with-style nl ;
+        [ ($title) ] [ ($navigation) ] bi
+    ] with-nested-style nl ;
 
 : print-topic ( topic -- )
     >link
