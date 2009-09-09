@@ -251,8 +251,8 @@ M:: x86 %unbox-vector ( dst src rep -- )
 
 M: x86 %broadcast-vector ( dst src rep -- )
     {
-        { float-4-rep [ [ MOVAPS ] [ drop dup 0 SHUFPS ] 2bi ] }
-        { double-2-rep [ [ MOVAPD ] [ drop dup 0 SHUFPD ] 2bi ] }
+        { float-4-rep [ [ MOVSS ] [ drop dup 0 SHUFPS ] 2bi ] }
+        { double-2-rep [ [ MOVSD ] [ drop dup UNPCKLPD ] 2bi ] }
     } case ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
@@ -263,7 +263,7 @@ M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
                 dst src1 MOVSS
                 dst src2 UNPCKLPS
                 src3 src4 UNPCKLPS
-                dst src3 HEX: 44 SHUFPS
+                dst src3 MOVLHPS
             ]
         }
     } case ;
@@ -273,8 +273,8 @@ M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
         {
             double-2-rep
             [
-                dst src1 MOVAPD
-                dst src2 0 SHUFPD
+                dst src1 MOVSD
+                dst src2 UNPCKLPD
             ]
         }
     } case ;
