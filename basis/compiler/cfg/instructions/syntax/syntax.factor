@@ -41,11 +41,11 @@ TUPLE: insn-slot-spec type name rep ;
     "insn-slots" word-prop
     [ type>> def eq? ] find nip ;
 
-: insn-use-slots ( class -- slot/f )
+: insn-use-slots ( class -- slots )
     "insn-slots" word-prop
     [ type>> use eq? ] filter ;
 
-: insn-temp-slots ( class -- slot/f )
+: insn-temp-slots ( class -- slots )
     "insn-slots" word-prop
     [ type>> temp eq? ] filter ;
 

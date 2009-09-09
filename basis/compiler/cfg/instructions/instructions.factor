@@ -533,6 +533,10 @@ INSN: ##gc
 temp: temp1/int-rep temp2/int-rep
 literal: data-values tagged-values uninitialized-locs ;
 
+INSN: ##save-context
+temp: temp1/int-rep temp2/int-rep
+literal: callback-allowed? ;
+
 ! Instructions used by machine IR only.
 INSN: _prologue
 literal: stack-frame ;
