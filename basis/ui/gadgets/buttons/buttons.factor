@@ -129,8 +129,11 @@ CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
     <border-button-state-pen> dup dup
     <button-pen> ;
 
+: border-button-label-theme ( gadget -- )
+    dup label? [ [ clone t >>bold? ] change-font ] when drop ;
+
 : border-button-theme ( gadget -- gadget )
-    dup children>> first font>> t >>bold? drop
+    dup children>> first border-button-label-theme
     horizontal >>orientation
     <border-button-pen> >>interior
     dup dup interior>> pen-pref-dim >>min-dim
