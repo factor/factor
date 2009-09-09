@@ -13,7 +13,6 @@ compiler.cfg.dce
 compiler.cfg.write-barrier
 compiler.cfg.representations
 compiler.cfg.two-operand
-compiler.cfg.save-contexts
 compiler.cfg.ssa.destruction
 compiler.cfg.empty-blocks
 compiler.cfg.checker ;
@@ -39,7 +38,6 @@ SYMBOL: check-optimizer?
     eliminate-write-barriers
     select-representations
     convert-two-operand
-    insert-save-contexts
     destruct-ssa
     delete-empty-blocks
     ?check ;
