@@ -12,7 +12,8 @@ IN: compiler.cfg.value-numbering.tests
         dup {
             [ ##compare? ]
             [ ##compare-imm? ]
-            [ ##compare-float? ]
+            [ ##compare-float-unordered? ]
+            [ ##compare-float-ordered? ]
         } 1|| [ f >>temp ] when
     ] map ;
 
@@ -108,8 +109,8 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##peek f 9 D -1 }
         T{ ##unbox-float f 10 8 }
         T{ ##unbox-float f 11 9 }
-        T{ ##compare-float f 12 10 11 cc< }
-        T{ ##compare-float f 14 10 11 cc/< }
+        T{ ##compare-float-unordered f 12 10 11 cc< }
+        T{ ##compare-float-unordered f 14 10 11 cc/< }
         T{ ##replace f 14 D 0 }
     }
 ] [
@@ -118,7 +119,7 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##peek f 9 D -1 }
         T{ ##unbox-float f 10 8 }
         T{ ##unbox-float f 11 9 }
-        T{ ##compare-float f 12 10 11 cc< }
+        T{ ##compare-float-unordered f 12 10 11 cc< }
         T{ ##compare-imm f 14 12 5 cc= }
         T{ ##replace f 14 D 0 }
     } value-numbering-step trim-temps

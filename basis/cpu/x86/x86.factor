@@ -658,23 +658,29 @@ M: x86 %compare-imm ( dst src1 src2 cc temp -- )
         "no-move" resolve-label
     ] with-scope ;
 
-M:: x86 %compare-float ( dst src1 src2 cc temp -- )
+:: (%compare-float) ( dst src1 src2 cc temp compare -- )
     cc {
-        { cc<    [ src2 src1  COMISD dst temp \ CMOVA  %boolean ] }
-        { cc<=   [ src2 src1  COMISD dst temp \ CMOVAE %boolean ] }
-        { cc>    [ src1 src2  COMISD dst temp \ CMOVA  %boolean ] }
-        { cc>=   [ src1 src2  COMISD dst temp \ CMOVAE %boolean ] }
-        { cc=    [ src1 src2 UCOMISD dst temp \ %cmov-float= %boolean ] }
-        { cc<>   [ src1 src2  COMISD dst temp \ CMOVNE %boolean ] }
-        { cc<>=  [ src1 src2  COMISD dst temp \ CMOVNP %boolean ] }
-        { cc/<   [ src2 src1 UCOMISD dst temp \ CMOVBE %boolean ] }
-        { cc/<=  [ src2 src1 UCOMISD dst temp \ CMOVB  %boolean ] }
-        { cc/>   [ src1 src2 UCOMISD dst temp \ CMOVBE %boolean ] }
-        { cc/>=  [ src1 src2 UCOMISD dst temp \ CMOVB  %boolean ] }
-        { cc/=   [ src1 src2 UCOMISD dst temp \ %cmov-float/= %boolean ] }
-        { cc/<>  [ src1 src2 UCOMISD dst temp \ CMOVE  %boolean ] }
-        { cc/<>= [ src1 src2 UCOMISD dst temp \ CMOVP  %boolean ] }
-    } case ;
+        { cc<    [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVA  %boolean ] }
+        { cc<=   [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVAE %boolean ] }
+        { cc>    [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVA  %boolean ] }
+        { cc>=   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVAE %boolean ] }
+        { cc=    [ src1 src2 \ compare execute( a b -- ) dst temp \ %cmov-float= %boolean ] }
+        { cc<>   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVNE %boolean ] }
+        { cc<>=  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVNP %boolean ] }
+        { cc/<   [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVBE %boolean ] }
+        { cc/<=  [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVB  %boolean ] }
+        { cc/>   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVBE %boolean ] }
+        { cc/>=  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVB  %boolean ] }
+        { cc/=   [ src1 src2 \ compare execute( a b -- ) dst temp \ %cmov-float/= %boolean ] }
+        { cc/<>  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVE  %boolean ] }
+        { cc/<>= [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVP  %boolean ] }
+    } case ; inline
+
+M: x86 %compare-float-ordered ( dst src1 src2 cc temp -- )
+    \ COMISD (%compare-float) ;
+
+M: x86 %compare-float-unordered ( dst src1 src2 cc temp -- )
+    \ UCOMISD (%compare-float) ;
 
 M:: x86 %compare-branch ( label src1 src2 cc -- )
     src1 src2 CMP
@@ -701,23 +707,29 @@ M: x86 %compare-imm-branch ( label src1 src2 cc -- )
 : %jump-float/= ( label -- )
     [ JNE ] [ JP ] bi ;
 
-M:: x86 %compare-float-branch ( label src1 src2 cc -- )
+:: (%compare-float-branch) ( label src1 src2 cc compare -- )
     cc {
-        { cc<    [ src2 src1  COMISD label JA  ] }
-        { cc<=   [ src2 src1  COMISD label JAE ] }
-        { cc>    [ src1 src2  COMISD label JA  ] }
-        { cc>=   [ src1 src2  COMISD label JAE ] }
-        { cc=    [ src1 src2 UCOMISD label %jump-float= ] }
-        { cc<>   [ src1 src2  COMISD label JNE ] }
-        { cc<>=  [ src1 src2  COMISD label JNP ] }
-        { cc/<   [ src2 src1 UCOMISD label JBE ] }
-        { cc/<=  [ src2 src1 UCOMISD label JB  ] }
-        { cc/>   [ src1 src2 UCOMISD label JBE ] }
-        { cc/>=  [ src1 src2 UCOMISD label JB  ] }
-        { cc/=   [ src1 src2 UCOMISD label %jump-float/= ] }
-        { cc/<>  [ src1 src2 UCOMISD label JE  ] }
-        { cc/<>= [ src1 src2 UCOMISD label JP  ] }
+        { cc<    [ src2 src1 \ compare execute( a b -- ) label JA  ] }
+        { cc<=   [ src2 src1 \ compare execute( a b -- ) label JAE ] }
+        { cc>    [ src1 src2 \ compare execute( a b -- ) label JA  ] }
+        { cc>=   [ src1 src2 \ compare execute( a b -- ) label JAE ] }
+        { cc=    [ src1 src2 \ compare execute( a b -- ) label %jump-float= ] }
+        { cc<>   [ src1 src2 \ compare execute( a b -- ) label JNE ] }
+        { cc<>=  [ src1 src2 \ compare execute( a b -- ) label JNP ] }
+        { cc/<   [ src2 src1 \ compare execute( a b -- ) label JBE ] }
+        { cc/<=  [ src2 src1 \ compare execute( a b -- ) label JB  ] }
+        { cc/>   [ src1 src2 \ compare execute( a b -- ) label JBE ] }
+        { cc/>=  [ src1 src2 \ compare execute( a b -- ) label JB  ] }
+        { cc/=   [ src1 src2 \ compare execute( a b -- ) label %jump-float/= ] }
+        { cc/<>  [ src1 src2 \ compare execute( a b -- ) label JE  ] }
+        { cc/<>= [ src1 src2 \ compare execute( a b -- ) label JP  ] }
     } case ;
+
+M: x86 %compare-float-ordered-branch ( label src1 src2 cc -- )
+    \ COMISD (%compare-float-branch) ;
+
+M: x86 %compare-float-unordered-branch ( label src1 src2 cc -- )
+    \ UCOMISD (%compare-float-branch) ;
 
 M:: x86 %spill ( src rep n -- )
     n spill@ src rep copy-register ;
