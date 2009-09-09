@@ -102,31 +102,6 @@ set-default-fp-env
     -1.0 3.0 /f double>bits
 ] unit-test
 
-[
-    HEX: 0000,0000,0000,07e8
-] [
-    +denormal-keep+ [
-        10.0 -320.0 ^ double>bits
-    ] with-denormal-mode
-] unit-test
-
-[
-    HEX: 0000,0000,0000,0000
-] [
-    +denormal-flush+ [
-        10.0 -320.0 ^ double>bits
-    ] with-denormal-mode
-] unit-test
-
-! ensure denormal mode is restored to +denormal-keep+
-[
-    HEX: 0000,0000,0000,07e8
-] [
-    +denormal-keep+ [
-        10.0 -320.0 ^ double>bits
-    ] with-denormal-mode
-] unit-test
-
 [ { +fp-zero-divide+ }       [ 1.0 0.0 /f ] with-fp-traps ] must-fail
 [ { +fp-inexact+ }           [ 1.0 3.0 /f ] with-fp-traps ] must-fail
 [ { +fp-invalid-operation+ } [ -1.0 fsqrt ] with-fp-traps ] must-fail
@@ -135,6 +110,11 @@ set-default-fp-env
 
 ! Ensure traps get cleared
 [ 1/0. ] [ 1.0 0.0 /f ] unit-test
+
+! Ensure state is back to normal
+[ +round-nearest+ ] [ rounding-mode ] unit-test
+[ +denormal-keep+ ] [ denormal-mode ] unit-test
+[ { } ] [ fp-traps ] unit-test
 
 ! In case the tests screw up the FP env because of bugs in math.floats.env
 set-default-fp-env
