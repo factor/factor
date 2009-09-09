@@ -289,7 +289,7 @@ HOOK: %save-param-reg cpu ( stack reg rep -- )
 
 HOOK: %load-param-reg cpu ( stack reg rep -- )
 
-HOOK: %prepare-alien-invoke cpu ( -- )
+HOOK: %save-context cpu ( temp1 temp2 callback-allowed? -- )
 
 HOOK: %prepare-var-args cpu ( -- )
 
