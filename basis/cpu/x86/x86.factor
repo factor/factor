@@ -610,7 +610,6 @@ M:: x86 %call-gc ( gc-root-count -- )
     ! Pass number of roots as second parameter
     param-reg-2 gc-root-count MOV
     ! Call GC
-    %prepare-alien-invoke
     "inline_gc" f %alien-invoke ;
 
 M: x86 %alien-global
@@ -739,16 +738,18 @@ M:: x86 %reload ( dst rep n -- )
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
-M: x86 %prepare-alien-invoke
+M:: x86 %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp-reg "stack_chain" f %alien-global
-    temp-reg temp-reg [] MOV
-    temp-reg [] stack-reg MOV
-    temp-reg [] cell SUB
-    temp-reg 2 cells [+] ds-reg MOV
-    temp-reg 3 cells [+] rs-reg MOV ;
+    temp1 "stack_chain" f %alien-global
+    temp1 temp1 [] MOV
+    temp2 stack-reg cell neg [+] LEA
+    temp1 [] temp2 MOV
+    callback-allowed? [
+        temp1 2 cells [+] ds-reg MOV
+        temp1 3 cells [+] rs-reg MOV
+    ] when ;
 
 M: x86 value-struct? drop t ;
 
