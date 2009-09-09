@@ -1,4 +1,5 @@
 ! Factor UI theme colors
+243 242 234		FactorLightLightTan
 227 226 219		FactorLightTan
 172 167 147		FactorDarkTan
  81  91 105		FactorLightSlateBlue
