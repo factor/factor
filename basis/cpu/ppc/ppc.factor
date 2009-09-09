@@ -564,11 +564,11 @@ M: ppc %compare-imm-branch [ (%compare-imm) ] 2dip %branch ;
     branch2 [ label branch2 execute( label -- ) ] when ; inline
 
 M:: ppc %compare-float-ordered-branch ( label src1 src2 cc -- )
-    cc src1 src2 \ (%compare-float-ordered) \ (%compare-float) :> branch2 :> branch1
+    src1 src2 cc \ (%compare-float-ordered) (%compare-float) :> branch2 :> branch1
     label branch1 branch2 (%branch) ;
 
 M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
-    cc src1 src2 \ (%compare-float-unordered) \ (%compare-float) :> branch2 :> branch1
+    cc src1 src2 \ (%compare-float-unordered) (%compare-float) :> branch2 :> branch1
     label branch1 branch2 (%branch) ;
 
 : load-from-frame ( dst n rep -- )
