@@ -555,11 +555,11 @@ M:: ppc %compare-float-unordered ( dst src1 src2 cc temp -- )
     } case ;
 
 M:: ppc %compare-branch ( label src1 src2 cc -- )
-    src1 src2 (%compare) %branch
+    src1 src2 (%compare)
     label cc %branch ;
 
 M:: ppc %compare-imm-branch ( label src1 src2 cc -- )
-    src1 src2 (%compare) %branch
+    src1 src2 (%compare)
     label cc %branch ;
 
 :: (%branch) ( label branch1 branch2 -- )
