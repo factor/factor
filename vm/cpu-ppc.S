@@ -246,11 +246,11 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
     bctr
 
 DEF(void,get_ppc_fpu_env,(void*)):
-    mffs fr0
-    stfd fr0,0(r3)
+    mffs f0
+    stfd f0,0(r3)
     blr
 
 DEF(void,set_ppc_fpu_env,(const void*)):
-    lfd fr0,0(r3)
-    mtfsf 0xff,fr0
+    lfd f0,0(r3)
+    mtfsf 0xff,f0
     blr
