@@ -468,7 +468,6 @@ M:: ppc %load-gc-root ( gc-root register -- )
     register 1 gc-root gc-root@ LWZ ;
 
 M:: ppc %call-gc ( gc-root-count -- )
-    %prepare-alien-invoke
     3 1 gc-root-base local@ ADDI
     gc-root-count 4 LI
     "inline_gc" f %alien-invoke ;
@@ -670,15 +669,17 @@ M: ppc %box-large-struct ( n c-type -- )
     ! Call the function
     "box_value_struct" f %alien-invoke ;
 
-M: ppc %prepare-alien-invoke
+M:: ppc %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    scratch-reg "stack_chain" f %alien-global
-    scratch-reg scratch-reg 0 LWZ
-    1 scratch-reg 0 STW
-    ds-reg scratch-reg 8 STW
-    rs-reg scratch-reg 12 STW ;
+    temp1 "stack_chain" f %alien-global
+    temp1 temp1 0 LWZ
+    1 temp1 0 STW
+    callback-allowed? [
+        ds-reg temp1 8 STW
+        rs-reg temp1 12 STW
+    ] when ;
 
 M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
