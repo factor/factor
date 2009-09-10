@@ -12,15 +12,19 @@ SYMBOL: errors
 
 PRIVATE>
 
-: (run-benchmark) ( vocab -- time )
+: run-benchmark ( vocab -- time )
     [ 5 ] dip '[ gc [ _ run ] benchmark ] replicate infimum ;
 
-: run-benchmark ( vocab -- )
+<PRIVATE
+
+: record-benchmark ( vocab -- )
     [ "=== " write print flush ] [
         [ [ require ] [ (run-benchmark) ] [ ] tri timings ]
         [ swap errors ]
         recover get set-at
     ] bi ;
+
+PRIVATE>
 
 : run-benchmarks ( -- timings errors )
     [
@@ -28,7 +32,7 @@ PRIVATE>
         V{ } clone errors set
         "benchmark" child-vocab-names
         [ find-vocab-root ] filter
-        [ run-benchmark ] each
+        [ record-benchmark ] each
         timings get
         errors get
     ] with-scope ;
