@@ -4,7 +4,9 @@ USING: accessors alien.c-types alien.syntax combinators
 io.backend io.files io.files.info io.files.unix kernel math system unix
 unix.statfs.freebsd unix.statvfs.freebsd unix.getfsstat.freebsd
 sequences grouping alien.strings io.encodings.utf8 unix.types
-arrays io.files.info.unix classes.struct struct-arrays ;
+arrays io.files.info.unix classes.struct
+specialized-arrays ;
+SPECIALIZED-ARRAY: statfs
 IN: io.files.info.unix.freebsd
 
 TUPLE: freebsd-file-system-info < unix-file-system-info
@@ -50,6 +52,6 @@ M: freebsd statvfs>file-system-info ( file-system-info statvfs -- file-system-in
 
 M: freebsd file-systems ( -- array )
     f 0 0 getfsstat dup io-error
-    \ statfs <struct-array>
+    <statfs-array>
     [ dup byte-length 0 getfsstat io-error ]
     [ [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ] bi ;

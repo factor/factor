@@ -5,9 +5,11 @@ classes.struct classes.tuple.private combinators
 compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
 literals math mirrors multiline namespaces prettyprint
-prettyprint.config see sequences specialized-arrays.char
-specialized-arrays.int specialized-arrays.ushort
-struct-arrays system tools.test ;
+prettyprint.config see sequences specialized-arrays
+system tools.test ;
+SPECIALIZED-ARRAY: char
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: ushort
 IN: classes.struct.tests
 
 <<
@@ -301,9 +303,11 @@ STRUCT: struct-test-array-slots
 STRUCT: struct-test-optimization
     { x { "int" 3 } } { y int } ;
 
+SPECIALIZED-ARRAY: struct-test-optimization
+
 [ t ] [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 [ t ] [
-    [ 3 struct-test-optimization <direct-struct-array> third y>> ]
+    [ 3 <direct-struct-test-optimization-array> third y>> ]
     { <tuple> <tuple-boa> memory>struct y>> } inlined?
 ] unit-test
 

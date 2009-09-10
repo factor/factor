@@ -1,8 +1,9 @@
-IN: math.vectors.simd.alien.tests
 USING: cpu.architecture math.vectors.simd
 math.vectors.simd.intrinsics accessors math.vectors.simd.alien
 kernel classes.struct tools.test compiler sequences byte-arrays
-alien math kernel.private specialized-arrays.float combinators ;
+alien math kernel.private specialized-arrays combinators ;
+SPECIALIZED-ARRAY: float
+IN: math.vectors.simd.alien.tests
 
 ! Vector alien intrinsics
 [ float-4{ 1 2 3 4 } ] [

@@ -1,6 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: gpu.buffers gpu.render gpu.shaders gpu.textures images kernel
-specialized-arrays.float ;
+specialized-arrays ;
+SPECIALIZED-ARRAY: float
 IN: gpu.util
 
 CONSTANT: environment-cube-map-mv-matrices

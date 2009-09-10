@@ -3,8 +3,10 @@ alien.syntax arrays classes.struct combinators
 compiler continuations effects io io.backend io.pathnames
 io.streams.string kernel math memory namespaces
 namespaces.private parser quotations sequences
-specialized-arrays.float stack-checker stack-checker.errors
-system threads tools.test words specialized-arrays.char ;
+specialized-arrays stack-checker stack-checker.errors
+system threads tools.test words ;
+SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAY: char
 IN: compiler.tests.alien
 
 <<

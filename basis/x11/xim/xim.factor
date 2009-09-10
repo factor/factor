@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings arrays byte-arrays
 hashtables io io.encodings.string kernel math namespaces
-sequences strings continuations x11 x11.xlib specialized-arrays.uint
-accessors io.encodings.utf16n ;
+sequences strings continuations x11 x11.xlib
+specialized-arrays accessors io.encodings.utf16n ;
+SPECIALIZED-ARRAY: uint
 IN: x11.xim
 
 SYMBOL: xim

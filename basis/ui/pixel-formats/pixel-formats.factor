@@ -1,6 +1,7 @@
 USING: accessors assocs classes destructors functors kernel
-lexer math parser sequences specialized-arrays.int ui.backend
+lexer math parser sequences specialized-arrays ui.backend
 words ;
+SPECIALIZED-ARRAY: int
 IN: ui.pixel-formats
 
 SYMBOLS:

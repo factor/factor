@@ -1,5 +1,6 @@
 USING: make math sequences splitting grouping
-kernel columns specialized-arrays.double bit-arrays ;
+kernel columns specialized-arrays bit-arrays ;
+SPECIALIZED-ARRAY: double
 IN: benchmark.dispatch2
 
 : sequences ( -- seq )

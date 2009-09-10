@@ -3,9 +3,12 @@ combinators.short-circuit fry kernel locals macros
 math math.blas.ffi math.blas.vectors math.blas.vectors.private
 math.complex math.functions math.order functors words
 sequences sequences.merged sequences.private shuffle
-specialized-arrays.float specialized-arrays.double
-specialized-arrays.complex-float specialized-arrays.complex-double
-parser prettyprint.backend prettyprint.custom ascii ;
+parser prettyprint.backend prettyprint.custom ascii
+specialized-arrays ;
+SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAY: double
+SPECIALIZED-ARRAY: complex-float
+SPECIALIZED-ARRAY: complex-double
 IN: math.blas.matrices
 
 TUPLE: blas-matrix-base underlying ld rows cols transpose ;

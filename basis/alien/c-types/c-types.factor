@@ -21,11 +21,7 @@ TUPLE: abstract-c-type
 { getter callable }
 { setter callable }
 size
-align
-array-class
-array-constructor
-(array)-constructor
-direct-array-constructor ;
+align ;
 
 TUPLE: c-type < abstract-c-type
 boxer
@@ -75,9 +71,6 @@ M: string c-type ( name -- type )
         ] ?if
     ] if ;
 
-: ?require-word ( word/pair -- )
-    dup word? [ drop ] [ first require ] ?if ;
-
 ! These words being foldable means that words need to be
 ! recompiled if a C type is redefined. Even so, folding the
 ! size facilitates some optimizations.
@@ -89,55 +82,28 @@ M: abstract-c-type heap-size size>> ;
 
 GENERIC: require-c-array ( c-type -- )
 
-M: object require-c-array
-    drop ;
+M: array require-c-array first require-c-array ;
 
-M: c-type require-c-array
-    array-class>> ?require-word ;
+GENERIC: c-array-constructor ( c-type -- word )
 
-M: string require-c-array
-    c-type require-c-array ;
+GENERIC: c-(array)-constructor ( c-type -- word )
 
-M: array require-c-array
-    first c-type require-c-array ;
-
-ERROR: specialized-array-vocab-not-loaded vocab word ;
-
-: c-array-constructor ( c-type -- word )
-    array-constructor>> dup array?
-    [ first2 specialized-array-vocab-not-loaded ] when ; foldable
-
-: c-(array)-constructor ( c-type -- word )
-    (array)-constructor>> dup array?
-    [ first2 specialized-array-vocab-not-loaded ] when ; foldable
-
-: c-direct-array-constructor ( c-type -- word )
-    direct-array-constructor>> dup array?
-    [ first2 specialized-array-vocab-not-loaded ] when ; foldable
+GENERIC: c-direct-array-constructor ( c-type -- word )
 
 GENERIC: <c-array> ( len c-type -- array )
-M: object <c-array>
-    c-array-constructor execute( len -- array ) ; inline
+
 M: string <c-array>
-    c-type <c-array> ; inline
-M: array <c-array>
-    first c-type <c-array> ; inline
+    c-array-constructor execute( len -- array ) ; inline
 
 GENERIC: (c-array) ( len c-type -- array )
-M: object (c-array)
-    c-(array)-constructor execute( len -- array ) ; inline
+
 M: string (c-array)
-    c-type (c-array) ; inline
-M: array (c-array)
-    first c-type (c-array) ; inline
+    c-(array)-constructor execute( len -- array ) ; inline
 
 GENERIC: <c-direct-array> ( alien len c-type -- array )
-M: object <c-direct-array>
-    c-direct-array-constructor execute( alien len -- array ) ; inline
+
 M: string <c-direct-array>
-    c-type <c-direct-array> ; inline
-M: array <c-direct-array>
-    first c-type <c-direct-array> ; inline
+    c-direct-array-constructor execute( alien len -- array ) ; inline
 
 : malloc-array ( n type -- alien )
     [ heap-size calloc ] [ <c-direct-array> ] 2bi ; inline
@@ -347,32 +313,6 @@ M: long-long-type box-return ( type -- )
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
 
-: ?lookup ( vocab word -- word/pair )
-    over vocab [ swap lookup ] [ 2array ] if ;
-
-: set-array-class* ( c-type vocab-stem type-stem -- c-type )
-    {
-        [
-            [ "specialized-arrays." prepend ]
-            [ "-array" append ] bi* ?lookup >>array-class
-        ]
-        [
-            [ "specialized-arrays." prepend ]
-            [ "<" "-array>" surround ] bi* ?lookup >>array-constructor
-        ]
-        [
-            [ "specialized-arrays." prepend ]
-            [ "(" "-array)" surround ] bi* ?lookup >>(array)-constructor
-        ]
-        [
-            [ "specialized-arrays." prepend ]
-            [ "<direct-" "-array>" surround ] bi* ?lookup >>direct-array-constructor
-        ]
-    } 2cleave ;
-
-: set-array-class ( c-type stem -- c-type )
-    dup set-array-class* ;
-
 CONSTANT: primitive-types
     {
         "char" "uchar"
@@ -395,7 +335,6 @@ CONSTANT: primitive-types
         [ >c-ptr ] >>unboxer-quot
         "box_alien" >>boxer
         "alien_offset" >>unboxer
-        "alien" "void*" set-array-class*
     "void*" define-primitive-type
 
     <long-long-type>
@@ -407,7 +346,6 @@ CONSTANT: primitive-types
         8 >>align
         "box_signed_8" >>boxer
         "to_signed_8" >>unboxer
-        "longlong" set-array-class
     "longlong" define-primitive-type
 
     <long-long-type>
@@ -419,7 +357,6 @@ CONSTANT: primitive-types
         8 >>align
         "box_unsigned_8" >>boxer
         "to_unsigned_8" >>unboxer
-        "ulonglong" set-array-class
     "ulonglong" define-primitive-type
 
     <c-type>
@@ -431,7 +368,6 @@ CONSTANT: primitive-types
         bootstrap-cell >>align
         "box_signed_cell" >>boxer
         "to_fixnum" >>unboxer
-        "long" set-array-class
     "long" define-primitive-type
 
     <c-type>
@@ -443,7 +379,6 @@ CONSTANT: primitive-types
         bootstrap-cell >>align
         "box_unsigned_cell" >>boxer
         "to_cell" >>unboxer
-        "ulong" set-array-class
     "ulong" define-primitive-type
 
     <c-type>
@@ -455,7 +390,6 @@ CONSTANT: primitive-types
         4 >>align
         "box_signed_4" >>boxer
         "to_fixnum" >>unboxer
-        "int" set-array-class
     "int" define-primitive-type
 
     <c-type>
@@ -467,7 +401,6 @@ CONSTANT: primitive-types
         4 >>align
         "box_unsigned_4" >>boxer
         "to_cell" >>unboxer
-        "uint" set-array-class
     "uint" define-primitive-type
 
     <c-type>
@@ -479,7 +412,6 @@ CONSTANT: primitive-types
         2 >>align
         "box_signed_2" >>boxer
         "to_fixnum" >>unboxer
-        "short" set-array-class
     "short" define-primitive-type
 
     <c-type>
@@ -491,7 +423,6 @@ CONSTANT: primitive-types
         2 >>align
         "box_unsigned_2" >>boxer
         "to_cell" >>unboxer
-        "ushort" set-array-class
     "ushort" define-primitive-type
 
     <c-type>
@@ -503,7 +434,6 @@ CONSTANT: primitive-types
         1 >>align
         "box_signed_1" >>boxer
         "to_fixnum" >>unboxer
-        "char" set-array-class
     "char" define-primitive-type
 
     <c-type>
@@ -515,7 +445,6 @@ CONSTANT: primitive-types
         1 >>align
         "box_unsigned_1" >>boxer
         "to_cell" >>unboxer
-        "uchar" set-array-class
     "uchar" define-primitive-type
 
     <c-type>
@@ -525,7 +454,6 @@ CONSTANT: primitive-types
         1 >>align
         "box_boolean" >>boxer
         "to_boolean" >>unboxer
-        "bool" set-array-class
     "bool" define-primitive-type
 
     <c-type>
@@ -539,7 +467,6 @@ CONSTANT: primitive-types
         "to_float" >>unboxer
         float-rep >>rep
         [ >float ] >>unboxer-quot
-        "float" set-array-class
     "float" define-primitive-type
 
     <c-type>
@@ -553,7 +480,6 @@ CONSTANT: primitive-types
         "to_double" >>unboxer
         double-rep >>rep
         [ >float ] >>unboxer-quot
-        "double" set-array-class
     "double" define-primitive-type
 
     "long" "ptrdiff_t" typedef
