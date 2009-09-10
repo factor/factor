@@ -23,11 +23,11 @@ $nl
 }
 "C structure objects can be allocated by calling " { $link <c-object> } " or " { $link malloc-object } "."
 $nl
-"Arrays of C structures can be created with the " { $vocab-link "struct-arrays" } " vocabulary." ;
+"Arrays of C structures can be created with the " { $vocab-link "specialized-arrays" } " vocabulary." ;
 
 ARTICLE: "c-unions" "C unions"
 "A " { $snippet "union" } " in C defines a type large enough to hold its largest member. This is usually used to allocate a block of memory which can hold one of several types of values."
 { $subsection POSTPONE: C-UNION: }
 "C union objects can be allocated by calling " { $link <c-object> } " or " { $link malloc-object } "."
 $nl
-"Arrays of C unions can be created with the " { $vocab-link "struct-arrays" } " vocabulary." ;
+"Arrays of C unions can be created with the " { $vocab-link "specialized-arrays" } " vocabulary." ;
