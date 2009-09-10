@@ -6,8 +6,9 @@ io.ports windows.types math windows.kernel32 namespaces make
 io.launcher kernel sequences windows.errors splitting system
 threads init strings combinators io.backend accessors
 concurrency.flags io.files assocs io.files.private windows
-destructors specialized-arrays.alien classes classes.struct ;
+destructors classes classes.struct specialized-arrays ;
 SPECIALIZED-ARRAY: ushort
+SPECIALIZED-ARRAY: void*
 IN: io.launcher.windows
 
 TUPLE: CreateProcess-args
