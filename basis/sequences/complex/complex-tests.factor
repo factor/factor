@@ -1,5 +1,6 @@
-USING: specialized-arrays.float sequences.complex
+USING: specialized-arrays sequences.complex
 kernel sequences tools.test arrays accessors ;
+SPECIALIZED-ARRAY: float
 IN: sequences.complex.tests
 
 : test-array ( -- x )

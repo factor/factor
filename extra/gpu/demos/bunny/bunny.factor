@@ -1,12 +1,14 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types arrays classes.struct combinators
-combinators.short-circuit game-worlds gpu gpu.buffers gpu.util.wasd
-gpu.framebuffers gpu.render gpu.shaders gpu.state gpu.textures gpu.util
-grouping http.client images images.loader io io.encodings.ascii io.files
-io.files.temp kernel math math.matrices math.parser math.vectors
-method-chains sequences specialized-arrays.float specialized-vectors.uint
-splitting struct-vectors threads ui ui.gadgets ui.gadgets.worlds
-ui.pixel-formats ;
+combinators.short-circuit game-worlds gpu gpu.buffers
+gpu.util.wasd gpu.framebuffers gpu.render gpu.shaders gpu.state
+gpu.textures gpu.util grouping http.client images images.loader
+io io.encodings.ascii io.files io.files.temp kernel math
+math.matrices math.parser math.vectors method-chains sequences
+splitting threads ui ui.gadgets ui.gadgets.worlds
+ui.pixel-formats specialized-arrays specialized-vectors ;
+SPECIALIZED-ARRAY: float
+SPECIALIZED-VECTOR: uint
 IN: gpu.demos.bunny
 
 GLSL-SHADER-FILE: bunny-vertex-shader vertex-shader "bunny.v.glsl"
@@ -51,6 +53,8 @@ VERTEX-FORMAT: bunny-vertex
     { f        float-components 1 f } ;
 VERTEX-STRUCT: bunny-vertex-struct bunny-vertex
 
+SPECIALIZED-VECTOR: bunny-vertex-struct
+
 UNIFORM-TUPLE: bunny-uniforms < mvp-uniforms
     { "light-position" vec3-uniform  f }
     { "color"          vec4-uniform  f }
@@ -86,7 +90,7 @@ UNIFORM-TUPLE: loading-uniforms
     ] when* ;
 
 : parse-bunny-model ( -- vertexes indexes )
-    100000 bunny-vertex-struct <struct-vector>
+    100000 <bunny-vertex-struct-vector>
     100000 <uint-vector>
     (parse-bunny-model) ;
 

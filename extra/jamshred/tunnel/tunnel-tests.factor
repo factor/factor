@@ -1,6 +1,8 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays jamshred.oint jamshred.tunnel kernel math.vectors sequences specialized-arrays.float tools.test ;
+USING: accessors arrays jamshred.oint jamshred.tunnel kernel
+math.vectors sequences specialized-arrays tools.test ;
+SPECIALIZED-ARRAY: float
 IN: jamshred.tunnel.tests
 
 [ 0 ] [ T{ segment f { 0 0 0 } f f f 0 }

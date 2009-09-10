@@ -4,7 +4,8 @@ game-input.scancodes game-loop game-worlds
 gpu.render gpu.state kernel literals
 locals math math.constants math.functions math.matrices
 math.order math.vectors opengl.gl sequences
-specialized-arrays.float ui ui.gadgets.worlds ;
+ui ui.gadgets.worlds specialized-arrays ;
+SPECIALIZED-ARRAY: float
 IN: gpu.util.wasd
 
 UNIFORM-TUPLE: mvp-uniforms

@@ -4,11 +4,12 @@ game-input.scancodes grouping kernel literals locals
 math math.constants math.functions math.matrices math.order
 math.vectors opengl opengl.capabilities opengl.gl
 opengl.shaders opengl.textures opengl.textures.private
-sequences sequences.product specialized-arrays.float
+sequences sequences.product specialized-arrays
 terrain.generation terrain.shaders ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats game-worlds method-chains
 math.affine-transforms noise ui.gestures combinators.short-circuit
 destructors grid-meshes ;
+SPECIALIZED-ARRAY: float
 IN: terrain
 
 CONSTANT: FOV $[ 2.0 sqrt 1 + ]

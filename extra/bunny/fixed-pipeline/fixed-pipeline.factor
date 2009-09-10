@@ -1,6 +1,6 @@
 USING: alien.c-types continuations destructors kernel
-opengl opengl.gl bunny.model specialized-arrays.float
-accessors ;
+opengl opengl.gl bunny.model specialized-arrays accessors ;
+SPECIALIZED-ARRAY: float
 IN: bunny.fixed-pipeline
 
 TUPLE: bunny-fixed-pipeline ;
