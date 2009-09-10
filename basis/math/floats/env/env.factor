@@ -1,7 +1,7 @@
 ! (c)Joe Groff bsd license
-USING: alien.syntax assocs biassocs combinators continuations
+USING: alien.syntax arrays assocs biassocs combinators continuations
 generalizations kernel literals locals math math.bitwise
-sequences system vocabs.loader ;
+sequences sets system vocabs.loader ;
 IN: math.floats.env
 
 SINGLETONS:
@@ -95,8 +95,10 @@ GENERIC# (set-denormal-mode) 1 ( fp-env mode -- fp-env )
 
 PRIVATE>
 
-: fp-exception-flags ( -- exceptions ) fp-env-register (get-exception-flags) ;
-: set-fp-exception-flags ( exceptions -- ) [ (set-exception-flags) ] curry change-fp-env-registers ;
+: fp-exception-flags ( -- exceptions )
+    (fp-env-registers) [ (get-exception-flags) ] [ union ] map-reduce >array ; inline
+: set-fp-exception-flags ( exceptions -- )
+    [ (set-exception-flags) ] curry change-fp-env-registers ; inline
 : clear-fp-exception-flags ( -- ) { } set-fp-exception-flags ; inline
 
 : collect-fp-exceptions ( quot -- exceptions )
@@ -116,7 +118,8 @@ PRIVATE>
     mode set-rounding-mode
     quot [ orig set-rounding-mode ] [ ] cleanup ; inline
 
-: fp-traps ( -- exceptions ) fp-env-register (get-fp-traps) ;
+: fp-traps ( -- exceptions )
+    (fp-env-registers) [ (get-fp-traps) ] [ union ] map-reduce >array ; inline
 
 :: with-fp-traps ( exceptions quot -- )
     fp-traps :> orig
