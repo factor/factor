@@ -1,6 +1,7 @@
 USING: sequences math mirrors splitting grouping
 kernel make assocs alien.syntax columns
-specialized-arrays.double bit-arrays ;
+specialized-arrays bit-arrays ;
+SPECIALIZED-ARRAY: double
 IN: benchmark.dispatch3
 
 GENERIC: g ( obj -- str )

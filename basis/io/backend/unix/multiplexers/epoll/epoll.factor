@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.struct kernel destructors bit-arrays
-sequences assocs struct-arrays math namespaces locals fry unix
-unix.linux.epoll unix.time io.ports io.backend.unix
-io.backend.unix.multiplexers ;
+sequences assocs specialized-arrays math namespaces
+locals fry unix unix.linux.epoll unix.time io.ports
+io.backend.unix io.backend.unix.multiplexers ;
+SPECIALIZED-ARRAY: epoll-event
 IN: io.backend.unix.multiplexers.epoll
 
 TUPLE: epoll-mx < mx events ;
@@ -16,7 +17,7 @@ TUPLE: epoll-mx < mx events ;
 : <epoll-mx> ( -- mx )
     epoll-mx new-mx
         max-events epoll_create dup io-error >>fd
-        max-events epoll-event <struct-array> >>events ;
+        max-events <epoll-event-array> >>events ;
 
 M: epoll-mx dispose* fd>> close-file ;
 

@@ -2,8 +2,11 @@ USING: accessors alien alien.c-types arrays ascii byte-arrays combinators
 combinators.short-circuit fry kernel math math.blas.ffi
 math.complex math.functions math.order sequences sequences.private
 functors words locals parser prettyprint.backend prettyprint.custom
-specialized-arrays.float specialized-arrays.double
-specialized-arrays.complex-float specialized-arrays.complex-double ;
+specialized-arrays ;
+SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAY: double
+SPECIALIZED-ARRAY: complex-float
+SPECIALIZED-ARRAY: complex-double
 IN: math.blas.vectors
 
 TUPLE: blas-vector-base underlying length inc ;

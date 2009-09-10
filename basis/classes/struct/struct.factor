@@ -4,13 +4,14 @@ alien.structs.fields arrays byte-arrays classes classes.parser
 classes.tuple classes.tuple.parser classes.tuple.private
 combinators combinators.short-circuit combinators.smart
 definitions functors.backend fry generalizations generic.parser
-kernel kernel.private lexer libc locals macros make math math.order
-parser quotations sequences slots slots.private struct-arrays vectors
-words compiler.tree.propagation.transforms specialized-arrays.uchar ;
+kernel kernel.private lexer libc locals macros make math
+math.order parser quotations sequences slots slots.private
+specialized-arrays vectors words
+compiler.tree.propagation.transforms ;
 FROM: slots => reader-word writer-word ;
 IN: classes.struct
 
-! struct class
+SPECIALIZED-ARRAY: uchar
 
 ERROR: struct-must-have-slots ;
 

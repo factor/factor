@@ -3,8 +3,9 @@ USING: accessors alien.c-types arrays byte-arrays combinators
 destructors gpu gpu.buffers gpu.private gpu.textures
 gpu.textures.private images kernel locals math math.rectangles opengl
 opengl.framebuffers opengl.gl opengl.textures sequences
-specialized-arrays.int specialized-arrays.uint
-ui.gadgets.worlds variants ;
+specialized-arrays ui.gadgets.worlds variants ;
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: uint
 IN: gpu.framebuffers
 
 SINGLETON: system-framebuffer

@@ -1,4 +1,6 @@
-USING: alien.c-types alien.syntax half-floats kernel math tools.test ;
+USING: alien.c-types alien.syntax half-floats kernel math tools.test
+specialized-arrays ;
+SPECIALIZED-ARRAY: half
 IN: half-floats.tests
 
 [ HEX: 0000 ] [  0.0  half>bits ] unit-test

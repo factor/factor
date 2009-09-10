@@ -8,8 +8,9 @@ math.functions math.private strings layouts
 compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
-specialized-arrays.double system sorting math.libm
+specialized-arrays system sorting math.libm
 math.intervals quotations effects alien ;
+SPECIALIZED-ARRAY: double
 IN: compiler.tree.propagation.tests
 
 [ V{ } ] [ [ ] final-classes ] unit-test

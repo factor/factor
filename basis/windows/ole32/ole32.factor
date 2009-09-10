@@ -1,8 +1,9 @@
 USING: alien alien.syntax alien.c-types alien.strings math
-kernel sequences windows.errors windows.types io
-accessors math.order namespaces make math.parser windows.kernel32
-combinators locals specialized-arrays.uchar
-literals splitting grouping classes.struct combinators.smart ;
+kernel sequences windows.errors windows.types io accessors
+math.order namespaces make math.parser windows.kernel32
+combinators locals specialized-arrays literals splitting
+grouping classes.struct combinators.smart ;
+SPECIALIZED-ARRAY: uchar
 IN: windows.ole32
 
 LIBRARY: ole32
