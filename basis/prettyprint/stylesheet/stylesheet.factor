@@ -7,27 +7,28 @@ IN: prettyprint.stylesheet
 
 <PRIVATE
 
-CONSTANT: dim-color COLOR: cornsilk4
+CONSTANT: dim-color COLOR: gray35
+CONSTANT: alt-color COLOR: DarkSlateGray
 
 : dimly-lit-word? ( word -- ? )
     { POSTPONE: USING: POSTPONE: USE: POSTPONE: IN: } memq? ;
 
-: parsing-word-color ( word -- color )
-    dimly-lit-word? dim-color COLOR: DarkSlateGray ? ;
+: parsing-or-delim-word? ( word -- ? )
+    [ parsing-word? ] [ delimiter? ] bi or ;
+
+: word-color ( word -- color )
+    {
+        { [ dup dimly-lit-word? ] [ drop dim-color ] }
+        { [ dup parsing-or-delim-word? ] [ drop alt-color ] }
+        [ drop COLOR: black ]
+    } cond ;
 
 PRIVATE>
 
 : word-style ( word -- style )
     dup "word-style" word-prop >hashtable [
         [
-            [ presented set ] [
-                {
-                    { [ dup parsing-word? ] [ parsing-word-color ] }
-                    { [ dup delimiter? ] [ drop COLOR: DarkSlateGray ] }
-                    { [ dup symbol? ] [ drop COLOR: DarkSlateGray ] }
-                    [ drop COLOR: black ]
-                } cond foreground set
-            ] bi
+            [ presented set ] [ word-color foreground set ] bi
         ] bind
     ] keep ;
 
