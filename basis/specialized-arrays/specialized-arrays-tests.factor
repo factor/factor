@@ -1,9 +1,16 @@
 IN: specialized-arrays.tests
-USING: tools.test alien.syntax specialized-arrays sequences
-specialized-arrays.int specialized-arrays.bool
-specialized-arrays.ushort alien.c-types accessors kernel
-specialized-arrays.char specialized-arrays.uint
-specialized-arrays.float arrays combinators compiler ;
+USING: tools.test alien.syntax specialized-arrays
+specialized-arrays sequences alien.c-types accessors
+kernel arrays combinators compiler classes.struct
+combinators.smart compiler.tree.debugger math libc destructors
+sequences.private ;
+
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: bool
+SPECIALIZED-ARRAY: ushort
+SPECIALIZED-ARRAY: char
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: float
 
 [ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
 
@@ -36,4 +43,66 @@ specialized-arrays.float arrays combinators compiler ;
 [ ushort-array{ 0 0 0 } ] [
     3 ALIEN: 123 100 <direct-ushort-array> new-sequence
     dup [ drop 0 ] change-each
+] unit-test
+
+STRUCT: test-struct
+    { x int }
+    { y int } ;
+
+SPECIALIZED-ARRAY: test-struct
+
+[ 1 ] [
+    1 test-struct-array{ } new-sequence length
+] unit-test
+
+[ V{ test-struct } ] [
+    [ [ test-struct-array <struct> ] test-struct-array{ } output>sequence first ] final-classes
+] unit-test
+
+: make-point ( x y -- struct )
+    test-struct <struct-boa> ;
+
+[ 5/4 ] [
+    2 <test-struct-array>
+    1 2 make-point over set-first
+    3 4 make-point over set-second
+    0 [ [ x>> ] [ y>> ] bi / + ] reduce
+] unit-test
+
+[ 5/4 ] [
+    [
+        2 malloc-test-struct-array
+        dup &free drop
+        1 2 make-point over set-first
+        3 4 make-point over set-second
+        0 [ [ x>> ] [ y>> ] bi / + ] reduce
+    ] with-destructors
+] unit-test
+
+[ ] [ ALIEN: 123 10 <direct-test-struct-array> drop ] unit-test
+
+[ ] [
+    [
+        10 malloc-test-struct-array
+        &free drop
+    ] with-destructors
+] unit-test
+
+[ 15 ] [ 15 10 <test-struct-array> resize length ] unit-test
+
+[ S{ test-struct f 12 20 } ] [
+    test-struct-array{
+        S{ test-struct f  4 20 } 
+        S{ test-struct f 12 20 }
+        S{ test-struct f 20 20 }
+    } second
+] unit-test
+
+! Regression
+STRUCT: fixed-string { text char[100] } ;
+
+SPECIALIZED-ARRAY: fixed-string
+
+[ { ALIEN: 123 ALIEN: 223 ALIEN: 323 ALIEN: 423 } ] [
+    ALIEN: 123 4 <direct-fixed-string-array> [ (underlying)>> ] { } map-as
 ] unit-test

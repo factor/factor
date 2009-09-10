@@ -1,10 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache colors.constants destructors kernel
-opengl opengl.gl opengl.capabilities combinators images
-images.tesselation grouping specialized-arrays.float sequences math
-math.vectors math.matrices generalizations fry arrays namespaces
-system locals literals ;
+USING: accessors assocs cache colors.constants destructors
+kernel opengl opengl.gl opengl.capabilities combinators images
+images.tesselation grouping sequences math math.vectors
+math.matrices generalizations fry arrays namespaces system
+locals literals specialized-arrays ;
+SPECIALIZED-ARRAY: float
 IN: opengl.textures
 
 SYMBOL: non-power-of-2-textures?

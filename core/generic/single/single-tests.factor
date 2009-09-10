@@ -1,9 +1,10 @@
-USING: tools.test math math.functions math.constants generic.standard
-generic.single strings sequences arrays kernel accessors words
-specialized-arrays.double byte-arrays bit-arrays parser namespaces
-make quotations stack-checker vectors growable hashtables sbufs
-prettyprint byte-vectors bit-vectors specialized-vectors.double
+USING: tools.test math math.functions math.constants
+generic.standard generic.single strings sequences arrays kernel
+accessors words byte-arrays bit-arrays parser namespaces make
+quotations stack-checker vectors growable hashtables sbufs
+prettyprint byte-vectors bit-vectors specialized-vectors
 definitions generic sets graphs assocs grouping see eval ;
+SPECIALIZED-VECTOR: double
 IN: generic.single.tests
 
 GENERIC: lo-tag-test ( obj -- obj' )

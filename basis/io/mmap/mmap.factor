@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
+! Copyright (C) 2007, 2009 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors io.files io.files.info
 io.backend kernel quotations system alien alien.accessors
@@ -29,6 +29,11 @@ PRIVATE>
 
 : <mapped-file> ( path -- mmap )
     [ (mapped-file-r/w) ] prepare-mapped-file ;
+
+: <mapped-array> ( mmap c-type -- direct-array )
+    [ [ address>> ] [ length>> ] bi ] dip
+    [ heap-size /i ] keep
+    <c-direct-array> ; inline
 
 HOOK: close-mapped-file io-backend ( mmap -- )
 

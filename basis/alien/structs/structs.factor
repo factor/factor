@@ -66,4 +66,4 @@ M: struct-type stack-size
     [ name>> = ] with find nip offset>> ;
 
 USE: vocabs.loader
-"struct-arrays" require
+"specialized-arrays" require

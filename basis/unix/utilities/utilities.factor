@@ -1,9 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings
-combinators.short-circuit fry kernel layouts sequences
-specialized-arrays.alien accessors ;
+combinators.short-circuit fry kernel layouts sequences accessors
+specialized-arrays ;
 IN: unix.utilities
+
+SPECIALIZED-ARRAY: void*
 
 : more? ( alien -- ? )
     { [ ] [ *void* ] } 1&& ;
