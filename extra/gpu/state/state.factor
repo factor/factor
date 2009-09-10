@@ -1,7 +1,9 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types arrays byte-arrays combinators gpu
 kernel literals math math.rectangles opengl opengl.gl sequences
-variants specialized-arrays.int specialized-arrays.float ;
+variants specialized-arrays ;
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: float
 IN: gpu.state
 
 UNION: ?rect rect POSTPONE: f ;

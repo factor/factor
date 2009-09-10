@@ -4,7 +4,8 @@ USING: alien alien.c-types alien.strings alien.syntax
 classes.struct combinators io.encodings.utf16n io.files
 io.pathnames kernel windows.errors windows.com
 windows.com.syntax windows.user32 windows.ole32 windows
-specialized-arrays.ushort ;
+specialized-arrays ;
+SPECIALIZED-ARRAY: ushort
 IN: windows.shell32
 
 CONSTANT: CSIDL_DESKTOP HEX: 00

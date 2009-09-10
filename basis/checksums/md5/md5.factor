@@ -5,7 +5,8 @@ math.functions math.parser namespaces splitting grouping strings
 sequences byte-arrays locals sequences.private macros fry
 io.encodings.binary math.bitwise checksums accessors
 checksums.common checksums.stream combinators combinators.smart
-specialized-arrays.uint literals hints ;
+specialized-arrays literals hints ;
+SPECIALIZED-ARRAY: uint
 IN: checksums.md5
 
 SINGLETON: md5

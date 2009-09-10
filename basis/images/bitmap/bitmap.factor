@@ -5,8 +5,10 @@ combinators compression.run-length endian fry grouping images
 images.bitmap.loading images.loader io io.binary
 io.encodings.binary io.encodings.string io.files
 io.streams.limited kernel locals macros math math.bitwise
-math.functions namespaces sequences specialized-arrays.uint
-specialized-arrays.ushort strings summary ;
+math.functions namespaces sequences specialized-arrays
+strings summary ;
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: ushort
 IN: images.bitmap
 
 : write2 ( n -- ) 2 >le write ;

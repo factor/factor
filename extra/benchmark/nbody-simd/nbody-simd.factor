@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel locals math math.constants
 math.functions math.vectors math.vectors.simd prettyprint
-combinators.smart sequences hints struct-arrays classes.struct ;
+combinators.smart sequences hints classes.struct
+specialized-arrays ;
 IN: benchmark.nbody-simd
 
 : solar-mass ( -- x ) 4 pi sq * ; inline
@@ -12,6 +13,8 @@ STRUCT: body
 { location double-4 }
 { velocity double-4 }
 { mass double } ;
+
+SPECIALIZED-ARRAY: body
 
 : <body> ( location velocity mass -- body )
     [ days-per-year v*n ] [ solar-mass * ] bi* body <struct-boa> ; inline
@@ -46,16 +49,14 @@ STRUCT: body
 : offset-momentum ( body offset -- body )
     vneg solar-mass v/n >>velocity ; inline
 
-TUPLE: nbody-system { bodies struct-array read-only } ;
-
 : init-bodies ( bodies -- )
     [ first ] [ [ [ velocity>> ] [ mass>> ] bi v*n ] [ v+ ] map-reduce ] bi
     offset-momentum drop ; inline
 
 : <nbody-system> ( -- system )
     [ <sun> <jupiter> <saturn> <uranus> <neptune> ]
-    struct-array{ body } output>sequence nbody-system boa
-    dup bodies>> init-bodies ; inline
+    body-array{ } output>sequence
+    dup init-bodies ; inline
 
 :: each-pair ( bodies pair-quot: ( other-body body -- ) each-quot: ( body -- ) -- )
     bodies [| body i |
@@ -77,7 +78,6 @@ TUPLE: nbody-system { bodies struct-array read-only } ;
     [ [ other-body ] 2dip '[ body mass>> _ * _ n*v v+ ] change-velocity drop ] 2bi ; inline
 
 : advance ( system dt -- )
-    [ bodies>> ] dip
     [ '[ _ update-velocity ] [ drop ] each-pair ]
     [ '[ _ update-position ] each ]
     2bi ; inline
@@ -89,7 +89,7 @@ TUPLE: nbody-system { bodies struct-array read-only } ;
     [ [ mass>> ] bi@ * ] [ [ location>> ] bi@ distance ] 2bi / ; inline
 
 : energy ( system -- x )
-    [ 0.0 ] dip bodies>> [ newton's-law - ] [ inertia + ] each-pair ; inline
+    [ 0.0 ] dip [ newton's-law - ] [ inertia + ] each-pair ; inline
 
 : nbody ( n -- )
     >fixnum

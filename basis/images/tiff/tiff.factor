@@ -5,8 +5,9 @@ compression.lzw endian fry grouping images io
 io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
-strings math.vectors specialized-arrays.float locals
+strings math.vectors specialized-arrays locals
 images.loader ;
+SPECIALIZED-ARRAY: float
 IN: images.tiff
 
 SINGLETON: tiff-image

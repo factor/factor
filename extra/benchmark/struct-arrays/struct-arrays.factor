@@ -2,10 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.struct combinators.smart fry kernel
 math math.functions math.order math.parser sequences
-struct-arrays io ;
+specialized-arrays io ;
 IN: benchmark.struct-arrays
 
 STRUCT: point { x float } { y float } { z float } ;
+
+SPECIALIZED-ARRAY: point
 
 : xyz ( point -- x y z )
     [ x>> ] [ y>> ] [ z>> ] tri ; inline
@@ -19,7 +21,7 @@ STRUCT: point { x float } { y float } { z float } ;
     1 + ; inline
 
 : make-points ( len -- points )
-    point <struct-array> dup 0 [ init-point ] reduce drop ; inline
+    <point-array> dup 0 [ init-point ] reduce drop ; inline
 
 : point-norm ( point -- norm )
     [ xyz [ absq ] tri@ ] sum-outputs sqrt ; inline
