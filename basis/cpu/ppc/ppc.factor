@@ -299,9 +299,9 @@ M:: ppc %binary-float-function ( dst src1 src2 func -- )
     dst float-function-return ;
 
 ! Internal format is always double-precision on PowerPC
-M: ppc %single>double-float 2drop ;
+M: ppc %single>double-float FMR ;
 
-M: ppc %double>single-float 2drop ;
+M: ppc %double>single-float FMR ;
 
 M: ppc %unbox-alien ( dst src -- )
     alien-offset LWZ ;
