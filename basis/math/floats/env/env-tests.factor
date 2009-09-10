@@ -1,5 +1,5 @@
 USING: kernel math math.floats.env math.floats.env.private
-math.functions math.libm sets sequences tools.test ;
+math.functions math.libm sequences tools.test ;
 IN: math.floats.env.tests
 
 : set-default-fp-env ( -- )
@@ -10,12 +10,12 @@ set-default-fp-env
 
 [ t ] [
     [ 1.0 0.0 / drop ] collect-fp-exceptions
-    { +fp-zero-divide+ } set= 
+    +fp-zero-divide+ swap member?
 ] unit-test
 
 [ t ] [
     [ 1.0 3.0 / drop ] collect-fp-exceptions
-    { +fp-inexact+ } set= 
+    +fp-inexact+ swap member?
 ] unit-test
 
 [ t ] [
@@ -29,8 +29,23 @@ set-default-fp-env
 ] unit-test
 
 [ t ] [
+    [ 2.0 100,000.0 ^ drop ] collect-fp-exceptions
+    +fp-overflow+ swap member?
+] unit-test
+
+[ t ] [
+    [ 2.0 -100,000.0 ^ drop ] collect-fp-exceptions
+    +fp-underflow+ swap member?
+] unit-test
+
+[ t ] [
     [ 0.0 0.0 /f drop ] collect-fp-exceptions
-    { +fp-invalid-operation+ } set= 
+    +fp-invalid-operation+ swap member?
+] unit-test
+
+[ t ] [
+    [ -1.0 fsqrt drop ] collect-fp-exceptions
+    +fp-invalid-operation+ swap member?
 ] unit-test
 
 [
