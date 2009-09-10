@@ -2,8 +2,12 @@
 USING: alien alien.syntax byte-arrays classes gpu.buffers
 gpu.framebuffers gpu.shaders gpu.textures help.markup
 help.syntax images kernel math multiline sequences
-specialized-arrays.alien specialized-arrays.uint
-specialized-arrays.ulong strings ;
+specialized-arrays strings ;
+SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: ulong
+SPECIALIZED-ARRAY: void*
 IN: gpu.render
 
 HELP: <index-elements>

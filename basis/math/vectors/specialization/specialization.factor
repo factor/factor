@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words kernel make sequences effects kernel.private accessors
-combinators math math.intervals math.vectors namespaces assocs fry
-splitting classes.algebra generalizations locals
-compiler.tree.propagation.info ;
+USING: alien.c-types words kernel make sequences effects
+kernel.private accessors combinators math math.intervals
+math.vectors namespaces assocs fry splitting classes.algebra
+generalizations locals compiler.tree.propagation.info ;
 IN: math.vectors.specialization
 
 SYMBOLS: -> +vector+ +scalar+ +nonnegative+ ;
@@ -99,12 +99,14 @@ M: vector-word subwords specializations values [ word? ] filter ;
     array-type elt-type word word-schema inputs signature-for-schema ;
 
 :: specialize-vector-words ( array-type elt-type simd -- )
-    vector-words keys [
-        [ array-type elt-type simd specialize-vector-word ]
-        [ array-type elt-type input-signature ]
-        [ ]
-        tri add-specialization
-    ] each ;
+    elt-type number class<= [
+        vector-words keys [
+            [ array-type elt-type simd specialize-vector-word ]
+            [ array-type elt-type input-signature ]
+            [ ]
+            tri add-specialization
+        ] each
+    ] when ;
 
 : find-specialization ( classes word -- word/f )
     specializations

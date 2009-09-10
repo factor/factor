@@ -1,10 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings combinators
-grouping io.encodings.utf8 io.files kernel math sequences
-system unix io.files.unix specialized-arrays.uint arrays
-unix.statfs.macosx unix.statvfs.macosx unix.getfsstat.macosx
-io.files.info.unix io.files.info classes.struct struct-arrays ;
+grouping io.encodings.utf8 io.files kernel math sequences system
+unix io.files.unix arrays unix.statfs.macosx unix.statvfs.macosx
+unix.getfsstat.macosx io.files.info.unix io.files.info
+classes.struct specialized-arrays ;
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: statfs64
 IN: io.files.info.unix.macosx
 
 TUPLE: macosx-file-system-info < unix-file-system-info
@@ -12,7 +14,7 @@ io-size owner type-id filesystem-subtype ;
 
 M: macosx file-systems ( -- array )
     f <void*> dup 0 getmntinfo64 dup io-error
-    [ *void* ] dip \ statfs64 <direct-struct-array>
+    [ *void* ] dip <direct-statfs64-array>
     [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ;
 
 M: macosx new-file-system-info macosx-file-system-info new ;

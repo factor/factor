@@ -1,6 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien.c-types alien.syntax kernel math math.order
-specialized-arrays.functor ;
+USING: accessors alien.c-types alien.syntax kernel math math.order ;
 IN: half-floats
 
 : half>bits ( float -- bits )
@@ -35,7 +34,5 @@ C-STRUCT: half { "ushort" "(bits)" } ;
     [ half>bits <ushort> ] >>unboxer-quot
     [ *ushort bits>half ] >>boxer-quot
     drop
-
-"half" define-array
 
 >>

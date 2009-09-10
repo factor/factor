@@ -3,8 +3,10 @@
 USING: accessors kernel system math math.bitwise strings arrays
 sequences combinators combinators.short-circuit alien.c-types
 vocabs.loader calendar calendar.unix io.files.info
-io.files.types io.backend io.directories unix unix.stat unix.time unix.users
-unix.groups classes.struct struct-arrays ;
+io.files.types io.backend io.directories unix unix.stat
+unix.time unix.users unix.groups classes.struct
+specialized-arrays ;
+SPECIALIZED-ARRAY: timeval
 IN: io.files.info.unix
 
 TUPLE: unix-file-system-info < file-system-info
@@ -184,7 +186,7 @@ M: unix copy-file-and-info ( from to -- )
 
 : timestamps>byte-array ( timestamps -- byte-array )
     [ [ timestamp>timeval ] [ \ timeval <struct> ] if* ] map
-    \ timeval >struct-array ;
+    >timeval-array ;
 
 PRIVATE>
 

@@ -7,9 +7,12 @@ gpu.framebuffers.private gpu.shaders gpu.shaders.private gpu.state
 gpu.textures gpu.textures.private half-floats images kernel
 lexer locals math math.order math.parser namespaces opengl
 opengl.gl parser quotations sequences slots sorting
-specialized-arrays.alien specialized-arrays.float specialized-arrays.int
-specialized-arrays.uint strings ui.gadgets.worlds variants
+specialized-arrays strings ui.gadgets.worlds variants
 vocabs.parser words ;
+SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: void*
 IN: gpu.render
 
 UNION: ?integer integer POSTPONE: f ;
