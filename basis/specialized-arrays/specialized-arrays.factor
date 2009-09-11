@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types assocs byte-arrays classes
-compiler.units functors io kernel lexer libc math
-math.vectors.specialization namespaces parser
-prettyprint.custom sequences sequences.private strings summary
-vocabs vocabs.loader vocabs.parser words ;
+compiler.units functors kernel lexer libc math
+math.vectors.specialization namespaces parser prettyprint.custom
+sequences sequences.private strings summary vocabs vocabs.loader
+vocabs.parser words fry combinators ;
 IN: specialized-arrays
 
 MIXIN: specialized-array
@@ -86,8 +86,12 @@ M: A resize
     ] [ drop ] 2bi
     <direct-A> ; inline
 
-M: A byte-length underlying>> length ; inline
+M: A byte-length length T heap-size * ; inline
+
+M: A direct-array-syntax drop \ A@ ;
+
 M: A pprint-delims drop \ A{ \ } ;
+
 M: A >pprint-sequence ;
 
 SYNTAX: A{ \ } [ >A ] parse-literal ;
@@ -100,34 +104,30 @@ A T c-type-boxed-class f specialize-vector-words
 ;FUNCTOR
 
 : underlying-type ( c-type -- c-type' )
-    dup c-types get at string? [
-        c-types get at underlying-type
-    ] when ;
+    dup c-types get at {
+        { [ dup not ] [ drop no-c-type ] }
+        { [ dup string? ] [ nip underlying-type ] }
+        [ drop ]
+    } cond ;
 
 : specialized-array-vocab ( c-type -- vocab )
     "specialized-arrays.instances." prepend ;
 
-: defining-array-message ( type -- )
-    "quiet" get [ drop ] [
-        "Generating specialized " " arrays..." surround print
-    ] if ;
-
 PRIVATE>
 
-: define-array-vocab ( type  -- vocab )
-    underlying-type
-    dup specialized-array-vocab vocab
-    [ ] [
-        [ defining-array-message ]
+: generate-vocab ( vocab-name quot -- vocab )
+    [ dup vocab [ ] ] dip '[
         [
             [
-                dup specialized-array-vocab
-                [ define-array ] with-current-vocab
+                 _ with-current-vocab
             ] with-compilation-unit
-        ]
-        [ specialized-array-vocab ]
-        tri
-    ] ?if ;
+        ] keep
+    ] ?if ; inline
+
+: define-array-vocab ( type -- vocab )
+    underlying-type
+    [ specialized-array-vocab ] [ '[ _ define-array ] ] bi
+    generate-vocab ;
 
 M: string require-c-array define-array-vocab drop ;
 

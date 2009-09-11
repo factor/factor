@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types assocs compiler.units functors
-growable io kernel lexer namespaces parser prettyprint.custom
+growable kernel lexer namespaces parser prettyprint.custom
 sequences specialized-arrays specialized-arrays.private strings
 vocabs vocabs.parser ;
 QUALIFIED: vectors.functor
@@ -44,27 +44,12 @@ INSTANCE: V S
 : specialized-vector-vocab ( type -- vocab )
     "specialized-vectors.instances." prepend ;
 
-: defining-vector-message ( type -- )
-    "quiet" get [ drop ] [
-        "Generating specialized " " vectors..." surround print
-    ] if ;
-
 PRIVATE>
 
-: define-vector-vocab ( type  -- vocab )
+: define-vector-vocab ( type -- vocab )
     underlying-type
-    dup specialized-vector-vocab vocab
-    [ ] [
-        [ defining-vector-message ]
-        [
-            [
-                dup specialized-vector-vocab
-                [ define-vector ] with-current-vocab
-            ] with-compilation-unit
-        ]
-        [ specialized-vector-vocab ]
-        tri
-    ] ?if ;
+    [ specialized-vector-vocab ] [ '[ _ define-vector ] ] bi
+    generate-vocab ;
 
 SYNTAX: SPECIALIZED-VECTOR:
     scan
