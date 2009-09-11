@@ -10,7 +10,7 @@ if !exists("g:FactorVocabRoots")
     let g:FactorVocabRoots = ["core", "basis", "extra", "work"]
 endif
 
-command! -nargs=1 -complete=custom,FactorCompleteVocab FactorVocab :call GoToFactorVocab("<args>")
+command! -nargs=1 -complete=customlist,FactorCompleteVocab FactorVocab :call GoToFactorVocab("<args>")
 command! FactorVocabImpl  :call GoToFactorVocabImpl()
 command! FactorVocabDocs  :call GoToFactorVocabDocs()
 command! FactorVocabTests :call GoToFactorVocabTests()
@@ -23,18 +23,29 @@ function! FactorVocabRoot(root)
     return vocabroot
 endfunction
 
+function! s:unique(list)
+    let dict = {}
+    for value in a:list
+        let dict[value] = 1
+    endfor
+    return sort(keys(dict))
+endfunction
+
 function! FactorCompleteVocab(arglead, cmdline, cursorpos)
-    let vocabs = ""
+    let vocabs = []
     let vocablead = substitute(a:arglead, "\\.", "/", "g")
     for root in g:FactorVocabRoots
         let vocabroot = FactorVocabRoot(root)
         let newvocabs = globpath(vocabroot, vocablead . "*")
         if newvocabs != ""
-            let newvocabs = substitute(newvocabs, "\\(^\\|\\n\\)\\V" . escape(vocabroot, "\\"), "\\1", "g")
-            let newvocabs = substitute(newvocabs, "/\\|\\\\", ".", "g")
-            let vocabs .= newvocabs . "\n"
+            let newvocabsl = split(newvocabs, "\n")
+            let newvocabsl = filter(newvocabsl, 'getftype(v:val) == "dir"')
+            let newvocabsl = map(newvocabsl, 'substitute(v:val, "^\\V" . escape(vocabroot, "\\"), "\\1", "g")')
+            let vocabs += newvocabsl
         endif
     endfor
+    let vocabs = s:unique(vocabs)
+    let vocabs = map(vocabs, 'substitute(v:val, "/\\|\\\\", ".", "g")')
     return vocabs
 endfunction
 
