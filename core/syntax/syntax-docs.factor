@@ -302,7 +302,7 @@ HELP: C{
 { $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: T{
-{ $syntax "T{ class slots... }" }
+{ $syntax "T{ class }" "T{ class f slot-values... }" "T{ class { slot-name slot-value } ... }" }
 { $values { "class" "a tuple class word" } { "slots" "slot values" } }
 { $description "Marks the beginning of a literal tuple."
 $nl

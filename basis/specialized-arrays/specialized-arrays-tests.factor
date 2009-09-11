@@ -1,9 +1,10 @@
 IN: specialized-arrays.tests
 USING: tools.test alien.syntax specialized-arrays
-specialized-arrays sequences alien.c-types accessors
-kernel arrays combinators compiler classes.struct
+specialized-arrays.private sequences alien.c-types accessors
+kernel arrays combinators compiler compiler.units classes.struct
 combinators.smart compiler.tree.debugger math libc destructors
-sequences.private ;
+sequences.private multiline eval words vocabs namespaces
+assocs prettyprint ;
 
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: bool
@@ -105,4 +106,44 @@ SPECIALIZED-ARRAY: fixed-string
 
 [ { ALIEN: 123 ALIEN: 223 ALIEN: 323 ALIEN: 423 } ] [
     ALIEN: 123 4 <direct-fixed-string-array> [ (underlying)>> ] { } map-as
+] unit-test
+
+! Ensure that byte-length works with direct arrays
+[ 400 ] [
+    ALIEN: 123 100 <direct-int-array> byte-length
+] unit-test
+
+! Test prettyprinting
+[ "int-array{ 1 2 3 }" ] [ int-array{ 1 2 3 } unparse ] unit-test
+[ "int-array@ f 100" ] [ f 100 <direct-int-array> unparse ] unit-test
+
+! If the C type doesn't exist, don't generate a vocab
+[ ] [
+    [ "__does_not_exist__" specialized-array-vocab forget-vocab ] with-compilation-unit
+    "__does_not_exist__" c-types get delete-at
+] unit-test
+
+[
+    <"
+IN: specialized-arrays.tests
+USING: specialized-arrays ;
+
+SPECIALIZED-ARRAY: __does_not_exist__ "> eval( -- )
+] must-fail
+
+[ ] [
+    <"
+IN: specialized-arrays.tests
+USING: classes.struct specialized-arrays ;
+
+STRUCT: __does_not_exist__ { x int } ;
+
+SPECIALIZED-ARRAY: __does_not_exist__
+"> eval( -- )
+] unit-test
+
+[ f ] [
+    "__does_not_exist__-array{"
+    "__does_not_exist__" specialized-array-vocab lookup
+    deferred?
 ] unit-test
