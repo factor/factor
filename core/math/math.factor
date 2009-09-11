@@ -22,6 +22,9 @@ MATH: <  ( x y -- ? ) foldable
 MATH: <= ( x y -- ? ) foldable
 MATH: >  ( x y -- ? ) foldable
 MATH: >= ( x y -- ? ) foldable
+MATH: unordered? ( x y -- ? ) foldable
+
+M: object unordered? 2drop f ;
 
 MATH: +   ( x y -- z ) foldable
 MATH: -   ( x y -- z ) foldable
