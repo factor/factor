@@ -2,8 +2,13 @@ nmap <silent> <Leader>fi :FactorVocabImpl<CR>
 nmap <silent> <Leader>fd :FactorVocabDocs<CR>
 nmap <silent> <Leader>ft :FactorVocabTests<CR>
 
-let g:FactorRoot = "~/factor"
-let g:FactorVocabRoots = ["core", "basis", "extra", "work"]
+if !exists("g:FactorRoot")
+    let g:FactorRoot = "~/factor"
+endif
+
+if !exists("g:FactorVocabRoots")
+    let g:FactorVocabRoots = ["core", "basis", "extra", "work"]
+endif
 
 command! -nargs=1 -complete=custom,FactorCompleteVocab FactorVocab :call GoToFactorVocab("<args>")
 command! FactorVocabImpl  :call GoToFactorVocabImpl()
