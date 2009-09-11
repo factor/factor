@@ -5,10 +5,10 @@ nmap <silent> <Leader>ft :FactorVocabTests<CR>
 let g:FactorRoot = "/Users/joe/Documents/Code/others/factor"
 let g:FactorVocabRoots = ["core", "basis", "extra", "work", "/Users/joe/Documents/Code/Factor"]
 
-command! -nargs=1 FactorVocab      :call GoToFactorVocab("<args>")
-command!          FactorVocabImpl  :call GoToFactorVocabImpl()
-command!          FactorVocabDocs  :call GoToFactorVocabDocs()
-command!          FactorVocabTests :call GoToFactorVocabTests()
+command! -nargs=1 -complete=custom,FactorCompleteVocab FactorVocab :call GoToFactorVocab("<args>")
+command! FactorVocabImpl  :call GoToFactorVocabImpl()
+command! FactorVocabDocs  :call GoToFactorVocabDocs()
+command! FactorVocabTests :call GoToFactorVocabTests()
 
 function! FactorVocabRoot(root)
     let cwd = getcwd()
@@ -16,6 +16,21 @@ function! FactorVocabRoot(root)
     let vocabroot = fnamemodify(a:root, ":p")
     exe "lcd " fnameescape(cwd)
     return vocabroot
+endfunction
+
+function! FactorCompleteVocab(arglead, cmdline, cursorpos)
+    let vocabs = ""
+    let vocablead = substitute(a:arglead, "\\.", "/", "g")
+    for root in g:FactorVocabRoots
+        let vocabroot = FactorVocabRoot(root)
+        let newvocabs = globpath(vocabroot, vocablead . "*")
+        if newvocabs != ""
+            let newvocabs = substitute(newvocabs, "\\(^\\|\\n\\)\\V" . escape(vocabroot, "\\"), "\\1", "g")
+            let newvocabs = substitute(newvocabs, "/\\|\\\\", ".", "g")
+            let vocabs .= newvocabs . "\n"
+        endif
+    endfor
+    return vocabs
 endfunction
 
 function! FactorVocabFile(root, vocab)
