@@ -19,7 +19,7 @@ PRIVATE>
 
 : record-benchmark ( vocab -- )
     [ "=== " write print flush ] [
-        [ [ require ] [ (run-benchmark) ] [ ] tri timings ]
+        [ [ require ] [ run-benchmark ] [ ] tri timings ]
         [ swap errors ]
         recover get set-at
     ] bi ;
