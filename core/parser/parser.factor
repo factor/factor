@@ -99,8 +99,11 @@ M: f parse-quotation \ ] parse-until >quotation ;
 
 ERROR: bad-number ;
 
+: scan-base ( base -- n )
+    scan swap base> [ bad-number ] unless* ;
+
 : parse-base ( parsed base -- parsed )
-    scan swap base> [ bad-number ] unless* parsed ;
+    scan-base parsed ;
 
 SYMBOL: bootstrap-syntax
 
