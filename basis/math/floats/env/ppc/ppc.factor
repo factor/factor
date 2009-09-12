@@ -31,7 +31,7 @@ CONSTANT: ppc-exception-flag>bit
         { +fp-inexact+           HEX: 0200,0000 }
     }
 
-CONSTANT: ppc-fp-traps-bits HEX: f80
+CONSTANT: ppc-fp-traps-bits HEX: f800
 CONSTANT: ppc-fp-traps>bit
     H{
         { +fp-invalid-operation+ HEX: 8000 }
