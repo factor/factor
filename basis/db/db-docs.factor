@@ -254,7 +254,7 @@ ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 { $code <"
 USING: db.sqlite db io.files ;
 : with-book-db ( quot -- )
-    "book.db" temp-file <sqlite-db> swap with-db ;"> }
+    "book.db" temp-file <sqlite-db> swap with-db ; inline"> }
 "Now let's create the table manually:"
 { $code <" "create table books
     (id integer primary key, title text, author text, date_published timestamp,
