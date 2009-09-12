@@ -21,6 +21,8 @@
 #include <time.h>
 
 /* C++ headers */
+#include <vector>
+
 #if __GNUC__ == 4
         #include <tr1/unordered_map>
         #define unordered_map std::tr1::unordered_map

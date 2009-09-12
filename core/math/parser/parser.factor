@@ -82,9 +82,37 @@ SYMBOL: negative?
         string>natural
     ] if ; inline
 
-: string>float ( str -- n/f )
+: dec>float ( str -- n/f )
     [ CHAR: , eq? not ] filter
     >byte-array 0 suffix (string>float) ;
+
+: hex>float-parts ( str -- neg? mantissa-str expt )
+    "-" ?head swap "p" split1 [ 10 base> ] [ 0 ] if* ;
+
+: make-mantissa ( str -- bits )
+    16 base> dup log2 52 swap - shift ;
+
+: combine-hex-float-parts ( neg? mantissa expt -- float )
+    dup 2046 > [ 2drop -1/0. 1/0. ? ] [
+        dup 0 <= [ 1 - shift 0 ] when
+        [ HEX: 8000,0000,0000,0000 0 ? ]
+        [ 52 2^ 1 - bitand ]
+        [ 52 shift ] tri* bitor bitor
+        bits>double 
+    ] if ;
+
+: hex>float ( str -- n/f )
+    hex>float-parts
+    [ "." split1 [ append make-mantissa ] [ drop 16 base> log2 ] 2bi ]
+    [ + 1023 + ] bi*
+    combine-hex-float-parts ;
+
+: base>float ( str base -- n/f )
+    {
+        { 10 [ dec>float ] }
+        { 16 [ hex>float ] }
+        [ "Floats can only be converted from strings in base 10 or 16" throw ]
+    } case ;
 
 : number-char? ( char -- ? )
     "0123456789ABCDEFabcdef." member? ;
@@ -99,11 +127,14 @@ SYMBOL: negative?
 
 PRIVATE>
 
+: string>float ( str -- n/f )
+    10 base>float ;
+
 : base> ( str radix -- n/f )
     over numeric-looking? [
         over [ "/." member? ] find nip {
             { CHAR: / [ string>ratio ] }
-            { CHAR: . [ drop string>float ] }
+            { CHAR: . [ base>float ] }
             [ drop string>integer ]
         } case
     ] [ 2drop f ] if ;
@@ -167,18 +198,58 @@ M: ratio >base
         [ ".0" append ]
     } cond ;
 
-: float>string ( n -- str )
+<PRIVATE
+
+: mantissa-expt-normalize ( mantissa expt -- mantissa' expt' )
+    dup zero?
+    [ over log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + - ] bi-curry bi* ]
+    [ 1023 - ] if ;
+
+: mantissa-expt ( float -- mantissa expt )
+    [ 52 2^ 1 - bitand ]
+    [ -0.0 double>bits bitnot bitand -52 shift ] bi
+    mantissa-expt-normalize ;
+
+: float>hex-sign ( bits -- str )
+    -0.0 double>bits bitand zero? "" "-" ? ;
+
+: float>hex-value ( mantissa -- str )
+    16 >base [ CHAR: 0 = ] trim-tail [ "0" ] [ ] if-empty "1." prepend ;
+
+: float>hex-expt ( mantissa -- str )
+    10 >base "p" prepend ;
+
+: float>hex ( n -- str )
+    double>bits
+    [ float>hex-sign ] [
+        mantissa-expt [ float>hex-value ] [ float>hex-expt ] bi*
+    ] bi 3append ;
+
+: float>decimal ( n -- str )
     (float>string)
     [ 0 = ] trim-tail >string
     fix-float ;
 
+: float>base ( n base -- str )
+    {
+        { 10 [ float>decimal ] }
+        { 16 [ float>hex ] }
+        [ "Floats can only be converted to strings in base 10 or 16" throw ]
+    } case ;
+
+PRIVATE>
+
+: float>string ( n -- str )
+    10 float>base ;
+
 M: float >base
-    drop {
-        { [ dup fp-nan? ] [ drop "0/0." ] }
-        { [ dup 1/0. = ] [ drop "1/0." ] }
-        { [ dup -1/0. = ] [ drop "-1/0." ] }
-        { [ dup double>bits HEX: 8000000000000000 = ] [ drop "-0.0" ] }
-        [ float>string ]
+    {
+        { [ over fp-nan? ] [ 2drop "0/0." ] }
+        { [ over 1/0. =  ] [ 2drop "1/0." ] }
+        { [ over -1/0. = ] [ 2drop "-1/0." ] }
+        { [ over  0.0 fp-bitwise= ] [ 2drop  "0.0" ] }
+        { [ over -0.0 fp-bitwise= ] [ 2drop "-0.0" ] }
+        [ float>base ]
     } cond ;
 
 : number>string ( n -- str ) 10 >base ;

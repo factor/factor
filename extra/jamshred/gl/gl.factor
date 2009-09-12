@@ -3,7 +3,8 @@
 USING: accessors alien.c-types jamshred.game jamshred.oint
 jamshred.player jamshred.tunnel kernel math math.constants
 math.functions math.vectors opengl opengl.gl opengl.glu
-opengl.demo-support sequences specialized-arrays.float ;
+opengl.demo-support sequences specialized-arrays ;
+SPECIALIZED-ARRAY: float
 IN: jamshred.gl
 
 CONSTANT: min-vertices 6

@@ -183,15 +183,7 @@ void init_data_heap(cell gens,
 	bool secure_gc_)
 {
 	set_data_heap(alloc_data_heap(gens,young_size,aging_size,tenured_size));
-
-	gc_locals_region = alloc_segment(getpagesize());
-	gc_locals = gc_locals_region->start - sizeof(cell);
-
-	gc_bignums_region = alloc_segment(getpagesize());
-	gc_bignums = gc_bignums_region->start - sizeof(cell);
-
 	secure_gc = secure_gc_;
-
 	init_data_gc();
 }
 

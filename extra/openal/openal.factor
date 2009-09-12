@@ -1,8 +1,10 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors arrays alien system combinators alien.syntax namespaces
-       alien.c-types sequences vocabs.loader shuffle
-       openal.backend specialized-arrays.uint alien.libraries generalizations ;
+USING: kernel accessors arrays alien system combinators
+alien.syntax namespaces alien.c-types sequences vocabs.loader
+shuffle openal.backend alien.libraries generalizations
+specialized-arrays ;
+SPECIALIZED-ARRAY: uint
 IN: openal
 
 << "alut" {

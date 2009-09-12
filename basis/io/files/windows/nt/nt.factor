@@ -5,7 +5,8 @@ windows.kernel32 kernel libc math threads system environment
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.short-circuit ascii splitting alien strings assocs
 namespaces make accessors tr windows.time windows.shell32
-windows.errors specialized-arrays.ushort classes.struct ;
+windows.errors specialized-arrays classes.struct ;
+SPECIALIZED-ARRAY: ushort
 IN: io.files.windows.nt
 
 M: winnt cwd

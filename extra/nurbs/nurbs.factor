@@ -1,7 +1,8 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays grouping kernel locals math math.order
 math.ranges math.vectors math.vectors.homogeneous sequences
-specialized-arrays.float ;
+specialized-arrays ;
+SPECIALIZED-ARRAY: float
 IN: nurbs
 
 TUPLE: nurbs-curve

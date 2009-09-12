@@ -11,6 +11,7 @@ ARTICLE: "debugger" "The debugger"
 "User-defined errors can have customized printed representation by implementing a generic word:"
 { $subsection error. }
 "A number of words facilitate interactive debugging of errors:"
+{ $subsection :error }
 { $subsection :s }
 { $subsection :r }
 { $subsection :c }
@@ -22,9 +23,14 @@ ARTICLE: "debugger" "The debugger"
 { $subsection :2 }
 { $subsection :3 }
 { $subsection :res }
-"You can read more about error handling in " { $link "errors" } "." ;
+"You can read more about error handling in " { $link "errors" } "."
+$nl
+"Note that in Factor, the debugger is a tool for printing and inspecting errors, not for walking through code. For the latter, see " { $link "ui-walker" } "." ;
 
 ABOUT: "debugger"
+
+HELP: :error
+{ $description "Prints the most recent error. Used for interactive debugging." } ;
 
 HELP: :s
 { $description "Prints the data stack at the time of the most recent error. Used for interactive debugging." } ;

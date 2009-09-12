@@ -22,14 +22,14 @@ IN: compiler.cfg.two-operand.tests
 
 [
     V{
-        T{ ##copy f 1 2 double-float-rep }
+        T{ ##copy f 1 2 double-rep }
         T{ ##sub-float f 1 1 3 }
     }
 ] [
     H{
-        { 1 double-float-rep }
-        { 2 double-float-rep }
-        { 3 double-float-rep }
+        { 1 double-rep }
+        { 2 double-rep }
+        { 3 double-rep }
     } clone representations set
     {
         T{ ##sub-float f 1 2 3 }
@@ -38,13 +38,13 @@ IN: compiler.cfg.two-operand.tests
 
 [
     V{
-        T{ ##copy f 1 2 double-float-rep }
+        T{ ##copy f 1 2 double-rep }
         T{ ##mul-float f 1 1 1 }
     }
 ] [
     H{
-        { 1 double-float-rep }
-        { 2 double-float-rep }
+        { 1 double-rep }
+        { 2 double-rep }
     } clone representations set
     {
         T{ ##mul-float f 1 2 2 }

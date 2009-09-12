@@ -1,10 +1,11 @@
 ! Factor port of the raytracer benchmark from
 ! http://www.ffconsultancy.com/free/ray_tracer/languages.html
 
-USING: arrays accessors specialized-arrays.double io io.files
-io.files.temp io.encodings.binary kernel math math.functions
-math.vectors math.parser make sequences sequences.private words
-hints ;
+USING: arrays accessors specialized-arrays io io.files
+io.files.temp io.encodings.binary kernel math math.constants
+math.functions math.vectors math.parser make sequences
+sequences.private words hints ;
+SPECIALIZED-ARRAY: double
 IN: benchmark.raytracer
 
 ! parameters
@@ -23,7 +24,7 @@ CONSTANT: levels 3
 
 CONSTANT: size 200
 
-CONSTANT: delta 1.4901161193847656E-8
+: delta ( -- n ) epsilon sqrt ; inline
 
 TUPLE: ray { orig double-array read-only } { dir double-array read-only } ;
 

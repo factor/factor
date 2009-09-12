@@ -99,8 +99,8 @@ M: f like drop [ f ] when-empty ; inline
 INSTANCE: f immutable-sequence
 
 ! Integers used to support the sequence protocol
-M: integer length ; inline deprecated
-M: integer nth-unsafe drop ; inline deprecated
+M: integer length ; inline
+M: integer nth-unsafe drop ; inline
 
 INSTANCE: integer immutable-sequence
 
@@ -535,8 +535,12 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
+<PRIVATE
+
 : (indices) ( elt i obj accum -- )
     [ swap [ = ] dip ] dip [ push ] 2curry when ; inline
+
+PRIVATE>
 
 : indices ( obj seq -- indices )
     swap V{ } clone

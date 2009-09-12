@@ -45,7 +45,7 @@ T{ error-type
 SYMBOL: file
 
 : file-failure ( error -- )
-    f file get f failure ;
+    [ f file get ] keep error-line failure ;
 
 :: (unit-test) ( output input -- error ? )
     [ { } input with-datastack output assert-sequence= f f ] [ t ] recover ;

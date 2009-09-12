@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions math.ranges math.order
-project-euler.common sequences ;
+project-euler.common sequences layouts ;
 IN: project-euler.044
 
 ! http://projecteuler.net/index.php?section=problems&id=44
@@ -29,20 +29,26 @@ IN: project-euler.044
 <PRIVATE
 
 : nth-pentagonal ( n -- seq )
-    dup 3 * 1 - * 2 / ;
+    dup 3 * 1 - * 2 /i ; inline
 
 : sum-and-diff? ( m n -- ? )
-    [ + ] [ - ] 2bi [ pentagonal? ] bi@ and ;
+    [ + ] [ - ] 2bi [ pentagonal? ] bi@ and ; inline
+
+: euler044-step ( min m n -- min' )
+    [ nth-pentagonal ] bi@
+    2dup sum-and-diff? [ - abs min ] [ 2drop ] if ; inline
 
 PRIVATE>
 
 : euler044 ( -- answer )
-    2500 [1,b] [ nth-pentagonal ] map dup cartesian-product
-    [ first2 sum-and-diff? ] filter [ first2 - abs ] [ min ] map-reduce ;
+    most-positive-fixnum >fixnum
+    2500 [1,b] [
+        dup [1,b] [
+            euler044-step
+        ] with each
+    ] each ;
 
 ! [ euler044 ] 10 ave-time
-! 4996 ms ave run time - 87.46 SD (10 trials)
-
-! TODO: this solution is ugly and not very efficient...find a better algorithm
+! 289 ms ave run time - 0.27 SD (10 trials)
 
 SOLUTION: euler044

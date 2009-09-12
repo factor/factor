@@ -87,7 +87,7 @@ ALIAS: $slot $snippet
 
 : ($code) ( presentation quot -- )
     [
-        snippet-style get [
+        code-char-style get [
             last-element off
             [ ($code-style) ] dip with-nesting
         ] with-style
@@ -205,14 +205,20 @@ ALIAS: $slot $snippet
         "Vocabulary" $heading nl dup ($vocab-link)
     ] when* ;
 
+: (textual-list) ( seq quot sep -- )
+    '[ _ print-element ] swap interleave ; inline
+
 : textual-list ( seq quot -- )
-    [ ", " print-element ] swap interleave ; inline
+    ", " (textual-list) ; inline
 
 : $links ( topics -- )
     [ [ ($link) ] textual-list ] ($span) ;
 
 : $vocab-links ( vocabs -- )
     [ vocab ] map $links ;
+
+: $breadcrumbs ( topics -- )
+    [ [ ($link) ] " > " (textual-list) ] ($span) ;
 
 : $see-also ( topics -- )
     "See also" $heading $links ;
@@ -307,7 +313,7 @@ M: f ($instance)
 
 : ($see) ( word quot -- )
     [
-        snippet-style get [
+        code-char-style get [
             code-style get swap with-nesting
         ] with-style
     ] ($block) ; inline

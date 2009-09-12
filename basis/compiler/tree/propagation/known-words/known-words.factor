@@ -7,7 +7,7 @@ layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private
 slots.private definitions strings.private vectors hashtables
-generic quotations
+generic quotations alien
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -16,7 +16,8 @@ compiler.tree.propagation.slots
 compiler.tree.propagation.simple
 compiler.tree.propagation.constraints
 compiler.tree.propagation.call-effect
-compiler.tree.propagation.transforms ;
+compiler.tree.propagation.transforms
+compiler.tree.propagation.simd ;
 IN: compiler.tree.propagation.known-words
 
 { + - * / }
@@ -263,6 +264,10 @@ generic-comparison-ops [
     '[ 2drop _ ] "outputs" set-word-prop
 ] each
 
+\ alien-cell [
+    2drop simple-alien \ f class-or <class-info>
+] "outputs" set-word-prop
+
 { <tuple> <tuple-boa> } [
     [
         literal>> dup array? [ first ] [ drop tuple ] if <class-info>
@@ -275,9 +280,12 @@ generic-comparison-ops [
 ] "outputs" set-word-prop
 
 ! the output of clone has the same type as the input
+: cloned-value-info ( value-info -- value-info' )
+    clone f >>literal f >>literal?
+    [ [ dup [ cloned-value-info ] when ] map ] change-slots ;
+
 { clone (clone) } [
-    [ clone f >>literal f >>literal? ]
-    "outputs" set-word-prop
+    [ cloned-value-info ] "outputs" set-word-prop
 ] each
 
 \ slot [

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
-combinators definitions fry generic generic.single
+combinators definitions effects fry generic generic.single
 generic.standard hashtables io.binary io.streams.string kernel
 kernel.private math math.parser namespaces parser sbufs
 sequences splitting splitting.private strings vectors words ;
@@ -19,6 +19,9 @@ M: class specializer-declaration ;
 
 M: object specializer-declaration class ;
 
+: specializer ( word -- specializer )
+    "specializer" word-prop ;
+
 : make-specializer ( specs -- quot )
     dup length <reversed>
     [ (picker) 2array ] 2map
@@ -28,14 +31,14 @@ M: object specializer-declaration class ;
         [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce
     ] if-empty ;
 
-: specializer-cases ( quot word -- default alist )
+: specializer-cases ( quot specializer -- alist )
     dup [ array? ] all? [ 1array ] unless [
-        [ make-specializer ] keep
-        [ specializer-declaration ] map '[ _ declare ] pick append
-    ] { } map>assoc ;
+        [ nip make-specializer ]
+        [ [ specializer-declaration ] map swap '[ _ declare @ ] ] 2bi
+    ] with { } map>assoc ;
 
-: specialize-quot ( quot specializer -- quot' )
-    specializer-cases alist>quot ;
+: specialize-quot ( quot word specializer -- quot' )
+    [ drop nip def>> ] [ nip specializer-cases ] 3bi alist>quot ;
 
 ! compiler.tree.propagation.inlining sets this to f
 SYMBOL: specialize-method?
@@ -49,8 +52,8 @@ t specialize-method? set-global
 
 : specialize-method ( quot method -- quot' )
     [ specialize-method? get [ method-declaration prepend ] [ drop ] if ]
-    [ "method-generic" word-prop "specializer" word-prop ] bi
-    [ specialize-quot ] when* ;
+    [ dup "method-generic" word-prop specializer ] bi
+    [ specialize-quot ] [ drop ] if* ;
 
 : standard-method? ( method -- ? )
     dup method-body? [
@@ -61,7 +64,7 @@ t specialize-method? set-global
     [ def>> ] keep
     dup generic? [ drop ] [
         [ dup standard-method? [ specialize-method ] [ drop ] if ]
-        [ "specializer" word-prop [ specialize-quot ] when* ]
+        [ dup specializer [ specialize-quot ] [ drop ] if* ]
         bi
     ] if ;
 

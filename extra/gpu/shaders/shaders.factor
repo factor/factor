@@ -1,15 +1,16 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien alien.c-types alien.strings
-arrays assocs byte-arrays classes.mixin classes.parser
-classes.singleton classes.struct combinators
-combinators.short-circuit definitions destructors
-generic.parser gpu gpu.buffers hashtables images
+USING: accessors alien alien.c-types alien.strings arrays assocs
+byte-arrays classes.mixin classes.parser classes.singleton
+classes.struct combinators combinators.short-circuit definitions
+destructors generic.parser gpu gpu.buffers hashtables images
 io.encodings.ascii io.files io.pathnames kernel lexer literals
 locals math math.parser memoize multiline namespaces opengl
 opengl.gl opengl.shaders parser quotations sequences
-specialized-arrays.alien specialized-arrays.int splitting
-strings tr ui.gadgets.worlds variants vectors vocabs vocabs.loader
-vocabs.parser words words.constant ;
+specialized-arrays splitting strings tr ui.gadgets.worlds
+variants vectors vocabs vocabs.loader vocabs.parser words
+words.constant ;
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: void*
 IN: gpu.shaders
 
 VARIANT: shader-kind

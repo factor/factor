@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.inline arrays
 combinators fry functors kernel lexer libc macros math
-sequences specialized-arrays.alien libc.private
+sequences specialized-arrays libc.private
 combinators.short-circuit ;
+SPECIALIZED-ARRAY: void*
 IN: alien.marshall.private
 
 : bool>arg ( ? -- 1/0/obj )

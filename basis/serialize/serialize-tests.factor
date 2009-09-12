@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! 
 USING: tools.test kernel serialize io io.streams.byte-array
-alien arrays byte-arrays bit-arrays specialized-arrays.double
+alien arrays byte-arrays bit-arrays specialized-arrays
 sequences math prettyprint parser classes math.constants
 io.encodings.binary random assocs serialize.private ;
+SPECIALIZED-ARRAY: double
 IN: serialize.tests
 
 : test-serialize-cell ( a -- ? )
