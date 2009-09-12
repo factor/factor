@@ -90,13 +90,6 @@ HELP: with-style
 { $notes "Details are in the documentation for " { $link make-span-stream } "." }
 $io-error ;
 
-HELP: with-nested-style
-{ $values { "style" assoc } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope where calls to " { $link write } ", " { $link format } " and other stream output words automatically inherit style settings from " { $snippet "style" } "." }
-$nl
-"This word is intended to be used when you have a single style assoc that contains both character and paragraph styles."
-$io-error ;
-
 ARTICLE: "formatted-stream-protocol" "Formatted stream protocol"
 "The " { $vocab-link "io.styles" } " vocabulary defines a protocol for output streams that support rich text."
 { $subsection stream-format }

@@ -42,9 +42,6 @@ make-cell-stream stream-write-table ;
     [ output-stream get make-block-stream ] dip
     with-output-stream ; inline
 
-: with-nested-style ( style quot -- )
-    over [ with-nesting ] with-style ; inline
-
 TUPLE: filter-writer stream ;
 
 CONSULT: output-stream-protocol filter-writer stream>> ;
