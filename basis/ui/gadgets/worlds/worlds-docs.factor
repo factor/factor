@@ -26,8 +26,7 @@ HELP: ungrab-input
 
 HELP: set-title
 { $values { "string" string } { "world" world } }
-{ $description "Sets the title bar of the native window containing the world." }
-{ $notes "This word should not be called directly by user code. Instead, change the " { $snippet "title" } " slot model; see " { $link "models" } "." } ;
+{ $description "Sets the title bar of the native window containing the world." } ;
 
 HELP: set-gl-context
 { $values { "world" world } }
