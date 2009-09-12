@@ -1,4 +1,4 @@
-USING: kernel math math.parser sequences tools.test ;
+USING: kernel literals math math.parser sequences tools.test ;
 IN: math.parser.tests
 
 [ f ]
@@ -126,3 +126,26 @@ unit-test
 
 [ "-3/4" ] [ -3/4 number>string ] unit-test
 [ "-1-1/4" ] [ -5/4 number>string ] unit-test
+
+[ "1.0p0" ] [ 1.0 >hex ] unit-test
+[ "1.8p2" ] [ 6.0 >hex ] unit-test
+[ "1.8p-2" ] [ 0.375 >hex ] unit-test
+[ "-1.8p2" ] [ -6.0 >hex ] unit-test
+[ "1.8p10" ] [ 1536.0 >hex ] unit-test
+[ "0.0" ] [ 0.0 >hex ] unit-test
+[ "1.0p-1074" ] [ 1 bits>double >hex ] unit-test
+[ "-0.0" ] [ -0.0 >hex ] unit-test
+
+[ 1.0 ] [ "1.0" hex> ] unit-test
+[ 15.5 ] [ "f.8" hex> ] unit-test
+[ 15.53125 ] [ "f.88" hex> ] unit-test
+[ -15.5 ] [ "-f.8" hex> ] unit-test
+[ 15.5 ] [ "f.8p0" hex> ] unit-test
+[ -15.5 ] [ "-f.8p0" hex> ] unit-test
+[ 62.0 ] [ "f.8p2" hex> ] unit-test
+[ 3.875 ] [ "f.8p-2" hex> ] unit-test
+[ $[ 1 bits>double ] ] [ "1.0p-1074" hex> ] unit-test
+[ 0.0 ] [ "1.0p-1075" hex> ] unit-test
+[ 1/0. ] [ "1.0p1024" hex> ] unit-test
+[ -1/0. ] [ "-1.0p1024" hex> ] unit-test
+
