@@ -51,6 +51,7 @@ ARTICLE: "power-functions" "Powers and logarithms"
 { $subsection exp }
 { $subsection cis }
 { $subsection log }
+{ $subsection log1+ }
 { $subsection log10 }
 "Raising a number to a power:"
 { $subsection ^ }
@@ -124,6 +125,10 @@ HELP: exp
 HELP: log
 { $values { "x" number } { "y" number } }
 { $description "Natural logarithm function. Outputs negative infinity if " { $snippet "x" } " is 0." } ;
+
+HELP: log1+
+{ $values { "x" number } { "y" number } }
+{ $description "Takes the natural logarithm of " { $snippet "1 + x" } ". Outputs negative infinity if " { $snippet "1 + x" } " is zero. This word may be more accurate than " { $snippet "1 + log" } " for very small values of " { $snippet "x" } "." } ;
 
 HELP: log10
 { $values { "x" number } { "y" number } }
