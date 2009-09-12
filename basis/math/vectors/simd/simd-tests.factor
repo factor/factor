@@ -1,7 +1,8 @@
 IN: math.vectors.simd.tests
 USING: math math.vectors.simd math.vectors.simd.private
 math.vectors math.functions math.private kernel.private compiler
-sequences tools.test compiler.tree.debugger accessors kernel ;
+sequences tools.test compiler.tree.debugger accessors kernel
+system ;
 
 [ float-4{ 0 0 0 0 } ] [ float-4 new ] unit-test
 
@@ -349,13 +350,15 @@ sequences tools.test compiler.tree.debugger accessors kernel ;
     [ { float-8 float } declare v/n ] compile-call
 ] unit-test
 
-! Test puns
-[ double-2{ 4 1024 } ] [
-    float-4{ 0 1 0 2 }
-    [ { float-4 } declare dup v+ underlying>> double-2 boa dup v+ ] compile-call
-] unit-test
-
-[ 33.0 ] [
-    double-2{ 1 2 } double-2{ 10 20 }
-    [ { double-2 double-2 } declare v+ underlying>> 3.0 float* ] compile-call
-] unit-test
+! Test puns; only on x86
+cpu x86? [
+    [ double-2{ 4 1024 } ] [
+        float-4{ 0 1 0 2 }
+        [ { float-4 } declare dup v+ underlying>> double-2 boa dup v+ ] compile-call
+    ] unit-test
+    
+    [ 33.0 ] [
+        double-2{ 1 2 } double-2{ 10 20 }
+        [ { double-2 double-2 } declare v+ underlying>> 3.0 float* ] compile-call
+    ] unit-test
+] when
