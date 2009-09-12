@@ -49,6 +49,6 @@ PRIVATE>
     ] each ;
 
 ! [ euler044 ] 10 ave-time
-! 4996 ms ave run time - 87.46 SD (10 trials)
+! 289 ms ave run time - 0.27 SD (10 trials)
 
 SOLUTION: euler044
