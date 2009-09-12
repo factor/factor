@@ -5,7 +5,7 @@ IN: math.floats.env.ppc
 
 STRUCT: ppc-fpu-env
     { padding uint }
-    { fpcsr uint } ;
+    { fpscr uint } ;
 
 ! defined in the vm, cpu-ppc*.S
 FUNCTION: void get_ppc_fpu_env ( ppc-fpu-env* env ) ;
@@ -53,27 +53,27 @@ CONSTANT: ppc-rounding-mode>bit
 CONSTANT: ppc-denormal-mode-bits HEX: 4
 
 M: ppc-fpu-env (get-exception-flags) ( register -- exceptions )
-    fpcsr>> ppc-exception-flag>bit mask> ; inline
+    fpscr>> ppc-exception-flag>bit mask> ; inline
 M: ppc-fpu-env (set-exception-flags) ( register exceptions -- register' )
-    [ ppc-exception-flag>bit >mask ppc-exception-flag-bits remask ] curry change-fpcsr ; inline
+    [ ppc-exception-flag>bit >mask ppc-exception-flag-bits remask ] curry change-fpscr ; inline
 
 M: ppc-fpu-env (get-fp-traps) ( register -- exceptions )
-    fpcsr>> not ppc-fp-traps>bit mask> ; inline
+    fpscr>> bitnot ppc-fp-traps>bit mask> ; inline
 M: ppc-fpu-env (set-fp-traps) ( register exceptions -- register' )
-    [ ppc-fp-traps>bit >mask not ppc-fp-traps-bits remask ] curry change-fpcsr ; inline
+    [ ppc-fp-traps>bit >mask bitnot ppc-fp-traps-bits remask ] curry change-fpscr ; inline
 
 M: ppc-fpu-env (get-rounding-mode) ( register -- mode )
-    fpcsr>> ppc-rounding-mode-bits mask ppc-rounding-mode>bit value-at ; inline
+    fpscr>> ppc-rounding-mode-bits mask ppc-rounding-mode>bit value-at ; inline
 M: ppc-fpu-env (set-rounding-mode) ( register mode -- register' )
-    [ ppc-rounding-mode>bit at ppc-rounding-mode-bits remask ] curry change-fpcsr ; inline
+    [ ppc-rounding-mode>bit at ppc-rounding-mode-bits remask ] curry change-fpscr ; inline
 
 M: ppc-fpu-env (get-denormal-mode) ( register -- mode )
-    fpcsr>> ppc-denormal-mode-bits mask zero? +denormal-keep+ +denormal-flush+ ? ; inline
+    fpscr>> ppc-denormal-mode-bits mask zero? +denormal-keep+ +denormal-flush+ ? ; inline
 M: ppc-fpu-env (set-denormal-mode) ( register mode -- register' )
     [
         {
             { +denormal-keep+  [ ppc-denormal-mode-bits unmask ] }
             { +denormal-flush+ [ ppc-denormal-mode-bits bitor  ] }
         } case
-    ] curry change-fpcsr ; inline
+    ] curry change-fpscr ; inline
 
