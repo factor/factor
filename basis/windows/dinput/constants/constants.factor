@@ -49,7 +49,7 @@ MEMO: heap-size* ( c-type -- n ) heap-size ;
     } cleave
     DIOBJECTDATAFORMAT <struct-boa> ;
 
-:: malloc-DIOBJECTDATAFORMAT-array ( struct array -- alien )
+:: make-DIOBJECTDATAFORMAT-array ( struct array -- alien )
     [let | alien [ array length malloc-DIOBJECTDATAFORMAT-array ] |
         array [| args i |
             struct args <DIOBJECTDATAFORMAT>
@@ -60,7 +60,7 @@ MEMO: heap-size* ( c-type -- n ) heap-size ;
 
 : <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
     [ DIDATAFORMAT heap-size DIOBJECTDATAFORMAT heap-size ] 4 ndip
-    [ nip length ] [ malloc-DIOBJECTDATAFORMAT-array ] 2bi
+    [ nip length ] [ make-DIOBJECTDATAFORMAT-array ] 2bi
     DIDATAFORMAT <struct-boa> ;
 
 : initialize ( symbol quot -- )
