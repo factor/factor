@@ -1,6 +1,7 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.ranges project-euler.common sequences ;
+USING: accessors kernel math math.ranges project-euler.common
+sequences locals ;
 IN: project-euler.085
 
 ! http://projecteuler.net/index.php?section=problems&id=85
@@ -23,28 +24,31 @@ IN: project-euler.085
 <PRIVATE
 
 : distance ( m -- n )
-    2000000 - abs ;
+    2000000 - abs ; inline
 
 : rectangles-count ( a b -- n )
-    2dup [ 1 + ] bi@ * * * 4 / ;
+    2dup [ 1 + ] bi@ * * * 4 /i ; inline
 
-: unique-products ( a b -- seq )
-    tuck [a,b] [
-        over dupd [a,b] [ 2array ] with map
-    ] map concat nip ;
+:: each-unique-product ( a b quot: ( i j -- ) -- )
+    a b [a,b] [| i |
+        i b [a,b] [| j |
+            i j quot call
+        ] each
+    ] each ; inline
 
-: max-by-last ( seq seq -- seq )
-    [ [ last ] bi@ < ] most ;
+TUPLE: result { area read-only } { distance read-only } ;
 
-: array2 ( seq -- a b )
-    [ first ] [ last ] bi ;
+C: <result> result
 
-: convert ( seq -- seq )
-    array2 [ * ] [ rectangles-count distance ] 2bi 2array ;
+: min-by-distance ( seq seq -- seq )
+    [ [ distance>> ] bi@ < ] most ; inline
+
+: compute-result ( i j -- pair )
+    [ * ] [ rectangles-count distance ] 2bi <result> ; inline
 
 : area-of-nearest ( -- n )
-    1 2000 unique-products
-    [ convert ] [ max-by-last ] map-reduce first ;
+    T{ result f 0 2000000 } 1 2000
+    [ compute-result min-by-distance ] each-unique-product area>> ;
 
 PRIVATE>
 
