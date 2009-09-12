@@ -46,7 +46,7 @@ IN: math.libm
     "double" "libm" "sqrt" { "double" } alien-invoke ;
     
 ! Windows doesn't have these...
-: flog1p ( x -- y )
+: flog1+ ( x -- y )
     "double" "libm" "log1p" { "double" } alien-invoke ;
 
 : facosh ( x -- y )
