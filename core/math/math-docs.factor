@@ -277,7 +277,32 @@ HELP: fp-bitwise=
     { "x" float } { "y" float }
     { "?" boolean }
 }
-{ $description "Compares two floating point numbers for bit equality." } ;
+{ $description "Compares two floating point numbers for bit equality." }
+{ $notes "Unlike " { $link = } " or " { $link number= } ", this word will consider NaNs with equal payloads to be equal, and positive zero and negative zero to be not equal." }
+{ $examples
+    "Not-a-number equality:"
+    { $example
+        "USING: math prettyprint ;"
+        "0.0 0.0 / dup number= ."
+        "f"
+    }
+    { $example
+        "USING: math prettyprint ;"
+        "0.0 0.0 / dup fp-bitwise= ."
+        "t"
+    }
+    "Signed zero equality:"
+    { $example
+        "USING: math prettyprint ;"
+        "-0.0 0.0 fp-bitwise= ."
+        "f"
+    }
+    { $example
+        "USING: math prettyprint ;"
+        "-0.0 0.0 = ."
+        "t"
+    }
+} ;
 
 HELP: fp-special?
 { $values { "x" real } { "?" "a boolean" } }
