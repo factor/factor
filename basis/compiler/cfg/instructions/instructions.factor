@@ -496,11 +496,21 @@ constant: src2
 literal: cc
 temp: temp/int-rep ;
 
-INSN: ##compare-float-branch
+INSN: ##compare-float-ordered-branch
 use: src1/double-rep src2/double-rep
 literal: cc ;
 
-PURE-INSN: ##compare-float
+INSN: ##compare-float-unordered-branch
+use: src1/double-rep src2/double-rep
+literal: cc ;
+
+PURE-INSN: ##compare-float-ordered
+def: dst/int-rep
+use: src1/double-rep src2/double-rep
+literal: cc
+temp: temp/int-rep ;
+
+PURE-INSN: ##compare-float-unordered
 def: dst/int-rep
 use: src1/double-rep src2/double-rep
 literal: cc
@@ -522,6 +532,10 @@ use: src1/int-rep src2/int-rep ;
 INSN: ##gc
 temp: temp1/int-rep temp2/int-rep
 literal: data-values tagged-values uninitialized-locs ;
+
+INSN: ##save-context
+temp: temp1/int-rep temp2/int-rep
+literal: callback-allowed? ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue
@@ -556,7 +570,12 @@ use: src1/int-rep
 constant: src2
 literal: cc ;
 
-INSN: _compare-float-branch
+INSN: _compare-float-unordered-branch
+literal: label
+use: src1/int-rep src2/int-rep
+literal: cc ;
+
+INSN: _compare-float-ordered-branch
 literal: label
 use: src1/int-rep src2/int-rep
 literal: cc ;

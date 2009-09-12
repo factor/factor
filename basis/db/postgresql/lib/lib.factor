@@ -6,7 +6,9 @@ db.types tools.walker ascii splitting math.parser combinators
 libc calendar.format byte-arrays destructors prettyprint
 accessors strings serialize io.encodings.binary io.encodings.utf8
 alien.strings io.streams.byte-array summary present urls
-specialized-arrays.uint specialized-arrays.alien db.private ;
+specialized-arrays db.private ;
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: void*
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )

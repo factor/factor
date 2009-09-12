@@ -244,3 +244,13 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
     EPILOGUE
     mtctr r3
     bctr
+
+DEF(void,get_ppc_fpu_env,(void*)):
+    mffs f0
+    stfd f0,0(r3)
+    blr
+
+DEF(void,set_ppc_fpu_env,(const void*)):
+    lfd f0,0(r3)
+    mtfsf 0xff,f0
+    blr

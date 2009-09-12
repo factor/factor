@@ -199,7 +199,9 @@ CODEGEN: ##allot %allot
 CODEGEN: ##write-barrier %write-barrier
 CODEGEN: ##compare %compare
 CODEGEN: ##compare-imm %compare-imm
-CODEGEN: ##compare-float %compare-float
+CODEGEN: ##compare-float-ordered %compare-float-ordered
+CODEGEN: ##compare-float-unordered %compare-float-unordered
+CODEGEN: ##save-context %save-context
 
 CODEGEN: _fixnum-add %fixnum-add
 CODEGEN: _fixnum-sub %fixnum-sub
@@ -208,7 +210,8 @@ CODEGEN: _label resolve-label
 CODEGEN: _branch %jump-label
 CODEGEN: _compare-branch %compare-branch
 CODEGEN: _compare-imm-branch %compare-imm-branch
-CODEGEN: _compare-float-branch %compare-float-branch
+CODEGEN: _compare-float-ordered-branch %compare-float-ordered-branch
+CODEGEN: _compare-float-unordered-branch %compare-float-unordered-branch
 CODEGEN: _dispatch %dispatch
 CODEGEN: _spill %spill
 CODEGEN: _reload %reload
@@ -252,6 +255,7 @@ M: _gc generate-insn
         [ [ uninitialized-locs>> ] [ temp1>> ] bi wipe-locs ]
         [ data-values>> save-data-regs ]
         [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
+        [ [ temp1>> ] [ temp2>> ] bi t %save-context ]
         [ tagged-values>> length %call-gc ]
         [ [ tagged-values>> ] [ temp1>> ] bi load-gc-roots ]
         [ data-values>> load-data-regs ]
@@ -394,8 +398,6 @@ M: long-long-type flatten-value-type ( type -- types )
 
 M: ##alien-invoke generate-insn
     params>>
-    ! Save registers for GC
-    %prepare-alien-invoke
     ! Unbox parameters
     dup objects>registers
     %prepare-var-args
@@ -408,8 +410,6 @@ M: ##alien-invoke generate-insn
 ! ##alien-indirect
 M: ##alien-indirect generate-insn
     params>>
-    ! Save registers for GC
-    %prepare-alien-invoke
     ! Save alien at top of stack to temporary storage
     %prepare-alien-indirect
     ! Unbox parameters

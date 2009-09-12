@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors math math.vectors locals sequences
-specialized-arrays.float colors arrays combinators
+specialized-arrays colors arrays combinators
 opengl opengl.gl ui.pens ui.pens.caching ;
+SPECIALIZED-ARRAY: float
 IN: ui.pens.gradient
 
 ! Gradient pen

@@ -1,6 +1,7 @@
 USING: kernel math namespaces make tools.test vectors sequences
 sequences.private hashtables io prettyprint assocs
-continuations specialized-arrays.double ;
+continuations specialized-arrays ;
+SPECIALIZED-ARRAY: double
 IN: assocs.tests
 
 [ t ] [ H{ } dup assoc-subset? ] unit-test

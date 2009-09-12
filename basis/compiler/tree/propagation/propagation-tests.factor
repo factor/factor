@@ -8,8 +8,9 @@ math.functions math.private strings layouts
 compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
-specialized-arrays.double system sorting math.libm
+specialized-arrays system sorting math.libm
 math.intervals quotations effects alien ;
+SPECIALIZED-ARRAY: double
 IN: compiler.tree.propagation.tests
 
 [ V{ } ] [ [ ] final-classes ] unit-test
@@ -818,3 +819,8 @@ M: tuple-with-read-only-slot clone
 
 ! Don't crash if bad literal inputs are passed to unsafe words
 [ f ] [ [ { } 1 fixnum+fast ] final-info first literal?>> ] unit-test
+
+! Converting /i to shift
+[ t ] [ [ >fixnum dup 0 >= [ 16 /i ] when ] { /i fixnum/i fixnum/i-fast } inlined? ] unit-test
+[ f ] [ [ >fixnum dup 0 >= [ 16 /i ] when ] { fixnum-shift-fast } inlined? ] unit-test
+[ f ] [ [ >float dup 0 >= [ 16 /i ] when ] { /i float/f } inlined? ] unit-test

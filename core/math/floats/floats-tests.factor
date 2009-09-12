@@ -61,3 +61,9 @@ unit-test
 [ t ] [ 64 [ 2^ 0.5 * ] map [ < ] monotonic? ] unit-test
 
 [ 5 ] [ 10.5 1.9 /i ] unit-test
+
+[ t ] [ 0/0. 0/0. unordered? ] unit-test
+[ t ] [ 1.0 0/0. unordered? ] unit-test
+[ t ] [ 0/0. 1.0 unordered? ] unit-test
+[ f ] [ 1.0 1.0 unordered? ] unit-test
+

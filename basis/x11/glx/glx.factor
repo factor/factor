@@ -3,8 +3,9 @@
 !
 ! based on glx.h from xfree86, and some of glxtokens.h
 USING: alien alien.c-types alien.syntax x11 x11.xlib x11.syntax
-namespaces make kernel sequences parser words specialized-arrays.int
-accessors ;
+namespaces make kernel sequences parser words
+specialized-arrays accessors ;
+SPECIALIZED-ARRAY: int
 IN: x11.glx
 
 LIBRARY: glx

@@ -20,9 +20,8 @@ struct gc_root : public tagged<T>
 	~gc_root() {
 #ifdef FACTOR_DEBUG
 		assert(gc_locals.back() == (cell)this);
-#else
-		gc_locals.pop_back();
 #endif
+		gc_locals.pop_back();
 	}
 };
 
