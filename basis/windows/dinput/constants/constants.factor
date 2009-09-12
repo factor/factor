@@ -2,7 +2,8 @@ USING: windows.dinput windows.kernel32 windows.ole32 windows.com
 windows.com.syntax alien alien.c-types alien.syntax kernel system namespaces
 combinators sequences fry math accessors macros words quotations
 libc continuations generalizations splitting locals assocs init
-struct-arrays memoize classes.struct ;
+specialized-arrays memoize classes.struct ;
+SPECIALIZED-ARRAY: DIOBJECTDATAFORMAT
 IN: windows.dinput.constants
 
 ! Some global variables aren't provided by the DirectInput DLL (they're in the
@@ -49,7 +50,7 @@ MEMO: heap-size* ( c-type -- n ) heap-size ;
     DIOBJECTDATAFORMAT <struct-boa> ;
 
 :: malloc-DIOBJECTDATAFORMAT-array ( struct array -- alien )
-    [let | alien [ array length DIOBJECTDATAFORMAT malloc-struct-array ] |
+    [let | alien [ array length malloc-DIOBJECTDATAFORMAT-array ] |
         array [| args i |
             struct args <DIOBJECTDATAFORMAT>
             i alien set-nth

@@ -1,6 +1,6 @@
 ! (c) Joe Groff, see license for details
 USING: accessors continuations kernel parser words quotations
-combinators.smart vectors sequences fry ;
+vectors sequences fry ;
 IN: literals
 
 <PRIVATE
@@ -19,7 +19,3 @@ PRIVATE>
 SYNTAX: $ scan-word expand-literal >vector ;
 SYNTAX: $[ parse-quotation with-datastack >vector ;
 SYNTAX: ${ \ } [ expand-literals ] parse-literal ;
-
-SYNTAX: $$
-    scan-word execute( accum -- accum ) dup pop [ >quotation ] keep
-    [ output>sequence ] 2curry call( -- object ) parsed ;

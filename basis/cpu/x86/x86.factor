@@ -251,8 +251,8 @@ M:: x86 %unbox-vector ( dst src rep -- )
 
 M: x86 %broadcast-vector ( dst src rep -- )
     {
-        { float-4-rep [ [ MOVAPS ] [ drop dup 0 SHUFPS ] 2bi ] }
-        { double-2-rep [ [ MOVAPD ] [ drop dup 0 SHUFPD ] 2bi ] }
+        { float-4-rep [ [ MOVSS ] [ drop dup 0 SHUFPS ] 2bi ] }
+        { double-2-rep [ [ MOVSD ] [ drop dup UNPCKLPD ] 2bi ] }
     } case ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
@@ -263,7 +263,7 @@ M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
                 dst src1 MOVSS
                 dst src2 UNPCKLPS
                 src3 src4 UNPCKLPS
-                dst src3 HEX: 44 SHUFPS
+                dst src3 MOVLHPS
             ]
         }
     } case ;
@@ -273,8 +273,8 @@ M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
         {
             double-2-rep
             [
-                dst src1 MOVAPD
-                dst src2 0 SHUFPD
+                dst src1 MOVSD
+                dst src2 UNPCKLPD
             ]
         }
     } case ;
@@ -610,7 +610,6 @@ M:: x86 %call-gc ( gc-root-count -- )
     ! Pass number of roots as second parameter
     param-reg-2 gc-root-count MOV
     ! Call GC
-    %prepare-alien-invoke
     "inline_gc" f %alien-invoke ;
 
 M: x86 %alien-global
@@ -658,23 +657,29 @@ M: x86 %compare-imm ( dst src1 src2 cc temp -- )
         "no-move" resolve-label
     ] with-scope ;
 
-M:: x86 %compare-float ( dst src1 src2 cc temp -- )
+:: (%compare-float) ( dst src1 src2 cc temp compare -- )
     cc {
-        { cc<    [ src2 src1  COMISD dst temp \ CMOVA  %boolean ] }
-        { cc<=   [ src2 src1  COMISD dst temp \ CMOVAE %boolean ] }
-        { cc>    [ src1 src2  COMISD dst temp \ CMOVA  %boolean ] }
-        { cc>=   [ src1 src2  COMISD dst temp \ CMOVAE %boolean ] }
-        { cc=    [ src1 src2 UCOMISD dst temp \ %cmov-float= %boolean ] }
-        { cc<>   [ src1 src2  COMISD dst temp \ CMOVNE %boolean ] }
-        { cc<>=  [ src1 src2  COMISD dst temp \ CMOVNP %boolean ] }
-        { cc/<   [ src2 src1 UCOMISD dst temp \ CMOVBE %boolean ] }
-        { cc/<=  [ src2 src1 UCOMISD dst temp \ CMOVB  %boolean ] }
-        { cc/>   [ src1 src2 UCOMISD dst temp \ CMOVBE %boolean ] }
-        { cc/>=  [ src1 src2 UCOMISD dst temp \ CMOVB  %boolean ] }
-        { cc/=   [ src1 src2 UCOMISD dst temp \ %cmov-float/= %boolean ] }
-        { cc/<>  [ src1 src2 UCOMISD dst temp \ CMOVE  %boolean ] }
-        { cc/<>= [ src1 src2 UCOMISD dst temp \ CMOVP  %boolean ] }
-    } case ;
+        { cc<    [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVA  %boolean ] }
+        { cc<=   [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVAE %boolean ] }
+        { cc>    [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVA  %boolean ] }
+        { cc>=   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVAE %boolean ] }
+        { cc=    [ src1 src2 \ compare execute( a b -- ) dst temp \ %cmov-float= %boolean ] }
+        { cc<>   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVNE %boolean ] }
+        { cc<>=  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVNP %boolean ] }
+        { cc/<   [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVBE %boolean ] }
+        { cc/<=  [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVB  %boolean ] }
+        { cc/>   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVBE %boolean ] }
+        { cc/>=  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVB  %boolean ] }
+        { cc/=   [ src1 src2 \ compare execute( a b -- ) dst temp \ %cmov-float/= %boolean ] }
+        { cc/<>  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVE  %boolean ] }
+        { cc/<>= [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVP  %boolean ] }
+    } case ; inline
+
+M: x86 %compare-float-ordered ( dst src1 src2 cc temp -- )
+    \ COMISD (%compare-float) ;
+
+M: x86 %compare-float-unordered ( dst src1 src2 cc temp -- )
+    \ UCOMISD (%compare-float) ;
 
 M:: x86 %compare-branch ( label src1 src2 cc -- )
     src1 src2 CMP
@@ -701,23 +706,29 @@ M: x86 %compare-imm-branch ( label src1 src2 cc -- )
 : %jump-float/= ( label -- )
     [ JNE ] [ JP ] bi ;
 
-M:: x86 %compare-float-branch ( label src1 src2 cc -- )
+:: (%compare-float-branch) ( label src1 src2 cc compare -- )
     cc {
-        { cc<    [ src2 src1  COMISD label JA  ] }
-        { cc<=   [ src2 src1  COMISD label JAE ] }
-        { cc>    [ src1 src2  COMISD label JA  ] }
-        { cc>=   [ src1 src2  COMISD label JAE ] }
-        { cc=    [ src1 src2 UCOMISD label %jump-float= ] }
-        { cc<>   [ src1 src2  COMISD label JNE ] }
-        { cc<>=  [ src1 src2  COMISD label JNP ] }
-        { cc/<   [ src2 src1 UCOMISD label JBE ] }
-        { cc/<=  [ src2 src1 UCOMISD label JB  ] }
-        { cc/>   [ src1 src2 UCOMISD label JBE ] }
-        { cc/>=  [ src1 src2 UCOMISD label JB  ] }
-        { cc/=   [ src1 src2 UCOMISD label %jump-float/= ] }
-        { cc/<>  [ src1 src2 UCOMISD label JE  ] }
-        { cc/<>= [ src1 src2 UCOMISD label JP  ] }
+        { cc<    [ src2 src1 \ compare execute( a b -- ) label JA  ] }
+        { cc<=   [ src2 src1 \ compare execute( a b -- ) label JAE ] }
+        { cc>    [ src1 src2 \ compare execute( a b -- ) label JA  ] }
+        { cc>=   [ src1 src2 \ compare execute( a b -- ) label JAE ] }
+        { cc=    [ src1 src2 \ compare execute( a b -- ) label %jump-float= ] }
+        { cc<>   [ src1 src2 \ compare execute( a b -- ) label JNE ] }
+        { cc<>=  [ src1 src2 \ compare execute( a b -- ) label JNP ] }
+        { cc/<   [ src2 src1 \ compare execute( a b -- ) label JBE ] }
+        { cc/<=  [ src2 src1 \ compare execute( a b -- ) label JB  ] }
+        { cc/>   [ src1 src2 \ compare execute( a b -- ) label JBE ] }
+        { cc/>=  [ src1 src2 \ compare execute( a b -- ) label JB  ] }
+        { cc/=   [ src1 src2 \ compare execute( a b -- ) label %jump-float/= ] }
+        { cc/<>  [ src1 src2 \ compare execute( a b -- ) label JE  ] }
+        { cc/<>= [ src1 src2 \ compare execute( a b -- ) label JP  ] }
     } case ;
+
+M: x86 %compare-float-ordered-branch ( label src1 src2 cc -- )
+    \ COMISD (%compare-float-branch) ;
+
+M: x86 %compare-float-unordered-branch ( label src1 src2 cc -- )
+    \ UCOMISD (%compare-float-branch) ;
 
 M:: x86 %spill ( src rep n -- )
     n spill@ src rep copy-register ;
@@ -727,16 +738,18 @@ M:: x86 %reload ( dst rep n -- )
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
-M: x86 %prepare-alien-invoke
+M:: x86 %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp-reg "stack_chain" f %alien-global
-    temp-reg temp-reg [] MOV
-    temp-reg [] stack-reg MOV
-    temp-reg [] cell SUB
-    temp-reg 2 cells [+] ds-reg MOV
-    temp-reg 3 cells [+] rs-reg MOV ;
+    temp1 "stack_chain" f %alien-global
+    temp1 temp1 [] MOV
+    temp2 stack-reg cell neg [+] LEA
+    temp1 [] temp2 MOV
+    callback-allowed? [
+        temp1 2 cells [+] ds-reg MOV
+        temp1 3 cells [+] rs-reg MOV
+    ] when ;
 
 M: x86 value-struct? drop t ;
 

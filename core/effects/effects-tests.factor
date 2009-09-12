@@ -1,4 +1,5 @@
-USING: effects tools.test prettyprint accessors sequences ;
+USING: effects kernel tools.test prettyprint accessors
+quotations sequences ;
 IN: effects.tests
 
 [ t ] [ 1 1 <effect> 2 2 <effect> effect<= ] unit-test
@@ -23,3 +24,6 @@ IN: effects.tests
 [ t ] [ (( -- )) (( -- )) compose-effects (( -- )) effect= ] unit-test
 [ t ] [ (( -- * )) (( -- )) compose-effects (( -- * )) effect= ] unit-test
 [ t ] [ (( -- )) (( -- * )) compose-effects (( -- * )) effect= ] unit-test
+
+[ { object object } ] [ (( a b -- )) effect-in-types ] unit-test
+[ { object sequence } ] [ (( a b: sequence -- )) effect-in-types ] unit-test

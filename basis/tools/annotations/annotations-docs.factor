@@ -16,7 +16,10 @@ $nl
 { $subsection add-timing }
 { $subsection word-timing. }
 "All of the above words are implemented using a single combinator which applies a quotation to a word definition to yield a new definition:"
-{ $subsection annotate } ;
+{ $subsection annotate }
+{ $warning
+    "Certain internal words, such as words in the " { $vocab-link "math" } ", " { $vocab-link "sequences" } " and UI vocabularies, cannot be annotated, since the annotated code may end up recursively invoking the word in question. This may crash or hang Factor. It is safest to only define annotations on your own words."
+} ;
 
 ABOUT: "tools.annotations"
 

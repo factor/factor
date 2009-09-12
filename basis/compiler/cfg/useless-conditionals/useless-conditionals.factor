@@ -7,7 +7,14 @@ IN: compiler.cfg.useless-conditionals
 
 : delete-conditional? ( bb -- ? )
     {
-        [ instructions>> last class { ##compare-branch ##compare-imm-branch ##compare-float-branch } memq? ]
+        [
+            instructions>> last class {
+                ##compare-branch
+                ##compare-imm-branch
+                ##compare-float-ordered-branch
+                ##compare-float-unordered-branch
+            } memq?
+        ]
         [ successors>> first2 [ skip-empty-blocks ] bi@ eq? ]
     } 1&& ;
 

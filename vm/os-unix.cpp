@@ -132,6 +132,16 @@ void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	UAP_PROGRAM_COUNTER(uap) = (cell)misc_signal_handler_impl;
 }
 
+void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	signal_number = signal;
+	signal_callstack_top = uap_stack_pointer(uap);
+	UAP_PROGRAM_COUNTER(uap) =
+            (siginfo->si_code == FPE_INTDIV || siginfo->si_code == FPE_INTOVF)
+                ? (cell)misc_signal_handler_impl
+                : (cell)fp_signal_handler_impl;
+}
+
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)
 {
 	int ret;
@@ -149,6 +159,7 @@ void unix_init_signals()
 {
 	struct sigaction memory_sigaction;
 	struct sigaction misc_sigaction;
+	struct sigaction fpe_sigaction;
 	struct sigaction ignore_sigaction;
 
 	memset(&memory_sigaction,0,sizeof(struct sigaction));
@@ -159,13 +170,19 @@ void unix_init_signals()
 	sigaction_safe(SIGBUS,&memory_sigaction,NULL);
 	sigaction_safe(SIGSEGV,&memory_sigaction,NULL);
 
+	memset(&fpe_sigaction,0,sizeof(struct sigaction));
+	sigemptyset(&fpe_sigaction.sa_mask);
+	fpe_sigaction.sa_sigaction = fpe_signal_handler;
+	fpe_sigaction.sa_flags = SA_SIGINFO;
+
+	sigaction_safe(SIGFPE,&fpe_sigaction,NULL);
+
 	memset(&misc_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&misc_sigaction.sa_mask);
 	misc_sigaction.sa_sigaction = misc_signal_handler;
 	misc_sigaction.sa_flags = SA_SIGINFO;
 
 	sigaction_safe(SIGABRT,&misc_sigaction,NULL);
-	sigaction_safe(SIGFPE,&misc_sigaction,NULL);
 	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
 	sigaction_safe(SIGILL,&misc_sigaction,NULL);
 
