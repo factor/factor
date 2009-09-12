@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
 assocs alien alien.strings libc opengl math sequences combinators
-macros arrays io.encodings.ascii fry specialized-arrays.uint
+macros arrays io.encodings.ascii fry specialized-arrays
 destructors accessors ;
+SPECIALIZED-ARRAY: uint
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )

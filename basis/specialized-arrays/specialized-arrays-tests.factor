@@ -1,9 +1,17 @@
 IN: specialized-arrays.tests
-USING: tools.test specialized-arrays sequences
-specialized-arrays.int specialized-arrays.bool
-specialized-arrays.ushort alien.c-types accessors kernel
-specialized-arrays.direct.int specialized-arrays.char
-specialized-arrays.uint arrays combinators ;
+USING: tools.test alien.syntax specialized-arrays
+specialized-arrays.private sequences alien.c-types accessors
+kernel arrays combinators compiler compiler.units classes.struct
+combinators.smart compiler.tree.debugger math libc destructors
+sequences.private multiline eval words vocabs namespaces
+assocs prettyprint ;
+
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: bool
+SPECIALIZED-ARRAY: ushort
+SPECIALIZED-ARRAY: char
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: float
 
 [ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
 
@@ -27,4 +35,115 @@ specialized-arrays.uint arrays combinators ;
 
 [ { 3 1 3 3 7 } ] [
     int-array{ 3 1 3 3 7 } malloc-byte-array 5 <direct-int-array> >array
+] unit-test
+
+[ f ] [ float-array{ 4 3 2 1 } dup clone [ underlying>> ] bi@ eq? ] unit-test
+
+[ f ] [ [ float-array{ 4 3 2 1 } dup clone [ underlying>> ] bi@ eq? ] compile-call ] unit-test
+
+[ ushort-array{ 0 0 0 } ] [
+    3 ALIEN: 123 100 <direct-ushort-array> new-sequence
+    dup [ drop 0 ] change-each
+] unit-test
+
+STRUCT: test-struct
+    { x int }
+    { y int } ;
+
+SPECIALIZED-ARRAY: test-struct
+
+[ 1 ] [
+    1 test-struct-array{ } new-sequence length
+] unit-test
+
+[ V{ test-struct } ] [
+    [ [ test-struct-array <struct> ] test-struct-array{ } output>sequence first ] final-classes
+] unit-test
+
+: make-point ( x y -- struct )
+    test-struct <struct-boa> ;
+
+[ 5/4 ] [
+    2 <test-struct-array>
+    1 2 make-point over set-first
+    3 4 make-point over set-second
+    0 [ [ x>> ] [ y>> ] bi / + ] reduce
+] unit-test
+
+[ 5/4 ] [
+    [
+        2 malloc-test-struct-array
+        dup &free drop
+        1 2 make-point over set-first
+        3 4 make-point over set-second
+        0 [ [ x>> ] [ y>> ] bi / + ] reduce
+    ] with-destructors
+] unit-test
+
+[ ] [ ALIEN: 123 10 <direct-test-struct-array> drop ] unit-test
+
+[ ] [
+    [
+        10 malloc-test-struct-array
+        &free drop
+    ] with-destructors
+] unit-test
+
+[ 15 ] [ 15 10 <test-struct-array> resize length ] unit-test
+
+[ S{ test-struct f 12 20 } ] [
+    test-struct-array{
+        S{ test-struct f  4 20 } 
+        S{ test-struct f 12 20 }
+        S{ test-struct f 20 20 }
+    } second
+] unit-test
+
+! Regression
+STRUCT: fixed-string { text char[100] } ;
+
+SPECIALIZED-ARRAY: fixed-string
+
+[ { ALIEN: 123 ALIEN: 223 ALIEN: 323 ALIEN: 423 } ] [
+    ALIEN: 123 4 <direct-fixed-string-array> [ (underlying)>> ] { } map-as
+] unit-test
+
+! Ensure that byte-length works with direct arrays
+[ 400 ] [
+    ALIEN: 123 100 <direct-int-array> byte-length
+] unit-test
+
+! Test prettyprinting
+[ "int-array{ 1 2 3 }" ] [ int-array{ 1 2 3 } unparse ] unit-test
+[ "int-array@ f 100" ] [ f 100 <direct-int-array> unparse ] unit-test
+
+! If the C type doesn't exist, don't generate a vocab
+[ ] [
+    [ "__does_not_exist__" specialized-array-vocab forget-vocab ] with-compilation-unit
+    "__does_not_exist__" c-types get delete-at
+] unit-test
+
+[
+    <"
+IN: specialized-arrays.tests
+USING: specialized-arrays ;
+
+SPECIALIZED-ARRAY: __does_not_exist__ "> eval( -- )
+] must-fail
+
+[ ] [
+    <"
+IN: specialized-arrays.tests
+USING: classes.struct specialized-arrays ;
+
+STRUCT: __does_not_exist__ { x int } ;
+
+SPECIALIZED-ARRAY: __does_not_exist__
+"> eval( -- )
+] unit-test
+
+[ f ] [
+    "__does_not_exist__-array{"
+    "__does_not_exist__" specialized-array-vocab lookup
+    deferred?
 ] unit-test

@@ -2,7 +2,8 @@
 USING: accessors alien.c-types arrays byte-arrays combinators
 destructors fry gpu gpu.buffers images kernel locals math
 opengl opengl.gl opengl.textures sequences
-specialized-arrays.float ui.gadgets.worlds variants ;
+specialized-arrays ui.gadgets.worlds variants ;
+SPECIALIZED-ARRAY: float
 IN: gpu.textures
 
 TUPLE: texture < gpu-object

@@ -72,13 +72,6 @@ IN: tools.deploy.shaker
     "vocab:tools/deploy/shaker/strip-destructors.factor"
     run-file ;
 
-: strip-struct-arrays ( -- )
-    "struct-arrays" vocab [
-        "Stripping dynamic struct array code" show
-        "vocab:tools/deploy/shaker/strip-struct-arrays.factor"
-        run-file
-    ] when ;
-
 : strip-call ( -- )
     "Stripping stack effect checking from call( and execute(" show
     "vocab:tools/deploy/shaker/strip-call.factor" run-file ;
@@ -178,6 +171,8 @@ IN: tools.deploy.shaker
                 "slots"
                 "special"
                 "specializer"
+                "specializations"
+                "struct-slots"
                 ! UI needs this
                 ! "superclass"
                 "transform-n"
@@ -350,8 +345,6 @@ IN: tools.deploy.shaker
 
             { } { "math.partial-dispatch" } strip-vocab-globals %
 
-            { } { "math.vectors.specialization" } strip-vocab-globals %
-
             { } { "peg" } strip-vocab-globals %
         ] when
 
@@ -498,7 +491,6 @@ SYMBOL: deploy-vocab
 : strip ( -- )
     init-stripper
     strip-libc
-    strip-struct-arrays
     strip-destructors
     strip-call
     strip-cocoa

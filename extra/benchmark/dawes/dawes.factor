@@ -1,16 +1,15 @@
-USING: sequences hints kernel math specialized-arrays.int fry ;
+USING: sequences kernel math specialized-arrays fry ;
+SPECIALIZED-ARRAY: int
 IN: benchmark.dawes
 
 ! Phil Dawes's performance problem
 
 : count-ones ( int-array -- n ) [ 1 = ] count ; inline
 
-HINTS: count-ones int-array ;
-
 : make-int-array ( -- int-array )
-    120000 [ 255 bitand ] int-array{ } map-as ;
+    120000 [ 255 bitand ] int-array{ } map-as ; inline
 
 : dawes-benchmark ( -- )
-    make-int-array 200 swap '[ _ count-ones ] replicate drop ;
+    200 make-int-array '[ _ count-ones ] replicate drop ;
 
 MAIN: dawes-benchmark

@@ -2,7 +2,7 @@ USING: help.markup help.syntax math sequences ;
 IN: math.vectors
 
 ARTICLE: "math-vectors" "Vector arithmetic"
-"Any Factor sequence can be used to represent a mathematical vector."
+"Any Factor sequence can be used to represent a mathematical vector, however for best performance, the sequences defined by the " { $vocab-link "specialized-arrays" } " and " { $vocab-link "math.vectors.simd" } " vocabularies should be used."
 $nl
 "Acting on vectors by a scalar:"
 { $subsection vneg }
@@ -10,6 +10,10 @@ $nl
 { $subsection n*v }
 { $subsection v/n }
 { $subsection n/v }
+{ $subsection v+n }
+{ $subsection n+v }
+{ $subsection v-n }
+{ $subsection n-v }
 "Combining two vectors to form another vector with " { $link 2map } ":"
 { $subsection v+ }
 { $subsection v- }

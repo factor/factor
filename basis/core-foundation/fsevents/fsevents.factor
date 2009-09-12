@@ -3,11 +3,14 @@
 USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces make assocs init accessors
 continuations combinators io.encodings.utf8 destructors locals
-arrays specialized-arrays.direct.alien classes.struct
-specialized-arrays.direct.int specialized-arrays.direct.longlong
-core-foundation core-foundation.run-loop core-foundation.strings
+arrays specialized-arrays classes.struct core-foundation
+core-foundation.run-loop core-foundation.strings
 core-foundation.time ;
 IN: core-foundation.fsevents
+
+SPECIALIZED-ARRAY: void*
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: longlong
 
 CONSTANT: kFSEventStreamCreateFlagUseCFTypes 2
 CONSTANT: kFSEventStreamCreateFlagWatchRoot 4

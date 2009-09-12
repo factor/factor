@@ -1,6 +1,9 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types combinators kernel locals math math.ranges openal sequences sequences.merged specialized-arrays.uchar specialized-arrays.short ;
+USING: accessors alien.c-types combinators kernel locals math
+math.ranges openal sequences sequences.merged specialized-arrays ;
+SPECIALIZED-ARRAY: uchar
+SPECIALIZED-ARRAY: short
 IN: synth.buffers
 
 TUPLE: buffer sample-freq 8bit? id ;

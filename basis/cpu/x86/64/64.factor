@@ -201,7 +201,7 @@ M: x86.64 %callback-value ( ctype -- )
     [ float-regs param-regs nth ] [ n>> spill@ ] bi* MOVSD ;
 
 : float-function-return ( reg -- )
-    float-regs return-reg double-float-rep copy-register ;
+    float-regs return-reg double-rep copy-register ;
 
 M:: x86.64 %unary-float-function ( dst src func -- )
     0 src float-function-param
@@ -221,12 +221,11 @@ enable-alien-4-intrinsics
 ! Enable fast calling of libc math functions
 enable-float-functions
 
-! SSE2 is always available on x86-64.
-enable-sse2
-
 USE: vocabs.loader
 
 {
     { [ os unix? ] [ "cpu.x86.64.unix" require ] }
     { [ os winnt? ] [ "cpu.x86.64.winnt" require ] }
 } cond
+
+"cpu.x86.features" require

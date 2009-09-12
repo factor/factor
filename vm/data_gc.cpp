@@ -266,19 +266,21 @@ static void copy_stack_elements(segment *region, cell top)
 
 static void copy_registered_locals()
 {
-	cell scan = gc_locals_region->start;
+	std::vector<cell>::const_iterator iter = gc_locals.begin();
+	std::vector<cell>::const_iterator end = gc_locals.end();
 
-	for(; scan <= gc_locals; scan += sizeof(cell))
-		copy_handle(*(cell **)scan);
+	for(; iter < end; iter++)
+		copy_handle((cell *)(*iter));
 }
 
 static void copy_registered_bignums()
 {
-	cell scan = gc_bignums_region->start;
+	std::vector<cell>::const_iterator iter = gc_bignums.begin();
+	std::vector<cell>::const_iterator end = gc_bignums.end();
 
-	for(; scan <= gc_bignums; scan += sizeof(cell))
+	for(; iter < end; iter++)
 	{
-		bignum **handle = *(bignum ***)scan;
+		bignum **handle = (bignum **)(*iter);
 		bignum *pointer = *handle;
 
 		if(pointer)
@@ -683,12 +685,12 @@ PRIMITIVE(become)
 VM_ASM_API void inline_gc(cell *gc_roots_base, cell gc_roots_size)
 {
 	for(cell i = 0; i < gc_roots_size; i++)
-		gc_local_push((cell)&gc_roots_base[i]);
+		gc_locals.push_back((cell)&gc_roots_base[i]);
 
 	garbage_collection(data->nursery(),false,0);
 
 	for(cell i = 0; i < gc_roots_size; i++)
-		gc_local_pop();
+		gc_locals.pop_back();
 }
 
 }

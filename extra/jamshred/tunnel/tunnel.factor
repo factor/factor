@@ -3,8 +3,9 @@
 USING: accessors arrays colors combinators fry jamshred.oint
 kernel literals locals math math.constants math.matrices
 math.order math.quadratic math.ranges math.vectors random
-sequences specialized-arrays.float vectors ;
+sequences specialized-arrays vectors ;
 FROM: jamshred.oint => distance ;
+SPECIALIZED-ARRAY: float
 IN: jamshred.tunnel
 
 CONSTANT: n-segments 5000

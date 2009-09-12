@@ -3,11 +3,13 @@ assocs byte-arrays combinators continuations game-input
 game-input.dinput.keys-array io.encodings.utf16
 io.encodings.utf16n kernel locals math math.bitwise
 math.rectangles namespaces parser sequences shuffle
-struct-arrays ui.backend.windows vectors windows.com
+specialized-arrays ui.backend.windows vectors windows.com
 windows.dinput windows.dinput.constants windows.errors
 windows.kernel32 windows.messages windows.ole32
 windows.user32 classes.struct ;
+SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game-input.dinput
+
 CONSTANT: MOUSE-BUFFER-SIZE 16
 
 SINGLETON: dinput-game-input-backend
@@ -70,12 +72,9 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-mouse ( -- )
     GUID_SysMouse device-for-guid
-    [ configure-mouse ]
-    [ +mouse-device+ set-global ] bi
-    0 0 0 0 8 f <array> mouse-state boa
-    +mouse-state+ set-global
-    MOUSE-BUFFER-SIZE DIDEVICEOBJECTDATA <struct-array>
-    +mouse-buffer+ set-global ;
+    [ configure-mouse ] [ +mouse-device+ set-global ] bi
+    0 0 0 0 8 f <array> mouse-state boa +mouse-state+ set-global
+    MOUSE-BUFFER-SIZE <DIDEVICEOBJECTDATA-array> +mouse-buffer+ set-global ;
 
 : device-info ( device -- DIDEVICEIMAGEINFOW )
     DIDEVICEINSTANCEW <struct>

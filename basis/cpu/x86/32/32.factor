@@ -70,13 +70,13 @@ M: int-rep push-return-reg drop EAX PUSH ;
 M: int-rep load-return-reg drop EAX swap next-stack@ MOV ;
 M: int-rep store-return-reg drop stack@ EAX MOV ;
 
-M: single-float-rep push-return-reg drop ESP 4 SUB ESP [] FSTPS ;
-M: single-float-rep load-return-reg drop next-stack@ FLDS ;
-M: single-float-rep store-return-reg drop stack@ FSTPS ;
+M: float-rep push-return-reg drop ESP 4 SUB ESP [] FSTPS ;
+M: float-rep load-return-reg drop next-stack@ FLDS ;
+M: float-rep store-return-reg drop stack@ FSTPS ;
 
-M: double-float-rep push-return-reg drop ESP 8 SUB ESP [] FSTPL ;
-M: double-float-rep load-return-reg drop next-stack@ FLDL ;
-M: double-float-rep store-return-reg drop stack@ FSTPL ;
+M: double-rep push-return-reg drop ESP 8 SUB ESP [] FSTPL ;
+M: double-rep load-return-reg drop next-stack@ FLDL ;
+M: double-rep store-return-reg drop stack@ FSTPL ;
 
 : align-sub ( n -- )
     [ align-stack ] keep - decr-stack-reg ;
@@ -295,22 +295,4 @@ os windows? [
     4 "double" c-type (>>align)
 ] unless
 
-USING: cpu.x86.features cpu.x86.features.private ;
-
-"-no-sse2" (command-line) member? [
-    [ { check_sse2 } compile ] with-optimizer
-
-    "Checking if your CPU supports SSE2..." print flush
-    sse2? [
-        " - yes" print
-        enable-sse2
-        [
-            sse2? [
-                "This image was built to use SSE2, which your CPU does not support." print
-                "You will need to bootstrap Factor again." print
-                flush
-                1 exit
-            ] unless
-        ] "cpu.x86" add-init-hook
-    ] [ " - no" print ] if
-] unless
+"cpu.x86.features" require

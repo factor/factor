@@ -86,6 +86,11 @@ PRIVATE>
     [ manifest get (>>current-vocab) ]
     [ words>> <extra-words> (add-qualified) ] bi ;
 
+: with-current-vocab ( name quot -- )
+    manifest get clone manifest [
+        [ set-current-vocab ] dip call
+    ] with-variable ; inline
+
 TUPLE: no-current-vocab ;
 
 : no-current-vocab ( -- vocab )

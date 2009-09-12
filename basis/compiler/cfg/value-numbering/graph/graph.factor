@@ -10,7 +10,7 @@ SYMBOL: vn-counter
 ! biassoc mapping expressions to value numbers
 SYMBOL: exprs>vns
 
-TUPLE: expr op ;
+TUPLE: expr ;
 
 : expr>vn ( expr -- vn ) exprs>vns get [ drop next-vn ] cache ;
 
@@ -22,7 +22,7 @@ TUPLE: input-expr < expr n ;
 SYMBOL: input-expr-counter
 
 : next-input-expr ( -- expr )
-    f input-expr-counter counter input-expr boa ;
+    input-expr-counter counter input-expr boa ;
 
 SYMBOL: vregs>vns
 
@@ -41,5 +41,6 @@ SYMBOL: vregs>vns
 
 : init-value-graph ( -- )
     0 vn-counter set
+    0 input-expr-counter set
     <bihash> exprs>vns set
     <bihash> vregs>vns set ;

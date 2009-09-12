@@ -1,13 +1,14 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays continuations io
-io.backend.windows io.pipes.windows.nt io.pathnames libc io.ports
-windows.types math windows.kernel32
-namespaces make io.launcher kernel sequences windows.errors
-splitting system threads init strings combinators
-io.backend accessors concurrency.flags io.files assocs
-io.files.private windows destructors specialized-arrays.ushort
-specialized-arrays.alien classes classes.struct ;
+io.backend.windows io.pipes.windows.nt io.pathnames libc
+io.ports windows.types math windows.kernel32 namespaces make
+io.launcher kernel sequences windows.errors splitting system
+threads init strings combinators io.backend accessors
+concurrency.flags io.files assocs io.files.private windows
+destructors classes classes.struct specialized-arrays ;
+SPECIALIZED-ARRAY: ushort
+SPECIALIZED-ARRAY: void*
 IN: io.launcher.windows
 
 TUPLE: CreateProcess-args

@@ -1,11 +1,12 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays byte-vectors continuations
-generic hashtables assocs kernel math namespaces make sequences
-strings sbufs vectors words prettyprint.config prettyprint.custom
-prettyprint.sections quotations io io.pathnames io.styles math.parser
-effects classes.tuple math.order classes.tuple.private classes
-combinators colors ;
+USING: accessors arrays assocs byte-arrays byte-vectors classes
+classes.tuple classes.tuple.private colors colors.constants
+combinators continuations effects generic hashtables io
+io.pathnames io.styles kernel make math math.order math.parser
+namespaces prettyprint.config prettyprint.custom
+prettyprint.sections prettyprint.stylesheet quotations sbufs
+sequences strings vectors words words.symbol ;
 IN: prettyprint.backend
 
 M: effect pprint* effect>string "(" ")" surround text ;
@@ -20,17 +21,6 @@ M: effect pprint* effect>string "(" ")" surround text ;
     ?effect-height 0 < [ end-group ] when ;
 
 ! Atoms
-: word-style ( word -- style )
-    dup "word-style" word-prop >hashtable [
-        [
-            [ presented set ]
-            [
-                [ parsing-word? ] [ delimiter? ] [ t eq? ] tri or or
-                [ bold font-style set ] when
-            ] bi
-        ] bind
-    ] keep ;
-
 : word-name* ( word -- str )
     name>> "( no name )" or ;
 
@@ -57,7 +47,15 @@ M: method-body pprint*
 
 M: real pprint* number>string text ;
 
+M: float pprint*
+    dup fp-nan? [
+        \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
+    ] [ call-next-method ] if ;
+
 M: f pprint* drop \ f pprint-word ;
+
+: pprint-effect ( effect -- )
+    [ effect>string ] [ effect-style ] bi styled-text ;
 
 ! Strings
 : ch>ascii-escape ( ch -- str )
@@ -81,12 +79,6 @@ M: f pprint* drop \ f pprint-word ;
             margin get 3 - head "..." append
         ] when
     ] when ;
-
-: string-style ( obj -- hash )
-    [
-        presented set
-        T{ rgba f 0.3 0.3 0.3 1.0 } foreground set
-    ] H{ } make-assoc ;
 
 : unparse-string ( str prefix suffix -- str )
     [ [ % do-string-limit [ unparse-ch ] each ] dip % ] "" make ;

@@ -3,7 +3,8 @@
 USING: alien alien.c-types classes.struct accessors kernel
 math namespaces windows windows.kernel32 windows.advapi32 words
 combinators vocabs.loader system-info.backend system
-alien.strings windows.errors specialized-arrays.ushort ;
+alien.strings windows.errors specialized-arrays ;
+SPECIALIZED-ARRAY: ushort
 IN: system-info.windows
 
 : system-info ( -- SYSTEM_INFO )

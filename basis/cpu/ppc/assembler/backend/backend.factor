@@ -36,10 +36,17 @@ SYNTAX: SD: CREATE scan-word define-sd-insn ;
 : x-insn ( a s b rc xo opcode -- )
     [ { 1 0 11 21 16 } bitfield ] dip insn ;
 
+: xd-insn ( d a b rc xo opcode -- )
+    [ { 1 0 11 16 21 } bitfield ] dip insn ;
+
 : (X) ( -- word quot )
     CREATE scan-word scan-word scan-word [ x-insn ] 3curry ;
 
-SYNTAX: X: (X) (( a s b -- )) define-declared ;
+: (XD) ( -- word quot )
+    CREATE scan-word scan-word scan-word [ xd-insn ] 3curry ;
+
+SYNTAX: X:  (X)  (( a s b -- )) define-declared ;
+SYNTAX: XD: (XD) (( d a b -- )) define-declared ;
 
 : (1) ( quot -- quot' ) [ 0 ] prepose ;
 
@@ -67,9 +74,9 @@ SYNTAX: MTSPR:
     CREATE scan-word scan-word scan-word scan-word
     [ xo-insn ] 2curry 2curry ;
 
-SYNTAX: XO: (XO) (( a s b -- )) define-declared ;
+SYNTAX: XO: (XO) (( d a b -- )) define-declared ;
 
-SYNTAX: XO1: (XO) (1) (( a s -- )) define-declared ;
+SYNTAX: XO1: (XO) (1) (( d a -- )) define-declared ;
 
 GENERIC# (B) 2 ( dest aa lk -- )
 M: integer (B) 18 i-insn ;
@@ -86,3 +93,40 @@ SYNTAX: BC:
 SYNTAX: B:
     CREATE-B scan-word scan-word scan-word scan-word scan-word
     '[ _ _ _ _ _ b-insn ] (( bo -- )) define-declared ;
+
+: va-insn ( d a b c xo opcode -- )
+    [ { 0 6 11 16 21 } bitfield ] dip insn ;
+
+: (VA) ( -- word quot )
+    CREATE scan-word scan-word [ va-insn ] 2curry ;
+
+SYNTAX: VA: (VA) (( d a b c -- )) define-declared ;
+
+: vx-insn ( d a b xo opcode -- )
+    [ { 0 11 16 21 } bitfield ] dip insn ;
+
+: (VX) ( -- word quot )
+    CREATE scan-word scan-word [ vx-insn ] 2curry ;
+: (VXD) ( -- word quot )
+    CREATE scan-word scan-word '[ 0 0 _ _ vx-insn ] ;
+: (VXA) ( -- word quot )
+    CREATE scan-word scan-word '[ [ 0 ] dip 0 _ _ vx-insn ] ;
+: (VXB) ( -- word quot )
+    CREATE scan-word scan-word '[ [ 0 0 ] dip _ _ vx-insn ] ;
+: (VXDB) ( -- word quot )
+    CREATE scan-word scan-word '[ [ 0 ] dip _ _ vx-insn ] ;
+
+SYNTAX: VX:   (VX)   (( d a b -- )) define-declared ;
+SYNTAX: VXD:  (VXD)  (( d     -- )) define-declared ;
+SYNTAX: VXA:  (VXA)  ((   a   -- )) define-declared ;
+SYNTAX: VXB:  (VXB)  ((     b -- )) define-declared ;
+SYNTAX: VXDB: (VXDB) (( d   b -- )) define-declared ;
+
+: vxr-insn ( d a b rc xo opcode -- )
+    [ { 0 10 11 16 21 } bitfield ] dip insn ;
+
+: (VXR) ( -- word quot )
+    CREATE scan-word scan-word scan-word [ vxr-insn ] 3curry ;
+
+SYNTAX: VXR: (VXR) (( d a b -- )) define-declared ;
+
