@@ -87,9 +87,10 @@ PRIVATE>
         "To avoid doing this in the future, add the following forms" print
         "at the top of the source file:" print nl
     ] with-style
-    { { page-color COLOR: FactorLightLightTan }
-      { border-color COLOR: FactorDarkTan }
-      { inset { 5 5 } } }
-    [ manifest get pprint-manifest ] with-nesting
+    {
+        { page-color COLOR: FactorLightLightTan }
+        { border-color COLOR: FactorDarkTan }
+        { inset { 5 5 } }
+    } [ manifest get pprint-manifest ] with-nesting
     nl nl
 ] print-use-hook set-global
