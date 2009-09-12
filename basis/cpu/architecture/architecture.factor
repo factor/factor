@@ -217,11 +217,13 @@ HOOK: %epilogue cpu ( n -- )
 
 HOOK: %compare cpu ( dst temp cc src1 src2 -- )
 HOOK: %compare-imm cpu ( dst temp cc src1 src2 -- )
-HOOK: %compare-float cpu ( dst temp cc src1 src2 -- )
+HOOK: %compare-float-ordered cpu ( dst temp cc src1 src2 -- )
+HOOK: %compare-float-unordered cpu ( dst temp cc src1 src2 -- )
 
 HOOK: %compare-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )
-HOOK: %compare-float-branch cpu ( label cc src1 src2 -- )
+HOOK: %compare-float-ordered-branch cpu ( label cc src1 src2 -- )
+HOOK: %compare-float-unordered-branch cpu ( label cc src1 src2 -- )
 
 HOOK: %spill cpu ( src rep n -- )
 HOOK: %reload cpu ( dst rep n -- )
@@ -287,7 +289,7 @@ HOOK: %save-param-reg cpu ( stack reg rep -- )
 
 HOOK: %load-param-reg cpu ( stack reg rep -- )
 
-HOOK: %prepare-alien-invoke cpu ( -- )
+HOOK: %save-context cpu ( temp1 temp2 callback-allowed? -- )
 
 HOOK: %prepare-var-args cpu ( -- )
 

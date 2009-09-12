@@ -7,7 +7,9 @@ continuations kernel libc math macros namespaces math.vectors
 math.parser opengl.gl combinators combinators.smart arrays
 sequences splitting words byte-arrays assocs vocabs
 colors colors.constants accessors generalizations locals fry
-specialized-arrays.float specialized-arrays.uint ;
+specialized-arrays ;
+SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAY: uint
 IN: opengl
 
 : gl-color ( color -- ) >rgba-components glColor4d ; inline

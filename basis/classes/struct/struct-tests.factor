@@ -1,28 +1,15 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.libraries
-alien.structs.fields alien.syntax ascii assocs byte-arrays
-classes.struct classes.tuple.private combinators
-compiler.tree.debugger compiler.units destructors
+USING: accessors alien alien.c-types alien.structs.fields ascii
+assocs byte-arrays classes.struct classes.tuple.private
+combinators compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
 literals math mirrors multiline namespaces prettyprint
-prettyprint.config see sequences specialized-arrays.char
-specialized-arrays.int specialized-arrays.ushort
-struct-arrays system tools.test ;
+prettyprint.config see sequences specialized-arrays system
+tools.test parser lexer eval ;
+SPECIALIZED-ARRAY: char
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: ushort
 IN: classes.struct.tests
-
-<<
-: libfactor-ffi-tests-path ( -- string )
-    "resource:" (normalize-path)
-    {
-        { [ os winnt? ]  [ "libfactor-ffi-test.dll" ] }
-        { [ os macosx? ] [ "libfactor-ffi-test.dylib" ] }
-        { [ os unix?  ]  [ "libfactor-ffi-test.so" ] }
-    } cond append-path ;
-
-"f-cdecl" libfactor-ffi-tests-path "cdecl" add-library
-
-"f-stdcall" libfactor-ffi-tests-path "stdcall" add-library
->>
 
 SYMBOL: struct-test-empty
 
@@ -276,15 +263,6 @@ STRUCT: struct-test-equality-2
     ] with-destructors
 ] unit-test
 
-STRUCT: struct-test-ffi-foo
-    { x int }
-    { y int } ;
-
-LIBRARY: f-cdecl
-FUNCTION: int ffi_test_11 ( int a, struct-test-ffi-foo b, int c ) ;
-
-[ 14 ] [ 1 2 3 struct-test-ffi-foo <struct-boa> 4 ffi_test_11 ] unit-test
-
 STRUCT: struct-test-array-slots
     { x int }
     { y ushort[6] initial: ushort-array{ 2 3 5 7 11 13 } }
@@ -301,9 +279,11 @@ STRUCT: struct-test-array-slots
 STRUCT: struct-test-optimization
     { x { "int" 3 } } { y int } ;
 
+SPECIALIZED-ARRAY: struct-test-optimization
+
 [ t ] [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 [ t ] [
-    [ 3 struct-test-optimization <direct-struct-array> third y>> ]
+    [ 3 <direct-struct-test-optimization-array> third y>> ]
     { <tuple> <tuple-boa> memory>struct y>> } inlined?
 ] unit-test
 
@@ -346,3 +326,27 @@ STRUCT: struct-that's-a-word { x int } ;
 
 [ -77 ] [ S{ struct-that's-a-word { x -77 } } clone x>> ] unit-test
 
+! Interactive parsing of struct slot definitions
+[
+    "USE: classes.struct IN: classes.struct.tests STRUCT: unexpected-eof-test" <string-reader>
+    "struct-class-test-1" parse-stream
+] [ error>> error>> unexpected-eof? ] must-fail-with
+
+! S{ with non-struct type
+[
+    "USE: classes.struct IN: classes.struct.tests TUPLE: not-a-struct ; S{ not-a-struct }"
+    eval( -- value )
+] must-fail
+
+! Subclassing a struct class should not be allowed
+[
+    "USE: classes.struct IN: classes.struct.tests STRUCT: a-struct { x int } ; TUPLE: not-a-struct < a-struct ;"
+    eval( -- )
+] must-fail
+
+! Remove c-type when struct class is forgotten
+[ ] [
+    "USE: classes.struct IN: classes.struct.tests TUPLE: a-struct ;" eval( -- )
+] unit-test
+
+[ f ] [ "a-struct" c-types get key? ] unit-test

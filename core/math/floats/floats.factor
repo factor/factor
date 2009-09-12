@@ -39,7 +39,7 @@ M: float fp-nan-payload
     double>bits 52 2^ 1 - bitand ; inline
 
 M: float fp-nan?
-    dup fp-special? [ fp-nan-payload zero? not ] [ drop f ] if ; inline
+    dup float= not ;
 
 M: float fp-qnan?
     dup fp-nan? [ fp-nan-payload 51 2^ bitand zero? not ] [ drop f ] if ; inline
@@ -57,6 +57,8 @@ M: float next-float ( m -- n )
             1 + bits>double ! positive
         ] if
     ] if ; inline
+
+M: float unordered? [ fp-nan? ] bi@ or ; inline
 
 M: float prev-float ( m -- n )
     double>bits

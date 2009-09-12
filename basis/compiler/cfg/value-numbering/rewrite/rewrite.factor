@@ -33,7 +33,12 @@ M: insn rewrite drop f ;
     ] [ drop f ] if ; inline
 
 : general-compare-expr? ( insn -- ? )
-    { [ compare-expr? ] [ compare-imm-expr? ] [ compare-float-expr? ] } 1|| ;
+    {
+        [ compare-expr? ]
+        [ compare-imm-expr? ]
+        [ compare-float-unordered-expr? ]
+        [ compare-float-ordered-expr? ]
+    } 1|| ;
 
 : rewrite-boolean-comparison? ( insn -- ? )
     dup ##branch-t? [
@@ -50,7 +55,8 @@ M: insn rewrite drop f ;
     src1>> vreg>expr {
         { [ dup compare-expr? ] [ >compare-expr< \ ##compare-branch new-insn ] }
         { [ dup compare-imm-expr? ] [ >compare-imm-expr< \ ##compare-imm-branch new-insn ] }
-        { [ dup compare-float-expr? ] [ >compare-expr< \ ##compare-float-branch new-insn ] }
+        { [ dup compare-float-unordered-expr? ] [ >compare-expr< \ ##compare-float-unordered-branch new-insn ] }
+        { [ dup compare-float-ordered-expr? ] [ >compare-expr< \ ##compare-float-ordered-branch new-insn ] }
     } cond ;
 
 : tag-fixnum-expr? ( expr -- ? )
@@ -93,7 +99,8 @@ M: ##compare-imm rewrite-tagged-comparison
     [ cc>> ] [ dst>> ] [ src1>> vreg>expr ] tri {
         { [ dup compare-expr? ] [ >compare-expr< next-vreg \ ##compare new-insn ] }
         { [ dup compare-imm-expr? ] [ >compare-imm-expr< next-vreg \ ##compare-imm new-insn ] }
-        { [ dup compare-float-expr? ] [ >compare-expr< next-vreg \ ##compare-float new-insn ] }
+        { [ dup compare-float-unordered-expr? ] [ >compare-expr< next-vreg \ ##compare-float-unordered new-insn ] }
+        { [ dup compare-float-ordered-expr? ] [ >compare-expr< next-vreg \ ##compare-float-ordered new-insn ] }
     } cond
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 

@@ -1,18 +1,22 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel compiler.cfg.instructions compiler.cfg.rpo
-compiler.cfg.def-use compiler.cfg.linearization compiler.cfg.utilities
-compiler.cfg.mr combinators.short-circuit accessors math
-sequences sets assocs ;
+USING: kernel combinators.short-circuit accessors math sequences
+sets assocs compiler.cfg.instructions compiler.cfg.rpo
+compiler.cfg.def-use compiler.cfg.linearization
+compiler.cfg.utilities compiler.cfg.mr compiler.utilities ;
 IN: compiler.cfg.checker
+
+! Check invariants
 
 ERROR: bad-kill-block bb ;
 
 : check-kill-block ( bb -- )
-    dup instructions>> first2
-    swap ##epilogue? [
-        { [ ##return? ] [ ##callback-return? ] [ ##jump? ] } 1||
-    ] [ ##branch? ] if
+    dup instructions>> dup penultimate ##epilogue? [
+        {
+            [ length 2 = ]
+            [ last { [ ##return? ] [ ##callback-return? ] [ ##jump? ] } 1|| ]
+        } 1&&
+    ] [ last ##branch? ] if
     [ drop ] [ bad-kill-block ] if ;
 
 ERROR: last-insn-not-a-jump bb ;
@@ -23,7 +27,8 @@ ERROR: last-insn-not-a-jump bb ;
         [ ##dispatch? ]
         [ ##compare-branch? ]
         [ ##compare-imm-branch? ]
-        [ ##compare-float-branch? ]
+        [ ##compare-float-ordered-branch? ]
+        [ ##compare-float-unordered-branch? ]
         [ ##fixnum-add? ]
         [ ##fixnum-sub? ]
         [ ##fixnum-mul? ]

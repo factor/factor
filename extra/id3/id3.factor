@@ -1,12 +1,12 @@
 ! Copyright (C) 2009 Tim Wawrzynczak, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences io io.encodings.binary io.files io.pathnames
-strings kernel math io.mmap io.mmap.uchar accessors
-combinators math.ranges unicode.categories byte-arrays
-io.encodings.string io.encodings.utf16 assocs math.parser
-combinators.short-circuit fry namespaces combinators.smart
-splitting io.encodings.ascii arrays io.files.info unicode.case
-io.directories.search literals math.functions continuations ;
+strings kernel math io.mmap accessors combinators math.ranges
+unicode.categories byte-arrays io.encodings.string
+io.encodings.utf16 assocs math.parser combinators.short-circuit
+fry namespaces combinators.smart splitting io.encodings.ascii
+arrays io.files.info unicode.case io.directories.search literals
+math.functions continuations ;
 IN: id3
 
 <PRIVATE
@@ -65,7 +65,7 @@ speed genre-name start-time end-time ;
 CONSTANT: id3v1-length 128
 CONSTANT: id3v1-offset 128
 CONSTANT: id3v1+-length 227
-CONSTANT: id3v1+-offset $[ 128 227 + ]
+: id3v1+-offset ( -- n ) id3v1-length id3v1+-length + ; inline
 
 : id3v1? ( seq -- ? )
     {
@@ -209,13 +209,12 @@ PRIVATE>
 
 : mp3>id3 ( path -- id3/f )
     [
-        [ <id3> ] dip
-        {
-            [ dup id3v1? [ read-v1-tags merge-id3v1 ] [ drop ] if ]
-            [ dup id3v1+? [ read-v1+-tags merge-id3v1 ] [ drop ] if ]
-            [ dup id3v2? [ read-v2-tags ] [ drop ] if ]
-        } cleave
-    ] with-mapped-uchar-file-reader ;
+        [ <id3> ] dip "uchar" <mapped-array>
+        [ dup id3v1? [ read-v1-tags merge-id3v1 ] [ drop ] if ]
+        [ dup id3v1+? [ read-v1+-tags merge-id3v1 ] [ drop ] if ]
+        [ dup id3v2? [ read-v2-tags ] [ drop ] if ]
+        tri
+    ] with-mapped-file-reader ;
 
 : find-id3-frame ( id3 name -- obj/f )
     swap frames>> at* [ data>> ] when ;

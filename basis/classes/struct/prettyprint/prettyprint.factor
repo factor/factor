@@ -18,12 +18,12 @@ IN: classes.struct.prettyprint
 
 : pprint-struct-slot ( slot -- )
     <flow \ { pprint-word
-    {
+    f <inset {
         [ name>> text ]
         [ c-type>> dup string? [ text ] [ pprint* ] if ]
         [ read-only>> [ \ read-only pprint-word ] when ]
         [ initial>> [ \ initial: pprint-word pprint* ] when* ]
-    } cleave
+    } cleave block>
     \ } pprint-word block> ;
 
 : pprint-struct ( struct -- )

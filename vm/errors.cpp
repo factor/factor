@@ -130,6 +130,11 @@ void divide_by_zero_error()
 	general_error(ERROR_DIVIDE_BY_ZERO,F,F,NULL);
 }
 
+void fp_trap_error()
+{
+	general_error(ERROR_FP_TRAP,F,F,NULL);
+}
+
 PRIMITIVE(call_clear)
 {
 	throw_impl(dpop(),stack_chain->callstack_bottom);
@@ -149,6 +154,11 @@ void memory_signal_handler_impl()
 void misc_signal_handler_impl()
 {
 	signal_error(signal_number,signal_callstack_top);
+}
+
+void fp_signal_handler_impl()
+{
+    fp_trap_error();
 }
 
 }

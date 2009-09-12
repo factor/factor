@@ -252,8 +252,13 @@ M: tuple-class update-class
     [ [ "slots" word-prop ] dip = ]
     bi-curry* bi and ;
 
-: valid-superclass? ( class -- ? )
-    [ tuple-class? ] [ tuple eq? ] bi or ;
+GENERIC: valid-superclass? ( class -- ? )
+
+M: tuple-class valid-superclass? drop t ;
+
+M: builtin-class valid-superclass? tuple eq? ;
+
+M: class valid-superclass? drop f ;
 
 : check-superclass ( superclass -- )
     dup valid-superclass? [ bad-superclass ] unless drop ;

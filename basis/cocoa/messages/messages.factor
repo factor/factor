@@ -5,8 +5,10 @@ classes.struct continuations combinators compiler compiler.alien
 stack-checker kernel math namespaces make quotations sequences
 strings words cocoa.runtime io macros memoize io.encodings.utf8
 effects libc libc.private lexer init core-foundation fry
-generalizations specialized-arrays.alien ;
+generalizations specialized-arrays ;
 IN: cocoa.messages
+
+SPECIALIZED-ARRAY: void*
 
 : make-sender ( method function -- quot )
     [ over first , f , , second , \ alien-invoke , ] [ ] make ;
