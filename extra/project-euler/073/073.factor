@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel locals make math project-euler.common sequences ;
+USING: kernel locals math project-euler.common sequences ;
 IN: project-euler.073
 
 ! http://projecteuler.net/index.php?section=problems&id=73
@@ -32,19 +32,19 @@ IN: project-euler.073
 
 <PRIVATE
 
-:: (euler073) ( limit lo hi -- )
+:: (euler073) ( counter limit lo hi -- counter' )
     [let | m [ lo hi mediant ] |
         m denominator limit <= [
-            m ,
+            counter 1 +
             limit lo m (euler073)
             limit m hi (euler073)
-        ] when
+        ] [ counter ] if
     ] ;
 
 PRIVATE>
 
 : euler073 ( -- answer )
-    [ 10000 1/3 1/2 (euler073) ] { } make length ;
+    0 10000 1/3 1/2 (euler073) ;
 
 ! [ euler073 ] 10 ave-time
 ! 20506 ms ave run time - 937.07 SD (10 trials)
