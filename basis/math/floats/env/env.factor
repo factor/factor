@@ -18,6 +18,15 @@ UNION: fp-exception
     +fp-zero-divide+
     +fp-inexact+ ;
 
+CONSTANT: all-fp-exceptions
+    {
+        +fp-invalid-operation+
+        +fp-overflow+
+        +fp-underflow+
+        +fp-zero-divide+
+        +fp-inexact+
+    }
+
 SINGLETONS:
     +round-nearest+
     +round-down+
