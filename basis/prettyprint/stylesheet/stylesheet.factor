@@ -1,51 +1,46 @@
-! Copyright (C) 2009 Your name.
+! Copyright (C) 2009 Keith Lazuka.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: colors.constants combinators combinators.short-circuit
-hashtables io.styles kernel namespaces sequences words
-words.symbol ;
+USING: assocs colors.constants combinators
+combinators.short-circuit hashtables io.styles kernel literals
+namespaces sequences words words.symbol ;
 IN: prettyprint.stylesheet
 
 <PRIVATE
 
 CONSTANT: dim-color COLOR: gray35
-CONSTANT: alt-color COLOR: DarkSlateGray
 
-: dimly-lit-word? ( word -- ? )
-    { POSTPONE: USING: POSTPONE: USE: POSTPONE: IN: } memq? ;
+{ POSTPONE: USING: POSTPONE: USE: POSTPONE: IN: }
+[
+    { { foreground $ dim-color } }
+    "word-style" set-word-prop
+] each
 
-: parsing-or-delim-word? ( word -- ? )
-    [ parsing-word? ] [ delimiter? ] bi or ;
-
-: word-color ( word -- color )
-    {
-        { [ dup dimly-lit-word? ] [ drop dim-color ] }
-        { [ dup parsing-or-delim-word? ] [ drop alt-color ] }
-        [ drop COLOR: black ]
-    } cond ;
+PREDICATE: highlighted-word < word [ parsing-word? ] [ delimiter? ] bi or ;
 
 PRIVATE>
 
-: word-style ( word -- style )
-    dup "word-style" word-prop >hashtable [
-        [
-            [ presented set ] [ word-color foreground set ] bi
-        ] bind
-    ] keep ;
+GENERIC: word-style ( word -- style )
+
+M: word word-style
+    [ presented associate ]
+    [ "word-style" word-prop >hashtable ] bi assoc-union ;
+
+M: highlighted-word word-style
+    call-next-method COLOR: DarkSlateGray foreground associate
+    swap assoc-union ;
+
+<PRIVATE
+
+: colored-presentation-style ( obj color -- style )
+    [ presented associate ] [ foreground associate ] bi* assoc-union ;
+
+PRIVATE>
 
 : string-style ( str -- style )
-    [
-        presented set
-        COLOR: LightSalmon4 foreground set
-    ] H{ } make-assoc ;
+    COLOR: LightSalmon4 colored-presentation-style ;
 
 : vocab-style ( vocab -- style )
-    [
-        presented set
-        dim-color foreground set
-    ] H{ } make-assoc ;
+    dim-color colored-presentation-style ;
 
 : effect-style ( effect -- style )
-    [
-        presented set
-        COLOR: DarkGreen foreground set
-    ] H{ } make-assoc ;
+    COLOR: DarkGreen colored-presentation-style ;
