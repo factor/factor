@@ -131,6 +131,7 @@ IN: compiler.cfg.intrinsics
         { math.libm:fsqrt [ drop "sqrt" emit-unary-float-function ] }
         { math.floats.private:float-min [ drop "fmin" emit-binary-float-function ] }
         { math.floats.private:float-max [ drop "fmax" emit-binary-float-function ] }
+        { math.private:float-mod [ drop "fmod" emit-binary-float-function ] }
     } enable-intrinsics ;
 
 : enable-min/max ( -- )
