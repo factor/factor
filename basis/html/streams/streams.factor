@@ -99,7 +99,8 @@ M: html-span-stream dispose
 : border-css, ( border -- )
     "border: 1px solid #" % hex-color, "; " % ;
 
-: padding-css, ( padding -- ) "padding: " % # "px; " % ;
+: padding-css, ( padding -- )
+    first2 "padding: " % # "px " % # "px; " % ;
 
 CONSTANT: pre-css "white-space: pre; font-family: monospace;"
 
@@ -108,7 +109,7 @@ CONSTANT: pre-css "white-space: pre; font-family: monospace;"
         {
             { page-color bg-css, }
             { border-color border-css, }
-            { border-width padding-css, }
+            { inset padding-css, }
         } make-css
     ] [
         wrap-margin swap at

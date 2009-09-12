@@ -132,7 +132,7 @@ SYMBOL: image
 ! Paragraph styles
 SYMBOL: page-color
 SYMBOL: border-color
-SYMBOL: border-width
+SYMBOL: inset
 SYMBOL: wrap-margin
 
 ! Table styles
