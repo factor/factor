@@ -31,14 +31,14 @@ CONSTANT: ppc-exception-flag>bit
         { +fp-inexact+           HEX: 0200,0000 }
     }
 
-CONSTANT: ppc-fp-traps-bits HEX: f800
+CONSTANT: ppc-fp-traps-bits HEX: f8
 CONSTANT: ppc-fp-traps>bit
     H{
-        { +fp-invalid-operation+ HEX: 8000 }
-        { +fp-overflow+          HEX: 4000 }
-        { +fp-underflow+         HEX: 2000 }
-        { +fp-zero-divide+       HEX: 1000 }
-        { +fp-inexact+           HEX: 0800 }
+        { +fp-invalid-operation+ HEX: 80 }
+        { +fp-overflow+          HEX: 40 }
+        { +fp-underflow+         HEX: 20 }
+        { +fp-zero-divide+       HEX: 10 }
+        { +fp-inexact+           HEX: 08 }
     }
 
 CONSTANT: ppc-rounding-mode-bits HEX: 3
@@ -58,9 +58,9 @@ M: ppc-fpu-env (set-exception-flags) ( register exceptions -- register' )
     [ ppc-exception-flag>bit >mask ppc-exception-flag-bits remask ] curry change-fpscr ; inline
 
 M: ppc-fpu-env (get-fp-traps) ( register -- exceptions )
-    fpscr>> bitnot ppc-fp-traps>bit mask> ; inline
+    fpscr>> ppc-fp-traps>bit mask> ; inline
 M: ppc-fpu-env (set-fp-traps) ( register exceptions -- register' )
-    [ ppc-fp-traps>bit >mask bitnot ppc-fp-traps-bits remask ] curry change-fpscr ; inline
+    [ ppc-fp-traps>bit >mask ppc-fp-traps-bits remask ] curry change-fpscr ; inline
 
 M: ppc-fpu-env (get-rounding-mode) ( register -- mode )
     fpscr>> ppc-rounding-mode-bits mask ppc-rounding-mode>bit value-at ; inline
