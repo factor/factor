@@ -205,14 +205,20 @@ ALIAS: $slot $snippet
         "Vocabulary" $heading nl dup ($vocab-link)
     ] when* ;
 
+: (textual-list) ( seq quot sep -- )
+    '[ _ print-element ] swap interleave ; inline
+
 : textual-list ( seq quot -- )
-    [ ", " print-element ] swap interleave ; inline
+    ", " (textual-list) ; inline
 
 : $links ( topics -- )
     [ [ ($link) ] textual-list ] ($span) ;
 
 : $vocab-links ( vocabs -- )
     [ vocab ] map $links ;
+
+: $breadcrumbs ( topics -- )
+    [ [ ($link) ] " > " (textual-list) ] ($span) ;
 
 : $see-also ( topics -- )
     "See also" $heading $links ;
