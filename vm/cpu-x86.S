@@ -56,6 +56,11 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
 	ret
 
 DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
+	/* clear x87 stack, but preserve rounding mode and exception flags */
+	sub $2,STACK_REG
+	fnstcw (STACK_REG)
+	fninit
+	fldcw (STACK_REG)
 	/* rewind_to */
 	mov ARG1,STACK_REG                    
 	jmp *QUOT_XT_OFFSET(ARG0)
