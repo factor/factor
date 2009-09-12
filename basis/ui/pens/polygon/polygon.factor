@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors help.markup help.syntax kernel opengl
-opengl.gl sequences specialized-arrays.float math.vectors
-ui.gadgets ui.pens ;
+opengl.gl sequences math.vectors ui.gadgets ui.pens
+specialized-arrays ;
+SPECIALIZED-ARRAY: float
 IN: ui.pens.polygon
 
 ! Polygon pen

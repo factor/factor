@@ -133,7 +133,7 @@ ARTICLE: "paragraph-styles" "Paragraph styles"
 "Paragraph styles for " { $link with-nesting } ":"
 { $subsection page-color }
 { $subsection border-color }
-{ $subsection border-width }
+{ $subsection inset }
 { $subsection wrap-margin }
 { $subsection presented } ;
 
@@ -243,10 +243,10 @@ HELP: border-color
     { $code "H{ { border-color T{ rgba f 1 0 0 1 } } }\n[ \"A border\" write ] with-nesting nl" }
 } ;
 
-HELP: border-width
-{ $description "Paragraph style. Pixels between edge of text and border, an integer." } 
+HELP: inset
+{ $description "Paragraph style. A pair of integers representing the number of pixels that the content should be inset from the border. The first number is the horizontal inset, and the second is the vertical inset." } 
 { $examples
-    { $code "H{ { border-width 10 } }\n[ \"Some inset text\" write ] with-nesting nl" }
+    { $code "H{ { inset { 10 10 } } }\n[ \"Some inset text\" write ] with-nesting nl" }
 } ;
 
 HELP: wrap-margin

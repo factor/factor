@@ -37,7 +37,7 @@ ICON: symbol symbol-word
 ICON: constant constant-word
 ICON: word normal-word
 ICON: word-link word-help-article
-ICON: link help-article
+ICON: topic help-article
 ICON: runnable-vocab runnable-vocab
 ICON: vocab open-vocab
 ICON: vocab-link unopen-vocab

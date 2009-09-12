@@ -5,6 +5,7 @@ arrays combinators make locals deques dlists
 cpu.architecture compiler.utilities
 compiler.cfg
 compiler.cfg.rpo
+compiler.cfg.hats
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.def-use
@@ -16,13 +17,52 @@ IN: compiler.cfg.representations
 
 ! Virtual register representation selection.
 
+ERROR: bad-conversion dst src dst-rep src-rep ;
+
+GENERIC: emit-box ( dst src rep -- )
+GENERIC: emit-unbox ( dst src rep -- )
+
+M: float-rep emit-box
+    drop
+    [ double-rep next-vreg-rep dup ] dip ##single>double-float
+    int-rep next-vreg-rep ##box-float ;
+
+M: float-rep emit-unbox
+    drop
+    [ double-rep next-vreg-rep dup ] dip ##unbox-float
+    ##double>single-float ;
+
+M: double-rep emit-box
+    drop
+    int-rep next-vreg-rep ##box-float ;
+
+M: double-rep emit-unbox
+    drop ##unbox-float ;
+
+M: vector-rep emit-box
+    int-rep next-vreg-rep ##box-vector ;
+
+M: vector-rep emit-unbox
+    ##unbox-vector ;
+
 : emit-conversion ( dst src dst-rep src-rep -- )
-    2array {
-        { { int-rep int-rep } [ int-rep ##copy ] }
-        { { double-float-rep double-float-rep } [ double-float-rep ##copy ] }
-        { { double-float-rep int-rep } [ ##unbox-float ] }
-        { { int-rep double-float-rep } [ int-rep next-vreg-rep ##box-float ] }
-    } case ;
+    {
+        { [ 2dup eq? ] [ drop ##copy ] }
+        { [ dup int-rep eq? ] [ drop emit-unbox ] }
+        { [ over int-rep eq? ] [ nip emit-box ] }
+        [
+            2dup 2array {
+                { { double-rep float-rep } [ 2drop ##single>double-float ] }
+                { { float-rep double-rep } [ 2drop ##double>single-float ] }
+                ! Punning SIMD vector types? Naughty naughty! But
+                ! it is allowed... otherwise bail out.
+                [
+                    drop 2dup [ reg-class-of ] bi@ eq?
+                    [ drop ##copy ] [ bad-conversion ] if
+                ]
+            } case
+        ]
+    } cond ;
 
 <PRIVATE
 

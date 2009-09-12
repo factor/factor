@@ -2,7 +2,7 @@ USING: alien alien.c-types alien.accessors effects kernel
 windows.ole32 parser lexer splitting grouping sequences
 namespaces assocs quotations generalizations accessors words
 macros alien.syntax fry arrays layouts math classes.struct
-windows.kernel32 prettyprint.custom prettyprint.sections ;
+windows.kernel32 ;
 IN: windows.com.syntax
 
 <PRIVATE
@@ -99,4 +99,8 @@ SYNTAX: COM-INTERFACE:
 
 SYNTAX: GUID: scan string>guid parsed ;
 
-M: GUID pprint* guid>string "GUID: " prepend text ;
+USING: vocabs vocabs.loader ;
+
+"prettyprint" vocab [
+    "windows.com.prettyprint" require
+] when

@@ -1,8 +1,9 @@
 IN: math.vectors.specialization.tests
 USING: compiler.tree.debugger math.vectors tools.test kernel
-kernel.private math specialized-arrays.double
-specialized-arrays.complex-float
-specialized-arrays.float ;
+kernel.private math specialized-arrays ;
+SPECIALIZED-ARRAY: double
+SPECIALIZED-ARRAY: complex-float
+SPECIALIZED-ARRAY: float
 
 [ V{ t } ] [
     [ { double-array double-array } declare distance 0.0 < not ] final-literals

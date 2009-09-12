@@ -1,17 +1,20 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings arrays assocs ui ui.private
-ui.gadgets ui.gadgets.private ui.backend ui.clipboards
-ui.gadgets.worlds ui.gestures ui.event-loop io kernel math
-math.vectors namespaces make sequences strings vectors words
-windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
-windows.messages windows.types windows.offscreen windows.nt
-threads libc combinators fry combinators.short-circuit continuations
-command-line shuffle opengl ui.render math.bitwise locals
-accessors math.rectangles math.order calendar ascii sets
-io.encodings.utf16n windows.errors literals ui.pixel-formats 
-ui.pixel-formats.private memoize classes struct-arrays classes.struct ;
+USING: alien alien.c-types alien.strings arrays assocs ui
+ui.private ui.gadgets ui.gadgets.private ui.backend
+ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
+kernel math math.vectors namespaces make sequences strings
+vectors words windows.kernel32 windows.gdi32 windows.user32
+windows.opengl32 windows.messages windows.types
+windows.offscreen windows.nt threads libc combinators fry
+combinators.short-circuit continuations command-line shuffle
+opengl ui.render math.bitwise locals accessors math.rectangles
+math.order calendar ascii sets io.encodings.utf16n
+windows.errors literals ui.pixel-formats
+ui.pixel-formats.private memoize classes
+specialized-arrays classes.struct ;
+SPECIALIZED-ARRAY: POINT
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
@@ -758,7 +761,7 @@ M: windows-ui-backend beep ( -- )
 : client-area>RECT ( hwnd -- RECT )
     RECT <struct>
     [ GetClientRect win32-error=0/f ]
-    [ >c-ptr "POINT" byte-array>struct-array [ ClientToScreen drop ] with each ]
+    [ >c-ptr byte-array>POINT-array [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )

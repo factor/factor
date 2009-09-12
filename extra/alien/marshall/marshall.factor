@@ -4,15 +4,22 @@ USING: accessors alien alien.c-types alien.inline.types
 alien.marshall.private alien.strings byte-arrays classes
 combinators combinators.short-circuit destructors fry
 io.encodings.utf8 kernel libc sequences
-specialized-arrays.alien specialized-arrays.bool
-specialized-arrays.char specialized-arrays.double
-specialized-arrays.float specialized-arrays.int
-specialized-arrays.long specialized-arrays.longlong
-specialized-arrays.short specialized-arrays.uchar
-specialized-arrays.uint specialized-arrays.ulong
-specialized-arrays.ulonglong specialized-arrays.ushort strings
-unix.utilities vocabs.parser words libc.private struct-arrays
-locals generalizations math ;
+specialized-arrays strings unix.utilities vocabs.parser
+words libc.private locals generalizations math ;
+SPECIALIZED-ARRAY: bool
+SPECIALIZED-ARRAY: char
+SPECIALIZED-ARRAY: double
+SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAY: int
+SPECIALIZED-ARRAY: long
+SPECIALIZED-ARRAY: longlong
+SPECIALIZED-ARRAY: short
+SPECIALIZED-ARRAY: uchar
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: ulong
+SPECIALIZED-ARRAY: ulonglong
+SPECIALIZED-ARRAY: ushort
+SPECIALIZED-ARRAY: void*
 IN: alien.marshall
 
 << primitive-types [ [ "void*" = ] [ "bool" = ] bi or not ]
@@ -39,7 +46,6 @@ M: class-wrapper c++-type class name>> parse-c++-type ;
         { [ dup not ] [ ] }
         { [ dup byte-array? ] [ malloc-byte-array ] }
         { [ dup alien-wrapper? ] [ underlying>> ] }
-        { [ dup struct-array? ] [ underlying>> ] }
     } cond ;
 
 : marshall-primitive ( n -- n )

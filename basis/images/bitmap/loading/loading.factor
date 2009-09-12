@@ -4,8 +4,9 @@ USING: accessors arrays byte-arrays combinators
 compression.run-length fry grouping images images.loader io
 io.binary io.encodings.8-bit io.encodings.binary
 io.encodings.string io.streams.limited kernel math math.bitwise
-sequences specialized-arrays.ushort summary ;
+sequences specialized-arrays summary ;
 QUALIFIED-WITH: bitstreams b
+SPECIALIZED-ARRAY: ushort
 IN: images.bitmap.loading
 
 SINGLETON: bitmap-image

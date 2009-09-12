@@ -80,6 +80,17 @@ IN: compiler.tree.propagation.transforms
     ] [ f ] if
 ] "custom-inlining" set-word-prop
 
+{ /i fixnum/i fixnum/i-fast bignum/i } [
+    [
+        in-d>> first2 [ value-info ] bi@ {
+            [ drop class>> integer class<= ]
+            [ drop interval>> 0 [a,a] interval>= ]
+            [ nip literal>> integer? ]
+            [ nip literal>> power-of-2? ]
+        } 2&& [ [ log2 neg shift ] ] [ f ] if
+    ] "custom-inlining" set-word-prop
+] each
+
 ! Integrate this with generic arithmetic optimization instead?
 : both-inputs? ( #call class -- ? )
     [ in-d>> first2 ] dip '[ value-info class>> _ class<= ] both? ;

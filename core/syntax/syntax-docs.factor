@@ -72,6 +72,8 @@ ARTICLE: "syntax-floats" "Float syntax"
 { "Negative infinity" { $snippet "-1/0." } }
 { "Not-a-number" { $snippet "0/0." } }
 }
+"A Not-a-number with an arbitrary payload can be parsed in:"
+{ $subsection POSTPONE: NAN: }
 "More information on floats can be found in " { $link "floats" } "." ;
 
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"
@@ -302,7 +304,7 @@ HELP: C{
 { $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: T{
-{ $syntax "T{ class slots... }" }
+{ $syntax "T{ class }" "T{ class f slot-values... }" "T{ class { slot-name slot-value } ... }" }
 { $values { "class" "a tuple class word" } { "slots" "slot values" } }
 { $description "Marks the beginning of a literal tuple."
 $nl
@@ -602,6 +604,18 @@ HELP: BIN:
 { $values { "integer" "binary digits (0 and 1)" } }
 { $description "Adds an integer read from an binary literal to the parse tree." }
 { $examples { $example "USE: prettyprint" "BIN: 100 ." "4" } } ;
+
+HELP: NAN:
+{ $syntax "NAN: payload" }
+{ $values { "payload" "64-bit hexadecimal integer" } }
+{ $description "Adds a floating point Not-a-Number literal to the parse tree." }
+{ $examples
+    { $example
+        "USE: prettyprint"
+        "NAN: deadbeef ."
+        "NAN: deadbeef"
+    }
+} ;
 
 HELP: GENERIC:
 { $syntax "GENERIC: word ( stack -- effect )" }

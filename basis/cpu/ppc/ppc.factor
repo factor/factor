@@ -272,7 +272,7 @@ M:: ppc %float>integer ( dst src -- )
 M: ppc %copy ( dst src rep -- )
     {
         { int-rep [ MR ] }
-        { double-float-rep [ FMR ] }
+        { double-rep [ FMR ] }
     } case ;
 
 M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
@@ -297,6 +297,14 @@ M:: ppc %binary-float-function ( dst src1 src2 func -- )
     1 src2 float-function-param
     func f %alien-invoke
     dst float-function-return ;
+
+! Internal format is always double-precision on PowerPC
+M: ppc %single>double-float FMR ;
+
+M: ppc %double>single-float FMR ;
+
+M: ppc %unbox-alien ( dst src -- )
+    alien-offset LWZ ;
 
 M:: ppc %unbox-any-c-ptr ( dst src temp -- )
     [
@@ -352,7 +360,7 @@ M:: ppc %box-alien ( dst src temp -- )
         "f" resolve-label
     ] with-scope ;
 
-M:: ppc %box-displaced-alien ( dst displacement base displacement' base' -- )
+M:: ppc %box-displaced-alien ( dst displacement base displacement' base' base-class -- )
     [
         "end" define-label
         "alloc" define-label
@@ -468,7 +476,6 @@ M:: ppc %load-gc-root ( gc-root register -- )
     register 1 gc-root gc-root@ LWZ ;
 
 M:: ppc %call-gc ( gc-root-count -- )
-    %prepare-alien-invoke
     3 1 gc-root-base local@ ADDI
     gc-root-count 4 LI
     "inline_gc" f %alien-invoke ;
@@ -501,7 +508,7 @@ M: ppc %epilogue ( n -- )
     dst \ t %load-reference
     "end" get resolve-label ; inline
 
-:: %boolean ( dst temp cc -- )
+:: %boolean ( dst cc temp -- )
     cc negate-cc order-cc {
         { cc<  [ dst temp \ BLT f (%boolean) ] }
         { cc<= [ dst temp \ BLE f (%boolean) ] }
@@ -516,28 +523,34 @@ M: ppc %epilogue ( n -- )
 : (%compare-float-unordered) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
 : (%compare-float-ordered) ( src1 src2 -- ) [ 0 ] dip FCMPO ; inline
 
-:: (%compare-float) ( cc src1 src2 -- branch1 branch2 )
+:: (%compare-float) ( src1 src2 cc compare -- branch1 branch2 )
     cc {
-        { cc<    [ src1 src2 (%compare-float-ordered)   \ BLT f     ] }
-        { cc<=   [ src1 src2 (%compare-float-ordered)   \ BLT \ BEQ ] }
-        { cc>    [ src1 src2 (%compare-float-ordered)   \ BGT f     ] }
-        { cc>=   [ src1 src2 (%compare-float-ordered)   \ BGT \ BEQ ] }
-        { cc=    [ src1 src2 (%compare-float-unordered) \ BEQ f     ] }
-        { cc<>   [ src1 src2 (%compare-float-ordered)   \ BLT \ BGT ] }
-        { cc<>=  [ src1 src2 (%compare-float-ordered)   \ BNO f     ] }
-        { cc/<   [ src1 src2 (%compare-float-unordered) \ BGE f     ] }
-        { cc/<=  [ src1 src2 (%compare-float-unordered) \ BGT \ BO  ] }
-        { cc/>   [ src1 src2 (%compare-float-unordered) \ BLE f     ] }
-        { cc/>=  [ src1 src2 (%compare-float-unordered) \ BLT \ BO  ] }
-        { cc/=   [ src1 src2 (%compare-float-unordered) \ BNE f     ] }
-        { cc/<>  [ src1 src2 (%compare-float-unordered) \ BEQ \ BO  ] }
-        { cc/<>= [ src1 src2 (%compare-float-unordered) \ BO  f     ] }
+        { cc<    [ src1 src2 \ compare execute( a b -- ) \ BLT f     ] }
+        { cc<=   [ src1 src2 \ compare execute( a b -- ) \ BLT \ BEQ ] }
+        { cc>    [ src1 src2 \ compare execute( a b -- ) \ BGT f     ] }
+        { cc>=   [ src1 src2 \ compare execute( a b -- ) \ BGT \ BEQ ] }
+        { cc=    [ src1 src2 \ compare execute( a b -- ) \ BEQ f     ] }
+        { cc<>   [ src1 src2 \ compare execute( a b -- ) \ BLT \ BGT ] }
+        { cc<>=  [ src1 src2 \ compare execute( a b -- ) \ BNO f     ] }
+        { cc/<   [ src1 src2 \ compare execute( a b -- ) \ BGE f     ] }
+        { cc/<=  [ src1 src2 \ compare execute( a b -- ) \ BGT \ BO  ] }
+        { cc/>   [ src1 src2 \ compare execute( a b -- ) \ BLE f     ] }
+        { cc/>=  [ src1 src2 \ compare execute( a b -- ) \ BLT \ BO  ] }
+        { cc/=   [ src1 src2 \ compare execute( a b -- ) \ BNE f     ] }
+        { cc/<>  [ src1 src2 \ compare execute( a b -- ) \ BEQ \ BO  ] }
+        { cc/<>= [ src1 src2 \ compare execute( a b -- ) \ BO  f     ] }
     } case ; inline
 
-M: ppc %compare (%compare) %boolean ;
-M: ppc %compare-imm (%compare-imm) %boolean ;
-M:: ppc %compare-float ( dst temp cc src1 src2 -- )
-    cc negate-cc src1 src2 (%compare-float) :> branch2 :> branch1
+M: ppc %compare [ (%compare) ] 2dip %boolean ;
+
+M: ppc %compare-imm [ (%compare-imm) ] 2dip %boolean ;
+
+M:: ppc %compare-float-ordered ( dst src1 src2 cc temp -- )
+    src1 src2 cc negate-cc \ (%compare-float-ordered) (%compare-float) :> branch2 :> branch1
+    dst temp branch1 branch2 (%boolean) ;
+
+M:: ppc %compare-float-unordered ( dst src1 src2 cc temp -- )
+    src1 src2 cc negate-cc \ (%compare-float-unordered) (%compare-float) :> branch2 :> branch1
     dst temp branch1 branch2 (%boolean) ;
 
 :: %branch ( label cc -- )
@@ -550,18 +563,31 @@ M:: ppc %compare-float ( dst temp cc src1 src2 -- )
         { cc/= [ label BNE ] }
     } case ;
 
-M: ppc %compare-branch (%compare) %branch ;
-M: ppc %compare-imm-branch (%compare-imm) %branch ;
-M:: ppc %compare-float-branch ( label cc src1 src2 -- )
-    cc src1 src2 (%compare-float) :> branch2 :> branch1
+M:: ppc %compare-branch ( label src1 src2 cc -- )
+    src1 src2 (%compare)
+    label cc %branch ;
+
+M:: ppc %compare-imm-branch ( label src1 src2 cc -- )
+    src1 src2 (%compare-imm)
+    label cc %branch ;
+
+:: (%branch) ( label branch1 branch2 -- )
     label branch1 execute( label -- )
-    branch2 [ label branch2 execute( label -- ) ] when ;
+    branch2 [ label branch2 execute( label -- ) ] when ; inline
+
+M:: ppc %compare-float-ordered-branch ( label src1 src2 cc -- )
+    src1 src2 cc \ (%compare-float-ordered) (%compare-float) :> branch2 :> branch1
+    label branch1 branch2 (%branch) ;
+
+M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
+    src1 src2 cc \ (%compare-float-unordered) (%compare-float) :> branch2 :> branch1
+    label branch1 branch2 (%branch) ;
 
 : load-from-frame ( dst n rep -- )
     {
         { int-rep [ [ 1 ] dip LWZ ] }
-        { single-float-rep [ [ 1 ] dip LFS ] }
-        { double-float-rep [ [ 1 ] dip LFD ] }
+        { float-rep [ [ 1 ] dip LFS ] }
+        { double-rep [ [ 1 ] dip LFD ] }
         { stack-params [ [ 0 1 ] dip LWZ [ 0 1 ] dip param@ STW ] }
     } case ;
 
@@ -570,16 +596,16 @@ M:: ppc %compare-float-branch ( label cc src1 src2 -- )
 : store-to-frame ( src n rep -- )
     {
         { int-rep [ [ 1 ] dip STW ] }
-        { single-float-rep [ [ 1 ] dip STFS ] }
-        { double-float-rep [ [ 1 ] dip STFD ] }
+        { float-rep [ [ 1 ] dip STFS ] }
+        { double-rep [ [ 1 ] dip STFD ] }
         { stack-params [ [ [ 0 1 ] dip next-param@ LWZ 0 1 ] dip STW ] }
     } case ;
 
-M: ppc %spill ( src n rep -- )
-    [ spill@ ] dip store-to-frame ;
+M: ppc %spill ( src rep n -- )
+    swap [ spill@ ] dip store-to-frame ;
 
-M: ppc %reload ( dst n rep -- )
-    [ spill@ ] dip load-from-frame ;
+M: ppc %reload ( dst rep n -- )
+    swap [ spill@ ] dip load-from-frame ;
 
 M: ppc %loop-entry ;
 
@@ -652,15 +678,17 @@ M: ppc %box-large-struct ( n c-type -- )
     ! Call the function
     "box_value_struct" f %alien-invoke ;
 
-M: ppc %prepare-alien-invoke
+M:: ppc %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    scratch-reg "stack_chain" f %alien-global
-    scratch-reg scratch-reg 0 LWZ
-    1 scratch-reg 0 STW
-    ds-reg scratch-reg 8 STW
-    rs-reg scratch-reg 12 STW ;
+    temp1 "stack_chain" f %alien-global
+    temp1 temp1 0 LWZ
+    1 temp1 0 STW
+    callback-allowed? [
+        ds-reg temp1 8 STW
+        rs-reg temp1 12 STW
+    ] when ;
 
 M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;

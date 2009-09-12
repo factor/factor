@@ -37,7 +37,7 @@ M: product-sequence length lengths>> product ;
 : product-iter ( ns lengths -- )
     [ 0 over [ 1 + ] change-nth ] dip carry-ns ;
 
-: start-product-iter ( sequence-product -- ns lengths )
+: start-product-iter ( sequences -- ns lengths )
     [ [ drop 0 ] map ] [ [ length ] map ] bi ;
 
 : end-product-iter? ( ns lengths -- ? )
@@ -50,8 +50,10 @@ M: product-sequence nth
 
 :: product-each ( sequences quot -- )
     sequences start-product-iter :> lengths :> ns
-    [ ns lengths end-product-iter? ]
-    [ ns sequences nths quot call ns lengths product-iter ] until ; inline
+    lengths [ 0 = ] any? [
+        [ ns lengths end-product-iter? ]
+        [ ns sequences nths quot call ns lengths product-iter ] until
+    ] unless ; inline
 
 :: product-map ( sequences quot -- sequence )
     0 :> i!
