@@ -409,6 +409,10 @@ tuple
     { "float<=" "math.private" (( x y -- ? )) }
     { "float>" "math.private" (( x y -- ? )) }
     { "float>=" "math.private" (( x y -- ? )) }
+    { "float-u<" "math.private" (( x y -- ? )) }
+    { "float-u<=" "math.private" (( x y -- ? )) }
+    { "float-u>" "math.private" (( x y -- ? )) }
+    { "float-u>=" "math.private" (( x y -- ? )) }
     { "<word>" "words" (( name vocab -- word )) }
     { "word-xt" "words" (( word -- start end )) }
     { "getenv" "kernel.private" (( n -- obj )) }

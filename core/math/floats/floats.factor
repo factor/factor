@@ -3,6 +3,7 @@
 USING: kernel math math.private ;
 IN: math.floats.private
 
+: float-unordered? ( x y -- ? ) [ fp-nan? ] bi@ or ;
 : float-min ( x y -- z ) [ float< ] most ; foldable
 : float-max ( x y -- z ) [ float> ] most ; foldable
 
@@ -17,10 +18,16 @@ M: float hashcode* nip float>bits ; inline
 M: float equal? over float? [ float= ] [ 2drop f ] if ; inline
 M: float number= float= ; inline
 
-M: float < float< ; inline
+M: float <  float< ; inline
 M: float <= float<= ; inline
-M: float > float> ; inline
+M: float >  float> ; inline
 M: float >= float>= ; inline
+
+M: float unordered? float-unordered? ; inline
+M: float u<  float-u< ; inline
+M: float u<= float-u<= ; inline
+M: float u>  float-u> ; inline
+M: float u>= float-u>= ; inline
 
 M: float + float+ ; inline
 M: float - float- ; inline
@@ -57,8 +64,6 @@ M: float next-float
             1 + bits>double ! positive
         ] if
     ] if ; inline
-
-M: float unordered? [ fp-nan? ] bi@ or ; inline
 
 M: float prev-float
     double>bits
