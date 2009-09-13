@@ -55,12 +55,12 @@ static void call_fault_handler(
 		MACH_PROGRAM_COUNTER(thread_state) = (cell)memory_signal_handler_impl;
 	}
 	else if(exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV)
-    {
+	{
 		MACH_PROGRAM_COUNTER(thread_state) = (cell)fp_signal_handler_impl;
-    }
-    else
-    {
-        signal_number = exception == EXC_ARITHMETIC ? SIGFPE : SIGABRT;
+	}
+	else
+	{
+		signal_number = (exception == EXC_ARITHMETIC ? SIGFPE : SIGABRT);
 		MACH_PROGRAM_COUNTER(thread_state) = (cell)misc_signal_handler_impl;
 	}
 }

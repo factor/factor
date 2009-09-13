@@ -282,12 +282,12 @@ HELP: fp-bitwise=
 { $examples
     "Not-a-number equality:"
     { $example
-        "USING: math prettyprint ;"
+        "USING: kernel math prettyprint ;"
         "0.0 0.0 / dup number= ."
         "f"
     }
     { $example
-        "USING: math prettyprint ;"
+        "USING: kernel math prettyprint ;"
         "0.0 0.0 / dup fp-bitwise= ."
         "t"
     }
@@ -299,7 +299,7 @@ HELP: fp-bitwise=
     }
     { $example
         "USING: math prettyprint ;"
-        "-0.0 0.0 = ."
+        "-0.0 0.0 number= ."
         "t"
     }
 } ;
