@@ -103,7 +103,7 @@ HELP: >hex
     { $example
         "USING: math.parser prettyprint ;"
         "-15.5 >hex ."
-        "\"-f.8p0\""
+        "\"-1.fp3\""
     }
 } ;
 
