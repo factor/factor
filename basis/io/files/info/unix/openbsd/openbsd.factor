@@ -6,7 +6,7 @@ sequences system unix unix.getfsstat.openbsd grouping
 unix.statfs.openbsd unix.statvfs.openbsd unix.types
 arrays io.files.info.unix classes.struct
 specialized-arrays io.encodings.utf8 ;
-SPECIALIZED-ARRAY: statvfs
+SPECIALIZED-ARRAY: statfs
 IN: io.files.unix.openbsd
 
 TUPLE: openbsd-file-system-info < unix-file-system-info
