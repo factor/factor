@@ -7,7 +7,10 @@ IN: compiler.cfg.intrinsics.float
 : emit-float-op ( insn -- )
     [ 2inputs ] dip call ds-push ; inline
 
-: emit-float-comparison ( cc -- )
+: emit-float-ordered-comparison ( cc -- )
+    [ 2inputs ] dip ^^compare-float-ordered ds-push ; inline
+
+: emit-float-unordered-comparison ( cc -- )
     [ 2inputs ] dip ^^compare-float-unordered ds-push ; inline
 
 : emit-float>fixnum ( -- )
