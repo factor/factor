@@ -90,7 +90,7 @@ M: ppc-fpu-env (set-denormal-mode) ( register mode -- register' )
         } case
     ] curry change-fpscr ; inline
 
-CONSTANT: vmx-denormal-mode-bits HEX: 8000
+CONSTANT: vmx-denormal-mode-bits HEX: 10000
 
 M: ppc-vmx-env (get-exception-flags) ( register -- exceptions )
     drop { } ; inline
@@ -109,7 +109,7 @@ M: ppc-vmx-env (set-rounding-mode) ( register mode -- register' )
 
 M: ppc-vmx-env (get-denormal-mode) ( register -- mode )
     vscr>> vmx-denormal-mode-bits mask zero? +denormal-keep+ +denormal-flush+ ? ; inline
-M: ppc-vmx-env (get-denormal-mode) ( register mode -- register )
+M: ppc-vmx-env (set-denormal-mode) ( register mode -- register )
     [
         {
             { +denormal-keep+  [ vmx-denormal-mode-bits unmask ] }
