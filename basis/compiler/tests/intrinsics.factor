@@ -472,15 +472,15 @@ cell 8 = [
 ] unit-test
 
 [ ALIEN: 123 ] [
-    123 [ <alien> ] compile-call
+    HEX: 123 [ <alien> ] compile-call
 ] unit-test
 
 [ ALIEN: 123 ] [
-    123 [ { fixnum } declare <alien> ] compile-call
+    HEX: 123 [ { fixnum } declare <alien> ] compile-call
 ] unit-test
 
 [ ALIEN: 123 ] [
-    [ 123 <alien> ] compile-call
+    [ HEX: 123 <alien> ] compile-call
 ] unit-test
 
 [ f ] [
@@ -522,8 +522,8 @@ cell 8 = [
 [ ALIEN: 1234 ALIEN: 2234 ] [
     ALIEN: 234 [
         { c-ptr } declare
-        [ 1000 swap <displaced-alien> ]
-        [ 2000 swap <displaced-alien> ] bi
+        [ HEX: 1000 swap <displaced-alien> ]
+        [ HEX: 2000 swap <displaced-alien> ] bi
     ] compile-call
 ] unit-test
 
