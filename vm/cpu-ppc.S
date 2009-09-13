@@ -254,3 +254,26 @@ DEF(void,set_ppc_fpu_env,(const void*)):
     lfd f0,0(r3)
     mtfsf 0xff,f0
     blr
+
+DEF(void,get_ppc_vmx_env,(void*)):
+    mfvscr v0
+    subi r4,r1,16
+    li r5,0xf
+    andc r4,r4,r5
+    li r5,0xc
+    stvewx v0,r5,r4
+    lwzx r6,r5,r4
+    stw r6,0(r3)
+    blr
+
+DEF(void,set_ppc_vmx_env,(const void*)):
+    subi r4,r1,16
+    li r5,0xf
+    andc r4,r4,r5
+    li r5,0xc
+    lwz r6,0(r3)
+    stwx r6,r5,r4
+    lvewx v0,r5,r4
+    mtvscr v0
+    blr
+
