@@ -4,6 +4,7 @@ USING: accessors arrays assocs colors colors.constants fry io
 io.styles kernel make math.order namespaces parser
 prettyprint.backend prettyprint.sections prettyprint.stylesheet
 sequences sets sorting vocabs vocabs.parser ;
+FROM: io.styles => inset ;
 IN: vocabs.prettyprint
 
 : pprint-vocab ( vocab -- )
@@ -86,7 +87,10 @@ PRIVATE>
         "To avoid doing this in the future, add the following forms" print
         "at the top of the source file:" print nl
     ] with-style
-    { { page-color COLOR: FactorLightTan } }
-    [ manifest get pprint-manifest ] with-nesting
+    {
+        { page-color COLOR: FactorLightLightTan }
+        { border-color COLOR: FactorDarkTan }
+        { inset { 5 5 } }
+    } [ manifest get pprint-manifest ] with-nesting
     nl nl
 ] print-use-hook set-global

@@ -33,6 +33,7 @@ IN: bootstrap.syntax
     "MAIN:"
     "MATH:"
     "MIXIN:"
+    "NAN:"
     "OCT:"
     "P\""
     "POSTPONE:"

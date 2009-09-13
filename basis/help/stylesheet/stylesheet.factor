@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.styles namespaces colors colors.constants ;
+USING: colors colors.constants io.styles literals namespaces ;
 IN: help.stylesheet
 
 SYMBOL: default-span-style
@@ -30,22 +30,27 @@ H{ { font-style bold } } strong-style set-global
 SYMBOL: title-style
 H{
     { font-name "sans-serif" }
-    { font-size 18 }
+    { font-size 20 }
     { font-style bold }
     { wrap-margin 500 }
-    { foreground COLOR: FactorDarkSlateBlue }
-    { page-color COLOR: FactorLightTan }
-    { border-width 5 }
+    { foreground COLOR: gray20 }
+    { page-color COLOR: FactorLightLightTan }
+    { inset { 5 5 } }
 } title-style set-global
 
 SYMBOL: help-path-style
-H{ { font-size 10 } } help-path-style set-global
+H{
+    { font-size 10 }
+    { table-gap { 5 5 } }
+    { table-border $ transparent }
+} help-path-style set-global
 
 SYMBOL: heading-style
 H{
     { font-name "sans-serif" }
     { font-size 16 }
     { font-style bold }
+    { foreground COLOR: FactorDarkSlateBlue }
 } heading-style set-global
 
 SYMBOL: subsection-style
@@ -70,8 +75,8 @@ H{
 
 SYMBOL: code-style
 H{
-    { page-color COLOR: FactorLightTan }
-    { border-width 5 }
+    { page-color COLOR: FactorLightLightTan }
+    { inset { 5 5 } }
     { wrap-margin f }
 } code-style set-global
 
@@ -88,7 +93,7 @@ SYMBOL: warning-style
 H{
     { page-color COLOR: gray90 }
     { border-color COLOR: red }
-    { border-width 5 }
+    { inset { 5 5 } }
     { wrap-margin 500 }
 } warning-style set-global
 
@@ -96,7 +101,7 @@ SYMBOL: deprecated-style
 H{
     { page-color COLOR: gray90 }
     { border-color COLOR: red }
-    { border-width 5 }
+    { inset { 5 5 } }
     { wrap-margin 500 }
 } deprecated-style set-global
 

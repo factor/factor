@@ -30,7 +30,7 @@ SYMBOL: tip-of-the-day-style
 
 H{
     { page-color COLOR: lavender }
-    { border-width 5 }
+    { inset { 5 5 } }
     { wrap-margin 500 }
 } tip-of-the-day-style set-global
 
