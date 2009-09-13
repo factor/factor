@@ -197,6 +197,12 @@ SYMBOL: fast-math-ops
         \ <=      define-math-ops
         \ >       define-math-ops
         \ >=      define-math-ops
+
+        \ u<      define-math-ops
+        \ u<=     define-math-ops
+        \ u>      define-math-ops
+        \ u>=     define-math-ops
+
         \ number= define-math-ops
 
         { { shift bignum bignum } bignum-shift } ,
