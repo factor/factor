@@ -47,6 +47,11 @@ M: method-body pprint*
 
 M: real pprint* number>string text ;
 
+M: float pprint*
+    dup fp-nan? [
+        \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
+    ] [ call-next-method ] if ;
+
 M: f pprint* drop \ f pprint-word ;
 
 : pprint-effect ( effect -- )
