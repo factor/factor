@@ -59,20 +59,25 @@ ARTICLE: "syntax-ratios" "Ratio syntax"
 "More information on ratios can be found in " { $link "rationals" } ;
 
 ARTICLE: "syntax-floats" "Float syntax"
-"Floating point literals must contain a decimal point, and may contain an exponent:"
+"Floating point literals can be input in base 10 or 16. Base 10 literals must contain a decimal point, and may contain an exponent after " { $snippet "e" } ":"
 { $code
     "10.5"
     "-3.1456"
     "7.e13"
     "1.0e-5"
 }
-"There are three special float values:"
+"Base 16 literals use " { $snippet "p" } " instead of " { $snippet "e" } " for the exponent, which is still decimal:"
+{ $example
+    "10.125 HEX: 1.44p3 = ."
+    "t"
+}
+"Syntax for special float values:"
 { $table
 { "Positive infinity" { $snippet "1/0." } }
 { "Negative infinity" { $snippet "-1/0." } }
 { "Not-a-number" { $snippet "0/0." } }
 }
-"A Not-a-number with an arbitrary payload can be parsed in:"
+"A Not-a-number with an arbitrary payload can also be parsed in:"
 { $subsection POSTPONE: NAN: }
 "More information on floats can be found in " { $link "floats" } "." ;
 
@@ -612,8 +617,8 @@ HELP: NAN:
 { $examples
     { $example
         "USE: prettyprint"
-        "NAN: deadbeef ."
-        "NAN: deadbeef"
+        "NAN: 80000deadbeef ."
+        "NAN: 80000deadbeef"
     }
 } ;
 
