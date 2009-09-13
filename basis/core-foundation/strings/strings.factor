@@ -83,3 +83,8 @@ FUNCTION: CFStringRef CFStringCreateWithCString (
 
 : <CFStringArray> ( seq -- alien )
     [ [ <CFString> &CFRelease ] map <CFArray> ] with-destructors ;
+
+SYNTAX: CFSTRING: 
+    CREATE scan-object 
+    [ drop ] [ '[ _ [ _ <CFString> ] initialize-alien ] ] 2bi
+    (( -- alien )) define-declared ;
