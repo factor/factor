@@ -9,7 +9,7 @@ IN: alien.syntax
 
 SYNTAX: DLL" lexer get skip-blank parse-string dlopen parsed ;
 
-SYNTAX: ALIEN: scan string>number <alien> parsed ;
+SYNTAX: ALIEN: 16 scan-base <alien> parsed ;
 
 SYNTAX: BAD-ALIEN <bad-alien> parsed ;
 

@@ -9,7 +9,7 @@ HELP: DLL"
 
 HELP: ALIEN:
 { $syntax "ALIEN: address" }
-{ $values { "address" "a non-negative integer" } }
+{ $values { "address" "a non-negative hexadecimal integer" } }
 { $description "Creates an alien object at parse time." }
 { $notes "Alien objects are invalidated between image saves and loads, and hence source files should not contain alien literals; this word is for interactive use only. See " { $link "alien-expiry" } " for details." } ;
 
