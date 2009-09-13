@@ -51,6 +51,12 @@ const primitive_type primitives[] = {
 	primitive_float_lesseq,
 	primitive_float_greater,
 	primitive_float_greatereq,
+	/* The unordered comparison primitives don't have a non-optimizing
+	compiler implementation */
+	primitive_float_less,
+	primitive_float_lesseq,
+	primitive_float_greater,
+	primitive_float_greatereq,
 	primitive_word,
 	primitive_word_xt,
 	primitive_getenv,
