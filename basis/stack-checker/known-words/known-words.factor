@@ -455,11 +455,11 @@ M: bad-executable summary
 \ float/f { float float } { float } define-primitive
 \ float/f make-foldable
 
-\ float< { float float } { object } define-primitive
-\ float< make-foldable
-
 \ float-mod { float float } { float } define-primitive
 \ float-mod make-foldable
+
+\ float< { float float } { object } define-primitive
+\ float< make-foldable
 
 \ float<= { float float } { object } define-primitive
 \ float<= make-foldable
@@ -469,6 +469,18 @@ M: bad-executable summary
 
 \ float>= { float float } { object } define-primitive
 \ float>= make-foldable
+
+\ float-u< { float float } { object } define-primitive
+\ float-u< make-foldable
+
+\ float-u<= { float float } { object } define-primitive
+\ float-u<= make-foldable
+
+\ float-u> { float float } { object } define-primitive
+\ float-u> make-foldable
+
+\ float-u>= { float float } { object } define-primitive
+\ float-u>= make-foldable
 
 \ <word> { object object } { word } define-primitive
 \ <word> make-flushable
