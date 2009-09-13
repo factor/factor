@@ -106,7 +106,7 @@ set-default-fp-env
     append '[ _ _ with-fp-traps ] ;
 
 : test-traps-compiled ( traps inputs quot -- quot' )
-    swapd '[ _ [ _ _ with-fp-traps ] compile-call ] ;
+    swapd '[ @ [ _ _ with-fp-traps ] compile-call ] ;
 
 { +fp-zero-divide+ }       [ 1.0 0.0 ] [ /f ] test-traps must-fail
 { +fp-inexact+ }           [ 1.0 3.0 ] [ /f ] test-traps must-fail
