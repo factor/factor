@@ -174,16 +174,21 @@ void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	SIGNAL_VM_PTR()->misc_signal_handler(signal,siginfo,uap);
 }
 
-void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+void factorvm::fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	signal_number = signal;
 	signal_callstack_top = uap_stack_pointer(uap);
-        signal_fpu_status = fpu_status(uap_fpu_status(uap));
-        uap_clear_fpu_status(uap);
+	signal_fpu_status = fpu_status(uap_fpu_status(uap));
+	uap_clear_fpu_status(uap);
 	UAP_PROGRAM_COUNTER(uap) =
-            (siginfo->si_code == FPE_INTDIV || siginfo->si_code == FPE_INTOVF)
-                ? (cell)misc_signal_handler_impl
-                : (cell)fp_signal_handler_impl;
+		(siginfo->si_code == FPE_INTDIV || siginfo->si_code == FPE_INTOVF)
+		? (cell)factor::misc_signal_handler_impl
+		: (cell)factor::fp_signal_handler_impl;
+}
+
+void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	SIGNAL_VM_PTR()->fpe_signal_handler(signal, siginfo, uap);
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)

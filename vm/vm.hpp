@@ -602,6 +602,7 @@ struct factorvm : factorvmdata {
   #else  // UNIX
 	void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap);
 	void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap);
+	void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap);
 	stack_frame *uap_stack_pointer(void *uap);
 
   #endif
