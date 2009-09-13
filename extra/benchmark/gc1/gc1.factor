@@ -3,6 +3,6 @@
 USING: math sequences kernel ;
 IN: benchmark.gc1
 
-: gc1 ( -- ) 6000000 [ >bignum 1 + ] map drop ;
+: gc1 ( -- ) 10 [ 600000 [ >bignum 1 + ] map drop ] times ;
 
 MAIN: gc1
