@@ -102,7 +102,7 @@ PRIVATE>
 : clear-fp-exception-flags ( -- ) { } set-fp-exception-flags ; inline
 
 : collect-fp-exceptions ( quot -- exceptions )
-    clear-fp-exception-flags call fp-exception-flags ; inline
+    [ clear-fp-exception-flags ] dip call fp-exception-flags ; inline
 
 : denormal-mode ( -- mode ) fp-env-register (get-denormal-mode) ;
 
