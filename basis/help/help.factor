@@ -99,19 +99,26 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 : $navigation-row ( content element label -- )
     [ prefix 1array ] dip prefix , ;
 
+: ($navigation-table) ( element -- )
+    help-path-style get table-style set [ $table ] with-scope ;
+
 : $navigation-table ( topic -- )
     [
-        [ help-path [ \ $links "Up:" $navigation-row ] unless-empty ]
         [ prev-article [ 1array \ $long-link "Prev:" $navigation-row ] when* ]
         [ next-article [ 1array \ $long-link "Next:" $navigation-row ] when* ]
-        tri
-    ] { } make [ $table ] unless-empty ;
+        bi
+    ] { } make [ ($navigation-table) ] unless-empty ;
+
+: ($navigation) ( topic -- )
+    help-path-style get [
+        [ help-path [ reverse $breadcrumbs ] unless-empty ]
+        [ $navigation-table ] bi
+    ] with-style ;
 
 : $title ( topic -- )
     title-style get [
         title-style get [
-            [ ($title) ]
-            [ help-path-style get [ $navigation-table ] with-style ] bi
+            [ ($title) ] [ ($navigation) ] bi
         ] with-nesting
     ] with-style nl ;
 

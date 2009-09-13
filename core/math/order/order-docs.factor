@@ -44,39 +44,41 @@ HELP: compare
 } ;
 
 HELP: max
-{ $values { "x" real } { "y" real } { "z" real } }
-{ $description "Outputs the greatest of two real numbers." } ;
+{ $values { "x" object } { "y" object } { "z" object } }
+{ $description "Outputs the greatest of two ordered values." }
+{ $notes "If one value is a floating point positive zero and the other is a negative zero, the result is undefined." } ;
 
 HELP: min
-{ $values { "x" real } { "y" real } { "z" real } }
-{ $description "Outputs the smallest of two real numbers." } ;
+{ $values { "x" object } { "y" object } { "z" object } }
+{ $description "Outputs the smallest of two ordered values." }
+{ $notes "If one value is a floating point positive zero and the other is a negative zero, the result is undefined." } ;
 
 HELP: clamp
-{ $values { "x" real } { "min" real } { "max" real } { "y" real } }
+{ $values { "x" object } { "min" object } { "max" object } { "y" object } }
 { $description "Outputs " { $snippet "x" } " if contained in the interval " { $snippet "[min,max]" } " or outputs one of the endpoints." } ;
 
 HELP: between?
-{ $values { "x" real } { "y" real } { "z" real } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "z" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is in the interval " { $snippet "[y,z]" } "." }
 { $notes "As per the closed interval notation, the end-points are included in the interval." } ;
 
 HELP: before?
-{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "obj1" } " comes before " { $snippet "obj2" } " using an intrinsic total order." }
 { $notes "Implemented using " { $link <=> } "." } ;
 
 HELP: after?
-{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "obj1" } " comes after " { $snippet "obj2" } " using an intrinsic total order." }
 { $notes "Implemented using " { $link <=> } "." } ;
 
 HELP: before=?
-{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "obj1" } " comes before or equals " { $snippet "obj2" } " using an intrinsic total order." }
 { $notes "Implemented using " { $link <=> } "." } ;
 
 HELP: after=?
-{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "obj1" } " comes after or equals " { $snippet "obj2" } " using an intrinsic total order." }
 { $notes "Implemented using " { $link <=> } "." } ;
 
@@ -100,7 +102,7 @@ ARTICLE: "math.order.example" "Linear order example"
 } ;
 
 ARTICLE: "math.order" "Linear order protocol"
-"Some classes have an intrinsic order amongst instances:"
+"Some classes define an intrinsic order amongst instances. This includes numbers, sequences (in particular, strings), and words."
 { $subsection <=> }
 { $subsection >=< }
 { $subsection compare }
@@ -112,6 +114,10 @@ ARTICLE: "math.order" "Linear order protocol"
 { $subsection before? }
 { $subsection after=? }
 { $subsection before=? }
+"Minimum, maximum, clamping:"
+{ $subsection min }
+{ $subsection max }
+{ $subsection clamp }
 "Out of the above generic words, it suffices to implement " { $link <=> } " alone. The others may be provided as an optimization."
 { $subsection "math.order.example" }
 { $see-also "sequences-sorting" } ;

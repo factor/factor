@@ -12,7 +12,11 @@ IN: tools.deploy.test
 
 : small-enough? ( n -- ? )
     [ "test.image" temp-file file-info size>> ]
-    [ cell 4 / * cpu ppc? [ 100000 + ] when ] bi*
+    [
+        cell 4 / *
+        cpu ppc? [ 100000 + ] when
+        os windows? [ 150000 + ] when
+    ] bi*
     <= ;
 
 : run-temp-image ( -- )
