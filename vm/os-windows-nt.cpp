@@ -28,16 +28,18 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 		c->EIP = (cell)memory_signal_handler_impl;
 	break;
 
-	case EXCEPTION_FLT_DENORMAL_OPERAND:
-	case EXCEPTION_FLT_DIVIDE_BY_ZERO:
-	case EXCEPTION_FLT_INEXACT_RESULT:
-	case EXCEPTION_FLT_INVALID_OPERATION:
-	case EXCEPTION_FLT_OVERFLOW:
-	case EXCEPTION_FLT_STACK_CHECK:
-	case EXCEPTION_FLT_UNDERFLOW:
-		/* XXX MxCsr is not available in CONTEXT structure on x86.32 */
-		signal_fpu_status = c->FloatSave.StatusWord;
-		c->FloatSave.StatusWord = 0;
+	case STATUS_FLOAT_DENORMAL_OPERAND:
+	case STATUS_FLOAT_DIVIDE_BY_ZERO:
+	case STATUS_FLOAT_INEXACT_RESULT:
+	case STATUS_FLOAT_INVALID_OPERATION:
+	case STATUS_FLOAT_OVERFLOW:
+	case STATUS_FLOAT_STACK_CHECK:
+	case STATUS_FLOAT_UNDERFLOW:
+	case STATUS_FLOAT_MULTIPLE_FAULTS:
+	case STATUS_FLOAT_MULTIPLE_TRAPS:
+		signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));
+		X87SW(c) = 0;
+		MXCSR(c) &= 0xffffffc0;
 		c->EIP = (cell)fp_signal_handler_impl;
 		break;
 	case 0x40010006:
