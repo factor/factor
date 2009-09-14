@@ -34,7 +34,7 @@ H{
     { font-style bold }
     { wrap-margin 500 }
     { foreground COLOR: gray20 }
-    { page-color COLOR: FactorLightLightTan }
+    { page-color COLOR: FactorLightTan }
     { inset { 5 5 } }
 } title-style set-global
 
@@ -42,7 +42,7 @@ SYMBOL: help-path-style
 H{
     { font-size 10 }
     { table-gap { 5 5 } }
-    { table-border COLOR: FactorLightLightTan }
+    { table-border COLOR: FactorLightTan }
 } help-path-style set-global
 
 SYMBOL: heading-style
@@ -75,7 +75,7 @@ H{
 
 SYMBOL: code-style
 H{
-    { page-color COLOR: FactorLightLightTan }
+    { page-color COLOR: FactorLightTan }
     { inset { 5 5 } }
     { wrap-margin f }
 } code-style set-global
@@ -113,7 +113,7 @@ H{
 SYMBOL: table-style
 H{
     { table-gap { 5 5 } }
-    { table-border COLOR: FactorLightTan }
+    { table-border COLOR: FactorTan }
 } table-style set-global
 
 SYMBOL: list-style
