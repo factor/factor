@@ -1,6 +1,7 @@
 USING: kernel math math.floats.env math.floats.env.private
 math.functions math.libm sequences tools.test locals
-compiler.units kernel.private fry compiler math.private words ;
+compiler.units kernel.private fry compiler math.private words
+system ;
 IN: math.floats.env.tests
 
 : set-default-fp-env ( -- )
@@ -29,7 +30,13 @@ set-default-fp-env
 [ t ] +fp-overflow+ [ 1.0e250 1.0e100 ] [ * ] test-fp-exception-compiled unit-test
 [ t ] +fp-underflow+ [ 1.0e-250 1.0e-100 ] [ * ] test-fp-exception-compiled unit-test
 [ t ] +fp-overflow+ [ 2.0 100,000.0 ] [ fpow ] test-fp-exception-compiled unit-test
-[ t ] +fp-underflow+ [ 2.0 -100,000.0 ] [ fpow ] test-fp-exception-compiled unit-test
+
+! No underflow on Linux with this test, just inexact. Reported as an Ubuntu bug:
+! https://bugs.launchpad.net/ubuntu/+source/glibc/+bug/429113
+os linux? cpu x86.64? and [
+    [ t ] +fp-underflow+ [ 2.0 -100,000.0 ] [ fpow ] test-fp-exception-compiled unit-test
+] unless
+
 [ t ] +fp-invalid-operation+ [ 0.0 0.0 ] [ /f ] test-fp-exception-compiled unit-test
 [ t ] +fp-invalid-operation+ [ -1.0 ] [ fsqrt ] test-fp-exception-compiled unit-test
 
@@ -108,17 +115,17 @@ set-default-fp-env
 : test-traps-compiled ( traps inputs quot -- quot' )
     swapd '[ @ [ _ _ with-fp-traps ] compile-call ] ;
 
-{ +fp-zero-divide+ }       [ 1.0 0.0 ] [ /f ] test-traps must-fail
-{ +fp-inexact+ }           [ 1.0 3.0 ] [ /f ] test-traps must-fail
+{ +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps must-fail
+{ +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps must-fail
 { +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps must-fail
-{ +fp-overflow+ }          [ 2.0 ] [ 100,000.0 ^ ] test-traps must-fail
-{ +fp-underflow+ }         [ 2.0 ] [ -100,000.0 ^ ] test-traps must-fail
+{ +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps must-fail
+{ +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps must-fail
 
-{ +fp-zero-divide+ }       [ 1.0 0.0 ] [ /f ] test-traps-compiled must-fail
-{ +fp-inexact+ }           [ 1.0 3.0 ] [ /f ] test-traps-compiled must-fail
+{ +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps-compiled must-fail
+{ +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps-compiled must-fail
 { +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps-compiled must-fail
-{ +fp-overflow+ }          [ 2.0 ] [ 100,000.0 ^ ] test-traps-compiled must-fail
-{ +fp-underflow+ }         [ 2.0 ] [ -100,000.0 ^ ] test-traps-compiled must-fail
+{ +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps-compiled must-fail
+{ +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps-compiled must-fail
 
 ! Ensure ordered comparisons raise traps
 :: test-comparison-quot ( word -- quot )
