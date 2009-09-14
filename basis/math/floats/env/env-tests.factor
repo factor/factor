@@ -21,7 +21,6 @@ set-default-fp-env
 [ t ] +fp-overflow+ [ 1.0e250 1.0e100 ] [ * ] test-fp-exception unit-test
 [ t ] +fp-underflow+ [ 1.0e-250 1.0e-100 ] [ * ] test-fp-exception unit-test
 [ t ] +fp-overflow+ [ 2.0 100,000.0 ] [ fpow ] test-fp-exception unit-test
-[ t ] +fp-underflow+ [ 2.0 -100,000.0 ] [ fpow ] test-fp-exception unit-test
 [ t ] +fp-invalid-operation+ [ 0.0 0.0 ] [ /f ] test-fp-exception unit-test
 [ t ] +fp-invalid-operation+ [ -1.0 ] [ fsqrt ] test-fp-exception unit-test
 
@@ -34,6 +33,7 @@ set-default-fp-env
 ! No underflow on Linux with this test, just inexact. Reported as an Ubuntu bug:
 ! https://bugs.launchpad.net/ubuntu/+source/glibc/+bug/429113
 os linux? cpu x86.64? and [
+    [ t ] +fp-underflow+ [ 2.0 -100,000.0 ] [ fpow ] test-fp-exception unit-test
     [ t ] +fp-underflow+ [ 2.0 -100,000.0 ] [ fpow ] test-fp-exception-compiled unit-test
 ] unless
 
