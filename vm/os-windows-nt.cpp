@@ -34,6 +34,9 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
     case EXCEPTION_FLT_OVERFLOW:
     case EXCEPTION_FLT_STACK_CHECK:
     case EXCEPTION_FLT_UNDERFLOW:
+        /* XXX MxCsr is not available in CONTEXT structure on x86.32 */
+        signal_fpu_status = c->FloatSave.StatusWord;
+        c->FloatSave.StatusWord = 0;
         c->EIP = (cell)fp_signal_handler_impl;
         break;
 
