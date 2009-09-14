@@ -67,15 +67,15 @@ inline static unsigned int fpu_status(unsigned int status)
         unsigned int r = 0;
 
         if (status & 0x20000000)
-            r |= FP_TRAP_INVALID_OPERATION;
+		r |= FP_TRAP_INVALID_OPERATION;
         if (status & 0x10000000)
-            r |= FP_TRAP_OVERFLOW;
+		r |= FP_TRAP_OVERFLOW;
         if (status & 0x08000000)
-            r |= FP_TRAP_UNDERFLOW;
+		r |= FP_TRAP_UNDERFLOW;
         if (status & 0x04000000)
-            r |= FP_TRAP_ZERO_DIVIDE;
+		r |= FP_TRAP_ZERO_DIVIDE;
         if (status & 0x02000000)
-            r |= FP_TRAP_INEXACT;
+		r |= FP_TRAP_INEXACT;
 
         return r;
 }
