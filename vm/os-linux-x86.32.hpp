@@ -38,7 +38,7 @@ inline static void *ucontext_stack_pointer(void *uap)
 inline static unsigned int uap_fpu_status(void *uap)
 {
 	ucontext_t *ucontext = (ucontext_t *)uap;
-	struct _fpstate *fpregs = (struct _fpstate *)uap->uc_mcontext.fpregs;
+	struct _fpstate *fpregs = (struct _fpstate *)ucontext->uc_mcontext.fpregs;
 	if (fpregs->magic == X86_FXSR_MAGIC)
 	    return fpregs->sw | fpregs->mxcsr;
 	else
@@ -48,7 +48,7 @@ inline static unsigned int uap_fpu_status(void *uap)
 inline static void uap_clear_fpu_status(void *uap)
 {
 	ucontext_t *ucontext = (ucontext_t *)uap;
-	struct _fpstate *fpregs = (struct _fpstate *)uap->uc_mcontext.fpregs;
+	struct _fpstate *fpregs = (struct _fpstate *)ucontext->uc_mcontext.fpregs;
 	fpregs->sw = 0;
 	if (fpregs->magic == X86_FXSR_MAGIC)
 	    fpregs->mxcsr &= 0xffffffc0;
