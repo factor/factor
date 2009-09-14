@@ -1,38 +1,38 @@
 DEF(void,primitive_fixnum_add,(void)):
-    mov (DS_REG),ARG0
-    mov -CELL_SIZE(DS_REG),ARG1
-    sub $CELL_SIZE,DS_REG
-    mov ARG1,ARITH_TEMP_1
-    add ARG0,ARITH_TEMP_1
-    jo MANGLE(overflow_fixnum_add)
-    mov ARITH_TEMP_1,(DS_REG)
-    ret
+	mov (DS_REG),ARG0
+	mov -CELL_SIZE(DS_REG),ARG1
+	sub $CELL_SIZE,DS_REG
+	mov ARG1,ARITH_TEMP_1
+	add ARG0,ARITH_TEMP_1
+	jo MANGLE(overflow_fixnum_add)
+	mov ARITH_TEMP_1,(DS_REG)
+	ret
 
 DEF(void,primitive_fixnum_subtract,(void)):
-    mov (DS_REG),ARG1
-    mov -CELL_SIZE(DS_REG),ARG0
-    sub $CELL_SIZE,DS_REG
-    mov ARG0,ARITH_TEMP_1
-    sub ARG1,ARITH_TEMP_1
-    jo MANGLE(overflow_fixnum_subtract)
-    mov ARITH_TEMP_1,(DS_REG)
-    ret
+	mov (DS_REG),ARG1
+	mov -CELL_SIZE(DS_REG),ARG0
+	sub $CELL_SIZE,DS_REG
+	mov ARG0,ARITH_TEMP_1
+	sub ARG1,ARITH_TEMP_1
+	jo MANGLE(overflow_fixnum_subtract)
+	mov ARITH_TEMP_1,(DS_REG)
+	ret
 
 DEF(void,primitive_fixnum_multiply,(void)):
-    mov (DS_REG),ARITH_TEMP_1
-    mov ARITH_TEMP_1,DIV_RESULT
-    mov -CELL_SIZE(DS_REG),ARITH_TEMP_2
-    sar $3,ARITH_TEMP_2
-    sub $CELL_SIZE,DS_REG
-    imul ARITH_TEMP_2
-    jo multiply_overflow
-    mov DIV_RESULT,(DS_REG)
-    ret
+	mov (DS_REG),ARITH_TEMP_1
+	mov ARITH_TEMP_1,DIV_RESULT
+	mov -CELL_SIZE(DS_REG),ARITH_TEMP_2
+	sar $3,ARITH_TEMP_2
+	sub $CELL_SIZE,DS_REG
+	imul ARITH_TEMP_2
+	jo multiply_overflow
+	mov DIV_RESULT,(DS_REG)
+	ret
 multiply_overflow:
-    sar $3,ARITH_TEMP_1
-    mov ARITH_TEMP_1,ARG0
-    mov ARITH_TEMP_2,ARG1
-    jmp MANGLE(overflow_fixnum_multiply)
+	sar $3,ARITH_TEMP_1
+	mov ARITH_TEMP_1,ARG0
+	mov ARITH_TEMP_2,ARG1
+	jmp MANGLE(overflow_fixnum_multiply)
 
 DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
 	PUSH_NONVOLATILE
@@ -77,38 +77,38 @@ DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot)):
 DEF(bool,sse_version,(void)):
 	mov $0x1,RETURN_REG
 	cpuid
-    /* test $0x100000,%ecx
-    jnz sse_42
-    test $0x80000,%ecx
-    jnz sse_41
-    test $0x200,%ecx
-    jnz ssse_3 */
-    test $0x1,%ecx
-    jnz sse_3
-    test $0x4000000,%edx
-    jnz sse_2
-    test $0x2000000,%edx
-    jnz sse_1
-    mov $0,%eax
-    ret
+	/* test $0x100000,%ecx
+	jnz sse_42
+	test $0x80000,%ecx
+	jnz sse_41
+	test $0x200,%ecx
+	jnz ssse_3 */
+	test $0x1,%ecx
+	jnz sse_3
+	test $0x4000000,%edx
+	jnz sse_2
+	test $0x2000000,%edx
+	jnz sse_1
+	mov $0,%eax
+	ret
 sse_42:
-    mov $42,RETURN_REG
-    ret
+	mov $42,RETURN_REG
+	ret
 sse_41:
-    mov $41,RETURN_REG
-    ret
+	mov $41,RETURN_REG
+	ret
 ssse_3:
-    mov $33,RETURN_REG
-    ret
+	mov $33,RETURN_REG
+	ret
 sse_3:
-    mov $30,RETURN_REG
-    ret
+	mov $30,RETURN_REG
+	ret
 sse_2:
-    mov $20,RETURN_REG
-    ret
+	mov $20,RETURN_REG
+	ret
 sse_1:
-    mov $10,RETURN_REG
-    ret
+	mov $10,RETURN_REG
+	ret
 #ifdef WINDOWS
 	.section .drectve
 	.ascii " -export:sse_version"
