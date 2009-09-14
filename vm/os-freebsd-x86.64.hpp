@@ -15,7 +15,7 @@ inline static unsigned int uap_fpu_status(void *uap)
         ucontext_t *ucontext = (ucontext_t *)uap;
         if (ucontext->uc_mcontext.mc_fpformat == _MC_FPFMT_XMM)
 	{
-		struct savexmm *xmm = (struct savexmm *)(&ucontext->uc_mcontext.mc_fpstate);
+		struct savefpu *xmm = (struct savefpu *)(&ucontext->uc_mcontext.mc_fpstate);
 		return xmm->sv_env.en_sw | xmm->sv_env.en_mxcsr;
         }
 	else
@@ -27,7 +27,7 @@ inline static void uap_clear_fpu_status(void *uap)
         ucontext_t *ucontext = (ucontext_t *)uap;
         if (ucontext->uc_mcontext.mc_fpformat == _MC_FPFMT_XMM)
 	{
-		struct savexmm *xmm = (struct savexmm *)(&ucontext->uc_mcontext.mc_fpstate);
+		struct savefpu *xmm = (struct savefpu *)(&ucontext->uc_mcontext.mc_fpstate);
 		xmm->sv_env.en_sw = 0;
 		xmm->sv_env.en_mxcsr &= 0xffffffc0;
         }

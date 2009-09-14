@@ -30,12 +30,12 @@ inline static unsigned int uap_fpu_status(void *uap)
 inline static void uap_clear_fpu_status(void *uap)
 {
         ucontext_t *ucontext = (ucontext_t *)uap;
-        if (uap->uc_mcontext.mc_fpformat == _MC_FPFMT_387)
+        if (ucontext->uc_mcontext.mc_fpformat == _MC_FPFMT_387)
 	{
 		struct save87 *x87 = (struct save87 *)(&ucontext->uc_mcontext.mc_fpstate);
 		x87->sv_env.en_sw = 0;
         }
-	else if (uap->uc_mcontext.mc_fpformat == _MC_FPFMT_XMM)
+	else if (ucontext->uc_mcontext.mc_fpformat == _MC_FPFMT_XMM)
 	{
 		struct savexmm *xmm = (struct savexmm *)(&ucontext->uc_mcontext.mc_fpstate);
 		xmm->sv_env.en_sw = 0;
