@@ -7,6 +7,7 @@ namespace factor
 user-space */
 cell signal_number;
 cell signal_fault_addr;
+unsigned int signal_fpu_status;
 stack_frame *signal_callstack_top;
 
 void out_of_memory()
@@ -130,9 +131,9 @@ void divide_by_zero_error()
 	general_error(ERROR_DIVIDE_BY_ZERO,F,F,NULL);
 }
 
-void fp_trap_error(stack_frame *signal_callstack_top)
+void fp_trap_error(unsigned int fpu_status, stack_frame *signal_callstack_top)
 {
-	general_error(ERROR_FP_TRAP,F,F,signal_callstack_top);
+	general_error(ERROR_FP_TRAP,tag_fixnum(fpu_status),F,signal_callstack_top);
 }
 
 PRIMITIVE(call_clear)
@@ -158,7 +159,7 @@ void misc_signal_handler_impl()
 
 void fp_signal_handler_impl()
 {
-	fp_trap_error(signal_callstack_top);
+	fp_trap_error(signal_fpu_status,signal_callstack_top);
 }
 
 }
