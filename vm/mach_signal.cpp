@@ -28,7 +28,7 @@ http://www.wodeveloper.com/omniLists/macosx-dev/2000/June/msg00137.html */
 /* Modify a suspended thread's thread_state so that when the thread resumes
 executing, the call frame of the current C primitive (if any) is rewound, and
 the appropriate Factor error is thrown from the top-most Factor frame. */
-static void call_fault_handler(
+void factorvm::call_fault_handler(
     exception_type_t exception,
     exception_data_type_t code,
 	MACH_EXC_STATE_TYPE *exc_state,
@@ -41,31 +41,40 @@ static void call_fault_handler(
 	a divide by zero or stack underflow in the listener */
 
 	/* Are we in compiled Factor code? Then use the current stack pointer */
-	if(SIGNAL_VM_PTR()->in_code_heap_p(MACH_PROGRAM_COUNTER(thread_state)))
-		SIGNAL_VM_PTR()->signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
+	if(in_code_heap_p(MACH_PROGRAM_COUNTER(thread_state)))
+		signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
 	/* Are we in C? Then use the saved callstack top */
 	else
-		SIGNAL_VM_PTR()->signal_callstack_top = NULL;
+		signal_callstack_top = NULL;
 
 	MACH_STACK_POINTER(thread_state) = fix_stack_pointer(MACH_STACK_POINTER(thread_state));
 
 	/* Now we point the program counter at the right handler function. */
 	if(exception == EXC_BAD_ACCESS)
 	{
-		SIGNAL_VM_PTR()->signal_fault_addr = MACH_EXC_STATE_FAULT(exc_state);
-		MACH_PROGRAM_COUNTER(thread_state) = (cell)memory_signal_handler_impl;
+		signal_fault_addr = MACH_EXC_STATE_FAULT(exc_state);
+		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::memory_signal_handler_impl;
 	}
 	else if(exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV)
 	{
-                signal_fpu_status = fpu_status(mach_fpu_status(float_state));
-                mach_clear_fpu_status(float_state);
-		MACH_PROGRAM_COUNTER(thread_state) = (cell)fp_signal_handler_impl;
+		signal_fpu_status = fpu_status(mach_fpu_status(float_state));
+		mach_clear_fpu_status(float_state);
+		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::fp_signal_handler_impl;
 	}
 	else
 	{
-		SIGNAL_VM_PTR()->signal_number = (exception == EXC_ARITHMETIC ? SIGFPE : SIGABRT);
-		MACH_PROGRAM_COUNTER(thread_state) = (cell)misc_signal_handler_impl;
+		signal_number = (exception == EXC_ARITHMETIC ? SIGFPE : SIGABRT);
+		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::misc_signal_handler_impl;
 	}
+}
+
+static void call_fault_handler(exception_type_t exception,
+							   exception_data_type_t code,
+							   MACH_EXC_STATE_TYPE *exc_state,
+							   MACH_THREAD_STATE_TYPE *thread_state,
+							   MACH_FLOAT_STATE_TYPE *float_state)
+{
+	SIGNAL_VM_PTR()->call_fault_handler(exception,code,exc_state,thread_state,float_state);
 }
 
 /* Handle an exception by invoking the user's fault handler and/or forwarding
