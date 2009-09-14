@@ -69,7 +69,7 @@ inline static cell fix_stack_pointer(cell sp)
 
 inline static void mach_clear_fpu_status(ppc_float_state_t *float_state)
 {
-	FPSCR(float_state) &= 0x0007ffff;
+	FPSCR(float_state) &= 0x0007f8ff;
 }
 
 inline static void uap_clear_fpu_status(void *uap)
