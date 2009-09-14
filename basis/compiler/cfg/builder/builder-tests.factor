@@ -192,14 +192,16 @@ IN: compiler.cfg.builder.tests
     [ [ ##unbox-alien? ] contains-insn? ] bi
 ] unit-test
 
-[ f t ] [
-    [ { byte-array fixnum } declare alien-cell 4 alien-float ]
-    [ [ ##box-alien? ] contains-insn? ]
-    [ [ ##box-float? ] contains-insn? ] bi
-] unit-test
+\ alien-float "intrinsic" word-prop [
+    [ f t ] [
+        [ { byte-array fixnum } declare alien-cell 4 alien-float ]
+        [ [ ##box-alien? ] contains-insn? ]
+        [ [ ##box-float? ] contains-insn? ] bi
+    ] unit-test
 
-[ f t ] [
-    [ { byte-array fixnum } declare alien-cell { simple-alien } declare 4 alien-float ]
-    [ [ ##box-alien? ] contains-insn? ]
-    [ [ ##box-float? ] contains-insn? ] bi
-] unit-test
+    [ f t ] [
+        [ { byte-array fixnum } declare alien-cell { simple-alien } declare 4 alien-float ]
+        [ [ ##box-alien? ] contains-insn? ]
+        [ [ ##box-float? ] contains-insn? ] bi
+    ] unit-test
+] when
