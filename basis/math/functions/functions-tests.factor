@@ -33,9 +33,9 @@ IN: math.functions.tests
 [ 0.0 ] [ 1.0 log ] unit-test
 [ 1.0 ] [ e log ] unit-test
 
-[ t ] [ 1 exp e = ] unit-test
-[ t ] [ 1.0 exp e = ] unit-test
-[ 1.0 ] [ -1 exp e * ] unit-test
+[ t ] [ 1 exp e 1.e-10 ~ ] unit-test
+[ t ] [ 1.0 exp e 1.e-10 ~ ] unit-test
+[ t ] [ -1 exp e * 1.0 1.e-10 ~ ] unit-test
 
 [ 1.0 ] [ 0 cosh ] unit-test
 [ 1.0 ] [ 0.0 cosh ] unit-test
