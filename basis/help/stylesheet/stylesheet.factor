@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: colors colors.constants io.styles literals namespaces ;
+USING: colors colors.constants io.styles namespaces ;
 IN: help.stylesheet
 
 SYMBOL: default-span-style
@@ -42,7 +42,7 @@ SYMBOL: help-path-style
 H{
     { font-size 10 }
     { table-gap { 5 5 } }
-    { table-border $ transparent }
+    { table-border COLOR: FactorLightLightTan }
 } help-path-style set-global
 
 SYMBOL: heading-style
