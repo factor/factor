@@ -5,22 +5,21 @@ namespace factor
 
 inline static void *ucontext_stack_pointer(void *uap)
 {
-        ucontext_t *ucontext = (ucontext_t *)uap;
-        return (void *)ucontext->uc_mcontext.gregs[7];
+	ucontext_t *ucontext = (ucontext_t *)uap;
+	return (void *)ucontext->uc_mcontext.gregs[7];
 }
 
 inline static unsigned int uap_fpu_status(void *uap)
 {
-        ucontext_t *ucontext = (ucontext_t *)uap;
-        return ucontext->uc_mcontext.fpregs->swd
-             | ucontext->uc_mcontext.fpregs->mxcsr;
+	// XXX mxcsr not available in i386 ucontext
+	ucontext_t *ucontext = (ucontext_t *)uap;
+	return ucontext->uc_mcontext.fpregs->sw;
 }
 
 inline static void uap_clear_fpu_status(void *uap)
 {
-        ucontext_t *ucontext = (ucontext_t *)uap;
-        ucontext->uc_mcontext.fpregs->swd = 0;
-        ucontext->uc_mcontext.fpregs->mxcsr &= 0xffffffc0;
+	ucontext_t *ucontext = (ucontext_t *)uap;
+	ucontext->uc_mcontext.fpregs->sw = 0;
 }
 
 #define UAP_PROGRAM_COUNTER(ucontext) \
