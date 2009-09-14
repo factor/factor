@@ -34,7 +34,7 @@ M: ppc-vmx-env (set-fp-env-register)
 M: ppc (fp-env-registers)
     <ppc-fpu-env> <ppc-vmx-env> 2array ;
 
-CONSTANT: ppc-exception-flag-bits HEX: fff8,0000
+CONSTANT: ppc-exception-flag-bits HEX: fff8,0700
 CONSTANT: ppc-exception-flag>bit
     H{
         { +fp-invalid-operation+ HEX: 2000,0000 }
