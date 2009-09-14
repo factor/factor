@@ -70,11 +70,11 @@ inline static cell align8(cell a)
 /* Constants used when floating-point trap exceptions are thrown */
 enum
 {
-        FP_TRAP_INVALID_OPERATION = 1 << 0,
-        FP_TRAP_OVERFLOW          = 1 << 1,
-        FP_TRAP_UNDERFLOW         = 1 << 2,
-        FP_TRAP_ZERO_DIVIDE       = 1 << 3,
-        FP_TRAP_INEXACT           = 1 << 4,
+	FP_TRAP_INVALID_OPERATION = 1 << 0,
+	FP_TRAP_OVERFLOW          = 1 << 1,
+	FP_TRAP_UNDERFLOW         = 1 << 2,
+	FP_TRAP_ZERO_DIVIDE       = 1 << 3,
+	FP_TRAP_INEXACT           = 1 << 4,
 };
 
 inline static bool immediate_p(cell obj)

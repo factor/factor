@@ -52,30 +52,30 @@ Modified for Factor by Slava Pestov and Daniel Ehrenberg */
 
 inline static unsigned int mach_fpu_status(x86_float_state64_t *float_state)
 {
-    unsigned short x87sw;
-    memcpy(&x87sw, &X87SW(float_state), sizeof(x87sw));
-    return MXCSR(float_state) | x87sw;
+	unsigned short x87sw;
+	memcpy(&x87sw, &X87SW(float_state), sizeof(x87sw));
+	return MXCSR(float_state) | x87sw;
 }
 
 inline static unsigned int uap_fpu_status(void *uap)
 {
-    return mach_fpu_status(UAP_FS(uap));
+	return mach_fpu_status(UAP_FS(uap));
 }
 
 inline static cell fix_stack_pointer(cell sp)
 {
-    return ((sp + 8) & ~15) - 8;
+	return ((sp + 8) & ~15) - 8;
 }
 
 inline static void mach_clear_fpu_status(x86_float_state64_t *float_state)
 {
-    MXCSR(float_state) &= 0xffffffc0;
-    memset(&X87SW(float_state), 0, sizeof(X87SW(float_state)));
+	MXCSR(float_state) &= 0xffffffc0;
+	memset(&X87SW(float_state), 0, sizeof(X87SW(float_state)));
 }
 
 inline static void uap_clear_fpu_status(void *uap)
 {
-    mach_clear_fpu_status(UAP_FS(uap));
+	mach_clear_fpu_status(UAP_FS(uap));
 }
 
 }
