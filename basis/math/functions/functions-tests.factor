@@ -33,6 +33,12 @@ IN: math.functions.tests
 [ 0.0 ] [ 1.0 log ] unit-test
 [ 1.0 ] [ e log ] unit-test
 
+[ 0.0 ] [ 1.0 log10 ] unit-test
+[ 1.0 ] [ 10.0 log10 ] unit-test
+[ 2.0 ] [ 100.0 log10 ] unit-test
+[ 3.0 ] [ 1000.0 log10 ] unit-test
+[ 4.0 ] [ 10000.0 log10 ] unit-test
+
 [ t ] [ 1 exp e 1.e-10 ~ ] unit-test
 [ t ] [ 1.0 exp e 1.e-10 ~ ] unit-test
 [ t ] [ -1 exp e * 1.0 1.e-10 ~ ] unit-test
