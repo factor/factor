@@ -88,11 +88,12 @@ multiply_overflow:
 #define RESTORE_FP(register,offset) lfd register,SAVE_AT(offset)(r1)
 
 #define SAVE_V(register,offset) \
-    li r2,SAVE_AT(offset) XX \
-    stvxl register,r2,r1
+	li r2,SAVE_AT(offset) XX \
+	stvxl register,r2,r1
+
 #define RESTORE_V(register,offset) \
-    li r2,SAVE_AT(offset) XX \
-    lvxl register,r2,r1
+	li r2,SAVE_AT(offset) XX \
+	lvxl register,r2,r1
 
 #define PROLOGUE \
 	mflr r0 XX	   /* get caller's return address */ \
@@ -103,8 +104,6 @@ multiply_overflow:
 	LOAD_LR(r0) XX \
 	lwz r1,0(r1) XX	   /* destroy the stack frame */ \
 	mtlr r0		   /* get ready to return */
-
-
 
 /* We have to save and restore nonvolatile registers because
 the Factor compiler treats the entire register file as volatile. */
@@ -288,44 +287,44 @@ DEF(void,flush_icache,(void *start, int len)):
 	blr
 
 DEF(void,primitive_inline_cache_miss,(void)):
-    mflr r6
+	mflr r6
 DEF(void,primitive_inline_cache_miss_tail,(void)):
-    PROLOGUE
-    mr r3,r6
-    bl MANGLE(inline_cache_miss)
-    EPILOGUE
-    mtctr r3
-    bctr
+	PROLOGUE
+	mr r3,r6
+	bl MANGLE(inline_cache_miss)
+	EPILOGUE
+	mtctr r3
+	bctr
 
 DEF(void,get_ppc_fpu_env,(void*)):
-    mffs f0
-    stfd f0,0(r3)
-    blr
+	mffs f0
+	stfd f0,0(r3)
+	blr
 
 DEF(void,set_ppc_fpu_env,(const void*)):
-    lfd f0,0(r3)
-    mtfsf 0xff,f0
-    blr
+	lfd f0,0(r3)
+	mtfsf 0xff,f0
+	blr
 
 DEF(void,get_ppc_vmx_env,(void*)):
-    mfvscr v0
-    subi r4,r1,16
-    li r5,0xf
-    andc r4,r4,r5
-    stvxl v0,0,r4
-    li r5,0xc
-    lwzx r6,r5,r4
-    stw r6,0(r3)
-    blr
+	mfvscr v0
+	subi r4,r1,16
+	li r5,0xf
+	andc r4,r4,r5
+	stvxl v0,0,r4
+	li r5,0xc
+	lwzx r6,r5,r4
+	stw r6,0(r3)
+	blr
 
 DEF(void,set_ppc_vmx_env,(const void*)):
-    subi r4,r1,16
-    li r5,0xf
-    andc r4,r4,r5
-    li r5,0xc
-    lwz r6,0(r3)
-    stwx r6,r5,r4
-    lvxl v0,0,r4
-    mtvscr v0
-    blr
+	subi r4,r1,16
+	li r5,0xf
+	andc r4,r4,r5
+	li r5,0xc
+	lwz r6,0(r3)
+	stwx r6,r5,r4
+	lvxl v0,0,r4
+	mtvscr v0
+	blr
 
