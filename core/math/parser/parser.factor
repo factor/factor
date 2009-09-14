@@ -109,9 +109,8 @@ SYMBOL: negative?
 
 : base>float ( str base -- n/f )
     {
-        { 10 [ dec>float ] }
         { 16 [ hex>float ] }
-        [ "Floats can only be converted from strings in base 10 or 16" throw ]
+        [ drop dec>float ]
     } case ;
 
 : number-char? ( char -- ? )
@@ -232,9 +231,8 @@ M: ratio >base
 
 : float>base ( n base -- str )
     {
-        { 10 [ float>decimal ] }
         { 16 [ float>hex ] }
-        [ "Floats can only be converted to strings in base 10 or 16" throw ]
+        [ drop float>decimal ]
     } case ;
 
 PRIVATE>
