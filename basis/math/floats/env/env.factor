@@ -1,7 +1,8 @@
 ! (c)Joe Groff bsd license
-USING: alien.syntax arrays assocs biassocs combinators continuations
-generalizations kernel literals locals math math.bitwise
-sequences sets system vocabs.loader ;
+USING: alien.syntax arrays assocs biassocs combinators
+combinators.short-circuit continuations generalizations kernel
+literals locals math math.bitwise sequences sets system
+vocabs.loader ;
 IN: math.floats.env
 
 SINGLETONS:
@@ -102,6 +103,15 @@ GENERIC# (set-denormal-mode) 1 ( fp-env mode -- fp-env )
         } spread
     ] 4 ncurry change-fp-env-registers ;
 
+CONSTANT: vm-error-exception-flag>bit
+    H{
+        { +fp-invalid-operation+ HEX: 01 }
+        { +fp-overflow+          HEX: 02 }
+        { +fp-underflow+         HEX: 04 }
+        { +fp-zero-divide+       HEX: 08 }
+        { +fp-inexact+           HEX: 10 }
+    }
+
 PRIVATE>
 
 : fp-exception-flags ( -- exceptions )
@@ -112,6 +122,11 @@ PRIVATE>
 
 : collect-fp-exceptions ( quot -- exceptions )
     [ clear-fp-exception-flags ] dip call fp-exception-flags ; inline
+
+: vm-error>exception-flags ( error -- exceptions )
+    third vm-error-exception-flag>bit mask> ;
+: vm-error-exception-flag? ( error flag -- ? )
+    vm-error>exception-flags member? ;
 
 : denormal-mode ( -- mode ) fp-env-register (get-denormal-mode) ;
 
@@ -131,6 +146,7 @@ PRIVATE>
     (fp-env-registers) [ (get-fp-traps) ] [ union ] map-reduce >array ; inline
 
 :: with-fp-traps ( exceptions quot -- )
+    clear-fp-exception-flags
     fp-traps :> orig
     exceptions set-fp-traps
     quot [ orig set-fp-traps ] [ ] cleanup ; inline
