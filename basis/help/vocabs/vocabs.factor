@@ -228,10 +228,9 @@ C: <vocab-author> vocab-author
     ] unless-empty ;
 
 : vocab-is-not-loaded ( vocab -- )
-    "Attention" $heading
-    vocab-name dup "The " " vocabulary is not loaded. In order to browse "
-    "its documentation, you must first load it." append surround print-element
-    "USE: " prepend 1array $code ;
+    "Words" $heading
+    "You must first load (USE:) this vocab to browse its documentation/words."
+    print-element vocab-name "USE: " prepend 1array $code ;
 
 : describe-words ( vocab -- )
     dup vocab [ words $words ] [ vocab-is-not-loaded ] if ;
