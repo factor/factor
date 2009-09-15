@@ -73,7 +73,8 @@ M: topic url-of topic>filename ;
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )
-    all-vocabs-recursive >hashtable f over delete-at no-roots remove-redundant-prefixes ;
+    all-vocabs-recursive >hashtable no-roots remove-redundant-prefixes
+    [ vocab-name "scratchpad" = not ] filter ;
 
 : all-topics ( -- topics )
     [
