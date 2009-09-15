@@ -5,12 +5,18 @@ parser sequences splitting words fry locals lexer namespaces
 summary math ;
 IN: alien.parser
 
+: scan-c-type ( -- c-type )
+    scan dup "{" =
+    [ drop \ } parse-until >array ]
+    [ parse-c-type ] if ; 
+
 : normalize-c-arg ( type name -- type' name' )
     [ length ]
     [
         [ CHAR: * = ] trim-head
         [ length - CHAR: * <array> append ] keep
-    ] bi ;
+    ] bi
+    [ parse-c-type ] dip ;
 
 : parse-arglist ( parameters return -- types effect )
     [
