@@ -129,6 +129,7 @@ IN: compiler.cfg.intrinsics
         { math.libm:ftanh [ drop "tanh" emit-unary-float-function ] }
         { math.libm:fexp [ drop "exp" emit-unary-float-function ] }
         { math.libm:flog [ drop "log" emit-unary-float-function ] }
+        { math.libm:flog10 [ drop "log10" emit-unary-float-function ] }
         { math.libm:fpow [ drop "pow" emit-binary-float-function ] }
         { math.libm:facosh [ drop "acosh" emit-unary-float-function ] }
         { math.libm:fasinh [ drop "asinh" emit-unary-float-function ] }

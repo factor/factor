@@ -39,6 +39,9 @@ IN: math.libm
 : flog ( x -- y )
     "double" "libm" "log" { "double" } alien-invoke ;
 
+: flog10 ( x -- y )
+    "double" "libm" "log10" { "double" } alien-invoke ;
+
 : fpow ( x y -- z )
     "double" "libm" "pow" { "double" "double" } alien-invoke ;
 

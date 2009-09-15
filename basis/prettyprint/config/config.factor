@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs io kernel math
-namespaces sequences strings io.styles vectors words
+namespaces sequences strings vectors words
 continuations ;
 IN: prettyprint.config
 
