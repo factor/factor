@@ -7,21 +7,34 @@ STRUCT: ppc-fpu-env
     { padding uint }
     { fpscr uint } ;
 
+STRUCT: ppc-vmx-env
+    { vscr uint } ;
+
 ! defined in the vm, cpu-ppc*.S
 FUNCTION: void get_ppc_fpu_env ( ppc-fpu-env* env ) ;
 FUNCTION: void set_ppc_fpu_env ( ppc-fpu-env* env ) ;
+
+FUNCTION: void get_ppc_vmx_env ( ppc-vmx-env* env ) ;
+FUNCTION: void set_ppc_vmx_env ( ppc-vmx-env* env ) ;
 
 : <ppc-fpu-env> ( -- ppc-fpu-env )
     ppc-fpu-env (struct)
     [ get_ppc_fpu_env ] keep ;
 
+: <ppc-vmx-env> ( -- ppc-fpu-env )
+    ppc-vmx-env (struct)
+    [ get_ppc_vmx_env ] keep ;
+
 M: ppc-fpu-env (set-fp-env-register)
     set_ppc_fpu_env ;
 
-M: ppc (fp-env-registers)
-    <ppc-fpu-env> 1array ;
+M: ppc-vmx-env (set-fp-env-register)
+    set_ppc_vmx_env ;
 
-CONSTANT: ppc-exception-flag-bits HEX: 3e00,0000
+M: ppc (fp-env-registers)
+    <ppc-fpu-env> <ppc-vmx-env> 2array ;
+
+CONSTANT: ppc-exception-flag-bits HEX: fff8,0700
 CONSTANT: ppc-exception-flag>bit
     H{
         { +fp-invalid-operation+ HEX: 2000,0000 }
@@ -76,4 +89,31 @@ M: ppc-fpu-env (set-denormal-mode) ( register mode -- register' )
             { +denormal-flush+ [ ppc-denormal-mode-bits bitor  ] }
         } case
     ] curry change-fpscr ; inline
+
+CONSTANT: vmx-denormal-mode-bits HEX: 10000
+
+M: ppc-vmx-env (get-exception-flags) ( register -- exceptions )
+    drop { } ; inline
+M: ppc-vmx-env (set-exception-flags) ( register exceptions -- register' )
+    drop ;
+
+M: ppc-vmx-env (get-fp-traps) ( register -- exceptions )
+    drop { } ; inline
+M: ppc-vmx-env (set-fp-traps) ( register exceptions -- register' )
+    drop ;
+
+M: ppc-vmx-env (get-rounding-mode) ( register -- mode )
+    drop +round-nearest+ ;
+M: ppc-vmx-env (set-rounding-mode) ( register mode -- register' )
+    drop ;
+
+M: ppc-vmx-env (get-denormal-mode) ( register -- mode )
+    vscr>> vmx-denormal-mode-bits mask zero? +denormal-keep+ +denormal-flush+ ? ; inline
+M: ppc-vmx-env (set-denormal-mode) ( register mode -- register )
+    [
+        {
+            { +denormal-keep+  [ vmx-denormal-mode-bits unmask ] }
+            { +denormal-flush+ [ vmx-denormal-mode-bits bitor  ] }
+        } case
+    ] curry change-vscr ; inline
 

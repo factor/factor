@@ -88,3 +88,15 @@ IN: compiler.tests.float
 [ 17.5 ] [ 17.5 -11.3 [ float-max ] compile-call ] unit-test
 [ -11.3 ] [ -11.3 17.5 [ float-min ] compile-call ] unit-test
 [ -11.3 ] [ 17.5 -11.3 [ float-min ] compile-call ] unit-test
+
+[ t ] [ 0/0. 0/0. [ float-unordered? ] compile-call ] unit-test
+[ t ] [ 0/0. 1.0 [ float-unordered? ] compile-call ] unit-test
+[ t ] [ 1.0 0/0. [ float-unordered? ] compile-call ] unit-test
+[ f ] [ 3.0 1.0 [ float-unordered? ] compile-call ] unit-test
+[ f ] [ 1.0 3.0 [ float-unordered? ] compile-call ] unit-test
+
+[ 1 ] [ 0/0. 0/0. [ float-unordered? [ 1 ] [ 2 ] if ] compile-call ] unit-test
+[ 1 ] [ 0/0. 1.0 [ float-unordered? [ 1 ] [ 2 ] if ] compile-call ] unit-test
+[ 1 ] [ 1.0 0/0. [ float-unordered? [ 1 ] [ 2 ] if ] compile-call ] unit-test
+[ 2 ] [ 3.0 1.0 [ float-unordered? [ 1 ] [ 2 ] if ] compile-call ] unit-test
+[ 2 ] [ 1.0 3.0 [ float-unordered? [ 1 ] [ 2 ] if ] compile-call ] unit-test

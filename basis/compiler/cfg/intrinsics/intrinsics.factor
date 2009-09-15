@@ -86,13 +86,18 @@ IN: compiler.cfg.intrinsics
         { math.private:float- [ drop [ ^^sub-float ] emit-float-op ] }
         { math.private:float* [ drop [ ^^mul-float ] emit-float-op ] }
         { math.private:float/f [ drop [ ^^div-float ] emit-float-op ] }
-        { math.private:float< [ drop cc< emit-float-comparison ] }
-        { math.private:float<= [ drop cc<= emit-float-comparison ] }
-        { math.private:float>= [ drop cc>= emit-float-comparison ] }
-        { math.private:float> [ drop cc> emit-float-comparison ] }
-        { math.private:float= [ drop cc= emit-float-comparison ] }
+        { math.private:float< [ drop cc< emit-float-ordered-comparison ] }
+        { math.private:float<= [ drop cc<= emit-float-ordered-comparison ] }
+        { math.private:float>= [ drop cc>= emit-float-ordered-comparison ] }
+        { math.private:float> [ drop cc> emit-float-ordered-comparison ] }
+        { math.private:float-u< [ drop cc< emit-float-unordered-comparison ] }
+        { math.private:float-u<= [ drop cc<= emit-float-unordered-comparison ] }
+        { math.private:float-u>= [ drop cc>= emit-float-unordered-comparison ] }
+        { math.private:float-u> [ drop cc> emit-float-unordered-comparison ] }
+        { math.private:float= [ drop cc= emit-float-unordered-comparison ] }
         { math.private:float>fixnum [ drop emit-float>fixnum ] }
         { math.private:fixnum>float [ drop emit-fixnum>float ] }
+        { math.floats.private:float-unordered? [ drop cc/<>= emit-float-unordered-comparison ] }
         { alien.accessors:alien-float [ float-rep emit-alien-float-getter ] }
         { alien.accessors:set-alien-float [ float-rep emit-alien-float-setter ] }
         { alien.accessors:alien-double [ double-rep emit-alien-float-getter ] }
@@ -124,6 +129,7 @@ IN: compiler.cfg.intrinsics
         { math.libm:ftanh [ drop "tanh" emit-unary-float-function ] }
         { math.libm:fexp [ drop "exp" emit-unary-float-function ] }
         { math.libm:flog [ drop "log" emit-unary-float-function ] }
+        { math.libm:flog10 [ drop "log10" emit-unary-float-function ] }
         { math.libm:fpow [ drop "pow" emit-binary-float-function ] }
         { math.libm:facosh [ drop "acosh" emit-unary-float-function ] }
         { math.libm:fasinh [ drop "asinh" emit-unary-float-function ] }

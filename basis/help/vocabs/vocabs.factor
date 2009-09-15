@@ -227,6 +227,18 @@ C: <vocab-author> vocab-author
         ] bi
     ] unless-empty ;
 
+: vocab-is-not-loaded ( vocab -- )
+    "Not loaded" $heading
+    "You must first load this vocabulary to browse its documentation and words."
+    print-element vocab-name "USE: " prepend 1array $code ;
+
+: describe-words ( vocab -- )
+    {
+        { [ dup vocab ] [ words $words ] }
+        { [ dup find-vocab-root ] [ vocab-is-not-loaded ] }
+        [ drop ]
+    } cond ;
+
 : words. ( vocab -- )
     last-element off
     [ require ] [ words $words ] bi nl ;
@@ -243,7 +255,7 @@ C: <vocab-author> vocab-author
     first {
         [ describe-help ]
         [ describe-metadata ]
-        [ words $words ]
+        [ describe-words ]
         [ describe-files ]
         [ describe-children ]
     } cleave ;

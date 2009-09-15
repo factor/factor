@@ -54,11 +54,7 @@ FUNCTION: void CFRunLoopRemoveTimer (
     CFStringRef mode
 ) ;
 
-: CFRunLoopDefaultMode ( -- alien )
-    #! Ugly, but we don't have static NSStrings
-    \ CFRunLoopDefaultMode [
-        "kCFRunLoopDefaultMode" <CFString>
-    ] initialize-alien ;
+CFSTRING: CFRunLoopDefaultMode "kCFRunLoopDefaultMode"
 
 TUPLE: run-loop fds sources timers ;
 
