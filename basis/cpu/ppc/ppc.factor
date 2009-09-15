@@ -770,5 +770,5 @@ USE: vocabs.loader
         4 >>align
         "box_boolean" >>boxer
         "to_boolean" >>unboxer
-    "bool" define-primitive-type
+    bool define-primitive-type
 ] with-compilation-unit
