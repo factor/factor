@@ -81,7 +81,10 @@ IN: compiler.tree.propagation.known-words
     class>> dup null-class? [ drop null ] [ math-closure ] if ;
 
 : unary-op-interval ( info quot -- newinterval )
-    [ interval>> ] dip call ; inline
+    [
+        dup class>> real classes-intersect?
+        [ interval>> ] [ drop full-interval ] if
+    ] dip call ; inline
 
 : unary-op ( word interval-quot post-proc-quot -- )
     '[
