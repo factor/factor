@@ -89,21 +89,21 @@ DEF(void,primitive_inline_cache_miss_tail,(void)):
 	jmp *%rax
 
 DEF(void,get_sse_env,(void*)):
-    stmxcsr (%rdi)
-    ret
+	stmxcsr (%rdi)
+	ret
 
 DEF(void,set_sse_env,(const void*)):
-    ldmxcsr (%rdi)
-    ret
+	ldmxcsr (%rdi)
+	ret
 
 DEF(void,get_x87_env,(void*)):
-    fnstsw (%rdi)
-    fnstcw 2(%rdi)
-    ret
+	fnstsw (%rdi)
+	fnstcw 2(%rdi)
+	ret
 
 DEF(void,set_x87_env,(const void*)):
-    fnclex
-    fldcw 2(%rdi)
-    ret
+	fnclex
+	fldcw 2(%rdi)
+	ret
 
 #include "cpu-x86.S"

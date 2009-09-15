@@ -23,4 +23,9 @@ void c_to_factor_toplevel(cell quot);
 FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe);
 void open_console();
 
+// SSE traps raise these exception codes, which are defined in internal NT headers
+// but not winbase.h
+#define STATUS_FLOAT_MULTIPLE_FAULTS 0xC00002B4
+#define STATUS_FLOAT_MULTIPLE_TRAPS  0xC00002B5
+
 }
