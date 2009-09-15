@@ -100,12 +100,12 @@ SPECIALIZED-ARRAY: test-struct
 ] unit-test
 
 ! Regression
-STRUCT: fixed-string { text char[100] } ;
+STRUCT: fixed-string { text char[64] } ;
 
 SPECIALIZED-ARRAY: fixed-string
 
-[ { ALIEN: 123 ALIEN: 223 ALIEN: 323 ALIEN: 423 } ] [
-    ALIEN: 123 4 <direct-fixed-string-array> [ (underlying)>> ] { } map-as
+[ { ALIEN: 100 ALIEN: 140 ALIEN: 180 ALIEN: 1c0 } ] [
+    ALIEN: 100 4 <direct-fixed-string-array> [ (underlying)>> ] { } map-as
 ] unit-test
 
 ! Ensure that byte-length works with direct arrays

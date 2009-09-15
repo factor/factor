@@ -20,7 +20,7 @@ enum vm_error_type
 	ERROR_RS_UNDERFLOW,
 	ERROR_RS_OVERFLOW,
 	ERROR_MEMORY,
-    ERROR_FP_TRAP,
+	ERROR_FP_TRAP,
 };
 
 void out_of_memory();
@@ -36,7 +36,7 @@ void memory_protection_error(cell addr, stack_frame *native_stack);
 void signal_error(int signal, stack_frame *native_stack);
 void type_error(cell type, cell tagged);
 void not_implemented_error();
-void fp_trap_error();
+void fp_trap_error(unsigned int fpu_status, stack_frame *signal_callstack_top);
 
 PRIMITIVE(call_clear);
 PRIMITIVE(unimplemented);
@@ -45,6 +45,7 @@ PRIMITIVE(unimplemented);
 user-space */
 extern cell signal_number;
 extern cell signal_fault_addr;
+extern unsigned int signal_fpu_status;
 extern stack_frame *signal_callstack_top;
 
 void memory_signal_handler_impl();
