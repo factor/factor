@@ -5,8 +5,18 @@ namespaces make parser sequences strings words splitting math.parser
 cpu.architecture alien alien.accessors alien.strings quotations
 layouts system compiler.units io io.files io.encodings.binary
 io.streams.memory accessors combinators effects continuations fry
-classes vocabs vocabs.loader vocabs.parser ;
+classes vocabs vocabs.loader vocabs.parser words.symbol ;
+QUALIFIED: math
 IN: alien.c-types
+
+SYMBOLS:
+    char uchar
+    short ushort
+    int uint
+    long ulong
+    longlong ulonglong
+    float double
+    void* bool ;
 
 DEFER: <int>
 DEFER: *char
@@ -78,7 +88,7 @@ M: string resolve-pointer-type
     {
         { [ CHAR: ] over member?    ] [ parse-array-type ] }
         { [ dup search c-type-word? ] [ parse-c-type-name resolve-typedef ] }
-        { [ dup c-types get at      ] [ dup c-types get at resolve-typedef ] }
+        { [ dup c-types get at      ] [ c-types get at resolve-typedef ] }
         { [ "*" ?tail               ] [ parse-c-type-name resolve-pointer-type ] }
         [ no-c-type ]
     } cond ;
@@ -294,8 +304,9 @@ PREDICATE: typedef-word < c-type-word
 
 M: string typedef ( old new -- ) c-types get set-at ;
 M: word typedef ( old new -- )
+    [ nip define-symbol ]
     [ name>> typedef ]
-    [ swap "c-type" set-word-prop ] 2bi ;
+    [ swap "c-type" set-word-prop ] 2tri ;
 
 TUPLE: long-long-type < c-type ;
 
@@ -338,15 +349,6 @@ M: long-long-type box-return ( type -- )
 
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
-
-SYMBOLS:
-    char uchar
-    short ushort
-    int uint
-    long ulong
-    longlong ulonglong
-    float double
-    void* bool ;
 
 CONSTANT: primitive-types
     {
@@ -496,8 +498,8 @@ SYMBOLS:
     \ bool define-primitive-type
 
     <c-type>
-        float >>class
-        float >>boxed-class
+        math:float >>class
+        math:float >>boxed-class
         [ alien-float ] >>getter
         [ [ >float ] 2dip set-alien-float ] >>setter
         4 >>size
@@ -509,8 +511,8 @@ SYMBOLS:
     \ float define-primitive-type
 
     <c-type>
-        float >>class
-        float >>boxed-class
+        math:float >>class
+        math:float >>boxed-class
         [ alien-double ] >>getter
         [ [ >float ] 2dip set-alien-double ] >>setter
         8 >>size
