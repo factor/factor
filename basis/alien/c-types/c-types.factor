@@ -5,7 +5,7 @@ namespaces make parser sequences strings words splitting math.parser
 cpu.architecture alien alien.accessors alien.strings quotations
 layouts system compiler.units io io.files io.encodings.binary
 io.streams.memory accessors combinators effects continuations fry
-classes vocabs vocabs.loader ;
+classes vocabs vocabs.loader vocabs.parser ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -40,6 +40,11 @@ global [
 
 ERROR: no-c-type name ;
 
+PREDICATE: c-type-word < word
+    "c-type" word-prop ;
+
+UNION: c-type-name string c-type-word ;
+
 : (c-type) ( name -- type/f )
     c-types get-global at dup [
         dup string? [ (c-type) ] when
@@ -48,35 +53,48 @@ ERROR: no-c-type name ;
 ! C type protocol
 GENERIC: c-type ( name -- type ) foldable
 
-: resolve-pointer-type ( name -- name )
+: parse-c-type-name ( name -- word/string )
+    [ search ] keep or ;
+
+GENERIC: resolve-pointer-type ( name -- c-type )
+
+M: word resolve-pointer-type
+    dup "pointer-c-type" word-prop
+    [ ] [ drop void* ] ?if c-type ;
+M: string resolve-pointer-type
     c-types get at dup string?
-    [ "*" append ] [ drop "void*" ] if
+    [ "*" append ] [ drop void* ] if
     c-type ;
 
 : resolve-typedef ( name -- type )
-    dup string? [ c-type ] when ;
+    dup c-type-name? [ c-type ] when ;
 
 : parse-array-type ( name -- array )
     "[" split unclip
-    [ [ "]" ?tail drop string>number ] map ] dip prefix ;
+    [ [ "]" ?tail drop string>number ] map ] dip
+    parse-c-type-name prefix ;
+
+: parse-c-type ( string -- array )
+    {
+        { [ CHAR: ] over member?    ] [ parse-array-type ] }
+        { [ dup search c-type-word? ] [ parse-c-type-name resolve-typedef ] }
+        { [ dup c-types get at      ] [ dup c-types get at resolve-typedef ] }
+        { [ "*" ?tail               ] [ parse-c-type-name resolve-pointer-type ] }
+        [ no-c-type ]
+    } cond ;
 
 M: string c-type ( name -- type )
-    CHAR: ] over member? [
-        parse-array-type
-    ] [
-        dup c-types get at [
-            resolve-typedef
-        ] [
-            "*" ?tail [ resolve-pointer-type ] [ no-c-type ] if
-        ] ?if
-    ] if ;
+    parse-c-type ;
+
+M: word c-type
+    "c-type" word-prop resolve-typedef ;
 
 ! These words being foldable means that words need to be
 ! recompiled if a C type is redefined. Even so, folding the
 ! size facilitates some optimizations.
 GENERIC: heap-size ( type -- size ) foldable
 
-M: string heap-size c-type heap-size ;
+M: c-type-name heap-size c-type heap-size ;
 
 M: abstract-c-type heap-size size>> ;
 
@@ -92,7 +110,7 @@ GENERIC: c-direct-array-constructor ( c-type -- word )
 
 GENERIC: <c-array> ( len c-type -- array )
 
-M: string <c-array>
+M: c-type-name <c-array>
     c-array-constructor execute( len -- array ) ; inline
 
 GENERIC: (c-array) ( len c-type -- array )
@@ -102,7 +120,7 @@ M: string (c-array)
 
 GENERIC: <c-direct-array> ( alien len c-type -- array )
 
-M: string <c-direct-array>
+M: c-type-name <c-direct-array>
     c-direct-array-constructor execute( alien len -- array ) ; inline
 
 : malloc-array ( n type -- alien )
@@ -115,67 +133,67 @@ GENERIC: c-type-class ( name -- class )
 
 M: abstract-c-type c-type-class class>> ;
 
-M: string c-type-class c-type c-type-class ;
+M: c-type-name c-type-class c-type c-type-class ;
 
 GENERIC: c-type-boxed-class ( name -- class )
 
 M: abstract-c-type c-type-boxed-class boxed-class>> ;
 
-M: string c-type-boxed-class c-type c-type-boxed-class ;
+M: c-type-name c-type-boxed-class c-type c-type-boxed-class ;
 
 GENERIC: c-type-boxer ( name -- boxer )
 
 M: c-type c-type-boxer boxer>> ;
 
-M: string c-type-boxer c-type c-type-boxer ;
+M: c-type-name c-type-boxer c-type c-type-boxer ;
 
 GENERIC: c-type-boxer-quot ( name -- quot )
 
 M: abstract-c-type c-type-boxer-quot boxer-quot>> ;
 
-M: string c-type-boxer-quot c-type c-type-boxer-quot ;
+M: c-type-name c-type-boxer-quot c-type c-type-boxer-quot ;
 
 GENERIC: c-type-unboxer ( name -- boxer )
 
 M: c-type c-type-unboxer unboxer>> ;
 
-M: string c-type-unboxer c-type c-type-unboxer ;
+M: c-type-name c-type-unboxer c-type c-type-unboxer ;
 
 GENERIC: c-type-unboxer-quot ( name -- quot )
 
 M: abstract-c-type c-type-unboxer-quot unboxer-quot>> ;
 
-M: string c-type-unboxer-quot c-type c-type-unboxer-quot ;
+M: c-type-name c-type-unboxer-quot c-type c-type-unboxer-quot ;
 
 GENERIC: c-type-rep ( name -- rep )
 
 M: c-type c-type-rep rep>> ;
 
-M: string c-type-rep c-type c-type-rep ;
+M: c-type-name c-type-rep c-type c-type-rep ;
 
 GENERIC: c-type-getter ( name -- quot )
 
 M: c-type c-type-getter getter>> ;
 
-M: string c-type-getter c-type c-type-getter ;
+M: c-type-name c-type-getter c-type c-type-getter ;
 
 GENERIC: c-type-setter ( name -- quot )
 
 M: c-type c-type-setter setter>> ;
 
-M: string c-type-setter c-type c-type-setter ;
+M: c-type-name c-type-setter c-type c-type-setter ;
 
 GENERIC: c-type-align ( name -- n )
 
 M: abstract-c-type c-type-align align>> ;
 
-M: string c-type-align c-type c-type-align ;
+M: c-type-name c-type-align c-type c-type-align ;
 
 GENERIC: c-type-stack-align? ( name -- ? )
 
 M: c-type c-type-stack-align? stack-align?>> ;
 
-M: string c-type-stack-align? c-type c-type-stack-align? ;
+M: c-type-name c-type-stack-align? c-type c-type-stack-align? ;
 
 : c-type-box ( n type -- )
     [ c-type-rep ] [ c-type-boxer [ "No boxer" throw ] unless* ] bi
@@ -189,29 +207,29 @@ GENERIC: box-parameter ( n ctype -- )
 
 M: c-type box-parameter c-type-box ;
 
-M: string box-parameter c-type box-parameter ;
+M: c-type-name box-parameter c-type box-parameter ;
 
 GENERIC: box-return ( ctype -- )
 
 M: c-type box-return f swap c-type-box ;
 
-M: string box-return c-type box-return ;
+M: c-type-name box-return c-type box-return ;
 
 GENERIC: unbox-parameter ( n ctype -- )
 
 M: c-type unbox-parameter c-type-unbox ;
 
-M: string unbox-parameter c-type unbox-parameter ;
+M: c-type-name unbox-parameter c-type unbox-parameter ;
 
 GENERIC: unbox-return ( ctype -- )
 
 M: c-type unbox-return f swap c-type-unbox ;
 
-M: string unbox-return c-type unbox-return ;
+M: c-type-name unbox-return c-type unbox-return ;
 
 GENERIC: stack-size ( type -- size ) foldable
 
-M: string stack-size c-type stack-size ;
+M: c-type-name stack-size c-type stack-size ;
 
 M: c-type stack-size size>> cell align ;
 
@@ -269,7 +287,15 @@ M: memory-stream stream-read
         \ swap , [ heap-size , [ * >fixnum ] % ] [ % ] bi*
     ] [ ] make ;
 
-: typedef ( old new -- ) c-types get set-at ;
+GENERIC: typedef ( old new -- )
+
+PREDICATE: typedef-word < c-type-word
+    "c-type" word-prop c-type-name? ;
+
+M: string typedef ( old new -- ) c-types get set-at ;
+M: word typedef ( old new -- )
+    [ name>> typedef ]
+    [ swap "c-type" set-word-prop ] 2bi ;
 
 TUPLE: long-long-type < c-type ;
 
@@ -303,8 +329,8 @@ M: long-long-type box-return ( type -- )
 
 : define-primitive-type ( type name -- )
     [ typedef ]
-    [ define-deref ]
-    [ define-out ]
+    [ name>> define-deref ]
+    [ name>> define-out ]
     tri ;
 
 : malloc-file-contents ( path -- alien len )
@@ -313,16 +339,29 @@ M: long-long-type box-return ( type -- )
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
 
+SYMBOLS:
+    char uchar
+    short ushort
+    int uint
+    long ulong
+    longlong ulonglong
+    float double
+    void* bool ;
+
 CONSTANT: primitive-types
     {
-        "char" "uchar"
-        "short" "ushort"
-        "int" "uint"
-        "long" "ulong"
-        "longlong" "ulonglong"
-        "float" "double"
-        "void*" "bool"
+        char uchar
+        short ushort
+        int uint
+        long ulong
+        longlong ulonglong
+        float double
+        void* bool
     }
+
+SYMBOLS:
+    ptrdiff_t intptr_t size_t
+    char* uchar* ;
 
 [
     <c-type>
@@ -335,7 +374,7 @@ CONSTANT: primitive-types
         [ >c-ptr ] >>unboxer-quot
         "box_alien" >>boxer
         "alien_offset" >>unboxer
-    "void*" define-primitive-type
+    \ void* define-primitive-type
 
     <long-long-type>
         integer >>class
@@ -346,7 +385,7 @@ CONSTANT: primitive-types
         8 >>align
         "box_signed_8" >>boxer
         "to_signed_8" >>unboxer
-    "longlong" define-primitive-type
+    \ longlong define-primitive-type
 
     <long-long-type>
         integer >>class
@@ -357,7 +396,7 @@ CONSTANT: primitive-types
         8 >>align
         "box_unsigned_8" >>boxer
         "to_unsigned_8" >>unboxer
-    "ulonglong" define-primitive-type
+    \ ulonglong define-primitive-type
 
     <c-type>
         integer >>class
@@ -368,7 +407,7 @@ CONSTANT: primitive-types
         bootstrap-cell >>align
         "box_signed_cell" >>boxer
         "to_fixnum" >>unboxer
-    "long" define-primitive-type
+    \ long define-primitive-type
 
     <c-type>
         integer >>class
@@ -379,7 +418,7 @@ CONSTANT: primitive-types
         bootstrap-cell >>align
         "box_unsigned_cell" >>boxer
         "to_cell" >>unboxer
-    "ulong" define-primitive-type
+    \ ulong define-primitive-type
 
     <c-type>
         integer >>class
@@ -390,7 +429,7 @@ CONSTANT: primitive-types
         4 >>align
         "box_signed_4" >>boxer
         "to_fixnum" >>unboxer
-    "int" define-primitive-type
+    \ int define-primitive-type
 
     <c-type>
         integer >>class
@@ -401,7 +440,7 @@ CONSTANT: primitive-types
         4 >>align
         "box_unsigned_4" >>boxer
         "to_cell" >>unboxer
-    "uint" define-primitive-type
+    \ uint define-primitive-type
 
     <c-type>
         fixnum >>class
@@ -412,7 +451,7 @@ CONSTANT: primitive-types
         2 >>align
         "box_signed_2" >>boxer
         "to_fixnum" >>unboxer
-    "short" define-primitive-type
+    \ short define-primitive-type
 
     <c-type>
         fixnum >>class
@@ -423,7 +462,7 @@ CONSTANT: primitive-types
         2 >>align
         "box_unsigned_2" >>boxer
         "to_cell" >>unboxer
-    "ushort" define-primitive-type
+    \ ushort define-primitive-type
 
     <c-type>
         fixnum >>class
@@ -434,7 +473,7 @@ CONSTANT: primitive-types
         1 >>align
         "box_signed_1" >>boxer
         "to_fixnum" >>unboxer
-    "char" define-primitive-type
+    \ char define-primitive-type
 
     <c-type>
         fixnum >>class
@@ -445,7 +484,7 @@ CONSTANT: primitive-types
         1 >>align
         "box_unsigned_1" >>boxer
         "to_cell" >>unboxer
-    "uchar" define-primitive-type
+    \ uchar define-primitive-type
 
     <c-type>
         [ alien-unsigned-1 c-bool> ] >>getter
@@ -454,7 +493,7 @@ CONSTANT: primitive-types
         1 >>align
         "box_boolean" >>boxer
         "to_boolean" >>unboxer
-    "bool" define-primitive-type
+    \ bool define-primitive-type
 
     <c-type>
         float >>class
@@ -467,7 +506,7 @@ CONSTANT: primitive-types
         "to_float" >>unboxer
         float-rep >>rep
         [ >float ] >>unboxer-quot
-    "float" define-primitive-type
+    \ float define-primitive-type
 
     <c-type>
         float >>class
@@ -480,10 +519,10 @@ CONSTANT: primitive-types
         "to_double" >>unboxer
         double-rep >>rep
         [ >float ] >>unboxer-quot
-    "double" define-primitive-type
+    \ double define-primitive-type
 
-    "long" "ptrdiff_t" typedef
-    "long" "intptr_t" typedef
-    "ulong" "size_t" typedef
+    \ long \ ptrdiff_t typedef
+    \ long \ intptr_t typedef
+    \ ulong \ size_t typedef
 ] with-compilation-unit
 

@@ -19,17 +19,20 @@ SYNTAX: FUNCTION:
     (FUNCTION:) define-declared ;
 
 SYNTAX: TYPEDEF:
-    scan scan typedef ;
+    scan-c-type CREATE typedef ;
 
 SYNTAX: C-STRUCT:
-    scan current-vocab parse-definition define-struct ; deprecated
+    CREATE current-vocab parse-definition define-struct ; deprecated
 
 SYNTAX: C-UNION:
-    scan parse-definition define-union ; deprecated
+    CREATE parse-definition define-union ; deprecated
 
 SYNTAX: C-ENUM:
     ";" parse-tokens
     [ [ create-in ] dip define-constant ] each-index ;
+
+SYNTAX: C-TYPE:
+    "Primitive C type definition not supported" throw ;
 
 ERROR: no-such-symbol name library ;
 
