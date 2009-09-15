@@ -88,7 +88,7 @@ PRIVATE>
         "at the top of the source file:" print nl
     ] with-style
     {
-        { page-color COLOR: FactorLightLightTan }
+        { page-color COLOR: FactorLightTan }
         { border-color COLOR: FactorDarkTan }
         { inset { 5 5 } }
     } [ manifest get pprint-manifest ] with-nesting
