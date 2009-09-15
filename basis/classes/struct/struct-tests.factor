@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.structs.fields ascii
+USING: accessors alien alien.c-types ascii
 assocs byte-arrays classes.struct classes.tuple.private
 combinators compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
@@ -196,41 +196,46 @@ UNION-STRUCT: struct-test-float-and-bits
 [ [ struct-test-float-and-bits see ] with-string-writer ] unit-test
 
 [ {
-    T{ field-spec
+    T{ struct-slot-spec
         { name "x" }
         { offset 0 }
+        { class fixnum }
         { type "char" }
         { reader x>> }
         { writer (>>x) }
     }
-    T{ field-spec
+    T{ struct-slot-spec
         { name "y" }
         { offset 4 }
+        { class $[ cell 8 = fixnum integer ? ] }
         { type "int" }
         { reader y>> }
         { writer (>>y) }
     }
-    T{ field-spec
+    T{ struct-slot-spec
         { name "z" }
         { offset 8 }
         { type "bool" }
+        { class boolean }
         { reader z>> }
         { writer (>>z) }
     }
 } ] [ "struct-test-foo" c-type fields>> ] unit-test
 
 [ {
-    T{ field-spec
+    T{ struct-slot-spec
         { name "f" }
         { offset 0 }
         { type "float" }
+        { class float }
         { reader f>> }
         { writer (>>f) }
     }
-    T{ field-spec
+    T{ struct-slot-spec
         { name "bits" }
         { offset 0 }
         { type "uint" }
+        { class $[ cell 8 = fixnum integer ? ] }
         { reader bits>> }
         { writer (>>bits) }
     }
