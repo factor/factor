@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math namespaces make sequences system
-layouts alien alien.c-types alien.accessors alien.structs slots
+layouts alien alien.c-types alien.accessors slots
 splitting assocs combinators locals compiler.constants
 compiler.codegen compiler.codegen.fixup compiler.cfg.instructions
 compiler.cfg.builder compiler.cfg.intrinsics compiler.cfg.stack-frame

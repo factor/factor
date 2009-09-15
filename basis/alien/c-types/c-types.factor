@@ -71,6 +71,13 @@ M: string c-type ( name -- type )
         ] ?if
     ] if ;
 
+GENERIC: c-struct? ( type -- ? )
+
+M: object c-struct?
+    drop f ;
+M: string c-struct?
+    dup "void" = [ drop f ] [ c-type c-struct? ] if ;
+
 ! These words being foldable means that words need to be
 ! recompiled if a C type is redefined. Even so, folding the
 ! size facilitates some optimizations.
@@ -214,6 +221,17 @@ GENERIC: stack-size ( type -- size ) foldable
 M: string stack-size c-type stack-size ;
 
 M: c-type stack-size size>> cell align ;
+
+MIXIN: value-type
+
+M: value-type c-type-rep drop int-rep ;
+
+M: value-type c-type-getter
+    drop [ swap <displaced-alien> ] ;
+
+M: value-type c-type-setter ( type -- quot )
+    [ c-type-getter ] [ c-type-unboxer-quot ] [ heap-size ] tri
+    '[ @ swap @ _ memcpy ] ;
 
 GENERIC: byte-length ( seq -- n ) flushable
 
