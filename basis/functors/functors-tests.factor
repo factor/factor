@@ -179,35 +179,35 @@ STRUCT: T-class
             { offset 0 }
             { class integer }
             { initial 0 } 
-            { c-type "int" }
+            { type "int" }
         }
         T{ struct-slot-spec
             { name "x" }
             { offset 4 }
             { class object }
             { initial f } 
-            { c-type { "char" 4 } }
+            { type { "char" 4 } }
         }
         T{ struct-slot-spec
             { name "y" }
             { offset 8 }
             { class object }
             { initial f } 
-            { c-type { "short" 2 } }
+            { type { "short" 2 } }
         }
         T{ struct-slot-spec
             { name "z" }
             { offset 12 }
             { class fixnum }
             { initial 5 } 
-            { c-type "char" }
+            { type "char" }
         }
         T{ struct-slot-spec
             { name "float" }
             { offset 16 }
             { class object }
             { initial f } 
-            { c-type { "float" 2 } }
+            { type { "float" 2 } }
         }
     }
 ] [ a-struct struct-slots ] unit-test
