@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators hashtables kernel
 math fry namespaces make sequences words byte-arrays
-layouts alien.c-types alien.structs
+layouts alien.c-types
 stack-checker.inlining cpu.architecture
 compiler.tree
 compiler.tree.builder
