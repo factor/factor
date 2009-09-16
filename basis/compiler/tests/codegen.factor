@@ -4,6 +4,7 @@ namespaces.private slots.private sequences.private byte-arrays alien
 alien.accessors layouts words definitions compiler.units io
 combinators vectors grouping make alien.c-types combinators.short-circuit
 math.order math.libm math.parser ;
+FROM: math => float ;
 QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
 

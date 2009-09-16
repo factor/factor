@@ -34,7 +34,7 @@ stack-params \ (stack-value) c-type (>>rep) >>
 : flatten-small-struct ( c-type -- seq )
     struct-types&offset split-struct [
         [ c-type c-type-rep reg-class-of ] map
-        int-regs swap member? "void*" "double" ? c-type
+        int-regs swap member? void* double ? c-type
     ] map ;
 
 : flatten-large-struct ( c-type -- seq )
