@@ -79,11 +79,9 @@ M: string c-type ( name -- type )
     CHAR: ] over member? [
         parse-array-type prefix
     ] [
-        dup c-types get at [
-            resolve-typedef
-        ] [
+        dup c-types get at [ ] [
             "*" ?tail [ resolve-pointer-type ] [ no-c-type ] if
-        ] ?if
+        ] ?if resolve-typedef
     ] if ;
 
 M: word c-type
