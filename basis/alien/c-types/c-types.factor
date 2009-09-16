@@ -318,8 +318,8 @@ M: word typedef ( old new -- )
         [ name>> typedef ]
         [ swap "c-type" set-word-prop ]
         [
-            swap dup word? [
-                "pointer-c-type" word-prop
+            swap dup c-type-name? [
+                resolve-pointer-type
                 "pointer-c-type" set-word-prop
             ] [ 2drop ] if
         ]
