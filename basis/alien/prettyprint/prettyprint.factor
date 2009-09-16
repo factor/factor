@@ -17,15 +17,20 @@ M: dll pprint* dll-path dup "DLL\" " "\"" pprint-string ;
 
 M: c-type-word definer drop \ C-TYPE: f ;
 M: c-type-word definition drop f ;
+M: typedef-word declarations. drop ;
 
 GENERIC: pprint-c-type ( c-type -- )
 M: word pprint-c-type pprint-word ;
 M: string pprint-c-type text ;
 M: array pprint-c-type pprint* ;
 
-M: typedef-word see-class*
+M: typedef-word definer drop \ TYPEDEF: f ;
+
+M: typedef-word synopsis*
     <colon
     \ TYPEDEF: pprint-word
     dup "c-type" word-prop pprint-c-type
     pprint-word
     block> ;
+
+
