@@ -174,6 +174,8 @@ M: no-method error.
 
 M: bad-slot-value summary drop "Bad store to specialized slot" ;
 
+M: bad-slot-name summary drop "Bad slot name in object literal" ;
+
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
 
