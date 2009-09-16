@@ -94,7 +94,7 @@ GENERIC: c-struct? ( type -- ? )
 
 M: object c-struct?
     drop f ;
-M: string c-struct?
+M: c-type-name c-struct?
     dup void? [ drop f ] [ c-type c-struct? ] if ;
 
 ! These words being foldable means that words need to be
@@ -123,7 +123,7 @@ M: c-type-name <c-array>
 
 GENERIC: (c-array) ( len c-type -- array )
 
-M: string (c-array)
+M: c-type-name (c-array)
     c-(array)-constructor execute( len -- array ) ; inline
 
 GENERIC: <c-direct-array> ( alien len c-type -- array )
