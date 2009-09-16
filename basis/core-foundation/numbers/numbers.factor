@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax kernel math core-foundation ;
+FROM: math => float ;
 IN: core-foundation.numbers
 
 TYPEDEF: void* CFNumberRef

@@ -456,7 +456,7 @@ TUPLE: callback-context ;
 
 : callback-return-quot ( ctype -- quot )
     return>> {
-        { [ dup "void" = ] [ drop [ ] ] }
+        { [ dup void? ] [ drop [ ] ] }
         { [ dup large-struct? ] [ heap-size '[ _ memcpy ] ] }
         [ c-type c-type-unboxer-quot ]
     } cond ;
