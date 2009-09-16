@@ -126,7 +126,7 @@ M: struct-c-type c-type ;
 M: struct-c-type c-type-stack-align? drop f ;
 
 : if-value-struct ( ctype true false -- )
-    [ dup value-struct? ] 2dip '[ drop "void*" @ ] if ; inline
+    [ dup value-struct? ] 2dip '[ drop void* @ ] if ; inline
 
 M: struct-c-type unbox-parameter
     [ %unbox-large-struct ] [ unbox-parameter ] if-value-struct ;

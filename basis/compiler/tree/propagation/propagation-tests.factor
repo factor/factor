@@ -10,6 +10,7 @@ compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
 specialized-arrays system sorting math.libm
 math.intervals quotations effects alien ;
+FROM: math => float ;
 SPECIALIZED-ARRAY: double
 IN: compiler.tree.propagation.tests
 
