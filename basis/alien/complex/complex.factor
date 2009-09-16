@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.structs alien.complex.functor accessors
+USING: alien.c-types alien.complex.functor accessors
 sequences kernel ;
 IN: alien.complex
 

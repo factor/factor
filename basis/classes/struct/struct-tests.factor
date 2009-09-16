@@ -1,11 +1,11 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.structs.fields ascii
+USING: accessors alien alien.c-types ascii
 assocs byte-arrays classes.struct classes.tuple.private
 combinators compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
 literals math mirrors multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
-tools.test parser lexer eval ;
+tools.test parser lexer eval layouts ;
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: ushort
@@ -196,43 +196,43 @@ UNION-STRUCT: struct-test-float-and-bits
 [ [ struct-test-float-and-bits see ] with-string-writer ] unit-test
 
 [ {
-    T{ field-spec
+    T{ struct-slot-spec
         { name "x" }
         { offset 0 }
+        { initial 0 }
+        { class fixnum }
         { type "char" }
-        { reader x>> }
-        { writer (>>x) }
     }
-    T{ field-spec
+    T{ struct-slot-spec
         { name "y" }
         { offset 4 }
+        { initial 123 }
+        { class integer }
         { type "int" }
-        { reader y>> }
-        { writer (>>y) }
     }
-    T{ field-spec
+    T{ struct-slot-spec
         { name "z" }
         { offset 8 }
+        { initial f }
         { type "bool" }
-        { reader z>> }
-        { writer (>>z) }
+        { class object }
     }
 } ] [ "struct-test-foo" c-type fields>> ] unit-test
 
 [ {
-    T{ field-spec
+    T{ struct-slot-spec
         { name "f" }
         { offset 0 }
         { type "float" }
-        { reader f>> }
-        { writer (>>f) }
+        { class float }
+        { initial 0.0 }
     }
-    T{ field-spec
+    T{ struct-slot-spec
         { name "bits" }
         { offset 0 }
         { type "uint" }
-        { reader bits>> }
-        { writer (>>bits) }
+        { class integer }
+        { initial 0 }
     }
 } ] [ "struct-test-float-and-bits" c-type fields>> ] unit-test
 
