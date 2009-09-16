@@ -5,6 +5,7 @@ io.streams.string kernel math memory namespaces
 namespaces.private parser quotations sequences
 specialized-arrays stack-checker stack-checker.errors
 system threads tools.test words ;
+FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
 IN: compiler.tests.alien
