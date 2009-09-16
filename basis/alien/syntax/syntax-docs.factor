@@ -73,10 +73,12 @@ HELP: C-ENUM:
 { $syntax "C-ENUM: words... ;" }
 { $values { "words" "a sequence of word names" } }
 { $description "Creates a sequence of word definitions in the current vocabulary. Each word pushes an integer according to its index in the enumeration definition. The first word pushes 0." }
-{ $notes "This word emulates a C-style " { $snippet "enum" } " in Factor. While this feature can be used for any purpose, using integer constants is discouraged unless it is for interfacing with C libraries. Factor code should use symbolic constants instead." }
+{ $notes "This word emulates a C-style " { $snippet "enum" } " in Factor. While this feature can be used for any purpose, using integer constants is discouraged unless it is for interfacing with C libraries. Factor code should use " { $link "words.symbol" } " or " { $link "singletons" } " instead." }
 { $examples
-    "The following two lines are equivalent:"
-    { $code "C-ENUM: red green blue ;" ": red 0 ;  : green 1 ;  : blue 2 ;" }
+    "Here is an example enumeration definition:"
+    { $code "C-ENUM: red green blue ;" }
+    "It is equivalent to the following series of definitions:"
+    { $code "CONSTANT: red 0" "CONSTANT: green 1" "CONSTANT: blue 2" }
 } ;
 
 HELP: &:

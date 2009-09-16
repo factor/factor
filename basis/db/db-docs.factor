@@ -252,14 +252,14 @@ ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 "Here's an example usage where we'll make a book table, insert some objects, and query them." $nl
 "First, let's set up a custom combinator for using our database. See " { $link "db-custom-database-combinators" } " for more details."
 { $code <"
-USING: db.sqlite db io.files ;
+USING: db.sqlite db io.files io.files.temp ;
 : with-book-db ( quot -- )
     "book.db" temp-file <sqlite-db> swap with-db ; inline"> }
 "Now let's create the table manually:"
 { $code <" "create table books
     (id integer primary key, title text, author text, date_published timestamp,
      edition integer, cover_price double, condition text)"
-    [ sql-command ] with-book-db" "> }
+    [ sql-command ] with-book-db"> }
 "Time to insert some books:"
 { $code <"
 "insert into books

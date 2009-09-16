@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.strings alien.c-types alien.accessors alien.structs
+USING: alien alien.strings alien.c-types alien.accessors
 arrays words sequences math kernel namespaces fry libc cpu.architecture
 io.encodings.utf8 accessors ;
 IN: alien.arrays
 
-UNION: value-type array struct-type ;
+INSTANCE: array value-type
 
 M: array c-type ;
 
@@ -39,15 +39,6 @@ M: array c-type-boxer-quot
     [ <c-direct-array> ] 2curry ;
 
 M: array c-type-unboxer-quot drop [ >c-ptr ] ;
-
-M: value-type c-type-rep drop int-rep ;
-
-M: value-type c-type-getter
-    drop [ swap <displaced-alien> ] ;
-
-M: value-type c-type-setter ( type -- quot )
-    [ c-type-getter ] [ c-type-unboxer-quot ] [ heap-size ] tri
-    '[ @ swap @ _ memcpy ] ;
 
 PREDICATE: string-type < pair
     first2 [ "char*" = ] [ word? ] bi* and ;

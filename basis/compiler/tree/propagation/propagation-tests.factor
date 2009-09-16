@@ -186,6 +186,10 @@ IN: compiler.tree.propagation.tests
 
 [ t ] [ [ { complex } declare absq ] final-info first interval>> [0,inf] = ] unit-test
 
+[ t ] [ [ { float float } declare rect> C{ 0.0 0.0 } + absq ] final-info first interval>> [0,inf] = ] unit-test
+
+[ V{ float } ] [ [ { float float } declare rect> C{ 0.0 0.0 } + absq ] final-classes ] unit-test
+
 [ t ] [ [ [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
 
 [ t ] [ [ { double-array double-array } declare [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
