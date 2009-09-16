@@ -5,7 +5,7 @@ combinators compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
 literals math mirrors multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
-tools.test parser lexer eval ;
+tools.test parser lexer eval layouts ;
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: ushort
@@ -199,26 +199,23 @@ UNION-STRUCT: struct-test-float-and-bits
     T{ struct-slot-spec
         { name "x" }
         { offset 0 }
+        { initial 0 }
         { class fixnum }
         { type "char" }
-        { reader x>> }
-        { writer (>>x) }
     }
     T{ struct-slot-spec
         { name "y" }
         { offset 4 }
-        { class $[ cell 8 = fixnum integer ? ] }
+        { initial 123 }
+        { class integer }
         { type "int" }
-        { reader y>> }
-        { writer (>>y) }
     }
     T{ struct-slot-spec
         { name "z" }
         { offset 8 }
+        { initial f }
         { type "bool" }
-        { class boolean }
-        { reader z>> }
-        { writer (>>z) }
+        { class object }
     }
 } ] [ "struct-test-foo" c-type fields>> ] unit-test
 
@@ -228,16 +225,14 @@ UNION-STRUCT: struct-test-float-and-bits
         { offset 0 }
         { type "float" }
         { class float }
-        { reader f>> }
-        { writer (>>f) }
+        { initial 0.0 }
     }
     T{ struct-slot-spec
         { name "bits" }
         { offset 0 }
         { type "uint" }
-        { class $[ cell 8 = fixnum integer ? ] }
-        { reader bits>> }
-        { writer (>>bits) }
+        { class integer }
+        { initial 0 }
     }
 } ] [ "struct-test-float-and-bits" c-type fields>> ] unit-test
 
