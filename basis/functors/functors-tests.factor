@@ -1,5 +1,6 @@
 USING: classes.struct functors tools.test math words kernel
 multiline parser io.streams.string generic ;
+QUALIFIED-WITH: alien.c-types c
 IN: functors.tests
 
 <<
@@ -162,9 +163,9 @@ WHERE
 STRUCT: T-class
     { NAME int }
     { x { TYPE 4 } }
-    { y { "short" N } }
+    { y { short N } }
     { z TYPE initial: 5 }
-    { float { "float" 2 } } ;
+    { float { c:float 2 } } ;
 
 ;FUNCTOR
 
@@ -179,35 +180,35 @@ STRUCT: T-class
             { offset 0 }
             { class integer }
             { initial 0 } 
-            { c-type "int" }
+            { c-type int }
         }
         T{ struct-slot-spec
             { name "x" }
             { offset 4 }
             { class object }
             { initial f } 
-            { c-type { "char" 4 } }
+            { c-type { char 4 } }
         }
         T{ struct-slot-spec
             { name "y" }
             { offset 8 }
             { class object }
             { initial f } 
-            { c-type { "short" 2 } }
+            { c-type { short 2 } }
         }
         T{ struct-slot-spec
             { name "z" }
             { offset 12 }
             { class fixnum }
             { initial 5 } 
-            { c-type "char" }
+            { c-type char }
         }
         T{ struct-slot-spec
             { name "float" }
             { offset 16 }
             { class object }
             { initial f } 
-            { c-type { "float" 2 } }
+            { c-type { c:float 2 } }
         }
     }
 ] [ a-struct struct-slots ] unit-test

@@ -1,9 +1,22 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays assocs effects grouping kernel
-parser sequences splitting words fry locals lexer namespaces
-summary math ;
+USING: alien alien.c-types arrays assocs combinators effects
+grouping kernel parser sequences splitting words fry locals
+lexer namespaces summary math vocabs.parser ;
 IN: alien.parser
+
+: parse-c-type-name ( name -- word/string )
+    [ search ] keep or ;
+
+: parse-c-type ( string -- array )
+    {
+        { [ dup "void" =            ] [ drop void ] }
+        { [ CHAR: ] over member?    ] [ parse-array-type parse-c-type-name prefix ] }
+        { [ dup search c-type-word? ] [ parse-c-type-name ] }
+        { [ dup c-types get at      ] [ ] }
+        { [ "*" ?tail               ] [ parse-c-type-name resolve-pointer-type ] }
+        [ no-c-type ]
+    } cond ;
 
 : scan-c-type ( -- c-type )
     scan dup "{" =
