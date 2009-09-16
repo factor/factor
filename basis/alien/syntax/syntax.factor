@@ -19,7 +19,7 @@ SYNTAX: FUNCTION:
     (FUNCTION:) define-declared ;
 
 SYNTAX: TYPEDEF:
-    scan-c-type CREATE typedef ;
+    scan-c-type CREATE-C-TYPE typedef ;
 
 SYNTAX: C-STRUCT:
     scan current-vocab parse-definition define-struct ; deprecated
