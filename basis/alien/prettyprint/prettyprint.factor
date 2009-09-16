@@ -36,9 +36,11 @@ M: typedef-word synopsis*
     [ pprint-c-type ] [ text ] bi* ;
 
 : pprint-function-args ( word -- )
-    [ def>> fourth ] [ stack-effect in>> ] bi zip unclip-last
-    [ [ first2 "," append pprint-function-arg ] each ] dip
-    first2 pprint-function-arg ;
+    [ def>> fourth ] [ stack-effect in>> ] bi zip [ ] [
+        unclip-last
+        [ [ first2 "," append pprint-function-arg ] each ] dip
+        first2 pprint-function-arg
+    ] if-empty ;
 
 M: alien-function-word definer
     drop \ FUNCTION: \ ; ;
