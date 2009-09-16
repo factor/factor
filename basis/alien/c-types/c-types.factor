@@ -65,8 +65,8 @@ M: word resolve-pointer-type
     dup "pointer-c-type" word-prop
     [ ] [ drop void* ] ?if ;
 M: string resolve-pointer-type
-    c-types get at dup string?
-    [ "*" append ] [ drop void* ] if ;
+    c-types get at dup c-type-name?
+    [ resolve-pointer-type ] [ drop void* ] if ;
 
 : resolve-typedef ( name -- type )
     dup c-type-name? [ c-type ] when ;
@@ -313,9 +313,17 @@ PREDICATE: typedef-word < c-type-word
 
 M: string typedef ( old new -- ) c-types get set-at ;
 M: word typedef ( old new -- )
-    [ nip define-symbol ]
-    [ name>> typedef ]
-    [ swap "c-type" set-word-prop ] 2tri ;
+    {
+        [ nip define-symbol ]
+        [ name>> typedef ]
+        [ swap "c-type" set-word-prop ]
+        [
+            swap dup word? [
+                "pointer-c-type" word-prop
+                "pointer-c-type" set-word-prop
+            ] [ 2drop ] if
+        ]
+    } 2cleave ;
 
 TUPLE: long-long-type < c-type ;
 
