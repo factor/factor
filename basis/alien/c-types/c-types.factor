@@ -5,7 +5,7 @@ namespaces make parser sequences strings words splitting math.parser
 cpu.architecture alien alien.accessors alien.strings quotations
 layouts system compiler.units io io.files io.encodings.binary
 io.streams.memory accessors combinators effects continuations fry
-classes vocabs vocabs.loader vocabs.parser words.symbol ;
+classes vocabs vocabs.loader words.symbol ;
 QUALIFIED: math
 IN: alien.c-types
 
@@ -16,7 +16,8 @@ SYMBOLS:
     long ulong
     longlong ulonglong
     float double
-    void* bool ;
+    void* bool
+    void ;
 
 DEFER: <int>
 DEFER: *char
@@ -55,56 +56,48 @@ PREDICATE: c-type-word < word
 
 UNION: c-type-name string c-type-word ;
 
-: (c-type) ( name -- type/f )
-    c-types get-global at dup [
-        dup string? [ (c-type) ] when
-    ] when ;
-
 ! C type protocol
 GENERIC: c-type ( name -- type ) foldable
-
-: parse-c-type-name ( name -- word/string )
-    [ search ] keep or ;
 
 GENERIC: resolve-pointer-type ( name -- c-type )
 
 M: word resolve-pointer-type
     dup "pointer-c-type" word-prop
-    [ ] [ drop void* ] ?if c-type ;
+    [ ] [ drop void* ] ?if ;
 M: string resolve-pointer-type
     c-types get at dup string?
-    [ "*" append ] [ drop void* ] if
-    c-type ;
+    [ "*" append ] [ drop void* ] if ;
 
 : resolve-typedef ( name -- type )
     dup c-type-name? [ c-type ] when ;
 
-: parse-array-type ( name -- array )
+: parse-array-type ( name -- dims type )
     "[" split unclip
-    [ [ "]" ?tail drop string>number ] map ] dip
-    parse-c-type-name prefix ;
-
-: parse-c-type ( string -- array )
-    {
-        { [ CHAR: ] over member?    ] [ parse-array-type ] }
-        { [ dup search c-type-word? ] [ parse-c-type-name resolve-typedef ] }
-        { [ dup c-types get at      ] [ c-types get at resolve-typedef ] }
-        { [ "*" ?tail               ] [ parse-c-type-name resolve-pointer-type ] }
-        [ no-c-type ]
-    } cond ;
+    [ [ "]" ?tail drop string>number ] map ] dip ;
 
 M: string c-type ( name -- type )
-    parse-c-type ;
+    CHAR: ] over member? [
+        parse-array-type prefix
+    ] [
+        dup c-types get at [
+            resolve-typedef
+        ] [
+            "*" ?tail [ resolve-pointer-type ] [ no-c-type ] if
+        ] ?if
+    ] if ;
 
 M: word c-type
     "c-type" word-prop resolve-typedef ;
+
+: void? ( c-type -- ? )
+    { void "void" } member? ;
 
 GENERIC: c-struct? ( type -- ? )
 
 M: object c-struct?
     drop f ;
 M: string c-struct?
-    dup "void" = [ drop f ] [ c-type c-struct? ] if ;
+    dup void? [ drop f ] [ c-type c-struct? ] if ;
 
 ! These words being foldable means that words need to be
 ! recompiled if a C type is redefined. Even so, folding the
@@ -366,7 +359,7 @@ M: long-long-type box-return ( type -- )
     binary file-contents [ malloc-byte-array ] [ length ] bi ;
 
 : if-void ( type true false -- )
-    pick "void" = [ drop nip call ] [ nip call ] if ; inline
+    pick void? [ drop nip call ] [ nip call ] if ; inline
 
 CONSTANT: primitive-types
     {

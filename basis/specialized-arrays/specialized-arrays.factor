@@ -103,12 +103,20 @@ A T c-type-boxed-class f specialize-vector-words
 
 ;FUNCTOR
 
+GENERIC: (underlying-type) ( c-type -- c-type' )
+
+M: string (underlying-type) c-types get at ;
+M: word (underlying-type) "c-type" word-prop ;
+
 : underlying-type ( c-type -- c-type' )
-    dup c-types get at {
+    dup (underlying-type) {
         { [ dup not ] [ drop no-c-type ] }
-        { [ dup string? ] [ nip underlying-type ] }
+        { [ dup c-type-name? ] [ nip underlying-type ] }
         [ drop ]
     } cond ;
+
+: underlying-type-name ( c-type -- name )
+    underlying-type dup word? [ name>> ] when ;
 
 : specialized-array-vocab ( c-type -- vocab )
     "specialized-arrays.instances." prepend ;
@@ -125,26 +133,26 @@ PRIVATE>
     ] ?if ; inline
 
 : define-array-vocab ( type -- vocab )
-    underlying-type
+    underlying-type-name
     [ specialized-array-vocab ] [ '[ _ define-array ] ] bi
     generate-vocab ;
 
-M: string require-c-array define-array-vocab drop ;
+M: c-type-name require-c-array define-array-vocab drop ;
 
 ERROR: specialized-array-vocab-not-loaded c-type ;
 
-M: string c-array-constructor
-    underlying-type
+M: c-type-name c-array-constructor
+    underlying-type-name
     dup [ "<" "-array>" surround ] [ specialized-array-vocab ] bi lookup
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
-M: string c-(array)-constructor
-    underlying-type
+M: c-type-name c-(array)-constructor
+    underlying-type-name
     dup [ "(" "-array)" surround ] [ specialized-array-vocab ] bi lookup
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
-M: string c-direct-array-constructor
-    underlying-type
+M: c-type-name c-direct-array-constructor
+    underlying-type-name
     dup [ "<direct-" "-array>" surround ] [ specialized-array-vocab ] bi lookup
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 

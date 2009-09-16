@@ -22,10 +22,10 @@ SYNTAX: TYPEDEF:
     scan-c-type CREATE typedef ;
 
 SYNTAX: C-STRUCT:
-    CREATE current-vocab parse-definition define-struct ; deprecated
+    scan current-vocab parse-definition define-struct ; deprecated
 
 SYNTAX: C-UNION:
-    CREATE parse-definition define-union ; deprecated
+    scan parse-definition define-union ; deprecated
 
 SYNTAX: C-ENUM:
     ";" parse-tokens
