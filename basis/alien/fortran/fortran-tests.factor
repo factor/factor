@@ -1,6 +1,6 @@
 ! (c) 2009 Joe Groff, see BSD license
 USING: accessors alien alien.c-types alien.complex
-alien.fortran alien.fortran.private alien.strings alien.structs
+alien.fortran alien.fortran.private alien.strings classes.struct
 arrays assocs byte-arrays combinators fry
 generalizations io.encodings.ascii kernel macros
 macros.expander namespaces sequences shuffle tools.test ;
@@ -8,10 +8,10 @@ IN: alien.fortran.tests
 
 << intel-unix-abi "(alien.fortran-tests)" (add-fortran-library) >>
 LIBRARY: (alien.fortran-tests)
-RECORD: FORTRAN_TEST_RECORD
-    { "INTEGER"     "FOO" }
-    { "REAL(2)"     "BAR" }
-    { "CHARACTER*4" "BAS" } ;
+STRUCT: FORTRAN_TEST_RECORD
+    { FOO int }
+    { BAR double[2] }
+    { BAS char[4] } ;
 
 intel-unix-abi fortran-abi [
 
@@ -167,29 +167,6 @@ intel-unix-abi fortran-abi [
     [ "void" { "complex-float*" "char*" "char*" "int*" "long" } ]
     [ "complex" { "character*17" "character" "integer" } fortran-sig>c-sig ]
     unit-test
-
-    ! fortran-record>c-struct
-
-    [ {
-        { "double"   "ex"  }
-        { "float"    "wye" }
-        { "int"      "zee" }
-        { "char[20]" "woo" }
-    } ] [
-        {
-            { "DOUBLE-PRECISION" "EX"  }
-            { "REAL"             "WYE" }
-            { "INTEGER"          "ZEE" }
-            { "CHARACTER(20)"    "WOO" }
-        } fortran-record>c-struct
-    ] unit-test
-
-    ! RECORD:
-
-    [ 16 ] [ "fortran_test_record" heap-size ] unit-test
-    [  0 ] [ "foo" "fortran_test_record" offset-of ] unit-test
-    [  4 ] [ "bar" "fortran_test_record" offset-of ] unit-test
-    [ 12 ] [ "bas" "fortran_test_record" offset-of ] unit-test
 
     ! (fortran-invoke)
 

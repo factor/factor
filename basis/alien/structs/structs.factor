@@ -8,6 +8,8 @@ IN: alien.structs
 
 TUPLE: struct-type < abstract-c-type fields return-in-registers? ;
 
+INSTANCE: struct-type value-type
+
 M: struct-type c-type ;
 
 M: struct-type c-type-stack-align? drop f ;
@@ -33,7 +35,7 @@ M: struct-type box-return
 M: struct-type stack-size
     [ heap-size ] [ stack-size ] if-value-struct ;
 
-: c-struct? ( type -- ? ) (c-type) struct-type? ;
+M: struct-type c-struct? drop t ;
 
 : (define-struct) ( name size align fields class -- )
     [ [ align ] keep ] 2dip new
