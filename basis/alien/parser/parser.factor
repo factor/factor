@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays assocs combinators effects
-grouping kernel parser sequences splitting words fry locals
-lexer namespaces summary math vocabs.parser ;
+USING: accessors alien alien.c-types arrays assocs
+combinators effects grouping kernel parser sequences
+splitting words fry locals lexer namespaces summary
+math vocabs.parser ;
 IN: alien.parser
 
 : parse-c-type-name ( name -- word/string )
@@ -55,3 +56,6 @@ IN: alien.parser
 
 : define-function ( return library function parameters -- )
     make-function define-declared ;
+
+PREDICATE: alien-function-word < word
+    def>> [ length 5 = ] [ last \ alien-invoke eq? ] bi and ;
