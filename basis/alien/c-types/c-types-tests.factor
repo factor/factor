@@ -43,7 +43,7 @@ TYPEDEF: int* MyIntArray
 
 TYPEDEF: uchar* MyLPBYTE
 
-[ t ] [ { "char*" utf8 } c-type "MyLPBYTE" c-type = ] unit-test
+[ t ] [ { char* utf8 } c-type "MyLPBYTE" c-type = ] unit-test
 
 [
     0 B{ 1 2 3 4 } <displaced-alien> <void*>
