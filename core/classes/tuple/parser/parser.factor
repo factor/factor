@@ -99,9 +99,17 @@ GENERIC# boa>object 1 ( class slots -- tuple )
 M: tuple-class boa>object
     swap prefix >tuple ;
 
+ERROR: bad-slot-name class slot ;
+
+: check-slot-exists ( class initials slot-spec/f index/f name -- class initials slot-spec index )
+    over [ drop ] [ nip nip nip bad-slot-name ] if ;
+
+: slot-named-checked ( class initials name slots -- class initials slot-spec )
+    over [ slot-named* ] dip check-slot-exists drop ;
+
 : assoc>object ( class slots values -- tuple )
     [ [ [ initial>> ] map ] keep ] dip
-    swap [ [ slot-named* drop ] curry dip ] curry assoc-map
+    swap [ [ slot-named-checked ] curry dip ] curry assoc-map
     [ dup <enum> ] dip update boa>object ;
 
 : parse-tuple-literal-slots ( class slots -- tuple )
