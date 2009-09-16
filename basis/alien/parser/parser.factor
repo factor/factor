@@ -24,6 +24,12 @@ IN: alien.parser
     [ drop \ } parse-until >array ]
     [ parse-c-type ] if ; 
 
+: reset-c-type ( word -- )
+    { "c-type" "pointer-c-type" } reset-props ;
+
+: CREATE-C-TYPE ( -- word )
+    scan current-vocab create dup reset-c-type ;
+
 : normalize-c-arg ( type name -- type' name' )
     [ length ]
     [
