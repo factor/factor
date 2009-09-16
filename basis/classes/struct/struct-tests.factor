@@ -6,7 +6,7 @@ io.encodings.utf8 io.pathnames io.streams.string kernel libc
 literals math mirrors multiline namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
 tools.test parser lexer eval layouts ;
-FROM: math => float
+FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
@@ -48,9 +48,9 @@ STRUCT: struct-test-bar
 
 [ {
     { "underlying" B{ 98 0 0 98 127 0 0 127 0 0 0 0 } }
-    { { "x" "char" } 98            }
-    { { "y" "int"  } HEX: 7F00007F }
-    { { "z" "bool" } f             }
+    { { "x" char } 98            }
+    { { "y" int  } HEX: 7F00007F }
+    { { "z" bool } f             }
 } ] [
     B{ 98 0 0 98 127 0 0 127 0 0 0 0 } struct-test-foo memory>struct
     make-mirror >alist
