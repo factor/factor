@@ -48,6 +48,7 @@ ARTICLE: "power-functions" "Powers and logarithms"
 { $subsection exp }
 { $subsection cis }
 { $subsection log }
+"Other logarithms:"
 { $subsection log1+ }
 { $subsection log10 }
 "Raising a number to a power:"

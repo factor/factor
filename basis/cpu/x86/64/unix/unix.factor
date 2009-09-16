@@ -1,9 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays sequences math splitting make assocs kernel
-layouts system alien.c-types alien.structs cpu.architecture
+layouts system alien.c-types cpu.architecture
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86 compiler.codegen
 compiler.cfg.registers ;
+QUALIFIED: alien.structs
+QUALIFIED: classes.struct
 IN: cpu.x86.64.unix
 
 M: int-regs param-regs
@@ -38,12 +40,17 @@ stack-params "__stack_value" c-type (>>rep) >>
     heap-size cell align
     cell /i "__stack_value" c-type <repetition> ;
 
-M: struct-type flatten-value-type ( type -- seq )
+: flatten-struct ( c-type -- seq )
     dup heap-size 16 > [
         flatten-large-struct
     ] [
         flatten-small-struct
     ] if ;
+
+M: alien.structs:struct-type flatten-value-type ( type -- seq )
+    flatten-struct ;
+M: classes.struct:struct-c-type flatten-value-type ( type -- seq )
+    flatten-struct ;
 
 M: x86.64 return-struct-in-registers? ( c-type -- ? )
     heap-size 2 cells <= ;
