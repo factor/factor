@@ -1,12 +1,17 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types arrays assocs classes
 classes.struct combinators combinators.short-circuit continuations
-definitions fry kernel libc make math math.parser mirrors
-prettyprint.backend prettyprint.custom prettyprint.sections
-see see.private sequences slots strings summary words ;
+fry kernel libc make math math.parser mirrors prettyprint.backend
+prettyprint.custom prettyprint.sections see.private sequences
+slots strings summary words ;
 IN: classes.struct.prettyprint
 
 <PRIVATE
+
+: struct-definer-word ( class -- word )
+    struct-slots dup length 2 >=
+    [ second offset>> 0 = \ UNION-STRUCT: \ STRUCT: ? ]
+    [ drop \ STRUCT: ] if ;
 
 : struct>assoc ( struct -- assoc )
     [ class struct-slots ] [ struct-slot-values ] bi zip ;
@@ -15,7 +20,7 @@ IN: classes.struct.prettyprint
     <flow \ { pprint-word
     f <inset {
         [ name>> text ]
-        [ c-type>> dup string? [ text ] [ pprint* ] if ]
+        [ type>> dup string? [ text ] [ pprint* ] if ]
         [ read-only>> [ \ read-only pprint-word ] when ]
         [ initial>> [ \ initial: pprint-word pprint* ] when* ]
     } cleave block>
@@ -34,14 +39,8 @@ IN: classes.struct.prettyprint
 
 PRIVATE>
 
-M: struct-class definer
-    struct-slots dup length 2 >=
-    [ second offset>> 0 = \ UNION-STRUCT: \ STRUCT: ? ]
-    [ drop \ STRUCT: ] if
-    \ ; ;
-
 M: struct-class see-class*
-    <colon dup definer drop pprint-word dup pprint-word
+    <colon dup struct-definer-word pprint-word dup pprint-word
     <block struct-slots [ pprint-struct-slot ] each
     block> pprint-; block> ;
 
@@ -112,7 +111,7 @@ M: struct-mirror >alist ( mirror -- alist )
     ] [
         '[
             _ struct>assoc
-            [ [ [ name>> ] [ c-type>> ] bi 2array ] dip ] assoc-map
+            [ [ [ name>> ] [ type>> ] bi 2array ] dip ] assoc-map
         ] [ drop { } ] recover
     ] bi append ;
 
