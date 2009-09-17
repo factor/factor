@@ -41,6 +41,11 @@ SYMBOL: c-strings
     [ current-vocab name>> % "_" % % ] "" make ;
 PRIVATE>
 
+: parse-arglist ( parameters return -- types effect )
+    [ 2 group unzip [ "," ?tail drop ] map ]
+    [ [ { } ] [ 1array ] if-void ]
+    bi* <effect> ;
+
 : append-function-body ( prototype-str body -- str )
     [ swap % " {\n" % % "\n}\n" % ] "" make ;
 
