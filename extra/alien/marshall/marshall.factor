@@ -6,6 +6,7 @@ combinators combinators.short-circuit destructors fry
 io.encodings.utf8 kernel libc sequences
 specialized-arrays strings unix.utilities vocabs.parser
 words libc.private locals generalizations math ;
+FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: bool
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: double
