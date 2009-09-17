@@ -23,7 +23,7 @@ SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: void*
 IN: alien.marshall
 
-<< primitive-types [ [ "void*" = ] [ "bool" = ] bi or not ]
+<< primitive-types [ [ void* = ] [ bool = ] bi or not ]
 filter [ define-primitive-marshallers ] each >>
 
 TUPLE: alien-wrapper { underlying alien } ;
