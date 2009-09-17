@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax http.server.filters kernel
-multiline furnace.actions furnace.alloy ;
+multiline furnace.actions furnace.alloy furnace.conversations ;
 IN: furnace.recaptcha
 
 HELP: <recaptcha>
@@ -24,49 +24,19 @@ ARTICLE: "recaptcha-example" "Recaptcha example"
 "There are several steps to using the Recaptcha library."
 { $list
     { "Wrap the responder in a " { $link <recaptcha> } }
+    { "Wrap the responder in a " { $link <conversations> } " if it is not already" }
+    { "Ensure that there is a database connected, with the " { $link <alloy> } " word" }
+    { "Start a conversation to move values between requests" }
     { "Add a handler calling " { $link validate-recaptcha } " in the " { $slot "submit" } " of the " { $link page-action } }
-    { "Put the chloe tag " { $snippet "<recaptcha/>" } " in the template for your " { $link action } }
+    { "Pass the conversation from your submit action using " { $link <continue-conversation> } }
+    { "Put the chloe tag " { $snippet "<recaptcha/>" } " inside a form tag in the template for your " { $link page-action } }
 }
-"An example follows:"
+$nl
+"Run this example vocabulary:"
 { $code
-HEREDOC: RECAPTCHA-TUTORIAL
-USING: db.sqlite kernel http.server.dispatchers db.sqlite
-furnace.actions furnace.recaptcha furnace.conversations
-furnace.redirection xml.syntax html.templates.chloe.compiler
-io.streams.string http.server.responses furnace.alloy http.server ;
-TUPLE: recaptcha-app < dispatcher recaptcha ;
-
-: recaptcha-db ( -- obj )
-    "recaptcha-example" <sqlite-db> ;
-
-: <recaptcha-challenge> ( -- obj )
-    <action>
-        [
-            begin-conversation
-            validate-recaptcha
-            recaptcha-valid? cget "?good" "?bad" ? >url <continue-conversation>
-        ] >>submit
-        [
-            <XML <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
-            <html><body><form submit="" method="post"><t:recaptcha/></form></body></html>
-            </t:chloe> XML>
-            compile-template [ call( -- ) ] with-string-writer "text/html" <content>
-        ] >>display ;
-
-: <recaptcha-app> ( -- obj )
-    \ recaptcha-app new-dispatcher
-        <recaptcha-challenge> "" add-responder
-        <recaptcha>
-        "concatenative.org" >>domain
-        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
-        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key
-        recaptcha-db <alloy> ;
-
-<recaptcha-app> main-responder set-global
-RECAPTCHA-TUTORIAL
-}
-
-;
+    "USE: furnace.recaptcha.example"
+    "<recaptcha-app> main-responder set-global"
+} ;
 
 ARTICLE: "furnace.recaptcha" "Recaptcha"
 "The " { $vocab-link "furnace.chloe-tags.recaptcha" } " vocabulary implements support for the Recaptcha. Recaptcha is a web service that provides the user with a captcha, a test that is easy to solve by visual inspection, but hard to solve by writing a computer program. Use a captcha to protect forms from abusive users." $nl
