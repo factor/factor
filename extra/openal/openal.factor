@@ -4,6 +4,7 @@ USING: kernel accessors arrays alien system combinators
 alien.syntax namespaces alien.c-types sequences vocabs.loader
 shuffle openal.backend alien.libraries generalizations
 specialized-arrays ;
+FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: uint
 IN: openal
 
