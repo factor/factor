@@ -23,7 +23,7 @@ TYPEDEF: ushort FT_UShort
 TYPEDEF: long FT_Long
 TYPEDEF: ulong FT_ULong
 TYPEDEF: uchar FT_Bool
-TYPEDEF: cell FT_Offset
+TYPEDEF: ulong FT_Offset
 TYPEDEF: int FT_PtrDist
 TYPEDEF: char FT_String
 TYPEDEF: int FT_Tag
