@@ -85,7 +85,7 @@ $nl
 } ;
 
 ARTICLE: "spread-combinators" "Spread combinators"
-"The spread combinators apply multiple quotations to multiple values. The " { $snippet "*" } " suffix signifies spreading."
+"The spread combinators apply multiple quotations to multiple values. In this case, " { $snippet "*" } " suffix signify spreading."
 $nl
 "Two quotations:"
 { $subsection bi* }
