@@ -39,7 +39,7 @@ $nl
 } ;
 
 ARTICLE: "furnace.recaptcha" "Recaptcha"
-"The " { $vocab-link "furnace.chloe-tags.recaptcha" } " vocabulary implements support for the Recaptcha. Recaptcha is a web service that provides the user with a captcha, a test that is easy to solve by visual inspection, but hard to solve by writing a computer program. Use a captcha to protect forms from abusive users." $nl
+"The " { $vocab-link "furnace.recaptcha" } " vocabulary implements support for the Recaptcha. Recaptcha is a web service that provides the user with a captcha, a test that is easy to solve by visual inspection, but hard to solve by writing a computer program. Use a captcha to protect forms from abusive users." $nl
 
 "The recaptcha responder is a " { $link filter-responder } " that wraps another responder. Set the " { $slot "domain" } ", " { $slot "public-key" } ", and " { $slot "private-key" } " slots of this responder to your Recaptcha account information." $nl
 
