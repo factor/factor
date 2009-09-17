@@ -5,6 +5,7 @@ math.complex math.functions math.order functors words
 sequences sequences.merged sequences.private shuffle
 parser prettyprint.backend prettyprint.custom ascii
 specialized-arrays ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: complex-float
