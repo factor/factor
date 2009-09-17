@@ -1,0 +1,4 @@
+<?xml version='1.0' ?>
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+<html><body><form submit="" method="post"><t:recaptcha/></form></body></html>
+</t:chloe>
