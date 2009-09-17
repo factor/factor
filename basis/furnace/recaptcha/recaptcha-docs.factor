@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax http.server.filters kernel
-multiline furnace.actions ;
-IN: furnace.chloe-tags.recaptcha
+multiline furnace.actions furnace.alloy ;
+IN: furnace.recaptcha
 
 HELP: <recaptcha>
 { $values
@@ -30,20 +30,27 @@ ARTICLE: "recaptcha-example" "Recaptcha example"
 "An example follows:"
 { $code
 HEREDOC: RECAPTCHA-TUTORIAL
+USING: db.sqlite kernel http.server.dispatchers db.sqlite
+furnace.actions furnace.recaptcha furnace.conversations
+furnace.redirection xml.syntax html.templates.chloe.compiler
+io.streams.string http.server.responses furnace.alloy http.server ;
 TUPLE: recaptcha-app < dispatcher recaptcha ;
+
+: recaptcha-db ( -- obj )
+    "recaptcha-example" <sqlite-db> ;
 
 : <recaptcha-challenge> ( -- obj )
     <action>
         [
+            begin-conversation
             validate-recaptcha
-            recaptcha-valid? get "?good" "?bad" ? <redirect>
+            recaptcha-valid? cget "?good" "?bad" ? >url <continue-conversation>
         ] >>submit
         [
-            <response>
-{" <?xml version='1.0' ?>
-<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
-<html><body><t:recaptcha/></body></html>
-</t:chloe>"} >>body
+            <XML <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+            <html><body><form submit="" method="post"><t:recaptcha/></form></body></html>
+            </t:chloe> XML>
+            compile-template [ call( -- ) ] with-string-writer "text/html" <content>
         ] >>display ;
 
 : <recaptcha-app> ( -- obj )
@@ -51,8 +58,9 @@ TUPLE: recaptcha-app < dispatcher recaptcha ;
         <recaptcha-challenge> "" add-responder
         <recaptcha>
         "concatenative.org" >>domain
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" >>public-key
-        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" >>private-key ;
+        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
+        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key
+        recaptcha-db <alloy> ;
 
 <recaptcha-app> main-responder set-global
 RECAPTCHA-TUTORIAL
@@ -60,7 +68,7 @@ RECAPTCHA-TUTORIAL
 
 ;
 
-ARTICLE: "furnace.chloe-tags.recaptcha" "Recaptcha chloe tag"
+ARTICLE: "furnace.recaptcha" "Recaptcha"
 "The " { $vocab-link "furnace.chloe-tags.recaptcha" } " vocabulary implements support for the Recaptcha. Recaptcha is a web service that provides the user with a captcha, a test that is easy to solve by visual inspection, but hard to solve by writing a computer program. Use a captcha to protect forms from abusive users." $nl
 
 "The recaptcha responder is a " { $link filter-responder } " that wraps another responder. Set the " { $slot "domain" } ", " { $slot "public-key" } ", and " { $slot "private-key" } " slots of this responder to your Recaptcha account information." $nl
@@ -74,4 +82,4 @@ ARTICLE: "furnace.chloe-tags.recaptcha" "Recaptcha chloe tag"
 { $subsection recaptcha-error }
 { $subsection "recaptcha-example" } ;
 
-ABOUT: "furnace.chloe-tags.recaptcha"
+ABOUT: "furnace.recaptcha"
