@@ -3,6 +3,7 @@
 USING: alien alien.c-types alien.syntax namespaces kernel words
 sequences math math.bitwise math.vectors colors
 io.encodings.utf16n classes.struct accessors ;
+FROM: alien.c-types => float short ;
 IN: windows.types
 
 TYPEDEF: char                CHAR
@@ -69,7 +70,8 @@ TYPEDEF: ulonglong   ULARGE_INTEGER
 TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
 TYPEDEF: ULARGE_INTEGER* PULARGE_INTEGER
 
-<< { "char*" utf16n } "wchar_t*" typedef >>
+SYMBOL: wchar_t*
+<< { char* utf16n } \ wchar_t* typedef >>
 
 TYPEDEF: wchar_t*  LPCSTR
 TYPEDEF: wchar_t*  LPWSTR
