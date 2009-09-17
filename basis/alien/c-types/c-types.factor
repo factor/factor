@@ -65,8 +65,12 @@ M: word resolve-pointer-type
     dup "pointer-c-type" word-prop
     [ ] [ drop void* ] ?if ;
 M: string resolve-pointer-type
-    c-types get at dup c-type-name?
-    [ resolve-pointer-type ] [ drop void* ] if ;
+    dup "*" append dup c-types get at
+    [ nip ] [
+        drop
+        c-types get at dup c-type-name?
+        [ resolve-pointer-type ] [ drop void* ] if
+    ] if ;
 
 : resolve-typedef ( name -- type )
     dup c-type-name? [ c-type ] when ;
