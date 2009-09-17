@@ -4,8 +4,8 @@ USING: accessors furnace.actions furnace.redirection html.forms
 html.templates.chloe.compiler html.templates.chloe.syntax
 http.client http.server http.server.filters io.sockets kernel
 locals namespaces sequences splitting urls validators
-xml.syntax ;
-IN: furnace.chloe-tags.recaptcha
+xml.syntax furnace.conversations ;
+IN: furnace.recaptcha
 
 TUPLE: recaptcha < filter-responder domain public-key private-key ;
 
@@ -38,8 +38,9 @@ M: recaptcha call-responder*
 XML] ;
 
 : recaptcha-url ( secure? -- ? )
-    [ "https://api.recaptcha.net/challenge" >url ]
-    [ "http://api.recaptcha.net/challenge" >url ] if ;
+    [ "https://api.recaptcha.net/challenge" ]
+    [ "http://api.recaptcha.net/challenge" ] if
+    recaptcha-error cget [ "?error=" glue ] when* >url ;
 
 : render-recaptcha ( -- xml )
     secure-connection? recaptcha-url
@@ -72,4 +73,4 @@ PRIVATE>
     "recaptcha_challenge_field" value
     "recaptcha_response_field" value
     \ recaptcha get (validate-recaptcha)
-    [ recaptcha-valid? set ] [ recaptcha-error set ] bi* ;
+    [ recaptcha-valid? cset ] [ recaptcha-error cset ] bi* ;
