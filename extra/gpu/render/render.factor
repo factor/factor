@@ -9,7 +9,9 @@ lexer locals math math.order math.parser namespaces opengl
 opengl.gl parser quotations sequences slots sorting
 specialized-arrays strings ui.gadgets.worlds variants
 vocabs.parser words ;
-SPECIALIZED-ARRAY: float
+FROM: math => float ;
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-ARRAY: c:float
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: void*
