@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types assocs byte-arrays classes
-compiler.units functors kernel lexer libc math
+USING: accessors alien alien.c-types alien.parser assocs
+byte-arrays classes compiler.units functors kernel lexer libc math
 math.vectors.specialization namespaces parser prettyprint.custom
 sequences sequences.private strings summary vocabs vocabs.loader
 vocabs.parser words fry combinators ;
@@ -157,7 +157,7 @@ M: c-type-name c-direct-array-constructor
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 SYNTAX: SPECIALIZED-ARRAY:
-    scan define-array-vocab use-vocab ;
+    scan-c-type define-array-vocab use-vocab ;
 
 "prettyprint" vocab [
     "specialized-arrays.prettyprint" require
