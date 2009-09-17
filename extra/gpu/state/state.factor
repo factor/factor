@@ -2,8 +2,10 @@
 USING: accessors alien.c-types arrays byte-arrays combinators gpu
 kernel literals math math.rectangles opengl opengl.gl sequences
 variants specialized-arrays ;
+QUALIFIED-WITH: alien.c-types c
+FROM: math => float ;
 SPECIALIZED-ARRAY: int
-SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAY: c:float
 IN: gpu.state
 
 UNION: ?rect rect POSTPONE: f ;

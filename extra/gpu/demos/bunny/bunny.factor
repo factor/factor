@@ -7,6 +7,7 @@ io io.encodings.ascii io.files io.files.temp kernel math
 math.matrices math.parser math.vectors method-chains sequences
 splitting threads ui ui.gadgets ui.gadgets.worlds
 ui.pixel-formats specialized-arrays specialized-vectors ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
 IN: gpu.demos.bunny
