@@ -172,7 +172,7 @@ M: irc-nick-chat remove-chat name>> unregister-chat ;
 M: irc-server-chat remove-chat drop +server-chat+ unregister-chat ;
 
 M: irc-channel-chat remove-chat
-    [ part new annotate-message irc-send ]
+    [ name>> "PART " prepend string>irc-message irc-send ]
     [ name>> unregister-chat ] bi ;
 
 : (speak) ( message irc-chat -- ) swap annotate-message irc-send ;
