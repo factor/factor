@@ -99,7 +99,13 @@ M: mb-writer dispose drop ;
 
 ! Test join
 [ { "JOIN #factortest" } [
-      "#factortest" %join %pop-output-line
+    "#factortest" %join %pop-output-line
+  ] unit-test
+] spawning-irc
+
+[ { "PART #factortest" } [
+    "#factortest" %join %pop-output-line drop
+    "#factortest" chat> remove-chat %pop-output-line
   ] unit-test
 ] spawning-irc
 
