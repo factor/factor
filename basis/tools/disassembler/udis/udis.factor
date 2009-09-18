@@ -4,7 +4,8 @@ USING: tools.disassembler namespaces combinators
 alien alien.syntax alien.c-types lexer parser kernel
 sequences layouts math math.order alien.libraries
 math.parser system make fry arrays libc destructors
-tools.disassembler.utils splitting alien.data ;
+tools.disassembler.utils splitting alien.data
+classes.struct ;
 IN: tools.disassembler.udis
 
 <<
@@ -17,57 +18,57 @@ IN: tools.disassembler.udis
 
 LIBRARY: libudis86
 
-C-STRUCT: ud_operand
-    { "int" "type" }
-    { "uchar" "size" }
-    { "ulonglong" "lval" }
-    { "int" "base" }
-    { "int" "index" }
-    { "uchar" "offset" }
-    { "uchar" "scale" } ;
+STRUCT: ud_operand
+    { type int }
+    { size uchar }
+    { lval ulonglong }
+    { base int }
+    { index int }
+    { offset uchar }
+    { scale uchar } ;
 
-C-STRUCT: ud
-    { "void*" "inp_hook" }
-    { "uchar" "inp_curr" }
-    { "uchar" "inp_fill" }
-    { "FILE*" "inp_file" }
-    { "uchar" "inp_ctr" }
-    { "uchar*" "inp_buff" }
-    { "uchar*" "inp_buff_end" }
-    { "uchar" "inp_end" }
-    { "void*" "translator" }
-    { "ulonglong" "insn_offset" }
-    { "char[32]" "insn_hexcode" }
-    { "char[64]" "insn_buffer" }
-    { "uint" "insn_fill" }
-    { "uchar" "dis_mode" }
-    { "ulonglong" "pc" }
-    { "uchar" "vendor" }
-    { "struct map_entry*" "mapen" }
-    { "int" "mnemonic" }
-    { "ud_operand[3]" "operand" }
-    { "uchar" "error" }
-    { "uchar" "pfx_rex" }
-    { "uchar" "pfx_seg" }
-    { "uchar" "pfx_opr" }
-    { "uchar" "pfx_adr" }
-    { "uchar" "pfx_lock" }
-    { "uchar" "pfx_rep" }
-    { "uchar" "pfx_repe" }
-    { "uchar" "pfx_repne" }
-    { "uchar" "pfx_insn" }
-    { "uchar" "default64" }
-    { "uchar" "opr_mode" }
-    { "uchar" "adr_mode" }
-    { "uchar" "br_far" }
-    { "uchar" "br_near" }
-    { "uchar" "implicit_addr" }
-    { "uchar" "c1" }
-    { "uchar" "c2" }
-    { "uchar" "c3" }
-    { "uchar[256]" "inp_cache" }
-    { "uchar[64]" "inp_sess" }
-    { "ud_itab_entry*" "itab_entry" } ;
+STRUCT: ud
+    { inp_hook void* }
+    { inp_curr uchar }
+    { inp_fill uchar }
+    { inp_file FILE* }
+    { inp_ctr uchar }
+    { inp_buff uchar* }
+    { inp_buff_end uchar* }
+    { inp_end uchar }
+    { translator void* }
+    { insn_offset ulonglong }
+    { insn_hexcode char[32] }
+    { insn_buffer char[64] }
+    { insn_fill uint }
+    { dis_mode uchar }
+    { pc ulonglong }
+    { vendor uchar }
+    { mapen void* }
+    { mnemonic int }
+    { operand ud_operand[3] }
+    { error uchar }
+    { pfx_rex uchar }
+    { pfx_seg uchar }
+    { pfx_opr uchar }
+    { pfx_adr uchar }
+    { pfx_lock uchar }
+    { pfx_rep uchar }
+    { pfx_repe uchar }
+    { pfx_repne uchar }
+    { pfx_insn uchar }
+    { default64 uchar }
+    { opr_mode uchar }
+    { adr_mode uchar }
+    { br_far uchar }
+    { br_near uchar }
+    { implicit_addr uchar }
+    { c1 uchar }
+    { c2 uchar }
+    { c3 uchar }
+    { inp_cache uchar[256] }
+    { inp_sess uchar[64] }
+    { itab_entry ud_itab_entry* } ;
 
 FUNCTION: void ud_translate_intel ( ud* u ) ;
 FUNCTION: void ud_translate_att ( ud* u ) ;
@@ -98,7 +99,7 @@ FUNCTION: uint ud_insn_len ( ud* u ) ;
 FUNCTION: char* ud_lookup_mnemonic ( int c ) ;
 
 : <ud> ( -- ud )
-    "ud" malloc-object &free
+    ud malloc-struct &free
     dup ud_init
     dup cell-bits ud_set_mode
     dup UD_SYN_INTEL ud_set_syntax ;
