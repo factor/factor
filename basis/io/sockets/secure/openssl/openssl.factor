@@ -31,7 +31,7 @@ TUPLE: openssl-context < secure-context aliens sessions ;
     ] [ drop ] if ;
 
 : password-callback ( -- alien )
-    "int" { "void*" "int" "bool" "void*" } "cdecl"
+    int { void* int bool void* } "cdecl"
     [| buf size rwflag password! |
         password [ B{ 0 } password! ] unless
 
