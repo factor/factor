@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings parser
+USING: accessors alien alien.data alien.strings parser
 threads words kernel.private kernel io.encodings.utf8 eval ;
 IN: alien.remote-control
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings libc destructors locals
-kernel math assocs namespaces make continuations sequences
+USING: alien alien.c-types alien.data alien.strings libc destructors
+locals kernel math assocs namespaces make continuations sequences
 hashtables sorting arrays combinators math.bitwise strings
 system accessors threads splitting io.backend io.backend.windows
 io.backend.windows.nt io.files.windows.nt io.monitors io.ports

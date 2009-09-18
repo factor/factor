@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
-assocs alien alien.strings libc opengl math sequences combinators
+assocs alien alien.data alien.strings libc opengl math sequences combinators
 macros arrays io.encodings.ascii fry specialized-arrays
 destructors accessors ;
 SPECIALIZED-ARRAY: uint

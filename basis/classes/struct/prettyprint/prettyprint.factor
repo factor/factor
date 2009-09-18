@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.prettyprint arrays
+USING: accessors alien alien.c-types alien.data alien.prettyprint arrays
 assocs classes classes.struct combinators combinators.short-circuit
 continuations fry kernel libc make math math.parser mirrors
 prettyprint.backend prettyprint.custom prettyprint.sections

@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax combinators continuations
-io.encodings.string io.encodings.utf8 kernel sequences strings
-unix calendar system accessors unix.time calendar.unix
-vocabs.loader ;
+USING: alien.c-types alien.data alien.syntax combinators
+continuations io.encodings.string io.encodings.utf8 kernel
+sequences strings unix calendar system accessors unix.time
+calendar.unix vocabs.loader ;
 IN: unix.utmpx
 
 CONSTANT: EMPTY 0

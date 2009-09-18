@@ -1,10 +1,10 @@
-USING: accessors alien alien.c-types arrays byte-arrays combinators
-combinators.short-circuit fry kernel locals macros
-math math.blas.ffi math.blas.vectors math.blas.vectors.private
-math.complex math.functions math.order functors words
-sequences sequences.merged sequences.private shuffle
-parser prettyprint.backend prettyprint.custom ascii
-specialized-arrays ;
+USING: accessors alien alien.c-types alien.data arrays
+byte-arrays combinators combinators.short-circuit fry
+kernel locals macros math math.blas.ffi math.blas.vectors
+math.blas.vectors.private math.complex math.functions
+math.order functors words sequences sequences.merged
+sequences.private shuffle parser prettyprint.backend
+prettyprint.custom ascii specialized-arrays ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: double

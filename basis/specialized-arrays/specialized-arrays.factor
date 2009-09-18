@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.parser assocs
+USING: accessors alien alien.c-types alien.data alien.parser assocs
 byte-arrays classes compiler.units functors kernel lexer libc math
 math.vectors.specialization namespaces parser prettyprint.custom
 sequences sequences.private strings summary vocabs vocabs.loader

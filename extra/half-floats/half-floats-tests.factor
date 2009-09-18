@@ -1,5 +1,5 @@
 USING: alien.c-types alien.syntax half-floats kernel math tools.test
-specialized-arrays ;
+specialized-arrays alien.data ;
 SPECIALIZED-ARRAY: half
 IN: half-floats.tests
 

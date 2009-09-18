@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types arrays assocs kernel math math.parser
+USING: alien.c-types alien.data arrays assocs kernel math math.parser
 namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
 io.streams.byte-array byte-arrays io.encodings.binary
