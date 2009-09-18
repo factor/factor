@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays continuations db io kernel math namespaces
 quotations sequences db.postgresql.ffi alien alien.c-types
-db.types tools.walker ascii splitting math.parser combinators
-libc calendar.format byte-arrays destructors prettyprint
-accessors strings serialize io.encodings.binary io.encodings.utf8
-alien.strings io.streams.byte-array summary present urls
-specialized-arrays db.private ;
+alien.data db.types tools.walker ascii splitting math.parser
+combinators libc calendar.format byte-arrays destructors
+prettyprint accessors strings serialize io.encodings.binary
+io.encodings.utf8 alien.strings io.streams.byte-array summary
+present urls specialized-arrays db.private ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: void*
 IN: db.postgresql.lib

@@ -1,8 +1,9 @@
 USING: windows.dinput windows.kernel32 windows.ole32 windows.com
-windows.com.syntax alien alien.c-types alien.syntax kernel system namespaces
-combinators sequences fry math accessors macros words quotations
-libc continuations generalizations splitting locals assocs init
-specialized-arrays memoize classes.struct strings arrays ;
+windows.com.syntax alien alien.c-types alien.data alien.syntax
+kernel system namespaces combinators sequences fry math accessors
+macros words quotations libc continuations generalizations
+splitting locals assocs init specialized-arrays memoize
+classes.struct strings arrays ;
 SPECIALIZED-ARRAY: DIOBJECTDATAFORMAT
 IN: windows.dinput.constants
 

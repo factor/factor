@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien.c-types alien.syntax kernel math math.order ;
+USING: accessors alien.c-types alien.data alien.syntax kernel math math.order ;
 IN: half-floats
 
 : half>bits ( float -- bits )

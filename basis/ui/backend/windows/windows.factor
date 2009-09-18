@@ -13,7 +13,7 @@ opengl ui.render math.bitwise locals accessors math.rectangles
 math.order calendar ascii sets io.encodings.utf16n
 windows.errors literals ui.pixel-formats
 ui.pixel-formats.private memoize classes
-specialized-arrays classes.struct ;
+specialized-arrays classes.struct alien.data ;
 SPECIALIZED-ARRAY: POINT
 IN: ui.backend.windows
 

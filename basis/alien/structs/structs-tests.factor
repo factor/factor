@@ -1,4 +1,4 @@
-USING: alien alien.syntax alien.c-types kernel tools.test
+USING: alien alien.syntax alien.c-types alien.data kernel tools.test
 sequences system libc words vocabs namespaces layouts ;
 IN: alien.structs.tests
 

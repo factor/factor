@@ -1,5 +1,5 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors alien alien.c-types alien.complex grouping
+USING: accessors alien alien.c-types alien.complex alien.data grouping
 alien.strings alien.syntax arrays ascii assocs
 byte-arrays combinators combinators.short-circuit fry generalizations
 kernel lexer macros math math.parser namespaces parser sequences
