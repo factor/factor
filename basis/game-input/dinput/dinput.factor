@@ -6,7 +6,7 @@ math.rectangles namespaces parser sequences shuffle
 specialized-arrays ui.backend.windows vectors windows.com
 windows.dinput windows.dinput.constants windows.errors
 windows.kernel32 windows.messages windows.ole32
-windows.user32 classes.struct ;
+windows.user32 classes.struct alien.data ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game-input.dinput
 

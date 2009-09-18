@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.parser arrays
+USING: accessors alien alien.c-types alien.data alien.parser arrays
 byte-arrays classes classes.parser classes.tuple classes.tuple.parser
 classes.tuple.private combinators combinators.short-circuit
 combinators.smart cpu.architecture definitions functors.backend

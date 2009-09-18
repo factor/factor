@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien alien.c-types arrays
+USING: accessors alien alien.c-types alien.data arrays
 assocs classes classes.mixin classes.parser classes.singleton
 classes.tuple classes.tuple.private combinators combinators.tuple destructors fry
 generic generic.parser gpu gpu.buffers gpu.framebuffers

@@ -1,4 +1,4 @@
-USING: alien.c-types strings help.markup help.syntax alien.syntax
+USING: alien.c-types alien.data strings help.markup help.syntax alien.syntax
 sequences io arrays kernel words assocs namespaces ;
 IN: alien.structs
 

@@ -4,7 +4,7 @@ USING: tools.disassembler namespaces combinators
 alien alien.syntax alien.c-types lexer parser kernel
 sequences layouts math math.order alien.libraries
 math.parser system make fry arrays libc destructors
-tools.disassembler.utils splitting ;
+tools.disassembler.utils splitting alien.data ;
 IN: tools.disassembler.udis
 
 <<

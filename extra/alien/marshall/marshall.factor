@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.inline.types
 alien.marshall.private alien.strings byte-arrays classes
 combinators combinators.short-circuit destructors fry
-io.encodings.utf8 kernel libc sequences
+io.encodings.utf8 kernel libc sequences alien.data
 specialized-arrays strings unix.utilities vocabs.parser
 words libc.private locals generalizations math ;
 FROM: alien.c-types => float short ;
