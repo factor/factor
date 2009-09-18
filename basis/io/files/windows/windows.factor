@@ -6,7 +6,7 @@ io.backend.windows kernel math splitting fry alien.strings
 windows windows.kernel32 windows.time calendar combinators
 math.functions sequences namespaces make words system
 destructors accessors math.bitwise continuations windows.errors
-arrays byte-arrays generalizations ;
+arrays byte-arrays generalizations alien.data ;
 IN: io.files.windows
 
 : open-file ( path access-mode create-mode flags -- handle )

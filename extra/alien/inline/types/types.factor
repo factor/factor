@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types assocs combinators.short-circuit
 continuations effects fry kernel math memoize sequences
-splitting strings peg.ebnf make ;
+splitting strings peg.ebnf make words ;
 IN: alien.inline.types
 
 : cify-type ( str -- str' )
+    dup word? [ name>> ] when
     { { CHAR: - CHAR: space } } substitute ;
 
 : factorize-type ( str -- str' )
