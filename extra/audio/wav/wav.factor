@@ -1,7 +1,7 @@
 USING: alien.c-types alien.syntax audio combinators
 combinators.short-circuit io io.binary io.encodings.binary
 io.files io.streams.byte-array kernel locals math
-sequences ;
+sequences alien.data ;
 IN: audio.wav
 
 CONSTANT: RIFF-MAGIC "RIFF"

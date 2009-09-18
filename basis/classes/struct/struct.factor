@@ -1,12 +1,12 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types arrays byte-arrays classes
-classes.parser classes.tuple classes.tuple.parser
+USING: accessors alien alien.c-types alien.data alien.parser arrays
+byte-arrays classes classes.parser classes.tuple classes.tuple.parser
 classes.tuple.private combinators combinators.short-circuit
 combinators.smart cpu.architecture definitions functors.backend
 fry generalizations generic.parser kernel kernel.private lexer
 libc locals macros make math math.order parser quotations
 sequences slots slots.private specialized-arrays vectors words
-summary namespaces assocs ;
+summary namespaces assocs vocabs.parser ;
 IN: classes.struct
 
 SPECIALIZED-ARRAY: uchar
@@ -126,7 +126,7 @@ M: struct-c-type c-type ;
 M: struct-c-type c-type-stack-align? drop f ;
 
 : if-value-struct ( ctype true false -- )
-    [ dup value-struct? ] 2dip '[ drop "void*" @ ] if ; inline
+    [ dup value-struct? ] 2dip '[ drop void* @ ] if ; inline
 
 M: struct-c-type unbox-parameter
     [ %unbox-large-struct ] [ unbox-parameter ] if-value-struct ;
@@ -197,20 +197,6 @@ M: struct-c-type c-struct? drop t ;
     [ type>> c-type-align ] [ max ] map-reduce ;
 PRIVATE>
 
-M: struct-class c-type name>> c-type ;
-
-M: struct-class c-type-align c-type c-type-align ;
-
-M: struct-class c-type-getter c-type c-type-getter ;
-
-M: struct-class c-type-setter c-type c-type-setter ;
-
-M: struct-class c-type-boxer-quot c-type c-type-boxer-quot ;
-
-M: struct-class c-type-unboxer-quot c-type c-type-boxer-quot ;
-
-M: struct-class heap-size c-type heap-size ;
-
 M: struct byte-length class "struct-size" word-prop ; foldable
 
 ! class definition
@@ -259,7 +245,7 @@ M: struct byte-length class "struct-size" word-prop ; foldable
         [ check-struct-slots ] _ [ struct-align [ align ] keep ] tri
         (struct-word-props)
     ]
-    [ drop [ c-type-for-class ] [ name>> ] bi typedef ] 2tri ; inline
+    [ drop [ c-type-for-class ] keep typedef ] 2tri ; inline
 PRIVATE>
 
 : define-struct-class ( class slots -- )
@@ -284,9 +270,6 @@ ERROR: invalid-struct-slot token ;
     [ [ dup empty? ] [ peel-off-attributes ] until drop ] tri* ;
 
 <PRIVATE
-: scan-c-type ( -- c-type )
-    scan dup "{" = [ drop \ } parse-until >array ] when ;
-
 : parse-struct-slot ( -- slot )
     scan scan-c-type \ } parse-until <struct-slot-spec> ;
     
@@ -317,7 +300,7 @@ SYNTAX: S@
 
 <PRIVATE
 : scan-c-type` ( -- c-type/param )
-    scan dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;
+    scan dup "{" = [ drop \ } parse-until >array ] [ search ] if ;
 
 : parse-struct-slot` ( accum -- accum )
     scan-string-param scan-c-type` \ } parse-until

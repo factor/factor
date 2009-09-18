@@ -1,7 +1,7 @@
 ! (c) 2009 Joe Groff, see BSD license
 USING: accessors alien alien.c-types alien.complex
-alien.fortran alien.fortran.private alien.strings classes.struct
-arrays assocs byte-arrays combinators fry
+alien.data alien.fortran alien.fortran.private alien.strings
+classes.struct arrays assocs byte-arrays combinators fry
 generalizations io.encodings.ascii kernel macros
 macros.expander namespaces sequences shuffle tools.test ;
 IN: alien.fortran.tests

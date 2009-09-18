@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax combinators io.ports
-io.streams.duplex system kernel math math.bitwise
-vocabs.loader unix io.serial io.serial.unix.termios io.backend.unix ;
+USING: accessors alien.c-types alien.syntax alien.data 
+combinators io.ports io.streams.duplex system kernel
+math math.bitwise vocabs.loader unix io.serial
+io.serial.unix.termios io.backend.unix ;
 IN: io.serial.unix
 
 << {
