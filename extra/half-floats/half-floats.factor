@@ -1,5 +1,7 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien.c-types alien.data alien.syntax kernel math math.order ;
+USING: accessors alien.accessors alien.c-types alien.data
+alien.syntax kernel math math.order ;
+FROM: math => float ;
 IN: half-floats
 
 : half>bits ( float -- bits )
@@ -26,13 +28,18 @@ IN: half-floats
         ] unless
     ] bi bitor bits>float ;
 
-C-STRUCT: half { "ushort" "(bits)" } ;
+SYMBOL: half
 
 <<
 
-"half" c-type
-    [ half>bits <ushort> ] >>unboxer-quot
-    [ *ushort bits>half ] >>boxer-quot
-    drop
+<c-type>
+    float >>class
+    float >>boxed-class
+    [ alien-unsigned-2 bits>half ] >>getter
+    [ [ >float half>bits ] 2dip set-alien-unsigned-2 ] >>setter
+    2 >>size
+    2 >>align
+    [ >float ] >>unboxer-quot
+\ half define-primitive-type
 
 >>
