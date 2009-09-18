@@ -9,6 +9,7 @@ compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.cfg.build-stack-frame
 compiler.units compiler.constants compiler.codegen ;
 FROM: cpu.ppc.assembler => B ;
+FROM: math => float ;
 IN: cpu.ppc
 
 ! PowerPC register assignments:
