@@ -1,7 +1,7 @@
 USING: alien.data kernel locals math math.bitwise
 windows.kernel32 sequences byte-arrays unicode.categories
 io.encodings.string io.encodings.utf16n alien.strings
-arrays literals windows.types ;
+arrays literals windows.types specialized-arrays ;
 SPECIALIZED-ARRAY: TCHAR
 IN: windows.errors
 
