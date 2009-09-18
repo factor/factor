@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors io.files io.files.info
 io.backend kernel quotations system alien alien.accessors
-accessors vocabs.loader combinators alien.c-types
+accessors vocabs.loader combinators alien.c-types alien.data
 math ;
 IN: io.mmap
 

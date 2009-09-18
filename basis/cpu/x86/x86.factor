@@ -12,6 +12,7 @@ compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.codegen
 compiler.codegen.fixup ;
+FROM: math => float ;
 IN: cpu.x86
 
 << enable-fixnum-log2 >>
