@@ -653,7 +653,7 @@ M: windows-ui-backend do-events
 
 : init-win32-ui ( -- )
     V{ } clone nc-buttons set-global
-    "MSG" malloc-object msg-obj set-global
+    MSG malloc-struct msg-obj set-global
     GetDoubleClickTime milliseconds double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
