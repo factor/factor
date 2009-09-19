@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.destructors ;
+USING: alien.syntax alien.destructors classes.struct ;
 IN: windows.usp10
 
 LIBRARY: usp10
