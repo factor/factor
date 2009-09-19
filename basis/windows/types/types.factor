@@ -14,7 +14,7 @@ TYPEDEF: ushort              wchar_t
 SYMBOL: wchar_t*
 <<
 { char* utf16n } \ wchar_t* typedef
-wchar_t wchar_t* "pointer-c-type" set-word-prop
+\ wchar_t \ wchar_t* "pointer-c-type" set-word-prop
 >>
 
 TYPEDEF: wchar_t             WCHAR
