@@ -25,7 +25,7 @@ PRIVATE>
 
 M: string equal?
     over string? [
-        over hashcode over hashcode eq?
+        2dup [ hashcode ] bi@ eq?
         [ sequence= ] [ 2drop f ] if
     ] [
         2drop f
