@@ -135,9 +135,9 @@ STRUCT: addrinfo
     { addr sockaddr* }
     { next addrinfo* } ;
 
-C-STRUCT: timeval
-    { "long" "sec" }
-    { "long" "usec" } ;
+STRUCT: timeval
+    { sec long }
+    { usec long } ;
 
 LIBRARY: winsock
 
@@ -177,15 +177,15 @@ TYPEDEF: HANDLE WSAEVENT
 TYPEDEF: LPHANDLE LPWSAEVENT
 TYPEDEF: sockaddr* LPSOCKADDR
 
-C-STRUCT: FLOWSPEC
-    { "uint"        "TokenRate" }
-    { "uint"        "TokenBucketSize" }
-    { "uint"        "PeakBandwidth" }
-    { "uint"        "Latency" }
-    { "uint"        "DelayVariation" }
-    { "SERVICETYPE" "ServiceType" }
-    { "uint"        "MaxSduSize" }
-    { "uint"        "MinimumPolicedSize" } ;
+STRUCT: FLOWSPEC
+    { TokenRate          uint        }
+    { TokenBucketSize    uint        }
+    { PeakBandwidth      uint        }
+    { Latency            uint        }
+    { DelayVariation     uint        }
+    { ServiceType        SERVICETYPE }
+    { MaxSduSize         uint        }
+    { MinimumPolicedSize uint        } ;
 TYPEDEF: FLOWSPEC* PFLOWSPEC
 TYPEDEF: FLOWSPEC* LPFLOWSPEC
 
@@ -194,44 +194,44 @@ STRUCT: WSABUF
     { buf void* } ;
 TYPEDEF: WSABUF* LPWSABUF
 
-C-STRUCT: QOS
-    { "FLOWSPEC" "SendingFlowspec" }
-    { "FLOWSPEC" "ReceivingFlowspec" }
-    { "WSABUF" "ProviderSpecific" } ;
+STRUCT: QOS
+    { SendingFlowspec FLOWSPEC }
+    { ReceivingFlowspec FLOWSPEC }
+    { ProviderSpecific WSABUF } ;
 TYPEDEF: QOS* LPQOS
 
 CONSTANT: MAX_PROTOCOL_CHAIN 7
 
-C-STRUCT: WSAPROTOCOLCHAIN
-    { "int" "ChainLen" }
-    ! { { "DWORD" MAX_PROTOCOL_CHAIN } "ChainEntries" } ;
-    { { "DWORD" 7 } "ChainEntries" } ;
+STRUCT: WSAPROTOCOLCHAIN
+    { ChainLen int }
+    ! { ChainEntries { DWORD MAX_PROTOCOL_CHAIN } } ;
+    { ChainEntries { DWORD 7 } } ;
 TYPEDEF: WSAPROTOCOLCHAIN* LPWSAPROTOCOLCHAIN
 
 CONSTANT: WSAPROTOCOL_LEN 255
 
-C-STRUCT: WSAPROTOCOL_INFOW
-    { "DWORD" "dwServiceFlags1" }
-    { "DWORD" "dwServiceFlags2" }
-    { "DWORD" "dwServiceFlags3" }
-    { "DWORD" "dwServiceFlags4" }
-    { "DWORD" "dwProviderFlags" }
-    { "GUID" "ProviderId" }
-    { "DWORD" "dwCatalogEntryId" }
-    { "WSAPROTOCOLCHAIN" "ProtocolChain" }
-    { "int" "iVersion" }
-    { "int" "iAddressFamily" }
-    { "int" "iMaxSockAddr" }
-    { "int" "iMinSockAddr" }
-    { "int" "iSocketType" }
-    { "int" "iProtocol" }
-    { "int" "iProtocolMaxOffset" }
-    { "int" "iNetworkByteOrder" }
-    { "int" "iSecurityScheme" }
-    { "DWORD" "dwMessageSize" }
-    { "DWORD" "dwProviderReserved" }
-    { { "WCHAR" 256 } "szProtocol" } ;
-    ! { { "WCHAR" 256 } "szProtocol"[WSAPROTOCOL_LEN+1] } ;
+STRUCT: WSAPROTOCOL_INFOW
+    { dwServiceFlags1 DWORD }
+    { dwServiceFlags2 DWORD }
+    { dwServiceFlags3 DWORD }
+    { dwServiceFlags4 DWORD }
+    { dwProviderFlags DWORD }
+    { ProviderId GUID }
+    { dwCatalogEntryId DWORD }
+    { ProtocolChain WSAPROTOCOLCHAIN }
+    { iVersion int }
+    { iAddressFamily int }
+    { iMaxSockAddr int }
+    { iMinSockAddr int }
+    { iSocketType int }
+    { iProtocol int }
+    { iProtocolMaxOffset int }
+    { iNetworkByteOrder int }
+    { iSecurityScheme int }
+    { dwMessageSize DWORD }
+    { dwProviderReserved DWORD }
+    { szProtocol { WCHAR 256 } } ;
+    ! { szProtocol[WSAPROTOCOL_LEN+1] { WCHAR 256 } } ;
 TYPEDEF: WSAPROTOCOL_INFOW* PWSAPROTOCOL_INFOW
 TYPEDEF: WSAPROTOCOL_INFOW* LPWSAPROTOCOL_INFOW
 TYPEDEF: WSAPROTOCOL_INFOW WSAPROTOCOL_INFO
@@ -239,12 +239,12 @@ TYPEDEF: WSAPROTOCOL_INFOW* PWSAPROTOCOL_INFO
 TYPEDEF: WSAPROTOCOL_INFOW* LPWSAPROTOCOL_INFO
 
 
-C-STRUCT: WSANAMESPACE_INFOW
-    { "GUID"    "NSProviderId" }
-    { "DWORD"   "dwNameSpace" }
-    { "BOOL"    "fActive" }
-    { "DWORD"   "dwVersion" }
-    { "LPWSTR"  "lpszIdentifier" } ;
+STRUCT: WSANAMESPACE_INFOW
+    { NSProviderId   GUID    }
+    { dwNameSpace    DWORD   }
+    { fActive        BOOL    }
+    { dwVersion      DWORD   }
+    { lpszIdentifier LPWSTR  } ;
 TYPEDEF: WSANAMESPACE_INFOW* PWSANAMESPACE_INFOW
 TYPEDEF: WSANAMESPACE_INFOW* LPWSANAMESPACE_INFOW
 TYPEDEF: WSANAMESPACE_INFOW WSANAMESPACE_INFO
@@ -253,19 +253,19 @@ TYPEDEF: WSANAMESPACE_INFO* LPWSANAMESPACE_INFO
 
 CONSTANT: FD_MAX_EVENTS 10
 
-C-STRUCT: WSANETWORKEVENTS
-    { "long" "lNetworkEvents" }
-    { { "int" FD_MAX_EVENTS } "iErrorCode" } ;
+STRUCT: WSANETWORKEVENTS
+    { lNetworkEvents long }
+    { iErrorCode { int FD_MAX_EVENTS } } ;
 TYPEDEF: WSANETWORKEVENTS* PWSANETWORKEVENTS
 TYPEDEF: WSANETWORKEVENTS* LPWSANETWORKEVENTS
 
-! C-STRUCT: WSAOVERLAPPED
-    ! { "DWORD" "Internal" }
-    ! { "DWORD" "InternalHigh" }
-    ! { "DWORD" "Offset" }
-    ! { "DWORD" "OffsetHigh" }
-    ! { "WSAEVENT" "hEvent" }
-    ! { "DWORD" "bytesTransferred" } ;
+! STRUCT: WSAOVERLAPPED
+    ! { Internal DWORD }
+    ! { InternalHigh DWORD }
+    ! { Offset DWORD }
+    ! { OffsetHigh DWORD }
+    ! { hEvent WSAEVENT }
+    ! { bytesTransferred DWORD } ;
 ! TYPEDEF: WSAOVERLAPPED* LPWSAOVERLAPPED
 
 FUNCTION: SOCKET WSAAccept ( SOCKET s,
