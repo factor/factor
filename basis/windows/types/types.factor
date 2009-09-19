@@ -11,6 +11,12 @@ TYPEDEF: uchar               UCHAR
 TYPEDEF: uchar               BYTE
 
 TYPEDEF: ushort              wchar_t
+SYMBOL: wchar_t*
+<<
+{ char* utf16n } \ wchar_t* typedef
+wchar_t wchar_t* "pointer-c-type" set-word-prop
+>>
+
 TYPEDEF: wchar_t             WCHAR
 
 TYPEDEF: short               SHORT
@@ -69,9 +75,6 @@ TYPEDEF: longlong    LARGE_INTEGER
 TYPEDEF: ulonglong   ULARGE_INTEGER
 TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
 TYPEDEF: ULARGE_INTEGER* PULARGE_INTEGER
-
-SYMBOL: wchar_t*
-<< { char* utf16n } \ wchar_t* typedef >>
 
 TYPEDEF: wchar_t*  LPCSTR
 TYPEDEF: wchar_t*  LPWSTR
