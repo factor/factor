@@ -11,10 +11,9 @@ compiler.cfg.intrinsics
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.codegen.fixup ;
+FROM: layouts => cell ;
 FROM: math => float ;
 IN: cpu.x86
-
-<< enable-fixnum-log2 >>
 
 ! Add some methods to the assembler to be more useful to the backend
 M: label JMP 0 JMP rc-relative label-fixup ;
@@ -779,3 +778,4 @@ M: x86 small-enough? ( n -- ? )
     enable-sse3-simd ;
 
 enable-min/max
+enable-fixnum-log2
