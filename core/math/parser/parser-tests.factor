@@ -129,6 +129,7 @@ unit-test
 
 [ "1.0p0" ] [ 1.0 >hex ] unit-test
 [ "1.8p2" ] [ 6.0 >hex ] unit-test
+[ "1.08p2" ] [ 4.125 >hex ] unit-test
 [ "1.8p-2" ] [ 0.375 >hex ] unit-test
 [ "-1.8p2" ] [ -6.0 >hex ] unit-test
 [ "1.8p10" ] [ 1536.0 >hex ] unit-test
@@ -137,6 +138,8 @@ unit-test
 [ "-0.0" ] [ -0.0 >hex ] unit-test
 
 [ 1.0 ] [ "1.0" hex> ] unit-test
+[ 1.5 ] [ "1.8" hex> ] unit-test
+[ 1.03125 ] [ "1.08" hex> ] unit-test
 [ 15.5 ] [ "f.8" hex> ] unit-test
 [ 15.53125 ] [ "f.88" hex> ] unit-test
 [ -15.5 ] [ "-f.8" hex> ] unit-test

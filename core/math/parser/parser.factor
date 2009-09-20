@@ -213,7 +213,8 @@ M: ratio >base
     -0.0 double>bits bitand zero? "" "-" ? ;
 
 : float>hex-value ( mantissa -- str )
-    16 >base [ CHAR: 0 = ] trim-tail [ "0" ] [ ] if-empty "1." prepend ;
+    16 >base 13 CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
+    [ "0" ] [ ] if-empty "1." prepend ;
 
 : float>hex-expt ( mantissa -- str )
     10 >base "p" prepend ;
