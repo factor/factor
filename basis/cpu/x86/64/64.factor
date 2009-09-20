@@ -228,4 +228,4 @@ USE: vocabs.loader
     { [ os winnt? ] [ "cpu.x86.64.winnt" require ] }
 } cond
 
-"cpu.x86.features" require
+check-sse

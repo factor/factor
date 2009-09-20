@@ -17,6 +17,7 @@ $nl
 "Combining two vectors to form another vector with " { $link 2map } ":"
 { $subsection v+ }
 { $subsection v- }
+{ $subsection v+- }
 { $subsection v* }
 { $subsection v/ }
 { $subsection vmax }
@@ -56,6 +57,17 @@ HELP: v+
 HELP: v-
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Subtracts " { $snippet "v" } " from " { $snippet "u" } " component-wise." } ;
+
+HELP: v+-
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Adds and subtracts alternate elements of " { $snippet "v" } " and " { $snippet "u" } " component-wise." }
+{ $examples
+    { $example
+        "USING: math.vectors prettyprint ;"
+        "{ 1 2 3 } { 2 3 2 } v+- ."
+        "{ -1 5 1 }"
+    }
+} ;
 
 HELP: [v-]
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }

@@ -170,6 +170,7 @@ CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##box-vector %box-vector
 CODEGEN: ##add-vector %add-vector
 CODEGEN: ##sub-vector %sub-vector
+CODEGEN: ##add-sub-vector %add-sub-vector
 CODEGEN: ##mul-vector %mul-vector
 CODEGEN: ##div-vector %div-vector
 CODEGEN: ##min-vector %min-vector

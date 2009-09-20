@@ -162,6 +162,7 @@ $nl
 "It is best to avoid calling these primitives directly. To write efficient high-level code that compiles down to primitives and avoids memory allocation, see " { $link "math.vectors.simd.efficiency" } "."
 { $subsection (simd-v+) }
 { $subsection (simd-v-) }
+{ $subsection (simd-v+-) }
 { $subsection (simd-v/) }
 { $subsection (simd-vmin) }
 { $subsection (simd-vmax) }

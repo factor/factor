@@ -8,6 +8,7 @@ IN: math.vectors.simd.intrinsics
 ERROR: bad-simd-call ;
 
 : (simd-v+) ( v1 v2 rep -- v3 ) bad-simd-call ;
+: (simd-v+-) ( v1 v2 rep -- v3 ) bad-simd-call ;
 : (simd-v-) ( v1 v2 rep -- v3 ) bad-simd-call ;
 : (simd-v*) ( v1 v2 rep -- v3 ) bad-simd-call ;
 : (simd-v/) ( v1 v2 rep -- v3 ) bad-simd-call ;
@@ -67,6 +68,7 @@ GENERIC# supported-simd-op? 1 ( rep intrinsic -- ? )
 M: vector-rep supported-simd-op?
     {
         { \ (simd-v+)        [ %add-vector-reps            ] }
+        { \ (simd-v+-)       [ %add-sub-vector-reps        ] }
         { \ (simd-v-)        [ %sub-vector-reps            ] }
         { \ (simd-v*)        [ %mul-vector-reps            ] }
         { \ (simd-v/)        [ %div-vector-reps            ] }

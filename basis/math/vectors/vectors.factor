@@ -24,6 +24,11 @@ IN: math.vectors
 : vmax ( u v -- w ) [ max ] 2map ;
 : vmin ( u v -- w ) [ min ] 2map ;
 
+: v+- ( u v -- w )
+    [ t ] 2dip
+    [ [ not ] 2dip pick [ + ] [ - ] if ] 2map
+    nip ;
+
 : vfloor    ( v -- _v_ ) [ floor    ] map ;
 : vceiling  ( v -- ^v^ ) [ ceiling  ] map ;
 : vtruncate ( v -- -v- ) [ truncate ] map ;
