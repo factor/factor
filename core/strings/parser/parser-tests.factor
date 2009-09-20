@@ -19,3 +19,15 @@ IN: strings.parser.tests
 ] [
     error>> escaped-char-expected?
 ] must-fail-with
+
+[
+    " \" abc \" "
+] [
+    "\"\"\" \" abc \" \"\"\"" eval( -- string )
+] unit-test
+
+[
+    "\"abc\""
+] [
+    "\"\"\"\"abc\"\"\"\"" eval( -- string )
+] unit-test
