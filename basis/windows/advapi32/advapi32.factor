@@ -1,5 +1,5 @@
 USING: alien.syntax kernel math windows.types windows.kernel32
-math.bitwise ;
+math.bitwise classes.struct ;
 IN: windows.advapi32
 
 LIBRARY: advapi32

@@ -690,8 +690,8 @@ STRUCT: OFSTRUCT
     { nErrCode WORD }
     { Reserved1 WORD }
     { Reserved2 WORD }
-    ! { szPathName { CHAR OFS_MAXPATHNAME } } ;
     { szPathName { CHAR 128 } } ;
+    ! { szPathName { CHAR OFS_MAXPATHNAME } } ;
 
 TYPEDEF: OFSTRUCT* LPOFSTRUCT
 
