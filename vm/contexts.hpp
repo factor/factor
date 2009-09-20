@@ -36,8 +36,6 @@ struct context {
 	context *next;
 };
 
-extern cell ds_size, rs_size;
-
 #define ds_bot (stack_chain->datastack_region->start)
 #define ds_top (stack_chain->datastack_region->end)
 #define rs_bot (stack_chain->retainstack_region->start)
@@ -46,21 +44,15 @@ extern cell ds_size, rs_size;
 DEFPUSHPOP(d,ds)
 DEFPUSHPOP(r,rs)
 
-void reset_datastack();
-void reset_retainstack();
-void fix_stacks();
-void init_stacks(cell ds_size, cell rs_size);
-
 PRIMITIVE(datastack);
 PRIMITIVE(retainstack);
 PRIMITIVE(set_datastack);
 PRIMITIVE(set_retainstack);
 PRIMITIVE(check_datastack);
 
-VM_C_API void save_stacks();
-VM_C_API void nest_stacks();
-VM_C_API void unnest_stacks();
+struct factorvm;
+VM_C_API void nest_stacks(factorvm *vm);
+VM_C_API void unnest_stacks(factorvm *vm);
 
 }
 
-VM_C_API factor::context *stack_chain;

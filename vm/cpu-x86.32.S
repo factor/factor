@@ -2,6 +2,7 @@
 
 #define ARG0 %eax
 #define ARG1 %edx
+#define ARG2 %ecx
 #define STACK_REG %esp
 #define DS_REG %esi
 #define RETURN_REG %eax
@@ -48,13 +49,14 @@ DEF(long long,read_timestamp_counter,(void)):
 	rdtsc
 	ret
 
-DEF(void,primitive_inline_cache_miss,(void)):
+DEF(void,primitive_inline_cache_miss,(void *vm)):
 	mov (%esp),%ebx
-DEF(void,primitive_inline_cache_miss_tail,(void)):
+DEF(void,primitive_inline_cache_miss_tail,(void *vm)):
 	sub $8,%esp
+	push ARG0   /* push vm ptr */
 	push %ebx
 	call MANGLE(inline_cache_miss)
-	add $12,%esp
+	add $16,%esp
 	jmp *%eax
 
 DEF(void,get_sse_env,(void*)):
@@ -79,6 +81,31 @@ DEF(void,set_x87_env,(const void*)):
 	fldcw 2(%eax)
 	ret
 
+DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
+	mov CELL_SIZE(STACK_REG),NV_TEMP_REG  /* get vm ptr in case quot_xt = lazy_jit_compile */		
+	/* clear x87 stack, but preserve rounding mode and exception flags */
+	sub $2,STACK_REG
+	fnstcw (STACK_REG)
+	fninit
+	fldcw (STACK_REG)
+	/* rewind_to */
+	mov ARG1,STACK_REG
+	mov NV_TEMP_REG,ARG1
+	jmp *QUOT_XT_OFFSET(ARG0)
+
+
+DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
+	mov ARG1,NV_TEMP_REG         /* stash vm ptr */
+	mov STACK_REG,ARG1           /* Save stack pointer */
+	sub $STACK_PADDING,STACK_REG
+	push NV_TEMP_REG             /* push vm ptr as arg3 */
+	call MANGLE(lazy_jit_compile_impl)
+	pop NV_TEMP_REG
+	mov RETURN_REG,ARG0          /* No-op on 32-bit */
+	add $STACK_PADDING,STACK_REG
+        jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
+
+	
 #include "cpu-x86.S"
 
 #ifdef WINDOWS

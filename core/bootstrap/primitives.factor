@@ -103,6 +103,7 @@ bootstrapping? on
     "words"
     "vectors"
     "vectors.private"
+    "vm"
 } [ create-vocab drop ] each
 
 ! Builtin classes
@@ -518,6 +519,7 @@ tuple
     { "inline-cache-stats" "generic.single" (( -- stats )) }
     { "optimized?" "words" (( word -- ? )) }
     { "quot-compiled?" "quotations" (( quot -- ? )) }
+    { "vm-ptr" "vm" (( -- ptr )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number

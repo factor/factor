@@ -21,6 +21,7 @@ IN: bootstrap.x86
 : rex-length ( -- n ) 1 ;
 
 [
+
     ! load stack_chain
     temp0 0 MOV rc-absolute-cell rt-stack-chain jit-rel
     temp0 temp0 [] MOV
@@ -28,6 +29,8 @@ IN: bootstrap.x86
     temp0 [] stack-reg MOV
     ! load XT
     temp1 0 MOV rc-absolute-cell rt-primitive jit-rel
+    ! load vm ptr
+    arg 0 MOV rc-absolute-cell rt-vm jit-rel
     ! go
     temp1 JMP
 ] jit-primitive jit-define

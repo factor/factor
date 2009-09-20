@@ -18,6 +18,7 @@ vm_char *safe_strdup(const vm_char *str)
 	return ptr;
 }
 
+
 /* We don't use printf directly, because format directives are not portable.
 Instead we define the common cases here. */
 void nl()
@@ -29,6 +30,7 @@ void print_string(const char *str)
 {
 	fputs(str,stdout);
 }
+
 
 void print_cell(cell x)
 {
@@ -55,6 +57,6 @@ cell read_cell_hex()
 	cell cell;
 	if(scanf(CELL_HEX_FORMAT,&cell) < 0) exit(1);
 	return cell;
-};
+}
 
 }
