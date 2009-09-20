@@ -131,8 +131,7 @@ DEFER: (parse-long-string)
         dup rest-begins? [
             [ lexer get ] dip length [ + ] curry change-column drop
         ] [
-            rest-of-line %
-            lexer get next-line "\n" % (parse-long-string)
+            lexer get next-char , (parse-long-string)
         ] if
     ] if ;
 
