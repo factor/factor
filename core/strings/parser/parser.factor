@@ -91,11 +91,26 @@ name>char-hook [
 : rest-of-line ( -- seq )
     lexer get [ line-text>> ] [ column>> ] bi tail-slice ;
 
+: current-char ( lexer -- ch )
+    [ column>> ] [ line-text>> ] bi nth ;
+
+: advance-char ( lexer -- )
+    [ 1 + ] change-column drop ;
+
+ERROR: escaped-char-expected ;
+
+: next-char ( lexer -- ch )
+    dup still-parsing-line? [
+        [ current-char ] [ advance-char ] bi
+    ] [
+        escaped-char-expected
+    ] if ;
+
 : parse-escape ( i -- )
     lexer-advance % CHAR: \ ,
     lexer get
-    [ [ 2 + ] change-column drop ]
-    [ [ column>> 1 - ] [ line-text>> ] bi nth , ] bi ;
+    [ advance-char ]
+    [ next-char , ] bi ;
 
 : next-string-line ( obj -- )
     drop rest-of-line %
@@ -135,15 +150,18 @@ DEFER: (parse-long-string)
         unexpected-eof
     ] if ;
 
-PRIVATE>
-
 : parse-long-string ( string -- string' )
-    [ (parse-long-string) ] "" make unescape-string ;
+    [ (parse-long-string) ] "" make ;
+
+: parse-long-string-escaped ( string -- string' )
+    parse-long-string unescape-string ;
+
+PRIVATE>
 
 : parse-multiline-string ( -- string )
     rest-of-line "\"\"" head? [
         lexer get [ 2 + ] change-column drop
-        "\"\"\"" parse-long-string
+        "\"\"\"" parse-long-string-escaped
     ] [
-        "\"" parse-long-string
+        "\"" parse-long-string-escaped
     ] if ;
