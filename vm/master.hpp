@@ -1,6 +1,9 @@
 #ifndef __FACTOR_MASTER_H__
 #define __FACTOR_MASTER_H__
 
+#define _THREAD_SAFE
+#define _REENTRANT
+
 #ifndef WINCE
 #include <errno.h>
 #endif
@@ -41,11 +44,11 @@
 #include "segments.hpp"
 #include "contexts.hpp"
 #include "run.hpp"
-#include "tagged.hpp"
 #include "profiler.hpp"
 #include "errors.hpp"
 #include "bignumint.hpp"
 #include "bignum.hpp"
+#include "code_block.hpp"
 #include "data_heap.hpp"
 #include "write_barrier.hpp"
 #include "data_gc.hpp"
@@ -62,16 +65,20 @@
 #include "float_bits.hpp"
 #include "io.hpp"
 #include "code_gc.hpp"
-#include "code_block.hpp"
 #include "code_heap.hpp"
 #include "image.hpp"
 #include "callstack.hpp"
 #include "alien.hpp"
+#include "vm.hpp"
+#include "tagged.hpp"
+#include "inlineimpls.hpp"
 #include "jit.hpp"
 #include "quotations.hpp"
 #include "dispatch.hpp"
 #include "inline_cache.hpp"
 #include "factor.hpp"
 #include "utilities.hpp"
+
+
 
 #endif /* __FACTOR_MASTER_H__ */

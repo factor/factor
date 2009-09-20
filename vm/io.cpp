@@ -14,14 +14,15 @@ The Factor library provides platform-specific code for Unix and Windows
 with many more capabilities so these words are not usually used in
 normal operation. */
 
-void init_c_io()
+void factorvm::init_c_io()
 {
 	userenv[STDIN_ENV] = allot_alien(F,(cell)stdin);
 	userenv[STDOUT_ENV] = allot_alien(F,(cell)stdout);
 	userenv[STDERR_ENV] = allot_alien(F,(cell)stderr);
 }
 
-void io_error()
+
+void factorvm::io_error()
 {
 #ifndef WINCE
 	if(errno == EINTR)
@@ -31,12 +32,13 @@ void io_error()
 	general_error(ERROR_IO,tag_fixnum(errno),F,NULL);
 }
 
-PRIMITIVE(fopen)
+
+inline void factorvm::vmprim_fopen()
 {
-	gc_root<byte_array> mode(dpop());
-	gc_root<byte_array> path(dpop());
-	mode.untag_check();
-	path.untag_check();
+	gc_root<byte_array> mode(dpop(),this);
+	gc_root<byte_array> path(dpop(),this);
+	mode.untag_check(this);
+	path.untag_check(this);
 
 	for(;;)
 	{
@@ -52,7 +54,12 @@ PRIMITIVE(fopen)
 	}
 }
 
-PRIMITIVE(fgetc)
+PRIMITIVE(fopen)
+{
+	PRIMITIVE_GETVM()->vmprim_fopen();
+}
+
+inline void factorvm::vmprim_fgetc()
 {
 	FILE *file = (FILE *)unbox_alien();
 
@@ -77,7 +84,12 @@ PRIMITIVE(fgetc)
 	}
 }
 
-PRIMITIVE(fread)
+PRIMITIVE(fgetc)
+{
+	PRIMITIVE_GETVM()->vmprim_fgetc();
+}
+
+inline void factorvm::vmprim_fread()
 {
 	FILE *file = (FILE *)unbox_alien();
 	fixnum size = unbox_array_size();
@@ -88,7 +100,7 @@ PRIMITIVE(fread)
 		return;
 	}
 
-	gc_root<byte_array> buf(allot_array_internal<byte_array>(size));
+	gc_root<byte_array> buf(allot_array_internal<byte_array>(size),this);
 
 	for(;;)
 	{
@@ -117,7 +129,12 @@ PRIMITIVE(fread)
 	}
 }
 
-PRIMITIVE(fputc)
+PRIMITIVE(fread)
+{
+	PRIMITIVE_GETVM()->vmprim_fread();
+}
+
+inline void factorvm::vmprim_fputc()
 {
 	FILE *file = (FILE *)unbox_alien();
 	fixnum ch = to_fixnum(dpop());
@@ -135,7 +152,12 @@ PRIMITIVE(fputc)
 	}
 }
 
-PRIMITIVE(fwrite)
+PRIMITIVE(fputc)
+{
+	PRIMITIVE_GETVM()->vmprim_fputc();
+}
+
+inline void factorvm::vmprim_fwrite()
 {
 	FILE *file = (FILE *)unbox_alien();
 	byte_array *text = untag_check<byte_array>(dpop());
@@ -164,7 +186,12 @@ PRIMITIVE(fwrite)
 	}
 }
 
-PRIMITIVE(fseek)
+PRIMITIVE(fwrite)
+{
+	PRIMITIVE_GETVM()->vmprim_fwrite();
+}
+
+inline void factorvm::vmprim_fseek()
 {
 	int whence = to_fixnum(dpop());
 	FILE *file = (FILE *)unbox_alien();
@@ -189,7 +216,12 @@ PRIMITIVE(fseek)
 	}
 }
 
-PRIMITIVE(fflush)
+PRIMITIVE(fseek)
+{
+	PRIMITIVE_GETVM()->vmprim_fseek();
+}
+
+inline void factorvm::vmprim_fflush()
 {
 	FILE *file = (FILE *)unbox_alien();
 	for(;;)
@@ -201,7 +233,12 @@ PRIMITIVE(fflush)
 	}
 }
 
-PRIMITIVE(fclose)
+PRIMITIVE(fflush)
+{
+	PRIMITIVE_GETVM()->vmprim_fflush();
+}
+
+inline void factorvm::vmprim_fclose()
 {
 	FILE *file = (FILE *)unbox_alien();
 	for(;;)
@@ -211,6 +248,11 @@ PRIMITIVE(fclose)
 		else
 			break;
 	}
+}
+
+PRIMITIVE(fclose)
+{
+	PRIMITIVE_GETVM()->vmprim_fclose();
 }
 
 /* This function is used by FFI I/O. Accessing the errno global directly is
@@ -225,5 +267,4 @@ VM_C_API void clear_err_no()
 {
 	errno = 0;
 }
-
 }

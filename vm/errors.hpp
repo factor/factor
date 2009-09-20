@@ -23,31 +23,11 @@ enum vm_error_type
 	ERROR_FP_TRAP,
 };
 
-void out_of_memory();
-void fatal_error(const char* msg, cell tagged);
-void critical_error(const char* msg, cell tagged);
-
 PRIMITIVE(die);
-
-void throw_error(cell error, stack_frame *native_stack);
-void general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *native_stack);
-void divide_by_zero_error();
-void memory_protection_error(cell addr, stack_frame *native_stack);
-void signal_error(int signal, stack_frame *native_stack);
-void type_error(cell type, cell tagged);
-void not_implemented_error();
-void fp_trap_error(unsigned int fpu_status, stack_frame *signal_callstack_top);
-
 PRIMITIVE(call_clear);
 PRIMITIVE(unimplemented);
 
-/* Global variables used to pass fault handler state from signal handler to
-user-space */
-extern cell signal_number;
-extern cell signal_fault_addr;
-extern unsigned int signal_fpu_status;
-extern stack_frame *signal_callstack_top;
-
+void fatal_error(const char* msg, cell tagged);
 void memory_signal_handler_impl();
 void fp_signal_handler_impl();
 void misc_signal_handler_impl();

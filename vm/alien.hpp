@@ -1,8 +1,6 @@
 namespace factor
 {
 
-cell allot_alien(cell delegate, cell displacement);
-
 PRIMITIVE(displaced_alien);
 PRIMITIVE(alien_address);
 
@@ -38,12 +36,14 @@ PRIMITIVE(dlsym);
 PRIMITIVE(dlclose);
 PRIMITIVE(dll_validp);
 
-VM_C_API char *alien_offset(cell object);
-VM_C_API char *unbox_alien();
-VM_C_API void box_alien(void *ptr);
-VM_C_API void to_value_struct(cell src, void *dest, cell size);
-VM_C_API void box_value_struct(void *src, cell size);
-VM_C_API void box_small_struct(cell x, cell y, cell size);
-VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size);
+PRIMITIVE(vm_ptr);
+
+VM_C_API char *alien_offset(cell object, factorvm *vm);
+VM_C_API char *unbox_alien(factorvm *vm);
+VM_C_API void box_alien(void *ptr, factorvm *vm);
+VM_C_API void to_value_struct(cell src, void *dest, cell size, factorvm *vm);
+VM_C_API void box_value_struct(void *src, cell size,factorvm *vm);
+VM_C_API void box_small_struct(cell x, cell y, cell size,factorvm *vm);
+VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size,factorvm *vm);
 
 }
