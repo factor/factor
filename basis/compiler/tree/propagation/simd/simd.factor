@@ -24,6 +24,7 @@ IN: compiler.tree.propagation.simd
         literal>> scalar-rep-of {
             { float-rep [ float ] }
             { double-rep [ float ] }
+            { int-rep [ integer ] }
         } case
     ] [ drop real ] if
     <class-info>

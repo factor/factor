@@ -1,8 +1,30 @@
+USING: accessors arrays classes compiler compiler.tree.debugger
+effects fry io kernel kernel.private math math.functions
+math.private math.vectors math.vectors.simd
+math.vectors.simd.private prettyprint random sequences system
+tools.test vocabs assocs compiler.cfg.debugger words
+locals math.vectors.specialization combinators cpu.architecture
+math.vectors.simd.intrinsics namespaces byte-arrays alien
+specialized-arrays classes.struct ;
+FROM: alien.c-types => c-type-boxed-class ;
+SPECIALIZED-ARRAY: float
+SIMD: char-16
+SIMD: uchar-16
+SIMD: char-32
+SIMD: uchar-32
+SIMD: short-8
+SIMD: ushort-8
+SIMD: short-16
+SIMD: ushort-16
+SIMD: int-4
+SIMD: uint-4
+SIMD: int-8
+SIMD: uint-8
+SIMD: float-4
+SIMD: float-8
+SIMD: double-2
+SIMD: double-4
 IN: math.vectors.simd.tests
-USING: math math.vectors.simd math.vectors.simd.private
-math.vectors math.functions math.private kernel.private compiler
-sequences tools.test compiler.tree.debugger accessors kernel
-system ;
 
 [ float-4{ 0 0 0 0 } ] [ float-4 new ] unit-test
 
@@ -11,344 +33,6 @@ system ;
 [ V{ float } ] [ [ { float-4 } declare norm-sq ] final-classes ] unit-test
 
 [ V{ float } ] [ [ { float-4 } declare norm ] final-classes ] unit-test
-
-[ float-4{ 12 12 12 12 } ] [
-    12 [ float-4-with ] compile-call
-] unit-test
-
-[ float-4{ 1 2 3 4 } ] [
-    1 2 3 4 [ float-4-boa ] compile-call
-] unit-test
-
-[ float-4{ 11 22 33 44 } ] [
-    float-4{ 1 2 3 4 } float-4{ 10 20 30 40 }
-    [ { float-4 float-4 } declare v+ ] compile-call
-] unit-test
-
-[ float-4{ -9 -18 -27 -36 } ] [
-    float-4{ 1 2 3 4 } float-4{ 10 20 30 40 }
-    [ { float-4 float-4 } declare v- ] compile-call
-] unit-test
-
-[ float-4{ 10 40 90 160 } ] [
-    float-4{ 1 2 3 4 } float-4{ 10 20 30 40 }
-    [ { float-4 float-4 } declare v* ] compile-call
-] unit-test
-
-[ float-4{ 10 100 1000 10000 } ] [
-    float-4{ 100 2000 30000 400000 } float-4{ 10 20 30 40 }
-    [ { float-4 float-4 } declare v/ ] compile-call
-] unit-test
-
-[ float-4{ -10 -20 -30 -40 } ] [
-    float-4{ -10 20 -30 40 } float-4{ 10 -20 30 -40 }
-    [ { float-4 float-4 } declare vmin ] compile-call
-] unit-test
-
-[ float-4{ 10 20 30 40 } ] [
-    float-4{ -10 20 -30 40 } float-4{ 10 -20 30 -40 }
-    [ { float-4 float-4 } declare vmax ] compile-call
-] unit-test
-
-[ 10.0 ] [
-    float-4{ 1 2 3 4 }
-    [ { float-4 } declare sum ] compile-call
-] unit-test
-
-[ 13.0 ] [
-    float-4{ 1 2 3 4 }
-    [ { float-4 } declare sum 3.0 + ] compile-call
-] unit-test
-
-[ 8.0 ] [
-    float-4{ 1 2 3 4 } float-4{ 2 0 2 0 }
-    [ { float-4 float-4 } declare v. ] compile-call
-] unit-test
-
-[ float-4{ 5 10 15 20 } ] [
-    5.0 float-4{ 1 2 3 4 }
-    [ { float float-4 } declare n*v ] compile-call
-] unit-test
-
-[ float-4{ 5 10 15 20 } ] [
-    float-4{ 1 2 3 4 } 5.0
-    [ { float float-4 } declare v*n ] compile-call
-] unit-test
-
-[ float-4{ 10 5 2 5 } ] [
-    10.0 float-4{ 1 2 5 2 }
-    [ { float float-4 } declare n/v ] compile-call
-] unit-test
-
-[ float-4{ 0.5 1 1.5 2 } ] [
-    float-4{ 1 2 3 4 } 2
-    [ { float float-4 } declare v/n ] compile-call
-] unit-test
-
-[ float-4{ 1 0 0 0 } ] [
-    float-4{ 10 0 0 0 }
-    [ { float-4 } declare normalize ] compile-call
-] unit-test
-
-[ 30.0 ] [
-    float-4{ 1 2 3 4 }
-    [ { float-4 } declare norm-sq ] compile-call
-] unit-test
-
-[ t ] [
-    float-4{ 1 0 0 0 }
-    float-4{ 0 1 0 0 }
-    [ { float-4 float-4 } declare distance ] compile-call
-    2 sqrt 1.0e-6 ~
-] unit-test
-
-[ double-2{ 12 12 } ] [
-    12 [ double-2-with ] compile-call
-] unit-test
-
-[ double-2{ 1 2 } ] [
-    1 2 [ double-2-boa ] compile-call
-] unit-test
-
-[ double-2{ 11 22 } ] [
-    double-2{ 1 2 } double-2{ 10 20 }
-    [ { double-2 double-2 } declare v+ ] compile-call
-] unit-test
-
-[ double-2{ -9 -18 } ] [
-    double-2{ 1 2 } double-2{ 10 20 }
-    [ { double-2 double-2 } declare v- ] compile-call
-] unit-test
-
-[ double-2{ 10 40 } ] [
-    double-2{ 1 2 } double-2{ 10 20 }
-    [ { double-2 double-2 } declare v* ] compile-call
-] unit-test
-
-[ double-2{ 10 100 } ] [
-    double-2{ 100 2000 } double-2{ 10 20 }
-    [ { double-2 double-2 } declare v/ ] compile-call
-] unit-test
-
-[ double-2{ -10 -20 } ] [
-    double-2{ -10 20 } double-2{ 10 -20 }
-    [ { double-2 double-2 } declare vmin ] compile-call
-] unit-test
-
-[ double-2{ 10 20 } ] [
-    double-2{ -10 20 } double-2{ 10 -20 }
-    [ { double-2 double-2 } declare vmax ] compile-call
-] unit-test
-
-[ 3.0 ] [
-    double-2{ 1 2 }
-    [ { double-2 } declare sum ] compile-call
-] unit-test
-
-[ 7.0 ] [
-    double-2{ 1 2 }
-    [ { double-2 } declare sum 4.0 + ] compile-call
-] unit-test
-
-[ 16.0 ] [
-    double-2{ 1 2 } double-2{ 2 7 }
-    [ { double-2 double-2 } declare v. ] compile-call
-] unit-test
-
-[ double-2{ 5 10 } ] [
-    5.0 double-2{ 1 2 }
-    [ { float double-2 } declare n*v ] compile-call
-] unit-test
-
-[ double-2{ 5 10 } ] [
-    double-2{ 1 2 } 5.0
-    [ { float double-2 } declare v*n ] compile-call
-] unit-test
-
-[ double-2{ 10 5 } ] [
-    10.0 double-2{ 1 2 }
-    [ { float double-2 } declare n/v ] compile-call
-] unit-test
-
-[ double-2{ 0.5 1 } ] [
-    double-2{ 1 2 } 2
-    [ { float double-2 } declare v/n ] compile-call
-] unit-test
-
-[ double-2{ 0 0 } ] [ double-2 new ] unit-test
-
-[ double-2{ 1 0 } ] [
-    double-2{ 10 0 }
-    [ { double-2 } declare normalize ] compile-call
-] unit-test
-
-[ 5.0 ] [
-    double-2{ 1 2 }
-    [ { double-2 } declare norm-sq ] compile-call
-] unit-test
-
-[ t ] [
-    double-2{ 1 0 }
-    double-2{ 0 1 }
-    [ { double-2 double-2 } declare distance ] compile-call
-    2 sqrt 1.0e-6 ~
-] unit-test
-
-[ double-4{ 0 0 0 0 } ] [ double-4 new ] unit-test
-
-[ double-4{ 1 2 3 4 } ] [
-    1 2 3 4 double-4-boa
-] unit-test
-
-[ double-4{ 1 1 1 1 } ] [
-    1 double-4-with
-] unit-test
-
-[ double-4{ 0 1 2 3 } ] [
-    1 double-4-with [ * ] map-index
-] unit-test
-
-[ V{ float } ] [ [ { double-4 } declare norm-sq ] final-classes ] unit-test
-
-[ V{ float } ] [ [ { double-4 } declare norm ] final-classes ] unit-test
-
-[ double-4{ 12 12 12 12 } ] [
-    12 [ double-4-with ] compile-call
-] unit-test
-
-[ double-4{ 1 2 3 4 } ] [
-    1 2 3 4 [ double-4-boa ] compile-call
-] unit-test
-
-[ double-4{ 11 22 33 44 } ] [
-    double-4{ 1 2 3 4 } double-4{ 10 20 30 40 }
-    [ { double-4 double-4 } declare v+ ] compile-call
-] unit-test
-
-[ double-4{ -9 -18 -27 -36 } ] [
-    double-4{ 1 2 3 4 } double-4{ 10 20 30 40 }
-    [ { double-4 double-4 } declare v- ] compile-call
-] unit-test
-
-[ double-4{ 10 40 90 160 } ] [
-    double-4{ 1 2 3 4 } double-4{ 10 20 30 40 }
-    [ { double-4 double-4 } declare v* ] compile-call
-] unit-test
-
-[ double-4{ 10 100 1000 10000 } ] [
-    double-4{ 100 2000 30000 400000 } double-4{ 10 20 30 40 }
-    [ { double-4 double-4 } declare v/ ] compile-call
-] unit-test
-
-[ double-4{ -10 -20 -30 -40 } ] [
-    double-4{ -10 20 -30 40 } double-4{ 10 -20 30 -40 }
-    [ { double-4 double-4 } declare vmin ] compile-call
-] unit-test
-
-[ double-4{ 10 20 30 40 } ] [
-    double-4{ -10 20 -30 40 } double-4{ 10 -20 30 -40 }
-    [ { double-4 double-4 } declare vmax ] compile-call
-] unit-test
-
-[ 10.0 ] [
-    double-4{ 1 2 3 4 }
-    [ { double-4 } declare sum ] compile-call
-] unit-test
-
-[ 13.0 ] [
-    double-4{ 1 2 3 4 }
-    [ { double-4 } declare sum 3.0 + ] compile-call
-] unit-test
-
-[ 8.0 ] [
-    double-4{ 1 2 3 4 } double-4{ 2 0 2 0 }
-    [ { double-4 double-4 } declare v. ] compile-call
-] unit-test
-
-[ double-4{ 5 10 15 20 } ] [
-    5.0 double-4{ 1 2 3 4 }
-    [ { float double-4 } declare n*v ] compile-call
-] unit-test
-
-[ double-4{ 5 10 15 20 } ] [
-    double-4{ 1 2 3 4 } 5.0
-    [ { float double-4 } declare v*n ] compile-call
-] unit-test
-
-[ double-4{ 10 5 2 5 } ] [
-    10.0 double-4{ 1 2 5 2 }
-    [ { float double-4 } declare n/v ] compile-call
-] unit-test
-
-[ double-4{ 0.5 1 1.5 2 } ] [
-    double-4{ 1 2 3 4 } 2
-    [ { float double-4 } declare v/n ] compile-call
-] unit-test
-
-[ double-4{ 1 0 0 0 } ] [
-    double-4{ 10 0 0 0 }
-    [ { double-4 } declare normalize ] compile-call
-] unit-test
-
-[ 30.0 ] [
-    double-4{ 1 2 3 4 }
-    [ { double-4 } declare norm-sq ] compile-call
-] unit-test
-
-[ t ] [
-    double-4{ 1 0 0 0 }
-    double-4{ 0 1 0 0 }
-    [ { double-4 double-4 } declare distance ] compile-call
-    2 sqrt 1.0e-6 ~
-] unit-test
-
-[ float-8{ 0 0 0 0 0 0 0 0 } ] [ float-8 new ] unit-test
-
-[ float-8{ 0 0 0 0 0 0 0 0 } ] [ [ float-8 new ] compile-call ] unit-test
-
-[ float-8{ 1 1 1 1 1 1 1 1 } ] [ 1 float-8-with ] unit-test
-
-[ float-8{ 1 1 1 1 1 1 1 1 } ] [ [ 1 float-8-with ] compile-call ] unit-test
-
-[ float-8{ 1 2 3 4 5 6 7 8 } ] [ 1 2 3 4 5 6 7 8 float-8-boa ] unit-test
-
-[ float-8{ 1 2 3 4 5 6 7 8 } ] [ [ 1 2 3 4 5 6 7 8 float-8-boa ] compile-call ] unit-test
-
-[ float-8{ 3 6 9 12 15 18 21 24 } ] [
-    float-8{ 1 2 3 4 5 6 7 8 }
-    float-8{ 2 4 6 8 10 12 14 16 }
-    [ { float-8 float-8 } declare v+ ] compile-call
-] unit-test
-
-[ float-8{ -1 -2 -3 -4 -5 -6 -7 -8 } ] [
-    float-8{ 1 2 3 4 5 6 7 8 }
-    float-8{ 2 4 6 8 10 12 14 16 }
-    [ { float-8 float-8 } declare v- ] compile-call
-] unit-test
-
-[ float-8{ -1 -2 -3 -4 -5 -6 -7 -8 } ] [
-    -0.5
-    float-8{ 2 4 6 8 10 12 14 16 }
-    [ { float float-8 } declare n*v ] compile-call
-] unit-test
-
-[ float-8{ -1 -2 -3 -4 -5 -6 -7 -8 } ] [
-    float-8{ 2 4 6 8 10 12 14 16 }
-    -0.5
-    [ { float-8 float } declare v*n ] compile-call
-] unit-test
-
-[ float-8{ 256 128 64 32 16 8 4 2 } ] [
-    256.0
-    float-8{ 1 2 4 8 16 32 64 128 }
-    [ { float float-8 } declare n/v ] compile-call
-] unit-test
-
-[ float-8{ -1 -2 -3 -4 -5 -6 -7 -8 } ] [
-    float-8{ 2 4 6 8 10 12 14 16 }
-    -2.0
-    [ { float-8 float } declare v/n ] compile-call
-] unit-test
 
 ! Test puns; only on x86
 cpu x86? [
@@ -362,3 +46,179 @@ cpu x86? [
         [ { double-2 double-2 } declare v+ underlying>> 3.0 float* ] compile-call
     ] unit-test
 ] when
+
+! Fuzz testing
+CONSTANT: simd-classes
+    {
+        char-16
+        uchar-16
+        char-32
+        uchar-32
+        short-8
+        ushort-8
+        short-16
+        ushort-16
+        int-4
+        uint-4
+        int-8
+        uint-8
+        float-4
+        float-8
+        double-2
+        double-4
+    }
+
+: with-ctors ( -- seq )
+    simd-classes [ [ name>> "-with" append ] [ vocabulary>> ] bi lookup ] map ;
+
+: boa-ctors ( -- seq )
+    simd-classes [ [ name>> "-boa" append ] [ vocabulary>> ] bi lookup ] map ;
+
+: check-optimizer ( seq inputs quot -- )
+    [
+        [ "print-mr" get [ nip test-mr mr. ] [ 2drop ] if ]
+        [ [ call ] dip call ]
+        [ [ call ] dip compile-call ] 2tri = not
+    ] compose filter ; inline
+
+"== Checking -new constructors" print
+
+[ { } ] [
+    simd-classes [ [ [ ] ] dip '[ _ new ] ] check-optimizer
+] unit-test
+
+[ { } ] [
+    simd-classes [ '[ _ new ] compile-call [ zero? ] all? not ] filter
+] unit-test
+
+"== Checking -with constructors" print
+
+[ { } ] [
+    with-ctors [
+        [ 1000 random '[ _ ] ] dip '[ { fixnum } declare _ execute ]
+    ] check-optimizer
+] unit-test
+
+"== Checking -boa constructors" print
+
+[ { } ] [
+    boa-ctors [
+        dup stack-effect in>> length
+        [ nip [ 1000 random ] [ ] replicate-as ]
+        [ fixnum <array> swap '[ _ declare _ execute ] ]
+        2bi
+    ] check-optimizer
+] unit-test
+
+"== Checking vector operations" print
+
+: random-vector ( class -- vec )
+    new [ drop 1000 random ] map ;
+
+:: check-vector-op ( word inputs class elt-class -- inputs quot )
+    inputs [
+        [
+            {
+                { +vector+ [ class random-vector ] }
+                { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
+            } case
+        ] [ ] map-as
+    ] [
+        [
+            {
+                { +vector+ [ class ] }
+                { +scalar+ [ elt-class ] }
+            } case
+        ] map
+    ] bi
+    word '[ _ declare _ execute ] ;
+
+: ops-to-check ( elt-class -- alist )
+    [ vector-words >alist ] dip float = [
+        [ drop { n/v v/n v/ normalize } member? not ] assoc-filter
+    ] unless ;
+
+: check-vector-ops ( class elt-class -- )
+    [ nip ops-to-check ] 2keep
+    '[ first2 inputs _ _ check-vector-op ] check-optimizer ; inline
+
+: simd-classes&reps ( -- alist )
+    simd-classes [
+        dup name>> [ "float" head? ] [ "double" head? ] bi or
+        float fixnum ?
+    ] { } map>assoc ;
+
+simd-classes&reps [
+    [ [ { } ] ] 2dip '[ _ _ check-vector-ops ] unit-test
+] assoc-each
+
+! Other regressions
+[ 8000000 ] [
+    int-8{ 1000 1000 1000 1000 1000 1000 1000 1000 }
+    [ { int-8 } declare dup [ * ] [ + ] 2map-reduce ] compile-call
+] unit-test
+
+
+! Vector alien intrinsics
+[ float-4{ 1 2 3 4 } ] [
+    [
+        float-4{ 1 2 3 4 }
+        underlying>> 0 float-4-rep alien-vector
+    ] compile-call float-4 boa
+] unit-test
+
+[ B{ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 } ] [
+    16 [ 1 ] B{ } replicate-as 16 <byte-array>
+    [
+        0 [
+            { byte-array c-ptr fixnum } declare
+            float-4-rep set-alien-vector
+        ] compile-call
+    ] keep
+] unit-test
+
+[ float-array{ 1 2 3 4 } ] [
+    [
+        float-array{ 1 2 3 4 } underlying>>
+        float-array{ 4 3 2 1 } clone
+        [ underlying>> 0 float-4-rep set-alien-vector ] keep
+    ] compile-call
+] unit-test
+
+STRUCT: simd-struct
+{ x float-4 }
+{ y double-2 }
+{ z double-4 }
+{ w float-8 } ;
+
+[ t ] [ [ simd-struct <struct> ] compile-call >c-ptr [ 0 = ] all? ] unit-test
+
+[
+    float-4{ 1 2 3 4 }
+    double-2{ 2 1 }
+    double-4{ 4 3 2 1 }
+    float-8{ 1 2 3 4 5 6 7 8 }
+] [
+    simd-struct <struct>
+    float-4{ 1 2 3 4 } >>x
+    double-2{ 2 1 } >>y
+    double-4{ 4 3 2 1 } >>z
+    float-8{ 1 2 3 4 5 6 7 8 } >>w
+    { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
+] unit-test
+
+[
+    float-4{ 1 2 3 4 }
+    double-2{ 2 1 }
+    double-4{ 4 3 2 1 }
+    float-8{ 1 2 3 4 5 6 7 8 }
+] [
+    [
+        simd-struct <struct>
+        float-4{ 1 2 3 4 } >>x
+        double-2{ 2 1 } >>y
+        double-4{ 4 3 2 1 } >>z
+        float-8{ 1 2 3 4 5 6 7 8 } >>w
+        { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
+    ] compile-call
+] unit-test
