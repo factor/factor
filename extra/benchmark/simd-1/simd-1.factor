@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io math math.functions math.parser math.vectors
 math.vectors.simd sequences specialized-arrays ;
+SIMD: float-4
 SPECIALIZED-ARRAY: float-4
 IN: benchmark.simd-1
 

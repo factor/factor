@@ -5,6 +5,7 @@ effects fry functors generalizations kernel literals locals
 math math.functions math.vectors math.vectors.simd.intrinsics
 math.vectors.specialization parser prettyprint.custom sequences
 sequences.private strings words definitions macros cpu.architecture ;
+QUALIFIED-WITH: math m
 IN: math.vectors.simd.functor
 
 ERROR: bad-length got expected ;
@@ -51,11 +52,10 @@ MACRO: simd-boa ( rep class -- simd-array )
     '[ nip _ swap supported-simd-op? ] assoc-filter
     '[ drop _ key? ] assoc-filter ;
 
-:: high-level-ops ( ctor -- assoc )
+:: high-level-ops ( ctor elt-class -- assoc )
     ! Some SIMD operations are defined in terms of others.
     {
         { vneg [ [ dup v- ] keep v- ] }
-        { v. [ v* sum ] }
         { n+v [ [ ctor execute ] dip v+ ] }
         { v+n [ ctor execute v+ ] }
         { n-v [ [ ctor execute ] dip v- ] }
@@ -67,15 +67,35 @@ MACRO: simd-boa ( rep class -- simd-array )
         { norm-sq [ dup v. assert-positive ] }
         { norm [ norm-sq sqrt ] }
         { normalize [ dup norm v/n ] }
-        { distance [ v- norm ] }
-    } ;
+    }
+    ! To compute dot product and distance with integer vectors, we
+    ! have to do things less efficiently, with integer overflow checks,
+    ! in the general case.
+    elt-class m:float = [
+        {
+            { distance [ v- norm ] }
+            { v. [ v* sum ] }
+        } append
+    ] when ;
 
 :: simd-vector-words ( class ctor rep assoc -- )
+    rep rep-component-type c-type-boxed-class :> elt-class
     class
-    rep rep-component-type c-type-boxed-class
+    elt-class
     assoc rep supported-simd-ops
-    ctor high-level-ops assoc-union
+    ctor elt-class high-level-ops assoc-union
     specialize-vector-words ;
+
+:: define-simd-128-type ( class rep -- )
+    <c-type>
+        byte-array >>class
+        class >>boxed-class
+        [ rep alien-vector class boa ] >>getter
+        [ [ underlying>> ] 2dip rep set-alien-vector ] >>setter
+        16 >>size
+        8 >>align
+        rep >>rep
+    class typedef ;
 
 FUNCTOR: define-simd-128 ( T -- )
 
@@ -159,11 +179,35 @@ INSTANCE: A sequence
     { sum [ [ (simd-sum) ] \ A-v->n-op execute ] }
 } simd-vector-words
 
+\ A \ A-rep define-simd-128-type
+
 PRIVATE>
 
 ;FUNCTOR
 
 ! Synthesize 256-bit vectors from a pair of 128-bit vectors
+SLOT: underlying1
+SLOT: underlying2
+
+:: define-simd-256-type ( class rep -- )
+    <c-type>
+        class >>class
+        class >>boxed-class
+        [
+            [ rep alien-vector ]
+            [ 16 + >fixnum rep alien-vector ] 2bi
+            class boa
+        ] >>getter
+        [
+            [ [ underlying1>> ] 2dip rep set-alien-vector ]
+            [ [ underlying2>> ] 2dip 16 + >fixnum rep set-alien-vector ]
+            3bi
+        ] >>setter
+        32 >>size
+        8 >>align
+        rep >>rep
+    class typedef ;
+
 FUNCTOR: define-simd-256 ( T -- )
 
 N            [ 32 T heap-size /i ]
@@ -235,7 +279,7 @@ M: A pprint* pprint-object ;
 
 : A-boa ( ... -- simd-array )
     [ A/2-boa ] N/2 ndip A/2-boa [ underlying>> ] bi@
-    \ A boa ;
+    \ A boa ; inline
 
 \ A-rep 2 boa-effect \ A-boa set-stack-effect
 
@@ -259,5 +303,7 @@ INSTANCE: A sequence
     { vmax [ [ (simd-vmax) ] \ A-vv->v-op execute ] }
     { sum [ [ (simd-v+) ] [ (simd-sum) ] \ A-v->n-op execute ] }
 } simd-vector-words
+
+\ A \ A-rep define-simd-256-type
 
 ;FUNCTOR
