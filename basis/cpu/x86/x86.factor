@@ -4,7 +4,8 @@ USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
 cpu.architecture kernel kernel.private math memory namespaces make
 sequences words system layouts combinators math.order fry locals
-compiler.constants byte-arrays
+compiler.constants byte-arrays io macros quotations cpu.x86.features
+cpu.x86.features.private compiler compiler.units init
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.intrinsics
@@ -250,11 +251,25 @@ M:: x86 %unbox-vector ( dst src rep -- )
     dst src byte-array-offset [+]
     rep copy-register ;
 
+MACRO: available-reps ( alist -- )
+    ! Each SSE version adds new representations and supports
+    ! all old ones
+    unzip { } [ append ] accumulate rest swap suffix
+    [ [ 1quotation ] map ] bi@ zip
+    reverse [ { } ] suffix
+    '[ _ cond ] ;
+
 M: x86 %broadcast-vector ( dst src rep -- )
     {
         { float-4-rep [ [ MOVSS ] [ drop dup 0 SHUFPS ] 2bi ] }
         { double-2-rep [ [ MOVSD ] [ drop dup UNPCKLPD ] 2bi ] }
     } case ;
+
+M: x86 %broadcast-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep } }
+    } available-reps ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
     rep {
@@ -269,6 +284,11 @@ M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
         }
     } case ;
 
+M: x86 %gather-vector-4-reps
+    {
+        { sse? { float-4-rep } }
+    } available-reps ;
+
 M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
     rep {
         {
@@ -279,6 +299,11 @@ M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
             ]
         }
     } case ;
+
+M: x86 %gather-vector-2-reps
+    {
+        { sse2? { double-2-rep } }
+    } available-reps ;
 
 M: x86 %add-vector ( dst src1 src2 rep -- )
     {
@@ -292,6 +317,12 @@ M: x86 %add-vector ( dst src1 src2 rep -- )
         { uint-4-rep [ PADDD ] }
     } case drop ;
 
+M: x86 %add-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+    } available-reps ;
+
 M: x86 %sub-vector ( dst src1 src2 rep -- )
     {
         { float-4-rep [ SUBPS ] }
@@ -304,12 +335,27 @@ M: x86 %sub-vector ( dst src1 src2 rep -- )
         { uint-4-rep [ PSUBD ] }
     } case drop ;
 
+M: x86 %sub-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+    } available-reps ;
+
 M: x86 %mul-vector ( dst src1 src2 rep -- )
     {
         { float-4-rep [ MULPS ] }
         { double-2-rep [ MULPD ] }
-        { int-4-rep [ PMULLW ] }
+        { short-8-rep [ PMULLW ] }
+        { ushort-8-rep [ PMULLW ] }
+        { int-4-rep [ PMULLD ] }
+        { uint-4-rep [ PMULLD ] }
     } case drop ;
+
+M: x86 %mul-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+    } available-reps ;
 
 M: x86 %div-vector ( dst src1 src2 rep -- )
     {
@@ -317,17 +363,39 @@ M: x86 %div-vector ( dst src1 src2 rep -- )
         { double-2-rep [ DIVPD ] }
     } case drop ;
 
+M: x86 %div-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep } }
+    } available-reps ;
+
 M: x86 %min-vector ( dst src1 src2 rep -- )
     {
         { float-4-rep [ MINPS ] }
         { double-2-rep [ MINPD ] }
+        { uchar-16-rep [ PMINUB ] }
+        { short-8-rep [ PMINSW ] }
     } case drop ;
+
+M: x86 %min-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep short-8-rep uchar-16-rep } }
+    } available-reps ;
 
 M: x86 %max-vector ( dst src1 src2 rep -- )
     {
         { float-4-rep [ MAXPS ] }
         { double-2-rep [ MAXPD ] }
+        { uchar-16-rep [ PMAXUB ] }
+        { short-8-rep [ PMAXSW ] }
     } case drop ;
+
+M: x86 %max-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep short-8-rep uchar-16-rep } }
+    } available-reps ;
 
 M: x86 %sqrt-vector ( dst src rep -- )
     {
@@ -335,11 +403,23 @@ M: x86 %sqrt-vector ( dst src rep -- )
         { double-2-rep [ SQRTPD ] }
     } case ;
 
+M: x86 %sqrt-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep } }
+    } available-reps ;
+
 M: x86 %horizontal-add-vector ( dst src rep -- )
     {
         { float-4-rep [ [ MOVAPS ] [ HADDPS ] [ HADDPS ] 2tri ] }
         { double-2-rep [ [ MOVAPD ] [ HADDPD ] 2bi ] }
     } case ;
+
+M: x86 %horizontal-add-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep short-8-rep uchar-16-rep } }
+    } available-reps ;
 
 M: x86 %unbox-alien ( dst src -- )
     alien-offset [+] MOV ;
@@ -775,3 +855,34 @@ M: x86 small-enough? ( n -- ? )
     enable-sse3-simd ;
 
 enable-min/max
+
+:: install-sse-check ( version -- )
+    [
+        sse-version version < [
+            "This image was built to use " write
+            version sse-string write
+            " but your CPU only supports " write
+            sse-version sse-string write "." print
+            "You will need to bootstrap Factor again." print
+            flush
+            1 exit
+        ] when
+    ] "cpu.x86" add-init-hook ;
+
+: enable-sse ( version -- )
+    {
+        { 00 [ ] }
+        { 10 [ ] }
+        { 20 [ enable-sse2 ] }
+        { 30 [ enable-sse3 ] }
+        { 33 [ enable-sse3 ] }
+        { 41 [ enable-sse3 ] }
+        { 42 [ enable-sse3 ] }
+    } case ;
+
+[ { sse_version } compile ] with-optimizer
+
+"Checking for multimedia extensions: " write sse-version 30 min
+[ sse-string write " detected" print ]
+[ install-sse-check ]
+[ enable-sse ] tri
