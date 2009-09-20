@@ -43,22 +43,6 @@ $nl
 }
 "The " { $link float-4 } " and " { $link double-2 } " types correspond to 128-bit vector registers. The " { $link float-8 } " and " { $link double-4 } " types are not directly supported in hardware, and instead unbox to a pair of 128-bit vector registers."
 $nl
-"Operations on " { $link float-4 } " instances:"
-{ $subsection float-4-with }
-{ $subsection float-4-boa }
-{ $subsection POSTPONE: float-4{ }
-"Operations on " { $link double-2 } " instances:"
-{ $subsection double-2-with }
-{ $subsection double-2-boa }
-{ $subsection POSTPONE: double-2{ }
-"Operations on " { $link float-8 } " instances:"
-{ $subsection float-8-with }
-{ $subsection float-8-boa }
-{ $subsection POSTPONE: float-8{ }
-"Operations on " { $link double-4 } " instances:"
-{ $subsection double-4-with }
-{ $subsection double-4-boa }
-{ $subsection POSTPONE: double-4{ }
 "To actually perform vector arithmetic on SIMD vectors, use " { $link "math-vectors" } " words."
 { $see-also "c-types-specs" } ;
 
@@ -183,73 +167,5 @@ ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
 { $subsection "math.vectors.simd.efficiency" }
 { $subsection "math.vectors.simd.alien" }
 { $subsection "math.vectors.simd.intrinsics" } ;
-
-! ! ! float-4
-
-HELP: float-4
-{ $class-description "A sequence of four single-precision floating point values. New instances can be created with " { $link float-4-with } " or " { $link float-4-boa } "." } ;
-
-HELP: float-4-with
-{ $values { "x" float } { "simd-array" float-4 } }
-{ $description "Creates a new vector with all four components equal to a scalar." } ;
-
-HELP: float-4-boa
-{ $values { "a" float } { "b" float } { "c" float } { "d" float } { "simd-array" float-4 } }
-{ $description "Creates a new vector from four scalar components." } ;
-
-HELP: float-4{
-{ $syntax "float-4{ a b c d }" }
-{ $description "Literal syntax for a " { $link float-4 } "." } ;
-
-! ! ! double-2
-
-HELP: double-2
-{ $class-description "A sequence of two double-precision floating point values. New instances can be created with " { $link double-2-with } " or " { $link double-2-boa } "." } ;
-
-HELP: double-2-with
-{ $values { "x" float } { "simd-array" double-2 } }
-{ $description "Creates a new vector with both components equal to a scalar." } ;
-
-HELP: double-2-boa
-{ $values { "a" float } { "b" float } { "simd-array" double-2 } }
-{ $description "Creates a new vector from two scalar components." } ;
-
-HELP: double-2{
-{ $syntax "double-2{ a b }" }
-{ $description "Literal syntax for a " { $link double-2 } "." } ;
-
-! ! ! float-8
-
-HELP: float-8
-{ $class-description "A sequence of eight single-precision floating point values. New instances can be created with " { $link float-8-with } " or " { $link float-8-boa } "." } ;
-
-HELP: float-8-with
-{ $values { "x" float } { "simd-array" float-8 } }
-{ $description "Creates a new vector with all eight components equal to a scalar." } ;
-
-HELP: float-8-boa
-{ $values { "a" float } { "b" float } { "c" float } { "d" float } { "e" float } { "f" float } { "g" float } { "h" float } { "simd-array" float-8 } }
-{ $description "Creates a new vector from eight scalar components." } ;
-
-HELP: float-8{
-{ $syntax "float-8{ a b c d e f g h }" }
-{ $description "Literal syntax for a " { $link float-8 } "." } ;
-
-! ! ! double-4
-
-HELP: double-4
-{ $class-description "A sequence of four double-precision floating point values. New instances can be created with " { $link double-4-with } " or " { $link double-4-boa } "." } ;
-
-HELP: double-4-with
-{ $values { "x" float } { "simd-array" double-4 } }
-{ $description "Creates a new vector with all four components equal to a scalar." } ;
-
-HELP: double-4-boa
-{ $values { "a" float } { "b" float } { "c" float } { "d" float } { "simd-array" double-4 } }
-{ $description "Creates a new vector from four scalar components." } ;
-
-HELP: double-4{
-{ $syntax "double-4{ a b c d }" }
-{ $description "Literal syntax for a " { $link double-4 } "." } ;
 
 ABOUT: "math.vectors.simd"

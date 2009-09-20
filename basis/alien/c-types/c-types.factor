@@ -472,3 +472,11 @@ SYMBOLS:
     \ ulong \ size_t typedef
 ] with-compilation-unit
 
+M: char-16-rep rep-component-type drop char ;
+M: uchar-16-rep rep-component-type drop uchar ;
+M: short-8-rep rep-component-type drop short ;
+M: ushort-8-rep rep-component-type drop ushort ;
+M: int-4-rep rep-component-type drop int ;
+M: uint-4-rep rep-component-type drop uint ;
+M: float-4-rep rep-component-type drop float ;
+M: double-2-rep rep-component-type drop double ;
