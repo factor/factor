@@ -417,8 +417,7 @@ M: x86 %horizontal-add-vector ( dst src rep -- )
 
 M: x86 %horizontal-add-vector-reps
     {
-        { sse? { float-4-rep } }
-        { sse2? { double-2-rep short-8-rep uchar-16-rep } }
+        { sse3? { float-4-rep double-2-rep } }
     } available-reps ;
 
 M: x86 %unbox-alien ( dst src -- )

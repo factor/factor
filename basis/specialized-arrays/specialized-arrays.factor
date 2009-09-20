@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.parser assocs
 byte-arrays classes compiler.units functors kernel lexer libc math
 math.vectors.specialization namespaces parser prettyprint.custom
 sequences sequences.private strings summary vocabs vocabs.loader
-vocabs.parser words fry combinators ;
+vocabs.parser vocabs.generated words fry combinators ;
 IN: specialized-arrays
 
 MIXIN: specialized-array
@@ -122,15 +122,6 @@ M: word (underlying-type) "c-type" word-prop ;
     "specialized-arrays.instances." prepend ;
 
 PRIVATE>
-
-: generate-vocab ( vocab-name quot -- vocab )
-    [ dup vocab [ ] ] dip '[
-        [
-            [
-                 _ with-current-vocab
-            ] with-compilation-unit
-        ] keep
-    ] ?if ; inline
 
 : define-array-vocab ( type -- vocab )
     underlying-type-name
