@@ -48,6 +48,7 @@ UNION: two-operand-insn
     ##max-float
     ##add-vector
     ##sub-vector
+    ##add-sub-vector
     ##mul-vector
     ##div-vector
     ##min-vector

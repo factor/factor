@@ -155,6 +155,7 @@ IN: compiler.cfg.intrinsics
     {
         { math.vectors.simd.intrinsics:assert-positive [ drop ] }
         { math.vectors.simd.intrinsics:(simd-v+) [ [ ^^add-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v+-) [ [ ^^add-sub-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v-) [ [ ^^sub-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v*) [ [ ^^mul-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v/) [ [ ^^div-vector ] emit-binary-vector-op ] }
