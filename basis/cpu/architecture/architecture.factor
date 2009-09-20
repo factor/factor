@@ -22,8 +22,6 @@ SINGLETONS: float-rep double-rep ;
 
 ! On x86, floating point registers are really vector registers
 SINGLETONS:
-float-4-rep
-double-2-rep
 char-16-rep
 uchar-16-rep
 short-8-rep
@@ -31,15 +29,25 @@ ushort-8-rep
 int-4-rep
 uint-4-rep ;
 
-UNION: vector-rep
+SINGLETONS:
 float-4-rep
-double-2-rep
+double-2-rep ;
+
+UNION: int-vector-rep
 char-16-rep
 uchar-16-rep
 short-8-rep
 ushort-8-rep
 int-4-rep
 uint-4-rep ;
+
+UNION: float-vector-rep
+float-4-rep
+double-2-rep ;
+
+UNION: vector-rep
+int-vector-rep
+float-vector-rep ;
 
 UNION: representation
 any-rep
@@ -76,10 +84,15 @@ M: double-rep rep-size drop 8 ;
 M: stack-params rep-size drop cell ;
 M: vector-rep rep-size drop 16 ;
 
+GENERIC: rep-component-type ( rep -- n )
+
+! Methods defined in alien.c-types
+
 GENERIC: scalar-rep-of ( rep -- rep' )
 
 M: float-4-rep scalar-rep-of drop float-rep ;
 M: double-2-rep scalar-rep-of drop double-rep ;
+M: int-vector-rep scalar-rep-of drop int-rep ;
 
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
@@ -167,7 +180,6 @@ HOOK: %unbox-vector cpu ( dst src rep -- )
 HOOK: %broadcast-vector cpu ( dst src rep -- )
 HOOK: %gather-vector-2 cpu ( dst src1 src2 rep -- )
 HOOK: %gather-vector-4 cpu ( dst src1 src2 src3 src4 rep -- )
-
 HOOK: %add-vector cpu ( dst src1 src2 rep -- )
 HOOK: %sub-vector cpu ( dst src1 src2 rep -- )
 HOOK: %mul-vector cpu ( dst src1 src2 rep -- )
@@ -176,6 +188,18 @@ HOOK: %min-vector cpu ( dst src1 src2 rep -- )
 HOOK: %max-vector cpu ( dst src1 src2 rep -- )
 HOOK: %sqrt-vector cpu ( dst src rep -- )
 HOOK: %horizontal-add-vector cpu ( dst src rep -- )
+
+HOOK: %broadcast-vector-reps cpu ( -- reps )
+HOOK: %gather-vector-2-reps cpu ( -- reps )
+HOOK: %gather-vector-4-reps cpu ( -- reps )
+HOOK: %add-vector-reps cpu ( -- reps )
+HOOK: %sub-vector-reps cpu ( -- reps )
+HOOK: %mul-vector-reps cpu ( -- reps )
+HOOK: %div-vector-reps cpu ( -- reps )
+HOOK: %min-vector-reps cpu ( -- reps )
+HOOK: %max-vector-reps cpu ( -- reps )
+HOOK: %sqrt-vector-reps cpu ( -- reps )
+HOOK: %horizontal-add-vector-reps cpu ( -- reps )
 
 HOOK: %unbox-alien cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
