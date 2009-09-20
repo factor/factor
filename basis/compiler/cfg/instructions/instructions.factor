@@ -310,6 +310,11 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##add-sub-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##mul-vector
 def: dst
 use: src1 src2

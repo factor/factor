@@ -55,6 +55,7 @@ H{
     { v* { +vector+ +vector+ -> +vector+ } }
     { v*n { +vector+ +scalar+ -> +vector+ } }
     { v+ { +vector+ +vector+ -> +vector+ } }
+    { v+- { +vector+ +vector+ -> +vector+ } }
     { v+n { +vector+ +scalar+ -> +vector+ } }
     { v- { +vector+ +vector+ -> +vector+ } }
     { v-n { +vector+ +scalar+ -> +vector+ } }

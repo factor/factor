@@ -341,6 +341,17 @@ M: x86 %sub-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
+M: x86 %add-sub-vector ( dst src1 src2 rep -- )
+    {
+        { float-4-rep [ ADDSUBPS ] }
+        { double-2-rep [ ADDSUBPD ] }
+    } case drop ;
+
+M: x86 %add-sub-vector-reps
+    {
+        { sse3? { float-4-rep double-2-rep } }
+    } available-reps ;
+
 M: x86 %mul-vector ( dst src1 src2 rep -- )
     {
         { float-4-rep [ MULPS ] }
@@ -879,9 +890,10 @@ enable-min/max
         { 42 [ enable-sse3 ] }
     } case ;
 
-[ { sse_version } compile ] with-optimizer
+: check-sse ( -- )
+    [ { sse_version } compile ] with-optimizer
 
-"Checking for multimedia extensions: " write sse-version 30 min
-[ sse-string write " detected" print ]
-[ install-sse-check ]
-[ enable-sse ] tri
+    "Checking for multimedia extensions: " write sse-version 30 min
+    [ sse-string write " detected" print ]
+    [ install-sse-check ]
+    [ enable-sse ] tri ;

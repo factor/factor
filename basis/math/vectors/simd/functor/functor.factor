@@ -42,6 +42,7 @@ MACRO: simd-boa ( rep class -- simd-array )
         {
             { v+ (simd-v+) }
             { v- (simd-v-) }
+            { v+- (simd-v+-) }
             { v* (simd-v*) }
             { v/ (simd-v/) }
             { vmin (simd-vmin) }
@@ -171,6 +172,7 @@ INSTANCE: A sequence
 
 \ A \ A-with \ A-rep H{
     { v+ [ [ (simd-v+) ] \ A-vv->v-op execute ] }
+    { v+- [ [ (simd-v+-) ] \ A-vv->v-op execute ] }
     { v- [ [ (simd-v-) ] \ A-vv->v-op execute ] }
     { v* [ [ (simd-v*) ] \ A-vv->v-op execute ] }
     { v/ [ [ (simd-v/) ] \ A-vv->v-op execute ] }
@@ -297,6 +299,7 @@ INSTANCE: A sequence
 \ A \ A-with \ A-rep H{
     { v+ [ [ (simd-v+) ] \ A-vv->v-op execute ] }
     { v- [ [ (simd-v-) ] \ A-vv->v-op execute ] }
+    { v+- [ [ (simd-v+-) ] \ A-vv->v-op execute ] }
     { v* [ [ (simd-v*) ] \ A-vv->v-op execute ] }
     { v/ [ [ (simd-v/) ] \ A-vv->v-op execute ] }
     { vmin [ [ (simd-vmin) ] \ A-vv->v-op execute ] }
