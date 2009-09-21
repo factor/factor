@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Keith Lazuka.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs colors.constants combinators
+USING: assocs colors colors.constants combinators
 combinators.short-circuit hashtables io.styles kernel literals
 namespaces sequences words words.symbol ;
 IN: prettyprint.stylesheet
@@ -43,4 +43,5 @@ PRIVATE>
     dim-color colored-presentation-style ;
 
 : effect-style ( effect -- style )
-    COLOR: DarkGreen colored-presentation-style ;
+    0 0.2 0 1 <rgba> colored-presentation-style
+    { { font-style plain } } assoc-union ;
