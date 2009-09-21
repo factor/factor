@@ -26,18 +26,18 @@ void flush_icache(cell start, cell end)
 
 char *getenv(char *name)
 {
-	not_implemented_error();
+	vm->not_implemented_error();
 	return 0; /* unreachable */
 }
 
 PRIMITIVE(os_envs)
 {
-	not_implemented_error();
+	vm->not_implemented_error();
 }
 
 void c_to_factor_toplevel(cell quot)
 {
-	c_to_factor(quot);
+	c_to_factor(quot,vm);
 }
 
 void open_console() { }

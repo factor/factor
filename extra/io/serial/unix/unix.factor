@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax combinators io.ports
-io.streams.duplex system kernel math math.bitwise
-vocabs.loader unix io.serial io.serial.unix.termios io.backend.unix ;
+USING: accessors alien.c-types alien.syntax alien.data 
+classes.struct combinators io.ports io.streams.duplex
+system kernel math math.bitwise vocabs.loader unix io.serial
+io.serial.unix.termios io.backend.unix ;
 IN: io.serial.unix
 
 << {
@@ -40,19 +41,19 @@ M: unix open-serial ( serial -- serial' )
 
 : get-termios ( serial -- termios )
     serial-fd
-    "termios" <c-object> [ tcgetattr io-error ] keep ;
+    termios <struct> [ tcgetattr io-error ] keep ;
 
 : configure-termios ( serial -- )
     dup termios>>
     {
-        [ [ iflag>> ] dip over [ set-termios-iflag ] [ 2drop ] if ]
-        [ [ oflag>> ] dip over [ set-termios-oflag ] [ 2drop ] if ]
+        [ [ iflag>> ] dip over [ (>>iflag) ] [ 2drop ] if ]
+        [ [ oflag>> ] dip over [ (>>oflag) ] [ 2drop ] if ]
         [
             [
                 [ cflag>> 0 or ] [ baud>> lookup-baud ] bi bitor
-            ] dip set-termios-cflag
+            ] dip (>>cflag)
         ]
-        [ [ lflag>> ] dip over [ set-termios-lflag ] [ 2drop ] if ]
+        [ [ lflag>> ] dip over [ (>>lflag) ] [ 2drop ] if ]
     } 2cleave ;
 
 : tciflush ( serial -- )

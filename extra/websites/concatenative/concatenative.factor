@@ -91,7 +91,10 @@ SYMBOL: dh-file
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
-        <factor-website> <wiki> <login-config> <factor-boilerplate> "wiki" add-responder test-db <alloy> "concatenative.org" add-responder
+        <factor-website>
+            <wiki> "wiki" add-responder
+            <user-admin> "user-admin" add-responder
+        <login-config> <factor-boilerplate> test-db <alloy> "concatenative.org" add-responder
         <pastebin> <login-config> <factor-boilerplate> test-db <alloy> "paste.factorcode.org" add-responder
         <planet> <login-config> <factor-boilerplate> test-db <alloy> "planet.factorcode.org" add-responder
         home "docs" append-path <help-webapp> test-db <alloy> "docs.factorcode.org" add-responder

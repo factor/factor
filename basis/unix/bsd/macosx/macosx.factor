@@ -1,4 +1,5 @@
-USING: alien.syntax unix.time classes.struct ;
+USING: alien.c-types alien.syntax unix.time unix.types
+unix.types.macosx classes.struct ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 1024
@@ -18,15 +19,15 @@ CONSTANT: _UTX_LINESIZE 32
 CONSTANT: _UTX_IDSIZE 4
 CONSTANT: _UTX_HOSTSIZE 256
     
-C-STRUCT: utmpx
-    { { "char" _UTX_USERSIZE } "ut_user" }
-    { { "char" _UTX_IDSIZE } "ut_id" }
-    { { "char" _UTX_LINESIZE } "ut_line" }
-    { "pid_t" "ut_pid" }
-    { "short" "ut_type" }
-    { "timeval" "ut_tv" }
-    { { "char" _UTX_HOSTSIZE } "ut_host" }
-    { { "uint" 16 } "ut_pad" } ;
+STRUCT: utmpx
+    { ut_user { char _UTX_USERSIZE } }
+    { ut_id   { char _UTX_IDSIZE   } }
+    { ut_line { char _UTX_LINESIZE } }
+    { ut_pid  pid_t }
+    { ut_type short }
+    { ut_tv   timeval }
+    { ut_host { char _UTX_HOSTSIZE } }
+    { ut_pad  { uint 16 } } ;
 
 CONSTANT: __DARWIN_MAXPATHLEN 1024
 CONSTANT: __DARWIN_MAXNAMELEN 255
@@ -37,7 +38,7 @@ STRUCT: dirent
     { d_reclen __uint16_t }
     { d_type __uint8_t }
     { d_namlen __uint8_t }
-    { d_name { "char" __DARWIN_MAXNAMELEN+1 } } ;
+    { d_name { char __DARWIN_MAXNAMELEN+1 } } ;
 
 CONSTANT: EPERM 1
 CONSTANT: ENOENT 2

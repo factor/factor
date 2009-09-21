@@ -1,9 +1,6 @@
 namespace factor
 {
 
-void init_c_io();
-void io_error();
-
 PRIMITIVE(fopen);
 PRIMITIVE(fgetc);
 PRIMITIVE(fread);

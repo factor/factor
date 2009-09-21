@@ -19,10 +19,14 @@ CONSTANT: stylesheet
                 { wrap-margin 1100 }
             }
         }
-        { code-style
+        { code-char-style
             H{
                 { font-name "monospace" }
                 { font-size 36 }
+            }
+        }
+        { code-style
+            H{
                 { page-color T{ rgba f 0.4 0.4 0.4 0.3 } }
             }
         }
@@ -101,6 +105,7 @@ SYNTAX: STRIP-TEASE:
     { T{ button-down } [ request-focus ] }
     { T{ key-down f f "DOWN" } [ next-page ] }
     { T{ key-down f f "UP" } [ prev-page ] }
+    { T{ key-down f f "f" } [ dup fullscreen? not set-fullscreen ] }
 } set-gestures
 
 : slides-window ( slides -- )

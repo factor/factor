@@ -1,5 +1,5 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors alien alien.c-types alien.complex alien.parser
+USING: accessors alien alien.c-types alien.complex alien.data grouping
 alien.strings alien.syntax arrays ascii assocs
 byte-arrays combinators combinators.short-circuit fry generalizations
 kernel lexer macros math math.parser namespaces parser sequences
@@ -428,6 +428,11 @@ PRIVATE>
 
 MACRO: fortran-invoke ( return library function parameters -- )
     { [ 2drop nip set-fortran-abi ] [ (fortran-invoke) ] } 4 ncleave ;
+
+: parse-arglist ( parameters return -- types effect )
+    [ 2 group unzip [ "," ?tail drop ] map ]
+    [ [ { } ] [ 1array ] if-void ]
+    bi* <effect> ;
 
 :: define-fortran-function ( return library function parameters -- )
     function create-in dup reset-generic 

@@ -1,15 +1,14 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.strings fry io.encodings.utf16n kernel
-splitting windows windows.kernel32 system environment
-alien.c-types sequences windows.errors io.streams.memory
-io.encodings io ;
+splitting windows windows.kernel32 windows.types system
+environment alien.data sequences windows.errors
+io.streams.memory io.encodings io specialized-arrays ;
+SPECIALIZED-ARRAY: TCHAR
 IN: environment.winnt
 
-<< "TCHAR" require-c-array >>
-
 M: winnt os-env ( key -- value )
-    MAX_UNICODE_PATH "TCHAR" <c-array>
+    MAX_UNICODE_PATH TCHAR <c-array>
     [ dup length GetEnvironmentVariable ] keep over 0 = [
         2drop f
     ] [

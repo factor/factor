@@ -3,7 +3,7 @@
 namespace factor
 {
 
-static void check_frame(stack_frame *frame)
+void factorvm::check_frame(stack_frame *frame)
 {
 #ifdef FACTOR_DEBUG
 	check_code_pointer((cell)frame->xt);
@@ -11,14 +11,14 @@ static void check_frame(stack_frame *frame)
 #endif
 }
 
-callstack *allot_callstack(cell size)
+callstack *factorvm::allot_callstack(cell size)
 {
 	callstack *stack = allot<callstack>(callstack_size(size));
 	stack->length = tag_fixnum(size);
 	return stack;
 }
 
-stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom)
+stack_frame *factorvm::fix_callstack_top(stack_frame *top, stack_frame *bottom)
 {
 	stack_frame *frame = bottom - 1;
 
@@ -35,7 +35,7 @@ This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-stack_frame *capture_start()
+stack_frame *factorvm::capture_start()
 {
 	stack_frame *frame = stack_chain->callstack_bottom - 1;
 	while(frame >= stack_chain->callstack_top
@@ -46,7 +46,7 @@ stack_frame *capture_start()
 	return frame + 1;
 }
 
-PRIMITIVE(callstack)
+inline void factorvm::vmprim_callstack()
 {
 	stack_frame *top = capture_start();
 	stack_frame *bottom = stack_chain->callstack_bottom;
@@ -60,7 +60,12 @@ PRIMITIVE(callstack)
 	dpush(tag<callstack>(stack));
 }
 
-PRIMITIVE(set_callstack)
+PRIMITIVE(callstack)
+{
+	PRIMITIVE_GETVM()->vmprim_callstack();
+}
+
+inline void factorvm::vmprim_set_callstack()
 {
 	callstack *stack = untag_check<callstack>(dpop());
 
@@ -73,18 +78,24 @@ PRIMITIVE(set_callstack)
 	critical_error("Bug in set_callstack()",0);
 }
 
-code_block *frame_code(stack_frame *frame)
+PRIMITIVE(set_callstack)
+{
+	PRIMITIVE_GETVM()->vmprim_set_callstack();
+}
+
+code_block *factorvm::frame_code(stack_frame *frame)
 {
 	check_frame(frame);
 	return (code_block *)frame->xt - 1;
 }
 
-cell frame_type(stack_frame *frame)
+
+cell factorvm::frame_type(stack_frame *frame)
 {
 	return frame_code(frame)->type;
 }
 
-cell frame_executing(stack_frame *frame)
+cell factorvm::frame_executing(stack_frame *frame)
 {
 	code_block *compiled = frame_code(frame);
 	if(compiled->literals == F || !stack_traces_p())
@@ -98,14 +109,14 @@ cell frame_executing(stack_frame *frame)
 	}
 }
 
-stack_frame *frame_successor(stack_frame *frame)
+stack_frame *factorvm::frame_successor(stack_frame *frame)
 {
 	check_frame(frame);
 	return (stack_frame *)((cell)frame - frame->size);
 }
 
 /* Allocates memory */
-cell frame_scan(stack_frame *frame)
+cell factorvm::frame_scan(stack_frame *frame)
 {
 	switch(frame_type(frame))
 	{
@@ -137,10 +148,12 @@ namespace
 struct stack_frame_accumulator {
 	growable_array frames;
 
-	void operator()(stack_frame *frame)
+	stack_frame_accumulator(factorvm *vm) : frames(vm) {} 
+
+	void operator()(stack_frame *frame, factorvm *myvm)
 	{
-		gc_root<object> executing(frame_executing(frame));
-		gc_root<object> scan(frame_scan(frame));
+		gc_root<object> executing(myvm->frame_executing(frame),myvm);
+		gc_root<object> scan(myvm->frame_scan(frame),myvm);
 
 		frames.add(executing.value());
 		frames.add(scan.value());
@@ -149,18 +162,23 @@ struct stack_frame_accumulator {
 
 }
 
-PRIMITIVE(callstack_to_array)
+inline void factorvm::vmprim_callstack_to_array()
 {
-	gc_root<callstack> callstack(dpop());
+	gc_root<callstack> callstack(dpop(),this);
 
-	stack_frame_accumulator accum;
+	stack_frame_accumulator accum(this);
 	iterate_callstack_object(callstack.untagged(),accum);
 	accum.frames.trim();
 
 	dpush(accum.frames.elements.value());
 }
 
-stack_frame *innermost_stack_frame(callstack *stack)
+PRIMITIVE(callstack_to_array)
+{
+	PRIMITIVE_GETVM()->vmprim_callstack_to_array();
+}
+
+stack_frame *factorvm::innermost_stack_frame(callstack *stack)
 {
 	stack_frame *top = stack->top();
 	stack_frame *bottom = stack->bottom();
@@ -172,32 +190,42 @@ stack_frame *innermost_stack_frame(callstack *stack)
 	return frame;
 }
 
-stack_frame *innermost_stack_frame_quot(callstack *callstack)
+stack_frame *factorvm::innermost_stack_frame_quot(callstack *callstack)
 {
 	stack_frame *inner = innermost_stack_frame(callstack);
-	tagged<quotation>(frame_executing(inner)).untag_check();
+	tagged<quotation>(frame_executing(inner)).untag_check(this);
 	return inner;
 }
 
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
-PRIMITIVE(innermost_stack_frame_executing)
+inline void factorvm::vmprim_innermost_stack_frame_executing()
 {
 	dpush(frame_executing(innermost_stack_frame(untag_check<callstack>(dpop()))));
 }
 
-PRIMITIVE(innermost_stack_frame_scan)
+PRIMITIVE(innermost_stack_frame_executing)
+{
+	PRIMITIVE_GETVM()->vmprim_innermost_stack_frame_executing();
+}
+
+inline void factorvm::vmprim_innermost_stack_frame_scan()
 {
 	dpush(frame_scan(innermost_stack_frame_quot(untag_check<callstack>(dpop()))));
 }
 
-PRIMITIVE(set_innermost_stack_frame_quot)
+PRIMITIVE(innermost_stack_frame_scan)
 {
-	gc_root<callstack> callstack(dpop());
-	gc_root<quotation> quot(dpop());
+	PRIMITIVE_GETVM()->vmprim_innermost_stack_frame_scan();
+}
 
-	callstack.untag_check();
-	quot.untag_check();
+inline void factorvm::vmprim_set_innermost_stack_frame_quot()
+{
+	gc_root<callstack> callstack(dpop(),this);
+	gc_root<quotation> quot(dpop(),this);
+
+	callstack.untag_check(this);
+	quot.untag_check(this);
 
 	jit_compile(quot.value(),true);
 
@@ -207,10 +235,21 @@ PRIMITIVE(set_innermost_stack_frame_quot)
 	FRAME_RETURN_ADDRESS(inner) = (char *)quot->xt + offset;
 }
 
+PRIMITIVE(set_innermost_stack_frame_quot)
+{
+	PRIMITIVE_GETVM()->vmprim_set_innermost_stack_frame_quot();
+}
+
 /* called before entry into Factor code. */
-VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom)
+void factorvm::save_callstack_bottom(stack_frame *callstack_bottom)
 {
 	stack_chain->callstack_bottom = callstack_bottom;
+}
+
+VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom, factorvm *myvm)
+{
+	ASSERTVM();
+	return VM_PTR->save_callstack_bottom(callstack_bottom);
 }
 
 }
