@@ -26,7 +26,11 @@ $nl
 { $subsection v. }
 { $subsection norm }
 { $subsection norm-sq }
-{ $subsection normalize } ;
+{ $subsection normalize }
+"Saturated arithmetic may be performed on " { $link "specialized-arrays" } "; the results are clamped to the minimum and maximum bounds of the array element type, instead of wrapping around:"
+{ $subsection vs+ }
+{ $subsection vs- }
+{ $subsection vs* } ;
 
 ABOUT: "math-vectors"
 
@@ -100,6 +104,34 @@ HELP: v.
     { $snippet "0 [ conjugate * + ] 2reduce" }
 } ;
 
+HELP: vs+
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Adds " { $snippet "u" } " and " { $snippet "v" } " component-wise with saturation." }
+{ $examples
+    "With saturation:"
+    { $example
+        "USING: math.vectors prettyprint specialized-arrays ;"
+        "SPECIALIZED-ARRAY: uchar"
+        "uchar-array{ 100 200 150 } uchar-array{ 70 70 70 } vs+ ."
+        "uchar-array{ 170 255 220 }"
+    }
+    "Without saturation:"
+    { $example
+        "USING: math.vectors prettyprint specialized-arrays ;"
+        "SPECIALIZED-ARRAY: uchar"
+        "uchar-array{ 100 200 150 } uchar-array{ 70 70 70 } v+ ."
+        "uchar-array{ 170 14 220 }"
+    }
+} ;
+
+HELP: vs-
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Subtracts " { $snippet "v" } " from " { $snippet "u" } " component-wise with saturation." } ;
+
+HELP: vs*
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Multiplies " { $snippet "u" } " and " { $snippet "v" } " component-wise with saturation." } ;
+
 HELP: norm-sq
 { $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
 { $description "Computes the squared length of a mathematical vector." } ;
@@ -120,3 +152,5 @@ HELP: set-axis
 { 2map v+ v- v* v/ } related-words
 
 { 2reduce v. } related-words
+
+{ vs+ vs- vs* } related-words

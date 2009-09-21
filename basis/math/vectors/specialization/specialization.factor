@@ -53,11 +53,14 @@ H{
     { norm-sq { +vector+ -> +nonnegative+ } }
     { normalize { +vector+ -> +vector+ } }
     { v* { +vector+ +vector+ -> +vector+ } }
+    { vs* { +vector+ +vector+ -> +vector+ } }
     { v*n { +vector+ +scalar+ -> +vector+ } }
     { v+ { +vector+ +vector+ -> +vector+ } }
+    { vs+ { +vector+ +vector+ -> +vector+ } }
     { v+- { +vector+ +vector+ -> +vector+ } }
     { v+n { +vector+ +scalar+ -> +vector+ } }
     { v- { +vector+ +vector+ -> +vector+ } }
+    { vs- { +vector+ +vector+ -> +vector+ } }
     { v-n { +vector+ +scalar+ -> +vector+ } }
     { v. { +vector+ +vector+ -> +scalar+ } }
     { v/ { +vector+ +vector+ -> +vector+ } }
