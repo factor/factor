@@ -3,24 +3,16 @@
 USING: accessors arrays assocs classes classes.builtin
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple classes.union combinators
-definitions effects fry generic help help.markup help.stylesheet
-help.topics io io.files io.pathnames io.styles kernel macros
-make namespaces prettyprint sequences sets sorting summary
-vocabs vocabs.files vocabs.hierarchy vocabs.loader
-vocabs.metadata words words.symbol definitions.icons ;
+effects fry generic help help.markup help.stylesheet
+help.topics io io.pathnames io.styles kernel macros make
+namespaces sequences sorting summary vocabs vocabs.files
+vocabs.hierarchy vocabs.loader vocabs.metadata words
+words.symbol ;
 FROM: vocabs.hierarchy => child-vocabs ;
 IN: help.vocabs
 
 : about ( vocab -- )
     [ require ] [ vocab help ] bi ;
-
-: $pretty-link ( element -- )
-    [ first definition-icon 1array $image " " print-element ]
-    [ $definition-link ]
-    bi ;
-
-: <$pretty-link> ( definition -- element )
-    1array \ $pretty-link prefix ;
 
 : vocab-row ( vocab -- row )
     [ <$pretty-link> ] [ vocab-summary ] bi 2array ;
