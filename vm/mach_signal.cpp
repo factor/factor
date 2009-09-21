@@ -28,7 +28,7 @@ http://www.wodeveloper.com/omniLists/macosx-dev/2000/June/msg00137.html */
 /* Modify a suspended thread's thread_state so that when the thread resumes
 executing, the call frame of the current C primitive (if any) is rewound, and
 the appropriate Factor error is thrown from the top-most Factor frame. */
-static void call_fault_handler(
+void factorvm::call_fault_handler(
     exception_type_t exception,
     exception_data_type_t code,
 	MACH_EXC_STATE_TYPE *exc_state,
@@ -53,19 +53,28 @@ static void call_fault_handler(
 	if(exception == EXC_BAD_ACCESS)
 	{
 		signal_fault_addr = MACH_EXC_STATE_FAULT(exc_state);
-		MACH_PROGRAM_COUNTER(thread_state) = (cell)memory_signal_handler_impl;
+		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::memory_signal_handler_impl;
 	}
 	else if(exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV)
 	{
-                signal_fpu_status = fpu_status(mach_fpu_status(float_state));
-                mach_clear_fpu_status(float_state);
-		MACH_PROGRAM_COUNTER(thread_state) = (cell)fp_signal_handler_impl;
+		signal_fpu_status = fpu_status(mach_fpu_status(float_state));
+		mach_clear_fpu_status(float_state);
+		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::fp_signal_handler_impl;
 	}
 	else
 	{
 		signal_number = (exception == EXC_ARITHMETIC ? SIGFPE : SIGABRT);
-		MACH_PROGRAM_COUNTER(thread_state) = (cell)misc_signal_handler_impl;
+		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::misc_signal_handler_impl;
 	}
+}
+
+static void call_fault_handler(exception_type_t exception,
+							   exception_data_type_t code,
+							   MACH_EXC_STATE_TYPE *exc_state,
+							   MACH_THREAD_STATE_TYPE *thread_state,
+							   MACH_FLOAT_STATE_TYPE *float_state)
+{
+	SIGNAL_VM_PTR()->call_fault_handler(exception,code,exc_state,thread_state,float_state);
 }
 
 /* Handle an exception by invoking the user's fault handler and/or forwarding
@@ -215,7 +224,7 @@ void mach_initialize ()
 	mask = EXC_MASK_BAD_ACCESS | EXC_MASK_ARITHMETIC;
 
 	/* Create the thread listening on the exception port.  */
-	start_thread(mach_exception_thread);
+	start_thread(mach_exception_thread,NULL);
 
 	/* Replace the exception port info for these exceptions with our own.
 	Note that we replace the exception port for the entire task, not only

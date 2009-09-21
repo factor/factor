@@ -5,12 +5,12 @@
 namespace factor
 {
 
-void c_to_factor_toplevel(cell quot)
+void factorvm::c_to_factor_toplevel(cell quot)
 {
 	for(;;)
 	{
 NS_DURING
-		c_to_factor(quot);
+		c_to_factor(quot,this);
 		NS_VOIDRETURN;
 NS_HANDLER
 		dpush(allot_alien(F,(cell)localException));

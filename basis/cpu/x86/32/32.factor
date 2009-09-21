@@ -47,6 +47,18 @@ M: x86.32 reserved-area-size 0 ;
 
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
+: push-vm-ptr ( -- )
+    temp-reg 0 MOV rc-absolute-cell rt-vm rel-fixup ! push the vm ptr as an argument
+    temp-reg PUSH ;
+
+M: x86.32 %vm-invoke-1st-arg ( function -- )
+    push-vm-ptr
+    f %alien-invoke
+    temp-reg POP ;
+
+M: x86.32 %vm-invoke-3rd-arg ( function -- )
+    %vm-invoke-1st-arg ;    ! first 2 args are regs, 3rd is stack so vm-invoke-1st-arg works here
+
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
     c-type
     [ return-in-registers?>> ]
@@ -103,9 +115,12 @@ M: x86.32 %save-param-reg 3drop ;
     #! parameter being passed to a callback from C.
     over [ load-return-reg ] [ 2drop ] if ;
 
+CONSTANT: vm-ptr-size 4
+
 M:: x86.32 %box ( n rep func -- )
     n rep (%box)
-    rep rep-size [
+    rep rep-size vm-ptr-size + [
+        push-vm-ptr
         rep push-return-reg
         func f %alien-invoke
     ] with-aligned-stack ;
@@ -118,7 +133,8 @@ M:: x86.32 %box ( n rep func -- )
 
 M: x86.32 %box-long-long ( n func -- )
     [ (%box-long-long) ] dip
-    8 [
+    8 vm-ptr-size + [
+        push-vm-ptr
         EDX PUSH
         EAX PUSH
         f %alien-invoke
@@ -126,12 +142,13 @@ M: x86.32 %box-long-long ( n func -- )
 
 M:: x86.32 %box-large-struct ( n c-type -- )
     ! Compute destination address
-    ECX n struct-return@ LEA
-    8 [
+    EDX n struct-return@ LEA
+    8 vm-ptr-size + [
+        push-vm-ptr
         ! Push struct size
         c-type heap-size PUSH
         ! Push destination address
-        ECX PUSH
+        EDX PUSH
         ! Copy the struct from the C stack
         "box_value_struct" f %alien-invoke
     ] with-aligned-stack ;
@@ -144,7 +161,8 @@ M: x86.32 %prepare-box-struct ( -- )
 
 M: x86.32 %box-small-struct ( c-type -- )
     #! Box a <= 8-byte struct returned in EAX:EDX. OS X only.
-    12 [
+    12 vm-ptr-size + [
+        push-vm-ptr
         heap-size PUSH
         EDX PUSH
         EAX PUSH
@@ -157,7 +175,9 @@ M: x86.32 %prepare-unbox ( -- )
     ESI 4 SUB ;
 
 : call-unbox-func ( func -- )
-    4 [
+    8 [
+        ! push the vm ptr as an argument
+        push-vm-ptr
         ! Push parameter
         EAX PUSH
         ! Call the unboxer
@@ -183,7 +203,8 @@ M: x86.32 %unbox-long-long ( n func -- )
 
 : %unbox-struct-1 ( -- )
     #! Alien must be in EAX.
-    4 [
+    4 vm-ptr-size + [
+        push-vm-ptr
         EAX PUSH
         "alien_offset" f %alien-invoke
         ! Load first cell
@@ -192,7 +213,8 @@ M: x86.32 %unbox-long-long ( n func -- )
 
 : %unbox-struct-2 ( -- )
     #! Alien must be in EAX.
-    4 [
+    4 vm-ptr-size + [
+        push-vm-ptr
         EAX PUSH
         "alien_offset" f %alien-invoke
         ! Load second cell
@@ -211,12 +233,13 @@ M: x86 %unbox-small-struct ( size -- )
 M:: x86.32 %unbox-large-struct ( n c-type -- )
     ! Alien must be in EAX.
     ! Compute destination address
-    ECX n stack@ LEA
-    12 [
+    EDX n stack@ LEA
+    12 vm-ptr-size + [
+        push-vm-ptr
         ! Push struct size
         c-type heap-size PUSH
         ! Push destination address
-        ECX PUSH
+        EDX PUSH
         ! Push source address
         EAX PUSH
         ! Copy the struct to the stack
@@ -224,7 +247,8 @@ M:: x86.32 %unbox-large-struct ( n c-type -- )
     ] with-aligned-stack ;
 
 M: x86.32 %prepare-alien-indirect ( -- )
-    "unbox_alien" f %alien-invoke
+    push-vm-ptr "unbox_alien" f %alien-invoke
+    temp-reg POP
     EBP EAX MOV ;
 
 M: x86.32 %alien-indirect ( -- )
@@ -234,6 +258,7 @@ M: x86.32 %alien-callback ( quot -- )
     4 [
         EAX swap %load-reference
         EAX PUSH
+        param-reg-2 0 MOV rc-absolute-cell rt-vm rel-fixup 
         "c_to_factor" f %alien-invoke
     ] with-aligned-stack ;
 
@@ -243,9 +268,11 @@ M: x86.32 %callback-value ( ctype -- )
     ! Save top of data stack in non-volatile register
     %prepare-unbox
     EAX PUSH
+    push-vm-ptr
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Place top of data stack in EAX
+    temp-reg POP
     EAX POP
     ! Restore C stack
     ESP 12 ADD
