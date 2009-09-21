@@ -1,6 +1,6 @@
 USING: assocs classes help.markup help.syntax io.streams.string
 http http.server.dispatchers http.server.responses
-furnace.redirection strings multiline html.forms ;
+furnace.redirection strings html.forms ;
 IN: furnace.actions
 
 HELP: <action>
@@ -53,12 +53,12 @@ HELP: validate-params
 { $examples
     "A simple validator from " { $vocab-link "webapps.todo" } "; this word is invoked from the " { $slot "validate" } " quotation of action for editing a todo list item:"
     { $code
-        <" : validate-todo ( -- )
+        """: validate-todo ( -- )
     {
         { "summary" [ v-one-line ] }
         { "priority" [ v-integer 0 v-min-value 10 v-max-value ] }
         { "description" [ v-required ] }
-    } validate-params ;">
+    } validate-params ;"""
     }
 } ;
 

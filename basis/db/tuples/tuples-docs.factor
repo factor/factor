@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes help.markup help.syntax io.streams.string kernel
-quotations sequences strings multiline math db.types
-db.tuples.private db ;
+quotations sequences strings math db.types db.tuples.private db ;
 IN: db.tuples
 
 HELP: random-id-generator
@@ -209,7 +208,7 @@ ARTICLE: "db-tuples-tutorial" "Tuple database tutorial"
 "The title, author, and publisher should be strings; the date-published a timestamp; the edition an integer; the cover-price a float. These are the Factor types for which we will need to look up the corresponding " { $link "db.types" } ". " $nl
 "To actually bind the tuple slots to the database types, we'll use " { $link define-persistent } "."
 { $code
-<" USING: db.tuples db.types ;
+"""USING: db.tuples db.types ;
 book "BOOK"
 {
     { "id" "ID" +db-assigned-id+ }
@@ -219,9 +218,9 @@ book "BOOK"
     { "edition" "EDITION" INTEGER }
     { "cover-price" "COVER_PRICE" DOUBLE }
     { "condition" "CONDITION" VARCHAR }
-} define-persistent "> }
+} define-persistent""" }
 "That's all we'll have to do with the database for this tutorial. Now let's make a book."
-{ $code <" USING: calendar namespaces ;
+{ $code """USING: calendar namespaces ;
 T{ book
     { title "Factor for Sheeple" }
     { author "Mister Stacky Pants" }
@@ -229,9 +228,9 @@ T{ book
     { edition 1 }
     { cover-price 13.37 }
 } book set
-"> }
+""" }
 "Now we've created a book. Let's save it to the database."
-{ $code <" USING: db db.sqlite fry io.files ;
+{ $code """USING: db db.sqlite fry io.files ;
 : with-book-tutorial ( quot -- )
      '[ "book-tutorial.db" temp-file <sqlite-db> _ with-db ] call ;
 
@@ -239,25 +238,25 @@ T{ book
     book recreate-table
     book get insert-tuple
 ] with-book-tutorial
-"> }
+""" }
 "Is it really there?"
-{ $code <" [
+{ $code """[
     T{ book { title "Factor for Sheeple" } } select-tuples .
-] with-book-tutorial "> }
+] with-book-tutorial""" }
 "Oops, we spilled some orange juice on the book cover."
-{ $code <" book get "Small orange juice stain on cover" >>condition "> }
+{ $code """book get "Small orange juice stain on cover" >>condition""" }
 "Now let's save the modified book."
-{ $code <" [
+{ $code """[
     book get update-tuple
-] with-book-tutorial "> }
+] with-book-tutorial""" }
 "And select it again. You can query the database by any field -- just set it in the exemplar tuple you pass to " { $link select-tuples } "."
-{ $code <" [
+{ $code """[
     T{ book { title "Factor for Sheeple" } } select-tuples
-] with-book-tutorial "> }
+] with-book-tutorial""" }
 "Let's drop the table because we're done."
-{ $code <" [
+{ $code """[
     book drop-table
-] with-book-tutorial "> }
+] with-book-tutorial""" }
 "To summarize, the steps for using Factor's tuple database are:"
 { $list
     "Make a new tuple to represent your data"

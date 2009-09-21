@@ -1,4 +1,4 @@
-USING: destructors help.markup help.syntax kernel math multiline sequences
+USING: destructors help.markup help.syntax kernel math sequences
 vocabs vocabs.parser words namespaces ;
 IN: ui.pixel-formats
 
@@ -41,7 +41,7 @@ ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"
 { $subsection samples }
 { $examples
 "The following " { $link world } " subclass will request a double-buffered window with minimum 24-bit color and depth buffers, and will throw an error if the requirements aren't met:"
-{ $code <"
+{ $code """
 USING: kernel ui.worlds ui.pixel-formats ;
 IN: ui.pixel-formats.examples
 
@@ -60,7 +60,7 @@ M: picky-depth-buffered-world check-world-pixel-format
     [ color-bits pixel-format-attribute 24 < [ "Not enough color bits!" throw ] when ]
     [ depth-bits pixel-format-attribute 24 < [ "Not enough depth bits!" throw ] when ]
     tri ;
-"> } }
+""" } }
 ;
 
 HELP: double-buffered
