@@ -1,5 +1,5 @@
 IN: urls.encoding
-USING: strings help.markup help.syntax assocs multiline ;
+USING: strings help.markup help.syntax assocs multiline urls ;
 
 HELP: url-decode
 { $values { "str" string } { "decoded" string } }
