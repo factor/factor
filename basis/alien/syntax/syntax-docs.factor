@@ -81,6 +81,10 @@ HELP: C-ENUM:
     { $code "CONSTANT: red 0" "CONSTANT: green 1" "CONSTANT: blue 2" }
 } ;
 
+HELP: CALLBACK:
+{ $syntax "CALLBACK: return name ( parameters ) ;" }
+{ $values { "return" "a C return type" } { "name" "a type name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
+
 HELP: &:
 { $syntax "&: symbol" }
 { $values { "symbol" "A C library symbol name" } }
