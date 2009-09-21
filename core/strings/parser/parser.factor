@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel lexer make math math.parser
-namespaces parser sequences splitting strings arrays ;
+namespaces parser sequences splitting strings arrays
+math.order ;
 IN: strings.parser
 
 ERROR: bad-escape ;
@@ -73,7 +74,7 @@ name>char-hook [
 
 <PRIVATE
 
-: lexer-advance ( i -- before )
+: lexer-before ( i -- before )
     [
         [
             lexer get
@@ -88,11 +89,11 @@ name>char-hook [
     [ lexer get [ column>> ] [ line-text>> ] bi ] dip
     [ member? ] curry find-from ;
 
-: rest-of-line ( -- seq )
-    lexer get [ line-text>> ] [ column>> ] bi tail-slice ;
+: rest-of-line ( lexer -- seq )
+    [ line-text>> ] [ column>> ] bi tail-slice ;
 
-: current-char ( lexer -- ch )
-    [ column>> ] [ line-text>> ] bi nth ;
+: current-char ( lexer -- ch/f )
+    [ column>> ] [ line-text>> ] bi ?nth ;
 
 : advance-char ( lexer -- )
     [ 1 + ] change-column drop ;
@@ -106,61 +107,74 @@ ERROR: escaped-char-expected ;
         escaped-char-expected
     ] if ;
 
-: parse-escape ( i -- )
-    lexer-advance % CHAR: \ ,
-    lexer get
-    [ advance-char ]
-    [ next-char , ] bi ;
-
-: next-string-line ( obj -- )
-    drop rest-of-line %
-    lexer get next-line "\n" % ;
+: next-line% ( lexer -- )
+    [ rest-of-line % ]
+    [ next-line "\n" % ] bi ;
 
 : rest-begins? ( string -- ? )
     [
         lexer get [ line-text>> ] [ column>> ] bi tail-slice
     ] dip head? ;
 
+: advance-lexer ( n -- )
+    [ lexer get ] dip [ + ] curry change-column drop ; inline
+
+: take-double-quotes ( -- string )
+    lexer get dup current-char CHAR: " = [
+        [ ] [ column>> ] [ line-text>> ] tri
+        [ CHAR: " = not ] find-from drop [
+            swap column>> - CHAR: " <repetition>
+        ] [
+            rest-of-line
+        ] if*
+    ] [
+        drop f
+    ] if dup length advance-lexer ;
+
+: end-string-parse ( delimiter -- )
+    length 3 = [
+        take-double-quotes 3 tail %
+    ] [
+        lexer get advance-char
+    ] if ;
+
 DEFER: (parse-long-string)
 
-: parse-rest-of-line ( string i token -- )
+: parse-found-token ( i string token -- )
+    [ lexer-before % ] dip
     CHAR: \ = [
-        parse-escape (parse-long-string)
+        lexer get [ next-char , ] [ next-char , ] bi (parse-long-string)
     ] [
-        lexer-advance %
         dup rest-begins? [
-            [ lexer get ] dip length [ + ] curry change-column drop
+            end-string-parse
         ] [
             lexer get next-char , (parse-long-string)
         ] if
     ] if ;
 
-: parse-til-separator ( string -- )
-    dup first find-next-token [
-        parse-rest-of-line
-    ] [
-        next-string-line (parse-long-string)
-    ] if* ;
+ERROR: trailing-characters string ;
 
 : (parse-long-string) ( string -- )
     lexer get still-parsing? [
-        parse-til-separator
+        dup first find-next-token [
+            parse-found-token
+        ] [
+            drop lexer get next-line%
+            (parse-long-string)
+        ] if*
     ] [
         unexpected-eof
     ] if ;
 
+PRIVATE>
+
 : parse-long-string ( string -- string' )
     [ (parse-long-string) ] "" make ;
 
-: parse-long-string-escaped ( string -- string' )
-    parse-long-string unescape-string ;
-
-PRIVATE>
-
 : parse-multiline-string ( -- string )
-    rest-of-line "\"\"" head? [
+    lexer get rest-of-line "\"\"" head? [
         lexer get [ 2 + ] change-column drop
-        "\"\"\"" parse-long-string-escaped
+        "\"\"\""
     ] [
-        "\"" parse-long-string-escaped
-    ] if ;
+        "\""
+    ] if parse-long-string unescape-string ;
