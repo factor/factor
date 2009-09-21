@@ -2,8 +2,7 @@ USING: accessors alien arrays definitions generic generic.standard
 generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
 quotations classes classes.algebra classes.tuple continuations
-layouts classes.union sorting compiler.units eval multiline
-io.streams.string ;
+layouts classes.union sorting compiler.units eval io.streams.string ;
 IN: generic.tests
 
 GENERIC: foobar ( x -- y )
@@ -140,26 +139,20 @@ M: f generic-forget-test ;
 
 ! erg's regression
 [ ] [
-    <"
-    IN: compiler.tests
+    """IN: compiler.tests
 
     GENERIC: jeah ( a -- b )
     TUPLE: boii ;
     M: boii jeah ;
     GENERIC: jeah* ( a -- b )
-    M: boii jeah* jeah ;
-    "> eval( -- )
+    M: boii jeah* jeah ;""" eval( -- )
 
-    <"
-    IN: compiler.tests
-    FORGET: boii
-    "> eval( -- )
+    """IN: compiler.tests
+    FORGET: boii""" eval( -- )
     
-    <"
-    IN: compiler.tests
+    """IN: compiler.tests
     TUPLE: boii ;
-    M: boii jeah ;
-    "> eval( -- )
+    M: boii jeah ;""" eval( -- )
 ] unit-test
 
 ! call-next-method cache test

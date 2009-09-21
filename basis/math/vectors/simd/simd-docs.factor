@@ -1,5 +1,5 @@
 USING: help.markup help.syntax sequences math math.vectors
-multiline kernel.private classes.tuple.private
+kernel.private classes.tuple.private
 math.vectors.simd.intrinsics cpu.architecture ;
 IN: math.vectors.simd
 
@@ -71,7 +71,7 @@ $nl
 $nl
 "For example, in the following, no SIMD operations are used at all, because the compiler's propagation pass does not consider dynamic variable usage:"
 { $code
-<" USING: compiler.tree.debugger math.vectors
+"""USING: compiler.tree.debugger math.vectors
 math.vectors.simd ;
 SYMBOLS: x y ;
 
@@ -79,22 +79,22 @@ SYMBOLS: x y ;
     double-4{ 1.5 2.0 3.7 0.4 } x set
     double-4{ 1.5 2.0 3.7 0.4 } y set
     x get y get v+
-] optimizer-report."> }
+] optimizer-report.""" }
 "The following word benefits from SIMD optimization, because it begins with an unsafe declaration:"
 { $code
-<" USING: compiler.tree.debugger kernel.private
+"""USING: compiler.tree.debugger kernel.private
 math.vectors math.vectors.simd ;
 
 : interpolate ( v a b -- w )
     { float-4 float-4 float-4 } declare
     [ v* ] [ [ 1.0 ] dip n-v v* ] bi-curry* bi v+ ;
 
-\ interpolate optimizer-report. "> }
+\ interpolate optimizer-report.""" }
 "Note that using " { $link declare } " is not recommended. Safer ways of getting type information for the input parameters to a word include defining methods on a generic word (the value being dispatched upon has a statically known type in the method body), as well as using " { $link "hints" } " and " { $link POSTPONE: inline } " declarations."
 $nl
 "Here is a better version of the " { $snippet "interpolate" } " words above that uses hints:"
 { $code
-<" USING: compiler.tree.debugger hints
+"""USING: compiler.tree.debugger hints
 math.vectors math.vectors.simd ;
 
 : interpolate ( v a b -- w )
@@ -102,14 +102,14 @@ math.vectors math.vectors.simd ;
 
 HINTS: interpolate float-4 float-4 float-4 ;
 
-\ interpolate optimizer-report. "> }
+\ interpolate optimizer-report. """ }
 "This time, the optimizer report lists calls to both SIMD primitives and high-level vector words, because hints cause two code paths to be generated. The " { $snippet "optimized." } " word can be used to make sure that the fast code path consists entirely of calls to primitives."
 $nl
 "If the " { $snippet "interpolate" } " word was to be used in several places with different types of vectors, it would be best to declare it " { $link POSTPONE: inline } "."
 $nl
 "In the " { $snippet "interpolate" } " word, there is still a call to the " { $link <tuple-boa> } " primitive, because the return value at the end is being boxed on the heap. In the next example, no memory allocation occurs at all because the SIMD vectors are stored inside a struct class (see " { $link "classes.struct" } "); also note the use of inlining:"
 { $code
-<" USING: compiler.tree.debugger math.vectors math.vectors.simd ;
+"""USING: compiler.tree.debugger math.vectors math.vectors.simd ;
 IN: simd-demo
 
 STRUCT: actor
@@ -132,13 +132,13 @@ M: actor advance ( dt actor -- )
     [ >float ] dip
     [ update-velocity ] [ update-position ] 2bi ;
 
-M\ actor advance optimized.">
+M\ actor advance optimized."""
 }
 "The " { $vocab-link "compiler.cfg.debugger" } " vocabulary can give a lower-level picture of the generated code, that includes register assignments and other low-level details. To look at low-level optimizer output, call " { $snippet "test-mr mr." } " on a word or quotation:"
 { $code
-<" USE: compiler.tree.debugger
+"""USE: compiler.tree.debugger
 
-M\ actor advance test-mr mr."> }
+M\ actor advance test-mr mr.""" }
 "An example of a high-performance algorithm that uses SIMD primitives can be found in the " { $vocab-link "benchmark.nbody-simd" } " vocabulary." ;
 
 ARTICLE: "math.vectors.simd.intrinsics" "Low-level SIMD primitives"
@@ -169,10 +169,10 @@ $nl
 ARTICLE: "math.vectors.simd.alien" "SIMD data in struct classes"
 "Struct classes may contain fields which store SIMD data; use one of the following C type names:"
 { $code
-<" float-4
+"""float-4
 double-2
 float-8
-double-4"> }
+double-4""" }
 "Passing SIMD data as function parameters is not yet supported." ;
 
 ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"

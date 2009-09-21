@@ -128,29 +128,29 @@ CONSTANT: otug-slides
     { $slide "Locals example"
         "Area of a triangle using Heron's formula"
         { $code
-            <" :: area ( a b c -- x )
+            """:: area ( a b c -- x )
     a b c + + 2 / :> p
     p
     p a - *
     p b - *
-    p c - * sqrt ;">
+    p c - * sqrt ;"""
         }
     }
     { $slide "Previous example without locals"
         "A bit unwieldy..."
         { $code
-            <" : area ( a b c -- x )
+            """: area ( a b c -- x )
     [ ] [ + + 2 / ] 3bi
     [ '[ _ - ] tri@ ] [ neg ] bi
-    * * * sqrt ;"> }
+    * * * sqrt ;""" }
     }
     { $slide "More idiomatic version"
         "But there's a trick: put the points in an array"
-        { $code <" : v-n ( v n -- w ) '[ _ - ] map ;
+        { $code """: v-n ( v n -- w ) '[ _ - ] map ;
 
 : area ( points -- x )
     [ 0 suffix ] [ sum 2 / ] bi
-    v-n product sqrt ;"> }
+    v-n product sqrt ;""" }
     }
     ! { $slide "The parser"
     !     "All data types have a literal syntax"
@@ -213,10 +213,10 @@ CONSTANT: otug-slides
     }
     { $slide "This is hard with mainstream syntax!"
         { $code
-            <" var customer = ...;
+            """var customer = ...;
 var orders = (customer == null ? null : customer.orders);
 var order = (orders == null ? null : orders[0]);
-var price = (order == null ? null : order.price);"> }
+var price = (order == null ? null : order.price);""" }
     }
     { $slide "An ad-hoc solution"
         "Something like..."
@@ -245,14 +245,14 @@ var price = (order == null ? null : order.price);"> }
     }
     { $slide "UI example"
         { $code
-    <" <pile>
+    """<pile>
     { 5 5 } >>gap
     1 >>fill
     "Hello world!" <label> add-gadget
     "Click me!" [ drop beep ]
     <bevel-button> add-gadget
     <editor> <scroller> add-gadget
-"UI test" open-window "> }
+"UI test" open-window""" }
     }
     { $slide "Help system"
         "Help markup is just literal data"

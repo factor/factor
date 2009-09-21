@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Jeff Bigot
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax multiline ;
+USING: help.markup help.syntax ;
 IN: adsoda
 
 ! --------------------------------------------------------------
@@ -240,7 +240,7 @@ $nl
 ;
 
 ARTICLE: { "adsoda" "light" } "ADSODA : lights"
-{ $code <"
+{ $code """
 ! HELP: light position color
 ! <light> ( -- tuple ) light new ;
 ! light est un vecteur avec 3 variables pour les couleurs\n
@@ -260,7 +260,7 @@ ARTICLE: { "adsoda" "light" } "ADSODA : lights"
   if (cRed > 1.0) cRed = 1.0;
    if (cGreen > 1.0) cGreen = 1.0;
    if (cBlue > 1.0) cBlue = 1.0;
-"> }
+""" }
 ;
 
 

@@ -4,8 +4,7 @@ USING: accessors assocs combinators combinators.smart
 destructors fry io io.encodings.utf8 kernel managed-server
 namespaces parser sequences sorting splitting strings.parser
 unicode.case unicode.categories calendar calendar.format
-locals multiline io.encodings.binary io.encodings.string
-prettyprint ;
+locals io.encodings.binary io.encodings.string prettyprint ;
 IN: managed-server.chat
 
 TUPLE: chat-server < managed-server ;
@@ -69,31 +68,31 @@ CONSTANT: line-beginning "-!- "
     docs key chat-docs get set-at ;
 
 [ handle-help ]
-<" Syntax: /help [command]
-Displays the documentation for a command.">
+"""Syntax: /help [command]
+Displays the documentation for a command."""
 "help" add-command
 
 [ drop clients keys [ "``" "''" surround ] map ", " join send-line ]
-<" Syntax: /who
-Shows the list of connected users.">
+"""Syntax: /who
+Shows the list of connected users."""
 "who" add-command
 
 [ drop gmt timestamp>rfc822 send-line ]
-<" Syntax: /time
-Returns the current GMT time."> "time" add-command
+"""Syntax: /time
+Returns the current GMT time.""" "time" add-command
 
 [ handle-nick ]
-<" Syntax: /nick nickname
-Changes your nickname.">
+"""Syntax: /nick nickname
+Changes your nickname."""
 "nick" add-command
 
 [ handle-me ]
-<" Syntax: /me action">
+"""Syntax: /me action"""
 "me" add-command
 
 [ handle-quit ]
-<" Syntax: /quit [message]
-Disconnects a user from the chat server."> "quit" add-command
+"""Syntax: /quit [message]
+Disconnects a user from the chat server.""" "quit" add-command
 
 : handle-command ( string -- )
     dup " " split1 swap >lower commands get at* [

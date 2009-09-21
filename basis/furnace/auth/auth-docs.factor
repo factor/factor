@@ -1,7 +1,7 @@
 USING: assocs classes help.markup help.syntax kernel
 quotations strings words words.symbol furnace.auth.providers.db
 checksums.sha furnace.auth.providers math byte-arrays
-http multiline ;
+http ;
 IN: furnace.auth
 
 HELP: <protected>
@@ -149,24 +149,24 @@ ARTICLE: "furnace.auth.users" "User profiles"
 ARTICLE: "furnace.auth.example" "Furnace authentication example"
 "The " { $vocab-link "webapps.todo" } " vocabulary wraps all of its responders in a protected responder. The " { $slot "description" } " slot is set so that the login page contains the message “You must log in to view your todo list”:"
 { $code
-    <" <protected>
-    "view your todo list" >>description">
+    """<protected>
+    "view your todo list" >>description"""
 }
 "The " { $vocab-link "webapps.wiki" } " vocabulary defines a mix of protected and unprotected actions. One example of a protected action is that for deleting wiki pages, an action normally reserved for administrators. This action is protected with the following code:"
 { $code
-    <" <protected>
+    """<protected>
     "delete wiki articles" >>description
-    { can-delete-wiki-articles? } >>capabilities">
+    { can-delete-wiki-articles? } >>capabilities"""
 }
 "The " { $vocab-link "websites.concatenative" } " vocabulary wraps all of its responders, including the wiki, in a login authentication realm:"
 { $code
-<" : <login-config> ( responder -- responder' )
+""": <login-config> ( responder -- responder' )
     "Factor website" <login-realm>
         "Factor website" >>name
         allow-registration
         allow-password-recovery
         allow-edit-profile
-        allow-deactivation ;">
+        allow-deactivation ;"""
 } ;
 
 ARTICLE: "furnace.auth" "Furnace authentication"

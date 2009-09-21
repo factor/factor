@@ -3,7 +3,7 @@ USING: accessors alien alien.c-types ascii
 assocs byte-arrays classes.struct classes.tuple.private
 combinators compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
-literals math mirrors multiline namespaces prettyprint
+literals math mirrors namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
 tools.test parser lexer eval layouts ;
 SPECIALIZED-ARRAY: char
@@ -181,18 +181,18 @@ STRUCT: struct-test-string-ptr
     ] with-scope
 ] unit-test
 
-[ <" USING: classes.struct ;
+[ "USING: classes.struct ;
 IN: classes.struct.tests
 STRUCT: struct-test-foo
     { x char initial: 0 } { y int initial: 123 } { z bool } ;
-"> ]
+" ]
 [ [ struct-test-foo see ] with-string-writer ] unit-test
 
-[ <" USING: classes.struct ;
+[ "USING: classes.struct ;
 IN: classes.struct.tests
 UNION-STRUCT: struct-test-float-and-bits
     { f float initial: 0.0 } { bits uint initial: 0 } ;
-"> ]
+" ]
 [ [ struct-test-float-and-bits see ] with-string-writer ] unit-test
 
 [ {
