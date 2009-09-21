@@ -1,6 +1,8 @@
 nmap <silent> <Leader>fi :FactorVocabImpl<CR>
 nmap <silent> <Leader>fd :FactorVocabDocs<CR>
 nmap <silent> <Leader>ft :FactorVocabTests<CR>
+nmap <Leader>fv :FactorVocab<SPACE>
+nmap <Leader>fn :NewFactorVocab<SPACE>
 
 if !exists("g:FactorRoot")
     let g:FactorRoot = "~/factor"
