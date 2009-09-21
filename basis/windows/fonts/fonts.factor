@@ -6,7 +6,7 @@ IN: windows.fonts
 MEMO: windows-fonts ( -- fonts )
     windows-major 6 >=
     H{
-        { "sans-serif" "Calibri" }
+        { "sans-serif" "Segoe UI" }
         { "serif" "Cambria" }
         { "monospace" "Consolas" }
     }
