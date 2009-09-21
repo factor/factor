@@ -6,17 +6,16 @@ cpu.architecture kernel kernel.private math memory namespaces make
 sequences words system layouts combinators math.order fry locals
 compiler.constants byte-arrays io macros quotations cpu.x86.features
 cpu.x86.features.private compiler compiler.units init
+compiler.constants vm byte-arrays
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.intrinsics
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
-compiler.codegen
 compiler.codegen.fixup ;
+FROM: layouts => cell ;
 FROM: math => float ;
 IN: cpu.x86
-
-<< enable-fixnum-log2 >>
 
 ! Add some methods to the assembler to be more useful to the backend
 M: label JMP 0 JMP rc-relative label-fixup ;
@@ -676,9 +675,13 @@ M: x86 %shl [ SHL ] emit-shift ;
 M: x86 %shr [ SHR ] emit-shift ;
 M: x86 %sar [ SAR ] emit-shift ;
 
+M: x86 %vm-field-ptr ( dst field -- )
+    [ drop 0 MOV rc-absolute-cell rt-vm rel-fixup ]
+    [ vm-field-offset ADD ] 2bi ;
+
 : load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
-    0 MOV "nursery" f rc-absolute-cell rel-dlsym ;
+    "nursery" %vm-field-ptr ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap cell [+] MOV ] 2bi ;
@@ -698,18 +701,19 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
     dst class store-tagged
     nursery-ptr size inc-allot-ptr ;
 
+
 M:: x86 %write-barrier ( src card# table -- )
     #! Mark the card pointed to by vreg.
     ! Mark the card
     card# src MOV
     card# card-bits SHR
-    table "cards_offset" f %alien-global
+    table "cards_offset" %vm-field-ptr
     table table [] MOV
     table card# [+] card-mark <byte> MOV
 
     ! Mark the card deck
     card# deck-bits card-bits - SHR
-    table "decks_offset" f %alien-global
+    table "decks_offset" %vm-field-ptr
     table table [] MOV
     table card# [+] card-mark <byte> MOV ;
 
@@ -731,10 +735,10 @@ M:: x86 %call-gc ( gc-root-count -- )
     ! Pass number of roots as second parameter
     param-reg-2 gc-root-count MOV
     ! Call GC
-    "inline_gc" f %alien-invoke ;
+    "inline_gc" %vm-invoke-3rd-arg ; 
 
-M: x86 %alien-global
-    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
+M: x86 %alien-global ( dst symbol library -- )
+    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
@@ -863,8 +867,8 @@ M:: x86 %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp1 "stack_chain" f %alien-global
-    temp1 temp1 [] MOV
+    temp1 0 MOV rc-absolute-cell rt-vm rel-fixup
+    temp1 temp1 "stack_chain" vm-field-offset [+] MOV
     temp2 stack-reg cell neg [+] LEA
     temp1 [] temp2 MOV
     callback-allowed? [
@@ -884,6 +888,10 @@ M: x86 small-enough? ( n -- ? )
     #! set up by the caller.
     stack-frame get total-size>> + stack@ ;
 
+enable-simd
+enable-min/max
+enable-fixnum-log2
+
 :: install-sse2-check ( -- )
     [
         sse-version 20 < [
@@ -901,10 +909,6 @@ M: x86 small-enough? ( n -- ? )
         enable-float-min/max
         install-sse2-check
     ] when ;
-
-
-enable-simd
-enable-min/max
 
 : check-sse ( -- )
     [ { sse_version } compile ] with-optimizer

@@ -79,14 +79,16 @@ DEF(long long,read_timestamp_counter,(void)):
 	or %rdx,%rax
 	ret
 
-DEF(void,primitive_inline_cache_miss,(void)):
+DEF(void,primitive_inline_cache_miss,(void *vm)):
 	mov (%rsp),%rbx
-DEF(void,primitive_inline_cache_miss_tail,(void)):
+DEF(void,primitive_inline_cache_miss_tail,(void *vm)):
 	sub $STACK_PADDING,%rsp
+	mov ARG0,ARG1
 	mov %rbx,ARG0
 	call MANGLE(inline_cache_miss)
 	add $STACK_PADDING,%rsp
 	jmp *%rax
+
 
 DEF(void,get_sse_env,(void*)):
 	stmxcsr (%rdi)
@@ -106,4 +108,25 @@ DEF(void,set_x87_env,(const void*)):
 	fldcw 2(%rdi)
 	ret
 
+DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
+	/* clear x87 stack, but preserve rounding mode and exception flags */
+	sub $2,STACK_REG
+	fnstcw (STACK_REG)
+	fninit
+	fldcw (STACK_REG)
+	/* rewind_to */
+	mov ARG1,STACK_REG
+	mov ARG2,ARG1  /* make vm ptr 2nd arg in case quot_xt = lazy_jit_compile */
+	jmp *QUOT_XT_OFFSET(ARG0)
+
+DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
+	mov ARG1,ARG2                /* vm is 3rd arg */
+	mov STACK_REG,ARG1           /* Save stack pointer */
+	sub $STACK_PADDING,STACK_REG
+	call MANGLE(lazy_jit_compile_impl)
+	mov RETURN_REG,ARG0          /* No-op on 32-bit */
+	add $STACK_PADDING,STACK_REG
+        jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
+
+	
 #include "cpu-x86.S"

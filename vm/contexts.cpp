@@ -1,26 +1,22 @@
 #include "master.hpp"
 
-factor::context *stack_chain;
-
 namespace factor
 {
 
-cell ds_size, rs_size;
-context *unused_contexts;
 
-void reset_datastack()
+void factorvm::reset_datastack()
 {
 	ds = ds_bot - sizeof(cell);
 }
 
-void reset_retainstack()
+void factorvm::reset_retainstack()
 {
 	rs = rs_bot - sizeof(cell);
 }
 
 static const cell stack_reserved = (64 * sizeof(cell));
 
-void fix_stacks()
+void factorvm::fix_stacks()
 {
 	if(ds + sizeof(cell) < ds_bot || ds + stack_reserved >= ds_top) reset_datastack();
 	if(rs + sizeof(cell) < rs_bot || rs + stack_reserved >= rs_top) reset_retainstack();
@@ -28,7 +24,7 @@ void fix_stacks()
 
 /* called before entry into foreign C code. Note that ds and rs might
 be stored in registers, so callbacks must save and restore the correct values */
-void save_stacks()
+void factorvm::save_stacks()
 {
 	if(stack_chain)
 	{
@@ -37,7 +33,7 @@ void save_stacks()
 	}
 }
 
-context *alloc_context()
+context *factorvm::alloc_context()
 {
 	context *new_context;
 
@@ -56,14 +52,14 @@ context *alloc_context()
 	return new_context;
 }
 
-void dealloc_context(context *old_context)
+void factorvm::dealloc_context(context *old_context)
 {
 	old_context->next = unused_contexts;
 	unused_contexts = old_context;
 }
 
 /* called on entry into a compiled callback */
-void nest_stacks()
+void factorvm::nest_stacks()
 {
 	context *new_context = alloc_context();
 
@@ -94,8 +90,14 @@ void nest_stacks()
 	reset_retainstack();
 }
 
+void nest_stacks(factorvm *myvm)
+{
+	ASSERTVM();
+	return VM_PTR->nest_stacks();
+}
+
 /* called when leaving a compiled callback */
-void unnest_stacks()
+void factorvm::unnest_stacks()
 {
 	ds = stack_chain->datastack_save;
 	rs = stack_chain->retainstack_save;
@@ -109,8 +111,14 @@ void unnest_stacks()
 	dealloc_context(old_stacks);
 }
 
+void unnest_stacks(factorvm *myvm)
+{
+	ASSERTVM();
+	return VM_PTR->unnest_stacks();
+}
+
 /* called on startup */
-void init_stacks(cell ds_size_, cell rs_size_)
+void factorvm::init_stacks(cell ds_size_, cell rs_size_)
 {
 	ds_size = ds_size_;
 	rs_size = rs_size_;
@@ -118,7 +126,7 @@ void init_stacks(cell ds_size_, cell rs_size_)
 	unused_contexts = NULL;
 }
 
-bool stack_to_array(cell bottom, cell top)
+bool factorvm::stack_to_array(cell bottom, cell top)
 {
 	fixnum depth = (fixnum)(top - bottom + sizeof(cell));
 
@@ -133,38 +141,58 @@ bool stack_to_array(cell bottom, cell top)
 	}
 }
 
-PRIMITIVE(datastack)
+inline void factorvm::vmprim_datastack()
 {
 	if(!stack_to_array(ds_bot,ds))
 		general_error(ERROR_DS_UNDERFLOW,F,F,NULL);
 }
 
-PRIMITIVE(retainstack)
+PRIMITIVE(datastack)
+{
+	PRIMITIVE_GETVM()->vmprim_datastack();
+}
+
+inline void factorvm::vmprim_retainstack()
 {
 	if(!stack_to_array(rs_bot,rs))
 		general_error(ERROR_RS_UNDERFLOW,F,F,NULL);
 }
 
+PRIMITIVE(retainstack)
+{
+	PRIMITIVE_GETVM()->vmprim_retainstack();
+}
+
 /* returns pointer to top of stack */
-cell array_to_stack(array *array, cell bottom)
+cell factorvm::array_to_stack(array *array, cell bottom)
 {
 	cell depth = array_capacity(array) * sizeof(cell);
 	memcpy((void*)bottom,array + 1,depth);
 	return bottom + depth - sizeof(cell);
 }
 
-PRIMITIVE(set_datastack)
+inline void factorvm::vmprim_set_datastack()
 {
 	ds = array_to_stack(untag_check<array>(dpop()),ds_bot);
 }
 
-PRIMITIVE(set_retainstack)
+PRIMITIVE(set_datastack)
+{
+	PRIMITIVE_GETVM()->vmprim_set_datastack();
+}
+
+inline void factorvm::vmprim_set_retainstack()
 {
 	rs = array_to_stack(untag_check<array>(dpop()),rs_bot);
 }
 
+PRIMITIVE(set_retainstack)
+{
+	PRIMITIVE_GETVM()->vmprim_set_retainstack();
+}
+
 /* Used to implement call( */
-PRIMITIVE(check_datastack)
+inline void factorvm::vmprim_check_datastack()
 {
 	fixnum out = to_fixnum(dpop());
 	fixnum in = to_fixnum(dpop());
@@ -187,6 +215,11 @@ PRIMITIVE(check_datastack)
 		}
 		dpush(T);
 	}
+}
+
+PRIMITIVE(check_datastack)
+{
+	PRIMITIVE_GETVM()->vmprim_check_datastack();
 }
 
 }

@@ -5,30 +5,30 @@ namespace factor
 
 HMODULE hFactorDll;
 
-void init_ffi()
+void factorvm::init_ffi()
 {
 	hFactorDll = GetModuleHandle(FACTOR_DLL);
 	if(!hFactorDll)
 		fatal_error("GetModuleHandle(\"" FACTOR_DLL_NAME "\") failed", 0);
 }
 
-void ffi_dlopen(dll *dll)
+void factorvm::ffi_dlopen(dll *dll)
 {
 	dll->dll = LoadLibraryEx((WCHAR *)alien_offset(dll->path), NULL, 0);
 }
 
-void *ffi_dlsym(dll *dll, symbol_char *symbol)
+void *factorvm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
 	return (void *)GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
 }
 
-void ffi_dlclose(dll *dll)
+void factorvm::ffi_dlclose(dll *dll)
 {
 	FreeLibrary((HMODULE)dll->dll);
 	dll->dll = NULL;
 }
 
-bool windows_stat(vm_char *path)
+bool factorvm::windows_stat(vm_char *path)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
 	HANDLE h = CreateFileW(path,
@@ -56,14 +56,15 @@ bool windows_stat(vm_char *path)
 	return ret;
 }
 
-void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
+
+void factorvm::windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
 {
 	snwprintf(temp_path, length-1, L"%s.image", full_path); 
-	temp_path[sizeof(temp_path) - 1] = 0;
+	temp_path[length - 1] = 0;
 }
 
 /* You must free() this yourself. */
-const vm_char *default_image_path()
+const vm_char *factorvm::default_image_path()
 {
 	vm_char full_path[MAX_UNICODE_PATH];
 	vm_char *ptr;
@@ -75,14 +76,14 @@ const vm_char *default_image_path()
 	if((ptr = wcsrchr(full_path, '.')))
 		*ptr = 0;
 
-	snwprintf(temp_path, sizeof(temp_path)-1, L"%s.image", full_path); 
-	temp_path[sizeof(temp_path) - 1] = 0;
+	snwprintf(temp_path, MAX_UNICODE_PATH-1, L"%s.image", full_path); 
+	temp_path[MAX_UNICODE_PATH - 1] = 0;
 
 	return safe_strdup(temp_path);
 }
 
 /* You must free() this yourself. */
-const vm_char *vm_executable_path()
+const vm_char *factorvm::vm_executable_path()
 {
 	vm_char full_path[MAX_UNICODE_PATH];
 	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
@@ -91,13 +92,18 @@ const vm_char *vm_executable_path()
 }
 
 
-PRIMITIVE(existsp)
+inline void factorvm::vmprim_existsp()
 {
 	vm_char *path = untag_check<byte_array>(dpop())->data<vm_char>();
 	box_boolean(windows_stat(path));
 }
 
-segment *alloc_segment(cell size)
+PRIMITIVE(existsp)
+{
+	PRIMITIVE_GETVM()->vmprim_existsp();
+}
+
+segment *factorvm::alloc_segment(cell size)
 {
 	char *mem;
 	DWORD ignore;
@@ -122,7 +128,7 @@ segment *alloc_segment(cell size)
 	return block;
 }
 
-void dealloc_segment(segment *block)
+void factorvm::dealloc_segment(segment *block)
 {
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
@@ -131,7 +137,7 @@ void dealloc_segment(segment *block)
 	free(block);
 }
 
-long getpagesize()
+long factorvm::getpagesize()
 {
 	static long g_pagesize = 0;
 	if (! g_pagesize)
@@ -143,7 +149,7 @@ long getpagesize()
 	return g_pagesize;
 }
 
-void sleep_micros(u64 usec)
+void factorvm::sleep_micros(u64 usec)
 {
 	Sleep((DWORD)(usec / 1000));
 }
