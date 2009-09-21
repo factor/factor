@@ -47,9 +47,12 @@ UNION: two-operand-insn
     ##min-float
     ##max-float
     ##add-vector
-    ##sub-vector
+    ##saturated-add-vector
     ##add-sub-vector
+    ##sub-vector
+    ##saturated-sub-vector
     ##mul-vector
+    ##saturated-mul-vector
     ##div-vector
     ##min-vector
     ##max-vector ;

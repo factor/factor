@@ -41,9 +41,12 @@ MACRO: simd-boa ( rep class -- simd-array )
     [
         {
             { v+ (simd-v+) }
-            { v- (simd-v-) }
+            { vs+ (simd-vs+) }
             { v+- (simd-v+-) }
+            { v- (simd-v-) }
+            { vs- (simd-vs-) }
             { v* (simd-v*) }
+            { vs* (simd-vs*) }
             { v/ (simd-v/) }
             { vmin (simd-vmin) }
             { vmax (simd-vmax) }
@@ -111,7 +114,7 @@ A{           DEFINES ${A}{
 NTH          [ T dup c-type-getter-boxer array-accessor ]
 SET-NTH      [ T dup c-setter array-accessor ]
 
-A-rep        IS ${A}-rep
+A-rep        [ A name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
@@ -141,6 +144,8 @@ M: A new-sequence
 M: A equal? over \ A instance? [ sequence= ] [ 2drop f ] if ;
 
 M: A byte-length underlying>> length ; inline
+
+M: A element-type drop A-rep rep-component-type ;
 
 M: A pprint-delims drop \ A{ \ } ;
 
@@ -172,9 +177,12 @@ INSTANCE: A sequence
 
 \ A \ A-with \ A-rep H{
     { v+ [ [ (simd-v+) ] \ A-vv->v-op execute ] }
+    { vs+ [ [ (simd-vs+) ] \ A-vv->v-op execute ] }
     { v+- [ [ (simd-v+-) ] \ A-vv->v-op execute ] }
     { v- [ [ (simd-v-) ] \ A-vv->v-op execute ] }
+    { vs- [ [ (simd-vs-) ] \ A-vv->v-op execute ] }
     { v* [ [ (simd-v*) ] \ A-vv->v-op execute ] }
+    { vs* [ [ (simd-vs*) ] \ A-vv->v-op execute ] }
     { v/ [ [ (simd-v/) ] \ A-vv->v-op execute ] }
     { vmin [ [ (simd-vmin) ] \ A-vv->v-op execute ] }
     { vmax [ [ (simd-vmax) ] \ A-vv->v-op execute ] }
@@ -227,7 +235,7 @@ A{           DEFINES ${A}{
 
 A-deref      DEFINES-PRIVATE ${A}-deref
 
-A-rep        IS ${A/2}-rep
+A-rep        [ A/2 name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
@@ -267,6 +275,8 @@ M: A equal? over \ A instance? [ sequence= ] [ 2drop f ] if ;
 
 M: A byte-length drop 32 ; inline
 
+M: A element-type drop A-rep rep-component-type ;
+
 SYNTAX: A{ \ } [ >A ] parse-literal ;
 
 M: A pprint-delims drop \ A{ \ } ;
@@ -298,9 +308,12 @@ INSTANCE: A sequence
 
 \ A \ A-with \ A-rep H{
     { v+ [ [ (simd-v+) ] \ A-vv->v-op execute ] }
+    { vs+ [ [ (simd-vs+) ] \ A-vv->v-op execute ] }
     { v- [ [ (simd-v-) ] \ A-vv->v-op execute ] }
+    { vs- [ [ (simd-vs-) ] \ A-vv->v-op execute ] }
     { v+- [ [ (simd-v+-) ] \ A-vv->v-op execute ] }
     { v* [ [ (simd-v*) ] \ A-vv->v-op execute ] }
+    { vs* [ [ (simd-vs*) ] \ A-vv->v-op execute ] }
     { v/ [ [ (simd-v/) ] \ A-vv->v-op execute ] }
     { vmin [ [ (simd-vmin) ] \ A-vv->v-op execute ] }
     { vmax [ [ (simd-vmax) ] \ A-vv->v-op execute ] }

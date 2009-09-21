@@ -151,13 +151,16 @@ IN: compiler.cfg.intrinsics
         { math.integers.private:fixnum-log2 [ drop emit-fixnum-log2 ] }
     } enable-intrinsics ;
 
-: enable-sse2-simd ( -- )
+: enable-simd ( -- )
     {
         { math.vectors.simd.intrinsics:assert-positive [ drop ] }
         { math.vectors.simd.intrinsics:(simd-v+) [ [ ^^add-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vs+) [ [ ^^saturated-add-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v+-) [ [ ^^add-sub-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v-) [ [ ^^sub-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vs-) [ [ ^^saturated-sub-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v*) [ [ ^^mul-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vs*) [ [ ^^saturated-mul-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v/) [ [ ^^div-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vmin) [ [ ^^min-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vmax) [ [ ^^max-vector ] emit-binary-vector-op ] }
@@ -165,13 +168,9 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-broadcast) [ [ ^^broadcast-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-gather-2) [ emit-gather-vector-2 ] }
         { math.vectors.simd.intrinsics:(simd-gather-4) [ emit-gather-vector-4 ] }
+        { math.vectors.simd.intrinsics:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:alien-vector [ emit-alien-vector ] }
         { math.vectors.simd.intrinsics:set-alien-vector [ emit-set-alien-vector ] }
-    } enable-intrinsics ;
-
-: enable-sse3-simd ( -- )
-    {
-        { math.vectors.simd.intrinsics:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
     } enable-intrinsics ;
 
 : emit-intrinsic ( node word -- )

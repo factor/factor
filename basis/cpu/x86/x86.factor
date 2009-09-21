@@ -323,6 +323,30 @@ M: x86 %add-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
+M: x86 %saturated-add-vector ( dst src1 src2 rep -- )
+    {
+        { char-16-rep [ PADDSB ] }
+        { uchar-16-rep [ PADDUSB ] }
+        { short-8-rep [ PADDSW ] }
+        { ushort-8-rep [ PADDUSW ] }
+    } case drop ;
+
+M: x86 %saturated-add-vector-reps
+    {
+        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep } }
+    } available-reps ;
+
+M: x86 %add-sub-vector ( dst src1 src2 rep -- )
+    {
+        { float-4-rep [ ADDSUBPS ] }
+        { double-2-rep [ ADDSUBPD ] }
+    } case drop ;
+
+M: x86 %add-sub-vector-reps
+    {
+        { sse3? { float-4-rep double-2-rep } }
+    } available-reps ;
+
 M: x86 %sub-vector ( dst src1 src2 rep -- )
     {
         { float-4-rep [ SUBPS ] }
@@ -341,15 +365,17 @@ M: x86 %sub-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
-M: x86 %add-sub-vector ( dst src1 src2 rep -- )
+M: x86 %saturated-sub-vector ( dst src1 src2 rep -- )
     {
-        { float-4-rep [ ADDSUBPS ] }
-        { double-2-rep [ ADDSUBPD ] }
+        { char-16-rep [ PSUBSB ] }
+        { uchar-16-rep [ PSUBUSB ] }
+        { short-8-rep [ PSUBSW ] }
+        { ushort-8-rep [ PSUBUSW ] }
     } case drop ;
 
-M: x86 %add-sub-vector-reps
+M: x86 %saturated-sub-vector-reps
     {
-        { sse3? { float-4-rep double-2-rep } }
+        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep } }
     } available-reps ;
 
 M: x86 %mul-vector ( dst src1 src2 rep -- )
@@ -367,6 +393,10 @@ M: x86 %mul-vector-reps
         { sse? { float-4-rep } }
         { sse2? { double-2-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
+
+M: x86 %saturated-mul-vector-reps
+    ! No multiplication with saturation on x86
+    { } ;
 
 M: x86 %div-vector ( dst src1 src2 rep -- )
     {
@@ -854,46 +884,29 @@ M: x86 small-enough? ( n -- ? )
     #! set up by the caller.
     stack-frame get total-size>> + stack@ ;
 
-: enable-sse2 ( -- )
-    enable-float-intrinsics
-    enable-fsqrt
-    enable-float-min/max
-    enable-sse2-simd ;
-
-: enable-sse3 ( -- )
-    enable-sse2
-    enable-sse3-simd ;
-
-enable-min/max
-
-:: install-sse-check ( version -- )
+:: install-sse2-check ( -- )
     [
-        sse-version version < [
-            "This image was built to use " write
-            version sse-string write
-            " but your CPU only supports " write
-            sse-version sse-string write "." print
+        sse-version 20 < [
+            "This image was built to use SSE2 but your CPU does not support it." print
             "You will need to bootstrap Factor again." print
             flush
             1 exit
         ] when
     ] "cpu.x86" add-init-hook ;
 
-: enable-sse ( version -- )
-    {
-        { 00 [ ] }
-        { 10 [ ] }
-        { 20 [ enable-sse2 ] }
-        { 30 [ enable-sse3 ] }
-        { 33 [ enable-sse3 ] }
-        { 41 [ enable-sse3 ] }
-        { 42 [ enable-sse3 ] }
-    } case ;
+: enable-sse2 ( version -- )
+    20 >= [
+        enable-float-intrinsics
+        enable-fsqrt
+        enable-float-min/max
+        install-sse2-check
+    ] when ;
+
+
+enable-simd
+enable-min/max
 
 : check-sse ( -- )
     [ { sse_version } compile ] with-optimizer
-
-    "Checking for multimedia extensions: " write sse-version 30 min
-    [ sse-string write " detected" print ]
-    [ install-sse-check ]
-    [ enable-sse ] tri ;
+    "Checking for multimedia extensions: " write sse-version
+    [ sse-string write " detected" print ] [ enable-sse2 ] bi ;

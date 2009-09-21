@@ -1,8 +1,10 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences math math.functions hints
-math.order ;
+USING: arrays alien.c-types kernel sequences math math.functions
+hints math.order fry ;
 IN: math.vectors
+
+GENERIC: element-type ( obj -- c-type )
 
 : vneg ( u -- v ) [ neg ] map ;
 
@@ -28,6 +30,13 @@ IN: math.vectors
     [ t ] 2dip
     [ [ not ] 2dip pick [ + ] [ - ] if ] 2map
     nip ;
+
+: 2saturate-map ( u v quot -- w )
+    pick element-type '[ @ _ c-type-clamp ] 2map ; inline
+
+: vs+ ( u v -- w ) [ + ] 2saturate-map ;
+: vs- ( u v -- w ) [ - ] 2saturate-map ;
+: vs* ( u v -- w ) [ * ] 2saturate-map ;
 
 : vfloor    ( v -- _v_ ) [ floor    ] map ;
 : vceiling  ( v -- ^v^ ) [ ceiling  ] map ;
