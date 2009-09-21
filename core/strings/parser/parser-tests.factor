@@ -31,3 +31,6 @@ IN: strings.parser.tests
 ] [
     "\"\"\"\"abc\"\"\"\"" eval( -- string )
 ] unit-test
+
+
+[ "\"\\" ] [ "\"\\" ] unit-test
