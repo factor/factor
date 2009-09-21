@@ -38,8 +38,8 @@ M: typedef-word synopsis*
 : pprint-function-arg ( type name -- )
     [ pprint-c-type ] [ text ] bi* ;
 
-: pprint-function-args ( word -- )
-    [ def>> fourth ] [ stack-effect in>> ] bi zip [ ] [
+: pprint-function-args ( types names -- )
+    zip [ ] [
         unclip-last
         [ [ first2 "," append pprint-function-arg ] each ] dip
         first2 pprint-function-arg
@@ -51,8 +51,33 @@ M: alien-function-word definition drop f ;
 M: alien-function-word synopsis*
     {
         [ seeing-word ]
+        [ def>> second [ \ LIBRARY: [ text ] pprint-prefix ] when* ]
         [ definer. ]
         [ def>> first pprint-c-type ]
         [ pprint-word ]
-        [ <block "(" text pprint-function-args ")" text block> ]
+        [
+            <block "(" text
+            [ def>> fourth ] [ stack-effect in>> ] bi
+            pprint-function-args
+            ")" text block>
+        ]
+    } cleave ;
+
+M: alien-callback-type-word definer
+    "callback-abi" word-prop "stdcall" =
+    \ STDCALL-CALLBACK: \ CALLBACK: ? 
+    f ;
+M: alien-callback-type-word definition drop f ;
+M: alien-callback-type-word synopsis*
+    {
+        [ seeing-word ]
+        [ definer. ]
+        [ def>> first pprint-c-type ]
+        [ pprint-word ]
+        [
+            <block "(" text 
+            [ def>> second ] [ "callback-effect" word-prop in>> ] bi
+            pprint-function-args
+            ")" text block>
+        ]
     } cleave ;
