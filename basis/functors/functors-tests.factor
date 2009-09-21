@@ -1,5 +1,5 @@
 USING: classes.struct functors tools.test math words kernel
-multiline parser io.streams.string generic ;
+parser io.streams.string generic ;
 IN: functors.tests
 
 <<
@@ -104,14 +104,13 @@ M: integer W 1 + ;
 
 ! Does replacing an ordinary word with a functor-generated one work?
 [ [ ] ] [
-    <" IN: functors.tests
+    "IN: functors.tests
 
     TUPLE: some-tuple ;
     : some-word ( -- ) ;
     GENERIC: some-generic ( a -- b )
     M: some-tuple some-generic ;
-    SYMBOL: some-symbol
-    "> <string-reader> "functors-test" parse-stream
+    SYMBOL: some-symbol" <string-reader> "functors-test" parse-stream
 ] unit-test
 
 : test-redefinition ( -- )
@@ -144,9 +143,8 @@ SYMBOL: W-symbol
 ;FUNCTOR
 
 [ [ ] ] [
-    <" IN: functors.tests
-    << "some" redefine-test >>
-    "> <string-reader> "functors-test" parse-stream
+    """IN: functors.tests
+    << "some" redefine-test >>""" <string-reader> "functors-test" parse-stream
 ] unit-test
 
 test-redefinition

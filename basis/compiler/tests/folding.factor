@@ -1,4 +1,4 @@
-USING: eval tools.test compiler.units vocabs multiline words
+USING: eval tools.test compiler.units vocabs words
 kernel classes.mixin arrays ;
 IN: compiler.tests.folding
 
@@ -7,20 +7,18 @@ IN: compiler.tests.folding
 [ ] [ [ "compiler.tests.redefine11" forget-vocab ] with-compilation-unit ] unit-test
 
 [ ] [
-    <"
-    USING: math arrays ;
+    "USING: math arrays ;
     IN: compiler.tests.folding
     GENERIC: foldable-generic ( a -- b ) foldable
-    M: integer foldable-generic f <array> ;
-    "> eval( -- )
+    M: integer foldable-generic f <array> ;"
+    eval( -- )
 ] unit-test
 
 [ ] [
-    <"
-    USING: math arrays ;
+    "USING: math arrays ;
     IN: compiler.tests.folding
-    : fold-test ( -- x ) 10 foldable-generic ;
-    "> eval( -- )
+    : fold-test ( -- x ) 10 foldable-generic ;"
+    eval( -- )
 ] unit-test
 
 [ t ] [

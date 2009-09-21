@@ -1,5 +1,6 @@
 ! (c)2009 Joe Groff bsd license
-USING: help.markup help.syntax kernel math math.rectangles multiline sequences ;
+USING: help.markup help.syntax kernel math math.rectangles
+sequences ;
 IN: gpu.state
 
 HELP: <blend-mode>
@@ -188,11 +189,11 @@ HELP: blend-mode
     { { $link func-one-minus-constant-alpha } " returns one minus the alpha component of the current " { $link blend-state } "'s " { $snippet "constant-color" } " for every result component." }
 }
 "A typical transparency effect will use the values:"
-{ $code <" T{ blend-mode
+{ $code """T{ blend-mode
     { equation eq-add }
     { source-function func-source-alpha }
     { dest-function func-one-minus-source-alpha }
-} "> }
+}""" }
 } } ;
 
 HELP: blend-state

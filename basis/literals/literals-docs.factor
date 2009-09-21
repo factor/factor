@@ -9,21 +9,21 @@ HELP: $
 { $notes { $snippet "word" } "'s definition is looked up and " { $link call } "ed at parse time, so words that reference words in the current compilation unit cannot be used with " { $snippet "$" } "." }
 { $examples
 
-    { $example <"
+    { $example """
 USING: kernel literals prettyprint ;
 IN: scratchpad
 
 CONSTANT: five 5
 { $ five } .
-    "> "{ 5 }" }
+    """ "{ 5 }" }
 
-    { $example <"
+    { $example """
 USING: kernel literals prettyprint ;
 IN: scratchpad
 
 : seven-eleven ( -- a b ) 7 11 ;
 { $ seven-eleven } .
-    "> "{ 7 11 }" }
+    """ "{ 7 11 }" }
 
 } ;
 
@@ -33,13 +33,13 @@ HELP: $[
 { $notes "Since " { $snippet "code" } " is " { $link call } "ed at parse time, it cannot reference any words defined in the same compilation unit." }
 { $examples
 
-    { $example <"
+    { $example """
 USING: kernel literals math prettyprint ;
 IN: scratchpad
 
 << CONSTANT: five 5 >>
 { $[ five dup 1 + dup 2 + ] } .
-    "> "{ 5 6 8 }" }
+    """ "{ 5 6 8 }" }
 
 } ;
 
@@ -49,14 +49,14 @@ HELP: ${
 { $notes { $snippet "code" } "'s definition is looked up and " { $link call } "ed at parse time, so words that reference words in the current compilation unit cannot be used with " { $snippet "$" } "." }
 { $examples
 
-    { $example <"
+    { $example """
 USING: kernel literals math prettyprint ;
 IN: scratchpad
 
 CONSTANT: five 5
 CONSTANT: six 6
 ${ five six 7 } .
-    "> "{ 5 6 7 }"
+    """ "{ 5 6 7 }"
     }
 } ;
 
@@ -64,13 +64,13 @@ ${ five six 7 } .
 
 ARTICLE: "literals" "Interpolating code results into literal values"
 "The " { $vocab-link "literals" } " vocabulary contains words to run code at parse time and insert the results into more complex literal values."
-{ $example <"
+{ $example """
 USE: literals
 IN: scratchpad
 
 CONSTANT: five 5
 { $ five $[ five dup 1 + dup 2 + ] } .
-    "> "{ 5 5 6 8 }" }
+    """ "{ 5 5 6 8 }" }
 { $subsection POSTPONE: $ }
 { $subsection POSTPONE: $[ }
 { $subsection POSTPONE: ${ }
