@@ -14,7 +14,7 @@ IN: compiler.tree.propagation.transforms
     ! If first input has a known type and second input is an
     ! object, we convert this to [ swap equal? ].
     in-d>> first2 value-info class>> object class= [
-        value-info class>> \ equal? specific-method
+        value-info class>> \ equal? method-for-class
         [ swap equal? ] f ?
     ] [ drop f ] if
 ] "custom-inlining" set-word-prop

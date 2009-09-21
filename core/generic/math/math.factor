@@ -50,7 +50,7 @@ ERROR: no-math-method left right generic ;
 
 <PRIVATE
 
-: applicable-method ( generic class -- quot )
+: (math-method) ( generic class -- quot )
     over method
     [ 1quotation ]
     [ default-math-method ] ?if ;
@@ -58,13 +58,13 @@ ERROR: no-math-method left right generic ;
 PRIVATE>
 
 : object-method ( generic -- quot )
-    object bootstrap-word applicable-method ;
+    object bootstrap-word (math-method) ;
 
 : math-method ( word class1 class2 -- quot )
     2dup and [
         [ 2array [ declare ] curry nip ]
         [ math-upgrade nip ]
-        [ math-class-max over order min-class applicable-method ]
+        [ math-class-max over nearest-class (math-method) ]
         3tri 3append
     ] [
         2drop object-method
