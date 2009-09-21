@@ -1,5 +1,5 @@
-USING: alien.c-types alien.syntax half-floats kernel math tools.test
-specialized-arrays ;
+USING: accessors alien.c-types alien.syntax half-floats kernel
+math tools.test specialized-arrays alien.data classes.struct ;
 SPECIALIZED-ARRAY: half
 IN: half-floats.tests
 
@@ -9,7 +9,7 @@ IN: half-floats.tests
 [ HEX: be00 ] [ -1.5  half>bits ] unit-test
 [ HEX: 7c00 ] [  1/0. half>bits ] unit-test
 [ HEX: fc00 ] [ -1/0. half>bits ] unit-test
-[ HEX: 7eaa ] [ HEX: aaaaaaaaaaaaa <fp-nan> half>bits ] unit-test
+[ HEX: 7eaa ] [ NAN: aaaaaaaaaaaaa half>bits ] unit-test
 
 ! too-big floats overflow to infinity
 [ HEX: 7c00 ] [   65536.0 half>bits ] unit-test
@@ -30,18 +30,18 @@ IN: half-floats.tests
 [  3.0  ] [ HEX: 4200 bits>half ] unit-test
 [    t  ] [ HEX: 7e00 bits>half fp-nan? ] unit-test
 
-C-STRUCT: halves
-    { "half" "tom" }
-    { "half" "dick" }
-    { "half" "harry" }
-    { "half" "harry-jr" } ;
+STRUCT: halves
+    { tom half }
+    { dick half }
+    { harry half }
+    { harry-jr half } ;
 
-[ 8 ] [ "halves" heap-size ] unit-test
+[ 8 ] [ halves heap-size ] unit-test
 
 [ 3.0 ] [
-    "halves" <c-object>
-    3.0 over set-halves-dick
-    halves-dick
+    halves <struct>
+        3.0 >>dick
+    dick>>
 ] unit-test
 
 [ half-array{ 1.0 2.0 3.0 1/0. -1/0. } ]

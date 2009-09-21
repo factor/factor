@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types system-info kernel math namespaces
+USING: alien.c-types alien.data system-info kernel math namespaces
 windows windows.kernel32 system-info.backend system ;
 IN: system-info.windows.ce
 

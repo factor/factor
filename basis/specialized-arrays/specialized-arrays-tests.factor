@@ -3,8 +3,9 @@ USING: tools.test alien.syntax specialized-arrays
 specialized-arrays.private sequences alien.c-types accessors
 kernel arrays combinators compiler compiler.units classes.struct
 combinators.smart compiler.tree.debugger math libc destructors
-sequences.private eval words vocabs namespaces assocs
-prettyprint ;
+sequences.private multiline eval words vocabs namespaces
+assocs prettyprint alien.data ;
+FROM: alien.c-types => float ;
 
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: bool

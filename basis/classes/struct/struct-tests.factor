@@ -1,11 +1,13 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types ascii
+USING: accessors alien alien.c-types alien.data ascii
 assocs byte-arrays classes.struct classes.tuple.private
 combinators compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
 literals math mirrors namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
 tools.test parser lexer eval layouts ;
+FROM: math => float ;
+QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: ushort
@@ -46,9 +48,9 @@ STRUCT: struct-test-bar
 
 [ {
     { "underlying" B{ 98 0 0 98 127 0 0 127 0 0 0 0 } }
-    { { "x" "char" } 98            }
-    { { "y" "int"  } HEX: 7F00007F }
-    { { "z" "bool" } f             }
+    { { "x" char } 98            }
+    { { "y" int  } HEX: 7F00007F }
+    { { "z" bool } f             }
 } ] [
     B{ 98 0 0 98 127 0 0 127 0 0 0 0 } struct-test-foo memory>struct
     make-mirror >alist
@@ -128,7 +130,7 @@ STRUCT: struct-test-bar
 ] unit-test
 
 UNION-STRUCT: struct-test-float-and-bits
-    { f float }
+    { f c:float }
     { bits uint } ;
 
 [ 1.0 ] [ struct-test-float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
@@ -181,14 +183,14 @@ STRUCT: struct-test-string-ptr
     ] with-scope
 ] unit-test
 
-[ "USING: classes.struct ;
+[ "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 STRUCT: struct-test-foo
     { x char initial: 0 } { y int initial: 123 } { z bool } ;
 " ]
 [ [ struct-test-foo see ] with-string-writer ] unit-test
 
-[ "USING: classes.struct ;
+[ "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 UNION-STRUCT: struct-test-float-and-bits
     { f float initial: 0.0 } { bits uint initial: 0 } ;
@@ -201,20 +203,20 @@ UNION-STRUCT: struct-test-float-and-bits
         { offset 0 }
         { initial 0 }
         { class fixnum }
-        { type "char" }
+        { type char }
     }
     T{ struct-slot-spec
         { name "y" }
         { offset 4 }
         { initial 123 }
         { class integer }
-        { type "int" }
+        { type int }
     }
     T{ struct-slot-spec
         { name "z" }
         { offset 8 }
         { initial f }
-        { type "bool" }
+        { type bool }
         { class object }
     }
 } ] [ "struct-test-foo" c-type fields>> ] unit-test
@@ -223,14 +225,14 @@ UNION-STRUCT: struct-test-float-and-bits
     T{ struct-slot-spec
         { name "f" }
         { offset 0 }
-        { type "float" }
+        { type c:float }
         { class float }
         { initial 0.0 }
     }
     T{ struct-slot-spec
         { name "bits" }
         { offset 0 }
-        { type "uint" }
+        { type uint }
         { class integer }
         { initial 0 }
     }
@@ -277,7 +279,7 @@ STRUCT: struct-test-array-slots
 ] unit-test
 
 STRUCT: struct-test-optimization
-    { x { "int" 3 } } { y int } ;
+    { x { int 3 } } { y int } ;
 
 SPECIALIZED-ARRAY: struct-test-optimization
 

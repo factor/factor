@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.accessors alien.c-types alien.syntax byte-arrays
 destructors generalizations hints kernel libc locals math math.order
-sequences sequences.private classes.struct accessors ;
+sequences sequences.private classes.struct accessors alien.data ;
 IN: benchmark.yuv-to-rgb
 
 STRUCT: yuv_buffer

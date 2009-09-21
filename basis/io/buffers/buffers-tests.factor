@@ -1,7 +1,7 @@
 IN: io.buffers.tests
-USING: alien alien.c-types io.buffers kernel kernel.private libc
-sequences tools.test namespaces byte-arrays strings accessors
-destructors ;
+USING: alien alien.c-types alien.data io.buffers kernel
+kernel.private libc sequences tools.test namespaces byte-arrays
+strings accessors destructors ;
 
 : buffer-set ( string buffer -- )
     over >byte-array over ptr>> byte-array>memory

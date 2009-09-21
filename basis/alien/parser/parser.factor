@@ -1,16 +1,42 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays assocs effects grouping kernel
-parser sequences splitting words fry locals lexer namespaces
-summary math ;
+USING: accessors alien alien.c-types arrays assocs
+combinators combinators.short-circuit effects grouping
+kernel parser sequences splitting words fry locals lexer
+namespaces summary math vocabs.parser ;
 IN: alien.parser
+
+: parse-c-type-name ( name -- word/string )
+    [ search ] keep or ;
+
+: parse-c-type ( string -- array )
+    {
+        { [ dup "void" =            ] [ drop void ] }
+        { [ CHAR: ] over member?    ] [ parse-array-type parse-c-type-name prefix ] }
+        { [ dup search c-type-word? ] [ parse-c-type-name ] }
+        { [ dup c-types get at      ] [ ] }
+        { [ "*" ?tail               ] [ parse-c-type-name resolve-pointer-type ] }
+        [ no-c-type ]
+    } cond ;
+
+: scan-c-type ( -- c-type )
+    scan dup "{" =
+    [ drop \ } parse-until >array ]
+    [ parse-c-type ] if ; 
+
+: reset-c-type ( word -- )
+    { "c-type" "pointer-c-type" } reset-props ;
+
+: CREATE-C-TYPE ( -- word )
+    scan current-vocab create dup reset-c-type ;
 
 : normalize-c-arg ( type name -- type' name' )
     [ length ]
     [
         [ CHAR: * = ] trim-head
         [ length - CHAR: * <array> append ] keep
-    ] bi ;
+    ] bi
+    [ parse-c-type ] dip ;
 
 : parse-arglist ( parameters return -- types effect )
     [
@@ -36,3 +62,9 @@ IN: alien.parser
 
 : define-function ( return library function parameters -- )
     make-function define-declared ;
+
+PREDICATE: alien-function-word < word
+    def>> {
+        [ length 5 = ]
+        [ last \ alien-invoke eq? ]
+    } 1&& ;

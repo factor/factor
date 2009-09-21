@@ -3,6 +3,7 @@ namespace factor
 
 #define FACTOR_CPU_STRING "ppc"
 #define VM_ASM_API VM_C_API
+#define VM_ASM_API_OVERFLOW VM_C_API
 
 register cell ds asm("r13");
 register cell rs asm("r14");
@@ -81,9 +82,9 @@ inline static unsigned int fpu_status(unsigned int status)
 }
 
 /* Defined in assembly */
-VM_ASM_API void c_to_factor(cell quot);
-VM_ASM_API void throw_impl(cell quot, stack_frame *rewind);
-VM_ASM_API void lazy_jit_compile(cell quot);
+VM_ASM_API void c_to_factor(cell quot, void *vm);
+VM_ASM_API void throw_impl(cell quot, stack_frame *rewind, void *vm);
+VM_ASM_API void lazy_jit_compile(cell quot, void *vm);
 VM_ASM_API void flush_icache(cell start, cell len);
 
 VM_ASM_API void set_callstack(stack_frame *to,

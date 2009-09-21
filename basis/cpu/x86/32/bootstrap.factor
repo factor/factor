@@ -12,6 +12,7 @@ IN: bootstrap.x86
 : div-arg ( -- reg ) EAX ;
 : mod-arg ( -- reg ) EDX ;
 : arg ( -- reg ) EAX ;
+: arg2 ( -- reg ) EDX ;
 : temp0 ( -- reg ) EAX ;
 : temp1 ( -- reg ) EDX ;
 : temp2 ( -- reg ) ECX ;
@@ -27,6 +28,8 @@ IN: bootstrap.x86
     temp0 0 [] MOV rc-absolute-cell rt-stack-chain jit-rel
     ! save stack pointer
     temp0 [] stack-reg MOV
+    ! pass vm ptr to primitive
+    arg 0 MOV rc-absolute-cell rt-vm jit-rel
     ! call the primitive
     0 JMP rc-relative rt-primitive jit-rel
 ] jit-primitive jit-define

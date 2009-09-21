@@ -202,6 +202,7 @@ HOOK: %set-alien-double    cpu ( ptr value -- )
 HOOK: %set-alien-vector    cpu ( ptr value rep -- )
 
 HOOK: %alien-global cpu ( dst symbol library -- )
+HOOK: %vm-field-ptr cpu ( dst fieldname -- )
 
 HOOK: %allot cpu ( dst size class temp -- )
 HOOK: %write-barrier cpu ( src card# table -- )
@@ -296,6 +297,9 @@ HOOK: %prepare-var-args cpu ( -- )
 M: object %prepare-var-args ;
 
 HOOK: %alien-invoke cpu ( function library -- )
+
+HOOK: %vm-invoke-1st-arg cpu ( function -- )
+HOOK: %vm-invoke-3rd-arg cpu ( function -- )
 
 HOOK: %cleanup cpu ( params -- )
 

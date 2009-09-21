@@ -2,13 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
-alien alien.accessors alien.c-types literals cpu.architecture
+alien alien.accessors alien.c-types alien.data literals cpu.architecture
 cpu.ppc.assembler cpu.ppc.assembler.backend compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.comparisons
 compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.cfg.build-stack-frame
-compiler.units compiler.constants compiler.codegen ;
+compiler.units compiler.constants compiler.codegen vm ;
 FROM: cpu.ppc.assembler => B ;
+FROM: math => float ;
 IN: cpu.ppc
 
 ! PowerPC register assignments:
@@ -28,6 +29,18 @@ enable-float-intrinsics
 \ ##integer>float t frame-required? set-word-prop
 \ ##float>integer t frame-required? set-word-prop
 >>
+
+: %load-vm-addr ( reg -- )
+    0 swap LOAD32 rc-absolute-ppc-2/2 rt-vm rel-fixup ;
+
+: %load-vm-field-addr ( reg symbol -- )
+    [ drop %load-vm-addr ]
+    [ [ dup ] dip vm-field-offset ADDI ] 2bi ;
+
+M: ppc %vm-field-ptr ( dst field -- ) %load-vm-field-addr ;
+
+M: ppc %vm-invoke-1st-arg ( function -- ) f %alien-invoke ;
+M: ppc %vm-invoke-3rd-arg ( function -- ) f %alien-invoke ;
 
 M: ppc machine-registers
     {
@@ -418,7 +431,7 @@ M: ppc %set-alien-float swap 0 STFS ;
 M: ppc %set-alien-double swap 0 STFD ;
 
 : load-zone-ptr ( reg -- )
-    "nursery" f %alien-global ;
+    "nursery" %load-vm-field-addr ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap 4 LWZ ] 2bi ;
@@ -441,10 +454,10 @@ M:: ppc %allot ( dst size class nursery-ptr -- )
     dst class store-tagged ;
 
 : load-cards-offset ( dst -- )
-    [ "cards_offset" f %alien-global ] [ dup 0 LWZ ] bi ;
+    [ "cards_offset" %load-vm-field-addr ] [ dup 0 LWZ ] bi ;
 
 : load-decks-offset ( dst -- )
-    [ "decks_offset" f %alien-global ] [ dup 0 LWZ ] bi  ;
+    [ "decks_offset" %load-vm-field-addr ] [ dup 0 LWZ ] bi  ;
 
 M:: ppc %write-barrier ( src card# table -- )
     card-mark scratch-reg LI
@@ -682,7 +695,7 @@ M:: ppc %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp1 "stack_chain" f %alien-global
+    temp1 "stack_chain" %load-vm-field-addr
     temp1 temp1 0 LWZ
     1 temp1 0 STW
     callback-allowed? [
@@ -770,5 +783,5 @@ USE: vocabs.loader
         4 >>align
         "box_boolean" >>boxer
         "to_boolean" >>unboxer
-    "bool" define-primitive-type
+    bool define-primitive-type
 ] with-compilation-unit

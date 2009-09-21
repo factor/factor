@@ -8,6 +8,7 @@ math.parser opengl.gl combinators combinators.smart arrays
 sequences splitting words byte-arrays assocs vocabs
 colors colors.constants accessors generalizations locals fry
 specialized-arrays ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: uint
 IN: opengl
