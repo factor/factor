@@ -81,6 +81,42 @@ HELP: C-ENUM:
     { $code "CONSTANT: red 0" "CONSTANT: green 1" "CONSTANT: blue 2" }
 } ;
 
+HELP: CALLBACK:
+{ $syntax "CALLBACK: return type ( parameters ) ;" }
+{ $values { "return" "a C return type" } { "type" "a type name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
+{ $description "Defines a new function pointer C type word " { $snippet "type" } ". The newly defined word works both as a C type and as a wrapper for " { $link alien-callback } " for callbacks that accept the given return type and parameters with the " { $snippet "\"cdecl\"" } " ABI." }
+{ $examples
+    { $code
+        "CALLBACK: bool FakeCallback ( int message, void* payload ) ;"
+        ": MyFakeCallback ( -- alien )"
+        "    [| message payload |"
+        "        \"message #\" write"
+        "        message number>string write"
+        "        \" received\" write nl"
+        "        t"
+        "    ] FakeCallback ;"
+    }
+} ;
+
+HELP: STDCALL-CALLBACK:
+{ $syntax "STDCALL-CALLBACK: return type ( parameters ) ;" }
+{ $values { "return" "a C return type" } { "type" "a type name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
+{ $description "Defines a new function pointer C type word " { $snippet "type" } ". The newly defined word works both as a C type and as a wrapper for " { $link alien-callback } " for callbacks that accept the given return type and parameters with the " { $snippet "\"stdcall\"" } " ABI." }
+{ $examples
+    { $code
+        "STDCALL-CALLBACK: bool FakeCallback ( int message, void* payload ) ;"
+        ": MyFakeCallback ( -- alien )"
+        "    [| message payload |"
+        "        \"message #\" write"
+        "        message number>string write"
+        "        \" received\" write nl"
+        "        t"
+        "    ] FakeCallback ;"
+    }
+} ;
+
+{ POSTPONE: CALLBACK: POSTPONE: STDCALL-CALLBACK: } related-words 
+
 HELP: &:
 { $syntax "&: symbol" }
 { $values { "symbol" "A C library symbol name" } }
@@ -88,7 +124,7 @@ HELP: &:
 
 HELP: typedef
 { $values { "old" "a string" } { "new" "a string" } }
-{ $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
+{ $description "Aliases the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
 { $notes "Using this word in the same source file which defines C bindings can cause problems, because words are compiled before top-level forms are run. Use the " { $link POSTPONE: TYPEDEF: } " word instead." } ;
 
 { POSTPONE: TYPEDEF: typedef } related-words

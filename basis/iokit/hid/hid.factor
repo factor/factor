@@ -130,30 +130,11 @@ TYPEDEF: void* IOHIDTransactionRef
 TYPEDEF: UInt32 IOHIDValueScaleType
 TYPEDEF: UInt32 IOHIDTransactionDirectionType
 
-TYPEDEF: void* IOHIDCallback
-: IOHIDCallback ( quot -- alien )
-    [ "void" { "void*" "IOReturn" "void*" } "cdecl" ]
-    dip alien-callback ; inline
-
-TYPEDEF: void* IOHIDReportCallback
-: IOHIDReportCallback ( quot -- alien )
-    [ "void" { "void*" "IOReturn" "void*" "IOHIDReportType" "UInt32" "uchar*" "CFIndex" } "cdecl" ]
-    dip alien-callback ; inline
-
-TYPEDEF: void* IOHIDValueCallback
-: IOHIDValueCallback ( quot -- alien )
-    [ "void" { "void*" "IOReturn" "void*" "IOHIDValueRef" } "cdecl" ]
-    dip alien-callback ; inline
-
-TYPEDEF: void* IOHIDValueMultipleCallback
-: IOHIDValueMultipleCallback ( quot -- alien )
-    [ "void" { "void*" "IOReturn" "void*" "CFDictionaryRef" } "cdecl" ]
-    dip alien-callback ; inline
-
-TYPEDEF: void* IOHIDDeviceCallback
-: IOHIDDeviceCallback ( quot -- alien )
-    [ "void" { "void*" "IOReturn" "void*" "IOHIDDeviceRef" } "cdecl" ]
-    dip alien-callback ; inline
+CALLBACK: void IOHIDCallback ( void* context, IOReturn result, void* sender ) ;
+CALLBACK: void IOHIDReportCallback ( void* context, IOReturn result, void* sender, IOHIDReportType type, UInt32 reportID, uchar* report, CFIndex reportLength ) ;
+CALLBACK: void IOHIDValueCallback ( void* context, IOReturn result, void* sender, IOHIDValueRef value ) ;
+CALLBACK: void IOHIDValueMultipleCallback ( void* context, IOReturn result, void* sender, CFDictionaryRef multiple ) ;
+CALLBACK: void IOHIDDeviceCallback ( void* context, IOReturn result, void* sender, IOHIDDeviceRef device ) ;
 
 ! IOHIDDevice
 
