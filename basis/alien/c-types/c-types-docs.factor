@@ -1,6 +1,8 @@
-USING: alien help.syntax help.markup libc kernel.private
-byte-arrays math strings hashtables alien.syntax alien.strings sequences
-io.encodings.string debugger destructors vocabs.loader ;
+USING: alien alien.complex help.syntax help.markup libc kernel.private
+byte-arrays strings hashtables alien.syntax alien.strings sequences
+io.encodings.string debugger destructors vocabs.loader
+classes.struct ;
+QUALIFIED: math
 IN: alien.c-types
 
 HELP: byte-length
@@ -8,7 +10,7 @@ HELP: byte-length
 { $contract "Outputs the size of the byte array, struct, or specialized array data in bytes." } ;
 
 HELP: heap-size
-{ $values { "type" string } { "size" integer } }
+{ $values { "type" string } { "size" math:integer } }
 { $description "Outputs the number of bytes needed for a heap-allocated value of this C type." }
 { $examples
     "On a 32-bit system, you will get the following output:"
@@ -17,7 +19,7 @@ HELP: heap-size
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: stack-size
-{ $values { "type" string } { "size" integer } }
+{ $values { "type" string } { "size" math:integer } }
 { $description "Outputs the number of bytes to reserve on the C stack by a value of this C type. In most cases this is equal to " { $link heap-size } ", except on some platforms where C structs are passed by invisible reference, in which case a C struct type only uses as much space as a pointer on the C stack." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
@@ -49,7 +51,7 @@ HELP: c-setter
 { $errors "Throws an error if the type does not exist." } ;
 
 HELP: box-parameter
-{ $values { "n" integer } { "ctype" string } }
+{ $values { "n" math:integer } { "ctype" string } }
 { $description "Generates code for converting a C value stored at  offset " { $snippet "n" } " from the top of the stack into a Factor object to be pushed on the data stack." }
 { $notes "This is an internal word used by the compiler when compiling callbacks." } ;
 
@@ -120,29 +122,29 @@ $nl
 "Note that while structure and union types do not get these words defined for them, there is no loss of generality since " { $link <void*> } " and " { $link *void* } " may be used." ;
 
 ARTICLE: "c-types-specs" "C type specifiers"
-"C types are identified by strings, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words, as well as " { $link POSTPONE: C-STRUCT: } ", " { $link POSTPONE: C-UNION: } " and " { $link POSTPONE: TYPEDEF: } "."
+"C types are identified by special words, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words. New C types can be defined by the words " { $link POSTPONE: STRUCT: } ", " { $link POSTPONE: UNION-STRUCT: } ", " { $link POSTPONE: CALLBACK: } ", and " { $link POSTPONE: TYPEDEF: } "."
 $nl
 "The following numerical types are available; a " { $snippet "u" } " prefix denotes an unsigned type:"
 { $table
     { "C type" "Notes" }
-    { { $snippet "char" } "always 1 byte" }
-    { { $snippet "uchar" } { } }
-    { { $snippet "short" } "always 2 bytes" }
-    { { $snippet "ushort" } { } }
-    { { $snippet "int" } "always 4 bytes" }
-    { { $snippet "uint" } { } }
-    { { $snippet "long" } { "same size as CPU word size and " { $snippet "void*" } ", except on 64-bit Windows, where it is 4 bytes" } }
-    { { $snippet "ulong" } { } }
-    { { $snippet "longlong" } "always 8 bytes" }
-    { { $snippet "ulonglong" } { } }
-    { { $snippet "float" } { } }
-    { { $snippet "double" } { "same format as " { $link float } " objects" } }
-    { { $snippet "complex-float" } { "C99 " { $snippet "complex float" } " type, converted to and from " { $link complex } " values" } }
-    { { $snippet "complex-double" } { "C99 " { $snippet "complex double" } " type, converted to and from " { $link complex } " values" } }
+    { { $link char } "always 1 byte" }
+    { { $link uchar } { } }
+    { { $link short } "always 2 bytes" }
+    { { $link ushort } { } }
+    { { $link int } "always 4 bytes" }
+    { { $link uint } { } }
+    { { $link long } { "same size as CPU word size and " { $link void* } ", except on 64-bit Windows, where it is 4 bytes" } }
+    { { $link ulong } { } }
+    { { $link longlong } "always 8 bytes" }
+    { { $link ulonglong } { } }
+    { { $link float } { "single-precision float (not the same as Factor's " { $link math:float } " class!)" } }
+    { { $link double } { "double-precision float (the same format as Factor's " { $link math:float } " objects)" } }
+    { { $link complex-float } { "C99 or Fortran " { $snippet "complex float" } " type, converted to and from Factor " { $link math:complex } " values" } }
+    { { $link complex-double } { "C99 or Fortran " { $snippet "complex double" } " type, converted to and from Factor " { $link math:complex } " values" } }
 }
 "When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision."
 $nl
-"Pointer types are specified by suffixing a C type with " { $snippet "*" } ", for example " { $snippet "float*" } ". One special case is " { $snippet "void*" } ", which denotes a generic pointer; " { $snippet "void" } " by itself is not a valid C type specifier. With the exception of strings (see " { $link "c-strings" } "), all pointer types are identical to " { $snippet "void*" } " as far as the C library interface is concerned."
+"Pointer types are specified by suffixing a C type with " { $snippet "*" } ", for example " { $snippet "float*" } ". One special case is " { $link void* } ", which denotes a generic pointer; " { $link void } " by itself is not a valid C type specifier. With the exception of strings (see " { $link "c-strings" } "), all pointer types are identical to " { $snippet "void*" } " as far as the C library interface is concerned."
 $nl
 "Fixed-size array types are supported; the syntax consists of a C type name followed by dimension sizes in brackets; the following denotes a 3 by 4 array of integers:"
 { $code "int[3][4]" }
