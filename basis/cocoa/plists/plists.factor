@@ -4,8 +4,8 @@
 USING: strings arrays hashtables assocs sequences fry macros
 cocoa.messages cocoa.classes cocoa.application cocoa kernel
 namespaces io.backend math cocoa.enumeration byte-arrays
-combinators alien.c-types words core-foundation quotations
-core-foundation.data core-foundation.utilities ;
+combinators alien.c-types alien.data words core-foundation
+quotations core-foundation.data core-foundation.utilities ;
 IN: cocoa.plists
 
 : >plist ( value -- plist ) >cf -> autorelease ;

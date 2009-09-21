@@ -3,7 +3,14 @@
 namespace factor
 {
 
-VM_C_API void default_parameters(vm_parameters *p)
+factorvm *vm;
+
+void init_globals()
+{
+	init_platform_globals();
+}
+
+void factorvm::default_parameters(vm_parameters *p)
 {
 	p->image_path = NULL;
 
@@ -37,13 +44,17 @@ VM_C_API void default_parameters(vm_parameters *p)
 #ifdef WINDOWS
 	p->console = false;
 #else
-	p->console = true;
+	if (this == vm)
+		p->console = true;
+	else 		
+		p->console = false;
+	
 #endif
 
 	p->stack_traces = true;
 }
 
-static bool factor_arg(const vm_char* str, const vm_char* arg, cell* value)
+bool factorvm::factor_arg(const vm_char* str, const vm_char* arg, cell* value)
 {
 	int val;
 	if(SSCANF(str,arg,&val) > 0)
@@ -55,7 +66,7 @@ static bool factor_arg(const vm_char* str, const vm_char* arg, cell* value)
 		return false;
 }
 
-VM_C_API void init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv)
+void factorvm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv)
 {
 	default_parameters(p);
 	p->executable_path = argv[0];
@@ -81,7 +92,7 @@ VM_C_API void init_parameters_from_args(vm_parameters *p, int argc, vm_char **ar
 }
 
 /* Do some initialization that we do once only */
-static void do_stage1_init()
+void factorvm::do_stage1_init()
 {
 	print_string("*** Stage 2 early init... ");
 	fflush(stdout);
@@ -93,7 +104,7 @@ static void do_stage1_init()
 	fflush(stdout);
 }
 
-VM_C_API void init_factor(vm_parameters *p)
+void factorvm::init_factor(vm_parameters *p)
 {
 	/* Kilobytes */
 	p->ds_size = align_page(p->ds_size << 10);
@@ -150,19 +161,20 @@ VM_C_API void init_factor(vm_parameters *p)
 }
 
 /* May allocate memory */
-VM_C_API void pass_args_to_factor(int argc, vm_char **argv)
+void factorvm::pass_args_to_factor(int argc, vm_char **argv)
 {
-	growable_array args;
+	growable_array args(this);
 	int i;
 
-	for(i = 1; i < argc; i++)
+	for(i = 1; i < argc; i++){
 		args.add(allot_alien(F,(cell)argv[i]));
+	}
 
 	args.trim();
 	userenv[ARGS_ENV] = args.elements.value();
 }
 
-static void start_factor(vm_parameters *p)
+void factorvm::start_factor(vm_parameters *p)
 {
 	if(p->fep) factorbug();
 
@@ -171,13 +183,31 @@ static void start_factor(vm_parameters *p)
 	unnest_stacks();
 }
 
-VM_C_API void start_embedded_factor(vm_parameters *p)
+
+char *factorvm::factor_eval_string(char *string)
 {
-	userenv[EMBEDDED_ENV] = T;
-	start_factor(p);
+	char *(*callback)(char *) = (char *(*)(char *))alien_offset(userenv[EVAL_CALLBACK_ENV]);
+	return callback(string);
 }
 
-VM_C_API void start_standalone_factor(int argc, vm_char **argv)
+void factorvm::factor_eval_free(char *result)
+{
+	free(result);
+}
+
+void factorvm::factor_yield()
+{
+	void (*callback)() = (void (*)())alien_offset(userenv[YIELD_CALLBACK_ENV]);
+	callback();
+}
+
+void factorvm::factor_sleep(long us)
+{
+	void (*callback)(long) = (void (*)(long))alien_offset(userenv[SLEEP_CALLBACK_ENV]);
+	callback(us);
+}
+
+void factorvm::start_standalone_factor(int argc, vm_char **argv)
 {
 	vm_parameters p;
 	default_parameters(&p);
@@ -187,27 +217,34 @@ VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 	start_factor(&p);
 }
 
-VM_C_API char *factor_eval_string(char *string)
+struct startargs {
+	int argc;
+	vm_char **argv;
+};
+
+void* start_standalone_factor_thread(void *arg) 
 {
-	char *(*callback)(char *) = (char *(*)(char *))alien_offset(userenv[EVAL_CALLBACK_ENV]);
-	return callback(string);
+	factorvm *newvm = new factorvm;
+	register_vm_with_thread(newvm);
+	startargs *args = (startargs*) arg;
+	newvm->start_standalone_factor(args->argc, args->argv);
+	return 0;
 }
 
-VM_C_API void factor_eval_free(char *result)
+
+VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {
-	free(result);
+	factorvm *newvm = new factorvm;
+	vm = newvm;
+	register_vm_with_thread(newvm);
+	return newvm->start_standalone_factor(argc,argv);
 }
 
-VM_C_API void factor_yield()
+VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc, vm_char **argv)
 {
-	void (*callback)() = (void (*)())alien_offset(userenv[YIELD_CALLBACK_ENV]);
-	callback();
-}
-
-VM_C_API void factor_sleep(long us)
-{
-	void (*callback)(long) = (void (*)(long))alien_offset(userenv[SLEEP_CALLBACK_ENV]);
-	callback(us);
+	startargs *args = new startargs;   // leaks startargs structure
+	args->argc = argc; args->argv = argv;
+	return start_thread(start_standalone_factor_thread,args);
 }
 
 }

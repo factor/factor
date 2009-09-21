@@ -98,9 +98,6 @@ inline static bool save_env_p(cell i)
 	return (i >= FIRST_SAVE_ENV && i <= LAST_SAVE_ENV) || i == STACK_TRACES_ENV;
 }
 
-/* Canonical T object. It's just a word */
-extern cell T;
-
 PRIMITIVE(getenv);
 PRIMITIVE(setenv);
 PRIMITIVE(exit);
@@ -112,5 +109,4 @@ PRIMITIVE(clone);
 
 }
 
-/* TAGGED user environment data; see getenv/setenv prims */
-VM_C_API factor::cell userenv[USER_ENV];
+ 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel alien alien.c-types cpu.architecture libc ;
+USING: kernel alien alien.data cpu.architecture libc ;
 IN: math.vectors.simd.intrinsics
 
 ERROR: bad-simd-call ;
