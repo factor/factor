@@ -5,8 +5,7 @@ cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
 cpu.architecture kernel kernel.private math memory namespaces make
 sequences words system layouts combinators math.order fry locals
 compiler.constants byte-arrays io macros quotations cpu.x86.features
-cpu.x86.features.private compiler compiler.units init
-compiler.constants vm byte-arrays
+cpu.x86.features.private compiler compiler.units init vm
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.intrinsics
