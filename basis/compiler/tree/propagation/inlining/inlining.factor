@@ -52,7 +52,7 @@ M: callable splicing-nodes splicing-body ;
         2dup [ in-d>> length ] [ dispatch# ] bi* <= [ 2drop f f ] [
             [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
             [ swap nth value-info class>> dup ] dip
-            specific-method
+            method-for-class
         ] if
     ] if ;
 

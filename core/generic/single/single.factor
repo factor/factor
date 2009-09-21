@@ -42,8 +42,8 @@ M: single-combination next-method-quot* ( class generic combination -- quot )
         ] [ 3drop f ] if
     ] with-combination ;
 
-: (effective-method) ( obj word -- method )
-    [ [ order [ instance? ] with find-last nip ] keep method ]
+: method-for-object ( obj word -- method )
+    [ [ method-classes [ instance? ] with filter smallest-class ] keep method ]
     [ "default-method" word-prop ]
     bi or ;
 
