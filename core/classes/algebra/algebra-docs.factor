@@ -10,7 +10,6 @@ ARTICLE: "class-operations" "Class operations"
 { $subsection class-and }
 { $subsection class-or }
 { $subsection classes-intersect? }
-{ $subsection min-class }
 "Low-level implementation detail:"
 { $subsection flatten-class }
 { $subsection flatten-builtin-class }
@@ -37,6 +36,7 @@ $nl
 "Operations:"
 { $subsection class< }
 { $subsection sort-classes }
+{ $subsection smallest-class }
 "Metaclass order:"
 { $subsection rank-class } ;
 
@@ -73,6 +73,6 @@ HELP: classes-intersect?
 { $values { "first" class } { "second" class } { "?" "a boolean" } }
 { $description "Tests if two classes have a non-empty intersection. If the intersection is empty, no object can be an instance of both classes at once." } ;
 
-HELP: min-class
-{ $values { "class" class } { "seq" "a sequence of class words" } { "class/f" "a class word or " { $link f } } }
-{ $description "If all classes in " { $snippet "seq" } " that intersect " { $snippet "class" } " are subtypes of " { $snippet "class" } ", outputs the last such element of " { $snippet "seq" } ". If any conditions fail to hold, outputs " { $link f } "." } ;
+HELP: smallest-class
+{ $values { "classes" "a sequence of class words" } { "class/f" { $maybe class } } }
+{ $description "Outputs a minimum class from the given sequence." } ;
