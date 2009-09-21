@@ -71,7 +71,7 @@ ALIAS: $slot $snippet
     ] ($span) ;
 
 : $nl ( children -- )
-    nl nl drop ;
+    nl last-block? [ nl ] unless drop ;
 
 ! Some blocks
 : ($heading) ( children quot -- )
