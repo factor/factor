@@ -51,8 +51,10 @@ M: alien-function-word definition drop f ;
 M: alien-function-word synopsis*
     {
         [ seeing-word ]
+        [ def>> second [ \ LIBRARY: [ text ] pprint-prefix ] when* ]
         [ definer. ]
         [ def>> first pprint-c-type ]
         [ pprint-word ]
         [ <block "(" text pprint-function-args ")" text block> ]
     } cleave ;
+
