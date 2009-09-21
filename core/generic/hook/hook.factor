@@ -23,4 +23,4 @@ M: hook-combination mega-cache-quot
 M: hook-generic definer drop \ HOOK: f ;
 
 M: hook-generic effective-method
-    [ "combination" word-prop var>> get ] keep (effective-method) ;
+    [ "combination" word-prop var>> get ] keep method-for-object ;
