@@ -77,12 +77,12 @@ DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot)):
 DEF(bool,sse_version,(void)):
 	mov $0x1,RETURN_REG
 	cpuid
-	/* test $0x100000,%ecx
+	test $0x100000,%ecx
 	jnz sse_42
 	test $0x80000,%ecx
 	jnz sse_41
 	test $0x200,%ecx
-	jnz ssse_3 */
+	jnz ssse_3
 	test $0x1,%ecx
 	jnz sse_3
 	test $0x4000000,%edx

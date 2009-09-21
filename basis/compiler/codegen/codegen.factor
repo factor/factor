@@ -169,9 +169,12 @@ CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##box-vector %box-vector
 CODEGEN: ##add-vector %add-vector
-CODEGEN: ##sub-vector %sub-vector
+CODEGEN: ##saturated-add-vector %saturated-add-vector
 CODEGEN: ##add-sub-vector %add-sub-vector
+CODEGEN: ##sub-vector %sub-vector
+CODEGEN: ##saturated-sub-vector %saturated-sub-vector
 CODEGEN: ##mul-vector %mul-vector
+CODEGEN: ##saturated-mul-vector %saturated-mul-vector
 CODEGEN: ##div-vector %div-vector
 CODEGEN: ##min-vector %min-vector
 CODEGEN: ##max-vector %max-vector

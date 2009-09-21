@@ -305,7 +305,7 @@ def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##sub-vector
+PURE-INSN: ##saturated-add-vector
 def: dst
 use: src1 src2
 literal: rep ;
@@ -315,7 +315,22 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##sub-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##saturated-sub-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##mul-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##saturated-mul-vector
 def: dst
 use: src1 src2
 literal: rep ;
