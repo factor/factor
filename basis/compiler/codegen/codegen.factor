@@ -274,6 +274,9 @@ M: ##alien-global generate-insn
     [ dst>> ] [ symbol>> ] [ library>> ] tri
     %alien-global ;
 
+M: ##vm-field-ptr generate-insn
+    [ dst>> ] [ fieldname>> ] bi %vm-field-ptr ;
+
 ! ##alien-invoke
 GENERIC: next-fastcall-param ( rep -- )
 
@@ -438,7 +441,7 @@ M: ##alien-indirect generate-insn
     ! Generate code for boxing input parameters in a callback.
     [
         dup \ %save-param-reg move-parameters
-        "nest_stacks" f %alien-invoke
+        "nest_stacks" %vm-invoke-1st-arg
         box-parameters
     ] with-param-regs ;
 
@@ -476,7 +479,7 @@ TUPLE: callback-context ;
         [ callback-context new do-callback ] %
     ] [ ] make ;
 
-: %unnest-stacks ( -- ) "unnest_stacks" f %alien-invoke ;
+: %unnest-stacks ( -- ) "unnest_stacks" %vm-invoke-1st-arg ;
 
 M: ##callback-return generate-insn
     #! All the extra book-keeping for %unwind is only for x86.

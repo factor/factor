@@ -17,7 +17,7 @@ M: dll pprint* dll-path dup "DLL\" " "\"" pprint-string ;
 
 M: c-type-word definer drop \ C-TYPE: f ;
 M: c-type-word definition drop f ;
-M: typedef-word declarations. drop ;
+M: c-type-word declarations. drop ;
 
 GENERIC: pprint-c-type ( c-type -- )
 M: word pprint-c-type pprint-word ;
@@ -28,9 +28,12 @@ M: array pprint-c-type pprint* ;
 M: typedef-word definer drop \ TYPEDEF: f ;
 
 M: typedef-word synopsis*
-    \ TYPEDEF: pprint-word
-    dup "c-type" word-prop pprint-c-type
-    pprint-word ;
+    {
+        [ seeing-word ]
+        [ definer. ]
+        [ "c-type" word-prop pprint-c-type ]
+        [ pprint-word ]
+    } cleave ;
 
 : pprint-function-arg ( type name -- )
     [ pprint-c-type ] [ text ] bi* ;
@@ -46,7 +49,10 @@ M: alien-function-word definer
     drop \ FUNCTION: \ ; ;
 M: alien-function-word definition drop f ;
 M: alien-function-word synopsis*
-    \ FUNCTION: pprint-word
-    [ def>> first pprint-c-type ]
-    [ pprint-word ]
-    [ <block "(" text pprint-function-args ")" text block> ] tri ;
+    {
+        [ seeing-word ]
+        [ definer. ]
+        [ def>> first pprint-c-type ]
+        [ pprint-word ]
+        [ <block "(" text pprint-function-args ")" text block> ]
+    } cleave ;
