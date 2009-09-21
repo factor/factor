@@ -75,6 +75,42 @@ HELP: define-out
 { $description "Defines a word " { $snippet "<" { $emphasis "name" } ">" } " with stack effect " { $snippet "( value -- array )" } ". This word allocates a byte array large enough to hold a value with C type " { $snippet "name" } ", and writes the value at the top of the stack to the array." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
+HELP: char
+{ $description "This C type represents a one-byte signed integer type. Input values will be converted to " { $link math:integer } "s and truncated to eight bits; output values will be returned as " { $link math:fixnum } "s." } ;
+HELP: uchar
+{ $description "This C type represents a one-byte unsigned integer type. Input values will be converted to " { $link math:integer } "s and truncated to eight bits; output values will be returned as " { $link math:fixnum } "s." } ;
+HELP: short
+{ $description "This C type represents a two-byte signed integer type. Input values will be converted to " { $link math:integer } "s and truncated to sixteen bits; output values will be returned as " { $link math:fixnum } "s." } ;
+HELP: ushort
+{ $description "This C type represents a two-byte unsigned integer type. Input values will be converted to " { $link math:integer } "s and truncated to sixteen bits; output values will be returned as " { $link math:fixnum } "s." } ;
+HELP: int
+{ $description "This C type represents a four-byte signed integer type. Input values will be converted to " { $link math:integer } "s and truncated to 32 bits; output values will be returned as " { $link math:integer } "s." } ;
+HELP: uint
+{ $description "This C type represents a four-byte unsigned integer type. Input values will be converted to " { $link math:integer } "s and truncated to 32 bits; output values will be returned as " { $link math:integer } "s." } ;
+HELP: long
+{ $description "This C type represents a four- or eight-byte signed integer type. On Windows and on 32-bit Unix platforms, it will be four bytes. On 64-bit Unix platforms, it will be eight bytes. Input values will be converted to " { $link math:integer } "s and truncated to 32 or 64 bits; output values will be returned as " { $link math:integer } "s." } ;
+HELP: ulong
+{ $description "This C type represents a four- or eight-byte unsigned integer type. On Windows and on 32-bit Unix platforms, it will be four bytes. On 64-bit Unix platforms, it will be eight bytes. Input values will be converted to " { $link math:integer } "s and truncated to 32 or 64 bits; output values will be returned as " { $link math:integer } "s." } ;
+HELP: longlong
+{ $description "This C type represents an eight-byte signed integer type. Input values will be converted to " { $link math:integer } "s and truncated to 64 bits; output values will be returned as " { $link math:integer } "s." } ;
+HELP: ulonglong
+{ $description "This C type represents an eight-byte unsigned integer type. Input values will be converted to " { $link math:integer } "s and truncated to 64 bits; output values will be returned as " { $link math:integer } "s." } ;
+HELP: void
+{ $description "This symbol is not a valid C type, but it can be used as the return type for a " { $link POSTPONE: FUNCTION: } " or " { $link POSTPONE: CALLBACK: } " definition, or an " { $link alien-invoke } " or " { $link alien-callback } " call." } ;
+HELP: void*
+{ $description "This C type represents a pointer to C memory. " { $link byte-array } " and " { $link alien } " values can be passed as inputs, but see " { $link "byte-arrays-gc" } " for notes about passing byte arrays into C functions. Output values are returned as " { $link alien } "s." } ;
+HELP: char*
+{ $description "This C type represents a pointer to a C string. See " { $link "c-strings" } " for details about using strings with the FFI." } ;
+HELP: float
+{ $description "This C type represents a single-precision IEEE 754 floating-point type. Input values will be converted to Factor " { $link math:float } "s and demoted to single-precision; output values will be returned as Factor " { $link math:float } "s." } ;
+HELP: double
+{ $description "This C type represents a double-precision IEEE 754 floating-point type. Input values will be converted to Factor " { $link math:float } "s; output values will be returned as Factor " { $link math:float } "s." } ;
+HELP: complex-float
+{ $description "This C type represents a single-precision IEEE 754 floating-point complex type. Input values will be converted from Factor " { $link math:complex } " objects into a single-precision complex float type; output values will be returned as Factor " { $link math:complex } " objects." } ;
+HELP: complex-double
+{ $description "This C type represents a double-precision IEEE 754 floating-point complex type. Input values will be converted from Factor " { $link math:complex } " objects into a double-precision complex float type; output values will be returned as Factor " { $link math:complex } " objects." } ;
+
+
 ARTICLE: "byte-arrays-gc" "Byte arrays and the garbage collector"
 "The Factor garbage collector can move byte arrays around, and it is only safe to pass byte arrays to C functions if the garbage collector will not run while C code still has a reference to the data."
 $nl
