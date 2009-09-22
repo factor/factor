@@ -4,12 +4,18 @@ USING: kernel accessors math sequences grouping namespaces
 compiler.cfg.linearization.order ;
 IN: compiler.cfg.linear-scan.numbering
 
-: number-instructions ( rpo -- )
-    linearization-order 0 [
-        instructions>> [
-            [ (>>insn#) ] [ drop 2 + ] 2bi
-        ] each
-    ] reduce drop ;
+ERROR: already-numbered insn ;
+
+: number-instruction ( n insn -- n' )
+    [ nip dup insn#>> [ already-numbered ] [ drop ] if ]
+    [ (>>insn#) ]
+    [ drop 2 + ]
+    2tri ;
+
+: number-instructions ( cfg -- )
+    linearization-order
+    0 [ instructions>> [ number-instruction ] each ] reduce
+    drop ;
 
 SYMBOL: check-numbering?
 
