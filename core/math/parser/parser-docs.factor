@@ -8,17 +8,21 @@ $nl
 "Integers can be converted to and from arbitrary bases. Floating point numbers can only be converted to and from base 10 and 16."
 $nl
 "Converting numbers to strings:"
-{ $subsection number>string }
-{ $subsection >bin }
-{ $subsection >oct }
-{ $subsection >hex }
-{ $subsection >base }
+{ $subsections
+    number>string
+    >bin
+    >oct
+    >hex
+    >base
+}
 "Converting strings to numbers:"
-{ $subsection string>number }
-{ $subsection bin> }
-{ $subsection oct> }
-{ $subsection hex> }
-{ $subsection base> }
+{ $subsections
+    string>number
+    bin>
+    oct>
+    hex>
+    base>
+}
 "You can also input literal numbers in a different base (" { $link "syntax-integers" } ")."
 { $see-also "prettyprint-numbers" } ;
 
