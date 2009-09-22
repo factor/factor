@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry kernel sequences assocs accessors namespaces
 math.intervals arrays classes.algebra combinators columns
-stack-checker.branches
+stack-checker.branches locals
 compiler.utilities
 compiler.tree
 compiler.tree.combinators
@@ -82,6 +82,13 @@ M: #phi propagate-before ( #phi -- )
     [ [ phi-info-d>> flip ] [ out-d>> ] bi merge-value-infos ]
     bi ;
 
+:: update-constraints ( new old -- )
+    new [| key value | key old [ value append ] change-at ] assoc-each ;
+
+: include-child-constraints ( i -- )
+    infer-children-data get nth constraints swap at last
+    constraints get last update-constraints ;
+
 : branch-phi-constraints ( output values booleans -- )
      {
         {
@@ -116,22 +123,24 @@ M: #phi propagate-before ( #phi -- )
                 swap t-->
             ]
         }
-        ! {
-        !     { { t f } { } }
-        !     [ B
-        !         first
-        !         [ [ =t ] bi@ <--> ]
-        !         [ [ =f ] bi@ <--> ] 2bi /\
-        !     ]
-        ! }
-        ! {
-        !     { { } { t f } }
-        !     [
-        !         second
-        !         [ [ =t ] bi@ <--> ]
-        !         [ [ =f ] bi@ <--> ] 2bi /\
-        !     ]
-        ! }
+        {
+            { { t f } { } }
+            [
+                first
+                [ [ =t ] bi@ <--> ]
+                [ [ =f ] bi@ <--> ] 2bi /\
+                0 include-child-constraints
+            ]
+        }
+        {
+            { { } { t f } }
+            [
+                second
+                [ [ =t ] bi@ <--> ]
+                [ [ =f ] bi@ <--> ] 2bi /\
+                1 include-child-constraints
+            ]
+        }
         [ 3drop f ]
     } case assume ;
 
@@ -145,9 +154,6 @@ M: #phi propagate-after ( #phi -- )
             branch-phi-constraints
         ] 3each
     ] [ drop ] if ;
-
-M: #phi propagate-around ( #phi -- )
-    [ propagate-before ] [ propagate-after ] bi ;
 
 M: #branch propagate-around
     dup live-branches >>live-branches

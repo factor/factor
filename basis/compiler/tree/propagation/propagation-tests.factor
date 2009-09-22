@@ -764,17 +764,17 @@ MIXIN: empty-mixin
     [ { word object } declare equal? ] final-classes
 ] unit-test
 
-! [ V{ string } ] [
-!     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
-! ] unit-test
+[ V{ string } ] [
+    [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
+] unit-test
 
-! [ t ] [ [ dup t xor or ] final-classes first true-class? ] unit-test
+[ t ] [ [ dup t xor or ] final-classes first true-class? ] unit-test
 
-! [ t ] [ [ dup t xor swap or ] final-classes first true-class? ] unit-test
+[ t ] [ [ dup t xor swap or ] final-classes first true-class? ] unit-test
 
-! [ t ] [ [ dup t xor and ] final-classes first false-class? ] unit-test
+[ t ] [ [ dup t xor and ] final-classes first false-class? ] unit-test
 
-! [ t ] [ [ dup t xor swap and ] final-classes first false-class? ] unit-test
+[ t ] [ [ dup t xor swap and ] final-classes first false-class? ] unit-test
 
 ! generalize-counter-interval wasn't being called in all the right places.
 ! bug found by littledan
