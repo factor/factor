@@ -3,8 +3,9 @@ http.client io io.encodings.ascii io.files io.files.temp kernel
 math math.matrices math.parser math.vectors opengl
 opengl.capabilities opengl.gl opengl.demo-support sequences
 splitting vectors words specialized-arrays ;
-SPECIALIZED-ARRAY: float
-SPECIALIZED-ARRAY: uint
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-ARRAY: c:float
+SPECIALIZED-ARRAY: c:uint
 IN: bunny.model
 
 : numbers ( str -- seq )

@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types combinators kernel locals math
 math.ranges openal sequences sequences.merged specialized-arrays ;
+FROM: alien.c-types => short ;
 SPECIALIZED-ARRAY: uchar
 SPECIALIZED-ARRAY: short
 IN: synth.buffers

@@ -450,6 +450,10 @@ INSN: ##alien-global
 def: dst/int-rep
 literal: symbol library ;
 
+INSN: ##vm-field-ptr
+def: dst/int-rep
+literal: fieldname ;
+
 ! FFI
 INSN: ##alien-invoke
 literal: params stack-frame ;

@@ -6,7 +6,7 @@ math.rectangles namespaces parser sequences shuffle
 specialized-arrays ui.backend.windows vectors windows.com
 windows.dinput windows.dinput.constants windows.errors
 windows.kernel32 windows.messages windows.ole32
-windows.user32 classes.struct ;
+windows.user32 classes.struct alien.data ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game-input.dinput
 
@@ -160,19 +160,24 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     [ device-attached? not ] filter
     [ remove-controller ] each ;
 
-: device-interface? ( dbt-broadcast-hdr -- ? )
-    dbch_devicetype>> DBT_DEVTYP_DEVICEINTERFACE = ;
+: ?device-interface ( dbt-broadcast-hdr -- ? )
+    dup dbch_devicetype>> DBT_DEVTYP_DEVICEINTERFACE =
+    [ >c-ptr DEV_BROADCAST_DEVICEW memory>struct ]
+    [ drop f ] if ; inline
 
 : device-arrived ( dbt-broadcast-hdr -- )
-    device-interface? [ find-controllers ] when ;
+    ?device-interface [ find-controllers ] when ; inline
 
 : device-removed ( dbt-broadcast-hdr -- )
-    device-interface? [ find-and-remove-detached-devices ] when ;
+    ?device-interface [ find-and-remove-detached-devices ] when ; inline
+
+: <DEV_BROADCAST_HDR> ( wParam -- struct )
+    <alien> DEV_BROADCAST_HDR memory>struct ;
 
 : handle-wm-devicechange ( hWnd uMsg wParam lParam -- )
     [ 2drop ] 2dip swap {
-        { [ dup DBT_DEVICEARRIVAL = ]         [ drop <alien> device-arrived ] }
-        { [ dup DBT_DEVICEREMOVECOMPLETE = ]  [ drop <alien> device-removed ] }
+        { [ dup DBT_DEVICEARRIVAL = ]         [ drop <DEV_BROADCAST_HDR> device-arrived ] }
+        { [ dup DBT_DEVICEREMOVECOMPLETE = ]  [ drop <DEV_BROADCAST_HDR> device-removed ] }
         [ 2drop ]
     } cond ;
 

@@ -40,7 +40,7 @@ load-help? off
     "bootstrap.layouts" require
 
     [
-        "vocab:bootstrap/stage2.factor"
+        "resource:basis/bootstrap/stage2.factor"
         dup exists? [
             run-file
         ] [

@@ -1,5 +1,5 @@
-USING: alien alien.syntax alien.c-types alien.strings math
-kernel sequences windows.errors windows.types io accessors
+USING: alien alien.syntax alien.c-types alien.data alien.strings
+math kernel sequences windows.errors windows.types io accessors
 math.order namespaces make math.parser windows.kernel32
 combinators locals specialized-arrays literals splitting
 grouping classes.struct combinators.smart ;
@@ -78,29 +78,29 @@ CONSTANT: TYMED_MFPICT   32
 CONSTANT: TYMED_ENHMF    64
 CONSTANT: TYMED_NULL     0
 
-C-STRUCT: DVTARGETDEVICE
-    { "DWORD" "tdSize" }
-    { "WORD" "tdDriverNameOffset" }
-    { "WORD" "tdDeviceNameOffset" }
-    { "WORD" "tdPortNameOffset" }
-    { "WORD" "tdExtDevmodeOffset" }
-    { "BYTE[1]" "tdData" } ;
+STRUCT: DVTARGETDEVICE
+    { tdSize DWORD }
+    { tdDriverNameOffset WORD }
+    { tdDeviceNameOffset WORD }
+    { tdPortNameOffset WORD }
+    { tdExtDevmodeOffset WORD }
+    { tdData BYTE[1] } ;
 
 TYPEDEF: WORD CLIPFORMAT
 TYPEDEF: POINT POINTL
 
-C-STRUCT: FORMATETC
-    { "CLIPFORMAT" "cfFormat" }
-    { "DVTARGETDEVICE*" "ptd" }
-    { "DWORD" "dwAspect" }
-    { "LONG" "lindex" }
-    { "DWORD" "tymed" } ;
+STRUCT: FORMATETC
+    { cfFormat CLIPFORMAT }
+    { ptd DVTARGETDEVICE* }
+    { dwAspect DWORD }
+    { lindex LONG }
+    { tymed DWORD } ;
 TYPEDEF: FORMATETC* LPFORMATETC
 
-C-STRUCT: STGMEDIUM
-    { "DWORD" "tymed" }
-    { "void*" "data" }
-    { "LPUNKNOWN" "punkForRelease" } ;
+STRUCT: STGMEDIUM
+    { tymed DWORD }
+    { data void* }
+    { punkForRelease LPUNKNOWN } ;
 TYPEDEF: STGMEDIUM* LPSTGMEDIUM
 
 CONSTANT: COINIT_MULTITHREADED     0

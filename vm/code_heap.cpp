@@ -3,24 +3,22 @@
 namespace factor
 {
 
-heap code;
-
 /* Allocate a code heap during startup */
-void init_code_heap(cell size)
+void factorvm::init_code_heap(cell size)
 {
 	new_heap(&code,size);
 }
 
-bool in_code_heap_p(cell ptr)
+bool factorvm::in_code_heap_p(cell ptr)
 {
 	return (ptr >= code.seg->start && ptr <= code.seg->end);
 }
 
 /* Compile a word definition with the non-optimizing compiler. Allocates memory */
-void jit_compile_word(cell word_, cell def_, bool relocate)
+void factorvm::jit_compile_word(cell word_, cell def_, bool relocate)
 {
-	gc_root<word> word(word_);
-	gc_root<quotation> def(def_);
+	gc_root<word> word(word_,this);
+	gc_root<quotation> def(def_,this);
 
 	jit_compile(def.value(),relocate);
 
@@ -30,36 +28,40 @@ void jit_compile_word(cell word_, cell def_, bool relocate)
 	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
 }
 
+
 /* Apply a function to every code block */
-void iterate_code_heap(code_heap_iterator iter)
+void factorvm::iterate_code_heap(code_heap_iterator iter)
 {
 	heap_block *scan = first_block(&code);
 
 	while(scan)
 	{
 		if(scan->status != B_FREE)
-			iter((code_block *)scan);
+			iter((code_block *)scan,this);
 		scan = next_block(&code,scan);
 	}
 }
 
+
 /* Copy literals referenced from all code blocks to newspace. Only for
 aging and nursery collections */
-void copy_code_heap_roots()
+void factorvm::copy_code_heap_roots()
 {
-	iterate_code_heap(copy_literal_references);
+	iterate_code_heap(factor::copy_literal_references);
 }
+
 
 /* Update pointers to words referenced from all code blocks. Only after
 defining a new word. */
-void update_code_heap_words()
+void factorvm::update_code_heap_words()
 {
-	iterate_code_heap(update_word_references);
+	iterate_code_heap(factor::update_word_references);
 }
 
-PRIMITIVE(modify_code_heap)
+
+inline void factorvm::vmprim_modify_code_heap()
 {
-	gc_root<array> alist(dpop());
+	gc_root<array> alist(dpop(),this);
 
 	cell count = array_capacity(alist.untagged());
 
@@ -69,10 +71,10 @@ PRIMITIVE(modify_code_heap)
 	cell i;
 	for(i = 0; i < count; i++)
 	{
-		gc_root<array> pair(array_nth(alist.untagged(),i));
+		gc_root<array> pair(array_nth(alist.untagged(),i),this);
 
-		gc_root<word> word(array_nth(pair.untagged(),0));
-		gc_root<object> data(array_nth(pair.untagged(),1));
+		gc_root<word> word(array_nth(pair.untagged(),0),this);
+		gc_root<object> data(array_nth(pair.untagged(),1),this);
 
 		switch(data.type())
 		{
@@ -108,8 +110,13 @@ PRIMITIVE(modify_code_heap)
 	update_code_heap_words();
 }
 
+PRIMITIVE(modify_code_heap)
+{
+	PRIMITIVE_GETVM()->vmprim_modify_code_heap();
+}
+
 /* Push the free space and total size of the code heap */
-PRIMITIVE(code_room)
+inline void factorvm::vmprim_code_room()
 {
 	cell used, total_free, max_free;
 	heap_usage(&code,&used,&total_free,&max_free);
@@ -119,14 +126,19 @@ PRIMITIVE(code_room)
 	dpush(tag_fixnum(max_free / 1024));
 }
 
-static unordered_map<heap_block *,char *> forwarding;
+PRIMITIVE(code_room)
+{
+	PRIMITIVE_GETVM()->vmprim_code_room();
+}
 
-code_block *forward_xt(code_block *compiled)
+
+code_block *factorvm::forward_xt(code_block *compiled)
 {
 	return (code_block *)forwarding[compiled];
 }
 
-void forward_frame_xt(stack_frame *frame)
+
+void factorvm::forward_frame_xt(stack_frame *frame)
 {
 	cell offset = (cell)FRAME_RETURN_ADDRESS(frame) - (cell)frame_code(frame);
 	code_block *forwarded = forward_xt(frame_code(frame));
@@ -134,7 +146,12 @@ void forward_frame_xt(stack_frame *frame)
 	FRAME_RETURN_ADDRESS(frame) = (void *)((cell)forwarded + offset);
 }
 
-void forward_object_xts()
+void forward_frame_xt(stack_frame *frame,factorvm *myvm)
+{
+	return myvm->forward_frame_xt(frame);
+}
+
+void factorvm::forward_object_xts()
 {
 	begin_scan();
 
@@ -165,7 +182,7 @@ void forward_object_xts()
 		case CALLSTACK_TYPE:
 			{
 				callstack *stack = untag<callstack>(obj);
-				iterate_callstack_object(stack,forward_frame_xt);
+				iterate_callstack_object(stack,factor::forward_frame_xt);
 			}
 			break;
 		default:
@@ -176,8 +193,9 @@ void forward_object_xts()
 	end_scan();
 }
 
+
 /* Set the XT fields now that the heap has been compacted */
-void fixup_object_xts()
+void factorvm::fixup_object_xts()
 {
 	begin_scan();
 
@@ -205,11 +223,12 @@ void fixup_object_xts()
 	end_scan();
 }
 
+
 /* Move all free space to the end of the code heap. This is not very efficient,
 since it makes several passes over the code and data heaps, but we only ever
 do this before saving a deployed image and exiting, so performaance is not
 critical here */
-void compact_code_heap()
+void factorvm::compact_code_heap()
 {
 	/* Free all unreachable code blocks */
 	gc();

@@ -3,6 +3,7 @@ USING: accessors alien.c-types arrays byte-arrays combinators
 destructors fry gpu gpu.buffers images kernel locals math
 opengl opengl.gl opengl.textures sequences
 specialized-arrays ui.gadgets.worlds variants ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: gpu.textures
 
