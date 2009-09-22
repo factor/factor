@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien alien.c-types alien.structs arrays
+USING: accessors alien alien.c-types alien.data arrays
 assocs classes classes.mixin classes.parser classes.singleton
 classes.tuple classes.tuple.private combinators combinators.tuple destructors fry
 generic generic.parser gpu gpu.buffers gpu.framebuffers
@@ -9,7 +9,9 @@ lexer locals math math.order math.parser namespaces opengl
 opengl.gl parser quotations sequences slots sorting
 specialized-arrays strings ui.gadgets.worlds variants
 vocabs.parser words ;
-SPECIALIZED-ARRAY: float
+FROM: math => float ;
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-ARRAY: c:float
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: void*

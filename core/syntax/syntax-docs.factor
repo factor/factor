@@ -59,19 +59,26 @@ ARTICLE: "syntax-ratios" "Ratio syntax"
 "More information on ratios can be found in " { $link "rationals" } ;
 
 ARTICLE: "syntax-floats" "Float syntax"
-"Floating point literals must contain a decimal point, and may contain an exponent:"
+"Floating point literals can be input in base 10 or 16. Base 10 literals must contain a decimal point, and may contain an exponent after " { $snippet "e" } ":"
 { $code
     "10.5"
     "-3.1456"
     "7.e13"
     "1.0e-5"
 }
-"There are three special float values:"
+"Base 16 literals use " { $snippet "p" } " instead of " { $snippet "e" } " for the exponent, which is still decimal:"
+{ $example
+    "10.125 HEX: 1.44p3 = ."
+    "t"
+}
+"Syntax for special float values:"
 { $table
 { "Positive infinity" { $snippet "1/0." } }
 { "Negative infinity" { $snippet "-1/0." } }
 { "Not-a-number" { $snippet "0/0." } }
 }
+"A Not-a-number with an arbitrary payload can also be parsed in:"
+{ $subsection POSTPONE: NAN: }
 "More information on floats can be found in " { $link "floats" } "." ;
 
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"
@@ -586,10 +593,13 @@ HELP: #!
 { $description "Discards all input until the end of the line." } ;
 
 HELP: HEX:
-{ $syntax "HEX: integer" }
-{ $values { "integer" "hexadecimal digits (0-9, a-f, A-F)" } }
-{ $description "Adds an integer read from a hexadecimal literal to the parse tree." }
-{ $examples { $example "USE: prettyprint" "HEX: ff ." "255" } } ;
+{ $syntax "HEX: NNN" "HEX: NNN.NNNpEEE" }
+{ $values { "N" "hexadecimal digit (0-9, a-f, A-F)" } { "pEEE" "decimal exponent value" } }
+{ $description "Adds an integer or floating-point value read from a hexadecimal literal to the parse tree." }
+{ $examples
+    { $example "USE: prettyprint" "HEX: ff ." "255" }
+    { $example "USE: prettyprint" "HEX: 1.8p5 ." "48.0" }
+} ;
 
 HELP: OCT:
 { $syntax "OCT: integer" }
@@ -602,6 +612,18 @@ HELP: BIN:
 { $values { "integer" "binary digits (0 and 1)" } }
 { $description "Adds an integer read from an binary literal to the parse tree." }
 { $examples { $example "USE: prettyprint" "BIN: 100 ." "4" } } ;
+
+HELP: NAN:
+{ $syntax "NAN: payload" }
+{ $values { "payload" "64-bit hexadecimal integer" } }
+{ $description "Adds a floating point Not-a-Number literal to the parse tree." }
+{ $examples
+    { $example
+        "USE: prettyprint"
+        "NAN: 80000deadbeef ."
+        "NAN: 80000deadbeef"
+    }
+} ;
 
 HELP: GENERIC:
 { $syntax "GENERIC: word ( stack -- effect )" }

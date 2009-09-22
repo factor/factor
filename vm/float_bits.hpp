@@ -5,8 +5,8 @@ namespace factor
 representations and vice versa */
 
 union double_bits_pun {
-    double x;
-    u64 y;
+	double x;
+	u64 y;
 };
 
 inline static u64 double_bits(double x)
@@ -24,8 +24,8 @@ inline static double bits_double(u64 y)
 }
 
 union float_bits_pun {
-    float x;
-    u32 y;
+	float x;
+	u32 y;
 };
 
 inline static u32 float_bits(float x)

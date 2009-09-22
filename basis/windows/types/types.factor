@@ -3,6 +3,7 @@
 USING: alien alien.c-types alien.syntax namespaces kernel words
 sequences math math.bitwise math.vectors colors
 io.encodings.utf16n classes.struct accessors ;
+FROM: alien.c-types => float short ;
 IN: windows.types
 
 TYPEDEF: char                CHAR
@@ -10,6 +11,12 @@ TYPEDEF: uchar               UCHAR
 TYPEDEF: uchar               BYTE
 
 TYPEDEF: ushort              wchar_t
+SYMBOL: wchar_t*
+<<
+{ char* utf16n } \ wchar_t* typedef
+\ wchar_t \ wchar_t* "pointer-c-type" set-word-prop
+>>
+
 TYPEDEF: wchar_t             WCHAR
 
 TYPEDEF: short               SHORT
@@ -68,8 +75,6 @@ TYPEDEF: longlong    LARGE_INTEGER
 TYPEDEF: ulonglong   ULARGE_INTEGER
 TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
 TYPEDEF: ULARGE_INTEGER* PULARGE_INTEGER
-
-<< { "char*" utf16n } "wchar_t*" typedef >>
 
 TYPEDEF: wchar_t*  LPCSTR
 TYPEDEF: wchar_t*  LPWSTR
@@ -248,14 +253,13 @@ STRUCT: RECT
     { right LONG }
     { bottom LONG } ;
 
-C-STRUCT: PAINTSTRUCT
-    { "HDC" " hdc" }
-    { "BOOL" "fErase" }
-    { "RECT" "rcPaint" }
-    { "BOOL" "fRestore" }
-    { "BOOL" "fIncUpdate" }
-    { "BYTE[32]" "rgbReserved" }
-;
+STRUCT: PAINTSTRUCT
+    { hdc HDC }
+    { fErase BOOL }
+    { rcPaint RECT }
+    { fRestore BOOL }
+    { fIncUpdate BOOL }
+    { rgbReserved BYTE[32] } ;
 
 STRUCT: BITMAPINFOHEADER
     { biSize DWORD }
@@ -283,21 +287,21 @@ STRUCT: BITMAPINFO
 TYPEDEF: void* LPPAINTSTRUCT
 TYPEDEF: void* PAINTSTRUCT
 
-C-STRUCT: POINT
-    { "LONG" "x" }
-    { "LONG" "y" } ; 
+STRUCT: POINT
+    { x LONG }
+    { y LONG } ; 
 
 STRUCT: SIZE
     { cx LONG }
     { cy LONG } ;
 
-C-STRUCT: MSG
-    { "HWND" "hWnd" }
-    { "UINT" "message" }
-    { "WPARAM" "wParam" }
-    { "LPARAM" "lParam" }
-    { "DWORD" "time" }
-    { "POINT" "pt" } ;
+STRUCT: MSG
+    { hWnd HWND }
+    { message UINT }
+    { wParam WPARAM }
+    { lParam LPARAM }
+    { time DWORD }
+    { pt POINT } ;
 
 TYPEDEF: MSG*                LPMSG
 
@@ -339,34 +343,34 @@ TYPEDEF: PFD* LPPFD
 TYPEDEF: HANDLE HGLRC
 TYPEDEF: HANDLE HRGN
 
-C-STRUCT: LVITEM
-    { "uint" "mask" }
-    { "int" "iItem" }
-    { "int" "iSubItem" }
-    { "uint" "state" }
-    { "uint" "stateMask" }
-    { "void*" "pszText" }
-    { "int" "cchTextMax" }
-    { "int" "iImage" }
-    { "long" "lParam" }
-    { "int" "iIndent" }
-    { "int" "iGroupId" }
-    { "uint" "cColumns" }
-    { "uint*" "puColumns" }
-    { "int*" "piColFmt" }
-    { "int" "iGroup" } ;
+STRUCT: LVITEM
+    { mask uint }
+    { iItem int }
+    { iSubItem int }
+    { state uint }
+    { stateMask uint }
+    { pszText void* }
+    { cchTextMax int }
+    { iImage int }
+    { lParam long }
+    { iIndent int }
+    { iGroupId int }
+    { cColumns uint }
+    { puColumns uint* }
+    { piColFmt int* }
+    { iGroup int } ;
 
-C-STRUCT: LVFINDINFO
-    { "uint" "flags" }
-    { "char*" "psz" }
-    { "long" "lParam" }
-    { "POINT" "pt" }
-    { "uint" "vkDirection" } ;
+STRUCT: LVFINDINFO
+    { flags uint }
+    { psz char* }
+    { lParam long }
+    { pt POINT }
+    { vkDirection uint } ;
 
-C-STRUCT: ACCEL
-    { "BYTE" "fVirt" }
-    { "WORD" "key" }
-    { "WORD" "cmd" } ;
+STRUCT: ACCEL
+    { fVirt BYTE }
+    { key WORD }
+    { cmd WORD } ;
 TYPEDEF: ACCEL* LPACCEL
 
 TYPEDEF: DWORD COLORREF

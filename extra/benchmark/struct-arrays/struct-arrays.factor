@@ -47,6 +47,6 @@ SPECIALIZED-ARRAY: point
 : struct-array-benchmark ( len -- )
     make-points [ normalize-points ] [ max-points ] bi print-point ;
 
-: main ( -- ) 5000000 struct-array-benchmark ;
+: main ( -- ) 10 [ 500000 struct-array-benchmark ] times ;
 
 MAIN: main

@@ -1,9 +1,9 @@
 namespace factor
 {
 
-template <typename T> cell tag(T *value)
+template <typename TYPE> cell tag(TYPE *value)
 {
-	return RETAG(value,tag_for(T::type_number));
+	return RETAG(value,tag_for(TYPE::type_number));
 }
 
 inline static cell tag_dynamic(object *value)
@@ -11,13 +11,13 @@ inline static cell tag_dynamic(object *value)
 	return RETAG(value,tag_for(value->h.hi_tag()));
 }
 
-template <typename T>
+template <typename TYPE>
 struct tagged
 {
 	cell value_;
 
 	cell value() const { return value_; }
-	T *untagged() const { return (T *)(UNTAG(value_)); }
+	TYPE *untagged() const { return (TYPE *)(UNTAG(value_)); }
 
 	cell type() const {
 		cell tag = TAG(value_);
@@ -29,44 +29,44 @@ struct tagged
 
 	bool type_p(cell type_) const { return type() == type_; }
 
-	T *untag_check() const {
-		if(T::type_number != TYPE_COUNT && !type_p(T::type_number))
-			type_error(T::type_number,value_);
+	TYPE *untag_check(factorvm *myvm) const {
+		if(TYPE::type_number != TYPE_COUNT && !type_p(TYPE::type_number))
+			myvm->type_error(TYPE::type_number,value_);
 		return untagged();
 	}
 
 	explicit tagged(cell tagged) : value_(tagged) {
 #ifdef FACTOR_DEBUG
-		untag_check();
+		untag_check(SIGNAL_VM_PTR());
 #endif
 	}
 
-	explicit tagged(T *untagged) : value_(factor::tag(untagged)) {
+	explicit tagged(TYPE *untagged) : value_(factor::tag(untagged)) {
 #ifdef FACTOR_DEBUG
-		untag_check();
+		untag_check(SIGNAL_VM_PTR()); 
 #endif
 	}
 
-	T *operator->() const { return untagged(); }
+	TYPE *operator->() const { return untagged(); }
 	cell *operator&() const { return &value_; }
 
-	const tagged<T>& operator=(const T *x) { value_ = tag(x); return *this; }
-	const tagged<T>& operator=(const cell &x) { value_ = x; return *this; }
+	const tagged<TYPE>& operator=(const TYPE *x) { value_ = tag(x); return *this; }
+	const tagged<TYPE>& operator=(const cell &x) { value_ = x; return *this; }
 
-	bool operator==(const tagged<T> &x) { return value_ == x.value_; }
-	bool operator!=(const tagged<T> &x) { return value_ != x.value_; }
+	bool operator==(const tagged<TYPE> &x) { return value_ == x.value_; }
+	bool operator!=(const tagged<TYPE> &x) { return value_ != x.value_; }
 
 	template<typename X> tagged<X> as() { return tagged<X>(value_); }
 };
 
-template <typename T> T *untag_check(cell value)
+template <typename TYPE> TYPE *factorvm::untag_check(cell value)
 {
-	return tagged<T>(value).untag_check();
+	return tagged<TYPE>(value).untag_check(this);
 }
 
-template <typename T> T *untag(cell value)
+template <typename TYPE> TYPE *factorvm::untag(cell value)
 {
-	return tagged<T>(value).untagged();
+	return tagged<TYPE>(value).untagged();
 }
 
 }

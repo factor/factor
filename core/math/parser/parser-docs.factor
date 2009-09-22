@@ -5,7 +5,7 @@ IN: math.parser
 ARTICLE: "number-strings" "Converting between numbers and strings"
 "These words only convert between real numbers and strings. Complex numbers are constructed by the parser (" { $link "parser" } ") and printed by the prettyprinter (" { $link "prettyprint" } ")."
 $nl
-"Note that only integers can be converted to and from strings using a representation other than base 10. Calling a word such as " { $link >oct } " on a float will give a result in base 10."
+"Integers can be converted to and from arbitrary bases. Floating point numbers can only be converted to and from base 10 and 16."
 $nl
 "Converting numbers to strings:"
 { $subsection number>string }
@@ -61,7 +61,7 @@ HELP: bin>
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
-{ bin> POSTPONE: BIN: bin> .b } related-words
+{ >bin POSTPONE: BIN: bin> .b } related-words
 
 HELP: oct>
 { $values { "str" string } { "n/f" "a real number or " { $link f } } }
@@ -69,7 +69,7 @@ HELP: oct>
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
-{ oct> POSTPONE: OCT: oct> .o } related-words
+{ >oct POSTPONE: OCT: oct> .o } related-words
 
 HELP: hex>
 { $values { "str" string } { "n/f" "a real number or " { $link f } } }
@@ -77,7 +77,7 @@ HELP: hex>
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
-{ hex> POSTPONE: HEX: hex> .h } related-words
+{ >hex POSTPONE: HEX: hex> .h } related-words
 
 HELP: >base
 { $values { "n" real } { "radix" "an integer between 2 and 36" } { "str" string } }
@@ -93,7 +93,19 @@ HELP: >oct
 
 HELP: >hex
 { $values { "n" real } { "str" string } }
-{ $description "Outputs a string representation of a number using base 16." } ;
+{ $description "Outputs a string representation of a number using base 16." }
+{ $examples
+    { $example
+        "USING: math.parser prettyprint ;"
+        "3735928559 >hex ."
+        "\"deadbeef\""
+    }
+    { $example
+        "USING: math.parser prettyprint ;"
+        "-15.5 >hex ."
+        "\"-1.fp3\""
+    }
+} ;
 
 HELP: string>float ( str -- n/f )
 { $values { "str" string } { "n/f" "a real number or " { $link f } } }

@@ -63,7 +63,9 @@ multiply_overflow:
 
 #define SAVED_FP_REGS_SIZE 144
 
-#define FRAME (RESERVED_SIZE + PARAM_SIZE + SAVED_INT_REGS_SIZE + SAVED_FP_REGS_SIZE + 8)
+#define SAVED_V_REGS_SIZE 208
+
+#define FRAME (RESERVED_SIZE + PARAM_SIZE + SAVED_INT_REGS_SIZE + SAVED_FP_REGS_SIZE + SAVED_V_REGS_SIZE + 8)
    
 #if defined( __APPLE__)
 	#define LR_SAVE 8
@@ -84,6 +86,14 @@ multiply_overflow:
 
 #define SAVE_FP(register,offset) stfd register,SAVE_AT(offset)(r1)
 #define RESTORE_FP(register,offset) lfd register,SAVE_AT(offset)(r1)
+
+#define SAVE_V(register,offset) \
+	li r2,SAVE_AT(offset) XX \
+	stvxl register,r2,r1
+
+#define RESTORE_V(register,offset) \
+	li r2,SAVE_AT(offset) XX \
+	lvxl register,r2,r1
 
 #define PROLOGUE \
 	mflr r0 XX	   /* get caller's return address */ \
@@ -137,6 +147,31 @@ DEF(void,c_to_factor,(CELL quot)):
 	SAVE_FP(f30,52)
 	SAVE_FP(f31,54)
 
+        SAVE_V(v20,56)
+        SAVE_V(v21,60)
+        SAVE_V(v22,64)
+        SAVE_V(v23,68)
+        SAVE_V(v24,72)
+        SAVE_V(v25,76)
+        SAVE_V(v26,80)
+        SAVE_V(v27,84)
+        SAVE_V(v28,88)
+        SAVE_V(v29,92)
+        SAVE_V(v30,96)
+        SAVE_V(v31,100)
+
+        mfvscr v0
+        li r2,SAVE_AT(104)
+        stvxl v0,r2,r1
+        addi r2,r2,0xc
+        lwzx r4,r2,r1
+        lis r5,0x1
+        andc r4,r4,r5
+        stwx r4,r2,r1
+        subi r2,r2,0xc
+        lvxl v0,r2,r1
+        mtvscr v0
+
 	SAVE_INT(r3,19)	   /* save quotation since we're about to mangle it */
 
 	mr r3,r1	   /* pass call stack pointer as an argument */
@@ -144,6 +179,22 @@ DEF(void,c_to_factor,(CELL quot)):
 
 	RESTORE_INT(r3,19)	 /* restore quotation */
 	CALL_QUOT
+
+        RESTORE_V(v0,104)
+        mtvscr v0
+
+        RESTORE_V(v31,100)
+        RESTORE_V(v30,96)
+        RESTORE_V(v29,92)
+        RESTORE_V(v28,88)
+        RESTORE_V(v27,84)
+        RESTORE_V(v26,80)
+        RESTORE_V(v25,76)
+        RESTORE_V(v24,72)
+        RESTORE_V(v23,68)
+        RESTORE_V(v22,64)
+        RESTORE_V(v21,60)
+        RESTORE_V(v20,56)
 
 	RESTORE_FP(f31,54)
 	RESTORE_FP(f30,52)
@@ -236,21 +287,44 @@ DEF(void,flush_icache,(void *start, int len)):
 	blr
 
 DEF(void,primitive_inline_cache_miss,(void)):
-    mflr r6
+	mflr r6
 DEF(void,primitive_inline_cache_miss_tail,(void)):
-    PROLOGUE
-    mr r3,r6
-    bl MANGLE(inline_cache_miss)
-    EPILOGUE
-    mtctr r3
-    bctr
+	PROLOGUE
+	mr r3,r6
+	bl MANGLE(inline_cache_miss)
+	EPILOGUE
+	mtctr r3
+	bctr
 
 DEF(void,get_ppc_fpu_env,(void*)):
-    mffs f0
-    stfd f0,0(r3)
-    blr
+	mffs f0
+	stfd f0,0(r3)
+	blr
 
 DEF(void,set_ppc_fpu_env,(const void*)):
-    lfd f0,0(r3)
-    mtfsf 0xff,f0
-    blr
+	lfd f0,0(r3)
+	mtfsf 0xff,f0
+	blr
+
+DEF(void,get_ppc_vmx_env,(void*)):
+	mfvscr v0
+	subi r4,r1,16
+	li r5,0xf
+	andc r4,r4,r5
+	stvxl v0,0,r4
+	li r5,0xc
+	lwzx r6,r5,r4
+	stw r6,0(r3)
+	blr
+
+DEF(void,set_ppc_vmx_env,(const void*)):
+	subi r4,r1,16
+	li r5,0xf
+	andc r4,r4,r5
+	li r5,0xc
+	lwz r6,0(r3)
+	stwx r6,r5,r4
+	lvxl v0,0,r4
+	mtvscr v0
+	blr
+

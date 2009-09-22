@@ -9,7 +9,7 @@ HELP: DLL"
 
 HELP: ALIEN:
 { $syntax "ALIEN: address" }
-{ $values { "address" "a non-negative integer" } }
+{ $values { "address" "a non-negative hexadecimal integer" } }
 { $description "Creates an alien object at parse time." }
 { $notes "Alien objects are invalidated between image saves and loads, and hence source files should not contain alien literals; this word is for interactive use only. See " { $link "alien-expiry" } " for details." } ;
 
@@ -73,11 +73,49 @@ HELP: C-ENUM:
 { $syntax "C-ENUM: words... ;" }
 { $values { "words" "a sequence of word names" } }
 { $description "Creates a sequence of word definitions in the current vocabulary. Each word pushes an integer according to its index in the enumeration definition. The first word pushes 0." }
-{ $notes "This word emulates a C-style " { $snippet "enum" } " in Factor. While this feature can be used for any purpose, using integer constants is discouraged unless it is for interfacing with C libraries. Factor code should use symbolic constants instead." }
+{ $notes "This word emulates a C-style " { $snippet "enum" } " in Factor. While this feature can be used for any purpose, using integer constants is discouraged unless it is for interfacing with C libraries. Factor code should use " { $link "words.symbol" } " or " { $link "singletons" } " instead." }
 { $examples
-    "The following two lines are equivalent:"
-    { $code "C-ENUM: red green blue ;" ": red 0 ;  : green 1 ;  : blue 2 ;" }
+    "Here is an example enumeration definition:"
+    { $code "C-ENUM: red green blue ;" }
+    "It is equivalent to the following series of definitions:"
+    { $code "CONSTANT: red 0" "CONSTANT: green 1" "CONSTANT: blue 2" }
 } ;
+
+HELP: CALLBACK:
+{ $syntax "CALLBACK: return type ( parameters ) ;" }
+{ $values { "return" "a C return type" } { "type" "a type name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
+{ $description "Defines a new function pointer C type word " { $snippet "type" } ". The newly defined word works both as a C type and as a wrapper for " { $link alien-callback } " for callbacks that accept the given return type and parameters with the " { $snippet "\"cdecl\"" } " ABI." }
+{ $examples
+    { $code
+        "CALLBACK: bool FakeCallback ( int message, void* payload ) ;"
+        ": MyFakeCallback ( -- alien )"
+        "    [| message payload |"
+        "        \"message #\" write"
+        "        message number>string write"
+        "        \" received\" write nl"
+        "        t"
+        "    ] FakeCallback ;"
+    }
+} ;
+
+HELP: STDCALL-CALLBACK:
+{ $syntax "STDCALL-CALLBACK: return type ( parameters ) ;" }
+{ $values { "return" "a C return type" } { "type" "a type name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
+{ $description "Defines a new function pointer C type word " { $snippet "type" } ". The newly defined word works both as a C type and as a wrapper for " { $link alien-callback } " for callbacks that accept the given return type and parameters with the " { $snippet "\"stdcall\"" } " ABI." }
+{ $examples
+    { $code
+        "STDCALL-CALLBACK: bool FakeCallback ( int message, void* payload ) ;"
+        ": MyFakeCallback ( -- alien )"
+        "    [| message payload |"
+        "        \"message #\" write"
+        "        message number>string write"
+        "        \" received\" write nl"
+        "        t"
+        "    ] FakeCallback ;"
+    }
+} ;
+
+{ POSTPONE: CALLBACK: POSTPONE: STDCALL-CALLBACK: } related-words 
 
 HELP: &:
 { $syntax "&: symbol" }
@@ -86,7 +124,7 @@ HELP: &:
 
 HELP: typedef
 { $values { "old" "a string" } { "new" "a string" } }
-{ $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
+{ $description "Aliases the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
 { $notes "Using this word in the same source file which defines C bindings can cause problems, because words are compiled before top-level forms are run. Use the " { $link POSTPONE: TYPEDEF: } " word instead." } ;
 
 { POSTPONE: TYPEDEF: typedef } related-words

@@ -8,7 +8,15 @@ listener ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
+[ "4096" ] [ 4096 unparse ] unit-test
+[ "BIN: 1000000000000" ] [ 2 number-base [ 4096 unparse ] with-variable ] unit-test
+[ "OCT: 10000" ] [ 8 number-base [ 4096 unparse ] with-variable ] unit-test
+[ "HEX: 1000" ] [ 16 number-base [ 4096 unparse ] with-variable ] unit-test
 [ "1.0" ] [ 1.0 unparse ] unit-test
+[ "8.0" ] [ 8.0 unparse ] unit-test
+[ "8.0" ] [ 2 number-base [ 8.0 unparse ] with-variable ] unit-test
+[ "8.0" ] [ 8 number-base [ 8.0 unparse ] with-variable ] unit-test
+[ "HEX: 1.0p3" ] [ 16 number-base [ 8.0 unparse ] with-variable ] unit-test
 [ "1267650600228229401496703205376" ] [ 1 100 shift unparse ] unit-test
 
 [ "+" ] [ \ + unparse ] unit-test

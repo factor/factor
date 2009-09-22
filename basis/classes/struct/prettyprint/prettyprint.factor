@@ -1,9 +1,9 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types arrays assocs classes
-classes.struct combinators combinators.short-circuit continuations
-fry kernel libc make math math.parser mirrors prettyprint.backend
-prettyprint.custom prettyprint.sections see.private sequences
-slots strings summary words ;
+USING: accessors alien alien.c-types alien.data alien.prettyprint arrays
+assocs classes classes.struct combinators combinators.short-circuit
+continuations fry kernel libc make math math.parser mirrors
+prettyprint.backend prettyprint.custom prettyprint.sections
+see.private sequences slots strings summary words ;
 IN: classes.struct.prettyprint
 
 <PRIVATE
@@ -20,7 +20,7 @@ IN: classes.struct.prettyprint
     <flow \ { pprint-word
     f <inset {
         [ name>> text ]
-        [ c-type>> dup string? [ text ] [ pprint* ] if ]
+        [ type>> pprint-c-type ]
         [ read-only>> [ \ read-only pprint-word ] when ]
         [ initial>> [ \ initial: pprint-word pprint* ] when* ]
     } cleave block>
@@ -111,7 +111,7 @@ M: struct-mirror >alist ( mirror -- alist )
     ] [
         '[
             _ struct>assoc
-            [ [ [ name>> ] [ c-type>> ] bi 2array ] dip ] assoc-map
+            [ [ [ name>> ] [ type>> ] bi 2array ] dip ] assoc-map
         ] [ drop { } ] recover
     ] bi append ;
 

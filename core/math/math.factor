@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math.private ;
 IN: math
@@ -22,7 +22,12 @@ MATH: <  ( x y -- ? ) foldable
 MATH: <= ( x y -- ? ) foldable
 MATH: >  ( x y -- ? ) foldable
 MATH: >= ( x y -- ? ) foldable
+
 MATH: unordered? ( x y -- ? ) foldable
+MATH: u<  ( x y -- ? ) foldable
+MATH: u<= ( x y -- ? ) foldable
+MATH: u>  ( x y -- ? ) foldable
+MATH: u>= ( x y -- ? ) foldable
 
 M: object unordered? 2drop f ;
 
@@ -99,13 +104,13 @@ GENERIC: fp-qnan? ( x -- ? )
 GENERIC: fp-snan? ( x -- ? )
 GENERIC: fp-infinity? ( x -- ? )
 GENERIC: fp-nan-payload ( x -- bits )
+GENERIC: fp-sign ( x -- ? )
 
 M: object fp-special? drop f ; inline
 M: object fp-nan? drop f ; inline
 M: object fp-qnan? drop f ; inline
 M: object fp-snan? drop f ; inline
 M: object fp-infinity? drop f ; inline
-M: object fp-nan-payload drop f ; inline
 
 : <fp-nan> ( payload -- nan )
     HEX: 7ff0000000000000 bitor bits>double ; inline

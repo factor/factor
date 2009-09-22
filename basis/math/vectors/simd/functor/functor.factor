@@ -9,14 +9,16 @@ ERROR: bad-length got expected ;
 
 FUNCTOR: define-simd-128 ( T -- )
 
-N            [ 16 T heap-size /i ]
+T-TYPE       IS ${T}
+
+N            [ 16 T-TYPE heap-size /i ]
 
 A            DEFINES-CLASS ${T}-${N}
 >A           DEFINES >${A}
 A{           DEFINES ${A}{
 
-NTH          [ T dup c-type-getter-boxer array-accessor ]
-SET-NTH      [ T dup c-setter array-accessor ]
+NTH          [ T-TYPE dup c-type-getter-boxer array-accessor ]
+SET-NTH      [ T-TYPE dup c-setter array-accessor ]
 
 A-rep        IS ${A}-rep
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
@@ -74,7 +76,9 @@ PRIVATE>
 ! Synthesize 256-bit vectors from a pair of 128-bit vectors
 FUNCTOR: define-simd-256 ( T -- )
 
-N            [ 32 T heap-size /i ]
+T-TYPE       IS ${T}
+
+N            [ 32 T-TYPE heap-size /i ]
 
 N/2          [ N 2 / ]
 A/2          IS ${T}-${N/2}

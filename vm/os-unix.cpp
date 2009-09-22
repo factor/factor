@@ -3,18 +3,39 @@
 namespace factor
 {
 
-void start_thread(void *(*start_routine)(void *))
+THREADHANDLE start_thread(void *(*start_routine)(void *),void *args)
 {
 	pthread_attr_t attr;
 	pthread_t thread;
-
 	if (pthread_attr_init (&attr) != 0)
 		fatal_error("pthread_attr_init() failed",0);
-	if (pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED) != 0)
+	if (pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_JOINABLE) != 0)
 		fatal_error("pthread_attr_setdetachstate() failed",0);
-	if (pthread_create (&thread, &attr, start_routine, NULL) != 0)
+	if (pthread_create (&thread, &attr, start_routine, args) != 0)
 		fatal_error("pthread_create() failed",0);
 	pthread_attr_destroy (&attr);
+	return thread;
+}
+
+
+pthread_key_t tlsKey = 0;
+
+void init_platform_globals()
+{
+	if (pthread_key_create(&tlsKey, NULL) != 0){
+		fatal_error("pthread_key_create() failed",0);
+	}
+
+}
+
+void register_vm_with_thread(factorvm *vm)
+{
+	pthread_setspecific(tlsKey,vm);
+}
+
+factorvm *tls_vm()
+{
+	return (factorvm*)pthread_getspecific(tlsKey);
 }
 
 static void *null_dll;
@@ -31,38 +52,46 @@ void sleep_micros(cell usec)
 	usleep(usec);
 }
 
-void init_ffi()
+void factorvm::init_ffi()
 {
 	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic unix */
 	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
 }
 
-void ffi_dlopen(dll *dll)
+void factorvm::ffi_dlopen(dll *dll)
 {
 	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY);
 }
 
-void *ffi_dlsym(dll *dll, symbol_char *symbol)
+void *factorvm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
 	return dlsym(handle,symbol);
 }
 
-void ffi_dlclose(dll *dll)
+void factorvm::ffi_dlclose(dll *dll)
 {
 	if(dlclose(dll->dll))
 		general_error(ERROR_FFI,F,F,NULL);
 	dll->dll = NULL;
 }
 
-PRIMITIVE(existsp)
+
+
+
+inline void factorvm::vmprim_existsp()
 {
 	struct stat sb;
 	char *path = (char *)(untag_check<byte_array>(dpop()) + 1);
 	box_boolean(stat(path,&sb) >= 0);
 }
 
-segment *alloc_segment(cell size)
+PRIMITIVE(existsp)
+{
+	PRIMITIVE_GETVM()->vmprim_existsp();
+}
+
+segment *factorvm::alloc_segment(cell size)
 {
 	int pagesize = getpagesize();
 
@@ -101,7 +130,7 @@ void dealloc_segment(segment *block)
 	free(block);
 }
   
-static stack_frame *uap_stack_pointer(void *uap)
+stack_frame *factorvm::uap_stack_pointer(void *uap)
 {
 	/* There is a race condition here, but in practice a signal
 	delivered during stack frame setup/teardown or while transitioning
@@ -118,28 +147,48 @@ static stack_frame *uap_stack_pointer(void *uap)
 		return NULL;
 }
 
-void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+
+
+void factorvm::memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	signal_fault_addr = (cell)siginfo->si_addr;
 	signal_callstack_top = uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) = (cell)memory_signal_handler_impl;
+	UAP_PROGRAM_COUNTER(uap) = (cell)factor::memory_signal_handler_impl;
+}
+
+void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	SIGNAL_VM_PTR()->memory_signal_handler(signal,siginfo,uap);
+}
+
+
+void factorvm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	signal_number = signal;
+	signal_callstack_top = uap_stack_pointer(uap);
+	UAP_PROGRAM_COUNTER(uap) = (cell)factor::misc_signal_handler_impl;
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
+	SIGNAL_VM_PTR()->misc_signal_handler(signal,siginfo,uap);
+}
+
+void factorvm::fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
 	signal_number = signal;
 	signal_callstack_top = uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) = (cell)misc_signal_handler_impl;
+	signal_fpu_status = fpu_status(uap_fpu_status(uap));
+	uap_clear_fpu_status(uap);
+	UAP_PROGRAM_COUNTER(uap) =
+		(siginfo->si_code == FPE_INTDIV || siginfo->si_code == FPE_INTOVF)
+		? (cell)factor::misc_signal_handler_impl
+		: (cell)factor::fp_signal_handler_impl;
 }
 
 void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	signal_number = signal;
-	signal_callstack_top = uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) =
-            (siginfo->si_code == FPE_INTDIV || siginfo->si_code == FPE_INTOVF)
-                ? (cell)misc_signal_handler_impl
-                : (cell)fp_signal_handler_impl;
+	SIGNAL_VM_PTR()->fpe_signal_handler(signal, siginfo, uap);
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)
@@ -318,7 +367,7 @@ void open_console()
 	stdin_read = filedes[0];
 	stdin_write = filedes[1];
 
-	start_thread(stdin_loop);
+	start_thread(stdin_loop,NULL);
 }
 
 VM_C_API void wait_for_stdin()

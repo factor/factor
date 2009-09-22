@@ -10,7 +10,7 @@ IN: compiler.cfg.intrinsics.misc
     ds-pop tag-mask get ^^and-imm ^^tag-fixnum ds-push ;
 
 : emit-getenv ( node -- )
-    "userenv" f ^^alien-global
+    "userenv" ^^vm-field-ptr
     swap node-input-infos first literal>>
     [ ds-drop 0 ^^slot-imm ] [ ds-pop ^^offset>slot 0 ^^slot ] if*
     ds-push ;
