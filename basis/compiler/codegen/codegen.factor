@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
-combinators classes.algebra alien alien.c-types alien.structs
+combinators classes.algebra alien alien.c-types
 alien.strings alien.arrays alien.complex alien.libraries sets libc
 continuations.private fry cpu.architecture classes locals
 source-files.errors slots parser generic.parser
@@ -16,6 +16,8 @@ compiler.cfg.registers
 compiler.cfg.builder
 compiler.codegen.fixup
 compiler.utilities ;
+QUALIFIED: classes.struct
+QUALIFIED: alien.structs
 IN: compiler.codegen
 
 SYMBOL: insn-counts
@@ -268,6 +270,9 @@ M: ##alien-global generate-insn
     [ dst>> ] [ symbol>> ] [ library>> ] tri
     %alien-global ;
 
+M: ##vm-field-ptr generate-insn
+    [ dst>> ] [ fieldname>> ] bi %vm-field-ptr ;
+
 ! ##alien-invoke
 GENERIC: next-fastcall-param ( rep -- )
 
@@ -316,7 +321,10 @@ GENERIC: flatten-value-type ( type -- types )
 
 M: object flatten-value-type 1array ;
 
-M: struct-type flatten-value-type ( type -- types )
+M: alien.structs:struct-type flatten-value-type ( type -- types )
+    stack-size cell align (flatten-int-type) ;
+
+M: classes.struct:struct-c-type flatten-value-type ( type -- types )
     stack-size cell align (flatten-int-type) ;
 
 M: long-long-type flatten-value-type ( type -- types )
@@ -429,7 +437,7 @@ M: ##alien-indirect generate-insn
     ! Generate code for boxing input parameters in a callback.
     [
         dup \ %save-param-reg move-parameters
-        "nest_stacks" f %alien-invoke
+        "nest_stacks" %vm-invoke-1st-arg
         box-parameters
     ] with-param-regs ;
 
@@ -451,7 +459,7 @@ TUPLE: callback-context ;
 
 : callback-return-quot ( ctype -- quot )
     return>> {
-        { [ dup "void" = ] [ drop [ ] ] }
+        { [ dup void? ] [ drop [ ] ] }
         { [ dup large-struct? ] [ heap-size '[ _ memcpy ] ] }
         [ c-type c-type-unboxer-quot ]
     } cond ;
@@ -467,7 +475,7 @@ TUPLE: callback-context ;
         [ callback-context new do-callback ] %
     ] [ ] make ;
 
-: %unnest-stacks ( -- ) "unnest_stacks" f %alien-invoke ;
+: %unnest-stacks ( -- ) "unnest_stacks" %vm-invoke-1st-arg ;
 
 M: ##callback-return generate-insn
     #! All the extra book-keeping for %unwind is only for x86.

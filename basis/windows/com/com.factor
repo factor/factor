@@ -1,6 +1,6 @@
 USING: alien alien.c-types alien.destructors windows.com.syntax
 windows.ole32 windows.types continuations kernel alien.syntax
-libc destructors accessors ;
+libc destructors accessors alien.data ;
 IN: windows.com
 
 LIBRARY: ole32

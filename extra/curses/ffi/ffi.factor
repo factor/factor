@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.syntax combinators kernel system
-alien.libraries ;
+alien.libraries classes.struct ;
 IN: curses.ffi
 
 << "curses" {
@@ -21,56 +21,56 @@ TYPEDEF: ushort wchar_t
 
 CONSTANT: CCHARW_MAX  5
 
-C-STRUCT: cchar_t
-    { "attr_t" "attr" }
-    { { "wchar_t" CCHARW_MAX } "chars" } ;
+STRUCT: cchar_t
+    { attr attr_t }
+    { chars { wchar_t CCHARW_MAX } } ;
 
-C-STRUCT: pdat
-    { "NCURSES_SIZE_T" "_pad_y" }
-    { "NCURSES_SIZE_T" "_pad_x" }
-    { "NCURSES_SIZE_T" "_pad_top" }
-    { "NCURSES_SIZE_T" "_pad_left" }
-    { "NCURSES_SIZE_T" "_pad_bottom" }
-    { "NCURSES_SIZE_T" "_pad_right" } ;
+STRUCT: pdat
+    { _pad_y NCURSES_SIZE_T }
+    { _pad_x NCURSES_SIZE_T }
+    { _pad_top NCURSES_SIZE_T }
+    { _pad_left NCURSES_SIZE_T }
+    { _pad_bottom NCURSES_SIZE_T }
+    { _pad_right NCURSES_SIZE_T } ;
 
-C-STRUCT: c-window
-    { "NCURSES_SIZE_T" "_cury" }
-    { "NCURSES_SIZE_T" "_curx" }
+STRUCT: c-window
+    { _cury NCURSES_SIZE_T }
+    { _curx NCURSES_SIZE_T }
 
-    { "NCURSES_SIZE_T" "_maxy" }
-    { "NCURSES_SIZE_T" "_maxx" }
-    { "NCURSES_SIZE_T" "_begy" }
-    { "NCURSES_SIZE_T" "_begx" }
+    { _maxy NCURSES_SIZE_T }
+    { _maxx NCURSES_SIZE_T }
+    { _begy NCURSES_SIZE_T }
+    { _begx NCURSES_SIZE_T }
 
-    { "short"  " _flags" }
+    { _flags short  }
 
-    { "attr_t"  "_attrs" }
-    { "chtype"  "_bkgd" }
+    { _attrs attr_t  }
+    { _bkgd chtype  }
 
-    { "bool"    "_notimeout" }
-    { "bool"    "_clear" }
-    { "bool"    "_leaveok" }
-    { "bool"    "_scroll" }
-    { "bool"    "_idlok" }
-    { "bool"    "_idcok" }
-    { "bool"    "_immed" }
-    { "bool"    "_sync" }
-    { "bool"    "_use_keypad" }
-    { "int"     "_delay" }
+    { _notimeout bool    }
+    { _clear bool    }
+    { _leaveok bool    }
+    { _scroll bool    }
+    { _idlok bool    }
+    { _idcok bool    }
+    { _immed bool    }
+    { _sync bool    }
+    { _use_keypad bool    }
+    { _delay int     }
 
-    { "char*" "_line" }
-    { "NCURSES_SIZE_T" "_regtop" }
-    { "NCURSES_SIZE_T" "_regbottom" }
+    { _line char* }
+    { _regtop NCURSES_SIZE_T }
+    { _regbottom NCURSES_SIZE_T }
 
-    { "int" "_parx" }
-    { "int" "_pary" }
-    { "WINDOW*" "_parent" }
+    { _parx int }
+    { _pary int }
+    { _parent WINDOW* }
 
-    { "pdat" "_pad" }
+    { _pad pdat }
 
-    { "NCURSES_SIZE_T" "_yoffset" }
+    { _yoffset NCURSES_SIZE_T }
 
-    { "cchar_t"  "_bkgrnd" } ;
+    { _bkgrnd cchar_t  } ;
 
 LIBRARY: curses
 

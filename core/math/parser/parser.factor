@@ -109,9 +109,8 @@ SYMBOL: negative?
 
 : base>float ( str base -- n/f )
     {
-        { 10 [ dec>float ] }
         { 16 [ hex>float ] }
-        [ "Floats can only be converted from strings in base 10 or 16" throw ]
+        [ drop dec>float ]
     } case ;
 
 : number-char? ( char -- ? )
@@ -214,7 +213,8 @@ M: ratio >base
     -0.0 double>bits bitand zero? "" "-" ? ;
 
 : float>hex-value ( mantissa -- str )
-    16 >base [ CHAR: 0 = ] trim-tail [ "0" ] [ ] if-empty "1." prepend ;
+    16 >base 13 CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
+    [ "0" ] [ ] if-empty "1." prepend ;
 
 : float>hex-expt ( mantissa -- str )
     10 >base "p" prepend ;
@@ -232,9 +232,8 @@ M: ratio >base
 
 : float>base ( n base -- str )
     {
-        { 10 [ float>decimal ] }
         { 16 [ float>hex ] }
-        [ "Floats can only be converted to strings in base 10 or 16" throw ]
+        [ drop float>decimal ]
     } case ;
 
 PRIVATE>

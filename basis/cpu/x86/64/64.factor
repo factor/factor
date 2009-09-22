@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math namespaces make sequences system
-layouts alien alien.c-types alien.accessors alien.structs slots
+layouts alien alien.c-types alien.accessors slots
 splitting assocs combinators locals compiler.constants
 compiler.codegen compiler.codegen.fixup compiler.cfg.instructions
 compiler.cfg.builder compiler.cfg.intrinsics compiler.cfg.stack-frame
@@ -74,9 +74,26 @@ M: x86.64 %prepare-unbox ( -- )
     param-reg-1 R14 [] MOV
     R14 cell SUB ;
 
+M: x86.64 %vm-invoke-1st-arg ( function -- )
+    param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
+    f %alien-invoke ;
+
+: %vm-invoke-2nd-arg ( function -- )
+    param-reg-2 0 MOV rc-absolute-cell rt-vm rel-fixup
+    f %alien-invoke ;
+
+M: x86.64 %vm-invoke-3rd-arg ( function -- )
+    param-reg-3 0 MOV rc-absolute-cell rt-vm rel-fixup
+    f %alien-invoke ;
+
+: %vm-invoke-4th-arg ( function -- )
+    int-regs param-regs fourth 0 MOV rc-absolute-cell rt-vm rel-fixup
+    f %alien-invoke ;
+
+
 M:: x86.64 %unbox ( n rep func -- )
     ! Call the unboxer
-    func f %alien-invoke
+    func %vm-invoke-2nd-arg
     ! Store the return value on the C stack if this is an
     ! alien-invoke, otherwise leave it the return register if
     ! this is the end of alien-callback
@@ -92,9 +109,10 @@ M: x86.64 %unbox-long-long ( n func -- )
         { float-regs [ float-regs get pop swap MOVSD ] }
     } case ;
 
+
 M: x86.64 %unbox-small-struct ( c-type -- )
     ! Alien must be in param-reg-1.
-    "alien_offset" f %alien-invoke
+    "alien_offset" %vm-invoke-2nd-arg
     ! Move alien_offset() return value to R11 so that we don't
     ! clobber it.
     R11 RAX MOV
@@ -109,13 +127,15 @@ M:: x86.64 %unbox-large-struct ( n c-type -- )
     ! Load structure size into param-reg-3
     param-reg-3 c-type heap-size MOV
     ! Copy the struct to the C stack
-    "to_value_struct" f %alien-invoke ;
+    "to_value_struct" %vm-invoke-4th-arg ;
 
 : load-return-value ( rep -- )
     [ [ 0 ] dip reg-class-of param-reg ]
     [ reg-class-of return-reg ]
     [ ]
     tri copy-register ;
+
+
 
 M:: x86.64 %box ( n rep func -- )
     n [
@@ -125,7 +145,7 @@ M:: x86.64 %box ( n rep func -- )
     ] [
         rep load-return-value
     ] if
-    func f %alien-invoke ;
+    rep int-rep? [ func %vm-invoke-2nd-arg ] [ func %vm-invoke-1st-arg ] if ;
 
 M: x86.64 %box-long-long ( n func -- )
     [ int-rep ] dip %box ;
@@ -145,7 +165,7 @@ M: x86.64 %box-small-struct ( c-type -- )
         [ param-reg-3 swap heap-size MOV ] bi
         param-reg-1 0 box-struct-field@ MOV
         param-reg-2 1 box-struct-field@ MOV
-        "box_small_struct" f %alien-invoke
+        "box_small_struct" %vm-invoke-4th-arg
     ] with-return-regs ;
 
 : struct-return@ ( n -- operand )
@@ -157,7 +177,7 @@ M: x86.64 %box-large-struct ( n c-type -- )
     ! Compute destination address
     param-reg-1 swap struct-return@ LEA
     ! Copy the struct from the C stack
-    "box_value_struct" f %alien-invoke ;
+    "box_value_struct" %vm-invoke-3rd-arg ;
 
 M: x86.64 %prepare-box-struct ( -- )
     ! Compute target address for value struct return
@@ -172,8 +192,9 @@ M: x86.64 %alien-invoke
     rc-absolute-cell rel-dlsym
     R11 CALL ;
 
+
 M: x86.64 %prepare-alien-indirect ( -- )
-    "unbox_alien" f %alien-invoke
+    "unbox_alien" %vm-invoke-1st-arg
     RBP RAX MOV ;
 
 M: x86.64 %alien-indirect ( -- )
@@ -181,7 +202,7 @@ M: x86.64 %alien-indirect ( -- )
 
 M: x86.64 %alien-callback ( quot -- )
     param-reg-1 swap %load-reference
-    "c_to_factor" f %alien-invoke ;
+    "c_to_factor" %vm-invoke-2nd-arg ;
 
 M: x86.64 %callback-value ( ctype -- )
     ! Save top of data stack
@@ -190,7 +211,7 @@ M: x86.64 %callback-value ( ctype -- )
     RSP 8 SUB
     param-reg-1 PUSH
     ! Restore data/call/retain stacks
-    "unnest_stacks" f %alien-invoke
+    "unnest_stacks" %vm-invoke-1st-arg
     ! Put former top of data stack in param-reg-1
     param-reg-1 POP
     RSP 8 ADD

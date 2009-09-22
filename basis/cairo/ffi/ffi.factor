@@ -6,7 +6,7 @@
 
 USING: system combinators alien alien.syntax alien.c-types
 alien.destructors kernel accessors sequences arrays ui.gadgets
-alien.libraries ;
+alien.libraries classes.struct ;
 
 IN: cairo.ffi
 << {
@@ -26,23 +26,23 @@ TYPEDEF: int cairo_bool_t
 TYPEDEF: void* cairo_t
 TYPEDEF: void* cairo_surface_t
 
-C-STRUCT: cairo_matrix_t
-    { "double" "xx" }
-    { "double" "yx" }
-    { "double" "xy" }
-    { "double" "yy" }
-    { "double" "x0" }
-    { "double" "y0" } ;
+STRUCT: cairo_matrix_t
+    { xx double }
+    { yx double }
+    { xy double }
+    { yy double }
+    { x0 double }
+    { y0 double } ;
 
 TYPEDEF: void* cairo_pattern_t
 
 TYPEDEF: void* cairo_destroy_func_t
 : cairo-destroy-func ( quot -- callback )
-    [ "void" { "void*" } "cdecl" ] dip alien-callback ; inline
+    [ void { void* } "cdecl" ] dip alien-callback ; inline
 
 ! See cairo.h for details
-C-STRUCT: cairo_user_data_key_t
-    { "int" "unused" } ;
+STRUCT: cairo_user_data_key_t
+    { unused int } ;
 
 TYPEDEF: int cairo_status_t
 C-ENUM:
@@ -79,11 +79,11 @@ CONSTANT: CAIRO_CONTENT_COLOR_ALPHA HEX: 3000
 
 TYPEDEF: void* cairo_write_func_t
 : cairo-write-func ( quot -- callback )
-    [ "cairo_status_t" { "void*" "uchar*" "int" } "cdecl" ] dip alien-callback ; inline
+    [ cairo_status_t { void* uchar* int } "cdecl" ] dip alien-callback ; inline
                           
 TYPEDEF: void* cairo_read_func_t
 : cairo-read-func ( quot -- callback )
-    [ "cairo_status_t" { "void*" "uchar*" "int" } "cdecl" ] dip alien-callback ; inline
+    [ cairo_status_t { void* uchar* int } "cdecl" ] dip alien-callback ; inline
 
 ! Functions for manipulating state objects
 FUNCTION: cairo_t*
@@ -336,16 +336,16 @@ cairo_clip_preserve ( cairo_t* cr ) ;
 FUNCTION: void
 cairo_clip_extents ( cairo_t* cr, double* x1, double* y1, double* x2, double* y2 ) ;
 
-C-STRUCT: cairo_rectangle_t
-    { "double" "x" }
-    { "double" "y" }
-    { "double" "width" }
-    { "double" "height" } ;
+STRUCT: cairo_rectangle_t
+    { x      double }
+    { y      double }
+    { width  double }
+    { height double } ;
     
-C-STRUCT: cairo_rectangle_list_t
-    { "cairo_status_t"     "status" }
-    { "cairo_rectangle_t*" "rectangles" }
-    { "int"                "num_rectangles" } ;
+STRUCT: cairo_rectangle_list_t
+    { status         cairo_status_t     }
+    { rectangles     cairo_rectangle_t* }
+    { num_rectangles int                } ;
 
 FUNCTION: cairo_rectangle_list_t*
 cairo_copy_clip_rectangle_list ( cairo_t* cr ) ;
@@ -359,25 +359,25 @@ TYPEDEF: void* cairo_scaled_font_t
 
 TYPEDEF: void* cairo_font_face_t
 
-C-STRUCT: cairo_glyph_t
-  { "ulong"     "index" }
-  { "double"    "x" }
-  { "double"    "y" } ;
+STRUCT: cairo_glyph_t
+  { index ulong     }
+  { x     double    }
+  { y     double    } ;
 
-C-STRUCT: cairo_text_extents_t
-    { "double" "x_bearing" }
-    { "double" "y_bearing" }
-    { "double" "width" }
-    { "double" "height" }
-    { "double" "x_advance" }
-    { "double" "y_advance" } ;
+STRUCT: cairo_text_extents_t
+    { x_bearing double }
+    { y_bearing double }
+    { width     double }
+    { height    double }
+    { x_advance double }
+    { y_advance double } ;
 
-C-STRUCT: cairo_font_extents_t
-    { "double" "ascent" }
-    { "double" "descent" }
-    { "double" "height" }
-    { "double" "max_x_advance" }
-    { "double" "max_y_advance" } ;
+STRUCT: cairo_font_extents_t
+    { ascent double }
+    { descent double }
+    { height double }
+    { max_x_advance double }
+    { max_y_advance double } ;
 
 TYPEDEF: int cairo_font_slant_t
 C-ENUM:
@@ -648,20 +648,22 @@ C-ENUM:
     CAIRO_PATH_CLOSE_PATH ;
 
 ! NEED TO DO UNION HERE
-C-STRUCT: cairo_path_data_t-point
-    { "double" "x" }
-    { "double" "y" } ;
+STRUCT: cairo_path_data_t-point
+    { x double }
+    { y double } ;
 
-C-STRUCT: cairo_path_data_t-header
-    { "cairo_path_data_type_t" "type" }
-    { "int" "length" } ;
+STRUCT: cairo_path_data_t-header
+    { type cairo_path_data_type_t }
+    { length int } ;
 
-C-UNION: cairo_path_data_t "cairo_path_data_t-point" "cairo_path_data_t-header" ;
+UNION-STRUCT: cairo_path_data_t 
+    { point  cairo_path_data_t-point }
+    { header cairo_path_data_t-header } ;
 
-C-STRUCT: cairo_path_t
-    { "cairo_status_t"      "status" }
-    { "cairo_path_data_t*"  "data" }
-    { "int"                 "num_data" } ;
+STRUCT: cairo_path_t
+    { status   cairo_status_t      }
+    { data     cairo_path_data_t*  }
+    { num_data int                 } ;
 
 FUNCTION: cairo_path_t*
 cairo_copy_path ( cairo_t* cr ) ;

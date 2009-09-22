@@ -28,6 +28,7 @@ ARTICLE: "prettyprint-variables" "Prettyprint control variables"
 { $subsection nesting-limit }
 { $subsection length-limit }
 { $subsection line-limit }
+{ $subsection number-base }
 { $subsection string-limit? }
 { $subsection boa-tuples? }
 { $subsection c-object-pointers? }
@@ -202,8 +203,8 @@ HELP: .o
 { $description "Outputs an integer in octal." } ;
 
 HELP: .h
-{ $values { "n" "an integer" } }
-{ $description "Outputs an integer in hexadecimal." } ;
+{ $values { "n" "an integer or floating-point value" } }
+{ $description "Outputs an integer or floating-point value in hexadecimal." } ;
 
 HELP: stack.
 { $values { "seq" "a sequence" } }

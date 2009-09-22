@@ -9,7 +9,7 @@ IN: alien.syntax
 
 SYNTAX: DLL" lexer get skip-blank parse-string dlopen parsed ;
 
-SYNTAX: ALIEN: scan string>number <alien> parsed ;
+SYNTAX: ALIEN: 16 scan-base <alien> parsed ;
 
 SYNTAX: BAD-ALIEN <bad-alien> parsed ;
 
@@ -18,8 +18,14 @@ SYNTAX: LIBRARY: scan "c-library" set ;
 SYNTAX: FUNCTION:
     (FUNCTION:) define-declared ;
 
+SYNTAX: CALLBACK:
+    "cdecl" (CALLBACK:) define-inline ;
+
+SYNTAX: STDCALL-CALLBACK:
+    "stdcall" (CALLBACK:) define-inline ;
+
 SYNTAX: TYPEDEF:
-    scan scan typedef ;
+    scan-c-type CREATE-C-TYPE typedef ;
 
 SYNTAX: C-STRUCT:
     scan current-vocab parse-definition define-struct ; deprecated
@@ -30,6 +36,9 @@ SYNTAX: C-UNION:
 SYNTAX: C-ENUM:
     ";" parse-tokens
     [ [ create-in ] dip define-constant ] each-index ;
+
+SYNTAX: C-TYPE:
+    "Primitive C type definition not supported" throw ;
 
 ERROR: no-such-symbol name library ;
 

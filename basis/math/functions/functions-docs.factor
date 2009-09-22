@@ -20,10 +20,6 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
 "Computing additive and multiplicative inverses:"
 { $subsection neg }
 { $subsection recip }
-"Minimum, maximum, clamping:"
-{ $subsection min }
-{ $subsection max }
-{ $subsection clamp }
 "Complex conjugation:"
 { $subsection conjugate }
 "Tests:"
@@ -41,7 +37,8 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
 { $subsection truncate }
 { $subsection round }
 "Inexact comparison:"
-{ $subsection ~ } ;
+{ $subsection ~ }
+"Numbers implement the " { $link "math.order" } ", therefore operations such as " { $link min } " and " { $link max } " can be used with numbers." ;
 
 ARTICLE: "power-functions" "Powers and logarithms"
 "Squares:"
@@ -51,6 +48,7 @@ ARTICLE: "power-functions" "Powers and logarithms"
 { $subsection exp }
 { $subsection cis }
 { $subsection log }
+"Other logarithms:"
 { $subsection log1+ }
 { $subsection log10 }
 "Raising a number to a power:"

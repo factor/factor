@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays byte-arrays combinators
 destructors generic io kernel libc math sequences system tr
-vocabs.loader words ;
+vocabs.loader words alien.data ;
 IN: tools.disassembler
 
 GENERIC: disassemble ( obj -- )

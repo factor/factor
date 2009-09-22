@@ -119,7 +119,7 @@ PRIVATE>
         [ append theme-image ] tri-curry@ tri
     ] 2dip <tile-pen> ;
 
-CONSTANT: button-background COLOR: FactorLightTan
+CONSTANT: button-background COLOR: FactorTan
 CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
 
 : <border-button-pen> ( -- pen )

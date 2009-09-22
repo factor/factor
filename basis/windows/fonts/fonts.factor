@@ -1,13 +1,23 @@
 USING: assocs memoize locals kernel accessors init fonts math
-combinators windows.errors windows.types windows.gdi32 ;
+combinators system-info.windows windows.errors windows.types
+windows.gdi32 ;
 IN: windows.fonts
 
-: windows-font-name ( string -- string' )
+MEMO: windows-fonts ( -- fonts )
+    windows-major 6 >=
+    H{
+        { "sans-serif" "Segoe UI" }
+        { "serif" "Cambria" }
+        { "monospace" "Consolas" }
+    }
     H{
         { "sans-serif" "Tahoma" }
         { "serif" "Times New Roman" }
         { "monospace" "Courier New" }
-    } ?at drop ;
+    } ? ;
+
+: windows-font-name ( string -- string' )
+    windows-fonts ?at drop ;
 
 MEMO:: (cache-font) ( font -- HFONT )
     font size>> neg ! nHeight

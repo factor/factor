@@ -5,6 +5,8 @@ kernel math math.functions math.vectors
 math.vectors.simd.functor math.vectors.simd.intrinsics
 math.vectors.specialization parser prettyprint.custom sequences
 sequences.private locals assocs words fry ;
+FROM: alien.c-types => float ;
+QUALIFIED-WITH: math m
 IN: math.vectors.simd
 
 <<
@@ -15,9 +17,9 @@ DEFER: float-8
 DEFER: double-4
 
 "double" define-simd-128
-"float" define-simd-128
+"float"  define-simd-128
 "double" define-simd-256
-"float" define-simd-256
+"float"  define-simd-256
 
 >>
 
@@ -136,7 +138,7 @@ DEFER: double-4
 
 PRIVATE>
 
-\ float-4 \ float-4-with float H{
+\ float-4 \ float-4-with m:float H{
     { v+ [ [ (simd-v+) ] float-4-vv->v-op ] }
     { v- [ [ (simd-v-) ] float-4-vv->v-op ] }
     { v* [ [ (simd-v*) ] float-4-vv->v-op ] }
@@ -146,7 +148,7 @@ PRIVATE>
     { sum [ [ (simd-sum) ] float-4-v->n-op ] }
 } simd-vector-words
 
-\ double-2 \ double-2-with float H{
+\ double-2 \ double-2-with m:float H{
     { v+ [ [ (simd-v+) ] double-2-vv->v-op ] }
     { v- [ [ (simd-v-) ] double-2-vv->v-op ] }
     { v* [ [ (simd-v*) ] double-2-vv->v-op ] }
@@ -156,7 +158,7 @@ PRIVATE>
     { sum [ [ (simd-sum) ] double-2-v->n-op ] }
 } simd-vector-words
 
-\ float-8 \ float-8-with float H{
+\ float-8 \ float-8-with m:float H{
     { v+ [ [ (simd-v+) ] float-8-vv->v-op ] }
     { v- [ [ (simd-v-) ] float-8-vv->v-op ] }
     { v* [ [ (simd-v*) ] float-8-vv->v-op ] }
@@ -166,7 +168,7 @@ PRIVATE>
     { sum [ [ (simd-sum) ] [ + ] float-8-v->n-op ] }
 } simd-vector-words
 
-\ double-4 \ double-4-with float H{
+\ double-4 \ double-4-with m:float H{
     { v+ [ [ (simd-v+) ] double-4-vv->v-op ] }
     { v- [ [ (simd-v-) ] double-4-vv->v-op ] }
     { v* [ [ (simd-v*) ] double-4-vv->v-op ] }

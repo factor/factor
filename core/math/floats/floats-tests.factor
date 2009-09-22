@@ -67,3 +67,11 @@ unit-test
 [ t ] [ 0/0. 1.0 unordered? ] unit-test
 [ f ] [ 1.0 1.0 unordered? ] unit-test
 
+[ t ] [ -0.0 fp-sign ] unit-test
+[ t ] [ -1.0 fp-sign ] unit-test
+[ f ] [ 0.0 fp-sign ] unit-test
+[ f ] [ 1.0 fp-sign ] unit-test
+
+[ t ] [ -0.0 abs 0.0 fp-bitwise= ] unit-test
+[ 1.5 ] [ -1.5 abs ] unit-test
+[ 1.5 ] [ 1.5 abs ] unit-test

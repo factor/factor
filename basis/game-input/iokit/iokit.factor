@@ -3,7 +3,8 @@ kernel cocoa.enumeration destructors math.parser cocoa.application
 sequences locals combinators.short-circuit threads
 namespaces assocs arrays combinators hints alien
 core-foundation.run-loop accessors sequences.private
-alien.c-types math parser game-input vectors bit-arrays ;
+alien.c-types alien.data math parser game-input vectors
+bit-arrays ;
 IN: game-input.iokit
 
 SINGLETON: iokit-game-input-backend

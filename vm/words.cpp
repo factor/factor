@@ -3,12 +3,12 @@
 namespace factor
 {
 
-word *allot_word(cell vocab_, cell name_)
+word *factorvm::allot_word(cell vocab_, cell name_)
 {
-	gc_root<object> vocab(vocab_);
-	gc_root<object> name(name_);
+	gc_root<object> vocab(vocab_,this);
+	gc_root<object> name(name_,this);
 
-	gc_root<word> new_word(allot<word>(sizeof(word)));
+	gc_root<word> new_word(allot<word>(sizeof(word)),this);
 
 	new_word->hashcode = tag_fixnum((rand() << 16) ^ rand());
 	new_word->vocabulary = vocab.value();
@@ -32,15 +32,20 @@ word *allot_word(cell vocab_, cell name_)
 }
 
 /* <word> ( name vocabulary -- word ) */
-PRIMITIVE(word)
+inline void factorvm::vmprim_word()
 {
 	cell vocab = dpop();
 	cell name = dpop();
 	dpush(tag<word>(allot_word(vocab,name)));
 }
 
+PRIMITIVE(word)
+{
+	PRIMITIVE_GETVM()->vmprim_word();
+}
+
 /* word-xt ( word -- start end ) */
-PRIMITIVE(word_xt)
+inline void factorvm::vmprim_word_xt()
 {
 	word *w = untag_check<word>(dpop());
 	code_block *code = (profiling_p ? w->profiling : w->code);
@@ -48,10 +53,15 @@ PRIMITIVE(word_xt)
 	dpush(allot_cell((cell)code + code->size));
 }
 
-/* Allocates memory */
-void update_word_xt(cell w_)
+PRIMITIVE(word_xt)
 {
-	gc_root<word> w(w_);
+	PRIMITIVE_GETVM()->vmprim_word_xt();
+}
+
+/* Allocates memory */
+void factorvm::update_word_xt(cell w_)
+{
+	gc_root<word> w(w_,this);
 
 	if(profiling_p)
 	{
@@ -64,16 +74,26 @@ void update_word_xt(cell w_)
 		w->xt = w->code->xt();
 }
 
-PRIMITIVE(optimized_p)
+inline void factorvm::vmprim_optimized_p()
 {
 	drepl(tag_boolean(word_optimized_p(untag_check<word>(dpeek()))));
 }
 
-PRIMITIVE(wrapper)
+PRIMITIVE(optimized_p)
+{
+	PRIMITIVE_GETVM()->vmprim_optimized_p();
+}
+
+inline void factorvm::vmprim_wrapper()
 {
 	wrapper *new_wrapper = allot<wrapper>(sizeof(wrapper));
 	new_wrapper->object = dpeek();
 	drepl(tag<wrapper>(new_wrapper));
+}
+
+PRIMITIVE(wrapper)
+{
+	PRIMITIVE_GETVM()->vmprim_wrapper();
 }
 
 }

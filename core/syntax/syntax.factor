@@ -73,6 +73,8 @@ IN: bootstrap.syntax
     "OCT:" [ 8 parse-base ] define-core-syntax
     "BIN:" [ 2 parse-base ] define-core-syntax
 
+    "NAN:" [ 16 scan-base <fp-nan> parsed ] define-core-syntax
+
     "f" [ f parsed ] define-core-syntax
     "t" "syntax" lookup define-singleton-class
 

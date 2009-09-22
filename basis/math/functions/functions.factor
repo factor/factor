@@ -137,13 +137,13 @@ M: real absq sq ; inline
     [ - abs ] dip < ;
 
 : ~rel ( x y epsilon -- ? )
-    [ [ - abs ] 2keep [ abs ] bi@ + ] dip * < ;
+    [ [ - abs ] 2keep [ abs ] bi@ + ] dip * <= ;
 
 : ~ ( x y epsilon -- ? )
     {
         { [ 2over [ fp-nan? ] either? ] [ 3drop f ] }
         { [ dup zero? ] [ drop number= ] }
-        { [ dup 0 < ] [ ~rel ] }
+        { [ dup 0 < ] [ neg ~rel ] }
         [ ~abs ]
     } cond ;
 
@@ -173,7 +173,11 @@ M: float log1+ dup -1.0 >= [ flog1+ ] [ 1.0 + 0.0 rect> log ] if ; inline
 
 : 10^ ( x -- y ) 10 swap ^ ; inline
 
-: log10 ( x -- y ) log 10 log / ; inline
+GENERIC: log10 ( x -- y ) foldable
+
+M: real log10 >float flog10 ; inline
+
+M: complex log10 log 10 log / ; inline
 
 GENERIC: cos ( x -- y ) foldable
 

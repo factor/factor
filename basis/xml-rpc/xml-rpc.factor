@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel xml arrays math generic http.client
-combinators hashtables namespaces io base64 sequences strings
-calendar xml.data xml.writer xml.traversal assocs math.parser
-debugger calendar.format math.order xml.syntax ;
+USING: accessors arrays assocs base64 calendar calendar.format
+combinators debugger generic hashtables http http.client
+http.client.private io io.encodings.string io.encodings.utf8
+kernel math math.order math.parser namespaces sequences strings
+xml xml.data xml.syntax xml.traversal xml.writer ;
 IN: xml-rpc
 
 ! * Sending RPC requests
@@ -174,9 +175,20 @@ TAG: array xml>item
         ] [ "Bad main tag name" server-error ] if
     ] if ;
 
+<PRIVATE
+
+: xml-post-data ( xml -- post-data )
+    xml>string utf8 encode "text/xml" <post-data> swap >>data ;
+
+: rpc-post-request ( xml url -- request )
+    [ send-rpc xml-post-data ] [ "POST" <client-request> ] bi*
+    swap >>post-data ;
+
+PRIVATE>
+
 : post-rpc ( rpc url -- rpc )
     ! This needs to do something in the event of an error
-    [ send-rpc ] dip http-post nip string>xml receive-rpc ;
+    rpc-post-request http-request nip string>xml receive-rpc ;
 
 : invoke-method ( params method url -- response )
     [ swap <rpc-method> ] dip post-rpc ;
