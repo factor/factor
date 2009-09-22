@@ -147,7 +147,7 @@ SYMBOL: fast-math-ops
 : math-both-known? ( word left right -- ? )
     3dup math-op
     [ 2drop 2drop t ]
-    [ drop math-class-max swap specific-method >boolean ] if ;
+    [ drop math-class-max swap method-for-class >boolean ] if ;
 
 : (derived-ops) ( word assoc -- words )
     swap '[ swap first _ eq? nip ] assoc-filter ;
@@ -197,6 +197,12 @@ SYMBOL: fast-math-ops
         \ <=      define-math-ops
         \ >       define-math-ops
         \ >=      define-math-ops
+
+        \ u<      define-math-ops
+        \ u<=     define-math-ops
+        \ u>      define-math-ops
+        \ u>=     define-math-ops
+
         \ number= define-math-ops
 
         { { shift bignum bignum } bignum-shift } ,

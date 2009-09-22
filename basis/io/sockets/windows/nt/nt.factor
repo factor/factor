@@ -1,4 +1,4 @@
-USING: alien alien.accessors alien.c-types byte-arrays
+USING: alien alien.accessors alien.c-types alien.data byte-arrays
 continuations destructors io.ports io.timeouts io.sockets
 io.sockets.private io namespaces io.streams.duplex
 io.backend.windows io.sockets.windows io.backend.windows.nt

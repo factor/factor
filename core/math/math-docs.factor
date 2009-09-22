@@ -5,7 +5,9 @@ IN: math
 HELP: number=
 { $values { "x" number } { "y" number } { "?" "a boolean" } }
 { $description "Tests if two numbers have the same numeric value." }
-{ $notes "This word differs from " { $link = } " in that it disregards differences in type when comparing numbers." }
+{ $notes "This word differs from " { $link = } " in that it disregards differences in type when comparing numbers."
+$nl
+"This word performs an unordered comparison on floating point numbers. See " { $link "math.floats.compare" } " for an explanation." }
 { $examples
     { $example "USING: math prettyprint ;" "3.0 3 number= ." "t" }
     { $example "USING: kernel math prettyprint ;" "3.0 3 = ." "f" }
@@ -13,20 +15,47 @@ HELP: number=
 
 HELP: <
 { $values { "x" real } { "y" real } { "?" boolean } }
-{ $description "Tests if " { $snippet "x" } " is less than " { $snippet "y" } "." } ;
+{ $description "Tests if " { $snippet "x" } " is less than " { $snippet "y" } "." }
+{ $notes "This word performs an ordered comparison on floating point numbers. See " { $link "math.floats.compare" } " for an explanation." } ;
 
 HELP: <=
 { $values { "x" real } { "y" real } { "?" boolean } }
-{ $description "Tests if " { $snippet "x" } " is less than or equal to " { $snippet "y" } "." } ;
+{ $description "Tests if " { $snippet "x" } " is less than or equal to " { $snippet "y" } "." }
+{ $notes "This word performs an ordered comparison on floating point numbers. See " { $link "math.floats.compare" } " for an explanation." } ;
 
 HELP: >
 { $values { "x" real } { "y" real } { "?" boolean } }
-{ $description "Tests if " { $snippet "x" } " is greater than " { $snippet "y" } "." } ;
+{ $description "Tests if " { $snippet "x" } " is greater than " { $snippet "y" } "." }
+{ $notes "This word performs an ordered comparison on floating point numbers. See " { $link "math.floats.compare" } " for an explanation." } ;
 
 HELP: >=
 { $values { "x" real } { "y" real } { "?" boolean } }
-{ $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." } ;
+{ $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." }
+{ $notes "This word performs an ordered comparison on floating point numbers. See " { $link "math.floats.compare" } " for an explanation." } ;
 
+HELP: unordered?
+{ $values { "x" real } { "y" real } { "?" boolean } }
+{ $description "Tests if " { $snippet "x" } " is unordered with respect to " { $snippet "y" } ". This can only occur if one or both values is a floating-point Not-a-Number value." } ;
+
+HELP: u<
+{ $values { "x" real } { "y" real } { "?" boolean } }
+{ $description "Tests if " { $snippet "x" } " is less than " { $snippet "y" } "." }
+{ $notes "This word performs an unordered comparison on floating point numbers. On rational numbers it is equivalent to " { $link < } ". See " { $link "math.floats.compare" } " for an explanation." } ;
+
+HELP: u<=
+{ $values { "x" real } { "y" real } { "?" boolean } }
+{ $description "Tests if " { $snippet "x" } " is less than or equal to " { $snippet "y" } "." }
+{ $notes "This word performs an unordered comparison on floating point numbers. On rational numbers it is equivalent to " { $link <= } ". See " { $link "math.floats.compare" } " for an explanation." } ;
+
+HELP: u>
+{ $values { "x" real } { "y" real } { "?" boolean } }
+{ $description "Tests if " { $snippet "x" } " is greater than " { $snippet "y" } "." }
+{ $notes "This word performs an unordered comparison on floating point numbers. On rational numbers it is equivalent to " { $link > } ". See " { $link "math.floats.compare" } " for an explanation." } ;
+
+HELP: u>=
+{ $values { "x" real } { "y" real } { "?" boolean } }
+{ $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." }
+{ $notes "This word performs an unordered comparison on floating point numbers. On rational numbers it is equivalent to " { $link >= } ". See " { $link "math.floats.compare" } " for an explanation." } ;
 
 HELP: +
 { $values { "x" number } { "y" number } { "z" number } }
@@ -277,7 +306,32 @@ HELP: fp-bitwise=
     { "x" float } { "y" float }
     { "?" boolean }
 }
-{ $description "Compares two floating point numbers for bit equality." } ;
+{ $description "Compares two floating point numbers for bit equality." }
+{ $notes "Unlike " { $link = } " or " { $link number= } ", this word will consider NaNs with equal payloads to be equal, and positive zero and negative zero to be not equal." }
+{ $examples
+    "Not-a-number equality:"
+    { $example
+        "USING: kernel math prettyprint ;"
+        "0.0 0.0 / dup number= ."
+        "f"
+    }
+    { $example
+        "USING: kernel math prettyprint ;"
+        "0.0 0.0 / dup fp-bitwise= ."
+        "t"
+    }
+    "Signed zero equality:"
+    { $example
+        "USING: math prettyprint ;"
+        "-0.0 0.0 fp-bitwise= ."
+        "f"
+    }
+    { $example
+        "USING: math prettyprint ;"
+        "-0.0 0.0 number= ."
+        "t"
+    }
+} ;
 
 HELP: fp-special?
 { $values { "x" real } { "?" "a boolean" } }
@@ -302,6 +356,10 @@ HELP: fp-infinity?
     { $example "USING: math prettyprint ;" "1/0. fp-infinity? ." "t" }
     { $example "USING: io kernel math ;" "-1/0. [ fp-infinity? ] [ 0 < ] bi and [ \"negative infinity\" print ] when" "negative infinity" }
 } ;
+
+HELP: fp-sign
+{ $values { "x" float } { "?" "a boolean" } }
+{ $description "Outputs the sign bit of " { $snippet "x" } ". For ordered non-zero values, this is equivalent to calling " { $snippet "0 <" } ". For zero values, this outputs the zero's sign bit." } ;
 
 HELP: fp-nan-payload
 { $values { "x" real } { "bits" integer } }

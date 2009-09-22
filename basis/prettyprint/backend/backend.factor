@@ -45,7 +45,23 @@ M: method-body pprint*
         ] "" make
     ] [ word-style ] bi styled-text ;
 
-M: real pprint* number>string text ;
+M: real pprint*
+    number-base get {
+        { 16 [ \ HEX: [ 16 >base text ] pprint-prefix ] }
+        {  8 [ \ OCT: [  8 >base text ] pprint-prefix ] }
+        {  2 [ \ BIN: [  2 >base text ] pprint-prefix ] }
+        [ drop number>string text ]
+    } case ;
+
+M: float pprint*
+    dup fp-nan? [
+        \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
+    ] [
+        number-base get {
+            { 16 [ \ HEX: [ 16 >base text ] pprint-prefix ] }
+            [ drop number>string text ]
+        } case
+    ] if ;
 
 M: f pprint* drop \ f pprint-word ;
 

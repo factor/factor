@@ -5,7 +5,7 @@ threads sequences byte-arrays io.binary io.backend.unix
 io.streams.duplex io.backend io.pathnames io.sockets.private
 io.files.private io.encodings.utf8 math.parser continuations
 libc combinators system accessors destructors unix locals init
-classes.struct ;
+classes.struct alien.data ;
 
 EXCLUDE: namespaces => bind ;
 EXCLUDE: io => read write ;

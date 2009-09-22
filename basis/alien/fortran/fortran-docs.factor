@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations sequences strings words.symbol ;
+USING: help.markup help.syntax kernel quotations sequences strings words.symbol classes.struct ;
 QUALIFIED-WITH: alien.syntax c
 IN: alien.fortran
 
@@ -25,7 +25,7 @@ ARTICLE: "alien.fortran-types" "Fortran types"
     { { $snippet "DOUBLE-COMPLEX" } " specifies a double-precision floating-point complex value. The alias " { $snippet "COMPLEX*16" } " is also recognized." }
     { { $snippet "CHARACTER(n)" } " specifies a character string of length " { $snippet "n" } ". The Fortran 77 syntax " { $snippet "CHARACTER*n" } " is also recognized." }
     { "Fortran arrays can be specified by suffixing a comma-separated set of dimensions in parentheses, e.g. " { $snippet "REAL(2,3,4)" } ". Arrays of unspecified length can be specified using " { $snippet "*" } " as a dimension. Arrays are passed in as flat " { $link "specialized-arrays" } "." }
-    { "Fortran records defined by " { $link POSTPONE: RECORD: } " and C structs defined by " { $link POSTPONE: c:C-STRUCT: } " are also supported as parameter and return types." }
+    { "Struct classes defined by " { $link POSTPONE: STRUCT: } " are also supported as parameter and return types." }
 }
 "When declaring the parameters of Fortran functions, an output argument can be specified by prefixing an exclamation point to the type name. This will cause the function word to leave the final value of the parameter on the stack." ;
 
@@ -41,10 +41,6 @@ HELP: LIBRARY:
 { $syntax "LIBRARY: name" }
 { $values { "name" "a logical library name" } }
 { $description "Sets the logical library for subsequent " { $link POSTPONE: FUNCTION: } " and " { $link POSTPONE: SUBROUTINE: } " definitions. The given library name must have been opened with a previous call to " { $link add-fortran-library } "." } ;
-
-HELP: RECORD:
-{ $syntax "RECORD: NAME { \"TYPE\" \"SLOT\" } ... ;" }
-{ $description "Defines a Fortran record type with the given slots. The record is defined as the corresponding C struct and can be used as a type for subsequent Fortran or C function declarations." } ;
 
 HELP: add-fortran-library
 { $values { "name" string } { "soname" string } { "fortran-abi" symbol } } 
@@ -66,7 +62,6 @@ ARTICLE: "alien.fortran" "Fortran FFI"
 { $subsection POSTPONE: LIBRARY: }
 { $subsection POSTPONE: FUNCTION: }
 { $subsection POSTPONE: SUBROUTINE: }
-{ $subsection POSTPONE: RECORD: }
 { $subsection fortran-invoke }
 ;
 

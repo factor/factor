@@ -19,7 +19,7 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
 
 : alien-stack ( params extra -- )
     over parameters>> length + consume-d >>in-d
-    dup return>> "void" = 0 1 ? produce-d >>out-d
+    dup return>> void? 0 1 ? produce-d >>out-d
     drop ;
 
 : return-prep-quot ( node -- quot )

@@ -1,6 +1,6 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors alien alien.c-types alien.complex alien.parser
-alien.strings alien.structs alien.syntax arrays ascii assocs
+USING: accessors alien alien.c-types alien.complex alien.data grouping
+alien.strings alien.syntax arrays ascii assocs
 byte-arrays combinators combinators.short-circuit fry generalizations
 kernel lexer macros math math.parser namespaces parser sequences
 splitting stack-checker vectors vocabs.parser words locals
@@ -415,14 +415,6 @@ PRIVATE>
 : fortran-sig>c-sig ( fortran-return fortran-args -- c-return c-args )
     [ fortran-ret-type>c-type ] [ fortran-arg-types>c-types ] bi* append ;
 
-: fortran-record>c-struct ( record -- struct )
-    [ first2 [ fortran-type>c-type ] [ >lower ] bi* 2array ] map ;
-
-: define-fortran-record ( name vocab fields -- )
-    [ >lower ] [ ] [ fortran-record>c-struct ] tri* define-struct ;
-
-SYNTAX: RECORD: scan current-vocab parse-definition define-fortran-record ;
-
 : set-fortran-abi ( library -- )
     library-fortran-abis get-global at fortran-abi set ;
 
@@ -436,6 +428,11 @@ SYNTAX: RECORD: scan current-vocab parse-definition define-fortran-record ;
 
 MACRO: fortran-invoke ( return library function parameters -- )
     { [ 2drop nip set-fortran-abi ] [ (fortran-invoke) ] } 4 ncleave ;
+
+: parse-arglist ( parameters return -- types effect )
+    [ 2 group unzip [ "," ?tail drop ] map ]
+    [ [ { } ] [ 1array ] if-void ]
+    bi* <effect> ;
 
 :: define-fortran-function ( return library function parameters -- )
     function create-in dup reset-generic 

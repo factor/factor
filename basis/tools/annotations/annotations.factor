@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math sorting words parser io summary
 quotations sequences prettyprint continuations effects
-definitions compiler.units namespaces assocs tools.walker
-tools.time generic inspector fry tools.continuations
-locals generalizations macros ;
+definitions compiler.units namespaces assocs tools.time generic
+inspector fry locals generalizations macros ;
 IN: tools.annotations
 
 <PRIVATE
@@ -89,12 +88,6 @@ PRIVATE>
 
 : watch-vars ( word vars -- )
     dupd '[ [ _ _ ] dip (watch-vars) ] annotate ;
-
-: breakpoint ( word -- )
-    [ add-breakpoint ] annotate ;
-
-: breakpoint-if ( word quot -- )
-    '[ [ _ [ [ break ] when ] ] dip 3append ] annotate ;
 
 SYMBOL: word-timing
 

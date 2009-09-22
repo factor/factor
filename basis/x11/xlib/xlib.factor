@@ -10,9 +10,10 @@
 ! add to this library and are wondering what part of the file to
 ! modify, just find the function or data structure in the manual
 ! and note the section.
-USING: accessors kernel arrays alien alien.c-types alien.strings
-alien.syntax classes.struct math math.bitwise words sequences
-namespaces continuations io io.encodings.ascii x11.syntax ;
+USING: accessors kernel arrays alien alien.c-types alien.data
+alien.strings alien.syntax classes.struct math math.bitwise words
+sequences namespaces continuations io io.encodings.ascii x11.syntax ;
+FROM: alien.c-types => short ;
 IN: x11.xlib
 
 LIBRARY: xlib
