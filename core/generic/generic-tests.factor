@@ -1,8 +1,9 @@
-USING: accessors alien arrays definitions generic generic.standard
-generic.math assocs hashtables io kernel math namespaces parser
-prettyprint sequences strings tools.test vectors words
-quotations classes classes.algebra classes.tuple continuations
-layouts classes.union sorting compiler.units eval io.streams.string ;
+USING: accessors alien arrays assocs classes classes.algebra
+classes.tuple classes.union compiler.units continuations
+definitions eval generic generic.math generic.standard
+hashtables io io.streams.string kernel layouts math math.order
+namespaces parser prettyprint quotations sequences sorting
+strings tools.test vectors words ;
 IN: generic.tests
 
 GENERIC: foobar ( x -- y )

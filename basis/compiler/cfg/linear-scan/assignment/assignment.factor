@@ -28,10 +28,12 @@ SYMBOL: pending-interval-assoc
 : remove-pending ( live-interval -- )
     vreg>> pending-interval-assoc get delete-at ;
 
+ERROR: bad-vreg vreg ;
+
 : (vreg>reg) ( vreg pending -- reg )
     ! If a live vreg is not in the pending set, then it must
     ! have been spilled.
-    ?at [ spill-slots get at <spill-slot> ] unless ;
+    ?at [ spill-slots get ?at [ <spill-slot> ] [ bad-vreg ] if ] unless ;
 
 : vreg>reg ( vreg -- reg )
     pending-interval-assoc get (vreg>reg) ;
@@ -156,8 +158,6 @@ M: insn assign-registers-in-insn drop ;
 
 : end-block ( bb -- )
     [ live-out vregs>regs ] keep register-live-outs get set-at ;
-
-ERROR: bad-vreg vreg ;
 
 : vreg-at-start ( vreg bb -- state )
     register-live-ins get at ?at [ bad-vreg ] unless ;
