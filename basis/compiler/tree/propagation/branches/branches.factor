@@ -155,10 +155,6 @@ M: #phi propagate-after ( #phi -- )
         ] 3each
     ] [ drop ] if ;
 
-M: #phi propagate-around ( #phi -- )
-    ! Is this necessary?
-    [ propagate-before ] [ propagate-after ] bi ;
-
 M: #branch propagate-around
     dup live-branches >>live-branches
     [ infer-children ] [ annotate-node ] bi ;
