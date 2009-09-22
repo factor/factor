@@ -416,3 +416,18 @@ cell 4 = [
 [ 1 "0.169967142900241" "0.9854497299884601" ] [ 1.4 1 [ swap >float [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
 
 [ 6.0 ] [ 1.0 [ >float 3.0 + [ B{ 0 0 0 0 } 0 set-alien-float ] [ 2.0 + ] bi ] compile-call ] unit-test
+
+! Bug in linearization
+[ 283686952174081 ] [
+    B{ 1 1 1 1 } [
+        { byte-array } declare
+        [ 0 2 ] dip
+        [
+            [ drop ] 2dip
+            [
+                swap 1 < [ [ ] dip ] [ [ ] dip ] if
+                0 alien-signed-4
+            ] curry dup bi *
+        ] curry each-integer
+    ] compile-call
+] unit-test
