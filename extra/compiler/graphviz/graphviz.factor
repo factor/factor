@@ -18,14 +18,17 @@ IN: compiler.graphviz
         "}" ,
     ] { } make , ; inline
 
-: render-graph ( quot -- )
+: render-graph ( quot -- name )
     { } make
     "cfg" ".dot" make-unique-file
     dup "Wrote " prepend print
     [ [ concat ] dip ascii set-file-lines ]
     [ { "dot" "-Tpng" "-O" } swap suffix try-process ]
-    [ ".png" append "open" swap 2array try-process ]
+    [ ".png" append ]
     tri ; inline
+
+: display-graph ( name -- )
+    "open" swap 2array try-process ;
 
 : attrs>string ( seq -- str )
     [ "" ] [ "," join "[" "]" surround ] if-empty ;
@@ -75,12 +78,12 @@ IN: compiler.graphviz
 : optimized-cfg ( quot -- cfgs )
     {
         { [ dup cfg? ] [ 1array ] }
-        { [ dup quotation? ] [ test-cfg [ optimize-cfg ] map ] }
-        { [ dup word? ] [ test-cfg [ optimize-cfg ] map ] }
+        { [ dup quotation? ] [ test-cfg [ dup cfg set optimize-cfg ] map ] }
+        { [ dup word? ] [ test-cfg [ dup cfg set optimize-cfg ] map ] }
         [ ]
     } cond ;
 
-: render-cfg ( cfg -- )
+: render-cfg ( cfg -- name )
     optimized-cfg [ cfgs ] render-graph ;
 
 : dom-trees ( cfgs -- )
@@ -95,7 +98,7 @@ IN: compiler.graphviz
         ] over cfg-title graph,
     ] each ;
 
-: render-dom ( cfg -- )
+: render-dom ( cfg -- name )
     optimized-cfg [ dom-trees ] render-graph ;
 
 SYMBOL: word-counts
@@ -131,7 +134,7 @@ SYMBOL: vertex-names
     H{ } clone vertex-names set
     [ "ROOT" ] dip (call-graph-edges) ;
 
-: render-call-graph ( tree -- )
+: render-call-graph ( tree -- name )
     dup quotation? [ build-tree ] when
     analyze-recursive drop
     [ [ call-graph get call-graph-edges ] "Call graph" graph, ]

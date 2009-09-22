@@ -8,9 +8,6 @@ $nl
 "Printing messages when a word is called or returns:"
 { $subsection watch }
 { $subsection watch-vars }
-"Starting the walker when a word is called:"
-{ $subsection breakpoint }
-{ $subsection breakpoint-if }
 "Timing words:"
 { $subsection reset-word-timing }
 { $subsection add-timing }
@@ -33,14 +30,6 @@ HELP: watch
 { $description "Annotates a word definition to print the data stack on entry and exit." } ;
 
 { watch watch-vars reset } related-words
-
-HELP: breakpoint
-{ $values { "word" word } }
-{ $description "Annotates a word definition to enter the single stepper when executed." } ;
-
-HELP: breakpoint-if
-{ $values { "quot" { $quotation "( -- ? )" } } { "word" word } }
-{ $description "Annotates a word definition to enter the single stepper if the quotation yields true." } ;
 
 HELP: reset
 { $values
