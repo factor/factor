@@ -3,7 +3,7 @@
 USING: accessors assocs deques dlists kernel make sorting
 namespaces sequences combinators combinators.short-circuit
 fry math sets compiler.cfg.rpo compiler.cfg.utilities
-compiler.cfg.loop-detection ;
+compiler.cfg.loop-detection compiler.cfg.predecessors ;
 IN: compiler.cfg.linearization.order
 
 ! This is RPO except loops are rotated. Based on SBCL's src/compiler/control.lisp
@@ -56,10 +56,12 @@ SYMBOLS: work-list loop-heads visited ;
     successors>> <reversed> [ loop-nesting-at ] sort-with ;
 
 : process-block ( bb -- )
-    [ , ]
-    [ visited get conjoin ]
-    [ sorted-successors [ process-successor ] each ]
-    tri ;
+    dup visited? [ drop ] [
+        [ , ]
+        [ visited get conjoin ]
+        [ sorted-successors [ process-successor ] each ]
+        tri
+    ] if ;
 
 : (linearization-order) ( cfg -- bbs )
     init-linearization-order
@@ -69,7 +71,7 @@ SYMBOLS: work-list loop-heads visited ;
 PRIVATE>
 
 : linearization-order ( cfg -- bbs )
-    needs-post-order needs-loops
+    needs-post-order needs-loops needs-predecessors
 
     dup linear-order>> [ ] [
         dup (linearization-order)

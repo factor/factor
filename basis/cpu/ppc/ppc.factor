@@ -9,6 +9,7 @@ compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.cfg.build-stack-frame
 compiler.units compiler.constants compiler.codegen vm ;
 FROM: cpu.ppc.assembler => B ;
+FROM: layouts => cell ;
 FROM: math => float ;
 IN: cpu.ppc
 
