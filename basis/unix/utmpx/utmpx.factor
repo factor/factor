@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax combinators continuations
-io.encodings.string io.encodings.utf8 kernel sequences strings
-unix calendar system accessors unix.time calendar.unix
-vocabs.loader ;
+USING: alien.c-types alien.data alien.syntax combinators
+continuations io.encodings.string io.encodings.utf8 kernel
+sequences strings unix calendar system accessors unix.time
+calendar.unix vocabs.loader classes.struct ;
 IN: unix.utmpx
 
 CONSTANT: EMPTY 0
@@ -39,15 +39,15 @@ M: unix new-utmpx-record
     utmpx-record new ;
     
 M: unix utmpx>utmpx-record ( utmpx -- utmpx-record )
-    [ new-utmpx-record ] dip
+    [ new-utmpx-record ] dip \ utmpx memory>struct
     {
-        [ utmpx-ut_user _UTX_USERSIZE memory>string >>user ]
-        [ utmpx-ut_id _UTX_IDSIZE memory>string >>id ]
-        [ utmpx-ut_line _UTX_LINESIZE memory>string >>line ]
-        [ utmpx-ut_pid >>pid ]
-        [ utmpx-ut_type >>type ]
-        [ utmpx-ut_tv timeval>unix-time >>timestamp ]
-        [ utmpx-ut_host _UTX_HOSTSIZE memory>string >>host ]
+        [ ut_user>> _UTX_USERSIZE memory>string >>user ]
+        [ ut_id>>   _UTX_IDSIZE memory>string >>id ]
+        [ ut_line>> _UTX_LINESIZE memory>string >>line ]
+        [ ut_pid>>  >>pid ]
+        [ ut_type>> >>type ]
+        [ ut_tv>>   timeval>unix-time >>timestamp ]
+        [ ut_host>> _UTX_HOSTSIZE memory>string >>host ]
     } cleave ;
 
 : with-utmpx ( quot -- )

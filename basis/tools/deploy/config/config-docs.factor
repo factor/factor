@@ -1,4 +1,4 @@
-USING: help.markup help.syntax words alien.c-types assocs
+USING: help.markup help.syntax words alien.c-types alien.data assocs
 kernel math ;
 IN: tools.deploy.config
 

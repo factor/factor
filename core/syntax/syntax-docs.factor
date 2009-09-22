@@ -593,10 +593,13 @@ HELP: #!
 { $description "Discards all input until the end of the line." } ;
 
 HELP: HEX:
-{ $syntax "HEX: integer" }
-{ $values { "integer" "hexadecimal digits (0-9, a-f, A-F)" } }
-{ $description "Adds an integer read from a hexadecimal literal to the parse tree." }
-{ $examples { $example "USE: prettyprint" "HEX: ff ." "255" } } ;
+{ $syntax "HEX: NNN" "HEX: NNN.NNNpEEE" }
+{ $values { "N" "hexadecimal digit (0-9, a-f, A-F)" } { "pEEE" "decimal exponent value" } }
+{ $description "Adds an integer or floating-point value read from a hexadecimal literal to the parse tree." }
+{ $examples
+    { $example "USE: prettyprint" "HEX: ff ." "255" }
+    { $example "USE: prettyprint" "HEX: 1.8p5 ." "48.0" }
+} ;
 
 HELP: OCT:
 { $syntax "OCT: integer" }

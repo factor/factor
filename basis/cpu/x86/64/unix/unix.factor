@@ -16,9 +16,10 @@ M: float-regs param-regs
 
 M: x86.64 reserved-area-size 0 ;
 
-! The ABI for passing structs by value is pretty messed up
-<< "void*" c-type clone "__stack_value" define-primitive-type
-stack-params "__stack_value" c-type (>>rep) >>
+SYMBOL: (stack-value)
+! The ABI for passing structs by value is pretty great
+<< void* c-type clone \ (stack-value) define-primitive-type
+stack-params \ (stack-value) c-type (>>rep) >>
 
 : struct-types&offset ( struct-type -- pairs )
     fields>> [
@@ -33,12 +34,12 @@ stack-params "__stack_value" c-type (>>rep) >>
 : flatten-small-struct ( c-type -- seq )
     struct-types&offset split-struct [
         [ c-type c-type-rep reg-class-of ] map
-        int-regs swap member? "void*" "double" ? c-type
+        int-regs swap member? void* double ? c-type
     ] map ;
 
 : flatten-large-struct ( c-type -- seq )
     heap-size cell align
-    cell /i "__stack_value" c-type <repetition> ;
+    cell /i \ (stack-value) c-type <repetition> ;
 
 : flatten-struct ( c-type -- seq )
     dup heap-size 16 > [

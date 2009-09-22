@@ -1,4 +1,5 @@
-USING: classes.struct cocoa core-foundation.strings ;
+USING: classes.struct cocoa cocoa.application cocoa.classes
+cocoa.enumeration cocoa.plists core-foundation.strings kernel ;
 IN: qtkit
 
 STRUCT: QTTime
@@ -74,3 +75,19 @@ IMPORT: QTMovieView
 IMPORT: QTSampleBuffer
 IMPORT: QTTrack
 
+: <movie> ( filename -- movie )
+    QTMovie swap <NSString> f -> movieWithFile:error: -> retain ;
+
+: movie-attributes ( movie -- attributes )
+    -> movieAttributes plist> ;
+
+: play ( movie -- )
+    -> play ;
+: stop ( movie -- )
+    -> stop ;
+
+: movie-tracks ( movie -- tracks )
+    -> tracks NSFastEnumeration>vector ;
+
+: track-attributes ( track -- attributes )
+    -> trackAttributes plist> ;

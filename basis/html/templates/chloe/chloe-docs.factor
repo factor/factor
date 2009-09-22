@@ -24,7 +24,7 @@ HELP: compile-attr
 { $description "Compiles code which pushes an attribute value previously extracted by " { $link required-attr } " or " { $link optional-attr } " on the stack. If the attribute value begins with " { $snippet "@" } ", compiles into code which pushes the a form value." } ;
 
 HELP: CHLOE:
-{ $syntax "name definition... ;" }
+{ $syntax "CHLOE: name definition... ;" }
 { $values { "name" "the tag name" } { "definition" { $quotation "( tag -- )" } } }
 { $description "Defines compilation semantics for the Chloe tag named " { $snippet "tag" } ". The definition body receives a " { $link tag } " on the stack." } ;
 

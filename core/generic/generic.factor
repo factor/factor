@@ -24,20 +24,42 @@ M: generic definition drop f ;
 : method ( class generic -- method/f )
     "methods" word-prop at ;
 
-: order ( generic -- seq )
-    "methods" word-prop keys sort-classes ;
+<PRIVATE
 
-: specific-method ( class generic -- method/f )
-    [ nip ] [ order min-class ] 2bi
-    dup [ swap method ] [ 2drop f ] if ;
+: interesting-class? ( class1 class2 -- ? )
+    {
+        ! Case 1: no intersection. Discard and keep going
+        { [ 2dup classes-intersect? not ] [ 2drop t ] }
+        ! Case 2: class1 contained in class2. Add to
+        ! interesting set and keep going.
+        { [ 2dup class<= ] [ nip , t ] }
+        ! Case 3: class1 and class2 are incomparable. Give up
+        [ 2drop f ]
+    } cond ;
+
+: interesting-classes ( class classes -- interesting/f )
+    [ [ interesting-class? ] with all? ] { } make and ;
+
+PRIVATE>
+
+: method-classes ( generic -- classes )
+    "methods" word-prop keys ;
+
+: order ( generic -- seq )
+    method-classes sort-classes ;
+
+: nearest-class ( class generic -- class/f )
+    method-classes interesting-classes smallest-class ;
+
+: method-for-class ( class generic -- method/f )
+    [ nip ] [ nearest-class ] 2bi dup [ swap method ] [ 2drop f ] if ;
 
 GENERIC: effective-method ( generic -- method )
 
 \ effective-method t "no-compile" set-word-prop
 
 : next-method-class ( class generic -- class/f )
-    order [ class<= ] with filter reverse dup length 1 =
-    [ drop f ] [ second ] if ;
+    method-classes [ class< ] with filter smallest-class ;
 
 : next-method ( class generic -- method/f )
     [ next-method-class ] keep method ;

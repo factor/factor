@@ -4,7 +4,7 @@ tools.test words quotations classes classes.algebra
 classes.private classes.union classes.mixin classes.predicate
 vectors source-files compiler.units growable random
 stack-checker effects kernel.private sbufs math.order
-classes.tuple accessors ;
+classes.tuple accessors generic.private ;
 IN: classes.algebra.tests
 
 : class-and* ( cls1 cls2 cls3 -- ? ) [ class-and ] dip class= ;
@@ -150,6 +150,12 @@ UNION: z1 b1 c1 ;
 ] unit-test
 
 ! Test method inlining
+[ real ] [ { real sequence } smallest-class ] unit-test
+[ real ] [ { sequence real } smallest-class ] unit-test
+
+: min-class ( class classes -- class/f )
+    interesting-classes smallest-class ;
+
 [ f ] [ fixnum { } min-class ] unit-test
 
 [ string ] [

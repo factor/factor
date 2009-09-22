@@ -61,7 +61,7 @@ HELP: bin>
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
-{ bin> POSTPONE: BIN: bin> .b } related-words
+{ >bin POSTPONE: BIN: bin> .b } related-words
 
 HELP: oct>
 { $values { "str" string } { "n/f" "a real number or " { $link f } } }
@@ -69,7 +69,7 @@ HELP: oct>
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
-{ oct> POSTPONE: OCT: oct> .o } related-words
+{ >oct POSTPONE: OCT: oct> .o } related-words
 
 HELP: hex>
 { $values { "str" string } { "n/f" "a real number or " { $link f } } }
@@ -77,7 +77,7 @@ HELP: hex>
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
-{ hex> POSTPONE: HEX: hex> .h } related-words
+{ >hex POSTPONE: HEX: hex> .h } related-words
 
 HELP: >base
 { $values { "n" real } { "radix" "an integer between 2 and 36" } { "str" string } }

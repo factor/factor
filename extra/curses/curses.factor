@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.strings assocs byte-arrays
 combinators continuations destructors fry io.encodings.8-bit
 io io.encodings.string io.encodings.utf8 kernel math
-namespaces prettyprint sequences
+namespaces prettyprint sequences classes.struct
 strings threads curses.ffi ;
 IN: curses
 
@@ -133,12 +133,12 @@ PRIVATE>
 
 : move-cursor ( window-name y x -- )
     [
-        window-ptr
+        window-ptr c-window memory>struct
         {
             [ ]
             [ (curses-window-refresh) ]
-            [ c-window-_curx ]
-            [ c-window-_cury ]
+            [ _curx>> ]
+            [ _cury>> ]
         } cleave
     ] 2dip mvcur curses-error (curses-window-refresh) ;
 
