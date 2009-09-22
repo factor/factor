@@ -4,6 +4,7 @@ USING: accessors alien.c-types jamshred.game jamshred.oint
 jamshred.player jamshred.tunnel kernel math math.constants
 math.functions math.vectors opengl opengl.gl opengl.glu
 opengl.demo-support sequences specialized-arrays ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: jamshred.gl
 

@@ -14,19 +14,7 @@ struct heap {
 	heap_free_list free;
 };
 
-typedef void (*heap_iterator)(heap_block *compiled);
-
-void new_heap(heap *h, cell size);
-void build_free_list(heap *h, cell size);
-heap_block *heap_allot(heap *h, cell size);
-void heap_free(heap *h, heap_block *block);
-void mark_block(heap_block *block);
-void unmark_marked(heap *heap);
-void free_unmarked(heap *heap, heap_iterator iter);
-void heap_usage(heap *h, cell *used, cell *total_free, cell *max_free);
-cell heap_size(heap *h);
-cell compute_heap_forwarding(heap *h, unordered_map<heap_block *,char *> &forwarding);
-void compact_heap(heap *h, unordered_map<heap_block *,char *> &forwarding);
+typedef void (*heap_iterator)(heap_block *compiled,factorvm *vm);
 
 inline static heap_block *next_block(heap *h, heap_block *block)
 {

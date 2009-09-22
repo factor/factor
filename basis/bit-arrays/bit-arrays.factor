@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types accessors math alien.accessors kernel
+USING: alien.c-types alien.data accessors math alien.accessors kernel
 kernel.private sequences sequences.private byte-arrays
 parser prettyprint.custom fry ;
 IN: bit-arrays

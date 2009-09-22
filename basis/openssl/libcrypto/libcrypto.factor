@@ -5,8 +5,8 @@
 !
 ! export LD_LIBRARY_PATH=/opt/local/lib
 
-USING: alien alien.syntax combinators kernel system
-alien.libraries ;
+USING: alien alien.c-types alien.syntax combinators kernel system
+alien.libraries classes.struct ;
 
 IN: openssl.libcrypto
 
@@ -20,35 +20,35 @@ IN: openssl.libcrypto
 } cond
 >>
 
-C-STRUCT: bio-method
-    { "int" "type" }
-    { "void*" "name" }
-    { "void*" "bwrite" }
-    { "void*" "bread" }
-    { "void*" "bputs" }
-    { "void*" "bgets" }
-    { "void*" "ctrl" }
-    { "void*" "create" }
-    { "void*" "destroy" }
-    { "void*" "callback-ctrl" } ;
+STRUCT: bio-method
+    { type int }
+    { name void* }
+    { bwrite void* }
+    { bread void* }
+    { bputs void* }
+    { bgets void* }
+    { ctrl void* }
+    { create void* }
+    { destroy void* }
+    { callback-ctrl void* } ;
 
-C-STRUCT: bio
-    { "void*" "method" }
-    { "void*" "callback" }
-    { "void*" "cb-arg" }
-    { "int" "init" }
-    { "int" "shutdown" }
-    { "int" "flags" }
-    { "int" "retry-reason" }
-    { "int" "num" }
-    { "void*" "ptr" }
-    { "void*" "next-bio" }
-    { "void*" "prev-bio" }
-    { "int" "references" } 
-    { "ulong" "num-read" }
-    { "ulong" "num-write" } 
-    { "void*" "crypto-ex-data-stack" }
-    { "int" "crypto-ex-data-dummy" } ;
+STRUCT: bio
+    { method void* }
+    { callback void* }
+    { cb-arg void* }
+    { init int }
+    { shutdown int }
+    { flags int }
+    { retry-reason int }
+    { num int }
+    { ptr void* }
+    { next-bio void* }
+    { prev-bio void* }
+    { references int } 
+    { num-read ulong }
+    { num-write ulong } 
+    { crypto-ex-data-stack void* }
+    { crypto-ex-data-dummy int } ;
 
 CONSTANT: BIO_NOCLOSE       HEX: 00
 CONSTANT: BIO_CLOSE         HEX: 01
@@ -103,11 +103,11 @@ FUNCTION: void* BIO_f_buffer (  ) ;
 
 CONSTANT: EVP_MAX_MD_SIZE 64
 
-C-STRUCT: EVP_MD_CTX
-    { "EVP_MD*" "digest" }
-    { "ENGINE*" "engine" }
-    { "ulong" "flags" }
-    { "void*" "md_data" } ;
+STRUCT: EVP_MD_CTX
+    { digest EVP_MD* }
+    { engine ENGINE* }
+    { flags ulong }
+    { md_data void* } ;
 
 TYPEDEF: void* EVP_MD*
 TYPEDEF: void* ENGINE*
