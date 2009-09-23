@@ -21,7 +21,6 @@ IN: bootstrap.x86
 : rex-length ( -- n ) 1 ;
 
 [
-
     ! load stack_chain
     temp0 0 MOV rc-absolute-cell rt-stack-chain jit-rel
     temp0 temp0 [] MOV
