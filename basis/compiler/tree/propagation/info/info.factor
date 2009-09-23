@@ -302,7 +302,7 @@ SYMBOL: value-infos
 
 : refine-value-info ( info value -- )
     resolve-copy value-infos get
-    [ assoc-stack value-info-intersect ] 2keep
+    [ assoc-stack [ value-info-intersect ] when* ] 2keep
     last set-at ;
 
 : value-literal ( value -- obj ? )
