@@ -34,7 +34,6 @@ IN: mason.child
         factor-vm ,
         "-i=" boot-image-name append ,
         "-no-user-init" ,
-        target-cpu get { "x86.32" "x86.64" } member? [ "-sse-version=30" , ] when
     ] { } make ;
 
 : boot ( -- )

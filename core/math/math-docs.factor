@@ -434,11 +434,15 @@ HELP: byte-array>bignum
 { $description "Converts a byte-array, interpreted as little-endian, into a bignum integer. User code should call " { $link le> } " or " { $link be> } " instead." } ;
 
 ARTICLE: "division-by-zero" "Division by zero"
-"Floating point division never raises an error if the denominator is zero. This means that if at least one of the two inputs to " { $link / } ", " { $link /f } " or " { $link mod } " is a float, the result will be a floating point infinity or not a number value."
+"Behavior of division operations when a denominator of zero is used depends on the data types in question, as well as the platform being used."
+$nl
+"Floating point division only throws an error if the appropriate traps are enabled in the floating point environment. If traps are disabled, a Not-a-number value or an infinity is output, depending on whether the numerator is zero or non-zero."
+$nl
+"Floating point traps are disabled by default and the " { $vocab-link "math.floats.env" } " vocabulary provides words to enable them. Floating point division is performed by " { $link / } ", " { $link /f } " or " { $link mod } " if at least one of the two inputs is a float. Floating point division is always performed by " { $link /f } "."
 $nl
 "The behavior of integer division is hardware specific. On x86 processors, " { $link /i } " and " { $link mod } " raise an error if both inputs are integers and the denominator is zero. On PowerPC, integer division by zero yields a result of zero."
 $nl
-"On the other hand, the " { $link / } " word, when given integer arguments, implements a much more expensive division algorithm which always yields an exact rational answer, and this word always tests for division by zero explicitly." ;
+"The " { $link / } " word, when given integer arguments, implements a much more expensive division algorithm which always yields an exact rational answer, and this word always tests for division by zero explicitly." ;
 
 ARTICLE: "number-protocol" "Number protocol"
 "Math operations obey certain numerical upgrade rules. If one of the inputs is a bignum and the other is a fixnum, the latter is first coerced to a bignum; if one of the inputs is a float, the other is coerced to a float."
@@ -459,7 +463,8 @@ $nl
 { $subsection > }
 { $subsection >= }
 "Numbers can be compared for equality using " { $link = } ", or a less precise test which disregards types:"
-{ $subsection number= } ;
+{ $subsection number= }
+{ $see-also "math.floats.compare" } ;
 
 ARTICLE: "modular-arithmetic" "Modular arithmetic"
 { $subsection mod }

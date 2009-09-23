@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov
+! copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays alien.c-types alien.data kernel
 continuations destructors sequences io openssl openssl.libcrypto
@@ -23,10 +23,10 @@ TUPLE: evp-md-context < disposable handle ;
 
 : <evp-md-context> ( -- ctx )
     evp-md-context new-disposable
-    EVP_MD_CTX <struct> dup EVP_MD_CTX_init >>handle ;
+    EVP_MD_CTX_create >>handle ;
 
 M: evp-md-context dispose*
-    handle>> EVP_MD_CTX_cleanup drop ;
+    handle>> EVP_MD_CTX_destroy ;
 
 : with-evp-md-context ( quot -- )
     maybe-init-ssl [ <evp-md-context> ] dip with-disposal ; inline
