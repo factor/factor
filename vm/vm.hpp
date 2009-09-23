@@ -3,7 +3,7 @@
 namespace factor
 {
 
-struct factorvm : factorvmdata {
+struct factor_vm : factor_vm_data {
 
 	// segments
 	inline cell align_page(cell a);
@@ -124,7 +124,7 @@ struct factorvm : factorvmdata {
 	bignum *bignum_integer_length(bignum * x);
 	int bignum_logbitp(int shift, bignum * arg);
 	int bignum_unsigned_logbitp(int shift, bignum * bignum);
-	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factorvm *), unsigned int radix, int negative_p);
+	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factor_vm *), unsigned int radix, int negative_p);
 
 	//data_heap
 	cell init_zone(zone *z, cell size, cell start);
@@ -494,7 +494,7 @@ struct factorvm : factorvmdata {
 	inline void primitive_set_innermost_stack_frame_quot();
 	void save_callstack_bottom(stack_frame *callstack_bottom);
 	template<typename T> void iterate_callstack(cell top, cell bottom, T &iterator);
-	inline void do_slots(cell obj, void (* iter)(cell *,factorvm*));
+	inline void do_slots(cell obj, void (* iter)(cell *,factor_vm*));
 
 	//alien
 	char *pinned_alien_offset(cell obj);
@@ -617,7 +617,7 @@ struct factorvm : factorvmdata {
 
 #ifdef FACTOR_SINGLE_THREADED_SINGLETON
 /* calls are dispatched using the singleton vm ptr */
-  extern factorvm *vm;
+  extern factor_vm *vm;
   #define PRIMITIVE_GETVM() vm
   #define PRIMITIVE_OVERFLOW_GETVM() vm
   #define VM_PTR vm
@@ -627,9 +627,9 @@ struct factorvm : factorvmdata {
 
 #ifdef FACTOR_SINGLE_THREADED_TESTING
 /* calls are dispatched as per multithreaded, but checked against singleton */
-  extern factorvm *vm;
+  extern factor_vm *vm;
   #define ASSERTVM() assert(vm==myvm)
-  #define PRIMITIVE_GETVM() ((factorvm*)myvm)
+  #define PRIMITIVE_GETVM() ((factor_vm*)myvm)
   #define PRIMITIVE_OVERFLOW_GETVM() ASSERTVM(); myvm
   #define VM_PTR myvm
   #define SIGNAL_VM_PTR() tls_vm()
@@ -645,8 +645,8 @@ struct factorvm : factorvmdata {
 #endif
 
 #ifdef FACTOR_REENTRANT
-  #define PRIMITIVE_GETVM() ((factorvm*)myvm)
-  #define PRIMITIVE_OVERFLOW_GETVM() ((factorvm*)myvm)
+  #define PRIMITIVE_GETVM() ((factor_vm*)myvm)
+  #define PRIMITIVE_OVERFLOW_GETVM() ((factor_vm*)myvm)
   #define VM_PTR myvm
   #define ASSERTVM() 
   #define SIGNAL_VM_PTR() tls_vm()

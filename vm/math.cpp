@@ -3,7 +3,7 @@
 namespace factor
 {
 
-inline void factorvm::primitive_bignum_to_fixnum()
+inline void factor_vm::primitive_bignum_to_fixnum()
 {
 	drepl(tag_fixnum(bignum_to_fixnum(untag<bignum>(dpeek()))));
 }
@@ -13,7 +13,7 @@ PRIMITIVE(bignum_to_fixnum)
 	PRIMITIVE_GETVM()->primitive_bignum_to_fixnum();
 }
 
-inline void factorvm::primitive_float_to_fixnum()
+inline void factor_vm::primitive_float_to_fixnum()
 {
 	drepl(tag_fixnum(float_to_fixnum(dpeek())));
 }
@@ -25,7 +25,7 @@ PRIMITIVE(float_to_fixnum)
 
 /* Division can only overflow when we are dividing the most negative fixnum
 by -1. */
-inline void factorvm::primitive_fixnum_divint()
+inline void factor_vm::primitive_fixnum_divint()
 {
 	fixnum y = untag_fixnum(dpop()); \
 	fixnum x = untag_fixnum(dpeek());
@@ -41,7 +41,7 @@ PRIMITIVE(fixnum_divint)
 	PRIMITIVE_GETVM()->primitive_fixnum_divint();
 }
 
-inline void factorvm::primitive_fixnum_divmod()
+inline void factor_vm::primitive_fixnum_divmod()
 {
 	cell y = ((cell *)ds)[0];
 	cell x = ((cell *)ds)[-1];
@@ -66,22 +66,22 @@ PRIMITIVE(fixnum_divmod)
  * If we're shifting right by n bits, we won't overflow as long as none of the
  * high WORD_SIZE-TAG_BITS-n bits are set.
  */
-inline fixnum factorvm::sign_mask(fixnum x)
+inline fixnum factor_vm::sign_mask(fixnum x)
 {
 	return x >> (WORD_SIZE - 1);
 }
 
-inline fixnum factorvm::branchless_max(fixnum x, fixnum y)
+inline fixnum factor_vm::branchless_max(fixnum x, fixnum y)
 {
 	return (x - ((x - y) & sign_mask(x - y)));
 }
 
-inline fixnum factorvm::branchless_abs(fixnum x)
+inline fixnum factor_vm::branchless_abs(fixnum x)
 {
 	return (x ^ sign_mask(x)) - sign_mask(x);
 }
 
-inline void factorvm::primitive_fixnum_shift()
+inline void factor_vm::primitive_fixnum_shift()
 {
 	fixnum y = untag_fixnum(dpop());
 	fixnum x = untag_fixnum(dpeek());
@@ -113,7 +113,7 @@ PRIMITIVE(fixnum_shift)
 	PRIMITIVE_GETVM()->primitive_fixnum_shift();
 }
 
-inline void factorvm::primitive_fixnum_to_bignum()
+inline void factor_vm::primitive_fixnum_to_bignum()
 {
 	drepl(tag<bignum>(fixnum_to_bignum(untag_fixnum(dpeek()))));
 }
@@ -123,7 +123,7 @@ PRIMITIVE(fixnum_to_bignum)
 	PRIMITIVE_GETVM()->primitive_fixnum_to_bignum();
 }
 
-inline void factorvm::primitive_float_to_bignum()
+inline void factor_vm::primitive_float_to_bignum()
 {
 	drepl(tag<bignum>(float_to_bignum(dpeek())));
 }
@@ -137,7 +137,7 @@ PRIMITIVE(float_to_bignum)
 	bignum * y = untag<bignum>(dpop()); \
 	bignum * x = untag<bignum>(dpop());
 
-inline void factorvm::primitive_bignum_eq()
+inline void factor_vm::primitive_bignum_eq()
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_equal_p(x,y));
@@ -148,7 +148,7 @@ PRIMITIVE(bignum_eq)
 	PRIMITIVE_GETVM()->primitive_bignum_eq();
 }
 
-inline void factorvm::primitive_bignum_add()
+inline void factor_vm::primitive_bignum_add()
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<bignum>(bignum_add(x,y)));
@@ -159,7 +159,7 @@ PRIMITIVE(bignum_add)
 	PRIMITIVE_GETVM()->primitive_bignum_add();
 }
 
-inline void factorvm::primitive_bignum_subtract()
+inline void factor_vm::primitive_bignum_subtract()
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<bignum>(bignum_subtract(x,y)));
@@ -170,7 +170,7 @@ PRIMITIVE(bignum_subtract)
 	PRIMITIVE_GETVM()->primitive_bignum_subtract();
 }
 
-inline void factorvm::primitive_bignum_multiply()
+inline void factor_vm::primitive_bignum_multiply()
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<bignum>(bignum_multiply(x,y)));
@@ -181,7 +181,7 @@ PRIMITIVE(bignum_multiply)
 	PRIMITIVE_GETVM()->primitive_bignum_multiply();
 }
 
-inline void factorvm::primitive_bignum_divint()
+inline void factor_vm::primitive_bignum_divint()
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<bignum>(bignum_quotient(x,y)));
@@ -192,7 +192,7 @@ PRIMITIVE(bignum_divint)
 	PRIMITIVE_GETVM()->primitive_bignum_divint();
 }
 
-inline void factorvm::primitive_bignum_divmod()
+inline void factor_vm::primitive_bignum_divmod()
 {
 	bignum *q, *r;
 	POP_BIGNUMS(x,y);
@@ -206,7 +206,7 @@ PRIMITIVE(bignum_divmod)
 	PRIMITIVE_GETVM()->primitive_bignum_divmod();
 }
 
-inline void factorvm::primitive_bignum_mod()
+inline void factor_vm::primitive_bignum_mod()
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<bignum>(bignum_remainder(x,y)));
@@ -217,7 +217,7 @@ PRIMITIVE(bignum_mod)
 	PRIMITIVE_GETVM()->primitive_bignum_mod();
 }
 
-inline void factorvm::primitive_bignum_and()
+inline void factor_vm::primitive_bignum_and()
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<bignum>(bignum_bitwise_and(x,y)));
@@ -228,7 +228,7 @@ PRIMITIVE(bignum_and)
 	PRIMITIVE_GETVM()->primitive_bignum_and();
 }
 
-inline void factorvm::primitive_bignum_or()
+inline void factor_vm::primitive_bignum_or()
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<bignum>(bignum_bitwise_ior(x,y)));
@@ -239,7 +239,7 @@ PRIMITIVE(bignum_or)
 	PRIMITIVE_GETVM()->primitive_bignum_or();
 }
 
-inline void factorvm::primitive_bignum_xor()
+inline void factor_vm::primitive_bignum_xor()
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag<bignum>(bignum_bitwise_xor(x,y)));
@@ -250,7 +250,7 @@ PRIMITIVE(bignum_xor)
 	PRIMITIVE_GETVM()->primitive_bignum_xor();
 }
 
-inline void factorvm::primitive_bignum_shift()
+inline void factor_vm::primitive_bignum_shift()
 {
 	fixnum y = untag_fixnum(dpop());
         bignum* x = untag<bignum>(dpop());
@@ -262,7 +262,7 @@ PRIMITIVE(bignum_shift)
 	PRIMITIVE_GETVM()->primitive_bignum_shift();
 }
 
-inline void factorvm::primitive_bignum_less()
+inline void factor_vm::primitive_bignum_less()
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) == bignum_comparison_less);
@@ -273,7 +273,7 @@ PRIMITIVE(bignum_less)
 	PRIMITIVE_GETVM()->primitive_bignum_less();
 }
 
-inline void factorvm::primitive_bignum_lesseq()
+inline void factor_vm::primitive_bignum_lesseq()
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) != bignum_comparison_greater);
@@ -284,7 +284,7 @@ PRIMITIVE(bignum_lesseq)
 	PRIMITIVE_GETVM()->primitive_bignum_lesseq();
 }
 
-inline void factorvm::primitive_bignum_greater()
+inline void factor_vm::primitive_bignum_greater()
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) == bignum_comparison_greater);
@@ -295,7 +295,7 @@ PRIMITIVE(bignum_greater)
 	PRIMITIVE_GETVM()->primitive_bignum_greater();
 }
 
-inline void factorvm::primitive_bignum_greatereq()
+inline void factor_vm::primitive_bignum_greatereq()
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) != bignum_comparison_less);
@@ -306,7 +306,7 @@ PRIMITIVE(bignum_greatereq)
 	PRIMITIVE_GETVM()->primitive_bignum_greatereq();
 }
 
-inline void factorvm::primitive_bignum_not()
+inline void factor_vm::primitive_bignum_not()
 {
 	drepl(tag<bignum>(bignum_bitwise_not(untag<bignum>(dpeek()))));
 }
@@ -316,7 +316,7 @@ PRIMITIVE(bignum_not)
 	PRIMITIVE_GETVM()->primitive_bignum_not();
 }
 
-inline void factorvm::primitive_bignum_bitp()
+inline void factor_vm::primitive_bignum_bitp()
 {
 	fixnum bit = to_fixnum(dpop());
 	bignum *x = untag<bignum>(dpop());
@@ -328,7 +328,7 @@ PRIMITIVE(bignum_bitp)
 	PRIMITIVE_GETVM()->primitive_bignum_bitp();
 }
 
-inline void factorvm::primitive_bignum_log2()
+inline void factor_vm::primitive_bignum_log2()
 {
 	drepl(tag<bignum>(bignum_integer_length(untag<bignum>(dpeek()))));
 }
@@ -338,18 +338,18 @@ PRIMITIVE(bignum_log2)
 	PRIMITIVE_GETVM()->primitive_bignum_log2();
 }
 
-unsigned int factorvm::bignum_producer(unsigned int digit)
+unsigned int factor_vm::bignum_producer(unsigned int digit)
 {
 	unsigned char *ptr = (unsigned char *)alien_offset(dpeek());
 	return *(ptr + digit);
 }
 
-unsigned int bignum_producer(unsigned int digit, factorvm *myvm)
+unsigned int bignum_producer(unsigned int digit, factor_vm *myvm)
 {
 	return myvm->bignum_producer(digit);
 }
 
-inline void factorvm::primitive_byte_array_to_bignum()
+inline void factor_vm::primitive_byte_array_to_bignum()
 {
 	cell n_digits = array_capacity(untag_check<byte_array>(dpeek()));
 	bignum * result = digit_stream_to_bignum(n_digits,factor::bignum_producer,0x100,0);
@@ -361,7 +361,7 @@ PRIMITIVE(byte_array_to_bignum)
 	PRIMITIVE_GETVM()->primitive_byte_array_to_bignum();
 }
 
-cell factorvm::unbox_array_size()
+cell factor_vm::unbox_array_size()
 {
 	switch(tagged<object>(dpeek()).type())
 	{
@@ -394,7 +394,7 @@ cell factorvm::unbox_array_size()
 	return 0; /* can't happen */
 }
 
-inline void factorvm::primitive_fixnum_to_float()
+inline void factor_vm::primitive_fixnum_to_float()
 {
 	drepl(allot_float(fixnum_to_float(dpeek())));
 }
@@ -404,7 +404,7 @@ PRIMITIVE(fixnum_to_float)
 	PRIMITIVE_GETVM()->primitive_fixnum_to_float();
 }
 
-inline void factorvm::primitive_bignum_to_float()
+inline void factor_vm::primitive_bignum_to_float()
 {
 	drepl(allot_float(bignum_to_float(dpeek())));
 }
@@ -414,7 +414,7 @@ PRIMITIVE(bignum_to_float)
 	PRIMITIVE_GETVM()->primitive_bignum_to_float();
 }
 
-inline void factorvm::primitive_str_to_float()
+inline void factor_vm::primitive_str_to_float()
 {
 	byte_array *bytes = untag_check<byte_array>(dpeek());
 	cell capacity = array_capacity(bytes);
@@ -433,7 +433,7 @@ PRIMITIVE(str_to_float)
 	PRIMITIVE_GETVM()->primitive_str_to_float();
 }
 
-inline void factorvm::primitive_float_to_str()
+inline void factor_vm::primitive_float_to_str()
 {
 	byte_array *array = allot_byte_array(33);
 	snprintf((char *)(array + 1),32,"%.16g",untag_float_check(dpop()));
@@ -449,7 +449,7 @@ PRIMITIVE(float_to_str)
 	double y = untag_float(dpop()); \
 	double x = untag_float(dpop());
 
-inline void factorvm::primitive_float_eq()
+inline void factor_vm::primitive_float_eq()
 {
 	POP_FLOATS(x,y);
 	box_boolean(x == y);
@@ -460,7 +460,7 @@ PRIMITIVE(float_eq)
 	PRIMITIVE_GETVM()->primitive_float_eq();
 }
 
-inline void factorvm::primitive_float_add()
+inline void factor_vm::primitive_float_add()
 {
 	POP_FLOATS(x,y);
 	box_double(x + y);
@@ -471,7 +471,7 @@ PRIMITIVE(float_add)
 	PRIMITIVE_GETVM()->primitive_float_add();
 }
 
-inline void factorvm::primitive_float_subtract()
+inline void factor_vm::primitive_float_subtract()
 {
 	POP_FLOATS(x,y);
 	box_double(x - y);
@@ -482,7 +482,7 @@ PRIMITIVE(float_subtract)
 	PRIMITIVE_GETVM()->primitive_float_subtract();
 }
 
-inline void factorvm::primitive_float_multiply()
+inline void factor_vm::primitive_float_multiply()
 {
 	POP_FLOATS(x,y);
 	box_double(x * y);
@@ -493,7 +493,7 @@ PRIMITIVE(float_multiply)
 	PRIMITIVE_GETVM()->primitive_float_multiply();
 }
 
-inline void factorvm::primitive_float_divfloat()
+inline void factor_vm::primitive_float_divfloat()
 {
 	POP_FLOATS(x,y);
 	box_double(x / y);
@@ -504,7 +504,7 @@ PRIMITIVE(float_divfloat)
 	PRIMITIVE_GETVM()->primitive_float_divfloat();
 }
 
-inline void factorvm::primitive_float_mod()
+inline void factor_vm::primitive_float_mod()
 {
 	POP_FLOATS(x,y);
 	box_double(fmod(x,y));
@@ -515,7 +515,7 @@ PRIMITIVE(float_mod)
 	PRIMITIVE_GETVM()->primitive_float_mod();
 }
 
-inline void factorvm::primitive_float_less()
+inline void factor_vm::primitive_float_less()
 {
 	POP_FLOATS(x,y);
 	box_boolean(x < y);
@@ -526,7 +526,7 @@ PRIMITIVE(float_less)
 	PRIMITIVE_GETVM()->primitive_float_less();
 }
 
-inline void factorvm::primitive_float_lesseq()
+inline void factor_vm::primitive_float_lesseq()
 {
 	POP_FLOATS(x,y);
 	box_boolean(x <= y);
@@ -537,7 +537,7 @@ PRIMITIVE(float_lesseq)
 	PRIMITIVE_GETVM()->primitive_float_lesseq();
 }
 
-inline void factorvm::primitive_float_greater()
+inline void factor_vm::primitive_float_greater()
 {
 	POP_FLOATS(x,y);
 	box_boolean(x > y);
@@ -548,7 +548,7 @@ PRIMITIVE(float_greater)
 	PRIMITIVE_GETVM()->primitive_float_greater();
 }
 
-inline void factorvm::primitive_float_greatereq()
+inline void factor_vm::primitive_float_greatereq()
 {
 	POP_FLOATS(x,y);
 	box_boolean(x >= y);
@@ -559,7 +559,7 @@ PRIMITIVE(float_greatereq)
 	PRIMITIVE_GETVM()->primitive_float_greatereq();
 }
 
-inline void factorvm::primitive_float_bits()
+inline void factor_vm::primitive_float_bits()
 {
 	box_unsigned_4(float_bits(untag_float_check(dpop())));
 }
@@ -569,7 +569,7 @@ PRIMITIVE(float_bits)
 	PRIMITIVE_GETVM()->primitive_float_bits();
 }
 
-inline void factorvm::primitive_bits_float()
+inline void factor_vm::primitive_bits_float()
 {
 	box_float(bits_float(to_cell(dpop())));
 }
@@ -579,7 +579,7 @@ PRIMITIVE(bits_float)
 	PRIMITIVE_GETVM()->primitive_bits_float();
 }
 
-inline void factorvm::primitive_double_bits()
+inline void factor_vm::primitive_double_bits()
 {
 	box_unsigned_8(double_bits(untag_float_check(dpop())));
 }
@@ -589,7 +589,7 @@ PRIMITIVE(double_bits)
 	PRIMITIVE_GETVM()->primitive_double_bits();
 }
 
-inline void factorvm::primitive_bits_double()
+inline void factor_vm::primitive_bits_double()
 {
 	box_double(bits_double(to_unsigned_8(dpop())));
 }
@@ -599,7 +599,7 @@ PRIMITIVE(bits_double)
 	PRIMITIVE_GETVM()->primitive_bits_double();
 }
 
-fixnum factorvm::to_fixnum(cell tagged)
+fixnum factor_vm::to_fixnum(cell tagged)
 {
 	switch(TAG(tagged))
 	{
@@ -613,112 +613,112 @@ fixnum factorvm::to_fixnum(cell tagged)
 	}
 }
 
-VM_C_API fixnum to_fixnum(cell tagged,factorvm *myvm)
+VM_C_API fixnum to_fixnum(cell tagged,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->to_fixnum(tagged);
 }
 
-cell factorvm::to_cell(cell tagged)
+cell factor_vm::to_cell(cell tagged)
 {
 	return (cell)to_fixnum(tagged);
 }
 
-VM_C_API cell to_cell(cell tagged, factorvm *myvm)
+VM_C_API cell to_cell(cell tagged, factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->to_cell(tagged);
 }
 
-void factorvm::box_signed_1(s8 n)
+void factor_vm::box_signed_1(s8 n)
 {
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_signed_1(s8 n,factorvm *myvm)
+VM_C_API void box_signed_1(s8 n,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_signed_1(n);
 }
 
-void factorvm::box_unsigned_1(u8 n)
+void factor_vm::box_unsigned_1(u8 n)
 {
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_unsigned_1(u8 n,factorvm *myvm)
+VM_C_API void box_unsigned_1(u8 n,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_unsigned_1(n);
 }
 
-void factorvm::box_signed_2(s16 n)
+void factor_vm::box_signed_2(s16 n)
 {
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_signed_2(s16 n,factorvm *myvm)
+VM_C_API void box_signed_2(s16 n,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_signed_2(n);
 }
 
-void factorvm::box_unsigned_2(u16 n)
+void factor_vm::box_unsigned_2(u16 n)
 {
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_unsigned_2(u16 n,factorvm *myvm)
+VM_C_API void box_unsigned_2(u16 n,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_unsigned_2(n);
 }
 
-void factorvm::box_signed_4(s32 n)
+void factor_vm::box_signed_4(s32 n)
 {
 	dpush(allot_integer(n));
 }
 
-VM_C_API void box_signed_4(s32 n,factorvm *myvm)
+VM_C_API void box_signed_4(s32 n,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_signed_4(n);
 }
 
-void factorvm::box_unsigned_4(u32 n)
+void factor_vm::box_unsigned_4(u32 n)
 {
 	dpush(allot_cell(n));
 }
 
-VM_C_API void box_unsigned_4(u32 n,factorvm *myvm)
+VM_C_API void box_unsigned_4(u32 n,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_unsigned_4(n);
 }
 
-void factorvm::box_signed_cell(fixnum integer)
+void factor_vm::box_signed_cell(fixnum integer)
 {
 	dpush(allot_integer(integer));
 }
 
-VM_C_API void box_signed_cell(fixnum integer,factorvm *myvm)
+VM_C_API void box_signed_cell(fixnum integer,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_signed_cell(integer);
 }
 
-void factorvm::box_unsigned_cell(cell cell)
+void factor_vm::box_unsigned_cell(cell cell)
 {
 	dpush(allot_cell(cell));
 }
 
-VM_C_API void box_unsigned_cell(cell cell,factorvm *myvm)
+VM_C_API void box_unsigned_cell(cell cell,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_unsigned_cell(cell);
 }
 
-void factorvm::box_signed_8(s64 n)
+void factor_vm::box_signed_8(s64 n)
 {
 	if(n < fixnum_min || n > fixnum_max)
 		dpush(tag<bignum>(long_long_to_bignum(n)));
@@ -726,13 +726,13 @@ void factorvm::box_signed_8(s64 n)
 		dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_signed_8(s64 n,factorvm *myvm)
+VM_C_API void box_signed_8(s64 n,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_signed_8(n);
 }
 
-s64 factorvm::to_signed_8(cell obj)
+s64 factor_vm::to_signed_8(cell obj)
 {
 	switch(tagged<object>(obj).type())
 	{
@@ -746,13 +746,13 @@ s64 factorvm::to_signed_8(cell obj)
 	}
 }
 
-VM_C_API s64 to_signed_8(cell obj,factorvm *myvm)
+VM_C_API s64 to_signed_8(cell obj,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->to_signed_8(obj);
 }
 
-void factorvm::box_unsigned_8(u64 n)
+void factor_vm::box_unsigned_8(u64 n)
 {
 	if(n > (u64)fixnum_max)
 		dpush(tag<bignum>(ulong_long_to_bignum(n)));
@@ -760,13 +760,13 @@ void factorvm::box_unsigned_8(u64 n)
 		dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_unsigned_8(u64 n,factorvm *myvm)
+VM_C_API void box_unsigned_8(u64 n,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_unsigned_8(n);
 }
 
-u64 factorvm::to_unsigned_8(cell obj)
+u64 factor_vm::to_unsigned_8(cell obj)
 {
 	switch(tagged<object>(obj).type())
 	{
@@ -780,51 +780,51 @@ u64 factorvm::to_unsigned_8(cell obj)
 	}
 }
 
-VM_C_API u64 to_unsigned_8(cell obj,factorvm *myvm)
+VM_C_API u64 to_unsigned_8(cell obj,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->to_unsigned_8(obj);
 }
  
-void factorvm::box_float(float flo)
+void factor_vm::box_float(float flo)
 {
         dpush(allot_float(flo));
 }
 
-VM_C_API void box_float(float flo, factorvm *myvm)
+VM_C_API void box_float(float flo, factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_float(flo);
 }
 
-float factorvm::to_float(cell value)
+float factor_vm::to_float(cell value)
 {
 	return untag_float_check(value);
 }
 
-VM_C_API float to_float(cell value,factorvm *myvm)
+VM_C_API float to_float(cell value,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->to_float(value);
 }
 
-void factorvm::box_double(double flo)
+void factor_vm::box_double(double flo)
 {
         dpush(allot_float(flo));
 }
 
-VM_C_API void box_double(double flo,factorvm *myvm)
+VM_C_API void box_double(double flo,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_double(flo);
 }
 
-double factorvm::to_double(cell value)
+double factor_vm::to_double(cell value)
 {
 	return untag_float_check(value);
 }
 
-VM_C_API double to_double(cell value,factorvm *myvm)
+VM_C_API double to_double(cell value,factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->to_double(value);
@@ -832,29 +832,29 @@ VM_C_API double to_double(cell value,factorvm *myvm)
 
 /* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
 overflow, they call these functions. */
-inline void factorvm::overflow_fixnum_add(fixnum x, fixnum y)
+inline void factor_vm::overflow_fixnum_add(fixnum x, fixnum y)
 {
 	drepl(tag<bignum>(fixnum_to_bignum(
 		untag_fixnum(x) + untag_fixnum(y))));
 }
 
-VM_ASM_API_OVERFLOW void overflow_fixnum_add(fixnum x, fixnum y, factorvm *myvm)
+VM_ASM_API_OVERFLOW void overflow_fixnum_add(fixnum x, fixnum y, factor_vm *myvm)
 {
 	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_add(x,y);
 }
 
-inline void factorvm::overflow_fixnum_subtract(fixnum x, fixnum y)
+inline void factor_vm::overflow_fixnum_subtract(fixnum x, fixnum y)
 {
 	drepl(tag<bignum>(fixnum_to_bignum(
 		untag_fixnum(x) - untag_fixnum(y))));
 }
 
-VM_ASM_API_OVERFLOW void overflow_fixnum_subtract(fixnum x, fixnum y, factorvm *myvm)
+VM_ASM_API_OVERFLOW void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm *myvm)
 {
 	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_subtract(x,y);
 }
 
-inline void factorvm::overflow_fixnum_multiply(fixnum x, fixnum y)
+inline void factor_vm::overflow_fixnum_multiply(fixnum x, fixnum y)
 {
 	bignum *bx = fixnum_to_bignum(x);
 	GC_BIGNUM(bx);
@@ -863,7 +863,7 @@ inline void factorvm::overflow_fixnum_multiply(fixnum x, fixnum y)
 	drepl(tag<bignum>(bignum_multiply(bx,by)));
 }
 
-VM_ASM_API_OVERFLOW void overflow_fixnum_multiply(fixnum x, fixnum y, factorvm *myvm)
+VM_ASM_API_OVERFLOW void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm *myvm)
 {
 	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_multiply(x,y);
 }
