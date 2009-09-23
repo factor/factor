@@ -206,7 +206,7 @@ struct gc_bignum
 	}
 };
 
-#define GC_BIGNUM(x,vm) gc_bignum x##__gc_root(&x,vm)
+#define GC_BIGNUM(x) gc_bignum x##__gc_root(&x,this)
 
 //generic_arrays.hpp
 template <typename TYPE> TYPE *factorvm::allot_array_internal(cell capacity)
