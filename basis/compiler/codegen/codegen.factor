@@ -180,6 +180,10 @@ CODEGEN: ##min-vector %min-vector
 CODEGEN: ##max-vector %max-vector
 CODEGEN: ##sqrt-vector %sqrt-vector
 CODEGEN: ##horizontal-add-vector %horizontal-add-vector
+CODEGEN: ##abs-vector %abs-vector
+CODEGEN: ##and-vector %and-vector
+CODEGEN: ##or-vector %or-vector
+CODEGEN: ##xor-vector %xor-vector
 CODEGEN: ##box-alien %box-alien
 CODEGEN: ##box-displaced-alien %box-displaced-alien
 CODEGEN: ##unbox-alien %unbox-alien

@@ -1,7 +1,8 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien.c-types kernel sequences math math.functions
-hints math.order fry ;
+hints math.order fry combinators ;
+QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
 GENERIC: element-type ( obj -- c-type )
@@ -31,12 +32,34 @@ GENERIC: element-type ( obj -- c-type )
     [ [ not ] 2dip pick [ + ] [ - ] if ] 2map
     nip ;
 
+<PRIVATE
+
 : 2saturate-map ( u v quot -- w )
     pick element-type '[ @ _ c-type-clamp ] 2map ; inline
+
+PRIVATE>
 
 : vs+ ( u v -- w ) [ + ] 2saturate-map ;
 : vs- ( u v -- w ) [ - ] 2saturate-map ;
 : vs* ( u v -- w ) [ * ] 2saturate-map ;
+
+: vabs ( u -- v ) [ abs ] map ;
+: vsqrt ( u -- v ) [ sqrt ] map ;
+
+<PRIVATE
+
+: fp-bitwise-op ( x y seq quot -- z )
+    swap element-type {
+        { c:double [ [ [ double>bits ] bi@ ] dip call bits>double ] }
+        { c:float [ [ [ float>bits ] bi@ ] dip call bits>float ] }
+        [ drop call ]
+    } case ; inline
+
+PRIVATE>
+
+: vbitand ( u v -- w ) over '[ _ [ bitand ] fp-bitwise-op ] 2map ;
+: vbitor ( u v -- w ) over '[ _ [ bitor ] fp-bitwise-op ] 2map ;
+: vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
 
 : vfloor    ( v -- _v_ ) [ floor    ] map ;
 : vceiling  ( v -- ^v^ ) [ ceiling  ] map ;

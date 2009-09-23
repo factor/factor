@@ -55,7 +55,10 @@ UNION: two-operand-insn
     ##saturated-mul-vector
     ##div-vector
     ##min-vector
-    ##max-vector ;
+    ##max-vector
+    ##and-vector
+    ##or-vector
+    ##xor-vector ;
 
 GENERIC: convert-two-operand* ( insn -- )
 
