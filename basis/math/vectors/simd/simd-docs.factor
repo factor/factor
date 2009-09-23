@@ -1,6 +1,6 @@
-USING: help.markup help.syntax sequences math math.vectors
-classes.tuple.private
-math.vectors.simd.intrinsics cpu.architecture ;
+USING: classes.tuple.private cpu.architecture help.markup
+help.syntax kernel.private math math.vectors
+math.vectors.simd.intrinsics sequences ;
 IN: math.vectors.simd
 
 ARTICLE: "math.vectors.simd.intro" "Introduction to SIMD support"
