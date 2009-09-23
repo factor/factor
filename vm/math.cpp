@@ -857,9 +857,9 @@ VM_ASM_API_OVERFLOW void overflow_fixnum_subtract(fixnum x, fixnum y, factorvm *
 inline void factorvm::overflow_fixnum_multiply(fixnum x, fixnum y)
 {
 	bignum *bx = fixnum_to_bignum(x);
-	GC_BIGNUM(bx,this);
+	GC_BIGNUM(bx);
 	bignum *by = fixnum_to_bignum(y);
-	GC_BIGNUM(by,this);
+	GC_BIGNUM(by);
 	drepl(tag<bignum>(bignum_multiply(bx,by)));
 }
 
