@@ -19,7 +19,6 @@ static const cell card_bits = 8;
 static const cell card_size = (1<<card_bits);
 static const cell addr_card_mask = (card_size-1);
 
-
 typedef u8 card_deck;
 
 static const cell deck_bits = (card_bits + 10);

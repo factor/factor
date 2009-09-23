@@ -16,5 +16,4 @@ PRIMITIVE(set_innermost_stack_frame_quot);
 VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom,factorvm *vm);
 
 
-
 }

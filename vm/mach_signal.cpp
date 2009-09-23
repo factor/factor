@@ -150,7 +150,6 @@ catch_exception_raise (mach_port_t exception_port,
 	return KERN_SUCCESS;
 }
 
-
 /* The main function of the thread listening for exceptions.  */
 static void *
 mach_exception_thread (void *arg)

@@ -3,7 +3,6 @@
 namespace factor
 {
 
-
 inline void factorvm::primitive_getenv()
 {
 	fixnum e = untag_fixnum(dpeek());

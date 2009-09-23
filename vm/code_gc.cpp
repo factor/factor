@@ -8,7 +8,6 @@ void factorvm::clear_free_list(heap *heap)
 	memset(&heap->free,0,sizeof(heap_free_list));
 }
 
-
 /* This malloc-style heap code is reasonably generic. Maybe in the future, it
 will be used for the data heap too, if we ever get incremental
 mark/sweep/compact GC. */
@@ -20,7 +19,6 @@ void factorvm::new_heap(heap *heap, cell size)
 
 	clear_free_list(heap);
 }
-
 
 void factorvm::add_to_free_list(heap *heap, free_heap_block *block)
 {
@@ -36,7 +34,6 @@ void factorvm::add_to_free_list(heap *heap, free_heap_block *block)
 		heap->free.large_blocks = block;
 	}
 }
-
 
 /* Called after reading the code heap from the image file, and after code GC.
 
@@ -94,7 +91,6 @@ void factorvm::build_free_list(heap *heap, cell size)
 
 }
 
-
 void factorvm::assert_free_block(free_heap_block *block)
 {
 	if(block->status != B_FREE)
@@ -142,7 +138,6 @@ free_heap_block *factorvm::find_free_block(heap *heap, cell size)
 	return NULL;
 }
 
-
 free_heap_block *factorvm::split_free_block(heap *heap, free_heap_block *block, cell size)
 {
 	if(block->size != size )
@@ -158,7 +153,6 @@ free_heap_block *factorvm::split_free_block(heap *heap, free_heap_block *block, 
 
 	return block;
 }
-
 
 /* Allocate a block of memory from the mark and sweep GC heap */
 heap_block *factorvm::heap_allot(heap *heap, cell size)
@@ -177,14 +171,12 @@ heap_block *factorvm::heap_allot(heap *heap, cell size)
 		return NULL;
 }
 
-
 /* Deallocates a block manually */
 void factorvm::heap_free(heap *heap, heap_block *block)
 {
 	block->status = B_FREE;
 	add_to_free_list(heap,(free_heap_block *)block);
 }
-
 
 void factorvm::mark_block(heap_block *block)
 {
@@ -202,7 +194,6 @@ void factorvm::mark_block(heap_block *block)
 	}
 }
 
-
 /* If in the middle of code GC, we have to grow the heap, data GC restarts from
 scratch, so we have to unmark any marked blocks. */
 void factorvm::unmark_marked(heap *heap)
@@ -217,7 +208,6 @@ void factorvm::unmark_marked(heap *heap)
 		scan = next_block(heap,scan);
 	}
 }
-
 
 /* After code GC, all referenced code blocks have status set to B_MARKED, so any
 which are allocated and not marked can be reclaimed. */
@@ -268,7 +258,6 @@ void factorvm::free_unmarked(heap *heap, heap_iterator iter)
 		add_to_free_list(heap,(free_heap_block *)prev);
 }
 
-
 /* Compute total sum of sizes of free blocks, and size of largest free block */
 void factorvm::heap_usage(heap *heap, cell *used, cell *total_free, cell *max_free)
 {
@@ -298,7 +287,6 @@ void factorvm::heap_usage(heap *heap, cell *used, cell *total_free, cell *max_fr
 	}
 }
 
-
 /* The size of the heap, not including the last block if it's free */
 cell factorvm::heap_size(heap *heap)
 {
@@ -314,7 +302,6 @@ cell factorvm::heap_size(heap *heap)
 	else
 		return heap->seg->size;
 }
-
 
 /* Compute where each block is going to go, after compaction */
 cell factorvm::compute_heap_forwarding(heap *heap, unordered_map<heap_block *,char *> &forwarding)
@@ -337,7 +324,6 @@ cell factorvm::compute_heap_forwarding(heap *heap, unordered_map<heap_block *,ch
 
 	return (cell)address - heap->seg->start;
 }
-
 
 void factorvm::compact_heap(heap *heap, unordered_map<heap_block *,char *> &forwarding)
 {

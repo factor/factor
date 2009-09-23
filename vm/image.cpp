@@ -14,8 +14,6 @@ void factorvm::init_objects(image_header *h)
 	bignum_neg_one = h->bignum_neg_one;
 }
 
-
-
 void factorvm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 {
 	cell good_size = h->data_size + (1 << 20);
@@ -49,8 +47,6 @@ void factorvm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 	data_relocation_base = h->data_relocation_base;
 }
 
-
-
 void factorvm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 {
 	if(h->code_size > p->code_size)
@@ -75,7 +71,6 @@ void factorvm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 	code_relocation_base = h->code_relocation_base;
 	build_free_list(&code,h->code_size);
 }
-
 
 /* Save the current image to disk */
 bool factorvm::save_image(const vm_char *filename)
@@ -122,7 +117,6 @@ bool factorvm::save_image(const vm_char *filename)
 
 	return ok;
 }
-
 
 inline void factorvm::primitive_save_image()
 {
@@ -191,7 +185,6 @@ template <typename TYPE> void factorvm::code_fixup(TYPE **handle)
 	*handle = new_ptr;
 }
 
-
 void factorvm::fixup_word(word *word)
 {
 	if(word->code)
@@ -200,7 +193,6 @@ void factorvm::fixup_word(word *word)
 		code_fixup(&word->profiling);
 	code_fixup(&word->xt);
 }
-
 
 void factorvm::fixup_quotation(quotation *quot)
 {
@@ -213,12 +205,10 @@ void factorvm::fixup_quotation(quotation *quot)
 		quot->xt = (void *)lazy_jit_compile;
 }
 
-
 void factorvm::fixup_alien(alien *d)
 {
 	d->expired = T;
 }
-
 
 void factorvm::fixup_stack_frame(stack_frame *frame)
 {
@@ -235,7 +225,6 @@ void factorvm::fixup_callstack_object(callstack *stack)
 {
 	iterate_callstack_object(stack,factor::fixup_stack_frame);
 }
-
 
 /* Initialize an object in a newly-loaded image */
 void factorvm::relocate_object(object *object)
@@ -281,7 +270,6 @@ void factorvm::relocate_object(object *object)
 	}
 }
 
-
 /* Since the image might have been saved with a different base address than
 where it is loaded, we need to fix up pointers in the image. */
 void factorvm::relocate_data()
@@ -309,7 +297,6 @@ void factorvm::relocate_data()
 	}
 }
 
-
 void factorvm::fixup_code_block(code_block *compiled)
 {
 	/* relocate literal table data */
@@ -328,7 +315,6 @@ void factorvm::relocate_code()
 {
 	iterate_code_heap(factor::fixup_code_block);
 }
-
 
 /* Read an image file from disk, only done once during startup */
 /* This function also initializes the data and code heaps */
@@ -365,6 +351,5 @@ void factorvm::load_image(vm_parameters *p)
 	/* Store image path name */
 	userenv[IMAGE_ENV] = allot_alien(F,(cell)p->image_path);
 }
-
 
 }

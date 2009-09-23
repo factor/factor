@@ -89,7 +89,6 @@ code_block *factorvm::frame_code(stack_frame *frame)
 	return (code_block *)frame->xt - 1;
 }
 
-
 cell factorvm::frame_type(stack_frame *frame)
 {
 	return frame_code(frame)->type;
