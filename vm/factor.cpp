@@ -183,7 +183,6 @@ void factorvm::start_factor(vm_parameters *p)
 	unnest_stacks();
 }
 
-
 char *factorvm::factor_eval_string(char *string)
 {
 	char *(*callback)(char *) = (char *(*)(char *))alien_offset(userenv[EVAL_CALLBACK_ENV]);
@@ -230,7 +229,6 @@ void* start_standalone_factor_thread(void *arg)
 	newvm->start_standalone_factor(args->argc, args->argv);
 	return 0;
 }
-
 
 VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {

@@ -166,7 +166,6 @@ struct factorvm : factorvmdata {
 	inline void write_barrier(object *obj);
 	inline void allot_barrier(object *address);
 
-
 	//data_gc
 	void init_data_gc();
 	object *copy_untagged_object_impl(object *pointer, cell size);
@@ -454,7 +453,6 @@ struct factorvm : factorvmdata {
 	void compact_code_heap();
 	inline void check_code_pointer(cell ptr);
 
-
 	//image
 	void init_objects(image_header *h);
 	void load_data_heap(FILE *file, image_header *h, vm_parameters *p);
@@ -497,7 +495,6 @@ struct factorvm : factorvmdata {
 	void save_callstack_bottom(stack_frame *callstack_bottom);
 	template<typename T> void iterate_callstack(cell top, cell bottom, T &iterator);
 	inline void do_slots(cell obj, void (* iter)(cell *,factorvm*));
-
 
 	//alien
 	char *pinned_alien_offset(cell obj);
@@ -613,7 +610,6 @@ struct factorvm : factorvmdata {
 	
 	void print_vm_data();
 };
-
 
 #ifndef FACTOR_REENTRANT
    #define FACTOR_SINGLE_THREADED_SINGLETON

@@ -76,7 +76,6 @@ void factorvm::general_error(vm_error_type error, cell arg1, cell arg2, stack_fr
 		tag_fixnum(error),arg1,arg2),callstack_top);
 }
 
-
 void factorvm::type_error(cell type, cell tagged)
 {
 	general_error(ERROR_TYPE,tag_fixnum(type),tagged,NULL);
@@ -86,7 +85,6 @@ void factorvm::not_implemented_error()
 {
 	general_error(ERROR_NOT_IMPLEMENTED,F,F,NULL);
 }
-
 
 /* Test if 'fault' is in the guard page at the top or bottom (depending on
 offset being 0 or -1) of area+area_size */

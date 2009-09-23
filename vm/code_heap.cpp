@@ -28,7 +28,6 @@ void factorvm::jit_compile_word(cell word_, cell def_, bool relocate)
 	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
 }
 
-
 /* Apply a function to every code block */
 void factorvm::iterate_code_heap(code_heap_iterator iter)
 {
@@ -42,7 +41,6 @@ void factorvm::iterate_code_heap(code_heap_iterator iter)
 	}
 }
 
-
 /* Copy literals referenced from all code blocks to newspace. Only for
 aging and nursery collections */
 void factorvm::copy_code_heap_roots()
@@ -50,14 +48,12 @@ void factorvm::copy_code_heap_roots()
 	iterate_code_heap(factor::copy_literal_references);
 }
 
-
 /* Update pointers to words referenced from all code blocks. Only after
 defining a new word. */
 void factorvm::update_code_heap_words()
 {
 	iterate_code_heap(factor::update_word_references);
 }
-
 
 inline void factorvm::primitive_modify_code_heap()
 {
@@ -131,12 +127,10 @@ PRIMITIVE(code_room)
 	PRIMITIVE_GETVM()->primitive_code_room();
 }
 
-
 code_block *factorvm::forward_xt(code_block *compiled)
 {
 	return (code_block *)forwarding[compiled];
 }
-
 
 void factorvm::forward_frame_xt(stack_frame *frame)
 {
@@ -193,7 +187,6 @@ void factorvm::forward_object_xts()
 	end_scan();
 }
 
-
 /* Set the XT fields now that the heap has been compacted */
 void factorvm::fixup_object_xts()
 {
@@ -222,7 +215,6 @@ void factorvm::fixup_object_xts()
 
 	end_scan();
 }
-
 
 /* Move all free space to the end of the code heap. This is not very efficient,
 since it makes several passes over the code and data heaps, but we only ever

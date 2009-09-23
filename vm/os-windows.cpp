@@ -56,7 +56,6 @@ bool factorvm::windows_stat(vm_char *path)
 	return ret;
 }
 
-
 void factorvm::windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
 {
 	snwprintf(temp_path, length-1, L"%s.image", full_path); 
@@ -90,7 +89,6 @@ const vm_char *factorvm::vm_executable_path()
 		fatal_error("GetModuleFileName() failed", 0);
 	return safe_strdup(full_path);
 }
-
 
 inline void factorvm::primitive_existsp()
 {

@@ -3,14 +3,12 @@
 namespace factor
 {
 
-
 void factorvm::print_chars(string* str)
 {
 	cell i;
 	for(i = 0; i < string_capacity(str); i++)
 		putchar(string_nth(str,i));
 }
-
 
 void factorvm::print_word(word* word, cell nesting)
 {
@@ -30,14 +28,12 @@ void factorvm::print_word(word* word, cell nesting)
 	}
 }
 
-
 void factorvm::print_factor_string(string* str)
 {
 	putchar('"');
 	print_chars(str);
 	putchar('"');
 }
-
 
 void factorvm::print_array(array* array, cell nesting)
 {
@@ -62,7 +58,6 @@ void factorvm::print_array(array* array, cell nesting)
 	if(trimmed)
 		print_string("...");
 }
-
 
 void factorvm::print_tuple(tuple *tuple, cell nesting)
 {
@@ -92,7 +87,6 @@ void factorvm::print_tuple(tuple *tuple, cell nesting)
 	if(trimmed)
 		print_string("...");
 }
-
 
 void factorvm::print_nested_obj(cell obj, fixnum nesting)
 {
@@ -144,12 +138,10 @@ void factorvm::print_nested_obj(cell obj, fixnum nesting)
 	}
 }
 
-
 void factorvm::print_obj(cell obj)
 {
 	print_nested_obj(obj,10);
 }
-
 
 void factorvm::print_objects(cell *start, cell *end)
 {
@@ -160,20 +152,17 @@ void factorvm::print_objects(cell *start, cell *end)
 	}
 }
 
-
 void factorvm::print_datastack()
 {
 	print_string("==== DATA STACK:\n");
 	print_objects((cell *)ds_bot,(cell *)ds);
 }
 
-
 void factorvm::print_retainstack()
 {
 	print_string("==== RETAIN STACK:\n");
 	print_objects((cell *)rs_bot,(cell *)rs);
 }
-
 
 void factorvm::print_stack_frame(stack_frame *frame)
 {
@@ -205,7 +194,6 @@ void factorvm::print_callstack()
 	iterate_callstack(top,bottom,factor::print_stack_frame);
 }
 
-
 void factorvm::dump_cell(cell x)
 {
 	print_cell_hex_pad(x); print_string(": ");
@@ -213,7 +201,6 @@ void factorvm::dump_cell(cell x)
 	print_cell_hex_pad(x); print_string(" tag "); print_cell(TAG(x));
 	nl();
 }
-
 
 void factorvm::dump_memory(cell from, cell to)
 {
@@ -223,14 +210,12 @@ void factorvm::dump_memory(cell from, cell to)
 		dump_cell(from);
 }
 
-
 void factorvm::dump_zone(zone *z)
 {
 	print_string("Start="); print_cell(z->start);
 	print_string(", size="); print_cell(z->size);
 	print_string(", here="); print_cell(z->here - z->start); nl();
 }
-
 
 void factorvm::dump_generations()
 {
@@ -258,7 +243,6 @@ void factorvm::dump_generations()
 	nl();
 }
 
-
 void factorvm::dump_objects(cell type)
 {
 	gc();
@@ -278,7 +262,6 @@ void factorvm::dump_objects(cell type)
 
 	end_scan();
 }
-
 
 
 void factorvm::find_data_references_step(cell *scan)
@@ -308,7 +291,6 @@ void factorvm::find_data_references(cell look_for_)
 
 	end_scan();
 }
-
 
 /* Dump all code blocks for debugging */
 void factorvm::dump_code_heap()
@@ -350,7 +332,6 @@ void factorvm::dump_code_heap()
 	print_cell(reloc_size); print_string(" bytes of relocation data\n");
 	print_cell(literal_size); print_string(" bytes of literal data\n");
 }
-
 
 void factorvm::factorbug()
 {
@@ -495,7 +476,6 @@ void factorvm::factorbug()
 			print_string("unknown command\n");
 	}
 }
-
 
 inline void factorvm::primitive_die()
 {

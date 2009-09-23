@@ -18,12 +18,10 @@ inline card *factorvm::addr_to_card(cell a)
 	return (card*)(((cell)(a) >> card_bits) + cards_offset);
 }
 
-
 inline cell factorvm::card_to_addr(card *c)
 {
 	return ((cell)c - cards_offset) << card_bits;
 }
-
 
 inline cell factorvm::card_offset(card *c)
 {
@@ -65,7 +63,6 @@ inline void factorvm::allot_barrier(object *address)
 	if(*ptr == invalid_allot_marker)
 		*ptr = ((cell)address & addr_card_mask);
 }
-
 
 //data_gc.hpp
 inline bool factorvm::collecting_accumulation_gen_p()
@@ -371,7 +368,6 @@ template<typename TYPE> void factorvm::iterate_callstack(cell top, cell bottom, 
 		frame = frame_successor(frame);
 	}
 }
-
 
 // data_heap.hpp
 /* Every object has a regular representation in the runtime, which makes GC

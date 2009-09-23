@@ -3,7 +3,6 @@
 namespace factor
 {
 
-
 void factorvm::init_inline_caching(int max_size)
 {
 	max_pic_size = max_size;
@@ -250,7 +249,6 @@ VM_C_API void *inline_cache_miss(cell return_address, factorvm *myvm)
 	ASSERTVM();
 	return VM_PTR->inline_cache_miss(return_address);
 }
-
 
 inline void factorvm::primitive_reset_inline_cache_stats()
 {

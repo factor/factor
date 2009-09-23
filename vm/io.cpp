@@ -21,7 +21,6 @@ void factorvm::init_c_io()
 	userenv[STDERR_ENV] = allot_alien(F,(cell)stderr);
 }
 
-
 void factorvm::io_error()
 {
 #ifndef WINCE
@@ -31,7 +30,6 @@ void factorvm::io_error()
 
 	general_error(ERROR_IO,tag_fixnum(errno),F,NULL);
 }
-
 
 inline void factorvm::primitive_fopen()
 {
