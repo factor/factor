@@ -1,8 +1,11 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences math math.functions hints
-math.order ;
+USING: arrays alien.c-types kernel sequences math math.functions
+hints math.order math.libm fry combinators ;
+QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
+
+GENERIC: element-type ( obj -- c-type )
 
 : vneg ( u -- v ) [ neg ] map ;
 
@@ -24,9 +27,43 @@ IN: math.vectors
 : vmax ( u v -- w ) [ max ] 2map ;
 : vmin ( u v -- w ) [ min ] 2map ;
 
-: vfloor    ( v -- _v_ ) [ floor    ] map ;
-: vceiling  ( v -- ^v^ ) [ ceiling  ] map ;
-: vtruncate ( v -- -v- ) [ truncate ] map ;
+: v+- ( u v -- w )
+    [ t ] 2dip
+    [ [ not ] 2dip pick [ + ] [ - ] if ] 2map
+    nip ;
+
+<PRIVATE
+
+: 2saturate-map ( u v quot -- w )
+    pick element-type '[ @ _ c-type-clamp ] 2map ; inline
+
+PRIVATE>
+
+: vs+ ( u v -- w ) [ + ] 2saturate-map ;
+: vs- ( u v -- w ) [ - ] 2saturate-map ;
+: vs* ( u v -- w ) [ * ] 2saturate-map ;
+
+: vabs ( u -- v ) [ abs ] map ;
+: vsqrt ( u -- v ) [ >float fsqrt ] map ;
+
+<PRIVATE
+
+: fp-bitwise-op ( x y seq quot -- z )
+    swap element-type {
+        { c:double [ [ [ double>bits ] bi@ ] dip call bits>double ] }
+        { c:float [ [ [ float>bits ] bi@ ] dip call bits>float ] }
+        [ drop call ]
+    } case ; inline
+
+PRIVATE>
+
+: vbitand ( u v -- w ) over '[ _ [ bitand ] fp-bitwise-op ] 2map ;
+: vbitor ( u v -- w ) over '[ _ [ bitor ] fp-bitwise-op ] 2map ;
+: vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
+
+: vfloor    ( u -- v ) [ floor ] map ;
+: vceiling  ( u -- v ) [ ceiling ] map ;
+: vtruncate ( u -- v ) [ truncate ] map ;
 
 : vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; 
 : vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; 

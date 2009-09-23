@@ -322,4 +322,4 @@ os windows? [
     4 "double" c-type (>>align)
 ] unless
 
-"cpu.x86.features" require
+check-sse
