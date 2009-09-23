@@ -13,16 +13,18 @@ FUNCTION: longlong read_timestamp_counter ( ) ;
 
 PRIVATE>
 
-: sse-version ( -- n )
+MEMO: sse-version ( -- n )
     sse_version
-    "sse-version" get string>number [ min ] when* ; foldable
+    "sse-version" get string>number [ min ] when* ;
 
-: sse? ( -- ? ) sse-version 10 >= ; foldable
-: sse2? ( -- ? ) sse-version 20 >= ; foldable
-: sse3? ( -- ? ) sse-version 30 >= ; foldable
-: ssse3? ( -- ? ) sse-version 33 >= ; foldable
-: sse4.1? ( -- ? ) sse-version 41 >= ; foldable
-: sse4.2? ( -- ? ) sse-version 42 >= ; foldable
+[ \ sse-version reset-memoized ] "cpu.x86.features" add-init-hook
+
+: sse? ( -- ? ) sse-version 10 >= ;
+: sse2? ( -- ? ) sse-version 20 >= ;
+: sse3? ( -- ? ) sse-version 30 >= ;
+: ssse3? ( -- ? ) sse-version 33 >= ;
+: sse4.1? ( -- ? ) sse-version 41 >= ;
+: sse4.2? ( -- ? ) sse-version 42 >= ;
 
 : sse-string ( version -- string )
     {
