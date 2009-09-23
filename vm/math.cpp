@@ -355,7 +355,6 @@ unsigned int bignum_producer(unsigned int digit, factorvm *myvm)
 inline void factorvm::primitive_byte_array_to_bignum()
 {
 	cell n_digits = array_capacity(untag_check<byte_array>(dpeek()));
-	//	bignum * result = factor::digit_stream_to_bignum(n_digits,factor::bignum_producer,0x100,0);
 	bignum * result = digit_stream_to_bignum(n_digits,factor::bignum_producer,0x100,0);
 	drepl(tag<bignum>(result));
 }
@@ -796,7 +795,7 @@ void factorvm::box_float(float flo)
         dpush(allot_float(flo));
 }
 
-VM_C_API void box_float(float flo,factorvm *myvm)      // not sure if this is ever called
+VM_C_API void box_float(float flo, factorvm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->box_float(flo);

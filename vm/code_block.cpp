@@ -15,7 +15,7 @@ relocation_class factorvm::relocation_class_of(relocation_entry r)
 
 cell factorvm::relocation_offset_of(relocation_entry r)
 {
-	return  (r & 0x00ffffff);
+	return (r & 0x00ffffff);
 }
 
 void factorvm::flush_icache_for(code_block *block)
@@ -529,7 +529,7 @@ code_block *factorvm::allot_code_block(cell size)
 }
 
 /* Might GC */
-code_block *factorvm::add_code_block(cell type,cell code_,cell labels_,cell relocation_,cell literals_)
+code_block *factorvm::add_code_block(cell type, cell code_, cell labels_, cell relocation_, cell literals_)
 {
 	gc_root<byte_array> code(code_,this);
 	gc_root<object> labels(labels_,this);
