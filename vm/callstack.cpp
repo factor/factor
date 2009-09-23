@@ -46,7 +46,7 @@ stack_frame *factorvm::capture_start()
 	return frame + 1;
 }
 
-inline void factorvm::vmprim_callstack()
+inline void factorvm::primitive_callstack()
 {
 	stack_frame *top = capture_start();
 	stack_frame *bottom = stack_chain->callstack_bottom;
@@ -62,10 +62,10 @@ inline void factorvm::vmprim_callstack()
 
 PRIMITIVE(callstack)
 {
-	PRIMITIVE_GETVM()->vmprim_callstack();
+	PRIMITIVE_GETVM()->primitive_callstack();
 }
 
-inline void factorvm::vmprim_set_callstack()
+inline void factorvm::primitive_set_callstack()
 {
 	callstack *stack = untag_check<callstack>(dpop());
 
@@ -80,7 +80,7 @@ inline void factorvm::vmprim_set_callstack()
 
 PRIMITIVE(set_callstack)
 {
-	PRIMITIVE_GETVM()->vmprim_set_callstack();
+	PRIMITIVE_GETVM()->primitive_set_callstack();
 }
 
 code_block *factorvm::frame_code(stack_frame *frame)
@@ -162,7 +162,7 @@ struct stack_frame_accumulator {
 
 }
 
-inline void factorvm::vmprim_callstack_to_array()
+inline void factorvm::primitive_callstack_to_array()
 {
 	gc_root<callstack> callstack(dpop(),this);
 
@@ -175,7 +175,7 @@ inline void factorvm::vmprim_callstack_to_array()
 
 PRIMITIVE(callstack_to_array)
 {
-	PRIMITIVE_GETVM()->vmprim_callstack_to_array();
+	PRIMITIVE_GETVM()->primitive_callstack_to_array();
 }
 
 stack_frame *factorvm::innermost_stack_frame(callstack *stack)
@@ -199,27 +199,27 @@ stack_frame *factorvm::innermost_stack_frame_quot(callstack *callstack)
 
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
-inline void factorvm::vmprim_innermost_stack_frame_executing()
+inline void factorvm::primitive_innermost_stack_frame_executing()
 {
 	dpush(frame_executing(innermost_stack_frame(untag_check<callstack>(dpop()))));
 }
 
 PRIMITIVE(innermost_stack_frame_executing)
 {
-	PRIMITIVE_GETVM()->vmprim_innermost_stack_frame_executing();
+	PRIMITIVE_GETVM()->primitive_innermost_stack_frame_executing();
 }
 
-inline void factorvm::vmprim_innermost_stack_frame_scan()
+inline void factorvm::primitive_innermost_stack_frame_scan()
 {
 	dpush(frame_scan(innermost_stack_frame_quot(untag_check<callstack>(dpop()))));
 }
 
 PRIMITIVE(innermost_stack_frame_scan)
 {
-	PRIMITIVE_GETVM()->vmprim_innermost_stack_frame_scan();
+	PRIMITIVE_GETVM()->primitive_innermost_stack_frame_scan();
 }
 
-inline void factorvm::vmprim_set_innermost_stack_frame_quot()
+inline void factorvm::primitive_set_innermost_stack_frame_quot()
 {
 	gc_root<callstack> callstack(dpop(),this);
 	gc_root<quotation> quot(dpop(),this);
@@ -237,7 +237,7 @@ inline void factorvm::vmprim_set_innermost_stack_frame_quot()
 
 PRIMITIVE(set_innermost_stack_frame_quot)
 {
-	PRIMITIVE_GETVM()->vmprim_set_innermost_stack_frame_quot();
+	PRIMITIVE_GETVM()->primitive_set_innermost_stack_frame_quot();
 }
 
 /* called before entry into Factor code. */

@@ -497,7 +497,7 @@ void factorvm::factorbug()
 }
 
 
-inline void factorvm::vmprim_die()
+inline void factorvm::primitive_die()
 {
 	print_string("The die word was called by the library. Unless you called it yourself,\n");
 	print_string("you have triggered a bug in Factor. Please report.\n");
@@ -506,7 +506,7 @@ inline void factorvm::vmprim_die()
 
 PRIMITIVE(die)
 {
-	PRIMITIVE_GETVM()->vmprim_die();
+	PRIMITIVE_GETVM()->primitive_die();
 }
 
 }
