@@ -112,6 +112,8 @@ $nl
 { $subsection "random-protocol" }
 "Randomizing a sequence:"
 { $subsection randomize }
+"Sampling a sequences:"
+{ $subsection sample }
 "Deleting a random element from a sequence:"
 { $subsection delete-random }
 "Random numbers with " { $snippet "n" } " bits:"
