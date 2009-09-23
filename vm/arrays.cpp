@@ -23,7 +23,6 @@ array *factorvm::allot_array(cell capacity, cell fill_)
 	return new_array.untagged();
 }
 
-
 /* push a new array on the stack */
 inline void factorvm::primitive_array()
 {
@@ -45,7 +44,6 @@ cell factorvm::allot_array_1(cell obj_)
 	return a.value();
 }
 
-
 cell factorvm::allot_array_2(cell v1_, cell v2_)
 {
 	gc_root<object> v1(v1_,this);
@@ -55,7 +53,6 @@ cell factorvm::allot_array_2(cell v1_, cell v2_)
 	set_array_nth(a.untagged(),1,v2.value());
 	return a.value();
 }
-
 
 cell factorvm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 {
@@ -70,7 +67,6 @@ cell factorvm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 	set_array_nth(a.untagged(),3,v4.value());
 	return a.value();
 }
-
 
 inline void factorvm::primitive_resize_array()
 {
