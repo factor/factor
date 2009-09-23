@@ -3,12 +3,10 @@
 namespace factor
 {
 
-
 void factorvm::init_profiler()
 {
 	profiling_p = false;
 }
-
 
 /* Allocates memory */
 code_block *factorvm::compile_profiling_stub(cell word_)
@@ -20,7 +18,6 @@ code_block *factorvm::compile_profiling_stub(cell word_)
 
 	return jit.to_code_block();
 }
-
 
 /* Allocates memory */
 void factorvm::set_profiling(bool profiling)
@@ -49,7 +46,6 @@ void factorvm::set_profiling(bool profiling)
 	/* Update XTs in code heap */
 	iterate_code_heap(factor::relocate_code_block);
 }
-
 
 inline void factorvm::primitive_profiling()
 {

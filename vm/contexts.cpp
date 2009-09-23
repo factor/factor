@@ -3,7 +3,6 @@
 namespace factor
 {
 
-
 void factorvm::reset_datastack()
 {
 	ds = ds_bot - sizeof(cell);

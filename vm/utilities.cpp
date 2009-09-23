@@ -18,7 +18,6 @@ vm_char *safe_strdup(const vm_char *str)
 	return ptr;
 }
 
-
 /* We don't use printf directly, because format directives are not portable.
 Instead we define the common cases here. */
 void nl()
@@ -30,7 +29,6 @@ void print_string(const char *str)
 {
 	fputs(str,stdout);
 }
-
 
 void print_cell(cell x)
 {

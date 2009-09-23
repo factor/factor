@@ -17,7 +17,6 @@ THREADHANDLE start_thread(void *(*start_routine)(void *),void *args)
 	return thread;
 }
 
-
 pthread_key_t tlsKey = 0;
 
 void init_platform_globals()
@@ -75,7 +74,6 @@ void factorvm::ffi_dlclose(dll *dll)
 		general_error(ERROR_FFI,F,F,NULL);
 	dll->dll = NULL;
 }
-
 
 
 
@@ -148,7 +146,6 @@ stack_frame *factorvm::uap_stack_pointer(void *uap)
 }
 
 
-
 void factorvm::memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	signal_fault_addr = (cell)siginfo->si_addr;
@@ -160,7 +157,6 @@ void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	SIGNAL_VM_PTR()->memory_signal_handler(signal,siginfo,uap);
 }
-
 
 void factorvm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {

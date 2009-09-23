@@ -10,7 +10,6 @@ byte_array *factorvm::allot_byte_array(cell size)
 	return array;
 }
 
-
 inline void factorvm::primitive_byte_array()
 {
 	cell size = unbox_array_size();
