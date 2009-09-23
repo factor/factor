@@ -47,11 +47,18 @@ UNION: two-operand-insn
     ##min-float
     ##max-float
     ##add-vector
+    ##saturated-add-vector
+    ##add-sub-vector
     ##sub-vector
+    ##saturated-sub-vector
     ##mul-vector
+    ##saturated-mul-vector
     ##div-vector
     ##min-vector
-    ##max-vector ;
+    ##max-vector
+    ##and-vector
+    ##or-vector
+    ##xor-vector ;
 
 GENERIC: convert-two-operand* ( insn -- )
 
