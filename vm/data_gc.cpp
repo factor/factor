@@ -10,7 +10,6 @@ void factorvm::init_data_gc()
 	collecting_aging_again = false;
 }
 
-
 /* Given a pointer to oldspace, copy it to newspace */
 object *factorvm::copy_untagged_object_impl(object *pointer, cell size)
 {
@@ -26,14 +25,12 @@ object *factorvm::copy_untagged_object_impl(object *pointer, cell size)
 	return newpointer;
 }
 
-
 object *factorvm::copy_object_impl(object *untagged)
 {
 	object *newpointer = copy_untagged_object_impl(untagged,untagged_object_size(untagged));
 	untagged->h.forward_to(newpointer);
 	return newpointer;
 }
-
 
 bool factorvm::should_copy_p(object *untagged)
 {
@@ -51,7 +48,6 @@ bool factorvm::should_copy_p(object *untagged)
 		return false;
 	}
 }
-
 
 /* Follow a chain of forwarding pointers */
 object *factorvm::resolve_forwarding(object *untagged)
@@ -72,7 +68,6 @@ object *factorvm::resolve_forwarding(object *untagged)
 	}
 }
 
-
 template <typename TYPE> TYPE *factorvm::copy_untagged_object(TYPE *untagged)
 {
 	check_data_pointer(untagged);
@@ -88,12 +83,10 @@ template <typename TYPE> TYPE *factorvm::copy_untagged_object(TYPE *untagged)
 	return untagged;
 }
 
-
 cell factorvm::copy_object(cell pointer)
 {
 	return RETAG(copy_untagged_object(untag<object>(pointer)),TAG(pointer));
 }
-
 
 void factorvm::copy_handle(cell *handle)
 {
@@ -108,7 +101,6 @@ void factorvm::copy_handle(cell *handle)
 	}
 }
 
-
 /* Scan all the objects in the card */
 void factorvm::copy_card(card *ptr, cell gen, cell here)
 {
@@ -122,7 +114,6 @@ void factorvm::copy_card(card *ptr, cell gen, cell here)
 
 	cards_scanned++;
 }
-
 
 void factorvm::copy_card_deck(card_deck *deck, cell gen, card mask, card unmask)
 {
@@ -154,7 +145,6 @@ void factorvm::copy_card_deck(card_deck *deck, cell gen, card mask, card unmask)
 
 	decks_scanned++;
 }
-
 
 /* Copy all newspace objects referenced from marked cards to the destination */
 void factorvm::copy_gen_cards(cell gen)
@@ -222,7 +212,6 @@ void factorvm::copy_gen_cards(cell gen)
 	}
 }
 
-
 /* Scan cards in all generations older than the one being collected, copying
 old->new references */
 void factorvm::copy_cards()
@@ -236,7 +225,6 @@ void factorvm::copy_cards()
 	card_scan_time += (current_micros() - start);
 }
 
-
 /* Copy all tagged pointers in a range of memory */
 void factorvm::copy_stack_elements(segment *region, cell top)
 {
@@ -246,7 +234,6 @@ void factorvm::copy_stack_elements(segment *region, cell top)
 		copy_handle((cell*)ptr);
 }
 
-
 void factorvm::copy_registered_locals()
 {
 	std::vector<cell>::const_iterator iter = gc_locals.begin();
@@ -255,7 +242,6 @@ void factorvm::copy_registered_locals()
 	for(; iter < end; iter++)
 		copy_handle((cell *)(*iter));
 }
-
 
 void factorvm::copy_registered_bignums()
 {
@@ -278,7 +264,6 @@ void factorvm::copy_registered_bignums()
 		}
 	}
 }
-
 
 /* Copy roots over at the start of GC, namely various constants, stacks,
 the user environment and extra roots registered by local_roots.hpp */
@@ -316,7 +301,6 @@ void factorvm::copy_roots()
 		copy_handle(&userenv[i]);
 }
 
-
 cell factorvm::copy_next_from_nursery(cell scan)
 {
 	cell *obj = (cell *)scan;
@@ -344,7 +328,6 @@ cell factorvm::copy_next_from_nursery(cell scan)
 
 	return scan + untagged_object_size((object *)scan);
 }
-
 
 cell factorvm::copy_next_from_aging(cell scan)
 {
@@ -378,7 +361,6 @@ cell factorvm::copy_next_from_aging(cell scan)
 	return scan + untagged_object_size((object *)scan);
 }
 
-
 cell factorvm::copy_next_from_tenured(cell scan)
 {
 	cell *obj = (cell *)scan;
@@ -409,7 +391,6 @@ cell factorvm::copy_next_from_tenured(cell scan)
 	return scan + untagged_object_size((object *)scan);
 }
 
-
 void factorvm::copy_reachable_objects(cell scan, cell *end)
 {
 	if(collecting_gen == data->nursery())
@@ -428,7 +409,6 @@ void factorvm::copy_reachable_objects(cell scan, cell *end)
 			scan = copy_next_from_tenured(scan);
 	}
 }
-
 
 /* Prepare to start copying reachable objects into an unused zone */
 void factorvm::begin_gc(cell requested_bytes)
@@ -463,7 +443,6 @@ void factorvm::begin_gc(cell requested_bytes)
 		newspace = &data->generations[collecting_gen + 1];
 	}
 }
-
 
 void factorvm::end_gc(cell gc_elapsed)
 {
@@ -502,7 +481,6 @@ void factorvm::end_gc(cell gc_elapsed)
 
 	collecting_aging_again = false;
 }
-
 
 /* Collect gen and all younger generations.
 If growing_data_heap_ is true, we must grow the data heap to such a size that
@@ -585,12 +563,10 @@ void factorvm::garbage_collection(cell gen,bool growing_data_heap_,cell requeste
 	performing_gc = false;
 }
 
-
 void factorvm::gc()
 {
 	garbage_collection(data->tenured(),false,0);
 }
-
 
 inline void factorvm::primitive_gc()
 {

@@ -3,33 +3,28 @@
 namespace factor
 {
 
-
 THREADHANDLE start_thread(void *(*start_routine)(void *),void *args){
     return (void*) CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0); 
 }
-
 
 DWORD dwTlsIndex; 
 
 void init_platform_globals()
 {
-	if ((dwTlsIndex = TlsAlloc()) == TLS_OUT_OF_INDEXES) {
+	if ((dwTlsIndex = TlsAlloc()) == TLS_OUT_OF_INDEXES)
 		fatal_error("TlsAlloc failed - out of indexes",0);
-	}
 }
 
 void register_vm_with_thread(factorvm *vm)
 {
-	if (! TlsSetValue(dwTlsIndex, vm)) {
+	if (! TlsSetValue(dwTlsIndex, vm))
 		fatal_error("TlsSetValue failed",0);
-	}
 }
 
 factorvm *tls_vm()
 {
 	return (factorvm*)TlsGetValue(dwTlsIndex);
 }
-
 
 s64 current_micros()
 {
@@ -84,7 +79,6 @@ LONG factorvm::exception_handler(PEXCEPTION_POINTERS pe)
 	}
 	return EXCEPTION_CONTINUE_EXECUTION;
 }
-
 
 FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 {
