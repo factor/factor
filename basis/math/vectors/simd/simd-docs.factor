@@ -17,13 +17,17 @@ $nl
 "There should never be any reason to use " { $link "math.vectors.simd.intrinsics" } " directly, but they too have a straightforward, but lower-level, interface." ;
 
 ARTICLE: "math.vectors.simd.support" "Supported SIMD instruction sets and operations"
-"At present, the SIMD support makes use of SSE, SSE2 and a few SSE3 instructions on x86 CPUs."
+"At present, the SIMD support makes use of a subset of SSE up to SSE4.1. The subset used depends on the current CPU type."
 $nl
 "SSE1 only supports single-precision SIMD (" { $snippet "float-4" } " and " { $snippet "float-8" } ")."
 $nl
-"SSE2 introduces double-precision and integer SIMD."
+"SSE2 introduces double-precision SIMD (" { $snippet "double-2" } " and " { $snippet "double-4" } ") and integer SIMD (all types). Integer SIMD in missing a few features, in particular the " { $link vmin } " and " { $link vmax } " operations only work on " { $snippet "uchar-16" } " and " { $snippet "short-8" } "."
 $nl
-"SSE3 introduces horizontal adds (summing all components of a single vector register), which is useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link v. } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } ". If SSE3 is not available, software fallbacks are used for " { $link sum } " and related words."
+"SSE3 introduces horizontal adds (summing all components of a single vector register), which is useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link v. } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } "."
+$nl
+"SSSE3 introduces " { $link vabs } " for " { $snippet "char-16" } ", " { $snippet "short-8" } " and " { $snippet "int-4" } "."
+$nl
+"SSE4.1 introduces " { $link vmin } " and " { $link vmax } " for all remaining integer types."
 $nl
 "On PowerPC, or older x86 chips without SSE, software fallbacks are used for all high-level vector operations. SIMD code can run with no loss in functionality, just decreased performance."
 $nl
