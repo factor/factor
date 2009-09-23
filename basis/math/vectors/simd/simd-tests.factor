@@ -74,17 +74,18 @@ CONSTANT: simd-classes
 : boa-ctors ( -- seq )
     simd-classes [ [ name>> "-boa" append ] [ vocabulary>> ] bi lookup ] map ;
 
-: check-optimizer ( seq inputs quot -- )
-    [
+: check-optimizer ( seq inputs quot eq-quot -- )
+    '[
+        @
         [ "print-mr" get [ nip test-mr mr. ] [ 2drop ] if ]
         [ [ call ] dip call ]
-        [ [ call ] dip compile-call ] 2tri = not
-    ] compose filter ; inline
+        [ [ call ] dip compile-call ] 2tri @ not
+    ] filter ; inline
 
 "== Checking -new constructors" print
 
 [ { } ] [
-    simd-classes [ [ [ ] ] dip '[ _ new ] ] check-optimizer
+    simd-classes [ [ [ ] ] dip '[ _ new ] ] [ = ] check-optimizer
 ] unit-test
 
 [ { } ] [
@@ -96,7 +97,7 @@ CONSTANT: simd-classes
 [ { } ] [
     with-ctors [
         [ 1000 random '[ _ ] ] dip '[ { fixnum } declare _ execute ]
-    ] check-optimizer
+    ] [ = ] check-optimizer
 ] unit-test
 
 "== Checking -boa constructors" print
@@ -107,7 +108,7 @@ CONSTANT: simd-classes
         [ nip [ 1000 random ] [ ] replicate-as ]
         [ fixnum <array> swap '[ _ declare _ execute ] ]
         2bi
-    ] check-optimizer
+    ] [ = ] check-optimizer
 ] unit-test
 
 "== Checking vector operations" print
@@ -133,31 +134,50 @@ CONSTANT: simd-classes
     ] bi
     word '[ _ declare _ execute ] ;
 
-: ops-to-check ( elt-class -- alist )
-    [ vector-words >alist ] dip float = [
-        [ drop { n/v v/n v/ normalize } member? not ] assoc-filter
-    ] unless ;
+: remove-float-words ( alist -- alist' )
+    [ drop { n/v v/n v/ normalize } member? not ] assoc-filter ;
 
-: check-vector-ops ( class elt-class -- )
-    [ nip ops-to-check ] 2keep
-    '[ first2 inputs _ _ check-vector-op ] check-optimizer ; inline
+: ops-to-check ( elt-class -- alist )
+    [ vector-words >alist ] dip
+    float = [ remove-float-words ] unless ;
+
+: check-vector-ops ( class elt-class compare-quot -- )
+    [
+        [ nip ops-to-check ] 2keep
+        '[ first2 inputs _ _ check-vector-op ]
+    ] dip check-optimizer ; inline
+
+: approx= ( x y -- ? )
+    {
+        { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
+        { [ 2dup [ sequence? ] both? ] [
+            [
+                {
+                    { [ 2dup [ fp-nan? ] both? ] [ 2drop t ] }
+                    { [ 2dup [ fp-nan? ] either? not ] [ -1.e8 ~ ] }
+                } cond
+            ] 2all?
+        ] }
+    } cond ;
 
 : simd-classes&reps ( -- alist )
     simd-classes [
-        dup name>> [ "float" head? ] [ "double" head? ] bi or
-        float fixnum ?
-    ] { } map>assoc ;
+        {
+            { [ dup name>> "float" head? ] [ float [ approx= ] ] }
+            { [ dup name>> "double" tail? ] [ float [ = ] ] }
+            [ fixnum [ = ] ]
+        } cond 3array
+    ] map ;
 
 simd-classes&reps [
-    [ [ { } ] ] 2dip '[ _ _ check-vector-ops ] unit-test
-] assoc-each
+    [ [ { } ] ] dip first3 '[ _ _ _ check-vector-ops ] unit-test
+] each
 
 ! Other regressions
 [ 8000000 ] [
     int-8{ 1000 1000 1000 1000 1000 1000 1000 1000 }
     [ { int-8 } declare dup [ * ] [ + ] 2map-reduce ] compile-call
 ] unit-test
-
 
 ! Vector alien intrinsics
 [ float-4{ 1 2 3 4 } ] [

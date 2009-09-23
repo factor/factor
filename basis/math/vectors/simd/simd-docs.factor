@@ -1,5 +1,5 @@
-USING: help.markup help.syntax sequences math math.vectors
-multiline kernel.private classes.tuple.private
+USING: help.markup help.syntax help.vocabs sequences math
+math.vectors multiline kernel.private classes.tuple.private
 math.vectors.simd.intrinsics cpu.architecture ;
 IN: math.vectors.simd
 
@@ -159,22 +159,8 @@ ARTICLE: "math.vectors.simd.intrinsics" "Low-level SIMD primitives"
 }
 "The compiler converts " { $link "math-vectors" } " into SIMD primitives automatically in cases where it is safe; this means that the input types are known to be SIMD vectors, and the CPU supports SIMD."
 $nl
-"It is best to avoid calling these primitives directly. To write efficient high-level code that compiles down to primitives and avoids memory allocation, see " { $link "math.vectors.simd.efficiency" } "."
-{ $subsection (simd-v+) }
-{ $subsection (simd-vs+) }
-{ $subsection (simd-v+-) }
-{ $subsection (simd-v-) }
-{ $subsection (simd-vs-) }
-{ $subsection (simd-v*) }
-{ $subsection (simd-vs*) }
-{ $subsection (simd-v/) }
-{ $subsection (simd-vmin) }
-{ $subsection (simd-vmax) }
-{ $subsection (simd-vsqrt) }
-{ $subsection (simd-sum) }
-{ $subsection (simd-broadcast) }
-{ $subsection (simd-gather-2) }
-{ $subsection (simd-gather-4) }
+"It is best to avoid calling SIMD primitives directly. To write efficient high-level code that compiles down to primitives and avoids memory allocation, see " { $link "math.vectors.simd.efficiency" } "."
+$nl
 "There are two primitives which are used to implement accessing SIMD vector fields of " { $link "classes.struct" } ":"
 { $subsection alien-vector }
 { $subsection set-alien-vector }
@@ -185,12 +171,18 @@ ARTICLE: "math.vectors.simd.alien" "SIMD data in struct classes"
 $nl
 "Only SIMD struct fields are allowed at the moment; passing SIMD data as function parameters is not yet supported." ;
 
+ARTICLE: "math.vectors.simd.accuracy" "Numerical accuracy of SIMD primitives"
+"No guarantees are made that " { $vocab-link "math.vectors.simd" } " words will give identical results on different SSE versions, or between the hardware intrinsics and the software fallbacks."
+$nl
+"In particular, horizontal operations on " { $snippet "float-4" } " and " { $snippet "float-8" } " are affected by this. They are computed with lower precision in intrinsics than the software fallback. Horizontal opeartions include anything involving adding together the components of a vector, such as " { $link sum } " or " { $link normalize } "." ;
+
 ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
 "The " { $vocab-link "math.vectors.simd" } " vocabulary extends the " { $vocab-link "math.vectors" } " vocabulary to support efficient vector arithmetic on small, fixed-size vectors."
 { $subsection "math.vectors.simd.intro" }
 { $subsection "math.vectors.simd.types" }
 { $subsection "math.vectors.simd.words" }
 { $subsection "math.vectors.simd.support" }
+{ $subsection "math.vectors.simd.accuracy" }
 { $subsection "math.vectors.simd.efficiency" }
 { $subsection "math.vectors.simd.alien" }
 { $subsection "math.vectors.simd.intrinsics" } ;
