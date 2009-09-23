@@ -19,14 +19,14 @@ jit::jit(cell type_, cell owner_, factor_vm *vm)
 	  computing_offset_p(false),
 	  position(0),
 	  offset(0),
-	  myvm(vm)
+	  parent_vm(vm)
 {
-	if(myvm->stack_traces_p()) literal(owner.value());
+	if(parent_vm->stack_traces_p()) literal(owner.value());
 }
 
 void jit::emit_relocation(cell code_template_)
 {
-	gc_root<array> code_template(code_template_,myvm);
+	gc_root<array> code_template(code_template_,parent_vm);
 	cell capacity = array_capacity(code_template.untagged());
 	for(cell i = 1; i < capacity; i += 3)
 	{
@@ -45,11 +45,11 @@ void jit::emit_relocation(cell code_template_)
 /* Allocates memory */
 void jit::emit(cell code_template_)
 {
-	gc_root<array> code_template(code_template_,myvm);
+	gc_root<array> code_template(code_template_,parent_vm);
 
 	emit_relocation(code_template.value());
 
-	gc_root<byte_array> insns(array_nth(code_template.untagged(),0),myvm);
+	gc_root<byte_array> insns(array_nth(code_template.untagged(),0),parent_vm);
 
 	if(computing_offset_p)
 	{
@@ -73,16 +73,16 @@ void jit::emit(cell code_template_)
 }
 
 void jit::emit_with(cell code_template_, cell argument_) {
-	gc_root<array> code_template(code_template_,myvm);
-	gc_root<object> argument(argument_,myvm);
+	gc_root<array> code_template(code_template_,parent_vm);
+	gc_root<object> argument(argument_,parent_vm);
 	literal(argument.value());
 	emit(code_template.value());
 }
 
 void jit::emit_class_lookup(fixnum index, cell type)
 {
-	emit_with(myvm->userenv[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
-	emit(myvm->userenv[type]);
+	emit_with(parent_vm->userenv[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
+	emit(parent_vm->userenv[type]);
 }
 
 /* Facility to convert compiled code offsets to quotation offsets.
@@ -102,7 +102,7 @@ code_block *jit::to_code_block()
 	relocation.trim();
 	literals.trim();
 
-	return myvm->add_code_block(
+	return parent_vm->add_code_block(
 		type,
 		code.elements.value(),
 		F, /* no labels */

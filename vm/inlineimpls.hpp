@@ -169,12 +169,12 @@ inline void factor_vm::check_tagged_pointer(cell tagged)
 template <typename TYPE>
 struct gc_root : public tagged<TYPE>
 {
-	factor_vm *myvm;
+	factor_vm *parent_vm;
 
-	void push() { myvm->check_tagged_pointer(tagged<TYPE>::value()); myvm->gc_locals.push_back((cell)this); }
+	void push() { parent_vm->check_tagged_pointer(tagged<TYPE>::value()); parent_vm->gc_locals.push_back((cell)this); }
 	
-	explicit gc_root(cell value_,factor_vm *vm) : tagged<TYPE>(value_),myvm(vm) { push(); }
-	explicit gc_root(TYPE *value_, factor_vm *vm) : tagged<TYPE>(value_),myvm(vm) { push(); }
+	explicit gc_root(cell value_,factor_vm *vm) : tagged<TYPE>(value_),parent_vm(vm) { push(); }
+	explicit gc_root(TYPE *value_, factor_vm *vm) : tagged<TYPE>(value_),parent_vm(vm) { push(); }
 
 	const gc_root<TYPE>& operator=(const TYPE *x) { tagged<TYPE>::operator=(x); return *this; }
 	const gc_root<TYPE>& operator=(const cell &x) { tagged<TYPE>::operator=(x); return *this; }
@@ -183,7 +183,7 @@ struct gc_root : public tagged<TYPE>
 #ifdef FACTOR_DEBUG
 		assert(myvm->gc_locals.back() == (cell)this);
 #endif
-		myvm->gc_locals.pop_back();
+		parent_vm->gc_locals.pop_back();
 	}
 };
 
@@ -191,18 +191,18 @@ struct gc_root : public tagged<TYPE>
 struct gc_bignum
 {
 	bignum **addr;
-	factor_vm *myvm;
-	gc_bignum(bignum **addr_, factor_vm *vm) : addr(addr_), myvm(vm) {
+	factor_vm *parent_vm;
+	gc_bignum(bignum **addr_, factor_vm *vm) : addr(addr_), parent_vm(vm) {
 		if(*addr_)
-			myvm->check_data_pointer(*addr_);
-		myvm->gc_bignums.push_back((cell)addr);
+			parent_vm->check_data_pointer(*addr_);
+		parent_vm->gc_bignums.push_back((cell)addr);
 	}
 
 	~gc_bignum() {
 #ifdef FACTOR_DEBUG
 		assert(myvm->gc_bignums.back() == (cell)addr);
 #endif
-		myvm->gc_bignums.pop_back();
+		parent_vm->gc_bignums.pop_back();
 	}
 };
 

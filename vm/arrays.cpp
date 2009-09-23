@@ -82,18 +82,18 @@ PRIMITIVE(resize_array)
 
 void growable_array::add(cell elt_)
 {
-	factor_vm* myvm = elements.myvm;
-	gc_root<object> elt(elt_,myvm);
+	factor_vm* parent_vm = elements.parent_vm;
+	gc_root<object> elt(elt_,parent_vm);
 	if(count == array_capacity(elements.untagged()))
-		elements = myvm->reallot_array(elements.untagged(),count * 2);
+		elements = parent_vm->reallot_array(elements.untagged(),count * 2);
 
-	myvm->set_array_nth(elements.untagged(),count++,elt.value());
+	parent_vm->set_array_nth(elements.untagged(),count++,elt.value());
 }
 
 void growable_array::trim()
 {
-	factor_vm *myvm = elements.myvm;
-	elements = myvm->reallot_array(elements.untagged(),count);
+	factor_vm *parent_vm = elements.parent_vm;
+	elements = parent_vm->reallot_array(elements.untagged(),count);
 }
 
 }
