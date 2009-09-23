@@ -3,7 +3,7 @@ math hashtables.private math.private namespaces sequences tools.test
 namespaces.private slots.private sequences.private byte-arrays alien
 alien.accessors layouts words definitions compiler.units io
 combinators vectors grouping make alien.c-types combinators.short-circuit
-math.order math.libm math.parser ;
+math.order math.libm math.parser alien.c-types ;
 FROM: math => float ;
 QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
@@ -429,5 +429,23 @@ cell 4 = [
                 0 alien-signed-4
             ] curry dup bi *
         ] curry each-integer
+    ] compile-call
+] unit-test
+
+TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-only } ;
+
+[ 2 ] [
+    little-endian?
+    T{ myseq f B{ 1 0 0 0 } B{ 1 0 0 0 } }
+    T{ myseq f B{ 0 0 0 1 } B{ 0 0 0 1 } } ?
+    [
+        { myseq } declare
+        [ 0 2 ] dip dup
+        [
+            [
+                over 1 < [ underlying1>> ] [ [ 1 - ] dip underlying2>> ] if
+                swap 4 * >fixnum alien-signed-4
+            ] bi-curry@ bi * +
+        ] 2curry each-integer
     ] compile-call
 ] unit-test
