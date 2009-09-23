@@ -592,17 +592,17 @@ void factorvm::gc()
 }
 
 
-inline void factorvm::vmprim_gc()
+inline void factorvm::primitive_gc()
 {
 	gc();
 }
 
 PRIMITIVE(gc)
 {
-	PRIMITIVE_GETVM()->vmprim_gc();
+	PRIMITIVE_GETVM()->primitive_gc();
 }
 
-inline void factorvm::vmprim_gc_stats()
+inline void factorvm::primitive_gc_stats()
 {
 	growable_array result(this);
 
@@ -634,7 +634,7 @@ inline void factorvm::vmprim_gc_stats()
 
 PRIMITIVE(gc_stats)
 {
-	PRIMITIVE_GETVM()->vmprim_gc_stats();
+	PRIMITIVE_GETVM()->primitive_gc_stats();
 }
 
 void factorvm::clear_gc_stats()
@@ -648,19 +648,19 @@ void factorvm::clear_gc_stats()
 	code_heap_scans = 0;
 }
 
-inline void factorvm::vmprim_clear_gc_stats()
+inline void factorvm::primitive_clear_gc_stats()
 {
 	clear_gc_stats();
 }
 
 PRIMITIVE(clear_gc_stats)
 {
-	PRIMITIVE_GETVM()->vmprim_clear_gc_stats();
+	PRIMITIVE_GETVM()->primitive_clear_gc_stats();
 }
 
 /* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
    to coalesce equal but distinct quotations and wrappers. */
-inline void factorvm::vmprim_become()
+inline void factorvm::primitive_become()
 {
 	array *new_objects = untag_check<array>(dpop());
 	array *old_objects = untag_check<array>(dpop());
@@ -691,7 +691,7 @@ inline void factorvm::vmprim_become()
 
 PRIMITIVE(become)
 {
-	PRIMITIVE_GETVM()->vmprim_become();
+	PRIMITIVE_GETVM()->primitive_become();
 }
 
 void factorvm::inline_gc(cell *gc_roots_base, cell gc_roots_size)

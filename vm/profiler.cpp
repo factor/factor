@@ -51,14 +51,14 @@ void factorvm::set_profiling(bool profiling)
 }
 
 
-inline void factorvm::vmprim_profiling()
+inline void factorvm::primitive_profiling()
 {
 	set_profiling(to_boolean(dpop()));
 }
 
 PRIMITIVE(profiling)
 {
-	PRIMITIVE_GETVM()->vmprim_profiling();
+	PRIMITIVE_GETVM()->primitive_profiling();
 }
 
 }

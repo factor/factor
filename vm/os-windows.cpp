@@ -92,7 +92,7 @@ const vm_char *factorvm::vm_executable_path()
 }
 
 
-inline void factorvm::vmprim_existsp()
+inline void factorvm::primitive_existsp()
 {
 	vm_char *path = untag_check<byte_array>(dpop())->data<vm_char>();
 	box_boolean(windows_stat(path));
@@ -100,7 +100,7 @@ inline void factorvm::vmprim_existsp()
 
 PRIMITIVE(existsp)
 {
-	PRIMITIVE_GETVM()->vmprim_existsp();
+	PRIMITIVE_GETVM()->primitive_existsp();
 }
 
 segment *factorvm::alloc_segment(cell size)

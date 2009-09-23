@@ -46,7 +46,7 @@ cell factorvm::allot_alien(cell delegate_, cell displacement)
 }
 
 /* make an alien pointing at an offset of another alien */
-inline void factorvm::vmprim_displaced_alien()
+inline void factorvm::primitive_displaced_alien()
 {
 	cell alien = dpop();
 	cell displacement = to_cell(dpop());
@@ -71,19 +71,19 @@ inline void factorvm::vmprim_displaced_alien()
 
 PRIMITIVE(displaced_alien)
 {
-	PRIMITIVE_GETVM()->vmprim_displaced_alien();
+	PRIMITIVE_GETVM()->primitive_displaced_alien();
 }
 
 /* address of an object representing a C pointer. Explicitly throw an error
 if the object is a byte array, as a sanity check. */
-inline void factorvm::vmprim_alien_address()
+inline void factorvm::primitive_alien_address()
 {
 	box_unsigned_cell((cell)pinned_alien_offset(dpop()));
 }
 
 PRIMITIVE(alien_address)
 {
-	PRIMITIVE_GETVM()->vmprim_alien_address();
+	PRIMITIVE_GETVM()->primitive_alien_address();
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
@@ -121,7 +121,7 @@ DEFINE_ALIEN_ACCESSOR(double,double,box_double,to_double)
 DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
 
 /* open a native library and push a handle */
-inline void factorvm::vmprim_dlopen()
+inline void factorvm::primitive_dlopen()
 {
 	gc_root<byte_array> path(dpop(),this);
 	path.untag_check(this);
@@ -133,11 +133,11 @@ inline void factorvm::vmprim_dlopen()
 
 PRIMITIVE(dlopen)
 {
-	PRIMITIVE_GETVM()->vmprim_dlopen();
+	PRIMITIVE_GETVM()->primitive_dlopen();
 }
 
 /* look up a symbol in a native library */
-inline void factorvm::vmprim_dlsym()
+inline void factorvm::primitive_dlsym()
 {
 	gc_root<object> library(dpop(),this);
 	gc_root<byte_array> name(dpop(),this);
@@ -160,11 +160,11 @@ inline void factorvm::vmprim_dlsym()
 
 PRIMITIVE(dlsym)
 {
-	PRIMITIVE_GETVM()->vmprim_dlsym();
+	PRIMITIVE_GETVM()->primitive_dlsym();
 }
 
 /* close a native library handle */
-inline void factorvm::vmprim_dlclose()
+inline void factorvm::primitive_dlclose()
 {
 	dll *d = untag_check<dll>(dpop());
 	if(d->dll != NULL)
@@ -173,10 +173,10 @@ inline void factorvm::vmprim_dlclose()
 
 PRIMITIVE(dlclose)
 {
-	PRIMITIVE_GETVM()->vmprim_dlclose();
+	PRIMITIVE_GETVM()->primitive_dlclose();
 }
 
-inline void factorvm::vmprim_dll_validp()
+inline void factorvm::primitive_dll_validp()
 {
 	cell library = dpop();
 	if(library == F)
@@ -187,7 +187,7 @@ inline void factorvm::vmprim_dll_validp()
 
 PRIMITIVE(dll_validp)
 {
-	PRIMITIVE_GETVM()->vmprim_dll_validp();
+	PRIMITIVE_GETVM()->primitive_dll_validp();
 }
 
 /* gets the address of an object representing a C pointer */
@@ -303,14 +303,14 @@ VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, f
 	return VM_PTR->box_medium_struct(x1, x2, x3, x4, size);
 }
 
-inline void factorvm::vmprim_vm_ptr()
+inline void factorvm::primitive_vm_ptr()
 {
 	box_alien(this);
 }
 
 PRIMITIVE(vm_ptr)
 {
-	PRIMITIVE_GETVM()->vmprim_vm_ptr();
+	PRIMITIVE_GETVM()->primitive_vm_ptr();
 }
 
 }

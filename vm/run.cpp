@@ -4,7 +4,7 @@ namespace factor
 {
 
 
-inline void factorvm::vmprim_getenv()
+inline void factorvm::primitive_getenv()
 {
 	fixnum e = untag_fixnum(dpeek());
 	drepl(userenv[e]);
@@ -12,10 +12,10 @@ inline void factorvm::vmprim_getenv()
 
 PRIMITIVE(getenv)
 {
-	PRIMITIVE_GETVM()->vmprim_getenv();
+	PRIMITIVE_GETVM()->primitive_getenv();
 }
 
-inline void factorvm::vmprim_setenv()
+inline void factorvm::primitive_setenv()
 {
 	fixnum e = untag_fixnum(dpop());
 	cell value = dpop();
@@ -24,40 +24,40 @@ inline void factorvm::vmprim_setenv()
 
 PRIMITIVE(setenv)
 {
-	PRIMITIVE_GETVM()->vmprim_setenv();
+	PRIMITIVE_GETVM()->primitive_setenv();
 }
 
-inline void factorvm::vmprim_exit()
+inline void factorvm::primitive_exit()
 {
 	exit(to_fixnum(dpop()));
 }
 
 PRIMITIVE(exit)
 {
-	PRIMITIVE_GETVM()->vmprim_exit();
+	PRIMITIVE_GETVM()->primitive_exit();
 }
 
-inline void factorvm::vmprim_micros()
+inline void factorvm::primitive_micros()
 {
 	box_unsigned_8(current_micros());
 }
 
 PRIMITIVE(micros)
 {
-	PRIMITIVE_GETVM()->vmprim_micros();
+	PRIMITIVE_GETVM()->primitive_micros();
 }
 
-inline void factorvm::vmprim_sleep()
+inline void factorvm::primitive_sleep()
 {
 	sleep_micros(to_cell(dpop()));
 }
 
 PRIMITIVE(sleep)
 {
-	PRIMITIVE_GETVM()->vmprim_sleep();
+	PRIMITIVE_GETVM()->primitive_sleep();
 }
 
-inline void factorvm::vmprim_set_slot()
+inline void factorvm::primitive_set_slot()
 {
 	fixnum slot = untag_fixnum(dpop());
 	object *obj = untag<object>(dpop());
@@ -69,10 +69,10 @@ inline void factorvm::vmprim_set_slot()
 
 PRIMITIVE(set_slot)
 {
-	PRIMITIVE_GETVM()->vmprim_set_slot();
+	PRIMITIVE_GETVM()->primitive_set_slot();
 }
 
-inline void factorvm::vmprim_load_locals()
+inline void factorvm::primitive_load_locals()
 {
 	fixnum count = untag_fixnum(dpop());
 	memcpy((cell *)(rs + sizeof(cell)),(cell *)(ds - sizeof(cell) * (count - 1)),sizeof(cell) * count);
@@ -82,7 +82,7 @@ inline void factorvm::vmprim_load_locals()
 
 PRIMITIVE(load_locals)
 {
-	PRIMITIVE_GETVM()->vmprim_load_locals();
+	PRIMITIVE_GETVM()->primitive_load_locals();
 }
 
 cell factorvm::clone_object(cell obj_)
@@ -100,14 +100,14 @@ cell factorvm::clone_object(cell obj_)
 	}
 }
 
-inline void factorvm::vmprim_clone()
+inline void factorvm::primitive_clone()
 {
 	drepl(clone_object(dpeek()));
 }
 
 PRIMITIVE(clone)
 {
-	PRIMITIVE_GETVM()->vmprim_clone();
+	PRIMITIVE_GETVM()->primitive_clone();
 }
 
 }

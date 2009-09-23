@@ -130,25 +130,25 @@ void factorvm::fp_trap_error(unsigned int fpu_status, stack_frame *signal_callst
 	general_error(ERROR_FP_TRAP,tag_fixnum(fpu_status),F,signal_callstack_top);
 }
 
-inline void factorvm::vmprim_call_clear()
+inline void factorvm::primitive_call_clear()
 {
 	throw_impl(dpop(),stack_chain->callstack_bottom,this);
 }
 
 PRIMITIVE(call_clear)
 {
-	PRIMITIVE_GETVM()->vmprim_call_clear();
+	PRIMITIVE_GETVM()->primitive_call_clear();
 }
 
 /* For testing purposes */
-inline void factorvm::vmprim_unimplemented()
+inline void factorvm::primitive_unimplemented()
 {
 	not_implemented_error();
 }
 
 PRIMITIVE(unimplemented)
 {
-	PRIMITIVE_GETVM()->vmprim_unimplemented();
+	PRIMITIVE_GETVM()->primitive_unimplemented();
 }
 
 void factorvm::memory_signal_handler_impl()

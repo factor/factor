@@ -252,7 +252,7 @@ VM_C_API void *inline_cache_miss(cell return_address, factorvm *myvm)
 }
 
 
-inline void factorvm::vmprim_reset_inline_cache_stats()
+inline void factorvm::primitive_reset_inline_cache_stats()
 {
 	cold_call_to_ic_transitions = ic_to_pic_transitions = pic_to_mega_transitions = 0;
 	cell i;
@@ -261,10 +261,10 @@ inline void factorvm::vmprim_reset_inline_cache_stats()
 
 PRIMITIVE(reset_inline_cache_stats)
 {
-	PRIMITIVE_GETVM()->vmprim_reset_inline_cache_stats();
+	PRIMITIVE_GETVM()->primitive_reset_inline_cache_stats();
 }
 
-inline void factorvm::vmprim_inline_cache_stats()
+inline void factorvm::primitive_inline_cache_stats()
 {
 	growable_array stats(this);
 	stats.add(allot_cell(cold_call_to_ic_transitions));
@@ -279,7 +279,7 @@ inline void factorvm::vmprim_inline_cache_stats()
 
 PRIMITIVE(inline_cache_stats)
 {
-	PRIMITIVE_GETVM()->vmprim_inline_cache_stats();
+	PRIMITIVE_GETVM()->primitive_inline_cache_stats();
 }
 
 }

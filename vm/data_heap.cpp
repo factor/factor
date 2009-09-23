@@ -231,14 +231,14 @@ cell factorvm::unaligned_object_size(object *pointer)
 }
 
 
-inline void factorvm::vmprim_size()
+inline void factorvm::primitive_size()
 {
 	box_unsigned_cell(object_size(dpop()));
 }
 
 PRIMITIVE(size)
 {
-	PRIMITIVE_GETVM()->vmprim_size();
+	PRIMITIVE_GETVM()->primitive_size();
 }
 
 /* The number of cells from the start of the object which should be scanned by
@@ -280,7 +280,7 @@ cell factorvm::binary_payload_start(object *pointer)
 
 
 /* Push memory usage statistics in data heap */
-inline void factorvm::vmprim_data_room()
+inline void factorvm::primitive_data_room()
 {
 	dpush(tag_fixnum((data->cards_end - data->cards) >> 10));
 	dpush(tag_fixnum((data->decks_end - data->decks) >> 10));
@@ -301,7 +301,7 @@ inline void factorvm::vmprim_data_room()
 
 PRIMITIVE(data_room)
 {
-	PRIMITIVE_GETVM()->vmprim_data_room();
+	PRIMITIVE_GETVM()->primitive_data_room();
 }
 
 /* Disables GC and activates next-object ( -- obj ) primitive */
@@ -318,14 +318,14 @@ void factorvm::end_scan()
 }
 
 
-inline void factorvm::vmprim_begin_scan()
+inline void factorvm::primitive_begin_scan()
 {
 	begin_scan();
 }
 
 PRIMITIVE(begin_scan)
 {
-	PRIMITIVE_GETVM()->vmprim_begin_scan();
+	PRIMITIVE_GETVM()->primitive_begin_scan();
 }
 
 cell factorvm::next_object()
@@ -343,25 +343,25 @@ cell factorvm::next_object()
 
 
 /* Push object at heap scan cursor and advance; pushes f when done */
-inline void factorvm::vmprim_next_object()
+inline void factorvm::primitive_next_object()
 {
 	dpush(next_object());
 }
 
 PRIMITIVE(next_object)
 {
-	PRIMITIVE_GETVM()->vmprim_next_object();
+	PRIMITIVE_GETVM()->primitive_next_object();
 }
 
 /* Re-enables GC */
-inline void factorvm::vmprim_end_scan()
+inline void factorvm::primitive_end_scan()
 {
 	gc_off = false;
 }
 
 PRIMITIVE(end_scan)
 {
-	PRIMITIVE_GETVM()->vmprim_end_scan();
+	PRIMITIVE_GETVM()->primitive_end_scan();
 }
 
 template<typename TYPE> void factorvm::each_object(TYPE &functor)

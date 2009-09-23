@@ -106,7 +106,7 @@ string *factorvm::allot_string(cell capacity, cell fill)
 }
 
 
-inline void factorvm::vmprim_string()
+inline void factorvm::primitive_string()
 {
 	cell initial = to_cell(dpop());
 	cell length = unbox_array_size();
@@ -115,7 +115,7 @@ inline void factorvm::vmprim_string()
 
 PRIMITIVE(string)
 {
-	PRIMITIVE_GETVM()->vmprim_string();
+	PRIMITIVE_GETVM()->primitive_string();
 }
 
 bool factorvm::reallot_string_in_place_p(string *str, cell capacity)
@@ -169,7 +169,7 @@ string* factorvm::reallot_string(string *str_, cell capacity)
 }
 
 
-inline void factorvm::vmprim_resize_string()
+inline void factorvm::primitive_resize_string()
 {
 	string* str = untag_check<string>(dpop());
 	cell capacity = unbox_array_size();
@@ -178,10 +178,10 @@ inline void factorvm::vmprim_resize_string()
 
 PRIMITIVE(resize_string)
 {
-	PRIMITIVE_GETVM()->vmprim_resize_string();
+	PRIMITIVE_GETVM()->primitive_resize_string();
 }
 
-inline void factorvm::vmprim_string_nth()
+inline void factorvm::primitive_string_nth()
 {
 	string *str = untag<string>(dpop());
 	cell index = untag_fixnum(dpop());
@@ -190,10 +190,10 @@ inline void factorvm::vmprim_string_nth()
 
 PRIMITIVE(string_nth)
 {
-	PRIMITIVE_GETVM()->vmprim_string_nth();
+	PRIMITIVE_GETVM()->primitive_string_nth();
 }
 
-inline void factorvm::vmprim_set_string_nth_fast()
+inline void factorvm::primitive_set_string_nth_fast()
 {
 	string *str = untag<string>(dpop());
 	cell index = untag_fixnum(dpop());
@@ -203,10 +203,10 @@ inline void factorvm::vmprim_set_string_nth_fast()
 
 PRIMITIVE(set_string_nth_fast)
 {
-	PRIMITIVE_GETVM()->vmprim_set_string_nth_fast();
+	PRIMITIVE_GETVM()->primitive_set_string_nth_fast();
 }
 
-inline void factorvm::vmprim_set_string_nth_slow()
+inline void factorvm::primitive_set_string_nth_slow()
 {
 	string *str = untag<string>(dpop());
 	cell index = untag_fixnum(dpop());
@@ -216,7 +216,7 @@ inline void factorvm::vmprim_set_string_nth_slow()
 
 PRIMITIVE(set_string_nth_slow)
 {
-	PRIMITIVE_GETVM()->vmprim_set_string_nth_slow();
+	PRIMITIVE_GETVM()->primitive_set_string_nth_slow();
 }
 
 }
