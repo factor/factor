@@ -3,12 +3,12 @@
 namespace factor
 {
 
-void factorvm::init_inline_caching(int max_size)
+void factor_vm::init_inline_caching(int max_size)
 {
 	max_pic_size = max_size;
 }
 
-void factorvm::deallocate_inline_cache(cell return_address)
+void factor_vm::deallocate_inline_cache(cell return_address)
 {
 	/* Find the call target. */
 	void *old_xt = get_call_target(return_address);
@@ -29,7 +29,7 @@ void factorvm::deallocate_inline_cache(cell return_address)
 
 /* Figure out what kind of type check the PIC needs based on the methods
 it contains */
-cell factorvm::determine_inline_cache_type(array *cache_entries)
+cell factor_vm::determine_inline_cache_type(array *cache_entries)
 {
 	bool seen_hi_tag = false, seen_tuple = false;
 
@@ -66,7 +66,7 @@ cell factorvm::determine_inline_cache_type(array *cache_entries)
 	return 0;
 }
 
-void factorvm::update_pic_count(cell type)
+void factor_vm::update_pic_count(cell type)
 {
 	pic_counts[type - PIC_TAG]++;
 }
@@ -74,7 +74,7 @@ void factorvm::update_pic_count(cell type)
 struct inline_cache_jit : public jit {
 	fixnum index;
 
-	inline_cache_jit(cell generic_word_,factorvm *vm) : jit(PIC_TYPE,generic_word_,vm) {};
+	inline_cache_jit(cell generic_word_,factor_vm *vm) : jit(PIC_TYPE,generic_word_,vm) {};
 
 	void emit_check(cell klass);
 	void compile_inline_cache(fixnum index,
@@ -138,7 +138,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 	word_special(myvm->userenv[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
 }
 
-code_block *factorvm::compile_inline_cache(fixnum index,cell generic_word_,cell methods_,cell cache_entries_,bool tail_call_p)
+code_block *factor_vm::compile_inline_cache(fixnum index,cell generic_word_,cell methods_,cell cache_entries_,bool tail_call_p)
 {
 	gc_root<word> generic_word(generic_word_,this);
 	gc_root<array> methods(methods_,this);
@@ -156,18 +156,18 @@ code_block *factorvm::compile_inline_cache(fixnum index,cell generic_word_,cell 
 }
 
 /* A generic word's definition performs general method lookup. Allocates memory */
-void *factorvm::megamorphic_call_stub(cell generic_word)
+void *factor_vm::megamorphic_call_stub(cell generic_word)
 {
 	return untag<word>(generic_word)->xt;
 }
 
-cell factorvm::inline_cache_size(cell cache_entries)
+cell factor_vm::inline_cache_size(cell cache_entries)
 {
 	return array_capacity(untag_check<array>(cache_entries)) / 2;
 }
 
 /* Allocates memory */
-cell factorvm::add_inline_cache_entry(cell cache_entries_, cell klass_, cell method_)
+cell factor_vm::add_inline_cache_entry(cell cache_entries_, cell klass_, cell method_)
 {
 	gc_root<array> cache_entries(cache_entries_,this);
 	gc_root<object> klass(klass_,this);
@@ -180,7 +180,7 @@ cell factorvm::add_inline_cache_entry(cell cache_entries_, cell klass_, cell met
 	return new_cache_entries.value();
 }
 
-void factorvm::update_pic_transitions(cell pic_size)
+void factor_vm::update_pic_transitions(cell pic_size)
 {
 	if(pic_size == max_pic_size)
 		pic_to_mega_transitions++;
@@ -192,7 +192,7 @@ void factorvm::update_pic_transitions(cell pic_size)
 
 /* The cache_entries parameter is either f (on cold call site) or an array (on cache miss).
 Called from assembly with the actual return address */
-void *factorvm::inline_cache_miss(cell return_address)
+void *factor_vm::inline_cache_miss(cell return_address)
 {
 	check_code_pointer(return_address);
 
@@ -244,13 +244,13 @@ void *factorvm::inline_cache_miss(cell return_address)
 	return xt;
 }
 
-VM_C_API void *inline_cache_miss(cell return_address, factorvm *myvm)
+VM_C_API void *inline_cache_miss(cell return_address, factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->inline_cache_miss(return_address);
 }
 
-inline void factorvm::primitive_reset_inline_cache_stats()
+inline void factor_vm::primitive_reset_inline_cache_stats()
 {
 	cold_call_to_ic_transitions = ic_to_pic_transitions = pic_to_mega_transitions = 0;
 	cell i;
@@ -262,7 +262,7 @@ PRIMITIVE(reset_inline_cache_stats)
 	PRIMITIVE_GETVM()->primitive_reset_inline_cache_stats();
 }
 
-inline void factorvm::primitive_inline_cache_stats()
+inline void factor_vm::primitive_inline_cache_stats()
 {
 	growable_array stats(this);
 	stats.add(allot_cell(cold_call_to_ic_transitions));
