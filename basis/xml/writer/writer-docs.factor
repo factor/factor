@@ -52,7 +52,8 @@ HELP: sensitive-tags
 { $example """USING: xml.syntax xml.writer namespaces ;
 [XML <html> <head>   <title> something</title></head><body><pre>bing
 bang
-   bong</pre></body></html> XML] { "pre" } sensitive-tags [ pprint-xml ] with-variable "} {"
+   bong</pre></body></html> XML] { "pre" } sensitive-tags [ pprint-xml ] with-variable"""
+"""
 <html>
   <head>
     <title>
