@@ -11,7 +11,7 @@ byte_array *factorvm::allot_byte_array(cell size)
 }
 
 
-inline void factorvm::vmprim_byte_array()
+inline void factorvm::primitive_byte_array()
 {
 	cell size = unbox_array_size();
 	dpush(tag<byte_array>(allot_byte_array(size)));
@@ -19,10 +19,10 @@ inline void factorvm::vmprim_byte_array()
 
 PRIMITIVE(byte_array)
 {
-	PRIMITIVE_GETVM()->vmprim_byte_array();
+	PRIMITIVE_GETVM()->primitive_byte_array();
 }
 
-inline void factorvm::vmprim_uninitialized_byte_array()
+inline void factorvm::primitive_uninitialized_byte_array()
 {
 	cell size = unbox_array_size();
 	dpush(tag<byte_array>(allot_array_internal<byte_array>(size)));
@@ -30,10 +30,10 @@ inline void factorvm::vmprim_uninitialized_byte_array()
 
 PRIMITIVE(uninitialized_byte_array)
 {
-	PRIMITIVE_GETVM()->vmprim_uninitialized_byte_array();
+	PRIMITIVE_GETVM()->primitive_uninitialized_byte_array();
 }
 
-inline void factorvm::vmprim_resize_byte_array()
+inline void factorvm::primitive_resize_byte_array()
 {
 	byte_array *array = untag_check<byte_array>(dpop());
 	cell capacity = unbox_array_size();
@@ -42,7 +42,7 @@ inline void factorvm::vmprim_resize_byte_array()
 
 PRIMITIVE(resize_byte_array)
 {
-	PRIMITIVE_GETVM()->vmprim_resize_byte_array();
+	PRIMITIVE_GETVM()->primitive_resize_byte_array();
 }
 
 void growable_byte_array::append_bytes(void *elts, cell len)

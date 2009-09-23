@@ -113,7 +113,7 @@ cell factorvm::lookup_method(cell obj, cell methods)
 		return array_nth(untag<array>(methods),TAG(obj));
 }
 
-inline void factorvm::vmprim_lookup_method()
+inline void factorvm::primitive_lookup_method()
 {
 	cell methods = dpop();
 	cell obj = dpop();
@@ -122,7 +122,7 @@ inline void factorvm::vmprim_lookup_method()
 
 PRIMITIVE(lookup_method)
 {
-	PRIMITIVE_GETVM()->vmprim_lookup_method();
+	PRIMITIVE_GETVM()->primitive_lookup_method();
 }
 
 cell factorvm::object_class(cell obj)
@@ -152,7 +152,7 @@ void factorvm::update_method_cache(cell cache, cell klass, cell method)
 	set_array_nth(cache_elements,hashcode + 1,method);
 }
 
-inline void factorvm::vmprim_mega_cache_miss()
+inline void factorvm::primitive_mega_cache_miss()
 {
 	megamorphic_cache_misses++;
 
@@ -171,20 +171,20 @@ inline void factorvm::vmprim_mega_cache_miss()
 
 PRIMITIVE(mega_cache_miss)
 {
-	PRIMITIVE_GETVM()->vmprim_mega_cache_miss();
+	PRIMITIVE_GETVM()->primitive_mega_cache_miss();
 }
 
-inline void factorvm::vmprim_reset_dispatch_stats()
+inline void factorvm::primitive_reset_dispatch_stats()
 {
 	megamorphic_cache_hits = megamorphic_cache_misses = 0;
 }
 
 PRIMITIVE(reset_dispatch_stats)
 {
-	PRIMITIVE_GETVM()->vmprim_reset_dispatch_stats();
+	PRIMITIVE_GETVM()->primitive_reset_dispatch_stats();
 }
 
-inline void factorvm::vmprim_dispatch_stats()
+inline void factorvm::primitive_dispatch_stats()
 {
 	growable_array stats(this);
 	stats.add(allot_cell(megamorphic_cache_hits));
@@ -195,7 +195,7 @@ inline void factorvm::vmprim_dispatch_stats()
 
 PRIMITIVE(dispatch_stats)
 {
-	PRIMITIVE_GETVM()->vmprim_dispatch_stats();
+	PRIMITIVE_GETVM()->primitive_dispatch_stats();
 }
 
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cache_)

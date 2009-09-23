@@ -79,7 +79,7 @@ void factorvm::ffi_dlclose(dll *dll)
 
 
 
-inline void factorvm::vmprim_existsp()
+inline void factorvm::primitive_existsp()
 {
 	struct stat sb;
 	char *path = (char *)(untag_check<byte_array>(dpop()) + 1);
@@ -88,7 +88,7 @@ inline void factorvm::vmprim_existsp()
 
 PRIMITIVE(existsp)
 {
-	PRIMITIVE_GETVM()->vmprim_existsp();
+	PRIMITIVE_GETVM()->primitive_existsp();
 }
 
 segment *factorvm::alloc_segment(cell size)
