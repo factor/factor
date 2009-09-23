@@ -3,7 +3,7 @@
 namespace factor
 {
 
-cell factorvm::search_lookup_alist(cell table, cell klass)
+cell factor_vm::search_lookup_alist(cell table, cell klass)
 {
 	array *elements = untag<array>(table);
 	fixnum index = array_capacity(elements) - 2;
@@ -18,7 +18,7 @@ cell factorvm::search_lookup_alist(cell table, cell klass)
 	return F;
 }
 
-cell factorvm::search_lookup_hash(cell table, cell klass, cell hashcode)
+cell factor_vm::search_lookup_hash(cell table, cell klass, cell hashcode)
 {
 	array *buckets = untag<array>(table);
 	cell bucket = array_nth(buckets,hashcode & (array_capacity(buckets) - 1));
@@ -28,19 +28,19 @@ cell factorvm::search_lookup_hash(cell table, cell klass, cell hashcode)
 		return search_lookup_alist(bucket,klass);
 }
 
-cell factorvm::nth_superclass(tuple_layout *layout, fixnum echelon)
+cell factor_vm::nth_superclass(tuple_layout *layout, fixnum echelon)
 {
 	cell *ptr = (cell *)(layout + 1);
 	return ptr[echelon * 2];
 }
 
-cell factorvm::nth_hashcode(tuple_layout *layout, fixnum echelon)
+cell factor_vm::nth_hashcode(tuple_layout *layout, fixnum echelon)
 {
 	cell *ptr = (cell *)(layout + 1);
 	return ptr[echelon * 2 + 1];
 }
 
-cell factorvm::lookup_tuple_method(cell obj, cell methods)
+cell factor_vm::lookup_tuple_method(cell obj, cell methods)
 {
 	tuple_layout *layout = untag<tuple_layout>(untag<tuple>(obj)->layout);
 
@@ -72,7 +72,7 @@ cell factorvm::lookup_tuple_method(cell obj, cell methods)
 	return F;
 }
 
-cell factorvm::lookup_hi_tag_method(cell obj, cell methods)
+cell factor_vm::lookup_hi_tag_method(cell obj, cell methods)
 {
 	array *hi_tag_methods = untag<array>(methods);
 	cell tag = untag<object>(obj)->h.hi_tag() - HEADER_TYPE;
@@ -82,7 +82,7 @@ cell factorvm::lookup_hi_tag_method(cell obj, cell methods)
 	return array_nth(hi_tag_methods,tag);
 }
 
-cell factorvm::lookup_hairy_method(cell obj, cell methods)
+cell factor_vm::lookup_hairy_method(cell obj, cell methods)
 {
 	cell method = array_nth(untag<array>(methods),TAG(obj));
 	if(tagged<object>(method).type_p(WORD_TYPE))
@@ -104,7 +104,7 @@ cell factorvm::lookup_hairy_method(cell obj, cell methods)
 	}
 }
 
-cell factorvm::lookup_method(cell obj, cell methods)
+cell factor_vm::lookup_method(cell obj, cell methods)
 {
 	cell tag = TAG(obj);
 	if(tag == TUPLE_TYPE || tag == OBJECT_TYPE)
@@ -113,7 +113,7 @@ cell factorvm::lookup_method(cell obj, cell methods)
 		return array_nth(untag<array>(methods),TAG(obj));
 }
 
-inline void factorvm::primitive_lookup_method()
+inline void factor_vm::primitive_lookup_method()
 {
 	cell methods = dpop();
 	cell obj = dpop();
@@ -125,7 +125,7 @@ PRIMITIVE(lookup_method)
 	PRIMITIVE_GETVM()->primitive_lookup_method();
 }
 
-cell factorvm::object_class(cell obj)
+cell factor_vm::object_class(cell obj)
 {
 	switch(TAG(obj))
 	{
@@ -138,13 +138,13 @@ cell factorvm::object_class(cell obj)
 	}
 }
 
-cell factorvm::method_cache_hashcode(cell klass, array *array)
+cell factor_vm::method_cache_hashcode(cell klass, array *array)
 {
 	cell capacity = (array_capacity(array) >> 1) - 1;
 	return ((klass >> TAG_BITS) & capacity) << 1;
 }
 
-void factorvm::update_method_cache(cell cache, cell klass, cell method)
+void factor_vm::update_method_cache(cell cache, cell klass, cell method)
 {
 	array *cache_elements = untag<array>(cache);
 	cell hashcode = method_cache_hashcode(klass,cache_elements);
@@ -152,7 +152,7 @@ void factorvm::update_method_cache(cell cache, cell klass, cell method)
 	set_array_nth(cache_elements,hashcode + 1,method);
 }
 
-inline void factorvm::primitive_mega_cache_miss()
+inline void factor_vm::primitive_mega_cache_miss()
 {
 	megamorphic_cache_misses++;
 
@@ -174,7 +174,7 @@ PRIMITIVE(mega_cache_miss)
 	PRIMITIVE_GETVM()->primitive_mega_cache_miss();
 }
 
-inline void factorvm::primitive_reset_dispatch_stats()
+inline void factor_vm::primitive_reset_dispatch_stats()
 {
 	megamorphic_cache_hits = megamorphic_cache_misses = 0;
 }
@@ -184,7 +184,7 @@ PRIMITIVE(reset_dispatch_stats)
 	PRIMITIVE_GETVM()->primitive_reset_dispatch_stats();
 }
 
-inline void factorvm::primitive_dispatch_stats()
+inline void factor_vm::primitive_dispatch_stats()
 {
 	growable_array stats(this);
 	stats.add(allot_cell(megamorphic_cache_hits));

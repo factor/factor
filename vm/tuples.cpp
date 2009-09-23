@@ -4,7 +4,7 @@ namespace factor
 {
 
 /* push a new tuple on the stack */
-tuple *factorvm::allot_tuple(cell layout_)
+tuple *factor_vm::allot_tuple(cell layout_)
 {
 	gc_root<tuple_layout> layout(layout_,this);
 	gc_root<tuple> t(allot<tuple>(tuple_size(layout.untagged())),this);
@@ -12,7 +12,7 @@ tuple *factorvm::allot_tuple(cell layout_)
 	return t.untagged();
 }
 
-inline void factorvm::primitive_tuple()
+inline void factor_vm::primitive_tuple()
 {
 	gc_root<tuple_layout> layout(dpop(),this);
 	tuple *t = allot_tuple(layout.value());
@@ -29,7 +29,7 @@ PRIMITIVE(tuple)
 }
 
 /* push a new tuple on the stack, filling its slots from the stack */
-inline void factorvm::primitive_tuple_boa()
+inline void factor_vm::primitive_tuple_boa()
 {
 	gc_root<tuple_layout> layout(dpop(),this);
 	gc_root<tuple> t(allot_tuple(layout.value()),this);

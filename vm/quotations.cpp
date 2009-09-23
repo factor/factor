@@ -265,7 +265,7 @@ void quotation_jit::iterate_quotation()
 	}
 }
 
-void factorvm::set_quot_xt(quotation *quot, code_block *code)
+void factor_vm::set_quot_xt(quotation *quot, code_block *code)
 {
 	if(code->type != QUOTATION_TYPE)
 		critical_error("Bad param to set_quot_xt",(cell)code);
@@ -275,7 +275,7 @@ void factorvm::set_quot_xt(quotation *quot, code_block *code)
 }
 
 /* Allocates memory */
-void factorvm::jit_compile(cell quot_, bool relocating)
+void factor_vm::jit_compile(cell quot_, bool relocating)
 {
 	gc_root<quotation> quot(quot_,this);
 	if(quot->code) return;
@@ -289,7 +289,7 @@ void factorvm::jit_compile(cell quot_, bool relocating)
 	if(relocating) relocate_code_block(compiled);
 }
 
-inline void factorvm::primitive_jit_compile()
+inline void factor_vm::primitive_jit_compile()
 {
 	jit_compile(dpop(),true);
 }
@@ -300,7 +300,7 @@ PRIMITIVE(jit_compile)
 }
 
 /* push a new quotation on the stack */
-inline void factorvm::primitive_array_to_quotation()
+inline void factor_vm::primitive_array_to_quotation()
 {
 	quotation *quot = allot<quotation>(sizeof(quotation));
 	quot->array = dpeek();
@@ -316,7 +316,7 @@ PRIMITIVE(array_to_quotation)
 	PRIMITIVE_GETVM()->primitive_array_to_quotation();
 }
 
-inline void factorvm::primitive_quotation_xt()
+inline void factor_vm::primitive_quotation_xt()
 {
 	quotation *quot = untag_check<quotation>(dpeek());
 	drepl(allot_cell((cell)quot->xt));
@@ -327,7 +327,7 @@ PRIMITIVE(quotation_xt)
 	PRIMITIVE_GETVM()->primitive_quotation_xt();
 }
 
-void factorvm::compile_all_words()
+void factor_vm::compile_all_words()
 {
 	gc_root<array> words(find_all_words(),this);
 
@@ -348,7 +348,7 @@ void factorvm::compile_all_words()
 }
 
 /* Allocates memory */
-fixnum factorvm::quot_code_offset_to_scan(cell quot_, cell offset)
+fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 {
 	gc_root<quotation> quot(quot_,this);
 	gc_root<array> array(quot->array,this);
@@ -360,7 +360,7 @@ fixnum factorvm::quot_code_offset_to_scan(cell quot_, cell offset)
 	return compiler.get_position();
 }
 
-cell factorvm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
+cell factor_vm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 {
 	gc_root<quotation> quot(quot_,this);
 	stack_chain->callstack_top = stack;
@@ -368,13 +368,13 @@ cell factorvm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 	return quot.value();
 }
 
-VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factorvm *myvm)
+VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->lazy_jit_compile_impl(quot_,stack);
 }
 
-inline void factorvm::primitive_quot_compiled_p()
+inline void factor_vm::primitive_quot_compiled_p()
 {
 	tagged<quotation> quot(dpop());
 	quot.untag_check(this);

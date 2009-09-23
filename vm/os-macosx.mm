@@ -5,7 +5,7 @@
 namespace factor
 {
 
-void factorvm::c_to_factor_toplevel(cell quot)
+void factor_vm::c_to_factor_toplevel(cell quot)
 {
 	for(;;)
 	{
