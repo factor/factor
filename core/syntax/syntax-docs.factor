@@ -531,13 +531,16 @@ HELP: CHAR:
 
 HELP: "
 { $syntax "\"string...\"" }
+{ $syntax "\"\"\"string...\"\"\"" }
 { $values { "string" "literal and escaped characters" } }
-{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", and appends the resulting string to the parse tree. String literals can span multiple lines. Strings containing the " { $link POSTPONE: " } " character and various other special characters can be read by inserting " { $link "escape" } "." }
+{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } " or " { $snippet "\"\"\"" } ", and appends the resulting string to the parse tree. String literals can span multiple lines. For strings beginning with a single double-quote, the " { $link POSTPONE: " } " character and various other special characters can be read by inserting " { $link "escape" } ". For triple quoted strings, the double-quote character does not require escaping." }
 { $examples
-  "A string with a newline in it:"
-  { $example "USE: io" "\"Hello\\nworld\" print" "Hello\nworld" }
-  "A string with a named Unicode code point:"
-  { $example "USE: io" "\"\\u{greek-capital-letter-sigma}\" print" "\u{greek-capital-letter-sigma}" }
+    "A string with a newline in it:"
+    { $example "USE: io" "\"Hello\\nworld\" print" "Hello\nworld" }
+    "A string with a named Unicode code point:"
+    { $example "USE: io" "\"\\u{greek-capital-letter-sigma}\" print" "\u{greek-capital-letter-sigma}" }
+    "A triple-quoted string:"
+    { $example "USE: io \"\"\"\"Teach a man to fish...\"\"\"\" print" """"Teach a man to fish..."""" }
 } ;
 
 HELP: SBUF"
