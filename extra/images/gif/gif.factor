@@ -42,7 +42,7 @@ packed delay-time color-index
 block-terminator ;
 
 TUPLE: image-descriptor
-separator left top width height flags ;
+left top width height flags lzw-min-code-size ;
 
 TUPLE: plain-text-extension
 introducer label block-size text-grid-left text-grid-top text-grid-width
@@ -92,12 +92,12 @@ M: input-port stream-peek1
 
 : read-image-descriptor ( -- image-descriptor )
     \ image-descriptor new
-        1 read le> >>separator
         2 read le> >>left
         2 read le> >>top
         2 read le> >>width
         2 read le> >>height
-        1 read le> >>flags ;
+        1 read le> >>flags
+        1 read le> >>lzw-min-code-size ;
 
 : read-graphic-control-extension ( -- graphic-control-extension )
     \ graphics-control-extension new
