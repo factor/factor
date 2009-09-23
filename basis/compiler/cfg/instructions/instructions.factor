@@ -492,7 +492,7 @@ literal: symbol library ;
 
 INSN: ##vm-field-ptr
 def: dst/int-rep
-literal: fieldname ;
+literal: field-name ;
 
 ! FFI
 INSN: ##alien-invoke

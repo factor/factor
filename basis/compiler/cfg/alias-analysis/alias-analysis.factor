@@ -190,7 +190,7 @@ M: ##slot-imm insn-slot# slot>> ;
 M: ##set-slot insn-slot# slot>> constant ;
 M: ##set-slot-imm insn-slot# slot>> ;
 M: ##alien-global insn-slot# [ library>> ] [ symbol>> ] bi 2array ;
-M: ##vm-field-ptr insn-slot# fieldname>> 1array ;  ! is this right?
+M: ##vm-field-ptr insn-slot# field-name>> ;  ! is this right?
 
 M: ##slot insn-object obj>> resolve ;
 M: ##slot-imm insn-object obj>> resolve ;
