@@ -4,7 +4,8 @@ USING: accessors alien.c-types assocs byte-arrays classes
 effects fry functors generalizations kernel literals locals
 math math.functions math.vectors math.vectors.simd.intrinsics
 math.vectors.specialization parser prettyprint.custom sequences
-sequences.private strings words definitions macros cpu.architecture ;
+sequences.private strings words definitions macros cpu.architecture
+namespaces arrays quotations ;
 QUALIFIED-WITH: math m
 IN: math.vectors.simd.functor
 
@@ -38,23 +39,18 @@ MACRO: simd-boa ( rep class -- simd-array )
     { "simd-vector" } <effect> ;
 
 : supported-simd-ops ( assoc rep -- assoc' )
-    [
-        {
-            { v+ (simd-v+) }
-            { vs+ (simd-vs+) }
-            { v+- (simd-v+-) }
-            { v- (simd-v-) }
-            { vs- (simd-vs-) }
-            { v* (simd-v*) }
-            { vs* (simd-vs*) }
-            { v/ (simd-v/) }
-            { vmin (simd-vmin) }
-            { vmax (simd-vmax) }
-            { sum (simd-sum) }
-        }
-    ] dip 
+    [ simd-ops get ] dip 
     '[ nip _ swap supported-simd-op? ] assoc-filter
     '[ drop _ key? ] assoc-filter ;
+
+ERROR: bad-schema schema ;
+
+: low-level-ops ( box-quot: ( inputs... simd-op -- outputs... ) -- alist )
+    [ simd-ops get ] dip '[
+        1quotation
+        over word-schema _ ?at [ bad-schema ] unless
+        [ ] 2sequence
+    ] assoc-map ;
 
 :: high-level-ops ( ctor elt-class -- assoc )
     ! Some SIMD operations are defined in terms of others.
@@ -82,11 +78,17 @@ MACRO: simd-boa ( rep class -- simd-array )
         } append
     ] when ;
 
-:: simd-vector-words ( class ctor rep assoc -- )
+:: simd-vector-words ( class ctor rep vv->v v->v v->n -- )
     rep rep-component-type c-type-boxed-class :> elt-class
     class
     elt-class
-    assoc rep supported-simd-ops
+    {
+        { { +vector+ +vector+ -> +vector+ } vv->v }
+        { { +vector+ -> +vector+ } v->v }
+        { { +vector+ -> +scalar+ } v->n }
+        { { +vector+ -> +nonnegative+ } v->n }
+    } low-level-ops
+    rep supported-simd-ops
     ctor elt-class high-level-ops assoc-union
     specialize-vector-words ;
 
@@ -116,6 +118,7 @@ SET-NTH      [ T dup c-setter array-accessor ]
 
 A-rep        [ A name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
+A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
 WHERE
@@ -172,23 +175,13 @@ INSTANCE: A sequence
 : A-vv->v-op ( v1 v2 quot -- v3 )
     [ [ underlying>> ] bi@ A-rep ] dip call \ A boa ; inline
 
+: A-v->v-op ( v1 quot -- v2 )
+    [ underlying>> A-rep ] dip call \ A boa ; inline
+
 : A-v->n-op ( v quot -- n )
     [ underlying>> A-rep ] dip call ; inline
 
-\ A \ A-with \ A-rep H{
-    { v+ [ [ (simd-v+) ] \ A-vv->v-op execute ] }
-    { vs+ [ [ (simd-vs+) ] \ A-vv->v-op execute ] }
-    { v+- [ [ (simd-v+-) ] \ A-vv->v-op execute ] }
-    { v- [ [ (simd-v-) ] \ A-vv->v-op execute ] }
-    { vs- [ [ (simd-vs-) ] \ A-vv->v-op execute ] }
-    { v* [ [ (simd-v*) ] \ A-vv->v-op execute ] }
-    { vs* [ [ (simd-vs*) ] \ A-vv->v-op execute ] }
-    { v/ [ [ (simd-v/) ] \ A-vv->v-op execute ] }
-    { vmin [ [ (simd-vmin) ] \ A-vv->v-op execute ] }
-    { vmax [ [ (simd-vmax) ] \ A-vv->v-op execute ] }
-    { sum [ [ (simd-sum) ] \ A-v->n-op execute ] }
-} simd-vector-words
-
+\ A \ A-with \ A-rep \ A-vv->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
 \ A \ A-rep define-simd-128-type
 
 PRIVATE>
@@ -237,6 +230,7 @@ A-deref      DEFINES-PRIVATE ${A}-deref
 
 A-rep        [ A/2 name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
+A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
 WHERE
@@ -302,24 +296,15 @@ INSTANCE: A sequence
     [ [ [ underlying2>> ] bi@ A-rep ] dip call ] 3bi
     \ A boa ; inline
 
-: A-v->n-op ( v1 combine-quot reduce-quot -- v2 )
-    [ [ [ underlying1>> ] [ underlying2>> ] bi A-rep ] dip call A-rep ]
-    dip call ; inline
+: A-v->v-op ( v1 combine-quot -- v2 )
+    [ [ underlying1>> A-rep ] dip call ]
+    [ [ underlying2>> A-rep ] dip call ] 2bi
+    \ A boa ; inline
 
-\ A \ A-with \ A-rep H{
-    { v+ [ [ (simd-v+) ] \ A-vv->v-op execute ] }
-    { vs+ [ [ (simd-vs+) ] \ A-vv->v-op execute ] }
-    { v- [ [ (simd-v-) ] \ A-vv->v-op execute ] }
-    { vs- [ [ (simd-vs-) ] \ A-vv->v-op execute ] }
-    { v+- [ [ (simd-v+-) ] \ A-vv->v-op execute ] }
-    { v* [ [ (simd-v*) ] \ A-vv->v-op execute ] }
-    { vs* [ [ (simd-vs*) ] \ A-vv->v-op execute ] }
-    { v/ [ [ (simd-v/) ] \ A-vv->v-op execute ] }
-    { vmin [ [ (simd-vmin) ] \ A-vv->v-op execute ] }
-    { vmax [ [ (simd-vmax) ] \ A-vv->v-op execute ] }
-    { sum [ [ (simd-v+) ] [ (simd-sum) ] \ A-v->n-op execute ] }
-} simd-vector-words
+: A-v->n-op ( v1 combine-quot -- v2 )
+    [ [ underlying1>> ] [ underlying2>> ] bi A-rep (simd-v+) A-rep ] dip call ; inline
 
+\ A \ A-with \ A-rep \ A-vv->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
 \ A \ A-rep define-simd-256-type
 
 ;FUNCTOR

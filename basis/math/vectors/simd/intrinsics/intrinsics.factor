@@ -2,23 +2,47 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data assocs combinators
 cpu.architecture fry generalizations kernel libc macros math
-sequences ;
+sequences effects accessors namespaces lexer parser vocabs.parser
+words arrays math.vectors ;
 IN: math.vectors.simd.intrinsics
 
 ERROR: bad-simd-call ;
 
-: (simd-v+) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-v-) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-v+-) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-vs+) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-vs-) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-vs*) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-v*) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-v/) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-vmin) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-vmax) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-vsqrt) ( v1 v2 rep -- v3 ) bad-simd-call ;
-: (simd-sum) ( v1 rep -- v2 ) bad-simd-call ;
+<<
+
+: simd-effect ( word -- effect )
+    stack-effect [ in>> "rep" suffix ] [ out>> ] bi <effect> ;
+
+SYMBOL: simd-ops
+
+V{ } clone simd-ops set-global
+
+SYNTAX: SIMD-OP:
+    scan-word dup name>> "(simd-" ")" surround create-in
+    [ nip [ bad-simd-call ] define ]
+    [ [ simd-effect ] dip set-stack-effect ]
+    [ 2array simd-ops get push ]
+    2tri ;
+
+>>
+
+SIMD-OP: v+
+SIMD-OP: v-
+SIMD-OP: v+-
+SIMD-OP: vs+
+SIMD-OP: vs-
+SIMD-OP: vs*
+SIMD-OP: v*
+SIMD-OP: v/
+SIMD-OP: vmin
+SIMD-OP: vmax
+SIMD-OP: vsqrt
+SIMD-OP: sum
+SIMD-OP: vabs
+SIMD-OP: vbitand
+SIMD-OP: vbitor
+SIMD-OP: vbitxor
+
 : (simd-broadcast) ( x rep -- v ) bad-simd-call ;
 : (simd-gather-2) ( a b rep -- v ) bad-simd-call ;
 : (simd-gather-4) ( a b c d rep -- v ) bad-simd-call ;
@@ -82,6 +106,10 @@ M: vector-rep supported-simd-op?
         { \ (simd-vmax)      [ %max-vector-reps            ] }
         { \ (simd-vsqrt)     [ %sqrt-vector-reps           ] }
         { \ (simd-sum)       [ %horizontal-add-vector-reps ] }
+        { \ (simd-vabs)      [ %abs-vector-reps            ] }
+        { \ (simd-vbitand)   [ %and-vector-reps            ] }
+        { \ (simd-vbitor)    [ %or-vector-reps             ] }
+        { \ (simd-vbitxor)   [ %xor-vector-reps            ] }
         { \ (simd-broadcast) [ %broadcast-vector-reps      ] }
         { \ (simd-gather-2)  [ %gather-vector-2-reps       ] }
         { \ (simd-gather-4)  [ %gather-vector-4-reps       ] }

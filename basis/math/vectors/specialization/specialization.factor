@@ -72,6 +72,11 @@ H{
     { vneg { +vector+ -> +vector+ } }
     { vtruncate { +vector+ -> +vector+ } }
     { sum { +vector+ -> +scalar+ } }
+    { vabs { +vector+ -> +vector+ } }
+    { vsqrt { +vector+ -> +vector+ } }
+    { vbitand { +vector+ +vector+ -> +vector+ } }
+    { vbitor { +vector+ +vector+ -> +vector+ } }
+    { vbitxor { +vector+ +vector+ -> +vector+ } }
 }
 
 PREDICATE: vector-word < word vector-words key? ;
