@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien.c-types kernel sequences math math.functions
-hints math.order fry combinators ;
+hints math.order math.libm fry combinators ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
@@ -44,7 +44,7 @@ PRIVATE>
 : vs* ( u v -- w ) [ * ] 2saturate-map ;
 
 : vabs ( u -- v ) [ abs ] map ;
-: vsqrt ( u -- v ) [ sqrt ] map ;
+: vsqrt ( u -- v ) [ >float fsqrt ] map ;
 
 <PRIVATE
 
@@ -61,9 +61,9 @@ PRIVATE>
 : vbitor ( u v -- w ) over '[ _ [ bitor ] fp-bitwise-op ] 2map ;
 : vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
 
-: vfloor    ( v -- _v_ ) [ floor    ] map ;
-: vceiling  ( v -- ^v^ ) [ ceiling  ] map ;
-: vtruncate ( v -- -v- ) [ truncate ] map ;
+: vfloor    ( u -- v ) [ floor ] map ;
+: vceiling  ( u -- v ) [ ceiling ] map ;
+: vtruncate ( u -- v ) [ truncate ] map ;
 
 : vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; 
 : vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; 
