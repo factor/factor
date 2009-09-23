@@ -75,7 +75,7 @@ $nl
     false [ f ]
     url [ URL" http://factorcode.org/" ]
     string [ "hello" ]
-    word [ \ drop ] |
+    word [ \\ drop ] |
     <XML
         <x
             number=<-number->
@@ -83,7 +83,8 @@ $nl
             url=<-url->
             string=<-string->
             word=<-word-> />
-    XML> pprint-xml ]"""
+    XML> pprint-xml
+]"""
 
 """<?xml version="1.0" encoding="UTF-8"?>
 <x number="3" url="http://factorcode.org/" string="hello" word="drop"/>""" }
