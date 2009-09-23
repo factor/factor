@@ -135,7 +135,7 @@ CONSTANT: simd-classes
     word '[ _ declare _ execute ] ;
 
 : remove-float-words ( alist -- alist' )
-    [ drop { n/v v/n v/ normalize } member? not ] assoc-filter ;
+    [ drop { vsqrt n/v v/n v/ normalize } member? not ] assoc-filter ;
 
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
@@ -242,3 +242,5 @@ STRUCT: simd-struct
         { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
     ] compile-call
 ] unit-test
+
+[ ] [ char-16 new 1array stack. ] unit-test

@@ -410,30 +410,63 @@ M: x86 %div-vector-reps
 
 M: x86 %min-vector ( dst src1 src2 rep -- )
     {
-        { float-4-rep [ MINPS ] }
-        { double-2-rep [ MINPD ] }
+        { char-16-rep [ PMINSB ] }
         { uchar-16-rep [ PMINUB ] }
         { short-8-rep [ PMINSW ] }
+        { ushort-8-rep [ PMINUW ] }
+        { int-4-rep [ PMINSD ] }
+        { uint-4-rep [ PMINUD ] }
+        { float-4-rep [ MINPS ] }
+        { double-2-rep [ MINPD ] }
     } case drop ;
 
 M: x86 %min-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { double-2-rep short-8-rep uchar-16-rep } }
+        { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
+        { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
 M: x86 %max-vector ( dst src1 src2 rep -- )
     {
-        { float-4-rep [ MAXPS ] }
-        { double-2-rep [ MAXPD ] }
+        { char-16-rep [ PMAXSB ] }
         { uchar-16-rep [ PMAXUB ] }
         { short-8-rep [ PMAXSW ] }
+        { ushort-8-rep [ PMAXUW ] }
+        { int-4-rep [ PMAXSD ] }
+        { uint-4-rep [ PMAXUD ] }
+        { float-4-rep [ MAXPS ] }
+        { double-2-rep [ MAXPD ] }
     } case drop ;
 
 M: x86 %max-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { double-2-rep short-8-rep uchar-16-rep } }
+        { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
+        { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
+    } available-reps ;
+
+M: x86 %horizontal-add-vector ( dst src rep -- )
+    {
+        { float-4-rep [ [ MOVAPS ] [ HADDPS ] [ HADDPS ] 2tri ] }
+        { double-2-rep [ [ MOVAPD ] [ HADDPD ] 2bi ] }
+    } case ;
+
+M: x86 %horizontal-add-vector-reps
+    {
+        { sse3? { float-4-rep double-2-rep } }
+    } available-reps ;
+
+M: x86 %abs-vector ( dst src rep -- )
+    {
+        { char-16-rep [ PABSB ] }
+        { short-8-rep [ PABSW ] }
+        { int-4-rep [ PABSD ] }
+    } case ;
+
+M: x86 %abs-vector-reps
+    {
+        { ssse3? { char-16-rep short-8-rep int-4-rep } }
     } available-reps ;
 
 M: x86 %sqrt-vector ( dst src rep -- )
@@ -448,15 +481,58 @@ M: x86 %sqrt-vector-reps
         { sse2? { double-2-rep } }
     } available-reps ;
 
-M: x86 %horizontal-add-vector ( dst src rep -- )
+M: x86 %and-vector ( dst src1 src2 rep -- )
     {
-        { float-4-rep [ [ MOVAPS ] [ HADDPS ] [ HADDPS ] 2tri ] }
-        { double-2-rep [ [ MOVAPD ] [ HADDPD ] 2bi ] }
-    } case ;
+        { float-4-rep [ ANDPS ] }
+        { double-2-rep [ ANDPD ] }
+        { char-16-rep [ PAND ] }
+        { uchar-16-rep [ PAND ] }
+        { short-8-rep [ PAND ] }
+        { ushort-8-rep [ PAND ] }
+        { int-4-rep [ PAND ] }
+        { uint-4-rep [ PAND ] }
+    } case drop ;
 
-M: x86 %horizontal-add-vector-reps
+M: x86 %and-vector-reps
     {
-        { sse3? { float-4-rep double-2-rep } }
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+    } available-reps ;
+
+M: x86 %or-vector ( dst src1 src2 rep -- )
+    {
+        { float-4-rep [ ORPS ] }
+        { double-2-rep [ ORPD ] }
+        { char-16-rep [ POR ] }
+        { uchar-16-rep [ POR ] }
+        { short-8-rep [ POR ] }
+        { ushort-8-rep [ POR ] }
+        { int-4-rep [ POR ] }
+        { uint-4-rep [ POR ] }
+    } case drop ;
+
+M: x86 %or-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+    } available-reps ;
+
+M: x86 %xor-vector ( dst src1 src2 rep -- )
+    {
+        { float-4-rep [ XORPS ] }
+        { double-2-rep [ XORPD ] }
+        { char-16-rep [ PXOR ] }
+        { uchar-16-rep [ PXOR ] }
+        { short-8-rep [ PXOR ] }
+        { ushort-8-rep [ PXOR ] }
+        { int-4-rep [ PXOR ] }
+        { uint-4-rep [ PXOR ] }
+    } case drop ;
+
+M: x86 %xor-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
 M: x86 %unbox-alien ( dst src -- )

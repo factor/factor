@@ -30,7 +30,10 @@ $nl
 "Saturated arithmetic may be performed on " { $link "specialized-arrays" } "; the results are clamped to the minimum and maximum bounds of the array element type, instead of wrapping around:"
 { $subsection vs+ }
 { $subsection vs- }
-{ $subsection vs* } ;
+{ $subsection vs* }
+"Comparing vectors:"
+{ $subsection distance }
+{ $subsection v~ } ;
 
 ABOUT: "math-vectors"
 
@@ -143,6 +146,10 @@ HELP: norm
 HELP: normalize
 { $values { "u" "a sequence of numbers, not all zero" } { "v" "a sequence of numbers" } }
 { $description "Outputs a vector with the same direction as " { $snippet "u" } " but length 1." } ;
+
+HELP: distance
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
+{ $description "Outputs the Euclidean distance between two vectors." } ;
 
 HELP: set-axis
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "axis" "a sequence of 0/1" } { "w" "a sequence of numbers" } }
