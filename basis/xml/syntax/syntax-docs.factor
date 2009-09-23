@@ -54,6 +54,7 @@ $nl
 "one two three" " " split
 [ [XML <item><-></item> XML] ] map
 <XML <doc><-></doc> XML> pprint-xml"""
+
 """<?xml version="1.0" encoding="UTF-8"?>
 <doc>
   <item>
@@ -83,6 +84,7 @@ $nl
             string=<-string->
             word=<-word-> />
     XML> pprint-xml ]"""
+
 """<?xml version="1.0" encoding="UTF-8"?>
 <x number="3" url="http://factorcode.org/" string="hello" word="drop"/>""" }
 "XML interpolation can also be used, in conjunction with " { $vocab-link "inverse" } " in pattern matching. For example:"
@@ -94,7 +96,8 @@ $nl
         { [ [XML <b val='yes'/> XML] ] [ "yes" ] }
         { [ [XML <b val=<->/> XML] ] [ "no" prepend ] }
     } switch ;
-[XML <a>pple</a> XML] dispatch write""" "apple" } ;
+[XML <a>pple</a> XML] dispatch write"""
+"apple" } ;
 
 HELP: XML-NS:
 { $syntax "XML-NS: name http://url" }
