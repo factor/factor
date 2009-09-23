@@ -88,9 +88,9 @@ void inline_cache_jit::emit_check(cell klass)
 {
 	cell code_template;
 	if(TAG(klass) == FIXNUM_TYPE && untag_fixnum(klass) < HEADER_TYPE)
-		code_template = myvm->userenv[PIC_CHECK_TAG];
+		code_template = parent_vm->userenv[PIC_CHECK_TAG];
 	else
-		code_template = myvm->userenv[PIC_CHECK];
+		code_template = parent_vm->userenv[PIC_CHECK];
 
 	emit_with(code_template,klass);
 }
@@ -103,12 +103,12 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 					    cell cache_entries_,
 					    bool tail_call_p)
 {
-	gc_root<word> generic_word(generic_word_,myvm);
-	gc_root<array> methods(methods_,myvm);
-	gc_root<array> cache_entries(cache_entries_,myvm);
+	gc_root<word> generic_word(generic_word_,parent_vm);
+	gc_root<array> methods(methods_,parent_vm);
+	gc_root<array> cache_entries(cache_entries_,parent_vm);
 
-	cell inline_cache_type = myvm->determine_inline_cache_type(cache_entries.untagged());
-	myvm->update_pic_count(inline_cache_type);
+	cell inline_cache_type = parent_vm->determine_inline_cache_type(cache_entries.untagged());
+	parent_vm->update_pic_count(inline_cache_type);
 
 	/* Generate machine code to determine the object's class. */
 	emit_class_lookup(index,inline_cache_type);
@@ -123,7 +123,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 
 		/* Yes? Jump to method */
 		cell method = array_nth(cache_entries.untagged(),i + 1);
-		emit_with(myvm->userenv[PIC_HIT],method);
+		emit_with(parent_vm->userenv[PIC_HIT],method);
 	}
 
 	/* Generate machine code to handle a cache miss, which ultimately results in
@@ -135,7 +135,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 	push(methods.value());
 	push(tag_fixnum(index));
 	push(cache_entries.value());
-	word_special(myvm->userenv[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
+	word_special(parent_vm->userenv[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
 }
 
 code_block *factor_vm::compile_inline_cache(fixnum index,cell generic_word_,cell methods_,cell cache_entries_,bool tail_call_p)

@@ -47,9 +47,9 @@ PRIMITIVE(resize_byte_array)
 void growable_byte_array::append_bytes(void *elts, cell len)
 {
 	cell new_size = count + len;
-	factor_vm *myvm = elements.myvm;
+	factor_vm *parent_vm = elements.parent_vm;
 	if(new_size >= array_capacity(elements.untagged()))
-		elements = myvm->reallot_array(elements.untagged(),new_size * 2);
+		elements = parent_vm->reallot_array(elements.untagged(),new_size * 2);
 
 	memcpy(&elements->data<u8>()[count],elts,len);
 
@@ -58,13 +58,13 @@ void growable_byte_array::append_bytes(void *elts, cell len)
 
 void growable_byte_array::append_byte_array(cell byte_array_)
 {
-	gc_root<byte_array> byte_array(byte_array_,elements.myvm);
+	gc_root<byte_array> byte_array(byte_array_,elements.parent_vm);
 
 	cell len = array_capacity(byte_array.untagged());
 	cell new_size = count + len;
-	factor_vm *myvm = elements.myvm;
+	factor_vm *parent_vm = elements.parent_vm;
 	if(new_size >= array_capacity(elements.untagged()))
-		elements = myvm->reallot_array(elements.untagged(),new_size * 2);
+		elements = parent_vm->reallot_array(elements.untagged(),new_size * 2);
 
 	memcpy(&elements->data<u8>()[count],byte_array->data<u8>(),len);
 
@@ -73,8 +73,8 @@ void growable_byte_array::append_byte_array(cell byte_array_)
 
 void growable_byte_array::trim()
 {
-	factor_vm *myvm = elements.myvm;
-	elements = myvm->reallot_array(elements.untagged(),count);
+	factor_vm *parent_vm = elements.parent_vm;
+	elements = parent_vm->reallot_array(elements.untagged(),count);
 }
 
 }
