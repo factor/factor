@@ -4,7 +4,7 @@ namespace factor
 {
 
 /* Certain special objects in the image are known to the runtime */
-void factorvm::init_objects(image_header *h)
+void factor_vm::init_objects(image_header *h)
 {
 	memcpy(userenv,h->userenv,sizeof(userenv));
 
@@ -14,9 +14,7 @@ void factorvm::init_objects(image_header *h)
 	bignum_neg_one = h->bignum_neg_one;
 }
 
-
-
-void factorvm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
+void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 {
 	cell good_size = h->data_size + (1 << 20);
 
@@ -49,9 +47,7 @@ void factorvm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 	data_relocation_base = h->data_relocation_base;
 }
 
-
-
-void factorvm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
+void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 {
 	if(h->code_size > p->code_size)
 		fatal_error("Code heap too small to fit image",h->code_size);
@@ -76,9 +72,8 @@ void factorvm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 	build_free_list(&code,h->code_size);
 }
 
-
 /* Save the current image to disk */
-bool factorvm::save_image(const vm_char *filename)
+bool factor_vm::save_image(const vm_char *filename)
 {
 	FILE* file;
 	image_header h;
@@ -123,8 +118,7 @@ bool factorvm::save_image(const vm_char *filename)
 	return ok;
 }
 
-
-inline void factorvm::vmprim_save_image()
+inline void factor_vm::primitive_save_image()
 {
 	/* do a full GC to push everything into tenured space */
 	gc();
@@ -136,10 +130,10 @@ inline void factorvm::vmprim_save_image()
 
 PRIMITIVE(save_image)
 {
-	PRIMITIVE_GETVM()->vmprim_save_image();
+	PRIMITIVE_GETVM()->primitive_save_image();
 }
 
-inline void factorvm::vmprim_save_image_and_exit()
+inline void factor_vm::primitive_save_image_and_exit()
 {
 	/* We unbox this before doing anything else. This is the only point
 	where we might throw an error, so we have to throw an error here since
@@ -167,10 +161,10 @@ inline void factorvm::vmprim_save_image_and_exit()
 
 PRIMITIVE(save_image_and_exit)
 {	
-	PRIMITIVE_GETVM()->vmprim_save_image_and_exit();
+	PRIMITIVE_GETVM()->primitive_save_image_and_exit();
 }
 
-void factorvm::data_fixup(cell *cell)
+void factor_vm::data_fixup(cell *cell)
 {
 	if(immediate_p(*cell))
 		return;
@@ -179,20 +173,19 @@ void factorvm::data_fixup(cell *cell)
 	*cell += (tenured->start - data_relocation_base);
 }
 
-void data_fixup(cell *cell, factorvm *myvm)
+void data_fixup(cell *cell, factor_vm *myvm)
 {
 	return myvm->data_fixup(cell);
 }
 
-template <typename TYPE> void factorvm::code_fixup(TYPE **handle)
+template <typename TYPE> void factor_vm::code_fixup(TYPE **handle)
 {
 	TYPE *ptr = *handle;
 	TYPE *new_ptr = (TYPE *)(((cell)ptr) + (code.seg->start - code_relocation_base));
 	*handle = new_ptr;
 }
 
-
-void factorvm::fixup_word(word *word)
+void factor_vm::fixup_word(word *word)
 {
 	if(word->code)
 		code_fixup(&word->code);
@@ -201,8 +194,7 @@ void factorvm::fixup_word(word *word)
 	code_fixup(&word->xt);
 }
 
-
-void factorvm::fixup_quotation(quotation *quot)
+void factor_vm::fixup_quotation(quotation *quot)
 {
 	if(quot->code)
 	{
@@ -213,32 +205,29 @@ void factorvm::fixup_quotation(quotation *quot)
 		quot->xt = (void *)lazy_jit_compile;
 }
 
-
-void factorvm::fixup_alien(alien *d)
+void factor_vm::fixup_alien(alien *d)
 {
 	d->expired = T;
 }
 
-
-void factorvm::fixup_stack_frame(stack_frame *frame)
+void factor_vm::fixup_stack_frame(stack_frame *frame)
 {
 	code_fixup(&frame->xt);
 	code_fixup(&FRAME_RETURN_ADDRESS(frame));
 }
 
-void fixup_stack_frame(stack_frame *frame, factorvm *myvm)
+void fixup_stack_frame(stack_frame *frame, factor_vm *myvm)
 {
 	return myvm->fixup_stack_frame(frame);
 }
 
-void factorvm::fixup_callstack_object(callstack *stack)
+void factor_vm::fixup_callstack_object(callstack *stack)
 {
 	iterate_callstack_object(stack,factor::fixup_stack_frame);
 }
 
-
 /* Initialize an object in a newly-loaded image */
-void factorvm::relocate_object(object *object)
+void factor_vm::relocate_object(object *object)
 {
 	cell hi_tag = object->h.hi_tag();
 	
@@ -281,10 +270,9 @@ void factorvm::relocate_object(object *object)
 	}
 }
 
-
 /* Since the image might have been saved with a different base address than
 where it is loaded, we need to fix up pointers in the image. */
-void factorvm::relocate_data()
+void factor_vm::relocate_data()
 {
 	cell relocating;
 
@@ -309,8 +297,7 @@ void factorvm::relocate_data()
 	}
 }
 
-
-void factorvm::fixup_code_block(code_block *compiled)
+void factor_vm::fixup_code_block(code_block *compiled)
 {
 	/* relocate literal table data */
 	data_fixup(&compiled->relocation);
@@ -319,20 +306,19 @@ void factorvm::fixup_code_block(code_block *compiled)
 	relocate_code_block(compiled);
 }
 
-void fixup_code_block(code_block *compiled,factorvm *myvm)
+void fixup_code_block(code_block *compiled, factor_vm *myvm)
 {
 	return myvm->fixup_code_block(compiled);
 }
 
-void factorvm::relocate_code()
+void factor_vm::relocate_code()
 {
 	iterate_code_heap(factor::fixup_code_block);
 }
 
-
 /* Read an image file from disk, only done once during startup */
 /* This function also initializes the data and code heaps */
-void factorvm::load_image(vm_parameters *p)
+void factor_vm::load_image(vm_parameters *p)
 {
 	FILE *file = OPEN_READ(p->image_path);
 	if(file == NULL)
@@ -365,6 +351,5 @@ void factorvm::load_image(vm_parameters *p)
 	/* Store image path name */
 	userenv[IMAGE_ENV] = allot_alien(F,(cell)p->image_path);
 }
-
 
 }

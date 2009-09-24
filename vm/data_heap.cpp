@@ -3,7 +3,7 @@
 namespace factor
 {
 
-cell factorvm::init_zone(zone *z, cell size, cell start)
+cell factor_vm::init_zone(zone *z, cell size, cell start)
 {
 	z->size = size;
 	z->start = z->here = start;
@@ -11,8 +11,7 @@ cell factorvm::init_zone(zone *z, cell size, cell start)
 	return z->end;
 }
 
-
-void factorvm::init_card_decks()
+void factor_vm::init_card_decks()
 {
 	cell start = align(data->seg->start,deck_size);
 	allot_markers_offset = (cell)data->allot_markers - (start >> card_bits);
@@ -20,7 +19,7 @@ void factorvm::init_card_decks()
 	decks_offset = (cell)data->decks - (start >> deck_bits);
 }
 
-data_heap *factorvm::alloc_data_heap(cell gens, cell young_size,cell aging_size,cell tenured_size)
+data_heap *factor_vm::alloc_data_heap(cell gens, cell young_size,cell aging_size,cell tenured_size)
 {
 	young_size = align(young_size,deck_size);
 	aging_size = align(aging_size,deck_size);
@@ -84,8 +83,7 @@ data_heap *factorvm::alloc_data_heap(cell gens, cell young_size,cell aging_size,
 	return data;
 }
 
-
-data_heap *factorvm::grow_data_heap(data_heap *data, cell requested_bytes)
+data_heap *factor_vm::grow_data_heap(data_heap *data, cell requested_bytes)
 {
 	cell new_tenured_size = (data->tenured_size * 2) + requested_bytes;
 
@@ -95,8 +93,7 @@ data_heap *factorvm::grow_data_heap(data_heap *data, cell requested_bytes)
 		new_tenured_size);
 }
 
-
-void factorvm::dealloc_data_heap(data_heap *data)
+void factor_vm::dealloc_data_heap(data_heap *data)
 {
 	dealloc_segment(data->seg);
 	free(data->generations);
@@ -107,8 +104,7 @@ void factorvm::dealloc_data_heap(data_heap *data)
 	free(data);
 }
 
-
-void factorvm::clear_cards(cell from, cell to)
+void factor_vm::clear_cards(cell from, cell to)
 {
 	/* NOTE: reverse order due to heap layout. */
 	card *first_card = addr_to_card(data->generations[to].start);
@@ -116,8 +112,7 @@ void factorvm::clear_cards(cell from, cell to)
 	memset(first_card,0,last_card - first_card);
 }
 
-
-void factorvm::clear_decks(cell from, cell to)
+void factor_vm::clear_decks(cell from, cell to)
 {
 	/* NOTE: reverse order due to heap layout. */
 	card_deck *first_deck = addr_to_deck(data->generations[to].start);
@@ -125,8 +120,7 @@ void factorvm::clear_decks(cell from, cell to)
 	memset(first_deck,0,last_deck - first_deck);
 }
 
-
-void factorvm::clear_allot_markers(cell from, cell to)
+void factor_vm::clear_allot_markers(cell from, cell to)
 {
 	/* NOTE: reverse order due to heap layout. */
 	card *first_card = addr_to_allot_marker((object *)data->generations[to].start);
@@ -134,8 +128,7 @@ void factorvm::clear_allot_markers(cell from, cell to)
 	memset(first_card,invalid_allot_marker,last_card - first_card);
 }
 
-
-void factorvm::reset_generation(cell i)
+void factor_vm::reset_generation(cell i)
 {
 	zone *z = (i == data->nursery() ? &nursery : &data->generations[i]);
 
@@ -144,10 +137,9 @@ void factorvm::reset_generation(cell i)
 		memset((void*)z->start,69,z->size);
 }
 
-
 /* After garbage collection, any generations which are now empty need to have
 their allocation pointers and cards reset. */
-void factorvm::reset_generations(cell from, cell to)
+void factor_vm::reset_generations(cell from, cell to)
 {
 	cell i;
 	for(i = from; i <= to; i++)
@@ -158,8 +150,7 @@ void factorvm::reset_generations(cell from, cell to)
 	clear_allot_markers(from,to);
 }
 
-
-void factorvm::set_data_heap(data_heap *data_)
+void factor_vm::set_data_heap(data_heap *data_)
 {
 	data = data_;
 	nursery = data->generations[data->nursery()];
@@ -169,17 +160,15 @@ void factorvm::set_data_heap(data_heap *data_)
 	clear_allot_markers(data->nursery(),data->tenured());
 }
 
-
-void factorvm::init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,bool secure_gc_)
+void factor_vm::init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,bool secure_gc_)
 {
 	set_data_heap(alloc_data_heap(gens,young_size,aging_size,tenured_size));
 	secure_gc = secure_gc_;
 	init_data_gc();
 }
 
-
 /* Size of the object pointed to by a tagged pointer */
-cell factorvm::object_size(cell tagged)
+cell factor_vm::object_size(cell tagged)
 {
 	if(immediate_p(tagged))
 		return 0;
@@ -187,16 +176,14 @@ cell factorvm::object_size(cell tagged)
 		return untagged_object_size(untag<object>(tagged));
 }
 
-
 /* Size of the object pointed to by an untagged pointer */
-cell factorvm::untagged_object_size(object *pointer)
+cell factor_vm::untagged_object_size(object *pointer)
 {
 	return align8(unaligned_object_size(pointer));
 }
 
-
 /* Size of the data area of an object pointed to by an untagged pointer */
-cell factorvm::unaligned_object_size(object *pointer)
+cell factor_vm::unaligned_object_size(object *pointer)
 {
 	switch(pointer->h.hi_tag())
 	{
@@ -230,21 +217,20 @@ cell factorvm::unaligned_object_size(object *pointer)
 	}
 }
 
-
-inline void factorvm::vmprim_size()
+inline void factor_vm::primitive_size()
 {
 	box_unsigned_cell(object_size(dpop()));
 }
 
 PRIMITIVE(size)
 {
-	PRIMITIVE_GETVM()->vmprim_size();
+	PRIMITIVE_GETVM()->primitive_size();
 }
 
 /* The number of cells from the start of the object which should be scanned by
 the GC. Some types have a binary payload at the end (string, word, DLL) which
 we ignore. */
-cell factorvm::binary_payload_start(object *pointer)
+cell factor_vm::binary_payload_start(object *pointer)
 {
 	switch(pointer->h.hi_tag())
 	{
@@ -278,9 +264,8 @@ cell factorvm::binary_payload_start(object *pointer)
 	}
 }
 
-
 /* Push memory usage statistics in data heap */
-inline void factorvm::vmprim_data_room()
+inline void factor_vm::primitive_data_room()
 {
 	dpush(tag_fixnum((data->cards_end - data->cards) >> 10));
 	dpush(tag_fixnum((data->decks_end - data->decks) >> 10));
@@ -301,34 +286,32 @@ inline void factorvm::vmprim_data_room()
 
 PRIMITIVE(data_room)
 {
-	PRIMITIVE_GETVM()->vmprim_data_room();
+	PRIMITIVE_GETVM()->primitive_data_room();
 }
 
 /* Disables GC and activates next-object ( -- obj ) primitive */
-void factorvm::begin_scan()
+void factor_vm::begin_scan()
 {
 	heap_scan_ptr = data->generations[data->tenured()].start;
 	gc_off = true;
 }
 
-
-void factorvm::end_scan()
+void factor_vm::end_scan()
 {
 	gc_off = false;
 }
 
-
-inline void factorvm::vmprim_begin_scan()
+inline void factor_vm::primitive_begin_scan()
 {
 	begin_scan();
 }
 
 PRIMITIVE(begin_scan)
 {
-	PRIMITIVE_GETVM()->vmprim_begin_scan();
+	PRIMITIVE_GETVM()->primitive_begin_scan();
 }
 
-cell factorvm::next_object()
+cell factor_vm::next_object()
 {
 	if(!gc_off)
 		general_error(ERROR_HEAP_SCAN,F,F,NULL);
@@ -341,30 +324,29 @@ cell factorvm::next_object()
 	return tag_dynamic(obj);
 }
 
-
 /* Push object at heap scan cursor and advance; pushes f when done */
-inline void factorvm::vmprim_next_object()
+inline void factor_vm::primitive_next_object()
 {
 	dpush(next_object());
 }
 
 PRIMITIVE(next_object)
 {
-	PRIMITIVE_GETVM()->vmprim_next_object();
+	PRIMITIVE_GETVM()->primitive_next_object();
 }
 
 /* Re-enables GC */
-inline void factorvm::vmprim_end_scan()
+inline void factor_vm::primitive_end_scan()
 {
 	gc_off = false;
 }
 
 PRIMITIVE(end_scan)
 {
-	PRIMITIVE_GETVM()->vmprim_end_scan();
+	PRIMITIVE_GETVM()->primitive_end_scan();
 }
 
-template<typename TYPE> void factorvm::each_object(TYPE &functor)
+template<typename TYPE> void factor_vm::each_object(TYPE &functor)
 {
 	begin_scan();
 	cell obj;
@@ -372,7 +354,6 @@ template<typename TYPE> void factorvm::each_object(TYPE &functor)
 		functor(tagged<object>(obj));
 	end_scan();
 }
-
 
 namespace
 {
@@ -385,13 +366,13 @@ struct word_counter {
 
 struct word_accumulator {
 	growable_array words;
-	word_accumulator(int count,factorvm *vm) : words(vm,count) {}
+	word_accumulator(int count,factor_vm *vm) : words(vm,count) {}
 	void operator()(tagged<object> obj) { if(obj.type_p(WORD_TYPE)) words.add(obj.value()); }
 };
 
 }
 
-cell factorvm::find_all_words()
+cell factor_vm::find_all_words()
 {
 	word_counter counter;
 	each_object(counter);
@@ -400,6 +381,5 @@ cell factorvm::find_all_words()
 	accum.words.trim();
 	return accum.words.elements.value();
 }
-
 
 }

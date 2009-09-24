@@ -1,6 +1,6 @@
 USING: alien.syntax io io.encodings.utf16n io.encodings.utf8 io.files
 kernel namespaces sequences system threads unix.utilities ;
-IN: mttest
+IN: native-thread-test
 
 FUNCTION: void* start_standalone_factor_in_new_thread ( int argc, char** argv ) ;
 
@@ -17,7 +17,7 @@ M: unix native-string-encoding utf8 ;
      { "-run=tetris" } start-vm-in-os-thread drop ;
 
 : start-testthread-in-os-thread ( -- )
-     { "-run=mttest" } start-vm-in-os-thread drop ;
+     { "-run=native-thread-test" } start-vm-in-os-thread drop ;
  
 : testthread ( -- )
      "/tmp/hello" utf8 [ "hello!\n" write ] with-file-appender 5000000 sleep ;
