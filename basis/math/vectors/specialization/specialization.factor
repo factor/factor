@@ -30,7 +30,14 @@ SYMBOLS: -> +vector+ +scalar+ +nonnegative+ ;
         {
             { +vector+ [ drop <class-info> ] }
             { +scalar+ [ nip <class-info> ] }
-            { +nonnegative+ [ nip real class-and [0,inf] <class/interval-info> ] }
+            {
+                +nonnegative+
+                [
+                    nip
+                    dup complex class<= [ drop float ] when
+                    [0,inf] <class/interval-info>
+                ]
+            }
         } case
     ] with with map ;
 
@@ -77,8 +84,8 @@ H{
     { vbitand { +vector+ +vector+ -> +vector+ } }
     { vbitor { +vector+ +vector+ -> +vector+ } }
     { vbitxor { +vector+ +vector+ -> +vector+ } }
-    { v>> { +vector+ +scalar+ -> +vector+ } }
-    { v<< { +vector+ +scalar+ -> +vector+ } }
+    { vlshift { +vector+ +scalar+ -> +vector+ } }
+    { vrshift { +vector+ +scalar+ -> +vector+ } }
 }
 
 PREDICATE: vector-word < word vector-words key? ;
@@ -112,9 +119,11 @@ M: vector-word subwords specializations values [ word? ] filter ;
 : vector-words-for-type ( elt-type -- alist )
     {
         ! Can't do shifts on floats
-        { [ dup float class<= ] [ vector-words keys { v<< v>> } diff ] }
+        { [ dup float class<= ] [ vector-words keys { vlshift vrshift } diff ] }
         ! Can't divide integers
         { [ dup integer class<= ] [ vector-words keys { vsqrt n/v v/n v/ normalize } diff ] }
+        ! Can't compute square root of complex numbers (vsqrt uses fsqrt not sqrt)
+        { [ dup complex class<= ] [ vector-words keys { vsqrt } diff ] }
         [ { } ]
     } cond nip ;
 
