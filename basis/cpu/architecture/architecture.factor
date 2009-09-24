@@ -27,7 +27,9 @@ uchar-16-rep
 short-8-rep
 ushort-8-rep
 int-4-rep
-uint-4-rep ;
+uint-4-rep
+longlong-2-rep
+ulonglong-2-rep ;
 
 SINGLETONS:
 float-4-rep
@@ -39,7 +41,9 @@ uchar-16-rep
 short-8-rep
 ushort-8-rep
 int-4-rep
-uint-4-rep ;
+uint-4-rep
+longlong-2-rep
+ulonglong-2-rep ;
 
 UNION: float-vector-rep
 float-4-rep
