@@ -93,7 +93,6 @@ DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
 	mov NV_TEMP_REG,ARG1
 	jmp *QUOT_XT_OFFSET(ARG0)
 
-
 DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
 	mov ARG1,NV_TEMP_REG         /* stash vm ptr */
 	mov STACK_REG,ARG1           /* Save stack pointer */

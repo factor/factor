@@ -79,6 +79,4 @@
 #include "factor.hpp"
 #include "utilities.hpp"
 
-
-
 #endif /* __FACTOR_MASTER_H__ */

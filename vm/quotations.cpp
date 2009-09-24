@@ -40,7 +40,7 @@ bool quotation_jit::primitive_call_p(cell i)
 {
 	return (i + 2) == array_capacity(elements.untagged())
 		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(FIXNUM_TYPE)
-		&& array_nth(elements.untagged(),i + 1) == myvm->userenv[JIT_PRIMITIVE_WORD];
+		&& array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_PRIMITIVE_WORD];
 }
 
 bool quotation_jit::fast_if_p(cell i)
@@ -48,28 +48,28 @@ bool quotation_jit::fast_if_p(cell i)
 	return (i + 3) == array_capacity(elements.untagged())
 		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(QUOTATION_TYPE)
 		&& tagged<object>(array_nth(elements.untagged(),i + 1)).type_p(QUOTATION_TYPE)
-		&& array_nth(elements.untagged(),i + 2) == myvm->userenv[JIT_IF_WORD];
+		&& array_nth(elements.untagged(),i + 2) == parent_vm->userenv[JIT_IF_WORD];
 }
 
 bool quotation_jit::fast_dip_p(cell i)
 {
 	return (i + 2) <= array_capacity(elements.untagged())
 		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(QUOTATION_TYPE)
-		&& array_nth(elements.untagged(),i + 1) == myvm->userenv[JIT_DIP_WORD];
+		&& array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_DIP_WORD];
 }
 
 bool quotation_jit::fast_2dip_p(cell i)
 {
 	return (i + 2) <= array_capacity(elements.untagged())
 		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(QUOTATION_TYPE)
-		&& array_nth(elements.untagged(),i + 1) == myvm->userenv[JIT_2DIP_WORD];
+		&& array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_2DIP_WORD];
 }
 
 bool quotation_jit::fast_3dip_p(cell i)
 {
 	return (i + 2) <= array_capacity(elements.untagged())
 		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(QUOTATION_TYPE)
-		&& array_nth(elements.untagged(),i + 1) == myvm->userenv[JIT_3DIP_WORD];
+		&& array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_3DIP_WORD];
 }
 
 bool quotation_jit::mega_lookup_p(cell i)
@@ -78,7 +78,7 @@ bool quotation_jit::mega_lookup_p(cell i)
 		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(ARRAY_TYPE)
 		&& tagged<object>(array_nth(elements.untagged(),i + 1)).type_p(FIXNUM_TYPE)
 		&& tagged<object>(array_nth(elements.untagged(),i + 2)).type_p(ARRAY_TYPE)
-		&& array_nth(elements.untagged(),i + 3) == myvm->userenv[MEGA_LOOKUP_WORD];
+		&& array_nth(elements.untagged(),i + 3) == parent_vm->userenv[MEGA_LOOKUP_WORD];
 }
 
 bool quotation_jit::stack_frame_p()
@@ -92,7 +92,7 @@ bool quotation_jit::stack_frame_p()
 		switch(tagged<object>(obj).type())
 		{
 		case WORD_TYPE:
-			if(myvm->untag<word>(obj)->subprimitive == F)
+			if(parent_vm->untag<word>(obj)->subprimitive == F)
 				return true;
 			break;
 		case QUOTATION_TYPE:
@@ -115,7 +115,7 @@ void quotation_jit::iterate_quotation()
 	set_position(0);
 
 	if(stack_frame)
-		emit(myvm->userenv[JIT_PROLOG]);
+		emit(parent_vm->userenv[JIT_PROLOG]);
 
 	cell i;
 	cell length = array_capacity(elements.untagged());
@@ -125,7 +125,7 @@ void quotation_jit::iterate_quotation()
 	{
 		set_position(i);
 
-		gc_root<object> obj(array_nth(elements.untagged(),i),myvm);
+		gc_root<object> obj(array_nth(elements.untagged(),i),parent_vm);
 
 		switch(obj.type())
 		{
@@ -134,23 +134,23 @@ void quotation_jit::iterate_quotation()
 			if(obj.as<word>()->subprimitive != F)
 				emit_subprimitive(obj.value());
 			/* The (execute) primitive is special-cased */
-			else if(obj.value() == myvm->userenv[JIT_EXECUTE_WORD])
+			else if(obj.value() == parent_vm->userenv[JIT_EXECUTE_WORD])
 			{
 				if(i == length - 1)
 				{
-					if(stack_frame) emit(myvm->userenv[JIT_EPILOG]);
+					if(stack_frame) emit(parent_vm->userenv[JIT_EPILOG]);
 					tail_call = true;
-					emit(myvm->userenv[JIT_EXECUTE_JUMP]);
+					emit(parent_vm->userenv[JIT_EXECUTE_JUMP]);
 				}
 				else
-					emit(myvm->userenv[JIT_EXECUTE_CALL]);
+					emit(parent_vm->userenv[JIT_EXECUTE_CALL]);
 			}
 			/* Everything else */
 			else
 			{
 				if(i == length - 1)
 				{
-					if(stack_frame) emit(myvm->userenv[JIT_EPILOG]);
+					if(stack_frame) emit(parent_vm->userenv[JIT_EPILOG]);
 					tail_call = true;
 					/* Inline cache misses are special-cased.
 					   The calling convention for tail
@@ -160,8 +160,8 @@ void quotation_jit::iterate_quotation()
 					   the inline cache miss primitive, and
 					   we don't want to clobber the saved
 					   address. */
-					if(obj.value() == myvm->userenv[PIC_MISS_WORD]
-					   || obj.value() == myvm->userenv[PIC_MISS_TAIL_WORD])
+					if(obj.value() == parent_vm->userenv[PIC_MISS_WORD]
+					   || obj.value() == parent_vm->userenv[PIC_MISS_TAIL_WORD])
 					{
 						word_special(obj.value());
 					}
@@ -181,7 +181,7 @@ void quotation_jit::iterate_quotation()
 			/* Primitive calls */
 			if(primitive_call_p(i))
 			{
-				emit_with(myvm->userenv[JIT_PRIMITIVE],obj.value());
+				emit_with(parent_vm->userenv[JIT_PRIMITIVE],obj.value());
 
 				i++;
 
@@ -193,18 +193,18 @@ void quotation_jit::iterate_quotation()
 			   mutually recursive in the library, but both still work) */
 			if(fast_if_p(i))
 			{
-				if(stack_frame) emit(myvm->userenv[JIT_EPILOG]);
+				if(stack_frame) emit(parent_vm->userenv[JIT_EPILOG]);
 				tail_call = true;
 
 				if(compiling)
 				{
-					myvm->jit_compile(array_nth(elements.untagged(),i),relocate);
-					myvm->jit_compile(array_nth(elements.untagged(),i + 1),relocate);
+					parent_vm->jit_compile(array_nth(elements.untagged(),i),relocate);
+					parent_vm->jit_compile(array_nth(elements.untagged(),i + 1),relocate);
 				}
 
 				literal(array_nth(elements.untagged(),i));
 				literal(array_nth(elements.untagged(),i + 1));
-				emit(myvm->userenv[JIT_IF]);
+				emit(parent_vm->userenv[JIT_IF]);
 
 				i += 2;
 
@@ -214,8 +214,8 @@ void quotation_jit::iterate_quotation()
 			else if(fast_dip_p(i))
 			{
 				if(compiling)
-					myvm->jit_compile(obj.value(),relocate);
-				emit_with(myvm->userenv[JIT_DIP],obj.value());
+					parent_vm->jit_compile(obj.value(),relocate);
+				emit_with(parent_vm->userenv[JIT_DIP],obj.value());
 				i++;
 				break;
 			}
@@ -223,8 +223,8 @@ void quotation_jit::iterate_quotation()
 			else if(fast_2dip_p(i))
 			{
 				if(compiling)
-					myvm->jit_compile(obj.value(),relocate);
-				emit_with(myvm->userenv[JIT_2DIP],obj.value());
+					parent_vm->jit_compile(obj.value(),relocate);
+				emit_with(parent_vm->userenv[JIT_2DIP],obj.value());
 				i++;
 				break;
 			}
@@ -232,8 +232,8 @@ void quotation_jit::iterate_quotation()
 			else if(fast_3dip_p(i))
 			{
 				if(compiling)
-					myvm->jit_compile(obj.value(),relocate);
-				emit_with(myvm->userenv[JIT_3DIP],obj.value());
+					parent_vm->jit_compile(obj.value(),relocate);
+				emit_with(parent_vm->userenv[JIT_3DIP],obj.value());
 				i++;
 				break;
 			}
@@ -260,12 +260,12 @@ void quotation_jit::iterate_quotation()
 		set_position(length);
 
 		if(stack_frame)
-			emit(myvm->userenv[JIT_EPILOG]);
-		emit(myvm->userenv[JIT_RETURN]);
+			emit(parent_vm->userenv[JIT_EPILOG]);
+		emit(parent_vm->userenv[JIT_RETURN]);
 	}
 }
 
-void factorvm::set_quot_xt(quotation *quot, code_block *code)
+void factor_vm::set_quot_xt(quotation *quot, code_block *code)
 {
 	if(code->type != QUOTATION_TYPE)
 		critical_error("Bad param to set_quot_xt",(cell)code);
@@ -275,7 +275,7 @@ void factorvm::set_quot_xt(quotation *quot, code_block *code)
 }
 
 /* Allocates memory */
-void factorvm::jit_compile(cell quot_, bool relocating)
+void factor_vm::jit_compile(cell quot_, bool relocating)
 {
 	gc_root<quotation> quot(quot_,this);
 	if(quot->code) return;
@@ -289,18 +289,18 @@ void factorvm::jit_compile(cell quot_, bool relocating)
 	if(relocating) relocate_code_block(compiled);
 }
 
-inline void factorvm::vmprim_jit_compile()
+inline void factor_vm::primitive_jit_compile()
 {
 	jit_compile(dpop(),true);
 }
 
 PRIMITIVE(jit_compile)
 {
-	PRIMITIVE_GETVM()->vmprim_jit_compile();
+	PRIMITIVE_GETVM()->primitive_jit_compile();
 }
 
 /* push a new quotation on the stack */
-inline void factorvm::vmprim_array_to_quotation()
+inline void factor_vm::primitive_array_to_quotation()
 {
 	quotation *quot = allot<quotation>(sizeof(quotation));
 	quot->array = dpeek();
@@ -313,10 +313,10 @@ inline void factorvm::vmprim_array_to_quotation()
 
 PRIMITIVE(array_to_quotation)
 {
-	PRIMITIVE_GETVM()->vmprim_array_to_quotation();
+	PRIMITIVE_GETVM()->primitive_array_to_quotation();
 }
 
-inline void factorvm::vmprim_quotation_xt()
+inline void factor_vm::primitive_quotation_xt()
 {
 	quotation *quot = untag_check<quotation>(dpeek());
 	drepl(allot_cell((cell)quot->xt));
@@ -324,10 +324,10 @@ inline void factorvm::vmprim_quotation_xt()
 
 PRIMITIVE(quotation_xt)
 {
-	PRIMITIVE_GETVM()->vmprim_quotation_xt();
+	PRIMITIVE_GETVM()->primitive_quotation_xt();
 }
 
-void factorvm::compile_all_words()
+void factor_vm::compile_all_words()
 {
 	gc_root<array> words(find_all_words(),this);
 
@@ -348,7 +348,7 @@ void factorvm::compile_all_words()
 }
 
 /* Allocates memory */
-fixnum factorvm::quot_code_offset_to_scan(cell quot_, cell offset)
+fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 {
 	gc_root<quotation> quot(quot_,this);
 	gc_root<array> array(quot->array,this);
@@ -360,7 +360,7 @@ fixnum factorvm::quot_code_offset_to_scan(cell quot_, cell offset)
 	return compiler.get_position();
 }
 
-cell factorvm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
+cell factor_vm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 {
 	gc_root<quotation> quot(quot_,this);
 	stack_chain->callstack_top = stack;
@@ -368,13 +368,13 @@ cell factorvm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 	return quot.value();
 }
 
-VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factorvm *myvm)
+VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->lazy_jit_compile_impl(quot_,stack);
 }
 
-inline void factorvm::vmprim_quot_compiled_p()
+inline void factor_vm::primitive_quot_compiled_p()
 {
 	tagged<quotation> quot(dpop());
 	quot.untag_check(this);
@@ -383,7 +383,7 @@ inline void factorvm::vmprim_quot_compiled_p()
 
 PRIMITIVE(quot_compiled_p)
 {
-	PRIMITIVE_GETVM()->vmprim_quot_compiled_p();
+	PRIMITIVE_GETVM()->primitive_quot_compiled_p();
 }
 
 }
