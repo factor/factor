@@ -4,7 +4,7 @@ help.syntax kernel multiline slots quotations ;
 IN: variants
 
 HELP: VARIANT:
-{ $syntax <"
+{ $syntax """
 VARIANT: class-name
     singleton
     singleton
@@ -12,9 +12,9 @@ VARIANT: class-name
     .
     .
     .
-    ; "> }
+    ; """ }
 { $description "Defines " { $snippet "class-name" } " as a union of the following " { $link singleton-class } " and " { $link tuple-class } " definitions. Each " { $snippet "singleton" } " word is defined as a " { $snippet "singleton-class" } ", and each " { $snippet "tuple" } " word is defined aas a " { $snippet "tuple-class" } " with the given set of " { $snippet "slot" } "s, using the same syntax for slot specifiers as " { $link POSTPONE: TUPLE: } ". Typed tuple slots can recursively reference the variant " { $snippet "class-name" } " being defined. For " { $snippet "tuple" } " types, a " { $link boa } " constructor word " { $snippet "<tuple>" } " is defined as well." }
-{ $examples { $code <"
+{ $examples { $code """
 USING: kernel variants ;
 IN: scratchpad
 
@@ -22,12 +22,12 @@ VARIANT: list
     nil
     cons: { { first object } { rest list } }
     ;
-"> } } ;
+""" } } ;
 
 HELP: match
 { $values { "branches" array } }
 { $description "Dispatches on the type of the value on the top of the stack. If the type is a " { $link singleton-class } ", the corresponding quotation is called with the underlying stack unchanged. If the type is a " { $link tuple-class } ", the tuple slots are pushed onto the stack by order of arguments." }
-{ $examples { $example <"
+{ $examples { $example """
 USING: kernel math prettyprint variants ;
 IN: scratchpad
 
@@ -43,7 +43,7 @@ VARIANT: list
     } match ;
 
 1 2 3 4 nil <cons> <cons> <cons> <cons> list-length .
-"> "4" } } ;
+""" "4" } } ;
 
 HELP: unboa
 { $values { "class" class } }

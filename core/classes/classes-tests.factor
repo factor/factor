@@ -44,69 +44,69 @@ USE: multiline
 
 ! So the user has some code...
 [ ] [
-    <" IN: classes.test.a
+    """IN: classes.test.a
     GENERIC: g ( a -- b )
     TUPLE: x ;
     M: x g ;
-    TUPLE: z < x ;"> <string-reader>
+    TUPLE: z < x ;""" <string-reader>
     "class-intersect-no-method-a" parse-stream drop
 ] unit-test
 
 ! Note that q inlines M: x g ;
 [ ] [
-    <" IN: classes.test.b
+    """IN: classes.test.b
     USE: classes.test.a
     USE: kernel
-    : q ( -- b ) z new g ;"> <string-reader>
+    : q ( -- b ) z new g ;""" <string-reader>
     "class-intersect-no-method-b" parse-stream drop
 ] unit-test
 
 ! Now, the user removes the z class and adds a method,
 [ ] [
-    <" IN: classes.test.a
+    """IN: classes.test.a
     GENERIC: g ( a -- b )
     TUPLE: x ;
     M: x g ;
     TUPLE: j ;
-    M: j g ;"> <string-reader>
+    M: j g ;""" <string-reader>
     "class-intersect-no-method-a" parse-stream drop
 ] unit-test
 
 ! And changes the definition of q
 [ ] [
-    <" IN: classes.test.b
+    """IN: classes.test.b
     USE: classes.test.a
     USE: kernel
-    : q ( -- b ) j new g ;"> <string-reader>
+    : q ( -- b ) j new g ;""" <string-reader>
     "class-intersect-no-method-b" parse-stream drop
 ] unit-test
 
 ! Similar problem, but with anonymous classes
 [ ] [
-    <" IN: classes.test.c
+    """IN: classes.test.c
     USE: kernel
     GENERIC: g ( a -- b )
     M: object g ;
-    TUPLE: z ;"> <string-reader>
+    TUPLE: z ;""" <string-reader>
     "class-intersect-no-method-c" parse-stream drop
 ] unit-test
 
 [ ] [
-    <" IN: classes.test.d
+    """IN: classes.test.d
     USE: classes.test.c
     USE: kernel
-    : q ( a -- b ) dup z? [ g ] unless ;"> <string-reader>
+    : q ( a -- b ) dup z? [ g ] unless ;""" <string-reader>
     "class-intersect-no-method-d" parse-stream drop
 ] unit-test
 
 ! Now, the user removes the z class and adds a method,
 [ ] [
-    <" IN: classes.test.c
+    """IN: classes.test.c
     USE: kernel
     GENERIC: g ( a -- b )
     M: object g ;
     TUPLE: j ;
-    M: j g ;"> <string-reader>
+    M: j g ;""" <string-reader>
     "class-intersect-no-method-c" parse-stream drop
 ] unit-test
 

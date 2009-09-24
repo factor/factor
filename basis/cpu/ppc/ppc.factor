@@ -9,6 +9,7 @@ compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.cfg.build-stack-frame
 compiler.units compiler.constants compiler.codegen vm ;
 FROM: cpu.ppc.assembler => B ;
+FROM: layouts => cell ;
 FROM: math => float ;
 IN: cpu.ppc
 
@@ -283,10 +284,12 @@ M:: ppc %float>integer ( dst src -- )
     dst 1 4 scratch@ LWZ ;
 
 M: ppc %copy ( dst src rep -- )
-    {
-        { int-rep [ MR ] }
-        { double-rep [ FMR ] }
-    } case ;
+    2over eq? [ 3drop ] [
+        {
+            { int-rep [ MR ] }
+            { double-rep [ FMR ] }
+        } case
+    ] if ;
 
 M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
 
@@ -298,7 +301,7 @@ M:: ppc %box-float ( dst src temp -- )
     [ float-regs param-regs nth 1 ] [ n>> spill@ ] bi* LFD ;
 
 : float-function-return ( reg -- )
-    float-regs return-reg 2dup = [ 2drop ] [ FMR ] if ;
+    float-regs return-reg double-rep %copy ;
 
 M:: ppc %unary-float-function ( dst src func -- )
     0 src float-function-param
@@ -312,9 +315,29 @@ M:: ppc %binary-float-function ( dst src1 src2 func -- )
     dst float-function-return ;
 
 ! Internal format is always double-precision on PowerPC
-M: ppc %single>double-float FMR ;
+M: ppc %single>double-float double-rep %copy ;
+M: ppc %double>single-float double-rep %copy ;
 
-M: ppc %double>single-float FMR ;
+! VMX/AltiVec not supported yet
+M: %broadcast-vector-reps drop { } ;
+M: %gather-vector-2-reps drop { } ;
+M: %gather-vector-4-reps drop { } ;
+M: %add-vector-reps drop { } ;
+M: %saturated-add-vector-reps drop { } ;
+M: %add-sub-vector-reps drop { } ;
+M: %sub-vector-reps drop { } ;
+M: %saturated-sub-vector-reps drop { } ;
+M: %mul-vector-reps drop { } ;
+M: %saturated-mul-vector-reps drop { } ;
+M: %div-vector-reps drop { } ;
+M: %min-vector-reps drop { } ;
+M: %max-vector-reps drop { } ;
+M: %sqrt-vector-reps drop { } ;
+M: %horizontal-add-vector-reps drop { } ;
+M: %abs-vector-reps drop { } ;
+M: %and-vector-reps drop { } ;
+M: %or-vector-reps drop { } ;
+M: %xor-vector-reps drop { } ;
 
 M: ppc %unbox-alien ( dst src -- )
     alien-offset LWZ ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel quotations math sequences
-multiline stack-checker ;
+stack-checker ;
 IN: combinators.smart
 
 HELP: input<sequence
@@ -26,10 +26,10 @@ HELP: output>array
 { $description "Infers the number or outputs from the quotation and constructs an array from those outputs." }
 { $examples
     { $example
-        <" USING: combinators combinators.smart math prettyprint ;
+        "USING: combinators combinators.smart math prettyprint ;
 9 [
     { [ 1 - ] [ 1 + ] [ sq ] } cleave
-] output>array .">
+] output>array ."
     "{ 8 10 81 }"
     }
 } ;

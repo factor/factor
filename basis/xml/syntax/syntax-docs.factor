@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax xml.data present multiline ;
+USING: help.markup help.syntax xml.data present ;
 IN: xml.syntax
 
 ABOUT: "xml.syntax"
@@ -50,11 +50,12 @@ ARTICLE: { "xml.syntax" "interpolation" } "XML interpolation syntax"
 $nl
 "These forms can be used where a tag might go, as in " { $snippet "[XML <foo><-></foo> XML]" } " or where an attribute might go, as in " { $snippet "[XML <foo bar=<->/> XML]" } ". When an attribute is spliced in, it is not included if the value is " { $snippet "f" } " and if the value is not a string, the value is put through " { $link present } ". Here is an example of the fry style of XML interpolation:"
 { $example 
-{" USING: splitting xml.writer xml.syntax ;
+"""USING: splitting xml.writer xml.syntax ;
 "one two three" " " split
 [ [XML <item><-></item> XML] ] map
-<XML <doc><-></doc> XML> pprint-xml"}
-{" <?xml version="1.0" encoding="UTF-8"?>
+<XML <doc><-></doc> XML> pprint-xml"""
+
+"""<?xml version="1.0" encoding="UTF-8"?>
 <doc>
   <item>
     one
@@ -65,16 +66,16 @@ $nl
   <item>
     three
   </item>
-</doc>"} }
+</doc>""" }
 "Here is an example of the locals version:"
 { $example
-{" USING: locals urls xml.syntax xml.writer ;
+"""USING: locals urls xml.syntax xml.writer ;
 [let |
     number [ 3 ]
     false [ f ]
     url [ URL" http://factorcode.org/" ]
     string [ "hello" ]
-    word [ \ drop ] |
+    word [ \\ drop ] |
     <XML
         <x
             number=<-number->
@@ -82,11 +83,13 @@ $nl
             url=<-url->
             string=<-string->
             word=<-word-> />
-    XML> pprint-xml ] "}
-{" <?xml version="1.0" encoding="UTF-8"?>
-<x number="3" url="http://factorcode.org/" string="hello" word="drop"/>"} }
+    XML> pprint-xml
+]"""
+
+"""<?xml version="1.0" encoding="UTF-8"?>
+<x number="3" url="http://factorcode.org/" string="hello" word="drop"/>""" }
 "XML interpolation can also be used, in conjunction with " { $vocab-link "inverse" } " in pattern matching. For example:"
-{ $example {" USING: xml.syntax inverse ;
+{ $example """USING: xml.syntax inverse ;
 : dispatch ( xml -- string )
     {
         { [ [XML <a><-></a> XML] ] [ "a" prepend ] }
@@ -94,7 +97,8 @@ $nl
         { [ [XML <b val='yes'/> XML] ] [ "yes" ] }
         { [ [XML <b val=<->/> XML] ] [ "no" prepend ] }
     } switch ;
-[XML <a>pple</a> XML] dispatch write "} "apple" } ;
+[XML <a>pple</a> XML] dispatch write"""
+"apple" } ;
 
 HELP: XML-NS:
 { $syntax "XML-NS: name http://url" }

@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations classes sequences
-multiline ;
+USING: help.markup help.syntax kernel quotations classes sequences ;
 IN: splitting.monotonic
 
 HELP: monotonic-slice
@@ -14,7 +13,7 @@ HELP: monotonic-slice
     { $example
         "USING: splitting.monotonic math prettyprint ;"
         "{ 1 2 3 2 3 4 } [ < ] upward-slice monotonic-slice ."
-        <" {
+        """{
     T{ upward-slice
         { from 0 }
         { to 3 }
@@ -25,7 +24,7 @@ HELP: monotonic-slice
         { to 6 }
         { seq { 1 2 3 2 3 4 } }
     }
-}">
+}"""
     }
 } ;
 
@@ -74,7 +73,7 @@ HELP: trends
     { $example
         "USING: splitting.monotonic math prettyprint ;"
         "{ 1 2 3 3 2 1 } trends ."
-        <" {
+        """{
     T{ upward-slice
         { from 0 }
         { to 3 }
@@ -90,7 +89,7 @@ HELP: trends
         { to 6 }
         { seq { 1 2 3 3 2 1 } }
     }
-}">
+}"""
     }
 } ;
 

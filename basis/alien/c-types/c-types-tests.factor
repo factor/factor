@@ -1,5 +1,6 @@
 USING: alien alien.syntax alien.c-types kernel tools.test
-sequences system libc alien.strings io.encodings.utf8 ;
+sequences system libc alien.strings io.encodings.utf8
+math.constants ;
 IN: alien.c-types.tests
 
 CONSTANT: xyz 123
@@ -52,3 +53,9 @@ TYPEDEF: uchar* MyLPBYTE
 os windows? cpu x86.64? and [
     [ -2147467259 ] [ 2147500037 <long> *long ] unit-test
 ] when
+
+[ 0 ] [ -10 uchar c-type-clamp ] unit-test
+[ 12 ] [ 12 uchar c-type-clamp ] unit-test
+[ -10 ] [ -10 char c-type-clamp ] unit-test
+[ 127 ] [ 230 char c-type-clamp ] unit-test
+[ t ] [ pi dup float c-type-clamp = ] unit-test

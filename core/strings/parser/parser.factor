@@ -1,10 +1,11 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs namespaces make splitting sequences
-strings math.parser lexer accessors ;
+USING: accessors assocs kernel lexer make math math.parser
+namespaces parser sequences splitting strings arrays
+math.order ;
 IN: strings.parser
 
-ERROR: bad-escape ;
+ERROR: bad-escape char ;
 
 : escape ( escape -- ch )
     H{
@@ -18,7 +19,7 @@ ERROR: bad-escape ;
         { CHAR: 0  CHAR: \0 }
         { CHAR: \\ CHAR: \\ }
         { CHAR: \" CHAR: \" }
-    } at [ bad-escape ] unless* ;
+    } ?at [ bad-escape ] unless ;
 
 SYMBOL: name>char-hook
 
@@ -42,6 +43,18 @@ name>char-hook [
         unclip-slice escape swap
     ] if ;
 
+: (unescape-string) ( str -- )
+    CHAR: \\ over index dup [
+        cut-slice [ % ] dip rest-slice
+        next-escape [ , ] dip
+        (unescape-string)
+    ] [
+        drop %
+    ] if ;
+
+: unescape-string ( str -- str' )
+    [ (unescape-string) ] "" make ;
+
 : (parse-string) ( str -- m )
     dup [ "\"\\" member? ] find dup [
         [ cut-slice [ % ] dip rest-slice ] dip
@@ -59,14 +72,109 @@ name>char-hook [
         [ swap tail-slice (parse-string) ] "" make swap
     ] change-lexer-column ;
 
-: (unescape-string) ( str -- )
-    CHAR: \\ over index dup [
-        cut-slice [ % ] dip rest-slice
-        next-escape [ , ] dip
-        (unescape-string)
+<PRIVATE
+
+: lexer-before ( i -- before )
+    [
+        [
+            lexer get
+            [ column>> ] [ line-text>> ] bi
+        ] dip swap subseq
     ] [
-        drop %
+        lexer get (>>column)
+    ] bi ;
+
+: find-next-token ( ch -- i elt )
+    CHAR: \ 2array
+    [ lexer get [ column>> ] [ line-text>> ] bi ] dip
+    [ member? ] curry find-from ;
+
+: rest-of-line ( lexer -- seq )
+    [ line-text>> ] [ column>> ] bi tail-slice ;
+
+: current-char ( lexer -- ch/f )
+    [ column>> ] [ line-text>> ] bi ?nth ;
+
+: advance-char ( lexer -- )
+    [ 1 + ] change-column drop ;
+
+ERROR: escaped-char-expected ;
+
+: next-char ( lexer -- ch )
+    dup still-parsing-line? [
+        [ current-char ] [ advance-char ] bi
+    ] [
+        escaped-char-expected
     ] if ;
 
-: unescape-string ( str -- str' )
-    [ (unescape-string) ] "" make ;
+: next-line% ( lexer -- )
+    [ rest-of-line % ]
+    [ next-line "\n" % ] bi ;
+
+: rest-begins? ( string -- ? )
+    [
+        lexer get [ line-text>> ] [ column>> ] bi tail-slice
+    ] dip head? ;
+
+: advance-lexer ( n -- )
+    [ lexer get ] dip [ + ] curry change-column drop ; inline
+
+: take-double-quotes ( -- string )
+    lexer get dup current-char CHAR: " = [
+        [ ] [ column>> ] [ line-text>> ] tri
+        [ CHAR: " = not ] find-from drop [
+            swap column>> - CHAR: " <repetition>
+        ] [
+            rest-of-line
+        ] if*
+    ] [
+        drop f
+    ] if dup length advance-lexer ;
+
+: end-string-parse ( delimiter -- )
+    length 3 = [
+        take-double-quotes 3 tail %
+    ] [
+        lexer get advance-char
+    ] if ;
+
+DEFER: (parse-long-string)
+
+: parse-found-token ( i string token -- )
+    [ lexer-before % ] dip
+    CHAR: \ = [
+        lexer get [ next-char , ] [ next-char , ] bi (parse-long-string)
+    ] [
+        dup rest-begins? [
+            end-string-parse
+        ] [
+            lexer get next-char , (parse-long-string)
+        ] if
+    ] if ;
+
+ERROR: trailing-characters string ;
+
+: (parse-long-string) ( string -- )
+    lexer get still-parsing? [
+        dup first find-next-token [
+            parse-found-token
+        ] [
+            drop lexer get next-line%
+            (parse-long-string)
+        ] if*
+    ] [
+        unexpected-eof
+    ] if ;
+
+PRIVATE>
+
+: parse-long-string ( string -- string' )
+    [ (parse-long-string) ] "" make ;
+
+: parse-multiline-string ( -- string )
+    lexer get rest-of-line "\"\"" head? [
+        lexer get [ 2 + ] change-column drop
+        "\"\"\""
+    ] [
+        "\""
+    ] if parse-long-string unescape-string ;

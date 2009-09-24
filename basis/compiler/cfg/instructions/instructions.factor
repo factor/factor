@@ -305,12 +305,32 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##saturated-add-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##add-sub-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##sub-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##saturated-sub-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##mul-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##saturated-mul-vector
 def: dst
 use: src1 src2
 literal: rep ;
@@ -330,14 +350,34 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##horizontal-add-vector
+def: dst/scalar-rep
+use: src
+literal: rep ;
+
+PURE-INSN: ##abs-vector
+def: dst
+use: src
+literal: rep ;
+
 PURE-INSN: ##sqrt-vector
 def: dst
 use: src
 literal: rep ;
 
-PURE-INSN: ##horizontal-add-vector
-def: dst/scalar-rep
-use: src
+PURE-INSN: ##and-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##or-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##xor-vector
+def: dst
+use: src1 src2
 literal: rep ;
 
 ! Boxing and unboxing aliens

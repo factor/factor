@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
-cpu.architecture kernel kernel.private math memory namespaces make
-sequences words system layouts combinators math.order fry locals
-compiler.constants vm byte-arrays
+cpu.x86.features cpu.x86.features.private cpu.architecture kernel
+kernel.private math memory namespaces make sequences words system
+layouts combinators math.order fry locals compiler.constants
+byte-arrays io macros quotations compiler compiler.units init vm
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.intrinsics
@@ -139,10 +140,8 @@ M: float-4-rep copy-register* drop MOVUPS ;
 M: double-2-rep copy-register* drop MOVUPD ;
 M: vector-rep copy-register* drop MOVDQU ;
 
-: copy-register ( dst src rep -- )
+M: x86 %copy ( dst src rep -- )
     2over eq? [ 3drop ] [ copy-register* ] if ;
-
-M: x86 %copy ( dst src rep -- ) copy-register ;
 
 :: overflow-template ( label dst src1 src2 insn -- )
     src1 src2 insn call
@@ -242,24 +241,38 @@ M:: x86 %box-vector ( dst src rep temp -- )
     dst rep rep-size 2 cells + byte-array temp %allot
     16 tag-fixnum dst 1 byte-array tag-number %set-slot-imm
     dst byte-array-offset [+]
-    src rep copy-register ;
+    src rep %copy ;
 
 M:: x86 %unbox-vector ( dst src rep -- )
     dst src byte-array-offset [+]
-    rep copy-register ;
+    rep %copy ;
+
+MACRO: available-reps ( alist -- )
+    ! Each SSE version adds new representations and supports
+    ! all old ones
+    unzip { } [ append ] accumulate rest swap suffix
+    [ [ 1quotation ] map ] bi@ zip
+    reverse [ { } ] suffix
+    '[ _ cond ] ;
 
 M: x86 %broadcast-vector ( dst src rep -- )
     {
-        { float-4-rep [ [ MOVSS ] [ drop dup 0 SHUFPS ] 2bi ] }
-        { double-2-rep [ [ MOVSD ] [ drop dup UNPCKLPD ] 2bi ] }
+        { float-4-rep [ [ float-4-rep %copy ] [ drop dup 0 SHUFPS ] 2bi ] }
+        { double-2-rep [ [ double-2-rep %copy ] [ drop dup UNPCKLPD ] 2bi ] }
     } case ;
+
+M: x86 %broadcast-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep } }
+    } available-reps ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
     rep {
         {
             float-4-rep
             [
-                dst src1 MOVSS
+                dst src1 float-4-rep %copy
                 dst src2 UNPCKLPS
                 src3 src4 UNPCKLPS
                 dst src3 MOVLHPS
@@ -267,16 +280,26 @@ M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
         }
     } case ;
 
+M: x86 %gather-vector-4-reps
+    {
+        { sse? { float-4-rep } }
+    } available-reps ;
+
 M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
     rep {
         {
             double-2-rep
             [
-                dst src1 MOVSD
+                dst src1 double-2-rep %copy
                 dst src2 UNPCKLPD
             ]
         }
     } case ;
+
+M: x86 %gather-vector-2-reps
+    {
+        { sse2? { double-2-rep } }
+    } available-reps ;
 
 M: x86 %add-vector ( dst src1 src2 rep -- )
     {
@@ -288,7 +311,39 @@ M: x86 %add-vector ( dst src1 src2 rep -- )
         { ushort-8-rep [ PADDW ] }
         { int-4-rep [ PADDD ] }
         { uint-4-rep [ PADDD ] }
+        { longlong-2-rep [ PADDQ ] }
+        { ulonglong-2-rep [ PADDQ ] }
     } case drop ;
+
+M: x86 %add-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %saturated-add-vector ( dst src1 src2 rep -- )
+    {
+        { char-16-rep [ PADDSB ] }
+        { uchar-16-rep [ PADDUSB ] }
+        { short-8-rep [ PADDSW ] }
+        { ushort-8-rep [ PADDUSW ] }
+    } case drop ;
+
+M: x86 %saturated-add-vector-reps
+    {
+        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep } }
+    } available-reps ;
+
+M: x86 %add-sub-vector ( dst src1 src2 rep -- )
+    {
+        { float-4-rep [ ADDSUBPS ] }
+        { double-2-rep [ ADDSUBPD ] }
+    } case drop ;
+
+M: x86 %add-sub-vector-reps
+    {
+        { sse3? { float-4-rep double-2-rep } }
+    } available-reps ;
 
 M: x86 %sub-vector ( dst src1 src2 rep -- )
     {
@@ -300,14 +355,49 @@ M: x86 %sub-vector ( dst src1 src2 rep -- )
         { ushort-8-rep [ PSUBW ] }
         { int-4-rep [ PSUBD ] }
         { uint-4-rep [ PSUBD ] }
+        { longlong-2-rep [ PSUBQ ] }
+        { ulonglong-2-rep [ PSUBQ ] }
     } case drop ;
+
+M: x86 %sub-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %saturated-sub-vector ( dst src1 src2 rep -- )
+    {
+        { char-16-rep [ PSUBSB ] }
+        { uchar-16-rep [ PSUBUSB ] }
+        { short-8-rep [ PSUBSW ] }
+        { ushort-8-rep [ PSUBUSW ] }
+    } case drop ;
+
+M: x86 %saturated-sub-vector-reps
+    {
+        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep } }
+    } available-reps ;
 
 M: x86 %mul-vector ( dst src1 src2 rep -- )
     {
         { float-4-rep [ MULPS ] }
         { double-2-rep [ MULPD ] }
-        { int-4-rep [ PMULLW ] }
+        { short-8-rep [ PMULLW ] }
+        { ushort-8-rep [ PMULLW ] }
+        { int-4-rep [ PMULLD ] }
+        { uint-4-rep [ PMULLD ] }
     } case drop ;
+
+M: x86 %mul-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep short-8-rep ushort-8-rep } }
+        { sse4.1? { int-4-rep uint-4-rep } }
+    } available-reps ;
+
+M: x86 %saturated-mul-vector-reps
+    ! No multiplication with saturation on x86
+    { } ;
 
 M: x86 %div-vector ( dst src1 src2 rep -- )
     {
@@ -315,17 +405,72 @@ M: x86 %div-vector ( dst src1 src2 rep -- )
         { double-2-rep [ DIVPD ] }
     } case drop ;
 
+M: x86 %div-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep } }
+    } available-reps ;
+
 M: x86 %min-vector ( dst src1 src2 rep -- )
     {
+        { char-16-rep [ PMINSB ] }
+        { uchar-16-rep [ PMINUB ] }
+        { short-8-rep [ PMINSW ] }
+        { ushort-8-rep [ PMINUW ] }
+        { int-4-rep [ PMINSD ] }
+        { uint-4-rep [ PMINUD ] }
         { float-4-rep [ MINPS ] }
         { double-2-rep [ MINPD ] }
     } case drop ;
 
+M: x86 %min-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
+        { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
+    } available-reps ;
+
 M: x86 %max-vector ( dst src1 src2 rep -- )
     {
+        { char-16-rep [ PMAXSB ] }
+        { uchar-16-rep [ PMAXUB ] }
+        { short-8-rep [ PMAXSW ] }
+        { ushort-8-rep [ PMAXUW ] }
+        { int-4-rep [ PMAXSD ] }
+        { uint-4-rep [ PMAXUD ] }
         { float-4-rep [ MAXPS ] }
         { double-2-rep [ MAXPD ] }
     } case drop ;
+
+M: x86 %max-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
+        { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
+    } available-reps ;
+
+M: x86 %horizontal-add-vector ( dst src rep -- )
+    {
+        { float-4-rep [ [ float-4-rep %copy ] [ HADDPS ] [ HADDPS ] 2tri ] }
+        { double-2-rep [ [ double-2-rep %copy ] [ HADDPD ] 2bi ] }
+    } case ;
+
+M: x86 %horizontal-add-vector-reps
+    {
+        { sse3? { float-4-rep double-2-rep } }
+    } available-reps ;
+
+M: x86 %abs-vector ( dst src rep -- )
+    {
+        { char-16-rep [ PABSB ] }
+        { short-8-rep [ PABSW ] }
+        { int-4-rep [ PABSD ] }
+    } case ;
+
+M: x86 %abs-vector-reps
+    {
+        { ssse3? { char-16-rep short-8-rep int-4-rep } }
+    } available-reps ;
 
 M: x86 %sqrt-vector ( dst src rep -- )
     {
@@ -333,11 +478,50 @@ M: x86 %sqrt-vector ( dst src rep -- )
         { double-2-rep [ SQRTPD ] }
     } case ;
 
-M: x86 %horizontal-add-vector ( dst src rep -- )
+M: x86 %sqrt-vector-reps
     {
-        { float-4-rep [ [ MOVAPS ] [ HADDPS ] [ HADDPS ] 2tri ] }
-        { double-2-rep [ [ MOVAPD ] [ HADDPD ] 2bi ] }
-    } case ;
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep } }
+    } available-reps ;
+
+M: x86 %and-vector ( dst src1 src2 rep -- )
+    {
+        { float-4-rep [ ANDPS ] }
+        { double-2-rep [ ANDPD ] }
+        [ drop PAND ]
+    } case drop ;
+
+M: x86 %and-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %or-vector ( dst src1 src2 rep -- )
+    {
+        { float-4-rep [ ORPS ] }
+        { double-2-rep [ ORPD ] }
+        [ drop POR ]
+    } case drop ;
+
+M: x86 %or-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %xor-vector ( dst src1 src2 rep -- )
+    {
+        { float-4-rep [ XORPS ] }
+        { double-2-rep [ XORPD ] }
+        [ drop PXOR ]
+    } case drop ;
+
+M: x86 %xor-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
 
 M: x86 %unbox-alien ( dst src -- )
     alien-offset [+] MOV ;
@@ -452,9 +636,6 @@ M: x86.64 has-small-reg? 2drop t ;
         [ quot call ] with-save/restore
     ] if ; inline
 
-: ?MOV ( dst src -- )
-    2dup = [ 2drop ] [ MOV ] if ; inline
-
 M:: x86 %string-nth ( dst src index temp -- )
     ! We request a small-reg of size 8 since those of size 16 are
     ! a superset.
@@ -482,12 +663,12 @@ M:: x86 %string-nth ( dst src index temp -- )
         ! Compute code point
         new-dst temp XOR
         "end" resolve-label
-        dst new-dst ?MOV
+        dst new-dst int-rep %copy
     ] with-small-register ;
 
 M:: x86 %set-string-nth-fast ( ch str index temp -- )
     ch { index str temp } 8 [| new-ch |
-        new-ch ch ?MOV
+        new-ch ch int-rep %copy
         temp str index [+] LEA
         temp string-offset [+] new-ch 8-bit-version-of MOV
     ] with-small-register ;
@@ -496,7 +677,7 @@ M:: x86 %set-string-nth-fast ( ch str index temp -- )
     dst { src } size [| new-dst |
         new-dst dup size n-bit-version-of dup src [] MOV
         quot call
-        dst new-dst ?MOV
+        dst new-dst int-rep %copy
     ] with-small-register ; inline
 
 : %alien-unsigned-getter ( dst src size -- )
@@ -516,11 +697,11 @@ M: x86 %alien-signed-4 32 %alien-signed-getter ;
 M: x86 %alien-cell [] MOV ;
 M: x86 %alien-float [] MOVSS ;
 M: x86 %alien-double [] MOVSD ;
-M: x86 %alien-vector [ [] ] dip copy-register ;
+M: x86 %alien-vector [ [] ] dip %copy ;
 
 :: %alien-integer-setter ( ptr value size -- )
     value { ptr } size [| new-value |
-        new-value value ?MOV
+        new-value value int-rep %copy
         ptr [] new-value size n-bit-version-of MOV
     ] with-small-register ; inline
 
@@ -530,7 +711,7 @@ M: x86 %set-alien-integer-4 32 %alien-integer-setter ;
 M: x86 %set-alien-cell [ [] ] dip MOV ;
 M: x86 %set-alien-float [ [] ] dip MOVSS ;
 M: x86 %set-alien-double [ [] ] dip MOVSD ;
-M: x86 %set-alien-vector [ [] ] 2dip copy-register ;
+M: x86 %set-alien-vector [ [] ] 2dip %copy ;
 
 : shift-count? ( reg -- ? ) { ECX RCX } memq? ;
 
@@ -735,10 +916,10 @@ M: x86 %compare-float-unordered-branch ( label src1 src2 cc -- )
     \ UCOMISD (%compare-float-branch) ;
 
 M:: x86 %spill ( src rep n -- )
-    n spill@ src rep copy-register ;
+    n spill@ src rep %copy ;
 
 M:: x86 %reload ( dst rep n -- )
-    dst n spill@ rep copy-register ;
+    dst n spill@ rep %copy ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
@@ -767,15 +948,29 @@ M: x86 small-enough? ( n -- ? )
     #! set up by the caller.
     stack-frame get total-size>> + stack@ ;
 
-: enable-sse2 ( -- )
-    enable-float-intrinsics
-    enable-fsqrt
-    enable-float-min/max
-    enable-sse2-simd ;
-
-: enable-sse3 ( -- )
-    enable-sse2
-    enable-sse3-simd ;
-
+enable-simd
 enable-min/max
 enable-fixnum-log2
+
+:: install-sse2-check ( -- )
+    [
+        sse-version 20 < [
+            "This image was built to use SSE2 but your CPU does not support it." print
+            "You will need to bootstrap Factor again." print
+            flush
+            1 exit
+        ] when
+    ] "cpu.x86" add-init-hook ;
+
+: enable-sse2 ( version -- )
+    20 >= [
+        enable-float-intrinsics
+        enable-fsqrt
+        enable-float-min/max
+        install-sse2-check
+    ] when ;
+
+: check-sse ( -- )
+    [ { sse_version } compile ] with-optimizer
+    "Checking for multimedia extensions: " write sse-version
+    [ sse-string write " detected" print ] [ enable-sse2 ] bi ;
