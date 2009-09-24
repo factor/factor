@@ -998,7 +998,7 @@ FUNCTION: int GetPriorityClipboardFormat ( UINT* paFormatPriorityList, int cForm
 ! FUNCTION: GetScrollRange
 ! FUNCTION: GetShellWindow
 ! FUNCTION: GetSubMenu
-! FUNCTION: GetSysColor
+FUNCTION: COLORREF GetSysColor ( int nIndex ) ;
 FUNCTION: HBRUSH GetSysColorBrush ( int nIndex ) ;
 FUNCTION: HMENU GetSystemMenu ( HWND hWnd, BOOL bRevert ) ;
 ! FUNCTION: GetSystemMetrics
