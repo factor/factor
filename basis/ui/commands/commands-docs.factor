@@ -106,19 +106,6 @@ HELP: define-command
     }
 } ;
 
-HELP: command-string
-{ $values { "gesture" "a gesture" } { "command" "a command" } { "string" string } }
-{ $description "Outputs a string containing the command name followed by the gesture." }
-{ $examples
-    { $unchecked-example
-        "USING: io ui.commands ui.gestures ;"
-        "IN: scratchpad"
-        ": com-my-command ;"
-        "T{ key-down f { C+ } \"s\" } \\ com-my-command command-string write"
-        "My Command (C+s)"
-    }
-} ;
-
 ARTICLE: "ui-commands" "Commands"
 "Commands are an abstraction layered on top of gestures. Their main advantage is that they are identified by words and can be organized into " { $emphasis "command maps" } ". This allows easy construction of buttons and tool bars for invoking commands."
 { $subsection define-command }
