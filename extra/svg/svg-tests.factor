@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff, see BSD license
 USING: accessors arrays literals math math.affine-transforms
-math.functions sequences svg tools.test xml xml.traversal ;
+math.functions sequences svg tools.test xml xml.traversal multiline ;
 IN: svg.tests
 
 { 1.0 2.25 } { -3.0 4.0 } { 5.5 0.5 } <affine-transform> 1array [
