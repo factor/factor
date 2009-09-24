@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators destructors fry html io
 io.backend io.pathnames io.styles kernel macros make math
-math.order math.parser namespaces sequences strings words xml
-xml.syntax ;
+math.order math.parser namespaces sequences strings words
+splitting xml xml.syntax ;
 IN: html.streams
 
 GENERIC: url-of ( object -- url )
@@ -88,12 +88,11 @@ MACRO: make-css ( pairs -- str )
 : emit-html ( quot stream -- )
     dip data>> push ; inline
 
-: image-resource-path ( path -- images-path )
-    normalize-path current-directory get drop-prefix drop
-    "/images" prepend ;
+: image-path ( path -- images-path )
+    "vocab:definitions/icons/" ?head [ "/icons/" prepend ] when ;
 
 : img-tag ( xml style -- xml )
-    image swap at [ nip image-resource-path simple-image ] when* ;
+    image swap at [ nip image-path simple-image ] when* ;
 
 : format-html-span ( string style stream -- )
     [
