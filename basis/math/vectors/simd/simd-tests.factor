@@ -142,7 +142,7 @@ CONSTANT: simd-classes
     [ drop { vsqrt n/v v/n v/ normalize } member? not ] assoc-filter ;
 
 : remove-integer-words ( alist -- alist' )
-    [ drop { v<< v>> } member? not ] assoc-filter ;
+    [ drop { vlshift vrshift } member? not ] assoc-filter ;
 
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip

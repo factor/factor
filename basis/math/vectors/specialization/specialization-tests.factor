@@ -13,10 +13,14 @@ SPECIALIZED-ARRAY: float
     [ { float-array float } declare v*n norm ] final-classes
 ] unit-test
 
-[ V{ number } ] [
+[ V{ complex } ] [
     [ { complex-float-array complex-float-array } declare v. ] final-classes
 ] unit-test
 
-[ V{ real } ] [
+[ V{ float } ] [
+    [ { float-array float } declare v*n norm ] final-classes
+] unit-test
+
+[ V{ float } ] [
     [ { complex-float-array complex } declare v*n norm ] final-classes
 ] unit-test
