@@ -8,18 +8,22 @@ ABOUT: "regexp"
 
 ARTICLE: "regexp" "Regular expressions"
 "The " { $vocab-link "regexp" } " vocabulary provides word for creating and using regular expressions."
-{ $subsection { "regexp" "intro" } }
+{ $subsections { "regexp" "intro" } }
 "The class of regular expressions:"
-{ $subsection regexp }
+{ $subsections regexp }
 "Basic usage:"
-{ $subsection { "regexp" "syntax" } }
-{ $subsection { "regexp" "options" } }
-{ $subsection { "regexp" "construction" } }
-{ $subsection { "regexp" "operations" } }
+{ $subsections
+    { "regexp" "syntax" }
+    { "regexp" "options" }
+    { "regexp" "construction" }
+    { "regexp" "operations" }
+}
 "Advanced topics:"
 { $vocab-subsection "Regular expression combinators" "regexp.combinators" }
-{ $subsection { "regexp" "theory" } }
-{ $subsection { "regexp" "deploy" } } ;
+{ $subsections
+    { "regexp" "theory" }
+    { "regexp" "deploy" }
+} ;
 
 ARTICLE: { "regexp" "intro" } "A quick introduction to regular expressions"
 "Regular expressions are a terse way to do certain simple string processing tasks. For example, to replace all instances of " { $snippet "foo" } " in one string with " { $snippet "bar" } ", the following can be used:"
@@ -36,10 +40,9 @@ ARTICLE: { "regexp" "intro" } "A quick introduction to regular expressions"
 
 ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
 "Most of the time, regular expressions are literals and the parsing word should be used, to construct them at parse time. This ensures that they are only compiled once, and gives parse time syntax checking."
-{ $subsection POSTPONE: R/ }
+{ $subsections POSTPONE: R/ }
 "Sometimes, regular expressions need to be constructed at run time instead; for example, in a text editor, the user might input a regular expression to search for in a document."
-{ $subsection <regexp> } 
-{ $subsection <optioned-regexp> }
+{ $subsections <regexp> <optioned-regexp> } 
 "Another approach is to use " { $vocab-link "regexp.combinators" } "." ;
 
 ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
@@ -167,18 +170,19 @@ ARTICLE: { "regexp" "theory" } "The theory of regular expressions"
 
 ARTICLE: { "regexp" "operations" } "Matching operations with regular expressions"
 "Testing if a string matches a regular expression:"
-{ $subsection matches? }
+{ $subsections matches? }
 "Finding a match inside a string:"
-{ $subsection re-contains? }
-{ $subsection first-match }
+{ $subsections re-contains? first-match }
 "Finding all matches inside a string:"
-{ $subsection count-matches }
-{ $subsection all-matching-slices }
-{ $subsection all-matching-subseqs }
+{ $subsections
+    count-matches
+    all-matching-slices
+    all-matching-subseqs
+}
 "Splitting a string into tokens delimited by a regular expression:"
-{ $subsection re-split }
+{ $subsections re-split }
 "Replacing occurrences of a regular expression with a string:"
-{ $subsection re-replace } ;
+{ $subsections re-replace } ;
 
 ARTICLE: { "regexp" "deploy" } "Regular expressions and the deploy tool"
 "The " { $link "tools.deploy" } " tool has the option to strip out the optimizing compiler from the resulting image. Since regular expressions compile to Factor code, this creates a minor performance-related caveat."
