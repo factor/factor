@@ -13,7 +13,8 @@ SYMBOLS:
     maximize-button
     resize-handles
     small-title-bar
-    normal-title-bar ;
+    normal-title-bar
+    textured-background ;
 
 CONSTANT: default-world-pixel-format-attributes
     { windowed double-buffered T{ depth-bits { value 16 } } }
@@ -34,6 +35,7 @@ TUPLE: world < track
     text-handle handle images
     window-loc
     pixel-format-attributes
+    transparent?
     window-controls
     window-resources ;
 
@@ -119,6 +121,7 @@ M: world request-focus-on ( child gadget -- )
         [ status>> >>status ]
         [ pixel-format-attributes>> >>pixel-format-attributes ]
         [ window-controls>> >>window-controls ]
+        [ window-controls>> textured-background swap memq? >>transparent? ]
         [ grab-input?>> >>grab-input? ]
         [ gadgets>> [ 1 track-add ] each ]
     } cleave ;
@@ -174,6 +177,7 @@ M: world draw-world*
     check-extensions
     {
         [ init-gl ]
+        [ transparent?>> clear-gl ]
         [ draw-gadget ]
         [ text-handle>> [ purge-cache ] when* ]
         [ images>> [ purge-cache ] when* ]

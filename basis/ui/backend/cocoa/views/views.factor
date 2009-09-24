@@ -399,6 +399,12 @@ CLASS: {
     ]
 }
 
+{ "isOpaque" "char" { "id" "SEL" }
+    [
+        drop window transparent?>> not >c-bool
+    ]
+}
+
 { "dealloc" "void" { "id" "SEL" }
     [
         drop
