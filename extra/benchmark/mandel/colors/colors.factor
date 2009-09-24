@@ -1,5 +1,5 @@
 USING: math math.order kernel arrays byte-arrays sequences
-colors.hsv benchmark.mandel.params accessors colors ;
+colors.hsv accessors colors fry benchmark.mandel.params ;
 IN: benchmark.mandel.colors
 
 : scale ( x -- y ) 255 * >fixnum ; inline
@@ -11,10 +11,10 @@ CONSTANT: sat 0.85
 CONSTANT: val 0.85
 
 : <color-map> ( nb-cols -- map )
-    dup [
-        360 * swap 1 + / sat val
+    [ iota ] keep '[
+        360 * _ 1 + / sat val
         1 <hsva> >rgba scale-rgb
-    ] with map ;
+    ] map ;
 
 : color-map ( -- map )
     max-iterations max-color min <color-map> ; foldable
