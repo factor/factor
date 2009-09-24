@@ -12,7 +12,7 @@ fry combinators.short-circuit continuations command-line shuffle
 opengl ui.render math.bitwise locals accessors math.rectangles
 math.order calendar ascii sets io.encodings.utf16n
 windows.errors literals ui.pixel-formats
-ui.pixel-formats.private memoize classes
+ui.pixel-formats.private memoize classes colors
 specialized-arrays classes.struct alien.data ;
 SPECIALIZED-ARRAY: POINT
 IN: ui.backend.windows
@@ -164,6 +164,11 @@ M: windows-ui-backend (free-pixel-format)
 M: windows-ui-backend (pixel-format-attribute)
     over world>> has-wglChoosePixelFormatARB?
     [ arb-pixel-format-attribute ] [ pfd-pixel-format-attribute ] if ;
+
+M: windows-ui-backend system-background-color
+    composition-enabled?
+    [ T{ rgba f 0.0 0.0 0.0 0.0 } ]
+    [ COLOR_BTNFACE GetSysColor RGB>color ] if ;
 
 PRIVATE>
 
@@ -533,6 +538,14 @@ SYMBOL: nc-buttons
     #! message sent if mouse leaves main application 
     4drop forget-rollover ;
 
+: ?make-glass ( world hwnd -- )
+    swap { [ transparent?>> ] [ drop windows-major 6 >= ] } 1&&
+    [ full-window-margins DwmExtendFrameIntoClientArea drop ]
+    [ drop ] if ;
+
+: handle-wm-dwmcompositionchanged ( hWnd uMsg wParam lParam -- )
+    3drop [ window ] keep ?make-glass ;
+
 SYMBOL: wm-handlers
 
 H{ } clone wm-handlers set-global
@@ -562,6 +575,7 @@ H{ } clone wm-handlers set-global
 [ handle-wm-buttonup 0   ] WM_LBUTTONUP   add-wm-handler
 [ handle-wm-buttonup 0   ] WM_MBUTTONUP   add-wm-handler
 [ handle-wm-buttonup 0   ] WM_RBUTTONUP   add-wm-handler
+[ handle-wm-dwmcompositionchanged 0   ] WM_DWMCOMPOSITIONCHANGED add-wm-handler
 
 [ 4dup handle-wm-ncbutton DefWindowProc ]
 { WM_NCLBUTTONDOWN WM_NCMBUTTONDOWN WM_NCRBUTTONDOWN
@@ -681,11 +695,6 @@ M: windows-ui-backend do-events
 : disable-close-button ( hwnd -- )
     0 GetSystemMenu
     SC_CLOSE MF_BYCOMMAND MF_GRAYED bitor EnableMenuItem drop ;
-
-: ?make-glass ( world hwnd -- )
-    swap { [ transparent?>> ] [ drop windows-major 6 >= ] } 1&&
-    [ full-window-margins DwmExtendFrameIntoClientArea drop ]
-    [ drop ] if ;
 
 : ?disable-close-button ( world hwnd -- )
     swap window-controls>> close-button swap member? not

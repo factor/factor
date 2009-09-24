@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.rectangles math.vectors namespaces kernel accessors
 assocs combinators sequences opengl opengl.gl colors
-colors.constants ui.gadgets ui.pens ;
+colors.constants ui.backend ui.gadgets ui.pens ;
 IN: ui.render
 
 SYMBOL: clip
@@ -38,7 +38,9 @@ SYMBOL: viewport-translation
 
 : clear-gl ( transparent? -- )
     [
-        0.0 0.0 0.0 0.0 glClearColor
+        system-background-color
+        [ red>> ] [ green>> ] [ blue>> ] tri 0.0
+        glClearColor
         GL_COLOR_BUFFER_BIT glClear
     ] [
         ! white gl-clear is broken w.r.t window resizing
