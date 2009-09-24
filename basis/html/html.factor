@@ -22,3 +22,6 @@ IN: html
 
 : simple-link ( xml url -- xml' )
     url-encode swap [XML <a href=<->><-></a> XML] ;
+
+: simple-image ( url -- xml )
+    url-encode [XML <img src=<-> /> XML] ;

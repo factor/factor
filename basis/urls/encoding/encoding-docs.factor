@@ -1,5 +1,5 @@
+USING: strings help.markup help.syntax assocs ;
 IN: urls.encoding
-USING: strings help.markup help.syntax assocs multiline ;
 
 HELP: url-decode
 { $values { "str" string } { "decoded" string } }
@@ -39,12 +39,12 @@ HELP: query>assoc
         "USING: prettyprint urls.encoding ;"
         "\"gender=female&agefrom=22&ageto=28&location=Omaha+NE\""
         "query>assoc ."
-        <" H{
+        """H{
     { "gender" "female" }
     { "agefrom" "22" }
     { "ageto" "28" }
     { "location" "Omaha NE" }
-}">
+}"""
     }
 } ;
 

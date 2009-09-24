@@ -1,10 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.parser assocs
-byte-arrays classes compiler.units functors kernel lexer libc math
-math.vectors.specialization namespaces parser prettyprint.custom
-sequences sequences.private strings summary vocabs vocabs.loader
-vocabs.parser words fry combinators ;
+USING: accessors alien alien.c-types alien.data alien.parser
+assocs byte-arrays classes compiler.units functors kernel lexer
+libc math math.vectors math.vectors.specialization namespaces
+parser prettyprint.custom sequences sequences.private strings
+summary vocabs vocabs.loader vocabs.parser vocabs.generated
+words fry combinators present ;
 IN: specialized-arrays
 
 MIXIN: specialized-array
@@ -53,14 +54,14 @@ TUPLE: A
 
 : <direct-A> ( alien len -- specialized-array ) A boa ; inline
 
-: <A> ( n -- specialized-array ) [ T <underlying> ] keep <direct-A> ; inline
+: <A> ( n -- specialized-array ) [ \ T <underlying> ] keep <direct-A> ; inline
 
-: (A) ( n -- specialized-array ) [ T (underlying) ] keep <direct-A> ; inline
+: (A) ( n -- specialized-array ) [ \ T (underlying) ] keep <direct-A> ; inline
 
-: malloc-A ( len -- specialized-array ) [ T heap-size calloc ] keep <direct-A> ; inline
+: malloc-A ( len -- specialized-array ) [ \ T heap-size calloc ] keep <direct-A> ; inline
 
 : byte-array>A ( byte-array -- specialized-array )
-    dup length T heap-size /mod 0 = [ drop T bad-byte-array-length ] unless
+    dup length \ T heap-size /mod 0 = [ drop \ T bad-byte-array-length ] unless
     <direct-A> ; inline
 
 M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
@@ -81,12 +82,14 @@ M: A equal? over A instance? [ sequence= ] [ 2drop f ] if ;
 
 M: A resize
     [
-        [ T heap-size * ] [ underlying>> ] bi*
+        [ \ T heap-size * ] [ underlying>> ] bi*
         resize-byte-array
     ] [ drop ] 2bi
     <direct-A> ; inline
 
-M: A byte-length length T heap-size * ; inline
+M: A byte-length length \ T heap-size * ; inline
+
+M: A element-type drop \ T ; inline
 
 M: A direct-array-syntax drop \ A@ ;
 
@@ -116,24 +119,15 @@ M: word (underlying-type) "c-type" word-prop ;
     } cond ;
 
 : underlying-type-name ( c-type -- name )
-    underlying-type dup word? [ name>> ] when ;
+    underlying-type present ;
 
 : specialized-array-vocab ( c-type -- vocab )
-    "specialized-arrays.instances." prepend ;
+    present "specialized-arrays.instances." prepend ;
 
 PRIVATE>
 
-: generate-vocab ( vocab-name quot -- vocab )
-    [ dup vocab [ ] ] dip '[
-        [
-            [
-                 _ with-current-vocab
-            ] with-compilation-unit
-        ] keep
-    ] ?if ; inline
-
 : define-array-vocab ( type -- vocab )
-    underlying-type-name
+    underlying-type
     [ specialized-array-vocab ] [ '[ _ define-array ] ] bi
     generate-vocab ;
 

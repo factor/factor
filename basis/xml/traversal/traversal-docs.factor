@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax xml.data sequences strings multiline ;
+USING: help.markup help.syntax xml.data sequences strings ;
 IN: xml.traversal
 
 ABOUT: "xml.traversal"
@@ -22,16 +22,16 @@ ARTICLE: "xml.traversal" "Utilities for traversing XML"
 
 ARTICLE: { "xml.traversal" "intro" } "An example of XML processing"
 "To illustrate how to use the XML library, we develop a simple Atom parser in Factor. Atom is an XML-based syndication format, like RSS. To see the full version of what we develop here, look at " { $snippet "basis/syndication" } " at the " { $snippet "atom1.0" } " word. First, we want to load a file and get a DOM tree for it."
-{ $code <" "file.xml" file>xml "> }
+{ $code """"file.xml" file>xml""" }
 "No encoding descriptor is needed, because XML files contain sufficient information to auto-detect the encoding. Next, we want to extract information from the tree. To get the title, we can use the following:"
-{ $code <" "title" tag-named children>string "> }
+{ $code """"title" tag-named children>string""" }
 "The " { $link tag-named } " word finds the first tag named " { $snippet "title" } " in the top level (just under the main tag). Then, with a tag on the stack, its children are asserted to be a string, and the string is returned." $nl
 "For a slightly more complicated example, we can look at how entries are parsed. To get a sequence of tags with the name " { $snippet "entry" } ":"
-{ $code <" "entry" tags-named "> }
+{ $code """"entry" tags-named""" }
 "Imagine that, for each of these, we want to get the URL of the entry. In Atom, the URLs are in a " { $snippet "link" } " tag which is contained in the " { $snippet "entry" } " tag. There are multiple " { $snippet "link" } " tags, but one of them contains the attribute " { $snippet "rel=alternate" } ", and the " { $snippet "href" } " attribute has the URL. So, given an element of the sequence produced in the above quotation, we run the code:"
-{ $code <" "link" tags-named [ "rel" attr "alternate" = ] find nip "> }
+{ $code """"link" tags-named [ "rel" attr "alternate" = ] find nip """ }
 "to get the link tag on the stack, and"
-{ $code <" "href" attr >url "> }
+{ $code """"href" attr >url """ }
 "to extract the URL from it." ;
 
 HELP: deep-tag-named

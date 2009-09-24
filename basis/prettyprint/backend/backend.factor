@@ -173,6 +173,7 @@ M: tuple pprint*
     ] when ;
 
 : pprint-elements ( seq -- )
+    >array
     do-length-limit
     [ [ pprint* ] each ] dip
     [ "~" swap number>string " more~" 3append text ] when* ;

@@ -1,4 +1,4 @@
-USING: eval tools.test compiler.units vocabs multiline words
+USING: eval tools.test compiler.units vocabs words
 kernel classes.mixin arrays ;
 IN: compiler.tests.redefine11
 
@@ -7,8 +7,7 @@ IN: compiler.tests.redefine11
 [ ] [ [ "compiler.tests.redefine11" forget-vocab ] with-compilation-unit ] unit-test
 
 [ ] [
-    <"
-    USING: kernel math classes arrays ;
+    "USING: kernel math classes arrays ;
     IN: compiler.tests.redefine11
     MIXIN: my-mixin
     INSTANCE: array my-mixin
@@ -16,8 +15,8 @@ IN: compiler.tests.redefine11
     GENERIC: my-generic ( a -- b )
     M: my-mixin my-generic drop 0 ;
     M: object my-generic drop 1 ;
-    : my-inline ( -- b ) { } my-generic ;
-    "> eval( -- )
+    : my-inline ( -- b ) { } my-generic ;"
+    eval( -- )
 ] unit-test
 
 [ ] [

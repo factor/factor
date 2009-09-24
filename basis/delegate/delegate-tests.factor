@@ -105,20 +105,20 @@ PROTOCOL: silly-protocol do-me ;
 
 ! Replacing a method definition with a consultation would cause problems
 [ [ ] ] [
-    <" IN: delegate.tests
+    "IN: delegate.tests
     USE: kernel
 
-    M: a-tuple do-me drop ; "> <string-reader> "delegate-test" parse-stream
+    M: a-tuple do-me drop ;" <string-reader> "delegate-test" parse-stream
 ] unit-test
 
 [ ] [ T{ a-tuple } do-me ] unit-test
 
 ! Change method definition to consultation
 [ [ ] ] [
-    <" IN: delegate.tests
+    "IN: delegate.tests
     USE: kernel
     USE: delegate
-    CONSULT: silly-protocol a-tuple drop f ; "> <string-reader> "delegate-test" parse-stream
+    CONSULT: silly-protocol a-tuple drop f ; " <string-reader> "delegate-test" parse-stream
 ] unit-test
 
 ! Method should be there
@@ -126,7 +126,7 @@ PROTOCOL: silly-protocol do-me ;
 
 ! Now try removing the consulation
 [ [ ] ] [
-    <" IN: delegate.tests "> <string-reader> "delegate-test" parse-stream
+    "IN: delegate.tests" <string-reader> "delegate-test" parse-stream
 ] unit-test
 
 ! Method should be gone
@@ -139,18 +139,18 @@ SLOT: y
 [ f ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
 
 [ [ ] ] [
-    <" IN: delegate.tests
+    "IN: delegate.tests
 USING: accessors delegate ;
 TUPLE: slot-protocol-test-3 x ;
-CONSULT: y>> slot-protocol-test-3 x>> ;">
+CONSULT: y>> slot-protocol-test-3 x>> ;"
     <string-reader> "delegate-test-1" parse-stream
 ] unit-test
 
 [ t ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
 
 [ [ ] ] [
-    <" IN: delegate.tests
-TUPLE: slot-protocol-test-3 x y ;">
+    "IN: delegate.tests
+TUPLE: slot-protocol-test-3 x y ;"
     <string-reader> "delegate-test-1" parse-stream
 ] unit-test
 
@@ -160,11 +160,11 @@ TUPLE: slot-protocol-test-3 x y ;">
 
 ! We want to be able to override methods after consultation
 [ [ ] ] [
-    <" IN: delegate.tests
+    "IN: delegate.tests
     USING: delegate kernel sequences delegate.protocols accessors ;
     TUPLE: override-method-test seq ;
     CONSULT: sequence-protocol override-method-test seq>> ;
-    M: override-method-test like drop ; ">
+    M: override-method-test like drop ; "
     <string-reader> "delegate-test-2" parse-stream
 ] unit-test
 
@@ -172,10 +172,10 @@ DEFER: seq-delegate
     
 ! See if removing a consultation updates protocol-consult word prop
 [ [ ] ] [
-    <" IN: delegate.tests
+    "IN: delegate.tests
     USING: accessors delegate delegate.protocols ;
     TUPLE: seq-delegate seq ;
-    CONSULT: sequence-protocol seq-delegate seq>> ;">
+    CONSULT: sequence-protocol seq-delegate seq>> ;"
     <string-reader> "remove-consult-test" parse-stream
 ] unit-test
 
@@ -186,9 +186,9 @@ DEFER: seq-delegate
 ] unit-test
 
 [ [ ] ] [
-    <" IN: delegate.tests
+    "IN: delegate.tests
     USING: delegate delegate.protocols ;
-    TUPLE: seq-delegate seq ;">
+    TUPLE: seq-delegate seq ;"
     <string-reader> "remove-consult-test" parse-stream
 ] unit-test
 

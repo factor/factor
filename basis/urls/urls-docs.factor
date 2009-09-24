@@ -1,6 +1,6 @@
 USING: assocs hashtables help.markup help.syntax
 io.streams.string io.files io.pathnames kernel strings present
-math multiline ;
+math ;
 IN: urls
 
 HELP: url
@@ -112,11 +112,11 @@ HELP: set-query-param
 }
 { $examples
     { $code
-        <" USING: kernel http.client urls ;
+        """USING: kernel http.client urls ;
 URL" http://search.yahooapis.com/WebSearchService/V1/webSearch" clone
     "concatenative programming (NSFW)" "query" set-query-param
     "1" "adult_ok" set-query-param
-http-get">
+http-get"""
     }
     "(For a complete Yahoo! search web service implementation, see the " { $vocab-link "yahoo" } " vocabulary.)"
 }

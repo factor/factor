@@ -23,7 +23,6 @@ CONSTANT: number-of-requests 1000
             ] [
                 number-of-requests
                 [ read1 write1 flush ] times
-                counter get count-down
             ] if
         ] with-stream
     ] curry "Client handler" spawn drop server-loop ;
@@ -55,7 +54,7 @@ CONSTANT: number-of-requests 1000
 : clients ( n -- )
     dup pprint " clients: " write [
         <promise> port-promise set
-        dup 2 * <count-down> counter set
+        dup <count-down> counter set
         [ simple-server ] "Simple server" spawn drop
         yield yield
         [ [ simple-client ] "Simple client" spawn drop ] times

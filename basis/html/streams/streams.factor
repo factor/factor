@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel assocs io io.styles math math.order math.parser
-sequences strings make words combinators macros xml.syntax html fry
-destructors ;
+USING: accessors assocs combinators destructors fry html io
+io.backend io.pathnames io.styles kernel macros make math
+math.order math.parser namespaces sequences strings words
+splitting xml xml.syntax ;
 IN: html.streams
 
 GENERIC: url-of ( object -- url )
@@ -87,9 +88,21 @@ MACRO: make-css ( pairs -- str )
 : emit-html ( quot stream -- )
     dip data>> push ; inline
 
+: image-path ( path -- images-path )
+    "vocab:definitions/icons/" ?head [ "/icons/" prepend ] when ;
+
+: img-tag ( xml style -- xml )
+    image swap at [ nip image-path simple-image ] when* ;
+
 : format-html-span ( string style stream -- )
-    [ [ span-tag ] [ href-link-tag ] [ object-link-tag ] tri ]
-    emit-html ;
+    [
+        {
+            [ span-tag ]
+            [ href-link-tag ]
+            [ object-link-tag ]
+            [ img-tag ]
+        } cleave
+    ] emit-html ;
 
 TUPLE: html-span-stream < html-sub-stream ;
 

@@ -75,18 +75,6 @@ PRIVATE>
 : parse-multiline-string ( end-text -- str )
     1 (parse-multiline-string) ;
 
-SYNTAX: <"
-    "\">" parse-multiline-string parsed ;
-
-SYNTAX: <'
-    "'>" parse-multiline-string parsed ;
-
-SYNTAX: {'
-    "'}" parse-multiline-string parsed ;
-
-SYNTAX: {"
-    "\"}" parse-multiline-string parsed ;
-
 SYNTAX: /* "*/" parse-multiline-string drop ;
 
 SYNTAX: HEREDOC:

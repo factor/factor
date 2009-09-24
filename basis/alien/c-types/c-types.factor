@@ -1,11 +1,12 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays arrays assocs kernel kernel.private math
-namespaces make parser sequences strings words splitting math.parser
-cpu.architecture alien alien.accessors alien.strings quotations
-layouts system compiler.units io io.files io.encodings.binary
-io.streams.memory accessors combinators effects continuations fry
-classes vocabs vocabs.loader words.symbol ;
+math.order math.parser namespaces make parser sequences strings
+words splitting cpu.architecture alien alien.accessors
+alien.strings quotations layouts system compiler.units io
+io.files io.encodings.binary io.streams.memory accessors
+combinators effects continuations fry classes vocabs
+vocabs.loader words.symbol ;
 QUALIFIED: math
 IN: alien.c-types
 
@@ -472,3 +473,27 @@ SYMBOLS:
     \ ulong \ size_t typedef
 ] with-compilation-unit
 
+M: char-16-rep rep-component-type drop char ;
+M: uchar-16-rep rep-component-type drop uchar ;
+M: short-8-rep rep-component-type drop short ;
+M: ushort-8-rep rep-component-type drop ushort ;
+M: int-4-rep rep-component-type drop int ;
+M: uint-4-rep rep-component-type drop uint ;
+M: longlong-2-rep rep-component-type drop longlong ;
+M: ulonglong-2-rep rep-component-type drop ulonglong ;
+M: float-4-rep rep-component-type drop float ;
+M: double-2-rep rep-component-type drop double ;
+
+: (unsigned-interval) ( bytes -- from to ) [ 0 ] dip 8 * 2^ 1 - ; foldable
+: unsigned-interval ( c-type -- from to ) heap-size (unsigned-interval) ; foldable
+: (signed-interval) ( bytes -- from to ) 8 * 1 - 2^ [ neg ] [ 1 - ] bi ; foldable
+: signed-interval ( c-type -- from to ) heap-size (signed-interval) ; foldable
+
+: c-type-interval ( c-type -- from to )
+    {
+        { [ dup { float double } memq? ] [ drop -1/0. 1/0. ] }
+        { [ dup { char short int long longlong } memq? ] [ signed-interval ] }
+        { [ dup { uchar ushort uint ulong ulonglong } memq? ] [ unsigned-interval ] }
+    } cond ; foldable
+
+: c-type-clamp ( value c-type -- value' ) c-type-interval clamp ; inline

@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions generic io kernel assocs
-hashtables namespaces make parser prettyprint sequences strings
-io.styles vectors words math sorting splitting classes slots fry
-sets vocabs help.stylesheet help.topics vocabs.loader quotations
-combinators see present ;
+USING: accessors arrays assocs classes colors.constants
+combinators definitions definitions.icons effects fry generic
+hashtables help.stylesheet help.topics io io.styles kernel make
+math namespaces parser present prettyprint
+prettyprint.stylesheet quotations see sequences sets slots
+sorting splitting strings vectors vocabs vocabs.loader words ;
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
 
@@ -70,7 +71,7 @@ ALIAS: $slot $snippet
     ] ($span) ;
 
 : $nl ( children -- )
-    nl nl drop ;
+    nl last-block? [ nl ] unless drop ;
 
 ! Some blocks
 : ($heading) ( children quot -- )
@@ -156,45 +157,73 @@ ALIAS: $slot $snippet
 : write-link ( string object -- )
     link-style get [ write-object ] with-style ;
 
-: ($link) ( article -- )
-    [ [ article-name ] [ >link ] bi write-link ] ($span) ;
+: link-icon ( topic -- )
+    definition-icon 1array $image ;
 
-: $link ( element -- )
-    first ($link) ;
-
-: ($definition-link) ( word -- )
+: link-text ( topic -- )
     [ article-name ] keep write-link ;
 
-: $definition-link ( element -- )
-    first ($definition-link) ;
+: link-effect ( topic -- )
+    dup word? [
+        stack-effect [ effect>string ] [ effect-style ] bi
+        [ write ] with-style
+    ] [ drop ] if ;
 
-: ($long-link) ( object -- )
-    [ article-title ] [ >link ] bi write-link ;
+: inter-cleave ( x seq between -- )
+    [ [ call( x -- ) ] with ] dip swap interleave ; inline
 
-: $long-link ( object -- )
-    first ($long-link) ;
+: (($link)) ( topic words -- )
+    [ dup topic? [ >link ] unless ] dip
+    [ [ bl ] inter-cleave ] ($span) ; inline
+
+: ($link) ( topic -- )
+    { [ link-text ] } (($link)) ;
+
+: $link ( element -- ) first ($link) ;
+
+: ($long-link) ( topic -- )
+    { [ link-text ] [ link-effect ] } (($link)) ;
+
+: $long-link ( element -- ) first ($long-link) ;
+
+: ($pretty-link) ( topic -- )
+    { [ link-icon ] [ link-text ] } (($link)) ;
+
+: $pretty-link ( element -- ) first ($pretty-link) ;
+
+: ($long-pretty-link) ( topic -- )
+    { [ link-icon ] [ link-text ] [ link-effect ] } (($link)) ;
+
+: $long-pretty-link ( element -- ) first ($long-pretty-link) ;
+
+: <$pretty-link> ( definition -- element )
+    1array \ $pretty-link prefix ;
 
 : ($subsection) ( element quot -- )
     [
-        subsection-style get [
-            bullet get write bl
-            call
-        ] with-style
+        subsection-style get [ call ] with-style
     ] ($block) ; inline
 
+: $subsection* ( topic -- )
+    [
+        [ ($long-pretty-link) ] with-scope
+    ] ($subsection) ;
+
+: $subsections ( children -- )
+    [ $subsection* ] each nl ;
+
 : $subsection ( element -- )
-    [ first ($long-link) ] ($subsection) ;
+    first $subsection* ;
 
 : ($vocab-link) ( text vocab -- )
     >vocab-link write-link ;
 
 : $vocab-subsection ( element -- )
     [
-        first2 dup vocab-help dup [
-            2nip ($long-link)
-        ] [
-            drop ($vocab-link)
-        ] if
+        first2 dup vocab-help
+        [ 2nip ($long-pretty-link) ]
+        [ [ >vocab-link link-icon bl ] [ ($vocab-link) ] bi ]
+        if*
     ] ($subsection) ;
 
 : $vocab-link ( element -- )
@@ -390,3 +419,10 @@ M: array elements*
 
 : <$snippet> ( str -- element )
     1array \ $snippet prefix ;
+
+: $definition-icons ( element -- )
+    drop
+    icons get >alist sort-keys
+    [ [ <$link> ] [ definition-icon-path <$image> ] bi* swap ] assoc-map
+    { "" "Definition class" } prefix
+    $table ;
