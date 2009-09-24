@@ -61,6 +61,9 @@ PRIVATE>
 : vbitor ( u v -- w ) over '[ _ [ bitor ] fp-bitwise-op ] 2map ;
 : vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
 
+: vlshift ( u n -- w ) '[ _ shift ] map ;
+: vrshift ( u n -- w ) neg '[ _ shift ] map ;
+
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;
 : vtruncate ( u -- v ) [ truncate ] map ;
@@ -68,7 +71,7 @@ PRIVATE>
 : vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; 
 : vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; 
 
-: v. ( u v -- x ) [ * ] [ + ] 2map-reduce ;
+: v. ( u v -- x ) [ conjugate * ] [ + ] 2map-reduce ;
 : norm-sq ( v -- x ) [ absq ] [ + ] map-reduce ;
 : norm ( v -- x ) norm-sq sqrt ;
 : normalize ( u -- v ) dup norm v/n ;

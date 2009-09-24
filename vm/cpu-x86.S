@@ -39,13 +39,13 @@ multiply_overflow:
 	pop ARG2
 	jmp MANGLE(overflow_fixnum_multiply)
 
-
 DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	PUSH_NONVOLATILE
 	mov ARG0,NV_TEMP_REG
+	
 	/* Create register shadow area for Win64 */
 	sub $32,STACK_REG
-
+	
 	/* Save stack pointer */
 	lea -CELL_SIZE(STACK_REG),ARG0
 	push ARG1  /* save vm ptr */

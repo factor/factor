@@ -148,9 +148,30 @@ HELP: :help
 
 HELP: $subsection
 { $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
-{ $description "Prints a large clickable link to the help topic named by the first string element of " { $snippet "element" } "." }
+{ $description "Prints a large clickable link to the help topic named by the first item in " { $snippet "element" } ". The link is printed along with its associated definition icon." }
 { $examples
-    { $code "{ $subsection \"sequences\" }" }
+    { $markup-example { $subsection "sequences" } }
+    { $markup-example { $subsection nth } }
+    { $markup-example { $subsection each } }
+} ;
+
+HELP: $subsections
+{ $values { "children" "a " { $link sequence } " of one or more " { $link topic } "s or, in the case of a help article, the article's string name." } }
+{ $description "Prints a large clickable link for each of the listed help topics in " { $snippet "children" } ". The link is printed along with its associated definition icon." }
+{ $examples
+    { $markup-example { $subsections "sequences" nth each } }
+} ;
+
+{ $subsection $subsections $link } related-words
+
+HELP: $vocab-subsection
+{ $values { "element" "a markup element of the form " { $snippet "{ title vocab }" } } }
+{ $description "Prints a large clickable link for " { $snippet "vocab" } ". If " { $snippet "vocab" } " has a main help article, the link will point at that article and the " { $snippet "title" } " input will be ignored. Otherwise, the link text will be taken from " { $snippet "title" } " and point to " { $snippet "vocab" } "'s automatically generated documentation."
+$nl
+"The link will be printed along with its associated definition icon." }
+{ $examples
+    { $markup-example { $vocab-subsection "SQLite" "db.sqlite" } }
+    { $markup-example { $vocab-subsection "Alien" "alien" } }
 } ;
 
 HELP: $index

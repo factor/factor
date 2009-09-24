@@ -3,8 +3,18 @@
 USING: tools.test ui.tools.listener.completion ;
 IN: ui.tools.listener.completion.tests
 
-[ t ] [ { "USING:" "A" "B" "C" } complete-USING:? ] unit-test
+[ f ] [ { "USE:" "A" "B" "C" } complete-vocab? ] unit-test
 
-[ f ] [ { "USING:" "A" "B" "C" ";" } complete-USING:? ] unit-test
+[ t ] [ { "USE:" "A" } complete-vocab? ] unit-test
 
-[ t ] [ { "X" ";" "USING:" "A" "B" "C" } complete-USING:? ] unit-test
+[ t ] [ { "UNUSE:" "A" } complete-vocab? ] unit-test
+
+[ t ] [ { "QUALIFIED:" "A" } complete-vocab? ] unit-test
+
+[ t ] [ { "QUALIFIED-WITH:" "A" } complete-vocab? ] unit-test
+
+[ t ] [ { "USING:" "A" "B" "C" } complete-vocab-list? ] unit-test
+
+[ f ] [ { "USING:" "A" "B" "C" ";" } complete-vocab-list? ] unit-test
+
+[ t ] [ { "X" ";" "USING:" "A" "B" "C" } complete-vocab-list? ] unit-test

@@ -25,7 +25,7 @@ STRUCT: T-class { real N } { imaginary N } ;
 T-class c-type
 <T> 1quotation >>unboxer-quot
 *T 1quotation >>boxer-quot
-number >>boxed-class
+complex >>boxed-class
 drop
 
 ;FUNCTOR

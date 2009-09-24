@@ -1,5 +1,5 @@
 IN: math.vectors.tests
-USING: math.vectors tools.test ;
+USING: math.vectors tools.test kernel ;
 
 [ { 1 2 3 } ] [ 1/2 { 2 4 6 } n*v ] unit-test
 [ { 1 2 3 } ] [ { 2 4 6 } 1/2 v*n ] unit-test
@@ -20,3 +20,5 @@ USING: math.vectors tools.test ;
 [ 17 ] [ 0 1 2 3 4 5 6 7 { 1 2 3 } trilerp ] unit-test
 
 [ { 0 3 2 5 4 } ] [ { 1 2 3 4 5 } { 1 1 1 1 1 } v+- ] unit-test
+
+[ 1 ] [ { C{ 0 1 } } dup v. ] unit-test

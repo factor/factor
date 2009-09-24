@@ -284,10 +284,12 @@ M:: ppc %float>integer ( dst src -- )
     dst 1 4 scratch@ LWZ ;
 
 M: ppc %copy ( dst src rep -- )
-    {
-        { int-rep [ MR ] }
-        { double-rep [ FMR ] }
-    } case ;
+    2over eq? [ 3drop ] [
+        {
+            { int-rep [ MR ] }
+            { double-rep [ FMR ] }
+        } case
+    ] if ;
 
 M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
 
@@ -299,7 +301,7 @@ M:: ppc %box-float ( dst src temp -- )
     [ float-regs param-regs nth 1 ] [ n>> spill@ ] bi* LFD ;
 
 : float-function-return ( reg -- )
-    float-regs return-reg 2dup = [ 2drop ] [ FMR ] if ;
+    float-regs return-reg double-rep %copy ;
 
 M:: ppc %unary-float-function ( dst src func -- )
     0 src float-function-param
@@ -313,9 +315,29 @@ M:: ppc %binary-float-function ( dst src1 src2 func -- )
     dst float-function-return ;
 
 ! Internal format is always double-precision on PowerPC
-M: ppc %single>double-float FMR ;
+M: ppc %single>double-float double-rep %copy ;
+M: ppc %double>single-float double-rep %copy ;
 
-M: ppc %double>single-float FMR ;
+! VMX/AltiVec not supported yet
+M: ppc %broadcast-vector-reps { } ;
+M: ppc %gather-vector-2-reps { } ;
+M: ppc %gather-vector-4-reps { } ;
+M: ppc %add-vector-reps { } ;
+M: ppc %saturated-add-vector-reps { } ;
+M: ppc %add-sub-vector-reps { } ;
+M: ppc %sub-vector-reps { } ;
+M: ppc %saturated-sub-vector-reps { } ;
+M: ppc %mul-vector-reps { } ;
+M: ppc %saturated-mul-vector-reps { } ;
+M: ppc %div-vector-reps { } ;
+M: ppc %min-vector-reps { } ;
+M: ppc %max-vector-reps { } ;
+M: ppc %sqrt-vector-reps { } ;
+M: ppc %horizontal-add-vector-reps { } ;
+M: ppc %abs-vector-reps { } ;
+M: ppc %and-vector-reps { } ;
+M: ppc %or-vector-reps { } ;
+M: ppc %xor-vector-reps { } ;
 
 M: ppc %unbox-alien ( dst src -- )
     alien-offset LWZ ;

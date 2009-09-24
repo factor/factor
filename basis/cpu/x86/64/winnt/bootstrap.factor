@@ -6,7 +6,7 @@ cpu.x86.assembler.operands ;
 IN: bootstrap.x86
 
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
-: arg ( -- reg ) RCX ;
+: arg1 ( -- reg ) RCX ;
 : arg2 ( -- reg ) RDX ;
 
 << "vocab:cpu/x86/64/bootstrap.factor" parse-file parsed >>
