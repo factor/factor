@@ -1,7 +1,6 @@
 namespace factor
 {
 
-
 /* generational copying GC divides memory into zones */
 struct zone {
 	/* allocation pointer is 'here'; its offset is hardcoded in the
@@ -44,7 +43,6 @@ struct data_heap {
 	
 	bool have_aging_p() { return gen_count > 2; }
 };
-
 
 static const cell max_gen_count = 3;
 

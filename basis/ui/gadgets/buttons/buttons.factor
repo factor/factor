@@ -233,7 +233,7 @@ PRIVATE>
     '[ _ _ invoke-command ] ;
 
 : gesture>tooltip ( gesture -- str/f )
-    dup [ gesture>string "Shortcut: " prepend ] when ;
+    gesture>string dup [ "Shortcut: " prepend ] when ;
 
 : <command-button> ( target gesture command -- button )
     swapd [ command-name swap ] keep command-button-quot

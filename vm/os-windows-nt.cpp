@@ -3,33 +3,28 @@
 namespace factor
 {
 
-
 THREADHANDLE start_thread(void *(*start_routine)(void *),void *args){
     return (void*) CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0); 
 }
-
 
 DWORD dwTlsIndex; 
 
 void init_platform_globals()
 {
-	if ((dwTlsIndex = TlsAlloc()) == TLS_OUT_OF_INDEXES) {
+	if ((dwTlsIndex = TlsAlloc()) == TLS_OUT_OF_INDEXES)
 		fatal_error("TlsAlloc failed - out of indexes",0);
-	}
 }
 
-void register_vm_with_thread(factorvm *vm)
+void register_vm_with_thread(factor_vm *vm)
 {
-	if (! TlsSetValue(dwTlsIndex, vm)) {
+	if (! TlsSetValue(dwTlsIndex, vm))
 		fatal_error("TlsSetValue failed",0);
-	}
 }
 
-factorvm *tls_vm()
+factor_vm *tls_vm()
 {
-	return (factorvm*)TlsGetValue(dwTlsIndex);
+	return (factor_vm*)TlsGetValue(dwTlsIndex);
 }
-
 
 s64 current_micros()
 {
@@ -39,7 +34,7 @@ s64 current_micros()
 		- EPOCH_OFFSET) / 10;
 }
 
-LONG factorvm::exception_handler(PEXCEPTION_POINTERS pe)
+LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 {
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
@@ -85,7 +80,6 @@ LONG factorvm::exception_handler(PEXCEPTION_POINTERS pe)
 	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
-
 FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 {
 	return SIGNAL_VM_PTR()->exception_handler(pe);
@@ -93,7 +87,7 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 
 bool handler_added = 0;
 
-void factorvm::c_to_factor_toplevel(cell quot)
+void factor_vm::c_to_factor_toplevel(cell quot)
 {
 	if(!handler_added){
 		if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)factor::exception_handler))
@@ -104,7 +98,7 @@ void factorvm::c_to_factor_toplevel(cell quot)
  	RemoveVectoredExceptionHandler((void *)factor::exception_handler);
 }
 
-void factorvm::open_console()
+void factor_vm::open_console()
 {
 }
 

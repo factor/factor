@@ -125,7 +125,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 : print-topic ( topic -- )
     >link
     last-element off
-    [ $title ] [ article-content print-content nl ] bi ;
+    [ $title ] [ nl article-content print-content nl ] bi ;
 
 SYMBOL: help-hook
 

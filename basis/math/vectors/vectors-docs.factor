@@ -38,6 +38,8 @@ $nl
 { $subsection vbitand }
 { $subsection vbitor }
 { $subsection vbitxor }
+{ $subsection vlshift }
+{ $subsection vrshift }
 "Inner product and norm:"
 { $subsection v. }
 { $subsection norm }
@@ -160,11 +162,7 @@ HELP: vmin
 
 HELP: v.
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
-{ $description "Computes the real-valued dot product." }
-{ $notes
-    "This word can also take complex number sequences as input, however mathematically it will compute the wrong result. The complex-valued dot product is defined differently:"
-    { $code "0 [ conjugate * + ] 2reduce" }
-} ;
+{ $description "Computes the dot product of two vectors." } ;
 
 HELP: vs+
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
@@ -208,6 +206,14 @@ HELP: vbitxor
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
 { $description "Takes the bitwise exclusive or of " { $snippet "u" } " and " { $snippet "v" } " component-wise." }
 { $notes "Unlike " { $link bitxor } ", this word may be used on a specialized array of floats or doubles, in which case the bitwise representation of the floating point numbers is operated upon." } ;
+
+HELP: vlshift
+{ $values { "u" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
+{ $description "Shifts each element of " { $snippet "u" } " to the left by " { $snippet "n" } " bits." } ;
+
+HELP: vrshift
+{ $values { "u" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
+{ $description "Shifts each element of " { $snippet "u" } " to the right by " { $snippet "n" } " bits." } ;
 
 HELP: norm-sq
 { $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }

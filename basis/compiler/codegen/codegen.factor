@@ -184,6 +184,10 @@ CODEGEN: ##abs-vector %abs-vector
 CODEGEN: ##and-vector %and-vector
 CODEGEN: ##or-vector %or-vector
 CODEGEN: ##xor-vector %xor-vector
+CODEGEN: ##shl-vector %shl-vector
+CODEGEN: ##shr-vector %shr-vector
+CODEGEN: ##integer>scalar %integer>scalar
+CODEGEN: ##scalar>integer %scalar>integer
 CODEGEN: ##box-alien %box-alien
 CODEGEN: ##box-displaced-alien %box-displaced-alien
 CODEGEN: ##unbox-alien %unbox-alien
@@ -212,6 +216,7 @@ CODEGEN: ##compare-imm %compare-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered
 CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
+CODEGEN: ##vm-field-ptr %vm-field-ptr
 
 CODEGEN: _fixnum-add %fixnum-add
 CODEGEN: _fixnum-sub %fixnum-sub
@@ -277,9 +282,6 @@ M: _loop-entry generate-insn drop %loop-entry ;
 M: ##alien-global generate-insn
     [ dst>> ] [ symbol>> ] [ library>> ] tri
     %alien-global ;
-
-M: ##vm-field-ptr generate-insn
-    [ dst>> ] [ fieldname>> ] bi %vm-field-ptr ;
 
 ! ##alien-invoke
 GENERIC: next-fastcall-param ( rep -- )

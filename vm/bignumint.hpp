@@ -54,7 +54,6 @@ typedef fixnum bignum_length_type;
 /* BIGNUM_EXCEPTION is invoked to handle assertion violations. */
 #define BIGNUM_EXCEPTION abort
 
-
 #define BIGNUM_DIGIT_LENGTH (((sizeof (bignum_digit_type)) * CHAR_BIT) - 2)
 #define BIGNUM_HALF_DIGIT_LENGTH (BIGNUM_DIGIT_LENGTH / 2)
 #define BIGNUM_RADIX (bignum_digit_type)(((cell) 1) << BIGNUM_DIGIT_LENGTH)

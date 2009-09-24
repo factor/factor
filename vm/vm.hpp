@@ -3,7 +3,7 @@
 namespace factor
 {
 
-struct factorvm : factorvmdata {
+struct factor_vm : factor_vm_data {
 
 	// segments
 	inline cell align_page(cell a);
@@ -20,28 +20,28 @@ struct factorvm : factorvmdata {
 	void init_stacks(cell ds_size_, cell rs_size_);
 	bool stack_to_array(cell bottom, cell top);
 	cell array_to_stack(array *array, cell bottom);
-	inline void vmprim_datastack();
-	inline void vmprim_retainstack();
-	inline void vmprim_set_datastack();
-	inline void vmprim_set_retainstack();
-	inline void vmprim_check_datastack();
+	inline void primitive_datastack();
+	inline void primitive_retainstack();
+	inline void primitive_set_datastack();
+	inline void primitive_set_retainstack();
+	inline void primitive_check_datastack();
 
 	// run
-	inline void vmprim_getenv();
-	inline void vmprim_setenv();
-	inline void vmprim_exit();
-	inline void vmprim_micros();
-	inline void vmprim_sleep();
-	inline void vmprim_set_slot();
-	inline void vmprim_load_locals();
+	inline void primitive_getenv();
+	inline void primitive_setenv();
+	inline void primitive_exit();
+	inline void primitive_micros();
+	inline void primitive_sleep();
+	inline void primitive_set_slot();
+	inline void primitive_load_locals();
 	cell clone_object(cell obj_);
-	inline void vmprim_clone();
+	inline void primitive_clone();
 
 	// profiler
 	void init_profiler();
 	code_block *compile_profiling_stub(cell word_);
 	void set_profiling(bool profiling);
-	inline void vmprim_profiling();
+	inline void primitive_profiling();
 
 	// errors
 	void out_of_memory();
@@ -53,8 +53,8 @@ struct factorvm : factorvmdata {
 	void signal_error(int signal, stack_frame *native_stack);
 	void divide_by_zero_error();
 	void fp_trap_error(unsigned int fpu_status, stack_frame *signal_callstack_top);
-	inline void vmprim_call_clear();
-	inline void vmprim_unimplemented();
+	inline void primitive_call_clear();
+	inline void primitive_unimplemented();
 	void memory_signal_handler_impl();
 	void misc_signal_handler_impl();
 	void fp_signal_handler_impl();
@@ -124,7 +124,7 @@ struct factorvm : factorvmdata {
 	bignum *bignum_integer_length(bignum * x);
 	int bignum_logbitp(int shift, bignum * arg);
 	int bignum_unsigned_logbitp(int shift, bignum * bignum);
-	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factorvm *), unsigned int radix, int negative_p);
+	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factor_vm *), unsigned int radix, int negative_p);
 
 	//data_heap
 	cell init_zone(zone *z, cell size, cell start);
@@ -141,15 +141,15 @@ struct factorvm : factorvmdata {
 	void init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,bool secure_gc_);
 	cell untagged_object_size(object *pointer);
 	cell unaligned_object_size(object *pointer);
-	inline void vmprim_size();
+	inline void primitive_size();
 	cell binary_payload_start(object *pointer);
-	inline void vmprim_data_room();
+	inline void primitive_data_room();
 	void begin_scan();
 	void end_scan();
-	inline void vmprim_begin_scan();
+	inline void primitive_begin_scan();
 	cell next_object();
-	inline void vmprim_next_object();
-	inline void vmprim_end_scan();
+	inline void primitive_next_object();
+	inline void primitive_end_scan();
 	template<typename T> void each_object(T &functor);
 	cell find_all_words();
 	cell object_size(cell tagged);
@@ -165,7 +165,6 @@ struct factorvm : factorvmdata {
 	inline card *addr_to_allot_marker(object *a);
 	inline void write_barrier(object *obj);
 	inline void allot_barrier(object *address);
-
 
 	//data_gc
 	void init_data_gc();
@@ -192,10 +191,10 @@ struct factorvm : factorvmdata {
 	void end_gc(cell gc_elapsed);
 	void garbage_collection(cell gen,bool growing_data_heap_,cell requested_bytes);
 	void gc();
-	inline void vmprim_gc();
-	inline void vmprim_gc_stats();
+	inline void primitive_gc();
+	inline void primitive_gc_stats();
 	void clear_gc_stats();
-	inline void vmprim_become();
+	inline void primitive_become();
 	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
 	inline bool collecting_accumulation_gen_p();
 	inline object *allot_zone(zone *z, cell a);
@@ -203,7 +202,7 @@ struct factorvm : factorvmdata {
 	template <typename TYPE> TYPE *allot(cell size);
 	inline void check_data_pointer(object *pointer);
 	inline void check_tagged_pointer(cell tagged);
-	inline void vmprim_clear_gc_stats();
+	inline void primitive_clear_gc_stats();
 
 	// generic arrays
 	template <typename T> T *allot_array_internal(cell capacity);
@@ -232,15 +231,15 @@ struct factorvm : factorvmdata {
 	void find_data_references(cell look_for_);
 	void dump_code_heap();
 	void factorbug();
-	inline void vmprim_die();
+	inline void primitive_die();
 
 	//arrays
 	array *allot_array(cell capacity, cell fill_);
-	inline void vmprim_array();
+	inline void primitive_array();
 	cell allot_array_1(cell obj_);
 	cell allot_array_2(cell v1_, cell v2_);
 	cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_);
-	inline void vmprim_resize_array();
+	inline void primitive_resize_array();
 	inline void set_array_nth(array *array, cell slot, cell value);
 
 	//strings
@@ -251,13 +250,13 @@ struct factorvm : factorvmdata {
 	string *allot_string_internal(cell capacity);
 	void fill_string(string *str_, cell start, cell capacity, cell fill);
 	string *allot_string(cell capacity, cell fill);
-	inline void vmprim_string();
+	inline void primitive_string();
 	bool reallot_string_in_place_p(string *str, cell capacity);
 	string* reallot_string(string *str_, cell capacity);
-	inline void vmprim_resize_string();
-	inline void vmprim_string_nth();
-	inline void vmprim_set_string_nth_fast();
-	inline void vmprim_set_string_nth_slow();
+	inline void primitive_resize_string();
+	inline void primitive_string_nth();
+	inline void primitive_set_string_nth_fast();
+	inline void primitive_set_string_nth_slow();
 
 	//booleans
 	void box_boolean(bool value);
@@ -266,28 +265,28 @@ struct factorvm : factorvmdata {
 
 	//byte arrays
 	byte_array *allot_byte_array(cell size);
-	inline void vmprim_byte_array();
-	inline void vmprim_uninitialized_byte_array();
-	inline void vmprim_resize_byte_array();
+	inline void primitive_byte_array();
+	inline void primitive_uninitialized_byte_array();
+	inline void primitive_resize_byte_array();
 
 	//tuples
 	tuple *allot_tuple(cell layout_);
-	inline void vmprim_tuple();
-	inline void vmprim_tuple_boa();
+	inline void primitive_tuple();
+	inline void primitive_tuple_boa();
 
 	//words
 	word *allot_word(cell vocab_, cell name_);
-	inline void vmprim_word();
-	inline void vmprim_word_xt();
+	inline void primitive_word();
+	inline void primitive_word_xt();
 	void update_word_xt(cell w_);
-	inline void vmprim_optimized_p();
-	inline void vmprim_wrapper();
+	inline void primitive_optimized_p();
+	inline void primitive_wrapper();
 
 	//math
-	inline void vmprim_bignum_to_fixnum();
-	inline void vmprim_float_to_fixnum();
-	inline void vmprim_fixnum_divint();
-	inline void vmprim_fixnum_divmod();
+	inline void primitive_bignum_to_fixnum();
+	inline void primitive_float_to_fixnum();
+	inline void primitive_fixnum_divint();
+	inline void primitive_fixnum_divmod();
 	bignum *fixnum_to_bignum(fixnum);
 	bignum *cell_to_bignum(cell);
 	bignum *long_long_to_bignum(s64 n);
@@ -295,48 +294,48 @@ struct factorvm : factorvmdata {
 	inline fixnum sign_mask(fixnum x);
 	inline fixnum branchless_max(fixnum x, fixnum y);
 	inline fixnum branchless_abs(fixnum x);
-	inline void vmprim_fixnum_shift();
-	inline void vmprim_fixnum_to_bignum();
-	inline void vmprim_float_to_bignum();
-	inline void vmprim_bignum_eq();
-	inline void vmprim_bignum_add();
-	inline void vmprim_bignum_subtract();
-	inline void vmprim_bignum_multiply();
-	inline void vmprim_bignum_divint();
-	inline void vmprim_bignum_divmod();
-	inline void vmprim_bignum_mod();
-	inline void vmprim_bignum_and();
-	inline void vmprim_bignum_or();
-	inline void vmprim_bignum_xor();
-	inline void vmprim_bignum_shift();
-	inline void vmprim_bignum_less();
-	inline void vmprim_bignum_lesseq();
-	inline void vmprim_bignum_greater();
-	inline void vmprim_bignum_greatereq();
-	inline void vmprim_bignum_not();
-	inline void vmprim_bignum_bitp();
-	inline void vmprim_bignum_log2();
+	inline void primitive_fixnum_shift();
+	inline void primitive_fixnum_to_bignum();
+	inline void primitive_float_to_bignum();
+	inline void primitive_bignum_eq();
+	inline void primitive_bignum_add();
+	inline void primitive_bignum_subtract();
+	inline void primitive_bignum_multiply();
+	inline void primitive_bignum_divint();
+	inline void primitive_bignum_divmod();
+	inline void primitive_bignum_mod();
+	inline void primitive_bignum_and();
+	inline void primitive_bignum_or();
+	inline void primitive_bignum_xor();
+	inline void primitive_bignum_shift();
+	inline void primitive_bignum_less();
+	inline void primitive_bignum_lesseq();
+	inline void primitive_bignum_greater();
+	inline void primitive_bignum_greatereq();
+	inline void primitive_bignum_not();
+	inline void primitive_bignum_bitp();
+	inline void primitive_bignum_log2();
 	unsigned int bignum_producer(unsigned int digit);
-	inline void vmprim_byte_array_to_bignum();
+	inline void primitive_byte_array_to_bignum();
 	cell unbox_array_size();
-	inline void vmprim_fixnum_to_float();
-	inline void vmprim_bignum_to_float();
-	inline void vmprim_str_to_float();
-	inline void vmprim_float_to_str();
-	inline void vmprim_float_eq();
-	inline void vmprim_float_add();
-	inline void vmprim_float_subtract();
-	inline void vmprim_float_multiply();
-	inline void vmprim_float_divfloat();
-	inline void vmprim_float_mod();
-	inline void vmprim_float_less();
-	inline void vmprim_float_lesseq();
-	inline void vmprim_float_greater();
-	inline void vmprim_float_greatereq();
-	inline void vmprim_float_bits();
-	inline void vmprim_bits_float();
-	inline void vmprim_double_bits();
-	inline void vmprim_bits_double();
+	inline void primitive_fixnum_to_float();
+	inline void primitive_bignum_to_float();
+	inline void primitive_str_to_float();
+	inline void primitive_float_to_str();
+	inline void primitive_float_eq();
+	inline void primitive_float_add();
+	inline void primitive_float_subtract();
+	inline void primitive_float_multiply();
+	inline void primitive_float_divfloat();
+	inline void primitive_float_mod();
+	inline void primitive_float_less();
+	inline void primitive_float_lesseq();
+	inline void primitive_float_greater();
+	inline void primitive_float_greatereq();
+	inline void primitive_float_bits();
+	inline void primitive_bits_float();
+	inline void primitive_double_bits();
+	inline void primitive_bits_double();
 	fixnum to_fixnum(cell tagged);
 	cell to_cell(cell tagged);
 	void box_signed_1(s8 n);
@@ -373,14 +372,14 @@ struct factorvm : factorvmdata {
 	//io
 	void init_c_io();
 	void io_error();
-	inline void vmprim_fopen();
-	inline void vmprim_fgetc();
-	inline void vmprim_fread();
-	inline void vmprim_fputc();
-	inline void vmprim_fwrite();
-	inline void vmprim_fseek();
-	inline void vmprim_fflush();
-	inline void vmprim_fclose();
+	inline void primitive_fopen();
+	inline void primitive_fgetc();
+	inline void primitive_fread();
+	inline void primitive_fputc();
+	inline void primitive_fwrite();
+	inline void primitive_fseek();
+	inline void primitive_fflush();
+	inline void primitive_fclose();
 
 	//code_gc
 	void clear_free_list(heap *heap);
@@ -445,8 +444,8 @@ struct factorvm : factorvmdata {
 	void iterate_code_heap(code_heap_iterator iter);
 	void copy_code_heap_roots();
 	void update_code_heap_words();
-	inline void vmprim_modify_code_heap();
-	inline void vmprim_code_room();
+	inline void primitive_modify_code_heap();
+	inline void primitive_code_room();
 	code_block *forward_xt(code_block *compiled);
 	void forward_frame_xt(stack_frame *frame);
 	void forward_object_xts();
@@ -454,14 +453,13 @@ struct factorvm : factorvmdata {
 	void compact_code_heap();
 	inline void check_code_pointer(cell ptr);
 
-
 	//image
 	void init_objects(image_header *h);
 	void load_data_heap(FILE *file, image_header *h, vm_parameters *p);
 	void load_code_heap(FILE *file, image_header *h, vm_parameters *p);
 	bool save_image(const vm_char *filename);
-	inline void vmprim_save_image();
-	inline void vmprim_save_image_and_exit();
+	inline void primitive_save_image();
+	inline void primitive_save_image_and_exit();
 	void data_fixup(cell *cell);
 	template <typename T> void code_fixup(T **handle);
 	void fixup_word(word *word);
@@ -481,35 +479,34 @@ struct factorvm : factorvmdata {
 	callstack *allot_callstack(cell size);
 	stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom);
 	stack_frame *capture_start();
-	inline void vmprim_callstack();
-	inline void vmprim_set_callstack();
+	inline void primitive_callstack();
+	inline void primitive_set_callstack();
 	code_block *frame_code(stack_frame *frame);
 	cell frame_type(stack_frame *frame);
 	cell frame_executing(stack_frame *frame);
 	stack_frame *frame_successor(stack_frame *frame);
 	cell frame_scan(stack_frame *frame);
-	inline void vmprim_callstack_to_array();
+	inline void primitive_callstack_to_array();
 	stack_frame *innermost_stack_frame(callstack *stack);
 	stack_frame *innermost_stack_frame_quot(callstack *callstack);
-	inline void vmprim_innermost_stack_frame_executing();
-	inline void vmprim_innermost_stack_frame_scan();
-	inline void vmprim_set_innermost_stack_frame_quot();
+	inline void primitive_innermost_stack_frame_executing();
+	inline void primitive_innermost_stack_frame_scan();
+	inline void primitive_set_innermost_stack_frame_quot();
 	void save_callstack_bottom(stack_frame *callstack_bottom);
 	template<typename T> void iterate_callstack(cell top, cell bottom, T &iterator);
-	inline void do_slots(cell obj, void (* iter)(cell *,factorvm*));
-
+	inline void do_slots(cell obj, void (* iter)(cell *,factor_vm*));
 
 	//alien
 	char *pinned_alien_offset(cell obj);
 	cell allot_alien(cell delegate_, cell displacement);
-	inline void vmprim_displaced_alien();
-	inline void vmprim_alien_address();
+	inline void primitive_displaced_alien();
+	inline void primitive_alien_address();
 	void *alien_pointer();
-	inline void vmprim_dlopen();
-	inline void vmprim_dlsym();
-	inline void vmprim_dlclose();
-	inline void vmprim_dll_validp();
-	inline void vmprim_vm_ptr();
+	inline void primitive_dlopen();
+	inline void primitive_dlsym();
+	inline void primitive_dlclose();
+	inline void primitive_dll_validp();
+	inline void primitive_vm_ptr();
 	char *alien_offset(cell obj);
 	char *unbox_alien();
 	void box_alien(void *ptr);
@@ -519,15 +516,15 @@ struct factorvm : factorvmdata {
 	void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size);
 
 	//quotations
-	inline void vmprim_jit_compile();
-	inline void vmprim_array_to_quotation();
-	inline void vmprim_quotation_xt();
+	inline void primitive_jit_compile();
+	inline void primitive_array_to_quotation();
+	inline void primitive_quotation_xt();
 	void set_quot_xt(quotation *quot, code_block *code);
 	void jit_compile(cell quot_, bool relocating);
 	void compile_all_words();
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
 	cell lazy_jit_compile_impl(cell quot_, stack_frame *stack);
-	inline void vmprim_quot_compiled_p();
+	inline void primitive_quot_compiled_p();
 
 	//dispatch
 	cell search_lookup_alist(cell table, cell klass);
@@ -538,13 +535,13 @@ struct factorvm : factorvmdata {
 	cell lookup_hi_tag_method(cell obj, cell methods);
 	cell lookup_hairy_method(cell obj, cell methods);
 	cell lookup_method(cell obj, cell methods);
-	inline void vmprim_lookup_method();
+	inline void primitive_lookup_method();
 	cell object_class(cell obj);
 	cell method_cache_hashcode(cell klass, array *array);
 	void update_method_cache(cell cache, cell klass, cell method);
-	inline void vmprim_mega_cache_miss();
-	inline void vmprim_reset_dispatch_stats();
-	inline void vmprim_dispatch_stats();
+	inline void primitive_mega_cache_miss();
+	inline void primitive_reset_dispatch_stats();
+	inline void primitive_dispatch_stats();
 
 	//inline cache
 	void init_inline_caching(int max_size);
@@ -557,8 +554,8 @@ struct factorvm : factorvmdata {
 	cell add_inline_cache_entry(cell cache_entries_, cell klass_, cell method_);
 	void update_pic_transitions(cell pic_size);
 	void *inline_cache_miss(cell return_address);
-	inline void vmprim_reset_inline_cache_stats();
-	inline void vmprim_inline_cache_stats();
+	inline void primitive_reset_inline_cache_stats();
+	inline void primitive_inline_cache_stats();
 
 	//factor
 	void default_parameters(vm_parameters *p);
@@ -576,7 +573,7 @@ struct factorvm : factorvmdata {
 	void factor_sleep(long us);
 
 	// os-*
-	inline void vmprim_existsp();
+	inline void primitive_existsp();
 	void init_ffi();
 	void ffi_dlopen(dll *dll);
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);
@@ -614,14 +611,13 @@ struct factorvm : factorvmdata {
 	void print_vm_data();
 };
 
-
 #ifndef FACTOR_REENTRANT
    #define FACTOR_SINGLE_THREADED_SINGLETON
 #endif
 
 #ifdef FACTOR_SINGLE_THREADED_SINGLETON
 /* calls are dispatched using the singleton vm ptr */
-  extern factorvm *vm;
+  extern factor_vm *vm;
   #define PRIMITIVE_GETVM() vm
   #define PRIMITIVE_OVERFLOW_GETVM() vm
   #define VM_PTR vm
@@ -631,9 +627,9 @@ struct factorvm : factorvmdata {
 
 #ifdef FACTOR_SINGLE_THREADED_TESTING
 /* calls are dispatched as per multithreaded, but checked against singleton */
-  extern factorvm *vm;
+  extern factor_vm *vm;
   #define ASSERTVM() assert(vm==myvm)
-  #define PRIMITIVE_GETVM() ((factorvm*)myvm)
+  #define PRIMITIVE_GETVM() ((factor_vm*)myvm)
   #define PRIMITIVE_OVERFLOW_GETVM() ASSERTVM(); myvm
   #define VM_PTR myvm
   #define SIGNAL_VM_PTR() tls_vm()
@@ -649,8 +645,8 @@ struct factorvm : factorvmdata {
 #endif
 
 #ifdef FACTOR_REENTRANT
-  #define PRIMITIVE_GETVM() ((factorvm*)myvm)
-  #define PRIMITIVE_OVERFLOW_GETVM() ((factorvm*)myvm)
+  #define PRIMITIVE_GETVM() ((factor_vm*)myvm)
+  #define PRIMITIVE_OVERFLOW_GETVM() ((factor_vm*)myvm)
   #define VM_PTR myvm
   #define ASSERTVM() 
   #define SIGNAL_VM_PTR() tls_vm()
