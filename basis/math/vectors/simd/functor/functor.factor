@@ -1,27 +1,124 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types byte-arrays classes functors
-kernel math parser prettyprint.custom sequences
-sequences.private literals ;
+USING: accessors alien.c-types assocs byte-arrays classes
+effects fry functors generalizations kernel literals locals
+math math.functions math.vectors math.vectors.simd.intrinsics
+math.vectors.specialization parser prettyprint.custom sequences
+sequences.private strings words definitions macros cpu.architecture
+namespaces arrays quotations ;
+QUALIFIED-WITH: math m
 IN: math.vectors.simd.functor
 
 ERROR: bad-length got expected ;
 
+MACRO: simd-boa ( rep class -- simd-array )
+    [ rep-components ] [ new ] bi* '[ _ _ nsequence ] ;
+
+:: define-boa-custom-inlining ( word rep class -- )
+    word [
+        drop
+        rep rep rep-gather-word supported-simd-op? [
+            [ rep (simd-boa) class boa ]
+        ] [ word def>> ] if
+    ] "custom-inlining" set-word-prop ;
+
+: simd-with ( rep class x -- simd-array )
+    [ rep-components ] [ new ] [ '[ _ ] ] tri* swap replicate-as ; inline
+
+:: define-with-custom-inlining ( word rep class -- )
+    word [
+        drop
+        rep \ (simd-broadcast) supported-simd-op? [
+            [ rep rep-coerce rep (simd-broadcast) class boa ]
+        ] [ word def>> ] if
+    ] "custom-inlining" set-word-prop ;
+
+: boa-effect ( rep n -- effect )
+    [ rep-components ] dip *
+    [ CHAR: a + 1string ] map
+    { "simd-vector" } <effect> ;
+
+: supported-simd-ops ( assoc rep -- assoc' )
+    [ simd-ops get ] dip 
+    '[ nip _ swap supported-simd-op? ] assoc-filter
+    '[ drop _ key? ] assoc-filter ;
+
+ERROR: bad-schema schema ;
+
+: low-level-ops ( box-quot: ( inputs... simd-op -- outputs... ) -- alist )
+    [ simd-ops get ] dip '[
+        1quotation
+        over word-schema _ ?at [ bad-schema ] unless
+        [ ] 2sequence
+    ] assoc-map ;
+
+:: high-level-ops ( ctor elt-class -- assoc )
+    ! Some SIMD operations are defined in terms of others.
+    {
+        { vneg [ [ dup v- ] keep v- ] }
+        { n+v [ [ ctor execute ] dip v+ ] }
+        { v+n [ ctor execute v+ ] }
+        { n-v [ [ ctor execute ] dip v- ] }
+        { v-n [ ctor execute v- ] }
+        { n*v [ [ ctor execute ] dip v* ] }
+        { v*n [ ctor execute v* ] }
+        { n/v [ [ ctor execute ] dip v/ ] }
+        { v/n [ ctor execute v/ ] }
+        { norm-sq [ dup v. assert-positive ] }
+        { norm [ norm-sq sqrt ] }
+        { normalize [ dup norm v/n ] }
+    }
+    ! To compute dot product and distance with integer vectors, we
+    ! have to do things less efficiently, with integer overflow checks,
+    ! in the general case.
+    elt-class m:float = [
+        {
+            { distance [ v- norm ] }
+            { v. [ v* sum ] }
+        } append
+    ] when ;
+
+:: simd-vector-words ( class ctor rep vv->v v->v v->n -- )
+    rep rep-component-type c-type-boxed-class :> elt-class
+    class
+    elt-class
+    {
+        { { +vector+ +vector+ -> +vector+ } vv->v }
+        { { +vector+ -> +vector+ } v->v }
+        { { +vector+ -> +scalar+ } v->n }
+        { { +vector+ -> +nonnegative+ } v->n }
+    } low-level-ops
+    rep supported-simd-ops
+    ctor elt-class high-level-ops assoc-union
+    specialize-vector-words ;
+
+:: define-simd-128-type ( class rep -- )
+    <c-type>
+        byte-array >>class
+        class >>boxed-class
+        [ rep alien-vector class boa ] >>getter
+        [ [ underlying>> ] 2dip rep set-alien-vector ] >>setter
+        16 >>size
+        8 >>align
+        rep >>rep
+    class typedef ;
+
 FUNCTOR: define-simd-128 ( T -- )
 
-T-TYPE       IS ${T}
-
-N            [ 16 T-TYPE heap-size /i ]
+N            [ 16 T heap-size /i ]
 
 A            DEFINES-CLASS ${T}-${N}
+A-boa        DEFINES ${A}-boa
+A-with       DEFINES ${A}-with
 >A           DEFINES >${A}
 A{           DEFINES ${A}{
 
-NTH          [ T-TYPE dup c-type-getter-boxer array-accessor ]
-SET-NTH      [ T-TYPE dup c-setter array-accessor ]
+NTH          [ T dup c-type-getter-boxer array-accessor ]
+SET-NTH      [ T dup c-setter array-accessor ]
 
-A-rep        IS ${A}-rep
+A-rep        [ A name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
+A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
 WHERE
@@ -51,6 +148,8 @@ M: A equal? over \ A instance? [ sequence= ] [ 2drop f ] if ;
 
 M: A byte-length underlying>> length ; inline
 
+M: A element-type drop A-rep rep-component-type ;
+
 M: A pprint-delims drop \ A{ \ } ;
 
 M: A >pprint-sequence ;
@@ -59,6 +158,16 @@ M: A pprint* pprint-object ;
 
 SYNTAX: A{ \ } [ >A ] parse-literal ;
 
+: A-with ( x -- simd-array ) [ A-rep A ] dip simd-with ;
+
+\ A-with \ A-rep \ A define-with-custom-inlining
+
+\ A-boa [ \ A-rep \ A simd-boa ] \ A-rep 1 boa-effect define-declared
+
+\ A-rep rep-gather-word [
+    \ A-boa \ A-rep \ A define-boa-custom-inlining
+] when
+
 INSTANCE: A sequence
 
 <PRIVATE
@@ -66,31 +175,62 @@ INSTANCE: A sequence
 : A-vv->v-op ( v1 v2 quot -- v3 )
     [ [ underlying>> ] bi@ A-rep ] dip call \ A boa ; inline
 
+: A-v->v-op ( v1 quot -- v2 )
+    [ underlying>> A-rep ] dip call \ A boa ; inline
+
 : A-v->n-op ( v quot -- n )
     [ underlying>> A-rep ] dip call ; inline
+
+\ A \ A-with \ A-rep \ A-vv->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
+\ A \ A-rep define-simd-128-type
 
 PRIVATE>
 
 ;FUNCTOR
 
 ! Synthesize 256-bit vectors from a pair of 128-bit vectors
+SLOT: underlying1
+SLOT: underlying2
+
+:: define-simd-256-type ( class rep -- )
+    <c-type>
+        class >>class
+        class >>boxed-class
+        [
+            [ rep alien-vector ]
+            [ 16 + >fixnum rep alien-vector ] 2bi
+            class boa
+        ] >>getter
+        [
+            [ [ underlying1>> ] 2dip rep set-alien-vector ]
+            [ [ underlying2>> ] 2dip 16 + >fixnum rep set-alien-vector ]
+            3bi
+        ] >>setter
+        32 >>size
+        8 >>align
+        rep >>rep
+    class typedef ;
+
 FUNCTOR: define-simd-256 ( T -- )
 
-T-TYPE       IS ${T}
-
-N            [ 32 T-TYPE heap-size /i ]
+N            [ 32 T heap-size /i ]
 
 N/2          [ N 2 / ]
 A/2          IS ${T}-${N/2}
+A/2-boa      IS ${A/2}-boa
+A/2-with     IS ${A/2}-with
 
 A            DEFINES-CLASS ${T}-${N}
+A-boa        DEFINES ${A}-boa
+A-with       DEFINES ${A}-with
 >A           DEFINES >${A}
 A{           DEFINES ${A}{
 
 A-deref      DEFINES-PRIVATE ${A}-deref
 
-A-rep        IS ${A/2}-rep
+A-rep        [ A/2 name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
+A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
 WHERE
@@ -129,6 +269,8 @@ M: A equal? over \ A instance? [ sequence= ] [ 2drop f ] if ;
 
 M: A byte-length drop 32 ; inline
 
+M: A element-type drop A-rep rep-component-type ;
+
 SYNTAX: A{ \ } [ >A ] parse-literal ;
 
 M: A pprint-delims drop \ A{ \ } ;
@@ -137,6 +279,16 @@ M: A >pprint-sequence ;
 
 M: A pprint* pprint-object ;
 
+: A-with ( x -- simd-array )
+    [ A/2-with ] [ A/2-with ] bi [ underlying>> ] bi@
+    \ A boa ; inline
+
+: A-boa ( ... -- simd-array )
+    [ A/2-boa ] N/2 ndip A/2-boa [ underlying>> ] bi@
+    \ A boa ; inline
+
+\ A-rep 2 boa-effect \ A-boa set-stack-effect
+
 INSTANCE: A sequence
 
 : A-vv->v-op ( v1 v2 quot -- v3 )
@@ -144,8 +296,15 @@ INSTANCE: A sequence
     [ [ [ underlying2>> ] bi@ A-rep ] dip call ] 3bi
     \ A boa ; inline
 
-: A-v->n-op ( v1 combine-quot reduce-quot -- v2 )
-    [ [ [ underlying1>> ] [ underlying2>> ] bi A-rep ] dip call A-rep ]
-    dip call ; inline
+: A-v->v-op ( v1 combine-quot -- v2 )
+    [ [ underlying1>> A-rep ] dip call ]
+    [ [ underlying2>> A-rep ] dip call ] 2bi
+    \ A boa ; inline
+
+: A-v->n-op ( v1 combine-quot -- v2 )
+    [ [ underlying1>> ] [ underlying2>> ] bi A-rep (simd-v+) A-rep ] dip call ; inline
+
+\ A \ A-with \ A-rep \ A-vv->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
+\ A \ A-rep define-simd-256-type
 
 ;FUNCTOR

@@ -34,23 +34,23 @@ HELP: GLSL-SHADER-FILE:
 { $description "Defines a new " { $link shader } " of kind " { $link shader-kind } " named " { $snippet "shader-name" } ". The shader will read its source code from " { $snippet "filename" } " in the current Factor source file's directory." } ;
 
 HELP: GLSL-SHADER:
-{ $syntax <" GLSL-SHADER-FILE: shader-name shader-kind
+{ $syntax """GLSL-SHADER-FILE: shader-name shader-kind
 
 shader source
 
-; "> }
+;""" }
 { $description "Defines a new " { $link shader } " of kind " { $link shader-kind } " named " { $snippet "shader-name" } ". The shader will read its source code from the current Factor source file between the " { $snippet "GLSL-SHADER:" } " line and the first subsequent line with a single semicolon on it." } ;
 
 HELP: VERTEX-FORMAT:
-{ $syntax <" VERTEX-FORMAT: format-name
+{ $syntax """VERTEX-FORMAT: format-name
     { "attribute"/f component-type dimension normalize? }
     { "attribute"/f component-type dimension normalize? }
     ...
-    { "attribute"/f component-type dimension normalize? } ; "> }
+    { "attribute"/f component-type dimension normalize? } ;""" }
 { $description "Defines a new binary " { $link vertex-format } " for structuring vertex data stored in " { $link buffer } "s. Each " { $snippet "attribute" } " name either corresponds to an input parameter of a vertex shader, or is " { $link f } " to include padding in the vertex format. The " { $link component-type } " determines the format of the components, and the " { $snippet "dimension" } " determines the number of components. If the " { $snippet "component-type" } " is an integer type and " { $snippet "normalize?" } " is true, the component values will be scaled to the range 0.0 to 1.0 when fed to the vertex shader; otherwise, they will be cast to floats retaining their integral values." } ;
 
 HELP: VERTEX-STRUCT:
-{ $syntax <" VERTEX-STRUCT: struct-name format-name "> }
+{ $syntax """VERTEX-STRUCT: struct-name format-name""" }
 { $description "Defines a struct class (like " { $link POSTPONE: STRUCT: } ") with the same binary format and component types as the given " { $link vertex-format } "." } ;
 
 { POSTPONE: GLSL-PROGRAM: POSTPONE: GLSL-SHADER-FILE: POSTPONE: GLSL-SHADER: } related-words

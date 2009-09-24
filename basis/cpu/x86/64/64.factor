@@ -58,9 +58,9 @@ M: stack-params copy-register*
         { [ over integer? ] [ R11 swap MOV              param@ R11 MOV ] }
     } cond ;
 
-M: x86 %save-param-reg [ param@ ] 2dip copy-register ;
+M: x86 %save-param-reg [ param@ ] 2dip %copy ;
 
-M: x86 %load-param-reg [ swap param@ ] dip copy-register ;
+M: x86 %load-param-reg [ swap param@ ] dip %copy ;
 
 : with-return-regs ( quot -- )
     [
@@ -133,7 +133,7 @@ M:: x86.64 %unbox-large-struct ( n c-type -- )
     [ [ 0 ] dip reg-class-of param-reg ]
     [ reg-class-of return-reg ]
     [ ]
-    tri copy-register ;
+    tri %copy ;
 
 
 
@@ -222,7 +222,7 @@ M: x86.64 %callback-value ( ctype -- )
     [ float-regs param-regs nth ] [ n>> spill@ ] bi* MOVSD ;
 
 : float-function-return ( reg -- )
-    float-regs return-reg double-rep copy-register ;
+    float-regs return-reg double-rep %copy ;
 
 M:: x86.64 %unary-float-function ( dst src func -- )
     0 src float-function-param
@@ -249,4 +249,4 @@ USE: vocabs.loader
     { [ os winnt? ] [ "cpu.x86.64.winnt" require ] }
 } cond
 
-"cpu.x86.features" require
+check-sse

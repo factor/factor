@@ -79,9 +79,3 @@ M: word invoke-command ( target command -- )
 M: word command-word ;
 
 M: f invoke-command ( target command -- ) 2drop ;
-
-: command-string ( gesture command -- string )
-    [
-        command-name %
-        gesture>string [ " (" % % ")" % ] when*
-    ] "" make ;

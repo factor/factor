@@ -137,13 +137,13 @@ M: real absq sq ; inline
     [ - abs ] dip < ;
 
 : ~rel ( x y epsilon -- ? )
-    [ [ - abs ] 2keep [ abs ] bi@ + ] dip * < ;
+    [ [ - abs ] 2keep [ abs ] bi@ + ] dip * <= ;
 
 : ~ ( x y epsilon -- ? )
     {
         { [ 2over [ fp-nan? ] either? ] [ 3drop f ] }
         { [ dup zero? ] [ drop number= ] }
-        { [ dup 0 < ] [ ~rel ] }
+        { [ dup 0 < ] [ neg ~rel ] }
         [ ~abs ]
     } cond ;
 

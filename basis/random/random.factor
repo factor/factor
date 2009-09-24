@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel math namespaces sequences
-io.backend io.binary combinators system vocabs.loader
-summary math.bitwise byte-vectors fry byte-arrays
-math.ranges math.constants math.functions accessors ;
+USING: accessors alien.c-types assocs byte-arrays byte-vectors
+combinators fry io.backend io.binary kernel locals math
+math.bitwise math.constants math.functions math.ranges
+namespaces sequences sets summary system vocabs.loader ;
 IN: random
 
 SYMBOL: system-random-generator
@@ -59,6 +59,25 @@ PRIVATE>
     dup length [ dup 1 > ]
     [ [ iota random ] [ 1 - ] bi [ pick exchange ] keep ]
     while drop ;
+
+ERROR: too-many-samples seq n ;
+
+<PRIVATE
+
+:: next-sample ( length n seq hashtable -- elt )
+    n hashtable key? [
+        length n 1 + length mod seq hashtable next-sample
+    ] [
+        n hashtable conjoin
+        n seq nth
+    ] if ;
+
+PRIVATE>
+
+: sample ( seq n -- seq' )
+    2dup [ length ] dip < [ too-many-samples ] when
+    swap [ length ] [ ] bi H{ } clone 
+    '[ _ dup random _ _ next-sample ] replicate ;
 
 : delete-random ( seq -- elt )
     [ length random-integer ] keep [ nth ] 2keep delete-nth ;

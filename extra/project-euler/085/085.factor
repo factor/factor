@@ -19,7 +19,7 @@ IN: project-euler.085
 ! SOLUTION
 ! --------
 
-! A grid measuring x by y contains x * (x + 1) * y * (x + 1) rectangles.
+! A grid measuring x by y contains x * (x + 1) * y * (x + 1) / 4 rectangles.
 
 <PRIVATE
 
@@ -56,6 +56,6 @@ PRIVATE>
     area-of-nearest ;
 
 ! [ euler085 ] 100 ave-time
-! 2285 ms ave run time - 4.8 SD (100 trials)
+! 791 ms ave run time - 17.15 SD (100 trials)
 
 SOLUTION: euler085

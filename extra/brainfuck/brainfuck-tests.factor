@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: brainfuck kernel io.streams.string math math.parser math.ranges 
-multiline quotations sequences tools.test ;
+quotations sequences tools.test ;
+IN: brainfuck.tests
 
 
 [ "+" run-brainfuck ] must-infer
@@ -10,9 +11,9 @@ multiline quotations sequences tools.test ;
 
 ! Hello World!
 
-[ "Hello World!\n" ] [ <" ++++++++++[>+++++++>++++++++++>+++>+<<<<-]
+[ "Hello World!\n" ] [ """++++++++++[>+++++++>++++++++++>+++>+<<<<-]
                           >++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.
-                          ------.--------.>+.>. "> get-brainfuck ] unit-test
+                          ------.--------.>+.>.""" get-brainfuck ] unit-test
 
 ! Addition (single-digit)
 
@@ -21,14 +22,14 @@ multiline quotations sequences tools.test ;
 
 ! Multiplication (single-digit)
 
-[ "8\0" ] [ "24" [ <" ,>,>++++++++[<------<------>>-]
+[ "8\0" ] [ "24" [ """,>,>++++++++[<------<------>>-]
                     <<[>[>+>+<<-]>>[<<+>>-]<<<-]
-                    >>>++++++[<++++++++>-],<.>. "> 
+                    >>>++++++[<++++++++>-],<.>."""
           get-brainfuck ] with-string-reader ] unit-test
 
 ! Division (single-digit, integer)
 
-[ "3" ] [ "62" [ <" ,>,>++++++[-<--------<-------->>]
+[ "3" ] [ "62" [ """,>,>++++++[-<--------<-------->>]
                     <<[
                     >[->+>+<<]
                     >[-<<-
@@ -37,7 +38,7 @@ multiline quotations sequences tools.test ;
                     <<[-<<+>>]
                     <<<]
                     >[-]>>>>[-<<<<<+>>>>>]
-                    <<<<++++++[-<++++++++>]<. ">
+                    <<<<++++++[-<++++++++>]<."""
            get-brainfuck ] with-string-reader ] unit-test 
 
 ! Uppercase
@@ -52,11 +53,11 @@ multiline quotations sequences tools.test ;
 ! Squares of numbers from 0 to 100
 
 100 [0,b] [ dup * number>string ] map "\n" join "\n" append 1quotation
-[ <" ++++[>+++++<-]>[<+++++>-]+<+[
+[ """++++[>+++++<-]>[<+++++>-]+<+[
      >[>+>+<<-]++>>[<<+>>-]>>>[-]++>[-]+
      >>>+[[-]++++++>>>]<<<[[<++++++++<++>>-]+<.<[>----<-]<]
      <<[>>>>>[>>>[-]+++++++++<[>-<-]+++++++++>
-     [-[<->-]+[<<<]]<[>+<-]>]<<-]<<-] ">
+     [-[<->-]+[<<<]]<[>+<-]>]<<-]<<-]"""
   get-brainfuck ] unit-test
 
 
