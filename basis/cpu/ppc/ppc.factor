@@ -301,7 +301,7 @@ M:: ppc %box-float ( dst src temp -- )
     [ float-regs param-regs nth 1 ] [ n>> spill@ ] bi* LFD ;
 
 : float-function-return ( reg -- )
-    float-regs return-reg double-float-rep %copy ;
+    float-regs return-reg double-rep %copy ;
 
 M:: ppc %unary-float-function ( dst src func -- )
     0 src float-function-param
@@ -315,9 +315,8 @@ M:: ppc %binary-float-function ( dst src1 src2 func -- )
     dst float-function-return ;
 
 ! Internal format is always double-precision on PowerPC
-M: ppc %single>double-float double-float-rep %copy ;
-
-M: ppc %double>single-float double-float-rep %copy ;
+M: ppc %single>double-float double-rep %copy ;
+M: ppc %double>single-float double-rep %copy ;
 
 ! VMX/AltiVec not supported yet
 M: %broadcast-vector-reps drop { } ;
