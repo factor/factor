@@ -319,25 +319,25 @@ M: ppc %single>double-float double-rep %copy ;
 M: ppc %double>single-float double-rep %copy ;
 
 ! VMX/AltiVec not supported yet
-M: ppc %broadcast-vector-reps drop { } ;
-M: ppc %gather-vector-2-reps drop { } ;
-M: ppc %gather-vector-4-reps drop { } ;
-M: ppc %add-vector-reps drop { } ;
-M: ppc %saturated-add-vector-reps drop { } ;
-M: ppc %add-sub-vector-reps drop { } ;
-M: ppc %sub-vector-reps drop { } ;
-M: ppc %saturated-sub-vector-reps drop { } ;
-M: ppc %mul-vector-reps drop { } ;
-M: ppc %saturated-mul-vector-reps drop { } ;
-M: ppc %div-vector-reps drop { } ;
-M: ppc %min-vector-reps drop { } ;
-M: ppc %max-vector-reps drop { } ;
-M: ppc %sqrt-vector-reps drop { } ;
-M: ppc %horizontal-add-vector-reps drop { } ;
-M: ppc %abs-vector-reps drop { } ;
-M: ppc %and-vector-reps drop { } ;
-M: ppc %or-vector-reps drop { } ;
-M: ppc %xor-vector-reps drop { } ;
+M: ppc %broadcast-vector-reps { } ;
+M: ppc %gather-vector-2-reps { } ;
+M: ppc %gather-vector-4-reps { } ;
+M: ppc %add-vector-reps { } ;
+M: ppc %saturated-add-vector-reps { } ;
+M: ppc %add-sub-vector-reps { } ;
+M: ppc %sub-vector-reps { } ;
+M: ppc %saturated-sub-vector-reps { } ;
+M: ppc %mul-vector-reps { } ;
+M: ppc %saturated-mul-vector-reps { } ;
+M: ppc %div-vector-reps { } ;
+M: ppc %min-vector-reps { } ;
+M: ppc %max-vector-reps { } ;
+M: ppc %sqrt-vector-reps { } ;
+M: ppc %horizontal-add-vector-reps { } ;
+M: ppc %abs-vector-reps { } ;
+M: ppc %and-vector-reps { } ;
+M: ppc %or-vector-reps { } ;
+M: ppc %xor-vector-reps { } ;
 
 M: ppc %unbox-alien ( dst src -- )
     alien-offset LWZ ;
