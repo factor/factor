@@ -10,13 +10,15 @@ $nl
 "Sorting combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- <=> )" } ", where the output value is one of the three " { $link "order-specifiers" } "."
 $nl
 "Sorting a sequence with a custom comparator:"
-{ $subsection sort }
+{ $subsections sort }
 "Sorting a sequence with common comparators:"
-{ $subsection sort-with }
-{ $subsection inv-sort-with }
-{ $subsection natural-sort }
-{ $subsection sort-keys }
-{ $subsection sort-values } ;
+{ $subsections
+    sort-with
+    inv-sort-with
+    natural-sort
+    sort-keys
+    sort-values
+} ;
 
 ABOUT: "sequences-sorting"
 
