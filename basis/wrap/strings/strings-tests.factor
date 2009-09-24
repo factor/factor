@@ -1,29 +1,29 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: wrap.strings tools.test multiline ;
+USING: wrap.strings tools.test ;
 IN: wrap.strings.tests
 
 [
-    <" This is a
+    """This is a
 long piece
 of text
 that we
 wish to
-word wrap.">
+word wrap."""
 ] [
-    <" This is a long piece of text that we wish to word wrap."> 10
+    """This is a long piece of text that we wish to word wrap.""" 10
     wrap-string
 ] unit-test
     
 [
-    <"   This is a
+    """  This is a
   long piece
   of text
   that we
   wish to
-  word wrap.">
+  word wrap."""
 ] [
-    <" This is a long piece of text that we wish to word wrap."> 12
+    """This is a long piece of text that we wish to word wrap.""" 12
     "  " wrap-indented-string
 ] unit-test
 

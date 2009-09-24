@@ -72,6 +72,18 @@ HELP: randomize
 }
 { $description "Randomizes a sequence in-place with the Fisher-Yates algorithm and returns the sequence." } ;
 
+HELP: sample
+{ $values
+    { "seq" sequence } { "n" integer }
+    { "seq'" sequence }
+}
+{ $description "Takes " { $snippet "n" } " samples at random without replacement from a sequence. Throws an error if " { $snippet "n" } " is longer than the sequence." }
+{ $examples
+    { $unchecked-example "USING: random prettyprint ; { 1 2 3 } 2 sample ."
+        "{ 3 2 }"
+    }
+} ;
+
 HELP: delete-random
 { $values
      { "seq" sequence }
@@ -100,6 +112,8 @@ $nl
 { $subsection "random-protocol" }
 "Randomizing a sequence:"
 { $subsection randomize }
+"Sampling a sequences:"
+{ $subsection sample }
 "Deleting a random element from a sequence:"
 { $subsection delete-random }
 "Random numbers with " { $snippet "n" } " bits:"
