@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel fry accessors sequences assocs sets namespaces
-arrays combinators make locals deques dlists
+arrays combinators make locals deques dlists layouts
 cpu.architecture compiler.utilities
 compiler.cfg
 compiler.cfg.rpo
@@ -22,19 +22,18 @@ ERROR: bad-conversion dst src dst-rep src-rep ;
 GENERIC: emit-box ( dst src rep -- )
 GENERIC: emit-unbox ( dst src rep -- )
 
-M: float-rep emit-box
-    drop
-    [ double-rep next-vreg-rep dup ] dip ##single>double-float
-    int-rep next-vreg-rep ##box-float ;
+M:: float-rep emit-box ( dst src rep -- )
+    double-rep next-vreg-rep :> temp
+    temp src ##single>double-float
+    dst temp int-rep next-vreg-rep ##box-float ;
 
-M: float-rep emit-unbox
-    drop
-    [ double-rep next-vreg-rep dup ] dip ##unbox-float
-    ##double>single-float ;
+M:: float-rep emit-unbox ( dst src rep -- )
+    double-rep next-vreg-rep :> temp
+    temp src ##unbox-float
+    dst temp ##double>single-float ;
 
 M: double-rep emit-box
-    drop
-    int-rep next-vreg-rep ##box-float ;
+    drop int-rep next-vreg-rep ##box-float ;
 
 M: double-rep emit-unbox
     drop ##unbox-float ;
@@ -44,6 +43,16 @@ M: vector-rep emit-box
 
 M: vector-rep emit-unbox
     ##unbox-vector ;
+
+M:: scalar-rep emit-box ( dst src rep -- )
+    int-rep next-vreg-rep :> temp
+    temp src rep ##scalar>integer
+    dst temp tag-bits get ##shl-imm ;
+
+M:: scalar-rep emit-unbox ( dst src rep -- )
+    int-rep next-vreg-rep :> temp
+    temp src tag-bits get ##sar-imm
+    dst temp rep ##integer>scalar ;
 
 : emit-conversion ( dst src dst-rep src-rep -- )
     {

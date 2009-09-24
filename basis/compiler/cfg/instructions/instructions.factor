@@ -380,6 +380,27 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##shl-vector
+def: dst
+use: src1 src2/scalar-rep
+literal: rep ;
+
+PURE-INSN: ##shr-vector
+def: dst
+use: src1 src2/scalar-rep
+literal: rep ;
+
+! Scalar/integer conversion
+PURE-INSN: ##scalar>integer
+def: dst/int-rep
+use: src
+literal: rep ;
+
+PURE-INSN: ##integer>scalar
+def: dst
+use: src/int-rep
+literal: rep ;
+
 ! Boxing and unboxing aliens
 PURE-INSN: ##box-alien
 def: dst/int-rep
