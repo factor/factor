@@ -52,6 +52,10 @@ $nl
     "uint-4"
     "int-8"
     "uint-8"
+    "longlong-2"
+    "ulonglong-2"
+    "longlong-4"
+    "ulonglong-4"
     "float-4"
     "float-8"
     "double-2"
@@ -92,7 +96,7 @@ SYMBOLS: x y ;
 { $code
 """USING: compiler.tree.debugger kernel.private
 math.vectors math.vectors.simd ;
-SIMD: float-4
+SIMD: float
 IN: simd-demo
 
 : interpolate ( v a b -- w )
@@ -106,7 +110,7 @@ $nl
 { $code
 """USING: compiler.tree.debugger hints
 math.vectors math.vectors.simd ;
-SIMD: float-4
+SIMD: float
 IN: simd-demo
 
 : interpolate ( v a b -- w )
@@ -122,7 +126,7 @@ $nl
 "In the " { $snippet "interpolate" } " word, there is still a call to the " { $link <tuple-boa> } " primitive, because the return value at the end is being boxed on the heap. In the next example, no memory allocation occurs at all because the SIMD vectors are stored inside a struct class (see " { $link "classes.struct" } "); also note the use of inlining:"
 { $code
 """USING: compiler.tree.debugger math.vectors math.vectors.simd ;
-SIMD: float-4
+SIMD: float
 IN: simd-demo
 
 STRUCT: actor
@@ -192,8 +196,8 @@ ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
 { $subsection "math.vectors.simd.intrinsics" } ;
 
 HELP: SIMD:
-{ $syntax "SIMD: type-length" }
-{ $values { "type" "a scalar C type" } { "length" "a vector dimension" } }
-{ $description "Brings a SIMD array for holding " { $snippet "length" } " values of " { $snippet "type" } " into the vocabulary search path. The possible type/length combinations are listed in " { $link "math.vectors.simd.types" } " and the generated words are documented in " { $link "math.vectors.simd.words" } "." } ;
+{ $syntax "SIMD: type" }
+{ $values { "type" "a scalar C type" } }
+{ $description "Defines 128-bit and 256-bit SIMD arrays for holding elements of " { $snippet "type" } " into the vocabulary search path. The possible type/length combinations are listed in " { $link "math.vectors.simd.types" } " and the generated words are documented in " { $link "math.vectors.simd.words" } "." } ;
 
 ABOUT: "math.vectors.simd"

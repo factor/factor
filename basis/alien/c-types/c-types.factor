@@ -479,6 +479,8 @@ M: short-8-rep rep-component-type drop short ;
 M: ushort-8-rep rep-component-type drop ushort ;
 M: int-4-rep rep-component-type drop int ;
 M: uint-4-rep rep-component-type drop uint ;
+M: longlong-2-rep rep-component-type drop longlong ;
+M: ulonglong-2-rep rep-component-type drop ulonglong ;
 M: float-4-rep rep-component-type drop float ;
 M: double-2-rep rep-component-type drop double ;
 

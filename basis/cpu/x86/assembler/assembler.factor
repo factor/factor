@@ -223,8 +223,12 @@ GENERIC: CALL ( op -- )
 M: integer CALL HEX: e8 , 4, ;
 M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 
+<PRIVATE
+
 GENERIC# JUMPcc 1 ( addr opcode -- )
 M: integer JUMPcc extended-opcode, 4, ;
+
+PRIVATE>
 
 : JO  ( dst -- ) HEX: 80 JUMPcc ;
 : JNO ( dst -- ) HEX: 81 JUMPcc ;
