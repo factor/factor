@@ -78,12 +78,13 @@ ERROR: bad-schema schema ;
         } append
     ] when ;
 
-:: simd-vector-words ( class ctor rep vv->v v->v v->n -- )
+:: simd-vector-words ( class ctor rep vv->v vn->v v->v v->n -- )
     rep rep-component-type c-type-boxed-class :> elt-class
     class
     elt-class
     {
         { { +vector+ +vector+ -> +vector+ } vv->v }
+        { { +vector+ +scalar+ -> +vector+ } vn->v }
         { { +vector+ -> +vector+ } v->v }
         { { +vector+ -> +scalar+ } v->n }
         { { +vector+ -> +nonnegative+ } v->n }
@@ -118,6 +119,7 @@ SET-NTH      [ T dup c-setter array-accessor ]
 
 A-rep        [ A name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
+A-vn->v-op   DEFINES-PRIVATE ${A}-vn->v-op
 A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
@@ -175,13 +177,16 @@ INSTANCE: A sequence
 : A-vv->v-op ( v1 v2 quot -- v3 )
     [ [ underlying>> ] bi@ A-rep ] dip call \ A boa ; inline
 
+: A-vn->v-op ( v1 v2 quot -- v3 )
+    [ [ underlying>> ] dip A-rep ] dip call \ A boa ; inline
+
 : A-v->v-op ( v1 quot -- v2 )
     [ underlying>> A-rep ] dip call \ A boa ; inline
 
 : A-v->n-op ( v quot -- n )
     [ underlying>> A-rep ] dip call ; inline
 
-\ A \ A-with \ A-rep \ A-vv->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
+\ A \ A-with \ A-rep \ A-vv->v-op \ A-vn->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
 \ A \ A-rep define-simd-128-type
 
 PRIVATE>
@@ -230,6 +235,7 @@ A-deref      DEFINES-PRIVATE ${A}-deref
 
 A-rep        [ A/2 name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
+A-vn->v-op   DEFINES-PRIVATE ${A}-vn->v-op
 A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
@@ -296,6 +302,11 @@ INSTANCE: A sequence
     [ [ [ underlying2>> ] bi@ A-rep ] dip call ] 3bi
     \ A boa ; inline
 
+: A-vn->v-op ( v1 v2 quot -- v3 )
+    [ [ [ underlying1>> ] dip A-rep ] dip call ]
+    [ [ [ underlying2>> ] dip A-rep ] dip call ] 3bi
+    \ A boa ; inline
+
 : A-v->v-op ( v1 combine-quot -- v2 )
     [ [ underlying1>> A-rep ] dip call ]
     [ [ underlying2>> A-rep ] dip call ] 2bi
@@ -304,7 +315,7 @@ INSTANCE: A sequence
 : A-v->n-op ( v1 combine-quot -- v2 )
     [ [ underlying1>> ] [ underlying2>> ] bi A-rep (simd-v+) A-rep ] dip call ; inline
 
-\ A \ A-with \ A-rep \ A-vv->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
+\ A \ A-with \ A-rep \ A-vv->v-op \ A-vn->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
 \ A \ A-rep define-simd-256-type
 
 ;FUNCTOR

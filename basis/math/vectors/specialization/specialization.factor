@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types words kernel make sequences effects
-kernel.private accessors combinators math math.intervals
-math.vectors namespaces assocs fry splitting classes.algebra
-generalizations locals compiler.tree.propagation.info ;
+USING: words kernel make sequences effects sets kernel.private
+accessors combinators math math.intervals math.vectors
+namespaces assocs fry splitting classes.algebra generalizations
+locals compiler.tree.propagation.info ;
 IN: math.vectors.specialization
 
 SYMBOLS: -> +vector+ +scalar+ +nonnegative+ ;
@@ -77,6 +77,8 @@ H{
     { vbitand { +vector+ +vector+ -> +vector+ } }
     { vbitor { +vector+ +vector+ -> +vector+ } }
     { vbitxor { +vector+ +vector+ -> +vector+ } }
+    { v>> { +vector+ +scalar+ -> +vector+ } }
+    { v<< { +vector+ +scalar+ -> +vector+ } }
 }
 
 PREDICATE: vector-word < word vector-words key? ;
@@ -107,15 +109,22 @@ M: vector-word subwords specializations values [ word? ] filter ;
 :: input-signature ( word array-type elt-type -- signature )
     array-type elt-type word word-schema inputs signature-for-schema ;
 
+: vector-words-for-type ( elt-type -- alist )
+    {
+        ! Can't do shifts on floats
+        { [ dup float class<= ] [ vector-words keys { v<< v>> } diff ] }
+        ! Can't divide integers
+        { [ dup integer class<= ] [ vector-words keys { vsqrt n/v v/n v/ normalize } diff ] }
+        [ { } ]
+    } cond nip ;
+
 :: specialize-vector-words ( array-type elt-type simd -- )
-    elt-type number class<= [
-        vector-words keys [
-            [ array-type elt-type simd specialize-vector-word ]
-            [ array-type elt-type input-signature ]
-            [ ]
-            tri add-specialization
-        ] each
-    ] when ;
+    elt-type vector-words-for-type [
+        [ array-type elt-type simd specialize-vector-word ]
+        [ array-type elt-type input-signature ]
+        [ ]
+        tri add-specialization
+    ] each ;
 
 : find-specialization ( classes word -- word/f )
     specializations

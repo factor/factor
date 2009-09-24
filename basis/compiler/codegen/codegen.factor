@@ -184,6 +184,10 @@ CODEGEN: ##abs-vector %abs-vector
 CODEGEN: ##and-vector %and-vector
 CODEGEN: ##or-vector %or-vector
 CODEGEN: ##xor-vector %xor-vector
+CODEGEN: ##shl-vector %shl-vector
+CODEGEN: ##shr-vector %shr-vector
+CODEGEN: ##integer>scalar %integer>scalar
+CODEGEN: ##scalar>integer %scalar>integer
 CODEGEN: ##box-alien %box-alien
 CODEGEN: ##box-displaced-alien %box-displaced-alien
 CODEGEN: ##unbox-alien %unbox-alien
