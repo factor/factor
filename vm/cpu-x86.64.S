@@ -89,7 +89,6 @@ DEF(void,primitive_inline_cache_miss_tail,(void *vm)):
 	add $STACK_PADDING,%rsp
 	jmp *%rax
 
-
 DEF(void,get_sse_env,(void*)):
 	stmxcsr (%rdi)
 	ret

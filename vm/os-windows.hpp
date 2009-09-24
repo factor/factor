@@ -41,7 +41,6 @@ typedef wchar_t vm_char;
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
 
-
 inline static void init_signals() {}
 inline static void early_init() {}
 

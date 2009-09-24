@@ -28,7 +28,7 @@ http://www.wodeveloper.com/omniLists/macosx-dev/2000/June/msg00137.html */
 /* Modify a suspended thread's thread_state so that when the thread resumes
 executing, the call frame of the current C primitive (if any) is rewound, and
 the appropriate Factor error is thrown from the top-most Factor frame. */
-void factorvm::call_fault_handler(
+void factor_vm::call_fault_handler(
     exception_type_t exception,
     exception_data_type_t code,
 	MACH_EXC_STATE_TYPE *exc_state,
@@ -149,7 +149,6 @@ catch_exception_raise (mach_port_t exception_port,
 
 	return KERN_SUCCESS;
 }
-
 
 /* The main function of the thread listening for exceptions.  */
 static void *
