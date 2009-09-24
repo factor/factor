@@ -290,6 +290,9 @@ HELP: small-title-bar
 HELP: normal-title-bar
 { $description "Asks for a window to have a title bar. Without a title bar, the " { $link close-button } ", " { $link minimize-button } ", and " { $link maximize-button } " controls will not be available." } ;
 
+HELP: textured-background
+{ $description "Asks for a window to have a background that blends seamlessly with the window frame. Factor will leave the window background transparent and pass mouse button gestures not handled directly by a gadget through to the window system so that the window can be dragged from anywhere on its background." } ;
+
 ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
 "The following window controls can be placed in a " { $link world } " window:"
 { $subsection close-button }
@@ -298,4 +301,5 @@ ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
 { $subsection resize-handles }
 { $subsection small-title-bar }
 { $subsection normal-title-bar }
+{ $subsection textured-background }
 "Provide a sequence of these values in the " { $snippet "window-controls" } " slot of the " { $link world-attributes } " tuple you pass to " { $link open-window } "." ;
