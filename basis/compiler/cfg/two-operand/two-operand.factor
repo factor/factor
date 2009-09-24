@@ -58,7 +58,9 @@ UNION: two-operand-insn
     ##max-vector
     ##and-vector
     ##or-vector
-    ##xor-vector ;
+    ##xor-vector
+    ##shl-vector
+    ##shr-vector ;
 
 GENERIC: convert-two-operand* ( insn -- )
 

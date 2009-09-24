@@ -141,9 +141,12 @@ CONSTANT: simd-classes
 : remove-float-words ( alist -- alist' )
     [ drop { vsqrt n/v v/n v/ normalize } member? not ] assoc-filter ;
 
+: remove-integer-words ( alist -- alist' )
+    [ drop { v<< v>> } member? not ] assoc-filter ;
+
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
-    float = [ remove-float-words ] unless ;
+    float = [ remove-integer-words ] [ remove-float-words ] if ;
 
 : check-vector-ops ( class elt-class compare-quot -- )
     [
@@ -168,7 +171,7 @@ CONSTANT: simd-classes
     simd-classes [
         {
             { [ dup name>> "float" head? ] [ float [ approx= ] ] }
-            { [ dup name>> "double" tail? ] [ float [ = ] ] }
+            { [ dup name>> "double" head? ] [ float [ = ] ] }
             [ fixnum [ = ] ]
         } cond 3array
     ] map ;

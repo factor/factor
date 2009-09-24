@@ -61,6 +61,9 @@ PRIVATE>
 : vbitor ( u v -- w ) over '[ _ [ bitor ] fp-bitwise-op ] 2map ;
 : vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
 
+: v<< ( u n -- w ) '[ _ shift ] map ;
+: v>> ( u n -- w ) neg '[ _ shift ] map ;
+
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;
 : vtruncate ( u -- v ) [ truncate ] map ;

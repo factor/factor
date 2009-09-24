@@ -22,6 +22,8 @@ M: label JUMPcc [ 0 ] dip JUMPcc rc-relative label-fixup ;
 
 M: x86 two-operand? t ;
 
+M: x86 vector-regs float-regs ;
+
 HOOK: stack-reg cpu ( -- reg )
 
 HOOK: reserved-area-size cpu ( -- n )
@@ -522,6 +524,39 @@ M: x86 %xor-vector-reps
         { sse? { float-4-rep } }
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
+
+M: x86 %shl-vector ( dst src1 src2 rep -- )
+    {
+        { short-8-rep [ PSLLW ] }
+        { ushort-8-rep [ PSLLW ] }
+        { int-4-rep [ PSLLD ] }
+        { uint-4-rep [ PSLLD ] }
+        { longlong-2-rep [ PSLLQ ] }
+        { ulonglong-2-rep [ PSLLQ ] }
+    } case drop ;
+
+M: x86 %shl-vector-reps
+    {
+        { sse2? { short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %shr-vector ( dst src1 src2 rep -- )
+    {
+        { short-8-rep [ PSRAW ] }
+        { ushort-8-rep [ PSRLW ] }
+        { int-4-rep [ PSRAD ] }
+        { uint-4-rep [ PSRLD ] }
+        { ulonglong-2-rep [ PSRLQ ] }
+    } case drop ;
+
+M: x86 %shr-vector-reps
+    {
+        { sse2? { short-8-rep ushort-8-rep int-4-rep uint-4-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %integer>scalar drop MOVD ;
+
+M: x86 %scalar>integer drop MOVD ;
 
 M: x86 %unbox-alien ( dst src -- )
     alien-offset [+] MOV ;
