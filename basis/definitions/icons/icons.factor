@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes.predicate fry generic io.pathnames kernel
-macros sequences vocabs words words.symbol words.constant
-lexer parser help.topics help.markup namespaces sorting ;
+USING: assocs classes.predicate fry generic help.topics
+io.pathnames kernel lexer macros namespaces parser sequences
+vocabs words words.constant words.symbol ;
 IN: definitions.icons
 
 GENERIC: definition-icon ( definition -- path )
@@ -41,10 +41,3 @@ ICON: topic help-article
 ICON: runnable-vocab runnable-vocab
 ICON: vocab open-vocab
 ICON: vocab-link unopen-vocab
-
-: $definition-icons ( element -- )
-    drop
-    icons get >alist sort-keys
-    [ [ <$link> ] [ definition-icon-path <$image> ] bi* swap ] assoc-map
-    { "" "Definition class" } prefix
-    $table ;

@@ -1336,49 +1336,39 @@ $nl
 
 ARTICLE: "sequence-protocol" "Sequence protocol"
 "All sequences must be instances of a mixin class:"
-{ $subsection sequence }
-{ $subsection sequence? }
+{ $subsections sequence sequence? }
 "All sequences must know their length:"
-{ $subsection length }
+{ $subsections length }
 "At least one of the following two generic words must have a method for accessing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
-{ $subsection nth }
-{ $subsection nth-unsafe }
+{ $subsections nth nth-unsafe }
 "Note that sequences are always indexed starting from zero."
 $nl
 "At least one of the following two generic words must have a method for storing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
-{ $subsection set-nth }
-{ $subsection set-nth-unsafe }
-"Note that even if the sequence is immutable, at least one of the generic words must be specialized, otherwise calling them will result in an infinite recursion. There is a standard word which throws an error indicating a sequence is immutable:"
-{ $subsection immutable }
+{ $subsections set-nth set-nth-unsafe }
+"If your sequence is immutable, then you must implement either " { $link set-nth } " or " { $link set-nth-unsafe } " to simply call " { $link immutable } " to signal an error."
+$nl
 "The following two generic words are optional, as not all sequences are resizable:"
-{ $subsection set-length }
-{ $subsection lengthen }
+{ $subsections set-length lengthen }
 "An optional generic word for creating sequences of the same class as a given sequence:"
-{ $subsection like }
+{ $subsections like }
 "Optional generic words for optimization purposes:"
-{ $subsection new-sequence }
-{ $subsection new-resizable }
+{ $subsections new-sequence new-resizable }
 { $see-also "sequences-unsafe" } ;
 
 ARTICLE: "virtual-sequences-protocol" "Virtual sequence protocol"
 "Virtual sequences must know their length:"
-{ $subsection length }
+{ $subsections length }
 "The underlying sequence to look up a value in:"
-{ $subsection virtual-seq }
+{ $subsections virtual-seq }
 "The index of the value in the underlying sequence:"
-{ $subsection virtual@ } ;
+{ $subsections virtual@ } ;
 
 ARTICLE: "virtual-sequences" "Virtual sequences"
 "A virtual sequence is an implementation of the " { $link "sequence-protocol" } " which does not store its own elements, and instead computes them, either from scratch or by retrieving them from another sequence."
 $nl
 "Implementations include the following:"
-{ $list
-  { $link reversed }
-  { $link slice }
-  { $link iota }
-}
-"Virtual sequences can be implemented with the " { $link "virtual-sequences-protocol" } ", by translating an index in the virtual sequence into an index in another sequence:"
-{ $subsection "virtual-sequences-protocol" } ;
+{ $subsections reversed slice iota }
+"Virtual sequences can be implemented with the " { $link "virtual-sequences-protocol" } ", by translating an index in the virtual sequence into an index in another sequence." ;
 
 ARTICLE: "sequences-integers" "Counted loops"
 "Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, and 2. This is very useful for performing counted loops."
@@ -1395,59 +1385,50 @@ ARTICLE: "sequences-if" "Control flow with sequences"
 "To reduce the boilerplate of checking if a sequence is empty, several combinators are provided."
 $nl
 "Checking if a sequence is empty:"
-{ $subsection if-empty }
-{ $subsection when-empty }
-{ $subsection unless-empty } ;
+{ $subsections if-empty when-empty unless-empty } ;
 
 ARTICLE: "sequences-access" "Accessing sequence elements"
-{ $subsection ?nth }
+"Element access by index, without raising exceptions:"
+{ $subsections ?nth }
 "Concise way of extracting one of the first four elements:"
-{ $subsection first }
-{ $subsection second }
-{ $subsection third }
-{ $subsection fourth }
+{ $subsections first second third fourth }
 "Extracting the last element:"
-{ $subsection last }
+{ $subsections last }
 "Unpacking sequences:"
-{ $subsection first2 }
-{ $subsection first3 }
-{ $subsection first4 }
+{ $subsections first2 first3 first4 }
 { $see-also nth } ;
 
 ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 "Adding elements:"
-{ $subsection prefix }
-{ $subsection suffix }
+{ $subsections prefix suffix }
 "Removing elements:"
-{ $subsection remove }
-{ $subsection remq }
-{ $subsection remove-nth } ;
+{ $subsections remove remq remove-nth } ;
 
 ARTICLE: "sequences-reshape" "Reshaping sequences"
 "A " { $emphasis "repetition" } " is a virtual sequence consisting of a single element repeated multiple times:"
-{ $subsection repetition }
-{ $subsection <repetition> }
+{ $subsections repetition <repetition> }
 "Reversing a sequence:"
-{ $subsection reverse }
+{ $subsections reverse }
 "A " { $emphasis "reversal" } " presents a reversed view of an underlying sequence:"
-{ $subsection reversed }
-{ $subsection <reversed> }
+{ $subsections reversed <reversed> }
 "Transposing a matrix:"
-{ $subsection flip } ;
+{ $subsections flip } ;
 
 ARTICLE: "sequences-appending" "Appending sequences"
-{ $subsection append }
-{ $subsection append-as }
-{ $subsection prepend }
-{ $subsection 3append }
-{ $subsection 3append-as }
-{ $subsection surround }
-{ $subsection glue }
-{ $subsection concat }
-{ $subsection join }
+"Basic append operations:"
+{ $subsections
+    append
+    append-as
+    prepend
+    3append
+    3append-as
+    surround
+    glue
+}
+"Collapse a sequence unto itself:"
+{ $subsections concat join }
 "A pair of words useful for aligning strings:"
-{ $subsection pad-head }
-{ $subsection pad-tail } ;
+{ $subsections pad-head pad-tail } ;
 
 ARTICLE: "sequences-slices" "Subsequences and slices"
 "There are two ways to extract a subrange of elements from a sequence. The first approach creates a new sequence of the same type as the input, which does not share storage with the underlying sequence. This takes time proportional to the number of elements being extracted. The second approach creates a " { $emphasis "slice" } ", which is a virtual sequence (see " { $link "virtual-sequences" } ") sharing storage with the original sequence. Slices are constructed in constant time."
@@ -1461,119 +1442,125 @@ $nl
 }
 { $heading "Subsequence operations" }
 "Extracting a subsequence:"
-{ $subsection subseq }
-{ $subsection head }
-{ $subsection tail }
-{ $subsection head* }
-{ $subsection tail* }
+{ $subsections
+    subseq
+    head
+    tail
+    head*
+    tail*
+}
 "Removing the first or last element:"
-{ $subsection rest }
-{ $subsection but-last }
+{ $subsections rest but-last }
 "Taking a sequence apart into a head and a tail:"
-{ $subsection unclip }
-{ $subsection unclip-last }
-{ $subsection cut }
-{ $subsection cut* }
+{ $subsections
+    unclip
+    unclip-last
+    cut
+    cut*
+}
 { $heading "Slice operations" }
 "The slice data type:"
-{ $subsection slice }
-{ $subsection slice? }
+{ $subsections slice slice? }
 "Extracting a slice:"
-{ $subsection <slice> }
-{ $subsection head-slice }
-{ $subsection tail-slice }
-{ $subsection head-slice* }
-{ $subsection tail-slice* }
+{ $subsections
+    <slice>
+    head-slice
+    tail-slice
+    head-slice*
+    tail-slice*
+}
 "Removing the first or last element:"
-{ $subsection rest-slice }
-{ $subsection but-last-slice }
+{ $subsections rest-slice but-last-slice }
 "Taking a sequence apart into a head and a tail:"
-{ $subsection unclip-slice }
-{ $subsection unclip-last-slice }
-{ $subsection cut-slice }
+{ $subsections unclip-slice unclip-last-slice cut-slice }
 "A utility for words which use slices as iterators:"
-{ $subsection <flat-slice> }
+{ $subsections <flat-slice> }
 "Replacing slices with new elements:"
-{ $subsection replace-slice } ;
+{ $subsections replace-slice } ;
 
 ARTICLE: "sequences-combinators" "Sequence combinators"
 "Iteration:"
-{ $subsection each }
-{ $subsection each-index }
-{ $subsection reduce }
-{ $subsection interleave }
-{ $subsection replicate }
-{ $subsection replicate-as }
+{ $subsections
+    each
+    each-index
+    reduce
+    interleave
+    replicate
+    replicate-as
+}
 "Mapping:"
-{ $subsection map }
-{ $subsection map-as }
-{ $subsection map-index }
-{ $subsection map-reduce }
-{ $subsection accumulate }
-{ $subsection produce }
-{ $subsection produce-as }
+{ $subsections
+    map
+    map-as
+    map-index
+    map-reduce
+    accumulate
+    produce
+    produce-as
+}
 "Filtering:"
-{ $subsection filter }
-{ $subsection partition }
+{ $subsections
+    filter
+    partition
+}
 "Testing if a sequence contains elements satisfying a predicate:"
-{ $subsection any? }
-{ $subsection all? }
+{ $subsections
+    any?
+    all?
+}
+{ $heading "Related Articles" }
 { $subsection "sequence-2combinators" }
 { $subsection "sequence-3combinators" } ;
 
 ARTICLE: "sequence-2combinators" "Pair-wise sequence combinators"
 "There is a set of combinators which traverse two sequences pairwise. If one sequence is shorter than the other, then only the prefix having the length of the minimum of the two is examined."
-{ $subsection 2each }
-{ $subsection 2reduce }
-{ $subsection 2map }
-{ $subsection 2map-as }
-{ $subsection 2map-reduce }
-{ $subsection 2all? } ;
+{ $subsections
+    2each
+    2reduce
+    2map
+    2map-as
+    2map-reduce
+    2all?
+} ;
 
 ARTICLE: "sequence-3combinators" "Triple-wise sequence combinators"
 "There is a set of combinators which traverse three sequences triple-wise. If one sequence is shorter than the others, then only the prefix having the length of the minimum of the three is examined."
-{ $subsection 3each }
-{ $subsection 3map }
-{ $subsection 3map-as } ;
+{ $subsections 3each 3map 3map-as } ;
 
 ARTICLE: "sequences-tests" "Testing sequences"
 "Testing for an empty sequence:"
-{ $subsection empty? }
+{ $subsections empty? }
 "Testing indices:"
-{ $subsection bounds-check? }
+{ $subsections bounds-check? }
 "Testing if a sequence contains an object:"
-{ $subsection member? }
-{ $subsection memq? }
+{ $subsections member? memq? }
 "Testing if a sequence contains a subsequence:"
-{ $subsection head? }
-{ $subsection tail? }
-{ $subsection subseq? } ;
+{ $subsections head? tail? subseq? } ;
 
 ARTICLE: "sequences-search" "Searching sequences"
 "Finding the index of an element:"
-{ $subsection index }
-{ $subsection index-from }
-{ $subsection last-index }
-{ $subsection last-index-from }
+{ $subsections
+    index
+    index-from
+    last-index
+    last-index-from
+}
 "Finding the start of a subsequence:"
-{ $subsection start }
-{ $subsection start* }
+{ $subsections start start* }
 "Finding the index of an element satisfying a predicate:"
-{ $subsection find }
-{ $subsection find-from }
-{ $subsection find-last }
-{ $subsection find-last-from }
-{ $subsection map-find } ;
+{ $subsections
+    find
+    find-from
+    find-last
+    find-last-from
+    map-find
+} ;
 
 ARTICLE: "sequences-trimming" "Trimming sequences"
 "Trimming words:"
-{ $subsection trim }
-{ $subsection trim-head }
-{ $subsection trim-tail }
+{ $subsections trim trim-head trim-tail }
 "Potentially more efficient trim:"
-{ $subsection trim-slice }
-{ $subsection trim-head-slice }
-{ $subsection trim-tail-slice } ;
+{ $subsections trim-slice trim-head-slice trim-tail-slice } ;
 
 ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
 "Constructive (non-destructive) operations should be preferred where possible because code without side-effects is usually more re-usable and easier to reason about. There are two main reasons to use destructive operations:"
@@ -1584,24 +1571,25 @@ ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
 "The second reason is much weaker than the first one. In particular, many combinators (see " { $link map } ", " { $link produce } " and " { $link "namespaces-make" } ") as well as more advanced data structures (such as " { $vocab-link "persistent.vectors" } ") alleviate the need for explicit use of side effects." ;
 
 ARTICLE: "sequences-destructive" "Destructive operations"
-"These words modify their input, instead of creating a new sequence."
-{ $subsection "sequences-destructive-discussion" }
 "Changing elements:"
-{ $subsection change-each }
-{ $subsection change-nth }
+{ $subsections change-each change-nth }
 "Deleting elements:"
-{ $subsection delete }
-{ $subsection delq }
-{ $subsection delete-nth }
-{ $subsection delete-slice }
-{ $subsection delete-all }
-{ $subsection filter-here }
+{ $subsections
+    delete
+    delq
+    delete-nth
+    delete-slice
+    delete-all
+    filter-here
+}
 "Other destructive words:"
-{ $subsection reverse-here }
-{ $subsection push-all }
-{ $subsection move }
-{ $subsection exchange }
-{ $subsection copy }
+{ $subsections
+    reverse-here
+    push-all
+    move
+    exchange
+    copy
+}
 "Many operations have constructive and destructive variants:"
 { $table
     { "Constructive" "Destructive" }
@@ -1616,21 +1604,24 @@ ARTICLE: "sequences-destructive" "Destructive operations"
     { { $link map } { $link change-each } }
     { { $link filter } { $link filter-here } }
 }
-{ $see-also set-nth push pop "sequences-stacks" } ;
+{ $heading "Related Articles" }
+{ $subsection "sequences-destructive-discussion" }
+{ $subsection "sequences-stacks" }
+{ $see-also set-nth push pop } ;
 
 ARTICLE: "sequences-stacks" "Treating sequences as stacks"
 "The classical stack operations, modifying a sequence in place:"
-{ $subsection push }
-{ $subsection pop }
-{ $subsection pop* }
+{ $subsections push pop pop* }
 { $see-also empty? } ;
 
 ARTICLE: "sequences-comparing" "Comparing sequences"
 "Element equality testing:"
-{ $subsection sequence= }
-{ $subsection mismatch }
-{ $subsection drop-prefix }
-{ $subsection assert-sequence= }
+{ $subsections
+    sequence=
+    mismatch
+    drop-prefix
+    assert-sequence=
+}
 "The " { $link <=> } " generic word performs lexicographic comparison when applied to sequences." ;
 
 ARTICLE: "sequences-f" "The f object as a sequence"
@@ -1640,33 +1631,39 @@ ARTICLE: "sequences" "Sequence operations"
 "A " { $emphasis "sequence" } " is a finite, linearly-ordered collection of elements. Words for working with sequences are in the " { $vocab-link "sequences" } " vocabulary."
 $nl
 "Sequences implement a protocol:"
-{ $subsection "sequence-protocol" }
-{ $subsection "sequences-f" }
+{ $subsections
+    "sequence-protocol"
+    "sequences-f"
+}
 "Sequence utility words can operate on any object whose class implements the sequence protocol. Most implementations are backed by storage. Some implementations obtain their elements from an underlying sequence, or compute them on the fly. These are known as " { $link "virtual-sequences" } "."
-{ $subsection "sequences-access" }
-{ $subsection "sequences-combinators" }
-{ $subsection "sequences-add-remove" }
-{ $subsection "sequences-appending" }
-{ $subsection "sequences-slices" }
-{ $subsection "sequences-reshape" }
-{ $subsection "sequences-tests" }
-{ $subsection "sequences-search" }
-{ $subsection "sequences-comparing" }
-{ $subsection "sequences-split" }
-{ $subsection "grouping" }
-{ $subsection "sequences-destructive" }
-{ $subsection "sequences-stacks" }
-{ $subsection "sequences-sorting" }
-{ $subsection "binary-search" }
-{ $subsection "sets" }
-{ $subsection "sequences-trimming" }
-{ $subsection "sequences.deep" }
+{ $subsections
+    "sequences-access"
+    "sequences-combinators"
+    "sequences-add-remove"
+    "sequences-appending"
+    "sequences-slices"
+    "sequences-reshape"
+    "sequences-tests"
+    "sequences-search"
+    "sequences-comparing"
+    "sequences-split"
+    "grouping"
+    "sequences-destructive"
+    "sequences-stacks"
+    "sequences-sorting"
+    "binary-search"
+    "sets"
+    "sequences-trimming"
+    "sequences.deep"
+}
 "Using sequences for looping:"
-{ $subsection "sequences-integers" }
-{ $subsection "math.ranges" }
+{ $subsections
+    "sequences-integers"
+    "math.ranges"
+}
 "Using sequences for control flow:"
-{ $subsection "sequences-if" }
+{ $subsections "sequences-if" }
 "For inner loops:"
-{ $subsection "sequences-unsafe" } ;
+{ $subsections "sequences-unsafe" } ;
 
 ABOUT: "sequences"
