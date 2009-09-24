@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
-cpu.architecture kernel kernel.private math memory namespaces make
-sequences words system layouts combinators math.order fry locals
-compiler.constants byte-arrays io macros quotations cpu.x86.features
-cpu.x86.features.private compiler compiler.units init vm
+cpu.x86.features cpu.x86.features.private cpu.architecture kernel
+kernel.private math memory namespaces make sequences words system
+layouts combinators math.order fry locals compiler.constants
+byte-arrays io macros quotations compiler compiler.units init vm
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.intrinsics
@@ -259,8 +259,8 @@ MACRO: available-reps ( alist -- )
 
 M: x86 %broadcast-vector ( dst src rep -- )
     {
-        { float-4-rep [ [ MOVSS ] [ drop dup 0 SHUFPS ] 2bi ] }
-        { double-2-rep [ [ MOVSD ] [ drop dup UNPCKLPD ] 2bi ] }
+        { float-4-rep [ [ float-4-rep copy-register ] [ drop dup 0 SHUFPS ] 2bi ] }
+        { double-2-rep [ [ double-2-rep copy-register ] [ drop dup UNPCKLPD ] 2bi ] }
     } case ;
 
 M: x86 %broadcast-vector-reps
@@ -274,7 +274,7 @@ M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
         {
             float-4-rep
             [
-                dst src1 MOVSS
+                dst src1 float-4-rep copy-register
                 dst src2 UNPCKLPS
                 src3 src4 UNPCKLPS
                 dst src3 MOVLHPS
@@ -292,7 +292,7 @@ M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
         {
             double-2-rep
             [
-                dst src1 MOVSD
+                dst src1 double-2-rep copy-register
                 dst src2 UNPCKLPD
             ]
         }
@@ -313,12 +313,14 @@ M: x86 %add-vector ( dst src1 src2 rep -- )
         { ushort-8-rep [ PADDW ] }
         { int-4-rep [ PADDD ] }
         { uint-4-rep [ PADDD ] }
+        { longlong-2-rep [ PADDQ ] }
+        { ulonglong-2-rep [ PADDQ ] }
     } case drop ;
 
 M: x86 %add-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
 M: x86 %saturated-add-vector ( dst src1 src2 rep -- )
@@ -355,12 +357,14 @@ M: x86 %sub-vector ( dst src1 src2 rep -- )
         { ushort-8-rep [ PSUBW ] }
         { int-4-rep [ PSUBD ] }
         { uint-4-rep [ PSUBD ] }
+        { longlong-2-rep [ PSUBQ ] }
+        { ulonglong-2-rep [ PSUBQ ] }
     } case drop ;
 
 M: x86 %sub-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
 M: x86 %saturated-sub-vector ( dst src1 src2 rep -- )
@@ -389,7 +393,8 @@ M: x86 %mul-vector ( dst src1 src2 rep -- )
 M: x86 %mul-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { double-2-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+        { sse2? { double-2-rep short-8-rep ushort-8-rep } }
+        { sse4.1? { int-4-rep uint-4-rep } }
     } available-reps ;
 
 M: x86 %saturated-mul-vector-reps
@@ -448,8 +453,8 @@ M: x86 %max-vector-reps
 
 M: x86 %horizontal-add-vector ( dst src rep -- )
     {
-        { float-4-rep [ [ MOVAPS ] [ HADDPS ] [ HADDPS ] 2tri ] }
-        { double-2-rep [ [ MOVAPD ] [ HADDPD ] 2bi ] }
+        { float-4-rep [ [ float-4-rep copy-register ] [ HADDPS ] [ HADDPS ] 2tri ] }
+        { double-2-rep [ [ double-2-rep copy-register ] [ HADDPD ] 2bi ] }
     } case ;
 
 M: x86 %horizontal-add-vector-reps
@@ -485,54 +490,39 @@ M: x86 %and-vector ( dst src1 src2 rep -- )
     {
         { float-4-rep [ ANDPS ] }
         { double-2-rep [ ANDPD ] }
-        { char-16-rep [ PAND ] }
-        { uchar-16-rep [ PAND ] }
-        { short-8-rep [ PAND ] }
-        { ushort-8-rep [ PAND ] }
-        { int-4-rep [ PAND ] }
-        { uint-4-rep [ PAND ] }
+        [ drop PAND ]
     } case drop ;
 
 M: x86 %and-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
 M: x86 %or-vector ( dst src1 src2 rep -- )
     {
         { float-4-rep [ ORPS ] }
         { double-2-rep [ ORPD ] }
-        { char-16-rep [ POR ] }
-        { uchar-16-rep [ POR ] }
-        { short-8-rep [ POR ] }
-        { ushort-8-rep [ POR ] }
-        { int-4-rep [ POR ] }
-        { uint-4-rep [ POR ] }
+        [ drop POR ]
     } case drop ;
 
 M: x86 %or-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
 M: x86 %xor-vector ( dst src1 src2 rep -- )
     {
         { float-4-rep [ XORPS ] }
         { double-2-rep [ XORPD ] }
-        { char-16-rep [ PXOR ] }
-        { uchar-16-rep [ PXOR ] }
-        { short-8-rep [ PXOR ] }
-        { ushort-8-rep [ PXOR ] }
-        { int-4-rep [ PXOR ] }
-        { uint-4-rep [ PXOR ] }
+        [ drop PXOR ]
     } case drop ;
 
 M: x86 %xor-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
 M: x86 %unbox-alien ( dst src -- )
@@ -648,9 +638,6 @@ M: x86.64 has-small-reg? 2drop t ;
         [ quot call ] with-save/restore
     ] if ; inline
 
-: ?MOV ( dst src -- )
-    2dup = [ 2drop ] [ MOV ] if ; inline
-
 M:: x86 %string-nth ( dst src index temp -- )
     ! We request a small-reg of size 8 since those of size 16 are
     ! a superset.
@@ -678,12 +665,12 @@ M:: x86 %string-nth ( dst src index temp -- )
         ! Compute code point
         new-dst temp XOR
         "end" resolve-label
-        dst new-dst ?MOV
+        dst new-dst int-rep copy-register
     ] with-small-register ;
 
 M:: x86 %set-string-nth-fast ( ch str index temp -- )
     ch { index str temp } 8 [| new-ch |
-        new-ch ch ?MOV
+        new-ch ch int-rep copy-register
         temp str index [+] LEA
         temp string-offset [+] new-ch 8-bit-version-of MOV
     ] with-small-register ;
@@ -692,7 +679,7 @@ M:: x86 %set-string-nth-fast ( ch str index temp -- )
     dst { src } size [| new-dst |
         new-dst dup size n-bit-version-of dup src [] MOV
         quot call
-        dst new-dst ?MOV
+        dst new-dst int-rep copy-register
     ] with-small-register ; inline
 
 : %alien-unsigned-getter ( dst src size -- )
@@ -716,7 +703,7 @@ M: x86 %alien-vector [ [] ] dip copy-register ;
 
 :: %alien-integer-setter ( ptr value size -- )
     value { ptr } size [| new-value |
-        new-value value ?MOV
+        new-value value int-rep copy-register
         ptr [] new-value size n-bit-version-of MOV
     ] with-small-register ; inline
 
