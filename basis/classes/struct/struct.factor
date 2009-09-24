@@ -27,6 +27,8 @@ PREDICATE: struct-class < tuple-class
 
 M: struct-class valid-superclass? drop f ;
 
+SLOT: fields
+
 : struct-slots ( struct-class -- slots )
     "c-type" word-prop fields>> ;
 
