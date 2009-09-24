@@ -1,7 +1,7 @@
 namespace factor
 {
 
-struct factorvmdata {
+struct factor_vm_data {
 	// if you change this struct, also change vm.factor k--------
 	context *stack_chain; 
 	zone nursery; /* new objects are allocated here */
@@ -101,7 +101,7 @@ struct factorvmdata {
 	cell pic_to_mega_transitions;
 	cell pic_counts[4];  /* PIC_TAG, PIC_HI_TAG, PIC_TUPLE, PIC_HI_TAG_TUPLE */
 
-	factorvmdata() 
+	factor_vm_data() 
 		: profiling_p(false),
 		  secure_gc(false),
 		  gc_off(false),

@@ -19,6 +19,8 @@ IN: compiler.tree.propagation.simd
     (simd-vbitand)
     (simd-vbitor)
     (simd-vbitxor)
+    (simd-vlshift)
+    (simd-vrshift)
     (simd-broadcast)
     (simd-gather-2)
     (simd-gather-4)
@@ -30,7 +32,7 @@ IN: compiler.tree.propagation.simd
         literal>> scalar-rep-of {
             { float-rep [ float ] }
             { double-rep [ float ] }
-            { int-rep [ integer ] }
+            [ integer ]
         } case
     ] [ drop real ] if
     <class-info>

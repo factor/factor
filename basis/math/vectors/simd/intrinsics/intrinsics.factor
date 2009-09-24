@@ -42,6 +42,8 @@ SIMD-OP: vabs
 SIMD-OP: vbitand
 SIMD-OP: vbitor
 SIMD-OP: vbitxor
+SIMD-OP: vlshift
+SIMD-OP: vrshift
 
 : (simd-broadcast) ( x rep -- v ) bad-simd-call ;
 : (simd-gather-2) ( a b rep -- v ) bad-simd-call ;
@@ -110,6 +112,8 @@ M: vector-rep supported-simd-op?
         { \ (simd-vbitand)   [ %and-vector-reps            ] }
         { \ (simd-vbitor)    [ %or-vector-reps             ] }
         { \ (simd-vbitxor)   [ %xor-vector-reps            ] }
+        { \ (simd-vlshift)   [ %shl-vector-reps            ] }
+        { \ (simd-vrshift)   [ %shr-vector-reps            ] }
         { \ (simd-broadcast) [ %broadcast-vector-reps      ] }
         { \ (simd-gather-2)  [ %gather-vector-2-reps       ] }
         { \ (simd-gather-4)  [ %gather-vector-4-reps       ] }

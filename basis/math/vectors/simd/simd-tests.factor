@@ -5,34 +5,34 @@ math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals math.vectors.specialization combinators cpu.architecture
 math.vectors.simd.intrinsics namespaces byte-arrays alien
-specialized-arrays classes.struct ;
+specialized-arrays classes.struct eval ;
 FROM: alien.c-types => c-type-boxed-class ;
 SPECIALIZED-ARRAY: float
-SIMD: char-16
-SIMD: uchar-16
-SIMD: char-32
-SIMD: uchar-32
-SIMD: short-8
-SIMD: ushort-8
-SIMD: short-16
-SIMD: ushort-16
-SIMD: int-4
-SIMD: uint-4
-SIMD: int-8
-SIMD: uint-8
-SIMD: float-4
-SIMD: float-8
-SIMD: double-2
-SIMD: double-4
+SIMD: char
+SIMD: uchar
+SIMD: short
+SIMD: ushort
+SIMD: int
+SIMD: uint
+SIMD: longlong
+SIMD: ulonglong
+SIMD: float
+SIMD: double
 IN: math.vectors.simd.tests
 
-[ float-4{ 0 0 0 0 } ] [ float-4 new ] unit-test
+! Make sure the functor doesn't generate bogus vocabularies
+2 [ [ "USE: math.vectors.simd SIMD: rubinius" eval( -- ) ] must-fail ] times
 
-[ float-4{ 0 0 0 0 } ] [ [ float-4 new ] compile-call ] unit-test
+[ f ] [ "math.vectors.simd.instances.rubinius" vocab ] unit-test
 
+! Test type propagation
 [ V{ float } ] [ [ { float-4 } declare norm-sq ] final-classes ] unit-test
 
 [ V{ float } ] [ [ { float-4 } declare norm ] final-classes ] unit-test
+
+[ V{ float-4 } ] [ [ { float-4 } declare normalize ] final-classes ] unit-test
+
+[ V{ float-4 } ] [ [ { float-4 float-4 } declare v+ ] final-classes ] unit-test
 
 ! Test puns; only on x86
 cpu x86? [
@@ -62,6 +62,10 @@ CONSTANT: simd-classes
         uint-4
         int-8
         uint-8
+        longlong-2
+        ulonglong-2
+        longlong-4
+        ulonglong-4
         float-4
         float-8
         double-2
@@ -137,9 +141,12 @@ CONSTANT: simd-classes
 : remove-float-words ( alist -- alist' )
     [ drop { vsqrt n/v v/n v/ normalize } member? not ] assoc-filter ;
 
+: remove-integer-words ( alist -- alist' )
+    [ drop { vlshift vrshift } member? not ] assoc-filter ;
+
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
-    float = [ remove-float-words ] unless ;
+    float = [ remove-integer-words ] [ remove-float-words ] if ;
 
 : check-vector-ops ( class elt-class compare-quot -- )
     [
@@ -164,7 +171,7 @@ CONSTANT: simd-classes
     simd-classes [
         {
             { [ dup name>> "float" head? ] [ float [ approx= ] ] }
-            { [ dup name>> "double" tail? ] [ float [ = ] ] }
+            { [ dup name>> "double" head? ] [ float [ = ] ] }
             [ fixnum [ = ] ]
         } cond 3array
     ] map ;

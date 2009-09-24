@@ -1,7 +1,6 @@
 namespace factor
 {
 
-
 PRIMITIVE(die);
 
 }

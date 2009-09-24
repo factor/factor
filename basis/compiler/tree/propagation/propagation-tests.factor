@@ -9,7 +9,7 @@ compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
 specialized-arrays system sorting math.libm
-math.intervals quotations effects alien ;
+math.intervals quotations effects alien alien.data ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 IN: compiler.tree.propagation.tests
@@ -894,3 +894,6 @@ M: tuple-with-read-only-slot clone
 [ t ] [ [ >fixnum dup 0 >= [ 16 /i ] when ] { /i fixnum/i fixnum/i-fast } inlined? ] unit-test
 [ f ] [ [ >fixnum dup 0 >= [ 16 /i ] when ] { fixnum-shift-fast } inlined? ] unit-test
 [ f ] [ [ >float dup 0 >= [ 16 /i ] when ] { /i float/f } inlined? ] unit-test
+
+! We want this to inline
+[ t ] [ [ void* <c-direct-array> ] { <c-direct-array> } inlined? ] unit-test

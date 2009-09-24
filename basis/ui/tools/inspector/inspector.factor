@@ -92,7 +92,7 @@ M: inspector-gadget focusable-child*
 
 : slot-editor-window ( close-hook update-hook assoc key key-string -- )
     [ <value-ref> <slot-editor> ] [ "Slot editor: " prepend ] bi*
-    open-window ;
+    open-status-window ;
 
 : com-edit-slot ( inspector -- )
     [ close-window ] swap

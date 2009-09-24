@@ -13,5 +13,4 @@ inline cell array_nth(array *array, cell slot)
 PRIMITIVE(array);
 PRIMITIVE(resize_array);
 
-
 }

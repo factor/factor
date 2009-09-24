@@ -4,7 +4,7 @@ USING: accessors fry kernel locals math math.constants
 math.functions math.vectors math.vectors.simd prettyprint
 combinators.smart sequences hints classes.struct
 specialized-arrays ;
-SIMD: double-4
+SIMD: double
 IN: benchmark.nbody-simd
 
 : solar-mass ( -- x ) 4 pi sq * ; inline

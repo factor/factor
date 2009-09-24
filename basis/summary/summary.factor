@@ -7,7 +7,7 @@ IN: summary
 GENERIC: summary ( object -- string )
 
 : object-summary ( object -- string )
-    class name>> " instance" append ;
+    class name>> ;
 
 M: object summary object-summary ;
 
