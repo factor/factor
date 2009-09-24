@@ -265,8 +265,9 @@ M: x86 %broadcast-vector ( dst src rep -- )
 
 M: x86 %broadcast-vector-reps
     {
-        { sse? { float-4-rep } }
-        { sse2? { double-2-rep } }
+        ! Can't do this with sse1 since it will want to unbox
+        ! a double-precision float and convert to single precision
+        { sse2? { float-4-rep double-2-rep } }
     } available-reps ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
@@ -284,7 +285,9 @@ M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
 
 M: x86 %gather-vector-4-reps
     {
-        { sse? { float-4-rep } }
+        ! Can't do this with sse1 since it will want to unbox
+        ! double-precision floats and convert to single precision
+        { sse2? { float-4-rep } }
     } available-reps ;
 
 M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
