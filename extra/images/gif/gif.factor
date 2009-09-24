@@ -1,11 +1,11 @@
 ! Copyrigt (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators constructors destructors
-images images.loader io io.binary io.buffers
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.files.info io.ports io.streams.limited kernel make
-math math.bitwise math.functions multiline namespaces
-prettyprint sequences ;
+USING: accessors arrays assocs combinators compression.lzw-gif
+constructors destructors grouping images images.loader io
+io.binary io.buffers io.encodings.binary io.encodings.string
+io.encodings.utf8 io.files io.files.info io.ports
+io.streams.limited kernel make math math.bitwise math.functions
+multiline namespaces prettyprint sequences ;
 IN: images.gif
 
 SINGLETON: gif-image
@@ -42,7 +42,7 @@ packed delay-time color-index
 block-terminator ;
 
 TUPLE: image-descriptor
-left top width height flags lzw-min-code-size ;
+left top width height flags first-code-size ;
 
 TUPLE: plain-text-extension
 introducer label block-size text-grid-left text-grid-top text-grid-width
@@ -97,7 +97,7 @@ M: input-port stream-peek1
         2 read le> >>width
         2 read le> >>height
         1 read le> >>flags
-        1 read le> >>lzw-min-code-size ;
+        1 read le> 1 + >>first-code-size ;
 
 : read-graphic-control-extension ( -- graphic-control-extension )
     \ graphics-control-extension new
@@ -152,7 +152,7 @@ ERROR: unimplemented message ;
 
 : read-global-color-table ( loading-gif -- loading-gif )
     dup color-table? [
-        dup color-table-size read >>global-color-table
+        dup color-table-size read 3 group >>global-color-table
     ] when ;
 
 : maybe-read-local-color-table ( loading-gif -- loading-gif )
@@ -220,8 +220,25 @@ ERROR: unhandled-data byte ;
         } case
     ] with-input-stream ;
 
+: decompress ( loading-gif -- indexes )
+    [ image-descriptor>> first-code-size>> ]
+    [ compressed-bytes>> ] bi
+    lzw-uncompress ;
+
+: apply-palette ( indexes palette -- bitmap )
+    [ nth 255 suffix ] curry V{ } map-as concat ;
+
+: dimensions ( loading-gif -- dim )
+    [ image-descriptor>> width>> ] [ image-descriptor>> height>> ] bi 2array ;
+
 : loading-gif>image ( loading-gif -- image )
-    ;
+    [ <image> ] dip
+    [ dimensions >>dim ]
+    [ drop RGBA >>component-order ubyte-components >>component-type ]
+    [
+        [ decompress ] [ global-color-table>> ] bi
+        apply-palette >>bitmap
+    ] tri ;
 
 ERROR: loading-gif-error gif-image ;
 
