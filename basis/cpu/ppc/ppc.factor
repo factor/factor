@@ -317,6 +317,27 @@ M: ppc %single>double-float FMR ;
 
 M: ppc %double>single-float FMR ;
 
+! VMX/AltiVec not supported yet
+M: %broadcast-vector-reps drop { } ;
+M: %gather-vector-2-reps drop { } ;
+M: %gather-vector-4-reps drop { } ;
+M: %add-vector-reps drop { } ;
+M: %saturated-add-vector-reps drop { } ;
+M: %add-sub-vector-reps drop { } ;
+M: %sub-vector-reps drop { } ;
+M: %saturated-sub-vector-reps drop { } ;
+M: %mul-vector-reps drop { } ;
+M: %saturated-mul-vector-reps drop { } ;
+M: %div-vector-reps drop { } ;
+M: %min-vector-reps drop { } ;
+M: %max-vector-reps drop { } ;
+M: %sqrt-vector-reps drop { } ;
+M: %horizontal-add-vector-reps drop { } ;
+M: %abs-vector-reps drop { } ;
+M: %and-vector-reps drop { } ;
+M: %or-vector-reps drop { } ;
+M: %xor-vector-reps drop { } ;
+
 M: ppc %unbox-alien ( dst src -- )
     alien-offset LWZ ;
 
