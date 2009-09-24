@@ -338,6 +338,8 @@ M: ppc %abs-vector-reps { } ;
 M: ppc %and-vector-reps { } ;
 M: ppc %or-vector-reps { } ;
 M: ppc %xor-vector-reps { } ;
+M: ppc %shl-vector-reps { } ;
+M: ppc %shr-vector-reps { } ;
 
 M: ppc %unbox-alien ( dst src -- )
     alien-offset LWZ ;
