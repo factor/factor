@@ -5,7 +5,7 @@ namespaces parser sequences splitting strings arrays
 math.order ;
 IN: strings.parser
 
-ERROR: bad-escape ;
+ERROR: bad-escape char ;
 
 : escape ( escape -- ch )
     H{
@@ -19,7 +19,7 @@ ERROR: bad-escape ;
         { CHAR: 0  CHAR: \0 }
         { CHAR: \\ CHAR: \\ }
         { CHAR: \" CHAR: \" }
-    } at [ bad-escape ] unless* ;
+    } ?at [ bad-escape ] unless ;
 
 SYMBOL: name>char-hook
 

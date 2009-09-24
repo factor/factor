@@ -25,3 +25,8 @@ IN: random.tests
 [ 100 [ { 0 1 } random ] replicate all-equal? ] unit-test
 
 [ 49 ] [ 50 random-bits* log2 ] unit-test
+
+[ { 1 2 } 3 sample ] [ too-many-samples?  ] must-fail-with
+
+[ 3 ] [ { 1 2 3 4 } 3 sample prune length ] unit-test
+[ 99 ] [ 100 99 sample prune length ] unit-test

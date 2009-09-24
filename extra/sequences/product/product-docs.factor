@@ -24,8 +24,8 @@ HELP: <product-sequence>
 { $description "Constructs a " { $link product-sequence } " over " { $snippet "sequences" } "." }
 { $examples
 { $example """USING: arrays prettyprint sequences.product ;
-{ { 1 2 3 } { "a" "b" "c" } } <product-sequence> >array .
-""" """ {
+{ { 1 2 3 } { "a" "b" "c" } } <product-sequence> >array ."""
+"""{
     { 1 "a" }
     { 2 "a" }
     { 3 "a" }
