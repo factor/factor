@@ -198,11 +198,15 @@ M: register POP f HEX: 58 short-operand ;
 M: operand POP { BIN: 000 f HEX: 8f } 1-operand ;
 
 ! MOV where the src is immediate.
+<PRIVATE
+
 GENERIC: (MOV-I) ( src dst -- )
 M: register (MOV-I) t HEX: b8 short-operand cell, ;
 M: operand (MOV-I)
     { BIN: 000 t HEX: c6 }
     pick byte? [ immediate-1 ] [ immediate-4 ] if ;
+
+PRIVATE>
 
 GENERIC: MOV ( dst src -- )
 M: immediate MOV swap (MOV-I) ;
@@ -296,12 +300,16 @@ M: operand TEST OCT: 204 2-operand ;
 : CDQ ( -- ) HEX: 99 , ;
 : CQO ( -- ) HEX: 48 , CDQ ;
 
+<PRIVATE
+
 : (SHIFT) ( dst src op -- )
     over CL eq? [
         nip t HEX: d3 3array 1-operand
     ] [
         swapd t HEX: c0 3array immediate-1
     ] if ; inline
+
+PRIVATE>
 
 : ROL ( dst n -- ) BIN: 000 (SHIFT) ;
 : ROR ( dst n -- ) BIN: 001 (SHIFT) ;
