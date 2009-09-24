@@ -140,10 +140,8 @@ M: float-4-rep copy-register* drop MOVUPS ;
 M: double-2-rep copy-register* drop MOVUPD ;
 M: vector-rep copy-register* drop MOVDQU ;
 
-: copy-register ( dst src rep -- )
+M: x86 %copy ( dst src rep -- )
     2over eq? [ 3drop ] [ copy-register* ] if ;
-
-M: x86 %copy ( dst src rep -- ) copy-register ;
 
 :: overflow-template ( label dst src1 src2 insn -- )
     src1 src2 insn call
@@ -243,11 +241,11 @@ M:: x86 %box-vector ( dst src rep temp -- )
     dst rep rep-size 2 cells + byte-array temp %allot
     16 tag-fixnum dst 1 byte-array tag-number %set-slot-imm
     dst byte-array-offset [+]
-    src rep copy-register ;
+    src rep %copy ;
 
 M:: x86 %unbox-vector ( dst src rep -- )
     dst src byte-array-offset [+]
-    rep copy-register ;
+    rep %copy ;
 
 MACRO: available-reps ( alist -- )
     ! Each SSE version adds new representations and supports
@@ -259,8 +257,8 @@ MACRO: available-reps ( alist -- )
 
 M: x86 %broadcast-vector ( dst src rep -- )
     {
-        { float-4-rep [ [ float-4-rep copy-register ] [ drop dup 0 SHUFPS ] 2bi ] }
-        { double-2-rep [ [ double-2-rep copy-register ] [ drop dup UNPCKLPD ] 2bi ] }
+        { float-4-rep [ [ float-4-rep %copy ] [ drop dup 0 SHUFPS ] 2bi ] }
+        { double-2-rep [ [ double-2-rep %copy ] [ drop dup UNPCKLPD ] 2bi ] }
     } case ;
 
 M: x86 %broadcast-vector-reps
@@ -274,7 +272,7 @@ M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
         {
             float-4-rep
             [
-                dst src1 float-4-rep copy-register
+                dst src1 float-4-rep %copy
                 dst src2 UNPCKLPS
                 src3 src4 UNPCKLPS
                 dst src3 MOVLHPS
@@ -292,7 +290,7 @@ M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
         {
             double-2-rep
             [
-                dst src1 double-2-rep copy-register
+                dst src1 double-2-rep %copy
                 dst src2 UNPCKLPD
             ]
         }
@@ -453,8 +451,8 @@ M: x86 %max-vector-reps
 
 M: x86 %horizontal-add-vector ( dst src rep -- )
     {
-        { float-4-rep [ [ float-4-rep copy-register ] [ HADDPS ] [ HADDPS ] 2tri ] }
-        { double-2-rep [ [ double-2-rep copy-register ] [ HADDPD ] 2bi ] }
+        { float-4-rep [ [ float-4-rep %copy ] [ HADDPS ] [ HADDPS ] 2tri ] }
+        { double-2-rep [ [ double-2-rep %copy ] [ HADDPD ] 2bi ] }
     } case ;
 
 M: x86 %horizontal-add-vector-reps
@@ -665,12 +663,12 @@ M:: x86 %string-nth ( dst src index temp -- )
         ! Compute code point
         new-dst temp XOR
         "end" resolve-label
-        dst new-dst int-rep copy-register
+        dst new-dst int-rep %copy
     ] with-small-register ;
 
 M:: x86 %set-string-nth-fast ( ch str index temp -- )
     ch { index str temp } 8 [| new-ch |
-        new-ch ch int-rep copy-register
+        new-ch ch int-rep %copy
         temp str index [+] LEA
         temp string-offset [+] new-ch 8-bit-version-of MOV
     ] with-small-register ;
@@ -679,7 +677,7 @@ M:: x86 %set-string-nth-fast ( ch str index temp -- )
     dst { src } size [| new-dst |
         new-dst dup size n-bit-version-of dup src [] MOV
         quot call
-        dst new-dst int-rep copy-register
+        dst new-dst int-rep %copy
     ] with-small-register ; inline
 
 : %alien-unsigned-getter ( dst src size -- )
@@ -699,11 +697,11 @@ M: x86 %alien-signed-4 32 %alien-signed-getter ;
 M: x86 %alien-cell [] MOV ;
 M: x86 %alien-float [] MOVSS ;
 M: x86 %alien-double [] MOVSD ;
-M: x86 %alien-vector [ [] ] dip copy-register ;
+M: x86 %alien-vector [ [] ] dip %copy ;
 
 :: %alien-integer-setter ( ptr value size -- )
     value { ptr } size [| new-value |
-        new-value value int-rep copy-register
+        new-value value int-rep %copy
         ptr [] new-value size n-bit-version-of MOV
     ] with-small-register ; inline
 
@@ -713,7 +711,7 @@ M: x86 %set-alien-integer-4 32 %alien-integer-setter ;
 M: x86 %set-alien-cell [ [] ] dip MOV ;
 M: x86 %set-alien-float [ [] ] dip MOVSS ;
 M: x86 %set-alien-double [ [] ] dip MOVSD ;
-M: x86 %set-alien-vector [ [] ] 2dip copy-register ;
+M: x86 %set-alien-vector [ [] ] 2dip %copy ;
 
 : shift-count? ( reg -- ? ) { ECX RCX } memq? ;
 
@@ -918,10 +916,10 @@ M: x86 %compare-float-unordered-branch ( label src1 src2 cc -- )
     \ UCOMISD (%compare-float-branch) ;
 
 M:: x86 %spill ( src rep n -- )
-    n spill@ src rep copy-register ;
+    n spill@ src rep %copy ;
 
 M:: x86 %reload ( dst rep n -- )
-    dst n spill@ rep copy-register ;
+    dst n spill@ rep %copy ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 

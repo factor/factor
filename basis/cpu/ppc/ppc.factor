@@ -284,10 +284,12 @@ M:: ppc %float>integer ( dst src -- )
     dst 1 4 scratch@ LWZ ;
 
 M: ppc %copy ( dst src rep -- )
-    {
-        { int-rep [ MR ] }
-        { double-rep [ FMR ] }
-    } case ;
+    2over eq? [ 3drop ] [
+        {
+            { int-rep [ MR ] }
+            { double-rep [ FMR ] }
+        } case
+    ] if ;
 
 M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
 
@@ -299,7 +301,7 @@ M:: ppc %box-float ( dst src temp -- )
     [ float-regs param-regs nth 1 ] [ n>> spill@ ] bi* LFD ;
 
 : float-function-return ( reg -- )
-    float-regs return-reg 2dup = [ 2drop ] [ FMR ] if ;
+    float-regs return-reg double-float-rep %copy ;
 
 M:: ppc %unary-float-function ( dst src func -- )
     0 src float-function-param
@@ -313,9 +315,9 @@ M:: ppc %binary-float-function ( dst src1 src2 func -- )
     dst float-function-return ;
 
 ! Internal format is always double-precision on PowerPC
-M: ppc %single>double-float FMR ;
+M: ppc %single>double-float double-float-rep %copy ;
 
-M: ppc %double>single-float FMR ;
+M: ppc %double>single-float double-float-rep %copy ;
 
 ! VMX/AltiVec not supported yet
 M: %broadcast-vector-reps drop { } ;
