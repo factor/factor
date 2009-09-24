@@ -198,7 +198,7 @@ IN: tools.deploy.shaker
         ] when
         
         deploy-c-types? get [
-            { "c-type" "struct-slots" "struct-size" "struct-align" } %
+            { "c-type" "struct-slots" "struct-align" } %
         ] unless
     ] { } make ;
 
