@@ -202,7 +202,7 @@ M: struct-c-type c-struct? drop t ;
     [ type>> c-type-align ] [ max ] map-reduce ;
 PRIVATE>
 
-M: struct byte-length class "c-type" word-prop size>> ; foldable
+M: struct byte-length class "struct-size" word-prop ; foldable
 
 ! class definition
 
@@ -253,6 +253,7 @@ M: struct binary-zero?
 
     c-type class typedef
     class slot-specs define-accessors
+    class size "struct-size" set-word-prop
     class dup make-struct-prototype "prototype" set-word-prop
     class (struct-methods) ; inline
 PRIVATE>
