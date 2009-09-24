@@ -103,6 +103,8 @@ M: struct-class boa>object
     [ <struct> ] [ struct-slots ] bi 
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] curry keep ;
 
+M: struct-class initial-value* <struct> ; inline
+
 ! Struct slot accessors
 
 GENERIC: struct-slot-values ( struct -- sequence )
@@ -112,6 +114,9 @@ M: struct-class reader-quot
 
 M: struct-class writer-quot
     nip (writer-quot) ;
+
+: offset-of ( field struct -- offset )
+    struct-slots slot-named offset>> ; inline
 
 ! c-types
 
@@ -202,15 +207,29 @@ M: struct byte-length class "struct-size" word-prop ; foldable
 ! class definition
 
 <PRIVATE
+GENERIC: binary-zero? ( value -- ? )
+
+M: object binary-zero? drop f ;
+M: f binary-zero? drop t ;
+M: number binary-zero? zero? ;
+M: struct binary-zero?
+    [ byte-length iota ] [ >c-ptr ] bi
+    [ <displaced-alien> *uchar zero? ] curry all? ;
+
+: struct-needs-prototype? ( class -- ? )
+    struct-slots [ initial>> binary-zero? ] all? not ;
+
 : make-struct-prototype ( class -- prototype )
-    [ "struct-size" word-prop <byte-array> ]
-    [ memory>struct ]
-    [ struct-slots ] tri
-    [
-        [ initial>> ]
-        [ (writer-quot) ] bi
-        over [ swapd [ call( value struct -- ) ] curry keep ] [ 2drop ] if
-    ] each ;
+    dup struct-needs-prototype? [
+        [ "struct-size" word-prop <byte-array> ]
+        [ memory>struct ]
+        [ struct-slots ] tri
+        [
+            [ initial>> ]
+            [ (writer-quot) ] bi
+            over [ swapd [ call( value struct -- ) ] curry keep ] [ 2drop ] if
+        ] each
+    ] [ drop f ] if ;
 
 : (struct-methods) ( class -- )
     [ (define-struct-slot-values-method) ]
