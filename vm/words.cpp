@@ -66,7 +66,13 @@ void factorvm::update_word_xt(cell w_)
 	if(profiling_p)
 	{
 		if(!w->profiling)
-			w->profiling = compile_profiling_stub(w.value());
+		{
+			/* Note: can't do w->profiling = ... since if LHS
+			evaluates before RHS, since in that case if RHS does a
+			GC, we will have an invalid pointer on the LHS */
+			code_block *profiling = compile_profiling_stub(w.value());
+			w->profiling = profiling;
+		}
 
 		w->xt = w->profiling->xt();
 	}
