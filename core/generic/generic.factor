@@ -103,7 +103,7 @@ TUPLE: check-method class generic ;
     [ drop remake-generic drop ]
     3tri ; inline
 
-: method-word-name ( class word -- string )
+: method-word-name ( class generic -- string )
     [ name>> ] bi@ "=>" glue ;
 
 PREDICATE: method-body < word
@@ -123,9 +123,8 @@ M: method-body crossref?
 
 : <method> ( class generic -- method )
     check-method
-    [ method-word-props ] 2keep
-    method-word-name f <word>
-    swap >>props ;
+    [ method-word-name f <word> ] [ method-word-props ] 2bi
+    >>props ;
 
 : with-implementors ( class generic quot -- )
     [ swap implementors-map get at ] dip call ; inline
