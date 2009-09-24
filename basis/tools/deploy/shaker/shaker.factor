@@ -196,6 +196,10 @@ IN: tools.deploy.shaker
                 "word-style"
             } %
         ] when
+        
+        deploy-c-types? get [
+            { "c-type" "struct-slots" "struct-size" "struct-align" } %
+        ] unless
     ] { } make ;
 
 : strip-words ( props -- )
@@ -344,6 +348,8 @@ IN: tools.deploy.shaker
             { } { "layouts" } strip-vocab-globals %
 
             { } { "math.partial-dispatch" } strip-vocab-globals %
+
+            { } { "math.vectors.simd" } strip-vocab-globals %
 
             { } { "peg" } strip-vocab-globals %
         ] when

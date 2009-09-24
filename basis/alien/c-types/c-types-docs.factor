@@ -13,8 +13,7 @@ HELP: heap-size
 { $values { "type" string } { "size" math:integer } }
 { $description "Outputs the number of bytes needed for a heap-allocated value of this C type." }
 { $examples
-    "On a 32-bit system, you will get the following output:"
-    { $unchecked-example "USE: alien\n\"void*\" heap-size ." "4" }
+    { $example "USING: alien alien.c-types prettyprint ;\nint heap-size ." "4" }
 }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 

@@ -53,7 +53,7 @@ ERROR: no-c-type name ;
 PREDICATE: c-type-word < word
     "c-type" word-prop ;
 
-UNION: c-type-name string c-type-word ;
+UNION: c-type-name string word ;
 
 ! C type protocol
 GENERIC: c-type ( name -- type ) foldable
