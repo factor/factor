@@ -5,10 +5,10 @@ USING: alien alien.c-types alien.strings arrays assocs ui
 ui.private ui.gadgets ui.gadgets.private ui.backend
 ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
 kernel math math.vectors namespaces make sequences strings
-vectors words windows.kernel32 windows.gdi32 windows.user32
-windows.opengl32 windows.messages windows.types
-windows.offscreen windows.nt threads libc combinators fry
-combinators.short-circuit continuations command-line shuffle
+vectors words windows.dwmapi system-info.windows windows.kernel32
+windows.gdi32 windows.user32 windows.opengl32 windows.messages
+windows.types windows.offscreen windows.nt threads libc combinators
+fry combinators.short-circuit continuations command-line shuffle
 opengl ui.render math.bitwise locals accessors math.rectangles
 math.order calendar ascii sets io.encodings.utf16n
 windows.errors literals ui.pixel-formats
@@ -680,6 +680,11 @@ M: windows-ui-backend do-events
     0 GetSystemMenu
     SC_CLOSE MF_BYCOMMAND MF_GRAYED bitor EnableMenuItem drop ;
 
+: ?make-glass ( world hwnd -- )
+    swap { [ transparent?>> ] [ drop windows-major 6 >= ] } 0&&
+    [ full-window-margins DwmExtendFrameIntoClientArea drop ]
+    [ drop ] if ;
+
 : ?disable-close-button ( world hwnd -- )
     swap window-controls>> close-button swap member? not
     [ disable-close-button ] [ drop ] if ;
@@ -688,8 +693,9 @@ M: windows-ui-backend (open-window) ( world -- )
     [
         dup
         [ ] [ world>style ] [ world>ex-style ] tri create-window
+        [ ?make-glass ]
         [ ?disable-close-button ]
-        [ [ f f ] dip f f <win> >>handle setup-gl ] 2bi
+        [ [ f f ] dip f f <win> >>handle setup-gl ] 2tri
     ]
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
