@@ -48,9 +48,7 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	
 	/* Save stack pointer */
 	lea -CELL_SIZE(STACK_REG),ARG0
-	push ARG1  /* save vm ptr */
 	call MANGLE(save_callstack_bottom)
-	pop ARG1
 	
 	/* Call quot-xt */
 	mov NV_TEMP_REG,ARG0
