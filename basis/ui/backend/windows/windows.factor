@@ -230,6 +230,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 CONSTANT: window-control>style
     H{
         { close-button 0 }
+        { textured-background 0 }
         { minimize-button $ WS_MINIMIZEBOX }
         { maximize-button $ WS_MAXIMIZEBOX }
         { resize-handles $ WS_THICKFRAME }
@@ -240,6 +241,7 @@ CONSTANT: window-control>style
 CONSTANT: window-control>ex-style
     H{
         { close-button 0 }
+        { textured-background 0 }
         { minimize-button 0 }
         { maximize-button 0 }
         { resize-handles $ WS_EX_WINDOWEDGE }
@@ -681,7 +683,7 @@ M: windows-ui-backend do-events
     SC_CLOSE MF_BYCOMMAND MF_GRAYED bitor EnableMenuItem drop ;
 
 : ?make-glass ( world hwnd -- )
-    swap { [ transparent?>> ] [ drop windows-major 6 >= ] } 0&&
+    swap { [ transparent?>> ] [ drop windows-major 6 >= ] } 1&&
     [ full-window-margins DwmExtendFrameIntoClientArea drop ]
     [ drop ] if ;
 
