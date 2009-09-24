@@ -102,7 +102,7 @@ DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
 	pop NV_TEMP_REG
 	mov RETURN_REG,ARG0          /* No-op on 32-bit */
 	add $STACK_PADDING,STACK_REG
-        jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
+    jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
 
 	
 #include "cpu-x86.S"
