@@ -778,6 +778,12 @@ M: ppc %box-small-struct ( c-type -- )
     4 3 4 LWZ
     3 3 0 LWZ ;
 
+M: ppc %nest-stacks ( -- )
+    "nest_stacks" f %alien-invoke ;
+
+M: ppc %unnest-stacks ( -- )
+    "unnest_stacks" f %alien-invoke ;
+
 M: ppc %unbox-small-struct ( size -- )
     #! Alien must be in EAX.
     heap-size cell align cell /i {
