@@ -74,7 +74,7 @@ M: x86.64 %prepare-unbox ( -- )
     param-reg-1 R14 [] MOV
     R14 cell SUB ;
 
-M: x86.64 %vm-invoke-1st-arg ( function -- )
+: %vm-invoke-1st-arg ( function -- )
     param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
     f %alien-invoke ;
 
@@ -82,7 +82,7 @@ M: x86.64 %vm-invoke-1st-arg ( function -- )
     param-reg-2 0 MOV rc-absolute-cell rt-vm rel-fixup
     f %alien-invoke ;
 
-M: x86.64 %vm-invoke-3rd-arg ( function -- )
+: %vm-invoke-3rd-arg ( function -- )
     param-reg-3 0 MOV rc-absolute-cell rt-vm rel-fixup
     f %alien-invoke ;
 
