@@ -55,6 +55,7 @@ HOOK: temp-reg cpu ( -- reg )
 ! Fastcall calling convention
 HOOK: param-reg-1 cpu ( -- reg )
 HOOK: param-reg-2 cpu ( -- reg )
+HOOK: param-reg-3 cpu ( -- reg )
 
 HOOK: pic-tail-reg cpu ( -- reg )
 
@@ -832,8 +833,10 @@ M:: x86 %call-gc ( gc-root-count -- )
     param-reg-1 gc-root-base param@ LEA
     ! Pass number of roots as second parameter
     param-reg-2 gc-root-count MOV
+    ! Pass vm as third argument
+    param-reg-3 0 MOV rc-absolute-cell rt-vm rel-fixup
     ! Call GC
-    "inline_gc" %vm-invoke-3rd-arg ; 
+    "inline_gc" f %alien-invoke ; 
 
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    

@@ -7,7 +7,7 @@ cocoa.views cocoa.windows combinators command-line
 core-foundation core-foundation.run-loop core-graphics
 core-graphics.types destructors fry generalizations io.thread
 kernel libc literals locals math math.bitwise math.rectangles memory
-namespaces sequences threads ui
+namespaces sequences threads ui colors
 ui.backend ui.backend.cocoa.views ui.clipboards ui.gadgets
 ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private
 ui.private words.symbol ;
