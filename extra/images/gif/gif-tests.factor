@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Keith Lazuka.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors bitstreams compression.lzw-gif images.gif io
+USING: accessors bitstreams compression.lzw images.gif io
 io.encodings.binary io.files kernel math math.bitwise
 math.parser namespaces prettyprint sequences tools.test images.viewer ;
 QUALIFIED-WITH: bitstreams bs
@@ -49,7 +49,7 @@ IN: images.gif.tests
 : >index-stream ( gif -- seq )
     [ compressed-bytes>> ]
     [ image-descriptor>> first-code-size>> ] bi
-    lzw-uncompress-lsb0 ;
+    gif-lzw-uncompress ;
 
 [
     BV{

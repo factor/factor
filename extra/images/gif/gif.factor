@@ -1,6 +1,6 @@
 ! Copyrigt (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compression.lzw-gif
+USING: accessors arrays assocs combinators compression.lzw
 constructors destructors grouping images images.loader io
 io.binary io.buffers io.encodings.binary io.encodings.string
 io.encodings.utf8 io.files io.files.info io.ports
@@ -227,7 +227,7 @@ ERROR: unhandled-data byte ;
 : decompress ( loading-gif -- indexes )
     [ compressed-bytes>> ]
     [ image-descriptor>> first-code-size>> ] bi
-    lzw-uncompress-lsb0 ;
+    gif-lzw-uncompress ;
 
 : colorize ( index palette transparent-index/f -- seq )
     pick = [ 2drop B{ 0 0 0 0 } ] [ nth 255 suffix ] if ;

@@ -5,28 +5,38 @@ prettyprint sequences vectors ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.lzw
 
-SYMBOL: clear-code
-4 clear-code set-global
+SYMBOL: current-lzw
 
-SYMBOL: end-of-information
-5 end-of-information set-global
+TUPLE: lzw
+input
+output
+table
+code
+old-code
+initial-code-size
+code-size
+clear-code
+end-of-information-code ;
 
-TUPLE: lzw input output table code old-code initial-code-size code-size ;
+TUPLE: tiff-lzw < lzw ;
+TUPLE: gif-lzw < lzw ;
 
 : initial-uncompress-table ( -- seq )
-    end-of-information get 1 + iota [ 1vector ] V{ } map-as ;
+    current-lzw get end-of-information-code>> 1 +
+    iota [ 1vector ] V{ } map-as ;
 
 : reset-lzw-uncompress ( lzw -- lzw )
     initial-uncompress-table >>table
     dup initial-code-size>> >>code-size ;
 
-: <lzw-uncompress> ( input code-size -- obj )
-    lzw new
-        swap >>initial-code-size
-        dup initial-code-size>> >>code-size
+: <lzw-uncompress> ( input code-size class -- obj )
+    new
+        swap >>code-size
+        dup code-size>> >>initial-code-size
+        dup code-size>> 1 - 2^ >>clear-code
+        dup clear-code>> 1 + >>end-of-information-code
         swap >>input
-        BV{ } clone >>output
-        reset-lzw-uncompress ;
+        BV{ } clone >>output ;
 
 ERROR: not-in-table value ;
 
@@ -45,15 +55,16 @@ ERROR: not-in-table value ;
 : write-code ( lzw -- )
     [ lookup-code ] [ output>> ] bi push-all ;
 
-: kdebug ( lzw -- lzw )
-    dup "TIFF: incrementing code size " write
-    [ code-size>> pprint ] 
-    [ " table length " write table>> length pprint ] bi
-    nl ;
+GENERIC: code-space-full? ( lzw -- ? )
+
+M: tiff-lzw code-space-full?
+    [ table>> length ] [ code-size>> 2^ 1 - ] bi = ;
+
+M: gif-lzw code-space-full?
+    [ table>> length ] [ code-size>> 2^ ] bi = ;
 
 : maybe-increment-code-size ( lzw -- lzw )
-    dup [ table>> length ] [ code-size>> 2^ 1 - ] bi =
-    [ kdebug [ 1 + ] change-code-size ] when ;
+    dup code-space-full? [ [ 1 + ] change-code-size ] when ;
 
 : add-to-table ( seq lzw -- )
     [ table>> push ]
@@ -64,9 +75,8 @@ ERROR: not-in-table value ;
 
 DEFER: lzw-uncompress-char
 : handle-clear-code ( lzw -- )
-    "CLEAR CODE" print
     reset-lzw-uncompress
-    lzw-read dup end-of-information get = [
+    lzw-read dup current-lzw get end-of-information-code>> = [
         2drop
     ] [
         >>code
@@ -94,10 +104,10 @@ DEFER: lzw-uncompress-char
 : lzw-uncompress-char ( lzw -- )
     lzw-read [
         >>code
-        dup code>> end-of-information get = [
+        dup code>> current-lzw get end-of-information-code>> = [
             drop
         ] [
-            dup code>> clear-code get = [
+            dup code>> current-lzw get clear-code>> = [
                 handle-clear-code
             ] [
                 handle-uncompress-code
@@ -108,19 +118,13 @@ DEFER: lzw-uncompress-char
         drop
     ] if* ;
 
-: register-special-codes ( first-code-size -- first-code-size )
-    [
-        1 - 2^ dup clear-code set
-        1 + end-of-information set
-    ] keep ;
+: lzw-uncompress ( bitstream code-size class -- byte-array )
+    <lzw-uncompress> dup current-lzw [
+        [ reset-lzw-uncompress drop ] [ lzw-uncompress-char ] [ output>> ] tri
+    ] with-variable ;
 
-: lzw-uncompress ( bitstream code-size -- byte-array )
-    register-special-codes
-    <lzw-uncompress>
-    [ lzw-uncompress-char ] [ output>> ] bi ;
+: tiff-lzw-uncompress ( seq -- byte-array )
+    bs:<msb0-bit-reader> 9 tiff-lzw lzw-uncompress ;
 
-: lzw-uncompress-msb0 ( seq code-size -- byte-array )
-    [ bs:<msb0-bit-reader> ] dip lzw-uncompress ;
-
-: lzw-uncompress-lsb0 ( seq code-size -- byte-array )
-    [ bs:<lsb0-bit-reader> ] dip lzw-uncompress ;
+: gif-lzw-uncompress ( seq code-size -- byte-array )
+    [ bs:<lsb0-bit-reader> ] dip gif-lzw lzw-uncompress ;
