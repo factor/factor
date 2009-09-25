@@ -434,13 +434,10 @@ ERROR: bad-small-ifd-type n ;
 
 ERROR: unhandled-compression compression ;
 
-: lzw-tiff-uncompress ( seq -- byte-array )
-    9 lzw-uncompress-msb0 ;
-
 : (uncompress-strips) ( strips compression -- uncompressed-strips )
     {
         { compression-none [ ] }
-        { compression-lzw [ [ lzw-tiff-uncompress ] map ] }
+        { compression-lzw [ [ tiff-lzw-uncompress ] map ] }
         [ unhandled-compression ]
     } case ;
 
