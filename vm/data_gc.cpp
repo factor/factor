@@ -681,7 +681,7 @@ void factor_vm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 		gc_locals.pop_back();
 }
 
-VM_ASM_API_OVERFLOW void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm)
+VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm)
 {
 	ASSERTVM();
 	VM_PTR->inline_gc(gc_roots_base,gc_roots_size);

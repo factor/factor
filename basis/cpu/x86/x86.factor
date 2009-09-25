@@ -828,16 +828,6 @@ M: x86 %save-gc-root ( gc-root register -- ) [ gc-root@ ] dip MOV ;
 
 M: x86 %load-gc-root ( gc-root register -- ) swap gc-root@ MOV ;
 
-M:: x86 %call-gc ( gc-root-count -- )
-    ! Pass pointer to start of GC roots as first parameter
-    param-reg-1 gc-root-base param@ LEA
-    ! Pass number of roots as second parameter
-    param-reg-2 gc-root-count MOV
-    ! Pass vm as third argument
-    param-reg-3 0 MOV rc-absolute-cell rt-vm rel-fixup
-    ! Call GC
-    "inline_gc" f %alien-invoke ; 
-
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    
 

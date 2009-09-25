@@ -233,6 +233,16 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     func f %alien-invoke
     dst float-function-return ;
 
+M:: x86.64 %call-gc ( gc-root-count -- )
+    ! Pass pointer to start of GC roots as first parameter
+    param-reg-1 gc-root-base param@ LEA
+    ! Pass number of roots as second parameter
+    param-reg-2 gc-root-count MOV
+    ! Pass vm as third parameter
+    param-reg-3 0 MOV rc-absolute-cell rt-vm rel-fixup
+    ! Call GC
+    "inline_gc" f %alien-invoke ;
+
 ! The result of reading 4 bytes from memory is a fixnum on
 ! x86-64.
 enable-alien-4-intrinsics
