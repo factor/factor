@@ -37,9 +37,7 @@ ERROR: unknown-extension n ;
 ERROR: gif-unexpected-eof ;
 
 TUPLE: graphics-control-extension
-label block-size raw-data
-packed delay-time color-index
-block-terminator ;
+flags delay-time transparent-color-index ;
 
 TUPLE: image-descriptor
 left top width height flags first-code-size ;
@@ -67,6 +65,8 @@ CONSTANT: graphic-control-extension HEX: f9
 CONSTANT: comment-extension HEX: fe
 CONSTANT: application-extension HEX: ff
 CONSTANT: trailer HEX: 3b
+CONSTANT: graphic-control-extension-block-size HEX: 04
+CONSTANT: block-terminator HEX: 00
 
 : <loading-gif> ( -- loading-gif )
     \ loading-gif new
@@ -101,9 +101,11 @@ M: input-port stream-peek1
 
 : read-graphic-control-extension ( -- graphic-control-extension )
     \ graphics-control-extension new
-        1 read le> [ >>block-size ] [ read ] bi
-        >>raw-data
-        1 read le> >>block-terminator ;
+        1 read le> graphic-control-extension-block-size assert=
+        1 read le> >>flags
+        2 read le> >>delay-time
+        1 read le> >>transparent-color-index
+        1 read le> block-terminator assert= ;
 
 : read-plain-text-extension ( -- plain-text-extension )
     \ plain-text-extension new
@@ -147,6 +149,8 @@ ERROR: unimplemented message ;
 : interlaced? ( image -- ? ) flags>> 6 bit? ; inline
 : sort? ( image -- ? ) flags>> 5 bit? ; inline
 : color-table-size ( image -- ? ) flags>> 3 bits 1 + 2^ 3 * ; inline
+: transparency? ( image -- ? )
+    graphic-control-extensions>> first flags>> 0 bit? ; inline
 
 : color-resolution ( image -- ? ) flags>> -4 shift 3 bits ; inline
 
@@ -225,18 +229,26 @@ ERROR: unhandled-data byte ;
     [ compressed-bytes>> ] bi
     lzw-uncompress ;
 
-: apply-palette ( indexes palette -- bitmap )
-    [ nth 255 suffix ] curry V{ } map-as concat ;
+: colorize ( index palette transparent-index/f -- seq )
+    pick = [ 2drop B{ 0 0 0 0 } ] [ nth 255 suffix ] if ;
+
+: apply-palette ( indexes palette transparent-index/f -- bitmap )
+    [ colorize ] 2curry V{ } map-as concat ;
 
 : dimensions ( loading-gif -- dim )
     [ image-descriptor>> width>> ] [ image-descriptor>> height>> ] bi 2array ;
+
+: ?transparent-color-index ( loading-gif -- index/f )
+    dup transparency?
+    [ graphic-control-extensions>> first transparent-color-index>> ]
+    [ drop f ] if ;
 
 : loading-gif>image ( loading-gif -- image )
     [ <image> ] dip
     [ dimensions >>dim ]
     [ drop RGBA >>component-order ubyte-components >>component-type ]
     [
-        [ decompress ] [ global-color-table>> ] bi
+        [ decompress ] [ global-color-table>> ] [ ?transparent-color-index ] tri
         apply-palette >>bitmap
     ] tri ;
 
