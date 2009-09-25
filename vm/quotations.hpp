@@ -12,12 +12,13 @@ struct quotation_jit : public jit {
 		  relocate(relocate_){};
 
 	void emit_mega_cache_lookup(cell methods, fixnum index, cell cache);
-	bool primitive_call_p(cell i);
-	bool fast_if_p(cell i);
-	bool fast_dip_p(cell i);
-	bool fast_2dip_p(cell i);
-	bool fast_3dip_p(cell i);
-	bool mega_lookup_p(cell i);
+	bool primitive_call_p(cell i, cell length);
+	bool fast_if_p(cell i, cell length);
+	bool fast_dip_p(cell i, cell length);
+	bool fast_2dip_p(cell i, cell length);
+	bool fast_3dip_p(cell i, cell length);
+	bool mega_lookup_p(cell i, cell length);
+	bool declare_p(cell i, cell length);
 	bool stack_frame_p();
 	void iterate_quotation();
 };
