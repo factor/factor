@@ -36,9 +36,9 @@ M:: x86.64 %dispatch ( src temp -- )
     [ align-code ]
     bi ;
 
-M: x86.64 param-reg-1 int-regs param-regs first ;
-M: x86.64 param-reg-2 int-regs param-regs second ;
-M: x86.64 param-reg-3 int-regs param-regs third ;
+: param-reg-1 ( -- reg ) int-regs param-regs first ; inline
+: param-reg-2 ( -- reg ) int-regs param-regs second ; inline
+: param-reg-3 ( -- reg ) int-regs param-regs third ; inline
 
 M: x86.64 pic-tail-reg RBX ;
 
