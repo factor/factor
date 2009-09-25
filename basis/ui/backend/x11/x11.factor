@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays ascii assocs
+USING: accessors alien.c-types arrays ascii assocs colors
 classes.struct combinators io.encodings.ascii
 io.encodings.string io.encodings.utf8 kernel literals math
 namespaces sequences strings ui ui.backend ui.clipboards
@@ -62,6 +62,9 @@ M: x11-ui-backend (pixel-format-attribute)
         first
         0 <int> [ glXGetConfig drop ] keep *int
     ] if-empty ;
+
+M: x11-ui-backend system-background-color
+    T{ rgba f 0.0 0.0 0.0 0.0 } ; inline
 
 CONSTANT: modifiers
     {
