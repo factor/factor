@@ -399,6 +399,12 @@ CLASS: {
     ]
 }
 
+{ "isOpaque" "char" { "id" "SEL" }
+    [
+        2drop 0
+    ]
+}
+
 { "dealloc" "void" { "id" "SEL" }
     [
         drop

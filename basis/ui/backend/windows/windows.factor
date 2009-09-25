@@ -5,14 +5,14 @@ USING: alien alien.c-types alien.strings arrays assocs ui
 ui.private ui.gadgets ui.gadgets.private ui.backend
 ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
 kernel math math.vectors namespaces make sequences strings
-vectors words windows.kernel32 windows.gdi32 windows.user32
-windows.opengl32 windows.messages windows.types
-windows.offscreen windows.nt threads libc combinators fry
-combinators.short-circuit continuations command-line shuffle
+vectors words windows.dwmapi system-info.windows windows.kernel32
+windows.gdi32 windows.user32 windows.opengl32 windows.messages
+windows.types windows.offscreen windows.nt threads libc combinators
+fry combinators.short-circuit continuations command-line shuffle
 opengl ui.render math.bitwise locals accessors math.rectangles
 math.order calendar ascii sets io.encodings.utf16n
 windows.errors literals ui.pixel-formats
-ui.pixel-formats.private memoize classes
+ui.pixel-formats.private memoize classes colors
 specialized-arrays classes.struct alien.data ;
 SPECIALIZED-ARRAY: POINT
 IN: ui.backend.windows
@@ -230,6 +230,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 CONSTANT: window-control>style
     H{
         { close-button 0 }
+        { textured-background 0 }
         { minimize-button $ WS_MINIMIZEBOX }
         { maximize-button $ WS_MAXIMIZEBOX }
         { resize-handles $ WS_THICKFRAME }
@@ -240,6 +241,7 @@ CONSTANT: window-control>style
 CONSTANT: window-control>ex-style
     H{
         { close-button 0 }
+        { textured-background 0 }
         { minimize-button 0 }
         { maximize-button 0 }
         { resize-handles $ WS_EX_WINDOWEDGE }
@@ -531,6 +533,21 @@ SYMBOL: nc-buttons
     #! message sent if mouse leaves main application 
     4drop forget-rollover ;
 
+: system-background-color ( -- color )
+    COLOR_BTNFACE GetSysColor RGB>color ;
+
+: ?make-glass ( world hwnd -- )
+    over window-controls>> textured-background swap memq? [
+        composition-enabled? [
+            full-window-margins DwmExtendFrameIntoClientArea drop
+            T{ rgba f 0.0 0.0 0.0 0.0 }
+        ] [ drop system-background-color ] if >>background-color
+        drop
+    ] [ 2drop ] if ;
+
+: handle-wm-dwmcompositionchanged ( hWnd uMsg wParam lParam -- )
+    3drop [ window ] keep ?make-glass ;
+
 SYMBOL: wm-handlers
 
 H{ } clone wm-handlers set-global
@@ -560,6 +577,7 @@ H{ } clone wm-handlers set-global
 [ handle-wm-buttonup 0   ] WM_LBUTTONUP   add-wm-handler
 [ handle-wm-buttonup 0   ] WM_MBUTTONUP   add-wm-handler
 [ handle-wm-buttonup 0   ] WM_RBUTTONUP   add-wm-handler
+[ handle-wm-dwmcompositionchanged 0   ] WM_DWMCOMPOSITIONCHANGED add-wm-handler
 
 [ 4dup handle-wm-ncbutton DefWindowProc ]
 { WM_NCLBUTTONDOWN WM_NCMBUTTONDOWN WM_NCRBUTTONDOWN
@@ -688,8 +706,9 @@ M: windows-ui-backend (open-window) ( world -- )
     [
         dup
         [ ] [ world>style ] [ world>ex-style ] tri create-window
+        [ ?make-glass ]
         [ ?disable-close-button ]
-        [ [ f f ] dip f f <win> >>handle setup-gl ] 2bi
+        [ [ f f ] dip f f <win> >>handle setup-gl ] 2tri
     ]
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
