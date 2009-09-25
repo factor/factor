@@ -39,6 +39,7 @@ M:: x86.64 %dispatch ( src temp -- )
 : param-reg-1 ( -- reg ) int-regs param-regs first ; inline
 : param-reg-2 ( -- reg ) int-regs param-regs second ; inline
 : param-reg-3 ( -- reg ) int-regs param-regs third ; inline
+: param-reg-4 ( -- reg ) int-regs param-regs fourth ; inline
 
 M: x86.64 pic-tail-reg RBX ;
 
@@ -74,26 +75,13 @@ M: x86.64 %prepare-unbox ( -- )
     param-reg-1 R14 [] MOV
     R14 cell SUB ;
 
-: %vm-invoke-1st-arg ( function -- )
-    param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
-    f %alien-invoke ;
-
-: %vm-invoke-2nd-arg ( function -- )
-    param-reg-2 0 MOV rc-absolute-cell rt-vm rel-fixup
-    f %alien-invoke ;
-
-: %vm-invoke-3rd-arg ( function -- )
-    param-reg-3 0 MOV rc-absolute-cell rt-vm rel-fixup
-    f %alien-invoke ;
-
-: %vm-invoke-4th-arg ( function -- )
-    int-regs param-regs fourth 0 MOV rc-absolute-cell rt-vm rel-fixup
-    f %alien-invoke ;
-
+: %mov-vm-ptr ( reg -- )
+    0 MOV rc-absolute-cell rt-vm rel-fixup ;
 
 M:: x86.64 %unbox ( n rep func -- )
+    param-reg-2 %mov-vm-ptr
     ! Call the unboxer
-    func %vm-invoke-2nd-arg
+    func f %alien-invoke
     ! Store the return value on the C stack if this is an
     ! alien-invoke, otherwise leave it the return register if
     ! this is the end of alien-callback
@@ -109,10 +97,10 @@ M: x86.64 %unbox-long-long ( n func -- )
         { float-regs [ float-regs get pop swap MOVSD ] }
     } case ;
 
-
 M: x86.64 %unbox-small-struct ( c-type -- )
     ! Alien must be in param-reg-1.
-    "alien_offset" %vm-invoke-2nd-arg
+    param-reg-2 %mov-vm-ptr
+    "alien_offset" f %alien-invoke
     ! Move alien_offset() return value to R11 so that we don't
     ! clobber it.
     R11 RAX MOV
@@ -126,8 +114,9 @@ M:: x86.64 %unbox-large-struct ( n c-type -- )
     param-reg-2 n param@ LEA
     ! Load structure size into param-reg-3
     param-reg-3 c-type heap-size MOV
+    param-reg-4 %mov-vm-ptr
     ! Copy the struct to the C stack
-    "to_value_struct" %vm-invoke-4th-arg ;
+    "to_value_struct" f %alien-invoke ;
 
 : load-return-value ( rep -- )
     [ [ 0 ] dip reg-class-of param-reg ]
@@ -143,7 +132,8 @@ M:: x86.64 %box ( n rep func -- )
     ] [
         rep load-return-value
     ] if
-    rep int-rep? [ func %vm-invoke-2nd-arg ] [ func %vm-invoke-1st-arg ] if ;
+    rep int-rep? [ param-reg-2 ] [ param-reg-1 ] if %mov-vm-ptr
+    func f %alien-invoke ;
 
 M: x86.64 %box-long-long ( n func -- )
     [ int-rep ] dip %box ;
@@ -163,7 +153,8 @@ M: x86.64 %box-small-struct ( c-type -- )
         [ param-reg-3 swap heap-size MOV ] bi
         param-reg-1 0 box-struct-field@ MOV
         param-reg-2 1 box-struct-field@ MOV
-        "box_small_struct" %vm-invoke-4th-arg
+        param-reg-4 %mov-vm-ptr
+        "box_small_struct" f %alien-invoke
     ] with-return-regs ;
 
 : struct-return@ ( n -- operand )
@@ -174,8 +165,9 @@ M: x86.64 %box-large-struct ( n c-type -- )
     param-reg-2 swap heap-size MOV
     ! Compute destination address
     param-reg-1 swap struct-return@ LEA
+    param-reg-3 %mov-vm-ptr
     ! Copy the struct from the C stack
-    "box_value_struct" %vm-invoke-3rd-arg ;
+    "box_value_struct" f %alien-invoke ;
 
 M: x86.64 %prepare-box-struct ( -- )
     ! Compute target address for value struct return
@@ -199,7 +191,8 @@ M: x86.64 %unnest-stacks ( -- )
     "unnest_stacks" f %alien-invoke ;
 
 M: x86.64 %prepare-alien-indirect ( -- )
-    "unbox_alien" %vm-invoke-1st-arg
+    param-reg-1 %mov-vm-ptr
+    "unbox_alien" f %alien-invoke
     RBP RAX MOV ;
 
 M: x86.64 %alien-indirect ( -- )
@@ -207,7 +200,8 @@ M: x86.64 %alien-indirect ( -- )
 
 M: x86.64 %alien-callback ( quot -- )
     param-reg-1 swap %load-reference
-    "c_to_factor" %vm-invoke-2nd-arg ;
+    param-reg-2 %mov-vm-ptr
+    "c_to_factor" f %alien-invoke ;
 
 M: x86.64 %callback-value ( ctype -- )
     ! Save top of data stack
@@ -215,8 +209,9 @@ M: x86.64 %callback-value ( ctype -- )
     ! Save top of data stack
     RSP 8 SUB
     param-reg-1 PUSH
+    param-reg-1 %mov-vm-ptr
     ! Restore data/call/retain stacks
-    "unnest_stacks" %vm-invoke-1st-arg
+    "unnest_stacks" f %alien-invoke
     ! Put former top of data stack in param-reg-1
     param-reg-1 POP
     RSP 8 ADD
@@ -246,7 +241,7 @@ M:: x86.64 %call-gc ( gc-root-count temp1 -- )
     ! Pass number of roots as second parameter
     param-reg-2 gc-root-count MOV
     ! Pass vm as third parameter
-    param-reg-3 0 MOV rc-absolute-cell rt-vm rel-fixup
+    param-reg-3 %mov-vm-ptr
     ! Call GC
     "inline_gc" f %alien-invoke ;
 
