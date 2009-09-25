@@ -138,36 +138,33 @@ ERROR: escaped-char-expected ;
         lexer get advance-char
     ] if ;
 
-DEFER: ((parse-multiline-string))
+DEFER: (parse-multiline-string)
 
 : parse-found-token ( i string token -- )
     [ lexer-before % ] dip
     CHAR: \ = [
-        lexer get [ next-char , ] [ next-char , ] bi ((parse-multiline-string))
+        lexer get [ next-char , ] [ next-char , ] bi (parse-multiline-string)
     ] [
         dup rest-begins? [
             end-string-parse
         ] [
-            lexer get next-char , ((parse-multiline-string))
+            lexer get next-char , (parse-multiline-string)
         ] if
     ] if ;
 
 ERROR: trailing-characters string ;
 
-: ((parse-multiline-string)) ( string -- )
+: (parse-multiline-string) ( string -- )
     lexer get still-parsing? [
         dup first find-next-token [
             parse-found-token
         ] [
             drop lexer get next-line%
-            ((parse-multiline-string))
+            (parse-multiline-string)
         ] if*
     ] [
         unexpected-eof
     ] if ;
-
-: (parse-multiline-string) ( string -- string' )
-    [ ((parse-multiline-string)) ] "" make ;
 
 PRIVATE>
 
@@ -177,4 +174,4 @@ PRIVATE>
         "\"\"\""
     ] [
         "\""
-    ] if (parse-multiline-string) unescape-string ;
+    ] if [ (parse-multiline-string) ] "" make unescape-string ;
