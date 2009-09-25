@@ -133,10 +133,7 @@ inline void factor_vm::primitive_call_clear()
 	throw_impl(dpop(),stack_chain->callstack_bottom,this);
 }
 
-PRIMITIVE(call_clear)
-{
-	PRIMITIVE_GETVM()->primitive_call_clear();
-}
+PRIMITIVE_FORWARD(call_clear)
 
 /* For testing purposes */
 inline void factor_vm::primitive_unimplemented()
@@ -144,10 +141,7 @@ inline void factor_vm::primitive_unimplemented()
 	not_implemented_error();
 }
 
-PRIMITIVE(unimplemented)
-{
-	PRIMITIVE_GETVM()->primitive_unimplemented();
-}
+PRIMITIVE_FORWARD(unimplemented)
 
 void factor_vm::memory_signal_handler_impl()
 {
