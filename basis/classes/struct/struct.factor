@@ -246,10 +246,10 @@ M: struct binary-zero?
     slots empty? [ struct-must-have-slots ] when
     class redefine-struct-tuple-class
     slots make-slots dup check-struct-slots :> slot-specs
-    slot-specs offsets-quot call :> size
     slot-specs struct-align :> alignment
+    slot-specs offsets-quot call alignment align :> size
 
-    class  slot-specs  size alignment align  alignment  c-type-for-class :> c-type
+    class  slot-specs  size  alignment  c-type-for-class :> c-type
 
     c-type class typedef
     class slot-specs define-accessors
