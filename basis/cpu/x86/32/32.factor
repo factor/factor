@@ -38,9 +38,8 @@ M:: x86.32 %dispatch ( src temp -- )
     bi ;
 
 ! Registers for fastcall
-M: x86.32 param-reg-1 EAX ;
-M: x86.32 param-reg-2 EDX ;
-M: x86.32 param-reg-3 ECX ;
+: param-reg-1 ( -- reg ) EAX ;
+: param-reg-2 ( -- reg ) EDX ;
 
 M: x86.32 pic-tail-reg EBX ;
 
