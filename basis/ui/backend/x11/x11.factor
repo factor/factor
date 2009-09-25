@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays ascii assocs
+USING: accessors alien.c-types arrays ascii assocs colors
 classes.struct combinators io.encodings.ascii
 io.encodings.string io.encodings.utf8 kernel literals math
 namespaces sequences strings ui ui.backend ui.clipboards

@@ -369,7 +369,7 @@ cell factor_vm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 	return quot.value();
 }
 
-VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm *myvm)
+VM_ASM_API_OVERFLOW cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->lazy_jit_compile_impl(quot_,stack);

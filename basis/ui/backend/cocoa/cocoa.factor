@@ -7,7 +7,7 @@ cocoa.views cocoa.windows combinators command-line
 core-foundation core-foundation.run-loop core-graphics
 core-graphics.types destructors fry generalizations io.thread
 kernel libc literals locals math math.bitwise math.rectangles memory
-namespaces sequences threads ui
+namespaces sequences threads ui colors
 ui.backend ui.backend.cocoa.views ui.clipboards ui.gadgets
 ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private
 ui.private words.symbol ;
@@ -117,14 +117,21 @@ CONSTANT: window-control>styleMask
         { resize-handles $ NSResizableWindowMask }
         { small-title-bar $[ NSTitledWindowMask NSUtilityWindowMask bitor ] }
         { normal-title-bar $ NSTitledWindowMask }
+        { textured-background $ NSTexturedBackgroundWindowMask }
     }
 
 : world>styleMask ( world -- n )
     window-controls>> window-control>styleMask symbols>flags ;
 
+: make-context-transparent ( view -- )
+    -> openGLContext
+    0 <int> NSOpenGLCPSurfaceOpacity -> setValues:forParameter: ;
+
 M:: cocoa-ui-backend (open-window) ( world -- )
     world [ [ dim>> ] dip <FactorView> ]
     with-world-pixel-format :> view
+    world window-controls>> textured-background swap memq?
+    [ view make-context-transparent ] when
     view world [ world>NSRect ] [ world>styleMask ] bi <ViewWindow> :> window
     view -> release
     world view register-window

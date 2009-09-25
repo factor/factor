@@ -40,7 +40,9 @@ CONSTANT: NSOpenGLPFAScreenMask 84
 CONSTANT: NSOpenGLPFAPixelBuffer 90
 CONSTANT: NSOpenGLPFAAllowOfflineRenderers 96
 CONSTANT: NSOpenGLPFAVirtualScreenCount 128
+
 CONSTANT: NSOpenGLCPSwapInterval 222
+CONSTANT: NSOpenGLCPSurfaceOpacity 236
 
 : <GLView> ( class dim pixel-format -- view )
     [ -> alloc ]

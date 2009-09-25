@@ -20,6 +20,6 @@ PRIMITIVE(gc_stats);
 PRIMITIVE(clear_gc_stats);
 PRIMITIVE(become);
 struct factor_vm;
-VM_ASM_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm);
+VM_ASM_API_OVERFLOW void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm);
 
 }
