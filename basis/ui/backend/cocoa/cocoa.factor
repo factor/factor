@@ -7,7 +7,7 @@ cocoa.views cocoa.windows combinators command-line
 core-foundation core-foundation.run-loop core-graphics
 core-graphics.types destructors fry generalizations io.thread
 kernel libc literals locals math math.bitwise math.rectangles memory
-namespaces sequences threads ui
+namespaces sequences threads ui colors
 ui.backend ui.backend.cocoa.views ui.clipboards ui.gadgets
 ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private
 ui.private words.symbol ;
@@ -57,9 +57,6 @@ M: cocoa-ui-backend (pixel-format-attribute)
     [ drop f ]
     [ first 0 <int> [ swap 0 -> getValues:forAttribute:forVirtualScreen: ] keep *int ]
     if-empty ;
-
-M: cocoa-ui-backend system-background-color
-    T{ rgba f 0.0 0.0 0.0 0.0 } ; inline
 
 TUPLE: pasteboard handle ;
 
@@ -133,7 +130,8 @@ CONSTANT: window-control>styleMask
 M:: cocoa-ui-backend (open-window) ( world -- )
     world [ [ dim>> ] dip <FactorView> ]
     with-world-pixel-format :> view
-    world transparent?>> [ view make-context-transparent ] when
+    world window-controls>> textured-background swap memq?
+    [ view make-context-transparent ] when
     view world [ world>NSRect ] [ world>styleMask ] bi <ViewWindow> :> window
     view -> release
     world view register-window
