@@ -395,6 +395,10 @@ HOOK: %alien-callback cpu ( quot -- )
 
 HOOK: %callback-value cpu ( ctype -- )
 
+HOOK: %nest-stacks cpu ( -- )
+
+HOOK: %unnest-stacks cpu ( -- )
+
 ! Return to caller with stdcall unwinding (only for x86)
 HOOK: %callback-return cpu ( params -- )
 

@@ -190,6 +190,13 @@ M: x86.64 %alien-invoke
     rc-absolute-cell rel-dlsym
     R11 CALL ;
 
+M: x86.64 %nest-stacks ( -- )
+    param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
+    "nest_stacks" f %alien-invoke ;
+
+M: x86.64 %unnest-stacks ( -- )
+    param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
+    "unnest_stacks" f %alien-invoke ;
 
 M: x86.64 %prepare-alien-indirect ( -- )
     "unbox_alien" %vm-invoke-1st-arg

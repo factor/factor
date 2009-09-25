@@ -48,8 +48,7 @@ M: x86.32 reserved-area-size 0 ;
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
 : push-vm-ptr ( -- )
-    temp-reg 0 MOV rc-absolute-cell rt-vm rel-fixup ! push the vm ptr as an argument
-    temp-reg PUSH ;
+    0 PUSH rc-absolute-cell rt-vm rel-fixup ; ! push the vm ptr as an argument
 
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
     c-type
@@ -238,6 +237,18 @@ M:: x86.32 %unbox-large-struct ( n c-type -- )
         "to_value_struct" f %alien-invoke
     ] with-aligned-stack ;
 
+M: x86.32 %nest-stacks ( -- )
+    4 [
+        push-vm-ptr
+        "nest_stacks" f %alien-invoke
+    ] with-aligned-stack ;
+
+M: x86.32 %unnest-stacks ( -- )
+    4 [
+        push-vm-ptr
+        "unnest_stacks" f %alien-invoke
+    ] with-aligned-stack ;
+
 M: x86.32 %prepare-alien-indirect ( -- )
     push-vm-ptr "unbox_alien" f %alien-invoke
     temp-reg POP
@@ -270,6 +281,7 @@ M: x86.32 %callback-value ( ctype -- )
     ESP 12 ADD
     ! Unbox EAX
     unbox-return ;
+
 
 M: x86.32 %cleanup ( params -- )
     #! a) If we just called an stdcall function in Windows, it
