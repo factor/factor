@@ -47,9 +47,9 @@ IN: images.gif.tests
 [ 2 ] [ gif-example3 declared-num-colors ] unit-test
 
 : >index-stream ( gif -- seq )
-    [ image-descriptor>> first-code-size>> ]
-    [ compressed-bytes>> ] bi
-    lzw-uncompress ;
+    [ compressed-bytes>> ]
+    [ image-descriptor>> first-code-size>> ] bi
+    lzw-uncompress-lsb0 ;
 
 [
     BV{
