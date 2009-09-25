@@ -21,6 +21,8 @@ HOOK: (close-offscreen-buffer) ui-backend ( handle -- )
 
 HOOK: raise-window* ui-backend ( world -- )
 
+HOOK: system-background-color ui-backend ( -- color )
+
 GENERIC: select-gl-context ( handle -- )
 
 GENERIC: flush-gl-context ( handle -- )
