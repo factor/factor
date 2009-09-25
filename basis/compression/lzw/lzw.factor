@@ -1,39 +1,29 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors assocs byte-arrays combinators
-io.encodings.binary io.streams.byte-array kernel math sequences
-vectors ;
+USING: accessors combinators io kernel math namespaces
+prettyprint sequences vectors ;
+QUALIFIED-WITH: bitstreams bs
 IN: compression.lzw
 
-QUALIFIED-WITH: bitstreams bs
+SYMBOL: clear-code
+4 clear-code set-global
 
-CONSTANT: clear-code 256
-CONSTANT: end-of-information 257
+SYMBOL: end-of-information
+5 end-of-information set-global
 
-TUPLE: lzw input output table code old-code ;
-
-SYMBOL: table-full
-
-: lzw-bit-width ( n -- n' )
-    {
-        { [ dup 510 <= ] [ drop 9 ] }
-        { [ dup 1022 <= ] [ drop 10 ] }
-        { [ dup 2046 <= ] [ drop 11 ] }
-        { [ dup 4094 <= ] [ drop 12 ] }
-        [ drop table-full ]
-    } cond ;
-
-: lzw-bit-width-uncompress ( lzw -- n )
-    table>> length lzw-bit-width ;
+TUPLE: lzw input output table code old-code initial-code-size code-size ;
 
 : initial-uncompress-table ( -- seq )
-    258 iota [ 1vector ] V{ } map-as ;
+    end-of-information get 1 + iota [ 1vector ] V{ } map-as ;
 
 : reset-lzw-uncompress ( lzw -- lzw )
-    initial-uncompress-table >>table ;
+    initial-uncompress-table >>table
+    dup initial-code-size>> >>code-size ;
 
-: <lzw-uncompress> ( input -- obj )
+: <lzw-uncompress> ( input code-size -- obj )
     lzw new
+        swap >>initial-code-size
+        dup initial-code-size>> >>code-size
         swap >>input
         BV{ } clone >>output
         reset-lzw-uncompress ;
@@ -55,15 +45,28 @@ ERROR: not-in-table value ;
 : write-code ( lzw -- )
     [ lookup-code ] [ output>> ] bi push-all ;
 
-: add-to-table ( seq lzw -- ) table>> push ;
+: kdebug ( lzw -- lzw )
+    dup "TIFF: incrementing code size " write
+    [ code-size>> pprint ] 
+    [ " table length " write table>> length pprint ] bi
+    nl ;
+
+: maybe-increment-code-size ( lzw -- lzw )
+    dup [ table>> length ] [ code-size>> 2^ 1 - ] bi =
+    [ kdebug [ 1 + ] change-code-size ] when ;
+
+: add-to-table ( seq lzw -- )
+    [ table>> push ]
+    [ maybe-increment-code-size 2drop ] 2bi ;
 
 : lzw-read ( lzw -- lzw n )
-    [ ] [ lzw-bit-width-uncompress ] [ input>> ] tri bs:read ;
+    [ ] [ code-size>> ] [ input>> ] tri bs:read ;
 
 DEFER: lzw-uncompress-char
 : handle-clear-code ( lzw -- )
+    "CLEAR CODE" print
     reset-lzw-uncompress
-    lzw-read dup end-of-information = [
+    lzw-read dup end-of-information get = [
         2drop
     ] [
         >>code
@@ -91,10 +94,10 @@ DEFER: lzw-uncompress-char
 : lzw-uncompress-char ( lzw -- )
     lzw-read [
         >>code
-        dup code>> end-of-information = [
+        dup code>> end-of-information get = [
             drop
         ] [
-            dup code>> clear-code = [
+            dup code>> clear-code get = [
                 handle-clear-code
             ] [
                 handle-uncompress-code
@@ -105,7 +108,19 @@ DEFER: lzw-uncompress-char
         drop
     ] if* ;
 
-: lzw-uncompress ( seq -- byte-array )
-    bs:<msb0-bit-reader>
+: register-special-codes ( first-code-size -- first-code-size )
+    [
+        1 - 2^ dup clear-code set
+        1 + end-of-information set
+    ] keep ;
+
+: lzw-uncompress ( bitstream code-size -- byte-array )
+    register-special-codes
     <lzw-uncompress>
     [ lzw-uncompress-char ] [ output>> ] bi ;
+
+: lzw-uncompress-msb0 ( seq code-size -- byte-array )
+    [ bs:<msb0-bit-reader> ] dip lzw-uncompress ;
+
+: lzw-uncompress-lsb0 ( seq code-size -- byte-array )
+    [ bs:<lsb0-bit-reader> ] dip lzw-uncompress ;
