@@ -271,7 +271,7 @@ M: _gc generate-insn
         [ data-values>> save-data-regs ]
         [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
         [ [ temp1>> ] [ temp2>> ] bi t %save-context ]
-        [ tagged-values>> length %call-gc ]
+        [ [ tagged-values>> length ] [ temp1>> ] bi %call-gc ]
         [ [ tagged-values>> ] [ temp1>> ] bi load-gc-roots ]
         [ data-values>> load-data-regs ]
     } cleave

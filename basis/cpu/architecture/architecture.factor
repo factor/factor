@@ -296,7 +296,7 @@ HOOK: %write-barrier cpu ( src card# table -- )
 HOOK: %check-nursery cpu ( label temp1 temp2 -- )
 HOOK: %save-gc-root cpu ( gc-root register -- )
 HOOK: %load-gc-root cpu ( gc-root register -- )
-HOOK: %call-gc cpu ( gc-root-count -- )
+HOOK: %call-gc cpu ( gc-root-count temp1 -- )
 
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
