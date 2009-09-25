@@ -9,10 +9,7 @@ inline void factor_vm::primitive_getenv()
 	drepl(userenv[e]);
 }
 
-PRIMITIVE(getenv)
-{
-	PRIMITIVE_GETVM()->primitive_getenv();
-}
+PRIMITIVE_FORWARD(getenv)
 
 inline void factor_vm::primitive_setenv()
 {
@@ -21,40 +18,28 @@ inline void factor_vm::primitive_setenv()
 	userenv[e] = value;
 }
 
-PRIMITIVE(setenv)
-{
-	PRIMITIVE_GETVM()->primitive_setenv();
-}
+PRIMITIVE_FORWARD(setenv)
 
 inline void factor_vm::primitive_exit()
 {
 	exit(to_fixnum(dpop()));
 }
 
-PRIMITIVE(exit)
-{
-	PRIMITIVE_GETVM()->primitive_exit();
-}
+PRIMITIVE_FORWARD(exit)
 
 inline void factor_vm::primitive_micros()
 {
 	box_unsigned_8(current_micros());
 }
 
-PRIMITIVE(micros)
-{
-	PRIMITIVE_GETVM()->primitive_micros();
-}
+PRIMITIVE_FORWARD(micros)
 
 inline void factor_vm::primitive_sleep()
 {
 	sleep_micros(to_cell(dpop()));
 }
 
-PRIMITIVE(sleep)
-{
-	PRIMITIVE_GETVM()->primitive_sleep();
-}
+PRIMITIVE_FORWARD(sleep)
 
 inline void factor_vm::primitive_set_slot()
 {
@@ -66,10 +51,7 @@ inline void factor_vm::primitive_set_slot()
 	write_barrier(obj);
 }
 
-PRIMITIVE(set_slot)
-{
-	PRIMITIVE_GETVM()->primitive_set_slot();
-}
+PRIMITIVE_FORWARD(set_slot)
 
 inline void factor_vm::primitive_load_locals()
 {
@@ -79,10 +61,7 @@ inline void factor_vm::primitive_load_locals()
 	rs += sizeof(cell) * count;
 }
 
-PRIMITIVE(load_locals)
-{
-	PRIMITIVE_GETVM()->primitive_load_locals();
-}
+PRIMITIVE_FORWARD(load_locals)
 
 cell factor_vm::clone_object(cell obj_)
 {
@@ -104,9 +83,6 @@ inline void factor_vm::primitive_clone()
 	drepl(clone_object(dpeek()));
 }
 
-PRIMITIVE(clone)
-{
-	PRIMITIVE_GETVM()->primitive_clone();
-}
+PRIMITIVE_FORWARD(clone)
 
 }

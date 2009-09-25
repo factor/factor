@@ -39,10 +39,7 @@ inline void factor_vm::primitive_word()
 	dpush(tag<word>(allot_word(vocab,name)));
 }
 
-PRIMITIVE(word)
-{
-	PRIMITIVE_GETVM()->primitive_word();
-}
+PRIMITIVE_FORWARD(word)
 
 /* word-xt ( word -- start end ) */
 inline void factor_vm::primitive_word_xt()
@@ -53,10 +50,7 @@ inline void factor_vm::primitive_word_xt()
 	dpush(allot_cell((cell)code + code->size));
 }
 
-PRIMITIVE(word_xt)
-{
-	PRIMITIVE_GETVM()->primitive_word_xt();
-}
+PRIMITIVE_FORWARD(word_xt)
 
 /* Allocates memory */
 void factor_vm::update_word_xt(cell w_)
@@ -85,10 +79,7 @@ inline void factor_vm::primitive_optimized_p()
 	drepl(tag_boolean(word_optimized_p(untag_check<word>(dpeek()))));
 }
 
-PRIMITIVE(optimized_p)
-{
-	PRIMITIVE_GETVM()->primitive_optimized_p();
-}
+PRIMITIVE_FORWARD(optimized_p)
 
 inline void factor_vm::primitive_wrapper()
 {
@@ -97,9 +88,6 @@ inline void factor_vm::primitive_wrapper()
 	drepl(tag<wrapper>(new_wrapper));
 }
 
-PRIMITIVE(wrapper)
-{
-	PRIMITIVE_GETVM()->primitive_wrapper();
-}
+PRIMITIVE_FORWARD(wrapper)
 
 }

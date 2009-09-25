@@ -52,10 +52,7 @@ inline void factor_vm::primitive_fopen()
 	}
 }
 
-PRIMITIVE(fopen)
-{
-	PRIMITIVE_GETVM()->primitive_fopen();
-}
+PRIMITIVE_FORWARD(fopen)
 
 inline void factor_vm::primitive_fgetc()
 {
@@ -82,10 +79,7 @@ inline void factor_vm::primitive_fgetc()
 	}
 }
 
-PRIMITIVE(fgetc)
-{
-	PRIMITIVE_GETVM()->primitive_fgetc();
-}
+PRIMITIVE_FORWARD(fgetc)
 
 inline void factor_vm::primitive_fread()
 {
@@ -127,10 +121,7 @@ inline void factor_vm::primitive_fread()
 	}
 }
 
-PRIMITIVE(fread)
-{
-	PRIMITIVE_GETVM()->primitive_fread();
-}
+PRIMITIVE_FORWARD(fread)
 
 inline void factor_vm::primitive_fputc()
 {
@@ -150,10 +141,7 @@ inline void factor_vm::primitive_fputc()
 	}
 }
 
-PRIMITIVE(fputc)
-{
-	PRIMITIVE_GETVM()->primitive_fputc();
-}
+PRIMITIVE_FORWARD(fputc)
 
 inline void factor_vm::primitive_fwrite()
 {
@@ -184,10 +172,7 @@ inline void factor_vm::primitive_fwrite()
 	}
 }
 
-PRIMITIVE(fwrite)
-{
-	PRIMITIVE_GETVM()->primitive_fwrite();
-}
+PRIMITIVE_FORWARD(fwrite)
 
 inline void factor_vm::primitive_fseek()
 {
@@ -214,10 +199,7 @@ inline void factor_vm::primitive_fseek()
 	}
 }
 
-PRIMITIVE(fseek)
-{
-	PRIMITIVE_GETVM()->primitive_fseek();
-}
+PRIMITIVE_FORWARD(fseek)
 
 inline void factor_vm::primitive_fflush()
 {
@@ -231,10 +213,7 @@ inline void factor_vm::primitive_fflush()
 	}
 }
 
-PRIMITIVE(fflush)
-{
-	PRIMITIVE_GETVM()->primitive_fflush();
-}
+PRIMITIVE_FORWARD(fflush)
 
 inline void factor_vm::primitive_fclose()
 {
@@ -248,10 +227,7 @@ inline void factor_vm::primitive_fclose()
 	}
 }
 
-PRIMITIVE(fclose)
-{
-	PRIMITIVE_GETVM()->primitive_fclose();
-}
+PRIMITIVE_FORWARD(fclose)
 
 /* This function is used by FFI I/O. Accessing the errno global directly is
 not portable, since on some libc's errno is not a global but a funky macro that

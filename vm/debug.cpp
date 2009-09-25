@@ -484,9 +484,6 @@ inline void factor_vm::primitive_die()
 	factorbug();
 }
 
-PRIMITIVE(die)
-{
-	PRIMITIVE_GETVM()->primitive_die();
-}
+PRIMITIVE_FORWARD(die)
 
 }
