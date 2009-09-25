@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax unix.types unix.stat classes.struct ;
+USING: alien.syntax alien.c-types unix.types unix.stat classes.struct ;
 IN: unix.statfs.freebsd
 
 CONSTANT: MFSNAMELEN      16            ! length of type name including null */

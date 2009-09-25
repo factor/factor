@@ -27,9 +27,10 @@ PREDICATE: struct-class < tuple-class
 
 M: struct-class valid-superclass? drop f ;
 
-GENERIC: struct-slots ( struct-class -- slots )
+SLOT: fields
 
-M: struct-class struct-slots "struct-slots" word-prop ;
+: struct-slots ( struct-class -- slots )
+    "c-type" word-prop fields>> ;
 
 ! struct allocation
 
@@ -175,16 +176,15 @@ M: struct-c-type c-struct? drop t ;
     [ \ clone-underlying swap literalize \ memory>struct [ ] 3sequence ] bi
     define-inline-method ;
 
-: c-type-for-class ( class -- c-type )
-    struct-c-type new swap {
-        [ drop byte-array >>class ]
-        [ >>boxed-class ]
-        [ struct-slots >>fields ]
-        [ "struct-size" word-prop >>size ]
-        [ "struct-align" word-prop >>align ]
-        [ (unboxer-quot) >>unboxer-quot ]
-        [ (boxer-quot) >>boxer-quot ]
-    } cleave ;
+:: c-type-for-class ( class slots size align -- c-type )
+    struct-c-type new
+        byte-array >>class
+        class >>boxed-class
+        slots >>fields
+        size >>size
+        align >>align
+        class (unboxer-quot) >>unboxer-quot
+        class (boxer-quot)   >>boxer-quot ;
     
 : align-offset ( offset class -- offset' )
     c-type-align align ;
@@ -221,7 +221,7 @@ M: struct binary-zero?
 
 : make-struct-prototype ( class -- prototype )
     dup struct-needs-prototype? [
-        [ "struct-size" word-prop <byte-array> ]
+        [ "c-type" word-prop size>> <byte-array> ]
         [ memory>struct ]
         [ struct-slots ] tri
         [
@@ -236,35 +236,26 @@ M: struct binary-zero?
     [ (define-clone-method) ]
     bi ;
 
-: (struct-word-props) ( class slots size align -- )
-    [
-        [ "struct-slots" set-word-prop ]
-        [ define-accessors ] 2bi
-    ]
-    [ "struct-size" set-word-prop ]
-    [ "struct-align" set-word-prop ] tri-curry*
-    [ tri ] 3curry
-    [ dup make-struct-prototype "prototype" set-word-prop ]
-    [ (struct-methods) ] tri ;
-
 : check-struct-slots ( slots -- )
     [ type>> c-type drop ] each ;
 
 : redefine-struct-tuple-class ( class -- )
     [ dup class? [ forget-class ] [ drop ] if ] [ struct f define-tuple-class ] bi ;
 
-: (define-struct-class) ( class slots offsets-quot -- )
-    [ 
-        empty?
-        [ struct-must-have-slots ]
-        [ redefine-struct-tuple-class ] if
-    ]
-    swap '[
-        make-slots dup
-        [ check-struct-slots ] _ [ struct-align [ align ] keep ] tri
-        (struct-word-props)
-    ]
-    [ drop [ c-type-for-class ] keep typedef ] 2tri ; inline
+:: (define-struct-class) ( class slots offsets-quot -- )
+    slots empty? [ struct-must-have-slots ] when
+    class redefine-struct-tuple-class
+    slots make-slots dup check-struct-slots :> slot-specs
+    slot-specs struct-align :> alignment
+    slot-specs offsets-quot call alignment align :> size
+
+    class  slot-specs  size  alignment  c-type-for-class :> c-type
+
+    c-type class typedef
+    class slot-specs define-accessors
+    class size "struct-size" set-word-prop
+    class dup make-struct-prototype "prototype" set-word-prop
+    class (struct-methods) ; inline
 PRIVATE>
 
 : define-struct-class ( class slots -- )
