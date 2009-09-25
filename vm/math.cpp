@@ -838,7 +838,7 @@ inline void factor_vm::overflow_fixnum_add(fixnum x, fixnum y)
 		untag_fixnum(x) + untag_fixnum(y))));
 }
 
-VM_ASM_API_OVERFLOW void overflow_fixnum_add(fixnum x, fixnum y, factor_vm *myvm)
+VM_ASM_API void overflow_fixnum_add(fixnum x, fixnum y, factor_vm *myvm)
 {
 	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_add(x,y);
 }
@@ -849,7 +849,7 @@ inline void factor_vm::overflow_fixnum_subtract(fixnum x, fixnum y)
 		untag_fixnum(x) - untag_fixnum(y))));
 }
 
-VM_ASM_API_OVERFLOW void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm *myvm)
+VM_ASM_API void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm *myvm)
 {
 	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_subtract(x,y);
 }
@@ -863,7 +863,7 @@ inline void factor_vm::overflow_fixnum_multiply(fixnum x, fixnum y)
 	drepl(tag<bignum>(bignum_multiply(bx,by)));
 }
 
-VM_ASM_API_OVERFLOW void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm *myvm)
+VM_ASM_API void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm *myvm)
 {
 	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_multiply(x,y);
 }
