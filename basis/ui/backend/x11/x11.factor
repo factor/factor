@@ -64,7 +64,7 @@ M: x11-ui-backend (pixel-format-attribute)
     ] if-empty ;
 
 M: x11-ui-backend system-background-color
-    T{ rgba f 0.0 0.0 0.0 0.0 } ; inline
+    T{ rgba f 1.0 1.0 1.0 0.0 } ; inline
 
 CONSTANT: modifiers
     {
