@@ -74,7 +74,7 @@ name>char-hook [
 
 <PRIVATE
 
-: lexer-before ( i -- before )
+: lexer-subseq ( i -- before )
     [
         [
             lexer get
@@ -102,7 +102,7 @@ ERROR: escaped-char-expected ;
         escaped-char-expected
     ] if ;
 
-: rest-begins? ( string -- ? )
+: lexer-head? ( string -- ? )
     [
         lexer get [ line-text>> ] [ column>> ] bi tail-slice
     ] dip head? ;
@@ -141,11 +141,11 @@ ERROR: escaped-char-expected ;
 DEFER: (parse-multiline-string)
 
 : parse-found-token ( i string token -- )
-    [ lexer-before % ] dip
+    [ lexer-subseq % ] dip
     CHAR: \ = [
         lexer get [ next-char , ] [ next-char , ] bi (parse-multiline-string)
     ] [
-        dup rest-begins? [
+        dup lexer-head? [
             end-string-parse
         ] [
             lexer get next-char , (parse-multiline-string)
