@@ -225,9 +225,9 @@ ERROR: unhandled-data byte ;
     ] with-input-stream ;
 
 : decompress ( loading-gif -- indexes )
-    [ image-descriptor>> first-code-size>> ]
-    [ compressed-bytes>> ] bi
-    lzw-uncompress ;
+    [ compressed-bytes>> ]
+    [ image-descriptor>> first-code-size>> ] bi
+    lzw-uncompress-lsb0 ;
 
 : colorize ( index palette transparent-index/f -- seq )
     pick = [ 2drop B{ 0 0 0 0 } ] [ nth 255 suffix ] if ;

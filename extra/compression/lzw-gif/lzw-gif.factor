@@ -13,8 +13,6 @@ SYMBOL: end-of-information
 
 TUPLE: lzw input output table code old-code initial-code-size code-size ;
 
-SYMBOL: table-full
-
 : initial-uncompress-table ( -- seq )
     end-of-information get 1 + iota [ 1vector ] V{ } map-as ;
 
@@ -22,11 +20,11 @@ SYMBOL: table-full
     initial-uncompress-table >>table
     dup initial-code-size>> >>code-size ;
 
-: <lzw-uncompress> ( code-size input -- obj )
+: <lzw-uncompress> ( input code-size -- obj )
     lzw new
-        swap >>input
         swap >>initial-code-size
         dup initial-code-size>> >>code-size
+        swap >>input
         BV{ } clone >>output
         reset-lzw-uncompress ;
 
@@ -103,14 +101,19 @@ DEFER: lzw-uncompress-char
         drop
     ] if* ;
 
-: register-special-codes ( first-code-size -- )
+: register-special-codes ( first-code-size -- first-code-size )
     [
         1 - 2^ dup clear-code set
         1 + end-of-information set
     ] keep ;
 
-: lzw-uncompress ( code-size seq -- byte-array )
-    [ register-special-codes ] dip
-    bs:<lsb0-bit-reader>
+: lzw-uncompress ( bitstream code-size -- byte-array )
+    register-special-codes
     <lzw-uncompress>
     [ lzw-uncompress-char ] [ output>> ] bi ;
+
+: lzw-uncompress-msb0 ( seq code-size -- byte-array )
+    [ bs:<msb0-bit-reader> ] dip lzw-uncompress ;
+
+: lzw-uncompress-lsb0 ( seq code-size -- byte-array )
+    [ bs:<lsb0-bit-reader> ] dip lzw-uncompress ;
