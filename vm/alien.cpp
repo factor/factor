@@ -69,10 +69,7 @@ inline void factor_vm::primitive_displaced_alien()
 	}
 }
 
-PRIMITIVE(displaced_alien)
-{
-	PRIMITIVE_GETVM()->primitive_displaced_alien();
-}
+PRIMITIVE_FORWARD(displaced_alien)
 
 /* address of an object representing a C pointer. Explicitly throw an error
 if the object is a byte array, as a sanity check. */
@@ -81,10 +78,7 @@ inline void factor_vm::primitive_alien_address()
 	box_unsigned_cell((cell)pinned_alien_offset(dpop()));
 }
 
-PRIMITIVE(alien_address)
-{
-	PRIMITIVE_GETVM()->primitive_alien_address();
-}
+PRIMITIVE_FORWARD(alien_address)
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
 void *factor_vm::alien_pointer()
@@ -131,10 +125,7 @@ inline void factor_vm::primitive_dlopen()
 	dpush(library.value());
 }
 
-PRIMITIVE(dlopen)
-{
-	PRIMITIVE_GETVM()->primitive_dlopen();
-}
+PRIMITIVE_FORWARD(dlopen)
 
 /* look up a symbol in a native library */
 inline void factor_vm::primitive_dlsym()
@@ -158,10 +149,7 @@ inline void factor_vm::primitive_dlsym()
 	}
 }
 
-PRIMITIVE(dlsym)
-{
-	PRIMITIVE_GETVM()->primitive_dlsym();
-}
+PRIMITIVE_FORWARD(dlsym)
 
 /* close a native library handle */
 inline void factor_vm::primitive_dlclose()
@@ -171,10 +159,7 @@ inline void factor_vm::primitive_dlclose()
 		ffi_dlclose(d);
 }
 
-PRIMITIVE(dlclose)
-{
-	PRIMITIVE_GETVM()->primitive_dlclose();
-}
+PRIMITIVE_FORWARD(dlclose)
 
 inline void factor_vm::primitive_dll_validp()
 {
@@ -185,10 +170,7 @@ inline void factor_vm::primitive_dll_validp()
 		dpush(untag_check<dll>(library)->dll == NULL ? F : T);
 }
 
-PRIMITIVE(dll_validp)
-{
-	PRIMITIVE_GETVM()->primitive_dll_validp();
-}
+PRIMITIVE_FORWARD(dll_validp)
 
 /* gets the address of an object representing a C pointer */
 char *factor_vm::alien_offset(cell obj)
@@ -308,9 +290,6 @@ inline void factor_vm::primitive_vm_ptr()
 	box_alien(this);
 }
 
-PRIMITIVE(vm_ptr)
-{
-	PRIMITIVE_GETVM()->primitive_vm_ptr();
-}
+PRIMITIVE_FORWARD(vm_ptr)
 
 }

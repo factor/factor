@@ -106,10 +106,7 @@ inline void factor_vm::primitive_modify_code_heap()
 	update_code_heap_words();
 }
 
-PRIMITIVE(modify_code_heap)
-{
-	PRIMITIVE_GETVM()->primitive_modify_code_heap();
-}
+PRIMITIVE_FORWARD(modify_code_heap)
 
 /* Push the free space and total size of the code heap */
 inline void factor_vm::primitive_code_room()
@@ -122,10 +119,7 @@ inline void factor_vm::primitive_code_room()
 	dpush(tag_fixnum(max_free / 1024));
 }
 
-PRIMITIVE(code_room)
-{
-	PRIMITIVE_GETVM()->primitive_code_room();
-}
+PRIMITIVE_FORWARD(code_room)
 
 code_block *factor_vm::forward_xt(code_block *compiled)
 {
