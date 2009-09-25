@@ -84,11 +84,6 @@ name>char-hook [
         lexer get (>>column)
     ] bi ;
 
-: find-next-token ( ch -- i elt )
-    CHAR: \ 2array
-    [ lexer get [ column>> ] [ line-text>> ] bi ] dip
-    [ member? ] curry find-from ;
-
 : rest-of-line ( lexer -- seq )
     [ line-text>> ] [ column>> ] bi tail-slice ;
 
@@ -107,10 +102,6 @@ ERROR: escaped-char-expected ;
         escaped-char-expected
     ] if ;
 
-: next-line% ( lexer -- )
-    [ rest-of-line % ]
-    [ next-line "\n" % ] bi ;
-
 : rest-begins? ( string -- ? )
     [
         lexer get [ line-text>> ] [ column>> ] bi tail-slice
@@ -118,6 +109,15 @@ ERROR: escaped-char-expected ;
 
 : advance-lexer ( n -- )
     [ lexer get ] dip [ + ] curry change-column drop ; inline
+
+: find-next-token ( ch -- i elt )
+    CHAR: \ 2array
+    [ lexer get [ column>> ] [ line-text>> ] bi ] dip
+    [ member? ] curry find-from ;
+
+: next-line% ( lexer -- )
+    [ rest-of-line % ]
+    [ next-line "\n" % ] bi ;
 
 : take-double-quotes ( -- string )
     lexer get dup current-char CHAR: " = [
@@ -138,38 +138,38 @@ ERROR: escaped-char-expected ;
         lexer get advance-char
     ] if ;
 
-DEFER: (parse-long-string)
+DEFER: ((parse-multiline-string))
 
 : parse-found-token ( i string token -- )
     [ lexer-before % ] dip
     CHAR: \ = [
-        lexer get [ next-char , ] [ next-char , ] bi (parse-long-string)
+        lexer get [ next-char , ] [ next-char , ] bi ((parse-multiline-string))
     ] [
         dup rest-begins? [
             end-string-parse
         ] [
-            lexer get next-char , (parse-long-string)
+            lexer get next-char , ((parse-multiline-string))
         ] if
     ] if ;
 
 ERROR: trailing-characters string ;
 
-: (parse-long-string) ( string -- )
+: ((parse-multiline-string)) ( string -- )
     lexer get still-parsing? [
         dup first find-next-token [
             parse-found-token
         ] [
             drop lexer get next-line%
-            (parse-long-string)
+            ((parse-multiline-string))
         ] if*
     ] [
         unexpected-eof
     ] if ;
 
-PRIVATE>
+: (parse-multiline-string) ( string -- string' )
+    [ ((parse-multiline-string)) ] "" make ;
 
-: parse-long-string ( string -- string' )
-    [ (parse-long-string) ] "" make ;
+PRIVATE>
 
 : parse-multiline-string ( -- string )
     lexer get rest-of-line "\"\"" head? [
@@ -177,4 +177,4 @@ PRIVATE>
         "\"\"\""
     ] [
         "\""
-    ] if parse-long-string unescape-string ;
+    ] if (parse-multiline-string) unescape-string ;
