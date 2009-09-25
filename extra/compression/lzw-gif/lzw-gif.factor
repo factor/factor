@@ -45,9 +45,15 @@ ERROR: not-in-table value ;
 : write-code ( lzw -- )
     [ lookup-code ] [ output>> ] bi push-all ;
 
+: kdebug ( lzw -- lzw )
+    dup "GIF: incrementing code size " write
+    [ code-size>> pprint ] 
+    [ " table length " write table>> length pprint ] bi
+    nl ;
+
 : maybe-increment-code-size ( lzw -- lzw )
     dup [ table>> length ] [ code-size>> 2^ ] bi =
-    [ [ 1 + ] change-code-size ] when ;
+    [ kdebug [ 1 + ] change-code-size ] when ;
 
 : add-to-table ( seq lzw -- )
     [ table>> push ]
@@ -58,6 +64,7 @@ ERROR: not-in-table value ;
 
 DEFER: lzw-uncompress-char
 : handle-clear-code ( lzw -- )
+    "CLEAR CODE" print
     reset-lzw-uncompress
     lzw-read dup end-of-information get = [
         2drop
