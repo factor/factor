@@ -52,11 +52,6 @@ M: x86 stack-frame-size ( stack-frame -- i )
 ! use in calls in and out of C
 HOOK: temp-reg cpu ( -- reg )
 
-! Fastcall calling convention
-HOOK: param-reg-1 cpu ( -- reg )
-HOOK: param-reg-2 cpu ( -- reg )
-HOOK: param-reg-3 cpu ( -- reg )
-
 HOOK: pic-tail-reg cpu ( -- reg )
 
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
