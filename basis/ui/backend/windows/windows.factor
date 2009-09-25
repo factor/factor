@@ -165,11 +165,6 @@ M: windows-ui-backend (pixel-format-attribute)
     over world>> has-wglChoosePixelFormatARB?
     [ arb-pixel-format-attribute ] [ pfd-pixel-format-attribute ] if ;
 
-M: windows-ui-backend system-background-color
-    composition-enabled?
-    [ T{ rgba f 0.0 0.0 0.0 0.0 } ]
-    [ COLOR_BTNFACE GetSysColor RGB>color ] if ;
-
 PRIVATE>
 
 : lo-word ( wparam -- lo ) <short> *short ; inline
@@ -538,10 +533,18 @@ SYMBOL: nc-buttons
     #! message sent if mouse leaves main application 
     4drop forget-rollover ;
 
+: system-background-color ( -- color )
+    COLOR_BTNFACE GetSysColor RGB>color ;
+
 : ?make-glass ( world hwnd -- )
-    swap { [ transparent?>> ] [ drop windows-major 6 >= ] } 1&&
-    [ full-window-margins DwmExtendFrameIntoClientArea drop ]
-    [ drop ] if ;
+    over {
+        [ composition-enabled? ]
+        [ window-controls>> textured-background swap memq? ]
+    } 1&&
+    [
+        full-window-margins DwmExtendFrameIntoClientArea drop
+        T{ rgba f 0.0 0.0 0.0 0.0 }
+    ] [ system-background-color ] if >>background-color ;
 
 : handle-wm-dwmcompositionchanged ( hWnd uMsg wParam lParam -- )
     3drop [ window ] keep ?make-glass ;
