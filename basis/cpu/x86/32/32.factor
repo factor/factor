@@ -311,6 +311,19 @@ M: x86.32 %callback-return ( n -- )
         [ drop 0 ]
     } cond RET ;
 
+M:: x86.32 %call-gc ( gc-root-count -- )
+    EAX gc-root-base param@ LEA
+    12 [
+        push-vm-ptr
+        ! Pass number of roots as second parameter
+        temp-reg gc-root-count MOV
+        temp-reg PUSH 
+        ! Pass pointer to start of GC roots as first parameter
+        EAX PUSH 
+        ! Call GC
+        "inline_gc" f %alien-invoke
+    ] with-aligned-stack ;
+
 M: x86.32 dummy-stack-params? f ;
 
 M: x86.32 dummy-int-params? f ;
