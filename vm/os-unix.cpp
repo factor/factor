@@ -21,9 +21,8 @@ pthread_key_t tlsKey = 0;
 
 void init_platform_globals()
 {
-	if (pthread_key_create(&tlsKey, NULL) != 0){
+	if (pthread_key_create(&tlsKey, NULL) != 0)
 		fatal_error("pthread_key_create() failed",0);
-	}
 
 }
 
@@ -74,8 +73,6 @@ void factor_vm::ffi_dlclose(dll *dll)
 		general_error(ERROR_FFI,F,F,NULL);
 	dll->dll = NULL;
 }
-
-
 
 inline void factor_vm::primitive_existsp()
 {
