@@ -63,9 +63,6 @@ M: x11-ui-backend (pixel-format-attribute)
         0 <int> [ glXGetConfig drop ] keep *int
     ] if-empty ;
 
-M: x11-ui-backend system-background-color
-    T{ rgba f 1.0 1.0 1.0 0.0 } ; inline
-
 CONSTANT: modifiers
     {
         { S+ HEX: 1 }
