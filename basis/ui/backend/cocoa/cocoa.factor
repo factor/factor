@@ -58,9 +58,6 @@ M: cocoa-ui-backend (pixel-format-attribute)
     [ first 0 <int> [ swap 0 -> getValues:forAttribute:forVirtualScreen: ] keep *int ]
     if-empty ;
 
-M: cocoa-ui-backend system-background-color
-    T{ rgba f 0.0 0.0 0.0 0.0 } ; inline
-
 TUPLE: pasteboard handle ;
 
 C: <pasteboard> pasteboard
@@ -133,7 +130,8 @@ CONSTANT: window-control>styleMask
 M:: cocoa-ui-backend (open-window) ( world -- )
     world [ [ dim>> ] dip <FactorView> ]
     with-world-pixel-format :> view
-    world transparent?>> [ view make-context-transparent ] when
+    world window-controls>> textured-background swap memq?
+    [ view make-context-transparent ] when
     view world [ world>NSRect ] [ world>styleMask ] bi <ViewWindow> :> window
     view -> release
     world view register-window
