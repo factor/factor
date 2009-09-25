@@ -378,9 +378,15 @@ TYPEDEF: DWORD* LPCOLORREF
 
 : RGB ( r g b -- COLORREF )
     { 16 8 0 } bitfield ; inline
+: >RGB< ( COLORREF -- r g b )
+    [           HEX: ff bitand ]
+    [  -8 shift HEX: ff bitand ]
+    [ -16 shift HEX: ff bitand ] tri ;
 
 : color>RGB ( color -- COLORREF )
     >rgba-components drop [ 255 * >integer ] tri@ RGB ;
+: RGB>color ( COLORREF -- color )
+    >RGB< [ 1/255. * >float ] tri@ 1.0 <rgba> ;
 
 STRUCT: TEXTMETRICW
     { tmHeight LONG }
