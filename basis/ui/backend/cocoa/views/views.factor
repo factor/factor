@@ -401,7 +401,7 @@ CLASS: {
 
 { "isOpaque" "char" { "id" "SEL" }
     [
-        drop window transparent?>> not >c-bool
+        2drop 0
     ]
 }
 
