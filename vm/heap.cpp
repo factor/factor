@@ -14,7 +14,7 @@ void heap::clear_free_list()
 heap::heap(factor_vm *myvm_, cell size)
 {
 	myvm = myvm_;
-	seg = myvm->alloc_segment(myvm->align_page(size));
+	seg = new segment(myvm,align_page(size));
 	if(!seg) fatal_error("Out of memory in new_heap",size);
 	clear_free_list();
 }

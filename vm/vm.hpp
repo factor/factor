@@ -5,9 +5,6 @@ namespace factor
 
 struct factor_vm : factor_vm_data {
 
-	// segments
-	inline cell align_page(cell a);
-
 	// contexts
 	void reset_datastack();
 	void reset_retainstack();
@@ -127,11 +124,8 @@ struct factor_vm : factor_vm_data {
 	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factor_vm *), unsigned int radix, int negative_p);
 
 	//data_heap
-	cell init_zone(zone *z, cell size, cell start);
 	void init_card_decks();
-	data_heap *alloc_data_heap(cell gens, cell young_size,cell aging_size,cell tenured_size);
 	data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
-	void dealloc_data_heap(data_heap *data);
 	void clear_cards(cell from, cell to);
 	void clear_decks(cell from, cell to);
 	void clear_allot_markers(cell from, cell to);
@@ -560,14 +554,12 @@ struct factor_vm : factor_vm_data {
 	void ffi_dlopen(dll *dll);
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);
 	void ffi_dlclose(dll *dll);
-	segment *alloc_segment(cell size);
 	void c_to_factor_toplevel(cell quot);
 
 	// os-windows
   #if defined(WINDOWS)
 	void sleep_micros(u64 usec);
 	long getpagesize();
-	void dealloc_segment(segment *block);
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);

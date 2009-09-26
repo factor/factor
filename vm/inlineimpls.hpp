@@ -4,13 +4,6 @@ namespace factor
 // I've had to copy inline implementations here to make dependencies work. Am hoping to move this code back into include files
 // once the rest of the reentrant changes are done. -PD
 
-// segments.hpp
-
-inline cell factor_vm::align_page(cell a)
-{
-	return align(a,getpagesize());
-}
-
 // write_barrier.hpp
 
 inline card *factor_vm::addr_to_card(cell a)

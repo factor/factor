@@ -43,9 +43,9 @@ context *factor_vm::alloc_context()
 	}
 	else
 	{
-		new_context = (context *)safe_malloc(sizeof(context));
-		new_context->datastack_region = alloc_segment(ds_size);
-		new_context->retainstack_region = alloc_segment(rs_size);
+		new_context = new context;
+		new_context->datastack_region = new segment(this,ds_size);
+		new_context->retainstack_region = new segment(this,rs_size);
 	}
 
 	return new_context;

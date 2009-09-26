@@ -18,6 +18,7 @@ void early_init() { }
 #define SUFFIX ".image"
 #define SUFFIX_LEN 6
 
+/* You must delete[] the result yourself. */
 const char *default_image_path()
 {
 	const char *path = vm_executable_path();
@@ -31,7 +32,7 @@ const char *default_image_path()
 	const char *iter = path;
 	while(*iter) { len++; iter++; }
 
-	char *new_path = (char *)safe_malloc(PATH_MAX + SUFFIX_LEN + 1);
+	char *new_path = new char[PATH_MAX + SUFFIX_LEN + 1];
 	memcpy(new_path,path,len + 1);
 	memcpy(new_path + len,SUFFIX,SUFFIX_LEN + 1);
 	return new_path;

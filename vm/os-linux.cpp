@@ -3,10 +3,10 @@
 namespace factor
 {
 
-/* Snarfed from SBCL linux-so.c. You must free() this yourself. */
+/* Snarfed from SBCL linux-so.c. You must delete[] the result yourself. */
 const char *vm_executable_path()
 {
-	char *path = (char *)safe_malloc(PATH_MAX + 1);
+	char *path = new char[PATH_MAX + 1];
 
 	int size = readlink("/proc/self/exe", path, PATH_MAX);
 	if (size < 0)
