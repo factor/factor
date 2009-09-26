@@ -25,11 +25,11 @@ HELP: lzw-read
 }
 { $description "Read the next LZW code." } ;
 
-HELP: lzw-read*
+HELP: lzw-process-next-code
 { $values
     { "lzw" lzw } { "quot" quotation }
 }
-{ $description "Read the next LZW code and call " { $snippet "quot" } " with the lzw object and the LZW code only if the code is neither the Clear Code nor the End of Information Code. If it does read a Clear Code, this combinator will take care of handling the Clear Code for you." } ;
+{ $description "Read the next LZW code and, assuming that the code is neither the Clear Code nor the End of Information Code, conditionally processes it by calling " { $snippet "quot" } " with the lzw object and the LZW code. If it does read a Clear Code, this combinator will take care of handling the Clear Code for you." } ;
 
 HELP: <lzw-uncompress>
 { $values

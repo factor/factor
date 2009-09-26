@@ -75,7 +75,7 @@ M: gif-lzw code-space-full?
 : clear-code? ( lzw code -- ? ) swap clear-code>> = ;
 
 DEFER: handle-clear-code
-: lzw-read* ( lzw quot: ( lzw code -- ) -- )
+: lzw-process-next-code ( lzw quot: ( lzw code -- ) -- )
     [ lzw-read ] dip {
         { [ 3dup drop end-of-information? ] [ 3drop ] }
         { [ 3dup drop clear-code? ] [ 2drop handle-clear-code ] }
@@ -90,7 +90,7 @@ DEFER: lzw-uncompress-char
         [ write-code ]
         [ code>old-code ] bi
         lzw-uncompress-char
-    ] lzw-read* ;
+    ] lzw-process-next-code ;
 
 : handle-uncompress-code ( lzw -- lzw )
     dup code-in-table? [
@@ -109,7 +109,8 @@ DEFER: lzw-uncompress-char
     ] if ;
     
 : lzw-uncompress-char ( lzw -- )
-    [ >>code handle-uncompress-code lzw-uncompress-char ] lzw-read* ;
+    [ >>code handle-uncompress-code lzw-uncompress-char ]
+    lzw-process-next-code ;
 
 : lzw-uncompress ( bitstream code-size class -- byte-array )
     <lzw-uncompress>
