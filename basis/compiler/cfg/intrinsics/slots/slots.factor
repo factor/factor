@@ -10,7 +10,7 @@ IN: compiler.cfg.intrinsics.slots
 
 : (emit-slot) ( infos -- dst )
     [ 2inputs ^^offset>slot ] [ first value-tag ] bi*
-    ^^slot ;
+    ^^sub-imm ^^slot ;
 
 : (emit-slot-imm) ( infos -- dst )
     ds-drop
@@ -29,7 +29,7 @@ IN: compiler.cfg.intrinsics.slots
 
 : (emit-set-slot) ( infos -- obj-reg )
     [ 3inputs ^^offset>slot ] [ second value-tag ] bi*
-    pick [ next-vreg ##set-slot ] dip ;
+    ^^sub-imm over [ ##set-slot ] dip ;
 
 : (emit-set-slot-imm) ( infos -- obj-reg )
     ds-drop
