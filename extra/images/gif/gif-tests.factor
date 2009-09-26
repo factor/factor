@@ -32,7 +32,7 @@ IN: images.gif.tests
         gif-example1 gif-example2 gif-example3 gif-example4 gif-example5
         gif-example6
     }
-    [ execute( -- gif ) loading-gif>image image. ] each ;
+    [ execute( -- gif ) gif>image image. ] each ;
 
 : declared-num-colors ( gif -- n ) flags>> 3 bits 1 + 2^ ;
 : actual-num-colors ( gif -- n ) global-color-table>> length ;
@@ -71,7 +71,7 @@ IN: images.gif.tests
         0 0 0 255 255 255 255 255 0 0 0 255 0 0 0 255 255 255 255 255 0 0 0 255
         0 0 0 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 0 0 0 255
     }
-] [ gif-example3 loading-gif>image bitmap>> ] unit-test
+] [ gif-example3 gif>image bitmap>> ] unit-test
 
 [
     BV{
@@ -85,7 +85,7 @@ IN: images.gif.tests
         255 000 000 255     000 000 000 000
         000 000 000 000     255 000 000 255
     }
-] [ gif-example5 loading-gif>image bitmap>> ] unit-test
+] [ gif-example5 gif>image bitmap>> ] unit-test
 
 [ 100 ] [ gif-example1 >index-stream length ] unit-test
 [ 870 ] [ gif-example2 >index-stream length ] unit-test
