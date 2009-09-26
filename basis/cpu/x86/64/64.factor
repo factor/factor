@@ -235,12 +235,12 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     func f %alien-invoke
     dst float-function-return ;
 
-M:: x86.64 %call-gc ( gc-root-count temp1 -- )
+M:: x86.64 %call-gc ( gc-root-count temp -- )
     ! Pass pointer to start of GC roots as first parameter
     param-reg-1 gc-root-base param@ LEA
     ! Pass number of roots as second parameter
     param-reg-2 gc-root-count MOV
-    ! Pass vm as third parameter
+    ! Pass VM ptr as third parameter
     param-reg-3 %mov-vm-ptr
     ! Call GC
     "inline_gc" f %alien-invoke ;

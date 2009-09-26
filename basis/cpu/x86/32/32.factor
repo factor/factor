@@ -314,15 +314,15 @@ M: x86.32 %callback-return ( n -- )
         [ drop 0 ]
     } cond RET ;
 
-M:: x86.32 %call-gc ( gc-root-count temp1 -- )
-    ! USE: prettyprint "PHIL" pprint temp1 pprint temp2 pprint
-    temp1 gc-root-base param@ LEA
+M:: x86.32 %call-gc ( gc-root-count temp -- )
+    temp gc-root-base param@ LEA
     12 [
-        0 PUSH rc-absolute-cell rt-vm rel-fixup ! push the vm ptr as an argument
+        ! Pass the VM ptr as the third parameter
+        0 PUSH rc-absolute-cell rt-vm rel-fixup
         ! Pass number of roots as second parameter
         gc-root-count PUSH 
         ! Pass pointer to start of GC roots as first parameter
-        temp1 PUSH 
+        temp PUSH 
         ! Call GC
         "inline_gc" f %alien-invoke
     ] with-aligned-stack ;

@@ -510,7 +510,7 @@ M:: ppc %save-gc-root ( gc-root register -- )
 M:: ppc %load-gc-root ( gc-root register -- )
     register 1 gc-root gc-root@ LWZ ;
 
-M:: ppc %call-gc ( gc-root-count -- )
+M:: ppc %call-gc ( gc-root-count temp -- )
     3 1 gc-root-base local@ ADDI
     gc-root-count 4 LI
     "inline_gc" f %alien-invoke ;
