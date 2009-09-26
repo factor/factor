@@ -135,10 +135,10 @@ CONSTANT: cpus
 : requirements ( builder -- xml )
     [
         os>> {
-            { "winnt" "Windows XP (also tested on Vista)" }
+            { "winnt" "Windows XP, Windows Vista or Windows 7" }
             { "macosx" "Mac OS X 10.5 Leopard" }
             { "linux" "Ubuntu Linux 9.04 (other distributions may also work)" }
-            { "freebsd" "FreeBSD 7.0" }
+            { "freebsd" "FreeBSD 7.1" }
             { "netbsd" "NetBSD 5.0" }
             { "openbsd" "OpenBSD 4.4" }
         } at
@@ -146,7 +146,7 @@ CONSTANT: cpus
         dup cpu>> "x86.32" = [
             os>> {
                 { [ dup { "winnt" "linux" "freebsd"  "netbsd" } member? ] [ drop "Intel Pentium 4, Core Duo, or other x86 chip with SSE2 support. Note that 32-bit Athlon XP processors do not support SSE2." ] }
-                { [ dup {"openbsd" } member? ] [ drop "Intel Pentium Pro or better" ] }
+                { [ dup { "openbsd" } member? ] [ drop "Intel Pentium Pro or better" ] }
                 { [ t ] [ drop f ] }
             } cond
         ] [ drop f ] if

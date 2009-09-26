@@ -297,7 +297,7 @@ void factor_vm::dump_code_heap()
 {
 	cell reloc_size = 0, literal_size = 0;
 
-	heap_block *scan = first_block(&code);
+	heap_block *scan = code->first_block();
 
 	while(scan)
 	{
@@ -326,7 +326,7 @@ void factor_vm::dump_code_heap()
 		print_cell_hex(scan->size); print_string(" ");
 		print_string(status); print_string("\n");
 
-		scan = next_block(&code,scan);
+		scan = code->next_block(scan);
 	}
 	
 	print_cell(reloc_size); print_string(" bytes of relocation data\n");
@@ -484,9 +484,6 @@ inline void factor_vm::primitive_die()
 	factorbug();
 }
 
-PRIMITIVE(die)
-{
-	PRIMITIVE_GETVM()->primitive_die();
-}
+PRIMITIVE_FORWARD(die)
 
 }

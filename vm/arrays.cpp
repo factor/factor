@@ -31,10 +31,7 @@ inline void factor_vm::primitive_array()
 	dpush(tag<array>(allot_array(size,initial)));
 }
 
-PRIMITIVE(array)
-{
-	PRIMITIVE_GETVM()->primitive_array();
-}
+PRIMITIVE_FORWARD(array)
 
 cell factor_vm::allot_array_1(cell obj_)
 {
@@ -75,10 +72,7 @@ inline void factor_vm::primitive_resize_array()
 	dpush(tag<array>(reallot_array(a,capacity)));
 }
 
-PRIMITIVE(resize_array)
-{
-	PRIMITIVE_GETVM()->primitive_resize_array();
-}
+PRIMITIVE_FORWARD(resize_array)
 
 void growable_array::add(cell elt_)
 {

@@ -57,6 +57,7 @@ enum special_object {
 	JIT_EXECUTE_WORD,
 	JIT_EXECUTE_JUMP,
 	JIT_EXECUTE_CALL,
+	JIT_DECLARE_WORD,
 
 	/* Polymorphic inline cache generation in inline_cache.c */
 	PIC_LOAD            = 47,

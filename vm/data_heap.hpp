@@ -9,6 +9,14 @@ struct zone {
 	cell here;
 	cell size;
 	cell end;
+	
+	cell init_zone(cell size_, cell start_)
+	{
+		size = size_;
+		start = here = start_;
+		end = start_ + size_;
+		return end;
+	}
 };
 
 struct data_heap {
@@ -23,14 +31,14 @@ struct data_heap {
 	zone *generations;
 	zone *semispaces;
 
-	cell *allot_markers;
-	cell *allot_markers_end;
+	char *allot_markers;
+	char *allot_markers_end;
 
-	cell *cards;
-	cell *cards_end;
+	char *cards;
+	char *cards_end;
 
-	cell *decks;
-	cell *decks_end;
+	char *decks;
+	char *decks_end;
 	
 	/* the 0th generation is where new objects are allocated. */
 	cell nursery() { return 0; }
@@ -42,6 +50,9 @@ struct data_heap {
 	cell tenured() { return gen_count - 1; }
 	
 	bool have_aging_p() { return gen_count > 2; }
+
+	data_heap(factor_vm *myvm, cell gen_count, cell young_size, cell aging_size, cell tenured_size);
+	~data_heap();
 };
 
 static const cell max_gen_count = 3;
@@ -50,11 +61,6 @@ inline static bool in_zone(zone *z, object *pointer)
 {
 	return (cell)pointer >= z->start && (cell)pointer < z->end;
 }
-
-/* set up guard pages to check for under/overflow.
-size must be a multiple of the page size */
-segment *alloc_segment(cell size);    //  defined in OS-*.cpp files PD
-void dealloc_segment(segment *block);
 
 PRIMITIVE(data_room);
 PRIMITIVE(size);

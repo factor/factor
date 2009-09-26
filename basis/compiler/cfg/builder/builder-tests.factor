@@ -4,6 +4,7 @@ compiler.tree.optimizer compiler.cfg.builder compiler.cfg.debugger
 compiler.cfg.optimizer compiler.cfg.predecessors compiler.cfg.checker
 compiler.cfg arrays locals byte-arrays kernel.private math
 slots.private vectors sbufs strings math.partial-dispatch
+hashtables assocs combinators.short-circuit
 strings.private accessors compiler.cfg.instructions ;
 IN: compiler.cfg.builder.tests
 
@@ -205,3 +206,6 @@ IN: compiler.cfg.builder.tests
         [ [ ##box-float? ] contains-insn? ] bi
     ] unit-test
 ] when
+
+! Regression. Make sure everything is inlined correctly
+[ f ] [ M\ hashtable set-at [ { [ ##call? ] [ word>> \ set-slot eq? ] } 1&& ] contains-insn? ] unit-test

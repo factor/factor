@@ -6,12 +6,12 @@ namespace factor
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size)
 {
-	new_heap(&code,size);
+	code = new heap(this,size);
 }
 
 bool factor_vm::in_code_heap_p(cell ptr)
 {
-	return (ptr >= code.seg->start && ptr <= code.seg->end);
+	return (ptr >= code->seg->start && ptr <= code->seg->end);
 }
 
 /* Compile a word definition with the non-optimizing compiler. Allocates memory */
@@ -31,13 +31,13 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocate)
 /* Apply a function to every code block */
 void factor_vm::iterate_code_heap(code_heap_iterator iter)
 {
-	heap_block *scan = first_block(&code);
+	heap_block *scan = code->first_block();
 
 	while(scan)
 	{
 		if(scan->status != B_FREE)
 			iter((code_block *)scan,this);
-		scan = next_block(&code,scan);
+		scan = code->next_block(scan);
 	}
 }
 
@@ -106,26 +106,20 @@ inline void factor_vm::primitive_modify_code_heap()
 	update_code_heap_words();
 }
 
-PRIMITIVE(modify_code_heap)
-{
-	PRIMITIVE_GETVM()->primitive_modify_code_heap();
-}
+PRIMITIVE_FORWARD(modify_code_heap)
 
 /* Push the free space and total size of the code heap */
 inline void factor_vm::primitive_code_room()
 {
 	cell used, total_free, max_free;
-	heap_usage(&code,&used,&total_free,&max_free);
-	dpush(tag_fixnum(code.seg->size / 1024));
+	code->heap_usage(&used,&total_free,&max_free);
+	dpush(tag_fixnum(code->seg->size / 1024));
 	dpush(tag_fixnum(used / 1024));
 	dpush(tag_fixnum(total_free / 1024));
 	dpush(tag_fixnum(max_free / 1024));
 }
 
-PRIMITIVE(code_room)
-{
-	PRIMITIVE_GETVM()->primitive_code_room();
-}
+PRIMITIVE_FORWARD(code_room)
 
 code_block *factor_vm::forward_xt(code_block *compiled)
 {
@@ -226,20 +220,20 @@ void factor_vm::compact_code_heap()
 	gc();
 
 	/* Figure out where the code heap blocks are going to end up */
-	cell size = compute_heap_forwarding(&code, forwarding);
+	cell size = code->compute_heap_forwarding(forwarding);
 
 	/* Update word and quotation code pointers */
 	forward_object_xts();
 
 	/* Actually perform the compaction */
-	compact_heap(&code,forwarding);
+	code->compact_heap(forwarding);
 
 	/* Update word and quotation XTs */
 	fixup_object_xts();
 
 	/* Now update the free list; there will be a single free block at
 	the end */
-	build_free_list(&code,size);
+	code->build_free_list(size);
 }
 
 }
