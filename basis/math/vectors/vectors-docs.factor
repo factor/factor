@@ -209,11 +209,13 @@ HELP: vbitxor
 
 HELP: vlshift
 { $values { "u" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
-{ $description "Shifts each element of " { $snippet "u" } " to the left by " { $snippet "n" } " bits." } ;
+{ $description "Shifts each element of " { $snippet "u" } " to the left by " { $snippet "n" } " bits." }
+{ $notes "Undefined behavior will result if " { $snippet "n" } " is negative." } ;
 
 HELP: vrshift
 { $values { "u" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
-{ $description "Shifts each element of " { $snippet "u" } " to the right by " { $snippet "n" } " bits." } ;
+{ $description "Shifts each element of " { $snippet "u" } " to the right by " { $snippet "n" } " bits." }
+{ $notes "Undefined behavior will result if " { $snippet "n" } " is negative." } ;
 
 HELP: norm-sq
 { $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
