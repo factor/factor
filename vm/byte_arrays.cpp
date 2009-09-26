@@ -16,10 +16,7 @@ inline void factor_vm::primitive_byte_array()
 	dpush(tag<byte_array>(allot_byte_array(size)));
 }
 
-PRIMITIVE(byte_array)
-{
-	PRIMITIVE_GETVM()->primitive_byte_array();
-}
+PRIMITIVE_FORWARD(byte_array)
 
 inline void factor_vm::primitive_uninitialized_byte_array()
 {
@@ -27,10 +24,7 @@ inline void factor_vm::primitive_uninitialized_byte_array()
 	dpush(tag<byte_array>(allot_array_internal<byte_array>(size)));
 }
 
-PRIMITIVE(uninitialized_byte_array)
-{
-	PRIMITIVE_GETVM()->primitive_uninitialized_byte_array();
-}
+PRIMITIVE_FORWARD(uninitialized_byte_array)
 
 inline void factor_vm::primitive_resize_byte_array()
 {
@@ -39,10 +33,7 @@ inline void factor_vm::primitive_resize_byte_array()
 	dpush(tag<byte_array>(reallot_array(array,capacity)));
 }
 
-PRIMITIVE(resize_byte_array)
-{
-	PRIMITIVE_GETVM()->primitive_resize_byte_array();
-}
+PRIMITIVE_FORWARD(resize_byte_array)
 
 void growable_byte_array::append_bytes(void *elts, cell len)
 {

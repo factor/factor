@@ -222,10 +222,7 @@ inline void factor_vm::primitive_size()
 	box_unsigned_cell(object_size(dpop()));
 }
 
-PRIMITIVE(size)
-{
-	PRIMITIVE_GETVM()->primitive_size();
-}
+PRIMITIVE_FORWARD(size)
 
 /* The number of cells from the start of the object which should be scanned by
 the GC. Some types have a binary payload at the end (string, word, DLL) which
@@ -284,10 +281,7 @@ inline void factor_vm::primitive_data_room()
 	dpush(a.elements.value());
 }
 
-PRIMITIVE(data_room)
-{
-	PRIMITIVE_GETVM()->primitive_data_room();
-}
+PRIMITIVE_FORWARD(data_room)
 
 /* Disables GC and activates next-object ( -- obj ) primitive */
 void factor_vm::begin_scan()
@@ -306,10 +300,7 @@ inline void factor_vm::primitive_begin_scan()
 	begin_scan();
 }
 
-PRIMITIVE(begin_scan)
-{
-	PRIMITIVE_GETVM()->primitive_begin_scan();
-}
+PRIMITIVE_FORWARD(begin_scan)
 
 cell factor_vm::next_object()
 {
@@ -330,10 +321,7 @@ inline void factor_vm::primitive_next_object()
 	dpush(next_object());
 }
 
-PRIMITIVE(next_object)
-{
-	PRIMITIVE_GETVM()->primitive_next_object();
-}
+PRIMITIVE_FORWARD(next_object)
 
 /* Re-enables GC */
 inline void factor_vm::primitive_end_scan()
@@ -341,10 +329,7 @@ inline void factor_vm::primitive_end_scan()
 	gc_off = false;
 }
 
-PRIMITIVE(end_scan)
-{
-	PRIMITIVE_GETVM()->primitive_end_scan();
-}
+PRIMITIVE_FORWARD(end_scan)
 
 template<typename TYPE> void factor_vm::each_object(TYPE &functor)
 {

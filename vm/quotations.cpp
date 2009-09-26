@@ -295,10 +295,7 @@ inline void factor_vm::primitive_jit_compile()
 	jit_compile(dpop(),true);
 }
 
-PRIMITIVE(jit_compile)
-{
-	PRIMITIVE_GETVM()->primitive_jit_compile();
-}
+PRIMITIVE_FORWARD(jit_compile)
 
 /* push a new quotation on the stack */
 inline void factor_vm::primitive_array_to_quotation()
@@ -312,10 +309,7 @@ inline void factor_vm::primitive_array_to_quotation()
 	drepl(tag<quotation>(quot));
 }
 
-PRIMITIVE(array_to_quotation)
-{
-	PRIMITIVE_GETVM()->primitive_array_to_quotation();
-}
+PRIMITIVE_FORWARD(array_to_quotation)
 
 inline void factor_vm::primitive_quotation_xt()
 {
@@ -323,10 +317,7 @@ inline void factor_vm::primitive_quotation_xt()
 	drepl(allot_cell((cell)quot->xt));
 }
 
-PRIMITIVE(quotation_xt)
-{
-	PRIMITIVE_GETVM()->primitive_quotation_xt();
-}
+PRIMITIVE_FORWARD(quotation_xt)
 
 void factor_vm::compile_all_words()
 {
@@ -369,7 +360,7 @@ cell factor_vm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 	return quot.value();
 }
 
-VM_ASM_API_OVERFLOW cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm *myvm)
+VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->lazy_jit_compile_impl(quot_,stack);
@@ -382,9 +373,6 @@ inline void factor_vm::primitive_quot_compiled_p()
 	dpush(tag_boolean(quot->code != NULL));
 }
 
-PRIMITIVE(quot_compiled_p)
-{
-	PRIMITIVE_GETVM()->primitive_quot_compiled_p();
-}
+PRIMITIVE_FORWARD(quot_compiled_p)
 
 }

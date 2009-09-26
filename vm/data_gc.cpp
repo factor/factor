@@ -573,10 +573,7 @@ inline void factor_vm::primitive_gc()
 	gc();
 }
 
-PRIMITIVE(gc)
-{
-	PRIMITIVE_GETVM()->primitive_gc();
-}
+PRIMITIVE_FORWARD(gc)
 
 inline void factor_vm::primitive_gc_stats()
 {
@@ -608,10 +605,7 @@ inline void factor_vm::primitive_gc_stats()
 	dpush(result.elements.value());
 }
 
-PRIMITIVE(gc_stats)
-{
-	PRIMITIVE_GETVM()->primitive_gc_stats();
-}
+PRIMITIVE_FORWARD(gc_stats)
 
 void factor_vm::clear_gc_stats()
 {
@@ -629,10 +623,7 @@ inline void factor_vm::primitive_clear_gc_stats()
 	clear_gc_stats();
 }
 
-PRIMITIVE(clear_gc_stats)
-{
-	PRIMITIVE_GETVM()->primitive_clear_gc_stats();
-}
+PRIMITIVE_FORWARD(clear_gc_stats)
 
 /* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
    to coalesce equal but distinct quotations and wrappers. */
@@ -665,10 +656,7 @@ inline void factor_vm::primitive_become()
 	compile_all_words();
 }
 
-PRIMITIVE(become)
-{
-	PRIMITIVE_GETVM()->primitive_become();
-}
+PRIMITIVE_FORWARD(become)
 
 void factor_vm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 {
@@ -681,7 +669,7 @@ void factor_vm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 		gc_locals.pop_back();
 }
 
-VM_ASM_API_OVERFLOW void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm)
+VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm)
 {
 	ASSERTVM();
 	VM_PTR->inline_gc(gc_roots_base,gc_roots_size);
