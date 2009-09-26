@@ -381,24 +381,6 @@ struct factor_vm : factor_vm_data {
 	inline void primitive_fflush();
 	inline void primitive_fclose();
 
-	//code_gc
-	void clear_free_list(heap *heap);
-	void new_heap(heap *heap, cell size);
-	void add_to_free_list(heap *heap, free_heap_block *block);
-	void build_free_list(heap *heap, cell size);
-	void assert_free_block(free_heap_block *block);
-	free_heap_block *find_free_block(heap *heap, cell size);
-	free_heap_block *split_free_block(heap *heap, free_heap_block *block, cell size);
-	heap_block *heap_allot(heap *heap, cell size);
-	void heap_free(heap *heap, heap_block *block);
-	void mark_block(heap_block *block);
-	void unmark_marked(heap *heap);
-	void free_unmarked(heap *heap, heap_iterator iter);
-	void heap_usage(heap *heap, cell *used, cell *total_free, cell *max_free);
-	cell heap_size(heap *heap);
-	cell compute_heap_forwarding(heap *heap, unordered_map<heap_block *,char *> &forwarding);
-	void compact_heap(heap *heap, unordered_map<heap_block *,char *> &forwarding);
-
 	//code_block
 	relocation_type relocation_type_of(relocation_entry r);
 	relocation_class relocation_class_of(relocation_entry r);

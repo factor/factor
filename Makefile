@@ -38,7 +38,6 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/byte_arrays.o \
 	vm/callstack.o \
 	vm/code_block.o \
-	vm/code_gc.o \
 	vm/code_heap.o \
 	vm/contexts.o \
 	vm/data_gc.o \
@@ -47,6 +46,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/dispatch.o \
 	vm/errors.o \
 	vm/factor.o \
+	vm/heap.o \
 	vm/image.o \
 	vm/inline_cache.o \
 	vm/io.o \

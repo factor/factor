@@ -371,7 +371,7 @@ void factor_vm::update_word_references(code_block *compiled)
 	   the code heap with dead PICs that will be freed on the next
 	   GC, we add them to the free list immediately. */
 	else if(compiled->type == PIC_TYPE)
-		heap_free(&code,compiled);
+		code->heap_free(compiled);
 	else
 	{
 		iterate_relocations(compiled,factor::update_word_references_step);
@@ -411,7 +411,7 @@ void factor_vm::mark_code_block(code_block *compiled)
 {
 	check_code_address((cell)compiled);
 
-	mark_block(compiled);
+	code->mark_block(compiled);
 
 	copy_handle(&compiled->literals);
 	copy_handle(&compiled->relocation);
@@ -503,19 +503,19 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 /* Might GC */
 code_block *factor_vm::allot_code_block(cell size)
 {
-	heap_block *block = heap_allot(&code,size + sizeof(code_block));
+	heap_block *block = code->heap_allot(size + sizeof(code_block));
 
 	/* If allocation failed, do a code GC */
 	if(block == NULL)
 	{
 		gc();
-		block = heap_allot(&code,size + sizeof(code_block));
+		block = code->heap_allot(size + sizeof(code_block));
 
 		/* Insufficient room even after code GC, give up */
 		if(block == NULL)
 		{
 			cell used, total_free, max_free;
-			heap_usage(&code,&used,&total_free,&max_free);
+			code->heap_usage(&used,&total_free,&max_free);
 
 			print_string("Code heap stats:\n");
 			print_string("Used: "); print_cell(used); nl();

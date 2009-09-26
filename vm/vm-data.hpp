@@ -83,8 +83,8 @@ struct factor_vm_data {
 	cell bignum_neg_one;	
 
 	//code_heap
-	heap code;
-	unordered_map<heap_block *,char *> forwarding;
+	heap *code;
+	unordered_map<heap_block *, char *> forwarding;
 
 	//image
 	cell code_relocation_base;
