@@ -46,15 +46,29 @@ insn-classes get [
         { [ dup not ] [ drop \ f tag-number ##load-immediate ] }
         { [ dup fixnum? ] [ tag-fixnum ##load-immediate ] }
         [ ##load-reference ]
-    } cond ; inline
+    } cond ;
 
 : ^^unbox-c-ptr ( src class -- dst )
-    [ next-vreg dup ] 2dip next-vreg ##unbox-c-ptr ; inline
+    [ next-vreg dup ] 2dip next-vreg ##unbox-c-ptr ;
 
-: ^^neg ( src -- dst ) [ 0 ^^load-literal ] dip ^^sub ; inline
-: ^^allot-tuple ( n -- dst ) 2 + cells tuple ^^allot ; inline
-: ^^allot-array ( n -- dst ) 2 + cells array ^^allot ; inline
-: ^^allot-byte-array ( n -- dst ) 2 cells + byte-array ^^allot ; inline
-: ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] [ any-rep ^^copy ] if ; inline
-: ^^tag-fixnum ( src -- dst ) tag-bits get ^^shl-imm ; inline
-: ^^untag-fixnum ( src -- dst ) tag-bits get ^^sar-imm ; inline
+: ^^neg ( src -- dst )
+    [ 0 ^^load-literal ] dip ^^sub ;
+
+: ^^allot-tuple ( n -- dst )
+    2 + cells tuple ^^allot ;
+
+: ^^allot-array ( n -- dst )
+    2 + cells array ^^allot ;
+
+: ^^allot-byte-array ( n -- dst )
+    2 cells + byte-array ^^allot ;
+
+: ^^offset>slot ( tag slot -- vreg' )
+    cell 4 = [ 1 ^^shr-imm ] [ any-rep ^^copy ] if
+    swap ^^sub-imm ;
+
+: ^^tag-fixnum ( src -- dst )
+    tag-bits get ^^shl-imm ;
+
+: ^^untag-fixnum ( src -- dst )
+    tag-bits get ^^sar-imm ;
