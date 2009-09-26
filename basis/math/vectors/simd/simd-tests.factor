@@ -81,9 +81,13 @@ CONSTANT: simd-classes
 : check-optimizer ( seq inputs quot eq-quot -- )
     '[
         @
-        [ "print-mr" get [ nip test-mr mr. ] [ 2drop ] if ]
-        [ [ call ] dip call ]
-        [ [ call ] dip compile-call ] 2tri @ not
+        {
+            [ "print-mr" get [ nip test-mr mr. ] [ 2drop ] if ]
+            [ "print-checks" get [ [ . ] bi@ ] [ 2drop ] if ]
+            [ [ call ] dip call ]
+            [ [ call ] dip compile-call ]
+        } 2cleave
+        @ not
     ] filter ; inline
 
 "== Checking -new constructors" print
