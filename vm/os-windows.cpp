@@ -129,7 +129,12 @@ segment::~segment()
 		myvm->fatal_error("Segment deallocation failed",0);
 }
 
-long factor_vm::getpagesize()
+void factor_vm::sleep_micros(u64 usec)
+{
+	Sleep((DWORD)(usec / 1000));
+}
+
+long getpagesize()
 {
 	static long g_pagesize = 0;
 	if (! g_pagesize)
@@ -139,11 +144,6 @@ long factor_vm::getpagesize()
 		g_pagesize = system_info.dwPageSize;
 	}
 	return g_pagesize;
-}
-
-void factor_vm::sleep_micros(u64 usec)
-{
-	Sleep((DWORD)(usec / 1000));
 }
 
 }

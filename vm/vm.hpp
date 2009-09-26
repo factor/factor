@@ -559,7 +559,6 @@ struct factor_vm : factor_vm_data {
 	// os-windows
   #if defined(WINDOWS)
 	void sleep_micros(u64 usec);
-	long getpagesize();
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
