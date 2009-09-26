@@ -93,9 +93,9 @@ void factor_vm::undefined_symbol()
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
 }
 
-void undefined_symbol(factor_vm *myvm)
+void undefined_symbol()
 {
-	return myvm->undefined_symbol();
+	return SIGNAL_VM_PTR()->undefined_symbol();
 }
 
 /* Look up an external library symbol referenced by a compiled code block */

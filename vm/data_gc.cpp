@@ -455,7 +455,7 @@ void factor_vm::end_gc(cell gc_elapsed)
 
 	if(growing_data_heap)
 	{
-		dealloc_data_heap(old_data_heap);
+		delete old_data_heap;
 		old_data_heap = NULL;
 		growing_data_heap = false;
 	}
