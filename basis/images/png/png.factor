@@ -64,22 +64,25 @@ ERROR: bad-checksum ;
     chunks>> [ type>> "IDAT" = ] filter
     [ data>> ] map concat ;
 
-
-: zlib-data ( loading-png -- bytes ) 
-    chunks>> [ type>> "IDAT" = ] find nip data>> ;
-
 ERROR: unknown-color-type n ;
 ERROR: unimplemented-color-type image ;
 
 : inflate-data ( loading-png -- bytes )
-    zlib-data zlib-inflate ; 
+    find-compressed-bytes zlib-inflate ; 
+
+: png-group-width ( loading-png -- n )
+    dup color-type>> {
+        { 2 [ [ bit-depth>> 8 / 3 * ] [ width>> ] bi * 1 + ] }
+        { 6 [ [ bit-depth>> 8 / 4 * ] [ width>> ] bi * 1 + ] }
+        [ unknown-color-type ]
+    } case ;
+
+: png-image-bytes ( loading-png -- byte-array )
+    [ inflate-data ] [ png-group-width ] bi group
+    reverse-png-filter ;
 
 : decode-greyscale ( loading-png -- loading-png )
     unimplemented-color-type ;
-
-: png-image-bytes ( loading-png -- byte-array )
-    [ inflate-data ] [ width>> 3 * 1 + ] bi group
-    reverse-png-filter ;
 
 : decode-truecolor ( loading-png -- loading-png )
     [ <image> ] dip {
@@ -101,13 +104,34 @@ ERROR: unimplemented-color-type image ;
         [ drop RGBA >>component-order ubyte-components >>component-type ]
     } cleave ;
 
+ERROR: invalid-color-type/bit-depth loading-png ;
+
+: validate-bit-depth ( loading-png seq -- loading-png )
+    [ dup bit-depth>> ] dip member?
+    [ invalid-color-type/bit-depth ] unless ;
+
+: validate-greyscale ( loading-png -- loading-png )
+    { 1 2 4 8 16 } validate-bit-depth ;
+
+: validate-truecolor ( loading-png -- loading-png )
+    { 8 16 } validate-bit-depth ;
+
+: validate-indexed-color ( loading-png -- loading-png )
+    { 1 2 4 8 } validate-bit-depth ;
+
+: validate-greyscale-alpha ( loading-png -- loading-png )
+    { 8 16 } validate-bit-depth ;
+
+: validate-truecolor-alpha ( loading-png -- loading-png )
+    { 8 16 } validate-bit-depth ;
+
 : decode-png ( loading-png -- loading-png ) 
     dup color-type>> {
-        { 0 [ decode-greyscale ] }
-        { 2 [ decode-truecolor ] }
-        { 3 [ decode-indexed-color ] }
-        { 4 [ decode-greyscale-alpha ] }
-        { 6 [ decode-truecolor-alpha ] }
+        { 0 [ validate-greyscale decode-greyscale ] }
+        { 2 [ validate-truecolor decode-truecolor ] }
+        { 3 [ validate-indexed-color decode-indexed-color ] }
+        { 4 [ validate-greyscale-alpha decode-greyscale-alpha ] }
+        { 6 [ validate-truecolor-alpha decode-truecolor-alpha ] }
         [ unknown-color-type ]
     } case ;
 
