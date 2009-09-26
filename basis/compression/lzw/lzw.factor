@@ -5,8 +5,6 @@ prettyprint sequences vectors ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.lzw
 
-SYMBOL: current-lzw
-
 TUPLE: lzw
 input
 output
@@ -21,12 +19,11 @@ end-of-information-code ;
 TUPLE: tiff-lzw < lzw ;
 TUPLE: gif-lzw < lzw ;
 
-: initial-uncompress-table ( -- seq )
-    current-lzw get end-of-information-code>> 1 +
+: initial-uncompress-table ( size -- seq )
     iota [ 1vector ] V{ } map-as ;
 
 : reset-lzw-uncompress ( lzw -- lzw )
-    initial-uncompress-table >>table
+    dup end-of-information-code>> 1 + initial-uncompress-table >>table
     dup initial-code-size>> >>code-size ;
 
 : <lzw-uncompress> ( input code-size class -- obj )
@@ -36,7 +33,8 @@ TUPLE: gif-lzw < lzw ;
         dup code-size>> 1 - 2^ >>clear-code
         dup clear-code>> 1 + >>end-of-information-code
         swap >>input
-        BV{ } clone >>output ;
+        BV{ } clone >>output
+        reset-lzw-uncompress ;
 
 ERROR: not-in-table value ;
 
@@ -73,17 +71,26 @@ M: gif-lzw code-space-full?
 : lzw-read ( lzw -- lzw n )
     [ ] [ code-size>> ] [ input>> ] tri bs:read ;
 
+: end-of-information? ( lzw code -- ? ) swap end-of-information-code>> = ;
+: clear-code? ( lzw code -- ? ) swap clear-code>> = ;
+
+DEFER: handle-clear-code
+: lzw-read* ( lzw quot: ( lzw code -- ) -- )
+    [ lzw-read ] dip {
+        { [ 3dup drop end-of-information? ] [ 3drop ] }
+        { [ 3dup drop clear-code? ] [ 2drop handle-clear-code ] }
+        [ call( lzw code -- ) ]
+    } cond ; inline
+
 DEFER: lzw-uncompress-char
 : handle-clear-code ( lzw -- )
     reset-lzw-uncompress
-    lzw-read dup current-lzw get end-of-information-code>> = [
-        2drop
-    ] [
+    [
         >>code
         [ write-code ]
         [ code>old-code ] bi
         lzw-uncompress-char
-    ] if ;
+    ] lzw-read* ;
 
 : handle-uncompress-code ( lzw -- lzw )
     dup code-in-table? [
@@ -102,26 +109,11 @@ DEFER: lzw-uncompress-char
     ] if ;
     
 : lzw-uncompress-char ( lzw -- )
-    lzw-read [
-        >>code
-        dup code>> current-lzw get end-of-information-code>> = [
-            drop
-        ] [
-            dup code>> current-lzw get clear-code>> = [
-                handle-clear-code
-            ] [
-                handle-uncompress-code
-                lzw-uncompress-char
-            ] if
-        ] if
-    ] [
-        drop
-    ] if* ;
+    [ >>code handle-uncompress-code lzw-uncompress-char ] lzw-read* ;
 
 : lzw-uncompress ( bitstream code-size class -- byte-array )
-    <lzw-uncompress> dup current-lzw [
-        [ reset-lzw-uncompress drop ] [ lzw-uncompress-char ] [ output>> ] tri
-    ] with-variable ;
+    <lzw-uncompress>
+    [ lzw-uncompress-char ] [ output>> ] bi ;
 
 : tiff-lzw-uncompress ( seq -- byte-array )
     bs:<msb0-bit-reader> 9 tiff-lzw lzw-uncompress ;
