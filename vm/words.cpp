@@ -44,10 +44,19 @@ PRIMITIVE_FORWARD(word)
 /* word-xt ( word -- start end ) */
 inline void factor_vm::primitive_word_xt()
 {
-	word *w = untag_check<word>(dpop());
-	code_block *code = (profiling_p ? w->profiling : w->code);
-	dpush(allot_cell((cell)code->xt()));
-	dpush(allot_cell((cell)code + code->size));
+	gc_root<word> w(dpop(),this);
+	w.untag_check(this);
+
+	if(profiling_p)
+	{
+		dpush(allot_cell((cell)w->profiling->xt()));
+		dpush(allot_cell((cell)w->profiling + w->profiling->size));
+	}
+	else
+	{
+		dpush(allot_cell((cell)w->code->xt()));
+		dpush(allot_cell((cell)w->code + w->code->size));
+	}
 }
 
 PRIMITIVE_FORWARD(word_xt)
