@@ -45,5 +45,6 @@ inline static void init_signals() {}
 inline static void early_init() {}
 
 s64 current_micros();
+long getpagesize();
 
 }
