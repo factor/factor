@@ -128,10 +128,7 @@ inline void factor_vm::primitive_save_image()
 	save_image((vm_char *)(path.untagged() + 1));
 }
 
-PRIMITIVE(save_image)
-{
-	PRIMITIVE_GETVM()->primitive_save_image();
-}
+PRIMITIVE_FORWARD(save_image)
 
 inline void factor_vm::primitive_save_image_and_exit()
 {
@@ -159,10 +156,7 @@ inline void factor_vm::primitive_save_image_and_exit()
 		exit(1);
 }
 
-PRIMITIVE(save_image_and_exit)
-{	
-	PRIMITIVE_GETVM()->primitive_save_image_and_exit();
-}
+PRIMITIVE_FORWARD(save_image_and_exit)
 
 void factor_vm::data_fixup(cell *cell)
 {

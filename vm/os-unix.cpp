@@ -81,10 +81,7 @@ inline void factor_vm::primitive_existsp()
 	box_boolean(stat(path,&sb) >= 0);
 }
 
-PRIMITIVE(existsp)
-{
-	PRIMITIVE_GETVM()->primitive_existsp();
-}
+PRIMITIVE_FORWARD(existsp)
 
 segment *factor_vm::alloc_segment(cell size)
 {

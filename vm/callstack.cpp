@@ -60,10 +60,7 @@ inline void factor_vm::primitive_callstack()
 	dpush(tag<callstack>(stack));
 }
 
-PRIMITIVE(callstack)
-{
-	PRIMITIVE_GETVM()->primitive_callstack();
-}
+PRIMITIVE_FORWARD(callstack)
 
 inline void factor_vm::primitive_set_callstack()
 {
@@ -78,10 +75,7 @@ inline void factor_vm::primitive_set_callstack()
 	critical_error("Bug in set_callstack()",0);
 }
 
-PRIMITIVE(set_callstack)
-{
-	PRIMITIVE_GETVM()->primitive_set_callstack();
-}
+PRIMITIVE_FORWARD(set_callstack)
 
 code_block *factor_vm::frame_code(stack_frame *frame)
 {
@@ -172,10 +166,7 @@ inline void factor_vm::primitive_callstack_to_array()
 	dpush(accum.frames.elements.value());
 }
 
-PRIMITIVE(callstack_to_array)
-{
-	PRIMITIVE_GETVM()->primitive_callstack_to_array();
-}
+PRIMITIVE_FORWARD(callstack_to_array)
 
 stack_frame *factor_vm::innermost_stack_frame(callstack *stack)
 {
@@ -203,20 +194,14 @@ inline void factor_vm::primitive_innermost_stack_frame_executing()
 	dpush(frame_executing(innermost_stack_frame(untag_check<callstack>(dpop()))));
 }
 
-PRIMITIVE(innermost_stack_frame_executing)
-{
-	PRIMITIVE_GETVM()->primitive_innermost_stack_frame_executing();
-}
+PRIMITIVE_FORWARD(innermost_stack_frame_executing)
 
 inline void factor_vm::primitive_innermost_stack_frame_scan()
 {
 	dpush(frame_scan(innermost_stack_frame_quot(untag_check<callstack>(dpop()))));
 }
 
-PRIMITIVE(innermost_stack_frame_scan)
-{
-	PRIMITIVE_GETVM()->primitive_innermost_stack_frame_scan();
-}
+PRIMITIVE_FORWARD(innermost_stack_frame_scan)
 
 inline void factor_vm::primitive_set_innermost_stack_frame_quot()
 {
@@ -234,10 +219,7 @@ inline void factor_vm::primitive_set_innermost_stack_frame_quot()
 	FRAME_RETURN_ADDRESS(inner) = (char *)quot->xt + offset;
 }
 
-PRIMITIVE(set_innermost_stack_frame_quot)
-{
-	PRIMITIVE_GETVM()->primitive_set_innermost_stack_frame_quot();
-}
+PRIMITIVE_FORWARD(set_innermost_stack_frame_quot)
 
 /* called before entry into Factor code. */
 void factor_vm::save_callstack_bottom(stack_frame *callstack_bottom)
