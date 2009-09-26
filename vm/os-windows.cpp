@@ -96,19 +96,19 @@ inline void factor_vm::primitive_existsp()
 	box_boolean(windows_stat(path));
 }
 
-PRIMITIVE(existsp)
-{
-	PRIMITIVE_GETVM()->primitive_existsp();
-}
+PRIMITIVE_FORWARD(existsp)
 
-segment *factor_vm::alloc_segment(cell size)
+segment::segment(factor_vm *myvm_, cell size_)
 {
+	myvm = myvm_;
+	size = size_;
+
 	char *mem;
 	DWORD ignore;
 
 	if((mem = (char *)VirtualAlloc(NULL, getpagesize() * 2 + size,
 		MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
-		out_of_memory();
+		myvm->out_of_memory();
 
 	if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate low guard page", (cell)mem);
@@ -117,22 +117,16 @@ segment *factor_vm::alloc_segment(cell size)
 		getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate high guard page", (cell)mem);
 
-	segment *block = (segment *)safe_malloc(sizeof(segment));
-
-	block->start = (cell)mem + getpagesize();
-	block->size = size;
-	block->end = block->start + size;
-
-	return block;
+	start = (cell)mem + getpagesize();
+	end = start + size;
 }
 
-void factor_vm::dealloc_segment(segment *block)
+segment::~segment()
 {
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
-	if(!VirtualFree((void*)(block->start - si.dwPageSize), 0, MEM_RELEASE))
-		fatal_error("dealloc_segment failed",0);
-	free(block);
+	if(!VirtualFree((void*)(start - si.dwPageSize), 0, MEM_RELEASE))
+		myvm->fatal_error("Segment deallocation failed",0);
 }
 
 long factor_vm::getpagesize()

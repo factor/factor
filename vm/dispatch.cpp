@@ -120,10 +120,7 @@ inline void factor_vm::primitive_lookup_method()
 	dpush(lookup_method(obj,methods));
 }
 
-PRIMITIVE(lookup_method)
-{
-	PRIMITIVE_GETVM()->primitive_lookup_method();
-}
+PRIMITIVE_FORWARD(lookup_method)
 
 cell factor_vm::object_class(cell obj)
 {
@@ -169,20 +166,14 @@ inline void factor_vm::primitive_mega_cache_miss()
 	dpush(method);
 }
 
-PRIMITIVE(mega_cache_miss)
-{
-	PRIMITIVE_GETVM()->primitive_mega_cache_miss();
-}
+PRIMITIVE_FORWARD(mega_cache_miss)
 
 inline void factor_vm::primitive_reset_dispatch_stats()
 {
 	megamorphic_cache_hits = megamorphic_cache_misses = 0;
 }
 
-PRIMITIVE(reset_dispatch_stats)
-{
-	PRIMITIVE_GETVM()->primitive_reset_dispatch_stats();
-}
+PRIMITIVE_FORWARD(reset_dispatch_stats)
 
 inline void factor_vm::primitive_dispatch_stats()
 {
@@ -193,10 +184,7 @@ inline void factor_vm::primitive_dispatch_stats()
 	dpush(stats.elements.value());
 }
 
-PRIMITIVE(dispatch_stats)
-{
-	PRIMITIVE_GETVM()->primitive_dispatch_stats();
-}
+PRIMITIVE_FORWARD(dispatch_stats)
 
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cache_)
 {

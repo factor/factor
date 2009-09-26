@@ -3,14 +3,6 @@
 namespace factor
 {
 
-cell factor_vm::init_zone(zone *z, cell size, cell start)
-{
-	z->size = size;
-	z->start = z->here = start;
-	z->end = start + size;
-	return z->end;
-}
-
 void factor_vm::init_card_decks()
 {
 	cell start = align(data->seg->start,deck_size);
@@ -19,89 +11,86 @@ void factor_vm::init_card_decks()
 	decks_offset = (cell)data->decks - (start >> deck_bits);
 }
 
-data_heap *factor_vm::alloc_data_heap(cell gens, cell young_size,cell aging_size,cell tenured_size)
+data_heap::data_heap(factor_vm *myvm, cell gen_count_, cell young_size_, cell aging_size_, cell tenured_size_)
 {
-	young_size = align(young_size,deck_size);
-	aging_size = align(aging_size,deck_size);
-	tenured_size = align(tenured_size,deck_size);
+	young_size_ = align(young_size_,deck_size);
+	aging_size_ = align(aging_size_,deck_size);
+	tenured_size_ = align(tenured_size_,deck_size);
 
-	data_heap *data = (data_heap *)safe_malloc(sizeof(data_heap));
-	data->young_size = young_size;
-	data->aging_size = aging_size;
-	data->tenured_size = tenured_size;
-	data->gen_count = gens;
+	young_size = young_size_;
+	aging_size = aging_size_;
+	tenured_size = tenured_size_;
+	gen_count = gen_count_;
 
 	cell total_size;
-	if(data->gen_count == 2)
+	if(gen_count == 2)
 		total_size = young_size + 2 * tenured_size;
-	else if(data->gen_count == 3)
+	else if(gen_count == 3)
 		total_size = young_size + 2 * aging_size + 2 * tenured_size;
 	else
 	{
-		fatal_error("Invalid number of generations",data->gen_count);
-		return NULL; /* can't happen */
+		total_size = 0;
+		fatal_error("Invalid number of generations",gen_count);
 	}
 
 	total_size += deck_size;
 
-	data->seg = alloc_segment(total_size);
+	seg = new segment(myvm,total_size);
 
-	data->generations = (zone *)safe_malloc(sizeof(zone) * data->gen_count);
-	data->semispaces = (zone *)safe_malloc(sizeof(zone) * data->gen_count);
+	generations = new zone[gen_count];
+	semispaces = new zone[gen_count];
 
 	cell cards_size = total_size >> card_bits;
-	data->allot_markers = (cell *)safe_malloc(cards_size);
-	data->allot_markers_end = data->allot_markers + cards_size;
+	allot_markers = new char[cards_size];
+	allot_markers_end = allot_markers + cards_size;
 
-	data->cards = (cell *)safe_malloc(cards_size);
-	data->cards_end = data->cards + cards_size;
+	cards = new char[cards_size];
+	cards_end = cards + cards_size;
 
 	cell decks_size = total_size >> deck_bits;
-	data->decks = (cell *)safe_malloc(decks_size);
-	data->decks_end = data->decks + decks_size;
+	decks = new char[decks_size];
+	decks_end = decks + decks_size;
 
-	cell alloter = align(data->seg->start,deck_size);
+	cell alloter = align(seg->start,deck_size);
 
-	alloter = init_zone(&data->generations[data->tenured()],tenured_size,alloter);
-	alloter = init_zone(&data->semispaces[data->tenured()],tenured_size,alloter);
+	alloter = generations[tenured()].init_zone(tenured_size,alloter);
+	alloter = semispaces[tenured()].init_zone(tenured_size,alloter);
 
-	if(data->gen_count == 3)
+	if(gen_count == 3)
 	{
-		alloter = init_zone(&data->generations[data->aging()],aging_size,alloter);
-		alloter = init_zone(&data->semispaces[data->aging()],aging_size,alloter);
+		alloter = generations[aging()].init_zone(aging_size,alloter);
+		alloter = semispaces[aging()].init_zone(aging_size,alloter);
 	}
 
-	if(data->gen_count >= 2)
+	if(gen_count >= 2)
 	{
-		alloter = init_zone(&data->generations[data->nursery()],young_size,alloter);
-		alloter = init_zone(&data->semispaces[data->nursery()],0,alloter);
+		alloter = generations[nursery()].init_zone(young_size,alloter);
+		alloter = semispaces[nursery()].init_zone(0,alloter);
 	}
 
-	if(data->seg->end - alloter > deck_size)
-		critical_error("Bug in alloc_data_heap",alloter);
-
-	return data;
+	if(seg->end - alloter > deck_size)
+		myvm->critical_error("Bug in alloc_data_heap",alloter);
 }
 
 data_heap *factor_vm::grow_data_heap(data_heap *data, cell requested_bytes)
 {
 	cell new_tenured_size = (data->tenured_size * 2) + requested_bytes;
 
-	return alloc_data_heap(data->gen_count,
+	return new data_heap(this,
+		data->gen_count,
 		data->young_size,
 		data->aging_size,
 		new_tenured_size);
 }
 
-void factor_vm::dealloc_data_heap(data_heap *data)
+data_heap::~data_heap()
 {
-	dealloc_segment(data->seg);
-	free(data->generations);
-	free(data->semispaces);
-	free(data->allot_markers);
-	free(data->cards);
-	free(data->decks);
-	free(data);
+	delete seg;
+	delete[] generations;
+	delete[] semispaces;
+	delete[] allot_markers;
+	delete[] cards;
+	delete[] decks;
 }
 
 void factor_vm::clear_cards(cell from, cell to)
@@ -162,7 +151,7 @@ void factor_vm::set_data_heap(data_heap *data_)
 
 void factor_vm::init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,bool secure_gc_)
 {
-	set_data_heap(alloc_data_heap(gens,young_size,aging_size,tenured_size));
+	set_data_heap(new data_heap(this,gens,young_size,aging_size,tenured_size));
 	secure_gc = secure_gc_;
 	init_data_gc();
 }
@@ -222,10 +211,7 @@ inline void factor_vm::primitive_size()
 	box_unsigned_cell(object_size(dpop()));
 }
 
-PRIMITIVE(size)
-{
-	PRIMITIVE_GETVM()->primitive_size();
-}
+PRIMITIVE_FORWARD(size)
 
 /* The number of cells from the start of the object which should be scanned by
 the GC. Some types have a binary payload at the end (string, word, DLL) which
@@ -284,10 +270,7 @@ inline void factor_vm::primitive_data_room()
 	dpush(a.elements.value());
 }
 
-PRIMITIVE(data_room)
-{
-	PRIMITIVE_GETVM()->primitive_data_room();
-}
+PRIMITIVE_FORWARD(data_room)
 
 /* Disables GC and activates next-object ( -- obj ) primitive */
 void factor_vm::begin_scan()
@@ -306,10 +289,7 @@ inline void factor_vm::primitive_begin_scan()
 	begin_scan();
 }
 
-PRIMITIVE(begin_scan)
-{
-	PRIMITIVE_GETVM()->primitive_begin_scan();
-}
+PRIMITIVE_FORWARD(begin_scan)
 
 cell factor_vm::next_object()
 {
@@ -330,10 +310,7 @@ inline void factor_vm::primitive_next_object()
 	dpush(next_object());
 }
 
-PRIMITIVE(next_object)
-{
-	PRIMITIVE_GETVM()->primitive_next_object();
-}
+PRIMITIVE_FORWARD(next_object)
 
 /* Re-enables GC */
 inline void factor_vm::primitive_end_scan()
@@ -341,10 +318,7 @@ inline void factor_vm::primitive_end_scan()
 	gc_off = false;
 }
 
-PRIMITIVE(end_scan)
-{
-	PRIMITIVE_GETVM()->primitive_end_scan();
-}
+PRIMITIVE_FORWARD(end_scan)
 
 template<typename TYPE> void factor_vm::each_object(TYPE &functor)
 {
