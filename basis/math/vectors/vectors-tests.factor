@@ -24,11 +24,3 @@ SPECIALIZED-ARRAY: int
 [ { 0 3 2 5 4 } ] [ { 1 2 3 4 5 } { 1 1 1 1 1 } v+- ] unit-test
 
 [ 1 ] [ { C{ 0 1 } } dup v. ] unit-test
-
-! Make sure vector shifts behave the same as hardware SIMD vector shifts
-[ int-array{ 0 0 0 0 } ] [ int-array{ 10 20 30 40 } -1 vlshift ] unit-test
-
-[ int-array{ 0 0 0 0 } ] [
-    int-array{ 10 20 30 40 }
-    [ { int-array } declare -1 vlshift ] compile-call
-] unit-test
