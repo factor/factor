@@ -64,7 +64,7 @@
 #include "math.hpp"
 #include "float_bits.hpp"
 #include "io.hpp"
-#include "code_gc.hpp"
+#include "heap.hpp"
 #include "code_heap.hpp"
 #include "image.hpp"
 #include "callstack.hpp"

@@ -509,7 +509,7 @@ void factor_vm::garbage_collection(cell gen,bool growing_data_heap_,cell request
 			growing_data_heap = true;
 
 			/* see the comment in unmark_marked() */
-			unmark_marked(&code);
+			code->unmark_marked();
 		}
 		/* we try collecting aging space twice before going on to
 		collect tenured */
@@ -546,7 +546,7 @@ void factor_vm::garbage_collection(cell gen,bool growing_data_heap_,cell request
 		code_heap_scans++;
 
 		if(collecting_gen == data->tenured())
-			free_unmarked(&code,(heap_iterator)factor::update_literal_and_word_references);
+			code->free_unmarked((heap_iterator)factor::update_literal_and_word_references);
 		else
 			copy_code_heap_roots();
 

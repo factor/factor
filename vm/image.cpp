@@ -56,7 +56,7 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	if(h->code_size != 0)
 	{
-		size_t bytes_read = fread(first_block(&code),1,h->code_size,file);
+		size_t bytes_read = fread(code->first_block(),1,h->code_size,file);
 		if(bytes_read != h->code_size)
 		{
 			print_string("truncated image: ");
@@ -69,7 +69,7 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 	}
 
 	code_relocation_base = h->code_relocation_base;
-	build_free_list(&code,h->code_size);
+	code->build_free_list(h->code_size);
 }
 
 /* Save the current image to disk */
@@ -92,8 +92,8 @@ bool factor_vm::save_image(const vm_char *filename)
 	h.version = image_version;
 	h.data_relocation_base = tenured->start;
 	h.data_size = tenured->here - tenured->start;
-	h.code_relocation_base = code.seg->start;
-	h.code_size = heap_size(&code);
+	h.code_relocation_base = code->seg->start;
+	h.code_size = code->heap_size();
 
 	h.t = T;
 	h.bignum_zero = bignum_zero;
@@ -107,7 +107,7 @@ bool factor_vm::save_image(const vm_char *filename)
 
 	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
 	if(fwrite((void*)tenured->start,h.data_size,1,file) != 1) ok = false;
-	if(fwrite(first_block(&code),h.code_size,1,file) != 1) ok = false;
+	if(fwrite(code->first_block(),h.code_size,1,file) != 1) ok = false;
 	if(fclose(file)) ok = false;
 
 	if(!ok)
@@ -175,7 +175,7 @@ void data_fixup(cell *cell, factor_vm *myvm)
 template <typename TYPE> void factor_vm::code_fixup(TYPE **handle)
 {
 	TYPE *ptr = *handle;
-	TYPE *new_ptr = (TYPE *)(((cell)ptr) + (code.seg->start - code_relocation_base));
+	TYPE *new_ptr = (TYPE *)(((cell)ptr) + (code->seg->start - code_relocation_base));
 	*handle = new_ptr;
 }
 
