@@ -95,16 +95,12 @@ M: x86 %return ( -- ) 0 RET ;
 : align-code ( n -- )
     0 <repetition> % ;
 
-:: (%slot) ( obj slot tag temp -- op )
-    temp slot obj [+] LEA
-    temp tag neg [+] ; inline
-
 :: (%slot-imm) ( obj slot tag -- op )
     obj slot cells tag - [+] ; inline
 
-M: x86 %slot ( dst obj slot tag temp -- ) (%slot) MOV ;
+M: x86 %slot ( dst obj slot -- ) [+] MOV ;
 M: x86 %slot-imm ( dst obj slot tag -- ) (%slot-imm) MOV ;
-M: x86 %set-slot ( src obj slot tag temp -- ) (%slot) swap MOV ;
+M: x86 %set-slot ( src obj slot -- ) [+] swap MOV ;
 M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
 
 M: x86 %add     2over eq? [ nip ADD ] [ [+] LEA ] if ;
