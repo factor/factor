@@ -61,8 +61,8 @@ PRIVATE>
 : vbitor ( u v -- w ) over '[ _ [ bitor ] fp-bitwise-op ] 2map ;
 : vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
 
-: vlshift ( u n -- w ) HEX: ff bitand '[ _ shift ] map ;
-: vrshift ( u n -- w ) HEX: ff bitand neg '[ _ shift ] map ;
+: vlshift ( u n -- w ) HEX: ffffffff bitand '[ _ shift ] map ;
+: vrshift ( u n -- w ) HEX: ffffffff bitand neg '[ _ shift ] map ;
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;
