@@ -126,7 +126,7 @@ segment::~segment()
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
 	if(!VirtualFree((void*)(start - si.dwPageSize), 0, MEM_RELEASE))
-		myvm->fatal_error("Segment deallocation failed",0);
+		fatal_error("Segment deallocation failed",0);
 }
 
 void factor_vm::sleep_micros(u64 usec)
