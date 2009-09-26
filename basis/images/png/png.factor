@@ -14,6 +14,18 @@ TUPLE: loading-png
     width height bit-depth color-type compression-method
     filter-method interlace-method uncompressed ;
 
+CONSTANT: filter-none 0
+CONSTANT: filter-sub 1
+CONSTANT: filter-up 2
+CONSTANT: filter-average 3
+CONSTANT: filter-paeth 4
+
+CONSTANT: greyscale 0
+CONSTANT: truecolor 2
+CONSTANT: indexed-color 3
+CONSTANT: greyscale-alpha 4
+CONSTANT: truecolor-alpha 6
+
 : <loading-png> ( -- image )
     loading-png new
     V{ } clone >>chunks ;
@@ -66,6 +78,7 @@ ERROR: bad-checksum ;
 
 ERROR: unknown-color-type n ;
 ERROR: unimplemented-color-type image ;
+ERROR: unknown-filter-method image ;
 
 : inflate-data ( loading-png -- bytes )
     find-compressed-bytes zlib-inflate ; 
@@ -77,9 +90,15 @@ ERROR: unimplemented-color-type image ;
         [ unknown-color-type ]
     } case ;
 
+: filter-png ( groups loading-png -- byte-array )
+    filter-method>> {
+        { filter-none [ reverse-png-filter ] }
+        [ unknown-filter-method ]
+    } case ;
+
 : png-image-bytes ( loading-png -- byte-array )
-    [ inflate-data ] [ png-group-width ] bi group
-    reverse-png-filter ;
+    [ [ inflate-data ] [ png-group-width ] bi group ]
+    [ filter-png ] bi ;
 
 : decode-greyscale ( loading-png -- loading-png )
     unimplemented-color-type ;
@@ -127,11 +146,11 @@ ERROR: invalid-color-type/bit-depth loading-png ;
 
 : decode-png ( loading-png -- loading-png ) 
     dup color-type>> {
-        { 0 [ validate-greyscale decode-greyscale ] }
-        { 2 [ validate-truecolor decode-truecolor ] }
-        { 3 [ validate-indexed-color decode-indexed-color ] }
-        { 4 [ validate-greyscale-alpha decode-greyscale-alpha ] }
-        { 6 [ validate-truecolor-alpha decode-truecolor-alpha ] }
+        { greyscale [ validate-greyscale decode-greyscale ] }
+        { truecolor [ validate-truecolor decode-truecolor ] }
+        { indexed-color [ validate-indexed-color decode-indexed-color ] }
+        { greyscale-alpha [ validate-greyscale-alpha decode-greyscale-alpha ] }
+        { truecolor-alpha [ validate-truecolor-alpha decode-truecolor-alpha ] }
         [ unknown-color-type ]
     } case ;
 
