@@ -588,3 +588,8 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
         123 >>parents
     ffi_test_48
 ] unit-test
+
+! Regression: calling an undefined function would raise a protection fault
+FUNCTION: void this_does_not_exist ( ) ;
+
+[ this_does_not_exist ] [ { "kernel-error" 10 f f } = ] must-fail-with

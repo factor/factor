@@ -106,10 +106,7 @@ inline void factor_vm::primitive_string()
 	dpush(tag<string>(allot_string(length,initial)));
 }
 
-PRIMITIVE(string)
-{
-	PRIMITIVE_GETVM()->primitive_string();
-}
+PRIMITIVE_FORWARD(string)
 
 bool factor_vm::reallot_string_in_place_p(string *str, cell capacity)
 {
@@ -167,10 +164,7 @@ inline void factor_vm::primitive_resize_string()
 	dpush(tag<string>(reallot_string(str,capacity)));
 }
 
-PRIMITIVE(resize_string)
-{
-	PRIMITIVE_GETVM()->primitive_resize_string();
-}
+PRIMITIVE_FORWARD(resize_string)
 
 inline void factor_vm::primitive_string_nth()
 {
@@ -179,10 +173,7 @@ inline void factor_vm::primitive_string_nth()
 	dpush(tag_fixnum(string_nth(str,index)));
 }
 
-PRIMITIVE(string_nth)
-{
-	PRIMITIVE_GETVM()->primitive_string_nth();
-}
+PRIMITIVE_FORWARD(string_nth)
 
 inline void factor_vm::primitive_set_string_nth_fast()
 {
@@ -192,10 +183,7 @@ inline void factor_vm::primitive_set_string_nth_fast()
 	set_string_nth_fast(str,index,value);
 }
 
-PRIMITIVE(set_string_nth_fast)
-{
-	PRIMITIVE_GETVM()->primitive_set_string_nth_fast();
-}
+PRIMITIVE_FORWARD(set_string_nth_fast)
 
 inline void factor_vm::primitive_set_string_nth_slow()
 {
@@ -205,9 +193,6 @@ inline void factor_vm::primitive_set_string_nth_slow()
 	set_string_nth_slow(str,index,value);
 }
 
-PRIMITIVE(set_string_nth_slow)
-{
-	PRIMITIVE_GETVM()->primitive_set_string_nth_slow();
-}
+PRIMITIVE_FORWARD(set_string_nth_slow)
 
 }

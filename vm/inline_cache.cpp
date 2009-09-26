@@ -24,7 +24,7 @@ void factor_vm::deallocate_inline_cache(cell return_address)
 #endif
 
 	if(old_type == PIC_TYPE)
-		heap_free(&code,old_block);
+		code->heap_free(old_block);
 }
 
 /* Figure out what kind of type check the PIC needs based on the methods
@@ -257,10 +257,7 @@ inline void factor_vm::primitive_reset_inline_cache_stats()
 	for(i = 0; i < 4; i++) pic_counts[i] = 0;
 }
 
-PRIMITIVE(reset_inline_cache_stats)
-{
-	PRIMITIVE_GETVM()->primitive_reset_inline_cache_stats();
-}
+PRIMITIVE_FORWARD(reset_inline_cache_stats)
 
 inline void factor_vm::primitive_inline_cache_stats()
 {
@@ -275,9 +272,6 @@ inline void factor_vm::primitive_inline_cache_stats()
 	dpush(stats.elements.value());
 }
 
-PRIMITIVE(inline_cache_stats)
-{
-	PRIMITIVE_GETVM()->primitive_inline_cache_stats();
-}
+PRIMITIVE_FORWARD(inline_cache_stats)
 
 }
