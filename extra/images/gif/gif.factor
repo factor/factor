@@ -243,7 +243,7 @@ ERROR: unhandled-data byte ;
     [ graphic-control-extensions>> first transparent-color-index>> ]
     [ drop f ] if ;
 
-: loading-gif>image ( loading-gif -- image )
+: gif>image ( loading-gif -- image )
     [ <image> ] dip
     [ dimensions >>dim ]
     [ drop RGBA >>component-order ubyte-components >>component-type ]
@@ -258,4 +258,4 @@ ERROR: loading-gif-error gif-image ;
     dup loading?>> [ loading-gif-error ] when ;
 
 M: gif-image stream>image ( path gif-image -- image )
-    drop load-gif ensure-loaded loading-gif>image ;
+    drop load-gif ensure-loaded gif>image ;
