@@ -1,4 +1,4 @@
-! Copyrigt (C) 2009 Doug Coleman.
+! Copyrigt (C) 2009 Doug Coleman, Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compression.lzw
 constructors destructors grouping images images.loader io
