@@ -142,16 +142,12 @@ M:: ppc %dispatch ( src temp -- )
     temp MTCTR
     BCTR ;
 
-:: (%slot) ( obj slot tag temp -- reg offset )
-    temp slot obj ADD
-    temp tag neg ; inline
-
 : (%slot-imm) ( obj slot tag -- reg offset )
     [ cells ] dip - ; inline
 
-M: ppc %slot ( dst obj slot tag temp -- ) (%slot) LWZ ;
+M: ppc %slot ( dst obj slot -- ) LWZX ;
 M: ppc %slot-imm ( dst obj slot tag -- ) (%slot-imm) LWZ ;
-M: ppc %set-slot ( src obj slot tag temp -- ) (%slot) STW ;
+M: ppc %set-slot ( src obj slot -- ) STWX ;
 M: ppc %set-slot-imm ( src obj slot tag -- ) (%slot-imm) STW ;
 
 M:: ppc %string-nth ( dst src index temp -- )
