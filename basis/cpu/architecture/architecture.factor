@@ -102,9 +102,9 @@ HOOK: %return cpu ( -- )
 
 HOOK: %dispatch cpu ( src temp -- )
 
-HOOK: %slot cpu ( dst obj slot tag temp -- )
+HOOK: %slot cpu ( dst obj slot -- )
 HOOK: %slot-imm cpu ( dst obj slot tag -- )
-HOOK: %set-slot cpu ( src obj slot tag temp -- )
+HOOK: %set-slot cpu ( src obj slot -- )
 HOOK: %set-slot-imm cpu ( src obj slot tag -- )
 
 HOOK: %string-nth cpu ( dst obj index temp -- )

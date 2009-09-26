@@ -63,9 +63,11 @@ insn-classes get [
 : ^^allot-byte-array ( n -- dst )
     2 cells + byte-array ^^allot ;
 
-: ^^offset>slot ( tag slot -- vreg' )
-    cell 4 = [ 1 ^^shr-imm ] [ any-rep ^^copy ] if
-    swap ^^sub-imm ;
+: ^^offset>slot ( slot -- vreg' )
+    cell 4 = [ 1 ^^shr-imm ] [ any-rep ^^copy ] if ;
+
+: ^^tag-offset>slot ( slot tag -- vreg' )
+    [ ^^offset>slot ] dip ^^sub-imm ;
 
 : ^^tag-fixnum ( src -- dst )
     tag-bits get ^^shl-imm ;
