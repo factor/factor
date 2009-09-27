@@ -26,8 +26,8 @@ endif
 syn cluster factorCluster contains=factorComment,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorCompileDirective,factorString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorCharErr,factorBackslash,@factorWordOps,factorAlien,factorTuple,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
-syn match factorComment /\<#! .*/ contains=factorTodo
-syn match factorComment /\<! .*/ contains=factorTodo
+syn match factorComment /\<#!\>.*/ contains=factorTodo
+syn match factorComment /\<!\>.*/ contains=factorTodo
 
 syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
 
@@ -84,6 +84,9 @@ syn match   factorChar          /\<CHAR:\s\+\\\=\S\>/
 syn match   factorBackslash     /\<\\\>\s\+\S\+\>/
 
 syn region  factorUsing         start=/\<USING:\>/       end=/;/
+syn match   factorQualified     /\<QUALIFIED:\s\+\S\+\>/
+syn match   factorQualifiedWith /\<QUALIFIED-WITH:\s\+\S\+\s\+\S\+\>/
+syn region  factorFrom          start=/\<FROM:\>/        end=/;/
 syn region  factorSingletons    start=/\<SINGLETONS:\>/  end=/;/
 syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
 syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
@@ -92,6 +95,7 @@ syn region  factorTuple         start=/\<TUPLE:\>/ end=/\<;\>/
 syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/
 
 syn match   factorConstant      /\<CONSTANT:\s\+\S\+\>/
+syn match   factorAlias         /\<ALIAS:\s\+\S\+\>/
 syn match   factorSingleton     /\<SINGLETON:\s\+\S\+\>/
 syn match   factorPostpone      /\<POSTPONE:\s\+\S\+\>/
 syn match   factorDefer         /\<DEFER:\s\+\S\+\>/
@@ -103,8 +107,7 @@ syn match   factorMain          /\<MAIN:\s\+\S\+\>/
 syn match   factorConstructor   /\<C:\s\+\S\+\s\+\S\+\>/
 syn match   factorAlien         /\<ALIEN:\s\+\d\+\>/
 
-syn cluster factorWordOps       contains=factorSymbol,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
-
+syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
 
 "TODO:
 "misc:
@@ -114,20 +117,10 @@ syn cluster factorWordOps       contains=factorSymbol,factorPostpone,factorDefer
 " PRIMITIVE:
 
 "C interface:
-" FIELD:
-" BEGIN-STRUCT:
 " C-ENUM:
 " FUNCTION:
-" END-STRUCT
-" DLL"
 " TYPEDEF:
 " LIBRARY:
-" C-UNION:
-"QUALIFIED:
-"QUALIFIED-WITH:
-"FROM:
-"ALIAS:
-"! POSTPONE: "
 "#\ "
 
 syn region factorString start=/"/ skip=/\\"/ end=/"/ oneline
@@ -223,6 +216,9 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorFloat                  Float
     HiLink factorInt                    Number
     HiLink factorUsing                  Include
+    HiLink factorQualified              Include
+    HiLink factorQualifiedWith          Include
+    HiLink factorFrom                   Include
     HiLink factorUse                    Include
     HiLink factorUnuse                  Include
     HiLink factorIn                     Define
