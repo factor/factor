@@ -3,6 +3,7 @@
 USING: accessors classes.struct combinators.smart fry kernel
 math math.functions math.order math.parser sequences
 specialized-arrays io ;
+FROM: alien.c-types => float ;
 IN: benchmark.struct-arrays
 
 STRUCT: point { x float } { y float } { z float } ;

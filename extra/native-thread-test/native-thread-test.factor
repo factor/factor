@@ -1,5 +1,6 @@
-USING: alien.syntax io io.encodings.utf16n io.encodings.utf8 io.files
-kernel namespaces sequences system threads unix.utilities ;
+USING: alien.c-types alien.syntax io io.encodings.utf16n
+io.encodings.utf8 io.files kernel namespaces sequences system threads
+unix.utilities ;
 IN: native-thread-test
 
 FUNCTION: void* start_standalone_factor_in_new_thread ( int argc, char** argv ) ;
