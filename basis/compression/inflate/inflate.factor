@@ -190,14 +190,12 @@ CONSTANT: dist-table
     curr :> a
     curr 3 tail-slice :> x
     x length [0,b)
-    filter
-    {
+    filter {
         { 0 [ drop ] }
         { 1 [ [| n | n x nth n a nth + 256 wrap n x set-nth ] each ] }
         { 2 [ [| n | n x nth n b nth + 256 wrap n x set-nth ] each ] }
         { 3 [ [| n | n x nth n a nth n b nth + 2/ + 256 wrap n x set-nth ] each ] }
         { 4 [ [| n | n x nth n a nth n b nth n c nth paeth + 256 wrap n x set-nth ] each ] }
-        
     } case 
     curr 3 tail ;
 
@@ -208,10 +206,11 @@ PRIVATE>
     concat [ 128 + ] B{ } map-as ;
 
 : reverse-png-filter ( lines -- byte-array )
-    dup first [ 0 ] replicate prefix
-    [ { 0 0 } prepend  ] map
+    dup first length 0 <array> prefix
+    [ { 0 0 } prepend ] map
     2 clump [
-        first2 dup [ third ] [ 0 2 rot set-nth ] bi png-unfilter-line
+        first2 dup [ third ] [ [ 0 2 ] dip set-nth ] bi
+        png-unfilter-line
     ] map B{ } concat-as ;
 
 : zlib-inflate ( bytes -- bytes )
