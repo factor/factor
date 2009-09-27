@@ -47,11 +47,9 @@ void factor_vm::set_profiling(bool profiling)
 	iterate_code_heap(factor::relocate_code_block);
 }
 
-inline void factor_vm::primitive_profiling()
+void factor_vm::primitive_profiling()
 {
 	set_profiling(to_boolean(dpop()));
 }
-
-PRIMITIVE_FORWARD(profiling)
 
 }

@@ -99,14 +99,12 @@ string *factor_vm::allot_string(cell capacity, cell fill)
 	return str.untagged();
 }
 
-inline void factor_vm::primitive_string()
+void factor_vm::primitive_string()
 {
 	cell initial = to_cell(dpop());
 	cell length = unbox_array_size();
 	dpush(tag<string>(allot_string(length,initial)));
 }
-
-PRIMITIVE_FORWARD(string)
 
 bool factor_vm::reallot_string_in_place_p(string *str, cell capacity)
 {
@@ -157,25 +155,21 @@ string* factor_vm::reallot_string(string *str_, cell capacity)
 	}
 }
 
-inline void factor_vm::primitive_resize_string()
+void factor_vm::primitive_resize_string()
 {
 	string* str = untag_check<string>(dpop());
 	cell capacity = unbox_array_size();
 	dpush(tag<string>(reallot_string(str,capacity)));
 }
 
-PRIMITIVE_FORWARD(resize_string)
-
-inline void factor_vm::primitive_string_nth()
+void factor_vm::primitive_string_nth()
 {
 	string *str = untag<string>(dpop());
 	cell index = untag_fixnum(dpop());
 	dpush(tag_fixnum(string_nth(str,index)));
 }
 
-PRIMITIVE_FORWARD(string_nth)
-
-inline void factor_vm::primitive_set_string_nth_fast()
+void factor_vm::primitive_set_string_nth_fast()
 {
 	string *str = untag<string>(dpop());
 	cell index = untag_fixnum(dpop());
@@ -183,16 +177,12 @@ inline void factor_vm::primitive_set_string_nth_fast()
 	set_string_nth_fast(str,index,value);
 }
 
-PRIMITIVE_FORWARD(set_string_nth_fast)
-
-inline void factor_vm::primitive_set_string_nth_slow()
+void factor_vm::primitive_set_string_nth_slow()
 {
 	string *str = untag<string>(dpop());
 	cell index = untag_fixnum(dpop());
 	cell value = untag_fixnum(dpop());
 	set_string_nth_slow(str,index,value);
 }
-
-PRIMITIVE_FORWARD(set_string_nth_slow)
 
 }

@@ -6,60 +6,10 @@ static const fixnum fixnum_min = (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)));
 static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));
 
 // defined in assembler
-PRIMITIVE(fixnum_add);
-PRIMITIVE(fixnum_subtract);
-PRIMITIVE(fixnum_multiply);
 
-PRIMITIVE(bignum_to_fixnum);
-PRIMITIVE(float_to_fixnum);
 
-PRIMITIVE(fixnum_divint);
-PRIMITIVE(fixnum_divmod);
-PRIMITIVE(fixnum_shift);
 
-PRIMITIVE(fixnum_to_bignum);
-PRIMITIVE(float_to_bignum);
-PRIMITIVE(bignum_eq);
-PRIMITIVE(bignum_add);
-PRIMITIVE(bignum_subtract);
-PRIMITIVE(bignum_multiply);
-PRIMITIVE(bignum_divint);
-PRIMITIVE(bignum_divmod);
-PRIMITIVE(bignum_mod);
-PRIMITIVE(bignum_and);
-PRIMITIVE(bignum_or);
-PRIMITIVE(bignum_xor);
-PRIMITIVE(bignum_shift);
-PRIMITIVE(bignum_less);
-PRIMITIVE(bignum_lesseq);
-PRIMITIVE(bignum_greater);
-PRIMITIVE(bignum_greatereq);
-PRIMITIVE(bignum_not);
-PRIMITIVE(bignum_bitp);
-PRIMITIVE(bignum_log2);
-PRIMITIVE(byte_array_to_bignum);
 
-PRIMITIVE(fixnum_to_float);
-PRIMITIVE(bignum_to_float);
-PRIMITIVE(str_to_float);
-PRIMITIVE(float_to_str);
-PRIMITIVE(float_to_bits);
-
-PRIMITIVE(float_eq);
-PRIMITIVE(float_add);
-PRIMITIVE(float_subtract);
-PRIMITIVE(float_multiply);
-PRIMITIVE(float_divfloat);
-PRIMITIVE(float_mod);
-PRIMITIVE(float_less);
-PRIMITIVE(float_lesseq);
-PRIMITIVE(float_greater);
-PRIMITIVE(float_greatereq);
-
-PRIMITIVE(float_bits);
-PRIMITIVE(bits_float);
-PRIMITIVE(double_bits);
-PRIMITIVE(bits_double);
 
 VM_C_API void box_float(float flo, factor_vm *vm);
 VM_C_API float to_float(cell value, factor_vm *vm);

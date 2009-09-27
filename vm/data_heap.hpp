@@ -62,11 +62,5 @@ inline static bool in_zone(zone *z, object *pointer)
 	return (cell)pointer >= z->start && (cell)pointer < z->end;
 }
 
-PRIMITIVE(data_room);
-PRIMITIVE(size);
-
-PRIMITIVE(begin_scan);
-PRIMITIVE(next_object);
-PRIMITIVE(end_scan);
 
 }
