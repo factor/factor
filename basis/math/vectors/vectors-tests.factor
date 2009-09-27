@@ -1,5 +1,7 @@
 IN: math.vectors.tests
-USING: math.vectors tools.test kernel ;
+USING: math.vectors tools.test kernel specialized-arrays compiler
+kernel.private ;
+SPECIALIZED-ARRAY: int
 
 [ { 1 2 3 } ] [ 1/2 { 2 4 6 } n*v ] unit-test
 [ { 1 2 3 } ] [ { 2 4 6 } 1/2 v*n ] unit-test

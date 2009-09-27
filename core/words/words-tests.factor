@@ -125,3 +125,5 @@ DEFER: x
         keys [ "forgotten" word-prop ] filter
     ] map harvest
 ] unit-test
+
+[ "hi" word-xt ] must-fail

@@ -21,9 +21,8 @@ pthread_key_t tlsKey = 0;
 
 void init_platform_globals()
 {
-	if (pthread_key_create(&tlsKey, NULL) != 0){
+	if (pthread_key_create(&tlsKey, NULL) != 0)
 		fatal_error("pthread_key_create() failed",0);
-	}
 
 }
 
@@ -75,8 +74,6 @@ void factor_vm::ffi_dlclose(dll *dll)
 	dll->dll = NULL;
 }
 
-
-
 inline void factor_vm::primitive_existsp()
 {
 	struct stat sb;
@@ -84,13 +81,13 @@ inline void factor_vm::primitive_existsp()
 	box_boolean(stat(path,&sb) >= 0);
 }
 
-PRIMITIVE(existsp)
-{
-	PRIMITIVE_GETVM()->primitive_existsp();
-}
+PRIMITIVE_FORWARD(existsp)
 
-segment *factor_vm::alloc_segment(cell size)
+segment::segment(factor_vm *myvm_, cell size_)
 {
+	myvm = myvm_;
+	size = size_;
+
 	int pagesize = getpagesize();
 
 	char *array = (char *)mmap(NULL,pagesize + size + pagesize,
@@ -98,7 +95,7 @@ segment *factor_vm::alloc_segment(cell size)
 		MAP_ANON | MAP_PRIVATE,-1,0);
 
 	if(array == (char*)-1)
-		out_of_memory();
+		myvm->out_of_memory();
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect low guard page",(cell)array);
@@ -106,26 +103,16 @@ segment *factor_vm::alloc_segment(cell size)
 	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect high guard page",(cell)array);
 
-	segment *retval = (segment *)safe_malloc(sizeof(segment));
-
-	retval->start = (cell)(array + pagesize);
-	retval->size = size;
-	retval->end = retval->start + size;
-
-	return retval;
+	start = (cell)(array + pagesize);
+	end = start + size;
 }
 
-void dealloc_segment(segment *block)
+segment::~segment()
 {
 	int pagesize = getpagesize();
-
-	int retval = munmap((void*)(block->start - pagesize),
-		pagesize + block->size + pagesize);
-	
+	int retval = munmap((void*)(start - pagesize),pagesize + size + pagesize);
 	if(retval)
-		fatal_error("dealloc_segment failed",0);
-
-	free(block);
+		fatal_error("Segment deallocation failed",0);
 }
   
 stack_frame *factor_vm::uap_stack_pointer(void *uap)

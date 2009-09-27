@@ -5,9 +5,6 @@ namespace factor
 
 struct factor_vm : factor_vm_data {
 
-	// segments
-	inline cell align_page(cell a);
-
 	// contexts
 	void reset_datastack();
 	void reset_retainstack();
@@ -127,11 +124,8 @@ struct factor_vm : factor_vm_data {
 	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factor_vm *), unsigned int radix, int negative_p);
 
 	//data_heap
-	cell init_zone(zone *z, cell size, cell start);
 	void init_card_decks();
-	data_heap *alloc_data_heap(cell gens, cell young_size,cell aging_size,cell tenured_size);
 	data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
-	void dealloc_data_heap(data_heap *data);
 	void clear_cards(cell from, cell to);
 	void clear_decks(cell from, cell to);
 	void clear_allot_markers(cell from, cell to);
@@ -381,24 +375,6 @@ struct factor_vm : factor_vm_data {
 	inline void primitive_fflush();
 	inline void primitive_fclose();
 
-	//code_gc
-	void clear_free_list(heap *heap);
-	void new_heap(heap *heap, cell size);
-	void add_to_free_list(heap *heap, free_heap_block *block);
-	void build_free_list(heap *heap, cell size);
-	void assert_free_block(free_heap_block *block);
-	free_heap_block *find_free_block(heap *heap, cell size);
-	free_heap_block *split_free_block(heap *heap, free_heap_block *block, cell size);
-	heap_block *heap_allot(heap *heap, cell size);
-	void heap_free(heap *heap, heap_block *block);
-	void mark_block(heap_block *block);
-	void unmark_marked(heap *heap);
-	void free_unmarked(heap *heap, heap_iterator iter);
-	void heap_usage(heap *heap, cell *used, cell *total_free, cell *max_free);
-	cell heap_size(heap *heap);
-	cell compute_heap_forwarding(heap *heap, unordered_map<heap_block *,char *> &forwarding);
-	void compact_heap(heap *heap, unordered_map<heap_block *,char *> &forwarding);
-
 	//code_block
 	relocation_type relocation_type_of(relocation_entry r);
 	relocation_class relocation_class_of(relocation_entry r);
@@ -578,14 +554,11 @@ struct factor_vm : factor_vm_data {
 	void ffi_dlopen(dll *dll);
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);
 	void ffi_dlclose(dll *dll);
-	segment *alloc_segment(cell size);
 	void c_to_factor_toplevel(cell quot);
 
 	// os-windows
   #if defined(WINDOWS)
 	void sleep_micros(u64 usec);
-	long getpagesize();
-	void dealloc_segment(segment *block);
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);

@@ -12,5 +12,5 @@ IN: compiler.cfg.intrinsics.misc
 : emit-getenv ( node -- )
     "userenv" ^^vm-field-ptr
     swap node-input-infos first literal>>
-    [ ds-drop 0 ^^slot-imm ] [ ds-pop ^^offset>slot 0 ^^slot ] if*
+    [ ds-drop 0 ^^slot-imm ] [ ds-pop ^^offset>slot ^^slot ] if*
     ds-push ;
