@@ -1,11 +1,19 @@
-#include "vm-data.hpp"
-
 namespace factor
 {
 
-struct factor_vm : factor_vm_data {
+struct factor_vm 
+{
+	// First five fields accessed directly by assembler. See vm.factor
+	context *stack_chain; 
+	zone nursery; /* new objects are allocated here */
+	cell cards_offset;
+	cell decks_offset;
+	cell userenv[USER_ENV]; /* TAGGED user environment data; see getenv/setenv prims */
 
 	// contexts
+	cell ds_size, rs_size;
+	context *unused_contexts;
+
 	void reset_datastack();
 	void reset_retainstack();
 	void fix_stacks();
@@ -24,6 +32,8 @@ struct factor_vm : factor_vm_data {
 	void primitive_check_datastack();
 
 	// run
+	cell T;  /* Canonical T object. It's just a word */
+
 	void primitive_getenv();
 	void primitive_setenv();
 	void primitive_exit();
@@ -35,12 +45,21 @@ struct factor_vm : factor_vm_data {
 	void primitive_clone();
 
 	// profiler
+	bool profiling_p;
+
 	void init_profiler();
 	code_block *compile_profiling_stub(cell word_);
 	void set_profiling(bool profiling);
 	void primitive_profiling();
 
 	// errors
+	/* Global variables used to pass fault handler state from signal handler to
+	   user-space */
+	cell signal_number;
+	cell signal_fault_addr;
+	unsigned int signal_fpu_status;
+	stack_frame *signal_callstack_top;
+
 	void out_of_memory();
 	void critical_error(const char* msg, cell tagged);
 	void throw_error(cell error, stack_frame *callstack_top);
@@ -57,8 +76,6 @@ struct factor_vm : factor_vm_data {
 	void fp_signal_handler_impl();
 	void type_error(cell type, cell tagged);
 	void general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *native_stack);
-
-	//callstack
 
 	// bignum
 	int bignum_equal_p(bignum * x, bignum * y);
@@ -124,6 +141,13 @@ struct factor_vm : factor_vm_data {
 	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factor_vm *), unsigned int radix, int negative_p);
 
 	//data_heap
+	bool secure_gc;  /* Set by the -securegc command line argument */
+	bool gc_off; /* GC is off during heap walking */
+	data_heap *data;
+	/* A heap walk allows useful things to be done, like finding all
+	   references to an object for debugging purposes. */
+	cell heap_scan_ptr;
+
 	void init_card_decks();
 	data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
 	void clear_cards(cell from, cell to);
@@ -150,6 +174,8 @@ struct factor_vm : factor_vm_data {
 
 	
 	//write barrier
+	cell allot_markers_offset;
+
 	inline card *addr_to_card(cell a);
 	inline cell card_to_addr(card *c);
 	inline cell card_offset(card *c);
@@ -161,6 +187,31 @@ struct factor_vm : factor_vm_data {
 	inline void allot_barrier(object *address);
 
 	//data_gc
+	/* used during garbage collection only */
+	zone *newspace;
+	bool performing_gc;
+	bool performing_compaction;
+	cell collecting_gen;
+	/* if true, we are collecting aging space for the second time, so if it is still
+	   full, we go on to collect tenured */
+	bool collecting_aging_again;
+	/* in case a generation fills up in the middle of a gc, we jump back
+	   up to try collecting the next generation. */
+	jmp_buf gc_jmp;
+	gc_stats stats[max_gen_count];
+	u64 cards_scanned;
+	u64 decks_scanned;
+	u64 card_scan_time;
+	cell code_heap_scans;
+	/* What generation was being collected when copy_code_heap_roots() was last
+	   called? Until the next call to add_code_block(), future
+	   collections of younger generations don't have to touch the code
+	   heap. */
+	cell last_code_heap_scan;
+	/* sometimes we grow the heap */
+	bool growing_data_heap;
+	data_heap *old_data_heap;
+
 	void init_data_gc();
 	object *copy_untagged_object_impl(object *pointer, cell size);
 	object *copy_object_impl(object *untagged);
@@ -198,12 +249,24 @@ struct factor_vm : factor_vm_data {
 	inline void check_tagged_pointer(cell tagged);
 	void primitive_clear_gc_stats();
 
+	// local roots
+	/* If a runtime function needs to call another function which potentially
+	   allocates memory, it must wrap any local variable references to Factor
+	   objects in gc_root instances */
+	std::vector<cell> gc_locals;
+	std::vector<cell> gc_bignums;
+
 	// generic arrays
 	template <typename T> T *allot_array_internal(cell capacity);
 	template <typename T> bool reallot_array_in_place_p(T *array, cell capacity);
 	template <typename TYPE> TYPE *reallot_array(TYPE *array_, cell capacity);
 
 	//debug
+	bool fep_disabled;
+	bool full_output;
+	cell look_for;
+	cell obj;
+
 	void print_chars(string* str);
 	void print_word(word* word, cell nesting);
 	void print_factor_string(string* str);
@@ -277,6 +340,10 @@ struct factor_vm : factor_vm_data {
 	void primitive_wrapper();
 
 	//math
+	cell bignum_zero;
+	cell bignum_pos_one;
+	cell bignum_neg_one;	
+
 	void primitive_bignum_to_fixnum();
 	void primitive_float_to_fixnum();
 	void primitive_fixnum_divint();
@@ -414,6 +481,9 @@ struct factor_vm : factor_vm_data {
 	}
 
 	//code_heap
+	heap *code;
+	unordered_map<heap_block *, char *> forwarding;
+
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
 	void jit_compile_word(cell word_, cell def_, bool relocate);
@@ -430,6 +500,9 @@ struct factor_vm : factor_vm_data {
 	inline void check_code_pointer(cell ptr);
 
 	//image
+	cell code_relocation_base;
+	cell data_relocation_base;
+
 	void init_objects(image_header *h);
 	void load_data_heap(FILE *file, image_header *h, vm_parameters *p);
 	void load_code_heap(FILE *file, image_header *h, vm_parameters *p);
@@ -503,6 +576,9 @@ struct factor_vm : factor_vm_data {
 	void primitive_quot_compiled_p();
 
 	//dispatch
+	cell megamorphic_cache_hits;
+	cell megamorphic_cache_misses;
+
 	cell search_lookup_alist(cell table, cell klass);
 	cell search_lookup_hash(cell table, cell klass, cell hashcode);
 	cell nth_superclass(tuple_layout *layout, fixnum echelon);
@@ -520,6 +596,12 @@ struct factor_vm : factor_vm_data {
 	void primitive_dispatch_stats();
 
 	//inline cache
+	cell max_pic_size;
+	cell cold_call_to_ic_transitions;
+	cell ic_to_pic_transitions;
+	cell pic_to_mega_transitions;
+	cell pic_counts[4];  /* PIC_TAG, PIC_HI_TAG, PIC_TUPLE, PIC_HI_TAG_TUPLE */
+
 	void init_inline_caching(int max_size);
 	void deallocate_inline_cache(cell return_address);
 	cell determine_inline_cache_type(array *cache_entries);
@@ -581,7 +663,21 @@ struct factor_vm : factor_vm_data {
 	void call_fault_handler(exception_type_t exception, exception_data_type_t code, MACH_EXC_STATE_TYPE *exc_state, MACH_THREAD_STATE_TYPE *thread_state, MACH_FLOAT_STATE_TYPE *float_state);
   #endif
 	
-	void print_vm_data();
+	factor_vm() 
+		: profiling_p(false),
+		  secure_gc(false),
+		  gc_off(false),
+		  performing_gc(false),
+		  performing_compaction(false),
+		  collecting_aging_again(false),
+		  growing_data_heap(false),
+		  fep_disabled(false),
+		  full_output(false),
+		  max_pic_size(0)
+	{
+		memset(this,0,sizeof(this)); // just to make sure
+	}
+
 };
 
 #ifndef FACTOR_REENTRANT
