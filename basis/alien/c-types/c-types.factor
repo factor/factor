@@ -39,8 +39,8 @@ unboxer
 { rep initial: int-rep }
 stack-align? ;
 
-: <c-type> ( -- type )
-    \ c-type new ;
+: <c-type> ( -- c-type )
+    \ c-type new ; inline
 
 SYMBOL: c-types
 
@@ -56,13 +56,14 @@ PREDICATE: c-type-word < word
 UNION: c-type-name string word ;
 
 ! C type protocol
-GENERIC: c-type ( name -- type ) foldable
+GENERIC: c-type ( name -- c-type ) foldable
 
 GENERIC: resolve-pointer-type ( name -- c-type )
 
 M: word resolve-pointer-type
     dup "pointer-c-type" word-prop
     [ ] [ drop void* ] ?if ;
+
 M: string resolve-pointer-type
     dup "*" append dup c-types get at
     [ nip ] [
@@ -71,14 +72,14 @@ M: string resolve-pointer-type
         [ resolve-pointer-type ] [ drop void* ] if
     ] if ;
 
-: resolve-typedef ( name -- type )
+: resolve-typedef ( name -- c-type )
     dup c-type-name? [ c-type ] when ;
 
-: parse-array-type ( name -- dims type )
+: parse-array-type ( name -- dims c-type )
     "[" split unclip
     [ [ "]" ?tail drop string>number ] map ] dip ;
 
-M: string c-type ( name -- type )
+M: string c-type ( name -- c-type )
     CHAR: ] over member? [
         parse-array-type prefix
     ] [
@@ -93,7 +94,7 @@ M: word c-type
 : void? ( c-type -- ? )
     { void "void" } member? ;
 
-GENERIC: c-struct? ( type -- ? )
+GENERIC: c-struct? ( c-type -- ? )
 
 M: object c-struct?
     drop f ;
@@ -169,33 +170,33 @@ M: c-type c-type-stack-align? stack-align?>> ;
 
 M: c-type-name c-type-stack-align? c-type c-type-stack-align? ;
 
-: c-type-box ( n type -- )
+: c-type-box ( n c-type -- )
     [ c-type-rep ] [ c-type-boxer [ "No boxer" throw ] unless* ] bi
     %box ;
 
-: c-type-unbox ( n ctype -- )
+: c-type-unbox ( n c-type -- )
     [ c-type-rep ] [ c-type-unboxer [ "No unboxer" throw ] unless* ] bi
     %unbox ;
 
-GENERIC: box-parameter ( n ctype -- )
+GENERIC: box-parameter ( n c-type -- )
 
 M: c-type box-parameter c-type-box ;
 
 M: c-type-name box-parameter c-type box-parameter ;
 
-GENERIC: box-return ( ctype -- )
+GENERIC: box-return ( c-type -- )
 
 M: c-type box-return f swap c-type-box ;
 
 M: c-type-name box-return c-type box-return ;
 
-GENERIC: unbox-parameter ( n ctype -- )
+GENERIC: unbox-parameter ( n c-type -- )
 
 M: c-type unbox-parameter c-type-unbox ;
 
 M: c-type-name unbox-parameter c-type unbox-parameter ;
 
-GENERIC: unbox-return ( ctype -- )
+GENERIC: unbox-return ( c-type -- )
 
 M: c-type unbox-return f swap c-type-unbox ;
 
@@ -203,13 +204,13 @@ M: c-type-name unbox-return c-type unbox-return ;
 
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
-GENERIC: heap-size ( type -- size ) foldable
+GENERIC: heap-size ( name -- size ) foldable
 
 M: c-type-name heap-size c-type heap-size ;
 
 M: abstract-c-type heap-size size>> ;
 
-GENERIC: stack-size ( type -- size ) foldable
+GENERIC: stack-size ( name -- size ) foldable
 
 M: c-type-name stack-size c-type stack-size ;
 
@@ -236,7 +237,7 @@ MIXIN: value-type
         [ "Cannot write struct fields with this type" throw ]
     ] unless* ;
 
-: array-accessor ( type quot -- def )
+: array-accessor ( c-type quot -- def )
     [
         \ swap , [ heap-size , [ * >fixnum ] % ] [ % ] bi*
     ] [ ] make ;
@@ -262,19 +263,19 @@ M: word typedef ( old new -- )
 
 TUPLE: long-long-type < c-type ;
 
-: <long-long-type> ( -- type )
+: <long-long-type> ( -- c-type )
     long-long-type new ;
 
-M: long-long-type unbox-parameter ( n type -- )
+M: long-long-type unbox-parameter ( n c-type -- )
     c-type-unboxer %unbox-long-long ;
 
-M: long-long-type unbox-return ( type -- )
+M: long-long-type unbox-return ( c-type -- )
     f swap unbox-parameter ;
 
-M: long-long-type box-parameter ( n type -- )
+M: long-long-type box-parameter ( n c-type -- )
     c-type-boxer %box-long-long ;
 
-M: long-long-type box-return ( type -- )
+M: long-long-type box-return ( c-type -- )
     f swap box-parameter ;
 
 : define-deref ( name -- )
@@ -286,13 +287,13 @@ M: long-long-type box-return ( type -- )
     [ dup c-setter '[ _ heap-size <byte-array> [ 0 @ ] keep ] ] bi
     (( value -- c-ptr )) define-inline ;
 
-: define-primitive-type ( type name -- )
+: define-primitive-type ( c-type name -- )
     [ typedef ]
     [ name>> define-deref ]
     [ name>> define-out ]
     tri ;
 
-: if-void ( type true false -- )
+: if-void ( c-type true false -- )
     pick void? [ drop nip call ] [ nip call ] if ; inline
 
 CONSTANT: primitive-types

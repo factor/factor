@@ -311,7 +311,7 @@ HELP: textual-list
 { $values { "seq" "a sequence" } { "quot" { $quotation "( elt -- )" } } }
 { $description "Applies the quotation to each element of the sequence, printing a comma between each pair of elements." }
 { $examples
-    { $example "USING: help.markup io ;" "{ \"fish\" \"chips\" \"salt\" } [ write ] textual-list" "fish, chips, salt" }
+    { $example "USING: help.markup io namespaces ;" "last-element off" "{ \"fish\" \"chips\" \"salt\" } [ write ] textual-list" "fish, chips, salt" }
 } ;
 
 HELP: $links

@@ -1,6 +1,7 @@
-USING: alien alien.c-types help.syntax help.markup libc kernel.private
-byte-arrays math strings hashtables alien.syntax alien.strings sequences
-io.encodings.string debugger destructors vocabs.loader ;
+USING: alien alien.c-types help.syntax help.markup libc
+kernel.private byte-arrays math strings hashtables alien.syntax
+alien.strings sequences io.encodings.string debugger destructors
+vocabs.loader classes.struct ;
 IN: alien.data
 
 HELP: <c-array>
@@ -26,7 +27,7 @@ HELP: byte-array>memory
 { $warning "This word is unsafe. Improper use can corrupt memory." } ;
 
 HELP: malloc-array
-{ $values { "n" "a non-negative integer" } { "type" "a C type" } { "alien" alien } }
+{ $values { "n" "a non-negative integer" } { "type" "a C type" } { "array" "a specialized array" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type, then wraps the memory in a sequence object using " { $link <c-direct-array> } "." }
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
@@ -53,8 +54,8 @@ ARTICLE: "malloc" "Manual memory management"
 $nl
 "Allocating a C datum with a fixed address:"
 { $subsection malloc-object }
-{ $subsection malloc-array }
 { $subsection malloc-byte-array }
+{ $subsection malloc-file-contents }
 "There is a set of words in the " { $vocab-link "libc" } " vocabulary which directly call C standard library memory management functions:"
 { $subsection malloc }
 { $subsection calloc }
@@ -73,26 +74,31 @@ $nl
 "You can copy a byte array to memory unsafely:"
 { $subsection byte-array>memory } ;
 
-
-ARTICLE: "c-byte-arrays" "Passing data in byte arrays"
-"Instances of the " { $link byte-array } " class can be passed to C functions; the C function receives a pointer to the first element of the array."
-$nl
-"Byte arrays can be allocated directly with a byte count using the " { $link <byte-array> } " word. However in most cases, instead of computing a size in bytes directly, it is easier to use a higher-level word which expects C type and outputs a byte array large enough to hold that type:"
-{ $subsection <c-object> }
-{ $subsection <c-array> }
+ARTICLE: "c-pointers" "Passing pointers to C functions"
+"The following Factor objects may be passed to C function parameters with pointer types:"
+{ $list
+    { "Instances of " { $link alien } "." }
+    { "Instances of " { $link f } "; this is interpreted as a null pointer." }
+    { "Instances of " { $link byte-array } "; the C function receives a pointer to the first element of the array." }
+    { "Any data type which defines a method on " { $link >c-ptr } " that returns an instance of one of the above. This includes " { $link "classes.struct" } " and " { $link "specialized-arrays" } "." } 
+}
+"The class of primitive C pointer types:"
+{ $subsection c-ptr }
+"A generic word for converting any object to a C pointer; user-defined types may add methods to this generic word:"
+{ $subsection >c-ptr }
+"More about the " { $link alien } " type:"
+{ $subsection "aliens" }
 { $warning
-"The Factor garbage collector can move byte arrays around, and code passing byte arrays to C must obey important guidelines. See " { $link "byte-arrays-gc" } "." }
-{ $see-also "c-arrays" } ;
+"The Factor garbage collector can move byte arrays around, and code passing byte arrays, or objects backed by byte arrays, must obey important guidelines. See " { $link "byte-arrays-gc" } "." } ;
 
 ARTICLE: "c-data" "Passing data between Factor and C"
 "Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers."
 $nl
 "Furthermore, Factor's garbage collector can move objects in memory; for a discussion of the consequences, see " { $link "byte-arrays-gc" } "."
 { $subsection "c-types-specs" }
-{ $subsection "c-byte-arrays" }
+{ $subsection "c-pointers" }
 { $subsection "malloc" }
 { $subsection "c-strings" }
-{ $subsection "c-arrays" }
 { $subsection "c-out-params" }
 "Important guidelines for passing data in byte arrays:"
 { $subsection "byte-arrays-gc" }
@@ -100,12 +106,10 @@ $nl
 { $subsection POSTPONE: C-ENUM: }
 "C types can be aliased for convenience and consitency with native library documentation:"
 { $subsection POSTPONE: TYPEDEF: }
-"New C types can be defined:"
-{ $subsection "c-structs" }
-{ $subsection "c-unions" }
 "A utility for defining " { $link "destructors" } " for deallocating memory:"
 { $subsection "alien.destructors" }
-{ $see-also "aliens" } ;
+"C struct and union types can be defined with " { $link POSTPONE: STRUCT: } " and " { $link POSTPONE: UNION: } ". See " { $link "classes.struct" } " for details. For passing arrays to and from C, use the " { $link "specialized-arrays" } " vocabulary." ;
+
 HELP: malloc-string
 { $values { "string" string } { "encoding" "an encoding descriptor" } { "alien" c-ptr } }
 { $description "Encodes a string together with a trailing null code point using the given encoding, and stores the resulting bytes in a freshly-allocated unmanaged memory block." }
