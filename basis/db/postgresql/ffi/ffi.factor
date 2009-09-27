@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 ! tested on debian linux with postgresql 8.1
-USING: alien alien.syntax combinators system alien.libraries ;
+USING: alien alien.c-types alien.syntax combinators system
+alien.libraries ;
 IN: db.postgresql.ffi
 
 << "postgresql" {
@@ -69,6 +70,7 @@ TYPEDEF: void* PGnotify*
 TYPEDEF: void* PQArgBlock*
 TYPEDEF: void* PQprintOpt*
 TYPEDEF: void* SSL*
+TYPEDEF: void* FILE*
 
 LIBRARY: postgresql
 
