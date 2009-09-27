@@ -4,7 +4,7 @@ USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types
 alien.strings alien.arrays alien.complex alien.libraries sets libc
-continuations.private fry cpu.architecture classes locals
+continuations.private fry cpu.architecture classes classes.struct locals
 source-files.errors slots parser generic.parser
 compiler.errors
 compiler.alien
@@ -16,8 +16,6 @@ compiler.cfg.registers
 compiler.cfg.builder
 compiler.codegen.fixup
 compiler.utilities ;
-QUALIFIED: classes.struct
-QUALIFIED: alien.structs
 IN: compiler.codegen
 
 SYMBOL: insn-counts
@@ -331,10 +329,7 @@ GENERIC: flatten-value-type ( type -- types )
 
 M: object flatten-value-type 1array ;
 
-M: alien.structs:struct-type flatten-value-type ( type -- types )
-    stack-size cell align (flatten-int-type) ;
-
-M: classes.struct:struct-c-type flatten-value-type ( type -- types )
+M: struct-c-type flatten-value-type ( type -- types )
     stack-size cell align (flatten-int-type) ;
 
 M: long-long-type flatten-value-type ( type -- types )

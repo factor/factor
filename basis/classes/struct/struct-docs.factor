@@ -95,9 +95,36 @@ HELP: struct
 HELP: struct-class
 { $class-description "The metaclass of all " { $link struct } " classes." } ;
 
-ARTICLE: "classes.struct" "Struct classes"
-{ $link struct } " classes are similar to " { $link tuple } "s, but their slots exhibit value semantics, and they are backed by a contiguous structured block of memory. Structs can be used for structured access to C memory or Factor byte arrays and for passing struct values in and out of the FFI. Struct types are defined using a syntax similar to tuple syntax:"
+ARTICLE: "classes.struct.examples" "Struct class examples"
+"A struct with a variety of fields:"
+{ $code
+    "USING: alien.c-types classes.struct ;"
+    ""
+    "STRUCT: test-struct"
+    "    { i int }"
+    "    { chicken char[16] }"
+    "    { data void* } ;"
+}
+"Creating a new instance of this struct, and printing out:"
+{ $code "test-struct <struct> ." }
+"Creating a new instance with slots initialized from the stack:"
+{ $code
+    "USING: libc specialized-arrays ;"
+    "SPECIALIZED-ARRAY: char"
+    ""
+    "42"
+    "\"Hello, chicken.\" >char-array"
+    "1024 malloc"
+    "test-struct <struct-boa> ."
+} ;
+
+ARTICLE: "classes.struct.define" "Defining struct classes"
+"Struct classes are defined using a syntax similar to the " { $link POSTPONE: TUPLE: } " syntax for defining tuple classes:"
 { $subsection POSTPONE: STRUCT: }
+"Union structs are also supported, which behave like structs but share the same memory for all the slots."
+{ $subsection POSTPONE: UNION-STRUCT: } ;
+
+ARTICLE: "classes.struct.create" "Creating instances of structs"
 "Structs can be allocated with " { $link new } "- and " { $link boa } "-like constructor words. Additional words are provided for building structs from C memory and from existing buffers:"
 { $subsection <struct> }
 { $subsection <struct-boa> }
@@ -106,10 +133,40 @@ ARTICLE: "classes.struct" "Struct classes"
 "When the contents of a struct will be immediately reset, faster primitive words are available that will create a struct without initializing its contents:"
 { $subsection (struct) }
 { $subsection (malloc-struct) }
-"Structs have literal syntax like tuples:"
-{ $subsection POSTPONE: S{ }
-"Union structs are also supported, which behave like structs but share the same memory for all the type's slots."
-{ $subsection POSTPONE: UNION-STRUCT: }
-;
+"Structs have literal syntax, similar to " { $link POSTPONE: T{ } " for tuples:"
+{ $subsection POSTPONE: S{ } ;
+
+ARTICLE: "classes.struct.c" "Passing structs to C functions"
+"Structs can be passed and returned by value, or by reference."
+$nl
+"If a parameter is declared with a struct type, the parameter is passed by value. To pass a struct by reference, declare a parameter with a pointer to struct type."
+$nl
+"If a C function is declared as returning a struct type, the struct is returned by value, and wrapped in an instance of the correct struct class automatically. If a C function is declared as returning a pointer to a struct, it will return an " { $link alien } " instance. This is because there is no way to distinguish between a pointer to a single struct and a pointer to an array of zero or more structs. It is up to the caller to wrap it in a struct, or a specialized array of structs, respectively."
+$nl
+"An example of a struct declaration:"
+{ $code
+    "USING: alien.c-types classes.struct ;"
+    ""
+    "STRUCT: Point"
+    "    { x int }"
+    "    { y int }"
+    "    { z int } ;"
+}
+"A C function which returns a struct by value:"
+{ $code
+    "USING: alien.syntax ;"
+    "FUNCTION: Point give_me_a_point ( char* description ) ;"
+}
+"A C function which takes a struct parameter by reference:"
+{ $code
+    "FUNCTION: void print_point ( Point* p ) ;"
+} ;
+
+ARTICLE: "classes.struct" "Struct classes"
+{ $link struct } " classes are similar to " { $link tuple } "s, but their slots exhibit value semantics, and they are backed by a contiguous structured block of memory. Structs can be used for structured access to C memory or Factor byte arrays and for passing struct values in and out of the FFI."
+{ $subsection "classes.struct.examples" }
+{ $subsection "classes.struct.define" }
+{ $subsection "classes.struct.create" }
+{ $subsection "classes.struct.c" } ;
 
 ABOUT: "classes.struct"

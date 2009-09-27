@@ -10,7 +10,7 @@ HELP: byte-length
 { $contract "Outputs the size of the byte array, struct, or specialized array data in bytes." } ;
 
 HELP: heap-size
-{ $values { "type" string } { "size" math:integer } }
+{ $values { "name" "a C type name" } { "size" math:integer } }
 { $description "Outputs the number of bytes needed for a heap-allocated value of this C type." }
 { $examples
     { $example "USING: alien alien.c-types prettyprint ;\nint heap-size ." "4" }
@@ -18,16 +18,16 @@ HELP: heap-size
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: stack-size
-{ $values { "type" string } { "size" math:integer } }
+{ $values { "name" "a C type name" } { "size" math:integer } }
 { $description "Outputs the number of bytes to reserve on the C stack by a value of this C type. In most cases this is equal to " { $link heap-size } ", except on some platforms where C structs are passed by invisible reference, in which case a C struct type only uses as much space as a pointer on the C stack." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: <c-type>
-{ $values { "type" hashtable } }
+{ $values { "c-type" c-type } }
 { $description "Creates a prototypical C type. User code should use higher-level facilities to define C types; see " { $link "c-data" } "." } ;
 
 HELP: no-c-type
-{ $values { "type" string } }
+{ $values { "name" "a C type name" } }
 { $description "Throws a " { $link no-c-type } " error." }
 { $error-description "Thrown by " { $link c-type } " if a given string does not name a C type. When thrown during compile time, indicates a typo in an " { $link alien-invoke } " or " { $link alien-callback } " form." } ;
 
@@ -35,32 +35,32 @@ HELP: c-types
 { $var-description "Global variable holding a hashtable mapping C type names to C types. Use the " { $link c-type } " word to look up C types." } ;
 
 HELP: c-type
-{ $values { "name" string } { "type" hashtable } }
+{ $values { "name" "a C type" } { "c-type" c-type } }
 { $description "Looks up a C type by name." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: c-getter
-{ $values { "name" string } { "quot" { $quotation "( c-ptr n -- obj )" } } }
+{ $values { "name" "a C type" } { "quot" { $quotation "( c-ptr n -- obj )" } } }
 { $description "Outputs a quotation which reads values of this C type from a C structure." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: c-setter
-{ $values { "name" string } { "quot" { $quotation "( obj c-ptr n -- )" } } }
+{ $values { "name" "a C type" } { "quot" { $quotation "( obj c-ptr n -- )" } } }
 { $description "Outputs a quotation which writes values of this C type to a C structure." }
 { $errors "Throws an error if the type does not exist." } ;
 
 HELP: box-parameter
-{ $values { "n" math:integer } { "ctype" string } }
+{ $values { "n" math:integer } { "c-type" "a C type" } }
 { $description "Generates code for converting a C value stored at  offset " { $snippet "n" } " from the top of the stack into a Factor object to be pushed on the data stack." }
 { $notes "This is an internal word used by the compiler when compiling callbacks." } ;
 
 HELP: box-return
-{ $values { "ctype" string } }
+{ $values { "c-type" "a C type" } }
 { $description "Generates code for converting a C value stored in return registers into a Factor object to be pushed on the data stack." }
 { $notes "This is an internal word used by the compiler when compiling alien calls." } ;
 
 HELP: unbox-return
-{ $values { "ctype" string } }
+{ $values { "c-type" "a C type" } }
 { $description "Generates code for converting a Factor value on the data stack into a C value to be stored in the return registers." }
 { $notes "This is an internal word used by the compiler when compiling callbacks." } ;
 
