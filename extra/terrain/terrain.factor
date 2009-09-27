@@ -9,6 +9,7 @@ terrain.generation terrain.shaders ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats game-worlds method-chains
 math.affine-transforms noise ui.gestures combinators.short-circuit
 destructors grid-meshes ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: terrain
 

@@ -410,10 +410,6 @@ STRUCT: XCharStruct
 { descent short }
 { attributes ushort } ;
 
-X-FUNCTION: Font XLoadFont ( Display* display, char* name ) ;
-X-FUNCTION: XFontStruct* XQueryFont ( Display* display, XID font_ID ) ;
-X-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, char* name ) ;
-
 STRUCT: XFontStruct
 { ext_data XExtData* }
 { fid Font }
@@ -431,6 +427,10 @@ STRUCT: XFontStruct
 { per_char XCharStruct* }
 { ascent int }
 { descent int } ;
+
+X-FUNCTION: Font XLoadFont ( Display* display, char* name ) ;
+X-FUNCTION: XFontStruct* XQueryFont ( Display* display, XID font_ID ) ;
+X-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, char* name ) ;
 
 X-FUNCTION: int XTextWidth ( XFontStruct* font_struct, char* string, int count ) ;
 

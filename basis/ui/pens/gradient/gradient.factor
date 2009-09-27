@@ -3,6 +3,7 @@
 USING: kernel accessors math math.vectors locals sequences
 specialized-arrays colors arrays combinators
 opengl opengl.gl ui.pens ui.pens.caching ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: ui.pens.gradient
 
