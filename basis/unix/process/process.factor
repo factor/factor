@@ -1,6 +1,6 @@
 USING: kernel alien.c-types alien.data alien.strings sequences
 math alien.syntax unix namespaces continuations threads assocs
-io.backend.unix io.encodings.utf8 unix.utilities fry ;
+io.backend.unix io.encodings.utf8 unix.types unix.utilities fry ;
 IN: unix.process
 
 ! Low-level Unix process launching utilities. These are used

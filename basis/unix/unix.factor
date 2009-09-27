@@ -5,7 +5,7 @@ USING: alien alien.c-types alien.syntax kernel libc
 sequences continuations byte-arrays strings math namespaces
 system combinators vocabs.loader accessors
 stack-checker macros locals generalizations unix.types
-io vocabs classes.struct ;
+io vocabs classes.struct unix.time ;
 IN: unix
 
 CONSTANT: PROT_NONE   0
@@ -35,12 +35,6 @@ CONSTANT: DT_LNK      10
 CONSTANT: DT_SOCK     12
 CONSTANT: DT_WHT      14
 
-STRUCT: group
-    { gr_name char* }
-    { gr_passwd char* }
-    { gr_gid int }
-    { gr_mem char** } ;
-
 LIBRARY: libc
 
 FUNCTION: char* strerror ( int errno ) ;
@@ -68,6 +62,26 @@ MACRO:: unix-system-call ( quot -- )
         ]
     ] ;
 
+<<
+
+{
+    { [ os linux? ] [ "unix.linux" require ] }
+    { [ os bsd? ] [ "unix.bsd" require ] }
+    { [ os solaris? ] [ "unix.solaris" require ] }
+} cond
+
+"debugger" vocab [
+    "unix.debugger" require
+] when
+
+>>
+
+STRUCT: group
+    { gr_name char* }
+    { gr_passwd char* }
+    { gr_gid int }
+    { gr_mem char** } ;
+
 FUNCTION: int accept ( int s, void* sockaddr, socklen_t* socklen ) ;
 FUNCTION: int bind ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int chdir ( char* path ) ;
@@ -86,7 +100,7 @@ FUNCTION: int dup2 ( int oldd, int newd ) ;
 ! FUNCTION: int dup ( int oldd ) ;
 : _exit ( status -- * )
     #! We throw to give this a terminating stack effect.
-    "int" f "_exit" { "int" } alien-invoke "Exit failed" throw ;
+    int f "_exit" { int } alien-invoke "Exit failed" throw ;
 FUNCTION: void endpwent ( ) ;
 FUNCTION: int fchdir ( int fd ) ;
 FUNCTION: int fchown ( int fd, uid_t owner, gid_t group ) ;
@@ -207,12 +221,3 @@ FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 
-{
-    { [ os linux? ] [ "unix.linux" require ] }
-    { [ os bsd? ] [ "unix.bsd" require ] }
-    { [ os solaris? ] [ "unix.solaris" require ] }
-} cond
-
-"debugger" vocab [
-    "unix.debugger" require
-] when
