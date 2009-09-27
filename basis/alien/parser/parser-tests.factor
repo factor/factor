@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
-USING: alien.c-types alien.parser alien.syntax tools.test
-vocabs.parser ;
+USING: accessors alien.c-types alien.parser alien.syntax
+tools.test vocabs.parser ;
 IN: alien.parser.tests
 
 TYPEDEF: char char2
@@ -22,5 +22,6 @@ TYPEDEF: char char2
 SYMBOL: not-c-type
 
 [ "not-c-type" parse-c-type ] [ no-c-type? ] must-fail-with
-[ "not-word" parse-c-type ] [ no-word-error? ] must-fail-with
+! uncomment this when string C type parsing goes away
+! [ "not-word" parse-c-type ] [ error>> no-word-error? ] must-fail-with
 
