@@ -78,7 +78,6 @@ ERROR: bad-checksum ;
 
 ERROR: unknown-color-type n ;
 ERROR: unimplemented-color-type image ;
-ERROR: unknown-filter-method image ;
 
 : inflate-data ( loading-png -- bytes )
     find-compressed-bytes zlib-inflate ; 
@@ -117,15 +116,8 @@ ERROR: unknown-filter-method image ;
         png-unfilter-line
     ] map B{ } concat-as ;
 
-: filter-png ( groups loading-png -- byte-array )
-    filter-method>> {
-        { filter-none [ reverse-png-filter ] }
-        [ unknown-filter-method ]
-    } case ;
-
 : png-image-bytes ( loading-png -- byte-array )
-    [ [ inflate-data ] [ png-group-width ] bi group ]
-    [ filter-png ] bi ;
+    [ inflate-data ] [ png-group-width ] bi group reverse-png-filter ;
 
 : decode-greyscale ( loading-png -- loading-png )
     unimplemented-color-type ;
