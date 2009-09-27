@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.syntax assocs core-foundation
-core-foundation.strings core-text.utilities destructors init
-kernel math memoize fonts combinators ;
+USING: accessors alien.c-types alien.syntax assocs core-foundation
+core-foundation.dictionaries core-foundation.strings
+core-graphics.types core-text.utilities destructors init
+kernel math memoize fonts combinators unix.types ;
 IN: core-text.fonts
 
 TYPEDEF: void* CTFontRef

@@ -68,7 +68,6 @@ TYPEDEF: void* PQconninfoOption*
 TYPEDEF: void* PGnotify*
 TYPEDEF: void* PQArgBlock*
 TYPEDEF: void* PQprintOpt*
-TYPEDEF: void* FILE*
 TYPEDEF: void* SSL*
 
 LIBRARY: postgresql

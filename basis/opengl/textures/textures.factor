@@ -5,6 +5,7 @@ kernel opengl opengl.gl opengl.capabilities combinators images
 images.tesselation grouping sequences math math.vectors
 math.matrices generalizations fry arrays namespaces system
 locals literals specialized-arrays ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: opengl.textures
 

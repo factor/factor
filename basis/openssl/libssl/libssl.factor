@@ -1,9 +1,9 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax combinators kernel system namespaces
-assocs parser lexer sequences words quotations math.bitwise
-alien.libraries ;
+USING: alien alien.c-types alien.syntax combinators kernel
+system namespaces assocs parser lexer sequences words
+quotations math.bitwise alien.libraries ;
 
 IN: openssl.libssl
 
@@ -94,6 +94,17 @@ TYPEDEF: void* SSL_SESSION*
 TYPEDEF: void* SSL*
 
 LIBRARY: libssl
+
+! ===============================================
+! x509.h
+! ===============================================
+
+TYPEDEF: void* X509_NAME*
+
+TYPEDEF: void* X509*
+
+FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
+FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;
 
 ! ===============================================
 ! ssl.h
@@ -257,17 +268,6 @@ CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_STORE  HEX: 0200
 
 : SSL_SESS_CACHE_NO_INTERNAL ( -- n )
     { SSL_SESS_CACHE_NO_INTERNAL_LOOKUP SSL_SESS_CACHE_NO_INTERNAL_STORE } flags ; inline
-
-! ===============================================
-! x509.h
-! ===============================================
-
-TYPEDEF: void* X509_NAME*
-
-TYPEDEF: void* X509*
-
-FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
-FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;
 
 ! ===============================================
 ! x509_vfy.h
