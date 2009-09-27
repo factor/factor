@@ -63,9 +63,7 @@ temp: temp/int-rep ;
 ! Slot access
 INSN: ##slot
 def: dst/int-rep
-use: obj/int-rep slot/int-rep
-literal: tag
-temp: temp/int-rep ;
+use: obj/int-rep slot/int-rep ;
 
 INSN: ##slot-imm
 def: dst/int-rep
@@ -73,9 +71,7 @@ use: obj/int-rep
 literal: slot tag ;
 
 INSN: ##set-slot
-use: src/int-rep obj/int-rep slot/int-rep
-literal: tag
-temp: temp/int-rep ;
+use: src/int-rep obj/int-rep slot/int-rep ;
 
 INSN: ##set-slot-imm
 use: src/int-rep obj/int-rep

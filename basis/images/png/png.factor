@@ -14,6 +14,18 @@ TUPLE: loading-png
     width height bit-depth color-type compression-method
     filter-method interlace-method uncompressed ;
 
+CONSTANT: filter-none 0
+CONSTANT: filter-sub 1
+CONSTANT: filter-up 2
+CONSTANT: filter-average 3
+CONSTANT: filter-paeth 4
+
+CONSTANT: greyscale 0
+CONSTANT: truecolor 2
+CONSTANT: indexed-color 3
+CONSTANT: greyscale-alpha 4
+CONSTANT: truecolor-alpha 6
+
 : <loading-png> ( -- image )
     loading-png new
     V{ } clone >>chunks ;
@@ -64,22 +76,32 @@ ERROR: bad-checksum ;
     chunks>> [ type>> "IDAT" = ] filter
     [ data>> ] map concat ;
 
-
-: zlib-data ( loading-png -- bytes ) 
-    chunks>> [ type>> "IDAT" = ] find nip data>> ;
-
 ERROR: unknown-color-type n ;
 ERROR: unimplemented-color-type image ;
+ERROR: unknown-filter-method image ;
 
 : inflate-data ( loading-png -- bytes )
-    zlib-data zlib-inflate ; 
+    find-compressed-bytes zlib-inflate ; 
+
+: png-group-width ( loading-png -- n )
+    dup color-type>> {
+        { 2 [ [ bit-depth>> 8 / 3 * ] [ width>> ] bi * 1 + ] }
+        { 6 [ [ bit-depth>> 8 / 4 * ] [ width>> ] bi * 1 + ] }
+        [ unknown-color-type ]
+    } case ;
+
+: filter-png ( groups loading-png -- byte-array )
+    filter-method>> {
+        { filter-none [ reverse-png-filter ] }
+        [ unknown-filter-method ]
+    } case ;
+
+: png-image-bytes ( loading-png -- byte-array )
+    [ [ inflate-data ] [ png-group-width ] bi group ]
+    [ filter-png ] bi ;
 
 : decode-greyscale ( loading-png -- loading-png )
     unimplemented-color-type ;
-
-: png-image-bytes ( loading-png -- byte-array )
-    [ inflate-data ] [ width>> 3 * 1 + ] bi group
-    reverse-png-filter ;
 
 : decode-truecolor ( loading-png -- loading-png )
     [ <image> ] dip {
@@ -101,13 +123,34 @@ ERROR: unimplemented-color-type image ;
         [ drop RGBA >>component-order ubyte-components >>component-type ]
     } cleave ;
 
+ERROR: invalid-color-type/bit-depth loading-png ;
+
+: validate-bit-depth ( loading-png seq -- loading-png )
+    [ dup bit-depth>> ] dip member?
+    [ invalid-color-type/bit-depth ] unless ;
+
+: validate-greyscale ( loading-png -- loading-png )
+    { 1 2 4 8 16 } validate-bit-depth ;
+
+: validate-truecolor ( loading-png -- loading-png )
+    { 8 16 } validate-bit-depth ;
+
+: validate-indexed-color ( loading-png -- loading-png )
+    { 1 2 4 8 } validate-bit-depth ;
+
+: validate-greyscale-alpha ( loading-png -- loading-png )
+    { 8 16 } validate-bit-depth ;
+
+: validate-truecolor-alpha ( loading-png -- loading-png )
+    { 8 16 } validate-bit-depth ;
+
 : decode-png ( loading-png -- loading-png ) 
     dup color-type>> {
-        { 0 [ decode-greyscale ] }
-        { 2 [ decode-truecolor ] }
-        { 3 [ decode-indexed-color ] }
-        { 4 [ decode-greyscale-alpha ] }
-        { 6 [ decode-truecolor-alpha ] }
+        { greyscale [ validate-greyscale decode-greyscale ] }
+        { truecolor [ validate-truecolor decode-truecolor ] }
+        { indexed-color [ validate-indexed-color decode-indexed-color ] }
+        { greyscale-alpha [ validate-greyscale-alpha decode-greyscale-alpha ] }
+        { truecolor-alpha [ validate-truecolor-alpha decode-truecolor-alpha ] }
         [ unknown-color-type ]
     } case ;
 

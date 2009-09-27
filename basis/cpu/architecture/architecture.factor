@@ -153,9 +153,9 @@ HOOK: %return cpu ( -- )
 
 HOOK: %dispatch cpu ( src temp -- )
 
-HOOK: %slot cpu ( dst obj slot tag temp -- )
+HOOK: %slot cpu ( dst obj slot -- )
 HOOK: %slot-imm cpu ( dst obj slot tag -- )
-HOOK: %set-slot cpu ( src obj slot tag temp -- )
+HOOK: %set-slot cpu ( src obj slot -- )
 HOOK: %set-slot-imm cpu ( src obj slot tag -- )
 
 HOOK: %string-nth cpu ( dst obj index temp -- )
@@ -296,7 +296,7 @@ HOOK: %write-barrier cpu ( src card# table -- )
 HOOK: %check-nursery cpu ( label temp1 temp2 -- )
 HOOK: %save-gc-root cpu ( gc-root register -- )
 HOOK: %load-gc-root cpu ( gc-root register -- )
-HOOK: %call-gc cpu ( gc-root-count -- )
+HOOK: %call-gc cpu ( gc-root-count temp1 -- )
 
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
@@ -383,9 +383,6 @@ M: object %prepare-var-args ;
 
 HOOK: %alien-invoke cpu ( function library -- )
 
-HOOK: %vm-invoke-1st-arg cpu ( function -- )
-HOOK: %vm-invoke-3rd-arg cpu ( function -- )
-
 HOOK: %cleanup cpu ( params -- )
 
 M: object %cleanup ( params -- ) drop ;
@@ -397,6 +394,10 @@ HOOK: %alien-indirect cpu ( -- )
 HOOK: %alien-callback cpu ( quot -- )
 
 HOOK: %callback-value cpu ( ctype -- )
+
+HOOK: %nest-stacks cpu ( -- )
+
+HOOK: %unnest-stacks cpu ( -- )
 
 ! Return to caller with stdcall unwinding (only for x86)
 HOOK: %callback-return cpu ( params -- )

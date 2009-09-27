@@ -36,49 +36,45 @@ includes stack shufflers, some fixnum arithmetic words, and words such as tag,
 slot and eq?. A primitive call is relatively expensive (two subroutine calls)
 so this results in a big speedup for relatively little effort. */
 
-bool quotation_jit::primitive_call_p(cell i)
+bool quotation_jit::primitive_call_p(cell i, cell length)
 {
-	return (i + 2) == array_capacity(elements.untagged())
-		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(FIXNUM_TYPE)
-		&& array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_PRIMITIVE_WORD];
+	return (i + 2) == length && array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_PRIMITIVE_WORD];
 }
 
-bool quotation_jit::fast_if_p(cell i)
+bool quotation_jit::fast_if_p(cell i, cell length)
 {
-	return (i + 3) == array_capacity(elements.untagged())
-		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(QUOTATION_TYPE)
+	return (i + 3) == length
 		&& tagged<object>(array_nth(elements.untagged(),i + 1)).type_p(QUOTATION_TYPE)
 		&& array_nth(elements.untagged(),i + 2) == parent_vm->userenv[JIT_IF_WORD];
 }
 
-bool quotation_jit::fast_dip_p(cell i)
+bool quotation_jit::fast_dip_p(cell i, cell length)
 {
-	return (i + 2) <= array_capacity(elements.untagged())
-		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(QUOTATION_TYPE)
-		&& array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_DIP_WORD];
+	return (i + 2) <= length && array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_DIP_WORD];
 }
 
-bool quotation_jit::fast_2dip_p(cell i)
+bool quotation_jit::fast_2dip_p(cell i, cell length)
 {
-	return (i + 2) <= array_capacity(elements.untagged())
-		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(QUOTATION_TYPE)
-		&& array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_2DIP_WORD];
+	return (i + 2) <= length && array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_2DIP_WORD];
 }
 
-bool quotation_jit::fast_3dip_p(cell i)
+bool quotation_jit::fast_3dip_p(cell i, cell length)
 {
-	return (i + 2) <= array_capacity(elements.untagged())
-		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(QUOTATION_TYPE)
-		&& array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_3DIP_WORD];
+	return (i + 2) <= length && array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_3DIP_WORD];
 }
 
-bool quotation_jit::mega_lookup_p(cell i)
+bool quotation_jit::mega_lookup_p(cell i, cell length)
 {
-	return (i + 3) < array_capacity(elements.untagged())
-		&& tagged<object>(array_nth(elements.untagged(),i)).type_p(ARRAY_TYPE)
+	return (i + 4) <= length
 		&& tagged<object>(array_nth(elements.untagged(),i + 1)).type_p(FIXNUM_TYPE)
 		&& tagged<object>(array_nth(elements.untagged(),i + 2)).type_p(ARRAY_TYPE)
 		&& array_nth(elements.untagged(),i + 3) == parent_vm->userenv[MEGA_LOOKUP_WORD];
+}
+
+bool quotation_jit::declare_p(cell i, cell length)
+{
+	return (i + 2) <= length
+		&& array_nth(elements.untagged(),i + 1) == parent_vm->userenv[JIT_DECLARE_WORD];
 }
 
 bool quotation_jit::stack_frame_p()
@@ -96,7 +92,7 @@ bool quotation_jit::stack_frame_p()
 				return true;
 			break;
 		case QUOTATION_TYPE:
-			if(fast_dip_p(i) || fast_2dip_p(i) || fast_3dip_p(i))
+			if(fast_dip_p(i,length) || fast_2dip_p(i,length) || fast_3dip_p(i,length))
 				return true;
 			break;
 		default:
@@ -179,19 +175,21 @@ void quotation_jit::iterate_quotation()
 			break;
 		case FIXNUM_TYPE:
 			/* Primitive calls */
-			if(primitive_call_p(i))
+			if(primitive_call_p(i,length))
 			{
 				emit_with(parent_vm->userenv[JIT_PRIMITIVE],obj.value());
 
 				i++;
 
 				tail_call = true;
-				break;
 			}
+			else
+				push(obj.value());
+			break;
 		case QUOTATION_TYPE:
 			/* 'if' preceeded by two literal quotations (this is why if and ? are
 			   mutually recursive in the library, but both still work) */
-			if(fast_if_p(i))
+			if(fast_if_p(i,length))
 			{
 				if(stack_frame) emit(parent_vm->userenv[JIT_EPILOG]);
 				tail_call = true;
@@ -207,39 +205,37 @@ void quotation_jit::iterate_quotation()
 				emit(parent_vm->userenv[JIT_IF]);
 
 				i += 2;
-
-				break;
 			}
 			/* dip */
-			else if(fast_dip_p(i))
+			else if(fast_dip_p(i,length))
 			{
 				if(compiling)
 					parent_vm->jit_compile(obj.value(),relocate);
 				emit_with(parent_vm->userenv[JIT_DIP],obj.value());
 				i++;
-				break;
 			}
 			/* 2dip */
-			else if(fast_2dip_p(i))
+			else if(fast_2dip_p(i,length))
 			{
 				if(compiling)
 					parent_vm->jit_compile(obj.value(),relocate);
 				emit_with(parent_vm->userenv[JIT_2DIP],obj.value());
 				i++;
-				break;
 			}
 			/* 3dip */
-			else if(fast_3dip_p(i))
+			else if(fast_3dip_p(i,length))
 			{
 				if(compiling)
 					parent_vm->jit_compile(obj.value(),relocate);
 				emit_with(parent_vm->userenv[JIT_3DIP],obj.value());
 				i++;
-				break;
 			}
+			else
+				push(obj.value());
+			break;
 		case ARRAY_TYPE:
 			/* Method dispatch */
-			if(mega_lookup_p(i))
+			if(mega_lookup_p(i,length))
 			{
 				emit_mega_cache_lookup(
 					array_nth(elements.untagged(),i),
@@ -247,8 +243,13 @@ void quotation_jit::iterate_quotation()
 					array_nth(elements.untagged(),i + 2));
 				i += 3;
 				tail_call = true;
-				break;
 			}
+			/* Non-optimizing compiler ignores declarations */
+			else if(declare_p(i,length))
+				i++;
+			else
+				push(obj.value());
+			break;
 		default:
 			push(obj.value());
 			break;
@@ -294,10 +295,7 @@ inline void factor_vm::primitive_jit_compile()
 	jit_compile(dpop(),true);
 }
 
-PRIMITIVE(jit_compile)
-{
-	PRIMITIVE_GETVM()->primitive_jit_compile();
-}
+PRIMITIVE_FORWARD(jit_compile)
 
 /* push a new quotation on the stack */
 inline void factor_vm::primitive_array_to_quotation()
@@ -311,10 +309,7 @@ inline void factor_vm::primitive_array_to_quotation()
 	drepl(tag<quotation>(quot));
 }
 
-PRIMITIVE(array_to_quotation)
-{
-	PRIMITIVE_GETVM()->primitive_array_to_quotation();
-}
+PRIMITIVE_FORWARD(array_to_quotation)
 
 inline void factor_vm::primitive_quotation_xt()
 {
@@ -322,10 +317,7 @@ inline void factor_vm::primitive_quotation_xt()
 	drepl(allot_cell((cell)quot->xt));
 }
 
-PRIMITIVE(quotation_xt)
-{
-	PRIMITIVE_GETVM()->primitive_quotation_xt();
-}
+PRIMITIVE_FORWARD(quotation_xt)
 
 void factor_vm::compile_all_words()
 {
@@ -368,7 +360,7 @@ cell factor_vm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 	return quot.value();
 }
 
-VM_ASM_API_OVERFLOW cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm *myvm)
+VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm *myvm)
 {
 	ASSERTVM();
 	return VM_PTR->lazy_jit_compile_impl(quot_,stack);
@@ -381,9 +373,6 @@ inline void factor_vm::primitive_quot_compiled_p()
 	dpush(tag_boolean(quot->code != NULL));
 }
 
-PRIMITIVE(quot_compiled_p)
-{
-	PRIMITIVE_GETVM()->primitive_quot_compiled_p();
-}
+PRIMITIVE_FORWARD(quot_compiled_p)
 
 }

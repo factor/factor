@@ -37,8 +37,8 @@ M: object specializer-declaration class ;
         [ [ specializer-declaration ] map swap '[ _ declare @ ] ] 2bi
     ] with { } map>assoc ;
 
-: specialize-quot ( quot word specializer -- quot' )
-    [ drop nip def>> ] [ nip specializer-cases ] 3bi alist>quot ;
+: specialize-quot ( quot specializer -- quot' )
+    [ drop ] [ specializer-cases ] 2bi alist>quot ;
 
 ! compiler.tree.propagation.inlining sets this to f
 SYMBOL: specialize-method?
@@ -52,8 +52,8 @@ t specialize-method? set-global
 
 : specialize-method ( quot method -- quot' )
     [ specialize-method? get [ method-declaration prepend ] [ drop ] if ]
-    [ dup "method-generic" word-prop specializer ] bi
-    [ specialize-quot ] [ drop ] if* ;
+    [ "method-generic" word-prop ] bi
+    specializer [ specialize-quot ] when* ;
 
 : standard-method? ( method -- ? )
     dup method-body? [
@@ -64,7 +64,7 @@ t specialize-method? set-global
     [ def>> ] keep
     dup generic? [ drop ] [
         [ dup standard-method? [ specialize-method ] [ drop ] if ]
-        [ dup specializer [ specialize-quot ] [ drop ] if* ]
+        [ specializer [ specialize-quot ] when* ]
         bi
     ] if ;
 

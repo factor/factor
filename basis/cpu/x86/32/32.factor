@@ -38,9 +38,8 @@ M:: x86.32 %dispatch ( src temp -- )
     bi ;
 
 ! Registers for fastcall
-M: x86.32 param-reg-1 EAX ;
-M: x86.32 param-reg-2 EDX ;
-M: x86.32 param-reg-3 ECX ;
+: param-reg-1 ( -- reg ) EAX ;
+: param-reg-2 ( -- reg ) EDX ;
 
 M: x86.32 pic-tail-reg EBX ;
 
@@ -49,16 +48,7 @@ M: x86.32 reserved-area-size 0 ;
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
 : push-vm-ptr ( -- )
-    temp-reg 0 MOV rc-absolute-cell rt-vm rel-fixup ! push the vm ptr as an argument
-    temp-reg PUSH ;
-
-M: x86.32 %vm-invoke-1st-arg ( function -- )
-    push-vm-ptr
-    f %alien-invoke
-    temp-reg POP ;
-
-M: x86.32 %vm-invoke-3rd-arg ( function -- )
-    %vm-invoke-1st-arg ;    ! first 2 args are regs, 3rd is stack so vm-invoke-1st-arg works here
+    0 PUSH rc-absolute-cell rt-vm rel-fixup ; ! push the vm ptr as an argument
 
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
     c-type
@@ -247,6 +237,18 @@ M:: x86.32 %unbox-large-struct ( n c-type -- )
         "to_value_struct" f %alien-invoke
     ] with-aligned-stack ;
 
+M: x86.32 %nest-stacks ( -- )
+    4 [
+        push-vm-ptr
+        "nest_stacks" f %alien-invoke
+    ] with-aligned-stack ;
+
+M: x86.32 %unnest-stacks ( -- )
+    4 [
+        push-vm-ptr
+        "unnest_stacks" f %alien-invoke
+    ] with-aligned-stack ;
+
 M: x86.32 %prepare-alien-indirect ( -- )
     push-vm-ptr "unbox_alien" f %alien-invoke
     temp-reg POP
@@ -280,6 +282,7 @@ M: x86.32 %callback-value ( ctype -- )
     ! Unbox EAX
     unbox-return ;
 
+
 M: x86.32 %cleanup ( params -- )
     #! a) If we just called an stdcall function in Windows, it
     #! cleaned up the stack frame for us. But we don't want that
@@ -310,6 +313,19 @@ M: x86.32 %callback-return ( n -- )
         { [ dup return>> large-struct? ] [ drop 4 ] }
         [ drop 0 ]
     } cond RET ;
+
+M:: x86.32 %call-gc ( gc-root-count temp -- )
+    temp gc-root-base param@ LEA
+    12 [
+        ! Pass the VM ptr as the third parameter
+        0 PUSH rc-absolute-cell rt-vm rel-fixup
+        ! Pass number of roots as second parameter
+        gc-root-count PUSH 
+        ! Pass pointer to start of GC roots as first parameter
+        temp PUSH 
+        ! Call GC
+        "inline_gc" f %alien-invoke
+    ] with-aligned-stack ;
 
 M: x86.32 dummy-stack-params? f ;
 
