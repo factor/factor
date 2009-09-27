@@ -114,7 +114,7 @@ HELP: typedef
 { POSTPONE: TYPEDEF: typedef } related-words
 
 HELP: c-struct?
-{ $values { "type" "a string" } { "?" "a boolean" } }
+{ $values { "c-type" "a C type name" } { "?" "a boolean" } }
 { $description "Tests if a C type is a structure defined by " { $link POSTPONE: STRUCT: } "." } ;
 
 HELP: define-function
