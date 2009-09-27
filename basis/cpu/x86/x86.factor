@@ -989,6 +989,7 @@ enable-fixnum-log2
         enable-float-intrinsics
         enable-fsqrt
         enable-float-min/max
+        enable-float-functions
         install-sse2-check
     ] when ;
 
