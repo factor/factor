@@ -29,7 +29,7 @@ GENERIC: <c-direct-array> ( alien len c-type -- array )
 M: c-type-name <c-direct-array>
     c-direct-array-constructor execute( alien len -- array ) ; inline
 
-: malloc-array ( n type -- alien )
+: malloc-array ( n type -- array )
     [ heap-size calloc ] [ <c-direct-array> ] 2bi ; inline
 
 : (malloc-array) ( n type -- alien )
