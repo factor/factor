@@ -249,9 +249,6 @@ M:: x86.64 %call-gc ( gc-root-count temp -- )
 ! x86-64.
 enable-alien-4-intrinsics
 
-! Enable fast calling of libc math functions
-enable-float-functions
-
 USE: vocabs.loader
 
 {
