@@ -55,11 +55,10 @@ ERROR: not-in-table value ;
 
 GENERIC: code-space-full? ( lzw -- ? )
 
-M: tiff-lzw code-space-full?
-    [ table>> length ] [ code-size>> 2^ 1 - ] bi = ;
+: size-and-limit ( lzw -- m n ) [ table>> length ] [ code-size>> 2^ ] bi ;
 
-M: gif-lzw code-space-full?
-    [ table>> length ] [ code-size>> 2^ ] bi = ;
+M: tiff-lzw code-space-full? size-and-limit 1 - = ;
+M: gif-lzw code-space-full? size-and-limit = ;
 
 : maybe-increment-code-size ( lzw -- lzw )
     dup code-space-full? [ [ 1 + ] change-code-size ] when ;
