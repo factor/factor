@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system kernel unix math sequences
+USING: alien.c-types system kernel unix math sequences
 io.backend.unix io.ports specialized-arrays accessors ;
 QUALIFIED: io.pipes
 SPECIALIZED-ARRAY: int

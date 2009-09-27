@@ -31,7 +31,7 @@ STRUCT: ud
     { inp_hook void* }
     { inp_curr uchar }
     { inp_fill uchar }
-    { inp_file FILE* }
+    { inp_file void* }
     { inp_ctr uchar }
     { inp_buff uchar* }
     { inp_buff_end uchar* }
@@ -68,7 +68,7 @@ STRUCT: ud
     { c3 uchar }
     { inp_cache uchar[256] }
     { inp_sess uchar[64] }
-    { itab_entry ud_itab_entry* } ;
+    { itab_entry void* } ;
 
 FUNCTION: void ud_translate_intel ( ud* u ) ;
 FUNCTION: void ud_translate_att ( ud* u ) ;

@@ -7,6 +7,7 @@ io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
 strings math.vectors specialized-arrays locals
 images.loader ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: images.tiff
 

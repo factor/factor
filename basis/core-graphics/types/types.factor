@@ -1,10 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax classes.struct kernel layouts
-math math.rectangles arrays ;
+math math.rectangles arrays literals ;
+FROM: alien.c-types => float ;
 IN: core-graphics.types
 
-<< cell 4 = "float" "double" ? "CGFloat" typedef >>
+SYMBOL: CGFloat
+<< cell 4 = float double ? \ CGFloat typedef >>
 
 : <CGFloat> ( x -- alien )
     cell 4 = [ <float> ] [ <double> ] if ; inline

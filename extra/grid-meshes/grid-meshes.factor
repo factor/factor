@@ -1,6 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays destructors kernel math opengl
 opengl.gl sequences sequences.product specialized-arrays ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: grid-meshes
 
