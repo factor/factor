@@ -82,17 +82,23 @@ ERROR: unimplemented-color-type image ;
 : inflate-data ( loading-png -- bytes )
     find-compressed-bytes zlib-inflate ; 
 
-: png-group-width ( loading-png -- n )
+: scale-bit-depth ( loading-png -- n ) bit-depth>> 8 / ; inline
+
+: png-bytes-per-pixel ( loading-png -- n )
     dup color-type>> {
-        { 2 [ [ bit-depth>> 8 / 3 * ] [ width>> ] bi * 1 + ] }
-        { 6 [ [ bit-depth>> 8 / 4 * ] [ width>> ] bi * 1 + ] }
+        { 2 [ scale-bit-depth 3 * ] }
+        { 6 [ scale-bit-depth 4 * ] }
         [ unknown-color-type ]
-    } case ;
+    } case ; inline
+
+: png-group-width ( loading-png -- n )
+    ! 1 + is for the filter type, 1 byte preceding each line
+    [ png-bytes-per-pixel ] [ width>> ] bi * 1 + ;
 
 :: paeth ( a b c -- p ) 
     a b + c - { a b c } [ [ - abs ] keep 2array ] with map 
     sort-keys first second ;
-    
+
 :: png-unfilter-line ( prev curr filter -- curr' )
     prev :> c
     prev 3 tail-slice :> b
