@@ -135,8 +135,6 @@ M: ulonglong-2-rep scalar-rep-of drop ulonglong-scalar-rep ;
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
 
-HOOK: two-operand? cpu ( -- ? )
-
 HOOK: %load-immediate cpu ( reg obj -- )
 HOOK: %load-reference cpu ( reg obj -- )
 

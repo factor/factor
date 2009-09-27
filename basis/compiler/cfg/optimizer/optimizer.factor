@@ -12,7 +12,6 @@ compiler.cfg.copy-prop
 compiler.cfg.dce
 compiler.cfg.write-barrier
 compiler.cfg.representations
-compiler.cfg.two-operand
 compiler.cfg.ssa.destruction
 compiler.cfg.empty-blocks
 compiler.cfg.checker ;
@@ -37,7 +36,6 @@ SYMBOL: check-optimizer?
     eliminate-dead-code
     eliminate-write-barriers
     select-representations
-    convert-two-operand
     destruct-ssa
     delete-empty-blocks
     ?check ;
