@@ -103,14 +103,14 @@ FUNCTION: void* BIO_f_buffer (  ) ;
 
 CONSTANT: EVP_MAX_MD_SIZE 64
 
+TYPEDEF: void* EVP_MD*
+TYPEDEF: void* ENGINE*
+
 STRUCT: EVP_MD_CTX
     { digest EVP_MD* }
     { engine ENGINE* }
     { flags ulong }
     { md_data void* } ;
-
-TYPEDEF: void* EVP_MD*
-TYPEDEF: void* ENGINE*
 
 ! Initialize ciphers and digest tables
 FUNCTION: void OpenSSL_add_all_ciphers (  ) ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax system sequences vocabs.loader words
+USING: alien.c-types alien.syntax system sequences vocabs.loader words
 accessors ;
 IN: unix.kqueue
 

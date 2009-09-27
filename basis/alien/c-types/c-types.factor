@@ -60,6 +60,8 @@ GENERIC: c-type ( name -- type ) foldable
 
 GENERIC: resolve-pointer-type ( name -- c-type )
 
+<< \ void \ void* "pointer-c-type" set-word-prop >>
+
 M: word resolve-pointer-type
     dup "pointer-c-type" word-prop
     [ ] [ drop void* ] ?if ;
