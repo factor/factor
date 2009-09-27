@@ -7,7 +7,7 @@ ARTICLE: "bit-arrays" "Bit arrays"
 $nl
 "Bit array words are in the " { $vocab-link "bit-arrays" } " vocabulary."
 $nl
-"Bit arrays play a special role in the C library interface; they can be used to pass binary data back and forth between Factor and C. See " { $link "c-byte-arrays" } "."
+"Bit arrays play a special role in the C library interface; they can be used to pass binary data back and forth between Factor and C. See " { $link "c-pointers" } "."
 $nl
 "Bit arrays form a class of objects:"
 { $subsection bit-array }
