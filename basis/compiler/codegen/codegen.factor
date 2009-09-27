@@ -269,7 +269,7 @@ M: _gc generate-insn
         [ data-values>> save-data-regs ]
         [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
         [ [ temp1>> ] [ temp2>> ] bi t %save-context ]
-        [ tagged-values>> length %call-gc ]
+        [ [ tagged-values>> length ] [ temp1>> ] bi %call-gc ]
         [ [ tagged-values>> ] [ temp1>> ] bi load-gc-roots ]
         [ data-values>> load-data-regs ]
     } cleave
@@ -442,7 +442,7 @@ M: ##alien-indirect generate-insn
     ! Generate code for boxing input parameters in a callback.
     [
         dup \ %save-param-reg move-parameters
-        "nest_stacks" %vm-invoke-1st-arg
+        %nest-stacks
         box-parameters
     ] with-param-regs ;
 
@@ -479,8 +479,6 @@ TUPLE: callback-context ;
         [ callback-return-quot ] tri 3append ,
         [ callback-context new do-callback ] %
     ] [ ] make ;
-
-: %unnest-stacks ( -- ) "unnest_stacks" %vm-invoke-1st-arg ;
 
 M: ##callback-return generate-insn
     #! All the extra book-keeping for %unwind is only for x86.

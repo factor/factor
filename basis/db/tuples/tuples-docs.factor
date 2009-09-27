@@ -230,9 +230,9 @@ T{ book
 } book set
 """ }
 "Now we've created a book. Let's save it to the database."
-{ $code """USING: db db.sqlite fry io.files ;
+{ $code """USING: db db.sqlite fry io.files.temp ;
 : with-book-tutorial ( quot -- )
-     '[ "book-tutorial.db" temp-file <sqlite-db> _ with-db ] call ;
+     '[ "book-tutorial.db" temp-file <sqlite-db> _ with-db ] call ; inline
 
 [
     book recreate-table

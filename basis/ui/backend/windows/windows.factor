@@ -537,14 +537,13 @@ SYMBOL: nc-buttons
     COLOR_BTNFACE GetSysColor RGB>color ;
 
 : ?make-glass ( world hwnd -- )
-    over {
-        [ composition-enabled? ]
-        [ window-controls>> textured-background swap memq? ]
-    } 1&&
-    [
-        full-window-margins DwmExtendFrameIntoClientArea drop
-        T{ rgba f 0.0 0.0 0.0 0.0 }
-    ] [ system-background-color ] if >>background-color ;
+    over window-controls>> textured-background swap memq? [
+        composition-enabled? [
+            full-window-margins DwmExtendFrameIntoClientArea drop
+            T{ rgba f 0.0 0.0 0.0 0.0 }
+        ] [ drop system-background-color ] if >>background-color
+        drop
+    ] [ 2drop ] if ;
 
 : handle-wm-dwmcompositionchanged ( hWnd uMsg wParam lParam -- )
     3drop [ window ] keep ?make-glass ;

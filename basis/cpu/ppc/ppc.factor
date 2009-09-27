@@ -40,9 +40,6 @@ enable-float-intrinsics
 
 M: ppc %vm-field-ptr ( dst field -- ) %load-vm-field-addr ;
 
-M: ppc %vm-invoke-1st-arg ( function -- ) f %alien-invoke ;
-M: ppc %vm-invoke-3rd-arg ( function -- ) f %alien-invoke ;
-
 M: ppc machine-registers
     {
         { int-regs $[ 2 12 [a,b] 15 29 [a,b] append ] }
@@ -142,16 +139,12 @@ M:: ppc %dispatch ( src temp -- )
     temp MTCTR
     BCTR ;
 
-:: (%slot) ( obj slot tag temp -- reg offset )
-    temp slot obj ADD
-    temp tag neg ; inline
-
 : (%slot-imm) ( obj slot tag -- reg offset )
     [ cells ] dip - ; inline
 
-M: ppc %slot ( dst obj slot tag temp -- ) (%slot) LWZ ;
+M: ppc %slot ( dst obj slot -- ) swapd LWZX ;
 M: ppc %slot-imm ( dst obj slot tag -- ) (%slot-imm) LWZ ;
-M: ppc %set-slot ( src obj slot tag temp -- ) (%slot) STW ;
+M: ppc %set-slot ( src obj slot -- ) swapd STWX ;
 M: ppc %set-slot-imm ( src obj slot tag -- ) (%slot-imm) STW ;
 
 M:: ppc %string-nth ( dst src index temp -- )
@@ -513,7 +506,7 @@ M:: ppc %save-gc-root ( gc-root register -- )
 M:: ppc %load-gc-root ( gc-root register -- )
     register 1 gc-root gc-root@ LWZ ;
 
-M:: ppc %call-gc ( gc-root-count -- )
+M:: ppc %call-gc ( gc-root-count temp -- )
     3 1 gc-root-base local@ ADDI
     gc-root-count 4 LI
     "inline_gc" f %alien-invoke ;
@@ -780,6 +773,12 @@ M: ppc %box-small-struct ( c-type -- )
     5 3 8 LWZ
     4 3 4 LWZ
     3 3 0 LWZ ;
+
+M: ppc %nest-stacks ( -- )
+    "nest_stacks" f %alien-invoke ;
+
+M: ppc %unnest-stacks ( -- )
+    "unnest_stacks" f %alien-invoke ;
 
 M: ppc %unbox-small-struct ( size -- )
     #! Alien must be in EAX.

@@ -163,6 +163,7 @@ USERENV: jit-3dip 40
 USERENV: jit-execute-word 41
 USERENV: jit-execute-jump 42
 USERENV: jit-execute-call 43
+USERENV: jit-declare-word 44
 
 ! PIC stubs
 USERENV: pic-load 47
@@ -493,6 +494,7 @@ M: quotation '
     \ inline-cache-miss-tail \ pic-miss-tail-word set
     \ mega-cache-lookup \ mega-lookup-word set
     \ mega-cache-miss \ mega-miss-word set
+    \ declare jit-declare-word set
     [ undefined ] undefined-quot set ;
 
 : emit-userenvs ( -- )
