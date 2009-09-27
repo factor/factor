@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.libraries alien.syntax kernel sequences words system
-combinators ;
+USING: alien alien.c-types alien.libraries alien.syntax kernel
+sequences words system combinators opengl.gl ;
 IN: opengl.glu
 
 <<
