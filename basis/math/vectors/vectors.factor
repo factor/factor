@@ -55,11 +55,33 @@ PRIVATE>
         [ drop call ]
     } case ; inline
 
+: fp-bitwise-unary ( x seq quot -- z )
+    swap element-type {
+        { c:double [ [ double>bits ] dip call bits>double ] }
+        { c:float  [ [ float>bits  ] dip call bits>float  ] }
+        [ drop call ]
+    } case ; inline
+
 PRIVATE>
 
 : vbitand ( u v -- w ) over '[ _ [ bitand ] fp-bitwise-op ] 2map ;
 : vbitor ( u v -- w ) over '[ _ [ bitor ] fp-bitwise-op ] 2map ;
 : vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
+: vbitnot ( u -- w ) dup '[ _ [ bitnot ] fp-bitwise-unary ] map ;
+
+: vand ( u v -- w ) [ and ] 2map ;
+: vor  ( u v -- w ) [ or  ] 2map ;
+: vxor ( u v -- w ) [ xor ] 2map ;
+: vnot ( u -- w )   [ not ] map ;
+
+: v<  ( u v -- w ) [ <   ] { } 2map-as ;
+: v<= ( u v -- w ) [ <=  ] { } 2map-as ;
+: v>= ( u v -- w ) [ >=  ] { } 2map-as ;
+: v>  ( u v -- w ) [ >   ] { } 2map-as ;
+: vunordered? ( u v -- w ) [ unordered? ] { } 2map-as ;
+: v=  ( u v -- w ) [ =   ] { } 2map-as ;
+
+: v?   ( ? u v -- w ) [ ? ] pick 3map-as ;
 
 : vlshift ( u n -- w ) '[ _ shift ] map ;
 : vrshift ( u n -- w ) neg '[ _ shift ] map ;
