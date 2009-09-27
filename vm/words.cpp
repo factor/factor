@@ -32,7 +32,7 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 }
 
 /* (word) ( name vocabulary hashcode -- word ) */
-inline void factor_vm::primitive_word()
+void factor_vm::primitive_word()
 {
 	cell hashcode = dpop();
 	cell vocab = dpop();
@@ -40,10 +40,8 @@ inline void factor_vm::primitive_word()
 	dpush(tag<word>(allot_word(name,vocab,hashcode)));
 }
 
-PRIMITIVE_FORWARD(word)
-
 /* word-xt ( word -- start end ) */
-inline void factor_vm::primitive_word_xt()
+void factor_vm::primitive_word_xt()
 {
 	gc_root<word> w(dpop(),this);
 	w.untag_check(this);
@@ -59,8 +57,6 @@ inline void factor_vm::primitive_word_xt()
 		dpush(allot_cell((cell)w->code + w->code->size));
 	}
 }
-
-PRIMITIVE_FORWARD(word_xt)
 
 /* Allocates memory */
 void factor_vm::update_word_xt(cell w_)
@@ -84,20 +80,16 @@ void factor_vm::update_word_xt(cell w_)
 		w->xt = w->code->xt();
 }
 
-inline void factor_vm::primitive_optimized_p()
+void factor_vm::primitive_optimized_p()
 {
 	drepl(tag_boolean(word_optimized_p(untag_check<word>(dpeek()))));
 }
 
-PRIMITIVE_FORWARD(optimized_p)
-
-inline void factor_vm::primitive_wrapper()
+void factor_vm::primitive_wrapper()
 {
 	wrapper *new_wrapper = allot<wrapper>(sizeof(wrapper));
 	new_wrapper->object = dpeek();
 	drepl(tag<wrapper>(new_wrapper));
 }
-
-PRIMITIVE_FORWARD(wrapper)
 
 }

@@ -568,14 +568,12 @@ void factor_vm::gc()
 	garbage_collection(data->tenured(),false,0);
 }
 
-inline void factor_vm::primitive_gc()
+void factor_vm::primitive_gc()
 {
 	gc();
 }
 
-PRIMITIVE_FORWARD(gc)
-
-inline void factor_vm::primitive_gc_stats()
+void factor_vm::primitive_gc_stats()
 {
 	growable_array result(this);
 
@@ -605,8 +603,6 @@ inline void factor_vm::primitive_gc_stats()
 	dpush(result.elements.value());
 }
 
-PRIMITIVE_FORWARD(gc_stats)
-
 void factor_vm::clear_gc_stats()
 {
 	for(cell i = 0; i < max_gen_count; i++)
@@ -618,16 +614,14 @@ void factor_vm::clear_gc_stats()
 	code_heap_scans = 0;
 }
 
-inline void factor_vm::primitive_clear_gc_stats()
+void factor_vm::primitive_clear_gc_stats()
 {
 	clear_gc_stats();
 }
 
-PRIMITIVE_FORWARD(clear_gc_stats)
-
 /* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
    to coalesce equal but distinct quotations and wrappers. */
-inline void factor_vm::primitive_become()
+void factor_vm::primitive_become()
 {
 	array *new_objects = untag_check<array>(dpop());
 	array *old_objects = untag_check<array>(dpop());
@@ -655,8 +649,6 @@ inline void factor_vm::primitive_become()
 	   unoptimized words. */
 	compile_all_words();
 }
-
-PRIMITIVE_FORWARD(become)
 
 void factor_vm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 {

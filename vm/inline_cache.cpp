@@ -250,16 +250,14 @@ VM_C_API void *inline_cache_miss(cell return_address, factor_vm *myvm)
 	return VM_PTR->inline_cache_miss(return_address);
 }
 
-inline void factor_vm::primitive_reset_inline_cache_stats()
+void factor_vm::primitive_reset_inline_cache_stats()
 {
 	cold_call_to_ic_transitions = ic_to_pic_transitions = pic_to_mega_transitions = 0;
 	cell i;
 	for(i = 0; i < 4; i++) pic_counts[i] = 0;
 }
 
-PRIMITIVE_FORWARD(reset_inline_cache_stats)
-
-inline void factor_vm::primitive_inline_cache_stats()
+void factor_vm::primitive_inline_cache_stats()
 {
 	growable_array stats(this);
 	stats.add(allot_cell(cold_call_to_ic_transitions));
@@ -271,7 +269,5 @@ inline void factor_vm::primitive_inline_cache_stats()
 	stats.trim();
 	dpush(stats.elements.value());
 }
-
-PRIMITIVE_FORWARD(inline_cache_stats)
 
 }

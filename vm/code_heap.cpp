@@ -55,7 +55,7 @@ void factor_vm::update_code_heap_words()
 	iterate_code_heap(factor::update_word_references);
 }
 
-inline void factor_vm::primitive_modify_code_heap()
+void factor_vm::primitive_modify_code_heap()
 {
 	gc_root<array> alist(dpop(),this);
 
@@ -106,10 +106,8 @@ inline void factor_vm::primitive_modify_code_heap()
 	update_code_heap_words();
 }
 
-PRIMITIVE_FORWARD(modify_code_heap)
-
 /* Push the free space and total size of the code heap */
-inline void factor_vm::primitive_code_room()
+void factor_vm::primitive_code_room()
 {
 	cell used, total_free, max_free;
 	code->heap_usage(&used,&total_free,&max_free);
@@ -118,8 +116,6 @@ inline void factor_vm::primitive_code_room()
 	dpush(tag_fixnum(total_free / 1024));
 	dpush(tag_fixnum(max_free / 1024));
 }
-
-PRIMITIVE_FORWARD(code_room)
 
 code_block *factor_vm::forward_xt(code_block *compiled)
 {

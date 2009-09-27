@@ -10,7 +10,4 @@ inline cell array_nth(array *array, cell slot)
 	return array->data()[slot];
 }
 
-PRIMITIVE(array);
-PRIMITIVE(resize_array);
-
 }
