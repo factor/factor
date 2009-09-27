@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays alien alien.c-types alien.structs
+USING: accessors arrays alien alien.c-types
 alien.arrays alien.strings kernel math namespaces parser
 sequences words quotations math.parser splitting grouping
 effects assocs combinators lexer strings.parser alien.parser 
@@ -26,12 +26,6 @@ SYNTAX: STDCALL-CALLBACK:
 
 SYNTAX: TYPEDEF:
     scan-c-type CREATE-C-TYPE typedef ;
-
-SYNTAX: C-STRUCT:
-    scan current-vocab parse-definition define-struct ; deprecated
-
-SYNTAX: C-UNION:
-    scan parse-definition define-union ; deprecated
 
 SYNTAX: C-ENUM:
     ";" parse-tokens
