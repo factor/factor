@@ -113,14 +113,12 @@ cell factor_vm::lookup_method(cell obj, cell methods)
 		return array_nth(untag<array>(methods),TAG(obj));
 }
 
-inline void factor_vm::primitive_lookup_method()
+void factor_vm::primitive_lookup_method()
 {
 	cell methods = dpop();
 	cell obj = dpop();
 	dpush(lookup_method(obj,methods));
 }
-
-PRIMITIVE_FORWARD(lookup_method)
 
 cell factor_vm::object_class(cell obj)
 {
@@ -149,7 +147,7 @@ void factor_vm::update_method_cache(cell cache, cell klass, cell method)
 	set_array_nth(cache_elements,hashcode + 1,method);
 }
 
-inline void factor_vm::primitive_mega_cache_miss()
+void factor_vm::primitive_mega_cache_miss()
 {
 	megamorphic_cache_misses++;
 
@@ -166,16 +164,12 @@ inline void factor_vm::primitive_mega_cache_miss()
 	dpush(method);
 }
 
-PRIMITIVE_FORWARD(mega_cache_miss)
-
-inline void factor_vm::primitive_reset_dispatch_stats()
+void factor_vm::primitive_reset_dispatch_stats()
 {
 	megamorphic_cache_hits = megamorphic_cache_misses = 0;
 }
 
-PRIMITIVE_FORWARD(reset_dispatch_stats)
-
-inline void factor_vm::primitive_dispatch_stats()
+void factor_vm::primitive_dispatch_stats()
 {
 	growable_array stats(this);
 	stats.add(allot_cell(megamorphic_cache_hits));
@@ -183,8 +177,6 @@ inline void factor_vm::primitive_dispatch_stats()
 	stats.trim();
 	dpush(stats.elements.value());
 }
-
-PRIMITIVE_FORWARD(dispatch_stats)
 
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cache_)
 {

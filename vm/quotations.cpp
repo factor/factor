@@ -290,15 +290,13 @@ void factor_vm::jit_compile(cell quot_, bool relocating)
 	if(relocating) relocate_code_block(compiled);
 }
 
-inline void factor_vm::primitive_jit_compile()
+void factor_vm::primitive_jit_compile()
 {
 	jit_compile(dpop(),true);
 }
 
-PRIMITIVE_FORWARD(jit_compile)
-
 /* push a new quotation on the stack */
-inline void factor_vm::primitive_array_to_quotation()
+void factor_vm::primitive_array_to_quotation()
 {
 	quotation *quot = allot<quotation>(sizeof(quotation));
 	quot->array = dpeek();
@@ -309,15 +307,11 @@ inline void factor_vm::primitive_array_to_quotation()
 	drepl(tag<quotation>(quot));
 }
 
-PRIMITIVE_FORWARD(array_to_quotation)
-
-inline void factor_vm::primitive_quotation_xt()
+void factor_vm::primitive_quotation_xt()
 {
 	quotation *quot = untag_check<quotation>(dpeek());
 	drepl(allot_cell((cell)quot->xt));
 }
-
-PRIMITIVE_FORWARD(quotation_xt)
 
 void factor_vm::compile_all_words()
 {
@@ -366,13 +360,11 @@ VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm 
 	return VM_PTR->lazy_jit_compile_impl(quot_,stack);
 }
 
-inline void factor_vm::primitive_quot_compiled_p()
+void factor_vm::primitive_quot_compiled_p()
 {
 	tagged<quotation> quot(dpop());
 	quot.untag_check(this);
 	dpush(tag_boolean(quot->code != NULL));
 }
-
-PRIMITIVE_FORWARD(quot_compiled_p)
 
 }

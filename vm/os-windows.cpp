@@ -90,13 +90,11 @@ const vm_char *factor_vm::vm_executable_path()
 	return safe_strdup(full_path);
 }
 
-inline void factor_vm::primitive_existsp()
+void factor_vm::primitive_existsp()
 {
 	vm_char *path = untag_check<byte_array>(dpop())->data<vm_char>();
 	box_boolean(windows_stat(path));
 }
-
-PRIMITIVE_FORWARD(existsp)
 
 segment::segment(factor_vm *myvm_, cell size_)
 {

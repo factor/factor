@@ -206,12 +206,10 @@ cell factor_vm::unaligned_object_size(object *pointer)
 	}
 }
 
-inline void factor_vm::primitive_size()
+void factor_vm::primitive_size()
 {
 	box_unsigned_cell(object_size(dpop()));
 }
-
-PRIMITIVE_FORWARD(size)
 
 /* The number of cells from the start of the object which should be scanned by
 the GC. Some types have a binary payload at the end (string, word, DLL) which
@@ -251,7 +249,7 @@ cell factor_vm::binary_payload_start(object *pointer)
 }
 
 /* Push memory usage statistics in data heap */
-inline void factor_vm::primitive_data_room()
+void factor_vm::primitive_data_room()
 {
 	dpush(tag_fixnum((data->cards_end - data->cards) >> 10));
 	dpush(tag_fixnum((data->decks_end - data->decks) >> 10));
@@ -270,8 +268,6 @@ inline void factor_vm::primitive_data_room()
 	dpush(a.elements.value());
 }
 
-PRIMITIVE_FORWARD(data_room)
-
 /* Disables GC and activates next-object ( -- obj ) primitive */
 void factor_vm::begin_scan()
 {
@@ -284,12 +280,10 @@ void factor_vm::end_scan()
 	gc_off = false;
 }
 
-inline void factor_vm::primitive_begin_scan()
+void factor_vm::primitive_begin_scan()
 {
 	begin_scan();
 }
-
-PRIMITIVE_FORWARD(begin_scan)
 
 cell factor_vm::next_object()
 {
@@ -305,20 +299,16 @@ cell factor_vm::next_object()
 }
 
 /* Push object at heap scan cursor and advance; pushes f when done */
-inline void factor_vm::primitive_next_object()
+void factor_vm::primitive_next_object()
 {
 	dpush(next_object());
 }
 
-PRIMITIVE_FORWARD(next_object)
-
 /* Re-enables GC */
-inline void factor_vm::primitive_end_scan()
+void factor_vm::primitive_end_scan()
 {
 	gc_off = false;
 }
-
-PRIMITIVE_FORWARD(end_scan)
 
 template<typename TYPE> void factor_vm::each_object(TYPE &functor)
 {

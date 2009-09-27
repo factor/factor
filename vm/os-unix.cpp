@@ -74,14 +74,12 @@ void factor_vm::ffi_dlclose(dll *dll)
 	dll->dll = NULL;
 }
 
-inline void factor_vm::primitive_existsp()
+void factor_vm::primitive_existsp()
 {
 	struct stat sb;
 	char *path = (char *)(untag_check<byte_array>(dpop()) + 1);
 	box_boolean(stat(path,&sb) >= 0);
 }
-
-PRIMITIVE_FORWARD(existsp)
 
 segment::segment(factor_vm *myvm_, cell size_)
 {

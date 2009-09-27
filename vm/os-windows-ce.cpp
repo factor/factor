@@ -30,8 +30,6 @@ char *getenv(char *name)
 	return 0; /* unreachable */
 }
 
-PRIMITIVE_FORWARD(os_envs)
-
 void c_to_factor_toplevel(cell quot)
 {
 	c_to_factor(quot,vm);
