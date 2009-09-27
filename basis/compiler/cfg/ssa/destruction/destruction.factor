@@ -6,6 +6,7 @@ sets vectors
 compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.renaming
+compiler.cfg.registers
 compiler.cfg.dominance
 compiler.cfg.instructions
 compiler.cfg.liveness.ssa
@@ -60,16 +61,24 @@ SYMBOL: copies
 
 GENERIC: prepare-insn ( insn -- )
 
+: try-to-coalesce ( dst src -- ) 2array copies get push ;
+
+M: insn prepare-insn
+    [ defs-vreg ] [ uses-vregs ] bi
+    2dup empty? not and [
+        first 
+        2dup [ rep-of ] bi@ eq?
+        [ try-to-coalesce ] [ 2drop ] if
+    ] [ 2drop ] if ;
+
 M: ##copy prepare-insn
-    [ dst>> ] [ src>> ] bi 2array copies get push ;
+    [ dst>> ] [ src>> ] bi try-to-coalesce ;
 
 M: ##phi prepare-insn
     [ dst>> ] [ inputs>> values ] bi
     [ eliminate-copy ] with each ;
 
-M: insn prepare-insn drop ;
-
-: prepare-block ( bb -- )
+    : prepare-block ( bb -- )
     instructions>> [ prepare-insn ] each ;
 
 : prepare-coalescing ( cfg -- )

@@ -20,8 +20,6 @@ IN: cpu.x86
 M: label JMP 0 JMP rc-relative label-fixup ;
 M: label JUMPcc [ 0 ] dip JUMPcc rc-relative label-fixup ;
 
-M: x86 two-operand? t ;
-
 M: x86 vector-regs float-regs ;
 
 HOOK: stack-reg cpu ( -- reg )
@@ -102,26 +100,35 @@ M: x86 %slot-imm ( dst obj slot tag -- ) (%slot-imm) MOV ;
 M: x86 %set-slot ( src obj slot -- ) [+] swap MOV ;
 M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
 
+:: two-operand ( dst src1 src2 rep -- dst src )
+    dst src2 eq? [ "Cannot handle this case" throw ] when
+    dst src1 rep %copy
+    dst src2 ; inline
+
+:: one-operand ( dst src rep -- dst )
+    dst src rep %copy
+    dst ; inline
+
 M: x86 %add     2over eq? [ nip ADD ] [ [+] LEA ] if ;
 M: x86 %add-imm 2over eq? [ nip ADD ] [ [+] LEA ] if ;
-M: x86 %sub     nip SUB ;
+M: x86 %sub     int-rep two-operand SUB ;
 M: x86 %sub-imm 2over eq? [ nip SUB ] [ neg [+] LEA ] if ;
-M: x86 %mul     nip swap IMUL2 ;
+M: x86 %mul     int-rep two-operand swap IMUL2 ;
 M: x86 %mul-imm IMUL3 ;
-M: x86 %and     nip AND ;
-M: x86 %and-imm nip AND ;
-M: x86 %or      nip OR ;
-M: x86 %or-imm  nip OR ;
-M: x86 %xor     nip XOR ;
-M: x86 %xor-imm nip XOR ;
-M: x86 %shl-imm nip SHL ;
-M: x86 %shr-imm nip SHR ;
-M: x86 %sar-imm nip SAR ;
+M: x86 %and     int-rep two-operand AND ;
+M: x86 %and-imm int-rep two-operand AND ;
+M: x86 %or      int-rep two-operand OR ;
+M: x86 %or-imm  int-rep two-operand OR ;
+M: x86 %xor     int-rep two-operand XOR ;
+M: x86 %xor-imm int-rep two-operand XOR ;
+M: x86 %shl-imm int-rep two-operand SHL ;
+M: x86 %shr-imm int-rep two-operand SHR ;
+M: x86 %sar-imm int-rep two-operand SAR ;
 
-M: x86 %min     nip [ CMP ] [ CMOVG ] 2bi ;
-M: x86 %max     nip [ CMP ] [ CMOVL ] 2bi ;
+M: x86 %min     int-rep two-operand [ CMP ] [ CMOVG ] 2bi ;
+M: x86 %max     int-rep two-operand [ CMP ] [ CMOVL ] 2bi ;
 
-M: x86 %not     drop NOT ;
+M: x86 %not     int-rep one-operand NOT ;
 M: x86 %log2    BSR ;
 
 GENERIC: copy-register* ( dst src rep -- )
@@ -137,18 +144,14 @@ M: vector-rep copy-register* drop MOVDQU ;
 M: x86 %copy ( dst src rep -- )
     2over eq? [ 3drop ] [ copy-register* ] if ;
 
-:: overflow-template ( label dst src1 src2 insn -- )
-    src1 src2 insn call
-    label JO ; inline
-
 M: x86 %fixnum-add ( label dst src1 src2 -- )
-    [ ADD ] overflow-template ;
+    int-rep two-operand ADD JO ;
 
 M: x86 %fixnum-sub ( label dst src1 src2 -- )
-    [ SUB ] overflow-template ;
+    int-rep two-operand SUB JO ;
 
 M: x86 %fixnum-mul ( label dst src1 src2 -- )
-    [ swap IMUL2 ] overflow-template ;
+    int-rep two-operand swap IMUL2 JO ;
 
 : bignum@ ( reg n -- op )
     cells bignum tag-number - [+] ; inline
@@ -210,12 +213,12 @@ M:: x86 %bignum>integer ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
-M: x86 %add-float nip ADDSD ;
-M: x86 %sub-float nip SUBSD ;
-M: x86 %mul-float nip MULSD ;
-M: x86 %div-float nip DIVSD ;
-M: x86 %min-float nip MINSD ;
-M: x86 %max-float nip MAXSD ;
+M: x86 %add-float double-rep two-operand ADDSD ;
+M: x86 %sub-float double-rep two-operand SUBSD ;
+M: x86 %mul-float double-rep two-operand MULSD ;
+M: x86 %div-float double-rep two-operand DIVSD ;
+M: x86 %min-float double-rep two-operand MINSD ;
+M: x86 %max-float double-rep two-operand MAXSD ;
 M: x86 %sqrt SQRTSD ;
 
 M: x86 %single>double-float CVTSS2SD ;
@@ -299,6 +302,7 @@ M: x86 %gather-vector-2-reps
     } available-reps ;
 
 M: x86 %add-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { float-4-rep [ ADDPS ] }
         { double-2-rep [ ADDPD ] }
@@ -310,7 +314,7 @@ M: x86 %add-vector ( dst src1 src2 rep -- )
         { uint-4-rep [ PADDD ] }
         { longlong-2-rep [ PADDQ ] }
         { ulonglong-2-rep [ PADDQ ] }
-    } case drop ;
+    } case ;
 
 M: x86 %add-vector-reps
     {
@@ -319,12 +323,13 @@ M: x86 %add-vector-reps
     } available-reps ;
 
 M: x86 %saturated-add-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { char-16-rep [ PADDSB ] }
         { uchar-16-rep [ PADDUSB ] }
         { short-8-rep [ PADDSW ] }
         { ushort-8-rep [ PADDUSW ] }
-    } case drop ;
+    } case ;
 
 M: x86 %saturated-add-vector-reps
     {
@@ -332,10 +337,11 @@ M: x86 %saturated-add-vector-reps
     } available-reps ;
 
 M: x86 %add-sub-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { float-4-rep [ ADDSUBPS ] }
         { double-2-rep [ ADDSUBPD ] }
-    } case drop ;
+    } case ;
 
 M: x86 %add-sub-vector-reps
     {
@@ -343,6 +349,7 @@ M: x86 %add-sub-vector-reps
     } available-reps ;
 
 M: x86 %sub-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { float-4-rep [ SUBPS ] }
         { double-2-rep [ SUBPD ] }
@@ -354,7 +361,7 @@ M: x86 %sub-vector ( dst src1 src2 rep -- )
         { uint-4-rep [ PSUBD ] }
         { longlong-2-rep [ PSUBQ ] }
         { ulonglong-2-rep [ PSUBQ ] }
-    } case drop ;
+    } case ;
 
 M: x86 %sub-vector-reps
     {
@@ -363,12 +370,13 @@ M: x86 %sub-vector-reps
     } available-reps ;
 
 M: x86 %saturated-sub-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { char-16-rep [ PSUBSB ] }
         { uchar-16-rep [ PSUBUSB ] }
         { short-8-rep [ PSUBSW ] }
         { ushort-8-rep [ PSUBUSW ] }
-    } case drop ;
+    } case ;
 
 M: x86 %saturated-sub-vector-reps
     {
@@ -376,6 +384,7 @@ M: x86 %saturated-sub-vector-reps
     } available-reps ;
 
 M: x86 %mul-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { float-4-rep [ MULPS ] }
         { double-2-rep [ MULPD ] }
@@ -383,7 +392,7 @@ M: x86 %mul-vector ( dst src1 src2 rep -- )
         { ushort-8-rep [ PMULLW ] }
         { int-4-rep [ PMULLD ] }
         { uint-4-rep [ PMULLD ] }
-    } case drop ;
+    } case ;
 
 M: x86 %mul-vector-reps
     {
@@ -397,10 +406,11 @@ M: x86 %saturated-mul-vector-reps
     { } ;
 
 M: x86 %div-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { float-4-rep [ DIVPS ] }
         { double-2-rep [ DIVPD ] }
-    } case drop ;
+    } case ;
 
 M: x86 %div-vector-reps
     {
@@ -409,6 +419,7 @@ M: x86 %div-vector-reps
     } available-reps ;
 
 M: x86 %min-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { char-16-rep [ PMINSB ] }
         { uchar-16-rep [ PMINUB ] }
@@ -418,7 +429,7 @@ M: x86 %min-vector ( dst src1 src2 rep -- )
         { uint-4-rep [ PMINUD ] }
         { float-4-rep [ MINPS ] }
         { double-2-rep [ MINPD ] }
-    } case drop ;
+    } case ;
 
 M: x86 %min-vector-reps
     {
@@ -428,6 +439,7 @@ M: x86 %min-vector-reps
     } available-reps ;
 
 M: x86 %max-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { char-16-rep [ PMAXSB ] }
         { uchar-16-rep [ PMAXUB ] }
@@ -437,7 +449,7 @@ M: x86 %max-vector ( dst src1 src2 rep -- )
         { uint-4-rep [ PMAXUD ] }
         { float-4-rep [ MAXPS ] }
         { double-2-rep [ MAXPD ] }
-    } case drop ;
+    } case ;
 
 M: x86 %max-vector-reps
     {
@@ -482,11 +494,12 @@ M: x86 %sqrt-vector-reps
     } available-reps ;
 
 M: x86 %and-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { float-4-rep [ ANDPS ] }
         { double-2-rep [ ANDPD ] }
         [ drop PAND ]
-    } case drop ;
+    } case ;
 
 M: x86 %and-vector-reps
     {
@@ -495,11 +508,12 @@ M: x86 %and-vector-reps
     } available-reps ;
 
 M: x86 %or-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { float-4-rep [ ORPS ] }
         { double-2-rep [ ORPD ] }
         [ drop POR ]
-    } case drop ;
+    } case ;
 
 M: x86 %or-vector-reps
     {
@@ -508,11 +522,12 @@ M: x86 %or-vector-reps
     } available-reps ;
 
 M: x86 %xor-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { float-4-rep [ XORPS ] }
         { double-2-rep [ XORPD ] }
         [ drop PXOR ]
-    } case drop ;
+    } case ;
 
 M: x86 %xor-vector-reps
     {
@@ -521,6 +536,7 @@ M: x86 %xor-vector-reps
     } available-reps ;
 
 M: x86 %shl-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { short-8-rep [ PSLLW ] }
         { ushort-8-rep [ PSLLW ] }
@@ -528,7 +544,7 @@ M: x86 %shl-vector ( dst src1 src2 rep -- )
         { uint-4-rep [ PSLLD ] }
         { longlong-2-rep [ PSLLQ ] }
         { ulonglong-2-rep [ PSLLQ ] }
-    } case drop ;
+    } case ;
 
 M: x86 %shl-vector-reps
     {
@@ -536,13 +552,14 @@ M: x86 %shl-vector-reps
     } available-reps ;
 
 M: x86 %shr-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
     {
         { short-8-rep [ PSRAW ] }
         { ushort-8-rep [ PSRLW ] }
         { int-4-rep [ PSRAD ] }
         { uint-4-rep [ PSRLD ] }
         { ulonglong-2-rep [ PSRLQ ] }
-    } case drop ;
+    } case ;
 
 M: x86 %shr-vector-reps
     {

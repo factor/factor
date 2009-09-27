@@ -49,8 +49,6 @@ M: ppc machine-registers
 CONSTANT: scratch-reg 30
 CONSTANT: fp-scratch-reg 30
 
-M: ppc two-operand? f ;
-
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
 M: ppc %load-reference ( reg obj -- )
