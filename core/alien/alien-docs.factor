@@ -261,7 +261,6 @@ $nl
 "C library interface words are found in the " { $vocab-link "alien" } " vocabulary."
 { $warning "C does not perform runtime type checking, automatic memory management or array bounds checks. Incorrect usage of C library functions can lead to crashes, data corruption, and security exploits." }
 { $subsection "loading-libs" }
-{ $subsection "aliens" }
 { $subsection "alien-invoke" }
 { $subsection "alien-callback" }
 { $subsection "c-data" }
