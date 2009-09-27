@@ -1,5 +1,5 @@
-USING: alien.syntax kernel math windows.types windows.kernel32
-math.bitwise classes.struct ;
+USING: alien.c-types alien.syntax kernel math windows.types
+windows.kernel32 math.bitwise classes.struct ;
 IN: windows.advapi32
 
 LIBRARY: advapi32
@@ -222,14 +222,14 @@ C-ENUM:
     SE_WMIGUID_OBJECT
     SE_REGISTRY_WOW64_32KEY ;
 
-TYPEDEF: TRUSTEE* PTRUSTEE
-
 STRUCT: TRUSTEE
-    { pMultipleTrustee PTRUSTEE }
+    { pMultipleTrustee TRUSTEE* }
     { MultipleTrusteeOperation MULTIPLE_TRUSTEE_OPERATION }
     { TrusteeForm TRUSTEE_FORM }
     { TrusteeType TRUSTEE_TYPE }
     { ptstrName LPTSTR } ;
+
+TYPEDEF: TRUSTEE* PTRUSTEE
 
 STRUCT: EXPLICIT_ACCESS
     { grfAccessPermissions DWORD }
