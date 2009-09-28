@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types assocs byte-arrays classes
-effects fry functors generalizations kernel literals locals
-math math.functions math.vectors math.vectors.simd.intrinsics
+USING: accessors alien.c-types assocs byte-arrays classes effects fry
+functors generalizations kernel literals locals math math.functions
+math.vectors math.vectors.private math.vectors.simd.intrinsics
 math.vectors.specialization parser prettyprint.custom sequences
 sequences.private strings words definitions macros cpu.architecture
 namespaces arrays quotations ;
@@ -140,6 +140,8 @@ M: A set-nth-unsafe underlying>> SET-NTH call ; inline
 : >A ( seq -- simd-array ) \ A new clone-like ;
 
 M: A like drop dup \ A instance? [ >A ] unless ; inline
+
+M: A new-underlying drop \ A boa ; inline
 
 M: A new-sequence
     drop dup N =
