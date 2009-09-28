@@ -188,9 +188,6 @@ HOOK: %fixnum-add cpu ( label dst src1 src2 -- )
 HOOK: %fixnum-sub cpu ( label dst src1 src2 -- )
 HOOK: %fixnum-mul cpu ( label dst src1 src2 -- )
 
-HOOK: %integer>bignum cpu ( dst src temp -- )
-HOOK: %bignum>integer cpu ( dst src temp -- )
-
 HOOK: %unbox-float cpu ( dst src -- )
 HOOK: %box-float cpu ( dst src temp -- )
 

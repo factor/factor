@@ -144,8 +144,6 @@ CODEGEN: ##max %max
 CODEGEN: ##not %not
 CODEGEN: ##log2 %log2
 CODEGEN: ##copy %copy
-CODEGEN: ##integer>bignum %integer>bignum
-CODEGEN: ##bignum>integer %bignum>integer
 CODEGEN: ##unbox-float %unbox-float
 CODEGEN: ##box-float %box-float
 CODEGEN: ##add-float %add-float

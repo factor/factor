@@ -132,24 +132,3 @@ IN: compiler.tests.low-level-ir
         T{ ##add-imm f 0 0 -8 }
     } compile-test-bb
 ] unit-test
-
-! These are def-is-use-insns
-USE: multiline
-
-/*
-
-[ 100 ] [
-    V{
-        T{ ##load-immediate f 0 100 }
-        T{ ##integer>bignum f 0 0 1 }
-    } compile-test-bb
-] unit-test
-
-[ 1 ] [
-    V{
-        T{ ##load-reference f 0 ALIEN: 8 }
-        T{ ##unbox-any-c-ptr f 0 0 1 }
-    } compile-test-bb
-] unit-test
-
-*/
