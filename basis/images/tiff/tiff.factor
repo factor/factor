@@ -556,7 +556,7 @@ ERROR: unknown-component-order ifd ;
 : process-tif-ifds ( loading-tiff -- )
     ifds>> [ process-ifd ] each ;
 
-: load-tiff ( path -- loading-tiff )
+: load-tiff ( stream -- loading-tiff )
     [ load-tiff-ifds dup ]
     [
         [ [ 0 seek-absolute ] dip stream-seek ]
