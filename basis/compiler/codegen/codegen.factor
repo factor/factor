@@ -142,6 +142,7 @@ CODEGEN: ##sar-imm %sar-imm
 CODEGEN: ##min %min
 CODEGEN: ##max %max
 CODEGEN: ##not %not
+CODEGEN: ##neg %neg
 CODEGEN: ##log2 %log2
 CODEGEN: ##copy %copy
 CODEGEN: ##unbox-float %unbox-float
@@ -160,9 +161,12 @@ CODEGEN: ##double>single-float %double>single-float
 CODEGEN: ##integer>float %integer>float
 CODEGEN: ##float>integer %float>integer
 CODEGEN: ##unbox-vector %unbox-vector
+CODEGEN: ##zero-vector %zero-vector
 CODEGEN: ##broadcast-vector %broadcast-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
+CODEGEN: ##shuffle-vector %shuffle-vector
+CODEGEN: ##select-vector %select-vector
 CODEGEN: ##box-vector %box-vector
 CODEGEN: ##add-vector %add-vector
 CODEGEN: ##saturated-add-vector %saturated-add-vector
@@ -174,6 +178,7 @@ CODEGEN: ##saturated-mul-vector %saturated-mul-vector
 CODEGEN: ##div-vector %div-vector
 CODEGEN: ##min-vector %min-vector
 CODEGEN: ##max-vector %max-vector
+CODEGEN: ##dot-vector %dot-vector
 CODEGEN: ##sqrt-vector %sqrt-vector
 CODEGEN: ##horizontal-add-vector %horizontal-add-vector
 CODEGEN: ##horizontal-sub-vector %horizontal-sub-vector

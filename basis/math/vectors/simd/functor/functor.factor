@@ -55,7 +55,7 @@ ERROR: bad-schema schema ;
 :: high-level-ops ( ctor elt-class -- assoc )
     ! Some SIMD operations are defined in terms of others.
     {
-        { vneg [ [ dup v- ] keep v- ] }
+        { vneg [ [ dup vbitxor ] keep v- ] }
         { n+v [ [ ctor execute ] dip v+ ] }
         { v+n [ ctor execute v+ ] }
         { n-v [ [ ctor execute ] dip v- ] }
@@ -71,12 +71,7 @@ ERROR: bad-schema schema ;
     ! To compute dot product and distance with integer vectors, we
     ! have to do things less efficiently, with integer overflow checks,
     ! in the general case.
-    elt-class m:float = [
-        {
-            { distance [ v- norm ] }
-            { v. [ v* sum ] }
-        } append
-    ] when ;
+    elt-class m:float = [ { distance [ v- norm ] } suffix ] when ;
 
 :: simd-vector-words ( class ctor rep vv->v vn->v v->v v->n -- )
     rep rep-component-type c-type-boxed-class :> elt-class

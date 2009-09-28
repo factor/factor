@@ -51,9 +51,6 @@ insn-classes get [
 : ^^unbox-c-ptr ( src class -- dst )
     [ next-vreg dup ] 2dip next-vreg ##unbox-c-ptr ;
 
-: ^^neg ( src -- dst )
-    [ 0 ^^load-literal ] dip ^^sub ;
-
 : ^^allot-tuple ( n -- dst )
     2 + cells tuple ^^allot ;
 
