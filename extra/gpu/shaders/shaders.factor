@@ -8,7 +8,8 @@ literals locals math math.parser memoize multiline namespaces
 opengl opengl.gl opengl.shaders parser quotations sequences
 specialized-arrays splitting strings tr ui.gadgets.worlds
 variants vectors vocabs vocabs.loader vocabs.parser words
-words.constant ;
+words.constant half-floats ;
+QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: void*
 IN: gpu.shaders
@@ -226,17 +227,17 @@ M: f (verify-feedback-format)
 
 : component-type>c-type ( component-type -- c-type )
     {
-        { ubyte-components [ "uchar" ] }
-        { ushort-components [ "ushort" ] }
-        { uint-components [ "uint" ] }
-        { half-components [ "half" ] }
-        { float-components [ "float" ] }
-        { byte-integer-components [ "char" ] }
-        { ubyte-integer-components [ "uchar" ] }
-        { short-integer-components [ "short" ] }
-        { ushort-integer-components [ "ushort" ] }
-        { int-integer-components [ "int" ] }
-        { uint-integer-components [ "uint" ] }
+        { ubyte-components [ c:uchar ] }
+        { ushort-components [ c:ushort ] }
+        { uint-components [ c:uint ] }
+        { half-components [ half ] }
+        { float-components [ c:float ] }
+        { byte-integer-components [ c:char ] }
+        { ubyte-integer-components [ c:uchar ] }
+        { short-integer-components [ c:short ] }
+        { ushort-integer-components [ c:ushort ] }
+        { int-integer-components [ c:int ] }
+        { uint-integer-components [ c:uint ] }
     } case ;
 
 : c-array-dim ( type dim -- type' )
