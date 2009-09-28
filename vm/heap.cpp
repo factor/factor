@@ -244,7 +244,7 @@ void heap::free_unmarked(heap_iterator iter)
 				add_to_free_list((free_heap_block *)prev);
 			scan->status = B_ALLOCATED;
 			prev = scan;
-			iter(scan,myvm);
+			(myvm->*iter)(scan);
 			break;
 		default:
 			myvm->critical_error("Invalid scan->status",(cell)scan);

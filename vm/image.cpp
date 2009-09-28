@@ -303,7 +303,7 @@ void fixup_code_block(code_block *compiled, factor_vm *myvm)
 
 void factor_vm::relocate_code()
 {
-	iterate_code_heap(factor::fixup_code_block);
+	iterate_code_heap(&factor_vm::fixup_code_block);
 }
 
 /* Read an image file from disk, only done once during startup */

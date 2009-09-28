@@ -484,6 +484,8 @@ struct factor_vm
 	void primitive_fclose();
 
 	//code_block
+	typedef void (factor_vm::*relocation_iterator)(relocation_entry rel, cell index, code_block *compiled);
+
 	relocation_type relocation_type_of(relocation_entry r);
 	relocation_class relocation_class_of(relocation_entry r);
 	cell relocation_offset_of(relocation_entry r);
@@ -524,6 +526,7 @@ struct factor_vm
 	//code_heap
 	heap *code;
 	unordered_map<heap_block *, char *> forwarding;
+	typedef void (factor_vm::*code_heap_iterator)(code_block *compiled);
 
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
