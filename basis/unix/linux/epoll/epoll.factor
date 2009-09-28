@@ -1,18 +1,18 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix.linux.epoll
-USING: alien.syntax classes.struct math ;
+USING: alien.c-types alien.syntax classes.struct math ;
 
 FUNCTION: int epoll_create ( int size ) ;
-
-FUNCTION: int epoll_ctl ( int epfd, int op, int fd, epoll_event* event ) ;
 
 STRUCT: epoll-event
 { events uint }
 { fd uint }
 { padding uint } ;
 
-FUNCTION: int epoll_wait ( int epfd, epoll_event* events, int maxevents, int timeout ) ;
+FUNCTION: int epoll_ctl ( int epfd, int op, int fd, epoll-event* event ) ;
+
+FUNCTION: int epoll_wait ( int epfd, epoll-event* events, int maxevents, int timeout ) ;
 
 CONSTANT: EPOLL_CTL_ADD 1 ! Add a file decriptor to the interface.
 CONSTANT: EPOLL_CTL_DEL 2 ! Remove a file decriptor from the interface.
