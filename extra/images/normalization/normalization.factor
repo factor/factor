@@ -1,7 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors grouping sequences combinators math
-byte-arrays fry images half-floats specialized-arrays ;
+USING: alien.c-types kernel accessors grouping sequences
+combinators math byte-arrays fry images half-floats
+specialized-arrays ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: float

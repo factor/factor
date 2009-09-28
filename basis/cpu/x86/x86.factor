@@ -142,7 +142,10 @@ M: double-2-rep copy-register* drop MOVUPD ;
 M: vector-rep copy-register* drop MOVDQU ;
 
 M: x86 %copy ( dst src rep -- )
-    2over eq? [ 3drop ] [ copy-register* ] if ;
+    2over eq? [ 3drop ] [
+        [ [ dup spill-slot? [ n>> spill@ ] when ] bi@ ] dip
+        copy-register*
+    ] if ;
 
 M: x86 %fixnum-add ( label dst src1 src2 -- )
     int-rep two-operand ADD JO ;
@@ -954,11 +957,8 @@ M: x86 %compare-float-ordered-branch ( label src1 src2 cc -- )
 M: x86 %compare-float-unordered-branch ( label src1 src2 cc -- )
     \ UCOMISD (%compare-float-branch) ;
 
-M:: x86 %spill ( src rep n -- )
-    n spill@ src rep %copy ;
-
-M:: x86 %reload ( dst rep n -- )
-    dst n spill@ rep %copy ;
+M:: x86 %spill ( src rep dst -- ) dst src rep %copy ;
+M:: x86 %reload ( dst rep src -- ) dst src rep %copy ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
@@ -1006,6 +1006,7 @@ enable-fixnum-log2
         enable-float-intrinsics
         enable-fsqrt
         enable-float-min/max
+        enable-float-functions
         install-sse2-check
     ] when ;
 

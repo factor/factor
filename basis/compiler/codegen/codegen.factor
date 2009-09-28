@@ -240,7 +240,7 @@ CODEGEN: _reload %reload
 GENERIC# save-gc-root 1 ( gc-root operand temp -- )
 
 M:: spill-slot save-gc-root ( gc-root operand temp -- )
-    temp int-rep operand n>> %reload
+    temp int-rep operand %reload
     gc-root temp %save-gc-root ;
 
 M: object save-gc-root drop %save-gc-root ;
@@ -253,7 +253,7 @@ GENERIC# load-gc-root 1 ( gc-root operand temp -- )
 
 M:: spill-slot load-gc-root ( gc-root operand temp -- )
     gc-root temp %load-gc-root
-    temp int-rep operand n>> %spill ;
+    temp int-rep operand %spill ;
 
 M: object load-gc-root drop %load-gc-root ;
 

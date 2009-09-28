@@ -33,7 +33,7 @@ ERROR: bad-vreg vreg ;
 : (vreg>reg) ( vreg pending -- reg )
     ! If a live vreg is not in the pending set, then it must
     ! have been spilled.
-    ?at [ spill-slots get ?at [ <spill-slot> ] [ bad-vreg ] if ] unless ;
+    ?at [ spill-slots get ?at [ ] [ bad-vreg ] if ] unless ;
 
 : vreg>reg ( vreg -- reg )
     pending-interval-assoc get (vreg>reg) ;

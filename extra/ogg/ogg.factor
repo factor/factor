@@ -122,7 +122,7 @@ FUNCTION: int      ogg_sync_pageout ( ogg-sync-state* oy, ogg-page* og ) ;
 FUNCTION: int      ogg_stream_pagein ( ogg-stream-state* os, ogg-page* og ) ;
 FUNCTION: int      ogg_stream_packetout ( ogg-stream-state* os, ogg-packet* op ) ;
 FUNCTION: int      ogg_stream_packetpeek ( ogg-stream-state* os, ogg-packet* op ) ;
-FUNCTION: int      ogg_stream_init (ogg-stream-state* os, int serialno ) ;
+FUNCTION: int      ogg_stream_init ( ogg-stream-state* os, int serialno ) ;
 FUNCTION: int      ogg_stream_clear ( ogg-stream-state* os ) ;
 FUNCTION: int      ogg_stream_reset ( ogg-stream-state* os ) ;
 FUNCTION: int      ogg_stream_reset_serialno ( ogg-stream-state* os, int serialno ) ;

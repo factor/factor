@@ -630,11 +630,11 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
         { stack-params [ [ [ 0 1 ] dip next-param@ LWZ 0 1 ] dip STW ] }
     } case ;
 
-M: ppc %spill ( src rep n -- )
-    swap [ spill@ ] dip store-to-frame ;
+M: ppc %spill ( src rep dst -- )
+    swap [ n>> spill@ ] dip store-to-frame ;
 
-M: ppc %reload ( dst rep n -- )
-    swap [ spill@ ] dip load-from-frame ;
+M: ppc %reload ( dst rep src -- )
+    swap [ n>> spill@ ] dip load-from-frame ;
 
 M: ppc %loop-entry ;
 

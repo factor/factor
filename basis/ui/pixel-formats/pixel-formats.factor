@@ -1,6 +1,6 @@
-USING: accessors assocs classes destructors functors kernel
-lexer math parser sequences specialized-arrays ui.backend
-words ;
+USING: alien.c-types accessors assocs classes destructors
+functors kernel lexer math parser sequences specialized-arrays
+ui.backend words ;
 SPECIALIZED-ARRAY: int
 IN: ui.pixel-formats
 

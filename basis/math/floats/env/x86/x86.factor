@@ -1,7 +1,7 @@
-USING: accessors alien.syntax arrays assocs biassocs
-classes.struct combinators cpu.x86.features kernel literals
-math math.bitwise math.floats.env math.floats.env.private
-system ;
+USING: accessors alien.c-types alien.syntax arrays assocs
+biassocs classes.struct combinators cpu.x86.features kernel
+literals math math.bitwise math.floats.env
+math.floats.env.private system ;
 IN: math.floats.env.x86
 
 STRUCT: sse-env
