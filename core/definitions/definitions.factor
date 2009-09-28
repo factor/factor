@@ -39,16 +39,16 @@ GENERIC: set-where ( loc defspec -- )
 
 GENERIC: forget* ( defspec -- )
 
-M: f forget* drop ;
-
-M: wrapper forget* wrapped>> forget* ;
-
 SYMBOL: forgotten-definitions
 
 : forgotten-definition ( defspec -- )
     dup forgotten-definitions get set-in-unit ;
 
 : forget ( defspec -- ) [ forgotten-definition ] [ forget* ] bi ;
+
+M: f forget* drop ;
+
+M: wrapper forget* wrapped>> forget ;
 
 : forget-all ( definitions -- ) [ forget ] each ;
 
