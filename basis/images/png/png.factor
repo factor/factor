@@ -6,7 +6,7 @@ io.binary io.encodings.ascii io.encodings.string kernel locals
 math math.bitwise math.ranges sequences sorting ;
 IN: images.png
 
-SINGLETON: png-image
+TUPLE: png-image < image ;
 "png" png-image register-image-class
 
 TUPLE: loading-png
@@ -123,17 +123,22 @@ ERROR: unimplemented-color-type image ;
     ] map B{ } concat-as ;
 
 : png-image-bytes ( loading-png -- byte-array )
-    [ png-bytes-per-pixel ] [ inflate-data ] [ png-group-width ] tri group reverse-png-filter ;
+    [ png-bytes-per-pixel ]
+    [ inflate-data ]
+    [ png-group-width ] tri group reverse-png-filter ;
+
+: loading-png>image ( loading-png -- image )
+    [ png-image new ] dip {
+        [ png-image-bytes >>bitmap ]
+        [ [ width>> ] [ height>> ] bi 2array >>dim ]
+        [ drop ubyte-components >>component-type ]
+    } cleave ;
 
 : decode-greyscale ( loading-png -- image )
     unimplemented-color-type ;
 
 : decode-truecolor ( loading-png -- image )
-    [ <image> ] dip {
-        [ png-image-bytes >>bitmap ]
-        [ [ width>> ] [ height>> ] bi 2array >>dim ]
-        [ drop RGB >>component-order ubyte-components >>component-type ]
-    } cleave ;
+    loading-png>image RGB >>component-order ;
     
 : decode-indexed-color ( loading-png -- image )
     unimplemented-color-type ;
@@ -142,11 +147,7 @@ ERROR: unimplemented-color-type image ;
     unimplemented-color-type ;
 
 : decode-truecolor-alpha ( loading-png -- image )
-    [ <image> ] dip {
-        [ png-image-bytes >>bitmap ]
-        [ [ width>> ] [ height>> ] bi 2array >>dim ]
-        [ drop RGBA >>component-order ubyte-components >>component-type ]
-    } cleave ;
+    loading-png>image RGBA >>component-order ;
 
 ERROR: invalid-color-type/bit-depth loading-png ;
 
