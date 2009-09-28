@@ -37,11 +37,11 @@ TYPEDEF: fsfilcnt_t __fsfilcnt_t
 TYPEDEF: __uint64_t rlim_t
 TYPEDEF: uint32_t id_t
 
-TYPEDEF: void* DIR*
-TYPEDEF: void* FILE*
-TYPEDEF: void* rlimit*
-TYPEDEF: void* rusage*
-TYPEDEF: void* sockaddr*
+C-TYPE: DIR
+C-TYPE: FILE
+C-TYPE: rlimit
+C-TYPE: rusage
+C-TYPE: sockaddr
 
 os {
     { linux   [ "unix.types.linux"   require ] }

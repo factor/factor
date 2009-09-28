@@ -15,14 +15,14 @@ PANGO_STYLE_OBLIQUE
 PANGO_STYLE_ITALIC ;
 
 TYPEDEF: int PangoWeight
-TYPEDEF: void* PangoFont*
-TYPEDEF: void* PangoFontFamily*
-TYPEDEF: void* PangoFontFace*
-TYPEDEF: void* PangoFontMap*
-TYPEDEF: void* PangoFontMetrics*
-TYPEDEF: void* PangoFontDescription*
-TYPEDEF: void* PangoGlyphString*
-TYPEDEF: void* PangoLanguage*
+C-TYPE: PangoFont
+C-TYPE: PangoFontFamily
+C-TYPE: PangoFontFace
+C-TYPE: PangoFontMap
+C-TYPE: PangoFontMetrics
+C-TYPE: PangoFontDescription
+C-TYPE: PangoGlyphString
+C-TYPE: PangoLanguage
 
 CONSTANT: PANGO_WEIGHT_THIN 100
 CONSTANT: PANGO_WEIGHT_ULTRALIGHT 200

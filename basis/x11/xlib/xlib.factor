@@ -31,12 +31,12 @@ TYPEDEF: XID KeySym
 TYPEDEF: ulong Atom
 
 TYPEDEF: char* XPointer
-TYPEDEF: void* Screen*
+C-TYPE: Screen
 TYPEDEF: void* GC
-TYPEDEF: void* Visual*
-TYPEDEF: void* XExtData*
-TYPEDEF: void* XFontProp*
-TYPEDEF: void* XComposeStatus*
+C-TYPE: Visual
+C-TYPE: XExtData
+C-TYPE: XFontProp
+C-TYPE: XComposeStatus
 TYPEDEF: void* XIM
 TYPEDEF: void* XIC
 
@@ -46,9 +46,6 @@ TYPEDEF: int Bool
 
 TYPEDEF: ulong VisualID
 TYPEDEF: ulong Time
-
-TYPEDEF: void* Window**
-TYPEDEF: void* Atom**
 
 ALIAS: <XID> <ulong>
 ALIAS: <Window> <XID>
