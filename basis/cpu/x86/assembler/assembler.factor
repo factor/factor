@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.binary kernel combinators kernel.private math locals
-namespaces make sequences words system layouts math.order accessors
-cpu.x86.assembler.operands cpu.x86.assembler.operands.private ;
+USING: arrays io.binary kernel combinators kernel.private math
+math.bitwise locals namespaces make sequences words system
+layouts math.order accessors cpu.x86.assembler.operands
+cpu.x86.assembler.operands.private ;
 QUALIFIED: sequences
 IN: cpu.x86.assembler
 
@@ -617,9 +618,14 @@ ALIAS: PINSRQ PINSRD
 : MOVDQA     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: 66 2-operand-rm-mr-sse ;
 : MOVDQU     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: f3 2-operand-rm-mr-sse ;
 
-: PSHUFD     ( dest src imm -- ) HEX: 70 HEX: 66 3-operand-rm-sse ;
-: PSHUFLW    ( dest src imm -- ) HEX: 70 HEX: f2 3-operand-rm-sse ;
-: PSHUFHW    ( dest src imm -- ) HEX: 70 HEX: f3 3-operand-rm-sse ;
+: 2shuffler ( indexes/mask -- mask )
+    dup integer? [ first2 { 1 0 } bitfield ] unless ;
+: 4shuffler ( indexes/mask -- mask )
+    dup integer? [ first4 { 6 4 2 0 } bitfield ] unless ;
+
+: PSHUFD     ( dest src imm -- ) 4shuffler HEX: 70 HEX: 66 3-operand-rm-sse ;
+: PSHUFLW    ( dest src imm -- ) 4shuffler HEX: 70 HEX: f2 3-operand-rm-sse ;
+: PSHUFHW    ( dest src imm -- ) 4shuffler HEX: 70 HEX: f3 3-operand-rm-sse ;
 
 <PRIVATE
 
@@ -713,8 +719,8 @@ PRIVATE>
 : MOVNTI     ( dest src -- ) { HEX: 0f HEX: c3 } (2-operand) ;
 
 : PINSRW     ( dest src imm -- ) HEX: c4 HEX: 66 3-operand-rm-sse ;
-: SHUFPS     ( dest src imm -- ) HEX: c6 f       3-operand-rm-sse ;
-: SHUFPD     ( dest src imm -- ) HEX: c6 HEX: 66 3-operand-rm-sse ;
+: SHUFPS     ( dest src imm -- ) 4shuffler HEX: c6 f       3-operand-rm-sse ;
+: SHUFPD     ( dest src imm -- ) 2shuffler HEX: c6 HEX: 66 3-operand-rm-sse ;
 
 : ADDSUBPD   ( dest src -- ) HEX: d0 HEX: 66 2-operand-rm-sse ;
 : ADDSUBPS   ( dest src -- ) HEX: d0 HEX: f2 2-operand-rm-sse ;
