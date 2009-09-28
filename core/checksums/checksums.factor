@@ -27,9 +27,9 @@ GENERIC: get-checksum ( checksum -- value )
     over bytes>> [ push-all ] keep
     [ dup length pick block-size>> >= ]
     [
-        64 cut-slice [ >byte-array ] dip [
+        over block-size>> cut-slice [ >byte-array ] dip [
             over [ checksum-block ]
-            [ [ 64 + ] change-bytes-read drop ] bi
+            [ [ ] [ block-size>> ] bi [ + ] curry change-bytes-read drop ] bi
         ] dip
     ] while
     >byte-vector
