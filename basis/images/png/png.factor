@@ -125,23 +125,23 @@ ERROR: unimplemented-color-type image ;
 : png-image-bytes ( loading-png -- byte-array )
     [ png-bytes-per-pixel ] [ inflate-data ] [ png-group-width ] tri group reverse-png-filter ;
 
-: decode-greyscale ( loading-png -- loading-png )
+: decode-greyscale ( loading-png -- image )
     unimplemented-color-type ;
 
-: decode-truecolor ( loading-png -- loading-png )
+: decode-truecolor ( loading-png -- image )
     [ <image> ] dip {
         [ png-image-bytes >>bitmap ]
         [ [ width>> ] [ height>> ] bi 2array >>dim ]
         [ drop RGB >>component-order ubyte-components >>component-type ]
     } cleave ;
     
-: decode-indexed-color ( loading-png -- loading-png )
+: decode-indexed-color ( loading-png -- image )
     unimplemented-color-type ;
 
-: decode-greyscale-alpha ( loading-png -- loading-png )
+: decode-greyscale-alpha ( loading-png -- image )
     unimplemented-color-type ;
 
-: decode-truecolor-alpha ( loading-png -- loading-png )
+: decode-truecolor-alpha ( loading-png -- image )
     [ <image> ] dip {
         [ png-image-bytes >>bitmap ]
         [ [ width>> ] [ height>> ] bi 2array >>dim ]
@@ -169,7 +169,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
 : validate-truecolor-alpha ( loading-png -- loading-png )
     { 8 16 } validate-bit-depth ;
 
-: decode-png ( loading-png -- loading-png ) 
+: png>image ( loading-png -- image )
     dup color-type>> {
         { greyscale [ validate-greyscale decode-greyscale ] }
         { truecolor [ validate-truecolor decode-truecolor ] }
@@ -179,11 +179,13 @@ ERROR: invalid-color-type/bit-depth loading-png ;
         [ unknown-color-type ]
     } case ;
 
-M: png-image stream>image
-    drop [
+: load-png ( stream -- loading-png )
+    [
         <loading-png>
         read-png-header
         read-png-chunks
         parse-ihdr-chunk
-        decode-png
     ] with-input-stream ;
+
+M: png-image stream>image
+    drop load-png png>image ;
