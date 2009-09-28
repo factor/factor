@@ -88,16 +88,24 @@ HELP: uint
 { $description "This C type represents a four-byte unsigned integer type. Input values will be converted to " { $link math:integer } "s and truncated to 32 bits; output values will be returned as " { $link math:integer } "s." } ;
 HELP: long
 { $description "This C type represents a four- or eight-byte signed integer type. On Windows and on 32-bit Unix platforms, it will be four bytes. On 64-bit Unix platforms, it will be eight bytes. Input values will be converted to " { $link math:integer } "s and truncated to 32 or 64 bits; output values will be returned as " { $link math:integer } "s." } ;
+HELP: intptr_t
+{ $description "This C type represents a signed integer type large enough to hold any pointer value; that is, on 32-bit platforms, it will be four bytes, and on 64-bit platforms, it will be eight bytes. Input values will be converted to " { $link math:integer } "s and truncated to 32 or 64 bits; output values will be returned as " { $link math:integer } "s." } ;
 HELP: ulong
 { $description "This C type represents a four- or eight-byte unsigned integer type. On Windows and on 32-bit Unix platforms, it will be four bytes. On 64-bit Unix platforms, it will be eight bytes. Input values will be converted to " { $link math:integer } "s and truncated to 32 or 64 bits; output values will be returned as " { $link math:integer } "s." } ;
+HELP: uintptr_t
+{ $description "This C type represents an unsigned integer type large enough to hold any pointer value; that is, on 32-bit platforms, it will be four bytes, and on 64-bit platforms, it will be eight bytes. Input values will be converted to " { $link math:integer } "s and truncated to 32 or 64 bits; output values will be returned as " { $link math:integer } "s." } ;
+HELP: ptrdiff_t
+{ $description "This C type represents a signed integer type large enough to hold the distance between two pointer values; that is, on 32-bit platforms, it will be four bytes, and on 64-bit platforms, it will be eight bytes. Input values will be converted to " { $link math:integer } "s and truncated to 32 or 64 bits; output values will be returned as " { $link math:integer } "s." } ;
+HELP: size_t
+{ $description "This C type represents unsigned size values of the size expected by the platform's standard C library (usually four bytes on a 32-bit platform, and eight on a 64-bit platform). Input values will be converted to " { $link math:integer } "s and truncated to the appropriate size; output values will be returned as " { $link math:integer } "s." } ;
 HELP: longlong
 { $description "This C type represents an eight-byte signed integer type. Input values will be converted to " { $link math:integer } "s and truncated to 64 bits; output values will be returned as " { $link math:integer } "s." } ;
 HELP: ulonglong
 { $description "This C type represents an eight-byte unsigned integer type. Input values will be converted to " { $link math:integer } "s and truncated to 64 bits; output values will be returned as " { $link math:integer } "s." } ;
 HELP: void
-{ $description "This symbol is not a valid C type, but it can be used as the return type for a " { $link POSTPONE: FUNCTION: } " or " { $link POSTPONE: CALLBACK: } " definition, or an " { $link alien-invoke } " or " { $link alien-callback } " call." } ;
+{ $description "This symbol is not a valid C type, but it can be used as the return type for a " { $link POSTPONE: FUNCTION: } " or " { $link POSTPONE: CALLBACK: } " definition or for an " { $link alien-invoke } " or " { $link alien-callback } " call." } ;
 HELP: void*
-{ $description "This C type represents a pointer to C memory. " { $link byte-array } " and " { $link alien } " values can be passed as inputs, but see " { $link "byte-arrays-gc" } " for notes about passing byte arrays into C functions. Output values are returned as " { $link alien } "s." } ;
+{ $description "This C type represents a pointer to C memory. " { $link byte-array } " and " { $link alien } " values can be passed as " { $snippet "void*" } " function inputs, but see " { $link "byte-arrays-gc" } " for notes about passing byte arrays into C functions. " { $snippet "void*" } " output values are returned as " { $link alien } "s." } ;
 HELP: char*
 { $description "This C type represents a pointer to a C string. See " { $link "c-strings" } " for details about using strings with the FFI." } ;
 HELP: float
