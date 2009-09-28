@@ -57,12 +57,6 @@ IN: compiler.cfg.intrinsics.fixnum
 : emit-fixnum-comparison ( cc -- )
     '[ _ ^^compare ] emit-fixnum-op ;
 
-: emit-bignum>fixnum ( -- )
-    ds-pop ^^bignum>integer ^^tag-fixnum ds-push ;
-
-: emit-fixnum>bignum ( -- )
-    ds-pop ^^untag-fixnum ^^integer>bignum ds-push ;
-
 : emit-no-overflow-case ( dst -- final-bb )
     [ ds-drop ds-drop ds-push ] with-branch ;
 
