@@ -9,7 +9,7 @@ struct heap_free_list {
 	free_heap_block *large_blocks;
 };
 
-typedef void (*heap_iterator)(heap_block *compiled, factor_vm *vm);
+typedef void (factor_vm::*heap_iterator)(heap_block *compiled);
 
 struct heap {
 	factor_vm *myvm;

@@ -36,7 +36,7 @@ void factor_vm::iterate_code_heap(code_heap_iterator iter)
 	while(scan)
 	{
 		if(scan->status != B_FREE)
-			iter((code_block *)scan,this);
+			(this->*iter)((code_block *)scan);
 		scan = code->next_block(scan);
 	}
 }
@@ -45,14 +45,14 @@ void factor_vm::iterate_code_heap(code_heap_iterator iter)
 aging and nursery collections */
 void factor_vm::copy_code_heap_roots()
 {
-	iterate_code_heap(factor::copy_literal_references);
+	iterate_code_heap(&factor_vm::copy_literal_references);
 }
 
 /* Update pointers to words referenced from all code blocks. Only after
 defining a new word. */
 void factor_vm::update_code_heap_words()
 {
-	iterate_code_heap(factor::update_word_references);
+	iterate_code_heap(&factor_vm::update_word_references);
 }
 
 void factor_vm::primitive_modify_code_heap()
