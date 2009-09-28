@@ -62,6 +62,8 @@ MACRO:: unix-system-call ( quot -- )
         ]
     ] ;
 
+HOOK: open-file os ( path flags mode -- fd )
+
 <<
 
 {
@@ -154,8 +156,6 @@ FUNCTION: ushort ntohs ( ushort n ) ;
 FUNCTION: int shutdown ( int fd, int how ) ;
 
 FUNCTION: int open ( char* path, int flags, int prot ) ;
-
-HOOK: open-file os ( path flags mode -- fd )
 
 M: unix open-file [ open ] unix-system-call ;
 
