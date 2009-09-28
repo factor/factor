@@ -592,9 +592,9 @@ M: x86 %broadcast-vector-reps
     } available-reps ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
-    rep {
+    {
         {
-            float-4-rep
+            [ rep float-4-rep eq? ]
             [
                 dst src1 float-4-rep %copy
                 dst src2 UNPCKLPS
@@ -602,13 +602,22 @@ M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
                 dst src3 MOVLHPS
             ]
         }
-    } case ;
+        {
+            [ rep { int-4-rep uint-4-rep } memq? ]
+            [
+                dst src1 int-4-rep %copy
+                dst src2 PUNPCKLDQ
+                src3 src4 PUNPCKLDQ
+                dst src3 PUNPCKLQDQ
+            ]
+        }
+    } cond ;
 
 M: x86 %gather-vector-4-reps
     {
         ! Can't do this with sse1 since it will want to unbox
         ! double-precision floats and convert to single precision
-        { sse2? { float-4-rep } }
+        { sse2? { float-4-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
 M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
