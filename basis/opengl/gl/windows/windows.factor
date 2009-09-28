@@ -1,4 +1,4 @@
-USING: alien.syntax kernel windows.types ;
+USING: alien.c-types alien.syntax kernel windows.types ;
 IN: opengl.gl.windows
 
 LIBRARY: gl

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays combinators
+USING: accessors alien.c-types arrays byte-arrays combinators
 compression.run-length fry grouping images images.loader io
 io.binary io.encodings.8-bit io.encodings.binary
 io.encodings.string io.streams.limited kernel math math.bitwise

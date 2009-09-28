@@ -1,11 +1,12 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel math.bitwise core-foundation ;
+USING: alien.c-types alien.syntax kernel math.bitwise core-foundation ;
 IN: core-foundation.file-descriptors
 
 TYPEDEF: void* CFFileDescriptorRef
 TYPEDEF: int CFFileDescriptorNativeDescriptor
 TYPEDEF: void* CFFileDescriptorCallBack
+TYPEDEF: void* CFFileDescriptorContext*
 
 FUNCTION: CFFileDescriptorRef CFFileDescriptorCreate (
     CFAllocatorRef allocator,

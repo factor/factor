@@ -3,9 +3,9 @@
 
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
-USING: alien alien.syntax combinators kernel parser sequences
-system words opengl.gl.extensions ;
-
+USING: alien alien.c-types alien.syntax combinators kernel parser
+sequences system words opengl.gl.extensions ;
+FROM: alien.c-types => short ;
 IN: opengl.gl
 
 TYPEDEF: uint    GLenum

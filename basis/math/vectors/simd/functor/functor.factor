@@ -111,6 +111,7 @@ N            [ 16 T heap-size /i ]
 A            DEFINES-CLASS ${T}-${N}
 A-boa        DEFINES ${A}-boa
 A-with       DEFINES ${A}-with
+A-cast       DEFINES ${A}-cast
 >A           DEFINES >${A}
 A{           DEFINES ${A}{
 
@@ -170,6 +171,9 @@ SYNTAX: A{ \ } [ >A ] parse-literal ;
     \ A-boa \ A-rep \ A define-boa-custom-inlining
 ] when
 
+: A-cast ( simd-array -- simd-array' )
+    underlying>> \ A boa ; inline
+
 INSTANCE: A sequence
 
 <PRIVATE
@@ -228,6 +232,7 @@ A/2-with     IS ${A/2}-with
 A            DEFINES-CLASS ${T}-${N}
 A-boa        DEFINES ${A}-boa
 A-with       DEFINES ${A}-with
+A-cast       DEFINES ${A}-cast
 >A           DEFINES >${A}
 A{           DEFINES ${A}{
 
@@ -294,6 +299,9 @@ M: A pprint* pprint-object ;
     \ A boa ; inline
 
 \ A-rep 2 boa-effect \ A-boa set-stack-effect
+
+: A-cast ( simd-array -- simd-array' )
+    [ underlying1>> ] [ underlying2>> ] bi \ A boa ; inline
 
 INSTANCE: A sequence
 

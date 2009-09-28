@@ -1,4 +1,5 @@
-USING: sequences kernel math specialized-arrays fry ;
+USING: alien.c-types sequences kernel math specialized-arrays
+fry ;
 SPECIALIZED-ARRAY: int
 IN: benchmark.dawes
 

@@ -309,8 +309,8 @@ HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-ordered-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-unordered-branch cpu ( label cc src1 src2 -- )
 
-HOOK: %spill cpu ( src rep n -- )
-HOOK: %reload cpu ( dst rep n -- )
+HOOK: %spill cpu ( src rep dst -- )
+HOOK: %reload cpu ( dst rep src -- )
 
 HOOK: %loop-entry cpu ( -- )
 

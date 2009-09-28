@@ -17,7 +17,7 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 [
     {
-        T{ _reload { dst 1 } { rep int-rep } { n 0 } }
+        T{ _reload { dst 1 } { rep int-rep } { src T{ spill-slot f 0 } } }
     }
 ] [
     [
@@ -27,7 +27,7 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 [
     {
-        T{ _spill { src 1 } { rep int-rep } { n 0 } }
+        T{ _spill { src 1 } { rep int-rep } { dst T{ spill-slot f 0 } } }
     }
 ] [
     [
@@ -54,14 +54,14 @@ H{ } clone spill-temps set
     { { { 0 int-rep } { 1 int-rep } } { { 1 int-rep } { 0 int-rep } } }
     mapping-instructions {
         {
-            T{ _spill { src 0 } { rep int-rep } { n 8 } }
+            T{ _spill { src 0 } { rep int-rep } { dst T{ spill-slot f 8 } } }
             T{ ##copy { dst 0 } { src 1 } { rep int-rep } }
-            T{ _reload { dst 1 } { rep int-rep } { n 8 } }
+            T{ _reload { dst 1 } { rep int-rep } { src T{ spill-slot f 8 } } }
         }
         {
-            T{ _spill { src 1 } { rep int-rep } { n 8 } }
+            T{ _spill { src 1 } { rep int-rep } { dst T{ spill-slot f 8 } } }
             T{ ##copy { dst 1 } { src 0 } { rep int-rep } }
-            T{ _reload { dst 0 } { rep int-rep } { n 8 } }
+            T{ _reload { dst 0 } { rep int-rep } { src T{ spill-slot f 8 } } }
         }
     } member?
 ] unit-test

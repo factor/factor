@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Phil Dawes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes.struct alien.syntax ;
+USING: classes.struct alien.c-types alien.syntax ;
 IN: vm
 
 TYPEDEF: void* cell
+TYPEDEF: void* context*
 
 STRUCT: zone
     { start cell }

@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors images io io.binary io.encodings.ascii
-io.encodings.binary io.encodings.string io.files io.files.info kernel
-sequences io.streams.limited fry combinators arrays math checksums
-checksums.crc32 compression.inflate grouping byte-arrays images.loader ;
+USING: accessors arrays checksums checksums.crc32 combinators
+compression.inflate fry grouping images images.loader io
+io.binary io.encodings.ascii io.encodings.string kernel locals
+math math.bitwise math.ranges sequences sorting ;
 IN: images.png
 
 SINGLETON: png-image
@@ -78,27 +78,52 @@ ERROR: bad-checksum ;
 
 ERROR: unknown-color-type n ;
 ERROR: unimplemented-color-type image ;
-ERROR: unknown-filter-method image ;
 
 : inflate-data ( loading-png -- bytes )
     find-compressed-bytes zlib-inflate ; 
 
-: png-group-width ( loading-png -- n )
-    dup color-type>> {
-        { 2 [ [ bit-depth>> 8 / 3 * ] [ width>> ] bi * 1 + ] }
-        { 6 [ [ bit-depth>> 8 / 4 * ] [ width>> ] bi * 1 + ] }
-        [ unknown-color-type ]
-    } case ;
+: scale-bit-depth ( loading-png -- n ) bit-depth>> 8 / ; inline
 
-: filter-png ( groups loading-png -- byte-array )
-    filter-method>> {
-        { filter-none [ reverse-png-filter ] }
-        [ unknown-filter-method ]
-    } case ;
+: png-bytes-per-pixel ( loading-png -- n )
+    dup color-type>> {
+        { 2 [ scale-bit-depth 3 * ] }
+        { 6 [ scale-bit-depth 4 * ] }
+        [ unknown-color-type ]
+    } case ; inline
+
+: png-group-width ( loading-png -- n )
+    ! 1 + is for the filter type, 1 byte preceding each line
+    [ png-bytes-per-pixel ] [ width>> ] bi * 1 + ;
+
+:: paeth ( a b c -- p ) 
+    a b + c - { a b c } [ [ - abs ] keep 2array ] with map 
+    sort-keys first second ;
+
+:: png-unfilter-line ( prev curr filter -- curr' )
+    prev :> c
+    prev 3 tail-slice :> b
+    curr :> a
+    curr 3 tail-slice :> x
+    x length [0,b)
+    filter {
+        { filter-none [ drop ] }
+        { filter-sub [ [| n | n x nth n a nth + 256 wrap n x set-nth ] each ] }
+        { filter-up [ [| n | n x nth n b nth + 256 wrap n x set-nth ] each ] }
+        { filter-average [ [| n | n x nth n a nth n b nth + 2/ + 256 wrap n x set-nth ] each ] }
+        { filter-paeth [ [| n | n x nth n a nth n b nth n c nth paeth + 256 wrap n x set-nth ] each ] }
+    } case 
+    curr 3 tail ;
+
+: reverse-png-filter ( lines -- byte-array )
+    dup first length 0 <array> prefix
+    [ { 0 0 } prepend ] map
+    2 clump [
+        first2 dup [ third ] [ [ 0 2 ] dip set-nth ] bi
+        png-unfilter-line
+    ] map B{ } concat-as ;
 
 : png-image-bytes ( loading-png -- byte-array )
-    [ [ inflate-data ] [ png-group-width ] bi group ]
-    [ filter-png ] bi ;
+    [ inflate-data ] [ png-group-width ] bi group reverse-png-filter ;
 
 : decode-greyscale ( loading-png -- loading-png )
     unimplemented-color-type ;
