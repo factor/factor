@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax parser namespaces kernel math
-windows.types generalizations math.bitwise classes.struct
-literals ;
+USING: alien alien.c-types alien.syntax parser namespaces
+kernel math windows.types generalizations math.bitwise
+classes.struct literals windows.kernel32 ;
 IN: windows.user32
 
 ! HKL for ActivateKeyboardLayout
