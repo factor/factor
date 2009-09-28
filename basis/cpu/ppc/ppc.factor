@@ -235,8 +235,13 @@ M:: ppc %box-float ( dst src temp -- )
     dst 16 float temp %allot
     src dst float-offset STFD ;
 
-: float-function-param ( i spill-slot -- )
-    [ float-regs param-regs nth 1 ] [ n>> spill@ ] bi* LFD ;
+GENERIC: float-function-param* ( dst src -- )
+
+M: spill-slot float-function-param* [ 1 ] dip n>> spill@ LFD ;
+M: integer float-function-param* FMR ;
+
+: float-function-param ( i src -- )
+    [ float-regs param-regs nth ] dip float-function-param* ;
 
 : float-function-return ( reg -- )
     float-regs return-reg double-rep %copy ;
