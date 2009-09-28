@@ -461,3 +461,12 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 [ 65537.0 ] [
     [ 2.0 4 [ 2.0 fpow ] times 1.0 float+ ] compile-call
 ] unit-test
+
+! ##box-displaced-alien is a def-is-use instruction
+[ ALIEN: e39 ] [
+    [
+        f
+        100 [ 10 swap <displaced-alien> ] times
+        1 swap <displaced-alien>
+    ] compile-call
+] unit-test
