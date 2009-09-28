@@ -176,17 +176,58 @@ struct factor_vm
 	//write barrier
 	cell allot_markers_offset;
 
-	inline card *addr_to_card(cell a);
-	inline cell card_to_addr(card *c);
-	inline cell card_offset(card *c);
-	inline card_deck *addr_to_deck(cell a);
-	inline cell deck_to_addr(card_deck *c);
-	inline card *deck_to_card(card_deck *d);
-	inline card *addr_to_allot_marker(object *a);
-	inline void write_barrier(object *obj);
-	inline void allot_barrier(object *address);
+	inline card *addr_to_card(cell a)
+	{
+		return (card*)(((cell)(a) >> card_bits) + cards_offset);
+	}
 
-	//data_gc
+	inline cell card_to_addr(card *c)
+	{
+		return ((cell)c - cards_offset) << card_bits;
+	}
+	
+	inline cell card_offset(card *c)
+	{
+		return *(c - (cell)data->cards + (cell)data->allot_markers);
+	}
+	
+	inline card_deck *addr_to_deck(cell a)
+	{
+		return (card_deck *)(((cell)a >> deck_bits) + decks_offset);
+	}
+	
+	inline cell deck_to_addr(card_deck *c)
+	{
+		return ((cell)c - decks_offset) << deck_bits;
+	}
+	
+	inline card *deck_to_card(card_deck *d)
+	{
+		return (card *)((((cell)d - decks_offset) << (deck_bits - card_bits)) + cards_offset);
+	}
+	
+	inline card *addr_to_allot_marker(object *a)
+	{
+		return (card *)(((cell)a >> card_bits) + allot_markers_offset);
+	}
+
+	/* the write barrier must be called any time we are potentially storing a
+	   pointer from an older generation to a younger one */
+	inline void write_barrier(object *obj)
+	{
+		*addr_to_card((cell)obj) = card_mark_mask;
+		*addr_to_deck((cell)obj) = card_mark_mask;
+	}
+
+	/* we need to remember the first object allocated in the card */
+	inline void allot_barrier(object *address)
+	{
+		card *ptr = addr_to_allot_marker(address);
+		if(*ptr == invalid_allot_marker)
+			*ptr = ((cell)address & addr_card_mask);
+	}
+
+	// data_gc
 	/* used during garbage collection only */
 	zone *newspace;
 	bool performing_gc;
