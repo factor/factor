@@ -593,8 +593,7 @@ M:: x86 %broadcast-vector ( dst src rep -- )
             dst dst { 0 0 0 0 } SHUFPS
         ] }
         { double-2-rep   [
-            dst src double-2-rep %copy
-            dst dst UNPCKLPD
+            dst src MOVDDUP
         ] }
         { longlong-2-rep [
             dst src longlong-2-rep %copy
