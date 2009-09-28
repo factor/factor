@@ -590,22 +590,25 @@ M:: x86 %broadcast-vector ( dst src rep -- )
     rep unsign-rep {
         { float-4-rep    [
             dst src float-4-rep  %copy
-            dst dst 0 SHUFPS
+            dst dst { 0 0 0 0 } SHUFPS
         ] }
         { double-2-rep   [
             dst src double-2-rep %copy
             dst dst UNPCKLPD
         ] }
-        { longlong-2-rep [ dst src BIN: 01000100 PSHUFD ] }
-        { int-4-rep      [ dst src 0 PSHUFD ] }
+        { longlong-2-rep [
+            dst src longlong-2-rep %copy
+            dst dst PUNPCKLQDQ
+        ] }
+        { int-4-rep      [ dst src { 0 0 0 0 } PSHUFD ] }
         { short-8-rep    [
-            dst src 0 PSHUFLW 
+            dst src { 0 0 0 0 } PSHUFLW 
             dst dst PUNPCKLQDQ 
         ] }
         { char-16-rep    [
             dst src char-16-rep %copy
             dst dst PUNPCKLBW
-            dst dst 0 PSHUFLW
+            dst dst { 0 0 0 0 } PSHUFLW
             dst dst PUNPCKLQDQ
         ] }
     } case ;
