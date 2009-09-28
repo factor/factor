@@ -578,40 +578,66 @@ MACRO: available-reps ( alist -- )
     reverse [ { } ] suffix
     '[ _ cond ] ;
 
-M: x86 %broadcast-vector ( dst src rep -- )
-    {
-        { float-4-rep [ [ float-4-rep %copy ] [ drop dup 0 SHUFPS ] 2bi ] }
-        { double-2-rep [ [ double-2-rep %copy ] [ drop dup UNPCKLPD ] 2bi ] }
+: unsign-rep ( rep -- rep' )
+    dup {
+        { uint-4-rep      int-4-rep }
+        { ulonglong-2-rep longlong-2-rep }
+        { ushort-8-rep    short-8-rep }
+        { uchar-16-rep    char-16-rep }
+    } at* [ nip ] [ drop ] if ;
+
+M:: x86 %broadcast-vector ( dst src rep -- )
+    rep unsign-rep {
+        { float-4-rep    [
+            dst src float-4-rep  %copy
+            dst dst 0 SHUFPS
+        ] }
+        { double-2-rep   [
+            dst src double-2-rep %copy
+            dst dst UNPCKLPD
+        ] }
+        { longlong-2-rep [ dst src BIN: 01000100 PSHUFD ] }
+        { int-4-rep      [ dst src 0 PSHUFD ] }
+        { short-8-rep    [
+            dst src 0 PSHUFLW 
+            dst dst PUNPCKLQDQ 
+        ] }
+        { char-16-rep    [
+            dst src char-16-rep %copy
+            dst dst PUNPCKLBW
+            dst dst 0 PSHUFLW
+            dst dst PUNPCKLQDQ
+        ] }
     } case ;
 
 M: x86 %broadcast-vector-reps
     {
         ! Can't do this with sse1 since it will want to unbox
         ! a double-precision float and convert to single precision
-        { sse2? { float-4-rep double-2-rep } }
+        { sse2? {
+            float-4-rep double-2-rep
+            longlong-2-rep ulonglong-2-rep
+            int-4-rep uint-4-rep
+            short-8-rep ushort-8-rep
+            char-16-rep uchar-16-rep
+        } }
     } available-reps ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
-    {
-        {
-            [ rep float-4-rep eq? ]
-            [
-                dst src1 float-4-rep %copy
-                dst src2 UNPCKLPS
-                src3 src4 UNPCKLPS
-                dst src3 MOVLHPS
-            ]
-        }
-        {
-            [ rep { int-4-rep uint-4-rep } memq? ]
-            [
-                dst src1 int-4-rep %copy
-                dst src2 PUNPCKLDQ
-                src3 src4 PUNPCKLDQ
-                dst src3 PUNPCKLQDQ
-            ]
-        }
-    } cond ;
+    rep unsign-rep {
+        { float-4-rep [
+            dst src1 float-4-rep %copy
+            dst src2 UNPCKLPS
+            src3 src4 UNPCKLPS
+            dst src3 MOVLHPS
+        ] }
+        { int-4-rep [
+            dst src1 int-4-rep %copy
+            dst src2 PUNPCKLDQ
+            src3 src4 PUNPCKLDQ
+            dst src3 PUNPCKLQDQ
+        ] }
+    } case ;
 
 M: x86 %gather-vector-4-reps
     {
@@ -621,19 +647,20 @@ M: x86 %gather-vector-4-reps
     } available-reps ;
 
 M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
-    rep {
-        {
-            double-2-rep
-            [
-                dst src1 double-2-rep %copy
-                dst src2 UNPCKLPD
-            ]
-        }
+    rep unsign-rep {
+        { double-2-rep [
+            dst src1 double-2-rep %copy
+            dst src2 UNPCKLPD
+        ] }
+        { longlong-2-rep [
+            dst src1 longlong-2-rep %copy
+            dst src2 PUNPCKLQDQ
+        ] }
     } case ;
 
 M: x86 %gather-vector-2-reps
     {
-        { sse2? { double-2-rep } }
+        { sse2? { double-2-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
 M: x86 %add-vector ( dst src1 src2 rep -- )
