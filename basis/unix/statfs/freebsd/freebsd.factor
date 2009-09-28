@@ -27,8 +27,8 @@ STRUCT: statfs
     { f_owner uid_t }
     { f_fsid fsid_t }
     { f_charspare char[80] }
-    { f_fstypename { "char" MFSNAMELEN } }
-    { f_mntfromname { "char" MNAMELEN } }
-    { f_mntonname { "char" MNAMELEN } } ;
+    { f_fstypename { char MFSNAMELEN } }
+    { f_mntfromname { char MNAMELEN } }
+    { f_mntonname { char MNAMELEN } } ;
 
 FUNCTION: int statfs ( char* path, statvfs* buf ) ;
