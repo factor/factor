@@ -92,7 +92,7 @@ H{
        { end 2 }
        { uses V{ 0 1 } }
        { ranges V{ T{ live-range f 0 2 } } }
-       { spill-to 0 }
+       { spill-to T{ spill-slot f 0 } }
     }
     T{ live-interval
        { vreg 1 }
@@ -100,7 +100,7 @@ H{
        { end 5 }
        { uses V{ 5 } }
        { ranges V{ T{ live-range f 5 5 } } }
-       { reload-from 0 }
+       { reload-from T{ spill-slot f 0 } }
     }
 ] [
     T{ live-interval
@@ -119,7 +119,7 @@ H{
        { end 1 }
        { uses V{ 0 } }
        { ranges V{ T{ live-range f 0 1 } } }
-       { spill-to 4 }
+       { spill-to T{ spill-slot f 4 } }
     }
     T{ live-interval
        { vreg 2 }
@@ -127,7 +127,7 @@ H{
        { end 5 }
        { uses V{ 1 5 } }
        { ranges V{ T{ live-range f 1 5 } } }
-       { reload-from 4 }
+       { reload-from T{ spill-slot f 4 } }
     }
 ] [
     T{ live-interval
@@ -146,7 +146,7 @@ H{
        { end 1 }
        { uses V{ 0 } }
        { ranges V{ T{ live-range f 0 1 } } }
-       { spill-to 8 }
+       { spill-to T{ spill-slot f 8 } }
     }
     T{ live-interval
        { vreg 3 }
@@ -154,7 +154,7 @@ H{
        { end 30 }
        { uses V{ 20 30 } }
        { ranges V{ T{ live-range f 20 30 } } }
-       { reload-from 8 }
+       { reload-from T{ spill-slot f 8 } }
     }
 ] [
     T{ live-interval
@@ -1042,8 +1042,8 @@ V{
 
 [ _spill ] [ 1 get instructions>> second class ] unit-test
 [ _reload ] [ 4 get instructions>> 4 swap nth class ] unit-test
-[ V{ 3 2 1 } ] [ 8 get instructions>> [ _spill? ] filter [ n>> cell / ] map ] unit-test
-[ V{ 3 2 1 } ] [ 9 get instructions>> [ _reload? ] filter [ n>> cell / ] map ] unit-test
+[ V{ 3 2 1 } ] [ 8 get instructions>> [ _spill? ] filter [ dst>> n>> cell / ] map ] unit-test
+[ V{ 3 2 1 } ] [ 9 get instructions>> [ _reload? ] filter [ src>> n>> cell / ] map ] unit-test
 
 ! Resolve pass should insert this
 [ _reload ] [ 5 get predecessors>> first instructions>> first class ] unit-test
