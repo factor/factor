@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces cache images images.loader accessors assocs
 kernel opengl opengl.gl opengl.textures ui.gadgets.worlds
-memoize images.tiff ;
+memoize images.tiff images.png ;
 IN: ui.images
 
 TUPLE: image-name path ;
