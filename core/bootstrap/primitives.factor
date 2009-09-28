@@ -101,6 +101,7 @@ bootstrapping? on
     "threads.private"
     "tools.profiler.private"
     "words"
+    "words.private"
     "vectors"
     "vectors.private"
     "vm"
@@ -414,7 +415,7 @@ tuple
     { "float-u<=" "math.private" (( x y -- ? )) }
     { "float-u>" "math.private" (( x y -- ? )) }
     { "float-u>=" "math.private" (( x y -- ? )) }
-    { "<word>" "words" (( name vocab -- word )) }
+    { "(word)" "words.private" (( name vocab -- word )) }
     { "word-xt" "words" (( word -- start end )) }
     { "getenv" "kernel.private" (( n -- obj )) }
     { "setenv" "kernel.private" (( obj n -- )) }
