@@ -36,6 +36,7 @@ $nl
 { $subsection vmin }
 "Bitwise operations:"
 { $subsection vbitand }
+{ $subsection vbitandn }
 { $subsection vbitor }
 { $subsection vbitxor }
 { $subsection vlshift }
@@ -197,6 +198,11 @@ HELP: vbitand
 { $description "Takes the bitwise and of " { $snippet "u" } " and " { $snippet "v" } " component-wise." }
 { $notes "Unlike " { $link bitand } ", this word may be used on a specialized array of floats or doubles, in which case the bitwise representation of the floating point numbers is operated upon." } ;
 
+HELP: vbitandn
+{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $description "Takes the bitwise and-not of " { $snippet "u" } " and " { $snippet "v" } " component-wise, where " { $snippet "x and-not y" } " is defined as " { $snippet "not(x) and y" } "." }
+{ $notes "This word may be used on a specialized array of floats or doubles, in which case the bitwise representation of the floating point numbers is operated upon." } ;
+
 HELP: vbitor
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
 { $description "Takes the bitwise or of " { $snippet "u" } " and " { $snippet "v" } " component-wise." }
@@ -216,6 +222,14 @@ HELP: vrshift
 { $values { "u" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
 { $description "Shifts each element of " { $snippet "u" } " to the right by " { $snippet "n" } " bits." }
 { $notes "Undefined behavior will result if " { $snippet "n" } " is negative." } ;
+
+HELP: hlshift
+{ $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
+{ $description "Shifts the entire SIMD array to the left by " { $snippet "n" } " bytes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
+
+HELP: hrshift
+{ $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
+{ $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
 HELP: norm-sq
 { $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }

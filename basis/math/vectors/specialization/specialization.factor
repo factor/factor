@@ -82,10 +82,13 @@ H{
     { vabs { +vector+ -> +vector+ } }
     { vsqrt { +vector+ -> +vector+ } }
     { vbitand { +vector+ +vector+ -> +vector+ } }
+    { vbitandn { +vector+ +vector+ -> +vector+ } }
     { vbitor { +vector+ +vector+ -> +vector+ } }
     { vbitxor { +vector+ +vector+ -> +vector+ } }
     { vlshift { +vector+ +scalar+ -> +vector+ } }
     { vrshift { +vector+ +scalar+ -> +vector+ } }
+    { hlshift { +vector+ +scalar+ -> +vector+ } }
+    { hrshift { +vector+ +scalar+ -> +vector+ } }
 }
 
 PREDICATE: vector-word < word vector-words key? ;
@@ -116,7 +119,7 @@ M: vector-word subwords specializations values [ word? ] filter ;
 :: input-signature ( word array-type elt-type -- signature )
     array-type elt-type word word-schema inputs signature-for-schema ;
 
-: vector-words-for-type ( elt-type -- alist )
+: vector-words-for-type ( elt-type -- words )
     {
         ! Can't do shifts on floats
         { [ dup float class<= ] [ vector-words keys { vlshift vrshift } diff ] }
@@ -125,10 +128,13 @@ M: vector-word subwords specializations values [ word? ] filter ;
         ! Can't compute square root of complex numbers (vsqrt uses fsqrt not sqrt)
         { [ dup complex class<= ] [ vector-words keys { vsqrt } diff ] }
         [ { } ]
-    } cond nip ;
+    } cond
+    ! Don't specialize horizontal shifts at all, they're only for SIMD
+    { hlshift hrshift } diff
+    nip ;
 
 :: specialize-vector-words ( array-type elt-type simd -- )
-    elt-type vector-words-for-type [
+    elt-type vector-words-for-type simd keys union [
         [ array-type elt-type simd specialize-vector-word ]
         [ array-type elt-type input-signature ]
         [ ]
