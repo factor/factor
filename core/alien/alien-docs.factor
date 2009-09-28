@@ -258,12 +258,13 @@ ARTICLE: "alien" "C library interface"
 $nl
 "The C library interface is entirely self-contained; there is no C code which one must write in order to wrap a library."
 $nl
-"C library interface words are found in the " { $vocab-link "alien" } " vocabulary."
+"C library interface words are found in the " { $vocab-link "alien" } " vocabulary and its subvocabularies."
 { $warning "C does not perform runtime type checking, automatic memory management or array bounds checks. Incorrect usage of C library functions can lead to crashes, data corruption, and security exploits." }
 { $subsection "loading-libs" }
 { $subsection "alien-invoke" }
 { $subsection "alien-callback" }
 { $subsection "c-data" }
+{ $subsection "classes.struct" }
 { $subsection "dll.private" }
 { $subsection "embedding" } ;
 

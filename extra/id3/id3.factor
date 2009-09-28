@@ -7,6 +7,7 @@ io.encodings.utf16 assocs math.parser combinators.short-circuit
 fry namespaces combinators.smart splitting io.encodings.ascii
 arrays io.files.info unicode.case io.directories.search literals
 math.functions continuations ;
+FROM: alien.c-types => uchar ;
 IN: id3
 
 <PRIVATE
@@ -209,7 +210,7 @@ PRIVATE>
 
 : mp3>id3 ( path -- id3/f )
     [
-        [ <id3> ] dip "uchar" <mapped-array>
+        [ <id3> ] dip uchar <mapped-array>
         [ dup id3v1? [ read-v1-tags merge-id3v1 ] [ drop ] if ]
         [ dup id3v1+? [ read-v1+-tags merge-id3v1 ] [ drop ] if ]
         [ dup id3v2? [ read-v2-tags ] [ drop ] if ]
