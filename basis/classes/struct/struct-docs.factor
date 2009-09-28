@@ -163,7 +163,7 @@ $nl
 } ;
 
 ARTICLE: "classes.struct" "Struct classes"
-{ $link struct } " classes are similar to " { $link tuple } "s, but their slots exhibit value semantics, and they are backed by a contiguous structured block of memory. Structs can be used for structured access to C memory or Factor byte arrays and for passing struct values in and out of the FFI."
+"The " { $vocab-link "classes.struct" } " vocabulary implements " { $link struct } " classes. They are similar to " { $link tuple } " classes, but their slots exhibit value semantics, and they are backed by a contiguous structured block of memory. Structs can be used for space-efficient storage of data in the Factor heap, as well as for passing data to and from C libraries using the " { $link "alien" } "."
 { $subsection "classes.struct.examples" }
 { $subsection "classes.struct.define" }
 { $subsection "classes.struct.create" }
