@@ -7,10 +7,10 @@ prettyprint.sections parser compiler.tree.builder
 compiler.tree.optimizer cpu.architecture compiler.cfg.builder
 compiler.cfg.linearization compiler.cfg.registers
 compiler.cfg.stack-frame compiler.cfg.linear-scan
-compiler.cfg.two-operand compiler.cfg.optimizer
-compiler.cfg.instructions compiler.cfg.utilities
-compiler.cfg.def-use compiler.cfg.rpo compiler.cfg.mr
-compiler.cfg.representations.preferred compiler.cfg ;
+compiler.cfg.optimizer compiler.cfg.instructions
+compiler.cfg.utilities compiler.cfg.def-use compiler.cfg.rpo
+compiler.cfg.mr compiler.cfg.representations.preferred
+compiler.cfg ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-cfg ( quot -- cfgs )
