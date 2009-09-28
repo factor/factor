@@ -19,8 +19,8 @@ IN: pango.cairo
 
 LIBRARY: pangocairo
 
-TYPEDEF: void* PangoCairoFontMap*
-TYPEDEF: void* PangoCairoFont*
+C-TYPE: PangoCairoFontMap
+C-TYPE: PangoCairoFont
 
 FUNCTION: PangoFontMap*
 pango_cairo_font_map_new ( ) ;

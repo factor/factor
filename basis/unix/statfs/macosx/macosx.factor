@@ -111,9 +111,9 @@ STRUCT: statfs64
     { f_type uint32_t }
     { f_flags uint32_t }
     { f_fssubtype uint32_t }
-    { f_fstypename { "char" MFSTYPENAMELEN } }
-    { f_mntonname { "char" MAXPATHLEN } }
-    { f_mntfromname { "char" MAXPATHLEN } }
+    { f_fstypename { char MFSTYPENAMELEN } }
+    { f_mntonname { char MAXPATHLEN } }
+    { f_mntfromname { char MAXPATHLEN } }
     { f_reserved uint32_t[8] } ;
 
 FUNCTION: int statfs64 ( char* path, statfs64* buf ) ;

@@ -10,8 +10,8 @@ IN: curses.ffi
     { [ os unix?  ]  [ "libcurses.so" ] }
 } cond "cdecl" add-library >>
 
-TYPEDEF: void* WINDOW*
-TYPEDEF: void* SCREEN*
+C-TYPE: WINDOW
+C-TYPE: SCREEN
 TYPEDEF: void* va_list
 
 TYPEDEF: uint chtype

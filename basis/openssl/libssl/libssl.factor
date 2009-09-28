@@ -91,7 +91,7 @@ CONSTANT: SSL_ERROR_WANT_ACCEPT      8
 TYPEDEF: void* ssl-method
 TYPEDEF: void* SSL_CTX*
 TYPEDEF: void* SSL_SESSION*
-TYPEDEF: void* SSL*
+C-TYPE: SSL
 
 LIBRARY: libssl
 
@@ -101,7 +101,7 @@ LIBRARY: libssl
 
 TYPEDEF: void* X509_NAME*
 
-TYPEDEF: void* X509*
+C-TYPE: X509
 
 FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
 FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;

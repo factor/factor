@@ -53,7 +53,7 @@ ERROR: no-c-type name ;
 PREDICATE: c-type-word < word
     "c-type" word-prop ;
 
-UNION: c-type-name string word ;
+UNION: c-type-name string c-type-word ;
 
 ! C type protocol
 GENERIC: c-type ( name -- c-type ) foldable
@@ -61,6 +61,9 @@ GENERIC: c-type ( name -- c-type ) foldable
 GENERIC: resolve-pointer-type ( name -- c-type )
 
 << \ void \ void* "pointer-c-type" set-word-prop >>
+
+: void? ( c-type -- ? )
+    { void "void" } member? ;
 
 M: word resolve-pointer-type
     dup "pointer-c-type" word-prop
@@ -75,6 +78,7 @@ M: string resolve-pointer-type
     ] if ;
 
 : resolve-typedef ( name -- c-type )
+    dup void? [ no-c-type ] when
     dup c-type-name? [ c-type ] when ;
 
 : parse-array-type ( name -- dims c-type )
@@ -91,10 +95,8 @@ M: string c-type ( name -- c-type )
     ] if ;
 
 M: word c-type
-    "c-type" word-prop resolve-typedef ;
-
-: void? ( c-type -- ? )
-    { void "void" } member? ;
+    dup "c-type" word-prop resolve-typedef
+    [ ] [ no-c-type ] ?if ;
 
 GENERIC: c-struct? ( c-type -- ? )
 
@@ -310,7 +312,7 @@ CONSTANT: primitive-types
     }
 
 SYMBOLS:
-    ptrdiff_t intptr_t size_t
+    ptrdiff_t intptr_t uintptr_t size_t
     char* uchar* ;
 
 [
@@ -471,9 +473,10 @@ SYMBOLS:
         [ >float ] >>unboxer-quot
     \ double define-primitive-type
 
-    \ long \ ptrdiff_t typedef
-    \ long \ intptr_t typedef
-    \ ulong \ size_t typedef
+    \ long c-type \ ptrdiff_t typedef
+    \ long c-type \ intptr_t typedef
+    \ ulong c-type \ uintptr_t typedef
+    \ ulong c-type \ size_t typedef
 ] with-compilation-unit
 
 M: char-16-rep rep-component-type drop char ;

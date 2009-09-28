@@ -4,7 +4,7 @@ USING: classes.struct alien.c-types alien.syntax ;
 IN: vm
 
 TYPEDEF: void* cell
-TYPEDEF: void* context*
+C-TYPE: context
 
 STRUCT: zone
     { start cell }

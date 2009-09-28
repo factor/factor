@@ -59,18 +59,18 @@ TYPEDEF: int PostgresPollingStatusType
 TYPEDEF: int PGTransactionStatusType 
 TYPEDEF: int PGVerbosity 
 
-TYPEDEF: void* PGconn*
-TYPEDEF: void* PGresult*
-TYPEDEF: void* PGcancel*
+C-TYPE: PGconn
+C-TYPE: PGresult
+C-TYPE: PGcancel
 TYPEDEF: uint Oid
 TYPEDEF: uint* Oid*
 TYPEDEF: char pqbool
-TYPEDEF: void* PQconninfoOption*
-TYPEDEF: void* PGnotify*
-TYPEDEF: void* PQArgBlock*
-TYPEDEF: void* PQprintOpt*
-TYPEDEF: void* SSL*
-TYPEDEF: void* FILE*
+C-TYPE: PQconninfoOption
+C-TYPE: PGnotify
+C-TYPE: PQArgBlock
+C-TYPE: PQprintOpt
+C-TYPE: SSL
+C-TYPE: FILE
 
 LIBRARY: postgresql
 
