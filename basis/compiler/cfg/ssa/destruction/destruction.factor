@@ -79,7 +79,7 @@ M: ##phi prepare-insn
     [ dst>> ] [ inputs>> values ] bi
     [ eliminate-copy ] with each ;
 
-    : prepare-block ( bb -- )
+: prepare-block ( bb -- )
     instructions>> [ prepare-insn ] each ;
 
 : prepare-coalescing ( cfg -- )
