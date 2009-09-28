@@ -23,7 +23,7 @@ CONSTANT: PANGO_SCALE 1024
 : pango>float ( n -- x ) PANGO_SCALE /f ; inline
 : float>pango ( x -- n ) PANGO_SCALE * >integer ; inline
 
-TYPEDEF: void* PangoContext*
+C-TYPE: PangoContext
 
 FUNCTION: PangoContext* pango_context_new ( ) ;
 

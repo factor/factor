@@ -105,7 +105,7 @@ CONSTANT: SD_BOTH 2
 
 CONSTANT: SOL_SOCKET HEX: ffff
 
-TYPEDEF: void* sockaddr*
+C-TYPE: sockaddr
 
 STRUCT: sockaddr-in
     { family short }
