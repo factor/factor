@@ -3,7 +3,7 @@
 USING: accessors assocs byte-arrays combinators images
 io.encodings.binary io.pathnames io.streams.byte-array
 io.streams.limited kernel namespaces splitting strings
-unicode.case ;
+unicode.case sequences ;
 IN: images.loader
 
 ERROR: unknown-image-extension extension ;
@@ -33,7 +33,10 @@ GENERIC: stream>image ( stream class -- image )
     [ open-image-file ] [ image-class ] bi load-image* ;
 
 M: byte-array load-image*
-    [ binary <byte-reader> ] dip stream>image ;
+    [
+        [ binary <byte-reader> ]
+        [ length stream-throws <limited-stream> ] bi
+    ] dip stream>image ;
 
 M: limited-stream load-image* stream>image ;
 
