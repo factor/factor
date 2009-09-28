@@ -82,3 +82,10 @@ IN: io.streams.limited.tests
     [ f stream-throws limit-input 4 read ]
     with-string-reader
 ] unit-test
+
+
+[ "asdf" ] [
+    "asdf" <string-reader> 2 stream-eofs <limited-stream> [
+        unlimited-input contents
+    ] with-input-stream
+] unit-test
