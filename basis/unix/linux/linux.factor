@@ -103,7 +103,7 @@ STRUCT: dirent
     { d_name char[256] } ;
 
 FUNCTION: int open64 ( char* path, int flags, int prot ) ;
-FUNCTION: dirent64* readdir64 ( DIR* dirp ) ;
+FUNCTION: dirent* readdir64 ( DIR* dirp ) ;
 FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result ) ;
 
 M: linux open-file [ open64 ] unix-system-call ;
