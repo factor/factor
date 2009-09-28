@@ -164,6 +164,7 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-v/) [ [ ^^div-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vmin) [ [ ^^min-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vmax) [ [ ^^max-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v.) [ [ ^^dot-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vabs) [ [ ^^abs-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vsqrt) [ [ ^^sqrt-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vbitand) [ [ ^^and-vector ] emit-binary-vector-op ] }
@@ -177,6 +178,8 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-broadcast) [ [ ^^broadcast-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-gather-2) [ emit-gather-vector-2 ] }
         { math.vectors.simd.intrinsics:(simd-gather-4) [ emit-gather-vector-4 ] }
+        { math.vectors.simd.intrinsics:(simd-vshuffle) [ emit-shuffle-vector ] }
+        { math.vectors.simd.intrinsics:(simd-vselect) [ emit-select-vector ] }
         { math.vectors.simd.intrinsics:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:alien-vector [ emit-alien-vector ] }
         { math.vectors.simd.intrinsics:set-alien-vector [ emit-set-alien-vector ] }

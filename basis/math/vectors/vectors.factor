@@ -66,6 +66,9 @@ PRIVATE>
 
 GENERIC: new-underlying ( underlying seq -- seq' )
 
+: change-underlying ( seq quot -- seq' )
+    '[ underlying>> @ ] keep new-underlying ; inline
+
 PRIVATE>
 
 : vbitand ( u v -- w ) over '[ _ [ bitand ] fp-bitwise-op ] 2map ;
@@ -73,6 +76,14 @@ PRIVATE>
 : vbitor ( u v -- w ) over '[ _ [ bitor ] fp-bitwise-op ] 2map ;
 : vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
 : vbitnot ( u -- w ) dup '[ _ [ bitnot ] fp-bitwise-unary ] map ;
+
+: vshuffle ( u perm -- v ) swap nths ;
+
+: vlshift ( u n -- w ) '[ _ shift ] map ;
+: vrshift ( u n -- w ) neg '[ _ shift ] map ;
+
+: hlshift ( u n -- w ) '[ _ <byte-array> prepend 16 head ] change-underlying ;
+: hrshift ( u n -- w ) '[ _ <byte-array> append 16 tail* ] change-underlying ;
 
 : vand ( u v -- w ) [ and ] 2map ;
 : vor  ( u v -- w ) [ or  ] 2map ;
@@ -87,15 +98,6 @@ PRIVATE>
 : v=  ( u v -- w ) [ =   ] { } 2map-as ;
 
 : v?   ( ? u v -- w ) [ ? ] pick 3map-as ;
-
-: vlshift ( u n -- w ) '[ _ shift ] map ;
-: vrshift ( u n -- w ) neg '[ _ shift ] map ;
-
-: hlshift ( u n -- w )
-    [ [ underlying>> ] dip <byte-array> prepend 16 head ] [ drop ] 2bi new-underlying ;
-
-: hrshift ( u n -- w )
-    [ [ underlying>> ] dip <byte-array> append 16 tail* ] [ drop ] 2bi new-underlying ;
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;
