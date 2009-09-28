@@ -176,8 +176,12 @@ CODEGEN: ##min-vector %min-vector
 CODEGEN: ##max-vector %max-vector
 CODEGEN: ##sqrt-vector %sqrt-vector
 CODEGEN: ##horizontal-add-vector %horizontal-add-vector
+CODEGEN: ##horizontal-sub-vector %horizontal-sub-vector
+CODEGEN: ##horizontal-shl-vector %horizontal-shl-vector
+CODEGEN: ##horizontal-shr-vector %horizontal-shr-vector
 CODEGEN: ##abs-vector %abs-vector
 CODEGEN: ##and-vector %and-vector
+CODEGEN: ##andn-vector %andn-vector
 CODEGEN: ##or-vector %or-vector
 CODEGEN: ##xor-vector %xor-vector
 CODEGEN: ##shl-vector %shl-vector

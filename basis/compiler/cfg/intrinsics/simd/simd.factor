@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays fry cpu.architecture kernel
+USING: accessors byte-arrays fry cpu.architecture kernel math
 sequences compiler.tree.propagation.info
 compiler.cfg.builder.blocks compiler.cfg.stacks
 compiler.cfg.stacks.local compiler.cfg.hats
@@ -9,14 +9,24 @@ compiler.cfg.intrinsics.alien ;
 IN: compiler.cfg.intrinsics.simd
 
 : emit-vector-op ( node quot: ( rep -- ) -- )
-    [ dup node-input-infos last literal>> ] dip over representation?
-    [ [ drop ] 2dip call ] [ 2drop emit-primitive ] if ; inline
+    [ dup node-input-infos last literal>> dup representation? ] dip
+    '[ nip @ ] [ drop emit-primitive ] if ; inline
 
 : emit-binary-vector-op ( node quot -- )
     '[ [ ds-drop 2inputs ] dip @ ds-push ] emit-vector-op ; inline
 
 : emit-unary-vector-op ( node quot -- )
     '[ [ ds-drop ds-pop ] dip @ ds-push ] emit-vector-op ; inline
+
+: emit-horizontal-shift ( node quot -- )
+    [
+        dup node-input-infos
+        [ second literal>> ] [ third literal>> ] bi
+        2dup [ integer? ] [ representation? ] bi* and
+    ] dip
+    '[ [ drop ds-drop ds-drop ds-pop ] 2dip @ ds-push ]
+    [ 2drop emit-primitive ]
+    if ; inline
 
 : emit-gather-vector-2 ( node -- )
     [ ^^gather-vector-2 ] emit-binary-vector-op ;
