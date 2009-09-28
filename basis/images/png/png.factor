@@ -6,7 +6,7 @@ io.binary io.encodings.ascii io.encodings.string kernel locals
 math math.bitwise math.ranges sequences sorting ;
 IN: images.png
 
-TUPLE: png-image < image ;
+SINGLETON: png-image
 "png" png-image register-image-class
 
 TUPLE: loading-png
@@ -128,7 +128,7 @@ ERROR: unimplemented-color-type image ;
     [ png-group-width ] tri group reverse-png-filter ;
 
 : loading-png>image ( loading-png -- image )
-    [ png-image new ] dip {
+    [ image new ] dip {
         [ png-image-bytes >>bitmap ]
         [ [ width>> ] [ height>> ] bi 2array >>dim ]
         [ drop ubyte-components >>component-type ]
