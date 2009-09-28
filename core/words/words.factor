@@ -3,7 +3,7 @@
 USING: accessors arrays definitions graphs kernel
 kernel.private slots.private math namespaces sequences
 strings vectors sbufs quotations assocs hashtables sorting vocabs
-math.order sets ;
+math.order sets words.private ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -169,8 +169,11 @@ M: word reset-word
         } reset-props
     ] tri ;
 
+: <word> ( name vocab -- word )
+    2dup [ hashcode ] bi@ bitxor >fixnum (word) ;
+
 : gensym ( -- word )
-    "( gensym )" f <word> ;
+    "( gensym )" f \ gensym counter >fixnum (word) ;
 
 : define-temp ( quot effect -- word )
     [ gensym dup ] 2dip define-declared ;
