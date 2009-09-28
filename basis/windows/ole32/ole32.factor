@@ -111,10 +111,6 @@ CONSTANT: COINIT_SPEED_OVER_MEMORY 8
 FUNCTION: HRESULT OleInitialize ( void* reserved ) ;
 FUNCTION: HRESULT CoInitializeEx ( void* reserved, DWORD dwCoInit ) ;
 
-FUNCTION: HRESULT RegisterDragDrop ( HWND hWnd, IDropTarget* pDropTarget ) ;
-FUNCTION: HRESULT RevokeDragDrop ( HWND hWnd ) ;
-FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
-
 : succeeded? ( hresult -- ? )
     0 HEX: 7FFFFFFF between? ;
 

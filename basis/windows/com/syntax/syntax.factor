@@ -1,8 +1,8 @@
-USING: alien alien.c-types alien.accessors effects kernel
-windows.ole32 parser lexer splitting grouping sequences
-namespaces assocs quotations generalizations accessors words
-macros alien.syntax fry arrays layouts math classes.struct
-windows.kernel32 ;
+USING: alien alien.c-types alien.accessors alien.parser
+effects kernel windows.ole32 parser lexer splitting grouping
+sequences namespaces assocs quotations generalizations
+accessors words macros alien.syntax fry arrays layouts math
+classes.struct windows.kernel32 ;
 IN: windows.com.syntax
 
 <PRIVATE
@@ -14,7 +14,7 @@ MACRO: com-invoke ( n return parameters -- )
         "stdcall" alien-indirect
     ] ;
 
-TUPLE: com-interface-definition name parent iid functions ;
+TUPLE: com-interface-definition word parent iid functions ;
 C: <com-interface-definition> com-interface-definition
 
 TUPLE: com-function-definition name return parameters ;
@@ -25,22 +25,25 @@ SYMBOL: +com-interface-definitions+
 [ H{ } +com-interface-definitions+ set-global ]
 unless
 
+ERROR: no-com-interface interface ;
+
 : find-com-interface-definition ( name -- definition )
-    dup "f" = [ drop f ] [
+    [
         dup +com-interface-definitions+ get-global at*
-        [ nip ]
-        [ " COM interface hasn't been defined" prepend throw ]
-        if
-    ] if ;
+        [ nip ] [ drop no-com-interface ] if
+    ] [ f ] if* ;
 
 : save-com-interface-definition ( definition -- )
-    dup name>> +com-interface-definitions+ get-global set-at ;
+    dup word>> +com-interface-definitions+ get-global set-at ;
 
 : (parse-com-function) ( tokens -- definition )
     [ second ]
     [ first ]
-    [ 3 tail [ CHAR: , swap remove ] map 2 group { "void*" "this" } prefix ]
-    tri
+    [
+        3 tail [ CHAR: , swap remove ] map
+        2 group [ first2 normalize-c-arg 2array ] map
+        { void* "this" } prefix
+    ] tri
     <com-function-definition> ;
 
 : parse-com-functions ( -- functions )
@@ -48,10 +51,11 @@ unless
     [ (parse-com-function) ] map ;
 
 : (iid-word) ( definition -- word )
-    name>> "-iid" append create-in ;
+    word>> name>> "-iid" append create-in ;
 
 : (function-word) ( function interface -- word )
-    name>> "::" rot name>> 3append create-in ;
+    swap [ word>> name>> "::" ] [ name>> ] bi*
+    3append create-in ;
 
 : family-tree ( definition -- definitions )
     dup parent>> [ family-tree ] [ { } ] if*
@@ -79,7 +83,7 @@ unless
 
 : define-words-for-com-interface ( definition -- )
     [ [ (iid-word) ] [ iid>> 1quotation ] bi (( -- iid )) define-declared ]
-    [ name>> "com-interface" swap typedef ]
+    [ word>> void* swap typedef ]
     [
         dup family-tree-functions
         [ (define-word-for-function) ] with each-index
@@ -89,8 +93,8 @@ unless
 PRIVATE>
 
 SYNTAX: COM-INTERFACE:
-    scan
-    scan find-com-interface-definition
+    CREATE-C-TYPE
+    scan-object find-com-interface-definition
     scan string>guid
     parse-com-functions
     <com-interface-definition>
