@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct unix.types ;
+USING: alien.c-types alien.syntax classes.struct unix.types
+unix.stat ;
 IN: unix.statvfs.netbsd
 
 CONSTANT: _VFS_NAMELEN    32
