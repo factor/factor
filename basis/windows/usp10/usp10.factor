@@ -58,7 +58,7 @@ STRUCT: SCRIPT_VISATTR
     { flags WORD } ;
 
 TYPEDEF: void* SCRIPT_CACHE*
-TYPEDEF: void* ABC*
+C-TYPE: ABC
 
 FUNCTION: HRESULT ScriptShape (
     HDC hdc,

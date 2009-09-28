@@ -104,7 +104,7 @@ FUNCTION: void* BIO_f_buffer (  ) ;
 CONSTANT: EVP_MAX_MD_SIZE 64
 
 TYPEDEF: void* EVP_MD*
-TYPEDEF: void* ENGINE*
+C-TYPE: ENGINE
 
 STRUCT: EVP_MD_CTX
     { digest EVP_MD* }

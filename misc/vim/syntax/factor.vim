@@ -123,8 +123,9 @@ syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingle
 " LIBRARY:
 "#\ "
 
-syn region factorString start=/"/ skip=/\\"/ end=/"/ oneline
-syn region factorSbuf start=/SBUF" / skip=/\\"/ end=/"/ oneline
+syn region factorString start=/\<"/ skip=/\\"/ end=/"/
+syn region factorTriString start=/\<"""/ skip=/\\"/ end=/"""/
+syn region factorSbuf start=/\<SBUF"\>/ skip=/\\"/ end=/"/
 
 syn region factorMultiString matchgroup=factorMultiStringDelims start=/\<STRING:\s\+\S\+\>/ end=/^;$/ contains=factorMultiStringContents
 syn match factorMultiStringContents /.*/ contained
@@ -201,6 +202,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorPGenericDelims         Special
     HiLink factorPGenericNDelims        Special
     HiLink factorString                 String
+    HiLink factorTriString              String
     HiLink factorSbuf                   String
     HiLink factorMultiStringContents    String
     HiLink factorMultiStringDelims      Typedef

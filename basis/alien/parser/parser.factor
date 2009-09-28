@@ -1,22 +1,22 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays assocs
-combinators combinators.short-circuit effects grouping
-kernel parser sequences splitting words fry locals lexer
-namespaces summary math vocabs.parser ;
+USING: accessors alien alien.c-types arrays assocs classes
+combinators combinators.short-circuit compiler.units effects
+grouping kernel parser sequences splitting words fry locals
+lexer namespaces summary math vocabs.parser ;
 IN: alien.parser
 
-: parse-c-type-name ( name -- word/string )
-    [ search ] keep or ;
+: parse-c-type-name ( name -- word )
+    dup search [ nip ] [ no-word ] if* ;
 
 : parse-c-type ( string -- array )
     {
         { [ dup "void" =            ] [ drop void ] }
         { [ CHAR: ] over member?    ] [ parse-array-type parse-c-type-name prefix ] }
         { [ dup search c-type-word? ] [ parse-c-type-name ] }
-        { [ dup c-types get at      ] [ ] }
+        { [ "**" ?tail              ] [ drop void* ] }
         { [ "*" ?tail               ] [ parse-c-type-name resolve-pointer-type ] }
-        [ no-c-type ]
+        [ parse-c-type-name no-c-type ]
     } cond ;
 
 : scan-c-type ( -- c-type )
@@ -25,10 +25,17 @@ IN: alien.parser
     [ parse-c-type ] if ; 
 
 : reset-c-type ( word -- )
+    dup "struct-size" word-prop
+    [ dup [ forget-class ] [ { "struct-size" } reset-props ] bi ] when
     { "c-type" "pointer-c-type" "callback-effect" "callback-abi" } reset-props ;
 
 : CREATE-C-TYPE ( -- word )
-    scan current-vocab create dup reset-c-type ;
+    scan current-vocab create {
+        [ fake-definition ]
+        [ set-word ]
+        [ reset-c-type ]
+        [ ]
+    } cleave ;
 
 : normalize-c-arg ( type name -- type' name' )
     [ length ]
