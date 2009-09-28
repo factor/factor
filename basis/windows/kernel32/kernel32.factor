@@ -704,7 +704,7 @@ STRUCT: WIN32_FIND_DATA
     { nFileSizeLow DWORD }
     { dwReserved0 DWORD }
     { dwReserved1 DWORD }
-    { cFileName { "TCHAR" MAX_PATH } }
+    { cFileName { TCHAR MAX_PATH } }
     { cAlternateFileName TCHAR[14] } ;
 
 TYPEDEF: WIN32_FIND_DATA* PWIN32_FIND_DATA
