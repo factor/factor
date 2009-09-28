@@ -45,6 +45,13 @@ IN: compiler.cfg.intrinsics.simd
         ds-push
     ] emit-vector-op ;
 
+: emit-shuffle-vector ( node -- )
+    ;
+
+: emit-select-vector ( node -- )
+    
+    ;
+
 : emit-alien-vector ( node -- )
     dup [
         '[
