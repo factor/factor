@@ -974,9 +974,9 @@ enable-fixnum-log2
 : enable-sse2 ( version -- )
     20 >= [
         enable-float-intrinsics
-        enable-fsqrt
-        enable-float-min/max
         enable-float-functions
+        enable-float-min/max
+        enable-fsqrt
         install-sse2-check
     ] when ;
 
