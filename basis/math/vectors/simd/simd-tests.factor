@@ -6,18 +6,18 @@ tools.test vocabs assocs compiler.cfg.debugger words
 locals math.vectors.specialization combinators cpu.architecture
 math.vectors.simd.intrinsics namespaces byte-arrays alien
 specialized-arrays classes.struct eval ;
-FROM: alien.c-types => c-type-boxed-class ;
-SPECIALIZED-ARRAY: float
-SIMD: char
-SIMD: uchar
-SIMD: short
-SIMD: ushort
-SIMD: int
-SIMD: uint
-SIMD: longlong
-SIMD: ulonglong
-SIMD: float
-SIMD: double
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-ARRAY: c:float
+SIMD: c:char
+SIMD: c:uchar
+SIMD: c:short
+SIMD: c:ushort
+SIMD: c:int
+SIMD: c:uint
+SIMD: c:longlong
+SIMD: c:ulonglong
+SIMD: c:float
+SIMD: c:double
 IN: math.vectors.simd.tests
 
 ! Make sure the functor doesn't generate bogus vocabularies
