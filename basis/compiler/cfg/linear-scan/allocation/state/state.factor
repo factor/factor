@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators cpu.architecture fry heaps
 kernel math math.order namespaces sequences vectors
-compiler.cfg compiler.cfg.registers
+compiler.cfg compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation.state
 
@@ -118,7 +118,8 @@ SYMBOL: unhandled-intervals
 
 : next-spill-slot ( rep -- n )
     rep-size cfg get
-    [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop ;
+    [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop
+    <spill-slot> ;
 
 ! Minheap of sync points which still need to be processed
 SYMBOL: unhandled-sync-points
@@ -126,7 +127,7 @@ SYMBOL: unhandled-sync-points
 ! Mapping from vregs to spill slots
 SYMBOL: spill-slots
 
-: vreg-spill-slot ( vreg -- n )
+: vreg-spill-slot ( vreg -- spill-slot )
     spill-slots get [ rep-of next-spill-slot ] cache ;
 
 : init-allocator ( registers -- )

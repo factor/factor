@@ -218,8 +218,8 @@ M: x86.64 %callback-value ( ctype -- )
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
-: float-function-param ( i spill-slot -- )
-    [ float-regs param-regs nth ] [ n>> spill@ ] bi* MOVSD ;
+: float-function-param ( i src -- )
+    [ float-regs param-regs nth ] dip double-rep %copy ;
 
 : float-function-return ( reg -- )
     float-regs return-reg double-rep %copy ;
@@ -230,6 +230,8 @@ M:: x86.64 %unary-float-function ( dst src func -- )
     dst float-function-return ;
 
 M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
+    ! src1 might equal dst; otherwise it will be a spill slot
+    ! src2 is always a spill slot
     0 src1 float-function-param
     1 src2 float-function-param
     func f %alien-invoke
@@ -248,9 +250,6 @@ M:: x86.64 %call-gc ( gc-root-count temp -- )
 ! The result of reading 4 bytes from memory is a fixnum on
 ! x86-64.
 enable-alien-4-intrinsics
-
-! Enable fast calling of libc math functions
-enable-float-functions
 
 USE: vocabs.loader
 
