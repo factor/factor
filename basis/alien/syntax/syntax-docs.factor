@@ -1,5 +1,5 @@
 IN: alien.syntax
-USING: alien alien.c-types alien.parser classes.struct help.markup help.syntax ;
+USING: alien alien.c-types alien.parser classes.struct help.markup help.syntax see ;
 
 HELP: DLL"
 { $syntax "DLL\" path\"" }
@@ -64,6 +64,16 @@ HELP: C-ENUM:
     "It is equivalent to the following series of definitions:"
     { $code "CONSTANT: red 0" "CONSTANT: green 1" "CONSTANT: blue 2" }
 } ;
+
+HELP: C-TYPE:
+{ $syntax "C-TYPE: type" }
+{ $values { "type" "a new C type" } }
+{ $description "Defines a new, opaque C type. Since it is opaque, " { $snippet "type" } " will not be directly usable as a parameter or return type of a " { $link POSTPONE: FUNCTION: } " or as a slot of a " { $link POSTPONE: STRUCT: } ". However, it can be used as the type of a pointer (that is, as " { $snippet "type*" } ")." $nl
+{ $snippet "C-TYPE:" } " can also be used to forward-declare C types to enable circular dependencies. For example:"
+{ $code """C-TYPE: forward 
+STRUCT: backward { x forward* } ;
+STRUCT: forward { x backward* } ; """ } }
+{ $notes "Primitive C types are also displayed using " { $snippet "C-TYPE:" } " syntax when they are displayed by " { $link see } "." } ;
 
 HELP: CALLBACK:
 { $syntax "CALLBACK: return type ( parameters ) ;" }

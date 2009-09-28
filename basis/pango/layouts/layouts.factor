@@ -10,9 +10,9 @@ IN: pango.layouts
 
 LIBRARY: pango
 
-TYPEDEF: void* PangoLayout*
-TYPEDEF: void* PangoLayoutIter*
-TYPEDEF: void* PangoLayoutLine*
+C-TYPE: PangoLayout
+C-TYPE: PangoLayoutIter
+C-TYPE: PangoLayoutLine
 
 FUNCTION: PangoLayout*
 pango_layout_new ( PangoContext* context ) ;
