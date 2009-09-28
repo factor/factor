@@ -16,6 +16,7 @@
 
 	<pre class="description"><t:code t:name="contents" t:mode="mode" /></pre>
 
+	<t:a t:href="$pastebin/paste.txt" t:query="id">Plain Text</t:a> |
 	<t:button t:action="$pastebin/delete-paste" t:for="id" class="link-button link">Delete Paste</t:button>
 
 	<t:bind-each t:name="annotations">
@@ -30,6 +31,7 @@
 
 		<pre class="description"><t:code t:name="contents" t:mode="mode"/></pre>
 
+		<t:a t:href="$pastebin/annotation.txt" t:query="id">Plain Text</t:a> |
 		<t:button t:action="$pastebin/delete-annotation" t:for="id" class="link-button link">Delete Annotation</t:button>
 
 	</t:bind-each>
