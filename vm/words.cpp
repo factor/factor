@@ -3,14 +3,14 @@
 namespace factor
 {
 
-word *factor_vm::allot_word(cell vocab_, cell name_)
+word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 {
 	gc_root<object> vocab(vocab_,this);
 	gc_root<object> name(name_,this);
 
 	gc_root<word> new_word(allot<word>(sizeof(word)),this);
 
-	new_word->hashcode = tag_fixnum((rand() << 16) ^ rand());
+	new_word->hashcode = hashcode_;
 	new_word->vocabulary = vocab.value();
 	new_word->name = name.value();
 	new_word->def = userenv[UNDEFINED_ENV];
@@ -31,12 +31,13 @@ word *factor_vm::allot_word(cell vocab_, cell name_)
 	return new_word.untagged();
 }
 
-/* <word> ( name vocabulary -- word ) */
+/* (word) ( name vocabulary hashcode -- word ) */
 inline void factor_vm::primitive_word()
 {
+	cell hashcode = dpop();
 	cell vocab = dpop();
 	cell name = dpop();
-	dpush(tag<word>(allot_word(vocab,name)));
+	dpush(tag<word>(allot_word(name,vocab,hashcode)));
 }
 
 PRIMITIVE_FORWARD(word)
