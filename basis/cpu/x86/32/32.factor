@@ -282,11 +282,16 @@ M: x86.32 %callback-value ( ctype -- )
     ! Unbox EAX
     unbox-return ;
 
-:: float-function-param ( stack-slot dst src -- )
+GENERIC: float-function-param ( stack-slot dst src -- )
+
+M:: spill-slot float-function-param ( stack-slot dst src -- )
     ! We can clobber dst here since its going to contain the
     ! final result
-    dst src n>> spill@ MOVSD
-    stack-slot dst MOVSD ;
+    dst src double-rep %copy
+    stack-slot dst double-rep %copy ;
+
+M: register float-function-param
+    nip double-rep %copy ;
 
 : float-function-return ( reg -- )
     ESP [] FSTPL
