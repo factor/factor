@@ -40,14 +40,18 @@ SIMD-OP: vsqrt
 SIMD-OP: sum
 SIMD-OP: vabs
 SIMD-OP: vbitand
+SIMD-OP: vbitandn
 SIMD-OP: vbitor
 SIMD-OP: vbitxor
 SIMD-OP: vlshift
 SIMD-OP: vrshift
+SIMD-OP: hlshift
+SIMD-OP: hrshift
 
 : (simd-broadcast) ( x rep -- v ) bad-simd-call ;
 : (simd-gather-2) ( a b rep -- v ) bad-simd-call ;
 : (simd-gather-4) ( a b c d rep -- v ) bad-simd-call ;
+
 : assert-positive ( x -- y ) ;
 
 : alien-vector ( c-ptr n rep -- value )
@@ -110,10 +114,13 @@ M: vector-rep supported-simd-op?
         { \ (simd-sum)       [ %horizontal-add-vector-reps ] }
         { \ (simd-vabs)      [ %abs-vector-reps            ] }
         { \ (simd-vbitand)   [ %and-vector-reps            ] }
+        { \ (simd-vbitandn)  [ %andn-vector-reps           ] }
         { \ (simd-vbitor)    [ %or-vector-reps             ] }
         { \ (simd-vbitxor)   [ %xor-vector-reps            ] }
         { \ (simd-vlshift)   [ %shl-vector-reps            ] }
         { \ (simd-vrshift)   [ %shr-vector-reps            ] }
+        { \ (simd-hlshift)   [ %horizontal-shl-vector-reps ] }
+        { \ (simd-hrshift)   [ %horizontal-shr-vector-reps ] }
         { \ (simd-broadcast) [ %broadcast-vector-reps      ] }
         { \ (simd-gather-2)  [ %gather-vector-2-reps       ] }
         { \ (simd-gather-4)  [ %gather-vector-4-reps       ] }

@@ -148,9 +148,13 @@ CONSTANT: simd-classes
 : remove-integer-words ( alist -- alist' )
     [ drop { vlshift vrshift } member? not ] assoc-filter ;
 
+: remove-horizontal-shifts ( alist -- alist' )
+    [ drop { hlshift hrshift } member? not ] assoc-filter ;
+
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
-    float = [ remove-integer-words ] [ remove-float-words ] if ;
+    float = [ remove-integer-words ] [ remove-float-words ] if
+    remove-horizontal-shifts ;
 
 : check-vector-ops ( class elt-class compare-quot -- )
     [
@@ -255,3 +259,15 @@ STRUCT: simd-struct
 ] unit-test
 
 [ ] [ char-16 new 1array stack. ] unit-test
+
+[ int-4{ 256 512 1024 2048 } ]
+[ int-4{ 1 2 4 8 } 1 hlshift ] unit-test
+
+[ int-4{ 256 512 1024 2048 } ]
+[ int-4{ 1 2 4 8 } [ { int-4 } declare 1 hlshift ] compile-call ] unit-test
+
+[ int-4{ 1 2 4 8 } ]
+[ int-4{ 256 512 1024 2048 } 1 hrshift ] unit-test
+
+[ int-4{ 1 2 4 8 } ]
+[ int-4{ 256 512 1024 2048 } [ { int-4 } declare 1 hrshift ] compile-call ] unit-test

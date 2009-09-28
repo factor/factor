@@ -340,6 +340,21 @@ def: dst/scalar-rep
 use: src
 literal: rep ;
 
+PURE-INSN: ##horizontal-sub-vector
+def: dst/scalar-rep
+use: src
+literal: rep ;
+
+PURE-INSN: ##horizontal-shl-vector
+def: dst
+use: src1
+literal: src2 rep ;
+
+PURE-INSN: ##horizontal-shr-vector
+def: dst
+use: src1
+literal: src2 rep ;
+
 PURE-INSN: ##abs-vector
 def: dst
 use: src
@@ -351,6 +366,11 @@ use: src
 literal: rep ;
 
 PURE-INSN: ##and-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##andn-vector
 def: dst
 use: src1 src2
 literal: rep ;

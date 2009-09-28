@@ -63,12 +63,12 @@ $nl
 } ;
 
 ARTICLE: "math.vectors.simd.words" "SIMD vector words"
-"For each SIMD vector type, several words are defined:"
+"For each SIMD vector type, several words are defined, where " { $snippet "type" } " is the type in question:"
 { $table
     { "Word" "Stack effect" "Description" }
     { { $snippet "type-with" } { $snippet "( x -- simd-array )" } "creates a new instance where all components are set to a single scalar" }
     { { $snippet "type-boa" } { $snippet "( ... -- simd-array )" } "creates a new instance where components are read from the stack" }
-    { { $snipept "type-cast" } { $snippet "( simd-array -- simd-array' )" } "creates a new SIMD array where the underlying data is taken from another SIMD array, with no format conversion" }
+    { { $snippet "type-cast" } { $snippet "( simd-array -- simd-array' )" } "creates a new SIMD array where the underlying data is taken from another SIMD array, with no format conversion" }
     { { $snippet ">type" } { $snippet "( seq -- simd-array )" } "creates a new instance initialized with the elements of an existing sequence, which must have the correct length" }
     { { $snippet "type{" } { $snippet "type{ elements... }" } "parsing word defining literal syntax for an SIMD vector; the correct number of elements must be given" }
 }

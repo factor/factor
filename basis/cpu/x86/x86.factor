@@ -412,6 +412,22 @@ M: x86 %horizontal-add-vector-reps
         { sse3? { float-4-rep double-2-rep } }
     } available-reps ;
 
+M: x86 %horizontal-shl-vector ( dst src1 src2 rep -- )
+    two-operand PSLLDQ ;
+
+M: x86 %horizontal-shl-vector-reps
+    {
+        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %horizontal-shr-vector ( dst src1 src2 rep -- )
+    two-operand PSRLDQ ;
+
+M: x86 %horizontal-shr-vector-reps
+    {
+        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 M: x86 %abs-vector ( dst src rep -- )
     {
         { char-16-rep [ PABSB ] }
@@ -445,6 +461,20 @@ M: x86 %and-vector ( dst src1 src2 rep -- )
     } case ;
 
 M: x86 %and-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %andn-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
+    {
+        { float-4-rep [ ANDNPS ] }
+        { double-2-rep [ ANDNPD ] }
+        [ drop PANDN ]
+    } case ;
+
+M: x86 %andn-vector-reps
     {
         { sse? { float-4-rep } }
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
