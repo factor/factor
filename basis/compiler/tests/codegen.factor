@@ -4,7 +4,7 @@ sequences tools.test namespaces.private slots.private
 sequences.private byte-arrays alien alien.accessors layouts
 words definitions compiler.units io combinators vectors grouping
 make alien.c-types combinators.short-circuit math.order
-math.libm math.parser math.functions ;
+math.libm math.parser math.functions alien.syntax ;
 FROM: math => float ;
 QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
@@ -463,7 +463,7 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 ] unit-test
 
 ! ##box-displaced-alien is a def-is-use instruction
-[ ALIEN: e39 ] [
+[ ALIEN: 3e9 ] [
     [
         f
         100 [ 10 swap <displaced-alien> ] times
