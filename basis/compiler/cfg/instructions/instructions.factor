@@ -708,10 +708,10 @@ UNION: kill-vreg-insn
 UNION: def-is-use-insn
 ##integer>bignum
 ##bignum>integer
+##box-alien
+##box-displaced-alien
 ##string-nth
-##unbox-any-c-ptr
-##unary-float-function
-##binary-float-function ;
+##unbox-any-c-ptr ;
 
 SYMBOL: vreg-insn
 
