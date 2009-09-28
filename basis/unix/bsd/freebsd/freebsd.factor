@@ -1,4 +1,4 @@
-USING: alien.syntax classes.struct ;
+USING: alien.c-types alien.syntax classes.struct unix.types ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 1024
