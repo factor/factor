@@ -32,7 +32,7 @@ SYNTAX: C-ENUM:
     [ [ create-in ] dip define-constant ] each-index ;
 
 SYNTAX: C-TYPE:
-    "Primitive C type definition not supported" throw ;
+    void CREATE-C-TYPE typedef ;
 
 ERROR: no-such-symbol name library ;
 
