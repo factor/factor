@@ -657,7 +657,8 @@ literal: label
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-TUPLE: spill-slot n ; C: <spill-slot> spill-slot
+TUPLE: spill-slot { n integer } ;
+C: <spill-slot> spill-slot
 
 INSN: _gc
 temp: temp1 temp2
@@ -667,11 +668,11 @@ literal: data-values tagged-values uninitialized-locs ;
 ! virtual registers
 INSN: _spill
 use: src
-literal: rep n ;
+literal: rep dst ;
 
 INSN: _reload
 def: dst
-literal: rep n ;
+literal: rep src ;
 
 INSN: _spill-area-size
 literal: n ;
