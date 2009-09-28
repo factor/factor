@@ -1,12 +1,14 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals alien.c-types alien.syntax arrays kernel fry math
-namespaces sequences system layouts io vocabs.loader accessors init
-combinators command-line make compiler compiler.units
-compiler.constants compiler.alien compiler.codegen
-compiler.codegen.fixup compiler.cfg.instructions compiler.cfg.builder
-compiler.cfg.intrinsics compiler.cfg.stack-frame cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86 cpu.architecture ;
+USING: locals alien.c-types alien.libraries alien.syntax arrays
+kernel fry math namespaces sequences system layouts io
+vocabs.loader accessors init combinators command-line make
+compiler compiler.units compiler.constants compiler.alien
+compiler.codegen compiler.codegen.fixup
+compiler.cfg.instructions compiler.cfg.builder
+compiler.cfg.intrinsics compiler.cfg.stack-frame
+cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
+cpu.architecture ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -301,14 +303,14 @@ M: register float-function-param
 M:: x86.32 %unary-float-function ( dst src func -- )
     ESP -16 [+] dst src float-function-param
     ESP 16 SUB
-    func f %alien-invoke
+    func "libm" load-library %alien-invoke
     dst float-function-return ;
 
 M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     ESP -16 [+] dst src1 float-function-param
     ESP  -8 [+] dst src2 float-function-param
     ESP 16 SUB
-    func f %alien-invoke
+    func "libm" load-library %alien-invoke
     dst float-function-return ;
 
 M: x86.32 %cleanup ( params -- )
