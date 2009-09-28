@@ -99,11 +99,11 @@ ERROR: unimplemented-color-type image ;
     a b + c - { a b c } [ [ - abs ] keep 2array ] with map 
     sort-keys first second ;
 
-:: png-unfilter-line ( prev curr filter -- curr' )
+:: png-unfilter-line ( width prev curr filter -- curr' )
     prev :> c
-    prev 3 tail-slice :> b
+    prev width tail-slice :> b
     curr :> a
-    curr 3 tail-slice :> x
+    curr width tail-slice :> x
     x length [0,b)
     filter {
         { filter-none [ drop ] }
@@ -112,18 +112,18 @@ ERROR: unimplemented-color-type image ;
         { filter-average [ [| n | n x nth n a nth n b nth + 2/ + 256 wrap n x set-nth ] each ] }
         { filter-paeth [ [| n | n x nth n a nth n b nth n c nth paeth + 256 wrap n x set-nth ] each ] }
     } case 
-    curr 3 tail ;
+    curr width tail ;
 
-: reverse-png-filter ( lines -- byte-array )
-    dup first length 0 <array> prefix
-    [ { 0 0 } prepend ] map
+:: reverse-png-filter ( n lines -- byte-array )
+    lines dup first length 0 <array> prefix
+    [ n 1 - 0 <array> prepend ] map
     2 clump [
-        first2 dup [ third ] [ [ 0 2 ] dip set-nth ] bi
+        n swap first2 [ ] [ n 1 - swap nth ] [ [ 0 n 1 - ] dip set-nth ] tri
         png-unfilter-line
     ] map B{ } concat-as ;
 
 : png-image-bytes ( loading-png -- byte-array )
-    [ inflate-data ] [ png-group-width ] bi group reverse-png-filter ;
+    [ png-bytes-per-pixel ] [ inflate-data ] [ png-group-width ] tri group reverse-png-filter ;
 
 : decode-greyscale ( loading-png -- loading-png )
     unimplemented-color-type ;
