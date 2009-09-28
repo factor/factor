@@ -282,6 +282,34 @@ M: x86.32 %callback-value ( ctype -- )
     ! Unbox EAX
     unbox-return ;
 
+GENERIC: float-function-param ( stack-slot dst src -- )
+
+M:: spill-slot float-function-param ( stack-slot dst src -- )
+    ! We can clobber dst here since its going to contain the
+    ! final result
+    dst src double-rep %copy
+    stack-slot dst double-rep %copy ;
+
+M: register float-function-param
+    nip double-rep %copy ;
+
+: float-function-return ( reg -- )
+    ESP [] FSTPL
+    ESP [] MOVSD
+    ESP 16 ADD ;
+
+M:: x86.32 %unary-float-function ( dst src func -- )
+    ESP -16 [+] dst src float-function-param
+    ESP 16 SUB
+    func f %alien-invoke
+    dst float-function-return ;
+
+M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
+    ESP -16 [+] dst src1 float-function-param
+    ESP  -8 [+] dst src2 float-function-param
+    ESP 16 SUB
+    func f %alien-invoke
+    dst float-function-return ;
 
 M: x86.32 %cleanup ( params -- )
     #! a) If we just called an stdcall function in Windows, it

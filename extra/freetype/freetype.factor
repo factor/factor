@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel system combinators
+USING: alien alien.c-types alien.syntax kernel system combinators
 alien.libraries classes.struct ;
 IN: freetype
 
@@ -38,8 +38,8 @@ TYPEDEF: long FT_F26Dot6
 FUNCTION: FT_Error FT_Init_FreeType ( void* library ) ;
 
 ! circular reference between glyph and face
-TYPEDEF: void face
-TYPEDEF: void glyph
+TYPEDEF: void* face*
+TYPEDEF: void* glyph*
 
 STRUCT: glyph
     { library void* }
@@ -165,6 +165,8 @@ STRUCT: FT_Bitmap
     { pixel_mode char }
     { palette_mode char }
     { palette void* } ;
+
+TYPEDEF: void* FT_Face*
 
 FUNCTION: FT_Error FT_New_Face ( void* library, FT_Char* font, FT_Long index, face* face ) ;
 

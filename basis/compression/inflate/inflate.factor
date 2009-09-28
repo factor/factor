@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays
-byte-vectors combinators fry grouping hashtables
-compression.huffman images io.binary kernel locals
-math math.bitwise math.order math.ranges multiline sequences
-sorting ;
+USING: accessors arrays assocs byte-vectors combinators
+compression.huffman fry hashtables io.binary kernel locals math
+math.bitwise math.order math.ranges sequences sorting ;
+QUALIFIED-WITH: bitstreams bs
 IN: compression.inflate
 
 QUALIFIED-WITH: bitstreams bs
@@ -177,41 +176,8 @@ CONSTANT: dist-table
         case
     ]
     [ produce ] keep call suffix concat ;
-    
-  !  [ produce ] keep dip swap suffix
-
-:: paeth ( a b c -- p ) 
-    a b + c - { a b c } [ [ - abs ] keep 2array ] with map 
-    sort-keys first second ;
-    
-:: png-unfilter-line ( prev curr filter -- curr' )
-    prev :> c
-    prev 3 tail-slice :> b
-    curr :> a
-    curr 3 tail-slice :> x
-    x length [0,b)
-    filter {
-        { 0 [ drop ] }
-        { 1 [ [| n | n x nth n a nth + 256 wrap n x set-nth ] each ] }
-        { 2 [ [| n | n x nth n b nth + 256 wrap n x set-nth ] each ] }
-        { 3 [ [| n | n x nth n a nth n b nth + 2/ + 256 wrap n x set-nth ] each ] }
-        { 4 [ [| n | n x nth n a nth n b nth n c nth paeth + 256 wrap n x set-nth ] each ] }
-    } case 
-    curr 3 tail ;
 
 PRIVATE>
-
-: reverse-png-filter' ( lines -- byte-array )
-    [ first ] [ 1 tail ] [ map ] bi-curry@ bi nip
-    concat [ 128 + ] B{ } map-as ;
-
-: reverse-png-filter ( lines -- byte-array )
-    dup first length 0 <array> prefix
-    [ { 0 0 } prepend ] map
-    2 clump [
-        first2 dup [ third ] [ [ 0 2 ] dip set-nth ] bi
-        png-unfilter-line
-    ] map B{ } concat-as ;
 
 : zlib-inflate ( bytes -- bytes )
     bs:<lsb0-bit-reader>

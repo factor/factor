@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax system math kernel calendar core-foundation
-core-foundation.time ;
+USING: alien.c-types alien.syntax system math kernel calendar
+core-foundation core-foundation.time ;
 IN: core-foundation.timers
 
 TYPEDEF: void* CFRunLoopTimerRef

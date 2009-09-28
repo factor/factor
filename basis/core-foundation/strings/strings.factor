@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.strings io.encodings.string kernel
-sequences byte-arrays io.encodings.utf8 math core-foundation
+USING: alien.c-types alien.syntax alien.strings io.encodings.string
+kernel sequences byte-arrays io.encodings.utf8 math core-foundation
 core-foundation.arrays destructors parser fry alien words ;
 IN: core-foundation.strings
 
