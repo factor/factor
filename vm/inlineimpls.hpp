@@ -4,59 +4,6 @@ namespace factor
 // I've had to copy inline implementations here to make dependencies work. Am hoping to move this code back into include files
 // once the rest of the reentrant changes are done. -PD
 
-// write_barrier.hpp
-
-inline card *factor_vm::addr_to_card(cell a)
-{
-	return (card*)(((cell)(a) >> card_bits) + cards_offset);
-}
-
-inline cell factor_vm::card_to_addr(card *c)
-{
-	return ((cell)c - cards_offset) << card_bits;
-}
-
-inline cell factor_vm::card_offset(card *c)
-{
-	return *(c - (cell)data->cards + (cell)data->allot_markers);
-}
-
-inline card_deck *factor_vm::addr_to_deck(cell a)
-{
-	return (card_deck *)(((cell)a >> deck_bits) + decks_offset);
-}
-
-inline cell factor_vm::deck_to_addr(card_deck *c)
-{
-	return ((cell)c - decks_offset) << deck_bits;
-}
-
-inline card *factor_vm::deck_to_card(card_deck *d)
-{
-	return (card *)((((cell)d - decks_offset) << (deck_bits - card_bits)) + cards_offset);
-}
-
-inline card *factor_vm::addr_to_allot_marker(object *a)
-{
-	return (card *)(((cell)a >> card_bits) + allot_markers_offset);
-}
-
-/* the write barrier must be called any time we are potentially storing a
-pointer from an older generation to a younger one */
-inline void factor_vm::write_barrier(object *obj)
-{
-	*addr_to_card((cell)obj) = card_mark_mask;
-	*addr_to_deck((cell)obj) = card_mark_mask;
-}
-
-/* we need to remember the first object allocated in the card */
-inline void factor_vm::allot_barrier(object *address)
-{
-	card *ptr = addr_to_allot_marker(address);
-	if(*ptr == invalid_allot_marker)
-		*ptr = ((cell)address & addr_card_mask);
-}
-
 //data_gc.hpp
 inline bool factor_vm::collecting_accumulation_gen_p()
 {
@@ -157,49 +104,6 @@ inline void factor_vm::check_tagged_pointer(cell tagged)
 	}
 #endif
 }
-
-//local_roots.hpp
-template <typename TYPE>
-struct gc_root : public tagged<TYPE>
-{
-	factor_vm *parent_vm;
-
-	void push() { parent_vm->check_tagged_pointer(tagged<TYPE>::value()); parent_vm->gc_locals.push_back((cell)this); }
-	
-	explicit gc_root(cell value_,factor_vm *vm) : tagged<TYPE>(value_),parent_vm(vm) { push(); }
-	explicit gc_root(TYPE *value_, factor_vm *vm) : tagged<TYPE>(value_),parent_vm(vm) { push(); }
-
-	const gc_root<TYPE>& operator=(const TYPE *x) { tagged<TYPE>::operator=(x); return *this; }
-	const gc_root<TYPE>& operator=(const cell &x) { tagged<TYPE>::operator=(x); return *this; }
-
-	~gc_root() {
-#ifdef FACTOR_DEBUG
-		assert(myvm->gc_locals.back() == (cell)this);
-#endif
-		parent_vm->gc_locals.pop_back();
-	}
-};
-
-/* A similar hack for the bignum implementation */
-struct gc_bignum
-{
-	bignum **addr;
-	factor_vm *parent_vm;
-	gc_bignum(bignum **addr_, factor_vm *vm) : addr(addr_), parent_vm(vm) {
-		if(*addr_)
-			parent_vm->check_data_pointer(*addr_);
-		parent_vm->gc_bignums.push_back((cell)addr);
-	}
-
-	~gc_bignum() {
-#ifdef FACTOR_DEBUG
-		assert(myvm->gc_bignums.back() == (cell)addr);
-#endif
-		parent_vm->gc_bignums.pop_back();
-	}
-};
-
-#define GC_BIGNUM(x) gc_bignum x##__gc_root(&x,this)
 
 //generic_arrays.hpp
 template <typename TYPE> TYPE *factor_vm::allot_array_internal(cell capacity)
