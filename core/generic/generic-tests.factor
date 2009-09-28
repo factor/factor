@@ -3,7 +3,7 @@ classes.tuple classes.union compiler.units continuations
 definitions eval generic generic.math generic.standard
 hashtables io io.streams.string kernel layouts math math.order
 namespaces parser prettyprint quotations sequences sorting
-strings tools.test vectors words ;
+strings tools.test vectors words generic.single ;
 IN: generic.tests
 
 GENERIC: foobar ( x -- y )
@@ -197,3 +197,18 @@ M: slice foozul ;
     real \ <=> method
     eq?
 ] unit-test
+
+! FORGET: on method wrappers
+GENERIC: forget-test ( a -- b )
+
+M: integer forget-test 3 + ;
+
+[ ] [ "IN: generic.tests USE: math FORGET: M\\ integer forget-test" eval( -- ) ] unit-test
+
+[ { } ] [
+    \ + compiled-usage keys
+    [ method-body? ] filter
+    [ "method-generic" word-prop \ forget-test eq? ] filter
+] unit-test
+
+[ 10 forget-test ] [ no-method? ] must-fail-with
