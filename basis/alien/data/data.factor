@@ -1,32 +1,32 @@
 ! (c)2009 Slava Pestov, Joe Groff bsd license
 USING: accessors alien alien.c-types alien.strings arrays
 byte-arrays cpu.architecture fry io io.encodings.binary
-io.files io.streams.memory kernel libc math sequences ;
+io.files io.streams.memory kernel libc math sequences words ;
 IN: alien.data
 
 GENERIC: require-c-array ( c-type -- )
 
 M: array require-c-array first require-c-array ;
 
-GENERIC: c-array-constructor ( c-type -- word )
+GENERIC: c-array-constructor ( c-type -- word ) foldable
 
-GENERIC: c-(array)-constructor ( c-type -- word )
+GENERIC: c-(array)-constructor ( c-type -- word ) foldable
 
-GENERIC: c-direct-array-constructor ( c-type -- word )
+GENERIC: c-direct-array-constructor ( c-type -- word ) foldable
 
 GENERIC: <c-array> ( len c-type -- array )
 
-M: c-type-name <c-array>
+M: word <c-array>
     c-array-constructor execute( len -- array ) ; inline
 
 GENERIC: (c-array) ( len c-type -- array )
 
-M: c-type-name (c-array)
+M: word (c-array)
     c-(array)-constructor execute( len -- array ) ; inline
 
 GENERIC: <c-direct-array> ( alien len c-type -- array )
 
-M: c-type-name <c-direct-array>
+M: word <c-direct-array>
     c-direct-array-constructor execute( alien len -- array ) ; inline
 
 : malloc-array ( n type -- array )
