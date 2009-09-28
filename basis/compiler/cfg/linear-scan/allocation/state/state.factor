@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators cpu.architecture fry heaps
 kernel math math.order namespaces sequences vectors
-compiler.cfg compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.linear-scan.live-intervals ;
+linked-assocs compiler.cfg compiler.cfg.registers
+compiler.cfg.instructions compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 ! Start index of current live interval. We ensure that all
@@ -148,7 +148,8 @@ SYMBOL: spill-slots
 
 ! A utility used by register-status and spill-status words
 : free-positions ( new -- assoc )
-    vreg>> rep-of reg-class-of registers get at [ 1/0. ] H{ } map>assoc ;
+    vreg>> rep-of reg-class-of registers get at
+    [ 1/0. ] H{ } <linked-assoc> map>assoc ;
 
 : add-use-position ( n reg assoc -- ) [ [ min ] when* ] change-at ;
 
