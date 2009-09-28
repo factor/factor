@@ -34,10 +34,10 @@ SYMBOL: spill-temps
     ] if ;
 
 : memory->register ( from to -- )
-    swap [ first2 ] [ first n>> ] bi* _reload ;
+    swap [ first2 ] [ first ] bi* _reload ;
 
 : register->memory ( from to -- )
-    [ first2 ] [ first n>> ] bi* _spill ;
+    [ first2 ] [ first ] bi* _spill ;
 
 : temp->register ( from to -- )
     nip [ first ] [ second ] [ second spill-temp ] tri _reload ;
