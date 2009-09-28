@@ -618,10 +618,14 @@ ALIAS: PINSRQ PINSRD
 : MOVDQA     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: 66 2-operand-rm-mr-sse ;
 : MOVDQU     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: f3 2-operand-rm-mr-sse ;
 
+<PRIVATE
+
 : 2shuffler ( indexes/mask -- mask )
     dup integer? [ first2 { 1 0 } bitfield ] unless ;
 : 4shuffler ( indexes/mask -- mask )
     dup integer? [ first4 { 6 4 2 0 } bitfield ] unless ;
+
+PRIVATE>
 
 : PSHUFD     ( dest src imm -- ) 4shuffler HEX: 70 HEX: 66 3-operand-rm-sse ;
 : PSHUFLW    ( dest src imm -- ) 4shuffler HEX: 70 HEX: f2 3-operand-rm-sse ;

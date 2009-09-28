@@ -20,8 +20,9 @@ ERROR: bad-base-type type ;
 PRIVATE>
 
 : define-simd-vocab ( type -- vocab )
+    parse-base-type
     [ simd-vocab ] keep '[
-        _ parse-base-type
+        _
         [ define-simd-128 ]
         [ define-simd-256 ] bi
     ] generate-vocab ;
