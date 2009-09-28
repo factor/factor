@@ -269,7 +269,7 @@ struct factor_vm : factor_vm_data {
 	inline void primitive_tuple_boa();
 
 	//words
-	word *allot_word(cell vocab_, cell name_);
+	word *allot_word(cell name_, cell vocab_, cell hashcode_);
 	inline void primitive_word();
 	inline void primitive_word_xt();
 	void update_word_xt(cell w_);
