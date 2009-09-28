@@ -129,6 +129,7 @@ M: x86 %min     int-rep two-operand [ CMP ] [ CMOVG ] 2bi ;
 M: x86 %max     int-rep two-operand [ CMP ] [ CMOVL ] 2bi ;
 
 M: x86 %not     int-rep one-operand NOT ;
+M: x86 %neg     int-rep one-operand NEG ;
 M: x86 %log2    BSR ;
 
 GENERIC: copy-register* ( dst src rep -- )
@@ -578,6 +579,19 @@ MACRO: available-reps ( alist -- )
     reverse [ { } ] suffix
     '[ _ cond ] ;
 
+M: x86 %zero-vector
+    {
+        { double-2-rep [ dup XORPD ] }
+        { float-4-rep [ dup XORPS ] }
+        [ drop dup PXOR ]
+    } case ;
+
+M: x86 %zero-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 : unsign-rep ( rep -- rep' )
     {
         { uint-4-rep      int-4-rep }
@@ -662,6 +676,10 @@ M: x86 %gather-vector-2-reps
     {
         { sse2? { double-2-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
+
+M: x86 %shuffle-vector-reps { } ;
+
+M: x86 %select-vector-reps { } ;
 
 M: x86 %add-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
@@ -818,6 +836,28 @@ M: x86 %max-vector-reps
         { sse? { float-4-rep } }
         { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
+    } available-reps ;
+
+M: x86 %dot-vector
+    [ two-operand ] keep
+    {
+        { float-4-rep [
+            sse4.1?
+            [ HEX: ff DPPS ]
+            [ [ MULPS ] [ drop dup float-4-rep %horizontal-add-vector ] 2bi ]
+            if
+        ] }
+        { double-2-rep [
+            sse4.1?
+            [ HEX: ff DPPD ]
+            [ [ MULPD ] [ drop dup double-2-rep %horizontal-add-vector ] 2bi ]
+            if
+        ] }
+    } case ;
+
+M: x86 %dot-vector-reps
+    {
+        { sse3? { float-4-rep double-2-rep } }
     } available-reps ;
 
 M: x86 %horizontal-add-vector ( dst src rep -- )

@@ -36,6 +36,7 @@ SIMD-OP: v*
 SIMD-OP: v/
 SIMD-OP: vmin
 SIMD-OP: vmax
+SIMD-OP: v.
 SIMD-OP: vsqrt
 SIMD-OP: sum
 SIMD-OP: vabs
@@ -47,10 +48,12 @@ SIMD-OP: vlshift
 SIMD-OP: vrshift
 SIMD-OP: hlshift
 SIMD-OP: hrshift
+SIMD-OP: vshuffle
 
 : (simd-broadcast) ( x rep -- v ) bad-simd-call ;
 : (simd-gather-2) ( a b rep -- v ) bad-simd-call ;
 : (simd-gather-4) ( a b c d rep -- v ) bad-simd-call ;
+: (simd-select) ( v n rep -- x ) bad-simd-call ;
 
 : assert-positive ( x -- y ) ;
 
@@ -110,6 +113,7 @@ M: vector-rep supported-simd-op?
         { \ (simd-v/)        [ %div-vector-reps            ] }
         { \ (simd-vmin)      [ %min-vector-reps            ] }
         { \ (simd-vmax)      [ %max-vector-reps            ] }
+        { \ (simd-v.)        [ %dot-vector-reps            ] }
         { \ (simd-vsqrt)     [ %sqrt-vector-reps           ] }
         { \ (simd-sum)       [ %horizontal-add-vector-reps ] }
         { \ (simd-vabs)      [ %abs-vector-reps            ] }
@@ -121,7 +125,9 @@ M: vector-rep supported-simd-op?
         { \ (simd-vrshift)   [ %shr-vector-reps            ] }
         { \ (simd-hlshift)   [ %horizontal-shl-vector-reps ] }
         { \ (simd-hrshift)   [ %horizontal-shr-vector-reps ] }
+        { \ (simd-vshuffle)  [ %shuffle-vector-reps        ] }
         { \ (simd-broadcast) [ %broadcast-vector-reps      ] }
         { \ (simd-gather-2)  [ %gather-vector-2-reps       ] }
         { \ (simd-gather-4)  [ %gather-vector-4-reps       ] }
+        { \ (simd-select)    [ %select-vector-reps         ] }
     } case member? ;
