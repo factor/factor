@@ -1,5 +1,5 @@
 USING: help.markup help.syntax alien math continuations
-destructors ;
+destructors specialized-arrays ;
 IN: io.mmap
 
 HELP: mapped-file
@@ -25,7 +25,7 @@ HELP: with-mapped-file
 HELP: with-mapped-file-reader
 { $values { "path" "a pathname string" } { "quot" { $quotation "( mmap -- )" } } }
 { $contract "Opens a file for read-only access and maps its contents into memory, passing the " { $link mapped-file } " instance to the quotation. The mapped file is disposed of when the quotation returns, or if an error is thrown." }
-{ $notes "This is a low-level word, because " { $link mapped-file } " objects simply expose their base address and length. Most applications should use " { $link "io.mmap.arrays" } " instead." }
+{ $notes "This is a low-level word, because " { $link mapped-file } " objects simply expose their base address and length. See " { $link "io.mmap.arrays" } " for a discussion of how to access data in a mapped file." }
 { $errors "Throws an error if a memory mapping could not be established." } ;
 
 HELP: close-mapped-file
@@ -33,51 +33,43 @@ HELP: close-mapped-file
 { $contract "Releases system resources associated with the mapped file. This word should not be called by user code; use " { $link dispose } " instead." }
 { $errors "Throws an error if a memory mapping could not be established." } ;
 
-ARTICLE: "io.mmap.arrays" "Memory-mapped arrays"
-"Mapped file can be viewed as a sequence using the words in sub-vocabularies of " { $vocab-link "io.mmap" } ". For each primitive C type " { $snippet "T" } ", a set of words are defined in the vocabulary named " { $snippet "io.mmap.T" } ":"
-{ $table
-    { { $snippet "<mapped-T-array>" } { "Wraps a " { $link mapped-file } " in a sequence; stack effect " { $snippet "( mapped-file -- direct-array )" } } }
-    { { $snippet "with-mapped-T-file" } { "Maps a file into memory and wraps it in a sequence by combining " { $link with-mapped-file } " and " { $snippet "<mapped-T-array>" } "; stack effect " { $snippet "( path quot -- )" } } }
-}
-"The primitive C types for which mapped arrays exist:"
-{ $list
-    { $snippet "char" }
-    { $snippet "uchar" }
-    { $snippet "short" }
-    { $snippet "ushort" }
-    { $snippet "int" }
-    { $snippet "uint" }
-    { $snippet "long" }
-    { $snippet "ulong" }
-    { $snippet "longlong" }
-    { $snippet "ulonglong" }
-    { $snippet "float" }
-    { $snippet "double" }
-    { $snippet "void*" }
-    { $snippet "bool" }
-} ;
+ARTICLE: "io.mmap.arrays" "Working with memory-mapped data"
+"The " { $link <mapped-file> } " word returns an instance of " { $link mapped-file } ", which doesn't directly support the sequence protocol. Instead, it needs to be wrapped in a specialized array of the appropriate C type:"
+{ $subsection <mapped-array> }
+"The appropriate specialized array type must first be generated with " { $link POSTPONE: SPECIALIZED-ARRAY: } "."
+$nl
+"Data can also be read and written from the " { $link mapped-file } " by applying low-level alien words to the " { $slot "address" } " slot. This approach is not recommended, though, since in most cases the compiler will generate efficient code for specialized array usage. See " { $link "reading-writing-memory" } " for a description of low-level memory access primitives." ;
 
-ARTICLE: "io.mmap.low-level" "Reading and writing mapped files directly"
-"Data can be read and written from the " { $link mapped-file } " by applying low-level alien words to the " { $slot "address" } " slot. See " { $link "reading-writing-memory" } "." ;
-
-ARTICLE: "io.mmap.examples" "Memory-mapped file example"
+ARTICLE: "io.mmap.examples" "Memory-mapped file examples"
 "Convert a file of 4-byte cells from little to big endian or vice versa, by directly mapping it into memory and operating on it with sequence words:"
 { $code
-    "USING: accessors grouping io.files io.mmap.char kernel sequences ;"
+    "USING: alien.c-types grouping io.mmap sequences" "specialized-arrays ;"
+    "SPECIALIZED-ARRAY: char"
+    ""
     "\"mydata.dat\" ["
-    "    4 <sliced-groups> [ reverse-here ] change-each"
-    "] with-mapped-char-file"
+    "    char <mapped-array> 4 <sliced-groups>"
+    "    [ reverse-here ] change-each"
+    "] with-mapped-file"
+}
+"Normalize a file containing packed quadrupes of floats:"
+{ $code
+    "USING: kernel io.mmap math.vectors math.vectors.simd" "sequences specialized-arrays ;"
+    "SIMD: float"
+    "SPECIALIZED-ARRAY: float-4"
+    ""
+    "\"mydata.dat\" ["
+    "    float-4 <mapped-array>"
+    "    [ normalize ] change-each"
+    "] with-mapped-file"
 } ;
 
 ARTICLE: "io.mmap" "Memory-mapped files"
 "The " { $vocab-link "io.mmap" } " vocabulary implements support for memory-mapped files."
 { $subsection <mapped-file> }
-"Memory-mapped files are disposable and can be closed with " { $link dispose } " or " { $link with-disposal } "."
-{ $subsection "io.mmap.examples" }
-"A utility combinator which wraps the above:"
+"Memory-mapped files are disposable and can be closed with " { $link dispose } " or " { $link with-disposal } ". A utility combinator which wraps the above:"
 { $subsection with-mapped-file }
 "Instances of " { $link mapped-file } " don't support any interesting operations in themselves. There are two facilities for accessing their contents:"
 { $subsection "io.mmap.arrays" }
-{ $subsection "io.mmap.low-level" } ;
+{ $subsection "io.mmap.examples" } ;
 
 ABOUT: "io.mmap"
