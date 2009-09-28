@@ -386,6 +386,8 @@ interactor "completion" f {
         error-summary? off
         tip-of-the-day. nl
         listener
+        nl
+        "The listener has exited. To start it again, click “Restart Listener”." print
     ] with-streams* ;
 
 : start-listener-thread ( listener -- )
@@ -406,18 +408,14 @@ interactor "completion" f {
         [ wait-for-listener ]
     } cleave ;
 
-: listener-help ( -- ) "help.home" com-browse ;
+: com-help ( -- ) "help.home" com-browse ;
 
-\ listener-help H{ { +nullary+ t } } define-command
+\ com-help H{ { +nullary+ t } } define-command
 
 : com-auto-use ( -- )
     auto-use? [ not ] change ;
 
 \ com-auto-use H{ { +nullary+ t } { +listener+ t } } define-command
-
-listener-gadget "misc" "Miscellaneous commands" {
-    { T{ key-down f f "F1" } listener-help }
-} define-command-map
 
 listener-gadget "toolbar" f {
     { f restart-listener }
@@ -425,6 +423,7 @@ listener-gadget "toolbar" f {
     { T{ key-down f { A+ } "k" } clear-output }
     { T{ key-down f { A+ } "K" } clear-stack }
     { T{ key-down f { C+ } "d" } com-end }
+    { T{ key-down f f "F1" } com-help }
 } define-command-map
 
 listener-gadget "scrolling"
