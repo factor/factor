@@ -330,7 +330,7 @@ void factor_vm::compile_all_words()
 
 	}
 
-	iterate_code_heap(factor::relocate_code_block);
+	iterate_code_heap(&factor_vm::relocate_code_block);
 }
 
 /* Allocates memory */

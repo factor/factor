@@ -199,7 +199,7 @@ void factor_vm::iterate_relocations(code_block *compiled, relocation_iterator it
 		for(cell i = 0; i < length; i++)
 		{
 			relocation_entry rel = relocation->data<relocation_entry>()[i];
-			iter(rel,index,compiled,this);
+			(this->*iter)(rel,index,compiled);
 			index += number_of_parameters(relocation_type_of(rel));			
 		}
 	}
@@ -290,7 +290,7 @@ void factor_vm::update_literal_references(code_block *compiled)
 {
 	if(!compiled->needs_fixup)
 	{
-		iterate_relocations(compiled,factor::update_literal_references_step);
+		iterate_relocations(compiled,&factor_vm::update_literal_references_step);
 		flush_icache_for(compiled);
 	}
 }
@@ -318,11 +318,6 @@ void factor_vm::copy_literal_references(code_block *compiled)
 
 		update_literal_references(compiled);
 	}
-}
-
-void copy_literal_references(code_block *compiled, factor_vm *myvm)
-{
-	return myvm->copy_literal_references(compiled);
 }
 
 /* Compute an address to store at a relocation */
@@ -374,7 +369,7 @@ void factor_vm::update_word_references(code_block *compiled)
 		code->heap_free(compiled);
 	else
 	{
-		iterate_relocations(compiled,factor::update_word_references_step);
+		iterate_relocations(compiled,&factor_vm::update_word_references_step);
 		flush_icache_for(compiled);
 	}
 }
@@ -473,7 +468,7 @@ void factor_vm::relocate_code_block(code_block *compiled)
 {
 	compiled->last_scan = data->nursery();
 	compiled->needs_fixup = false;
-	iterate_relocations(compiled,factor::relocate_code_block_step);
+	iterate_relocations(compiled,&factor_vm::relocate_code_block_step);
 	flush_icache_for(compiled);
 }
 
