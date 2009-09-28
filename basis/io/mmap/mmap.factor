@@ -25,10 +25,10 @@ ERROR: bad-mmap-size n ;
 PRIVATE>
 
 : <mapped-file-reader> ( path -- mmap )
-    [ (mapped-file-reader) ] prepare-mapped-file ;
+    [ (mapped-file-reader) ] prepare-mapped-file ; inline
 
 : <mapped-file> ( path -- mmap )
-    [ (mapped-file-r/w) ] prepare-mapped-file ;
+    [ (mapped-file-r/w) ] prepare-mapped-file ; inline
 
 : <mapped-array> ( mmap c-type -- direct-array )
     [ [ address>> ] [ length>> ] bi ] dip

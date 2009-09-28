@@ -12,6 +12,7 @@ specialized-arrays system sorting math.libm
 math.intervals quotations effects alien alien.data ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
+SPECIALIZED-ARRAY: void*
 IN: compiler.tree.propagation.tests
 
 [ V{ } ] [ [ ] final-classes ] unit-test
@@ -897,3 +898,4 @@ M: tuple-with-read-only-slot clone
 
 ! We want this to inline
 [ t ] [ [ void* <c-direct-array> ] { <c-direct-array> } inlined? ] unit-test
+[ V{ void*-array } ] [ [ void* <c-direct-array> ] final-classes ] unit-test
