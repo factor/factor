@@ -37,7 +37,7 @@ M: decoder unlimited ( stream -- stream' )
     [ stream>> ] change-stream ;
 
 M: object unlimited ( stream -- stream' )
-    stream>> stream>> ;
+    stream>> ;
 
 : limit-input ( limit mode -- )
     [ input-stream ] 2dip '[ _ _ limit ] change ;
@@ -103,3 +103,6 @@ M: limited-stream stream-seek
 
 M: limited-stream dispose
     stream>> dispose ;
+
+M: limited-stream stream-element-type
+    stream>> stream-element-type ;
