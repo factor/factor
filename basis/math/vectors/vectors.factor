@@ -64,6 +64,8 @@ PRIVATE>
 
 : bitandn ( x y -- z ) [ bitnot ] dip bitand ; inline
 
+GENERIC: new-underlying ( underlying seq -- seq' )
+
 PRIVATE>
 
 : vbitand ( u v -- w ) over '[ _ [ bitand ] fp-bitwise-op ] 2map ;
@@ -90,12 +92,10 @@ PRIVATE>
 : vrshift ( u n -- w ) neg '[ _ shift ] map ;
 
 : hlshift ( u n -- w )
-    [ clone ] dip
-    '[ _ <byte-array> append 16 tail* ] change-underlying ;
+    [ [ underlying>> ] dip <byte-array> prepend 16 head ] [ drop ] 2bi new-underlying ;
 
 : hrshift ( u n -- w )
-    [ clone ] dip
-    '[ _ <byte-array> prepend 16 head* ] change-underlying ;
+    [ [ underlying>> ] dip <byte-array> append 16 tail* ] [ drop ] 2bi new-underlying ;
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;

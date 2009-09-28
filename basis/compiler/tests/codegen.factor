@@ -470,3 +470,9 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
         1 swap <displaced-alien>
     ] compile-call
 ] unit-test
+
+! Forgot to two-operand shifts
+[ 2 0 ] [
+    1 1
+    [ [ HEX: f bitand ] bi@ [ shift ] [ drop -3 shift ] 2bi ] compile-call
+] unit-test
