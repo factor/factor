@@ -138,7 +138,7 @@ SPECIALIZED-ARRAY: __does_not_exist__ """ eval( -- )
 [ ] [
     """
 IN: specialized-arrays.tests
-USING: classes.struct specialized-arrays ;
+USING: alien.c-types classes.struct specialized-arrays ;
 
 STRUCT: __does_not_exist__ { x int } ;
 

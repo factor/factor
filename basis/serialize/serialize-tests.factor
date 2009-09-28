@@ -4,7 +4,7 @@
 USING: tools.test kernel serialize io io.streams.byte-array
 alien arrays byte-arrays bit-arrays specialized-arrays
 sequences math prettyprint parser classes math.constants
-io.encodings.binary random assocs serialize.private ;
+io.encodings.binary random assocs serialize.private alien.c-types ;
 SPECIALIZED-ARRAY: double
 IN: serialize.tests
 

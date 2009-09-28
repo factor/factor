@@ -3,6 +3,7 @@ byte-arrays strings hashtables alien.syntax alien.strings sequences
 io.encodings.string debugger destructors vocabs.loader
 classes.struct ;
 QUALIFIED: math
+QUALIFIED: sequences
 IN: alien.c-types
 
 HELP: byte-length
@@ -164,10 +165,8 @@ $nl
 { $subsection *void* }
 "Note that while structure and union types do not get these words defined for them, there is no loss of generality since " { $link <void*> } " and " { $link *void* } " may be used." ;
 
-ARTICLE: "c-types-specs" "C type specifiers"
-"C types are identified by special words, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words. New C types can be defined by the words " { $link POSTPONE: STRUCT: } ", " { $link POSTPONE: UNION-STRUCT: } ", " { $link POSTPONE: CALLBACK: } ", and " { $link POSTPONE: TYPEDEF: } "."
-$nl
-"The following numerical types are available; a " { $snippet "u" } " prefix denotes an unsigned type:"
+ARTICLE: "c-types.primitives" "Primitive C types"
+"The following numerical types are defined in the " { $vocab-link "alien.c-types" } " vocabulary; a " { $snippet "u" } " prefix denotes an unsigned type:"
 { $table
     { "C type" "Notes" }
     { { $link char } "always 1 byte" }
@@ -182,15 +181,57 @@ $nl
     { { $link ulonglong } { } }
     { { $link float } { "single-precision float (not the same as Factor's " { $link math:float } " class!)" } }
     { { $link double } { "double-precision float (the same format as Factor's " { $link math:float } " objects)" } }
+}
+"The following C99 complex number types are defined in the " { $vocab-link "alien.complex" } " vocabulary:"
+{ $table
     { { $link complex-float } { "C99 or Fortran " { $snippet "complex float" } " type, converted to and from Factor " { $link math:complex } " values" } }
     { { $link complex-double } { "C99 or Fortran " { $snippet "complex double" } " type, converted to and from Factor " { $link math:complex } " values" } }
 }
-"When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision."
-$nl
+"When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision." ;
+
+ARTICLE: "c-types.pointers" "Pointer and array types"
 "Pointer types are specified by suffixing a C type with " { $snippet "*" } ", for example " { $snippet "float*" } ". One special case is " { $link void* } ", which denotes a generic pointer; " { $link void } " by itself is not a valid C type specifier. With the exception of strings (see " { $link "c-strings" } "), all pointer types are identical to " { $snippet "void*" } " as far as the C library interface is concerned."
 $nl
 "Fixed-size array types are supported; the syntax consists of a C type name followed by dimension sizes in brackets; the following denotes a 3 by 4 array of integers:"
 { $code "int[3][4]" }
-"Fixed-size arrays differ from pointers in that they are allocated inside structures and unions; however when used as function parameters they behave exactly like pointers and thus the dimensions only serve as documentation."
-$nl
-"Structure and union types are specified by the name of the structure or union." ;
+"Fixed-size arrays differ from pointers in that they are allocated inside structures and unions; however when used as function parameters they behave exactly like pointers and thus the dimensions only serve as documentation." ;
+
+ARTICLE: "c-types.ambiguity" "Word name clashes with C types"
+"Note that some of the C type word names clash with commonly-used Factor words:"
+{ $list
+  { { $link short } " clashes with the " { $link sequences:short } " word in the " { $vocab-link "sequences" } " vocabulary" }
+  { { $link float } " clashes with the " { $link math:float } " word in the " { $vocab-link "math" } " vocabulary" }
+}
+"If you use the wrong vocabulary, you will see a " { $link no-c-type } " error. For example, the following is " { $strong "not" } " valid, and will raise an error because the " { $link math:float } " word from the " { $vocab-link "math" } " vocabulary is not a C type:"
+{ $code
+  "USING: alien.syntax math prettyprint ;"
+  "FUNCTION: float magic_number ( ) ;"
+  "magic_number 3.0 + ."
+}
+"The following won't work either; now the problem is that there are two vocabularies in the search path that define a word named " { $snippet "float" } ":"
+{ $code
+  "USING: alien.c-types alien.syntax math prettyprint ;"
+  "FUNCTION: float magic_number ( ) ;"
+  "magic_number 3.0 + ."
+}
+"The correct solution is to use one of " { $link POSTPONE: FROM: } ", " { $link POSTPONE: QUALIFIED: } " or " { $link POSTPONE: QUALIFIED-WITH: } " to disambiguate word lookup:"
+{ $code
+  "USING: alien.syntax math prettyprint ;"
+  "QUALIFIED-WITH: alien.c-types c"
+  "FUNCTION: c:float magic_number ( ) ;"
+  "magic_number 3.0 + ."
+}
+"See " { $link "word-search-semantics" } " for details." ;
+
+ARTICLE: "c-types.structs" "Struct and union types"
+"Struct and union types are identified by their class word. See " { $link "classes.struct" } "." ;
+
+ARTICLE: "c-types-specs" "C type specifiers"
+"C types are identified by special words, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words. New C types can be defined by the words " { $link POSTPONE: STRUCT: } ", " { $link POSTPONE: UNION-STRUCT: } ", " { $link POSTPONE: CALLBACK: } ", and " { $link POSTPONE: TYPEDEF: } "."
+{ $subsection "c-types.primitives" }
+{ $subsection "c-types.pointers" }
+{ $subsection "c-types.ambiguity" }
+{ $subsection "c-types.structs" }
+;
+
+ABOUT: "c-types-specs"

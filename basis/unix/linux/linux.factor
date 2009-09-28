@@ -61,7 +61,7 @@ CONSTANT: max-un-path 108
 
 STRUCT: sockaddr-un
     { family ushort }
-    { path { "char" max-un-path } } ;
+    { path { char max-un-path } } ;
 
 CONSTANT: SOCK_STREAM 1
 CONSTANT: SOCK_DGRAM 2

@@ -101,7 +101,7 @@ M: x86 %set-slot ( src obj slot -- ) [+] swap MOV ;
 M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
 
 :: two-operand ( dst src1 src2 rep -- dst src )
-    dst src2 eq? [ "Cannot handle this case" throw ] when
+    dst src2 eq? dst src1 eq? not and [ "Cannot handle this case" throw ] when
     dst src1 rep %copy
     dst src2 ; inline
 

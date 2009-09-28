@@ -171,14 +171,14 @@ HELP: vs+
 { $examples
     "With saturation:"
     { $example
-        "USING: math.vectors prettyprint specialized-arrays ;"
+        "USING: alien.c-types math.vectors prettyprint specialized-arrays ;"
         "SPECIALIZED-ARRAY: uchar"
         "uchar-array{ 100 200 150 } uchar-array{ 70 70 70 } vs+ ."
         "uchar-array{ 170 255 220 }"
     }
     "Without saturation:"
     { $example
-        "USING: math.vectors prettyprint specialized-arrays ;"
+        "USING: alien.c-types math.vectors prettyprint specialized-arrays ;"
         "SPECIALIZED-ARRAY: uchar"
         "uchar-array{ 100 200 150 } uchar-array{ 70 70 70 } v+ ."
         "uchar-array{ 170 14 220 }"
