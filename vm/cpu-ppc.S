@@ -250,13 +250,15 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	mtlr r0		   /* prepare to return to restored callstack */
 	blr		   /* go */
 
-DEF(void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
+DEF(void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
 	mr r1,r4	   /* compute new stack pointer */
+	mr r4,r5	   /* make vm ptr 2nd arg in case quot_xt = lazy_jit_compile */
 	lwz r0,LR_SAVE(r1) /* we have rewound the stack; load return address */
 	mtlr r0
 	JUMP_QUOT	   /* call the quotation */
 
-DEF(void,lazy_jit_compile,(CELL quot)):
+DEF(void,lazy_jit_compile,(CELL quot, void *vm)):
+	mr r5,r4	   /* vm ptr is 3rd arg */
 	mr r4,r1	   /* save stack pointer */
 	PROLOGUE
 	bl MANGLE(lazy_jit_compile_impl)

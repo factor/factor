@@ -51,8 +51,9 @@ CONSTANT: rs-reg 14
     0 3 LOAD32 rc-absolute-ppc-2/2 rt-stack-chain jit-rel
     4 3 0 LWZ
     1 4 0 STW
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
-    3 MTCTR
+    4 0 swap LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
+    0 5 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
+    5 MTCTR
     BCTR
 ] jit-primitive jit-define
 
@@ -254,8 +255,9 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    4 3 quot-xt-offset LWZ
-    4 MTCTR
+    4 0 swap LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
+    5 3 quot-xt-offset LWZ
+    5 MTCTR
     BCTR
 ] \ (call) define-sub-primitive
 
