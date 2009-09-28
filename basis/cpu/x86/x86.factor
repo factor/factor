@@ -156,66 +156,6 @@ M: x86 %fixnum-sub ( label dst src1 src2 -- )
 M: x86 %fixnum-mul ( label dst src1 src2 -- )
     int-rep two-operand swap IMUL2 JO ;
 
-: bignum@ ( reg n -- op )
-    cells bignum tag-number - [+] ; inline
-
-M:: x86 %integer>bignum ( dst src temp -- )
-    #! on entry, inreg is a signed 32-bit quantity
-    #! exits with tagged ptr to bignum in outreg
-    #! 1 cell header, 1 cell length, 1 cell sign, + digits
-    #! length is the # of digits + sign
-    [
-        "end" define-label
-        ! Load cached zero value
-        dst 0 >bignum %load-reference
-        src 0 CMP
-        ! Is it zero? Then just go to the end and return this zero
-        "end" get JE
-        ! Allocate a bignum
-        dst 4 cells bignum temp %allot
-        ! Write length
-        dst 1 bignum@ 2 tag-fixnum MOV
-        ! Store value
-        dst 3 bignum@ src MOV
-        ! Compute sign
-        temp src MOV
-        temp cell-bits 1 - SAR
-        temp 1 AND
-        ! Store sign
-        dst 2 bignum@ temp MOV
-        ! Make negative value positive
-        temp temp ADD
-        temp NEG
-        temp 1 ADD
-        src temp IMUL2
-        ! Store the bignum
-        dst 3 bignum@ temp MOV
-        "end" resolve-label
-    ] with-scope ;
-
-M:: x86 %bignum>integer ( dst src temp -- )
-    [
-        "end" define-label
-        ! load length
-        temp src 1 bignum@ MOV
-        ! if the length is 1, its just the sign and nothing else,
-        ! so output 0
-        dst 0 MOV
-        temp 1 tag-fixnum CMP
-        "end" get JE
-        ! load the value
-        dst src 3 bignum@ MOV
-        ! load the sign
-        temp src 2 bignum@ MOV
-        ! convert it into -1 or 1
-        temp temp ADD
-        temp NEG
-        temp 1 ADD
-        ! make dst signed
-        temp dst IMUL2
-        "end" resolve-label
-    ] with-scope ;
-
 M: x86 %add-float double-rep two-operand ADDSD ;
 M: x86 %sub-float double-rep two-operand SUBSD ;
 M: x86 %mul-float double-rep two-operand MULSD ;

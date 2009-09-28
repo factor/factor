@@ -200,59 +200,6 @@ M: ppc %fixnum-sub ( label dst src1 src2 -- )
 M: ppc %fixnum-mul ( label dst src1 src2 -- )
     [ MULLWO. ] overflow-template ;
 
-: bignum@ ( n -- offset ) cells bignum tag-number - ; inline
-
-M:: ppc %integer>bignum ( dst src temp -- )
-    [
-        "end" define-label
-        dst 0 >bignum %load-reference
-        ! Is it zero? Then just go to the end and return this zero
-        0 src 0 CMPI
-        "end" get BEQ
-        ! Allocate a bignum
-        dst 4 cells bignum temp %allot
-        ! Write length
-        2 tag-fixnum temp LI
-        temp dst 1 bignum@ STW
-        ! Compute sign
-        temp src MR
-        temp temp cell-bits 1 - SRAWI
-        temp temp 1 ANDI
-        ! Store sign
-        temp dst 2 bignum@ STW
-        ! Make negative value positive
-        temp temp temp ADD
-        temp temp NEG
-        temp temp 1 ADDI
-        temp src temp MULLW
-        ! Store the bignum
-        temp dst 3 bignum@ STW
-        "end" resolve-label
-    ] with-scope ;
-
-M:: ppc %bignum>integer ( dst src temp -- )
-    [
-        "end" define-label
-        temp src 1 bignum@ LWZ
-        ! if the length is 1, its just the sign and nothing else,
-        ! so output 0
-        0 dst LI
-        0 temp 1 tag-fixnum CMPI
-        "end" get BEQ
-        ! load the value
-        dst src 3 bignum@ LWZ
-        ! load the sign
-        temp src 2 bignum@ LWZ
-        ! branchless arithmetic: we want to turn 0 into 1,
-        ! and 1 into -1
-        temp temp temp ADD
-        temp temp 1 SUBI
-        temp temp NEG
-        ! multiply value by sign
-        dst dst temp MULLW
-        "end" resolve-label
-    ] with-scope ;
-
 M: ppc %add-float FADD ;
 M: ppc %sub-float FSUB ;
 M: ppc %mul-float FMUL ;

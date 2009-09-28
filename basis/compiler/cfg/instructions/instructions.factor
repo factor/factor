@@ -190,17 +190,6 @@ PURE-INSN: ##log2
 def: dst/int-rep
 use: src/int-rep ;
 
-! Bignum/integer conversion
-PURE-INSN: ##integer>bignum
-def: dst/int-rep
-use: src/int-rep
-temp: temp/int-rep ;
-
-PURE-INSN: ##bignum>integer
-def: dst/int-rep
-use: src/int-rep
-temp: temp/int-rep ;
-
 ! Float arithmetic
 PURE-INSN: ##unbox-float
 def: dst/double-rep
@@ -682,8 +671,7 @@ UNION: ##allocation
 ##box-float
 ##box-vector
 ##box-alien
-##box-displaced-alien
-##integer>bignum ;
+##box-displaced-alien ;
 
 ! For alias analysis
 UNION: ##read ##slot ##slot-imm ;
@@ -706,8 +694,6 @@ UNION: kill-vreg-insn
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers
 UNION: def-is-use-insn
-##integer>bignum
-##bignum>integer
 ##box-alien
 ##box-displaced-alien
 ##string-nth
