@@ -596,8 +596,11 @@ M:: x86 %broadcast-vector ( dst src rep -- )
             dst src MOVDDUP
         ] }
         { longlong-2-rep [
-            dst src longlong-2-rep %copy
-            dst dst PUNPCKLQDQ
+            dst src = [
+                dst dst PUNPCKLQDQ
+            ] [
+                dst src { 0 1 0 1 } PSHUFD
+            ] if
         ] }
         { int-4-rep      [ dst src { 0 0 0 0 } PSHUFD ] }
         { short-8-rep    [
