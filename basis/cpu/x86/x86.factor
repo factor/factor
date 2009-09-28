@@ -579,12 +579,12 @@ MACRO: available-reps ( alist -- )
     '[ _ cond ] ;
 
 : unsign-rep ( rep -- rep' )
-    dup {
+    {
         { uint-4-rep      int-4-rep }
         { ulonglong-2-rep longlong-2-rep }
         { ushort-8-rep    short-8-rep }
         { uchar-16-rep    char-16-rep }
-    } at* [ nip ] [ drop ] if ;
+    } ?at drop ;
 
 M:: x86 %broadcast-vector ( dst src rep -- )
     rep unsign-rep {
@@ -592,22 +592,23 @@ M:: x86 %broadcast-vector ( dst src rep -- )
             dst src float-4-rep  %copy
             dst dst { 0 0 0 0 } SHUFPS
         ] }
-        { double-2-rep   [
+        { double-2-rep [
             dst src MOVDDUP
         ] }
         { longlong-2-rep [
-            dst src = [
-                dst dst PUNPCKLQDQ
-            ] [
-                dst src { 0 1 0 1 } PSHUFD
-            ] if
+            dst src =
+            [ dst dst PUNPCKLQDQ ]
+            [ dst src { 0 1 0 1 } PSHUFD ]
+            if
         ] }
-        { int-4-rep      [ dst src { 0 0 0 0 } PSHUFD ] }
-        { short-8-rep    [
+        { int-4-rep [
+            dst src { 0 0 0 0 } PSHUFD
+        ] }
+        { short-8-rep [
             dst src { 0 0 0 0 } PSHUFLW 
             dst dst PUNPCKLQDQ 
         ] }
-        { char-16-rep    [
+        { char-16-rep [
             dst src char-16-rep %copy
             dst dst PUNPCKLBW
             dst dst { 0 0 0 0 } PSHUFLW
@@ -619,13 +620,7 @@ M: x86 %broadcast-vector-reps
     {
         ! Can't do this with sse1 since it will want to unbox
         ! a double-precision float and convert to single precision
-        { sse2? {
-            float-4-rep double-2-rep
-            longlong-2-rep ulonglong-2-rep
-            int-4-rep uint-4-rep
-            short-8-rep ushort-8-rep
-            char-16-rep uchar-16-rep
-        } }
+        { sse2? { float-4-rep double-2-rep longlong-2-rep ulonglong-2-rep int-4-rep uint-4-rep short-8-rep ushort-8-rep char-16-rep uchar-16-rep } }
     } available-reps ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
