@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays fry cpu.architecture kernel math
-sequences macros generalizations combinators
-combinators.short-circuit arrays compiler.tree.propagation.info
-compiler.cfg.builder.blocks compiler.cfg.stacks
-compiler.cfg.stacks.local compiler.cfg.hats
+sequences math.vectors.simd.intrinsics macros generalizations
+combinators combinators.short-circuit arrays
+compiler.tree.propagation.info compiler.cfg.builder.blocks
+compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.intrinsics.alien ;
 IN: compiler.cfg.intrinsics.simd
@@ -69,6 +69,19 @@ MACRO: if-literals-match ( quots -- )
 : emit-shuffle-vector ( node -- )
     [ [ -2 inc-d ds-pop ] 2dip ^^shuffle-vector ds-push ]
     { [ shuffle? ] [ representation? ] } if-literals-match ; inline
+
+: ^^broadcast-vector ( src rep -- dst )
+    [ ^^scalar>vector ] keep
+    [ rep-components 0 <array> ] keep
+    ^^shuffle-vector ;
+
+: emit-broadcast-vector ( node -- )
+    [ ^^broadcast-vector ] emit-unary-vector-op ;
+
+: ^^select-vector ( src n rep -- dst )
+    [ rep-components swap <array> ] keep
+    [ ^^shuffle-vector ] keep
+    ^^vector>scalar ;
 
 : emit-select-vector ( node -- )
     [ [ -2 inc-d ds-pop ] 2dip ^^select-vector ds-push ]

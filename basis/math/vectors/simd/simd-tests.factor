@@ -5,7 +5,8 @@ math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals math.vectors.specialization combinators cpu.architecture
 math.vectors.simd.intrinsics namespaces byte-arrays alien
-specialized-arrays classes.struct eval ;
+specialized-arrays classes.struct eval classes.algebra sets
+quotations ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 SIMD: c:char
@@ -33,6 +34,20 @@ IN: math.vectors.simd.tests
 [ V{ float-4 } ] [ [ { float-4 } declare normalize ] final-classes ] unit-test
 
 [ V{ float-4 } ] [ [ { float-4 float-4 } declare v+ ] final-classes ] unit-test
+
+[ V{ float } ] [ [ { float-4 } declare second ] final-classes ] unit-test
+
+[ V{ int-4 } ] [ [ { int-4 int-4 } declare v+ ] final-classes ] unit-test
+
+[ t ] [ [ { int-4 } declare second ] final-classes first integer class<= ] unit-test
+
+[ V{ longlong-2 } ] [ [ { longlong-2 longlong-2 } declare v+ ] final-classes ] unit-test
+
+[ V{ integer } ] [ [ { longlong-2 } declare second ] final-classes ] unit-test
+
+[ V{ int-8 } ] [ [ { int-8 int-8 } declare v+ ] final-classes ] unit-test
+
+[ t ] [ [ { int-8 } declare second ] final-classes first integer class<= ] unit-test
 
 ! Test puns; only on x86
 cpu x86? [
@@ -78,9 +93,10 @@ CONSTANT: simd-classes
 : boa-ctors ( -- seq )
     simd-classes [ [ name>> "-boa" append ] [ vocabulary>> ] bi lookup ] map ;
 
-: check-optimizer ( seq inputs quot eq-quot -- )
+: check-optimizer ( seq quot eq-quot -- failures )
     '[
         @
+        [ dup [ class ] { } map-as ] dip '[ _ declare @ ]
         {
             [ "print-mr" get [ nip test-mr mr. ] [ 2drop ] if ]
             [ "print-checks" get [ [ . ] bi@ ] [ 2drop ] if ]
@@ -104,7 +120,7 @@ CONSTANT: simd-classes
 
 [ { } ] [
     with-ctors [
-        [ 1000 random '[ _ ] ] dip '[ { fixnum } declare _ execute ]
+        [ 1000 random '[ _ ] ] dip '[ _ execute ]
     ] [ = ] check-optimizer
 ] unit-test
 
@@ -112,10 +128,8 @@ CONSTANT: simd-classes
 
 [ { } ] [
     boa-ctors [
-        dup stack-effect in>> length
-        [ nip [ 1000 random ] [ ] replicate-as ]
-        [ fixnum <array> swap '[ _ declare _ execute ] ]
-        2bi
+        [ stack-effect in>> length [ 1000 random ] [ ] replicate-as ] keep
+        '[ _ execute ]
     ] [ = ] check-optimizer
 ] unit-test
 
@@ -126,31 +140,22 @@ CONSTANT: simd-classes
 
 :: check-vector-op ( word inputs class elt-class -- inputs quot )
     inputs [
-        [
-            {
-                { +vector+ [ class random-vector ] }
-                { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
-            } case
-        ] [ ] map-as
-    ] [
-        [
-            {
-                { +vector+ [ class ] }
-                { +scalar+ [ elt-class ] }
-            } case
-        ] map
-    ] bi
-    word '[ _ declare _ execute ] ;
+        {
+            { +vector+ [ class random-vector ] }
+            { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
+        } case
+    ] [ ] map-as
+    word '[ _ execute ] ;
 
 : remove-float-words ( alist -- alist' )
-    [ drop { vsqrt n/v v/n v/ normalize } member? not ] assoc-filter ;
+    { vsqrt n/v v/n v/ normalize } unique assoc-diff ;
 
 : remove-integer-words ( alist -- alist' )
-    [ drop { vlshift vrshift } member? not ] assoc-filter ;
+    { vlshift vrshift } unique assoc-diff ;
 
 : remove-special-words ( alist -- alist' )
     ! These have their own tests later
-    [ drop { hlshift hrshift vshuffle } member? not ] assoc-filter ;
+    { hlshift hrshift vshuffle } unique assoc-diff ;
 
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
@@ -189,13 +194,89 @@ simd-classes&reps [
     [ [ { } ] ] dip first3 '[ _ _ _ check-vector-ops ] unit-test
 ] each
 
-! Other regressions
-[ 8000000 ] [
-    int-8{ 1000 1000 1000 1000 1000 1000 1000 1000 }
-    [ { int-8 } declare dup [ * ] [ + ] 2map-reduce ] compile-call
-] unit-test
+"== Checking shifts and permutations" print
 
-! Vector alien intrinsics
+[ int-4{ 256 512 1024 2048 } ]
+[ int-4{ 1 2 4 8 } 1 hlshift ] unit-test
+
+[ int-4{ 256 512 1024 2048 } ]
+[ int-4{ 1 2 4 8 } [ { int-4 } declare 1 hlshift ] compile-call ] unit-test
+
+[ int-4{ 1 2 4 8 } ]
+[ int-4{ 256 512 1024 2048 } 1 hrshift ] unit-test
+
+[ int-4{ 1 2 4 8 } ]
+[ int-4{ 256 512 1024 2048 } [ { int-4 } declare 1 hrshift ] compile-call ] unit-test
+
+! Shuffles
+: shuffles-for ( n -- shuffles )
+    {
+        { 2 [
+            {
+                { 0 1 }
+                { 1 1 }
+                { 1 0 }
+                { 0 0 }
+            }
+        ] }
+        { 4 [
+            {
+                { 1 2 3 0 }
+                { 0 1 2 3 }
+                { 1 1 2 2 }
+                { 0 0 1 1 }
+                { 2 2 3 3 }
+                { 0 1 0 1 }
+                { 2 3 2 3 }
+                { 0 0 2 2 }
+                { 1 1 3 3 }
+                { 0 1 0 1 }
+                { 2 2 3 3 }
+            }
+        ] }
+        { 8 [
+            4 shuffles-for
+            4 shuffles-for
+            [ [ 4 + ] map ] map
+            [ append ] 2map
+        ] }
+        [ dup '[ _ random ] replicate 1array ]
+    } case ;
+
+simd-classes [
+    [ [ { } ] ] dip
+    [ new length shuffles-for ] keep
+    '[
+        _ [ [ _ new [ length iota ] keep like 1quotation ] dip '[ _ vshuffle ] ]
+        [ = ] check-optimizer
+    ] unit-test
+] each
+
+"== Checking element access" print
+
+! Test element access -- it should box bignums for int-4 on x86
+: test-accesses ( seq -- failures )
+    [ length >array ] keep
+    '[ [ _ 1quotation ] dip '[ _ swap nth ] ] [ = ] check-optimizer ; inline
+
+[ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
+[ { } ] [ int-4{ HEX: 7fffffff 3 4 -8 } test-accesses ] unit-test
+[ { } ] [ uint-4{ HEX: ffffffff 2 3 4 } test-accesses ] unit-test
+
+[ { } ] [ double-2{ 1.0 2.0 } test-accesses ] unit-test
+[ { } ] [ longlong-2{ 1 2 } test-accesses ] unit-test
+[ { } ] [ ulonglong-2{ 1 2 } test-accesses ] unit-test
+
+[ { } ] [ float-8{ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 } test-accesses ] unit-test
+[ { } ] [ int-8{ 1 2 3 4 5 6 7 8 } test-accesses ] unit-test
+[ { } ] [ uint-8{ 1 2 3 4 5 6 7 8 } test-accesses ] unit-test
+
+[ { } ] [ double-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
+[ { } ] [ longlong-4{ 1 2 3 4 } test-accesses ] unit-test
+[ { } ] [ ulonglong-4{ 1 2 3 4 } test-accesses ] unit-test
+
+"== Checking alien operations" print
+
 [ float-4{ 1 2 3 4 } ] [
     [
         float-4{ 1 2 3 4 }
@@ -259,60 +340,12 @@ STRUCT: simd-struct
     ] compile-call
 ] unit-test
 
+"== Misc tests" print
+
 [ ] [ char-16 new 1array stack. ] unit-test
 
-[ int-4{ 256 512 1024 2048 } ]
-[ int-4{ 1 2 4 8 } 1 hlshift ] unit-test
-
-[ int-4{ 256 512 1024 2048 } ]
-[ int-4{ 1 2 4 8 } [ { int-4 } declare 1 hlshift ] compile-call ] unit-test
-
-[ int-4{ 1 2 4 8 } ]
-[ int-4{ 256 512 1024 2048 } 1 hrshift ] unit-test
-
-[ int-4{ 1 2 4 8 } ]
-[ int-4{ 256 512 1024 2048 } [ { int-4 } declare 1 hrshift ] compile-call ] unit-test
-
-! Shuffles
-: test-shuffle ( input shuffle -- failures )
-    [ dup class 1array ] dip
-    '[ _ declare _ vshuffle ]
-    [ call ] [ compile-call ] 2bi = not ; inline
-
-: shuffles-for ( seq -- shuffles )
-    length {
-        { 2 [
-            {
-                { 0 1 }
-                { 1 1 }
-                { 1 0 }
-                { 0 0 }
-            }
-        ] }
-        { 4 [
-            {
-                { 1 2 3 0 }
-                { 0 1 2 3 }
-                { 1 1 2 2 }
-                { 0 0 1 1 }
-                { 2 2 3 3 }
-                { 0 1 0 1 }
-                { 2 3 2 3 }
-                { 0 0 2 2 }
-                { 1 1 3 3 }
-                { 0 1 0 1 }
-                { 2 2 3 3 }
-            }
-        ] }
-    } case ;
-
-: test-shuffles ( input -- failures )
-    dup shuffles-for [ test-shuffle ] with filter ; inline
-
-[ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-shuffles ] unit-test
-[ { } ] [ int-4{ 1 2 3 4 } test-shuffles ] unit-test
-[ { } ] [ uint-4{ 1 2 3 4 } test-shuffles ] unit-test
-
-[ { } ] [ double-2{ 1.0 2.0 } test-shuffles ] unit-test
-[ { } ] [ longlong-2{ 1 2 } test-shuffles ] unit-test
-[ { } ] [ ulonglong-2{ 1 2 } test-shuffles ] unit-test
+! Other regressions
+[ 8000000 ] [
+    int-8{ 1000 1000 1000 1000 1000 1000 1000 1000 }
+    [ { int-8 } declare dup [ * ] [ + ] 2map-reduce ] compile-call
+] unit-test
