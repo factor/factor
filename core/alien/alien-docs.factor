@@ -176,7 +176,6 @@ ARTICLE: "alien-callback" "Calling Factor from C"
 "Callbacks can be defined and passed to C code as function pointers; the C code can then invoke the callback and run Factor code:"
 { $subsection alien-callback }
 { $subsection POSTPONE: CALLBACK: }
-{ $subsection POSTPONE: STDCALL-CALLBACK: }
 "There are some caveats concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "."
 { $subsection "alien-callback-gc" }
 { $see-also "byte-arrays-gc" } ;
