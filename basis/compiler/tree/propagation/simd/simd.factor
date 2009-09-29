@@ -24,22 +24,27 @@ IN: compiler.tree.propagation.simd
     (simd-vrshift)
     (simd-hlshift)
     (simd-hrshift)
+    (simd-vshuffle)
     (simd-broadcast)
     (simd-gather-2)
     (simd-gather-4)
+    (simd-select)
     alien-vector
 } [ { byte-array } "default-output-classes" set-word-prop ] each
 
-\ (simd-sum) [
-    nip dup literal?>> [
+: scalar-output-class ( rep -- class )
+    dup literal?>> [
         literal>> scalar-rep-of {
             { float-rep [ float ] }
             { double-rep [ float ] }
-            [ integer ]
+            [ drop integer ]
         } case
     ] [ drop real ] if
-    <class-info>
-] "outputs" set-word-prop
+    <class-info> ;
+
+\ (simd-sum) [ nip scalar-output-class ] "outputs" set-word-prop
+
+\ (simd-v.) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
 \ assert-positive [
     real [0,inf] <class/interval-info> value-info-intersect
