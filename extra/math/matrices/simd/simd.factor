@@ -70,8 +70,8 @@ TYPED: m4/ ( a: matrix4 b: matrix4 -- c: matrix4 ) [ v/ ] 2map-rows ;
 
 TYPED: m4*n ( a: matrix4 b: float -- c: matrix4 ) [ v*n ] curry map-rows ;
 TYPED: m4/n ( a: matrix4 b: float -- c: matrix4 ) [ v/n ] curry map-rows ;
-TYPED: n*m4 ( a: matrix4 b: float -- c: matrix4 ) [ n*v ] with map-rows ;
-TYPED: n/m4 ( a: matrix4 b: float -- c: matrix4 ) [ n/v ] with map-rows ;
+TYPED: n*m4 ( a: float b: matrix4 -- c: matrix4 ) [ n*v ] with map-rows ;
+TYPED: n/m4 ( a: float b: matrix4 -- c: matrix4 ) [ n/v ] with map-rows ;
 
 TYPED:: m4. ( a: matrix4 b: matrix4 -- c: matrix4 )
     matrix4 (struct) :> c
@@ -156,4 +156,31 @@ TYPED:: translation-matrix4 ( offset: float-4 -- matrix: matrix4 )
     c4 c rows>> set-fourth
 
     c ;
+
+! TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
+!     matrix4 (struct) :> c
+!     float-4{  1.0 -1.0  1.0 0.0 } :> triangle-sign
+! 
+!     theta cos float-4-with :> cc
+!     theta sin float-4-with :> ss
+!     1.0 float-4-with :> ones
+!     ones cc v- :> 1-c
+!     axis axis v* :> axis2
+! 
+!     axis2 cc ones axis2 v- v* v+ ones
+!     [ { t t t f } ] 2dip v? :> diagonal
+! 
+!     axis { 0 0 1 3 } vshuffle axis { 1 2 2 3 } vshuffle v* 1-c v* :> triangle-a
+!     ss { 2 1 0 3 } vshuffle triangle-sign * :> triangle-b
+!     triangle-a triangle-b + :> triangle-lo
+!     triangle-a triangle-b - :> triangle-hi
+! 
+!     ... ;
+! !   x*x + c*(1.0 - x*x)   x*y*(1.0 - c) - s*z   x*z*(1.0 - c) + s*y   0
+! !   x*y*(1.0 - c) + s*z   y*y + c*(1.0 - y*y)   y*z*(1.0 - c) - s*x   0
+! !   x*z*(1.0 - c) - s*y   y*z*(1.0 - c) + s*x   z*z + c*(1.0 - z*z)   0
+! !   0                     0                     0                     1
+! 
+! TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 )
+
 
