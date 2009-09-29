@@ -602,8 +602,8 @@ M: x86 %zero-vector-reps
 
 M:: x86 %broadcast-vector ( dst src rep -- )
     rep unsign-rep {
-        { float-4-rep    [
-            dst src float-4-rep  %copy
+        { float-4-rep [
+            dst src float-4-rep %copy
             dst dst { 0 0 0 0 } SHUFPS
         ] }
         { double-2-rep [
@@ -677,7 +677,52 @@ M: x86 %gather-vector-2-reps
         { sse2? { double-2-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %shuffle-vector-reps { } ;
+: double-2-shuffle ( dst shuffle -- )
+    {
+        { { 0 1 } [ drop ] }
+        { { 0 0 } [ dup UNPCKLPD ] }
+        { { 1 1 } [ dup UNPCKHPD ] }
+        [ dupd SHUFPD ]
+    } case ;
+
+: float-4-shuffle ( dst shuffle -- )
+    {
+        { { 0 1 2 3 } [ drop ] }
+        { { 0 0 2 2 } [ dup MOVSLDUP ] }
+        { { 1 1 3 3 } [ dup MOVSHDUP ] }
+        { { 0 1 0 1 } [ dup MOVLHPS ] }
+        { { 2 3 2 3 } [ dup MOVHLPS ] }
+        { { 0 0 1 1 } [ dup UNPCKLPS ] }
+        { { 2 2 3 3 } [ dup UNPCKHPS ] }
+        [ dupd SHUFPS ]
+    } case ;
+
+: int-4-shuffle ( dst shuffle -- )
+    {
+        { { 0 1 2 3 } [ drop ] }
+        { { 0 0 1 1 } [ dup PUNPCKLDQ ] }
+        { { 2 2 3 3 } [ dup PUNPCKHDQ ] }
+        { { 0 1 0 1 } [ dup PUNPCKLQDQ ] }
+        { { 2 3 2 3 } [ dup PUNPCKHQDQ ] }
+        [ dupd PSHUFD ]
+    } case ;
+
+: longlong-2-shuffle ( dst shuffle -- )
+    first2 [ 2 * dup 1 + ] bi@ 4array int-4-shuffle ;
+
+M:: x86 %shuffle-vector ( dst src shuffle rep -- )
+    dst src rep %copy
+    dst shuffle rep unsign-rep {
+        { double-2-rep [ double-2-shuffle ] }
+        { float-4-rep [ float-4-shuffle ] }
+        { int-4-rep [ int-4-shuffle ] }
+        { longlong-2-rep [ longlong-2-shuffle ] }
+    } case ;
+
+M: x86 %shuffle-vector-reps
+    {
+        { sse2? { double-2-rep float-4-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
 
 M: x86 %select-vector-reps { } ;
 

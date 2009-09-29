@@ -77,7 +77,7 @@ PRIVATE>
 : vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
 : vbitnot ( u -- w ) dup '[ _ [ bitnot ] fp-bitwise-unary ] map ;
 
-: vshuffle ( u perm -- v ) swap nths ;
+: vshuffle ( u perm -- v ) swap [ nths ] keep like ;
 
 : vlshift ( u n -- w ) '[ _ shift ] map ;
 : vrshift ( u n -- w ) neg '[ _ shift ] map ;
