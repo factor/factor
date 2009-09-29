@@ -184,6 +184,7 @@ M: ppc %shr-imm swapd SRWI ;
 M: ppc %sar     SRAW ;
 M: ppc %sar-imm SRAWI ;
 M: ppc %not     NOT ;
+M: ppc %neg     NEG ;
 
 :: overflow-template ( label dst src1 src2 insn -- )
     0 0 LI
@@ -262,9 +263,10 @@ M: ppc %single>double-float double-rep %copy ;
 M: ppc %double>single-float double-rep %copy ;
 
 ! VMX/AltiVec not supported yet
-M: ppc %broadcast-vector-reps { } ;
+M: ppc %zero-vector-reps { } ;
 M: ppc %gather-vector-2-reps { } ;
 M: ppc %gather-vector-4-reps { } ;
+M: ppc %shuffle-vector-reps { } ;
 M: ppc %add-vector-reps { } ;
 M: ppc %saturated-add-vector-reps { } ;
 M: ppc %add-sub-vector-reps { } ;
@@ -275,14 +277,19 @@ M: ppc %saturated-mul-vector-reps { } ;
 M: ppc %div-vector-reps { } ;
 M: ppc %min-vector-reps { } ;
 M: ppc %max-vector-reps { } ;
+M: ppc %dot-vector-reps { } ;
 M: ppc %sqrt-vector-reps { } ;
 M: ppc %horizontal-add-vector-reps { } ;
+M: ppc %horizontal-sub-vector-reps { } ;
 M: ppc %abs-vector-reps { } ;
 M: ppc %and-vector-reps { } ;
+M: ppc %andn-vector-reps { } ;
 M: ppc %or-vector-reps { } ;
 M: ppc %xor-vector-reps { } ;
 M: ppc %shl-vector-reps { } ;
 M: ppc %shr-vector-reps { } ;
+M: ppc %horizontal-shl-vector-reps { } ;
+M: ppc %horizontal-shr-vector-reps { } ;
 
 M: ppc %unbox-alien ( dst src -- )
     alien-offset LWZ ;

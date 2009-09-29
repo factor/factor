@@ -129,6 +129,7 @@ M: x86 %min     int-rep two-operand [ CMP ] [ CMOVG ] 2bi ;
 M: x86 %max     int-rep two-operand [ CMP ] [ CMOVL ] 2bi ;
 
 M: x86 %not     int-rep one-operand NOT ;
+M: x86 %neg     int-rep one-operand NEG ;
 M: x86 %log2    BSR ;
 
 GENERIC: copy-register* ( dst src rep -- )
@@ -578,6 +579,19 @@ MACRO: available-reps ( alist -- )
     reverse [ { } ] suffix
     '[ _ cond ] ;
 
+M: x86 %zero-vector
+    {
+        { double-2-rep [ dup XORPD ] }
+        { float-4-rep [ dup XORPS ] }
+        [ drop dup PXOR ]
+    } case ;
+
+M: x86 %zero-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 : unsign-rep ( rep -- rep' )
     {
         { uint-4-rep      int-4-rep }
@@ -586,42 +600,42 @@ MACRO: available-reps ( alist -- )
         { uchar-16-rep    char-16-rep }
     } ?at drop ;
 
-M:: x86 %broadcast-vector ( dst src rep -- )
-    rep unsign-rep {
-        { float-4-rep    [
-            dst src float-4-rep  %copy
-            dst dst { 0 0 0 0 } SHUFPS
-        ] }
-        { double-2-rep [
-            dst src MOVDDUP
-        ] }
-        { longlong-2-rep [
-            dst src =
-            [ dst dst PUNPCKLQDQ ]
-            [ dst src { 0 1 0 1 } PSHUFD ]
-            if
-        ] }
-        { int-4-rep [
-            dst src { 0 0 0 0 } PSHUFD
-        ] }
-        { short-8-rep [
-            dst src { 0 0 0 0 } PSHUFLW 
-            dst dst PUNPCKLQDQ 
-        ] }
-        { char-16-rep [
-            dst src char-16-rep %copy
-            dst dst PUNPCKLBW
-            dst dst { 0 0 0 0 } PSHUFLW
-            dst dst PUNPCKLQDQ
-        ] }
-    } case ;
-
-M: x86 %broadcast-vector-reps
-    {
-        ! Can't do this with sse1 since it will want to unbox
-        ! a double-precision float and convert to single precision
-        { sse2? { float-4-rep double-2-rep longlong-2-rep ulonglong-2-rep int-4-rep uint-4-rep short-8-rep ushort-8-rep char-16-rep uchar-16-rep } }
-    } available-reps ;
+! M:: x86 %broadcast-vector ( dst src rep -- )
+!     rep unsign-rep {
+!         { float-4-rep [
+!             dst src float-4-rep %copy
+!             dst dst { 0 0 0 0 } SHUFPS
+!         ] }
+!         { double-2-rep [
+!             dst src MOVDDUP
+!         ] }
+!         { longlong-2-rep [
+!             dst src =
+!             [ dst dst PUNPCKLQDQ ]
+!             [ dst src { 0 1 0 1 } PSHUFD ]
+!             if
+!         ] }
+!         { int-4-rep [
+!             dst src { 0 0 0 0 } PSHUFD
+!         ] }
+!         { short-8-rep [
+!             dst src { 0 0 0 0 } PSHUFLW 
+!             dst dst PUNPCKLQDQ 
+!         ] }
+!         { char-16-rep [
+!             dst src char-16-rep %copy
+!             dst dst PUNPCKLBW
+!             dst dst { 0 0 0 0 } PSHUFLW
+!             dst dst PUNPCKLQDQ
+!         ] }
+!     } case ;
+! 
+! M: x86 %broadcast-vector-reps
+!     {
+!         ! Can't do this with sse1 since it will want to unbox
+!         ! a double-precision float and convert to single precision
+!         { sse2? { float-4-rep double-2-rep longlong-2-rep ulonglong-2-rep int-4-rep uint-4-rep short-8-rep ushort-8-rep char-16-rep uchar-16-rep } }
+!     } available-reps ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
     rep unsign-rep {
@@ -661,6 +675,54 @@ M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
 M: x86 %gather-vector-2-reps
     {
         { sse2? { double-2-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+: double-2-shuffle ( dst shuffle -- )
+    {
+        { { 0 1 } [ drop ] }
+        { { 0 0 } [ dup UNPCKLPD ] }
+        { { 1 1 } [ dup UNPCKHPD ] }
+        [ dupd SHUFPD ]
+    } case ;
+
+: float-4-shuffle ( dst shuffle -- )
+    {
+        { { 0 1 2 3 } [ drop ] }
+        { { 0 0 2 2 } [ dup MOVSLDUP ] }
+        { { 1 1 3 3 } [ dup MOVSHDUP ] }
+        { { 0 1 0 1 } [ dup MOVLHPS ] }
+        { { 2 3 2 3 } [ dup MOVHLPS ] }
+        { { 0 0 1 1 } [ dup UNPCKLPS ] }
+        { { 2 2 3 3 } [ dup UNPCKHPS ] }
+        [ dupd SHUFPS ]
+    } case ;
+
+: int-4-shuffle ( dst shuffle -- )
+    {
+        { { 0 1 2 3 } [ drop ] }
+        { { 0 0 1 1 } [ dup PUNPCKLDQ ] }
+        { { 2 2 3 3 } [ dup PUNPCKHDQ ] }
+        { { 0 1 0 1 } [ dup PUNPCKLQDQ ] }
+        { { 2 3 2 3 } [ dup PUNPCKHQDQ ] }
+        [ dupd PSHUFD ]
+    } case ;
+
+: longlong-2-shuffle ( dst shuffle -- )
+    first2 [ 2 * dup 1 + ] bi@ 4array int-4-shuffle ;
+
+M:: x86 %shuffle-vector ( dst src shuffle rep -- )
+    dst src rep %copy
+    dst shuffle rep unsign-rep {
+        { double-2-rep [ double-2-shuffle ] }
+        { float-4-rep [ float-4-shuffle ] }
+        { int-4-rep [ int-4-shuffle ] }
+        { longlong-2-rep [ longlong-2-shuffle ] }
+    } case ;
+
+M: x86 %shuffle-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
 M: x86 %add-vector ( dst src1 src2 rep -- )
@@ -820,6 +882,28 @@ M: x86 %max-vector-reps
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
+M: x86 %dot-vector
+    [ two-operand ] keep
+    {
+        { float-4-rep [
+            sse4.1?
+            [ HEX: ff DPPS ]
+            [ [ MULPS ] [ drop dup float-4-rep %horizontal-add-vector ] 2bi ]
+            if
+        ] }
+        { double-2-rep [
+            sse4.1?
+            [ HEX: ff DPPD ]
+            [ [ MULPD ] [ drop dup double-2-rep %horizontal-add-vector ] 2bi ]
+            if
+        ] }
+    } case ;
+
+M: x86 %dot-vector-reps
+    {
+        { sse3? { float-4-rep double-2-rep } }
+    } available-reps ;
+
 M: x86 %horizontal-add-vector ( dst src rep -- )
     {
         { float-4-rep [ [ float-4-rep %copy ] [ HADDPS ] [ HADDPS ] 2tri ] }
@@ -959,8 +1043,9 @@ M: x86 %shr-vector-reps
     } available-reps ;
 
 M: x86 %integer>scalar drop MOVD ;
-
 M: x86 %scalar>integer drop MOVD ;
+M: x86 %vector>scalar %copy ;
+M: x86 %scalar>vector %copy ;
 
 M:: x86 %spill ( src rep dst -- ) dst src rep %copy ;
 M:: x86 %reload ( dst rep src -- ) dst src rep %copy ;

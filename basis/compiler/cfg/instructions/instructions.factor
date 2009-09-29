@@ -186,6 +186,10 @@ PURE-INSN: ##not
 def: dst/int-rep
 use: src/int-rep ;
 
+PURE-INSN: ##neg
+def: dst/int-rep
+use: src/int-rep ;
+
 PURE-INSN: ##log2
 def: dst/int-rep
 use: src/int-rep ;
@@ -270,9 +274,8 @@ def: dst
 use: src/int-rep
 literal: rep ;
 
-PURE-INSN: ##broadcast-vector
+PURE-INSN: ##zero-vector
 def: dst
-use: src/scalar-rep
 literal: rep ;
 
 PURE-INSN: ##gather-vector-2
@@ -284,6 +287,11 @@ PURE-INSN: ##gather-vector-4
 def: dst
 use: src1/scalar-rep src2/scalar-rep src3/scalar-rep src4/scalar-rep
 literal: rep ;
+
+PURE-INSN: ##shuffle-vector
+def: dst
+use: src
+literal: shuffle rep ;
 
 PURE-INSN: ##add-vector
 def: dst
@@ -332,6 +340,11 @@ literal: rep ;
 
 PURE-INSN: ##max-vector
 def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##dot-vector
+def: dst/scalar-rep
 use: src1 src2
 literal: rep ;
 
@@ -395,7 +408,7 @@ def: dst
 use: src1 src2/scalar-rep
 literal: rep ;
 
-! Scalar/integer conversion
+! Scalar/vector conversion
 PURE-INSN: ##scalar>integer
 def: dst/int-rep
 use: src
@@ -404,6 +417,16 @@ literal: rep ;
 PURE-INSN: ##integer>scalar
 def: dst
 use: src/int-rep
+literal: rep ;
+
+PURE-INSN: ##vector>scalar
+def: dst/scalar-rep
+use: src
+literal: rep ;
+
+PURE-INSN: ##scalar>vector
+def: dst
+use: src/scalar-rep
 literal: rep ;
 
 ! Boxing and unboxing aliens
