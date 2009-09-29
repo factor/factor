@@ -55,7 +55,7 @@ ERROR: bad-schema schema ;
 :: high-level-ops ( ctor elt-class -- assoc )
     ! Some SIMD operations are defined in terms of others.
     {
-        { vneg [ [ dup v- ] keep v- ] }
+        { vneg [ [ dup vbitxor ] keep v- ] }
         { n+v [ [ ctor execute ] dip v+ ] }
         { v+n [ ctor execute v+ ] }
         { n-v [ [ ctor execute ] dip v- ] }
@@ -71,20 +71,17 @@ ERROR: bad-schema schema ;
     ! To compute dot product and distance with integer vectors, we
     ! have to do things less efficiently, with integer overflow checks,
     ! in the general case.
-    elt-class m:float = [
-        {
-            { distance [ v- norm ] }
-            { v. [ v* sum ] }
-        } append
-    ] when ;
+    elt-class m:float = [ { distance [ v- norm ] } suffix ] when ;
 
-:: simd-vector-words ( class ctor rep vv->v vn->v v->v v->n -- )
+:: simd-vector-words ( class ctor rep vv->v vn->v vv->n v->v v->n -- )
     rep rep-component-type c-type-boxed-class :> elt-class
     class
     elt-class
     {
         { { +vector+ +vector+ -> +vector+ } vv->v }
         { { +vector+ +scalar+ -> +vector+ } vn->v }
+        { { +vector+ +literal+ -> +vector+ } vn->v }
+        { { +vector+ +vector+ -> +scalar+ } vv->n }
         { { +vector+ -> +vector+ } v->v }
         { { +vector+ -> +scalar+ } v->n }
         { { +vector+ -> +nonnegative+ } v->n }
@@ -121,6 +118,7 @@ SET-NTH      [ T dup c-setter array-accessor ]
 A-rep        [ A name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
 A-vn->v-op   DEFINES-PRIVATE ${A}-vn->v-op
+A-vv->n-op   DEFINES-PRIVATE ${A}-vv->n-op
 A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
@@ -186,13 +184,16 @@ INSTANCE: A sequence
 : A-vn->v-op ( v1 v2 quot -- v3 )
     [ [ underlying>> ] dip A-rep ] dip call \ A boa ; inline
 
+: A-vv->n-op ( v1 v2 quot -- n )
+    [ [ underlying>> ] bi@ A-rep ] dip call ; inline
+
 : A-v->v-op ( v1 quot -- v2 )
     [ underlying>> A-rep ] dip call \ A boa ; inline
 
 : A-v->n-op ( v quot -- n )
     [ underlying>> A-rep ] dip call ; inline
 
-\ A \ A-with \ A-rep \ A-vv->v-op \ A-vn->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
+\ A \ A-with \ A-rep \ A-vv->v-op \ A-vn->v-op \ A-vv->n-op \ A-v->v-op \ A-v->n-op simd-vector-words
 \ A \ A-rep define-simd-128-type
 
 PRIVATE>
@@ -243,6 +244,7 @@ A-deref      DEFINES-PRIVATE ${A}-deref
 A-rep        [ A/2 name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
 A-vn->v-op   DEFINES-PRIVATE ${A}-vn->v-op
+A-vv->n-op   DEFINES-PRIVATE ${A}-vv->n-op
 A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
@@ -317,6 +319,11 @@ INSTANCE: A sequence
     [ [ [ underlying2>> ] dip A-rep ] dip call ] 3bi
     \ A boa ; inline
 
+: A-vv->n-op ( v1 v2 quot -- v3 )
+    [ [ [ underlying1>> ] bi@ A-rep ] dip call ]
+    [ [ [ underlying2>> ] bi@ A-rep ] dip call ] 3bi
+    + ; inline
+
 : A-v->v-op ( v1 combine-quot -- v2 )
     [ [ underlying1>> A-rep ] dip call ]
     [ [ underlying2>> A-rep ] dip call ] 2bi
@@ -325,7 +332,7 @@ INSTANCE: A sequence
 : A-v->n-op ( v1 combine-quot -- v2 )
     [ [ underlying1>> ] [ underlying2>> ] bi A-rep (simd-v+) A-rep ] dip call ; inline
 
-\ A \ A-with \ A-rep \ A-vv->v-op \ A-vn->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
+\ A \ A-with \ A-rep \ A-vv->v-op \ A-vn->v-op \ A-vv->n-op \ A-v->v-op \ A-v->n-op simd-vector-words
 \ A \ A-rep define-simd-256-type
 
 ;FUNCTOR

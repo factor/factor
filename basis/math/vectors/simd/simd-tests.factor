@@ -148,13 +148,14 @@ CONSTANT: simd-classes
 : remove-integer-words ( alist -- alist' )
     [ drop { vlshift vrshift } member? not ] assoc-filter ;
 
-: remove-horizontal-shifts ( alist -- alist' )
-    [ drop { hlshift hrshift } member? not ] assoc-filter ;
+: remove-special-words ( alist -- alist' )
+    ! These have their own tests later
+    [ drop { hlshift hrshift vshuffle } member? not ] assoc-filter ;
 
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
     float = [ remove-integer-words ] [ remove-float-words ] if
-    remove-horizontal-shifts ;
+    remove-special-words ;
 
 : check-vector-ops ( class elt-class compare-quot -- )
     [
@@ -271,3 +272,47 @@ STRUCT: simd-struct
 
 [ int-4{ 1 2 4 8 } ]
 [ int-4{ 256 512 1024 2048 } [ { int-4 } declare 1 hrshift ] compile-call ] unit-test
+
+! Shuffles
+: test-shuffle ( input shuffle -- failures )
+    [ dup class 1array ] dip
+    '[ _ declare _ vshuffle ]
+    [ call ] [ compile-call ] 2bi = not ; inline
+
+: shuffles-for ( seq -- shuffles )
+    length {
+        { 2 [
+            {
+                { 0 1 }
+                { 1 1 }
+                { 1 0 }
+                { 0 0 }
+            }
+        ] }
+        { 4 [
+            {
+                { 1 2 3 0 }
+                { 0 1 2 3 }
+                { 1 1 2 2 }
+                { 0 0 1 1 }
+                { 2 2 3 3 }
+                { 0 1 0 1 }
+                { 2 3 2 3 }
+                { 0 0 2 2 }
+                { 1 1 3 3 }
+                { 0 1 0 1 }
+                { 2 2 3 3 }
+            }
+        ] }
+    } case ;
+
+: test-shuffles ( input -- failures )
+    dup shuffles-for [ test-shuffle ] with filter ; inline
+
+[ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-shuffles ] unit-test
+[ { } ] [ int-4{ 1 2 3 4 } test-shuffles ] unit-test
+[ { } ] [ uint-4{ 1 2 3 4 } test-shuffles ] unit-test
+
+[ { } ] [ double-2{ 1.0 2.0 } test-shuffles ] unit-test
+[ { } ] [ longlong-2{ 1 2 } test-shuffles ] unit-test
+[ { } ] [ ulonglong-2{ 1 2 } test-shuffles ] unit-test
