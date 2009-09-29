@@ -5,7 +5,7 @@ functors generalizations kernel literals locals math math.functions
 math.vectors math.vectors.private math.vectors.simd.intrinsics
 math.vectors.specialization parser prettyprint.custom sequences
 sequences.private strings words definitions macros cpu.architecture
-namespaces arrays quotations ;
+namespaces arrays quotations combinators sets ;
 QUALIFIED-WITH: math m
 IN: math.vectors.simd.functor
 
@@ -28,10 +28,22 @@ MACRO: simd-boa ( rep class -- simd-array )
 :: define-with-custom-inlining ( word rep class -- )
     word [
         drop
-        rep \ (simd-broadcast) supported-simd-op? [
+        rep \ (simd-vshuffle) supported-simd-op? [
             [ rep rep-coerce rep (simd-broadcast) class boa ]
         ] [ word def>> ] if
     ] "custom-inlining" set-word-prop ;
+
+: simd-nth-fast ( rep -- quot )
+    [ rep-components ] keep
+    '[ swap _ '[ _ _ (simd-select) ] 2array ] map-index
+    '[ swap >fixnum _ case ] ;
+
+: simd-nth-slow ( rep -- quot )
+    rep-component-type dup c-type-getter-boxer array-accessor ;
+
+MACRO: simd-nth ( rep -- x )
+    dup \ (simd-vshuffle) supported-simd-op?
+    [ simd-nth-fast ] [ simd-nth-slow ] if ;
 
 : boa-effect ( rep n -- effect )
     [ rep-components ] dip *
@@ -45,8 +57,8 @@ MACRO: simd-boa ( rep class -- simd-array )
 
 ERROR: bad-schema schema ;
 
-: low-level-ops ( box-quot: ( inputs... simd-op -- outputs... ) -- alist )
-    [ simd-ops get ] dip '[
+: low-level-ops ( simd-ops alist -- alist' )
+    '[
         1quotation
         over word-schema _ ?at [ bad-schema ] unless
         [ ] 2sequence
@@ -55,7 +67,7 @@ ERROR: bad-schema schema ;
 :: high-level-ops ( ctor elt-class -- assoc )
     ! Some SIMD operations are defined in terms of others.
     {
-        { vneg [ [ dup v- ] keep v- ] }
+        { vneg [ [ dup vbitxor ] keep v- ] }
         { n+v [ [ ctor execute ] dip v+ ] }
         { v+n [ ctor execute v+ ] }
         { n-v [ [ ctor execute ] dip v- ] }
@@ -71,26 +83,19 @@ ERROR: bad-schema schema ;
     ! To compute dot product and distance with integer vectors, we
     ! have to do things less efficiently, with integer overflow checks,
     ! in the general case.
-    elt-class m:float = [
-        {
-            { distance [ v- norm ] }
-            { v. [ v* sum ] }
-        } append
-    ] when ;
+    elt-class m:float = [ { distance [ v- norm ] } suffix ] when ;
 
-:: simd-vector-words ( class ctor rep vv->v vn->v v->v v->n -- )
-    rep rep-component-type c-type-boxed-class :> elt-class
-    class
-    elt-class
+TUPLE: simd class elt-class ops wrappers ctor rep ;
+
+: define-simd ( simd -- )
+    dup rep>> rep-component-type c-type-boxed-class >>elt-class
     {
-        { { +vector+ +vector+ -> +vector+ } vv->v }
-        { { +vector+ +scalar+ -> +vector+ } vn->v }
-        { { +vector+ -> +vector+ } v->v }
-        { { +vector+ -> +scalar+ } v->n }
-        { { +vector+ -> +nonnegative+ } v->n }
-    } low-level-ops
-    rep supported-simd-ops
-    ctor elt-class high-level-ops assoc-union
+        [ class>> ]
+        [ elt-class>> ]
+        [ [ ops>> ] [ wrappers>> ] bi low-level-ops ]
+        [ rep>> supported-simd-ops ]
+        [ [ ctor>> ] [ elt-class>> ] bi high-level-ops assoc-union ]
+    } cleave
     specialize-vector-words ;
 
 :: define-simd-128-type ( class rep -- )
@@ -104,6 +109,11 @@ ERROR: bad-schema schema ;
         rep >>rep
     class typedef ;
 
+: (define-simd-128) ( simd -- )
+    simd-ops get >>ops
+    [ define-simd ]
+    [ [ class>> ] [ rep>> ] bi define-simd-128-type ] bi ;
+
 FUNCTOR: define-simd-128 ( T -- )
 
 N            [ 16 T heap-size /i ]
@@ -115,12 +125,12 @@ A-cast       DEFINES ${A}-cast
 >A           DEFINES >${A}
 A{           DEFINES ${A}{
 
-NTH          [ T dup c-type-getter-boxer array-accessor ]
 SET-NTH      [ T dup c-setter array-accessor ]
 
 A-rep        [ A name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
 A-vn->v-op   DEFINES-PRIVATE ${A}-vn->v-op
+A-vv->n-op   DEFINES-PRIVATE ${A}-vv->n-op
 A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
@@ -133,7 +143,7 @@ M: A clone underlying>> clone \ A boa ; inline
 
 M: A length drop N ; inline
 
-M: A nth-unsafe underlying>> NTH call ; inline
+M: A nth-unsafe underlying>> A-rep simd-nth ; inline
 
 M: A set-nth-unsafe underlying>> SET-NTH call ; inline
 
@@ -186,14 +196,29 @@ INSTANCE: A sequence
 : A-vn->v-op ( v1 v2 quot -- v3 )
     [ [ underlying>> ] dip A-rep ] dip call \ A boa ; inline
 
+: A-vv->n-op ( v1 v2 quot -- n )
+    [ [ underlying>> ] bi@ A-rep ] dip call ; inline
+
 : A-v->v-op ( v1 quot -- v2 )
     [ underlying>> A-rep ] dip call \ A boa ; inline
 
 : A-v->n-op ( v quot -- n )
     [ underlying>> A-rep ] dip call ; inline
 
-\ A \ A-with \ A-rep \ A-vv->v-op \ A-vn->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
-\ A \ A-rep define-simd-128-type
+simd new
+    \ A >>class
+    \ A-with >>ctor
+    \ A-rep >>rep
+    {
+        { { +vector+ +vector+ -> +vector+ } A-vv->v-op }
+        { { +vector+ +scalar+ -> +vector+ } A-vn->v-op }
+        { { +vector+ +literal+ -> +vector+ } A-vn->v-op }
+        { { +vector+ +vector+ -> +scalar+ } A-vv->n-op }
+        { { +vector+ -> +vector+ } A-v->v-op }
+        { { +vector+ -> +scalar+ } A-v->n-op }
+        { { +vector+ -> +nonnegative+ } A-v->n-op }
+    } >>wrappers
+(define-simd-128)
 
 PRIVATE>
 
@@ -222,6 +247,11 @@ SLOT: underlying2
         rep >>rep
     class typedef ;
 
+: (define-simd-256) ( simd -- )
+    simd-ops get { vshuffle hlshift hrshift } unique assoc-diff >>ops
+    [ define-simd ]
+    [ [ class>> ] [ rep>> ] bi define-simd-256-type ] bi ;
+
 FUNCTOR: define-simd-256 ( T -- )
 
 N            [ 32 T heap-size /i ]
@@ -243,6 +273,7 @@ A-deref      DEFINES-PRIVATE ${A}-deref
 A-rep        [ A/2 name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
 A-vn->v-op   DEFINES-PRIVATE ${A}-vn->v-op
+A-vv->n-op   DEFINES-PRIVATE ${A}-vv->n-op
 A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
@@ -317,6 +348,11 @@ INSTANCE: A sequence
     [ [ [ underlying2>> ] dip A-rep ] dip call ] 3bi
     \ A boa ; inline
 
+: A-vv->n-op ( v1 v2 quot -- v3 )
+    [ [ [ underlying1>> ] bi@ A-rep ] dip call ]
+    [ [ [ underlying2>> ] bi@ A-rep ] dip call ] 3bi
+    + ; inline
+
 : A-v->v-op ( v1 combine-quot -- v2 )
     [ [ underlying1>> A-rep ] dip call ]
     [ [ underlying2>> A-rep ] dip call ] 2bi
@@ -325,7 +361,19 @@ INSTANCE: A sequence
 : A-v->n-op ( v1 combine-quot -- v2 )
     [ [ underlying1>> ] [ underlying2>> ] bi A-rep (simd-v+) A-rep ] dip call ; inline
 
-\ A \ A-with \ A-rep \ A-vv->v-op \ A-vn->v-op \ A-v->v-op \ A-v->n-op simd-vector-words
-\ A \ A-rep define-simd-256-type
+simd new
+    \ A >>class
+    \ A-with >>ctor
+    \ A-rep >>rep
+    {
+        { { +vector+ +vector+ -> +vector+ } A-vv->v-op }
+        { { +vector+ +scalar+ -> +vector+ } A-vn->v-op }
+        { { +vector+ +literal+ -> +vector+ } A-vn->v-op }
+        { { +vector+ +vector+ -> +scalar+ } A-vv->n-op }
+        { { +vector+ -> +vector+ } A-v->v-op }
+        { { +vector+ -> +scalar+ } A-v->n-op }
+        { { +vector+ -> +nonnegative+ } A-v->n-op }
+    } >>wrappers
+(define-simd-256)
 
 ;FUNCTOR
