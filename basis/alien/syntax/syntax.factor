@@ -19,10 +19,7 @@ SYNTAX: FUNCTION:
     (FUNCTION:) define-declared ;
 
 SYNTAX: CALLBACK:
-    "cdecl" (CALLBACK:) define-inline ;
-
-SYNTAX: STDCALL-CALLBACK:
-    "stdcall" (CALLBACK:) define-inline ;
+    (CALLBACK:) define-inline ;
 
 SYNTAX: TYPEDEF:
     scan-c-type CREATE-C-TYPE typedef ;
