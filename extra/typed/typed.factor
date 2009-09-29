@@ -1,7 +1,8 @@
 ! (c)Joe Groff bsd license
 USING: accessors combinators combinators.short-circuit
 definitions effects fry hints kernel kernel.private namespaces
-parser quotations see.private sequences words ;
+parser quotations see.private sequences words
+locals locals.definitions locals.parser ;
 IN: typed
 
 ERROR: type-mismatch-error word expected-types ;
@@ -53,7 +54,10 @@ ERROR: output-mismatch-error < type-mismatch-error ;
     [ [ swap ] dip typed-gensym-quot ]
     [ 2nip ] 3tri define-declared ;
 
-PREDICATE: typed < word "typed-word" word-prop ;
+PREDICATE: typed-standard-word < word "typed-word" word-prop ;
+PREDICATE: typed-lambda-word < lambda-word "typed-word" word-prop ;
+
+UNION: typed-word typed-standard-word typed-lambda-word ;
 
 : typed-quot ( quot word effect -- quot' )
     [ effect-in-types dup typed-stack-effect? [ typed-inputs ] [ 2drop ] if ] 
@@ -77,8 +81,12 @@ PREDICATE: typed < word "typed-word" word-prop ;
 
 SYNTAX: TYPED:
     (:) define-typed ;
+SYNTAX: TYPED::
+    (::) define-typed ;
 
-M: typed definer drop \ TYPED: \ ; ;
-M: typed definition "typed-def" word-prop ;
-M: typed declarations. "typed-word" word-prop declarations. ;
+M: typed-standard-word definer drop \ TYPED: \ ; ;
+M: typed-lambda-word definer drop \ TYPED:: \ ; ;
+
+M: typed-word definition "typed-def" word-prop ;
+M: typed-word declarations. "typed-word" word-prop declarations. ;
 
