@@ -667,4 +667,68 @@ VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm
 	VM_PTR->inline_gc(gc_roots_base,gc_roots_size);
 }
 
+inline object *factor_vm::allot_zone(zone *z, cell a)
+{
+	cell h = z->here;
+	z->here = h + align8(a);
+	object *obj = (object *)h;
+	allot_barrier(obj);
+	return obj;
+}
+
+/*
+ * It is up to the caller to fill in the object's fields in a meaningful
+ * fashion!
+ */
+object *factor_vm::allot_object(header header, cell size)
+{
+#ifdef GC_DEBUG
+	if(!gc_off)
+		gc();
+#endif
+
+	object *obj;
+
+	if(nursery.size - allot_buffer_zone > size)
+	{
+		/* If there is insufficient room, collect the nursery */
+		if(nursery.here + allot_buffer_zone + size > nursery.end)
+			garbage_collection(data->nursery(),false,0);
+
+		cell h = nursery.here;
+		nursery.here = h + align8(size);
+		obj = (object *)h;
+	}
+	/* If the object is bigger than the nursery, allocate it in
+	tenured space */
+	else
+	{
+		zone *tenured = &data->generations[data->tenured()];
+
+		/* If tenured space does not have enough room, collect */
+		if(tenured->here + size > tenured->end)
+		{
+			gc();
+			tenured = &data->generations[data->tenured()];
+		}
+
+		/* If it still won't fit, grow the heap */
+		if(tenured->here + size > tenured->end)
+		{
+			garbage_collection(data->tenured(),true,size);
+			tenured = &data->generations[data->tenured()];
+		}
+
+		obj = allot_zone(tenured,size);
+
+		/* Allows initialization code to store old->new pointers
+		without hitting the write barrier in the common case of
+		a nursery allocation */
+		write_barrier(obj);
+	}
+
+	obj->h = header;
+	return obj;
+}
+
 }

@@ -1,7 +1,6 @@
 namespace factor
 {
 
-//local_roots.hpp
 template <typename TYPE>
 struct gc_root : public tagged<TYPE>
 {

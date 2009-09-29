@@ -101,20 +101,20 @@ struct factor_vm
 	void bignum_destructive_add(bignum * bignum, bignum_digit_type n);
 	void bignum_destructive_scale_up(bignum * bignum, bignum_digit_type factor);
 	void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denominator, 
-												  bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
+						      bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
 	void bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q);
 	bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end, 
-											 bignum_digit_type guess, bignum_digit_type * u_start);
+						 bignum_digit_type guess, bignum_digit_type * u_start);
 	void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator, 
-												   bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
+						       bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
 	void bignum_destructive_normalization(bignum * source, bignum * target, int shift_left);
 	void bignum_destructive_unnormalization(bignum * bignum, int shift_right);
 	bignum_digit_type bignum_digit_divide(bignum_digit_type uh, bignum_digit_type ul, 
-										  bignum_digit_type v, bignum_digit_type * q) /* return value */;
+					      bignum_digit_type v, bignum_digit_type * q) /* return value */;
 	bignum_digit_type bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2, 
-												   bignum_digit_type guess, bignum_digit_type * u);
+						       bignum_digit_type guess, bignum_digit_type * u);
 	void bignum_divide_unsigned_small_denominator(bignum * numerator, bignum_digit_type denominator, 
-												  bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
+						      bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
 	bignum_digit_type bignum_destructive_scale_down(bignum * bignum, bignum_digit_type denominator);
 	bignum * bignum_remainder_unsigned_small_denominator(bignum * n, bignum_digit_type d, int negative_p);
 	bignum *bignum_digit_to_bignum(bignum_digit_type digit, int negative_p);
@@ -171,7 +171,6 @@ struct factor_vm
 	template<typename T> void each_object(T &functor);
 	cell find_all_words();
 	cell object_size(cell tagged);
-
 	
 	//write barrier
 	cell allot_markers_offset;
@@ -282,13 +281,45 @@ struct factor_vm
 	void clear_gc_stats();
 	void primitive_become();
 	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
-	inline bool collecting_accumulation_gen_p();
 	inline object *allot_zone(zone *z, cell a);
-	inline object *allot_object(header header, cell size);
-	template <typename TYPE> TYPE *allot(cell size);
-	inline void check_data_pointer(object *pointer);
-	inline void check_tagged_pointer(cell tagged);
+	object *allot_object(header header, cell size);
 	void primitive_clear_gc_stats();
+
+	template<typename TYPE> TYPE *allot(cell size)
+	{
+		return (TYPE *)allot_object(header(TYPE::type_number),size);
+	}
+
+	inline bool collecting_accumulation_gen_p()
+	{
+		return ((data->have_aging_p()
+			 && collecting_gen == data->aging()
+			 && !collecting_aging_again)
+			|| collecting_gen == data->tenured());
+	}
+
+	inline void check_data_pointer(object *pointer)
+	{
+	#ifdef FACTOR_DEBUG
+		if(!growing_data_heap)
+		{
+			assert((cell)pointer >= data->seg->start
+			       && (cell)pointer < data->seg->end);
+		}
+	#endif
+	}
+
+	inline void check_tagged_pointer(cell tagged)
+	{
+	#ifdef FACTOR_DEBUG
+		if(!immediate_p(tagged))
+		{
+			object *obj = untag<object>(tagged);
+			check_data_pointer(obj);
+			obj->h.hi_tag();
+		}
+	#endif
+	}
 
 	// local roots
 	/* If a runtime function needs to call another function which potentially
