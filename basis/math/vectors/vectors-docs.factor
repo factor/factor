@@ -41,6 +41,8 @@ $nl
 { $subsection vbitxor }
 { $subsection vlshift }
 { $subsection vrshift }
+"Shuffling:"
+{ $subsection vshuffle }
 "Inner product and norm:"
 { $subsection v. }
 { $subsection norm }
@@ -230,6 +232,18 @@ HELP: hlshift
 HELP: hrshift
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
 { $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
+
+HELP: vshuffle
+{ $values { "u" "a SIMD array" } { "perm" "an array of integers" } { "v" "a SIMD array" } }
+{ $description "Permutes the elements of a SIMD array. Duplicate entries are allowed in the permutation." }
+{ $examples
+    { $example
+        "USING: alien.c-types math.vectors math.vectors.simd" "prettyprint ;"
+        "SIMD: int"
+        "int-4{ 69 42 911 13 } { 1 3 2 3 } vshuffle ."
+        "int-4{ 42 13 911 13 }"
+    }
+} ;
 
 HELP: norm-sq
 { $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }

@@ -179,7 +179,7 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-gather-2) [ emit-gather-vector-2 ] }
         { math.vectors.simd.intrinsics:(simd-gather-4) [ emit-gather-vector-4 ] }
         { math.vectors.simd.intrinsics:(simd-vshuffle) [ emit-shuffle-vector ] }
-        { math.vectors.simd.intrinsics:(simd-vselect) [ emit-select-vector ] }
+        { math.vectors.simd.intrinsics:(simd-select) [ emit-select-vector ] }
         { math.vectors.simd.intrinsics:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:alien-vector [ emit-alien-vector ] }
         { math.vectors.simd.intrinsics:set-alien-vector [ emit-set-alien-vector ] }
