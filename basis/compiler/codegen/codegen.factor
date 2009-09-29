@@ -162,11 +162,9 @@ CODEGEN: ##integer>float %integer>float
 CODEGEN: ##float>integer %float>integer
 CODEGEN: ##unbox-vector %unbox-vector
 CODEGEN: ##zero-vector %zero-vector
-CODEGEN: ##broadcast-vector %broadcast-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##shuffle-vector %shuffle-vector
-CODEGEN: ##select-vector %select-vector
 CODEGEN: ##box-vector %box-vector
 CODEGEN: ##add-vector %add-vector
 CODEGEN: ##saturated-add-vector %saturated-add-vector
@@ -193,6 +191,8 @@ CODEGEN: ##shl-vector %shl-vector
 CODEGEN: ##shr-vector %shr-vector
 CODEGEN: ##integer>scalar %integer>scalar
 CODEGEN: ##scalar>integer %scalar>integer
+CODEGEN: ##vector>scalar %vector>scalar
+CODEGEN: ##scalar>vector %scalar>vector
 CODEGEN: ##box-alien %box-alien
 CODEGEN: ##box-displaced-alien %box-displaced-alien
 CODEGEN: ##unbox-alien %unbox-alien
