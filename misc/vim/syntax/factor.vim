@@ -63,16 +63,17 @@ syn keyword factorKeyword with-return restarts return-continuation with-datastac
 syn cluster factorReal          contains=factorInt,factorFloat,factorRatio,factorBinary,factorHex,factorOctal
 syn cluster factorNumber        contains=@factorReal,factorComplex
 syn cluster factorNumErr        contains=factorBinErr,factorHexErr,factorOctErr
-syn match   factorInt           /\<-\=\d\+\>/
-syn match   factorFloat         /\<-\=\d*\.\d\+\>/
-syn match   factorRatio         /\<-\=\d*\.*\d\+\/-\=\d*\.*\d\+\>/
+syn match   factorInt           /\<-\=[0-9]\([0-9,]*[0-9]\)\?\>/
+syn match   factorFloat         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\.[0-9,]*[0-9]\+\>/
+syn match   factorRatio         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\(+[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
 syn region  factorComplex       start=/\<C{\>/ end=/\<}\>/ contains=@factorReal
-syn match   factorBinErr        /\<BIN:\s\+[01]*[^\s01]\S*\>/
-syn match   factorBinary        /\<BIN:\s\+[01]\+\>/
-syn match   factorHexErr        /\<HEX:\s\+\x*[^\x\s]\S*\>/
-syn match   factorHex           /\<HEX:\s\+\x\+\>/
-syn match   factorOctErr        /\<OCT:\s\+\o*[^\o\s]\S*\>/
-syn match   factorOctal         /\<OCT:\s\+\o\+\>/
+syn match   factorBinErr        /\<BIN:\s\+-\=[01,]*[^01 ]\S*\>/
+syn match   factorBinary        /\<BIN:\s\+-\=[01,]\+\>/
+syn match   factorHexErr        /\<HEX:\s\+-\=\(,\S*\|\S*,\|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*\)\>/
+syn match   factorHex           /\<HEX:\s\+-\=[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\(\.[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\)\?\(p-\=[0-9]\([0-9,]*[0-9]\)\?\)\?\>/
+syn match   factorOctErr        /\<OCT:\s\+-\=\(,\S*\|\S*,\|[0-7,]*[^0-7, ]\S*\)\>/
+syn match   factorOctal         /\<OCT:\s\+-\=[0-7,]\+\>/
+syn match   factorNan           /\<NAN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
 
 syn match   factorIn            /\<IN:\s\+\S\+\>/
 syn match   factorUse           /\<USE:\s\+\S\+\>/
@@ -105,7 +106,7 @@ syn match   factorInstance      /\<INSTANCE:\s\+\S\+\s\+\S\+\>/
 syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/
 syn match   factorMain          /\<MAIN:\s\+\S\+\>/
 syn match   factorConstructor   /\<C:\s\+\S\+\s\+\S\+\>/
-syn match   factorAlien         /\<ALIEN:\s\+\d\+\>/
+syn match   factorAlien         /\<ALIEN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
 
 syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
 
@@ -213,6 +214,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorBinErr                 Error
     HiLink factorHex                    Number
     HiLink factorHexErr                 Error
+    HiLink factorNan                    Number
     HiLink factorOctal                  Number
     HiLink factorOctErr                 Error
     HiLink factorFloat                  Float
