@@ -6,7 +6,7 @@ namespaces assocs fry splitting classes.algebra generalizations
 locals compiler.tree.propagation.info ;
 IN: math.vectors.specialization
 
-SYMBOLS: -> +vector+ +scalar+ +nonnegative+ ;
+SYMBOLS: -> +vector+ +scalar+ +nonnegative+ +literal+ ;
 
 : signature-for-schema ( array-type elt-type schema -- signature )
     [
@@ -14,6 +14,7 @@ SYMBOLS: -> +vector+ +scalar+ +nonnegative+ ;
             { +vector+ [ drop ] }
             { +scalar+ [ nip ] }
             { +nonnegative+ [ nip ] }
+            { +literal+ [ 2drop object ] }
         } case
     ] with with map ;
 
@@ -87,8 +88,9 @@ H{
     { vbitxor { +vector+ +vector+ -> +vector+ } }
     { vlshift { +vector+ +scalar+ -> +vector+ } }
     { vrshift { +vector+ +scalar+ -> +vector+ } }
-    { hlshift { +vector+ +scalar+ -> +vector+ } }
-    { hrshift { +vector+ +scalar+ -> +vector+ } }
+    { hlshift { +vector+ +literal+ -> +vector+ } }
+    { hrshift { +vector+ +literal+ -> +vector+ } }
+    { vshuffle { +vector+ +literal+ -> +vector+ } }
 }
 
 PREDICATE: vector-word < word vector-words key? ;
@@ -102,7 +104,10 @@ M: vector-word subwords specializations values [ word? ] filter ;
 : add-specialization ( new-word signature word -- )
     specializations set-at ;
 
-: word-schema ( word -- schema ) vector-words at ;
+ERROR: bad-vector-word word ;
+
+: word-schema ( word -- schema )
+    vector-words ?at [ bad-vector-word ] unless ;
 
 : inputs ( schema -- seq ) { -> } split first ;
 
@@ -129,8 +134,8 @@ M: vector-word subwords specializations values [ word? ] filter ;
         { [ dup complex class<= ] [ vector-words keys { vsqrt } diff ] }
         [ { } ]
     } cond
-    ! Don't specialize horizontal shifts at all, they're only for SIMD
-    { hlshift hrshift } diff
+    ! Don't specialize horizontal shifts or shuffles at all, they're only for SIMD
+    { hlshift hrshift vshuffle } diff
     nip ;
 
 :: specialize-vector-words ( array-type elt-type simd -- )
