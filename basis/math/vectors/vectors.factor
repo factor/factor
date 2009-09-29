@@ -97,7 +97,9 @@ PRIVATE>
 : vunordered? ( u v -- w ) [ unordered? ] { } 2map-as ;
 : v=  ( u v -- w ) [ =   ] { } 2map-as ;
 
-: v?   ( ? u v -- w ) [ ? ] pick 3map-as ;
+: v?   ( ? true false -- w ) [ ? ] pick 3map-as ;
+
+: vmask ( u ? -- u' ) swap dup dup vbitxor v? ;
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;
