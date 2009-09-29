@@ -1,12 +1,12 @@
 USING: accessors alien alien.c-types alien.strings arrays
-assocs byte-arrays combinators continuations game-input
-game-input.dinput.keys-array io.encodings.utf16
-io.encodings.utf16n kernel locals math math.bitwise
-math.rectangles namespaces parser sequences shuffle
-specialized-arrays ui.backend.windows vectors windows.com
-windows.dinput windows.dinput.constants windows.errors
-windows.kernel32 windows.messages windows.ole32
-windows.user32 classes.struct alien.data ;
+assocs byte-arrays combinators combinators.short-circuit
+continuations game-input game-input.dinput.keys-array
+io.encodings.utf16 io.encodings.utf16n kernel locals math
+math.bitwise math.rectangles namespaces parser sequences
+shuffle specialized-arrays ui.backend.windows vectors
+windows.com windows.dinput windows.dinput.constants
+windows.errors windows.kernel32 windows.messages
+windows.ole32 windows.user32 classes.struct alien.data ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game-input.dinput
 
@@ -265,7 +265,7 @@ M: dinput-game-input-backend instance-id
     handle>> device-guid ;
 
 :: with-acquisition ( device acquired-quot succeeded-quot failed-quot -- result/f )
-    device IDirectInputDevice8W::Acquire succeeded? [
+    device { [ ] [ IDirectInputDevice8W::Acquire succeeded? ] } 1&& [
         device acquired-quot call
         succeeded-quot call
     ] failed-quot if ; inline
