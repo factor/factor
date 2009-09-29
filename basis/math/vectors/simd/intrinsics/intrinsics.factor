@@ -126,8 +126,6 @@ M: vector-rep supported-simd-op?
         { \ (simd-hlshift)   [ %horizontal-shl-vector-reps ] }
         { \ (simd-hrshift)   [ %horizontal-shr-vector-reps ] }
         { \ (simd-vshuffle)  [ %shuffle-vector-reps        ] }
-        { \ (simd-broadcast) [ %broadcast-vector-reps      ] }
         { \ (simd-gather-2)  [ %gather-vector-2-reps       ] }
         { \ (simd-gather-4)  [ %gather-vector-4-reps       ] }
-        { \ (simd-select)    [ %select-vector-reps         ] }
     } case member? ;

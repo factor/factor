@@ -28,7 +28,6 @@ IN: compiler.tree.propagation.simd
     (simd-broadcast)
     (simd-gather-2)
     (simd-gather-4)
-    (simd-select)
     alien-vector
 } [ { byte-array } "default-output-classes" set-word-prop ] each
 
@@ -45,6 +44,8 @@ IN: compiler.tree.propagation.simd
 \ (simd-sum) [ nip scalar-output-class ] "outputs" set-word-prop
 
 \ (simd-v.) [ 2nip scalar-output-class ] "outputs" set-word-prop
+
+\ (simd-select) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
 \ assert-positive [
     real [0,inf] <class/interval-info> value-info-intersect
