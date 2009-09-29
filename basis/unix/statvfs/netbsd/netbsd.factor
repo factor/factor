@@ -29,8 +29,8 @@ STRUCT: statvfs
     { f_namemax ulong }
     { f_owner uid_t }
     { f_spare uint32_t[4] }
-    { f_fstypename { "char" _VFS_NAMELEN } }
-    { f_mntonname { "char" _VFS_MNAMELEN } }
-    { f_mntfromname { "char" _VFS_MNAMELEN } } ;
+    { f_fstypename { char _VFS_NAMELEN } }
+    { f_mntonname { char _VFS_MNAMELEN } }
+    { f_mntfromname { char _VFS_MNAMELEN } } ;
 
 FUNCTION: int statvfs ( char* path, statvfs* buf ) ;
