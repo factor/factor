@@ -1189,6 +1189,16 @@ cell 8 = [
     } value-numbering-step
 ] unit-test
 
+[
+    {
+        T{ ##zero-vector f 2 float-4-rep }
+    }
+] [
+    {
+        T{ ##xor-vector f 2 1 1 float-4-rep }
+    } value-numbering-step
+] unit-test
+
 : test-branch-folding ( insns -- insns' n )
     <basic-block>
     [ V{ 0 1 } clone >>successors basic-block set value-numbering-step ] keep

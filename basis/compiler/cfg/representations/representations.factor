@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel fry accessors sequences assocs sets namespaces
-arrays combinators make locals deques dlists layouts
-cpu.architecture compiler.utilities
+arrays combinators combinators.short-circuit make locals deques
+dlists layouts cpu.architecture compiler.utilities
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.hats
@@ -207,6 +207,25 @@ SYMBOL: phi-mappings
 ! output won't have a representation assigned.
 M: ##phi conversions-for-insn
     [ , ] [ [ inputs>> values ] [ dst>> ] bi phi-mappings get set-at ] bi ;
+
+! When a literal zero vector is unboxed, we replace the ##load-reference
+! with a ##zero-vector instruction since this is more efficient.
+: convert-to-zero-vector? ( insn -- ? )
+    {
+        [ dst>> rep-of vector-rep? ]
+        [ obj>> B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } = ]
+    } 1&& ;
+
+: convert-to-zero-vector ( insn -- )
+    dst>> dup rep-of ##zero-vector ;
+
+M: ##load-reference conversions-for-insn
+    dup convert-to-zero-vector?
+    [ convert-to-zero-vector ] [ call-next-method ] if ;
+
+M: ##load-constant conversions-for-insn
+    dup convert-to-zero-vector?
+    [ convert-to-zero-vector ] [ call-next-method ] if ;
 
 M: vreg-insn conversions-for-insn
     [ compute-renaming-set ] [ perform-renaming ] bi ;
