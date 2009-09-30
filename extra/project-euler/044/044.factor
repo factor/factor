@@ -41,7 +41,7 @@ IN: project-euler.044
 PRIVATE>
 
 : euler044 ( -- answer )
-    most-positive-fixnum >fixnum
+    most-positive-fixnum
     2500 [1,b] [
         dup [1,b] [
             euler044-step
