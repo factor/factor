@@ -110,7 +110,7 @@ multiply_overflow:
 
 /* We have to save and restore nonvolatile registers because
 the Factor compiler treats the entire register file as volatile. */
-DEF(void,c_to_factor,(CELL quot)):
+DEF(void,c_to_factor,(CELL quot, void *vm)):
 	PROLOGUE
 
 	SAVE_INT(r15,0)	   /* save GPRs */
@@ -163,14 +163,15 @@ DEF(void,c_to_factor,(CELL quot)):
         SAVE_V(v30,96)
         SAVE_V(v31,100)
 
+	/* r4 vm ptr preserved */
         mfvscr v0
         li r2,SAVE_AT(104)
         stvxl v0,r2,r1
         addi r2,r2,0xc
-        lwzx r4,r2,r1
-        lis r5,0x1
-        andc r4,r4,r5
-        stwx r4,r2,r1
+        lwzx r5,r2,r1
+        lis r6,0x1
+        andc r5,r5,r6
+        stwx r5,r2,r1
         subi r2,r2,0xc
         lvxl v0,r2,r1
         mtvscr v0
@@ -291,10 +292,11 @@ DEF(void,flush_icache,(void *start, int len)):
 	isync
 	blr
 
-DEF(void,primitive_inline_cache_miss,(void)):
+DEF(void,primitive_inline_cache_miss,(void *vm)):
 	mflr r6
-DEF(void,primitive_inline_cache_miss_tail,(void)):
+DEF(void,primitive_inline_cache_miss_tail,(void *vm)):
 	PROLOGUE
+	mr r4,r3          /* vm ptr in 2nd arg */
 	mr r3,r6
 	bl MANGLE(inline_cache_miss)
 	EPILOGUE
