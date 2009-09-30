@@ -16,6 +16,7 @@ IN: compiler.cfg.value-numbering.rewrite
 : vreg-small-constant? ( vreg -- ? )
     vreg>expr {
         [ constant-expr? ]
+        [ value>> fixnum? ]
         [ value>> small-enough? ]
     } 1&& ;
 
