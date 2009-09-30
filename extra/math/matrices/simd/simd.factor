@@ -20,7 +20,7 @@ M: matrix4 new-sequence 2drop matrix4 (struct) ; inline
 <PRIVATE
 
 : rows ( a -- a1 a2 a3 a4 )
-    rows>> first4 ; inline
+    rows>> 4 firstn ; inline
 
 :: set-rows ( c1 c2 c3 c4 c -- c )
     c rows>> :> rows
