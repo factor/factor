@@ -29,6 +29,10 @@ INSN: ##load-reference
 def: dst/int-rep
 constant: obj ;
 
+INSN: ##load-constant
+def: dst/int-rep
+constant: obj ;
+
 INSN: ##peek
 def: dst/int-rep
 literal: loc ;
