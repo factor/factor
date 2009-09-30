@@ -1,11 +1,11 @@
-! Copyrigt (C) 2009 Doug Coleman.
+! Copyrigt (C) 2009 Doug Coleman, Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators constructors destructors
-images images.loader io io.binary io.buffers
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.files.info io.ports io.streams.limited kernel make
-math math.bitwise math.functions multiline namespaces
-prettyprint sequences ;
+USING: accessors arrays assocs combinators compression.lzw
+constructors destructors grouping images images.loader io
+io.binary io.buffers io.encodings.binary io.encodings.string
+io.encodings.utf8 io.files io.files.info io.ports
+io.streams.limited kernel make math math.bitwise math.functions
+multiline namespaces prettyprint sequences ;
 IN: images.gif
 
 SINGLETON: gif-image
@@ -37,12 +37,10 @@ ERROR: unknown-extension n ;
 ERROR: gif-unexpected-eof ;
 
 TUPLE: graphics-control-extension
-label block-size raw-data
-packed delay-time color-index
-block-terminator ;
+flags delay-time transparent-color-index ;
 
 TUPLE: image-descriptor
-separator left top width height flags ;
+left top width height flags first-code-size ;
 
 TUPLE: plain-text-extension
 introducer label block-size text-grid-left text-grid-top text-grid-width
@@ -67,6 +65,8 @@ CONSTANT: graphic-control-extension HEX: f9
 CONSTANT: comment-extension HEX: fe
 CONSTANT: application-extension HEX: ff
 CONSTANT: trailer HEX: 3b
+CONSTANT: graphic-control-extension-block-size HEX: 04
+CONSTANT: block-terminator HEX: 00
 
 : <loading-gif> ( -- loading-gif )
     \ loading-gif new
@@ -92,18 +92,20 @@ M: input-port stream-peek1
 
 : read-image-descriptor ( -- image-descriptor )
     \ image-descriptor new
-        1 read le> >>separator
         2 read le> >>left
         2 read le> >>top
         2 read le> >>width
         2 read le> >>height
-        1 read le> >>flags ;
+        1 read le> >>flags
+        1 read le> 1 + >>first-code-size ;
 
 : read-graphic-control-extension ( -- graphic-control-extension )
     \ graphics-control-extension new
-        1 read le> [ >>block-size ] [ read ] bi
-        >>raw-data
-        1 read le> >>block-terminator ;
+        1 read le> graphic-control-extension-block-size assert=
+        1 read le> >>flags
+        2 read le> >>delay-time
+        1 read le> >>transparent-color-index
+        1 read le> block-terminator assert= ;
 
 : read-plain-text-extension ( -- plain-text-extension )
     \ plain-text-extension new
@@ -147,12 +149,14 @@ ERROR: unimplemented message ;
 : interlaced? ( image -- ? ) flags>> 6 bit? ; inline
 : sort? ( image -- ? ) flags>> 5 bit? ; inline
 : color-table-size ( image -- ? ) flags>> 3 bits 1 + 2^ 3 * ; inline
+: transparency? ( image -- ? )
+    graphic-control-extensions>> first flags>> 0 bit? ; inline
 
 : color-resolution ( image -- ? ) flags>> -4 shift 3 bits ; inline
 
 : read-global-color-table ( loading-gif -- loading-gif )
     dup color-table? [
-        dup color-table-size read >>global-color-table
+        dup color-table-size read 3 group >>global-color-table
     ] when ;
 
 : maybe-read-local-color-table ( loading-gif -- loading-gif )
@@ -220,8 +224,33 @@ ERROR: unhandled-data byte ;
         } case
     ] with-input-stream ;
 
-: loading-gif>image ( loading-gif -- image )
-    ;
+: decompress ( loading-gif -- indexes )
+    [ compressed-bytes>> ]
+    [ image-descriptor>> first-code-size>> ] bi
+    gif-lzw-uncompress ;
+
+: colorize ( index palette transparent-index/f -- seq )
+    pick = [ 2drop B{ 0 0 0 0 } ] [ nth 255 suffix ] if ;
+
+: apply-palette ( indexes palette transparent-index/f -- bitmap )
+    [ colorize ] 2curry V{ } map-as concat ;
+
+: dimensions ( loading-gif -- dim )
+    [ image-descriptor>> width>> ] [ image-descriptor>> height>> ] bi 2array ;
+
+: ?transparent-color-index ( loading-gif -- index/f )
+    dup transparency?
+    [ graphic-control-extensions>> first transparent-color-index>> ]
+    [ drop f ] if ;
+
+: gif>image ( loading-gif -- image )
+    [ <image> ] dip
+    [ dimensions >>dim ]
+    [ drop RGBA >>component-order ubyte-components >>component-type ]
+    [
+        [ decompress ] [ global-color-table>> ] [ ?transparent-color-index ] tri
+        apply-palette >>bitmap
+    ] tri ;
 
 ERROR: loading-gif-error gif-image ;
 
@@ -229,4 +258,4 @@ ERROR: loading-gif-error gif-image ;
     dup loading?>> [ loading-gif-error ] when ;
 
 M: gif-image stream>image ( path gif-image -- image )
-    drop load-gif ensure-loaded loading-gif>image ;
+    drop load-gif ensure-loaded gif>image ;
