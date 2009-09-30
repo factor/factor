@@ -177,21 +177,29 @@ CONSTANT: simd-classes
 : approx= ( x y -- ? )
     {
         { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
+        { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
         { [ 2dup [ sequence? ] both? ] [
             [
                 {
                     { [ 2dup [ fp-nan? ] both? ] [ 2drop t ] }
+                    { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
                     { [ 2dup [ fp-nan? ] either? not ] [ -1.e8 ~ ] }
                 } cond
             ] 2all?
         ] }
     } cond ;
 
+: exact= ( x y -- ? )
+    {
+        { [ 2dup [ float? ] both? ] [ fp-bitwise= ] }
+        { [ 2dup [ sequence? ] both? ] [ [ fp-bitwise= ] 2all? ] }
+    } cond ;
+
 : simd-classes&reps ( -- alist )
     simd-classes [
         {
             { [ dup name>> "float" head? ] [ float [ approx= ] ] }
-            { [ dup name>> "double" head? ] [ float [ = ] ] }
+            { [ dup name>> "double" head? ] [ float [ exact= ] ] }
             [ fixnum [ = ] ]
         } cond 3array
     ] map ;
