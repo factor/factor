@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
-USING: accessors combinators combinators.short-circuit
-definitions effects fry hints kernel kernel.private namespaces
+USING: accessors arrays combinators combinators.short-circuit
+definitions effects fry hints math kernel kernel.private namespaces
 parser quotations see.private sequences words
 locals locals.definitions locals.parser ;
 IN: typed
@@ -49,8 +49,11 @@ ERROR: output-mismatch-error < type-mismatch-error ;
     [ nip effect-in-types swap '[ _ declare @ ] ]
     [ effect-out-types dup typed-stack-effect? [ typed-outputs ] [ 2drop ] if ] 2bi ;
 
+: typed-gensym ( parent-word -- word )
+    name>> "( typed " " )" surround f <word> ;
+
 : define-typed-gensym ( word def effect -- gensym )
-    [ 3drop gensym dup ]
+    [ 2drop typed-gensym dup ]
     [ [ swap ] dip typed-gensym-quot ]
     [ 2nip ] 3tri define-declared ;
 
@@ -90,3 +93,4 @@ M: typed-lambda-word definer drop \ TYPED:: \ ; ;
 M: typed-word definition "typed-def" word-prop ;
 M: typed-word declarations. "typed-word" word-prop declarations. ;
 
+M: typed-word subwords "typed-word" word-prop 1array ;
