@@ -1,7 +1,8 @@
 ! (c)Joe Groff bsd license
-USING: accessors classes.struct kernel locals math math.functions
-math.matrices.simd math.vectors math.vectors.simd sequences
-sequences.private specialized-arrays typed ;
+USING: accessors classes.struct generalizations kernel locals
+math math.functions math.matrices.simd math.vectors
+math.vectors.simd sequences sequences.private specialized-arrays
+typed ;
 QUALIFIED-WITH: alien.c-types c
 SIMD: c:float
 SPECIALIZED-ARRAY: float-4
@@ -17,49 +18,42 @@ M: matrix4 nth-unsafe rows>> nth-unsafe ; inline
 M: matrix4 new-sequence 2drop matrix4 (struct) ; inline
 
 <PRIVATE
+
+: rows ( a -- a1 a2 a3 a4 )
+    rows>> first4 ; inline
+
+:: set-rows ( c1 c2 c3 c4 c -- c )
+    c rows>> :> rows
+    c1 rows set-first
+    c2 rows set-second
+    c3 rows set-third
+    c4 rows set-fourth
+    c ; inline
+
 :: 2map-rows ( a b quot -- c )
     matrix4 (struct) :> c
 
-    a rows>> first  :> a1
-    a rows>> second :> a2
-    a rows>> third  :> a3
-    a rows>> fourth :> a4
-    b rows>> first  :> b1
-    b rows>> second :> b2
-    b rows>> third  :> b3
-    b rows>> fourth :> b4
+    a rows :> a4 :> a3 :> a2 :> a1
+    b rows :> b4 :> b3 :> b2 :> b1
 
-    a1 b1 quot call :> c1
-    a2 b2 quot call :> c2
-    a3 b3 quot call :> c3
-    a4 b4 quot call :> c4
+    a1 b1 quot call
+    a2 b2 quot call
+    a3 b3 quot call
+    a4 b4 quot call
 
-    c1 c rows>> set-first
-    c2 c rows>> set-second
-    c3 c rows>> set-third
-    c4 c rows>> set-fourth
-
-    c ; inline
+    c set-rows ; inline
 
 :: map-rows ( a quot -- c )
     matrix4 (struct) :> c
 
-    a rows>> first  :> a1
-    a rows>> second :> a2
-    a rows>> third  :> a3
-    a rows>> fourth :> a4
+    a rows :> a4 :> a3 :> a2 :> a1
 
-    a1 quot call :> c1
-    a2 quot call :> c2
-    a3 quot call :> c3
-    a4 quot call :> c4
+    a1 quot call
+    a2 quot call
+    a3 quot call
+    a4 quot call
 
-    c1 c rows>> set-first
-    c2 c rows>> set-second
-    c3 c rows>> set-third
-    c4 c rows>> set-fourth
-
-    c ; inline
+    c set-rows ; inline
     
 PRIVATE>
 
@@ -76,41 +70,30 @@ TYPED: n/m4 ( a: float b: matrix4 -- c: matrix4 ) [ n/v ] with map-rows ;
 TYPED:: m4. ( a: matrix4 b: matrix4 -- c: matrix4 )
     matrix4 (struct) :> c
 
-    a rows>> first  :> a1
-    a rows>> second :> a2
-    a rows>> third  :> a3
-    a rows>> fourth :> a4
-    b rows>> first  :> b1
-    b rows>> second :> b2
-    b rows>> third  :> b3
-    b rows>> fourth :> b4
+    a rows :> a4 :> a3 :> a2 :> a1
+    b rows :> b4 :> b3 :> b2 :> b1
 
-    a1 { 0 0 0 0 } vshuffle b1 v* :> c1a
-    a2 { 0 0 0 0 } vshuffle b1 v* :> c2a
-    a3 { 0 0 0 0 } vshuffle b1 v* :> c3a
-    a4 { 0 0 0 0 } vshuffle b1 v* :> c4a
+    a1 first  b1 n*v :> c1a
+    a2 first  b1 n*v :> c2a
+    a3 first  b1 n*v :> c3a
+    a4 first  b1 n*v :> c4a
 
-    a1 { 1 1 1 1 } vshuffle b2 v* c1a v+ :> c1b 
-    a2 { 1 1 1 1 } vshuffle b2 v* c2a v+ :> c2b
-    a3 { 1 1 1 1 } vshuffle b2 v* c3a v+ :> c3b
-    a4 { 1 1 1 1 } vshuffle b2 v* c4a v+ :> c4b
+    a1 second b2 n*v c1a v+ :> c1b 
+    a2 second b2 n*v c2a v+ :> c2b
+    a3 second b2 n*v c3a v+ :> c3b
+    a4 second b2 n*v c4a v+ :> c4b
 
-    a1 { 2 2 2 2 } vshuffle b3 v* c1b v+ :> c1c 
-    a2 { 2 2 2 2 } vshuffle b3 v* c2b v+ :> c2c
-    a3 { 2 2 2 2 } vshuffle b3 v* c3b v+ :> c3c
-    a4 { 2 2 2 2 } vshuffle b3 v* c4b v+ :> c4c
+    a1 third  b3 n*v c1b v+ :> c1c 
+    a2 third  b3 n*v c2b v+ :> c2c
+    a3 third  b3 n*v c3b v+ :> c3c
+    a4 third  b3 n*v c4b v+ :> c4c
 
-    a1 { 3 3 3 3 } vshuffle b4 v* c1c v+ :> c1 
-    a2 { 3 3 3 3 } vshuffle b4 v* c2c v+ :> c2
-    a3 { 3 3 3 3 } vshuffle b4 v* c3c v+ :> c3
-    a4 { 3 3 3 3 } vshuffle b4 v* c4c v+ :> c4
+    a1 fourth b4 n*v c1c v+
+    a2 fourth b4 n*v c2c v+
+    a3 fourth b4 n*v c3c v+
+    a4 fourth b4 n*v c4c v+
 
-    c1 c rows>> set-first
-    c2 c rows>> set-second
-    c3 c rows>> set-third
-    c4 c rows>> set-fourth
-
-    c ;
+    c set-rows ;
 
 CONSTANT: identity-matrix4
     S{ matrix4 f
@@ -126,17 +109,13 @@ TYPED:: scale-matrix4 ( factors: float-4 -- matrix: matrix4 )
     matrix4 (struct) :> c
 
     factors { t t t f } vmask :> factors'
-    factors' { 0 3 3 3 } vshuffle :> c1
-    factors' { 3 1 3 3 } vshuffle :> c2
-    factors' { 3 3 2 3 } vshuffle :> c3
-    float-4{ 0.0 0.0 0.0 1.0 } :> c4
 
-    c1 c rows>> set-first
-    c2 c rows>> set-second
-    c3 c rows>> set-third
-    c4 c rows>> set-fourth
+    factors' { 0 3 3 3 } vshuffle
+    factors' { 3 1 3 3 } vshuffle
+    factors' { 3 3 2 3 } vshuffle
+    float-4{ 0.0 0.0 0.0 1.0 }
 
-    c ;
+    c set-rows ;
 
 : ortho-matrix4 ( factors -- matrix )
     float-4{ 1.0 1.0 1.0 1.0 } swap v/ scale-matrix4 ; inline
@@ -146,16 +125,13 @@ TYPED:: translation-matrix4 ( offset: float-4 -- matrix: matrix4 )
 
     float-4{ 0.0 0.0 0.0 1.0 } :> c4
     { t t t f } offset c4 v? :> offset'
-    offset' { 3 3 3 0 } vshuffle { t f f t } vmask :> c1
-    offset' { 3 3 3 1 } vshuffle { f t f t } vmask :> c2
-    offset' { 3 3 3 2 } vshuffle { f f t t } vmask :> c3
 
-    c1 c rows>> set-first
-    c2 c rows>> set-second
-    c3 c rows>> set-third
-    c4 c rows>> set-fourth
+    offset' { 3 3 3 0 } vshuffle { t f f t } vmask
+    offset' { 3 3 3 1 } vshuffle { f t f t } vmask
+    offset' { 3 3 3 2 } vshuffle { f f t t } vmask
+    c4
 
-    c ;
+    c set-rows ;
 
 TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
     !   x*x + c*(1.0 - x*x)   x*y*(1.0 - c) - s*z   x*z*(1.0 - c) + s*y   0
@@ -183,34 +159,27 @@ TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
     triangle-a triangle-b v- :> triangle-hi
 
     diagonal scale-matrix4 :> diagonal-m
-    triangle-hi { 3 0 1 3 } vshuffle :> tri1
-    triangle-hi { 3 3 2 3 } vshuffle
-    triangle-lo { 0 3 3 3 } vshuffle v+ :> tri2
-    triangle-lo { 1 2 3 3 } vshuffle :> tri3
-    tri1 triangle-m rows>> set-first
-    tri2 triangle-m rows>> set-second
-    tri3 triangle-m rows>> set-third
-    float-4 new triangle-m rows>> set-fourth
+
+    triangle-hi { 3 0 1 3 } vshuffle
+    triangle-hi { 3 3 2 3 } vshuffle triangle-lo { 0 3 3 3 } vshuffle v+
+    triangle-lo { 1 2 3 3 } vshuffle
+    float-4 new
+
+    triangle-m set-rows drop
 
     diagonal-m triangle-m m4+ ;
 
 TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 )
     matrix4 (struct) :> c
 
-    float-4{ 0.0 0.0 -1.0 0.0 } :> c4
-
     near near near far + 2 near far * * float-4-boa :> num
     { t t f f } xy near far - float-4-with v? :> denom
     num denom v/ :> fov
 
-    fov { 0 0 0 0 } vshuffle { t f f f } vmask :> c1
-    fov { 1 1 1 1 } vshuffle { f t f f } vmask :> c2
-    fov { 2 2 2 3 } vshuffle { f f t t } vmask :> c3
+    fov { 0 0 0 0 } vshuffle { t f f f } vmask
+    fov { 1 1 1 1 } vshuffle { f t f f } vmask
+    fov { 2 2 2 3 } vshuffle { f f t t } vmask
+    float-4{ 0.0 0.0 -1.0 0.0 }
 
-    c1 c rows>> set-first
-    c2 c rows>> set-second
-    c3 c rows>> set-third
-    c4 c rows>> set-fourth
-
-    c ;
+    c set-rows ;
 
