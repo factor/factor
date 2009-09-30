@@ -2,11 +2,15 @@ USING: help.markup help.syntax math kernel sequences ;
 IN: random
 
 HELP: seed-random
-{ $values { "tuple" "a random number generator" } { "seed" "an integer between 0 and 2^32-1" } }
-{ $description "Seed the random number generator." }
+{ $values
+    { "tuple" "a random number generator" }
+    { "seed" "a seed specific to the random number generator" }
+    { "tuple'" "a random number generator" }
+}
+{ $description "Seed the random number generator. Repeatedly seeding the random number generator should provide the same sequence of random numbers." }
 { $notes "Not supported on all random number generators." } ;
 
-HELP: random-32*
+HELP: random-32
 { $values { "tuple" "a random number generator" } { "r" "an integer between 0 and 2^32-1" } }
 { $description "Generates a random 32-bit unsigned integer." } ;
 
@@ -92,7 +96,7 @@ HELP: delete-random
 
 ARTICLE: "random-protocol" "Random protocol"
 "A random number generator must implement one of these two words:"
-{ $subsection random-32* }
+{ $subsection random-32 }
 { $subsection random-bytes* }
 "Optional, to seed a random number generator:"
 { $subsection seed-random } ;
