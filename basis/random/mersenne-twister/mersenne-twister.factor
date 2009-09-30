@@ -62,15 +62,21 @@ PRIVATE>
     init-mt-seq 0 mersenne-twister boa
     dup mt-generate ;
 
-M: mersenne-twister seed-random ( mt seed -- )
-    init-mt-seq >>seq drop ;
+M: mersenne-twister seed-random ( mt seed -- mt' )
+    init-mt-seq >>seq
+    [ mt-generate ]
+    [ 0 >>i drop ]
+    [ ] tri ;
 
-M: mersenne-twister random-32* ( mt -- r )
+M: mersenne-twister random-32 ( mt -- r )
     [ next-index ]
     [ seq>> nth-unsafe mt-temper ]
     [ [ 1 + ] change-i drop ] tri ;
 
-[
+: default-mersenne-twister ( -- mersenne-twister )
     [ 32 random-bits ] with-system-random
-    <mersenne-twister> random-generator set-global
+    <mersenne-twister> ;
+
+[
+    default-mersenne-twister random-generator set-global
 ] "bootstrap.random" add-init-hook

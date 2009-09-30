@@ -10,19 +10,19 @@ SYMBOL: system-random-generator
 SYMBOL: secure-random-generator
 SYMBOL: random-generator
 
-GENERIC: seed-random ( tuple seed -- )
-GENERIC: random-32* ( tuple -- r )
+GENERIC# seed-random 1 ( tuple seed -- tuple' )
+GENERIC: random-32 ( tuple -- r )
 GENERIC: random-bytes* ( n tuple -- byte-array )
 
 M: object random-bytes* ( n tuple -- byte-array )
     [ [ <byte-vector> ] keep 4 /mod ] dip
-    [ pick '[ _ random-32* 4 >le _ push-all ] times ]
+    [ pick '[ _ random-32 4 >le _ push-all ] times ]
     [
         over zero?
-        [ 2drop ] [ random-32* 4 >le swap head over push-all ] if
+        [ 2drop ] [ random-32 4 >le swap head over push-all ] if
     ] bi-curry bi* ;
 
-M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
+M: object random-32 ( tuple -- r ) 4 random-bytes* le> ;
 
 ERROR: no-random-number-generator ;
 
@@ -31,7 +31,7 @@ M: no-random-number-generator summary
 
 M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
 
-M: f random-32* ( obj -- * ) no-random-number-generator ;
+M: f random-32 ( obj -- * ) no-random-number-generator ;
 
 : random-bytes ( n -- byte-array )
     random-generator get random-bytes* ;
