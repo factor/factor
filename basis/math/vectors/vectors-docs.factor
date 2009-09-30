@@ -31,7 +31,13 @@ $nl
 { $subsection vs+ }
 { $subsection vs- }
 { $subsection vs* }
-"Comparisons:"
+"Componentwise vector operations:"
+{ $subsection v< }
+{ $subsection v<= }
+{ $subsection v= }
+{ $subsection v>= }
+{ $subsection v> }
+{ $subsection vunordered? }
 { $subsection vmax }
 { $subsection vmin }
 "Bitwise operations:"
@@ -41,6 +47,12 @@ $nl
 { $subsection vbitxor }
 { $subsection vlshift }
 { $subsection vrshift }
+"Componentwise logical operations:"
+{ $subsection vand }
+{ $subsection vor }
+{ $subsection vxor }
+{ $subsection vmask }
+{ $subsection v? }
 "Shuffling:"
 { $subsection vshuffle }
 "Inner product and norm:"
@@ -48,7 +60,7 @@ $nl
 { $subsection norm }
 { $subsection norm-sq }
 { $subsection normalize }
-"Comparing vectors:"
+"Comparing entire vectors:"
 { $subsection distance }
 { $subsection v~ }
 "Other functions:"
@@ -155,12 +167,12 @@ HELP: v/
 
 HELP: vmax
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
-{ $description "Creates a sequence where each element is the maximum of the corresponding elements from " { $snippet "u" } " andd " { $snippet "v" } "." }
+{ $description "Creates a sequence where each element is the maximum of the corresponding elements from " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 5 } { -7 6 3 } vmax ." "{ 1 6 5 }" } } ;
 
 HELP: vmin
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
-{ $description "Creates a sequence where each element is the minimum of the corresponding elements from " { $snippet "u" } " andd " { $snippet "v" } "." }
+{ $description "Creates a sequence where each element is the minimum of the corresponding elements from " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 5 } { -7 6 3 } vmin ." "{ -7 2 3 }" } } ;
 
 HELP: v.
@@ -278,8 +290,60 @@ HELP: set-axis
 { $description "Using " { $snippet "w" } " as a template, creates a new sequence containing corresponding elements from " { $snippet "u" } " in place of 0, and corresponding elements from " { $snippet "v" } " in place of 1." }
 { $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 3 } { 4 5 6 } { 0 1 0 } set-axis ." "{ 1 5 3 }" } } ;
 
+HELP: v<
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is less than the latter or " { $link f } " otherwise." } ;
+
+HELP: v<=
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is less than or equal to the latter or " { $link f } " otherwise." } ;
+
+HELP: v=
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when they are equal or " { $link f } " otherwise." } ;
+
+HELP: v>
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is greater than the latter or " { $link f } " otherwise." } ;
+
+HELP: v>=
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is greater than or equal to the latter or " { $link f } " otherwise." } ;
+
+HELP: vunordered?
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when either value is Not-a-Number or " { $link f } " otherwise." } ;
+
+HELP: vand
+{ $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $description "Takes the logical AND of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." } ;
+
+HELP: vor
+{ $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $description "Takes the logical OR of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." } ;
+
+HELP: vxor
+{ $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $description "Takes the logical XOR of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." } ;
+
+HELP: vnot
+{ $values { "u" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $description "Takes the logical NOT of each element of " { $snippet "u" } "." } ;
+
+HELP: vmask
+{ $values { "u" "a sequence of numbers" } { "?" "a sequence of booleans" } { "u'" "a sequence of numbers" } }
+{ $description "Returns a copy of " { $snippet "u" } " with the elements for which the corresponding element of " { $snippet "?" } " is false replaced by zero." } ;
+
+HELP: v?
+{ $values { "?" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding element of the " { $snippet "?" } " sequence is true or false." } ;
+
 { 2map v+ v- v* v/ } related-words
 
 { 2reduce v. } related-words
 
 { vs+ vs- vs* } related-words
+
+{ v< v<= v= v> v>= vunordered? vand vor vxor vnot vmask v? } related-words
+
+{ vbitand vbitandn vbitor vbitxor vbitnot } related-words
