@@ -68,7 +68,7 @@ M: mersenne-twister seed-random ( mt seed -- mt' )
     [ 0 >>i drop ]
     [ ] tri ;
 
-M: mersenne-twister random-32 ( mt -- r )
+M: mersenne-twister random-32* ( mt -- r )
     [ next-index ]
     [ seq>> nth-unsafe mt-temper ]
     [ [ 1 + ] change-i drop ] tri ;

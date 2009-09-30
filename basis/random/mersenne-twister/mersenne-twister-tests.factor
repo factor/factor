@@ -16,11 +16,11 @@ IN: random.mersenne-twister.tests
 [ f ] [ 1234 [ randoms randoms = ] test-rng ] unit-test
 
 [ 1333075495 ] [
-    0 [ 1000 [ drop random-generator get random-32 drop ] each random-generator get random-32 ] test-rng
+    0 [ 1000 [ drop random-generator get random-32* drop ] each random-generator get random-32* ] test-rng
 ] unit-test
 
 [ 1575309035 ] [
-    0 [ 10000 [ drop random-generator get random-32 drop ] each random-generator get random-32 ] test-rng
+    0 [ 10000 [ drop random-generator get random-32* drop ] each random-generator get random-32* ] test-rng
 ] unit-test
 
 
@@ -31,5 +31,5 @@ IN: random.mersenne-twister.tests
 [ t ]
 [
     1234 <mersenne-twister>
-    [ random-32 ] [ 1234 seed-random random-32 ] bi =
+    [ random-32* ] [ 1234 seed-random random-32* ] bi =
 ] unit-test
