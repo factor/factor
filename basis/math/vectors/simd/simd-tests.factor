@@ -6,7 +6,7 @@ tools.test vocabs assocs compiler.cfg.debugger words
 locals math.vectors.specialization combinators cpu.architecture
 math.vectors.simd.intrinsics namespaces byte-arrays alien
 specialized-arrays classes.struct eval classes.algebra sets
-quotations ;
+quotations math.constants ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 SIMD: c:char
@@ -124,6 +124,10 @@ CONSTANT: simd-classes
     ] [ = ] check-optimizer
 ] unit-test
 
+[ HEX: ffffffff ] [ HEX: ffffffff uint-4-with first ] unit-test
+
+[ HEX: ffffffff ] [ HEX: ffffffff [ uint-4-with ] compile-call first ] unit-test
+
 "== Checking -boa constructors" print
 
 [ { } ] [
@@ -132,6 +136,8 @@ CONSTANT: simd-classes
         '[ _ execute ]
     ] [ = ] check-optimizer
 ] unit-test
+
+[ HEX: ffffffff ] [ HEX: ffffffff 2 3 4 [ uint-4-boa ] compile-call first ] unit-test
 
 "== Checking vector operations" print
 
@@ -155,7 +161,7 @@ CONSTANT: simd-classes
 
 : remove-special-words ( alist -- alist' )
     ! These have their own tests later
-    { hlshift hrshift vshuffle } unique assoc-diff ;
+    { hlshift hrshift vshuffle vbroadcast } unique assoc-diff ;
 
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
@@ -263,6 +269,9 @@ simd-classes [
 [ { } ] [ int-4{ HEX: 7fffffff 3 4 -8 } test-accesses ] unit-test
 [ { } ] [ uint-4{ HEX: ffffffff 2 3 4 } test-accesses ] unit-test
 
+[ HEX: 7fffffff ] [ int-4{ HEX: 7fffffff 3 4 -8 } first ] unit-test
+[ HEX: ffffffff ] [ uint-4{ HEX: ffffffff 2 3 4 } first ] unit-test
+
 [ { } ] [ double-2{ 1.0 2.0 } test-accesses ] unit-test
 [ { } ] [ longlong-2{ 1 2 } test-accesses ] unit-test
 [ { } ] [ ulonglong-2{ 1 2 } test-accesses ] unit-test
@@ -274,6 +283,27 @@ simd-classes [
 [ { } ] [ double-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
 [ { } ] [ longlong-4{ 1 2 3 4 } test-accesses ] unit-test
 [ { } ] [ ulonglong-4{ 1 2 3 4 } test-accesses ] unit-test
+
+"== Checking broadcast" print
+: test-broadcast ( seq -- failures )
+    [ length >array ] keep
+    '[ [ _ 1quotation ] dip '[ _ vbroadcast ] ] [ = ] check-optimizer ; inline
+
+[ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test
+[ { } ] [ int-4{ HEX: 7fffffff 3 4 -8 } test-broadcast ] unit-test
+[ { } ] [ uint-4{ HEX: ffffffff 2 3 4 } test-broadcast ] unit-test
+
+[ { } ] [ double-2{ 1.0 2.0 } test-broadcast ] unit-test
+[ { } ] [ longlong-2{ 1 2 } test-broadcast ] unit-test
+[ { } ] [ ulonglong-2{ 1 2 } test-broadcast ] unit-test
+
+[ { } ] [ float-8{ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 } test-broadcast ] unit-test
+[ { } ] [ int-8{ 1 2 3 4 5 6 7 8 } test-broadcast ] unit-test
+[ { } ] [ uint-8{ 1 2 3 4 5 6 7 8 } test-broadcast ] unit-test
+
+[ { } ] [ double-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test
+[ { } ] [ longlong-4{ 1 2 3 4 } test-broadcast ] unit-test
+[ { } ] [ ulonglong-4{ 1 2 3 4 } test-broadcast ] unit-test
 
 "== Checking alien operations" print
 
@@ -344,8 +374,25 @@ STRUCT: simd-struct
 
 [ ] [ char-16 new 1array stack. ] unit-test
 
-! Other regressions
+! CSSA bug
 [ 8000000 ] [
     int-8{ 1000 1000 1000 1000 1000 1000 1000 1000 }
     [ { int-8 } declare dup [ * ] [ + ] 2map-reduce ] compile-call
+] unit-test
+
+! Coalescing was too aggressive
+:: broken ( axis theta -- a b c )
+   axis { float-4 } declare drop
+   theta { float } declare drop
+
+   theta cos float-4-with :> cc
+   theta sin float-4-with :> ss
+   
+   axis cc v+ :> diagonal
+
+   diagonal cc ss ; inline
+
+[ t ] [
+    float-4{ 1.0 0.0 1.0 0.0 } pi [ broken 3array ]
+    [ compile-call ] [ call ] 3bi =
 ] unit-test
