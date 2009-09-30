@@ -409,6 +409,20 @@ IN: compiler.cfg.value-numbering.tests
 [
     {
         T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare f 2 0 1 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare f 2 0 1 cc= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
         T{ ##load-immediate f 1 100 }
         T{ ##compare-imm f 2 0 100 cc>= }
     }
@@ -432,6 +446,20 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##load-immediate f 1 100 }
         T{ ##compare-branch f 0 1 cc<= }
     } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare-branch f 0 1 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare-branch f 0 1 cc= }
+    } value-numbering-step trim-temps
 ] unit-test
 
 [
