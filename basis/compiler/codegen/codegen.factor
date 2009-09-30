@@ -110,6 +110,7 @@ SYNTAX: CODEGEN:
 
 CODEGEN: ##load-immediate %load-immediate
 CODEGEN: ##load-reference %load-reference
+CODEGEN: ##load-constant %load-reference
 CODEGEN: ##peek %peek
 CODEGEN: ##replace %replace
 CODEGEN: ##inc-d %inc-d

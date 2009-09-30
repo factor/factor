@@ -14,10 +14,10 @@ C: <constant> constant-expr
 
 M: constant-expr equal?
     over constant-expr? [
-        {
-            [ [ value>> class ] bi@ = ]
-            [ [ value>> ] bi@ = ]
-        } 2&&
+        [ value>> ] bi@
+        2dup [ float? ] both? [ fp-bitwise= ] [
+            { [ [ class ] bi@ = ] [ = ] } 2&&
+        ] if
     ] [ 2drop f ] if ;
 
 TUPLE: reference-expr < expr value ;
@@ -25,13 +25,7 @@ TUPLE: reference-expr < expr value ;
 C: <reference> reference-expr
 
 M: reference-expr equal?
-    over reference-expr? [
-        [ value>> ] bi@ {
-            { [ 2dup eq? ] [ 2drop t ] }
-            { [ 2dup [ float? ] both? ] [ fp-bitwise= ] }
-            [ 2drop f ]
-        } cond
-    ] [ 2drop f ] if ;
+    over reference-expr? [ [ value>> ] bi@ eq? ] [ 2drop f ] if ;
 
 : constant>vn ( constant -- vn ) <constant> expr>vn ; inline
 
@@ -42,6 +36,8 @@ M: insn >expr drop next-input-expr ;
 M: ##load-immediate >expr val>> <constant> ;
 
 M: ##load-reference >expr obj>> <reference> ;
+
+M: ##load-constant >expr obj>> <constant> ;
 
 <<
 
