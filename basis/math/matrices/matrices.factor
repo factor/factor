@@ -104,6 +104,8 @@ IN: math.matrices
 : m.v ( m v -- v ) [ v. ] curry map ;
 : m.  ( m m -- m ) flip [ swap m.v ] curry map ;
 
+: m~  ( m m epsilon -- ? ) [ v~ ] curry 2all? ;
+
 : mmin ( m -- n ) [ 1/0. ] dip [ [ min ] each ] each ;
 : mmax ( m -- n ) [ -1/0. ] dip [ [ max ] each ] each ;
 : mnorm ( m -- n ) dup mmax abs m/n ;
