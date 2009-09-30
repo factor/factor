@@ -33,10 +33,10 @@ IN: compiler.cfg.intrinsics.alien
     [ second class>> fixnum class<= ]
     bi and ;
 
-: prepare-alien-accessor ( info -- offset-vreg )
-    class>> [ 2inputs ^^untag-fixnum swap ] dip ^^unbox-c-ptr ^^add ;
+: prepare-alien-accessor ( info -- ptr-vreg offset )
+    class>> [ 2inputs ^^untag-fixnum swap ] dip ^^unbox-c-ptr ^^add 0 ;
 
-: prepare-alien-getter ( infos -- offset-vreg )
+: prepare-alien-getter ( infos -- ptr-vreg offset )
     first prepare-alien-accessor ;
 
 : inline-alien-getter ( node quot -- )
@@ -49,7 +49,7 @@ IN: compiler.cfg.intrinsics.alien
     [ third class>> fixnum class<= ]
     tri and and ;
 
-: prepare-alien-setter ( infos -- offset-vreg )
+: prepare-alien-setter ( infos -- ptr-vreg offset )
     second prepare-alien-accessor ;
 
 : inline-alien-integer-setter ( node quot -- )
