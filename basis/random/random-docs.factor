@@ -2,8 +2,12 @@ USING: help.markup help.syntax math kernel sequences ;
 IN: random
 
 HELP: seed-random
-{ $values { "tuple" "a random number generator" } { "seed" "an integer between 0 and 2^32-1" } }
-{ $description "Seed the random number generator." }
+{ $values
+    { "tuple" "a random number generator" }
+    { "seed" "a seed specific to the random number generator" }
+    { "tuple'" "a random number generator" }
+}
+{ $description "Seed the random number generator. Repeatedly seeding the random number generator should provide the same sequence of random numbers." }
 { $notes "Not supported on all random number generators." } ;
 
 HELP: random-32*
@@ -28,6 +32,10 @@ HELP: random
         "{ heads tails } random ."
         "heads" }
 } ;
+
+HELP: random-32
+{ $values { "elt" "a 32-bit random integer" } }
+{ $description "Outputs 32 random bits. This word is more efficient than calling " { $link random } " because no scaling is done on the output." } ;
 
 HELP: random-bytes
 { $values { "n" "an integer" } { "byte-array" "a random integer" } }
@@ -104,6 +112,8 @@ $nl
 $nl
 "Generate a random object:"
 { $subsection random }
+"Efficient 32-bit random numbers:"
+{ $subsection random-32 }
 "Combinators to change the random number generator:"
 { $subsection with-random }
 { $subsection with-system-random }

@@ -181,20 +181,22 @@ M: word link-long-text
 
 : >topic ( obj -- topic ) dup topic? [ >link ] unless ;
 
+: topic-span ( topic quot -- ) [ >topic ] dip ($span) ; inline
+
 PRIVATE>
 
-: ($link) ( topic -- ) >topic link-text ;
+: ($link) ( topic -- ) [ link-text ] topic-span ;
 : $link ( element -- ) first ($link) ;
 
-: ($long-link) ( topic -- ) >topic link-long-text ;
+: ($long-link) ( topic -- ) [ link-long-text ] topic-span ;
 : $long-link ( element -- ) first ($long-link) ;
 
 : ($pretty-link) ( topic -- )
-    >topic [ link-icon ] [ drop bl ] [ link-text ] tri ;
+    [ [ link-icon ] [ drop bl ] [ link-text ] tri ] topic-span ;
 : $pretty-link ( element -- ) first ($pretty-link) ;
 
 : ($long-pretty-link) ( topic -- )
-    >topic [ link-icon ] [ drop bl ] [ link-long-text ] tri ;
+    [ [ link-icon ] [ drop bl ] [ link-long-text ] tri ] topic-span ;
 
 : <$pretty-link> ( definition -- element )
     1array \ $pretty-link prefix ;
