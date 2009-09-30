@@ -114,6 +114,14 @@ M: float-rep rep-size drop 4 ;
 M: double-rep rep-size drop 8 ;
 M: stack-params rep-size drop cell ;
 M: vector-rep rep-size drop 16 ;
+M: char-scalar-rep rep-size drop 1 ;
+M: uchar-scalar-rep rep-size drop 1 ;
+M: short-scalar-rep rep-size drop 2 ;
+M: ushort-scalar-rep rep-size drop 2 ;
+M: int-scalar-rep rep-size drop 4 ;
+M: uint-scalar-rep rep-size drop 4 ;
+M: longlong-scalar-rep rep-size drop 8 ;
+M: ulonglong-scalar-rep rep-size drop 8 ;
 
 GENERIC: rep-component-type ( rep -- n )
 
@@ -277,24 +285,24 @@ HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
 HOOK: %box-alien cpu ( dst src temp -- )
 HOOK: %box-displaced-alien cpu ( dst displacement base temp1 temp2 base-class -- )
 
-HOOK: %alien-unsigned-1 cpu ( dst src -- )
-HOOK: %alien-unsigned-2 cpu ( dst src -- )
-HOOK: %alien-unsigned-4 cpu ( dst src -- )
-HOOK: %alien-signed-1   cpu ( dst src -- )
-HOOK: %alien-signed-2   cpu ( dst src -- )
-HOOK: %alien-signed-4   cpu ( dst src -- )
-HOOK: %alien-cell       cpu ( dst src -- )
-HOOK: %alien-float      cpu ( dst src -- )
-HOOK: %alien-double     cpu ( dst src -- )
-HOOK: %alien-vector     cpu ( dst src rep -- )
+HOOK: %alien-unsigned-1 cpu ( dst src offset -- )
+HOOK: %alien-unsigned-2 cpu ( dst src offset -- )
+HOOK: %alien-unsigned-4 cpu ( dst src offset -- )
+HOOK: %alien-signed-1   cpu ( dst src offset -- )
+HOOK: %alien-signed-2   cpu ( dst src offset -- )
+HOOK: %alien-signed-4   cpu ( dst src offset -- )
+HOOK: %alien-cell       cpu ( dst src offset -- )
+HOOK: %alien-float      cpu ( dst src offset -- )
+HOOK: %alien-double     cpu ( dst src offset -- )
+HOOK: %alien-vector     cpu ( dst src offset rep -- )
 
-HOOK: %set-alien-integer-1 cpu ( ptr value -- )
-HOOK: %set-alien-integer-2 cpu ( ptr value -- )
-HOOK: %set-alien-integer-4 cpu ( ptr value -- )
-HOOK: %set-alien-cell      cpu ( ptr value -- )
-HOOK: %set-alien-float     cpu ( ptr value -- )
-HOOK: %set-alien-double    cpu ( ptr value -- )
-HOOK: %set-alien-vector    cpu ( ptr value rep -- )
+HOOK: %set-alien-integer-1 cpu ( ptr offset value -- )
+HOOK: %set-alien-integer-2 cpu ( ptr offset value -- )
+HOOK: %set-alien-integer-4 cpu ( ptr offset value -- )
+HOOK: %set-alien-cell      cpu ( ptr offset value -- )
+HOOK: %set-alien-float     cpu ( ptr offset value -- )
+HOOK: %set-alien-double    cpu ( ptr offset value -- )
+HOOK: %set-alien-vector    cpu ( ptr offset value rep -- )
 
 HOOK: %alien-global cpu ( dst symbol library -- )
 HOOK: %vm-field-ptr cpu ( dst fieldname -- )

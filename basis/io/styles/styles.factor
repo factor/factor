@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables io io.streams.plain io.streams.string
-colors summary make accessors splitting math.order
-kernel namespaces assocs destructors strings sequences
-present fry strings.tables delegate delegate.protocols ;
+USING: accessors assocs colors colors.constants delegate
+delegate.protocols destructors fry hashtables io
+io.streams.plain io.streams.string kernel make math.order
+namespaces present sequences splitting strings strings.tables
+summary ;
 IN: io.styles
 
 GENERIC: stream-format ( str style stream -- )
@@ -162,3 +163,9 @@ M: input summary
 : write-object ( str obj -- ) presented associate format ;
 
 : write-image ( image -- ) [ "" ] dip image associate format ;
+
+SYMBOL: stack-effect-style
+H{
+    { foreground COLOR: FactorDarkGreen }
+    { font-style plain }
+} stack-effect-style set-global

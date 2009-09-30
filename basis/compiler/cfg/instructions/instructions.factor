@@ -29,6 +29,10 @@ INSN: ##load-reference
 def: dst/int-rep
 constant: obj ;
 
+INSN: ##load-constant
+def: dst/int-rep
+constant: obj ;
+
 INSN: ##peek
 def: dst/int-rep
 literal: loc ;
@@ -464,65 +468,88 @@ use: src/int-rep ;
 ! Alien accessors
 INSN: ##alien-unsigned-1
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-unsigned-2
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-unsigned-4
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-signed-1
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-signed-2
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-signed-4
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-cell
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-float
 def: dst/float-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-double
 def: dst/double-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-vector
 def: dst
 use: src/int-rep
-literal: rep ;
+literal: offset rep ;
 
 INSN: ##set-alien-integer-1
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-integer-2
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-integer-4
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-cell
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-float
-use: src/int-rep value/float-rep ;
+use: src/int-rep
+literal: offset
+use: value/float-rep ;
 
 INSN: ##set-alien-double
-use: src/int-rep value/double-rep ;
+use: src/int-rep
+literal: offset
+use: value/double-rep ;
 
 INSN: ##set-alien-vector
-use: src/int-rep value
+use: src/int-rep
+literal: offset
+use: value
 literal: rep ;
 
 ! Memory allocation

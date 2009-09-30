@@ -1,39 +1,37 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors assocs byte-arrays combinators
-io.encodings.binary io.streams.byte-array kernel math sequences
-vectors ;
+USING: accessors combinators io kernel math namespaces
+prettyprint sequences vectors ;
+QUALIFIED-WITH: bitstreams bs
 IN: compression.lzw
 
-QUALIFIED-WITH: bitstreams bs
+TUPLE: lzw
+input
+output
+table
+code
+old-code
+initial-code-size
+code-size
+clear-code
+end-of-information-code ;
 
-CONSTANT: clear-code 256
-CONSTANT: end-of-information 257
+TUPLE: tiff-lzw < lzw ;
+TUPLE: gif-lzw < lzw ;
 
-TUPLE: lzw input output table code old-code ;
-
-SYMBOL: table-full
-
-: lzw-bit-width ( n -- n' )
-    {
-        { [ dup 510 <= ] [ drop 9 ] }
-        { [ dup 1022 <= ] [ drop 10 ] }
-        { [ dup 2046 <= ] [ drop 11 ] }
-        { [ dup 4094 <= ] [ drop 12 ] }
-        [ drop table-full ]
-    } cond ;
-
-: lzw-bit-width-uncompress ( lzw -- n )
-    table>> length lzw-bit-width ;
-
-: initial-uncompress-table ( -- seq )
-    258 iota [ 1vector ] V{ } map-as ;
+: initial-uncompress-table ( size -- seq )
+    iota [ 1vector ] V{ } map-as ;
 
 : reset-lzw-uncompress ( lzw -- lzw )
-    initial-uncompress-table >>table ;
+    dup end-of-information-code>> 1 + initial-uncompress-table >>table
+    dup initial-code-size>> >>code-size ;
 
-: <lzw-uncompress> ( input -- obj )
-    lzw new
+: <lzw-uncompress> ( input code-size class -- obj )
+    new
+        swap >>code-size
+        dup code-size>> >>initial-code-size
+        dup code-size>> 1 - 2^ >>clear-code
+        dup clear-code>> 1 + >>end-of-information-code
         swap >>input
         BV{ } clone >>output
         reset-lzw-uncompress ;
@@ -55,22 +53,43 @@ ERROR: not-in-table value ;
 : write-code ( lzw -- )
     [ lookup-code ] [ output>> ] bi push-all ;
 
-: add-to-table ( seq lzw -- ) table>> push ;
+GENERIC: code-space-full? ( lzw -- ? )
+
+: size-and-limit ( lzw -- m n ) [ table>> length ] [ code-size>> 2^ ] bi ;
+
+M: tiff-lzw code-space-full? size-and-limit 1 - = ;
+M: gif-lzw code-space-full? size-and-limit = ;
+
+: maybe-increment-code-size ( lzw -- lzw )
+    dup code-space-full? [ [ 1 + ] change-code-size ] when ;
+
+: add-to-table ( seq lzw -- )
+    [ table>> push ]
+    [ maybe-increment-code-size 2drop ] 2bi ;
 
 : lzw-read ( lzw -- lzw n )
-    [ ] [ lzw-bit-width-uncompress ] [ input>> ] tri bs:read ;
+    [ ] [ code-size>> ] [ input>> ] tri bs:read ;
+
+: end-of-information? ( lzw code -- ? ) swap end-of-information-code>> = ;
+: clear-code? ( lzw code -- ? ) swap clear-code>> = ;
+
+DEFER: handle-clear-code
+: lzw-process-next-code ( lzw quot: ( lzw code -- ) -- )
+    [ lzw-read ] dip {
+        { [ 3dup drop end-of-information? ] [ 3drop ] }
+        { [ 3dup drop clear-code? ] [ 2drop handle-clear-code ] }
+        [ call( lzw code -- ) ]
+    } cond ; inline
 
 DEFER: lzw-uncompress-char
 : handle-clear-code ( lzw -- )
     reset-lzw-uncompress
-    lzw-read dup end-of-information = [
-        2drop
-    ] [
+    [
         >>code
         [ write-code ]
         [ code>old-code ] bi
         lzw-uncompress-char
-    ] if ;
+    ] lzw-process-next-code ;
 
 : handle-uncompress-code ( lzw -- lzw )
     dup code-in-table? [
@@ -89,23 +108,15 @@ DEFER: lzw-uncompress-char
     ] if ;
     
 : lzw-uncompress-char ( lzw -- )
-    lzw-read [
-        >>code
-        dup code>> end-of-information = [
-            drop
-        ] [
-            dup code>> clear-code = [
-                handle-clear-code
-            ] [
-                handle-uncompress-code
-                lzw-uncompress-char
-            ] if
-        ] if
-    ] [
-        drop
-    ] if* ;
+    [ >>code handle-uncompress-code lzw-uncompress-char ]
+    lzw-process-next-code ;
 
-: lzw-uncompress ( seq -- byte-array )
-    bs:<msb0-bit-reader>
+: lzw-uncompress ( bitstream code-size class -- byte-array )
     <lzw-uncompress>
     [ lzw-uncompress-char ] [ output>> ] bi ;
+
+: tiff-lzw-uncompress ( seq -- byte-array )
+    bs:<msb0-bit-reader> 9 tiff-lzw lzw-uncompress ;
+
+: gif-lzw-uncompress ( seq code-size -- byte-array )
+    [ bs:<lsb0-bit-reader> ] dip gif-lzw lzw-uncompress ;
