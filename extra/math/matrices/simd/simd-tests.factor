@@ -1,7 +1,8 @@
 ! (c)Joe Groff bsd license
 USING: classes.struct math.matrices.simd math.vectors.simd
-specialized-arrays tools.test ;
+literals math.constants math.functions specialized-arrays tools.test ;
 QUALIFIED-WITH: alien.c-types c
+FROM: math.matrices => m~ ;
 SIMD: c:float
 SPECIALIZED-ARRAY: float-4
 IN: math.matrices.simd.tests
@@ -38,6 +39,19 @@ IN: math.matrices.simd.tests
         }
     }
 ] [ float-4{ 3.0 4.0 2.0 0.0 } translation-matrix4 ] unit-test
+
+[ t ] [
+    float-4{ $[ 1/2. sqrt ] 0.0 $[ 1/2. sqrt ] 0.0 } pi rotation-matrix4
+    S{ matrix4 f
+        float-4-array{
+            float-4{  0.0  0.0  1.0 0.0 }
+            float-4{  0.0 -1.0  0.0 0.0 }
+            float-4{  1.0  0.0  0.0 0.0 }
+            float-4{  0.0  0.0  0.0 1.0 }
+        }
+    }
+    1.0e-7 m~ 
+] unit-test
 
 [
     S{ matrix4 f
@@ -169,3 +183,16 @@ IN: math.matrices.simd.tests
     n*m4
 ] unit-test
 
+[
+    S{ matrix4 f
+        float-4-array{
+            float-4{ 1/2. 0.0   0.0    0.0  }
+            float-4{ 0.0  1/2.  0.0    0.0  }
+            float-4{ 0.0  0.0  -6/4. -10/4. }
+            float-4{ 0.0  0.0  -1.0    0.0  }
+        }
+    }
+] [
+    float-4{ 2.0 2.0 0.0 0.0 } 1.0 5.0
+    frustum-matrix4
+] unit-test
