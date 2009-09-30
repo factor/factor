@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: accessors classes.struct kernel locals math
+USING: accessors classes.struct kernel locals math math.functions
 math.matrices.simd math.vectors math.vectors.simd sequences
 sequences.private specialized-arrays typed ;
 QUALIFIED-WITH: alien.c-types c
@@ -157,30 +157,60 @@ TYPED:: translation-matrix4 ( offset: float-4 -- matrix: matrix4 )
 
     c ;
 
-! TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
-!     matrix4 (struct) :> c
-!     float-4{  1.0 -1.0  1.0 0.0 } :> triangle-sign
-! 
-!     theta cos float-4-with :> cc
-!     theta sin float-4-with :> ss
-!     1.0 float-4-with :> ones
-!     ones cc v- :> 1-c
-!     axis axis v* :> axis2
-! 
-!     axis2 cc ones axis2 v- v* v+ ones
-!     [ { t t t f } ] 2dip v? :> diagonal
-! 
-!     axis { 0 0 1 3 } vshuffle axis { 1 2 2 3 } vshuffle v* 1-c v* :> triangle-a
-!     ss { 2 1 0 3 } vshuffle triangle-sign * :> triangle-b
-!     triangle-a triangle-b + :> triangle-lo
-!     triangle-a triangle-b - :> triangle-hi
-! 
-!     ... ;
-! !   x*x + c*(1.0 - x*x)   x*y*(1.0 - c) - s*z   x*z*(1.0 - c) + s*y   0
-! !   x*y*(1.0 - c) + s*z   y*y + c*(1.0 - y*y)   y*z*(1.0 - c) - s*x   0
-! !   x*z*(1.0 - c) - s*y   y*z*(1.0 - c) + s*x   z*z + c*(1.0 - z*z)   0
-! !   0                     0                     0                     1
-! 
-! TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 )
+TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
+    !   x*x + c*(1.0 - x*x)   x*y*(1.0 - c) - s*z   x*z*(1.0 - c) + s*y   0
+    !   x*y*(1.0 - c) + s*z   y*y + c*(1.0 - y*y)   y*z*(1.0 - c) - s*x   0
+    !   x*z*(1.0 - c) - s*y   y*z*(1.0 - c) + s*x   z*z + c*(1.0 - z*z)   0
+    !   0                     0                     0                     1
+    matrix4 (struct) :> triangle-m
+    theta cos :> c
+    theta sin :> s
 
+    float-4{  1.0 -1.0  1.0 0.0 } :> triangle-sign
+
+    c float-4-with :> cc
+    s float-4-with :> ss
+    1.0 float-4-with :> ones
+    ones cc v- :> 1-c
+    axis axis v* :> axis2
+
+    axis2 cc ones axis2 v- v* v+ :> diagonal
+
+    axis { 0 0 1 3 } vshuffle axis { 1 2 2 3 } vshuffle v* 1-c v*
+    { t t t f } vmask :> triangle-a
+    ss { 2 1 0 3 } vshuffle triangle-sign v* :> triangle-b
+    triangle-a triangle-b v+ :> triangle-lo
+    triangle-a triangle-b v- :> triangle-hi
+
+    diagonal scale-matrix4 :> diagonal-m
+    triangle-hi { 3 0 1 3 } vshuffle :> tri1
+    triangle-hi { 3 3 2 3 } vshuffle
+    triangle-lo { 0 3 3 3 } vshuffle v+ :> tri2
+    triangle-lo { 1 2 3 3 } vshuffle :> tri3
+    tri1 triangle-m rows>> set-first
+    tri2 triangle-m rows>> set-second
+    tri3 triangle-m rows>> set-third
+    float-4 new triangle-m rows>> set-fourth
+
+    diagonal-m triangle-m m4+ ;
+
+TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 )
+    matrix4 (struct) :> c
+
+    float-4{ 0.0 0.0 -1.0 0.0 } :> c4
+
+    near near near far + 2 near far * * float-4-boa :> num
+    { t t f f } xy near far - float-4-with v? :> denom
+    num denom v/ :> fov
+
+    fov { 0 0 0 0 } vshuffle { t f f f } vmask :> c1
+    fov { 1 1 1 1 } vshuffle { f t f f } vmask :> c2
+    fov { 2 2 2 3 } vshuffle { f f t t } vmask :> c3
+
+    c1 c rows>> set-first
+    c2 c rows>> set-second
+    c3 c rows>> set-third
+    c4 c rows>> set-fourth
+
+    c ;
 
