@@ -307,45 +307,45 @@ M:: x86 %set-string-nth-fast ( ch str index temp -- )
         temp string-offset [+] new-ch 8-bit-version-of MOV
     ] with-small-register ;
 
-:: %alien-integer-getter ( dst src size quot -- )
+:: %alien-integer-getter ( dst src offset size quot -- )
     dst { src } size [| new-dst |
-        new-dst dup size n-bit-version-of dup src [] MOV
+        new-dst dup size n-bit-version-of dup src offset [+] MOV
         quot call
         dst new-dst int-rep %copy
     ] with-small-register ; inline
 
-: %alien-unsigned-getter ( dst src size -- )
+: %alien-unsigned-getter ( dst src offset size -- )
     [ MOVZX ] %alien-integer-getter ; inline
 
 M: x86 %alien-unsigned-1 8 %alien-unsigned-getter ;
 M: x86 %alien-unsigned-2 16 %alien-unsigned-getter ;
 M: x86 %alien-unsigned-4 32 [ 2drop ] %alien-integer-getter ;
 
-: %alien-signed-getter ( dst src size -- )
+: %alien-signed-getter ( dst src offset size -- )
     [ MOVSX ] %alien-integer-getter ; inline
 
 M: x86 %alien-signed-1 8 %alien-signed-getter ;
 M: x86 %alien-signed-2 16 %alien-signed-getter ;
 M: x86 %alien-signed-4 32 %alien-signed-getter ;
 
-M: x86 %alien-cell [] MOV ;
-M: x86 %alien-float [] MOVSS ;
-M: x86 %alien-double [] MOVSD ;
-M: x86 %alien-vector [ [] ] dip %copy ;
+M: x86 %alien-cell [+] MOV ;
+M: x86 %alien-float [+] MOVSS ;
+M: x86 %alien-double [+] MOVSD ;
+M: x86 %alien-vector [ [+] ] dip %copy ;
 
-:: %alien-integer-setter ( ptr value size -- )
+:: %alien-integer-setter ( ptr offset value size -- )
     value { ptr } size [| new-value |
         new-value value int-rep %copy
-        ptr [] new-value size n-bit-version-of MOV
+        ptr offset [+] new-value size n-bit-version-of MOV
     ] with-small-register ; inline
 
 M: x86 %set-alien-integer-1 8 %alien-integer-setter ;
 M: x86 %set-alien-integer-2 16 %alien-integer-setter ;
 M: x86 %set-alien-integer-4 32 %alien-integer-setter ;
-M: x86 %set-alien-cell [ [] ] dip MOV ;
-M: x86 %set-alien-float [ [] ] dip MOVSS ;
-M: x86 %set-alien-double [ [] ] dip MOVSD ;
-M: x86 %set-alien-vector [ [] ] 2dip %copy ;
+M: x86 %set-alien-cell [ [+] ] dip MOV ;
+M: x86 %set-alien-float [ [+] ] dip MOVSS ;
+M: x86 %set-alien-double [ [+] ] dip MOVSD ;
+M: x86 %set-alien-vector [ [+] ] 2dip %copy ;
 
 : shift-count? ( reg -- ? ) { ECX RCX } memq? ;
 
@@ -600,42 +600,42 @@ M: x86 %zero-vector-reps
         { uchar-16-rep    char-16-rep }
     } ?at drop ;
 
-M:: x86 %broadcast-vector ( dst src rep -- )
-    rep unsign-rep {
-        { float-4-rep [
-            dst src float-4-rep %copy
-            dst dst { 0 0 0 0 } SHUFPS
-        ] }
-        { double-2-rep [
-            dst src MOVDDUP
-        ] }
-        { longlong-2-rep [
-            dst src =
-            [ dst dst PUNPCKLQDQ ]
-            [ dst src { 0 1 0 1 } PSHUFD ]
-            if
-        ] }
-        { int-4-rep [
-            dst src { 0 0 0 0 } PSHUFD
-        ] }
-        { short-8-rep [
-            dst src { 0 0 0 0 } PSHUFLW 
-            dst dst PUNPCKLQDQ 
-        ] }
-        { char-16-rep [
-            dst src char-16-rep %copy
-            dst dst PUNPCKLBW
-            dst dst { 0 0 0 0 } PSHUFLW
-            dst dst PUNPCKLQDQ
-        ] }
-    } case ;
-
-M: x86 %broadcast-vector-reps
-    {
-        ! Can't do this with sse1 since it will want to unbox
-        ! a double-precision float and convert to single precision
-        { sse2? { float-4-rep double-2-rep longlong-2-rep ulonglong-2-rep int-4-rep uint-4-rep short-8-rep ushort-8-rep char-16-rep uchar-16-rep } }
-    } available-reps ;
+! M:: x86 %broadcast-vector ( dst src rep -- )
+!     rep unsign-rep {
+!         { float-4-rep [
+!             dst src float-4-rep %copy
+!             dst dst { 0 0 0 0 } SHUFPS
+!         ] }
+!         { double-2-rep [
+!             dst src MOVDDUP
+!         ] }
+!         { longlong-2-rep [
+!             dst src =
+!             [ dst dst PUNPCKLQDQ ]
+!             [ dst src { 0 1 0 1 } PSHUFD ]
+!             if
+!         ] }
+!         { int-4-rep [
+!             dst src { 0 0 0 0 } PSHUFD
+!         ] }
+!         { short-8-rep [
+!             dst src { 0 0 0 0 } PSHUFLW 
+!             dst dst PUNPCKLQDQ 
+!         ] }
+!         { char-16-rep [
+!             dst src char-16-rep %copy
+!             dst dst PUNPCKLBW
+!             dst dst { 0 0 0 0 } PSHUFLW
+!             dst dst PUNPCKLQDQ
+!         ] }
+!     } case ;
+! 
+! M: x86 %broadcast-vector-reps
+!     {
+!         ! Can't do this with sse1 since it will want to unbox
+!         ! a double-precision float and convert to single precision
+!         { sse2? { float-4-rep double-2-rep longlong-2-rep ulonglong-2-rep int-4-rep uint-4-rep short-8-rep ushort-8-rep char-16-rep uchar-16-rep } }
+!     } available-reps ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
     rep unsign-rep {
@@ -721,10 +721,9 @@ M:: x86 %shuffle-vector ( dst src shuffle rep -- )
 
 M: x86 %shuffle-vector-reps
     {
-        { sse2? { double-2-rep float-4-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
-
-M: x86 %select-vector-reps { } ;
 
 M: x86 %add-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
@@ -1043,9 +1042,13 @@ M: x86 %shr-vector-reps
         { sse2? { short-8-rep ushort-8-rep int-4-rep uint-4-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %integer>scalar drop MOVD ;
+: scalar-sized-reg ( reg rep -- reg' )
+    rep-size 8 * n-bit-version-of ;
 
-M: x86 %scalar>integer drop MOVD ;
+M: x86 %integer>scalar scalar-sized-reg MOVD ;
+M: x86 %scalar>integer swap [ scalar-sized-reg ] dip MOVD ;
+M: x86 %vector>scalar %copy ;
+M: x86 %scalar>vector %copy ;
 
 M:: x86 %spill ( src rep dst -- ) dst src rep %copy ;
 M:: x86 %reload ( dst rep src -- ) dst src rep %copy ;
