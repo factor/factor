@@ -4,40 +4,43 @@ in the public domain. */
 
 #define DS_REG r13
 
-DEF(void,primitive_fixnum_add,(void)):
+DEF(void,primitive_fixnum_add,(void *vm)):
+	mr r5,r3  /* save vm ptr for overflow */
 	lwz r3,0(DS_REG)
 	lwz r4,-4(DS_REG)
 	subi DS_REG,DS_REG,4
 	li r0,0
 	mtxer r0
-	addo. r5,r3,r4
+	addo. r6,r3,r4
 	bso add_overflow
-	stw r5,0(DS_REG)
+	stw r6,0(DS_REG)
 	blr
 add_overflow:
 	b MANGLE(overflow_fixnum_add)
 
-DEF(void,primitive_fixnum_subtract,(void)):
+DEF(void,primitive_fixnum_subtract,(void *vm)):
+	mr r5,r3  /* save vm ptr for overflow */
 	lwz r3,-4(DS_REG)
 	lwz r4,0(DS_REG)
 	subi DS_REG,DS_REG,4
 	li r0,0
 	mtxer r0
-	subfo. r5,r4,r3
+	subfo. r6,r4,r3
 	bso sub_overflow
-	stw r5,0(DS_REG)
+	stw r6,0(DS_REG)
 	blr
 sub_overflow:
 	b MANGLE(overflow_fixnum_subtract)
 
-DEF(void,primitive_fixnum_multiply,(void)):
+DEF(void,primitive_fixnum_multiply,(void *vm)):
+	mr r5,r3  /* save vm ptr for overflow */
 	lwz r3,0(DS_REG)
 	lwz r4,-4(DS_REG)
 	subi DS_REG,DS_REG,4
 	srawi r3,r3,3
-	mullwo. r5,r3,r4
+	mullwo. r6,r3,r4
 	bso multiply_overflow
-	stw r5,0(DS_REG)
+	stw r6,0(DS_REG)
 	blr
 multiply_overflow:
 	srawi r4,r4,3
