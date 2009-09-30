@@ -45,6 +45,7 @@ insn-classes get [
     [ next-vreg dup ] dip {
         { [ dup not ] [ drop \ f tag-number ##load-immediate ] }
         { [ dup fixnum? ] [ tag-fixnum ##load-immediate ] }
+        { [ dup float? ] [ ##load-constant ] }
         [ ##load-reference ]
     } cond ;
 

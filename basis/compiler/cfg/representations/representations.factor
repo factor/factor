@@ -96,9 +96,8 @@ SYMBOL: always-boxed
     H{ } clone [
         '[
             [
-                dup ##load-reference? [ drop ] [
-                    [ _ (compute-always-boxed) ] each-def-rep
-                ] if
+                dup [ ##load-reference? ] [ ##load-constant? ] bi or
+                [ drop ] [ [ _ (compute-always-boxed) ] each-def-rep ] if
             ] each-non-phi
         ] each-basic-block
     ] keep ;
