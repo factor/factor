@@ -26,5 +26,6 @@ IN: images.testing
 PRIVATE>
 
 : decode-test ( path -- )
-    [ load-image 1quotation ] [ '[ _ pam-name load-image ] ] bi
+    [ load-image 1quotation ]
+    [ '[ _ pam-name load-image ] ] bi
     unit-test ;
