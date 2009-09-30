@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien.c-types kernel sequences math math.functions
-hints math.order math.libm fry combinators byte-arrays accessors ;
+hints math.order math.libm fry combinators byte-arrays accessors
+locals ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
@@ -77,7 +78,8 @@ PRIVATE>
 : vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
 : vbitnot ( u -- w ) dup '[ _ [ bitnot ] fp-bitwise-unary ] map ;
 
-: vshuffle ( u perm -- v ) swap [ nths ] keep like ;
+:: vbroadcast ( u n -- v ) u length n u nth <repetition> u like ;
+: vshuffle ( u perm -- v ) swap [ '[ _ nth ] ] keep map-as ;
 
 : vlshift ( u n -- w ) '[ _ shift ] map ;
 : vrshift ( u n -- w ) neg '[ _ shift ] map ;

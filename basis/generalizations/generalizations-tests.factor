@@ -1,4 +1,5 @@
-USING: tools.test generalizations kernel math arrays sequences ascii ;
+USING: tools.test generalizations kernel math arrays sequences
+ascii fry math.parser ;
 IN: generalizations.tests
 
 { 1 2 3 4 1 } [ 1 2 3 4 4 npick ] unit-test
@@ -72,3 +73,5 @@ IN: generalizations.tests
    1 2 3 4 3 nover ;
 
 [ 1 2 3 4 1 2 3 ] [ nover-test ] unit-test
+
+[ '[ number>string _ append ] 4 napply ] must-infer

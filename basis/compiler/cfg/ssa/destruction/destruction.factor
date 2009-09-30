@@ -3,7 +3,6 @@
 USING: accessors arrays assocs fry kernel namespaces
 sequences sequences.deep
 sets vectors
-cpu.architecture
 compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.renaming
@@ -68,7 +67,7 @@ M: insn prepare-insn
     [ defs-vreg ] [ uses-vregs ] bi
     2dup empty? not and [
         first 
-        2dup [ rep-of reg-class-of ] bi@ eq?
+        2dup [ rep-of ] bi@ eq?
         [ try-to-coalesce ] [ 2drop ] if
     ] [ 2drop ] if ;
 

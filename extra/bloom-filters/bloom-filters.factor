@@ -127,7 +127,7 @@ PRIVATE>
 
 ! Make sure it's a fixnum here to speed up double-hashing.
 : hashcodes-from-hashcode ( n -- n n )
-    dup most-positive-fixnum >fixnum bitxor ;
+    dup most-positive-fixnum bitxor ;
 
 : hashcodes-from-object ( obj -- n n )
     hashcode abs hashcodes-from-hashcode ;
