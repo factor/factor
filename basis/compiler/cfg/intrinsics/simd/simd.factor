@@ -35,16 +35,23 @@ MACRO: if-literals-match ( quots -- )
 : emit-vector-op ( node quot: ( rep -- ) -- )
     { [ representation? ] } if-literals-match ; inline
 
+: [binary] ( quot -- quot' )
+    '[ [ ds-drop 2inputs ] dip @ ds-push ] ; inline
+
 : emit-binary-vector-op ( node quot -- )
-    '[ [ ds-drop 2inputs ] dip @ ds-push ] 
-    emit-vector-op ; inline
+    [binary] emit-vector-op ; inline
+
+: [unary] ( quot -- quot' )
+    '[ [ ds-drop ds-pop ] dip @ ds-push ] ; inline
 
 : emit-unary-vector-op ( node quot -- )
-    '[ [ ds-drop ds-pop ] dip @ ds-push ]
-    emit-vector-op ; inline
+    [unary] emit-vector-op ; inline
+
+: [unary/param] ( quot -- quot' )
+    '[ [ -2 inc-d ds-pop ] 2dip @ ds-push ] ; inline
 
 : emit-horizontal-shift ( node quot -- )
-    '[ [ -2 inc-d ds-pop ] 2dip @ ds-push ]
+    [unary/param]
     { [ integer? ] [ representation? ] } if-literals-match ; inline
 
 : emit-gather-vector-2 ( node -- )
@@ -67,24 +74,25 @@ MACRO: if-literals-match ( quots -- )
 : shuffle? ( obj -- ? ) { [ array? ] [ [ integer? ] all? ] } 1&& ;
 
 : emit-shuffle-vector ( node -- )
-    [ [ -2 inc-d ds-pop ] 2dip ^^shuffle-vector ds-push ]
-    { [ shuffle? ] [ representation? ] } if-literals-match ; inline
+    [ ^^shuffle-vector ] [unary/param]
+    { [ shuffle? ] [ representation? ] } if-literals-match ;
 
-: ^^broadcast-vector ( src rep -- dst )
-    [ ^^scalar>vector ] keep
-    [ rep-components 0 <array> ] keep
+: ^^broadcast-vector ( src n rep -- dst )
+    [ rep-components swap <array> ] keep
     ^^shuffle-vector ;
 
 : emit-broadcast-vector ( node -- )
-    [ ^^broadcast-vector ] emit-unary-vector-op ;
+    [ ^^broadcast-vector ] [unary/param]
+    { [ integer? ] [ representation? ] } if-literals-match ;
+
+: ^^with-vector ( src rep -- dst )
+    [ ^^scalar>vector ] keep [ 0 ] dip ^^broadcast-vector ;
 
 : ^^select-vector ( src n rep -- dst )
-    [ rep-components swap <array> ] keep
-    [ ^^shuffle-vector ] keep
-    ^^vector>scalar ;
+    [ ^^broadcast-vector ] keep ^^vector>scalar ;
 
 : emit-select-vector ( node -- )
-    [ [ -2 inc-d ds-pop ] 2dip ^^select-vector ds-push ]
+    [ ^^select-vector ] [unary/param]
     { [ integer? ] [ representation? ] } if-literals-match ; inline
 
 : emit-alien-vector ( node -- )

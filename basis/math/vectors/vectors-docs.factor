@@ -233,6 +233,18 @@ HELP: hrshift
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
 { $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
+HELP: vbroadcast
+{ $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "v" "a SIMD array" } }
+{ $description "Outputs a new SIMD array of the same type as " { $snippet "u" } " where every element is equal to the " { $snippet "n" } "th element of " { $snippet "u" } "." }
+{ $examples
+    { $example
+        "USING: alien.c-types math.vectors math.vectors.simd" "prettyprint ;"
+        "SIMD: int"
+        "int-4{ 69 42 911 13 } 2 vbroadcast ."
+        "int-4{ 911 911 911 911 }"
+    }
+} ;
+
 HELP: vshuffle
 { $values { "u" "a SIMD array" } { "perm" "an array of integers" } { "v" "a SIMD array" } }
 { $description "Permutes the elements of a SIMD array. Duplicate entries are allowed in the permutation." }
