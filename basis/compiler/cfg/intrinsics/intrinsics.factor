@@ -175,7 +175,7 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-vrshift) [ [ ^^shr-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-hlshift) [ [ ^^horizontal-shl-vector ] emit-horizontal-shift ] }
         { math.vectors.simd.intrinsics:(simd-hrshift) [ [ ^^horizontal-shr-vector ] emit-horizontal-shift ] }
-        { math.vectors.simd.intrinsics:(simd-broadcast) [ [ ^^broadcast-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-with) [ [ ^^with-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-gather-2) [ emit-gather-vector-2 ] }
         { math.vectors.simd.intrinsics:(simd-gather-4) [ emit-gather-vector-4 ] }
         { math.vectors.simd.intrinsics:(simd-vshuffle) [ emit-shuffle-vector ] }

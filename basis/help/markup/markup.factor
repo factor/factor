@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes colors.constants
+USING: accessors arrays assocs classes colors colors.constants
 combinators definitions definitions.icons effects fry generic
 hashtables help.stylesheet help.topics io io.styles kernel make
 math namespaces parser present prettyprint
@@ -154,6 +154,9 @@ ALIAS: $slot $snippet
     1array \ $image prefix ;
 
 ! Some links
+
+<PRIVATE
+
 : write-link ( string object -- )
     link-style get [ write-object ] with-style ;
 
@@ -163,38 +166,37 @@ ALIAS: $slot $snippet
 : link-text ( topic -- )
     [ article-name ] keep write-link ;
 
-: link-effect ( topic -- )
-    dup word? [
-        stack-effect [ effect>string ] [ effect-style ] bi
-        [ write ] with-style
-    ] [ drop ] if ;
+GENERIC: link-long-text ( topic -- )
 
-: inter-cleave ( x seq between -- )
-    [ [ call( x -- ) ] with ] dip swap interleave ; inline
+M: topic link-long-text
+    [ article-title ] keep write-link ;
 
-: (($link)) ( topic words -- )
-    [ dup topic? [ >link ] unless ] dip
-    [ [ bl ] inter-cleave ] ($span) ; inline
+M: word link-long-text
+    dup presented associate [
+        [ article-name link-style get format ]
+        [ drop bl ]
+        [ stack-effect effect>string stack-effect-style get format ]
+        tri
+    ] with-nesting ;
 
-: ($link) ( topic -- )
-    { [ link-text ] } (($link)) ;
+: >topic ( obj -- topic ) dup topic? [ >link ] unless ;
 
+: topic-span ( topic quot -- ) [ >topic ] dip ($span) ; inline
+
+PRIVATE>
+
+: ($link) ( topic -- ) [ link-text ] topic-span ;
 : $link ( element -- ) first ($link) ;
 
-: ($long-link) ( topic -- )
-    { [ link-text ] [ link-effect ] } (($link)) ;
-
+: ($long-link) ( topic -- ) [ link-long-text ] topic-span ;
 : $long-link ( element -- ) first ($long-link) ;
 
 : ($pretty-link) ( topic -- )
-    { [ link-icon ] [ link-text ] } (($link)) ;
-
+    [ [ link-icon ] [ drop bl ] [ link-text ] tri ] topic-span ;
 : $pretty-link ( element -- ) first ($pretty-link) ;
 
 : ($long-pretty-link) ( topic -- )
-    { [ link-icon ] [ link-text ] [ link-effect ] } (($link)) ;
-
-: $long-pretty-link ( element -- ) first ($long-pretty-link) ;
+    [ [ link-icon ] [ drop bl ] [ link-long-text ] tri ] topic-span ;
 
 : <$pretty-link> ( definition -- element )
     1array \ $pretty-link prefix ;

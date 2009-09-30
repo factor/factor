@@ -29,6 +29,10 @@ INSN: ##load-reference
 def: dst/int-rep
 constant: obj ;
 
+INSN: ##load-constant
+def: dst/int-rep
+constant: obj ;
+
 INSN: ##peek
 def: dst/int-rep
 literal: loc ;
@@ -278,11 +282,6 @@ PURE-INSN: ##zero-vector
 def: dst
 literal: rep ;
 
-PURE-INSN: ##broadcast-vector
-def: dst
-use: src/scalar-rep
-literal: rep ;
-
 PURE-INSN: ##gather-vector-2
 def: dst
 use: src1/scalar-rep src2/scalar-rep
@@ -297,11 +296,6 @@ PURE-INSN: ##shuffle-vector
 def: dst
 use: src
 literal: shuffle rep ;
-
-PURE-INSN: ##select-vector
-def: dst
-use: src
-literal: n rep ;
 
 PURE-INSN: ##add-vector
 def: dst
@@ -418,7 +412,7 @@ def: dst
 use: src1 src2/scalar-rep
 literal: rep ;
 
-! Scalar/integer conversion
+! Scalar/vector conversion
 PURE-INSN: ##scalar>integer
 def: dst/int-rep
 use: src
@@ -427,6 +421,16 @@ literal: rep ;
 PURE-INSN: ##integer>scalar
 def: dst
 use: src/int-rep
+literal: rep ;
+
+PURE-INSN: ##vector>scalar
+def: dst/scalar-rep
+use: src
+literal: rep ;
+
+PURE-INSN: ##scalar>vector
+def: dst
+use: src/scalar-rep
 literal: rep ;
 
 ! Boxing and unboxing aliens
@@ -464,65 +468,88 @@ use: src/int-rep ;
 ! Alien accessors
 INSN: ##alien-unsigned-1
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-unsigned-2
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-unsigned-4
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-signed-1
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-signed-2
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-signed-4
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-cell
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-float
 def: dst/float-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-double
 def: dst/double-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-vector
 def: dst
 use: src/int-rep
-literal: rep ;
+literal: offset rep ;
 
 INSN: ##set-alien-integer-1
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-integer-2
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-integer-4
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-cell
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-float
-use: src/int-rep value/float-rep ;
+use: src/int-rep
+literal: offset
+use: value/float-rep ;
 
 INSN: ##set-alien-double
-use: src/int-rep value/double-rep ;
+use: src/int-rep
+literal: offset
+use: value/double-rep ;
 
 INSN: ##set-alien-vector
-use: src/int-rep value
+use: src/int-rep
+literal: offset
+use: value
 literal: rep ;
 
 ! Memory allocation

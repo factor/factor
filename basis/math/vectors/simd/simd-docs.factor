@@ -21,13 +21,13 @@ ARTICLE: "math.vectors.simd.support" "Supported SIMD instruction sets and operat
 $nl
 "SSE1 only supports single-precision SIMD (" { $snippet "float-4" } " and " { $snippet "float-8" } ")."
 $nl
-"SSE2 introduces double-precision SIMD (" { $snippet "double-2" } " and " { $snippet "double-4" } ") and integer SIMD (all types). Integer SIMD in missing a few features, in particular the " { $link vmin } " and " { $link vmax } " operations only work on " { $snippet "uchar-16" } " and " { $snippet "short-8" } "."
+"SSE2 introduces double-precision SIMD (" { $snippet "double-2" } " and " { $snippet "double-4" } ") and integer SIMD (all types). Integer SIMD is missing a few features, in particular the " { $link vmin } " and " { $link vmax } " operations only work on " { $snippet "uchar-16" } " and " { $snippet "short-8" } "."
 $nl
 "SSE3 introduces horizontal adds (summing all components of a single vector register), which is useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link v. } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } "."
 $nl
 "SSSE3 introduces " { $link vabs } " for " { $snippet "char-16" } ", " { $snippet "short-8" } " and " { $snippet "int-4" } "."
 $nl
-"SSE4.1 introduces " { $link vmin } " and " { $link vmax } " for all remaining integer types."
+"SSE4.1 introduces " { $link vmin } " and " { $link vmax } " for all remaining integer types, a faster instruction for " { $link v. } ", and a few other things."
 $nl
 "On PowerPC, or older x86 chips without SSE, software fallbacks are used for all high-level vector operations. SIMD code can run with no loss in functionality, just decreased performance."
 $nl
@@ -183,7 +183,7 @@ $nl
 ARTICLE: "math.vectors.simd.accuracy" "Numerical accuracy of SIMD primitives"
 "No guarantees are made that " { $vocab-link "math.vectors.simd" } " words will give identical results on different SSE versions, or between the hardware intrinsics and the software fallbacks."
 $nl
-"In particular, horizontal operations on " { $snippet "float-4" } " and " { $snippet "float-8" } " are affected by this. They are computed with lower precision in intrinsics than the software fallback. Horizontal opeartions include anything involving adding together the components of a vector, such as " { $link sum } " or " { $link normalize } "." ;
+"In particular, horizontal operations on " { $snippet "float-4" } " and " { $snippet "float-8" } " are affected by this. They are computed with lower precision in intrinsics than the software fallback. Horizontal operations include anything involving adding together the components of a vector, such as " { $link sum } " or " { $link normalize } "." ;
 
 ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
 "The " { $vocab-link "math.vectors.simd" } " vocabulary extends the " { $vocab-link "math.vectors" } " vocabulary to support efficient vector arithmetic on small, fixed-size vectors."
