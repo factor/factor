@@ -44,6 +44,9 @@ M: word test-cfg
         nl
     ] each ;
 
+: test-mr. ( quot -- )
+    test-mr mr. ; inline
+
 ! Prettyprinting
 : pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;
 
