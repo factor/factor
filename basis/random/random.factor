@@ -10,7 +10,7 @@ SYMBOL: system-random-generator
 SYMBOL: secure-random-generator
 SYMBOL: random-generator
 
-GENERIC: seed-random ( tuple seed -- )
+GENERIC# seed-random 1 ( tuple seed -- tuple' )
 GENERIC: random-32* ( tuple -- r )
 GENERIC: random-bytes* ( n tuple -- byte-array )
 
@@ -54,6 +54,8 @@ PRIVATE>
     [ f ] [
         [ length random-integer ] keep nth
     ] if-empty ;
+
+: random-32 ( -- n ) random-generator get random-32* ;
 
 : randomize ( seq -- seq )
     dup length [ dup 1 > ]
