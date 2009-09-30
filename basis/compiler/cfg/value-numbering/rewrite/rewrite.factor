@@ -391,6 +391,29 @@ M: ##unbox-any-c-ptr rewrite
     dup src>> vreg>expr dup box-displaced-alien-expr?
     [ rewrite-unbox-displaced-alien ] [ 2drop f ] if ;
 
+! More efficient addressing for alien intrinsics
+: rewrite-alien-addressing ( insn -- insn' )
+    dup src>> vreg>expr dup add-imm-expr? [
+        [ src1>> vn>vreg ] [ src2>> vn>constant ] bi
+        [ >>src ] [ '[ _ + ] change-offset ] bi*
+    ] [ 2drop f ] if ;
+
+M: ##alien-unsigned-1 rewrite rewrite-alien-addressing ;
+M: ##alien-unsigned-2 rewrite rewrite-alien-addressing ;
+M: ##alien-unsigned-4 rewrite rewrite-alien-addressing ;
+M: ##alien-signed-1 rewrite rewrite-alien-addressing ;
+M: ##alien-signed-2 rewrite rewrite-alien-addressing ;
+M: ##alien-signed-4 rewrite rewrite-alien-addressing ;
+M: ##alien-float rewrite rewrite-alien-addressing ;
+M: ##alien-double rewrite rewrite-alien-addressing ;
+M: ##alien-vector rewrite rewrite-alien-addressing ;
+M: ##set-alien-integer-1 rewrite rewrite-alien-addressing ;
+M: ##set-alien-integer-2 rewrite rewrite-alien-addressing ;
+M: ##set-alien-integer-4 rewrite rewrite-alien-addressing ;
+M: ##set-alien-float rewrite rewrite-alien-addressing ;
+M: ##set-alien-double rewrite rewrite-alien-addressing ;
+M: ##set-alien-vector rewrite rewrite-alien-addressing ;
+
 ! Some lame constant folding for SIMD intrinsics. Eventually this
 ! should be redone completely.
 
@@ -431,3 +454,7 @@ M: ##shuffle-vector rewrite
 M: ##scalar>vector rewrite
     dup src>> vreg>expr dup constant-expr?
     [ fold-scalar>vector ] [ 2drop f ] if ;
+
+M: ##xor-vector rewrite
+    dup [ src1>> vreg>vn ] [ src2>> vreg>vn ] bi eq?
+    [ [ dst>> ] [ rep>> ] bi \ ##zero-vector new-insn ] [ drop f ] if ;
