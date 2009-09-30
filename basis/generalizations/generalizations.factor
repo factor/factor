@@ -87,8 +87,8 @@ MACRO: nspread ( quots n -- )
         '[ [ _ _ nspread ] _ ndip @ ]
     ] if ;
 
-MACRO: napply ( quot n -- )
-    swap <repetition> spread>quot ;
+MACRO: napply ( n -- )
+    [ [ drop ] ] dip [ '[ tuck _ 2dip call ] ] times ;
 
 MACRO: mnswap ( m n -- )
     1 + '[ _ -nrot ] swap '[ _ _ napply ] ;
