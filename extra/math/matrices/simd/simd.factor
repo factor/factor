@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
 USING: accessors classes.struct generalizations kernel locals
-math math.functions math.matrices.simd math.vectors
+math math.combinatorics math.functions math.matrices.simd math.vectors
 math.vectors.simd sequences sequences.private specialized-arrays
 typed ;
 QUALIFIED-WITH: alien.c-types c
@@ -104,6 +104,19 @@ CONSTANT: identity-matrix4
             float-4{ 0.0 0.0 0.0 1.0 }
         }
     }
+
+CONSTANT: zero-matrix4
+    S{ matrix4 f
+        float-4-array{
+            float-4{ 0.0 0.0 0.0 0.0 }
+            float-4{ 0.0 0.0 0.0 0.0 }
+            float-4{ 0.0 0.0 0.0 0.0 }
+            float-4{ 0.0 0.0 0.0 0.0 }
+        }
+    }
+
+TYPED:: m4^n ( m: matrix4 n: fixnum -- m^n: matrix4 )
+    identity-matrix4 n [ m m4. ] times ;
 
 TYPED:: scale-matrix4 ( factors: float-4 -- matrix: matrix4 )
     matrix4 (struct) :> c
