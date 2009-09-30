@@ -1,18 +1,21 @@
 ! Copyright (C) 2009 Keith Lazuka.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors bitstreams compression.lzw fry images.gif
-images.loader images.viewer images.testing io io.encodings.binary io.files
-io.pathnames kernel math math.bitwise math.parser namespaces
-prettyprint quotations sequences tools.test ;
+images.loader images.testing images.viewer io
+io.encodings.binary io.files io.pathnames kernel math
+math.bitwise math.parser namespaces prettyprint quotations
+sequences tools.test tools.test.private ;
 QUALIFIED-WITH: bitstreams bs
 IN: images.gif.tests
 
+verbose-tests? off
 "vocab:images/testing/gif/circle.gif" decode-test
 "vocab:images/testing/gif/checkmark.gif" decode-test
 "vocab:images/testing/gif/monochrome.gif" decode-test
 "vocab:images/testing/gif/alpha.gif" decode-test
-! "vocab:images/testing/gif/noise.gif" decode-test
+"vocab:images/testing/gif/noise.gif" decode-test
 "vocab:images/testing/gif/astronaut_animation.gif" decode-test
+verbose-tests? on
 
 : path>gif ( path -- gif )
     binary [ input-stream get load-gif ] with-file-reader ;
