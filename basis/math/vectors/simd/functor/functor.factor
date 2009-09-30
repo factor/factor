@@ -1,12 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types assocs byte-arrays classes effects fry
+USING: accessors assocs byte-arrays classes effects fry
 functors generalizations kernel literals locals math math.functions
 math.vectors math.vectors.private math.vectors.simd.intrinsics
 math.vectors.specialization parser prettyprint.custom sequences
 sequences.private strings words definitions macros cpu.architecture
-namespaces arrays quotations combinators sets ;
-QUALIFIED-WITH: math m
+namespaces arrays quotations combinators sets layouts ;
+QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd.functor
 
 ERROR: bad-length got expected ;
@@ -14,10 +14,22 @@ ERROR: bad-length got expected ;
 MACRO: simd-boa ( rep class -- simd-array )
     [ rep-components ] [ new ] bi* '[ _ _ nsequence ] ;
 
+: can-be-unboxed? ( type -- ? )
+    {
+        { c:float [ t ] }
+        { c:double [ t ] }
+        [ c:heap-size cell < ]
+    } case ;
+
+: simd-boa-fast? ( rep -- ? )
+    [ dup rep-gather-word supported-simd-op? ]
+    [ rep-component-type can-be-unboxed? ]
+    bi and ;
+
 :: define-boa-custom-inlining ( word rep class -- )
     word [
         drop
-        rep rep rep-gather-word supported-simd-op? [
+        rep simd-boa-fast? [
             [ rep (simd-boa) class boa ]
         ] [ word def>> ] if
     ] "custom-inlining" set-word-prop ;
@@ -25,13 +37,23 @@ MACRO: simd-boa ( rep class -- simd-array )
 : simd-with ( rep class x -- simd-array )
     [ rep-components ] [ new ] [ '[ _ ] ] tri* swap replicate-as ; inline
 
+: simd-with-fast? ( rep -- ? )
+    [ \ (simd-vshuffle) supported-simd-op? ]
+    [ rep-component-type can-be-unboxed? ]
+    bi and ;
+
 :: define-with-custom-inlining ( word rep class -- )
     word [
         drop
-        rep \ (simd-vshuffle) supported-simd-op? [
-            [ rep rep-coerce rep (simd-broadcast) class boa ]
+        rep simd-with-fast? [
+            [ rep rep-coerce rep (simd-with) class boa ]
         ] [ word def>> ] if
     ] "custom-inlining" set-word-prop ;
+
+: simd-nth-fast? ( rep -- ? )
+    [ \ (simd-vshuffle) supported-simd-op? ]
+    [ rep-component-type can-be-unboxed? ]
+    bi and ;
 
 : simd-nth-fast ( rep -- quot )
     [ rep-components ] keep
@@ -39,11 +61,10 @@ MACRO: simd-boa ( rep class -- simd-array )
     '[ swap >fixnum _ case ] ;
 
 : simd-nth-slow ( rep -- quot )
-    rep-component-type dup c-type-getter-boxer array-accessor ;
+    rep-component-type dup c:c-type-getter-boxer c:array-accessor ;
 
 MACRO: simd-nth ( rep -- x )
-    dup \ (simd-vshuffle) supported-simd-op?
-    [ simd-nth-fast ] [ simd-nth-slow ] if ;
+    dup simd-nth-fast? [ simd-nth-fast ] [ simd-nth-slow ] if ;
 
 : boa-effect ( rep n -- effect )
     [ rep-components ] dip *
@@ -67,6 +88,7 @@ ERROR: bad-schema schema ;
 :: high-level-ops ( ctor elt-class -- assoc )
     ! Some SIMD operations are defined in terms of others.
     {
+        { vbroadcast [ swap nth ctor execute ] }
         { vneg [ [ dup vbitxor ] keep v- ] }
         { n+v [ [ ctor execute ] dip v+ ] }
         { v+n [ ctor execute v+ ] }
@@ -83,12 +105,12 @@ ERROR: bad-schema schema ;
     ! To compute dot product and distance with integer vectors, we
     ! have to do things less efficiently, with integer overflow checks,
     ! in the general case.
-    elt-class m:float = [ { distance [ v- norm ] } suffix ] when ;
+    elt-class float = [ { distance [ v- norm ] } suffix ] when ;
 
 TUPLE: simd class elt-class ops wrappers ctor rep ;
 
 : define-simd ( simd -- )
-    dup rep>> rep-component-type c-type-boxed-class >>elt-class
+    dup rep>> rep-component-type c:c-type-boxed-class >>elt-class
     {
         [ class>> ]
         [ elt-class>> ]
@@ -99,7 +121,7 @@ TUPLE: simd class elt-class ops wrappers ctor rep ;
     specialize-vector-words ;
 
 :: define-simd-128-type ( class rep -- )
-    <c-type>
+    c:<c-type>
         byte-array >>class
         class >>boxed-class
         [ rep alien-vector class boa ] >>getter
@@ -107,7 +129,7 @@ TUPLE: simd class elt-class ops wrappers ctor rep ;
         16 >>size
         8 >>align
         rep >>rep
-    class typedef ;
+    class c:typedef ;
 
 : (define-simd-128) ( simd -- )
     simd-ops get >>ops
@@ -116,7 +138,7 @@ TUPLE: simd class elt-class ops wrappers ctor rep ;
 
 FUNCTOR: define-simd-128 ( T -- )
 
-N            [ 16 T heap-size /i ]
+N            [ 16 T c:heap-size /i ]
 
 A            DEFINES-CLASS ${T}-${N}
 A-boa        DEFINES ${A}-boa
@@ -125,7 +147,7 @@ A-cast       DEFINES ${A}-cast
 >A           DEFINES >${A}
 A{           DEFINES ${A}{
 
-SET-NTH      [ T dup c-setter array-accessor ]
+SET-NTH      [ T dup c:c-setter c:array-accessor ]
 
 A-rep        [ A name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
@@ -161,7 +183,7 @@ M: A new-sequence
 
 M: A equal? over \ A instance? [ sequence= ] [ 2drop f ] if ;
 
-M: A byte-length underlying>> length ; inline
+M: A c:byte-length underlying>> length ; inline
 
 M: A element-type drop A-rep rep-component-type ;
 
@@ -229,7 +251,7 @@ SLOT: underlying1
 SLOT: underlying2
 
 :: define-simd-256-type ( class rep -- )
-    <c-type>
+    c:<c-type>
         class >>class
         class >>boxed-class
         [
@@ -245,7 +267,7 @@ SLOT: underlying2
         32 >>size
         8 >>align
         rep >>rep
-    class typedef ;
+    class c:typedef ;
 
 : (define-simd-256) ( simd -- )
     simd-ops get { vshuffle hlshift hrshift } unique assoc-diff >>ops
@@ -254,7 +276,7 @@ SLOT: underlying2
 
 FUNCTOR: define-simd-256 ( T -- )
 
-N            [ 32 T heap-size /i ]
+N            [ 32 T c:heap-size /i ]
 
 N/2          [ N 2 / ]
 A/2          IS ${T}-${N/2}
@@ -311,7 +333,7 @@ M: A new-sequence
 
 M: A equal? over \ A instance? [ sequence= ] [ 2drop f ] if ;
 
-M: A byte-length drop 32 ; inline
+M: A c:byte-length drop 32 ; inline
 
 M: A element-type drop A-rep rep-component-type ;
 

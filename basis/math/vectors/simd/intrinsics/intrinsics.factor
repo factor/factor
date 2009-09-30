@@ -50,7 +50,7 @@ SIMD-OP: hlshift
 SIMD-OP: hrshift
 SIMD-OP: vshuffle
 
-: (simd-broadcast) ( x rep -- v ) bad-simd-call ;
+: (simd-with) ( x rep -- v ) bad-simd-call ;
 : (simd-gather-2) ( a b rep -- v ) bad-simd-call ;
 : (simd-gather-4) ( a b c d rep -- v ) bad-simd-call ;
 : (simd-select) ( v n rep -- x ) bad-simd-call ;
@@ -103,29 +103,29 @@ GENERIC# supported-simd-op? 1 ( rep intrinsic -- ? )
 
 M: vector-rep supported-simd-op?
     {
-        { \ (simd-v+)        [ %add-vector-reps            ] }
-        { \ (simd-vs+)       [ %saturated-add-vector-reps  ] }
-        { \ (simd-v+-)       [ %add-sub-vector-reps        ] }
-        { \ (simd-v-)        [ %sub-vector-reps            ] }
-        { \ (simd-vs-)       [ %saturated-sub-vector-reps  ] }
-        { \ (simd-v*)        [ %mul-vector-reps            ] }
-        { \ (simd-vs*)       [ %saturated-mul-vector-reps  ] }
-        { \ (simd-v/)        [ %div-vector-reps            ] }
-        { \ (simd-vmin)      [ %min-vector-reps            ] }
-        { \ (simd-vmax)      [ %max-vector-reps            ] }
-        { \ (simd-v.)        [ %dot-vector-reps            ] }
-        { \ (simd-vsqrt)     [ %sqrt-vector-reps           ] }
-        { \ (simd-sum)       [ %horizontal-add-vector-reps ] }
-        { \ (simd-vabs)      [ %abs-vector-reps            ] }
-        { \ (simd-vbitand)   [ %and-vector-reps            ] }
-        { \ (simd-vbitandn)  [ %andn-vector-reps           ] }
-        { \ (simd-vbitor)    [ %or-vector-reps             ] }
-        { \ (simd-vbitxor)   [ %xor-vector-reps            ] }
-        { \ (simd-vlshift)   [ %shl-vector-reps            ] }
-        { \ (simd-vrshift)   [ %shr-vector-reps            ] }
-        { \ (simd-hlshift)   [ %horizontal-shl-vector-reps ] }
-        { \ (simd-hrshift)   [ %horizontal-shr-vector-reps ] }
-        { \ (simd-vshuffle)  [ %shuffle-vector-reps        ] }
-        { \ (simd-gather-2)  [ %gather-vector-2-reps       ] }
-        { \ (simd-gather-4)  [ %gather-vector-4-reps       ] }
+        { \ (simd-v+)       [ %add-vector-reps            ] }
+        { \ (simd-vs+)      [ %saturated-add-vector-reps  ] }
+        { \ (simd-v+-)      [ %add-sub-vector-reps        ] }
+        { \ (simd-v-)       [ %sub-vector-reps            ] }
+        { \ (simd-vs-)      [ %saturated-sub-vector-reps  ] }
+        { \ (simd-v*)       [ %mul-vector-reps            ] }
+        { \ (simd-vs*)      [ %saturated-mul-vector-reps  ] }
+        { \ (simd-v/)       [ %div-vector-reps            ] }
+        { \ (simd-vmin)     [ %min-vector-reps            ] }
+        { \ (simd-vmax)     [ %max-vector-reps            ] }
+        { \ (simd-v.)       [ %dot-vector-reps            ] }
+        { \ (simd-vsqrt)    [ %sqrt-vector-reps           ] }
+        { \ (simd-sum)      [ %horizontal-add-vector-reps ] }
+        { \ (simd-vabs)     [ %abs-vector-reps            ] }
+        { \ (simd-vbitand)  [ %and-vector-reps            ] }
+        { \ (simd-vbitandn) [ %andn-vector-reps           ] }
+        { \ (simd-vbitor)   [ %or-vector-reps             ] }
+        { \ (simd-vbitxor)  [ %xor-vector-reps            ] }
+        { \ (simd-vlshift)  [ %shl-vector-reps            ] }
+        { \ (simd-vrshift)  [ %shr-vector-reps            ] }
+        { \ (simd-hlshift)  [ %horizontal-shl-vector-reps ] }
+        { \ (simd-hrshift)  [ %horizontal-shr-vector-reps ] }
+        { \ (simd-vshuffle) [ %shuffle-vector-reps        ] }
+        { \ (simd-gather-2) [ %gather-vector-2-reps       ] }
+        { \ (simd-gather-4) [ %gather-vector-4-reps       ] }
     } case member? ;

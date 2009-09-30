@@ -25,7 +25,7 @@ IN: compiler.tree.propagation.simd
     (simd-hlshift)
     (simd-hrshift)
     (simd-vshuffle)
-    (simd-broadcast)
+    (simd-with)
     (simd-gather-2)
     (simd-gather-4)
     alien-vector
