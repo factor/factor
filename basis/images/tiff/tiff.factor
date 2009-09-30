@@ -438,7 +438,7 @@ ERROR: unhandled-compression compression ;
 : (uncompress-strips) ( strips compression -- uncompressed-strips )
     {
         { compression-none [ ] }
-        { compression-lzw [ [ lzw-uncompress ] map ] }
+        { compression-lzw [ [ tiff-lzw-uncompress ] map ] }
         [ unhandled-compression ]
     } case ;
 

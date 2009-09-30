@@ -43,5 +43,4 @@ PRIVATE>
     dim-color colored-presentation-style ;
 
 : effect-style ( effect -- style )
-    0 0.2 0 1 <rgba> colored-presentation-style
-    { { font-style plain } } assoc-union ;
+    presented associate stack-effect-style get assoc-union ;

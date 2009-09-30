@@ -409,6 +409,20 @@ IN: compiler.cfg.value-numbering.tests
 [
     {
         T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare f 2 0 1 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare f 2 0 1 cc= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
         T{ ##load-immediate f 1 100 }
         T{ ##compare-imm f 2 0 100 cc>= }
     }
@@ -432,6 +446,20 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##load-immediate f 1 100 }
         T{ ##compare-branch f 0 1 cc<= }
     } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare-branch f 0 1 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare-branch f 0 1 cc= }
+    } value-numbering-step trim-temps
 ] unit-test
 
 [
@@ -1186,6 +1214,16 @@ cell 8 = [
         T{ ##load-constant f 0 1.25 }
         T{ ##scalar>vector f 1 0 float-4-rep }
         T{ ##shuffle-vector f 2 1 { 0 0 0 0 } float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##zero-vector f 2 float-4-rep }
+    }
+] [
+    {
+        T{ ##xor-vector f 2 1 1 float-4-rep }
     } value-numbering-step
 ] unit-test
 
