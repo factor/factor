@@ -11,5 +11,4 @@ inline static cell string_size(cell size)
 	return sizeof(string) + size;
 }
 
-
 }

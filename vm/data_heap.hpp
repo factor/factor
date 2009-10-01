@@ -62,5 +62,4 @@ inline static bool in_zone(zone *z, object *pointer)
 	return (cell)pointer >= z->start && (cell)pointer < z->end;
 }
 
-
 }
