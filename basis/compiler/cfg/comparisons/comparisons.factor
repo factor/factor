@@ -9,6 +9,9 @@ SYMBOLS:
     cc<  cc<=  cc=  cc>  cc>=  cc<>  cc<>= 
     cc/< cc/<= cc/= cc/> cc/>= cc/<> cc/<>= ;
 
+SYMBOLS:
+    vcc-all vcc-any vcc-none ;
+
 : negate-cc ( cc -- cc' )
     H{
         { cc<    cc/<   }

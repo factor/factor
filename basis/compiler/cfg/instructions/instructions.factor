@@ -302,6 +302,12 @@ def: dst
 use: src1 src2
 literal: rep cc ;
 
+PURE-INSN: ##test-vector
+def: dst/int-rep
+use: src
+temp: temp/int-rep
+literal: rep vcc ;
+
 PURE-INSN: ##add-vector
 def: dst
 use: src1 src2

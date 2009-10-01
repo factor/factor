@@ -93,6 +93,9 @@ H{
     { vshuffle { +vector+ +literal+ -> +vector+ } }
     { vbroadcast { +vector+ +literal+ -> +vector+ } }
     { v= { +vector+ +vector+ -> +vector+ } }
+    { vany? { +vector+ -> +scalar+ } }
+    { vall? { +vector+ -> +scalar+ } }
+    { vnone? { +vector+ -> +scalar+ } }
 }
 
 PREDICATE: vector-word < word vector-words key? ;
