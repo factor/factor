@@ -6,7 +6,7 @@ tools.test vocabs assocs compiler.cfg.debugger words
 locals math.vectors.specialization combinators cpu.architecture
 math.vectors.simd.intrinsics namespaces byte-arrays alien
 specialized-arrays classes.struct eval classes.algebra sets
-quotations math.constants ;
+quotations math.constants compiler.units ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 SIMD: c:char
@@ -216,11 +216,26 @@ simd-classes&reps [
 [ int-4{ 256 512 1024 2048 } ]
 [ int-4{ 1 2 4 8 } [ { int-4 } declare 1 hlshift ] compile-call ] unit-test
 
+[ int-4{ 256 512 1024 2048 } ]
+[ int-4{ 1 2 4 8 } 1 [ { int-4 fixnum } declare hlshift ] compile-call ] unit-test
+
 [ int-4{ 1 2 4 8 } ]
 [ int-4{ 256 512 1024 2048 } 1 hrshift ] unit-test
 
 [ int-4{ 1 2 4 8 } ]
 [ int-4{ 256 512 1024 2048 } [ { int-4 } declare 1 hrshift ] compile-call ] unit-test
+
+[ int-4{ 1 2 4 8 } ]
+[ int-4{ 256 512 1024 2048 } 1 [ { int-4 fixnum } declare hrshift ] compile-call ] unit-test
+
+! Invalid inputs should not cause the compiler to throw errors
+[ ] [
+    [ [ { int-4 } declare t hrshift ] (( a -- b )) define-temp drop ] with-compilation-unit
+] unit-test
+
+[ ] [
+    [ [ { int-4 } declare { 3 2 1 } vshuffle ] (( a -- b )) define-temp drop ] with-compilation-unit
+] unit-test
 
 ! Shuffles
 : shuffles-for ( n -- shuffles )
@@ -278,6 +293,7 @@ simd-classes [
 [ { } ] [ uint-4{ HEX: ffffffff 2 3 4 } test-accesses ] unit-test
 
 [ HEX: 7fffffff ] [ int-4{ HEX: 7fffffff 3 4 -8 } first ] unit-test
+[ -8 ] [ int-4{ HEX: 7fffffff 3 4 -8 } last ] unit-test
 [ HEX: ffffffff ] [ uint-4{ HEX: ffffffff 2 3 4 } first ] unit-test
 
 [ { } ] [ double-2{ 1.0 2.0 } test-accesses ] unit-test
@@ -312,6 +328,9 @@ simd-classes [
 [ { } ] [ double-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test
 [ { } ] [ longlong-4{ 1 2 3 4 } test-broadcast ] unit-test
 [ { } ] [ ulonglong-4{ 1 2 3 4 } test-broadcast ] unit-test
+
+! Make sure we use the fallback in the correct situations
+[ int-4{ 3 3 3 3 } ] [ int-4{ 12 34 3 17 } 2 [ { int-4 fixnum } declare vbroadcast ] compile-call ] unit-test
 
 "== Checking alien operations" print
 

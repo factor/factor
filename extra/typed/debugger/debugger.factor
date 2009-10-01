@@ -4,5 +4,7 @@ IN: typed.debugger
 
 : typed-test-mr ( word -- mrs )
     "typed-word" word-prop test-mr ; inline
+: typed-test-mr. ( word -- )
+    "typed-word" word-prop test-mr mr. ; inline
 : typed-optimized. ( word -- )
     "typed-word" word-prop optimized. ; inline

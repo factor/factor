@@ -404,12 +404,12 @@ literal: rep ;
 
 PURE-INSN: ##shl-vector
 def: dst
-use: src1 src2/scalar-rep
+use: src1 src2/int-scalar-rep
 literal: rep ;
 
 PURE-INSN: ##shr-vector
 def: dst
-use: src1 src2/scalar-rep
+use: src1 src2/int-scalar-rep
 literal: rep ;
 
 ! Scalar/vector conversion
