@@ -107,19 +107,15 @@ IN: compiler.cfg.value-numbering.tests
     {
         T{ ##peek f 8 D 0 }
         T{ ##peek f 9 D -1 }
-        T{ ##unbox-float f 10 8 }
-        T{ ##unbox-float f 11 9 }
-        T{ ##compare-float-unordered f 12 10 11 cc< }
-        T{ ##compare-float-unordered f 14 10 11 cc/< }
+        T{ ##compare-float-unordered f 12 8 9 cc< }
+        T{ ##compare-float-unordered f 14 8 9 cc/< }
         T{ ##replace f 14 D 0 }
     }
 ] [
     {
         T{ ##peek f 8 D 0 }
         T{ ##peek f 9 D -1 }
-        T{ ##unbox-float f 10 8 }
-        T{ ##unbox-float f 11 9 }
-        T{ ##compare-float-unordered f 12 10 11 cc< }
+        T{ ##compare-float-unordered f 12 8 9 cc< }
         T{ ##compare-imm f 14 12 5 cc= }
         T{ ##replace f 14 D 0 }
     } value-numbering-step trim-temps
