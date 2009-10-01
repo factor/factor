@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs byte-arrays classes effects fry
+USING: accessors assocs byte-arrays classes classes.algebra effects fry
 functors generalizations kernel literals locals math math.functions
 math.vectors math.vectors.private math.vectors.simd.intrinsics
 math.vectors.specialization parser prettyprint.custom sequences
@@ -10,6 +10,25 @@ QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd.functor
 
 ERROR: bad-length got expected ;
+
+: vector-true-value ( class -- value )
+    {
+        { [ dup integer class<= ] [ drop -1 ] }
+        { [ dup float   class<= ] [ drop -1 bits>double ] }
+    } cond ; foldable
+
+: vector-false-value ( class -- value )
+    {
+        { [ dup integer class<= ] [ drop 0   ] }
+        { [ dup float   class<= ] [ drop 0.0 ] }
+    } cond ; foldable
+
+: boolean>element ( bool/elt class -- elt )
+    swap {
+        { t [ vector-true-value  ] }
+        { f [ vector-false-value ] }
+        [ nip ]
+    } case ; inline
 
 MACRO: simd-boa ( rep class -- simd-array )
     [ rep-components ] [ new ] bi* '[ _ _ nsequence ] ;
@@ -156,6 +175,8 @@ A-vv->n-op   DEFINES-PRIVATE ${A}-vv->n-op
 A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
 
+A-element-class [ A-rep rep-component-type c:c-type-boxed-class ]
+
 WHERE
 
 TUPLE: A
@@ -167,7 +188,9 @@ M: A length drop N ; inline
 
 M: A nth-unsafe underlying>> A-rep simd-nth ; inline
 
-M: A set-nth-unsafe underlying>> SET-NTH call ; inline
+M: A set-nth-unsafe
+    [ A-element-class boolean>element ] 2dip
+    underlying>> SET-NTH call ; inline
 
 : >A ( seq -- simd-array ) \ A new clone-like ;
 
