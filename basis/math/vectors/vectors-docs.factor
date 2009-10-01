@@ -343,8 +343,8 @@ HELP: vmask
 { $description "Returns a copy of " { $snippet "u" } " with the elements for which the corresponding element of " { $snippet "?" } " is false replaced by zero." } ;
 
 HELP: v?
-{ $values { "?" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding element of the " { $snippet "?" } " sequence is true or false." } ;
+{ $values { "mask" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding bits of the " { $snippet "mask" } " sequence are set or not." } ;
 
 { 2map v+ v- v* v/ } related-words
 

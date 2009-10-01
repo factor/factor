@@ -99,9 +99,10 @@ PRIVATE>
 : vunordered? ( u v -- w ) [ unordered? ] { } 2map-as ;
 : v=  ( u v -- w ) [ =   ] { } 2map-as ;
 
-: v?   ( ? true false -- w ) [ ? ] pick 3map-as ;
+: v? ( mask true false -- w )
+    [ vbitand ] [ vbitandn ] bi-curry* bi vbitor ; inline
 
-: vmask ( u ? -- u' ) swap dup dup vbitxor v? ;
+: vmask ( u ? -- u' ) vbitand ; inline
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;
