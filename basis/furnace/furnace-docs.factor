@@ -3,25 +3,33 @@ quotations sequences strings urls xml.data http ;
 IN: furnace
 
 ARTICLE: "furnace.persistence" "Furnace persistence layer"
-{ $subsection "furnace.db" }
+{ $subsections "furnace.db" }
 "Server-side state:"
-{ $subsection "furnace.sessions" }
-{ $subsection "furnace.conversations" }
-{ $subsection "furnace.asides" }
-{ $subsection "furnace.presentation" } ;
+{ $subsections
+    "furnace.sessions"
+    "furnace.conversations"
+    "furnace.asides"
+    "furnace.presentation"
+} ;
 
 ARTICLE: "furnace.presentation" "Furnace presentation layer"
 "HTML components:"
-{ $subsection "html.components" }
-{ $subsection "html.forms" }
+{ $subsections
+    "html.components"
+    "html.forms"
+}
 "Content templates:"
-{ $subsection "html.templates" }
-{ $subsection "html.templates.chloe" }
-{ $subsection "html.templates.fhtml" }
-{ $subsection "furnace.boilerplate" }
+{ $subsections
+    "html.templates"
+    "html.templates.chloe"
+    "html.templates.fhtml"
+    "furnace.boilerplate"
+}
 "Other types of content:"
-{ $subsection "furnace.syndication" }
-{ $subsection "furnace.json" } ;
+{ $subsections
+    "furnace.syndication"
+    "furnace.json"
+} ;
 
 ARTICLE: "furnace.load-balancing" "Load balancing and fail-over with Furnace"
 "The Furnace session manager persists sessions to a database. This means that HTTP requests can be transparently distributed between multiple Factor HTTP server instances, running the same web app on top of the same database, as long as the web applications do not use mutable global state, such as global variables. The Furnace framework itself does not use any mutable global state." ;
@@ -36,22 +44,28 @@ ARTICLE: "furnace" "Furnace framework"
     "Conversation scope and asides for complex page flow"
 }
 "Major functionality:"
-{ $subsection "furnace.actions" }
-{ $subsection "furnace.alloy" }
-{ $subsection "furnace.persistence" }
-{ $subsection "furnace.presentation" }
-{ $subsection "furnace.auth" }
-{ $subsection "furnace.load-balancing" }
+{ $subsections
+    "furnace.actions"
+    "furnace.alloy"
+    "furnace.persistence"
+    "furnace.presentation"
+    "furnace.auth"
+    "furnace.load-balancing"
+}
 "Utilities:"
-{ $subsection "furnace.referrer" }
-{ $subsection "furnace.redirection" }
-{ $subsection "furnace.extension-points" }
-{ $subsection "furnace.misc" }
+{ $subsections
+    "furnace.referrer"
+    "furnace.redirection"
+    "furnace.extension-points"
+    "furnace.misc"
+}
 "Related frameworks:"
-{ $subsection "db" }
-{ $subsection "xml" }
-{ $subsection "http.server" }
-{ $subsection "logging" }
-{ $subsection "urls" } ;
+{ $subsections
+    "db"
+    "xml"
+    "http.server"
+    "logging"
+    "urls"
+} ;
 
 ABOUT: "furnace"

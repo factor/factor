@@ -18,13 +18,15 @@ HELP: make-descriptive
 
 ARTICLE: "descriptive" "Descriptive errors"
 "This vocabulary defines automatic descriptive errors. Using it, you can define a word which acts as normal, except when it throws an error, the error is wrapped in an instance of a class:"
-{ $subsection descriptive-error }
+{ $subsections descriptive-error }
 "The wrapper contains the word itself, the input parameters, as well as the original error."
 $nl
 "To annotate an existing word with descriptive error checking:"
-{ $subsection make-descriptive }
+{ $subsections make-descriptive }
 "To define words which throw descriptive errors, use the following words:"
-{ $subsection POSTPONE: DESCRIPTIVE: }
-{ $subsection POSTPONE: DESCRIPTIVE:: } ;
+{ $subsections
+    POSTPONE: DESCRIPTIVE:
+    POSTPONE: DESCRIPTIVE::
+} ;
 
 ABOUT: "descriptive"

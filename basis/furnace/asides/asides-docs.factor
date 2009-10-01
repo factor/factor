@@ -21,13 +21,13 @@ ARTICLE: "furnace.asides" "Furnace asides"
 "The " { $vocab-link "furnace.asides" } " vocabulary provides support for sending a user to a page which can then return to the former location."
 $nl
 "To use asides, wrap your responder in an aside responder:"
-{ $subsection <asides> }
+{ $subsections <asides> }
 "The asides responder must be wrapped inside a session responder (" { $link <sessions> } "), which in turn must be wrapped inside a database persistence responder (" { $link <db-persistence> } "). The " { $vocab-link "furnace.alloy" } " vocabulary combines all of these responders into one."
 $nl
 "Saving the current page in an aside which propagates through " { $link <redirect> } " responses:"
-{ $subsection begin-aside }
+{ $subsections begin-aside }
 "Returning from an aside:"
-{ $subsection end-aside }
+{ $subsections end-aside }
 "Asides are used by " { $vocab-link "furnace.auth.login" } "; when the client requests a protected page, an aside begins and the client is redirected to a login page. Upon a successful login, the aside ends and the client returns to the protected page. If the client directly visits the login page and logs in, there is no current aside, so the client is sent to the default URL passed to " { $link end-aside } ", which in the case of login is the root URL." ;
 
 ABOUT: "furnace.asides"

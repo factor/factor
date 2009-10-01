@@ -79,75 +79,99 @@ ARTICLE: "evaluator" "Stack machine model"
     { "a " { $link wrapper } " - the wrapped object is pushed on the data stack. Wrappers are used to push word objects directly on the stack when they would otherwise execute. See the " { $link POSTPONE: \ } " parsing word." }
     { "All other types of objects are pushed on the data stack." }
 }
-{ $subsection "tail-call-opt" }
+{ $subsections "tail-call-opt" }
 { $see-also "compiler" } ;
 
 ARTICLE: "objects" "Objects"
 "An " { $emphasis "object" } " is any datum which may be identified. All values are objects in Factor. Each object carries type information, and types are checked at runtime; Factor is dynamically typed."
-{ $subsection "equality" }
-{ $subsection "math.order" }
-{ $subsection "classes" }
-{ $subsection "tuples" }
-{ $subsection "generic" }
+{ $subsections
+    "equality"
+    "math.order"
+    "classes"
+    "tuples"
+    "generic"
+}
 "Advanced features:"
-{ $subsection "delegate" }
-{ $subsection "mirrors" }
-{ $subsection "slots" } ;
+{ $subsections
+    "delegate"
+    "mirrors"
+    "slots"
+} ;
 
 ARTICLE: "numbers" "Numbers"
-{ $subsection "arithmetic" }
-{ $subsection "math-constants" }
-{ $subsection "math-functions" }
-{ $subsection "number-strings" }
+{ $subsections
+    "arithmetic"
+    "math-constants"
+    "math-functions"
+    "number-strings"
+}
 "Number implementations:"
-{ $subsection "integers" }
-{ $subsection "rationals" }
-{ $subsection "floats" }
-{ $subsection "complex-numbers" }
+{ $subsections
+    "integers"
+    "rationals"
+    "floats"
+    "complex-numbers"
+}
 "Advanced features:"
-{ $subsection "math-vectors" }
-{ $subsection "math-intervals" } ;
+{ $subsections
+    "math-vectors"
+    "math-intervals"
+} ;
 
 USE: io.buffers
 
 ARTICLE: "collections" "Collections" 
 { $heading "Sequences" }
-{ $subsection "sequences" }
-{ $subsection "virtual-sequences" }
-{ $subsection "namespaces-make" }
+{ $subsections
+    "sequences"
+    "virtual-sequences"
+    "namespaces-make"
+}
 "Fixed-length sequences:"
-{ $subsection "arrays" }
-{ $subsection "quotations" }
-{ $subsection "strings" }
-{ $subsection "byte-arrays" }
-{ $subsection "specialized-arrays" }
+{ $subsections
+    "arrays"
+    "quotations"
+    "strings"
+    "byte-arrays"
+    "specialized-arrays"
+}
 "Resizable sequences:"
-{ $subsection "vectors" }
-{ $subsection "byte-vectors" }
-{ $subsection "sbufs" }
-{ $subsection "growable" }
+{ $subsections
+    "vectors"
+    "byte-vectors"
+    "sbufs"
+    "growable"
+}
 { $heading "Associative mappings" }
-{ $subsection "assocs" }
-{ $subsection "linked-assocs" }
-{ $subsection "biassocs" }
-{ $subsection "refs" }
+{ $subsections
+    "assocs"
+    "linked-assocs"
+    "biassocs"
+    "refs"
+}
 "Implementations:"
-{ $subsection "hashtables" }
-{ $subsection "alists" }
-{ $subsection "enums" }
+{ $subsections
+    "hashtables"
+    "alists"
+    "enums"
+}
 { $heading "Double-ended queues" }
-{ $subsection "deques" }
+{ $subsections "deques" }
 "Implementations:"
-{ $subsection "dlists" }
-{ $subsection "search-deques" }
+{ $subsections
+    "dlists"
+    "search-deques"
+}
 { $heading "Other collections" }
-{ $subsection "lists" }
-{ $subsection "disjoint-sets" }
-{ $subsection "interval-maps" }
-{ $subsection "heaps" }
-{ $subsection "boxes" }
-{ $subsection "graphs" }
-{ $subsection "buffers" }
+{ $subsections
+    "lists"
+    "disjoint-sets"
+    "interval-maps"
+    "heaps"
+    "boxes"
+    "graphs"
+    "buffers"
+}
 "There are also many other vocabularies tagged " { $link T{ vocab-tag { name "collections" } } } " in the library." ;
 
 USING: io.encodings.utf8 io.encodings.binary io.files ;
@@ -170,28 +194,40 @@ $nl
 
 ARTICLE: "io" "Input and output"
 { $heading "Streams" }
-{ $subsection "streams" }
-{ $subsection "io.files" }
+{ $subsections
+    "streams"
+    "io.files"
+}
 { $heading "The file system" }
-{ $subsection "io.pathnames" }
-{ $subsection "io.files.info" }
-{ $subsection "io.files.links" }
-{ $subsection "io.directories" }
+{ $subsections
+    "io.pathnames"
+    "io.files.info"
+    "io.files.links"
+    "io.directories"
+}
 { $heading "Encodings" }
-{ $subsection "encodings-introduction" }
-{ $subsection "io.encodings" }
+{ $subsections
+    "encodings-introduction"
+    "io.encodings"
+}
 { $heading "Wrapper streams" }
-{ $subsection "io.streams.duplex" }
-{ $subsection "io.streams.plain" }
-{ $subsection "io.streams.string" }
-{ $subsection "io.streams.byte-array" }
+{ $subsections
+    "io.streams.duplex"
+    "io.streams.plain"
+    "io.streams.string"
+    "io.streams.byte-array"
+}
 { $heading "Utilities" }
-{ $subsection "stream-binary" }
-{ $subsection "io.styles" }
-{ $subsection "checksums" }
+{ $subsections
+    "stream-binary"
+    "io.styles"
+    "checksums"
+}
 { $heading "Implementation" }
-{ $subsection "io.streams.c" }
-{ $subsection "io.ports" }
+{ $subsections
+    "io.streams.c"
+    "io.ports"
+}
 { $see-also "destructors" } ;
 
 ARTICLE: "article-index" "Article index"
@@ -224,107 +260,137 @@ USING: help.cookbook help.tutorial ;
 
 ARTICLE: "handbook-language-reference" "The language"
 { $heading "Fundamentals" }
-{ $subsection "conventions" }
-{ $subsection "syntax" }
+{ $subsections
+    "conventions"
+    "syntax"
+}
 { $heading "The stack" }
-{ $subsection "evaluator" }
-{ $subsection "effects" }
-{ $subsection "inference" }
+{ $subsections
+    "evaluator"
+    "effects"
+    "inference"
+}
 { $heading "Basic data types" }
-{ $subsection "booleans" }
-{ $subsection "numbers" }
-{ $subsection "collections" }
+{ $subsections
+    "booleans"
+    "numbers"
+    "collections"
+}
 { $heading "Evaluation" }
-{ $subsection "words" }
-{ $subsection "shuffle-words" }
-{ $subsection "combinators" }
-{ $subsection "threads" }
+{ $subsections
+    "words"
+    "shuffle-words"
+    "combinators"
+    "threads"
+}
 { $heading "Named values" }
-{ $subsection "locals" }
-{ $subsection "namespaces" }
-{ $subsection "namespaces-global" }
-{ $subsection "values" }
+{ $subsections
+    "locals"
+    "namespaces"
+    "namespaces-global"
+    "values"
+}
 { $heading "Abstractions" }
-{ $subsection "fry" }
-{ $subsection "objects" }
-{ $subsection "errors" }
-{ $subsection "destructors" }
-{ $subsection "memoize" }
-{ $subsection "parsing-words" }
-{ $subsection "macros" }
-{ $subsection "continuations" }
+{ $subsections
+    "fry"
+    "objects"
+    "errors"
+    "destructors"
+    "memoize"
+    "parsing-words"
+    "macros"
+    "continuations"
+}
 { $heading "Program organization" }
-{ $subsection "vocabs.loader" }
+{ $subsections "vocabs.loader" }
 "Vocabularies tagged " { $link T{ vocab-tag { name "extensions" } } } " implement various additional language abstractions." ;
 
 ARTICLE: "handbook-system-reference" "The implementation"
 { $heading "Parse time and compile time" }
-{ $subsection "parser" }
-{ $subsection "definitions" }
-{ $subsection "vocabularies" }
-{ $subsection "source-files" }
-{ $subsection "compiler" }
-{ $subsection "tools.errors" }
+{ $subsections
+    "parser"
+    "definitions"
+    "vocabularies"
+    "source-files"
+    "compiler"
+    "tools.errors"
+}
 { $heading "Virtual machine" }
-{ $subsection "images" }
-{ $subsection "cli" }
-{ $subsection "rc-files" }
-{ $subsection "init" }
-{ $subsection "system" }
-{ $subsection "layouts" } ;
+{ $subsections
+    "images"
+    "cli"
+    "rc-files"
+    "init"
+    "system"
+    "layouts"
+} ;
 
 ARTICLE: "handbook-tools-reference" "Developer tools"
 "The below tools are text-based. " { $link "ui-tools" } " are documented separately."
 { $heading "Workflow" }
-{ $subsection "listener" }
-{ $subsection "editor" }
-{ $subsection "vocabs.refresh" }
-{ $subsection "tools.test" }
-{ $subsection "help" }
+{ $subsections
+    "listener"
+    "editor"
+    "vocabs.refresh"
+    "tools.test"
+    "help"
+}
 { $heading "Debugging" }
-{ $subsection "prettyprint" }
-{ $subsection "inspector" }
-{ $subsection "tools.inference" }
-{ $subsection "tools.annotations" }
-{ $subsection "tools.deprecation" }
+{ $subsections
+    "prettyprint"
+    "inspector"
+    "tools.inference"
+    "tools.annotations"
+    "tools.deprecation"
+}
 { $heading "Browsing" }
-{ $subsection "see" }
-{ $subsection "tools.crossref" }
-{ $subsection "vocabs.hierarchy" }
+{ $subsections
+    "see"
+    "tools.crossref"
+    "vocabs.hierarchy"
+}
 { $heading "Performance" }
-{ $subsection "timing" }
-{ $subsection "profiling" }
-{ $subsection "tools.memory" }
-{ $subsection "tools.threads" }
-{ $subsection "tools.destructors" }
-{ $subsection "tools.disassembler" }
+{ $subsections
+    "timing"
+    "profiling"
+    "tools.memory"
+    "tools.threads"
+    "tools.destructors"
+    "tools.disassembler"
+}
 { $heading "Deployment" }
-{ $subsection "tools.deploy" } ;
+{ $subsections "tools.deploy" } ;
 
 ARTICLE: "handbook-library-reference" "Libraries"
 "This index lists articles from loaded vocabularies which are not subsections of any other article. To explore more vocabularies, see " { $link "vocab-index" } "."
 { $index [ orphan-articles { "help.home" "handbook" } diff ] } ;
 
 ARTICLE: "handbook" "Factor handbook"
-"Learn the language:"
-{ $subsection "cookbook" }
-{ $subsection "first-program" }
-"Reference material:"
-{ $subsection "handbook-language-reference" }
-{ $subsection "io" }
-{ $subsection "ui" }
-{ $subsection "handbook-system-reference" }
-{ $subsection "handbook-tools-reference" }
-{ $subsection "ui-tools" }
-{ $subsection "alien" }
-{ $subsection "handbook-library-reference" }
-"Explore loaded libraries:"
-{ $subsection "article-index" }
-{ $subsection "primitive-index" }
-{ $subsection "error-index" }
-{ $subsection "type-index" }
-{ $subsection "class-index" }
-"Explore the code base:"
-{ $subsection "vocab-index" } ;
+{ $heading "Getting Started" }
+{ $subsections
+    "cookbook"
+    "first-program"
+}
+{ $heading "Reference" }
+{ $subsections
+    "handbook-language-reference"
+    "io"
+    "ui"
+    "handbook-system-reference"
+    "handbook-tools-reference"
+    "ui-tools"
+    "alien"
+    "handbook-library-reference"
+}
+{ $heading "Explore loaded libraries" }
+{ $subsections
+    "article-index"
+    "primitive-index"
+    "error-index"
+    "type-index"
+    "class-index"
+}
+{ $heading "Explore the code base" }
+{ $subsections "vocab-index" } ;
 
 ABOUT: "handbook"

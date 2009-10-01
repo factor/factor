@@ -51,13 +51,17 @@ HELP: open-offscreen
 
 ARTICLE: "ui.offscreen" "Offscreen UI rendering"
 "The " { $vocab-link "ui.offscreen" } " provides words for rendering gadgets to an offscreen buffer so that bitmaps can be made from their contents."
-{ $subsection offscreen-world }
+{ $subsections offscreen-world }
 "Opening gadgets offscreen:"
-{ $subsection open-offscreen }
-{ $subsection close-offscreen }
-{ $subsection do-offscreen }
+{ $subsections
+    open-offscreen
+    close-offscreen
+    do-offscreen
+}
 "Creating bitmaps from offscreen buffers:"
-{ $subsection offscreen-world>bitmap }
-{ $subsection gadget>bitmap } ;
+{ $subsections
+    offscreen-world>bitmap
+    gadget>bitmap
+} ;
 
 ABOUT: "ui.offscreen"

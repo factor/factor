@@ -210,22 +210,30 @@ HELP: write-access
 
 ARTICLE: "gpu.buffers" "Buffer objects"
 "The " { $vocab-link "gpu.buffers" } " vocabulary provides words for creating, allocating, updating, and reading GPU data buffers."
-{ $subsection buffer }
-{ $subsection <buffer> }
-{ $subsection byte-array>buffer }
+{ $subsections
+    buffer
+    <buffer>
+    byte-array>buffer
+}
 "Declaring buffer usage:"
-{ $subsection buffer-kind }
-{ $subsection buffer-upload-pattern }
-{ $subsection buffer-usage-pattern }
+{ $subsections
+    buffer-kind
+    buffer-upload-pattern
+    buffer-usage-pattern
+}
 "Referencing buffer data:"
-{ $subsection buffer-ptr }
-{ $subsection buffer-range }
+{ $subsections
+    buffer-ptr
+    buffer-range
+}
 "Manipulating buffer data:"
-{ $subsection allocate-buffer }
-{ $subsection update-buffer }
-{ $subsection read-buffer }
-{ $subsection copy-buffer }
-{ $subsection with-mapped-buffer }
+{ $subsections
+    allocate-buffer
+    update-buffer
+    read-buffer
+    copy-buffer
+    with-mapped-buffer
+}
 ;
 
 ABOUT: "gpu.buffers"

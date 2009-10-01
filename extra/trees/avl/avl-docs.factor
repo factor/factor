@@ -19,9 +19,11 @@ HELP: avl
 
 ARTICLE: "trees.avl" "AVL trees"
 "This is a library for AVL trees, with logarithmic time storage and retrieval operations. These trees conform to the assoc protocol."
-{ $subsection avl }
-{ $subsection <avl> }
-{ $subsection >avl }
-{ $subsection POSTPONE: AVL{ } ;
+{ $subsections
+    avl
+    <avl>
+    >avl
+    POSTPONE: AVL{
+} ;
 
 ABOUT: "trees.avl"

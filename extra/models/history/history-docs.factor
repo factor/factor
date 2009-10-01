@@ -25,12 +25,16 @@ HELP: add-history
 
 ARTICLE: "models-history" "History models"
 "History models record previous values."
-{ $subsection history }
-{ $subsection <history> }
+{ $subsections
+    history
+    <history>
+}
 "Recording history:"
-{ $subsection add-history }
+{ $subsections add-history }
 "Navigating the history:"
-{ $subsection go-back }
-{ $subsection go-forward } ;
+{ $subsections
+    go-back
+    go-forward
+} ;
 
 ABOUT: "models-history"

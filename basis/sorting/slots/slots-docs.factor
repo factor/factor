@@ -37,10 +37,12 @@ HELP: sort-by
 ARTICLE: "sorting.slots" "Sorting by slots"
 "The " { $vocab-link "sorting.slots" } " vocabulary can sort tuples by slot in ascending or descending order, using subsequent slots as tie-breakers." $nl
 "Comparing two objects by a sequence of slots:"
-{ $subsection compare-slots }
+{ $subsections compare-slots }
 "Sorting a sequence of tuples by a slot/comparator pairs:"
-{ $subsection sort-by }
-{ $subsection sort-keys-by }
-{ $subsection sort-values-by } ;
+{ $subsections
+    sort-by
+    sort-keys-by
+    sort-values-by
+} ;
 
 ABOUT: "sorting.slots"

@@ -93,32 +93,45 @@ HELP: clear-doc
 
 ARTICLE: "documents" "Documents"
 "The " { $vocab-link "documents" } " vocabulary implements " { $emphasis "documents" } ", which are models storing a passage of text as a sequence of lines. Operations are defined for operating on subranges of the text, and " { $link "ui.gadgets.editors" } " can display these models."
-{ $subsection document }
-{ $subsection <document> }
+{ $subsections
+    document
+    <document>
+}
 "Getting and setting the contents of the entire document:"
-{ $subsection doc-string }
-{ $subsection set-doc-string }
-{ $subsection clear-doc }
+{ $subsections
+    doc-string
+    set-doc-string
+    clear-doc
+}
 "Getting and setting subranges:"
-{ $subsection doc-line }
-{ $subsection doc-lines }
-{ $subsection doc-range }
-{ $subsection set-doc-range }
-{ $subsection remove-doc-range }
+{ $subsections
+    doc-line
+    doc-lines
+    doc-range
+    set-doc-range
+    remove-doc-range
+}
 "A combinator:"
-{ $subsection each-line }
-{ $subsection "document-locs" }
-{ $subsection "documents.elements" }
+{ $subsections each-line }
+"More info:"
+{ $subsections
+    "document-locs"
+    "documents.elements"
+}
 { $see-also "ui.gadgets.editors" } ;
 
 ARTICLE: "document-locs" "Document locations"
 "Locations in the document are represented as a line/column number pair, with both indices being zero-based. There are some words for manipulating locations:"
-{ $subsection +col }
-{ $subsection +line }
-{ $subsection =col }
-{ $subsection =line }
+{ $subsections
+    +col
+    +line
+    =col
+    =line
+}
 "Miscellaneous words for working with locations:"
-{ $subsection lines-equal? }
-{ $subsection validate-loc } ;
+{ $subsections
+    lines-equal?
+    validate-loc
+} ;
 
 ABOUT: "documents"

@@ -50,21 +50,27 @@ HELP: line-metrics
 
 ARTICLE: "text-rendering" "Rendering text"
 "The " { $vocab-link "ui.text" } " vocabulary provides a cross-platform interface to the operating system's native font rendering engine. Currently, it uses Core Text on Mac OS X and FreeType on Windows and X11."
-{ $subsection "fonts" }
+{ $subsections "fonts" }
 "Measuring text:"
-{ $subsection text-dim }
-{ $subsection text-width }
-{ $subsection text-height }
-{ $subsection line-metrics }
+{ $subsections
+    text-dim
+    text-width
+    text-height
+    line-metrics
+}
 "Converting screen locations to string offsets, and vice versa:"
-{ $subsection x>offset }
-{ $subsection offset>x }
+{ $subsections
+    x>offset
+    offset>x
+}
 "Rendering text:"
-{ $subsection draw-text }
+{ $subsections draw-text }
 "Low-level text protocol for UI backends:"
-{ $subsection string-width }
-{ $subsection string-height }
-{ $subsection string-dim }
-{ $subsection draw-string } ;
+{ $subsections
+    string-width
+    string-height
+    string-dim
+    draw-string
+} ;
 
 ABOUT: "text-rendering"

@@ -75,16 +75,16 @@ HELP: stream-throws
 ARTICLE: "io.streams.limited" "Limited input streams"
 "The " { $vocab-link "io.streams.limited" } " vocabulary wraps a stream to behave as if it had only a limited number of bytes, either throwing an error or returning " { $link f } " upon reaching the end." $nl
 "Wrap a stream in a limited stream:"
-{ $subsection limit }
+{ $subsections limit }
 "Wrap the current " { $link input-stream } " in a limited stream:"
-{ $subsection limit-input }
+{ $subsections limit-input }
 "Unlimits a limited stream:"
-{ $subsection unlimited }
+{ $subsections unlimited }
 "Unlimits the current " { $link input-stream } ":"
-{ $subsection unlimited-input }
+{ $subsections unlimited-input }
 "Make a limited stream throw an exception on exhaustion:"
-{ $subsection stream-throws }
+{ $subsections stream-throws }
 "Make a limited stream return " { $link f } " on exhaustion:"
-{ $subsection stream-eofs } ;
+{ $subsections stream-eofs } ;
 
 ABOUT: "io.streams.limited"

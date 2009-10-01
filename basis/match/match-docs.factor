@@ -54,12 +54,12 @@ ARTICLE: "match" "Pattern matching"
 "The " { $vocab-link "match" } " vocabulary implements ML-style pattern matching."
 $nl
 "Variables used for pattern matching must be explicitly defined first:"
-{ $subsection POSTPONE: MATCH-VARS: }
+{ $subsections POSTPONE: MATCH-VARS: }
 "A basic pattern match:"
-{ $subsection match }
+{ $subsections match }
 "A conditional form analogous to " { $link cond } ":"
-{ $subsection match-cond }
+{ $subsections match-cond }
 "Pattern replacement:"
-{ $subsection match-replace } ;
+{ $subsections match-replace } ;
 
 ABOUT: "match"

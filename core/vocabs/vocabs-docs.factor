@@ -5,30 +5,40 @@ ARTICLE: "vocabularies" "Vocabularies"
 "A " { $emphasis "vocabulary" } " is a named collection of words. Vocabularies are defined in the " { $vocab-link "vocabs" } " vocabulary."
 $nl
 "Vocabularies are stored in a global hashtable:"
-{ $subsection dictionary }
+{ $subsections dictionary }
 "Vocabularies form a class."
-{ $subsection vocab }
-{ $subsection vocab? }
+{ $subsections
+    vocab
+    vocab?
+}
 "Various vocabulary words are overloaded to accept a " { $emphasis "vocabulary specifier" } ", which is a string naming the vocabulary, the " { $link vocab } " instance itself, or a " { $link vocab-link } ":"
-{ $subsection vocab-link }
-{ $subsection >vocab-link }
+{ $subsections
+    vocab-link
+    >vocab-link
+}
 "Looking up vocabularies by name:"
-{ $subsection vocab }
+{ $subsections vocab }
 "Accessors for various vocabulary attributes:"
-{ $subsection vocab-name }
-{ $subsection vocab-main }
-{ $subsection vocab-help }
+{ $subsections
+    vocab-name
+    vocab-main
+    vocab-help
+}
 "Looking up existing vocabularies and creating new vocabularies:"
-{ $subsection vocab }
-{ $subsection child-vocabs }
-{ $subsection create-vocab }
+{ $subsections
+    vocab
+    child-vocabs
+    create-vocab
+}
 "Getting words from a vocabulary:"
-{ $subsection vocab-words }
-{ $subsection words }
-{ $subsection all-words }
-{ $subsection words-named }
+{ $subsections
+    vocab-words
+    words
+    all-words
+    words-named
+}
 "Removing a vocabulary:"
-{ $subsection forget-vocab }
+{ $subsections forget-vocab }
 { $see-also "words" "vocabs.loader" } ;
 
 ABOUT: "vocabularies"

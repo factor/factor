@@ -26,8 +26,10 @@ HELP: with-html-writer
 
 ARTICLE: "html.streams" "HTML streams"
 "The " { $vocab-link "html.streams" } " vocabulary provides a stream which implements " { $link "io.styles" } " by constructing HTML markup in the form of " { $vocab-link "xml.data" } " types."
-{ $subsection html-writer }
-{ $subsection <html-writer> }
-{ $subsection with-html-writer } ;
+{ $subsections
+    html-writer
+    <html-writer>
+    with-html-writer
+} ;
 
 ABOUT: "html.streams"

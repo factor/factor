@@ -185,6 +185,8 @@ ARTICLE: "ui-control-impl" "Implementing controls"
 "A " { $emphasis "control" } " is a gadget which is linked to an underlying " { $link model } " by having its " { $snippet "model" } " slot set to a " { $link model } " instance."
 $nl
 "Some utility words useful in control implementations:"
-{ $subsection control-value }
-{ $subsection set-control-value }
+{ $subsections
+    control-value
+    set-control-value
+}
 { $see-also "models" } ;

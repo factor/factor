@@ -6,8 +6,10 @@ IN: io.encodings.string
 ARTICLE: "io.encodings.string" "Encoding and decoding strings"
 "Strings can be encoded or decoded to and from byte arrays through an encoding by passing "
 { $link "encodings-descriptors" } " to the following words:"
-{ $subsection encode }
-{ $subsection decode } ;
+{ $subsections
+    encode
+    decode
+} ;
 
 HELP: decode
 { $values { "byte-array" byte-array } { "encoding" "an encoding descriptor" }

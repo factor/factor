@@ -17,8 +17,10 @@ HELP: show-commands-menu
 
 ARTICLE: "ui.gadgets.menus" "Popup menus"
 "The " { $vocab-link "ui.gadgets.menus" } " vocabulary displays popup menus in " { $link "ui.gadgets.glass" } "."
-{ $subsection <commands-menu> }
-{ $subsection show-menu }
-{ $subsection show-commands-menu } ;
+{ $subsections
+    <commands-menu>
+    show-menu
+    show-commands-menu
+} ;
 
 ABOUT: "ui.gadgets.menus"

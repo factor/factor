@@ -3,82 +3,104 @@ IN: math.vectors
 
 ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
 "Vector/vector binary operations:"
-{ $subsection v+ }
-{ $subsection v- }
-{ $subsection v+- }
-{ $subsection v* }
-{ $subsection v/ }
+{ $subsections
+    v+
+    v-
+    v+-
+    v*
+    v/
+}
 "Vector unary operations:"
-{ $subsection vneg }
-{ $subsection vabs }
-{ $subsection vsqrt }
-{ $subsection vfloor }
-{ $subsection vceiling }
-{ $subsection vtruncate }
+{ $subsections
+    vneg
+    vabs
+    vsqrt
+    vfloor
+    vceiling
+    vtruncate
+}
 "Vector/scalar and scalar/vector binary operations:"
-{ $subsection vneg }
-{ $subsection v*n }
-{ $subsection n*v }
-{ $subsection v/n }
-{ $subsection n/v }
-{ $subsection v+n }
-{ $subsection n+v }
-{ $subsection v-n }
-{ $subsection n-v }
+{ $subsections
+    vneg
+    v*n
+    n*v
+    v/n
+    n/v
+    v+n
+    n+v
+    v-n
+    n-v
+}
 "Saturated arithmetic (only on " { $link "specialized-arrays" } "):"
-{ $subsection vs+ }
-{ $subsection vs- }
-{ $subsection vs* }
+{ $subsections
+    vs+
+    vs-
+    vs*
+}
 "Inner product and norm:"
-{ $subsection v. }
-{ $subsection norm }
-{ $subsection norm-sq }
-{ $subsection normalize }
+{ $subsections
+    v.
+    norm
+    norm-sq
+    normalize
+}
 "Comparing entire vectors:"
-{ $subsection distance }
-{ $subsection v~ } ;
+{ $subsections
+    distance
+    v~
+} ;
 
 ARTICLE: "math-vectors-logic" "Vector componentwise logic"
 "Element comparisons:"
-{ $subsection v< }
-{ $subsection v<= }
-{ $subsection v= }
-{ $subsection v>= }
-{ $subsection v> }
-{ $subsection vunordered? }
-{ $subsection vmax }
-{ $subsection vmin }
-{ $subsection vsupremum }
-{ $subsection vinfimum }
+{ $subsections
+    v<
+    v<=
+    v=
+    v>=
+    v>
+    vunordered?
+    vmax
+    vmin
+    vsupremum
+    vinfimum
+}
 "Bitwise operations:"
-{ $subsection vbitand }
-{ $subsection vbitandn }
-{ $subsection vbitor }
-{ $subsection vbitxor }
-{ $subsection vlshift }
-{ $subsection vrshift }
+{ $subsections
+    vbitand
+    vbitandn
+    vbitor
+    vbitxor
+    vlshift
+    vrshift
+}
 "Element logical operations:"
-{ $subsection vand }
-{ $subsection vor }
-{ $subsection vxor }
-{ $subsection vmask }
-{ $subsection v? }
+{ $subsections
+    vand
+    vor
+    vxor
+    vmask
+    v?
+}
 "Element shuffling:"
-{ $subsection vshuffle } ;
+{ $subsections vshuffle } ;
 
 ARTICLE: "math-vectors-misc" "Miscellaneous vector functions"
-{ $subsection trilerp }
-{ $subsection bilerp }
-{ $subsection vlerp }
-{ $subsection vnlerp }
-{ $subsection vbilerp } ;
+{ $subsections
+    trilerp
+    bilerp
+    vlerp
+    vnlerp
+    vbilerp
+} ;
 
 
 ARTICLE: "math-vectors" "Vector operations"
 "Any Factor sequence can be used to represent a mathematical vector, however for best performance, the sequences defined by the " { $vocab-link "specialized-arrays" } " and " { $vocab-link "math.vectors.simd" } " vocabularies should be used."
-{ $subsection "math-vectors-arithmetic" }
-{ $subsection "math-vectors-logic" }
-{ $subsection "math-vectors-misc" } ;
+{ $subsections
+    "math-vectors-arithmetic"
+    "math-vectors-logic"
+    "math-vectors-misc"
+} ;
 
 ABOUT: "math-vectors"
 

@@ -104,17 +104,21 @@ HELP: ROMAN:
 ARTICLE: "roman" "Roman numerals"
 "The " { $vocab-link "roman" } " vocabulary can convert numbers to and from the Roman numeral system and can perform arithmetic given Roman numerals as input." $nl
 "A parsing word for literal Roman numerals:"
-{ $subsection POSTPONE: ROMAN: }
+{ $subsections POSTPONE: ROMAN: }
 "Converting to Roman numerals:"
-{ $subsection >roman }
-{ $subsection >ROMAN }
+{ $subsections
+    >roman
+    >ROMAN
+}
 "Converting Roman numerals to integers:"
-{ $subsection roman> }
+{ $subsections roman> }
 "Roman numeral arithmetic:"
-{ $subsection roman+ }
-{ $subsection roman- }
-{ $subsection roman* }
-{ $subsection roman/i }
-{ $subsection roman/mod } ;
+{ $subsections
+    roman+
+    roman-
+    roman*
+    roman/i
+    roman/mod
+} ;
 
 ABOUT: "roman"

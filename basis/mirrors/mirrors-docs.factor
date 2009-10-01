@@ -5,10 +5,12 @@ ARTICLE: "mirrors" "Mirrors"
 "The " { $vocab-link "mirrors" } " vocabulary defines data types which present an object's slots and slot values as an associative structure. This enables idioms such as iteration over all slots in a tuple, or editing of tuples, sequences and assocs in a generic fashion. This functionality is used by developer tools and meta-programming utilities."
 $nl
 "A mirror provides such a view of a tuple:"
-{ $subsection mirror }
-{ $subsection <mirror> }
+{ $subsections
+    mirror
+    <mirror>
+}
 "Utility word used by developer tools which inspect objects:"
-{ $subsection make-mirror }
+{ $subsections make-mirror }
 { $see-also "slots" } ;
 
 ABOUT: "mirrors"

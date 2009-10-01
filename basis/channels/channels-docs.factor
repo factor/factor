@@ -37,10 +37,10 @@ HELP: from
 ARTICLE: "channels" "Channels"
 "The " { $vocab-link "channels" } " vocabulary provides a simple abstraction to send and receive objects." $nl
 "Opening a channel:"
-{ $subsection <channel> }
+{ $subsections <channel> }
 "Sending a message:"
-{ $subsection to }
+{ $subsections to }
 "Receiving a message:"
-{ $subsection from } ;
+{ $subsections from } ;
 
 ABOUT: "channels"

@@ -90,9 +90,11 @@ HELP: [-]
 
 ARTICLE: "order-specifiers" "Ordering specifiers"
 "Ordering words such as " { $link <=> } " output one of the following values, indicating that of two objects being compared, the first is less than the second, the two are equal, or that the first is greater than the second:"
-{ $subsection +lt+ }
-{ $subsection +eq+ }
-{ $subsection +gt+ } ;
+{ $subsections
+    +lt+
+    +eq+
+    +gt+
+} ;
 
 ARTICLE: "math.order.example" "Linear order example"
 "A tuple class which defines an ordering among instances by comparing the values of the " { $snippet "id" } " slot:"
@@ -103,23 +105,29 @@ ARTICLE: "math.order.example" "Linear order example"
 
 ARTICLE: "math.order" "Linear order protocol"
 "Some classes define an intrinsic order amongst instances. This includes numbers, sequences (in particular, strings), and words."
-{ $subsection <=> }
-{ $subsection >=< }
-{ $subsection compare }
-{ $subsection invert-comparison }
+{ $subsections
+    <=>
+    >=<
+    compare
+    invert-comparison
+}
 "The above words output order specifiers."
-{ $subsection "order-specifiers" }
+{ $subsections "order-specifiers" }
 "Utilities for comparing objects:"
-{ $subsection after? }
-{ $subsection before? }
-{ $subsection after=? }
-{ $subsection before=? }
+{ $subsections
+    after?
+    before?
+    after=?
+    before=?
+}
 "Minimum, maximum, clamping:"
-{ $subsection min }
-{ $subsection max }
-{ $subsection clamp }
+{ $subsections
+    min
+    max
+    clamp
+}
 "Out of the above generic words, it suffices to implement " { $link <=> } " alone. The others may be provided as an optimization."
-{ $subsection "math.order.example" }
+{ $subsections "math.order.example" }
 { $see-also "sequences-sorting" } ;
 
 ABOUT: "math.order"

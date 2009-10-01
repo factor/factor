@@ -74,13 +74,17 @@ HELP: $operation
 
 ARTICLE: "ui-operations" "Operations"
 "Operations are commands performed on presentations."
-{ $subsection operation }
-{ $subsection define-operation }
-{ $subsection primary-operation }
-{ $subsection secondary-operation }
-{ $subsection define-operation-map }
+{ $subsections
+    operation
+    define-operation
+    primary-operation
+    secondary-operation
+    define-operation-map
+}
 "When documenting gadgets, operation documentation can be automatically generated:"
-{ $subsection $operations }
-{ $subsection $operation } ;
+{ $subsections
+    $operations
+    $operation
+} ;
 
 ABOUT: "ui-operations"
