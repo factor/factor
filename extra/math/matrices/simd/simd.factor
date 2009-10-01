@@ -132,7 +132,7 @@ TYPED:: m4^n ( m: matrix4 n: fixnum -- m^n: matrix4 )
 TYPED:: scale-matrix4 ( factors: float-4 -- matrix: matrix4 )
     matrix4 (struct) :> c
 
-    factors float-4{ t t t f } vmask :> factors'
+    factors float-4{ t t t f } vbitand :> factors'
 
     factors' { 0 3 3 3 } vshuffle
     factors' { 3 1 3 3 } vshuffle
@@ -150,9 +150,9 @@ TYPED:: translation-matrix4 ( offset: float-4 -- matrix: matrix4 )
     float-4{ 0.0 0.0 0.0 1.0 } :> c4
     float-4{ t t t f } offset c4 v? :> offset'
 
-    offset' { 3 3 3 0 } vshuffle float-4{ t f f t } vmask
-    offset' { 3 3 3 1 } vshuffle float-4{ f t f t } vmask
-    offset' { 3 3 3 2 } vshuffle float-4{ f f t t } vmask
+    offset' { 3 3 3 0 } vshuffle float-4{ t f f t } vbitand
+    offset' { 3 3 3 1 } vshuffle float-4{ f t f t } vbitand
+    offset' { 3 3 3 2 } vshuffle float-4{ f f t t } vbitand
     c4
 
     c set-rows ;
@@ -177,7 +177,7 @@ TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
     axis2 cc ones axis2 v- v* v+ :> diagonal
 
     axis { 1 0 0 3 } vshuffle axis { 2 2 1 3 } vshuffle v* 1-c v*
-    float-4{ t t t f } vmask :> triangle-a
+    float-4{ t t t f } vbitand :> triangle-a
     ss axis v* triangle-sign v* :> triangle-b
     triangle-a triangle-b v+ :> triangle-lo
     triangle-a triangle-b v- :> triangle-hi
@@ -200,9 +200,9 @@ TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 
     float-4{ t t f f } xy near far - float-4-with v? :> denom
     num denom v/ :> fov
 
-    fov { 0 0 0 0 } vshuffle float-4{ t f f f } vmask
-    fov { 1 1 1 1 } vshuffle float-4{ f t f f } vmask
-    fov { 2 2 2 3 } vshuffle float-4{ f f t t } vmask
+    fov { 0 0 0 0 } vshuffle float-4{ t f f f } vbitand
+    fov { 1 1 1 1 } vshuffle float-4{ f t f f } vbitand
+    fov { 2 2 2 3 } vshuffle float-4{ f f t t } vbitand
     float-4{ 0.0 0.0 -1.0 0.0 }
 
     c set-rows ;

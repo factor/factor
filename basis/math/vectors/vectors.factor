@@ -92,6 +92,10 @@ PRIVATE>
 : vxor ( u v -- w ) [ xor ] 2map ;
 : vnot ( u -- w )   [ not ] map ;
 
+: vall? ( v -- ? ) [ ] all? ;
+: vany? ( v -- ? ) [ ] any? ;
+: vnone? ( v -- ? ) [ not ] all? ;
+
 : v<  ( u v -- w ) [ <   ] { } 2map-as ;
 : v<= ( u v -- w ) [ <=  ] { } 2map-as ;
 : v>= ( u v -- w ) [ >=  ] { } 2map-as ;
@@ -101,8 +105,6 @@ PRIVATE>
 
 : v? ( mask true false -- w )
     [ vbitand ] [ vbitandn ] bi-curry* bi vbitor ; inline
-
-: vmask ( u ? -- u' ) vbitand ; inline
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;
