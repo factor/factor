@@ -14,7 +14,7 @@ SYMBOLS: -> +vector+ +scalar+ +nonnegative+ +literal+ ;
             { +vector+ [ drop ] }
             { +scalar+ [ nip ] }
             { +nonnegative+ [ nip ] }
-            { +literal+ [ 2drop object ] }
+            { +literal+ [ 2drop f ] }
         } case
     ] with with map ;
 
@@ -136,7 +136,7 @@ ERROR: bad-vector-word word ;
         [ { } ]
     } cond
     ! Don't specialize horizontal shifts or shuffles at all, they're only for SIMD
-    { hlshift hrshift vshuffle } diff
+    { hlshift hrshift vshuffle vbroadcast } diff
     nip ;
 
 :: specialize-vector-words ( array-type elt-type simd -- )
@@ -147,13 +147,16 @@ ERROR: bad-vector-word word ;
         tri add-specialization
     ] each ;
 
+: specialization-matches? ( value-infos signature -- ? )
+    [ [ [ class>> ] dip class<= ] [ literal?>> ] if* ] 2all? ;
+
 : find-specialization ( classes word -- word/f )
     specializations
-    [ first [ class<= ] 2all? ] with find
+    [ first specialization-matches? ] with find
     swap [ second ] when ;
 
 : vector-word-custom-inlining ( #call -- word/f )
-    [ in-d>> [ value-info class>> ] map ] [ word>> ] bi
+    [ in-d>> [ value-info ] map ] [ word>> ] bi
     find-specialization ;
 
 vector-words keys [

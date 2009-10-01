@@ -27,3 +27,9 @@ IN: random.mersenne-twister.tests
 [ 3 ] [ 101 [ 3 random-bytes length ] test-rng ] unit-test
 [ 33 ] [ 101 [ 33 random-bytes length ] test-rng ] unit-test
 [ t ] [ 101 [ 100 random-bits log2 90 > ] test-rng ] unit-test
+
+[ t ]
+[
+    1234 <mersenne-twister>
+    [ random-32* ] [ 1234 seed-random random-32* ] bi =
+] unit-test
