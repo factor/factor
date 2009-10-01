@@ -11,7 +11,9 @@ HELP: <grid-lines>
 { $description "Creates a new " { $link grid-lines } "." } ;
 
 ARTICLE: "ui.gadgets.grid-lines" "Grid lines"
-{ $subsection grid-lines }
-{ $subsection <grid-lines> } ;
+{ $subsections
+    grid-lines
+    <grid-lines>
+} ;
 
 ABOUT: "ui.gadgets.grid-lines"

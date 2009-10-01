@@ -24,8 +24,10 @@ HELP: COLOR:
 
 ARTICLE: "colors.constants" "Standard color database"
 "The " { $vocab-link "colors.constants" } " vocabulary bundles the X11 " { $snippet "rgb.txt" } " database and Factor's " { $snippet "factor-colors.txt" } " theme database to provide words for looking up color values by name."
-{ $subsection named-color }
-{ $subsection named-colors }
-{ $subsection POSTPONE: COLOR: } ;
+{ $subsections
+    named-color
+    named-colors
+    POSTPONE: COLOR:
+} ;
 
 ABOUT: "colors.constants" 

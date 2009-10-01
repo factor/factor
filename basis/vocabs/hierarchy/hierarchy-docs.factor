@@ -5,20 +5,30 @@ ARTICLE: "vocabs.hierarchy" "Vocabulary hierarchy tools"
 "These tools operate on all vocabularies found in the current set of " { $link vocab-roots } ", loaded or not."
 $nl
 "Loading vocabulary hierarchies:"
-{ $subsection load }
-{ $subsection load-all }
+{ $subsections
+    load
+    load-all
+}
 "Getting all vocabularies from disk:"
-{ $subsection all-vocabs }
-{ $subsection all-vocabs-recursive }
+{ $subsections
+    all-vocabs
+    all-vocabs-recursive
+}
 "Getting all vocabularies from disk whose names which match a string prefix:"
-{ $subsection child-vocabs }
-{ $subsection child-vocabs-recursive }
+{ $subsections
+    child-vocabs
+    child-vocabs-recursive
+}
 "Words for modifying output:"
-{ $subsection no-roots }
-{ $subsection no-prefixes }
+{ $subsections
+    no-roots
+    no-prefixes
+}
 "Getting " { $link "vocabs.metadata" } " for all vocabularies from disk:"
-{ $subsection all-tags }
-{ $subsection all-authors } ;
+{ $subsections
+    all-tags
+    all-authors
+} ;
 
 ABOUT: "vocabs.hierarchy"
 

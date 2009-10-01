@@ -17,7 +17,7 @@ ARTICLE: "slot-class-declaration" "Slot class declarations"
     { "The " { $link slots>tuple } " and " { $link >tuple } " words ensure that the values in the sequence satisfy the correct class predicates." }
     { { $link "tuple-redefinition" } " fills in new slots with initial values and ensures that changes to existing declarations result in incompatible values being replaced with the initial value of their respective slots." }
 }
-{ $subsection "slot-class-coercion" } ;
+{ $subsections "slot-class-coercion" } ;
 
 ARTICLE: "slot-class-coercion" "Coercive slot declarations"
 "If the class of a slot is declared to be one of " { $link fixnum } " or " { $link float } ", then rather than testing values with the class predicate, writer words coerce values to the relevant type with " { $link >fixnum } " or " { $link >float } ". This may still result in error, but permits a wider range of values than a class predicate test. It also results in a possible loss of precision; for example, storing a large integer into a " { $link fixnum } " slot will silently overflow and discard high bits, and storing a ratio into a " { $link float } " slot may lose precision if the ratio is one which cannot be represented exactly with floating-point."
@@ -31,9 +31,11 @@ ARTICLE: "tuple-declarations" "Tuple slot declarations"
     { "whether a slot is read only or not (" { $link read-only } ")" }
     { "an initial value (" { $link initial: } ")" }
 }
-{ $subsection "slot-read-only-declaration" }
-{ $subsection "slot-class-declaration" }
-{ $subsection "slot-initial-values" } ;
+{ $subsections
+    "slot-read-only-declaration"
+    "slot-class-declaration"
+    "slot-initial-values"
+} ;
 
 ARTICLE: "parametrized-constructors" "Parameterized constructors"
 "A " { $emphasis "parametrized constructor" } " is a word which directly or indirectly calls " { $link new } " or " { $link boa } ", but instead of passing a literal class symbol, it takes the class symbol as an input from the stack."
@@ -84,10 +86,12 @@ $nl
 
 ARTICLE: "tuple-constructors" "Tuple constructors"
 "Tuples are created by calling one of two constructor primitives:"
-{ $subsection new }
-{ $subsection boa }
+{ $subsections
+    new
+    boa
+}
 "A shortcut for defining BOA constructors:"
-{ $subsection POSTPONE: C: }
+{ $subsections POSTPONE: C: }
 "By convention, construction logic is encapsulated in a word named after the tuple class surrounded in angle brackets; for example, the constructor word for a " { $snippet "point" } " class might be named " { $snippet "<point>" } "."
 $nl
 "Constructors play a part in enforcing the invariant that slot values must always match slot declarations. The " { $link new } " word fills in the tuple with initial values, and " { $link boa } " ensures that the values on the stack match the corresponding slot declarations. See " { $link "tuple-declarations" } "."
@@ -115,7 +119,7 @@ $nl
     "! Run-time error"
     "\"not a number\" 2 3 4 color boa"
 }
-{ $subsection "parametrized-constructors" } ;
+{ $subsections "parametrized-constructors" } ;
 
 ARTICLE: "tuple-inheritance-example" "Tuple subclassing example"
 "Rectangles, parallelograms and circles are all shapes. We support two operations on shapes:"
@@ -182,17 +186,21 @@ $nl
 { $code
     "TUPLE: subclass < superclass ... ;"
 }
-{ $subsection "tuple-inheritance-example" }
-{ $subsection "tuple-inheritance-anti-example" } 
+{ $subsections
+    "tuple-inheritance-example"
+    "tuple-inheritance-anti-example"
+} 
 { $see-also "call-next-method" "parametrized-constructors" "unions" "mixins" } ;
 
 ARTICLE: "tuple-introspection" "Tuple introspection"
 "In addition to the slot reader and writer words which " { $link POSTPONE: TUPLE: } " defines for every tuple class, it is possible to construct and take apart entire tuples in a generic way."
-{ $subsection >tuple }
-{ $subsection tuple>array }
-{ $subsection tuple-slots }
+{ $subsections
+    >tuple
+    tuple>array
+    tuple-slots
+}
 "Tuple classes can also be defined at run time:"
-{ $subsection define-tuple-class }
+{ $subsections define-tuple-class }
 { $see-also "slots" "mirrors" } ;
 
 ARTICLE: "tuple-examples" "Tuple examples"
@@ -288,7 +296,7 @@ ARTICLE: "protocol-slots" "Protocol slots"
 "A " { $emphasis "protocol slot" } " is one which is assumed to exist by the implementation of a class, without being defined on the class itself. The burden is on subclasses (or mixin instances) to provide this slot."
 $nl
 "Protocol slots are defined using a parsing word:"
-{ $subsection POSTPONE: SLOT: }
+{ $subsections POSTPONE: SLOT: }
 "Protocol slots are used where the implementation of a superclass needs to assume that each subclass defines certain slots, however the slots of each subclass are potentially declared with different class specializers, thus preventing the slots from being defined in the superclass."
 $nl
 "For example, the " { $link growable } " mixin provides an implementation of the sequence protocol which wraps an underlying sequence, resizing it as necessary when elements are added beyond the length of the sequence. It assumes that the concrete mixin instances define two slots, " { $snippet "length" } " and " { $snippet "underlying" } ". These slots are defined as protocol slots: " { $snippet "SLOT: length" } " and " { $snippet "SLOT: underlying" } ". "
@@ -313,20 +321,22 @@ $nl
 
 ARTICLE: "tuples" "Tuples"
 "Tuples are user-defined classes composed of named slots. They are the central data type of Factor's object system."
-{ $subsection "tuple-examples" }
+{ $subsections "tuple-examples" }
 "A parsing word defines tuple classes:"
-{ $subsection POSTPONE: TUPLE: }
+{ $subsections POSTPONE: TUPLE: }
 "For each tuple class, several words are defined, the class word, a class predicate, and accessor words for each slot."
 $nl
 "The class word is used for defining methods on the tuple class; it has the same name as the tuple class. The predicate is named " { $snippet { $emphasis "name" } "?" } ". Initially, no specific words are defined for constructing new instances of the tuple. Constructors must be defined explicitly, and tuple slots are accessed via automatically-generated accessor words."
-{ $subsection "accessors" }
-{ $subsection "tuple-constructors" }
-{ $subsection "tuple-subclassing" }
-{ $subsection "tuple-declarations" }
-{ $subsection "protocol-slots" }
-{ $subsection "tuple-introspection" }
+{ $subsections
+    "accessors"
+    "tuple-constructors"
+    "tuple-subclassing"
+    "tuple-declarations"
+    "protocol-slots"
+    "tuple-introspection"
+}
 "Tuple classes can be redefined; this updates existing instances:"
-{ $subsection "tuple-redefinition" }
+{ $subsections "tuple-redefinition" }
 "Tuple literal syntax is documented in " { $link "syntax-tuples" } "." ;
 
 ABOUT: "tuples"

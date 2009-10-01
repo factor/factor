@@ -19,23 +19,27 @@ HELP: CRITICAL
 
 ARTICLE: "logging.levels" "Log levels"
 "Several log levels are supported, from lowest to highest:"
-{ $subsection DEBUG }
-{ $subsection NOTICE }
-{ $subsection WARNING }
-{ $subsection ERROR }
-{ $subsection CRITICAL } ;
+{ $subsections
+    DEBUG
+    NOTICE
+    WARNING
+    ERROR
+    CRITICAL
+} ;
 
 ARTICLE: "logging.files" "Log files"
 "Each application that wishes to use logging must choose a log service name; the following combinator should wrap the top level of the application:"
-{ $subsection with-logging }
+{ $subsections with-logging }
 "Log messages are written to " { $snippet "log-root/service/1.log" } ", where"
 { $list
     { { $snippet "log-root" } " is the Factor source directory by default, but can be overriden with the " { $link log-root } " variable" }
     { { $snippet "service" } " is the service name" }
 }
 "You can get the log path for a service:"
-{ $subsection log-path }
-{ $subsection log# }
+{ $subsections
+    log-path
+    log#
+}
 "New log entries are always sent to " { $snippet "1.log" } " but " { $link "logging.rotation" } " moves " { $snippet "1.log" } " to " { $snippet "2.log" } ", " { $snippet "2.log" } " to " { $snippet "3.log" } ", and so on." ;
 
 HELP: log-message
@@ -77,15 +81,19 @@ HELP: LOG:
 
 ARTICLE: "logging.messages" "Logging messages"
 "Logging messages explicitly:"
-{ $subsection log-message }
-{ $subsection log-error }
-{ $subsection log-critical }
+{ $subsections
+    log-message
+    log-error
+    log-critical
+}
 "A utility for defining words which just log and do nothing else:"
-{ $subsection POSTPONE: LOG: }
+{ $subsections POSTPONE: LOG: }
 "Annotating words to log; this uses the " { $link "tools.annotations" } " feature:"
-{ $subsection add-input-logging }
-{ $subsection add-output-logging }
-{ $subsection add-error-logging } ;
+{ $subsections
+    add-input-logging
+    add-output-logging
+    add-error-logging
+} ;
 
 HELP: rotate-logs
 { $description "Rotates all logs. The highest numbered log file in each log directory is deleted, and each file is renamed so that its number increments by one. Subsequent logging calls will create a new #1 log file. This keeps log files from getting too large and makes them easier to search." } ;
@@ -99,28 +107,32 @@ HELP: with-logging
 
 ARTICLE: "logging.rotation" "Log rotation"
 "Log files should be rotated periodically to prevent unbounded growth."
-{ $subsection rotate-logs }
-{ $subsection close-logs }
+{ $subsections
+    rotate-logs
+    close-logs
+}
 "The " { $vocab-link "logging.insomniac" } " vocabulary automates log rotation." ;
 
 ARTICLE: "logging.server" "Log implementation"
 "The " { $vocab-link "logging.server" } " vocabulary implements a concurrent log server using " { $vocab-link "concurrency.messaging" } ". User code never interacts with the server directly, instead it uses the words in the " { $link "logging" } " vocabulary. The server is used to synchronize access to log files and ensure that log rotation can proceed in an orderly fashion."
 $nl
 "The " { $link log-message } " word sends a message to the server which results in the server executing an internal word:"
-{ $subsection (log-message) }
+{ $subsections (log-message) }
 "The " { $link rotate-logs } " word sends a message to the server which results in the server executing an internal word:"
-{ $subsection (rotate-logs) }
+{ $subsections (rotate-logs) }
 "The " { $link close-logs } " word sends a message to the server which results in the server executing an internal word:"
-{ $subsection (close-logs) } ;
+{ $subsections (close-logs) } ;
 
 ARTICLE: "logging" "Logging framework"
 "The " { $vocab-link "logging" } " vocabulary implements a comprehensive logging framework suitable for server-side production applications."
-{ $subsection "logging.files" }
-{ $subsection "logging.levels" }
-{ $subsection "logging.messages" }
-{ $subsection "logging.rotation" }
-{ $subsection "logging.parser" }
-{ $subsection "logging.analysis" }
-{ $subsection "logging.server" } ;
+{ $subsections
+    "logging.files"
+    "logging.levels"
+    "logging.messages"
+    "logging.rotation"
+    "logging.parser"
+    "logging.analysis"
+    "logging.server"
+} ;
 
 ABOUT: "logging"

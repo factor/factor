@@ -11,34 +11,38 @@ IN: ui.pixel-formats
 
 ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"
 "The following pixel format attributes can be requested and queried of " { $link pixel-format } "s. Binary attributes are represented by the presence of a symbol in an attribute sequence:"
-{ $subsection double-buffered }
-{ $subsection stereo }
-{ $subsection offscreen }
-{ $subsection fullscreen }
-{ $subsection windowed }
-{ $subsection accelerated }
-{ $subsection software-rendered }
-{ $subsection backing-store }
-{ $subsection multisampled }
-{ $subsection supersampled }
-{ $subsection sample-alpha }
-{ $subsection color-float }
+{ $subsections
+    double-buffered
+    stereo
+    offscreen
+    fullscreen
+    windowed
+    accelerated
+    software-rendered
+    backing-store
+    multisampled
+    supersampled
+    sample-alpha
+    color-float
+}
 "Integer attributes are represented by a " { $link tuple } " with a single " { $snippet "value" } "slot:"
-{ $subsection color-bits }
-{ $subsection red-bits }
-{ $subsection green-bits }
-{ $subsection blue-bits }
-{ $subsection alpha-bits }
-{ $subsection accum-bits }
-{ $subsection accum-red-bits }
-{ $subsection accum-green-bits }
-{ $subsection accum-blue-bits }
-{ $subsection accum-alpha-bits }
-{ $subsection depth-bits }
-{ $subsection stencil-bits }
-{ $subsection aux-buffers }
-{ $subsection sample-buffers }
-{ $subsection samples }
+{ $subsections
+    color-bits
+    red-bits
+    green-bits
+    blue-bits
+    alpha-bits
+    accum-bits
+    accum-red-bits
+    accum-green-bits
+    accum-blue-bits
+    accum-alpha-bits
+    depth-bits
+    stencil-bits
+    aux-buffers
+    sample-buffers
+    samples
+}
 { $examples
 "The following " { $link world } " subclass will request a double-buffered window with minimum 24-bit color and depth buffers, and will throw an error if the requirements aren't met:"
 { $code """
@@ -180,19 +184,23 @@ related-words
 
 ARTICLE: "ui.pixel-formats" "Pixel formats"
 "The UI allows you to control the window system's OpenGL interface with a cross-platform set of pixel format specifiers:"
-{ $subsection "ui.pixel-formats-attributes" }
+{ $subsections "ui.pixel-formats-attributes" }
 
 "Pixel formats can be requested using these attributes:"
-{ $subsection pixel-format }
-{ $subsection <pixel-format> }
-{ $subsection pixel-format-attribute }
+{ $subsections
+    pixel-format
+    <pixel-format>
+    pixel-format-attribute
+}
 
 "If a request for a set of pixel format attributes cannot be satisfied, an error is thrown:"
-{ $subsection invalid-pixel-format-attributes }
+{ $subsections invalid-pixel-format-attributes }
 
 "Pixel formats are requested as part of opening a window for a " { $link world } ". These generics can be overridden on " { $snippet "world" } " subclasses to control pixel format selection:"
-{ $subsection world-pixel-format-attributes }
-{ $subsection check-world-pixel-format }
+{ $subsections
+    world-pixel-format-attributes
+    check-world-pixel-format
+}
 ;
 
 ABOUT: "ui.pixel-formats"

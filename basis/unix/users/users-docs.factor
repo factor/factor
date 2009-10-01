@@ -90,17 +90,23 @@ ARTICLE: "unix.users" "Unix users"
 "The " { $vocab-link "unix.users" } " vocabulary contains words that return information about Unix users."
 $nl
 "Listing all users:"
-{ $subsection all-users }
+{ $subsections all-users }
 "Real user:"
-{ $subsection real-user-name }
-{ $subsection real-user-id }
-{ $subsection set-real-user }
+{ $subsections
+    real-user-name
+    real-user-id
+    set-real-user
+}
 "Effective user:"
-{ $subsection effective-user-name }
-{ $subsection effective-user-id }
-{ $subsection set-effective-user }
+{ $subsections
+    effective-user-name
+    effective-user-id
+    set-effective-user
+}
 "Combinators to change users:"
-{ $subsection with-real-user }
-{ $subsection with-effective-user } ;
+{ $subsections
+    with-real-user
+    with-effective-user
+} ;
 
 ABOUT: "unix.users"

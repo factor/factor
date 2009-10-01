@@ -3,15 +3,17 @@ IN: ui.gadgets.grids
 
 ARTICLE: "ui-grid-layout" "Grid layouts"
 "Grid gadgets layout their children in a rectangular grid."
-{ $subsection grid }
+{ $subsections grid }
 "Creating grids from a fixed set of gadgets:"
-{ $subsection <grid> }
+{ $subsections <grid> }
 "Managing children:"
-{ $subsection grid-add }
-{ $subsection grid-remove }
-{ $subsection grid-child }
+{ $subsections
+    grid-add
+    grid-remove
+    grid-child
+}
 "Grid lines:"
-{ $subsection "ui.gadgets.grid-lines" } ;
+{ $subsections "ui.gadgets.grid-lines" } ;
 
 HELP: grid
 { $class-description "A grid gadget lays out its children so that all gadgets in a column have equal width and all gadgets in a row have equal height."

@@ -6,13 +6,17 @@ ARTICLE: "definition-protocol" "Definition protocol"
 "A common protocol is used to build generic tools for working with all definitions."
 $nl
 "Definitions must know what source file they were loaded from, and provide a way to set this:"
-{ $subsection where }
-{ $subsection set-where }
+{ $subsections
+    where
+    set-where
+}
 "Definitions can be removed:"
-{ $subsection forget }
+{ $subsections forget }
 "Definitions must implement a few operations used for printing them in source form:"
-{ $subsection definer }
-{ $subsection definition }
+{ $subsections
+    definer
+    definition
+}
 { $see-also "see" } ;
 
 ARTICLE: "definition-checking" "Definition sanity checking"
@@ -43,7 +47,7 @@ $nl
 "Since this is undesirable, the parser explicitly raises a " { $link no-word } " error if a source file refers to a word which is in the dictionary, but defined after it is used."
 $nl
 "The parser also catches duplicate definitions. If an artifact is defined twice in the same source file, the earlier definition will never be accessible, and this is almost always a mistake, perhaps due to a bad choice of word names, or a copy and paste error. The parser raises an error in this case."
-{ $subsection redefine-error } ;
+{ $subsections redefine-error } ;
 
 ARTICLE: "definitions" "Definitions"
 "A " { $emphasis "definition" } " is an artifact read from a source file. Words for working with definitions are found in the " { $vocab-link "definitions" } " vocabulary."
@@ -58,11 +62,13 @@ $nl
   "Instances of the definition may be introspected and modified with the definition protocol"
 }
 "For every source file loaded into the system, a list of definitions is maintained. Pathname objects implement the definition protocol, acting over the definitions their source files contain. See " { $link "source-files" } " for details."
-{ $subsection "definition-protocol" }
-{ $subsection "definition-checking" }
-{ $subsection "compilation-units" }
+{ $subsections
+    "definition-protocol"
+    "definition-checking"
+    "compilation-units"
+}
 "A parsing word to remove definitions:"
-{ $subsection POSTPONE: FORGET: }
+{ $subsections POSTPONE: FORGET: }
 { $see-also "see" "parser" "source-files" "words" "generic" "help-impl" } ;
 
 ABOUT: "definitions"

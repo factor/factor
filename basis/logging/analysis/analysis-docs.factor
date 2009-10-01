@@ -23,9 +23,11 @@ ARTICLE: "logging.analysis" "Log analysis"
 "The " { $vocab-link "logging.analysis" } " vocabulary builds on the " { $vocab-link "logging.parser" } " vocabulary. It parses log files and produces formatted summary reports. It is used by the " { $vocab-link "logging.insomniac" } " vocabulary to e-mail daily reports."
 $nl
 "Print log file summary:"
-{ $subsection analyze-log }
+{ $subsections analyze-log }
 "Factors:"
-{ $subsection analyze-entries }
-{ $subsection analysis. } ;
+{ $subsections
+    analyze-entries
+    analysis.
+} ;
 
 ABOUT: "logging.analysis"

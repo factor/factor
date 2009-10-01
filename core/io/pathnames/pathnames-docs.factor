@@ -102,21 +102,25 @@ HELP: home
 
 ARTICLE: "io.pathnames" "Pathname manipulation"
 "Pathname manipulation:"
-{ $subsection parent-directory }
-{ $subsection file-name }
-{ $subsection file-stem }
-{ $subsection file-extension }
-{ $subsection last-path-separator }
-{ $subsection path-components }
-{ $subsection prepend-path }
-{ $subsection append-path }
-{ $subsection canonicalize-path }
+{ $subsections
+    parent-directory
+    file-name
+    file-stem
+    file-extension
+    last-path-separator
+    path-components
+    prepend-path
+    append-path
+    canonicalize-path
+}
 "Pathname presentations:"
-{ $subsection pathname }
-{ $subsection <pathname> }
+{ $subsections
+    pathname
+    <pathname>
+}
 "Literal pathnames:"
-{ $subsection POSTPONE: P" }
+{ $subsections POSTPONE: P" }
 "Low-level word:"
-{ $subsection normalize-path } ;
+{ $subsections normalize-path } ;
 
 ABOUT: "io.pathnames"

@@ -71,9 +71,10 @@ IN: scratchpad
 CONSTANT: five 5
 { $ five $[ five dup 1 + dup 2 + ] } .
     """ "{ 5 5 6 8 }" }
-{ $subsection POSTPONE: $ }
-{ $subsection POSTPONE: $[ }
-{ $subsection POSTPONE: ${ }
-;
+{ $subsections
+    POSTPONE: $
+    POSTPONE: $[
+    POSTPONE: ${
+} ;
 
 ABOUT: "literals"

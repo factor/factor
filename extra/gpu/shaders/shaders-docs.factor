@@ -179,17 +179,21 @@ HELP: vertex-format-size
 
 ARTICLE: "gpu.shaders" "Shader objects"
 "The " { $vocab-link "gpu.shaders" } " vocabulary supports defining, compiling, and linking " { $link shader } "s into " { $link program } "s that run on the GPU and control rendering."
-{ $subsection POSTPONE: GLSL-PROGRAM: }
-{ $subsection POSTPONE: GLSL-SHADER: }
-{ $subsection POSTPONE: GLSL-SHADER-FILE: }
+{ $subsections
+    POSTPONE: GLSL-PROGRAM:
+    POSTPONE: GLSL-SHADER:
+    POSTPONE: GLSL-SHADER-FILE:
+}
 "A program must be instantiated for each graphics context it is used in:"
-{ $subsection <program-instance> }
+{ $subsections <program-instance> }
 "Program instances can be updated on the fly, allowing for interactive development of shaders:"
-{ $subsection refresh-program }
+{ $subsections refresh-program }
 "Render data inside GPU " { $link buffer } "s is organized into " { $link vertex-array } "s for consumption by shader code:"
-{ $subsection vertex-array }
-{ $subsection <vertex-array> }
-{ $subsection buffer>vertex-array }
-{ $subsection POSTPONE: VERTEX-FORMAT: } ;
+{ $subsections
+    vertex-array
+    <vertex-array>
+    buffer>vertex-array
+    POSTPONE: VERTEX-FORMAT:
+} ;
 
 ABOUT: "gpu.shaders"

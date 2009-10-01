@@ -15,8 +15,10 @@ HELP: <hashed-unrolled-list>
 
 ARTICLE: "unrolled-lists" "Unrolled lists"
 "The " { $vocab-link "unrolled-lists" } " vocabulary provides an implementation of the " { $link deque } " protocol with constant time insertion and removal at both ends, and lower memory overhead than a " { $link dlist } " due to packing 32 elements per every node. The one tradeoff is that unlike dlists, " { $link delete-node } " is not supported for unrolled lists."
-{ $subsection unrolled-list }
-{ $subsection <unrolled-list> }
-{ $subsection <hashed-unrolled-list> } ;
+{ $subsections
+    unrolled-list
+    <unrolled-list>
+    <hashed-unrolled-list>
+} ;
 
 ABOUT: "unrolled-lists"

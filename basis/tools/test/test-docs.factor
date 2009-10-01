@@ -3,26 +3,34 @@ IN: tools.test
 
 ARTICLE: "tools.test.write" "Writing unit tests"
 "Assert that a quotation outputs a specific set of values:"
-{ $subsection POSTPONE: unit-test }
+{ $subsections POSTPONE: unit-test }
 "Assert that a quotation throws an error:"
-{ $subsection POSTPONE: must-fail }
-{ $subsection POSTPONE: must-fail-with }
+{ $subsections
+    POSTPONE: must-fail
+    POSTPONE: must-fail-with
+}
 "Assert that a quotation or word has a specific static stack effect (see " { $link "inference" } "):"
-{ $subsection POSTPONE: must-infer }
-{ $subsection POSTPONE: must-infer-as }
+{ $subsections
+    POSTPONE: must-infer
+    POSTPONE: must-infer-as
+}
 "All of the above are used like ordinary words but are actually parsing words. This ensures that parse-time state, namely the line number, can be associated with the test in question, and reported in test failures." ;
 
 ARTICLE: "tools.test.run" "Running unit tests"
 "The following words run test harness files; any test failures are collected and printed at the end:"
-{ $subsection test }
-{ $subsection test-all }
+{ $subsections
+    test
+    test-all
+}
 "The following word prints failures:"
-{ $subsection :test-failures }
+{ $subsections :test-failures }
 "Test failures are reported using the " { $link "tools.errors" } " mechanism and are shown in the " { $link "ui.tools.error-list" } "."
 $nl
 "Unit test failures are instances of a class, and are stored in a global variable:"
-{ $subsection test-failure }
-{ $subsection test-failures } ;
+{ $subsections
+    test-failure
+    test-failures
+} ;
 
 ARTICLE: "tools.test" "Unit testing"
 "A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."
@@ -37,8 +45,10 @@ $nl
 "The latter is used for vocabularies with more extensive test suites."
 $nl
 "If the test harness needs to define words, they should be placed in a vocabulary named " { $snippet { $emphasis "vocab" } ".tests" } " where " { $emphasis "vocab" } " is the vocab being tested."
-{ $subsection "tools.test.write" }
-{ $subsection "tools.test.run" } ;
+{ $subsections
+    "tools.test.write"
+    "tools.test.run"
+} ;
 
 ABOUT: "tools.test"
 

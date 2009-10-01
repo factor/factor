@@ -17,10 +17,12 @@ HELP: <temporary-redirect>
 
 ARTICLE: "http.server.redirection" "HTTP responder redirection"
 "The " { $vocab-link "http.server.redirection" } " defines some " { $link response } " types which redirect the user's client to a new page."
-{ $subsection <permanent-redirect> }
-{ $subsection <temporary-redirect> }
+{ $subsections
+    <permanent-redirect>
+    <temporary-redirect>
+}
 "A utility used by the above:"
-{ $subsection relative-to-request }
+{ $subsections relative-to-request }
 "The " { $vocab-link "furnace.redirection" } " vocabulary provides a higher-level implementation of this. The " { $vocab-link "furnace.conversations" } " vocabulary allows state to be maintained between redirects." ;
 
 ABOUT: "http.server.redirection"

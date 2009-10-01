@@ -7,18 +7,22 @@ ABOUT: "xml.traversal"
 
 ARTICLE: "xml.traversal" "Utilities for traversing XML"
     "The " { $vocab-link "xml.traversal" } " vocabulary provides utilities for traversing an XML DOM tree and viewing the contents of a single tag. The following words are defined:"
-    $nl
-    { $subsection { "xml.traversal" "intro" } }
-    { $subsection tag-named }
-    { $subsection tags-named }
-    { $subsection deep-tag-named }
-    { $subsection deep-tags-named }
-    { $subsection get-id }
-    "To get at the contents of a single tag, use"
-    { $subsection children>string }
-    { $subsection children-tags }
-    { $subsection first-child-tag }
-    { $subsection assert-tag } ;
+$nl
+{ $subsections
+    { "xml.traversal" "intro" }
+    tag-named
+    tags-named
+    deep-tag-named
+    deep-tags-named
+    get-id
+}
+"To get at the contents of a single tag, use"
+{ $subsections
+    children>string
+    children-tags
+    first-child-tag
+    assert-tag
+} ;
 
 ARTICLE: { "xml.traversal" "intro" } "An example of XML processing"
 "To illustrate how to use the XML library, we develop a simple Atom parser in Factor. Atom is an XML-based syndication format, like RSS. To see the full version of what we develop here, look at " { $snippet "basis/syndication" } " at the " { $snippet "atom1.0" } " word. First, we want to load a file and get a DOM tree for it."

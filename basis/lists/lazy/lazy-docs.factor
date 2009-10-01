@@ -7,45 +7,55 @@ ABOUT: "lists.lazy"
 
 ARTICLE: "lists.lazy" "Lazy lists"
 "The " { $vocab-link "lists.lazy" } " vocabulary implements lazy lists and standard operations to manipulate them."
-{ $subsection { "lists.lazy" "construction" } }
-{ $subsection { "lists.lazy" "manipulation" } }
-{ $subsection { "lists.lazy" "combinators" } }
-{ $subsection { "lists.lazy" "io" } } ;
+{ $subsections
+    { "lists.lazy" "construction" }
+    { "lists.lazy" "manipulation" }
+    { "lists.lazy" "combinators" }
+    { "lists.lazy" "io" }
+} ;
 
 ARTICLE: { "lists.lazy" "combinators" } "Combinators for manipulating lazy lists"
 "The following combinators create lazy lists from other lazy lists:"
-{ $subsection lazy-map }
-{ $subsection lfilter }
-{ $subsection luntil }
-{ $subsection lwhile }
-{ $subsection lfrom-by }
-{ $subsection lcomp }
-{ $subsection lcomp* } ;
+{ $subsections
+    lazy-map
+    lfilter
+    luntil
+    lwhile
+    lfrom-by
+    lcomp
+    lcomp*
+} ;
 
 ARTICLE: { "lists.lazy" "io" } "Lazy list I/O"
 "Input from a stream can be read through a lazy list, using the following words:"
-{ $subsection lcontents }
-{ $subsection llines } ;
+{ $subsections
+    lcontents
+    llines
+} ;
 
 ARTICLE: { "lists.lazy" "construction" } "Constructing lazy lists"
 "Words for constructing lazy lists:"
-{ $subsection lazy-cons }
-{ $subsection 1lazy-list }
-{ $subsection 2lazy-list }
-{ $subsection 3lazy-list }
-{ $subsection sequence-tail>list }
-{ $subsection >list }
-{ $subsection lfrom } ;
+{ $subsections
+    lazy-cons
+    1lazy-list
+    2lazy-list
+    3lazy-list
+    sequence-tail>list
+    >list
+    lfrom
+} ;
 
 ARTICLE: { "lists.lazy" "manipulation" } "Manipulating lazy lists"
 "To make new lazy lists from old ones:"
-{ $subsection <memoized-cons> }
-{ $subsection lappend }
-{ $subsection lconcat }
-{ $subsection lcartesian-product }
-{ $subsection lcartesian-product* }
-{ $subsection lmerge }
-{ $subsection ltake } ;
+{ $subsections
+    <memoized-cons>
+    lappend
+    lconcat
+    lcartesian-product
+    lcartesian-product*
+    lmerge
+    ltake
+} ;
 
 HELP: lazy-cons
 { $values { "car" { $quotation "( -- elt )" } } { "cdr" { $quotation "( -- cons )" } } { "promise" "the resulting cons object" } }

@@ -27,7 +27,9 @@ HELP: <delay>
 
 ARTICLE: "models-delay" "Delay models"
 "Delay models are used to implement delayed updating of gadgets in response to user input."
-{ $subsection delay }
-{ $subsection <delay> } ;
+{ $subsections
+    delay
+    <delay>
+} ;
 
 ABOUT: "models-delay"
