@@ -167,6 +167,7 @@ CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##shuffle-vector %shuffle-vector
 CODEGEN: ##compare-vector %compare-vector
+CODEGEN: ##test-vector %test-vector
 CODEGEN: ##box-vector %box-vector
 CODEGEN: ##add-vector %add-vector
 CODEGEN: ##saturated-add-vector %saturated-add-vector
