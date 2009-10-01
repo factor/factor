@@ -74,7 +74,9 @@ MACRO: if-literals-match ( quots -- )
 : shuffle? ( obj -- ? ) { [ array? ] [ [ integer? ] all? ] } 1&& ;
 
 : emit-shuffle-vector ( node -- )
-    [ ^^shuffle-vector ] [unary/param]
+    ! Pad the permutation with zeroes if its too short, since we
+    ! can't throw an error at this point.
+    [ [ rep-components 0 pad-tail ] keep ^^shuffle-vector ] [unary/param]
     { [ shuffle? ] [ representation? ] } if-literals-match ;
 
 : ^^broadcast-vector ( src n rep -- dst )
