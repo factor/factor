@@ -402,12 +402,6 @@ def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##blend-vector
-def: dst
-use: mask src1 src2
-temp: temp
-literal: rep ;
-
 PURE-INSN: ##shl-vector
 def: dst
 use: src1 src2/int-scalar-rep

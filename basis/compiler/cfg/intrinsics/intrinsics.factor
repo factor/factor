@@ -181,7 +181,6 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-vshuffle) [ emit-shuffle-vector ] }
         { math.vectors.simd.intrinsics:(simd-select) [ emit-select-vector ] }
         { math.vectors.simd.intrinsics:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-v?) [ emit-blend-vector ] }
         { math.vectors.simd.intrinsics:alien-vector [ emit-alien-vector ] }
         { math.vectors.simd.intrinsics:set-alien-vector [ emit-set-alien-vector ] }
     } enable-intrinsics ;

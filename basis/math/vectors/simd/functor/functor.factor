@@ -30,9 +30,6 @@ ERROR: bad-length got expected ;
         [ nip ]
     } case ; inline
 
-: element>boolean ( elt class -- bool )
-    vector-false-value = not ; inline
-
 MACRO: simd-boa ( rep class -- simd-array )
     [ rep-components ] [ new ] bi* '[ _ _ nsequence ] ;
 
@@ -172,7 +169,6 @@ A{           DEFINES ${A}{
 SET-NTH      [ T dup c:c-setter c:array-accessor ]
 
 A-rep        [ A name>> "-rep" append "cpu.architecture" lookup ]
-A-vvv->v-op  DEFINES-PRIVATE ${A}-vvv->v-op
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
 A-vn->v-op   DEFINES-PRIVATE ${A}-vn->v-op
 A-vv->n-op   DEFINES-PRIVATE ${A}-vv->n-op
@@ -239,9 +235,6 @@ INSTANCE: A sequence
 
 <PRIVATE
 
-: A-vvv->v-op ( v1 v2 v3 quot -- v4 )
-    [ [ underlying>> ] tri@ A-rep ] dip call \ A boa ; inline
-
 : A-vv->v-op ( v1 v2 quot -- v3 )
     [ [ underlying>> ] bi@ A-rep ] dip call \ A boa ; inline
 
@@ -262,7 +255,6 @@ simd new
     \ A-with >>ctor
     \ A-rep >>rep
     {
-        { { +vector+ +vector+ +vector+ -> +vector+ } A-vv->v-op }
         { { +vector+ +vector+ -> +vector+ } A-vv->v-op }
         { { +vector+ +scalar+ -> +vector+ } A-vn->v-op }
         { { +vector+ +literal+ -> +vector+ } A-vn->v-op }
@@ -324,7 +316,6 @@ A{           DEFINES ${A}{
 A-deref      DEFINES-PRIVATE ${A}-deref
 
 A-rep        [ A/2 name>> "-rep" append "cpu.architecture" lookup ]
-A-vvv->v-op  DEFINES-PRIVATE ${A}-vvv->v-op
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
 A-vn->v-op   DEFINES-PRIVATE ${A}-vn->v-op
 A-vv->n-op   DEFINES-PRIVATE ${A}-vv->n-op
@@ -392,11 +383,6 @@ M: A pprint* pprint-object ;
 
 INSTANCE: A sequence
 
-: A-vvv->v-op ( v1 v2 v3 quot -- v4 )
-    [ [ [ underlying1>> ] tri@ A-rep ] dip call ]
-    [ [ [ underlying2>> ] tri@ A-rep ] dip call ] 3bi
-    \ A boa ; inline
-
 : A-vv->v-op ( v1 v2 quot -- v3 )
     [ [ [ underlying1>> ] bi@ A-rep ] dip call ]
     [ [ [ underlying2>> ] bi@ A-rep ] dip call ] 3bi
@@ -425,7 +411,6 @@ simd new
     \ A-with >>ctor
     \ A-rep >>rep
     {
-        { { +vector+ +vector+ +vector+ -> +vector+ } A-vvv->v-op }
         { { +vector+ +vector+ -> +vector+ } A-vv->v-op }
         { { +vector+ +scalar+ -> +vector+ } A-vn->v-op }
         { { +vector+ +literal+ -> +vector+ } A-vn->v-op }
