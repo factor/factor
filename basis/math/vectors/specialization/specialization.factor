@@ -92,6 +92,7 @@ H{
     { hrshift { +vector+ +literal+ -> +vector+ } }
     { vshuffle { +vector+ +literal+ -> +vector+ } }
     { vbroadcast { +vector+ +literal+ -> +vector+ } }
+    { v? { +vector+ +vector+ +vector+ -> +vector+ } }
 }
 
 PREDICATE: vector-word < word vector-words key? ;
