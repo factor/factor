@@ -49,6 +49,7 @@ SIMD-OP: vrshift
 SIMD-OP: hlshift
 SIMD-OP: hrshift
 SIMD-OP: vshuffle
+SIMD-OP: v?
 
 : (simd-with) ( x rep -- v ) bad-simd-call ;
 : (simd-gather-2) ( a b rep -- v ) bad-simd-call ;
@@ -121,6 +122,7 @@ M: vector-rep supported-simd-op?
         { \ (simd-vbitandn) [ %andn-vector-reps           ] }
         { \ (simd-vbitor)   [ %or-vector-reps             ] }
         { \ (simd-vbitxor)  [ %xor-vector-reps            ] }
+        { \ (simd-v?)       [ %blend-vector-reps          ] }
         { \ (simd-vlshift)  [ %shl-vector-reps            ] }
         { \ (simd-vrshift)  [ %shr-vector-reps            ] }
         { \ (simd-hlshift)  [ %horizontal-shl-vector-reps ] }

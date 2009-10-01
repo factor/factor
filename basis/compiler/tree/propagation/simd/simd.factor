@@ -28,6 +28,7 @@ IN: compiler.tree.propagation.simd
     (simd-with)
     (simd-gather-2)
     (simd-gather-4)
+    (simd-v?)
     alien-vector
 } [ { byte-array } "default-output-classes" set-word-prop ] each
 
