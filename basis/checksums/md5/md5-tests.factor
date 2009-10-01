@@ -33,3 +33,9 @@ IN: checksums.md5.tests
     <md5-state> "asdf" binary <byte-reader> add-checksum-stream
     [ get-checksum ] [ get-checksum ] bi =
 ] unit-test
+
+[
+    t
+] [
+    { "abcd" "efg" } md5 checksum-lines length 16 =
+] unit-test
