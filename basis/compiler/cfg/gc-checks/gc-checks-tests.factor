@@ -16,7 +16,7 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##box-float f 0 1 }
+    T{ ##box-alien f 0 1 }
 } 1 test-bb
 
 0 1 edge

@@ -199,15 +199,6 @@ def: dst/int-rep
 use: src/int-rep ;
 
 ! Float arithmetic
-PURE-INSN: ##unbox-float
-def: dst/double-rep
-use: src/int-rep ;
-
-PURE-INSN: ##box-float
-def: dst/int-rep
-use: src/double-rep
-temp: temp/int-rep ;
-
 PURE-INSN: ##add-float
 def: dst/double-rep
 use: src1/double-rep src2/double-rep ;
@@ -266,18 +257,6 @@ def: dst/double-rep
 use: src/int-rep ;
 
 ! SIMD operations
-
-PURE-INSN: ##box-vector
-def: dst/int-rep
-use: src
-literal: rep
-temp: temp/int-rep ;
-
-PURE-INSN: ##unbox-vector
-def: dst
-use: src/int-rep
-literal: rep ;
-
 PURE-INSN: ##zero-vector
 def: dst
 literal: rep ;
@@ -738,8 +717,6 @@ literal: n ;
 
 UNION: ##allocation
 ##allot
-##box-float
-##box-vector
 ##box-alien
 ##box-displaced-alien ;
 
