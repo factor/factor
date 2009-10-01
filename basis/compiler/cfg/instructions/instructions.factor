@@ -297,6 +297,11 @@ def: dst
 use: src
 literal: shuffle rep ;
 
+PURE-INSN: ##compare-vector
+def: dst
+use: src1 src2
+literal: rep cc ;
+
 PURE-INSN: ##add-vector
 def: dst
 use: src1 src2

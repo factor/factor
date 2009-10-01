@@ -725,6 +725,28 @@ M: x86 %shuffle-vector-reps
         { sse2? { double-2-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
+: %compare-vector-equal ( dst src rep -- )
+    unsign-rep {
+        { double-2-rep   [ CMPEQPD ] }
+        { float-4-rep    [ CMPEQPS ] }
+        { longlong-2-rep [ PCMPEQQ ] }
+        { int-4-rep      [ PCMPEQD ] }
+        { short-8-rep    [ PCMPEQW ] }
+        { char-16-rep    [ PCMPEQB ] }
+    } case ;
+
+M: x86 %compare-vector ( dst src1 src2 rep cc -- )
+    [ [ two-operand ] keep ] dip {
+        { cc= [ %compare-vector-equal ] }
+    } case ;
+
+M: x86 %compare-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+        { sse4.1? { longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 M: x86 %add-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
