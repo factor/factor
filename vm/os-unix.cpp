@@ -130,7 +130,6 @@ stack_frame *factor_vm::uap_stack_pointer(void *uap)
 		return NULL;
 }
 
-
 void factor_vm::memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	signal_fault_addr = (cell)siginfo->si_addr;
