@@ -7,6 +7,7 @@ math.vectors.specialization parser prettyprint.custom sequences
 sequences.private strings words definitions macros cpu.architecture
 namespaces arrays quotations combinators sets layouts ;
 QUALIFIED-WITH: alien.c-types c
+QUALIFIED: math.private
 IN: math.vectors.simd.functor
 
 ERROR: bad-length got expected ;
@@ -16,8 +17,8 @@ MACRO: simd-boa ( rep class -- simd-array )
 
 : can-be-unboxed? ( type -- ? )
     {
-        { c:float [ t ] }
-        { c:double [ t ] }
+        { c:float [ \ math.private:float+ "intrinsic" word-prop ] }
+        { c:double [ \ math.private:float+ "intrinsic" word-prop ] }
         [ c:heap-size cell < ]
     } case ;
 
@@ -37,7 +38,7 @@ MACRO: simd-boa ( rep class -- simd-array )
 : simd-with ( rep class x -- simd-array )
     [ rep-components ] [ new ] [ '[ _ ] ] tri* swap replicate-as ; inline
 
-: simd-with-fast? ( rep -- ? )
+: simd-with/nth-fast? ( rep -- ? )
     [ \ (simd-vshuffle) supported-simd-op? ]
     [ rep-component-type can-be-unboxed? ]
     bi and ;
@@ -45,15 +46,10 @@ MACRO: simd-boa ( rep class -- simd-array )
 :: define-with-custom-inlining ( word rep class -- )
     word [
         drop
-        rep simd-with-fast? [
+        rep simd-with/nth-fast? [
             [ rep rep-coerce rep (simd-with) class boa ]
         ] [ word def>> ] if
     ] "custom-inlining" set-word-prop ;
-
-: simd-nth-fast? ( rep -- ? )
-    [ \ (simd-vshuffle) supported-simd-op? ]
-    [ rep-component-type can-be-unboxed? ]
-    bi and ;
 
 : simd-nth-fast ( rep -- quot )
     [ rep-components ] keep
@@ -64,7 +60,7 @@ MACRO: simd-boa ( rep class -- simd-array )
     rep-component-type dup c:c-type-getter-boxer c:array-accessor ;
 
 MACRO: simd-nth ( rep -- x )
-    dup simd-nth-fast? [ simd-nth-fast ] [ simd-nth-slow ] if ;
+    dup simd-with/nth-fast? [ simd-nth-fast ] [ simd-nth-slow ] if ;
 
 : boa-effect ( rep n -- effect )
     [ rep-components ] dip *
