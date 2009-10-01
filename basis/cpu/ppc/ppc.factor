@@ -230,12 +230,6 @@ M: ppc %copy ( dst src rep -- )
         } case
     ] if ;
 
-M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
-
-M:: ppc %box-float ( dst src temp -- )
-    dst 16 float temp %allot
-    src dst float-offset STFD ;
-
 GENERIC: float-function-param* ( dst src -- )
 
 M: spill-slot float-function-param* [ 1 ] dip n>> spill@ LFD ;
