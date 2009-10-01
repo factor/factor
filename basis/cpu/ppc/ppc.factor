@@ -286,6 +286,7 @@ M: ppc %and-vector-reps { } ;
 M: ppc %andn-vector-reps { } ;
 M: ppc %or-vector-reps { } ;
 M: ppc %xor-vector-reps { } ;
+M: ppc %blend-vector-reps { } ;
 M: ppc %shl-vector-reps { } ;
 M: ppc %shr-vector-reps { } ;
 M: ppc %horizontal-shl-vector-reps { } ;

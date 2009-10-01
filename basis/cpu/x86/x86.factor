@@ -1011,6 +1011,17 @@ M: x86 %xor-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
+M:: x86 %blend-vector ( dst mask src1 src2 temp rep -- )
+    temp src1 mask rep %and-vector
+    dst  mask src2 rep %andn-vector
+    dst  dst  temp rep %or-vector ;
+
+M: x86 %blend-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 M: x86 %shl-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {

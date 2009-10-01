@@ -38,6 +38,9 @@ MACRO: if-literals-match ( quots -- )
 : [binary] ( quot -- quot' )
     '[ [ ds-drop 2inputs ] dip @ ds-push ] ; inline
 
+: [ternary] ( quot -- quot' )
+    '[ [ ds-drop 3inputs ] dip @ ds-push ] ; inline
+
 : emit-binary-vector-op ( node quot -- )
     [binary] emit-vector-op ; inline
 
@@ -94,6 +97,10 @@ MACRO: if-literals-match ( quots -- )
 : emit-select-vector ( node -- )
     [ ^^select-vector ] [unary/param]
     { [ integer? ] [ representation? ] } if-literals-match ; inline
+
+: emit-blend-vector ( node -- )
+    [ ^^blend-vector ] [ternary]
+    { [ representation? ] } if-literals-match ; inline
 
 : emit-alien-vector ( node -- )
     dup [
