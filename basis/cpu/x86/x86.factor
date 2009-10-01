@@ -747,6 +747,27 @@ M: x86 %compare-vector-reps
         { sse4.1? { longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
+:: (%test-vector) ( dst temp mask vcc -- )
+    vcc {
+        { vcc-any  [ dst dst TEST dst temp \ CMOVNE %boolean ] }
+        { vcc-none [ dst dst TEST dst temp \ CMOVE  %boolean ] }
+        { vcc-all  [ dst mask CMP dst temp \ CMOVE  %boolean ] }
+    } case ;
+
+M:: x86 %test-vector ( dst src temp rep vcc -- )
+    dst src rep {
+        { double-2-rep [ MOVMSKPD HEX: 3 ] }
+        { float-4-rep  [ MOVMSKPS HEX: f ] }
+        [ drop PMOVMSKB HEX: ffff ]
+    } case :> mask
+    dst temp mask vcc (%test-vector) ;
+
+M: x86 %test-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 M: x86 %add-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {

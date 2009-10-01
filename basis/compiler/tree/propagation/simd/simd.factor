@@ -46,6 +46,12 @@ IN: compiler.tree.propagation.simd
 
 \ (simd-v.) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
+{
+    (simd-vany?)
+    (simd-vall?)
+    (simd-vnone?)
+} [ { boolean } "default-output-classes" set-word-prop ] each
+
 \ (simd-select) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
 \ assert-positive [
