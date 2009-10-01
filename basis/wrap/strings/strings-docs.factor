@@ -7,9 +7,11 @@ ABOUT: "wrap.strings"
 
 ARTICLE: "wrap.strings" "String word wrapping"
 "The " { $vocab-link "wrap.strings" } " vocabulary implements word wrapping for simple strings, assumed to be in monospace font."
-{ $subsection wrap-lines }
-{ $subsection wrap-string }
-{ $subsection wrap-indented-string } ;
+{ $subsections
+    wrap-lines
+    wrap-string
+    wrap-indented-string
+} ;
 
 HELP: wrap-lines
 { $values { "lines" string } { "width" integer } { "newlines" "sequence of strings" } }

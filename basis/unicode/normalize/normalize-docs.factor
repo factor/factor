@@ -11,10 +11,12 @@ $nl
 "There are four normalization forms: NFD, NFC, NFKD, and NFKC. Basically, in NFD and NFKD, everything is expanded, whereas in NFC and NFKC, everything is contracted. In NFKD and NFKC, more things are expanded and contracted. This is a process which loses some information, so it should be done only with care."
 $nl
 "Most of the world uses NFC to communicate, but for many purposes, NFD/NFKD is easier to process. For more information, see Unicode Standard Annex #15 and section 3 of the Unicode standard."
-{ $subsection nfc }
-{ $subsection nfd }
-{ $subsection nfkc }
-{ $subsection nfkd } ;
+{ $subsections
+    nfc
+    nfd
+    nfkc
+    nfkd
+} ;
 
 HELP: nfc
 { $values { "string" string } { "nfc" "a string in NFC" } }

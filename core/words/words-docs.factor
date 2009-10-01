@@ -9,47 +9,59 @@ $nl
 "Words whose names are known at parse time -- that is, most words making up your program -- can be referenced in source code by stating their name. However, the parser itself, and sometimes code you write, will need to create look up words dynamically."
 $nl
 "Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link POSTPONE: IN: } " parsing word (see " { $link "word-search" } ")."
-{ $subsection create }
-{ $subsection create-in }
-{ $subsection lookup } ;
+{ $subsections
+    create
+    create-in
+    lookup
+} ;
 
 ARTICLE: "uninterned-words" "Uninterned words"
 "A word that is not a member of any vocabulary is said to be " { $emphasis "uninterned" } "."
 $nl
 "There are several ways of creating an uninterned word:"
-{ $subsection <word> }
-{ $subsection gensym }
-{ $subsection define-temp } ;
+{ $subsections
+    <word>
+    gensym
+    define-temp
+} ;
 
 ARTICLE: "colon-definition" "Colon definitions"
 "Every word has an associated quotation definition that is called when the word is executed. A " { $emphasis "colon definition" } " is a word where this quotation is supplied directly by the user. This is the simplest and most common type of word definition."
 $nl
 "Defining words at parse time:"
-{ $subsection POSTPONE: : }
-{ $subsection POSTPONE: ; }
+{ $subsections
+    POSTPONE: :
+    POSTPONE: ;
+}
 "Defining words at run time:"
-{ $subsection define }
-{ $subsection define-declared }
-{ $subsection define-inline }
+{ $subsections
+    define
+    define-declared
+    define-inline
+}
 "Word definitions must declare their stack effect. See " { $link "effects" } "."
 $nl
 "All other types of word definitions, such as " { $link "words.symbol" } " and " { $link "generic" } ", are just special cases of the above." ;
 
 ARTICLE: "primitives" "Primitives"
 "Primitives are words defined in the Factor VM. They provide the essential low-level services to the rest of the system."
-{ $subsection primitive }
-{ $subsection primitive? } ;
+{ $subsections
+    primitive
+    primitive?
+} ;
 
 ARTICLE: "deferred" "Deferred words and mutual recursion"
 "Words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. This is done to simplify the implementation, facilitate better parse time checking and remove some odd corner cases; it also encourages better coding style."
 $nl
 "Sometimes this restriction gets in the way, for example when defining mutually-recursive words; one way to get around this limitation is to make a forward definition."
-{ $subsection POSTPONE: DEFER: }
+{ $subsections POSTPONE: DEFER: }
 "The class of deferred word definitions:"
-{ $subsection deferred }
-{ $subsection deferred? }
+{ $subsections
+    deferred
+    deferred?
+}
 "Deferred words throw an error when called:"
-{ $subsection undefined }
+{ $subsections undefined }
 "Deferred words are just compound definitions in disguise. The following two lines are equivalent:"
 { $code
     "DEFER: foo"
@@ -60,17 +72,21 @@ ARTICLE: "declarations" "Compiler declarations"
 "Compiler declarations are parsing words that set a word property in the most recently defined word. They appear after the final " { $link POSTPONE: ; } " of a word definition:"
 { $code ": cubed ( x -- y ) dup dup * * ; foldable" }
 "Compiler declarations assert that the word follows a certain contract, enabling certain optimizations that are not valid in general."
-{ $subsection POSTPONE: inline }
-{ $subsection POSTPONE: foldable }
-{ $subsection POSTPONE: flushable }
-{ $subsection POSTPONE: recursive }
+{ $subsections
+    POSTPONE: inline
+    POSTPONE: foldable
+    POSTPONE: flushable
+    POSTPONE: recursive
+}
 "It is entirely up to the programmer to ensure that the word satisfies the contract of a declaration. Furthermore, if a generic word is declared " { $link POSTPONE: foldable } " or " { $link POSTPONE: flushable } ", all methods must satisfy the contract. Unspecified behavior may result if a word does not follow the contract of one of its declarations."
 { $see-also "effects" } ;
 
 ARTICLE: "word-props" "Word properties"
 "Each word has a hashtable of properties."
-{ $subsection word-prop }
-{ $subsection set-word-prop }
+{ $subsections
+    word-prop
+    set-word-prop
+}
 "The stack effect of the above two words is designed so that it is most convenient when " { $snippet "name" } " is a literal pushed on the stack right before executing this word."
 $nl
 "The following are some of the properties used by the library:"
@@ -118,7 +134,7 @@ ARTICLE: "word.private" "Word implementation details"
 "The " { $snippet "def" } " slot of a word holds a " { $link quotation } " instance that is called when the word is executed."
 $nl
 "An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
-{ $subsection word-xt } ;
+{ $subsections word-xt } ;
 
 ARTICLE: "words.introspection" "Word introspection"
 "Word introspection facilities and implementation details are found in the " { $vocab-link "words" } " vocabulary."
@@ -131,13 +147,17 @@ $nl
     { { $snippet "props" } "an assoc of word properties, including documentation and other meta-data" }
 }
 "Words are instances of a class."
-{ $subsection word }
-{ $subsection word? }
+{ $subsections
+    word
+    word?
+}
 "Words implement the definition protocol; see " { $link "definitions" } "."
-{ $subsection "interned-words" }
-{ $subsection "uninterned-words" }
-{ $subsection "word-props" }
-{ $subsection "word.private" } ;
+{ $subsections
+    "interned-words"
+    "uninterned-words"
+    "word-props"
+    "word.private"
+} ;
 
 ARTICLE: "words" "Words"
 "Words are the Factor equivalent of functions or procedures; a word is essentially a named quotation."
@@ -150,15 +170,19 @@ $nl
 "The latter is a more dynamic feature that can be used to implement code generation and such, and in fact parse time defining words are implemented in terms of run time defining words."
 $nl
 "Types of words:"
-{ $subsection "colon-definition" }
-{ $subsection "words.symbol" }
-{ $subsection "words.alias" }
-{ $subsection "words.constant" }
-{ $subsection "primitives" }
+{ $subsections
+    "colon-definition"
+    "words.symbol"
+    "words.alias"
+    "words.constant"
+    "primitives"
+}
 "Advanced topics:"
-{ $subsection "deferred" }
-{ $subsection "declarations" }
-{ $subsection "words.introspection" }
+{ $subsections
+    "deferred"
+    "declarations"
+    "words.introspection"
+}
 { $see-also "vocabularies" "vocabs.loader" "definitions" "see" } ;
 
 ABOUT: "words"

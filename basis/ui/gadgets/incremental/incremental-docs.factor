@@ -34,11 +34,15 @@ $nl
 "Incremental layout is used by " { $link "ui.gadgets.panes" } " to ensure that new lines of output does not take longer to display when the pane already has previous output."
 $nl
 "Incremental layouts are not a general replacement for " { $link "ui-pack-layout" } " and there are some limitations to be aware of."
-{ $subsection incremental }
-{ $subsection <incremental> }
+{ $subsections
+    incremental
+    <incremental>
+}
 "Children are added and removed with a special set of words which perform necessary relayout immediately:"
-{ $subsection add-incremental }
-{ $subsection clear-incremental }
+{ $subsections
+    add-incremental
+    clear-incremental
+}
 "Calling " { $link unparent } " to remove a child of an incremental layout is permitted, however the relayout following the removal will not be performed in constant time, because all gadgets following the removed gadget need to be moved." ;
 
 ABOUT: "ui-incremental-layout"

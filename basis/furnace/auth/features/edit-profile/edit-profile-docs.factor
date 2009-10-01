@@ -13,9 +13,9 @@ ARTICLE: "furnace.auth.features.edit-profile" "User profile editing"
 "The " { $vocab-link "furnace.auth.features.edit-profile" } " vocabulary implements an authentication feature for user profile editing, allowing users to change some details of their account."
 $nl
 "To enable this feature, call the following word on an authentication realm:"
-{ $subsection allow-edit-profile }
+{ $subsections allow-edit-profile }
 "To check if profile editing is enabled:"
-{ $subsection allow-edit-profile? }
+{ $subsections allow-edit-profile? }
 "This feature adds an " { $snippet "edit-profile" } " action to the realm, and a link to this action can be inserted in Chloe templates using the following XML snippet:"
 { $code
     "<t:if t:code=\"furnace.auth.features.edit-profile:allow-edit-profile?\">"

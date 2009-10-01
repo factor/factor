@@ -19,7 +19,9 @@ $nl
 "For the full list of HTML tags and attributes, consult the word list for the " { $vocab-link "html.elements" } " vocabulary. In addition to HTML tag and attribute words, a few utilities are provided."
 $nl
 "Writing unescaped HTML to " { $vocab-link "html.streams" } ":"
-{ $subsection write-html }
-{ $subsection print-html } ;
+{ $subsections
+    write-html
+    print-html
+} ;
 
 ABOUT: "html.elements"

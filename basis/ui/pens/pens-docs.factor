@@ -11,8 +11,10 @@ HELP: draw-boundary
 
 ARTICLE: "ui-pen-protocol" "UI pen protocol"
 "The " { $snippet "interior" } " and " { $snippet "boundary" } " slots of a gadget facilitate easy factoring and sharing of drawing logic. Objects stored in these slots must implement the pen protocol:"
-{ $subsection draw-interior }
-{ $subsection draw-boundary }
+{ $subsections
+    draw-interior
+    draw-boundary
+}
 "The default value of these slots is the " { $link f } " singleton, which implements the above protocol by doing nothing."
 $nl
 "Some other pre-defined implementations:"

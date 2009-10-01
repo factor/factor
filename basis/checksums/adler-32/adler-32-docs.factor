@@ -6,6 +6,6 @@ HELP: adler-32
 
 ARTICLE: "checksums.adler-32" "Adler-32 checksum"
 "The Adler-32 checksum algorithm implements simple and fast checksum. It is used in zlib and rsync."
-{ $subsection adler-32 } ;
+{ $subsections adler-32 } ;
 
 ABOUT: "checksums.adler-32"

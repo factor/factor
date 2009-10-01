@@ -38,27 +38,29 @@ HELP: uncased
 
 ARTICLE: "unicode.categories" "Character classes"
 "The " { $vocab-link "unicode.categories" } " vocabulary implements predicates for determining if a code point has a particular property, for example being a lower cased letter. These should be used in preference to the " { $vocab-link "ascii" } " equivalents in most cases. Each character class has an associated predicate word."
-{ $subsection blank }
-{ $subsection blank? }
-{ $subsection letter }
-{ $subsection letter? }
-{ $subsection LETTER }
-{ $subsection LETTER? }
-{ $subsection Letter }
-{ $subsection Letter? }
-{ $subsection digit }
-{ $subsection digit? } 
-{ $subsection printable }
-{ $subsection printable? }
-{ $subsection alpha }
-{ $subsection alpha? }
-{ $subsection control }
-{ $subsection control? }
-{ $subsection uncased }
-{ $subsection uncased? }
-{ $subsection character }
-{ $subsection character? }
-{ $subsection math }
-{ $subsection math? } ;
+{ $subsections
+    blank
+    blank?
+    letter
+    letter?
+    LETTER
+    LETTER?
+    Letter
+    Letter?
+    digit
+    digit?
+    printable
+    printable?
+    alpha
+    alpha?
+    control
+    control?
+    uncased
+    uncased?
+    character
+    character?
+    math
+    math?
+} ;
 
 ABOUT: "unicode.categories"

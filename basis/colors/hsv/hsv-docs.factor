@@ -6,8 +6,10 @@ HELP: hsva
 
 ARTICLE: "colors.hsv" "HSV colors"
 "The " { $vocab-link "colors.hsv" } " vocabulary implements colors specified by their hue, saturation, and value, together with an alpha channel."
-{ $subsection hsva }
-{ $subsection <hsva> }
+{ $subsections
+    hsva
+    <hsva>
+}
 { $see-also "colors" } ;
 
 ABOUT: "colors.hsv"

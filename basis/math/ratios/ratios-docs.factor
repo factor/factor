@@ -3,7 +3,7 @@ math.ratios.private math.functions ;
 IN: math.ratios
 
 ARTICLE: "rationals" "Rational numbers"
-{ $subsection ratio }
+{ $subsections ratio }
 "When we add, subtract or multiply any two integers, the result is always an integer. However, dividing a numerator by a denominator that is not an integral divisor of the denominator yields a ratio:"
 { $example "1210 11 / ." "110" }
 { $example "100 330 / ." "10/33" }
@@ -14,9 +14,11 @@ $nl
 { $example "1/2 1/3 + ." "5/6" }
 { $example "100 6 / 3 * ." "50" }
 "Ratios can be taken apart:"
-{ $subsection numerator }
-{ $subsection denominator }
-{ $subsection >fraction }
+{ $subsections
+    numerator
+    denominator
+    >fraction
+}
 { $see-also "syntax-ratios" } ;
 
 ABOUT: "rationals"

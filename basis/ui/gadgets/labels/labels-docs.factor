@@ -16,13 +16,15 @@ HELP: <label-control>
 
 ARTICLE: "ui.gadgets.labels" "Label gadgets"
 "The " { $vocab-link "ui.gadgets.labels" } " vocabulary implements labels. A label displays a piece of text, which is either a single line string or an array of line strings."
-{ $subsection label }
-{ $subsection <label> }
-{ $subsection <label-control> }
+{ $subsections
+    label
+    <label>
+    <label-control>
+}
 "Labels have a virtual slot named " { $slot "string" } " which contains the displayed text. The " { $slot "text" } " slot should not be set directly."
 $nl
 "Label specifiers are used by buttons, checkboxes and radio buttons:"
-{ $subsection >label } ;
+{ $subsections >label } ;
 
 ABOUT: "ui.gadgets.labels"
 

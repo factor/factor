@@ -9,28 +9,32 @@ $nl
 "If " { $link auto-use? } " mode is on and only one vocabulary has a word with this name, the vocabulary is added to the search path and parsing continues."
 $nl
 "If any restarts were invoked, or if " { $link auto-use? } " is on, the parser will print the correct " { $link POSTPONE: USING: } " after parsing completes. This form can be copy and pasted back into the source file."
-{ $subsection auto-use? } ;
+{ $subsections auto-use? } ;
 
 ARTICLE: "word-search-syntax" "Syntax to control word lookup"
 "Parsing words which make all words in a vocabulary available:"
-{ $subsection POSTPONE: USE: }
-{ $subsection POSTPONE: USING: }
-{ $subsection POSTPONE: QUALIFIED: }
-{ $subsection POSTPONE: QUALIFIED-WITH: }
+{ $subsections
+    POSTPONE: USE:
+    POSTPONE: USING:
+    POSTPONE: QUALIFIED:
+    POSTPONE: QUALIFIED-WITH:
+}
 "Parsing words which make a subset of all words in a vocabulary available:"
-{ $subsection POSTPONE: FROM: }
-{ $subsection POSTPONE: EXCLUDE: }
-{ $subsection POSTPONE: RENAME: }
+{ $subsections
+    POSTPONE: FROM:
+    POSTPONE: EXCLUDE:
+    POSTPONE: RENAME:
+}
 "Removing vocabularies from the search path:"
-{ $subsection POSTPONE: UNUSE: }
+{ $subsections POSTPONE: UNUSE: }
 "In the listener, the " { $vocab-link "scratchpad" } " is the default vocabulary for new word definitions. In source files, there is no default vocabulary. Defining words before declaring a vocabulary with " { $link POSTPONE: IN: } " results in an error."
-{ $subsection POSTPONE: IN: } ;
+{ $subsections POSTPONE: IN: } ;
 
 ARTICLE: "word-search-semantics" "Resolution of ambiguous word names"
 "There is a distinction between parsing words which perform “open” imports versus “closed” imports. An open import introduces all words from a vocabulary as identifiers, except possibly a finite set of exclusions. The " { $link POSTPONE: USE: } ", " { $link POSTPONE: USING: } " and " { $link POSTPONE: EXCLUDE: } " words perform open imports. A closed import only adds a fixed set of identifiers. The " { $link POSTPONE: FROM: } ", " { $link POSTPONE: RENAME: } ", " { $link POSTPONE: QUALIFIED: } " and " { $link POSTPONE: QUALIFIED-WITH: } " words perform closed imports. Note that the latter two are considered as closed imports, due to the fact that all identifiers they introduce are unambiguously qualified with a prefix. The " { $link POSTPONE: IN: } " parsing word also performs a closed import of the newly-created vocabulary."
 $nl
 "When the parser encounters a reference to a word, it first searches the closed imports, in order. Closed imports are searched from the most recent to least recent. If the word could not be found this way, it searches open imports. Unlike closed imports, with open imports, the order does not matter -- instead, if more than one vocabulary defines a word with this name, an error is thrown."
-{ $subsection ambiguous-use-error }
+{ $subsections ambiguous-use-error }
 "To resolve the error, add a closed import, using " { $link POSTPONE: FROM: } ", " { $link POSTPONE: QUALIFIED: } " or " { $link POSTPONE: QUALIFIED-WITH: } ". The closed import will then take precedence over the open imports, and the ambiguity will be resolved."
 $nl
 "The rationale for this behavior is as follows. Open imports are named such because they are open to future extension; if a future version of a vocabulary that you use adds new words, those new words will now be in scope in your source file, too. To avoid problems, any references to the new word have to be resolved since the parser cannot safely determine which vocabulary was meant. This problem can be avoided entirely by using only closed imports, but this leads to additional verbosity."
@@ -44,36 +48,46 @@ $nl
 
 ARTICLE: "word-search-private" "Private words"
 "Words which only serve as implementation detail should be defined in a private code block. Words in a private code blocks get defined in a vocabulary whose name is the name of the current vocabulary suffixed with " { $snippet ".private" } ". Privacy is not enforced by the system; private words can be called from other vocabularies, and from the listener. However, this should be avoided where possible."
-{ $subsection POSTPONE: <PRIVATE }
-{ $subsection POSTPONE: PRIVATE> } ;
+{ $subsections
+    POSTPONE: <PRIVATE
+    POSTPONE: PRIVATE>
+} ;
 
 ARTICLE: "word-search" "Parse-time word lookup"
 "When the parser reads a word name, it resolves the word at parse-time, looking up the " { $link word } " instance in the right vocabulary and adding it to the parse tree."
 $nl
 "Initially, only words from the " { $vocab-link "syntax" } " vocabulary are available in source files. Since most files will use words in other vocabularies, they will need to make those words available using a set of parsing words."
-{ $subsection "word-search-syntax" }
-{ $subsection "word-search-private" }
-{ $subsection "word-search-semantics" }
-{ $subsection "word-search-errors" }
+{ $subsections
+    "word-search-syntax"
+    "word-search-private"
+    "word-search-semantics"
+    "word-search-errors"
+}
 { $see-also "words" } ;
 
 ARTICLE: "word-search-parsing" "Word lookup in parsing words"
 "The parsing words described in " { $link "word-search-syntax" } " are implemented using the below words, which you can also call from your own parsing words."
 $nl
 "The current state used for word search is stored in a " { $emphasis "manifest" } ":"
-{ $subsection manifest }
+{ $subsections manifest }
 "Words for working with the current manifest:"
-{ $subsection use-vocab }
-{ $subsection unuse-vocab }
-{ $subsection add-qualified }
-{ $subsection add-words-from }
-{ $subsection add-words-excluding }
+{ $subsections
+    use-vocab
+    unuse-vocab
+    add-qualified
+    add-words-from
+    add-words-excluding
+}
 "Words used to implement " { $link POSTPONE: IN: } ":"
-{ $subsection current-vocab }
-{ $subsection set-current-vocab }
+{ $subsections
+    current-vocab
+    set-current-vocab
+}
 "Words used to implement " { $link "word-search-private" } ":"
-{ $subsection begin-private }
-{ $subsection end-private } ;
+{ $subsections
+    begin-private
+    end-private
+} ;
 
 ABOUT: "word-search"
 

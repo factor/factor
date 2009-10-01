@@ -14,4 +14,4 @@ HELP: enable-cgi
 
 ARTICLE: "http.server.cgi" "Serving CGI scripts"
 "The " { $vocab-link "http.server.cgi" } " implements CGI support. It is used in conjunction with a " { $link <static> } " responder."
-{ $subsection enable-cgi } ;
+{ $subsections enable-cgi } ;

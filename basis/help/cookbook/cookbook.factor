@@ -309,15 +309,17 @@ ARTICLE: "cookbook-next" "Next steps"
 
 ARTICLE: "cookbook" "Factor cookbook"
 "The Factor cookbook is a high-level overview of the most important concepts required to program in Factor."
-{ $subsection "cookbook-syntax" }
-{ $subsection "cookbook-colon-defs" }
-{ $subsection "cookbook-combinators" }
-{ $subsection "cookbook-variables" }
-{ $subsection "cookbook-vocabs" }
-{ $subsection "cookbook-application" }
-{ $subsection "cookbook-scripts" }
-{ $subsection "cookbook-philosophy" }
-{ $subsection "cookbook-pitfalls" }
-{ $subsection "cookbook-next" } ;
+{ $subsections
+    "cookbook-syntax"
+    "cookbook-colon-defs"
+    "cookbook-combinators"
+    "cookbook-variables"
+    "cookbook-vocabs"
+    "cookbook-application"
+    "cookbook-scripts"
+    "cookbook-philosophy"
+    "cookbook-pitfalls"
+    "cookbook-next"
+} ;
 
 ABOUT: "cookbook"

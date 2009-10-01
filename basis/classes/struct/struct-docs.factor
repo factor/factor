@@ -120,21 +120,25 @@ ARTICLE: "classes.struct.examples" "Struct class examples"
 
 ARTICLE: "classes.struct.define" "Defining struct classes"
 "Struct classes are defined using a syntax similar to the " { $link POSTPONE: TUPLE: } " syntax for defining tuple classes:"
-{ $subsection POSTPONE: STRUCT: }
+{ $subsections POSTPONE: STRUCT: }
 "Union structs are also supported, which behave like structs but share the same memory for all the slots."
-{ $subsection POSTPONE: UNION-STRUCT: } ;
+{ $subsections POSTPONE: UNION-STRUCT: } ;
 
 ARTICLE: "classes.struct.create" "Creating instances of structs"
 "Structs can be allocated with " { $link new } "- and " { $link boa } "-like constructor words. Additional words are provided for building structs from C memory and from existing buffers:"
-{ $subsection <struct> }
-{ $subsection <struct-boa> }
-{ $subsection malloc-struct }
-{ $subsection memory>struct }
+{ $subsections
+    <struct>
+    <struct-boa>
+    malloc-struct
+    memory>struct
+}
 "When the contents of a struct will be immediately reset, faster primitive words are available that will create a struct without initializing its contents:"
-{ $subsection (struct) }
-{ $subsection (malloc-struct) }
+{ $subsections
+    (struct)
+    (malloc-struct)
+}
 "Structs have literal syntax, similar to " { $link POSTPONE: T{ } " for tuples:"
-{ $subsection POSTPONE: S{ } ;
+{ $subsections POSTPONE: S{ } ;
 
 ARTICLE: "classes.struct.c" "Passing structs to C functions"
 "Structs can be passed and returned by value, or by reference."
@@ -164,9 +168,11 @@ $nl
 
 ARTICLE: "classes.struct" "Struct classes"
 "The " { $vocab-link "classes.struct" } " vocabulary implements " { $link struct } " classes. They are similar to " { $link tuple } " classes, but their slots exhibit value semantics, and they are backed by a contiguous structured block of memory. Structs can be used for space-efficient storage of data in the Factor heap, as well as for passing data to and from C libraries using the " { $link "alien" } "."
-{ $subsection "classes.struct.examples" }
-{ $subsection "classes.struct.define" }
-{ $subsection "classes.struct.create" }
-{ $subsection "classes.struct.c" } ;
+{ $subsections
+    "classes.struct.examples"
+    "classes.struct.define"
+    "classes.struct.create"
+    "classes.struct.c"
+} ;
 
 ABOUT: "classes.struct"

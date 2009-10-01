@@ -5,13 +5,13 @@ ARTICLE: "graphs" "Directed graph utilities"
 "Words for treating associative mappings as directed graphs can be found in the " { $vocab-link "graphs" } " vocabulary. A directed graph is represented as an assoc mapping each vertex to a set of edges entering that vertex, where the set is itself an assoc, with equal keys and values."
 $nl
 "To create a new graph, just create an assoc, for example by calling " { $link <hashtable> } ". To add vertices and edges to a graph:"
-{ $subsection add-vertex }
+{ $subsections add-vertex }
 "To remove vertices from the graph:"
-{ $subsection remove-vertex }
+{ $subsections remove-vertex }
 "Since graphs are represented as assocs, they can be cleared out by calling " { $link clear-assoc } "."
 $nl
 "You can perform queries on the graph:"
-{ $subsection closure }
+{ $subsections closure }
 "Directed graphs are used to maintain cross-referencing information for " { $link "definitions" } "." ;
 
 ABOUT: "graphs"
