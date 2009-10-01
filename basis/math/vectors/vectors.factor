@@ -101,7 +101,7 @@ PRIVATE>
 
 : v?   ( ? true false -- w ) [ ? ] pick 3map-as ;
 
-: vmask ( u ? -- u' ) vbitand ; inline
+: vmask ( u ? -- u' ) swap dup dup vbitxor v? ;
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;
