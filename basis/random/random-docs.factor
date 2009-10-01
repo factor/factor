@@ -34,7 +34,7 @@ HELP: random
 } ;
 
 HELP: random-32
-{ $values { "elt" "a 32-bit random integer" } }
+{ $values { "n" "a 32-bit random integer" } }
 { $description "Outputs 32 random bits. This word is more efficient than calling " { $link random } " because no scaling is done on the output." } ;
 
 HELP: random-bytes
