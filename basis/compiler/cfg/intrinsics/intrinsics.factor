@@ -171,6 +171,7 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-vbitandn) [ [ ^^andn-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vbitor) [ [ ^^or-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vbitxor) [ [ ^^xor-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v=) [ [ cc= ^^compare-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vlshift) [ [ ^^shl-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vrshift) [ [ ^^shr-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-hlshift) [ [ ^^horizontal-shl-vector ] emit-horizontal-shift ] }
