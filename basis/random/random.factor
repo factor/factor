@@ -22,7 +22,7 @@ M: object random-bytes* ( n tuple -- byte-array )
         [ 2drop ] [ random-32* 4 >le swap head over push-all ] if
     ] bi-curry bi* ;
 
-M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
+M: object random-32* ( tuple -- r ) 4 swap random-bytes* le> ;
 
 ERROR: no-random-number-generator ;
 
