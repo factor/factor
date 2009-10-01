@@ -317,12 +317,18 @@ M:: x86 %set-string-nth-fast ( ch str index temp -- )
 : %alien-unsigned-getter ( dst src offset size -- )
     [ MOVZX ] %alien-integer-getter ; inline
 
+: %alien-signed-getter ( dst src offset size -- )
+    [ MOVSX ] %alien-integer-getter ; inline
+
+:: %alien-integer-setter ( ptr offset value size -- )
+    value { ptr } size [| new-value |
+        new-value value int-rep %copy
+        ptr offset [+] new-value size n-bit-version-of MOV
+    ] with-small-register ; inline
+
 M: x86 %alien-unsigned-1 8 %alien-unsigned-getter ;
 M: x86 %alien-unsigned-2 16 %alien-unsigned-getter ;
 M: x86 %alien-unsigned-4 32 [ 2drop ] %alien-integer-getter ;
-
-: %alien-signed-getter ( dst src offset size -- )
-    [ MOVSX ] %alien-integer-getter ; inline
 
 M: x86 %alien-signed-1 8 %alien-signed-getter ;
 M: x86 %alien-signed-2 16 %alien-signed-getter ;
@@ -332,12 +338,6 @@ M: x86 %alien-cell [+] MOV ;
 M: x86 %alien-float [+] MOVSS ;
 M: x86 %alien-double [+] MOVSD ;
 M: x86 %alien-vector [ [+] ] dip %copy ;
-
-:: %alien-integer-setter ( ptr offset value size -- )
-    value { ptr } size [| new-value |
-        new-value value int-rep %copy
-        ptr offset [+] new-value size n-bit-version-of MOV
-    ] with-small-register ; inline
 
 M: x86 %set-alien-integer-1 8 %alien-integer-setter ;
 M: x86 %set-alien-integer-2 16 %alien-integer-setter ;
@@ -1056,8 +1056,20 @@ M: x86 %shr-vector-reps
 : scalar-sized-reg ( reg rep -- reg' )
     rep-size 8 * n-bit-version-of ;
 
-M: x86 %integer>scalar scalar-sized-reg MOVD ;
-M: x86 %scalar>integer swap [ scalar-sized-reg ] dip MOVD ;
+M: x86 %integer>scalar drop MOVD ;
+
+M:: x86 %scalar>integer ( dst src rep -- )
+    rep {
+        { int-scalar-rep [
+            dst 32-bit-version-of src MOVD
+            dst dst 32-bit-version-of
+            2dup eq? [ 2drop ] [ MOVSX ] if
+        ] }
+        { uint-scalar-rep [
+            dst 32-bit-version-of src MOVD
+        ] }
+    } case ;
+
 M: x86 %vector>scalar %copy ;
 M: x86 %scalar>vector %copy ;
 
