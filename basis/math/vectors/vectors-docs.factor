@@ -61,8 +61,11 @@ ARTICLE: "math-vectors-logic" "Vector componentwise logic"
 { $subsection vand }
 { $subsection vor }
 { $subsection vxor }
-{ $subsection vmask }
 { $subsection v? }
+"Entire vector tests:"
+{ $subsection vall? }
+{ $subsection vany? }
+{ $subsection vnone? }
 "Element shuffling:"
 { $subsection vshuffle } ;
 
@@ -338,13 +341,21 @@ HELP: vnot
 { $values { "u" "a sequence of booleans" } { "w" "a sequence of booleans" } }
 { $description "Takes the logical NOT of each element of " { $snippet "u" } "." } ;
 
-HELP: vmask
-{ $values { "u" "a sequence of numbers" } { "?" "a sequence of booleans" } { "u'" "a sequence of numbers" } }
-{ $description "Returns a copy of " { $snippet "u" } " with the elements for which the corresponding element of " { $snippet "?" } " is false replaced by zero." } ;
-
 HELP: v?
-{ $values { "?" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding element of the " { $snippet "?" } " sequence is true or false." } ;
+{ $values { "mask" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding bits of the " { $snippet "mask" } " sequence are set or not." } ;
+
+HELP: vany?
+{ $values { "v" "a sequence of booleans" } { "?" "a boolean" } }
+{ $description "Returns true if any element of " { $snippet "v" } " is true." } ;
+
+HELP: vall?
+{ $values { "v" "a sequence of booleans" } { "?" "a boolean" } }
+{ $description "Returns true if every element of " { $snippet "v" } " is true." } ;
+
+HELP: vnone?
+{ $values { "v" "a sequence of booleans" } { "?" "a boolean" } }
+{ $description "Returns true if every element of " { $snippet "v" } " is false." } ;
 
 { 2map v+ v- v* v/ } related-words
 
@@ -352,6 +363,6 @@ HELP: v?
 
 { vs+ vs- vs* } related-words
 
-{ v< v<= v= v> v>= vunordered? vand vor vxor vnot vmask v? } related-words
+{ v< v<= v= v> v>= vunordered? vand vor vxor vnot vany? vall? vnone? v? } related-words
 
 { vbitand vbitandn vbitor vbitxor vbitnot } related-words

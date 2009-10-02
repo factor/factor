@@ -25,6 +25,7 @@ IN: compiler.tree.propagation.simd
     (simd-hlshift)
     (simd-hrshift)
     (simd-vshuffle)
+    (simd-v=)
     (simd-with)
     (simd-gather-2)
     (simd-gather-4)
@@ -44,6 +45,12 @@ IN: compiler.tree.propagation.simd
 \ (simd-sum) [ nip scalar-output-class ] "outputs" set-word-prop
 
 \ (simd-v.) [ 2nip scalar-output-class ] "outputs" set-word-prop
+
+{
+    (simd-vany?)
+    (simd-vall?)
+    (simd-vnone?)
+} [ { boolean } "default-output-classes" set-word-prop ] each
 
 \ (simd-select) [ 2nip scalar-output-class ] "outputs" set-word-prop
 

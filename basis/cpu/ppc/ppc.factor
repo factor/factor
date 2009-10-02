@@ -261,6 +261,8 @@ M: ppc %zero-vector-reps { } ;
 M: ppc %gather-vector-2-reps { } ;
 M: ppc %gather-vector-4-reps { } ;
 M: ppc %shuffle-vector-reps { } ;
+M: ppc %compare-vector-reps { } ;
+M: ppc %test-vector-reps { } ;
 M: ppc %add-vector-reps { } ;
 M: ppc %saturated-add-vector-reps { } ;
 M: ppc %add-sub-vector-reps { } ;
