@@ -76,15 +76,19 @@ main-responder set-global"""
 
 ARTICLE: "http.server.dispatchers" "HTTP dispatchers and virtual hosting"
 "The " { $vocab-link "http.server.dispatchers" } " vocabulary implements two responders which route HTTP requests to one or more child responders."
-{ $subsection "http.server.dispatchers.example" }
+{ $subsections "http.server.dispatchers.example" }
 "Pathname dispatchers implement a directory hierarchy where each subdirectory is its own responder:"
-{ $subsection dispatcher }
-{ $subsection <dispatcher> }
+{ $subsections
+    dispatcher
+    <dispatcher>
+}
 "Virtual host dispatchers dispatch each virtual host to a different responder:"
-{ $subsection vhost-dispatcher }
-{ $subsection <vhost-dispatcher> }
+{ $subsections
+    vhost-dispatcher
+    <vhost-dispatcher>
+}
 "Adding responders to dispatchers:"
-{ $subsection add-responder }
+{ $subsections add-responder }
 "The " { $slot "default" } " slot holds a responder which receives all unrecognized URLs. By default, it responds with 404 messages." ;
 
 ABOUT: "http.server.dispatchers"

@@ -35,10 +35,12 @@ ARTICLE: "prettyprint.stylesheet" "Prettyprinter Formatted Output"
 { $vocab-link "prettyprint.stylesheet" }
 $nl
 "Control the way that the prettyprinter formats output based on object type. These hooks form a basic \"syntax\" highlighting system."
-{ $subsection word-style }
-{ $subsection string-style } 
-{ $subsection vocab-style }
-{ $subsection effect-style }
+{ $subsections
+    word-style
+    string-style
+    vocab-style
+    effect-style
+}
 ;
 
 ABOUT: "prettyprint.stylesheet"

@@ -16,9 +16,11 @@ TIP: "Use the " { $link leaks } " combinator to track down resource leaks." ;
 
 ARTICLE: "tools.destructors" "Destructor tools"
 "The " { $vocab-link "tools.destructors" } " vocabulary provides words for tracking down resource leaks."
-{ $subsection debug-leaks? }
-{ $subsection disposables. }
-{ $subsection leaks }
+{ $subsections
+    debug-leaks?
+    disposables.
+    leaks
+}
 { $see-also "destructors" } ;
 
 ABOUT: "tools.destructors"

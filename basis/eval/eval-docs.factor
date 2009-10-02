@@ -17,7 +17,9 @@ HELP: eval>string
 
 ARTICLE: "eval" "Evaluating strings at runtime"
 "The " { $vocab-link "eval" } " vocabulary implements support for evaluating strings at runtime."
-{ $subsection POSTPONE: eval( }
-{ $subsection eval>string } ;
+{ $subsections
+    POSTPONE: eval(
+    eval>string
+} ;
 
 ABOUT: "eval"

@@ -29,11 +29,23 @@ ARTICLE: "cleave-combinators" "Cleave combinators"
 "The cleave combinators apply multiple quotations to a single value."
 $nl
 "Two quotations:"
-{ $subsections bi 2bi 3bi }
+{ $subsections
+    bi
+    2bi
+    3bi
+}
 "Three quotations:"
-{ $subsections tri 2tri 3tri }
+{ $subsections
+    tri
+    2tri
+    3tri
+}
 "An array of quotations:"
-{ $subsection cleave 2cleave 3cleave }
+{ $subsections
+    cleave
+    2cleave
+    3cleave
+}
 $nl
 "Technically, the cleave combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on the top of the stack can be written in one of two ways:"
 { $code
@@ -48,7 +60,7 @@ $nl
 }
 "The latter is more aesthetically pleasing than the former."
 $nl
-{ $subsection "cleave-shuffle-equivalence" } ;
+{ $subsections "cleave-shuffle-equivalence" } ;
 
 ARTICLE: "spread-shuffle-equivalence" "Expressing shuffle words with spread combinators"
 "Spread combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to spread combinators are discussed in the documentation for " { $link bi* } ", " { $link 2bi* } ", " { $link tri* } ", and " { $link 2tri* } "."
@@ -98,7 +110,7 @@ $nl
 }
 "A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
 $nl
-{ $subsection "spread-shuffle-equivalence" } ;
+{ $subsections "spread-shuffle-equivalence" } ;
 
 ARTICLE: "apply-combinators" "Apply combinators"
 "The apply combinators apply a single quotation to multiple values. The " { $snippet "@" } " suffix signifies application."
@@ -221,7 +233,7 @@ ARTICLE: "conditionals" "Conditional combinators"
 { $subsections ? }
 "Two combinators which abstract out nested chains of " { $link if } ":"
 { $subsections cond case }
-{ $subsection "conditionals-boolean-equivalence" }
+{ $subsections "conditionals-boolean-equivalence" }
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
 ARTICLE: "dataflow-combinators" "Data flow combinators"
@@ -254,7 +266,7 @@ $nl
 "The above are syntax sugar. The underlying words are a bit more verbose but allow non-constant effects to be passed in:"
 { $subsections call-effect execute-effect }
 "The combinator variants that do not take an effect declaration can only be used if the compiler is able to infer the stack effect by other means. See " { $link "inference-combinators" } "."
-{ $subsection "call-unsafe" }
+{ $subsections "call-unsafe" }
 { $see-also "effects" "inference" } ;
 
 ARTICLE: "combinators" "Combinators"

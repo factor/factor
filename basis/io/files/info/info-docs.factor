@@ -28,14 +28,18 @@ HELP: file-system-info
 
 ARTICLE: "io.files.info" "File system meta-data"
 "File meta-data:"
-{ $subsection file-info }
-{ $subsection link-info }
-{ $subsection exists? }
-{ $subsection directory? }
+{ $subsections
+    file-info
+    link-info
+    exists?
+    directory?
+}
 "File types:"
-{ $subsection "file-types" }
+{ $subsections "file-types" }
 "File system meta-data:"
-{ $subsection file-system-info }
-{ $subsection file-systems } ;
+{ $subsections
+    file-system-info
+    file-systems
+} ;
 
 ABOUT: "io.files.info"

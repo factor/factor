@@ -14,12 +14,14 @@ $nl
 "There is no special syntax for literal alists since they are just sequences; in practice, literals look like so:"
 { $code "{" "    { key1 value1 }" "    { key2 value2 }" "}" }
 "To make an assoc into an alist:"
-{ $subsection >alist } ;
+{ $subsections >alist } ;
 
 ARTICLE: "enums" "Enumerations"
 "An enumeration provides a view of a sequence as an assoc mapping integer indices to elements:"
-{ $subsection enum }
-{ $subsection <enum> }
+{ $subsections
+    enum
+    <enum>
+}
 "Inverting a permutation using enumerations:"
 { $example "IN: scratchpad" ": invert ( perm -- perm' )" "    <enum> >alist sort-values keys ;" "{ 2 0 4 1 3 } invert ." "{ 1 3 0 4 2 }" } ;
 
@@ -34,75 +36,93 @@ HELP: <enum>
 
 ARTICLE: "assocs-protocol" "Associative mapping protocol"
 "All associative mappings must be instances of a mixin class:"
-{ $subsection assoc }
-{ $subsection assoc? }
+{ $subsections
+    assoc
+    assoc?
+}
 "All associative mappings must implement methods on the following generic words:"
-{ $subsection at* }
-{ $subsection assoc-size }
-{ $subsection >alist }
+{ $subsections
+    at*
+    assoc-size
+    >alist
+}
 "Mutable assocs should implement the following additional words:"
-{ $subsection set-at }
-{ $subsection delete-at }
-{ $subsection clear-assoc }
+{ $subsections
+    set-at
+    delete-at
+    clear-assoc
+}
 "The following three words are optional:"
-{ $subsection value-at* }
-{ $subsection new-assoc }
-{ $subsection assoc-like }
+{ $subsections
+    value-at*
+    new-assoc
+    assoc-like
+}
 "Assocs should also implement methods on the " { $link clone } ", " { $link equal? } " and " { $link hashcode* } " generic words. Two utility words will help with the implementation of the last two:"
-{ $subsection assoc= }
-{ $subsection assoc-hashcode }
+{ $subsections
+    assoc=
+    assoc-hashcode
+}
 "Finally, assoc classes should define a word for converting other types of assocs; conventionally, such words are named " { $snippet ">" { $emphasis "class" } } " where " { $snippet { $emphasis "class" } } " is the class name. Such a word can be implemented using a utility:"
-{ $subsection assoc-clone-like } ;
+{ $subsections assoc-clone-like } ;
 
 ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 "Utility operations built up from the " { $link "assocs-protocol" } ":"
-{ $subsection key? }
-{ $subsection at }
-{ $subsection ?at }
-{ $subsection assoc-empty? }
-{ $subsection keys }
-{ $subsection values }
-{ $subsection assoc-stack }
+{ $subsections
+    key?
+    at
+    ?at
+    assoc-empty?
+    keys
+    values
+    assoc-stack
+}
 { $see-also at* assoc-size } ;
 
 ARTICLE: "assocs-values" "Transposed assoc operations"
 "default Most assoc words take a key and find the corresponding value. The following words take a value and find the corresponding key:"
-{ $subsection value-at }
-{ $subsection value-at* }
-{ $subsection value? }
+{ $subsections
+    value-at
+    value-at*
+    value?
+}
 "With most assoc implementations, these words runs in linear time, proportional to the number of entries in the assoc. For fast value lookups, use " { $vocab-link "biassocs" } "." ;
 
 ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 "It is often useful to use the keys of an associative mapping as a set, exploiting the constant or logarithmic lookup time of most implementations (" { $link "alists" } " being a notable exception)."
-{ $subsection assoc-subset? }
-{ $subsection assoc-intersect }
-{ $subsection update }
-{ $subsection assoc-union }
-{ $subsection assoc-diff }
-{ $subsection remove-all }
-{ $subsection substitute }
-{ $subsection substitute-here }
-{ $subsection extract-keys }
+{ $subsections
+    assoc-subset?
+    assoc-intersect
+    update
+    assoc-union
+    assoc-diff
+    remove-all
+    substitute
+    substitute-here
+    extract-keys
+}
 { $see-also key? assoc-any? assoc-all? "sets" } ;
 
 ARTICLE: "assocs-mutation" "Storing keys and values in assocs"
 "Utility operations built up from the " { $link "assocs-protocol" } ":"
-{ $subsection delete-at* }
-{ $subsection rename-at }
-{ $subsection change-at }
-{ $subsection at+ }
-{ $subsection inc-at }
+{ $subsections
+    delete-at*
+    rename-at
+    change-at
+    at+
+    inc-at
+}
 { $see-also set-at delete-at clear-assoc push-at } ;
 
 ARTICLE: "assocs-conversions" "Associative mapping conversions"
 "Converting to other assocs:"
-{ $subsection assoc-clone-like }
+{ $subsections assoc-clone-like }
 "Combining a sequence of assocs into a single assoc:"
-{ $subsection assoc-combine }
+{ $subsections assoc-combine }
 "Creating an assoc from key/value sequences:"
-{ $subsection zip }
+{ $subsections zip }
 "Creating key/value sequences from an assoc:"
-{ $subsection unzip }
+{ $subsections unzip }
 ;
 
 ARTICLE: "assocs-combinators" "Associative mapping combinators"
@@ -111,20 +131,24 @@ $nl
 "The " { $link assoc-find } " combinator is part of the " { $link "assocs-protocol" } " and must be implemented once for each class of assoc. All other combinators are implemented in terms of this combinator."
 $nl
 "The standard functional programming idioms:"
-{ $subsection assoc-each }
-{ $subsection assoc-find }
-{ $subsection assoc-map }
-{ $subsection assoc-filter }
-{ $subsection assoc-filter-as }
-{ $subsection assoc-any? }
-{ $subsection assoc-all? }
+{ $subsections
+    assoc-each
+    assoc-find
+    assoc-map
+    assoc-filter
+    assoc-filter-as
+    assoc-any?
+    assoc-all?
+}
 "Additional combinators:"
-{ $subsection assoc-partition }
-{ $subsection cache }
-{ $subsection 2cache }
-{ $subsection map>assoc }
-{ $subsection assoc>map }
-{ $subsection assoc-map-as } ;
+{ $subsections
+    assoc-partition
+    cache
+    2cache
+    map>assoc
+    assoc>map
+    assoc-map-as
+} ;
 
 ARTICLE: "assocs" "Associative mapping operations"
 "An " { $emphasis "associative mapping" } ", abbreviated " { $emphasis "assoc" } ", is a collection of key/value pairs which provides efficient lookup and storage indexed by key."
@@ -132,14 +156,16 @@ $nl
 "Words used for working with assocs are in the " { $vocab-link "assocs" } " vocabulary."
 $nl
 "Associative mappings implement a protocol:"
-{ $subsection "assocs-protocol" }
+{ $subsections "assocs-protocol" }
 "A large set of utility words work on any object whose class implements the associative mapping protocol."
-{ $subsection "assocs-lookup" }
-{ $subsection "assocs-values" }
-{ $subsection "assocs-mutation" }
-{ $subsection "assocs-combinators" }
-{ $subsection "assocs-sets" }
-{ $subsection "assocs-conversions" } ;
+{ $subsections
+    "assocs-lookup"
+    "assocs-values"
+    "assocs-mutation"
+    "assocs-combinators"
+    "assocs-sets"
+    "assocs-conversions"
+} ;
 
 ABOUT: "assocs"
 

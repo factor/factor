@@ -60,11 +60,15 @@ ARTICLE: "environment" "Environment variables"
 "The " { $vocab-link "environment" } " vocabulary interfaces to the platform-dependent mechanism for setting environment variables." $nl
 "Windows CE has no concept of environment variables, so these words are undefined on that platform." $nl
 "Reading environment variables:"
-{ $subsection os-env }
-{ $subsection os-envs }
+{ $subsections
+    os-env
+    os-envs
+}
 "Writing environment variables:"
-{ $subsection set-os-env }
-{ $subsection unset-os-env }
-{ $subsection set-os-envs } ;
+{ $subsections
+    set-os-env
+    unset-os-env
+    set-os-envs
+} ;
 
 ABOUT: "environment"

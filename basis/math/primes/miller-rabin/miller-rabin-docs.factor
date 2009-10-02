@@ -22,7 +22,9 @@ HELP: miller-rabin*
 ARTICLE: "math.primes.miller-rabin" "Miller-Rabin probabilistic primality test"
 "The " { $vocab-link "math.primes.miller-rabin" } " vocabulary implements the Miller-Rabin probabilistic primality test and utility words that use it in order to generate random prime numbers." $nl
 "The Miller-Rabin probabilistic primality test:"
-{ $subsection miller-rabin }
-{ $subsection miller-rabin* } ;
+{ $subsections
+    miller-rabin
+    miller-rabin*
+} ;
 
 ABOUT: "math.primes.miller-rabin"

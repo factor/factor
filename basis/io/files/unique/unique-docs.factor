@@ -76,16 +76,20 @@ HELP: with-temporary-directory
 ARTICLE: "io.files.unique" "Unique files"
 "The " { $vocab-link "io.files.unique" } " vocabulary implements cross-platform unique file creation in temporary directories in a high-level and secure way." $nl
 "Changing the temporary path:"
-{ $subsection current-temporary-directory }
+{ $subsections current-temporary-directory }
 "Creating unique files:"
-{ $subsection unique-file }
-{ $subsection cleanup-unique-file }
-{ $subsection make-unique-file }
+{ $subsections
+    unique-file
+    cleanup-unique-file
+    make-unique-file
+}
 "Creating unique directories:"
-{ $subsection unique-directory }
-{ $subsection with-unique-directory }
-{ $subsection cleanup-unique-directory }
+{ $subsections
+    unique-directory
+    with-unique-directory
+    cleanup-unique-directory
+}
 "Default temporary directory:"
-{ $subsection default-temporary-directory } ;
+{ $subsections default-temporary-directory } ;
 
 ABOUT: "io.files.unique"

@@ -17,13 +17,13 @@ ARTICLE: "furnace.auth.features.recover-password" "User password recovery"
 " vocabulary implements an authentication feature for user password recovery, allowing users to get a new password e-mailed to them in the event they forget their current one."
 $nl
 "To enable this feature, first call the following word on an authentication realm,"
-{ $subsection allow-password-recovery }
+{ $subsections allow-password-recovery }
 "Then set a global configuration variable:"
-{ $subsection lost-password-from }
+{ $subsections lost-password-from }
 "In addition, the " { $link "smtp" } " may need to be configured as well."
 $nl
 "To check if password recovery is enabled:"
-{ $subsection allow-password-recovery? }
+{ $subsections allow-password-recovery? }
 "This feature adds a " { $snippet "recover-password" } " action to the realm, and a link to this action can be inserted in Chloe templates using the following XML snippet:"
 { $code
     "<t:if t:code=\"furnace.auth.features.recover-password:allow-password-recovery?\">"

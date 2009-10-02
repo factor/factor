@@ -26,12 +26,16 @@ $nl
 "Bidirectional assocs implement the entire " { $link "assocs-protocol" } " with the exception of " { $link delete-at } ". Duplicate values are allowed, however value lookups with " { $link value-at } " only return the first key that a given value was stored with."
 $nl
 "The class of biassocs:"
-{ $subsection biassoc }
-{ $subsection biassoc? }
+{ $subsections
+    biassoc
+    biassoc?
+}
 "Creating new biassocs:"
-{ $subsection <biassoc> }
-{ $subsection <bihash> }
+{ $subsections
+    <biassoc>
+    <bihash>
+}
 "Converting existing assocs to biassocs:"
-{ $subsection >biassoc } ;
+{ $subsections >biassoc } ;
 
 ABOUT: "biassocs"

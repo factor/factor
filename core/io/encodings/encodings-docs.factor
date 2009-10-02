@@ -78,8 +78,10 @@ HELP: replacement-char
 
 ARTICLE: "encodings-descriptors" "Encoding descriptors"
 "An encoding descriptor is something which can be used with binary input or output streams to encode or decode bytes stored in a certain representation. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
-{ $subsection "io.encodings.binary" }
-{ $subsection "io.encodings.utf8" }
+{ $subsections
+    "io.encodings.binary"
+    "io.encodings.utf8"
+}
 { $vocab-subsection "UTF-16 encoding" "io.encodings.utf16" }
 { $vocab-subsection "UTF-32 encoding" "io.encodings.utf32" }
 { $vocab-subsection "Strict encodings" "io.encodings.strict" }
@@ -90,17 +92,23 @@ ARTICLE: "encodings-descriptors" "Encoding descriptors"
 
 ARTICLE: "encodings-protocol" "Encoding protocol"
 "There are two parts to implementing a new encoding. First, methods for creating an encoded or decoded stream must be provided. These have defaults, however, which wrap a stream in an encoder or decoder wrapper with the given encoding descriptor."
-{ $subsection <encoder> }
-{ $subsection <decoder> }
+{ $subsections
+    <encoder>
+    <decoder>
+}
 "If an encoding might be contained in the code slot of an encoder or decoder tuple, then the following methods must be implemented to read or write one code point from a stream:"
-{ $subsection decode-char }
-{ $subsection encode-char }
+{ $subsections
+    decode-char
+    encode-char
+}
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "encodings-constructors" "Manually constructing an encoded stream"
 "The following words can be used to construct encoded streams. Note that they are usually not used directly, but rather by the stream constructors themselves. Most stream constructors take an encoding descriptor as a parameter and call these constructors internally."
-{ $subsection <encoder> }
-{ $subsection <decoder> } ;
+{ $subsections
+    <encoder>
+    <decoder>
+} ;
 
 ARTICLE: "io.encodings" "I/O encodings"
 "The " { $vocab-link "io.encodings" } " vocabulary provides utilities for encoding and decoding bytes that represent text. Encodings can be used in the following situations:"
@@ -110,20 +118,28 @@ ARTICLE: "io.encodings" "I/O encodings"
   "With byte arrays, to convert bytes to characters"
   "With strings, to convert characters to bytes"
 }
-{ $subsection "encodings-descriptors" }
-{ $subsection "encodings-constructors" }
-{ $subsection "io.encodings.string" }
+{ $subsections
+    "encodings-descriptors"
+    "encodings-constructors"
+    "io.encodings.string"
+}
 "New types of encodings can be defined:"
-{ $subsection "encodings-protocol" }
+{ $subsections "encodings-protocol" }
 "Setting encodings on the current streams:"
-{ $subsection encode-output }
-{ $subsection decode-input }
+{ $subsections
+    encode-output
+    decode-input
+}
 "Setting encodings on streams:"
-{ $subsection re-encode }
-{ $subsection re-decode }
+{ $subsections
+    re-encode
+    re-decode
+}
 "Combinators to change the encoding:"
-{ $subsection with-encoded-output }
-{ $subsection with-decoded-input }
+{ $subsections
+    with-encoded-output
+    with-decoded-input
+}
 { $see-also "encodings-introduction" } ;
 
 ABOUT: "io.encodings"
