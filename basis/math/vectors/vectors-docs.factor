@@ -89,7 +89,6 @@ $nl
     vrshift
 }
 "Element logical operations:"
-<<<<<<< HEAD:basis/math/vectors/vectors-docs.factor
 { $subsections
     vand
     vandn
@@ -106,18 +105,6 @@ $nl
 }
 "Element shuffling:"
 { $subsections vshuffle } ;
-=======
-{ $subsection vand }
-{ $subsection vandn }
-{ $subsection vor }
-{ $subsection vxor }
-{ $subsection vnot }
-{ $subsection v? }
-"Vector tests:"
-{ $subsection vall? }
-{ $subsection vany? }
-{ $subsection vnone? } ;
->>>>>>> 271e6ddde513aa3de68337c67127a2a6da5ef6f4:basis/math/vectors/vectors-docs.factor
 
 ARTICLE: "math-vectors-misc" "Miscellaneous vector functions"
 { $subsections
@@ -188,18 +175,12 @@ $nl
 
 ARTICLE: "math-vectors" "Vector operations"
 "Any Factor sequence can be used to represent a mathematical vector, however for best performance, the sequences defined by the " { $vocab-link "specialized-arrays" } " and " { $vocab-link "math.vectors.simd" } " vocabularies should be used."
-<<<<<<< HEAD:basis/math/vectors/vectors-docs.factor
 { $subsections
     "math-vectors-arithmetic"
     "math-vectors-logic"
+    "math-vectors-shuffle"
     "math-vectors-misc"
 } ;
-=======
-{ $subsection "math-vectors-arithmetic" }
-{ $subsection "math-vectors-logic" }
-{ $subsection "math-vectors-shuffle" }
-{ $subsection "math-vectors-misc" } ;
->>>>>>> 271e6ddde513aa3de68337c67127a2a6da5ef6f4:basis/math/vectors/vectors-docs.factor
 
 ABOUT: "math-vectors"
 
