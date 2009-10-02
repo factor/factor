@@ -235,6 +235,7 @@ CODEGEN: _compare-branch %compare-branch
 CODEGEN: _compare-imm-branch %compare-imm-branch
 CODEGEN: _compare-float-ordered-branch %compare-float-ordered-branch
 CODEGEN: _compare-float-unordered-branch %compare-float-unordered-branch
+CODEGEN: _test-vector-branch %test-vector-branch
 CODEGEN: _dispatch %dispatch
 CODEGEN: _spill %spill
 CODEGEN: _reload %reload
