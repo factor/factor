@@ -113,9 +113,9 @@ int-4{ f f t f } ."""
 """int-4{ 0 0 -1 0 }""" }
 "However, extracting an element from a boolean SIMD vector with " { $link nth } " will not yield a valid Factor boolean. This is not generally a problem, since the results of vector comparisons are meant to be consumed by subsequent vector logical and test operations, which will accept SIMD values in the native boolean format."
 $nl
-"Also note that providing SIMD vectors with element values other than true or false as inputs to logical or test operations is undefined."
+"Providing a SIMD boolean vector with element values other than the proper true and false representations as an input to the vector logical or test operations is undefined. Do not count on operations such as " { $link vall? } " or " { $link v? } " using bitwise operations to construct their results."
 $nl
-"These notes apply to the output of the following element comparison words: "
+"This applies to the output of the following element comparison words: "
 { $list
 { $link v< }
 { $link v<= }
@@ -124,7 +124,7 @@ $nl
 { $link v> }
 { $link vunordered? }
 }
-"They likewise apply to the " { $snippet "mask" } " argument of " { $link v? } " and the inputs and outputs of the following element logic words:"
+"This likewise applies to the " { $snippet "mask" } " argument of " { $link v? } " and to the inputs and outputs of the following element logic words:"
 { $list
 { $link vand }
 { $link vandn }
@@ -132,7 +132,7 @@ $nl
 { $link vxor }
 { $link vnot }
 }
-"Finally, the inputs of these vector test words is affected:"
+"Finally, this applies to the inputs of these vector test words:"
 { $list
 { $link vall? }
 { $link vany? }
