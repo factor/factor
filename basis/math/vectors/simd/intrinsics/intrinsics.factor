@@ -44,6 +44,10 @@ SIMD-OP: vbitand
 SIMD-OP: vbitandn
 SIMD-OP: vbitor
 SIMD-OP: vbitxor
+SIMD-OP: vand
+SIMD-OP: vandn
+SIMD-OP: vor
+SIMD-OP: vxor
 SIMD-OP: vlshift
 SIMD-OP: vrshift
 SIMD-OP: hlshift
@@ -125,6 +129,10 @@ M: vector-rep supported-simd-op?
         { \ (simd-vbitandn) [ %andn-vector-reps           ] }
         { \ (simd-vbitor)   [ %or-vector-reps             ] }
         { \ (simd-vbitxor)  [ %xor-vector-reps            ] }
+        { \ (simd-vand)     [ %and-vector-reps            ] }
+        { \ (simd-vandn)    [ %andn-vector-reps           ] }
+        { \ (simd-vor)      [ %or-vector-reps             ] }
+        { \ (simd-vxor)     [ %xor-vector-reps            ] }
         { \ (simd-vlshift)  [ %shl-vector-reps            ] }
         { \ (simd-vrshift)  [ %shr-vector-reps            ] }
         { \ (simd-hlshift)  [ %horizontal-shl-vector-reps ] }

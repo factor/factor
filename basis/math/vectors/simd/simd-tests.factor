@@ -159,6 +159,12 @@ CONSTANT: simd-classes
 : remove-integer-words ( alist -- alist' )
     { vlshift vrshift } unique assoc-diff ;
 
+: boolean-ops ( -- words )
+    { vand vandn vor vxor } ;
+
+: remove-boolean-words ( alist -- alist' )
+    boolean-ops unique assoc-diff ;
+
 : remove-special-words ( alist -- alist' )
     ! These have their own tests later
     {
@@ -169,6 +175,7 @@ CONSTANT: simd-classes
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
     float = [ remove-integer-words ] [ remove-float-words ] if
+    remove-boolean-words
     remove-special-words ;
 
 : check-vector-ops ( class elt-class compare-quot -- )
@@ -209,6 +216,30 @@ CONSTANT: simd-classes
 
 simd-classes&reps [
     [ [ { } ] ] dip first3 '[ _ _ _ check-vector-ops ] unit-test
+] each
+
+"== Checking boolean operations" print
+
+: random-boolean-vector ( class -- vec )
+    new [ drop 2 random zero? ] map ;
+
+:: check-boolean-op ( word inputs class elt-class -- inputs quot )
+    inputs [
+        {
+            { +vector+ [ class random-boolean-vector ] }
+            { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
+        } case
+    ] [ ] map-as
+    word '[ _ execute ] ;
+
+: check-boolean-ops ( class elt-class compare-quot -- )
+    [
+        [ boolean-ops [ dup word-schema ] { } map>assoc ] 2dip
+        '[ first2 inputs _ _ check-boolean-op ]
+    ] dip check-optimizer ; inline
+
+simd-classes&reps [
+    [ [ { } ] ] dip first3 '[ _ _ _ check-boolean-ops ] unit-test
 ] each
 
 "== Checking shifts and permutations" print

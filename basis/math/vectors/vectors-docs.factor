@@ -329,6 +329,10 @@ HELP: vand
 { $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
 { $description "Takes the logical AND of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." } ;
 
+HELP: vandn
+{ $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $description "Takes the logical AND-NOT of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", where " { $snippet "x AND-NOT y" } " is defined as " { $snippet "NOT(x) AND y" } "." } ;
+
 HELP: vor
 { $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
 { $description "Takes the logical OR of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." } ;
