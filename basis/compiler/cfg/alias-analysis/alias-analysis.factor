@@ -282,6 +282,7 @@ M: ##copy analyze-aliases*
     } 1&& ; inline
 
 M: ##compare analyze-aliases*
+    call-next-method
     dup useless-compare? [
         dst>> \ f tag-number \ ##load-immediate new-insn
         analyze-aliases*
