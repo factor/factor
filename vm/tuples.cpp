@@ -12,7 +12,7 @@ tuple *factor_vm::allot_tuple(cell layout_)
 	return t.untagged();
 }
 
-inline void factor_vm::primitive_tuple()
+void factor_vm::primitive_tuple()
 {
 	gc_root<tuple_layout> layout(dpop(),this);
 	tuple *t = allot_tuple(layout.value());
@@ -23,10 +23,8 @@ inline void factor_vm::primitive_tuple()
 	dpush(tag<tuple>(t));
 }
 
-PRIMITIVE_FORWARD(tuple)
-
 /* push a new tuple on the stack, filling its slots from the stack */
-inline void factor_vm::primitive_tuple_boa()
+void factor_vm::primitive_tuple_boa()
 {
 	gc_root<tuple_layout> layout(dpop(),this);
 	gc_root<tuple> t(allot_tuple(layout.value()),this);
@@ -35,7 +33,5 @@ inline void factor_vm::primitive_tuple_boa()
 	ds -= size;
 	dpush(t.value());
 }
-
-PRIMITIVE_FORWARD(tuple_boa)
 
 }

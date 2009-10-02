@@ -365,7 +365,6 @@ FOO_TO_BIGNUM(fixnum,fixnum,cell)
 FOO_TO_BIGNUM(long_long,s64,u64)
 FOO_TO_BIGNUM(ulong_long,u64,u64)
 
-
 #define BIGNUM_TO_FOO(name,type,utype)					\
 	type factor_vm::bignum_to_##name(bignum * bignum)		\
 	{								\

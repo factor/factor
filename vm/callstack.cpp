@@ -46,7 +46,7 @@ stack_frame *factor_vm::capture_start()
 	return frame + 1;
 }
 
-inline void factor_vm::primitive_callstack()
+void factor_vm::primitive_callstack()
 {
 	stack_frame *top = capture_start();
 	stack_frame *bottom = stack_chain->callstack_bottom;
@@ -60,9 +60,7 @@ inline void factor_vm::primitive_callstack()
 	dpush(tag<callstack>(stack));
 }
 
-PRIMITIVE_FORWARD(callstack)
-
-inline void factor_vm::primitive_set_callstack()
+void factor_vm::primitive_set_callstack()
 {
 	callstack *stack = untag_check<callstack>(dpop());
 
@@ -74,8 +72,6 @@ inline void factor_vm::primitive_set_callstack()
 	/* We cannot return here ... */
 	critical_error("Bug in set_callstack()",0);
 }
-
-PRIMITIVE_FORWARD(set_callstack)
 
 code_block *factor_vm::frame_code(stack_frame *frame)
 {
@@ -155,7 +151,7 @@ struct stack_frame_accumulator {
 
 }
 
-inline void factor_vm::primitive_callstack_to_array()
+void factor_vm::primitive_callstack_to_array()
 {
 	gc_root<callstack> callstack(dpop(),this);
 
@@ -165,8 +161,6 @@ inline void factor_vm::primitive_callstack_to_array()
 
 	dpush(accum.frames.elements.value());
 }
-
-PRIMITIVE_FORWARD(callstack_to_array)
 
 stack_frame *factor_vm::innermost_stack_frame(callstack *stack)
 {
@@ -189,21 +183,17 @@ stack_frame *factor_vm::innermost_stack_frame_quot(callstack *callstack)
 
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
-inline void factor_vm::primitive_innermost_stack_frame_executing()
+void factor_vm::primitive_innermost_stack_frame_executing()
 {
 	dpush(frame_executing(innermost_stack_frame(untag_check<callstack>(dpop()))));
 }
 
-PRIMITIVE_FORWARD(innermost_stack_frame_executing)
-
-inline void factor_vm::primitive_innermost_stack_frame_scan()
+void factor_vm::primitive_innermost_stack_frame_scan()
 {
 	dpush(frame_scan(innermost_stack_frame_quot(untag_check<callstack>(dpop()))));
 }
 
-PRIMITIVE_FORWARD(innermost_stack_frame_scan)
-
-inline void factor_vm::primitive_set_innermost_stack_frame_quot()
+void factor_vm::primitive_set_innermost_stack_frame_quot()
 {
 	gc_root<callstack> callstack(dpop(),this);
 	gc_root<quotation> quot(dpop(),this);
@@ -218,8 +208,6 @@ inline void factor_vm::primitive_set_innermost_stack_frame_quot()
 	inner->xt = quot->xt;
 	FRAME_RETURN_ADDRESS(inner) = (char *)quot->xt + offset;
 }
-
-PRIMITIVE_FORWARD(set_innermost_stack_frame_quot)
 
 /* called before entry into Factor code. */
 void factor_vm::save_callstack_bottom(stack_frame *callstack_bottom)

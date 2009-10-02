@@ -23,10 +23,6 @@ enum vm_error_type
 	ERROR_FP_TRAP,
 };
 
-PRIMITIVE(die);
-PRIMITIVE(call_clear);
-PRIMITIVE(unimplemented);
-
 void fatal_error(const char* msg, cell tagged);
 void memory_signal_handler_impl();
 void fp_signal_handler_impl();

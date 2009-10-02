@@ -99,15 +99,6 @@ inline static bool save_env_p(cell i)
 	return (i >= FIRST_SAVE_ENV && i <= LAST_SAVE_ENV) || i == STACK_TRACES_ENV;
 }
 
-PRIMITIVE(getenv);
-PRIMITIVE(setenv);
-PRIMITIVE(exit);
-PRIMITIVE(micros);
-PRIMITIVE(sleep);
-PRIMITIVE(set_slot);
-PRIMITIVE(load_locals);
-PRIMITIVE(clone);
-
 }
 
  

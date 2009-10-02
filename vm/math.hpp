@@ -5,61 +5,60 @@ static const fixnum fixnum_max = (((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
 static const fixnum fixnum_min = (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)));
 static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));
 
+inline cell factor_vm::allot_integer(fixnum x)
+{
+	if(x < fixnum_min || x > fixnum_max)
+		return tag<bignum>(fixnum_to_bignum(x));
+	else
+		return tag_fixnum(x);
+}
+
+inline cell factor_vm::allot_cell(cell x)
+{
+	if(x > (cell)fixnum_max)
+		return tag<bignum>(cell_to_bignum(x));
+	else
+		return tag_fixnum(x);
+}
+
+inline cell factor_vm::allot_float(double n)
+{
+	boxed_float *flo = allot<boxed_float>(sizeof(boxed_float));
+	flo->n = n;
+	return tag(flo);
+}
+
+inline bignum *factor_vm::float_to_bignum(cell tagged)
+{
+	return double_to_bignum(untag_float(tagged));
+}
+
+inline double factor_vm::bignum_to_float(cell tagged)
+{
+	return bignum_to_double(untag<bignum>(tagged));
+}
+
+inline double factor_vm::untag_float(cell tagged)
+{
+	return untag<boxed_float>(tagged)->n;
+}
+
+inline double factor_vm::untag_float_check(cell tagged)
+{
+	return untag_check<boxed_float>(tagged)->n;
+}
+
+inline fixnum factor_vm::float_to_fixnum(cell tagged)
+{
+	return (fixnum)untag_float(tagged);
+}
+
+inline double factor_vm::fixnum_to_float(cell tagged)
+{
+	return (double)untag_fixnum(tagged);
+}
+
 // defined in assembler
-PRIMITIVE(fixnum_add);
-PRIMITIVE(fixnum_subtract);
-PRIMITIVE(fixnum_multiply);
-
-PRIMITIVE(bignum_to_fixnum);
-PRIMITIVE(float_to_fixnum);
-
-PRIMITIVE(fixnum_divint);
-PRIMITIVE(fixnum_divmod);
-PRIMITIVE(fixnum_shift);
-
-PRIMITIVE(fixnum_to_bignum);
-PRIMITIVE(float_to_bignum);
-PRIMITIVE(bignum_eq);
-PRIMITIVE(bignum_add);
-PRIMITIVE(bignum_subtract);
-PRIMITIVE(bignum_multiply);
-PRIMITIVE(bignum_divint);
-PRIMITIVE(bignum_divmod);
-PRIMITIVE(bignum_mod);
-PRIMITIVE(bignum_and);
-PRIMITIVE(bignum_or);
-PRIMITIVE(bignum_xor);
-PRIMITIVE(bignum_shift);
-PRIMITIVE(bignum_less);
-PRIMITIVE(bignum_lesseq);
-PRIMITIVE(bignum_greater);
-PRIMITIVE(bignum_greatereq);
-PRIMITIVE(bignum_not);
-PRIMITIVE(bignum_bitp);
-PRIMITIVE(bignum_log2);
-PRIMITIVE(byte_array_to_bignum);
-
-PRIMITIVE(fixnum_to_float);
-PRIMITIVE(bignum_to_float);
-PRIMITIVE(str_to_float);
-PRIMITIVE(float_to_str);
-PRIMITIVE(float_to_bits);
-
-PRIMITIVE(float_eq);
-PRIMITIVE(float_add);
-PRIMITIVE(float_subtract);
-PRIMITIVE(float_multiply);
-PRIMITIVE(float_divfloat);
-PRIMITIVE(float_mod);
-PRIMITIVE(float_less);
-PRIMITIVE(float_lesseq);
-PRIMITIVE(float_greater);
-PRIMITIVE(float_greatereq);
-
-PRIMITIVE(float_bits);
-PRIMITIVE(bits_float);
-PRIMITIVE(double_bits);
-PRIMITIVE(bits_double);
 
 VM_C_API void box_float(float flo, factor_vm *vm);
 VM_C_API float to_float(cell value, factor_vm *vm);

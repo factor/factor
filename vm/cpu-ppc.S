@@ -4,40 +4,43 @@ in the public domain. */
 
 #define DS_REG r13
 
-DEF(void,primitive_fixnum_add,(void)):
+DEF(void,primitive_fixnum_add,(void *vm)):
+	mr r5,r3  /* save vm ptr for overflow */
 	lwz r3,0(DS_REG)
 	lwz r4,-4(DS_REG)
 	subi DS_REG,DS_REG,4
 	li r0,0
 	mtxer r0
-	addo. r5,r3,r4
+	addo. r6,r3,r4
 	bso add_overflow
-	stw r5,0(DS_REG)
+	stw r6,0(DS_REG)
 	blr
 add_overflow:
 	b MANGLE(overflow_fixnum_add)
 
-DEF(void,primitive_fixnum_subtract,(void)):
+DEF(void,primitive_fixnum_subtract,(void *vm)):
+	mr r5,r3  /* save vm ptr for overflow */
 	lwz r3,-4(DS_REG)
 	lwz r4,0(DS_REG)
 	subi DS_REG,DS_REG,4
 	li r0,0
 	mtxer r0
-	subfo. r5,r4,r3
+	subfo. r6,r4,r3
 	bso sub_overflow
-	stw r5,0(DS_REG)
+	stw r6,0(DS_REG)
 	blr
 sub_overflow:
 	b MANGLE(overflow_fixnum_subtract)
 
-DEF(void,primitive_fixnum_multiply,(void)):
+DEF(void,primitive_fixnum_multiply,(void *vm)):
+	mr r5,r3  /* save vm ptr for overflow */
 	lwz r3,0(DS_REG)
 	lwz r4,-4(DS_REG)
 	subi DS_REG,DS_REG,4
 	srawi r3,r3,3
-	mullwo. r5,r3,r4
+	mullwo. r6,r3,r4
 	bso multiply_overflow
-	stw r5,0(DS_REG)
+	stw r6,0(DS_REG)
 	blr
 multiply_overflow:
 	srawi r4,r4,3
@@ -107,7 +110,7 @@ multiply_overflow:
 
 /* We have to save and restore nonvolatile registers because
 the Factor compiler treats the entire register file as volatile. */
-DEF(void,c_to_factor,(CELL quot)):
+DEF(void,c_to_factor,(CELL quot, void *vm)):
 	PROLOGUE
 
 	SAVE_INT(r15,0)	   /* save GPRs */
@@ -160,14 +163,15 @@ DEF(void,c_to_factor,(CELL quot)):
         SAVE_V(v30,96)
         SAVE_V(v31,100)
 
+	/* r4 vm ptr preserved */
         mfvscr v0
         li r2,SAVE_AT(104)
         stvxl v0,r2,r1
         addi r2,r2,0xc
-        lwzx r4,r2,r1
-        lis r5,0x1
-        andc r4,r4,r5
-        stwx r4,r2,r1
+        lwzx r5,r2,r1
+        lis r6,0x1
+        andc r5,r5,r6
+        stwx r5,r2,r1
         subi r2,r2,0xc
         lvxl v0,r2,r1
         mtvscr v0
@@ -250,13 +254,15 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	mtlr r0		   /* prepare to return to restored callstack */
 	blr		   /* go */
 
-DEF(void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
+DEF(void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
 	mr r1,r4	   /* compute new stack pointer */
+	mr r4,r5	   /* make vm ptr 2nd arg in case quot_xt = lazy_jit_compile */
 	lwz r0,LR_SAVE(r1) /* we have rewound the stack; load return address */
 	mtlr r0
 	JUMP_QUOT	   /* call the quotation */
 
-DEF(void,lazy_jit_compile,(CELL quot)):
+DEF(void,lazy_jit_compile,(CELL quot, void *vm)):
+	mr r5,r4	   /* vm ptr is 3rd arg */
 	mr r4,r1	   /* save stack pointer */
 	PROLOGUE
 	bl MANGLE(lazy_jit_compile_impl)
@@ -286,10 +292,11 @@ DEF(void,flush_icache,(void *start, int len)):
 	isync
 	blr
 
-DEF(void,primitive_inline_cache_miss,(void)):
+DEF(void,primitive_inline_cache_miss,(void *vm)):
 	mflr r6
-DEF(void,primitive_inline_cache_miss_tail,(void)):
+DEF(void,primitive_inline_cache_miss_tail,(void *vm)):
 	PROLOGUE
+	mr r4,r3          /* vm ptr in 2nd arg */
 	mr r3,r6
 	bl MANGLE(inline_cache_miss)
 	EPILOGUE
