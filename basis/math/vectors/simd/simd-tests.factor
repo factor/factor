@@ -161,7 +161,10 @@ CONSTANT: simd-classes
 
 : remove-special-words ( alist -- alist' )
     ! These have their own tests later
-    { hlshift hrshift vshuffle vbroadcast } unique assoc-diff ;
+    {
+        hlshift hrshift vshuffle vbroadcast
+        v= vany? vall? vnone?
+    } unique assoc-diff ;
 
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
@@ -280,6 +283,129 @@ simd-classes [
         [ = ] check-optimizer
     ] unit-test
 ] each
+
+"== Checking element tests" print
+
+[ { t f t f f f t f } ]
+[ short-8{ 1 2 3 4 5 6 7 8 } short-8{ 1 0 3 -1 -2 -3 7 -4 } v= ] unit-test
+
+[ short-8{ t f t f f f t f } ]
+[ short-8{ 1 2 3 4 5 6 7 8 } short-8{ 1 0 3 -1 -2 -3 7 -4 } [ { short-8 short-8 } declare v= ] compile-call ] unit-test
+
+[ { t f t f f f t f } ]
+[ int-8{ 1 2 3 4 5 6 7 8 } int-8{ 1 0 3 -1 -2 -3 7 -4 } v= ] unit-test
+
+[ int-8{ t f t f f f t f } ]
+[ int-8{ 1 2 3 4 5 6 7 8 } int-8{ 1 0 3 -1 -2 -3 7 -4 } [ { int-8 int-8 } declare v= ] compile-call ] unit-test
+
+[ int-4{ t f t f } ]
+[ int-4{ 1 2 3 4 } int-4{ 1 0 3 -1 } [ { int-4 int-4 } declare v= ] compile-call ] unit-test
+
+[ { t f t f } ]
+[ int-4{ 1 2 3 4 } int-4{ 1 0 3 -1 } v= ] unit-test
+
+[ int-4{ t f t f } ]
+[ int-4{ 1 2 3 4 } int-4{ 1 0 3 -1 } [ { int-4 int-4 } declare v= ] compile-call ] unit-test
+
+[ { t f t f } ]
+[ float-4{ 1.0 0/0. 3.0 4.0 } float-4{ 1.0 0/0. 3.0 -1.0 } v= ] unit-test
+
+[ t ]
+[
+    float-4{ t f t f }
+    float-4{ 1.0 0/0. 3.0 4.0 } float-4{ 1.0 0/0. 3.0 -1.0 } [ { float-4 float-4 } declare v= ] compile-call
+    exact=
+] unit-test
+
+[ { t f t f f t t t } ]
+[ float-8{ 1.0 0/0. 3.0 4.0 5.0 6.0 7.0 8.0 } float-8{ 1.0 0/0. 3.0 -1.0 -2.0 6.0 7.0 8.0 } v= ] unit-test
+
+[ t ]
+[
+    float-8{ t f t f f t t t }
+    float-8{ 1.0 0/0. 3.0 4.0 5.0 6.0 7.0 8.0 } float-8{ 1.0 0/0. 3.0 -1.0 -2.0 6.0 7.0 8.0 } [ { float-8 float-8 } declare v= ] compile-call
+    exact=
+] unit-test
+
+[ { f t } ]
+[ double-2{ 0/0. 3.0 } double-2{ 0/0. 3.0 } v= ] unit-test
+
+[ t ]
+[
+    double-2{ f t }
+    double-2{ 0/0. 3.0 } double-2{ 0/0. 3.0 } [ { double-2 double-2 } declare v= ] compile-call
+    exact=
+] unit-test
+
+:: test-vector-tests-bool ( vector declaration -- none? any? all? )
+    vector
+    [ [ declaration declare vnone? ] compile-call ]
+    [ [ declaration declare vany?  ] compile-call ]
+    [ [ declaration declare vall?  ] compile-call ] tri ; inline
+
+: yes ( -- x ) t ;
+: no ( -- x ) f ;
+
+:: test-vector-tests-branch ( vector declaration -- none? any? all? )
+    vector
+    [ [ declaration declare vnone? [ yes ] [ no ] if ] compile-call ]
+    [ [ declaration declare vany?  [ yes ] [ no ] if ] compile-call ]
+    [ [ declaration declare vall?  [ yes ] [ no ] if ] compile-call ] tri ; inline
+
+SYMBOL: !!inconsistent!!
+
+: ?inconsistent ( a b -- ab/inconsistent )
+    2dup = [ drop ] [ 2drop !!inconsistent!! ] if ;
+
+:: test-vector-tests ( vector decl -- none? any? all? )
+    vector decl test-vector-tests-bool :> bool-all :> bool-any :> bool-none
+    vector decl test-vector-tests-branch :> branch-all :> branch-any :> branch-none
+    
+    bool-none branch-none ?inconsistent
+    bool-any  branch-any  ?inconsistent
+    bool-all  branch-all  ?inconsistent ; inline
+
+[ f t t ]
+[ float-4{ t t t t } { float-4 } test-vector-tests ] unit-test
+[ f t f ]
+[ float-4{ f t t t } { float-4 } test-vector-tests ] unit-test
+[ t f f ]
+[ float-4{ f f f f } { float-4 } test-vector-tests ] unit-test
+
+[ f t t ]
+[ double-2{ t t } { double-2 } test-vector-tests ] unit-test
+[ f t f ]
+[ double-2{ f t } { double-2 } test-vector-tests ] unit-test
+[ t f f ]
+[ double-2{ f f } { double-2 } test-vector-tests ] unit-test
+
+[ f t t ]
+[ int-4{ t t t t } { int-4 } test-vector-tests ] unit-test
+[ f t f ]
+[ int-4{ f t t t } { int-4 } test-vector-tests ] unit-test
+[ t f f ]
+[ int-4{ f f f f } { int-4 } test-vector-tests ] unit-test
+
+[ f t t ]
+[ float-8{ t t t t t t t t } { float-8 } test-vector-tests ] unit-test
+[ f t f ]
+[ float-8{ f t t t t f t t } { float-8 } test-vector-tests ] unit-test
+[ t f f ]
+[ float-8{ f f f f f f f f } { float-8 } test-vector-tests ] unit-test
+
+[ f t t ]
+[ double-4{ t t t t } { double-4 } test-vector-tests ] unit-test
+[ f t f ]
+[ double-4{ f t t f } { double-4 } test-vector-tests ] unit-test
+[ t f f ]
+[ double-4{ f f f f } { double-4 } test-vector-tests ] unit-test
+
+[ f t t ]
+[ int-8{ t t t t t t t t } { int-8 } test-vector-tests ] unit-test
+[ f t f ]
+[ int-8{ f t t t t f f f } { int-8 } test-vector-tests ] unit-test
+[ t f f ]
+[ int-8{ f f f f f f f f } { int-8 } test-vector-tests ] unit-test
 
 "== Checking element access" print
 
