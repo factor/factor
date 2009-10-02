@@ -53,11 +53,13 @@ ARTICLE: "see" "Printing definitions"
 "The " { $vocab-link "see" } " vocabulary implements support for printing out " { $link "definitions" } " in the image."
 $nl
 "Printing a definition:"
-{ $subsection see }
+{ $subsections see }
 "Printing the methods defined on a generic word or class (see " { $link "objects" } "):"
-{ $subsection see-methods }
+{ $subsections see-methods }
 "Definition specifiers implementing the " { $link "definition-protocol" } " should also implement the " { $emphasis "see protocol" } ":"
-{ $subsection see* }
-{ $subsection synopsis* } ;
+{ $subsections
+    see*
+    synopsis*
+} ;
 
 ABOUT: "see"

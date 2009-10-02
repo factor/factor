@@ -251,23 +251,29 @@ $nl
 "Compile-time transformation is used to compile local variables to efficient code; prettyprinter extensions are defined so that " { $link see } " can display original word definitions with local variables and not the closure-converted concatenative code which results."
 $nl
 "Applicative word definitions where the inputs are named local variables:"
-{ $subsection POSTPONE: :: }
-{ $subsection POSTPONE: M:: }
-{ $subsection POSTPONE: MEMO:: }
-{ $subsection POSTPONE: MACRO:: }
+{ $subsections
+    POSTPONE: ::
+    POSTPONE: M::
+    POSTPONE: MEMO::
+    POSTPONE: MACRO::
+}
 "Lexical binding forms:"
-{ $subsection POSTPONE: [let }
-{ $subsection POSTPONE: [let* }
-{ $subsection POSTPONE: [wlet }
+{ $subsections
+    POSTPONE: [let
+    POSTPONE: [let*
+    POSTPONE: [wlet
+}
 "Lambda abstractions:"
-{ $subsection POSTPONE: [| }
+{ $subsections POSTPONE: [| }
 "Lightweight binding form:"
-{ $subsection POSTPONE: :> }
+{ $subsections POSTPONE: :> }
 "Additional topics:"
-{ $subsection "locals-literals" }
-{ $subsection "locals-mutable" }
-{ $subsection "locals-fry" }
-{ $subsection "locals-limitations" }
+{ $subsections
+    "locals-literals"
+    "locals-mutable"
+    "locals-fry"
+    "locals-limitations"
+}
 "Locals complement dynamically scoped variables implemented in the " { $vocab-link "namespaces" } " vocabulary." ;
 
 ABOUT: "locals"

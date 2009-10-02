@@ -26,10 +26,12 @@ HELP: gl-break
 
 ARTICLE: "opengl.debug" "Interactive debugging of OpenGL applications"
 "The " { $vocab-link "opengl.debug" } " vocabulary provides words to assist with interactive debugging of OpenGL applications in the Factor UI."
-{ $subsection G-world }
-{ $subsection G }
-{ $subsection F }
-{ $subsection GB }
-{ $subsection gl-break } ;
+{ $subsections
+    G-world
+    G
+    F
+    GB
+    gl-break
+} ;
 
 ABOUT: "opengl.debug"

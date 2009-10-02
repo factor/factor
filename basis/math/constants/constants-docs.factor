@@ -3,12 +3,14 @@ IN: math.constants
 
 ARTICLE: "math-constants" "Constants"
 "Standard mathematical constants:"
-{ $subsection e }
-{ $subsection euler }
-{ $subsection phi }
-{ $subsection pi }
-{ $subsection epsilon }
-{ $subsection single-epsilon } ;
+{ $subsections
+    e
+    euler
+    phi
+    pi
+    epsilon
+    single-epsilon
+} ;
 
 ABOUT: "math-constants"
 

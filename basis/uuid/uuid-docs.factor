@@ -36,10 +36,12 @@ ARTICLE: "uuid" "UUID (Universally Unique Identifier)"
 "The below words can be used to generate version 1, 3, 4, and 5 UUIDs as specified in RFC 4122."
 $nl 
 "If all you want is a unique ID, you should probably call " { $link uuid1 } " or " { $link uuid4 } "."
-{ $subsection uuid1 }
-{ $subsection uuid3 }
-{ $subsection uuid4 }
-{ $subsection uuid5 }
+{ $subsections
+    uuid1
+    uuid3
+    uuid4
+    uuid5
+}
 ;
 
 ABOUT: "uuid"

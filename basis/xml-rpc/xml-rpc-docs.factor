@@ -53,20 +53,26 @@ HELP: post-rpc
 { $description "posts an XML-RPC document to the specified URL, receives the response and parses it as XML-RPC, returning the tuple" } ;
 
 ARTICLE: { "xml-rpc" "intro" } "XML-RPC"
-    "This is the XML-RPC library. XML-RPC is used instead of SOAP because it is far simpler and easier to use for most tasks. The library was implemented by Daniel Ehrenberg."
-    $nl
-    "The most important words that this library implements are:"
-    { $subsection send-rpc }
-    { $subsection receive-rpc } 
-    "data types in XML-RPC"
-    { $subsection base64 }
-    { $subsection rpc-method }
-    { $subsection rpc-response }
-    { $subsection rpc-fault }
-    "the constructors for these are"
-    { $subsection <base64> }
-    { $subsection <rpc-method> }
-    { $subsection <rpc-response> }
-    { $subsection <rpc-fault> }
-    "other words include"
-    { $subsection post-rpc } ; 
+"This is the XML-RPC library. XML-RPC is used instead of SOAP because it is far simpler and easier to use for most tasks. The library was implemented by Daniel Ehrenberg."
+$nl
+"The most important words that this library implements are:"
+{ $subsections
+    send-rpc
+    receive-rpc
+}
+"data types in XML-RPC"
+{ $subsections
+    base64
+    rpc-method
+    rpc-response
+    rpc-fault
+}
+"the constructors for these are"
+{ $subsections
+    <base64>
+    <rpc-method>
+    <rpc-response>
+    <rpc-fault>
+}
+"other words include"
+{ $subsections post-rpc } ;

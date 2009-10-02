@@ -30,6 +30,6 @@ HELP: nonstandard-mime-types
 ARTICLE: "mime.types" "MIME types"
 "The " { $vocab-link "mime.types" } " vocabulary loads a file of MIME types and provides a word to look up the MIME type based on a file extension." $nl
 "Looking up a MIME type:"
-{ $subsection mime-type } ;
+{ $subsections mime-type } ;
 
 ABOUT: "mime.types"

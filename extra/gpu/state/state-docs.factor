@@ -605,19 +605,21 @@ HELP: viewport-state
 
 ARTICLE: "gpu.state" "GPU state"
 "The " { $vocab-link "gpu.state" } " vocabulary provides words for querying and setting GPU state."
-{ $subsection set-gpu-state }
+{ $subsections set-gpu-state }
 "The following state tuples are available:"
-{ $subsection viewport-state }
-{ $subsection scissor-state }
-{ $subsection multisample-state }
-{ $subsection stencil-state }
-{ $subsection depth-range-state }
-{ $subsection depth-state }
-{ $subsection blend-state }
-{ $subsection mask-state }
-{ $subsection triangle-cull-state }
-{ $subsection triangle-state }
-{ $subsection point-state }
-{ $subsection line-state } ;
+{ $subsections
+    viewport-state
+    scissor-state
+    multisample-state
+    stencil-state
+    depth-range-state
+    depth-state
+    blend-state
+    mask-state
+    triangle-cull-state
+    triangle-state
+    point-state
+    line-state
+} ;
 
 ABOUT: "gpu.state"

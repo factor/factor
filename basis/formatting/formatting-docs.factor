@@ -129,10 +129,11 @@ HELP: strftime
 
 ARTICLE: "formatting" "Formatted printing"
 "The " { $vocab-link "formatting" } " vocabulary is used for formatted printing."
-{ $subsection printf }
-{ $subsection sprintf }
-{ $subsection strftime }
-;
+{ $subsections
+    printf
+    sprintf
+    strftime
+} ;
 
 ABOUT: "formatting"
 

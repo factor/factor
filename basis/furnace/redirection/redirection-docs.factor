@@ -40,20 +40,24 @@ ARTICLE: "furnace.redirection.secure" "Secure redirection"
 "The words in this section help with implementing sites which require SSL/TLS for additional security."
 $nl
 "Converting a HTTP URL into an HTTPS URL:"
-{ $subsection >secure-url }
+{ $subsections >secure-url }
 "Redirecting the client to an HTTPS URL:"
-{ $subsection <secure-redirect> }
+{ $subsections <secure-redirect> }
 "Tools for writing responders which require SSL/TLS connections:"
-{ $subsection if-secure }
-{ $subsection <secure-only> } ;
+{ $subsections
+    if-secure
+    <secure-only>
+} ;
 
 ARTICLE: "furnace.redirection" "Furnace redirection support"
 "The " { $vocab-link "furnace.redirection" } " vocabulary builds additional functionality on top of " { $vocab-link "http.server.redirection" } ", and integrates with various Furnace features such as " { $link "furnace.asides" } " and " { $link "furnace.conversations" } "."
 $nl
 "A redirection response which takes asides and conversations into account:"
-{ $subsection <redirect> }
+{ $subsections <redirect> }
 "A responder which unconditionally redirects the client to another URL:"
-{ $subsection <redirect-responder> }
-{ $subsection "furnace.redirection.secure" } ;
+{ $subsections
+    <redirect-responder>
+    "furnace.redirection.secure"
+} ;
 
 ABOUT: "furnace.redirection"

@@ -33,10 +33,10 @@ ARTICLE: "furnace.alloy" "Furnace alloy responder"
     { $link "furnace.db" }
 }
 "A word to wrap a responder in an alloy:"
-{ $subsection <alloy> }
+{ $subsections <alloy> }
 "Initializing database tables for asides, conversations and sessions:"
-{ $subsection init-furnace-tables }
+{ $subsections init-furnace-tables }
 "Start a timer to expire asides, conversations and sessions:"
-{ $subsection start-expiring } ;
+{ $subsections start-expiring } ;
 
 ABOUT: "furnace.alloy"

@@ -96,13 +96,15 @@ HELP: trends
 ARTICLE: "splitting.monotonic" "Splitting trending sequences"
 "The " { $vocab-link "splitting.monotonic" } " vocabulary splits sequences that are trending downwards, upwards, or stably." $nl
 "Splitting into sequences:"
-{ $subsection monotonic-split }
+{ $subsections monotonic-split }
 "Splitting into slices:"
-{ $subsection monotonic-slice }
+{ $subsections monotonic-slice }
 "Trending:"
-{ $subsection downward-slices }
-{ $subsection stable-slices }
-{ $subsection upward-slices }
-{ $subsection trends } ;
+{ $subsections
+    downward-slices
+    stable-slices
+    upward-slices
+    trends
+} ;
 
 ABOUT: "splitting.monotonic"

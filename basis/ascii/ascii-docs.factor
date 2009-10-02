@@ -61,18 +61,22 @@ ARTICLE: "ascii" "ASCII"
 "The " { $vocab-link "ascii" } " vocabulary implements support for the legacy ASCII character set. Most applications should use " { $link "unicode" } " instead."
 $nl
 "ASCII character classes:"
-{ $subsection blank? }
-{ $subsection letter? }
-{ $subsection LETTER? }
-{ $subsection digit? }
-{ $subsection printable? }
-{ $subsection control? }
-{ $subsection quotable? }
-{ $subsection ascii? }
+{ $subsections
+    blank?
+    letter?
+    LETTER?
+    digit?
+    printable?
+    control?
+    quotable?
+    ascii?
+}
 "ASCII case conversion:"
-{ $subsection ch>lower }
-{ $subsection ch>upper }
-{ $subsection >lower }
-{ $subsection >upper } ;
+{ $subsections
+    ch>lower
+    ch>upper
+    >lower
+    >upper
+} ;
 
 ABOUT: "ascii"

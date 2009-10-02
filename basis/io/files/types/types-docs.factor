@@ -27,14 +27,18 @@ HELP: +unknown+
 
 ARTICLE: "file-types" "File types"
 "Platform-independent types:"
-{ $subsection +regular-file+ }
-{ $subsection +directory+ }
+{ $subsections
+    +regular-file+
+    +directory+
+}
 "Platform-specific types:"
-{ $subsection +character-device+ }
-{ $subsection +block-device+ }
-{ $subsection +fifo+ }
-{ $subsection +symbolic-link+ }
-{ $subsection +socket+ }
-{ $subsection +unknown+ } ;
+{ $subsections
+    +character-device+
+    +block-device+
+    +fifo+
+    +symbolic-link+
+    +socket+
+    +unknown+
+} ;
 
 ABOUT: "file-types"

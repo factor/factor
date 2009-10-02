@@ -13,8 +13,10 @@ HELP: ALIEN:
 { $notes "Alien objects are invalidated between image saves and loads, and hence source files should not contain alien literals; this word is for interactive use only. See " { $link "alien-expiry" } " for details." } ;
 
 ARTICLE: "syntax-aliens" "Alien object literal syntax"
-{ $subsection POSTPONE: ALIEN: }
-{ $subsection POSTPONE: DLL" } ;
+{ $subsections
+    POSTPONE: ALIEN:
+    POSTPONE: DLL"
+} ;
 
 HELP: LIBRARY:
 { $syntax "LIBRARY: name" }

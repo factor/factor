@@ -92,29 +92,31 @@ HELP: xml-error
 
 ARTICLE: "xml.errors" "XML parsing errors"
 "The " { $vocab-link "xml.errors" } " vocabulary provides a rich and highly inspectable set of parsing errors. All XML errors are described by the union class " { $link xml-error } "."
-    { $subsection multitags }
-    { $subsection notags }
-    { $subsection extra-attrs }
-    { $subsection nonexist-ns }
-    { $subsection not-yes/no }
-    { $subsection unclosed }
-    { $subsection mismatched }
-    { $subsection expected }
-    { $subsection no-entity }
-    { $subsection pre/post-content }
-    { $subsection unclosed-quote }
-    { $subsection bad-name }
-    { $subsection quoteless-attr }
-    { $subsection disallowed-char }
-    { $subsection missing-close }
-    { $subsection unexpected-end }
-    { $subsection duplicate-attr }
-    { $subsection bad-cdata }
-    { $subsection text-w/]]> }
-    { $subsection attr-w/< }
-    { $subsection misplaced-directive }
-    "Additionally, most of these errors are a kind of " { $link xml-error-at } " which provides more information about where the error occurred."
-    $nl
-    "Note that, in parsing an XML document, only the first error is reported." ;
+{ $subsections
+    multitags
+    notags
+    extra-attrs
+    nonexist-ns
+    not-yes/no
+    unclosed
+    mismatched
+    expected
+    no-entity
+    pre/post-content
+    unclosed-quote
+    bad-name
+    quoteless-attr
+    disallowed-char
+    missing-close
+    unexpected-end
+    duplicate-attr
+    bad-cdata
+    text-w/]]>
+    attr-w/<
+    misplaced-directive
+}
+"Additionally, most of these errors are a kind of " { $link xml-error-at } " which provides more information about where the error occurred."
+$nl
+"Note that, in parsing an XML document, only the first error is reported." ;
 
 ABOUT: "xml.errors"

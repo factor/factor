@@ -3,8 +3,10 @@ IN: math.blas.config
 
 ARTICLE: "math.blas.config" "Configuring the BLAS interface"
 "The " { $link "math.blas-summary" } " chooses the underlying BLAS interface to use based on the values of the following global variables:"
-{ $subsection blas-library }
-{ $subsection blas-fortran-abi }
+{ $subsections
+    blas-library
+    blas-fortran-abi
+}
 "The interface attempts to set default values based on the ones encountered on the Factor project's build machines. If these settings don't work with your system's BLAS, or you wish to use a commercial BLAS, you may change the global values of those variables in your " { $link "factor-rc" } ". For example, to use AMD's ACML library on Windows with " { $snippet "math.blas" } ", your " { $snippet "factor-rc" } " would look like this:"
 { $code """
 USING: math.blas.config namespaces ;

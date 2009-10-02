@@ -9,10 +9,12 @@ $nl
 "There are two special objects: the " { $link ((tombstone)) } " marker and the " { $link ((empty)) } " marker. Neither of these markers can be used as hashtable keys."
 $nl
 "The " { $snippet "count" } " slot is the number of entries including deleted entries, and " { $snippet "deleted" } " is the number of deleted entries."
-{ $subsection <hash-array> }
-{ $subsection set-nth-pair }
+{ $subsections
+    <hash-array>
+    set-nth-pair
+}
 "If a hashtable's keys are mutated, or if hashing algorithms change, hashtables can be rehashed:"
-{ $subsection rehash } ;
+{ $subsections rehash } ;
 
 ARTICLE: "hashtables" "Hashtables"
 "A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made. The literal syntax is covered in " { $link "syntax-hashtables" } "."
@@ -20,18 +22,22 @@ $nl
 "Words for constructing hashtables are in the " { $vocab-link "hashtables" } " vocabulary. Hashtables implement the " { $link "assocs-protocol" } ", and all " { $link "assocs" } " can be used on them; there are no hashtable-specific words to access and modify keys, because associative mapping operations are generic and work with all associative mappings."
 $nl
 "Hashtables are a class of objects."
-{ $subsection hashtable }
-{ $subsection hashtable? }
+{ $subsections
+    hashtable
+    hashtable?
+}
 "You can create a new hashtable with an initial capacity."
-{ $subsection <hashtable> }
+{ $subsections <hashtable> }
 "If you don't care about initial capacity, a more elegant way to create a new hashtable is to write:"
 { $code "H{ } clone" }
 "To convert an assoc to a hashtable:"
-{ $subsection >hashtable }
+{ $subsections >hashtable }
 "Further topics:"
-{ $subsection "hashtables.keys" }
-{ $subsection "hashtables.utilities" }
-{ $subsection "hashtables.private" } ;
+{ $subsections
+    "hashtables.keys"
+    "hashtables.utilities"
+    "hashtables.private"
+} ;
 
 ARTICLE: "hashtables.keys" "Hashtable keys"
 "Hashtables rely on the " { $link hashcode } " word to rapidly locate values associated with keys. The objects used as keys in a hashtable must obey certain restrictions."
@@ -44,8 +50,10 @@ $nl
 
 ARTICLE: "hashtables.utilities" "Hashtable utilities"
 "Utility words to create a new hashtable from a single key/value pair:"
-{ $subsection associate }
-{ $subsection ?set-at } ;
+{ $subsections
+    associate
+    ?set-at
+} ;
 
 ABOUT: "hashtables"
 

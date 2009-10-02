@@ -37,14 +37,18 @@ ARTICLE: "documents.elements" "Document elements"
 "Document elements, defined in the " { $vocab-link "documents.elements" } " vocabulary, overlay a hierarchy of structure on top of the flat sequence of characters presented by the document."
 $nl
 "The different types of document elements correspond to the standard editing taxonomy:"
-{ $subsection char-elt }
-{ $subsection one-word-elt }
-{ $subsection word-elt }
-{ $subsection one-line-elt }
-{ $subsection line-elt }
-{ $subsection doc-elt }
+{ $subsections
+    char-elt
+    one-word-elt
+    word-elt
+    one-line-elt
+    line-elt
+    doc-elt
+}
 "New locations can be created out of existing ones by finding the start or end of a document element nearest to a given location."
-{ $subsection prev-elt }
-{ $subsection next-elt } ;
+{ $subsections
+    prev-elt
+    next-elt
+} ;
 
 ABOUT: "documents.elements"

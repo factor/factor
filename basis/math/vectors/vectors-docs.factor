@@ -3,83 +3,105 @@ IN: math.vectors
 
 ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
 "Vector/vector binary operations:"
-{ $subsection v+ }
-{ $subsection v- }
-{ $subsection v+- }
-{ $subsection v* }
-{ $subsection v/ }
+{ $subsections
+    v+
+    v-
+    v+-
+    v*
+    v/
+}
 "Vector unary operations:"
-{ $subsection vneg }
-{ $subsection vabs }
-{ $subsection vsqrt }
-{ $subsection vfloor }
-{ $subsection vceiling }
-{ $subsection vtruncate }
+{ $subsections
+    vneg
+    vabs
+    vsqrt
+    vfloor
+    vceiling
+    vtruncate
+}
 "Vector/scalar and scalar/vector binary operations:"
-{ $subsection vneg }
-{ $subsection v*n }
-{ $subsection n*v }
-{ $subsection v/n }
-{ $subsection n/v }
-{ $subsection v+n }
-{ $subsection n+v }
-{ $subsection v-n }
-{ $subsection n-v }
+{ $subsections
+    vneg
+    v*n
+    n*v
+    v/n
+    n/v
+    v+n
+    n+v
+    v-n
+    n-v
+}
 "Saturated arithmetic (only on " { $link "specialized-arrays" } "):"
-{ $subsection vs+ }
-{ $subsection vs- }
-{ $subsection vs* }
+{ $subsections
+    vs+
+    vs-
+    vs*
+}
 "Inner product and norm:"
-{ $subsection v. }
-{ $subsection norm }
-{ $subsection norm-sq }
-{ $subsection normalize }
+{ $subsections
+    v.
+    norm
+    norm-sq
+    normalize
+}
 "Comparing entire vectors:"
-{ $subsection distance }
-{ $subsection v~ } ;
+{ $subsections
+    distance
+    v~
+} ;
 
 ARTICLE: "math-vectors-logic" "Vector componentwise logic"
 "See " { $link "math-vectors-simd-logic" } " for notes about using comparison and logical operations with SIMD vector types."
 $nl
 "Element comparisons:"
-{ $subsection v< }
-{ $subsection v<= }
-{ $subsection v= }
-{ $subsection v>= }
-{ $subsection v> }
-{ $subsection vunordered? }
-{ $subsection vmax }
-{ $subsection vmin }
-{ $subsection vsupremum }
-{ $subsection vinfimum }
+{ $subsections
+    v<
+    v<=
+    v=
+    v>=
+    v>
+    vunordered?
+    vmax
+    vmin
+    vsupremum
+    vinfimum
+}
 "Bitwise operations:"
-{ $subsection vbitand }
-{ $subsection vbitandn }
-{ $subsection vbitor }
-{ $subsection vbitxor }
-{ $subsection vbitnot }
-{ $subsection vlshift }
-{ $subsection vrshift }
+{ $subsections
+    vbitand
+    vbitandn
+    vbitor
+    vbitxor
+    vbitnot
+    vlshift
+    vrshift
+}
 "Element logical operations:"
-{ $subsection vand }
-{ $subsection vandn }
-{ $subsection vor }
-{ $subsection vxor }
-{ $subsection vnot }
-{ $subsection v? }
+{ $subsections
+    vand
+    vandn
+    vor
+    vxor
+    vnot
+    v?
+}
 "Entire vector tests:"
-{ $subsection vall? }
-{ $subsection vany? }
-{ $subsection vnone? }
+{ $subsections
+    vall?
+    vany?
+    vnone?
+}
 "Element shuffling:"
-{ $subsection vshuffle } ;
+{ $subsections vshuffle } ;
 
 ARTICLE: "math-vectors-misc" "Miscellaneous vector functions"
-{ $subsection trilerp }
-{ $subsection bilerp }
-{ $subsection vlerp }
-{ $subsection vnlerp }
-{ $subsection vbilerp } ;
+{ $subsections
+    trilerp
+    bilerp
+    vlerp
+    vnlerp
+    vbilerp
+} ;
 
 ARTICLE: "math-vectors-simd-logic" "Componentwise logic with SIMD vectors"
 "Processor SIMD units supported by the " { $vocab-link "math.vectors.simd" } " vocabulary represent boolean values as bitmasks, where a true result's binary representation is all ones and a false representation is all zeroes. This is the format in which results from comparison words such as " { $link v= } " return their results and in which logic and test words such as " { $link vand } " and " { $link vall? } " take their inputs when working with SIMD types. For a float vector, false will manifest itself as " { $snippet "0.0" } " and true as a " { $link POSTPONE: NAN: } " literal with a string of set bits in its payload:"
@@ -141,9 +163,11 @@ $nl
 
 ARTICLE: "math-vectors" "Vector operations"
 "Any Factor sequence can be used to represent a mathematical vector, however for best performance, the sequences defined by the " { $vocab-link "specialized-arrays" } " and " { $vocab-link "math.vectors.simd" } " vocabularies should be used."
-{ $subsection "math-vectors-arithmetic" }
-{ $subsection "math-vectors-logic" }
-{ $subsection "math-vectors-misc" } ;
+{ $subsections
+    "math-vectors-arithmetic"
+    "math-vectors-logic"
+    "math-vectors-misc"
+} ;
 
 ABOUT: "math-vectors"
 

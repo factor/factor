@@ -71,13 +71,15 @@ ARTICLE: "compression.lzw" "LZW Compression"
 $nl
 "Implements both the TIFF and GIF variations of the LZW algorithm."
 { $heading "Decompression" }
-{ $subsection tiff-lzw-uncompress }
-{ $subsection gif-lzw-uncompress }
+{ $subsections
+    tiff-lzw-uncompress
+    gif-lzw-uncompress
+}
 { $heading "Compression" }
 "Compression has not yet been implemented."
 $nl
 "Implementation details:"
-{ $subsection "compression.lzw.differences" }
+{ $subsections "compression.lzw.differences" }
 ;
 
 ABOUT: "compression.lzw"

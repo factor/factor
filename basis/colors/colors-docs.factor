@@ -13,7 +13,7 @@ HELP: >rgba
 
 ARTICLE: "colors.protocol" "Color protocol"
 "Abstract superclass for colors:"
-{ $subsection color }
+{ $subsections color }
 "All color objects must are required to implement a method on the " { $link >rgba } " generic word."
 $nl
 "Optionally, they can provide methods on the accessors " { $link red>> } ", " { $link green>> } ", " { $link blue>> } " and " { $link alpha>> } ", either by defining slots with the appropriate names, or with methods which calculate the color component values. The accessors should return color components which are real numbers in the range between 0 and 1."
@@ -24,15 +24,19 @@ ARTICLE: "colors" "Colors"
 "The " { $vocab-link "colors" } " vocabulary defines a protocol for colors, with a concrete implementation for RGBA colors. This vocabulary is used by " { $vocab-link "io.styles" } ", " { $vocab-link "ui" } " and other vocabularies, but it is independent of them."
 $nl
 "RGBA colors with floating point components in the range " { $snippet "[0,1]" } ":"
-{ $subsection rgba }
-{ $subsection <rgba> }
+{ $subsections
+    rgba
+    <rgba>
+}
 "Converting a color to RGBA:"
-{ $subsection >rgba }
+{ $subsections >rgba }
 "Extracting RGBA components of colors:"
-{ $subsection >rgba-components }
+{ $subsections >rgba-components }
 "Further topics:"
-{ $subsection "colors.protocol" }
-{ $subsection "colors.constants" }
+{ $subsections
+    "colors.protocol"
+    "colors.constants"
+}
 { $vocab-subsection "Grayscale colors" "colors.gray" }
 { $vocab-subsection "HSV colors" "colors.hsv" } ;
 

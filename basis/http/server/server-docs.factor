@@ -71,53 +71,71 @@ HELP: params
 
 ARTICLE: "http.server.requests" "HTTP request variables"
 "The following variables are set by the HTTP server at the beginning of a request."
-{ $subsection request }
-{ $subsection url }
-{ $subsection post-request? }
-{ $subsection responder-nesting }
-{ $subsection params }
+{ $subsections
+    request
+    url
+    post-request?
+    responder-nesting
+    params
+}
 "Utility words:"
-{ $subsection param }
-{ $subsection set-param }
-{ $subsection request-params }
+{ $subsections
+    param
+    set-param
+    request-params
+}
 "Additional vocabularies may be set by vocabularies such as " { $vocab-link "html.forms" } " and " { $vocab-link "furnace.sessions" } "." ;
 
 ARTICLE: "http.server.responders" "HTTP server responders"
 "The HTTP server dispatches requests to a main responder:"
-{ $subsection main-responder }
+{ $subsections main-responder }
 "The main responder may in turn dispatch it a subordinate dispatcher, and so on."
 $nl
 "Responders process requests and output " { $link "http.responses" } "; concretely are instances of classes which implement a generic word:"
-{ $subsection call-responder* }
+{ $subsections call-responder* }
 "To actually call a subordinate responder, use the following word instead:"
-{ $subsection call-responder }
+{ $subsections call-responder }
 "A simple implementation of a responder which always outputs the same response:"
-{ $subsection trivial-responder }
-{ $subsection <trivial-responder> }
+{ $subsections
+    trivial-responder
+    <trivial-responder>
+}
 { $vocab-subsection "Furnace actions" "furnace.actions" }
 "In particular, writing new responders by hand is rarely necessary, because in most cases it is easier to use " { $vocab-link "furnace.actions" } " instead." ;
 
 ARTICLE: "http.server.variables" "HTTP server variables"
 "The following global variables control the behavior of the HTTP server. Both are off by default."
-{ $subsection development? }
-{ $subsection benchmark? } ;
+{ $subsections
+    development?
+    benchmark?
+} ;
 
 ARTICLE: "http.server" "HTTP server"
 "The " { $vocab-link "http.server" } " vocabulary implements an HTTP and HTTPS server on top of " { $vocab-link "io.servers.connection" } "."
-{ $subsection "http.server.responders" }
-{ $subsection "http.server.requests" }
+{ $subsections
+    "http.server.responders"
+    "http.server.requests"
+}
 "Various types of responders are defined in other vocabularies:"
-{ $subsection "http.server.dispatchers" }
-{ $subsection "http.server.filters" }
+{ $subsections
+    "http.server.dispatchers"
+    "http.server.filters"
+}
 "Useful canned responses:"
-{ $subsection "http.server.responses" }
-{ $subsection "http.server.redirection" }
+{ $subsections
+    "http.server.responses"
+    "http.server.redirection"
+}
 "Configuration:"
-{ $subsection "http.server.variables" }
-{ $subsection "http.server.remapping" }
+{ $subsections
+    "http.server.variables"
+    "http.server.remapping"
+}
 "Features:"
-{ $subsection "http.server.static" }
-{ $subsection "http.server.cgi" }
+{ $subsections
+    "http.server.static"
+    "http.server.cgi"
+}
 "The " { $vocab-link "furnace" } " framework implements high-level abstractions which make developing web applications much easier than writing responders by hand." ;
 
 ABOUT: "http.server"

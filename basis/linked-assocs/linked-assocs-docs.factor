@@ -16,8 +16,10 @@ ARTICLE: "linked-assocs" "Linked assocs"
 "A " { $emphasis "linked assoc" } " is an assoc which combines an underlying assoc with a dlist to form a structure which has the insertion and retrieval characteristics of the underlying assoc (typically a hashtable), but with the ability to get the entries in insertion order by calling " { $link >alist } "."
 $nl
 "Linked assocs are implemented in the " { $vocab-link "linked-assocs" } " vocabulary."
-{ $subsection linked-assoc }
-{ $subsection <linked-hash> }
-{ $subsection <linked-assoc> } ;
+{ $subsections
+    linked-assoc
+    <linked-hash>
+    <linked-assoc>
+} ;
 
 ABOUT: "linked-assocs"

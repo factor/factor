@@ -37,7 +37,7 @@ ARTICLE: "math.vectors.simd.types" "SIMD vector types"
 "Each SIMD vector type is named " { $snippet "scalar-count" } ", where " { $snippet "scalar" } " is a scalar C type and " { $snippet "count" } " is a vector dimension."
 $nl
 "To use a SIMD vector type, a parsing word is used to generate the relevant code and bring it into the vocabulary search path; this is the same idea as with " { $link "specialized-arrays" } ":"
-{ $subsection POSTPONE: SIMD: }
+{ $subsections POSTPONE: SIMD: }
 "The following vector types are supported:"
 { $code
     "char-16"
@@ -171,8 +171,10 @@ $nl
 "It is best to avoid calling SIMD primitives directly. To write efficient high-level code that compiles down to primitives and avoids memory allocation, see " { $link "math.vectors.simd.efficiency" } "."
 $nl
 "There are two primitives which are used to implement accessing SIMD vector fields of " { $link "classes.struct" } ":"
-{ $subsection alien-vector }
-{ $subsection set-alien-vector }
+{ $subsections
+    alien-vector
+    set-alien-vector
+}
 "For the most part, the above primitives correspond directly to vector arithmetic words. They take a representation parameter, which is one of the singleton members of the " { $link vector-rep } " union in the " { $vocab-link "cpu.architecture" } " vocabulary." ;
 
 ARTICLE: "math.vectors.simd.alien" "SIMD data in struct classes"
@@ -187,14 +189,16 @@ $nl
 
 ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
 "The " { $vocab-link "math.vectors.simd" } " vocabulary extends the " { $vocab-link "math.vectors" } " vocabulary to support efficient vector arithmetic on small, fixed-size vectors."
-{ $subsection "math.vectors.simd.intro" }
-{ $subsection "math.vectors.simd.types" }
-{ $subsection "math.vectors.simd.words" }
-{ $subsection "math.vectors.simd.support" }
-{ $subsection "math.vectors.simd.accuracy" }
-{ $subsection "math.vectors.simd.efficiency" }
-{ $subsection "math.vectors.simd.alien" }
-{ $subsection "math.vectors.simd.intrinsics" } ;
+{ $subsections
+    "math.vectors.simd.intro"
+    "math.vectors.simd.types"
+    "math.vectors.simd.words"
+    "math.vectors.simd.support"
+    "math.vectors.simd.accuracy"
+    "math.vectors.simd.efficiency"
+    "math.vectors.simd.alien"
+    "math.vectors.simd.intrinsics"
+} ;
 
 HELP: SIMD:
 { $syntax "SIMD: type" }
