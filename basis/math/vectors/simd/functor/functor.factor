@@ -5,7 +5,8 @@ functors generalizations kernel literals locals math math.functions
 math.vectors math.vectors.private math.vectors.simd.intrinsics
 math.vectors.specialization parser prettyprint.custom sequences
 sequences.private strings words definitions macros cpu.architecture
-namespaces arrays quotations combinators sets layouts ;
+namespaces arrays quotations combinators combinators.short-circuit sets
+layouts ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd.functor
 
@@ -95,14 +96,17 @@ MACRO: simd-nth ( rep -- x )
     '[ nip _ swap supported-simd-op? ] assoc-filter
     '[ drop _ key? ] assoc-filter ;
 
-ERROR: bad-schema schema ;
+ERROR: bad-schema op schema ;
 
-: low-level-ops ( simd-ops alist -- alist' )
-    '[
-        1quotation
-        over word-schema _ ?at [ bad-schema ] unless
-        [ ] 2sequence
-    ] assoc-map ;
+:: op-wrapper ( op specials schemas -- wrapper )
+    op {
+        [ specials at ]
+        [ word-schema schemas at ]
+        [ dup word-schema bad-schema ]
+    } 1|| ;
+
+: low-level-ops ( simd-ops specials schemas -- alist )
+    '[ 1quotation over _ _ op-wrapper [ ] 2sequence ] assoc-map ;
 
 :: high-level-ops ( ctor elt-class -- assoc )
     ! Some SIMD operations are defined in terms of others.
@@ -126,14 +130,14 @@ ERROR: bad-schema schema ;
     ! in the general case.
     elt-class float = [ { distance [ v- norm ] } suffix ] when ;
 
-TUPLE: simd class elt-class ops wrappers ctor rep ;
+TUPLE: simd class elt-class ops special-wrappers schema-wrappers ctor rep ;
 
 : define-simd ( simd -- )
     dup rep>> rep-component-type c:c-type-boxed-class >>elt-class
     {
         [ class>> ]
         [ elt-class>> ]
-        [ [ ops>> ] [ wrappers>> ] bi low-level-ops ]
+        [ [ ops>> ] [ special-wrappers>> ] [ schema-wrappers>> ] tri low-level-ops ]
         [ rep>> supported-simd-ops ]
         [ [ ctor>> ] [ elt-class>> ] bi high-level-ops assoc-union ]
     } cleave
@@ -262,7 +266,7 @@ simd new
         { { +vector+ -> +vector+ } A-v->v-op }
         { { +vector+ -> +scalar+ } A-v->n-op }
         { { +vector+ -> +nonnegative+ } A-v->n-op }
-    } >>wrappers
+    } >>schema-wrappers
 (define-simd-128)
 
 PRIVATE>
@@ -318,9 +322,12 @@ A-deref      DEFINES-PRIVATE ${A}-deref
 A-rep        [ A/2 name>> "-rep" append "cpu.architecture" lookup ]
 A-vv->v-op   DEFINES-PRIVATE ${A}-vv->v-op
 A-vn->v-op   DEFINES-PRIVATE ${A}-vn->v-op
-A-vv->n-op   DEFINES-PRIVATE ${A}-vv->n-op
 A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
-A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
+A-v.-op      DEFINES-PRIVATE ${A}-v.-op
+(A-v->n-op)  DEFINES-PRIVATE (${A}-v->v-op)
+A-sum-op     DEFINES-PRIVATE ${A}-sum-op
+A-vany-op    DEFINES-PRIVATE ${A}-vany-op
+A-vall-op    DEFINES-PRIVATE ${A}-vall-op
 
 WHERE
 
@@ -393,32 +400,44 @@ INSTANCE: A sequence
     [ [ [ underlying2>> ] dip A-rep ] dip call ] 3bi
     \ A boa ; inline
 
-: A-vv->n-op ( v1 v2 quot -- v3 )
-    [ [ [ underlying1>> ] bi@ A-rep ] dip call ]
-    [ [ [ underlying2>> ] bi@ A-rep ] dip call ] 3bi
-    + ; inline
-
 : A-v->v-op ( v1 combine-quot -- v2 )
     [ [ underlying1>> A-rep ] dip call ]
     [ [ underlying2>> A-rep ] dip call ] 2bi
     \ A boa ; inline
 
-: A-v->n-op ( v1 combine-quot -- v2 )
-    [ [ underlying1>> ] [ underlying2>> ] bi A-rep (simd-v+) A-rep ] dip call ; inline
+: A-v.-op ( v1 v2 quot -- n )
+    [ [ [ underlying1>> ] bi@ A-rep ] dip call ]
+    [ [ [ underlying2>> ] bi@ A-rep ] dip call ] 3bi
+    + ; inline
+
+: (A-v->n-op) ( v1 quot reduce-quot -- n )
+    '[ [ underlying1>> ] [ underlying2>> ] bi A-rep @ A-rep ] dip call ; inline
+
+: A-sum-op ( v1 quot -- n )
+    [ (simd-v+) ] (A-v->n-op) ; inline
+
+: A-vany-op ( v1 quot -- n )
+    [ (simd-vbitor) ] (A-v->n-op) ; inline
+: A-vall-op ( v1 quot -- n )
+    [ (simd-vbitand) ] (A-v->n-op) ; inline
 
 simd new
     \ A >>class
     \ A-with >>ctor
     \ A-rep >>rep
     {
+        { v.     A-v.-op   }
+        { sum    A-sum-op  }
+        { vnone? A-vany-op }
+        { vany?  A-vany-op }
+        { vall?  A-vall-op }
+    } >>special-wrappers
+    {
         { { +vector+ +vector+ -> +vector+ } A-vv->v-op }
         { { +vector+ +scalar+ -> +vector+ } A-vn->v-op }
         { { +vector+ +literal+ -> +vector+ } A-vn->v-op }
-        { { +vector+ +vector+ -> +scalar+ } A-vv->n-op }
         { { +vector+ -> +vector+ } A-v->v-op }
-        { { +vector+ -> +scalar+ } A-v->n-op }
-        { { +vector+ -> +nonnegative+ } A-v->n-op }
-    } >>wrappers
+    } >>schema-wrappers
 (define-simd-256)
 
 ;FUNCTOR
