@@ -276,9 +276,19 @@ HELP: reduce-index
     "153"
 } } ;
 
+HELP: accumulate-as
+{ $values { "identity" object } { "seq" sequence } { "quot" { $quotation "( prev elt -- next )" } } { "exemplar" sequence } { "final" "the final result" } { "newseq" "a new sequence" } }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of the same type as " { $snippet "exemplar" } " containing intermediate results, together with the final result."
+$nl
+"The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
+$nl
+"When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." } ;
+
 HELP: accumulate
-{ $values { "identity" object } { "seq" sequence } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } { "newseq" "a new sequence" } }
-{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results together with the final result. The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
+{ $values { "identity" object } { "seq" sequence } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } { "newseq" "a new array" } }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs an array of intermediate results, together with the final result."
+$nl
+"The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
 $nl
 "When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." }
 { $examples
@@ -1400,7 +1410,7 @@ ARTICLE: "sequences-access" "Accessing sequence elements"
 
 ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 "Adding elements:"
-{ $subsections prefix suffix }
+{ $subsections prefix suffix insert-nth }
 "Removing elements:"
 { $subsections remove remq remove-nth } ;
 
@@ -1495,6 +1505,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
     map-index
     map-reduce
     accumulate
+    accumulate-as
     produce
     produce-as
 }
