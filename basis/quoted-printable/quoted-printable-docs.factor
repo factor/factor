@@ -7,9 +7,11 @@ ABOUT: "quoted-printable"
 
 ARTICLE: "quoted-printable" "Quoted printable encoding"
 "The " { $vocab-link "quoted-printable" } " vocabulary implements RFC 2045 part 6.7, providing words for reading and generating quotable printed text."
-{ $subsection >quoted }
-{ $subsection >quoted-lines }
-{ $subsection quoted> } ;
+{ $subsections
+    >quoted
+    >quoted-lines
+    quoted>
+} ;
 
 HELP: >quoted
 { $values { "byte-array" byte-array } { "string" string } }

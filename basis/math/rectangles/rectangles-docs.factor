@@ -52,20 +52,26 @@ HELP: <zero-rect>
 
 ARTICLE: "math.rectangles" "Rectangles"
 "The " { $vocab-link "math.rectangles" } " vocabulary defines a rectangle data type and operations on them."
-{ $subsection rect }
+{ $subsections rect }
 "Rectangles can be taken apart:"
-{ $subsection rect-bounds }
-{ $subsection rect-extent }
+{ $subsections
+    rect-bounds
+    rect-extent
+}
 "New rectangles can be created:"
-{ $subsection <zero-rect> }
-{ $subsection <rect> }
-{ $subsection <extent-rect> }
+{ $subsections
+    <zero-rect>
+    <rect>
+    <extent-rect>
+}
 "Set-theoretic operations on rectangles:"
-{ $subsection rect-intersect }
-{ $subsection rect-union }
-{ $subsection contains-rect? }
-{ $subsection contains-point? }
+{ $subsections
+    rect-intersect
+    rect-union
+    contains-rect?
+    contains-point?
+}
 "A utility word:"
-{ $subsection offset-rect } ;
+{ $subsections offset-rect } ;
 
 ABOUT: "math.rectangles"

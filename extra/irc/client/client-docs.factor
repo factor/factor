@@ -31,20 +31,24 @@ HELP: hear "Reads a message from a chat"
 ARTICLE: "irc.client" "IRC Client"
 "An IRC Client library"
 { $heading "IRC objects:" }
-{ $subsection irc-client }
+{ $subsections irc-client }
 { $heading "Chat objects:" }
-{ $subsection irc-server-chat }
-{ $subsection irc-channel-chat }
-{ $subsection irc-nick-chat }
+{ $subsections
+    irc-server-chat
+    irc-channel-chat
+    irc-nick-chat
+}
 { $heading "Setup objects:" }
-{ $subsection irc-profile }
+{ $subsections irc-profile }
 { $heading "Words:" }
-{ $subsection connect-irc }
-{ $subsection terminate-irc }
-{ $subsection attach-chat }
-{ $subsection detach-chat }
-{ $subsection hear }
-{ $subsection speak }
+{ $subsections
+    connect-irc
+    terminate-irc
+    attach-chat
+    detach-chat
+    hear
+    speak
+}
 { $heading "IRC messages" }
 "Some of the RFC defined irc messages as objects:"
 { $table

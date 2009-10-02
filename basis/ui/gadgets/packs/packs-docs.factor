@@ -5,15 +5,19 @@ IN: ui.gadgets.packs
 
 ARTICLE: "ui-pack-layout" "Pack layouts"
 "Pack gadgets layout their children along a single axis."
-{ $subsection pack }
+{ $subsections pack }
 "Creating empty packs:"
-{ $subsection <pack> }
-{ $subsection <pile> }
-{ $subsection <shelf> }
+{ $subsections
+    <pack>
+    <pile>
+    <shelf>
+}
 
 "For more control, custom layouts can reuse portions of pack layout logic:"
-{ $subsection pack-pref-dim }
-{ $subsection pack-layout } ;
+{ $subsections
+    pack-pref-dim
+    pack-layout
+} ;
 
 HELP: pack
 { $class-description "A gadget which lays out its children along a single axis stored in the " { $snippet "orientation" } " slot. Can be constructed with one of the following words:"

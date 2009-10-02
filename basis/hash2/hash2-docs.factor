@@ -3,10 +3,12 @@ IN: hash2
 
 ARTICLE: { "hash2" "intro" } "Hash2"
 "The hash2 vocabulary specifies a simple minimal datastructure for hash tables with two integers as keys. These hash tables are fixed size and do not conform to the associative mapping protocol. Words used in creating and manipulating these hash tables include:"
-{ $subsection <hash2> }
-{ $subsection hash2 }
-{ $subsection set-hash2 }
-{ $subsection alist>hash2 } ;
+{ $subsections
+    <hash2>
+    hash2
+    set-hash2
+    alist>hash2
+} ;
 
 HELP: <hash2>
 { $values { "size" "size of the underlying array" } { "hash2" hash2 } }

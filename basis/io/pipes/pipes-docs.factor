@@ -37,11 +37,13 @@ ARTICLE: "io.pipes" "Pipes"
 "A " { $emphasis "pipe" } " is a unidirectional channel for transfer of bytes. Data written to one end of the pipe can be read from the other. Pipes can be used to pass data between processes; they can also be used within a single process to implement communication between coroutines."
 $nl
 "Low-level pipes:"
-{ $subsection pipe }
-{ $subsection (pipe) }
+{ $subsections
+    pipe
+    (pipe)
+}
 "High-level pipe streams:"
-{ $subsection <pipe> }
+{ $subsections <pipe> }
 "Pipelines of coroutines and processes:"
-{ $subsection run-pipeline } ;
+{ $subsections run-pipeline } ;
 
 ABOUT: "io.pipes"

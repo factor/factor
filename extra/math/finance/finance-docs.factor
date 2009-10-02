@@ -73,16 +73,18 @@ HELP: weekly
 { $description "Divides a number by the number of weeks in a year." } ;
 
 ARTICLE: "time-period-calculations" "Calculations over periods of time"
-{ $subsection monthly }
-{ $subsection semimonthly }
-{ $subsection biweekly }
-{ $subsection weekly }
-{ $subsection daily-360 }
-{ $subsection daily-365 } ;
+{ $subsections
+    monthly
+    semimonthly
+    biweekly
+    weekly
+    daily-360
+    daily-365
+} ;
 
 ARTICLE: "math.finance" "Financial math"
 "The " { $vocab-link "math.finance" } " vocabulary contains financial calculation words." $nl
 "Calculating payroll over periods of time:"
-{ $subsection "time-period-calculations" } ;
+{ $subsections "time-period-calculations" } ;
 
 ABOUT: "math.finance"

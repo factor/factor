@@ -43,13 +43,15 @@ $nl
 "This feature is used for completion popups and " { $link "ui.gadgets.menus" } " in the " { $link "ui-tools" } "."
 $nl
 "Displaying a gadget in a glass layer:"
-{ $subsection show-glass }
+{ $subsections show-glass }
 "Hiding a gadget in a glass layer:"
-{ $subsection hide-glass }
+{ $subsections hide-glass }
 "Callback generic invoked on the gadget when its glass layer is hidden:"
-{ $subsection hide-glass-hook }
+{ $subsections hide-glass-hook }
 "Popup gadgets add support for forwarding keyboard gestures from an owner gadget to the glass layer:"
-{ $subsection show-popup }
-{ $subsection pass-to-popup } ;
+{ $subsections
+    show-popup
+    pass-to-popup
+} ;
 
 ABOUT: "ui.gadgets.glass"

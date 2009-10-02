@@ -26,11 +26,13 @@ ARTICLE: "concurrency.locks.mutex" "Mutual-exclusion locks"
 "A mutual-exclusion lock ensures that only one thread executes with the lock held at a time. They are used to protect critical sections so that certain operations appear to be atomic to other threads."
 $nl
 "There are two varieties of locks: non-reentrant and reentrant. The latter may be acquired recursively by the same thread. Attempting to do so with the former will deadlock."
-{ $subsection lock }
-{ $subsection <lock> }
-{ $subsection <reentrant-lock> }
-{ $subsection with-lock }
-{ $subsection with-lock-timeout } ;
+{ $subsections
+    lock
+    <lock>
+    <reentrant-lock>
+    with-lock
+    with-lock-timeout
+} ;
 
 HELP: rw-lock
 { $class-description "The class of reader/writer locks." } ;
@@ -61,17 +63,23 @@ $nl
 "Read/write locks allow any number of threads to hold the read lock simulateneously, however attempting to acquire a write lock blocks until all other threads release read locks and write locks."
 $nl
 "Read/write locks are reentrant. A thread holding a write lock may acquire a read lock or a write lock without blocking. However a thread holding a read lock may not acquire a write lock recursively since that could break invariants assumed by the code executing with the read lock held."
-{ $subsection rw-lock }
-{ $subsection <rw-lock> }
-{ $subsection with-read-lock }
-{ $subsection with-write-lock }
+{ $subsections
+    rw-lock
+    <rw-lock>
+    with-read-lock
+    with-write-lock
+}
 "Versions of the above that take a timeout duration:"
-{ $subsection with-read-lock-timeout }
-{ $subsection with-write-lock-timeout } ;
+{ $subsections
+    with-read-lock-timeout
+    with-write-lock-timeout
+} ;
 
 ARTICLE: "concurrency.locks" "Locks"
 "A " { $emphasis "lock" } " is an object protecting a critical region of code, enforcing a particular mutual-exclusion policy. The " { $vocab-link "concurrency.locks" } " vocabulary implements two types of locks:"
-{ $subsection "concurrency.locks.mutex" }
-{ $subsection "concurrency.locks.rw" } ;
+{ $subsections
+    "concurrency.locks.mutex"
+    "concurrency.locks.rw"
+} ;
 
 ABOUT: "concurrency.locks"

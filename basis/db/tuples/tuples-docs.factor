@@ -154,52 +154,58 @@ HELP: count-tuples
 
 ARTICLE: "db-tuples" "High-level tuple/database integration"
 "Start with a tutorial:"
-{ $subsection "db-tuples-tutorial" }
+{ $subsections "db-tuples-tutorial" }
 "Database types supported:"
-{ $subsection "db.types" }
+{ $subsections "db.types" }
 "Useful words:"
-{ $subsection "db-tuples-words" }
+{ $subsections "db-tuples-words" }
 "For porting db.tuples to other databases:"
-{ $subsection "db-tuples-protocol" }
+{ $subsections "db-tuples-protocol" }
 ;
 
 ARTICLE: "db-tuples-words" "High-level tuple/database words"
 "Making tuples work with a database:"
-{ $subsection define-persistent }
+{ $subsections define-persistent }
 "Creating tables:"
-{ $subsection create-table }
-{ $subsection ensure-table }
-{ $subsection ensure-tables }
-{ $subsection recreate-table }
+{ $subsections
+    create-table
+    ensure-table
+    ensure-tables
+    recreate-table
+}
 "Dropping tables:"
-{ $subsection drop-table }
+{ $subsections drop-table }
 "Inserting a tuple:"
-{ $subsection insert-tuple }
+{ $subsections insert-tuple }
 "Updating a tuple:"
-{ $subsection update-tuple }
+{ $subsections update-tuple }
 "Deleting tuples:"
-{ $subsection delete-tuples }
+{ $subsections delete-tuples }
 "Querying tuples:"
-{ $subsection select-tuple }
-{ $subsection select-tuples }
-{ $subsection count-tuples } ;
+{ $subsections
+    select-tuple
+    select-tuples
+    count-tuples
+} ;
 
 ARTICLE: "db-tuples-protocol" "Tuple database protocol"
 "Creating a table:"
-{ $subsection create-sql-statement }
+{ $subsections create-sql-statement }
 "Dropping a table:"
-{ $subsection drop-sql-statement }
+{ $subsections drop-sql-statement }
 "Inserting a tuple:"
-{ $subsection <insert-db-assigned-statement> }
-{ $subsection <insert-user-assigned-statement> }
+{ $subsections
+    <insert-db-assigned-statement>
+    <insert-user-assigned-statement>
+}
 "Updating a tuple:"
-{ $subsection <update-tuple-statement> }
+{ $subsections <update-tuple-statement> }
 "Deleting tuples:"
-{ $subsection <delete-tuples-statement> }
+{ $subsections <delete-tuples-statement> }
 "Selecting tuples:"
-{ $subsection <select-by-slots-statement> }
+{ $subsections <select-by-slots-statement> }
 "Counting tuples:"
-{ $subsection <count-statement> } ;
+{ $subsections <count-statement> } ;
 
 ARTICLE: "db-tuples-tutorial" "Tuple database tutorial"
 "Let's make a tuple and store it in a database. To follow along, click on each code example and run it in the listener. If you forget to run an example, just start at the top and run them all again in order." $nl

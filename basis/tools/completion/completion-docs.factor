@@ -6,13 +6,15 @@ ARTICLE: "tools.completion" "Fuzzy completion"
 "Various developer tools make use of a general-purpose fuzzy completion algorithm."
 $nl
 "The main entry point:"
-{ $subsection completions }
+{ $subsections completions }
 "The words used to implement the algorithm can be called as well, for finer control over fuzzy matching:"
-{ $subsection fuzzy }
-{ $subsection runs }
-{ $subsection score }
-{ $subsection complete }
-{ $subsection rank-completions } ;
+{ $subsections
+    fuzzy
+    runs
+    score
+    complete
+    rank-completions
+} ;
 
 ABOUT: "tools.completion"
 

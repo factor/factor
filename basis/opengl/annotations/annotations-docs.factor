@@ -33,9 +33,11 @@ HELP: reset-gl-functions
 
 ARTICLE: "opengl.annotations" "OpenGL error reporting"
 "The " { $vocab-link "opengl.annotations" } " vocabulary provides some tools for tracking down GL errors:"
-{ $subsection throw-gl-errors }
-{ $subsection log-gl-errors }
-{ $subsection clear-gl-error-log }
-{ $subsection reset-gl-functions } ;
+{ $subsections
+    throw-gl-errors
+    log-gl-errors
+    clear-gl-error-log
+    reset-gl-functions
+} ;
 
 ABOUT: "opengl.annotations"

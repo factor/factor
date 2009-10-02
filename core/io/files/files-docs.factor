@@ -15,20 +15,26 @@ ARTICLE: "io.files.examples" "Examples of reading and writing files"
 } ;
 
 ARTICLE: "io.files" "Reading and writing files"
-{ $subsection "io.files.examples" }
+{ $subsections "io.files.examples" }
 "File streams:"
-{ $subsection <file-reader> }
-{ $subsection <file-writer> }
-{ $subsection <file-appender> }
+{ $subsections
+    <file-reader>
+    <file-writer>
+    <file-appender>
+}
 "Reading and writing the entire contents of a file; this is only recommended for smaller files:"
-{ $subsection file-contents }
-{ $subsection set-file-contents }
-{ $subsection file-lines }
-{ $subsection set-file-lines }
+{ $subsections
+    file-contents
+    set-file-contents
+    file-lines
+    set-file-lines
+}
 "Utility combinators:"
-{ $subsection with-file-reader }
-{ $subsection with-file-writer }
-{ $subsection with-file-appender } ;
+{ $subsections
+    with-file-reader
+    with-file-writer
+    with-file-appender
+} ;
 
 ABOUT: "io.files"
 

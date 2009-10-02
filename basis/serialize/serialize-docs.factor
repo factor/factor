@@ -25,10 +25,14 @@ ARTICLE: "serialize" "Binary object serialization"
 "The " { $vocab-link "serialize" } " vocabulary implements binary serialization for all Factor data types except for continuations. Unlike the prettyprinter, shared structure and circularity is preserved."
 $nl
 "Storing objects on streams:"
-{ $subsection serialize }
-{ $subsection deserialize }
+{ $subsections
+    serialize
+    deserialize
+}
 "Storing objects as byte arrays:"
-{ $subsection object>bytes }
-{ $subsection bytes>object } ;
+{ $subsections
+    object>bytes
+    bytes>object
+} ;
 
 ABOUT: "serialize"

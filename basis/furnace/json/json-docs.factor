@@ -7,6 +7,6 @@ HELP: <json-content>
 
 ARTICLE: "furnace.json" "Furnace JSON support"
 "The " { $vocab-link "furnace.json" } " vocabulary provides a utility word for serving HTTP responses with JSON content."
-{ $subsection <json-content> } ;
+{ $subsections <json-content> } ;
 
 ABOUT: "furnace.json"

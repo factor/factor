@@ -50,12 +50,16 @@ HELP: query>assoc
 
 ARTICLE: "url-encoding" "URL encoding and decoding"
 "URL encoding and decoding strings:"
-{ $subsection url-encode }
-{ $subsection url-decode }
-{ $subsection url-quotable? }
+{ $subsections
+    url-encode
+    url-decode
+    url-quotable?
+}
 "Encoding and decoding queries:"
-{ $subsection assoc>query }
-{ $subsection query>assoc }
+{ $subsections
+    assoc>query
+    query>assoc
+}
 "See " { $url "http://en.wikipedia.org/wiki/Percent-encoding" } " for a description of URL encoding." ;
 
 ABOUT: "url-encoding"

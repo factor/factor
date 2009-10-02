@@ -15,8 +15,8 @@ HELP: make-admin
 
 ARTICLE: "furnace.auth.user-admin" "Furnace user administration tool"
 "The " { $vocab-link "webapps.user-admin" } " vocabulary implements a web application for adding, removing and editing users in authentication realms that use " { $link "furnace.auth.providers.db" } "."
-{ $subsection <user-admin> }
+{ $subsections <user-admin> }
 "Access to the web app itself is protected, and only users having an administrative capability can access it:"
-{ $subsection can-administer-users? }
+{ $subsections can-administer-users? }
 "To make an existing user an administrator, call the following word in a " { $link with-db } " scope:"
-{ $subsection make-admin } ;
+{ $subsections make-admin } ;

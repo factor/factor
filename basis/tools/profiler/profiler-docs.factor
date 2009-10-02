@@ -15,14 +15,16 @@ ARTICLE: "profiling" "Profiling code"
 "The " { $vocab-link "tools.profiler" } " vocabulary implements a simple call counting profiler."
 $nl
 "Quotations can be passed to a combinator which calls them with the profiler enabled:"
-{ $subsection profile }
+{ $subsections profile }
 "After a quotation has been profiled, call counts can be presented in various ways:"
-{ $subsection profile. }
-{ $subsection vocab-profile. }
-{ $subsection usage-profile. }
-{ $subsection vocabs-profile. }
-{ $subsection method-profile. }
-{ $subsection "profiler-limitations" }
+{ $subsections
+    profile.
+    vocab-profile.
+    usage-profile.
+    vocabs-profile.
+    method-profile.
+    "profiler-limitations"
+}
 { $see-also "ui.tools.profiler" } ;
 
 ABOUT: "profiling"

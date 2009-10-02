@@ -3,12 +3,14 @@ IN: sequences.merged
 
 ARTICLE: "sequences-merge" "Merging sequences"
 "When multiple sequences are merged into one sequence, the new sequence takes an element from each input sequence in turn. For example, if we merge " { $code "{ 1 2 3 }" } "and" { $code "{ \"a\" \"b\" \"c\" }" } "we get:" { $code "{ 1 \"a\" 2 \"b\" 3 \"c\" }" } "."
-{ $subsection merge }
-{ $subsection 2merge }
-{ $subsection 3merge }
-{ $subsection <merged> }
-{ $subsection <2merged> }
-{ $subsection <3merged> } ;
+{ $subsections
+    merge
+    2merge
+    3merge
+    <merged>
+    <2merged>
+    <3merged>
+} ;
 
 ABOUT: "sequences-merge"
 

@@ -42,21 +42,25 @@ HELP: move-by-page
 
 ARTICLE: "models-range" "Range models"
 "Range models ensure their value is a real number within a fixed range."
-{ $subsection range }
-{ $subsection <range> }
+{ $subsections
+    range
+    <range>
+}
 "Range models conform to a protocol for getting and setting the current value, as well as the endpoints of the range."
-{ $subsection "range-model-protocol" } ;
+{ $subsections "range-model-protocol" } ;
 
 ARTICLE: "range-model-protocol" "Range model protocol"
 "The range model protocol is implemented by the " { $link range } " and " { $link compose } " classes. User-defined models may implement it too."
-{ $subsection range-value          }
-{ $subsection range-page-value     } 
-{ $subsection range-min-value      } 
-{ $subsection range-max-value      } 
-{ $subsection range-max-value*     } 
-{ $subsection set-range-value      } 
-{ $subsection set-range-page-value } 
-{ $subsection set-range-min-value  } 
-{ $subsection set-range-max-value  } ;
+{ $subsections
+    range-value
+    range-page-value
+    range-min-value
+    range-max-value
+    range-max-value*
+    set-range-value
+    set-range-page-value
+    set-range-min-value 
+    set-range-max-value 
+} ;
 
 ABOUT: "models-range"
