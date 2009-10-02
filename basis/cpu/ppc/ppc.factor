@@ -230,12 +230,6 @@ M: ppc %copy ( dst src rep -- )
         } case
     ] if ;
 
-M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
-
-M:: ppc %box-float ( dst src temp -- )
-    dst 16 float temp %allot
-    src dst float-offset STFD ;
-
 GENERIC: float-function-param* ( dst src -- )
 
 M: spill-slot float-function-param* [ 1 ] dip n>> spill@ LFD ;
@@ -399,13 +393,13 @@ M: ppc %alien-cell LWZ ;
 M: ppc %alien-float LFS ;
 M: ppc %alien-double LFD ;
 
-M: ppc %set-alien-integer-1 swapd STB ;
-M: ppc %set-alien-integer-2 swapd STH ;
+M: ppc %set-alien-integer-1 -rot STB ;
+M: ppc %set-alien-integer-2 -rot STH ;
 
-M: ppc %set-alien-cell swapd STW ;
+M: ppc %set-alien-cell -rot STW ;
 
-M: ppc %set-alien-float swapd STFS ;
-M: ppc %set-alien-double swapd STFD ;
+M: ppc %set-alien-float -rot STFS ;
+M: ppc %set-alien-double -rot STFD ;
 
 : load-zone-ptr ( reg -- )
     "nursery" %load-vm-field-addr ;

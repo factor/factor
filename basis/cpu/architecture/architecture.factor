@@ -197,9 +197,6 @@ HOOK: %fixnum-add cpu ( label dst src1 src2 -- )
 HOOK: %fixnum-sub cpu ( label dst src1 src2 -- )
 HOOK: %fixnum-mul cpu ( label dst src1 src2 -- )
 
-HOOK: %unbox-float cpu ( dst src -- )
-HOOK: %box-float cpu ( dst src temp -- )
-
 HOOK: %add-float cpu ( dst src1 src2 -- )
 HOOK: %sub-float cpu ( dst src1 src2 -- )
 HOOK: %mul-float cpu ( dst src1 src2 -- )
@@ -215,9 +212,6 @@ HOOK: %double>single-float cpu ( dst src -- )
 
 HOOK: %integer>float cpu ( dst src -- )
 HOOK: %float>integer cpu ( dst src -- )
-
-HOOK: %box-vector cpu ( dst src temp rep -- )
-HOOK: %unbox-vector cpu ( dst src rep -- )
 
 HOOK: %zero-vector cpu ( dst rep -- )
 HOOK: %gather-vector-2 cpu ( dst src1 src2 rep -- )
