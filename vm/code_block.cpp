@@ -145,7 +145,8 @@ void *factor_vm::get_rel_symbol(array *literals, cell index)
 
 cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block *compiled)
 {
-	array *literals = untag<array>(compiled->literals);
+	array *literals = (compiled->literals == F
+		? NULL : untag<array>(compiled->literals));
 	cell offset = relocation_offset_of(rel) + (cell)compiled->xt();
 
 #define ARG array_nth(literals,index)
@@ -329,8 +330,10 @@ void copy_literal_references(code_block *compiled, factor_vm *myvm)
 void factor_vm::relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled)
 {
 #ifdef FACTOR_DEBUG
-	tagged<array>(compiled->literals).untag_check(this);
-	tagged<byte_array>(compiled->relocation).untag_check(this);
+	if(compiled->literals != F)
+		tagged<array>(compiled->literals).untag_check(this);
+	if(compiled->relocation != F)
+		tagged<byte_array>(compiled->relocation).untag_check(this);
 #endif
 
 	store_address_in_code_block(relocation_class_of(rel),
@@ -398,7 +401,7 @@ void update_literal_and_word_references(code_block *compiled, factor_vm *myvm)
 void factor_vm::check_code_address(cell address)
 {
 #ifdef FACTOR_DEBUG
-	assert(address >= code.seg->start && address < code.seg->end);
+	assert(address >= code->seg->start && address < code->seg->end);
 #endif
 }
 
