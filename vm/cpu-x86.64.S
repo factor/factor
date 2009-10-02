@@ -7,7 +7,8 @@
 #define CELL_SIZE 8
 #define STACK_PADDING 56
 
-#define NV_TEMP_REG %rbp
+#define NV0 %rbp
+#define NV1 %r12
 
 #define ARITH_TEMP_1 %r8
 #define ARITH_TEMP_2 %r9
