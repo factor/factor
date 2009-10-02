@@ -38,8 +38,20 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
 { $subsection distance }
 { $subsection v~ } ;
 
-ARTICLE: "math-vectors-logic" "Vector componentwise logic"
+ARTICLE: "math-vectors-shuffle" "Vector shuffling, packing, and unpacking"
+{ $notes
+"These operations are primarily meant to be used with " { $vocab-link "math.vectors.simd" } " types. The software fallbacks for types not supported by hardware will not perform well."
+}
+$nl
+{ $subsection vshuffle }
+{ $subsection vbroadcast }
+{ $subsection hlshift } 
+{ $subsection hrshift } ;
+
+ARTICLE: "math-vectors-logic" "Vector component- and bit-wise logic"
+{ $notes
 "See " { $link "math-vectors-simd-logic" } " for notes about using comparison and logical operations with SIMD vector types."
+}
 $nl
 "Element comparisons:"
 { $subsection v< }
@@ -67,12 +79,10 @@ $nl
 { $subsection vxor }
 { $subsection vnot }
 { $subsection v? }
-"Entire vector tests:"
+"Vector tests:"
 { $subsection vall? }
 { $subsection vany? }
-{ $subsection vnone? }
-"Element shuffling:"
-{ $subsection vshuffle } ;
+{ $subsection vnone? } ;
 
 ARTICLE: "math-vectors-misc" "Miscellaneous vector functions"
 { $subsection trilerp }
@@ -143,6 +153,7 @@ ARTICLE: "math-vectors" "Vector operations"
 "Any Factor sequence can be used to represent a mathematical vector, however for best performance, the sequences defined by the " { $vocab-link "specialized-arrays" } " and " { $vocab-link "math.vectors.simd" } " vocabularies should be used."
 { $subsection "math-vectors-arithmetic" }
 { $subsection "math-vectors-logic" }
+{ $subsection "math-vectors-shuffle" }
 { $subsection "math-vectors-misc" } ;
 
 ABOUT: "math-vectors"
@@ -312,11 +323,11 @@ HELP: vrshift
 
 HELP: hlshift
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
-{ $description "Shifts the entire SIMD array to the left by " { $snippet "n" } " bytes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
+{ $description "Shifts the entire SIMD array to the left by " { $snippet "n" } " bytes, filling the vacated right-hand bits with zeroes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
 HELP: hrshift
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
-{ $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
+{ $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes, filling the vacated left-hand bits with zeroes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
 HELP: vbroadcast
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "v" "a SIMD array" } }
