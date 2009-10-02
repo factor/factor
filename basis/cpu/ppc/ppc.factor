@@ -618,7 +618,6 @@ M: ppc %unbox ( n rep func -- )
     over [ [ reg-class-of return-reg ] keep %save-param-reg ] [ 2drop ] if ;
 
 M: ppc %unbox-long-long ( n func -- )
-    ! Value must be in r3:r4
     4 %load-vm-addr
     ! Call the unboxer
     f %alien-invoke
