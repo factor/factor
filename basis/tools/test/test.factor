@@ -79,8 +79,12 @@ MACRO: <experiment> ( word -- )
     [ name>> experiment-title ] bi
     '[ _ ndup _ narray _ prefix ] ;
 
+SYMBOL: verbose-tests?
+t verbose-tests? set-global
+
 : experiment. ( seq -- )
-    [ first write ": " write ] [ rest . flush ] bi ;
+    [ first write ": " write ]
+    [ rest verbose-tests? get [ . ] [ short. ] if flush ] bi ;
 
 :: experiment ( word: ( -- error ? ) line# -- )
     word <experiment> :> e
