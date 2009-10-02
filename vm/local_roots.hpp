@@ -16,7 +16,7 @@ struct gc_root : public tagged<TYPE>
 
 	~gc_root() {
 #ifdef FACTOR_DEBUG
-		assert(myvm->gc_locals.back() == (cell)this);
+		assert(parent_vm->gc_locals.back() == (cell)this);
 #endif
 		parent_vm->gc_locals.pop_back();
 	}
@@ -35,7 +35,7 @@ struct gc_bignum
 
 	~gc_bignum() {
 #ifdef FACTOR_DEBUG
-		assert(myvm->gc_bignums.back() == (cell)addr);
+		assert(parent_vm->gc_bignums.back() == (cell)addr);
 #endif
 		parent_vm->gc_bignums.pop_back();
 	}
