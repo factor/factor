@@ -118,7 +118,7 @@ bool factor_vm::save_image(const vm_char *filename)
 	return ok;
 }
 
-inline void factor_vm::primitive_save_image()
+void factor_vm::primitive_save_image()
 {
 	/* do a full GC to push everything into tenured space */
 	gc();
@@ -128,9 +128,7 @@ inline void factor_vm::primitive_save_image()
 	save_image((vm_char *)(path.untagged() + 1));
 }
 
-PRIMITIVE_FORWARD(save_image)
-
-inline void factor_vm::primitive_save_image_and_exit()
+void factor_vm::primitive_save_image_and_exit()
 {
 	/* We unbox this before doing anything else. This is the only point
 	where we might throw an error, so we have to throw an error here since
@@ -155,8 +153,6 @@ inline void factor_vm::primitive_save_image_and_exit()
 	else
 		exit(1);
 }
-
-PRIMITIVE_FORWARD(save_image_and_exit)
 
 void factor_vm::data_fixup(cell *cell)
 {
@@ -307,7 +303,7 @@ void fixup_code_block(code_block *compiled, factor_vm *myvm)
 
 void factor_vm::relocate_code()
 {
-	iterate_code_heap(factor::fixup_code_block);
+	iterate_code_heap(&factor_vm::fixup_code_block);
 }
 
 /* Read an image file from disk, only done once during startup */
