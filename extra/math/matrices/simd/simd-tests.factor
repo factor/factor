@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: classes.struct math.matrices.simd math.vectors.simd
+USING: classes.struct math.matrices.simd math.vectors.simd math
 literals math.constants math.functions specialized-arrays tools.test ;
 QUALIFIED-WITH: alien.c-types c
 FROM: math.matrices => m~ ;
