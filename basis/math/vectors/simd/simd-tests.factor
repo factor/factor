@@ -286,13 +286,13 @@ simd-classes [
 
 "== Checking element tests" print
 
-[ { t f t f f f t f } ]
+[ short-8{ t f t f f f t f } ]
 [ short-8{ 1 2 3 4 5 6 7 8 } short-8{ 1 0 3 -1 -2 -3 7 -4 } v= ] unit-test
 
 [ short-8{ t f t f f f t f } ]
 [ short-8{ 1 2 3 4 5 6 7 8 } short-8{ 1 0 3 -1 -2 -3 7 -4 } [ { short-8 short-8 } declare v= ] compile-call ] unit-test
 
-[ { t f t f f f t f } ]
+[ int-8{ t f t f f f t f } ]
 [ int-8{ 1 2 3 4 5 6 7 8 } int-8{ 1 0 3 -1 -2 -3 7 -4 } v= ] unit-test
 
 [ int-8{ t f t f f f t f } ]
@@ -301,14 +301,18 @@ simd-classes [
 [ int-4{ t f t f } ]
 [ int-4{ 1 2 3 4 } int-4{ 1 0 3 -1 } [ { int-4 int-4 } declare v= ] compile-call ] unit-test
 
-[ { t f t f } ]
+[ int-4{ t f t f } ]
 [ int-4{ 1 2 3 4 } int-4{ 1 0 3 -1 } v= ] unit-test
 
 [ int-4{ t f t f } ]
 [ int-4{ 1 2 3 4 } int-4{ 1 0 3 -1 } [ { int-4 int-4 } declare v= ] compile-call ] unit-test
 
-[ { t f t f } ]
-[ float-4{ 1.0 0/0. 3.0 4.0 } float-4{ 1.0 0/0. 3.0 -1.0 } v= ] unit-test
+[ t ]
+[
+    float-4{ t f t f }
+    float-4{ 1.0 0/0. 3.0 4.0 } float-4{ 1.0 0/0. 3.0 -1.0 } v=
+    exact=
+] unit-test
 
 [ t ]
 [
@@ -317,8 +321,12 @@ simd-classes [
     exact=
 ] unit-test
 
-[ { t f t f f t t t } ]
-[ float-8{ 1.0 0/0. 3.0 4.0 5.0 6.0 7.0 8.0 } float-8{ 1.0 0/0. 3.0 -1.0 -2.0 6.0 7.0 8.0 } v= ] unit-test
+[ t ]
+[
+    float-8{ t f t f f t t t }
+    float-8{ 1.0 0/0. 3.0 4.0 5.0 6.0 7.0 8.0 } float-8{ 1.0 0/0. 3.0 -1.0 -2.0 6.0 7.0 8.0 } v=
+    exact=
+] unit-test
 
 [ t ]
 [
@@ -327,8 +335,12 @@ simd-classes [
     exact=
 ] unit-test
 
-[ { f t } ]
-[ double-2{ 0/0. 3.0 } double-2{ 0/0. 3.0 } v= ] unit-test
+[ t ]
+[
+    double-2{ f t }
+    double-2{ 0/0. 3.0 } double-2{ 0/0. 3.0 } v=
+    exact=
+] unit-test
 
 [ t ]
 [
