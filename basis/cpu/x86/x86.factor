@@ -474,13 +474,6 @@ M: x86 %double>single-float CVTSD2SS ;
 M: x86 %integer>float CVTSI2SD ;
 M: x86 %float>integer CVTTSD2SI ;
 
-M: x86 %unbox-float ( dst src -- )
-    float-offset [+] MOVSD ;
-
-M:: x86 %box-float ( dst src temp -- )
-    dst 16 float temp %allot
-    dst float-offset [+] src MOVSD ;
-
 : %cmov-float= ( dst src -- )
     [
         "no-move" define-label
@@ -560,16 +553,6 @@ M: x86 %compare-float-ordered-branch ( label src1 src2 cc -- )
 
 M: x86 %compare-float-unordered-branch ( label src1 src2 cc -- )
     \ UCOMISD (%compare-float-branch) ;
-
-M:: x86 %box-vector ( dst src rep temp -- )
-    dst rep rep-size 2 cells + byte-array temp %allot
-    16 tag-fixnum dst 1 byte-array tag-number %set-slot-imm
-    dst byte-array-offset [+]
-    src rep %copy ;
-
-M:: x86 %unbox-vector ( dst src rep -- )
-    dst src byte-array-offset [+]
-    rep %copy ;
 
 MACRO: available-reps ( alist -- )
     ! Each SSE version adds new representations and supports

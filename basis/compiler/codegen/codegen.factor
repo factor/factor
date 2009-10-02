@@ -146,8 +146,6 @@ CODEGEN: ##not %not
 CODEGEN: ##neg %neg
 CODEGEN: ##log2 %log2
 CODEGEN: ##copy %copy
-CODEGEN: ##unbox-float %unbox-float
-CODEGEN: ##box-float %box-float
 CODEGEN: ##add-float %add-float
 CODEGEN: ##sub-float %sub-float
 CODEGEN: ##mul-float %mul-float
@@ -161,14 +159,12 @@ CODEGEN: ##single>double-float %single>double-float
 CODEGEN: ##double>single-float %double>single-float
 CODEGEN: ##integer>float %integer>float
 CODEGEN: ##float>integer %float>integer
-CODEGEN: ##unbox-vector %unbox-vector
 CODEGEN: ##zero-vector %zero-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##shuffle-vector %shuffle-vector
 CODEGEN: ##compare-vector %compare-vector
 CODEGEN: ##test-vector %test-vector
-CODEGEN: ##box-vector %box-vector
 CODEGEN: ##add-vector %add-vector
 CODEGEN: ##saturated-add-vector %saturated-add-vector
 CODEGEN: ##add-sub-vector %add-sub-vector
