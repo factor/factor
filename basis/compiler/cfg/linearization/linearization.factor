@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math accessors sequences namespaces make
 combinators assocs arrays locals layouts hashtables
-cpu.architecture
+cpu.architecture generalizations
 compiler.cfg
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
@@ -42,14 +42,26 @@ M: ##branch linearize-insn
 
 : successors ( bb -- first second ) successors>> first2 ; inline
 
+:: conditional ( bb insn n conditional-quot negate-cc-quot -- bb successor label ... )
+    bb insn
+    conditional-quot
+    [ drop dup successors>> second useless-branch? ] 2bi
+    [ [ swap block-number ] n ndip ]
+    [ [ block-number ] n ndip negate-cc-quot call ] if ; inline
+
 : (binary-conditional) ( bb insn -- bb successor1 successor2 src1 src2 cc )
     [ dup successors ]
     [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] bi* ; inline
 
 : binary-conditional ( bb insn -- bb successor label2 src1 src2 cc )
-    [ (binary-conditional) ]
-    [ drop dup successors>> second useless-branch? ] 2bi
-    [ [ swap block-number ] 3dip ] [ [ block-number ] 3dip negate-cc ] if ;
+    3 [ (binary-conditional) ] [ negate-cc ] conditional ;
+
+: (test-vector-conditional) ( bb insn -- bb successor1 successor2 src1 temp rep vcc )
+    [ dup successors ]
+    [ { [ src1>> ] [ temp>> ] [ rep>> ] [ vcc>> ] } cleave ] bi* ; inline
+
+: test-vector-conditional ( bb insn -- bb successor label src1 temp rep vcc )
+    4 [ (test-vector-conditional) ] [ negate-vcc ] conditional ;
 
 M: ##compare-branch linearize-insn
     binary-conditional _compare-branch emit-branch ;
@@ -62,6 +74,9 @@ M: ##compare-float-ordered-branch linearize-insn
 
 M: ##compare-float-unordered-branch linearize-insn
     binary-conditional _compare-float-unordered-branch emit-branch ;
+
+M: ##test-vector-branch linearize-insn
+    test-vector-conditional _test-vector-branch emit-branch ;
 
 : overflow-conditional ( bb insn -- bb successor label2 dst src1 src2 )
     [ dup successors block-number ]
