@@ -221,12 +221,15 @@ struct startargs {
 	vm_char **argv;
 };
 
+// arg must be new'ed because we're going to delete it!
 void* start_standalone_factor_thread(void *arg) 
 {
 	factor_vm *newvm = new factor_vm;
 	register_vm_with_thread(newvm);
 	startargs *args = (startargs*) arg;
-	newvm->start_standalone_factor(args->argc, args->argv);
+        int argc = args->argc; vm_char **argv = args->argv;
+        delete args;
+	newvm->start_standalone_factor(argc, argv);
 	return 0;
 }
 
@@ -240,8 +243,8 @@ VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 
 VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc, vm_char **argv)
 {
-	startargs *args = new startargs;   // leaks startargs structure
-	args->argc = argc; args->argv = argv;
+	startargs *args = new startargs;
+	args->argc = argc; args->argv = argv; 
 	return start_thread(start_standalone_factor_thread,args);
 }
 
