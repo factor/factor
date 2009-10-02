@@ -22,9 +22,9 @@ STRUCT: sfmt-state
     { r2 uint-4 } ;
 
 TUPLE: sfmt
-{ state sfmt-state }
-{ uint-array uint-array }
-{ uint-4-array uint-4-array } ;
+    { state sfmt-state }
+    { uint-array uint-array }
+    { uint-4-array uint-4-array } ;
 
 : wA ( w -- wA )
    dup 1 hlshift vbitxor ; inline
@@ -99,12 +99,15 @@ M:: sfmt generate ( sfmt -- )
         swap >>seed
         0 >>ix ;
 
+: init-sfmt ( sfmt -- sfmt' )
+    dup <sfmt-array> [ >>uint-array ] [ >>uint-4-array ] bi*
+    [ generate ] keep ; inline
+
 : <sfmt> ( seed n m mask -- sfmt )
     <sfmt-state>
     sfmt new
         swap >>state
-        dup <sfmt-array> [ >>uint-array ] [ >>uint-4-array ] bi*
-        [ generate ] keep ; inline
+        init-sfmt ; inline
 
 : refill-sfmt? ( sfmt -- ? )
     state>> [ ix>> ] [ n>> 4 * ] bi >= ;
@@ -119,6 +122,10 @@ PRIVATE>
 
 M: sfmt random-32* ( sfmt -- n )
     dup refill-sfmt? [ dup generate ] when next ; inline
+
+M: sfmt seed-random ( sfmt seed -- sfmt )
+    [ [ state>> ] dip >>seed drop ]
+    [ drop init-sfmt ] 2bi ;
 
 : <sfmt-19937> ( seed -- sfmt )
     348 330 uint-4{ HEX: BFFFFFF6 HEX: BFFAFFFF HEX: DDFECB7F HEX: DFFFFFEF }
