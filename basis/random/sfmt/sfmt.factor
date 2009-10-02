@@ -16,16 +16,15 @@ STRUCT: sfmt-state
     { seed uint }
     { n uint }
     { m uint }
-    { m-n int }
     { ix uint }
     { mask uint-4 }
     { r1 uint-4 }
     { r2 uint-4 } ;
 
 TUPLE: sfmt
-{ state sfmt-state }
-{ uint-array uint-array }
-{ uint-4-array uint-4-array } ;
+    { state sfmt-state }
+    { uint-array uint-array }
+    { uint-4-array uint-4-array } ;
 
 : wA ( w -- wA )
    dup 1 hlshift vbitxor ; inline
@@ -53,7 +52,6 @@ M:: sfmt generate ( sfmt -- )
     state n>> 1 - array nth state (>>r2)
     state m>> :> m 
     state n>> :> n 
-    state m-n>> :> m-n
     state mask>> :> mask
 
     n m - >fixnum iota [| i |
@@ -70,7 +68,7 @@ M:: sfmt generate ( sfmt -- )
     m 1 - iota [
         n m - 1 + + >fixnum :> i
         i array nth-unsafe
-        m-n i + array nth-unsafe
+        m n - i + array nth-unsafe
         mask state r1>> state r2>> formula :> r
 
         r i array set-nth-unsafe
@@ -99,15 +97,17 @@ M:: sfmt generate ( sfmt -- )
         swap >>m
         swap >>n
         swap >>seed
-        dup [ m>> ] [ n>> ] bi - >>m-n
         0 >>ix ;
+
+: init-sfmt ( sfmt -- sfmt' )
+    dup <sfmt-array> [ >>uint-array ] [ >>uint-4-array ] bi*
+    [ generate ] keep ; inline
 
 : <sfmt> ( seed n m mask -- sfmt )
     <sfmt-state>
     sfmt new
         swap >>state
-        dup <sfmt-array> [ >>uint-array ] [ >>uint-4-array ] bi*
-        [ generate ] keep ;
+        init-sfmt ; inline
 
 : refill-sfmt? ( sfmt -- ? )
     state>> [ ix>> ] [ n>> 4 * ] bi >= ;
@@ -121,8 +121,12 @@ M:: sfmt generate ( sfmt -- )
 PRIVATE>
 
 M: sfmt random-32* ( sfmt -- n )
-    dup refill-sfmt? [ dup generate ] when next ;
+    dup refill-sfmt? [ dup generate ] when next ; inline
+
+M: sfmt seed-random ( sfmt seed -- sfmt )
+    [ [ state>> ] dip >>seed drop ]
+    [ drop init-sfmt ] 2bi ;
 
 : <sfmt-19937> ( seed -- sfmt )
     348 330 uint-4{ HEX: BFFFFFF6 HEX: BFFAFFFF HEX: DDFECB7F HEX: DFFFFFEF }
-    <sfmt> ;
+    <sfmt> ; inline
