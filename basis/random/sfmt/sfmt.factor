@@ -17,7 +17,7 @@ CONSTANT: state-multiplier 1812433253
 TUPLE: sfmt
 sl1 sl2 sr1 sr2 mask parity
 { seed integer } { n fixnum } { m fixnum }
-{ ix fixnum } { state uint-4-array } ;
+{ m-n fixnum } { ix fixnum } { state uint-4-array } ;
 
 : init-state ( sfmt -- sfmt' )
     dup [ n>> 4 * iota >uint-array ] [ seed>> ] bi
@@ -55,8 +55,9 @@ M:: sfmt generate ( sfmt -- sfmt' )
     sfmt n>> 1 - sfmt state>> nth :> r2!
     0 :> r!
     0 :> i!
-    sfmt n>> :> n 
     sfmt m>> :> m 
+    sfmt n>> :> n 
+    sfmt m-n>> :> m-n
     sfmt mask>> :> mask
     sfmt state>> :> state
 
@@ -71,10 +72,10 @@ M:: sfmt generate ( sfmt -- sfmt' )
         r r2!
     ] each
 
-    i 1 + n [a,b) [
+    n m - 1 + n [a,b) [
         i!
         i state nth 
-        m n - i + state nth
+        m-n i + state nth
         mask r1 r2 formula r!
 
         r i state set-nth
@@ -95,6 +96,7 @@ M:: sfmt generate ( sfmt -- sfmt' )
         swap >>m
         swap >>n
         swap 32 bits >>seed
+        dup [ m>> ] [ n>> ] bi - >>m-n
         0 >>ix
         init-state
         generate ;
