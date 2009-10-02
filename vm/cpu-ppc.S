@@ -110,7 +110,7 @@ multiply_overflow:
 
 /* We have to save and restore nonvolatile registers because
 the Factor compiler treats the entire register file as volatile. */
-DEF(void,c_to_factor,(CELL quot, void *vm)):
+DEF(void,c_to_factor,(cell quot, void *vm)):
 	PROLOGUE
 
 	SAVE_INT(r15,0)	   /* save GPRs */
@@ -176,12 +176,17 @@ DEF(void,c_to_factor,(CELL quot, void *vm)):
         lvxl v0,r2,r1
         mtvscr v0
 
-	SAVE_INT(r3,19)	   /* save quotation since we're about to mangle it */
+        /* save args in non-volatile regs */
+        mr r15,r3
+        mr r16,r4
 
-	mr r3,r1	   /* pass call stack pointer as an argument */
+	/* pass call stack pointer as an argument */
+	mr r3,r1
 	bl MANGLE(save_callstack_bottom)
 
-	RESTORE_INT(r3,19)	 /* restore quotation */
+	/* restore quotation args */
+	mr r3,r15
+	mr r4,r16
 	CALL_QUOT
 
         RESTORE_V(v0,104)
@@ -200,6 +205,7 @@ DEF(void,c_to_factor,(CELL quot, void *vm)):
         RESTORE_V(v21,60)
         RESTORE_V(v20,56)
 
+        /* Restore FPRs */
 	RESTORE_FP(f31,54)
 	RESTORE_FP(f30,52)
 	RESTORE_FP(f29,50)
@@ -217,9 +223,10 @@ DEF(void,c_to_factor,(CELL quot, void *vm)):
 	RESTORE_FP(f17,26)
 	RESTORE_FP(f16,24)
 	RESTORE_FP(f15,22)
-	RESTORE_FP(f14,20)	/* save FPRs */
+	RESTORE_FP(f14,20)
 
-	RESTORE_INT(r31,16)   /* restore GPRs */
+	/* restore GPRs */
+	RESTORE_INT(r31,16)   
 	RESTORE_INT(r30,15)
 	RESTORE_INT(r29,14)
 	RESTORE_INT(r28,13)
@@ -243,7 +250,7 @@ DEF(void,c_to_factor,(CELL quot, void *vm)):
 /* We pass a function pointer to memcpy in r6 to work around a Mac OS X ABI
 limitation which would otherwise require us to do a bizzaro PC-relative
 trampoline to retrieve the function address */
-DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *memcpy)):
+DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, cell length, void *memcpy)):
 	sub r1,r3,r5	   /* compute new stack pointer */
 	mr r3,r1	   /* start of destination of memcpy() */
 	stwu r1,-64(r1)	   /* setup fake stack frame for memcpy() */
@@ -254,14 +261,14 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	mtlr r0		   /* prepare to return to restored callstack */
 	blr		   /* go */
 
-DEF(void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
+DEF(void,throw_impl,(cell quot, F_STACK_FRAME *rewind_to, void *vm)):
 	mr r1,r4	   /* compute new stack pointer */
 	mr r4,r5	   /* make vm ptr 2nd arg in case quot_xt = lazy_jit_compile */
 	lwz r0,LR_SAVE(r1) /* we have rewound the stack; load return address */
 	mtlr r0
 	JUMP_QUOT	   /* call the quotation */
 
-DEF(void,lazy_jit_compile,(CELL quot, void *vm)):
+DEF(void,lazy_jit_compile,(cell quot, void *vm)):
 	mr r5,r4	   /* vm ptr is 3rd arg */
 	mr r4,r1	   /* save stack pointer */
 	PROLOGUE
